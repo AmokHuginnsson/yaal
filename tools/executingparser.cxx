@@ -60,8 +60,8 @@ class HRecursionDetector {
 	checkpoints_t _checkpoints;
 public:
 	HRecursionDetector( void )
-		: _visited(),
-		_checkpoints() {
+		: _visited()
+		, _checkpoints() {
 		_visited.emplace();
 		_checkpoints.emplace();
 		return;
@@ -169,9 +169,12 @@ private:
 }
 
 HExecutingParser::HExecutingParser( executing_parser::HRuleBase const& rule_, INIT_MODE initMode_ )
-	: _grammar( rule_.clone() ), _excutors(), _matched( false ),
-	_errorPosition( yaal::hcore::HString::npos ), _errorMessages(),
-	_inputStart( NULL ) {
+	: _grammar( rule_.clone() )
+	, _excutors()
+	, _matched( false )
+	, _errorPosition( yaal::hcore::HString::npos )
+	, _errorMessages()
+	, _inputStart( NULL ) {
 	M_PROLOG
 	if ( initMode_ == INIT_MODE::VERIFY_GRAMMAR ) {
 		sanitize();
@@ -555,120 +558,120 @@ void HNamedRule::describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const 
 }
 
 HRule::HRule( void )
-	: HRuleBase(),
-	_rule( make_pointer<HRecursiveRule>() ),
-	_completelyDefined( false ) {
+	: HRuleBase()
+	, _rule( make_pointer<HRecursiveRule>() )
+	, _completelyDefined( false ) {
 	return;
 }
 
 HRule::HRule( action_t const& action_ )
-	: HRuleBase( action_ ),
-	_rule( make_pointer<HRecursiveRule>() ),
-	_completelyDefined( false ) {
+	: HRuleBase( action_ )
+	, _rule( make_pointer<HRecursiveRule>() )
+	, _completelyDefined( false ) {
 	return;
 }
 
 HRule::HRule( action_position_t const& action_ )
-	: HRuleBase( action_ ),
-	_rule( make_pointer<HRecursiveRule>() ),
-	_completelyDefined( false ) {
+	: HRuleBase( action_ )
+	, _rule( make_pointer<HRecursiveRule>() )
+	, _completelyDefined( false ) {
 	return;
 }
 
 HRule::HRule( yaal::hcore::HString const& name_ )
-	: HRuleBase(),
-	_rule( name_, make_pointer<HRecursiveRule>() ),
-	_completelyDefined( false ) {
+	: HRuleBase()
+	, _rule( name_, make_pointer<HRecursiveRule>() )
+	, _completelyDefined( false ) {
 	return;
 }
 
 HRule::HRule( yaal::hcore::HString const& name_, action_t const& action_ )
-	: HRuleBase( action_ ),
-	_rule( name_, make_pointer<HRecursiveRule>() ),
-	_completelyDefined( false ) {
+	: HRuleBase( action_ )
+	, _rule( name_, make_pointer<HRecursiveRule>() )
+	, _completelyDefined( false ) {
 	return;
 }
 
 HRule::HRule( yaal::hcore::HString const& name_, action_position_t const& action_ )
-	: HRuleBase( action_ ),
-	_rule( name_, make_pointer<HRecursiveRule>() ),
-	_completelyDefined( false ) {
+	: HRuleBase( action_ )
+	, _rule( name_, make_pointer<HRecursiveRule>() )
+	, _completelyDefined( false ) {
 	return;
 }
 
 HRule::HRule( HRule const& rule_ )
-	: HRuleBase( rule_._action, rule_._actionPosition ),
-	_rule( rule_._rule ),
-	_completelyDefined( rule_._completelyDefined ) {
+	: HRuleBase( rule_._action, rule_._actionPosition )
+	, _rule( rule_._rule )
+	, _completelyDefined( rule_._completelyDefined ) {
 	return;
 }
 
 HRule::HRule( HRuleBase const& rule_ )
-	: HRuleBase(),
-	_rule( rule_.clone() ),
-	_completelyDefined( true ) {
+	: HRuleBase()
+	, _rule( rule_.clone() )
+	, _completelyDefined( true ) {
 	return;
 }
 
 HRule::HRule( HRuleBase const& rule_, action_t const& action_ )
-	: HRuleBase( action_ ),
-	_rule( rule_.clone() ),
-	_completelyDefined( true ) {
+	: HRuleBase( action_ )
+	, _rule( rule_.clone() )
+	, _completelyDefined( true ) {
 	return;
 }
 
 HRule::HRule( HRuleBase const& rule_, action_position_t const& action_ )
-	: HRuleBase( action_ ),
-	_rule( rule_.clone() ),
-	_completelyDefined( true ) {
+	: HRuleBase( action_ )
+	, _rule( rule_.clone() )
+	, _completelyDefined( true ) {
 	return;
 }
 
 HRule::HRule( ptr_t const& rule_ )
-	: HRuleBase(),
-	_rule( rule_ ),
-	_completelyDefined( true ) {
+	: HRuleBase()
+	, _rule( rule_ )
+	, _completelyDefined( true ) {
 	return;
 }
 
 HRule::HRule( yaal::hcore::HString const& name_, HRuleBase const& rule_ )
-	: HRuleBase(),
-	_rule( name_, rule_.clone() ),
-	_completelyDefined( true ) {
+	: HRuleBase()
+	, _rule( name_, rule_.clone() )
+	, _completelyDefined( true ) {
 	return;
 }
 
 HRule::HRule( yaal::hcore::HString const& name_, HRuleBase const& rule_, action_t const& action_ )
-	: HRuleBase( action_ ),
-	_rule( name_, rule_.clone() ),
-	_completelyDefined( true ) {
+	: HRuleBase( action_ )
+	, _rule( name_, rule_.clone() )
+	, _completelyDefined( true ) {
 	return;
 }
 
 HRule::HRule( yaal::hcore::HString const& name_, HRuleBase const& rule_, action_position_t const& action_ )
-	: HRuleBase( action_ ),
-	_rule( name_, rule_.clone() ),
-	_completelyDefined( true ) {
+	: HRuleBase( action_ )
+	, _rule( name_, rule_.clone() )
+	,_completelyDefined( true ) {
 	return;
 }
 
 HRule::HRule( yaal::hcore::HString const& name_, ptr_t const& rule_ )
-	: _rule( name_, rule_ ),
-	_completelyDefined( true ) {
+	: _rule( name_, rule_ )
+	, _completelyDefined( true ) {
 	return;
 }
 
 HRule::HRule( yaal::hcore::HString const& name_, ptr_t const& rule_, action_t const& action_ )
-	: HRuleBase( action_ ),
-	_rule( name_, rule_ ),
-	_completelyDefined( true ) {
+	: HRuleBase( action_ )
+	, _rule( name_, rule_ )
+	, _completelyDefined( true ) {
 	return;
 }
 
 HRule::HRule( yaal::hcore::HString const& name_, ptr_t const& rule_, action_position_t const& action_ )
-	: HRuleBase( action_ ),
-	_rule( name_, rule_ ),
-	_completelyDefined( true ) {
+	: HRuleBase( action_ )
+	, _rule( name_, rule_ )
+	, _completelyDefined( true ) {
 	return;
 }
 
@@ -975,7 +978,8 @@ HRuleBase::ptr_t HRuleRef::get_rule( void ) const {
 }
 
 HFollows::HFollows( HRuleBase const& predecessor_, HRuleBase const& successor_ )
-	: HRuleBase(), _rules() {
+	: HRuleBase()
+	, _rules() {
 	M_PROLOG
 	_rules.push_back( predecessor_ );
 	_rules.push_back( successor_ );
@@ -985,14 +989,16 @@ HFollows::HFollows( HRuleBase const& predecessor_, HRuleBase const& successor_ )
 }
 
 HFollows::HFollows( HFollows const& follows_ )
-	: HRuleBase( follows_._action, follows_._actionPosition ), _rules( follows_._rules ) {
+	: HRuleBase( follows_._action, follows_._actionPosition )
+	, _rules( follows_._rules ) {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
 HFollows::HFollows( HFollows const& predecessors_, HRuleBase const& successor_ )
-	: HRuleBase(), _rules() {
+	: HRuleBase()
+	, _rules() {
 	M_PROLOG
 	for ( rules_t::const_iterator it( predecessors_._rules.begin() ), end( predecessors_._rules.end() ); it != end; ++ it )
 		_rules.push_back( *it );
@@ -1003,12 +1009,14 @@ HFollows::HFollows( HFollows const& predecessors_, HRuleBase const& successor_ )
 }
 
 HFollows::HFollows( HFollows::rules_t const& rules_, action_t const& action_ )
-	: HRuleBase( action_ ), _rules( rules_ ) {
+	: HRuleBase( action_ )
+	, _rules( rules_ ) {
 	return;
 }
 
 HFollows::HFollows( HFollows::rules_t const& rules_, action_position_t const& action_ )
-	: HRuleBase( action_ ), _rules( rules_ ) {
+	: HRuleBase( action_ )
+	, _rules( rules_ ) {
 	return;
 }
 
@@ -1129,22 +1137,26 @@ void HFollows::do_find_recursions( HRuleAggregator& recursions_ ) {
 }
 
 HKleeneBase::HKleeneBase( HRuleBase const& rule_ )
-	: HRuleBase(), _rule( rule_ ) {
+	: HRuleBase()
+	, _rule( rule_ ) {
 	return;
 }
 
 HKleeneBase::HKleeneBase( HNamedRule const& rule_, action_t const& action_ )
-	: HRuleBase( action_ ), _rule( rule_ ) {
+	: HRuleBase( action_ )
+	, _rule( rule_ ) {
 	return;
 }
 
 HKleeneBase::HKleeneBase( HNamedRule const& rule_, action_position_t const& action_ )
-	: HRuleBase( action_ ), _rule( rule_ ) {
+	: HRuleBase( action_ )
+	, _rule( rule_ ) {
 	return;
 }
 
 HKleeneBase::HKleeneBase( HNamedRule const& rule_, action_t const& action_, action_position_t const& actionPosition_ )
-	: HRuleBase( action_, actionPosition_ ), _rule( rule_ ) {
+	: HRuleBase( action_, actionPosition_ )
+	, _rule( rule_ ) {
 	return;
 }
 
@@ -1331,7 +1343,8 @@ void HKleenePlus::do_detect_recursion( HRecursionDetector& recursionDetector_ ) 
 }
 
 HAlternative::HAlternative( HRuleBase const& choice1_, HRuleBase const& choice2_ )
-	: HRuleBase(), _rules() {
+	: HRuleBase()
+	, _rules() {
 	M_PROLOG
 	_rules.push_back( choice1_ );
 	_rules.push_back( choice2_ );
@@ -1341,14 +1354,16 @@ HAlternative::HAlternative( HRuleBase const& choice1_, HRuleBase const& choice2_
 }
 
 HAlternative::HAlternative( HAlternative const& alternative_ )
-	: HRuleBase( alternative_._action, alternative_._actionPosition ), _rules( alternative_._rules ) {
+	: HRuleBase( alternative_._action, alternative_._actionPosition )
+	, _rules( alternative_._rules ) {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
 HAlternative::HAlternative( HAlternative const& alternative_, HRuleBase const& choice_ )
-	: HRuleBase(), _rules() {
+	: HRuleBase()
+	, _rules() {
 	M_PROLOG
 	for ( rules_t::const_iterator it( alternative_._rules.begin() ), end( alternative_._rules.end() ); it != end; ++ it ) {
 		_rules.push_back( *it );
@@ -1360,12 +1375,14 @@ HAlternative::HAlternative( HAlternative const& alternative_, HRuleBase const& c
 }
 
 HAlternative::HAlternative( rules_t const& rules_, action_t const& action_ )
-	: HRuleBase( action_ ), _rules( rules_ ) {
+	: HRuleBase( action_ )
+	, _rules( rules_ ) {
 	return;
 }
 
 HAlternative::HAlternative( rules_t const& rules_, action_position_t const& action_ )
-	: HRuleBase( action_ ), _rules( rules_ ) {
+	: HRuleBase( action_ )
+	, _rules( rules_ ) {
 	return;
 }
 
@@ -1481,23 +1498,26 @@ void HAlternative::do_find_recursions( HRuleAggregator& recursions_ ) {
 }
 
 HOptional::HOptional( HRuleBase const& rule_ )
-	: HRuleBase(), _rule( rule_ ) {
+	: HRuleBase()
+	, _rule( rule_ ) {
 	return;
 }
 
 HOptional::HOptional( HOptional const& optional_ )
-	: HRuleBase( optional_._action, optional_._actionPosition ),
-	_rule( optional_._rule ) {
+	: HRuleBase( optional_._action, optional_._actionPosition )
+	, _rule( optional_._rule ) {
 	return;
 }
 
 HOptional::HOptional( HNamedRule const& rule_, action_t const& action_ )
-	: HRuleBase( action_ ), _rule( rule_ ) {
+	: HRuleBase( action_ )
+	, _rule( rule_ ) {
 	return;
 }
 
 HOptional::HOptional( HNamedRule const& rule_, action_position_t const& action_ )
-	: HRuleBase( action_ ), _rule( rule_ ) {
+	: HRuleBase( action_ )
+	, _rule( rule_ ) {
 	return;
 }
 
@@ -1598,24 +1618,30 @@ void HOptional::do_find_recursions( HRuleAggregator& recursions_ ) {
 }
 
 HAnd::HAnd( HRuleBase const& rule_, HRuleBase const& and_ )
-	: HRuleBase(), _rule( rule_ ), _and( and_ ) {
+	: HRuleBase()
+	, _rule( rule_ )
+	, _and( and_ ) {
 	return;
 }
 
 HAnd::HAnd( HAnd const& and_ )
-	: HRuleBase( and_._action, and_._actionPosition ),
-	_rule( and_._rule ),
-	_and( and_._and ) {
+	: HRuleBase( and_._action, and_._actionPosition )
+	, _rule( and_._rule )
+	, _and( and_._and ) {
 	return;
 }
 
 HAnd::HAnd( HNamedRule const& rule_, HNamedRule const& and_, action_t const& action_ )
-	: HRuleBase( action_ ), _rule( rule_ ), _and( and_ ) {
+	: HRuleBase( action_ )
+	, _rule( rule_ )
+	, _and( and_ ) {
 	return;
 }
 
 HAnd::HAnd( HNamedRule const& rule_, HNamedRule const& and_, action_position_t const& action_ )
-	: HRuleBase( action_ ), _rule( rule_ ), _and( and_ ) {
+	: HRuleBase( action_ )
+	, _rule( rule_ )
+	, _and( and_ ) {
 	return;
 }
 
@@ -1735,24 +1761,30 @@ void HAnd::do_find_recursions( HRuleAggregator& recursions_ ) {
 }
 
 HNot::HNot( HRuleBase const& rule_, HRuleBase const& not_ )
-	: HRuleBase(), _rule( rule_ ), _not( not_ ) {
+	: HRuleBase()
+	, _rule( rule_ )
+	, _not( not_ ) {
 	return;
 }
 
 HNot::HNot( HNot const& not_ )
-	: HRuleBase( not_._action, not_._actionPosition ),
-	_rule( not_._rule ),
-	_not( not_._not ) {
+	: HRuleBase( not_._action, not_._actionPosition )
+	, _rule( not_._rule )
+	, _not( not_._not ) {
 	return;
 }
 
 HNot::HNot( HNamedRule const& rule_, HNamedRule const& not_, action_t const& action_ )
-	: HRuleBase( action_ ), _rule( rule_ ), _not( not_ ) {
+	: HRuleBase( action_ )
+	, _rule( rule_ )
+	, _not( not_ ) {
 	return;
 }
 
 HNot::HNot( HNamedRule const& rule_, HNamedRule const& not_, action_position_t const& action_ )
-	: HRuleBase( action_ ), _rule( rule_ ), _not( not_ ) {
+	: HRuleBase( action_ )
+	, _rule( rule_ )
+	, _not( not_ ) {
 	return;
 }
 
@@ -1970,123 +2002,182 @@ HOptional operator - ( HRuleBase const& rule_ ) {
 }
 
 HReal::HReal( PARSE parse_ )
-	: HRuleBase(), _actionDouble(), _actionDoublePosition(),
-	_actionDoubleLong(), _actionDoubleLongPosition(),
-	_actionNumber(), _actionNumberPosition(),
-	_actionString(), _actionStringPosition(),
-	_parse( parse_ ),
-	_cache() {
+	: HRuleBase()
+	, _actionDouble()
+	, _actionDoublePosition()
+	, _actionDoubleLong()
+	, _actionDoubleLongPosition()
+	, _actionNumber()
+	, _actionNumberPosition()
+	, _actionString()
+	, _actionStringPosition()
+	, _parse( parse_ )
+	, _cache() {
 	return;
 }
 
 HReal::HReal( action_t const& action_, PARSE parse_ )
-	: HRuleBase( action_ ), _actionDouble(), _actionDoublePosition(),
-	_actionDoubleLong(), _actionDoubleLongPosition(),
-	_actionNumber(), _actionNumberPosition(),
-	_actionString(), _actionStringPosition(),
-	_parse( parse_ ),
-	_cache() {
+	: HRuleBase( action_ )
+	, _actionDouble()
+	, _actionDoublePosition()
+	, _actionDoubleLong()
+	, _actionDoubleLongPosition()
+	, _actionNumber()
+	, _actionNumberPosition()
+	, _actionString()
+	, _actionStringPosition()
+	, _parse( parse_ )
+	, _cache() {
 	return;
 }
 
 HReal::HReal( action_position_t const& action_, PARSE parse_ )
-	: HRuleBase( action_ ), _actionDouble(), _actionDoublePosition(),
-	_actionDoubleLong(), _actionDoubleLongPosition(),
-	_actionNumber(), _actionNumberPosition(),
-	_actionString(), _actionStringPosition(),
-	_parse( parse_ ),
-	_cache() {
+	: HRuleBase( action_ )
+	, _actionDouble()
+	, _actionDoublePosition()
+	, _actionDoubleLong()
+	, _actionDoubleLongPosition()
+	, _actionNumber()
+	, _actionNumberPosition()
+	, _actionString()
+	, _actionStringPosition()
+	, _parse( parse_ )
+	, _cache() {
 	return;
 }
 
 HReal::HReal( action_double_t const& action_, PARSE parse_ )
-	: HRuleBase(), _actionDouble( action_ ), _actionDoublePosition(),
-	_actionDoubleLong(), _actionDoubleLongPosition(),
-	_actionNumber(), _actionNumberPosition(),
-	_actionString(), _actionStringPosition(),
-	_parse( parse_ ),
-	_cache() {
+	: HRuleBase()
+	, _actionDouble( action_ )
+	, _actionDoublePosition()
+	, _actionDoubleLong()
+	, _actionDoubleLongPosition()
+	, _actionNumber()
+	, _actionNumberPosition()
+	, _actionString()
+	, _actionStringPosition()
+	, _parse( parse_ )
+	, _cache() {
 	return;
 }
 
 HReal::HReal( action_double_position_t const& action_, PARSE parse_ )
-	: HRuleBase(), _actionDouble(), _actionDoublePosition( action_ ),
-	_actionDoubleLong(), _actionDoubleLongPosition(),
-	_actionNumber(), _actionNumberPosition(),
-	_actionString(), _actionStringPosition(),
-	_parse( parse_ ),
-	_cache() {
+	: HRuleBase()
+	, _actionDouble()
+	, _actionDoublePosition( action_ )
+	, _actionDoubleLong()
+	, _actionDoubleLongPosition()
+	, _actionNumber()
+	, _actionNumberPosition()
+	, _actionString()
+	, _actionStringPosition()
+	, _parse( parse_ )
+	, _cache() {
 	return;
 }
 
 HReal::HReal( action_double_long_t const& action_, PARSE parse_ )
-	: HRuleBase(), _actionDouble(), _actionDoublePosition(),
-	_actionDoubleLong( action_ ), _actionDoubleLongPosition(),
-	_actionNumber(), _actionNumberPosition(),
-	_actionString(), _actionStringPosition(),
-	_parse( parse_ ),
-	_cache() {
+	: HRuleBase()
+	, _actionDouble()
+	, _actionDoublePosition()
+	, _actionDoubleLong( action_ )
+	, _actionDoubleLongPosition()
+	, _actionNumber()
+	, _actionNumberPosition()
+	, _actionString()
+	, _actionStringPosition()
+	, _parse( parse_ )
+	, _cache() {
 	return;
 }
 
 HReal::HReal( action_double_long_position_t const& action_, PARSE parse_ )
-	: HRuleBase(), _actionDouble(), _actionDoublePosition(),
-	_actionDoubleLong(), _actionDoubleLongPosition( action_ ),
-	_actionNumber(), _actionNumberPosition(),
-	_actionString(), _actionStringPosition(),
-	_parse( parse_ ),
-	_cache() {
+	: HRuleBase()
+	, _actionDouble()
+	, _actionDoublePosition()
+	, _actionDoubleLong()
+	, _actionDoubleLongPosition( action_ )
+	, _actionNumber()
+	, _actionNumberPosition()
+	, _actionString()
+	, _actionStringPosition()
+	, _parse( parse_ )
+	, _cache() {
 	return;
 }
 
 HReal::HReal( action_number_t const& action_, PARSE parse_ )
-	: HRuleBase(), _actionDouble(), _actionDoublePosition(),
-	_actionDoubleLong(), _actionDoubleLongPosition(),
-	_actionNumber( action_ ), _actionNumberPosition(),
-	_actionString(), _actionStringPosition(),
-	_parse( parse_ ),
-	_cache() {
+	: HRuleBase()
+	, _actionDouble()
+	, _actionDoublePosition()
+	, _actionDoubleLong()
+	, _actionDoubleLongPosition()
+	, _actionNumber( action_ )
+	, _actionNumberPosition()
+	, _actionString()
+	, _actionStringPosition()
+	, _parse( parse_ )
+	, _cache() {
 	return;
 }
 
 HReal::HReal( action_number_position_t const& action_, PARSE parse_ )
-	: HRuleBase(), _actionDouble(), _actionDoublePosition(),
-	_actionDoubleLong(), _actionDoubleLongPosition(),
-	_actionNumber(), _actionNumberPosition( action_ ),
-	_actionString(), _actionStringPosition(),
-	_parse( parse_ ),
-	_cache() {
+	: HRuleBase()
+	, _actionDouble()
+	, _actionDoublePosition()
+	, _actionDoubleLong()
+	, _actionDoubleLongPosition()
+	, _actionNumber()
+	, _actionNumberPosition( action_ )
+	, _actionString()
+	, _actionStringPosition()
+	, _parse( parse_ )
+	, _cache() {
 	return;
 }
 
 HReal::HReal( action_string_t const& action_, PARSE parse_ )
-	: HRuleBase(), _actionDouble(), _actionDoublePosition(),
-	_actionDoubleLong(), _actionDoubleLongPosition(),
-	_actionNumber(), _actionNumberPosition(),
-	_actionString( action_ ), _actionStringPosition(),
-	_parse( parse_ ),
-	_cache() {
+	: HRuleBase()
+	, _actionDouble()
+	, _actionDoublePosition()
+	, _actionDoubleLong()
+	, _actionDoubleLongPosition()
+	, _actionNumber()
+	, _actionNumberPosition()
+	, _actionString( action_ )
+	, _actionStringPosition()
+	, _parse( parse_ )
+	, _cache() {
 	return;
 }
 
 HReal::HReal( action_string_position_t const& action_, PARSE parse_ )
-	: HRuleBase(), _actionDouble(), _actionDoublePosition(),
-	_actionDoubleLong(), _actionDoubleLongPosition(),
-	_actionNumber(), _actionNumberPosition(),
-	_actionString(), _actionStringPosition( action_ ),
-	_parse( parse_ ),
-	_cache() {
+	: HRuleBase()
+	, _actionDouble()
+	, _actionDoublePosition()
+	, _actionDoubleLong()
+	, _actionDoubleLongPosition()
+	, _actionNumber()
+	, _actionNumberPosition()
+	, _actionString()
+	, _actionStringPosition( action_ )
+	, _parse( parse_ )
+	, _cache() {
 	return;
 }
 
 HReal::HReal( HReal const& real_ )
-	: HRuleBase( real_._action, real_._actionPosition ),
-	_actionDouble( real_._actionDouble ), _actionDoublePosition( real_._actionDoublePosition ),
-	_actionDoubleLong( real_._actionDoubleLong ), _actionDoubleLongPosition( real_._actionDoubleLongPosition ),
-	_actionNumber( real_._actionNumber ), _actionNumberPosition( real_._actionNumberPosition ),
-	_actionString( real_._actionString ), _actionStringPosition( real_._actionStringPosition ),
-	_parse( real_._parse ),
-	_cache( real_._cache ) {
+	: HRuleBase( real_._action, real_._actionPosition )
+	, _actionDouble( real_._actionDouble )
+	, _actionDoublePosition( real_._actionDoublePosition )
+	, _actionDoubleLong( real_._actionDoubleLong )
+	, _actionDoubleLongPosition( real_._actionDoubleLongPosition )
+	, _actionNumber( real_._actionNumber )
+	, _actionNumberPosition( real_._actionNumberPosition )
+	, _actionString( real_._actionString )
+	, _actionStringPosition( real_._actionStringPosition )
+	, _parse( real_._parse )
+	, _cache( real_._cache ) {
 	return;
 }
 
@@ -2298,156 +2389,226 @@ HReal const& get_real_instance( void ) {
 HReal const& real( get_real_instance() );
 
 HInteger::HInteger( void )
-	: HRuleBase(),
-	_actionIntLongLong(), _actionIntLongLongPosition(),
-	_actionIntLong(), _actionIntLongPosition(),
-	_actionInt(), _actionIntPosition(),
-	_actionNumber(), _actionNumberPosition(),
-	_actionString(), _actionStringPosition(),
-	_cache() {
+	: HRuleBase()
+	, _actionIntLongLong()
+	, _actionIntLongLongPosition()
+	, _actionIntLong()
+	, _actionIntLongPosition()
+	, _actionInt()
+	, _actionIntPosition()
+	, _actionNumber()
+	, _actionNumberPosition()
+	, _actionString()
+	, _actionStringPosition()
+	, _cache() {
 	return;
 }
 
 HInteger::HInteger( action_t const& action_ )
-	: HRuleBase( action_ ),
-	_actionIntLongLong(), _actionIntLongLongPosition(),
-	_actionIntLong(), _actionIntLongPosition(),
-	_actionInt(), _actionIntPosition(),
-	_actionNumber(), _actionNumberPosition(),
-	_actionString(), _actionStringPosition(),
-	_cache() {
+	: HRuleBase( action_ )
+	, _actionIntLongLong()
+	, _actionIntLongLongPosition()
+	, _actionIntLong()
+	, _actionIntLongPosition()
+	, _actionInt()
+	, _actionIntPosition()
+	, _actionNumber()
+	, _actionNumberPosition()
+	, _actionString()
+	, _actionStringPosition()
+	, _cache() {
 	return;
 }
 
 HInteger::HInteger( action_position_t const& action_ )
-	: HRuleBase( action_ ),
-	_actionIntLongLong(), _actionIntLongLongPosition(),
-	_actionIntLong(), _actionIntLongPosition(),
-	_actionInt(), _actionIntPosition(),
-	_actionNumber(), _actionNumberPosition(),
-	_actionString(), _actionStringPosition(),
-	_cache() {
+	: HRuleBase( action_ )
+	, _actionIntLongLong()
+	, _actionIntLongLongPosition()
+	, _actionIntLong()
+	, _actionIntLongPosition()
+	, _actionInt()
+	, _actionIntPosition()
+	, _actionNumber()
+	, _actionNumberPosition()
+	, _actionString()
+	, _actionStringPosition()
+	, _cache() {
 	return;
 }
 
 HInteger::HInteger( action_int_long_long_t const& action_ )
-	: HRuleBase(),
-	_actionIntLongLong( action_ ), _actionIntLongLongPosition(),
-	_actionIntLong(), _actionIntLongPosition(),
-	_actionInt(), _actionIntPosition(),
-	_actionNumber(), _actionNumberPosition(),
-	_actionString(), _actionStringPosition(),
-	_cache() {
+	: HRuleBase()
+	, _actionIntLongLong( action_ )
+	, _actionIntLongLongPosition()
+	, _actionIntLong()
+	, _actionIntLongPosition()
+	, _actionInt()
+	, _actionIntPosition()
+	, _actionNumber()
+	, _actionNumberPosition()
+	, _actionString()
+	, _actionStringPosition()
+	, _cache() {
 	return;
 }
 
 HInteger::HInteger( action_int_long_long_position_t const& action_ )
-	: HRuleBase(),
-	_actionIntLongLong(), _actionIntLongLongPosition( action_ ),
-	_actionIntLong(), _actionIntLongPosition(),
-	_actionInt(), _actionIntPosition(),
-	_actionNumber(), _actionNumberPosition(),
-	_actionString(), _actionStringPosition(),
-	_cache() {
+	: HRuleBase()
+	, _actionIntLongLong()
+	, _actionIntLongLongPosition( action_ )
+	, _actionIntLong()
+	, _actionIntLongPosition()
+	, _actionInt()
+	, _actionIntPosition()
+	, _actionNumber()
+	, _actionNumberPosition()
+	, _actionString()
+	, _actionStringPosition()
+	, _cache() {
 	return;
 }
 
 HInteger::HInteger( action_int_long_t const& action_ )
-	: HRuleBase(),
-	_actionIntLongLong(), _actionIntLongLongPosition(),
-	_actionIntLong( action_ ), _actionIntLongPosition(),
-	_actionInt(), _actionIntPosition(),
-	_actionNumber(), _actionNumberPosition(),
-	_actionString(), _actionStringPosition(),
-	_cache() {
+	: HRuleBase()
+	, _actionIntLongLong()
+	, _actionIntLongLongPosition()
+	, _actionIntLong( action_ )
+	, _actionIntLongPosition()
+	, _actionInt()
+	, _actionIntPosition()
+	, _actionNumber()
+	, _actionNumberPosition()
+	, _actionString()
+	, _actionStringPosition()
+	, _cache() {
 	return;
 }
 
 HInteger::HInteger( action_int_long_position_t const& action_ )
-	: HRuleBase(),
-	_actionIntLongLong(), _actionIntLongLongPosition(),
-	_actionIntLong(), _actionIntLongPosition( action_ ),
-	_actionInt(), _actionIntPosition(),
-	_actionNumber(), _actionNumberPosition(),
-	_actionString(), _actionStringPosition(),
-	_cache() {
+	: HRuleBase()
+	, _actionIntLongLong()
+	, _actionIntLongLongPosition()
+	, _actionIntLong()
+	, _actionIntLongPosition( action_ )
+	, _actionInt()
+	, _actionIntPosition()
+	, _actionNumber()
+	, _actionNumberPosition()
+	, _actionString()
+	, _actionStringPosition()
+	, _cache() {
 	return;
 }
 
 HInteger::HInteger( action_int_t const& action_ )
-	: HRuleBase(),
-	_actionIntLongLong(), _actionIntLongLongPosition(),
-	_actionIntLong(), _actionIntLongPosition(),
-	_actionInt( action_ ), _actionIntPosition(),
-	_actionNumber(), _actionNumberPosition(),
-	_actionString(), _actionStringPosition(),
-	_cache() {
+	: HRuleBase()
+	, _actionIntLongLong()
+	, _actionIntLongLongPosition()
+	, _actionIntLong()
+	, _actionIntLongPosition()
+	, _actionInt( action_ )
+	, _actionIntPosition()
+	, _actionNumber()
+	, _actionNumberPosition()
+	, _actionString()
+	, _actionStringPosition()
+	, _cache() {
 	return;
 }
 
 HInteger::HInteger( action_int_position_t const& action_ )
-	: HRuleBase(),
-	_actionIntLongLong(), _actionIntLongLongPosition(),
-	_actionIntLong(), _actionIntLongPosition(),
-	_actionInt(), _actionIntPosition( action_ ),
-	_actionNumber(), _actionNumberPosition(),
-	_actionString(), _actionStringPosition(),
-	_cache() {
+	: HRuleBase()
+	, _actionIntLongLong()
+	, _actionIntLongLongPosition()
+	, _actionIntLong()
+	, _actionIntLongPosition()
+	, _actionInt()
+	, _actionIntPosition( action_ )
+	, _actionNumber()
+	, _actionNumberPosition()
+	, _actionString()
+	, _actionStringPosition()
+	, _cache() {
 	return;
 }
 
 HInteger::HInteger( action_number_t const& action_ )
-	: HRuleBase(),
-	_actionIntLongLong(), _actionIntLongLongPosition(),
-	_actionIntLong(), _actionIntLongPosition(),
-	_actionInt(), _actionIntPosition(),
-	_actionNumber( action_ ), _actionNumberPosition(),
-	_actionString(), _actionStringPosition(),
-	_cache() {
+	: HRuleBase()
+	, _actionIntLongLong()
+	, _actionIntLongLongPosition()
+	, _actionIntLong()
+	, _actionIntLongPosition()
+	, _actionInt()
+	, _actionIntPosition()
+	, _actionNumber( action_ )
+	, _actionNumberPosition()
+	, _actionString()
+	, _actionStringPosition()
+	, _cache() {
 	return;
 }
 
 HInteger::HInteger( action_number_position_t const& action_ )
-	: HRuleBase(),
-	_actionIntLongLong(), _actionIntLongLongPosition(),
-	_actionIntLong(), _actionIntLongPosition(),
-	_actionInt(), _actionIntPosition(),
-	_actionNumber(), _actionNumberPosition( action_ ),
-	_actionString(), _actionStringPosition(),
-	_cache() {
+	: HRuleBase()
+	, _actionIntLongLong()
+	, _actionIntLongLongPosition()
+	, _actionIntLong()
+	, _actionIntLongPosition()
+	, _actionInt()
+	, _actionIntPosition()
+	, _actionNumber()
+	, _actionNumberPosition( action_ )
+	, _actionString()
+	, _actionStringPosition()
+	, _cache() {
 	return;
 }
 
 HInteger::HInteger( action_string_t const& action_ )
-	: HRuleBase(),
-	_actionIntLongLong(), _actionIntLongLongPosition(),
-	_actionIntLong(), _actionIntLongPosition(),
-	_actionInt(), _actionIntPosition(),
-	_actionNumber(), _actionNumberPosition(),
-	_actionString( action_ ), _actionStringPosition(),
-	_cache() {
+	: HRuleBase()
+	, _actionIntLongLong()
+	, _actionIntLongLongPosition()
+	, _actionIntLong()
+	, _actionIntLongPosition()
+	, _actionInt()
+	, _actionIntPosition()
+	, _actionNumber()
+	, _actionNumberPosition()
+	, _actionString( action_ )
+	, _actionStringPosition()
+	, _cache() {
 	return;
 }
 
 HInteger::HInteger( action_string_position_t const& action_ )
-	: HRuleBase(),
-	_actionIntLongLong(), _actionIntLongLongPosition(),
-	_actionIntLong(), _actionIntLongPosition(),
-	_actionInt(), _actionIntPosition(),
-	_actionNumber(), _actionNumberPosition(),
-	_actionString(), _actionStringPosition( action_ ),
-	_cache() {
+	: HRuleBase()
+	, _actionIntLongLong()
+	, _actionIntLongLongPosition()
+	, _actionIntLong()
+	, _actionIntLongPosition()
+	, _actionInt()
+	, _actionIntPosition()
+	, _actionNumber()
+	, _actionNumberPosition()
+	, _actionString()
+	, _actionStringPosition( action_ )
+	, _cache() {
 	return;
 }
 
 HInteger::HInteger( HInteger const& integer_ )
-	: HRuleBase( integer_._action, integer_._actionPosition ),
-	_actionIntLongLong( integer_._actionIntLongLong ), _actionIntLongLongPosition( integer_._actionIntLongLongPosition ),
-	_actionIntLong( integer_._actionIntLong ), _actionIntLongPosition( integer_._actionIntLongPosition ),
-	_actionInt( integer_._actionInt ), _actionIntPosition( integer_._actionIntPosition ),
-	_actionNumber( integer_._actionNumber ), _actionNumberPosition( integer_._actionNumberPosition ),
-	_actionString( integer_._actionString ), _actionStringPosition( integer_._actionStringPosition ),
-	_cache( integer_._cache ) {
+	: HRuleBase( integer_._action, integer_._actionPosition )
+	, _actionIntLongLong( integer_._actionIntLongLong )
+	, _actionIntLongLongPosition( integer_._actionIntLongLongPosition )
+	, _actionIntLong( integer_._actionIntLong )
+	, _actionIntLongPosition( integer_._actionIntLongPosition )
+	, _actionInt( integer_._actionInt )
+	, _actionIntPosition( integer_._actionIntPosition )
+	, _actionNumber( integer_._actionNumber )
+	, _actionNumberPosition( integer_._actionNumberPosition )
+	, _actionString( integer_._actionString )
+	, _actionStringPosition( integer_._actionStringPosition )
+	, _cache( integer_._cache ) {
 	return;
 }
 
@@ -2662,30 +2823,45 @@ HInteger const& get_integer_instance( void ) {
 HInteger const& integer( get_integer_instance() );
 
 HStringLiteral::HStringLiteral( void )
-	: HRuleBase(), _actionString(), _actionStringPosition(), _cache() {
+	: HRuleBase()
+	, _actionString()
+	, _actionStringPosition()
+	, _cache() {
 }
 
 HStringLiteral::HStringLiteral( action_t const& action_ )
-	: HRuleBase( action_ ), _actionString(), _actionStringPosition(), _cache() {
+	: HRuleBase( action_ )
+	, _actionString()
+	, _actionStringPosition()
+	, _cache() {
 }
 
 HStringLiteral::HStringLiteral( action_position_t const& action_ )
-	: HRuleBase( action_ ), _actionString(), _actionStringPosition(), _cache() {
+	: HRuleBase( action_ )
+	, _actionString()
+	, _actionStringPosition()
+	, _cache() {
 }
 
 HStringLiteral::HStringLiteral( action_string_t const& action_ )
-	: HRuleBase(), _actionString( action_ ), _actionStringPosition(), _cache() {
+	: HRuleBase()
+	, _actionString( action_ )
+	, _actionStringPosition()
+	, _cache() {
 }
 
 HStringLiteral::HStringLiteral( action_string_position_t const& action_ )
-	: HRuleBase(), _actionString(), _actionStringPosition( action_ ), _cache() {
+	: HRuleBase()
+	, _actionString()
+	, _actionStringPosition( action_ )
+	, _cache() {
 }
 
 HStringLiteral::HStringLiteral( HStringLiteral const& stringLiteral_ )
-	: HRuleBase( stringLiteral_._action, stringLiteral_._actionPosition ),
-	_actionString( stringLiteral_._actionString ),
-	_actionStringPosition( stringLiteral_._actionStringPosition ),
-	_cache( stringLiteral_._cache ) {
+	: HRuleBase( stringLiteral_._action, stringLiteral_._actionPosition )
+	, _actionString( stringLiteral_._actionString )
+	, _actionStringPosition( stringLiteral_._actionStringPosition )
+	, _cache( stringLiteral_._cache ) {
 }
 
 HStringLiteral HStringLiteral::operator[]( action_t const& action_ ) const {
@@ -2827,29 +3003,45 @@ HStringLiteral const& get_string_literal_instance( void ) {
 HStringLiteral const& string_literal( get_string_literal_instance() );
 
 HCharacterLiteral::HCharacterLiteral( void )
-	: HRuleBase(), _actionCharacter(), _actionCharacterPosition(), _cache() {
+	: HRuleBase()
+	, _actionCharacter()
+	, _actionCharacterPosition()
+	, _cache() {
 }
 
 HCharacterLiteral::HCharacterLiteral( action_t const& action_ )
-	: HRuleBase( action_ ), _actionCharacter(), _actionCharacterPosition(), _cache() {
+	: HRuleBase( action_ )
+	, _actionCharacter()
+	, _actionCharacterPosition()
+	, _cache() {
 }
 
 HCharacterLiteral::HCharacterLiteral( action_position_t const& action_ )
-	: HRuleBase( action_ ), _actionCharacter(), _actionCharacterPosition(), _cache() {
+	: HRuleBase( action_ )
+	, _actionCharacter()
+	, _actionCharacterPosition()
+	, _cache() {
 }
 
 HCharacterLiteral::HCharacterLiteral( action_character_t const& action_ )
-	: HRuleBase(), _actionCharacter( action_ ), _actionCharacterPosition(), _cache() {
+	: HRuleBase()
+	, _actionCharacter( action_ )
+	, _actionCharacterPosition()
+	, _cache() {
 }
 
 HCharacterLiteral::HCharacterLiteral( action_character_position_t const& action_ )
-	: HRuleBase(), _actionCharacter(), _actionCharacterPosition( action_ ), _cache() {
+	: HRuleBase()
+	, _actionCharacter()
+	, _actionCharacterPosition( action_ )
+	, _cache() {
 }
 
 HCharacterLiteral::HCharacterLiteral( HCharacterLiteral const& characterLiteral_ )
-	: HRuleBase( characterLiteral_._action, characterLiteral_._actionPosition ), _actionCharacter( characterLiteral_._actionCharacter ),
-	_actionCharacterPosition( characterLiteral_._actionCharacterPosition ),
-	_cache( characterLiteral_._cache ) {
+	: HRuleBase( characterLiteral_._action, characterLiteral_._actionPosition )
+	, _actionCharacter( characterLiteral_._actionCharacter )
+	, _actionCharacterPosition( characterLiteral_._actionCharacterPosition )
+	, _cache( characterLiteral_._cache ) {
 }
 
 HCharacterLiteral HCharacterLiteral::operator[]( action_t const& action_ ) const {
@@ -2982,35 +3174,50 @@ HCharacterLiteral const& get_character_literal_instance( void ) {
 HCharacterLiteral const& character_literal( get_character_literal_instance() );
 
 HCharacter::HCharacter( void )
-	: HRuleBase(), _characters(), _actionCharacter(), _actionCharacterPosition() {
+	: HRuleBase()
+	, _characters()
+	, _actionCharacter()
+	, _actionCharacterPosition() {
 	return;
 }
 
 HCharacter::HCharacter( hcore::HString const& characters_, action_t const& action_ )
-	: HRuleBase( action_ ), _characters( characters_ ), _actionCharacter(), _actionCharacterPosition() {
+	: HRuleBase( action_ )
+	, _characters( characters_ )
+	, _actionCharacter()
+	, _actionCharacterPosition() {
 	return;
 }
 
 HCharacter::HCharacter( hcore::HString const& characters_, action_position_t const& action_ )
-	: HRuleBase( action_ ), _characters( characters_ ), _actionCharacter(), _actionCharacterPosition() {
+	: HRuleBase( action_ )
+	, _characters( characters_ )
+	, _actionCharacter()
+	, _actionCharacterPosition() {
 	return;
 }
 
 HCharacter::HCharacter( hcore::HString const& characters_, action_character_t const& action_ )
-	: HRuleBase(), _characters( characters_ ), _actionCharacter( action_ ), _actionCharacterPosition() {
+	: HRuleBase()
+	, _characters( characters_ )
+	, _actionCharacter( action_ )
+	, _actionCharacterPosition() {
 	return;
 }
 
 HCharacter::HCharacter( hcore::HString const& characters_, action_character_position_t const& action_ )
-	: HRuleBase(), _characters( characters_ ), _actionCharacter(), _actionCharacterPosition( action_ ) {
+	: HRuleBase()
+	, _characters( characters_ )
+	, _actionCharacter()
+	, _actionCharacterPosition( action_ ) {
 	return;
 }
 
 HCharacter::HCharacter( HCharacter const& character_ )
-	: HRuleBase( character_._action, character_._actionPosition ),
-	_characters( character_._characters ),
-	_actionCharacter( character_._actionCharacter ),
-	_actionCharacterPosition( character_._actionCharacterPosition ) {
+	: HRuleBase( character_._action, character_._actionPosition )
+	, _characters( character_._characters )
+	, _actionCharacter( character_._actionCharacter )
+	, _actionCharacterPosition( character_._actionCharacterPosition ) {
 	return;
 }
 
@@ -3147,19 +3354,19 @@ HFollows operator >> ( HRuleBase const& predecessor_, char character_ ) {
 }
 
 HString::HString( hcore::HString const& string_ )
-	: HRuleBase(),
-	_dictionary( 1, string_ ),
-	_actionString(),
-	_actionStringPosition() {
+	: HRuleBase()
+	, _dictionary( 1, string_ )
+	, _actionString()
+	, _actionStringPosition() {
 	M_ASSERT( ! string_.is_empty() );
 	return;
 }
 
 HString::HString( HString const& string_, yaal::hcore::HString const& token_ )
-	: HRuleBase( string_._action, string_._actionPosition ),
-	_dictionary( string_._dictionary ),
-	_actionString( string_._actionString ),
-	_actionStringPosition( string_._actionStringPosition ) {
+	: HRuleBase( string_._action, string_._actionPosition )
+	, _dictionary( string_._dictionary )
+	, _actionString( string_._actionString )
+	, _actionStringPosition( string_._actionStringPosition ) {
 	M_ASSERT( ! token_.is_empty() );
 	for ( yaal::hcore::HString const& s : _dictionary ) {
 		if ( token_.find( s ) == 0 ) {
@@ -3171,82 +3378,82 @@ HString::HString( HString const& string_, yaal::hcore::HString const& token_ )
 }
 
 HString::HString( hcore::HString const& string_, action_t const& action_ )
-	: HRuleBase( action_ ),
-	_dictionary( 1, string_ ),
-	_actionString(),
-	_actionStringPosition() {
+	: HRuleBase( action_ )
+	, _dictionary( 1, string_ )
+	, _actionString()
+	, _actionStringPosition() {
 	M_ASSERT( ! string_.is_empty() );
 	return;
 }
 
 HString::HString( hcore::HString const& string_, action_position_t const& action_ )
-	: HRuleBase( action_ ),
-	_dictionary( 1, string_ ),
-	_actionString(),
-	_actionStringPosition() {
+	: HRuleBase( action_ )
+	, _dictionary( 1, string_ )
+	, _actionString()
+	, _actionStringPosition() {
 	M_ASSERT( ! string_.is_empty() );
 	return;
 }
 
 HString::HString( hcore::HString const& string_, action_string_t const& action_ )
-	: HRuleBase(),
-	_dictionary( 1, string_ ),
-	_actionString( action_ ),
-	_actionStringPosition() {
+	: HRuleBase()
+	, _dictionary( 1, string_ )
+	, _actionString( action_ )
+	, _actionStringPosition() {
 	M_ASSERT( ! string_.is_empty() );
 	return;
 }
 
 HString::HString( hcore::HString const& string_, action_string_position_t const& action_ )
-	: HRuleBase(),
-	_dictionary( 1, string_ ),
-	_actionString(),
-	_actionStringPosition( action_ ) {
+	: HRuleBase()
+	, _dictionary( 1, string_ )
+	, _actionString()
+	, _actionStringPosition( action_ ) {
 	M_ASSERT( ! string_.is_empty() );
 	return;
 }
 
 HString::HString( dictionary_t const& dictionary_, action_t const& action_ )
-	: HRuleBase( action_ ),
-	_dictionary( dictionary_ ),
-	_actionString(),
-	_actionStringPosition() {
+	: HRuleBase( action_ )
+	, _dictionary( dictionary_ )
+	, _actionString()
+	, _actionStringPosition() {
 	M_ASSERT( ! _dictionary.is_empty() );
 	return;
 }
 
 HString::HString( dictionary_t const& dictionary_, action_position_t const& action_ )
-	: HRuleBase( action_ ),
-	_dictionary( dictionary_ ),
-	_actionString(),
-	_actionStringPosition() {
+	: HRuleBase( action_ )
+	, _dictionary( dictionary_ )
+	, _actionString()
+	, _actionStringPosition() {
 	M_ASSERT( ! _dictionary.is_empty() );
 	return;
 }
 
 HString::HString( dictionary_t const& dictionary_, action_string_t const& action_ )
-	: HRuleBase(),
-	_dictionary( dictionary_ ),
-	_actionString( action_ ),
-	_actionStringPosition() {
+	: HRuleBase()
+	, _dictionary( dictionary_ )
+	, _actionString( action_ )
+	, _actionStringPosition() {
 	M_ASSERT( ! _dictionary.is_empty() );
 	return;
 }
 
 HString::HString( dictionary_t const& dictionary_, action_string_position_t const& action_ )
-	: HRuleBase(),
-	_dictionary( dictionary_ ),
-	_actionString(),
-	_actionStringPosition( action_ ) {
+	: HRuleBase()
+	, _dictionary( dictionary_ )
+	, _actionString()
+	, _actionStringPosition( action_ ) {
 	M_ASSERT( ! _dictionary.is_empty() );
 	return;
 }
 
 HString::HString( HString const& string_ )
-	: HRuleBase( string_._action, string_._actionPosition ),
-	_dictionary( string_._dictionary ),
-	_actionString( string_._actionString ),
-	_actionStringPosition( string_._actionStringPosition ) {
+	: HRuleBase( string_._action, string_._actionPosition )
+	, _dictionary( string_._dictionary )
+	, _actionString( string_._actionString )
+	, _actionStringPosition( string_._actionStringPosition ) {
 	M_ASSERT( ! _dictionary.is_empty() );
 	return;
 }
@@ -3406,73 +3613,82 @@ HString string( yaal::hcore::HString const& string_, HString::action_position_t 
 }
 
 HRegex::HRegex( hcore::HString const& string_ )
-	: HRuleBase(),
-	_regex( make_pointer<hcore::HRegex>( string_, hcore::HRegex::COMPILE::EXTENDED ) ),
-	_actionString(), _actionStringPosition() {
+	: HRuleBase()
+	, _regex( make_pointer<hcore::HRegex>( string_, hcore::HRegex::COMPILE::EXTENDED ) )
+	, _actionString()
+	, _actionStringPosition() {
 	return;
 }
 
 HRegex::HRegex( hcore::HString const& string_, action_t const& action_ )
-	: HRuleBase( action_ ),
-	_regex( make_pointer<hcore::HRegex>( string_, hcore::HRegex::COMPILE::EXTENDED ) ),
-	_actionString(),
-	_actionStringPosition() {
+	: HRuleBase( action_ )
+	, _regex( make_pointer<hcore::HRegex>( string_, hcore::HRegex::COMPILE::EXTENDED ) )
+	, _actionString()
+	, _actionStringPosition() {
 	return;
 }
 
 HRegex::HRegex( hcore::HString const& string_, action_position_t const& action_ )
-	: HRuleBase( action_ ),
-	_regex( make_pointer<hcore::HRegex>( string_, hcore::HRegex::COMPILE::EXTENDED ) ),
-	_actionString(),
-	_actionStringPosition() {
+	: HRuleBase( action_ )
+	, _regex( make_pointer<hcore::HRegex>( string_, hcore::HRegex::COMPILE::EXTENDED ) )
+	, _actionString()
+	, _actionStringPosition() {
 	return;
 }
 
 HRegex::HRegex( hcore::HString const& string_, action_string_t const& action_ )
-	: HRuleBase(),
-	_regex( make_pointer<hcore::HRegex>( string_, hcore::HRegex::COMPILE::EXTENDED ) ),
-	_actionString( action_ ),
-	_actionStringPosition() {
+	: HRuleBase()
+	, _regex( make_pointer<hcore::HRegex>( string_, hcore::HRegex::COMPILE::EXTENDED ) )
+	, _actionString( action_ )
+	, _actionStringPosition() {
 	return;
 }
 
 HRegex::HRegex( hcore::HString const& string_, action_string_position_t const& action_ )
-	: HRuleBase(),
-	_regex( make_pointer<hcore::HRegex>( string_, hcore::HRegex::COMPILE::EXTENDED ) ),
-	_actionString(),
-	_actionStringPosition( action_ ) {
+	: HRuleBase()
+	, _regex( make_pointer<hcore::HRegex>( string_, hcore::HRegex::COMPILE::EXTENDED ) )
+	, _actionString()
+	, _actionStringPosition( action_ ) {
 	return;
 }
 
 HRegex::HRegex( regex_t const& regex_, action_t const& action_ )
-	: HRuleBase( action_ ), _regex( regex_ ),
-	_actionString(), _actionStringPosition() {
+	: HRuleBase( action_ )
+	, _regex( regex_ )
+	, _actionString()
+	, _actionStringPosition() {
 	return;
 }
 
 HRegex::HRegex( regex_t const& regex_, action_position_t const& action_ )
-	: HRuleBase( action_ ), _regex( regex_ ),
-	_actionString(), _actionStringPosition() {
+	: HRuleBase( action_ )
+	, _regex( regex_ )
+	, _actionString()
+	, _actionStringPosition() {
 	return;
 }
 
 HRegex::HRegex( regex_t const& regex_, action_string_t const& action_ )
-	: HRuleBase(), _regex( regex_ ),
-	_actionString( action_ ), _actionStringPosition() {
+	: HRuleBase()
+	, _regex( regex_ )
+	, _actionString( action_ )
+	, _actionStringPosition() {
 	return;
 }
 
 HRegex::HRegex( regex_t const& regex_, action_string_position_t const& action_ )
-	: HRuleBase(), _regex( regex_ ),
-	_actionString(), _actionStringPosition( action_ ) {
+	: HRuleBase()
+	, _regex( regex_ )
+	, _actionString()
+	, _actionStringPosition( action_ ) {
 	return;
 }
 
 HRegex::HRegex( HRegex const& regex_ )
-	: HRuleBase( regex_._action, regex_._actionPosition ),
-	_regex( regex_._regex ),
-	_actionString( regex_._actionString ),
-	_actionStringPosition( regex_._actionStringPosition ) {
+	: HRuleBase( regex_._action, regex_._actionPosition )
+	, _regex( regex_._regex )
+	, _actionString( regex_._actionString )
+	, _actionStringPosition( regex_._actionStringPosition ) {
 	return;
 }
 
@@ -3784,7 +4000,9 @@ HRule regex( yaal::hcore::HString const& name_, yaal::hcore::HString const& patt
 }
 
 HRuleDescription::HRuleDescription( void )
-	: _children(), _description(), _automaticNames() {
+	: _children()
+	, _description()
+	, _automaticNames() {
 	return;
 }
 
@@ -3865,7 +4083,9 @@ void HRuleDescription::reset_names( void ) {
 }
 
 HGrammarDescription::HGrammarDescription( HRuleBase const& rule_ )
-	: _rules(), _visited(), _ruleOrder() {
+	: _rules()
+	, _visited()
+	, _ruleOrder() {
 	M_PROLOG
 	HRuleDescription rd;
 	rule_use_t ru;
