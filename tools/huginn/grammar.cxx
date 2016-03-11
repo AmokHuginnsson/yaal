@@ -177,7 +177,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	);
 	HRule factorial(
 		"factorial",
-		atom >> -( constant( '!' )[HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FACTORIAL, _1 ) )] ^ '=' )
+		atom >> -( ( ( constant( '!' ) & "==" ) | ( constant( '!' ) ^ '=' ) )[HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FACTORIAL, _1 ) )] )
 	);
 	HRule negation(
 		"negation",
