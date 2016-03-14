@@ -350,8 +350,10 @@ void HConsole::enter_curses( void ) {
 	if ( ! _terminal_.exists() ) {
 		throw HConsoleException( "Not connected to a terminal." );
 	}
-	static short const colors[] = { COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
-		COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE };
+	static short const colors[] = {
+		COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
+		COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE
+	};
 /*	def_shell_mode(); */
 /* this is done automatically by initscr(), read man next time */
 	if ( ! _initialized ) {
@@ -494,9 +496,14 @@ void HConsole::set_background( int color_ ) const {
 	if ( ! _enabled ) {
 		M_THROW( "not in curses mode", errno );
 	}
-	wbkgd( static_cast<WINDOW*>( _window ), ' '
-			| static_cast<chtype>( _brokenBrightBackground ? ATTR::encode_fix( COLORS::FG_BLACK | color_ )
-				: ATTR::encode( COLORS::FG_BLACK | color_ ) ) ); /* meaningless value from macro */
+	wbkgd(
+		static_cast<WINDOW*>( _window ),
+		' ' | static_cast<chtype>(
+			_brokenBrightBackground
+				? ATTR::encode_fix( COLORS::FG_BLACK | color_ )
+				: ATTR::encode( COLORS::FG_BLACK | color_ )
+		)
+	); /* meaningless value from macro */
 	return;
 	M_EPILOG
 }
