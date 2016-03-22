@@ -682,7 +682,8 @@ void HConsole::addstr( char const* str_ ) const {
 	M_EPILOG
 }
 
-int HConsole::ungetch( int code_ ) {
+void HConsole::ungetch( int code_ ) {
+	M_PROLOG
 	switch ( code_ ) {
 		case ( KEY_CODES::PAGE_DOWN ): code_ = KEY_NPAGE;     break;
 		case ( KEY_CODES::PAGE_UP ):   code_ = KEY_PPAGE;     break;
@@ -723,7 +724,14 @@ int HConsole::ungetch( int code_ ) {
 		default:
 		break;
 	}
-	return ( ::ungetch( code_ ) );
+	if ( code_ >= KEY_CODES::COMMAND_BASE ) {
+		code_ -= KEY_CODES::COMMAND_BASE;
+		M_ENSURE( ::ungetch( code_ ) != ERR );
+		code_ = KEY<>::ctrl_r( _commandComposeCharacter_ );
+	}
+	M_ENSURE( ::ungetch( code_ ) != ERR );
+	return;
+	M_EPILOG
 }
 
 int HConsole::get_key( void ) const {
@@ -758,7 +766,7 @@ int HConsole::get_key( void ) const {
 		} else {
 			int character = 0;
 			if ( key < KEY_CODES::ESCAPE ) {
-				key = KEY<>::command_r( character = key + 96 );
+				key = KEY<>::command_r( character = key + KEY_CODES::CONTROL_BASE );
 			} else if ( key == KEY_CODES::ESCAPE ) {
 				M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), true ) != ERR );
 				key = wgetch( static_cast<WINDOW*>( _window ) );

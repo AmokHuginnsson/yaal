@@ -85,6 +85,7 @@ struct KEY_CODES {
 	static int const F23          = F22       + 1;
 	static int const F24          = F23       + 1;
 	static int const MOUSE        = F24       + 1;
+	static int const CONTROL_BASE = 96;
 	static int const META_BASE    = 0x04000;
 	static int const COMMAND_BASE = 0x08000;
 };
@@ -216,9 +217,9 @@ struct KEY {
 	static int meta_r( int code_ ) {
 		return ( code_ + KEY_CODES::META_BASE );
 	}
-	static int const ctrl = code - 96;
+	static int const ctrl = code - KEY_CODES::CONTROL_BASE;
 	static int ctrl_r( int code_ ) {
-		return ( code_ - 96 );
+		return ( code_ - KEY_CODES::CONTROL_BASE );
 	}
 	static int const command = code + KEY_CODES::COMMAND_BASE;
 	static int command_r( int code_ ) {
@@ -270,7 +271,7 @@ public:
 	void printf( char const*, ... ) const;
 	void mvprintf( int, int, char const*, ... ) const;
 	void cmvprintf( int, int, int, char const*, ... ) const;
-	int ungetch( int );
+	void ungetch( int );
 	int get_key( void ) const;
 	int kbhit( void ) const;
 	char unsigned get_attr( void ) const;
