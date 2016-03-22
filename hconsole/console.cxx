@@ -734,11 +734,11 @@ int HConsole::get_key( void ) const {
 	}
 	M_ENSURE( noecho() != ERR );
 	M_ENSURE( ::fflush( NULL ) == 0 );
-	int key( getch() );
+	int key( wgetch( static_cast<WINDOW*>( _window ) ) );
 	M_ASSERT( key < KEY_CODES::SPECIAL_KEY );
 	if ( key == KEY_CODES::ESCAPE ) {
 		M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), true ) != ERR );
-		key = getch();
+		key = wgetch( static_cast<WINDOW*>( _window ) );
 		M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), false ) != ERR );
 		if ( key == ERR ) {
 			key = KEY_CODES::ESCAPE;
@@ -748,11 +748,10 @@ int HConsole::get_key( void ) const {
 	}
 	if ( key == KEY<>::ctrl_r( _commandComposeCharacter_ ) ) {
 		origCursState = curs_set( CURSOR::INVISIBLE );
-		cmvprintf( _height - 1, -1, COLORS::FG_WHITE, "ctrl-%c",
-					_commandComposeCharacter_ );
-		timeout( _commandComposeDelay_ * 100 );
-		key = getch();
-		timeout( -1 );
+		cmvprintf( _height - 1, -1, COLORS::FG_WHITE, "ctrl-%c", _commandComposeCharacter_ );
+		wtimeout( static_cast<WINDOW*>( _window ), _commandComposeDelay_ * 100 );
+		key = wgetch( static_cast<WINDOW*>( _window ) );
+		wtimeout( static_cast<WINDOW*>( _window ), -1 );
 		if ( key == ERR ) {
 			key = KEY<>::ctrl_r( _commandComposeCharacter_ );
 			cmvprintf( _height - 1, 0, COLORS::FG_LIGHTGRAY, "      " );
@@ -762,7 +761,7 @@ int HConsole::get_key( void ) const {
 				key = KEY<>::command_r( character = key + 96 );
 			} else if ( key == KEY_CODES::ESCAPE ) {
 				M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), true ) != ERR );
-				key = getch();
+				key = wgetch( static_cast<WINDOW*>( _window ) );
 				M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), false ) != ERR );
 				if ( key == ERR ) {
 					key = KEY<>::command_r( character = KEY_CODES::ESCAPE );
