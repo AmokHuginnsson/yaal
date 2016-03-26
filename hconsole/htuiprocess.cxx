@@ -116,8 +116,9 @@ void HTUIProcess::init_tui( yaal::hcore::HString const& processName_, HWindow::p
 	}
 	_mainWindow = mainWindow;
 	add_window( mainWindow );
-	if ( ! mainWindow->is_initialised() )
+	if ( ! mainWindow->is_initialised() ) {
 		M_THROW( _( "window has not been initialised" ), errno );
+	}
 	_foregroundWindow = hcore::cyclic_iterator( *_windows );
 	_commandHandlers[ "quit" ] = call( &HTUIProcess::handler_quit, this, _1 );
 	repaint();
@@ -178,8 +179,9 @@ void HTUIProcess::add_window( HWindow::ptr_t window_ ) {
 	_foregroundWindow = cyclic_iterator( &*_windows, prev( _windows->end() ) );
 	M_ASSERT( _foregroundWindow != _windows->end() );
 	_mainWindow->update_all();
-	if ( ! (*_foregroundWindow)->is_initialised() )
+	if ( ! (*_foregroundWindow)->is_initialised() ) {
 		M_THROW( _( "window has not been initialised" ), errno );
+	}
 	repaint( true );
 	return;
 	M_EPILOG
@@ -201,43 +203,39 @@ void HTUIProcess::process_stdin( HIODispatcher::stream_t& ) {
 		consumed = process_input_with_handlers( code, _postprocessHandlers );
 	}
 	if ( !consumed ) {
-		if ( !! (*_foregroundWindow) )
+		if ( !! (*_foregroundWindow) ) {
 			_command = (*_foregroundWindow)->get_command();
-		if ( ! _command.is_empty() )
+		}
+		if ( ! _command.is_empty() ) {
 			command = process_command();
-		if ( ! command.is_empty()
-				&& !! (*_foregroundWindow) )
-			(*_foregroundWindow)->status_bar()->message( COLORS::FG_RED,
-					"unknown command: `%s'", command.raw() );
+		}
+		if ( ! command.is_empty() && !! (*_foregroundWindow) ) {
+			(*_foregroundWindow)->status_bar()->message(
+				COLORS::FG_RED, "unknown command: `%s'", command.raw()
+			);
+		}
 	}
 	flush_call_queue();
-	if ( _needRepaint )
+	if ( _needRepaint ) {
 		repaint();
+	}
 #ifdef __DEBUGGER_BABUNI__
 	_needRepaint = true;
 	if ( code ) {
-		if ( code > KEY<KEY<0>::meta>::command )
-			cons.cmvprintf ( 0, 0, COLORS::FG_GREEN,
-					"COMMAND-META-%c: %5d       ",
-					code - KEY<KEY<0>::meta>::command, code );
-		else if ( code > KEY<0>::command )
-			cons.cmvprintf ( 0, 0, COLORS::FG_GREEN,
-					"     COMMAND-%c: %5d       ",
-					code - KEY<0>::command, code );
-		else if ( code > KEY<0>::meta )
-			cons.cmvprintf ( 0, 0, COLORS::FG_GREEN,
-					"        META-%c: %5d       ",
-					code - KEY<0>::meta, code );
-		else if ( code < KEY_CODES::ESC )
-			cons.cmvprintf ( 0, 0, COLORS::FG_GREEN,
-					"        CTRL-%c: %5d       ",
-					code + 96, code);
-		else
-			cons.cmvprintf ( 0, 0, COLORS::FG_GREEN,
-					"             %c: %5d       ",
-					code, code );
-	} else
-		cons.cmvprintf ( 0, 0, COLORS::FG_GREEN, "                           " );
+		if ( code > KEY<KEY<0>::meta>::command ) {
+			cons.cmvprintf( 0, 0, COLORS::FG_GREEN, "COMMAND-META-%c: %5d       ", code - KEY<KEY<0>::meta>::command, code );
+		} else if ( code > KEY<0>::command ) {
+			cons.cmvprintf( 0, 0, COLORS::FG_GREEN, "     COMMAND-%c: %5d       ", code - KEY<0>::command, code );
+		} else if ( code > KEY<0>::meta ) {
+			cons.cmvprintf( 0, 0, COLORS::FG_GREEN, "        META-%c: %5d       ", code - KEY<0>::meta, code );
+		} else if ( code < KEY_CODES::ESC ) {
+			cons.cmvprintf( 0, 0, COLORS::FG_GREEN, "        CTRL-%c: %5d       ", code + KEY_CODES::CONTROL_BASE, code );
+		} else {
+			cons.cmvprintf( 0, 0, COLORS::FG_GREEN, "             %c: %5d       ", code, code );
+		}
+	} else {
+		cons.cmvprintf( 0, 0, COLORS::FG_GREEN, "                           " );
+	}
 #endif /* __DEBUGGER_BABUNI__ */
 	if ( ! consumed && !! (*_foregroundWindow) )
 		(*_foregroundWindow)->status_bar()->message( COLORS::FG_RED,
@@ -258,17 +256,20 @@ void HTUIProcess::handler_alert( void ) {
 
 void HTUIProcess::handler_idle( void ) {
 	M_PROLOG
-#ifdef __DEBUG__
 	HConsole& cons = HConsole::get_instance();
+#ifdef __DEBUG__
 	HString clock( HTime( HTime::TZ::LOCAL ).string() );
-	cons.cmvprintf( 0, static_cast<int>( cons.get_width() - clock.get_length() ),
-			COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY, clock.raw() );
+	cons.cmvprintf(
+		0, static_cast<int>( cons.get_width() - clock.get_length() ),
+		COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY, clock.raw()
+	);
 	_needRepaint = true;
 #endif /* __DEBUG__ */
 	if ( !! (*_foregroundWindow) ) {
 		HStatusBarWidget::ptr_t& statusBar = (*_foregroundWindow)->status_bar();
-		if ( !! statusBar )
+		if ( !! statusBar ) {
 			statusBar->paint();
+		}
 	}
 	return;
 	M_EPILOG
@@ -285,13 +286,17 @@ bool HTUIProcess::handler_mouse( HEvent const& ) {
 	M_PROLOG
 	mouse::OMouse mouse;
 	static_cast<void>( mouse::mouse_get( mouse ) );
-	if ( !! (*_foregroundWindow) )
+	if ( !! (*_foregroundWindow) ) {
 		(*_foregroundWindow)->click( mouse );
-	if ( _needRepaint )
+	}
+	if ( _needRepaint ) {
 		repaint();
+	}
 #ifdef __DEBUGGER_BABUNI__
-	HConsole::get_instance().cmvprintf( 0, 0,	COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
-			mouse._buttons, mouse._row, mouse._column );
+	HConsole::get_instance().cmvprintf(
+		0, 0,	COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
+		mouse._buttons, mouse._row, mouse._column
+	);
 	_needRepaint = true;
 #endif /* __DEBUGGER_BABUNI__ */
 	return ( true );
@@ -303,12 +308,16 @@ void HTUIProcess::process_terminal_event( HIODispatcher::stream_t& event_ ) {
 	char type;
 	M_ENSURE( event_->read( &type, 1 ) == 1 );
 	switch( type ) {
-		case 'r':
+		case 't': {
 			handler_refresh( HKeyPressEvent( 'r' ) );
-		break;
+		} break;
 		case 'm': {
 			static HIODispatcher::stream_t dummy;
 			process_mouse( dummy );
+		} break;
+		case 'k': {
+			static HIODispatcher::stream_t dummy;
+			process_stdin( dummy );
 		} break;
 	}
 	return;

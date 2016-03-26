@@ -27,8 +27,6 @@ Copyright:
 #ifndef YAAL_HCONSOLE_CONSOLE_HXX_INCLUDED
 #define YAAL_HCONSOLE_CONSOLE_HXX_INCLUDED 1
 
-#include <cstdarg>
-
 #include "hcore/hsingleton.hxx"
 #include "hcore/hpipe.hxx"
 #include "tools/signals.hxx"
@@ -281,6 +279,9 @@ public:
 	void bell( void ) const;
 	int get_mouse_fd( void ) const;
 	yaal::hcore::HStreamInterface::ptr_t const& get_event_source( void ) const;
+	void notify_terminal( void );
+	void notify_mouse( void );
+	void notify_keyboard( void );
 	int on_terminal_resize( int );
 	int console_cleanup( int );
 	int on_quit( int );

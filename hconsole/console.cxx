@@ -24,6 +24,7 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <cstdarg>
 #include <cstdlib> /* getenv */
 #include <cstring>
 #include <csignal>  /* signal handling */
@@ -730,6 +731,9 @@ void HConsole::ungetch( int code_ ) {
 		code_ = KEY<>::ctrl_r( _commandComposeCharacter_ );
 	}
 	M_ENSURE( ::ungetch( code_ ) != ERR );
+	if ( ! _event.unique() ) {
+		notify_keyboard();
+	}
 	return;
 	M_EPILOG
 }
@@ -917,6 +921,27 @@ void HConsole::bell( void ) const {
 	M_EPILOG
 }
 
+void HConsole::notify_terminal( void ) {
+	M_PROLOG
+	_event->write( "t", 1 );
+	return;
+	M_EPILOG
+}
+
+void HConsole::notify_mouse( void ) {
+	M_PROLOG
+	_event->write( "m", 1 );
+	return;
+	M_EPILOG
+}
+
+void HConsole::notify_keyboard( void ) {
+	M_PROLOG
+	_event->write( "k", 1 );
+	return;
+	M_EPILOG
+}
+
 int HConsole::on_terminal_resize( int signum_ ) {
 	M_PROLOG
 	HString message;
@@ -925,7 +950,7 @@ int HConsole::on_terminal_resize( int signum_ ) {
 	message += '.';
 	log << message << endl;
 	if ( is_enabled() ) {
-		_event->write( "r", 1 );
+		notify_terminal();
 	} else {
 		::fprintf( stderr, "\n%s", message.raw() );
 	}
@@ -978,7 +1003,7 @@ int HConsole::on_cont( int ) {
 	if ( ! is_enabled() )
 		enter_curses();
 	if ( is_enabled() ) {
-		_event->write( "r", 1 );
+		notify_terminal();
 	}
 	return ( 0 );
 	M_EPILOG
@@ -989,7 +1014,8 @@ int HConsole::on_mouse( int ) {
 	int res( 0 );
 	if ( _mouseDes >= 0 ) {
 		if ( is_enabled() ) {
-			res = static_cast<int>( _event->write( "m", 1 ) );
+			notify_mouse();
+			res = 1;
 		}
 	}
 	if ( is_enabled() ) {
