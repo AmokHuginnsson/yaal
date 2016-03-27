@@ -256,8 +256,8 @@ void HTUIProcess::handler_alert( void ) {
 
 void HTUIProcess::handler_idle( void ) {
 	M_PROLOG
-	HConsole& cons = HConsole::get_instance();
 #ifdef __DEBUG__
+	HConsole& cons = HConsole::get_instance();
 	HString clock( HTime( HTime::TZ::LOCAL ).string() );
 	cons.cmvprintf(
 		0, static_cast<int>( cons.get_width() - clock.get_length() ),
