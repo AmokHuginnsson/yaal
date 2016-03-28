@@ -115,30 +115,44 @@ int const FUNCTION::BRACKET = 5;
 
 
 char const* const _syntaxError_ = _( "syntax error" );
-char _functionsMnemonics_ [ ] [ 8 ] = {
-	"sinh\0\0\0", "sin\0\0\0\0", "cosh\0\0\0", "cos\0\0\0\0",
-	"tgh\0\0\0\0", "tg\0\0\0\0\0", "ctgh\0\0\0", "ctg\0\0\0\0",
-	"arcsin\0", "arccos\0", "arctg\0\0", "arcctg\0", "exp\0\0\0\0",
-	"sqrt\0\0\0", "ln\0\0\0\0\0", "log\0\0\0\0"
+char _functionsMnemonics_[][ 8 ] = {
+	"sinh\0\0\0", "sin\0\0\0\0",
+	"cosh\0\0\0", "cos\0\0\0\0",
+	"tgh\0\0\0\0", "tg\0\0\0\0\0",
+	"ctgh\0\0\0", "ctg\0\0\0\0",
+	"arcsin\0", "arccos\0",
+	"arctg\0\0", "arcctg\0",
+	"exp\0\0\0\0", "sqrt\0\0\0",
+	"ln\0\0\0\0\0", "log\0\0\0\0"
 };
 
-int _functionMnemonicsLength_ [ 16 ] = {
+int _functionMnemonicsLength_[ 16 ] = {
 	4, 3, 4, 3, 3, 2, 4, 3, 6, 6, 5, 6, 3, 4, 2, 3
 };
 
 HExpression::HExpression( void )
-	: _index( 0 ), _length( 0 ), _error( OK ), _variables(),
-	_constantsPool(), _terminalIndexes(), _formula(),
-	_equationTree() {
+	: _index( 0 )
+	, _length( 0 )
+	, _error( OK )
+	, _variables()
+	, _constantsPool()
+	, _terminalIndexes()
+	, _formula()
+	, _equationTree() {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
 HExpression::HExpression( HString const& formula )
-	: _index( 0 ), _length( 0 ), _error( OK ), _variables(),
-	_constantsPool(), _terminalIndexes(), _formula(),
-	_equationTree() {
+	: _index( 0 )
+	, _length( 0 )
+	, _error( OK )
+	, _variables()
+	, _constantsPool()
+	, _terminalIndexes()
+	, _formula()
+	, _equationTree() {
 	M_PROLOG
 	compile( formula );
 	return;
@@ -152,10 +166,14 @@ HExpression::~HExpression( void ) {
 }
 
 HExpression::HExpression( HExpression const& ex )
-	: _index( ex._index ), _length( ex._length ), _error( ex._error ), _variables(),
-	_constantsPool( ex._constantsPool ),
-	_terminalIndexes( ex._terminalIndexes ), _formula( ex._formula ),
-	_equationTree( ex._equationTree ) {
+	: _index( ex._index )
+	, _length( ex._length )
+	, _error( ex._error )
+	, _variables()
+	, _constantsPool( ex._constantsPool )
+	, _terminalIndexes( ex._terminalIndexes )
+	, _formula( ex._formula )
+	, _equationTree( ex._equationTree ) {
 	M_PROLOG
 	yaal::copy( ex._variables, ex._variables + MAX_VARIABLE_COUNT, _variables );
 	return;
@@ -179,11 +197,11 @@ void HExpression::swap( HExpression& ex ) {
 		swap( _index, ex._index );
 		swap( _length, ex._length );
 		swap( _error, ex._error );
+		yaal::swap_ranges( _variables, _variables + MAX_VARIABLE_COUNT, ex._variables );
 		_constantsPool.swap( ex._constantsPool );
 		_terminalIndexes.swap( ex._terminalIndexes );
 		_formula.swap( ex._formula );
 		_equationTree.swap( ex._equationTree );
-		yaal::swap_ranges( _variables, _variables + MAX_VARIABLE_COUNT, ex._variables );
 	}
 	return;
 	M_EPILOG
@@ -192,14 +210,15 @@ void HExpression::swap( HExpression& ex ) {
 double long HExpression::count_branch( tree_t::const_node_t node_ ) {
 	M_PROLOG
 	double long value( 0 );
-	if ( node_->has_childs() )
+	if ( node_->has_childs() ) {
 		value = ( this->*( (*node_)->METHOD ) )( node_ );
-	else {
+	} else {
 		int index( (*node_)->_variables.head() );
-		if ( index >= 0 )
+		if ( index >= 0 ) {
 			value = _variables[ index ];
-		else
-			value = _constantsPool[ - 1 - index ];
+		} else {
+			value = _constantsPool[ -1 - index ];
+		}
 	}
 	return ( value );
 	M_EPILOG
@@ -410,12 +429,17 @@ bool HExpression::translate( HString const& formula_ ) {
 		_terminalIndexes[ realIndex ] = index;
 		if ( ( formula_[ index ] >= 'a' )
 				&& ( formula_[ index ] <= 'z' ) ) {
-			for ( ctr = 0; ctr < 16; ctr++ )
-				if ( strncmp( formula_.raw() + index,
-							_functionsMnemonics_[ ctr ],
-							static_cast<size_t>( _functionMnemonicsLength_[ ctr ] ) ) == 0 ) {
-				_formula.set_at( realIndex, static_cast<char>( ctr + 1 ) );
-				break;
+			for ( ctr = 0; ctr < 16; ctr++ ) {
+				if (
+					strncmp(
+						formula_.raw() + index,
+						_functionsMnemonics_[ ctr ],
+						static_cast<size_t>( _functionMnemonicsLength_[ ctr ] )
+					) == 0
+				) {
+					_formula.set_at( realIndex, static_cast<char>( ctr + 1 ) );
+					break;
+				}
 			}
 			if ( ctr < 16 ) {
 				index += _functionMnemonicsLength_[ ctr ];
@@ -423,7 +447,7 @@ bool HExpression::translate( HString const& formula_ ) {
 			} else {
 				_error = UNKNOWN_MNEMONIC;
 				_index = realIndex;
-				return ( true );
+				return ( false );
 			}
 		} else {
 			_formula.set_at( realIndex, formula_[ index ] );
@@ -433,56 +457,62 @@ bool HExpression::translate( HString const& formula_ ) {
 		_length = realIndex;
 	}
 	_terminalIndexes[ realIndex ] = index;
-	return ( false );
+	return ( true );
 	M_EPILOG
 }
 
 bool HExpression::addition_production( tree_t::node_t node_ ) {
 	M_PROLOG
 	M_ASSERT ( node_ );
-	if ( multiplication_production( &*node_->add_node() ) )
-		return ( true );
+	if ( ! multiplication_production( &*node_->add_node() ) ) {
+		return ( false );
+	}
 	if ( _index > _length ) {
 		_error = UNEXPECTED_TERMINATION;
-		return ( true );
+		return ( false );
 	}
 	(**node_).METHOD = &HExpression::addition;
 	if ( ( _formula[ _index ] != OPERATOR::ADD )
 			&& ( _formula[ _index ] != OPERATOR::SUBTRACT ) ) {
 		shorten_the_branch( node_ );
-		return ( false );
-	} while ( ( _formula [ _index ] == OPERATOR::ADD )
-			|| ( _formula [ _index ] == OPERATOR::SUBTRACT ) ) {
-		(**node_)._variables.push_back( _formula[ _index ++ ] );
-		if ( multiplication_production( &*node_->add_node() ) )
-			return ( true );
+		return ( true );
 	}
-	return ( false );
+	while ( ( _formula[ _index ] == OPERATOR::ADD )
+			|| ( _formula[ _index ] == OPERATOR::SUBTRACT ) ) {
+		(**node_)._variables.push_back( _formula[ _index ++ ] );
+		if ( ! multiplication_production( &*node_->add_node() ) ) {
+			return ( false );
+		}
+	}
+	return ( true );
 	M_EPILOG
 }
 
 bool HExpression::multiplication_production( tree_t::node_t node_ ) {
 	M_PROLOG
-	if ( power_production( &*node_->add_node() ) )
-		return ( true );
+	if ( ! power_production( &*node_->add_node() ) ) {
+		return ( false );
+	}
 	if ( _index > _length ) {
 		_error = UNEXPECTED_TERMINATION;
-		return ( true );
+		return ( false );
 	}
 	(**node_).METHOD = &HExpression::multiplication;
 	if ( ( _formula[ _index ] != OPERATOR::MULTIPLY )
 			&& ( _formula[ _index ] != OPERATOR::DIVIDE )
 			&& ( _formula[ _index ] != OPERATOR::MODULO ) ) {
 		shorten_the_branch( node_ );
-		return ( false );
-	} while ( ( _formula[ _index ] == OPERATOR::MULTIPLY )
+		return ( true );
+	}
+	while ( ( _formula[ _index ] == OPERATOR::MULTIPLY )
 			|| ( _formula[ _index ] == OPERATOR::DIVIDE )
 			|| ( _formula[ _index ] == OPERATOR::MODULO ) ) {
 		(**node_)._variables.push_back( _formula[ _index ++ ] );
-		if ( power_production( &*node_->add_node() ) )
-			return ( true );
+		if ( ! power_production( &*node_->add_node() ) ) {
+			return ( false );
+		}
 	}
-	return ( false );
+	return ( true );
 	M_EPILOG
 }
 
@@ -505,21 +535,24 @@ void HExpression::shorten_the_branch( tree_t::node_t node_ ) {
 
 bool HExpression::power_production( tree_t::node_t node_ ) {
 	M_PROLOG
-	if ( signum_production( &*node_->add_node() ) )
-		return ( true );
+	if ( ! signum_production( &*node_->add_node() ) ) {
+		return ( false );
+	}
 	if ( _index > _length ) {
 		_error = UNEXPECTED_TERMINATION;
-		return ( true );
+		return ( false );
 	}
 	(**node_).METHOD = &HExpression::bracket;
 	if ( _formula[ _index ] == '^' ) {
-		_index ++;
-		if ( power_production( &*node_->add_node() ) )
-			return ( true );
+		++ _index;
+		if ( ! power_production( &*node_->add_node() ) ) {
+			return ( false );
+		}
 		(**node_).METHOD = &HExpression::power;
-	} else
+	} else {
 		shorten_the_branch( node_ );
-	return ( false );
+	}
+	return ( true );
 	M_EPILOG
 }
 
@@ -527,34 +560,35 @@ bool HExpression::signum_production( tree_t::node_t node_ ) {
 	M_PROLOG
 	if ( _index > _length ) {
 		_error = UNEXPECTED_TERMINATION;
-		return ( true );
+		return ( false );
 	}
 	if ( _formula[ _index ] == '-' ) {
-		_index ++;
-		if ( factorial_production( &*node_->add_node() ) )
-			return ( true );
+		++ _index;
+		if ( ! factorial_production( &*node_->add_node() ) ) {
+			return ( false );
+		}
 		(**node_).METHOD = &HExpression::signum;
-	} else
-		if ( factorial_production( node_ ) )
-			return ( true );
-	return ( false );
+	} else if ( ! factorial_production( node_ ) ) {
+		return ( false );
+	}
+	return ( true );
 	M_EPILOG
 }
 
 bool HExpression::factorial_production( tree_t::node_t node_ ) {
 	M_PROLOG
-	if ( terminal_production( &*node_->add_node() ) )
-		return ( true );
+	if ( ! terminal_production( &*node_->add_node() ) )
+		return ( false );
 	if ( _index > _length ) {
 		_error = UNEXPECTED_TERMINATION;
-		return ( true );
+		return ( false );
 	} else if ( ( _index < _length ) && ( _formula[ _index ] == OPERATOR::FACTORIAL ) ) {
 		++ _index;
 		(**node_).METHOD = &HExpression::factorial;
 	} else {
 		shorten_the_branch( node_ );
 	}
-	return ( false );
+	return ( true );
 	M_EPILOG
 }
 
@@ -562,81 +596,84 @@ bool HExpression::terminal_production( tree_t::node_t node_ ) {
 	M_PROLOG
 	if ( _index > _length ) {
 		_error = UNEXPECTED_TERMINATION;
-		return ( true );
+		return ( false );
 	}
-	switch ( _formula [ _index ] ) {
+	switch ( _formula[ _index ] ) {
 		case '(' : {
-			_index ++;
-			if ( addition_production( node_ ) )
-				return ( true );
+			++ _index;
+			if ( ! addition_production( node_ ) ) {
+				return ( false );
+			}
 			if ( _formula [ _index ] != ')' ) {
 				_error = CLOSING_BRACKET_EXPECTED;
-				return ( true );
-			} else
-				_index ++;
-			return ( false );
+				return ( false );
+			} else {
+				++ _index;
+			}
+			return ( true );
 		}
 		case '|' : {
-			_index ++;
-			if ( addition_production( &*node_->add_node() ) )
-				return ( true );
+			++ _index;
+			if ( ! addition_production( &*node_->add_node() ) ) {
+				return ( false );
+			}
 			(**node_).METHOD = &HExpression::functions;
 			(**node_)._variables.push_back( FUNCTION::ABS );
 			if ( _formula[ _index ] != '|' ) {
 				_error = CLOSING_ABSOLUTE_EXPECTED;
-				return ( true );
-			} else
-				_index ++;
-			return ( false );
+				return ( false );
+			} else {
+				++ _index;
+			}
+			return ( true );
 		}
 		default:
 			break;
 	}
-	if ( ( _formula[ _index ] >= 'A' )
-			&& ( _formula[ _index ] <= 'Z' ) ) {
+	if ( ( _formula[ _index ] >= 'A' ) && ( _formula[ _index ] <= 'Z' ) ) {
 		(**node_)._variables.push_back( _formula[ _index ++ ] - 'A' );
-		return ( false );
+		return ( true );
 	}
-	if ( ( _formula[ _index ] > FUNCTION::FUNCTIONS )
-			&& ( _formula[ _index ] < FUNCTION::ABS ) ) {
-		_index ++;
+	if ( ( _formula[ _index ] > FUNCTION::FUNCTIONS ) && ( _formula[ _index ] < FUNCTION::ABS ) ) {
+		++ _index;
 		if ( _formula[ _index ] == '(' ) {
-			_index ++;
+			++ _index;
 			(**node_).METHOD = &HExpression::functions;
 			(**node_)._variables.push_back ( static_cast<int>( _formula[ _index - 2 ] ) );
-			if ( addition_production ( &*node_->add_node() ) )
-				return ( true );
-			if ( _formula [ _index ] != ')' ) {
+			if ( ! addition_production ( &*node_->add_node() ) ) {
+				return ( false );
+			}
+			if ( _formula[ _index ] != ')' ) {
 				_error = CLOSING_FUNCTION_BRACKET_EXPECTED;
-				return ( true );
-			} else
-				_index ++;
+				return ( false );
+			} else {
+				++ _index;
+			}
 		} else {
 			_error = OPENING_FUNCTION_BRACKET_EXPECTED;
-			return ( true );
+			return ( false );
 		}
-		return ( false );
+		return ( true );
 	}
-	if ( ( _formula [ _index ] >= '0' )
-			&& ( _formula [ _index ] <= '9' ) ) {
+	if ( ( _formula [ _index ] >= '0' ) && ( _formula [ _index ] <= '9' ) ) {
 		double long value = 0;
 		int offset = _index;
 		if ( _index > _length ) {
 			_error = UNEXPECTED_TERMINATION;
-			return ( true );
-		} while ( ( _formula [ _index ] >= '0' )
-				&& ( _formula [ _index ] <= '9' ) )
-			_index ++;
-		if ( _formula [ _index ] == '.' ) {
-			_index ++;
-			if ( ( _formula [ _index ] >= '0' )
-					&& ( _formula [ _index ] <= '9' ) )
-				while ( ( _formula [ _index ] >= '0' )
-						&& ( _formula [ _index ] <= '9' ) )
+			return ( false );
+		}
+		while ( ( _formula[ _index ] >= '0' ) && ( _formula[ _index ] <= '9' ) ) {
+			++ _index;
+		}
+		if ( _formula[ _index ] == '.' ) {
+			++ _index;
+			if ( ( _formula[ _index ] >= '0' ) && ( _formula[ _index ] <= '9' ) ) {
+				while ( ( _formula[ _index ] >= '0' ) && ( _formula[ _index ] <= '9' ) ) {
 					_index ++;
-			else {
+				}
+			} else {
 				_error = DIGIT_EXPECTED;
-				return ( true );
+				return ( false );
 			}
 		}
 		value = ::strtod( _formula.raw() + offset, NULL );
@@ -648,10 +685,10 @@ bool HExpression::terminal_production( tree_t::node_t node_ ) {
 		 * HArray::size() returns current access/addition peak for revelant pool,
 		 * so to get index of lately added value we need to decrement size by 1. */
 		(**node_)._variables.push_back( static_cast<int>( - ( _constantsPool.size() - 1 ) - 1 ) );
-		return ( false );
+		return ( true );
 	}
 	_error = UNEXPECTED_TOKEN;
-	return ( true );
+	return ( false );
 	M_EPILOG
 }
 
@@ -665,17 +702,21 @@ double long* HExpression::compile( HString const& formula_ ) {
 		_error = PREMATURE_TERMINATION;
 		throw HExpressionException( _syntaxError_ );
 	}
-	if ( translate( formula_ ) )
+	if ( ! translate( formula_ ) ) {
 		throw HExpressionException( _syntaxError_ );
+	}
 	_constantsPool.clear();
 	tree_t::node_t root = _equationTree.create_new_root();
-	if ( ! addition_production( root ) ) {
-		if ( ( _index < _length ) && ( _error == OK ) )
+	if ( addition_production( root ) ) {
+		if ( ( _index < _length ) && ( _error == OK ) ) {
 			_error = UNEXPECTED_TOKEN;
-	} else if ( _index >= _length )
+		}
+	} else if ( _index >= _length ) {
 		_error = UNEXPECTED_TERMINATION;
-	if ( _error != OK )
+	}
+	if ( _error != OK ) {
 		throw HExpressionException( _syntaxError_ );
+	}
 	return ( _variables );
 	M_EPILOG
 }
@@ -692,12 +733,13 @@ double long& HExpression::operator[]( int index_ ) {
 	if ( ( index_ >= 'a' ) && ( index_ <= 'z' ) )
 		index_ = ( index_ - 'a' ) + 'A';
 	double long* val = NULL;
-	if ( ( index_ >= 0 ) && ( index_ < MAX_VARIABLE_COUNT ) )
+	if ( ( index_ >= 0 ) && ( index_ < MAX_VARIABLE_COUNT ) ) {
 		val = &_variables[ index_ ];
-	else if ( ( index_ >= 'A' ) && ( index_ <= 'Z' ) )
+	} else if ( ( index_ >= 'A' ) && ( index_ <= 'Z' ) ) {
 		val = &_variables[ index_ - 'A' ];
-	else
+	} else {
 		M_THROW( "index out of range", index_ );
+	}
 	return ( *val );
 	M_EPILOG
 }
@@ -705,9 +747,10 @@ double long& HExpression::operator[]( int index_ ) {
 double long HExpression::evaluate( void ) {
 	M_PROLOG
 	tree_t::const_node_t root = _equationTree.get_root();
-	if ( ! root )
+	if ( ! root ) {
 		M_THROW( "logic tree is not compiled", _error );
-	return ( ( this->* ( (*root)->METHOD ) ) ( root ) );
+	}
+	return ( ( this->*( (*root)->METHOD ) )( root ) );
 	M_EPILOG
 }
 
@@ -744,10 +787,11 @@ char const* HExpression::get_error( void ) const {
 
 int HExpression::get_error_token( void ) const {
 	M_PROLOG
-	if ( _length > _index )
+	if ( _length > _index ) {
 		return ( _terminalIndexes [ _index ] );
-	else if ( _index >= 0 )
+	} else if ( _index >= 0 ) {
 		return ( _length );
+	}
 	return ( 0 );
 	M_EPILOG
 }
