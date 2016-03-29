@@ -70,6 +70,24 @@ extern M_YAAL_TOOLS_PUBLIC_API HSequence const brightmagenta;
 extern M_YAAL_TOOLS_PUBLIC_API HSequence const brightcyan;
 extern M_YAAL_TOOLS_PUBLIC_API HSequence const white;
 
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const bgblack;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const bgred;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const bggreen;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const bgbrown;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const bgblue;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const bgmagenta;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const bgcyan;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const bglightgray;
+
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const bggray;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const bgbrightred;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const bgbrightgreen;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const bgyellow;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const bgbrightblue;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const bgbrightmagenta;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const bgbrightcyan;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const bgwhite;
+
 extern M_YAAL_TOOLS_PUBLIC_API HSequence const up;
 extern M_YAAL_TOOLS_PUBLIC_API HSequence const down;
 extern M_YAAL_TOOLS_PUBLIC_API HSequence const left;

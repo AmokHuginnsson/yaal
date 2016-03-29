@@ -25,6 +25,7 @@ Copyright:
 */
 
 #include <cstdio>
+#include <cstdlib>
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
@@ -38,25 +39,48 @@ namespace yaal {
 
 namespace ansi {
 
+namespace {
+bool smartTerm = ::getenv( "DISPLAY" ) != nullptr;
+}
+
 HSequence const bold( "\033[1m" );
 HSequence const underline( "\033[4m" );
 HSequence const reset( "\033[0m" );
-HSequence const black( "\033[0;30m" );
-HSequence const red( "\033[0;31m" );
-HSequence const green( "\033[0;32m" );
-HSequence const brown( "\033[0;33m" );
-HSequence const blue( "\033[0;34m" );
-HSequence const magenta( "\033[0;35m" );
-HSequence const cyan( "\033[0;36m" );
-HSequence const lightgray( "\033[0;37m" );
-HSequence const gray( "\033[1;30m" );
-HSequence const brightred( "\033[1;31m" );
-HSequence const brightgreen( "\033[1;32m" );
-HSequence const yellow( "\033[1;33m" );
-HSequence const brightblue( "\033[1;34m" );
-HSequence const brightmagenta( "\033[1;35m" );
-HSequence const brightcyan( "\033[1;36m" );
-HSequence const white( "\033[1;37m" );
+HSequence const black( "\033[22;30m" );
+HSequence const red( "\033[22;31m" );
+HSequence const green( "\033[22;32m" );
+HSequence const brown( "\033[22;33m" );
+HSequence const blue( "\033[22;34m" );
+HSequence const magenta( "\033[22;35m" );
+HSequence const cyan( "\033[22;36m" );
+HSequence const lightgray( "\033[22;37m" );
+
+HSequence const gray( smartTerm ? "\033[90m" : "\033[1;30m" );
+HSequence const brightred( smartTerm ? "\033[91m" : "\033[1;31m" );
+HSequence const brightgreen( smartTerm ? "\033[92m" : "\033[1;32m" );
+HSequence const yellow( smartTerm ? "\033[93m" : "\033[1;33m" );
+HSequence const brightblue( smartTerm ? "\033[94m" : "\033[1;34m" );
+HSequence const brightmagenta( smartTerm ? "\033[95m" : "\033[1;35m" );
+HSequence const brightcyan( smartTerm ? "\033[96m" : "\033[1;36m" );
+HSequence const white( smartTerm ? "\033[97m" : "\033[1;37m" );
+
+HSequence const bgblack( "\033[40m" );
+HSequence const bgred( "\033[41m" );
+HSequence const bggreen( "\033[42m" );
+HSequence const bgbrown( "\033[43m" );
+HSequence const bgblue( "\033[44m" );
+HSequence const bgmagenta( "\033[45m" );
+HSequence const bgcyan( "\033[46m" );
+HSequence const bglightgray( "\033[47m" );
+
+HSequence const bggray( "\033[100m" );
+HSequence const bgbrightred( "\033[101m" );
+HSequence const bgbrightgreen( "\033[102m" );
+HSequence const bgyellow( "\033[103m" );
+HSequence const bgbrightblue( "\033[104m" );
+HSequence const bgbrightmagenta( "\033[105m" );
+HSequence const bgbrightcyan( "\033[106m" );
+HSequence const bgwhite( "\033[107m" );
 
 HSequence const home( "\033[H" );
 HSequence const up( "\033[A" );
