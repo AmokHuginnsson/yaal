@@ -232,36 +232,35 @@ double long HExpression::functions( tree_t::const_node_t node_ ) {
 	double long retVal = 0;
 	switch ( function ) {
 		case ( FUNCTION::SIN ):
-			retVal = ::std::sin( leftValue );
+			retVal = sinus( leftValue );
 		break;
 		case ( FUNCTION::SINH ):
 			retVal = ::std::sinh( leftValue );
 		break;
 		case ( FUNCTION::COS ):
-			retVal = ::std::cos( leftValue );
+			retVal = cosinus( leftValue );
 		break;
 		case ( FUNCTION::COSH ):
 			retVal = ::std::cosh( leftValue );
 		break;
 		case ( FUNCTION::TG	): {
-			if ( eq( ::std::floor( leftValue / PI + .5 ),
-						( leftValue / PI + .5 ) ) )
+			if ( eq( ::std::floor( leftValue / PI + .5 ), ( leftValue / PI + .5 ) ) ) {
 				throw HExpressionException( _( "tg: argument not in domain" ) );
-			retVal = ::std::tan( leftValue );
+			}
+			retVal = tangens( leftValue );
 		}
 		break;
 		case ( FUNCTION::TGH ):
 			retVal = ::std::tanh( leftValue );
 		break;
 		case ( FUNCTION::CTG ): {
-			if ( eq( ::std::floor( leftValue / PI ),
-						( leftValue / PI ) ) )
+			if ( eq( ::std::floor( leftValue / PI ), ( leftValue / PI ) ) ) {
 				throw HExpressionException( _( "ctg: argument not in domain" ) );
-			leftValue = ::std::tan( leftValue );
+			}
 			if ( leftValue == 0 ) {
 				leftValue =  std::numeric_limits<double long>::epsilon();
 			}
-			retVal = 1. / leftValue;
+			retVal = cotangens( leftValue );
 		}
 		break;
 		case ( FUNCTION::CTGH ): {
@@ -273,36 +272,40 @@ double long HExpression::functions( tree_t::const_node_t node_ ) {
 		}
 		break;
 		case ( FUNCTION::ARCSIN ): {
-			if ( ( leftValue < - PI / 2 ) || ( leftValue > PI / 2 ) )
+			if ( ( leftValue < - PI / 2 ) || ( leftValue > PI / 2 ) ) {
 				throw HExpressionException( _( "arcsin: argument not in domain" ) );
-			retVal = ::std::asin( leftValue );
+			}
+			retVal = arcus_sinus( leftValue );
 		}
 		break;
 		case ( FUNCTION::ARCCOS ): {
-			if ( ( leftValue < - PI / 2 ) || ( leftValue > PI / 2 ) )
+			if ( ( leftValue < - PI / 2 ) || ( leftValue > PI / 2 ) ) {
 				throw HExpressionException( _( "arccos: argument not in domain" ) );
-			retVal = ::std::acos( leftValue );
+			}
+			retVal = arcus_cosinus( leftValue );
 		}
 		break;
 		case ( FUNCTION::ARCTG ):
-			retVal = ::std::atan( leftValue );
+			retVal = arcus_tangens( leftValue );
 		break;
 		case ( FUNCTION::ARCCTG ):
-			retVal = PI - std::atan( leftValue );
+			retVal = arcus_cotangens( leftValue );
 		break;
 		case ( FUNCTION::EXP ):
-			retVal = ::std::exp( leftValue );
+			retVal = natural_expotential( leftValue );
 		break;
 		case ( FUNCTION::SQRT ): {
-			if ( leftValue < 0 )
+			if ( leftValue < 0 ) {
 				throw HExpressionException( _( "square_root: argument not in domain" ) );
+			}
 			retVal = square_root( leftValue );
 		}
 		break;
 		case ( FUNCTION::LN ): {
-			if ( leftValue <= 0 )
+			if ( leftValue <= 0 ) {
 				throw HExpressionException( _( "ln: argument not in domain" ) );
-			retVal = ::std::log( leftValue );
+			}
+			retVal = natural_logarithm( leftValue );
 		}
 		break;
 		case ( FUNCTION::LOG ): {
