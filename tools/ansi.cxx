@@ -39,10 +39,6 @@ namespace yaal {
 
 namespace ansi {
 
-namespace {
-bool smartTerm = ::getenv( "DISPLAY" ) != nullptr;
-}
-
 HSequence const bold( "\033[1m" );
 HSequence const underline( "\033[4m" );
 HSequence const reset( "\033[0m" );
@@ -55,14 +51,14 @@ HSequence const magenta( "\033[22;35m" );
 HSequence const cyan( "\033[22;36m" );
 HSequence const lightgray( "\033[22;37m" );
 
-HSequence const gray( smartTerm ? "\033[90m" : "\033[1;30m" );
-HSequence const brightred( smartTerm ? "\033[91m" : "\033[1;31m" );
-HSequence const brightgreen( smartTerm ? "\033[92m" : "\033[1;32m" );
-HSequence const yellow( smartTerm ? "\033[93m" : "\033[1;33m" );
-HSequence const brightblue( smartTerm ? "\033[94m" : "\033[1;34m" );
-HSequence const brightmagenta( smartTerm ? "\033[95m" : "\033[1;35m" );
-HSequence const brightcyan( smartTerm ? "\033[96m" : "\033[1;36m" );
-HSequence const white( smartTerm ? "\033[97m" : "\033[1;37m" );
+HSequence const gray( "\033[1;30m" );
+HSequence const brightred( "\033[1;31m" );
+HSequence const brightgreen( "\033[1;32m" );
+HSequence const yellow( "\033[1;33m" );
+HSequence const brightblue( "\033[1;34m" );
+HSequence const brightmagenta( "\033[1;35m" );
+HSequence const brightcyan( "\033[1;36m" );
+HSequence const white( "\033[1;37m" );
 
 HSequence const bgblack( "\033[40m" );
 HSequence const bgred( "\033[41m" );
