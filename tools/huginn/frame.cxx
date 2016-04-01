@@ -48,6 +48,7 @@ HFrame::HFrame(
 	, _object( nullptr )
 	, _upCast( 0 )
 	, _variables()
+	, _namedVariables()
 	, _operations()
 	, _values()
 	, _result()
@@ -98,6 +99,7 @@ void HFrame::reset( void ) {
 	M_ASSERT( _values.is_empty() );
 	M_ASSERT( _operations.is_empty() );
 	_result.reset();
+	_namedVariables.clear();
 	_variables.clear();
 	_state = STATE::NORMAL;
 	return;
@@ -110,9 +112,9 @@ HHuginn::value_t HFrame::get_reference( HHuginn::identifier_id_t identifierId_, 
 	int fieldIdx( -1 );
 	HFrame* f( this );
 	while ( f ) {
-		variables_t::iterator it( f->_variables.find( identifierId_ ) );
+		named_variables_t::iterator it( f->_namedVariables.find( identifierId_ ) );
 		HHuginn::HObject* obj( f->_object ? static_cast<HHuginn::HObject*>( f->_object->raw() ) : nullptr );
-		if ( it != f->_variables.end() ) {
+		if ( it != f->_namedVariables.end() ) {
 			v = it->second;
 			break;
 		} else if ( obj && ( ( fieldIdx = obj->field_index( identifierId_ ) ) >= 0 ) ) {
@@ -151,6 +153,28 @@ HHuginn::value_t HFrame::get_reference( HHuginn::identifier_id_t identifierId_, 
 	M_EPILOG
 }
 
+HHuginn::value_t HFrame::get_field( int index_ ) {
+	M_PROLOG
+	HFrame* f( this );
+	while ( ! f->_object ) {
+		f = f->_parent;
+		M_ASSERT( f );
+	}
+	return ( static_cast<HHuginn::HObject*>( f->_object->raw() )->field( *f->_object, index_ ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HFrame::get_variable( int scopeUp_, int index_ ) {
+	M_PROLOG
+	HFrame* f( this );
+	while ( scopeUp_ > 0 ) {
+		f = f->_parent;
+		M_ASSERT( f );
+	}
+	return ( f->_variables[index_] );
+	M_EPILOG
+}
+
 void HFrame::set_variable( HHuginn::identifier_id_t identifierId_, HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
 	HHuginn::value_t ref( make_variable( identifierId_, position_ ) );
@@ -170,8 +194,8 @@ HHuginn::value_t HFrame::make_variable( HHuginn::identifier_id_t identifierId_, 
 			v = &( obj->field_ref( fieldIdx ) );
 			break;
 		}
-		variables_t::iterator it( f->_variables.find( identifierId_ ) );
-		if ( it != f->_variables.end() ) {
+		named_variables_t::iterator it( f->_namedVariables.find( identifierId_ ) );
+		if ( it != f->_namedVariables.end() ) {
 			v = &( it->second );
 			break;
 		}
@@ -182,7 +206,7 @@ HHuginn::value_t HFrame::make_variable( HHuginn::identifier_id_t identifierId_, 
 		}
 	}
 	if ( ! v ) {
-		v = &( _variables.insert( make_pair( identifierId_, _thread->huginn().none_value() ) ).first->second );
+		v = &( _namedVariables.insert( make_pair( identifierId_, _thread->huginn().none_value() ) ).first->second );
 	}
 	return ( make_pointer<HHuginn::HReference>( *v ) );
 	M_EPILOG

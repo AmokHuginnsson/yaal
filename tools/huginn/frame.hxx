@@ -44,7 +44,7 @@ class HFunction;
 class HFrame {
 public:
 	typedef HFrame this_type;
-	typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, HHuginn::value_t> variables_t;
+	typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, HHuginn::value_t> named_variables_t;
 	typedef yaal::hcore::HStack<HHuginn::value_t> values_t;
 	enum class TYPE {
 		SCOPE,
@@ -65,7 +65,8 @@ private:
 	HFrame* const _parent;
 	HHuginn::value_t* _object;
 	int _upCast;
-	variables_t _variables;
+	HHuginn::values_t _variables;
+	named_variables_t _namedVariables;
 	/*
 	 * Operations must be kept per frame (and not in HThread)
 	 * because new frame (new scope) can be created from within an expression
@@ -83,6 +84,8 @@ public:
 	HHuginn::value_t make_variable( HHuginn::identifier_id_t, int );
 	void set_variable( HHuginn::identifier_id_t, HHuginn::value_t const&, int );
 	HHuginn::value_t get_reference( HHuginn::identifier_id_t, int );
+	HHuginn::value_t get_field( int );
+	HHuginn::value_t get_variable( int, int );
 	bool can_continue( void ) const {
 		return ( _state == STATE::NORMAL );
 	}

@@ -150,7 +150,7 @@ OCompiler::OFunctionContext::OFunctionContext( void )
 	, _lastDereferenceOperator( OPERATOR::NONE )
 	, _isAssert( false )
 	, _lastMemberName() {
-	_scopeStack.emplace( make_resource<OScopeContext>( nullptr, 0 ) );
+	_scopeStack.emplace( make_pointer<OScopeContext>( nullptr, 0 ) );
 	return;
 }
 
@@ -171,8 +171,18 @@ OCompiler::OClassContext::OClassContext( void )
 	return;
 }
 
-OCompiler::OExecutionStep::OExecutionStep( HHuginn::expression_t& expression_, int index_, HHuginn::identifier_id_t identifier_, int position_ )
-	: _expression( expression_ )
+OCompiler::OExecutionStep::OExecutionStep(
+	OPERATION operation_,
+	HHuginn::expression_t const& expression_,
+	OFunctionContext::scope_context_t const& scope_,
+	HHuginn::identifier_id_t classId_,
+	int index_,
+	HHuginn::identifier_id_t identifier_,
+	int position_
+) : _operation( operation_ )
+	, _expression( expression_ )
+	, _scope( scope_ )
+	, _classId( classId_ )
 	, _index( index_ )
 	, _identifier( identifier_ )
 	, _position( position_ ) {
@@ -229,7 +239,7 @@ void OCompiler::optimize( void ) {
 	M_PROLOG
 	M_ASSERT( _submittedClasses.is_empty() );
 	for ( OExecutionStep& es : _executionStepsBacklog ) {
-		if ( ! is_keyword( _huginn->identifier_name( es._identifier ) ) ) {
+		if ( ( es._operation == OExecutionStep::OPERATION::USE ) && ! is_keyword( _huginn->identifier_name( es._identifier ) ) ) {
 			HHuginn::class_t c( _huginn->get_class( es._identifier ) );
 			if ( !! c ) {
 				es._expression->replace_execution_step(
@@ -583,7 +593,7 @@ void OCompiler::add_paramater( yaal::hcore::HString const& name_, executing_pars
 void OCompiler::create_scope( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	fc._scopeStack.emplace( make_resource<OScopeContext>( fc._scopeStack.top().raw(), position_.get() ) );
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( fc._scopeStack.top().raw(), position_.get() ) );
 	return;
 	M_EPILOG
 }
@@ -1649,7 +1659,15 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 				hcore::call( &HExpression::get_reference, expression.raw(), refIdentifier, _1, position_.get() )
 			)
 		);
-		_executionStepsBacklog.emplace_back( expression, index, refIdentifier, position_.get() );
+		_executionStepsBacklog.emplace_back(
+			OExecutionStep::OPERATION::USE,
+			expression,
+			fc._scopeStack.top(),
+			!! _classContext ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
+			index,
+			refIdentifier,
+			position_.get()
+		);
 	}
 	fc._valueTypes.push( guess_type( refIdentifier ) );
 	return;
@@ -1682,7 +1700,21 @@ void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executi
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted name." ), position_.get() );
 	}
 	HHuginn::identifier_id_t varIdentifier( _huginn->identifier_id( value_ ) );
-	current_expression()->add_execution_step( hcore::call( &HExpression::make_variable, current_expression().raw(), varIdentifier, _1, position_.get() ) );
+	HHuginn::expression_t& expression( current_expression() );
+	int index(
+		expression->add_execution_step(
+			hcore::call( &HExpression::make_variable, current_expression().raw(), varIdentifier, _1, position_.get() )
+		)
+	);
+	_executionStepsBacklog.emplace_back(
+		OExecutionStep::OPERATION::DEFINE,
+		expression,
+		fc._scopeStack.top(),
+		!! _classContext ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
+		index,
+		varIdentifier,
+		position_.get()
+	);
 	fc._valueTypes.push( type_id( HHuginn::TYPE::UNKNOWN ) );
 	fc._variables.push( varIdentifier );
 	return;

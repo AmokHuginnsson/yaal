@@ -125,7 +125,7 @@ struct OCompiler {
 	/* \brief Compilation context for currently compiled function/method/lambda.
 	 */
 	struct OFunctionContext {
-		typedef yaal::hcore::HResource<OScopeContext> scope_context_t;
+		typedef yaal::hcore::HPointer<OScopeContext> scope_context_t;
 		typedef yaal::hcore::HStack<scope_context_t> scope_stack_t;
 		typedef yaal::hcore::HStack<HHuginn::type_id_t> type_stack_t;
 		typedef yaal::hcore::HStack<HHuginn::identifier_id_t> variable_stack_t;
@@ -220,6 +220,7 @@ struct OCompiler {
 		 * \endcode
 		 */
 		HHuginn::identifier_id_t _lastMemberName;
+
 		OFunctionContext( void );
 		expressions_stack_t& expressions_stack( void );
 	};
@@ -239,11 +240,23 @@ struct OCompiler {
 		OClassContext( void );
 	};
 	struct OExecutionStep {
+		enum class OPERATION {
+			DEFINE,
+			USE
+		};
+		OPERATION _operation;
 		HHuginn::expression_t _expression;
+		OFunctionContext::scope_context_t _scope;
+
+		/*! \brief Class identifier if this scope if part of class method.
+		 */
+		HHuginn::identifier_id_t _classId;
 		int _index;
 		HHuginn::identifier_id_t _identifier;
 		int _position;
-		OExecutionStep( HHuginn::expression_t&, int, HHuginn::identifier_id_t, int );
+		OExecutionStep(
+			OPERATION, HHuginn::expression_t const&, OFunctionContext::scope_context_t const&, HHuginn::identifier_id_t, int, HHuginn::identifier_id_t, int
+		);
 	};
 	struct OIdentifierUse {
 		enum class TYPE {
