@@ -135,7 +135,7 @@ void OCompiler::OScopeContext::note_type( HHuginn::identifier_id_t identifierId_
 	M_EPILOG
 }
 
-OCompiler::OFunctionContext::OFunctionContext( void )
+OCompiler::OFunctionContext::OFunctionContext( bool isLambda_ )
 	: _functionIdentifier( INVALID_IDENTIFIER )
 	, _parameters()
 	, _defaultValues()
@@ -149,7 +149,8 @@ OCompiler::OFunctionContext::OFunctionContext( void )
 	, _nestedCalls( 0 )
 	, _lastDereferenceOperator( OPERATOR::NONE )
 	, _isAssert( false )
-	, _lastMemberName() {
+	, _lastMemberName()
+	, _isLambda( isLambda_ ) {
 	_scopeStack.emplace( make_pointer<OScopeContext>( nullptr, 0 ) );
 	return;
 }
@@ -238,7 +239,18 @@ void OCompiler::set_setup( HHuginn::compiler_setup_t setup_ ) {
 void OCompiler::optimize( void ) {
 	M_PROLOG
 	M_ASSERT( _submittedClasses.is_empty() );
+	HHuginn::identifier_id_t lastClassId( INVALID_IDENTIFIER );
+	HHuginn::class_t aClass;
 	for ( OExecutionStep& es : _executionStepsBacklog ) {
+		if ( es._classId != lastClassId ) {
+			if ( es._classId != INVALID_IDENTIFIER ) {
+				aClass = _huginn->get_class( es._classId );
+				M_ASSERT( !! aClass );
+			} else {
+				aClass.reset();
+			}
+			lastClassId = es._classId;
+		}
 		if ( ( es._operation == OExecutionStep::OPERATION::USE ) && ! is_keyword( _huginn->identifier_name( es._identifier ) ) ) {
 			HHuginn::class_t c( _huginn->get_class( es._identifier ) );
 			if ( !! c ) {
@@ -355,7 +367,7 @@ void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_
 			! _classContext ? OIdentifierUse::TYPE::FUNCTION : OIdentifierUse::TYPE::METHOD
 		);
 	}
-	_functionContexts.emplace( make_resource<OFunctionContext>() );
+	_functionContexts.emplace( make_resource<OFunctionContext>( false ) );
 	f()._functionIdentifier = functionIdentifier;
 	if ( !! _classContext ) {
 		add_field_name( name_, position_ );
@@ -427,7 +439,7 @@ void OCompiler::set_class_name( yaal::hcore::HString const& name_, executing_par
 	if ( _submittedClasses.count( classIdentifer ) > 0 ) {
 		throw HHuginn::HHuginnRuntimeException( "Class `"_ys.append( name_ ).append( "' is already defined." ), position_.get() );
 	}
-	_functionContexts.emplace( make_resource<OFunctionContext>() );
+	_functionContexts.emplace( make_resource<OFunctionContext>( false ) );
 	_classContext->_classIdentifier = classIdentifer;
 	_classContext->_position = position_;
 	return;
@@ -475,7 +487,7 @@ void OCompiler::set_field_name( yaal::hcore::HString const& name_, executing_par
 void OCompiler::set_lambda_name( executing_parser::position_t position_ ) {
 	M_PROLOG
 	HHuginn::HErrorCoordinate ec( _huginn->get_coordinate( position_.get() ) );
-	_functionContexts.emplace( make_resource<OFunctionContext>() );
+	_functionContexts.emplace( make_resource<OFunctionContext>( true ) );
 	f()._functionIdentifier = _huginn->identifier_id( to_string( "@" ).append( ec.line() ).append( ":" ).append( ec.column() ) );
 	return;
 	M_EPILOG
@@ -1663,7 +1675,7 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 			OExecutionStep::OPERATION::USE,
 			expression,
 			fc._scopeStack.top(),
-			!! _classContext ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
+			!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
 			index,
 			refIdentifier,
 			position_.get()
@@ -1710,7 +1722,7 @@ void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executi
 		OExecutionStep::OPERATION::DEFINE,
 		expression,
 		fc._scopeStack.top(),
-		!! _classContext ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
+		!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
 		index,
 		varIdentifier,
 		position_.get()

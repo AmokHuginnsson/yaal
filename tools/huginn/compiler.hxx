@@ -221,7 +221,11 @@ struct OCompiler {
 		 */
 		HHuginn::identifier_id_t _lastMemberName;
 
-		OFunctionContext( void );
+		/*! \brief Tell if this function context refers to lambda.
+		 */
+		bool _isLambda;
+
+		OFunctionContext( bool );
 		expressions_stack_t& expressions_stack( void );
 	};
 	typedef yaal::hcore::HResource<OFunctionContext> function_context_t;
