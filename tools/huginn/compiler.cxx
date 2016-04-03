@@ -251,24 +251,43 @@ void OCompiler::optimize( void ) {
 			}
 			lastClassId = es._classId;
 		}
-		if ( ( es._operation == OExecutionStep::OPERATION::USE ) && ! is_keyword( _huginn->identifier_name( es._identifier ) ) ) {
-			HHuginn::class_t c( _huginn->get_class( es._identifier ) );
-			if ( !! c ) {
-				es._expression->replace_execution_step(
-					es._index,
-					hcore::call(
-						&HExpression::store_direct,
-						es._expression.raw(),
-						make_pointer<HHuginn::HFunctionReference>(
-							es._identifier,
-							hcore::call( &HHuginn::HClass::create_instance, c.raw(), _1, _2, _3, _4 )
-						),
-						_1,
-						es._position
-					)
-				);
+		do {
+			if ( !! aClass ) {
+				int index( aClass->field_index( es._identifier ) );
+				if ( index >= 0 ) {
+					es._expression->replace_execution_step(
+						es._index,
+						hcore::call(
+							&HExpression::get_field_direct,
+							es._expression.raw(),
+							es._operation == OExecutionStep::OPERATION::USE ? HExpression::ACCESS::VALUE : HExpression::ACCESS::REFERENCE,
+							index,
+							_1,
+							es._position
+						)
+					);
+					break;
+				}
 			}
-		}
+			if ( ( es._operation == OExecutionStep::OPERATION::USE ) && ! is_keyword( _huginn->identifier_name( es._identifier ) ) ) {
+				HHuginn::class_t c( _huginn->get_class( es._identifier ) );
+				if ( !! c ) {
+					es._expression->replace_execution_step(
+						es._index,
+						hcore::call(
+							&HExpression::store_direct,
+							es._expression.raw(),
+							make_pointer<HHuginn::HFunctionReference>(
+								es._identifier,
+								hcore::call( &HHuginn::HClass::create_instance, c.raw(), _1, _2, _3, _4 )
+							),
+							_1,
+							es._position
+						)
+					);
+				}
+			}
+		} while ( false );
 	}
 	return;
 	M_EPILOG

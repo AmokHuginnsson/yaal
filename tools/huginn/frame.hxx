@@ -31,6 +31,7 @@ Copyright:
 
 #include "tools/hhuginn.hxx"
 #include "tools/huginn/operator.hxx"
+#include "tools/huginn/expression.hxx"
 
 namespace yaal {
 
@@ -84,7 +85,7 @@ public:
 	HHuginn::value_t make_variable( HHuginn::identifier_id_t, int );
 	void set_variable( HHuginn::identifier_id_t, HHuginn::value_t const&, int );
 	HHuginn::value_t get_reference( HHuginn::identifier_id_t, int );
-	HHuginn::value_t get_field( int );
+	HHuginn::value_t get_field( HExpression::ACCESS, int );
 	HHuginn::value_t get_variable( int, int );
 	bool can_continue( void ) const {
 		return ( _state == STATE::NORMAL );

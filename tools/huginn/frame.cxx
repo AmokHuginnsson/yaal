@@ -117,9 +117,6 @@ HHuginn::value_t HFrame::get_reference( HHuginn::identifier_id_t identifierId_, 
 		if ( it != f->_namedVariables.end() ) {
 			v = it->second;
 			break;
-		} else if ( obj && ( ( fieldIdx = obj->field_index( identifierId_ ) ) >= 0 ) ) {
-			v = obj->field( *f->_object, fieldIdx );
-			break;
 		} else if ( obj && ( identifierId_ == KEYWORD::THIS_IDENTIFIER ) ) {
 			v = *f->_object;
 			M_ASSERT( !! v );
@@ -153,14 +150,21 @@ HHuginn::value_t HFrame::get_reference( HHuginn::identifier_id_t identifierId_, 
 	M_EPILOG
 }
 
-HHuginn::value_t HFrame::get_field( int index_ ) {
+HHuginn::value_t HFrame::get_field( HExpression::ACCESS access_, int index_ ) {
 	M_PROLOG
 	HFrame* f( this );
 	while ( ! f->_object ) {
 		f = f->_parent;
 		M_ASSERT( f );
 	}
-	return ( static_cast<HHuginn::HObject*>( f->_object->raw() )->field( *f->_object, index_ ) );
+	HHuginn::value_t v;
+	if ( access_ == HExpression::ACCESS::VALUE ) {
+		v = static_cast<HHuginn::HObject*>( f->_object->raw() )->field( *f->_object, index_ );
+	} else {
+		HHuginn::value_t& ref( static_cast<HHuginn::HObject*>( f->_object->raw() )->field_ref( index_ ) );
+	  v = make_pointer<HHuginn::HReference>( ref );
+	}
+	return ( v );
 	M_EPILOG
 }
 
