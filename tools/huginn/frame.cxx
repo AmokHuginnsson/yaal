@@ -109,7 +109,6 @@ void HFrame::reset( void ) {
 HHuginn::value_t HFrame::get_reference( HHuginn::identifier_id_t identifierId_, int position_ ) {
 	M_PROLOG
 	HHuginn::value_t v;
-	int fieldIdx( -1 );
 	HFrame* f( this );
 	while ( f ) {
 		named_variables_t::iterator it( f->_namedVariables.find( identifierId_ ) );
