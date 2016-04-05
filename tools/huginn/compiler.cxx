@@ -62,9 +62,9 @@ OCompiler::OActiveScope::OActiveScope( HHuginn::scope_t& scope_, HHuginn::expres
 	return;
 }
 
-OCompiler::OScopeContext::OScopeContext( OScopeContext* parent_, int position_ )
+OCompiler::OScopeContext::OScopeContext( OScopeContext* parent_, HScope::scope_id_t scopeId_, int position_ )
 	: _parent( parent_ )
-	, _scope( make_pointer<HScope>( position_ ) )
+	, _scope( make_pointer<HScope>( scopeId_, position_ ) )
 	, _expressionsStack()
 	, _variableTypes()
 	, _exceptionType( INVALID_IDENTIFIER )
@@ -73,14 +73,15 @@ OCompiler::OScopeContext::OScopeContext( OScopeContext* parent_, int position_ )
 	, _scopeChain()
 	, _else()
 	, _catches()
-	, _terminatedAt( NOT_TERMINATED ) {
+	, _terminatedAt( NOT_TERMINATED )
+	, _executionStepIndex( -1 ) {
 	_expressionsStack.emplace( 1, make_pointer<HExpression>() );
 	return;
 }
 
-void OCompiler::OScopeContext::clear( void ) {
+void OCompiler::OScopeContext::reset( HScope::scope_id_t scopeId_ ) {
 	M_PROLOG
-	_scope = make_pointer<HScope>( 0 );
+	_scope = make_pointer<HScope>( scopeId_, 0 );
 	_expressionsStack.clear();
 	_expressionsStack.emplace( 1, make_pointer<HExpression>() );
 	_variableTypes.clear();
@@ -135,7 +136,7 @@ void OCompiler::OScopeContext::note_type( HHuginn::identifier_id_t identifierId_
 	M_EPILOG
 }
 
-OCompiler::OFunctionContext::OFunctionContext( bool isLambda_ )
+OCompiler::OFunctionContext::OFunctionContext( HScope::scope_id_t scopeId_, bool isLambda_ )
 	: _functionIdentifier( INVALID_IDENTIFIER )
 	, _parameters()
 	, _defaultValues()
@@ -151,7 +152,7 @@ OCompiler::OFunctionContext::OFunctionContext( bool isLambda_ )
 	, _isAssert( false )
 	, _lastMemberName()
 	, _isLambda( isLambda_ ) {
-	_scopeStack.emplace( make_pointer<OScopeContext>( nullptr, 0 ) );
+	_scopeStack.emplace( make_resource<OScopeContext>( nullptr, scopeId_, 0 ) );
 	return;
 }
 
@@ -175,7 +176,7 @@ OCompiler::OClassContext::OClassContext( void )
 OCompiler::OExecutionStep::OExecutionStep(
 	OPERATION operation_,
 	HHuginn::expression_t const& expression_,
-	OFunctionContext::scope_context_t const& scope_,
+	HHuginn::scope_t const& scope_,
 	HHuginn::identifier_id_t classId_,
 	int index_,
 	HHuginn::identifier_id_t identifier_,
@@ -227,6 +228,7 @@ OCompiler::OCompiler( HHuginn* huginn_ )
 	, _executionStepsBacklog()
 	, _usedIdentifiers()
 	, _setup( HHuginn::COMPILER::BE_STRICT | HHuginn::COMPILER::OPTIMIZE )
+	, _scopeIdGenerator( INVALID_SCOPE_IDENTIFIER )
 	, _huginn( huginn_ ) {
 	return;
 }
@@ -386,7 +388,7 @@ void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_
 			! _classContext ? OIdentifierUse::TYPE::FUNCTION : OIdentifierUse::TYPE::METHOD
 		);
 	}
-	_functionContexts.emplace( make_resource<OFunctionContext>( false ) );
+	_functionContexts.emplace( make_resource<OFunctionContext>( ++ _scopeIdGenerator, false ) );
 	f()._functionIdentifier = functionIdentifier;
 	if ( !! _classContext ) {
 		add_field_name( name_, position_ );
@@ -458,7 +460,7 @@ void OCompiler::set_class_name( yaal::hcore::HString const& name_, executing_par
 	if ( _submittedClasses.count( classIdentifer ) > 0 ) {
 		throw HHuginn::HHuginnRuntimeException( "Class `"_ys.append( name_ ).append( "' is already defined." ), position_.get() );
 	}
-	_functionContexts.emplace( make_resource<OFunctionContext>( false ) );
+	_functionContexts.emplace( make_resource<OFunctionContext>( ++ _scopeIdGenerator, false ) );
 	_classContext->_classIdentifier = classIdentifer;
 	_classContext->_position = position_;
 	return;
@@ -506,7 +508,7 @@ void OCompiler::set_field_name( yaal::hcore::HString const& name_, executing_par
 void OCompiler::set_lambda_name( executing_parser::position_t position_ ) {
 	M_PROLOG
 	HHuginn::HErrorCoordinate ec( _huginn->get_coordinate( position_.get() ) );
-	_functionContexts.emplace( make_resource<OFunctionContext>( true ) );
+	_functionContexts.emplace( make_resource<OFunctionContext>( ++ _scopeIdGenerator, true ) );
 	f()._functionIdentifier = _huginn->identifier_id( to_string( "@" ).append( ec.line() ).append( ":" ).append( ec.column() ) );
 	return;
 	M_EPILOG
@@ -538,7 +540,7 @@ HHuginn::function_t OCompiler::create_function( executing_parser::position_t ) {
 		)
 	);
 	M_ASSERT( fc._scopeStack.get_size() == 1 );
-	fc._scopeStack.top()->clear();
+	fc._scopeStack.top()->reset( ++ _scopeIdGenerator );
 	fc._parameters.clear();
 	fc._defaultValues.clear();
 	fc._lastDefaultValuePosition = -1;
@@ -624,7 +626,7 @@ void OCompiler::add_paramater( yaal::hcore::HString const& name_, executing_pars
 void OCompiler::create_scope( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( fc._scopeStack.top().raw(), position_.get() ) );
+	fc._scopeStack.emplace( make_resource<OScopeContext>( fc._scopeStack.top().raw(), ++ _scopeIdGenerator, position_.get() ) );
 	return;
 	M_EPILOG
 }
@@ -1693,7 +1695,7 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 		_executionStepsBacklog.emplace_back(
 			OExecutionStep::OPERATION::USE,
 			expression,
-			fc._scopeStack.top(),
+			current_scope(),
 			!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
 			index,
 			refIdentifier,
@@ -1740,7 +1742,7 @@ void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executi
 	_executionStepsBacklog.emplace_back(
 		OExecutionStep::OPERATION::DEFINE,
 		expression,
-		fc._scopeStack.top(),
+		current_scope(),
 		!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
 		index,
 		varIdentifier,

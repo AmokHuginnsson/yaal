@@ -57,7 +57,7 @@ HIf::HIf(
 
 void HIf::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
-	thread_->create_scope_frame();
+	thread_->create_scope_frame( INVALID_SCOPE_IDENTIFIER );
 	HFrame* f( thread_->current_frame() );
 	bool done( false );
 	for (

@@ -51,7 +51,7 @@ HTryCatch::HTryCatch( HHuginn::scope_t const& try_, catches_t const& catches_, i
 
 void HTryCatch::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
-	thread_->create_try_catch_frame();
+	thread_->create_try_catch_frame( INVALID_SCOPE_IDENTIFIER );
 	_try->execute( thread_ );
 	if ( thread_->has_exception() ) {
 		HFrame* f( thread_->current_frame() );

@@ -59,7 +59,7 @@ HFor::HFor(
 
 void HFor::do_execute( HThread* thread_ ) const {
 	M_PROLOG
-	thread_->create_loop_frame();
+	thread_->create_loop_frame( _loop->id() );
 	HFrame* f( thread_->current_frame() );
 	_source->execute( thread_ );
 	if ( f->can_continue() ) {

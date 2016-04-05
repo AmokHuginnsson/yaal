@@ -52,7 +52,7 @@ HWhile::HWhile(
 
 void HWhile::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
-	thread_->create_loop_frame();
+	thread_->create_loop_frame( _loop->id() );
 	HFrame* f( thread_->current_frame() );
 	while ( f->can_continue() ) {
 		_condition->execute( thread_ );

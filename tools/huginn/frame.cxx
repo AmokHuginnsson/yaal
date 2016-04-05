@@ -54,17 +54,20 @@ HFrame::HFrame(
 	, _result()
 	, _number( 0 )
 	, _type( TYPE::SCOPE )
-	, _state( STATE::NORMAL ) {
+	, _state( STATE::NORMAL )
+	, _scopeId( INVALID_SCOPE_IDENTIFIER ) {
 	return;
 }
 
 void HFrame::init(
 	TYPE type_,
+	HScope::scope_id_t scopeId_,
 	HHuginn::value_t* object_,
 	int upCast_
 ) {
 	M_PROLOG
 	_type = type_;
+	_scopeId = scopeId_;
 	_object = object_;
 	_upCast = upCast_;
 	_result = _thread->huginn().none_value();
@@ -98,6 +101,7 @@ void HFrame::reset( void ) {
 	M_PROLOG
 	M_ASSERT( _values.is_empty() );
 	M_ASSERT( _operations.is_empty() );
+	_scopeId = INVALID_SCOPE_IDENTIFIER;
 	_result.reset();
 	_namedVariables.clear();
 	_variables.clear();

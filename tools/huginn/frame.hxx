@@ -32,6 +32,7 @@ Copyright:
 #include "tools/hhuginn.hxx"
 #include "tools/huginn/operator.hxx"
 #include "tools/huginn/expression.hxx"
+#include "tools/huginn/scope.hxx"
 
 namespace yaal {
 
@@ -79,9 +80,10 @@ private:
 	int _number;
 	TYPE _type;
 	STATE _state;
+	HScope::scope_id_t _scopeId;
 public:
 	HFrame( HThread*, HFrame* );
-	void init( TYPE, HHuginn::value_t* = nullptr, int = 0 );
+	void init( TYPE, HScope::scope_id_t, HHuginn::value_t* = nullptr, int = 0 );
 	HHuginn::value_t make_variable( HHuginn::identifier_id_t, int );
 	void set_variable( HHuginn::identifier_id_t, HHuginn::value_t const&, int );
 	HHuginn::value_t get_reference( HHuginn::identifier_id_t, int );

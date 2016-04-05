@@ -80,7 +80,7 @@ HHuginn::value_t HFunction::execute( huginn::HThread* thread_, HHuginn::value_t*
 			upCast = 0;
 		}
 	}
-	thread_->create_function_frame( object_, upCast );
+	thread_->create_function_frame( _scope->id(), object_, upCast );
 	HFrame* f( thread_->current_frame() );
 	for (
 		int i( 0 ),

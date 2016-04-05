@@ -32,6 +32,7 @@ Copyright:
 #include "hcore/harray.hxx"
 #include "hcore/hpointer.hxx"
 #include "tools/huginn/statement.hxx"
+#include "hcore/htaggedpod.hxx"
 
 namespace yaal {
 
@@ -45,11 +46,14 @@ public:
 	typedef HStatement base_type;
 	typedef yaal::hcore::HPointer<HStatement> statement_t;
 	typedef yaal::hcore::HArray<statement_t> statement_list_t;
+	struct scope_tag;
+	typedef yaal::hcore::HTaggedPOD<int, scope_tag> scope_id_t;
 private:
 	statement_list_t _statements;
 	bool _inline;
+	scope_id_t _id;
 public:
-	HScope( int );
+	HScope( scope_id_t, int );
 	virtual ~HScope( void ) {
 		return;
 	}
@@ -59,6 +63,9 @@ public:
 	int statement_count( void ) const {
 		return ( static_cast<int>( _statements.get_size() ) );
 	}
+	scope_id_t id( void ) const {
+		return ( _id );
+	}
 protected:
 	virtual void do_execute( HThread* ) const override;
 private:
@@ -66,6 +73,8 @@ private:
 	HScope( HScope&& ) = delete;
 	HScope& operator = ( HScope const& ) = delete;
 };
+
+extern HScope::scope_id_t const INVALID_SCOPE_IDENTIFIER;
 
 }
 
