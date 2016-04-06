@@ -80,10 +80,10 @@ private:
 	int _number;
 	TYPE _type;
 	STATE _state;
-	HScope::scope_id_t _scopeId;
+	HStatement::statement_id_t _statementId;
 public:
 	HFrame( HThread*, HFrame* );
-	void init( TYPE, HScope::scope_id_t, HHuginn::value_t* = nullptr, int = 0 );
+	void init( TYPE, HStatement::statement_id_t, HHuginn::value_t* = nullptr, int = 0 );
 	HHuginn::value_t make_variable( HHuginn::identifier_id_t, int );
 	void set_variable( HHuginn::identifier_id_t, HHuginn::value_t const&, int );
 	HHuginn::value_t get_reference( HHuginn::identifier_id_t, int );

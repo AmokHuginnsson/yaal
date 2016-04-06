@@ -114,15 +114,15 @@ struct OCompiler {
 		 */
 		int _terminatedAt;
 
-		/*! \brief Index of `OExecutionStep` that needs to be updated after committing this scope.
+		/*! \brief Identificator of currently compiled statement.
 		 */
-		int _executionStepIndex;
+		HStatement::statement_id_t _statementId;
 
-		OScopeContext( OScopeContext*, HScope::scope_id_t, int );
+		OScopeContext( OScopeContext*, HStatement::statement_id_t, int );
 		HHuginn::expression_t& expression( void );
 		HHuginn::type_id_t guess_type( HHuginn::identifier_id_t ) const;
 		void note_type( HHuginn::identifier_id_t, HHuginn::type_id_t );
-		void reset( HScope::scope_id_t );
+		void reset( HStatement::statement_id_t, int );
 	private:
 		OScopeContext( OScopeContext const& ) = delete;
 		OScopeContext& operator = ( OScopeContext const& ) = delete;
@@ -130,7 +130,7 @@ struct OCompiler {
 	/* \brief Compilation context for currently compiled function/method/lambda.
 	 */
 	struct OFunctionContext {
-		typedef yaal::hcore::HResource<OScopeContext> scope_context_t;
+		typedef yaal::hcore::HPointer<OScopeContext> scope_context_t;
 		typedef yaal::hcore::HStack<scope_context_t> scope_stack_t;
 		typedef yaal::hcore::HStack<HHuginn::type_id_t> type_stack_t;
 		typedef yaal::hcore::HStack<HHuginn::identifier_id_t> variable_stack_t;
@@ -230,7 +230,7 @@ struct OCompiler {
 		 */
 		bool _isLambda;
 
-		OFunctionContext( HScope::scope_id_t, bool );
+		OFunctionContext( HStatement::statement_id_t, bool );
 		expressions_stack_t& expressions_stack( void );
 	};
 	typedef yaal::hcore::HResource<OFunctionContext> function_context_t;
@@ -255,7 +255,7 @@ struct OCompiler {
 		};
 		OPERATION _operation;
 		HHuginn::expression_t _expression;
-		HHuginn::scope_t _scope;
+		OFunctionContext::scope_context_t _scope;
 
 		/*! \brief Class identifier if this scope if part of class method.
 		 */
@@ -264,7 +264,7 @@ struct OCompiler {
 		HHuginn::identifier_id_t _identifier;
 		int _position;
 		OExecutionStep(
-			OPERATION, HHuginn::expression_t const&, HHuginn::scope_t const&, HHuginn::identifier_id_t, int, HHuginn::identifier_id_t, int
+			OPERATION, HHuginn::expression_t const&, OFunctionContext::scope_context_t const&, HHuginn::identifier_id_t, int, HHuginn::identifier_id_t, int
 		);
 	};
 	struct OIdentifierUse {
@@ -300,7 +300,7 @@ struct OCompiler {
 	execution_steps_backlog_t _executionStepsBacklog;
 	used_identifiers_t _usedIdentifiers;
 	HHuginn::compiler_setup_t _setup;
-	HScope::scope_id_t _scopeIdGenerator;
+	HStatement::statement_id_t _statementIdGenerator;
 	HHuginn* _huginn;
 	OCompiler( HHuginn* );
 	OFunctionContext& f( void );

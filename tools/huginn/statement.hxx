@@ -29,6 +29,8 @@ Copyright:
 #ifndef YAAL_TOOLS_HUGINN_STATEMENT_HXX_INCLUDED
 #define YAAL_TOOLS_HUGINN_STATEMENT_HXX_INCLUDED 1
 
+#include "hcore/htaggedpod.hxx"
+
 namespace yaal {
 
 namespace tools {
@@ -40,11 +42,15 @@ class HThread;
 class HStatement {
 public:
 	typedef HStatement this_type;
+	struct statement_tag;
+	typedef yaal::hcore::HTaggedPOD<int, statement_tag> statement_id_t;
 private:
+	statement_id_t _id;
 	int _position;
 public:
-	HStatement( int position_ )
-		: _position( position_ ) {
+	HStatement( statement_id_t id_, int position_ )
+		: _id( id_ )
+		,_position( position_ ) {
 		return;
 	}
 	virtual ~HStatement( void ) {
@@ -53,6 +59,9 @@ public:
 	void execute( HThread* thread_ ) const {
 		do_execute( thread_ );
 		return;
+	}
+	statement_id_t id( void ) const {
+		return ( _id );
 	}
 	int position( void ) const {
 		return ( _position );
@@ -64,6 +73,8 @@ public:
 protected:
 	virtual void do_execute( HThread* ) const {}
 };
+
+extern HStatement::statement_id_t const INVALID_STATEMENT_IDENTIFIER;
 
 }
 

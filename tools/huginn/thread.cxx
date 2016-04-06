@@ -58,34 +58,34 @@ void HThread::add_frame( void ) {
 	++ _frameCount;
 }
 
-void HThread::create_function_frame( HScope::scope_id_t scopeId_, HHuginn::value_t* object_, int upCast_ ) {
+void HThread::create_function_frame( HStatement::statement_id_t statementId_, HHuginn::value_t* object_, int upCast_ ) {
 	M_PROLOG
 	add_frame();
-	_currentFrame->init( HFrame::TYPE::FUNCTION, scopeId_, object_, upCast_ );
+	_currentFrame->init( HFrame::TYPE::FUNCTION, statementId_, object_, upCast_ );
 	return;
 	M_EPILOG
 }
 
-void HThread::create_loop_frame( HScope::scope_id_t scopeId_ ) {
+void HThread::create_loop_frame( HStatement::statement_id_t statementId_ ) {
 	M_PROLOG
 	add_frame();
-	_currentFrame->init( HFrame::TYPE::LOOP, scopeId_ );
+	_currentFrame->init( HFrame::TYPE::LOOP, statementId_ );
 	return;
 	M_EPILOG
 }
 
-void HThread::create_scope_frame( HScope::scope_id_t scopeId_ ) {
+void HThread::create_scope_frame( HStatement::statement_id_t statementId_ ) {
 	M_PROLOG
 	add_frame();
-	_currentFrame->init( HFrame::TYPE::SCOPE, scopeId_ );
+	_currentFrame->init( HFrame::TYPE::SCOPE, statementId_ );
 	return;
 	M_EPILOG
 }
 
-void HThread::create_try_catch_frame( HScope::scope_id_t scopeId_ ) {
+void HThread::create_try_catch_frame( HStatement::statement_id_t statementId_ ) {
 	M_PROLOG
 	add_frame();
-	_currentFrame->init( HFrame::TYPE::TRY_CATCH, scopeId_ );
+	_currentFrame->init( HFrame::TYPE::TRY_CATCH, statementId_ );
 	return;
 	M_EPILOG
 }

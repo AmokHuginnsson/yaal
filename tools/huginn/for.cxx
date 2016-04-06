@@ -43,12 +43,13 @@ namespace tools {
 namespace huginn {
 
 HFor::HFor(
+	HStatement::statement_id_t id_,
 	HHuginn::identifier_id_t variableName_,
 	HHuginn::expression_t const& source_,
 	HHuginn::scope_t const& loop_,
 	int statementPosition_,
 	int identifierPosition_
-) : HStatement( statementPosition_ )
+) : HStatement( id_, statementPosition_ )
 	, _variableName( variableName_ )
 	, _source( source_ )
 	, _loop( loop_ )
@@ -59,7 +60,7 @@ HFor::HFor(
 
 void HFor::do_execute( HThread* thread_ ) const {
 	M_PROLOG
-	thread_->create_loop_frame( _loop->id() );
+	thread_->create_loop_frame( id() );
 	HFrame* f( thread_->current_frame() );
 	_source->execute( thread_ );
 	if ( f->can_continue() ) {

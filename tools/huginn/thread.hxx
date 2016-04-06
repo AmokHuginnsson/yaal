@@ -53,10 +53,10 @@ private:
 	int _exceptionPosition;
 public:
 	HThread( HHuginn*, yaal::hcore::HThread::id_t );
-	void create_function_frame( HScope::scope_id_t, HHuginn::value_t*, int );
-	void create_loop_frame( HScope::scope_id_t );
-	void create_scope_frame( HScope::scope_id_t );
-	void create_try_catch_frame( HScope::scope_id_t );
+	void create_function_frame( HStatement::statement_id_t, HHuginn::value_t*, int );
+	void create_loop_frame( HStatement::statement_id_t );
+	void create_scope_frame( HStatement::statement_id_t );
+	void create_try_catch_frame( HStatement::statement_id_t );
 	void pop_frame( void );
 	HFrame* current_frame( void ) {
 		return ( _currentFrame );

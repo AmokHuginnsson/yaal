@@ -36,13 +36,10 @@ namespace tools {
 
 namespace huginn {
 
-HScope::scope_id_t const INVALID_SCOPE_IDENTIFIER( -1 );
-
-HScope::HScope( scope_id_t id_, int position_ )
-	: HStatement( position_ )
+HScope::HScope( statement_id_t id_, int position_ )
+	: HStatement( id_, position_ )
 	, _statements()
-	, _inline( false )
-	, _id( id_ ) {
+	, _inline( false ) {
 	return;
 }
 
@@ -60,7 +57,7 @@ int HScope::statement_position_at( int index_ ) const {
 void HScope::do_execute( HThread* thread_ ) const {
 	M_PROLOG
 	if ( ! _inline ) {
-		thread_->create_scope_frame( _id );
+		thread_->create_scope_frame( id() );
 	}
 	HFrame* f( thread_->current_frame() );
 	for ( statement_t const& s : _statements ) {

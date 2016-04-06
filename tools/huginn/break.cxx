@@ -37,7 +37,7 @@ namespace tools {
 namespace huginn {
 
 HBreak::HBreak( HFrame::STATE state_, int position_ )
-	: HStatement( position_ )
+	: HStatement( INVALID_STATEMENT_IDENTIFIER, position_ )
 	, _state( state_ ) {
 	return;
 }

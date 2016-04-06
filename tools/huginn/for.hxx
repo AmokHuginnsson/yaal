@@ -48,7 +48,7 @@ private:
 	HHuginn::scope_t _loop;
 	int _identifierPosition;
 public:
-	HFor( HHuginn::identifier_id_t, HHuginn::expression_t const&, HHuginn::scope_t const&, int, int );
+	HFor( HStatement::statement_id_t, HHuginn::identifier_id_t, HHuginn::expression_t const&, HHuginn::scope_t const&, int, int );
 protected:
 	virtual void do_execute( HThread* ) const override;
 };

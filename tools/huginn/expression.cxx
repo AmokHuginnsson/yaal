@@ -45,7 +45,7 @@ namespace tools {
 namespace huginn {
 
 HExpression::HExpression( int position_ )
-	: HStatement( position_ ),
+	: HStatement( INVALID_STATEMENT_IDENTIFIER, position_ ),
 	_executionSteps() {
 	return;
 }

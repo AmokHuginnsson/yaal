@@ -376,7 +376,7 @@ void HHuginn::finalize_compilation( compiler_setup_t compilerSetup_ ) {
 	}
 	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
 	huginn::HThread* t( _threads.insert( make_pair( threadId, make_pointer<huginn::HThread>( this, threadId ) ) ).first->second.get() );
-	t->create_function_frame( INVALID_SCOPE_IDENTIFIER, nullptr, 0 );
+	t->create_function_frame( INVALID_STATEMENT_IDENTIFIER, nullptr, 0 );
 	for ( OCompiler::submitted_classes_t::value_type const& sc : _compiler->_submittedClasses ) {
 		commit_class( sc.first );
 	}

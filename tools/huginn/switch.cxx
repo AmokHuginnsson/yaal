@@ -40,11 +40,12 @@ namespace tools {
 namespace huginn {
 
 HSwitch::HSwitch(
+	HStatement::statement_id_t id_,
 	HHuginn::expression_t const& expression_,
 	cases_t const& cases_,
 	HHuginn::scope_t const& default_,
 	int position_
-) : HStatement( position_ ),
+) : HStatement( id_, position_ ),
 	_expression( expression_ ),
 	_cases( cases_ ),
 	_default( default_ ) {
@@ -53,7 +54,7 @@ HSwitch::HSwitch(
 
 void HSwitch::do_execute( HThread* thread_ ) const {
 	M_PROLOG
-	thread_->create_loop_frame( INVALID_SCOPE_IDENTIFIER );
+	thread_->create_loop_frame( id() );
 	HFrame* f( thread_->current_frame() );
 	_expression->execute( thread_ );
 	if ( f->can_continue() ) {

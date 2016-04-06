@@ -41,8 +41,8 @@ namespace tools {
 
 namespace huginn {
 
-HTryCatch::HTryCatch( HHuginn::scope_t const& try_, catches_t const& catches_, int position_ )
-	: HStatement( position_ )
+HTryCatch::HTryCatch( HStatement::statement_id_t id_, HHuginn::scope_t const& try_, catches_t const& catches_, int position_ )
+	: HStatement( id_, position_ )
 	, _try( try_ )
 	, _catches( catches_ ) {
 	_try->make_inline();
@@ -51,7 +51,7 @@ HTryCatch::HTryCatch( HHuginn::scope_t const& try_, catches_t const& catches_, i
 
 void HTryCatch::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
-	thread_->create_try_catch_frame( INVALID_SCOPE_IDENTIFIER );
+	thread_->create_try_catch_frame( id() );
 	_try->execute( thread_ );
 	if ( thread_->has_exception() ) {
 		HFrame* f( thread_->current_frame() );

@@ -47,7 +47,7 @@ private:
 	if_clauses_t _ifClauses;
 	HHuginn::scope_t _elseClause;
 public:
-	HIf( if_clauses_t const&, HHuginn::scope_t const&, int );
+	HIf( HStatement::statement_id_t, if_clauses_t const&, HHuginn::scope_t const&, int );
 protected:
 	virtual void do_execute( HThread* ) const override;
 };

@@ -48,7 +48,7 @@ private:
 	cases_t _cases;
 	HHuginn::scope_t _default;
 public:
-	HSwitch( HHuginn::expression_t const&, cases_t const&, HHuginn::scope_t const&, int );
+	HSwitch( HStatement::statement_id_t, HHuginn::expression_t const&, cases_t const&, HHuginn::scope_t const&, int );
 protected:
 	virtual void do_execute( huginn::HThread* ) const override;
 };
