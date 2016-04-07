@@ -337,7 +337,10 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	);
 	HRule ifClause(
 		"ifClause",
-		e_p::constant( KEYWORD::IF ) >> '(' >> expression >> ')' >> scope,
+		e_p::constant(
+			KEYWORD::IF,
+			bound_call<e_p::HRuleBase::action_position_t>( &OCompiler::start_if_statement, _compiler.get(), _1 )
+		) >> '(' >> expression >> ')' >> scope,
 		HRuleBase::action_position_t( hcore::call( &OCompiler::commit_if_clause, _compiler.get(), _1 ) )
 	);
 	HRule ifStatement(
@@ -391,7 +394,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		"switchStatement",
 		constant(
 			KEYWORD::SWITCH,
-			bound_call<e_p::HRuleBase::action_position_t>( &OCompiler::inc_loop_switch_count, _compiler.get(), _1 )
+			bound_call<e_p::HRuleBase::action_position_t>( &OCompiler::start_switch_statement, _compiler.get(), _1 )
 		) >> '(' >> expression >> ')' >>
 		constant( '{', HRuleBase::action_position_t( hcore::call( &OCompiler::create_scope, _compiler.get(), _1 ) ) ) >> +caseStatement >>
 		-( defaultStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::commit_else_clause, _compiler.get(), _1 ) )] ) >> '}'

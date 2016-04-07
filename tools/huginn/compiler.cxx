@@ -627,10 +627,7 @@ void OCompiler::add_paramater( yaal::hcore::HString const& name_, executing_pars
 void OCompiler::create_scope( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	if ( fc._scopeStack.top()->_scopeChain.is_empty() ) {
-		++ _statementIdGenerator;
-	}
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( fc._scopeStack.top().raw(), _statementIdGenerator, position_.get() ) );
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( fc._scopeStack.top().raw(), ++ _statementIdGenerator, position_.get() ) );
 	return;
 	M_EPILOG
 }
@@ -711,6 +708,16 @@ void OCompiler::terminate_scope( HScope::statement_t&& statement_ ) {
 	M_EPILOG
 }
 
+void OCompiler::start_if_statement( executing_parser::position_t position_ ) {
+	M_PROLOG
+	OFunctionContext& fc( f() );
+	if ( fc._scopeStack.top()->_scopeChain.is_empty() ) {
+		fc._scopeStack.emplace( make_pointer<OScopeContext>( fc._scopeStack.top().raw(), ++ _statementIdGenerator, position_.get() ) );
+	}
+	return;
+	M_EPILOG
+}
+
 void OCompiler::inc_loop_count( executing_parser::position_t ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
@@ -720,10 +727,13 @@ void OCompiler::inc_loop_count( executing_parser::position_t ) {
 	M_EPILOG
 }
 
-void OCompiler::inc_loop_switch_count( executing_parser::position_t ) {
+void OCompiler::start_switch_statement( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	++ fc._loopSwitchCount;
+	if ( fc._scopeStack.top()->_scopeChain.is_empty() ) {
+		fc._scopeStack.emplace( make_pointer<OScopeContext>( fc._scopeStack.top().raw(), ++ _statementIdGenerator, position_.get() ) );
+	}
 	return;
 	M_EPILOG
 }
@@ -939,6 +949,8 @@ void OCompiler::add_if_statement( executing_parser::position_t position_ ) {
 	HScope::statement_t ifStatement( make_pointer<HIf>( sc._statementId, sc._scopeChain, sc._else, position_.get() ) );
 	sc._scopeChain.clear();
 	sc._else.reset();
+	fc._scopeStack.pop();
+	M_ASSERT( ! fc._scopeStack.is_empty() );
 	current_scope()->add_statement( ifStatement );
 	reset_expression();
 	return;
@@ -978,6 +990,8 @@ void OCompiler::add_switch_statement( executing_parser::position_t position_ ) {
 		)
 	);
 	-- fc._loopSwitchCount;
+	fc._scopeStack.pop();
+	M_ASSERT( ! fc._scopeStack.is_empty() );
 	current_scope()->add_statement( switchStatement );
 	reset_expression();
 	return;
