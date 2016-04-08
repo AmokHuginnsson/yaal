@@ -718,11 +718,12 @@ void OCompiler::start_if_statement( executing_parser::position_t position_ ) {
 	M_EPILOG
 }
 
-void OCompiler::inc_loop_count( executing_parser::position_t ) {
+void OCompiler::start_loop_statement( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	++ fc._loopCount;
 	++ fc._loopSwitchCount;
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( fc._scopeStack.top().raw(), ++ _statementIdGenerator, position_.get() ) );
 	return;
 	M_EPILOG
 }
@@ -731,9 +732,7 @@ void OCompiler::start_switch_statement( executing_parser::position_t position_ )
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	++ fc._loopSwitchCount;
-	if ( fc._scopeStack.top()->_scopeChain.is_empty() ) {
-		fc._scopeStack.emplace( make_pointer<OScopeContext>( fc._scopeStack.top().raw(), ++ _statementIdGenerator, position_.get() ) );
-	}
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( fc._scopeStack.top().raw(), ++ _statementIdGenerator, position_.get() ) );
 	return;
 	M_EPILOG
 }
@@ -847,9 +846,12 @@ void OCompiler::add_while_statement( executing_parser::position_t position_ ) {
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	HHuginn::scope_t scope( pop_scope_context() );
 	OScopeContext& sc( current_scope_context() );
-	current_scope()->add_statement(
+	HScope::statement_t whileStatement(
 		make_pointer<HWhile>( sc._statementId, current_expression(), scope, position_.get() )
 	);
+	fc._scopeStack.pop();
+	M_ASSERT( ! fc._scopeStack.is_empty() );
+	current_scope()->add_statement( whileStatement );
 	-- fc._loopCount;
 	-- fc._loopSwitchCount;
 	reset_expression();
@@ -859,9 +861,19 @@ void OCompiler::add_while_statement( executing_parser::position_t position_ ) {
 
 void OCompiler::set_identifier( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
+	OFunctionContext& fc( f() );
 	OScopeContext& sc( current_scope_context() );
 	HHuginn::identifier_id_t identifier( _huginn->identifier_id( name_ ) );
 	_usedIdentifiers[identifier].write( position_.get(), OIdentifierUse::TYPE::VARIABLE );
+	_executionStepsBacklog.emplace_back(
+		OExecutionStep::OPERATION::DEFINE,
+		HHuginn::expression_t(),
+		fc._scopeStack.top(),
+		!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
+		-1,
+		identifier,
+		position_.get()
+	);
 	sc._identifier = identifier;
 	sc._position = position_.get();
 	return;
@@ -908,10 +920,13 @@ void OCompiler::add_for_statement( executing_parser::position_t position_ ) {
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	HHuginn::scope_t scope( pop_scope_context() ); /* don't squash! pop_scope_context() changes fc._scopeStack */
 	OScopeContext& sc( *fc._scopeStack.top() );
-	current_scope()->add_statement(
+	HScope::statement_t forStatement(
 		make_pointer<HFor>( sc._statementId, sc._identifier, current_expression(), scope, position_.get(), sc._position )
 	);
-	sc._position = 0;
+	fc._scopeStack.pop();
+	M_ASSERT( ! fc._scopeStack.is_empty() );
+	current_scope()->add_statement( forStatement );
+	fc._scopeStack.top()->_position = 0;
 	-- fc._loopCount;
 	-- fc._loopSwitchCount;
 	reset_expression();

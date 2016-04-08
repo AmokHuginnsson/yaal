@@ -366,7 +366,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		"whileStatement",
 		constant(
 			KEYWORD::WHILE,
-			bound_call<e_p::HRuleBase::action_position_t>( &OCompiler::inc_loop_count, _compiler.get(), _1 )
+			bound_call<e_p::HRuleBase::action_position_t>( &OCompiler::start_loop_statement, _compiler.get(), _1 )
 		) >> '(' >> expression >> ')' >> scope
 	);
 	HRule forIdentifier(
@@ -380,7 +380,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		"forStatement",
 		constant(
 			KEYWORD::FOR,
-			bound_call<e_p::HRuleBase::action_position_t>( &OCompiler::inc_loop_count, _compiler.get(), _1 )
+			bound_call<e_p::HRuleBase::action_position_t>( &OCompiler::start_loop_statement, _compiler.get(), _1 )
 		) >> '(' >> forIdentifier >> ':' >> expression >> ')' >> scope
 	);
 	HRule caseStatement(

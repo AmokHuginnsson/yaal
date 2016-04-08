@@ -353,7 +353,7 @@ struct OCompiler {
 	HHuginn::scope_t pop_scope_context( void );
 	void terminate_scope( HScope::statement_t&& );
 	void start_if_statement( executing_parser::position_t );
-	void inc_loop_count( executing_parser::position_t );
+	void start_loop_statement( executing_parser::position_t );
 	void start_switch_statement( executing_parser::position_t );
 	void start_subexpression( executing_parser::position_t );
 	void add_subexpression( OPERATOR, executing_parser::position_t );
