@@ -618,6 +618,9 @@ void OCompiler::add_paramater( yaal::hcore::HString const& name_, executing_pars
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	HHuginn::identifier_id_t parameterIdentifer( _huginn->identifier_id( name_ ) );
+	if ( find( fc._parameters.begin(), fc._parameters.end(), parameterIdentifer ) != fc._parameters.end() ) {
+		throw HHuginn::HHuginnRuntimeException( "Parameter `"_ys.append( name_ ).append( "' was already defined." ), position_.get() );
+	}
 	verify_default_argument( position_ );
 	_usedIdentifiers[parameterIdentifer].write( position_.get(), OIdentifierUse::TYPE::VARIABLE );
 	_executionStepsBacklog.emplace_back(
