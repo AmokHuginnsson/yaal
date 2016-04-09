@@ -616,10 +616,20 @@ void OCompiler::verify_default_argument( executing_parser::position_t position_ 
 
 void OCompiler::add_paramater( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
+	OFunctionContext& fc( f() );
 	HHuginn::identifier_id_t parameterIdentifer( _huginn->identifier_id( name_ ) );
 	verify_default_argument( position_ );
 	_usedIdentifiers[parameterIdentifer].write( position_.get(), OIdentifierUse::TYPE::VARIABLE );
-	f()._parameters.push_back( parameterIdentifer );
+	_executionStepsBacklog.emplace_back(
+		OExecutionStep::OPERATION::DEFINE,
+		HHuginn::expression_t(),
+		fc._scopeStack.top(),
+		!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
+		-1,
+		parameterIdentifer,
+		position_.get()
+	);
+	fc._parameters.push_back( parameterIdentifer );
 	return;
 	M_EPILOG
 }

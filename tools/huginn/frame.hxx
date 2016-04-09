@@ -88,7 +88,7 @@ public:
 	void set_variable( HHuginn::identifier_id_t, HHuginn::value_t const&, int );
 	HHuginn::value_t get_reference( HHuginn::identifier_id_t, int );
 	HHuginn::value_t get_field( HExpression::ACCESS, int );
-	HHuginn::value_t get_variable( int, int );
+	HHuginn::value_t get_variable( HExpression::ACCESS, HStatement::statement_id_t, int );
 	bool can_continue( void ) const {
 		return ( _state == STATE::NORMAL );
 	}

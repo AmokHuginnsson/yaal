@@ -124,8 +124,10 @@ void HExpression::get_field_direct( ACCESS access_, int index_, huginn::HFrame* 
 	M_EPILOG
 }
 
-void HExpression::get_variable_direct( ACCESS, int, int, huginn::HFrame*, int ) {
+void HExpression::get_variable_direct( ACCESS access_, HStatement::statement_id_t statementId_, int index_, huginn::HFrame* frame_, int ) {
 	M_PROLOG
+	HHuginn::value_t v( frame_->get_variable( access_, statementId_, index_ ) );
+	frame_->values().push( v );
 	return;
 	M_EPILOG
 }

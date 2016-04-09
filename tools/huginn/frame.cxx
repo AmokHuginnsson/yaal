@@ -171,14 +171,20 @@ HHuginn::value_t HFrame::get_field( HExpression::ACCESS access_, int index_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HFrame::get_variable( int scopeUp_, int index_ ) {
+HHuginn::value_t HFrame::get_variable( HExpression::ACCESS access_, HStatement::statement_id_t statementId_, int index_ ) {
 	M_PROLOG
 	HFrame* f( this );
-	while ( scopeUp_ > 0 ) {
+	while ( statementId_ != f->_statementId ) {
 		f = f->_parent;
 		M_ASSERT( f );
 	}
-	return ( f->_variables[index_] );
+	HHuginn::value_t v;
+	if ( access_ == HExpression::ACCESS::VALUE ) {
+		v = f->_variables[index_];
+	} else {
+	  v = make_pointer<HHuginn::HReference>( f->_variables[index_] );
+	}
+	return ( v );
 	M_EPILOG
 }
 

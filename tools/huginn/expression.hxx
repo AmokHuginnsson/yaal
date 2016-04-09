@@ -76,7 +76,7 @@ public:
 	void get_reference( HHuginn::identifier_id_t, huginn::HFrame*, int );
 	void make_variable( HHuginn::identifier_id_t, huginn::HFrame*, int );
 	void get_field_direct( ACCESS, int, huginn::HFrame*, int );
-	void get_variable_direct( ACCESS, int, int, huginn::HFrame*, int );
+	void get_variable_direct( ACCESS, HStatement::statement_id_t, int, huginn::HFrame*, int );
 	void set_variable( huginn::HFrame*, int );
 	void subscript( ACCESS, huginn::HFrame*, int );
 	void range( huginn::HFrame*, int );
