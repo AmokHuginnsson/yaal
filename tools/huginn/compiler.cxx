@@ -63,8 +63,11 @@ OCompiler::OActiveScope::OActiveScope( HHuginn::scope_t& scope_, HHuginn::expres
 	return;
 }
 
-OCompiler::OScopeContext::OScopeContext( OScopeContext* parent_, HStatement::statement_id_t statementId_, int position_ )
-	: _parent( parent_ )
+OCompiler::OScopeContext::OScopeContext(
+	OFunctionContext* functionContext_,
+	HStatement::statement_id_t statementId_,
+	int position_
+) : _parent( ! functionContext_->_scopeStack.is_empty() ? functionContext_->_scopeStack.top().raw() : nullptr )
 	, _scope( make_pointer<HScope>( statementId_, position_ ) )
 	, _expressionsStack()
 	, _variableTypes()
@@ -75,7 +78,9 @@ OCompiler::OScopeContext::OScopeContext( OScopeContext* parent_, HStatement::sta
 	, _else()
 	, _catches()
 	, _terminatedAt( NOT_TERMINATED )
-	, _statementId( statementId_ ) {
+	, _statementId( statementId_ )
+	, _functionId( functionContext_->_functionIdentifier )
+	, _variables() {
 	_expressionsStack.emplace( 1, make_pointer<HExpression>() );
 	return;
 }
@@ -93,6 +98,7 @@ void OCompiler::OScopeContext::reset( HStatement::statement_id_t statementId_, i
 	_else.reset();
 	_catches.clear();
 	_terminatedAt = NOT_TERMINATED;
+	_statementId = statementId_;
 	return;
 	M_EPILOG
 }
@@ -137,8 +143,11 @@ void OCompiler::OScopeContext::note_type( HHuginn::identifier_id_t identifierId_
 	M_EPILOG
 }
 
-OCompiler::OFunctionContext::OFunctionContext( HStatement::statement_id_t statementId_, bool isLambda_ )
-	: _functionIdentifier( INVALID_IDENTIFIER )
+OCompiler::OFunctionContext::OFunctionContext(
+	HHuginn::identifier_id_t functionId_,
+	HStatement::statement_id_t statementId_,
+	bool isLambda_
+) : _functionIdentifier( functionId_ )
 	, _parameters()
 	, _defaultValues()
 	, _lastDefaultValuePosition( -1 )
@@ -153,7 +162,7 @@ OCompiler::OFunctionContext::OFunctionContext( HStatement::statement_id_t statem
 	, _isAssert( false )
 	, _lastMemberName()
 	, _isLambda( isLambda_ ) {
-	_scopeStack.emplace( make_pointer<OScopeContext>( nullptr, statementId_, 0 ) );
+	_scopeStack.emplace( make_pointer<OScopeContext>( this, statementId_, 0 ) );
 	return;
 }
 
@@ -230,6 +239,7 @@ OCompiler::OCompiler( HHuginn* huginn_ )
 	, _usedIdentifiers()
 	, _setup( HHuginn::COMPILER::BE_STRICT | HHuginn::COMPILER::OPTIMIZE )
 	, _statementIdGenerator( INVALID_STATEMENT_IDENTIFIER )
+	, _scopeContextCache()
 	, _huginn( huginn_ ) {
 	return;
 }
@@ -272,26 +282,76 @@ void OCompiler::optimize( void ) {
 					break;
 				}
 			}
+			OScopeContext* sc( es._scope.raw() );
+			HHuginn::identifier_id_t fi( sc->_functionId );
+			int index( -1 );
+			while ( sc ) {
+				OScopeContext::local_variables_t::const_iterator it( sc->_variables.find( es._identifier ) );
+				if ( it != sc->_variables.end() ) {
+					index = it->second;
+					break;
+				}
+				if ( sc->_parent && ( sc->_parent->_functionId == fi ) ) {
+					sc = sc->_parent;
+				} else {
+					sc = nullptr;
+				}
+			}
+			if ( es._operation == OExecutionStep::OPERATION::DEFINE ) {
+				if ( ! sc ) {
+					sc = es._scope.raw();
+					M_ASSERT( index == -1 );
+					sc->_variables[es._identifier] = index = static_cast<int>( sc->_variables.get_size() );
+				}
+				break;
+			} else {
+				if ( sc ) {
+					break;
+				}
+			}
 			if ( ( es._operation == OExecutionStep::OPERATION::USE ) && ! is_keyword( _huginn->identifier_name( es._identifier ) ) ) {
-				HHuginn::class_t c( _huginn->get_class( es._identifier ) );
-				if ( !! c ) {
+				HHuginn::function_t f( _huginn->get_function( es._identifier ) );
+				if ( !! f ) {
 					es._expression->replace_execution_step(
 						es._index,
 						hcore::call(
 							&HExpression::store_direct,
 							es._expression.raw(),
-							make_pointer<HHuginn::HFunctionReference>(
-								es._identifier,
-								hcore::call( &HHuginn::HClass::create_instance, c.raw(), _1, _2, _3, _4 )
-							),
+							make_pointer<HHuginn::HFunctionReference>( es._identifier, f ),
 							_1,
 							es._position
 						)
 					);
+					break;
+				} else {
+					HHuginn::value_t p( _huginn->get_package( es._identifier ) );
+					if ( !! p ) {
+						/*
+						 * *TODO FIXME*
+						 * Putting package references directly in expressions causes problems at destruction stage.
+						 */
+						break;
+						es._expression->replace_execution_step(
+							es._index,
+							hcore::call(
+								&HExpression::store_direct,
+								es._expression.raw(),
+								p,
+								_1,
+								es._position
+							)
+						);
+						break;
+					}
 				}
 			}
+			throw HHuginn::HHuginnRuntimeException(
+				"Symbol `"_ys.append( _huginn->identifier_name( es._identifier ) ).append( "' is not defined in this context." ), es._position
+			);
 		} while ( false );
 	}
+	_scopeContextCache.clear();
+	_executionStepsBacklog.clear();
 	return;
 	M_EPILOG
 }
@@ -389,8 +449,7 @@ void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_
 			! _classContext ? OIdentifierUse::TYPE::FUNCTION : OIdentifierUse::TYPE::METHOD
 		);
 	}
-	_functionContexts.emplace( make_resource<OFunctionContext>( ++ _statementIdGenerator, false ) );
-	f()._functionIdentifier = functionIdentifier;
+	_functionContexts.emplace( make_resource<OFunctionContext>( functionIdentifier, ++ _statementIdGenerator, false ) );
 	if ( !! _classContext ) {
 		add_field_name( name_, position_ );
 	}
@@ -461,7 +520,7 @@ void OCompiler::set_class_name( yaal::hcore::HString const& name_, executing_par
 	if ( _submittedClasses.count( classIdentifer ) > 0 ) {
 		throw HHuginn::HHuginnRuntimeException( "Class `"_ys.append( name_ ).append( "' is already defined." ), position_.get() );
 	}
-	_functionContexts.emplace( make_resource<OFunctionContext>( ++ _statementIdGenerator, false ) );
+	_functionContexts.emplace( make_resource<OFunctionContext>( classIdentifer, ++ _statementIdGenerator, false ) );
 	_classContext->_classIdentifier = classIdentifer;
 	_classContext->_position = position_;
 	return;
@@ -509,8 +568,8 @@ void OCompiler::set_field_name( yaal::hcore::HString const& name_, executing_par
 void OCompiler::set_lambda_name( executing_parser::position_t position_ ) {
 	M_PROLOG
 	HHuginn::HErrorCoordinate ec( _huginn->get_coordinate( position_.get() ) );
-	_functionContexts.emplace( make_resource<OFunctionContext>( ++ _statementIdGenerator, true ) );
-	f()._functionIdentifier = _huginn->identifier_id( to_string( "@" ).append( ec.line() ).append( ":" ).append( ec.column() ) );
+	HHuginn::identifier_id_t id( _huginn->identifier_id( to_string( "@" ).append( ec.line() ).append( ":" ).append( ec.column() ) ) );
+	_functionContexts.emplace( make_resource<OFunctionContext>( id, ++ _statementIdGenerator, true ) );
 	return;
 	M_EPILOG
 }
@@ -640,7 +699,7 @@ void OCompiler::add_paramater( yaal::hcore::HString const& name_, executing_pars
 void OCompiler::create_scope( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( fc._scopeStack.top().raw(), ++ _statementIdGenerator, position_.get() ) );
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, position_.get() ) );
 	return;
 	M_EPILOG
 }
@@ -705,8 +764,17 @@ HHuginn::scope_t OCompiler::pop_scope_context( void ) {
 			scope->statement_position_at( sc._terminatedAt + 1 )
 		);
 	}
-	fc._scopeStack.pop();
+	pop_scope_context_low();
 	return ( scope );
+	M_EPILOG
+}
+
+void OCompiler::pop_scope_context_low( void ) {
+	M_PROLOG
+	OFunctionContext& fc( f() );
+	_scopeContextCache.push_back( yaal::move( fc._scopeStack.top() ) );
+	fc._scopeStack.pop();
+	return;
 	M_EPILOG
 }
 
@@ -725,7 +793,7 @@ void OCompiler::start_if_statement( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	if ( fc._scopeStack.top()->_scopeChain.is_empty() ) {
-		fc._scopeStack.emplace( make_pointer<OScopeContext>( fc._scopeStack.top().raw(), ++ _statementIdGenerator, position_.get() ) );
+		fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, position_.get() ) );
 	}
 	return;
 	M_EPILOG
@@ -736,7 +804,7 @@ void OCompiler::start_loop_statement( executing_parser::position_t position_ ) {
 	OFunctionContext& fc( f() );
 	++ fc._loopCount;
 	++ fc._loopSwitchCount;
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( fc._scopeStack.top().raw(), ++ _statementIdGenerator, position_.get() ) );
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, position_.get() ) );
 	return;
 	M_EPILOG
 }
@@ -745,7 +813,7 @@ void OCompiler::start_switch_statement( executing_parser::position_t position_ )
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	++ fc._loopSwitchCount;
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( fc._scopeStack.top().raw(), ++ _statementIdGenerator, position_.get() ) );
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, position_.get() ) );
 	return;
 	M_EPILOG
 }
@@ -862,7 +930,7 @@ void OCompiler::add_while_statement( executing_parser::position_t position_ ) {
 	HScope::statement_t whileStatement(
 		make_pointer<HWhile>( sc._statementId, current_expression(), scope, position_.get() )
 	);
-	fc._scopeStack.pop();
+	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	current_scope()->add_statement( whileStatement );
 	-- fc._loopCount;
@@ -936,7 +1004,7 @@ void OCompiler::add_for_statement( executing_parser::position_t position_ ) {
 	HScope::statement_t forStatement(
 		make_pointer<HFor>( sc._statementId, sc._identifier, current_expression(), scope, position_.get(), sc._position )
 	);
-	fc._scopeStack.pop();
+	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	current_scope()->add_statement( forStatement );
 	fc._scopeStack.top()->_position = 0;
@@ -977,7 +1045,7 @@ void OCompiler::add_if_statement( executing_parser::position_t position_ ) {
 	HScope::statement_t ifStatement( make_pointer<HIf>( sc._statementId, sc._scopeChain, sc._else, position_.get() ) );
 	sc._scopeChain.clear();
 	sc._else.reset();
-	fc._scopeStack.pop();
+	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	current_scope()->add_statement( ifStatement );
 	reset_expression();
@@ -1006,7 +1074,7 @@ void OCompiler::add_switch_statement( executing_parser::position_t position_ ) {
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	OScopeContext::active_scopes_t contexts( yaal::move( fc._scopeStack.top()->_scopeChain ) );
 	HHuginn::scope_t Default( fc._scopeStack.top()->_else );
-	fc._scopeStack.pop();
+	pop_scope_context_low();
 	OScopeContext& sc( *fc._scopeStack.top() );
 	HScope::statement_t switchStatement(
 		make_pointer<HSwitch>(
@@ -1018,7 +1086,7 @@ void OCompiler::add_switch_statement( executing_parser::position_t position_ ) {
 		)
 	);
 	-- fc._loopSwitchCount;
-	fc._scopeStack.pop();
+	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	current_scope()->add_statement( switchStatement );
 	reset_expression();
@@ -1726,6 +1794,11 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 		}
 	}
 	if ( ! keyword && huginn::is_builtin( value_ ) ) {
+		/*
+		 * We can do it here (as opposed to *::optimize()) because built-ins must exist,
+		 * hence h->get_function() always succeeds, and built-ins cannot be overriden
+		 * so they meaning stays always the same.
+		 */
 		current_expression()->add_execution_step(
 			hcore::call(
 				&HExpression::store_direct,
@@ -1742,15 +1815,17 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 				hcore::call( &HExpression::get_reference, expression.raw(), refIdentifier, _1, position_.get() )
 			)
 		);
-		_executionStepsBacklog.emplace_back(
-			OExecutionStep::OPERATION::USE,
-			expression,
-			fc._scopeStack.top(),
-			!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
-			index,
-			refIdentifier,
-			position_.get()
-		);
+		if ( ( refIdentifier != KEYWORD::THIS_IDENTIFIER ) && ( refIdentifier != KEYWORD::SUPER_IDENTIFIER ) ) {
+			_executionStepsBacklog.emplace_back(
+				OExecutionStep::OPERATION::USE,
+				expression,
+				fc._scopeStack.top(),
+				!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
+				index,
+				refIdentifier,
+				position_.get()
+			);
+		}
 	}
 	fc._valueTypes.push( guess_type( refIdentifier ) );
 	return;

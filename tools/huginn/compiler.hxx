@@ -33,6 +33,7 @@ Copyright:
 #include "hcore/hstack.hxx"
 #include "tools/huginn/operator.hxx"
 #include "tools/huginn/function.hxx"
+#include "tools/huginn/frame.hxx"
 #include "tools/huginn/trycatch.hxx"
 #include "tools/huginn/scope.hxx"
 #include "tools/hhuginn.hxx"
@@ -44,7 +45,6 @@ namespace tools {
 namespace huginn {
 
 class HExpression;
-class HFrame;
 
 /*! \brief Huginn language compiler.
  */
@@ -64,10 +64,12 @@ struct OCompiler {
 		HHuginn::expression_t _expression;
 		OActiveScope( HHuginn::scope_t&, HHuginn::expression_t& );
 	};
+	struct OFunctionContext;
 	/*! \brief Huginn program scope as seen by the compiler.
 	 */
 	struct OScopeContext {
 		typedef yaal::hcore::HArray<OActiveScope> active_scopes_t;
+		typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, int> local_variables_t;
 		OScopeContext* _parent;  /*!< parent scope */
 		HHuginn::scope_t _scope; /*!< currently compiled Huginn run-time scope */
 
@@ -118,7 +120,17 @@ struct OCompiler {
 		 */
 		HStatement::statement_id_t _statementId;
 
-		OScopeContext( OScopeContext*, HStatement::statement_id_t, int );
+		/*! \brief Context of a function this scope belongs to.
+		 */
+		HHuginn::identifier_id_t _functionId;
+
+		/*! \brief Variable name to index map for variables defined in this scope.
+		 *
+		 * Used during local symbols dereferencing stage.
+		 */
+		local_variables_t _variables;
+
+		OScopeContext( OFunctionContext*, HStatement::statement_id_t, int );
 		HHuginn::expression_t& expression( void );
 		HHuginn::type_id_t guess_type( HHuginn::identifier_id_t ) const;
 		void note_type( HHuginn::identifier_id_t, HHuginn::type_id_t );
@@ -230,7 +242,7 @@ struct OCompiler {
 		 */
 		bool _isLambda;
 
-		OFunctionContext( HStatement::statement_id_t, bool );
+		OFunctionContext( HHuginn::identifier_id_t, HStatement::statement_id_t, bool );
 		expressions_stack_t& expressions_stack( void );
 	};
 	typedef yaal::hcore::HResource<OFunctionContext> function_context_t;
@@ -291,6 +303,7 @@ struct OCompiler {
 	typedef yaal::hcore::HResource<OClassContext> class_context_t;
 	typedef yaal::hcore::HHashMap<HHuginn::identifier_id_t, class_context_t> submitted_classes_t;
 	typedef yaal::hcore::HHashMap<HHuginn::identifier_id_t, HHuginn::identifier_id_t> submitted_imports_t;
+	typedef yaal::hcore::HArray<OFunctionContext::scope_context_t> scope_context_cache_t;
 	function_contexts_t _functionContexts;
 	class_context_t _classContext;
 	submitted_classes_t _submittedClasses;
@@ -301,6 +314,7 @@ struct OCompiler {
 	used_identifiers_t _usedIdentifiers;
 	HHuginn::compiler_setup_t _setup;
 	HStatement::statement_id_t _statementIdGenerator;
+	scope_context_cache_t _scopeContextCache;
 	HHuginn* _huginn;
 	OCompiler( HHuginn* );
 	OFunctionContext& f( void );
@@ -351,6 +365,7 @@ struct OCompiler {
 	void reset_expression( void );
 	void pop_function_context( void );
 	HHuginn::scope_t pop_scope_context( void );
+	void pop_scope_context_low( void );
 	void terminate_scope( HScope::statement_t&& );
 	void start_if_statement( executing_parser::position_t );
 	void start_loop_statement( executing_parser::position_t );
