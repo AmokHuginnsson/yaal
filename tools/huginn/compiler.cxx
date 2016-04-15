@@ -1785,15 +1785,18 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 	HHuginn::identifier_id_t refIdentifier( _huginn->identifier_id( value_ ) );
 	_usedIdentifiers[refIdentifier].read( position_.get() );
 	bool keyword( false );
+	bool isAssert( refIdentifier == KEYWORD::ASSERT_IDENTIFIER );
 	if ( ( keyword = huginn::is_keyword( value_ ) ) ) {
-		fc._isAssert = refIdentifier == KEYWORD::ASSERT_IDENTIFIER;
-		if ( ( ( value_ != KEYWORD::THIS ) && ( value_ != KEYWORD::SUPER ) && ! fc._isAssert ) || ( fc._isAssert && ! current_expression()->is_empty() ) ) {
+		if ( isAssert ) {
+			fc._isAssert = isAssert;
+		}
+		if ( ( ( value_ != KEYWORD::THIS ) && ( value_ != KEYWORD::SUPER ) && ! isAssert ) || ( isAssert && ! current_expression()->is_empty() ) ) {
 			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted keyword." ), position_.get() );
-		} else if ( ! fc._isAssert && ! _classContext ) {
+		} else if ( ! isAssert && ! _classContext ) {
 			throw HHuginn::HHuginnRuntimeException( "Keyword `"_ys.append( value_ ).append( "' can be used only in class context." ), position_.get() );
 		}
 	}
-	if ( ! keyword && huginn::is_builtin( value_ ) ) {
+	if ( ( ! keyword || isAssert ) && huginn::is_builtin( value_ ) ) {
 		/*
 		 * We can do it here (as opposed to *::optimize()) because built-ins must exist,
 		 * hence h->get_function() always succeeds, and built-ins cannot be overriden
