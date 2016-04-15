@@ -553,25 +553,25 @@ bool operator != ( char const* left_, HString const& right_ ) {
 	M_EPILOG
 }
 
-bool operator >= ( char const* left_, HString const& right_ ) {
+bool operator > ( char const* left_, HString const& right_ ) {
 	M_PROLOG
 	return ( right_.operator < ( left_ ) );
 	M_EPILOG
 }
 
-bool operator <= ( char const* left_, HString const& right_ ) {
+bool operator < ( char const* left_, HString const& right_ ) {
 	M_PROLOG
 	return ( right_.operator > ( left_ ) );
 	M_EPILOG
 }
 
-bool operator > ( char const* left_, HString const& right_ ) {
+bool operator >= ( char const* left_, HString const& right_ ) {
 	M_PROLOG
 	return ( right_.operator <= ( left_ ) );
 	M_EPILOG
 }
 
-bool operator < ( char const* left_, HString const& right_ ) {
+bool operator <= ( char const* left_, HString const& right_ ) {
 	M_PROLOG
 	return ( right_.operator >= ( left_ ) );
 	M_EPILOG
