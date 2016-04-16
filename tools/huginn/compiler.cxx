@@ -741,9 +741,12 @@ void OCompiler::reset_expression( void ) {
 
 void OCompiler::pop_function_context( void ) {
 	M_PROLOG
-	M_DEBUG_CODE( OFunctionContext& fc( f() ); );
+	OFunctionContext& fc( f() );
 	M_ASSERT( fc._loopCount == 0 );
 	M_ASSERT( fc._loopSwitchCount == 0 );
+	while ( ! fc._scopeStack.is_empty() ) {
+		pop_scope_context_low();
+	}
 	_functionContexts.pop();
 	return;
 	M_EPILOG
