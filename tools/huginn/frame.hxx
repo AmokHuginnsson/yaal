@@ -89,6 +89,8 @@ public:
 	HHuginn::value_t get_reference( HHuginn::identifier_id_t, int );
 	HHuginn::value_t get_field( HExpression::ACCESS, int );
 	HHuginn::value_t get_variable( HExpression::ACCESS, HStatement::statement_id_t, int );
+	HHuginn::value_t get_this( void );
+	HHuginn::value_t get_super( int );
 	bool can_continue( void ) const {
 		return ( _state == STATE::NORMAL );
 	}
@@ -124,10 +126,10 @@ public:
 		return ( _values );
 	}
 	void reset( void );
-	HHuginn::HObject* object( void ) const;
 private:
 	HFrame( HFrame const& ) = delete;
 	HFrame& operator = ( HFrame const& ) = delete;
+	HHuginn::value_t* object( void ) const;
 };
 
 }

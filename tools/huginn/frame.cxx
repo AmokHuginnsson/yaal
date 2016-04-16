@@ -116,18 +116,8 @@ HHuginn::value_t HFrame::get_reference( HHuginn::identifier_id_t identifierId_, 
 	HFrame* f( this );
 	while ( f ) {
 		named_variables_t::iterator it( f->_namedVariables.find( identifierId_ ) );
-		HHuginn::HObject* obj( f->_object ? static_cast<HHuginn::HObject*>( f->_object->raw() ) : nullptr );
 		if ( it != f->_namedVariables.end() ) {
 			v = it->second;
-			break;
-		} else if ( obj && ( identifierId_ == KEYWORD::THIS_IDENTIFIER ) ) {
-			v = *f->_object;
-			M_ASSERT( !! v );
-			break;
-		} else if ( obj && ( identifierId_ == KEYWORD::SUPER_IDENTIFIER ) ) {
-			HHuginn::value_t p = *f->_object;
-			M_ASSERT( !! p );
-			v = make_pointer<HHuginn::HObjectReference>( p, _upCast, true, position_ );
 			break;
 		} else if ( f->_parent && ( f->_parent->_number == _number ) ) {
 			f = f->_parent;
@@ -155,16 +145,13 @@ HHuginn::value_t HFrame::get_reference( HHuginn::identifier_id_t identifierId_, 
 
 HHuginn::value_t HFrame::get_field( HExpression::ACCESS access_, int index_ ) {
 	M_PROLOG
-	HFrame* f( this );
-	while ( ! f->_object ) {
-		f = f->_parent;
-		M_ASSERT( f );
-	}
+	HHuginn::value_t* obj( object() );
+	M_ASSERT( obj && !! *obj );
 	HHuginn::value_t v;
 	if ( access_ == HExpression::ACCESS::VALUE ) {
-		v = static_cast<HHuginn::HObject*>( f->_object->raw() )->field( *f->_object, index_ );
+		v = static_cast<HHuginn::HObject*>( obj->raw() )->field( *obj, index_ );
 	} else {
-		HHuginn::value_t& ref( static_cast<HHuginn::HObject*>( f->_object->raw() )->field_ref( index_ ) );
+		HHuginn::value_t& ref( static_cast<HHuginn::HObject*>( obj->raw() )->field_ref( index_ ) );
 	  v = make_pointer<HHuginn::HReference>( ref );
 	}
 	return ( v );
@@ -185,6 +172,22 @@ HHuginn::value_t HFrame::get_variable( HExpression::ACCESS access_, HStatement::
 	  v = make_pointer<HHuginn::HReference>( f->_variables[index_] );
 	}
 	return ( v );
+	M_EPILOG
+}
+
+HHuginn::value_t HFrame::get_this( void ) {
+	M_PROLOG
+	HHuginn::value_t* obj( object() );
+	M_ASSERT( obj && !! *obj );
+	return ( *obj );
+	M_EPILOG
+}
+
+HHuginn::value_t HFrame::get_super( int position_ ) {
+	M_PROLOG
+	HHuginn::value_t* obj( object() );
+	M_ASSERT( obj && !! *obj );
+	return ( make_pointer<HHuginn::HObjectReference>( *obj, _upCast, true, position_ ) );
 	M_EPILOG
 }
 
@@ -225,8 +228,13 @@ HHuginn::value_t HFrame::make_variable( HHuginn::identifier_id_t identifierId_, 
 	M_EPILOG
 }
 
-HHuginn::HObject* HFrame::object( void ) const {
-	return ( _object ? static_cast<HHuginn::HObject*>( _object->raw() ) : ( ( _parent && _parent->_number == _number ) ? _parent->object() : nullptr ) );
+HHuginn::value_t* HFrame::object( void ) const {
+	HFrame const* f( this );
+	while ( ! f->_object ) {
+		M_ASSERT( f->_parent && ( f->_parent->_number == _number ) );
+		f = f->_parent;
+	}
+	return ( f->_object );
 }
 
 }

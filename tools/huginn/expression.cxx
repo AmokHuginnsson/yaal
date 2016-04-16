@@ -132,6 +132,20 @@ void HExpression::get_variable_direct( ACCESS access_, HStatement::statement_id_
 	M_EPILOG
 }
 
+void HExpression::get_this( huginn::HFrame* frame_, int ) {
+	M_PROLOG
+	frame_->values().push( frame_->get_this() );
+	return;
+	M_EPILOG
+}
+
+void HExpression::get_super( huginn::HFrame* frame_, int position_ ) {
+	M_PROLOG
+	frame_->values().push( frame_->get_super( position_ ) );
+	return;
+	M_EPILOG
+}
+
 void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifierId_, huginn::HFrame* frame_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( frame_->operations().top()._operator == OPERATOR::MEMBER_ACCESS );

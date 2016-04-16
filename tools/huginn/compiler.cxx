@@ -1799,6 +1799,7 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 			throw HHuginn::HHuginnRuntimeException( "Keyword `"_ys.append( value_ ).append( "' can be used only in class context." ), position_.get() );
 		}
 	}
+	HHuginn::expression_t& expression( current_expression() );
 	if ( ( ! keyword || isAssert ) && huginn::is_builtin( value_ ) ) {
 		/*
 		 * We can do it here (as opposed to *::optimize()) because built-ins must exist,
@@ -1814,24 +1815,29 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 				position_.get()
 			)
 		);
+	} else if ( refIdentifier == KEYWORD::THIS_IDENTIFIER ) {
+		expression->add_execution_step(
+			hcore::call( &HExpression::get_this, expression.raw(), _1, position_.get() )
+		);
+	} else if ( refIdentifier == KEYWORD::SUPER_IDENTIFIER ) {
+		expression->add_execution_step(
+			hcore::call( &HExpression::get_super, expression.raw(), _1, position_.get() )
+		);
 	} else {
-		HHuginn::expression_t& expression( current_expression() );
 		int index(
 			expression->add_execution_step(
 				hcore::call( &HExpression::get_reference, expression.raw(), refIdentifier, _1, position_.get() )
 			)
 		);
-		if ( ( refIdentifier != KEYWORD::THIS_IDENTIFIER ) && ( refIdentifier != KEYWORD::SUPER_IDENTIFIER ) ) {
-			_executionStepsBacklog.emplace_back(
-				OExecutionStep::OPERATION::USE,
-				expression,
-				fc._scopeStack.top(),
-				!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
-				index,
-				refIdentifier,
-				position_.get()
-			);
-		}
+		_executionStepsBacklog.emplace_back(
+			OExecutionStep::OPERATION::USE,
+			expression,
+			fc._scopeStack.top(),
+			!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
+			index,
+			refIdentifier,
+			position_.get()
+		);
 	}
 	fc._valueTypes.push( guess_type( refIdentifier ) );
 	return;
