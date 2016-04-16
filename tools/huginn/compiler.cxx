@@ -310,14 +310,14 @@ void OCompiler::optimize( void ) {
 				}
 			}
 			if ( ( es._operation == OExecutionStep::OPERATION::USE ) && ! is_keyword( _huginn->identifier_name( es._identifier ) ) ) {
-				HHuginn::function_t f( _huginn->get_function( es._identifier ) );
-				if ( !! f ) {
+				HHuginn::function_t callable( _huginn->get_function( es._identifier ) );
+				if ( !! callable ) {
 					es._expression->replace_execution_step(
 						es._index,
 						hcore::call(
 							&HExpression::store_direct,
 							es._expression.raw(),
-							make_pointer<HHuginn::HFunctionReference>( es._identifier, f ),
+							make_pointer<HHuginn::HFunctionReference>( es._identifier, callable ),
 							_1,
 							es._position
 						)
