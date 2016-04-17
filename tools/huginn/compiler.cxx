@@ -325,17 +325,12 @@ void OCompiler::optimize( void ) {
 					);
 					break;
 				} else {
-					HHuginn::value_t p( _huginn->get_package( es._identifier ) );
+					HHuginn::value_t* p( _huginn->get_package( es._identifier ) );
 					if ( !! p ) {
-						/*
-						 * *TODO FIXME*
-						 * Putting package references directly in expressions causes problems at destruction stage.
-						 */
-						break;
 						es._expression->replace_execution_step(
 							es._index,
 							hcore::call(
-								&HExpression::store_direct,
+								&HExpression::store_external_reference,
 								es._expression.raw(),
 								p,
 								_1,

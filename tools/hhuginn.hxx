@@ -315,7 +315,7 @@ public:
 	yaal::hcore::HStreamInterface& error_stream( void );
 	function_t* get_function( identifier_id_t );
 	class_t get_class( identifier_id_t );
-	value_t get_package( identifier_id_t );
+	value_t* get_package( identifier_id_t );
 	yaal::hcore::HString get_snippet( int, int ) const;
 	void register_class( class_t );
 	identifier_id_t identifier_id( yaal::hcore::HString const& );

@@ -487,7 +487,7 @@ HHuginn::function_t* HHuginn::get_function( identifier_id_t identifierId_ ) {
 	HHuginn::function_t* f( nullptr );
 	functions_t::iterator fi( _functions.find( identifierId_ ) );
 	if ( fi != _functions.end() ) {
-		f = &(fi->second);
+		f = &( fi->second );
 	}
 	return ( f );
 	M_EPILOG
@@ -500,12 +500,12 @@ HHuginn::class_t HHuginn::get_class( identifier_id_t identifierId_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::get_package( identifier_id_t identifierId_ ) {
+HHuginn::value_t* HHuginn::get_package( identifier_id_t identifierId_ ) {
 	M_PROLOG
-	HHuginn::value_t v;
+	HHuginn::value_t* v( nullptr );
 	packages_t::iterator it( _packages.find( identifierId_ ) );
 	if ( it != _packages.end() ) {
-		v = it->second;
+		v = &( it->second );
 	}
 	return ( v );
 	M_EPILOG
