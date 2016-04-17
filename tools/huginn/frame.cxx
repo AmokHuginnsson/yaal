@@ -126,9 +126,9 @@ HHuginn::value_t HFrame::get_reference( HHuginn::identifier_id_t identifierId_, 
 		}
 	}
 	if ( ! v ) {
-		HHuginn::function_t fun( _thread->huginn().get_function( identifierId_ ) );
+		HHuginn::function_t* fun( _thread->huginn().get_function( identifierId_ ) );
 		if ( !! fun ) {
-			v = make_pointer<HHuginn::HFunctionReference>( identifierId_, fun );
+			v = make_pointer<HHuginn::HFunctionReference>( identifierId_, *fun );
 		} else {
 			v = _thread->huginn().get_package( identifierId_ );
 			if ( ! v ) {

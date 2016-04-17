@@ -323,6 +323,7 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 			}
 		}
 		c = _classes.insert( make_pair( identifierId_, make_pointer<HClass>( this, type_id_t( _idGenerator ), cc->_classIdentifier, super, fieldDefinitions ) ) ).first->second.get();
+		_functions.insert( make_pair( identifierId_, hcore::call( &HHuginn::HClass::create_instance, c, _1, _2, _3, _4 ) ) );
 		++ _idGenerator;
 	}
 	return ( c );
@@ -333,6 +334,7 @@ void HHuginn::register_class( class_t class_ ) {
 	M_PROLOG
 	M_ENSURE( _state != STATE::COMPILED );
 	_classes.insert( make_pair( class_->identifier_id(), class_ ) );
+	_functions.insert( make_pair( class_->identifier_id(), hcore::call( &HHuginn::HClass::create_instance, class_.raw(), _1, _2, _3, _4 ) ) );
 	OCompiler::OIdentifierUse& ciu( _compiler->_usedIdentifiers[class_->identifier_id()] );
 	ciu.write( 0, OCompiler::OIdentifierUse::TYPE::CLASS );
 	ciu.read( 0 );
@@ -480,17 +482,12 @@ HHuginn::value_t HHuginn::result( void ) const {
 	return ( _result );
 }
 
-HHuginn::function_t HHuginn::get_function( identifier_id_t identifierId_ ) {
+HHuginn::function_t* HHuginn::get_function( identifier_id_t identifierId_ ) {
 	M_PROLOG
-	HHuginn::function_t f;
-	functions_t::const_iterator fi( _functions.find( identifierId_ ) );
+	HHuginn::function_t* f( nullptr );
+	functions_t::iterator fi( _functions.find( identifierId_ ) );
 	if ( fi != _functions.end() ) {
-		f = fi->second;
-	} else {
-		classes_t::const_iterator ci( _classes.find( identifierId_ ) );
-		if ( ci != _classes.end() ) {
-			f = hcore::call( &HHuginn::HClass::create_instance, ci->second.raw(), _1, _2, _3, _4 );
-		}
+		f = &(fi->second);
 	}
 	return ( f );
 	M_EPILOG

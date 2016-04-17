@@ -717,6 +717,13 @@ void HExpression::store_direct( HHuginn::value_t const& value_, HFrame* frame_, 
 	M_EPILOG
 }
 
+void HExpression::store_function( HHuginn::identifier_id_t identifier_, HHuginn::function_t* function_, huginn::HFrame* frame_, int ) {
+	M_PROLOG
+	frame_->values().push( make_pointer<HHuginn::HFunctionReference>( identifier_, *function_ ) );
+	return;
+	M_EPILOG
+}
+
 void HExpression::store_real( double long value_, HFrame* frame_, int ) {
 	M_PROLOG
 	frame_->values().push( frame_->thread()->object_factory().create_real( value_ ) );

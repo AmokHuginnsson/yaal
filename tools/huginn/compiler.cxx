@@ -310,14 +310,15 @@ void OCompiler::optimize( void ) {
 				}
 			}
 			if ( ( es._operation == OExecutionStep::OPERATION::USE ) && ! is_keyword( _huginn->identifier_name( es._identifier ) ) ) {
-				HHuginn::function_t callable( _huginn->get_function( es._identifier ) );
+				HHuginn::function_t* callable( _huginn->get_function( es._identifier ) );
 				if ( !! callable ) {
 					es._expression->replace_execution_step(
 						es._index,
 						hcore::call(
-							&HExpression::store_direct,
+							&HExpression::store_function,
 							es._expression.raw(),
-							make_pointer<HHuginn::HFunctionReference>( es._identifier, callable ),
+							es._identifier,
+							callable,
 							_1,
 							es._position
 						)
@@ -1810,7 +1811,7 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 			hcore::call(
 				&HExpression::store_direct,
 				current_expression().raw(),
-				make_pointer<HHuginn::HFunctionReference>( refIdentifier, _huginn->get_function( refIdentifier ) ),
+				make_pointer<HHuginn::HFunctionReference>( refIdentifier, *_huginn->get_function( refIdentifier ) ),
 				_1,
 				position_.get()
 			)

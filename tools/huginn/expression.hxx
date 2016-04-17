@@ -96,6 +96,7 @@ public:
 	void boolean_not( huginn::HFrame*, int );
 	void ternary( huginn::HFrame*, int );
 	void store_direct( HHuginn::value_t const&, huginn::HFrame*, int );
+	void store_function( HHuginn::identifier_id_t, HHuginn::function_t*, huginn::HFrame*, int );
 	void store_real( double long, huginn::HFrame*, int );
 	void store_integer( int long long, huginn::HFrame*, int );
 	void store_string( yaal::hcore::HString const&, huginn::HFrame*, int );

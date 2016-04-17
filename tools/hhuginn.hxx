@@ -313,7 +313,7 @@ public:
 	yaal::hcore::HStreamInterface& input_stream( void );
 	yaal::hcore::HStreamInterface& output_stream( void );
 	yaal::hcore::HStreamInterface& error_stream( void );
-	function_t get_function( identifier_id_t );
+	function_t* get_function( identifier_id_t );
 	class_t get_class( identifier_id_t );
 	value_t get_package( identifier_id_t );
 	yaal::hcore::HString get_snippet( int, int ) const;
@@ -928,6 +928,12 @@ class HHuginn::HFunctionReference : public HHuginn::HValue {
 	typedef HHuginn::HValue base_type;
 private:
 	HHuginn::identifier_id_t _identifierId;
+	/*! \brief Function definition holder.
+	 *
+	 * It has to be a ref count bumping pointer because lambdas are stored
+	 * with help of HFunctionReference directly in run-time,
+	 * so this holder must have shared ownership.
+	 */
 	HHuginn::function_t _function;
 public:
 	HFunctionReference( identifier_id_t, HHuginn::function_t const& );
