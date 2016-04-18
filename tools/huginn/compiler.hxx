@@ -134,7 +134,6 @@ struct OCompiler {
 		HHuginn::expression_t& expression( void );
 		HHuginn::type_id_t guess_type( HHuginn::identifier_id_t ) const;
 		void note_type( HHuginn::identifier_id_t, HHuginn::type_id_t );
-		void reset( HStatement::statement_id_t, int );
 	private:
 		OScopeContext( OScopeContext const& ) = delete;
 		OScopeContext& operator = ( OScopeContext const& ) = delete;
@@ -304,6 +303,7 @@ struct OCompiler {
 	typedef yaal::hcore::HHashMap<HHuginn::identifier_id_t, class_context_t> submitted_classes_t;
 	typedef yaal::hcore::HHashMap<HHuginn::identifier_id_t, HHuginn::identifier_id_t> submitted_imports_t;
 	typedef yaal::hcore::HArray<OFunctionContext::scope_context_t> scope_context_cache_t;
+	typedef yaal::hcore::HPair<HHuginn::identifier_id_t, HHuginn::function_t> function_info_t;
 	function_contexts_t _functionContexts;
 	class_context_t _classContext;
 	submitted_classes_t _submittedClasses;
@@ -329,7 +329,8 @@ struct OCompiler {
 	void set_field_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void add_field_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void set_lambda_name( executing_parser::position_t );
-	HHuginn::function_t create_function( executing_parser::position_t );
+	void create_function( executing_parser::position_t );
+	function_info_t create_function_low( executing_parser::position_t );
 	void commit_import( executing_parser::position_t );
 	void submit_class( executing_parser::position_t );
 	void create_lambda( executing_parser::position_t );
@@ -373,7 +374,6 @@ struct OCompiler {
 	void start_subexpression( executing_parser::position_t );
 	void add_subexpression( OPERATOR, executing_parser::position_t );
 	void add_field_definition( executing_parser::position_t );
-	void add_method( executing_parser::position_t );
 	void commit_boolean( OPERATOR, executing_parser::position_t );
 	void commit_ternary( executing_parser::position_t );
 	void create_scope( executing_parser::position_t );

@@ -283,7 +283,7 @@ public:
 	void dump_vm_state( yaal::hcore::HStreamInterface& );
 	huginn::HThread* current_thread( void );
 	huginn::HFrame* current_frame( void );
-	void create_function( executing_parser::position_t );
+	void register_function( identifier_id_t, function_t );
 	class_t create_class( yaal::hcore::HString const&, HClass const*, field_definitions_t const& );
 	class_t create_class( class_constructor_t const& );
 

@@ -85,24 +85,6 @@ OCompiler::OScopeContext::OScopeContext(
 	return;
 }
 
-void OCompiler::OScopeContext::reset( HStatement::statement_id_t statementId_, int position_ ) {
-	M_PROLOG
-	_scope = make_pointer<HScope>( statementId_, 0 );
-	_expressionsStack.clear();
-	_expressionsStack.emplace( 1, make_pointer<HExpression>() );
-	_variableTypes.clear();
-	_exceptionType = INVALID_IDENTIFIER;
-	_identifier = INVALID_IDENTIFIER;
-	_position = position_;
-	_scopeChain.clear();
-	_else.reset();
-	_catches.clear();
-	_terminatedAt = NOT_TERMINATED;
-	_statementId = statementId_;
-	return;
-	M_EPILOG
-}
-
 HHuginn::HHuginn::expression_t& OCompiler::OScopeContext::expression( void ) {
 	return ( _expressionsStack.top().back() );
 }
@@ -570,15 +552,18 @@ void OCompiler::set_lambda_name( executing_parser::position_t position_ ) {
 	M_EPILOG
 }
 
-void OCompiler::add_method( executing_parser::position_t position_ ) {
+void OCompiler::create_function( executing_parser::position_t position_ ) {
 	M_PROLOG
-	_classContext->_methods.insert( make_pair( static_cast<int>( _classContext->_fieldNames.get_size() - 1 ), create_function( position_ ) ) );
-	pop_function_context();
-	return;
+	function_info_t fi( create_function_low( position_ ) );
+	if ( !! _classContext ) {
+		_classContext->_methods.insert( make_pair( static_cast<int>( _classContext->_fieldNames.get_size() - 1 ), fi.second ) );
+	} else {
+		_huginn->register_function( fi.first, fi.second );
+	}
 	M_EPILOG
 }
 
-HHuginn::function_t OCompiler::create_function( executing_parser::position_t position_ ) {
+OCompiler::function_info_t OCompiler::create_function_low( executing_parser::position_t ) {
 	M_PROLOG
 	OCompiler::OFunctionContext& fc( f() );
 	M_ASSERT( fc._functionIdentifier != INVALID_IDENTIFIER );
@@ -596,11 +581,9 @@ HHuginn::function_t OCompiler::create_function( executing_parser::position_t pos
 		)
 	);
 	M_ASSERT( fc._scopeStack.get_size() == 1 );
-	fc._scopeStack.top()->reset( ++ _statementIdGenerator, position_.get() );
-	fc._parameters.clear();
-	fc._defaultValues.clear();
-	fc._lastDefaultValuePosition = -1;
-	return ( fun );
+	function_info_t fi( fc._functionIdentifier, fun );
+	pop_function_context();
+	return ( fi );
 	M_EPILOG
 }
 
@@ -650,9 +633,8 @@ void OCompiler::track_name_cycle( HHuginn::identifier_id_t identifierId_ ) {
 
 void OCompiler::create_lambda( executing_parser::position_t position_ ) {
 	M_PROLOG
-	HHuginn::function_t fun( create_function( position_ ) );
-	HHuginn::value_t fRef( make_pointer<HHuginn::HFunctionReference>( f()._functionIdentifier, fun ) );
-	pop_function_context();
+	function_info_t fi( create_function_low( position_ ) );
+	HHuginn::value_t fRef( make_pointer<HHuginn::HFunctionReference>( fi.first, fi.second ) );
 	defer_store_direct( fRef, position_ );
 	return;
 	M_EPILOG

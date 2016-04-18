@@ -737,15 +737,9 @@ void HHuginn::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) {
 	M_EPILOG
 }
 
-void HHuginn::create_function( executing_parser::position_t position_ ) {
+void HHuginn::register_function( identifier_id_t identifier_, function_t function_ ) {
 	M_PROLOG
-	if ( ! _compiler->_classContext ) {
-		OCompiler::OFunctionContext& fc( _compiler->f() );
-		_functions.insert( make_pair( fc._functionIdentifier, _compiler->create_function( position_ ) ) );
-		_compiler->pop_function_context();
-	} else {
-		_compiler->add_method( position_ );
-	}
+	_functions.insert( make_pair( identifier_, function_ ) );
 	return;
 	M_EPILOG
 }

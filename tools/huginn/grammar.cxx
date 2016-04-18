@@ -423,7 +423,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		) >> '(' >> -nameList >>
 		constant( ')', HRuleBase::action_position_t( hcore::call( &OCompiler::verify_default_argument, _compiler.get(), _1 ) ) )
 		>> scope,
-		HRuleBase::action_position_t( hcore::call( &HHuginn::create_function, this, _1 ) )
+		HRuleBase::action_position_t( hcore::call( &OCompiler::create_function, _compiler.get(), _1 ) )
 	);
 	HRule field(
 		"field",
