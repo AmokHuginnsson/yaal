@@ -292,22 +292,22 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	);
 	HRule value( "value", ternary );
 	HRule subscript( "subscript", ( reference >> +( subscriptOperator | functionCallOperator | memberAccess ) ) );
+	HRule assignable(
+		"assignable",
+		subscript[e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::make_reference, _compiler.get(), _1 ) )]
+		| regex(
+			"variableSetter",
+			identifierPattern,
+			e_p::HString::action_string_position_t( hcore::call( &OCompiler::defer_make_variable, _compiler.get(), _1, _2 ) )
+		)
+	);
 	/*
 	 * Assignment shall work only as aliasing.
 	 * In other words you cannot modify value of referenced object
 	 * with assignment. You can only change where a reference points to.
 	 */
 	expression %= HRule(
-		* (
-			/* make reference */ (
-				subscript[e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::make_reference, _compiler.get(), _1 ) )]
-				| regex(
-					"variableSetter",
-					identifierPattern,
-					e_p::HString::action_string_position_t( hcore::call( &OCompiler::defer_make_variable, _compiler.get(), _1, _2 ) )
-				)
-			) >>
-			( constant( "=" ) | "+=" | "-=" | "*=" | "/=" | "%=" | "^=" )[
+		* ( assignable >> ( constant( "=" ) | "+=" | "-=" | "*=" | "/=" | "%=" | "^=" )[
 				e_p::HString::action_string_position_t( hcore::call( &OCompiler::defer_str_oper, _compiler.get(), _1, _2 ) )
 			] ^ '='
 		) >> value,
