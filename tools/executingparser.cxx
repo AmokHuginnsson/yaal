@@ -55,6 +55,7 @@ static EscapeTable const _escapes_( _raw_,  static_cast<int>( sizeof ( _raw_ ) )
 }
 
 class HRecursionDetector {
+	typedef yaal::hcore::HArray<HRuleBase const*> visited_t;
 	typedef yaal::hcore::HStack<visited_t> checkpoints_t;
 	checkpoints_t _visited;
 	checkpoints_t _checkpoints;
@@ -68,10 +69,44 @@ public:
 	}
 	bool visit( HRuleBase const* rule_ ) {
 		M_PROLOG
-		if ( ! _checkpoints.top().insert( rule_ ).second ) {
-			throw HRecursionDetectorException( "Infinite recursion detected." );
+		visited_t& chk( _checkpoints.top() );
+		if ( find( chk.begin(), chk.end(), rule_ ) != chk.end() ) {
+			rule_use_t ru;
+			chk.front()->rule_use( ru );
+			HRuleDescription rd;
+			hcore::HString name;
+			for ( HRuleBase const* r : chk ) {
+				if ( dynamic_cast<HRuleRef const*>( r ) ) {
+					continue;
+				}
+				rd.clear();
+				r->describe( rd, ru );
+				for ( HNamedRule const* nr : rd.children() ) {
+					if ( nr->id() == rule_ ) {
+						name = rd.make_name( *nr );
+						break;
+					}
+				}
+				if ( ! name.is_empty() ) {
+					break;
+				}
+			}
+			rd.clear();
+			if ( ! name.is_empty() ) {
+				rd.desc( name );
+				rd.desc( " = " );
+			}
+			rule_->describe( rd, ru );
+			throw HRecursionDetectorException( "Infinite recursion detected: "_ys.append( rd.description() ) );
 		}
-		return ( _visited.top().insert( rule_ ).second );
+		chk.push_back( rule_ );
+		bool firstTime( false );
+		visited_t& vis( _visited.top() );
+		if ( find( vis.begin(), vis.end(), rule_ ) == vis.end() ) {
+			vis.push_back( rule_ );
+			firstTime = true;
+		}
+		return ( firstTime );
 		M_EPILOG
 	}
 	void reset_visits( void ) {
@@ -4044,9 +4079,9 @@ yaal::hcore::HString const& HRuleDescription::make_name( HNamedRule const& nr_ )
 	M_PROLOG
 	hcore::HString const* name( NULL );
 
-	if ( ! nr_.name().is_empty() )
+	if ( ! nr_.name().is_empty() ) {
 		name = &nr_.name();
-	else {
+	} else {
 		name = &make_name_auto( nr_.id() );
 	}
 	return ( *name );
@@ -4057,9 +4092,9 @@ yaal::hcore::HString const& HRuleDescription::make_name_auto( HRuleBase const* r
 	M_PROLOG
 	hcore::HString const* name( NULL );
 	automatic_names_t::const_iterator a( _automaticNames.find( rule_ ) );
-	if ( a != _automaticNames.end() )
+	if ( a != _automaticNames.end() ) {
 		name = &a->second;
-	else {
+	} else {
 		static int const MAX_AUTO_NAMES_COUNT = 26;
 		int autoNamesCount( static_cast<int>( _automaticNames.get_size() ) );
 		if ( autoNamesCount < MAX_AUTO_NAMES_COUNT ) {
