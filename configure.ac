@@ -174,16 +174,16 @@ MYSQL_REENTRANT=[""]
 CXXFLAGS_ORIG="${CXXFLAGS}"
 if test ["${MYSQL}"] != ["no"] ; then
 	LIBS=""
-	AC_SEARCH_LIBS([mysql_init],[mysqlclient_r mysqlclient])
+	AC_SEARCH_LIBS([mysql_init],[mysqlclient])
 	if test ["x${LIBS}"] = "x" ; then
 		CXXFLAGS=["${CXXFLAGS_ORIG} -L/usr/local/lib/mysql"]
 		unset ac_cv_search_mysql_init
-		AC_SEARCH_LIBS([mysql_init],[mysqlclient_r mysqlclient],[EXTRA_LIBRARY_PATHS="${EXTRA_LIBRARY_PATHS} -L/usr/local/lib/mysql"])
+		AC_SEARCH_LIBS([mysql_init],[mysqlclient],[EXTRA_LIBRARY_PATHS="${EXTRA_LIBRARY_PATHS} -L/usr/local/lib/mysql"])
 	fi
 	if test ["x${LIBS}"] = "x" ; then
 		CXXFLAGS=["${CXXFLAGS_ORIG} -L/usr/lib64/mysql/"]
 		unset ac_cv_search_mysql_init
-		AC_SEARCH_LIBS([mysql_init],[mysqlclient_r mysqlclient],[EXTRA_LIBRARY_PATHS="${EXTRA_LIBRARY_PATHS} -L/usr/lib64/mysql/"])
+		AC_SEARCH_LIBS([mysql_init],[mysqlclient],[EXTRA_LIBRARY_PATHS="${EXTRA_LIBRARY_PATHS} -L/usr/lib64/mysql/"])
 	fi
 	if test ["x${LIBS}"] = "x" ; then
 		if test ["${MYSQL}"] = ["yes"] ; then

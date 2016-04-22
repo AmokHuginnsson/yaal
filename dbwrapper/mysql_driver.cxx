@@ -351,12 +351,14 @@ HMySQLInitDeinit::HMySQLInitDeinit( void ) {
 	);
 	yaal_options().process_rc_file( "yaal", "mysql", NULL );
 #if defined( HAVE_DECL_MYSQL_AUTODETECT_CHARSET_NAME ) && ( HAVE_DECL_MYSQL_AUTODETECT_CHARSET_NAME == 1 )
-	if ( _clientCharacterSet_ == AUTODETECT_CHARSET )
+	if ( _clientCharacterSet_ == AUTODETECT_CHARSET ) {
 		_clientCharacterSet_ = MYSQL_AUTODETECT_CHARSET_NAME;
+	}
 #endif /* #ifdef defined( HAVE_DECL_MYSQL_AUTODETECT_CHARSET_NAME ) && ( HAVE_DECL_MYSQL_AUTODETECT_CHARSET_NAME == 1 ) */
 	char const* characterSetOverride( ::getenv( "YAAL_MYSQL_CLIENT_CHARACTER_SET" ) );
-	if ( characterSetOverride )
+	if ( characterSetOverride ) {
 		_clientCharacterSet_ = characterSetOverride;
+	}
 	return;
 	M_EPILOG
 }
