@@ -242,7 +242,7 @@ void HExecutingParser::sanitize( void ) {
 		executing_parser::HGrammarDescription gd( *_grammar );
 		M_ENSURE( ! gd.is_empty() );
 		executing_parser::HRecursionDetector recursionDetector;
-		_grammar->detect_recursion( recursionDetector );
+		_grammar->detect_recursion( recursionDetector, false );
 	} catch ( executing_parser::HRuleBaseException const& e ) {
 		throw HExecutingParserException( e.what() );
 	} catch ( executing_parser::HRecursionDetectorException const& e ) {
@@ -468,8 +468,9 @@ bool HRuleBase::do_is_optional( void ) const {
 yaal::hcore::HString::const_iterator HRuleBase::skip_space( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
 	M_ASSERT( first_ && last_ );
-	while ( ( first_ != last_ ) && isspace( *first_ ) )
+	while ( ( first_ != last_ ) && isspace( *first_ ) ) {
 		++ first_;
+	}
 	return ( first_ );
 	M_EPILOG
 }
@@ -477,25 +478,27 @@ yaal::hcore::HString::const_iterator HRuleBase::skip_space( yaal::hcore::HString
 void HRuleBase::detach( HRuleBase const* rule_, visited_t& visited_, bool& detachAll_ ) {
 	M_PROLOG
 	visited_t::insert_result ir( visited_.insert( this ) );
-	if ( ir.second )
+	if ( ir.second ) {
 		do_detach( rule_, visited_, detachAll_ );
-	return;
-	M_EPILOG
-}
-
-void HRuleBase::detect_recursion( HRecursionDetector& recursionDetector_ ) const {
-	M_PROLOG
-	if ( recursionDetector_.visit( this ) ) {
-		do_detect_recursion( recursionDetector_ );
 	}
 	return;
 	M_EPILOG
 }
 
+bool HRuleBase::detect_recursion( HRecursionDetector& recursionDetector_, bool skipVisit_ ) const {
+	M_PROLOG
+	if ( ! skipVisit_ ) {
+		skipVisit_ = ! recursionDetector_.visit( this );
+	}
+	return ( do_detect_recursion( recursionDetector_, skipVisit_ ) );
+	M_EPILOG
+}
+
 void HRuleBase::find_recursions( HRuleAggregator& recursions_ ) {
 	M_PROLOG
-	if ( recursions_.visit( this ) )
+	if ( recursions_.visit( this ) ) {
 		do_find_recursions( recursions_ );
+	}
 	return;
 	M_EPILOG
 }
@@ -509,13 +512,14 @@ bool HRuleBase::do_has_action( void ) const {
 }
 
 HNamedRule::HNamedRule( yaal::hcore::HString const& name_, ptr_t rule_ )
-	: _name( name_ ), _rule( rule_ ) {
+	: _name( name_ )
+	, _rule( rule_ ) {
 	M_ENSURE( name_.is_empty() || ( name_[name_.get_length() - 1] != '_' ) );
 }
 
 HNamedRule::HNamedRule( HRuleBase const& rule_ )
-	: _name( dynamic_cast<HRule const*>( &rule_ ) ? dynamic_cast<HRule const*>( &rule_ )->get_name() : yaal::hcore::HString() ),
-	_rule( rule_.clone() ) {
+	: _name( dynamic_cast<HRule const*>( &rule_ ) ? dynamic_cast<HRule const*>( &rule_ )->get_name() : yaal::hcore::HString() )
+	, _rule( rule_.clone() ) {
 	return;
 }
 
@@ -808,13 +812,14 @@ void HRule::do_detach( HRuleBase const* rule_, visited_t& visited_, bool& detach
 	M_EPILOG
 }
 
-void HRule::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
+bool HRule::do_detect_recursion( HRecursionDetector& recursionDetector_, bool skipVisit_ ) const {
 	M_PROLOG
 	HRuleBase::ptr_t r( _rule.rule() );
+	bool reset( false );
 	if ( !! r ) {
-		r->detect_recursion( recursionDetector_ );
+		reset = r->detect_recursion( recursionDetector_, skipVisit_ );
 	}
-	return;
+	return ( reset );
 	M_EPILOG
 }
 
@@ -914,12 +919,13 @@ void HRecursiveRule::do_detach( HRuleBase const* rule_, visited_t& visited_, boo
 	M_EPILOG
 }
 
-void HRecursiveRule::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
+bool HRecursiveRule::do_detect_recursion( HRecursionDetector& recursionDetector_, bool skipVisit_ ) const {
 	M_PROLOG
+	bool reset( false );
 	if ( !! _rule ) {
-		_rule->detect_recursion( recursionDetector_ );
+		reset = _rule->detect_recursion( recursionDetector_, skipVisit_ );
 	}
-	return;
+	return ( reset );
 	M_EPILOG
 }
 
@@ -987,12 +993,11 @@ void HRuleRef::do_detach( HRuleBase const* rule_, visited_t& visited_, bool& det
 	M_EPILOG
 }
 
-void HRuleRef::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
+bool HRuleRef::do_detect_recursion( HRecursionDetector& recursionDetector_, bool skipVisit_ ) const {
 	M_PROLOG
 	HRuleBase::ptr_t r( _rule );
 	M_ASSERT( !! r );
-	r->detect_recursion( recursionDetector_ );
-	return;
+	return ( r->detect_recursion( recursionDetector_, skipVisit_ ) );
 	M_EPILOG
 }
 
@@ -1150,15 +1155,20 @@ void HFollows::do_detach( HRuleBase const* rule_, visited_t& visited_, bool& det
 	M_EPILOG
 }
 
-void HFollows::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
+bool HFollows::do_detect_recursion( HRecursionDetector& recursionDetector_, bool skipVisit_ ) const {
 	M_PROLOG
-	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
+	bool reset( false );
+	for (
+		rules_t::const_iterator it( _rules.begin() ), end( _rules.end() );
+		! ( reset && skipVisit_  ) && ( it != end );
+		++ it
+	) {
 		HRuleBase::ptr_t r( it->rule() );
 		if ( !! r ) {
-			r->detect_recursion( recursionDetector_ );
+			reset  = r->detect_recursion( recursionDetector_, skipVisit_ );
 		}
 	}
-	return;
+	return ( reset );
 	M_EPILOG
 }
 
@@ -1307,15 +1317,17 @@ void HKleeneStar::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) co
 	M_EPILOG
 }
 
-void HKleeneStar::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
+bool HKleeneStar::do_detect_recursion( HRecursionDetector& recursionDetector_, bool skipVisit_ ) const {
 	M_PROLOG
-	HRuleBase::ptr_t r( _rule.rule() );
-	if ( !! r ) {
-		recursionDetector_.checkpoints_push();
-		r->detect_recursion( recursionDetector_ );
-		recursionDetector_.checkpoints_pop();
+	if ( ! skipVisit_ ) {
+		HRuleBase::ptr_t r( _rule.rule() );
+		if ( !! r ) {
+			recursionDetector_.checkpoints_push();
+			r->detect_recursion( recursionDetector_, skipVisit_ );
+			recursionDetector_.checkpoints_pop();
+		}
 	}
-	return;
+	return ( false );
 	M_EPILOG
 }
 
@@ -1367,13 +1379,14 @@ void HKleenePlus::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) co
 	M_EPILOG
 }
 
-void HKleenePlus::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
+bool HKleenePlus::do_detect_recursion( HRecursionDetector& recursionDetector_, bool skipVisit_ ) const {
 	M_PROLOG
 	HRuleBase::ptr_t r( _rule.rule() );
+	bool reset( false );
 	if ( !! r ) {
-		r->detect_recursion( recursionDetector_ );
+		reset = r->detect_recursion( recursionDetector_, skipVisit_ );
 	}
-	return;
+	return ( reset );
 	M_EPILOG
 }
 
@@ -1509,17 +1522,26 @@ void HAlternative::do_detach( HRuleBase const* rule_, visited_t& visited_, bool&
 	M_EPILOG
 }
 
-void HAlternative::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
+bool HAlternative::do_detect_recursion( HRecursionDetector& recursionDetector_, bool skipVisit_ ) const {
 	M_PROLOG
-	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
-		HRuleBase::ptr_t r( it->rule() );
-		if ( !! r ) {
-			recursionDetector_.checkpoints_push();
-			r->detect_recursion( recursionDetector_ );
-			recursionDetector_.checkpoints_pop();
+	bool reset( false );
+	if ( ! skipVisit_ ) {
+		reset = true;
+		for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
+			HRuleBase::ptr_t r( it->rule() );
+			if ( !! r ) {
+				recursionDetector_.checkpoints_push();
+				if ( ! r->detect_recursion( recursionDetector_, skipVisit_ ) ) {
+					reset = false;
+				}
+				recursionDetector_.checkpoints_pop();
+			}
+		}
+		if ( reset ) {
+			recursionDetector_.reset_visits();
 		}
 	}
-	return;
+	return ( reset );
 	M_EPILOG
 }
 
@@ -1633,15 +1655,17 @@ void HOptional::do_detach( HRuleBase const* rule_, visited_t& visited_, bool& de
 	M_EPILOG
 }
 
-void HOptional::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
+bool HOptional::do_detect_recursion( HRecursionDetector& recursionDetector_, bool skipVisit_ ) const {
 	M_PROLOG
-	HRuleBase::ptr_t r( _rule.rule() );
-	if ( !! r ) {
-		recursionDetector_.checkpoints_push();
-		r->detect_recursion( recursionDetector_ );
-		recursionDetector_.checkpoints_pop();
+	if ( ! skipVisit_ ) {
+		HRuleBase::ptr_t r( _rule.rule() );
+		if ( !! r ) {
+			recursionDetector_.checkpoints_push();
+			r->detect_recursion( recursionDetector_, skipVisit_ );
+			recursionDetector_.checkpoints_pop();
+		}
 	}
-	return;
+	return ( false );
 	M_EPILOG
 }
 
@@ -1769,21 +1793,20 @@ void HAnd::do_detach( HRuleBase const* rule_, visited_t& visited_, bool& detachA
 	M_EPILOG
 }
 
-void HAnd::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
+bool HAnd::do_detect_recursion( HRecursionDetector& recursionDetector_, bool skipVisit_ ) const {
 	M_PROLOG
-	HNamedRule const* rules[2] = {
-		&_rule,
-		&_and
-	};
-	for ( HNamedRule const* rule : rules ) {
-		HRuleBase::ptr_t r( rule->rule() );
-		if ( !! r ) {
-			recursionDetector_.checkpoints_push();
-			r->detect_recursion( recursionDetector_ );
-			recursionDetector_.checkpoints_pop();
-		}
+	bool reset( false );
+	HRuleBase::ptr_t r( _rule.rule() );
+	if ( !! r ) {
+		reset = r->detect_recursion( recursionDetector_, skipVisit_ );
 	}
-	return;
+	r = _and.rule();
+	if ( !! r ) {
+		recursionDetector_.checkpoints_push();
+		r->detect_recursion( recursionDetector_, skipVisit_ );
+		recursionDetector_.checkpoints_pop();
+	}
+	return ( reset );
 	M_EPILOG
 }
 
@@ -1914,21 +1937,20 @@ void HNot::do_detach( HRuleBase const* rule_, visited_t& visited_, bool& detachA
 	M_EPILOG
 }
 
-void HNot::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
+bool HNot::do_detect_recursion( HRecursionDetector& recursionDetector_, bool skipVisit_ ) const {
 	M_PROLOG
-	HNamedRule const* rules[2] = {
-		&_rule,
-		&_not
-	};
-	for ( HNamedRule const* rule : rules ) {
-		HRuleBase::ptr_t r( rule->rule() );
-		if ( !! r ) {
-			recursionDetector_.checkpoints_push();
-			r->detect_recursion( recursionDetector_ );
-			recursionDetector_.checkpoints_pop();
-		}
+	bool reset( false );
+	HRuleBase::ptr_t r( _rule.rule() );
+	if ( !! r ) {
+		reset = r->detect_recursion( recursionDetector_, skipVisit_ );
 	}
-	return;
+	r = _not.rule();
+	if ( !! r ) {
+		recursionDetector_.checkpoints_push();
+		r->detect_recursion( recursionDetector_, skipVisit_ );
+		recursionDetector_.checkpoints_pop();
+	}
+	return ( reset );
 	M_EPILOG
 }
 
@@ -2401,10 +2423,10 @@ void HReal::do_detach( HRuleBase const*, visited_t&, bool& ) {
 	M_EPILOG
 }
 
-void HReal::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
+bool HReal::do_detect_recursion( HRecursionDetector& recursionDetector_, bool ) const {
 	M_PROLOG
 	recursionDetector_.reset_visits();
-	return;
+	return ( true );
 	M_EPILOG
 }
 
@@ -2835,10 +2857,10 @@ void HInteger::do_detach( HRuleBase const*, visited_t&, bool& ) {
 	M_EPILOG
 }
 
-void HInteger::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
+bool HInteger::do_detect_recursion( HRecursionDetector& recursionDetector_, bool ) const {
 	M_PROLOG
 	recursionDetector_.reset_visits();
-	return;
+	return ( true );
 	M_EPILOG
 }
 
@@ -3015,10 +3037,10 @@ void HStringLiteral::do_detach( HRuleBase const*, visited_t&, bool& ) {
 	M_EPILOG
 }
 
-void HStringLiteral::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
+bool HStringLiteral::do_detect_recursion( HRecursionDetector& recursionDetector_, bool ) const {
 	M_PROLOG
 	recursionDetector_.reset_visits();
-	return;
+	return ( true );
 	M_EPILOG
 }
 
@@ -3186,10 +3208,10 @@ void HCharacterLiteral::do_detach( HRuleBase const*, visited_t&, bool& ) {
 	M_EPILOG
 }
 
-void HCharacterLiteral::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
+bool HCharacterLiteral::do_detect_recursion( HRecursionDetector& recursionDetector_, bool ) const {
 	M_PROLOG
 	recursionDetector_.reset_visits();
-	return;
+	return ( true );
 	M_EPILOG
 }
 
@@ -3348,10 +3370,10 @@ void HCharacter::do_detach( HRuleBase const*, visited_t&, bool& ) {
 	M_EPILOG
 }
 
-void HCharacter::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
+bool HCharacter::do_detect_recursion( HRecursionDetector& recursionDetector_, bool ) const {
 	M_PROLOG
 	recursionDetector_.reset_visits();
-	return;
+	return ( true );
 	M_EPILOG
 }
 
@@ -3604,10 +3626,10 @@ void HString::do_detach( HRuleBase const*, visited_t&, bool& ) {
 	M_EPILOG
 }
 
-void HString::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
+bool HString::do_detect_recursion( HRecursionDetector& recursionDetector_, bool ) const {
 	M_PROLOG
 	recursionDetector_.reset_visits();
-	return;
+	return ( true );
 	M_EPILOG
 }
 
@@ -3810,10 +3832,10 @@ void HRegex::do_detach( HRuleBase const*, visited_t&, bool& ) {
 	M_EPILOG
 }
 
-void HRegex::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
+bool HRegex::do_detect_recursion( HRecursionDetector& recursionDetector_, bool ) const {
 	M_PROLOG
 	recursionDetector_.reset_visits();
-	return;
+	return ( true );
 	M_EPILOG
 }
 

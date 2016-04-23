@@ -153,7 +153,7 @@ public:
 	void describe( HRuleDescription&, rule_use_t const& ) const;
 	void detach( HRuleBase const*, visited_t&, bool& );
 	void rule_use( rule_use_t& ) const;
-	void detect_recursion( HRecursionDetector& ) const;
+	bool detect_recursion( HRecursionDetector&, bool ) const;
 	void find_recursions( HRuleAggregator& );
 	bool has_action( void ) const;
 	static yaal::hcore::HString::const_iterator skip_space( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
@@ -164,7 +164,7 @@ protected:
 	virtual bool do_is_optional( void ) const;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const = 0;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) = 0;
-	virtual void do_detect_recursion( HRecursionDetector& ) const = 0;
+	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const = 0;
 	virtual void do_find_recursions( HRuleAggregator& ) = 0;
 	virtual bool do_has_action( void ) const;
 	void add_execution_step( HExecutingParser*, yaal::hcore::HString::const_iterator, action_t const& ) const;
@@ -244,7 +244,7 @@ protected:
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_rule_use( rule_use_t& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
-	virtual void do_detect_recursion( HRecursionDetector& ) const override;
+	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
 private:
 	HRule& operator = ( HRule const& ) = delete;
@@ -267,7 +267,7 @@ protected:
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_rule_use( rule_use_t& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
-	virtual void do_detect_recursion( HRecursionDetector& ) const override;
+	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
 private:
 	HRecursiveRule( void );
@@ -298,7 +298,7 @@ protected:
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override M_DEBUG_CODE( __attribute__((__noreturn__)) );
 	virtual void do_rule_use( rule_use_t& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
-	virtual void do_detect_recursion( HRecursionDetector& ) const override;
+	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
 };
 
@@ -359,7 +359,7 @@ protected:
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_rule_use( rule_use_t& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
-	virtual void do_detect_recursion( HRecursionDetector& ) const override;
+	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
 private:
 	HFollows( HRuleBase const&, HRuleBase const& );
@@ -424,7 +424,7 @@ protected:
 	virtual ptr_t do_clone( void ) const override;
 	virtual bool do_is_optional( void ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
-	virtual void do_detect_recursion( HRecursionDetector& ) const override;
+	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 private:
 	HKleeneStar( HRuleBase const& );
 	HKleeneStar& operator = ( HKleeneStar const& ) = delete;
@@ -449,7 +449,7 @@ protected:
 	HKleenePlus( HNamedRule const&, action_position_t const& );
 	virtual ptr_t do_clone( void ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
-	virtual void do_detect_recursion( HRecursionDetector& ) const override;
+	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 private:
 	HKleenePlus( HRuleBase const& rule_ );
 	HKleenePlus& operator = ( HKleenePlus const& ) = delete;
@@ -475,7 +475,7 @@ protected:
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_rule_use( rule_use_t& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
-	virtual void do_detect_recursion( HRecursionDetector& ) const override;
+	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
 private:
 	HAlternative( HRuleBase const&, HRuleBase const& );
@@ -508,7 +508,7 @@ protected:
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_rule_use( rule_use_t& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
-	virtual void do_detect_recursion( HRecursionDetector& ) const override;
+	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
 private:
 	HOptional( HRuleBase const& );
@@ -538,7 +538,7 @@ protected:
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_rule_use( rule_use_t& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
-	virtual void do_detect_recursion( HRecursionDetector& ) const override;
+	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
 private:
 	HAnd( HRuleBase const&, HRuleBase const& );
@@ -571,7 +571,7 @@ protected:
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_rule_use( rule_use_t& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
-	virtual void do_detect_recursion( HRecursionDetector& ) const override;
+	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
 private:
 	HNot( HRuleBase const&, HRuleBase const& );
@@ -646,7 +646,7 @@ protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
-	virtual void do_detect_recursion( HRecursionDetector& ) const override;
+	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
 	virtual bool do_has_action( void ) const override;
 private:
@@ -723,7 +723,7 @@ protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
-	virtual void do_detect_recursion( HRecursionDetector& ) const override;
+	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
 	virtual bool do_has_action( void ) const override;
 private:
@@ -761,7 +761,7 @@ protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
-	virtual void do_detect_recursion( HRecursionDetector& ) const override;
+	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
 	virtual bool do_has_action( void ) const override;
 private:
@@ -799,7 +799,7 @@ protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
-	virtual void do_detect_recursion( HRecursionDetector& ) const override;
+	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
 	virtual bool do_has_action( void ) const override;
 private:
@@ -841,7 +841,7 @@ protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
-	virtual void do_detect_recursion( HRecursionDetector& ) const override;
+	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
 	virtual bool do_has_action( void ) const override;
 private:
@@ -887,7 +887,7 @@ protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
-	virtual void do_detect_recursion( HRecursionDetector& ) const override;
+	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
 	virtual bool do_has_action( void ) const override;
 private:
@@ -939,7 +939,7 @@ protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
-	virtual void do_detect_recursion( HRecursionDetector& ) const override;
+	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
 	virtual bool do_has_action( void ) const override;
 private:
