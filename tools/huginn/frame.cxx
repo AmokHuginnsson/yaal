@@ -48,7 +48,6 @@ HFrame::HFrame(
 	, _object( nullptr )
 	, _upCast( 0 )
 	, _variables()
-	, _namedVariables()
 	, _operations()
 	, _values()
 	, _result()
@@ -103,35 +102,27 @@ void HFrame::reset( void ) {
 	M_ASSERT( _operations.is_empty() );
 	_statementId = INVALID_STATEMENT_IDENTIFIER;
 	_result.reset();
-	_namedVariables.clear();
 	_variables.clear();
 	_state = STATE::NORMAL;
 	return;
 	M_EPILOG
 }
 
-HHuginn::value_t HFrame::get_reference( HHuginn::identifier_id_t identifierId_, int position_ ) {
+void HFrame::add_variable( HHuginn::value_t const& value_ ) {
 	M_PROLOG
-	HHuginn::value_t v;
-	HFrame* f( this );
-	while ( f ) {
-		named_variables_t::iterator it( f->_namedVariables.find( identifierId_ ) );
-		if ( it != f->_namedVariables.end() ) {
-			v = it->second;
-			break;
-		} else if ( f->_parent && ( f->_parent->_number == _number ) ) {
-			f = f->_parent;
-		} else {
-			break;
-		}
+	_variables.push_back( value_ );
+	return;
+	M_EPILOG
+}
+
+void HFrame::commit_variable( HHuginn::value_t const& value_, int position_ ) {
+	M_PROLOG
+	if ( _result->type_id() != HHuginn::TYPE::REFERENCE ) {
+		M_ASSERT( _result->type_id() == HHuginn::TYPE::CHARACTER );
+		throw HHuginn::HHuginnRuntimeException( "String does not support item assignment.", position_ );
 	}
-	if ( ! v ) {
-		throw HHuginn::HHuginnRuntimeException(
-			"Name `"_ys.append( _thread->huginn().identifier_name( identifierId_ ) ).append( "' is not defined." ),
-			position_
-		);
-	}
-	return ( v );
+	static_cast<HHuginn::HReference*>( _result.raw() )->value() = value_;
+	return;
 	M_EPILOG
 }
 
@@ -158,6 +149,9 @@ HHuginn::value_t HFrame::get_variable( HExpression::ACCESS access_, HStatement::
 		M_ASSERT( f );
 	}
 	HHuginn::value_t v;
+	if ( ( access_ == HExpression::ACCESS::REFERENCE ) && ( static_cast<int>( _variables.get_size() ) == index_ ) ) {
+		f->_variables.push_back( HHuginn::value_t() );
+	}
 	if ( access_ == HExpression::ACCESS::VALUE ) {
 		v = f->_variables[index_];
 	} else {
@@ -180,43 +174,6 @@ HHuginn::value_t HFrame::get_super( int position_ ) {
 	HHuginn::value_t* obj( object() );
 	M_ASSERT( obj && !! *obj );
 	return ( make_pointer<HHuginn::HObjectReference>( *obj, _upCast, true, position_ ) );
-	M_EPILOG
-}
-
-void HFrame::set_variable( HHuginn::identifier_id_t identifierId_, HHuginn::value_t const& value_, int position_ ) {
-	M_PROLOG
-	HHuginn::value_t ref( make_variable( identifierId_, position_ ) );
-	static_cast<HHuginn::HReference*>( ref.raw() )->value() = value_;
-	return;
-	M_EPILOG
-}
-
-HHuginn::value_t HFrame::make_variable( HHuginn::identifier_id_t identifierId_, int ) {
-	M_PROLOG
-	HFrame* f( this );
-	HHuginn::value_t* v( nullptr );
-	while ( f ) {
-		int fieldIdx( -1 );
-		HHuginn::HObject* obj( f->_object ? static_cast<HHuginn::HObject*>( f->_object->raw() ) : nullptr );
-		if ( obj && ( ( fieldIdx = obj->field_index( identifierId_ ) ) >= 0 ) ) {
-			v = &( obj->field_ref( fieldIdx ) );
-			break;
-		}
-		named_variables_t::iterator it( f->_namedVariables.find( identifierId_ ) );
-		if ( it != f->_namedVariables.end() ) {
-			v = &( it->second );
-			break;
-		}
-		if ( f->_parent && ( f->_parent->_number == _number ) ) {
-			f = f->_parent;
-		} else {
-			f = nullptr;
-		}
-	}
-	if ( ! v ) {
-		v = &( _namedVariables.insert( make_pair( identifierId_, _thread->huginn().none_value() ) ).first->second );
-	}
-	return ( make_pointer<HHuginn::HReference>( *v ) );
 	M_EPILOG
 }
 

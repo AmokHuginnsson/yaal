@@ -387,9 +387,7 @@ void HHuginn::finalize_compilation( compiler_setup_t compilerSetup_ ) {
 	if ( compilerSetup_ & COMPILER::BE_STRICT ) {
 		_compiler->detect_misuse();
 	}
-	if ( compilerSetup_ & COMPILER::OPTIMIZE ) {
-		_compiler->optimize();
-	}
+	_compiler->resolve_symbols();
 	_threads.clear();
 	return;
 	M_EPILOG

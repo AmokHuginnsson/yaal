@@ -72,8 +72,7 @@ OCompiler::OScopeContext::OScopeContext(
 	, _expressionsStack()
 	, _variableTypes()
 	, _exceptionType( INVALID_IDENTIFIER )
-	, _identifier( INVALID_IDENTIFIER )
-	, _position( 0 )
+	, _assertExpressionEnd( 0 )
 	, _scopeChain()
 	, _else()
 	, _catches()
@@ -143,7 +142,8 @@ OCompiler::OFunctionContext::OFunctionContext(
 	, _lastDereferenceOperator( OPERATOR::NONE )
 	, _isAssert( false )
 	, _lastMemberName()
-	, _isLambda( isLambda_ ) {
+	, _isLambda( isLambda_ )
+	, _inline( true ) {
 	_scopeStack.emplace( make_pointer<OScopeContext>( this, statementId_, 0 ) );
 	return;
 }
@@ -231,7 +231,7 @@ void OCompiler::set_setup( HHuginn::compiler_setup_t setup_ ) {
 	return;
 }
 
-void OCompiler::optimize( void ) {
+void OCompiler::resolve_symbols( void ) {
 	M_PROLOG
 	M_ASSERT( _submittedClasses.is_empty() );
 	HHuginn::identifier_id_t lastClassId( INVALID_IDENTIFIER );
@@ -282,12 +282,61 @@ void OCompiler::optimize( void ) {
 			if ( es._operation == OExecutionStep::OPERATION::DEFINE ) {
 				if ( ! sc ) {
 					sc = es._scope.raw();
+					/*
+					 * There are two kind of OScopeContexts:
+					 * 1. Real scope context that is equivalent of {...} in program code.
+					 * 2. Virtual scope context that is necessary for proper scoping of `for' and `while' and `if'
+					 *    control variables e.g.:
+					 *        for ( e : list ) { ... }
+					 *    in this case `e' is in virtual scope.
+					 * Finding indices of local variables must take into account both types of scopes
+					 * because real scopes `{}' can be inlined in virtual scopes in run-time,
+					 * like it happens in case of `if/else' statement.
+					 * Inlining `if/else' real scopes has a side effect of allowing different
+					 * variables from different scopes (different `else if' stanzas in the same `if/else' chain)
+					 * to have the same index, this is possible because `[else] if' stanzas are mutually exclusive
+					 * in given `if/else' chain.
+					 */
+					OScopeContext* parent( sc );
+					while ( parent->_parent && ( parent->_parent->_statementId == parent->_statementId ) ) {
+						parent = parent->_parent;
+					}
 					M_ASSERT( index == -1 );
-					sc->_variables[es._identifier] = index = static_cast<int>( sc->_variables.get_size() );
+					index = static_cast<int>( sc->_variables.get_size() );
+					if ( parent != sc ) {
+						index += static_cast<int>( parent->_variables.get_size() );
+					}
+					sc->_variables[es._identifier] = index;
+				}
+				if ( !! es._expression ) {
+					es._expression->replace_execution_step(
+						es._index,
+						hcore::call(
+							&HExpression::get_variable_direct,
+							es._expression.raw(),
+							HExpression::ACCESS::REFERENCE,
+							sc->_statementId,
+							index,
+							_1,
+							es._position
+						)
+					);
 				}
 				break;
 			} else {
 				if ( sc ) {
+					es._expression->replace_execution_step(
+						es._index,
+						hcore::call(
+							&HExpression::get_variable_direct,
+							es._expression.raw(),
+							HExpression::ACCESS::VALUE,
+							sc->_statementId,
+							index,
+							_1,
+							es._position
+						)
+					);
 					break;
 				}
 			}
@@ -376,7 +425,7 @@ void OCompiler::detect_misuse( void ) const {
 					use_name( use._type ).append( " `" ).append( _huginn->identifier_name( id ) ).append( "' is never used." ), use._writePosition
 				);
 			}
-		} else if ( use._writeCount == 0 ) {
+		} else if ( ( use._writeCount == 0 ) && ( use._type != OIdentifierUse::TYPE::VARIABLE ) && ( use._type != OIdentifierUse::TYPE::UNKNOWN ) ) {
 			if ( find( begin( implicitDefinition ), end( implicitDefinition ), id ) == end( implicitDefinition ) ) {
 				throw HHuginn::HHuginnRuntimeException(
 					use_name( use._type ).append( " `" ).append( _huginn->identifier_name( id ) ).append( "' was never defined." ), use._readPosition
@@ -573,7 +622,7 @@ OCompiler::function_info_t OCompiler::create_function_low( executing_parser::pos
 			&HFunction::execute,
 			make_pointer<HFunction>(
 				fc._functionIdentifier,
-				fc._parameters,
+				static_cast<int>( fc._parameters.get_size() ),
 				pop_scope_context(),
 				fc._defaultValues
 			),
@@ -677,7 +726,11 @@ void OCompiler::add_paramater( yaal::hcore::HString const& name_, executing_pars
 void OCompiler::create_scope( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, position_.get() ) );
+	if ( ! fc._inline ) {
+		++ _statementIdGenerator;
+	}
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, _statementIdGenerator, position_.get() ) );
+	fc._inline = false;
 	return;
 	M_EPILOG
 }
@@ -699,8 +752,10 @@ void OCompiler::commit_catch( executing_parser::position_t ) {
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	HHuginn::scope_t scope( pop_scope_context() ); /* don't squash! pop_scope_context() changes fc._scopeStack */
 	OScopeContext& sc( *fc._scopeStack.top() );
-	sc._catches.emplace_back( HTryCatch::OCatch{ sc._exceptionType, sc._identifier, scope, sc._position } );
-	sc._position = 0;
+	HTryCatch::HCatch c( sc._statementId, sc._exceptionType, current_expression(), scope );
+	pop_scope_context_low();
+	M_ASSERT( ! fc._scopeStack.is_empty() );
+	fc._scopeStack.top()->_catches.emplace_back( c );
 	reset_expression();
 	return;
 	M_EPILOG
@@ -776,6 +831,15 @@ void OCompiler::start_if_statement( executing_parser::position_t position_ ) {
 	if ( fc._scopeStack.top()->_scopeChain.is_empty() ) {
 		fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, position_.get() ) );
 	}
+	fc._inline = true;
+	return;
+	M_EPILOG
+}
+
+void OCompiler::start_else_clause( executing_parser::position_t ) {
+	M_PROLOG
+	OFunctionContext& fc( f() );
+	fc._inline = true;
 	return;
 	M_EPILOG
 }
@@ -783,6 +847,7 @@ void OCompiler::start_if_statement( executing_parser::position_t position_ ) {
 void OCompiler::start_loop_statement( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
+	fc._inline = true;
 	++ fc._loopCount;
 	++ fc._loopSwitchCount;
 	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, position_.get() ) );
@@ -921,23 +986,21 @@ void OCompiler::add_while_statement( executing_parser::position_t position_ ) {
 	M_EPILOG
 }
 
-void OCompiler::set_identifier( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+void OCompiler::save_control_variable( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	OScopeContext& sc( current_scope_context() );
-	HHuginn::identifier_id_t identifier( _huginn->identifier_id( name_ ) );
-	_usedIdentifiers[identifier].write( position_.get(), OIdentifierUse::TYPE::VARIABLE );
-	_executionStepsBacklog.emplace_back(
-		OExecutionStep::OPERATION::DEFINE,
-		HHuginn::expression_t(),
-		fc._scopeStack.top(),
-		!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
-		-1,
-		identifier,
-		position_.get()
-	);
-	sc._identifier = identifier;
-	sc._position = position_.get();
+	current_expression()->set_position( position_.get() );
+	fc._variables.clear();
+	fc.expressions_stack().top().emplace_back( make_pointer<HExpression>() );
+	return;
+	M_EPILOG
+}
+
+void OCompiler::commit_catch_control_variable( executing_parser::position_t position_ ) {
+	M_PROLOG
+	OFunctionContext& fc( f() );
+	mark_expression_position( position_ );
+	fc._variables.clear();
 	return;
 	M_EPILOG
 }
@@ -959,8 +1022,8 @@ void OCompiler::close_function_call( executing_parser::position_t position_ ) {
 	if ( fc._isAssert ) {
 		-- fc._nestedCalls;
 		OScopeContext& sc( *fc._scopeStack.top() );
-		if ( ( fc._nestedCalls == 0 ) && ( sc._position == 0 ) ) {
-			sc._position = position_.get();
+		if ( ( fc._nestedCalls == 0 ) && ( sc._assertExpressionEnd == 0 ) ) {
+			sc._assertExpressionEnd = position_.get();
 		}
 	}
 	return;
@@ -969,9 +1032,10 @@ void OCompiler::close_function_call( executing_parser::position_t position_ ) {
 
 void OCompiler::set_type_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
+	OFunctionContext& fc( f() );
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, position_.get() ) );
 	OScopeContext& sc( current_scope_context() );
 	sc._exceptionType = _huginn->identifier_id( name_ );
-	sc._position = position_.get();
 	return;
 	M_EPILOG
 }
@@ -982,13 +1046,14 @@ void OCompiler::add_for_statement( executing_parser::position_t position_ ) {
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	HHuginn::scope_t scope( pop_scope_context() ); /* don't squash! pop_scope_context() changes fc._scopeStack */
 	OScopeContext& sc( *fc._scopeStack.top() );
+	HHuginn::expression_t source( fc.expressions_stack().top().back() );
+	fc.expressions_stack().top().pop_back();
 	HScope::statement_t forStatement(
-		make_pointer<HFor>( sc._statementId, sc._identifier, current_expression(), scope, position_.get(), sc._position )
+		make_pointer<HFor>( sc._statementId, current_expression(), source, scope, position_.get() )
 	);
 	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	current_scope()->add_statement( forStatement );
-	fc._scopeStack.top()->_position = 0;
 	-- fc._loopCount;
 	-- fc._loopSwitchCount;
 	reset_expression();
@@ -1039,11 +1104,12 @@ void OCompiler::add_try_catch_statement( executing_parser::position_t position_ 
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	HTryCatch::catches_t catches( yaal::move( fc._scopeStack.top()->_catches ) );
-	OScopeContext& sc( *fc._scopeStack.top() );
-	HScope::statement_t trCatchStatement(
-		make_pointer<HTryCatch>( sc._statementId, pop_scope_context(), catches, position_.get() )
+	HStatement::statement_id_t statementId( fc._scopeStack.top()->_statementId );
+	HHuginn::scope_t scope( pop_scope_context() );
+	HScope::statement_t tryCatchStatement(
+		make_pointer<HTryCatch>( statementId, scope, catches, position_.get() )
 	);
-	current_scope()->add_statement( trCatchStatement );
+	current_scope()->add_statement( tryCatchStatement );
 	reset_expression();
 	return;
 	M_EPILOG
@@ -1187,7 +1253,7 @@ void OCompiler::defer_oper_direct( OPERATOR operator_, executing_parser::positio
 		&& ( fc._operations.size() == ASSERT_SECOND_ARGUMENT_OPERATION_COUNT )
 	) {
 		OScopeContext& sc( *fc._scopeStack.top() );
-		sc._position = position_.get();
+		sc._assertExpressionEnd = position_.get();
 	}
 	return;
 	M_EPILOG
@@ -1619,8 +1685,8 @@ void OCompiler::dispatch_function_call( expression_action_t const& action_, exec
 	if ( fc._isAssert && ( fc._nestedCalls == 0 ) ) {
 		int from( position_.get() + 1 );
 		OScopeContext& sc( *fc._scopeStack.top() );
-		int len( sc._position - from );
-		sc._position = 0;
+		int len( sc._assertExpressionEnd - from );
+		sc._assertExpressionEnd = 0;
 		current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), OPERATOR::FUNCTION_ARGUMENT, _1, position_.get() ) );
 		current_expression()->add_execution_step(
 			hcore::call(
@@ -1780,7 +1846,7 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 	HHuginn::expression_t& expression( current_expression() );
 	if ( ( ! keyword || isAssert ) && huginn::is_builtin( value_ ) ) {
 		/*
-		 * We can do it here (as opposed to *::optimize()) because built-ins must exist,
+		 * We can do it here (as opposed to *::resolve_symbols()) because built-ins must exist,
 		 * hence h->get_function() always succeeds, and built-ins cannot be overriden
 		 * so they meaning stays always the same.
 		 */
@@ -1802,11 +1868,7 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 			hcore::call( &HExpression::get_super, expression.raw(), _1, position_.get() )
 		);
 	} else {
-		int index(
-			expression->add_execution_step(
-				hcore::call( &HExpression::get_reference, expression.raw(), refIdentifier, _1, position_.get() )
-			)
-		);
+		int index( expression->add_execution_step( HExpression::execution_step_t() ) );
 		_executionStepsBacklog.emplace_back(
 			OExecutionStep::OPERATION::USE,
 			expression,
@@ -1849,11 +1911,7 @@ void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executi
 	}
 	HHuginn::identifier_id_t varIdentifier( _huginn->identifier_id( value_ ) );
 	HHuginn::expression_t& expression( current_expression() );
-	int index(
-		expression->add_execution_step(
-			hcore::call( &HExpression::make_variable, current_expression().raw(), varIdentifier, _1, position_.get() )
-		)
-	);
+	int index( expression->add_execution_step( HExpression::execution_step_t() ) );
 	_executionStepsBacklog.emplace_back(
 		OExecutionStep::OPERATION::DEFINE,
 		expression,

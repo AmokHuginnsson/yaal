@@ -44,11 +44,11 @@ namespace huginn {
 
 HFunction::HFunction(
 	HHuginn::identifier_id_t name_,
-	parameter_names_t const& parameterNames_,
+	int parameterCount_,
 	HHuginn::scope_t const& scope_,
 	expressions_t const& defaultValues_
 ) : _name( name_ ),
-	_parameterNames( parameterNames_ ),
+	_parameterCount( parameterCount_ ),
 	_defaultValues( defaultValues_ ),
 	_scope( scope_ ) {
 	_scope->make_inline();
@@ -60,8 +60,8 @@ HHuginn::value_t HFunction::execute( huginn::HThread* thread_, HHuginn::value_t*
 	verify_arg_count(
 		thread_->huginn().identifier_name( _name ),
 		values_,
-		static_cast<int>( _parameterNames.get_size() - _defaultValues.get_size() ),
-		static_cast<int>( _parameterNames.get_size() ),
+		_parameterCount - static_cast<int>( _defaultValues.get_size() ),
+		_parameterCount,
 		position_
 	);
 	int upCast( 0 );
@@ -84,21 +84,20 @@ HHuginn::value_t HFunction::execute( huginn::HThread* thread_, HHuginn::value_t*
 	HFrame* f( thread_->current_frame() );
 	for (
 		int i( 0 ),
-			NAME_COUNT( static_cast<int>( _parameterNames.get_size() ) ),
 			VALUE_COUNT( static_cast<int>( values_.get_size() ) ),
 			DEFAULT_VALUE_COUNT( static_cast<int>( _defaultValues.get_size() ) );
-		i < NAME_COUNT;
+		i < _parameterCount;
 		++ i
 	) {
 		if ( i < VALUE_COUNT ) {
-			f->set_variable( _parameterNames[i], values_[i], position_ );
+			f->add_variable( values_[i] );
 		} else {
-			int defaultValueIndex( i - ( NAME_COUNT - DEFAULT_VALUE_COUNT ) );
+			int defaultValueIndex( i - ( _parameterCount - DEFAULT_VALUE_COUNT ) );
 			_defaultValues[defaultValueIndex]->execute( thread_ );
 			if ( ! f->can_continue() ) {
 				break;
 			}
-			f->set_variable( _parameterNames[i], f->result(), position_ );
+			f->add_variable( f->result() );
 		}
 	}
 	if ( f->can_continue() ) {

@@ -90,14 +90,13 @@ struct OCompiler {
 		 */
 		variable_types_t _variableTypes;
 
-		/*! \brief type of currently compiled exception catch clause
+		/*! \brief Type of currently compiled exception catch clause.
 		 */
 		HHuginn::identifier_id_t _exceptionType;
 
-		/*! \brief identifier used either as `for' variable or caught exception variable
+		/*! \brief Source code position where currently evaluated `assert' expression ends.
 		 */
-		HHuginn::identifier_id_t _identifier;
-		int _position;
+		int _assertExpressionEnd;
 
 		/*! \brief Set of already fully compiled scopes of either if/else-if of switch->case..case chain.
 		 */
@@ -145,6 +144,7 @@ struct OCompiler {
 		typedef yaal::hcore::HStack<scope_context_t> scope_stack_t;
 		typedef yaal::hcore::HStack<HHuginn::type_id_t> type_stack_t;
 		typedef yaal::hcore::HStack<HHuginn::identifier_id_t> variable_stack_t;
+		typedef yaal::hcore::HArray<HHuginn::identifier_id_t> parameter_names_t;
 
 		/*! \brief Identifier of currently compiled function.
 		 */
@@ -152,7 +152,7 @@ struct OCompiler {
 
 		/*! \param Names of parameters for currently compiled function.
 		 */
-		HFunction::parameter_names_t _parameters;
+		parameter_names_t _parameters;
 
 		/*! \brief Default values for parameters of currently compiled function.
 		 */
@@ -241,6 +241,10 @@ struct OCompiler {
 		 */
 		bool _isLambda;
 
+		/*! \brief Tell if next scope created with {...} should be inlined.
+		 */
+		bool _inline;
+
 		OFunctionContext( HHuginn::identifier_id_t, HStatement::statement_id_t, bool );
 		expressions_stack_t& expressions_stack( void );
 	};
@@ -320,7 +324,7 @@ struct OCompiler {
 	OFunctionContext& f( void );
 	void set_setup( HHuginn::compiler_setup_t );
 	void detect_misuse( void ) const;
-	void optimize( void );
+	void resolve_symbols( void );
 	void set_function_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void set_import_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void set_import_alias( yaal::hcore::HString const&, executing_parser::position_t );
@@ -334,7 +338,8 @@ struct OCompiler {
 	void commit_import( executing_parser::position_t );
 	void submit_class( executing_parser::position_t );
 	void create_lambda( executing_parser::position_t );
-	void set_identifier( yaal::hcore::HString const&, executing_parser::position_t );
+	void save_control_variable( executing_parser::position_t );
+	void commit_catch_control_variable( executing_parser::position_t );
 	void start_function_call( executing_parser::position_t );
 	void close_function_call( executing_parser::position_t );
 	void set_type_name( yaal::hcore::HString const&, executing_parser::position_t );
@@ -369,6 +374,7 @@ struct OCompiler {
 	void pop_scope_context_low( void );
 	void terminate_scope( HScope::statement_t&& );
 	void start_if_statement( executing_parser::position_t );
+	void start_else_clause( executing_parser::position_t );
 	void start_loop_statement( executing_parser::position_t );
 	void start_switch_statement( executing_parser::position_t );
 	void start_subexpression( executing_parser::position_t );

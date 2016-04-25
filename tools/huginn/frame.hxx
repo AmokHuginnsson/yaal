@@ -68,7 +68,6 @@ private:
 	HHuginn::value_t* _object;
 	int _upCast;
 	HHuginn::values_t _variables;
-	named_variables_t _namedVariables;
 	/*
 	 * Operations must be kept per frame (and not in HThread)
 	 * because new frame (new scope) can be created from within an expression
@@ -84,13 +83,12 @@ private:
 public:
 	HFrame( HThread*, HFrame* );
 	void init( TYPE, HStatement::statement_id_t, HHuginn::value_t* = nullptr, int = 0 );
-	HHuginn::value_t make_variable( HHuginn::identifier_id_t, int );
-	void set_variable( HHuginn::identifier_id_t, HHuginn::value_t const&, int );
-	HHuginn::value_t get_reference( HHuginn::identifier_id_t, int );
 	HHuginn::value_t get_field( HExpression::ACCESS, int );
 	HHuginn::value_t get_variable( HExpression::ACCESS, HStatement::statement_id_t, int );
 	HHuginn::value_t get_this( void );
 	HHuginn::value_t get_super( int );
+	void add_variable( HHuginn::value_t const& );
+	void commit_variable( HHuginn::value_t const&, int );
 	bool can_continue( void ) const {
 		return ( _state == STATE::NORMAL );
 	}

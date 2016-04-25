@@ -44,16 +44,14 @@ namespace huginn {
 
 HFor::HFor(
 	HStatement::statement_id_t id_,
-	HHuginn::identifier_id_t variableName_,
+	HHuginn::expression_t const& control_,
 	HHuginn::expression_t const& source_,
 	HHuginn::scope_t const& loop_,
-	int statementPosition_,
-	int identifierPosition_
+	int statementPosition_
 ) : HStatement( id_, statementPosition_ )
-	, _variableName( variableName_ )
+	, _control( control_ )
 	, _source( source_ )
-	, _loop( loop_ )
-	, _identifierPosition( identifierPosition_ ) {
+	, _loop( loop_ ) {
 	_loop->make_inline();
 	return;
 }
@@ -62,6 +60,7 @@ void HFor::do_execute( HThread* thread_ ) const {
 	M_PROLOG
 	thread_->create_loop_frame( id() );
 	HFrame* f( thread_->current_frame() );
+	f->add_variable( HHuginn::value_t() );
 	_source->execute( thread_ );
 	if ( f->can_continue() ) {
 		HHuginn::value_t source( f->result() );
@@ -71,9 +70,11 @@ void HFor::do_execute( HThread* thread_ ) const {
 		}
 		HHuginn::HIterable::HIterator it( coll->iterator() );
 		while ( f->can_continue() && it.is_valid() ) {
-			HHuginn::value_t v( it.value() );
-			f->set_variable( _variableName, v, _identifierPosition );
-			_loop->execute( thread_ );
+			_control->execute( thread_ );
+			f->commit_variable( it.value(), _control->position() );
+			if ( f->can_continue() ) {
+				_loop->execute( thread_ );
+			}
 			f->continue_execution();
 			it.next();
 		}

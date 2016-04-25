@@ -41,6 +41,33 @@ namespace tools {
 
 namespace huginn {
 
+HTryCatch::HCatch::HCatch(
+	HStatement::statement_id_t id_,
+	HHuginn::identifier_id_t type_,
+	HHuginn::expression_t const& control_,
+	HHuginn::scope_t const& scope_
+) : _id( id_ )
+	, _type( type_ )
+	, _control( control_ )
+	, _scope( scope_ ) {
+	_scope->make_inline();
+	return;
+}
+
+void HTryCatch::HCatch::execute( HThread* thread_, HHuginn::value_t value_ ) const {
+	M_PROLOG
+	thread_->create_scope_frame( _id );
+	HFrame* f( thread_->current_frame() );
+	_control->execute( thread_ );
+	f->commit_variable( value_, _control->position() );
+	if ( f->can_continue() ) {
+		_scope->execute( thread_ );
+	}
+	thread_->pop_frame();
+	return;
+	M_EPILOG
+}
+
 HTryCatch::HTryCatch( HStatement::statement_id_t id_, HHuginn::scope_t const& try_, catches_t const& catches_, int position_ )
 	: HStatement( id_, position_ )
 	, _try( try_ )
@@ -58,10 +85,9 @@ void HTryCatch::do_execute( huginn::HThread* thread_ ) const {
 		HHuginn::value_t v( f->result() );
 		HHuginn::HObject* e( dynamic_cast<HHuginn::HObject*>( v.raw() ) );
 		bool handled( false );
-		for ( OCatch const& c : _catches ) {
-			if ( ( e && e->is_kind_of( c._type ) ) || ( ! e && ( v->get_class()->identifier_id() == c._type ) ) ) {
-				f->set_variable( c._identifier, v, c._position );
-				c._scope->execute( thread_ );
+		for ( HCatch const& c : _catches ) {
+			if ( ( e && e->is_kind_of( c.type() ) ) || ( ! e && ( v->get_class()->identifier_id() == c.type() ) ) ) {
+				c.execute( thread_, v );
 				handled = true;
 				break;
 			}

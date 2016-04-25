@@ -108,14 +108,6 @@ void HExpression::close_parenthesis( HFrame* frame_, int position_ ) {
 	M_EPILOG
 }
 
-void HExpression::get_reference( HHuginn::identifier_id_t identifierId_, HFrame* frame_, int position_ ) {
-	M_PROLOG
-	HHuginn::value_t v( frame_->get_reference( identifierId_, position_ ) );
-	frame_->values().push( v );
-	return;
-	M_EPILOG
-}
-
 void HExpression::get_field_direct( ACCESS access_, int index_, huginn::HFrame* frame_, int ) {
 	M_PROLOG
 	HHuginn::value_t v( frame_->get_field( access_, index_ ) );
@@ -200,13 +192,6 @@ void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifier
 			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( v->get_class()->name() ).append( "' is not a compound object." ), p );
 		}
 	}
-	return;
-	M_EPILOG
-}
-
-void HExpression::make_variable( HHuginn::identifier_id_t identifierId_, HFrame* frame_, int position_ ) {
-	M_PROLOG
-	frame_->values().push( frame_->make_variable( identifierId_, position_ ) );
 	return;
 	M_EPILOG
 }

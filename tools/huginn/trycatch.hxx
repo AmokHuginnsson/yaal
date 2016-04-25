@@ -42,13 +42,24 @@ class HTryCatch : public HStatement {
 public:
 	typedef HTryCatch this_type;
 	typedef HStatement base_type;
-	struct OCatch {
+	class HCatch {
+		HStatement::statement_id_t _id;
 		HHuginn::identifier_id_t _type;
-		HHuginn::identifier_id_t _identifier;
+		HHuginn::expression_t _control;
 		HHuginn::scope_t _scope;
-		int _position;
+	public:
+		HCatch(
+			HStatement::statement_id_t,
+			HHuginn::identifier_id_t,
+			HHuginn::expression_t const&,
+			HHuginn::scope_t const&
+		);
+		void execute( HThread*, HHuginn::value_t ) const;
+		HHuginn::identifier_id_t type( void ) const {
+			return ( _type );
+		}
 	};
-	typedef yaal::hcore::HArray<OCatch> catches_t;
+	typedef yaal::hcore::HArray<HCatch> catches_t;
 private:
 	HHuginn::scope_t _try;
 	catches_t _catches;

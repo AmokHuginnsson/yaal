@@ -324,12 +324,8 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 			"exceptionType",
 			identifierPattern,
 			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_type_name, _compiler.get(), _1, _2 ) )
-		) >>
-		regex(
-			"exceptionVariable",
-			identifierPattern,
-			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_identifier, _compiler.get(), _1, _2 ) )
-		) >> ')' >> scope[HRuleBase::action_position_t( hcore::call( &OCompiler::commit_catch, _compiler.get(), _1 ) )]
+		) >> assignable[e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::commit_catch_control_variable, _compiler.get(), _1 ) )] >> ')' >>
+		scope[HRuleBase::action_position_t( hcore::call( &OCompiler::commit_catch, _compiler.get(), _1 ) )]
 	);
 	HRule tryCatchStatement(
 		"tryCatchStatement",
@@ -347,7 +343,16 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		"ifStatement",
 		ifClause >>
 		*( constant( KEYWORD::ELSE ) >> ifClause ) >>
-		-( ( constant( KEYWORD::ELSE ) >> scope )[HRuleBase::action_position_t( hcore::call( &OCompiler::commit_else_clause, _compiler.get(), _1 ) )] )
+		-(
+			/* `else' clause */(
+				constant(
+					KEYWORD::ELSE,
+					bound_call<e_p::HRuleBase::action_position_t>( &OCompiler::start_else_clause, _compiler.get(), _1 )
+				) >> scope
+			)[
+				HRuleBase::action_position_t( hcore::call( &OCompiler::commit_else_clause, _compiler.get(), _1 ) )
+			]
+		)
 	);
 	HRule continueStatement( "continueStatement", constant( KEYWORD::CONTINUE ) >> ';' );
 	HRule throwStatement(
@@ -369,19 +374,14 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 			bound_call<e_p::HRuleBase::action_position_t>( &OCompiler::start_loop_statement, _compiler.get(), _1 )
 		) >> '(' >> expression >> ')' >> scope
 	);
-	HRule forIdentifier(
-		regex(
-			"forIdentifier",
-			identifierPattern,
-			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_identifier, _compiler.get(), _1, _2 ) )
-		)
-	);
 	HRule forStatement(
 		"forStatement",
 		constant(
 			KEYWORD::FOR,
 			bound_call<e_p::HRuleBase::action_position_t>( &OCompiler::start_loop_statement, _compiler.get(), _1 )
-		) >> '(' >> forIdentifier >> ':' >> expression >> ')' >> scope
+		) >> '(' >>
+		assignable[e_p::HRegex::action_position_t( hcore::call( &OCompiler::save_control_variable, _compiler.get(), _1 ) )]
+		>> ':' >> expression >> ')' >> scope
 	);
 	HRule caseStatement(
 		"caseStatement",

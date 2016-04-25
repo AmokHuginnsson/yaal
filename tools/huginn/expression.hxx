@@ -52,8 +52,8 @@ public:
 		VALUE,
 		REFERENCE
 	};
-private:
 	typedef yaal::hcore::HBoundCall<void ( huginn::HFrame* )> execution_step_t;
+private:
 	typedef yaal::hcore::HArray<execution_step_t> execution_steps_t;
 	execution_steps_t _executionSteps;
 public:
@@ -73,8 +73,6 @@ public:
 	void negate( huginn::HFrame*, int );
 	void function_call( huginn::HFrame*, int );
 	void make_dict( huginn::HFrame*, int );
-	void get_reference( HHuginn::identifier_id_t, huginn::HFrame*, int );
-	void make_variable( HHuginn::identifier_id_t, huginn::HFrame*, int );
 	void get_field_direct( ACCESS, int, huginn::HFrame*, int );
 	void get_variable_direct( ACCESS, HStatement::statement_id_t, int, huginn::HFrame*, int );
 	void get_this( huginn::HFrame*, int );
