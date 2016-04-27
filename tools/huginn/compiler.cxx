@@ -219,7 +219,7 @@ OCompiler::OCompiler( HHuginn* huginn_ )
 	, _importAlias( INVALID_IDENTIFIER )
 	, _executionStepsBacklog()
 	, _usedIdentifiers()
-	, _setup( HHuginn::COMPILER::BE_STRICT | HHuginn::COMPILER::OPTIMIZE )
+	, _setup( HHuginn::COMPILER::BE_STRICT )
 	, _statementIdGenerator( INVALID_STATEMENT_IDENTIFIER )
 	, _scopeContextCache()
 	, _huginn( huginn_ ) {
