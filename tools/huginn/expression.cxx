@@ -110,30 +110,28 @@ void HExpression::close_parenthesis( HFrame* frame_, int position_ ) {
 
 void HExpression::get_field_direct( ACCESS access_, int index_, huginn::HFrame* frame_, int ) {
 	M_PROLOG
-	HHuginn::value_t v( frame_->get_field( access_, index_ ) );
-	frame_->values().push( v );
+	frame_->values().emplace( frame_->get_field( access_, index_ ) );
 	return;
 	M_EPILOG
 }
 
 void HExpression::get_variable_direct( ACCESS access_, HStatement::statement_id_t statementId_, int index_, huginn::HFrame* frame_, int ) {
 	M_PROLOG
-	HHuginn::value_t v( frame_->get_variable( access_, statementId_, index_ ) );
-	frame_->values().push( v );
+	frame_->values().emplace( frame_->get_variable( access_, statementId_, index_ ) );
 	return;
 	M_EPILOG
 }
 
 void HExpression::get_this( huginn::HFrame* frame_, int ) {
 	M_PROLOG
-	frame_->values().push( frame_->get_this() );
+	frame_->values().emplace( frame_->get_this() );
 	return;
 	M_EPILOG
 }
 
 void HExpression::get_super( huginn::HFrame* frame_, int position_ ) {
 	M_PROLOG
-	frame_->values().push( frame_->get_super( position_ ) );
+	frame_->values().emplace( frame_->get_super( position_ ) );
 	return;
 	M_EPILOG
 }
