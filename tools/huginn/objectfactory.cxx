@@ -88,7 +88,8 @@ HHuginn::class_t get_class( HHuginn* );
 }
 
 HObjectFactory::HObjectFactory( HHuginn* huginn_ )
-	: _boolean( boolean::get_class( huginn_ ) )
+	: _huginn( huginn_ )
+	, _boolean( boolean::get_class( huginn_ ) )
 	, _integer( integer::get_class( huginn_ ) )
 	, _string( string::get_class( huginn_ ) )
 	, _real( real::get_class( huginn_ ) )
@@ -118,27 +119,27 @@ HObjectFactory::HObjectFactory( HHuginn* huginn_ )
 	return;
 }
 
-void HObjectFactory::register_builtin_classes( HHuginn* huginn_ ) {
+void HObjectFactory::register_builtin_classes( void ) {
 	M_PROLOG
-	_exception = exception::get_class( huginn_ );
-	_conversionException = exception::create_class( huginn_, "ConversionException", _exception.raw() );
-	_arithmeticException = exception::create_class( huginn_, "ArithmeticException", _exception.raw() );
+	_exception = exception::get_class( _huginn );
+	_conversionException = exception::create_class( _huginn, "ConversionException", _exception.raw() );
+	_arithmeticException = exception::create_class( _huginn, "ArithmeticException", _exception.raw() );
 
-	huginn_->register_class( _boolean );
-	huginn_->register_class( _integer );
-	huginn_->register_class( _string );
-	huginn_->register_class( _real );
-	huginn_->register_class( _number );
-	huginn_->register_class( _character );
-	huginn_->register_class( _list );
-	huginn_->register_class( _deque );
-	huginn_->register_class( _dict );
-	huginn_->register_class( _order );
-	huginn_->register_class( _lookup );
-	huginn_->register_class( _set );
-	huginn_->register_class( _exception );
-	huginn_->register_class( _conversionException );
-	huginn_->register_class( _arithmeticException );
+	_huginn->register_class( _boolean );
+	_huginn->register_class( _integer );
+	_huginn->register_class( _string );
+	_huginn->register_class( _real );
+	_huginn->register_class( _number );
+	_huginn->register_class( _character );
+	_huginn->register_class( _list );
+	_huginn->register_class( _deque );
+	_huginn->register_class( _dict );
+	_huginn->register_class( _order );
+	_huginn->register_class( _lookup );
+	_huginn->register_class( _set );
+	_huginn->register_class( _exception );
+	_huginn->register_class( _conversionException );
+	_huginn->register_class( _arithmeticException );
 	return;
 	M_EPILOG
 }

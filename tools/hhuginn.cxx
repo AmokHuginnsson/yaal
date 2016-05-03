@@ -226,7 +226,7 @@ HHuginn::HHuginn( void )
 	M_PROLOG
 	_grammarVerified.store( true );
 	register_builtins();
-	_objectFactory->register_builtin_classes( this );
+	_objectFactory->register_builtin_classes();
 	return;
 	M_EPILOG
 }
@@ -1100,8 +1100,8 @@ inline HHuginn::value_t input( huginn::HThread* thread_, HHuginn::value_t*, HHug
 	M_PROLOG
 	verify_arg_count( "input", values_, 0, 0, position_ );
 	yaal::hcore::HString l;
-	thread_->huginn().input_stream().read_until( l, HStreamInterface::eols, false );
-	return ( thread_->object_factory().create_string( l ) );
+	int len( static_cast<int>( thread_->huginn().input_stream().read_until( l, HStreamInterface::eols, false ) ) );
+	return ( len > 0 ? thread_->object_factory().create_string( l ) : thread_->huginn().none_value() );
 	M_EPILOG
 }
 

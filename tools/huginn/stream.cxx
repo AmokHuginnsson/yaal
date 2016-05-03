@@ -56,7 +56,7 @@ public:
 	}
 protected:
 	virtual HHuginn::value_t do_value( void ) override {
-		return ( _objectFactory->create_string( _lineCache ) );
+		return ( ! _lineCache.is_empty() ? _objectFactory->create_string( _lineCache ) : _objectFactory->huginn().none_value() );
 	}
 	virtual bool do_is_valid( void ) override {
 		return ( _stream->is_valid() );
@@ -92,7 +92,8 @@ HHuginn::value_t HStream::read_line( huginn::HThread* thread_, HHuginn::value_t*
 	M_PROLOG
 	verify_arg_count( "Stream.read_line", values_, 0, 0, position_ );
 	HStream* s( static_cast<HStream*>( object_->raw() ) );
-	return ( thread_->object_factory().create_string( s->read_line_impl() ) );
+	HString const& line( s->read_line_impl() );
+	return ( ! line.is_empty() ? thread_->object_factory().create_string( line ) : thread_->huginn().none_value() );
 	M_EPILOG
 }
 
