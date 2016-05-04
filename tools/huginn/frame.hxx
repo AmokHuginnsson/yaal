@@ -48,6 +48,7 @@ public:
 	typedef HFrame this_type;
 	typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, HHuginn::value_t> named_variables_t;
 	typedef yaal::hcore::HStack<HHuginn::value_t> values_t;
+	typedef yaal::hcore::HStack<int> instruction_pointers_t;
 	enum class TYPE {
 		SCOPE,
 		LOOP,
@@ -69,11 +70,14 @@ private:
 	int _upCast;
 	HHuginn::values_t _variables;
 	/*
-	 * Operations must be kept per frame (and not in HThread)
+	 * Instruction pointers must be kept per frame (and not in HThread)
 	 * because new frame (new scope) can be created from within an expression
 	 * by means of function call.
+	 *
+	 * Instruction pointers must be kept in form of stack to support subexpressions,
+	 * e.g.: boolean short-circuits and ternary operators.
 	 */
-	operations_t _operations;
+	instruction_pointers_t _instructionPointers;
 	values_t _values;
 	HHuginn::value_t _result;
 	int _number;
@@ -116,14 +120,19 @@ public:
 		return ( _result );
 	}
 	void set_result( HHuginn::value_t&& );
-	operations_t& operations( void ) {
-		return ( _operations );
-	}
-
 	values_t& values( void ) {
 		return ( _values );
 	}
 	void reset( void );
+	int& ip( void ) {
+		return ( _instructionPointers.top() );
+	}
+	void start_expression( void ) {
+		_instructionPointers.push( 0 );
+	}
+	void end_expression( void ) {
+		_instructionPointers.pop();
+	}
 private:
 	HFrame( HFrame const& ) = delete;
 	HFrame& operator = ( HFrame const& ) = delete;

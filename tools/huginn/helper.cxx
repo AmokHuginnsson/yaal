@@ -328,6 +328,7 @@ char const* op_to_str( OPERATOR o_ ) {
 		case ( OPERATOR::MODULO_ASSIGN ):      str = "%=";     break;
 		case ( OPERATOR::POWER_ASSIGN ):       str = "^=";     break;
 		case ( OPERATOR::SUBSCRIPT ):          str = "[...]";  break;
+		case ( OPERATOR::RANGE ):              str = "[::]";   break;
 		case ( OPERATOR::SUBSCRIPT_ARGUMENT ): str = "[xxx]";  break;
 		case ( OPERATOR::NEGATE ):             str = "-x";     break;
 		case ( OPERATOR::FUNCTION_CALL ):      str = "f(,,,)"; break;

@@ -63,7 +63,6 @@ void HScope::do_execute( HThread* thread_ ) const {
 	for ( statement_t const& s : _statements ) {
 		s->execute( thread_ );
 		M_ASSERT( f->values().is_empty() );
-		M_ASSERT( f->operations().is_empty() );
 		if ( ! f->can_continue() ) {
 			break;
 		}

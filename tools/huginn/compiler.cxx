@@ -889,8 +889,10 @@ void OCompiler::commit_boolean( OPERATOR operator_, executing_parser::position_t
 		M_ASSERT( ! fc._valueTypes.is_empty() && fc._valueTypes.top() == HHuginn::TYPE::BOOLEAN );
 		fc._valueTypes.pop();
 		defer_store_direct( And, position_ );
-		current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), operator_, _1, position_.get() ) );
+		HExpression& expression( *current_expression() );
+		expression.oper( operator_, position_.get() );
 		defer_action( operator_ == OPERATOR::BOOLEAN_AND ? &HExpression::boolean_and : &HExpression::boolean_or, position_ );
+		expression.commit_oper( operator_ );
 	} else {
 		HHuginn::expression_t e( fc._scopeStack.top()->expression() );
 		fc.expressions_stack().pop();
@@ -910,8 +912,10 @@ void OCompiler::commit_ternary( executing_parser::position_t position_ ) {
 		M_ASSERT( ! fc._valueTypes.is_empty() && fc._valueTypes.top() == HHuginn::TYPE::UNKNOWN );
 		fc._valueTypes.pop();
 		defer_store_direct( ternary, position_ );
-		current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), OPERATOR::TERNARY, _1, position_.get() ) );
+		HExpression& expression( *current_expression() );
+		expression.oper( OPERATOR::TERNARY, position_.get() );
 		defer_action( &HExpression::ternary, position_ );
+		expression.commit_oper( OPERATOR::TERNARY );
 	} else {
 		HHuginn::expression_t e( fc._scopeStack.top()->expression() );
 		fc.expressions_stack().pop();
@@ -1195,7 +1199,7 @@ void OCompiler::defer_oper( char operator_, executing_parser::position_t positio
 			M_ASSERT( ! "bad code path"[0] );
 		}
 	}
-	current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), o, _1, position_.get() ) );
+	current_expression()->oper( o, position_.get() );
 	f()._operations.emplace( o, position_.get() );
 	return;
 	M_EPILOG
@@ -1223,7 +1227,7 @@ void OCompiler::defer_str_oper( yaal::hcore::HString const& operator_, executing
 		{ op_to_str( OPERATOR::GREATER ),          OPERATOR::GREATER }
 	} );
 	OPERATOR o( operatorLookup.at( operator_ ) );
-	current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), o, _1, position_.get() ) );
+	current_expression()->oper( o, position_.get() );
 	f()._operations.emplace( o, position_.get() );
 	return;
 	M_EPILOG
@@ -1233,7 +1237,7 @@ void OCompiler::defer_oper_direct( OPERATOR operator_, executing_parser::positio
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	HHuginn::expression_t& expression( current_expression() );
-	expression->add_execution_step( hcore::call( &HExpression::oper, expression.raw(), operator_, _1, position_.get() ) );
+	expression->oper( operator_, position_.get() );
 	fc._operations.emplace( operator_, position_.get() );
 	/*
 	 * We want to support assert() statement.
@@ -1340,6 +1344,7 @@ void OCompiler::dispatch_plus( executing_parser::position_t position_ ) {
 	int p( po._position );
 	M_ASSERT( ( o == OPERATOR::PLUS ) || ( o == OPERATOR::MINUS ) );
 	defer_action( o == OPERATOR::PLUS ? &HExpression::plus : &HExpression::minus, position_ );
+	current_expression()->commit_oper( o );
 	fc._operations.pop();
 	HHuginn::type_id_t t1( fc._valueTypes.top() );
 	fc._valueTypes.pop();
@@ -1372,6 +1377,7 @@ void OCompiler::dispatch_mul( executing_parser::position_t position_ ) {
 	int p( po._position );
 	M_ASSERT( ( o == OPERATOR::MULTIPLY ) || ( o == OPERATOR::DIVIDE ) || ( o == OPERATOR::MODULO ) );
 	defer_action( o == OPERATOR::MULTIPLY ? &HExpression::mul : ( o == OPERATOR::DIVIDE ? &HExpression::div : &HExpression::mod ), position_ );
+	current_expression()->commit_oper( o );
 	fc._operations.pop();
 	HHuginn::type_id_t t1( fc._valueTypes.top() );
 	fc._valueTypes.pop();
@@ -1417,6 +1423,7 @@ void OCompiler::dispatch_power( executing_parser::position_t position_ ) {
 	}
 	if ( hasPower ) {
 		defer_action( &HExpression::power, position_ );
+		current_expression()->commit_oper( OPERATOR::POWER );
 	}
 	return;
 	M_EPILOG
@@ -1443,6 +1450,7 @@ void OCompiler::dispatch_negate( executing_parser::position_t position_ ) {
 	M_ASSERT( po._operator == OPERATOR::NEGATE );
 	M_ASSERT( ! fc._valueTypes.is_empty() );
 	defer_action( &HExpression::negate, position_ );
+	current_expression()->commit_oper( OPERATOR::NEGATE );
 	fc._operations.pop();
 	if ( ! is_numeric_congruent( fc._valueTypes.top() ) ) {
 		throw HHuginn::HHuginnRuntimeException( "Operand is not a numeric value.", p );
@@ -1468,6 +1476,7 @@ void OCompiler::dispatch_compare( executing_parser::position_t position_ ) {
 			M_ASSERT( ! "bad code path"[0] );
 		}
 	}
+	current_expression()->commit_oper( o );
 	fc._operations.pop();
 	M_ASSERT( fc._valueTypes.get_size() >= 2 );
 	HHuginn::type_id_t t1( fc._valueTypes.top() );
@@ -1491,7 +1500,9 @@ void OCompiler::dispatch_boolean( expression_action_t const& action_, executing_
 	OPositionedOperator po( fc._operations.top() );
 	int p( po._position );
 	if ( !! action_ ) {
+		M_ASSERT( action_ == &HExpression::boolean_xor );
 		defer_action( action_, position_ );
+		current_expression()->commit_oper( po._operator );
 	}
 	fc._operations.pop();
 	M_ASSERT( fc._valueTypes.get_size() >= 2 );
@@ -1536,6 +1547,7 @@ void OCompiler::dispatch_equals( executing_parser::position_t position_ ) {
 	int p( po._position );
 	M_ASSERT( ( o == OPERATOR::EQUALS ) || ( o == OPERATOR::NOT_EQUALS ) );
 	defer_action( o == OPERATOR::EQUALS ? &HExpression::equals : &HExpression::not_equals, position_ );
+	current_expression()->commit_oper( o );
 	fc._operations.pop();
 	M_ASSERT( fc._valueTypes.get_size() >= 2 );
 	HHuginn::type_id_t t1( fc._valueTypes.top() );
@@ -1631,6 +1643,7 @@ void OCompiler::dispatch_assign( executing_parser::position_t position_ ) {
 	}
 	if ( hasAssign ) {
 		defer_action( &HExpression::set_variable, position_ );
+		current_expression()->commit_oper( OPERATOR::ASSIGN );
 	}
 	return;
 	M_EPILOG
@@ -1667,8 +1680,10 @@ void OCompiler::dispatch_subscript( executing_parser::position_t position_ ) {
 			throw HHuginn::HHuginnRuntimeException( "Range specifier is not an integer.", p );
 		}
 		expression->add_execution_step( hcore::call( &HExpression::range, expression.raw(), _1, position_.get() ) );
+		expression->commit_oper( OPERATOR::RANGE );
 	} else {
 		expression->add_execution_step( hcore::call( &HExpression::subscript, expression.raw(), HExpression::ACCESS::VALUE, _1, position_.get() ) );
+		expression->commit_oper( OPERATOR::SUBSCRIPT );
 	}
 	fc._operations.pop();
 	M_ASSERT( fc._valueTypes.get_size() >= 1 );
@@ -1687,7 +1702,7 @@ void OCompiler::dispatch_function_call( expression_action_t const& action_, exec
 		OScopeContext& sc( *fc._scopeStack.top() );
 		int len( sc._assertExpressionEnd - from );
 		sc._assertExpressionEnd = 0;
-		current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), OPERATOR::FUNCTION_ARGUMENT, _1, position_.get() ) );
+		current_expression()->oper( OPERATOR::FUNCTION_ARGUMENT, position_.get() );
 		current_expression()->add_execution_step(
 			hcore::call(
 				&HExpression::store_direct, current_expression().raw(),
@@ -1708,6 +1723,7 @@ void OCompiler::dispatch_function_call( expression_action_t const& action_, exec
 	fc._valueTypes.push( type_id( HHuginn::TYPE::UNKNOWN ) );
 	M_ASSERT( fc._operations.top()._operator == OPERATOR::FUNCTION_CALL );
 	defer_action( action_, position_ );
+	current_expression()->commit_oper( OPERATOR::FUNCTION_CALL );
 	fc._operations.pop();
 	return;
 	M_EPILOG
@@ -1749,6 +1765,7 @@ void OCompiler::dispatch_action( OPERATOR oper_, executing_parser::position_t po
 		case ( OPERATOR::ABSOLUTE ): {
 			M_ASSERT( ( o == OPERATOR::ABSOLUTE ) || ( o == OPERATOR::PARENTHESIS ) );
 			defer_action( &HExpression::close_parenthesis, position_ );
+			current_expression()->commit_oper( o );
 			fc._operations.pop();
 			if ( o == OPERATOR::ABSOLUTE ) {
 				M_ASSERT( ! fc._valueTypes.is_empty() );
@@ -1775,6 +1792,7 @@ void OCompiler::dispatch_action( OPERATOR oper_, executing_parser::position_t po
 			M_ASSERT( o == OPERATOR::BOOLEAN_NOT );
 			M_ASSERT( ! fc._valueTypes.is_empty() );
 			defer_action( &HExpression::boolean_not, position_ );
+			current_expression()->commit_oper( o );
 			fc._operations.pop();
 			if ( ! is_boolean_congruent( fc._valueTypes.top() ) ) {
 				throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL], p );
@@ -1816,8 +1834,9 @@ void OCompiler::make_reference( executing_parser::position_t position_ ) {
 			hcore::call( &HExpression::subscript, current_expression().raw(), HExpression::ACCESS::REFERENCE, _1, position_.get() )
 		);
 	} else {
-		current_expression()->pop_execution_step();
-		current_expression()->add_execution_step(
+		HExpression& expression( *current_expression() );
+		expression.pop_execution_step();
+		expression.add_execution_step(
 			hcore::call( &HExpression::get_field, current_expression().raw(), HExpression::ACCESS::REFERENCE, fc._lastMemberName, _1, position_.get() )
 		);
 	}
@@ -1895,9 +1914,11 @@ void OCompiler::defer_get_field_reference( yaal::hcore::HString const& value_, e
 			throw HHuginn::HHuginnRuntimeException( "Keyword `"_ys.append( value_ ).append( "' can be used only in class context." ), position_.get() );
 		}
 	}
-	current_expression()->add_execution_step(
+	HExpression& expression( *current_expression() );
+	expression.add_execution_step(
 		hcore::call( &HExpression::get_field, current_expression().raw(), HExpression::ACCESS::VALUE, refIdentifier, _1, position_.get() )
 	);
+	expression.commit_oper( OPERATOR::MEMBER_ACCESS );
 	fc._lastMemberName = refIdentifier;
 	fc._valueTypes.pop();
 	fc._valueTypes.push( type_id( HHuginn::TYPE::REFERENCE ) );

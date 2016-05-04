@@ -46,7 +46,9 @@ namespace huginn {
 
 HExpression::HExpression( int position_ )
 	: HStatement( INVALID_STATEMENT_IDENTIFIER, position_ )
-	, _executionSteps() {
+	, _executionSteps()
+	, _instructions()
+	, _operations() {
 	return;
 }
 
@@ -85,20 +87,100 @@ bool HExpression::is_empty( void ) const {
 	M_EPILOG
 }
 
-void HExpression::oper( OPERATOR operator_, HFrame* frame_, int position_ ) {
+void HExpression::oper( OPERATOR operator_, int position_ ) {
 	M_PROLOG
-	frame_->operations().emplace( operator_, position_ );
+	_operations.emplace( operator_, position_ );
+	return;
+	M_EPILOG
+}
+
+void HExpression::commit_oper( OPERATOR operator_ ) {
+	M_PROLOG
+	M_ASSERT( ! _operations.is_empty() );
+	switch ( operator_ ) {
+		case ( OPERATOR::EQUALS ):
+		case ( OPERATOR::NOT_EQUALS ):
+		case ( OPERATOR::LESS ):
+		case ( OPERATOR::GREATER ):
+		case ( OPERATOR::LESS_OR_EQUAL ):
+		case ( OPERATOR::GREATER_OR_EQUAL ):
+		case ( OPERATOR::PLUS ):
+		case ( OPERATOR::MINUS ):
+		case ( OPERATOR::MULTIPLY ):
+		case ( OPERATOR::DIVIDE ):
+		case ( OPERATOR::MODULO ):
+		case ( OPERATOR::NEGATE ):
+		case ( OPERATOR::BOOLEAN_AND ):
+		case ( OPERATOR::BOOLEAN_OR ):
+		case ( OPERATOR::BOOLEAN_XOR ):
+		case ( OPERATOR::BOOLEAN_NOT ):
+		case ( OPERATOR::TERNARY ):
+		case ( OPERATOR::MEMBER_ACCESS ):
+		case ( OPERATOR::ABSOLUTE ):
+		case ( OPERATOR::PARENTHESIS ): {
+			M_ASSERT( _operations.top()._operator == operator_ );
+			_instructions.push_back( _operations.top() );
+			_operations.pop();
+		} break;
+		case ( OPERATOR::POWER ): {
+			M_DEBUG_CODE( bool hasPowerOperator( false ); );
+			while ( ! _operations.is_empty() && ( _operations.top()._operator == OPERATOR::POWER ) ) {
+				_instructions.push_back( _operations.top() );
+				_operations.pop();
+				M_DEBUG_CODE( hasPowerOperator = true; );
+			}
+			M_ASSERT( hasPowerOperator );
+		} break;
+		case ( OPERATOR::ASSIGN ): {
+			M_DEBUG_CODE( bool hasAssignOperator( false ); );
+			while ( ! _operations.is_empty() && ( _operations.top()._operator >= OPERATOR::ASSIGN ) && ( _operations.top()._operator <= OPERATOR::POWER_ASSIGN ) ) {
+				_instructions.push_back( _operations.top() );
+				_operations.pop();
+				M_DEBUG_CODE( hasAssignOperator = true; );
+			}
+			M_ASSERT( hasAssignOperator );
+		} break;
+		case ( OPERATOR::FUNCTION_CALL ): {
+			while ( _operations.top()._operator == OPERATOR::FUNCTION_ARGUMENT ) {
+				_instructions.push_back( _operations.top() );
+				_operations.pop();
+			}
+			M_ASSERT( _operations.top()._operator == operator_ );
+			_instructions.push_back( _operations.top() );
+			_operations.pop();
+		} break;
+		case ( OPERATOR::SUBSCRIPT ): {
+			M_ASSERT( _operations.top()._operator == OPERATOR::FUNCTION_ARGUMENT );
+			_instructions.push_back( _operations.top() );
+			_operations.pop();
+			M_ASSERT( _operations.top()._operator == operator_ );
+			_instructions.push_back( _operations.top() );
+			_operations.pop();
+		} break;
+		case ( OPERATOR::RANGE ): {
+			while ( ( _operations.top()._operator == OPERATOR::FUNCTION_ARGUMENT ) || ( _operations.top()._operator == OPERATOR::SUBSCRIPT_ARGUMENT ) ) {
+				_instructions.push_back( _operations.top() );
+				_operations.pop();
+			}
+			M_ASSERT( _operations.top()._operator == OPERATOR::SUBSCRIPT );
+			_instructions.push_back( _operations.top() );
+			_operations.pop();
+		} break;
+		default: {
+			M_ASSERT( ! "Invalid code path."[0] );
+		}
+	}
 	return;
 	M_EPILOG
 }
 
 void HExpression::close_parenthesis( HFrame* frame_, int position_ ) {
 	M_PROLOG
-	M_ASSERT( ! frame_->operations().is_empty() );
+	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( ! frame_->values().is_empty() );
-	OPERATOR o( frame_->operations().top()._operator );
+	OPERATOR o( _instructions[frame_->ip()]._operator );
 	M_ASSERT( ( o == OPERATOR::ABSOLUTE ) || ( o == OPERATOR::PARENTHESIS ) );
-	frame_->operations().pop();
+	++ frame_->ip();
 	if ( o == OPERATOR::ABSOLUTE ) {
 		HHuginn::value_t v( yaal::move( frame_->values().top() ) );
 		frame_->values().pop();
@@ -138,9 +220,10 @@ void HExpression::get_super( huginn::HFrame* frame_, int position_ ) {
 
 void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifierId_, huginn::HFrame* frame_, int position_ ) {
 	M_PROLOG
-	M_ASSERT( frame_->operations().top()._operator == OPERATOR::MEMBER_ACCESS );
-	int p( frame_->operations().top()._position );
-	frame_->operations().pop();
+	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::MEMBER_ACCESS );
+	int p( _instructions[frame_->ip()]._position );
+	++ frame_->ip();
 	HHuginn::value_t v( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	if ( v->get_class()->is_complex() ) {
@@ -196,14 +279,14 @@ void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifier
 
 void HExpression::set_variable( HFrame* frame_, int ) {
 	M_PROLOG
-	operations_t& operations( frame_->operations() );
-	while ( ! operations.is_empty() ) {
-		operations_t::value_type& operation( operations.top() );
+	int& ip( frame_->ip() );
+	while ( ip < static_cast<int>( _instructions.get_size() ) ) {
+		instructions_t::value_type& operation( _instructions[ip] );
 		if ( ( operation._operator < OPERATOR::ASSIGN ) || ( operation._operator > OPERATOR::POWER_ASSIGN ) ) {
 			break;
 		}
 		int p( operation._position );
-		operations.pop();
+		++ ip;
 		HHuginn::value_t src( yaal::move( frame_->values().top() ) );
 		frame_->values().pop();
 		HHuginn::value_t dst( yaal::move( frame_->values().top() ) );
@@ -239,19 +322,20 @@ void HExpression::set_variable( HFrame* frame_, int ) {
 
 void HExpression::function_call( HFrame* frame_, int position_ ) {
 	M_PROLOG
-	M_ASSERT( ! frame_->operations().is_empty() );
+	int& ip( frame_->ip() );
+	M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( ! frame_->values().is_empty() );
 	HHuginn::values_t values;
-	while ( frame_->operations().top()._operator == OPERATOR::FUNCTION_ARGUMENT ) {
-		frame_->operations().pop();
-		M_ASSERT( ! frame_->operations().is_empty() );
+	while ( _instructions[ip]._operator == OPERATOR::FUNCTION_ARGUMENT ) {
+		++ ip;
+		M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );
 		values.push_back( yaal::move( frame_->values().top() ) );
 		frame_->values().pop();
 		M_ASSERT( ! frame_->values().is_empty() );
 	}
-	M_ASSERT( frame_->operations().top()._operator == OPERATOR::FUNCTION_CALL );
-	int p( frame_->operations().top()._position );
-	frame_->operations().pop();
+	M_ASSERT( _instructions[ip]._operator == OPERATOR::FUNCTION_CALL );
+	int p( _instructions[ip]._position );
+	++ ip;
 	HHuginn::HClass const* c( frame_->values().top()->get_class() );
 	HHuginn::type_id_t t( c->type_id() );
 	if ( ( t != HHuginn::TYPE::FUNCTION_REFERENCE ) && ( t != HHuginn::TYPE::METHOD ) ) {
@@ -273,7 +357,8 @@ void HExpression::function_call( HFrame* frame_, int position_ ) {
 
 void HExpression::make_dict( HFrame* frame_, int ) {
 	M_PROLOG
-	M_ASSERT( ! frame_->operations().is_empty() );
+	int& ip( frame_->ip() );
+	M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );
 	struct ValuePosition {
 		HHuginn::value_t _value;
 		int _position;
@@ -283,16 +368,15 @@ void HExpression::make_dict( HFrame* frame_, int ) {
 	};
 	typedef yaal::hcore::HArray<ValuePosition> positioned_values_t;
 	positioned_values_t values;
-	while ( frame_->operations().top()._operator == OPERATOR::FUNCTION_ARGUMENT ) {
-		M_ASSERT( ! frame_->operations().is_empty() );
-		values.emplace_back( yaal::move( frame_->values().top() ), frame_->operations().top()._position );
-		frame_->operations().pop();
+	while ( _instructions[ip]._operator == OPERATOR::FUNCTION_ARGUMENT ) {
+		values.emplace_back( yaal::move( frame_->values().top() ), _instructions[ip]._position );
+		++ ip;
+		M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );
 		frame_->values().pop();
-		M_ASSERT( ! frame_->operations().is_empty() );
 	}
 	M_ASSERT( ( values.get_size() % 2 ) == 0 );
-	M_ASSERT( frame_->operations().top()._operator == OPERATOR::FUNCTION_CALL );
-	frame_->operations().pop();
+	M_ASSERT( _instructions[ip]._operator == OPERATOR::FUNCTION_CALL );
+	++ ip;
 	reverse( values.begin(), values.end() );
 	HHuginn::value_t dict( frame_->thread()->object_factory().create_dict() );
 	HHuginn::HDict* m( static_cast<HHuginn::HDict*>( dict.raw() ) );
@@ -306,10 +390,10 @@ void HExpression::make_dict( HFrame* frame_, int ) {
 
 void HExpression::plus( HFrame* frame_, int ) {
 	M_PROLOG
-	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == OPERATOR::PLUS );
-	int p( frame_->operations().top()._position );
-	frame_->operations().pop();
+	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::PLUS );
+	int p( _instructions[frame_->ip()]._position );
+	++ frame_->ip();
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	HHuginn::value_t v1( frame_->values().top()->clone( &frame_->thread()->huginn() ) );
@@ -325,10 +409,10 @@ void HExpression::plus( HFrame* frame_, int ) {
 
 void HExpression::minus( HFrame* frame_, int ) {
 	M_PROLOG
-	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == OPERATOR::MINUS );
-	int p( frame_->operations().top()._position );
-	frame_->operations().pop();
+	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::MINUS );
+	int p( _instructions[frame_->ip()]._position );
+	++ frame_->ip();
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	HHuginn::value_t v1( frame_->values().top()->clone( &frame_->thread()->huginn() ) );
@@ -344,10 +428,10 @@ void HExpression::minus( HFrame* frame_, int ) {
 
 void HExpression::mul( HFrame* frame_, int ) {
 	M_PROLOG
-	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == OPERATOR::MULTIPLY );
-	int p( frame_->operations().top()._position );
-	frame_->operations().pop();
+	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::MULTIPLY );
+	int p( _instructions[frame_->ip()]._position );
+	++ frame_->ip();
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	HHuginn::value_t v1( frame_->values().top()->clone( &frame_->thread()->huginn() ) );
@@ -363,10 +447,10 @@ void HExpression::mul( HFrame* frame_, int ) {
 
 void HExpression::div( HFrame* frame_, int ) {
 	M_PROLOG
-	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == OPERATOR::DIVIDE );
-	int p( frame_->operations().top()._position );
-	frame_->operations().pop();
+	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::DIVIDE );
+	int p( _instructions[frame_->ip()]._position );
+	++ frame_->ip();
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	HHuginn::value_t v1( frame_->values().top()->clone( &frame_->thread()->huginn() ) );
@@ -382,10 +466,10 @@ void HExpression::div( HFrame* frame_, int ) {
 
 void HExpression::mod( HFrame* frame_, int ) {
 	M_PROLOG
-	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == OPERATOR::MODULO );
-	int p( frame_->operations().top()._position );
-	frame_->operations().pop();
+	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::MODULO );
+	int p( _instructions[frame_->ip()]._position );
+	++ frame_->ip();
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	HHuginn::value_t v1( frame_->values().top()->clone( &frame_->thread()->huginn() ) );
@@ -411,10 +495,10 @@ void HExpression::factorial( huginn::HFrame* frame_, int position_ ) {
 
 void HExpression::negate( HFrame* frame_, int ) {
 	M_PROLOG
-	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == OPERATOR::NEGATE );
-	int p( frame_->operations().top()._position );
-	frame_->operations().pop();
+	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::NEGATE );
+	int p( _instructions[frame_->ip()]._position );
+	++ frame_->ip();
 	M_ASSERT( ! frame_->values().is_empty() );
 	HHuginn::value_t v( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
@@ -425,9 +509,10 @@ void HExpression::negate( HFrame* frame_, int ) {
 
 void HExpression::power( HFrame* frame_, int ) {
 	M_PROLOG
-	while ( ! frame_->operations().is_empty() && ( frame_->operations().top()._operator == OPERATOR::POWER ) ) {
-		int p( frame_->operations().top()._position );
-		frame_->operations().pop();
+	int& ip( frame_->ip() );
+	while ( ( ip < static_cast<int>( _instructions.get_size() ) ) && ( _instructions[ip]._operator == OPERATOR::POWER ) ) {
+		int p( _instructions[ip]._position );
+		++ ip;
 		HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 		frame_->values().pop();
 		HHuginn::value_t v1( frame_->values().top()->clone( &frame_->thread()->huginn() ) );
@@ -444,14 +529,16 @@ void HExpression::power( HFrame* frame_, int ) {
 
 void HExpression::subscript( ACCESS access_, HFrame* frame_, int ) {
 	M_PROLOG
-	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == OPERATOR::FUNCTION_ARGUMENT );
-	frame_->operations().pop();
+	int& ip( frame_->ip() );
+	M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[ip]._operator == OPERATOR::FUNCTION_ARGUMENT );
+	++ ip;
 	HHuginn::value_t index( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	M_ASSERT( frame_->operations().top()._operator == OPERATOR::SUBSCRIPT );
-	int p( frame_->operations().top()._position );
-	frame_->operations().pop();
+	M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[ip]._operator == OPERATOR::SUBSCRIPT );
+	int p( _instructions[ip]._position );
+	++ ip;
 	HHuginn::value_t base( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	frame_->values().push( value_builtin::subscript( frame_->thread(), access_, base, index, p ) );
@@ -461,12 +548,13 @@ void HExpression::subscript( ACCESS access_, HFrame* frame_, int ) {
 
 void HExpression::range( HFrame* frame_, int ) {
 	M_PROLOG
-	M_ASSERT( ! frame_->operations().is_empty() );
+	int& ip( frame_->ip() );
+	M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );
 	HHuginn::value_t from;
 	HHuginn::value_t to;
 	HHuginn::value_t step;
 	HHuginn::value_t* v( &step );
-	OPERATOR op( frame_->operations().top()._operator );
+	OPERATOR op( _instructions[ip]._operator );
 	M_ASSERT( ( op == OPERATOR::FUNCTION_ARGUMENT ) || ( op == OPERATOR::SUBSCRIPT_ARGUMENT ) );
 	int rangeOpCount( 0 );
 	while ( ( op == OPERATOR::FUNCTION_ARGUMENT ) || ( op == OPERATOR::SUBSCRIPT_ARGUMENT ) ) {
@@ -481,13 +569,14 @@ void HExpression::range( HFrame* frame_, int ) {
 			}
 			++ rangeOpCount;
 		}
-		frame_->operations().pop();
-		op = frame_->operations().top()._operator;
+		++ ip;
+		M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );
+		op = _instructions[ip]._operator;
 	}
 	M_ASSERT( rangeOpCount <= 2 );
-	M_ASSERT( frame_->operations().top()._operator == OPERATOR::SUBSCRIPT );
-	int p( frame_->operations().top()._position );
-	frame_->operations().pop();
+	M_ASSERT( op == OPERATOR::SUBSCRIPT );
+	int p( _instructions[ip]._position );
+	++ ip;
 	bool select( ( !! from ) || ( !! to ) || ( !! step ) );
 	HHuginn::value_t base( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
@@ -510,10 +599,10 @@ void HExpression::range( HFrame* frame_, int ) {
 
 void HExpression::equals( HFrame* frame_, int ) {
 	M_PROLOG
-	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == OPERATOR::EQUALS );
-	int p( frame_->operations().top()._position );
-	frame_->operations().pop();
+	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::EQUALS );
+	int p( _instructions[frame_->ip()]._position );
+	++ frame_->ip();
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
@@ -530,10 +619,10 @@ void HExpression::equals( HFrame* frame_, int ) {
 
 void HExpression::not_equals( HFrame* frame_, int ) {
 	M_PROLOG
-	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == OPERATOR::NOT_EQUALS );
-	int p( frame_->operations().top()._position );
-	frame_->operations().pop();
+	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::NOT_EQUALS );
+	int p( _instructions[frame_->ip()]._position );
+	++ frame_->ip();
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
@@ -550,10 +639,10 @@ void HExpression::not_equals( HFrame* frame_, int ) {
 
 void HExpression::less( HFrame* frame_, int ) {
 	M_PROLOG
-	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == OPERATOR::LESS );
-	int p( frame_->operations().top()._position );
-	frame_->operations().pop();
+	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::LESS );
+	int p( _instructions[frame_->ip()]._position );
+	++ frame_->ip();
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
@@ -568,10 +657,10 @@ void HExpression::less( HFrame* frame_, int ) {
 
 void HExpression::greater( HFrame* frame_, int ) {
 	M_PROLOG
-	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == OPERATOR::GREATER );
-	int p( frame_->operations().top()._position );
-	frame_->operations().pop();
+	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::GREATER );
+	int p( _instructions[frame_->ip()]._position );
+	++ frame_->ip();
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
@@ -586,10 +675,10 @@ void HExpression::greater( HFrame* frame_, int ) {
 
 void HExpression::less_or_equal( HFrame* frame_, int ) {
 	M_PROLOG
-	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == OPERATOR::LESS_OR_EQUAL );
-	int p( frame_->operations().top()._position );
-	frame_->operations().pop();
+	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::LESS_OR_EQUAL );
+	int p( _instructions[frame_->ip()]._position );
+	++ frame_->ip();
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
@@ -604,10 +693,10 @@ void HExpression::less_or_equal( HFrame* frame_, int ) {
 
 void HExpression::greater_or_equal( HFrame* frame_, int ) {
 	M_PROLOG
-	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == OPERATOR::GREATER_OR_EQUAL );
-	int p( frame_->operations().top()._position );
-	frame_->operations().pop();
+	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::GREATER_OR_EQUAL );
+	int p( _instructions[frame_->ip()]._position );
+	++ frame_->ip();
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
@@ -622,9 +711,9 @@ void HExpression::greater_or_equal( HFrame* frame_, int ) {
 
 void HExpression::boolean_and( HFrame* frame_, int ) {
 	M_PROLOG
-	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == OPERATOR::BOOLEAN_AND );
-	frame_->operations().pop();
+	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::BOOLEAN_AND );
+	++ frame_->ip();
 	HHuginn::value_t v( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	M_ASSERT( dynamic_cast<HBooleanEvaluator*>( v.raw() ) );
@@ -635,9 +724,9 @@ void HExpression::boolean_and( HFrame* frame_, int ) {
 
 void HExpression::boolean_or( HFrame* frame_, int ) {
 	M_PROLOG
-	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == OPERATOR::BOOLEAN_OR );
-	frame_->operations().pop();
+	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::BOOLEAN_OR );
+	++ frame_->ip();
 	HHuginn::value_t v( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	M_ASSERT( dynamic_cast<HBooleanEvaluator*>( v.raw() ) );
@@ -648,10 +737,10 @@ void HExpression::boolean_or( HFrame* frame_, int ) {
 
 void HExpression::boolean_xor( HFrame* frame_, int ) {
 	M_PROLOG
-	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == OPERATOR::BOOLEAN_XOR );
-	int p( frame_->operations().top()._position );
-	frame_->operations().pop();
+	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::BOOLEAN_XOR );
+	int p( _instructions[frame_->ip()]._position );
+	++ frame_->ip();
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
@@ -666,10 +755,10 @@ void HExpression::boolean_xor( HFrame* frame_, int ) {
 
 void HExpression::boolean_not( HFrame* frame_, int ) {
 	M_PROLOG
-	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == OPERATOR::BOOLEAN_NOT );
-	int p( frame_->operations().top()._position );
-	frame_->operations().pop();
+	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::BOOLEAN_NOT );
+	int p( _instructions[frame_->ip()]._position );
+	++ frame_->ip();
 	HHuginn::value_t v( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
@@ -682,9 +771,9 @@ void HExpression::boolean_not( HFrame* frame_, int ) {
 
 void HExpression::ternary( HFrame* frame_, int ) {
 	M_PROLOG
-	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == OPERATOR::TERNARY );
-	frame_->operations().pop();
+	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::TERNARY );
+	++ frame_->ip();
 	HHuginn::value_t v( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	M_ASSERT( dynamic_cast<HHuginn::HTernaryEvaluator*>( v.raw() ) );
@@ -751,7 +840,9 @@ void HExpression::store_character( char value_, HFrame* frame_, int ) {
 
 void HExpression::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
+	M_ASSERT( _operations.is_empty() );
 	HFrame* f( thread_->current_frame() );
+	f->start_expression();
 	for ( execution_step_t const& e : _executionSteps ) {
 		e( f );
 		if ( ! thread_->can_continue() ) {
@@ -760,8 +851,10 @@ void HExpression::do_execute( huginn::HThread* thread_ ) const {
 	}
 	if ( f->state() != HFrame::STATE::EXCEPTION ) {
 		f->set_result( yaal::move( f->values().top() ) );
+		M_ASSERT( f->ip() == static_cast<int>( _instructions.get_size() ) );
 	}
 	f->values().pop();
+	f->end_expression();
 	return;
 	M_EPILOG
 }

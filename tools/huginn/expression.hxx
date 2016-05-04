@@ -55,14 +55,18 @@ public:
 	typedef yaal::hcore::HBoundCall<void ( huginn::HFrame* )> execution_step_t;
 private:
 	typedef yaal::hcore::HArray<execution_step_t> execution_steps_t;
+	typedef yaal::hcore::HArray<OPositionedOperator> instructions_t;
 	execution_steps_t _executionSteps;
+	instructions_t _instructions;
+	operations_t _operations;
 public:
 	HExpression( int = 0 );
 	int add_execution_step( execution_step_t const& );
 	void replace_execution_step( int, execution_step_t const& );
 	void pop_execution_step( void );
 	void merge( HExpression& );
-	void oper( OPERATOR, huginn::HFrame*, int );
+	void oper( OPERATOR, int );
+	void commit_oper( OPERATOR );
 	void close_parenthesis( huginn::HFrame*, int );
 	void plus( huginn::HFrame*, int );
 	void minus( huginn::HFrame*, int );

@@ -48,7 +48,7 @@ HFrame::HFrame(
 	, _object( nullptr )
 	, _upCast( 0 )
 	, _variables()
-	, _operations()
+	, _instructionPointers()
 	, _values()
 	, _result()
 	, _number( 0 )
@@ -78,7 +78,6 @@ void HFrame::init(
 void HFrame::break_execution( STATE state_ ) {
 	_state = state_;
 	_values.clear();
-	_operations.clear();
 	return;
 }
 
@@ -99,7 +98,7 @@ void HFrame::set_result( HHuginn::value_t&& result_ ) {
 void HFrame::reset( void ) {
 	M_PROLOG
 	M_ASSERT( _values.is_empty() );
-	M_ASSERT( _operations.is_empty() );
+	M_ASSERT( _instructionPointers.is_empty() );
 	_statementId = INVALID_STATEMENT_IDENTIFIER;
 	_result.reset();
 	_variables.clear();
