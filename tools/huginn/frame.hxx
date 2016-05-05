@@ -79,6 +79,7 @@ private:
 	 */
 	instruction_pointers_t _instructionPointers;
 	values_t _values;
+	HHuginn::values_t _valueCache;
 	HHuginn::value_t _result;
 	int _number;
 	TYPE _type;
@@ -132,6 +133,9 @@ public:
 	}
 	void end_expression( void ) {
 		_instructionPointers.pop();
+	}
+	HHuginn::values_t& value_cache( void ) {
+		return ( _valueCache );
 	}
 private:
 	HFrame( HFrame const& ) = delete;

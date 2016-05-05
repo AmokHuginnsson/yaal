@@ -50,6 +50,7 @@ HFrame::HFrame(
 	, _variables()
 	, _instructionPointers()
 	, _values()
+	, _valueCache()
 	, _result()
 	, _number( 0 )
 	, _type( TYPE::SCOPE )
@@ -98,6 +99,7 @@ void HFrame::set_result( HHuginn::value_t&& result_ ) {
 void HFrame::reset( void ) {
 	M_PROLOG
 	M_ASSERT( _values.is_empty() );
+	M_ASSERT( _valueCache.is_empty() );
 	M_ASSERT( _instructionPointers.is_empty() );
 	_statementId = INVALID_STATEMENT_IDENTIFIER;
 	_result.reset();

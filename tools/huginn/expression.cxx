@@ -325,7 +325,7 @@ void HExpression::function_call( HFrame* frame_, int position_ ) {
 	int& ip( frame_->ip() );
 	M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( ! frame_->values().is_empty() );
-	HHuginn::values_t values;
+	HHuginn::values_t& values( frame_->value_cache() );
 	while ( _instructions[ip]._operator == OPERATOR::FUNCTION_ARGUMENT ) {
 		++ ip;
 		M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );
@@ -351,6 +351,7 @@ void HExpression::function_call( HFrame* frame_, int position_ ) {
 		M_ASSERT( m );
 		frame_->values().push( m->function()( frame_->thread(), m->object(), values, p ) );
 	}
+	values.clear();
 	return;
 	M_EPILOG
 }
