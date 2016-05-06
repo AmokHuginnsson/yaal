@@ -209,6 +209,7 @@ private:
 	value_t _result;
 	yaal::hcore::HString _errorMessage;
 	int _errorPosition;
+	int _maxLocalVariableCount;
 	typedef std::atomic<bool> flag_t;
 	static flag_t _grammarVerified;
 	yaal::hcore::HStreamInterface::ptr_t _inputStream;
@@ -330,6 +331,10 @@ public:
 	}
 	huginn::HObjectFactory* object_factory( void ) {
 		return ( _objectFactory.raw() );
+	}
+	void set_max_local_variable_count( int );
+	int max_local_variable_count() const {
+		return ( _maxLocalVariableCount );
 	}
 private:
 	void finalize_compilation( compiler_setup_t );

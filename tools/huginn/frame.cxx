@@ -56,6 +56,7 @@ HFrame::HFrame(
 	, _type( TYPE::SCOPE )
 	, _state( STATE::NORMAL )
 	, _statementId( INVALID_STATEMENT_IDENTIFIER ) {
+	_variables.reserve( _thread->huginn().max_local_variable_count() );
 	return;
 }
 

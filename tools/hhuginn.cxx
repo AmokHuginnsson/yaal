@@ -217,6 +217,7 @@ HHuginn::HHuginn( void )
 	, _result()
 	, _errorMessage()
 	, _errorPosition( -1 )
+	, _maxLocalVariableCount( 0 )
 	, _inputStream()
 	, _inputStreamRaw( &cin )
 	, _outputStream()
@@ -275,6 +276,14 @@ bool HHuginn::parse( void ) {
 		_state = STATE::PARSED;
 	}
 	return ( ok );
+	M_EPILOG
+}
+
+void HHuginn::set_max_local_variable_count( int maxLocalVariableCount_ ) {
+	M_PROLOG
+	M_ASSERT( maxLocalVariableCount_ >= 0 );
+	_maxLocalVariableCount = maxLocalVariableCount_;
+	return;
 	M_EPILOG
 }
 

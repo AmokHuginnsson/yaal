@@ -236,6 +236,7 @@ void OCompiler::resolve_symbols( void ) {
 	M_ASSERT( _submittedClasses.is_empty() );
 	HHuginn::identifier_id_t lastClassId( INVALID_IDENTIFIER );
 	HHuginn::class_t aClass;
+	int maxLocalVariableCount( 0 );
 	for ( OExecutionStep& es : _executionStepsBacklog ) {
 		if ( es._classId != lastClassId ) {
 			if ( es._classId != INVALID_IDENTIFIER ) {
@@ -307,6 +308,9 @@ void OCompiler::resolve_symbols( void ) {
 						index += static_cast<int>( parent->_variables.get_size() );
 					}
 					sc->_variables[es._identifier] = index;
+					if ( ( index + 1 ) > maxLocalVariableCount ) {
+						maxLocalVariableCount = index + 1;
+					}
 				}
 				if ( !! es._expression ) {
 					es._expression->replace_execution_step(
@@ -377,6 +381,7 @@ void OCompiler::resolve_symbols( void ) {
 			);
 		} while ( false );
 	}
+	_huginn->set_max_local_variable_count( maxLocalVariableCount );
 	_scopeContextCache.clear();
 	_executionStepsBacklog.clear();
 	return;
