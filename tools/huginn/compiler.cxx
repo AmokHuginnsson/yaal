@@ -1956,42 +1956,73 @@ void OCompiler::defer_store_direct( HHuginn::value_t const& value_, executing_pa
 	M_EPILOG
 }
 
+OPERATOR _copyConstContext_[] = {
+	OPERATOR::ASSIGN,
+	OPERATOR::FUNCTION_CALL,
+	OPERATOR::FUNCTION_ARGUMENT
+};
+
 void OCompiler::defer_store_real( double long value_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	current_expression()->add_execution_step( hcore::call( &HExpression::store_real, current_expression().raw(), value_, _1, position_.get() ) );
-	f()._valueTypes.push( type_id( HHuginn::TYPE::REAL ) );
+	OFunctionContext& fc( f() );
+	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
+		current_expression()->add_execution_step( hcore::call( &HExpression::store_direct, current_expression().raw(), _huginn->object_factory()->create_real( value_ ), _1, position_.get() ) );
+	} else {
+		current_expression()->add_execution_step( hcore::call( &HExpression::store_real, current_expression().raw(), value_, _1, position_.get() ) );
+	}
+	fc._valueTypes.push( type_id( HHuginn::TYPE::REAL ) );
 	return;
 	M_EPILOG
 }
 
 void OCompiler::defer_store_integer( int long long value_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	current_expression()->add_execution_step( hcore::call( &HExpression::store_integer, current_expression().raw(), value_, _1, position_.get() ) );
-	f()._valueTypes.push( type_id( HHuginn::TYPE::INTEGER ) );
+	OFunctionContext& fc( f() );
+	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
+		current_expression()->add_execution_step( hcore::call( &HExpression::store_direct, current_expression().raw(), _huginn->object_factory()->create_integer( value_ ), _1, position_.get() ) );
+	} else {
+		current_expression()->add_execution_step( hcore::call( &HExpression::store_integer, current_expression().raw(), value_, _1, position_.get() ) );
+	}
+	fc._valueTypes.push( type_id( HHuginn::TYPE::INTEGER ) );
 	return;
 	M_EPILOG
 }
 
 void OCompiler::defer_store_string( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	current_expression()->add_execution_step( hcore::call( &HExpression::store_string, current_expression().raw(), value_, _1, position_.get() ) );
-	f()._valueTypes.push( type_id( HHuginn::TYPE::STRING ) );
+	OFunctionContext& fc( f() );
+	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
+		current_expression()->add_execution_step( hcore::call( &HExpression::store_direct, current_expression().raw(), _huginn->object_factory()->create_string( value_ ), _1, position_.get() ) );
+	} else {
+		current_expression()->add_execution_step( hcore::call( &HExpression::store_string, current_expression().raw(), value_, _1, position_.get() ) );
+	}
+	fc._valueTypes.push( type_id( HHuginn::TYPE::STRING ) );
 	return;
 	M_EPILOG
 }
 
 void OCompiler::defer_store_number( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	current_expression()->add_execution_step( hcore::call( &HExpression::store_number, current_expression().raw(), value_, _1, position_.get() ) );
-	f()._valueTypes.push( type_id( HHuginn::TYPE::NUMBER ) );
+	OFunctionContext& fc( f() );
+	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
+		current_expression()->add_execution_step( hcore::call( &HExpression::store_direct, current_expression().raw(), _huginn->object_factory()->create_number( value_ ), _1, position_.get() ) );
+	} else {
+		current_expression()->add_execution_step( hcore::call( &HExpression::store_number, current_expression().raw(), value_, _1, position_.get() ) );
+	}
+	fc._valueTypes.push( type_id( HHuginn::TYPE::NUMBER ) );
 	return;
 	M_EPILOG
 }
 
 void OCompiler::defer_store_character( char value_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	current_expression()->add_execution_step( hcore::call( &HExpression::store_character, current_expression().raw(), value_, _1, position_.get() ) );
-	f()._valueTypes.push( type_id( HHuginn::TYPE::CHARACTER ) );
+	OFunctionContext& fc( f() );
+	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
+		current_expression()->add_execution_step( hcore::call( &HExpression::store_direct, current_expression().raw(), _huginn->object_factory()->create_character( value_ ), _1, position_.get() ) );
+	} else {
+		current_expression()->add_execution_step( hcore::call( &HExpression::store_character, current_expression().raw(), value_, _1, position_.get() ) );
+	}
+	fc._valueTypes.push( type_id( HHuginn::TYPE::CHARACTER ) );
 	return;
 	M_EPILOG
 }
