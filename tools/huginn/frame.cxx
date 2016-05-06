@@ -150,7 +150,18 @@ HHuginn::value_t HFrame::get_variable( HExpression::ACCESS access_, HStatement::
 		M_ASSERT( f );
 	}
 	HHuginn::value_t v;
-	if ( ( access_ == HExpression::ACCESS::REFERENCE ) && ( static_cast<int>( _variables.get_size() ) == index_ ) ) {
+	/*
+	 * It is very difficult to remove next following if() statement due to
+	 * loop statements in Huginn language.
+	 * For `for' and `while' loop statement variables that are local to their scope ({...})
+	 * shall be created during first iteration and only updated during subsequent iterations.
+	 *
+	 * Current implementation has interesting side effect that local variables
+	 * in all but last of iterations are destroyed in order of their definition
+	 * and not in reverse order of their definition as it would be expected.
+	 */
+	if ( ( access_ == HExpression::ACCESS::REFERENCE ) && ( static_cast<int>( f->_variables.get_size() ) == index_ ) ) {
+		M_ASSERT( f == this );
 		f->_variables.push_back( HHuginn::value_t() );
 	}
 	if ( access_ == HExpression::ACCESS::VALUE ) {
