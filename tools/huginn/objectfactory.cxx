@@ -115,7 +115,9 @@ HObjectFactory::HObjectFactory( HHuginn* huginn_ )
 	, _numberPool()
 	, _numberAllocator( _numberPool )
 	, _characterPool()
-	, _characterAllocator( _characterPool ) {
+	, _characterAllocator( _characterPool )
+	, _referencePool()
+	, _referenceAllocator( _referencePool ) {
 	return;
 }
 

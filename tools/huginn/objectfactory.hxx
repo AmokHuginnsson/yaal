@@ -97,6 +97,13 @@ class HObjectFactory final {
 	typedef allocator::shared_pool<shared_character_t::type> character_allocator_t;
 	character_pool_t _characterPool;
 	character_allocator_t _characterAllocator;
+	/* reference pool */
+	typedef yaal::hcore::HPointer<HHuginn::HReference> reference_ptr_t;
+	typedef reference_ptr_t::allocated_shared<allocator::shared_pool<HHuginn::HReference>> shared_reference_t;
+	typedef yaal::hcore::HPool<shared_reference_t::size> reference_pool_t;
+	typedef allocator::shared_pool<shared_reference_t::type> reference_allocator_t;
+	reference_pool_t _referencePool;
+	reference_allocator_t _referenceAllocator;
 public:
 	HObjectFactory( HHuginn* );
 	void register_builtin_classes( void );
@@ -150,6 +157,9 @@ public:
 	}
 	HHuginn::value_t create_set( HHuginn::HSet::values_t const& data_ ) const {
 		return ( yaal::hcore::make_pointer<HHuginn::HSet>( _set.raw(), data_ ) );
+	}
+	HHuginn::value_t create_reference( HHuginn::value_t& value_ ) const {
+		return ( yaal::hcore::allocate_pointer<reference_allocator_t, HHuginn::HReference>( _referenceAllocator, value_ ) );
 	}
 	HHuginn::HClass const* boolean_class( void ) const {
 		return ( _boolean.raw() );

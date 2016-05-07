@@ -818,8 +818,8 @@ HHuginn::value_t& HHuginn::HReference::value( void ) const {
 	return ( _value );
 }
 
-HHuginn::value_t HHuginn::HReference::do_clone( HHuginn* ) const {
-	return ( make_pointer<HReference>( _value ) );
+HHuginn::value_t HHuginn::HReference::do_clone( HHuginn* huginn_ ) const {
+	return ( huginn_->object_factory()->create_reference( _value ) );
 }
 
 HHuginn::HIterable::HIterable( HClass const* class_ )

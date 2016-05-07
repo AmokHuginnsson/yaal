@@ -226,6 +226,7 @@ void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifier
 	++ frame_->ip();
 	HHuginn::value_t v( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
+	HHuginn& h( frame_->thread()->huginn() );
 	if ( v->get_class()->is_complex() ) {
 		int fi( v->field_index( identifierId_ ) );
 		if ( fi < 0 ) {
@@ -233,7 +234,7 @@ void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifier
 				"`"_ys
 				.append( v->get_class()->name() )
 				.append( "' does not have `" )
-				.append( frame_->thread()->huginn().identifier_name( identifierId_ ) )
+				.append( h.identifier_name( identifierId_ ) )
 				.append( "' member." ),
 				p
 			);
@@ -243,7 +244,7 @@ void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifier
 		} else if ( ! v.unique() ) {
 			HHuginn::HObject* o( dynamic_cast<HHuginn::HObject*>( v.raw() ) );
 			if ( o != nullptr ) {
-				frame_->values().push( make_pointer<HHuginn::HReference>( o->field_ref( fi ) ) );
+				frame_->values().push( h.object_factory()->create_reference( o->field_ref( fi ) ) );
 			} else {
 				throw HHuginn::HHuginnRuntimeException( "Assignment to read-only location.", position_ );
 			}
@@ -259,7 +260,7 @@ void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifier
 					"`"_ys
 					.append( oref->get_class()->name() )
 					.append( "' does not have `" )
-					.append( frame_->thread()->huginn().identifier_name( identifierId_ ) )
+					.append( h.identifier_name( identifierId_ ) )
 					.append( "' member." ),
 					p
 				);

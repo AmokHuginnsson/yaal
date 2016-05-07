@@ -750,7 +750,7 @@ public:
 	void pop_back( void );
 	void clear( void );
 	value_t get( int long long );
-	value_t get_ref( int long long );
+	value_t& get_ref( int long long );
 	values_t const& value( void ) const {
 		return ( _data );
 	}
@@ -780,7 +780,7 @@ public:
 	void pop_front( void );
 	void clear( void );
 	value_t get( int long long );
-	value_t get_ref( int long long );
+	value_t& get_ref( int long long );
 	values_t const& value( void ) const {
 		return ( _data );
 	}
@@ -807,7 +807,7 @@ public:
 	HDict( HHuginn::HClass const* );
 	HDict( HHuginn::HClass const*, values_t const&, HHuginn::HClass const* );
 	value_t get( HHuginn::value_t const&, int );
-	value_t get_ref( HHuginn::value_t const&, int );
+	value_t& get_ref( HHuginn::value_t const&, int );
 	void insert( HHuginn::value_t const&, HHuginn::value_t const&, int );
 	bool has_key( HHuginn::value_t const&, int ) const;
 	bool try_get( HHuginn::value_t const& key_, HHuginn::value_t& result_, int position_ );
@@ -877,7 +877,7 @@ public:
 	bool has_key( HHuginn::value_t const& ) const;
 	void erase( HHuginn::value_t const& );
 	value_t get( HHuginn::value_t const&, int );
-	value_t get_ref( HHuginn::value_t const& );
+	value_t& get_ref( HHuginn::value_t const& );
 	bool try_get( HHuginn::value_t const& key_, HHuginn::value_t& result_ );
 	values_t const& value( void ) const {
 		return ( _data );

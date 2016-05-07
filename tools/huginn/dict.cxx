@@ -214,11 +214,11 @@ void HHuginn::HDict::erase( HHuginn::value_t const& key_, int position_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HDict::get_ref( HHuginn::value_t const& key_, int position_ ) {
+HHuginn::value_t& HHuginn::HDict::get_ref( HHuginn::value_t const& key_, int position_ ) {
 	M_PROLOG
 	verify_key_type( key_->get_class(), position_ );
 	_keyType = key_->get_class();
-	return ( make_pointer<HReference>( _data[key_] ) );
+	return ( _data[key_] );
 	M_EPILOG
 }
 

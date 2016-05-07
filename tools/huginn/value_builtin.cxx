@@ -55,6 +55,7 @@ HHuginn::value_t subscript(
 ) {
 	HHuginn::type_id_t baseType( base_->type_id() );
 	HHuginn::value_t res;
+	HObjectFactory& of( *thread_->huginn().object_factory() );
 	if ( ( baseType == HHuginn::TYPE::LIST ) || ( baseType == HHuginn::TYPE::DEQUE ) || ( baseType == HHuginn::TYPE::STRING ) ) {
 		if ( index_->type_id() != HHuginn::TYPE::INTEGER ) {
 			throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::IDX_NOT_INT], position_ );
@@ -70,10 +71,10 @@ HHuginn::value_t subscript(
 		}
 		if ( baseType == HHuginn::TYPE::LIST ) {
 			HHuginn::HList* l( static_cast<HHuginn::HList*>( base_.raw() ) );
-			res = ( subscript_ == HExpression::ACCESS::VALUE ? l->get( index ) : l->get_ref( index ) );
+			res = ( subscript_ == HExpression::ACCESS::VALUE ? l->get( index ) : of.create_reference( l->get_ref( index ) ) );
 		} else if ( baseType == HHuginn::TYPE::DEQUE ) {
 			HHuginn::HDeque* d( static_cast<HHuginn::HDeque*>( base_.raw() ) );
-			res = ( subscript_ == HExpression::ACCESS::VALUE ? d->get( index ) : d->get_ref( index ) );
+			res = ( subscript_ == HExpression::ACCESS::VALUE ? d->get( index ) : of.create_reference( d->get_ref( index ) ) );
 		} else {
 			M_ASSERT( baseType == HHuginn::TYPE::STRING );
 			HHuginn::HString* s( static_cast<HHuginn::HString*>( base_.raw() ) );
@@ -81,10 +82,10 @@ HHuginn::value_t subscript(
 		}
 	} else if ( baseType == HHuginn::TYPE::DICT ) {
 		HHuginn::HDict* d( static_cast<HHuginn::HDict*>( base_.raw() ) );
-		res = ( subscript_ == HExpression::ACCESS::VALUE ? d->get( index_, position_ ) : d->get_ref( index_, position_ ) );
+		res = ( subscript_ == HExpression::ACCESS::VALUE ? d->get( index_, position_ ) : of.create_reference( d->get_ref( index_, position_ ) ) );
 	} else if ( baseType == HHuginn::TYPE::LOOKUP ) {
 		HHuginn::HLookup* l( static_cast<HHuginn::HLookup*>( base_.raw() ) );
-		res = ( subscript_ == HExpression::ACCESS::VALUE ? l->get( index_, position_ ) : l->get_ref( index_ ) );
+		res = ( subscript_ == HExpression::ACCESS::VALUE ? l->get( index_, position_ ) : of.create_reference( l->get_ref( index_ ) ) );
 	} else {
 		throw HHuginn::HHuginnRuntimeException( "Subscript is not supported on `"_ys.append( base_->get_class()->name() ).append( "'." ), position_ );
 	}

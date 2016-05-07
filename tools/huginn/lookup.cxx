@@ -198,9 +198,9 @@ void HHuginn::HLookup::erase( HHuginn::value_t const& key_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HLookup::get_ref( HHuginn::value_t const& key_ ) {
+HHuginn::value_t& HHuginn::HLookup::get_ref( HHuginn::value_t const& key_ ) {
 	M_PROLOG
-	return ( make_pointer<HReference>( _data[key_] ) );
+	return ( _data[key_] );
 	M_EPILOG
 }
 

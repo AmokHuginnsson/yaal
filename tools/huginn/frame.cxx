@@ -29,6 +29,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "frame.hxx"
 #include "thread.hxx"
+#include "objectfactory.hxx"
 #include "keyword.hxx"
 
 using namespace yaal;
@@ -137,7 +138,7 @@ HHuginn::value_t HFrame::get_field( HExpression::ACCESS access_, int index_ ) {
 		v = static_cast<HHuginn::HObject*>( obj->raw() )->field( *obj, index_ );
 	} else {
 		HHuginn::value_t& ref( static_cast<HHuginn::HObject*>( obj->raw() )->field_ref( index_ ) );
-	  v = make_pointer<HHuginn::HReference>( ref );
+	  v = _thread->huginn().object_factory()->create_reference( ref );
 	}
 	return ( v );
 	M_EPILOG
@@ -168,7 +169,7 @@ HHuginn::value_t HFrame::get_variable( HExpression::ACCESS access_, HStatement::
 	if ( access_ == HExpression::ACCESS::VALUE ) {
 		v = f->_variables[index_];
 	} else {
-	  v = make_pointer<HHuginn::HReference>( f->_variables[index_] );
+	  v = _thread->huginn().object_factory()->create_reference( f->_variables[index_] );
 	}
 	return ( v );
 	M_EPILOG
