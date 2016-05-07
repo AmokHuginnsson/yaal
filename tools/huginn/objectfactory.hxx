@@ -104,6 +104,13 @@ class HObjectFactory final {
 	typedef allocator::shared_pool<shared_reference_t::type> reference_allocator_t;
 	reference_pool_t _referencePool;
 	reference_allocator_t _referenceAllocator;
+	/* bound method pool */
+	typedef yaal::hcore::HPointer<HHuginn::HClass::HBoundMethod> bound_method_ptr_t;
+	typedef bound_method_ptr_t::allocated_shared<allocator::shared_pool<HHuginn::HClass::HBoundMethod>> shared_bound_method_t;
+	typedef yaal::hcore::HPool<shared_bound_method_t::size> bound_method_pool_t;
+	typedef allocator::shared_pool<shared_bound_method_t::type> bound_method_allocator_t;
+	bound_method_pool_t _boundMethodPool;
+	bound_method_allocator_t _boundMethodAllocator;
 public:
 	HObjectFactory( HHuginn* );
 	void register_builtin_classes( void );
@@ -160,6 +167,9 @@ public:
 	}
 	HHuginn::value_t create_reference( HHuginn::value_t& value_ ) const {
 		return ( yaal::hcore::allocate_pointer<reference_allocator_t, HHuginn::HReference>( _referenceAllocator, value_ ) );
+	}
+	HHuginn::value_t create_bound_method( HHuginn::HClass::HMethod const& method_, HHuginn::value_t const& object_ ) const {
+		return ( yaal::hcore::allocate_pointer<bound_method_allocator_t, HHuginn::HClass::HBoundMethod>( _boundMethodAllocator, method_, object_ ) );
 	}
 	HHuginn::HClass const* boolean_class( void ) const {
 		return ( _boolean.raw() );

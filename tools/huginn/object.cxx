@@ -30,6 +30,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
 #include "keyword.hxx"
 #include "thread.hxx"
+#include "objectfactory.hxx"
 #include "helper.hxx"
 
 using namespace yaal;
@@ -138,7 +139,7 @@ HHuginn::value_t HHuginn::HObject::do_field( HHuginn::value_t const& object_, in
 	value_t const& f( _fields[index_] );
 	bool isMethod( f->type_id() == TYPE::METHOD );
 	if ( isMethod ) {
-		return ( make_pointer<HClass::HBoundMethod>( *static_cast<HClass::HMethod const*>( f.raw() ), object_ ) );
+		return ( get_class()->huginn()->object_factory()->create_bound_method( *static_cast<HClass::HMethod const*>( f.raw() ), object_ ) );
 	}
 	return ( f );
 	M_EPILOG
