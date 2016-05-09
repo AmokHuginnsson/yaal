@@ -53,7 +53,7 @@ HDictionary::HDictionary( yaal::dbwrapper::database_ptr_t const& db_,
 void HDictionary::load( void ) {
 	M_PROLOG
 	_data.clear();
-	HRecordSet::ptr_t rs( _crud.execute( HCRUDDescriptor::MODE::SELECT ) );
+	HRecordSet::ptr_t rs( _crud.execute( HCRUDDescriptor::MODE::READ ) );
 	_data.resize( rs->get_size() );
 	for ( HRecordSet::values_t const& values : *rs ) {
 		M_ENSURE( values[0] && values[1] );

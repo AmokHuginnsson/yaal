@@ -44,15 +44,21 @@ namespace {
 static int const INVALID_CURSOR( -1 );
 }
 
-HRecordSet::HRecordSet( database_ptr_t dataBase_,
-		ODBConnector const* connector_, void* reuslt_, CURSOR cursor_ )
-	: _dataBase( dataBase_ ), _connector( connector_ ),
-	_result( reuslt_ ), _cursor( cursor_ ), _iterating( false ) {
+HRecordSet::HRecordSet(
+	database_ptr_t dataBase_,
+	ODBConnector const* connector_, void* reuslt_, CURSOR cursor_
+) : _dataBase( dataBase_ )
+	, _connector( connector_ )
+	, _result( reuslt_ )
+	, _cursor( cursor_ )
+	, _iterating( false ) {
 	M_PROLOG
-	if ( ( _cursor == CURSOR::RANDOM_ACCESS ) && ( get_size() < 0 ) )
+	if ( ( _cursor == CURSOR::RANDOM_ACCESS ) && ( get_size() < 0 ) ) {
 		log( LOG_LEVEL::ERROR ) << "SQL error (query): " << (_connector->dbrs_error)( _dataBase->_dbLink, _result ) << endl;
-	if ( get_field_count() < 0 )
+	}
+	if ( get_field_count() < 0 ) {
 		log( LOG_LEVEL::ERROR ) << "SQL error (fields count): " << (_connector->dbrs_error)( _dataBase->_dbLink, _result ) << endl;
+	}
 	return;
 	M_EPILOG
 }
@@ -74,6 +80,7 @@ void HRecordSet::clear( void ) {
 		}
 	}
 	_result = NULL;
+	return;
 	M_EPILOG
 }
 
@@ -125,8 +132,9 @@ HRecordSet::value_t HRecordSet::get( int cursor_, int field_ ) {
 	M_ENSURE( _cursor == CURSOR::RANDOM_ACCESS );
 	char const* valRaw( (_connector->rs_get)( _result, cursor_, field_ ) );
 	value_t value;
-	if ( valRaw )
+	if ( valRaw ) {
 		value = value_t( valRaw );
+	}
 	return ( value );
 	M_EPILOG
 }
@@ -158,18 +166,24 @@ HRecordSet::iterator HRecordSet::rend( void ) {
 }
 
 HRecordSet::HIterator::HIterator( HRecordSet* owner_, int long position_ )
-	: _owner( owner_ ), _cursorPosition( position_ ) {
+	: _owner( owner_ )
+	, _cursorPosition( position_ ) {
+	return;
 }
 
 HRecordSet::HIterator::HIterator( HIterator const& it )
-	: _owner( it._owner ), _cursorPosition( it._cursorPosition ) {
+	: _owner( it._owner )
+	, _cursorPosition( it._cursorPosition ) {
 	M_ASSERT( it._owner->_cursor == CURSOR::RANDOM_ACCESS );
+	return;
 }
 
 HRecordSet::HIterator::HIterator( HIterator&& it_ )
-	: _owner( it_._owner ), _cursorPosition( it_._cursorPosition ) {
+	: _owner( it_._owner )
+	, _cursorPosition( it_._cursorPosition ) {
 	it_._owner = nullptr;
 	it_._cursorPosition = INVALID_CURSOR;
+	return;
 }
 
 HRecordSet::HIterator& HRecordSet::HIterator::operator = ( HIterator const& it ) {
@@ -236,8 +250,9 @@ HRecordSet::value_t HRecordSet::HIterator::operator[] ( int field_ ) const {
 			? (_owner->_connector->rs_get)( _owner->_result, _cursorPosition, field_ )
 			: (_owner->_connector->rs_get_field)( _owner->_result, field_ ) );
 	value_t value;
-	if ( valRaw )
+	if ( valRaw ) {
 		value = value_t( valRaw );
+	}
 	return ( value );
 	M_EPILOG
 }

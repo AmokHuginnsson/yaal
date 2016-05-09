@@ -44,44 +44,75 @@ char const _eMode_[] = "record set is not in appropriate mode for operation";
 }
 
 HCRUDDescriptor::HCRUDDescriptor( void )
-	: _mode( MODE::SELECT ),
-	_varTmpBuffer(),
-	_SQL(),
-	_table(),
-	_columns( "*" ),
-	_idColumn(),
-	_filter(),
-	_sort(),
-	_fields(),
-	_fieldCount( 0 ),
-	_setSize( 0 ),
-	_values(),
-	_dataBase(),
-	_query(),
-	_mutated() {
+	: _mode( MODE::READ )
+	, _varTmpBuffer()
+	, _SQL()
+	, _table()
+	, _columns( "*" )
+	, _idColumn()
+	, _filter()
+	, _filterValue()
+	, _sort()
+	, _fields()
+	, _fieldCount( 0 )
+	, _setSize( 0 )
+	, _values()
+	, _dataBase()
+	, _query()
+	, _mutated() {
 	return;
 }
 
 HCRUDDescriptor::HCRUDDescriptor( database_ptr_t dataBase_ )
-	: _mode( MODE::SELECT ),
-	_varTmpBuffer(),
-	_SQL(),
-	_table(),
-	_columns( "*" ),
-	_idColumn(),
-	_filter(),
-	_sort(),
-	_fields(),
-	_fieldCount( 0 ),
-	_setSize( 0 ),
-	_values(),
-	_dataBase( dataBase_ ),
-	_query(),
-	_mutated() {
+	: _mode( MODE::READ )
+	, _varTmpBuffer()
+	, _SQL()
+	, _table()
+	, _columns( "*" )
+	, _idColumn()
+	, _filter()
+	, _filterValue()
+	, _sort()
+	, _fields()
+	, _fieldCount( 0 )
+	, _setSize( 0 )
+	, _values()
+	, _dataBase( dataBase_ )
+	, _query()
+	, _mutated() {
 	return;
 }
 
 HCRUDDescriptor::~HCRUDDescriptor( void ) {
+	return;
+}
+
+namespace {
+
+char const* cond_to_str( HCRUDDescriptor::OFilter::CONDITION condition_ ) {
+	char const* str( "" );
+	switch ( condition_ ) {
+		case ( HCRUDDescriptor::OFilter::CONDITION::EQUALS ):           str = " = ?";        break;
+		case ( HCRUDDescriptor::OFilter::CONDITION::NOT_EQUALS ):       str = " <> ?";       break;
+		case ( HCRUDDescriptor::OFilter::CONDITION::LESS ):             str = " < ?";        break;
+		case ( HCRUDDescriptor::OFilter::CONDITION::LESS_OR_EQUAL ):    str = " <= ?";       break;
+		case ( HCRUDDescriptor::OFilter::CONDITION::GREATER ):          str = " > ?";        break;
+		case ( HCRUDDescriptor::OFilter::CONDITION::GREATER_OR_EQUAL ): str = " >= ?";       break;
+		case ( HCRUDDescriptor::OFilter::CONDITION::IS_NULL ):          str = " IS NULL";    break;
+		case ( HCRUDDescriptor::OFilter::CONDITION::IS_NOT_NULL ):      str = "IS NOT NULL"; break;
+		default: {}
+	}
+	return ( str );
+}
+
+bool cond_req_bind( HCRUDDescriptor::OFilter::CONDITION condition_ ) {
+	return (
+		( condition_ != HCRUDDescriptor::OFilter::CONDITION::NONE )
+		&& ( condition_ != HCRUDDescriptor::OFilter::CONDITION::IS_NULL )
+		&& ( condition_ != HCRUDDescriptor::OFilter::CONDITION::IS_NOT_NULL )
+	);
+}
+
 }
 
 void HCRUDDescriptor::build_query( MODE mode_ ) {
@@ -92,16 +123,20 @@ void HCRUDDescriptor::build_query( MODE mode_ ) {
 	_varTmpBuffer.clear();
 	_query.reset();
 	switch ( mode_ ) {
-		case ( MODE::SELECT ): {
-			_SQL.format( "SELECT %s FROM %s", _columns.raw(),
-					_table.raw() );
-			if ( ! _filter.is_empty() ) {
-				_SQL += ( " WHERE " + _filter );
+		case ( MODE::READ ): {
+			_SQL.format( "SELECT %s FROM %s", _columns.raw(), _table.raw() );
+			OFilter const& readFilter( _filter[static_cast<int>( MODE::READ )] );
+			if ( readFilter._condition != OFilter::CONDITION::NONE ) {
+				_SQL.append( " WHERE " ).append( readFilter._column ).append( cond_to_str( readFilter._condition ) );
 			}
 			if ( ! _sort.is_empty() ) {
-				_SQL += ( " ORDER BY " + _sort );
+				_SQL.append( " ORDER BY " ).append( _sort );
 			}
 			_SQL += ';';
+			if ( cond_req_bind( readFilter._condition ) ) {
+				_query = _dataBase->prepare_query( _SQL );
+				_query->bind( 1, _filterValue );
+			}
 		}
 		break;
 		case ( MODE::UPDATE ): {
@@ -124,20 +159,24 @@ void HCRUDDescriptor::build_query( MODE mode_ ) {
 					}
 				}
 			}
-			if ( ! _filter.is_empty() ) {
-				_SQL += " WHERE ";
-				_SQL += _filter;
+			OFilter const& updateFilter( _filter[static_cast<int>( MODE::UPDATE )] );
+			if ( updateFilter._condition != OFilter::CONDITION::NONE ) {
+				_SQL.append( " WHERE " ).append( updateFilter._column ).append( cond_to_str( updateFilter._condition ) );
 			}
 			_SQL += ';';
 			_query = _dataBase->prepare_query( _SQL );
-			for ( int i( 0 ), pos( 1 ); i < size; ++ i ) {
+			int pos( 1 );
+			for ( int i( 0 ); i < size; ++ i ) {
 				if ( _mutated[i] && !! _values[i] ) {
 					_query->bind( pos ++, *_values[ i ] );
 				}
 			}
+			if ( cond_req_bind( updateFilter._condition ) ) {
+				_query->bind( pos, _filterValue );
+			}
 		}
 		break;
-		case ( MODE::INSERT ): {
+		case ( MODE::CREATE ): {
 			verify_dml();
 			_SQL = "INSERT INTO " + _table + " ( ";
 			M_ENSURE( _fields.get_size() == _values.get_size() );
@@ -175,12 +214,15 @@ void HCRUDDescriptor::build_query( MODE mode_ ) {
 		case ( MODE::DELETE ): {
 			_SQL = "DELETE FROM ";
 			_SQL += _table;
-			if ( ! _filter.is_empty() ) {
-				_SQL += " WHERE ";
-				_SQL += _filter;
+			OFilter const& deleteFilter( _filter[static_cast<int>( MODE::DELETE )] );
+			if ( deleteFilter._condition != OFilter::CONDITION::NONE ) {
+				_SQL.append( " WHERE " ).append( deleteFilter._column ).append( cond_to_str( deleteFilter._condition ) );
 			}
 			_SQL += ";";
 			_query = _dataBase->prepare_query( _SQL );
+			if ( cond_req_bind( deleteFilter._condition ) ) {
+				_query->bind( 1, _filterValue );
+			}
 		}
 		break;
 		default :
@@ -210,9 +252,11 @@ void HCRUDDescriptor::verify_dml( void ) {
 HRecordSet::ptr_t HCRUDDescriptor::execute( void ) {
 	M_PROLOG
 	HRecordSet::ptr_t rs = !! _query ? _query->execute() : _dataBase->execute_query( _SQL );
-	if ( _mode == MODE::SELECT ) {
+	if ( _mode == MODE::READ ) {
 		_fieldCount = rs->get_field_count();
-		_setSize = rs->get_size();
+		if ( ! _query ) {
+			_setSize = rs->get_size();
+		}
 		if ( _fields.get_size() != _fieldCount ) {
 			_fields.resize( _fieldCount );
 			_values.resize( _fieldCount );
@@ -246,7 +290,7 @@ HRecordSet::ptr_t HCRUDDescriptor::execute( HString const& query_ ) {
 
 void HCRUDDescriptor::sync( int field_, HString& value ) {
 	M_PROLOG
-	if ( _mode == MODE::SELECT ) {
+	if ( _mode == MODE::READ ) {
 		if ( _values[ field_ ] ) {
 			value = *_values[ field_ ];
 		} else {
@@ -262,7 +306,7 @@ void HCRUDDescriptor::sync( int field_, HString& value ) {
 
 void HCRUDDescriptor::sync( int field_, HTime& value ) {
 	M_PROLOG
-	if ( _mode == MODE::SELECT ) {
+	if ( _mode == MODE::READ ) {
 		if ( _values[ field_ ] ) {
 			value.from_string( *_values[ field_ ] );
 		} else {
@@ -278,7 +322,7 @@ void HCRUDDescriptor::sync( int field_, HTime& value ) {
 
 void HCRUDDescriptor::sync( int field_, int long& value ) {
 	M_PROLOG
-	if ( _mode == MODE::SELECT ) {
+	if ( _mode == MODE::READ ) {
 		if ( _values[ field_ ] )
 			value = lexical_cast<int long>( *_values[ field_ ] );
 		else
@@ -343,9 +387,26 @@ void HCRUDDescriptor::set_id_column( yaal::hcore::HString const& idColumn_ ) {
 	M_EPILOG
 }
 
-void HCRUDDescriptor::set_filter( yaal::hcore::HString const& filter_ ) {
+void HCRUDDescriptor::set_filter( yaal::hcore::HString const& column_, OFilter::CONDITION condition_ ) {
 	M_PROLOG
-	_filter = filter_;
+	set_filter( column_, MODE::READ, condition_ );
+	set_filter( column_, MODE::UPDATE, condition_ );
+	set_filter( column_, MODE::DELETE, condition_ );
+	return;
+	M_EPILOG
+}
+
+void HCRUDDescriptor::set_filter( yaal::hcore::HString const& column_, MODE mode_, OFilter::CONDITION condition_ ) {
+	M_PROLOG
+	_filter[static_cast<int>( mode_ )]._column = column_;
+	_filter[static_cast<int>( mode_ )]._condition = condition_;
+	return;
+	M_EPILOG
+}
+
+void HCRUDDescriptor::set_filter_value( yaal::hcore::HString const& value_ ) {
+	M_PROLOG
+	_filterValue = value_;
 	return;
 	M_EPILOG
 }
@@ -366,7 +427,10 @@ HString HCRUDDescriptor::get_columns( void ) const {
 }
 
 HString HCRUDDescriptor::get_filter( void ) const {
-	return ( _filter );
+	OFilter const& filterInfo( _filter[static_cast<int>( _mode )] );
+	HString filterStr( filterInfo._column );
+	filterStr.append( cond_to_str( filterInfo._condition ) ).replace( "?", _filterValue );
+	return ( filterStr );
 }
 
 HString HCRUDDescriptor::get_sort( void ) const {

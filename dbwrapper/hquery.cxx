@@ -45,9 +45,11 @@ HQuery::HQuery(
 		ODBConnector const* connector_,
 		yaal::hcore::HString const& sql_,
 		void* query_
-) : _dataBase( database_ ), _connector( connector_ ),
-	_query( query_ ), _sql( sql_ ),
-	_bindBuffer() {
+) : _dataBase( database_ )
+	, _connector( connector_ )
+	, _query( query_ )
+	, _sql( sql_ )
+	, _bindBuffer() {
 	return;
 }
 

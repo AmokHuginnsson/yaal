@@ -41,8 +41,10 @@ namespace yaal {
 
 namespace dbwrapper {
 
-HDataBase::HDataBase( void ) : HPointerFromThisInterface<HDataBase>(),
-	_connector( NULL ), _dbLink() {
+HDataBase::HDataBase( void )
+	: HPointerFromThisInterface<HDataBase>()
+	, _connector( NULL )
+	, _dbLink() {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -63,8 +65,7 @@ void HDataBase::connect( yaal::hcore::HString const& dataBase_, yaal::hcore::HSt
 	M_PROLOG
 	M_ASSERT( _connector && _connector->db_connect );
 	if ( ! (_connector->db_connect)( _dbLink, dataBase_, login_, password_, server_ ) ) {
-		M_THROW( (_connector->dbrs_error)( _dbLink, NULL ),
-				(_connector->dbrs_errno)( _dbLink, NULL ) );
+		M_THROW( (_connector->dbrs_error)( _dbLink, NULL ), (_connector->dbrs_errno)( _dbLink, NULL ) );
 	}
 	return;
 	M_EPILOG

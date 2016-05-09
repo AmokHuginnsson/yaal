@@ -99,9 +99,8 @@ void HDataListWidget::make_crud( int long id_ ) {
 		_crud->set_table( _table );
 		_crud->set_columns( _columns );
 		if ( ! _filterColumn.is_empty() ) {
-			HString filter( _filterColumn );
-			filter.append( " = " ).append( to_string( id_ ) );
-			_crud->set_filter( filter );
+			_crud->set_filter( _filterColumn );
+			_crud->set_filter_value( to_string( id_ ) );
 		}
 		_crud->set_sort( _sort );
 	}
@@ -114,7 +113,7 @@ void HDataListWidget::do_load( int long id_ ) {
 	make_crud( id_ );
 	HDataWindow* parent( dynamic_cast<HDataWindow*>( _window ) );
 	M_ASSERT( parent );
-	HRecordSet::ptr_t rs( _viewQuery.is_empty() ? _crud->execute( HCRUDDescriptor::MODE::SELECT ) : _crud->execute( _viewQuery ) );
+	HRecordSet::ptr_t rs( _viewQuery.is_empty() ? _crud->execute( HCRUDDescriptor::MODE::READ ) : _crud->execute( _viewQuery ) );
 	int idColNo( -1 );
 	int const colCount = rs->get_field_count();
 	for ( int i = 0; i < colCount; ++ i ) {
@@ -165,7 +164,7 @@ void HDataListWidget::do_save( int long id_ ) {
 	M_PROLOG
 	make_crud( id_ );
 	_crud->set_columns( _idColumn );
-	HRecordSet::ptr_t rs( _crud->execute( HCRUDDescriptor::MODE::SELECT ) );
+	HRecordSet::ptr_t rs( _crud->execute( HCRUDDescriptor::MODE::READ ) );
 	typedef HSet<int> ids_t;
 	ids_t ids;
 	for ( HRecordSet::values_t const& values : *rs ) {
@@ -178,11 +177,10 @@ void HDataListWidget::do_save( int long id_ ) {
 	M_ENSURE( columnNames.back().trim() == _idColumn );
 	columnNames.pop_back(); /* remove `id' column */
 	int columns( static_cast<int>( columnNames.get_size() ) );
-	HString filter;
 	for ( HItem<> const& item : *data ) {
 		if ( item._id > 0 ) {
-			filter.assign( _idColumn ).append( " = " ).append( to_string( item._id ) );
-			_crud->set_filter( filter );
+			_crud->set_filter( _idColumn );
+			_crud->set_filter_value( to_string( item._id ) );
 			for ( int i( 0 ); i < columns; ++ i ) {
 				sync( (*_crud)[i], item[i], _header[i]->type() );
 			}
@@ -198,12 +196,12 @@ void HDataListWidget::do_save( int long id_ ) {
 				sync( (*_crud)[i], item[i], _header[i]->type() );
 			}
 			(*_crud)[columns] = to_string( id_ );
-			_crud->execute( HCRUDDescriptor::MODE::INSERT );
+			_crud->execute( HCRUDDescriptor::MODE::CREATE );
 		}
 	}
 	for ( int id : ids ) {
-		filter.assign( _idColumn ).append( " = " ).append( to_string( id ) );
-		_crud->set_filter( filter );
+		_crud->set_filter( _idColumn );
+		_crud->set_filter_value( to_string( id ) );
 		_crud->execute( HCRUDDescriptor::MODE::DELETE );
 	}
 	return;

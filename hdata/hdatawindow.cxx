@@ -56,7 +56,7 @@ HDataWindow::HDataWindow( HString const& title_, HDataProcess* owner_ )
 	_modified( false ), _documentMode( DOCUMENT::VIEW ), _mainWidget( NULL ),
 	_viewModeWidgets(), _editModeWidgets(),
 	_crud( new ( memory::yaal ) HCRUDDescriptor( owner_->data_base() ) ),
-	_mode( HCRUDDescriptor::MODE::SELECT ),
+	_mode( HCRUDDescriptor::MODE::READ ),
 	_columns(), _idColumnName(), _dictionaries() {
 	M_PROLOG
 	register_postprocess_handler( KEY<'n'>::command, NULL, call( &HDataWindow::handler_add_new, this, _1 ) );
@@ -151,7 +151,7 @@ bool HDataWindow::handler_add_new( hconsole::HEvent const& ) {
 				_( "You cannot add new record now." ) );
 		return ( true );
 	}
-	_mode = HCRUDDescriptor::MODE::INSERT;
+	_mode = HCRUDDescriptor::MODE::CREATE;
 	if ( _mainWidget )
 		_mainWidget->add_new();
 	set_mode( DOCUMENT::EDIT );
@@ -190,9 +190,7 @@ bool HDataWindow::handler_delete( hconsole::HEvent const& ) {
 		return ( true );
 	}
 	if ( _mainWidget ) {
-		HString filter;
-		filter.format( "id = %ld", _mainWidget->get_current_id() );
-		_crud->set_filter( filter );
+		_crud->set_filter_value( _mainWidget->get_current_id() );
 		_crud->execute( HCRUDDescriptor::MODE::DELETE );
 		_mainWidget->load();
 	}
@@ -206,7 +204,7 @@ bool HDataWindow::handler_save( hconsole::HEvent const& ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED, "%s", _( "There is nothing to save." ) );
 		return ( true );
 	}
-	if ( ( _mode == HCRUDDescriptor::MODE::INSERT ) || ( _mode == HCRUDDescriptor::MODE::UPDATE ) ) {
+	if ( ( _mode == HCRUDDescriptor::MODE::CREATE ) || ( _mode == HCRUDDescriptor::MODE::UPDATE ) ) {
 		for ( HDataWidget* dw : _editModeWidgets ) {
 			HDataEditWidget* dew( dynamic_cast<HDataEditWidget*>( dw ) );
 			if ( dew && ! dew->is_valid() ) {
@@ -218,16 +216,14 @@ bool HDataWindow::handler_save( hconsole::HEvent const& ) {
 	int long id( _mainWidget->get_current_id() );
 	_crud->set_columns( _columns );
 	if ( _mode == HCRUDDescriptor::MODE::UPDATE ) {
-		HString filter;
-		filter.assign( _idColumnName ).append( " = " ).append( to_string( id ) );
-		_crud->set_filter( filter );
+		_crud->set_filter_value( to_string( id ) );
 	}
 	sync();
 	HRecordSet::ptr_t rs = _crud->execute( _mode );
 	if ( rs->get_errno() ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED, "%s", rs->get_error() );
 	} else {
-		if ( _mode == HCRUDDescriptor::MODE::INSERT ) {
+		if ( _mode == HCRUDDescriptor::MODE::CREATE ) {
 			id = rs->get_insert_id();
 		}
 		for ( HDataWidget* dw : _editModeWidgets ) {
@@ -235,7 +231,6 @@ bool HDataWindow::handler_save( hconsole::HEvent const& ) {
 		}
 		_modified = false;
 		set_mode( DOCUMENT::VIEW );
-		_crud->set_filter( "" );
 		_mainWidget->load();
 	}
 	reload_record();
@@ -266,7 +261,7 @@ bool HDataWindow::handler_cancel( hconsole::HEvent const& ) {
 		return ( true );
 	}
 	set_mode( DOCUMENT::VIEW );
-	if ( ( _mode == HCRUDDescriptor::MODE::INSERT ) && _mainWidget ) {
+	if ( ( _mode == HCRUDDescriptor::MODE::CREATE ) && _mainWidget ) {
 		_mainWidget->cancel_new();
 	}
 	_modified = false;
@@ -348,7 +343,8 @@ void HDataWindow::set_record_descriptor( yaal::hcore::HString const& table_,
 	_columns.pop_back();
 	_crud->set_columns( _columns );
 	_crud->set_id_column( idCol_ );
-	_crud->set_filter( filter_ );
+	_crud->set_filter( idCol_ );
+	_crud->set_filter( filter_, HCRUDDescriptor::MODE::READ, HCRUDDescriptor::OFilter::CONDITION::NONE );
 	_crud->set_sort( sort_ );
 	_idColumnName = idCol_;
 	_mainWidget->set_crud_descriptor( _crud );

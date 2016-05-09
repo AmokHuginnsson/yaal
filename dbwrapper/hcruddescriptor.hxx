@@ -48,10 +48,29 @@ public:
 	/*! \brief Query types.
 	 */
 	enum class MODE {
-		SELECT, /*!< SELECT query. */
-		UPDATE, /*!< Data update query. */
-		INSERT, /*!< INSERT new data query. */
+		CREATE, /*!< INSERT new data query. */
+		READ,   /*!< Read one record with SELECT query. */
+		UPDATE, /*!< Data UPDATE query. */
 		DELETE  /*!< DELETE data query. */
+	};
+	struct OFilter {
+		enum class CONDITION {
+			NONE,
+			EQUALS,
+			NOT_EQUALS,
+			LESS,
+			LESS_OR_EQUAL,
+			GREATER,
+			GREATER_OR_EQUAL,
+			IS_NULL,
+			IS_NOT_NULL
+		};
+		yaal::hcore::HString _column;
+		CONDITION _condition;
+		OFilter( void )
+			: _column()
+			, _condition( CONDITION::NONE ) {
+		}
 	};
 private:
 	MODE _mode;
@@ -60,7 +79,8 @@ private:
 	yaal::hcore::HString _table;    /* table name */
 	yaal::hcore::HString _columns;  /* columns that should be returned by next query */
 	yaal::hcore::HString _idColumn; /* column that identifies row for UPDATE and DELETE query */
-	yaal::hcore::HString _filter;   /* additional constant filter (WHERE clause) */
+	OFilter _filter[4];   /* additional constant filter (WHERE clause) */
+	yaal::hcore::HString _filterValue;
 	yaal::hcore::HString _sort;     /* additional constant sort (ORDER BY clause) */
 	typedef HRecordSet::values_t values_t;
 	typedef yaal::hcore::HArray<bool> mutated_t;
@@ -80,7 +100,9 @@ public:
 	void set_columns( field_names_t&& );
 	void set_columns( field_names_t const& );
 	void set_id_column( yaal::hcore::HString const& );
-	void set_filter( yaal::hcore::HString const& );
+	void set_filter( yaal::hcore::HString const&, OFilter::CONDITION = OFilter::CONDITION::EQUALS );
+	void set_filter( yaal::hcore::HString const&, MODE, OFilter::CONDITION = OFilter::CONDITION::EQUALS );
+	void set_filter_value( yaal::hcore::HString const& );
 	void set_sort( yaal::hcore::HString const& );
 	yaal::hcore::HString get_table( void ) const;
 	yaal::hcore::HString get_columns( void ) const;
