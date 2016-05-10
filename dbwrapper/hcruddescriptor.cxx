@@ -92,14 +92,14 @@ namespace {
 char const* cond_to_str( HCRUDDescriptor::OFilter::CONDITION condition_ ) {
 	char const* str( "" );
 	switch ( condition_ ) {
-		case ( HCRUDDescriptor::OFilter::CONDITION::EQUALS ):           str = " = ?";        break;
-		case ( HCRUDDescriptor::OFilter::CONDITION::NOT_EQUALS ):       str = " <> ?";       break;
-		case ( HCRUDDescriptor::OFilter::CONDITION::LESS ):             str = " < ?";        break;
-		case ( HCRUDDescriptor::OFilter::CONDITION::LESS_OR_EQUAL ):    str = " <= ?";       break;
-		case ( HCRUDDescriptor::OFilter::CONDITION::GREATER ):          str = " > ?";        break;
-		case ( HCRUDDescriptor::OFilter::CONDITION::GREATER_OR_EQUAL ): str = " >= ?";       break;
-		case ( HCRUDDescriptor::OFilter::CONDITION::IS_NULL ):          str = " IS NULL";    break;
-		case ( HCRUDDescriptor::OFilter::CONDITION::IS_NOT_NULL ):      str = "IS NOT NULL"; break;
+		case ( HCRUDDescriptor::OFilter::CONDITION::EQUALS ):           str = " = ?";         break;
+		case ( HCRUDDescriptor::OFilter::CONDITION::NOT_EQUALS ):       str = " <> ?";        break;
+		case ( HCRUDDescriptor::OFilter::CONDITION::LESS ):             str = " < ?";         break;
+		case ( HCRUDDescriptor::OFilter::CONDITION::LESS_OR_EQUAL ):    str = " <= ?";        break;
+		case ( HCRUDDescriptor::OFilter::CONDITION::GREATER ):          str = " > ?";         break;
+		case ( HCRUDDescriptor::OFilter::CONDITION::GREATER_OR_EQUAL ): str = " >= ?";        break;
+		case ( HCRUDDescriptor::OFilter::CONDITION::IS_NULL ):          str = " IS NULL";     break;
+		case ( HCRUDDescriptor::OFilter::CONDITION::IS_NOT_NULL ):      str = " IS NOT NULL"; break;
 		default: {}
 	}
 	return ( str );
