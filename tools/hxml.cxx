@@ -1339,6 +1339,22 @@ HXml::HConstNodeProxy HXml::get_element_by_id( yaal::hcore::HString const& id ) 
 	M_EPILOG
 }
 
+HXml::HNodeSet HXml::get_elements_by_name( yaal::hcore::HString const& name_ ) {
+	return ( HNodeProxy( _domTree.get_root() ).get_elements_by_name( name_ ) );
+}
+
+HXml::HConstNodeSet HXml::get_elements_by_name( yaal::hcore::HString const& name_ ) const {
+	return ( HConstNodeProxy( _domTree.get_root() ).get_elements_by_name( name_ ) );
+}
+
+HXml::HNodeSet HXml::get_elements_by_path( yaal::hcore::HString const& name_ ) {
+	return ( HNodeProxy( _domTree.get_root() ).get_elements_by_path( name_ ) );
+}
+
+HXml::HConstNodeSet HXml::get_elements_by_path( yaal::hcore::HString const& name_ ) const {
+	return ( HConstNodeProxy( _domTree.get_root() ).get_elements_by_path( name_ ) );
+}
+
 HXml::HIterator HXml::HNodeProxy::remove_node( HXml::HIterator it ) {
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
@@ -1347,7 +1363,7 @@ HXml::HIterator HXml::HNodeProxy::remove_node( HXml::HIterator it ) {
 	M_EPILOG
 }
 
-void HXml::get_elements_by_path( HXml::HConstNodeSet& ns_, const_xml_element_t node,
+void HXml::HConstNodeProxy::get_elements_by_path( HXml::HConstNodeSet& ns_, const_xml_element_t node,
 		HTokenizer const& path, HTokenizer::iterator part ) const {
 	M_PROLOG
 	const_xml_element_t result = NULL;
@@ -1370,7 +1386,7 @@ void HXml::get_elements_by_path( HXml::HConstNodeSet& ns_, const_xml_element_t n
 	M_EPILOG
 }
 
-HXml::HNodeSet HXml::get_elements_by_path( yaal::hcore::HString const& path_ ) {
+HXml::HNodeSet HXml::HNodeProxy::get_elements_by_path( yaal::hcore::HString const& path_ ) {
 	M_PROLOG
 	HString path( path_ );
 	path.trim_right( "/" );
@@ -1380,14 +1396,14 @@ HXml::HNodeSet HXml::get_elements_by_path( yaal::hcore::HString const& path_ ) {
 	if ( it != t.end() ) {
 		++ it;
 		if ( it != t.end() ) {
-			get_elements_by_path( ns, _domTree.get_root(), t, it );
+			get_elements_by_path( ns, _node, t, it );
 		}
 	}
 	return ( ns );
 	M_EPILOG
 }
 
-HXml::HConstNodeSet HXml::get_elements_by_path( yaal::hcore::HString const& path_ ) const {
+HXml::HConstNodeSet HXml::HConstNodeProxy::get_elements_by_path( yaal::hcore::HString const& path_ ) const {
 	M_PROLOG
 	HString path( path_ );
 	path.trim_right( "/" );
@@ -1397,30 +1413,30 @@ HXml::HConstNodeSet HXml::get_elements_by_path( yaal::hcore::HString const& path
 	if ( it != t.end() ) {
 		++ it;
 		if ( it != t.end() ) {
-			get_elements_by_path( ns, _domTree.get_root(), t, it );
+			get_elements_by_path( ns, _node, t, it );
 		}
 	}
 	return ( ns );
 	M_EPILOG
 }
 
-HXml::HConstNodeSet HXml::get_elements_by_name( yaal::hcore::HString const& name_ ) const {
+HXml::HConstNodeSet HXml::HConstNodeProxy::get_elements_by_name( yaal::hcore::HString const& name_ ) const {
 	M_PROLOG
 	HConstNodeSet ns;
-	get_elements_by_name( ns, _domTree.get_root(), name_ );
+	get_elements_by_name( ns, _node, name_ );
 	return ( ns );
 	M_EPILOG
 }
 
-HXml::HNodeSet HXml::get_elements_by_name( yaal::hcore::HString const& name_ ) {
+HXml::HNodeSet HXml::HNodeProxy::get_elements_by_name( yaal::hcore::HString const& name_ ) {
 	M_PROLOG
 	HNodeSet ns;
-	get_elements_by_name( ns, const_cast<const_xml_element_t>( _domTree.get_root() ), name_ );
+	get_elements_by_name( ns, const_cast<const_xml_element_t>( _node ), name_ );
 	return ( ns );
 	M_EPILOG
 }
 
-void HXml::get_elements_by_name( yaal::tools::HXml::HConstNodeSet& ns_, const_xml_element_t node_, yaal::hcore::HString const& name_ ) const {
+void HXml::HConstNodeProxy::get_elements_by_name( yaal::tools::HXml::HConstNodeSet& ns_, const_xml_element_t node_, yaal::hcore::HString const& name_ ) const {
 	M_PROLOG
 	if ( (**node_)._text == name_ ) {
 		ns_.add( node_ );

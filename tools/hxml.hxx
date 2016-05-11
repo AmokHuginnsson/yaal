@@ -138,8 +138,6 @@ private:
 	yaal::hcore::HString const& convert( yaal::hcore::HString const&, way_t = TO_INTERNAL ) const;
 	int get_node_set_by_path( yaal::hcore::HString const& );
 	const_xml_element_t get_element_by_id( const_xml_element_t const&, yaal::hcore::HString const& ) const;
-	void get_elements_by_path( HConstNodeSet&, const_xml_element_t, yaal::hcore::HTokenizer const&, yaal::hcore::HTokenizer::iterator ) const;
-	void get_elements_by_name( HConstNodeSet&, const_xml_element_t, yaal::hcore::HString const& ) const;
 	void parse_dtd( void* );
 	char const* error_message( int ) const;
 };
@@ -237,6 +235,8 @@ public:
 	const_reverse_iterator rbegin() const;
 	const_reverse_iterator rend() const;
 	HXml const* xml( void ) const;
+	HConstNodeSet get_elements_by_path( yaal::hcore::HString const& ) const;
+	HConstNodeSet get_elements_by_name( yaal::hcore::HString const& ) const;
 	HXml::HNode::TYPE get_type() const;
 	bool has_childs( void ) const;
 	int long child_count( void ) const;
@@ -256,6 +256,8 @@ public:
 	bool operator != ( HConstNodeProxy const& ) const;
 	bool operator ! ( void ) const;
 private:
+	void get_elements_by_path( HConstNodeSet&, const_xml_element_t, yaal::hcore::HTokenizer const&, yaal::hcore::HTokenizer::iterator ) const;
+	void get_elements_by_name( HConstNodeSet&, const_xml_element_t, yaal::hcore::HString const& ) const;
 	friend class HXml;
 	friend class HXml::HConstIterator;
 	HConstNodeProxy( HXml::tree_t::const_node_t );
@@ -279,6 +281,10 @@ public:
 	reverse_iterator rend();
 	using HConstNodeProxy::rend;
 	HXml* xml( void );
+	using HConstNodeProxy::get_elements_by_path;
+	HNodeSet get_elements_by_path( yaal::hcore::HString const& );
+	using HConstNodeProxy::get_elements_by_name;
+	HNodeSet get_elements_by_name( yaal::hcore::HString const& );
 	using HConstNodeProxy::xml;
 	void set_name( yaal::hcore::HString const& );
 	void set_value( yaal::hcore::HString const& );
