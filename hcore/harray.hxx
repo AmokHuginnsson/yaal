@@ -219,8 +219,9 @@ public:
 		if ( arr_._size > 0 ) {
 			reserve( arr_._size );
 			_size = arr_._size;
-			for ( int long i = 0; i < _size; ++ i )
+			for ( int long i = 0; i < _size; ++ i ) {
 				new ( _buf + i ) value_type( arr_._buf[ i ] );
+			}
 		}
 		return;
 		M_EPILOG
@@ -237,7 +238,10 @@ public:
 	 */
 	void clear( void ) {
 		M_PROLOG
-		erase( begin(), end() );
+		while ( _size > 0 ) {
+			M_SAFE( _buf[ _size - 1 ].~value_type() );
+			-- _size;
+		}
 		return;
 		M_EPILOG
 	}
@@ -255,11 +259,13 @@ public:
 			} else {
 				copy_n( arr_._buf, min( _size, arr_._size ), _buf );
 				if ( arr_._size > _size ) {
-					for ( int long i = _size; i < arr_._size; ++ i )
+					for ( int long i = _size; i < arr_._size; ++ i ) {
 						new ( _buf + i ) value_type( arr_._buf[ i ] );
+					}
 				} else if ( arr_._size < _size ) {
-					for ( int long i = arr_._size; i < _size; ++ i )
+					for ( int long i = arr_._size; i < _size; ++ i ) {
 						M_SAFE( _buf[ i ].~value_type() );
+					}
 				}
 				_size = arr_._size;
 			}
