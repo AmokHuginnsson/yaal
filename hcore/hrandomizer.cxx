@@ -32,6 +32,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hrandomizer.hxx"
 #include "hexception.hxx"
 #include "algorithm.hxx"
+#include "system.hxx"
 
 namespace yaal {
 
@@ -54,8 +55,11 @@ private:
 	u32_t _jcong;
 public:
 	HSimpleRandom( u32_t seed_ )
-		: _z( seed_ ^ 362436069 ), _w( seed_ ^ 521288629 ), _jsr( seed_ ^ 123456789 ), _jcong( seed_ ^ 380116160 )
-		{}
+		: _z( seed_ ^ 362436069 )
+		, _w( seed_ ^ 521288629 )
+		, _jsr( seed_ ^ 123456789 )
+		, _jcong( seed_ ^ 380116160 ) {
+	}
 	u32_t operator()( void ) {
 		return ( ( mwc() ^ cong() ) + shr3() );
 	}
@@ -81,7 +85,9 @@ private:
 };
 
 HRandomizer::HRandomizer( u64_t seed_, u64_t cap_ )
-	: _index( STATE_SIZE + 1 ), _range( cap_ ), _state() {
+	: _index( STATE_SIZE + 1 )
+	, _range( cap_ )
+	, _state() {
 	M_PROLOG
 	HSimpleRandom sr( static_cast<u32_t>( ( seed_ >> 32 ) ^ seed_ ) );
 	u64_t state[STATE_SIZE];
@@ -96,7 +102,9 @@ HRandomizer::HRandomizer( u64_t seed_, u64_t cap_ )
 }
 
 HRandomizer::HRandomizer( u64_t const* stateFirst_, u64_t const* stateLast_, u64_t cap_ )
-	: _index( STATE_SIZE + 1 ), _range( cap_ ), _state() {
+	: _index( STATE_SIZE + 1 )
+	, _range( cap_ )
+	, _state() {
 	M_PROLOG
 	M_ASSERT( stateFirst_ && stateLast_ );
 	M_ASSERT( stateFirst_ != stateLast_ );
@@ -198,9 +206,9 @@ namespace randomizer_helper {
 
 HRandomizer make_randomizer( u64_t cap_ ) {
 	M_PROLOG
-		struct timeval tv;
+	struct timeval tv;
 	M_ENSURE( gettimeofday( &tv, NULL ) == 0 );
-	return ( HRandomizer( static_cast<u64_t>( tv.tv_sec + tv.tv_usec ), cap_ ) );
+	return ( HRandomizer( static_cast<u64_t>( tv.tv_sec + tv.tv_usec + system::getpid() ), cap_ ) );
 	M_EPILOG
 }
 
