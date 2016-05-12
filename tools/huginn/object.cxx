@@ -197,7 +197,7 @@ HHuginn::value_t HHuginn::HObject::do_clone( HHuginn* huginn_ ) const {
 	for ( value_t const& v : _fields ) {
 		fields.push_back( v->clone( huginn_ ) );
 	}
-	return ( make_pointer<HObject>( get_class(), fields ) );
+	return ( huginn_->object_factory()->create_object( get_class(), fields ) );
 	M_EPILOG
 }
 

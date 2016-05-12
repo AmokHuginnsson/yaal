@@ -119,7 +119,9 @@ HObjectFactory::HObjectFactory( HHuginn* huginn_ )
 	, _referencePool()
 	, _referenceAllocator( _referencePool )
 	, _boundMethodPool()
-	, _boundMethodAllocator( _boundMethodPool ) {
+	, _boundMethodAllocator( _boundMethodPool )
+	, _objectPool()
+	, _objectAllocator( _objectPool ) {
 	return;
 }
 

@@ -29,6 +29,8 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
 #include "keyword.hxx"
+#include "thread.hxx"
+#include "objectfactory.hxx"
 #include "compiler.hxx"
 #include "helper.hxx"
 
@@ -111,7 +113,7 @@ HHuginn::value_t HHuginn::HClass::create_instance( huginn::HThread* thread_, val
 
 HHuginn::value_t HHuginn::HClass::do_create_instance( huginn::HThread* thread_, values_t const& values_, int position_ ) const {
 	M_PROLOG
-	value_t v( make_pointer<HObject>( this ) );
+	value_t v( thread_->huginn().object_factory()->create_object( this ) );
 	int constructorIdx( field_index( KEYWORD::CONSTRUCTOR_IDENTIFIER ) );
 	if ( constructorIdx >= 0 ) {
 		function( constructorIdx )( thread_, &v, values_, position_ );
