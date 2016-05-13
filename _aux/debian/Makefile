@@ -41,9 +41,7 @@ $(CHANGELOG): $(VERIFY_DIR)
 	@/bin/rm -f $(CHANGELOG) && \
 	cd ../../ && \
 	if [ ! -d debian ] ; then cp -a ./_aux/debian . ; fi && \
-	$(DCH) --create --vendor CodeStation.Org --newversion $(VERSION) --package yaal "Vendor Release." && \
-	$(DCH) --append "commit: $(COMMIT)" && \
-	dch --release release
+	./_aux/mkchangelog debian/changelog
 
 $(ARTIFACTS_TARGET): $(VERIFY_DIR) $(CHANGELOG)
 	@cd ../../ && \

@@ -1,0 +1,101 @@
+#! /bin/sh
+
+if [ ! \( -f .git/config -a -f Makefile.mk.in \) ] ; then
+	echo "${0} must be executed from project root directory."
+	exit 1
+fi
+
+if [ ${#} -ne 1 ] ; then
+	echo "Changelog path is a requred parameter."
+	exit 1
+fi
+
+CHANGELOG="${1}"
+CODENAME=`lsb_release -sc | tr A-Z a-z`
+PROJECT=`awk -F '= ' '/^PRJNAME.*=/{print $2}' Makefile.mk.in`
+
+if [ -f "${CHANGELOG}" ] ; then
+	echo "Changelog file already exits"
+	exit 1
+fi
+
+git_get_author() {
+	REF="${1}"
+	git log --no-color -n 1 --pretty=format:"%an" "${REF}"
+}
+
+git_get_date() {
+	REF="${1}"
+	git log --no-color -n 1 --pretty=format:"%aD" "${REF}"
+}
+
+git_get_email() {
+	REF="${1}"
+	git log --no-color -n 1 --pretty=format:"%ae" "${REF}"
+}
+
+git_get_body_from_tag() {
+	TAG="${1}"
+	git tag -n100 -l ${TAG} | tail -n+3 | sed -e 's/^    /  /'
+}
+
+gen_changelog_entry() {
+	if [ -f "${CHANGELOG}" ] ; then
+		mv -f "${CHANGELOG}" "${CHANGELOG}.tmp"
+	fi
+	TAG="${1}"
+	VERSION=`echo "${TAG}" | awk -F '-' '{print $2}'`
+	AUTHOR=`git_get_author "${TAG}"`
+	EMAIL=`git_get_email "${TAG}"`
+	DATE=`git_get_date "${TAG}"`
+	BODY=`git_get_body_from_tag "${TAG}"`
+	cat > "${CHANGELOG}" << EOF
+${PROJECT} (${VERSION}) ${CODENAME}; urgency=medium
+
+  * Vendor stable release.
+${BODY}
+
+ -- ${AUTHOR} <${EMAIL}>  ${DATE}
+
+EOF
+	if [ -f "${CHANGELOG}.tmp" ] ; then
+		cat "${CHANGELOG}.tmp" >> "${CHANGELOG}"
+		/bin/rm "${CHANGELOG}.tmp"
+	fi
+}
+
+echo "Generating chagelog for project: \`${PROJECT}'"
+
+git for-each-ref --sort='taggerdate' --format='%(tag)' refs/tags | while read TAG ; do
+	BODY=`git_get_body_from_tag "${TAG}"`
+	if [ ! -z "${BODY}" ] ; then
+		gen_changelog_entry "${TAG}"
+	fi
+done
+
+LAST_TAG_REV=`git rev-list --tags --max-count=1`
+HEAD=`git rev-parse HEAD`
+
+if [ "x${HEAD}" != "x${LAST_TAG_REV}" ] ; then
+	VERSION=`awk '/^VERSION *=|SUBVERSION *=|EXTRAVERSION *=/{VERSION=VERSION DOT $3;DOT="."}END{print VERSION}' ./Makefile.mk.in`
+	AUTHOR=`git_get_author "${HEAD}"`
+	EMAIL=`git_get_email "${HEAD}"`
+	DATE=`git_get_date "${HEAD}"`
+	if [ -f "${CHANGELOG}" ] ; then
+		mv -f "${CHANGELOG}" "${CHANGELOG}.tmp"
+	fi
+	cat > "${CHANGELOG}" << EOF
+${PROJECT} (${VERSION}) ${CODENAME}; urgency=medium
+
+  * Vendor test release.
+  * commit: ${HEAD}
+
+ -- ${AUTHOR} <${EMAIL}>  ${DATE}
+
+EOF
+	if [ -f "${CHANGELOG}.tmp" ] ; then
+		cat "${CHANGELOG}.tmp" >> "${CHANGELOG}"
+		/bin/rm "${CHANGELOG}.tmp"
+	fi
+fi
+
