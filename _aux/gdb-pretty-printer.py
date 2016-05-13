@@ -42,9 +42,12 @@ def yaal_lookup_function( val_ ):
 	regex = re.compile( "^yaal::hcore::HList<.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHListPrinter( val_ )
-	regex = re.compile( "^yaal::hcore::HMap<.*>$" )
+	regex = re.compile( "^yaal::hcore::HMap<.*HSBBSTree.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHMapPrinter( val_ )
+	regex = re.compile( "^yaal::hcore::HMap<.*HLookup.*>$" )
+	if regex.match( lookup_tag ):
+		return YaalHCoreHLookupMapPrinter( val_ )
 	regex = re.compile( "^yaal::hcore::HSet<.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHSetPrinter( val_ )
@@ -192,34 +195,31 @@ class YaalHCoreHArrayPrinter:
 	"Print a yaal::hcore::HArray"
 
 	class Iterator:
-		def __init__ (self, start, size):
+		def __init__( self, start, size ):
 			self._item = start
 			self._size = size
 			self._count = 0
 
-		def __iter__(self):
+		def __iter__( self ):
 			return self
 
 		def __next__( self ):
 			return ( self.next() )
 
-		def next(self):
+		def next( self ):
 			if self._count == self._size:
 				raise StopIteration
 			count = self._count
-			self._count = self._count + 1
+			self._count += 1
 			elt = self._item.dereference()
-			self._item = self._item + 1
+			self._item += 1
 			return ( '[%d]' % count, elt )
 
-	def __init__(self, val_):
+	def __init__( self, val_ ):
 		self._val = val_
 
-	def sizeof_elem( self ):
-		return self._val.type.template_argument( 0 ).sizeof
-
 	def children( self ):
-		return self.Iterator(self._val['_buf'], self._val['_size'])
+		return self.Iterator( self._val['_buf'], self._val['_size'] )
 
 	def to_string( self ):
 		return ( "yaal::hcore::HArray of `%s' of length %d, capacity %d" % ( self._val.type.template_argument( 0 ), self._val['_size'], self._val['_capacity'] ) )
@@ -391,7 +391,7 @@ class YaalHCoreHMapPrinter:
 				elt = self._item.cast( nodeType )['_key']['second']
 				self._item = self.do_next( self._item )
 			self._count = self._count + 1
-			return ('[%d]' % count, elt)
+			return ( '[%d]' % count, elt )
 
 	def __init__( self, val_ ):
 		self._val = val_
@@ -408,6 +408,45 @@ class YaalHCoreHMapPrinter:
 
 	def to_string( self ):
 		return ( "yaal::hcore::HMap of `%s' to `%s' of length %d" % ( self._val.type.template_argument( 0 ), self._val.type.template_argument( 1 ), self._val['_engine']['_size'] ) )
+
+	def display_hint( self ):
+		return 'map'
+
+class YaalHCoreHLookupMapPrinter:
+	"Print a yaal::hcore::HLookupMap"
+
+	class Iterator:
+		def __init__( self, data_, size_ ):
+			self._count = 0
+			self._data = data_
+			self._size = size_
+
+		def __iter__( self ):
+			return self
+
+		def __next__( self ):
+			return ( self.next() )
+
+		def next( self ):
+			if self._count == ( self._size * 2 ):
+				raise StopIteration
+			count = self._count
+			if ( count % 2 ) == 0:
+				elt = self._data.dereference()['first']
+			else:
+				elt = self._data.dereference()['second']
+				self._data += 1
+			self._count += 1
+			return ( '[%d]' % count, elt )
+
+	def __init__( self, val_ ):
+		self._val = val_
+
+	def children( self ):
+		return self.Iterator( self._val['_engine']['_data']['_buf'], self._val['_engine']['_data']['_size'] )
+
+	def to_string( self ):
+		return ( "yaal::hcore::HLookupMap of `%s' to `%s' of length %d" % ( self._val.type.template_argument( 0 ), self._val.type.template_argument( 1 ), self._val['_engine']['_data']['_size'] ) )
 
 	def display_hint( self ):
 		return 'map'
@@ -499,7 +538,7 @@ class YaalHCoreHHashMapPrinter:
 				elt = self._atom.cast( nodeType )['_value']['second']
 				self.do_next()
 			self._count = self._count + 1
-			return ('[%d]' % count, elt)
+			return ( '[%d]' % count, elt )
 
 	def __init__( self, val_ ):
 		self._val = val_
@@ -509,8 +548,9 @@ class YaalHCoreHHashMapPrinter:
 		dataType = self._val.type.template_argument( 1 )
 		valueType = gdb.lookup_type( "yaal::hcore::HPair<%s,%s>" % ( keyType.const(), dataType ) )
 		hasherType = self._val.type.template_argument( 2 );
-		allocatorType = self._val.type.template_argument( 3 );
-		nodeType = gdb.lookup_type( "yaal::hcore::HHashContainer<%s,%s,yaal::hcore::hashmap_helper<%s,%s>,%s >::HAtom" % ( valueType, hasherType, keyType, dataType, allocatorType ) ).pointer()
+		equalType = self._val.type.template_argument( 3 );
+		allocatorType = self._val.type.template_argument( 4 );
+		nodeType = gdb.lookup_type( "yaal::hcore::HHashContainer<%s,%s,%s,yaal::hcore::hashmap_helper<%s,%s>,%s >::HAtom" % ( valueType, hasherType, equalType, keyType, dataType, allocatorType ) ).pointer()
 		return nodeType
 
 	def buckets( self ):
@@ -545,8 +585,8 @@ class YaalHCoreHHashSetPrinter:
 			nodeType = self._owner.nodeType()
 			elt = self._atom.cast( nodeType )['_value']
 			self.do_next()
-			self._count = self._count + 1
-			return ('[%d]' % count, elt)
+			self._count += 1
+			return ( '[%d]' % count, elt )
 
 	def __init__( self, val_ ):
 		self._val = val_
@@ -554,8 +594,9 @@ class YaalHCoreHHashSetPrinter:
 	def nodeType( self ):
 		valueType = self._val.type.template_argument( 0 );
 		hasherType = self._val.type.template_argument( 1 );
-		allocatorType = self._val.type.template_argument( 2 );
-		nodeType = gdb.lookup_type( "yaal::hcore::HHashContainer<%s,%s,yaal::hcore::hashset_helper<%s>,%s >::HAtom" % ( valueType, hasherType, valueType, allocatorType ) ).pointer()
+		equalType = self._val.type.template_argument( 2 );
+		allocatorType = self._val.type.template_argument( 3 );
+		nodeType = gdb.lookup_type( "yaal::hcore::HHashContainer<%s,%s,%s,yaal::hcore::hashset_helper<%s>,%s >::HAtom" % ( valueType, hasherType, equalType, valueType, allocatorType ) ).pointer()
 		return nodeType
 
 	def buckets( self ):
@@ -590,8 +631,8 @@ class YaalHCoreHNumberPrinter:
 			digit = 0
 			data = self._val['_canonical']['_data'].cast( gdb.lookup_type( 'yaal::i32_t' ).pointer() )
 			while digit < integralPartSize:
-				s = s + ( str( data[digit] ).zfill( DDIL ) if ( digit > 0 ) else str( data[digit] ) )
-				digit = digit + 1
+				s += ( str( data[digit] ).zfill( DDIL ) if ( digit > 0 ) else str( data[digit] ) )
+				digit += 1
 			if leftCount > integralPartSize:
 				if integralPartSize == 0:
 					s = s + "0"

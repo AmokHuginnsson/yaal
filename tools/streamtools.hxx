@@ -212,9 +212,16 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 }
 
 template<typename key_t, typename value_t, typename compare_t, typename allocator_t>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HMap<key_t, value_t, compare_t, allocator_t> const& m_ ) {
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HMap<key_t, value_t, compare_t, allocator_t, yaal::hcore::HSBBSTree<yaal::hcore::HPair<key_t const, value_t>, compare_t, yaal::hcore::map_helper<key_t, value_t>, allocator_t>> const& m_ ) {
 	M_PROLOG
 	return ( tools::container_dump( out, m_, "map" ) );
+	M_EPILOG
+}
+
+template<typename key_t, typename value_t, typename compare_t, typename allocator_t>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HMap<key_t, value_t, compare_t, allocator_t, yaal::hcore::HLookup<yaal::hcore::HPair<key_t const, value_t>, compare_t, yaal::hcore::map_helper<key_t, value_t>, yaal::trait::no_type>> const& m_ ) {
+	M_PROLOG
+	return ( tools::container_dump( out, m_, "lookup" ) );
 	M_EPILOG
 }
 

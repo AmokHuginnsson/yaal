@@ -11,8 +11,6 @@ VERSION=$(shell awk '/^VERSION *=|SUBVERSION *=|EXTRAVERSION *=/{VERSION=VERSION
 PACKAGE_VERSION=$(VERSION)$(call UNQUOTE,$(BUILD_ID))
 ARCH=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 SYSTEM=$(shell lsb_release -si | tr A-Z a-z)
-CODENAME=$(shell lsb_release -sc | tr A-Z a-z)
-COMMIT=$(shell git rev-parse HEAD)
 SYSTEM_RELEASE=$(shell lsb_release -sr)
 ARTIFACTS=yaal_$(PACKAGE_VERSION)_$(ARCH).deb \
 					yaal-dev_$(PACKAGE_VERSION)_$(ARCH).deb \
@@ -24,9 +22,6 @@ ARTIFACTS_TARGET=$(addprefix $(OUTPUT_DIR)/,$(ARTIFACTS))
 BUNDLE_DIR=yaal-bundle/$(SYSTEM)-$(SYSTEM_RELEASE)/$(ARCH)/$(VERSION)
 BUNDLE=yaal-$(VERSION)-$(SYSTEM)-$(SYSTEM_RELEASE)-$(ARCH).tar
 BUNDLE_WRAP=yaal-bundle.tar
-DEBEMAIL=amok@codestation.org
-DCH=dch --force-distribution --distribution "$(CODENAME)"
-export DEBEMAIL
 export PACKAGE_VERSION
 
 .PHONY: all package bundle clean
