@@ -60,7 +60,7 @@ clean: $(VERIFY_DIR)
 	cd ../../ && \
 	if [ ! -d debian ] ; then cp -a ./_aux/debian . ; fi && \
 	/bin/rm -f debian/changelog && \
-	$(DCH) --create --vendor CodeStation.Org --newversion $(VERSION) --package yaal "Vendor Release." && \
+	dch --force-distribution --distribution any --create --newversion 0.0.0 --package yaal cleaner && \
 	dpkg-buildpackage -Tclean && \
 	/bin/rm -r debian
 
