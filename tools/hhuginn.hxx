@@ -614,6 +614,10 @@ public:
 	value_type value( void ) const {
 		return ( _value );
 	}
+	void flip( void ) {
+		_value = ! _value;
+		return;
+	}
 	void to_string( void ) const;
 private:
 	virtual value_t do_clone( HHuginn* ) const override;

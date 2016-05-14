@@ -761,12 +761,15 @@ void HExpression::boolean_not( HFrame* frame_, int ) {
 	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::BOOLEAN_NOT );
 	int p( _instructions[frame_->ip()]._position );
 	++ frame_->ip();
-	HHuginn::value_t v( yaal::move( frame_->values().top() ) );
-	frame_->values().pop();
+	HHuginn::value_t& v( frame_->values().top() );
 	if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
 		throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL], p );
 	}
-	frame_->values().push( value_builtin::boolean_not( frame_->thread(), v, p ) );
+	if ( v.unique() ) {
+		static_cast<HHuginn::HBoolean*>( v.raw() )->flip();
+	} else {
+		v = value_builtin::boolean_not( frame_->thread(), v, p );
+	}
 	return;
 	M_EPILOG
 }
