@@ -1964,7 +1964,8 @@ void OCompiler::defer_store_direct( HHuginn::value_t const& value_, executing_pa
 OPERATOR _copyConstContext_[] = {
 	OPERATOR::ASSIGN,
 	OPERATOR::FUNCTION_CALL,
-	OPERATOR::FUNCTION_ARGUMENT
+	OPERATOR::FUNCTION_ARGUMENT,
+	OPERATOR::SUBSCRIPT
 };
 
 void OCompiler::defer_store_real( double long value_, executing_parser::position_t position_ ) {
