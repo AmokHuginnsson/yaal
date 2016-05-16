@@ -952,6 +952,8 @@ inline HHuginn::value_t size( huginn::HThread* thread_, HHuginn::value_t*, HHugi
 		s = static_cast<HHuginn::HDeque const*>( v )->size();
 	} else if ( typeId == HHuginn::TYPE::DICT ) {
 		s = static_cast<HHuginn::HDict const*>( v )->size();
+	} else if ( typeId == HHuginn::TYPE::LOOKUP ) {
+		s = static_cast<HHuginn::HLookup const*>( v )->size();
 	} else if ( typeId == HHuginn::TYPE::ORDER ) {
 		s = static_cast<HHuginn::HOrder const*>( v )->size();
 	} else if ( typeId == HHuginn::TYPE::SET ) {
