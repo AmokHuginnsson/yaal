@@ -41,13 +41,6 @@ namespace hcore {
 
 extern FILE* ERROR_STREAM;
 
-void HFailedAssertion::swap( HFailedAssertion& other ) {
-	using yaal::swap;
-	if ( &other != this )
-		swap( _what, other._what );
-	return;
-}
-
 void failed_assert( char const* const fileName_,
 		int line_, char const* const functionName_,
 		char const* const message_ ) {

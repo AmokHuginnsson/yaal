@@ -45,17 +45,9 @@ class HFailedAssertion {
 	char const* _what;
 public:
 	HFailedAssertion( char const* const what_ ) : _what( what_ ) {}
-	HFailedAssertion( HFailedAssertion const& fa ) : _what( fa._what ) {}
-	HFailedAssertion& operator = ( HFailedAssertion const& fa ) {
-		if ( &fa != this ) {
-			HFailedAssertion n( fa );
-			swap( n );
-		}
-		return ( *this );
-	}
+	HFailedAssertion( HFailedAssertion const& fa ) = default;
+	HFailedAssertion& operator = ( HFailedAssertion const& ) = default;
 	char const* what( void ) const { return ( _what ); }
-private:
-	void swap( HFailedAssertion& );
 };
 
 void failed_assert( char const* const, int, char const* const, char const* const ) __attribute__(( __noreturn__ ));
