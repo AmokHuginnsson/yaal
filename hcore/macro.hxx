@@ -103,9 +103,6 @@ Copyright:
 #ifdef M_NDEBUG_CODE
 #	error Yaal redefines M_NDEBUG_CODE macro.
 #endif /* #ifdef M_NDEBUG_CODE */
-#ifdef M_AT_END_OF_SCOPE
-#	error Yaal redefines M_AT_END_OF_SCOPE macro.
-#endif /* #ifdef M_AT_END_OF_SCOPE */
 #ifdef M_TEMP_FAILURE_RETRY
 #	error Yaal redefines M_TEMP_FAILURE_RETRY macro.
 #endif /* #ifdef M_TEMP_FAILURE_RETRY */
@@ -234,8 +231,6 @@ Copyright:
  *
  * \param code - code to be run.
  */
-#define M_AT_END_OF_SCOPE( code ) \
-class M_CONCAT( AtEndOfScope, __LINE__ ) { public: M_CONCAT( AtEndOfScope, __LINE__ )( void ) {} ~M_CONCAT( AtEndOfScope, __LINE__ )( void ) { do { code } while ( 0 ); } } M_CONCAT( atEndOfScope, __LINE__ )
 #if defined( HAVE_DECL_TEMP_FAILURE_RETRY ) && ( HAVE_DECL_TEMP_FAILURE_RETRY == 1 )
 /*! \brief Reinmplement TEMP_FAILURE_RETRY macro.
  * Some of the original implementations use C-style-casts which messes our build.

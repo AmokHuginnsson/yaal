@@ -33,6 +33,7 @@ Copyright:
 #include "hcore/base.hxx"
 #include "hcore/hstring.hxx"
 #include "hcore/algorithm.hxx"
+#include "hcore/hboundcall.hxx"
 
 namespace yaal {
 
@@ -47,6 +48,22 @@ namespace tools {
 /*! \brief Small but useful utils.
  */
 namespace util {
+
+class HScopeExitCall {
+public:
+	typedef HScopeExitCall this_type;
+private:
+	typedef yaal::hcore::HBoundCall<> call_t;
+	call_t _call;
+public:
+	HScopeExitCall( call_t&& call_ )
+		: _call( yaal::move( call_ ) ) {
+		return;
+	}
+	~HScopeExitCall( void ) {
+		M_SAFE( _call() );
+	}
+};
 
 template<typename T>
 inline T hton( T v_ ) {
