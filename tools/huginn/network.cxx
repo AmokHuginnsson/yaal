@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
+#include "runtime.hxx"
 #include "tools/huginn/thread.hxx"
 #include "tools/huginn/stream.hxx"
 #include "helper.hxx"
@@ -57,10 +58,10 @@ class HNetwork : public HHuginn::HObject {
 public:
 	HNetwork( HHuginn::HClass* class_ )
 		: HObject( class_ )
-		, _streamClass( HStream::get_class( class_->huginn() ) )
-		, _exceptionClass( exception::create_class( class_->huginn(), "NetworkException" ) ) {
-		class_->huginn()->register_class( _streamClass );
-		class_->huginn()->register_class( _exceptionClass );
+		, _streamClass( HStream::get_class( class_->runtime() ) )
+		, _exceptionClass( exception::create_class( class_->runtime(), "NetworkException" ) ) {
+		class_->runtime()->huginn()->register_class( _streamClass );
+		class_->runtime()->huginn()->register_class( _exceptionClass );
 		return;
 	}
 	static HHuginn::value_t resolve( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
@@ -92,7 +93,7 @@ private:
 				port = -1;
 			}
 		}
-		HHuginn::value_t v( thread_->huginn().none_value() );
+		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( port >= 0 ) {
 			HStreamInterface::ptr_t stream( make_pointer<HSocket>( port > 0 ? HSocket::TYPE::NETWORK : HSocket::TYPE::FILE ) );
 			HSocket* s( static_cast<HSocket*>( stream.raw() ) );
@@ -114,13 +115,13 @@ namespace package_factory {
 
 class HNetworkCreator : public HPackageCreatorInterface {
 protected:
-	virtual HHuginn::value_t do_new_instance( HHuginn* );
+	virtual HHuginn::value_t do_new_instance( HRuntime* );
 } networkCreator;
 
-HHuginn::value_t HNetworkCreator::do_new_instance( HHuginn* huginn_ ) {
+HHuginn::value_t HNetworkCreator::do_new_instance( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		huginn_->create_class(
+		runtime_->create_class(
 			"Network",
 			nullptr,
 			HHuginn::field_definitions_t{
@@ -129,7 +130,7 @@ HHuginn::value_t HNetworkCreator::do_new_instance( HHuginn* huginn_ ) {
 			}
 		)
 	);
-	huginn_->register_class( c );
+	runtime_->huginn()->register_class( c );
 	return ( make_pointer<HNetwork>( c.raw() ) );
 	M_EPILOG
 }

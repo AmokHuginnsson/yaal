@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
+#include "runtime.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
@@ -44,14 +45,14 @@ namespace huginn {
 
 namespace boolean {
 
-HHuginn::class_t get_class( HHuginn* );
-HHuginn::class_t get_class( HHuginn* huginn_ ) {
+HHuginn::class_t get_class( HRuntime* );
+HHuginn::class_t get_class( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
-			huginn_,
+			runtime_,
 			type_id( HHuginn::TYPE::BOOLEAN ),
-			huginn_->identifier_id( type_name( HHuginn::TYPE::BOOLEAN ) ),
+			runtime_->identifier_id( type_name( HHuginn::TYPE::BOOLEAN ) ),
 			nullptr,
 			HHuginn::field_definitions_t{}
 		)
@@ -70,8 +71,8 @@ HHuginn::HBoolean::HBoolean( HHuginn::HClass const* class_, HHuginn::HBoolean::v
 	return;
 }
 
-HHuginn::value_t HHuginn::HBoolean::do_clone( HHuginn* huginn_ ) const {
-	return ( huginn_->object_factory()->create_boolean( _value ) );
+HHuginn::value_t HHuginn::HBoolean::do_clone( HRuntime* runtime_ ) const {
+	return ( runtime_->object_factory()->create_boolean( _value ) );
 }
 
 }

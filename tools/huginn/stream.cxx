@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "stream.hxx"
+#include "runtime.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
@@ -51,12 +52,12 @@ public:
 	HStreamIterator( HStream* stream_ )
 		: _stream( stream_ )
 		, _lineCache( _stream->read_line_impl() )
-		, _objectFactory( _stream->HValue::get_class()->huginn()->object_factory() ) {
+		, _objectFactory( _stream->HValue::get_class()->runtime()->object_factory() ) {
 		return;
 	}
 protected:
 	virtual HHuginn::value_t do_value( void ) override {
-		return ( ! _lineCache.is_empty() ? _objectFactory->create_string( _lineCache ) : _objectFactory->huginn().none_value() );
+		return ( ! _lineCache.is_empty() ? _objectFactory->create_string( _lineCache ) : _objectFactory->runtime().none_value() );
 	}
 	virtual bool do_is_valid( void ) override {
 		return ( _stream->is_valid() );
@@ -93,7 +94,7 @@ HHuginn::value_t HStream::read_line( huginn::HThread* thread_, HHuginn::value_t*
 	verify_arg_count( "Stream.read_line", values_, 0, 0, position_ );
 	HStream* s( static_cast<HStream*>( object_->raw() ) );
 	HString const& line( s->read_line_impl() );
-	return ( ! line.is_empty() ? thread_->object_factory().create_string( line ) : thread_->huginn().none_value() );
+	return ( ! line.is_empty() ? thread_->object_factory().create_string( line ) : thread_->runtime().none_value() );
 	M_EPILOG
 }
 
@@ -105,7 +106,7 @@ HHuginn::value_t HStream::write( huginn::HThread* thread_, HHuginn::value_t* obj
 	HString const& val( get_string( values_[0] ) );
 	HStream* s( static_cast<HStream*>( object_->raw() ) );
 	s->write_impl( val );
-	return ( thread_->huginn().none_value() );
+	return ( thread_->runtime().none_value() );
 	M_EPILOG
 }
 
@@ -146,12 +147,12 @@ int long HStream::do_size( void ) const {
 	return ( 0 );
 }
 
-HHuginn::class_t HStream::get_class( HHuginn* huginn_ ) {
+HHuginn::class_t HStream::get_class( HRuntime* runtime_ ) {
 	M_PROLOG
 	char const name[] = "Stream";
-	HHuginn::class_t c( huginn_->get_class( huginn_->identifier_id( name ) ) );
+	HHuginn::class_t c( runtime_->get_class( runtime_->identifier_id( name ) ) );
 	if ( ! c ) {
-		c = huginn_->create_class(
+		c = runtime_->create_class(
 			name,
 			nullptr,
 			HHuginn::field_definitions_t{
@@ -160,7 +161,7 @@ HHuginn::class_t HStream::get_class( HHuginn* huginn_ ) {
 				{ "write", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HStream::write, _1, _2, _3, _4 ) ) }
 			}
 		);
-		huginn_->register_class( c );
+		runtime_->huginn()->register_class( c );
 	}
 	return ( c );
 	M_EPILOG

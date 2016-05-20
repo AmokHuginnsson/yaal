@@ -68,6 +68,7 @@ class HFunction;
  */
 class HObjectFactory;
 struct OCompiler;
+class HRuntime;
 
 namespace ERR_CODE {
 enum {
@@ -133,11 +134,6 @@ public:
 	typedef yaal::hcore::HArray<value_t> values_t;
 	typedef yaal::hcore::HPointer<huginn::HFrame> frame_t;
 	typedef yaal::hcore::HBoundCall<value_t ( huginn::HThread*, value_t*, values_t const&, int )> function_t;
-	typedef yaal::hcore::HBoundCall<HHuginn::class_t ( type_id_t )> class_constructor_t;
-	typedef yaal::hcore::HPointer<huginn::HThread> thread_t;
-	typedef yaal::hcore::HHashMap<yaal::hcore::HThread::id_t, thread_t> threads_t;
-	typedef yaal::hcore::HLookupMap<yaal::hcore::HString, identifier_id_t> identifier_ids_t;
-	typedef yaal::hcore::HArray<yaal::hcore::HString> identifier_names_t;
 	enum class TYPE {
 		NONE,
 		BOOLEAN,
@@ -172,11 +168,8 @@ public:
 	class HHuginnRuntimeException;
 	typedef yaal::hcore::HResource<huginn::HSource> source_t;
 	typedef yaal::hcore::HResource<huginn::OCompiler> compiler_t;
+	typedef yaal::hcore::HResource<huginn::HRuntime> runtime_t;
 private:
-	typedef yaal::hcore::HResource<huginn::HObjectFactory> object_factory_t;
-	typedef yaal::hcore::HLookupMap<identifier_id_t, class_t> classes_t;
-	typedef yaal::hcore::HLookupMap<identifier_id_t, value_t> packages_t;
-	typedef yaal::hcore::HLookupMap<identifier_id_t, function_t> functions_t;
 	enum class STATE {
 		EMPTY,
 		LOADED,
@@ -185,31 +178,12 @@ private:
 		COMPILED
 	};
 	STATE _state;
-	type_id_t::value_type _idGenerator;
-	identifier_ids_t _identifierIds;
-	identifier_names_t _identifierNames;
-	/*
-	 * Built-in types can by used as field definitions in user classes.
-	 * User class needs to be able to use built-in types in its destructor.
-	 * Hence order of two following fields:
-	 * _objectFactory and _classes
-	 */
-	object_factory_t _objectFactory;
-	value_t _none;
-	value_t _true;
-	value_t _false;
-	classes_t _classes;
-	functions_t _functions;
+	runtime_t _runtime;
 	source_t _source;
 	compiler_t _compiler;
 	HExecutingParser _engine;
-	threads_t _threads;
-	packages_t _packages;
-	list_t _argv;
-	value_t _result;
 	yaal::hcore::HString _errorMessage;
 	int _errorPosition;
-	int _maxLocalVariableCount;
 	typedef std::atomic<bool> flag_t;
 	static flag_t _grammarVerified;
 	yaal::hcore::HStreamInterface::ptr_t _inputStream;
@@ -260,15 +234,6 @@ public:
 	 */
 	bool execute( void );
 
-	/*! \brief Call (execute) Huginn function.
-	 *
-	 * \param name_ - name of the function to call.
-	 * \param argv_ - array of arguments that shall be passed to function call.
-	 * \param position_ - call context information for error reporting.
-	 * \return Result returned by called Huginn function.
-	 */
-	value_t call( yaal::hcore::HString const& name_, values_t const& argv_, int posiiton_ );
-
 	/*! \brief Get value returned by program's main().
 	 *
 	 * \return Value returned by program's main() function.
@@ -280,11 +245,6 @@ public:
 	 * \param stream_ - stream where VM state shall be dumped.
 	 */
 	void dump_vm_state( yaal::hcore::HStreamInterface& );
-	huginn::HThread* current_thread( void );
-	huginn::HFrame* current_frame( void );
-	void register_function( identifier_id_t, function_t );
-	class_t create_class( yaal::hcore::HString const&, HClass const*, field_definitions_t const& );
-	class_t create_class( class_constructor_t const& );
 
 	/*! \brief Add argument for main() function.
 	 *
@@ -312,35 +272,13 @@ public:
 	yaal::hcore::HStreamInterface& input_stream( void );
 	yaal::hcore::HStreamInterface& output_stream( void );
 	yaal::hcore::HStreamInterface& error_stream( void );
-	function_t* get_function( identifier_id_t );
-	class_t get_class( identifier_id_t );
-	value_t* get_package( identifier_id_t );
 	yaal::hcore::HString get_snippet( int, int ) const;
 	void register_class( class_t );
-	identifier_id_t identifier_id( yaal::hcore::HString const& );
-	yaal::hcore::HString const& identifier_name( identifier_id_t ) const;
+	void register_function( identifier_id_t );
 	static void disable_grammar_verification( void );
-	value_t& none_value( void ) {
-		return ( _none );
-	}
-	value_t& true_value( void ) {
-		return ( _true );
-	}
-	value_t& false_value( void ) {
-		return ( _false );
-	}
-	huginn::HObjectFactory* object_factory( void ) {
-		return ( _objectFactory.raw() );
-	}
-	void set_max_local_variable_count( int );
-	int max_local_variable_count() const {
-		return ( _maxLocalVariableCount );
-	}
 private:
 	void finalize_compilation( compiler_setup_t );
 	HClass const* commit_class( identifier_id_t );
-	void register_builtins( void );
-	void register_builtin_function( char const*, function_t&& );
 	char const* error_message( int ) const;
 	HHuginn( HHuginn const& ) = delete;
 	HHuginn& operator = ( HHuginn const& ) = delete;
@@ -408,9 +346,9 @@ private:
 	field_identifiers_t _fieldIdentifiers;
 	field_indexes_t _fieldIndexes;
 	values_t _fieldDefinitions;
-	HHuginn* _huginn;
+	huginn::HRuntime* _runtime;
 public:
-	HClass( HHuginn*, type_id_t, identifier_id_t, HClass const*, field_definitions_t const& );
+	HClass( huginn::HRuntime*, type_id_t, identifier_id_t, HClass const*, field_definitions_t const& );
 	HClass( HHuginn::TYPE );
 	virtual ~HClass( void ) {
 	}
@@ -437,8 +375,8 @@ public:
 	bool is_complex( void ) const {
 		return ( ! _fieldDefinitions.is_empty() );
 	}
-	HHuginn* huginn( void ) const {
-		return ( _huginn );
+	huginn::HRuntime* runtime( void ) const {
+		return ( _runtime );
 	}
 	value_t create_instance( huginn::HThread*, value_t*, values_t const&, int ) const;
 private:
@@ -463,14 +401,14 @@ public:
 	HClass const* get_class( void ) const {
 		return ( _class );
 	}
-	value_t clone( HHuginn* ) const;
+	value_t clone( huginn::HRuntime* ) const;
 	int field_index( identifier_id_t ) const;
 	value_t field( HHuginn::value_t const& subject_, int index_ ) const {
 		return ( do_field( subject_, index_ ) );
 	}
 private:
 	virtual value_t do_field( HHuginn::value_t const&, int ) const;
-	virtual value_t do_clone( HHuginn* ) const;
+	virtual value_t do_clone( huginn::HRuntime* ) const;
 	HValue( HValue const& ) = delete;
 	HValue& operator = ( HValue const& ) = delete;
 };
@@ -486,7 +424,7 @@ public:
 private:
 	HMethod( HMethod const& ) = delete;
 	HMethod& operator = ( HMethod const& ) = delete;
-	virtual value_t do_clone( HHuginn* ) const override;
+	virtual value_t do_clone( huginn::HRuntime* ) const override;
 };
 
 class HHuginn::HClass::HBoundMethod : public HHuginn::HClass::HMethod {
@@ -500,7 +438,7 @@ public:
 private:
 	HBoundMethod( HBoundMethod const& ) = delete;
 	HBoundMethod& operator = ( HBoundMethod const& ) = delete;
-	virtual value_t do_clone( HHuginn* ) const override;
+	virtual value_t do_clone( huginn::HRuntime* ) const override;
 };
 
 class HHuginn::HObject : public HHuginn::HValue {
@@ -521,7 +459,7 @@ private:
 	HObject( HObject const& ) = delete;
 	HObject& operator = ( HObject const& ) = delete;
 private:
-	virtual value_t do_clone( HHuginn* ) const override;
+	virtual value_t do_clone( huginn::HRuntime* ) const override;
 	virtual value_t do_field( HHuginn::value_t const&, int ) const override;
 };
 
@@ -544,7 +482,7 @@ public:
 private:
 	HObjectReference( HObjectReference const& ) = delete;
 	HObjectReference& operator = ( HObjectReference const& ) = delete;
-	virtual value_t do_clone( HHuginn* ) const override;
+	virtual value_t do_clone( huginn::HRuntime* ) const override;
 };
 
 class HHuginn::HObserver : public HHuginn::HValue {
@@ -558,7 +496,7 @@ public:
 	HObserver( HHuginn::value_t const& );
 	HHuginn::value_t value( void ) const;
 private:
-	virtual value_t do_clone( HHuginn* ) const override;
+	virtual value_t do_clone( huginn::HRuntime* ) const override;
 };
 
 class HHuginn::HReference : public HHuginn::HValue {
@@ -571,7 +509,7 @@ public:
 	HReference( HHuginn::value_t& );
 	HHuginn::value_t& value( void ) const;
 private:
-	virtual value_t do_clone( HHuginn* ) const override;
+	virtual value_t do_clone( huginn::HRuntime* ) const override;
 };
 
 class HHuginn::HTernaryEvaluator : public HHuginn::HValue {
@@ -586,7 +524,7 @@ public:
 	HTernaryEvaluator( expression_t const&, expression_t const&, expression_t const& );
 	value_t execute( huginn::HThread* );
 private:
-	virtual value_t do_clone( HHuginn* ) const override M_DEBUG_CODE( __attribute__((__noreturn__)) );
+	virtual value_t do_clone( huginn::HRuntime* ) const override M_DEBUG_CODE( __attribute__((__noreturn__)) );
 };
 
 class HHuginn::HIterable : public HHuginn::HValue {
@@ -620,7 +558,7 @@ public:
 	}
 	void to_string( void ) const;
 private:
-	virtual value_t do_clone( HHuginn* ) const override;
+	virtual value_t do_clone( huginn::HRuntime* ) const override;
 };
 
 class HHuginn::HInteger : public HHuginn::HValue {
@@ -644,7 +582,7 @@ public:
 	void to_real( void ) const;
 	void to_string( void ) const;
 private:
-	virtual value_t do_clone( HHuginn* ) const override;
+	virtual value_t do_clone( huginn::HRuntime* ) const override;
 };
 
 class HHuginn::HReal : public HHuginn::HValue {
@@ -668,7 +606,7 @@ public:
 	void to_string( void ) const;
 	/* There is no direct conversion to character. */
 private:
-	virtual value_t do_clone( HHuginn* ) const override;
+	virtual value_t do_clone( huginn::HRuntime* ) const override;
 };
 
 class HHuginn::HString : public HHuginn::HIterable {
@@ -694,7 +632,7 @@ protected:
 	virtual HIterator do_iterator( void ) override;
 	virtual int long do_size( void ) const override;
 private:
-	virtual value_t do_clone( HHuginn* ) const override;
+	virtual value_t do_clone( huginn::HRuntime* ) const override;
 };
 
 class HHuginn::HCharacter : public HHuginn::HValue {
@@ -714,7 +652,7 @@ public:
 	void to_integer( void ) const;
 	void to_string( void ) const;
 private:
-	virtual value_t do_clone( HHuginn* ) const override;
+	virtual value_t do_clone( huginn::HRuntime* ) const override;
 };
 
 class HHuginn::HNumber : public HHuginn::HValue {
@@ -737,7 +675,7 @@ public:
 	void to_real( void ) const;
 	void to_string( void ) const;
 private:
-	virtual value_t do_clone( HHuginn* ) const override;
+	virtual value_t do_clone( huginn::HRuntime* ) const override;
 };
 
 class HHuginn::HList : public HHuginn::HIterable {
@@ -765,7 +703,7 @@ protected:
 	virtual HIterator do_iterator( void ) override;
 	virtual int long do_size( void ) const override;
 private:
-	virtual value_t do_clone( HHuginn* ) const override;
+	virtual value_t do_clone( huginn::HRuntime* ) const override;
 };
 
 class HHuginn::HDeque : public HHuginn::HIterable {
@@ -795,7 +733,7 @@ protected:
 	virtual HIterator do_iterator( void ) override;
 	virtual int long do_size( void ) const override;
 private:
-	virtual value_t do_clone( HHuginn* ) const override;
+	virtual value_t do_clone( huginn::HRuntime* ) const override;
 };
 
 class HHuginn::HDict : public HHuginn::HIterable {
@@ -830,7 +768,7 @@ private:
 	HDict( HDict const& ) = delete;
 	HDict& operator = ( HDict const& ) = delete;
 private:
-	virtual value_t do_clone( HHuginn* ) const override;
+	virtual value_t do_clone( huginn::HRuntime* ) const override;
 };
 
 class HHuginn::HOrder : public HHuginn::HIterable {
@@ -862,7 +800,7 @@ private:
 	HOrder( HOrder const& ) = delete;
 	HOrder& operator = ( HOrder const& ) = delete;
 private:
-	virtual value_t do_clone( HHuginn* ) const override;
+	virtual value_t do_clone( huginn::HRuntime* ) const override;
 };
 
 class HHuginn::HLookup : public HHuginn::HIterable {
@@ -896,7 +834,7 @@ private:
 	HLookup( HLookup const& ) = delete;
 	HLookup& operator = ( HLookup const& ) = delete;
 private:
-	virtual value_t do_clone( HHuginn* ) const override;
+	virtual value_t do_clone( huginn::HRuntime* ) const override;
 };
 
 class HHuginn::HSet : public HHuginn::HIterable {
@@ -927,7 +865,7 @@ private:
 	HSet( HSet const& ) = delete;
 	HSet& operator = ( HSet const& ) = delete;
 private:
-	virtual value_t do_clone( HHuginn* ) const override;
+	virtual value_t do_clone( huginn::HRuntime* ) const override;
 };
 
 class HHuginn::HFunctionReference : public HHuginn::HValue {
@@ -951,7 +889,7 @@ public:
 		return ( _function );
 	}
 private:
-	virtual value_t do_clone( HHuginn* ) const override;
+	virtual value_t do_clone( huginn::HRuntime* ) const override;
 };
 
 class HHuginn::HException : public HHuginn::HValue {
@@ -967,7 +905,7 @@ public:
 	yaal::hcore::HString const& where( void ) const;
 	void set_where( yaal::hcore::HString const& );
 private:
-	virtual value_t do_clone( HHuginn* ) const override;
+	virtual value_t do_clone( huginn::HRuntime* ) const override;
 };
 
 namespace huginn {

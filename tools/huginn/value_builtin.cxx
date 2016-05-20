@@ -30,6 +30,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "value_builtin.hxx"
+#include "runtime.hxx"
 #include "thread.hxx"
 #include "helper.hxx"
 #include "exception.hxx"
@@ -55,7 +56,7 @@ HHuginn::value_t subscript(
 ) {
 	HHuginn::type_id_t baseType( base_->type_id() );
 	HHuginn::value_t res;
-	HObjectFactory& of( *thread_->huginn().object_factory() );
+	HObjectFactory& of( *thread_->runtime().object_factory() );
 	if ( ( baseType == HHuginn::TYPE::LIST ) || ( baseType == HHuginn::TYPE::DEQUE ) || ( baseType == HHuginn::TYPE::STRING ) ) {
 		if ( index_->type_id() != HHuginn::TYPE::INTEGER ) {
 			throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::IDX_NOT_INT], position_ );
@@ -273,29 +274,29 @@ void div( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 		if ( denominator != 0 ) {
 			static_cast<HHuginn::HInteger*>( v1_.raw() )->value() /= denominator;
 		} else {
-			v1_ = thread_->huginn().none_value();
+			v1_ = thread_->runtime().none_value();
 		}
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
 		HHuginn::HReal::value_type denominator( static_cast<HHuginn::HReal const*>( v2_.raw() )->value() );
 		if ( denominator != 0.0l ) {
 			static_cast<HHuginn::HReal*>( v1_.raw() )->value() /= denominator;
 		} else {
-			v1_ = thread_->huginn().none_value();
+			v1_ = thread_->runtime().none_value();
 		}
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		HHuginn::HNumber::value_type const& denominator( static_cast<HHuginn::HNumber const*>( v2_.raw() )->value() );
 		if ( denominator != number::N0 ) {
 			static_cast<HHuginn::HNumber*>( v1_.raw() )->value() /= denominator;
 		} else {
-			v1_ = thread_->huginn().none_value();
+			v1_ = thread_->runtime().none_value();
 		}
 	} else {
-		v1_ = thread_->huginn().none_value();
+		v1_ = thread_->runtime().none_value();
 		throw HHuginn::HHuginnRuntimeException( "There is no `/' operator for `"_ys.append( v1_->get_class()->name() ).append( "'." ), position_ );
 	}
-	HHuginn& h( thread_->huginn() );
-	if ( v1_ == h.none_value() ) {
-		thread_->raise( h.object_factory()->arithmetic_exception_class(), "Division by zero.", position_ );
+	HRuntime& rt( thread_->runtime() );
+	if ( v1_ == rt.none_value() ) {
+		thread_->raise( rt.object_factory()->arithmetic_exception_class(), "Division by zero.", position_ );
 	}
 }
 
@@ -307,7 +308,7 @@ void mod( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 		if ( denominator != 0 ) {
 			static_cast<HHuginn::HInteger*>( v1_.raw() )->value() %= denominator;
 		} else {
-			v1_ = thread_->huginn().none_value();
+			v1_ = thread_->runtime().none_value();
 		}
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
 		HHuginn::HReal::value_type denominator( static_cast<HHuginn::HReal const*>( v2_.raw() )->value() );
@@ -315,22 +316,22 @@ void mod( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 			double long& v( static_cast<HHuginn::HReal*>( v1_.raw() )->value() );
 			v = fmodl( v, denominator );
 		} else {
-			v1_ = thread_->huginn().none_value();
+			v1_ = thread_->runtime().none_value();
 		}
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		HHuginn::HNumber::value_type const& denominator( static_cast<HHuginn::HNumber const*>( v2_.raw() )->value() );
 		if ( denominator != number::N0 ) {
 			static_cast<HHuginn::HNumber*>( v1_.raw() )->value() %= denominator;
 		} else {
-			v1_ = thread_->huginn().none_value();
+			v1_ = thread_->runtime().none_value();
 		}
 	} else {
-		v1_ = thread_->huginn().none_value();
+		v1_ = thread_->runtime().none_value();
 		throw HHuginn::HHuginnRuntimeException( "There is no `%' operator for `"_ys.append( v1_->get_class()->name() ).append( "'." ), position_ );
 	}
-	HHuginn& h( thread_->huginn() );
-	if ( v1_ == h.none_value() ) {
-		thread_->raise( h.object_factory()->arithmetic_exception_class(), "Division by zero.", position_ );
+	HRuntime& rt( thread_->runtime() );
+	if ( v1_ == rt.none_value() ) {
+		thread_->raise( rt.object_factory()->arithmetic_exception_class(), "Division by zero.", position_ );
 	}
 	return;
 }
@@ -355,12 +356,12 @@ HHuginn::value_t factorial( HThread* thread_, HHuginn::value_t const& v_, int po
 	HHuginn::type_id_t typeId( v_->type_id() );
 	if ( typeId == HHuginn::TYPE::NUMBER ) {
 		HNumber const& n( static_cast<HHuginn::HNumber const*>( v_.raw() )->value() );
-		HHuginn& h( thread_->huginn() );
+		HRuntime& rt( thread_->runtime() );
 		if ( n < number::N0 ) {
-			thread_->raise( h.object_factory()->arithmetic_exception_class(), "Factorial from negative.", position_ );
+			thread_->raise( rt.object_factory()->arithmetic_exception_class(), "Factorial from negative.", position_ );
 		}
 		if ( ! n.is_integral() ) {
-			thread_->raise( h.object_factory()->arithmetic_exception_class(), "Factorial from fraction.", position_ );
+			thread_->raise( rt.object_factory()->arithmetic_exception_class(), "Factorial from fraction.", position_ );
 		}
 		res = thread_->object_factory().create_number( number::factorial( n.to_integer() ) );
 	} else {
@@ -415,24 +416,24 @@ HHuginn::value_t neg( HThread* thread_, HHuginn::value_t const& v_, int position
 }
 
 int long hash( HHuginn::value_t const& v_ ) {
-	int long h( 0 );
+	int long rt( 0 );
 	HHuginn::type_id_t typeId( v_->type_id() );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
-		h = hcore::hash<int long long>()( static_cast<HHuginn::HInteger const*>( v_.raw() )->value() );
+		rt = hcore::hash<int long long>()( static_cast<HHuginn::HInteger const*>( v_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
-		h = hcore::hash<double long>()( static_cast<HHuginn::HReal const*>( v_.raw() )->value() );
+		rt = hcore::hash<double long>()( static_cast<HHuginn::HReal const*>( v_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::STRING ) {
-		h = hcore::hash<hcore::HString>()( static_cast<HHuginn::HString const*>( v_.raw() )->value() );
+		rt = hcore::hash<hcore::HString>()( static_cast<HHuginn::HString const*>( v_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
-		h = hcore::hash<double long>()( static_cast<HHuginn::HNumber const*>( v_.raw() )->value().to_floating_point() );
+		rt = hcore::hash<double long>()( static_cast<HHuginn::HNumber const*>( v_.raw() )->value().to_floating_point() );
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
-		h = hcore::hash<char>()( static_cast<HHuginn::HCharacter const*>( v_.raw() )->value() );
+		rt = hcore::hash<char>()( static_cast<HHuginn::HCharacter const*>( v_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::BOOLEAN ) {
-		h = hcore::hash<bool>()( static_cast<HHuginn::HBoolean const*>( v_.raw() )->value() );
+		rt = hcore::hash<bool>()( static_cast<HHuginn::HBoolean const*>( v_.raw() )->value() );
 	} else if ( typeId != HHuginn::TYPE::NONE ) {
 		throw HHuginn::HHuginnRuntimeException( "There is no `hash' operator for `"_ys.append( v_->get_class()->name() ).append( "'." ), 0 );
 	}
-	return ( h );
+	return ( rt );
 }
 
 
@@ -614,7 +615,7 @@ HHuginn::value_t boolean( HThread* thread_, HHuginn::value_t const& v_, int posi
 }
 
 HHuginn::value_t integer( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
-	HHuginn::value_t res( thread_->huginn().none_value() );
+	HHuginn::value_t res( thread_->runtime().none_value() );
 	HHuginn::type_id_t typeId( v_->type_id() );
 	if ( typeId == HHuginn::TYPE::STRING ) {
 		int long long v( 0 );
@@ -675,7 +676,7 @@ HHuginn::value_t character( HThread* thread_, HHuginn::value_t const& v_, int po
 }
 
 HHuginn::value_t number( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
-	HHuginn::value_t res( thread_->huginn().none_value() );
+	HHuginn::value_t res( thread_->runtime().none_value() );
 	HHuginn::type_id_t typeId( v_->type_id() );
 	if ( typeId == HHuginn::TYPE::STRING ) {
 		try {

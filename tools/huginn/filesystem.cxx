@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
+#include "runtime.hxx"
 #include "thread.hxx"
 #include "stream.hxx"
 #include "helper.hxx"
@@ -57,8 +58,8 @@ class HFileSystem : public HHuginn::HObject {
 public:
 	HFileSystem( HHuginn::HClass* class_ )
 		: HObject( class_ )
-		, _streamClass( HStream::get_class( class_->huginn() ) )
-		, _exceptionClass( exception::create_class( class_->huginn(), "FileSystemException" ) ) {
+		, _streamClass( HStream::get_class( class_->runtime() ) )
+		, _exceptionClass( exception::create_class( class_->runtime(), "FileSystemException" ) ) {
 		return;
 	}
 	static HHuginn::value_t open( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
@@ -124,7 +125,7 @@ private:
 			)
 		);
 		HFile* f( static_cast<HFile*>( stream.raw() ) );
-		HHuginn::value_t v( thread_->huginn().none_value() );
+		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( f->is_opened() ) {
 			v = make_pointer<HStream>( _streamClass.raw(), stream );
 		} else {
@@ -139,13 +140,13 @@ namespace package_factory {
 
 class HFileSystemCreator : public HPackageCreatorInterface {
 protected:
-	virtual HHuginn::value_t do_new_instance( HHuginn* );
+	virtual HHuginn::value_t do_new_instance( HRuntime* );
 } filesystemCreator;
 
-HHuginn::value_t HFileSystemCreator::do_new_instance( HHuginn* huginn_ ) {
+HHuginn::value_t HFileSystemCreator::do_new_instance( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		huginn_->create_class(
+		runtime_->create_class(
 			"FileSystem",
 			nullptr,
 			HHuginn::field_definitions_t{
@@ -158,7 +159,7 @@ HHuginn::value_t HFileSystemCreator::do_new_instance( HHuginn* huginn_ ) {
 			}
 		)
 	);
-	huginn_->register_class( c );
+	runtime_->huginn()->register_class( c );
 	return ( make_pointer<HFileSystem>( c.raw() ) );
 	M_EPILOG
 }

@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "frame.hxx"
+#include "runtime.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
 #include "keyword.hxx"
@@ -57,7 +58,7 @@ HFrame::HFrame(
 	, _type( TYPE::SCOPE )
 	, _state( STATE::NORMAL )
 	, _statementId( INVALID_STATEMENT_IDENTIFIER ) {
-	_variables.reserve( _thread->huginn().max_local_variable_count() );
+	_variables.reserve( _thread->runtime().max_local_variable_count() );
 	return;
 }
 
@@ -72,7 +73,7 @@ void HFrame::init(
 	_statementId = statementId_;
 	_object = object_;
 	_upCast = upCast_;
-	_result = _thread->huginn().none_value();
+	_result = _thread->runtime().none_value();
 	_number = _parent ? ( _parent->_number + ( ( type_ == TYPE::FUNCTION ) ? 1 : 0 ) ) : 1;
 	return;
 	M_EPILOG
@@ -138,7 +139,7 @@ HHuginn::value_t HFrame::get_field( HExpression::ACCESS access_, int index_ ) {
 		v = static_cast<HHuginn::HObject*>( obj->raw() )->field( *obj, index_ );
 	} else {
 		HHuginn::value_t& ref( static_cast<HHuginn::HObject*>( obj->raw() )->field_ref( index_ ) );
-	  v = _thread->huginn().object_factory()->create_reference( ref );
+	  v = _thread->runtime().object_factory()->create_reference( ref );
 	}
 	return ( v );
 	M_EPILOG
@@ -169,7 +170,7 @@ HHuginn::value_t HFrame::get_variable( HExpression::ACCESS access_, HStatement::
 	if ( access_ == HExpression::ACCESS::VALUE ) {
 		v = f->_variables[index_];
 	} else {
-	  v = _thread->huginn().object_factory()->create_reference( f->_variables[index_] );
+	  v = _thread->runtime().object_factory()->create_reference( f->_variables[index_] );
 	}
 	return ( v );
 	M_EPILOG

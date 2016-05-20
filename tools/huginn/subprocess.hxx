@@ -48,7 +48,7 @@ public:
 	static HHuginn::value_t get_pid( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t kill( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t stream( char const*, stream_getter_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
-	static HHuginn::class_t get_class( HHuginn* );
+	static HHuginn::class_t get_class( HRuntime* );
 };
 
 }

@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "subprocess.hxx"
+#include "runtime.hxx"
 #include "stream.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
@@ -48,12 +49,12 @@ class HSubprocessClass : public HHuginn::HClass {
 	HHuginn::class_t _streamClass;
 public:
 	HSubprocessClass(
-		HHuginn* huginn_,
+		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_
 	) : HHuginn::HClass(
-			huginn_,
+			runtime_,
 			typeId_,
-			huginn_->identifier_id( "Subprocess" ),
+			runtime_->identifier_id( "Subprocess" ),
 			nullptr,
 			HHuginn::field_definitions_t{
 				{ "is_alive", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::is_alive, _1, _2, _3, _4 ) ) },
@@ -64,7 +65,7 @@ public:
 				{ "err",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::stream, "Subprocess.err", &HPipedChild::stream_err, _1, _2, _3, _4 ) ) }
 			}
 		)
-		, _streamClass( HStream::get_class( huginn_ ) ) {
+		, _streamClass( HStream::get_class( runtime_ ) ) {
 		return;
 	}
 	HHuginn::HClass const* stream_class( void ) const {
@@ -96,7 +97,7 @@ HHuginn::value_t HSubprocess::is_alive(
 	char const name[] = "Subprocess.is_alive";
 	verify_arg_count( name, values_, 0, 0, position_ );
 	HSubprocess* o( static_cast<HSubprocess*>( object_->raw() ) );
-	return ( thread_->huginn().object_factory()->create_boolean( o->_pipedChild.is_running() ) );
+	return ( thread_->runtime().object_factory()->create_boolean( o->_pipedChild.is_running() ) );
 	M_EPILOG
 }
 
@@ -111,7 +112,7 @@ HHuginn::value_t HSubprocess::kill(
 	verify_arg_count( name, values_, 0, 0, position_ );
 	HSubprocess* o( static_cast<HSubprocess*>( object_->raw() ) );
 	HPipedChild::STATUS s( o->_pipedChild.finish() );
-	return ( thread_->huginn().object_factory()->create_integer( s.value ) );
+	return ( thread_->runtime().object_factory()->create_integer( s.value ) );
 	M_EPILOG
 }
 
@@ -125,7 +126,7 @@ HHuginn::value_t HSubprocess::get_pid(
 	char const name[] = "Subprocess.get_pid";
 	verify_arg_count( name, values_, 0, 0, position_ );
 	HSubprocess* o( static_cast<HSubprocess*>( object_->raw() ) );
-	return ( thread_->huginn().object_factory()->create_integer( o->_pipedChild.get_pid() ) );
+	return ( thread_->runtime().object_factory()->create_integer( o->_pipedChild.get_pid() ) );
 	M_EPILOG
 }
 
@@ -146,15 +147,15 @@ HHuginn::value_t HSubprocess::stream(
 	M_EPILOG
 }
 
-HHuginn::class_t HSubprocess::get_class( HHuginn* huginn_ ) {
+HHuginn::class_t HSubprocess::get_class( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		huginn_->create_class(
-			HHuginn::class_constructor_t(
-				[&huginn_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
+		runtime_->create_class(
+			HRuntime::class_constructor_t(
+				[&runtime_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
 					return (
 						make_pointer<HSubprocessClass>(
-							huginn_,
+							runtime_,
 							typeId_
 						)
 					);
@@ -162,7 +163,7 @@ HHuginn::class_t HSubprocess::get_class( HHuginn* huginn_ ) {
 			)
 		)
 	);
-	huginn_->register_class( c );
+	runtime_->huginn()->register_class( c );
 	return ( c );
 	M_EPILOG
 }

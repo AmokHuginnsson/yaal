@@ -48,7 +48,7 @@ public:
 	static tools::HHuginn::value_t query( tools::huginn::HThread*, tools::HHuginn::value_t*, tools::HHuginn::values_t const&, int );
 	static tools::HHuginn::value_t table_names( tools::huginn::HThread*, tools::HHuginn::value_t*, tools::HHuginn::values_t const&, int );
 	static tools::HHuginn::value_t column_names( tools::huginn::HThread*, tools::HHuginn::value_t*, tools::HHuginn::values_t const&, int );
-	static tools::HHuginn::class_t get_class( tools::HHuginn*, tools::HHuginn::class_t const& );
+	static tools::HHuginn::class_t get_class( tools::huginn::HRuntime*, tools::HHuginn::class_t const& );
 private:
 	tools::HHuginn::value_t do_query( tools::huginn::HThread*, tools::HHuginn::values_t const&, int );
 	tools::HHuginn::value_t do_table_names( tools::huginn::HThread*, tools::HHuginn::values_t const&, int );

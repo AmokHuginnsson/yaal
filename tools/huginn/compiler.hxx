@@ -319,8 +319,8 @@ struct OCompiler {
 	HHuginn::compiler_setup_t _setup;
 	HStatement::statement_id_t _statementIdGenerator;
 	scope_context_cache_t _scopeContextCache;
-	HHuginn* _huginn;
-	OCompiler( HHuginn* );
+	HRuntime* _runtime;
+	OCompiler( HRuntime* );
 	OFunctionContext& f( void );
 	void set_setup( HHuginn::compiler_setup_t );
 	void detect_misuse( void ) const;

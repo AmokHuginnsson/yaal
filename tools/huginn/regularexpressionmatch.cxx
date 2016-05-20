@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "regularexpressionmatch.hxx"
+#include "runtime.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
@@ -53,7 +54,7 @@ public:
 		HRegex::HMatchIterator const& it_
 	) : _regularExpressionMatch( regularExpressionMatch_ )
 		, _it( it_ )
-		, _objectFactory( _regularExpressionMatch->HValue::get_class()->huginn()->object_factory() ) {
+		, _objectFactory( _regularExpressionMatch->HValue::get_class()->runtime()->object_factory() ) {
 		return;
 	}
 protected:
@@ -108,10 +109,10 @@ int long HRegularExpressionMatch::do_size( void ) const {
 	return ( distance( _regex->find( _fast ), _regex->end() ) );
 }
 
-HHuginn::class_t HRegularExpressionMatch::get_class( HHuginn* huginn_ ) {
+HHuginn::class_t HRegularExpressionMatch::get_class( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		huginn_->create_class(
+		runtime_->create_class(
 			"RegularExpressionMatch",
 			nullptr,
 			HHuginn::field_definitions_t{
@@ -119,7 +120,7 @@ HHuginn::class_t HRegularExpressionMatch::get_class( HHuginn* huginn_ ) {
 			}
 		)
 	);
-	huginn_->register_class( c );
+	runtime_->huginn()->register_class( c );
 	return ( c );
 	M_EPILOG
 }

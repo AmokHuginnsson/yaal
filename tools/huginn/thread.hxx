@@ -47,12 +47,12 @@ private:
 	HFrame* _currentFrame;
 	int _frameCount;
 	yaal::hcore::HThread::id_t _id;
-	HHuginn* _huginn;
+	HRuntime* _runtime;
 	HObjectFactory& _objectFactory;
 	yaal::hcore::HString _exceptionMessage;
 	int _exceptionPosition;
 public:
-	HThread( HHuginn*, yaal::hcore::HThread::id_t );
+	HThread( HRuntime*, yaal::hcore::HThread::id_t );
 	void create_function_frame( HStatement::statement_id_t, HHuginn::value_t*, int );
 	void create_loop_frame( HStatement::statement_id_t );
 	void create_scope_frame( HStatement::statement_id_t );
@@ -79,8 +79,8 @@ public:
 	bool has_runtime_exception( void ) const;
 	bool has_exception( void ) const;
 	void raise( HHuginn::HClass const*, yaal::hcore::HString const&, int );
-	HHuginn& huginn( void ) {
-		return ( *_huginn );
+	HRuntime& runtime( void ) {
+		return ( *_runtime );
 	}
 	HObjectFactory& object_factory( void ) const {
 		return ( _objectFactory );

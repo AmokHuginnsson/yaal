@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
+#include "runtime.hxx"
 #include "tools/huginn/thread.hxx"
 #include "helper.hxx"
 #include "exception.hxx"
@@ -50,8 +51,8 @@ class HRegularExpressions : public HHuginn::HObject {
 public:
 	HRegularExpressions( HHuginn::HClass* class_ )
 		: HObject( class_ )
-		, _exceptionClass( exception::create_class( class_->huginn(), "RegularExpressionException" ) )
-		, _compiledRegularExpressionClass( HCompiledRegularExpression::get_class( class_->huginn(), _exceptionClass ) ) {
+		, _exceptionClass( exception::create_class( class_->runtime(), "RegularExpressionException" ) )
+		, _compiledRegularExpressionClass( HCompiledRegularExpression::get_class( class_->runtime(), _exceptionClass ) ) {
 		return;
 	}
 	static HHuginn::value_t compile( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
@@ -74,13 +75,13 @@ namespace package_factory {
 
 class HRegularExpressionsCreator : public HPackageCreatorInterface {
 protected:
-	virtual HHuginn::value_t do_new_instance( HHuginn* );
+	virtual HHuginn::value_t do_new_instance( HRuntime* );
 } regularexpressionsCreator;
 
-HHuginn::value_t HRegularExpressionsCreator::do_new_instance( HHuginn* huginn_ ) {
+HHuginn::value_t HRegularExpressionsCreator::do_new_instance( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		huginn_->create_class(
+		runtime_->create_class(
 			"RegularExpressions",
 			nullptr,
 			HHuginn::field_definitions_t{
@@ -88,7 +89,7 @@ HHuginn::value_t HRegularExpressionsCreator::do_new_instance( HHuginn* huginn_ )
 			}
 		)
 	);
-	huginn_->register_class( c );
+	runtime_->huginn()->register_class( c );
 	return ( make_pointer<HRegularExpressions>( c.raw() ) );
 	M_EPILOG
 }

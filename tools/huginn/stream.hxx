@@ -49,7 +49,7 @@ public:
 	static HHuginn::value_t write( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	yaal::hcore::HString const& read_line_impl( void );
 	bool is_valid( void ) const;
-	static HHuginn::class_t get_class( HHuginn* );
+	static HHuginn::class_t get_class( HRuntime* );
 private:
 	yaal::hcore::HString read_impl( int long );
 	void write_impl( yaal::hcore::HString const& );

@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
+#include "runtime.hxx"
 #include "tools/huginn/thread.hxx"
 #include "tools/hash.hxx"
 #include "helper.hxx"
@@ -50,7 +51,7 @@ class HCryptography : public HHuginn::HObject {
 public:
 	HCryptography( HHuginn::HClass* class_ )
 		: HObject( class_ )
-		, _exceptionClass( exception::create_class( class_->huginn(), "CryptographyException" ) ) {
+		, _exceptionClass( exception::create_class( class_->runtime(), "CryptographyException" ) ) {
 		return;
 	}
 	static HHuginn::value_t md5( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
@@ -75,13 +76,13 @@ namespace package_factory {
 
 class HCryptographyCreator : public HPackageCreatorInterface {
 protected:
-	virtual HHuginn::value_t do_new_instance( HHuginn* );
+	virtual HHuginn::value_t do_new_instance( HRuntime* );
 } cryptographyCreator;
 
-HHuginn::value_t HCryptographyCreator::do_new_instance( HHuginn* huginn_ ) {
+HHuginn::value_t HCryptographyCreator::do_new_instance( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		huginn_->create_class(
+		runtime_->create_class(
 			"Cryptography",
 			nullptr,
 			HHuginn::field_definitions_t{
@@ -90,7 +91,7 @@ HHuginn::value_t HCryptographyCreator::do_new_instance( HHuginn* huginn_ ) {
 			}
 		)
 	);
-	huginn_->register_class( c );
+	runtime_->huginn()->register_class( c );
 	return ( make_pointer<HCryptography>( c.raw() ) );
 	M_EPILOG
 }

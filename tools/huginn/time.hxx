@@ -43,7 +43,7 @@ class HTime : public HHuginn::HObject {
 public:
 	HTime( HHuginn::HClass* );
 	static HHuginn::value_t to_string( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
-	static HHuginn::class_t get_class( HHuginn* );
+	static HHuginn::class_t get_class( HRuntime* );
 };
 
 }

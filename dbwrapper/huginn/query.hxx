@@ -44,7 +44,7 @@ public:
 	HQuery( tools::HHuginn::HClass const*, dbwrapper::HQuery::ptr_t const& );
 	static tools::HHuginn::value_t bind( tools::huginn::HThread*, tools::HHuginn::value_t* object_, tools::HHuginn::values_t const&, int );
 	static tools::HHuginn::value_t execute( tools::huginn::HThread*, tools::HHuginn::value_t* object_, tools::HHuginn::values_t const&, int );
-	static tools::HHuginn::class_t get_class( tools::HHuginn*, tools::HHuginn::class_t const& );
+	static tools::HHuginn::class_t get_class( tools::huginn::HRuntime*, tools::HHuginn::class_t const& );
 };
 
 }

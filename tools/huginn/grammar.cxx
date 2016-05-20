@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
+#include "runtime.hxx"
 #include "keyword.hxx"
 #include "compiler.hxx"
 
@@ -72,15 +73,15 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	);
 	HRule literalNone(
 		"none",
-		constant( KEYWORD::NONE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_direct, _compiler.get(), _none, _1 ) ) )
+		constant( KEYWORD::NONE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_direct, _compiler.get(), _runtime->none_value(), _1 ) ) )
 	);
 	HRule booleanLiteralTrue(
 		"true",
-		constant( KEYWORD::TRUE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_direct, _compiler.get(), _true, _1 ) ) )
+		constant( KEYWORD::TRUE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_direct, _compiler.get(), _runtime->true_value(), _1 ) ) )
 	);
 	HRule booleanLiteralFalse(
 		"false",
-		constant( KEYWORD::FALSE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_direct, _compiler.get(), _false, _1 ) ) )
+		constant( KEYWORD::FALSE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_direct, _compiler.get(), _runtime->false_value(), _1 ) ) )
 	);
 	HRule numberLiteral(
 		"numberLiteral",

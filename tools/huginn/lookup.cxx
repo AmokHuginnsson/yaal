@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
+#include "runtime.hxx"
 #include "iterator.hxx"
 #include "compiler.hxx"
 #include "value_builtin.hxx"
@@ -118,14 +119,14 @@ inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHug
 	M_EPILOG
 }
 
-HHuginn::class_t get_class( HHuginn* );
-HHuginn::class_t get_class( HHuginn* huginn_ ) {
+HHuginn::class_t get_class( HRuntime* );
+HHuginn::class_t get_class( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
-			huginn_,
+			runtime_,
 			type_id( HHuginn::TYPE::LOOKUP ),
-			huginn_->identifier_id( type_name( HHuginn::TYPE::LOOKUP ) ),
+			runtime_->identifier_id( type_name( HHuginn::TYPE::LOOKUP ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
 				{ "has_key", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &lookup::has_key, _1, _2, _3, _4 ) ) },
@@ -152,9 +153,9 @@ HHuginn::HLookup::HLookup( HHuginn::HClass const* class_ )
 HHuginn::HLookup::HLookup( HHuginn::HClass const* class_, values_t const& data_ )
 	: HIterable( class_ )
 	, _data( &value_builtin::hash, &value_builtin::key_equals ) {
-	HHuginn* huginn( class_->huginn() );
+	HRuntime* runtime( class_->runtime() );
 	for ( values_t::value_type const& v : data_ ) {
-		_data.insert( make_pair( v.first->clone( huginn ), v.second->clone( huginn ) ) );
+		_data.insert( make_pair( v.first->clone( runtime ), v.second->clone( runtime ) ) );
 	}
 	return;
 }
@@ -216,8 +217,8 @@ HHuginn::HIterable::HIterator HHuginn::HLookup::do_iterator( void ) {
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HLookup::do_clone( HHuginn* huginn_ ) const {
-	return ( huginn_->object_factory()->create_lookup( _data ) );
+HHuginn::value_t HHuginn::HLookup::do_clone( HRuntime* runtime_ ) const {
+	return ( runtime_->object_factory()->create_lookup( _data ) );
 }
 
 }

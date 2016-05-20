@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "compiler.hxx"
+#include "runtime.hxx"
 #include "function.hxx"
 #include "scope.hxx"
 #include "expression.hxx"
@@ -210,7 +211,7 @@ void OCompiler::OIdentifierUse::write( int position_, TYPE type_ ) {
 	return;
 }
 
-OCompiler::OCompiler( HHuginn* huginn_ )
+OCompiler::OCompiler( HRuntime* runtime_ )
 	: _functionContexts()
 	, _classContext()
 	, _submittedClasses()
@@ -222,7 +223,7 @@ OCompiler::OCompiler( HHuginn* huginn_ )
 	, _setup( HHuginn::COMPILER::BE_STRICT )
 	, _statementIdGenerator( INVALID_STATEMENT_IDENTIFIER )
 	, _scopeContextCache()
-	, _huginn( huginn_ ) {
+	, _runtime( runtime_ ) {
 	return;
 }
 
@@ -240,7 +241,7 @@ void OCompiler::resolve_symbols( void ) {
 	for ( OExecutionStep& es : _executionStepsBacklog ) {
 		if ( es._classId != lastClassId ) {
 			if ( es._classId != INVALID_IDENTIFIER ) {
-				aClass = _huginn->get_class( es._classId );
+				aClass = _runtime->get_class( es._classId );
 				M_ASSERT( !! aClass );
 			} else {
 				aClass.reset();
@@ -344,8 +345,8 @@ void OCompiler::resolve_symbols( void ) {
 					break;
 				}
 			}
-			if ( ( es._operation == OExecutionStep::OPERATION::USE ) && ! is_keyword( _huginn->identifier_name( es._identifier ) ) ) {
-				HHuginn::function_t* callable( _huginn->get_function( es._identifier ) );
+			if ( ( es._operation == OExecutionStep::OPERATION::USE ) && ! is_keyword( _runtime->identifier_name( es._identifier ) ) ) {
+				HHuginn::function_t* callable( _runtime->get_function( es._identifier ) );
 				if ( !! callable ) {
 					es._expression->replace_execution_step(
 						es._index,
@@ -360,7 +361,7 @@ void OCompiler::resolve_symbols( void ) {
 					);
 					break;
 				} else {
-					HHuginn::value_t* p( _huginn->get_package( es._identifier ) );
+					HHuginn::value_t* p( _runtime->get_package( es._identifier ) );
 					if ( !! p ) {
 						es._expression->replace_execution_step(
 							es._index,
@@ -377,11 +378,11 @@ void OCompiler::resolve_symbols( void ) {
 				}
 			}
 			throw HHuginn::HHuginnRuntimeException(
-				"Symbol `"_ys.append( _huginn->identifier_name( es._identifier ) ).append( "' is not defined in this context." ), es._position
+				"Symbol `"_ys.append( _runtime->identifier_name( es._identifier ) ).append( "' is not defined in this context." ), es._position
 			);
 		} while ( false );
 	}
-	_huginn->set_max_local_variable_count( maxLocalVariableCount );
+	_runtime->set_max_local_variable_count( maxLocalVariableCount );
 	_scopeContextCache.clear();
 	_executionStepsBacklog.clear();
 	return;
@@ -407,14 +408,14 @@ HString use_name( OCompiler::OIdentifierUse::TYPE type_ ) {
 void OCompiler::detect_misuse( void ) const {
 	M_PROLOG
 	HHuginn::identifier_id_t implicitUse[] = {
-		_huginn->identifier_id( "main" ),
-		_huginn->identifier_id( "get_size" ),
-		_huginn->identifier_id( "to_string" ),
-		_huginn->identifier_id( "to_integer" ),
-		_huginn->identifier_id( "to_real" ),
-		_huginn->identifier_id( "to_number" ),
-		_huginn->identifier_id( "to_character" ),
-		_huginn->identifier_id( "to_boolean" )
+		_runtime->identifier_id( "main" ),
+		_runtime->identifier_id( "get_size" ),
+		_runtime->identifier_id( "to_string" ),
+		_runtime->identifier_id( "to_integer" ),
+		_runtime->identifier_id( "to_real" ),
+		_runtime->identifier_id( "to_number" ),
+		_runtime->identifier_id( "to_character" ),
+		_runtime->identifier_id( "to_boolean" )
 	};
 	HHuginn::identifier_id_t implicitDefinition[] = {
 		KEYWORD::CONSTRUCTOR_IDENTIFIER,
@@ -427,13 +428,13 @@ void OCompiler::detect_misuse( void ) const {
 		if ( use._readCount == 0 ) {
 			if ( find( begin( implicitUse ), end( implicitUse ), id ) == end( implicitUse ) ) {
 				throw HHuginn::HHuginnRuntimeException(
-					use_name( use._type ).append( " `" ).append( _huginn->identifier_name( id ) ).append( "' is never used." ), use._writePosition
+					use_name( use._type ).append( " `" ).append( _runtime->identifier_name( id ) ).append( "' is never used." ), use._writePosition
 				);
 			}
 		} else if ( ( use._writeCount == 0 ) && ( use._type != OIdentifierUse::TYPE::VARIABLE ) && ( use._type != OIdentifierUse::TYPE::UNKNOWN ) ) {
 			if ( find( begin( implicitDefinition ), end( implicitDefinition ), id ) == end( implicitDefinition ) ) {
 				throw HHuginn::HHuginnRuntimeException(
-					use_name( use._type ).append( " `" ).append( _huginn->identifier_name( id ) ).append( "' was never defined." ), use._readPosition
+					use_name( use._type ).append( " `" ).append( _runtime->identifier_name( id ) ).append( "' was never defined." ), use._readPosition
 				);
 			}
 		}
@@ -468,7 +469,7 @@ void OCompiler::note_type( HHuginn::identifier_id_t identifierId_, HHuginn::type
 
 void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	HHuginn::identifier_id_t functionIdentifier( _huginn->identifier_id( name_ ) );
+	HHuginn::identifier_id_t functionIdentifier( _runtime->identifier_id( name_ ) );
 	bool isCtorDtor( ( functionIdentifier == KEYWORD::CONSTRUCTOR_IDENTIFIER ) || ( functionIdentifier == KEYWORD::DESTRUCTOR_IDENTIFIER ) );
 	if ( is_restricted( name_ ) ) {
 		if ( ! _classContext || ! isCtorDtor ) {
@@ -494,7 +495,7 @@ void OCompiler::set_import_name( yaal::hcore::HString const& name_, executing_pa
 	if ( is_restricted( name_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), position_.get() );
 	}
-	HHuginn::identifier_id_t importIdentifer( _huginn->identifier_id( name_ ) );
+	HHuginn::identifier_id_t importIdentifer( _runtime->identifier_id( name_ ) );
 	if ( _submittedClasses.count( importIdentifer ) > 0 ) {
 		throw HHuginn::HHuginnRuntimeException( "Class `"_ys.append( name_ ).append( "' named is already defined." ), position_.get() );
 	}
@@ -511,7 +512,7 @@ void OCompiler::set_import_alias( yaal::hcore::HString const& name_, executing_p
 	if ( is_restricted( name_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), position_.get() );
 	}
-	HHuginn::identifier_id_t importAliasIdentifer( _huginn->identifier_id( name_ ) );
+	HHuginn::identifier_id_t importAliasIdentifer( _runtime->identifier_id( name_ ) );
 	if ( _submittedClasses.count( importAliasIdentifer ) > 0 ) {
 		throw HHuginn::HHuginnRuntimeException( "Class `"_ys.append( name_ ).append( "' named is already defined." ), position_.get() );
 	}
@@ -526,14 +527,14 @@ void OCompiler::commit_import( executing_parser::position_t position_ ) {
 	for ( submitted_imports_t::value_type const& i : _submittedImports ) {
 		if ( i.second == _importAlias ) {
 			throw HHuginn::HHuginnRuntimeException(
-				"Import alias `"_ys.append( _huginn->identifier_name( _importAlias ) ).append( "' is already defined." ),
+				"Import alias `"_ys.append( _runtime->identifier_name( _importAlias ) ).append( "' is already defined." ),
 				position_.get()
 			);
 		}
 	}
 	if ( ! _submittedImports.insert( make_pair( _importIdentifier, _importAlias ) ).second ) {
 		throw HHuginn::HHuginnRuntimeException(
-			"Package `"_ys.append( _huginn->identifier_name( _importIdentifier ) ).append( "' was already imported." ),
+			"Package `"_ys.append( _runtime->identifier_name( _importIdentifier ) ).append( "' was already imported." ),
 			position_.get()
 		);
 	}
@@ -544,7 +545,7 @@ void OCompiler::commit_import( executing_parser::position_t position_ ) {
 void OCompiler::set_class_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	_classContext = make_resource<OClassContext>();
-	HHuginn::identifier_id_t classIdentifer( _huginn->identifier_id( name_ ) );
+	HHuginn::identifier_id_t classIdentifer( _runtime->identifier_id( name_ ) );
 	_usedIdentifiers[classIdentifer].write( position_.get(), OIdentifierUse::TYPE::CLASS );
 	if ( is_restricted( name_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), position_.get() );
@@ -564,7 +565,7 @@ void OCompiler::set_base_name( yaal::hcore::HString const& name_, executing_pars
 	if ( is_builtin( name_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), position_.get() );
 	}
-	HHuginn::identifier_id_t baseClassIdentifer( _huginn->identifier_id( name_ ) );
+	HHuginn::identifier_id_t baseClassIdentifer( _runtime->identifier_id( name_ ) );
 	_usedIdentifiers[baseClassIdentifer].read( position_.get() );
 	_classContext->_baseName = baseClassIdentifer;
 	_classContext->_basePosition = position_;
@@ -576,7 +577,7 @@ void OCompiler::add_field_name( yaal::hcore::HString const& name_, executing_par
 	M_PROLOG
 	if ( find( _classContext->_fieldNames.begin(), _classContext->_fieldNames.end(), name_ ) != _classContext->_fieldNames.end() ) {
 		throw HHuginn::HHuginnRuntimeException(
-			"Field `"_ys.append( name_ ).append( "' is already defined in `" ).append( _huginn->identifier_name( _classContext->_classIdentifier ) ).append( "'." ),
+			"Field `"_ys.append( name_ ).append( "' is already defined in `" ).append( _runtime->identifier_name( _classContext->_classIdentifier ) ).append( "'." ),
 			position_.get()
 		);
 	}
@@ -590,7 +591,7 @@ void OCompiler::set_field_name( yaal::hcore::HString const& name_, executing_par
 	if ( is_restricted( name_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), position_.get() );
 	}
-	HHuginn::identifier_id_t fieldIdentifer( _huginn->identifier_id( name_ ) );
+	HHuginn::identifier_id_t fieldIdentifer( _runtime->identifier_id( name_ ) );
 	_usedIdentifiers[fieldIdentifer].write( position_.get(), OIdentifierUse::TYPE::FIELD );
 	add_field_name( name_, position_ );
 	return;
@@ -599,8 +600,8 @@ void OCompiler::set_field_name( yaal::hcore::HString const& name_, executing_par
 
 void OCompiler::set_lambda_name( executing_parser::position_t position_ ) {
 	M_PROLOG
-	HHuginn::HErrorCoordinate ec( _huginn->get_coordinate( position_.get() ) );
-	HHuginn::identifier_id_t id( _huginn->identifier_id( to_string( "@" ).append( ec.line() ).append( ":" ).append( ec.column() ) ) );
+	HHuginn::HErrorCoordinate ec( _runtime->huginn()->get_coordinate( position_.get() ) );
+	HHuginn::identifier_id_t id( _runtime->identifier_id( to_string( "@" ).append( ec.line() ).append( ":" ).append( ec.column() ) ) );
 	_functionContexts.emplace( make_resource<OFunctionContext>( id, ++ _statementIdGenerator, true ) );
 	return;
 	M_EPILOG
@@ -612,7 +613,7 @@ void OCompiler::create_function( executing_parser::position_t position_ ) {
 	if ( !! _classContext ) {
 		_classContext->_methods.insert( make_pair( static_cast<int>( _classContext->_fieldNames.get_size() - 1 ), fi.second ) );
 	} else {
-		_huginn->register_function( fi.first, fi.second );
+		_runtime->register_function( fi.first, fi.second );
 	}
 	M_EPILOG
 }
@@ -646,7 +647,7 @@ void OCompiler::submit_class( executing_parser::position_t position_ ) {
 	pop_function_context();
 	if ( ! _submittedClasses.insert( make_pair( _classContext->_classIdentifier, yaal::move( _classContext ) ) ).second ) {
 		throw HHuginn::HHuginnRuntimeException(
-			"`"_ys.append( _huginn->identifier_name( _classContext->_classIdentifier ) ).append( "' is already defined." ),
+			"`"_ys.append( _runtime->identifier_name( _classContext->_classIdentifier ) ).append( "' is already defined." ),
 			position_.get()
 		);
 	}
@@ -666,16 +667,16 @@ void OCompiler::track_name_cycle( HHuginn::identifier_id_t identifierId_ ) {
 		submitted_classes_t::const_iterator it( _submittedClasses.find( cc->_baseName ) );
 		if ( it == _submittedClasses.end() ) {
 			throw HHuginn::HHuginnRuntimeException(
-				"Base class `"_ys.append( _huginn->identifier_name( cc->_baseName ) ).append( "' was not defined." ),
+				"Base class `"_ys.append( _runtime->identifier_name( cc->_baseName ) ).append( "' was not defined." ),
 				cc->_basePosition.get()
 			);
 		}
 		hierarhy.push_back( cc->_baseName );
 		if ( ! names.insert( cc->_baseName ).second ) {
-			hcore::HString hier( _huginn->identifier_name( identifierId_ ) );
+			hcore::HString hier( _runtime->identifier_name( identifierId_ ) );
 			for ( HHuginn::identifier_id_t n : hierarhy ) {
 				hier.append( "->" );
-				hier.append( _huginn->identifier_name( n ) );
+				hier.append( _runtime->identifier_name( n ) );
 			}
 			throw HHuginn::HHuginnRuntimeException( "Class derivation cycle detected `"_ys.append( hier ).append( "'." ), cc->_basePosition.get() );
 		}
@@ -708,7 +709,7 @@ void OCompiler::verify_default_argument( executing_parser::position_t position_ 
 void OCompiler::add_paramater( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	HHuginn::identifier_id_t parameterIdentifer( _huginn->identifier_id( name_ ) );
+	HHuginn::identifier_id_t parameterIdentifer( _runtime->identifier_id( name_ ) );
 	if ( find( fc._parameters.begin(), fc._parameters.end(), parameterIdentifer ) != fc._parameters.end() ) {
 		throw HHuginn::HHuginnRuntimeException( "Parameter `"_ys.append( name_ ).append( "' was already defined." ), position_.get() );
 	}
@@ -889,7 +890,7 @@ void OCompiler::commit_boolean( OPERATOR operator_, executing_parser::position_t
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	if ( fc.expressions_stack().top().get_size() > 1 ) {
-		HHuginn::value_t And( make_pointer<HBooleanEvaluator>( _huginn, fc.expressions_stack().top(), operator_ ) );
+		HHuginn::value_t And( make_pointer<HBooleanEvaluator>( _runtime, fc.expressions_stack().top(), operator_ ) );
 		fc.expressions_stack().pop();
 		M_ASSERT( ! fc._valueTypes.is_empty() && fc._valueTypes.top() == HHuginn::TYPE::BOOLEAN );
 		fc._valueTypes.pop();
@@ -933,7 +934,7 @@ void OCompiler::add_return_statement( executing_parser::position_t position_ ) {
 	M_ASSERT( ! f()._scopeStack.is_empty() );
 	HHuginn::expression_t& e( current_expression() );
 	if ( e->is_empty() ) {
-		e->add_execution_step( hcore::call( &HExpression::store_direct, e.raw(), _huginn->none_value(), _1, position_.get() ) );
+		e->add_execution_step( hcore::call( &HExpression::store_direct, e.raw(), _runtime->none_value(), _1, position_.get() ) );
 	}
 	terminate_scope( make_pointer<HReturn>( e, position_.get() ) );
 	reset_expression();
@@ -944,7 +945,7 @@ void OCompiler::add_return_statement( executing_parser::position_t position_ ) {
 void OCompiler::add_throw_statement( executing_parser::position_t position_ ) {
 	M_PROLOG
 	M_ASSERT( ! f()._scopeStack.is_empty() );
-	terminate_scope( make_pointer<HThrow>( _huginn, current_expression(), position_.get() ) );
+	terminate_scope( make_pointer<HThrow>( _runtime->huginn(), current_expression(), position_.get() ) );
 	reset_expression();
 	return;
 	M_EPILOG
@@ -1044,7 +1045,7 @@ void OCompiler::set_type_name( yaal::hcore::HString const& name_, executing_pars
 	OFunctionContext& fc( f() );
 	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, position_.get() ) );
 	OScopeContext& sc( current_scope_context() );
-	sc._exceptionType = _huginn->identifier_id( name_ );
+	sc._exceptionType = _runtime->identifier_id( name_ );
 	return;
 	M_EPILOG
 }
@@ -1711,7 +1712,7 @@ void OCompiler::dispatch_function_call( expression_action_t const& action_, exec
 		current_expression()->add_execution_step(
 			hcore::call(
 				&HExpression::store_direct, current_expression().raw(),
-				_huginn->object_factory()->create_string( _huginn->get_snippet( from, len ).trim() ),
+				_runtime->object_factory()->create_string( _runtime->huginn()->get_snippet( from, len ).trim() ),
 				_1,
 				position_.get()
 			)
@@ -1853,7 +1854,7 @@ void OCompiler::make_reference( executing_parser::position_t position_ ) {
 void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	HHuginn::identifier_id_t refIdentifier( _huginn->identifier_id( value_ ) );
+	HHuginn::identifier_id_t refIdentifier( _runtime->identifier_id( value_ ) );
 	_usedIdentifiers[refIdentifier].read( position_.get() );
 	bool keyword( false );
 	bool isAssert( refIdentifier == KEYWORD::ASSERT_IDENTIFIER );
@@ -1878,7 +1879,7 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 			hcore::call(
 				&HExpression::store_direct,
 				current_expression().raw(),
-				make_pointer<HHuginn::HFunctionReference>( refIdentifier, *_huginn->get_function( refIdentifier ) ),
+				make_pointer<HHuginn::HFunctionReference>( refIdentifier, *_runtime->get_function( refIdentifier ) ),
 				_1,
 				position_.get()
 			)
@@ -1910,7 +1911,7 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 
 void OCompiler::defer_get_field_reference( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
 	OFunctionContext& fc( f() );
-	HHuginn::identifier_id_t refIdentifier( _huginn->identifier_id( value_ ) );
+	HHuginn::identifier_id_t refIdentifier( _runtime->identifier_id( value_ ) );
 	_usedIdentifiers[refIdentifier].read( position_.get(), OIdentifierUse::TYPE::FIELD );
 	if ( huginn::is_keyword( value_ ) ) {
 		if ( refIdentifier != KEYWORD::CONSTRUCTOR_IDENTIFIER ) {
@@ -1935,7 +1936,7 @@ void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executi
 	if ( huginn::is_restricted( value_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted name." ), position_.get() );
 	}
-	HHuginn::identifier_id_t varIdentifier( _huginn->identifier_id( value_ ) );
+	HHuginn::identifier_id_t varIdentifier( _runtime->identifier_id( value_ ) );
 	HHuginn::expression_t& expression( current_expression() );
 	int index( expression->add_execution_step( HExpression::execution_step_t() ) );
 	_executionStepsBacklog.emplace_back(
@@ -1972,7 +1973,7 @@ void OCompiler::defer_store_real( double long value_, executing_parser::position
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		current_expression()->add_execution_step( hcore::call( &HExpression::store_direct, current_expression().raw(), _huginn->object_factory()->create_real( value_ ), _1, position_.get() ) );
+		current_expression()->add_execution_step( hcore::call( &HExpression::store_direct, current_expression().raw(), _runtime->object_factory()->create_real( value_ ), _1, position_.get() ) );
 	} else {
 		current_expression()->add_execution_step( hcore::call( &HExpression::store_real, current_expression().raw(), value_, _1, position_.get() ) );
 	}
@@ -1985,7 +1986,7 @@ void OCompiler::defer_store_integer( int long long value_, executing_parser::pos
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		current_expression()->add_execution_step( hcore::call( &HExpression::store_direct, current_expression().raw(), _huginn->object_factory()->create_integer( value_ ), _1, position_.get() ) );
+		current_expression()->add_execution_step( hcore::call( &HExpression::store_direct, current_expression().raw(), _runtime->object_factory()->create_integer( value_ ), _1, position_.get() ) );
 	} else {
 		current_expression()->add_execution_step( hcore::call( &HExpression::store_integer, current_expression().raw(), value_, _1, position_.get() ) );
 	}
@@ -1998,7 +1999,7 @@ void OCompiler::defer_store_string( yaal::hcore::HString const& value_, executin
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		current_expression()->add_execution_step( hcore::call( &HExpression::store_direct, current_expression().raw(), _huginn->object_factory()->create_string( value_ ), _1, position_.get() ) );
+		current_expression()->add_execution_step( hcore::call( &HExpression::store_direct, current_expression().raw(), _runtime->object_factory()->create_string( value_ ), _1, position_.get() ) );
 	} else {
 		current_expression()->add_execution_step( hcore::call( &HExpression::store_string, current_expression().raw(), value_, _1, position_.get() ) );
 	}
@@ -2011,7 +2012,7 @@ void OCompiler::defer_store_number( yaal::hcore::HString const& value_, executin
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		current_expression()->add_execution_step( hcore::call( &HExpression::store_direct, current_expression().raw(), _huginn->object_factory()->create_number( value_ ), _1, position_.get() ) );
+		current_expression()->add_execution_step( hcore::call( &HExpression::store_direct, current_expression().raw(), _runtime->object_factory()->create_number( value_ ), _1, position_.get() ) );
 	} else {
 		current_expression()->add_execution_step( hcore::call( &HExpression::store_number, current_expression().raw(), value_, _1, position_.get() ) );
 	}
@@ -2024,7 +2025,7 @@ void OCompiler::defer_store_character( char value_, executing_parser::position_t
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		current_expression()->add_execution_step( hcore::call( &HExpression::store_direct, current_expression().raw(), _huginn->object_factory()->create_character( value_ ), _1, position_.get() ) );
+		current_expression()->add_execution_step( hcore::call( &HExpression::store_direct, current_expression().raw(), _runtime->object_factory()->create_character( value_ ), _1, position_.get() ) );
 	} else {
 		current_expression()->add_execution_step( hcore::call( &HExpression::store_character, current_expression().raw(), value_, _1, position_.get() ) );
 	}

@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
+#include "runtime.hxx"
 #include "tools/stringalgo.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
@@ -58,7 +59,7 @@ public:
 		verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, false, position_ );
 		typedef HArray<HString> strings_t;
 		strings_t strings( string::split<strings_t>( get_string( values_[0] ), get_string( values_[1] ) ) );
-		HObjectFactory* of( thread_->huginn().object_factory() );
+		HObjectFactory* of( thread_->runtime().object_factory() );
 		HHuginn::value_t l( of->create_list() );
 		for ( HString const& s : strings ) {
 			static_cast<HHuginn::HList*>( l.raw() )->push_back( of->create_string( s ) );
@@ -107,7 +108,7 @@ public:
 			addSep = true;
 			it.next();
 		}
-		HHuginn::value_t v( thread_->huginn().object_factory()->create_string( s ) );
+		HHuginn::value_t v( thread_->runtime().object_factory()->create_string( s ) );
 		return ( v );
 	}
 	static HHuginn::value_t distance( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
@@ -115,7 +116,7 @@ public:
 		verify_arg_count( name, values_, 2, 2, position_ );
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, false, position_ );
 		verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, false, position_ );
-		return ( thread_->huginn().object_factory()->create_integer( string::distance::levenshtein_damerau( get_string( values_[0] ), get_string( values_[1] ) ) ) );
+		return ( thread_->runtime().object_factory()->create_integer( string::distance::levenshtein_damerau( get_string( values_[0] ), get_string( values_[1] ) ) ) );
 	}
 };
 
@@ -123,13 +124,13 @@ namespace package_factory {
 
 class HTextCreator : public HPackageCreatorInterface {
 protected:
-	virtual HHuginn::value_t do_new_instance( HHuginn* );
+	virtual HHuginn::value_t do_new_instance( HRuntime* );
 } textCreator;
 
-HHuginn::value_t HTextCreator::do_new_instance( HHuginn* huginn_ ) {
+HHuginn::value_t HTextCreator::do_new_instance( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		huginn_->create_class(
+		runtime_->create_class(
 			"Text",
 			nullptr,
 			HHuginn::field_definitions_t{
@@ -139,7 +140,7 @@ HHuginn::value_t HTextCreator::do_new_instance( HHuginn* huginn_ ) {
 			}
 		)
 	);
-	huginn_->register_class( c );
+	runtime_->huginn()->register_class( c );
 	return ( make_pointer<HText>( c.raw() ) );
 	M_EPILOG
 }

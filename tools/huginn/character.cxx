@@ -30,6 +30,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
+#include "runtime.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
@@ -74,15 +75,15 @@ inline HHuginn::value_t is_of_a_kind( char const* name, int (*isofakind)(int), h
 	M_EPILOG
 }
 
-HHuginn::class_t get_class( HHuginn* );
-HHuginn::class_t get_class( HHuginn* huginn_ ) {
+HHuginn::class_t get_class( HRuntime* );
+HHuginn::class_t get_class( HRuntime* runtime_ ) {
 	M_PROLOG
 
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
-			huginn_,
+			runtime_,
 			type_id( HHuginn::TYPE::CHARACTER ),
-			huginn_->identifier_id( type_name( HHuginn::TYPE::CHARACTER ) ),
+			runtime_->identifier_id( type_name( HHuginn::TYPE::CHARACTER ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
 				{ "to_lower",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &character::to_lower, _1, _2, _3, _4 ) ) },
@@ -116,8 +117,8 @@ void HHuginn::HCharacter::set( value_type value_ ) {
 	return;
 }
 
-HHuginn::value_t HHuginn::HCharacter::do_clone( HHuginn* huginn_ ) const {
-	return ( huginn_->object_factory()->create_character( _value ) );
+HHuginn::value_t HHuginn::HCharacter::do_clone( HRuntime* runtime_ ) const {
+	return ( runtime_->object_factory()->create_character( _value ) );
 }
 
 }

@@ -47,7 +47,7 @@ private:
 	expressions_t _expressions;
 	OPERATOR _operator;
 public:
-	HBooleanEvaluator( HHuginn*, expressions_t const&, OPERATOR );
+	HBooleanEvaluator( HRuntime*, expressions_t const&, OPERATOR );
 	bool execute( huginn::HThread* );
 };
 

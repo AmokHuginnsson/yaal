@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
+#include "runtime.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
@@ -62,7 +63,7 @@ public:
 	int stop( void ) const {
 		return ( _stop );
 	}
-	static HHuginn::class_t get_class( HHuginn* huginn_ ) {
+	static HHuginn::class_t get_class( HRuntime* huginn_ ) {
 		M_PROLOG
 		return (
 			huginn_->create_class(
@@ -89,7 +90,7 @@ public:
 	HRangeIterator( int from_, HRange const* range_ )
 		: _i( from_ )
 		, _range( range_ )
-		, _objectFactory( range_->HIterable::get_class()->huginn()->object_factory() ) {
+		, _objectFactory( range_->HIterable::get_class()->runtime()->object_factory() ) {
 		return;
 	}
 protected:
@@ -117,8 +118,8 @@ class HAlgorithms : public HHuginn::HObject {
 public:
 	HAlgorithms( HHuginn::HClass* class_ )
 		: HObject( class_ )
-		, _rangeClass( HRange::get_class( class_->huginn() ) ) {
-		class_->huginn()->register_class( _rangeClass );
+		, _rangeClass( HRange::get_class( class_->runtime() ) ) {
+		class_->runtime()->huginn()->register_class( _rangeClass );
 		return;
 	}
 	static HHuginn::value_t range( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
@@ -221,13 +222,13 @@ namespace package_factory {
 
 class HAlgorithmsCreator : public HPackageCreatorInterface {
 protected:
-	virtual HHuginn::value_t do_new_instance( HHuginn* );
+	virtual HHuginn::value_t do_new_instance( HRuntime* );
 } algorithmsCreator;
 
-HHuginn::value_t HAlgorithmsCreator::do_new_instance( HHuginn* huginn_ ) {
+HHuginn::value_t HAlgorithmsCreator::do_new_instance( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		huginn_->create_class(
+		runtime_->create_class(
 			"Algorithms",
 			nullptr,
 			HHuginn::field_definitions_t{
@@ -236,7 +237,7 @@ HHuginn::value_t HAlgorithmsCreator::do_new_instance( HHuginn* huginn_ ) {
 			}
 		)
 	);
-	huginn_->register_class( c );
+	runtime_->huginn()->register_class( c );
 	return ( make_pointer<HAlgorithms>( c.raw() ) );
 	M_EPILOG
 }

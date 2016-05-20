@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
+#include "tools/huginn/runtime.hxx"
 #include "tools/huginn/thread.hxx"
 #include "tools/huginn/helper.hxx"
 #include "tools/huginn/exception.hxx"
@@ -51,8 +52,8 @@ class HDatabase : public HHuginn::HObject {
 public:
 	HDatabase( HHuginn::HClass* class_ )
 		: HObject( class_ )
-		, _exceptionClass( exception::create_class( class_->huginn(), "DatabaseException" ) )
-		, _databaseConnectionClass( HDatabaseConnection::get_class( class_->huginn(), _exceptionClass ) ) {
+		, _exceptionClass( exception::create_class( class_->runtime(), "DatabaseException" ) )
+		, _databaseConnectionClass( HDatabaseConnection::get_class( class_->runtime(), _exceptionClass ) ) {
 		return;
 	}
 	static HHuginn::value_t connect( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
@@ -75,13 +76,13 @@ namespace package_factory {
 
 class HDatabaseCreator : public HPackageCreatorInterface {
 protected:
-	virtual HHuginn::value_t do_new_instance( HHuginn* );
+	virtual HHuginn::value_t do_new_instance( HRuntime* );
 } databaseCreator;
 
-HHuginn::value_t HDatabaseCreator::do_new_instance( HHuginn* huginn_ ) {
+HHuginn::value_t HDatabaseCreator::do_new_instance( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		huginn_->create_class(
+		runtime_->create_class(
 			"Database",
 			nullptr,
 			HHuginn::field_definitions_t{
@@ -89,7 +90,7 @@ HHuginn::value_t HDatabaseCreator::do_new_instance( HHuginn* huginn_ ) {
 			}
 		)
 	);
-	huginn_->register_class( c );
+	runtime_->huginn()->register_class( c );
 	return ( make_pointer<HDatabase>( c.raw() ) );
 	M_EPILOG
 }

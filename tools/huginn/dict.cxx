@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
+#include "runtime.hxx"
 #include "iterator.hxx"
 #include "compiler.hxx"
 #include "thread.hxx"
@@ -118,14 +119,14 @@ inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHug
 	M_EPILOG
 }
 
-HHuginn::class_t get_class( HHuginn* );
-HHuginn::class_t get_class( HHuginn* huginn_ ) {
+HHuginn::class_t get_class( HRuntime* );
+HHuginn::class_t get_class( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
-			huginn_,
+			runtime_,
 			type_id( HHuginn::TYPE::DICT ),
-			huginn_->identifier_id( type_name( HHuginn::TYPE::DICT ) ),
+			runtime_->identifier_id( type_name( HHuginn::TYPE::DICT ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
 				{ "has_key", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::has_key, _1, _2, _3, _4 ) ) },
@@ -154,9 +155,9 @@ HHuginn::HDict::HDict( HHuginn::HClass const* class_, values_t const& data_, HHu
 	: HIterable( class_ )
 	, _data( &value_builtin::less_low )
 	, _keyType( keyType_ ) {
-	HHuginn* huginn( class_->huginn() );
+	HRuntime* runtime( class_->runtime() );
 	for ( values_t::value_type const& v : data_ ) {
-		_data.insert( _data.end(), make_pair( v.first->clone( huginn ), v.second->clone( huginn ) ) );
+		_data.insert( _data.end(), make_pair( v.first->clone( runtime ), v.second->clone( runtime ) ) );
 	}
 	return;
 }
@@ -236,8 +237,8 @@ HHuginn::HIterable::HIterator HHuginn::HDict::do_iterator( void ) {
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HDict::do_clone( HHuginn* huginn_ ) const {
-	return ( huginn_->object_factory()->create_dict( _data, _keyType ) );
+HHuginn::value_t HHuginn::HDict::do_clone( HRuntime* runtime_ ) const {
+	return ( runtime_->object_factory()->create_dict( _data, _keyType ) );
 }
 
 }

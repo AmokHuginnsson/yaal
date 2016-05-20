@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "thread.hxx"
+#include "runtime.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -38,13 +39,13 @@ namespace tools {
 
 namespace huginn {
 
-HThread::HThread( HHuginn* huginn_, yaal::hcore::HThread::id_t id_ )
+HThread::HThread( HRuntime* runtime_, yaal::hcore::HThread::id_t id_ )
 	: _frames()
 	, _currentFrame( nullptr )
 	, _frameCount( 0 )
 	, _id( id_ )
-	, _huginn( huginn_ )
-	, _objectFactory( *_huginn->object_factory() )
+	, _runtime( runtime_ )
+	, _objectFactory( *_runtime->object_factory() )
 	, _exceptionMessage()
 	, _exceptionPosition( 0 ) {
 	return;
@@ -162,7 +163,7 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t&& value_, 
 void HThread::raise( HHuginn::HClass const* class_, yaal::hcore::HString const& message_, int position_ ) {
 	M_PROLOG
 	HHuginn::value_t e( make_pointer<HHuginn::HException>( class_, message_ ) );
-	static_cast<HHuginn::HException*>( e.raw() )->set_where( _huginn->where( position_ ) );
+	static_cast<HHuginn::HException*>( e.raw() )->set_where( _runtime->huginn()->where( position_ ) );
 	break_execution( HFrame::STATE::EXCEPTION, yaal::move( e ), 0, position_ );
 	return;
 	M_EPILOG

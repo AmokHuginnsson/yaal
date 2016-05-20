@@ -30,6 +30,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "databaseconnection.hxx"
 #include "query.hxx"
 #include "dbwrapper/dbwrapper.hxx"
+#include "tools/huginn/runtime.hxx"
 #include "tools/huginn/helper.hxx"
 #include "tools/huginn/thread.hxx"
 #include "tools/huginn/objectfactory.hxx"
@@ -88,13 +89,13 @@ public:
 	typedef HDatabaseConnectionClass this_type;
 	typedef HHuginn::HClass base_type;
 	HDatabaseConnectionClass(
-		HHuginn* huginn_,
+		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_,
 		HHuginn::class_t const& exceptionClass_
 	) : HHuginn::HClass(
-			huginn_,
+			runtime_,
 			typeId_,
-			huginn_->identifier_id( "DatabaseConnection" ),
+			runtime_->identifier_id( "DatabaseConnection" ),
 			nullptr,
 			HHuginn::field_definitions_t{
 				{ "query", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::query, _1, _2, _3, _4 ) ) },
@@ -103,7 +104,7 @@ public:
 			}
 		)
 		, _exceptionClass( exceptionClass_ )
-		, _queryClass( huginn::HQuery::get_class( huginn_, exceptionClass_ ) ) {
+		, _queryClass( huginn::HQuery::get_class( runtime_, exceptionClass_ ) ) {
 		return;
 	}
 	HHuginn::HClass const* query_class( void ) const {
@@ -118,7 +119,7 @@ private:
 		char const n[] = "DatabaseConnection.contructor";
 		verify_arg_count( n, values_, 1, 1, position_ );
 		verify_arg_type( n, values_, 0, HHuginn::TYPE::STRING, true, position_ );
-		HHuginn::value_t v( thread_->huginn().none_value() );
+		HHuginn::value_t v( thread_->runtime().none_value() );
 		try {
 			dbwrapper::database_ptr_t db( dbwrapper::util::connect( get_string( values_[0] ) ) );
 			v = make_pointer<HDatabaseConnection>( this, db );
@@ -139,7 +140,7 @@ HHuginn::value_t HDatabaseConnection::do_query(
 	verify_arg_count( name, values_, 1, 1, position_ );
 	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
 	HDatabaseConnectionClass const* dbcClass( static_cast<HDatabaseConnectionClass const*>( HObject::get_class() ) );
-	HHuginn::value_t v( thread_->huginn().none_value() );
+	HHuginn::value_t v( thread_->runtime().none_value() );
 	try {
 		dbwrapper::HQuery::ptr_t q( _database->prepare_query( get_string( values_[0] ) ) );
 		v = make_pointer<huginn::HQuery>( dbcClass->query_class(), q );
@@ -157,7 +158,7 @@ HHuginn::value_t HDatabaseConnection::do_table_names(
 	char const name[] = "DatabaseConnection.table_names";
 	verify_arg_count( name, values_, 0, 0, position_ );
 	HDatabaseConnectionClass const* dbcClass( static_cast<HDatabaseConnectionClass const*>( HObject::get_class() ) );
-	HHuginn::value_t v( thread_->huginn().none_value() );
+	HHuginn::value_t v( thread_->runtime().none_value() );
 	try {
 		HDataBase::table_list_t tl( _database->get_tables() );
 		v = thread_->object_factory().create_list();
@@ -180,7 +181,7 @@ HHuginn::value_t HDatabaseConnection::do_column_names(
 	verify_arg_count( name, values_, 1, 1, position_ );
 	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
 	HDatabaseConnectionClass const* dbcClass( static_cast<HDatabaseConnectionClass const*>( HObject::get_class() ) );
-	HHuginn::value_t v( thread_->huginn().none_value() );
+	HHuginn::value_t v( thread_->runtime().none_value() );
 	try {
 		HDataBase::column_list_t cl( _database->get_columns( get_string( values_[0] ) ) );
 		v = thread_->object_factory().create_list();
@@ -194,15 +195,15 @@ HHuginn::value_t HDatabaseConnection::do_column_names(
 	return ( v );
 }
 
-HHuginn::class_t HDatabaseConnection::get_class( HHuginn* huginn_, HHuginn::class_t const& exceptionClass_ ) {
+HHuginn::class_t HDatabaseConnection::get_class( HRuntime* runtime_, HHuginn::class_t const& exceptionClass_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		huginn_->create_class(
-			HHuginn::class_constructor_t(
-				[&huginn_, &exceptionClass_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
+		runtime_->create_class(
+			HRuntime::class_constructor_t(
+				[&runtime_, &exceptionClass_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
 					return (
 						make_pointer<HDatabaseConnectionClass>(
-							huginn_,
+							runtime_,
 							typeId_,
 							exceptionClass_
 						)
@@ -211,7 +212,7 @@ HHuginn::class_t HDatabaseConnection::get_class( HHuginn* huginn_, HHuginn::clas
 			)
 		)
 	);
-	huginn_->register_class( c );
+	runtime_->huginn()->register_class( c );
 	return ( c );
 	M_EPILOG
 }

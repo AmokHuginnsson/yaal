@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
+#include "runtime.hxx"
 #include "keyword.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
@@ -91,8 +92,8 @@ HHuginn::HObject::~HObject( void ) {
 	M_PROLOG
 	/* *FIXME* *TODO* Remove !is_builtin() test after HObject, HValue hierarchy fix. */
 	HHuginn::HClass const* clss( get_class() );
-	HHuginn* huginn( clss->huginn() );
-	huginn::HThread* t( huginn && ! is_builtin( clss->name() ) ? huginn->current_thread() : nullptr );
+	HRuntime* runtime( clss->runtime() );
+	huginn::HThread* t( runtime && ! is_builtin( clss->name() ) ? runtime->current_thread() : nullptr );
 	if ( t && ! t->has_runtime_exception() ) {
 		hobject_destructor_helper::buffer_t buffer;
 		hobject_destructor_helper::allocator<hobject_destructor_helper::holder_t> allocator( buffer.mem() );
@@ -139,7 +140,7 @@ HHuginn::value_t HHuginn::HObject::do_field( HHuginn::value_t const& object_, in
 	value_t const& f( _fields[index_] );
 	bool isMethod( f->type_id() == TYPE::METHOD );
 	if ( isMethod ) {
-		return ( get_class()->huginn()->object_factory()->create_bound_method( *static_cast<HClass::HMethod const*>( f.raw() ), object_ ) );
+		return ( get_class()->runtime()->object_factory()->create_bound_method( *static_cast<HClass::HMethod const*>( f.raw() ), object_ ) );
 	}
 	return ( f );
 	M_EPILOG
@@ -161,7 +162,7 @@ HHuginn::value_t HHuginn::HObject::call_method(
 	M_PROLOG
 	M_ASSERT( object_.raw() == this );
 	HHuginn::value_t res;
-	int idx( field_index( thread_->huginn().identifier_id( methodName_ ) ) );
+	int idx( field_index( thread_->runtime().identifier_id( methodName_ ) ) );
 	if ( idx >= 0 ) {
 		HHuginn::value_t const& f( field( object_, idx ) );
 		if ( f->type_id() == HHuginn::TYPE::METHOD ) {
@@ -191,13 +192,13 @@ HHuginn::value_t HHuginn::HObject::call_method(
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HObject::do_clone( HHuginn* huginn_ ) const {
+HHuginn::value_t HHuginn::HObject::do_clone( HRuntime* runtime_ ) const {
 	M_PROLOG
 	values_t fields;
 	for ( value_t const& v : _fields ) {
-		fields.push_back( v->clone( huginn_ ) );
+		fields.push_back( v->clone( runtime_ ) );
 	}
-	return ( huginn_->object_factory()->create_object( get_class(), fields ) );
+	return ( runtime_->object_factory()->create_object( get_class(), fields ) );
 	M_EPILOG
 }
 

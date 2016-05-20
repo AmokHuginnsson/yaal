@@ -54,9 +54,9 @@ void HPackageCreatorInterface::cleanup_globals( void ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HPackageCreatorInterface::new_instance( HHuginn* huginn_ ) {
+HHuginn::value_t HPackageCreatorInterface::new_instance( HRuntime* runtime_ ) {
 	M_PROLOG
-	return ( do_new_instance( huginn_ ) );
+	return ( do_new_instance( runtime_ ) );
 	M_EPILOG
 }
 
@@ -72,12 +72,12 @@ void HPackageFactory::register_package_creator( HString const& name_, HPackageCr
 	M_EPILOG
 }
 
-HHuginn::value_t HPackageFactory::create_package( HHuginn* huginn_, yaal::hcore::HString const& name_ ) {
+HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, yaal::hcore::HString const& name_ ) {
 	M_PROLOG
 	HHuginn::value_t package;
 	creators_t::iterator it = _creators.find( name_ );
 	if ( it != _creators.end() ) {
-		package = it->second._instantiator->new_instance( huginn_ );
+		package = it->second._instantiator->new_instance( runtime_ );
 	}
 	return ( package );
 	M_EPILOG

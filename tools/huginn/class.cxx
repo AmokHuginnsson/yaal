@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
+#include "runtime.hxx"
 #include "keyword.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
@@ -43,7 +44,7 @@ namespace yaal {
 namespace tools {
 
 HHuginn::HClass::HClass(
-	HHuginn* huginn_,
+	HRuntime* runtime_,
 	type_id_t typeId_,
 	identifier_id_t identifierId_,
 	HClass const* super_,
@@ -54,10 +55,10 @@ HHuginn::HClass::HClass(
 	, _fieldIdentifiers()
 	, _fieldIndexes( super_ ? super_->_fieldIndexes : field_indexes_t() )
 	, _fieldDefinitions( super_ ? super_->_fieldDefinitions : values_t() )
-	, _huginn( huginn_ ) {
+	, _runtime( runtime_ ) {
 	M_PROLOG
 	for ( field_definitions_t::value_type const& fd : fieldDefinitions_ ) {
-		identifier_id_t identifierId( huginn_->identifier_id( fd.name() ) );
+		identifier_id_t identifierId( runtime_->identifier_id( fd.name() ) );
 		_fieldIdentifiers.emplace_back( identifierId );
 		field_indexes_t::const_iterator fi(
 			_fieldIndexes.insert( make_pair( identifierId, static_cast<int>( _fieldIndexes.get_size() ) ) ).first
@@ -79,7 +80,7 @@ HHuginn::HClass::HClass(
 	, _fieldIdentifiers()
 	, _fieldIndexes()
 	, _fieldDefinitions()
-	, _huginn( nullptr ) {
+	, _runtime( nullptr ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -94,7 +95,7 @@ int HHuginn::HClass::field_index( identifier_id_t identifierId_ ) const {
 
 yaal::hcore::HString const& HHuginn::HClass::name( void ) const {
 	M_PROLOG
-	return ( _huginn ? _huginn->identifier_name( _identifierId ) : type_name( _typeId ) );
+	return ( _runtime ? _runtime->identifier_name( _identifierId ) : type_name( _typeId ) );
 	M_EPILOG
 }
 
@@ -113,7 +114,7 @@ HHuginn::value_t HHuginn::HClass::create_instance( huginn::HThread* thread_, val
 
 HHuginn::value_t HHuginn::HClass::do_create_instance( huginn::HThread* thread_, values_t const& values_, int position_ ) const {
 	M_PROLOG
-	value_t v( thread_->huginn().object_factory()->create_object( this ) );
+	value_t v( thread_->runtime().object_factory()->create_object( this ) );
 	int constructorIdx( field_index( KEYWORD::CONSTRUCTOR_IDENTIFIER ) );
 	if ( constructorIdx >= 0 ) {
 		function( constructorIdx )( thread_, &v, values_, position_ );
@@ -126,7 +127,7 @@ HHuginn::values_t HHuginn::HClass::get_defaults( void ) const {
 	M_PROLOG
 	values_t defaults;
 	for ( value_t const& v : _fieldDefinitions ) {
-		defaults.push_back( v->clone( _huginn ) );
+		defaults.push_back( v->clone( _runtime ) );
 	}
 	return ( defaults );
 	M_EPILOG

@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "booleanevaluator.hxx"
+#include "runtime.hxx"
 #include "thread.hxx"
 #include "expression.hxx"
 #include "helper.hxx"
@@ -40,8 +41,8 @@ namespace tools {
 
 namespace huginn {
 
-HBooleanEvaluator::HBooleanEvaluator( HHuginn* huginn_, expressions_t const& expressions_, OPERATOR operator_ )
-	: HValue( huginn_->object_factory()->boolean_class() ),
+HBooleanEvaluator::HBooleanEvaluator( HRuntime* runtime_, expressions_t const& expressions_, OPERATOR operator_ )
+	: HValue( runtime_->object_factory()->boolean_class() ),
 	_expressions( expressions_ ),
 	_operator( operator_ ) {
 	return;

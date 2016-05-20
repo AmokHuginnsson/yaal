@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "queryresult.hxx"
+#include "tools/huginn/runtime.hxx"
 #include "tools/huginn/thread.hxx"
 #include "tools/huginn/iterator.hxx"
 #include "tools/huginn/helper.hxx"
@@ -45,11 +46,11 @@ namespace dbwrapper {
 namespace huginn {
 
 namespace {
-HHuginn::value_t fetch_row( HRecordSet::ptr_t const& rs_, HRecordSet::HIterator& it_, HHuginn& huginn_ ) {
-	HObjectFactory& objectFactory( *huginn_.object_factory() );
+HHuginn::value_t fetch_row( HRecordSet::ptr_t const& rs_, HRecordSet::HIterator& it_, HRuntime& runtime_ ) {
+	HObjectFactory& objectFactory( *runtime_.object_factory() );
 	HHuginn::value_t v( objectFactory.create_list() );
 	HHuginn::HList* row( static_cast<HHuginn::HList*>( v.raw() ) );
-	HHuginn::value_t& none( huginn_.none_value() );
+	HHuginn::value_t& none( runtime_.none_value() );
 	for ( int i( 0 ), fieldCount( rs_->get_field_count() ); i < fieldCount; ++ i ) {
 		HRecordSet::value_t f( it_[i] );
 		if ( !! f ) {
@@ -65,17 +66,17 @@ HHuginn::value_t fetch_row( HRecordSet::ptr_t const& rs_, HRecordSet::HIterator&
 class HQueryResultIterator : public HIteratorInterface {
 	HRecordSet::ptr_t _recordSet;
 	HRecordSet::HIterator _it;
-	HHuginn* _huginn;
+	HRuntime* _runtime;
 public:
-	HQueryResultIterator( HRecordSet::ptr_t const& recordSet_, HRecordSet::HIterator&& it_, HHuginn* huginn_ )
+	HQueryResultIterator( HRecordSet::ptr_t const& recordSet_, HRecordSet::HIterator&& it_, HRuntime* runtime_ )
 		: _recordSet( recordSet_ )
 		, _it( yaal::move( it_ ) )
-		, _huginn( huginn_ ) {
+		, _runtime( runtime_ ) {
 		return;
 	}
 protected:
 	virtual HHuginn::value_t do_value( void ) override {
-		return ( fetch_row( _recordSet, _it, *_huginn ) );
+		return ( fetch_row( _recordSet, _it, *_runtime ) );
 	}
 	virtual bool do_is_valid( void ) override {
 		return ( _it != _recordSet->end() );
@@ -94,7 +95,7 @@ HQueryResult::HQueryResult(
 ) : HIterable( class_ )
 	, _recordSet( recordSet_ )
 	, _it( _recordSet->begin() )
-	, _huginn( class_->huginn() ) {
+	, _runtime( class_->runtime() ) {
 	return;
 }
 
@@ -141,7 +142,7 @@ HHuginn::value_t HQueryResult::has_next( tools::huginn::HThread* thread_, HHugin
 }
 
 HHuginn::HIterable::HIterator HQueryResult::do_iterator( void ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HQueryResultIterator( _recordSet, yaal::move( _it ), _huginn ) );
+	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HQueryResultIterator( _recordSet, yaal::move( _it ), _runtime ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
@@ -155,13 +156,13 @@ public:
 	typedef HQueryResultClass this_type;
 	typedef HHuginn::HClass base_type;
 	HQueryResultClass(
-		HHuginn* huginn_,
+		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_,
 		HHuginn::class_t const& exceptionClass_
 	) : HHuginn::HClass(
-			huginn_,
+			runtime_,
 			typeId_,
-			huginn_->identifier_id( "QueryResult" ),
+			runtime_->identifier_id( "QueryResult" ),
 			nullptr,
 			HHuginn::field_definitions_t{
 				{ "column_name", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQueryResult::column_name, _1, _2, _3, _4 ) ) },
@@ -185,9 +186,9 @@ HHuginn::value_t HQueryResult::fetch_row( tools::huginn::HThread* thread_, HHugi
 	verify_arg_count( name, values_, 0, 0, position_ );
 	HQueryResult* qr( static_cast<HQueryResult*>( object_->raw() ) );
 	HQueryResultClass const* qrc( static_cast<HQueryResultClass const*>( qr->HValue::get_class() ) );
-	HHuginn::value_t v( thread_->huginn().none_value() );
+	HHuginn::value_t v( thread_->runtime().none_value() );
 	try {
-		v = huginn::fetch_row( qr->_recordSet, qr->_it, thread_->huginn() );
+		v = huginn::fetch_row( qr->_recordSet, qr->_it, thread_->runtime() );
 		++ qr->_it;
 	} catch ( HException const& e ) {
 		thread_->raise( qrc->exception_class(), e.what(), position_ );
@@ -196,15 +197,15 @@ HHuginn::value_t HQueryResult::fetch_row( tools::huginn::HThread* thread_, HHugi
 	M_EPILOG
 }
 
-HHuginn::class_t HQueryResult::get_class( HHuginn* huginn_, HHuginn::class_t const& exceptionClass_ ) {
+HHuginn::class_t HQueryResult::get_class( HRuntime* runtime_, HHuginn::class_t const& exceptionClass_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		huginn_->create_class(
-			HHuginn::class_constructor_t(
-				[&huginn_, &exceptionClass_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
+		runtime_->create_class(
+			HRuntime::class_constructor_t(
+				[&runtime_, &exceptionClass_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
 					return (
 						make_pointer<HQueryResultClass>(
-							huginn_,
+							runtime_,
 							typeId_,
 							exceptionClass_
 						)
@@ -213,7 +214,7 @@ HHuginn::class_t HQueryResult::get_class( HHuginn* huginn_, HHuginn::class_t con
 			)
 		)
 	);
-	huginn_->register_class( c );
+	runtime_->huginn()->register_class( c );
 	return ( c );
 	M_EPILOG
 }

@@ -32,6 +32,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
+#include "runtime.hxx"
 #include "tools/huginn/thread.hxx"
 #include "helper.hxx"
 #include "exception.hxx"
@@ -55,8 +56,8 @@ class HOperatingSystem : public HHuginn::HObject {
 public:
 	HOperatingSystem( HHuginn::HClass* class_ )
 		: HObject( class_ )
-		, _exceptionClass( exception::create_class( class_->huginn(), "OperatingSystemException" ) )
-		, _subprocessClass( HSubprocess::get_class( class_->huginn() ) ) {
+		, _exceptionClass( exception::create_class( class_->runtime(), "OperatingSystemException" ) )
+		, _subprocessClass( HSubprocess::get_class( class_->runtime() ) ) {
 		return;
 	}
 	static HHuginn::value_t env( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
@@ -65,8 +66,8 @@ public:
 		verify_arg_count( name, values_, 1, 1, position_ );
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
 		char const* val( ::getenv( get_string( values_[0] ).raw() ) );
-		HHuginn& h( thread_->huginn() );
-		return ( val ? h.object_factory()->create_string( val ) : h.none_value() );
+		HRuntime& rt( thread_->runtime() );
+		return ( val ? rt.object_factory()->create_string( val ) : rt.none_value() );
 		M_EPILOG
 	}
 	static HHuginn::value_t exec( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
@@ -84,7 +85,7 @@ public:
 		}
 		::execvp( argv[0], argv );
 		thread_->raise( static_cast<HOperatingSystem*>( object_->raw() )->_exceptionClass.raw(), strerror( errno ), position_ );
-		return ( thread_->huginn().none_value() );
+		return ( thread_->runtime().none_value() );
 		M_EPILOG
 	}
 	static HHuginn::value_t exit( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
@@ -94,7 +95,7 @@ public:
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, true, position_ );
 		HHuginn::HInteger::value_type val( get_integer( values_[0] ) );
 		::exit( static_cast<int>( val ) );
-		return ( thread_->huginn().none_value() );
+		return ( thread_->runtime().none_value() );
 		M_EPILOG
 	}
 	static HHuginn::value_t spawn( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
@@ -105,7 +106,7 @@ public:
 		for ( int i( 0 ); i < argc; ++ i ) {
 			verify_arg_type( name, values_, i, HHuginn::TYPE::STRING, argc == 1, position_ );
 		}
-		HHuginn::value_t v( thread_->huginn().none_value() );
+		HHuginn::value_t v( thread_->runtime().none_value() );
 		try {
 			HOperatingSystem* o( static_cast<HOperatingSystem*>( object_->raw() ) );
 			v = make_pointer<HSubprocess>( o->_subprocessClass.raw(), values_ );
@@ -121,13 +122,13 @@ namespace package_factory {
 
 class HOperatingSystemCreator : public HPackageCreatorInterface {
 protected:
-	virtual HHuginn::value_t do_new_instance( HHuginn* );
+	virtual HHuginn::value_t do_new_instance( HRuntime* );
 } operatingsystemCreator;
 
-HHuginn::value_t HOperatingSystemCreator::do_new_instance( HHuginn* huginn_ ) {
+HHuginn::value_t HOperatingSystemCreator::do_new_instance( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		huginn_->create_class(
+		runtime_->create_class(
 			"OperatingSystem",
 			nullptr,
 			HHuginn::field_definitions_t{
@@ -138,7 +139,7 @@ HHuginn::value_t HOperatingSystemCreator::do_new_instance( HHuginn* huginn_ ) {
 			}
 		)
 	);
-	huginn_->register_class( c );
+	runtime_->huginn()->register_class( c );
 	return ( make_pointer<HOperatingSystem>( c.raw() ) );
 	M_EPILOG
 }

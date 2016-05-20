@@ -39,10 +39,10 @@ namespace huginn {
 
 namespace exception {
 
-HHuginn::class_t get_class( HHuginn* );
+HHuginn::class_t get_class( HRuntime* );
 
 HHuginn::class_t create_class(
-	HHuginn*,
+	HRuntime*,
 	yaal::hcore::HString const&,
 	HHuginn::HClass const* = nullptr
 );

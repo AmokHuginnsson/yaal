@@ -38,7 +38,7 @@ namespace tools {
 namespace huginn {
 
 class HObjectFactory final {
-	HHuginn* _huginn;
+	HRuntime* _runtime;
 	HHuginn::class_t _boolean;
 	HHuginn::class_t _integer;
 	HHuginn::class_t _string;
@@ -119,10 +119,10 @@ class HObjectFactory final {
 	object_pool_t _objectPool;
 	object_allocator_t _objectAllocator;
 public:
-	HObjectFactory( HHuginn* );
+	HObjectFactory( HRuntime* );
 	void register_builtin_classes( void );
-	HHuginn& huginn( void ) const {
-		return ( *_huginn );
+	HRuntime& runtime( void ) const {
+		return ( *_runtime );
 	}
 	HHuginn::value_t create_boolean( HHuginn::HBoolean::value_type value_ ) const {
 		return ( yaal::hcore::allocate_pointer<boolean_allocator_t, HHuginn::HBoolean>( _booleanAllocator, _boolean.raw(), value_ ) );

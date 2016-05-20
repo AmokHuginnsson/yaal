@@ -31,6 +31,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/math.hxx"
 #include "tools/hhuginn.hxx"
+#include "runtime.hxx"
 #include "tools/huginn/thread.hxx"
 #include "helper.hxx"
 #include "exception.hxx"
@@ -52,7 +53,7 @@ class HMathematics : public HHuginn::HObject {
 public:
 	HMathematics( HHuginn::HClass* class_ )
 		: HObject( class_ )
-		, _exceptionClass( exception::create_class( class_->huginn(), "MathematicsException" ) ) {
+		, _exceptionClass( exception::create_class( class_->runtime(), "MathematicsException" ) ) {
 		return;
 	}
 	static HHuginn::value_t square_root( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
@@ -60,7 +61,7 @@ public:
 		char const name[] = "Mathematics.square_root";
 		verify_arg_count( name, values_, 1, 1, position_ );
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
-		HHuginn::value_t v( thread_->huginn().none_value() );
+		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
 			if ( val >= number::N0 ) {
@@ -72,7 +73,7 @@ public:
 				v = thread_->object_factory().create_real( math::square_root( val ) );
 			}
 		}
-		if ( v == thread_->huginn().none_value() ) {
+		if ( v == thread_->runtime().none_value() ) {
 			thread_->raise( static_cast<HMathematics*>( object_->raw() )->_exceptionClass.raw(), "bad domain", position_ );
 		}
 		return ( v );
@@ -99,7 +100,7 @@ public:
 		char const name[] = "Mathematics.natural_logarithm";
 		verify_arg_count( name, values_, 1, 1, position_ );
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
-		HHuginn::value_t v( thread_->huginn().none_value() );
+		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
 			if ( val > number::N0 ) {
@@ -111,7 +112,7 @@ public:
 				v = thread_->object_factory().create_real( math::natural_logarithm( val ) );
 			}
 		}
-		if ( v == thread_->huginn().none_value() ) {
+		if ( v == thread_->runtime().none_value() ) {
 			thread_->raise( static_cast<HMathematics*>( object_->raw() )->_exceptionClass.raw(), "bad domain", position_ );
 		}
 		return ( v );
@@ -255,7 +256,7 @@ public:
 			verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
 			to = static_cast<int>( get_integer( values_[1] ) );
 		}
-		HHuginn::value_t v( thread_->huginn().none_value() );
+		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
 			try {
@@ -279,7 +280,7 @@ public:
 		char const name[] = "Mathematics.floor";
 		verify_arg_count( name, values_, 1, 1, position_ );
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
-		HHuginn::value_t v( thread_->huginn().none_value() );
+		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( val.floor() );
@@ -295,7 +296,7 @@ public:
 		char const name[] = "Mathematics.ceil";
 		verify_arg_count( name, values_, 1, 1, position_ );
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
-		HHuginn::value_t v( thread_->huginn().none_value() );
+		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( val.ceil() );
@@ -312,7 +313,7 @@ public:
 		verify_arg_count( name, values_, 2, 2, position_ );
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::NUMBER, false, position_ );
 		verify_arg_type( name, values_, 1, HHuginn::TYPE::NUMBER, false, position_ );
-		HHuginn::value_t v( thread_->huginn().none_value() );
+		HHuginn::value_t v( thread_->runtime().none_value() );
 		return ( thread_->object_factory().create_integer( number::differs_at( get_number( values_[0] ), get_number( values_[1] ) ) ) );
 		M_EPILOG
 	}
@@ -322,13 +323,13 @@ namespace package_factory {
 
 class HMathematicsCreator : public HPackageCreatorInterface {
 protected:
-	virtual HHuginn::value_t do_new_instance( HHuginn* );
+	virtual HHuginn::value_t do_new_instance( HRuntime* );
 } mathematicsCreator;
 
-HHuginn::value_t HMathematicsCreator::do_new_instance( HHuginn* huginn_ ) {
+HHuginn::value_t HMathematicsCreator::do_new_instance( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		huginn_->create_class(
+		runtime_->create_class(
 			"Mathematics",
 			nullptr,
 			HHuginn::field_definitions_t{
@@ -350,7 +351,7 @@ HHuginn::value_t HMathematicsCreator::do_new_instance( HHuginn* huginn_ ) {
 			}
 		)
 	);
-	huginn_->register_class( c );
+	runtime_->huginn()->register_class( c );
 	return ( make_pointer<HMathematics>( c.raw() ) );
 	M_EPILOG
 }

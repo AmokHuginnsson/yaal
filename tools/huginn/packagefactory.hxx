@@ -45,12 +45,12 @@ class HPackageCreatorInterface {
 protected:
 	virtual void do_initialize_globals( void ){};
 	virtual void do_cleanup_globals( void ){};
-	virtual HHuginn::value_t do_new_instance( HHuginn* ) = 0;
+	virtual HHuginn::value_t do_new_instance( HRuntime* ) = 0;
 public:
 	virtual ~HPackageCreatorInterface( void ){}
 	void initialize_globals( void );
 	void cleanup_globals( void );
-	HHuginn::value_t new_instance( HHuginn* );
+	HHuginn::value_t new_instance( HRuntime* );
 };
 
 class HPackageFactory {
@@ -69,7 +69,7 @@ private:
 	creators_t _creators;
 public:
 	void register_package_creator( yaal::hcore::HString const&, HPackageCreatorInterface* );
-	HHuginn::value_t create_package( HHuginn*, yaal::hcore::HString const& );
+	HHuginn::value_t create_package( HRuntime*, yaal::hcore::HString const& );
 	bool is_type_valid( yaal::hcore::HString const& );
 	creators_t::iterator begin( void );
 	creators_t::iterator end( void );

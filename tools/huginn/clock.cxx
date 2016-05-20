@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "clock.hxx"
+#include "runtime.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
@@ -67,10 +68,10 @@ HHuginn::value_t HClock::reset( huginn::HThread*, HHuginn::value_t* object_, HHu
 	M_EPILOG
 }
 
-HHuginn::class_t HClock::get_class( HHuginn* huginn_ ) {
+HHuginn::class_t HClock::get_class( HRuntime* runtime_ ) {
 	M_PROLOG
 	return (
-		huginn_->create_class(
+		runtime_->create_class(
 			"Clock",
 			nullptr,
 			HHuginn::field_definitions_t{

@@ -27,6 +27,7 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
+#include "runtime.hxx"
 #include "exception.hxx"
 #include "tools/hhuginn.hxx"
 #include "iterator.hxx"
@@ -52,12 +53,12 @@ public:
 	typedef HExceptionClass this_type;
 	typedef HHuginn::HClass base_type;
 	HExceptionClass(
-		HHuginn* huginn_,
+		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_,
 		HHuginn::identifier_id_t identifierId_,
 		HHuginn::HClass const* base_
 	) : HHuginn::HClass(
-			huginn_,
+			runtime_,
 			typeId_,
 			identifierId_,
 			base_,
@@ -114,14 +115,14 @@ private:
 	}
 };
 
-HHuginn::class_t get_class( HHuginn* huginn_ ) {
+HHuginn::class_t get_class( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		huginn_->create_class(
-			HHuginn::class_constructor_t(
-				[&huginn_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
+		runtime_->create_class(
+			HRuntime::class_constructor_t(
+				[&runtime_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
 					return (
-						make_pointer<HExceptionClass>( huginn_, typeId_, huginn_->identifier_id( "Exception" ), nullptr )
+						make_pointer<HExceptionClass>( runtime_, typeId_, runtime_->identifier_id( "Exception" ), nullptr )
 					);
 				}
 			)
@@ -131,28 +132,28 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 	M_EPILOG
 }
 
-HHuginn::class_t create_class( HHuginn* huginn_, yaal::hcore::HString const& name_, HHuginn::HClass const* base_ ) {
+HHuginn::class_t create_class( HRuntime* runtime_, yaal::hcore::HString const& name_, HHuginn::HClass const* base_ ) {
 	M_PROLOG
-	HHuginn::identifier_id_t classIdentifier( huginn_->identifier_id( name_ ) );
-	HHuginn::class_t c( huginn_ ? huginn_->get_class( classIdentifier ) : nullptr );
+	HHuginn::identifier_id_t classIdentifier( runtime_->identifier_id( name_ ) );
+	HHuginn::class_t c( runtime_ ? runtime_->get_class( classIdentifier ) : nullptr );
 	if ( ! c ) {
-		c =	huginn_->create_class(
-			HHuginn::class_constructor_t(
-				[&huginn_, &classIdentifier, &base_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
+		c =	runtime_->create_class(
+			HRuntime::class_constructor_t(
+				[&runtime_, &classIdentifier, &base_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
 					return (
 						make_pointer<HExceptionClass>(
-							huginn_,
+							runtime_,
 							typeId_,
 							classIdentifier,
-							base_ ? base_ : huginn_->object_factory()->exception_class()
+							base_ ? base_ : runtime_->object_factory()->exception_class()
 						)
 					);
 				}
 			)
 		);
 	}
-	if ( huginn_ ) {
-		huginn_->register_class( c );
+	if ( runtime_ ) {
+		runtime_->huginn()->register_class( c );
 	}
 	return ( c );
 	M_EPILOG
@@ -181,7 +182,7 @@ void HHuginn::HException::set_where( yaal::hcore::HString const& where_ ) {
 	_where = where_;
 }
 
-HHuginn::value_t HHuginn::HException::do_clone( HHuginn* ) const {
+HHuginn::value_t HHuginn::HException::do_clone( HRuntime* ) const {
 	HHuginn::value_t e( make_pointer<HException>( get_class(), _message ) );
 	static_cast<HException*>( e.raw() )->set_where( _where );
 	return ( e );

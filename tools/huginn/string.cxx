@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
+#include "runtime.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
@@ -50,7 +51,7 @@ class HStringIterator : public HIteratorInterface {
 public:
 	HStringIterator( HHuginn::HString* string_ )
 		: _string( string_ )
-		, _objectFactory( string_->get_class()->huginn()->object_factory() )
+		, _objectFactory( string_->get_class()->runtime()->object_factory() )
 		, _index( 0 ) {
 		return;
 	}
@@ -151,14 +152,14 @@ inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHug
 	M_EPILOG
 }
 
-HHuginn::class_t get_class( HHuginn* );
-HHuginn::class_t get_class( HHuginn* huginn_ ) {
+HHuginn::class_t get_class( HRuntime* );
+HHuginn::class_t get_class( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
-			huginn_,
+			runtime_,
 			type_id( HHuginn::TYPE::STRING ),
-			huginn_->identifier_id( type_name( HHuginn::TYPE::STRING ) ),
+			runtime_->identifier_id( type_name( HHuginn::TYPE::STRING ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
 				{ "find",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::find, _1, _2, _3, _4 ) ) },
@@ -184,8 +185,8 @@ HHuginn::HString::HString( HHuginn::HClass const* class_, yaal::hcore::HString c
 	return;
 }
 
-HHuginn::value_t HHuginn::HString::do_clone( HHuginn* huginn_ ) const {
-	return ( huginn_->object_factory()->create_string( _value ) );
+HHuginn::value_t HHuginn::HString::do_clone( HRuntime* runtime_ ) const {
+	return ( runtime_->object_factory()->create_string( _value ) );
 }
 
 HHuginn::HIterable::HIterator HHuginn::HString::do_iterator( void ) {

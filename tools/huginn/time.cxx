@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "time.hxx"
+#include "runtime.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
@@ -57,10 +58,10 @@ HHuginn::value_t HTime::to_string( huginn::HThread* thread_, HHuginn::value_t* o
 	M_EPILOG
 }
 
-HHuginn::class_t HTime::get_class( HHuginn* huginn_ ) {
+HHuginn::class_t HTime::get_class( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		huginn_->create_class(
+		runtime_->create_class(
 			"Time",
 			nullptr,
 			HHuginn::field_definitions_t{

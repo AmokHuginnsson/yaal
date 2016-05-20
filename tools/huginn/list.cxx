@@ -28,12 +28,14 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
+#include "runtime.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
 #include "objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
+using namespace yaal::tools::huginn;
 
 namespace yaal {
 
@@ -97,14 +99,14 @@ inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHug
 	M_EPILOG
 }
 
-HHuginn::class_t get_class( HHuginn* );
-HHuginn::class_t get_class( HHuginn* huginn_ ) {
+HHuginn::class_t get_class( HRuntime* );
+HHuginn::class_t get_class( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
-			huginn_,
+			runtime_,
 			type_id( HHuginn::TYPE::LIST ),
-			huginn_->identifier_id( type_name( HHuginn::TYPE::LIST ) ),
+			runtime_->identifier_id( type_name( HHuginn::TYPE::LIST ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
 				{ "add",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::add, _1, _2, _3, _4 ) ) },
@@ -131,9 +133,9 @@ HHuginn::HList::HList( HHuginn::HClass const* class_, values_t const& data_ )
 	: HIterable( class_ )
 	, _data() {
 	_data.reserve( data_.get_size() );
-	HHuginn* huginn( class_->huginn() );
+	HRuntime* runtime( class_->runtime() );
 	for ( values_t::value_type const& v : data_ ) {
-		_data.push_back( v->clone( huginn ) );
+		_data.push_back( v->clone( runtime ) );
 	}
 	return;
 }
@@ -179,8 +181,8 @@ HHuginn::HIterable::HIterator HHuginn::HList::do_iterator( void ) {
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HList::do_clone( HHuginn* huginn_ ) const {
-	return ( huginn_->object_factory()->create_list( _data ) );
+HHuginn::value_t HHuginn::HList::do_clone( HRuntime* runtime_ ) const {
+	return ( runtime_->object_factory()->create_list( _data ) );
 }
 
 }
