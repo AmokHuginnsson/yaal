@@ -658,28 +658,21 @@ bool HExpression::terminal_production( tree_t::node_t node_ ) {
 		}
 		return ( true );
 	}
-	if ( ( _formula [ _index ] >= '0' ) && ( _formula [ _index ] <= '9' ) ) {
-		double long value = 0;
-		int offset = _index;
-		if ( _index > _length ) {
-			_error = UNEXPECTED_TERMINATION;
-			return ( false );
-		}
-		while ( ( _formula[ _index ] >= '0' ) && ( _formula[ _index ] <= '9' ) ) {
-			++ _index;
-		}
-		if ( _formula[ _index ] == '.' ) {
-			++ _index;
-			if ( ( _formula[ _index ] >= '0' ) && ( _formula[ _index ] <= '9' ) ) {
-				while ( ( _formula[ _index ] >= '0' ) && ( _formula[ _index ] <= '9' ) ) {
-					_index ++;
-				}
-			} else {
-				_error = DIGIT_EXPECTED;
-				return ( false );
-			}
-		}
-		value = ::strtod( _formula.raw() + offset, NULL );
+	int digits( 0 );
+	int offset( _index );
+	while ( ( _index < _length ) && ( _formula[ _index ] >= '0' ) && ( _formula[ _index ] <= '9' ) ) {
+		++ _index;
+		++ digits;
+	}
+	if ( ( _index < _length ) && ( _formula[ _index ] == '.' ) ) {
+		++ _index;
+	}
+	while ( ( _index < _length ) && ( _formula[ _index ] >= '0' ) && ( _formula[ _index ] <= '9' ) ) {
+		++ _index;
+		++ digits;
+	}
+	if ( digits > 0 ) {
+		double long value( ::strtold( _formula.raw() + offset, NULL ) );
 		_constantsPool.push_back( value );
 		/* We save variables as positive indexes and constants as negative
 		 * indexes, positive and negative 0 index would conflict so
@@ -689,6 +682,10 @@ bool HExpression::terminal_production( tree_t::node_t node_ ) {
 		 * so to get index of lately added value we need to decrement size by 1. */
 		(**node_)._variables.push_back( static_cast<int>( - ( _constantsPool.size() - 1 ) - 1 ) );
 		return ( true );
+	} else if ( _index != offset ) {
+		/* Just one alone dot found. */
+		_error = DIGIT_EXPECTED;
+		return ( false );
 	}
 	_error = UNEXPECTED_TOKEN;
 	return ( false );
