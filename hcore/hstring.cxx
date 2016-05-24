@@ -469,20 +469,20 @@ HString HString::operator + ( HString const& other_ ) const {
 	M_EPILOG
 }
 
-char HString::operator[] ( int const index_ ) const {
+char HString::operator[] ( int index_ ) const {
 	return ( operator[] ( static_cast<int long>( index_ ) ) );
 }
 
-char HString::operator[] ( int long const index_ ) const {
+char HString::operator[] ( int long index_ ) const {
 	M_PROLOG
-	if ( index_ >= GET_ALLOC_BYTES ) {
+	if ( index_ > GET_SIZE ) {
 		M_THROW( _errMsgHString_[string_helper::INDEX_OOB], index_ );
 	}
 	return ( MEM[ index_ ] );
 	M_EPILOG
 }
 
-char HString::set_at( int long const index_, char char_ ) {
+char HString::set_at( int long index_, char char_ ) {
 	M_PROLOG
 	if ( index_ >= GET_SIZE ) {
 		M_THROW( _errMsgHString_[string_helper::INDEX_OOB], index_ );
