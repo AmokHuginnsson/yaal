@@ -935,6 +935,8 @@ inline bool operator != ( HHuginn::type_id_t t1_, HHuginn::TYPE t2_ ) {
 	return ( static_cast<HHuginn::type_id_t::value_type>( t2_ ) != t1_.get() );
 }
 
+yaal::hcore::HString to_string( HHuginn::value_t const& );
+
 }
 
 }

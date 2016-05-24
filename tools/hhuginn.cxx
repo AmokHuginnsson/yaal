@@ -684,6 +684,63 @@ HHuginn::value_t HHuginn::HClass::HBoundMethod::do_clone( HRuntime* runtime_ ) c
 	return ( runtime_->object_factory()->create_bound_method( *static_cast<HMethod const*>( this ), _objectHolder ) );
 }
 
+yaal::hcore::HString to_string( HHuginn::value_t const& value_ ) {
+	yaal::hcore::HString str;
+	switch ( static_cast<HHuginn::TYPE>( value_->type_id().get() ) ) {
+		case ( HHuginn::TYPE::STRING ): {
+			str.assign( '"' ).append( static_cast<HHuginn::HString const*>( value_.raw() )->value() ).append( '"' );
+		} break;
+		case ( HHuginn::TYPE::INTEGER ): {
+			str = static_cast<HHuginn::HInteger const*>( value_.raw() )->value();
+		} break;
+		case ( HHuginn::TYPE::REAL ): {
+			str = static_cast<HHuginn::HReal const*>( value_.raw() )->value();
+		} break;
+		case ( HHuginn::TYPE::NUMBER ): {
+			str.assign( '$' ).append( static_cast<HHuginn::HNumber const*>( value_.raw() )->value().to_string() );
+		} break;
+		case ( HHuginn::TYPE::CHARACTER ): {
+			str.assign( "'" ).append( static_cast<HHuginn::HCharacter const*>( value_.raw() )->value() ).append( "'" );
+		} break;
+		case ( HHuginn::TYPE::BOOLEAN ): {
+			str = static_cast<HHuginn::HBoolean const*>( value_.raw() )->value() ? "true" : "false";
+		} break;
+		case ( HHuginn::TYPE::NONE ): {
+			str = "none";
+		} break;
+		case ( HHuginn::TYPE::LIST ): {
+			HHuginn::HList const* l( static_cast<HHuginn::HList const*>( value_.raw() ) );
+			str = "[";
+			bool next( false );
+			for ( HHuginn::value_t const& v : l->value() ) {
+				if ( next ) {
+					str.append( ", " );
+				}
+				next = true;
+				str.append( to_string( v ) );
+			}
+			str.append( "]" );
+		} break;
+		case ( HHuginn::TYPE::DICT ): {
+			HHuginn::HDict const* d( static_cast<HHuginn::HDict const*>( value_.raw() ) );
+			str = "{";
+			bool next( false );
+			for ( HHuginn::HDict::values_t::value_type const& v : d->value() ) {
+				if ( next ) {
+					str.append( ", " );
+				}
+				next = true;
+				str.append( to_string( v.first ) ).append( ": " ).append( to_string( v.second ) );
+			}
+			str.append( "}" );
+		} break;
+		default: {
+			str = value_->get_class()->name();
+		}
+	}
+	return ( str );
+}
+
 }
 
 }
