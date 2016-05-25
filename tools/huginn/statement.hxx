@@ -29,7 +29,9 @@ Copyright:
 #ifndef YAAL_TOOLS_HUGINN_STATEMENT_HXX_INCLUDED
 #define YAAL_TOOLS_HUGINN_STATEMENT_HXX_INCLUDED 1
 
+#include "hcore/base.hxx"
 #include "hcore/htaggedpod.hxx"
+#include "tools/hhuginn.hxx"
 
 namespace yaal {
 
@@ -57,6 +59,9 @@ public:
 		return;
 	}
 	void execute( HThread* thread_ ) const {
+		if ( _isKilled_ ) {
+			throw HHuginn::HHuginnRuntimeException( "Killed interior.", _position );
+		}
 		do_execute( thread_ );
 		return;
 	}
