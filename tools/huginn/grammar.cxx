@@ -164,16 +164,17 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	HRule dereference( "dereference", *( subscriptOperator | functionCallOperator | memberAccess ) );
 	HRule atom( "atom",
 		absoluteValue
-		| parenthesis
+		| parenthesis >> -( memberAccess >> dereference )
 		| real( e_p::HReal::PARSE::STRICT )[e_p::HReal::action_double_long_position_t( hcore::call( &OCompiler::defer_store_real, _compiler.get(), _1, _2 ) )]
-		| numberLiteral
 		| integer[e_p::HInteger::action_int_long_long_position_t( hcore::call( &OCompiler::defer_store_integer, _compiler.get(), _1, _2 ) )]
-		| character_literal[e_p::HCharacterLiteral::action_character_position_t( hcore::call( &OCompiler::defer_store_character, _compiler.get(), _1, _2 ) )]
-		| ( listLiteral >> -( subscriptOperator >> dereference ) )
-		| ( dictLiteral >> -( subscriptOperator >> dereference ) )
+		| (
+			( numberLiteral
+				| character_literal[e_p::HCharacterLiteral::action_character_position_t( hcore::call( &OCompiler::defer_store_character, _compiler.get(), _1, _2 ) )] )
+			>> -( memberAccess >> functionCallOperator )
+		)
+		| ( ( listLiteral | dictLiteral | stringLiteral ) >> -( ( subscriptOperator | memberAccess ) >> dereference ) )
 		| literalNone | booleanLiteralTrue | booleanLiteralFalse
 		| ( reference >> dereference )
-		| ( stringLiteral >> -subscriptOperator )
 		| ( lambda >> -( functionCallOperator >> dereference ) )
 	);
 	HRule factorial(
