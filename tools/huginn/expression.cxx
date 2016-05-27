@@ -236,7 +236,9 @@ void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifier
 				.append( v->get_class()->name() )
 				.append( "' does not have `" )
 				.append( rt.identifier_name( identifierId_ ) )
-				.append( "' member." ),
+				.append( "' member (did you mean `" )
+				.append( rt.suggestion( identifierId_ ) )
+				.append( "'?)." ),
 				p
 			);
 		}
@@ -262,7 +264,9 @@ void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifier
 					.append( oref->get_class()->name() )
 					.append( "' does not have `" )
 					.append( rt.identifier_name( identifierId_ ) )
-					.append( "' member." ),
+					.append( "' member (did you mean `" )
+					.append( rt.suggestion( identifierId_ ) )
+					.append( "'?)." ),
 					p
 				);
 			}

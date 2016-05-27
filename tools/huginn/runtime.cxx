@@ -36,6 +36,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "compiler.hxx"
 #include "tools/util.hxx"
 #include "tools/streamtools.hxx"
+#include "tools/stringalgo.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -588,6 +589,22 @@ void HRuntime::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) {
 		stream_ << endl;
 	}
 	return;
+	M_EPILOG
+}
+
+yaal::hcore::HString HRuntime::suggestion( HHuginn::identifier_id_t identifier_ ) const {
+	M_PROLOG
+	HString identifier( identifier_name( identifier_ ) );
+	HString s;
+	int minDiff( meta::max_signed<int>::value );
+	for ( yaal::hcore::HString const& i : _identifierNames ) {
+		int diff( string::distance::levenshtein_damerau( i, identifier ) );
+		if ( ( diff > 0 ) && ( diff < minDiff ) ) {
+			minDiff = diff;
+			s = i;
+		}
+	}
+	return ( s );
 	M_EPILOG
 }
 

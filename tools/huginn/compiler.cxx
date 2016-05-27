@@ -378,7 +378,12 @@ void OCompiler::resolve_symbols( void ) {
 				}
 			}
 			throw HHuginn::HHuginnRuntimeException(
-				"Symbol `"_ys.append( _runtime->identifier_name( es._identifier ) ).append( "' is not defined in this context." ), es._position
+				"Symbol `"_ys
+					.append( _runtime->identifier_name( es._identifier ) )
+					.append( "' is not defined in this context (did you mean `" )
+					.append( _runtime->suggestion( es._identifier ) )
+					.append( "'?)." ),
+				es._position
 			);
 		} while ( false );
 	}
@@ -428,13 +433,25 @@ void OCompiler::detect_misuse( void ) const {
 		if ( use._readCount == 0 ) {
 			if ( find( begin( implicitUse ), end( implicitUse ), id ) == end( implicitUse ) ) {
 				throw HHuginn::HHuginnRuntimeException(
-					use_name( use._type ).append( " `" ).append( _runtime->identifier_name( id ) ).append( "' is never used." ), use._writePosition
+					use_name( use._type )
+						.append( " `" )
+						.append( _runtime->identifier_name( id ) )
+						.append( "' is never used (did you mean `" )
+						.append( _runtime->suggestion( id ) )
+						.append( "'?)." ),
+					use._writePosition
 				);
 			}
 		} else if ( ( use._writeCount == 0 ) && ( use._type != OIdentifierUse::TYPE::VARIABLE ) && ( use._type != OIdentifierUse::TYPE::UNKNOWN ) ) {
 			if ( find( begin( implicitDefinition ), end( implicitDefinition ), id ) == end( implicitDefinition ) ) {
 				throw HHuginn::HHuginnRuntimeException(
-					use_name( use._type ).append( " `" ).append( _runtime->identifier_name( id ) ).append( "' was never defined." ), use._readPosition
+					use_name( use._type )
+						.append( " `" )
+						.append( _runtime->identifier_name( id ) )
+						.append( "' was never defined (did you mean `" )
+						.append( _runtime->suggestion( id ) )
+						.append( "'?)." ),
+					use._readPosition
 				);
 			}
 		}

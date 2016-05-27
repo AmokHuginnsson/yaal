@@ -49,12 +49,12 @@ private:
 	typedef yaal::hcore::HPointer<huginn::HThread> thread_t;
 	typedef yaal::hcore::HHashMap<yaal::hcore::HThread::id_t, thread_t> threads_t;
 	typedef yaal::hcore::HLookupMap<yaal::hcore::HString, identifier_id_t> identifier_ids_t;
-	typedef yaal::hcore::HArray<yaal::hcore::HString> identifier_names_t;
 	typedef yaal::hcore::HResource<huginn::HObjectFactory> object_factory_t;
 	typedef yaal::hcore::HLookupMap<identifier_id_t, class_t> classes_t;
 	typedef yaal::hcore::HLookupMap<identifier_id_t, value_t> packages_t;
 	typedef yaal::hcore::HLookupMap<identifier_id_t, function_t> functions_t;
 public:
+	typedef yaal::hcore::HArray<yaal::hcore::HString> identifier_names_t;
 	typedef yaal::hcore::HBoundCall<HHuginn::class_t ( type_id_t )> class_constructor_t;
 private:
 	HHuginn* _huginn;
@@ -145,6 +145,8 @@ public:
 	 */
 	void dump_vm_state( yaal::hcore::HStreamInterface& );
 	void register_builtins( void );
+
+	yaal::hcore::HString suggestion( HHuginn::identifier_id_t ) const;
 private:
 	void register_builtin_function( char const*, function_t&& );
 private:
