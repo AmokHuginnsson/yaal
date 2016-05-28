@@ -46,7 +46,8 @@ char const * const _errMsgHMatrix_ [ 12 ] = {
 /* HMatrix::ERROR::DIM_NOT_MATCH_COLUMNS_ROWS */         _( "columns does not match rows" ),
 /* HMatrix::ERROR::DIM_NOT_MATCH_COLUMNS_ROWS_COLUMNS */ _( "columns does not match rows and columns" ),
 /* HMatrix::ERROR::ROW_OUT_OF_RANGE */                   _( "row too big for minor" ),
-/* HMatrix::ERROR::COLUMN_OUT_OF_RANGE */                _( "column too big for minor" )
+/* HMatrix::ERROR::COLUMN_OUT_OF_RANGE */                _( "column too big for minor" ),
+/* HMatrix::ERROR::DIVISION_BY_ZERO */                   _( "division by 0" )
 };
 
 }
