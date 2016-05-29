@@ -147,12 +147,38 @@ public:
 	void register_builtins( void );
 
 	yaal::hcore::HString suggestion( HHuginn::identifier_id_t ) const;
+
+	yaal::hcore::HString const& function_name( void const* ) const;
 private:
 	void register_builtin_function( char const*, function_t&& );
 private:
 	HRuntime( HRuntime const& ) = delete;
 	HRuntime& operator = ( HRuntime const& ) = delete;
 };
+
+namespace huginn_builtin {
+
+HHuginn::value_t string( HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+HHuginn::value_t integer( HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+HHuginn::value_t real( HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+HHuginn::value_t boolean( HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+HHuginn::value_t character( HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+HHuginn::value_t number( HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+HHuginn::value_t size( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+HHuginn::value_t type( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+HHuginn::value_t copy( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+HHuginn::value_t observe( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+HHuginn::value_t use( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+HHuginn::value_t list( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+HHuginn::value_t deque( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+HHuginn::value_t dict( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+HHuginn::value_t order( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+HHuginn::value_t lookup( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+HHuginn::value_t set( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+HHuginn::value_t print( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+HHuginn::value_t input( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+
+}
 
 }
 
