@@ -226,6 +226,12 @@ HHuginn::HCharacter::value_type get_character( HHuginn::value_t const& value_ ) 
 	return ( static_cast<HHuginn::HCharacter const*>( value_.raw() )->value() );
 }
 
+HHuginn::HList::values_t const& get_list( HHuginn::value_t const& value_ ) {
+	M_ASSERT( !! value_ );
+	M_ASSERT( dynamic_cast<HHuginn::HList const*>( value_.raw() ) );
+	return ( static_cast<HHuginn::HList const*>( value_.raw() )->value() );
+}
+
 HHuginn::HString::value_type const& get_string( HHuginn::HValue const* value_ ) {
 	M_ASSERT( !! value_ );
 	M_ASSERT( dynamic_cast<HHuginn::HString const*>( value_ ) );

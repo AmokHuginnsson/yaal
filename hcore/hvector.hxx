@@ -61,7 +61,8 @@ private:
 		 */
 		typedef enum {
 			OK = 0, /*!< no error. */
-			DIMNOTMATCH /*!< binary operation applied to two vectors with different dimensions. */
+			DIMNOTMATCH, /*!< binary operation applied to two vectors with different dimensions. */
+			DIVISION_BY_ZERO /*!< binary operation applied to two vectors with different dimensions. */
 		} error_t;
 	};
 public:
@@ -205,8 +206,10 @@ public:
 	}
 	HVector& operator /= ( value_type const& scalar_ ) {
 		M_PROLOG
-		if ( scalar_ )
-			yaal::transform( _data.begin(), _data.end(), _data.begin(), bind2nd( yaal::divides<value_type>(), scalar_ ) );
+		if ( ! scalar_ ) {
+			M_THROW( _errMsgHVector_[ERROR::DIVISION_BY_ZERO], 0 );
+		}
+		yaal::transform( _data.begin(), _data.end(), _data.begin(), bind2nd( yaal::divides<value_type>(), scalar_ ) );
 		return ( *this );
 		M_EPILOG
 	}
@@ -215,8 +218,9 @@ public:
 		int long size = vector_._data.size();
 		check_dimensions( size );
 		value_type scalar = 0;
-		for ( int long i = 0; i < size; i ++ )
+		for ( int long i = 0; i < size; i ++ ) {
 			scalar += ( _data[ i ] * vector_._data[ i ] );
+		}
 		return ( scalar );
 		M_EPILOG
 	}
@@ -239,9 +243,11 @@ public:
 		M_PROLOG
 		int long size = vector_._data.size();
 		check_dimensions( size );
-		for ( int long i = 0; i < size; ++ i )
-			if ( _data[ i ] != vector_._data[ i ] )
+		for ( int long i = 0; i < size; ++ i ) {
+			if ( _data[ i ] != vector_._data[ i ] ) {
 				return ( false );
+			}
+		}
 		return ( true );
 		M_EPILOG
 	}
@@ -263,11 +269,11 @@ public:
 		return ( _data.end() );
 	}
 private:
-	inline void check_dimensions( int sizeAnother_ ) const {
+	inline void check_dimensions( int long sizeAnother_ ) const {
 		M_PROLOG
-		if ( _data.size() != sizeAnother_ )
-			M_THROW( _errMsgHVector_[ ERROR::DIMNOTMATCH ],
-					_data.size() - sizeAnother_ );
+		if ( _data.size() != sizeAnother_ ) {
+			M_THROW( _errMsgHVector_[ ERROR::DIMNOTMATCH ], static_cast<int>( _data.size() - sizeAnother_ ) );
+		}
 		return;
 		M_EPILOG
 	}

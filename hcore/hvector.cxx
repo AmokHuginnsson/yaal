@@ -35,9 +35,10 @@ namespace yaal {
 
 namespace hcore {
 
-char const* _errMsgHVector_[ 2 ] = {
+char const* _errMsgHVector_[ 3 ] = {
 	_( "ok" ),
-/* HVector::ERROR::DIMNOTMATCH */	_( "dimensions do not match" )
+/* HVector::ERROR::DIMNOTMATCH */	_( "dimensions do not match" ),
+/* HVector::ERROR::DIVISION_BY_ZERO */	_( "division by 0" )
 };
 
 }

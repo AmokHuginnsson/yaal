@@ -54,7 +54,8 @@ HHuginn::HInteger::value_type get_integer( HHuginn::value_t const& );
 HHuginn::HReal::value_type get_real( HHuginn::value_t const& );
 HHuginn::HNumber::value_type const& get_number( HHuginn::value_t const& );
 HHuginn::HBoolean::value_type get_boolean( HHuginn::value_t const& );
-HHuginn::HCharacter::value_type  get_character( HHuginn::value_t const& );
+HHuginn::HCharacter::value_type get_character( HHuginn::value_t const& );
+HHuginn::HList::values_t const& get_list( HHuginn::value_t const& );
 
 HHuginn::HString::value_type const& get_string( HHuginn::HValue const* );
 HHuginn::HInteger::value_type get_integer( HHuginn::HValue const* );
