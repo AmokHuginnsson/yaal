@@ -570,9 +570,14 @@ void const* caller_id( HFunctor<CLASS_t, METHOD_t> const& functor_ ) {
 	return ( functor_.id() );
 }
 
-template<typename CLASS_t>
-void const* caller_id( CLASS_t const& object_ ) {
-	return ( reinterpret_cast<void const*>( &object_ ) );
+template<typename CLASS_t, typename T = typename trait::enable_if<trait::is_function_pointer<typename trait::decay<CLASS_t>::type>::value>::type>
+void const* caller_id( CLASS_t const& object_, T const** = nullptr ) {
+	return ( reinterpret_cast<void const*>( object_ ) );
+}
+
+template<typename CLASS_t, typename T = typename trait::enable_if<!trait::is_function_pointer<typename trait::decay<CLASS_t>::type>::value>::type>
+void const* caller_id( CLASS_t const& object_, T const* = nullptr ) {
+	return ( object_.id() );
 }
 
 /*! \brief Implementation of abstraction of any-method of any-class invocation.
