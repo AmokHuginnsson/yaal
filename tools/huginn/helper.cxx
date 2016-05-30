@@ -106,30 +106,56 @@ void verify_arg_count( yaal::hcore::HString const& name_, HHuginn::values_t cons
 	M_EPILOG
 }
 
+namespace {
 void verify_arg_type(
 	yaal::hcore::HString const& name_,
 	HHuginn::values_t const& values_,
-	int no_, HHuginn::TYPE type_, bool oneArg_, int position_ ) {
+	int no_,
+	HHuginn::type_id_t type_,
+	yaal::hcore::HString const& reqName_,
+	bool oneArg_,
+	int position_
+) {
 	M_PROLOG
 	if ( values_[no_]->type_id() != type_ ) {
 		HString no;
 		if ( ! oneArg_ ) {
 			no = util::ordinal( no_ + 1 ).append( " " );
 		}
+		HString const& realName( values_[no_]->get_class()->name() );
 		throw HHuginn::HHuginnRuntimeException(
 			""_ys.append( name_ )
 			.append( "() " )
 			.append( no )
-			.append( "argument must be a `" )
-			.append( type_name( type_ ) )
-			.append( "', not a `" )
-			.append( values_[no_]->get_class()->name() )
+			.append( "argument must be " )
+			.append( _vowel_.has( reqName_[0] ) ? "an" : "a" )
+			.append( " `" )
+			.append( reqName_ )
+			.append( "', not " )
+			.append( _vowel_.has( realName[0] ) ? "an" : "a" )
+			.append( " `" )
+			.append( realName )
 			.append( "'." ),
 			position_
 		);
 	}
 	return;
 	M_EPILOG
+}
+}
+
+void verify_arg_type(
+	yaal::hcore::HString const& name_,
+	HHuginn::values_t const& values_,
+	int no_, HHuginn::TYPE type_, bool oneArg_, int position_ ) {
+	verify_arg_type( name_, values_, no_, HHuginn::type_id_t( static_cast<HHuginn::type_id_t::value_type>( type_ ) ), type_name( type_ ), oneArg_, position_ );
+}
+
+void verify_arg_type(
+	yaal::hcore::HString const& name_,
+	HHuginn::values_t const& values_,
+	int no_, HHuginn::HClass const* class_, bool oneArg_, int position_ ) {
+	verify_arg_type( name_, values_, no_, class_->type_id(), class_->name(), oneArg_, position_ );
 }
 
 HHuginn::type_id_t verify_arg_numeric(
