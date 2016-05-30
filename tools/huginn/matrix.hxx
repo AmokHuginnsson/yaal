@@ -46,14 +46,20 @@ class HMatrix : public HHuginn::HObject {
 	typedef yaal::hcore::HVariant<arbitrary_precision_matrix_ptr_t, floating_point_matrix_ptr_t> data_t;
 	data_t _data;
 public:
-	HMatrix( huginn::HThread*, HHuginn::HClass*, HHuginn::values_t const&, int );
+	HMatrix( huginn::HThread*, HHuginn::HClass const*, HHuginn::values_t const&, int );
+	HMatrix( HHuginn::HClass const*, arbitrary_precision_matrix_ptr_t&& );
+	HMatrix( HHuginn::HClass const*, floating_point_matrix_ptr_t&& );
 	static HHuginn::value_t get( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t set( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+	static HHuginn::value_t add( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+	static HHuginn::value_t multiply( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t det( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t scale( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t scale_to( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t to_string( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::class_t get_class( HRuntime* );
+private:
+	virtual HHuginn::value_t do_clone( huginn::HRuntime* ) const override;
 };
 
 }

@@ -44,7 +44,7 @@ namespace tools {
 
 namespace huginn {
 
-HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass* class_, HHuginn::values_t const& values_, int position_ )
+HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass const* class_, HHuginn::values_t const& values_, int position_ )
 	: HObject( class_ )
 	, _data() {
 	char const name[] = "Matrix.constructor";
@@ -110,8 +110,17 @@ HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass* class_, HHuginn::va
 			}
 		}
 	}
-
 	return;
+}
+
+HMatrix::HMatrix( HHuginn::HClass const* class_, arbitrary_precision_matrix_ptr_t&& data_ )
+	: HObject( class_ )
+	, _data( yaal::move( data_ ) ) {
+}
+
+HMatrix::HMatrix( HHuginn::HClass const* class_, floating_point_matrix_ptr_t&& data_ )
+	: HObject( class_ )
+	, _data( yaal::move( data_ ) ) {
 }
 
 HHuginn::value_t HMatrix::get( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
@@ -176,6 +185,62 @@ HHuginn::value_t HMatrix::set( huginn::HThread*, HHuginn::value_t* object_, HHug
 			throw HHuginn::HHuginnRuntimeException( "Bad col: "_ys.append( col ), position_ );
 		}
 		m[row][col] = get_real( values_[2] );
+	}
+	return ( *object_ );
+	M_EPILOG
+}
+
+HHuginn::value_t HMatrix::add( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "Matrix.add";
+	verify_arg_count( name, values_, 1, 1, position_ );
+	verify_arg_type( name, values_, 0, (*object_)->get_class(), true, position_ );
+	HHuginn::value_t v;
+	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
+	HMatrix const* arg( static_cast<HMatrix const*>( values_[0].raw() ) );
+	if ( o->_data.type() != arg->_data.type() ) {
+		throw HHuginn::HHuginnRuntimeException( "Non matching data types.", position_ );
+	}
+	try {
+		if ( o->_data.type() == 0 ) {
+			arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
+			arbitrary_precision_matrix_t const& ma( *( arg->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
+			m += ma;
+		} else {
+			floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
+			floating_point_matrix_t const& ma( *( arg->_data.get<floating_point_matrix_ptr_t>().raw() ) );
+			m += ma;
+		}
+	} catch ( HException const& e ) {
+		throw HHuginn::HHuginnRuntimeException( e.what(), position_ );
+	}
+	return ( *object_ );
+	M_EPILOG
+}
+
+HHuginn::value_t HMatrix::multiply( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "Matrix.multiply";
+	verify_arg_count( name, values_, 1, 1, position_ );
+	verify_arg_type( name, values_, 0, (*object_)->get_class(), true, position_ );
+	HHuginn::value_t v;
+	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
+	HMatrix const* arg( static_cast<HMatrix const*>( values_[0].raw() ) );
+	if ( o->_data.type() != arg->_data.type() ) {
+		throw HHuginn::HHuginnRuntimeException( "Non matching data types.", position_ );
+	}
+	try {
+		if ( o->_data.type() == 0 ) {
+			arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
+			arbitrary_precision_matrix_t const& ma( *( arg->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
+			m *= ma;
+		} else {
+			floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
+			floating_point_matrix_t const& ma( *( arg->_data.get<floating_point_matrix_ptr_t>().raw() ) );
+			m *= ma;
+		}
+	} catch ( HException const& e ) {
+		throw HHuginn::HHuginnRuntimeException( e.what(), position_ );
 	}
 	return ( *object_ );
 	M_EPILOG
@@ -311,6 +376,8 @@ HHuginn::class_t HMatrix::get_class( HRuntime* runtime_ ) {
 			HHuginn::field_definitions_t{
 				{ "get", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::get, _1, _2, _3, _4 ) ) },
 				{ "set", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::set, _1, _2, _3, _4 ) ) },
+				{ "add", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::add, _1, _2, _3, _4 ) ) },
+				{ "multiply", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::multiply, _1, _2, _3, _4 ) ) },
 				{ "det", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::det, _1, _2, _3, _4 ) ) },
 				{ "scale", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::scale, _1, _2, _3, _4 ) ) },
 				{ "scale_to", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::scale_to, _1, _2, _3, _4 ) ) },
@@ -318,6 +385,18 @@ HHuginn::class_t HMatrix::get_class( HRuntime* runtime_ ) {
 			}
 		)
 	);
+	M_EPILOG
+}
+
+HHuginn::value_t HMatrix::do_clone( huginn::HRuntime* ) const {
+	M_PROLOG
+	HHuginn::value_t v;
+	if ( _data.type() == 0 ) {
+		v = make_pointer<HMatrix>( HObject::get_class(), make_resource<arbitrary_precision_matrix_t>( *( _data.get<arbitrary_precision_matrix_ptr_t>() ) ) );
+	} else {
+		v = make_pointer<HMatrix>( HObject::get_class(), make_resource<floating_point_matrix_t>( *( _data.get<floating_point_matrix_ptr_t>() ) ) );
+	}
+	return ( v );
 	M_EPILOG
 }
 
