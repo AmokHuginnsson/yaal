@@ -42,9 +42,9 @@ namespace value_builtin {
 
 HHuginn::value_t subscript( HThread*, HExpression::ACCESS, HHuginn::value_t&, HHuginn::value_t const&, int );
 HHuginn::value_t range( HThread*, HHuginn::value_t&, HHuginn::value_t const&, HHuginn::value_t const&, HHuginn::value_t const&, int );
-void add( HHuginn::value_t&, HHuginn::value_t const&, int );
-void sub( HHuginn::value_t&, HHuginn::value_t const&, int );
-void mul( HHuginn::value_t&, HHuginn::value_t const&, int );
+void add( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
+void sub( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
+void mul( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
 void div( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
 void mod( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
 void pow( HHuginn::value_t&, HHuginn::value_t const&, int );

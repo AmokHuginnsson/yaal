@@ -309,9 +309,9 @@ void HExpression::set_variable( HFrame* frame_, int ) {
 				operands_type_mismatch( op_to_str( operation._operator ), ref->type_id(), src->type_id(), p );
 			}
 			switch ( operation._operator ) {
-				case ( OPERATOR::PLUS_ASSIGN ):     { value_builtin::add( ref, src, p ); } break;
-				case ( OPERATOR::MINUS_ASSIGN ):    { value_builtin::sub( ref, src, p ); } break;
-				case ( OPERATOR::MULTIPLY_ASSIGN ): { value_builtin::mul( ref, src, p ); } break;
+				case ( OPERATOR::PLUS_ASSIGN ):     { value_builtin::add( frame_->thread(), ref, src, p ); } break;
+				case ( OPERATOR::MINUS_ASSIGN ):    { value_builtin::sub( frame_->thread(), ref, src, p ); } break;
+				case ( OPERATOR::MULTIPLY_ASSIGN ): { value_builtin::mul( frame_->thread(), ref, src, p ); } break;
 				case ( OPERATOR::DIVIDE_ASSIGN ):   { value_builtin::div( frame_->thread(), ref, src, p ); } break;
 				case ( OPERATOR::MODULO_ASSIGN ):   { value_builtin::mod( frame_->thread(), ref, src, p ); } break;
 				case ( OPERATOR::POWER_ASSIGN ):    { value_builtin::pow( ref, src, p ); } break;
@@ -403,13 +403,14 @@ void HExpression::plus( HFrame* frame_, int ) {
 	++ frame_->ip();
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	HHuginn::value_t v1( frame_->values().top()->clone( &frame_->thread()->runtime() ) );
-	frame_->values().pop();
+	HHuginn::value_t& v1( frame_->values().top() );
 	if ( v1->type_id() != v2->type_id() ) {
 		operands_type_mismatch( op_to_str( OPERATOR::PLUS ), v1->type_id(), v2->type_id(), p );
 	}
-	value_builtin::add( v1, v2, p );
-	frame_->values().push( yaal::move( v1 ) );
+	if ( ! v1.unique() ) {
+		v1 = v1->clone( &frame_->thread()->runtime() );
+	}
+	value_builtin::add( frame_->thread(), v1, v2, p );
 	return;
 	M_EPILOG
 }
@@ -422,13 +423,14 @@ void HExpression::minus( HFrame* frame_, int ) {
 	++ frame_->ip();
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	HHuginn::value_t v1( frame_->values().top()->clone( &frame_->thread()->runtime() ) );
-	frame_->values().pop();
+	HHuginn::value_t& v1( frame_->values().top() );
 	if ( v1->type_id() != v2->type_id() ) {
 		operands_type_mismatch( op_to_str( OPERATOR::MINUS ), v1->type_id(), v2->type_id(), p );
 	}
-	value_builtin::sub( v1, v2, p );
-	frame_->values().push( yaal::move( v1 ) );
+	if ( ! v1.unique() ) {
+		v1 = v1->clone( &frame_->thread()->runtime() );
+	}
+	value_builtin::sub( frame_->thread(), v1, v2, p );
 	return;
 	M_EPILOG
 }
@@ -441,13 +443,14 @@ void HExpression::mul( HFrame* frame_, int ) {
 	++ frame_->ip();
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	HHuginn::value_t v1( frame_->values().top()->clone( &frame_->thread()->runtime() ) );
-	frame_->values().pop();
+	HHuginn::value_t& v1( frame_->values().top() );
 	if ( v1->type_id() != v2->type_id() ) {
 		operands_type_mismatch( op_to_str( OPERATOR::MULTIPLY ), v1->type_id(), v2->type_id(), p );
 	}
-	value_builtin::mul( v1, v2, p );
-	frame_->values().push( yaal::move( v1 ) );
+	if ( ! v1.unique() ) {
+		v1 = v1->clone( &frame_->thread()->runtime() );
+	}
+	value_builtin::mul( frame_->thread(), v1, v2, p );
 	return;
 	M_EPILOG
 }
@@ -460,13 +463,14 @@ void HExpression::div( HFrame* frame_, int ) {
 	++ frame_->ip();
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	HHuginn::value_t v1( frame_->values().top()->clone( &frame_->thread()->runtime() ) );
-	frame_->values().pop();
+	HHuginn::value_t& v1( frame_->values().top() );
 	if ( v1->type_id() != v2->type_id() ) {
 		operands_type_mismatch( op_to_str( OPERATOR::DIVIDE ), v1->type_id(), v2->type_id(), p );
 	}
+	if ( ! v1.unique() ) {
+		v1 = v1->clone( &frame_->thread()->runtime() );
+	}
 	value_builtin::div( frame_->thread(), v1, v2, p );
-	frame_->values().push( yaal::move( v1 ) );
 	return;
 	M_EPILOG
 }
@@ -479,13 +483,14 @@ void HExpression::mod( HFrame* frame_, int ) {
 	++ frame_->ip();
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	HHuginn::value_t v1( frame_->values().top()->clone( &frame_->thread()->runtime() ) );
-	frame_->values().pop();
+	HHuginn::value_t& v1( frame_->values().top() );
 	if ( v1->type_id() != v2->type_id() ) {
 		operands_type_mismatch( op_to_str( OPERATOR::MODULO ), v1->type_id(), v2->type_id(), p );
 	}
+	if ( ! v1.unique() ) {
+		v1 = v1->clone( &frame_->thread()->runtime() );
+	}
 	value_builtin::mod( frame_->thread(), v1, v2, p );
-	frame_->values().push( yaal::move( v1 ) );
 	return;
 	M_EPILOG
 }
@@ -522,13 +527,14 @@ void HExpression::power( HFrame* frame_, int ) {
 		++ ip;
 		HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 		frame_->values().pop();
-		HHuginn::value_t v1( frame_->values().top()->clone( &frame_->thread()->runtime() ) );
-		frame_->values().pop();
+		HHuginn::value_t& v1( frame_->values().top() );
 		if ( v1->type_id() != v2->type_id() ) {
 			operands_type_mismatch( op_to_str( OPERATOR::POWER ), v1->type_id(), v2->type_id(), p );
 		}
+		if ( ! v1.unique() ) {
+			v1 = v1->clone( &frame_->thread()->runtime() );
+		}
 		value_builtin::pow( v1, v2, p );
-		frame_->values().push( yaal::move( v1 ) );
 	}
 	return;
 	M_EPILOG
