@@ -565,9 +565,18 @@ protected:
 	virtual void const* do_id( void ) const = 0;
 };
 
-template<typename CLASS_t, typename METHOD_t>
-void const* caller_id( HFunctor<CLASS_t, METHOD_t> const& functor_ ) {
-	return ( functor_.id() );
+template<typename T>
+struct has_id_member {
+private:
+	template<typename X> static auto test( int ) -> decltype( static_cast<X*>( nullptr )->id(), static_cast<trait::true_type*>( nullptr ) );
+	template<typename> static trait::false_type* test( ... );
+public:
+	static bool const value = trait::same_type<decltype( test<T>( 0 ) ), trait::true_type*>::value;
+};
+
+template<typename CLASS_t, typename T = decltype( static_cast<CLASS_t*>( nullptr )->id() )>
+void const* caller_id( CLASS_t const& object_, T const* = nullptr ) {
+	return ( object_.id() );
 }
 
 template<typename CLASS_t, typename T = typename trait::enable_if<trait::is_function_pointer<typename trait::decay<CLASS_t>::type>::value>::type>
@@ -575,9 +584,13 @@ void const* caller_id( CLASS_t const& object_, T const** = nullptr ) {
 	return ( reinterpret_cast<void const*>( object_ ) );
 }
 
-template<typename CLASS_t, typename T = typename trait::enable_if<!trait::is_function_pointer<typename trait::decay<CLASS_t>::type>::value>::type>
-void const* caller_id( CLASS_t const& object_, T const* = nullptr ) {
-	return ( object_.id() );
+template<
+	typename CLASS_t,
+	typename T = typename trait::enable_if<!trait::is_function_pointer<typename trait::decay<CLASS_t>::type>::value>::type,
+	typename U = typename trait::enable_if<!has_id_member<CLASS_t>::value>::type
+>
+void const* caller_id( CLASS_t const& object_, T const*** = nullptr ) {
+	return ( &object_ );
 }
 
 /*! \brief Implementation of abstraction of any-method of any-class invocation.
