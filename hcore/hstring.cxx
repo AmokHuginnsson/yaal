@@ -66,6 +66,10 @@ int long kmpcasesearch( char const* const, int long, char const* const, int long
 
 }
 
+bool HCharacterClass::has( char char_ ) const {
+	return ( ::memchr( _data, char_, static_cast<size_t>( _size ) ) != nullptr );
+}
+
 #undef D_WHITE_SPACE
 #define D_WHITE_SPACE "\a\b \t\v\f\r\n"
 HCharacterClass const _whiteSpace_ = HCharacterClass( D_WHITE_SPACE, static_cast<int>( sizeof ( D_WHITE_SPACE ) - 1 ) );
@@ -75,6 +79,7 @@ HCharacterClass const _whiteSpace_ = HCharacterClass( D_WHITE_SPACE, static_cast
 #undef D_LETTER
 #define D_LOWER_CASE_LETTER "abcdefghijklmnopqrstuvwxyz"
 #define D_UPPER_CASE_LETTER "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+#define D_VOWEL "aAeEiIoOuUyY"
 #define D_LETTER D_LOWER_CASE_LETTER D_UPPER_CASE_LETTER
 #undef D_DIGIT
 #define D_DIGIT "0123456789"
@@ -86,13 +91,15 @@ HCharacterClass const _letter_ = HCharacterClass( D_LETTER, static_cast<int>( si
 HCharacterClass const _lowerCaseLetter_ = HCharacterClass( D_LOWER_CASE_LETTER, static_cast<int>( sizeof ( D_LOWER_CASE_LETTER ) - 1 ) );
 HCharacterClass const _upperCaseLetter_ = HCharacterClass( D_UPPER_CASE_LETTER, static_cast<int>( sizeof ( D_UPPER_CASE_LETTER ) - 1 ) );
 HCharacterClass const _word_ = HCharacterClass( D_LETTER D_DIGIT "_", static_cast<int>( sizeof ( D_LETTER D_DIGIT "_" ) - 1 ) );
+HCharacterClass const _vowel_ = HCharacterClass( D_VOWEL, static_cast<int>( sizeof ( D_VOWEL ) - 1 ) );
 #undef D_HEX_DIGIT
 #undef D_DIGIT
 #undef D_LETTER
+#undef D_VOWEL
 #undef D_LOWER_CASE_LETTER
 #undef D_UPPER_CASE_LETTER
 
-HCharacterClass const* _characterClass_[] = { &_whiteSpace_, &_digit_, &_letter_, &_lowerCaseLetter_, &_upperCaseLetter_, &_word_ };
+HCharacterClass const* _characterClass_[] = { &_whiteSpace_, &_digit_, &_letter_, &_lowerCaseLetter_, &_upperCaseLetter_, &_word_, &_vowel_ };
 
 static int const ALLOC_BIT_MASK = 128;
 #undef IS_INPLACE
@@ -125,7 +132,7 @@ static int const ALLOC_BIT_MASK = 128;
 
 char const* _errMsgHString_[ 7 ] = {
 	_( "ok" ),
-	_( "NULL pointer used for string operations" ),
+	_( "nullptr pointer used for string operations" ),
 	_( "use of uninitialized string" ),
 	_( "index out of bound" ),
 	_( "bad length" ),
@@ -286,7 +293,7 @@ HString::HString( char unsigned charUnsigned_ )
 HString::HString( int short shortInt_ )
 	: _len() {
 	M_PROLOG
-	int long newSize( ::snprintf( NULL, 0, "%hd", shortInt_ ) );
+	int long newSize( ::snprintf( nullptr, 0, "%hd", shortInt_ ) );
 	reserve( newSize );
 	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%hd", shortInt_ ) == newSize );
 	SET_SIZE( newSize );
@@ -297,7 +304,7 @@ HString::HString( int short shortInt_ )
 HString::HString( int short unsigned unsignedShortInt_ )
 	: _len() {
 	M_PROLOG
-	int long newSize( ::snprintf( NULL, 0, "%hu", unsignedShortInt_ ) );
+	int long newSize( ::snprintf( nullptr, 0, "%hu", unsignedShortInt_ ) );
 	reserve( newSize );
 	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%hu", unsignedShortInt_ ) == newSize );
 	SET_SIZE( newSize );
@@ -308,7 +315,7 @@ HString::HString( int short unsigned unsignedShortInt_ )
 HString::HString( int int_ )
 	: _len() {
 	M_PROLOG
-	int long newSize( ::snprintf( NULL, 0, "%d", int_ ) );
+	int long newSize( ::snprintf( nullptr, 0, "%d", int_ ) );
 	reserve( newSize );
 	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%d", int_ ) == newSize );
 	SET_SIZE( newSize );
@@ -319,7 +326,7 @@ HString::HString( int int_ )
 HString::HString( int unsigned int_ )
 	: _len() {
 	M_PROLOG
-	int long newSize( ::snprintf( NULL, 0, "%u", int_ ) );
+	int long newSize( ::snprintf( nullptr, 0, "%u", int_ ) );
 	reserve( newSize );
 	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%u", int_ ) == newSize );
 	SET_SIZE( newSize );
@@ -330,7 +337,7 @@ HString::HString( int unsigned int_ )
 HString::HString( int long long_ )
 	: _len() {
 	M_PROLOG
-	int long newSize( ::snprintf( NULL, 0, "%ld", long_ ) );
+	int long newSize( ::snprintf( nullptr, 0, "%ld", long_ ) );
 	reserve( newSize );
 	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%ld", long_ ) == newSize );
 	SET_SIZE( newSize );
@@ -341,7 +348,7 @@ HString::HString( int long long_ )
 HString::HString( int long unsigned long_ )
 	: _len() {
 	M_PROLOG
-	int long newSize( ::snprintf( NULL, 0, "%lu", long_ ) );
+	int long newSize( ::snprintf( nullptr, 0, "%lu", long_ ) );
 	reserve( newSize );
 	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%lu", long_ ) == newSize );
 	SET_SIZE( newSize );
@@ -352,7 +359,7 @@ HString::HString( int long unsigned long_ )
 HString::HString( int long long longLong_ )
 	: _len() {
 	M_PROLOG
-	int long newSize( ::snprintf( NULL, 0, "%lld", longLong_ ) );
+	int long newSize( ::snprintf( nullptr, 0, "%lld", longLong_ ) );
 	reserve( newSize );
 	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%lld", longLong_ ) == newSize );
 	SET_SIZE( newSize );
@@ -363,7 +370,7 @@ HString::HString( int long long longLong_ )
 HString::HString( int long long unsigned longLong_ )
 	: _len() {
 	M_PROLOG
-	int long newSize( ::snprintf( NULL, 0, "%llu", longLong_ ) );
+	int long newSize( ::snprintf( nullptr, 0, "%llu", longLong_ ) );
 	reserve( newSize );
 	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%llu", longLong_ ) == newSize );
 	SET_SIZE( newSize );
@@ -374,7 +381,7 @@ HString::HString( int long long unsigned longLong_ )
 HString::HString( double double_ )
 	: _len() {
 	M_PROLOG
-	int long newSize( ::snprintf( NULL, 0, "%f", double_ ) );
+	int long newSize( ::snprintf( nullptr, 0, "%f", double_ ) );
 	reserve( newSize );
 	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%f", double_ ) == newSize );
 	SET_SIZE( newSize );
@@ -385,7 +392,7 @@ HString::HString( double double_ )
 HString::HString( double long double_ )
 	: _len() {
 	M_PROLOG
-	int long newSize( ::snprintf( NULL, 0, "%.12Lf", double_ ) );
+	int long newSize( ::snprintf( nullptr, 0, "%.12Lf", double_ ) );
 	reserve( newSize );
 	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%.12Lf", double_ ) == newSize );
 	SET_SIZE( newSize );
@@ -400,7 +407,7 @@ HString::HString( void const* const ptrVoid_ )
 	 * Solaris libc omits 0x in %p conversion.
 	 * Well, that sucks.
 	 */
-	int long newSize( ::snprintf( NULL, 0, "0x%lx", reinterpret_cast<int long>( ptrVoid_ ) ) );
+	int long newSize( ::snprintf( nullptr, 0, "0x%lx", reinterpret_cast<int long>( ptrVoid_ ) ) );
 	reserve( newSize );
 	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "0x%lx", reinterpret_cast<int long>( ptrVoid_ ) ) == newSize );
 	SET_SIZE( newSize );
@@ -773,7 +780,7 @@ HString& HString::vformat( char const* const format_, void* ap_ ) {
 		M_THROW( _errMsgHString_[ string_helper::NULL_PTR ], errno );
 	::std::va_list orig;
 	__va_copy( orig, *static_cast< ::std::va_list*>( ap_ ) );
-	int long newSize = vsnprintf( NULL, 0, format_, *static_cast< ::std::va_list*>( ap_ ) );
+	int long newSize = vsnprintf( nullptr, 0, format_, *static_cast< ::std::va_list*>( ap_ ) );
 	reserve( newSize );
 	M_ENSURE( vsnprintf( MEM, static_cast<size_t>( newSize + 1 ), format_, orig ) == newSize );
 	SET_SIZE( newSize );
@@ -968,7 +975,7 @@ HString& HString::replace( HString const& pattern_,
 			index += lenPattern;
 		}
 		HString s;
-		HString* src( NULL );
+		HString* src( nullptr );
 		if ( subWP > 0 ) { /* replacement is longer than pattern */
 			s = *this;
 			s.materialize();
@@ -1551,7 +1558,7 @@ int long long stoll_impl( char const*, int*, int );
 int long long stoll_impl( char const* str_, int* endIdx_, int base_ ) {
 	M_PROLOG
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
-	char* end( NULL );
+	char* end( nullptr );
 	int long long val( ::strtoll( str_, &end, base_ ) );
 	if ( ! val || ( val == LONG_MIN ) || ( val == LONG_MAX ) ) {
 		if ( errno == EINVAL )
@@ -1575,7 +1582,7 @@ int long long unsigned stoull_impl( char const*, int*, int );
 int long long unsigned stoull_impl( char const* str_, int* endIdx_, int base_ ) {
 	M_PROLOG
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
-	char* end( NULL );
+	char* end( nullptr );
 	int long long unsigned val( ::strtoull( str_, &end, base_ ) );
 	if ( ! val || ( val == ULONG_MAX ) ) {
 		if ( errno == EINVAL )
@@ -1608,19 +1615,19 @@ double long stold( HString const& str_, int* endIdx_ ) {
 }
 
 bool is_whitespace( char char_ ) {
-	return ( ::memchr( _whiteSpace_.data(), char_, static_cast<size_t>( _whiteSpace_.size() ) ) != NULL );
+	return ( _whiteSpace_.has( char_ ) );
 }
 
 bool is_digit( char char_ ) {
-	return ( ::memchr( _digit_.data(), char_, static_cast<size_t>( _digit_.size() ) ) != NULL );
+	return ( _digit_.has( char_ ) );
 }
 
 bool is_hex_digit( char char_ ) {
-	return ( ::memchr( _hexDigit_.data(), char_, static_cast<size_t>( _hexDigit_.size() ) ) != NULL );
+	return ( _hexDigit_.has( char_ ) );
 }
 
 bool is_letter( char char_ ) {
-	return ( ::memchr( _letter_.data(), char_, static_cast<size_t>( _letter_.size() ) ) != NULL );
+	return ( _letter_.has( char_ ) );
 }
 
 bool is_alpha( char char_ ) {
@@ -1636,7 +1643,7 @@ char* strrnpbrk( char const* buffer_,
 		char const* stopSet_, int long length_ ) {
 	M_PROLOG
 	if ( length_ < 1 )
-		return ( NULL );
+		return ( nullptr );
 	int long stopSetSize( static_cast<int long>( ::std::strlen( stopSet_ ) ) );
 	int long index( length_ - 1 );
 	while ( index >= 0 ) {
@@ -1644,7 +1651,7 @@ char* strrnpbrk( char const* buffer_,
 			return ( const_cast<char*>( buffer_ + index ) );
 		-- index;
 	}
-	return ( NULL );
+	return ( nullptr );
 	M_EPILOG
 }
 

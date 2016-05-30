@@ -71,6 +71,7 @@ public:
 	int size( void ) const {
 		return ( _size );
 	}
+	bool has( char ) const;
 };
 
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _whiteSpace_;
@@ -79,6 +80,7 @@ extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _letter_;
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _lowerCaseLetter_;
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _upperCaseLetter_;
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _word_;
+extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _vowel_;
 struct CHARACTER_CLASS {
 	typedef enum {
 		WHITE_SPACE = 0,
@@ -86,7 +88,8 @@ struct CHARACTER_CLASS {
 		LETTER = 2,
 		LOWER_CASE_LETTER = 3,
 		UPPER_CASE_LETTER = 4,
-		WORD = 5
+		WORD = 5,
+		VOWEL = 6
 	} character_class_t;
 };
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const* _characterClass_[];
