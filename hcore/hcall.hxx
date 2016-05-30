@@ -581,7 +581,7 @@ void const* caller_id( CLASS_t const& object_, T const* = nullptr ) {
 
 template<typename CLASS_t, typename T = typename trait::enable_if<trait::is_function_pointer<typename trait::decay<CLASS_t>::type>::value>::type>
 void const* caller_id( CLASS_t const& object_, T const** = nullptr ) {
-	return ( reinterpret_cast<void const*>( object_ ) );
+	return ( bit_cast<void const*>( object_ ) );
 }
 
 template<

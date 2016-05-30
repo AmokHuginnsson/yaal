@@ -63,9 +63,9 @@ HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass* class_, HHuginn::va
 		if ( cols < 1 ) {
 			throw HHuginn::HHuginnRuntimeException( "Invalid number of columns in matrix specification: "_ys.append( cols ).append( "." ), position_ );
 		}
-		if ( fr.function().id() == reinterpret_cast<void const*>( &huginn_builtin::number ) ) {
+		if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::number ) ) {
 			_data = data_t( make_resource<arbitrary_precision_matrix_t>( rows, cols ) );
-		} else if ( fr.function().id() == reinterpret_cast<void const*>( &huginn_builtin::real ) ) {
+		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::real ) ) {
 			_data = data_t( make_resource<floating_point_matrix_t>( rows, cols ) );
 		} else {
 			throw HHuginn::HHuginnRuntimeException( "Bad matrix type: `"_ys.append( thread_->runtime().function_name( fr.function().id() ) ).append( "'." ), position_ );

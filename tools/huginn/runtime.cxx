@@ -38,8 +38,6 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/streamtools.hxx"
 #include "tools/stringalgo.hxx"
 
-#include "hcore/hfile.hxx"
-
 using namespace yaal;
 using namespace yaal::hcore;
 
@@ -632,11 +630,6 @@ yaal::hcore::HString const& HRuntime::function_name( void const* id_ ) const {
 	yaal::hcore::HString const* name( &unknown );
 	for ( functions_t::value_type const& f : _functions ) {
 		if ( f.second.id() == id_ ) {
-			cerr << "id_ " << id_ << endl;
-			cerr << "f = " << f.second.id() << endl;
-			cerr << "this = " << this << endl;
-			cerr << "number = " << reinterpret_cast<void*>( &value_builtin::number ) << endl;
-			cerr << "boolean =  " << reinterpret_cast<void*>( &value_builtin::boolean ) << endl;
 			name = &identifier_name( f.first );
 			break;
 		}
