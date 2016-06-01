@@ -123,7 +123,7 @@ void HExpression::commit_oper( OPERATOR operator_ ) {
 			_instructions.push_back( _operations.top() );
 			_operations.pop();
 		} break;
-		case ( OPERATOR::POWER ): {
+		case ( OPERATOR::POWER_TERM ): {
 			M_DEBUG_CODE( bool hasPowerOperator( false ); );
 			while ( ! _operations.is_empty() && ( _operations.top()._operator == OPERATOR::POWER ) ) {
 				_instructions.push_back( _operations.top() );
@@ -131,8 +131,9 @@ void HExpression::commit_oper( OPERATOR operator_ ) {
 				M_DEBUG_CODE( hasPowerOperator = true; );
 			}
 			M_ASSERT( hasPowerOperator );
+			_instructions.push_back( OPositionedOperator( operator_, 0 ) );
 		} break;
-		case ( OPERATOR::ASSIGN ): {
+		case ( OPERATOR::ASSIGN_TERM ): {
 			M_DEBUG_CODE( bool hasAssignOperator( false ); );
 			while ( ! _operations.is_empty() && ( _operations.top()._operator >= OPERATOR::ASSIGN ) && ( _operations.top()._operator <= OPERATOR::POWER_ASSIGN ) ) {
 				_instructions.push_back( _operations.top() );
@@ -140,6 +141,7 @@ void HExpression::commit_oper( OPERATOR operator_ ) {
 				M_DEBUG_CODE( hasAssignOperator = true; );
 			}
 			M_ASSERT( hasAssignOperator );
+			_instructions.push_back( OPositionedOperator( operator_, 0 ) );
 		} break;
 		case ( OPERATOR::FUNCTION_CALL ): {
 			while ( _operations.top()._operator == OPERATOR::FUNCTION_ARGUMENT ) {
@@ -322,6 +324,8 @@ void HExpression::set_variable( HFrame* frame_, int ) {
 		}
 		frame_->values().push( ref );
 	}
+	M_ASSERT( ( ip < static_cast<int>( _instructions.get_size() ) ) && (  _instructions[ip]._operator == OPERATOR::ASSIGN_TERM ) );
+	++ ip;
 	return;
 	M_EPILOG
 }
@@ -536,6 +540,8 @@ void HExpression::power( HFrame* frame_, int ) {
 		}
 		value_builtin::pow( v1, v2, p );
 	}
+	M_ASSERT( ( ip < static_cast<int>( _instructions.get_size() ) ) && (  _instructions[ip]._operator == OPERATOR::POWER_TERM ) );
+	++ ip;
 	return;
 	M_EPILOG
 }

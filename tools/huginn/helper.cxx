@@ -349,10 +349,12 @@ char const* op_to_str( OPERATOR o_ ) {
 		case ( OPERATOR::DIVIDE ):             str = "/";      break;
 		case ( OPERATOR::MODULO ):             str = "%";      break;
 		case ( OPERATOR::POWER ):              str = "^";      break;
+		case ( OPERATOR::POWER_TERM ):         str = "^;";     break;
 		case ( OPERATOR::FACTORIAL ):          str = "x!";     break;
 		case ( OPERATOR::ABSOLUTE ):           str = "|...|";  break;
 		case ( OPERATOR::PARENTHESIS ):        str = "(...)";  break;
 		case ( OPERATOR::ASSIGN ):             str = "=";      break;
+		case ( OPERATOR::ASSIGN_TERM ):        str = "=;";     break;
 		case ( OPERATOR::PLUS_ASSIGN ):        str = "+=";     break;
 		case ( OPERATOR::MINUS_ASSIGN ):       str = "-=";     break;
 		case ( OPERATOR::MULTIPLY_ASSIGN ):    str = "*=";     break;

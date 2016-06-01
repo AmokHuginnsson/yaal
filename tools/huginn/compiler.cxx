@@ -1447,7 +1447,7 @@ void OCompiler::dispatch_power( executing_parser::position_t position_ ) {
 	}
 	if ( hasPower ) {
 		defer_action( &HExpression::power, position_ );
-		current_expression()->commit_oper( OPERATOR::POWER );
+		current_expression()->commit_oper( OPERATOR::POWER_TERM );
 	}
 	return;
 	M_EPILOG
@@ -1667,7 +1667,7 @@ void OCompiler::dispatch_assign( executing_parser::position_t position_ ) {
 	}
 	if ( hasAssign ) {
 		defer_action( &HExpression::set_variable, position_ );
-		current_expression()->commit_oper( OPERATOR::ASSIGN );
+		current_expression()->commit_oper( OPERATOR::ASSIGN_TERM );
 	}
 	return;
 	M_EPILOG

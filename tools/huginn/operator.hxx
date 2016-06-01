@@ -37,6 +37,11 @@ namespace tools {
 
 namespace huginn {
 
+/*
+ * Order of enumerated operators matters.
+ * ASSIGN and *_ASSIGN must be consecutive,
+ * starting with ASSIGN and ending with POWER_ASSIGN.
+ */
 enum class OPERATOR {
 	PLUS,
 	MINUS,
@@ -44,6 +49,7 @@ enum class OPERATOR {
 	DIVIDE,
 	MODULO,
 	POWER,
+	POWER_TERM,
 	FACTORIAL,
 	ABSOLUTE,
 	PARENTHESIS,
@@ -54,6 +60,7 @@ enum class OPERATOR {
 	DIVIDE_ASSIGN,
 	MODULO_ASSIGN,
 	POWER_ASSIGN,
+	ASSIGN_TERM,
 	SUBSCRIPT,
 	RANGE,
 	SUBSCRIPT_ARGUMENT,
