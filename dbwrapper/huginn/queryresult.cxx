@@ -219,6 +219,12 @@ HHuginn::class_t HQueryResult::get_class( HRuntime* runtime_, HHuginn::class_t c
 	M_EPILOG
 }
 
+HHuginn::value_t HQueryResult::do_clone( tools::huginn::HRuntime* ) const {
+	M_PROLOG
+	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on QueryResult.", 0 );
+	M_EPILOG
+}
+
 }
 
 }

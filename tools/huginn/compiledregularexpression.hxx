@@ -52,6 +52,8 @@ public:
 private:
 	HHuginn::value_t do_match( huginn::HThread*, HHuginn::values_t const&, int );
 	HHuginn::value_t do_groups( huginn::HThread*, HHuginn::values_t const&, int );
+private:
+	virtual HHuginn::value_t do_clone( huginn::HRuntime* ) const override;
 };
 
 }

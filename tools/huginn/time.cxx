@@ -43,9 +43,9 @@ namespace tools {
 
 namespace huginn {
 
-HTime::HTime( HHuginn::HClass* class_ )
+HTime::HTime( HHuginn::HClass const* class_, yaal::hcore::HTime const& time_ )
 	: HObject( class_ )
-	, _time( now_local() ) {
+	, _time( time_ ) {
 	return;
 }
 
@@ -70,6 +70,12 @@ HHuginn::class_t HTime::get_class( HRuntime* runtime_ ) {
 		)
 	);
 	return ( c );
+	M_EPILOG
+}
+
+HHuginn::value_t HTime::do_clone( huginn::HRuntime* ) const {
+	M_PROLOG
+	return ( make_pointer<HTime>( HObject::get_class(), _time ) );
 	M_EPILOG
 }
 

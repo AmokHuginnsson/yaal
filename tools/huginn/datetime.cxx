@@ -65,7 +65,7 @@ public:
 		verify_arg_count( "DateTime.now", values_, 0, 0, position_ );
 		HDateTime* dt( dynamic_cast<HDateTime*>( object_->raw() ) );
 		M_ASSERT( dt );
-		return ( make_pointer<huginn::HTime>( dt->_timeClass.raw() ) );
+		return ( make_pointer<huginn::HTime>( dt->_timeClass.raw(), now_local() ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t clock( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {

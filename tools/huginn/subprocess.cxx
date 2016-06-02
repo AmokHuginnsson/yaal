@@ -168,6 +168,12 @@ HHuginn::class_t HSubprocess::get_class( HRuntime* runtime_ ) {
 	M_EPILOG
 }
 
+HHuginn::value_t HSubprocess::do_clone( huginn::HRuntime* ) const {
+	M_PROLOG
+	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on Subprocess.", 0 );
+	M_EPILOG
+}
+
 }
 
 }

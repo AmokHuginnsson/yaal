@@ -51,7 +51,7 @@ class HRange : public HHuginn::HIterable {
 	int _stop;
 	int _step;
 public:
-	HRange( HHuginn::HClass* class_, int from_, int stop_, int step_ )
+	HRange( HHuginn::HClass const* class_, int from_, int stop_, int step_ )
 		: HIterable( class_ )
 		, _from( from_ )
 		, _stop( stop_ )
@@ -80,6 +80,10 @@ protected:
 	}
 private:
 	virtual HIterator do_iterator( void ) override;
+private:
+	virtual HHuginn::value_t do_clone( huginn::HRuntime* ) const override {
+		return ( make_pointer<HRange>( HIterable::get_class(), _from, _stop, _step ) );
+	}
 };
 
 class HRangeIterator : public HIteratorInterface {

@@ -41,9 +41,11 @@ namespace huginn {
 class HTime : public HHuginn::HObject {
 	yaal::hcore::HTime _time;
 public:
-	HTime( HHuginn::HClass* );
+	HTime( HHuginn::HClass const*, yaal::hcore::HTime const& );
 	static HHuginn::value_t to_string( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::class_t get_class( HRuntime* );
+private:
+	virtual HHuginn::value_t do_clone( huginn::HRuntime* ) const override;
 };
 
 }

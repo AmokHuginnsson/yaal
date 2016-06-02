@@ -55,6 +55,7 @@ private:
 	void write_impl( yaal::hcore::HString const& );
 	virtual HIterator do_iterator( void ) override;
 	virtual int long do_size( void ) const override;
+	virtual HHuginn::value_t do_clone( huginn::HRuntime* ) const override __attribute__((noreturn));
 };
 
 }

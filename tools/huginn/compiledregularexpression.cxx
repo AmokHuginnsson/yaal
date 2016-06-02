@@ -176,6 +176,12 @@ HHuginn::class_t HCompiledRegularExpression::get_class( HRuntime* runtime_, HHug
 	M_EPILOG
 }
 
+HHuginn::value_t HCompiledRegularExpression::do_clone( huginn::HRuntime* ) const {
+	M_PROLOG
+	return ( make_pointer<HCompiledRegularExpression>( HObject::get_class(), make_resource<HRegex>( _regex->copy() ) ) );
+	M_EPILOG
+}
+
 }
 
 }

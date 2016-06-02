@@ -217,6 +217,12 @@ HHuginn::class_t HDatabaseConnection::get_class( HRuntime* runtime_, HHuginn::cl
 	M_EPILOG
 }
 
+HHuginn::value_t HDatabaseConnection::do_clone( tools::huginn::HRuntime* ) const {
+	M_PROLOG
+	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on DatabaseConnection.", 0 );
+	M_EPILOG
+}
+
 }
 
 }

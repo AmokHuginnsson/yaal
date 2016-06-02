@@ -125,6 +125,12 @@ HHuginn::class_t HRegularExpressionMatch::get_class( HRuntime* runtime_ ) {
 	M_EPILOG
 }
 
+HHuginn::value_t HRegularExpressionMatch::do_clone( huginn::HRuntime* ) const {
+	M_PROLOG
+	return ( make_pointer<HRegularExpressionMatch>( HIterable::get_class(), make_resource<HRegex>( _regex->copy() ), _string ) );
+	M_EPILOG
+}
+
 }
 
 }
