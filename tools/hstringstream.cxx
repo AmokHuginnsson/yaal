@@ -74,13 +74,13 @@ yaal::hcore::HString const& HStringStream::str( void ) const {
 	return ( string() );
 }
 
-int long HStringStream::do_write( void const* const buffer_, int long size_ ) {
+int long HStringStream::do_write( void const* buffer_, int long size_ ) {
 	M_PROLOG
 	if ( _used ) {
 		_buffer.clear();
 		_used = false;
 	}
-	_buffer.append( static_cast<char const* const>( buffer_ ), size_ );
+	_buffer.append( static_cast<char const*>( buffer_ ), size_ );
 	return ( size_ );
 	M_EPILOG
 }
@@ -91,12 +91,12 @@ void HStringStream::do_flush( void ) {
 	M_EPILOG
 }
 
-int long HStringStream::do_read( void* const buffer_, int long size_ ) {
+int long HStringStream::do_read( void* buffer_, int long size_ ) {
 	M_PROLOG
 	int long length( _buffer.get_length() );
 	int long toCopy( yaal::min( length - _offset, size_ ) );
 	if ( length > 0 ) {
-		::strncpy( static_cast<char* const>( buffer_ ), _buffer.raw() + _offset, static_cast<size_t>( toCopy ) );
+		::strncpy( static_cast<char*>( buffer_ ), _buffer.raw() + _offset, static_cast<size_t>( toCopy ) );
 	}
 	_offset += toCopy;
 	if ( _offset >= length ) {

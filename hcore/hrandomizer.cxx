@@ -207,7 +207,7 @@ namespace randomizer_helper {
 HRandomizer make_randomizer( u64_t cap_ ) {
 	M_PROLOG
 	struct timeval tv;
-	M_ENSURE( gettimeofday( &tv, NULL ) == 0 );
+	M_ENSURE( gettimeofday( &tv, nullptr ) == 0 );
 	return ( HRandomizer( static_cast<u64_t>( tv.tv_sec + tv.tv_usec + system::getpid() ), cap_ ) );
 	M_EPILOG
 }

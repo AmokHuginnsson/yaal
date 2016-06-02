@@ -46,13 +46,13 @@ HWindow::HWindow( yaal::hcore::HString const& title_ )
 	: _initialised( false ),
 	_needRepaint( false ), _title( title_ ), _focusedChild(),
 	_previousFocusedChild(), _widgets( _focusedChild ),
-	_statusBar(), _tuiProcess( NULL ) {
+	_statusBar(), _tuiProcess( nullptr ) {
 	M_PROLOG
 	int cmds [] = { ':', KEY<':'>::command };
 	int search [] = { '/', KEY<'/'>::command, '?', KEY<'?'>::command };
 	if ( ! HConsole::get_instance().is_enabled() )
 		M_THROW( "console not initialised.", errno );
-	register_postprocess_handler( '\t', NULL, call( &HWindow::handler_jump_tab, this, _1 ) );
+	register_postprocess_handler( '\t', nullptr, call( &HWindow::handler_jump_tab, this, _1 ) );
 	register_postprocess_handler( 2, cmds, call( &HWindow::handler_command, this, _1 ) );
 	register_postprocess_handler( 4, search, call( &HWindow::handler_search, this, _1 ) );
 	return;
@@ -137,7 +137,7 @@ int HWindow::add_widget( HWidget::ptr_t widget_, int shortCut_ ) {
 	if ( _preprocessHandlers.find( shortCut_ ) != _preprocessHandlers.end() )
 		M_THROW( _( "shortcut occupied" ), shortCut_ );
 	_widgets.add_widget( widget_ );
-	register_postprocess_handler( shortCut_, NULL, call( &HWindow::handler_jump_direct, this, _1 ) );
+	register_postprocess_handler( shortCut_, nullptr, call( &HWindow::handler_jump_direct, this, _1 ) );
 	return ( 0 );
 	M_EPILOG
 }

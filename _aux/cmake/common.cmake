@@ -264,9 +264,18 @@ set( VERSION "${PROJECT_VERSION}.${PROJECT_SUBVERSION}.${PROJECT_EXTRAVERSION}-$
 
 link_directories( ${CMAKE_LIBRARY_PATH} )
 
-add_custom_target(
-	commit_id ALL
-	COMMAND "${CMAKE_HOME_DIRECTORY}/_aux/update-commit-id" "${CMAKE_HOME_DIRECTORY}" "${TARGET_PATH}/commit_id.hxx" "${GITID}"
-	COMMENT "Regenerating commit_id.hxx."
-)
+if ( NOT CMAKE_HOST_WIN32 )
+	add_custom_target(
+		commit_id ALL
+		COMMAND "${CMAKE_HOME_DIRECTORY}/_aux/update-commit-id" "${CMAKE_HOME_DIRECTORY}" "${TARGET_PATH}/commit_id.hxx" "${GITID}"
+		COMMENT "Regenerating commit_id.hxx."
+	)
+else()
+	add_custom_target(
+		commit_id ALL
+		COMMAND update-commit-id "${CMAKE_HOME_DIRECTORY}" "${TARGET_PATH}/commit_id.hxx"
+		DEPENDS update-config-id
+		COMMENT "Regenerating commit_id.hxx."
+	)
+endif()
 

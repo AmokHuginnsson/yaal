@@ -79,7 +79,7 @@ void HRecordSet::clear( void ) {
 			(_connector->rs_free_cursor)( _result );
 		}
 	}
-	_result = NULL;
+	_result = nullptr;
 	return;
 	M_EPILOG
 }

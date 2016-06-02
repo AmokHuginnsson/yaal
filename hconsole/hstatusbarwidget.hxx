@@ -85,11 +85,11 @@ public:
 	void set_prompt( yaal::hcore::HString const&, PROMPT = PROMPT::NORMAL );
 	void end_prompt( void );
 	void init_progress( double, char const*, bool = true );
-	void update_progress( double = -1, char const * = NULL );
+	void update_progress( double = -1, char const * = nullptr );
 	void message( int, char const*, ... ) __attribute__(( format( printf, 3, 4 ) ));
 	void message( char const*, ... ) __attribute__(( format( printf, 2, 3 ) ));
 	void clear( int );
-	void bar( char const* = NULL );
+	void bar( char const* = nullptr );
 	void ask( char const*, choices_t const&, int = -1 );
 	void confirm( char const*, HTUIProcess::call_t, HTUIProcess::call_t );
 	bool dialog( yaal::hcore::HString const& );

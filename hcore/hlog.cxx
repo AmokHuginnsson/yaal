@@ -117,12 +117,12 @@ void HLog::disable_auto_rehash( void ) {
 	return;
 }
 
-void HLog::do_rehash( void* src_, char const* const processName_ ) {
+void HLog::do_rehash( void* src_, char const* processName_ ) {
 	M_PROLOG
 	M_ASSERT( ! _realMode );
 	M_ASSERT( processName_ );
 #ifndef HAVE_GETLINE
-	char* ptr = NULL;
+	char* ptr = nullptr;
 	int len = 0;
 #endif /* not HAVE_GETLINE */
 	_realMode = true;
@@ -154,7 +154,7 @@ void HLog::do_rehash( void* src_, char const* const processName_ ) {
 			* ++ ptr = 0;
 			::fseek( src, static_cast<int long>( ptr - buf ) - len, SEEK_CUR );
 #endif /* not HAVE_GETLINE */
-			_type = static_cast<LOG_LEVEL::priority_t>( ::strtol( buf, NULL, 0x10 ) );
+			_type = static_cast<LOG_LEVEL::priority_t>( ::strtol( buf, nullptr, 0x10 ) );
 			if ( _type <= _logLevel ) {
 				timestamp();
 				static int const TIMESTAMP_LENGTH( 10 );
@@ -171,8 +171,7 @@ void HLog::do_rehash( void* src_, char const* const processName_ ) {
 	M_EPILOG
 }
 
-void HLog::rehash_stream( void* stream_,
-		char const* const processName_ ) {
+void HLog::rehash_stream( void* stream_, char const* processName_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	if ( ! stream_ ) {
@@ -185,8 +184,7 @@ void HLog::rehash_stream( void* stream_,
 	M_EPILOG
 }
 
-void HLog::rehash( HString const& logFileName_,
-		char const* const processName_ ) {
+void HLog::rehash( HString const& logFileName_, char const* processName_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	if ( logFileName_.is_empty() ) {
@@ -214,7 +212,7 @@ void HLog::timestamp( void ) {
 		}
 		return;
 	}
-	time_t currentTime = ::time( NULL );
+	time_t currentTime = ::time( nullptr );
 	tm* brokenTime = ::localtime( &currentTime );
 	::memset( buffer, 0, TIMESTAMP_SIZE );
 	/* ISO C++ does not support the `%e' strftime format */
@@ -236,7 +234,7 @@ void HLog::timestamp( void ) {
 	M_EPILOG
 }
 
-void HLog::eol_reset( char const* const buf_, int long len_ ) {
+void HLog::eol_reset( char const* buf_, int long len_ ) {
 	M_PROLOG
 	if ( ( len_ < 1 ) || ( buf_[ len_ - 1 ] != '\n' ) ) {
 		_newLine = false;
@@ -249,7 +247,7 @@ void HLog::eol_reset( char const* const buf_, int long len_ ) {
 	M_EPILOG
 }
 
-int HLog::vformat( char const* const format_, va_list ap_ ) {
+int HLog::vformat( char const* format_, va_list ap_ ) {
 	M_PROLOG
 	int err = 0;
 	if ( _newLine )
@@ -265,7 +263,7 @@ int HLog::vformat( char const* const format_, va_list ap_ ) {
 	M_EPILOG
 }
 
-int HLog::operator() ( char const * const format_, ... ) {
+int HLog::operator() ( char const * format_, ... ) {
 	M_PROLOG
 	int err = 0;
 	va_list ap;
@@ -276,7 +274,7 @@ int HLog::operator() ( char const * const format_, ... ) {
 	M_EPILOG
 }
 
-int HLog::operator() ( LOG_LEVEL::priority_t type_, char const* const format_, ... ) {
+int HLog::operator() ( LOG_LEVEL::priority_t type_, char const* format_, ... ) {
 	M_PROLOG
 	int err = 0;
 	va_list ap;
@@ -302,12 +300,12 @@ HLog& HLog::filter( LOG_LEVEL::priority_t type_ ) {
 	M_EPILOG
 }
 
-int long HLog::do_write( void const* const string_, int long size_ ) {
+int long HLog::do_write( void const* string_, int long size_ ) {
 	M_PROLOG
 	if ( ! string_ )
 		return ( 0 );
 	int len = 0;
-	char const* const str = static_cast<char const* const>( string_ );
+	char const* str = static_cast<char const*>( string_ );
 	if ( ! _realMode || ( _type <= _logLevel ) ) {
 		if ( _newLine ) {
 			timestamp();
@@ -326,7 +324,7 @@ void HLog::do_flush( void ) {
 	M_EPILOG
 }
 
-int long HLog::do_read( void* const, int long ) {
+int long HLog::do_read( void*, int long ) {
 	return ( 0 );
 }
 

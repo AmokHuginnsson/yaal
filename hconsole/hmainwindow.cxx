@@ -39,10 +39,10 @@ namespace hconsole {
 
 HMainWindow::HMainWindow( yaal::hcore::HString const& title_, HTUIProcess::model_ptr_t windows_,
 		HTUIProcess::cyclic_iterator& foregroundWindow_ )
-		: HWindow( title_ ), _menu( NULL ), _windowList( windows_ ),
+		: HWindow( title_ ), _menu( nullptr ), _windowList( windows_ ),
 		_foregroundWindow( foregroundWindow_ ) {
 	M_PROLOG
-	register_postprocess_handler( KEY<'q'>::command, NULL, call( &HMainWindow::handler_close, this, _1 ) );
+	register_postprocess_handler( KEY<'q'>::command, nullptr, call( &HMainWindow::handler_close, this, _1 ) );
 	return;
 	M_EPILOG
 }

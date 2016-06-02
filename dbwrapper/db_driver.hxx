@@ -42,10 +42,10 @@ struct ODBLink {
 	void* _conn;
 	bool _valid;
 	ODBLink( void )
-		: _conn( NULL ), _valid( false )
+		: _conn( nullptr ), _valid( false )
 		{}
 	void clear( void ) {
-		_conn = NULL;
+		_conn = nullptr;
 		_valid = false;
 	}
 private:

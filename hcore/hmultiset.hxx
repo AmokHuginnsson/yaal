@@ -79,7 +79,7 @@ public:
 		HIterator( void )
 			: base_type()
 			, _index( 0 )
-			, _owner( NULL )
+			, _owner( nullptr )
 			, _engine() {
 			return;
 		}

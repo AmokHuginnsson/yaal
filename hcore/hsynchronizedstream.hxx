@@ -101,10 +101,10 @@ protected:
 	virtual HStreamInterface& do_input( float& ) override;
 	virtual HStreamInterface& do_input( void const*& ) override;
 	virtual HStreamInterface& do_input( manipulator_t const& ) override;
-	virtual int long do_read_until( yaal::hcore::HString&, char const* const, bool ) override;
-	virtual int long do_read_until_n( yaal::hcore::HString&, int long, char const* const, bool ) override;
-	virtual int long do_read_while( yaal::hcore::HString&, char const* const ) override;
-	virtual int long do_read_while_n( yaal::hcore::HString&, int long, char const* const ) override;
+	virtual int long do_read_until( yaal::hcore::HString&, char const*, bool ) override;
+	virtual int long do_read_until_n( yaal::hcore::HString&, int long, char const*, bool ) override;
+	virtual int long do_read_while( yaal::hcore::HString&, char const* ) override;
+	virtual int long do_read_while_n( yaal::hcore::HString&, int long, char const* ) override;
 	virtual int do_peek( void ) override;
 	virtual HStreamInterface& do_set_fill( int ) override;
 	virtual HStreamInterface& do_set_width( int ) override;
@@ -123,8 +123,8 @@ protected:
 	virtual FLOAT_FORMAT do_get_float_format( void ) const override;
 	virtual ADJUST do_get_adjust( void ) const override;
 	virtual bool do_good( void ) const override;
-	virtual int long do_write( void const* const, int long ) override;
-	virtual int long do_read( void* const, int long ) override;
+	virtual int long do_write( void const*, int long ) override;
+	virtual int long do_read( void*, int long ) override;
 	virtual void do_flush( void ) override;
 	virtual bool do_is_valid( void ) const override;
 	virtual POLL_TYPE do_poll_type( void ) const override;

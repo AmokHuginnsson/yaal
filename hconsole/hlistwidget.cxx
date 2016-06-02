@@ -58,7 +58,7 @@ HListWidget::flag_t const HListWidget::FLAG::ALL = ~HListWidget::FLAG::NONE;
 
 namespace {
 char const* default_format( TYPE type_ ) {
-	char const* df = NULL;
+	char const* df = nullptr;
 	switch ( type_ ) {
 		case ( TYPE::HSTRING ):       df = "%s"; break;
 		case ( TYPE::INT_LONG_LONG ): df = "%lld"; break;
@@ -93,7 +93,7 @@ HListWidget::HColumnInfo::HColumnInfo( yaal::hcore::HString const& name_,
 
 HListWidget::HColumnInfo::~HColumnInfo( void ) {
 	M_PROLOG
-	_widget = NULL;
+	_widget = nullptr;
 	return;
 	M_EPILOG
 }
@@ -264,7 +264,7 @@ void HListWidget::draw_scroll( int posX_ ) {
 	M_EPILOG
 }
 
-void HListWidget::draw_cell( iterator_t& it_, int row_, int column_, int columnOffset_, HColumnInfo const* const  columnInfo_, bool checked_ ) {
+void HListWidget::draw_cell( iterator_t& it_, int row_, int column_, int columnOffset_, HColumnInfo const* columnInfo_, bool checked_ ) {
 	M_PROLOG
 	HConsole& cons( HConsole::get_instance() );
 	int len( static_cast<int>( _varTmpBuffer.get_length() ) );
@@ -975,8 +975,8 @@ void HListWidget::go_to_match( void ) {
 	int columns( static_cast<int>( _header.size() ) );
 	int widgetOffsetOrig( _widgetOffset );
 	int cursorPositionOrig( _cursorPosition );
-	char const* highlightStart( NULL );
-	char const* outcome( NULL );
+	char const* highlightStart( nullptr );
+	char const* outcome( nullptr );
 	iterator_t cursorOrig = _cursor;
 	iterator_t firstVisibleRowOrig = _firstVisibleRow;
 	if ( ! _searchActived ) {
@@ -991,7 +991,7 @@ void HListWidget::go_to_match( void ) {
 	while ( count -- ) {
 		for ( columnWithMatch = _match._columnWithMatch; columnWithMatch < columns; ++ columnWithMatch ) {
 			get_text_for_cell( _cursor, columnWithMatch, TYPE::HSTRING );
-			highlightStart = NULL;
+			highlightStart = nullptr;
 			matchNumber = 0;
 			for ( HPattern::HMatchIterator it = _pattern.find( _varTmpBuffer.raw() ),
 					end = _pattern.end(); it != end; ++ it, ++ matchNumber ) {
@@ -1056,8 +1056,8 @@ void HListWidget::go_to_match_previous( void ) {
 	int columns = static_cast<int>( _header.size() );
 	int widgetOffsetOrig( _widgetOffset );
 	int cursorPositionOrig( _cursorPosition );
-	char const* highlightStart( NULL );
-	char const* outcome( NULL );
+	char const* highlightStart( nullptr );
+	char const* outcome( nullptr );
 	iterator_t cursorOrig = _cursor;
 	iterator_t firstVisibleRowOrig = _firstVisibleRow;
 	if ( ! _searchActived )
@@ -1068,7 +1068,7 @@ void HListWidget::go_to_match_previous( void ) {
 	while ( count -- ) {
 		for ( ctr = _match._columnWithMatch; ctr >= 0; ctr -- ) {
 			get_text_for_cell( _cursor, ctr, TYPE::HSTRING );
-			highlightStart = NULL;
+			highlightStart = nullptr;
 			ctrLoc = 0;
 			if ( _match._matchNumber < 0 )
 				_match._matchNumber = static_cast<int>( distance( _pattern.find( _varTmpBuffer.raw() ), _pattern.end() ) );
@@ -1079,7 +1079,7 @@ void HListWidget::go_to_match_previous( void ) {
 					break;
 				}
 				if ( ctrLoc >= _match._matchNumber ) {
-					highlightStart = NULL;
+					highlightStart = nullptr;
 					break;
 				}
 			}
@@ -1326,7 +1326,7 @@ HAbstractListModel::~HAbstractListModel( void ) {
 }
 
 HAbstractListModel::HAbstractListModel( void )
-	: _widget( NULL ) {
+	: _widget( nullptr ) {
 	return;
 }
 
@@ -1379,13 +1379,13 @@ bool HAbstractListModel::HModelIteratorWrapper::is_valid( void ) const {
 
 bool HAbstractListModel::HModelIteratorWrapper::operator==( HAbstractListModel::HModelIteratorWrapper const& it_ ) {
 	M_PROLOG
-	return ( _iteratorPtr.raw() ? _iteratorPtr->is_equal( *it_._iteratorPtr ) : it_._iteratorPtr.raw() == NULL );
+	return ( _iteratorPtr.raw() ? _iteratorPtr->is_equal( *it_._iteratorPtr ) : it_._iteratorPtr.raw() == nullptr );
 	M_EPILOG
 }
 
 bool HAbstractListModel::HModelIteratorWrapper::operator!=( HAbstractListModel::HModelIteratorWrapper const& it_ ) {
 	M_PROLOG
-	return ( _iteratorPtr.raw() ? _iteratorPtr->is_not_equal( *it_._iteratorPtr ) : it_._iteratorPtr.raw() != NULL );
+	return ( _iteratorPtr.raw() ? _iteratorPtr->is_not_equal( *it_._iteratorPtr ) : it_._iteratorPtr.raw() != nullptr );
 	M_EPILOG
 }
 

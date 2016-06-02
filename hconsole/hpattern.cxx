@@ -59,7 +59,7 @@ HPattern::HPattern( void )
 	M_EPILOG
 }
 
-HPattern::HPattern( char const* const pattern_ )
+HPattern::HPattern( char const* pattern_ )
 	: _initialized( false ),
 	_ignoreCaseDefault( false ), _ignoreCase( false ),
 	_extended( false ), _simpleMatchLength( 0 ), _regex(),
@@ -129,7 +129,7 @@ void HPattern::restore_state( void* sp, pluggable_flags_t* f ) {
 int HPattern::parse( HString const& pattern_, pluggable_flags_t* externalFlags ) {
 	M_PROLOG
 	_errorCause.clear();
-	char const* const pattern( pattern_.raw() );
+	char const* pattern( pattern_.raw() );
 /* making copy of flags */
 	OPatternState savePoint;
 	save_state( &savePoint, externalFlags );
@@ -232,12 +232,12 @@ bool HPattern::set_switch( char const switch_, pluggable_flags_t* externalFlags 
 	M_EPILOG
 }
 
-char const* HPattern::matches( char const* const string_,
-		int long* const matchLength_ ) const {
+char const* HPattern::matches( char const* string_,
+		int long* matchLength_ ) const {
 	M_PROLOG
 	M_ASSERT( string_ );
 	_errorCause.clear();
-	char const* ptr = NULL;
+	char const* ptr = nullptr;
 	int long matchLength = 0;
 	if ( _simpleMatchLength ) {
 		if ( _extended ) {
@@ -268,7 +268,7 @@ char const* HPattern::matches( char const* const string_,
 	M_EPILOG
 }
 
-HPattern::HMatchIterator HPattern::find( char const* const str_ ) const {
+HPattern::HMatchIterator HPattern::find( char const* str_ ) const {
 	M_ASSERT( str_ );
 	int long len = 0;
 	char const* start = matches( str_, &len );
@@ -281,7 +281,7 @@ HPattern::HMatchIterator HPattern::find( HString const& str_ ) const {
 }
 
 HPattern::HMatchIterator HPattern::end( void ) const {
-	return ( HMatchIterator( this, NULL, 0 ) );
+	return ( HMatchIterator( this, nullptr, 0 ) );
 }
 
 bool HPattern::matches( HString const& str_ ) const {
@@ -300,12 +300,16 @@ char const* HPattern::HMatch::raw( void ) const {
 	return ( _start );
 }
 
-HPattern::HMatchIterator::HMatchIterator( HPattern const* owner_, char const* const start_, int long len_ )
-	: base_type(), _owner( owner_ ), _match( start_, len_ ) {
+HPattern::HMatchIterator::HMatchIterator( HPattern const* owner_, char const* start_, int long len_ )
+	: base_type()
+	, _owner( owner_ )
+	, _match( start_, len_ ) {
 }
 
 HPattern::HMatchIterator::HMatchIterator( HMatchIterator const& it_ )
-	: base_type(), _owner( it_._owner ), _match( it_._match ) {
+	: base_type()
+	, _owner( it_._owner )
+	, _match( it_._match ) {
 }
 
 HPattern::HMatchIterator& HPattern::HMatchIterator::operator = ( HPattern::HMatchIterator const& it_ ) {

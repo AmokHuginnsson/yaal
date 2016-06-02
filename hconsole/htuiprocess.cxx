@@ -99,16 +99,16 @@ void HTUIProcess::init_tui( yaal::hcore::HString const& processName_, HWindow::p
 	_dispatcher.add_alert_handle( call( &HTUIProcess::handler_alert, this ) );
 	_dispatcher.add_idle_handle( call( &HTUIProcess::handler_idle, this ) );
 	register_postprocess_handler( CTRLS_COUNT, ctrls, call( &HTUIProcess::handler_refresh, this, _1 ) );
-	register_postprocess_handler( KEY<'x'>::command, NULL, call( &HTUIProcess::handler_quit, this, _1 ) );
+	register_postprocess_handler( KEY<'x'>::command, nullptr, call( &HTUIProcess::handler_quit, this, _1 ) );
 	if ( _useMouse_ != USE_MOUSE::NO ) {
-		register_postprocess_handler( KEY_CODES::MOUSE, NULL, call( &HTUIProcess::handler_mouse, this, _1 ) );
+		register_postprocess_handler( KEY_CODES::MOUSE, nullptr, call( &HTUIProcess::handler_mouse, this, _1 ) );
 	}
 	if ( !! mainWindow_ ) {
 		mainWindow = mainWindow_;
 	} else { /* Create automatically default main window. */
 		mainWindow = make_pointer<HMainWindow>( processName_, _windows, ref( _foregroundWindow ) );
-		register_postprocess_handler( KEY<'\t'>::meta, NULL, call( &HTUIProcess::handler_jump_meta_tab, this, _1 ) );
-		register_postprocess_handler( KEY<'q'>::command, NULL, call( &HTUIProcess::handler_close_window, this, _1 ) );
+		register_postprocess_handler( KEY<'\t'>::meta, nullptr, call( &HTUIProcess::handler_jump_meta_tab, this, _1 ) );
+		register_postprocess_handler( KEY<'q'>::command, nullptr, call( &HTUIProcess::handler_close_window, this, _1 ) );
 		for ( int ctr( 0 ); ctr < ALTS_COUNT; ++ ctr ) {
 			alts[ ctr ] = KEY<>::meta_r( '0' + ctr );
 		}
@@ -411,7 +411,7 @@ void HTUIProcess::do_close_window( void ) {
 	M_EPILOG
 }
 
-void HTUIProcess::select( HWindow const* const window_ ) {
+void HTUIProcess::select( HWindow const* window_ ) {
 	M_PROLOG
 	for ( model_t::iterator it( _windows->begin() ), end( _windows->end() ); it != end; ++ it ) {
 		if ( (*it) == window_ ) {

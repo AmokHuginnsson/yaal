@@ -57,7 +57,7 @@ public:
 				BITS::ALIGN align = BITS::ALIGN::LEFT,
 				yaal::TYPE type = yaal::TYPE::HSTRING,
 				yaal::hcore::HString const& format_ = hcore::HString(),
-				HWidget* associatedWidget = NULL,
+				HWidget* associatedWidget = nullptr,
 				HDictionary::ptr_t const& = HDictionary::ptr_t() );
 	};
 private:

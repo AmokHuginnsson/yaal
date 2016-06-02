@@ -1,7 +1,7 @@
 #ifndef YAAL_MSVCXX_SYS_SOCKET_H_INCLUDED
 #define YAAL_MSVCXX_SYS_SOCKET_H_INCLUDED 1
 
-#include <sys/time.h>
+#include "_aux/msvcxx/sys/time.h"
 
 #ifndef ENOTCONN
 #define ENOTCONN WSAENOTCONN

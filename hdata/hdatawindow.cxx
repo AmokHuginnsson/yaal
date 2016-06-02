@@ -53,25 +53,25 @@ namespace hdata {
 
 HDataWindow::HDataWindow( HString const& title_, HDataProcess* owner_ )
 	: HWindow( title_ ),
-	_modified( false ), _documentMode( DOCUMENT::VIEW ), _mainWidget( NULL ),
+	_modified( false ), _documentMode( DOCUMENT::VIEW ), _mainWidget( nullptr ),
 	_viewModeWidgets(), _editModeWidgets(),
 	_crud( new ( memory::yaal ) HCRUDDescriptor( owner_->data_base() ) ),
 	_mode( HCRUDDescriptor::MODE::READ ),
 	_columns(), _idColumnName(), _dictionaries() {
 	M_PROLOG
-	register_postprocess_handler( KEY<'n'>::command, NULL, call( &HDataWindow::handler_add_new, this, _1 ) );
-	register_postprocess_handler( KEY<'e'>::command, NULL, call( &HDataWindow::handler_edit, this, _1 ) );
-	register_postprocess_handler( KEY<'d'>::command, NULL, call( &HDataWindow::handler_delete, this, _1 ) );
-	register_postprocess_handler( KEY<'w'>::command, NULL, call( &HDataWindow::handler_save, this, _1 ) );
-	register_postprocess_handler( KEY<'r'>::ctrl, NULL, call( &HDataWindow::handler_requery, this, _1 ) );
-	register_postprocess_handler( KEY_CODES::ESCAPE, NULL, call( &HDataWindow::handler_cancel, this, _1 ) );
+	register_postprocess_handler( KEY<'n'>::command, nullptr, call( &HDataWindow::handler_add_new, this, _1 ) );
+	register_postprocess_handler( KEY<'e'>::command, nullptr, call( &HDataWindow::handler_edit, this, _1 ) );
+	register_postprocess_handler( KEY<'d'>::command, nullptr, call( &HDataWindow::handler_delete, this, _1 ) );
+	register_postprocess_handler( KEY<'w'>::command, nullptr, call( &HDataWindow::handler_save, this, _1 ) );
+	register_postprocess_handler( KEY<'r'>::ctrl, nullptr, call( &HDataWindow::handler_requery, this, _1 ) );
+	register_postprocess_handler( KEY_CODES::ESCAPE, nullptr, call( &HDataWindow::handler_cancel, this, _1 ) );
 	return;
 	M_EPILOG
 }
 
 HDataWindow::~HDataWindow( void ) {
 	M_PROLOG
-	_mainWidget = NULL;
+	_mainWidget = nullptr;
 	return;
 	M_EPILOG
 }

@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <string>
-#include <hash_map>
+#include <unordered_map>
 
 #include "crit.hxx"
 #include "hcore/macro.hxx"
@@ -40,7 +40,7 @@ private:
 	bool _nonBlocking;
 	std::string _path;
 public:
-	IO( TYPE::type_t, HANDLE, HANDLE = NULL, std::string const& = std::string() );
+	IO( TYPE::type_t, HANDLE, HANDLE = nullptr, std::string const& = std::string() );
 	~IO( void );
 	HANDLE event( void ) const;
 	void schedule_read( void );
@@ -75,13 +75,13 @@ class M_YAAL_HCORE_PUBLIC_API SystemIO {
 public:
 	static int const MANAGED_IO = 0x10000;
 private:
-	typedef stdext::hash_map<int, io_ptr_t> io_table_t;
+	typedef std::unordered_map<int, io_ptr_t> io_table_t;
 	io_table_t _ioTable;
 	CMutex _mutex;
 	int _idPool;
 public:
 	typedef io_table_t::value_type io_t;
-	io_t& create_io( IO::TYPE::type_t, HANDLE, HANDLE = NULL, std::string const& = std::string() );
+	io_t& create_io( IO::TYPE::type_t, HANDLE, HANDLE = nullptr, std::string const& = std::string() );
 	io_t& get_io( int );
 	int close_io( int );
 	int dup2_io( int, int );

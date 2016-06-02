@@ -138,7 +138,7 @@ void HThread::finish( void ) {
 	lock.unlock();
 	_semaphore.wait();
 	lock.lock();
-	void* returnValue( NULL );
+	void* returnValue( nullptr );
 	M_ENSURE( ::pthread_join( *_buf.get<pthread_t>(), &returnValue ) == 0 );
 	_status = DEAD;
 	if ( _exceptionInfo._stacked ) {
@@ -187,7 +187,7 @@ void* HThread::SPAWN( void* thread_ ) {
 		log( LOG_LEVEL::ERROR ) << "Unknown uncaught exception in thread!" << endl;
 		throw;
 	}
-	return ( NULL );
+	return ( nullptr );
 	M_EPILOG
 }
 
@@ -206,8 +206,8 @@ void HThread::CLEANUP( void* ) {
 #endif /* #ifdef __HOST_OS_TYPE_SOLARIS__ */
 void HThread::control( void ) {
 	M_PROLOG
-	M_ENSURE( ::pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL ) == 0 );
-	M_ENSURE( ::pthread_setcanceltype( PTHREAD_CANCEL_DEFERRED, NULL ) == 0 );
+	M_ENSURE( ::pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, nullptr ) == 0 );
+	M_ENSURE( ::pthread_setcanceltype( PTHREAD_CANCEL_DEFERRED, nullptr ) == 0 );
 	/* pthread_cleanup_push and pthread_cleanup_pop are macros that need
 	 * to be treated as { and } brackets which means that variables
 	 * declared between pthread_cleanup_push and pthread_cleanup_pop
@@ -593,7 +593,7 @@ HReadWriteLock::~HReadWriteLock( void ) {
 
 void HReadWriteLock::lock_read( void ) {
 	M_PROLOG
-	OLockInfo* lockInfo( NULL );
+	OLockInfo* lockInfo( nullptr );
 	/* scope for _lockInfo access */ {
 		HLock l( _mutex );
 		lockInfo = &_lockInfo[ HThread::get_current_thread_id() ];
@@ -613,7 +613,7 @@ void HReadWriteLock::lock_read( void ) {
 
 void HReadWriteLock::lock_write( void ) {
 	M_PROLOG
-	OLockInfo* lockInfo( NULL );
+	OLockInfo* lockInfo( nullptr );
 	/* scope for _lockInfo access */ {
 		HLock l( _mutex );
 		lockInfo = &_lockInfo[ HThread::get_current_thread_id() ];

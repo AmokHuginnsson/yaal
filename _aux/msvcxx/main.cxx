@@ -43,7 +43,7 @@ static int const MAX_SYMBOL_NAME_LEN( 2048 );
 
 namespace abi {
 
-	char* __cxa_demangle( char const* const a, int, int, int* ) {
+	char* __cxa_demangle( char const* a, int, int, int* ) {
 		char* buf = memory::calloc<char>( MAX_SYMBOL_NAME_LEN );
 		::UnDecorateSymbolName( a, buf, MAX_SYMBOL_NAME_LEN - 1, 0 );
 		return ( buf );
@@ -64,14 +64,14 @@ int backtrace( void** buf_, int size_ ) {
  */
 	int toFetch( std::min( size_, 62 ) );
 	::SetLastError( 0 );
-	int got( ::CaptureStackBackTrace( 0, toFetch, buf_, NULL ) );
+	int got( ::CaptureStackBackTrace( 0, toFetch, buf_, nullptr ) );
 	if ( ( toFetch > 0 ) && ( got < 1 ) && ( ::GetLastError() != 0 ) )
 		log_windows_error( "CaptureStackBackTrace" );
 	static bool once( false );
 	if ( ! once ) {
 		once = true;
 		/* ::SymSetOptions( SYMOPT_UNDNAME ); */
-		if ( ! ::SymInitialize( ::GetCurrentProcess(), NULL, true ) ) {
+		if ( ! ::SymInitialize( ::GetCurrentProcess(), nullptr, true ) ) {
 			log_windows_error( "SymInitialize" );
 			got = 0;
 		}
@@ -116,7 +116,7 @@ char** backtrace_symbols( void* const* buf_, int size_ ) {
 	}
 	if ( fail ) {
 		memory::free( strings );
-		strings = NULL;
+		strings = nullptr;
 	}
 	return ( strings );
 }
@@ -126,7 +126,7 @@ M_EXPORT_SYMBOL
 void* dlopen_fix( char const* name_, int flag_ ) {
 	HANDLE handle( 0 );
 	if ( ! name_ )
-		handle = GetModuleHandle( NULL );
+		handle = GetModuleHandle( nullptr );
 	else
 		handle = dlopen( name_, flag_ );
 	return ( handle );
@@ -142,7 +142,7 @@ int unsetenv_fix( char const* name_ ) {
 }
 
 int unix_readdir_r( DIR* dir_, struct unix_dirent* entry_, struct unix_dirent** result_ ) {
-	dirent* result( NULL );
+	dirent* result( nullptr );
 	dirent broken;
 	int error( readdir_r( dir_, &broken, &result ) );
 	*result_ = reinterpret_cast<unix_dirent*>( result );
@@ -156,10 +156,10 @@ int unix_readdir_r( DIR* dir_, struct unix_dirent* entry_, struct unix_dirent** 
 
 PSID get_base_sid( char* buffer_, int size_ ) {
 	/* Open the access token associated with the calling process. */
-	HANDLE hToken( NULL );
+	HANDLE hToken( nullptr );
 	if ( ! ::OpenProcessToken( ::GetCurrentProcess(), TOKEN_QUERY, &hToken ) ) {
 		log_windows_error( "OpenProcessToken" );
-		return ( NULL );
+		return ( nullptr );
 	}
 
 	::memset( buffer_, 0, size_ );
@@ -167,14 +167,14 @@ PSID get_base_sid( char* buffer_, int size_ ) {
 	DWORD dummy( 0 );
 	if ( ! ::GetTokenInformation( hToken, TokenUser, buffer_, size_, &dummy ) ) {
 		log_windows_error( "GetTokenInformation" );
-		return ( NULL );
+		return ( nullptr );
 	}
 
 	::CloseHandle( hToken );
 	PTOKEN_USER tokenUser( static_cast<PTOKEN_USER>( static_cast<void*>( buffer_ ) ) );
 	if ( ! ::IsValidSid( tokenUser->User.Sid ) ) {
 		log_windows_error( "IsValidSid" );
-		return ( NULL );
+		return ( nullptr );
 	}
 	return ( tokenUser->User.Sid );
 }
@@ -196,20 +196,20 @@ bool get_system_account_name( int id_, char* buf_, int size_ ) {
 	PSID sid( get_base_sid( tokenUserBuffer, TOKEN_USER_SIZE ) );
 	bool fail( true );
 	if ( sid ) {
-		LPTSTR sidStrBuffer( NULL );
+		LPTSTR sidStrBuffer( nullptr );
 		if ( ::ConvertSidToStringSid( sid, &sidStrBuffer ) ) {
 			HString sidStr( sidStrBuffer );
 			::LocalFree( sidStrBuffer );
 			sidStr.erase( sidStr.find_last( '-' ) + 1 );
 			sidStr += id_;
-			PSID newSid( NULL );
+			PSID newSid( nullptr );
 			if ( ::ConvertStringSidToSid( sidStr.raw(), &newSid ) ) {
 				DWORD size( size_ );
 				static int const DUMMY_BUFFER_SIZE = 128;
 				char dummy[DUMMY_BUFFER_SIZE];
 				DWORD dummyLen( DUMMY_BUFFER_SIZE );
 				SID_NAME_USE eUse = SidTypeUnknown;
-				if ( ::LookupAccountSid( NULL, newSid, buf_, &size, dummy, &dummyLen, &eUse ) )
+				if ( ::LookupAccountSid( nullptr, newSid, buf_, &size, dummy, &dummyLen, &eUse ) )
 					fail = false;
 				::LocalFree( newSid );
 			}
@@ -287,7 +287,7 @@ void* get_module_func_address( char const* moduleName_, char const* funcName_ ) 
 }
 
 int* iconv_errno( void ) {
-	static int* (*msvcrt_errno)( void ) = NULL;
+	static int* (*msvcrt_errno)( void ) = nullptr;
 	__declspec( thread ) static int errorNumber( 0 );
 	if ( ! msvcrt_errno ) {
 		void* p( get_module_func_address( "msvcrt.dll", "_errno" ) );
@@ -314,7 +314,7 @@ int WINAPI WinMain(
 	}
 	::LocalFree( szArglist );
 	argv[ 0 ] = cmdLine;
-	HMODULE appHandle( ::GetModuleHandle( NULL ) );
+	HMODULE appHandle( ::GetModuleHandle( nullptr ) );
 	typedef int ( *main_type )( int, char** );
 	main_type main = bit_cast<main_type>( ::GetProcAddress( appHandle, "main" ) );
 	return ( main( nArgs, argv ) );
@@ -328,9 +328,9 @@ void __stdcall timer_expired( PVOID lpParameter, __in BOOLEAN ) {
 M_EXPORT_SYMBOL
 int timer_create( clockid_t, struct sigevent*, timer_t* timer_ ) {
 	int err( 0 );
-	HANDLE h( NULL );
+	HANDLE h( nullptr );
 	if ( ! ::CreateTimerQueueTimer( &h,
-			NULL, timer_expired, reinterpret_cast<PVOID>( SIGALRM ),
+			nullptr, timer_expired, reinterpret_cast<PVOID>( SIGALRM ),
 			ULONG_MAX, 0, WT_EXECUTEONLYONCE ) ) {
 		log_windows_error( "CreateTimerQueueTimer" );
 		err = -1;
@@ -343,7 +343,7 @@ M_EXPORT_SYMBOL
 int timer_settime( timer_t timer_, int, struct itimerspec const* due_, struct itimerspec* ) {
 	int err( 0 );
 	time_t miliseconds( due_->it_value.tv_sec * 1000 + due_->it_value.tv_nsec / 1000000 );
-	if ( ! ::ChangeTimerQueueTimer( NULL, timer_, static_cast<ULONG>( miliseconds ? miliseconds : ULONG_MAX ), 0 ) ) {
+	if ( ! ::ChangeTimerQueueTimer( nullptr, timer_, static_cast<ULONG>( miliseconds ? miliseconds : ULONG_MAX ), 0 ) ) {
 		log_windows_error( "CreateTimerQueueTimer" );
 		err = -1;
 	}
@@ -353,7 +353,7 @@ int timer_settime( timer_t timer_, int, struct itimerspec const* due_, struct it
 M_EXPORT_SYMBOL
 int timer_delete( timer_t timer_ ) {
 	int err( 0 );
-	if ( ! ::DeleteTimerQueueTimer( NULL, timer_, NULL ) && ( ::GetLastError() != ERROR_IO_PENDING ) ) {
+	if ( ! ::DeleteTimerQueueTimer( nullptr, timer_, nullptr ) && ( ::GetLastError() != ERROR_IO_PENDING ) ) {
 		log_windows_error( "DeleteTimerQueueTimer" );
 		err = -1;
 	}

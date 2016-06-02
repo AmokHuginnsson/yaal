@@ -128,7 +128,7 @@ void HLogPad::add( yaal::hcore::HString const& text_ ) {
 	M_PROLOG
 	int indexNL( 0 ), indexChar( 0 );
 	HLogLine logLine;
-	HLogLine* it( NULL );
+	HLogLine* it( nullptr );
 	if ( ! _contents.is_empty() )
 		it = &_contents.tail();
 	if ( ! it || ( it->_type != HLogLine::TEXT ) ) {

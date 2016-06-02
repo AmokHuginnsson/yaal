@@ -43,7 +43,7 @@ namespace dbwrapper {
 
 HDataBase::HDataBase( void )
 	: HPointerFromThisInterface<HDataBase>()
-	, _connector( NULL )
+	, _connector( nullptr )
 	, _dbLink() {
 	M_PROLOG
 	return;
@@ -65,7 +65,7 @@ void HDataBase::connect( yaal::hcore::HString const& dataBase_, yaal::hcore::HSt
 	M_PROLOG
 	M_ASSERT( _connector && _connector->db_connect );
 	if ( ! (_connector->db_connect)( _dbLink, dataBase_, login_, password_, server_ ) ) {
-		M_THROW( (_connector->dbrs_error)( _dbLink, NULL ), (_connector->dbrs_errno)( _dbLink, NULL ) );
+		M_THROW( (_connector->dbrs_error)( _dbLink, nullptr ), (_connector->dbrs_errno)( _dbLink, nullptr ) );
 	}
 	return;
 	M_EPILOG
@@ -103,13 +103,13 @@ HQuery::ptr_t HDataBase::prepare_query( HString const& query_ ) {
 
 char const* HDataBase::get_error( void ) const {
 	M_PROLOG
-	return ( (_connector->dbrs_error)( _dbLink, NULL ) );
+	return ( (_connector->dbrs_error)( _dbLink, nullptr ) );
 	M_EPILOG
 }
 
 int HDataBase::get_errno( void ) const {
 	M_PROLOG
-	return ( (_connector->dbrs_errno)( _dbLink, NULL ) );
+	return ( (_connector->dbrs_errno)( _dbLink, nullptr ) );
 	M_EPILOG
 }
 

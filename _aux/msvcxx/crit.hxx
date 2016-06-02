@@ -4,7 +4,7 @@
 class CMutex {
 	HANDLE _handle;
 public:
-	CMutex( void ) : _handle( ::CreateMutex( NULL, false, NULL ) ) {}
+	CMutex( void ) : _handle( ::CreateMutex( nullptr, false, nullptr ) ) {}
 	~CMutex( void ) { ::CloseHandle( _handle ); }
 	void Lock( void ) { ::WaitForSingleObject( _handle, INFINITE ); }
 	void Unlock( void ) { ::ReleaseMutex( _handle ); }

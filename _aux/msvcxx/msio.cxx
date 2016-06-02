@@ -24,7 +24,7 @@ IO::IO( TYPE::type_t t_, HANDLE h_, HANDLE e_, std::string const& p_ )
 	_readRequest( 0 ), _inBuffer( 0 ), _buffer( IO_BUFFER_SIZE ),
 	_connected( ( t_ == TYPE::TERMINAL ) || ( t_ == TYPE::PIPE ) ),
 	_scheduled( false ), _ready( false ), _nonBlocking( false ), _path( p_ ) {
-	_overlapped.hEvent = e_ ? e_ : ::CreateEvent( NULL, true, false, NULL );
+	_overlapped.hEvent = e_ ? e_ : ::CreateEvent( nullptr, true, false, nullptr );
 }
 
 IO::~IO( void ) {

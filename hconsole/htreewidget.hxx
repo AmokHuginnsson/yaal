@@ -153,7 +153,7 @@ public:
 		}
 		virtual bool do_is_valid( void ) const override {
 			M_PROLOG
-			return ( _node != NULL );
+			return ( _node != nullptr );
 			M_EPILOG
 		}
 		virtual int do_get_child_count( void ) const override {
@@ -202,7 +202,7 @@ private:
 	HTreeWidgetModelListener* _listener;
 public:
 	HAsIsValueTreeModel( data_ptr_t data_ )
-		: _data( data_ ), _listener( NULL ) {
+		: _data( data_ ), _listener( nullptr ) {
 	}
 	data_ptr_t get_data( void ) {
 		return ( _data );

@@ -49,12 +49,12 @@ namespace dbwrapper {
 
 namespace {
 
-char const* const etag = "Error: Data base request (";
-char const* const eend = ") while no driver loaded.";
+char const etag[] = "Error: Data base request (";
+char const eend[] = ") while no driver loaded.";
 
 }
 
-char const* const _done_ = "done.\r\n";
+char const _done_[] = "done.\r\n";
 
 static char const* _driver_[ 8 ] = {
 	"default",
@@ -64,7 +64,7 @@ static char const* _driver_[ 8 ] = {
 	LIB_PREFIX "yaal_mysql_driver" LIB_INFIX "." LIB_EXT,
 	LIB_PREFIX "yaal_firebird_driver" LIB_INFIX "." LIB_EXT,
 	LIB_PREFIX "yaal_oracle_driver" LIB_INFIX "." LIB_EXT,
-	NULL
+	nullptr
 };
 
 drivers_t _dBDrivers_;
@@ -104,7 +104,7 @@ char const* null_dbrs_error( ODBLink const&, void* ) {
 void* null_db_fetch_query_result( ODBLink&, char const* ) {
 	M_PROLOG
 	log( LOG_LEVEL::ERROR ) << etag << "db_fetch_query_result" << eend << endl;
-	return ( NULL );
+	return ( nullptr );
 	M_EPILOG
 }
 
@@ -118,14 +118,14 @@ void null_rs_free_query_result( void* ) {
 void* null_db_query( ODBLink&, char const* ) {
 	M_PROLOG
 	log( LOG_LEVEL::ERROR ) << etag << "db_query" << eend << endl;
-	return ( NULL );
+	return ( nullptr );
 	M_EPILOG
 }
 
 void* null_db_prepare_query( ODBLink&, char const* ) {
 	M_PROLOG
 	log( LOG_LEVEL::ERROR ) << etag << "db_prepare_query" << eend << endl;
-	return ( NULL );
+	return ( nullptr );
 	M_EPILOG
 }
 
@@ -139,7 +139,7 @@ void null_query_bind( ODBLink&, void*, int, yaal::hcore::HString const& ) {
 void* null_query_execute( ODBLink&, void* ) {
 	M_PROLOG
 	log( LOG_LEVEL::ERROR ) << etag << "query_execute" << eend << endl;
-	return ( NULL );
+	return ( nullptr );
 	M_EPILOG
 }
 
@@ -160,7 +160,7 @@ void null_rs_free_cursor( void* ) {
 char const* null_rs_get( void*, int long, int ) {
 	M_PROLOG
 	log( LOG_LEVEL::ERROR ) << etag << "rs_get" << eend << endl;
-	return ( NULL );
+	return ( nullptr );
 	M_EPILOG
 }
 
@@ -174,7 +174,7 @@ bool null_rs_next( void* ) {
 char const* null_rs_get_field( void*, int ) {
 	M_PROLOG
 	log( LOG_LEVEL::ERROR ) << etag << "rs_get_field" << eend << endl;
-	return ( NULL );
+	return ( nullptr );
 	M_EPILOG
 }
 
@@ -202,7 +202,7 @@ int long null_dbrs_id( ODBLink&, void* ) {
 char const* null_rs_column_name( void*, int ) {
 	M_PROLOG
 	log( LOG_LEVEL::ERROR ) << etag << "rs_column_name" << eend << endl;
-	return ( NULL );
+	return ( nullptr );
 	M_EPILOG
 }
 
@@ -256,13 +256,13 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 			driver.first->resolve( SYMBOL_PREFIX"dbrs_id", driver.second->dbrs_id );
 			driver.first->resolve( SYMBOL_PREFIX"rs_column_name", driver.second->rs_column_name );
 			driver.first->resolve( SYMBOL_PREFIX"db_connect", driver.second->db_connect );
-			char const** tlq = NULL; /* msvcxx bug */
+			char const** tlq = nullptr; /* msvcxx bug */
 			driver.first->resolve( SYMBOL_PREFIX"TABLE_LIST_QUERY", tlq );
 			driver.second->_tableListQuery = *tlq;
-			char const** clq = NULL; /* msvcxx bug */
+			char const** clq = nullptr; /* msvcxx bug */
 			driver.first->resolve( SYMBOL_PREFIX"COLUMN_LIST_QUERY", clq );
 			driver.second->_columnListQuery = *clq;
-			int* cni( NULL );
+			int* cni( nullptr );
 			driver.first->resolve( SYMBOL_PREFIX"COLUMN_NAME_INDEX", cni );
 			driver.second->_columnNameIndex = *cni;
 			it = _dBDrivers_.insert( make_pair( driverId_, driver ) ).first;
@@ -290,7 +290,7 @@ ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 	M_PROLOG
 	errno = 0;
 	cout << "Using dynamic database driver [" << _driver_[ driverId_ + 1 ] << "] ... " << flush;
-	ODBConnector const* pConnector( NULL );
+	ODBConnector const* pConnector( nullptr );
 	if ( driverId_ != ODBConnector::DRIVER::NONE ) {
 		if ( driverId_ == ODBConnector::DRIVER::DEFAULT ) {
 			for ( int i = 1; i < ODBConnector::DRIVER::TERMINATOR; ++ i ) {
@@ -312,8 +312,8 @@ ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
  */
 
 ODBConnector::ODBConnector( void )
-	: driver_init( NULL ),
-	driver_cleanup( NULL ),
+	: driver_init( nullptr ),
+	driver_cleanup( nullptr ),
 	db_connect( null_db_connect ),
 	db_disconnect( null_db_disconnect ),
 	dbrs_errno( null_dbrs_errno ),
@@ -333,8 +333,8 @@ ODBConnector::ODBConnector( void )
 	dbrs_records_count( null_dbrs_records_count ),
 	dbrs_id( null_dbrs_id ),
 	rs_column_name( null_rs_column_name ),
-	_tableListQuery( NULL ),
-	_columnListQuery( NULL ),
+	_tableListQuery( nullptr ),
+	_columnListQuery( nullptr ),
 	_columnNameIndex( 0 ) {
 }
 

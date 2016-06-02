@@ -55,7 +55,7 @@ private:
 public:
 	template<typename iter_t>
 	HAuxiliaryBuffer( iter_t first_, iter_t last_ )
-		: _data( NULL ), _size( 0 ), _requestedSize( 0 ), _allocated( 0 ), _initialized( false ) {
+		: _data( nullptr ), _size( 0 ), _requestedSize( 0 ), _allocated( 0 ), _initialized( false ) {
 		init( first_, last_ );
 		return;
 	}
@@ -67,10 +67,10 @@ public:
 		M_DESTRUCTOR_EPILOG
 	}
 	value_type* begin( void ) {
-		return ( _initialized ? _data : NULL );
+		return ( _initialized ? _data : nullptr );
 	}
 	value_type* end( void ) {
-		return ( _initialized ? _data + _size : NULL );
+		return ( _initialized ? _data + _size : nullptr );
 	}
 	i64_t get_size( void ) const {
 		return ( _initialized ? _size : 0 );
@@ -111,7 +111,7 @@ void HAuxiliaryBuffer<type_t>::init( iter_t first_, iter_t last_ ) {
 		if ( auxSize > _allocated ) {
 			if ( _allocated > 0 ) {
 				::operator delete ( _data, memory::yaal );
-				_data = NULL;
+				_data = nullptr;
 				_allocated = 0;
 			}
 			_data = static_cast<value_type*>( ::operator new ( static_cast<size_t>( auxSize * static_cast<int>( sizeof ( value_type ) ) ), memory::yaal ) );

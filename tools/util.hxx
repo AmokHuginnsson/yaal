@@ -92,7 +92,7 @@ struct OOptionInfo {
 	char const* _intro;
 	char const* _note;
 	char const* _syntax;
-	OOptionInfo( yaal::hcore::HProgramOptionsHandler const& opt, char const* const name, char const* const intro, char const* const note, char const* const syntax = NULL )
+	OOptionInfo( yaal::hcore::HProgramOptionsHandler const& opt, char const* name, char const* intro, char const* note, char const* syntax = nullptr )
 		: _opt( opt ), _name( name ), _intro( intro ), _note( note ), _syntax( syntax ) {}
 private:
 	OOptionInfo( OOptionInfo const& );
@@ -102,7 +102,7 @@ private:
 void show_help( OOptionInfo const& );
 void dump_configuration( OOptionInfo const& );
 
-void failure( int, char const* const, ... ) __attribute__(( __noreturn__, format( printf, 2, 3 ) ));
+void failure( int, char const*, ... ) __attribute__(( __noreturn__, format( printf, 2, 3 ) ));
 
 }
 

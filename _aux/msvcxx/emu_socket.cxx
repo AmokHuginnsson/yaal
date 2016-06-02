@@ -1,5 +1,4 @@
-#include <sys/cdefs.h>
-#include <sys/socket.h>
+#include "_aux/msvcxx/sys/socket.h"
 
 #include "hcore/base.hxx"
 #include "hcore/hexception.hxx"
@@ -16,7 +15,7 @@ int make_pipe_instance( IO& io_ ) {
 	io_.set_handle( CreateNamedPipe( io_.path().c_str(),
 		PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
 		PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,
-		PIPE_UNLIMITED_INSTANCES, 1024, 1024, 1000, NULL ) );
+		PIPE_UNLIMITED_INSTANCES, 1024, 1024, 1000, nullptr ) );
 	return ( io_.handle() != INVALID_HANDLE_VALUE ? 0 : -1 );
 }
 
@@ -30,10 +29,10 @@ int bind( int fd_, const struct sockaddr* addr_, socklen_t len_ ) {
 		HANDLE h = ::CreateFile( path,                // name of the write
                        GENERIC_WRITE,          // open for writing
                        0,                      // do not share
-                       NULL,                   // default security
+                       nullptr,                   // default security
                        CREATE_NEW,          // overwrite existing
 											 FILE_ATTRIBUTE_NORMAL | FILE_FLAG_NO_BUFFERING, // normal file
-                       NULL);                  // no attr. template
+                       nullptr);                  // no attr. template
 		string n( "\\\\.\\pipe" );
 		if ( h != INVALID_HANDLE_VALUE ) {
 			::CloseHandle( h );
@@ -106,7 +105,7 @@ int accept( int fd_, struct sockaddr* addr_, socklen_t* len_ ) {
 	} else {
 		M_ASSERT( io.type() == IO::TYPE::NAMED_PIPE );
 		SystemIO::io_t np( sysIo.create_io( IO::TYPE::NAMED_PIPE,
-			reinterpret_cast<HANDLE>( -1 ), NULL, io.path() ) );
+			reinterpret_cast<HANDLE>( -1 ), nullptr, io.path() ) );
 		ret = make_pipe_instance( *(np.second) );
 		np.second->swap( io );
 		np.second->reset();
@@ -130,7 +129,7 @@ int connect( int fd_, struct sockaddr* addr_, socklen_t len_ ) {
 		string n( "\\\\.\\pipe" );
 		n += path;
 		std::replace( n.begin(), n.end(), '/', '\\' );
-		HANDLE h( ::CreateFile( n.c_str(), ( GENERIC_READ | GENERIC_WRITE ) & ( ~SYNCHRONIZE ), 0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED | FILE_FLAG_NO_BUFFERING, 0 ) );
+		HANDLE h( ::CreateFile( n.c_str(), ( GENERIC_READ | GENERIC_WRITE ) & ( ~SYNCHRONIZE ), 0, nullptr, OPEN_EXISTING, FILE_FLAG_OVERLAPPED | FILE_FLAG_NO_BUFFERING, 0 ) );
 		if ( h == INVALID_HANDLE_VALUE ) {
 			log_windows_error( "CreateNamedPipe" );
 			ret = -1;

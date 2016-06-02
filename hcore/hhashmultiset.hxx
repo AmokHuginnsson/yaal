@@ -73,7 +73,7 @@ public:
 	public:
 		typedef iterator_interface<value_type const, iterator_category::forward> base_type;
 		HIterator( void )
-			: base_type(), _index( 0 ), _owner( NULL ), _engine() {
+			: base_type(), _index( 0 ), _owner( nullptr ), _engine() {
 			return;
 		}
 		HIterator( HIterator const& it_ )

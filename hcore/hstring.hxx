@@ -113,7 +113,7 @@ private:
 		char _mem[ INPLACE_BUFFER_SIZE ];
 		char* _ptr;
 	};
-	static_assert( sizeof ( _mem ) == sizeof ( _len ), "buffer views are missaligned" );
+	static_assert( sizeof ( HString::_mem ) == sizeof ( HString::_len ), "buffer views are missaligned" );
 public:
 	static int long const npos = -1;
 	typedef HIterator iterator; /*!< mutable iterator for string characters */
@@ -162,7 +162,7 @@ public:
 	 *
 	 * str - old style C string to base new HString on.
 	 */
-	HString( char const* const str );
+	HString( char const* str );
 	/*! \brief Construct string based on const iterator pair.
 	 *
 	 * first_ - beginning of the character range to copy.
@@ -180,7 +180,7 @@ public:
 	 * array - a character array where to initialize new HString object with.
 	 * size - at most that many characters from array are used.
 	 */
-	HString( char const* const array, int long size );
+	HString( char const* array, int long size );
 	/*! \brief Construct new HString from single character.
 	 *
 	 * ch - character to initialize new string with.
@@ -245,7 +245,7 @@ public:
 	 *
 	 * pointer - an pointer to initialize new string with.
 	 */
-	HString( void const* const pointer );
+	HString( void const* pointer );
 	HString& operator = ( HString const& );
 	/*! \brief Move assignemnt operator.
 	 *
@@ -415,7 +415,7 @@ public:
 	 * \param size - size of the date to be assigned.
 	 * \return Self.
 	 */
-	HString& assign( char const* const data, int long length );
+	HString& assign( char const* data, int long length );
 	/*! \brief Erase old content and assign a substring of given string.
 	 *
 	 * \param str - assign substring of this string.
@@ -440,8 +440,8 @@ public:
 	 *
 	 * \param frmt - `C's printf() style format specification.
 	 */
-	HString& format( char const* const frmt, ... ) __attribute__(( format( printf, 2, 3 ) ));
-	HString& vformat( char const* const, void* ) __attribute__(( format( printf, 2, 0 ) ));
+	HString& format( char const* frmt, ... ) __attribute__(( format( printf, 2, 3 ) ));
+	HString& vformat( char const*, void* ) __attribute__(( format( printf, 2, 0 ) ));
 	/*! \brief Find position of given character in this string.
 	 *
 	 * \param character - a character to look for.
@@ -575,19 +575,19 @@ public:
 	 * \param set - set of characters that shall be removed.
 	 * \return Self.
 	 */
-	HString& trim_left( char const* const set = _whiteSpace_.data() );
+	HString& trim_left( char const* set = _whiteSpace_.data() );
 	/*! \brief Trim all consecutive occurrences of given characters from end of the string.
 	 *
 	 * \param set - set of characters that shall be removed.
 	 * \return Self.
 	 */
-	HString& trim_right( char const* const set = _whiteSpace_.data() );
+	HString& trim_right( char const* set = _whiteSpace_.data() );
 	/*! \brief Trim all consecutive occurrences of given characters from both beginning and end of the string.
 	 *
 	 * \param set - set of characters that shall be removed.
 	 * \return Self.
 	 */
-	HString& trim( char const* const set = _whiteSpace_.data() );
+	HString& trim( char const* set = _whiteSpace_.data() );
 	/*! \brief Remove first N characters from this string.
 	 * \param len - remove that many characters from beginning of this string.
 	 * \return Self.
@@ -633,14 +633,14 @@ public:
 	 *
 	 * \pre \e str real length must not be smaller than \e len.
 	 */
-	HString& insert( int long pos, int long len, char const* str = NULL );
+	HString& insert( int long pos, int long len, char const* str = nullptr );
 	/*! \brief Insert given string at given position.
 	 *
 	 * \param pos - position where given string has to be inserted.
 	 * \param str - string to be inserted.
 	 * \return Self.
 	 */
-	HString& insert( int long pos, char const* str = NULL );
+	HString& insert( int long pos, char const* str = nullptr );
 	/*! \brief Insert given string at given position.
 	 *
 	 * \param pos - position where given string has to be inserted.
@@ -674,7 +674,7 @@ public:
 	 * \param size - size of the date to be appended.
 	 * \return Self.
 	 */
-	HString& append( char const* const, int long len_ );
+	HString& append( char const*, int long len_ );
 	/*! \brief Append new data from a range of characters to already existing data in this string.
 	 *
 	 * first_ - beginning of the character range to copy.
@@ -715,7 +715,7 @@ class HString::HIterator {
 	int long _index;
 public:
 	HIterator( void )
-		: _owner( NULL ), _index( 0 ) {
+		: _owner( nullptr ), _index( 0 ) {
 		return;
 	}
 	HIterator( HIterator const& it_ )
@@ -801,14 +801,14 @@ HString to_string( void const* );
 inline HString to_string( HString const& v_ ) {
 	return ( v_ );
 }
-int stoi( HString const&, int* = NULL, int = 10 );
-int long stol( HString const&, int* = NULL, int = 10 );
-int long unsigned stoul( HString const&, int* = NULL, int = 10 );
-int long long stoll( HString const&, int* = NULL, int = 10 );
-int long long unsigned stoull( HString const&, int* = NULL, int = 10 );
-float stof( HString const&, int* = NULL );
-double stod( HString const&, int* = NULL );
-double long stold( HString const&, int* = NULL );
+int stoi( HString const&, int* = nullptr, int = 10 );
+int long stol( HString const&, int* = nullptr, int = 10 );
+int long unsigned stoul( HString const&, int* = nullptr, int = 10 );
+int long long stoll( HString const&, int* = nullptr, int = 10 );
+int long long unsigned stoull( HString const&, int* = nullptr, int = 10 );
+float stof( HString const&, int* = nullptr );
+double stod( HString const&, int* = nullptr );
+double long stold( HString const&, int* = nullptr );
 bool is_whitespace( char );
 bool is_digit( char );
 bool is_hex_digit( char );

@@ -298,7 +298,7 @@ class HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t, selector_t>::HIt
 	view_type const* _owner;
 	iterator_t _engine;
 public:
-	HIterator( void ) : base_type(), _owner( NULL ), _engine() {}
+	HIterator( void ) : base_type(), _owner( nullptr ), _engine() {}
 	HIterator( HIterator const& it_ ) : base_type(), _owner( it_._owner ), _engine( it_._engine ) {}
 	HIterator& operator = ( HIterator const& it_ ) {
 		if ( &it_ != this ) {

@@ -61,7 +61,7 @@ int levenshtein_damerau( yaal::hcore::HString const& one_, yaal::hcore::HString 
 	int indexOne = 0, indexTwo = 0;
 	int lengthOne = static_cast<int>( one_.length() );
 	int lengthTwo = static_cast<int>( two_.length() );
-	int** distanceMatrix = NULL;
+	int** distanceMatrix = nullptr;
 	if ( ! lengthTwo )
 		return ( lengthOne );
 	if ( ! lengthOne )

@@ -222,7 +222,7 @@ bool HRegex::is_valid( void ) const {
 HString const& HRegex::error( void ) const {
 	if ( _errorMessage.is_empty() ) {
 		if ( _lastError ) {
-			int long size( static_cast<int long>( ::regerror( _lastError, _compiled.get<regex_t>(), NULL, 0 ) ) + 1 );
+			int long size( static_cast<int long>( ::regerror( _lastError, _compiled.get<regex_t>(), nullptr, 0 ) ) + 1 );
 			_errorBuffer.realloc( size + 1 );
 			M_ENSURE( static_cast<int>( ::regerror( _lastError, _compiled.get<regex_t>(),
 							_errorBuffer.get<char>(), static_cast<size_t>( size ) ) ) < size );
@@ -250,7 +250,7 @@ char const* HRegex::matches_impl( char const* string_, int* matchLength_ ) const
 		throw HRegexException( _errMsgHRegex_[ ERROR::UNINITIALIZED ] );
 	}
 	error_clear();
-	char const* ptr = NULL;
+	char const* ptr = nullptr;
 	int matchLength = 0;
 	regmatch_t match;
 	_lastError = ::regexec( _compiled.get<regex_t>(), string_, 1, &match, 0 );

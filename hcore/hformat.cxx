@@ -252,14 +252,14 @@ HFormat::HFormat( HString const& aFmt_ )
 			it->_width = ( - pos ) - 2;
 		if ( it->_width < 0 ) {
 			widthIdxs.insert( - ( it->_width + 2 ) );
-			_impl->_positions->insert( make_pair( - ( it->_width + 2 ), static_cast<HFormatImpl::OToken*>( NULL ) ) );
+			_impl->_positions->insert( make_pair( - ( it->_width + 2 ), static_cast<HFormatImpl::OToken*>( nullptr ) ) );
 			++ pos;
 		}
 		if ( it->_precision == -1 )
 			it->_precision = ( - pos ) - 2;
 		if ( it->_precision < 0 ) {
 			precIdxs.insert( - ( it->_precision + 2 ) );
-			_impl->_positions->insert( make_pair( - ( it->_precision + 2 ), static_cast<HFormatImpl::OToken*>( NULL ) ) );
+			_impl->_positions->insert( make_pair( - ( it->_precision + 2 ), static_cast<HFormatImpl::OToken*>( nullptr ) ) );
 			++ pos;
 		}
 		if ( it->_position > 0 )

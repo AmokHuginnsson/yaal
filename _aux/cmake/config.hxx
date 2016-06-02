@@ -148,11 +148,6 @@ extern "C" int unsetenv( char const* );
 #ifdef _CTIME_
 #include <pthread.h>
 #include <bits/types.h>
-/* clock_gettime() in libgw32c has a serious bug:
- * the `address of' operator (&tp_) is applied
- * again to object of type `timespec*',
- * so getntptimeofday() is presented with object of type
- * `timespec**' while it expects object of type `timespec*'. */
 extern "C" int getntptimeofday( struct timespec*, struct timezone* );
 typedef __clockid_t clockid_t;
 inline int clock_gettime( __clockid_t, struct timespec* tp_ )
@@ -161,14 +156,12 @@ static clockid_t const CLOCK_REALTIME = 0;
 #endif /* #ifdef _CTIME_ */
 #ifdef _CSTRING_
 #include <errno.h>
-#include <sys/time.h>
+#include "_aux/msvcxx/sys/time.h"
 #include "hcore/macro.hxx"
 #undef OVERFLOW
 #undef SIG_BLOCK
 #undef SIG_UNBLOCK
 #undef SIG_SETMASK
-/* Those functions are available from libgw32c library, but declarations
- * are placed in glibc/string.h which horribly conflicts with Visual C++. */
 extern "C" void* memrchr( void const*, int, size_t );
 extern "C" char* basename( char const* );
 extern "C" char* strptime( char const*, char const*, struct tm* );
@@ -179,7 +172,7 @@ namespace msvcxx { M_YAAL_HCORE_PUBLIC_API char const* windows_strerror( int ); 
 #ifdef _CSTDIO_
 extern "C" int long getline( char**, size_t*, FILE* );
 #endif /* _CSTDIO_ */
-#include "cleanup.hxx"
+#include "_aux/msvcxx/cleanup.hxx"
 #endif /* __YAAL_BUILD__ */
 #endif /* __MSVCXX__ */
 #endif /* not YAAL_CONFIG_HXX_INCLUDED */

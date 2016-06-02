@@ -120,7 +120,7 @@ void HScheduledAsyncCaller::run( void ) {
 	HThread::set_name( "HScheduledAsyncCaller" );
 	while ( ! _isKilled_ && _loop ) {
 		queue_t::iterator it = _queue.begin();
-		i64_t now( ::time( NULL ) * si::NANO_IN_WHOLE );
+		i64_t now( ::time( nullptr ) * si::NANO_IN_WHOLE );
 		while ( ( it != _queue.end() ) && ( (*it).first <= now ) ) {
 			HAsyncCaller::get_instance().register_call( 0, (*it).second );
 			it = _queue.erase( it );

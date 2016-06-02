@@ -61,7 +61,7 @@ typedef HResource<xmlXPathContext, void (*)( xmlXPathContextPtr )> xpath_context
 typedef HResource<xmlXPathObject, void (*)( xmlXPathObjectPtr )> xpath_object_resource_t;
 typedef HResource<xmlOutputBuffer, int (*)( xmlOutputBufferPtr )> outputbuffer_resource_t;
 
-char const* const FULL_TREE = "//*";
+char const FULL_TREE[] = "//*";
 
 }
 
@@ -148,7 +148,7 @@ struct HXml::OConvert {
 	}
 	void init( yaal::hcore::HString const& encoding_, xmlNodePtr root_, yaal::hcore::HString const& fileName_ ) {
 		M_PROLOG
-		xmlCharEncodingHandlerPtr encoder = NULL;
+		xmlCharEncodingHandlerPtr encoder = nullptr;
 		if ( !! encoding_ ) {
 			encoder = ::xmlFindCharEncodingHandler( encoding_.raw() );
 		} else {
@@ -197,7 +197,7 @@ protected:
 
 HXmlData::HXmlData( void )
 	: _doc(), _style(), _xPathContext(), _xPathObject(),
-	_nodeSet( NULL ) {
+	_nodeSet( nullptr ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -205,7 +205,7 @@ HXmlData::HXmlData( void )
 
 HXmlData::HXmlData( HXmlData const& xmlData_ )
 	: _doc(), _style(), _xPathContext(), _xPathObject(),
-	_nodeSet( NULL ) {
+	_nodeSet( nullptr ) {
 	M_PROLOG
 	_doc = doc_resource_t( ::xmlCopyDoc( const_cast<xmlDoc*>( xmlData_._doc.get() ), 1 ), &::xmlFreeDoc );
 	_style = xmlData_._style;
@@ -354,9 +354,9 @@ int HXml::get_node_set_by_path( yaal::hcore::HString const& path_ ) {
 	int long length = _varTmpBuffer.get_length() - 1;
 	xpath_context_resource_t ctx( xmlXPathNewContext( _xml->_doc.get() ), xmlXPathFreeContext );
 	int setSize = 0;
-	_xml->_nodeSet = NULL;
+	_xml->_nodeSet = nullptr;
 	if ( ctx.get() ) {
-		xmlXPathObjectPtr objPtr = NULL;
+		xmlXPathObjectPtr objPtr = nullptr;
 		while ( ! _varTmpBuffer.is_empty() ) {
 			objPtr = xmlXPathEvalExpression(
 					reinterpret_cast<xmlChar const*>( _varTmpBuffer.raw() ),
@@ -395,7 +395,7 @@ void HXml::init( yaal::hcore::HStreamInterface& stream, parser_t parser_ ) {
 	if ( parser_ & PARSER::RESOLVE_ENTITIES ) {
 		LOW_LEVEL_PARSING_OPTIONS |= XML_PARSE_NOENT;
 	}
-	doc_resource_t doc( ::xmlReadIO( reader_callback, NULL, &stream, _streamId.raw(), NULL, LOW_LEVEL_PARSING_OPTIONS ),
+	doc_resource_t doc( ::xmlReadIO( reader_callback, nullptr, &stream, _streamId.raw(), nullptr, LOW_LEVEL_PARSING_OPTIONS ),
 			xmlFreeDoc );
 	if ( errno ) {
 		log( LOG_LEVEL::WARNING ) << "XML: " << error_message( errno ) << ": " << _streamId;
@@ -546,7 +546,7 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 					<< ", at: " << node->line << endl;
 			break;
 		}
-		node = NULL;
+		node = nullptr;
 	}
 	return;
 	M_EPILOG
@@ -559,7 +559,7 @@ void HXml::apply_style( yaal::hcore::HString const& path_, parameters_t const& p
 	}
 	M_ASSERT( _xml->_doc.get() );
 	HXsltParserG::get_instance();
-	xsltStylesheet* pstyle( xsltParseStylesheetFile( reinterpret_cast<xmlChar const* const>( path_.raw() ) ) );
+	xsltStylesheet* pstyle( xsltParseStylesheetFile( reinterpret_cast<xmlChar const*>( path_.raw() ) ) );
 	M_ENSURE_EX( pstyle, HString( "failure parsing XSLT file: " ) + path_ );
 	style_resource_t style( pstyle, xsltFreeStylesheet );
 	HResource<char const*[]> parametersHolder( !parameters_.is_empty() ? new char const*[parameters_.get_size() + 1] : nullptr );
@@ -630,7 +630,7 @@ void HXml::parse( HString const& xPath_, parser_t parser_ ) {
 				parse( _xml->_nodeSet->nodeTab[ ctr ],
 						root, parser_ );
 		} else
-			parse( xmlDocGetRootElement( _xml->_doc.get() ), NULL, parser_ );
+			parse( xmlDocGetRootElement( _xml->_doc.get() ), nullptr, parser_ );
 	}
 	M_EPILOG
 }
@@ -657,7 +657,7 @@ void HXml::generate_intermediate_form( bool indent_ ) const {
 	M_PROLOG
 	doc_resource_t doc;
 	M_ENSURE( !! get_root() ); {
-		xmlDocPtr pDoc = NULL;
+		xmlDocPtr pDoc = nullptr;
 		writer_resource_t writer( xmlNewTextWriterDoc( &pDoc, 0 ), xmlFreeTextWriter );
 		if ( ! writer.get() ) {
 			throw HXmlException( _( "Cannot create the xml DOC writer." ) );
@@ -665,7 +665,7 @@ void HXml::generate_intermediate_form( bool indent_ ) const {
 		doc_resource_t dummy( pDoc, xmlFreeDoc );
 		using yaal::swap;
 		swap( doc, dummy );
-		int rc = ::xmlTextWriterStartDocument( writer.get(), NULL, _encoding.raw(), NULL );
+		int rc = ::xmlTextWriterStartDocument( writer.get(), nullptr, _encoding.raw(), nullptr );
 		if ( rc < 0 ) {
 			throw HXmlException( HString( "Unable to start document with encoding: " ) + _encoding );
 		}
@@ -674,8 +674,8 @@ void HXml::generate_intermediate_form( bool indent_ ) const {
 			if ( rc < 0 ) {
 				throw HXmlException( "Unable to enable indenting." );
 			}
-			static char const* const INDENTION_STRING = "\t";
-			rc = xmlTextWriterSetIndentString( writer.get(), reinterpret_cast<xmlChar const* const>( INDENTION_STRING ) );
+			static char const INDENTION_STRING[] = "\t";
+			rc = xmlTextWriterSetIndentString( writer.get(), reinterpret_cast<xmlChar const*>( INDENTION_STRING ) );
 			if ( rc < 0 ) {
 				throw HXmlException( "Cannot set indent string." );
 			}
@@ -684,7 +684,7 @@ void HXml::generate_intermediate_form( bool indent_ ) const {
 			(*_convert).init( _encoding );
 		}
 		if ( ! _entities.is_empty() ) {
-			rc = xmlTextWriterStartDTD( writer.get(), reinterpret_cast<xmlChar const*>( "workaround" ), NULL, NULL );
+			rc = xmlTextWriterStartDTD( writer.get(), reinterpret_cast<xmlChar const*>( "workaround" ), nullptr, nullptr );
 			if ( rc < 0 ) {
 				throw HXmlException( "Unable to start DTD section." );
 			}
@@ -727,13 +727,13 @@ void HXml::save( yaal::hcore::HStreamInterface& stream, bool indent_ ) const {
 	M_ASSERT( _xml->_doc.get() );
 	if ( _xml->_style.get() ) {
 		outputbuffer_resource_t obuf( ::xmlOutputBufferCreateIO( writer_callback,
-							NULL, &stream, ::xmlFindCharEncodingHandler( _encoding.raw() ) ),
+							nullptr, &stream, ::xmlFindCharEncodingHandler( _encoding.raw() ) ),
 				xmlOutputBufferClose );
 		M_ENSURE( ::xsltSaveResultTo( obuf.get(),
 					const_cast<xmlDoc*>( _xml->_doc.get() ), const_cast<xsltStylesheet*>( _xml->_style.get() ) ) != -1 );
 	} else {
 		M_ENSURE( ::xmlSaveFileTo( ::xmlOutputBufferCreateIO( writer_callback,
-						NULL, &stream, ::xmlFindCharEncodingHandler( _encoding.raw() ) ),
+						nullptr, &stream, ::xmlFindCharEncodingHandler( _encoding.raw() ) ),
 					const_cast<xmlDoc*>( _xml->_doc.get() ), _encoding.raw() ) != -1 );
 	}
 	return;
@@ -903,7 +903,7 @@ HXml::HNodeProxy::HNodeProxy( void )
 }
 
 HXml::HConstNodeProxy::HConstNodeProxy( void )
-	: _node( NULL ) {
+	: _node( nullptr ) {
 }
 
 HXml::HNodeProxy::HNodeProxy( HXml::tree_t::node_t node_ )
@@ -981,7 +981,7 @@ HString const& HXml::HConstNodeProxy::get_value( void ) const {
 	M_PROLOG
 	HXml::HNode::TYPE type( (**_node)._type );
 	M_ASSERT( _node && ( ( type == HXml::HNode::TYPE::CONTENT ) || ( type == HXml::HNode::TYPE::COMMENT ) || ( type == HXml::HNode::TYPE::ENTITY ) ) );
-	HString const* val( NULL );
+	HString const* val( nullptr );
 	if ( type == HXml::HNode::TYPE::ENTITY ) {
 		HXml::const_entity_iterator it( (**_node)._owner->_entities.find( (**_node)._text ) );
 		M_ASSERT( it != (**_node)._owner->entity_end() );
@@ -1238,11 +1238,11 @@ bool HXml::HConstNodeProxy::operator ! ( void ) const {
 }
 
 HXml::HIterator::HIterator( void )
-	: base_type(), _owner( NULL ), _iterator() {
+	: base_type(), _owner( nullptr ), _iterator() {
 }
 
 HXml::HConstIterator::HConstIterator( void )
-	: base_type(), _owner( NULL ), _iterator() {
+	: base_type(), _owner( nullptr ), _iterator() {
 }
 
 HXml::HIterator::HIterator( HXml::tree_t::node_t owner_, HXml::tree_t::HNode::iterator const& it )
@@ -1315,7 +1315,7 @@ HXml::HConstNodeProxy HXml::HConstIterator::operator* ( void ) const {
 
 HXml::const_xml_element_t HXml::get_element_by_id( const_xml_element_t const& node, yaal::hcore::HString const& id ) const {
 	M_PROLOG
-	const_xml_element_t result = NULL;
+	const_xml_element_t result = nullptr;
 	HXml::HNode::properties_t::const_iterator idIt = (*node)->_properties.find( "id" );
 	if ( ( idIt != (*node)->_properties.end() ) && ( idIt->second == id ) ) {
 		result = node;
@@ -1366,7 +1366,7 @@ HXml::HIterator HXml::HNodeProxy::remove_node( HXml::HIterator it ) {
 void HXml::HConstNodeProxy::get_elements_by_path( HXml::HConstNodeSet& ns_, const_xml_element_t node,
 		HTokenizer const& path, HTokenizer::iterator part ) const {
 	M_PROLOG
-	const_xml_element_t result = NULL;
+	const_xml_element_t result = nullptr;
 	HString name( *part );
 	if ( ! name.is_empty() ) {
 		if ( (**node)._text == name ) {

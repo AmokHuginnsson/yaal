@@ -151,7 +151,7 @@ int HCollector::receive_line( HString& line_ ) {
 		cRC &= 0x0ff;
 		::memset( _readBuf, 0, RECV_BUF_SIZE );
 		::strncpy( _readBuf, _line.raw() + ::strlen( PROTOCOL::DTA ), 2 );
-		pLength = strtol ( _readBuf, NULL, 0x10 );
+		pLength = strtol ( _readBuf, nullptr, 0x10 );
 		::memset( _readBuf, 0, RECV_BUF_SIZE );
 		::strncpy( _readBuf, _line.raw()
 				+ ::strlen( PROTOCOL::DTA ) + 2 /* for Plength */, 2 );
@@ -218,7 +218,7 @@ int HCollector::wait_for_connection ( int timeOut_ ) {
 	M_EPILOG
 }
 
-int HCollector::read_collector ( void ( *process_line )( char const* const, int ) ) {
+int HCollector::read_collector ( void ( *process_line )( char const*, int ) ) {
 	M_PROLOG
 	int error = 0;
 	_lines = 0;

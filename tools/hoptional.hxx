@@ -84,7 +84,7 @@ public:
 		return;
 	}
 	operator safe_bool_t() const {
-		return ( _initialized ? &SemanticContext::member : NULL );
+		return ( _initialized ? &SemanticContext::member : nullptr );
 	}
 	bool operator! ( void ) const {
 		return ( ! _initialized );
@@ -168,7 +168,7 @@ public:
 		return;
 	}
 	operator safe_bool_t() const {
-		return ( _initialized ? &SemanticContext::member : NULL );
+		return ( _initialized ? &SemanticContext::member : nullptr );
 	}
 	bool operator! ( void ) const {
 		return ( ! _initialized );

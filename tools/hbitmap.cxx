@@ -55,7 +55,7 @@ HBitmap::HBit HBitmap::HIterator<HBitmap::HBit>::operator* ( void ) const {
 }
 
 HBitmap::HBitmap( void )
-	: _allocatedBytes( 0 ), _size( 0 ), _data( NULL ) {
+	: _allocatedBytes( 0 ), _size( 0 ), _data( nullptr ) {
 	return;
 }
 
@@ -81,14 +81,14 @@ void const* HBitmap::raw( void ) const {
 void HBitmap::clear( void ) {
 	if ( _allocatedBytes )
 		M_SAFE( delete static_cast<HChunk*>( _data ) );
-	_data = NULL;
+	_data = nullptr;
 	_allocatedBytes = 0;
 	_size = 0;
 	return;
 }
 
 HBitmap::HBitmap( int long size_ )
-	: _allocatedBytes( 0 ), _size( 0 ), _data( NULL ) {
+	: _allocatedBytes( 0 ), _size( 0 ), _data( nullptr ) {
 	M_PROLOG
 	M_ASSERT( size_ > 0 );
 	ensure_pool( size_ );
@@ -97,7 +97,7 @@ HBitmap::HBitmap( int long size_ )
 }
 
 HBitmap::HBitmap( HBitmap const& b )
-	: _allocatedBytes( 0 ), _size( 0 ), _data( NULL ) {
+	: _allocatedBytes( 0 ), _size( 0 ), _data( nullptr ) {
 	M_PROLOG
 	operator = ( b );
 	return;

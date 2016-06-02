@@ -109,7 +109,7 @@ void HDestructor<tType>::destruct( void ) {
 	M_PROLOG
 	if ( _object )
 		M_SAFE( delete _object );
-	_object = NULL;
+	_object = nullptr;
 	M_EPILOG
 }
 
@@ -129,7 +129,7 @@ public:
 typedef HExceptionT<HSingletonInterface> HSingletonException;
 
 template<typename tType>
-tType* HSingleton<tType>::_instance = NULL;
+tType* HSingleton<tType>::_instance = nullptr;
 
 template<typename tType>
 tType* HSingleton<tType>::create_instance( int lifeTime_ ) {

@@ -38,12 +38,12 @@ namespace yaal {
 namespace hcore {
 
 HChunk::HChunk( void )
-	: _size( 0 ), _data( NULL ) {
+	: _size( 0 ), _data( nullptr ) {
 	return;
 }
 
 HChunk::HChunk( int long size_, STRATEGY strategy_ )
-	: _size( 0 ), _data( NULL ) {
+	: _size( 0 ), _data( nullptr ) {
 	M_PROLOG
 	realloc( size_, strategy_ );
 	return;
@@ -51,7 +51,7 @@ HChunk::HChunk( int long size_, STRATEGY strategy_ )
 }
 
 HChunk::HChunk( HChunk&& chunk_ )
-	: _size( 0 ), _data( NULL ) {
+	: _size( 0 ), _data( nullptr ) {
 	M_PROLOG
 	swap( chunk_ );
 	return;

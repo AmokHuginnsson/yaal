@@ -85,7 +85,7 @@ YAAL_DEFINE_OPER( ^ )
 		return ( _flag != bf_._flag );
 	}
 	operator unspecified_t ( void ) const {
-		return ( _flag != 0 ? &Unspecified::unspecified : NULL );
+		return ( _flag != 0 ? &Unspecified::unspecified : nullptr );
 	}
 	static HBitFlag new_flag( void ) {
 		return ( HBitFlag() );

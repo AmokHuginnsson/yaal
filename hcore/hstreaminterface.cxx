@@ -38,7 +38,7 @@ namespace yaal {
 namespace hcore {
 
 static int const INVALID_CHARACTER = -256;
-char const* const HStreamInterface::eols = "\r\n"; /* order matters */
+char const HStreamInterface::eols[] = "\r\n"; /* order matters */
 
 HStreamInterface::HStreamInterface( void )
 	: _cache( 1, HChunk::STRATEGY::GEOMETRIC )

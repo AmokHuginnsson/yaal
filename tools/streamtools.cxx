@@ -216,7 +216,7 @@ HTee::HTee( HTee const& tee_ )
 	, _stream2( tee_._stream2 ) {
 }
 
-int long HTee::do_write( void const* const data_, int long size_ ) {
+int long HTee::do_write( void const* data_, int long size_ ) {
 	M_PROLOG
 	int long w1( _stream1.write( data_, size_ ) );
 	int long w2( _stream2.write( data_, size_ ) );
@@ -224,7 +224,7 @@ int long HTee::do_write( void const* const data_, int long size_ ) {
 	M_EPILOG
 }
 
-int long HTee::do_read( void* const, int long ) {
+int long HTee::do_read( void*, int long ) {
 	M_PROLOG
 	M_ASSERT( 0 && "oparation makes no sense for tee stream" );
 #if defined( NDEBUG ) || defined( __MSVCXX__ )

@@ -448,7 +448,7 @@ class HHashMultiMap<key_type_t, value_type_t, hasher_t, equal_key_t, allocator_t
 	value_iterator_t _minor;
 public:
 	typedef iterator_interface<typename hash_multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor_t, iterator_category::forward> base_type;
-	HIterator( void ) : base_type(), _owner( NULL ), _major(), _minor() {}
+	HIterator( void ) : base_type(), _owner( nullptr ), _major(), _minor() {}
 	template<typename other_const_qual_t>
 	HIterator( HIterator<other_const_qual_t> const& it_ ) : base_type(), _owner( it_._owner ), _major( it_._major ), _minor( it_._minor ) {
 		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
@@ -519,9 +519,11 @@ public:
 	}
 private:
 	friend class HHashMultiMap<key_type, data_type, hasher_type, equal_key_type, allocator_t, storage_policy_t>;
-	explicit HIterator( hash_multi_map_t const* const owner_,
-			key_iterator_t const& major,
-			value_iterator_t const& minor ) : base_type(), _owner( owner_ ), _major( major ), _minor( minor ) {
+	explicit HIterator( hash_multi_map_t const* owner_, key_iterator_t const& major, value_iterator_t const& minor )
+		: base_type()
+		, _owner( owner_ )
+		, _major( major )
+		, _minor( minor ) {
 		return;
 	}
 };

@@ -47,7 +47,7 @@ private:
 	class ref_fwd {
 		basic_t* _ref;
 	public:
-		ref_fwd( void ) : _ref( NULL ) {}
+		ref_fwd( void ) : _ref( nullptr ) {}
 		operator basic_t& ( void ) const
 			{ return ( *_ref ); }
 		basic_t& operator = ( basic_t& v ) {

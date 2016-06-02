@@ -57,9 +57,9 @@ public:
 	yaal::hcore::HString const& consume( void ) const;
 	bool is_empty( void ) const;
 private:
-	virtual int long do_write( void const* const, int long ) override;
+	virtual int long do_write( void const*, int long ) override;
 	virtual void do_flush( void ) override;
-	virtual int long do_read( void* const, int long ) override;
+	virtual int long do_read( void*, int long ) override;
 	virtual bool do_is_valid( void ) const override;
 	virtual POLL_TYPE do_poll_type( void ) const override;
 	virtual void const* do_data( void ) const override;

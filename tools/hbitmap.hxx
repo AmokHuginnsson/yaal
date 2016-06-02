@@ -150,7 +150,7 @@ private:
 	owner_t _owner;
 	int long _index;
 public:
-	HIterator( void ) : base_type(), _owner( NULL ), _index( 0 ) {}
+	HIterator( void ) : base_type(), _owner( nullptr ), _index( 0 ) {}
 	HIterator( HIterator const& it ) : base_type(), _owner( it._owner ), _index( it._index ) {}
 	template<typename other_const_qual_t>
 	HIterator( HIterator<other_const_qual_t> const& it ) : base_type(), _owner( it._owner ), _index( it._index ) {

@@ -46,7 +46,7 @@ HMonitor::~HMonitor( void ) {
 
 HLock HMonitor::acquire( HString const& name_ ) {
 	M_PROLOG
-	HMutex* m( NULL );
+	HMutex* m( nullptr );
 	/* scope for mutexes' containter mutex */ {
 		HLock l( _mutex );
 		mutexes_t::iterator it( _mutexes.find( name_ ) );

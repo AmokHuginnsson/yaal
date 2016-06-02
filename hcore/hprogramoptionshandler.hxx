@@ -176,13 +176,13 @@ public:
 	 * \param count - number of supported program options.
 	 * \param[out] unknown - index of first unknown option in \e argv.
 	 */
-	int process_command_line( int argc, char* const* const argv, int* const unknown = NULL );
+	int process_command_line( int argc, char* const* argv, int* unknown = nullptr );
 	/*! \brief Reading configuration files.
 	 *
 	 * process_rc_file gives easy to use API for reading configuration files
 	 * that are common in Unix world.
 	 */
-	int process_rc_file( HString const&, HString const&, RC_CALLBACK_t = NULL );
+	int process_rc_file( HString const&, HString const&, RC_CALLBACK_t = nullptr );
 	options_t const& get_options( void ) const
 		{ return ( _options ); }
 private:

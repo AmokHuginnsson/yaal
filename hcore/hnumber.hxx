@@ -184,8 +184,8 @@ public:
 	 * __._22.2__  = ex
 	 * _-._1_      = ex
 	 */
-	HNumber( char const* const );
-	HNumber( char const* const, integer_t );
+	HNumber( char const* );
+	HNumber( char const*, integer_t );
 	HNumber( HString const& );
 	HNumber( HString const&, integer_t );
 	HNumber( HNumber const& );

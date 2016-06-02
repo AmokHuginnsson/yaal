@@ -3,8 +3,6 @@
 
 #include <cstdio>
 #include <cerrno>
-#undef tmpfile
-extern "C" FILE* tmpfile( void );
 
 #define _SYS_SOCKET_H 1
 #define _STRUCT_TIMEVAL 1
@@ -18,43 +16,11 @@ extern "C" FILE* tmpfile( void );
 #define EINPROGRESS WSAEINPROGRESS
 #endif /* #if ( EINPROGRESS != WSAEINPROGRESS ) */
 #define __socklen_t_defined 1
-#undef environ
-#define unlink unlink_off
-#define pipe pipe_off
-#define close close_off
-#define read read_off
-#define write write_off
-#define sendto sendto_off
-#define recvfrom recvfrom_off
-#define timeval timeval_off
-#define gethostname gethostname_off
-#define dup2 dup2_off
-#define getuid getuid_off
-#define isatty isatty_off
-#define lockf lockf_off
-#include <glibc/unistd.h>
-#include <glibc/stdint.h>
-#undef gethostname
 #include <sys/types.h>
 #include <libintl.h>
-#undef isatty
-#undef getuid
-#undef timeval
-#undef environ
-#undef select
-#undef fprintf
-#undef close
-#undef read
-#undef write
-#undef sendto
-#undef recvfrom
-#undef pipe
-#undef unlink
-#undef dup2
 
-#include <sys/time.h>
+#include <_aux/msvcxx/sys/time.h>
 
-#undef lockf
 #define fork ms_fork
 #define getuid ms_getuid
 #define gethostname ms_gethostname
@@ -65,6 +31,9 @@ extern "C" FILE* tmpfile( void );
 
 #include "hcore/macro.hxx"
 #include "emu_unistd.hxx"
+
+typedef int uid_t;
+typedef yaal::u64_t sigset_t;
 
 int ms_gethostname( char*, int );
 M_YAAL_HCORE_PUBLIC_API uid_t ms_getuid( void );
@@ -97,7 +66,7 @@ template<typename T>
 inline int close( T const& fd_ )
 	{ return ( msvcxx::close( fd_ ) ); }
 
-inline int lockf( int fd_, int cmd_, __off_t off_ )
+inline int lockf( int fd_, int cmd_, size_t off_ )
 	{ return ( msvcxx::lockf( fd_, cmd_, off_ ) ); }
 
 #include "tools/hpipedchild.hxx"

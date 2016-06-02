@@ -93,7 +93,7 @@ yaal::hcore::HStreamInterface::ptr_t ensure( yaal::hcore::HStreamInterface::ptr_
 
 template<typename container>
 yaal::hcore::HStreamInterface& container_dump( yaal::hcore::HStreamInterface& out,
-		container const& container_, char sep_, char const* const name_ ) {
+		container const& container_, char sep_, char const* name_ ) {
 	M_PROLOG
 	out << ( name_ ? name_ : "" );
 	char sep( '(' );
@@ -110,13 +110,13 @@ template<typename container>
 yaal::hcore::HStreamInterface& container_dump( yaal::hcore::HStreamInterface& out,
 		container const& container_, char sep_ ) {
 	M_PROLOG
-	return ( container_dump( out, container_, sep_, NULL ) );
+	return ( container_dump( out, container_, sep_, nullptr ) );
 	M_EPILOG
 }
 
 template<typename container>
 yaal::hcore::HStreamInterface& container_dump( yaal::hcore::HStreamInterface& out,
-		container const& container_, char const* const name_  ) {
+		container const& container_, char const* name_  ) {
 	M_PROLOG
 	return ( container_dump( out, container_, ' ', name_ ) );
 	M_EPILOG
@@ -148,8 +148,8 @@ public:
 		: _stream1( stream1_ ), _stream2( stream2_ ) {}
 	HTee( HTee const& );
 protected:
-	virtual int long do_write( void const* const, int long ) override;
-	virtual int long do_read( void* const, int long ) override M_DEBUG_CODE( __attribute__((noreturn)) );
+	virtual int long do_write( void const*, int long ) override;
+	virtual int long do_read( void*, int long ) override M_DEBUG_CODE( __attribute__((noreturn)) );
 	virtual void do_flush( void ) override;
 	virtual bool do_is_valid( void ) const override;
 	virtual POLL_TYPE do_poll_type( void ) const override;

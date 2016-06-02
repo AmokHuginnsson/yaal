@@ -61,7 +61,7 @@ struct OSQLite {
 	HString _errorMessage;
 	sqlite3* _db;
 	OSQLite( void )
-		: _errorCode( 0 ), _errorMessage(), _db( NULL ) {}
+		: _errorCode( 0 ), _errorMessage(), _db( nullptr ) {}
 private:
 	OSQLite( OSQLite const& );
 	OSQLite& operator = ( OSQLite const& );
@@ -78,7 +78,7 @@ struct OSQLiteResult {
 	bool _stepped;
 	bool _last;
 	OSQLiteResult( void )
-		: _useCount( 1 ), _rows( 0 ), _columns( 0 ), _data( NULL ),
+		: _useCount( 1 ), _rows( 0 ), _columns( 0 ), _data( nullptr ),
 		_errorCode( 0 ), _errorMessage(), _randomAccess( false ),
 		_stepped( false ), _last( false ) {
 		return;
@@ -105,7 +105,7 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, HString const& dataBase_,
 	do {
 		HScopedValueReplacement<int> saveErrno( errno, 0 );
 		struct stat stat;
-		OSQLite* sQLite( NULL );
+		OSQLite* sQLite( nullptr );
 		dbLink_._conn = sQLite = new ( memory::yaal ) OSQLite;
 		HString dataBase( dataBase_ );
 		if ( ::stat( dataBase.raw(), &stat ) ) {
@@ -188,10 +188,10 @@ void* yaal_sqlite3_db_fetch_query_result( ODBLink& dbLink_, char const* query_ )
 	OSQLiteResult* result( new ( memory::yaal ) OSQLiteResult );
 	result->_columns = 0;
 	result->_rows = 0;
-	result->_data = NULL;
+	result->_data = nullptr;
 	result->_randomAccess = true;
-	char* errmsg( NULL );
-	char** data = NULL; /* msvcxx initialization workaround */
+	char* errmsg( nullptr );
+	char** data = nullptr; /* msvcxx initialization workaround */
 	result->_errorCode = sqlite3_get_table( sQLite->_db,
 			query_, &data, &result->_rows,
 			&result->_columns, &errmsg );
@@ -228,10 +228,10 @@ void* yaal_db_query( ODBLink& dbLink_, char const* query_ ) {
 	OSQLiteResult* result( new ( memory::yaal ) OSQLiteResult );
 	result->_columns = 0;
 	result->_rows = 0;
-	result->_data = NULL;
+	result->_data = nullptr;
 	result->_randomAccess = false;
-	sqlite3_stmt* stmt( NULL );
-	result->_errorCode = sqlite3_prepare_v2( sQLite->_db, query_, -1, &stmt, NULL );
+	sqlite3_stmt* stmt( nullptr );
+	result->_errorCode = sqlite3_prepare_v2( sQLite->_db, query_, -1, &stmt, nullptr );
 	result->_data = stmt;
 	result->_columns = sqlite3_column_count( stmt );
 	if ( result->_errorCode != SQLITE_OK ) {

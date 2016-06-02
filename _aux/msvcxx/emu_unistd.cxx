@@ -1,16 +1,14 @@
-#include <sys/cdefs.h>
 #define log cmath_log
 #include <iterator>
 #include <sstream>
 #undef log
 #include <io.h>
-#include <sys/time.h>
-#include <../include/sys/stat.h>
+#include <_aux/msvcxx/sys/time.h>
+#include <sys/stat.h>
 #define YAAL_MSVCXX_OPENSSL_RSA_H_INCLUDED 1
 #include <openssl/ssl.h>
 
 #define getpid getpid_off
-#define isatty isatty_off
 #define getpwuid_r getpwuid_r_off
 #define access access_off
 #define lseek lseek_off
@@ -19,12 +17,12 @@
 #include <csignal>
 
 #define fill fill_off
-#include <unistd.h>
+#include <_aux/msvcxx/unistd.h>
 #undef fill
-#include <dirent.h>
-#include <pwd.h>
+#include <_aux/msvcxx/dirent.h>
+//#include <_aux/msvcxx/p>
 #define _FCNTL_H 1
-#include <bits/fcntl.h>
+//#include <bits/fcntl.h>
 #undef getpwuid_r
 #undef getpid
 #undef readdir_r
@@ -215,7 +213,7 @@ int APIENTRY CreatePipeEx( LPHANDLE lpReadPipe,
 		lpPipeAttributes,
 		OPEN_EXISTING,
 		FILE_ATTRIBUTE_NORMAL | dwWriteMode,
-		NULL );
+		nullptr );
 
 	if ( INVALID_HANDLE_VALUE == WritePipeHandle ) {
 		dwError = GetLastError();
@@ -257,9 +255,9 @@ int dup2( int fd1_, int fd2_ ) {
 M_EXPORT_SYMBOL
 int pipe( int* fds_ ) {
 	SystemIO& sysIo( SystemIO::get_instance() );
-	HANDLE hRead( NULL );
-	HANDLE hWrite( NULL );
-	bool ok( CreatePipeEx( &hRead, &hWrite, NULL, 4096, FILE_FLAG_OVERLAPPED , FILE_FLAG_OVERLAPPED ) ? true : false );
+	HANDLE hRead( nullptr );
+	HANDLE hWrite( nullptr );
+	bool ok( CreatePipeEx( &hRead, &hWrite, nullptr, 4096, FILE_FLAG_OVERLAPPED , FILE_FLAG_OVERLAPPED ) ? true : false );
 	if ( ok ) {
 		SystemIO::io_t readIO( sysIo.create_io( IO::TYPE::PIPE, hRead ) );
 		SystemIO::io_t writeIO( sysIo.create_io( IO::TYPE::PIPE, hWrite ) );
@@ -399,8 +397,8 @@ char const* windows_strerror( int code_ ) {
 
 	FormatMessage(
 		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL, code_, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),
-		p, MAX_MSG_LEN - 1, NULL );
+		nullptr, code_, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),
+		p, MAX_MSG_LEN - 1, nullptr );
 
 	return ( msg );
 }

@@ -217,7 +217,7 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 				break;
 			}
 			int i( 0 );
-			XSQLVAR* var( NULL );
+			XSQLVAR* var( nullptr );
 			for ( i = 0, var = in->sqlvar; i < in->sqld; ++ i, ++ var ) {
 				var->sqltype = SQL_TEXT;
 			}
@@ -235,7 +235,7 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 			if ( ( res->_status[0] == 1 ) && ( res->_status[1] != 0 ) )
 				break;
 			int i( 0 );
-			XSQLVAR* var( NULL );
+			XSQLVAR* var( nullptr );
 			int valuesMaxBufferSize( 0 );
 			for ( i = 0, var = out->sqlvar; i < out->sqld; ++ i, ++ var )
 				valuesMaxBufferSize += var->sqllen;
@@ -247,7 +247,7 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 				var->sqldata = valBuf;
 				valBuf += var->sqllen; /* vlaue buffer */
 				++ valBuf; /* \0 terminator */
-				var->sqlind = reinterpret_cast<short*>( valBuf ); /* NULL indicator */
+				var->sqlind = reinterpret_cast<short*>( valBuf ); /* nullptr indicator */
 				valBuf += sizeof ( short );
 				var->sqltype = SQL_VARYING + 1; /* get everything as null terminated text */
 			}
@@ -262,7 +262,7 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 		isc_rollback_transaction( db->_status, &res->_tr );
 		res->_tr = 0;
 	}
-	return ( res->_ok ? res.release() : NULL );
+	return ( res->_ok ? res.release() : nullptr );
 }
 
 void* firebird_query_execute( ODBLink&, void* data_ ) {
@@ -270,9 +270,9 @@ void* firebird_query_execute( ODBLink&, void* data_ ) {
 	if ( res ) {
 		XSQLDA* in( res->_descIn.get<XSQLDA>() );
 		if ( in ) {
-			isc_dsql_execute2( res->_status, &res->_tr, &res->_stmt, 1, in, NULL );
+			isc_dsql_execute2( res->_status, &res->_tr, &res->_stmt, 1, in, nullptr );
 		} else {
-			isc_dsql_execute( res->_status, &res->_tr, &res->_stmt, 1, NULL );
+			isc_dsql_execute( res->_status, &res->_tr, &res->_stmt, 1, nullptr );
 		}
 		if ( ( res->_status[0] == 1 ) && ( res->_status[1] != 0 ) ) {
 			res->_ok = false;
@@ -304,7 +304,7 @@ M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query
 			while ( ( retcode = static_cast<int>( isc_dsql_fetch( res->_status, &res->_stmt, 1, out ) ) ) == 0 ) {
 				int valuesBufferSize( 0 );
 				int i( 0 );
-				XSQLVAR* var( NULL );
+				XSQLVAR* var( nullptr );
 				for ( i = 0, var = out->sqlvar; i < out->sqld; ++ i, ++ var )
 					valuesBufferSize += ( var->sqllen - static_cast<int>( sizeof ( short ) ) );
 				valuesBufferSize += out->sqld * static_cast<int>( sizeof ( int ) ); /* for offsets */
@@ -343,7 +343,7 @@ M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query
 			res->_tr = 0;
 		}
 	}
-	return ( res && res->_ok ? rs.release() : NULL );
+	return ( res && res->_ok ? rs.release() : nullptr );
 }
 
 M_EXPORT_SYMBOL void rs_free_query_result( void* );
@@ -440,7 +440,7 @@ M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
 	XSQLDA* out( res->_descOut.get<XSQLDA>() );
 	int* offsets( c->get<int>() );
 	char* buf( reinterpret_cast<char*>( offsets + out->sqld ) );
-	return ( offsets[column_] >= 0 ? buf + offsets[column_] : NULL );
+	return ( offsets[column_] >= 0 ? buf + offsets[column_] : nullptr );
 }
 
 M_EXPORT_SYMBOL bool rs_next( void* );
@@ -454,7 +454,7 @@ M_EXPORT_SYMBOL char const* rs_get_field( void* data_, int field_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
 	XSQLDA* out( res->_descOut.get<XSQLDA>() );
 	XSQLVAR* var( out->sqlvar + field_ );
-	return ( *var->sqlind != -1 ? var->sqldata + sizeof ( short ) : NULL );
+	return ( *var->sqlind != -1 ? var->sqldata + sizeof ( short ) : nullptr );
 }
 
 M_EXPORT_SYMBOL int rs_fields_count( void* );
@@ -542,7 +542,7 @@ M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 			break;
 		var.sqlind = &nullInd;
 		var.sqldata = reinterpret_cast<char*>( &lastInsertId );
-		isc_dsql_execute( db->_status, &tr, &stmt, 1, NULL );
+		isc_dsql_execute( db->_status, &tr, &stmt, 1, nullptr );
 		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
 			break;
 		isc_dsql_fetch( db->_status, &stmt, 1, &desc );
@@ -551,13 +551,13 @@ M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 		ok = true;
 	} while ( false );
 	isc_dsql_free_statement( db->_status, &stmt, DSQL_drop );
-	M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, NULL ) );
+	M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, nullptr ) );
 	if ( ! ok ) {
 		isc_rollback_transaction( db->_status, &tr );
-		M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, NULL ) );
+		M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, nullptr ) );
 	} else {
 		isc_commit_transaction( db->_status, &tr );
-		M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, NULL ) );
+		M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, nullptr ) );
 	}
 	return ( nullInd != -1 ? static_cast<int long>( lastInsertId ) : -1 );
 }

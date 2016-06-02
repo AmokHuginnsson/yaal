@@ -281,7 +281,7 @@ HNumber::HNumber( double number_, integer_t precision_ )
 	M_EPILOG
 }
 
-HNumber::HNumber( char const* const number_ )
+HNumber::HNumber( char const* number_ )
 	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
 			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION )
 	, _leafCount( 0 )
@@ -295,7 +295,7 @@ HNumber::HNumber( char const* const number_ )
 	M_EPILOG
 }
 
-HNumber::HNumber( char const* const number_, integer_t precision_ )
+HNumber::HNumber( char const* number_, integer_t precision_ )
 	: _precision( precision_ > HARDCODED_MINIMUM_PRECISION
 			? precision_ : HARDCODED_MINIMUM_PRECISION )
 	, _leafCount( 0 )
@@ -476,7 +476,7 @@ void HNumber::from_string( HString const& number_ ) {
 	/* ! - represent known but invalid character, ? - represent unknown character */
 	integer_t start( static_cast<integer_t>( number_.find_one_of( VALID_CHARACTERS ) ) );
 	M_ENSURE( start != HString::npos ); /* exclude "!!!!" */
-	char const* const src = number_.raw();
+	char const* src = number_.raw();
 	_negative = ( src[ start ] == VALID_CHARACTERS[ A_MINUS ] ); /* "!!!-???" */
 	if ( _negative ) {
 		++ start;
@@ -567,7 +567,7 @@ void HNumber::from_string( HString const& number_ ) {
 
 HString HNumber::to_string( void ) const {
 	M_PROLOG
-	i32_t const* const src( _canonical.get<i32_t>() );
+	i32_t const* src( _canonical.get<i32_t>() );
 	_cache.realloc( _leafCount * DECIMAL_DIGITS_IN_LEAF_CONST + 3 ); /* + 1 for '.', + 1 for '-' and + 1 for terminating NIL */
 	char* ptr( _cache.get<char>() );
 	if ( _negative ) {
@@ -1296,7 +1296,7 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 						multiplierSample[0] = multiply_by_leaf_low( multiplierSample + 1, divisorLeafCount, static_cast<i32_t>( leaf ) );
 					}
 					i32_t const* addends[] = { dividendSample, multiplierSample + ( divSampleLen == divisorLeafCount ? 1 : 0 ) };
-					if ( mutate_addition( dividendSample - 1, divSampleLen + 1, addends, NULL, NULL, true ) ) {
+					if ( mutate_addition( dividendSample - 1, divSampleLen + 1, addends, nullptr, nullptr, true ) ) {
 						dividendSample[ -- divSampleLen ] = 0;
 					}
 					_cache.realloc( chunk_size<i32_t>( quotientLeafNo + 1 ) );
@@ -1512,7 +1512,7 @@ HNumber::integer_t HNumber::karatsuba( HChunk& result, i32_t const* fx, integer_
 		integer_t missingIntegral[] = { 2 * m - fxs, 0 };
 		i32_t const* addends[] = { fx, fx + fxs - m };
 		if ( fxs > m ) {
-			mutate_addition( hx, m + 1, addends, missingIntegral, NULL, false );
+			mutate_addition( hx, m + 1, addends, missingIntegral, nullptr, false );
 		} else {
 			::memcpy( hx + m + 1 - fxs, fx, static_cast<size_t>( chunk_size<i32_t>( fxs ) ) );
 		}
@@ -1521,7 +1521,7 @@ HNumber::integer_t HNumber::karatsuba( HChunk& result, i32_t const* fx, integer_
 		addends[ 0 ] = fy;
 		addends[ 1 ] = fy + fys - m;
 		if ( fys > m ) {
-			mutate_addition( hy, m + 1, addends, missingIntegral, NULL, false );
+			mutate_addition( hy, m + 1, addends, missingIntegral, nullptr, false );
 		} else {
 			::memcpy( hy + m + 1 - fys, fy, static_cast<size_t>( chunk_size<i32_t>( fys ) ) );
 		}
@@ -1529,7 +1529,7 @@ HNumber::integer_t HNumber::karatsuba( HChunk& result, i32_t const* fx, integer_
 		HChunk Z;
 		integer_t Zs( karatsuba( Z, hx, m + 1, hy, m + 1 ) );
 		/* combine all results */
-		i32_t* const res( buffer.get<i32_t>() + 1 ); /* Z*B^m can possibly (front)overflow buffer of size = fxs + fys, hence + 1 in allocation and here. */
+		i32_t* res( buffer.get<i32_t>() + 1 ); /* Z*B^m can possibly (front)overflow buffer of size = fxs + fys, hence + 1 in allocation and here. */
 		::memset( res, 0, static_cast<size_t>( chunk_size<i32_t>( size ) ) );
 
 		/* res = Z*B^m + r */
@@ -1546,7 +1546,7 @@ HNumber::integer_t HNumber::karatsuba( HChunk& result, i32_t const* fx, integer_
 		missingIntegral[ 1 ] = 0;
 		if ( addends[ 0 ] ) {
 			::memcpy( res + size - rs, r.raw(), static_cast<size_t>( chunk_size<i32_t>( rs ) ) );
-			mutate_addition( res + size - m - Zs - 1, Zs + 1, addends, missingIntegral, NULL, false );
+			mutate_addition( res + size - m - Zs - 1, Zs + 1, addends, missingIntegral, nullptr, false );
 		} else {
 			::memcpy( res + size - m - Zs, p, static_cast<size_t>( chunk_size<i32_t>( Zs ) ) );
 		}
@@ -1565,7 +1565,7 @@ HNumber::integer_t HNumber::karatsuba( HChunk& result, i32_t const* fx, integer_
 			addends[ 0 ] = res + 1 + shift;
 			addends[ 1 ] = p;
 			missingIntegral[ 1 ] = 0;
-			mutate_addition( res + shift, Zs + 1, addends, missingIntegral, NULL, false );
+			mutate_addition( res + shift, Zs + 1, addends, missingIntegral, nullptr, false );
 		}
 
 		/* res -= r2m*B^m, res -= r*B^m */
@@ -1577,12 +1577,12 @@ HNumber::integer_t HNumber::karatsuba( HChunk& result, i32_t const* fx, integer_
 		addends[ 1 ] = r2m.get<i32_t>();
 		if ( addends[ 1 ] ) {
 			missingIntegral[ 1 ] = size - r2ms - m - ncar;
-			mutate_addition( res - car, size - m + car, addends, missingIntegral, NULL, true );
+			mutate_addition( res - car, size - m + car, addends, missingIntegral, nullptr, true );
 		}
 		addends[ 1 ] = r.get<i32_t>();
 		if ( addends[ 1 ] ) {
 			missingIntegral[ 1 ] = size - rs - m - ncar;
-			mutate_addition( res - car, size - m + car, addends, missingIntegral, NULL, true );
+			mutate_addition( res - car, size - m + car, addends, missingIntegral, nullptr, true );
 		}
 		::memcpy( result.get<i32_t>() + totalShift, res + 1, static_cast<size_t>( chunk_size<i32_t>( leafCount - totalShift ) ) );
 	} else if ( ( fxrl > 0 ) && ( fyrl > 0 ) ) {
@@ -1610,7 +1610,7 @@ HNumber::integer_t HNumber::karatsuba( HChunk& result, i32_t const* fx, integer_
 				}
 				e[ 0 ] = carrier;
 				addends[ 0 ] = res + 1;
-				mutate_addition( res, fys + 1 + 1, addends, NULL, NULL, false );
+				mutate_addition( res, fys + 1 + 1, addends, nullptr, nullptr, false );
 				-- res;
 			} else {
 				-- res;

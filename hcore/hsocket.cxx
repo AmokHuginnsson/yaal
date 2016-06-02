@@ -86,7 +86,7 @@ HSocket::HSocket( socket_type_t const& socketType_,
 	, _type( socketType_ )
 	, _maximumNumberOfClients( maximumNumberOfClients_ )
 	, _addressSize( 0 )
-	, _address( NULL )
+	, _address( nullptr )
 	, _hostName() {
 	M_PROLOG
 	if ( _type == TYPE::DEFAULT ) {
@@ -290,7 +290,7 @@ void HSocket::connect( yaal::hcore::HString const& address_, int port_ ) {
 	if ( ( !!( _type & TYPE::NONBLOCKING ) ) && error && ( errno == EINPROGRESS ) ) {
 		int fd( _fileDescriptor );
 		int long timeout( _timeout );
-		int up( hcore::system::wait_for_io( NULL, 0, &fd, 1, &timeout ) );
+		int up( hcore::system::wait_for_io( nullptr, 0, &fd, 1, &timeout ) );
 		if ( up == 1 ) {
 			M_ASSERT( fd == _fileDescriptor );
 			socklen_t optLen( static_cast<socklen_t>( sizeof ( error ) ) );
@@ -351,7 +351,7 @@ int HSocket::get_port( void ) const {
 	if ( _fileDescriptor < 0 ) {
 		M_THROW( _errMsgHSocket_[ NOT_INITIALIZED ], _fileDescriptor );
 	}
-	sockaddr_in* addressNetwork = NULL;
+	sockaddr_in* addressNetwork = nullptr;
 	if ( ! ( _type & TYPE::NETWORK ) ) {
 		M_THROW( _( "unix socket has not a port attribute" ), _type.value() );
 	}

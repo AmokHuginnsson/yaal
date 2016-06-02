@@ -8,7 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <cerrno>
-#include <sys/stat.h>
+//#include <sys/stat.h>
 
 #ifdef __GNUC__
 #include <dirent.h>
@@ -21,7 +21,7 @@
 #include <io.h>
 #include <direct.h>
 #include <windows.h>
-#include <../include/sys/utime.h>
+#include <sys/utime.h>
 #define mkdir( x, y ) _mkdir( ( x ) )
 #define sleep( x ) Sleep( ( x ) * 1000 )
 #define stat _stat

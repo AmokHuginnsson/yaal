@@ -163,7 +163,7 @@ struct ORCLoader {
 	HString _section;
 	HProgramOptionsHandler::RC_CALLBACK_t rc_callback;
  	ORCLoader( void ) :
-		_optionHandler(), _path(), _section(), rc_callback( NULL ) { }
+		_optionHandler(), _path(), _section(), rc_callback( nullptr ) { }
  	ORCLoader( HProgramOptionsHandler const& optionHandler_, HString const& rcName_,
 		HString const& section_, HProgramOptionsHandler::RC_CALLBACK_t callback )
 		: _optionHandler( optionHandler_ ),
@@ -700,7 +700,7 @@ char const* make_short_opts( HProgramOptionsHandler::options_t const& options_, 
 
 option* make_option_array( HProgramOptionsHandler::options_t const& options_, HChunk& buffer_ ) {
 	M_PROLOG
-	option* options = NULL;
+	option* options = nullptr;
 	options = buffer_.get<option>();
 	int ctr = 0;
 	for ( HProgramOptionsHandler::options_t::const_iterator it = options_.begin(),
@@ -731,8 +731,8 @@ option* make_option_array( HProgramOptionsHandler::options_t const& options_, HC
 }
 
 int HProgramOptionsHandler::process_command_line( int argc_,
-		char* const* const argv_,
-		int* const unknown_ ) {
+		char* const* argv_,
+		int* unknown_ ) {
 	M_PROLOG
 	int val( 0 );
 	HString shortOptBuffer;
@@ -740,7 +740,7 @@ int HProgramOptionsHandler::process_command_line( int argc_,
 	hcore::log( LOG_LEVEL::INFO ) << "Decoding switches ... ";
 	char const* shortOpts( make_short_opts( _options, shortOptBuffer ) );
 	option* optionArray( make_option_array( _options, longOptBuffer ) );
-	while ( ( val = ::getopt_long( argc_, argv_, shortOpts, optionArray, NULL ) ) != EOF ) {
+	while ( ( val = ::getopt_long( argc_, argv_, shortOpts, optionArray, nullptr ) ) != EOF ) {
 		bool validSwitch( false );
 		for ( options_t::iterator it = _options.begin(), end = _options.end(); it != end; ++ it ) {
 			if ( it->short_form() == val ) {

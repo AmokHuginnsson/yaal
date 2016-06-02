@@ -73,14 +73,14 @@ HAlarm::HAlarm( int long miliseconds_ )
 		sigset_t mask;
 		M_ENSURE( sigemptyset( &mask ) == 0 );
 		M_ENSURE( sigaddset_fwd( &mask, SIGALRM ) == 0 );
-		M_ENSURE( pthread_sigmask( SIG_UNBLOCK, &mask, NULL ) == 0 );
+		M_ENSURE( pthread_sigmask( SIG_UNBLOCK, &mask, nullptr ) == 0 );
 		++ step;
 
 		itimerspec timeout;
 		::memset( &timeout, 0, sizeof ( timeout ) );
 		timeout.it_value.tv_sec = miliseconds_ / si::MILI_IN_WHOLE;
 		timeout.it_value.tv_nsec = static_cast<int long>( ( miliseconds_ % si::MILI_IN_WHOLE ) * si::NANO_IN_MILI );
-		M_ENSURE( timer_settime( *t, 0, &timeout, NULL ) == 0 );
+		M_ENSURE( timer_settime( *t, 0, &timeout, nullptr ) == 0 );
 		++ step;
 	} catch ( ... ) {
 		if ( step > 0 ) {
@@ -99,7 +99,7 @@ HAlarm::~HAlarm( void ) {
 	itimerspec timeout;
 	::memset( &timeout, 0, sizeof ( timeout ) );
 	timer_t* t( reinterpret_cast<timer_t*>( &_timer ) );
-	M_ENSURE( timer_settime( *t, 0, &timeout, NULL ) == 0 );
+	M_ENSURE( timer_settime( *t, 0, &timeout, nullptr ) == 0 );
 
 	cleanup_sigmask();
 
@@ -113,7 +113,7 @@ void HAlarm::cleanup_sigmask( void ) {
 	sigset_t mask;
 	M_ENSURE( sigemptyset( &mask ) == 0 );
 	M_ENSURE( sigaddset_fwd( &mask, SIGALRM ) == 0 );
-	M_ENSURE( pthread_sigmask( SIG_BLOCK, &mask, NULL ) == 0 );
+	M_ENSURE( pthread_sigmask( SIG_BLOCK, &mask, nullptr ) == 0 );
 	return;
 	M_EPILOG
 }

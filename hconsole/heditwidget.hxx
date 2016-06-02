@@ -36,11 +36,11 @@ namespace yaal {
 
 namespace hconsole {
 
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const _maskLetters_;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const _maskDigits_;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const _maskAlpha_;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const _maskExtended_;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const _maskLoose_;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const _maskLetters_[];
+extern M_YAAL_HCONSOLE_PUBLIC_API char const _maskDigits_[];
+extern M_YAAL_HCONSOLE_PUBLIC_API char const _maskAlpha_[];
+extern M_YAAL_HCONSOLE_PUBLIC_API char const _maskExtended_[];
+extern M_YAAL_HCONSOLE_PUBLIC_API char const _maskLoose_[];
 extern M_YAAL_HCONSOLE_PUBLIC_API char const* const _maskDefault_;
 
 class HInfoString : public HInfo {

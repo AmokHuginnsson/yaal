@@ -51,7 +51,7 @@ private:
 	char _readBuf[ RECV_BUF_SIZE + 1 /* for \0 - the terminator */ ];
 	hcore::HString _line;
 public:
-	HCollector( char const* = NULL ); /* device path */
+	HCollector( char const* = nullptr ); /* device path */
 	int send_line( char const* );
 	int receive_line( hcore::HString& );
 	int establish_connection( int = 9999 );

@@ -62,14 +62,14 @@ ip_t resolver::get_ip( HString const& hostName_ ) {
 	ip_t ip;
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 #if defined( HAVE_GETADDRINFO ) && ( HAVE_GETADDRINFO != 0 )
-	addrinfo* addrInfo( NULL );
-	errno = ::getaddrinfo( hostName_.raw(), NULL, NULL, &addrInfo );
+	addrinfo* addrInfo( nullptr );
+	errno = ::getaddrinfo( hostName_.raw(), nullptr, nullptr, &addrInfo );
 	M_ENSURE_EX( ! errno && addrInfo, hostName_ );
 	ip = ip_t( static_cast<sockaddr_in*>( static_cast<void*>( addrInfo->ai_addr ) )->sin_addr.s_addr );
 	::freeaddrinfo( addrInfo );
 #else /* #if defined( HAVE_GETADDRINFO ) && ( HAVE_GETADDRINFO != 0 ) */
 	hostent hostName;
-	hostent* hostNameStatus( NULL );
+	hostent* hostNameStatus( nullptr );
 	int size( static_cast<int>( _cache->get_size() ) );
 	_cache->realloc( size );
 	int error( 0 );
@@ -90,7 +90,7 @@ HString resolver::ip_to_string( ip_t ip_ ) {
 	sockaddr_in addr;
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = ip_.raw();
-	char const* name( NULL );
+	char const* name( nullptr );
 	while ( ! name ) {
 		name = inet_ntop( AF_INET, &addr.sin_addr, _cache->get<char>(), static_cast<socklen_t>( _cache->get_size() ) );
 		if ( ! name ) {
@@ -114,7 +114,7 @@ HString resolver::get_name( ip_t ip_ ) {
 	_cache->realloc( size );
 	error = getnameinfo(
 		reinterpret_cast<sockaddr*>( &addr ), static_cast<socklen_t>( sizeof ( addr ) ),
-		_cache->get<char>(), static_cast<socklen_t>( size ), NULL, 0, NI_NOFQDN
+		_cache->get<char>(), static_cast<socklen_t>( size ), nullptr, 0, NI_NOFQDN
 	);
 	HScopedValueReplacement<int> saveErrno( errno, error );
 	M_ENSURE( error == 0 );
@@ -123,7 +123,7 @@ HString resolver::get_name( ip_t ip_ ) {
 	int size( RESOLVER_INITIAL_CACHE_SIZE );
 	int code( 0 );
 	hostent hostName;
-	hostent* hostNameStatus( NULL );
+	hostent* hostNameStatus( nullptr );
 	::memset( &hostName, 0, sizeof ( hostent ) );
 	while ( ( error = ::gethostbyaddr_r( &addr.sin_addr, sizeof ( addr.sin_addr ),
 				AF_INET, &hostName,

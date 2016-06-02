@@ -273,7 +273,7 @@ AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cstring>
 # include <libgen.h>
 #endif /* not HAVE_BASENAME_IN_CSTRING */
 int main( int, char const** ) {
-	char const* const p( NULL );
+	char const* p( nullptr );
 	basename( p );
 	return ( 0 );
 }]])], [AC_DEFINE([HAVE_BASENAME_ARG_CONST],[],[Is your argument to basename a pointer to const?])] RESULT=["yes"])

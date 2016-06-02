@@ -103,9 +103,9 @@ HSBBSTreeBase::HAbstractNode* HSBBSTreeBase::previous( HAbstractNode* node_ ) co
 
 HSBBSTreeBase::HAbstractNode::HAbstractNode( void )
 	: _color( RED )
-	, _parent( NULL )
-	, _left( NULL )
-	, _right( NULL ) {
+	, _parent( nullptr )
+	, _left( nullptr )
+	, _right( nullptr ) {
 	return;
 }
 
@@ -120,7 +120,7 @@ void HSBBSTreeBase::HAbstractNode::set_child( HAbstractNode* which_, HAbstractNo
 }
 
 HSBBSTreeBase::HSBBSTreeBase( void )
-	: _root( NULL )
+	: _root( nullptr )
 	, _size( 0 ) {
 	return;
 }
@@ -253,12 +253,12 @@ void HSBBSTreeBase::remove_node( HAbstractNode* node_ ) {
 	remove_rebalance( node_ );
 	if ( ( node_->_parent )
 			&& ! ( node_->_left || node_->_right ) ) {
-		node_->_parent->set_child( node_, NULL );
+		node_->_parent->set_child( node_, nullptr );
 	}
-	node_->_left = node_->_right = NULL;
+	node_->_left = node_->_right = nullptr;
 	_size --;
 	if ( ! _size ) {
-		_root = NULL;
+		_root = nullptr;
 	}
 	M_ASSERT( ! ( _root && _root->_parent ) ); /* very tricky :^) */
 	return;
@@ -278,7 +278,7 @@ void HSBBSTreeBase::remove_rebalance( HAbstractNode* node_ ) {
 			/* after this line node_ is a pivot of rebalancing
 			 * no matter if it's child of removed node, or the node it self */
 			for ( int i = 0; ; ++i ) { /* tail recursion may be easily changed to iteration */
-				if ( node_->_parent == NULL ) {
+				if ( node_->_parent == nullptr ) {
 					_root->_color = HAbstractNode::BLACK;
 				} else { /* hard part starts here */
 					HAbstractNode* sibling = get_sibling( node_ );

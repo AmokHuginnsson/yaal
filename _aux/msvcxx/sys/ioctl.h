@@ -1,8 +1,6 @@
 #ifndef YAAL_MSVCXX_SYS_IOCTL_H_INCLUDED
 #define YAAL_MSVCXX_SYS_IOCTL_H_INCLUDED 1
 
-#define _SYS_IOCTL_H 1
-
 #define TIOCGWINSZ 0x5413
 
 #include <features.h>

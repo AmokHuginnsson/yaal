@@ -56,7 +56,7 @@ HQuery::HQuery(
 HQuery::~HQuery( void ) {
 	if ( _query ) {
 		(*_connector->query_free)( _dataBase->_dbLink, _query );
-		_query = NULL;
+		_query = nullptr;
 	}
 	return;
 }

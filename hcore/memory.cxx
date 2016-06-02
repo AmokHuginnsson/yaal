@@ -74,7 +74,7 @@ void* realloc( void* ptr_, int long size_ ) {
 }
 
 void free0( void* ptr_ ) throw() {
-	M_ASSERT( ( ptr_ != NULL ) && "memory::free0: request to free NULL pointer" );
+	M_ASSERT( ( ptr_ != nullptr ) && "memory::free0: request to free NULL pointer" );
 	::free( ptr_ );
 	return;
 }

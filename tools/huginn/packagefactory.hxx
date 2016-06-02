@@ -58,7 +58,7 @@ public:
 	typedef HPackageFactory this_type;
 	struct OCreator {
 		OCreator( void )
-			: _instantiator( NULL ) {
+			: _instantiator( nullptr ) {
 		}
 		OCreator( OCreator const& ) = default;
 		OCreator& operator = ( OCreator const& ) = default;

@@ -60,7 +60,7 @@ public:
 } _signalDispatcher_;
 
 SignalsSetup::SignalsSetup( void )
-	: _mask( _signalDispatcher_.get_mask() ), _interrupt( ::CreateEvent( NULL, false, false, NULL ) ) {
+	: _mask( _signalDispatcher_.get_mask() ), _interrupt( ::CreateEvent( nullptr, false, false, nullptr ) ) {
 }
 
 SignalsSetup::~SignalsSetup( void ) {

@@ -82,8 +82,8 @@ void HException::print_error( void ) const {
 	return;
 }
 
-void HException::log( char const* const fileName_, int const line_,
-		char const* const functionName_ ) {
+void HException::log( char const* fileName_, int line_,
+		char const* functionName_ ) {
 	if ( ! _frame
 			|| ( ( _fileName != fileName_ ) && ( ! _fileName || ::strcmp( _fileName, fileName_ ) ) )
 			|| ( ! _functionName && functionName_ )
@@ -155,7 +155,7 @@ HString demangle( char const* symbolName_ ) {
 	return ( symbol );
 }
 
-void kill_interior( char const* const msg_ ) {
+void kill_interior( char const* msg_ ) {
 	yaal::_isKilled_ = true;
 	if ( msg_ ) {
 		hcore::log << "FATAL ERROR: " << msg_ << endl;

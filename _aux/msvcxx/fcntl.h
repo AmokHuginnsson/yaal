@@ -1,8 +1,6 @@
 #ifndef YAAL_MSVCXX_FCNTL_H_INCLUDED
 #define YAAL_MSVCXX_FCNTL_H_INCLUDED 1
 
-#include <glibc/fcntl.h>
-
 namespace msvcxx {
 
 int fcntl( int, int, int );

@@ -75,8 +75,8 @@ public:
 		EXTERNAL
 	};
 protected:
-	typedef int long ( HRawFile::* READER_t )( void* const, int long );
-	typedef int long ( HRawFile::* WRITER_t )( void const* const, int long );
+	typedef int long ( HRawFile::* READER_t )( void*, int long );
+	typedef int long ( HRawFile::* WRITER_t )( void const*, int long );
 	typedef int ( HRawFile::* CLOSER_t )( void );
 	TYPE::raw_file_type_t _type;
 	file_descriptor_t _fileDescriptor; /* raw file descriptor of the file */
@@ -101,14 +101,14 @@ protected:
 	virtual int do_close( void );
 	int close_plain( void );
 	int close_ssl( void );
-	int long read_plain( void* const, int long );
-	int long write_plain( void const* const, int long );
-	int long read_ssl_loader( void* const, int long );
-	int long write_ssl_loader( void const* const, int long );
-	int long read_ssl( void* const, int long );
-	int long write_ssl( void const* const, int long );
-	virtual int long do_write( void const* const, int long ) override;
-	virtual int long do_read( void* const, int long ) override;
+	int long read_plain( void*, int long );
+	int long write_plain( void const*, int long );
+	int long read_ssl_loader( void*, int long );
+	int long write_ssl_loader( void const*, int long );
+	int long read_ssl( void*, int long );
+	int long write_ssl( void const*, int long );
+	virtual int long do_write( void const*, int long ) override;
+	virtual int long do_read( void*, int long ) override;
 	virtual void do_flush( void ) override;
 	virtual bool do_is_valid( void ) const override;
 	virtual POLL_TYPE do_poll_type( void ) const override;

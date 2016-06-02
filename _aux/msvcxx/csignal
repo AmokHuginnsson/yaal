@@ -3,9 +3,6 @@
 
 #include <unistd.h>
 
-typedef yaal::u64_t sigset_t;
-typedef yaal::u64_t __sigset_t;
-
 #define _SIGNAL_H 1
 typedef void (*__sighandler_t) (int);
 typedef __sighandler_t sighandler_t;

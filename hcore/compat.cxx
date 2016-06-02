@@ -232,7 +232,7 @@ double long strtold( char const* str, char** tail ) {
 #include <sys/time.h>
 int clock_gettime( clockid_t, struct timespec* time_ ) {
 	timeval now;
-	int err( gettimeofday( &now, NULL ) );
+	int err( gettimeofday( &now, nullptr ) );
 	if ( !err ) {
 		time_->tv_sec  = now.tv_sec;
 		time_->tv_nsec = now.tv_usec * 1000;

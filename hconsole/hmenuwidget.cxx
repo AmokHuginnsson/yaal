@@ -45,7 +45,7 @@ HMenuWidget::HMenuWidget( HWindow* parent_,
 	: HWidget( parent_, row_, column_, height_, width_, label_,
 			HWidgetAttributes().label_position( HWidget::LABEL::POSITION::STACKED ) ),
 	HTreeWidget( parent_, row_, column_, height_, width_, label_ ),
-	_process( NULL ) {
+	_process( nullptr ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -53,7 +53,7 @@ HMenuWidget::HMenuWidget( HWindow* parent_,
 
 HMenuWidget::~HMenuWidget ( void ) {
 	M_PROLOG
-	_process = NULL;
+	_process = nullptr;
 	return;
 	M_EPILOG
 }
@@ -112,7 +112,7 @@ bool HMenuWidget::do_click( OMouse& mouse_ ) {
 void HMenuWidget::set_data( HMenuWidget::data_ptr_t data_ ) {
 	M_PROLOG
 	_model = make_pointer<HAsIsValueTreeModel<OMenuItem> >( data_ );
-	menu_model_t::data_t::node_t node( NULL );
+	menu_model_t::data_t::node_t node( nullptr );
 	_view.clear();
 	node = static_cast<menu_model_t*>( _model.get() )->get_data()->get_root();
 	on_model_changed();

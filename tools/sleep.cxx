@@ -55,7 +55,7 @@ bool sleep_for( yaal::hcore::time::duration_t duration_, bool ignoreInterrupts_ 
 			static_cast<time_t>( left / si::NANO_IN_WHOLE ),
 			static_cast<suseconds_t>( ( left % si::NANO_IN_WHOLE ) / si::NANO_IN_MICRO )
 		};
-	} while ( ( ( err = ::select( 0, NULL, NULL, NULL, &wait ) ) == -1 ) && ( errno == EINTR ) && ignoreInterrupts_ );
+	} while ( ( ( err = ::select( 0, nullptr, nullptr, nullptr, &wait ) ) == -1 ) && ( errno == EINTR ) && ignoreInterrupts_ );
 	return ( ( c.get_time_elapsed( time::UNIT::NANOSECOND ) >= duration_ ) && ( err == 0 ) );
 }
 

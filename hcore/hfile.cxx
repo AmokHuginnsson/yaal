@@ -50,7 +50,7 @@ HFile::open_t const HFile::OPEN::TRUNCATE = HFile::open_t::new_flag();
 
 HFile::HFile( void )
 	: HStreamInterface()
-	, _handle( NULL )
+	, _handle( nullptr )
 	, _path()
 	, _error()
 	, _ownership( OWNERSHIP::NONE ) {
@@ -59,7 +59,7 @@ HFile::HFile( void )
 	M_EPILOG
 }
 
-HFile::HFile( void* const handle_, OWNERSHIP ownership_ )
+HFile::HFile( void* handle_, OWNERSHIP ownership_ )
 	: HStreamInterface()
 	, _handle( handle_ )
 	, _path()
@@ -72,7 +72,7 @@ HFile::HFile( void* const handle_, OWNERSHIP ownership_ )
 
 HFile::HFile( yaal::hcore::HString const& path, open_t const& open_ )
 	: HStreamInterface()
-	, _handle( NULL )
+	, _handle( nullptr )
 	, _path()
 	, _error()
 	, _ownership( OWNERSHIP::ACQUIRED ) {
@@ -82,7 +82,7 @@ HFile::HFile( yaal::hcore::HString const& path, open_t const& open_ )
 	} catch ( ... ) {
 		if ( _handle ) {
 			::fclose( static_cast<FILE*>( _handle ) );
-			_handle = NULL;
+			_handle = nullptr;
 			_ownership = OWNERSHIP::NONE;
 		}
 		throw;
@@ -109,7 +109,7 @@ int HFile::open( HString const& path_, open_t const& open_ ) {
 int HFile::do_open( HString const& path_, open_t const& open_ ) {
 	M_PROLOG
 	M_ENSURE_EX( ! _handle, "stream already opened" );
-	char const* mode( NULL );
+	char const* mode( nullptr );
 	if ( open_ == OPEN::READING )
 		mode = "rb";
 	else if ( ( open_ == OPEN::WRITING ) || ( open_ == ( OPEN::WRITING | OPEN::TRUNCATE ) ) )
@@ -145,7 +145,7 @@ int HFile::do_open( HString const& path_, open_t const& open_ ) {
 	M_EPILOG
 }
 
-int HFile::open( void* const handle_, OWNERSHIP ownership_ ) {
+int HFile::open( void* handle_, OWNERSHIP ownership_ ) {
 	M_PROLOG
 	M_ENSURE_EX( ! _handle, "stream already opened" );
 	M_ENSURE( handle_ || ( ownership_ == OWNERSHIP::NONE ) );
@@ -169,7 +169,7 @@ int HFile::do_close( void ) {
 	if ( error ) {
 		_error = error_message( error );
 	} else {
-		_handle = NULL;
+		_handle = nullptr;
 		_ownership = OWNERSHIP::NONE;
 	}
 	return ( error );
@@ -179,7 +179,7 @@ int HFile::do_close( void ) {
 void* HFile::release( void ) {
 	M_PROLOG
 	M_ENSURE( _handle );
-	void* handle( NULL );
+	void* handle( nullptr );
 	using yaal::swap;
 	swap( _handle, handle );
 	_ownership = OWNERSHIP::NONE;
@@ -259,7 +259,7 @@ int long HFile::get_line_length( void ) {
 	M_ASSERT( _handle );
 	static int const SCAN_BUFFER_SIZE( 8 );
 	char buffer[ SCAN_BUFFER_SIZE ];
-	char const* ptr( NULL );
+	char const* ptr( nullptr );
 	int long length( 0 );
 	int long size( 0 );
 	do {
@@ -299,7 +299,7 @@ void HFile::do_flush( void ) {
 
 bool HFile::is_opened( void ) const {
 	M_PROLOG
-	return ( _handle != NULL );
+	return ( _handle != nullptr );
 	M_EPILOG
 }
 
@@ -318,14 +318,14 @@ int HFile::get_file_descriptor( void ) const {
 	M_EPILOG
 }
 
-int long HFile::do_read( void* const buffer_, int long size_ ) {
+int long HFile::do_read( void* buffer_, int long size_ ) {
 	M_PROLOG
 	int long len( static_cast<int long>( ::std::fread( buffer_, sizeof ( char ), static_cast<size_t>( size_ ), static_cast<FILE*>( _handle ) ) ) );
 	return ( len ? len : ( ::std::ferror( static_cast<FILE*>( _handle ) ) ? -1 : len ) );
 	M_EPILOG
 }
 
-int long HFile::do_write( void const* const string_, int long size_ ) {
+int long HFile::do_write( void const* string_, int long size_ ) {
 	M_PROLOG
 	M_ASSERT( _handle );
 	int long len( static_cast<int long>( ::std::fwrite( string_, sizeof ( char ), static_cast<size_t>( size_ ), static_cast<FILE*>( _handle ) ) ) );
@@ -335,7 +335,7 @@ int long HFile::do_write( void const* const string_, int long size_ ) {
 
 bool HFile::do_is_valid( void ) const {
 	M_PROLOG
-	return ( _handle != NULL );
+	return ( _handle != nullptr );
 	M_EPILOG
 }
 

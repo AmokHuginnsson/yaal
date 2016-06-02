@@ -83,7 +83,7 @@ private:
 	bool _escape; /*!< Is a QUOTE substate. */
 public:
 	HIterator( void )
-		: _owner( NULL ), _cur(), _state( STATE::NORMAL ), _escape( false ) {
+		: _owner( nullptr ), _cur(), _state( STATE::NORMAL ), _escape( false ) {
 	}
 	HIterator( HIterator const& it_ )
 		: _owner( it_._owner ), _cur( it_._cur ), _state( it_._state ), _escape( it_._escape ) {

@@ -48,18 +48,18 @@ static void const* const FWD_MAP_FAILED = MAP_FAILED;
 }
 
 HMemoryMappedFile::HMemoryMappedFile( yaal::hcore::HString const& path_, int long size_ )
-	: _fd( -1 ), _map( NULL ), _size( 0 ) {
+	: _fd( -1 ), _map( nullptr ), _size( 0 ) {
 	M_PROLOG
 	M_ENSURE_EX( ( _fd = ::open( path_.raw(), O_RDWR ) ) >= 0, path_ );
 	try {
 		if ( ! size_ ) {
 			M_ENSURE( ( _size = static_cast<int long>( ::lseek( _fd, 0, SEEK_END ) ) ) >= 0 );
 		}
-		M_ENSURE( ( _map = ::mmap( NULL, static_cast<size_t>( _size ), PROT_READ | PROT_WRITE, MAP_PRIVATE, _fd, 0 ) ) != FWD_MAP_FAILED );
+		M_ENSURE( ( _map = ::mmap( nullptr, static_cast<size_t>( _size ), PROT_READ | PROT_WRITE, MAP_PRIVATE, _fd, 0 ) ) != FWD_MAP_FAILED );
 	} catch ( ... ) {
 		M_SAFE( M_ENSURE( ::close( _fd ) != 0 ) );
 		_fd = -1;
-		_map = NULL;
+		_map = nullptr;
 		throw;
 	}
 	return;

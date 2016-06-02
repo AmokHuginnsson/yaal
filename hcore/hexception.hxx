@@ -101,7 +101,7 @@ public:
 	 * \param line_ - line of code where where exception has been caught.
 	 * \param functionName_ - name of the function that is on unwinding path.
 	 */
-	void log( char const* const fileName_, int line_, char const* const functionName_ );
+	void log( char const* fileName_, int line_, char const* functionName_ );
 	char const* what( void ) const;
 	int code( void ) const;
 	static void set_error_stream( void* );
@@ -144,7 +144,7 @@ public:
 	typedef base_type_t base_type;
 	typedef HExceptionT<tType, base_type> this_type;
 	HExceptionT( HString const& reason_, int code_ = errno )
-		: base_type( NULL, 0, NULL, reason_ + ( _decodeErrno ? to_string( ": " ).append( error_message( code_ ) ) : "" ), code_, _name ) {
+		: base_type( nullptr, 0, nullptr, reason_ + ( _decodeErrno ? to_string( ": " ).append( error_message( code_ ) ) : "" ), code_, _name ) {
 		return;
 	}
 	HExceptionT( char const* fileName_,
@@ -195,7 +195,7 @@ public:
 	}
 };
 
-void kill_interior( char const* const = NULL );
+void kill_interior( char const* = nullptr );
 
 /*
  * A,     AE,      AE = ET<A, E>

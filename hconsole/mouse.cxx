@@ -65,9 +65,9 @@ namespace hconsole {
 
 namespace mouse {
 
-fun_console_mouse_open_t mouse_open = NULL;
-fun_console_mouse_get_t mouse_get = NULL;
-fun_console_mouse_close_t mouse_close = NULL;
+fun_console_mouse_open_t mouse_open = nullptr;
+fun_console_mouse_get_t mouse_get = nullptr;
+fun_console_mouse_close_t mouse_close = nullptr;
 
 #if defined( HAVE_SYS_CONSIO_H ) || defined( HAVE_GPM_H )
 namespace {
@@ -82,7 +82,7 @@ int hunt_tty( int offset_ ) {
 	else {
 		ttyName = ::getenv( "STY" );
 		if ( ttyName ) {
-			char const* ptr = NULL;
+			char const* ptr = nullptr;
 			if ( ( ptr = ::strstr( ttyName, ".tty" ) ) )
 				vC = lexical_cast<int>( ptr + 4 + offset_ );
 			else if ( ( ptr = ::strstr( ttyName, ".pts" ) ) )
@@ -248,7 +248,7 @@ int x_mouse_open( void ) {
 	mmask_t strictlyRequiredMask( BUTTON1_CLICKED | BUTTON1_DOUBLE_CLICKED | BUTTON2_CLICKED | BUTTON3_CLICKED );
 
 	set_env( "NCURSES_GPM_TERMS", "" );
-	mmask_t mouseMask( mousemask( desiredMouseMask, NULL ) );
+	mmask_t mouseMask( mousemask( desiredMouseMask, nullptr ) );
 	if ( ! mouseMask ) {
 		throw HMouseException( "mousemask() returned 0", errno );
 	}

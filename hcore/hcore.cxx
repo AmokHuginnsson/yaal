@@ -141,7 +141,7 @@ void decode_set_env( HString line ) {
 namespace {
 
 double long std_strtold( HString const& str_, int* endIdx_ ) {
-	char* endPtr( NULL );
+	char* endPtr( nullptr );
 	double long value( ::strtold( str_.raw(), &endPtr ) );
 	if ( endIdx_ )
 		*endIdx_ = static_cast<int>( endPtr - str_.raw() );
@@ -171,7 +171,7 @@ public:
 	HCoreInitDeinit( void );
 } initDeinit;
 
-void init_locale( char const* const package_ ) {
+void init_locale( char const* package_ ) {
 	M_PROLOG
 	char* gettextPath( ::getenv( "GETTEXT_PATH" ) );
 	if ( gettextPath ) {

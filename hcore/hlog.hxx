@@ -87,12 +87,12 @@ public:
 	static LOG_LEVEL::priority_t _logLevel;
 public:
 	/* already opened file */
-	void rehash_stream( void* = DEFAULT_LOG_STREAM, char const* const = NULL );
+	void rehash_stream( void* = DEFAULT_LOG_STREAM, char const* = nullptr );
 	/* log file name */
-	void rehash( HString const&, char const* const = NULL );
+	void rehash( HString const&, char const* = nullptr );
 	/*! \brief log ( "data %d", x ); will look nice
 	 */
-	int operator()( char const* const, ... ) __attribute__(( format( printf, 2, 3 ) ));
+	int operator()( char const*, ... ) __attribute__(( format( printf, 2, 3 ) ));
 	/*! \brief log ( "data %d", x ); will look nice
 	 */
 	int operator()( LOG_LEVEL::priority_t, char const*, ... ) __attribute__(( format( printf, 3, 4 ) ));
@@ -104,13 +104,13 @@ public:
 private:
 	HLog( void );
 	virtual ~HLog( void );
-	void do_rehash( void*, char const* const );
+	void do_rehash( void*, char const* );
 	void timestamp( void );
-	int vformat( char const* const, va_list ) __attribute__(( format( printf, 2, 0 ) ));
-	void eol_reset( char const* const, int long );
-	virtual int long do_write( void const* const, int long ) override;
+	int vformat( char const*, va_list ) __attribute__(( format( printf, 2, 0 ) ));
+	void eol_reset( char const*, int long );
+	virtual int long do_write( void const*, int long ) override;
 	virtual void do_flush( void ) override;
-	virtual int long do_read( void* const, int long ) override;
+	virtual int long do_read( void*, int long ) override;
 	virtual bool do_is_valid( void ) const override;
 	HLog( HLog const& );
 	HLog& operator= ( HLog const& );

@@ -46,7 +46,7 @@ HZipStream::HZipStream( MODE mode_ )
 	: _mode( mode_ )
 	, _error( Z_OK )
 	, _streamOwned()
-	, _streamRef( NULL )
+	, _streamRef( nullptr )
 	, _zStream( sizeof ( z_stream ) )
 	, _zBufferIn( _zBufferSize_ )
 	, _zBufferOut( _zBufferSize_ )
@@ -158,7 +158,7 @@ void HZipStream::reset( ref_stream_t stream_ ) {
 	M_EPILOG
 }
 
-int long HZipStream::do_write( void const* const buf_, int long size_ ) {
+int long HZipStream::do_write( void const* buf_, int long size_ ) {
 	M_PROLOG
 	M_ASSERT( _streamRef );
 	M_ASSERT( _mode == MODE::DEFLATE );
@@ -208,7 +208,7 @@ int long HZipStream::prepare_data( void ) {
 	M_EPILOG
 }
 
-int long HZipStream::do_read( void* const buf_, int long size_ ) {
+int long HZipStream::do_read( void* buf_, int long size_ ) {
 	M_PROLOG
 	M_ASSERT( _streamRef );
 	M_ASSERT( _mode == MODE::INFLATE );
@@ -236,7 +236,7 @@ void HZipStream::do_flush( void ) {
 	M_PROLOG
 	M_ASSERT( _streamRef );
 	if ( ( _mode == MODE::DEFLATE ) && ! _flushed )
-		do_write( NULL, 0 );
+		do_write( nullptr, 0 );
 	_flushed = true;
 	_streamRef->flush();
 	return;

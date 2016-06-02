@@ -672,7 +672,7 @@ bool HExpression::terminal_production( tree_t::node_t node_ ) {
 		++ digits;
 	}
 	if ( digits > 0 ) {
-		double long value( ::strtold( _formula.raw() + offset, NULL ) );
+		double long value( ::strtold( _formula.raw() + offset, nullptr ) );
 		_constantsPool.push_back( value );
 		/* We save variables as positive indexes and constants as negative
 		 * indexes, positive and negative 0 index would conflict so
@@ -732,7 +732,7 @@ double long& HExpression::operator[]( int index_ ) {
 	M_PROLOG
 	if ( ( index_ >= 'a' ) && ( index_ <= 'z' ) )
 		index_ = ( index_ - 'a' ) + 'A';
-	double long* val = NULL;
+	double long* val = nullptr;
 	if ( ( index_ >= 0 ) && ( index_ < MAX_VARIABLE_COUNT ) ) {
 		val = &_variables[ index_ ];
 	} else if ( ( index_ >= 'A' ) && ( index_ <= 'Z' ) ) {
@@ -781,7 +781,7 @@ char const* HExpression::get_error( void ) const {
 			M_THROW ( _( "enknown error code" ), _error );
 		break;
 	}
-	return ( NULL );
+	return ( nullptr );
 	M_EPILOG
 }
 

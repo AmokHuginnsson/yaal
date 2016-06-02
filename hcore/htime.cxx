@@ -103,7 +103,7 @@ HTime::HTime( TZ tz_, i64_t time_, char const* format_ )
 	: _value( time_ ), _broken(), _tz( tz_ ), _format( format_ ), _cache() {
 	M_PROLOG
 	time_t t( static_cast<time_t>( yaal_epoch_to_unix_epoch( _value ) ) );
-	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != nullptr );
 	mkgmtime( &_broken );
 	return;
 	M_EPILOG
@@ -134,7 +134,7 @@ HTime& HTime::set( i64_t time_ ) {
 	M_PROLOG
 	time_t t( static_cast<time_t>( yaal_epoch_to_unix_epoch( _value = time_ ) ) );
 	/* In Visual Studio C++ localtime_r is a macro and cannot be prefixed with ::. */
-	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != nullptr );
 	mkgmtime( &_broken );
 	return ( *this );
 	M_EPILOG
@@ -144,7 +144,7 @@ HTime& HTime::set_tz( TZ tz_ ) {
 	M_PROLOG
 	_tz = tz_;
 	time_t t( static_cast<time_t>( yaal_epoch_to_unix_epoch( _value ) ) );
-	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != nullptr );
 	mkgmtime( &_broken );
 	return ( *this );
 	M_EPILOG
@@ -152,9 +152,9 @@ HTime& HTime::set_tz( TZ tz_ ) {
 
 HTime& HTime::set_now( void ) {
 	M_PROLOG
-	time_t t( ::time( NULL ) );
+	time_t t( ::time( nullptr ) );
 	_value = unix_epoch_to_yaal_epoch( t );
-	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != nullptr );
 	mkgmtime( &_broken );
 	return ( *this );
 	M_EPILOG
@@ -309,7 +309,7 @@ HTime& HTime::mod_month( int mod_ ) {
 HTime& HTime::mod_day( int mod_ ) {
 	_value += ( mod_ * HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE );
 	time_t t( static_cast<time_t>( yaal_epoch_to_unix_epoch( _value ) ) );
-	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != nullptr );
 	mkgmtime( &_broken );
 	return ( *this );
 }
@@ -317,7 +317,7 @@ HTime& HTime::mod_day( int mod_ ) {
 HTime& HTime::mod_hour( int mod_ ) {
 	_value += ( mod_ * MINUTES_IN_HOUR * SECONDS_IN_MINUTE );
 	time_t t( static_cast<time_t>( yaal_epoch_to_unix_epoch( _value ) ) );
-	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != nullptr );
 	mkgmtime( &_broken );
 	return ( *this );
 }
@@ -325,7 +325,7 @@ HTime& HTime::mod_hour( int mod_ ) {
 HTime& HTime::mod_minute( int mod_ ) {
 	_value += ( mod_ * SECONDS_IN_MINUTE );
 	time_t t( static_cast<time_t>( yaal_epoch_to_unix_epoch( _value ) ) );
-	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != nullptr );
 	mkgmtime( &_broken );
 	return ( *this );
 }
@@ -333,7 +333,7 @@ HTime& HTime::mod_minute( int mod_ ) {
 HTime& HTime::mod_second( int mod_ ) {
 	_value += mod_;
 	time_t t( static_cast<time_t>( yaal_epoch_to_unix_epoch( _value ) ) );
-	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != nullptr );
 	mkgmtime( &_broken );
 	return ( *this );
 }
@@ -370,7 +370,7 @@ HTime& HTime::operator -= ( HTime const& time_ ) {
 #else
 	time_t t( static_cast<time_t>( _value ) );
 #endif
-	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != nullptr );
 	mkgmtime( &_broken );
 	return ( *this );
 	M_EPILOG
@@ -388,7 +388,7 @@ HTime& HTime::operator += ( HTime const& time_ ) {
 	M_PROLOG
 	_value += time_._value;
 	time_t t( static_cast<time_t>( yaal_epoch_to_unix_epoch( _value ) ) );
-	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != nullptr );
 	mkgmtime( &_broken );
 	return ( *this );
 	M_EPILOG
@@ -443,7 +443,7 @@ HString HTime::to_string( HString const& format_ ) const {
 	HString const& format( ! format_.is_empty() ? format_ : _format );
 #ifdef HAVE_SMART_STRFTIME
 	static int const MIN_TIME_STRING_LENGTH( 32 );
-	int long size( static_cast<int long>( ::strftime( NULL, 1024, format.raw(), &_broken ) + 1 ) );
+	int long size( static_cast<int long>( ::strftime( nullptr, 1024, format.raw(), &_broken ) + 1 ) );
 	if ( size < 2 )
 		M_THROW( "bad format", errno );
 	_cache.realloc( max<int long>( size, MIN_TIME_STRING_LENGTH ) );

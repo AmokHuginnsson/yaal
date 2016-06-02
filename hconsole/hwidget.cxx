@@ -103,7 +103,7 @@ HWidget::~HWidget( void ) {
 #ifdef __DEBUGGER_BABUNI__
 	log << "destroing widget: " << _label << endl;
 #endif /* __DEBUGGER_BABUNI__ */
-	_window = NULL;
+	_window = nullptr;
 	return;
 	M_DESTRUCTOR_EPILOG
 }

@@ -81,8 +81,8 @@ struct OMySQLResult {
 	MYSQL_ROW _row;
 	bool _randomAccess;
 	OMySQLResult( ODBLink& link_ )
-		: _link( link_ ), _useCount( 1 ), _statement( NULL ), _params(),
-		_results(), _fields(), _buffer(), _result( NULL ),
+		: _link( link_ ), _useCount( 1 ), _statement( nullptr ), _params(),
+		_results(), _fields(), _buffer(), _result( nullptr ),
 		_row(), _randomAccess( false ) {
 		return;
 	}
@@ -99,7 +99,7 @@ M_EXPORT_SYMBOL void driver_init( void );
 M_EXPORT_SYMBOL void driver_init( void ) {
 	M_PROLOG
 	log << "Initializing MySQL driver." << endl;
-	M_ENSURE( mysql_library_init( 0, NULL, NULL ) == 0 );
+	M_ENSURE( mysql_library_init( 0, nullptr, nullptr ) == 0 );
 	return;
 	M_EPILOG
 }
@@ -117,14 +117,14 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink&, yaal::hcore::HString const&,
 		yaal::hcore::HString const&, yaal::hcore::HString const&, yaal::hcore::HString const& );
 M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& dataBase_,
 		yaal::hcore::HString const& login_, yaal::hcore::HString const& password_, yaal::hcore::HString const& ) {
-	MYSQL* mySQL( NULL );
-	dbLink_._conn = mySQL = mysql_init( NULL );
+	MYSQL* mySQL( nullptr );
+	dbLink_._conn = mySQL = mysql_init( nullptr );
 	if ( mySQL ) {
 		int unsigned protocol( MYSQL_PROTOCOL_SOCKET );
 		if ( ! ( mysql_options( mySQL, MYSQL_OPT_PROTOCOL, &protocol ) || mysql_options( mySQL, MYSQL_SET_CHARSET_NAME, _clientCharacterSet_.raw() ) ) ) {
-			if ( mysql_real_connect( mySQL, NULL,
+			if ( mysql_real_connect( mySQL, nullptr,
 						login_.raw(), password_.raw(), dataBase_.raw(),
-						0, NULL, CLIENT_IGNORE_SPACE | CLIENT_IGNORE_SIGPIPE ) )
+						0, nullptr, CLIENT_IGNORE_SPACE | CLIENT_IGNORE_SIGPIPE ) )
 				dbLink_._valid = true;
 		}
 	}
@@ -298,7 +298,7 @@ M_EXPORT_SYMBOL bool rs_next( void* data_ ) {
 M_EXPORT_SYMBOL char const* rs_get_field( void*, int );
 M_EXPORT_SYMBOL char const* rs_get_field( void* data_, int field_ ) {
 	OMySQLResult* pr( static_cast<OMySQLResult*>( data_ ) );
-	return ( pr->_fields[field_]._isNull ? NULL : static_cast<char const*>( pr->_results[field_].buffer ) );
+	return ( pr->_fields[field_]._isNull ? nullptr : static_cast<char const*>( pr->_results[field_].buffer ) );
 }
 
 M_EXPORT_SYMBOL int rs_fields_count( void* );
@@ -325,7 +325,7 @@ M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 
 M_EXPORT_SYMBOL char const* rs_column_name( void*, int );
 M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ ) {
-	MYSQL_FIELD* field = NULL;
+	MYSQL_FIELD* field = nullptr;
 	field = mysql_fetch_field_direct( static_cast<OMySQLResult*>( dataR_ )->_result, static_cast<int unsigned>( field_ ) );
 	return ( field->name );
 }
@@ -349,7 +349,7 @@ HMySQLInitDeinit::HMySQLInitDeinit( void ) {
 		.recipient( _clientCharacterSet_ )
 		.argument_name( "name" )
 	);
-	yaal_options().process_rc_file( "yaal", "mysql", NULL );
+	yaal_options().process_rc_file( "yaal", "mysql", nullptr );
 #if defined( HAVE_DECL_MYSQL_AUTODETECT_CHARSET_NAME ) && ( HAVE_DECL_MYSQL_AUTODETECT_CHARSET_NAME == 1 )
 	if ( _clientCharacterSet_ == AUTODETECT_CHARSET ) {
 		_clientCharacterSet_ = MYSQL_AUTODETECT_CHARSET_NAME;

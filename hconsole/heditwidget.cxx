@@ -45,12 +45,12 @@ namespace yaal {
 
 namespace hconsole {
 
-char const* const _maskLetters_  = "^[a-zA-Z±°Ê∆Í ≥£Ò—Û”∂¶º¨øØ]*$";
-char const* const _maskDigits_   = "^[0-9]*$";
-char const* const _maskAlpha_    = "^[a-zA-Z0-9]*$";
-char const* const _maskExtended_ = "^[0-9a-zA-Z±°Ê∆Í ≥£Ò—Û”∂¶º¨øØ\\.\\(\\) -]*$";
-char const* const _maskLoose_    = ".*";
-char const* const _maskDefault_  = _maskLetters_;
+char const _maskLetters_[]      = "^[a-zA-Z±°Ê∆Í ≥£Ò—Û”∂¶º¨øØ]*$";
+char const _maskDigits_[]       = "^[0-9]*$";
+char const _maskAlpha_[]        = "^[a-zA-Z0-9]*$";
+char const _maskExtended_[]     = "^[0-9a-zA-Z±°Ê∆Í ≥£Ò—Û”∂¶º¨øØ\\.\\(\\) -]*$";
+char const _maskLoose_[]        = ".*";
+char const* const _maskDefault_ = _maskLetters_;
 
 HEditWidget::HEditWidget( HWindow* parent_,
 		int row_, int column_, int height_, int width_,
@@ -629,15 +629,15 @@ void HEditWidgetAttributes::do_apply( HWidget& widget_ ) const {
 	HEditWidget* widget( dynamic_cast<HEditWidget*>( &widget_ ) );
 	if ( widget ) {
 		widget->set_bits(
-				_maxStringSizeSet   ? &_maxStringSize   : NULL,
-				_textSet            ? &_text            : NULL,
-				_maskSet            ? &_mask            : NULL,
-				_replaceSet         ? &_replace         : NULL,
-				_multiLineSet       ? &_multiLine       : NULL,
-				_readOnlySet        ? &_readOnly        : NULL,
-				_rightAlignedSet    ? &_rightAligned    : NULL,
-				_passwordSet        ? &_password        : NULL,
-				_maxHistoryLevelSet ? &_maxHistoryLevel : NULL
+				_maxStringSizeSet   ? &_maxStringSize   : nullptr,
+				_textSet            ? &_text            : nullptr,
+				_maskSet            ? &_mask            : nullptr,
+				_replaceSet         ? &_replace         : nullptr,
+				_multiLineSet       ? &_multiLine       : nullptr,
+				_readOnlySet        ? &_readOnly        : nullptr,
+				_rightAlignedSet    ? &_rightAligned    : nullptr,
+				_passwordSet        ? &_password        : nullptr,
+				_maxHistoryLevelSet ? &_maxHistoryLevel : nullptr
 		);
 	}
 	HWidgetAttributes::do_apply( widget_ );

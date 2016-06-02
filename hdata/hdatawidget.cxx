@@ -42,7 +42,7 @@ namespace yaal {
 namespace hdata {
 
 HDataWidget::HDataWidget( void )
-	: HWidget( NULL, 0, 0, 0, 0, hcore::HString() ),
+	: HWidget( nullptr, 0, 0, 0, 0, hcore::HString() ),
 	_crud(),
 	_viewQuery() {
 	M_PROLOG

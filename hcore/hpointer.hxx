@@ -545,7 +545,7 @@ public:
 		return ( this->_object == static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) );
 	}
 	template<typename alien_t>
-	bool operator == ( alien_t const* const pointer_ ) const {
+	bool operator == ( alien_t const* pointer_ ) const {
 		return ( this->_object == pointer_ );
 	}
 	template<typename alien_t>
@@ -554,7 +554,7 @@ public:
 		return ( this->_object != static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) );
 	}
 	template<typename alien_t>
-	bool operator != ( alien_t const* const pointer_ ) const {
+	bool operator != ( alien_t const* pointer_ ) const {
 		return ( this->_object != pointer_ );
 	}
 
@@ -564,7 +564,7 @@ public:
 		return ( this->_object < static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) );
 	}
 	template<typename alien_t>
-	bool operator < ( alien_t const* const pointer_ ) const {
+	bool operator < ( alien_t const* pointer_ ) const {
 		return ( this->_object < pointer_ );
 	}
 	template<typename alien_t>
@@ -573,7 +573,7 @@ public:
 		return ( this->_object > static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) );
 	}
 	template<typename alien_t>
-	bool operator > ( alien_t const* const pointer_ ) const {
+	bool operator > ( alien_t const* pointer_ ) const {
 		return ( this->_object > pointer_ );
 	}
 
@@ -583,7 +583,7 @@ public:
 		return ( this->_object <= static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) );
 	}
 	template<typename alien_t>
-	bool operator <= ( alien_t const* const pointer_ ) const {
+	bool operator <= ( alien_t const* pointer_ ) const {
 		return ( this->_object <= pointer_ );
 	}
 	template<typename alien_t>
@@ -592,7 +592,7 @@ public:
 		return ( this->_object >= static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) );
 	}
 	template<typename alien_t>
-	bool operator >= ( alien_t const* const pointer_ ) const {
+	bool operator >= ( alien_t const* pointer_ ) const {
 		return ( this->_object >= pointer_ );
 	}
 
@@ -726,12 +726,12 @@ protected:
 };
 
 template<typename alien_t, typename tType>
-bool operator == ( alien_t const* const pointer_, HPointer<tType> const& smartPointer_ ) {
+bool operator == ( alien_t const* pointer_, HPointer<tType> const& smartPointer_ ) {
 	return ( smartPointer_ == pointer_ );
 }
 
 template<typename alien_t, typename tType>
-bool operator != ( alien_t const* const pointer_, HPointer<tType> const& smartPointer_ ) {
+bool operator != ( alien_t const* pointer_, HPointer<tType> const& smartPointer_ ) {
 	return ( smartPointer_ != pointer_ );
 }
 

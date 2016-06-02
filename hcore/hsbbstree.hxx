@@ -222,14 +222,14 @@ public:
 		return ( HIterator( this, leftmost() ) );
 	}
 	HIterator end( void ) const {
-		return ( HIterator( this, NULL ) );
+		return ( HIterator( this, nullptr ) );
 	}
 	void clear( void ) {
 		M_PROLOG
 		if ( _root ) {
 			delete_node( static_cast<HNode*>( _root ) );
 		}
-		_root = NULL;
+		_root = nullptr;
 		_size = 0;
 		M_EPILOG
 	}
@@ -374,11 +374,11 @@ private:
 		if ( node_->_left ) {
 			delete_node( static_cast<HNode*>( node_->_left ) );
 		}
-		node_->_left = NULL;
+		node_->_left = nullptr;
 		if ( node_->_right ) {
 			delete_node( static_cast<HNode*>( node_->_right ) );
 		}
-		node_->_right = NULL;
+		node_->_right = nullptr;
 		M_SAFE( node_->~HNode() );
 		_allocator.deallocate( node_, 1 );
 		M_EPILOG
@@ -394,7 +394,7 @@ class HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::HIterator {
 	HAbstractNode* _current;
 public:
 	HIterator( void )
-		: _owner( NULL ), _current( NULL ) {
+		: _owner( nullptr ), _current( nullptr ) {
 		return;
 	}
 	HIterator( HIterator const & iterator_ )
@@ -440,8 +440,9 @@ public:
 	}
 private:
 	friend class HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>;
-	explicit HIterator( owner_t const* owner_, HSBBSTreeBase::HAbstractNode* const node_ )
-		: _owner( owner_ ), _current( node_ ) {
+	explicit HIterator( owner_t const* owner_, HSBBSTreeBase::HAbstractNode* node_ )
+		: _owner( owner_ )
+		, _current( node_ ) {
 		return;
 	}
 };
@@ -473,7 +474,7 @@ HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::insert_impl( construc
 			static_cast<HNode*>( _root )->_color = HAbstractNode::BLACK;
 		}
 	}
-	M_ASSERT( ( ! _root ) || ( static_cast<HNode*>( _root )->_parent == NULL ) );
+	M_ASSERT( ( ! _root ) || ( static_cast<HNode*>( _root )->_parent == nullptr ) );
 	M_ASSERT( ( ! _root ) || ( static_cast<HNode*>( _root )->_color == HAbstractNode::BLACK ) );
 	return ( make_pair( HIterator( this, node ), ! existed ) );
 	M_EPILOG
@@ -483,7 +484,7 @@ template<typename key_value_t, typename compare_t, typename key_get_t, typename 
 typename HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::HIterator
 HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::lower_bound( key_type const& key_ ) const {
 	M_PROLOG
-	HIterator it( this, NULL );
+	HIterator it( this, nullptr );
 	if ( _root ) {
 		hint_t hint( find_node( key_, &_root ) );
 		if ( *(hint.first) ) {
@@ -503,7 +504,7 @@ template<typename key_value_t, typename compare_t, typename key_get_t, typename 
 typename HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::HIterator
 HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::upper_bound( key_type const& key_ ) const {
 	M_PROLOG
-	HIterator it( this, NULL );
+	HIterator it( this, nullptr );
 	if ( _root ) {
 		hint_t hint( find_node( key_, &_root ) );
 		if ( *(hint.first) ) {

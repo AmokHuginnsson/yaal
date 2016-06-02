@@ -74,8 +74,8 @@ private:
 	void init( void );
 	void cleanup( void );
 	int long prepare_data( void );
-	virtual int long do_write( void const* const, int long ) override;
-	virtual int long do_read( void* const, int long ) override;
+	virtual int long do_write( void const*, int long ) override;
+	virtual int long do_read( void*, int long ) override;
 	virtual void do_flush( void ) override;
 	virtual bool do_is_valid( void ) const override;
 	virtual POLL_TYPE do_poll_type( void ) const override;

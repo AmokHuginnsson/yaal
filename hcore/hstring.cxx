@@ -60,9 +60,9 @@ enum {
 /*! \brief HString class helpers, utility functions.
  */
 char* strrnpbrk( char const*, char const*, int long );
-int long strrnspn( char const* const, char const*, int long );
-int long kmpsearch( char const* const, int long, char const*, int long );
-int long kmpcasesearch( char const* const, int long, char const* const, int long );
+int long strrnspn( char const*, char const*, int long );
+int long kmpsearch( char const*, int long, char const*, int long );
+int long kmpcasesearch( char const*, int long, char const*, int long );
 
 }
 
@@ -219,7 +219,7 @@ void HString::reserve( int long preallocate_ ) {
 	M_EPILOG
 }
 
-HString::HString( char const* const str_ )
+HString::HString( char const* str_ )
 	: _len() {
 	M_PROLOG
 	if ( str_ ) {
@@ -256,7 +256,7 @@ HString::HString( iterator first_, iterator last_ )
 	M_EPILOG
 }
 
-HString::HString( char const* const array_, int long size_ )
+HString::HString( char const* array_, int long size_ )
 	: _len() {
 	M_PROLOG
 	if ( array_ ) {
@@ -400,7 +400,7 @@ HString::HString( double long double_ )
 	M_EPILOG
 }
 
-HString::HString( void const* const ptrVoid_ )
+HString::HString( void const* ptrVoid_ )
 	: _len() {
 	M_PROLOG
 	/*
@@ -716,7 +716,7 @@ HString& HString::assign( HString const& str_, int long offset_, int long length
 	M_EPILOG
 }
 
-HString& HString::assign( char const* const data_, int long length_ ) {
+HString& HString::assign( char const* data_, int long length_ ) {
 	M_PROLOG
 	if ( ! data_ )
 		M_THROW( _errMsgHString_[ string_helper::NULL_PTR ], errno );
@@ -759,7 +759,7 @@ HString& HString::assign( int long size_, char fill_ ) {
 	M_EPILOG
 }
 
-HString& HString::format( char const* const format_, ... ) {
+HString& HString::format( char const* format_, ... ) {
 	M_PROLOG
 	::std::va_list ap;
 	va_start( ap, format_ );
@@ -774,7 +774,7 @@ HString& HString::format( char const* const format_, ... ) {
 	M_EPILOG
 }
 
-HString& HString::vformat( char const* const format_, void* ap_ ) {
+HString& HString::vformat( char const* format_, void* ap_ ) {
 	M_PROLOG
 	if ( ! format_ )
 		M_THROW( _errMsgHString_[ string_helper::NULL_PTR ], errno );
@@ -1150,7 +1150,7 @@ HString HString::right( int long fromEnd_ ) const {
 	M_EPILOG
 }
 
-HString& HString::trim_left( char const* const set_ ) {
+HString& HString::trim_left( char const* set_ ) {
 	M_PROLOG
 	int cut( 0 );
 	while ( MEM[ cut ] && ::std::strchr( set_, MEM[ cut ] ) )
@@ -1161,7 +1161,7 @@ HString& HString::trim_left( char const* const set_ ) {
 	M_EPILOG
 }
 
-HString& HString::trim_right( char const* const set_ ) {
+HString& HString::trim_right( char const* set_ ) {
 	M_PROLOG
 	int long cut( 0 );
 	while ( ( cut < GET_SIZE )
@@ -1176,7 +1176,7 @@ HString& HString::trim_right( char const* const set_ ) {
 	M_EPILOG
 }
 
-HString& HString::trim( char const* const set_ ) {
+HString& HString::trim( char const* set_ ) {
 	M_PROLOG
 	trim_left( set_ );
 	trim_right( set_ );
@@ -1379,7 +1379,7 @@ HString& HString::append( int long count_, char val_ ) {
 	M_EPILOG
 }
 
-HString& HString::append( char const* const buf_, int long len_ ) {
+HString& HString::append( char const* buf_, int long len_ ) {
 	M_PROLOG
 	M_ASSERT( len_ >= 0 );
 	if ( len_ > 0 ) {

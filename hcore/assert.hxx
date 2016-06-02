@@ -44,13 +44,13 @@ namespace hcore {
 class HFailedAssertion {
 	char const* _what;
 public:
-	HFailedAssertion( char const* const what_ ) : _what( what_ ) {}
+	HFailedAssertion( char const* what_ ) : _what( what_ ) {}
 	HFailedAssertion( HFailedAssertion const& fa ) = default;
 	HFailedAssertion& operator = ( HFailedAssertion const& ) = default;
 	char const* what( void ) const { return ( _what ); }
 };
 
-void failed_assert( char const* const, int, char const* const, char const* const ) __attribute__(( __noreturn__ ));
+void failed_assert( char const*, int, char const*, char const* ) __attribute__(( __noreturn__ ));
 
 }
 

@@ -61,7 +61,7 @@ private:
 	mutable yaal::hcore::HString _errorCause; /*!< cause of last error */
 public:
 	HPattern( void );
-	HPattern( char const* const );
+	HPattern( char const* );
 	HPattern( yaal::hcore::HString const& );
 	/*! \brief Construct pattern with regex rule.
 	 *
@@ -75,7 +75,7 @@ public:
 	 * pattern - regular expression pattern to match against.
 	 * externalFlags - set of external flags that may by set by pattern extra arguments.
 	 */
-	int parse( yaal::hcore::HString const& pattern, pluggable_flags_t* externalFlags = NULL );
+	int parse( yaal::hcore::HString const& pattern, pluggable_flags_t* externalFlags = nullptr );
 	/*! \brief Parse naked regular expression pattern and prepare for matches retrieval.
 	 *
 	 * pattern - regular expression pattern to match against.
@@ -91,7 +91,7 @@ public:
 	 * Parameter must be raw memory pointer for HMatchIterator returns
 	 * raw memory pointers to input string while dereferenced.
 	 */
-	HMatchIterator find( char const* const string_ ) const;
+	HMatchIterator find( char const* string_ ) const;
 	HMatchIterator find( yaal::hcore::HString const& string_ ) const;
 	HMatchIterator end( void ) const;
 	/*! \brief Tell if given string matches pattern.
@@ -101,8 +101,7 @@ public:
 	 */
 	bool matches( yaal::hcore::HString const& string_ ) const;
 private:
-	char const* matches( char const* const,
-			int long* const = NULL /* match length */ ) const;
+	char const* matches( char const*, int long* = nullptr /* match length */ ) const;
 	bool set_switch( char const, pluggable_flags_t* );
 	void save_state( void*, pluggable_flags_t* );
 	void restore_state( void*, pluggable_flags_t* );

@@ -81,15 +81,15 @@ private:
 		type_t _value; /*!< The Object itself. */
 		template<typename... arg_t>
 		explicit HElement( HElement* element_, trait::true_type const*, arg_t&&... arg_ )
-			: _previous( NULL ), _next( NULL ), _value( yaal::forward<arg_t>( arg_ )... ) {
+			: _previous( nullptr ), _next( nullptr ), _value( yaal::forward<arg_t>( arg_ )... ) {
 			connect( element_ );
 		}
 		explicit HElement( HElement* element_, trait::false_type const*, type_t const& value_ )
-			: _previous( NULL ), _next( NULL ), _value( value_ ) {
+			: _previous( nullptr ), _next( nullptr ), _value( value_ ) {
 			connect( element_ );
 		}
 		explicit HElement( HElement* element_, trait::false_type const*, type_t&& value_ )
-			: _previous( NULL ), _next( NULL ), _value( yaal::move( value_ ) ) {
+			: _previous( nullptr ), _next( nullptr ), _value( yaal::move( value_ ) ) {
 			connect( element_ );
 		}
 
@@ -139,14 +139,14 @@ public:
 	/*! \brief Create an empty list.
 	 */
 	HList( void )
-		: _allocator( allocator_type() ), _size( 0 ), _hook( NULL ) {
+		: _allocator( allocator_type() ), _size( 0 ), _hook( nullptr ) {
 		return;
 	}
 
 	/*! \brief Create an empty list.
 	 */
 	explicit HList( allocator_type const& allocator_ )
-		: _allocator( allocator_ ), _size( 0 ), _hook( NULL ) {
+		: _allocator( allocator_ ), _size( 0 ), _hook( nullptr ) {
 		return;
 	}
 
@@ -155,7 +155,7 @@ public:
 	 * \param count_ - number of element for newly created list.
 	 */
 	explicit HList( int long count_ )
-		: _allocator( allocator_type() ), _size( 0 ), _hook( NULL ) {
+		: _allocator( allocator_type() ), _size( 0 ), _hook( nullptr ) {
 		M_PROLOG
 		while ( count_ -- )
 			add_tail();
@@ -168,7 +168,7 @@ public:
 	 * \param count_ - number of element for newly created list.
 	 */
 	HList( int long count_, allocator_type const& allocator_ )
-		: _allocator( allocator_ ), _size( 0 ), _hook( NULL ) {
+		: _allocator( allocator_ ), _size( 0 ), _hook( nullptr ) {
 		M_PROLOG
 		while ( count_ -- )
 			add_tail();
@@ -183,7 +183,7 @@ public:
 	 * \param list_ - an existing list to copy.
 	 */
 	HList( HList const& list_ )
-		: _allocator( list_._allocator ), _size( 0 ), _hook( NULL ) {
+		: _allocator( list_._allocator ), _size( 0 ), _hook( nullptr ) {
 		M_PROLOG
 		( *this ) = list_;
 		return;
@@ -191,7 +191,7 @@ public:
 	}
 
 	HList( HList&& list_ )
-		: _allocator(), _size( 0 ), _hook( NULL ) {
+		: _allocator(), _size( 0 ), _hook( nullptr ) {
 		M_PROLOG
 		swap( list_ );
 		return;
@@ -199,7 +199,7 @@ public:
 	}
 
 	HList( HList const& list_, allocator_type const& allocator_ )
-		: _allocator( allocator_ ), _size( 0 ), _hook( NULL ) {
+		: _allocator( allocator_ ), _size( 0 ), _hook( nullptr ) {
 		M_PROLOG
 		( *this ) = list_;
 		return;
@@ -212,7 +212,7 @@ public:
 	 * \param value_ - list initializer value.
 	 */
 	HList( int long count_, type_t const& value_, allocator_type const& allocator_ = allocator_type() )
-		: _allocator( allocator_ ), _size( 0 ), _hook( NULL ) {
+		: _allocator( allocator_ ), _size( 0 ), _hook( nullptr ) {
 		M_PROLOG
 		resize( count_, value_ );
 		return;
@@ -226,7 +226,7 @@ public:
 	 */
 	template<typename iter_t>
 	HList( iter_t first_, iter_t last_, allocator_type const& allocator_ = allocator_type() )
-		: _allocator( allocator_ ), _size( 0 ), _hook( NULL ) {
+		: _allocator( allocator_ ), _size( 0 ), _hook( nullptr ) {
 		M_PROLOG
 		initialize( first_, last_, typename trait::add_pointer<typename is_integral<iter_t>::type>::type() );
 		return;
@@ -240,7 +240,7 @@ public:
 	 */
 	template<typename T>
 	HList( std::initializer_list<T> constants_ )
-		: _allocator(), _size( 0 ), _hook( NULL ) {
+		: _allocator(), _size( 0 ), _hook( nullptr ) {
 		M_PROLOG
 		initialize( constants_.begin(), constants_.end(), static_cast<trait::false_type*>( nullptr ) );
 		return;
@@ -317,13 +317,13 @@ public:
 		return ( iterator( this, _hook ) );
 	}
 	const_iterator end( void ) const {
-		return ( const_iterator( this, NULL ) );
+		return ( const_iterator( this, nullptr ) );
 	}
 	const_iterator cend( void ) const {
-		return ( const_iterator( this, NULL ) );
+		return ( const_iterator( this, nullptr ) );
 	}
 	iterator end( void ) {
-		return ( iterator( this, NULL ) );
+		return ( iterator( this, nullptr ) );
 	}
 	const_reverse_iterator rbegin( void ) const {
 		return ( end() );
@@ -350,7 +350,7 @@ public:
 			M_SAFE( element->~HElement() );
 			_allocator.deallocate( element, 1 );
 		}
-		_hook = NULL;
+		_hook = nullptr;
 		_size = 0;
 		return ;
 		M_EPILOG
@@ -394,7 +394,7 @@ public:
 	}
 	void assign( int long size_, type_t const& fillWith_ ) {
 		M_PROLOG
-		assign( size_, fillWith_, static_cast<trait::true_type const*>( NULL ) );
+		assign( size_, fillWith_, static_cast<trait::true_type const*>( nullptr ) );
 		return;
 		M_EPILOG
 	}
@@ -531,7 +531,7 @@ public:
 			_allocator.deallocate( element, 1 );
 			-- _size;
 			if ( _size == 0 )
-				_hook = NULL;
+				_hook = nullptr;
 		} else
 			M_THROW( _errMsgHList_[ ERROR::EMPTY ], errno );
 		return;
@@ -567,7 +567,7 @@ public:
 	}
 	void pop_front( void ) {
 		M_PROLOG
-		HElement* element = NULL;
+		HElement* element = nullptr;
 		if ( _size > 0 ) {
 			element = _hook;
 			_hook = _hook->_next;
@@ -577,7 +577,7 @@ public:
 		_allocator.deallocate( element, 1 );
 		-- _size;
 		if ( _size == 0 )
-			_hook = NULL;
+			_hook = nullptr;
 		return;
 		M_EPILOG
 	}
@@ -617,7 +617,7 @@ public:
 		_allocator.deallocate( element, 1 );
 		-- _size;
 		if ( _size == 0 )
-			_hook = NULL;
+			_hook = nullptr;
 		return ( it );
 		M_EPILOG
 	}
@@ -682,7 +682,7 @@ public:
 		M_ASSERT( it_._owner == this );
 		M_ENSURE( &list_ != this );
 		if ( list_._hook ) {
-			HElement* e( _hook ? ( it_._current ? it_._current : _hook ) : NULL );
+			HElement* e( _hook ? ( it_._current ? it_._current : _hook ) : nullptr );
 			if ( e ) {
 				HElement* p( e->_previous );
 				p->_next = list_._hook;
@@ -693,7 +693,7 @@ public:
 			if ( it_._current == _hook )
 				_hook = list_._hook;
 			_size += list_._size;
-			list_._hook = NULL;
+			list_._hook = nullptr;
 			list_._size = 0;
 		}
 		return;
@@ -704,10 +704,10 @@ public:
 		M_ASSERT( to_._owner == this );
 		M_ASSERT( from_._owner == &list_ );
 		M_ASSERT( from_._current && ( list_._size > 0 ) );
-		HElement* e( _hook ? ( to_._current ? to_._current : _hook ) : NULL );
+		HElement* e( _hook ? ( to_._current ? to_._current : _hook ) : nullptr );
 		if ( ( from_._current != to_._current ) && ( from_._current->_next != to_._current ) ) {
 			if ( from_._current == list_._hook )
-				list_._hook = ( list_._hook->_next != list_._hook ) ? list_._hook->_next : NULL;
+				list_._hook = ( list_._hook->_next != list_._hook ) ? list_._hook->_next : nullptr;
 			if ( to_._current == _hook )
 				_hook = from_._current;
 			from_._current->_previous->_next = from_._current->_next;
@@ -734,7 +734,7 @@ public:
 		M_ASSERT( last_._owner == &list_ );
 		M_ASSERT( first_._current || ( first_._current == last_._current ) );
 		if ( first_._current != last_._current ) {
-			HElement* to( _hook ? ( it_._current ? it_._current : _hook ) : NULL );
+			HElement* to( _hook ? ( it_._current ? it_._current : _hook ) : nullptr );
 			HElement* last( last_._current ? last_._current : list_._hook );
 			if ( ( ( last_._current != to ) || ( &list_ != this ) ) && ( last->_previous != to ) ) {
 				int long count( ( &list_ != this ) ? distance( first_, last_ ) : 0 );
@@ -922,7 +922,7 @@ private:
 				insert_sort( rightIt, right, comp_ );
 			else
 				merge_sort( rightIt, right, comp_ );
-			HElement* first = NULL;
+			HElement* first = nullptr;
 			++ stepsLeft;
 			while ( stepsLeft -- ) {
 				if ( comp_( rightIt->_value, left->_value ) ) {
@@ -1004,8 +1004,8 @@ private:
 	}
 	void exchange( HElement* left_, HElement* right_ ) {
 		M_PROLOG
-		HElement* next = NULL;
-		HElement* previous = NULL;
+		HElement* next = nullptr;
+		HElement* previous = nullptr;
 		if ( left_ == right_ )
 			return;
 		if ( left_ == _hook )
@@ -1049,7 +1049,7 @@ private:
 public:
 	typedef iterator_interface<const_qual_t, iterator_category::forward> base_type;
 	HIterator( void )
-		: base_type(), _owner( NULL ), _current( NULL ) {
+		: base_type(), _owner( nullptr ), _current( nullptr ) {
 		return;
 	}
 	HIterator( HIterator const& iterator_ )
@@ -1073,7 +1073,7 @@ public:
 		if ( _current ) {
 			_current = _current->_next;
 			if ( _current == _owner->_hook )
-				_current = NULL;
+				_current = nullptr;
 		} else {
 			_current = _owner->_hook;
 		}
@@ -1093,7 +1093,7 @@ public:
 		if ( _current ) {
 			_current = _current->_previous;
 			if ( _current == _owner->_hook->_previous ) {
-				_current = NULL;
+				_current = nullptr;
 			}
 		} else if ( _owner->_hook ) {
 			_current = _owner->_hook->_previous;
@@ -1139,9 +1139,10 @@ public:
 	}
 protected:
 	friend class HList<type_t, allocator_t>;
-	HIterator( owner_t const* const owner_,
-			HElement* const element_ )
-		: base_type(), _owner( owner_ ), _current( element_ ) {
+	HIterator( owner_t const* owner_, HElement* element_ )
+		: base_type()
+		, _owner( owner_ )
+		, _current( element_ ) {
 		return;
 	}
 };

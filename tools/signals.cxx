@@ -107,8 +107,8 @@ void reset_signal_low( int sigNo_ ) {
 	act.sa_handler = FWD_SIG_DFL;
 	M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
 	M_ENSURE( sigaddset_fwd( &act.sa_mask, sigNo_ ) == 0 );
-	M_ENSURE( sigaction( sigNo_, &act, NULL ) == 0 );
-	M_ENSURE( pthread_sigmask( SIG_UNBLOCK, &act.sa_mask, NULL ) == 0 );
+	M_ENSURE( sigaction( sigNo_, &act, nullptr ) == 0 );
+	M_ENSURE( pthread_sigmask( SIG_UNBLOCK, &act.sa_mask, nullptr ) == 0 );
 	return;
 	M_EPILOG
 }
@@ -121,8 +121,8 @@ void catch_signal_low( int sigNo_ ) {
 	act.sa_handler = dummy_signal_handler;
 	M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
 	M_ENSURE( sigaddset_fwd( &act.sa_mask, sigNo_ ) == 0 );
-	M_ENSURE( sigaction( sigNo_, &act, NULL ) == 0 );
-	M_ENSURE( pthread_sigmask( SIG_BLOCK, &act.sa_mask, NULL ) == 0 );
+	M_ENSURE( sigaction( sigNo_, &act, nullptr ) == 0 );
+	M_ENSURE( pthread_sigmask( SIG_BLOCK, &act.sa_mask, nullptr ) == 0 );
 
 	return;
 	M_EPILOG
@@ -230,7 +230,7 @@ void HSignalService::register_handler( int sigNo_, handler_t handler_, void cons
 		act.sa_handler = &HBaseSignalHandlers::signal_fatal_sync;
 		M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
 		M_ENSURE( sigaddset_fwd( &act.sa_mask, sigNo_ ) == 0 );
-		M_ENSURE( sigaction( sigNo_, &act, NULL ) == 0 );
+		M_ENSURE( sigaction( sigNo_, &act, nullptr ) == 0 );
 	}
 	return;
 	M_EPILOG

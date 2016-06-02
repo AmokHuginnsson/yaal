@@ -41,9 +41,9 @@ namespace hcore {
 
 extern FILE* ERROR_STREAM;
 
-void failed_assert( char const* const fileName_,
-		int line_, char const* const functionName_,
-		char const* const message_ ) {
+void failed_assert( char const* fileName_,
+		int line_, char const* functionName_,
+		char const* message_ ) {
 	M_PROLOG
 	hcore::log << "Failed assertion: " << message_ << " -> " << fileName_ << "(" << line_ << "): " << functionName_ << endl;
 	fprintf( ERROR_STREAM, "Failed assertion: `%s' at: %s:%d: %s\n",

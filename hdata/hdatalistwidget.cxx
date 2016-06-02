@@ -64,7 +64,7 @@ HDataListWidget::HDataListWidget(
 		int width_, yaal::hcore::HString const& title_, HWidgetAttributesInterface const& attr_ )
 	: HWidget( window_, row_, column_, height_, width_, title_ ),
 	HSearchableWidget( HSearchableWidgetAttributes().searchable( true ) ),
-	HListWidget( NULL, 0, 0, 0, 0, HString(), attr_ ),
+	HListWidget( nullptr, 0, 0, 0, 0, HString(), attr_ ),
 	HDataWidget(),
 	_table(),
 	_columns(),

@@ -104,7 +104,7 @@ private:
 	int _free; /*!< index of first HPoolBlock with free space. */
 public:
 	HPool( void )
-		: _poolBlocks( NULL )
+		: _poolBlocks( nullptr )
 		, _poolBlockCount( 0 )
 		, _poolBlockCapacity( 0 )
 		, _free( -1 ) {

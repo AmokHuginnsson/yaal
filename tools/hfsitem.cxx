@@ -205,9 +205,9 @@ HFSItem::HIterator HFSItem::end( void ) {
 	M_EPILOG
 }
 
-static int const DIRENT_SIZE_BASE( static_cast<int>( sizeof ( dirent ) - sizeof ( static_cast<dirent*>( NULL )->d_name ) ) + 1 );
+static int const DIRENT_SIZE_BASE( static_cast<int>( sizeof ( dirent ) - sizeof ( static_cast<dirent*>( nullptr )->d_name ) ) + 1 );
 
-inline int dirent_size( char const* const path_ ) {
+inline int dirent_size( char const* path_ ) {
 	int const nameMax( static_cast<int>( pathconf( path_, _PC_NAME_MAX ) ) );
 #ifndef NAME_MAX
 #define NAME_MAX _XOPEN_NAME_MAX
@@ -216,7 +216,7 @@ inline int dirent_size( char const* const path_ ) {
 	return ( DIRENT_SIZE );
 }
 
-HFSItem::HIterator::HIterator( HString const& path_ ) : _path( path_ ), _dir( NULL ), _dirEnt(), _item( "" ) {
+HFSItem::HIterator::HIterator( HString const& path_ ) : _path( path_ ), _dir( nullptr ), _dirEnt(), _item( "" ) {
 	M_PROLOG
 	if ( ! _path.is_empty() ) {
 		_dir = ::opendir( _path.raw() );
@@ -227,7 +227,7 @@ HFSItem::HIterator::HIterator( HString const& path_ ) : _path( path_ ), _dir( NU
 	M_EPILOG
 }
 
-HFSItem::HIterator::HIterator( HIterator const& it_ ) : _path( it_._path ), _dir( NULL ), _dirEnt(), _item( "" ) {
+HFSItem::HIterator::HIterator( HIterator const& it_ ) : _path( it_._path ), _dir( nullptr ), _dirEnt(), _item( "" ) {
 	M_PROLOG
 	if ( it_._dir ) {
 		_dir = ::opendir( _path.raw() );
@@ -291,7 +291,7 @@ bool HFSItem::HIterator::operator != ( HIterator const& it ) const {
 
 HFSItem::HIterator& HFSItem::HIterator::operator++( void ) {
 	M_ASSERT( _dir );
-	dirent* result( NULL );
+	dirent* result( nullptr );
 	do {
 		readdir_r( static_cast<DIR*>( _dir ), _dirEnt->get<dirent>(), &result );
 	} while ( result && ( ! ( ::memcmp( result->d_name, ".\0", 2 ) && ::memcmp( result->d_name, "..\0", 3 ) ) ) );
@@ -311,7 +311,7 @@ void HFSItem::HIterator::update( void ) {
 void HFSItem::HIterator::cleanup( void ) {
 	if ( _dir )
 		closedir( static_cast<DIR*>( _dir ) );
-	_dir = NULL;
+	_dir = nullptr;
 	_path = "";
 	return;
 }

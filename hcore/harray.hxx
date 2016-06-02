@@ -82,7 +82,7 @@ public:
 	/*! \brief Construct empty array object.
 	 */
 	HArray( void )
-		: _buf( NULL )
+		: _buf( nullptr )
 		, _size( 0 )
 		, _capacity( 0 ) {
 		return;
@@ -92,7 +92,7 @@ public:
 	 * \param allocator_ - external allocator that should be used for all array's allocations.
 	 */
 	explicit HArray( allocator_t const& )
-		: _buf( NULL )
+		: _buf( nullptr )
 		, _size( 0 )
 		, _capacity( 0 ) {
 		return;
@@ -104,7 +104,7 @@ public:
 	 * \param size_ - size for newly created array.
 	 */
 	explicit HArray( int long size_ )
-		: _buf( NULL )
+		: _buf( nullptr )
 		, _size( 0 )
 		, _capacity( 0 ) {
 		M_PROLOG
@@ -120,7 +120,7 @@ public:
 	 * \param allocator_ - external allocator that should be used for all array's allocations.
 	 */
 	HArray( int long size_, allocator_t const& )
-		: _buf( NULL )
+		: _buf( nullptr )
 		, _size( 0 )
 		, _capacity( 0 ) {
 		M_PROLOG
@@ -137,7 +137,7 @@ public:
 	 * \param allocator_ - external allocator that should be used for all array's allocations.
 	 */
 	HArray( int long size_, type_t const& fillWith_, allocator_t const& = allocator_t() )
-		: _buf( NULL )
+		: _buf( nullptr )
 		, _size( 0 )
 		, _capacity( 0 ) {
 		M_PROLOG
@@ -154,7 +154,7 @@ public:
 	 */
 	template<typename iterator_t>
 	HArray( iterator_t first, iterator_t last, allocator_t const& = allocator_t() )
-		: _buf( NULL )
+		: _buf( nullptr )
 		, _size( 0 )
 		, _capacity( 0 ) {
 		M_PROLOG
@@ -167,7 +167,7 @@ public:
 	 * \param constants_ - set of compile time constants to into into this array.
 	 */
 	HArray( std::initializer_list<value_type> constants_ )
-		: _buf( NULL )
+		: _buf( nullptr )
 		, _size( 0 )
 		, _capacity( 0 ) {
 		M_PROLOG
@@ -180,7 +180,7 @@ public:
 	 * \param arr_ - array object that this new array should be a copy of.
 	 */
 	HArray( HArray const& arr_ )
-		: _buf( NULL )
+		: _buf( nullptr )
 		, _size( 0 )
 		, _capacity( 0 ) {
 		M_PROLOG
@@ -198,7 +198,7 @@ public:
 	 * \param arr_ - array whose whole data should be transferred to this newly created array.
 	 */
 	HArray( HArray&& arr_ )
-		: _buf( NULL )
+		: _buf( nullptr )
 		, _size( 0 )
 		, _capacity( 0 ) {
 		M_PROLOG
@@ -212,7 +212,7 @@ public:
 	 * \param allocator_ - external allocator that should be used for all array's allocations.
 	 */
 	HArray( HArray const& arr_, allocator_t const& )
-		: _buf( NULL )
+		: _buf( nullptr )
 		, _size( 0 )
 		, _capacity( 0 ) {
 		M_PROLOG
@@ -432,13 +432,13 @@ public:
 	 */
 	type_t const* data( void ) const {
 		M_PROLOG
-		M_ASSERT( _buf != NULL );
+		M_ASSERT( _buf != nullptr );
 		return ( _buf );
 		M_EPILOG
 	}
 	type_t* data( void ) {
 		M_PROLOG
-		M_ASSERT( _buf != NULL );
+		M_ASSERT( _buf != nullptr );
 		return ( _buf );
 		M_EPILOG
 	}
@@ -794,7 +794,7 @@ public:
 	typedef iterator_interface<const_qual_t, iterator_category::random_access> base_type;
 	HIterator( void )
 		: base_type()
-		, _owner( NULL )
+		, _owner( nullptr )
 		, _index( 0 ) {
 		return;
 	}

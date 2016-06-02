@@ -44,7 +44,7 @@ HDataTreeWidget::HDataTreeWidget(
 		hconsole::HWidgetAttributesInterface const& attrs_ )
 	: HWidget( window_, row_, column_, height_,
 			width_, title_, attrs_ ),
-		HTreeWidget( NULL, 0, 0, 0, 0, hcore::HString(), attrs_ ),
+		HTreeWidget( nullptr, 0, 0, 0, 0, hcore::HString(), attrs_ ),
 		HDataWidget() {
 	M_PROLOG
 	return;

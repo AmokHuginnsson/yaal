@@ -1,6 +1,10 @@
 #ifndef YAAL_MSVCXX_FIX_HXX_INCLUDED
 #define YAAL_MSVCXX_FIX_HXX_INCLUDED 1
 
+#define HAVE_STRUCT_TIMESPEC 1
+
+#if 0
+
 #define CONCATENATE_DIRECT(s1, s2) s1##s2
 #define CONCATENATE(s1, s2) CONCATENATE_DIRECT(s1, s2)
 
@@ -22,8 +26,7 @@
 
 #define tmpfile tmpfile_windows
 
-/* It must be included before <features.h> from GnuWin32 */
-#include <typeinfo>
+#endif
 
 /* warning LNK4221 goes bye bye */
 namespace { char dummy_symbol_to_quiet_down_LNK4221_warning = 0; };

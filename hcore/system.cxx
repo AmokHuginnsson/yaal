@@ -112,7 +112,7 @@ int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, i
 		FWD_FD_SET( input_[ i ], &readers );
 	for ( int i( 0 ); i < outputCount_; ++ i )
 		FWD_FD_SET( output_[ i ], &writers );
-	timeval timeOut, * timeOutP = timeOut_ ? &timeOut : NULL;
+	timeval timeOut, * timeOutP = timeOut_ ? &timeOut : nullptr;
 	if ( timeOut_ ) {
 		timeOut.tv_usec = static_cast<suseconds_t>( ( *timeOut_ % 1000 ) * 1000 );
 		timeOut.tv_sec = *timeOut_ / 1000;
@@ -120,7 +120,7 @@ int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, i
 	int ret( 0 );
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	do {
-		ret = ::select( FD_SETSIZE, inputCount_ ? &readers : NULL, outputCount_ ? &writers : NULL, NULL, timeOutP );
+		ret = ::select( FD_SETSIZE, inputCount_ ? &readers : nullptr, outputCount_ ? &writers : nullptr, nullptr, timeOutP );
 	} while ( restartable_
 			&& ( ret == -1 )
 			&& ( errno == EINTR )
@@ -152,7 +152,7 @@ HString get_user_name( int uid_ ) {
 	if ( bufferSize <= 0 )
 		bufferSize = GETPW_R_SIZE;
 	HChunk buffer( bufferSize );
-	passwd* any( NULL );
+	passwd* any( nullptr );
 	M_ENSURE( ! getpwuid_r( static_cast<uid_t>( uid_ ), &accountInfo, buffer.get<char>(), static_cast<size_t>( bufferSize ), &any ) );
 	return ( any ? HString( accountInfo.pw_name ) : HString( uid_ ) );
 	M_EPILOG
@@ -165,7 +165,7 @@ HString get_group_name( int gid_ ) {
 	if ( bufferSize <= 0 )
 		bufferSize = GETGR_R_SIZE;
 	HChunk buffer( bufferSize );
-	group* any( NULL );
+	group* any( nullptr );
 	M_ENSURE( ! getgrgid_r( static_cast<gid_t>( gid_ ), &groupInfo, buffer.get<char>(), static_cast<size_t>( bufferSize ), &any ) );
 	return ( any ? HString( groupInfo.gr_name ) : HString( gid_ ) );
 	M_EPILOG
@@ -234,17 +234,17 @@ HResourceInfo get_memory_size_info( void ) {
 	int mib[] = { CTL_HW, HW_PAGESIZE };
 	int long pagesize( 0 );
 	size_t size( sizeof ( pagesize ) );
-	M_ENSURE( sysctl( mib, 2, &pagesize, &size, NULL, 0 ) == 0 );
+	M_ENSURE( sysctl( mib, 2, &pagesize, &size, nullptr, 0 ) == 0 );
 	mib[ 1 ] = HW_PHYSMEM;
 	int long physmem( 0 );
 	size = sizeof ( physmem );
-	M_ENSURE( sysctl( mib, 2, &physmem, &size, NULL, 0 ) == 0 );
+	M_ENSURE( sysctl( mib, 2, &physmem, &size, nullptr, 0 ) == 0 );
 	mib[ 0 ] = CTL_VM;
 	mib[ 1 ] = VM_TOTAL;
 	vmtotal vm;
 	::memset( &vm, 0, sizeof ( vm ) );
 	size = sizeof ( vmtotal );
-	M_ENSURE( sysctl( mib, 2, &vm, &size, NULL, 0 ) == 0 );
+	M_ENSURE( sysctl( mib, 2, &vm, &size, nullptr, 0 ) == 0 );
 	freeMemory = vm.t_free * pagesize;
 	totalMemory = physmem;
 #elif defined ( __HOST_OS_TYPE_SOLARIS__ ) /* #elif defined ( __HOST_OS_TYPE_FREEBSD__ ) #if defined ( __HOST_OS_TYPE_LINUX__ ) || defined ( __HOST_OS_TYPE_CYGWIN__ ) */
@@ -256,11 +256,11 @@ HResourceInfo get_memory_size_info( void ) {
 	int mib[] = { CTL_HW, HW_PAGESIZE };
 	int long pagesize( 0 );
 	size_t size( sizeof ( pagesize ) );
-	M_ENSURE( sysctl( mib, 2, &pagesize, &size, NULL, 0 ) == 0 );
+	M_ENSURE( sysctl( mib, 2, &pagesize, &size, nullptr, 0 ) == 0 );
 	mib[ 1 ] = HW_MEMSIZE;
 	int long physmem( 0 );
 	size = sizeof ( physmem );
-	M_ENSURE( sysctl( mib, 2, &physmem, &size, NULL, 0 ) == 0 );
+	M_ENSURE( sysctl( mib, 2, &physmem, &size, nullptr, 0 ) == 0 );
 	totalMemory = physmem;
 	mach_msg_type_number_t count = HOST_VM_INFO_COUNT_FWD;
 	vm_statistics_data_t vmstat;

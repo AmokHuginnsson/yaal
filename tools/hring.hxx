@@ -339,7 +339,7 @@ class HRing<type_t>::HIterator : public yaal::hcore::iterator_interface<const_qu
 public:
 	typedef yaal::hcore::iterator_interface<const_qual_t, yaal::hcore::iterator_category::random_access> base_type;
 	typedef type_t value_type;
-	HIterator( void ) : base_type(), _owner( NULL ), _index( 0 ) {}
+	HIterator( void ) : base_type(), _owner( nullptr ), _index( 0 ) {}
 	HIterator( HIterator const& it_ ) : base_type(), _owner( it_._owner ), _index( it_._index ) {}
 	template<typename other_const_qual_t>
 	HIterator( HIterator<other_const_qual_t> const& it_ ) : base_type(), _owner( it_._owner ), _index( it_._index ) {

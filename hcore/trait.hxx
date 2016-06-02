@@ -778,7 +778,7 @@ template<typename derived_t, typename base_t>
 struct is_kind_of {
 	static true_type calc( typename strip_reference<base_t>::type const* );
 	static false_type calc( ... );
-	static bool const value = sizeof ( calc( static_cast<typename strip_reference<derived_t>::type const*>( NULL ) ) ) == sizeof ( true_type );
+	static bool const value = sizeof ( calc( static_cast<typename strip_reference<derived_t>::type const*>( nullptr ) ) ) == sizeof ( true_type );
 };
 
 /*! \brief Interface preventing copying of objects.

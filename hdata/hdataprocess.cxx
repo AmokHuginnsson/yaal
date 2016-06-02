@@ -88,7 +88,7 @@ void dummy( void ) {}
 
 void HDataProcess::do_quit( void ) {
 	M_PROLOG
-	HDataWindow* window = NULL;
+	HDataWindow* window = nullptr;
 	if ( _windows->size() ) {
 		model_t::iterator it = _windows->begin();
 		if ( it != _windows->end() )
@@ -117,7 +117,7 @@ void HDataProcess::force_quit( void ) {
 
 void HDataProcess::do_close_window( void ) {
 	M_PROLOG
-	HDataWindow* window = NULL;
+	HDataWindow* window = nullptr;
 	if ( !! (*_foregroundWindow) ) {
 		window = dynamic_cast<HDataWindow*>( &*(*_foregroundWindow) );
 		if ( window && window->is_modified() ) {

@@ -37,7 +37,7 @@ namespace yaal {
 
 namespace tools {
 
-HPlugin::HPlugin( void ) : _handle( NULL ) {
+HPlugin::HPlugin( void ) : _handle( nullptr ) {
 }
 
 HPlugin::~HPlugin( void ) {
@@ -49,10 +49,10 @@ HPlugin::~HPlugin( void ) {
 
 void HPlugin::load( HString const& path_ ) {
 	M_PROLOG
-	_handle = dlopen( ! path_.is_empty() ? path_.raw() : NULL, RTLD_NOW | RTLD_GLOBAL );
+	_handle = dlopen( ! path_.is_empty() ? path_.raw() : nullptr, RTLD_NOW | RTLD_GLOBAL );
 	if ( _handle == reinterpret_cast<void const*>( -1 ) )
-		_handle = NULL;
-	M_ENSURE_EX( _handle != NULL, path_ );
+		_handle = nullptr;
+	M_ENSURE_EX( _handle != nullptr, path_ );
 	return;
 	M_EPILOG
 }
@@ -64,7 +64,7 @@ void HPlugin::unload( void ) {
 #else /* not __HOST_OS_TYPE_FREEBSD__ */
 	dlclose( _handle );
 #endif /* __HOST_OS_TYPE_FREEBSD__ */
-	_handle = NULL;
+	_handle = nullptr;
 	return;
 	M_EPILOG
 }
@@ -84,8 +84,8 @@ void* HPlugin::try_resolve( HString const& symbolName_ ) {
 void* HPlugin::resolve( HString const& symbolName_ ) {
 	M_PROLOG
 	M_ASSERT( _handle );
-	void* sym( NULL );
-	M_ENSURE_EX( ( sym = try_resolve( symbolName_ ) ) != NULL, symbolName_ );
+	void* sym( nullptr );
+	M_ENSURE_EX( ( sym = try_resolve( symbolName_ ) ) != nullptr, symbolName_ );
 	return ( sym );
 	M_EPILOG
 }

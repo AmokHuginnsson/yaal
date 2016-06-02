@@ -402,7 +402,7 @@ class HMultiMap<key_type_t, value_type_t, compare_t, allocator_t, storage_policy
 	value_iterator_t _minor;
 public:
 	typedef iterator_interface<typename multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor_t, iterator_category::forward> base_type;
-	HIterator( void ) : base_type(), _owner( NULL ), _major(), _minor() {}
+	HIterator( void ) : base_type(), _owner( nullptr ), _major(), _minor() {}
 	HIterator( HIterator const& it_ ) : base_type(), _owner( it_._owner ), _major( it_._major ), _minor( it_._minor ) {}
 	template<typename other_const_qual_t>
 	HIterator( HIterator<other_const_qual_t> const& it_ ) : base_type(), _owner( it_._owner ), _major( it_._major ), _minor( it_._minor ) {
@@ -474,9 +474,12 @@ public:
 	}
 private:
 	friend class HMultiMap<key_type, data_type, compare_type, allocator_t, storage_policy_t>;
-	explicit HIterator( multi_map_t const* const owner_,
-			key_iterator_t const& major,
-			value_iterator_t const& minor ) : base_type(), _owner( owner_ ), _major( major ), _minor( minor ) {};
+	explicit HIterator( multi_map_t const* owner_, key_iterator_t const& major, value_iterator_t const& minor )
+		: base_type()
+		, _owner( owner_ )
+		, _major( major )
+		, _minor( minor ) {
+	}
 };
 
 }

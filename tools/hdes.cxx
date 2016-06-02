@@ -149,7 +149,7 @@ void HDes::_des( u32_t* block_, int action_, int part_ ) {
 	colBmp.use( &col, static_cast<int long>( sizeof ( col ) * DES::BITS_IN_BYTE ) );
 	for ( int cycle( 0 ); cycle < DES::IKEYS_COUNT; ++ cycle ) {
 		buf[ 0 ] = 0;
-		u32_t* endKey( NULL );
+		u32_t* endKey( nullptr );
 		if ( action_ )
 			endKey = _IKeys[ part_ ][ cycle ];
 		else

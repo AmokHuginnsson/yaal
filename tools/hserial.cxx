@@ -368,7 +368,7 @@ void HSerial::wait_for_eot( void ) {
 	M_EPILOG
 }
 
-int HSerial::timed_read( void* const buffer_, int const size_,
+int HSerial::timed_read( void* buffer_, int const size_,
 		int timeOut_ ) {
 	M_PROLOG
 	if ( _fileDescriptor < 0 )

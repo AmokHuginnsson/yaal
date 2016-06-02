@@ -34,7 +34,7 @@ namespace yaal {
 namespace hcore {
 
 HSynchronizedStream::HSynchronizedStream( void )
-	: _mutex( HMutex::TYPE::RECURSIVE ), _streamOwned(), _streamRef( NULL ) {
+	: _mutex( HMutex::TYPE::RECURSIVE ), _streamOwned(), _streamRef( nullptr ) {
 	return;
 }
 
@@ -326,28 +326,28 @@ HStreamInterface& HSynchronizedStream::do_input( manipulator_t const& val_ ) {
 	M_EPILOG
 }
 
-int long HSynchronizedStream::do_read_until( yaal::hcore::HString& store, char const* const delim, bool strip ) {
+int long HSynchronizedStream::do_read_until( yaal::hcore::HString& store, char const* delim, bool strip ) {
 	M_PROLOG
 	HLock l( _mutex );
 	return ( HStreamInterface::do_read_until( store, delim, strip ) );
 	M_EPILOG
 }
 
-int long HSynchronizedStream::do_read_until_n( yaal::hcore::HString& store, int long maxcount, char const* const delim, bool strip ) {
+int long HSynchronizedStream::do_read_until_n( yaal::hcore::HString& store, int long maxcount, char const* delim, bool strip ) {
 	M_PROLOG
 	HLock l( _mutex );
 	return ( HStreamInterface::do_read_until_n( store, maxcount, delim, strip ) );
 	M_EPILOG
 }
 
-int long HSynchronizedStream::do_read_while( yaal::hcore::HString& store, char const* const acquire_ ) {
+int long HSynchronizedStream::do_read_while( yaal::hcore::HString& store, char const* acquire_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	return ( HStreamInterface::do_read_while( store, acquire_ ) );
 	M_EPILOG
 }
 
-int long HSynchronizedStream::do_read_while_n( yaal::hcore::HString& store, int long maxcount, char const* const acquire_ ) {
+int long HSynchronizedStream::do_read_while_n( yaal::hcore::HString& store, int long maxcount, char const* acquire_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	return ( HStreamInterface::do_read_while_n( store, maxcount, acquire_ ) );
@@ -473,14 +473,14 @@ HStreamInterface::ADJUST HSynchronizedStream::do_get_adjust( void ) const {
 	M_EPILOG
 }
 
-int long HSynchronizedStream::do_write( void const* const buf_, int long size_ ) {
+int long HSynchronizedStream::do_write( void const* buf_, int long size_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	return ( _streamRef ? _streamRef->write( buf_, size_ ) : 0 );
 	M_EPILOG
 }
 
-int long HSynchronizedStream::do_read( void* const buf_, int long size_ ) {
+int long HSynchronizedStream::do_read( void* buf_, int long size_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	return ( _streamRef ? _streamRef->read( buf_, size_ ) : 0 );

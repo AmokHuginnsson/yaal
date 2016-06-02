@@ -46,7 +46,7 @@ namespace hconsole {
 HStatusBarWidget::HStatusBarWidget( HWindow* parent_,
 		yaal::hcore::HString const& label_, int statusBarAttribute_ )
 	: HWidget( parent_, - 2, 0, 2, - 1, label_ ),
-	HEditWidget( NULL, 0, 0, 0, 0, HString(),
+	HEditWidget( nullptr, 0, 0, 0, 0, HString(),
 			HEditWidgetAttributes().mask( _maskLoose_ ).max_history_level( 255 ).label_decoration( HWidget::LABEL::DECORATION::EXPLICIT ) ),
 	_statusBarAttribute( 0 ), _promptLength( 0 ),
 	_mode( PROMPT::NORMAL ),

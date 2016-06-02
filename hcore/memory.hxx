@@ -90,7 +90,7 @@ struct aligned {
 			>::type
 		>::type
 	>::type aligner_type;
-	static_assert ( sizeof ( aligner_type ) <= SIZE, "invalid aligner_type" );
+	static_assert ( static_cast<int>( sizeof ( aligner_type ) ) <= SIZE, "invalid aligner_type" );
 	typedef aligned_storage<T, aligner_type, SIZE, static_cast<int>( SIZE - sizeof ( aligner_type ) )> type;
 };
 
@@ -131,7 +131,7 @@ inline tType* realloc( void* pointer_, int long count_ ) {
 template<typename tType>
 inline void free( tType& pointer_ ) throw() {
 	free0( pointer_ );
-	pointer_ = NULL;
+	pointer_ = nullptr;
 	return;
 }
 

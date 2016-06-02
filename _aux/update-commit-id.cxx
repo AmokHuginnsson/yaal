@@ -1,9 +1,14 @@
 #include <iostream>
+#include <string>
 #include <fstream>
 #include <stdexcept>
 #include <cstdio>
 #include <cstring>
 
+#ifdef __MSVCXX__
+#define popen _popen
+#else
+#endif
 using namespace std;
 
 string read_cmd( string const& cmd_ ) {

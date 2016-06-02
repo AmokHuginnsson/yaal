@@ -50,8 +50,8 @@ private:
 public:
 	HPipe( void );
 	~HPipe( void );
-	int long read( void* const, int long );
-	int long write( void const* const, int long );
+	int long read( void*, int long );
+	int long write( void const*, int long );
 	yaal::hcore::HStreamInterface::ptr_t const& in( void ) const;
 	yaal::hcore::HStreamInterface::ptr_t const& out( void ) const;
 };

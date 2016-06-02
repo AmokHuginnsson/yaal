@@ -363,7 +363,7 @@ public:
 				BITS::ALIGN align = BITS::ALIGN::LEFT,
 				TYPE type = TYPE::HSTRING,
 				yaal::hcore::HString const& format_ = hcore::HString(),
-				HWidget* associatedWidget = NULL );
+				HWidget* associatedWidget = nullptr );
 		virtual ~HColumnInfo( void );
 		TYPE type( void ) const {
 			return ( _type );
@@ -448,7 +448,7 @@ protected:
 	virtual void go_to_match_previous( void ) override;
 	bool get_text_for_cell( iterator_t&, int, TYPE, hcore::HFormat* = nullptr );
 	void update_children( void );
-	void draw_cell( iterator_t&, int, int, int, HColumnInfo const* const, bool );
+	void draw_cell( iterator_t&, int, int, int, HColumnInfo const*, bool );
 	void handle_key_page_up( void );
 	void handle_key_page_down( void );
 	void handle_key_up( void );
@@ -510,7 +510,7 @@ void HAsIsValueListModel<tType>::add_orderly( tType const& row_, int column_, li
 	M_PROLOG
 	list_widget_helper::OSortHelper helper =
 		{ column_, order_, _widget->get_column_type( column_ ),
-		0, size(), NULL };
+		0, size(), nullptr };
 	tools::collections::add_orderly( *_list, row_, CompareListWidgetItems<tType>( helper ) );
 	_widget->invalidate();
 	return;

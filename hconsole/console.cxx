@@ -294,7 +294,7 @@ HConsole::HConsole( void )
 	, _width( 0 )
 	, _height( 0 )
 	, _mouseDes( -1 )
-	, _window( NULL )
+	, _window( nullptr )
 	, _event() {
 	return;
 }
@@ -375,7 +375,7 @@ void HConsole::enter_curses( void ) {
 	M_ENSURE( scrollok( static_cast<WINDOW*>( _window ), false ) != ERR );
 	M_ENSURE( leaveok( static_cast<WINDOW*>( _window ), false ) != ERR );
 	immedok( static_cast<WINDOW*>( _window ), false );
-	M_ENSURE( fflush( NULL ) == 0 );
+	M_ENSURE( fflush( nullptr ) == 0 );
 	flushinp(); /* Always returns OK */
 	curs_set( CURSOR::INVISIBLE );
 	/* init color pairs */
@@ -395,7 +395,7 @@ void HConsole::enter_curses( void ) {
 		_useMouse_ = USE_MOUSE::NO;
 	}
 	if ( _useMouse_ != USE_MOUSE::NO ) {
-		if ( ::getenv( "DISPLAY" ) != NULL ) {
+		if ( ::getenv( "DISPLAY" ) != nullptr ) {
 			mouse::mouse_open = mouse::x_mouse_open;
 			mouse::mouse_get = mouse::x_mouse_get;
 			mouse::mouse_close = mouse::x_mouse_close;
@@ -442,7 +442,7 @@ void HConsole::leave_curses( void ) {
 	set_attr( COLORS::ATTR_NORMAL );
 	set_background( COLORS::ATTR_NORMAL );
 	M_ENSURE( ::wprintw( static_cast<WINDOW*>( _window ), "" ) != ERR );
-	M_ENSURE( ::fflush( NULL ) == 0 );
+	M_ENSURE( ::fflush( nullptr ) == 0 );
 	flushinp(); /* Always returns OK */
 	M_ENSURE( ::intrflush( static_cast<WINDOW*>( _window ), true ) != ERR );
 	leaveok( static_cast<WINDOW*>( _window ), false ); /* Always OK */
@@ -458,7 +458,7 @@ void HConsole::leave_curses( void ) {
 /*
 	if ( static_cast<WINDOW*>( _window ) )
 		delwin ( static_cast<WINDOW*>( static_cast<WINDOW*>( _window ) ) );
-	static_cast<WINDOW*>( _window ) = NULL;
+	static_cast<WINDOW*>( _window ) = nullptr;
 */
 	M_ENSURE( endwin() == OK );
 	_terminal_.flush();
@@ -745,7 +745,7 @@ int HConsole::get_key( void ) const {
 		M_THROW( "not in curses mode", errno );
 	}
 	M_ENSURE( noecho() != ERR );
-	M_ENSURE( ::fflush( NULL ) == 0 );
+	M_ENSURE( ::fflush( nullptr ) == 0 );
 	int key( wgetch( static_cast<WINDOW*>( _window ) ) );
 	M_ASSERT( key < KEY_CODES::SPECIAL_KEY );
 	if ( key == KEY_CODES::ESCAPE ) {
@@ -852,7 +852,7 @@ namespace {
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 template <typename T1, typename T2>
 inline void fwd_attr_get( WINDOW* win_, T1& val1_, T2& val2_, void* ) {
-	static_cast<void>( wattr_get( win_, val1_, val2_, NULL ) ); /* Ugly macro */
+	static_cast<void>( wattr_get( win_, val1_, val2_, nullptr ) ); /* Ugly macro */
 }
 #pragma GCC diagnostic error "-Wold-style-cast"
 }
@@ -865,10 +865,10 @@ char unsigned HConsole::get_attr( void ) const {
 	attr_t attr = 0;
 	NCURSES_ATTR_GET_SECOND_ARG_TYPE color = 0;
 	/* A workaround for compiler warning regarding
-	 * &attr and &color never being NULL. */
+	 * &attr and &color never being nullptr. */
 	attr_t* pa( &attr );
 	NCURSES_ATTR_GET_SECOND_ARG_TYPE* pc( &color );
-	fwd_attr_get( static_cast<WINDOW*>( _window ), pa, pc, NULL );
+	fwd_attr_get( static_cast<WINDOW*>( _window ), pa, pc, nullptr );
 	int attribute(
 		_brokenBrightBackground
 			? ATTR::decode_fix( static_cast<int>( color ), static_cast<int>( attr ) )
@@ -898,7 +898,7 @@ int HConsole::wait_for_user_input( int& key_, mouse::OMouse& mouse_, int timeOut
 	M_PROLOG
 	int fds[2] = { STDIN_FILENO, _mouseDes };
 	int long wait( timeOut_ );
-	int error( hcore::system::wait_for_io( fds, _mouseDes ? 2 : 1, NULL, 0, timeOut_ ? &wait : NULL ) );
+	int error( hcore::system::wait_for_io( fds, _mouseDes ? 2 : 1, nullptr, 0, timeOut_ ? &wait : nullptr ) );
 	int eventType( 0 );
 	if ( error > 0 ) {
 		if ( fds[0] != -1 ) {

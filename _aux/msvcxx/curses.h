@@ -6,7 +6,7 @@
 #undef MOUSE_MOVED
 #include <../include/curses.h>
 
-#define newscr NULL
+#define newscr nullptr
 #undef ungetch
 
 inline int ungetch( int ch_ )

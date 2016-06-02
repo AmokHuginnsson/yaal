@@ -241,7 +241,7 @@ void show_help( OOptionInfo const& info ) {
 	int cols( columns - ( longestLongLength + longestShortLength + 2 + 2 + 2 ) );
 	/* display each option description */
 	int const COUNT( static_cast<int>( opts.size() ) );
-	char const* description( NULL );
+	char const* description( nullptr );
 	for ( int i( 0 ); i < COUNT; ++ i ) {
 		HProgramOptionsHandler::HOption const& o = opts[ i ];
 		if ( ! ( is_byte( o.short_form() ) || ! o.long_form().is_empty() ) ) {
@@ -356,7 +356,7 @@ void show_help( OOptionInfo const& info ) {
 				cout << setw( static_cast<int>( longestLongLength + longestShortLength + 2 + 2 + 2 ) ) << "";
 			} else {
 				cout << desc << "\n";
-				description = NULL;
+				description = nullptr;
 				loop = false;
 			}
 		} while ( loop );
@@ -396,7 +396,7 @@ void dump_configuration( OOptionInfo const& info ) {
 "# example:\n"
 "# log_path ${HOME}/var/log/program.log\n\n";
 	HString desc;
-	char const* description = NULL;
+	char const* description = nullptr;
 	HProgramOptionsHandler::options_t const& opts = info._opt.get_options();
 	int const COUNT = static_cast<int>( opts.size() );
 	for ( int i = 0; i < COUNT; ++ i ) {
@@ -462,7 +462,7 @@ void dump_configuration( OOptionInfo const& info ) {
 				description = desc.raw();
 			} else {
 				cout << "# " << desc << "\n";
-				description = NULL;
+				description = nullptr;
 				loop = false;
 			}
 		} while ( loop );
@@ -497,7 +497,7 @@ void dump_configuration( OOptionInfo const& info ) {
 	M_EPILOG
 }
 
-void failure( int exitStatus_, char const* const format_, ... ) {
+void failure( int exitStatus_, char const* format_, ... ) {
 	M_PROLOG
 	HString msg;
 	va_list ap;

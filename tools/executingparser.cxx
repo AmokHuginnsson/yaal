@@ -209,7 +209,7 @@ HExecutingParser::HExecutingParser( executing_parser::HRuleBase const& rule_, IN
 	, _matched( false )
 	, _errorPosition( yaal::hcore::HString::npos )
 	, _errorMessages()
-	, _inputStart( NULL ) {
+	, _inputStart( nullptr ) {
 	M_PROLOG
 	if ( initMode_ == INIT_MODE::VERIFY_GRAMMAR ) {
 		sanitize();
@@ -278,7 +278,7 @@ bool HExecutingParser::parse( yaal::hcore::HString::const_iterator first_, yaal:
 	} else if ( _errorPosition == yaal::hcore::HString::npos ) {
 		report_error( it, "failed to consume input" );
 	}
-	_inputStart = NULL;
+	_inputStart = nullptr;
 	_matched = ( it == last_ );
 	return ( _matched );
 	M_EPILOG
@@ -2970,7 +2970,7 @@ yaal::hcore::HString::const_iterator HStringLiteral::do_parse( HExecutingParser*
 	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
 	yaal::hcore::HString::const_iterator scan( start );
 	bool valid( false );
-	yaal::hcore::HString::const_iterator from( NULL );
+	yaal::hcore::HString::const_iterator from( nullptr );
 	do {
 		if ( ! ( ( scan != last_ ) && ( *scan == '"' ) ) ) {
 			break;
@@ -3138,7 +3138,7 @@ yaal::hcore::HString::const_iterator HCharacterLiteral::do_parse( HExecutingPars
 	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
 	yaal::hcore::HString::const_iterator scan( start );
 	bool valid( false );
-	yaal::hcore::HString::const_iterator from( NULL );
+	yaal::hcore::HString::const_iterator from( nullptr );
 	do {
 		if ( ! ( ( scan != last_ ) && ( *scan == '\'' ) ) ) {
 			break;
@@ -4099,7 +4099,7 @@ void HRuleDescription::add( HNamedRule const* nr_ ) {
 
 yaal::hcore::HString const& HRuleDescription::make_name( HNamedRule const& nr_ ) {
 	M_PROLOG
-	hcore::HString const* name( NULL );
+	hcore::HString const* name( nullptr );
 
 	if ( ! nr_.name().is_empty() ) {
 		name = &nr_.name();
@@ -4112,7 +4112,7 @@ yaal::hcore::HString const& HRuleDescription::make_name( HNamedRule const& nr_ )
 
 yaal::hcore::HString const& HRuleDescription::make_name_auto( HRuleBase const* rule_ ) {
 	M_PROLOG
-	hcore::HString const* name( NULL );
+	hcore::HString const* name( nullptr );
 	automatic_names_t::const_iterator a( _automaticNames.find( rule_ ) );
 	if ( a != _automaticNames.end() ) {
 		name = &a->second;

@@ -52,7 +52,7 @@ HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::HYaalWorkAroundForNoForkOn
 	: _path( path_ ), _argv( argv_ ), _in( in_ ), _out( out_ ), _err( err_ ) {
 }
 
-char* xstrdup( char const* const str_ ) {
+char* xstrdup( char const* str_ ) {
 	char* str = 0;
 	if ( ! str_ ) {
 		::perror( "xstrdup: request to duplicate NULL pointer string" );

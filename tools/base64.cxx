@@ -221,7 +221,7 @@ void base64::decode( yaal::hcore::HStreamInterface& in, yaal::hcore::HStreamInte
 	HString decodebuf( BASE64LINELEN + 1, 0 );
 	int long pos( 0 );
 	while ( in.read_until_n( line, BUF_LEN ) ) {
-		char const* const ptr = line.raw();
+		char const* ptr = line.raw();
 		int const SIZE = static_cast<int>( line.get_length() );
 		for ( int i = 0; i < SIZE; ++ i, ++ pos ) {
 			char ch = ptr[ i ];

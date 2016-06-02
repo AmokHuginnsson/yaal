@@ -75,11 +75,11 @@ private:
 		HAtom* _next;
 		value_type _value;
 		HAtom( value_type const& value_ )
-			: _next( NULL ), _value( value_ ) {
+			: _next( nullptr ), _value( value_ ) {
 			return;
 		}
 		HAtom( value_type&& value_ )
-			: _next( NULL ), _value( yaal::move( value_ ) ) {
+			: _next( nullptr ), _value( yaal::move( value_ ) ) {
 			return;
 		}
 		HAtom( HAtom const& );
@@ -120,7 +120,7 @@ public:
 		int long _index;
 		typename owner_t::HAtom* _atom;
 	public:
-		HIterator( void ) : _owner( NULL ), _index( 0 ), _atom( NULL ) {}
+		HIterator( void ) : _owner( nullptr ), _index( 0 ), _atom( nullptr ) {}
 		HIterator( HIterator const& it_ )
 			: _owner( it_._owner ), _index( it_._index ),
 			_atom( it_._atom ) {
@@ -162,7 +162,7 @@ public:
 				while ( ( atom != _atom ) && ( atom->_next != _atom ) )
 					atom = atom->_next;
 				if ( atom == _atom )
-					_atom = NULL;
+					_atom = nullptr;
 				else
 					_atom = atom;
 			}
@@ -243,7 +243,7 @@ public:
 				M_SAFE( del->~HAtom() );
 				_allocator.deallocate( del, 1 );
 			}
-			buckets[ i ] = NULL;
+			buckets[ i ] = nullptr;
 		}
 		_size = 0;
 		return;
@@ -264,13 +264,13 @@ public:
 	}
 	HIterator begin( void ) const {
 		M_PROLOG
-		HIterator it( this, _prime, NULL );
+		HIterator it( this, _prime, nullptr );
 		return ( ++ it );
 		M_EPILOG
 	}
 	HIterator end( void ) const {
 		M_PROLOG
-		return ( HIterator( this, _prime, NULL ) );
+		return ( HIterator( this, _prime, nullptr ) );
 		M_EPILOG
 	}
 	void resize( int long );
@@ -278,7 +278,7 @@ public:
 		M_PROLOG
 		HAtom** buckets = _buckets.get<HAtom*>();
 		HAtom* atom( buckets[ it._index ] );
-		HAtom* ancestor( NULL );
+		HAtom* ancestor( nullptr );
 		M_ASSERT( atom );
 		while ( atom != it._atom ) {
 			ancestor = atom, atom = atom->_next;
@@ -346,7 +346,7 @@ typename HHashContainer<value_t, hasher_t, equal_key_t, get_key_t, allocator_t>:
 HHashContainer<value_t, hasher_t, equal_key_t, get_key_t, allocator_t>::find( key_type const& key_ ) const {
 	M_PROLOG
 	int long idx( 0 );
-	HAtom* atom( NULL );
+	HAtom* atom( nullptr );
 	if ( _prime ) {
 		idx = yaal::abs( _hasher( key_ ) ) % _prime;
 		atom = _buckets.get<HAtom*>()[ idx ];

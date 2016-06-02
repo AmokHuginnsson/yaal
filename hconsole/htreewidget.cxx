@@ -107,7 +107,7 @@ HTreeWidget::HTreeWidget( HWindow* parent_, int row_, int column_,
 		HWidgetAttributesInterface const& attr_,
 		HAbstractTreeModel::ptr_t const& model_ )
 	: HWidget( parent_, row_, column_, height_, width_, label_, attr_ ),
-	_model( model_ ), _view(), _selected( NULL ) {
+	_model( model_ ), _view(), _selected( nullptr ) {
 	M_PROLOG
 	attr_.apply( *this );
 	_model->register_listener( this );
@@ -307,7 +307,7 @@ bool HTreeWidget::do_click( tree_view_t::node_t node_, OMouse& mouse_ ) {
 
 HTreeWidget::tree_view_t::node_t HTreeWidget::previous( tree_view_t::node_t node, bool wrap ) {
 	M_PROLOG
-	tree_view_t::node_t p = NULL;
+	tree_view_t::node_t p = nullptr;
 	tree_view_t::node_t parent = node->get_parent();
 	if ( parent ) {
 		tree_view_t::HNode::iterator it;
@@ -333,7 +333,7 @@ HTreeWidget::tree_view_t::node_t HTreeWidget::previous( tree_view_t::node_t node
 HTreeWidget::tree_view_t::node_t HTreeWidget::next( tree_view_t::node_t node ) {
 	M_PROLOG
 	tree_view_t::node_t parent = node->get_parent();
-	tree_view_t::node_t n = NULL;
+	tree_view_t::node_t n = nullptr;
 	if ( parent ) {
 		tree_view_t::HNode::iterator it;
 		for ( it = parent->begin(); ( it != parent->end() ) && ( &*it != node ); ++ it )

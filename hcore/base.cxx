@@ -165,7 +165,7 @@ int long long unsigned lexical_cast( HString const& str_ ) {
 	M_PROLOG
 	char alternateForm[ MAX_VALID_INTEGER_LENGTH ];
 	HPair<int, char const*> preParsed( preparse_integer( str_, alternateForm ) );
-	return ( hcore::stoull_impl( preParsed.second, NULL, preParsed.first ) );
+	return ( hcore::stoull_impl( preParsed.second, nullptr, preParsed.first ) );
 	M_EPILOG
 }
 
@@ -199,7 +199,7 @@ int long long lexical_cast( HString const& str_ ) {
 	M_PROLOG
 	char alternateForm[ MAX_VALID_INTEGER_LENGTH ];
 	HPair<int, char const*> preParsed( preparse_integer( str_, alternateForm ) );
-	return ( hcore::stoll_impl( preParsed.second, NULL, preParsed.first ) );
+	return ( hcore::stoll_impl( preParsed.second, nullptr, preParsed.first ) );
 	M_EPILOG
 }
 

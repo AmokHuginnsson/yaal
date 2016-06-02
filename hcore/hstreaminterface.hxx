@@ -262,7 +262,7 @@ public:
 	}
 	int long read( void*, int long );
 	int long write( void const*, int long );
-	M_YAAL_HCORE_PUBLIC_API static char const* const eols;
+	M_YAAL_HCORE_PUBLIC_API static char const eols[];
 	/*! \brief Tell if given stream instance if a valid stream object.
 	 *
 	 * Note: Implementation is not a trivial forward.
@@ -449,7 +449,7 @@ class HStreamIterator {
 	mutable bool _inCache;
 public:
 	HStreamIterator( void )
-		: _stream( NULL ), _delim(), _valueCache(),
+		: _stream( nullptr ), _delim(), _valueCache(),
 		_skip( 0 ), _inCache( false ) {
 	}
 	explicit HStreamIterator( HStreamInterface& stream, delim_t const& delim = delim_t() )
@@ -521,7 +521,7 @@ private:
 		if ( _stream ) {
 			*_stream >> _valueCache;
 			if ( ! _stream->good() ) {
-				_stream = NULL;
+				_stream = nullptr;
 			} else {
 				_inCache = true;
 			}
