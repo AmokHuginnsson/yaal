@@ -126,8 +126,10 @@ bool HWindow::process_input( HKeyPressEvent const& keyPress_ ) {
 	if ( ! consumed ) {
 		consumed = process_input_with_handlers( keyPress_, _postprocessHandlers );
 	}
-	if ( ! _command.is_empty() )
+	if ( ! _command.is_empty() ) {
 		process_command();
+		consumed = _command.is_empty();
+	}
 	return ( consumed );
 	M_EPILOG
 }

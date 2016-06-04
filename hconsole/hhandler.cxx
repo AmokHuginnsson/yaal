@@ -56,10 +56,12 @@ int HHandler::register_preprocess_handler( int codeCount_, int const* codes_,
 		HANDLER_t HANDLER ) {
 	M_PROLOG
 	if ( codes_ ) {
-		for ( int ctr( 0 ); ctr < codeCount_; ++ ctr )
+		for ( int ctr( 0 ); ctr < codeCount_; ++ ctr ) {
 			_preprocessHandlers[ codes_ [ ctr ] ] = HANDLER;
-	} else
+		}
+	} else {
 		_preprocessHandlers[ codeCount_ ] = HANDLER;
+	}
 	return ( 0 );
 	M_EPILOG
 }
@@ -68,10 +70,12 @@ int HHandler::register_postprocess_handler( int codeCount_, int const* codes_,
 		HANDLER_t HANDLER ) {
 	M_PROLOG
 	if ( codes_ ) {
-		for ( int ctr( 0 ); ctr < codeCount_; ++ ctr )
+		for ( int ctr( 0 ); ctr < codeCount_; ++ ctr ) {
 			_postprocessHandlers[ codes_[ ctr ] ] = HANDLER;
-	} else
+		}
+	} else {
 		_postprocessHandlers[ codeCount_ ] = HANDLER;
+	}
 	return ( 0 );
 	M_EPILOG
 }
@@ -100,7 +104,7 @@ HString HHandler::process_command( void ) {
 	if ( ! _command.is_empty() ) {
 		command = HTokenizer( _command, " \t", HTokenizer::DELIMITED_BY_ANY_OF )[ 0 ];
 		if ( process_command( command ) ) {
-			_command = "";
+			_command.clear();
 		}
 	}
 	return ( _command );
