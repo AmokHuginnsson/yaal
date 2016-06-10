@@ -51,6 +51,8 @@ private:
 public:
 	HResource( HTUIProcess*, yaal::hcore::HString const& );
 	void load( void );
+	yaal::tools::xml::value_t get_value( yaal::hcore::HString const& ) const;
+	yaal::tools::xml::value_t get_attribute( yaal::hcore::HString const& ) const;
 private:
 	void build_sub_menu( yaal::tools::HXml::HConstNodeProxy const&, HMenuWidget::data_t::node_t );
 	void build_menu_item( yaal::tools::HXml::HConstNodeProxy const&, HMenuWidget::data_t::node_t );

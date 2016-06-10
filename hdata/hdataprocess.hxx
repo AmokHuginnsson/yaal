@@ -54,12 +54,12 @@ protected:
 public:
 	HDataProcess( void );
 	virtual ~HDataProcess( void );
-	void init_xrc( yaal::hcore::HString const&, yaal::hcore::HString const& );
 /* cppcheck-suppress functionConst */
 	dbwrapper::database_ptr_t data_base( void );
 protected:
 	virtual void do_quit( void ) override;
 	virtual void do_close_window( void ) override;
+	void do_init_xrc( yaal::hcore::HString const&, yaal::hcore::HString const& ) override;
 	void force_close_window( void );
 	void force_quit( void );
 private:

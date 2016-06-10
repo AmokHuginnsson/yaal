@@ -36,6 +36,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hplugin.hxx"
 #include "hconsole/hmainwindow.hxx"
 #include "dbwrapper/db_driver_loader.hxx"
+#include "dbwrapper/dbwrapper.hxx"
 #include "hdatawindow.hxx"
 
 using namespace yaal::hcore;
@@ -48,7 +49,8 @@ namespace yaal {
 namespace hdata {
 
 HDataProcess::HDataProcess( void )
-	: HTUIProcess(), _dataBase( HDataBase::get_connector() ) {
+	: HTUIProcess()
+	, _dataBase() {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -63,13 +65,20 @@ HDataProcess::~HDataProcess( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
-void HDataProcess::init_xrc(
+void HDataProcess::do_init_xrc(
 		yaal::hcore::HString const& processName_,
 		yaal::hcore::HString const& resource_ ) {
 	M_PROLOG
-	HTUIProcess::init_xrc( processName_, resource_ );
-	if ( dbwrapper::_dBDrivers_.is_empty() )
+	HTUIProcess::do_init_xrc( processName_, resource_ );
+	xml::value_t dsn( _resource->get_value( "/resource/dsn" ) );
+	if ( !! dsn ) {
+		_dataBase = dbwrapper::util::connect( *dsn );
+	} else {
+		_dataBase = HDataBase::get_connector();
+	}
+	if ( dbwrapper::_dBDrivers_.is_empty() ) {
 		M_THROW( "no database driver loaded", errno );
+	}
 	M_ASSERT( ( _foregroundWindow != HTUIProcess::cyclic_iterator() ) && ( !! (*_foregroundWindow) ) );
 	HMainWindow* mainWindow( dynamic_cast<HMainWindow*>( &*(*_foregroundWindow) ) );
 	M_ASSERT( mainWindow );

@@ -144,6 +144,32 @@ void HResource::create_window( yaal::hcore::HString const& id_ ) {
 	M_EPILOG
 }
 
+yaal::tools::xml::value_t HResource::get_value( yaal::hcore::HString const& path_ ) const {
+	M_PROLOG
+	HXml::HConstNodeSet ns( _xml.get_elements_by_path( path_ ) );
+	xml::value_t v;
+	if ( ! ns.is_empty() ) {
+		v = xml::try_node_val( ns[0] );
+	}
+	return ( v );
+	M_EPILOG
+}
+
+yaal::tools::xml::value_t HResource::get_attribute( yaal::hcore::HString const& path_ ) const {
+	M_PROLOG
+	int attrPos( static_cast<int>( path_.reverse_find( '/' ) ) );
+	M_ENSURE( attrPos != HString::npos );
+	HString path( path_.left( attrPos ) );
+	HString attr( path_.mid( attrPos + 1 ) );
+	HXml::HConstNodeSet ns( _xml.get_elements_by_path( path ) );
+	xml::value_t v;
+	if ( ! ns.is_empty() ) {
+		v = xml::try_attr_val( ns[0], attr );
+	}
+	return ( v );
+	M_EPILOG
+}
+
 }
 
 }
