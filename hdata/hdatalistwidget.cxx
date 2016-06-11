@@ -137,7 +137,20 @@ void HDataListWidget::do_load( int long id_ ) {
 				item[i].set_integer( id );
 				item[i].set_string( (*(ci->_dict))[id] );
 			} else if ( ci->type() == yaal::TYPE::HTIME ) {
-				item[ i ].set_time( HTime( row[i] ? *row[ i ] : "", _iso8601DateFormat_ ) );
+				char const* format( _iso8601DateTimeFormat_ );
+				if ( !! row[i] ) {
+					HString const& s( *row[i] );
+					bool datePart( s.find_one_of( "/-" ) != HString::npos );
+					bool timePart( s.find( ':' ) != HString::npos );
+					if ( ! datePart && timePart ) {
+						format = _iso8601TimeFormat_;
+					} else if ( ! timePart && datePart ) {
+						format = _iso8601DateFormat_;
+					}
+					item[ i ].set_time( HTime( s, format ) );
+				} else {
+					item[ i ].set_time( HTime( "", format ) );
+				}
 			} else {
 				item[ i ].set_string( row[i] ? *row[ i ] : "" );
 			}

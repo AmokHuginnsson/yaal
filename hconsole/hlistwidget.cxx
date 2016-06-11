@@ -1638,7 +1638,7 @@ bool HListWidgetCreator::do_apply_resources( HWidget::ptr_t widget_, yaal::tools
 			type = TYPE::INT_LONG_LONG;
 		} else if ( xmlType == "real" ) {
 			type = TYPE::DOUBLE_LONG;
-		} else if ( xmlType == "date" ) {
+		} else if ( ( xmlType == "date" ) || ( xmlType == "datetime" ) || ( xmlType == "time" ) ) {
 			type = TYPE::HTIME;
 		} else {
 			M_THROW( _( "unknown column type" ), node_.get_line() );
