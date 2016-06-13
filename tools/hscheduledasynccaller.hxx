@@ -56,9 +56,9 @@ public:
 	void call_at( yaal::hcore::HTime const&, call_t );
 	void call_in( yaal::hcore::time::duration_t, call_t );
 	void flush( void* );
-	void stop( void );
 private:
 	void run( void );
+	void stop( void );
 	bool want_restart( void ) const;
 	HScheduledAsyncCaller( void );
 	virtual ~HScheduledAsyncCaller( void );
