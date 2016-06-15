@@ -177,7 +177,7 @@ void HWidgetList::reorder_widgets( widget_order_t const& widgetOrder_ ) {
 		int realPos( 0 );
 		bool found( false );
 		for ( HWidget::ptr_t const& w : _list ) {
-			if ( w->id() == wp.second ) {
+			if ( w->resource_id() == wp.second ) {
 				found = true;
 				break;
 			}

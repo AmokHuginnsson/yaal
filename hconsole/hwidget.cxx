@@ -510,7 +510,7 @@ bool HWidget::has_focus( void ) const {
 	return ( _enabled && _focused );
 }
 
-yaal::hcore::HString const& HWidget::id( void ) const {
+yaal::hcore::HString const& HWidget::resource_id( void ) const {
 	return ( _id );
 }
 

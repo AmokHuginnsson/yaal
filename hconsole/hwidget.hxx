@@ -377,7 +377,7 @@ public:
  *
  * \return Widget's resource id.
  */
-	yaal::hcore::HString const& id( void ) const;
+	yaal::hcore::HString const& resource_id( void ) const;
 
 /*! \brief Get widget label text.
  *
