@@ -98,6 +98,8 @@ public:
  */
 	void schedule_repaint( bool wholeWindow_ );
 	void schedule_call( HTUIProcess::call_t );
+
+	void reorder_widgets( HWidgetList::widget_order_t const& );
 protected:
 	virtual void do_init( void );
 	virtual HStatusBarWidget* do_init_bar( char const* );

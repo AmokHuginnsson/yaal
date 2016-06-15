@@ -275,7 +275,7 @@ HWidget::ptr_t HDataListWidgetCreator::do_new_instance( HWindow* window_, yaal::
 	M_ENSURE( window );
 	prepare_attributes( attrs, node_ );
 	OResource r( get_resource( node_ ) );
-	attrs.label_position( r._labelPosition ).label_decoration( r._labelDecoration );
+	attrs.id( r._id ).label_position( r._labelPosition ).label_decoration( r._labelDecoration );
 	HDataListWidget* list( new ( memory::yaal ) HDataListWidget( window, r._row, r._column, r._height, r._width, r._label, attrs ) );
 	apply_resources( list->get_pointer(), node_ );
 	apply_role( window, list, node_ );

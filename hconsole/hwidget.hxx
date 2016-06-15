@@ -119,6 +119,7 @@ protected:
 	                     to parent window (after repositioning). */
 	int _heightRaw; /*!< Drawing state keeping helper. */
 	int _widthRaw;  /*!< Drawing state keeping helper. */
+	hcore::HString _id;           /*!< Widget's resource id. */
 	hcore::HString _label;        /*!< Widget title. */
 	hcore::HString _varTmpBuffer; /*!< Buffer for temporary operations, used
 	                                   to keep memory fragmentation low. */
@@ -301,6 +302,12 @@ public:
 			OAttribute enabled = DEFAULT_ATTRS,
 			OAttribute focused = DEFAULT_ATTRS );
 
+/*! \brief Set widget's resource id.
+ *
+ * \param id - resource id to be set.
+ */
+	void set_id( hcore::HString const& id );
+
 /*! \brief Decide if label shall be drawn for this particular instance of a widget.
  *
  * \param draw - If set to true the label is drawn.
@@ -366,6 +373,12 @@ public:
  */
 	bool has_focus( void ) const;
 
+/*! \brief Get widget's resource id.
+ *
+ * \return Widget's resource id.
+ */
+	yaal::hcore::HString const& id( void ) const;
+
 /*! \brief Get widget label text.
  *
  * \return Current label text.
@@ -406,6 +419,8 @@ private:
 typedef yaal::hcore::HExceptionT<HWidget> HWidgetException;
 
 class HWidgetAttributes : public HWidgetAttributesInterface {
+	hcore::HString _id;
+	bool _idSet;
 	bool _drawLabel;
 	bool _drawLabelSet;
 	HWidget::LABEL::POSITION _labelPosition;
@@ -422,6 +437,7 @@ protected:
 	virtual void do_apply( HWidget& ) const;
 public:
 	HWidgetAttributes( void );
+	HWidgetAttributes& id( hcore::HString const& );
 	HWidgetAttributes& draw_label( bool );
 	HWidgetAttributes& label_position( HWidget::LABEL::POSITION );
 	HWidgetAttributes& label_decoration( HWidget::LABEL::DECORATION );

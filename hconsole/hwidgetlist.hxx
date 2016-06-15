@@ -43,6 +43,7 @@ public:
 	typedef HWidgetList this_type;
 	typedef hcore::HList<HWidget::ptr_t> model_t;
 	typedef hcore::HCyclicIterator<model_t> cyclic_iterator;
+	typedef yaal::hcore::HMap<int, yaal::hcore::HString> widget_order_t;
 private:
 	model_t _list;
 	cyclic_iterator& _focused;
@@ -59,6 +60,7 @@ public:
 	void hit_test_all( mouse::OMouse& );
 	HWidget* get_widget_by_no( int );
 	void exchange( int, int );
+	void reorder_widgets( widget_order_t const& );
 };
 
 typedef yaal::hcore::HExceptionT<HWidgetList> HWidgetListException;

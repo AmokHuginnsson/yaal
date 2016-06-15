@@ -53,18 +53,31 @@ bool HWidget::OAttribute::operator == ( OAttribute const& attr_ ) const {
 HWidget::HWidget( HWindow* parent_, int row_, int column_,
 		int height_, int width_, yaal::hcore::HString const& label_,
 		HWidgetAttributesInterface const& attr_ )
-	: _enabled( false ), _focused( false ), _drawLabel( true ),
-	_labelPosition( LABEL::POSITION::STACKED ),
-	_labelDecoration( LABEL::DECORATION::AUTO ),
-	_attributeDisabled( _attributeDisabled_ ),
-	_attributeEnabled( _attributeEnabled_ ),
-	_attributeFocused( _attributeFocused_ ),
-	_row( row_ ), _column( column_ ),
-	_height( height_ ), _width( width_ ), _rowRaw( 0 ),
-	_columnRaw( 0 ), _heightRaw( 0 ), _widthRaw( 0 ),
-	_label( label_ ), _varTmpBuffer(), _window( parent_ ),
-	_labelLength( 0 ), _shortcutIndex( 0 ), _valid( false ), _needRepaint( false ),
-	_eventDispatcher() {
+	: _enabled( false )
+	, _focused( false )
+	, _drawLabel( true )
+	, _labelPosition( LABEL::POSITION::STACKED )
+	, _labelDecoration( LABEL::DECORATION::AUTO )
+	, _attributeDisabled( _attributeDisabled_ )
+	, _attributeEnabled( _attributeEnabled_ )
+	, _attributeFocused( _attributeFocused_ )
+	, _row( row_ )
+	, _column( column_ )
+	, _height( height_ )
+	, _width( width_ )
+	, _rowRaw( 0 )
+	, _columnRaw( 0 )
+	, _heightRaw( 0 )
+	, _widthRaw( 0 )
+	, _id()
+	, _label( label_ )
+	, _varTmpBuffer()
+	, _window( parent_ )
+	, _labelLength( 0 )
+	, _shortcutIndex( 0 )
+	, _valid( false )
+	, _needRepaint( false )
+	, _eventDispatcher() {
 	M_PROLOG
 	if ( ! HConsole::get_instance().is_enabled() ) {
 		M_THROW( "not in curses mode.", errno );
@@ -447,6 +460,13 @@ void HWidget::set_draw_label( bool drawLabel_ ) {
 	M_EPILOG
 }
 
+void HWidget::set_id( hcore::HString const& id_ ) {
+	M_PROLOG
+	_id = id_;
+	return;
+	M_EPILOG
+}
+
 void HWidget::set_label_position( LABEL::POSITION labelPosition_ ) {
 	M_PROLOG
 	_labelPosition = labelPosition_;
@@ -490,6 +510,10 @@ bool HWidget::has_focus( void ) const {
 	return ( _enabled && _focused );
 }
 
+yaal::hcore::HString const& HWidget::id( void ) const {
+	return ( _id );
+}
+
 yaal::hcore::HString const& HWidget::get_label( void ) const {
 	return ( _label );
 }
@@ -513,19 +537,27 @@ void HWidgetAttributesInterface::apply( HWidget& widget_ ) const {
 }
 
 HWidgetAttributes::HWidgetAttributes( void )
-	: _drawLabel( true ),
-	_drawLabelSet( false ),
-	_labelPosition( HWidget::LABEL::POSITION::STACKED ),
-	_labelPositionSet( false ),
-	_labelDecoration( HWidget::LABEL::DECORATION::AUTO ),
-	_labelDecorationSet( false ),
-	_attributeDisabled( _attributeDisabled_ ),
-	_attributeDisabledSet( false ),
-	_attributeEnabled( _attributeEnabled_ ),
-	_attributeEnabledSet( false ),
-	_attributeFocused( _attributeFocused_ ),
-	_attributeFocusedSet( false ) {
+	: _id()
+	, _idSet( false )
+	, _drawLabel( true )
+	, _drawLabelSet( false )
+	, _labelPosition( HWidget::LABEL::POSITION::STACKED )
+	, _labelPositionSet( false )
+	, _labelDecoration( HWidget::LABEL::DECORATION::AUTO )
+	, _labelDecorationSet( false )
+	, _attributeDisabled( _attributeDisabled_ )
+	, _attributeDisabledSet( false )
+	, _attributeEnabled( _attributeEnabled_ )
+	, _attributeEnabledSet( false )
+	, _attributeFocused( _attributeFocused_ )
+	, _attributeFocusedSet( false ) {
 	return;
+}
+
+HWidgetAttributes& HWidgetAttributes::id( hcore::HString const& id_ ) {
+	_id = id_;
+	_idSet = true;
+	return ( *this );
 }
 
 HWidgetAttributes& HWidgetAttributes::draw_label( bool drawLabel_ ) {
@@ -566,6 +598,9 @@ HWidgetAttributes& HWidgetAttributes::attribure_focused( HWidget::OAttribute con
 
 void HWidgetAttributes::do_apply( yaal::hconsole::HWidget& widget_ ) const {
 	M_PROLOG
+	if ( _idSet ) {
+		widget_.set_id( _id );
+	}
 	if ( _drawLabelSet ) {
 		widget_.set_draw_label( _drawLabel );
 	}

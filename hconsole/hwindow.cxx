@@ -291,6 +291,13 @@ void HWindow::schedule_call( HTUIProcess::call_t call_ ) {
 	M_EPILOG
 }
 
+void HWindow::reorder_widgets( HWidgetList::widget_order_t const& widgetOrder_ ) {
+	M_PROLOG
+	_widgets.reorder_widgets( widgetOrder_ );
+	return;
+	M_EPILOG
+}
+
 HWindow::ptr_t HWindowCreator::do_new_instance( HTUIProcess*, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
 	HString name( xml::attr_val( node_, "title" ) );
@@ -302,12 +309,21 @@ HWindow::ptr_t HWindowCreator::do_new_instance( HTUIProcess*, yaal::tools::HXml:
 void HWindowCreator::create_widgets( HWindow::ptr_t window_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
 	HWidgetFactory& wf( HWidgetFactory::get_instance() );
+	int pos( 0 );
+	HWidgetList::widget_order_t widgetOrder;
 	for ( yaal::tools::HXml::HConstNodeProxy const& n : node_ ) {
 		HString type( n.get_name() );
-		if ( wf.is_type_valid( type ) && ! xml::try_attr_val( n, "id" ) ) {
-			wf.create_widget( window_.raw(), n );
+		if ( wf.is_type_valid( type ) ) {
+			xml::value_t id( xml::try_attr_val( n, "id" ) );
+			if ( ! id ) {
+				wf.create_widget( window_.raw(), n );
+			} else {
+				widgetOrder[pos] = *id;
+			}
+			++ pos;
 		}
 	}
+	window_->reorder_widgets( widgetOrder );
 	return;
 	M_EPILOG
 }

@@ -40,7 +40,9 @@ namespace yaal {
 
 namespace hconsole {
 
-HWidgetList::HWidgetList( cyclic_iterator& focused_ ) : _list(), _focused( focused_ ) {
+HWidgetList::HWidgetList( cyclic_iterator& focused_ )
+	: _list()
+	, _focused( focused_ ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -158,12 +160,32 @@ void HWidgetList::select( HWidget::ptr_t const& widget_ ) {
 void HWidgetList::exchange( int former_, int latter_ ) {
 	M_PROLOG
 	if ( former_ != latter_ ) {
-		int first( min( former_, latter_ ) + 1 ); /* *FIXME* Original code had +1, I do not why at this moment. */
-		int last( max( former_, latter_ ) + 1 );
+		int first( min( former_, latter_ ) ); /* *FIXME* Original code had +1, I do not why at this moment. */
+		int last( max( former_, latter_ ) );
 		model_t::iterator itFirst( n_th( _list, first ) );
 		model_t::iterator itLast( itFirst );
 		advance( itLast, last - first );
 		_list.exchange( itFirst, itLast );
+	}
+	return;
+	M_EPILOG
+}
+
+void HWidgetList::reorder_widgets( widget_order_t const& widgetOrder_ ) {
+	M_PROLOG
+	for ( widget_order_t::value_type const& wp : widgetOrder_ ) {
+		int realPos( 0 );
+		bool found( false );
+		for ( HWidget::ptr_t const& w : _list ) {
+			if ( w->id() == wp.second ) {
+				found = true;
+				break;
+			}
+			++ realPos;
+		}
+		if ( found && ( realPos != wp.first ) ) {
+			exchange( realPos, wp.first );
+		}
 	}
 	return;
 	M_EPILOG

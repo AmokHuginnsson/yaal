@@ -99,10 +99,14 @@ void HWidgetFactory::cleanup_globals( void ) {
 }
 
 HWidgetCreatorInterface::OResource::OResource( void )
-	: _row( 0 ), _column( 0 ), _height( 0 ), _width( 0 ),
-	_label( "" ),
-	_labelPosition( HWidget::LABEL::POSITION::SIDE_BY_SIDE ),
-	_labelDecoration( HWidget::LABEL::DECORATION::AUTO ) {
+	: _row( 0 )
+	, _column( 0 )
+	, _height( 0 )
+	, _width( 0 )
+	, _id()
+	, _label()
+	, _labelPosition( HWidget::LABEL::POSITION::SIDE_BY_SIDE )
+	, _labelDecoration( HWidget::LABEL::DECORATION::AUTO ) {
 }
 
 void HWidgetCreatorInterface::initialize_globals( void ) {
@@ -127,7 +131,6 @@ HWidget::ptr_t HWidgetCreatorInterface::new_instance( HWindow* window_, yaal::to
 
 char const POSITION_NAME[] = "position";
 char const LABEL_NAME[] = "label";
-
 
 void HWidgetCreatorInterface::apply_resources( HWidget::ptr_t widget_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
@@ -160,6 +163,10 @@ void HWidgetCreatorInterface::prepare_attributes( HWidgetAttributesInterface& at
 HWidgetCreatorInterface::OResource HWidgetCreatorInterface::get_resource( yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
 	OResource r;
+	xml::value_t id( xml::try_attr_val( node_, "id" ) );
+	if ( !! id ) {
+		r._id = *id;
+	}
 	for ( HXml::HConstNodeProxy const& n : node_ ) {
 		HString const& name( n.get_name() );
 		if ( name == POSITION_NAME ) {
