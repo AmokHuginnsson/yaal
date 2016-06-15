@@ -1415,8 +1415,10 @@ HAbstractListModel::HModelIteratorWrapper::HModelIteratorWrapper( HAbstractListM
 HAbstractListModel::HModelIteratorWrapper& HAbstractListModel::HModelIteratorWrapper::operator = ( HAbstractListModel::HModelIteratorWrapper const& it_ ) {
 	M_PROLOG
 	if ( &it_ != this ) {
-		if ( it_._iteratorPtr.raw() ) {
+		if ( it_.is_valid() ) {
 			_iteratorPtr = it_._iteratorPtr->clone();
+		} else {
+			_iteratorPtr.reset();
 		}
 	}
 	return ( *this );

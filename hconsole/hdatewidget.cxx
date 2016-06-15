@@ -288,7 +288,7 @@ bool HDateWidget::do_click( mouse::OMouse& mouse_ ) {
 
 char const* HDateWidget::week_day_name( int day_ ) {
 	M_PROLOG
-	tm broken;
+	tm broken{};
 	broken.tm_wday = day_;
 	static int const WEEK_DAY_NAME_ABBREV_SIZE( 8 );
 	char weekDayAbbrevBuf[WEEK_DAY_NAME_ABBREV_SIZE];
