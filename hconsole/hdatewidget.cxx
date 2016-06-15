@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <cstring>
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
@@ -288,7 +290,8 @@ bool HDateWidget::do_click( mouse::OMouse& mouse_ ) {
 
 char const* HDateWidget::week_day_name( int day_ ) {
 	M_PROLOG
-	tm broken{};
+	tm broken;
+	::memset( &broken, 0, sizeof ( broken ) );
 	broken.tm_wday = day_;
 	static int const WEEK_DAY_NAME_ABBREV_SIZE( 8 );
 	char weekDayAbbrevBuf[WEEK_DAY_NAME_ABBREV_SIZE];
