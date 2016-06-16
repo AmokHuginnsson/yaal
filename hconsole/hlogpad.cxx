@@ -35,25 +35,30 @@ namespace yaal {
 
 namespace hconsole {
 
-HLogPad::HLogLine::HLogLine ( void )
-	: _type ( NONE ), _attribute ( COLORS::ATTR_NORMAL ), _text() {
+HLogPad::HLogLine::HLogLine( void )
+	: _type( NONE )
+	, _attribute( COLORS::ATTR_NORMAL )
+	, _text() {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
-HLogPad::HLogLine::~HLogLine ( void ) {
+HLogPad::HLogLine::~HLogLine( void ) {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
-HLogPad::HLogPad ( HWindow* parent_, int row_, int column_,
+HLogPad::HLogPad( HWindow* parent_, int row_, int column_,
 		int height_, int width_, yaal::hcore::HString const& label_,
 		HWidgetAttributesInterface const& attr_ )
-	: HWidget ( parent_, row_, column_, height_, width_, label_ ),
-	_lines( 0 ), _offsetRow( 0 ), _offsetColumn( 0 ),
-	_attribute( 0 ), _contents() {
+	: HWidget( parent_, row_, column_, height_, width_, label_ )
+	, _lines( 0 )
+	, _offsetRow( 0 )
+	, _offsetColumn( 0 )
+	, _attribute( 0 )
+	, _contents() {
 	M_PROLOG
 	attr_.apply( *this );
 	return;
@@ -114,12 +119,22 @@ void HLogPad::do_paint( void ) {
 	M_EPILOG
 }
 
+void HLogPad::add( HLogLine const& ll_ ) {
+	M_PROLOG
+	if ( _contents.is_empty() || ( _contents.back()._type == HLogLine::TEXT_EOL ) ) {
+		++ _lines;
+	}
+	_contents.push_back( ll_ );
+	return;
+	M_EPILOG
+}
+
 void HLogPad::add( int attribute_ ) {
 	M_PROLOG
 	HLogLine logLine;
 	logLine._type = HLogLine::ATTRIBUTE;
 	logLine._attribute = attribute_;
-	_contents.push_back( logLine );
+	add( logLine );
 	return;
 	M_EPILOG
 }
@@ -129,8 +144,9 @@ void HLogPad::add( yaal::hcore::HString const& text_ ) {
 	int indexNL( 0 ), indexChar( 0 );
 	HLogLine logLine;
 	HLogLine* it( nullptr );
-	if ( ! _contents.is_empty() )
+	if ( ! _contents.is_empty() ) {
 		it = &_contents.tail();
+	}
 	if ( ! it || ( it->_type != HLogLine::TEXT ) ) {
 		it = &logLine;
 		it->_type = HLogLine::TEXT;
@@ -142,24 +158,26 @@ void HLogPad::add( yaal::hcore::HString const& text_ ) {
 		if ( indexNL >= 0 ) {
 			it->_text += _varTmpBuffer.left( indexNL );
 			it->_type = HLogLine::TEXT_EOL;
-			++ _lines;
 			indexChar = static_cast<int>( _varTmpBuffer.find_other_than( "\r\n", indexNL + 1 ) );
-			if ( indexChar >= 0 )
-				_varTmpBuffer = _varTmpBuffer.mid( indexChar );
-			else
-				_varTmpBuffer = "";
+			if ( indexChar >= 0 ) {
+				_varTmpBuffer.shift_left( indexChar );
+			} else {
+				_varTmpBuffer.clear();
+			}
 		} else {
 			it->_text += _varTmpBuffer;
 			_varTmpBuffer = "";
 		}
-		if ( it == &logLine )
-			_contents.push_back( *it );
+		if ( it == &logLine ) {
+			add( *it );
+		}
 		it = &logLine;
 		it->_type = HLogLine::TEXT;
 		it->_text = "";
 	}
-	if ( _lines > _heightRaw )
+	if ( ( _heightRaw > 0 ) && ( _lines > _heightRaw ) ) {
 		_offsetRow = _lines - _heightRaw;
+	}
 	schedule_repaint();
 	return;
 	M_EPILOG
@@ -177,38 +195,44 @@ int HLogPad::do_process_input( int code_ ) {
 	M_PROLOG
 	int code = 0;
 	switch ( code_ ) {
-		case ( KEY_CODES::DOWN ):
-			if ( _lines > ( _heightRaw + _offsetRow ) )
-				_offsetRow ++;
-		break;
-		case ( KEY_CODES::UP ):
-			if ( _offsetRow > 0 )
-				_offsetRow --;
-		break;
-		case ( KEY_CODES::LEFT ):
-			if ( _offsetColumn > 0 )
-				_offsetColumn --;
-		break;
-		case ( KEY_CODES::RIGHT ):
-			_offsetColumn ++;
-			if ( _offsetColumn < 0 )
+		case ( KEY_CODES::DOWN ): {
+			if ( _lines > ( _heightRaw + _offsetRow ) ) {
+				++ _offsetRow;
+			}
+		} break;
+		case ( KEY_CODES::UP ): {
+			if ( _offsetRow > 0 ) {
+				-- _offsetRow;
+			}
+		} break;
+		case ( KEY_CODES::LEFT ): {
+			if ( _offsetColumn > 0 ) {
+				-- _offsetColumn;
+			}
+		} break;
+		case ( KEY_CODES::RIGHT ): {
+			++ _offsetColumn;
+			if ( _offsetColumn < 0 ) {
 				_offsetColumn = 0;
-		break;
-		case ( KEY_CODES::HOME ):
+			}
+		} break;
+		case ( KEY_CODES::HOME ): {
 			_offsetRow = 0;
 			_offsetColumn = 0;
-		break;
-		case ( KEY_CODES::END ):
+		} break;
+		case ( KEY_CODES::END ): {
 			_offsetColumn = 0;
-			if ( _lines > _heightRaw )
+			if ( _lines > _heightRaw ) {
 				_offsetRow = _lines - _heightRaw;
-		break;
-		default :
+			}
+		} break;
+		default: {
 			code = code_;
-		break;
+		} break;
 	}
-	if ( ! code )
+	if ( ! code ) {
 		schedule_repaint();
+	}
 	return ( code );
 	M_EPILOG
 }

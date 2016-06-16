@@ -74,6 +74,7 @@ public:
 	void add( yaal::hcore::HString const& );
 	void add( int );
 protected:
+	void add( HLogLine const& );
 	virtual int do_process_input( int ) override;
 	virtual void do_paint( void ) override;
 };
