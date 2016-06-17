@@ -40,12 +40,10 @@ namespace hconsole {
 HWindowListWidget::HWindowListWidget ( HWindow * parent_, int row_,
 		int column_, int height_, int width_, char const * label_,
 		HAbstractListModel::ptr_t const& model_, cyclic_iterator& foregroundWindow_ )
-	:	HWidget( parent_, row_, column_, height_, width_, label_,
-			HWidgetAttributes().label_position( HWidget::LABEL::POSITION::STACKED ) ),
-		HSearchableWidget( HSearchableWidgetAttributes() ),
-		HListWidget( parent_, row_, column_, height_,
-				width_, label_, HWidgetAttributesInterface(), model_ ),
-		_foregroundWindow( foregroundWindow_ ) {
+	:	HWidget( parent_, row_, column_, height_, width_, label_, HWidgetAttributes().label_position( HWidget::LABEL::POSITION::STACKED ) )
+	, HSearchableWidget( HSearchableWidgetAttributes() )
+	, HListWidget( parent_, row_, column_, height_, width_, label_, HListWidgetAttributes().sortable( false ), model_ )
+	, _foregroundWindow( foregroundWindow_ ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -57,11 +55,14 @@ int HWindowListWidget::do_process_input( int code_ ) {
 	int size = static_cast<int>( _model->size() );
 	if ( size > 0 ) {
 		if ( ( code_ == '\r' ) || ( code_ == ' ' ) ) {
-			code_ = KEY<'\t'>::meta;
-			iterator_t it = _model->begin();
-			while ( it != _cursor )
-				++ it, ++ _foregroundWindow;
-			-- _foregroundWindow;
+			iterator_t it( _model->begin() );
+			while ( it != _cursor ) {
+				++ it;
+				++ _foregroundWindow;
+			}
+			(*_foregroundWindow)->schedule_repaint( true );
+			_window->get_tui()->schedule_repaint();
+			code_ = 0;
 		}
 	}
 	return ( code_ );
