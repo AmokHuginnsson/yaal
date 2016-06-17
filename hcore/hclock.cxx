@@ -89,7 +89,7 @@ i64_t HClock::get_time_elapsed( yaal::hcore::time::UNIT unit_ ) const {
 		case ( time::UNIT::SECOND ): elapsed = time.tv_sec; break;
 		case ( time::UNIT::NANOSECOND ): elapsed = static_cast<i64_t>( time.tv_sec ) * si::NANO_IN_WHOLE + time.tv_nsec; break;
 		case ( time::UNIT::MICROSECOND ): elapsed = static_cast<i64_t>( time.tv_sec ) * si::MICRO_IN_WHOLE + time.tv_nsec / si::NANO_IN_MICRO; break;
-		case ( time::UNIT::MILISECOND ): elapsed = static_cast<i64_t>( time.tv_sec ) * si::MILI_IN_WHOLE + time.tv_nsec / si::NANO_IN_MILI; break;
+		case ( time::UNIT::MILLISECOND ): elapsed = static_cast<i64_t>( time.tv_sec ) * si::MILLI_IN_WHOLE + time.tv_nsec / si::NANO_IN_MILLI; break;
 		default: M_ASSERT( 0 && "bad HClock::UNIT!" ); break;
 	}
 	return ( elapsed );

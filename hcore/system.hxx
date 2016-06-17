@@ -51,7 +51,7 @@ int kill( int, int );
  * \param inputCount_ - a number of input descriptors to observe.
  * \param[in,out] output_ - set of output descriptors to observe.
  * \param outputCount_ - a number of output descriptors to observe.
- * \param timeOut_ - wait that many miliseconds for an event.
+ * \param timeOut_ - wait that many milliseconds for an event.
  * \param restartable_ - should wait be automatically restarted after interrupt from signal.
  * \return number of signaled events.
  */

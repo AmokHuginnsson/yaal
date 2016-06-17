@@ -484,7 +484,7 @@ void dump_configuration( OOptionInfo const& info ) {
 			}
 			break;
 			default:
-				;
+				cout << "# " << o.long_form() << " " << o.get() << "\n";
 			break;
 		}
 		cout << "\n";

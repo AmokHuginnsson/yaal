@@ -49,12 +49,12 @@ HClock::HClock( HHuginn::HClass* class_ )
 	return;
 }
 
-HHuginn::value_t HClock::miliseconds( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HClock::milliseconds( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	char const name[] = "Clock.miliseconds";
+	char const name[] = "Clock.milliseconds";
 	verify_arg_count( name, values_, 0, 0, position_ );
 	huginn::HClock* c( static_cast<huginn::HClock*>( object_->raw() ) );
-	return ( thread_->object_factory().create_integer( c->_clock.get_time_elapsed( time::UNIT::MILISECOND ) ) );
+	return ( thread_->object_factory().create_integer( c->_clock.get_time_elapsed( time::UNIT::MILLISECOND ) ) );
 	M_EPILOG
 }
 
@@ -75,7 +75,7 @@ HHuginn::class_t HClock::get_class( HRuntime* runtime_ ) {
 			"Clock",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "miliseconds", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HClock::miliseconds, _1, _2, _3, _4 ) ) },
+				{ "milliseconds", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HClock::milliseconds, _1, _2, _3, _4 ) ) },
 				{ "reset", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HClock::reset, _1, _2, _3, _4 ) ) }
 			}
 		)

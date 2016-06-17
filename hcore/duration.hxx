@@ -45,17 +45,20 @@ namespace time {
 enum class UNIT {
 	NANOSECOND,
 	MICROSECOND,
-	MILISECOND,
+	MILLISECOND,
 	SECOND,
 	MINUTE,
 	HOUR,
-	DAY
+	DAY,
+	WEEK
 };
 
 struct Duration;
 typedef HTaggedPOD<yaal::i64_t, Duration> duration_t;
 
 duration_t duration( yaal::i64_t, UNIT );
+template <UNIT const u>
+yaal::i64_t in_units( duration_t );
 
 }
 

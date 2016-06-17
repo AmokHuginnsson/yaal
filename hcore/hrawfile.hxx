@@ -94,7 +94,7 @@ public:
 	file_descriptor_t get_file_descriptor( void ) const;
 	/*! \brief Set write timeout for this raw file.
 	 *
-	 * \param timeout - a new timeout value in miliseconds.
+	 * \param timeout - a new timeout value in milliseconds.
 	 */
 	void set_timeout( int long timeout );
 protected:
@@ -118,7 +118,7 @@ protected:
 
 typedef HExceptionT<HRawFile, HStreamInterfaceException> HRawFileException;
 
-static int const LOW_TIMEOUT_WARNING = 100; /* miliseconds */
+static int const LOW_TIMEOUT_WARNING = 100; /* milliseconds */
 extern M_YAAL_HCORE_PUBLIC_API int long _writeTimeout_;
 
 }

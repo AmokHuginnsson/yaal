@@ -57,7 +57,7 @@ int sigaddset_fwd( sigset_t* set, int signo ) {
 
 yaal::hcore::HMutex HAlarm::_mutex;
 
-HAlarm::HAlarm( int long miliseconds_ )
+HAlarm::HAlarm( int long milliseconds_ )
 	: _timer( -1 ), _lock( _mutex ) {
 	M_PROLOG
 	sigevent event;
@@ -78,8 +78,8 @@ HAlarm::HAlarm( int long miliseconds_ )
 
 		itimerspec timeout;
 		::memset( &timeout, 0, sizeof ( timeout ) );
-		timeout.it_value.tv_sec = miliseconds_ / si::MILI_IN_WHOLE;
-		timeout.it_value.tv_nsec = static_cast<int long>( ( miliseconds_ % si::MILI_IN_WHOLE ) * si::NANO_IN_MILI );
+		timeout.it_value.tv_sec = milliseconds_ / si::MILLI_IN_WHOLE;
+		timeout.it_value.tv_nsec = static_cast<int long>( ( milliseconds_ % si::MILLI_IN_WHOLE ) * si::NANO_IN_MILLI );
 		M_ENSURE( timer_settime( *t, 0, &timeout, nullptr ) == 0 );
 		++ step;
 	} catch ( ... ) {

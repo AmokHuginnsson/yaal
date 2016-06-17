@@ -42,7 +42,7 @@ class HClock : public HHuginn::HObject {
 	yaal::hcore::HClock _clock;
 public:
 	HClock( HHuginn::HClass* );
-	static HHuginn::value_t miliseconds( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+	static HHuginn::value_t milliseconds( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t reset( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::class_t get_class( HRuntime* );
 };

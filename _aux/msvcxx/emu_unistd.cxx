@@ -68,7 +68,7 @@ int select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, stru
 	do {
 		int count( ( readFds ? readFds->_count : 0 ) + ( writeFds ? writeFds->_count : 0 ) );
 		M_ENSURE( ( count + 1 ) <= MAXIMUM_WAIT_OBJECTS ); /* +1 for interrupt handler */
-		int long miliseconds( timeout ? ( ( timeout->tv_sec * 1000 ) + ( timeout->tv_usec / 1000 ) ) : 0 );
+		int long milliseconds( timeout ? ( ( timeout->tv_sec * 1000 ) + ( timeout->tv_usec / 1000 ) ) : 0 );
 		IO* ios[MAXIMUM_WAIT_OBJECTS];
 		HANDLE handles[MAXIMUM_WAIT_OBJECTS];
 		int offset( readFds ? readFds->_count : 0 );
@@ -121,7 +121,7 @@ int select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, stru
 		}
 		HANDLE interrupt( _tlsSignalsSetup_->interrupt() );
 		handles[count] = interrupt;
-		int up( ::WaitForMultipleObjects( count + 1, handles, false, miliseconds ) );
+		int up( ::WaitForMultipleObjects( count + 1, handles, false, milliseconds ) );
 		if ( up == WAIT_FAILED ) {
 			ret = -1;
 			log_windows_error( "WaitForMultipleObjects" );
@@ -155,14 +155,14 @@ int select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, stru
 				FD_ZERO( readFds );
 			if ( writeFds )
 				FD_ZERO( writeFds );
-			miliseconds = 0;
+			milliseconds = 0;
 			if ( up != WAIT_TIMEOUT ) {
 				ret = -1;
 				errno = EINTR;
 			}
 		}
-		if ( ! ret && miliseconds ) {
-			if ( ::WaitForSingleObject( interrupt, miliseconds ) == WAIT_OBJECT_0 ) {
+		if ( ! ret && milliseconds ) {
+			if ( ::WaitForSingleObject( interrupt, milliseconds ) == WAIT_OBJECT_0 ) {
 				ret = -1;
 				errno = EINTR;
 			}

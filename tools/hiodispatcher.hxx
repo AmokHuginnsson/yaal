@@ -61,7 +61,7 @@ private:
 	bool _initialised; /*!< did process has necessery initialisation */
 	bool _loop;        /*!< indicates if main loop continues */
 	int _idleCycles;   /*!< full select()'s without io activity */
-	int long _latency; /*!< timeout between recall (miliseconds) */
+	int long _latency; /*!< timeout between recall (milliseconds) */
 	yaal::hcore::HChunk _select;
 	io_handlers_t _readers;
 	io_handlers_t _writers;

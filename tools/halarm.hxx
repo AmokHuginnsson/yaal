@@ -53,9 +53,9 @@ private:
 public:
 	/*! \brief Register an alarm.
 	 *
-	 * miliseconds_ - alarm shall come in miliseconds_ miliseconds.
+	 * milliseconds_ - alarm shall come in milliseconds_ milliseconds.
 	 */
-	HAlarm( int long miliseconds_ );
+	HAlarm( int long milliseconds_ );
 
 	/*! \brief Deregister alarm if it has not came.
 	 */

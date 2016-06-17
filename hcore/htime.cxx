@@ -42,7 +42,7 @@ char const _iso8601TimeFormat_[] = "%T";
 char const _iso8601DateFormat_[] = "%Y-%m-%d";
 char const _iso8601DateTimeFormat_[] = "%Y-%m-%d %T";
 
-static i64_t const DAYS_IN_MILION_MONTHS = 30436875;
+static i64_t const DAYS_IN_MILLION_MONTHS = 30436875;
 static int const DAYS_IN_MONTH[] = {
 	31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
 };
@@ -495,7 +495,7 @@ HTime operator "" _yW ( int long long unsigned weeks_ ) {
 HTime operator "" _yM ( int long long unsigned months_ ) {
 	/*
 	 * Month has 30.436875 days on average.
-	 * We try our best not to loose any precision so we do all out calculations on 64 bit integers.
+	 * We try our best not to loose any precision so we do all of our calculations on 64 bit integers.
 	 * First we multiply average number of days in a month by 10^6 so it becomes a integer number.
 	 * Next we do calculations trying not to overflow and not to loose precision until last step
 	 * which means we do division in parts:
@@ -503,7 +503,7 @@ HTime operator "" _yM ( int long long unsigned months_ ) {
 	 * b) 24 * 60 * 60 == 86400 is divisible by 1600 without remainder ( 86400 / 1600 == 54.(0) )
 	 * we use that facts in our calculations.
 	 */
-	return ( HTime( HTime::TZ::UTC, static_cast<i64_t>( months_ * DAYS_IN_MILION_MONTHS * ( ( HTime::HOURS_IN_DAY * HTime::MINUTES_IN_HOUR * HTime::SECONDS_IN_MINUTE ) / 1600 ) ) / 625 ) );
+	return ( HTime( HTime::TZ::UTC, static_cast<i64_t>( months_ * DAYS_IN_MILLION_MONTHS * ( ( HTime::HOURS_IN_DAY * HTime::MINUTES_IN_HOUR * HTime::SECONDS_IN_MINUTE ) / 1600 ) ) / 625 ) );
 }
 
 HTime operator "" _yY ( int long long unsigned years_ ) {

@@ -124,7 +124,7 @@ int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, i
 	} while ( restartable_
 			&& ( ret == -1 )
 			&& ( errno == EINTR )
-			&& ( ! timeOut_ || ( clock.get_time_elapsed( time::UNIT::MILISECOND ) < *timeOut_ ) ) );
+			&& ( ! timeOut_ || ( clock.get_time_elapsed( time::UNIT::MILLISECOND ) < *timeOut_ ) ) );
 	for ( int i( 0 ); i < inputCount_; ++ i ) {
 		if ( ! FWD_FD_ISSET( input_[ i ], &readers ) )
 			input_[ i ] = -1;
@@ -134,7 +134,7 @@ int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, i
 			output_[ i ] = -1;
 	}
 	if ( timeOut_ )
-		*timeOut_ -= min( *timeOut_, static_cast<int long>( clock.get_time_elapsed( time::UNIT::MILISECOND ) ) );
+		*timeOut_ -= min( *timeOut_, static_cast<int long>( clock.get_time_elapsed( time::UNIT::MILLISECOND ) ) );
 	return ( ret );
 }
 
