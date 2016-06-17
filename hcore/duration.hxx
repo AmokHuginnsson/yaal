@@ -33,6 +33,7 @@ Copyright:
 
 #include "hcore/pod.hxx"
 #include "hcore/htaggedpod.hxx"
+#include "hcore/hstring.hxx"
 
 namespace yaal {
 
@@ -59,6 +60,7 @@ typedef HTaggedPOD<yaal::i64_t, Duration> duration_t;
 duration_t duration( yaal::i64_t, UNIT );
 template <UNIT const u>
 yaal::i64_t in_units( duration_t );
+yaal::hcore::HString duration_to_string( duration_t, UNIT );
 
 }
 

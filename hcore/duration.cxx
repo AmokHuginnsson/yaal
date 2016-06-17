@@ -112,6 +112,57 @@ yaal::i64_t in_units<UNIT::WEEK>( duration_t d_ ) {
 	return ( ( ( ( ( d_.get() / si::NANO_IN_WHOLE ) / HTime::SECONDS_IN_MINUTE ) / HTime::MINUTES_IN_HOUR ) / HTime::HOURS_IN_DAY ) / HTime::DAYS_IN_WEEK );
 }
 
+yaal::hcore::HString duration_to_string( duration_t val_, time::UNIT unit_ ) {
+	M_PROLOG
+	HString s;
+	time::duration_t d( val_ );
+	i64_t x( time::in_units<time::UNIT::WEEK>( d ) );
+	if ( x > 0 ) {
+		s.append( x ).append( " week" ).append( x > 1 ? "s" : "" );
+		d -= time::duration( x, time::UNIT::WEEK );
+	}
+	x = time::in_units<UNIT::DAY>( d );
+	if ( ( unit_ <= UNIT::DAY ) && ( x > 0 ) ) {
+		s.append( ! s.is_empty() ? " " : "" ).append( x ).append( " day" ).append( x > 1 ? "s" : "" );
+		d -= time::duration( x, UNIT::DAY );
+	}
+	x = time::in_units<UNIT::HOUR>( d );
+	if ( ( unit_ <= UNIT::HOUR ) && ( x > 0 ) ) {
+		s.append( ! s.is_empty() ? " " : "" ).append( x ).append( " hour" ).append( x > 1 ? "s" : "" );
+		d -= time::duration( x, UNIT::HOUR );
+	}
+	x = time::in_units<UNIT::MINUTE>( d );
+	if ( ( unit_ <= UNIT::MINUTE ) && ( x > 0 ) ) {
+		s.append( ! s.is_empty() ? " " : "" ).append( x ).append( " minute" ).append( x > 1 ? "s" : "" );
+		d -= time::duration( x, UNIT::MINUTE );
+	}
+	x = time::in_units<UNIT::SECOND>( d );
+	if ( ( unit_ <= UNIT::SECOND ) && ( x > 0 ) ) {
+		s.append( ! s.is_empty() ? " " : "" ).append( x ).append( " second" ).append( x > 1 ? "s" : "" );
+		d -= time::duration( x, UNIT::SECOND );
+	}
+	x = time::in_units<UNIT::MILLISECOND>( d );
+	if ( ( unit_ <= UNIT::MILLISECOND ) && ( x > 0 ) ) {
+		s.append( ! s.is_empty() ? " " : "" ).append( x ).append( " millisecond" ).append( x > 1 ? "s" : "" );
+		d -= time::duration( x, UNIT::MILLISECOND );
+	}
+	x = time::in_units<UNIT::MICROSECOND>( d );
+	if ( ( unit_ <= UNIT::MICROSECOND ) && ( x > 0 ) ) {
+		s.append( ! s.is_empty() ? " " : "" ).append( x ).append( " microsecond" ).append( x > 1 ? "s" : "" );
+		d -= time::duration( x, UNIT::MICROSECOND );
+	}
+	x = time::in_units<UNIT::NANOSECOND>( d );
+	if ( ( unit_ <= UNIT::NANOSECOND ) && ( x > 0 ) ) {
+		s.append( ! s.is_empty() ? " " : "" ).append( x ).append( " nanosecond" ).append( x > 1 ? "s" : "" );
+		d -= time::duration( x, UNIT::NANOSECOND );
+	}
+	if ( s.is_empty() ) {
+		s.assign( "0s" );
+	}
+	return ( s );
+	M_EPILOG
+}
+
 }
 
 }
@@ -191,54 +242,7 @@ hcore::time::duration_t lexical_cast( hcore::HString const& val_ ) {
 
 template<>
 HString lexical_cast( hcore::time::duration_t const& val_ ) {
-	M_PROLOG
-	HString s;
-	time::duration_t d( val_ );
-	i64_t x( time::in_units<time::UNIT::WEEK>( d ) );
-	if ( x > 0 ) {
-		s.append( x ).append( " week" ).append( x > 1 ? "s" : "" );
-		d -= time::duration( x, time::UNIT::WEEK );
-	}
-	x = time::in_units<time::UNIT::DAY>( d );
-	if ( x > 0 ) {
-		s.append( ! s.is_empty() ? " " : "" ).append( x ).append( " day" ).append( x > 1 ? "s" : "" );
-		d -= time::duration( x, time::UNIT::DAY );
-	}
-	x = time::in_units<time::UNIT::HOUR>( d );
-	if ( x > 0 ) {
-		s.append( ! s.is_empty() ? " " : "" ).append( x ).append( " hour" ).append( x > 1 ? "s" : "" );
-		d -= time::duration( x, time::UNIT::HOUR );
-	}
-	x = time::in_units<time::UNIT::MINUTE>( d );
-	if ( x > 0 ) {
-		s.append( ! s.is_empty() ? " " : "" ).append( x ).append( " minute" ).append( x > 1 ? "s" : "" );
-		d -= time::duration( x, time::UNIT::MINUTE );
-	}
-	x = time::in_units<time::UNIT::SECOND>( d );
-	if ( x > 0 ) {
-		s.append( ! s.is_empty() ? " " : "" ).append( x ).append( " second" ).append( x > 1 ? "s" : "" );
-		d -= time::duration( x, time::UNIT::SECOND );
-	}
-	x = time::in_units<time::UNIT::MILLISECOND>( d );
-	if ( x > 0 ) {
-		s.append( ! s.is_empty() ? " " : "" ).append( x ).append( " millisecond" ).append( x > 1 ? "s" : "" );
-		d -= time::duration( x, time::UNIT::MILLISECOND );
-	}
-	x = time::in_units<time::UNIT::MICROSECOND>( d );
-	if ( x > 0 ) {
-		s.append( ! s.is_empty() ? " " : "" ).append( x ).append( " microsecond" ).append( x > 1 ? "s" : "" );
-		d -= time::duration( x, time::UNIT::MICROSECOND );
-	}
-	x = time::in_units<time::UNIT::NANOSECOND>( d );
-	if ( x > 0 ) {
-		s.append( ! s.is_empty() ? " " : "" ).append( x ).append( " nanosecond" ).append( x > 1 ? "s" : "" );
-		d -= time::duration( x, time::UNIT::NANOSECOND );
-	}
-	if ( s.is_empty() ) {
-		s.assign( "0s" );
-	}
-	return ( s );
-	M_EPILOG
+	return ( duration_to_string( val_, time::UNIT::NANOSECOND ) );
 }
 
 }

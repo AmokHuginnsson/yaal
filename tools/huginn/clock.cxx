@@ -68,6 +68,15 @@ HHuginn::value_t HClock::reset( huginn::HThread*, HHuginn::value_t* object_, HHu
 	M_EPILOG
 }
 
+HHuginn::value_t HClock::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "Clock.to_string";
+	verify_arg_count( name, values_, 0, 0, position_ );
+	huginn::HClock* c( static_cast<huginn::HClock*>( object_->raw() ) );
+	return ( thread_->object_factory().create_string( lexical_cast<HString>( time::duration( c->_clock.get_time_elapsed( time::UNIT::NANOSECOND ), time::UNIT::NANOSECOND ) ) ) );
+	M_EPILOG
+}
+
 HHuginn::class_t HClock::get_class( HRuntime* runtime_ ) {
 	M_PROLOG
 	return (
@@ -76,7 +85,8 @@ HHuginn::class_t HClock::get_class( HRuntime* runtime_ ) {
 			nullptr,
 			HHuginn::field_definitions_t{
 				{ "milliseconds", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HClock::milliseconds, _1, _2, _3, _4 ) ) },
-				{ "reset", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HClock::reset, _1, _2, _3, _4 ) ) }
+				{ "reset", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HClock::reset, _1, _2, _3, _4 ) ) },
+				{ "to_string", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HClock::to_string, _1, _2, _3, _4 ) ) }
 			}
 		)
 	);
