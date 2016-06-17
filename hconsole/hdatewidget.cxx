@@ -49,6 +49,7 @@ void center( HString& str_, int toLen_ ) {
 }
 
 static int const CAL_EDIT_WIDTH = 22;
+static int const CAL_EDIT_HEIGHT = 8;
 static int const CAL_VIEW_WIDTH = static_cast<int>( sizeof ( " 0000-00-00 " ) ) - 1;
 
 }
@@ -56,10 +57,11 @@ static int const CAL_VIEW_WIDTH = static_cast<int>( sizeof ( " 0000-00-00 " ) ) 
 HDateWidget::HDateWidget( HWindow* parent_, int row_, int column_,
 		yaal::hcore::HString const& label_,
 		HWidgetAttributesInterface const& attr_ )
-	: HWidget( parent_, row_, column_, 1, CAL_VIEW_WIDTH, label_ ),
-	_time( HTime::TZ::LOCAL, _iso8601DateFormat_ ),
-	_selectedTime( HTime::TZ::LOCAL, _iso8601DateFormat_ ),
-	_infoTime( _selectedTime ), _mode( MODE::VIEW ) {
+	: HWidget( parent_, row_, column_, 1, CAL_VIEW_WIDTH, label_ )
+	, _time( HTime::TZ::LOCAL, _iso8601DateFormat_ )
+	, _selectedTime( HTime::TZ::LOCAL, _iso8601DateFormat_ )
+	, _infoTime( _selectedTime )
+	, _mode( MODE::VIEW ) {
 	M_PROLOG
 	attr_.apply( *this );
 	return;
@@ -84,6 +86,12 @@ void HDateWidget::do_paint( void ) {
 		_heightRaw = 1;
 		_widthRaw = CAL_VIEW_WIDTH;
 	} else {
+		if ( ( _columnRaw + CAL_EDIT_WIDTH ) > cons.get_width() ) {
+			_columnRaw = cons.get_width() - CAL_EDIT_WIDTH;
+		}
+		if ( ( _rowRaw + CAL_EDIT_HEIGHT ) > cons.get_height() ) {
+			_rowRaw = cons.get_height() - CAL_EDIT_HEIGHT;
+		}
 		int rowOffset( 0 );
 		HString month( _time.to_string( "%B %Y" ) );
 		center( month, 3 * HTime::DAYS_IN_WEEK + 1 );
