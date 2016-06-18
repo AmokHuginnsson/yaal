@@ -230,7 +230,7 @@ void show_help( OOptionInfo const& info, HStreamInterface& out_ ) {
 	}
 	HString desc;
 	int columns( 0 );
-	if ( _terminal_.exists() ) {
+	if ( tty && _terminal_.exists() ) {
 		HTerminal::coord_t c( _terminal_.size() );
 		columns = c.second;
 	}
