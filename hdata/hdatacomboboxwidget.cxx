@@ -153,7 +153,6 @@ HWidget::ptr_t HDataComboboxWidgetCreator::do_new_instance( HWindow* window_, ya
 	M_ENSURE( window );
 	prepare_attributes( attrs, node_ );
 	OResource r( get_resource( node_ ) );
-	attrs.id( r._id ).label_position( r._labelPosition ).label_decoration( r._labelDecoration );
 	HDataComboboxWidget* list( new ( memory::yaal ) HDataComboboxWidget( window, r._row, r._column, r._height, r._width, r._label, attrs ) );
 	apply_resources( list->get_pointer(), node_ );
 	apply_role( window, list, node_ );

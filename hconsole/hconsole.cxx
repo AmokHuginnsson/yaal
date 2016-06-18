@@ -86,41 +86,7 @@ int get_color_bits( HString& value_, int what_ ) {
 	M_PROLOG
 	HTokenizer t( value_, " \t", HTokenizer::DELIMITED_BY_ANY_OF );
 	HString str = t[ what_ ];
-	if ( str.is_empty() )
-		return ( 0 );
-	if ( ! strcasecmp( str, "BLACK" ) )
-		return ( COLORS::FG_BLACK );
-	else if ( ! strcasecmp( str, "RED" ) )
-		return ( COLORS::FG_RED );
-	else if ( ! strcasecmp( str, "GREEN" ) )
-		return ( COLORS::FG_GREEN );
-	else if ( ! strcasecmp( str, "BROWN" ) )
-		return ( COLORS::FG_BROWN );
-	else if ( ! strcasecmp( str, "BLUE" ) )
-		return ( COLORS::FG_BLUE );
-	else if ( ! strcasecmp( str, "MAGENTA" ) )
-		return ( COLORS::FG_MAGENTA );
-	else if ( ! strcasecmp( str, "CYAN" ) )
-		return ( COLORS::FG_CYAN );
-	else if ( ! strcasecmp( str, "LIGHTGRAY" ) )
-		return ( COLORS::FG_LIGHTGRAY );
-	else if ( ! strcasecmp( str, "GRAY" ) )
-		return ( COLORS::FG_GRAY );
-	else if ( ! strcasecmp( str, "BRIGHTRED" ) )
-		return ( COLORS::FG_BRIGHTRED );
-	else if ( ! strcasecmp( str, "BRIGHTGREEN" ) )
-		return ( COLORS::FG_BRIGHTGREEN );
-	else if ( ! strcasecmp( str, "YELLOW" ) )
-		return ( COLORS::FG_YELLOW );
-	else if ( ! strcasecmp( str, "BRIGHTBLUE" ) )
-		return ( COLORS::FG_BRIGHTBLUE );
-	else if ( ! strcasecmp( str, "BRIGHTMAGENTA" ) )
-		return ( COLORS::FG_BRIGHTMAGENTA );
-	else if ( ! strcasecmp( str, "BRIGHTCYAN" ) )
-		return ( COLORS::FG_BRIGHTCYAN );
-	else if ( ! strcasecmp( str, "WHITE" ) )
-		return ( COLORS::FG_WHITE );
-	return ( 0 );
+	return ( ! str.is_empty() ? COLORS::from_string( str ) : 0 );
 	M_EPILOG
 }
 

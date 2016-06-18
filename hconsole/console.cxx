@@ -272,6 +272,48 @@ int COLORS::fg_to_bg( int fg_ ) {
 	M_EPILOG
 }
 
+int COLORS::from_string( yaal::hcore::HString const& name_ ) {
+	HString name( name_ );
+	name.lower();
+	int color( ATTR_DEFAULT );
+	if ( name == "black" ) {
+		color = FG_BLACK;
+	} else if ( name == "gray" ) {
+		color = FG_GRAY;
+	} else if ( name == "lightgray" ) {
+		color = FG_LIGHTGRAY;
+	} else if ( name == "white" ) {
+		color = FG_WHITE;
+	} else if ( name == "red" ) {
+		color = FG_RED;
+	} else if ( name == "green" ) {
+		color = FG_GREEN;
+	} else if ( name == "blue" ) {
+		color = FG_BLUE;
+	} else if ( name == "cyan" ) {
+		color = FG_CYAN;
+	} else if ( name == "magenta" ) {
+		color = FG_MAGENTA;
+	} else if ( name == "brown" ) {
+		color = FG_BROWN;
+	} else if ( name == "brightred" ) {
+		color = FG_BRIGHTRED;
+	} else if ( name == "brightgreen" ) {
+		color = FG_BRIGHTGREEN;
+	} else if ( name == "brightblue" ) {
+		color = FG_BRIGHTBLUE;
+	} else if ( name == "brightcyan" ) {
+		color = FG_BRIGHTCYAN;
+	} else if ( name == "brightmagenta" ) {
+		color = FG_BRIGHTMAGENTA;
+	} else if ( name == "yellow" ) {
+		color = FG_YELLOW;
+	} else {
+		throw HConsoleException( "Bad color name: `"_ys.append( name_ ).append( "'." ) );
+	}
+	return ( color );
+}
+
 namespace {
 
 bool has_broken_bright_background( void ) {

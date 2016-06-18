@@ -394,7 +394,6 @@ HWidget::ptr_t HTreeWidgetCreator::do_new_instance( HWindow* window_, yaal::tool
 	HTreeWidgetAttributes attrs;
 	prepare_attributes( attrs, node_ );
 	OResource r( get_resource( node_ ) );
-	attrs.id( r._id ).label_position( r._labelPosition ).label_decoration( r._labelDecoration );
 	HWidget* tree( new ( memory::yaal ) HTreeWidget( window_, r._row, r._column, r._height, r._width, r._label, attrs ) );
 	apply_resources( tree->get_pointer(), node_ );
 	return ( tree->get_pointer() );

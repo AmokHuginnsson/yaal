@@ -355,7 +355,6 @@ HWidget::ptr_t HComboboxWidgetCreator::do_new_instance( HWindow* window_, yaal::
 	HComboboxWidgetAttributes attrs;
 	prepare_attributes( attrs, node_ );
 	OResource r( get_resource( node_ ) );
-	attrs.id( r._id ).label_position( r._labelPosition ).label_decoration( r._labelDecoration );
 	HWidget* combobox( new ( memory::yaal ) HComboboxWidget( window_, r._row, r._column, r._height, r._width, r._label, attrs ) );
 	apply_resources( combobox->get_pointer(), node_ );
 	return ( combobox->get_pointer() );

@@ -722,7 +722,6 @@ HWidget::ptr_t HEditWidgetCreator::do_new_instance( HWindow* window_, yaal::tool
 	HEditWidgetAttributes attrs;
 	prepare_attributes( attrs, node_ );
 	OResource r( get_resource( node_ ) );
-	attrs.id( r._id ).label_position( r._labelPosition ).label_decoration( r._labelDecoration );
 	HWidget* edit( new ( memory::yaal ) HEditWidget( window_, r._row, r._column, r._height, r._width, r._label, attrs ) );
 	apply_resources( edit->get_pointer(), node_ );
 	return ( edit->get_pointer() );

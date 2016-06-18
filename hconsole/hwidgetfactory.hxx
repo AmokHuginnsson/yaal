@@ -45,10 +45,7 @@ public:
 		int _column;        /*!< left coordinate of control */
 		int _height;        /*!< height of control */
 		int _width;         /*!< width of control */
-		yaal::hcore::HString _id;    /*!< control's resource id */
 		yaal::hcore::HString _label; /*!< control label */
-		HWidget::LABEL::POSITION _labelPosition;
-		HWidget::LABEL::DECORATION _labelDecoration;
 		OResource( void );
 	};
 protected:
@@ -89,6 +86,8 @@ private:
 	friend class yaal::hcore::HSingleton<HWidgetFactory>;
 	friend class yaal::hcore::HDestructor<HWidgetFactory>;
 };
+
+typedef yaal::hcore::HExceptionT<HWidgetFactory> HWidgetFactoryException;
 
 }
 

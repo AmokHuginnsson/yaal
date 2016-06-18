@@ -200,6 +200,7 @@ struct COLORS {
 		ATTR_DEFAULT     = -1
 	};
 	static int fg_to_bg( int );
+	static int from_string( yaal::hcore::HString const& );
 };
 
 /*! \brief Get special key code values.

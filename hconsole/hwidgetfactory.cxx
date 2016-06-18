@@ -30,6 +30,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hwidgetfactory.hxx"
+#include "hconsole.hxx"
 #include "hcore/hlog.hxx"
 
 using namespace yaal;
@@ -103,10 +104,7 @@ HWidgetCreatorInterface::OResource::OResource( void )
 	, _column( 0 )
 	, _height( 0 )
 	, _width( 0 )
-	, _id()
-	, _label()
-	, _labelPosition( HWidget::LABEL::POSITION::SIDE_BY_SIDE )
-	, _labelDecoration( HWidget::LABEL::DECORATION::AUTO ) {
+	, _label() {
 }
 
 void HWidgetCreatorInterface::initialize_globals( void ) {
@@ -131,6 +129,7 @@ HWidget::ptr_t HWidgetCreatorInterface::new_instance( HWindow* window_, yaal::to
 
 char const POSITION_NAME[] = "position";
 char const LABEL_NAME[] = "label";
+char const ATTRIBUTE_NAME[] = "attribute";
 
 void HWidgetCreatorInterface::apply_resources( HWidget::ptr_t widget_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
@@ -146,11 +145,76 @@ void HWidgetCreatorInterface::apply_resources( HWidget::ptr_t widget_, yaal::too
 	M_EPILOG
 }
 
+namespace {
+
+HWidget::OAttribute make_attr( yaal::hcore::HString const& type_, yaal::tools::HXml::HConstNodeProxy const& node_, HWidget::OAttribute const& init_ ) {
+	M_PROLOG
+	HWidget::OAttribute attr( init_ );
+	xml::value_t a( xml::try_attr_val( node_, "foreground_label_" + type_ ) );
+	if ( !! a ) {
+		attr._label &= 0xf0;
+		attr._label |= COLORS::from_string( *a );
+	}
+	a = xml::try_attr_val( node_, "background_label_" + type_ );
+	if ( !! a ) {
+		attr._label &= 0x0f;
+		attr._label |= COLORS::fg_to_bg( COLORS::from_string( *a ) );
+	}
+	a = xml::try_attr_val( node_, "foreground_data_" + type_ );
+	if ( !! a ) {
+		attr._data &= 0xf0;
+		attr._data |= COLORS::from_string( *a );
+	}
+	a = xml::try_attr_val( node_, "background_data_" + type_ );
+	if ( !! a ) {
+		attr._data &= 0x0f;
+		attr._data |= COLORS::fg_to_bg( COLORS::from_string( *a ) );
+	}
+	return ( attr );
+	M_EPILOG
+}
+
+}
+
 void HWidgetCreatorInterface::prepare_attributes( HWidgetAttributesInterface& attrs_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
+	xml::value_t id( xml::try_attr_val( node_, "id" ) );
+	HWidgetAttributes& wa( static_cast<HWidgetAttributes&>( attrs_ ) );
+	if ( !! id ) {
+		wa.id( *id );
+	}
 	for ( HXml::HConstNodeProxy const& n : node_ ) {
-		if ( ! do_prepare_attributes( attrs_, n ) ) {
-			HString const& name( n.get_name() );
+		HString const& name( n.get_name() );
+		if ( name == LABEL_NAME ) {
+			xml::value_t position( xml::try_attr_val( n, "position" ) );
+			if ( position ) {
+				HWidget::LABEL::POSITION labelPosition;
+				if ( *position == "stacked" ) {
+					labelPosition = HWidget::LABEL::POSITION::STACKED;
+				} else if ( *position == "side_by_side" ) {
+					labelPosition = HWidget::LABEL::POSITION::SIDE_BY_SIDE;
+				} else {
+					throw HWidgetFactoryException( "Bad label position type `"_ys.append( *position ).append( ", at: " ).append( n.get_line() ) );
+				}
+				wa.label_position( labelPosition );
+			}
+			xml::value_t decoration( xml::try_attr_val( n, "decoration" ) );
+			if ( decoration ) {
+				HWidget::LABEL::DECORATION labelDecoration;
+				if ( *decoration == "auto" ) {
+					labelDecoration = HWidget::LABEL::DECORATION::AUTO;
+				} else if ( *decoration == "explicit" ) {
+					labelDecoration = HWidget::LABEL::DECORATION::EXPLICIT;
+				} else {
+					throw HWidgetFactoryException( "Bad label decoration type `"_ys.append( *decoration ).append( ", at: " ).append( n.get_line() ) );
+				}
+				wa.label_decoration( labelDecoration );
+			}
+		} else if ( name == ATTRIBUTE_NAME ) {
+			wa.attribure_focused( make_attr( "focused", n, _attributeFocused_ ) );
+			wa.attribure_enabled( make_attr( "enabled", n, _attributeEnabled_ ) );
+			wa.attribure_disabled( make_attr( "disabled", n, _attributeDisabled_ ) );
+		} else if ( ! do_prepare_attributes( attrs_, n ) ) {
 			if ( ( name != POSITION_NAME ) && ( name != LABEL_NAME ) ) {
 				log << "unknown " << node_.get_name() << " attribute name: " << name << ", at: " << n.get_line() << endl;
 			}
@@ -163,10 +227,6 @@ void HWidgetCreatorInterface::prepare_attributes( HWidgetAttributesInterface& at
 HWidgetCreatorInterface::OResource HWidgetCreatorInterface::get_resource( yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
 	OResource r;
-	xml::value_t id( xml::try_attr_val( node_, "id" ) );
-	if ( !! id ) {
-		r._id = *id;
-	}
 	for ( HXml::HConstNodeProxy const& n : node_ ) {
 		HString const& name( n.get_name() );
 		if ( name == POSITION_NAME ) {
@@ -178,22 +238,6 @@ HWidgetCreatorInterface::OResource HWidgetCreatorInterface::get_resource( yaal::
 			r._width = !! width ? lexical_cast<int>( *width ) : 0;
 		} else if ( name == LABEL_NAME ) {
 			r._label = xml::node_val( n );
-			xml::value_t position( xml::try_attr_val( n, "position" ) );
-			if ( position ) {
-				if ( *position == "stacked" ) {
-					r._labelPosition = HWidget::LABEL::POSITION::STACKED;
-				} else if ( *position == "side_by_side" ) {
-					r._labelPosition = HWidget::LABEL::POSITION::SIDE_BY_SIDE;
-				}
-			}
-			xml::value_t decoration( xml::try_attr_val( n, "decoration" ) );
-			if ( decoration ) {
-				if ( *decoration == "auto" ) {
-					r._labelDecoration = HWidget::LABEL::DECORATION::AUTO;
-				} else if ( *decoration == "explicit" ) {
-					r._labelDecoration = HWidget::LABEL::DECORATION::EXPLICIT;
-				}
-			}
 		}
 	}
 	return ( r );
