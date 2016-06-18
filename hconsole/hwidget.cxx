@@ -168,6 +168,7 @@ bool HWidget::set_focus( char shortCut_ ) {
 void HWidget::kill_focus( void ) {
 	M_PROLOG
 	do_kill_focus();
+	return;
 	M_EPILOG
 }
 

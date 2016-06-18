@@ -576,6 +576,7 @@ void HListWidget::handle_key_insert( void ) {
 	M_ASSERT( model );
 	model->get_data()->emplace_back( size );
 	handle_key_end();
+	_cellEditor._currentColumn = 0;
 	return;
 	M_EPILOG
 }
@@ -1251,6 +1252,7 @@ void HListWidget::remove_current_row( void ) {
 
 void HListWidget::do_update( void ) {
 	M_PROLOG
+	_cellEditor._currentColumn = 0;
 	if ( _model->size() ) {
 		_widgetOffset = _cursorPosition = 0;
 		_firstVisibleRow = _model->begin();
