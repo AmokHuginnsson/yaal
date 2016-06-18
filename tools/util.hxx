@@ -34,6 +34,7 @@ Copyright:
 #include "hcore/hstring.hxx"
 #include "hcore/algorithm.hxx"
 #include "hcore/hboundcall.hxx"
+#include "hcore/hfile.hxx"
 
 namespace yaal {
 
@@ -78,7 +79,7 @@ iter_t find_local( iter_t it, iter_t end, pred_t pred ) {
 		pred( it );
 	return ( pred() );
 }
-void usun_ogonki( yaal::hcore::HString& );
+yaal::hcore::HString& usun_ogonki( yaal::hcore::HString& );
 double long atof_ex( yaal::hcore::HString const&, bool = false );
 yaal::hcore::HString get_token( yaal::hcore::HString const&, yaal::hcore::HString const&, int long );
 yaal::hcore::HString cardinal( int );
@@ -99,8 +100,8 @@ private:
 	OOptionInfo& operator = ( OOptionInfo const& );
 };
 
-void show_help( OOptionInfo const& );
-void dump_configuration( OOptionInfo const& );
+void show_help( OOptionInfo const&, yaal::hcore::HStreamInterface& = yaal::hcore::cout );
+void dump_configuration( OOptionInfo const&, yaal::hcore::HStreamInterface& = yaal::hcore::cout );
 
 void failure( int, char const*, ... ) __attribute__(( __noreturn__, format( printf, 2, 3 ) ));
 

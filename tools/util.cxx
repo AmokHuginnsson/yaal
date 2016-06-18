@@ -54,11 +54,12 @@ namespace util {
 
 char _transTableStripPL_[ 256 ];
 
-void usun_ogonki( HString& string_ ) {
+HString& usun_ogonki( HString& string_ ) {
 	M_PROLOG
-	for ( HString::HIterator it( string_.begin() ), end( string_.end() ); it != end; ++ it )
+	for ( HString::HIterator it( string_.begin() ), end( string_.end() ); it != end; ++ it ) {
 		*it = _transTableStripPL_[ static_cast<char unsigned>( *it ) ];
-	return;
+	}
+	return ( string_ );
 	M_EPILOG
 }
 
@@ -78,8 +79,9 @@ double long atof_ex( HString const& string_, bool parse_ ) {
 		} catch ( HExpressionException const& e ) {
 			throw HExpressionException( HString( e.what() ) + " - " + analyser.get_error() + " for: " + string_ + ", at: " + analyser.get_error_token() );
 		}
-	} else
+	} else {
 		value = lexical_cast<double long>( str );
+	}
 	return ( value );
 	M_EPILOG
 }
@@ -94,7 +96,7 @@ HString get_token( yaal::hcore::HString const& s, yaal::hcore::HString const& d,
 yaal::hcore::HString cardinal( int no_ ) {
 	M_PROLOG
 	static char const CARDINALS[][10] = {
-		"zero"
+		"zero",
 		"one",
 		"two",
 		"three",
@@ -175,38 +177,39 @@ inline bool is_byte( int value ) {
 	return ( value <= static_cast<int>( meta::max_unsigned<char unsigned>::value ) );
 }
 
-void show_help( OOptionInfo const& info ) {
+void show_help( OOptionInfo const& info, HStreamInterface& out_ ) {
 	M_PROLOG
 	errno = 0;
 	HString name;
-	if ( is_a_tty( stdout ) ) {
+	bool tty( is_a_tty( out_ ) );
+	if ( tty ) {
 		name.append( *ansi::bold );
 	}
 	name.append( info._name );
-	if ( is_a_tty( stdout ) ) {
+	if ( tty ) {
 		name.append( *ansi::reset );
 	}
 	HString syntax( info._syntax ? info._syntax : "" );
 	if ( syntax.is_empty() ) {
 		syntax.append( "[" );
-		if ( is_a_tty( stdout ) ) {
+		if ( tty ) {
 			syntax.append( *ansi::underline );
 		}
 		syntax.append( "OPTION" );
-		if ( is_a_tty( stdout ) ) {
+		if ( tty ) {
 			syntax.append( *ansi::reset );
 		}
 		syntax.append( "]... [" );
-		if ( is_a_tty( stdout ) ) {
+		if ( tty ) {
 			syntax.append( *ansi::underline );
 		}
 		syntax.append( "FILE" );
-		if ( is_a_tty( stdout ) ) {
+		if ( tty ) {
 			syntax.append( *ansi::reset );
 		}
 		syntax.append( "]..." );
 	}
-	cout << "Usage: " << name << " " << syntax << "\n"
+	out_ << "Usage: " << name << " " << syntax << "\n"
 		<< name << " - " << info._intro << "\n\n"
 		"Mandatory arguments to long options are mandatory for short options too.\n"
 		"Options:\n";
@@ -251,12 +254,12 @@ void show_help( OOptionInfo const& info ) {
 		int extraSFL( 0 );
 		/* if short form char exist, build full form of short form */
 		if ( is_byte( o.short_form() ) ) {
-			if ( is_a_tty( stdout ) ) {
+			if ( tty ) {
 				sf.append( *ansi::bold );
 			}
 			sf.append( "-" );
 			sf.append( static_cast<char>( o.short_form() ) );
-			if ( is_a_tty( stdout ) ) {
+			if ( tty ) {
 				sf.append( *ansi::reset );
 				extraSFL = static_cast<int>( strlen( *ansi::bold ) + strlen( *ansi::reset ) );
 			}
@@ -269,12 +272,12 @@ void show_help( OOptionInfo const& info ) {
 		HString lf;
 		int extraLFL( 0 );
 		if ( ! o.long_form().is_empty() ) {
-			if ( is_a_tty( stdout ) ) {
+			if ( tty ) {
 				lf.append( *ansi::bold );
 			}
 			lf.append( "--" );
 			lf.append( o.long_form() );
-			if ( is_a_tty( stdout ) ) {
+			if ( tty ) {
 				lf.append( *ansi::reset );
 				extraLFL = static_cast<int>( strlen( *ansi::bold ) + strlen( *ansi::reset ) );
 			}
@@ -284,11 +287,11 @@ void show_help( OOptionInfo const& info ) {
 				lf.append( "[" );
 			}
 			lf.append( "=" );
-			if ( is_a_tty( stdout ) ) {
+			if ( tty ) {
 				lf.append( *ansi::underline );
 			}
 			lf.append( o.argument_name() );
-			if ( is_a_tty( stdout ) ) {
+			if ( tty ) {
 				lf.append( *ansi::reset );
 				extraLFL += static_cast<int>( strlen( *ansi::underline ) + strlen( *ansi::reset ) );
 			}
@@ -315,7 +318,7 @@ void show_help( OOptionInfo const& info ) {
 				}
 			}
 		}
-		cout << "  " << setw( static_cast<int>( longestShortLength + extraSFL ) ) << sf << comma << " "
+		out_ << "  " << setw( static_cast<int>( longestShortLength + extraSFL ) ) << sf << comma << " "
 			<< setw( static_cast<int>( longestLongLength + extraLFL ) ) << left << lf << right << "  ";
 		/* + 2 for two prefixing spaces, + 2 for 2 spaces separating options from descriptions, + 2 for comma and space */
 		desc = description;
@@ -341,7 +344,7 @@ void show_help( OOptionInfo const& info ) {
 					++ words;
 			}
 			if ( ( ws >= cols ) || ( desc.get_length() > cols ) ) {
-				cout << desc.left( eol ) << "\n";
+				out_ << desc.left( eol ) << "\n";
 				desc.shift_left( eol );
 				desc.trim_left();
 				desc.insert( 0, 2, "  " );
@@ -353,33 +356,33 @@ void show_help( OOptionInfo const& info ) {
 						break;
 					}
 				}
-				cout << setw( static_cast<int>( longestLongLength + longestShortLength + 2 + 2 + 2 ) ) << "";
+				out_ << setw( static_cast<int>( longestLongLength + longestShortLength + 2 + 2 + 2 ) ) << "";
 			} else {
-				cout << desc << "\n";
+				out_ << desc << "\n";
 				description = nullptr;
 				loop = false;
 			}
 		} while ( loop );
 	}
 	if ( info._note ) {
-		cout << "\n" << info._note << endl;
+		out_ << "\n" << info._note << endl;
 	}
 	return;
 	M_EPILOG
 }
 
-void dump_configuration( OOptionInfo const& info ) {
+void dump_configuration( OOptionInfo const& info, HStreamInterface& out_ ) {
 	M_PROLOG
 	if ( info._name ) {
-		cout << "# this is configuration file for: `" << info._name << "' program\n";
+		out_ << "# this is configuration file for: `" << info._name << "' program\n";
 	}
 	if ( info._intro ) {
-		cout << "# " << info._intro << "\n";
+		out_ << "# " << info._intro << "\n";
 	}
 	if ( info._name || info._intro ) {
-		cout << "\n";
+		out_ << "\n";
 	}
-	cout <<
+	out_ <<
 "# comments begin with `#' char and continues until end of line\n"
 "# option names are case insensitive\n"
 "# in most cases option values are case insensitive also\n"
@@ -416,32 +419,32 @@ void dump_configuration( OOptionInfo const& info ) {
 				description = "";
 		}
 		static int const MAXIMUM_LINE_LENGTH = 72;
-		cout << "### " << o.long_form() << " ###\n# type: ";
+		out_ << "### " << o.long_form() << " ###\n# type: ";
 		switch ( o.recipient_type() ) {
 			case ( TYPE::BOOL ): {
-				cout << "boolean";
+				out_ << "boolean";
 			} break;
 			case ( TYPE::INT ):
 			case ( TYPE::INT_SHORT ):
 			case ( TYPE::INT_LONG ): {
-				cout << "integer";
+				out_ << "integer";
 			} break;
 			case ( TYPE::FLOAT ):
 			case ( TYPE::DOUBLE ):
 			case ( TYPE::DOUBLE_LONG ): {
-				cout << "floating point";
+				out_ << "floating point";
 			} break;
 			case ( TYPE::HSTRING ): {
-				cout << "character string";
+				out_ << "character string";
 			} break;
 			default: {
-				cout << "special";
+				out_ << "special";
 			} break;
 		}
 		if ( ! o.default_value().is_empty() ) {
-			cout << ", default: " << o.default_value();
+			out_ << ", default: " << o.default_value();
 		}
-		cout << "\n";
+		out_ << "\n";
 		if ( ! description ) {
 			description = o.description().raw();
 		}
@@ -456,12 +459,12 @@ void dump_configuration( OOptionInfo const& info ) {
 				eol = static_cast<int>( desc.find_other_than( _whiteSpace_.data(), eol ) );
 			}
 			if ( eol >= MAXIMUM_LINE_LENGTH ) {
-				cout << "# " << desc.left( eol ) << "\n";
+				out_ << "# " << desc.left( eol ) << "\n";
 				desc.shift_left( eol );
 				desc.trim_left();
 				description = desc.raw();
 			} else {
-				cout << "# " << desc << "\n";
+				out_ << "# " << desc << "\n";
 				description = nullptr;
 				loop = false;
 			}
@@ -472,27 +475,27 @@ void dump_configuration( OOptionInfo const& info ) {
 			case ( TYPE::INT_LONG ):
 			case ( TYPE::DOUBLE_LONG ):
 			case ( TYPE::DOUBLE ):
-				cout << o.long_form() << " " << o.get() << "\n";
+				out_ << o.long_form() << " " << o.get() << "\n";
 			break;
 			case ( TYPE::HSTRING ): {
 				HString s = o.get();
 				if ( ! s.is_empty() ) {
-					cout << o.long_form() << " \"" << s << "\"\n";
+					out_ << o.long_form() << " \"" << s << "\"\n";
 				} else {
-					cout << "# " << o.long_form() << "\n";
+					out_ << "# " << o.long_form() << "\n";
 				}
 			}
 			break;
 			default:
-				cout << "# " << o.long_form() << " " << o.get() << "\n";
+				out_ << "# " << o.long_form() << " " << o.get() << "\n";
 			break;
 		}
-		cout << "\n";
+		out_ << "\n";
 	}
 	if ( info._note ) {
-		cout << "# " << info._note << "\n\n";
+		out_ << "# " << info._note << "\n\n";
 	}
-	cout << "# vim: ft=conf" << endl;
+	out_ << "# vim: set ft=conf:" << endl;
 	return;
 	M_EPILOG
 }
