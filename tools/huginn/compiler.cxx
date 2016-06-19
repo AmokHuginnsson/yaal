@@ -335,7 +335,7 @@ void OCompiler::resolve_symbols( void ) {
 						hcore::call(
 							&HExpression::get_variable_direct,
 							es._expression.raw(),
-							HExpression::ACCESS::VALUE,
+							es._operation == OExecutionStep::OPERATION::USE ? HExpression::ACCESS::VALUE : HExpression::ACCESS::REFERENCE,
 							sc->_statementId,
 							index,
 							_1,
@@ -1603,22 +1603,24 @@ void OCompiler::dispatch_assign( executing_parser::position_t position_ ) {
 		fc._valueTypes.pop();
 		HHuginn::type_id_t t2( fc._valueTypes.top() );
 		fc._valueTypes.pop();
-		HHuginn::identifier_id_t name( fc._variables.top() );
+		OFunctionContext::OVariableRef varRef( fc._variables.top() );
 		HHuginn::type_id_t realDestType( t2 );
 		if ( realDestType == HHuginn::TYPE::UNKNOWN ) {
-			realDestType = guess_type( name );
+			realDestType = guess_type( varRef._identifier );
 		}
-		if ( name != INVALID_IDENTIFIER ) {
-			note_type( name, t1 );
+		if ( varRef._identifier != INVALID_IDENTIFIER ) {
+			note_type( varRef._identifier, t1 );
 		}
-		if ( o == OPERATOR::ASSIGN ) {
-			if ( name != INVALID_IDENTIFIER ) {
-				_usedIdentifiers[name].write( position_.get(), OIdentifierUse::TYPE::VARIABLE );
+		if ( varRef._identifier != INVALID_IDENTIFIER ) {
+			if ( o == OPERATOR::ASSIGN ) {
+				_usedIdentifiers[varRef._identifier].write( position_.get(), OIdentifierUse::TYPE::VARIABLE );
+			} else if ( are_congruous( t1, realDestType ) ) {
+				_usedIdentifiers[varRef._identifier].read( position_.get(), OIdentifierUse::TYPE::VARIABLE );
+				M_ASSERT( varRef._executionStepIndex >= 0 );
+				_executionStepsBacklog[varRef._executionStepIndex]._operation = OExecutionStep::OPERATION::UPDATE;
+			} else {
+				operands_type_mismatch( op_to_str( o ), realDestType, t1, p );
 			}
-		} else if ( are_congruous( t1, realDestType ) ) {
-			_usedIdentifiers[name].read( position_.get(), OIdentifierUse::TYPE::VARIABLE );
-		} else {
-			operands_type_mismatch( op_to_str( o ), realDestType, t1, p );
 		}
 		switch ( o ) {
 			case ( OPERATOR::PLUS_ASSIGN ):
@@ -1864,7 +1866,7 @@ void OCompiler::make_reference( executing_parser::position_t position_ ) {
 			hcore::call( &HExpression::get_field, current_expression().raw(), HExpression::ACCESS::REFERENCE, fc._lastMemberName, _1, position_.get() )
 		);
 	}
-	fc._variables.push( INVALID_IDENTIFIER );
+	fc._variables.emplace( INVALID_IDENTIFIER, -1 );
 	return;
 	M_EPILOG
 }
@@ -1967,7 +1969,7 @@ void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executi
 		position_.get()
 	);
 	fc._valueTypes.push( type_id( HHuginn::TYPE::UNKNOWN ) );
-	fc._variables.push( varIdentifier );
+	fc._variables.emplace( varIdentifier, static_cast<int>( _executionStepsBacklog.get_size() - 1 ) );
 	return;
 	M_EPILOG
 }

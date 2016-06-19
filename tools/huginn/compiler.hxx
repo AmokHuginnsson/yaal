@@ -143,7 +143,16 @@ struct OCompiler {
 		typedef yaal::hcore::HPointer<OScopeContext> scope_context_t;
 		typedef yaal::hcore::HStack<scope_context_t> scope_stack_t;
 		typedef yaal::hcore::HStack<HHuginn::type_id_t> type_stack_t;
-		typedef yaal::hcore::HStack<HHuginn::identifier_id_t> variable_stack_t;
+		struct OVariableRef {
+			HHuginn::identifier_id_t _identifier;
+			int _executionStepIndex;
+			OVariableRef( HHuginn::identifier_id_t identifier_, int index_ )
+				: _identifier( identifier_ )
+				, _executionStepIndex( index_ ) {
+				return;
+			}
+		};
+		typedef yaal::hcore::HStack<OVariableRef> variable_stack_t;
 		typedef yaal::hcore::HArray<HHuginn::identifier_id_t> parameter_names_t;
 
 		/*! \brief Identifier of currently compiled function.
@@ -266,7 +275,8 @@ struct OCompiler {
 	struct OExecutionStep {
 		enum class OPERATION {
 			DEFINE,
-			USE
+			USE,
+			UPDATE
 		};
 		OPERATION _operation;
 		HHuginn::expression_t _expression;
