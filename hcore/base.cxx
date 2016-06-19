@@ -42,47 +42,53 @@ namespace yaal {
 
 exit_flag_t _isKilled_{ false };
 
+bool is_hexadecimal( char const* str_, int len_ ) {
+	if ( ( len_ >= 4 ) && ( str_[ 0 ] == '-' ) ) { /* -0x0 */
+		++ str_;
+	}
+	if ( ( len_ >= 3 ) && ( str_[ 0 ] == '0' ) ) { /* 0x0 */
+		++ str_;
+	}
+	return ( ( len_ >= 2 )
+			&& ( ( str_[0] == 'x' ) || ( str_[0] == 'X' ) )
+			&& ( ( ( str_[1] >= '0' ) && ( str_[1] <= '9' ) )
+				|| ( ( str_[1] >= 'a' ) && ( str_[1] <= 'f' ) )
+				|| ( ( str_[1] >= 'A' ) && ( str_[1] <= 'F' ) ) ) );
+}
+
 template<>
 bool is_hexadecimal( HString const& str_ ) {
-	int long const len( str_.get_length() );
-	char const* str( str_.raw() );
-	if ( ( len >= 4 ) && ( str[ 0 ] == '-' ) ) { /* -0x0 */
-		++ str;
+	return ( is_hexadecimal( str_.raw(), static_cast<int>( str_.get_length() ) ) );
+}
+
+bool is_binary( char const* str_, int len_ ) {
+	if ( ( len_ >= 3 ) && ( str_[ 0 ] == '-' ) ) { /* -0b */
+		++ str_;
 	}
-	if ( ( len >= 3 ) && ( str[ 0 ] == '0' ) ) { /* 0x0 */
-		++ str;
-	}
-	return ( ( len >= 2 )
-			&& ( ( str[0] == 'x' ) || ( str[0] == 'X' ) )
-			&& ( ( ( str[1] >= '0' ) && ( str[1] <= '9' ) )
-				|| ( ( str[1] >= 'a' ) && ( str[1] <= 'f' ) )
-				|| ( ( str[1] >= 'A' ) && ( str[1] <= 'F' ) ) ) );
+	int binaryMark( static_cast<int>( strspn( str_, "01" ) ) );
+	return ( ( binaryMark > 0 ) && ( ( str_[binaryMark] == 'b' ) || ( str_[binaryMark] == 'B' ) ) );
 }
 
 template<>
 bool is_binary( HString const& str_ ) {
-	int long const len( str_.get_length() );
-	char const* str( str_.raw() );
-	int offset( 0 );
-	if ( ( len >= 3 ) && ( str[ 0 ] == '-' ) ) { /* -0b */
-		++ offset;
+	return ( is_binary( str_.raw(), static_cast<int>( str_.get_length() ) ) );
+}
+
+bool is_octal( char const* str_, int len_ ) {
+	bool octal( false );
+	if ( ! is_binary( str_, len_ ) ) {
+		int offset( 0 );
+		if ( ( len_ >= 3 ) && ( str_[ 0 ] == '-' ) ) { /* -01 */
+			++ offset, ++ str_;
+		}
+		octal = ( len_ >= 2 ) && ( str_[0] == '0' ) && ( str_[1] >= '0' ) && ( str_[1] <= '7' );
 	}
-	int long binaryMark( str_.find_other_than( "01", offset ) );
-	return ( ( binaryMark > 0 ) && ( ( str[binaryMark] == 'b' ) || ( str[binaryMark] == 'B' ) ) );
+	return ( octal );
 }
 
 template<>
 bool is_octal( HString const& str_ ) {
-	bool octal( false );
-	if ( ! is_binary( str_ ) ) {
-		int long const len( str_.get_length() );
-		char const* str( str_.raw() );
-		int offset( 0 );
-		if ( ( len >= 3 ) && ( str[ 0 ] == '-' ) ) /* -01 */
-			++ offset, ++ str;
-		octal = ( len >= 2 ) && ( str[0] == '0' ) && ( str[1] >= '0' ) && ( str[1] <= '7' );
-	}
-	return ( octal );
+	return ( is_octal( str_.raw(), static_cast<int>( str_.get_length() ) ) );
 }
 
 static int const MAX_VALID_INTEGER_LENGTH = 32;

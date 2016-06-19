@@ -811,7 +811,10 @@ double stod( HString const&, int* = nullptr );
 double long stold( HString const&, int* = nullptr );
 bool is_whitespace( char );
 bool is_digit( char );
+bool is_dec_digit( char );
 bool is_hex_digit( char );
+bool is_oct_digit( char );
+bool is_bin_digit( char );
 bool is_letter( char );
 bool is_alpha( char );
 

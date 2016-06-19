@@ -81,19 +81,27 @@ HCharacterClass const _whiteSpace_ = HCharacterClass( D_WHITE_SPACE, static_cast
 #define D_UPPER_CASE_LETTER "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 #define D_VOWEL "aAeEiIoOuUyY"
 #define D_LETTER D_LOWER_CASE_LETTER D_UPPER_CASE_LETTER
-#undef D_DIGIT
-#define D_DIGIT "0123456789"
+#undef D_BIN_DIGIT
+#define D_BIN_DIGIT "01"
+#undef D_OCT_DIGIT
+#define D_OCT_DIGIT D_BIN_DIGIT "234567"
+#undef D_DEC_DIGIT
+#define D_DEC_DIGIT D_OCT_DIGIT "89"
 #undef D_HEX_DIGIT
-#define D_HEX_DIGIT D_DIGIT "aAbBcCdDeEfF"
-HCharacterClass const _digit_ = HCharacterClass( D_DIGIT, static_cast<int>( sizeof ( D_DIGIT ) - 1 ) );
+#define D_HEX_DIGIT D_DEC_DIGIT "aAbBcCdDeEfF"
+HCharacterClass const _binDigit_ = HCharacterClass( D_BIN_DIGIT, static_cast<int>( sizeof ( D_BIN_DIGIT ) - 1 ) );
+HCharacterClass const _octDigit_ = HCharacterClass( D_OCT_DIGIT, static_cast<int>( sizeof ( D_OCT_DIGIT ) - 1 ) );
+HCharacterClass const _digit_ = HCharacterClass( D_DEC_DIGIT, static_cast<int>( sizeof ( D_DEC_DIGIT ) - 1 ) );
 HCharacterClass const _hexDigit_ = HCharacterClass( D_HEX_DIGIT, static_cast<int>( sizeof ( D_HEX_DIGIT ) - 1 ) );
 HCharacterClass const _letter_ = HCharacterClass( D_LETTER, static_cast<int>( sizeof ( D_LETTER ) - 1 ) );
 HCharacterClass const _lowerCaseLetter_ = HCharacterClass( D_LOWER_CASE_LETTER, static_cast<int>( sizeof ( D_LOWER_CASE_LETTER ) - 1 ) );
 HCharacterClass const _upperCaseLetter_ = HCharacterClass( D_UPPER_CASE_LETTER, static_cast<int>( sizeof ( D_UPPER_CASE_LETTER ) - 1 ) );
-HCharacterClass const _word_ = HCharacterClass( D_LETTER D_DIGIT "_", static_cast<int>( sizeof ( D_LETTER D_DIGIT "_" ) - 1 ) );
+HCharacterClass const _word_ = HCharacterClass( D_LETTER D_DEC_DIGIT "_", static_cast<int>( sizeof ( D_LETTER D_DEC_DIGIT "_" ) - 1 ) );
 HCharacterClass const _vowel_ = HCharacterClass( D_VOWEL, static_cast<int>( sizeof ( D_VOWEL ) - 1 ) );
 #undef D_HEX_DIGIT
-#undef D_DIGIT
+#undef D_DEC_DIGIT
+#undef D_OCT_DIGIT
+#undef D_BIN_DIGIT
 #undef D_LETTER
 #undef D_VOWEL
 #undef D_LOWER_CASE_LETTER
@@ -1622,8 +1630,20 @@ bool is_digit( char char_ ) {
 	return ( _digit_.has( char_ ) );
 }
 
+bool is_dec_digit( char char_ ) {
+	return ( _digit_.has( char_ ) );
+}
+
 bool is_hex_digit( char char_ ) {
 	return ( _hexDigit_.has( char_ ) );
+}
+
+bool is_oct_digit( char char_ ) {
+	return ( _octDigit_.has( char_ ) );
+}
+
+bool is_bin_digit( char char_ ) {
+	return ( _binDigit_.has( char_ ) );
 }
 
 bool is_letter( char char_ ) {

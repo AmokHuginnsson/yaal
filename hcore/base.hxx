@@ -134,6 +134,9 @@ template<typename type_t>
 bool is_binary( type_t const& );
 template<typename type_t>
 bool is_octal( type_t const& );
+bool is_hexadecimal( char const*, int );
+bool is_binary( char const*, int );
+bool is_octal( char const*, int );
 
 }
 
