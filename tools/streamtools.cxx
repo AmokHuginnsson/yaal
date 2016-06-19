@@ -24,6 +24,7 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <cstring>
 #ifdef __MSVCXX__
 #include <unistd.h>
 #endif /* #ifdef __MSVCXX__ */
@@ -144,8 +145,18 @@ HBinaryFormatter& HBinaryFormatter::operator << ( double v_ ) {
 
 HBinaryFormatter& HBinaryFormatter::operator << ( double long v_ ) {
 	M_PROLOG
-	double long v( hton( v_ ) );
-	return ( binary( &v, static_cast<int>( sizeof ( v ) ) ) );
+#if SIZEOF_DOUBLE_LONG > 8
+	/*
+	 * Use only first 80 bits of input.
+	 */
+	static size_t const BUF_SIZE( 10 );
+#else
+	static size_t const BUF_SIZE( sizeof ( v_ ) );
+#endif
+	char buf[BUF_SIZE];
+	::memcpy( buf, &v_, sizeof ( buf ) );
+	reverse( buf, buf + sizeof ( buf ) );
+	return ( binary( buf, static_cast<int>( sizeof ( buf ) ) ) );
 	M_EPILOG
 }
 
@@ -153,8 +164,9 @@ HBinaryFormatter& HBinaryFormatter::binary( void const* buf_, int size_ ) {
 	M_PROLOG
 	int const mask[] = { 128, 64, 32, 16, 8, 4, 2, 1 };
 	for ( int i = 0; i < size_; ++ i ) {
-		for ( int b = 0; b < 8; ++ b )
+		for ( int b = 0; b < 8; ++ b ) {
 			(*_stream) << ( static_cast<char const*>( buf_ )[ i ] & mask[ b ] ? '1' : '0' );
+		}
 	}
 	return ( *this );
 	M_EPILOG
