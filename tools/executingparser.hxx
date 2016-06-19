@@ -869,10 +869,16 @@ public:
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const& )> action_string_t;
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const&, position_t )> action_string_position_t;
 	typedef yaal::hcore::HArray<yaal::hcore::HString> dictionary_t;
+	enum class WORD_BOUNDARY {
+		REQUIRED,
+		OPTIONAL,
+		AUTO
+	};
 private:
 	dictionary_t _dictionary;
 	action_string_t _actionString;
 	action_string_position_t _actionStringPosition;
+	WORD_BOUNDARY _wordBoundary;
 public:
 	HString( HString const& );
 	virtual ~HString( void ) {
@@ -883,14 +889,14 @@ public:
 	HString operator[]( action_string_position_t const& ) const;
 protected:
 	HString( HString const&, yaal::hcore::HString const& );
-	HString( yaal::hcore::HString const&, action_t const&, bool );
-	HString( yaal::hcore::HString const&, action_position_t const&, bool );
-	HString( yaal::hcore::HString const&, action_string_t const&, bool );
-	HString( yaal::hcore::HString const&, action_string_position_t const&, bool );
-	HString( dictionary_t const&, action_t const&, bool );
-	HString( dictionary_t const&, action_position_t const&, bool );
-	HString( dictionary_t const&, action_string_t const&, bool );
-	HString( dictionary_t const&, action_string_position_t const&, bool );
+	HString( yaal::hcore::HString const&, action_t const&, bool, WORD_BOUNDARY );
+	HString( yaal::hcore::HString const&, action_position_t const&, bool, WORD_BOUNDARY );
+	HString( yaal::hcore::HString const&, action_string_t const&, bool, WORD_BOUNDARY );
+	HString( yaal::hcore::HString const&, action_string_position_t const&, bool, WORD_BOUNDARY );
+	HString( dictionary_t const&, action_t const&, bool, WORD_BOUNDARY );
+	HString( dictionary_t const&, action_position_t const&, bool, WORD_BOUNDARY );
+	HString( dictionary_t const&, action_string_t const&, bool, WORD_BOUNDARY );
+	HString( dictionary_t const&, action_string_position_t const&, bool, WORD_BOUNDARY );
 	virtual ptr_t do_clone( void ) const override;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
@@ -900,23 +906,33 @@ protected:
 	virtual bool do_has_action( void ) const override;
 private:
 	yaal::hcore::HString desc( void ) const;
-	HString( yaal::hcore::HString const&, bool );
+	HString( yaal::hcore::HString const&, bool, WORD_BOUNDARY );
 	HString& operator = ( HString const& ) = delete;
-	friend HString string( yaal::hcore::HString const&, HRuleBase::WHITE_SPACE );
-	friend HString string( yaal::hcore::HString const&, HString::action_string_t const&, HRuleBase::WHITE_SPACE );
-	friend HString string( yaal::hcore::HString const&, HString::action_string_position_t const&, HRuleBase::WHITE_SPACE );
-	friend HString string( yaal::hcore::HString const&, HString::action_t const&, HRuleBase::WHITE_SPACE );
-	friend HString string( yaal::hcore::HString const&, HString::action_position_t const&, HRuleBase::WHITE_SPACE );
+	friend HString string( yaal::hcore::HString const&, HRuleBase::WHITE_SPACE, WORD_BOUNDARY );
+	friend HString string( yaal::hcore::HString const&, HString::action_string_t const&, HRuleBase::WHITE_SPACE, WORD_BOUNDARY );
+	friend HString string( yaal::hcore::HString const&, HString::action_string_position_t const&, HRuleBase::WHITE_SPACE, WORD_BOUNDARY );
+	friend HString string( yaal::hcore::HString const&, HString::action_t const&, HRuleBase::WHITE_SPACE, WORD_BOUNDARY );
+	friend HString string( yaal::hcore::HString const&, HString::action_position_t const&, HRuleBase::WHITE_SPACE, WORD_BOUNDARY );
+	friend HString string( yaal::hcore::HString const&, WORD_BOUNDARY );
+	friend HString string( yaal::hcore::HString const&, HString::action_string_t const&, WORD_BOUNDARY );
+	friend HString string( yaal::hcore::HString const&, HString::action_string_position_t const&, WORD_BOUNDARY );
+	friend HString string( yaal::hcore::HString const&, HString::action_t const&, WORD_BOUNDARY );
+	friend HString string( yaal::hcore::HString const&, HString::action_position_t const&, WORD_BOUNDARY );
 	friend HString operator | ( HString const&, yaal::hcore::HString const& );
 };
 
 typedef yaal::hcore::HExceptionT<HString, HRuleBaseException> HStringException;
 
-HString string( yaal::hcore::HString const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO );
-HString string( yaal::hcore::HString const&, HString::action_string_t const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO );
-HString string( yaal::hcore::HString const&, HString::action_string_position_t const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO );
-HString string( yaal::hcore::HString const&, HString::action_t const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO );
-HString string( yaal::hcore::HString const&, HString::action_position_t const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO );
+HString string( yaal::hcore::HString const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO, HString::WORD_BOUNDARY = HString::WORD_BOUNDARY::AUTO );
+HString string( yaal::hcore::HString const&, HString::action_string_t const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO, HString::WORD_BOUNDARY = HString::WORD_BOUNDARY::AUTO );
+HString string( yaal::hcore::HString const&, HString::action_string_position_t const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO, HString::WORD_BOUNDARY = HString::WORD_BOUNDARY::AUTO );
+HString string( yaal::hcore::HString const&, HString::action_t const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO, HString::WORD_BOUNDARY = HString::WORD_BOUNDARY::AUTO );
+HString string( yaal::hcore::HString const&, HString::action_position_t const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO, HString::WORD_BOUNDARY = HString::WORD_BOUNDARY::AUTO );
+HString string( yaal::hcore::HString const&, HString::WORD_BOUNDARY );
+HString string( yaal::hcore::HString const&, HString::action_string_t const&, HString::WORD_BOUNDARY );
+HString string( yaal::hcore::HString const&, HString::action_string_position_t const&, HString::WORD_BOUNDARY );
+HString string( yaal::hcore::HString const&, HString::action_t const&, HString::WORD_BOUNDARY );
+HString string( yaal::hcore::HString const&, HString::action_position_t const&, HString::WORD_BOUNDARY );
 
 class HRegex : public HRuleBase {
 public:
@@ -981,11 +997,16 @@ HCharacter characters( yaal::hcore::HString const&, HRuleBase::action_t const&, 
 HCharacter characters( yaal::hcore::HString const&, HRuleBase::action_position_t const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO );
 HCharacter characters( yaal::hcore::HString const&, HCharacter::action_character_t const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO );
 HCharacter characters( yaal::hcore::HString const&, HCharacter::action_character_position_t const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO );
-HString constant( yaal::hcore::HString const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO );
-HString constant( yaal::hcore::HString const&, HRuleBase::action_t const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO );
-HString constant( yaal::hcore::HString const&, HRuleBase::action_position_t const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO );
-HString constant( yaal::hcore::HString const&, HString::action_string_t const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO );
-HString constant( yaal::hcore::HString const&, HString::action_string_position_t const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO );
+HString constant( yaal::hcore::HString const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO, HString::WORD_BOUNDARY = HString::WORD_BOUNDARY::AUTO );
+HString constant( yaal::hcore::HString const&, HRuleBase::action_t const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO, HString::WORD_BOUNDARY = HString::WORD_BOUNDARY::AUTO );
+HString constant( yaal::hcore::HString const&, HRuleBase::action_position_t const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO, HString::WORD_BOUNDARY = HString::WORD_BOUNDARY::AUTO );
+HString constant( yaal::hcore::HString const&, HString::action_string_t const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO, HString::WORD_BOUNDARY = HString::WORD_BOUNDARY::AUTO );
+HString constant( yaal::hcore::HString const&, HString::action_string_position_t const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO, HString::WORD_BOUNDARY = HString::WORD_BOUNDARY::AUTO );
+HString constant( yaal::hcore::HString const&, HString::WORD_BOUNDARY );
+HString constant( yaal::hcore::HString const&, HRuleBase::action_t const&, HString::WORD_BOUNDARY );
+HString constant( yaal::hcore::HString const&, HRuleBase::action_position_t const&, HString::WORD_BOUNDARY );
+HString constant( yaal::hcore::HString const&, HString::action_string_t const&, HString::WORD_BOUNDARY );
+HString constant( yaal::hcore::HString const&, HString::action_string_position_t const&, HString::WORD_BOUNDARY );
 HRegex regex( yaal::hcore::HString const&, bool = true );
 HRegex regex( yaal::hcore::HString const&, HRuleBase::action_t const&, bool = true );
 HRegex regex( yaal::hcore::HString const&, HRuleBase::action_position_t const&, bool = true );
