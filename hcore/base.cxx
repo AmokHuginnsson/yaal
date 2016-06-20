@@ -45,6 +45,7 @@ exit_flag_t _isKilled_{ false };
 bool is_hexadecimal( char const* str_, int len_ ) {
 	if ( ( len_ >= 4 ) && ( str_[ 0 ] == '-' ) ) { /* -0x0 */
 		++ str_;
+		-- len_;
 	}
 	return ( ( len_ >= 3 )
 			&& ( str_[ 0 ] == '0' )
@@ -60,11 +61,14 @@ bool is_hexadecimal( HString const& str_ ) {
 }
 
 bool is_binary( char const* str_, int len_ ) {
-	if ( ( len_ >= 3 ) && ( str_[ 0 ] == '-' ) ) { /* -0b */
+	if ( ( len_ >= 4 ) && ( str_[ 0 ] == '-' ) ) { /* -0b0 */
 		++ str_;
+		-- len_;
 	}
-	int binaryMark( static_cast<int>( strspn( str_, "01" ) ) );
-	return ( ( binaryMark > 0 ) && ( ( str_[binaryMark] == 'b' ) || ( str_[binaryMark] == 'B' ) ) );
+	return ( ( len_ >= 3 )
+			&& ( str_[ 0 ] == '0' )
+			&& ( ( str_[1] == 'b' ) || ( str_[1] == 'B' ) )
+			&& ( ( ( str_[2] >= '0' ) && ( str_[2] <= '1' ) ) ) );
 }
 
 template<>
@@ -73,13 +77,21 @@ bool is_binary( HString const& str_ ) {
 }
 
 bool is_octal( char const* str_, int len_ ) {
+	if ( ( len_ >= 3 ) && ( str_[ 0 ] == '-' ) ) { /* -07 */
+		++ str_;
+		-- len_;
+	}
 	bool octal( false );
-	if ( ! is_binary( str_, len_ ) ) {
-		int offset( 0 );
-		if ( ( len_ >= 3 ) && ( str_[ 0 ] == '-' ) ) { /* -01 */
-			++ offset, ++ str_;
+	if ( str_[0] == '0' ) {
+		++ str_;
+		-- len_;
+		if ( str_[0] == 'o' ) {
+			++ str_;
+			-- len_;
 		}
-		octal = ( len_ >= 2 ) && ( str_[0] == '0' ) && ( str_[1] >= '0' ) && ( str_[1] <= '7' );
+		if ( ( len_ > 0 ) && ( str_[0] >= '0' ) && ( str_[0] <= '7' ) ) {
+			octal = true;
+		}
 	}
 	return ( octal );
 }
@@ -89,7 +101,8 @@ bool is_octal( HString const& str_ ) {
 	return ( is_octal( str_.raw(), static_cast<int>( str_.get_length() ) ) );
 }
 
-static int const MAX_VALID_INTEGER_LENGTH = 32;
+static int const MAX_VALID_BINARY_INTEGER_LENGTH = 130; /* 128 bits + '-' + terminator */
+static int const MAX_VALID_OCTAL_INTEGER_LENGTH = 46;
 
 namespace {
 
@@ -115,14 +128,52 @@ HPair<int, char const*> preparse_integer( HString const& str_, char* alternate_ 
 	 */
 	int base( 10 );
 	char const* str( str_.raw() );
+	int long len( str_.get_length() );
 	if ( is_hexadecimal( str_ ) ) {
 		base = 16;
 	} else if ( is_binary( str_ ) ) {
 		base = 2;
+		char const* src( str );
+		str = alternate_;
+		int offset( 0 );
+		if ( src[0] == '-' ) {
+			alternate_[0] = '-';
+			++ offset;
+			++ src;
+			-- len;
+		}
+		len -= 2;
+		src += 2;
+		if ( len >= MAX_VALID_BINARY_INTEGER_LENGTH ) {
+			M_THROW( "too many binary digits: " + str_, len );
+		}
+		::memcpy( alternate_ + offset, src, static_cast<size_t>( len ) );
+		alternate_[offset + len] = 0;
 	} else if ( is_octal( str_ ) ) {
 		base = 8;
+		char const* src( str );
+		str = alternate_;
+		int offset( 0 );
+		if ( src[0] == '-' ) {
+			alternate_[offset] = '-';
+			++ offset;
+			++ src;
+			-- len;
+		}
+		alternate_[offset] = '0';
+		++ offset;
+		-- len;
+		++ src;
+		if ( ( src[0] == 'o' ) || ( src[0] == 'O' ) ) {
+			++ src;
+			-- len;
+		}
+		if ( len >= MAX_VALID_OCTAL_INTEGER_LENGTH ) {
+			M_THROW( "too many binary digits: " + str_, len );
+		}
+		::memcpy( alternate_ + offset, src, static_cast<size_t>( len ) );
+		alternate_[offset + len] = 0;
 	} else {
-		int long len( str_.get_length() );
 		char const* src( str );
 		if ( ( len >= 2 ) && ( src[0] == '-' ) ) { /* -0 */
 			++ src;
@@ -152,7 +203,7 @@ int long long unsigned stoull_impl( char const*, int*, int );
 template<>
 int long long unsigned lexical_cast( HString const& str_ ) {
 	M_PROLOG
-	char alternateForm[ MAX_VALID_INTEGER_LENGTH ];
+	char alternateForm[ MAX_VALID_BINARY_INTEGER_LENGTH ];
 	HPair<int, char const*> preParsed( preparse_integer( str_, alternateForm ) );
 	return ( hcore::stoull_impl( preParsed.second, nullptr, preParsed.first ) );
 	M_EPILOG
@@ -186,7 +237,7 @@ int long long stoll_impl( char const*, int*, int );
 template<>
 int long long lexical_cast( HString const& str_ ) {
 	M_PROLOG
-	char alternateForm[ MAX_VALID_INTEGER_LENGTH ];
+	char alternateForm[ MAX_VALID_BINARY_INTEGER_LENGTH ];
 	HPair<int, char const*> preParsed( preparse_integer( str_, alternateForm ) );
 	return ( hcore::stoll_impl( preParsed.second, nullptr, preParsed.first ) );
 	M_EPILOG
@@ -280,28 +331,32 @@ template<>
 bool lexical_cast( char const* const& value_ ) {
 	M_PROLOG
 	static HString message;
-	bool bVal = false;
-	if ( ! ::strcasecmp( value_, "yes" ) )
+	bool bVal( false );
+	if ( ! ::strcasecmp( value_, "true" ) ) {
 		bVal = true;
-	else if ( ! ::strcasecmp( value_, "no" ) )
+	} else if ( ! ::strcasecmp( value_, "false" ) ) {
 		bVal = false;
-	else if ( ! ::strcasecmp( value_, "true" ) )
+	} else if ( ! ::strcasecmp( value_, "yes" ) ) {
 		bVal = true;
-	else if ( ! ::strcasecmp( value_, "false" ) )
+	} else if ( ! ::strcasecmp( value_, "no" ) ) {
 		bVal = false;
-	else if ( ! ::strcasecmp( value_, "on" ) )
+	} else if ( ! ::strcasecmp( value_, "on" ) ) {
 		bVal = true;
-	else if ( ! ::strcasecmp( value_, "off" ) )
+	} else if ( ! ::strcasecmp( value_, "off" ) ) {
 		bVal = false;
-	else if ( ! ::strcasecmp( value_, "enable" ) )
+	} else if ( ! ::strcasecmp( value_, "enable" ) ) {
 		bVal = true;
-	else if ( ! ::strcasecmp( value_, "disable" ) )
+	} else if ( ! ::strcasecmp( value_, "disable" ) ) {
 		bVal = false;
-	else if ( ! ::strcasecmp( value_, "1" ) )
+	} else if ( ! ::strcasecmp( value_, "enabled" ) ) {
 		bVal = true;
-	else if ( ! ::strcasecmp( value_, "0" ) )
+	} else if ( ! ::strcasecmp( value_, "disabled" ) ) {
 		bVal = false;
-	else {
+	} else if ( ! ::strcasecmp( value_, "1" ) ) {
+		bVal = true;
+	} else if ( ! ::strcasecmp( value_, "0" ) ) {
+		bVal = false;
+	} else {
 		message = "not a boolean value: ";
 		message += value_;
 		typedef LexicalCast this_type;
