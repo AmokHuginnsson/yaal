@@ -80,7 +80,7 @@ double long atof_ex( HString const& string_, bool parse_ ) {
 			throw HExpressionException( HString( e.what() ) + " - " + analyser.get_error() + " for: " + string_ + ", at: " + analyser.get_error_token() );
 		}
 	} else {
-		value = lexical_cast<double long>( str );
+		value = ::strtold( str.raw(), nullptr );
 	}
 	return ( value );
 	M_EPILOG
