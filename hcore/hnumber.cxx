@@ -1235,8 +1235,9 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 						dividendSample[divSampleLen] = dividendLeafNo < _leafCount ? dividend[dividendLeafNo] : 0;
 						++ divSampleLen;
 						++ dividendLeafNo;
-						if ( firstLeaf )
+						if ( firstLeaf ) {
 							-- integralPart;
+						}
 						extra = true;
 					}
 
@@ -1281,8 +1282,9 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 					}
 					if ( ( v2 * leaf ) > ( ( ( ( ( u0 * LEAF ) + u1 ) - leaf * v1 ) * LEAF ) + u2 ) ) {
 						-- leaf;
-						if ( ( v2 * leaf ) > ( ( ( ( ( u0 * LEAF ) + u1 ) - leaf * v1 ) * LEAF ) + u2 ) )
+						if ( ( v2 * leaf ) > ( ( ( ( ( u0 * LEAF ) + u1 ) - leaf * v1 ) * LEAF ) + u2 ) ) {
 							-- leaf;
+						}
 					}
 					/*
 					 * A helper for mutate_addition.
@@ -1305,8 +1307,10 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 				} while ( ( quotientLeafNo - integralPart ) < precision );
 				_integralPartSize = integralPart;
 				_leafCount = ( integralPart > quotientLeafNo ? integralPart : quotientLeafNo );
-				if ( quotientLeafNo < _leafCount )
+				_cache.realloc( chunk_size<i32_t>( _leafCount ) );
+				if ( quotientLeafNo < _leafCount ) {
 					::memset( _cache.get<i32_t>() + quotientLeafNo, 0, static_cast<size_t>( chunk_size<i32_t>( _leafCount - quotientLeafNo ) ) );
+				}
 				_negative = ! ( ( _negative && normalizedDivisor._negative ) || ! ( _negative || normalizedDivisor._negative ) );
 				_canonical.swap( _cache );
 				normalize( exact && dividendExact && divisorExact );
