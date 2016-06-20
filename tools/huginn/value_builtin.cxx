@@ -670,7 +670,7 @@ HHuginn::value_t real( HThread* thread_, HHuginn::value_t const& v_, int positio
 		double long v( 0 );
 		try {
 			v = lexical_cast<double long>( static_cast<HHuginn::HString const*>( v_.raw() )->value() );
-		} catch ( HLexicalCastException const& e ) {
+		} catch ( HException const& e ) {
 			thread_->raise( thread_->object_factory().conversion_exception_class(), e.what(), position_ );
 		}
 		res = thread_->object_factory().create_real( v );
