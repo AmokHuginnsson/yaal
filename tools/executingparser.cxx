@@ -25,6 +25,7 @@ Copyright:
 */
 
 #include <cctype>
+#include <cstdlib>
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
