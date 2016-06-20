@@ -46,14 +46,12 @@ bool is_hexadecimal( char const* str_, int len_ ) {
 	if ( ( len_ >= 4 ) && ( str_[ 0 ] == '-' ) ) { /* -0x0 */
 		++ str_;
 	}
-	if ( ( len_ >= 3 ) && ( str_[ 0 ] == '0' ) ) { /* 0x0 */
-		++ str_;
-	}
-	return ( ( len_ >= 2 )
-			&& ( ( str_[0] == 'x' ) || ( str_[0] == 'X' ) )
-			&& ( ( ( str_[1] >= '0' ) && ( str_[1] <= '9' ) )
-				|| ( ( str_[1] >= 'a' ) && ( str_[1] <= 'f' ) )
-				|| ( ( str_[1] >= 'A' ) && ( str_[1] <= 'F' ) ) ) );
+	return ( ( len_ >= 3 )
+			&& ( str_[ 0 ] == '0' )
+			&& ( ( str_[1] == 'x' ) || ( str_[1] == 'X' ) )
+			&& ( ( ( str_[2] >= '0' ) && ( str_[2] <= '9' ) )
+				|| ( ( str_[2] >= 'a' ) && ( str_[2] <= 'f' ) )
+				|| ( ( str_[2] >= 'A' ) && ( str_[2] <= 'F' ) ) ) );
 }
 
 template<>
@@ -115,46 +113,31 @@ HPair<int, char const*> preparse_integer( HString const& str_, char* alternate_ 
 	 * 1010c -> 10
 	 * 1010b ->  2
 	 */
-	HPair<int, char const*> ret;
 	int base( 10 );
 	char const* str( str_.raw() );
-	int long const len( str_.get_length() );
 	if ( is_hexadecimal( str_ ) ) {
 		base = 16;
-		char* dst( alternate_ );
-		char const* src( str );
-		int offset( src[0] == '-' ? 2 : 1 );
-		if ( src[0] == '-' ) {
-			*dst ++ = '-';
-			++ src;
-		}
-		if ( src[0] != '0' ) {
-			*dst ++ = '0';
-			int long end( str_.find_other_than( "0123456789abcdefABCDEF", offset ) );
-			if ( end < 0 )
-				end = ( len + 1 - offset );
-			if ( end >= ( MAX_VALID_INTEGER_LENGTH - offset ) )
-				M_THROW( "number too long: " + str_, end );
-			::strncpy( dst, src, static_cast<size_t>( end ) );
-			dst[end] = 0;
-			str = alternate_;
-		}
-	} else if ( is_binary( str_ ) )
+	} else if ( is_binary( str_ ) ) {
 		base = 2;
-	else if ( is_octal( str_ ) )
+	} else if ( is_octal( str_ ) ) {
 		base = 8;
-	else {
+	} else {
+		int long len( str_.get_length() );
 		char const* src( str );
-		if ( ( len >= 2 ) && ( src[0] == '-' ) ) /* -0 */
+		if ( ( len >= 2 ) && ( src[0] == '-' ) ) { /* -0 */
 			++ src;
-		if ( ! len || ! src[0] || ( src[0] < '0' ) || ( src[0] > '9' ) )
+			-- len;
+		}
+		if ( ! ( ( len > 0 ) && ( src[0] >= '0' ) && ( src[0] <= '9' ) ) ) {
 			M_THROW( "not a number: " + str_, 0 );
+		}
 		if ( src[0] == '0' ) {
 			str = alternate_;
 			alternate_[0] = '0';
 			alternate_[1] = 0;
 		}
 	}
+	HPair<int, char const*> ret;
 	ret.first = base;
 	ret.second = str;
 	return ( ret );
