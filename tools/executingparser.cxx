@@ -2783,36 +2783,44 @@ yaal::hcore::HString::const_iterator HInteger::do_parse( HExecutingParser* execu
 	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
 	yaal::hcore::HString::const_iterator scan( start );
 	_cache.clear();
-	real_paring_state_t state( START );
-	while ( scan != last_ ) {
-		bool stop( false );
-		char ch( *scan );
-		switch ( state ) {
-			case ( START ): {
-				if ( isdigit( ch ) )
-					state = DIGIT;
-				else if ( ch == '-' )
-					state = MINUS;
-				else
-					stop = true;
-			} break;
-			case ( MINUS ):
-			case ( DIGIT ): {
-				if ( isdigit( ch ) )
-					state = DIGIT;
-				else
-					stop = true;
-			} break;
-			default: {
-				M_ASSERT( ! "invalid hardcoded state"[0] );
-			}
-		}
-		if ( stop )
+	bool valid( true );
+	do {
+		if ( scan == last_ ) {
+			valid = false;
 			break;
-		_cache.push_back( *scan );
-		++ scan;
-	}
-	if ( state >= DIGIT ) {
+		}
+		typedef bool ( *digit_test_func_t )( char );
+		digit_test_func_t is_digit_test( &is_dec_digit );
+		int skip( *scan == '-' ? 1 : 0 );
+		bool isBin( is_binary( scan, static_cast<int>( last_ - scan ) ) );
+		if ( is_hexadecimal( scan, static_cast<int>( last_ - scan ) ) ) {
+			skip += 2;
+			is_digit_test = &is_hex_digit;
+		} else if ( is_octal( scan, static_cast<int>( last_ - scan ) ) ) {
+			skip += 1;
+			if ( ( scan[skip] == 'o' ) || ( scan[skip] == 'O' ) ) {
+				skip += 1;
+			}
+			is_digit_test = &is_oct_digit;
+		} else if ( isBin ) {
+			skip += 2;
+			is_digit_test = &is_bin_digit;
+		}
+		scan += skip;
+		while ( ( scan != last_ ) && is_digit_test( *scan ) ) {
+			++ scan;
+		}
+		if ( scan == ( start + skip ) ) {
+			valid = false;
+			break;
+		}
+		if ( ( scan != last_ ) && ( _word_.has( *scan ) ) ) {
+			valid = false;
+			break;
+		}
+		_cache.assign( start, scan - start );
+	} while ( false );
+	if ( valid ) {
 		position_t pos( position( executingParser_, start ) );
 		if ( !! _actionIntLongLong ) {
 			int long long ill( lexical_cast<int long long>( _cache ) );
