@@ -35,6 +35,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hstring.hxx"
 #include "hformat.hxx"
 #include "hcore.hxx"
+#include "safe_cast.hxx"
 
 using namespace yaal::hcore;
 
@@ -212,21 +213,21 @@ int long long unsigned lexical_cast( HString const& str_ ) {
 template<>
 int long unsigned lexical_cast( HString const& val ) {
 	M_PROLOG
-	return ( static_cast<int long unsigned>( lexical_cast<int long long unsigned>( val ) ) );
+	return ( safe_cast<int long unsigned>( lexical_cast<int long long unsigned>( val ) ) );
 	M_EPILOG
 }
 
 template<>
 int unsigned lexical_cast( HString const& val ) {
 	M_PROLOG
-	return ( static_cast<int unsigned>( lexical_cast<int long unsigned>( val ) ) );
+	return ( safe_cast<int unsigned>( lexical_cast<int long long unsigned>( val ) ) );
 	M_EPILOG
 }
 
 template<>
 int short unsigned lexical_cast( HString const& val ) {
 	M_PROLOG
-	return ( static_cast<int short unsigned>( lexical_cast<int long unsigned>( val ) ) );
+	return ( safe_cast<int short unsigned>( lexical_cast<int long long unsigned>( val ) ) );
 	M_EPILOG
 }
 
@@ -246,49 +247,63 @@ int long long lexical_cast( HString const& str_ ) {
 template<>
 int long lexical_cast( HString const& val ) {
 	M_PROLOG
-	return ( static_cast<int long>( lexical_cast<int long long>( val ) ) );
+	return ( safe_cast<int long>( lexical_cast<int long long>( val ) ) );
 	M_EPILOG
 }
 
 template<>
 int long lexical_cast( char const* const& val ) {
 	M_PROLOG
-	return ( lexical_cast<int long, HString>( val ) );
+	return ( safe_cast<int long>( lexical_cast<int long long, HString>( val ) ) );
 	M_EPILOG
 }
 
 template<>
 int long lexical_cast( char* const& val ) {
 	M_PROLOG
-	return ( lexical_cast<int long, HString>( val ) );
+	return ( safe_cast<int long>( lexical_cast<int long long, HString>( val ) ) );
 	M_EPILOG
 }
 
 template<>
 int lexical_cast( HString const& val ) {
 	M_PROLOG
-	return ( static_cast<int>( lexical_cast<int long>( val ) ) );
-	M_EPILOG
-}
-
-template<>
-int short lexical_cast( HString const& val ) {
-	M_PROLOG
-	return ( static_cast<int short>( lexical_cast<int long>( val ) ) );
+	return ( safe_cast<int>( lexical_cast<int long long>( val ) ) );
 	M_EPILOG
 }
 
 template<>
 int lexical_cast( char const* const& val ) {
 	M_PROLOG
-	return ( static_cast<int>( lexical_cast<int long, HString>( val ) ) );
+	return ( safe_cast<int>( lexical_cast<int long long, HString>( val ) ) );
 	M_EPILOG
 }
 
 template<>
 int lexical_cast( char* const& val ) {
 	M_PROLOG
-	return ( static_cast<int>( lexical_cast<int long, HString>( val ) ) );
+	return ( safe_cast<int>( lexical_cast<int long long, HString>( val ) ) );
+	M_EPILOG
+}
+
+template<>
+int short lexical_cast( HString const& val ) {
+	M_PROLOG
+	return ( safe_cast<int short>( lexical_cast<int long long>( val ) ) );
+	M_EPILOG
+}
+
+template<>
+int short lexical_cast( char const* const& val ) {
+	M_PROLOG
+	return ( safe_cast<int short>( lexical_cast<int long long, HString>( val ) ) );
+	M_EPILOG
+}
+
+template<>
+int short lexical_cast( char* const& val ) {
+	M_PROLOG
+	return ( safe_cast<int short>( lexical_cast<int long long, HString>( val ) ) );
 	M_EPILOG
 }
 
