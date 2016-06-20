@@ -1569,10 +1569,11 @@ int long long stoll_impl( char const* str_, int* endIdx_, int base_ ) {
 	char* end( nullptr );
 	int long long val( ::strtoll( str_, &end, base_ ) );
 	if ( ! val || ( val == LONG_MIN ) || ( val == LONG_MAX ) ) {
-		if ( errno == EINVAL )
-			throw HInvalidArgumentException( str_ );
-		else if ( errno == ERANGE )
-			throw HOutOfRangeException( str_ );
+		if ( errno == EINVAL ) {
+			throw HInvalidArgumentException( "Invalid argument in conversion: "_ys.append( str_ ) );
+		} else if ( errno == ERANGE ) {
+			throw HOutOfRangeException( "Out of range value in conversion: "_ys.append( str_ ) );
+		}
 	}
 	if ( endIdx_ )
 		*endIdx_ = static_cast<int>( end - str_ );
@@ -1593,10 +1594,11 @@ int long long unsigned stoull_impl( char const* str_, int* endIdx_, int base_ ) 
 	char* end( nullptr );
 	int long long unsigned val( ::strtoull( str_, &end, base_ ) );
 	if ( ! val || ( val == ULONG_MAX ) ) {
-		if ( errno == EINVAL )
-			throw HInvalidArgumentException( str_ );
-		else if ( errno == ERANGE )
-			throw HOutOfRangeException( str_ );
+		if ( errno == EINVAL ) {
+			throw HInvalidArgumentException( "Invalid argument in conversion: "_ys.append( str_ ) );
+		} else if ( errno == ERANGE ) {
+			throw HOutOfRangeException( "Out of range value in conversion: "_ys.append( str_ ) );
+		}
 	}
 	if ( endIdx_ )
 		*endIdx_ = static_cast<int>( end - str_ );

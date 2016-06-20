@@ -2821,37 +2821,42 @@ yaal::hcore::HString::const_iterator HInteger::do_parse( HExecutingParser* execu
 		_cache.assign( start, scan - start );
 	} while ( false );
 	if ( valid ) {
-		position_t pos( position( executingParser_, start ) );
-		if ( !! _actionIntLongLong ) {
-			int long long ill( lexical_cast<int long long>( _cache ) );
-			add_execution_step( executingParser_, start, call( _actionIntLongLong, ill ) );
-		} else if ( !! _actionIntLongLongPosition ) {
-			int long long ill( lexical_cast<int long long>( _cache ) );
-			add_execution_step( executingParser_, start, call( _actionIntLongLongPosition, ill, pos ) );
-		} else if ( !! _actionIntLong ) {
-			int long il( lexical_cast<int long>( _cache ) );
-			add_execution_step( executingParser_, start, call( _actionIntLong, il ) );
-		} else if ( !! _actionIntLongPosition ) {
-			int long il( lexical_cast<int long>( _cache ) );
-			add_execution_step( executingParser_, start, call( _actionIntLongPosition, il, pos ) );
-		} else if ( !! _actionInt ) {
-			int i( lexical_cast<int>( _cache ) );
-			add_execution_step( executingParser_, start, call( _actionInt, i ) );
-		} else if ( !! _actionIntPosition ) {
-			int i( lexical_cast<int>( _cache ) );
-			add_execution_step( executingParser_, start, call( _actionIntPosition, i, pos ) );
-		} else if ( !! _actionNumber ) {
-			add_execution_step( executingParser_, start, call( _actionNumber, yaal::move( _cache ) ) );
-		} else if ( !! _actionNumberPosition ) {
-			add_execution_step( executingParser_, start, call( _actionNumberPosition, yaal::move( _cache ), pos ) );
-		} else if ( !! _actionString ) {
-			add_execution_step( executingParser_, start, call( _actionString, yaal::move( _cache ) ) );
-		} else if ( !! _actionStringPosition ) {
-			add_execution_step( executingParser_, start, call( _actionStringPosition, yaal::move( _cache ), pos ) );
-		} else if ( !! _action ) {
-			add_execution_step( executingParser_, start, call( _action ) );
-		} else if ( !! _actionPosition ) {
-			add_execution_step( executingParser_, start, call( _actionPosition, pos ) );
+		try {
+			position_t pos( position( executingParser_, start ) );
+			if ( !! _actionIntLongLong ) {
+				int long long ill( lexical_cast<int long long>( _cache ) );
+				add_execution_step( executingParser_, start, call( _actionIntLongLong, ill ) );
+			} else if ( !! _actionIntLongLongPosition ) {
+				int long long ill( lexical_cast<int long long>( _cache ) );
+				add_execution_step( executingParser_, start, call( _actionIntLongLongPosition, ill, pos ) );
+			} else if ( !! _actionIntLong ) {
+				int long il( lexical_cast<int long>( _cache ) );
+				add_execution_step( executingParser_, start, call( _actionIntLong, il ) );
+			} else if ( !! _actionIntLongPosition ) {
+				int long il( lexical_cast<int long>( _cache ) );
+				add_execution_step( executingParser_, start, call( _actionIntLongPosition, il, pos ) );
+			} else if ( !! _actionInt ) {
+				int i( lexical_cast<int>( _cache ) );
+				add_execution_step( executingParser_, start, call( _actionInt, i ) );
+			} else if ( !! _actionIntPosition ) {
+				int i( lexical_cast<int>( _cache ) );
+				add_execution_step( executingParser_, start, call( _actionIntPosition, i, pos ) );
+			} else if ( !! _actionNumber ) {
+				add_execution_step( executingParser_, start, call( _actionNumber, yaal::move( _cache ) ) );
+			} else if ( !! _actionNumberPosition ) {
+				add_execution_step( executingParser_, start, call( _actionNumberPosition, yaal::move( _cache ), pos ) );
+			} else if ( !! _actionString ) {
+				add_execution_step( executingParser_, start, call( _actionString, yaal::move( _cache ) ) );
+			} else if ( !! _actionStringPosition ) {
+				add_execution_step( executingParser_, start, call( _actionStringPosition, yaal::move( _cache ), pos ) );
+			} else if ( !! _action ) {
+				add_execution_step( executingParser_, start, call( _action ) );
+			} else if ( !! _actionPosition ) {
+				add_execution_step( executingParser_, start, call( _actionPosition, pos ) );
+			}
+		} catch ( HException const& e ) {
+			report_error( executingParser_, scan, e.what() );
+			scan = first_;
 		}
 	} else {
 		report_error( executingParser_, scan, "expected integral number" );

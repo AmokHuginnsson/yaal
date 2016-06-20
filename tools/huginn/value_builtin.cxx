@@ -645,7 +645,7 @@ HHuginn::value_t integer( HThread* thread_, HHuginn::value_t const& v_, int posi
 		int long long v( 0 );
 		try {
 			v = lexical_cast<int long long>( static_cast<HHuginn::HString const*>( v_.raw() )->value() );
-		} catch ( HLexicalCastException const& e ) {
+		} catch ( HException const& e ) {
 			thread_->raise( thread_->object_factory().conversion_exception_class(), e.what(), position_ );
 		}
 		res = thread_->object_factory().create_integer( v );
