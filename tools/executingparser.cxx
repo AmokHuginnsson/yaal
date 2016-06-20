@@ -2387,16 +2387,16 @@ yaal::hcore::HString::const_iterator HReal::do_parse( HExecutingParser* executin
 	if ( ( ( _parse == PARSE::GREEDY ) && ( state >= INTEGRAL ) ) || ( ( _parse == PARSE::STRICT ) && ( state >= DOT ) ) ) {
 		position_t pos( position( executingParser_, start ) );
 		if ( !! _actionDouble ) {
-			double d( lexical_cast<double>( _cache ) );
+			double d( ::strtod( _cache.raw(), nullptr ) );
 			add_execution_step( executingParser_, start, call( _actionDouble, d ) );
 		} else if ( !! _actionDoublePosition ) {
-			double d( lexical_cast<double>( _cache ) );
+			double d( ::strtod( _cache.raw(), nullptr ) );
 			add_execution_step( executingParser_, start, call( _actionDoublePosition, d, pos ) );
 		} else if ( !! _actionDoubleLong ) {
-			double long dl( lexical_cast<double long>( _cache ) );
+			double long dl( ::strtold( _cache.raw(), nullptr ) );
 			add_execution_step( executingParser_, start, call( _actionDoubleLong, dl ) );
 		} else if ( !! _actionDoubleLongPosition ) {
-			double long dl( lexical_cast<double long>( _cache ) );
+			double long dl( ::strtold( _cache.raw(), nullptr ) );
 			add_execution_step( executingParser_, start, call( _actionDoubleLongPosition, dl, pos ) );
 		} else if ( !! _actionNumber ) {
 			add_execution_step( executingParser_, start, call( _actionNumber, yaal::move( _cache ) ) );
