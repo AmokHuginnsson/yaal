@@ -108,8 +108,7 @@ public:
 			addSep = true;
 			it.next();
 		}
-		HHuginn::value_t v( thread_->runtime().object_factory()->create_string( s ) );
-		return ( v );
+		return ( thread_->runtime().object_factory()->create_string( s ) );
 	}
 	static HHuginn::value_t distance( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		char const name[] = "Text.distance";
@@ -117,6 +116,23 @@ public:
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, false, position_ );
 		verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, false, position_ );
 		return ( thread_->runtime().object_factory()->create_integer( string::distance::levenshtein_damerau( get_string( values_[0] ), get_string( values_[1] ) ) ) );
+	}
+	static HHuginn::value_t repeat( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+		char const name[] = "Text.repeat";
+		verify_arg_count( name, values_, 2, 2, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, false, position_ );
+		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
+		HString out;
+		HString const& s( get_string( values_[0] ) );
+		int count( static_cast<int>( get_integer( values_[1] ) ) );
+		if ( count < 0 ) {
+			throw HHuginn::HHuginnRuntimeException( "Negative repeat count: "_ys.append( count ), position_ );
+		}
+		out.reserve( count * s.get_length() );
+		for ( int i( 0 ); i < count; ++ i ) {
+			out.append( s );
+		}
+		return ( thread_->runtime().object_factory()->create_string( out ) );
 	}
 };
 
@@ -136,7 +152,8 @@ HHuginn::value_t HTextCreator::do_new_instance( HRuntime* runtime_ ) {
 			HHuginn::field_definitions_t{
 				{ "split",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::split, _1, _2, _3, _4 ) ) },
 				{ "join",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::join, _1, _2, _3, _4 ) ) },
-				{ "distance",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::distance, _1, _2, _3, _4 ) ) }
+				{ "distance",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::distance, _1, _2, _3, _4 ) ) },
+				{ "repeat",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::repeat, _1, _2, _3, _4 ) ) }
 			}
 		)
 	);
