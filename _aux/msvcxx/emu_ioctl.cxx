@@ -1,4 +1,3 @@
-#include "../msvcxx/sys/cdefs.h"
 #include <windows.h>
 #include <cerrno>
 #include "../msvcxx/sys/ioctl.h"

@@ -7,10 +7,6 @@
 #include <errno.h>
 #include <pthread.h>
 
-#define _SYS_UN_H 1
-#define _NETINET_IN_H 1
-#define _NETDB_H 1
-#define _ARPA_INET_H 1
 #define select select_off
 #define fd_set fd_set_off
 #define inet_ntop inet_ntop_off

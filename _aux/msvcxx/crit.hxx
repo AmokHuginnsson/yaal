@@ -1,6 +1,9 @@
 #ifndef YAAL_MSVCXX_CRIT_HXX_INCLUDED
 #define YAAL_MSVCXX_CRIT_HXX_INCLUDED 1
 
+#include <WinSock2.h>
+#include <windows.h>
+
 class CMutex {
 	HANDLE _handle;
 public:
@@ -9,8 +12,8 @@ public:
 	void Lock( void ) { ::WaitForSingleObject( _handle, INFINITE ); }
 	void Unlock( void ) { ::ReleaseMutex( _handle ); }
 private:
-	CMutex( CMutex const& );
-	CMutex& operator = ( CMutex const& );
+	CMutex( CMutex const& ) = delete;
+	CMutex& operator = ( CMutex const& ) = delete;
 };
 
 class CLock {
@@ -23,8 +26,8 @@ public:
 		_mutex.Unlock();
 	}
 private:
-	CLock( CLock const& );
-	CLock operator = ( CLock const& );
+	CLock( CLock const& ) = delete;
+	CLock operator = ( CLock const& ) = delete;
 };
 
 #endif /* #ifndef YAAL_MSVCXX_CRIT_HXX_INCLUDED */

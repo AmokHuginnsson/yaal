@@ -4,12 +4,12 @@
 #undef log
 #include <io.h>
 #include <_aux/msvcxx/sys/time.h>
+#include <_aux/msvcxx/unistd.h>
 #include <sys/stat.h>
 #define YAAL_MSVCXX_OPENSSL_RSA_H_INCLUDED 1
 #include <openssl/ssl.h>
 
 #define getpid getpid_off
-#define getpwuid_r getpwuid_r_off
 #define access access_off
 #define lseek lseek_off
 #define dup dup_off
@@ -21,8 +21,6 @@
 #undef fill
 #include <_aux/msvcxx/dirent.h>
 //#include <_aux/msvcxx/p>
-#define _FCNTL_H 1
-//#include <bits/fcntl.h>
 #undef getpwuid_r
 #undef getpid
 #undef readdir_r
@@ -363,8 +361,6 @@ int stat( char const* path_, struct stat* s_ ) {
 	}
 	return ( res );
 }
-
-typedef __mode_t mode_t;
 
 M_EXPORT_SYMBOL
 mode_t umask( mode_t umask_ ) {

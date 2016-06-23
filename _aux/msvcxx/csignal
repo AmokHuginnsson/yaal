@@ -3,18 +3,8 @@
 
 #include <unistd.h>
 
-#define _SIGNAL_H 1
 typedef void (*__sighandler_t) (int);
 typedef __sighandler_t sighandler_t;
-#include <bits/signum.h>
-#include <bits/siginfo.h>
-#include <bits/sigaction.h>
-#undef SIG_DFL
-#undef SIG_IGN
-#undef SIG_ERR
-#undef _SIGNAL_H
-#undef SIGABRT
-#include <../include/csignal>
 
 M_YAAL_HCORE_PUBLIC_API int sigaddset( sigset_t*, int );
 M_YAAL_HCORE_PUBLIC_API int sigdelset( sigset_t*, int );

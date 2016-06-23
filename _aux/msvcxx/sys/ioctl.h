@@ -3,12 +3,12 @@
 
 #define TIOCGWINSZ 0x5413
 
-#include <features.h>
-#include <bits/ioctls.h>
-#include <bits/ioctl-types.h>
-#include <sys/ttydefaults.h>
-
 #ifdef __MSVCXX__
+
+struct winsize {
+	int ws_col;
+	int ws_row;
+};
 
 namespace msvcxx {
 int ioctl( int, int, void* );

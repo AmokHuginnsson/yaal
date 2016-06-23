@@ -1,13 +1,8 @@
 #define WinMain WinMain_off
-#include <sys/cdefs.h>
-#include <sys/time.h>
 #include <dbghelp.h>
 #include <sddl.h>
 #include <psapi.h>
 #undef WinMain
-
-#define getpwuid_r getpwuid_r_off
-#define getgrgid_r getgrgid_r_off
 
 #include <csignal>
 #include <unistd.h>
@@ -18,10 +13,7 @@
 #include <sys/socket.h>
 #include <iostream>
 
-#undef getpwuid_r
-#undef getgrgid_r
-#undef readdir_r
-#undef dirent
+#include "_aux/msvcxx/sys/time.h"
 
 #include "hcore/base.hxx"
 #include "hcore/memory.hxx"
@@ -123,7 +115,7 @@ char** backtrace_symbols( void* const* buf_, int size_ ) {
 
 extern "C" void* dlopen( char const*, int );
 M_EXPORT_SYMBOL
-void* dlopen_fix( char const* name_, int flag_ ) {
+void* dlopen( char const* name_, int flag_ ) {
 	HANDLE handle( 0 );
 	if ( ! name_ )
 		handle = GetModuleHandle( nullptr );
@@ -141,7 +133,7 @@ int unsetenv_fix( char const* name_ ) {
 	return ( ret );
 }
 
-int unix_readdir_r( DIR* dir_, struct unix_dirent* entry_, struct unix_dirent** result_ ) {
+int readdir_r( DIR* dir_, struct unix_dirent* entry_, struct unix_dirent** result_ ) {
 	dirent* result( nullptr );
 	dirent broken;
 	int error( readdir_r( dir_, &broken, &result ) );

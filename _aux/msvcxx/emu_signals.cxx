@@ -1,28 +1,14 @@
-#include <sys/cdefs.h>
 #include <process.h>
 
-#define execl execl_off
-#define execle execle_off
-#define execv execv_off
-#define execve execve_off
-#define execlp execlp_off
-#define execvp execvp_off
-#define access access_off
-#define lseek lseek_off
-#define dup dup_off
-#define dup2 dup2_off
-#define getpid getpid_off
-#define isatty isatty_off
-#define getpwuid_r getpwuid_r_off
 #include <csignal>
 
-#undef getpwuid_r
-#undef getpid
+#include <pthread.h>
 
-#include "synchronizedqueue.hxx"
+#include "_aux/msvcxx/unistd.h"
+#include "_aux/msvcxx/synchronizedqueue.hxx"
 #include "hcore/base.hxx"
-#include "emu_signals.hxx"
-#include "cleanup.hxx"
+#include "_aux/msvcxx/emu_signals.hxx"
+#include "_aux/msvcxx/cleanup.hxx"
 
 using namespace std;
 using namespace yaal;
