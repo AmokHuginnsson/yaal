@@ -97,8 +97,8 @@ inline tType min( tType const& left, tType const& right ) {
 }
 
 template<typename... tType>
-inline typename trait::variadic_head<tType...>::type min( typename trait::variadic_head<tType...>::type const& head_, tType const&... tail_ ) {
-	typename trait::variadic_head<tType...>::type tail( min( tail_... ) );
+inline typename trait::variadic_head<tType...>::type min( typename trait::variadic_head<tType...>::type const& head_, typename trait::variadic_head<tType...>::type const& body_, tType const&... tail_ ) {
+	typename trait::variadic_head<tType...>::type tail( min( body_, tail_... ) );
 	return ( head_ < tail ? head_ : tail );
 }
 
@@ -114,8 +114,8 @@ inline tType max( tType const& left, tType const& right ) {
 }
 
 template<typename... tType>
-inline typename trait::variadic_head<tType...>::type max( typename trait::variadic_head<tType...>::type const& head_, tType const&... tail_ ) {
-	typename trait::variadic_head<tType...>::type tail( max( tail_... ) );
+inline typename trait::variadic_head<tType...>::type max( typename trait::variadic_head<tType...>::type const& head_, typename trait::variadic_head<tType...>::type const& body_, tType const&... tail_ ) {
+	typename trait::variadic_head<tType...>::type tail( max( body_, tail_... ) );
 	return ( head_ >= tail ? head_ : tail );
 }
 
