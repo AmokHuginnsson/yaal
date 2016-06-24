@@ -280,7 +280,7 @@ bool HExecutingParser::parse( yaal::hcore::HString::const_iterator first_, yaal:
 		report_error( it, "failed to consume input" );
 	}
 	_inputStart = nullptr;
-	_matched = ( it == last_ );
+	_matched = ( it == last_ ) && ( ( first_ != last_ ) || _grammar->is_optional() );
 	return ( _matched );
 	M_EPILOG
 }
@@ -814,11 +814,12 @@ void HRule::do_detach( HRuleBase const* rule_, visited_t& visited_, bool& detach
 	HRuleBase::ptr_t r( _rule.rule() );
 	if ( !! r ) {
 		bool detachThis( r.raw() == rule_ );
-		if ( detachThis && detachAll_ )
+		if ( detachThis && detachAll_ ) {
 			_rule.reset( make_pointer<HRuleRef>( r ) );
-		else {
-			if ( detachThis )
+		} else {
+			if ( detachThis ) {
 				detachAll_ = true;
+			}
 			r->detach( rule_, visited_, detachAll_ );
 		}
 	}
@@ -860,8 +861,9 @@ void HRule::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const {
 void HRule::do_rule_use( rule_use_t& ruleUse_ ) const {
 	M_PROLOG
 	int use( ++ ruleUse_[ this ] );
-	if ( ( use == 1 ) && !! _rule )
+	if ( ( use == 1 ) && !! _rule ) {
 		_rule->rule_use( ruleUse_ );
+	}
 	return;
 	M_EPILOG
 }
@@ -899,8 +901,7 @@ HRuleBase::ptr_t HRecursiveRule::do_clone( void ) const {
 
 bool HRecursiveRule::do_is_optional( void ) const {
 	M_PROLOG
-	M_ENSURE( _rule );
-	return ( _rule->is_optional() );
+	return ( !! _rule ? _rule->is_optional() : false );
 	M_EPILOG
 }
 
@@ -916,8 +917,9 @@ void HRecursiveRule::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ )
 void HRecursiveRule::do_rule_use( rule_use_t& ruleUse_ ) const {
 	M_PROLOG
 	int use( ++ ruleUse_[ this ] );
-	if ( ( use == 1 ) && !! _rule )
+	if ( ( use == 1 ) && !! _rule ) {
 		_rule->rule_use( ruleUse_ );
+	}
 	return;
 	M_EPILOG
 }
@@ -928,8 +930,9 @@ void HRecursiveRule::do_detach( HRuleBase const* rule_, visited_t& visited_, boo
 	 * HRecursiveRule can be omitted once while detaching!
 	 * It is impossible then to perform this test: M_ENSURE( rule_ != this ).
 	 */
-	if ( !! _rule )
+	if ( !! _rule ) {
 		_rule->detach( rule_, visited_, detachAll_ );
+	}
 	return;
 	M_EPILOG
 }
@@ -946,8 +949,9 @@ bool HRecursiveRule::do_detect_recursion( HRecursionDetector& recursionDetector_
 
 void HRecursiveRule::do_find_recursions( HRuleAggregator& recursions_ ) {
 	M_PROLOG
-	if ( !! _rule )
+	if ( !! _rule ) {
 		_rule->find_recursions( recursions_ );
+	}
 	return;
 	M_EPILOG
 }
@@ -1003,8 +1007,9 @@ void HRuleRef::do_detach( HRuleBase const* rule_, visited_t& visited_, bool& det
 	M_PROLOG
 	HRuleBase::ptr_t r( _rule );
 	M_ASSERT( !! r );
-	if ( r.raw() != rule_ )
+	if ( r.raw() != rule_ ) {
 		r->detach( rule_, visited_, detachAll_ );
+	}
 	return;
 	M_EPILOG
 }
@@ -1035,18 +1040,21 @@ HRuleBase::ptr_t HRuleRef::get_rule( void ) const {
 
 HFollows::HFollows( HRuleBase const& predecessor_, HRuleBase const& successor_ )
 	: HRuleBase( predecessor_.skips_ws() )
-	, _rules() {
+	, _rules()
+	, _optional( false ) {
 	M_PROLOG
 	_rules.push_back( predecessor_ );
 	_rules.push_back( successor_ );
 	HRuleAggregator rra( this );
+	count_optional();
 	return;
 	M_EPILOG
 }
 
 HFollows::HFollows( HFollows const& follows_ )
 	: HRuleBase( follows_._action, follows_._actionPosition, follows_.skips_ws() )
-	, _rules( follows_._rules ) {
+	, _rules( follows_._rules )
+	, _optional( follows_._optional ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -1054,26 +1062,36 @@ HFollows::HFollows( HFollows const& follows_ )
 
 HFollows::HFollows( HFollows const& predecessors_, HRuleBase const& successor_ )
 	: HRuleBase( predecessors_.skips_ws() )
-	, _rules() {
+	, _rules()
+	, _optional( false ) {
 	M_PROLOG
 	for ( rules_t::const_iterator it( predecessors_._rules.begin() ), end( predecessors_._rules.end() ); it != end; ++ it )
 		_rules.push_back( *it );
 	_rules.push_back( successor_ );
 	HRuleAggregator rra( this );
+	count_optional();
 	return;
 	M_EPILOG
 }
 
 HFollows::HFollows( HFollows::rules_t const& rules_, action_t const& action_, bool skipWS_ )
 	: HRuleBase( action_, skipWS_ )
-	, _rules( rules_ ) {
+	, _rules( rules_ )
+	, _optional( false ) {
+	M_PROLOG
+	count_optional();
 	return;
+	M_EPILOG
 }
 
 HFollows::HFollows( HFollows::rules_t const& rules_, action_position_t const& action_, bool skipWS_ )
 	: HRuleBase( action_, skipWS_ )
-	, _rules( rules_ ) {
+	, _rules( rules_ )
+	, _optional( false ) {
+	M_PROLOG
+	count_optional();
 	return;
+	M_EPILOG
 }
 
 HFollows HFollows::operator[]( action_t const& action_ ) const {
@@ -1087,6 +1105,23 @@ HFollows HFollows::operator[]( action_position_t const& action_ ) const {
 	M_PROLOG
 	M_ENSURE( ! has_action() );
 	return ( HFollows( _rules, action_, _skipWS ) );
+	M_EPILOG
+}
+
+bool HFollows::do_is_optional( void ) const {
+	return ( _optional );
+}
+
+void HFollows::count_optional( void ) {
+	M_PROLOG
+	_optional = true;
+	for ( rules_t::value_type const& r : _rules ) {
+		if ( ! r->is_optional() ) {
+			_optional = false;
+			break;
+		}
+	}
+	return;
 	M_EPILOG
 }
 
@@ -1408,18 +1443,21 @@ bool HKleenePlus::do_detect_recursion( HRecursionDetector& recursionDetector_, b
 
 HAlternative::HAlternative( HRuleBase const& choice1_, HRuleBase const& choice2_ )
 	: HRuleBase( choice1_.skips_ws() && choice2_.skips_ws() )
-	, _rules() {
+	, _rules()
+	, _optional( false ) {
 	M_PROLOG
 	_rules.push_back( choice1_ );
 	_rules.push_back( choice2_ );
 	HRuleAggregator rra( this );
+	count_optional();
 	return;
 	M_EPILOG
 }
 
 HAlternative::HAlternative( HAlternative const& alternative_ )
 	: HRuleBase( alternative_._action, alternative_._actionPosition, alternative_._skipWS )
-	, _rules( alternative_._rules ) {
+	, _rules( alternative_._rules )
+	, _optional( alternative_._optional ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -1427,27 +1465,54 @@ HAlternative::HAlternative( HAlternative const& alternative_ )
 
 HAlternative::HAlternative( HAlternative const& alternative_, HRuleBase const& choice_ )
 	: HRuleBase( alternative_.skips_ws() && choice_.skips_ws() )
-	, _rules() {
+	, _rules()
+	, _optional( false ) {
 	M_PROLOG
 	for ( rules_t::const_iterator it( alternative_._rules.begin() ), end( alternative_._rules.end() ); it != end; ++ it ) {
 		_rules.push_back( *it );
 	}
 	_rules.push_back( choice_ );
 	HRuleAggregator rra( this );
+	count_optional();
 	return;
 	M_EPILOG
 }
 
 HAlternative::HAlternative( rules_t const& rules_, action_t const& action_, bool skipWS_ )
 	: HRuleBase( action_, skipWS_ )
-	, _rules( rules_ ) {
+	, _rules( rules_ )
+	, _optional( false ) {
+	M_PROLOG
+	count_optional();
 	return;
+	M_EPILOG
 }
 
 HAlternative::HAlternative( rules_t const& rules_, action_position_t const& action_, bool skipWS_ )
 	: HRuleBase( action_, skipWS_ )
-	, _rules( rules_ ) {
+	, _rules( rules_ )
+	, _optional( false ) {
+	M_PROLOG
+	count_optional();
 	return;
+	M_EPILOG
+}
+
+void HAlternative::count_optional( void ) {
+	M_PROLOG
+	_optional = false;
+	for ( rules_t::value_type const& r : _rules ) {
+		if ( r->is_optional() ) {
+			_optional = true;
+			break;
+		}
+	}
+	return;
+	M_EPILOG
+}
+
+bool HAlternative::do_is_optional( void ) const {
+	return ( _optional );
 }
 
 HRuleBase::ptr_t HAlternative::do_clone( void ) const {
