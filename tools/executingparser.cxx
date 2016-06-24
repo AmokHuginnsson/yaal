@@ -272,7 +272,7 @@ bool HExecutingParser::parse( yaal::hcore::HString::const_iterator first_, yaal:
 	_errorPosition = yaal::hcore::HString::npos;
 	_errorMessages.clear();
 	yaal::hcore::HString::const_iterator it( _grammar->parse( this, first_, last_ ) );
-	if ( executing_parser::HRuleBase::skip_space( it, last_ ) == last_ ) {
+	if ( ( it != first_ ) && ( position( it ) != _errorPosition ) && ( executing_parser::HRuleBase::skip_space( it, last_ ) == last_ ) ) {
 		it = last_;
 		_errorPosition = yaal::hcore::HString::npos;
 		_errorMessages.clear();
@@ -2346,44 +2346,52 @@ yaal::hcore::HString::const_iterator HReal::do_parse( HExecutingParser* executin
 	yaal::hcore::HString::const_iterator scan( start );
 	_cache.clear();
 	real_paring_state_t state( START );
-	while ( scan != last_ ) {
-		bool stop( false );
-		char ch( *scan );
-		switch ( state ) {
-			case ( START ): {
-				if ( isdigit( ch ) )
-					state = INTEGRAL;
-				else if ( ch == '-' )
-					state = MINUS;
-				else if ( ch == '.' )
-					state = DOT;
-				else
-					stop = true;
-			} break;
-			case ( MINUS ):
-			case ( INTEGRAL ): {
-				if ( isdigit( ch ) )
-					state = INTEGRAL;
-				else if ( ch == '.' )
-					state = DOT;
-				else
-					stop = true;
-			} break;
-			case ( DOT ):
-			case ( DECIMAL ): {
-				if ( isdigit( ch ) )
-					state = DECIMAL;
-				else
-					stop = true;
-			} break;
-			default: {
-				M_ASSERT( ! "invalid hardcoded state"[0] );
+	if ( scan != last_ ) {
+		while ( scan != last_ ) {
+			bool stop( false );
+			char ch( *scan );
+			switch ( state ) {
+				case ( START ): {
+					if ( isdigit( ch ) ) {
+						state = INTEGRAL;
+					} else if ( ch == '-' ) {
+						state = MINUS;
+					} else if ( ch == '.' ) {
+						state = DOT;
+					} else {
+						stop = true;
+					}
+				} break;
+				case ( MINUS ):
+				case ( INTEGRAL ): {
+					if ( isdigit( ch ) ) {
+						state = INTEGRAL;
+					} else if ( ch == '.' ) {
+						state = DOT;
+					} else {
+						stop = true;
+					}
+				} break;
+				case ( DOT ):
+				case ( DECIMAL ): {
+					if ( isdigit( ch ) ) {
+						state = DECIMAL;
+					} else {
+						stop = true;
+					}
+				} break;
+				default: {
+					M_ASSERT( ! "invalid hardcoded state"[0] );
+				}
 			}
+			if ( stop ) {
+				break;
+			}
+			_cache.push_back( *scan );
+			++ scan;
 		}
-		if ( stop )
-			break;
-		_cache.push_back( *scan );
-		++ scan;
+	} else {
+		scan = first_;
 	}
 	if ( ( ( _parse == PARSE::GREEDY ) && ( state >= INTEGRAL ) ) || ( ( _parse == PARSE::STRICT ) && ( state >= DOT ) ) ) {
 		position_t pos( position( executingParser_, start ) );
@@ -2787,6 +2795,7 @@ yaal::hcore::HString::const_iterator HInteger::do_parse( HExecutingParser* execu
 	bool valid( true );
 	do {
 		if ( scan == last_ ) {
+			scan = first_;
 			valid = false;
 			break;
 		}
@@ -3001,7 +3010,11 @@ yaal::hcore::HString::const_iterator HStringLiteral::do_parse( HExecutingParser*
 	bool valid( false );
 	yaal::hcore::HString::const_iterator from( nullptr );
 	do {
-		if ( ! ( ( scan != last_ ) && ( *scan == '"' ) ) ) {
+		if ( scan == last_ ) {
+			scan = first_;
+			break;
+		}
+		if( *scan != '"' ) {
 			break;
 		}
 		++ scan;
@@ -3169,7 +3182,11 @@ yaal::hcore::HString::const_iterator HCharacterLiteral::do_parse( HExecutingPars
 	bool valid( false );
 	yaal::hcore::HString::const_iterator from( nullptr );
 	do {
-		if ( ! ( ( scan != last_ ) && ( *scan == '\'' ) ) ) {
+		if ( scan == last_ ) {
+			scan = first_;
+			break;
+		}
+		if ( *scan != '\'' ) {
 			break;
 		}
 		++ scan;
@@ -3392,6 +3409,8 @@ yaal::hcore::HString::const_iterator HCharacter::do_parse( HExecutingParser* exe
 			++ scan;
 			matched = true;
 		}
+	} else {
+		scan = first_;
 	}
 	if ( ! matched ) {
 		report_error( executingParser_, scan, "expected one of characters: " + _characters );
@@ -3646,6 +3665,8 @@ hcore::HString::const_iterator HString::do_parse( HExecutingParser* executingPar
 				break;
 			}
 		}
+	} else {
+		scan = first_;
 	}
 	if ( ! matched ) {
 		report_error( executingParser_, scan, "expected string: " + desc() );
@@ -3926,6 +3947,8 @@ hcore::HString::const_iterator HRegex::do_parse( HExecutingParser* executingPars
 			scan += ( it->start() + it->size() );
 			matched = true;
 		}
+	} else {
+		scan = first_;
 	}
 	if ( ! matched ) {
 		report_error( executingParser_, scan, "expected character sequence matching regular expression: " + _regex->pattern() );
