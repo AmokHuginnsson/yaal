@@ -52,6 +52,7 @@ public:
 	static HHuginn::value_t get( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t set( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t add( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+	static HHuginn::value_t substract( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t multiply( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t det( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t scale( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );

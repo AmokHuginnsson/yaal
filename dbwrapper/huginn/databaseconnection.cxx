@@ -177,7 +177,7 @@ HHuginn::value_t HDatabaseConnection::do_column_names(
 	HHuginn::values_t const& values_,
 	int position_
 ) {
-	char const name[] = "DatabaseConnection.table_names";
+	char const name[] = "DatabaseConnection.column_names";
 	verify_arg_count( name, values_, 1, 1, position_ );
 	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
 	HDatabaseConnectionClass const* dbcClass( static_cast<HDatabaseConnectionClass const*>( HObject::get_class() ) );
