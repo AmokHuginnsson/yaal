@@ -369,7 +369,7 @@ HHuginn::value_t HMatrix::to_string( huginn::HThread* thread_, HHuginn::value_t*
 
 HHuginn::class_t HMatrix::get_class( HRuntime* runtime_ ) {
 	M_PROLOG
-	return (
+	HHuginn::class_t c(
 		runtime_->create_class(
 			"Matrix",
 			nullptr,
@@ -385,6 +385,8 @@ HHuginn::class_t HMatrix::get_class( HRuntime* runtime_ ) {
 			}
 		)
 	);
+	runtime_->huginn()->register_class( c );
+	return ( c );
 	M_EPILOG
 }
 
