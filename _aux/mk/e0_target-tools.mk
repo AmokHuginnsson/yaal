@@ -4,7 +4,7 @@ tags: $(SRCS) $(HDRS)
 	printf "%b\n" "done."
 
 DIR_COVERAGE=build/cov
-LCOV_PARAMS=
+LCOV_PARAMS=--rc lcov_excl_line='\bM_EPILOG\b'
 
 prepare-coverage-baseline: $(DIR_COVERAGE)
 	@cd $(DIR_ROOT) && \
