@@ -1040,11 +1040,13 @@ HString& HString::replace( int long pos_, int long size_, char const* buffer_, i
 	if ( pos_ < 0 )
 		M_THROW( _errMsgHString_[string_helper::BAD_OFFSET], pos_ );
 	int long oldSize( GET_SIZE );
-	if ( ( pos_ + size_ ) >= oldSize )
+	if ( ( pos_ + size_ ) > oldSize ) {
 		M_THROW( _errMsgHString_[string_helper::OVERFLOW], pos_ + size_ );
+	}
 	int long newSize( oldSize + ( len_ - size_ ) );
-	if ( len_ > size_ )
+	if ( len_ > size_ ) {
 		reserve( newSize );
+	}
 	::memmove( MEM + pos_ + len_, MEM + pos_ + size_, static_cast<size_t>( oldSize - ( pos_ + size_ ) ) );
 	::memcpy( MEM + pos_, buffer_, static_cast<size_t>( len_ ) );
 	SET_SIZE( newSize );
