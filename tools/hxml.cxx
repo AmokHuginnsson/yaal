@@ -1659,6 +1659,44 @@ HString const& attr_val( HXml::HConstIterator const& it_, yaal::hcore::HString c
 	M_EPILOG
 }
 
+value_t try_node_val_by_path( HXml::HConstNodeProxy const& node_, yaal::hcore::HString const& path_ ) {
+	M_PROLOG
+	HXml::HConstNodeSet ns( node_.get_elements_by_path( path_ ) );
+	xml::value_t v;
+	if ( ! ns.is_empty() ) {
+		v = xml::try_node_val( ns[0] );
+	}
+	return ( v );
+	M_EPILOG
+}
+
+value_t try_node_val_by_path( HXml::HConstIterator const& it_, yaal::hcore::HString const& path_ ) {
+	M_PROLOG
+	return ( try_node_val_by_path( *it_, path_ ) );
+	M_EPILOG
+}
+
+value_t try_attr_val_by_path( HXml::HConstNodeProxy const& node_, yaal::hcore::HString const& path_ ) {
+	M_PROLOG
+	int attrPos( static_cast<int>( path_.reverse_find( '/' ) ) );
+	M_ENSURE( attrPos != HString::npos );
+	HString path( path_.left( attrPos ) );
+	HString attr( path_.mid( attrPos + 1 ) );
+	HXml::HConstNodeSet ns( node_.get_elements_by_path( path ) );
+	xml::value_t v;
+	if ( ! ns.is_empty() ) {
+		v = xml::try_attr_val( ns[0], attr );
+	}
+	return ( v );
+	M_EPILOG
+}
+
+value_t try_attr_val_by_path( HXml::HConstIterator const& it_, yaal::hcore::HString const& path_ ) {
+	M_PROLOG
+	return ( try_attr_val_by_path( *it_, path_ ) );
+	M_EPILOG
+}
+
 }
 
 }

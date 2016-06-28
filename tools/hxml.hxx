@@ -488,6 +488,11 @@ yaal::hcore::HString const& node_val( HXml::HConstIterator const& it );
 yaal::hcore::HString const& attr_val( HXml::HConstNodeProxy const& node, yaal::hcore::HString const& name );
 yaal::hcore::HString const& attr_val( HXml::HConstIterator const& it, yaal::hcore::HString const& name );
 
+value_t try_node_val_by_path( HXml::HConstNodeProxy const&, yaal::hcore::HString const& );
+value_t try_node_val_by_path( HXml::HConstIterator const&, yaal::hcore::HString const& );
+value_t try_attr_val_by_path( HXml::HConstNodeProxy const&, yaal::hcore::HString const& );
+value_t try_attr_val_by_path( HXml::HConstIterator const&, yaal::hcore::HString const& );
+
 }
 
 inline void swap( yaal::tools::HXml& a, yaal::tools::HXml& b )
