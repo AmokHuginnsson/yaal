@@ -874,27 +874,9 @@ HXml::HConstNodeProxy const HXml::get_root( void ) const {
 	M_EPILOG
 }
 
-HXml::const_entity_iterator HXml::entity_begin( void ) const {
+HXml::entities_t const& HXml::entities( void ) const {
 	M_PROLOG
-	return ( _entities.begin() );
-	M_EPILOG
-}
-
-HXml::const_entity_iterator HXml::entity_end( void ) const {
-	M_PROLOG
-	return ( _entities.end() );
-	M_EPILOG
-}
-
-HXml::entity_iterator HXml::entity_begin( void ) {
-	M_PROLOG
-	return ( _entities.begin() );
-	M_EPILOG
-}
-
-HXml::entity_iterator HXml::entity_end( void ) {
-	M_PROLOG
-	return ( _entities.end() );
+	return ( _entities );
 	M_EPILOG
 }
 
@@ -984,7 +966,7 @@ HString const& HXml::HConstNodeProxy::get_value( void ) const {
 	HString const* val( nullptr );
 	if ( type == HXml::HNode::TYPE::ENTITY ) {
 		HXml::const_entity_iterator it( (**_node)._owner->_entities.find( (**_node)._text ) );
-		M_ASSERT( it != (**_node)._owner->entity_end() );
+		M_ASSERT( it != (**_node)._owner->entities().end() );
 		val = &it->second;
 	}
 	return ( type == HXml::HNode::TYPE::ENTITY ? *val : (**_node)._text );

@@ -125,10 +125,7 @@ public:
 	HNodeSet get_elements_by_path( yaal::hcore::HString const& );
 	HConstNodeSet get_elements_by_name( yaal::hcore::HString const& ) const;
 	HNodeSet get_elements_by_name( yaal::hcore::HString const& );
-	const_entity_iterator entity_begin( void ) const;
-	const_entity_iterator entity_end( void ) const;
-	entity_iterator entity_begin( void );
-	entity_iterator entity_end( void );
+	entities_t const& entities( void ) const;
 private:
 	static int writer_callback( void*, char const*, int );
 	static int reader_callback( void*, char*, int );
