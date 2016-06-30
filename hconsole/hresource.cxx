@@ -146,7 +146,7 @@ void HResource::create_window( yaal::hcore::HString const& id_ ) {
 
 yaal::tools::xml::value_t HResource::get_value( yaal::hcore::HString const& path_ ) const {
 	M_PROLOG
-	return ( xml::try_attr_val_by_path( _xml.get_root(), path_ ) );
+	return ( xml::try_node_val_by_path( _xml.get_root(), path_ ) );
 	M_EPILOG
 }
 
