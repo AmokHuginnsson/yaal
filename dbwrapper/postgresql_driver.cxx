@@ -66,12 +66,16 @@ struct OPostgreSQLResult {
 	bool _randomAccess;
 	bool _requireSync;
 	OPostgreSQLResult( ODBLink& link_ )
-		: _link( link_ ), _useCount( 1 ), _result( nullptr ),
-		_id( ++ _statementIdSource ),
-		_query(), _index( 0 ), _total( 0 ),
-		_params(),
-		_randomAccess( false ),
-		_requireSync( false ) {
+		: _link( link_ )
+		, _useCount( 1 )
+		, _result( nullptr )
+		, _id( to_string( system::getpid() ).append( ":" ).append( ++ _statementIdSource ) )
+		, _query()
+		, _index( 0 )
+		, _total( 0 )
+		, _params()
+		, _randomAccess( false )
+		, _requireSync( false ) {
 		return;
 	}
 private:
