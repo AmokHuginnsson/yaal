@@ -1,10 +1,13 @@
 #ifndef YAAL_MSVCXX_CSIGNAL_INCLUDED
 #define YAAL_MSVCXX_CSIGNAL_INCLUDED 1
 
-#include <unistd.h>
+#include "unistd.h"
 
-typedef void (*__sighandler_t) (int);
-typedef __sighandler_t sighandler_t;
+typedef void (*sighandler_t) (int);
+
+struct sigaction {
+	sighandler_t sa_handler;
+};
 
 M_YAAL_HCORE_PUBLIC_API int sigaddset( sigset_t*, int );
 M_YAAL_HCORE_PUBLIC_API int sigdelset( sigset_t*, int );

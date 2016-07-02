@@ -1,9 +1,8 @@
 #include <process.h>
 
-#include <csignal>
-
 #include <pthread.h>
 
+#include "_aux/msvcxx/csignal"
 #include "_aux/msvcxx/unistd.h"
 #include "_aux/msvcxx/synchronizedqueue.hxx"
 #include "hcore/base.hxx"
@@ -97,7 +96,7 @@ void SignalDispatcher::dispatch( int sigNo_ ) {
 	if ( sigismember( &_accept, sigNo_ ) ) {
 		_queue.push( sigNo_ );
 	} else {
-		external_lock_t l( _tlsSignalsSetup_.acquire() );
+		HLock l( _tlsSignalsSetup_.acquire() );
 		for ( TLSSignalsSetup::iterator it( _tlsSignalsSetup_.begin() ), end( _tlsSignalsSetup_.end() );
 			it != end; ++ it ) {
 			if ( ! (**it)->is_blocked( sigNo_ ) ) {
@@ -224,7 +223,8 @@ int sigismember( sigset_t* set_, int sig_ ) {
 }
 
 int sigemptyset( sigset_t* set_ ) {
-	return ( *set_ = 0 );
+	*set_ = 0;
+	return ( 0 );
 }
 
 void win_signal_handler( int signo ) {

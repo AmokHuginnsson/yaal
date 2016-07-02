@@ -24,7 +24,6 @@
 #include "emu_unistd.hxx"
 
 typedef int uid_t;
-typedef int mode_t;
 typedef yaal::u64_t sigset_t;
 
 static int const STDIN_FILENO = 0;
@@ -57,6 +56,8 @@ static int const SIGURG = 16;
 static int const SIGSTOP = 17;
 static int const SIGTSTP = 18;
 static int const SIGCONT = 19;
+static int const SIGWINCH = 28;
+static int const SIGPWR = 29;
 static int const SIGUSR1 = 30;
 
 static int const WCONTINUED = 0;
@@ -69,6 +70,7 @@ static int const WCONTINUED = 0;
 #undef gai_strerror
 #define gai_strerror msvcxx::windows_strerror
 
+pid_t getpid( void );
 int ms_gethostname( char*, int );
 M_YAAL_HCORE_PUBLIC_API uid_t ms_getuid( void );
 int unsetenv_fix( char const* );

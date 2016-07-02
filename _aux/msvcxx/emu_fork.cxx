@@ -1,7 +1,6 @@
 #include <iostream>
 #include <algorithm>
 #include <unordered_set>
-#include <sys/cdefs.h>
 #include <process.h>
 #include <io.h>
 
@@ -15,15 +14,14 @@
 #define lseek lseek_off
 #define dup dup_off
 #define getpid getpid_off
-#define isatty isatty_off
 #define getpwuid_r getpwuid_r_off
 
 #define fill fill_off
 #include <csignal>
-#include <unistd.h>
+#include "_aux/msvcxx/unistd.h"
 #undef fill
 #undef waitpid
-#include <sys/wait.h>
+#include "_aux/msvcxx/sys/wait.h"
 
 #include "synchronizedunorderedset.hxx"
 #include "hcore/memory.hxx"
@@ -66,9 +64,9 @@ char* xstrdup( char const* str_ ) {
 M_EXPORT_SYMBOL
 int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void ) {
 	/* Make a backup of original descriptors. */
-	external_lock_t stdinLock( hcore::cin.acquire() );
-	external_lock_t sdtoutLock( hcore::cout.acquire() );
-	external_lock_t stderrLock( hcore::cerr.acquire() );
+	HLock stdinLock( hcore::cin.acquire() );
+	HLock sdtoutLock( hcore::cout.acquire() );
+	HLock stderrLock( hcore::cerr.acquire() );
 	int stdinFd( _fileno( stdin ) );
 	int stdoutFd( _fileno( stdout ) );
 	int stderrFd( _fileno( stderr ) );

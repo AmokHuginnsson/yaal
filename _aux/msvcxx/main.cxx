@@ -1,16 +1,19 @@
 #define WinMain WinMain_off
+#define fd_set fd_set_off
+#include <winsock2.h>
+#include <windows.h>
+#undef fd_set
 #include <dbghelp.h>
 #include <sddl.h>
 #include <psapi.h>
 #undef WinMain
 
-#include <csignal>
-#include <unistd.h>
-#include <dirent.h>
-#include <pwd.h>
-#include <grp.h>
-#include <sys/resource.h>
-#include <sys/socket.h>
+#include "_aux/msvcxx/csignal"
+#include "_aux/msvcxx/dirent.h"
+#include "_aux/msvcxx/pwd.h"
+#include "_aux/msvcxx/grp.h"
+#include "_aux/msvcxx/sys/resource.h"
+#include "_aux/msvcxx/sys/socket.h"
 #include <iostream>
 
 #include "_aux/msvcxx/sys/time.h"
@@ -113,8 +116,6 @@ char** backtrace_symbols( void* const* buf_, int size_ ) {
 	return ( strings );
 }
 
-extern "C" void* dlopen( char const*, int );
-M_EXPORT_SYMBOL
 void* dlopen( char const* name_, int flag_ ) {
 	HANDLE handle( 0 );
 	if ( ! name_ )
@@ -353,7 +354,7 @@ int timer_delete( timer_t timer_ ) {
 }
 
 extern "C"
-int getrusage( __rusage_who_t who_, struct rusage* usage_ ) __THROW {
+int getrusage( rusage_who_t who_, struct rusage* usage_ ) {
 	int err( 0 );
 	if ( who_ != RUSAGE_SELF )
 		err = EINVAL;

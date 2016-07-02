@@ -5,24 +5,20 @@
 #include <io.h>
 #include <_aux/msvcxx/sys/time.h>
 #include <_aux/msvcxx/unistd.h>
-#include <sys/stat.h>
+#include <_aux/msvcxx/sys/stat.h>
+#undef stat
 #define YAAL_MSVCXX_OPENSSL_RSA_H_INCLUDED 1
 #include <openssl/ssl.h>
 
-#define getpid getpid_off
 #define access access_off
 #define lseek lseek_off
 #define dup dup_off
 
 #include <csignal>
 
-#define fill fill_off
 #include <_aux/msvcxx/unistd.h>
-#undef fill
 #include <_aux/msvcxx/dirent.h>
 //#include <_aux/msvcxx/p>
-#undef getpwuid_r
-#undef getpid
 #undef readdir_r
 #undef dirent
 #undef isatty
@@ -339,8 +335,7 @@ int long recvfrom( int fd_, void* buf_, int long size_, int flags_, sockaddr* fr
 		static_cast<int>( size_ ), flags_, from_, fromLen_ ) );
 }
 
-M_EXPORT_SYMBOL
-int stat( char const* path_, struct stat* s_ ) {
+int unix_stat( char const* path_, struct stat* s_ ) {
 	string path( path_ );
 	string::size_type lastNonSeparator( path.find_last_not_of( "/\\" ) );
 	int len( path.length() );
@@ -362,7 +357,6 @@ int stat( char const* path_, struct stat* s_ ) {
 	return ( res );
 }
 
-M_EXPORT_SYMBOL
 mode_t umask( mode_t umask_ ) {
 	static bool initialized( false );
 	static mode_t currentUmask( 0 );

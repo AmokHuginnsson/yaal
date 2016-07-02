@@ -1,8 +1,6 @@
-#include <sys/cdefs.h>
-#include <sys/time.h>
+#include "_aux/msvcxx/sys/time.h"
 #include <io.h>
 #define _FCNTL_H 1
-#include <bits/fcntl.h>
 #include <sstream>
 
 #include "sys/socket.h"

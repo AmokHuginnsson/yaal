@@ -1021,8 +1021,8 @@ struct call_calculator {
  */
 template<int free_args, typename descriptor>
 class HCallBase : public descriptor::interface_type {
-	typedef typename descriptor::call_type CALL_t;
 protected:
+	typedef typename descriptor::call_type CALL_t;
 	typename trait::decay<CALL_t>::type _call;
 public:
 	HCallBase( CALL_t&& call_ )
