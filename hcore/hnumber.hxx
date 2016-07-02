@@ -311,6 +311,10 @@ yaal::hcore::HNumber arcus_sinus( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber arcus_cosinus( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber arcus_tangens( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber arcus_cotangens( yaal::hcore::HNumber const& );
+yaal::hcore::HNumber hyperbolic_sinus( yaal::hcore::HNumber const& );
+yaal::hcore::HNumber hyperbolic_cosinus( yaal::hcore::HNumber const& );
+yaal::hcore::HNumber hyperbolic_tangens( yaal::hcore::HNumber const& );
+yaal::hcore::HNumber hyperbolic_cotangens( yaal::hcore::HNumber const& );
 
 }
 

@@ -182,7 +182,10 @@ struct HNumber::ElementaryFunctions {
 			v += e;
 		}
 		if ( minus ) {
-			v = number::N1 / v;
+			e = v;
+			v = number::N1;
+			v.set_precision( e.get_precision() );
+			v /= e;
 		}
 		v.round( value_.get_precision() );
 		v.set_precision( value_.get_precision() );
@@ -413,6 +416,49 @@ struct HNumber::ElementaryFunctions {
 		v *= number::N0_5;
 		HNumber input( value_, value_.get_precision() + 1 );
 		v -= arcus_tangens( input );
+		v.round( value_.get_precision() );
+		v.set_precision( value_.get_precision() );
+		return ( v );
+		M_EPILOG
+	}
+	static yaal::hcore::HNumber hyperbolic_sinus( yaal::hcore::HNumber const& value_ ) {
+		M_PROLOG
+		HNumber v( value_, value_.get_precision() + 1 );
+		v = natural_expotential( v ) - natural_expotential( -v );
+		v /= number::N2;
+		v.set_precision( value_.get_precision() );
+		return ( v );
+		M_EPILOG
+	}
+	static yaal::hcore::HNumber hyperbolic_cosinus( yaal::hcore::HNumber const& value_ ) {
+		M_PROLOG
+		HNumber v( value_, value_.get_precision() + 1 );
+		v = natural_expotential( v ) + natural_expotential( -v );
+		v /= number::N2;
+		v.round( value_.get_precision() );
+		v.set_precision( value_.get_precision() );
+		return ( v );
+		M_EPILOG
+	}
+	static yaal::hcore::HNumber hyperbolic_tangens( yaal::hcore::HNumber const& value_ ) {
+		M_PROLOG
+		HNumber v( value_, value_.get_precision() + 10 );
+		HNumber p( natural_expotential( v ) );
+		HNumber n( natural_expotential( -v ) );
+		v = p - n;
+		v /= ( p + n );
+		v.round( value_.get_precision() );
+		v.set_precision( value_.get_precision() );
+		return ( v );
+		M_EPILOG
+	}
+	static yaal::hcore::HNumber hyperbolic_cotangens( yaal::hcore::HNumber const& value_ ) {
+		M_PROLOG
+		HNumber v( value_, value_.get_precision() + 10 );
+		HNumber p( natural_expotential( v ) );
+		HNumber n( natural_expotential( -v ) );
+		v = p + n;
+		v /= ( p - n );
 		v.round( value_.get_precision() );
 		v.set_precision( value_.get_precision() );
 		return ( v );
@@ -653,6 +699,30 @@ yaal::hcore::HNumber arcus_tangens( yaal::hcore::HNumber const& value_ ) {
 yaal::hcore::HNumber arcus_cotangens( yaal::hcore::HNumber const& value_ ) {
 	M_PROLOG
 	return ( yaal::hcore::HNumber::ElementaryFunctions::arcus_cotangens( value_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HNumber hyperbolic_sinus( yaal::hcore::HNumber const& value_ ) {
+	M_PROLOG
+	return ( yaal::hcore::HNumber::ElementaryFunctions::hyperbolic_sinus( value_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HNumber hyperbolic_cosinus( yaal::hcore::HNumber const& value_ ) {
+	M_PROLOG
+	return ( yaal::hcore::HNumber::ElementaryFunctions::hyperbolic_cosinus( value_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HNumber hyperbolic_tangens( yaal::hcore::HNumber const& value_ ) {
+	M_PROLOG
+	return ( yaal::hcore::HNumber::ElementaryFunctions::hyperbolic_tangens( value_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HNumber hyperbolic_cotangens( yaal::hcore::HNumber const& value_ ) {
+	M_PROLOG
+	return ( yaal::hcore::HNumber::ElementaryFunctions::hyperbolic_cotangens( value_ ) );
 	M_EPILOG
 }
 
