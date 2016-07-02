@@ -86,6 +86,22 @@ double long arcus_cotangens_impl( double long val_ ) {
 	return ( math::PI / 2.0L - atanl( val_ ) );
 }
 
+double long hyperbolic_sinus_impl( double long val_ ) {
+	return ( sinhl( val_ ) );
+}
+
+double long hyperbolic_cosinus_impl( double long val_ ) {
+	return ( coshl( val_ ) );
+}
+
+double long hyperbolic_tangens_impl( double long val_ ) {
+	return ( tanhl( val_ ) );
+}
+
+double long hyperbolic_cotangens_impl( double long val_ ) {
+	return ( 1.L / tanhl( val_ ) );
+}
+
 }
 
 }

@@ -50,6 +50,10 @@ double long arcus_sinus_impl( double long );
 double long arcus_cosinus_impl( double long );
 double long arcus_tangens_impl( double long );
 double long arcus_cotangens_impl( double long );
+double long hyperbolic_sinus_impl( double long );
+double long hyperbolic_cosinus_impl( double long );
+double long hyperbolic_tangens_impl( double long );
+double long hyperbolic_cotangens_impl( double long );
 
 template<typename T>
 T square_root( T val_ ) {
@@ -104,6 +108,26 @@ T arcus_tangens( T val_ ) {
 template<typename T>
 T arcus_cotangens( T val_ ) {
 	return ( static_cast<T>( arcus_cotangens_impl( val_ ) ) );
+}
+
+template<typename T>
+T hyperbolic_sinus( T val_ ) {
+	return ( static_cast<T>( hyperbolic_sinus_impl( val_ ) ) );
+}
+
+template<typename T>
+T hyperbolic_cosinus( T val_ ) {
+	return ( static_cast<T>( hyperbolic_cosinus_impl( val_ ) ) );
+}
+
+template<typename T>
+T hyperbolic_tangens( T val_ ) {
+	return ( static_cast<T>( hyperbolic_tangens_impl( val_ ) ) );
+}
+
+template<typename T>
+T hyperbolic_cotangens( T val_ ) {
+	return ( static_cast<T>( hyperbolic_cotangens_impl( val_ ) ) );
 }
 
 }

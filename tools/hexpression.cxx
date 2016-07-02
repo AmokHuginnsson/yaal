@@ -235,13 +235,13 @@ double long HExpression::functions( tree_t::const_node_t node_ ) {
 			retVal = sinus( leftValue );
 		break;
 		case ( FUNCTION::SINH ):
-			retVal = ::std::sinh( leftValue );
+			retVal = hyperbolic_sinus( leftValue );
 		break;
 		case ( FUNCTION::COS ):
 			retVal = cosinus( leftValue );
 		break;
 		case ( FUNCTION::COSH ):
-			retVal = ::std::cosh( leftValue );
+			retVal = hyperbolic_cosinus( leftValue );
 		break;
 		case ( FUNCTION::TG	): {
 			if ( eq( ::std::floor( leftValue / PI + .5 ), ( leftValue / PI + .5 ) ) ) {
@@ -251,7 +251,7 @@ double long HExpression::functions( tree_t::const_node_t node_ ) {
 		}
 		break;
 		case ( FUNCTION::TGH ):
-			retVal = ::std::tanh( leftValue );
+			retVal = hyperbolic_tangens( leftValue );
 		break;
 		case ( FUNCTION::CTG ): {
 			if ( eq( ::std::floor( leftValue / PI ), ( leftValue / PI ) ) ) {
@@ -264,7 +264,7 @@ double long HExpression::functions( tree_t::const_node_t node_ ) {
 		}
 		break;
 		case ( FUNCTION::CTGH ): {
-			leftValue = ::std::tanh( leftValue );
+			leftValue = hyperbolic_tangens( leftValue );
 			if ( leftValue == 0 ) {
 				leftValue = std::numeric_limits<double long>::epsilon();
 			}
