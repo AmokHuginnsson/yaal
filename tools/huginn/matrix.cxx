@@ -55,23 +55,23 @@ HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass const* class_, HHugi
 		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
 		verify_arg_type( name, values_, 2, HHuginn::TYPE::INTEGER, false, position_ );
 		HHuginn::HFunctionReference const& fr( *static_cast<HHuginn::HFunctionReference const*>( values_[0].raw() ) );
-		int rows( static_cast<int>( get_integer( values_[1] ) ) );
-		if ( rows < 1 ) {
-			throw HHuginn::HHuginnRuntimeException( "Invalid number of rows in matrix specification: "_ys.append( rows ).append( "." ), position_ );
+		int myRows( static_cast<int>( get_integer( values_[1] ) ) );
+		if ( myRows < 1 ) {
+			throw HHuginn::HHuginnRuntimeException( "Invalid number of rows in matrix specification: "_ys.append( myRows ).append( "." ), position_ );
 		}
 		int cols( static_cast<int>( get_integer( values_[2] ) ) );
 		if ( cols < 1 ) {
 			throw HHuginn::HHuginnRuntimeException( "Invalid number of columns in matrix specification: "_ys.append( cols ).append( "." ), position_ );
 		}
 		if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::number ) ) {
-			_data = data_t( make_resource<arbitrary_precision_matrix_t>( rows, cols ) );
+			_data = data_t( make_resource<arbitrary_precision_matrix_t>( myRows, cols ) );
 		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::real ) ) {
-			_data = data_t( make_resource<floating_point_matrix_t>( rows, cols ) );
+			_data = data_t( make_resource<floating_point_matrix_t>( myRows, cols ) );
 		} else {
 			throw HHuginn::HHuginnRuntimeException( "Bad matrix type: `"_ys.append( thread_->runtime().function_name( fr.function().id() ) ).append( "'." ), position_ );
 		}
 	} else {
-		int rows( static_cast<int>( values_.get_size() ) );
+		int myRows( static_cast<int>( values_.get_size() ) );
 		HHuginn::HList::values_t const* rowData( nullptr );
 		int cols( static_cast<int>( ( rowData = &get_list( values_[0] ) )->get_size() ) );
 		if ( cols < 1 ) {
@@ -79,13 +79,13 @@ HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass const* class_, HHugi
 		}
 		HHuginn::type_id_t t( (*rowData)[0]->type_id() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			_data = data_t( make_resource<arbitrary_precision_matrix_t>( rows, cols ) );
+			_data = data_t( make_resource<arbitrary_precision_matrix_t>( myRows, cols ) );
 		} else if ( t == HHuginn::TYPE::REAL ) {
-			_data = data_t( make_resource<floating_point_matrix_t>( rows, cols ) );
+			_data = data_t( make_resource<floating_point_matrix_t>( myRows, cols ) );
 		} else {
 			throw HHuginn::HHuginnRuntimeException( "Matrix must have numeric data, either `number' or `real'.", position_ );
 		}
-		for ( int r( 0 ); r < rows; ++ r ) {
+		for ( int r( 0 ); r < myRows; ++ r ) {
 			verify_arg_type( name, values_, r, HHuginn::TYPE::LIST, false, position_ );
 			int otherCols( 0 );
 			if ( ( otherCols = static_cast<int>( ( rowData = &get_list( values_[r] ) )->get_size() ) ) != cols ) {
