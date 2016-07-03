@@ -49,6 +49,8 @@ public:
 	HMatrix( huginn::HThread*, HHuginn::HClass const*, HHuginn::values_t const&, int );
 	HMatrix( HHuginn::HClass const*, arbitrary_precision_matrix_ptr_t&& );
 	HMatrix( HHuginn::HClass const*, floating_point_matrix_ptr_t&& );
+	static HHuginn::value_t columns( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+	static HHuginn::value_t rows( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t get( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t set( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t add( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );

@@ -123,6 +123,40 @@ HMatrix::HMatrix( HHuginn::HClass const* class_, floating_point_matrix_ptr_t&& d
 	, _data( yaal::move( data_ ) ) {
 }
 
+HHuginn::value_t HMatrix::columns( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "Matrix.columns";
+	verify_arg_count( name, values_, 0, 0, position_ );
+	HHuginn::value_t v;
+	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
+	if ( o->_data.type() == 0 ) {
+		arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
+		v = thread_->runtime().object_factory()->create_integer( m.col() );
+	} else {
+		floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
+		v = thread_->runtime().object_factory()->create_integer( m.col() );
+	}
+	return ( v );
+	M_EPILOG
+}
+
+HHuginn::value_t HMatrix::rows( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "Matrix.rows";
+	verify_arg_count( name, values_, 0, 0, position_ );
+	HHuginn::value_t v;
+	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
+	if ( o->_data.type() == 0 ) {
+		arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
+		v = thread_->runtime().object_factory()->create_integer( m.row() );
+	} else {
+		floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
+		v = thread_->runtime().object_factory()->create_integer( m.row() );
+	}
+	return ( v );
+	M_EPILOG
+}
+
 HHuginn::value_t HMatrix::get( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.get";
@@ -402,14 +436,16 @@ HHuginn::class_t HMatrix::get_class( HRuntime* runtime_ ) {
 			"Matrix",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "get", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::get, _1, _2, _3, _4 ) ) },
-				{ "set", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::set, _1, _2, _3, _4 ) ) },
-				{ "add", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::add, _1, _2, _3, _4 ) ) },
+				{ "columns",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::columns, _1, _2, _3, _4 ) ) },
+				{ "rows",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::rows, _1, _2, _3, _4 ) ) },
+				{ "get",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::get, _1, _2, _3, _4 ) ) },
+				{ "set",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::set, _1, _2, _3, _4 ) ) },
+				{ "add",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::add, _1, _2, _3, _4 ) ) },
 				{ "substract", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::substract, _1, _2, _3, _4 ) ) },
-				{ "multiply", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::multiply, _1, _2, _3, _4 ) ) },
-				{ "det", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::det, _1, _2, _3, _4 ) ) },
-				{ "scale", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::scale, _1, _2, _3, _4 ) ) },
-				{ "scale_to", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::scale_to, _1, _2, _3, _4 ) ) },
+				{ "multiply",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::multiply, _1, _2, _3, _4 ) ) },
+				{ "det",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::det, _1, _2, _3, _4 ) ) },
+				{ "scale",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::scale, _1, _2, _3, _4 ) ) },
+				{ "scale_to",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::scale_to, _1, _2, _3, _4 ) ) },
 				{ "to_string", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::to_string, _1, _2, _3, _4 ) ) }
 			}
 		)
