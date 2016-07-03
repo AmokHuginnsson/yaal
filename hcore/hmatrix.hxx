@@ -61,7 +61,6 @@ public:
 			NOT_A_SQUARE, /*!< Non-square matrix used where square necessary. */
 			ODD,          /*!< Odd matrix while counting inverse. */
 			DIM_NOT_MATCH_COLUMNS_ROWS, /*!< Number of rows does not match numbers of columns. */
-			DIM_NOT_MATCH_COLUMNS_ROWS_COLUMNS,
 			ROW_OUT_OF_RANGE,
 			COLUMN_OUT_OF_RANGE,
 			DIVISION_BY_ZERO
@@ -202,10 +201,19 @@ public:
 	HMatrix& operator *= ( HMatrix const& matrix_ ) {
 		M_PROLOG
 		check_dimensions_columns_rows( matrix_._rows );
-		if ( matrix_._rows != matrix_._columns ) {
-			M_THROW( _errMsgHMatrix_[ ERROR::DIM_NOT_MATCH_COLUMNS_ROWS_COLUMNS ], matrix_._rows - matrix_._columns );
+		value_type scalar = 0;
+		int ctrRow = 0, ctrColumn = 0, ctrRowColumn = 0;
+		data_t data( _rows, matrix_._columns );
+		for ( ctrRow = 0; ctrRow < _rows; ctrRow ++ ) {
+			for ( ctrColumn = 0; ctrColumn < matrix_._columns; ctrColumn ++, scalar = 0 ) {
+				for ( ctrRowColumn = 0; ctrRowColumn < _columns; ctrRowColumn ++ ) {
+					scalar += ( _data[ ctrRow ][ ctrRowColumn ] * matrix_._data[ ctrRowColumn ][ ctrColumn ] );
+				}
+				data[ ctrRow ][ ctrColumn ] = scalar;
+			}
 		}
-		( *this ) = ( *this ) * matrix_;
+		_data.swap( data );
+		_columns = matrix_._columns;
 		return ( *this );
 		M_EPILOG
 	}
@@ -261,17 +269,8 @@ public:
 	HMatrix operator * ( HMatrix const& matrix_ ) const {
 		M_PROLOG
 		check_dimensions_columns_rows( matrix_._rows );
-		value_type scalar = 0;
-		int ctrRow = 0, ctrColumn = 0, ctrRowColumn = 0;
-		HMatrix matrix( _rows, matrix_._columns );
-		for ( ctrRow = 0; ctrRow < _rows; ctrRow ++ ) {
-			for ( ctrColumn = 0; ctrColumn < matrix_._columns; ctrColumn ++, scalar = 0 ) {
-				for ( ctrRowColumn = 0; ctrRowColumn < _columns; ctrRowColumn ++ ) {
-					scalar += ( _data[ ctrRow ][ ctrRowColumn ] * matrix_._data[ ctrRowColumn ][ ctrColumn ] );
-				}
-				matrix._data[ ctrRow ][ ctrColumn ] = scalar;
-			}
-		}
+		HMatrix matrix ( *this );
+		matrix *= matrix_;
 		return ( matrix );
 		M_EPILOG
 	}
