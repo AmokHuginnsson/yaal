@@ -54,6 +54,7 @@ double long hyperbolic_sinus_impl( double long );
 double long hyperbolic_cosinus_impl( double long );
 double long hyperbolic_tangens_impl( double long );
 double long hyperbolic_cotangens_impl( double long );
+double long sigmoid_impl( double long );
 
 template<typename T>
 T square_root( T val_ ) {
@@ -128,6 +129,11 @@ T hyperbolic_tangens( T val_ ) {
 template<typename T>
 T hyperbolic_cotangens( T val_ ) {
 	return ( static_cast<T>( hyperbolic_cotangens_impl( val_ ) ) );
+}
+
+template<typename T>
+T sigmoid( T val_ ) {
+	return ( static_cast<T>( sigmoid_impl( val_ ) ) );
 }
 
 }

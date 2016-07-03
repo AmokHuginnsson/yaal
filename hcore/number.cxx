@@ -271,13 +271,13 @@ struct HNumber::ElementaryFunctions {
 		if ( minus ) {
 			v = -v;
 		}
-		v.round( value_.get_precision() );
-		v.set_precision( value_.get_precision() );
 		if ( v > number::N1 ) {
 			v = number::N1;
-		} else if ( v < -number::N1 ) {
-			v = -number::N1;
+		} else if ( v < number::N_1 ) {
+			v = number::N_1;
 		}
+		v.round( value_.get_precision() );
+		v.set_precision( value_.get_precision() );
 		return ( v );
 		M_EPILOG
 	}
@@ -323,11 +323,11 @@ struct HNumber::ElementaryFunctions {
 	 */
 	static yaal::hcore::HNumber arcus_sinus( yaal::hcore::HNumber const& value_ ) {
 		M_PROLOG
-		if ( ( value_ > number::N1 ) || ( value_ < -number::N1 ) ) {
+		if ( ( value_ > number::N1 ) || ( value_ < number::N_1 ) ) {
 			throw HNumberException( "argument not in arcus sinus domain" );
 		}
 		HNumber v;
-		if ( ( value_ < number::N1 ) && ( value_ > -number::N1 ) ) {
+		if ( ( value_ < number::N1 ) && ( value_ > number::N_1 ) ) {
 			HNumber input( value_, value_.get_precision() + 9 );
 			HNumber d( square_root( number::N1 - ( input ^ 2 ) ) );
 			v = arcus_tangens( input / d );
@@ -344,7 +344,7 @@ struct HNumber::ElementaryFunctions {
 	}
 	static yaal::hcore::HNumber arcus_cosinus( yaal::hcore::HNumber const& value_ ) {
 		M_PROLOG
-		if ( ( value_ > number::N1 ) || ( value_ < -number::N1 ) ) {
+		if ( ( value_ > number::N1 ) || ( value_ < number::N_1 ) ) {
 			throw HNumberException( "argument not in arcus cosinus domain" );
 		}
 		HNumber v;
@@ -464,6 +464,30 @@ struct HNumber::ElementaryFunctions {
 		return ( v );
 		M_EPILOG
 	}
+	static yaal::hcore::HNumber sigmoid( yaal::hcore::HNumber const& value_ ) {
+		M_PROLOG
+		static HNumber const CUTOFF( 11357 * 2 );
+		HNumber v( value_, value_.get_precision() + 1 );
+		if ( v.absolute_lower( CUTOFF ) < 0 ) {
+			v /= number::N2;
+			v = hyperbolic_tangens( v );
+			++ v;
+			v /= number::N2;
+			if ( v > number::N1 ) {
+				v = number::N1;
+			} else if ( v < number::N_1 ) {
+				v = number::N_1;
+			}
+		} else if ( v > number::N0 ) {
+			v = number::N1;
+		} else {
+			v = number::N_1;
+		}
+		v.round( value_.get_precision() );
+		v.set_precision( value_.get_precision() );
+		return ( v );
+		M_EPILOG
+	}
 };
 
 namespace number {
@@ -550,6 +574,7 @@ yaal::hcore::HNumber const N4( 4 );
 yaal::hcore::HNumber const N5( 5 );
 yaal::hcore::HNumber const N6( 6 );
 yaal::hcore::HNumber const N0_5( "0.5" );
+yaal::hcore::HNumber const N_1( -1 );
 namespace {
 yaal::hcore::HNumber find_pi( yaal::hcore::HNumber::integer_t precision_ ) {
 	static HNumber a( 545140134_yn );
@@ -723,6 +748,12 @@ yaal::hcore::HNumber hyperbolic_tangens( yaal::hcore::HNumber const& value_ ) {
 yaal::hcore::HNumber hyperbolic_cotangens( yaal::hcore::HNumber const& value_ ) {
 	M_PROLOG
 	return ( yaal::hcore::HNumber::ElementaryFunctions::hyperbolic_cotangens( value_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HNumber sigmoid( yaal::hcore::HNumber const& value_ ) {
+	M_PROLOG
+	return ( yaal::hcore::HNumber::ElementaryFunctions::sigmoid( value_ ) );
 	M_EPILOG
 }
 

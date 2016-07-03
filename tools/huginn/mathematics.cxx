@@ -313,6 +313,22 @@ public:
 		return ( v );
 		M_EPILOG
 	}
+	static HHuginn::value_t sigmoid( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "Mathematics.sigmoid";
+		verify_arg_count( name, values_, 1, 1, position_ );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::value_t v;
+		if ( t == HHuginn::TYPE::NUMBER ) {
+			HNumber val( get_number( values_[0] ) );
+			v = thread_->object_factory().create_number( math::sigmoid( val ) );
+		} else {
+			double long val( get_real( values_[0] ) );
+			v = thread_->object_factory().create_real( math::sigmoid( val ) );
+		}
+		return ( v );
+		M_EPILOG
+	}
 	static HHuginn::value_t round( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.round";
@@ -421,6 +437,7 @@ HHuginn::value_t HMathematicsCreator::do_new_instance( HRuntime* runtime_ ) {
 				{ "hyperbolic_cosinus",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::hyperbolic_cosinus, _1, _2, _3, _4 ) ) },
 				{ "hyperbolic_tangens",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::hyperbolic_tangens, _1, _2, _3, _4 ) ) },
 				{ "hyperbolic_cotangens", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::hyperbolic_cotangens, _1, _2, _3, _4 ) ) },
+				{ "sigmoid",              make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::sigmoid, _1, _2, _3, _4 ) ) },
 				{ "round",                make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::round, _1, _2, _3, _4 ) ) },
 				{ "floor",                make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::floor, _1, _2, _3, _4 ) ) },
 				{ "ceil",                 make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::ceil, _1, _2, _3, _4 ) ) },

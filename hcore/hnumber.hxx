@@ -288,6 +288,7 @@ extern yaal::hcore::HNumber const N4;
 extern yaal::hcore::HNumber const N5;
 extern yaal::hcore::HNumber const N6;
 extern yaal::hcore::HNumber const N0_5;
+extern yaal::hcore::HNumber const N_1;
 yaal::hcore::HNumber const& PI( yaal::hcore::HNumber::integer_t = 0 );
 yaal::hcore::HNumber const& E( yaal::hcore::HNumber::integer_t = 0 );
 
@@ -315,6 +316,7 @@ yaal::hcore::HNumber hyperbolic_sinus( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber hyperbolic_cosinus( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber hyperbolic_tangens( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber hyperbolic_cotangens( yaal::hcore::HNumber const& );
+yaal::hcore::HNumber sigmoid( yaal::hcore::HNumber const& );
 
 }
 

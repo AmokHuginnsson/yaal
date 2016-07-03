@@ -102,6 +102,16 @@ double long hyperbolic_cotangens_impl( double long val_ ) {
 	return ( 1.L / tanhl( val_ ) );
 }
 
+double long sigmoid_impl( double long val_ ) {
+	double long v( ( tanhl( val_ / 2.L ) + 1L ) / 2.L );
+	if ( v > 1.L ) {
+		v = 1.L;
+	} else if ( v < -1.L ) {
+		v = -1.L;
+	}
+	return ( v );
+}
+
 }
 
 }
