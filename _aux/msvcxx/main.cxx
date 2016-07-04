@@ -134,15 +134,57 @@ int unsetenv_fix( char const* name_ ) {
 	return ( ret );
 }
 
-int readdir_r( DIR* dir_, struct unix_dirent* entry_, struct unix_dirent** result_ ) {
-	dirent* result( nullptr );
-	dirent broken;
-	int error( readdir_r( dir_, &broken, &result ) );
-	*result_ = reinterpret_cast<unix_dirent*>( result );
-	if ( ( ! error ) && result ) {
-		entry_->d_fileno = (*result_)->d_fileno;
-		entry_->d_type = (*result_)->d_type;
-		strncpy( entry_->d_name, (*result_)->d_name, NAME_MAX );
+struct DIR {
+	HANDLE _handle;
+	bool _hasData;
+	int _index;
+	WIN32_FIND_DATA _data;
+};
+
+DIR* opendir( char const* path_ ) {
+	WIN32_FIND_DATA d;
+	HANDLE h( ::FindFirstFile( path_, &d ) );
+	DIR* dir( nullptr );
+	if ( h != INVALID_HANDLE_VALUE ) {
+		dir = memory::calloc<DIR>( 1 );
+		dir->_handle = h;
+		::memcpy( &dir->_data, &d, sizeof( d ) );
+		dir->_hasData = true;
+		dir->_index = 0;
+	}
+	return ( dir );
+}
+
+int closedir( DIR* dir_ ) {
+	BOOL ok( ::FindClose( dir_->_handle ) );
+	memory::free0( dir_ );
+	return ( ok ? 0 : -1 );
+}
+
+int readdir_r( DIR* dir_, struct dirent* entry_, struct dirent** result_ ) {
+	int error( 0 );
+	if ( dir_->_hasData ) {
+		entry_->d_fileno = dir_->_index;
+		if ( dir_->_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) {
+			entry_->d_type = DT_DIR;
+		} else if ( dir_->_data.dwFileAttributes & FILE_ATTRIBUTE_DEVICE ) {
+			entry_->d_type = DT_BLK;
+		} else if ( dir_->_data.dwFileAttributes & FILE_ATTRIBUTE_NORMAL ) {
+			entry_->d_type = DT_REG;
+		} else if ( dir_->_data.dwFileAttributes & ( FILE_ATTRIBUTE_ARCHIVE | FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM ) ) {
+			entry_->d_type = DT_REG;
+		} else {
+			entry_->d_type = DT_UNKNOWN;
+		}
+		strncpy( entry_->d_name, dir_->_data.cFileName, NAME_MAX );
+		result_ = &entry_;
+		if ( ::FindNextFile( dir_->_handle, &dir_->_data ) ) {
+			++ dir_->_index;
+		} else {
+			dir_->_hasData = false;
+		}
+	}	else {
+		error = 1;
 	}
 	return ( error );
 }

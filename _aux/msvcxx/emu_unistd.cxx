@@ -16,13 +16,6 @@
 
 #include <csignal>
 
-#include <_aux/msvcxx/unistd.h>
-#include <_aux/msvcxx/dirent.h>
-//#include <_aux/msvcxx/p>
-#undef readdir_r
-#undef dirent
-#undef isatty
-
 #include "emu_pwd.hxx"
 #include "hcore/base.hxx"
 #include "hcore/hlog.hxx"
@@ -261,6 +254,7 @@ int pipe( int* fds_ ) {
 	return ( ok ? 0 : -1 );
 }
 
+#undef isatty /* original isatty comes from VS */
 M_EXPORT_SYMBOL
 int isatty( int fd_ ) {
 	int val( ::isatty( fd_ ) );

@@ -252,7 +252,7 @@ private:
 template<typename signature_t, typename result_agregator_t, typename group_by>
 class HSignal<signature_t, result_agregator_t, group_by>::HConnection {
 public:
-	typedef HSignal<signature_t, result_agregator_t, group_by>::HConnection this_type;
+	typedef typename HSignal<signature_t, result_agregator_t, group_by>::HConnection this_type;
 	typedef typename HSignal<signature_t, result_agregator_t, group_by>::slot_t slot_t;
 private:
 	slot_t _slot;
@@ -285,7 +285,7 @@ template<typename callback_t>
 class HSignal<signature_t, result_agregator_t, group_by>::HIterator
 	: public yaal::hcore::iterator_interface<typename trait::return_type<result_agregator_t>::type, yaal::hcore::iterator_category::forward> {
 public:
-	typedef HSignal<signature_t, result_agregator_t, group_by>::HIterator<callback_t> this_type;
+	typedef typename HSignal<signature_t, result_agregator_t, group_by>::template HIterator<callback_t> this_type;
 	typedef yaal::hcore::iterator_interface<typename trait::return_type<result_agregator_t>::type, yaal::hcore::iterator_category::forward> base_type;
 	typedef typename trait::return_type<signature_t>::type result_type;
 	typedef typename HSignal<signature_t, result_agregator_t, group_by>::slots_t slots_t;

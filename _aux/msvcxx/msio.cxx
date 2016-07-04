@@ -1,9 +1,9 @@
 #include "_aux/msvcxx/sys/time.h"
 #include <io.h>
-#define _FCNTL_H 1
 #include <sstream>
 
 #include "sys/socket.h"
+#include "unistd.h"
 #include "hcore/base.hxx"
 #include "hcore/memory.hxx"
 #include "hcore/hexception.hxx"

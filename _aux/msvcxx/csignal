@@ -9,14 +9,14 @@ struct sigaction {
 	sighandler_t sa_handler;
 };
 
-M_YAAL_HCORE_PUBLIC_API int sigaddset( sigset_t*, int );
-M_YAAL_HCORE_PUBLIC_API int sigdelset( sigset_t*, int );
-M_YAAL_HCORE_PUBLIC_API int sigismember( sigset_t*, int );
-M_YAAL_HCORE_PUBLIC_API int sigwait( sigset_t*, int* );
-M_YAAL_HCORE_PUBLIC_API int sigaction( int, struct sigaction*, void* );
-M_YAAL_HCORE_PUBLIC_API int sigemptyset( sigset_t* );
-M_YAAL_HCORE_PUBLIC_API int kill( int, int );
-M_YAAL_HCORE_PUBLIC_API int pthread_sigmask( int, sigset_t*, void* );
+int sigaddset( sigset_t*, int );
+int sigdelset( sigset_t*, int );
+int sigismember( sigset_t*, int );
+int sigwait( sigset_t*, int* );
+int sigaction( int, struct sigaction*, void* );
+int sigemptyset( sigset_t* );
+int kill( int, int );
+int pthread_sigmask( int, sigset_t*, void* );
 
 #endif /* not YAAL_MSVCXX_CSIGNAL_INCLUDED */
 // vim: ft=cpp

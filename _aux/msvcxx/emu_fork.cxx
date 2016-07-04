@@ -17,7 +17,7 @@
 #define getpwuid_r getpwuid_r_off
 
 #define fill fill_off
-#include <csignal>
+#include "csignal"
 #include "_aux/msvcxx/unistd.h"
 #undef fill
 #undef waitpid

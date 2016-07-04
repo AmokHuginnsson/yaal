@@ -6,11 +6,10 @@
 template<typename type_t>
 class SynchronizedUnorderedSet {
 	public:
-		typedef std::tr1::unordered_set<type_t> data_t;
+		typedef std::unordered_set<type_t> data_t;
 		typedef typename data_t::value_type value_type;
 		typedef typename data_t::const_iterator const_iterator;
 		typedef typename data_t::iterator iterator;
-		typedef typename data_t::reverse_iterator reverse_iterator;
 		typedef std::pair<iterator, bool> insert_result;
 	private:
 		data_t _data;

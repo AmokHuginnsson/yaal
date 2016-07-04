@@ -147,16 +147,14 @@ extern "C" int unsetenv( char const* );
 #endif /* PTHREAD_H */
 #if 0 // def _CTIME_
 #include <pthread.h>
-#include <bits/types.h>
 extern "C" int getntptimeofday( struct timespec*, struct timezone* );
 typedef __clockid_t clockid_t;
 inline int clock_gettime( __clockid_t, struct timespec* tp_ )
 	{ return ( getntptimeofday( tp_, NULL ) ); }
 static clockid_t const CLOCK_REALTIME = 0;
 #endif /* #ifdef _CTIME_ */
-#if 0 //  _CSTRING_
+#ifdef _CSTRING_
 #include <errno.h>
-#include "_aux/msvcxx/sys/time.h"
 #include "hcore/macro.hxx"
 #undef OVERFLOW
 #undef SIG_BLOCK
