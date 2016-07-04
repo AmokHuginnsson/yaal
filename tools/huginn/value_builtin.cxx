@@ -711,7 +711,11 @@ HHuginn::value_t number( HThread* thread_, HHuginn::value_t const& v_, int posit
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		res = v_;
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
-		res = thread_->object_factory().create_number( static_cast<HHuginn::HReal const*>( v_.raw() )->value() );
+		try {
+			res = thread_->object_factory().create_number( static_cast<HHuginn::HReal const*>( v_.raw() )->value() );
+		} catch ( HNumberException const& ) {
+			thread_->raise( thread_->object_factory().conversion_exception_class(), "Not a number.", position_ );
+		}
 	} else if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = thread_->object_factory().create_number( static_cast<HHuginn::HInteger const*>( v_.raw() )->value() );
 	} else {
