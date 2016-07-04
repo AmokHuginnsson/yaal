@@ -90,6 +90,13 @@ int long strnlen( char const* str_, int long maxLen_ ) {
 
 #if ! defined( HAVE_STRCASESTR ) || ( HAVE_STRCASESTR == 0 )
 #include <cstring>
+namespace yaal {
+namespace hcore {
+namespace string_helper {
+int long kmpcasesearch( char const*, int long, char const*, int long );
+}
+}
+}
 char* strcasestr( char const* haystack, char const* needle ) {
 	int long idx(
 		::yaal::hcore::string_helper::kmpcasesearch(

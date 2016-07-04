@@ -95,7 +95,7 @@ HListWidget::HColumnInfo::~HColumnInfo( void ) {
 	M_PROLOG
 	_widget = nullptr;
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 }
 
 HListWidget::HListWidget( HWindow* parent_, int row_, int column_,

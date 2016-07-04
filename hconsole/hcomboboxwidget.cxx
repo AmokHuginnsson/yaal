@@ -73,7 +73,7 @@ HComboboxWidget::HComboboxWidget( HWindow* parent_,
 HComboboxWidget::~HComboboxWidget ( void ) {
 	M_PROLOG
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 }
 
 void HComboboxWidget::set_dropped_width( int droppedWidth_ ) {

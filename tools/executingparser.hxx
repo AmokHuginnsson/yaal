@@ -666,8 +666,8 @@ private:
 	HReal( PARSE = PARSE::GREEDY );
 	HReal& operator = ( HReal const& ) = delete;
 	friend HReal const& get_real_instance( void );
-	template<typename tType, typename a0_t>
-	friend yaal::hcore::HPointer<tType> yaal::hcore::make_pointer( a0_t const&& );
+	template<typename tType, typename... a0_t>
+	friend yaal::hcore::HPointer<tType> yaal::hcore::make_pointer( a0_t&&... );
 };
 
 typedef yaal::hcore::HExceptionT<HReal, HRuleBaseException> HRealException;

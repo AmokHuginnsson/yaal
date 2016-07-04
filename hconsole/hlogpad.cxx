@@ -47,7 +47,7 @@ HLogPad::HLogLine::HLogLine( void )
 HLogPad::HLogLine::~HLogLine( void ) {
 	M_PROLOG
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 }
 
 HLogPad::HLogPad( HWindow* parent_, int row_, int column_,
@@ -68,7 +68,7 @@ HLogPad::HLogPad( HWindow* parent_, int row_, int column_,
 HLogPad::~HLogPad( void ) {
 	M_PROLOG
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 }
 
 void HLogPad::do_paint( void ) {

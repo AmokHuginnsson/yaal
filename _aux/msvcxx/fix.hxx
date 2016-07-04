@@ -1,6 +1,7 @@
 #ifndef YAAL_MSVCXX_FIX_HXX_INCLUDED
 #define YAAL_MSVCXX_FIX_HXX_INCLUDED 1
 
+#define _inline _inlineMSVCXX
 #define HAVE_STRUCT_TIMESPEC 1
 
 #if 0

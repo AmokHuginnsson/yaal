@@ -4,7 +4,7 @@
 #define log cmath_log
 #include <algorithm>
 #undef log
-#include <errno.h>
+#include <cerrno>
 #include <pthread.h>
 
 #define select select_off
@@ -18,6 +18,8 @@
 #undef FD_ISSET
 #undef FD_ZERO
 #undef FD_SET
+
+#include "cleanup.hxx"
 
 #include "hcore/macro.hxx"
 

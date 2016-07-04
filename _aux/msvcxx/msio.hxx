@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include "cleanup.hxx"
 
 #include "crit.hxx"
 #include "hcore/macro.hxx"

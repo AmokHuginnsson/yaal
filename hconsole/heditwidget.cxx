@@ -94,7 +94,7 @@ HEditWidget::HEditWidget( HWindow* parent_,
 HEditWidget::~HEditWidget( void ) {
 	M_PROLOG
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 }
 
 void HEditWidget::set_mask( yaal::hcore::HString const& mask_ ) {

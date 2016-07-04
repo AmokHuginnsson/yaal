@@ -2,6 +2,7 @@
 #define YAAL_MSVCXX_EMU_SIGNALS_HXX_INCLUDED 1
 
 #include "hcore/htls.hxx"
+#include "csignal"
 
 namespace msvcxx {
 

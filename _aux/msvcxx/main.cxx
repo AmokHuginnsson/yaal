@@ -2,26 +2,26 @@
 #define fd_set fd_set_off
 #include <winsock2.h>
 #include <windows.h>
+#include <process.h>
 #undef fd_set
 #include <dbghelp.h>
 #include <sddl.h>
 #include <psapi.h>
 #undef WinMain
-
-#include "_aux/msvcxx/csignal"
-#include "_aux/msvcxx/dirent.h"
-#include "_aux/msvcxx/pwd.h"
-#include "_aux/msvcxx/grp.h"
-#include "_aux/msvcxx/sys/resource.h"
-#include "_aux/msvcxx/sys/socket.h"
 #include <iostream>
 
-#include "_aux/msvcxx/sys/time.h"
+#include "unistd.h"
+#include "csignal"
+#include "dirent.h"
+#include "pwd.h"
+#include "grp.h"
+#include "sys/resource.h"
+#include "sys/socket.h"
+#include "sys/time.h"
 
 #include "hcore/base.hxx"
 #include "hcore/memory.hxx"
 #include "cxxabi.h"
-#include "cleanup.hxx"
 #include "crit.hxx"
 #include "msio.hxx"
 #include "msvcxx.hxx"

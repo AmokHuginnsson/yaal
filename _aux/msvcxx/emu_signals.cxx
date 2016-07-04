@@ -170,7 +170,6 @@ bool SignalDispatcher::is_console_event_enabled( void ) const {
 
 }
 
-M_EXPORT_SYMBOL
 int kill( int pid_, int sigNo_ ) {
 	if ( sigNo_ == SIGABRT_COMPAT )
 		sigNo_ = SIGABRT;
@@ -196,10 +195,10 @@ int kill( int pid_, int sigNo_ ) {
 	return ( err );
 }
 
-M_EXPORT_SYMBOL
 int sigwait( sigset_t* set_, int* signo ) {
-	if ( _signalDispatcher_.sigwait( set_, *signo ) )
+	if ( _signalDispatcher_.sigwait( set_, *signo ) ) {
 		*signo = SIGURG;
+	}
 	return ( 0 );
 }
 

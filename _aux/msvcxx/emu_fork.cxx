@@ -18,15 +18,14 @@
 
 #define fill fill_off
 #include "csignal"
-#include "_aux/msvcxx/unistd.h"
+#include "unistd.h"
 #undef fill
 #undef waitpid
-#include "_aux/msvcxx/sys/wait.h"
+#include "sys/wait.h"
 
 #include "synchronizedunorderedset.hxx"
 #include "hcore/memory.hxx"
 #include "hcore/hfile.hxx"
-#include "cleanup.hxx"
 #include "msio.hxx"
 #include "emu_unistd.hxx"
 

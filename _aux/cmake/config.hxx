@@ -115,6 +115,7 @@
 #ifdef __MSVCXX__
 #define WIN32_LEAN_AND_MEAN 1
 #define VC_EXTRALEAN 1
+#define NOMINMAX 1
 #pragma warning( disable : 4068 )
 #pragma warning( disable : 4146 )
 #pragma warning( disable : 4180 )
@@ -131,7 +132,6 @@
 #undef __PRETTY_FUNCTION__
 #define __PRETTY_FUNCTION__ __FUNCSIG__
 #define HAVE_PRETTY_FUNCTION 1
-#define snprintf _snprintf
 #define strcasecmp stricmp
 #ifdef __YAAL_BUILD__
 #undef HAVE_DECL_TEMP_FAILURE_RETRY

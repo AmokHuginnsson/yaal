@@ -15,6 +15,7 @@
 #undef max
 #undef PARITY_ODD
 #undef DELETE
+#undef INFINITY
 #undef OUT
 #undef ERR
 #undef clear
@@ -25,6 +26,7 @@
 #undef sendto
 #undef recvfrom
 #undef interface
+#undef _try
 
 #ifndef YAAL_MSVCXX_CLEANUP_HXX_INCLUDED
 #define YAAL_MSVCXX_CLEANUP_HXX_INCLUDED
