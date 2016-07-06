@@ -711,19 +711,24 @@ inline yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1,
  */
 template<typename iterator_t>
 inline iterator_t rotate( iterator_t first_, iterator_t mid_, iterator_t last_ ) {
-	iterator_t mid( mid_ );
 	iterator_t newMid( last_ );
-	iterator_t it( mid_ );
-	while ( first_ != it ) {
-		swap( *first_, *it );
-		++ first_, ++ it, ++ mid;
-		if ( it == last_ )
-			it = mid_;
-		else if ( first_ == mid_ )
-			mid_ = it;
-		if ( mid == last_ ) {
-			newMid = first_;
-			mid = first_;
+	if ( mid_ != last_ ) {
+		iterator_t it( mid_ );
+		iterator_t mid( mid_ );
+		while ( first_ != it ) {
+			swap( *first_, *it );
+			++ first_;
+			++ it;
+			++ mid;
+			if ( it == last_ ) {
+				it = mid_;
+			} else if ( first_ == mid_ ) {
+				mid_ = it;
+			}
+			if ( mid == last_ ) {
+				newMid = first_;
+				mid = first_;
+			}
 		}
 	}
 	return ( newMid );
