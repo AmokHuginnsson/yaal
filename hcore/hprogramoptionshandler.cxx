@@ -27,7 +27,6 @@ Copyright:
 #include <cstdlib>  /* getenv() */
 #include <cstring>  /* strcpy(), strcat() */
 #include <cstdio>   /* fopen() */
-#include <getopt.h>
 #include <libintl.h> /* gettext() */
 
 #include "base.hxx"
@@ -672,90 +671,101 @@ void HProgramOptionsHandler::set_option( HOption& option_, HString const& value_
 	M_EPILOG
 }
 
-namespace {
-
-char const* make_short_opts( HProgramOptionsHandler::options_t const& options_, HString& buffer_ ) {
-	M_PROLOG
-	buffer_ = "";
-	for ( HProgramOptionsHandler::options_t::const_iterator it = options_.begin(),
-			end = options_.end(); it != end; ++ it ) {
-		if ( it->short_form() > static_cast<int>( meta::max_unsigned<char unsigned>::value ) )
-			continue;
-		buffer_ += static_cast<char>( it->short_form() );
-		switch ( it->switch_type() ) {
-			case ( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED ):
-				buffer_ += ':';
-			break;
-			case ( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL ):
-				buffer_ += "::";
-			break;
-			case ( HProgramOptionsHandler::HOption::ARGUMENT::NONE ):
-			default :
-				break;
-		}
-	}
-	return ( buffer_.raw() );
-	M_EPILOG
-}
-
-option* make_option_array( HProgramOptionsHandler::options_t const& options_, HChunk& buffer_ ) {
-	M_PROLOG
-	option* options = nullptr;
-	options = buffer_.get<option>();
-	int ctr = 0;
-	for ( HProgramOptionsHandler::options_t::const_iterator it = options_.begin(),
-			end = options_.end(); it != end; ++ it, ++ ctr ) {
-		memset( &options[ ctr ], 0, sizeof ( option ) );
-		/* Solaris version of `struct option' is braindead broken.
-		 * Another proof that Solaris sucks big time.
-		 */
-		options[ ctr ].name = const_cast<char*>( it->long_form().raw() );
-		switch ( it->switch_type() ) {
-			case ( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED ):
-				options[ ctr ].has_arg = required_argument;
-			break;
-			case ( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL ):
-				options[ ctr ].has_arg = optional_argument;
-			break;
-			case ( HProgramOptionsHandler::HOption::ARGUMENT::NONE ):
-			default :
-				options[ ctr ].has_arg = no_argument;
-			break;
-		}
-		options[ ctr ].val = it->short_form();
-	}
-	return ( options );
-	M_EPILOG
-}
-
-}
-
 int HProgramOptionsHandler::process_command_line( int argc_,
-		char* const* argv_,
-		int* unknown_ ) {
+		char** argv_,
+		int* invalid_ ) {
 	M_PROLOG
-	int val( 0 );
-	HString shortOptBuffer;
-	HChunk longOptBuffer( chunk_size<option>( _options.size() + 1 ) ); /* + 1 for array terminator */
 	hcore::log( LOG_LEVEL::INFO ) << "Decoding switches ... ";
-	char const* shortOpts( make_short_opts( _options, shortOptBuffer ) );
-	option* optionArray( make_option_array( _options, longOptBuffer ) );
-	while ( ( val = ::getopt_long( argc_, argv_, shortOpts, optionArray, nullptr ) ) != EOF ) {
-		bool validSwitch( false );
-		for ( options_t::iterator it = _options.begin(), end = _options.end(); it != end; ++ it ) {
-			if ( it->short_form() == val ) {
-				validSwitch = true;
-				set_option( *it, optarg );
-				break;
+	HString optName;
+	HString optValue;
+	int nonOption( 1 ); /* 1 because atgv[0] -- a program name is first non-option */
+	for ( int i( 1 ); i < argc_; ++ i ) {
+		char const* arg( argv_[i] );
+		optValue.clear();
+		if ( ( arg[0] == '-' ) && ( arg[1] == '-' ) ) {
+			optName.assign( arg + 2 );
+			int long optNameEnd( optName.find( '=' ) );
+			if ( optNameEnd != HString::npos ) {
+				optValue = optName.substr( optNameEnd + 1 );
+				optName.erase( optNameEnd );
 			}
-		}
-		if ( ! validSwitch && unknown_ ) {
-			++ ( *unknown_ );
+			options_t::value_type* opt( nullptr );
+			for ( options_t::value_type& o : _options ) {
+				if ( o.long_form() == optName ) {
+					opt = &o;
+					break;
+				}
+			}
+			if ( opt ) {
+				if ( opt->switch_type() == HOption::ARGUMENT::REQUIRED ) {
+					if ( optNameEnd == HString::npos ) {
+						++ i;
+						if ( i < argc_ ) {
+							optValue = argv_[i];
+						} else {
+							if ( invalid_ ) {
+								++ ( *invalid_ );
+							}
+							cerr << argv_[0] << ": option '--" << optName << "' requires an argument" << endl;
+							continue;
+						}
+					}
+				}
+				set_option( *opt, optValue );
+			} else {
+				if ( invalid_ ) {
+					++ ( *invalid_ );
+				}
+				cerr << argv_[0] << ": unrecognized option '" << argv_[i] << "'" << endl;
+			}
+		} else if ( arg[0] == '-' ) {
+			++ arg;
+			while ( *arg ) {
+				options_t::value_type* opt( nullptr );
+				for ( options_t::value_type& o : _options ) {
+					if ( o.short_form() == *arg ) {
+						opt = &o;
+						break;
+					}
+				}
+				if ( opt ) {
+					char on( *arg );
+					if ( ( opt->switch_type() == HOption::ARGUMENT::REQUIRED ) || ( opt->switch_type() == HOption::ARGUMENT::OPTIONAL ) ) {
+						optValue.assign( arg + 1 );
+						arg += optValue.get_length();
+					}
+					if ( ( opt->switch_type() == HOption::ARGUMENT::REQUIRED ) && optValue.is_empty() ) {
+						++ i;
+						if ( i < argc_ ) {
+							optValue = argv_[i];
+						} else {
+							++ arg;
+							if ( invalid_ ) {
+								++ ( *invalid_ );
+							}
+							cerr << argv_[0] << ": option requires an argument -- '" << on << "'" << endl;
+							continue;
+						}
+					}
+					set_option( *opt, optValue );
+				} else {
+					if ( invalid_ ) {
+						++ ( *invalid_ );
+					}
+					cerr << argv_[0] << ": invalid option -- '" << *arg << "'" << endl;
+				}
+				++ arg;
+			}
+		} else {
+			rotate( argv_ + i, argv_ + i + 1, argv_ + argc_ + nonOption - 1 );
+			-- i;
+			-- argc_;
+			++ nonOption;
 		}
 	}
 	set_from_env();
 	hcore::log << "done." << endl;
-	return ( optind );
+	return ( argc_ );
 	M_EPILOG
 }
 

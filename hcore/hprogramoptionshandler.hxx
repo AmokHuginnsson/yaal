@@ -176,7 +176,7 @@ public:
 	 * \param count - number of supported program options.
 	 * \param[out] unknown - index of first unknown option in \e argv.
 	 */
-	int process_command_line( int argc, char* const* argv, int* unknown = nullptr );
+	int process_command_line( int argc, char** argv, int* unknown = nullptr );
 	/*! \brief Reading configuration files.
 	 *
 	 * process_rc_file gives easy to use API for reading configuration files
