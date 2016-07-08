@@ -29,10 +29,6 @@ static int const STDIN_FILENO = 0;
 static int const STDOUT_FILENO = 1;
 static int const STDERR_FILENO = 2;
 
-static int const F_GETFL = 0x3;
-static int const F_SETFL = 0x4;
-static int const O_NONBLOCK = 0x4;
-
 static int const WCONTINUED = 0;
 
 #define fork ms_fork

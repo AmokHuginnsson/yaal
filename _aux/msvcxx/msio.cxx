@@ -4,6 +4,7 @@
 
 #include "sys/socket.h"
 #include "unistd.h"
+#include "fcntl.h"
 #include "hcore/base.hxx"
 #include "hcore/memory.hxx"
 #include "hcore/hexception.hxx"

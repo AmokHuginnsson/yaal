@@ -45,6 +45,7 @@
 #cmakedefine HAVE_PTHREAD_SETNAME_NP
 #cmakedefine HAVE_PTHREAD_SET_NAME_NP
 #cmakedefine HAVE_PRCTL
+#cmakedefine HAVE_CLOCK_GETTIME
 #cmakedefine01 HAVE_POWL
 #cmakedefine01 HAVE_DECL_EXPL
 #cmakedefine01 HAVE_DECL_LOGL
@@ -78,7 +79,6 @@
 #cmakedefine01 HAVE_DECL_VSWTC
 #cmakedefine01 HAVE_DECL_SIGIOT
 #cmakedefine01 HAVE_DECL_ERR
-#cmakedefine01 HAVE_CLOCK_GETTIME
 #cmakedefine01 HAVE_TIMER_CREATE
 #cmakedefine01 HAVE_GETLINE
 #cmakedefine01 HAVE_MEMRCHR

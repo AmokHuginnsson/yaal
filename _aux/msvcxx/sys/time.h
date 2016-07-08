@@ -1,9 +1,7 @@
 #ifndef YAAL_MSVCXX_SYS_TIME_H_INCLUDED
 #define YAAL_MSVCXX_SYS_TIME_H_INCLUDED 1
 
-#define log cmath_log
 #include <algorithm>
-#undef log
 #include <cerrno>
 #include <pthread.h>
 
@@ -53,16 +51,6 @@ inline void FD_SET_ms( int fd_, fd_set* fdset_ )
 
 using namespace asio;
 
-inline struct tm *gmtime_r(const time_t *timep, struct tm *result) {
-	gmtime_s( result, timep );
-	return ( result );
-}
-
-inline struct tm *localtime_r(const time_t *timep, struct tm *result) {
-	localtime_s( result, timep );
-	return ( result );
-}
-
 typedef int clockid_t;
 typedef void* timer_t;
 
@@ -90,7 +78,6 @@ inline int select( int ndfs_,
 									fd_set* extrafs_, struct timeval* timeout_ )
 	{ return ( msvcxx::select( ndfs_, readfs_, writefs_, extrafs_, timeout_ ) ); }
 
-extern "C"
 int gettimeofday( struct timeval*, struct timezone* );
 
 #endif /* not YAAL_MSVCXX_SYS_TIME_H_INCLUDED */

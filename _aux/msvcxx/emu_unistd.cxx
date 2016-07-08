@@ -1,7 +1,5 @@
-#define log cmath_log
 #include <iterator>
 #include <sstream>
-#undef log
 #include <io.h>
 #include <_aux/msvcxx/sys/time.h>
 #include <_aux/msvcxx/unistd.h>
@@ -390,7 +388,7 @@ char const* windows_strerror( int code_ ) {
 M_EXPORT_SYMBOL
 void log_windows_error( char const* api_ ) {
 	int err( GetLastError() );
-	log << "ERROR: API = " << api_
+	hcore::log << "ERROR: API = " << api_
 		<< ", code = " << err
 		<< ", message = " << windows_strerror( err ) << endl;
 	return;

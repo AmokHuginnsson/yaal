@@ -65,7 +65,7 @@ HComplex::HComplex( HComplex const& complex_ )
 HComplex::~HComplex( void ) {
 	M_PROLOG
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 }
 
 double long HComplex::re( void ) const {
@@ -197,7 +197,7 @@ HComplex& HComplex::operator *= ( double long value_ ) {
 HComplex& HComplex::operator /= ( HComplex const& complex_ ) {
 	M_PROLOG
 	double long denominator( complex_._real * complex_._real + complex_._imaginary * complex_._imaginary );
-	if ( denominator == 0.0l )
+	if ( denominator == 0.0L )
 		M_THROW( "denominator equals 0", errno );
 	double long real( ( _real * complex_._real + _imaginary * complex_._imaginary ) / denominator );
 	double long imaginary( ( complex_._real * _imaginary - _real * complex_._imaginary ) / denominator );
@@ -208,7 +208,7 @@ HComplex& HComplex::operator /= ( HComplex const& complex_ ) {
 
 HComplex& HComplex::operator /= ( double long value_ ) {
 	M_PROLOG
-	if ( value_ == 0.0l )
+	if ( value_ == 0.0L )
 		M_THROW( "denominator equals 0", errno );
 	_real /= value_;
 	_imaginary /= value_;
@@ -298,11 +298,11 @@ HComplex operator / ( double long value_, HComplex const& complex_ ) {
 }
 
 HComplex operator "" _yi ( double long val_ ) {
-	return ( HComplex( 0, val_ ) );
+	return ( HComplex( 0.L, val_ ) );
 }
 
 HComplex operator "" _yi ( int long long unsigned val_ ) {
-	return ( HComplex( 0, val_ ) );
+	return ( HComplex( 0.L, static_cast<double long>( val_ ) ) );
 }
 
 }

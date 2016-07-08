@@ -1,0 +1,18 @@
+#ifndef YAAL_MSVCXX_CTIME_INCLUDED
+#define YAAL_MSVCXX_CTIME_INCLUDED 1
+
+#include <../include/ctime>
+#include "cleanup.hxx"
+
+inline struct tm *gmtime_r(const time_t *timep, struct tm *result) {
+	gmtime_s( result, timep );
+	return ( result );
+}
+
+inline struct tm *localtime_r(const time_t *timep, struct tm *result) {
+	localtime_s( result, timep );
+	return ( result );
+}
+
+#endif /* not YAAL_MSVCXX_CTIME_INCLUDED */
+// vim: ft=cpp
