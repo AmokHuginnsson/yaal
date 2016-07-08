@@ -678,7 +678,9 @@ int HProgramOptionsHandler::process_command_line( int argc_,
 	hcore::log( LOG_LEVEL::INFO ) << "Decoding switches ... ";
 	HString optName;
 	HString optValue;
+	int invalid( 0 );
 	int nonOption( 1 ); /* 1 because atgv[0] -- a program name is first non-option */
+	options_t::iterator it;
 	for ( int i( 1 ); i < argc_; ++ i ) {
 		char const* arg( argv_[i] );
 		optValue.clear();
@@ -689,45 +691,27 @@ int HProgramOptionsHandler::process_command_line( int argc_,
 				optValue = optName.substr( optNameEnd + 1 );
 				optName.erase( optNameEnd );
 			}
-			options_t::value_type* opt( nullptr );
-			for ( options_t::value_type& o : _options ) {
-				if ( o.long_form() == optName ) {
-					opt = &o;
-					break;
-				}
-			}
+			HOption* opt( ( it = find_if( _options.begin(), _options.end(), [&optName]( HOption& opt_ ) { return ( opt_.long_form() == optName ); } ) ) != _options.end() ? &*it : nullptr );
 			if ( opt ) {
-				if ( opt->switch_type() == HOption::ARGUMENT::REQUIRED ) {
-					if ( optNameEnd == HString::npos ) {
-						++ i;
-						if ( i < argc_ ) {
-							optValue = argv_[i];
-						} else {
-							if ( invalid_ ) {
-								++ ( *invalid_ );
-							}
-							cerr << argv_[0] << ": option '--" << optName << "' requires an argument" << endl;
-							continue;
-						}
+				if ( ( opt->switch_type() == HOption::ARGUMENT::REQUIRED ) && ( optNameEnd == HString::npos ) ) {
+					++ i;
+					if ( i < argc_ ) {
+						optValue = argv_[i];
+					} else {
+						++ invalid;
+						cerr << argv_[0] << ": option '--" << optName << "' requires an argument" << endl;
+						continue;
 					}
 				}
 				set_option( *opt, optValue );
 			} else {
-				if ( invalid_ ) {
-					++ ( *invalid_ );
-				}
+				++ invalid;
 				cerr << argv_[0] << ": unrecognized option '" << argv_[i] << "'" << endl;
 			}
 		} else if ( arg[0] == '-' ) {
 			++ arg;
 			while ( *arg ) {
-				options_t::value_type* opt( nullptr );
-				for ( options_t::value_type& o : _options ) {
-					if ( o.short_form() == *arg ) {
-						opt = &o;
-						break;
-					}
-				}
+				HOption* opt( ( it = find_if( _options.begin(), _options.end(), [&arg]( HOption& opt_ ) { return ( opt_.short_form() == *arg ); } ) ) != _options.end() ? &*it : nullptr );
 				if ( opt ) {
 					char on( *arg );
 					if ( ( opt->switch_type() == HOption::ARGUMENT::REQUIRED ) || ( opt->switch_type() == HOption::ARGUMENT::OPTIONAL ) ) {
@@ -740,18 +724,14 @@ int HProgramOptionsHandler::process_command_line( int argc_,
 							optValue = argv_[i];
 						} else {
 							++ arg;
-							if ( invalid_ ) {
-								++ ( *invalid_ );
-							}
+							++ invalid;
 							cerr << argv_[0] << ": option requires an argument -- '" << on << "'" << endl;
 							continue;
 						}
 					}
 					set_option( *opt, optValue );
 				} else {
-					if ( invalid_ ) {
-						++ ( *invalid_ );
-					}
+					++ invalid;
 					cerr << argv_[0] << ": invalid option -- '" << *arg << "'" << endl;
 				}
 				++ arg;
@@ -764,6 +744,9 @@ int HProgramOptionsHandler::process_command_line( int argc_,
 		}
 	}
 	set_from_env();
+	if ( invalid_ ) {
+		*invalid_ = invalid;
+	}
 	hcore::log << "done." << endl;
 	return ( argc_ );
 	M_EPILOG
