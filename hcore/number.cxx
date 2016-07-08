@@ -496,29 +496,86 @@ class HFactorialCache : public yaal::hcore::HSingleton<HFactorialCache> {
 public:
 	typedef HFactorialCache this_type;
 	typedef HResource<HNumber> number_t;
-	typedef HArray<number_t> cache_t;
+	typedef HArray<number_t> consecutive_t;
+	typedef HMap<int long, number_t> isolated_t;
+	static int const FORCED_CONSECUTIVE_SIZE = 4096;
+	static int const CONSECUTIVE_STRECH_SIZE = 128;
+	static int const DIVIDE_AND_CONQUER_CUT_OFF = 32;
 private:
-	cache_t _cache;
+	consecutive_t _consecutive;
+	isolated_t _isolated;
 	HMutex _mutex;
 public:
-	yaal::hcore::HNumber const& factorial( int long long value_ ) {
-		M_ENSURE( value_ >= 0 );
-		HLock l( _mutex );
-		if ( value_ >= _cache.get_size() ) {
-			for ( int long long i( _cache.get_size() ); i <= value_; ++ i ) {
-				number_t n( make_resource<HNumber>( *_cache.back() ) );
-				*n *=i;
-				_cache.push_back( yaal::move( n ) );
+	static HNumber mul_range( int long from_, int long to_ ) {
+		M_PROLOG
+		HNumber n;
+		if ( ( to_ - from_ ) >= DIVIDE_AND_CONQUER_CUT_OFF ) {
+			int long mid( ( from_ + to_ ) / 2 );
+			n = mul_range( from_, mid ) * mul_range( mid + 1, to_ );
+		} else {
+			for ( n = from_, ++ from_; from_ <= to_; ++ from_ ) {
+				n *= from_;
 			}
 		}
-		return ( *_cache[static_cast<int long>( value_ )] );
+		return ( n );
+		M_EPILOG
+	}
+	yaal::hcore::HNumber const& factorial( int long long value_ ) {
+		M_ENSURE( value_ >= 0 );
+		HNumber const* res( nullptr );
+		HLock l( _mutex );
+		if ( value_ >= _consecutive.get_size() ) {
+			if ( ( value_ <= FORCED_CONSECUTIVE_SIZE ) || ( value_ <= ( _consecutive.get_size() + CONSECUTIVE_STRECH_SIZE ) ) ) {
+				for ( int long long i( _consecutive.get_size() ); i <= value_; ++ i ) {
+					number_t n( make_resource<HNumber>( *_consecutive.back() ) );
+					*n *=i;
+					_consecutive.push_back( yaal::move( n ) );
+				}
+				res = _consecutive[static_cast<int long>( value_ )].raw();
+			} else {
+				int long baseArg( 0 );
+				HNumber const* baseVal( nullptr );
+				isolated_t::iterator baseIt( _isolated.lower_bound( value_ ) );
+				if ( baseIt == _isolated.end() ) {
+					if ( ! _isolated.is_empty() ) {
+						baseArg = _isolated.rbegin()->first;
+						baseVal = _isolated.rbegin()->second.raw();
+					} else {
+						baseArg = _consecutive.get_size() - 1;
+						baseVal = _consecutive.back().raw();
+					}
+				} else if ( baseIt->first != value_ ) {
+					if ( baseIt != _isolated.begin() ) {
+						-- baseIt;
+						baseArg = baseIt->first;
+						baseVal = baseIt->second.raw();
+					} else {
+						baseArg = _consecutive.get_size() - 1;
+						baseVal = _consecutive.back().raw();
+					}
+				} else {
+					baseArg = baseIt->first;
+					baseVal = baseIt->second.raw();
+				}
+				M_ASSERT( baseArg <= value_ );
+				if ( baseArg == value_ ) {
+					res = baseVal;
+				} else {
+					res = _isolated.insert( make_pair( value_, make_resource<HNumber>( *baseVal * mul_range( baseArg + 1, value_ ) ) ) ).first->second.raw();
+				}
+			}
+		} else {
+			res = _consecutive[static_cast<int long>( value_ )].raw();
+		}
+		return ( *res );
 	}
 private:
 	HFactorialCache( void )
-		: _cache()
+		: _consecutive()
+		, _isolated()
 		, _mutex() {
-		_cache.push_back( make_resource<HNumber>( N1 ) );
-		_cache.push_back( make_resource<HNumber>( N1 ) );
+		_consecutive.push_back( make_resource<HNumber>( N1 ) );
+		_consecutive.push_back( make_resource<HNumber>( N1 ) );
 		return;
 	}
 	virtual ~HFactorialCache( void ) {
