@@ -22,6 +22,7 @@ struct rlimit {
 	rlim_t rlim_max;
 };
 
+int getrusage( rusage_who_t, struct rusage* );
 int getrlimit( rlimit_resource_t, struct rlimit* );
 
 #endif /* not YAAL_MSVCXX_SYS_RESOURCE_H_INCLUDED */

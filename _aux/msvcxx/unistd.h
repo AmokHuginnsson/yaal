@@ -31,6 +31,11 @@ static int const STDERR_FILENO = 2;
 
 static int const WCONTINUED = 0;
 
+static int const _SC_PAGESIZE = 1;
+static int const _SC_NPROCESSORS_ONLN = 2;
+static int const _SC_GETPW_R_SIZE_MAX = 3;
+static int const _SC_GETGR_R_SIZE_MAX = 4;
+
 #define fork ms_fork
 #define getuid ms_getuid
 #define gethostname ms_gethostname
@@ -42,6 +47,7 @@ static int const WCONTINUED = 0;
 int ms_gethostname( char*, int );
 M_YAAL_HCORE_PUBLIC_API uid_t ms_getuid( void );
 int unsetenv_fix( char const* );
+long int sysconf( int );
 
 #if ! defined( HAVE_PTHREAD_SETNAME_NP )
 #define HAVE_PTHREAD_SETNAME_NP 1

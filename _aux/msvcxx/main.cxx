@@ -253,7 +253,6 @@ bool get_system_account_name( int id_, char* buf_, int size_ ) {
 	return ( fail );
 }
 
-extern "C"
 int getpwuid_r( uid_t uid_, struct passwd* p_, char* buf_, int size_, struct passwd** result_ ) {
 	p_->pw_name = buf_;
 	int err( -1 );
@@ -264,7 +263,6 @@ int getpwuid_r( uid_t uid_, struct passwd* p_, char* buf_, int size_, struct pas
 	return ( err );
 }
 
-extern "C"
 int getgrgid_r( gid_t gid_, struct group* g_, char* buf_, int size_, struct group** result_ ) {
 	g_->gr_name = buf_;
 	int err( -1 );
@@ -395,7 +393,6 @@ int timer_delete( timer_t timer_ ) {
 	return ( err );
 }
 
-extern "C"
 int getrusage( rusage_who_t who_, struct rusage* usage_ ) {
 	int err( 0 );
 	if ( who_ != RUSAGE_SELF )

@@ -13,8 +13,6 @@
 #define access access_off
 #define lseek lseek_off
 #define dup dup_off
-#define getpid getpid_off
-#define getpwuid_r getpwuid_r_off
 
 #define fill fill_off
 #include "csignal"

@@ -1,5 +1,3 @@
-#include <process.h>
-
 #include <pthread.h>
 
 #include "_aux/msvcxx/csignal"

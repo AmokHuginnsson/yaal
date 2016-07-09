@@ -497,7 +497,7 @@ public:
 	typedef HFactorialCache this_type;
 	typedef HResource<HNumber> number_t;
 	typedef HArray<number_t> consecutive_t;
-	typedef HMap<int long, number_t> isolated_t;
+	typedef HMap<int long long, number_t> isolated_t;
 	static int const FORCED_CONSECUTIVE_SIZE = 4096;
 	static int const CONSECUTIVE_STRECH_SIZE = 128;
 	static int const DIVIDE_AND_CONQUER_CUT_OFF = 32;
@@ -506,11 +506,11 @@ private:
 	isolated_t _isolated;
 	HMutex _mutex;
 public:
-	static HNumber mul_range( int long from_, int long to_ ) {
+	static HNumber mul_range( int long long from_, int long long to_ ) {
 		M_PROLOG
 		HNumber n;
 		if ( ( to_ - from_ ) >= DIVIDE_AND_CONQUER_CUT_OFF ) {
-			int long mid( ( from_ + to_ ) / 2 );
+			int long long mid( ( from_ + to_ ) / 2 );
 			n = mul_range( from_, mid ) * mul_range( mid + 1, to_ );
 		} else {
 			for ( n = from_, ++ from_; from_ <= to_; ++ from_ ) {
@@ -533,7 +533,7 @@ public:
 				}
 				res = _consecutive[static_cast<int long>( value_ )].raw();
 			} else {
-				int long baseArg( 0 );
+				int long long baseArg( 0 );
 				HNumber const* baseVal( nullptr );
 				isolated_t::iterator baseIt( _isolated.lower_bound( value_ ) );
 				if ( baseIt == _isolated.end() ) {
@@ -561,7 +561,7 @@ public:
 				if ( baseArg == value_ ) {
 					res = baseVal;
 				} else {
-					res = _isolated.insert( make_pair( value_, make_resource<HNumber>( *baseVal * mul_range( baseArg + 1, value_ ) ) ) ).first->second.raw();
+					res = _isolated.insert( make_pair( value_, make_resource<HNumber>( *baseVal * mul_range( baseArg + 1LL, value_ ) ) ) ).first->second.raw();
 				}
 			}
 		} else {
