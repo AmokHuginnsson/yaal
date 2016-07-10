@@ -329,16 +329,24 @@ private:
 };
 
 template<typename T>
-inline void swap( yaal::allocator::system<T>& a, yaal::allocator::system<T>& b )
-	{ a.swap( b ); }
+inline void swap( yaal::allocator::system<T>& a, yaal::allocator::system<T>& b ) {
+	a.swap( b );
+}
 
 template<typename T>
-inline void swap( yaal::allocator::pool<T>& a, yaal::allocator::pool<T>& b )
-	{ a.swap( b ); }
+inline void swap( yaal::allocator::pool<T>& a, yaal::allocator::pool<T>& b ) {
+	a.swap( b );
+}
+
+template<typename T>
+inline void swap( yaal::allocator::shared_pool<T>& a, yaal::allocator::shared_pool<T>& b ) {
+	a.swap( b );
+}
 
 template<typename T, typename allocator_t>
-inline void swap( yaal::allocator::ref<T, allocator_t>& a, yaal::allocator::ref<T, allocator_t>& b )
-	{ a.swap( b ); }
+inline void swap( yaal::allocator::ref<T, allocator_t>& a, yaal::allocator::ref<T, allocator_t>& b ) {
+	a.swap( b );
+}
 
 }
 
