@@ -100,7 +100,7 @@ struct system final {
 		p->~T();
 	}
 private:
-	system& operator = ( system const& );
+	system& operator = ( system const& ) = delete;
 };
 
 /*! \brief Pool allocator.
@@ -174,7 +174,7 @@ struct pool final {
 		p->~T();
 	}
 private:
-	pool& operator = ( pool const& );
+	pool& operator = ( pool const& ) = delete;
 };
 
 /*! \brief Allocator with external (possibly shared) pool.
@@ -248,7 +248,7 @@ struct shared_pool final {
 		p->~T();
 	}
 private:
-	shared_pool& operator = ( shared_pool const& );
+	shared_pool& operator = ( shared_pool const& ) = delete;
 };
 
 /*! \brief Forwarding allocator.
@@ -325,7 +325,7 @@ struct ref final {
 		p->~T();
 	}
 private:
-	ref& operator = ( ref const& );
+	ref& operator = ( ref const& ) = delete;
 };
 
 template<typename T>

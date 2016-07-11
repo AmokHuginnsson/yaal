@@ -26,7 +26,6 @@
 #undef sendto
 #undef recvfrom
 #undef interface
-#undef _try
 
 #ifndef YAAL_MSVCXX_CLEANUP_HXX_INCLUDED
 #define YAAL_MSVCXX_CLEANUP_HXX_INCLUDED

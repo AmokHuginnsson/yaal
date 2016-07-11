@@ -116,19 +116,6 @@
 #define WIN32_LEAN_AND_MEAN 1
 #define VC_EXTRALEAN 1
 #define NOMINMAX 1
-#pragma warning( disable : 4068 )
-#pragma warning( disable : 4146 )
-#pragma warning( disable : 4180 )
-#pragma warning( disable : 4221 )
-#pragma warning( disable : 4250 )
-#pragma warning( disable : 4251 )
-#pragma warning( disable : 4275 )
-#pragma warning( disable : 4290 )
-#pragma warning( disable : 4351 )
-#pragma warning( disable : 4345 )
-#pragma warning( disable : 4355 )
-#pragma warning( disable : 4646 )
-#pragma warning( disable : 4996 )
 #undef __PRETTY_FUNCTION__
 #define __PRETTY_FUNCTION__ __FUNCSIG__
 #define HAVE_PRETTY_FUNCTION 1
