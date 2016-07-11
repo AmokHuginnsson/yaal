@@ -703,7 +703,7 @@ class HSharedDeleterAllocatorImpl : protected HSharedDeleterAllocator<tType, del
 	}
 	virtual void destroy( void ) override {
 		typedef typename allocator_t:: template rebind<HSharedDeleterAllocatorImpl>::other allocator_type;
-		allocator_type( base_type::_allocator ).deallocate( this, 1 );
+		allocator_type( this->_allocator ).deallocate( this, 1 );
 	}
 	friend struct pointer_helper;
 	template<typename>
