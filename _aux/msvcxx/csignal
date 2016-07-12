@@ -3,6 +3,7 @@
 
 #include <process.h>
 #include <../include/csignal>
+#include <pthread.h>
 #include "cleanup.hxx"
 #include "hcore/pod.hxx"
 

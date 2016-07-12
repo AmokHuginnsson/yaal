@@ -52,19 +52,6 @@ inline void FD_SET_ms( int fd_, fd_set* fdset_ )
 using namespace asio;
 
 typedef int clockid_t;
-typedef void* timer_t;
-
-struct itimerspec {
-	timespec it_value;
-	timespec it_interval;
-};
-
-M_YAAL_HCORE_PUBLIC_API
-int timer_create( clockid_t, struct sigevent*, timer_t* );
-M_YAAL_HCORE_PUBLIC_API
-int timer_settime( timer_t, int, struct itimerspec const*, struct itimerspec* );
-M_YAAL_HCORE_PUBLIC_API
-int timer_delete( timer_t );
 
 namespace msvcxx {
 

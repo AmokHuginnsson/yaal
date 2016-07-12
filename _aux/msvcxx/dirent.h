@@ -10,7 +10,7 @@ static int const DT_BLK = 6;
 static int const DT_REG = 8;
 
 struct dirent {
-	int d_fileno;
+	int d_ino;
 	int d_type;
 	char d_name[NAME_MAX + 1];
 };
@@ -20,6 +20,8 @@ struct DIR;
 DIR* opendir( char const* );
 int closedir( DIR* );
 int readdir_r( struct DIR*, struct dirent*, struct dirent** );
+int telldir( DIR* );
+void seekdir( DIR*, int );
 
 #endif /* not YAAL_MSVCXX_DIRENT_H_INCLUDED */
 

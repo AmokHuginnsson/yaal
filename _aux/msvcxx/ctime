@@ -16,5 +16,18 @@ inline struct tm *localtime_r(const time_t *timep, struct tm *result) {
 	return ( result );
 }
 
+static int const SIGEV_SIGNAL = 0;
+
+union sigval {
+	int sival_int;
+	void* sival_ptr;
+};
+
+struct sigevent {
+	sigval sigev_value;
+	int sigev_signo;
+	int sigev_notify;
+};
+
 #endif /* not YAAL_MSVCXX_CTIME_INCLUDED */
 // vim: ft=cpp

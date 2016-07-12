@@ -46,6 +46,7 @@
 #cmakedefine HAVE_PTHREAD_SET_NAME_NP
 #cmakedefine HAVE_PRCTL
 #cmakedefine HAVE_CLOCK_GETTIME
+#cmakedefine HAVE_TIMER_CREATE
 #cmakedefine01 HAVE_POWL
 #cmakedefine01 HAVE_DECL_EXPL
 #cmakedefine01 HAVE_DECL_LOGL
@@ -79,7 +80,6 @@
 #cmakedefine01 HAVE_DECL_VSWTC
 #cmakedefine01 HAVE_DECL_SIGIOT
 #cmakedefine01 HAVE_DECL_ERR
-#cmakedefine01 HAVE_TIMER_CREATE
 #cmakedefine01 HAVE_GETLINE
 #cmakedefine01 HAVE_MEMRCHR
 #cmakedefine01 HAVE_GETLINE
@@ -144,9 +144,6 @@ static clockid_t const CLOCK_REALTIME = 0;
 #include <errno.h>
 #include "hcore/macro.hxx"
 #undef OVERFLOW
-#undef SIG_BLOCK
-#undef SIG_UNBLOCK
-#undef SIG_SETMASK
 extern "C" void* memrchr( void const*, int, size_t );
 extern "C" char* basename( char const* );
 extern "C" char* strptime( char const*, char const*, struct tm* );

@@ -249,6 +249,7 @@ int clock_gettime( clockid_t, struct timespec* time_ ) {
 #endif /* #if ! defined( HAVE_CLOCK_GETTIME ) */
 
 #if ! defined( HAVE_TIMER_CREATE )
+#include <csignal>
 #include <signal.h>
 #include <unistd.h>
 #include "hcore/hthread.hxx"

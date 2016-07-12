@@ -301,9 +301,9 @@ int long read( int fd_, void* buf_, int long size_ ) {
 M_EXPORT_SYMBOL
 int long write( int fd_, void const* buf_, int long size_ ) {
 	int long nWritten( -1 );
-	if ( fd_ < SystemIO::MANAGED_IO )
+	if ( fd_ < SystemIO::MANAGED_IO ) {
 		nWritten = ::write( fd_, buf_, size_ );
-	else {
+	} else {
 		SystemIO& sysIo( SystemIO::get_instance() );
 		IO& io( *( sysIo.get_io( fd_ ).second ) );
 		nWritten = io.write( buf_, size_ );
@@ -315,26 +315,29 @@ M_EXPORT_SYMBOL
 int long sendto( int fd_, void const* buf_, int long size_, int flags_, sockaddr const* to_, int toLen_ ) {
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
-	return ( io.sendto( static_cast<char const*>( buf_ ),
-		static_cast<int>( size_ ), flags_, to_, toLen_ ) );
+	return (
+		io.sendto( static_cast<char const*>( buf_ ), static_cast<int>( size_ ), flags_, to_, toLen_ )
+	);
 }
 
 M_EXPORT_SYMBOL
 int long recvfrom( int fd_, void* buf_, int long size_, int flags_, sockaddr* from_, int* fromLen_ ) {
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
-	return ( io.recvfrom( static_cast<char*>( buf_ ),
-		static_cast<int>( size_ ), flags_, from_, fromLen_ ) );
+	return (
+		io.recvfrom( static_cast<char*>( buf_ ), static_cast<int>( size_ ), flags_, from_, fromLen_ )
+	);
 }
 
 int unix_stat( char const* path_, struct stat* s_ ) {
 	string path( path_ );
 	string::size_type lastNonSeparator( path.find_last_not_of( "/\\" ) );
 	int len( path.length() );
-	if ( lastNonSeparator != string::npos )
+	if ( lastNonSeparator != string::npos ) {
 		path.erase( lastNonSeparator + 1 );
-	else
+	} else {
 		path.erase( 1 );
+	}
 	int res( ::stat( path.c_str(), s_ ) );
 	if ( ! res ) {
 		if ( ( len != path.length() ) && ! ( S_IFDIR & s_->st_mode ) ) {

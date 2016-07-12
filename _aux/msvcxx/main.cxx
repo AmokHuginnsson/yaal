@@ -164,7 +164,7 @@ int closedir( DIR* dir_ ) {
 int readdir_r( DIR* dir_, struct dirent* entry_, struct dirent** result_ ) {
 	int error( 0 );
 	if ( dir_->_hasData ) {
-		entry_->d_fileno = dir_->_index;
+		entry_->d_ino = dir_->_index;
 		if ( dir_->_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) {
 			entry_->d_type = DT_DIR;
 		} else if ( dir_->_data.dwFileAttributes & FILE_ATTRIBUTE_DEVICE ) {
@@ -177,7 +177,9 @@ int readdir_r( DIR* dir_, struct dirent* entry_, struct dirent** result_ ) {
 			entry_->d_type = DT_UNKNOWN;
 		}
 		strncpy( entry_->d_name, dir_->_data.cFileName, NAME_MAX );
-		result_ = &entry_;
+		if ( result_ ) {
+			*result_ = entry_;
+		}
 		if ( ::FindNextFile( dir_->_handle, &dir_->_data ) ) {
 			++ dir_->_index;
 		} else {
@@ -187,6 +189,22 @@ int readdir_r( DIR* dir_, struct dirent* entry_, struct dirent** result_ ) {
 		error = 1;
 	}
 	return ( error );
+}
+
+int telldir( DIR* dir_ ) {
+	return ( dir_->_index );
+}
+
+void seekdir( DIR* dir_, int pos_ ) {
+	struct dirent de;
+	while ( true ) {
+		if ( dir_->_index == pos_ ) {
+			break;
+		}
+		if ( readdir_r( dir_, &de, nullptr ) != 0 ) {
+			break;
+		}
+	}
 }
 
 PSID get_base_sid( char* buffer_, int size_ ) {
@@ -351,46 +369,6 @@ int WINAPI WinMain(
 	typedef int ( *main_type )( int, char** );
 	main_type main = bit_cast<main_type>( ::GetProcAddress( appHandle, "main" ) );
 	return ( main( nArgs, argv ) );
-}
-
-void __stdcall timer_expired( PVOID lpParameter, __in BOOLEAN ) {
-	int sigNo( reinterpret_cast<int>( lpParameter ) );
-	kill( getpid(), sigNo );
-}
-
-M_EXPORT_SYMBOL
-int timer_create( clockid_t, struct sigevent*, timer_t* timer_ ) {
-	int err( 0 );
-	HANDLE h( nullptr );
-	if ( ! ::CreateTimerQueueTimer( &h,
-			nullptr, timer_expired, reinterpret_cast<PVOID>( SIGALRM ),
-			ULONG_MAX, 0, WT_EXECUTEONLYONCE ) ) {
-		log_windows_error( "CreateTimerQueueTimer" );
-		err = -1;
-	} else
-		*timer_ = h;
-	return ( err );
-}
-
-M_EXPORT_SYMBOL
-int timer_settime( timer_t timer_, int, struct itimerspec const* due_, struct itimerspec* ) {
-	int err( 0 );
-	time_t milliseconds( due_->it_value.tv_sec * 1000 + due_->it_value.tv_nsec / 1000000 );
-	if ( ! ::ChangeTimerQueueTimer( nullptr, timer_, static_cast<ULONG>( milliseconds ? milliseconds : ULONG_MAX ), 0 ) ) {
-		log_windows_error( "CreateTimerQueueTimer" );
-		err = -1;
-	}
-	return ( err );
-}
-
-M_EXPORT_SYMBOL
-int timer_delete( timer_t timer_ ) {
-	int err( 0 );
-	if ( ! ::DeleteTimerQueueTimer( nullptr, timer_, nullptr ) && ( ::GetLastError() != ERROR_IO_PENDING ) ) {
-		log_windows_error( "DeleteTimerQueueTimer" );
-		err = -1;
-	}
-	return ( err );
 }
 
 int getrusage( rusage_who_t who_, struct rusage* usage_ ) {

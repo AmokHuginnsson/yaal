@@ -24,13 +24,13 @@ static int const S_IXOTH = 0001;
 typedef int unsigned mode_t;
 
 namespace msvcxx {
-using ::stat;
+struct unix_stat : public stat {};
 int unix_stat( char const*, struct stat* );
 mode_t umask( mode_t );
 }
 
 inline int lstat( char const* path_, struct stat* s_ )
-	{ return ( msvcxx::stat( path_, s_ ) ); }
+	{ return ( msvcxx::unix_stat( path_, s_ ) ); }
 
 inline mode_t umask( mode_t umask_ )
 	{ return ( msvcxx::umask( umask_ ) ); }
