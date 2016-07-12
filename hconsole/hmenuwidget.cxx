@@ -55,7 +55,7 @@ HMenuWidget::~HMenuWidget ( void ) {
 	M_PROLOG
 	_process = nullptr;
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 }
 
 void HMenuWidget::init( HTUIProcess* process_ ) {

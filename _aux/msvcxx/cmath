@@ -1,8 +1,18 @@
 #ifndef YAAL_MSVCXX_CMATH_INCLUDED
 #define YAAL_MSVCXX_CMATH_INCLUDED 1
 
+#ifndef _INC_PROCESS
+#ifndef _CSTDARG_
+#ifndef __XML_XMLWRITER_H__
+#ifndef _LIBINTL_H
+#ifndef EMU_SIGNALS_IMPL
 #include <../include/cmath>
 #include "cleanup.hxx"
+#endif
+#endif
+#endif
+#endif
+#endif
 
 #endif /* not YAAL_MSVCXX_CMATH_INCLUDED */
 // vim: ft=cpp

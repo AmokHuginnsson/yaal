@@ -83,7 +83,7 @@ public:
 	~HVector( void ) {
 		M_PROLOG
 		return;
-		M_EPILOG
+		M_DESTRUCTOR_EPILOG
 	}
 	void set( data_t const& rawData ) {
 		M_PROLOG

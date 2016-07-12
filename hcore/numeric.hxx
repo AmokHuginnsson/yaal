@@ -93,7 +93,7 @@ bool const is_signed<T>::value;
  */
 template<typename T>
 struct max_signed {
-	STATIC_ASSERT( is_signed<T>::value );
+	static_assert( is_signed<T>::value, "must be a signed type" );
 	static T const value = static_cast<T>( ~( static_cast<T>( 1 ) << ( ( sizeof ( T ) << 3 ) - 1 ) ) );
 };
 template<typename T>
@@ -106,7 +106,7 @@ T const max_signed<T>::value;
  */
 template<typename T>
 struct max_unsigned {
-	STATIC_ASSERT( logical_not<is_signed<T>::value>::value );
+	static_assert( logical_not<is_signed<T>::value>::value, "must be an unsigned type" );
 	static T const value = static_cast<T>( ~0 );
 };
 template<typename T>
@@ -119,7 +119,7 @@ T const max_unsigned<T>::value;
  */
 template<typename T>
 struct min_signed {
-	STATIC_ASSERT( is_signed<T>::value );
+	static_assert( is_signed<T>::value, "must be a signed type" );
 	static T const value = static_cast<T>( static_cast<T>( 1 ) << ( ( sizeof ( T ) << 3 ) - 1 ) );
 };
 template<typename T>

@@ -9,6 +9,7 @@
 #pragma warning( disable : 4251 )
 #pragma warning( disable : 4275 )
 #pragma warning( disable : 4290 )
+#pragma warning( disable : 4309 )
 #pragma warning( disable : 4351 )
 #pragma warning( disable : 4345 )
 #pragma warning( disable : 4355 )
@@ -19,6 +20,9 @@
 #define _inline _inlineMSVCXX
 #define _try _tryMSVCXX
 #define HAVE_STRUCT_TIMESPEC 1
+#ifndef _WIN64
+#define _USE_32BIT_TIME_T 1
+#endif /* #ifndef _WIN64 */
 
 #if 0
 

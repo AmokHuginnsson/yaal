@@ -161,9 +161,9 @@ public:
 	 */
 	typedef yaal::hcore::HBitFlag<COMPILER> compiler_setup_t;
 	struct COMPILER {
-		static M_YAAL_HCORE_PUBLIC_API compiler_setup_t const DEFAULT;
-		static M_YAAL_HCORE_PUBLIC_API compiler_setup_t const BE_STRICT;
-		static M_YAAL_HCORE_PUBLIC_API compiler_setup_t const BE_SLOPPY;
+		static M_YAAL_TOOLS_PUBLIC_API compiler_setup_t const DEFAULT;
+		static M_YAAL_TOOLS_PUBLIC_API compiler_setup_t const BE_STRICT;
+		static M_YAAL_TOOLS_PUBLIC_API compiler_setup_t const BE_SLOPPY;
 	};
 	class HHuginnRuntimeException;
 	typedef yaal::hcore::HResource<huginn::HSource> source_t;

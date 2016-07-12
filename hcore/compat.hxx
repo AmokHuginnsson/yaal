@@ -60,7 +60,7 @@ int long strnlen( char const*, int long );
 #endif /* #if ! defined( HAVE_STRNLEN ) || ( HAVE_STRNLEN == 0 ) */
 
 #if ! defined( HAVE_DECL_SUN_LEN ) || ( HAVE_DECL_SUN_LEN == 0 )
-#define SUN_LEN(x) ( ::std::strlen( x->sun_path ) + sizeof ( x->sun_family ) )
+#define SUN_LEN( su ) ( (sizeof ( *(su) ) - sizeof ( (su)->sun_path ) + std::strlen( (su)->sun_path ) ) )
 #endif /* #if ! defined( HAVE_DECL_SUN_LEN ) || ( HAVE_DECL_SUN_LEN == 0 ) */
 
 #if ! defined( HAVE_GNU_GETHOSTBYNAME_R )

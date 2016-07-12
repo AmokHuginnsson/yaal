@@ -30,6 +30,9 @@ static int const STDIN_FILENO = 0;
 static int const STDOUT_FILENO = 1;
 static int const STDERR_FILENO = 2;
 
+static int const F_ULOCK = 0x0;
+static int const F_LOCK  = 0x1;
+
 static int const WCONTINUED = 0;
 
 static int const _SC_PAGESIZE = 1;
@@ -52,6 +55,7 @@ M_YAAL_HCORE_PUBLIC_API uid_t ms_getuid( void );
 int unsetenv_fix( char const* );
 int long sysconf( int );
 int long pathconf( char const*, int );
+int unsigned alarm( int unsigned );
 
 #if ! defined( HAVE_PTHREAD_SETNAME_NP )
 #define HAVE_PTHREAD_SETNAME_NP 1

@@ -132,14 +132,6 @@ extern "C" int unsetenv( char const* );
 #ifdef PTHREAD_H
 #define pthread_self() pthread_self().p
 #endif /* PTHREAD_H */
-#if 0 // def _CTIME_
-#include <pthread.h>
-extern "C" int getntptimeofday( struct timespec*, struct timezone* );
-typedef __clockid_t clockid_t;
-inline int clock_gettime( __clockid_t, struct timespec* tp_ )
-	{ return ( getntptimeofday( tp_, NULL ) ); }
-static clockid_t const CLOCK_REALTIME = 0;
-#endif /* #ifdef _CTIME_ */
 #ifdef _CSTRING_
 #include <errno.h>
 #include "hcore/macro.hxx"

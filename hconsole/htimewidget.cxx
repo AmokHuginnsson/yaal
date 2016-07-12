@@ -49,7 +49,7 @@ HTimeWidget::HTimeWidget( HWindow* parent_, int row_, int column_,
 HTimeWidget::~HTimeWidget ( void ) {
 	M_PROLOG
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 }
 
 void HTimeWidget::do_paint( void ) {

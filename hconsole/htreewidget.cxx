@@ -51,7 +51,7 @@ HTreeWidget::HNodeWidget::HNodeWidget( HAbstractTreeModel::HAbstractTreeModelNod
 HTreeWidget::HNodeWidget::~HNodeWidget( void ) {
 	M_PROLOG
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 }
 
 void HTreeWidget::expand( tree_view_t::node_t node ) {
@@ -118,7 +118,7 @@ HTreeWidget::HTreeWidget( HWindow* parent_, int row_, int column_,
 HTreeWidget::~HTreeWidget( void ) {
 	M_PROLOG
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 }
 
 void HTreeWidget::do_paint( void ) {

@@ -71,7 +71,7 @@ HDateWidget::HDateWidget( HWindow* parent_, int row_, int column_,
 HDateWidget::~HDateWidget( void ) {
 	M_PROLOG
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 }
 
 void HDateWidget::do_paint( void ) {

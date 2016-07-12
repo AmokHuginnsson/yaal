@@ -49,7 +49,7 @@ HHandler::HHandler( int keyHandlers_, int commandHandlers_ )
 HHandler::~HHandler ( void ) {
 	M_PROLOG
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 }
 
 int HHandler::register_preprocess_handler( int codeCount_, int const* codes_,

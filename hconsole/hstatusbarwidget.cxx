@@ -72,7 +72,7 @@ HStatusBarWidget::HStatusBarWidget( HWindow* parent_,
 HStatusBarWidget::~HStatusBarWidget( void ) {
 	M_PROLOG
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 }
 
 void HStatusBarWidget::do_draw_label( void ) {

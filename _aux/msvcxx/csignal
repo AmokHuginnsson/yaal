@@ -1,6 +1,7 @@
 #ifndef YAAL_MSVCXX_CSIGNAL_INCLUDED
 #define YAAL_MSVCXX_CSIGNAL_INCLUDED 1
 
+#define _INC_MATH
 #include <process.h>
 #include <../include/csignal>
 #include <pthread.h>
@@ -13,6 +14,8 @@ static int const UNIX_SIGABRT = 6;
 static int const UNIX_SIGFPE = 8;
 static int const UNIX_SIGSEGV = 11;
 static int const UNIX_SIGTERM = 15;
+
+static int const SA_RESTART = 0x2;
 
 static int const SIGHUP = 1;
 static_assert( SIGINT == UNIX_SIGINT, "bad SIGINT value" );
@@ -43,6 +46,8 @@ typedef yaal::u64_t sigset_t;
 
 struct sigaction {
 	sighandler_t sa_handler;
+	sigset_t sa_mask;
+	int sa_flags;
 };
 
 int sigaddset( sigset_t*, int );

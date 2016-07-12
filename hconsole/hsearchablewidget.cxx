@@ -53,7 +53,7 @@ HSearchableWidget::HSearchableWidget( HWidgetAttributesInterface const& attrs_ )
 HSearchableWidget::~HSearchableWidget ( void ) {
 	M_PROLOG
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 }
 
 void HSearchableWidget::search( HString const& pattern_, bool backwards_ ) {

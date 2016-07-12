@@ -23,7 +23,6 @@ struct sockaddr_un {
 	int sun_family;
 	char sun_path[MAX_PATH];		/* Path name.  */
 };
-#define SUN_LEN(ptr) ((size_t) (((struct sockaddr_un *) 0)->sun_path) + strlen ((ptr)->sun_path))
 
 inline int ms_socket( int af_, int type_, int protocol_ )
 	{ return ( msvcxx::socket( af_, type_, protocol_ ) ); }

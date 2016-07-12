@@ -1,3 +1,5 @@
+#define EMU_SIGNALS_IMPL 1
+#define _CMATH_ 1
 #include <pthread.h>
 
 #include "_aux/msvcxx/csignal"

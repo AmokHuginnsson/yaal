@@ -635,11 +635,11 @@ HHuginn::value_t HHuginn::HTernaryEvaluator::execute( huginn::HThread* thread_ )
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HTernaryEvaluator::do_clone( HRuntime* M_NDEBUG_CODE( runtime_ ) ) const {
+HHuginn::value_t HHuginn::HTernaryEvaluator::do_clone( HRuntime* ) const {
 	M_ASSERT( 0 && "cloning ternary evaluator"[0] );
-#ifdef NDEBUG
-	return ( runtime_->none_value() );
-#endif /* #ifdef NDEBUG */
+#if defined( NDEBUG ) || defined( __MSVCXX__ )
+	return ( HHuginn::value_t() );
+#endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
 }
 
 HHuginn::HFunctionReference::HFunctionReference(

@@ -1,6 +1,5 @@
 /* No header guards cause cleanup may by necessary multiple times. */
 
-#undef close
 #undef CALLBACK
 #undef ERROR
 #undef VOID
@@ -10,14 +9,16 @@
 #undef TRUE
 #undef FALSE
 #undef ALTERNATE
+#undef ABSOLUTE
 #undef OK
-#undef min
-#undef max
 #undef PARITY_ODD
 #undef DELETE
 #undef INFINITY
 #undef OUT
 #undef ERR
+#undef min
+#undef max
+#undef close
 #undef clear
 #undef erase
 #undef move

@@ -92,24 +92,24 @@ yaal::hcore::HString const& OMenuItem::get_string( void ) const {
 
 int long OMenuItem::get_integer( void ) const {
 	M_ASSERT( 0 && "invalid call" );
-#ifdef NDEBUG
+#if defined( NDEBUG ) || defined( __MSVCXX__ )
 	return ( 0 );
-#endif /* #ifdef NDEBUG */
+#endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
 }
 
 double OMenuItem::get_real( void ) const {
 	M_ASSERT( 0 && "invalid call" );
-#ifdef NDEBUG
+#if defined( NDEBUG ) || defined( __MSVCXX__ )
 	return ( 0 );
-#endif /* #ifdef NDEBUG */
+#endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
 }
 
 yaal::hcore::HTime const& OMenuItem::get_time( void ) const {
 	M_ASSERT( 0 && "invalid call" );
-#ifdef NDEBUG
+#if defined( NDEBUG ) || defined( __MSVCXX__ )
 	static HTime t( HTime::TZ::LOCAL );
 	return ( t );
-#endif /* #ifdef NDEBUG */
+#endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
 }
 
 }
