@@ -25,6 +25,7 @@ Copyright:
 */
 
 #include <cstring>
+#include <cctype>
 
 #include "base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
@@ -525,8 +526,9 @@ int HStreamInterface::do_peek( void ) {
 
 HStreamInterface& HStreamInterface::do_input( HString& word ) {
 	M_PROLOG
-	if ( read_word() )
+	if ( read_word() ) {
 		word = _wordCache;
+	}
 	return ( *this );
 	M_EPILOG
 }
@@ -548,6 +550,7 @@ bool HStreamInterface::read_word( void ) {
 		}
 		if ( good() ) {
 			read_until_retry( _wordCache, _whiteSpace_.data(), false );
+			_wordCache.trim_right( _whiteSpace_.data() );
 		}
 	}
 	return ( _wordCache.get_length() > 0 );
@@ -558,19 +561,40 @@ bool HStreamInterface::read_integer( void ) {
 	M_PROLOG
 	read_while_retry( _wordCache, _whiteSpace_.data() );
 	_wordCache.clear();
-	if ( good() ) {
+	do {
+		if ( ! good() ) {
+			break;
+		}
 		bool neg( HStreamInterface::do_peek() == '-' );
 		if ( neg ) {
 			char sink( 0 );
 			HStreamInterface::read( &sink, 1 );
 		}
-		if ( good() ) {
-			read_while_retry( _wordCache, _digit_.data() );
-			if ( neg ) {
-				_wordCache.insert( 0, "-" );
+		if ( ! good() ) {
+			break;
+		}
+		if ( _base != BASES::DEC ) {
+			char zero( 0 );
+			do_input( zero );
+			if ( zero != '0' ) {
+				_fail = true;
+				break;
+			}
+			char base( 0 );
+			do_input( base );
+			if ( ( ( _base == BASES::HEX ) && ( tolower( base ) != 'x' ) ) || ( ( _base == BASES::OCT ) && ( tolower( base ) != 'o' ) ) ) {
+				_fail = true;
+				break;
 			}
 		}
-	}
+		read_while_retry( _wordCache, _digit_.data() );
+		if ( _base != BASES::DEC ) {
+			_wordCache.insert( 0, _base == BASES::HEX ? "0x" : "0o" );
+		}
+		if ( neg ) {
+			_wordCache.insert( 0, "-" );
+		}
+	} while ( false );
 	return ( _wordCache.get_length() > 0 );
 	M_EPILOG
 }
@@ -735,8 +759,11 @@ HStreamInterface& HStreamInterface::do_input( float& f ) {
 	M_EPILOG
 }
 
-HStreamInterface& HStreamInterface::do_input( void const*& ) {
+HStreamInterface& HStreamInterface::do_input( void const*& pointer_ ) {
 	M_PROLOG
+	size_t val( 0 );
+	do_input( val );
+	pointer_ = reinterpret_cast<void const*>( val );
 	return ( *this );
 	M_EPILOG
 }
