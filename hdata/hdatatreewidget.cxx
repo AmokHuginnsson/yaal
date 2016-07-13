@@ -54,7 +54,7 @@ HDataTreeWidget::HDataTreeWidget(
 HDataTreeWidget::~HDataTreeWidget( void ) {
 	M_PROLOG
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 }
 
 void HDataTreeWidget::do_load( int long /*id_*/ ) {

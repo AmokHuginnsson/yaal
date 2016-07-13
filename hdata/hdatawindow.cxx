@@ -73,7 +73,7 @@ HDataWindow::~HDataWindow( void ) {
 	M_PROLOG
 	_mainWidget = nullptr;
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 }
 
 void HDataWindow::do_init( void ) {

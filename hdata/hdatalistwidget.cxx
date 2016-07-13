@@ -81,7 +81,7 @@ HDataListWidget::HDataListWidget(
 HDataListWidget::~HDataListWidget ( void ) {
 	M_PROLOG
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 }
 
 void HDataListWidget::make_crud( int long id_ ) {

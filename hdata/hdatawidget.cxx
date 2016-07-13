@@ -53,7 +53,7 @@ HDataWidget::HDataWidget( void )
 HDataWidget::~HDataWidget( void ) {
 	M_PROLOG
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 }
 
 void HDataWidget::set_crud_descriptor( HCRUDDescriptor::ptr_t crud_ ) {

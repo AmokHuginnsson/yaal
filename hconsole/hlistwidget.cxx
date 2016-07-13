@@ -1176,9 +1176,9 @@ bool HListWidget::get_text_for_cell( iterator_t& it_, int column_, TYPE type_, h
 				double long v( item[ column_ ].get_real() );
 				_varTmpBuffer.assign( format_ ? ( *format_ % v ).string() : v );
 			} catch ( HExpressionException const& e ) {
-				_varTmpBuffer = "#err#";
+				_varTmpBuffer.assign( "#err# " ).append( e.what() );
 			} catch ( HLexicalCastException const& e ) {
-				_varTmpBuffer = "#err#";
+				_varTmpBuffer.assign( "#err# " ).append( e.what() );
 			}
 		} break;
 		case ( TYPE::HSTRING ): {

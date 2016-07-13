@@ -4,6 +4,8 @@
 #include <cstdio>
 #include <cerrno>
 #include <process.h>
+#include <io.h>
+#include <direct.h>
 #include <libintl.h>
 
 #define _SYS_SOCKET_H 1
@@ -25,6 +27,10 @@
 #include "emu_unistd.hxx"
 
 typedef int uid_t;
+#ifndef MODE_T_DEFINED
+typedef int unsigned mode_t;
+#define MODE_T_DEFINED 1
+#endif
 
 static int const STDIN_FILENO = 0;
 static int const STDOUT_FILENO = 1;
@@ -64,6 +70,14 @@ void pthread_setname_np( void*, char const* );
 
 #define dup2 msvcxx::dup2
 #define isatty msvcxx::isatty
+
+inline char* getcwd( char* buf_, size_t size_ ) {
+	return( _getcwd( buf_, size_ ) );
+}
+
+inline int mkdir( char const* path_, mode_t ) {
+	return ( _mkdir( path_ ) );
+}
 
 inline int pipe( int* fds_ )
 	{ return ( msvcxx::pipe( fds_ ) ); }

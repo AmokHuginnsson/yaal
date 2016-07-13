@@ -156,11 +156,11 @@ double long HInfoMultiVal::do_get_real( void ) const {
 	double long val( _real );
 	if ( ! ( _type & static_cast<type_mask_t>( TYPE::DOUBLE_LONG ) ) ) {
 		if ( _type & static_cast<type_mask_t>( TYPE::INT_LONG_LONG ) ) {
-			val = _integer;
+			val = static_cast<double long>( _integer );
 		} else if ( _type & static_cast<type_mask_t>( TYPE::HSTRING ) ) {
 			val = lexical_cast<double long>( _string );
 		} else if ( _type & static_cast<type_mask_t>( TYPE::HTIME ) ) {
-			val = _time.raw();
+			val = static_cast<double long>( _time.raw() );
 		} else {
 			M_ASSERT( ( _real == 0. ) && ( _type == static_cast<type_mask_t>( TYPE::UNKNOWN ) ) );
 		}
