@@ -6,21 +6,26 @@
 #include <cstring>
 
 #ifdef __MSVCXX__
+#include <direct.h>
 #define popen _popen
+#define getcwd _getcwd
 #else
+#include <unistd.h>
 #endif
+
 using namespace std;
 
 string read_cmd( string const& cmd_ ) {
+	static int const BUF_SIZE( 1024 );
+	char buf[BUF_SIZE];
+	cout << "Executing command: `" << cmd_ << "' in `" << getcwd( buf, BUF_SIZE - 1 ) << "'." << endl;
 	FILE* idCmd( popen( cmd_.c_str(), "r" ) );
 	string out;
 	if ( !! idCmd ) {
-		static int const BUF_SIZE( 128 );
-		char buf[BUF_SIZE];
 		::memset( buf, 0, BUF_SIZE );
 		::fread( buf, BUF_SIZE - 1, sizeof ( char ), idCmd );
 		out = buf;
-		while ( ( out.back() == '\n' ) || ( out.back() == '\r' ) ) {
+		while ( ! out.empty() && ( ( out.back() == '\n' ) || ( out.back() == '\r' ) ) ) {
 			out.pop_back();
 		}
 		::fclose( idCmd );
@@ -29,6 +34,10 @@ string read_cmd( string const& cmd_ ) {
 }
 
 int main( int argc_, char** argv_ ) try {
+	char env[][16] = { "HOME=", "HOMEPATH=", "USERPROFILE=" };
+	for ( char* e : env ) {
+		putenv( e );
+	}
 	if ( argc_ != 3 ) {
 		throw runtime_error( string( argv_[0] ).append( " requres exactly 2 arguments!" ) );
 	}

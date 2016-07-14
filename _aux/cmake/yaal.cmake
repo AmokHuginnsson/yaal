@@ -208,7 +208,7 @@ function( yaal_make_component name )
 		add_dependencies( ${name} ${name}-static )
 		add_custom_command(
 			TARGET ${name}-static
-			POST_BUILD COMMAND dumpbin /linkermember:1 build/${CMAKE_BUILD_TYPE}/lib${name}.lib /out:build/${CMAKE_BUILD_TYPE}/${name}${LIB_INFIX}.sym
+			POST_BUILD COMMAND dumpbin /linkermember:1 build/${CMAKE_BUILD_TYPE}/libyaal_${name}.lib /out:build/${CMAKE_BUILD_TYPE}/${name}${LIB_INFIX}.sym
 		)
 		add_custom_command(
 			TARGET ${name}-static
