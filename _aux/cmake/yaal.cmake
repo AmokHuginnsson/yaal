@@ -322,6 +322,8 @@ else ( CMAKE_HOST_WIN32 )
 	)
 endif ( CMAKE_HOST_WIN32 )
 
+add_dependencies( hcore commit_id )
+
 add_custom_target( headers ALL DEPENDS ${HEADER_TARGET} )
 
 if ( NOT CMAKE_HOST_WIN32 )
