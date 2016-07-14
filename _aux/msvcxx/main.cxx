@@ -125,13 +125,36 @@ void* dlopen( char const* name_, int flag_ ) {
 	return ( handle );
 }
 
-#undef unsetenv
-extern "C" int unsetenv( char const* name_ );
-int unsetenv_fix( char const* name_ ) {
+int setenv( char const* name_, char const* value_, int replace_ ) {
+	char const* orig( ::getenv( name_ ) );
+	int ret( 1 );
+	if ( !orig || replace_ ) {
+		HString s( name_ );
+		s.append( "=" ).append( value_ );
+		ret = ::putenv( s.raw() );
+	}
+	return ( ret );
+}
+
+int unsetenv( char const* name_ ) {
 	string n( name_ );
 	n += "=";
-	int ret( unsetenv( n.c_str() ) );
+	int ret( putenv( n.c_str() ) );
 	return ( ret );
+}
+
+char* basename( char* path_ ) {
+	char* u( strrchr( path_, '/' ) );
+	char* w( strrchr( path_, '\\' ) );
+	char* r( path_ );
+	if ( u || w ) {
+		if ( u && w ) {
+			r = ( u - w > 0 ) ? u + 1 : w + 1;
+		} else {
+			r = u ? u + 1 : w + 1;
+		}
+	}
+	return ( r );
 }
 
 struct DIR {
@@ -373,14 +396,20 @@ int WINAPI WinMain(
 
 int getrusage( rusage_who_t who_, struct rusage* usage_ ) {
 	int err( 0 );
-	if ( who_ != RUSAGE_SELF )
-		err = EINVAL;
-	else {
+	if ( who_ != RUSAGE_SELF ) {
+		errno = EINVAL;
+		err = -1;
+	} else {
 		PROCESS_MEMORY_COUNTERS pmc;
 		::GetProcessMemoryInfo( ::GetCurrentProcess(), &pmc, sizeof ( pmc ) );
 		usage_->ru_maxrss = pmc.WorkingSetSize;
 	}
-	return ( 0 );
+	return ( err );
+}
+
+int getrlimit( rlimit_resource_t, struct rlimit* ) {
+	errno = EINVAL;
+	return ( -1 );
 }
 
 driver_names_t get_drivers( void ) {
@@ -406,5 +435,32 @@ driver_names_t get_drivers( void ) {
 		log_windows_error( "EnumDeviceDrivers" );
 	}
 	return ( driverNames );
+}
+
+int gettimeofday( struct timeval* tv_, struct timezone* tz_ ) {
+	int ret( 0 );
+	if ( tz_ ) {
+		memset( tz_, 0, sizeof ( *tz_ ) );
+		TIME_ZONE_INFORMATION tzi;
+		DWORD ret( GetTimeZoneInformation( &tzi ) );
+		if ( ret != TIME_ZONE_ID_INVALID ) {
+			tz_->tz_dsttime = tzi.Bias;
+			tz_->tz_dsttime = ( ret == TIME_ZONE_ID_DAYLIGHT ) ? 1 : 0;
+		} else {
+			ret = -1;
+			/* *TODO* *FIXME* Set errno accordingly. */
+		}
+	}
+	if ( tv_ ) {
+		FILETIME ft;
+		ULARGE_INTEGER li;
+		GetSystemTimeAsFileTime( &ft );
+		li.LowPart = ft.dwLowDateTime;
+		li.HighPart = ft.dwHighDateTime;
+		static int long unsigned HECTONANOSEC_PER_SEC( 10000000 );
+		tv_->tv_sec = static_cast<int long>( li.QuadPart / HECTONANOSEC_PER_SEC );
+		tv_->tv_usec = ( li.QuadPart % HECTONANOSEC_PER_SEC ) / 10;
+	}
+	return ( ret );
 }
 

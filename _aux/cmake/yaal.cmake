@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 2.8.4 )
+cmake_minimum_required( VERSION 3.4 )
 
 project( yaal CXX )
 include( common )
@@ -43,7 +43,12 @@ check_include_file_cxx( tty.h HAVE_TTY_H )
 check_include_file_cxx( sys/ioctl.h HAVE_SYS_IOCTL_H )
 check_include_file_cxx( sys/consio.h HAVE_SYS_CONSIO_H )
 check_include_file_cxx( gpm.h HAVE_GPM_H )
+check_include_file_cxx( netdb.h HAVE_NETDB_H )
+check_include_file_cxx( arpa/inet.h HAVE_ARPA_INET_H )
+check_include_file_cxx( netinet/in.h HAVE_NETINET_IN_H )
+check_include_file_cxx( sys/un.h HAVE_SYS_UN_H )
 check_include_file_cxx( ncurses/curses.h HAVE_NCURSES_CURSES_H )
+check_include_file_cxx( libgen.h HAVE_LIBGEN_H )
 check_include_file_cxx( curses.h HAVE_CURSES_H )
 set( CMAKE_EXTRA_INCLUDE_FILES signal.h )
 check_type_size( sighandler_t HAVE_SIGHANDLER_T )
@@ -262,7 +267,15 @@ if ( CMAKE_HOST_WIN32 )
 	target_link_libraries( hdata hconsole dbwrapper tools hcore libgcc )
 	msg( "Processing component: msvcxx" )
 	file( GLOB SRCS ${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/*.cxx )
-	file( GLOB HDRS ${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/*.hxx ${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/*.h ${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/*/*.h ${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/csignal )
+	file(
+		GLOB HDRS
+		${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/*.hxx
+		${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/*.h
+		${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/*/*.h
+		${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/csignal
+		${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/ctime
+		${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/cmath
+	)
 	add_library( msvcxx STATIC ${SRCS} ${HDRS} ${CMAKE_HOME_DIRECTORY}/_aux/cmake/config.hxx )
 	add_custom_command(
 		TARGET hcore-static

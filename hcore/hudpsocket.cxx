@@ -24,10 +24,14 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include "config.hxx"
+
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
+#ifdef HAVE_NETINET_IN_H
+#	include <netinet/in.h>
+#endif /* #ifdef HAVE_NETINET_IN_H */
 #include <libintl.h>
 
 #include "hcore/base.hxx"

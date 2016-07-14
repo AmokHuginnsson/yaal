@@ -34,7 +34,9 @@ Copyright:
 #include "config.hxx"
 
 #ifndef HAVE_BASENAME_IN_CSTRING
-#	include <libgen.h>
+#	ifdef HAVE_LIBGEN_H
+#		include <libgen.h>
+#	endif /* #ifdef HAVE_LIBGEN_H */
 #endif /* not HAVE_BASENAME_IN_CSTRING */
 
 #include "base.hxx"

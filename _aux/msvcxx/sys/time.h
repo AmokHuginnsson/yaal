@@ -21,6 +21,13 @@
 
 #include "hcore/macro.hxx"
 
+struct timezone {
+	int tz_minutewest;
+	int tz_dsttime;
+};
+
+int gettimeofday( struct timeval*, struct timezone* );
+
 struct fd_set {
 	static int const MAXIMUM_FD_WAIT_OBJECTS = FD_SETSIZE;
 	int _data[MAXIMUM_FD_WAIT_OBJECTS];
@@ -64,8 +71,6 @@ inline int select( int ndfs_,
 									fd_set* readfs_, fd_set* writefs_,
 									fd_set* extrafs_, struct timeval* timeout_ )
 	{ return ( msvcxx::select( ndfs_, readfs_, writefs_, extrafs_, timeout_ ) ); }
-
-int gettimeofday( struct timeval*, struct timezone* );
 
 #endif /* not YAAL_MSVCXX_SYS_TIME_H_INCLUDED */
 

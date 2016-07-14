@@ -32,7 +32,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "introspect.hxx"
 #include "memory.hxx"
 
-#if defined( HAVE_EXECINFO_H )
+#ifdef HAVE_EXECINFO_H
 #include <execinfo.h>
 #endif /* HAVE_EXECINFO_H */
 #include <cxxabi.h>

@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 2.8.5 )
+cmake_minimum_required( VERSION 3.4 )
 
 include( CheckCXXCompilerFlag )
 
@@ -12,7 +12,7 @@ function( use_cxx_compiler_flag flag )
 #	message( "FLAG = ${flag}, NAME = ${name}, VALUE = ${${name}}" )
 	if ( ${${name}} )
 		if ( NOT ( ${flag} MATCHES "-Wl,.*" ) )
-			add_definitions( ${flag} )
+			add_compile_options( ${flag} )
 		else()
 			set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${flag}" PARENT_SCOPE )
 			set( CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${flag}" PARENT_SCOPE )

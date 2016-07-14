@@ -47,6 +47,9 @@
 #cmakedefine HAVE_PRCTL
 #cmakedefine HAVE_CLOCK_GETTIME
 #cmakedefine HAVE_TIMER_CREATE
+#cmakedefine HAVE_GETLINE
+#cmakedefine HAVE_BASENAME_IN_CSTRING
+#cmakedefine HAVE_BASENAME_ARG_CONST
 #cmakedefine01 HAVE_POWL
 #cmakedefine01 HAVE_DECL_EXPL
 #cmakedefine01 HAVE_DECL_LOGL
@@ -68,8 +71,6 @@
 #cmakedefine01 HAVE_GETNAMEINFO
 #cmakedefine01 HAVE_GNU_GETHOSTBYNAME_R
 #cmakedefine01 HAVE_GNU_GETHOSTBYADDR_R
-#cmakedefine01 HAVE_BASENAME_IN_CSTRING
-#cmakedefine01 HAVE_BASENAME_ARG_CONST
 #cmakedefine01 HAVE_DECL_SUN_LEN
 #cmakedefine01 HAVE_DECL_RLIMIT_AS
 #cmakedefine01 HAVE_DECL_RLIMIT_NPROC
@@ -80,9 +81,7 @@
 #cmakedefine01 HAVE_DECL_VSWTC
 #cmakedefine01 HAVE_DECL_SIGIOT
 #cmakedefine01 HAVE_DECL_ERR
-#cmakedefine01 HAVE_GETLINE
 #cmakedefine01 HAVE_MEMRCHR
-#cmakedefine01 HAVE_GETLINE
 #define LIB_PREFIX "@LIB_PREFIX@"
 #define LIB_INFIX "@LIB_INFIX@"
 #define LIB_EXT "@LIB_EXT@"
@@ -92,10 +91,15 @@
 #define LOCALSTATEDIR "@CMAKE_INSTALL_FULL_LOCALSTATEDIR@"
 #cmakedefine01 HAVE_OPENSSL_SSL_H
 #cmakedefine01 HAVE_LIBXML2_LIBXML_XMLVERSION_H
-#cmakedefine01 HAVE_EXECINFO_H
 #cmakedefine01 HAVE_PCREPOSIX_H
+#cmakedefine HAVE_EXECINFO_H
 #cmakedefine HAVE_TERMIO_H
 #cmakedefine HAVE_TTY_H
+#cmakedefine HAVE_LIBGEN_H
+#cmakedefine HAVE_NETDB_H
+#cmakedefine HAVE_ARPA_INET_H
+#cmakedefine HAVE_NETINET_IN_H
+#cmakedefine HAVE_SYS_UN_H
 #cmakedefine HAVE_SQLITE3_H
 #cmakedefine HAVE_POSTGRESQL_LIBPQ_FE_H
 #cmakedefine HAVE_LIBPQ_FE_H
@@ -127,8 +131,6 @@
 #undef HAVE_GETHOSTBYNAME_R
 #define HAVE_GETHOSTBYNAME_R 1
 #define __va_copy( x, y ) ( ( x ) = ( y ) )
-extern "C" int setenv( char const*, char  const*, int );
-extern "C" int unsetenv( char const* );
 #ifdef PTHREAD_H
 #define pthread_self() pthread_self().p
 #endif /* PTHREAD_H */
@@ -136,16 +138,11 @@ extern "C" int unsetenv( char const* );
 #include <errno.h>
 #include "hcore/macro.hxx"
 #undef OVERFLOW
-extern "C" void* memrchr( void const*, int, size_t );
-extern "C" char* basename( char const* );
 extern "C" char* strptime( char const*, char const*, struct tm* );
 extern "C" char* strsignal( int );
 #define strerror msvcxx::windows_strerror
 namespace msvcxx { M_YAAL_HCORE_PUBLIC_API char const* windows_strerror( int ); }
 #endif /* _CSTRING_ */
-#ifdef _CSTDIO_
-extern "C" int long getline( char**, size_t*, FILE* );
-#endif /* _CSTDIO_ */
 #include "_aux/msvcxx/cleanup.hxx"
 #endif /* __YAAL_BUILD__ */
 #endif /* __MSVCXX__ */

@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 2.8.5 )
+cmake_minimum_required( VERSION 3.4 )
 
 string( TOUPPER ${PROJECT_NAME} PROJECT_NAME_UC )
 
@@ -157,8 +157,8 @@ use_cxx_compiler_flag( -Wl,--demangle )
 use_cxx_compiler_flag( -Wl,-C )
 use_cxx_compiler_flag( -Wextra )
 if ( NOT CMAKE_HOST_WIN32 )
-	get_directory_property( DEFINITIONS DEFINITIONS )
-	if ( NOT ( ${DEFINITIONS} MATCHES "-Wextra" ) )
+	get_directory_property( OPTIONS COMPILE_OPTIONS )
+	if ( NOT ( "-Wextra" IN_LIST OPTIONS ) )
 		use_cxx_compiler_flag( -W )
 	endif()
 	use_cxx_compiler_flag( -Wall )

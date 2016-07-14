@@ -24,12 +24,16 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include "config.hxx"
+
 #include <cstring>
 #ifdef __MSVCXX__
 #include <unistd.h>
 #endif /* #ifdef __MSVCXX__ */
 
-#include <arpa/inet.h>
+#ifdef HAVE_ARPA_INET_H
+#	include <arpa/inet.h>
+#endif /* #ifdef HAVE_ARPA_INET_H */
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
