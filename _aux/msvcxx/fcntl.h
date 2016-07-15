@@ -18,9 +18,7 @@ int fcntl( int, int, int );
 
 } /* namespace msvcxx */
 
-inline int ms_fcntl( int fd_, int cmd_, int arg_ )
-	{ return ( msvcxx::fcntl( fd_, cmd_, arg_ ) ); }
-#define fcntl ms_fcntl
+#define fcntl msvcxx::fcntl
 
 #endif /* not YAAL_MSVCXX_FCNTL_H_INCLUDED */
 

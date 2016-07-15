@@ -8,7 +8,10 @@
 #include <sddl.h>
 #include <psapi.h>
 #undef WinMain
+#include <sstream>
+#include <iomanip>
 #include <iostream>
+#include <ctime>
 
 #include "unistd.h"
 #include "csignal"
@@ -18,6 +21,7 @@
 #include "sys/resource.h"
 #include "sys/socket.h"
 #include "sys/time.h"
+#include "sys/statvfs.h"
 
 #include "hcore/base.hxx"
 #include "hcore/memory.hxx"
@@ -155,6 +159,13 @@ char* basename( char* path_ ) {
 		}
 	}
 	return ( r );
+}
+
+char* strptime( char const* source_, char const* format_, struct tm* broken_ ) {
+	istringstream source( source_ );
+	source.imbue( locale( setlocale( LC_ALL, nullptr ) ) );
+	source >> get_time( broken_, format_ );
+	return ( ! source.fail() ? const_cast<char*>( source_ + static_cast<int>( source.tellg() ) ) : nullptr );
 }
 
 struct DIR {
@@ -412,6 +423,26 @@ int getrlimit( rlimit_resource_t, struct rlimit* ) {
 	return ( -1 );
 }
 
+int long sysconf( int id_ ) {
+	int long result( -1 );
+	static int const PASS_BUF_SIZE( 1024 );
+	SYSTEM_INFO si;
+	GetSystemInfo( &si );
+	switch ( id_ ) {
+		case ( _SC_GETGR_R_SIZE_MAX ):
+		case ( _SC_GETPW_R_SIZE_MAX ): {
+			result = PASS_BUF_SIZE;
+		} break;
+		case ( _SC_PAGESIZE ): {
+			result = si.dwPageSize;
+		} break;
+		case ( _SC_NPROCESSORS_ONLN ): {
+			result = si.dwNumberOfProcessors;
+		} break;
+	}
+	return ( result );
+}
+
 driver_names_t get_drivers( void ) {
 	static int const ARRAY_SIZE( 1024 );
 	LPVOID drivers[ARRAY_SIZE];
@@ -435,6 +466,29 @@ driver_names_t get_drivers( void ) {
 		log_windows_error( "EnumDeviceDrivers" );
 	}
 	return ( driverNames );
+}
+
+int statvfs( char const* path_, struct statvfs* fs_ ) {
+	int code( 0 );
+	if ( path_ ) {
+		DWORD sectorsPerCluster( 0 );
+		DWORD bytesPerSector( 0 );
+		DWORD freeClusters( 0 );
+		DWORD clusters( 0 );
+		GetDiskFreeSpace( path_, &sectorsPerCluster, &bytesPerSector, &freeClusters, &clusters );
+		fs_->f_bsize = bytesPerSector;
+		fs_->f_frsize = bytesPerSector;
+		DWORD bytesPerCluster( bytesPerSector * sectorsPerCluster );
+		yaal::u64_t free( bytesPerCluster * freeClusters );
+		yaal::u64_t total( bytesPerCluster * clusters );
+		fs_->f_blocks = total / bytesPerSector;
+		fs_->f_bfree = free / bytesPerSector;
+		fs_->f_bavail = fs_->f_bfree;
+	} else {
+		code = -1;
+		errno = ENOENT;
+	}
+	return ( code );
 }
 
 int gettimeofday( struct timeval* tv_, struct timezone* tz_ ) {

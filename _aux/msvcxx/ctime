@@ -6,6 +6,8 @@
 
 typedef int long suseconds_t;
 
+char* strptime( char const*, char const*, struct tm* );
+
 inline struct tm *gmtime_r(const time_t *timep, struct tm *result) {
 	gmtime_s( result, timep );
 	return ( result );

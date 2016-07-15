@@ -10,6 +10,8 @@
 #include "hcore/macro.hxx"
 #include "hcore/hchunk.hxx"
 
+#undef fcntl
+
 namespace msvcxx {
 
 int const FALSE = 0;

@@ -31,8 +31,6 @@ using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::tools;
 
-extern "C" int fcntl( int fd_, int cmd_, ... );
-
 namespace msvcxx {
 
 struct OsCast {
@@ -215,9 +213,7 @@ int APIENTRY CreatePipeEx( LPHANDLE lpReadPipe,
 M_EXPORT_SYMBOL
 int fcntl( int fd_, int cmd_, int arg_ ) {
 	int ret( 0 );
-	if ( fd_ < SystemIO::MANAGED_IO ) {
-		ret = ::fcntl( fd_, cmd_, arg_ );
-	} else {
+	if ( fd_ >= SystemIO::MANAGED_IO ) {
 		SystemIO& sysIo( SystemIO::get_instance() );
 		IO& io( *( sysIo.get_io( fd_ ).second ) );
 		ret = io.fcntl( cmd_, arg_ );

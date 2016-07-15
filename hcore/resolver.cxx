@@ -24,10 +24,11 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include "config.hxx"
-
 #include <unistd.h>
 #include <sys/socket.h>
+
+#include "config.hxx"
+
 #ifdef HAVE_NETDB_H
 #	include <netdb.h>
 #endif /* #ifdef HAVE_NETDB_H */
@@ -37,8 +38,6 @@ Copyright:
 #ifdef HAVE_NETINET_IN_H
 #	include <netinet/in.h>
 #endif /* #ifdef HAVE_NETINET_IN_H */
-
-#include "config.hxx"
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
