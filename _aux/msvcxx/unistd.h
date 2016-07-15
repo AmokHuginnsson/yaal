@@ -26,6 +26,9 @@
 #include "hcore/macro.hxx"
 #include "emu_unistd.hxx"
 
+char* basename( char* );
+#include "tools/hscheduledasynccaller.hxx"
+
 typedef int uid_t;
 #ifndef MODE_T_DEFINED
 typedef int unsigned mode_t;
@@ -59,10 +62,15 @@ int ms_gethostname( char*, int );
 M_YAAL_HCORE_PUBLIC_API uid_t ms_getuid( void );
 int setenv( char const*, char const*, int );
 int unsetenv( char const* );
-char* basename( char* );
 int long sysconf( int );
 int long pathconf( char const*, int );
-int unsigned alarm( int unsigned );
+namespace msvcxx {
+void sendalarm( void );
+}
+inline int unsigned alarm( int unsigned seconds_ ) {
+	yaal::tools::HScheduledAsyncCaller::get_instance().call_in( yaal::hcore::time::duration( seconds_, yaal::hcore::time::UNIT::SECOND ), yaal::hcore::call( &msvcxx::sendalarm ) );
+	return ( 0 );
+}
 
 #if ! defined( HAVE_PTHREAD_SETNAME_NP )
 #define HAVE_PTHREAD_SETNAME_NP 1

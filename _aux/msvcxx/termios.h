@@ -80,12 +80,5 @@ int tcflush( int, int );
 int tcdrain( int );
 int tcsendbreak( int, int );
 
-/*
-speed_t cfgetospeed( struct termios const* );
-speed_t cfgetispeed( struct termios const* );
-int cfsetspeed( struct termios*, speed_t );
-void cfmakeraw( struct termios* );
-*/
-
 #endif /* not YAAL_MSVCXX_TERMIOS_H_INCLUDED */
 

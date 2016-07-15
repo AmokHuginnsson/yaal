@@ -58,6 +58,7 @@ int sigaction( int, struct sigaction*, void* );
 int sigemptyset( sigset_t* );
 int kill( int, int );
 int pthread_sigmask( int, sigset_t*, void* );
+char const* strsignal( int );
 
 #endif /* not YAAL_MSVCXX_CSIGNAL_INCLUDED */
 // vim: ft=cpp

@@ -224,9 +224,9 @@ int fcntl( int fd_, int cmd_, int arg_ ) {
 M_EXPORT_SYMBOL
 int dup2( int fd1_, int fd2_ ) {
 	int ret( -1 );
-	if ( ( fd1_ < SystemIO::MANAGED_IO ) && ( fd2_ < SystemIO::MANAGED_IO ) )
+	if ( ( fd1_ < SystemIO::MANAGED_IO ) && ( fd2_ < SystemIO::MANAGED_IO ) ) {
 		ret = _dup2( fd1_, fd2_ );
-	else {
+	} else {
 		SystemIO& sysIo( SystemIO::get_instance() );
 		ret = sysIo.dup2_io( fd1_, fd2_ );
 	}

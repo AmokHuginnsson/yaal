@@ -12,6 +12,7 @@
 using namespace std;
 using namespace yaal;
 using namespace yaal::hcore;
+using namespace yaal::tools;
 using namespace msvcxx;
 
 namespace msvcxx {
@@ -174,13 +175,13 @@ int kill( int pid_, int sigNo_ ) {
 	if ( sigNo_ == SIGABRT_COMPAT )
 		sigNo_ = SIGABRT;
 	int err( 0 );
-	if ( pid_ == getpid() )
+	if ( pid_ == getpid() ) {
 		_signalDispatcher_.dispatch( sigNo_ );
-	else if ( sigNo_ ) {
+	} else if ( sigNo_ ) {
 		HANDLE process( ::OpenProcess( PROCESS_TERMINATE, false, pid_ ) );
-		if ( ! process )
+		if ( ! process ) {
 			err = -1;
-		else {
+		} else {
 			::TerminateProcess( process, sigNo_ );
 			::CloseHandle( process );
 		}
@@ -189,8 +190,9 @@ int kill( int pid_, int sigNo_ ) {
 		if ( ! process ) {
 			int code( ::GetLastError() );
 			err = -1;
-		} else
+		} else {
 			::CloseHandle( process );
+		}
 	}
 	return ( err );
 }
@@ -285,19 +287,49 @@ int sigaction( int signo, struct sigaction* sa_, void* ) {
 				}
 			}
 			signal( signo, sa_->sa_handler );
-			if ( signo == SIGABRT )
+			if ( signo == SIGABRT ) {
 				signal( SIGABRT_COMPAT, sa_->sa_handler );
+			}
 		}
 	}
 	return ( 0 );
 }
 
 int pthread_sigmask( int how_, sigset_t* set_, void* ) {
-	if ( sigismember( set_, SIGALRM ) )
-	if ( _signalDispatcher_.is_started() )
-		_tlsSignalsSetup_->set_mask( how_, set_ );
-	else
-		_signalDispatcher_.set_mask( how_, set_ );
+	if ( sigismember( set_, SIGALRM ) ) {
+		if ( _signalDispatcher_.is_started() ) {
+			_tlsSignalsSetup_->set_mask( how_, set_ );
+		} else {
+			_signalDispatcher_.set_mask( how_, set_ );
+		}
+	}
 	return ( 0 );
 }
 
+char const* strsignal( int signum_ ) {
+	char const* name( "unknown" );
+	switch ( signum_ ) {
+		case ( SIGINT ):  name = "interrupted";          break;
+		case ( SIGKILL ): name = "killed";               break;
+		case ( SIGQUIT ): name = "exited";               break;
+		case ( SIGTERM ): name = "terminated";           break;
+		case ( SIGILL ):  name = "illegal instruction";  break;
+		case ( SIGABRT_COMPAT ):
+		case ( SIGABRT ): name = "aborted";              break;
+		case ( SIGSEGV ): name = "segvfaulted";          break;
+		case ( SIGFPE ):  name = "floating point error"; break;
+		case ( SIGALRM ): name = "alarmed";              break;
+		case ( SIGUSR1 ): name = "user signal 1";        break;
+		case ( SIGSTOP ): name = "stopped";              break;
+		case ( SIGTSTP ): name = "suspended";            break;
+		case ( SIGCONT ): name = "contunued";            break;
+	}
+	return ( name );
+}
+
+namespace msvcxx {
+void sendalarm() {
+	kill( getpid(), SIGALRM );
+	return;
+}
+}

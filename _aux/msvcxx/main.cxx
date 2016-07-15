@@ -18,6 +18,9 @@
 #include "dirent.h"
 #include "pwd.h"
 #include "grp.h"
+#include "dlfcn.h"
+#include "termios.h"
+#include "sys/mman.h"
 #include "sys/resource.h"
 #include "sys/socket.h"
 #include "sys/time.h"
@@ -118,15 +121,6 @@ char** backtrace_symbols( void* const* buf_, int size_ ) {
 		strings = nullptr;
 	}
 	return ( strings );
-}
-
-void* dlopen( char const* name_, int flag_ ) {
-	HANDLE handle( 0 );
-	if ( ! name_ )
-		handle = GetModuleHandle( nullptr );
-	else
-		handle = dlopen( name_, flag_ );
-	return ( handle );
 }
 
 int setenv( char const* name_, char const* value_, int replace_ ) {
@@ -439,6 +433,30 @@ int long sysconf( int id_ ) {
 		case ( _SC_NPROCESSORS_ONLN ): {
 			result = si.dwNumberOfProcessors;
 		} break;
+		default: {
+			errno = EINVAL;
+		}
+	}
+	return ( result );
+}
+
+int long pathconf( char const* path_, int id_ ) {
+	DWORD volSerNo( 0 );
+	static int const BUF_SIZE( 1024 );
+	char volName[BUF_SIZE];
+	DWORD volMaxComponentLength( 0 );
+	DWORD volFSFlags( 0 );
+	char volFSName[BUF_SIZE];
+	GetVolumeInformation( path_, volName, BUF_SIZE, &volSerNo, &volMaxComponentLength, &volFSFlags, volFSName, BUF_SIZE );
+	int long result( -1 );
+	switch ( id_ ) {
+		case ( _PC_NAME_MAX ):
+		case ( _XOPEN_NAME_MAX ): {
+			result = volMaxComponentLength;
+		} break;
+		default: {
+			errno = EINVAL;
+		}
 	}
 	return ( result );
 }
@@ -518,3 +536,103 @@ int gettimeofday( struct timeval* tv_, struct timezone* tz_ ) {
 	return ( ret );
 }
 
+void* dlopen( char const* name_, int flags_ ) {
+	void* dll( nullptr );
+	DWORD flags( ( flags_ & RTLD_NOW ) ? 0 : DONT_RESOLVE_DLL_REFERENCES );
+	if ( ! name_ ) {
+		dll = GetModuleHandle( nullptr );
+	} else {
+		dll = LoadLibraryEx( name_, nullptr, flags );
+	}
+	return ( dll );
+}
+
+int dlclose( void* dll_ ) {
+	return ( FreeLibrary( static_cast<HMODULE>( dll_ ) ) ? 0 : -1 );
+}
+
+char const* dlerror( void ) {
+	return ( msvcxx::windows_strerror( GetLastError() ) );
+}
+
+void* dlsym( void* dll_, char const* name_ ) {
+	return ( GetProcAddress( static_cast<HMODULE>( dll_ ), name_ ) );
+}
+
+void* mmap( void* ptr_, size_t size_, int mode_, int access_, int fd_, off_t off_ ) {
+	void* ptr( MAP_FAILED );
+	do {
+		if ( ptr_ ) {
+			errno = EINVAL;
+			break;
+		}
+		if ( off_ ) {
+			errno = EINVAL;
+			break;
+		}
+		DWORD mapFlags( 0 );
+		DWORD viewFlags( 0 );
+		if ( ( mode_ == ( PROT_READ | PROT_WRITE ) ) && ( access_ == MAP_PRIVATE ) ) {
+			mapFlags = PAGE_READWRITE;
+			viewFlags = FILE_MAP_COPY;
+		} else {
+			errno = EINVAL;
+			break;
+		}
+		DWORD size( static_cast<DWORD>( yaal::min<yaal::i64_t>( _filelengthi64( fd_ ), size_ ) ) );
+		HANDLE h(
+			CreateFileMapping( (HANDLE)_get_osfhandle( fd_ ), nullptr, mapFlags, 0, size, nullptr )
+		);
+		if ( ! h ) {
+			errno = EINVAL;
+			break;
+		}
+		ptr = MapViewOfFileEx( h, viewFlags, 0, 0, size, nullptr );
+		CloseHandle( h );
+		if ( ! ptr ) {
+			ptr = MAP_FAILED;
+			errno = EINVAL;
+			break;
+		}
+	} while ( false );
+	return ( ptr );
+}
+
+int munmap( void* ptr_, size_t ) {
+	return ( UnmapViewOfFile( ptr_ ) ? 0 : -1 );
+}
+
+int tcgetattr( int, struct termios* ) {
+	errno = ENOSYS;
+	return ( -1 );
+}
+
+int cfsetospeed( struct termios*, speed_t ) {
+	errno = ENOSYS;
+	return ( -1 );
+}
+
+int cfsetispeed( struct termios*, speed_t ) {
+	errno = ENOSYS;
+	return ( -1 );
+}
+
+int tcsetattr( int, int, struct termios const* ) {
+	errno = ENOSYS;
+	return ( -1 );
+}
+
+int tcflush( int, int ) {
+	errno = ENOSYS;
+	return ( -1 );
+}
+
+int tcdrain( int ) {
+	errno = ENOSYS;
+	return ( -1 );
+}
+
+int tcsendbreak( int, int ) {
+	errno = ENOSYS;
+	return ( -1 );
+}

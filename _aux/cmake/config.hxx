@@ -138,7 +138,6 @@
 #include <errno.h>
 #include "hcore/macro.hxx"
 #undef OVERFLOW
-extern "C" char* strsignal( int );
 #define strerror msvcxx::windows_strerror
 namespace msvcxx { M_YAAL_HCORE_PUBLIC_API char const* windows_strerror( int ); }
 #endif /* _CSTRING_ */
