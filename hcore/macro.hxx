@@ -34,6 +34,9 @@ Copyright:
 #ifdef _
 #	error Yaal redefines _ macro.
 #endif /* #ifdef _ */
+#ifdef M_EXPAND
+#	error Yaal redefines M_EXPAND macro.
+#endif /* #ifdef M_EXPAND */
 #ifdef M_STRINGIFY_REAL
 #	error Yaal redefines M_STRINGIFY_REAL macro.
 #endif /* #ifdef M_STRINGIFY_REAL */
@@ -133,10 +136,11 @@ Copyright:
 #define _(string) dgettext( PACKAGE_NAME, string )
 
 /*! \cond */
+#define M_EXPAND( x ) x
 #define M_STRINGIFY_REAL( x ) #x
 #define M_CONCAT_REAL( a, b ) a ## b
-#define M_MACRO_ARGC_HELPER( MACRO, NUM, ... ) M_CONCAT( MACRO, NUM )( __VA_ARGS__ )
-#define M_NUM_ARGC( ... ) M_NUM_ARGC_COUNTER( __VA_ARGS__, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 )
+#define M_MACRO_ARGC_HELPER( MACRO, NUM, ... ) M_EXPAND( M_CONCAT( MACRO, NUM )( __VA_ARGS__ ) )
+#define M_NUM_ARGC( ... ) M_EXPAND( M_NUM_ARGC_COUNTER( __VA_ARGS__, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 ) )
 #define M_NUM_ARGC_COUNTER( a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, N, ... ) N
 /*! \endcond */
 /*! \brief Create uniqe C++ identifier from two other identifier.

@@ -138,7 +138,7 @@ int main( int argc_, char** argv_ ) {
 		copy_modification_time( configIn.c_str(), configOut.c_str() );
 #ifndef __GNUC__
 		copy_file( dirRoot + "/_aux/msvcxx/cleanup.hxx", dirLibHeaders + "/cleanup.hxx" );
-		copy_file( dirRoot + "/_aux/msvcxx/client-fix.hxx", dirLibHeaders + "/fix.hxx" );
+		copy_file( dirRoot + "/_aux/msvcxx/fix.hxx", dirLibHeaders + "/fix.hxx" );
 #endif /* not __GNUC__ */
 	} catch ( exception const& e ) {
 		errorCode = 1;

@@ -41,18 +41,16 @@ int main( int argc_, char** argv_ ) try {
 	if ( argc_ != 3 ) {
 		throw runtime_error( string( argv_[0] ).append( " requres exactly 2 arguments!" ) );
 	}
-	string self( argv_[1] );
-	self.append( "/_aux/update-commit-id.cxx" );
-	if ( ! ifstream( self ) ) {
-		throw runtime_error( "Bad DIR_ROOT!" );
+	string masterPath( argv_[1] );
+	masterPath.append( "/.git/refs/heads/master" );
+	if ( ! ifstream( masterPath ) ) {
+		throw runtime_error( string( "Bad DIR_ROOT: `" ).append( argv_[1] ).append( "'!" ) );
 	}
 	string id( read_cmd( "git rev-parse HEAD" ) );
 	if ( id.empty() ) {
-		string headPath( argv_[1] );
-		headPath.append( "/.git/refs/heads/master" );
-		ifstream head( headPath );
+		ifstream head( masterPath );
 		if ( ! head ) {
-			throw runtime_error( string( "Cannot open id information file: " ).append( headPath ) );
+			throw runtime_error( string( "Cannot open id information file: " ).append( masterPath ) );
 		}
 		getline( head, id );
 	}

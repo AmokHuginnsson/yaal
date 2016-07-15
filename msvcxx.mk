@@ -23,7 +23,7 @@ $(BUILD_ARTIFACT): $(wildcard */*.cxx) $(wildcard */*.hxx)  $(wildcard */*/*.cxx
 	else \
 		echo "Unsupported Visual Studio C++ version ($${VS_VER})!" && false ; \
 	fi && \
-	test -f build/debug/hdata-d.dll -o -f build/release/hdata-d.dll -o -f build/debug/$(PROJECT_NAME)/1exec.exe -o -f build/release/$(PROJECT_NAME)/1exec.exe && touch $(BUILD_ARTIFACT) && \
+	test -f build/debug/yaal_hdata-d.dll -o -f build/release/yaal_hdata.dll -o -f build/debug/$(PROJECT_NAME)/1exec.exe -o -f build/release/$(PROJECT_NAME)/1exec.exe && touch $(BUILD_ARTIFACT) && \
 	test -f $(@)
 
 $(PROJECT_NAME).sln: ./configure.js ./local.js

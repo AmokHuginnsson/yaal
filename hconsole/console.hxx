@@ -139,6 +139,7 @@ struct GLYPHS {
 		static int APPROXIMATELY;
 		static int SQUARE_ROOT;
 		static int PI;
+#undef INFINITY
 		static int INFINITY;
 	};
 	struct FACE {

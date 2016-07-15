@@ -1,12 +1,15 @@
 #ifndef YAAL_MSVCXX_CSIGNAL_INCLUDED
 #define YAAL_MSVCXX_CSIGNAL_INCLUDED 1
 
+#include <../include/csignal>
+#ifdef __YAAL_BUILD__
 #define _INC_MATH
 #include <process.h>
-#include <../include/csignal>
 #include <pthread.h>
 #include "cleanup.hxx"
-#include "hcore/pod.hxx"
+#else
+#include <yaal/cleanup.hxx>
+#endif
 
 static int const UNIX_SIGINT = 2;
 static int const UNIX_SIGILL = 4;
@@ -36,13 +39,14 @@ static int const SIGURG = 16;
 static int const SIGSTOP = 17;
 static int const SIGTSTP = 18;
 static int const SIGCONT = 19;
+static int const SIGCHLD = 25;
 static int const SIGWINCH = 28;
 static int const SIGPWR = 29;
 static int const SIGUSR1 = 30;
 
 typedef void (*sighandler_t) (int);
 
-typedef yaal::u64_t sigset_t;
+typedef int long long unsigned sigset_t;
 
 struct sigaction {
 	sighandler_t sa_handler;
