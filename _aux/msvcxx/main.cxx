@@ -413,8 +413,8 @@ int getrusage( rusage_who_t who_, struct rusage* usage_ ) {
 }
 
 int getrlimit( rlimit_resource_t, struct rlimit* ) {
-	errno = EINVAL;
-	return ( -1 );
+	errno = ENOSYS;
+	return ( 0 );
 }
 
 int long sysconf( int id_ ) {

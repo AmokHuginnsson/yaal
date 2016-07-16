@@ -7,11 +7,11 @@
 typedef int rusage_who_t;
 typedef int rlimit_resource_t;
 typedef yaal::i64_t rlim_t;
-static rusage_who_t RUSAGE_SELF = 0;
-static rlimit_resource_t RLIMIT_DATA = 2;
-static rlimit_resource_t RLIMIT_STACK = 3;
-static rlimit_resource_t RLIMIT_NOFILE = 8;
-static rlim_t RLIM_INFINITY = yaal::meta::max_signed<rlim_t>::value;
+static rusage_who_t const RUSAGE_SELF = 0;
+static rlimit_resource_t const RLIMIT_DATA = 2;
+static rlimit_resource_t const RLIMIT_STACK = 3;
+static rlimit_resource_t const RLIMIT_NOFILE = 8;
+static rlim_t const RLIM_INFINITY = yaal::meta::max_signed<rlim_t>::value;
 
 struct rusage {
 	int long ru_maxrss;

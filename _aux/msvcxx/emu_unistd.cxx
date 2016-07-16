@@ -351,7 +351,7 @@ int unix_stat( char const* path_, struct stat* s_ ) {
 mode_t umask( mode_t umask_ ) {
 	static bool initialized( false );
 	static mode_t currentUmask( 0 );
-	mode_t oldUmask( ::umask( umask_ ) );
+	mode_t oldUmask( ::_umask( umask_ ) );
 	if ( initialized )
 		oldUmask = currentUmask;
 	else {
