@@ -11,12 +11,14 @@ endif
 CMAKE=$(wildcard /cygdrive/c/Program\ Files\ (x86)/CMake*/bin/cmake.exe)$(wildcard /cygdrive/c/Program\ Files/CMake*/bin/cmake.exe)
 BUILD_ARTIFACT=build.stamp
 CPUS=$(shell grep -c processor /proc/cpuinfo)
+INPUTS=$(sort $(wildcard */*.cxx) $(wildcard */*.hxx)  $(wildcard */*/*.cxx) $(wildcard */*/*.hxx) $(PROJECT_NAME).sln)
+INPUTS:=$(filter-out build/debug/config.hxx build/debug/commit_id.hxx,$(INPUTS))
 
 all: debug
 
 debug: $(BUILD_ARTIFACT)
 
-$(BUILD_ARTIFACT): $(wildcard */*.cxx) $(wildcard */*.hxx)  $(wildcard */*/*.cxx) $(wildcard */*/*.hxx) $(PROJECT_NAME).sln
+$(BUILD_ARTIFACT): $(INPUTS)
 	@export VS_VER="x`awk '/# Visual Studio /{print $$4}' $(PROJECT_NAME).sln`" ; \
 	if [ "$${VS_VER}" = "x14" ] ; then \
 		"$(CMAKE)" --build . ; \

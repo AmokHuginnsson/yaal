@@ -210,19 +210,25 @@ function( yaal_make_component name )
 		target_include_directories( ${name} BEFORE PRIVATE "${CMAKE_HOME_DIRECTORY}/_aux/msvcxx" )
 		target_include_directories( ${name}-static BEFORE PRIVATE "${CMAKE_HOME_DIRECTORY}/_aux/msvcxx" )
 		set_target_properties( ${name}-static PROPERTIES OUTPUT_NAME yaal_${name} PREFIX "lib" COMPILE_DEFINITIONS __YAAL_${NAME}_BUILD__ )
-		add_dependencies( ${name} ${name}-static )
 		add_custom_command(
-			TARGET ${name}-static
-			POST_BUILD COMMAND dumpbin /linkermember:1 build/${CMAKE_BUILD_TYPE}/libyaal_${name}.lib /out:build/${CMAKE_BUILD_TYPE}/${name}${LIB_INFIX}.sym
+			OUTPUT ${TARGET_PATH}/${name}${LIB_INFIX}.sym
+			COMMAND dumpbin /linkermember:1 ${TARGET_PATH}/libyaal_${name}.lib /out:${TARGET_PATH}/${name}${LIB_INFIX}.sym
+			DEPENDS ${name}-static
 		)
 		add_custom_command(
-			TARGET ${name}-static
-			POST_BUILD COMMAND makedef --source build/${CMAKE_BUILD_TYPE}/${name}${LIB_INFIX}.sym
-				--destination build/${CMAKE_BUILD_TYPE}/${name}${LIB_INFIX}.def --exclude _aux/msvcxx/exclude.sym
+			OUTPUT ${TARGET_PATH}/${name}${LIB_INFIX}.def
+			COMMAND makedef
+				--source ${TARGET_PATH}/${name}${LIB_INFIX}.sym
+				--destination ${TARGET_PATH}/${name}${LIB_INFIX}.def
+				--exclude _aux/msvcxx/exclude.sym
+			MAIN_DEPENDENCY ${TARGET_PATH}/${name}${LIB_INFIX}.sym
+			DEPENDS makedef
 		)
+		add_custom_target( ${name}-def DEPENDS ${TARGET_PATH}/${name}${LIB_INFIX}.def )
+		add_dependencies( ${name} ${name}-def )
 		set_target_properties(
 			${name} PROPERTIES
-			LINK_FLAGS "/DEF:build/${CMAKE_BUILD_TYPE}/${name}${LIB_INFIX}.def /IGNORE:4102"
+			LINK_FLAGS "/DEF:${TARGET_PATH}/${name}${LIB_INFIX}.def /IGNORE:4102"
 			COMPILE_DEFINITIONS __YAAL_${NAME}_BUILD__
 		)
 	endif ( CMAKE_HOST_WIN32 )
@@ -278,16 +284,19 @@ if ( CMAKE_HOST_WIN32 )
 	)
 	add_library( msvcxx STATIC ${SRCS} ${HDRS} ${CMAKE_HOME_DIRECTORY}/_aux/cmake/config.hxx )
 	add_custom_command(
-		TARGET hcore-static
-		POST_BUILD COMMAND dumpbin /linkermember:1 build/${CMAKE_BUILD_TYPE}/msvcxx.lib /out:build/${CMAKE_BUILD_TYPE}/msvcxx.sym
+		OUTPUT ${TARGET_PATH}/msvcxx.sym
+		COMMAND dumpbin /linkermember:1 ${TARGET_PATH}/msvcxx.lib /out:${TARGET_PATH}/msvcxx.sym
+		DEPENDS msvcxx
 	)
 	add_custom_command(
-		TARGET hcore-static
-		POST_BUILD COMMAND makedef
-			--source build/${CMAKE_BUILD_TYPE}/msvcxx.sym
-			--destination build/${CMAKE_BUILD_TYPE}/hcore${LIB_INFIX}.def
+		OUTPUT ${TARGET_PATH}/hcore${LIB_INFIX}.def
+		COMMAND makedef
+			--source ${TARGET_PATH}/msvcxx.sym
+			--destination ${TARGET_PATH}/hcore${LIB_INFIX}.def
 			--exclude _aux/msvcxx/exclude.sym
 			--append true
+		DEPENDS hcore-static ${TARGET_PATH}/msvcxx.sym
+		APPEND
 	)
 	set_target_properties( msvcxx PROPERTIES LINKER_LANGUAGE CXX COMPILE_DEFINITIONS __YAAL_HCORE_BUILD__ )
 	add_executable( makedef ${CMAKE_HOME_DIRECTORY}/_aux/makedef.cxx )
