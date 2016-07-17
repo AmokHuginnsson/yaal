@@ -110,20 +110,21 @@ int HFile::do_open( HString const& path_, open_t const& open_ ) {
 	M_PROLOG
 	M_ENSURE_EX( ! _handle, "stream already opened" );
 	char const* mode( nullptr );
-	if ( open_ == OPEN::READING )
+	if ( open_ == OPEN::READING ) {
 		mode = "rb";
-	else if ( ( open_ == OPEN::WRITING ) || ( open_ == ( OPEN::WRITING | OPEN::TRUNCATE ) ) )
+	} else if ( ( open_ == OPEN::WRITING ) || ( open_ == ( OPEN::WRITING | OPEN::TRUNCATE ) ) ) {
 		mode = "wb";
-	else if ( open_ == ( OPEN::WRITING | OPEN::APPEND ) )
+	} else if ( open_ == ( OPEN::WRITING | OPEN::APPEND ) ) {
 		mode = "ab";
-	else if ( open_ == ( OPEN::READING | OPEN::WRITING ) )
+	} else if ( open_ == ( OPEN::READING | OPEN::WRITING ) ) {
 		mode = "r+b";
-	else if ( open_ == ( OPEN::READING | OPEN::WRITING | OPEN::TRUNCATE ) )
+	} else if ( open_ == ( OPEN::READING | OPEN::WRITING | OPEN::TRUNCATE ) ) {
 		mode = "w+b";
-	else if ( open_ == ( OPEN::READING | OPEN::WRITING | OPEN::APPEND ) )
+	} else if ( open_ == ( OPEN::READING | OPEN::WRITING | OPEN::APPEND ) ) {
 		mode = "a+b";
-	else
+	} else {
 		M_THROW( "unexpected mode setting", open_.value() );
+	}
 	int saveErrno( errno );
 	_path = path_;
 	_handle = ::std::fopen( path_.raw(), mode );
@@ -201,18 +202,18 @@ void HFile::seek( int long pos, SEEK const& seek_ ) {
 	M_ASSERT( _handle );
 	int s( 0 );
 	switch ( seek_ ) {
-		case ( SEEK::SET ):
+		case ( SEEK::SET ): {
 			s = SEEK_SET;
-		break;
-		case ( SEEK::CUR ):
+		} break;
+		case ( SEEK::CUR ): {
 			s = SEEK_CUR;
-		break;
-		case ( SEEK::END ):
+		} break;
+		case ( SEEK::END ): {
 			s = SEEK_END;
-		break;
-		default:
+		} break;
+		default: {
 			M_ASSERT( 0 && "bad seek type" );
-		break;
+		} break;
 	}
 	M_ENSURE( ::std::fseek( static_cast<FILE*>( _handle ), pos, s ) == 0 );
 	return;
@@ -227,14 +228,16 @@ int long HFile::read_line( HString& line_, READ read_,
 	if ( readMode == READ::DEFAULTS ) {
 		readMode = READ::BUFFERED_READS;
 	}
-	if ( ! _handle )
+	if ( ! _handle ) {
 		M_THROW( _( "no file is opened" ), errno );
+	}
 	int long length( -1 );
 	if ( readMode == READ::BUFFERED_READS ) {
 		length = get_line_length();
 		if ( length ) {
-			if ( maximumLength_ && ( length > maximumLength_ ) )
+			if ( maximumLength_ && ( length > maximumLength_ ) ) {
 				M_THROW( _( "line too long" ), length );
+			}
 			char* ptr( static_cast<char*>( _cache.realloc( length ) ) );
 			M_ENSURE( read( ptr, length ) == length );
 			ptr[ length - 1 ] = 0;
@@ -242,14 +245,17 @@ int long HFile::read_line( HString& line_, READ read_,
 		}
 	} else /* UNBUFFERED_READS */ {
 		length = read_until( line_, HStreamInterface::eols, true );
-		if ( maximumLength_ && ( length > maximumLength_ ) )
+		if ( maximumLength_ && ( length > maximumLength_ ) ) {
 			M_THROW( _( "line too long" ), length );
+		}
 	}
 	if ( length > 0 ) {
-		if ( ( length > 1 ) && ( line_[ length - 2 ] == '\r' ) )
+		if ( ( length > 1 ) && ( line_[ length - 2 ] == '\r' ) ) {
 			line_.set_at( length - 2, 0 );
-	} else
+		}
+	} else {
 		length = -1;
+	}
 	return ( length );
 	M_EPILOG
 }
@@ -266,13 +272,13 @@ int long HFile::get_line_length( void ) {
 		size = static_cast<int long>( ::std::fread( buffer, sizeof ( char ),
 			SCAN_BUFFER_SIZE, static_cast<FILE*>( _handle ) ) );
 		length += size;
-		ptr = static_cast<char*>( ::std::memchr( buffer,
-					'\n', static_cast<size_t>( size ) ) );
+		ptr = static_cast<char*>( ::std::memchr( buffer, '\n', static_cast<size_t>( size ) ) );
+		M_ENSURE_EX( ::std::memchr( buffer, 0, static_cast<size_t>( size ) ) != nullptr, "binary data in file" );
 	} while ( ! ptr && ( size == SCAN_BUFFER_SIZE ) );
-	M_ENSURE( ::std::fseek( static_cast<FILE*>( _handle ),
-				- length, SEEK_CUR ) == 0 );
-	if ( ptr )
+	M_ENSURE( ::std::fseek( static_cast<FILE*>( _handle ), -length, SEEK_CUR ) == 0 );
+	if ( ptr ) {
 		length -= ( size - static_cast<int long>( ptr + 1 - buffer ) ); /* + 1 for \n */
+	}
 	return ( length );
 	M_EPILOG
 }
@@ -312,8 +318,9 @@ bool HFile::operator ! ( void ) const {
 int HFile::get_file_descriptor( void ) const {
 	M_PROLOG
 	int fd( -1 );
-	if ( is_opened() )
+	if ( is_opened() ) {
 		M_ENSURE( ( fd = fileno( static_cast<FILE*>( _handle ) ) ) >= 0 );
+	}
 	return ( fd );
 	M_EPILOG
 }
