@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-2"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="yaal::hcore::HString">
+		<DisplayString Condition="(_mem[ALLOC_FLAG_INDEX] &amp; 128) == 0">{_mem}</DisplayString>
+		<DisplayString Condition="(_mem[ALLOC_FLAG_INDEX] &amp; 128) != 0">{_ptr}</DisplayString>
+	</Type>
+	<Type Name="yaal::hcore::HArray&lt;*,*&gt;">
+		<DisplayString>Array of {"$T1"} of size {_size}</DisplayString>
+		<Expand>
+			<Item Name="size">_size</Item>
+			<Item Name="capacity">_capacity</Item>
+			<ArrayItems>
+				<Size>_size</Size>
+				<ValuePointer>_buf</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+	<Type Name="yaal::hcore::HPointer&lt;*&gt;">
+		<DisplayString Condition="( _shared != 0 ) &amp;&amp; ( _shared->_referenceCounter[REFERENCE_COUNTER_TYPE::HOLDER] &gt; 0 )">{*_object}</DisplayString>
+		<DisplayString Condition="( _shared == 0 ) || ( _shared->_referenceCounter[REFERENCE_COUNTER_TYPE::HOLDER] == 0 )">nullptr</DisplayString>
+	</Type>
+	<Type Name="yaal::hcore::HResource&lt;*,*&gt;">
+		<DisplayString Condition="_holder._resource != 0">{*_holder._resource}</DisplayString>
+		<DisplayString Condition="_holder._resource == 0">nullptr</DisplayString>
+	</Type>
+	<Type Name="yaal::hcore::HPair&lt;*,*&gt;">
+		<DisplayString>&lt;{first},{second}&gt;</DisplayString>
+	</Type>
+</AutoVisualizer>
+<!-- vim:set ft=xml:-->

@@ -281,6 +281,7 @@ if ( CMAKE_HOST_WIN32 )
 		${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/csignal
 		${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/ctime
 		${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/cmath
+		${CMAKE_HOME_DIRECTORY}/_aux/yaal.natvis
 	)
 	add_library( msvcxx STATIC ${SRCS} ${HDRS} ${CMAKE_HOME_DIRECTORY}/_aux/cmake/config.hxx )
 	add_custom_command(
