@@ -273,7 +273,9 @@ int long HFile::get_line_length( void ) {
 			SCAN_BUFFER_SIZE, static_cast<FILE*>( _handle ) ) );
 		length += size;
 		ptr = static_cast<char*>( ::std::memchr( buffer, '\n', static_cast<size_t>( size ) ) );
-		M_ENSURE_EX( ::std::memchr( buffer, 0, static_cast<size_t>( size ) ) != nullptr, "binary data in file" );
+		if ( ::std::memchr( buffer, 0, static_cast<size_t>( size ) ) != nullptr ) {
+			throw HFileException( "binary data in file" );
+		}
 	} while ( ! ptr && ( size == SCAN_BUFFER_SIZE ) );
 	M_ENSURE( ::std::fseek( static_cast<FILE*>( _handle ), -length, SEEK_CUR ) == 0 );
 	if ( ptr ) {

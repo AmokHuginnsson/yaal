@@ -52,24 +52,28 @@ HException::HException( char const* fileName_,
 		int const line_, char const* functionName_,
 		HString const& message_, int const code_,
 		HString const& name_ )
-	: _code( code_ ), _frame( 0 ),
-	_fileName( fileName_ ),
-	_functionName( functionName_ ),
-	_message( message_ ) {
-	if ( _logEnabled )
+	: _code( code_ )
+	, _frame( 0 )
+	, _fileName( fileName_ )
+	, _functionName( functionName_ )
+	, _message( message_ ) {
+	if ( _logEnabled ) {
 		hcore::log << name_ << ": " << _message << ", code: " << _code << '.' << endl;
-	if ( fileName_ && functionName_ )
+	}
+	if ( fileName_ && functionName_ ) {
 		log( fileName_, line_, functionName_ );
-	else
+	} else {
 		++ _frame;
+	}
 	return;
 }
 
 HException::HException( HException const& exception_ )
-	: _code( exception_._code ), _frame( exception_._frame ),
-	_fileName( exception_._fileName ),
-	_functionName( exception_._functionName ),
-	_message( exception_._message ) {
+	: _code( exception_._code )
+	, _frame( exception_._frame )
+	, _fileName( exception_._fileName )
+	, _functionName( exception_._functionName )
+	, _message( exception_._message ) {
 	return;
 }
 
@@ -79,6 +83,7 @@ HException::~HException( void ) {
 
 void HException::print_error( void ) const {
 	fprintf( ERROR_STREAM, "\nException: %s, %d.\n", _message.raw(), _code );
+	fflush( ERROR_STREAM );
 	return;
 }
 
@@ -97,10 +102,13 @@ void HException::log( char const* fileName_, int line_,
 						"Exception frame %2d: %16s : %4d : %s\n", _frame,
 						fileName_ + ( length > 16 ? length - 16 : 0 ),
 						line_, functionName_ );
-			if ( _debugLevel_ >= DEBUG_LEVEL::PRINT_EXCEPTION_STACK )
+			if ( _debugLevel_ >= DEBUG_LEVEL::PRINT_EXCEPTION_STACK ) {
 				fprintf( ERROR_STREAM, "%s", frame.raw() );
-			if ( _logEnabled )
+				fflush( ERROR_STREAM );
+			}
+			if ( _logEnabled ) {
 				hcore::log << frame;
+			}
 		}
 		++ _frame;
 	}
@@ -162,8 +170,9 @@ void kill_interior( char const* msg_ ) {
 		cerr << "FATAL ERROR: " << msg_ << endl;
 	}
 #ifndef NDEBUG
-	if ( _debugLevel_ >= DEBUG_LEVEL::ABORT_ON_ASSERT )
+	if ( _debugLevel_ >= DEBUG_LEVEL::ABORT_ON_ASSERT ) {
 		::abort();
+	}
 #endif /* #ifndef NDEBUG */
 	return;
 }

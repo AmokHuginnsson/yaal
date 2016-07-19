@@ -38,7 +38,7 @@ namespace yaal {
 
 namespace tools {
 
-class HThreadPool : public yaal::tools::HWorkFlow, public yaal::hcore::HSingleton<HThreadPool> {
+class M_YAAL_TOOLS_PUBLIC_API HThreadPool : public yaal::tools::HWorkFlow, public yaal::hcore::HSingleton<HThreadPool> {
 public:
 	typedef HThreadPool this_type;
 	typedef HWorkFlow base_type;

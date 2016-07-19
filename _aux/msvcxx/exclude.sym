@@ -5,6 +5,9 @@
 ??_7?$HSingleton@VHMonitor@tools@yaal@@@hcore@yaal@@6B@
 ??_7?$HSingleton@VHScheduledAsyncCaller@tools@yaal@@@hcore@yaal@@6B@
 ??_7?$HSingleton@VHSignalService@tools@yaal@@@hcore@yaal@@6B@
+??_7?$HSingleton@VHThreadPool@tools@yaal@@@hcore@yaal@@6B@
+??_7?$HSingleton@VHWidgetFactory@hconsole@yaal@@@hcore@yaal@@6B@
+??_7?$HSingleton@VHWindowFactory@hconsole@yaal@@@hcore@yaal@@6B@
 ??_7?$HSingleton@VOSSLContextClient@HOpenSSL@hcore@yaal@@@hcore@yaal@@6B@
 ??_7?$HSingleton@VOSSLContextServer@HOpenSSL@hcore@yaal@@@hcore@yaal@@6B@
 ??_7HAsyncCaller@tools@yaal@@6B@
@@ -15,6 +18,10 @@
 ??_7HMonitor@tools@yaal@@6B@
 ??_7HScheduledAsyncCaller@tools@yaal@@6B@
 ??_7HSignalService@tools@yaal@@6B@
+??_7HThreadPool@tools@yaal@@6B?$HSingleton@VHThreadPool@tools@yaal@@@hcore@2@@
+??_7HThreadPool@tools@yaal@@6BHWorkFlow@12@@
+??_7HWidgetFactory@hconsole@yaal@@6B@
+??_7HWindowFactory@hconsole@yaal@@6B@
 ??_7OSSLContextClient@HOpenSSL@hcore@yaal@@6B?$HSingleton@VOSSLContextClient@HOpenSSL@hcore@yaal@@@23@@
 ??_7OSSLContextClient@HOpenSSL@hcore@yaal@@6BOSSLContext@123@@
 ??_7OSSLContextServer@HOpenSSL@hcore@yaal@@6B?$HSingleton@VOSSLContextServer@HOpenSSL@hcore@yaal@@@23@@
@@ -122,6 +129,9 @@
 ?_instance@?$HSingleton@VHMonitor@tools@yaal@@@hcore@yaal@@0PAVHMonitor@tools@3@A
 ?_instance@?$HSingleton@VHScheduledAsyncCaller@tools@yaal@@@hcore@yaal@@0PAVHScheduledAsyncCaller@tools@3@A
 ?_instance@?$HSingleton@VHSignalService@tools@yaal@@@hcore@yaal@@0PAVHSignalService@tools@3@A
+?_instance@?$HSingleton@VHThreadPool@tools@yaal@@@hcore@yaal@@0PAVHThreadPool@tools@3@A
+?_instance@?$HSingleton@VHWidgetFactory@hconsole@yaal@@@hcore@yaal@@0PAVHWidgetFactory@hconsole@3@A
+?_instance@?$HSingleton@VHWindowFactory@hconsole@yaal@@@hcore@yaal@@0PAVHWindowFactory@hconsole@3@A
 ?_instance@?$HSingleton@VOSSLContextClient@HOpenSSL@hcore@yaal@@@hcore@yaal@@0PAVOSSLContextClient@HOpenSSL@23@A
 ?_instance@?$HSingleton@VOSSLContextServer@HOpenSSL@hcore@yaal@@@hcore@yaal@@0PAVOSSLContextServer@HOpenSSL@23@A
 ?_isKilled_@yaal@@3U?$atomic@_N@std@@A

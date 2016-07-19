@@ -65,7 +65,7 @@ public:
 	typedef yaal::hcore::HPointer<HWidgetCreatorInterface> ptr_t;
 };
 
-class HWidgetFactory : public yaal::hcore::HSingleton<HWidgetFactory> {
+class M_YAAL_HCONSOLE_PUBLIC_API HWidgetFactory : public yaal::hcore::HSingleton<HWidgetFactory> {
 public:
 	typedef HWidgetFactory this_type;
 	typedef yaal::hcore::HMap<yaal::hcore::HString, HWidgetCreatorInterface::ptr_t> creators_t;

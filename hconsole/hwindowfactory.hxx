@@ -59,7 +59,7 @@ public:
 	typedef yaal::hcore::HPointer<HWindowCreatorInterface> ptr_t;
 };
 
-class HWindowFactory : public yaal::hcore::HSingleton<HWindowFactory> {
+class M_YAAL_HCONSOLE_PUBLIC_API HWindowFactory : public yaal::hcore::HSingleton<HWindowFactory> {
 public:
 	typedef HWindowFactory this_type;
 	typedef yaal::hcore::HMap<yaal::hcore::HString, HWindowCreatorInterface::ptr_t> creators_t;

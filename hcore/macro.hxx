@@ -204,7 +204,16 @@ Copyright:
 } while ( 0 )
 /*! \brief Last statement in <tt>int main( int, char** )</tt>.
  */
-#define M_FINAL } catch ( yaal::hcore::HException& e ) { e.log( __FILE__, __LINE__, __PRETTY_FUNCTION__ ); e.print_error(); return ( -1 ); } catch ( yaal::hcore::HFailedAssertion const& ) { return ( -2 ); } catch ( int retVal ) { return ( retVal ? retVal : -3 ); }
+#define M_FINAL } \
+	catch ( yaal::hcore::HException& e ) { \
+		e.log( __FILE__, __LINE__, __PRETTY_FUNCTION__ ); \
+		e.print_error(); \
+		return ( -1 ); \
+	} catch ( yaal::hcore::HFailedAssertion const& ) { \
+		return ( -2 ); \
+	} catch ( int retVal ) { \
+		return ( retVal ? retVal : -3 ); \
+	}
 /*! \brief Throw HExceptionT<> is condition is not met.
  *
  * Use this macro to test return status of low-level system function calls.
