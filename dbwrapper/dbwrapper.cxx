@@ -152,14 +152,19 @@ public:
 
 HDBWrapperInitDeinit::HDBWrapperInitDeinit( void ) {
 	M_PROLOG
-	yaal_options()(
-		HProgramOptionsHandler::HOption()
-		.long_form( "log_sql" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL )
-		.description( "log content of SQL queries" )
-		.recipient( _logSQL_ )
-	);
-	yaal_options().process_rc_file( "yaal", "dbwrapper", set_dbwrapper_variables );
+	try {
+		yaal_options()(
+			HProgramOptionsHandler::HOption()
+			.long_form( "log_sql" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL )
+			.description( "log content of SQL queries" )
+			.recipient( _logSQL_ )
+		);
+		yaal_options().process_rc_file( "yaal", "dbwrapper", set_dbwrapper_variables );
+	} catch ( HException const& e ) {
+		fprintf( stderr, "Failed to initialize yaal-dbwrapper: %s\n", e.what() );
+		exit( 1 );
+	}
 	return;
 	M_EPILOG
 }

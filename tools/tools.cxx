@@ -163,134 +163,140 @@ public:
 
 HToolsInitDeinit::HToolsInitDeinit( void ) {
 	M_PROLOG
-	yaal_options()(
-		HProgramOptionsHandler::HOption()
-		.long_form( "ignore_signal_SIGINT" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL )
-		.description( "ignore INT (interrupt) signal" )
-		.recipient( _ignoreSignalSIGINT_ )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "ignore_signal_SIGTSTP" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL )
-		.description( "ignore TSTP (terminal stop, suspend) signal" )
-		.recipient( _ignoreSignalSIGTSTP_ )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "ignore_signal_SIGQUIT" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL )
-		.description( "ignore QUIT, core dump signal" )
-		.recipient( _ignoreSignalSIGQUIT_ )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "disable_XON" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL )
-		.description( "disable flow control events" )
-		.recipient( _disableXON_ )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "leave_ctrl_c" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL )
-		.description( "disable special handling of CTRL+C sequence" )
-		.recipient( _leaveCtrlC_ )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "leave_ctrl_z" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL )
-		.description( "disable special handling of CTRL+Z sequence" )
-		.recipient( _leaveCtrlZ_ )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "leave_ctrl_s" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL )
-		.description( "disable special handling of CTRL+S sequence" )
-		.recipient( _leaveCtrlS_ )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "leave_ctrl_q" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL )
-		.description( "disable special handling of CTRL+Q sequence" )
-		.recipient( _leaveCtrlQ_ )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "leave_ctrl_\\" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL )
-		.description( "disable special handling of CTRL+\\ sequence" )
-		.recipient( _leaveCtrlBackSlash_ )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "serial_device" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
-		.description( "path to serial device" )
-		.recipient( _serialDevice_ )
-		.argument_name( "path" )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "default_encoding" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
-		.description( "dafault character encoding used in text documents" )
-		.recipient( _defaultEncoding_ )
-		.argument_name( "encoding" )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "kill_grace_period" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
-		.description( "wait for that many milliseconds before killing interior" )
-		.recipient( HSignalService::_killGracePeriod )
-		.argument_name( "milliseconds" )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "child_kill_grace_period" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
-		.description( "wait for that many milliseconds before killing child process" )
-		.recipient( HPipedChild::_killGracePeriod )
-		.argument_name( "milliseconds" )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "compression_level" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
-		.description( "default compression level for zlib library" )
-		.recipient( _compressionLevel_ )
-		.argument_name( "level" )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "compression_buffer_size" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
-		.description( "size for compression buffer used in zlib library" )
-		.recipient( _zBufferSize_ )
-		.argument_name( "numBytes" )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "collector_connection_timeout" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
-		.description( "timeout on collector device read" )
-		.recipient( _collectorConnectionTimeOut_ )
-		.argument_name( "seconds" )
-	);
-	int ctr = 0;
-	errno = 0;
-	extendable::set_strtold_impl( &yaal_strtold );
-	yaal_options().process_rc_file ( "yaal", "tools", set_tools_variables );
-	for ( ctr = 0; ctr < 256; ctr ++ )
-		util::_transTableStripPL_[ ctr ] = static_cast<char>( ctr );
-	util::_transTableStripPL_[ static_cast<char unsigned>( '±' ) ] = 'a';
-	util::_transTableStripPL_[ static_cast<char unsigned>( '¡' ) ] = 'A';
-	util::_transTableStripPL_[ static_cast<char unsigned>( 'æ' ) ] = 'c';
-	util::_transTableStripPL_[ static_cast<char unsigned>( 'Æ' ) ] = 'C';
-	util::_transTableStripPL_[ static_cast<char unsigned>( 'ê' ) ] = 'e';
-	util::_transTableStripPL_[ static_cast<char unsigned>( 'Ê' ) ] = 'E';
-	util::_transTableStripPL_[ static_cast<char unsigned>( '³' ) ] = 'l';
-	util::_transTableStripPL_[ static_cast<char unsigned>( '£' ) ] = 'L';
-	util::_transTableStripPL_[ static_cast<char unsigned>( 'ñ' ) ] = 'n';
-	util::_transTableStripPL_[ static_cast<char unsigned>( 'Ñ' ) ] = 'N';
-	util::_transTableStripPL_[ static_cast<char unsigned>( 'ó' ) ] = 'o';
-	util::_transTableStripPL_[ static_cast<char unsigned>( 'Ó' ) ] = 'O';
-	util::_transTableStripPL_[ static_cast<char unsigned>( '¶' ) ] = 's';
-	util::_transTableStripPL_[ static_cast<char unsigned>( '¦' ) ] = 'S';
-	util::_transTableStripPL_[ static_cast<char unsigned>( '¼' ) ] = 'z';
-	util::_transTableStripPL_[ static_cast<char unsigned>( '¬' ) ] = 'Z';
-	util::_transTableStripPL_[ static_cast<char unsigned>( '¿' ) ] = 'z';
-	util::_transTableStripPL_[ static_cast<char unsigned>( '¯' ) ] = 'Z';
+	try {
+		yaal_options()(
+			HProgramOptionsHandler::HOption()
+			.long_form( "ignore_signal_SIGINT" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL )
+			.description( "ignore INT (interrupt) signal" )
+			.recipient( _ignoreSignalSIGINT_ )
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "ignore_signal_SIGTSTP" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL )
+			.description( "ignore TSTP (terminal stop, suspend) signal" )
+			.recipient( _ignoreSignalSIGTSTP_ )
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "ignore_signal_SIGQUIT" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL )
+			.description( "ignore QUIT, core dump signal" )
+			.recipient( _ignoreSignalSIGQUIT_ )
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "disable_XON" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL )
+			.description( "disable flow control events" )
+			.recipient( _disableXON_ )
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "leave_ctrl_c" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL )
+			.description( "disable special handling of CTRL+C sequence" )
+			.recipient( _leaveCtrlC_ )
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "leave_ctrl_z" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL )
+			.description( "disable special handling of CTRL+Z sequence" )
+			.recipient( _leaveCtrlZ_ )
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "leave_ctrl_s" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL )
+			.description( "disable special handling of CTRL+S sequence" )
+			.recipient( _leaveCtrlS_ )
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "leave_ctrl_q" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL )
+			.description( "disable special handling of CTRL+Q sequence" )
+			.recipient( _leaveCtrlQ_ )
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "leave_ctrl_\\" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL )
+			.description( "disable special handling of CTRL+\\ sequence" )
+			.recipient( _leaveCtrlBackSlash_ )
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "serial_device" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+			.description( "path to serial device" )
+			.recipient( _serialDevice_ )
+			.argument_name( "path" )
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "default_encoding" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+			.description( "dafault character encoding used in text documents" )
+			.recipient( _defaultEncoding_ )
+			.argument_name( "encoding" )
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "kill_grace_period" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+			.description( "wait for that many milliseconds before killing interior" )
+			.recipient( HSignalService::_killGracePeriod )
+			.argument_name( "milliseconds" )
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "child_kill_grace_period" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+			.description( "wait for that many milliseconds before killing child process" )
+			.recipient( HPipedChild::_killGracePeriod )
+			.argument_name( "milliseconds" )
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "compression_level" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+			.description( "default compression level for zlib library" )
+			.recipient( _compressionLevel_ )
+			.argument_name( "level" )
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "compression_buffer_size" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+			.description( "size for compression buffer used in zlib library" )
+			.recipient( _zBufferSize_ )
+			.argument_name( "numBytes" )
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "collector_connection_timeout" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+			.description( "timeout on collector device read" )
+			.recipient( _collectorConnectionTimeOut_ )
+			.argument_name( "seconds" )
+		);
+		int ctr = 0;
+		errno = 0;
+		extendable::set_strtold_impl( &yaal_strtold );
+		yaal_options().process_rc_file ( "yaal", "tools", set_tools_variables );
+		for ( ctr = 0; ctr < 256; ctr ++ ) {
+			util::_transTableStripPL_[ ctr ] = static_cast<char>( ctr );
+		}
+		util::_transTableStripPL_[ static_cast<char unsigned>( '±' ) ] = 'a';
+		util::_transTableStripPL_[ static_cast<char unsigned>( '¡' ) ] = 'A';
+		util::_transTableStripPL_[ static_cast<char unsigned>( 'æ' ) ] = 'c';
+		util::_transTableStripPL_[ static_cast<char unsigned>( 'Æ' ) ] = 'C';
+		util::_transTableStripPL_[ static_cast<char unsigned>( 'ê' ) ] = 'e';
+		util::_transTableStripPL_[ static_cast<char unsigned>( 'Ê' ) ] = 'E';
+		util::_transTableStripPL_[ static_cast<char unsigned>( '³' ) ] = 'l';
+		util::_transTableStripPL_[ static_cast<char unsigned>( '£' ) ] = 'L';
+		util::_transTableStripPL_[ static_cast<char unsigned>( 'ñ' ) ] = 'n';
+		util::_transTableStripPL_[ static_cast<char unsigned>( 'Ñ' ) ] = 'N';
+		util::_transTableStripPL_[ static_cast<char unsigned>( 'ó' ) ] = 'o';
+		util::_transTableStripPL_[ static_cast<char unsigned>( 'Ó' ) ] = 'O';
+		util::_transTableStripPL_[ static_cast<char unsigned>( '¶' ) ] = 's';
+		util::_transTableStripPL_[ static_cast<char unsigned>( '¦' ) ] = 'S';
+		util::_transTableStripPL_[ static_cast<char unsigned>( '¼' ) ] = 'z';
+		util::_transTableStripPL_[ static_cast<char unsigned>( '¬' ) ] = 'Z';
+		util::_transTableStripPL_[ static_cast<char unsigned>( '¿' ) ] = 'z';
+		util::_transTableStripPL_[ static_cast<char unsigned>( '¯' ) ] = 'Z';
+	} catch ( HException const& e ) {
+		fprintf( stderr, "Failed to initialize yaal-tools: %s\n", e.what() );
+		exit( 1 );
+	}
 	return;
 	M_EPILOG
 }

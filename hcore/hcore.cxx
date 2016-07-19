@@ -210,134 +210,140 @@ void ensure_limit( int resource_, char const* message_ ) {
 }
 
 HCoreInitDeinit::HCoreInitDeinit( void ) {
-	static_assert( sizeof( int ) >= 4, "insufficient size of `int' type" );
-	static_assert( sizeof( u8_t ) == 1, "bad size of `u8_t' type" );
-	static_assert( sizeof( u16_t ) == 2, "bad size of `u16_t' type" );
-	static_assert( sizeof( u32_t ) == 4, "bad size of `u32_t' type" );
-	static_assert( sizeof( u64_t ) == 8, "bad size of `u64_t' type" );
-	errno = 0;
-	if ( ! ( getuid() && geteuid() ) ) {
-		::perror( "running with super-user privileges - bailing out" );
-		::exit( 1 );
-	}
-	mode_t const lockOutUmask( S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IWOTH | S_IXOTH );
-	mode_t curUmask( ::umask( lockOutUmask ) );
-	if ( ::umask( curUmask ) != lockOutUmask ) {
-		::perror( SYSCALL_FAILURE );
-		exit( 1 );
-	}
-	if ( ( ~curUmask ) & ( S_IROTH | S_IWOTH | S_IXOTH )  ) {
-		::perror( "running with too permissive umask - bailing out" );
-		::exit( 1 );
-	}
-#ifndef __HOST_OS_TYPE_CYGWIN__
-#if ( HAVE_DECL_RLIMIT_AS == 1 )
-	ensure_limit( RLIMIT_AS, "unlimited VM size - bailing out" );
-#endif /* #if ( HAVE_DECL_RLIMIT_AS == 1 ) */
-	ensure_limit( RLIMIT_DATA, "unlimited data size - bailing out" );
-#endif /* #ifndef __HOST_OS_TYPE_CYGWIN__ */
-	ensure_limit( RLIMIT_STACK, "unlimited stack size - bailing out" );
-	ensure_limit( RLIMIT_NOFILE, "unlimited open descriptors count - bailing out" );
-#if ( HAVE_DECL_RLIMIT_NPROC == 1 )
-	ensure_limit( RLIMIT_NPROC, "unlimited process count - bailing out" );
-#endif /* #if ( HAVE_DECL_RLIMIT_NPROC == 1 ) */
-	init_locale();
-	char* env( ::getenv( "YAAL_DEBUG" ) );
-	if ( env ) {
-		_debugLevel_ = lexical_cast<int>( env );
-	}
-	bool enableExceptionLogging( true );
-	yaal_options()(
-		HProgramOptionsHandler::HOption()
-		.long_form( "log_level" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
-		.description( "Log severity level above which messages are actually processed." )
-		.argument_name( "level" )
-		.setter(
-			[]( yaal::hcore::HString const& value_ ) {
-				for ( int l( LOG_LEVEL::MIN ); l <= LOG_LEVEL::MAX; ++ l ) {
-					if ( ! strcasecmp( value_, LOG_LEVEL::name( static_cast<LOG_LEVEL::priority_t>( l ) ) ) ) {
-						HLog::_logLevel = static_cast<LOG_LEVEL::priority_t>( l );
-						return;
+	try {
+		static_assert( sizeof( int ) >= 4, "insufficient size of `int' type" );
+		static_assert( sizeof( u8_t ) == 1, "bad size of `u8_t' type" );
+		static_assert( sizeof( u16_t ) == 2, "bad size of `u16_t' type" );
+		static_assert( sizeof( u32_t ) == 4, "bad size of `u32_t' type" );
+		static_assert( sizeof( u64_t ) == 8, "bad size of `u64_t' type" );
+		errno = 0;
+		if ( ! ( getuid() && geteuid() ) ) {
+			::perror( "running with super-user privileges - bailing out" );
+			::exit( 1 );
+		}
+		mode_t const lockOutUmask( S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IWOTH | S_IXOTH );
+		mode_t curUmask( ::umask( lockOutUmask ) );
+		if ( ::umask( curUmask ) != lockOutUmask ) {
+			::perror( SYSCALL_FAILURE );
+			exit( 1 );
+		}
+		if ( ( ~curUmask ) & ( S_IROTH | S_IWOTH | S_IXOTH )  ) {
+			::perror( "running with too permissive umask - bailing out" );
+			::exit( 1 );
+		}
+	#ifndef __HOST_OS_TYPE_CYGWIN__
+	#if ( HAVE_DECL_RLIMIT_AS == 1 )
+		ensure_limit( RLIMIT_AS, "unlimited VM size - bailing out" );
+	#endif /* #if ( HAVE_DECL_RLIMIT_AS == 1 ) */
+		ensure_limit( RLIMIT_DATA, "unlimited data size - bailing out" );
+	#endif /* #ifndef __HOST_OS_TYPE_CYGWIN__ */
+		ensure_limit( RLIMIT_STACK, "unlimited stack size - bailing out" );
+		ensure_limit( RLIMIT_NOFILE, "unlimited open descriptors count - bailing out" );
+	#if ( HAVE_DECL_RLIMIT_NPROC == 1 )
+		ensure_limit( RLIMIT_NPROC, "unlimited process count - bailing out" );
+	#endif /* #if ( HAVE_DECL_RLIMIT_NPROC == 1 ) */
+		init_locale();
+		char* env( ::getenv( "YAAL_DEBUG" ) );
+		if ( env ) {
+			_debugLevel_ = lexical_cast<int>( env );
+		}
+		bool enableExceptionLogging( true );
+		yaal_options()(
+			HProgramOptionsHandler::HOption()
+			.long_form( "log_level" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+			.description( "Log severity level above which messages are actually processed." )
+			.argument_name( "level" )
+			.setter(
+				[]( yaal::hcore::HString const& value_ ) {
+					for ( int l( LOG_LEVEL::MIN ); l <= LOG_LEVEL::MAX; ++ l ) {
+						if ( ! strcasecmp( value_, LOG_LEVEL::name( static_cast<LOG_LEVEL::priority_t>( l ) ) ) ) {
+							HLog::_logLevel = static_cast<LOG_LEVEL::priority_t>( l );
+							return;
+						}
+					}
+					throw HProgramOptionsHandlerException( "Bad severity level: "_ys.append( value_ ) );
+				}
+			)
+			.getter(
+				[]( void ) {
+					return ( LOG_LEVEL::name( HLog::_logLevel ) );
+				}
+			)
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "on_alloc_failure" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+			.description( "Specify how to handle memory allocation failures." )
+			.argument_name( "strategy" )
+			.setter(
+				[]( yaal::hcore::HString const& value_ ) {
+					if ( value_ == "ABORT" ) {
+						memory::_onAllocFailure_ = memory::ON_ALLOC_FAILURE::ABORT;
+					} else if ( value_ == "THROW" ) {
+						memory::_onAllocFailure_ = memory::ON_ALLOC_FAILURE::THROW;
+					} else {
+						throw HProgramOptionsHandlerException( "Bad allocation failure strategy: "_ys.append( value_ ) );
 					}
 				}
-				throw HProgramOptionsHandlerException( "Bad severity level: "_ys.append( value_ ) );
-			}
-		)
-		.getter(
-			[]( void ) {
-				return ( LOG_LEVEL::name( HLog::_logLevel ) );
-			}
-		)
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "on_alloc_failure" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
-		.description( "Specify how to handle memory allocation failures." )
-		.argument_name( "strategy" )
-		.setter(
-			[]( yaal::hcore::HString const& value_ ) {
-				if ( value_ == "ABORT" ) {
-					memory::_onAllocFailure_ = memory::ON_ALLOC_FAILURE::ABORT;
-				} else if ( value_ == "THROW" ) {
-					memory::_onAllocFailure_ = memory::ON_ALLOC_FAILURE::THROW;
-				} else {
-					throw HProgramOptionsHandlerException( "Bad allocation failure strategy: "_ys.append( value_ ) );
+			)
+			.getter(
+				[]( void ) {
+					return ( memory::_onAllocFailure_ == memory::ON_ALLOC_FAILURE::THROW ? "THROW" : "ABORT" );
 				}
-			}
-		)
-		.getter(
-			[]( void ) {
-				return ( memory::_onAllocFailure_ == memory::ON_ALLOC_FAILURE::THROW ? "THROW" : "ABORT" );
-			}
-		)
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "ssl_key" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
-		.description( "Path to the OpenSSL private key file." )
-		.recipient( HOpenSSL::_sSLKey )
-		.argument_name( "path" )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "ssl_cert" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
-		.description( "Path to the OpenSSL certificate file." )
-		.recipient( HOpenSSL::_sSLCert )
-		.argument_name( "path" )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "resolve_hostnames" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
-		.description( "Resolve IP address into host names." )
-		.recipient( HSocket::_resolveHostnames )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "thread_stack_size" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
-		.description( "Set size of stack for newly created threads." )
-		.recipient( HThread::_threadStackSize )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "write_timeout" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
-		.description( "Time-out for low level write operations." )
-		.recipient( _writeTimeout_ )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "exception_logging" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
-		.description( "Enable automatic exception stack frames logging." )
-		.recipient( enableExceptionLogging )
-	);
-	if ( enableExceptionLogging ) {
-		HException::enable_logging();
-	} else {
-		HException::disable_logging();
+			)
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "ssl_key" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+			.description( "Path to the OpenSSL private key file." )
+			.recipient( HOpenSSL::_sSLKey )
+			.argument_name( "path" )
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "ssl_cert" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+			.description( "Path to the OpenSSL certificate file." )
+			.recipient( HOpenSSL::_sSLCert )
+			.argument_name( "path" )
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "resolve_hostnames" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+			.description( "Resolve IP address into host names." )
+			.recipient( HSocket::_resolveHostnames )
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "thread_stack_size" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+			.description( "Set size of stack for newly created threads." )
+			.recipient( HThread::_threadStackSize )
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "write_timeout" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+			.description( "Time-out for low level write operations." )
+			.recipient( _writeTimeout_ )
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "exception_logging" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+			.description( "Enable automatic exception stack frames logging." )
+			.recipient( enableExceptionLogging )
+		);
+		if ( enableExceptionLogging ) {
+			HException::enable_logging();
+		} else {
+			HException::disable_logging();
+		}
+		yaal_options().process_rc_file( "yaal", "core", set_hcore_variables );
+		if ( _writeTimeout_ < LOW_TIMEOUT_WARNING ) {
+			log( LOG_LEVEL::WARNING ) << "Low default timout for write operations!" << endl;
+		}
+	} catch ( HException const& e ) {
+		fprintf( stderr, "Failed to initialize yaal-hcore: %s\n", e.what() );
+		exit( 1 );
 	}
-	yaal_options().process_rc_file( "yaal", "core", set_hcore_variables );
-	if ( _writeTimeout_ < LOW_TIMEOUT_WARNING )
-		log( LOG_LEVEL::WARNING ) << "Low default timout for write operations!" << endl;
 	return;
 }
 

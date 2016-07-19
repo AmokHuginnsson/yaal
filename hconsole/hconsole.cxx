@@ -159,39 +159,44 @@ public:
 
 HConsoleInitDeinit::HConsoleInitDeinit( void ) {
 	M_PROLOG
-	errno = 0;
-	int escdelay( 0 );
-	yaal_options()(
-		HProgramOptionsHandler::HOption()
-		.long_form( "esc_delay" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
-		.description( "ncurses escape sequence time span" )
-		.recipient( escdelay ) /* defined inside ncurses lib */
-		.argument_name( "seconds" )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "latency" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
-		.description( "how often invoke idle event" )
-		.recipient( _latency_ )
-		.argument_name( "seconds" )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "command_compose_character" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
-		.description( "character that shall be uses as command composition base" )
-		.recipient( _commandComposeCharacter_ )
-		.argument_name( "character" )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "command_compose_delay" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
-		.description( "command composition time span" )
-		.recipient( _commandComposeDelay_ )
-		.argument_name( "seconds" )
-	);
-	yaal_options().process_rc_file( "yaal", "console", set_hconsole_variables );
-	HConsole::set_escdelay( escdelay );
+	try {
+		errno = 0;
+		int escdelay( 0 );
+		yaal_options()(
+			HProgramOptionsHandler::HOption()
+			.long_form( "esc_delay" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+			.description( "ncurses escape sequence time span" )
+			.recipient( escdelay ) /* defined inside ncurses lib */
+			.argument_name( "seconds" )
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "latency" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+			.description( "how often invoke idle event" )
+			.recipient( _latency_ )
+			.argument_name( "seconds" )
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "command_compose_character" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+			.description( "character that shall be uses as command composition base" )
+			.recipient( _commandComposeCharacter_ )
+			.argument_name( "character" )
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "command_compose_delay" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+			.description( "command composition time span" )
+			.recipient( _commandComposeDelay_ )
+			.argument_name( "seconds" )
+		);
+		yaal_options().process_rc_file( "yaal", "console", set_hconsole_variables );
+		HConsole::set_escdelay( escdelay );
+	} catch ( HException const& e ) {
+		fprintf( stderr, "Failed to initialize yaal-hconsole: %s\n", e.what() );
+		exit( 1 );
+	}
 	return;
 	M_EPILOG
 }
