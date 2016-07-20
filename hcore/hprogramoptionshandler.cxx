@@ -425,66 +425,87 @@ int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
 		{ RC_PATHER::HOME_ETC, RC_PATHER::LOCAL },
 		{ RC_PATHER::HOME, RC_PATHER::LOCAL }
 	};
-	bool section( false );
-	bool optionOK( false );
 	RC_PATHER::placement_state_t successStory( RC_PATHER::NONE );
 	HFile rc;
 	HString option, value, message;
-	log( LOG_LEVEL::INFO ) << __FUNCTION__ << ": ";
-	if ( _options.is_empty() )
+	if ( _options.is_empty() ) {
 		M_THROW( _( "bad variable count" ), _options.size() );
+	}
 	typedef HSet<HString> paths_t;
 	paths_t paths;
-	for ( int placementIdx( 0 ); placementIdx < static_cast<int>( sizeof ( placementTab ) / sizeof ( OPlacement ) ); placementIdx ++ ) {
-		if ( ( successStory == RC_PATHER::GLOBAL )
-				&& ( placementTab[ placementIdx ]._placementBit == RC_PATHER::GLOBAL ) )
+	bool needLog( true );
+	for ( OPlacement const& placement : placementTab ) {
+		if ( needLog ) {
+			needLog = false;
+			log( LOG_LEVEL::INFO ) << __FUNCTION__ << ": ";
+		}
+		if ( ( successStory == RC_PATHER::GLOBAL ) && ( placement._placementBit == RC_PATHER::GLOBAL ) ) {
 			continue;
-		if ( successStory == RC_PATHER::LOCAL )
+		}
+		if ( successStory == RC_PATHER::LOCAL ) {
 			break;
-		HString rcPath( make_path( rcName_, placementTab[ placementIdx ]._placement ) );
-		if ( rcPath.is_empty() )
-			continue;
-		if ( paths.insert( rcPath ).second && ! rc_open( rcPath, rc ) ) {
-			successStory = placementTab[ placementIdx ]._placementBit;
-			int line = 0;
-			while ( read_rc_line( option, value, rc, line ) ) {
-				if ( ! section_.is_empty() ) {
-					if ( value.is_empty() ) {
-						value.format( "[%s]", section_.raw() );
-						if ( option == value ) {
-							if ( _debugLevel_ >= DEBUG_LEVEL::PRINT_PROGRAM_OPTIONS )
-								::fprintf( stderr, "section: [%s]\n", option.raw() );
-							log << "section: " << section_ << ", ";
-							section = true;
+		}
+		try {
+			HString rcPath( make_path( rcName_, placement._placement ) );
+			if ( rcPath.is_empty() ) {
+				continue;
+			}
+			if ( paths.insert( rcPath ).second && ! rc_open( rcPath, rc ) ) {
+				successStory = placement._placementBit;
+				int line( 0 );
+				bool failed( false );
+				while ( read_rc_line( option, value, rc, line ) ) {
+					if ( ! section_.is_empty() ) {
+						bool section( false );
+						if ( value.is_empty() ) {
+							value.format( "[%s]", section_.raw() );
+							if ( option == value ) {
+								if ( _debugLevel_ >= DEBUG_LEVEL::PRINT_PROGRAM_OPTIONS ) {
+									::fprintf( stderr, "section: [%s]\n", option.raw() );
+								}
+								log << "section: " << section_ << ", ";
+								section = true;
+								continue;
+							} else {
+								section = false;
+							}
+						}
+						if ( ! section ) {
 							continue;
-						} else
-							section = false;
+						}
 					}
-					if ( ! section )
-						continue;
-				}
-				while ( substitute_environment( value ) )
-					;
-				if ( _debugLevel_ >= DEBUG_LEVEL::PRINT_PROGRAM_OPTIONS )
-					::fprintf( stderr, "option: [%s], value [%s]\n",
-							option.raw(), value.raw() );
-				optionOK = false;
-				for ( options_t::iterator it = _options.begin(), end = _options.end(); it != end; ++ it ) {
-					if ( ! strcasecmp( option, it->long_form() ) ) {
-						optionOK = true;
-						set_option( *it, value );
+					while ( substitute_environment( value ) ) {
+						/* empty loop */
 					}
-				}
-				if ( rc_callback && !rc_callback( option, value )
-						&& ! optionOK ) {
-					log << "failed." << endl;
-					message.format( "Error: unknown option found: `%s', "
-								"with value: `%s', on line %d.\n",
-								option.raw(), value.raw(), line );
-					log( LOG_LEVEL::ERROR ) << message;
-					::fputs( message.raw(), stderr );
+					if ( _debugLevel_ >= DEBUG_LEVEL::PRINT_PROGRAM_OPTIONS ) {
+						::fprintf( stderr, "option: [%s], value [%s]\n", option.raw(), value.raw() );
+					}
+					bool optionOK( false );
+					for ( HOption& opt : _options ) {
+						if ( ! strcasecmp( option, opt.long_form() ) ) {
+							optionOK = true;
+							set_option( opt, value );
+						}
+					}
+					if ( rc_callback && !rc_callback( option, value ) && ! optionOK ) {
+						if ( ! failed ) {
+							failed = true;
+							needLog = true;
+							log << "failed." << endl;
+						}
+						message.format( "Error: unknown option found: `%s', "
+									"with value: `%s', on line %d.\n",
+									option.raw(), value.raw(), line );
+						log( LOG_LEVEL::ERROR ) << message;
+						::fputs( message.raw(), stderr );
+					}
 				}
 			}
+		} catch ( HException const& e ) {
+			needLog = true;
+			log << "failed." << endl;
+			log << e.what() << endl;
+			::fputs( e.what(), stderr );
 		}
 	}
 	if ( !! rc ) {
