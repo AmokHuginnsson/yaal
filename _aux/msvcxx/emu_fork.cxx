@@ -121,15 +121,44 @@ namespace msvcxx {
 
 #undef waitpid
 int waitpid( int pid_, int* status_, int options_ ) {
-	int ret( ::waitpid( pid_, status_, options_ ) );
-	if ( ret == -1 ) {
-		if ( _children_.count( pid_ ) > 0 ) {
-			if ( ! kill( pid_, 0 ) )
-				ret = pid_;
+	int ret( -1 );
+	do {
+		if ( ( options_ & ~( WNOHANG | WUNTRACED ) ) != 0 ) {
+			errno = EINVAL;
+			break;
+		}
+		if ( ( pid_ == -1 ) || ( pid_ == -2 ) ) {
+			errno = ECHILD;
+			break;
+		}
+		HANDLE proc( OpenProcess( SYNCHRONIZE, FALSE, pid_ ) );
+		if ( proc == nullptr ) {
+			errno = ECHILD;
+			break;
+		}
+		if ( ::WaitForSingleObject( proc, static_cast<DWORD>( -1L ) ) == WAIT_FAILED ) {
+			errno = ECHILD;
+			break;
+		}
+		DWORD status( 0 );
+		if ( !GetExitCodeProcess( proc, &status ) ) {
+			errno = ECHILD;
+			break;
+		}
+		if ( status_ ) {
+			*status_ = status;
+		}
+		CloseHandle( proc );
+		ret = pid_;
+	} while ( false );
+	if ( ( ret == -1 ) && ( _children_.count( pid_ ) > 0 ) ) {
+		if ( ! kill( pid_, 0 ) ) {
+			ret = pid_;
 		}
 	}
-	if ( ret == pid_ )
+	if ( ret == pid_ ) {
 		_children_.erase( pid_ );
+	}
 	return ( ret );
 }
 

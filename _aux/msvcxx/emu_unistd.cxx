@@ -270,7 +270,7 @@ int isatty( int fd_ ) {
 	return ( val );
 }
 
-int close( int const& fd_ ) {
+int close( int fd_ ) {
 	int ret( 0 );
 	if ( fd_ < SystemIO::MANAGED_IO )
 		ret = ::close( fd_ );

@@ -79,7 +79,7 @@ HUDPSocket::HUDPSocket( int port_, ip_t ip_, MODE type_ )
 HUDPSocket::~HUDPSocket( void ) {
 	M_PROLOG
 	M_ASSERT( _fileDescriptor >= 0 );
-	::close( _fileDescriptor );
+	M_TEMP_FAILURE_RETRY( hcore::system::close( _fileDescriptor ) );
 	_fileDescriptor = -1;
 	return;
 	M_DESTRUCTOR_EPILOG

@@ -1,12 +1,11 @@
 #ifndef YAAL_MSVCXX_EMU_UNISTD_HXX_INCLUDED
 #define YAAL_MSVCXX_EMU_UNISTD_HXX_INCLUDED 1
 
-#include "config.hxx"
 #include "hcore/pod.hxx"
 
 namespace msvcxx {
 
-int close( int const& );
+int close( int );
 M_YAAL_HCORE_PUBLIC_API int long read( int, void*, int long );
 M_YAAL_HCORE_PUBLIC_API int long write( int, void const*, int long );
 M_YAAL_HCORE_PUBLIC_API int long sendto( int, void const*, int long, int, sockaddr const*, int );

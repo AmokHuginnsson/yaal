@@ -4,7 +4,11 @@
 #include <cstdio>
 #include <cerrno>
 #include <process.h>
+#define write write_off
+#define read read_off
 #include <io.h>
+#undef read
+#undef write
 #include <direct.h>
 #include <libintl.h>
 
@@ -99,8 +103,7 @@ inline int long sendto( int fd_, void const* buf_, int long size_, int flags_, s
 inline int long recvfrom( int fd_, void* buf_, int long size_, int flags_, sockaddr* from_, int* fromLen_ )
 	{ return ( msvcxx::recvfrom( fd_, buf_, size_, flags_, from_, fromLen_ ) ); }
 
-template<typename T>
-inline int close( T const& fd_ )
+inline int close( int fd_ )
 	{ return ( msvcxx::close( fd_ ) ); }
 
 inline int lockf( int fd_, int cmd_, size_t off_ )
