@@ -454,9 +454,9 @@ int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
 				successStory = placement._placementBit;
 				int line( 0 );
 				bool failed( false );
+				bool section( false );
 				while ( read_rc_line( option, value, rc, line ) ) {
 					if ( ! section_.is_empty() ) {
-						bool section( false );
 						if ( value.is_empty() ) {
 							value.format( "[%s]", section_.raw() );
 							if ( option == value ) {
