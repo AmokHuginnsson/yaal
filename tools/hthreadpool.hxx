@@ -45,6 +45,7 @@ public:
 	static int life_time( int ) {
 		return ( 100 );
 	}
+	void stop( void );
 private:
 	HThreadPool( void );
 	virtual ~HThreadPool( void );

@@ -527,9 +527,11 @@ int gettimeofday( struct timeval* tv_, struct timezone* tz_ ) {
 		FILETIME ft;
 		ULARGE_INTEGER li;
 		GetSystemTimeAsFileTime( &ft );
+		static int long unsigned HECTONANOSEC_PER_SEC( 10000000 );
+		static int long long WIN_TO_UNIX_EPOCH( 11644473600LL );
 		li.LowPart = ft.dwLowDateTime;
 		li.HighPart = ft.dwHighDateTime;
-		static int long unsigned HECTONANOSEC_PER_SEC( 10000000 );
+		li.QuadPart -= ( WIN_TO_UNIX_EPOCH * HECTONANOSEC_PER_SEC );
 		tv_->tv_sec = static_cast<int long>( li.QuadPart / HECTONANOSEC_PER_SEC );
 		tv_->tv_usec = ( li.QuadPart % HECTONANOSEC_PER_SEC ) / 10;
 	}

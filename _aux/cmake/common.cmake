@@ -32,7 +32,7 @@ if( CMAKE_HOST_WIN32 )
 	set( CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /SAFESEH:NO" )
 	set( CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /SAFESEH:NO" )
 	if ( NOT ( "${PROJECT_NAME}" STREQUAL "yaal" ) ) # For clients only.
-		add_definitions( -D__MSVCXX__ /FIyaal/fix.hxx -D_USE_32BIT_TIME_T )
+		add_definitions( -D__MSVCXX__ /FIyaal/fix.hxx )
 	endif()
 endif()
 

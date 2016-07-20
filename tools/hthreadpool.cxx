@@ -44,13 +44,19 @@ HThreadPool::HThreadPool( void )
 
 HThreadPool::~HThreadPool( void ) {
 	M_PROLOG
+	stop();
+	M_DESTRUCTOR_EPILOG
+}
+
+void HThreadPool::stop( void ) {
+	M_PROLOG
 	_isKilled_ = true;
 	if ( state() == STATE::RUNNING ) {
 		windup( WINDUP_MODE::ABORT );
 	}
 	M_ASSERT( state() == STATE::CLOSED );
 	return;
-	M_DESTRUCTOR_EPILOG
+	M_EPILOG
 }
 
 }

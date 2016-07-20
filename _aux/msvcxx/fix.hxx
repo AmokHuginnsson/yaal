@@ -22,9 +22,7 @@
 #define _inline _inlineMSVCXX
 #define _try _tryMSVCXX
 #define HAVE_STRUCT_TIMESPEC 1
-#ifndef _WIN64
 #define _USE_32BIT_TIME_T 1
-#endif /* #ifndef _WIN64 */
 
 /* warning LNK4221 goes bye bye */
 namespace { char dummy_symbol_to_quiet_down_LNK4221_warning = 0; };
