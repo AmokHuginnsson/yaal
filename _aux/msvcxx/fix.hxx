@@ -21,8 +21,9 @@
 
 #define _inline _inlineMSVCXX
 #define _try _tryMSVCXX
-#define HAVE_STRUCT_TIMESPEC 1
+#define _TIMESPEC_DEFINED 1
 #define _USE_32BIT_TIME_T 1
+#define __sync_synchronize _mm_mfence
 
 /* warning LNK4221 goes bye bye */
 namespace { char dummy_symbol_to_quiet_down_LNK4221_warning = 0; };

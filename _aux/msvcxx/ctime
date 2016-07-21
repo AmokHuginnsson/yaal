@@ -1,9 +1,13 @@
 #ifndef YAAL_MSVCXX_CTIME_INCLUDED
 #define YAAL_MSVCXX_CTIME_INCLUDED 1
 
+#define log cmath_log
+#include <pthread.h>
+#undef log
 #include <../include/ctime>
 #include "cleanup.hxx"
 
+typedef int clockid_t;
 typedef int long suseconds_t;
 
 char* strptime( char const*, char const*, struct tm* );

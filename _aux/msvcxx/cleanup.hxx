@@ -10,6 +10,7 @@
 #undef FALSE
 #undef ALTERNATE
 #undef ABSOLUTE
+#undef OVERFLOW
 #undef OK
 #undef PARITY_ODD
 #undef DELETE

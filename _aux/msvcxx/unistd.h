@@ -74,7 +74,7 @@ inline int unsigned alarm( int unsigned seconds_ ) {
 
 #if ! defined( HAVE_PTHREAD_SETNAME_NP )
 #define HAVE_PTHREAD_SETNAME_NP 1
-void pthread_setname_np( void*, char const* );
+void pthread_setname_np( pthread_t, char const* );
 #endif /* #if ! defined( HAVE_PTHREAD_SETNAME_NP ) */
 
 #define dup2 msvcxx::dup2

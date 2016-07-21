@@ -104,14 +104,14 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, HString const& dataBase_,
 		HString const&, HString const&, HString const& ) {
 	do {
 		HScopedValueReplacement<int> saveErrno( errno, 0 );
-		struct stat stat;
+		struct stat s;
 		OSQLite* sQLite( nullptr );
 		dbLink_._conn = sQLite = new ( memory::yaal ) OSQLite;
 		HString dataBase( dataBase_ );
-		if ( ::stat( dataBase.raw(), &stat ) ) {
+		if ( ::stat( dataBase.raw(), &s ) ) {
 			char const fileNameExt[] = ".sqlite";
 			dataBase += fileNameExt;
-			if ( ::stat( dataBase.raw(), &stat ) ) {
+			if ( ::stat( dataBase.raw(), &s ) ) {
 				sQLite->_errorMessage.format( "Database file `%s' does not exists.", dataBase.raw() );
 				break;
 			}

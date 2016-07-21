@@ -60,7 +60,7 @@ int long strnlen( char const*, int long );
 #endif /* #if ! defined( HAVE_STRNLEN ) || ( HAVE_STRNLEN == 0 ) */
 
 #if ! defined( HAVE_DECL_SUN_LEN ) || ( HAVE_DECL_SUN_LEN == 0 )
-#define SUN_LEN( su ) ( (sizeof ( *(su) ) - sizeof ( (su)->sun_path ) + std::strlen( (su)->sun_path ) ) )
+#define SUN_LEN( su ) ( ( sizeof ( *(su) ) - sizeof ( (su)->sun_path ) + std::strlen( (su)->sun_path ) ) )
 #endif /* #if ! defined( HAVE_DECL_SUN_LEN ) || ( HAVE_DECL_SUN_LEN == 0 ) */
 
 #if ! defined( HAVE_GNU_GETHOSTBYNAME_R )
@@ -82,7 +82,7 @@ int clock_gettime( clockid_t, struct timespec* );
 #endif /* #if ! defined( HAVE_CLOCK_GETTIME ) */
 
 #if ! defined( HAVE_TIMER_CREATE )
-#include<ctime>
+#include <ctime>
 class HDarwinTimer;
 typedef HDarwinTimer* timer_t;
 struct itimerspec {

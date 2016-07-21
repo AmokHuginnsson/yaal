@@ -131,13 +131,9 @@
 #undef HAVE_GETHOSTBYNAME_R
 #define HAVE_GETHOSTBYNAME_R 1
 #define __va_copy( x, y ) ( ( x ) = ( y ) )
-#ifdef PTHREAD_H
-#define pthread_self() pthread_self().p
-#endif /* PTHREAD_H */
 #ifdef _CSTRING_
 #include <errno.h>
 #include "hcore/macro.hxx"
-#undef OVERFLOW
 #define strerror msvcxx::windows_strerror
 namespace msvcxx { M_YAAL_HCORE_PUBLIC_API char const* windows_strerror( int ); }
 #endif /* _CSTRING_ */

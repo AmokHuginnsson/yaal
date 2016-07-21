@@ -343,7 +343,7 @@ typedef struct tagTHREADNAME_INFO {
 } THREADNAME_INFO;
 #pragma pack( pop )
 
-void pthread_setname_np( void*, char const* name_ ) {
+void pthread_setname_np( pthread_t, char const* name_ ) {
 	THREADNAME_INFO info;
 	info.dwType = 0x1000;
 	info.szName = name_;
