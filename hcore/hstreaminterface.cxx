@@ -953,6 +953,14 @@ void HStreamInterface::HManipulator::set_precision( HStreamInterface& iface_ ) c
 	M_EPILOG
 }
 
+HStreamInterface& getline( HStreamInterface& stream_, yaal::hcore::HString& store_ ) {
+	M_PROLOG
+	stream_.read_until( store_, "\n" );
+	store_.trim_right( "\r" );
+	return ( stream_ );
+	M_EPILOG
+}
+
 }
 
 }

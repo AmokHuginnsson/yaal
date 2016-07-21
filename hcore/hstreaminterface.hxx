@@ -433,6 +433,14 @@ HStreamInterface::HManipulator setprecision( int );
 
 typedef HExceptionT<HStreamInterface> HStreamInterfaceException;
 
+/*! \brief Read one line of input.
+ *
+ * \param stream - stream to read from.
+ * \param store - variable where read line should be stored.
+ * \return Stream that where read.
+ */
+HStreamInterface& getline( HStreamInterface& stream, yaal::hcore::HString& store );
+
 /*! \brief Iterator adaptor for streams.
  *
  * This helper may be useful in algorithms.
