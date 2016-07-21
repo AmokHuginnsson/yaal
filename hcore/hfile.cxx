@@ -244,7 +244,7 @@ int long HFile::read_line( HString& line_, READ read_,
 			line_ = ptr;
 		}
 	} else /* UNBUFFERED_READS */ {
-		length = read_until( line_, HStreamInterface::eols, true );
+		length = read_until( line_, "\n", true );
 		if ( maximumLength_ && ( length > maximumLength_ ) ) {
 			M_THROW( _( "line too long" ), length );
 		}
