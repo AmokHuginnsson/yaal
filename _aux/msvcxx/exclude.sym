@@ -65,6 +65,14 @@
 ?INCLUDE_EMPTY@HTokenizer@hcore@yaal@@2V?$HBitFlag@VHTokenizer@hcore@yaal@@@23@B
 ?KEEP_EMPTY@PARSER@HXml@tools@yaal@@2V?$HBitFlag@UPARSER@HXml@tools@yaal@@@hcore@4@B
 ?MANAGED_IO@SystemIO@msvcxx@@2HB
+?N0@number@hcore@yaal@@3VHNumber@23@B
+?N0_5@number@hcore@yaal@@3VHNumber@23@B
+?N1@number@hcore@yaal@@3VHNumber@23@B
+?N2@number@hcore@yaal@@3VHNumber@23@B
+?N3@number@hcore@yaal@@3VHNumber@23@B
+?N4@number@hcore@yaal@@3VHNumber@23@B
+?N5@number@hcore@yaal@@3VHNumber@23@B
+?N6@number@hcore@yaal@@3VHNumber@23@B
 ?NETWORK@TYPE@HSocket@hcore@yaal@@2V?$HBitFlag@UTYPE@HSocket@hcore@yaal@@@34@B
 ?NEWLINE@COMPILE@HRegex@hcore@yaal@@2V?$HBitFlag@UCOMPILE@HRegex@hcore@yaal@@@34@B
 ?NONBLOCKING@TYPE@HSocket@hcore@yaal@@2V?$HBitFlag@UTYPE@HSocket@hcore@yaal@@@34@B
@@ -74,6 +82,7 @@
 ?NOT_BEGINNING_OF_LINE@MATCH@HRegex@hcore@yaal@@2V?$HBitFlag@UMATCH@HRegex@hcore@yaal@@@34@B
 ?NOT_END_OF_LINE@MATCH@HRegex@hcore@yaal@@2V?$HBitFlag@UMATCH@HRegex@hcore@yaal@@@34@B
 ?NO_EXCEPTION@COMPILE@HRegex@hcore@yaal@@2V?$HBitFlag@UCOMPILE@HRegex@hcore@yaal@@@34@B
+?N_1@number@hcore@yaal@@3VHNumber@23@B
 ?PARITY_CHECK@FLAG@HSerial@tools@yaal@@2V?$HBitFlag@UFLAG@HSerial@tools@yaal@@@hcore@4@B
 ?PARITY_ODD@FLAG@HSerial@tools@yaal@@2V?$HBitFlag@UFLAG@HSerial@tools@yaal@@@hcore@4@B
 ?PI@math@yaal@@3OA

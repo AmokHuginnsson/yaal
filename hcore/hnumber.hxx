@@ -280,15 +280,15 @@ inline void swap( yaal::hcore::HNumber& a, yaal::hcore::HNumber& b ) {
 
 namespace number {
 
-extern yaal::hcore::HNumber const N0;
-extern yaal::hcore::HNumber const N1;
-extern yaal::hcore::HNumber const N2;
-extern yaal::hcore::HNumber const N3;
-extern yaal::hcore::HNumber const N4;
-extern yaal::hcore::HNumber const N5;
-extern yaal::hcore::HNumber const N6;
-extern yaal::hcore::HNumber const N0_5;
-extern yaal::hcore::HNumber const N_1;
+extern M_YAAL_HCORE_PUBLIC_API yaal::hcore::HNumber const N0;
+extern M_YAAL_HCORE_PUBLIC_API yaal::hcore::HNumber const N1;
+extern M_YAAL_HCORE_PUBLIC_API yaal::hcore::HNumber const N2;
+extern M_YAAL_HCORE_PUBLIC_API yaal::hcore::HNumber const N3;
+extern M_YAAL_HCORE_PUBLIC_API yaal::hcore::HNumber const N4;
+extern M_YAAL_HCORE_PUBLIC_API yaal::hcore::HNumber const N5;
+extern M_YAAL_HCORE_PUBLIC_API yaal::hcore::HNumber const N6;
+extern M_YAAL_HCORE_PUBLIC_API yaal::hcore::HNumber const N0_5;
+extern M_YAAL_HCORE_PUBLIC_API yaal::hcore::HNumber const N_1;
 yaal::hcore::HNumber const& PI( yaal::hcore::HNumber::integer_t = 0 );
 yaal::hcore::HNumber const& E( yaal::hcore::HNumber::integer_t = 0 );
 
