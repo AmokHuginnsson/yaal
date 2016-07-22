@@ -101,7 +101,7 @@ yaal::hcore::HTime HFSItem::modified( void ) const {
 	M_PROLOG
 	struct stat s;
 	do_stat( &s );
-	return ( s.st_mtime );
+	return ( unix_epoch_to_yaal_epoch( s.st_mtime ) );
 	M_EPILOG
 }
 
@@ -109,7 +109,7 @@ yaal::hcore::HTime HFSItem::created( void ) const {
 	M_PROLOG
 	struct stat s;
 	do_stat( &s );
-	return ( s.st_ctime );
+	return ( unix_epoch_to_yaal_epoch( s.st_ctime ) );
 	M_EPILOG
 }
 
@@ -117,7 +117,7 @@ yaal::hcore::HTime HFSItem::accessed( void ) const {
 	M_PROLOG
 	struct stat s;
 	do_stat( &s );
-	return ( s.st_atime );
+	return ( unix_epoch_to_yaal_epoch( s.st_atime ) );
 	M_EPILOG
 }
 

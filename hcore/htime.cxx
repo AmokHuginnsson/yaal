@@ -58,10 +58,6 @@ inline i64_t yaal_epoch_to_unix_epoch( i64_t time_ ) {
 	return ( time_ - HTime::SECONDS_TO_UNIX_EPOCH );
 }
 
-inline i64_t unix_epoch_to_yaal_epoch( i64_t time_ ) {
-	return ( time_ + HTime::SECONDS_TO_UNIX_EPOCH );
-}
-
 HTime::HTime( TZ tz_, char const* format_ )
 	: _value(), _broken(), _tz( tz_ ), _format( format_ ), _cache() {
 	M_PROLOG

@@ -186,6 +186,15 @@ inline HTime now_local( void ) {
  */
 i64_t mkgmtime( struct tm* tm_ );
 
+/*! \brief Convert UNIX timestamp to absolute time.
+ *
+ * \param time_ - number of seconds since begining of UNIX epoch.
+ * \return Number of seconds since begining of AD era.
+ */
+inline i64_t unix_epoch_to_yaal_epoch( i64_t time_ ) {
+	return ( time_ + HTime::SECONDS_TO_UNIX_EPOCH );
+}
+
 inline void swap( yaal::hcore::HTime& a, yaal::hcore::HTime& b ) {
 	a.swap( b );
 }
