@@ -136,7 +136,7 @@ int connect( int fd_, struct sockaddr* addr_, socklen_t len_ ) {
 		} else
 			io.set_handle( h );
 	} else {
-		M_ASSERT( io.type() == IO::TYPE::SOCKET );
+		M_ASSERT( ( io.type() == IO::TYPE::SOCKET ) || ( io.type() == IO::TYPE::SOCKET_DGRAM ) );
 		SOCKET s( reinterpret_cast<SOCKET>( io.handle() ) );
 		ret = ::connect( s, const_cast<sockaddr const*>( addr_ ), static_cast<int>( len_ ) );
 		if ( WSAEventSelect( s, io.event(), FD_ACCEPT | FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE | FD_OOB ) )

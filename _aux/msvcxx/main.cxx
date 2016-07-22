@@ -171,7 +171,9 @@ struct DIR {
 
 DIR* opendir( char const* path_ ) {
 	WIN32_FIND_DATA d;
-	HANDLE h( ::FindFirstFile( path_, &d ) );
+	HString path( path_ );
+	path.append( "/*" );
+	HANDLE h( ::FindFirstFile( path.raw(), &d ) );
 	DIR* dir( nullptr );
 	if ( h != INVALID_HANDLE_VALUE ) {
 		dir = memory::calloc<DIR>( 1 );

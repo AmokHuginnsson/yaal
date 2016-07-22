@@ -22,6 +22,14 @@ inline struct tm *localtime_r(const time_t *timep, struct tm *result) {
 	return ( result );
 }
 
+namespace msvcxx {
+inline int long long difftime( int long long end_, int long long start_ ) {
+	return ( end_ - start_ );
+}
+}
+
+#define difftime msvcxx::difftime
+
 static int const SIGEV_SIGNAL = 0;
 
 union sigval {

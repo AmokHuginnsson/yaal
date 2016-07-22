@@ -40,6 +40,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "memory.hxx"
 #include "hchunk.hxx"
 #include "hcore.hxx"
+#include "safe_cast.hxx"
 
 namespace yaal {
 
@@ -1548,19 +1549,19 @@ HString to_string( void const* val_ ) {
 
 int stoi( HString const& str_, int* endIdx_, int base_ ) {
 	M_PROLOG
-	return ( static_cast<int>( stoll( str_, endIdx_, base_ ) ) );
+	return ( safe_cast<int>( stoll( str_, endIdx_, base_ ) ) );
 	M_EPILOG
 }
 
 int long stol( HString const& str_, int* endIdx_, int base_ ) {
 	M_PROLOG
-	return ( static_cast<int long>( stoll( str_, endIdx_, base_ ) ) );
+	return ( safe_cast<int long>( stoll( str_, endIdx_, base_ ) ) );
 	M_EPILOG
 }
 
 int long unsigned stoul( HString const& str_, int* endIdx_, int base_ ) {
 	M_PROLOG
-	return ( static_cast<int long unsigned>( stoull( str_, endIdx_, base_ ) ) );
+	return ( safe_cast<int long unsigned>( stoull( str_, endIdx_, base_ ) ) );
 	M_EPILOG
 }
 
@@ -1570,7 +1571,7 @@ int long long stoll_impl( char const* str_, int* endIdx_, int base_ ) {
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	char* end( nullptr );
 	int long long val( ::strtoll( str_, &end, base_ ) );
-	if ( ! val || ( val == LONG_MIN ) || ( val == LONG_MAX ) ) {
+	if ( ! val || ( val == LLONG_MIN ) || ( val == LLONG_MAX ) ) {
 		if ( errno == EINVAL ) {
 			throw HInvalidArgumentException( "Invalid argument in conversion: "_ys.append( str_ ) );
 		} else if ( errno == ERANGE ) {

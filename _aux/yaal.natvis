@@ -26,5 +26,8 @@
 	<Type Name="yaal::hcore::HPair&lt;*,*&gt;">
 		<DisplayString>&lt;{first},{second}&gt;</DisplayString>
 	</Type>
+	<Type Name="yaal::hcore::HTime">
+		<DisplayString>{_broken.tm_year + 1900}-{_broken.tm_mon + 1}-{_broken.tm_mday} {_broken.tm_hour}:{_broken.tm_min}:{_broken.tm_sec,d}</DisplayString>
+	</Type>
 </AutoVisualizer>
 <!-- vim:set ft=xml:-->
