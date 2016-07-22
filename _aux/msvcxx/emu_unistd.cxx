@@ -327,6 +327,8 @@ int long recvfrom( int fd_, void* buf_, int long size_, int flags_, sockaddr* fr
 
 int unix_stat( char const* path_, struct stat* s_ ) {
 	string path( path_ );
+	size_t dotLnkPos( path.rfind( ".lnk" ) );
+	bool isLink( ( dotLnkPos != string::npos ) && ( dotLnkPos == ( path.length() - 4 ) ) );
 	string::size_type lastNonSeparator( path.find_last_not_of( "/\\" ) );
 	int len( path.length() );
 	if ( lastNonSeparator != string::npos ) {
@@ -340,6 +342,10 @@ int unix_stat( char const* path_, struct stat* s_ ) {
 			res = -1;
 			errno = ENOTDIR;
 		} else {
+			if ( isLink ) {
+				s_->st_mode &= ~TYPE_REG;
+				s_->st_mode |= TYPE_LNK;
+			}
 			owner_t owner( get_path_owner( path ) );
 			s_->st_uid = owner.first;
 			s_->st_gid = owner.second;

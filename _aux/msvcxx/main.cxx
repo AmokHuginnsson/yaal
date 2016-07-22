@@ -193,6 +193,9 @@ int closedir( DIR* dir_ ) {
 
 int readdir_r( DIR* dir_, struct dirent* entry_, struct dirent** result_ ) {
 	int error( 0 );
+	if ( result_ ) {
+		*result_ = dir_->_hasData ? entry_ : nullptr;
+	}
 	if ( dir_->_hasData ) {
 		entry_->d_ino = dir_->_index;
 		if ( dir_->_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) {
@@ -207,9 +210,6 @@ int readdir_r( DIR* dir_, struct dirent* entry_, struct dirent** result_ ) {
 			entry_->d_type = DT_UNKNOWN;
 		}
 		strncpy( entry_->d_name, dir_->_data.cFileName, NAME_MAX );
-		if ( result_ ) {
-			*result_ = entry_;
-		}
 		if ( ::FindNextFile( dir_->_handle, &dir_->_data ) ) {
 			++ dir_->_index;
 		} else {

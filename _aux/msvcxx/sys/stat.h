@@ -16,12 +16,13 @@ static int const S_IWOTH = 0002;
 static int const S_IXOTH = 0001;
 
 static int const TYPE_MASK = 0170000;
-static int const TYPE_DIR  = 0040000;
-static int const TYPE_REG  = 0120000;
-static int const TYPE_LNK  = 0010000;
-static int const TYPE_BLK  = 0060000;
-static int const TYPE_CHR  = 0020000;
 static int const TYPE_FIFO = 0010000;
+static int const TYPE_CHR  = 0020000;
+static int const TYPE_DIR  = 0040000;
+static int const TYPE_BLK  = 0060000;
+static int const TYPE_REG  = 0100000;
+static int const TYPE_LNK  = 0120000;
+static int const TYPE_SOCK = 0140000;
 
 #ifndef MODE_T_DEFINED
 typedef int unsigned mode_t;
@@ -42,6 +43,10 @@ constexpr bool S_ISREG( mode_t mode_ ) {
 
 constexpr bool S_ISLNK( mode_t mode_ ) {
 	return ( is_file_type( mode_, TYPE_LNK ) );
+}
+
+constexpr bool S_ISSOCK( mode_t mode_ ) {
+	return ( is_file_type( mode_, TYPE_SOCK ) );
 }
 
 namespace msvcxx {
