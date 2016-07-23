@@ -112,24 +112,42 @@ Copyright:
 #ifdef countof
 #	error Yaal redefines countof macro.
 #endif /* #ifdef countof */
+#ifdef M_ATTRIBUTE_SPEC
+#	error Yaal redefines M_ATTRIBUTE_SPEC macro.
+#endif /* #ifdef M_ATTRIBUTE_SPEC */
 #ifdef M_EXPORT_SYMBOL
 #	error Yaal redefines M_EXPORT_SYMBOL macro.
 #endif /* #ifdef M_EXPORT_SYMBOL */
 #ifdef M_YAAL_HCORE_PUBLIC_API
 #	error Yaal redefines M_YAAL_HCORE_PUBLIC_API macro.
 #endif /* #ifdef M_YAAL_HCORE_PUBLIC_API */
+#ifdef M_YAAL_HCORE_EXTERN
+#	error Yaal redefines M_YAAL_HCORE_EXTERN macro.
+#endif /* #ifdef M_YAAL_HCORE_EXTERN */
 #ifdef M_YAAL_TOOLS_PUBLIC_API
 #	error Yaal redefines M_YAAL_TOOLS_PUBLIC_API macro.
 #endif /* #ifdef M_YAAL_TOOLS_PUBLIC_API */
+#ifdef M_YAAL_TOOLS_EXTERN
+#	error Yaal redefines M_YAAL_TOOLS_EXTERN macro.
+#endif /* #ifdef M_YAAL_TOOLS_EXTERN */
 #ifdef M_YAAL_DBWRAPPER_PUBLIC_API
 #	error Yaal redefines M_YAAL_DBWRAPPER_PUBLIC_API macro.
 #endif /* #ifdef M_YAAL_DBWRAPPER_PUBLIC_API */
+#ifdef M_YAAL_DBWRAPPER_EXTERN
+#	error Yaal redefines M_YAAL_DBWRAPPER_EXTERN macro.
+#endif /* #ifdef M_YAAL_DBWRAPPER_EXTERN */
 #ifdef M_YAAL_HCONSOLE_PUBLIC_API
 #	error Yaal redefines M_YAAL_HCONSOLE_PUBLIC_API macro.
 #endif /* #ifdef M_YAAL_HCONSOLE_PUBLIC_API */
+#ifdef M_YAAL_HCONSOLE_EXTERN
+#	error Yaal redefines M_YAAL_HCONSOLE_EXTERN macro.
+#endif /* #ifdef M_YAAL_HCONSOLE_EXTERN */
 #ifdef M_YAAL_HDATA_PUBLIC_API
 #	error Yaal redefines M_YAAL_HDATA_PUBLIC_API macro.
 #endif /* #ifdef M_YAAL_HDATA_PUBLIC_API */
+#ifdef M_YAAL_HDATA_EXTERN
+#	error Yaal redefines M_YAAL_HDATA_EXTERN macro.
+#endif /* #ifdef M_YAAL_HDATA_EXTERN */
 
 /*! \brief gettext library API convenience macro.
  */
@@ -262,39 +280,60 @@ Copyright:
 #define countof( array ) ( yaal::meta::integer_cast<int, sizeof ( yaal::YaalArrayElementCountHelper( ( array ) ) )>::value )
 
 #ifdef __MSVCXX__
-#define M_EXPORT_SYMBOL __declspec( dllexport )
+#define M_ATTRIBUTE_SPEC( ... ) __declspec( __VA_ARGS__ )
+#else /* #ifdef __MSVCXX__ */
+#define M_ATTRIBUTE_SPEC( ... ) __attribute__(( __VA_ARGS__ ))
+#endif /* #else #ifdef __MSVCXX__ */
+
+#if defined( __MSVCXX__ ) || defined( __HOST_OS_TYPE_CYGWIN__ )
+#define M_EXPORT_SYMBOL M_ATTRIBUTE_SPEC( dllexport )
 #ifdef __YAAL_HCORE_BUILD__
-#define M_YAAL_HCORE_PUBLIC_API __declspec( dllexport )
+#define M_YAAL_HCORE_PUBLIC_API M_ATTRIBUTE_SPEC( dllexport )
+#define M_YAAL_HCORE_EXTERN
 #else /* #ifdef __YAAL_HCORE_BUILD__ */
-#define M_YAAL_HCORE_PUBLIC_API __declspec( dllimport )
+#define M_YAAL_HCORE_PUBLIC_API M_ATTRIBUTE_SPEC( dllimport )
+#define M_YAAL_HCORE_EXTERN extern
 #endif /* #else #ifdef __YAAL_HCORE_BUILD__ */
 #ifdef __YAAL_TOOLS_BUILD__
-#define M_YAAL_TOOLS_PUBLIC_API __declspec( dllexport )
+#define M_YAAL_TOOLS_PUBLIC_API M_ATTRIBUTE_SPEC( dllexport )
+#define M_YAAL_TOOLS_EXTERN
 #else /* #ifdef __YAAL_TOOLS_BUILD__ */
-#define M_YAAL_TOOLS_PUBLIC_API __declspec( dllimport )
+#define M_YAAL_TOOLS_PUBLIC_API M_ATTRIBUTE_SPEC( dllimport )
+#define M_YAAL_TOOLS_EXTERN extern
 #endif /* #else #ifdef __YAAL_TOOLS_BUILD__ */
 #ifdef __YAAL_DBWRAPPER_BUILD__
-#define M_YAAL_DBWRAPPER_PUBLIC_API __declspec( dllexport )
+#define M_YAAL_DBWRAPPER_PUBLIC_API M_ATTRIBUTE_SPEC( dllexport )
+#define M_YAAL_DBWRAPPER_EXTERN
 #else /* #ifdef __YAAL_DBWRAPPER_BUILD__ */
-#define M_YAAL_DBWRAPPER_PUBLIC_API __declspec( dllimport )
+#define M_YAAL_DBWRAPPER_PUBLIC_API M_ATTRIBUTE_SPEC( dllimport )
+#define M_YAAL_DBWRAPPER_EXTERN extern
 #endif /* #else #ifdef __YAAL_DBWRAPPER_BUILD__ */
 #ifdef __YAAL_HCONSOLE_BUILD__
-#define M_YAAL_HCONSOLE_PUBLIC_API __declspec( dllexport )
+#define M_YAAL_HCONSOLE_PUBLIC_API M_ATTRIBUTE_SPEC( dllexport )
+#define M_YAAL_HCONSOLE_EXTERN
 #else /* #ifdef __YAAL_HCONSOLE_BUILD__ */
-#define M_YAAL_HCONSOLE_PUBLIC_API __declspec( dllimport )
+#define M_YAAL_HCONSOLE_PUBLIC_API M_ATTRIBUTE_SPEC( dllimport )
+#define M_YAAL_HCONSOLE_EXTERN extern
 #endif /* #else #ifdef __YAAL_HCONSOLE_BUILD__ */
 #ifdef __YAAL_HDATA_BUILD__
-#define M_YAAL_HDATA_PUBLIC_API __declspec( dllexport )
+#define M_YAAL_HDATA_PUBLIC_API M_ATTRIBUTE_SPEC( dllexport )
+#define M_YAAL_HDATA_EXTERN
 #else /* #ifdef __YAAL_HDATA_BUILD__ */
-#define M_YAAL_HDATA_PUBLIC_API __declspec( dllexport )
+#define M_YAAL_HDATA_PUBLIC_API M_ATTRIBUTE_SPEC( dllexport )
+#define M_YAAL_HDATA_EXTERN extern
 #endif /* #else #ifdef __YAAL_HDATA_BUILD__ */
-#else /* #ifdef __MSVCXX__ */
+#else /* #if defined( __MSVCXX__ ) || defined( __HOST_OS_TYPE_CYGWIN__ ) */
 #define M_EXPORT_SYMBOL /**/
 #define M_YAAL_HCORE_PUBLIC_API /**/
+#define M_YAAL_HCORE_EXTERN /**/
 #define M_YAAL_TOOLS_PUBLIC_API /**/
+#define M_YAAL_TOOLS_EXTERN /**/
 #define M_YAAL_DBWRAPPER_PUBLIC_API /**/
+#define M_YAAL_DBWRAPPER_EXTERN /**/
 #define M_YAAL_HCONSOLE_PUBLIC_API /**/
+#define M_YAAL_HCONSOLE_EXTERN /**/
 #define M_YAAL_HDATA_PUBLIC_API /**/
+#define M_YAAL_HDATA_EXTERN /**/
 #undef __declspec
 #define __declspec( x ) /**/
 #endif /* #else #ifdef __MSVCXX__ */

@@ -249,6 +249,7 @@ AC_DEFUN_ONCE([YAAL_DETECT_COMMON_FLAGS], [
 	YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,-export_dynamic], [C++], [${FATAL_WARNINGS}])
 	YAAL_DETECT_FLAGS(LXXFLAGS_NO_UNDEFINED, [-Wl,--no-undefined], [C++])
 	YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,--enable-auto-import], [C++])
+	YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,--enable-runtime-pseudo-relocs], [C++])
 
 	YAAL_DETECT_FLAGS(START_GROUP, [-Wl,--start-group], [C++])
 	YAAL_DETECT_FLAGS(SONAME_FLAG, [-Wl,-soname,foo], [C++])
