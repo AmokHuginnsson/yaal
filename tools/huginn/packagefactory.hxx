@@ -53,9 +53,10 @@ public:
 	HHuginn::value_t new_instance( HRuntime* );
 };
 
-class HPackageFactory {
+class M_YAAL_TOOLS_PUBLIC_API HPackageFactory : public yaal::hcore::HSingleton<HPackageFactory> {
 public:
 	typedef HPackageFactory this_type;
+	typedef HSingleton<HPackageFactory> base_type;
 	struct OCreator {
 		OCreator( void )
 			: _instantiator( nullptr ) {
@@ -76,16 +77,12 @@ public:
 	void initialize_globals( void );
 	void cleanup_globals( void );
 private:
-	HPackageFactory( void )
-		: _creators() {
-	}
-	~HPackageFactory( void ) {}
+	HPackageFactory( void );
+	~HPackageFactory( void );
 	static int life_time( int );
 	friend class yaal::hcore::HSingleton<HPackageFactory>;
 	friend class yaal::hcore::HDestructor<HPackageFactory>;
 };
-
-typedef yaal::hcore::HSingleton<HPackageFactory> HPackageFactoryInstance;
 
 }
 

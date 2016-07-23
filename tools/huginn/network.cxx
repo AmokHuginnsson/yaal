@@ -140,7 +140,7 @@ namespace {
 bool registrar( void ) {
 	M_PROLOG
 	bool volatile failed = false;
-	HPackageFactory& factory = HPackageFactoryInstance::get_instance();
+	HPackageFactory& factory = HPackageFactory::get_instance();
 	factory.register_package_creator( "Network", &networkCreator );
 	return ( failed );
 	M_EPILOG

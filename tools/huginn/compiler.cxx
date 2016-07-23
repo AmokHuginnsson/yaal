@@ -516,7 +516,7 @@ void OCompiler::set_import_name( yaal::hcore::HString const& name_, executing_pa
 	if ( _submittedClasses.count( importIdentifer ) > 0 ) {
 		throw HHuginn::HHuginnRuntimeException( "Class `"_ys.append( name_ ).append( "' named is already defined." ), position_.get() );
 	}
-	if ( ! HPackageFactoryInstance::get_instance().is_type_valid( name_ ) ) {
+	if ( ! HPackageFactory::get_instance().is_type_valid( name_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "Package `"_ys.append( name_ ).append( "' does not exist." ), position_.get() );
 	}
 	_importIdentifier = importIdentifer;

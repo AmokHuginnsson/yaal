@@ -26,7 +26,6 @@ Copyright:
 
 #include <libintl.h>
 
-
 #include "packagefactory.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 
@@ -58,6 +57,15 @@ HHuginn::value_t HPackageCreatorInterface::new_instance( HRuntime* runtime_ ) {
 	M_PROLOG
 	return ( do_new_instance( runtime_ ) );
 	M_EPILOG
+}
+
+HPackageFactory::HPackageFactory( void )
+	: _creators() {
+	return;
+}
+
+HPackageFactory::~HPackageFactory( void ) {
+	return;
 }
 
 void HPackageFactory::register_package_creator( HString const& name_, HPackageCreatorInterface* instatiator_ ) {

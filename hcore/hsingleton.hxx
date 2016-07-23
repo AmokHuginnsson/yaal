@@ -94,7 +94,9 @@ public:
 };
 
 template<typename tType>
-HDestructor<tType>::HDestructor( tType*& object_ ) : HAbstractDestructor(), _object( object_ ) {
+HDestructor<tType>::HDestructor( tType*& object_ )
+	: HAbstractDestructor()
+	, _object( object_ ) {
 }
 
 template<typename tType>
@@ -107,8 +109,9 @@ HDestructor<tType>::~HDestructor( void ) {
 template<typename tType>
 void HDestructor<tType>::destruct( void ) {
 	M_PROLOG
-	if ( _object )
+	if ( _object ) {
 		M_SAFE( delete _object );
+	}
 	_object = nullptr;
 	M_EPILOG
 }

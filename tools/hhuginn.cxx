@@ -298,7 +298,7 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 void HHuginn::finalize_compilation( compiler_setup_t compilerSetup_ ) {
 	M_PROLOG
 	for ( OCompiler::submitted_imports_t::value_type i : _compiler->_submittedImports ) {
-		_runtime->register_package( i.second, HPackageFactoryInstance::get_instance().create_package( _runtime.raw(), _runtime->identifier_name( i.first ) ) );
+		_runtime->register_package( i.second, HPackageFactory::get_instance().create_package( _runtime.raw(), _runtime->identifier_name( i.first ) ) );
 	}
 	for ( OCompiler::submitted_classes_t::value_type const& sc : _compiler->_submittedClasses ) {
 		commit_class( sc.first );
