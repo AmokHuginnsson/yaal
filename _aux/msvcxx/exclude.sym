@@ -3,6 +3,7 @@
 ??_7?$HSingleton@VHConsole@hconsole@yaal@@@hcore@yaal@@6B@
 ??_7?$HSingleton@VHLog@hcore@yaal@@@hcore@yaal@@6B@
 ??_7?$HSingleton@VHMonitor@tools@yaal@@@hcore@yaal@@6B@
+??_7?$HSingleton@VHPackageFactory@huginn@tools@yaal@@@hcore@yaal@@6B@
 ??_7?$HSingleton@VHScheduledAsyncCaller@tools@yaal@@@hcore@yaal@@6B@
 ??_7?$HSingleton@VHSignalService@tools@yaal@@@hcore@yaal@@6B@
 ??_7?$HSingleton@VHThreadPool@tools@yaal@@@hcore@yaal@@6B@
@@ -16,6 +17,7 @@
 ??_7HLog@hcore@yaal@@6B?$HSingleton@VHLog@hcore@yaal@@@12@@
 ??_7HLog@hcore@yaal@@6BHSynchronizedStream@12@@
 ??_7HMonitor@tools@yaal@@6B@
+??_7HPackageFactory@huginn@tools@yaal@@6B@
 ??_7HScheduledAsyncCaller@tools@yaal@@6B@
 ??_7HSignalService@tools@yaal@@6B@
 ??_7HThreadPool@tools@yaal@@6B?$HSingleton@VHThreadPool@tools@yaal@@@hcore@2@@
@@ -136,6 +138,7 @@
 ?_instance@?$HSingleton@VHConsole@hconsole@yaal@@@hcore@yaal@@0PAVHConsole@hconsole@3@A
 ?_instance@?$HSingleton@VHLog@hcore@yaal@@@hcore@yaal@@0PAVHLog@23@A
 ?_instance@?$HSingleton@VHMonitor@tools@yaal@@@hcore@yaal@@0PAVHMonitor@tools@3@A
+?_instance@?$HSingleton@VHPackageFactory@huginn@tools@yaal@@@hcore@yaal@@0PAVHPackageFactory@huginn@tools@3@A
 ?_instance@?$HSingleton@VHScheduledAsyncCaller@tools@yaal@@@hcore@yaal@@0PAVHScheduledAsyncCaller@tools@3@A
 ?_instance@?$HSingleton@VHSignalService@tools@yaal@@@hcore@yaal@@0PAVHSignalService@tools@3@A
 ?_instance@?$HSingleton@VHThreadPool@tools@yaal@@@hcore@yaal@@0PAVHThreadPool@tools@3@A

@@ -15,7 +15,7 @@
 		<td>Debian Stable</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>Ubuntu 14.04 (Trusty Tahr)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>Ubuntu 16.10 (Yakkety Yak)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
 		<td>Centos 7 (Final)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
@@ -30,12 +30,12 @@
 		<td>Darwin 14.3.0 (compiled with clang)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>Windows 7 SP1 32bit with Cygwin 1.7.27</td><td class="good">100%</td><td class="fine">99%</td><td class="fail">Fail</td>
+		<td>Windows 7 SP1 32bit with Cygwin 2.5.2</td><td class="good">100%</td><td class="fine">100%</td><td class="good">Fail</td>
 	</tr>
-	<!--tr>
-		<td>Windows 7 SP1 32bit with Visual Studio 2012 (C++)<a class="note" href="#note_fork">3)</a></td>
+	<tr>
+		<td>Windows 7 SP1 32bit with Visual Studio 2015 (C++)<a class="note" href="#note_fork">3)</a></td>
 		<td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
-	</tr-->
+	</tr>
 </table>
 <ul>
 	<li>Platform - description of platform where tests were performed.</li>
