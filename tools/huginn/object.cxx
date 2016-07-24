@@ -146,12 +146,6 @@ HHuginn::value_t HHuginn::HObject::do_field( HHuginn::value_t const& object_, in
 	M_EPILOG
 }
 
-bool HHuginn::HObject::is_kind_of( HHuginn::identifier_id_t typeName_ ) const {
-	M_PROLOG
-	return ( get_class()->is_kind_of( typeName_ ) );
-	M_EPILOG
-}
-
 HHuginn::value_t HHuginn::HObject::call_method(
 	huginn::HThread* thread_,
 	HHuginn::value_t const& object_,

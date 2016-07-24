@@ -550,6 +550,12 @@ int HHuginn::HValue::field_index( identifier_id_t identifierId_ ) const {
 	M_EPILOG
 }
 
+bool HHuginn::HValue::is_kind_of( HHuginn::identifier_id_t typeName_ ) const {
+	M_PROLOG
+	return ( _class->is_kind_of( typeName_ ) );
+	M_EPILOG
+}
+
 HHuginn::value_t HHuginn::HValue::do_field( HHuginn::value_t const& object_, int index_ ) const {
 	M_PROLOG
 	value_t const& f( _class->field( index_ ) );

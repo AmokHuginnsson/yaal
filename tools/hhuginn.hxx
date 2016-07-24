@@ -403,6 +403,7 @@ public:
 	}
 	value_t clone( huginn::HRuntime* ) const;
 	int field_index( identifier_id_t ) const;
+	bool is_kind_of( HHuginn::identifier_id_t ) const;
 	value_t field( HHuginn::value_t const& subject_, int index_ ) const {
 		return ( do_field( subject_, index_ ) );
 	}
@@ -452,7 +453,6 @@ public:
 	HObject( HClass const* );
 	HObject( HClass const*, fields_t const& );
 	virtual ~HObject( void );
-	bool is_kind_of( HHuginn::identifier_id_t ) const;
 	value_t& field_ref( int );
 	HHuginn::value_t call_method( huginn::HThread*, HHuginn::value_t const&, yaal::hcore::HString const&, HHuginn::values_t const&, int ) const;
 private:

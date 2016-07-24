@@ -83,10 +83,9 @@ void HTryCatch::do_execute( huginn::HThread* thread_ ) const {
 	if ( thread_->has_exception() ) {
 		HFrame* f( thread_->current_frame() );
 		HHuginn::value_t v( f->result() );
-		HHuginn::HObject* e( dynamic_cast<HHuginn::HObject*>( v.raw() ) );
 		bool handled( false );
 		for ( HCatch const& c : _catches ) {
-			if ( ( e && e->is_kind_of( c.type() ) ) || ( ! e && ( v->get_class()->identifier_id() == c.type() ) ) ) {
+			if ( v->is_kind_of( c.type() ) ) {
 				c.execute( thread_, v );
 				handled = true;
 				break;
