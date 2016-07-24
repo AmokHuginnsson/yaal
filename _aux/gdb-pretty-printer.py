@@ -144,9 +144,9 @@ class YaalHCoreHStringPrinter:
 		inplace = not ( self._val['_mem'][AFL] & 128 )
 		s = ""
 		if inplace:
-			s = self._val['_mem']
+			s = self._val['_mem'].string()
 		else:
-			s = self._val['_ptr']
+			s = self._val['_ptr'].string()
 		return s
 
 	def display_hint( self ):
@@ -159,7 +159,7 @@ class YaalHCoreHTimePrinter:
 		self._val = val_
 
 	def to_string( self ):
-		return time.strftime( str( self._val['_format'] )[1:-1], time.localtime( int( self._val['_value'] ) ) )
+		return time.strftime( str( self._val['_format'] )[1:-1], time.localtime( int( self._val['_value'] - self._val['SECONDS_TO_UNIX_EPOCH'] ) ) )
 
 	def display_hint( self ):
 		return 'string'
