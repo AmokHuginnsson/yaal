@@ -40,6 +40,10 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/hfile.hxx"
 #include "util.hxx"
 #include "halarm.hxx"
+#ifdef __HOST_OS_TYPE_CYGWIN__
+/* Work around for buggy child process handling in Cygwin. */
+#	include "sleep.hxx"
+#endif /* #ifdef __HOST_OS_TYPE_CYGWIN__ */
 
 using namespace yaal::hcore;
 
@@ -116,6 +120,10 @@ HPipedChild::STATUS HPipedChild::finish( void ) {
 	if ( _pid > 0 ) {
 		int status( 0 );
 		int pid( 0 );
+#ifdef __HOST_OS_TYPE_CYGWIN__
+		/* Work around for buggy child process handling in Cygwin. */
+		sleep_for( duration( 16, time::UNIT::MILLISECOND ), true );
+#endif /* #ifdef __HOST_OS_TYPE_CYGWIN__ */
 		M_ENSURE( ( pid = ::waitpid( _pid, &status, WNOHANG | WUNTRACED | WCONTINUED ) ) != -1 );
 		if ( pid != _pid ) {
 			M_ENSURE( hcore::system::kill( _pid, SIGTERM ) == 0 ); {
