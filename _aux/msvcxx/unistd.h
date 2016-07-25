@@ -52,14 +52,11 @@ static int const _PC_NAME_MAX = 3;
 static int const _XOPEN_NAME_MAX = 2048;
 
 #define fork ms_fork
-#define getuid ms_getuid
-#define gethostname ms_gethostname
 #define geteuid getuid
 #undef gai_strerror
 #define gai_strerror msvcxx::windows_strerror
 
-int ms_gethostname( char*, int );
-M_YAAL_HCORE_PUBLIC_API uid_t ms_getuid( void );
+uid_t getuid( void );
 int setenv( char const*, char const*, int );
 int unsetenv( char const* );
 int long sysconf( int );

@@ -267,8 +267,13 @@ int IO::recvfrom( char* buf_, int size_, int flags_, struct sockaddr* from_, int
 }
 
 SystemIO::SystemIO( void )
-	: _ioTable(), _mutex(), _idPool( MANAGED_IO )
-	{}
+	: _ioTable()
+	, _mutex()
+	, _idPool( MANAGED_IO ) {
+	WSADATA wsaData;
+	WORD wVersionRequested( MAKEWORD( 2, 2 ) );
+	int err( WSAStartup( wVersionRequested, &wsaData ) );
+}
 
 SystemIO& SystemIO::get_instance( void ) {
 	static SystemIO instance;

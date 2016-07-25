@@ -42,14 +42,17 @@ CMutex _backtraceMutex_;
 __declspec( thread ) int SocketErrno::_errno = 0;
 int ESCDELAY = 0;
 static int const MAX_SYMBOL_NAME_LEN( 2048 );
+namespace {
+SystemIO const& _systemIOInit_( SystemIO::get_instance() );
+}
 
 namespace abi {
 
-	char* __cxa_demangle( char const* a, int, int, int* ) {
-		char* buf = memory::calloc<char>( MAX_SYMBOL_NAME_LEN );
-		::UnDecorateSymbolName( a, buf, MAX_SYMBOL_NAME_LEN - 1, 0 );
-		return ( buf );
-	}
+char* __cxa_demangle( char const* a, int, int, int* ) {
+	char* buf = memory::calloc<char>( MAX_SYMBOL_NAME_LEN );
+	::UnDecorateSymbolName( a, buf, MAX_SYMBOL_NAME_LEN - 1, 0 );
+	return ( buf );
+}
 
 }
 
@@ -262,8 +265,7 @@ PSID get_base_sid( char* buffer_, int size_ ) {
 	return ( tokenUser->User.Sid );
 }
 
-M_EXPORT_SYMBOL
-uid_t ms_getuid( void ) {
+uid_t getuid( void ) {
 	static int const SID_SIZE( 128 );
 	static int const TOKEN_USER_SIZE( sizeof ( TOKEN_USER ) + SID_SIZE );
 	char tokenUserBuffer[ TOKEN_USER_SIZE ];
@@ -319,19 +321,6 @@ int getgrgid_r( gid_t gid_, struct group* g_, char* buf_, int size_, struct grou
 		*result_ = g_;
 	}
 	return ( err );
-}
-
-int ms_gethostname( char* buf_, int len_ ) {
-	static bool once( false );
-	if ( ! once ) {
-		once = true;
-		WSADATA wsaData;
-		WORD wVersionRequested( MAKEWORD( 2, 2 ) );
-		int err( WSAStartup( wVersionRequested, &wsaData ) );
-		SystemIO::get_instance();
-	}
-#undef gethostname
-	return ( gethostname( buf_, len_ ) );
 }
 
 const DWORD MS_VC_EXCEPTION = 0x406D1388;

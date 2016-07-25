@@ -30,8 +30,12 @@ class SignalDispatcher {
 		bool _logoff;
 		bool _shutdown;
 		ConsoleEvents( void )
-			: _ctrlC( false ), _break( false ), _close( false ), _logoff( false ), _shutdown( false )
-			{}
+			: _ctrlC( false )
+			, _break( false )
+			, _close( false )
+			, _logoff( false )
+			, _shutdown( false ) {
+		}
 	} _acceptedConsoleEvents;
 public:
 	SignalDispatcher( void );
@@ -46,7 +50,8 @@ public:
 } _signalDispatcher_;
 
 SignalsSetup::SignalsSetup( void )
-	: _mask( _signalDispatcher_.get_mask() ), _interrupt( ::CreateEvent( nullptr, false, false, nullptr ) ) {
+	: _mask( _signalDispatcher_.get_mask() )
+	, _interrupt( ::CreateEvent( nullptr, false, false, nullptr ) ) {
 }
 
 SignalsSetup::~SignalsSetup( void ) {
