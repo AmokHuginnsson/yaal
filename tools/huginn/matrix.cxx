@@ -329,7 +329,6 @@ HHuginn::value_t HMatrix::scale( huginn::HThread*, HHuginn::value_t* object_, HH
 	M_PROLOG
 	char const name[] = "Matrix.scale";
 	verify_arg_count( name, values_, 1, 1, position_ );
-	HHuginn::value_t v;
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	if ( o->_data.type() == 0 ) {
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::NUMBER, true, position_ );
@@ -348,7 +347,6 @@ HHuginn::value_t HMatrix::scale_to( huginn::HThread*, HHuginn::value_t* object_,
 	M_PROLOG
 	char const name[] = "Matrix.scale_to";
 	verify_arg_count( name, values_, 1, 1, position_ );
-	HHuginn::value_t v;
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	if ( o->_data.type() == 0 ) {
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::NUMBER, true, position_ );
@@ -382,6 +380,22 @@ HHuginn::value_t HMatrix::scale_to( huginn::HThread*, HHuginn::value_t* object_,
 			throw HHuginn::HHuginnRuntimeException( "Zeroed matrix cannot be scaled.", position_ );
 		}
 		m *= get_real( values_[0] ) / extream;
+	}
+	return ( *object_ );
+	M_EPILOG
+}
+
+HHuginn::value_t HMatrix::invert( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "Matrix.invert";
+	verify_arg_count( name, values_, 0, 0, position_ );
+	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
+	if ( o->_data.type() == 0 ) {
+		arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
+		m = m._1();
+	} else {
+		floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
+		m = m._1();
 	}
 	return ( *object_ );
 	M_EPILOG
@@ -446,6 +460,7 @@ HHuginn::class_t HMatrix::get_class( HRuntime* runtime_ ) {
 				{ "det",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::det, _1, _2, _3, _4 ) ) },
 				{ "scale",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::scale, _1, _2, _3, _4 ) ) },
 				{ "scale_to",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::scale_to, _1, _2, _3, _4 ) ) },
+				{ "invert",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::invert, _1, _2, _3, _4 ) ) },
 				{ "to_string", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::to_string, _1, _2, _3, _4 ) ) }
 			}
 		)

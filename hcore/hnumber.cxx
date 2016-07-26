@@ -697,6 +697,10 @@ HNumber::integer_t HNumber::absolute_lower( HNumber const& other ) const {
 	M_EPILOG
 }
 
+bool HNumber::operator ! ( void ) const {
+	return ( _leafCount == 0 );
+}
+
 bool HNumber::operator == ( HNumber const& other ) const {
 	return ( ( _negative == other._negative )
 			&& ( _leafCount == other._leafCount )
