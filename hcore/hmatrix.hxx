@@ -229,7 +229,7 @@ public:
 
 	HMatrix& operator /= ( value_type const& scalar_ ) {
 		M_PROLOG
-		if ( ! scalar_ ) {
+		if ( scalar_ == 0 ) {
 			M_THROW( _errMsgHMatrix_[ERROR::DIVISION_BY_ZERO], 0 );
 		}
 		for ( typename data_t::iterator it( _data.begin() ), end( _data.end() ); it != end; ++ it ) {
@@ -458,8 +458,9 @@ HMatrix<value_type> HMatrix<value_type>::_1( void ) {
 	M_PROLOG
 	check_dimensions_square();
 	value_type scalar( 0 );
-	if ( ! ( scalar = det() ) )
+	if ( ( scalar = det() ) == 0 ) {
 		M_THROW( _errMsgHMatrix_[ ERROR::ODD ], 0 );
+	}
 	HMatrix matrix( *this );
 	for ( int ctrRow( 0 ); ctrRow < _rows; ctrRow ++ ) {
 		for ( int ctrColumn( 0 ); ctrColumn < _columns; ctrColumn ++ ) {
