@@ -874,8 +874,10 @@ void HExpression::do_execute( huginn::HThread* thread_ ) const {
 	if ( f->state() != HFrame::STATE::EXCEPTION ) {
 		f->set_result( yaal::move( f->values().top() ) );
 		M_ASSERT( f->ip() == static_cast<int>( _instructions.get_size() ) );
+		f->values().pop();
+	} else {
+		f->values().clear();
 	}
-	f->values().pop();
 	f->end_expression();
 	return;
 	M_EPILOG
