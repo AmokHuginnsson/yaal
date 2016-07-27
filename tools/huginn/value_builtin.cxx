@@ -356,7 +356,7 @@ void mod( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 	return;
 }
 
-void pow( HHuginn::value_t& v1_, HHuginn::value_t const& v2_, int position_ ) {
+void pow( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type_id() == v2_->type_id() );
 	HHuginn::value_t res;
 	HHuginn::type_id_t typeId( v1_->type_id() );
@@ -366,7 +366,12 @@ void pow( HHuginn::value_t& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		static_cast<HHuginn::HNumber*>( v1_.raw() )->value() ^= static_cast<HHuginn::HNumber const*>( v2_.raw() )->value().to_integer();
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "There is no `^' operator for `"_ys.append( v1_->get_class()->name() ).append( "'." ), position_ );
+		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v1_.raw() ) ) {
+			o->call_method( thread_, v1_, "power", { v2_ }, position_ );
+		} else {
+			v1_ = thread_->runtime().none_value();
+			throw HHuginn::HHuginnRuntimeException( "There is no `^' operator for `"_ys.append( v1_->get_class()->name() ).append( "'." ), position_ );
+		}
 	}
 	return;
 }

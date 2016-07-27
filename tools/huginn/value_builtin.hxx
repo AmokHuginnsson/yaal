@@ -47,7 +47,7 @@ void sub( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
 void mul( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
 void div( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
 void mod( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
-void pow( HHuginn::value_t&, HHuginn::value_t const&, int );
+void pow( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
 HHuginn::value_t abs( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t neg( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t factorial( HThread*, HHuginn::value_t const&, int );

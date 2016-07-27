@@ -316,7 +316,7 @@ void HExpression::set_variable( HFrame* frame_, int ) {
 				case ( OPERATOR::MULTIPLY_ASSIGN ): { value_builtin::mul( frame_->thread(), ref, src, p ); } break;
 				case ( OPERATOR::DIVIDE_ASSIGN ):   { value_builtin::div( frame_->thread(), ref, src, p ); } break;
 				case ( OPERATOR::MODULO_ASSIGN ):   { value_builtin::mod( frame_->thread(), ref, src, p ); } break;
-				case ( OPERATOR::POWER_ASSIGN ):    { value_builtin::pow( ref, src, p ); } break;
+				case ( OPERATOR::POWER_ASSIGN ):    { value_builtin::pow( frame_->thread(), ref, src, p ); } break;
 				default: {
 					M_ASSERT( ! "bad code path"[0] );
 				} break;
@@ -538,7 +538,7 @@ void HExpression::power( HFrame* frame_, int ) {
 		if ( ! v1.unique() ) {
 			v1 = v1->clone( &frame_->thread()->runtime() );
 		}
-		value_builtin::pow( v1, v2, p );
+		value_builtin::pow( frame_->thread(), v1, v2, p );
 	}
 	M_ASSERT( ( ip < static_cast<int>( _instructions.get_size() ) ) && (  _instructions[ip]._operator == OPERATOR::POWER_TERM ) );
 	++ ip;
