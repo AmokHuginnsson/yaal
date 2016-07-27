@@ -306,8 +306,9 @@ void div( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v1_.raw() ) ) {
 			o->call_method( thread_, v1_, "divide", { v2_ }, position_ );
 		} else {
+			HHuginn::HClass const* c( v1_->get_class() );
 			v1_ = thread_->runtime().none_value();
-			throw HHuginn::HHuginnRuntimeException( "There is no `/' operator for `"_ys.append( v1_->get_class()->name() ).append( "'." ), position_ );
+			throw HHuginn::HHuginnRuntimeException( "There is no `/' operator for `"_ys.append( c->name() ).append( "'." ), position_ );
 		}
 	}
 	HRuntime& rt( thread_->runtime() );
@@ -345,8 +346,9 @@ void mod( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v1_.raw() ) ) {
 			o->call_method( thread_, v1_, "modulo", { v2_ }, position_ );
 		} else {
+			HHuginn::HClass const* c( v1_->get_class() );
 			v1_ = thread_->runtime().none_value();
-			throw HHuginn::HHuginnRuntimeException( "There is no `%' operator for `"_ys.append( v1_->get_class()->name() ).append( "'." ), position_ );
+			throw HHuginn::HHuginnRuntimeException( "There is no `%' operator for `"_ys.append( c->name() ).append( "'." ), position_ );
 		}
 	}
 	HRuntime& rt( thread_->runtime() );
@@ -369,8 +371,9 @@ void pow( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v1_.raw() ) ) {
 			o->call_method( thread_, v1_, "power", { v2_ }, position_ );
 		} else {
+			HHuginn::HClass const* c( v1_->get_class() );
 			v1_ = thread_->runtime().none_value();
-			throw HHuginn::HHuginnRuntimeException( "There is no `^' operator for `"_ys.append( v1_->get_class()->name() ).append( "'." ), position_ );
+			throw HHuginn::HHuginnRuntimeException( "There is no `^' operator for `"_ys.append( c->name() ).append( "'." ), position_ );
 		}
 	}
 	return;
