@@ -468,8 +468,18 @@ int long hash( HHuginn::value_t const& v_ ) {
 	return ( rt );
 }
 
+namespace {
+bool fallback_compare( HHuginn::HObject const* object_, HThread* thread_, char const* methodName_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
+	HHuginn::value_t v( object_->call_method( thread_, v1_, methodName_, { v2_ }, position_ ) );
+	if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
+		throw HHuginn::HHuginnRuntimeException( "Comparision method `"_ys.append( methodName_ ).append( "' returned non-boolean result `" ).append( v->get_class()->name() ).append( "'." ), position_ );
+	}
+	HHuginn::HBoolean* b( static_cast<HHuginn::HBoolean*>( v.raw() ) );
+	return ( b->value() );
+}
+}
 
-bool equals( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
+bool equals( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	bool noneOperand( ( v1_->type_id() == HHuginn::TYPE::NONE ) || ( v2_->type_id() == HHuginn::TYPE::NONE ) );
 	M_ASSERT( noneOperand || ( v1_->type_id() == v2_->type_id() ) );
 	bool res( false );
@@ -488,7 +498,12 @@ bool equals( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int posit
 		} else if ( typeId == HHuginn::TYPE::BOOLEAN ) {
 			res = static_cast<HHuginn::HBoolean const*>( v1_.raw() )->value() == static_cast<HHuginn::HBoolean const*>( v2_.raw() )->value();
 		} else {
-			throw HHuginn::HHuginnRuntimeException( "There is no `==' operator for `"_ys.append( v1_->get_class()->name() ).append( "'." ), position_ );
+			HHuginn::HObject const* o( nullptr );
+			if ( thread_ && ( o = dynamic_cast<HHuginn::HObject const*>( v1_.raw() ) ) ) {
+				res = fallback_compare( o, thread_, "equals", v1_, v2_, position_ );
+			} else {
+				throw HHuginn::HHuginnRuntimeException( "There is no `==' operator for `"_ys.append( v1_->get_class()->name() ).append( "'." ), position_ );
+			}
 		}
 	} else {
 		res = v1_->type_id() == v2_->type_id();
@@ -497,14 +512,14 @@ bool equals( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int posit
 }
 
 bool key_equals( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) {
-	return ( ( v1_->type_id() == v2_->type_id() ) && equals( v1_, v2_, 0 ) );
+	return ( ( v1_->type_id() == v2_->type_id() ) && equals( nullptr, v1_, v2_, 0 ) );
 }
 
 bool less_low( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) {
-	return ( less( v1_, v2_, 0 ) );
+	return ( less( nullptr, v1_, v2_, 0 ) );
 }
 
-bool less( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
+bool less( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type_id() == v2_->type_id() );
 	bool res( false );
 	HHuginn::type_id_t typeId( v1_->type_id() );
@@ -519,12 +534,17 @@ bool less( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int positio
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
 		res = static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() ) < static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value() );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "There is no `<' operator for `"_ys.append( type_name( v1_->type_id() ) ).append( "'." ), position_ );
+		HHuginn::HObject const* o( nullptr );
+		if ( thread_ && ( o = dynamic_cast<HHuginn::HObject const*>( v1_.raw() ) ) ) {
+			res = fallback_compare( o, thread_, "less", v1_, v2_, position_ );
+		} else {
+			throw HHuginn::HHuginnRuntimeException( "There is no `<' operator for `"_ys.append( type_name( v1_->type_id() ) ).append( "'." ), position_ );
+		}
 	}
 	return ( res );
 }
 
-bool greater( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
+bool greater( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type_id() == v2_->type_id() );
 	bool res( false );
 	HHuginn::type_id_t typeId( v1_->type_id() );
@@ -539,12 +559,16 @@ bool greater( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int posi
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
 		res = static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() ) > static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value() );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "There is no `>' operator for `"_ys.append( type_name( v1_->type_id() ) ).append( "'." ), position_ );
+		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v1_.raw() ) ) {
+			res = fallback_compare( o, thread_, "greater", v1_, v2_, position_ );
+		} else {
+			throw HHuginn::HHuginnRuntimeException( "There is no `>' operator for `"_ys.append( type_name( v1_->type_id() ) ).append( "'." ), position_ );
+		}
 	}
 	return ( res );
 }
 
-bool less_or_equal( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
+bool less_or_equal( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type_id() == v2_->type_id() );
 	bool res( false );
 	HHuginn::type_id_t typeId( v1_->type_id() );
@@ -559,12 +583,16 @@ bool less_or_equal( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, in
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
 		res = static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() ) <= static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value() );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "There is no `<=' operator for `"_ys.append( type_name( v1_->type_id() ) ).append( "'." ), position_ );
+		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v1_.raw() ) ) {
+			res = fallback_compare( o, thread_, "less_or_equal", v1_, v2_, position_ );
+		} else {
+			throw HHuginn::HHuginnRuntimeException( "There is no `<=' operator for `"_ys.append( type_name( v1_->type_id() ) ).append( "'." ), position_ );
+		}
 	}
 	return ( res );
 }
 
-bool greater_or_equal( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
+bool greater_or_equal( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type_id() == v2_->type_id() );
 	bool res( false );
 	HHuginn::type_id_t typeId( v1_->type_id() );
@@ -579,7 +607,11 @@ bool greater_or_equal( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_,
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
 		res = static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() ) >= static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value() );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "There is no `>=' operator for `"_ys.append( type_name( v1_->type_id() ) ).append( "'." ), position_ );
+		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v1_.raw() ) ) {
+			res = fallback_compare( o, thread_, "greater_or_equal", v1_, v2_, position_ );
+		} else {
+			throw HHuginn::HHuginnRuntimeException( "There is no `>=' operator for `"_ys.append( type_name( v1_->type_id() ) ).append( "'." ), position_ );
+		}
 	}
 	return ( res );
 }

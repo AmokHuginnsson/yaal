@@ -631,7 +631,7 @@ void HExpression::equals( HFrame* frame_, int ) {
 	if ( ( t1 != t2 ) && ( t1 != HHuginn::TYPE::NONE ) && ( t2 != HHuginn::TYPE::NONE ) ) {
 		operands_type_mismatch( op_to_str( OPERATOR::EQUALS ), t1, t2, p );
 	}
-	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::equals( v1, v2, p ) ) );
+	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::equals( frame_->thread(), v1, v2, p ) ) );
 	return;
 	M_EPILOG
 }
@@ -651,7 +651,7 @@ void HExpression::not_equals( HFrame* frame_, int ) {
 	if ( ( t1 != t2 ) && ( t1 != HHuginn::TYPE::NONE ) && ( t2 != HHuginn::TYPE::NONE ) ) {
 		operands_type_mismatch( op_to_str( OPERATOR::NOT_EQUALS ), t1, t2, p );
 	}
-	frame_->values().push( frame_->thread()->object_factory().create_boolean( ! value_builtin::equals( v1, v2, p ) ) );
+	frame_->values().push( frame_->thread()->object_factory().create_boolean( ! value_builtin::equals( frame_->thread(), v1, v2, p ) ) );
 	return;
 	M_EPILOG
 }
@@ -669,7 +669,7 @@ void HExpression::less( HFrame* frame_, int ) {
 	if ( v1->type_id() != v2->type_id() ) {
 		operands_type_mismatch( op_to_str( OPERATOR::LESS ), v1->type_id(), v2->type_id(), p );
 	}
-	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::less( v1, v2, p ) ) );
+	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::less( frame_->thread(), v1, v2, p ) ) );
 	return;
 	M_EPILOG
 }
@@ -687,7 +687,7 @@ void HExpression::greater( HFrame* frame_, int ) {
 	if ( v1->type_id() != v2->type_id() ) {
 		operands_type_mismatch( op_to_str( OPERATOR::GREATER ), v1->type_id(), v2->type_id(), p );
 	}
-	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::greater( v1, v2, p ) ) );
+	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::greater( frame_->thread(), v1, v2, p ) ) );
 	return;
 	M_EPILOG
 }
@@ -705,7 +705,7 @@ void HExpression::less_or_equal( HFrame* frame_, int ) {
 	if ( v1->type_id() != v2->type_id() ) {
 		operands_type_mismatch( op_to_str( OPERATOR::LESS_OR_EQUAL ), v1->type_id(), v2->type_id(), p );
 	}
-	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::less_or_equal( v1, v2, p ) ) );
+	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::less_or_equal( frame_->thread(), v1, v2, p ) ) );
 	return;
 	M_EPILOG
 }
@@ -723,7 +723,7 @@ void HExpression::greater_or_equal( HFrame* frame_, int ) {
 	if ( v1->type_id() != v2->type_id() ) {
 		operands_type_mismatch( op_to_str( OPERATOR::GREATER_OR_EQUAL ), v1->type_id(), v2->type_id(), p );
 	}
-	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::greater_or_equal( v1, v2, p ) ) );
+	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::greater_or_equal( frame_->thread(), v1, v2, p ) ) );
 	return;
 	M_EPILOG
 }

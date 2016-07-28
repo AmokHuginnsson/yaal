@@ -183,6 +183,7 @@ public:
 					r[0] = r_;
 					return (
 						value_builtin::less(
+							thread_,
 							k( thread_, nullptr, l, position_ ),
 							k( thread_, nullptr, r, position_ ),
 							position_
