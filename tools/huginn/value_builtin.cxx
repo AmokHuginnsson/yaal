@@ -634,6 +634,16 @@ HHuginn::value_t fallback_conversion( HHuginn::type_id_t type_, HThread* thread_
 	HHuginn::value_t res;
 	if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v_.raw() ) ) {
 		res = o->call_method( thread_, v_, "to_"_ys.append( type_name( type_ ) ), HHuginn::values_t(), position_ );
+		if ( res->type_id() != type_ ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"User conversion method returned invalid type `"_ys
+				.append( res->get_class()->name() )
+				.append( "' instead of `" )
+				.append( type_name( type_ ) )
+				.append( "'." ),
+				position_
+			);
+		}
 	} else {
 		throw HHuginn::HHuginnRuntimeException(
 			"Conversion from `"_ys
