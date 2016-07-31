@@ -74,14 +74,18 @@ HSerial::flag_t const HSerial::FLAG::CR2NL = HSerial::flag_t::new_flag();
 HSerial::flag_t HSerial::FLAG_TEXT = HSerial::FLAG::DEFAULT | HSerial::FLAG::CANONICAL | HSerial::FLAG::CR2NL;
 
 HSerial::HSerial( HString const& devicePath_ )
-				: HRawFile(), _speed( SPEED::DEFAULT ),
-	_flags( FLAG::DEFAULT ), _devicePath(),
-	_tIO( chunk_size<termios>( 1 ) ), _backUpTIO( chunk_size<termios>( 1 ) ) {
+	: HRawFile()
+	, _speed( SPEED::DEFAULT )
+	, _flags( FLAG::DEFAULT )
+	, _devicePath()
+	, _tIO( chunk_size<termios>( 1 ) )
+	, _backUpTIO( chunk_size<termios>( 1 ) ) {
 	M_PROLOG
-	if ( !! devicePath_ )
+	if ( !! devicePath_ ) {
 		_devicePath = devicePath_;
-	else
+	} else {
 		_devicePath = tools::_serialDevice_;
+	}
 	compile();
 	return;
 	M_EPILOG
@@ -89,8 +93,9 @@ HSerial::HSerial( HString const& devicePath_ )
 
 HSerial::~HSerial( void ) {
 	M_PROLOG
-	if ( _fileDescriptor >= 0 )
+	if ( _fileDescriptor >= 0 ) {
 		close();
+	}
 	M_ASSERT ( _fileDescriptor < 0 );
 	return;
 	M_DESTRUCTOR_EPILOG
@@ -98,14 +103,16 @@ HSerial::~HSerial( void ) {
 
 void HSerial::open( void ) {
 	M_PROLOG
-	if ( _fileDescriptor >= 0 )
+	if ( _fileDescriptor >= 0 ) {
 		M_THROW( _eAlreadyOpened_, errno );
+	}
 	compile();
 	/* O_NONBLOCK allow open device even if nothing seats on other side */
 	_fileDescriptor = ::open( _devicePath.raw(), O_RDWR | O_NOCTTY | O_NONBLOCK );
-	M_ENSURE( _fileDescriptor >= 0 );
-	if ( ! ::isatty( _fileDescriptor ) )
-		M_THROW( _( "not a tty device" ), _fileDescriptor );
+	M_ENSURE_EX( _fileDescriptor >= 0, _devicePath );
+	if ( ! ::isatty( _fileDescriptor ) ) {
+		M_THROW( HString( _devicePath ).append( _( " is not a tty device" ) ), _fileDescriptor );
+	}
 	M_ENSURE( ::tcgetattr( _fileDescriptor, _backUpTIO.get<termios>() ) == 0 );
 	M_ENSURE( ::fcntl( _fileDescriptor, F_SETFD, 0 ) == 0 );
 	M_ENSURE( ::fcntl( _fileDescriptor, F_SETFL, 0 ) == 0 );
@@ -117,9 +124,9 @@ void HSerial::open( void ) {
 
 int HSerial::do_close( void ) {
 	M_PROLOG
-	if ( _fileDescriptor >= 0 )
-		::tcsetattr( _fileDescriptor, TCSANOW,
-				_backUpTIO.get<termios const>() );
+	if ( _fileDescriptor >= 0 ) {
+		::tcsetattr( _fileDescriptor, TCSANOW, _backUpTIO.get<termios const>() );
+	}
 	return ( HRawFile::do_close() );
 	M_EPILOG
 }
@@ -168,33 +175,35 @@ void HSerial::set_speed( SPEED speed_ ) {
 
 void HSerial::compile_speed( void ) {
 	M_PROLOG
-	if ( _fileDescriptor >= 0 )
+	if ( _fileDescriptor >= 0 ) {
 		M_THROW( _eAlreadyOpened_, errno );
+	}
 	termios& tIO = *_tIO.get<termios>();
 	int baudRate = 0;
-	if ( _speed == SPEED::DEFAULT )
+	if ( _speed == SPEED::DEFAULT ) {
 		_speed = tools::_baudRate_;
+	}
 	switch ( _speed ) {
 		case ( SPEED::B_230400 ): baudRate = B230400; break;
 		case ( SPEED::B_115200 ): baudRate = B115200; break;
 #if defined( HAVE_DECL_B76800 ) && ( HAVE_DECL_B76800 == 1 )
-		case ( SPEED::B_76800 ): baudRate = B76800; break;
+		case ( SPEED::B_76800 ):  baudRate = B76800;  break;
 #endif /* HAVE_DECL_B76800 */
-		case ( SPEED::B_57600 ): baudRate = B57600; break;
-		case ( SPEED::B_38400 ): baudRate = B38400; break;
+		case ( SPEED::B_57600 ):  baudRate = B57600;  break;
+		case ( SPEED::B_38400 ):  baudRate = B38400;  break;
 #if defined( HAVE_DECL_B28800 ) && ( HAVE_DECL_B28800 == 1 )
-		case ( SPEED::B_28800 ): baudRate = B28800; break;
+		case ( SPEED::B_28800 ):  baudRate = B28800;  break;
 #endif /* HAVE_DECL_B28800 */
-		case ( SPEED::B_19200 ): baudRate = B19200; break;
+		case ( SPEED::B_19200 ):  baudRate = B19200;  break;
 #if defined( HAVE_DECL_B14400 ) && ( HAVE_DECL_B14400 == 1 )
-		case ( SPEED::B_14400 ): baudRate = B14400; break;
+		case ( SPEED::B_14400 ):  baudRate = B14400;  break;
 #endif /* HAVE_DECL_B14400 */
-		case ( SPEED::B_9600 ): baudRate = B9600; break;
+		case ( SPEED::B_9600 ):   baudRate = B9600;   break;
 #if defined( HAVE_DECL_B7200 ) && ( HAVE_DECL_B7200 == 1 )
-		case ( SPEED::B_7200 ): baudRate = B7200; break;
+		case ( SPEED::B_7200 ):   baudRate = B7200;   break;
 #endif /* HAVE_DECL_B7200 */
-		case ( SPEED::B_4800 ): baudRate = B4800; break;
-		case ( SPEED::B_2400 ): baudRate = B2400; break;
+		case ( SPEED::B_4800 ):   baudRate = B4800;   break;
+		case ( SPEED::B_2400 ):   baudRate = B2400;   break;
 		case ( SPEED::DEFAULT ): break;
 		default : {
 			M_THROW( _( "unknown speed" ), _speed );
@@ -360,23 +369,26 @@ void HSerial::flush( int type_ ) {
 
 void HSerial::wait_for_eot( void ) {
 	M_PROLOG
-	if ( _fileDescriptor < 0 )
+	if ( _fileDescriptor < 0 ) {
 		M_THROW( _eNotOpened_, errno );
-	if ( tcdrain( _fileDescriptor ) )
+	}
+	if ( tcdrain( _fileDescriptor ) ) {
 		M_THROW( "tcdrain", errno );
+	}
 	return;
 	M_EPILOG
 }
 
-int HSerial::timed_read( void* buffer_, int const size_,
-		int timeOut_ ) {
+int HSerial::timed_read( void* buffer_, int const size_, int timeOut_ ) {
 	M_PROLOG
-	if ( _fileDescriptor < 0 )
+	if ( _fileDescriptor < 0 ) {
 		M_THROW( _eNotOpened_, errno );
+	}
 	int long timeOut( timeOut_ );
 	int nRead( -1 );
-	if ( ! wait_for( ACTION::READ, &timeOut ) )
+	if ( ! wait_for( ACTION::READ, &timeOut ) ) {
 		nRead = static_cast<int>( HRawFile::read( buffer_, size_ ) );
+	}
 	return ( nRead );
 	M_EPILOG
 }
