@@ -48,6 +48,7 @@ public:
 	typedef i64_t timer_handle_t;
 private:
 	timer_handle_t _timer;
+	yaal::hcore::HChunk _action;
 	yaal::hcore::HLock _lock;
 	M_YAAL_TOOLS_PUBLIC_API static yaal::hcore::HMutex _mutex;
 public:
@@ -63,7 +64,7 @@ public:
 private:
 	HAlarm( HAlarm const& );
 	HAlarm& operator = ( HAlarm const& );
-	void cleanup_sigmask( void );
+	void cleanup_sigsetup( int );
 };
 
 typedef yaal::hcore::HExceptionT<HAlarm> HAlarmException;

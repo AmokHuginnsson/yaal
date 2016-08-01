@@ -53,12 +53,17 @@ int sigaddset_fwd( sigset_t* set, int signo ) {
 	return ( sigaddset( set, signo ) );
 }
 #pragma GCC diagnostic error "-Wsign-conversion"
+
+static void dummy_signal_handler( int )
+	{ }
 }
 
 yaal::hcore::HMutex HAlarm::_mutex;
 
 HAlarm::HAlarm( int long milliseconds_ )
-	: _timer( -1 ), _lock( _mutex ) {
+	: _timer( -1 )
+	, _action( chunk_size<struct sigaction>( 1 ) )
+	, _lock( _mutex ) {
 	M_PROLOG
 	sigevent event;
 	::memset( &event, 0, sizeof ( event ) );
@@ -74,6 +79,11 @@ HAlarm::HAlarm( int long milliseconds_ )
 		M_ENSURE( sigemptyset( &mask ) == 0 );
 		M_ENSURE( sigaddset_fwd( &mask, SIGALRM ) == 0 );
 		M_ENSURE( pthread_sigmask( SIG_UNBLOCK, &mask, nullptr ) == 0 );
+		struct sigaction act;
+		::memset( &act, 0, sizeof ( act ) );
+		act.sa_handler = dummy_signal_handler;
+		++ step;
+		M_ENSURE( sigaction( SIGALRM, &act, _action.get<struct sigaction>() ) == 0 );
 		++ step;
 
 		itimerspec timeout;
@@ -84,7 +94,7 @@ HAlarm::HAlarm( int long milliseconds_ )
 		++ step;
 	} catch ( ... ) {
 		if ( step > 0 ) {
-			cleanup_sigmask();
+			cleanup_sigsetup( step );
 		}
 		M_ENSURE( timer_delete( *t ) == 0 );
 		throw;
@@ -101,15 +111,18 @@ HAlarm::~HAlarm( void ) {
 	timer_t* t( reinterpret_cast<timer_t*>( &_timer ) );
 	M_ENSURE( timer_settime( *t, 0, &timeout, nullptr ) == 0 );
 
-	cleanup_sigmask();
+	cleanup_sigsetup( 2 );
 
 	M_ENSURE( timer_delete( *t ) == 0 );
 	return;
 	M_DESTRUCTOR_EPILOG
 }
 
-void HAlarm::cleanup_sigmask( void ) {
+void HAlarm::cleanup_sigsetup( int step_ ) {
 	M_PROLOG
+	if ( step_ > 1 ) {
+		sigaction( SIGALRM, _action.get<struct sigaction>(), nullptr );
+	}
 	sigset_t mask;
 	M_ENSURE( sigemptyset( &mask ) == 0 );
 	M_ENSURE( sigaddset_fwd( &mask, SIGALRM ) == 0 );
