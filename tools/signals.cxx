@@ -219,18 +219,20 @@ void HSignalService::register_handler( int sigNo_, handler_t handler_, void cons
 	M_PROLOG
 	HLock lock( _mutex );
 	_handlers.push_front( make_pair( sigNo_, make_pair( handler_, owner_ ) ) );
-	int SYNCHRONOUS_SIGNALS[] = { SIGSEGV, SIGBUS, SIGFPE, SIGILL };
-	if ( find( SYNCHRONOUS_SIGNALS, SYNCHRONOUS_SIGNALS + countof ( SYNCHRONOUS_SIGNALS ), sigNo_ ) == ( SYNCHRONOUS_SIGNALS + countof ( SYNCHRONOUS_SIGNALS ) ) ) {
-		catch_signal( sigNo_ );
-		M_ENSURE( hcore::system::kill( hcore::system::getpid(), SIGURG ) == 0 );
-	} else {
-		struct sigaction act;
-		::memset( &act, 0, sizeof ( act ) );
-		act.sa_flags = SA_RESTART;
-		act.sa_handler = &HBaseSignalHandlers::signal_fatal_sync;
-		M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
-		M_ENSURE( sigaddset_fwd( &act.sa_mask, sigNo_ ) == 0 );
-		M_ENSURE( sigaction( sigNo_, &act, nullptr ) == 0 );
+	if ( _handlers.count( sigNo_ ) == 1 ) {
+		int SYNCHRONOUS_SIGNALS[] = { SIGSEGV, SIGBUS, SIGFPE, SIGILL };
+		if ( find( SYNCHRONOUS_SIGNALS, SYNCHRONOUS_SIGNALS + countof ( SYNCHRONOUS_SIGNALS ), sigNo_ ) == ( SYNCHRONOUS_SIGNALS + countof ( SYNCHRONOUS_SIGNALS ) ) ) {
+			catch_signal( sigNo_ );
+			M_ENSURE( hcore::system::kill( hcore::system::getpid(), SIGURG ) == 0 );
+		} else {
+			struct sigaction act;
+			::memset( &act, 0, sizeof ( act ) );
+			act.sa_flags = SA_RESTART;
+			act.sa_handler = &HBaseSignalHandlers::signal_fatal_sync;
+			M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
+			M_ENSURE( sigaddset_fwd( &act.sa_mask, sigNo_ ) == 0 );
+			M_ENSURE( sigaction( sigNo_, &act, nullptr ) == 0 );
+		}
 	}
 	return;
 	M_EPILOG
@@ -246,9 +248,8 @@ void HSignalService::flush_handlers( void const* owner_ ) {
 			int sigNo( del->first );
 			if ( _handlers.count( sigNo ) == 1 ) {
 				reset_signal( sigNo );
-			} else {
-				_handlers.erase( del );
 			}
+			_handlers.erase( del );
 		}
 	}
 	return;
