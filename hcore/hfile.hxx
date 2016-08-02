@@ -108,7 +108,7 @@ public:
 	void* release( void );
 	int long read_line( HString&, READ = READ::DEFAULTS, int const = 0 );
 	int long tell( void ) const;
-	void seek( int long, SEEK const& = SEEK::SET );
+	void seek( int long, SEEK = SEEK::SET );
 	HString const& get_path( void ) const;
 	HString const& get_error( void ) const;
 	bool is_opened( void ) const;

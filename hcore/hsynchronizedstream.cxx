@@ -524,6 +524,28 @@ bool HSynchronizedStream::do_good( void ) const {
 	M_EPILOG
 }
 
+bool HSynchronizedStream::do_fail( void ) const {
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_fail() );
+	M_EPILOG
+}
+
+bool HSynchronizedStream::do_bad( void ) const {
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_bad() );
+	M_EPILOG
+}
+
+void HSynchronizedStream::do_clear( void ) {
+	M_PROLOG
+	HLock l( _mutex );
+	HStreamInterface::do_clear();
+	return;
+	M_EPILOG
+}
+
 }
 
 }

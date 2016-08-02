@@ -295,6 +295,12 @@ public:
 	bool bad( void ) const {
 		return ( do_bad() );
 	}
+	/*! \brief Clear state bits.
+	 */
+	void clear( void ) {
+		do_clear();
+		return;
+	}
 	void flush( void );
 	int peek( void ) {
 		return ( do_peek() );
@@ -408,6 +414,7 @@ protected:
 	virtual bool do_good( void ) const;
 	virtual bool do_fail( void ) const;
 	virtual bool do_bad( void ) const;
+	virtual void do_clear( void );
 private:
 	int long read_while_retry( yaal::hcore::HString&, char const* );
 	int long read_until_retry( yaal::hcore::HString&, char const*, bool );

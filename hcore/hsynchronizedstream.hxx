@@ -123,6 +123,9 @@ protected:
 	virtual FLOAT_FORMAT do_get_float_format( void ) const override;
 	virtual ADJUST do_get_adjust( void ) const override;
 	virtual bool do_good( void ) const override;
+	virtual bool do_fail( void ) const override;
+	virtual bool do_bad( void ) const override;
+	virtual void do_clear( void ) override;
 	virtual int long do_write( void const*, int long ) override;
 	virtual int long do_read( void*, int long ) override;
 	virtual void do_flush( void ) override;

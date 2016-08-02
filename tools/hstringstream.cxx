@@ -78,6 +78,7 @@ int long HStringStream::do_write( void const* buffer_, int long size_ ) {
 	M_PROLOG
 	if ( _used ) {
 		_buffer.clear();
+		_offset = 0;
 		_used = false;
 	}
 	_buffer.append( static_cast<char const*>( buffer_ ), size_ );
@@ -113,9 +114,12 @@ void HStringStream::use( void ) const {
 	return;
 }
 
-void HStringStream::clear( void ) {
+void HStringStream::reset( void ) {
 	M_PROLOG
 	_buffer.clear();
+	_offset = 0;
+	_used = false;
+	clear();
 	return;
 	M_EPILOG
 }

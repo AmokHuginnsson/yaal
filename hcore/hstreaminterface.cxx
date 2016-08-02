@@ -826,6 +826,12 @@ bool HStreamInterface::do_bad( void ) const {
 	return ( ! is_valid() );
 }
 
+void HStreamInterface::do_clear( void ) {
+	_fail = false;
+	_valid = true;
+	return;
+}
+
 void HStreamInterface::flush( void ) {
 	M_PROLOG
 	do_flush();

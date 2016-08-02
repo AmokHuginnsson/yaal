@@ -53,7 +53,7 @@ public:
 	yaal::hcore::HString const& str( void ) const;
 	void str( yaal::hcore::HString const& );
 	void use( void ) const;
-	void clear( void );
+	void reset( void );
 	yaal::hcore::HString const& consume( void ) const;
 	bool is_empty( void ) const;
 private:
