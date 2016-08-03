@@ -76,7 +76,7 @@ public:
 	}
 protected:
 	virtual int long do_size( void ) const override {
-		return ( ( _stop - _from ) / _step );
+		return ( ( _stop + _step - ( _from + 1 ) ) / _step );
 	}
 private:
 	virtual HIterator do_iterator( void ) override;
