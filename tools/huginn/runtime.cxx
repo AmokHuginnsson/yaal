@@ -303,22 +303,9 @@ HHuginn::value_t size( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 	HHuginn::value_t const& val( values_.front() );
 	HHuginn::HValue const* v( val.raw() );
 	int long long s( 0 );
-	HHuginn::type_id_t typeId( v->type_id() );
-	HHuginn::value_t res;
-	if ( typeId == HHuginn::TYPE::STRING ) {
-		s = static_cast<HHuginn::HString const*>( v )->value().get_length();
-	} else if ( typeId == HHuginn::TYPE::LIST ) {
-		s = static_cast<HHuginn::HList const*>( v )->size();
-	} else if ( typeId == HHuginn::TYPE::DEQUE ) {
-		s = static_cast<HHuginn::HDeque const*>( v )->size();
-	} else if ( typeId == HHuginn::TYPE::DICT ) {
-		s = static_cast<HHuginn::HDict const*>( v )->size();
-	} else if ( typeId == HHuginn::TYPE::LOOKUP ) {
-		s = static_cast<HHuginn::HLookup const*>( v )->size();
-	} else if ( typeId == HHuginn::TYPE::ORDER ) {
-		s = static_cast<HHuginn::HOrder const*>( v )->size();
-	} else if ( typeId == HHuginn::TYPE::SET ) {
-		s = static_cast<HHuginn::HSet const*>( v )->size();
+	HHuginn::HIterable const* iterable( dynamic_cast<HHuginn::HIterable const*>( v ) );
+	if ( iterable ) {
+		s = iterable->size();
 	} else {
 		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v ) ) {
 			s = get_integer( value_builtin::integer( thread_, o->call_method( thread_, val, "get_size", HHuginn::values_t(), position_ ), position_ ) );
