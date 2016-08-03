@@ -193,6 +193,48 @@ public:
 	static HHuginn::value_t map( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		return ( static_cast<HAlgorithms*>( object_->raw() )->do_map( values_, position_ ) );
 	}
+	static HHuginn::value_t materialize( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+		char const name[] = "Algorithms.materialize";
+		verify_arg_count( name, values_, 2, 2, position_ );
+		verify_arg_collection( name, values_, 0, false, position_ );
+		verify_arg_type( name, values_, 1, HHuginn::TYPE::FUNCTION_REFERENCE, false, position_ );
+		HHuginn::HFunctionReference const& fr( *static_cast<HHuginn::HFunctionReference const*>( values_[1].raw() ) );
+		HHuginn::value_t v;
+		HHuginn::HIterable const* src( static_cast<HHuginn::HIterable const*>( values_[0].raw() ) );
+		HHuginn::HIterable::HIterator it( const_cast<HHuginn::HIterable*>( src )->iterator() );
+		if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::list ) ) {
+			v = thread_->object_factory().create_list();
+			HHuginn::HList::values_t& dest( static_cast<HHuginn::HList*>( v.raw() )->value() );
+			while ( it.is_valid() ) {
+				dest.push_back( it.value( thread_, position_ ) );
+				it.next();
+			}
+		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::deque ) ) {
+			v = thread_->object_factory().create_deque();
+			HHuginn::HDeque::values_t& dest( static_cast<HHuginn::HDeque*>( v.raw() )->value() );
+			while ( it.is_valid() ) {
+				dest.push_back( it.value( thread_, position_ ) );
+				it.next();
+			}
+		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::order ) ) {
+			v = thread_->object_factory().create_order();
+			HHuginn::HOrder::values_t& dest( static_cast<HHuginn::HOrder*>( v.raw() )->value() );
+			while ( it.is_valid() ) {
+				dest.insert( it.value( thread_, position_ ) );
+				it.next();
+			}
+		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::set ) ) {
+			v = thread_->object_factory().create_set();
+			HHuginn::HSet::values_t& dest( static_cast<HHuginn::HSet*>( v.raw() )->value() );
+			while ( it.is_valid() ) {
+				dest.insert( it.value( thread_, position_ ) );
+				it.next();
+			}
+		} else {
+			throw HHuginn::HHuginnRuntimeException( "Invalid materialized type: `"_ys.append( thread_->runtime().function_name( fr.function().id() ) ).append( "'." ), position_ );
+		}
+		return ( v );
+	}
 	static HHuginn::value_t range( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		return ( static_cast<HAlgorithms*>( object_->raw() )->do_range( values_, position_ ) );
 	}
@@ -208,8 +250,8 @@ public:
 		HHuginn::value_t v( thread_->object_factory().create_list() );
 		HHuginn::HList::values_t& dest( static_cast<HHuginn::HList*>( v.raw() )->value() );
 		if ( t == HHuginn::TYPE::LIST ) {
-			HHuginn::HList::values_t const& s( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
-			dest = s;
+			HHuginn::HList::values_t const& l( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
+			dest = l;
 		} else if ( t == HHuginn::TYPE::DEQUE ) {
 			HHuginn::HDeque::values_t const& d( static_cast<HHuginn::HDeque const*>( values_[0].raw() )->value() );
 			dest.assign( d.begin(), d.end() );
@@ -318,9 +360,10 @@ HHuginn::value_t HAlgorithmsCreator::do_new_instance( HRuntime* runtime_ ) {
 			"Algorithms",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "map",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::map, _1, _2, _3, _4 ) ) },
-				{ "range",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::range, _1, _2, _3, _4 ) ) },
-				{ "sorted", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::sorted, _1, _2, _3, _4 ) ) }
+				{ "map",         make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::map, _1, _2, _3, _4 ) ) },
+				{ "materialize", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::materialize, _1, _2, _3, _4 ) ) },
+				{ "range",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::range, _1, _2, _3, _4 ) ) },
+				{ "sorted",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::sorted, _1, _2, _3, _4 ) ) }
 			}
 		)
 	);
