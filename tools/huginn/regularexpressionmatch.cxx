@@ -58,7 +58,7 @@ public:
 		return;
 	}
 protected:
-	virtual HHuginn::value_t do_value( void ) override {
+	virtual HHuginn::value_t do_value( HThread*, int ) override {
 		return ( _objectFactory->create_string( _regularExpressionMatch->get_string().substr( _it->start(), _it->size() ) ) );
 	}
 	virtual bool do_is_valid( void ) override {

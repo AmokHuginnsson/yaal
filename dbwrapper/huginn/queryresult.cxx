@@ -75,7 +75,7 @@ public:
 		return;
 	}
 protected:
-	virtual HHuginn::value_t do_value( void ) override {
+	virtual HHuginn::value_t do_value( tools::huginn::HThread*, int ) override {
 		return ( fetch_row( _recordSet, _it, *_runtime ) );
 	}
 	virtual bool do_is_valid( void ) override {

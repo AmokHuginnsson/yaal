@@ -91,7 +91,7 @@ public:
 		HHuginn::HIterable::HIterator it( coll->iterator() );
 		bool addSep( false );
 		while ( it.is_valid() ) {
-			HHuginn::value_t v( it.value() );
+			HHuginn::value_t v( it.value( thread_, position_ ) );
 			if ( v->type_id() != HHuginn::TYPE::STRING ) {
 				throw HHuginn::HHuginnRuntimeException(
 					""_ys.append( name )

@@ -56,7 +56,7 @@ public:
 		return;
 	}
 protected:
-	virtual HHuginn::value_t do_value( void ) override {
+	virtual HHuginn::value_t do_value( HThread*, int ) override {
 		return ( _objectFactory->create_character( _string->value()[ _index ] ) );
 	}
 	virtual bool do_is_valid( void ) override {

@@ -188,16 +188,7 @@ HHuginn::type_id_t verify_arg_collection(
 	HHuginn::values_t const& values_,
 	int no_, bool oneArg_, int position_ ) {
 	M_PROLOG
-	HHuginn::type_id_t t( values_[no_]->type_id() );
-	if (
-			( t != HHuginn::TYPE::LIST )
-			&& ( t != HHuginn::TYPE::DEQUE )
-			&& ( t != HHuginn::TYPE::ORDER )
-			&& ( t != HHuginn::TYPE::SET )
-			&& ( t != HHuginn::TYPE::DICT )
-			&& ( t != HHuginn::TYPE::LOOKUP )
-			&& ( t != HHuginn::TYPE::STRING )
-	) {
+	if ( ! dynamic_cast<HHuginn::HIterable const*>( values_[no_].raw() ) ) {
 		HString no;
 		if ( ! oneArg_ ) {
 			no = util::ordinal( no_ + 1 ).append( " " );
@@ -212,7 +203,7 @@ HHuginn::type_id_t verify_arg_collection(
 			position_
 		);
 	}
-	return ( t );
+	return ( values_[no_]->type_id() );
 	M_EPILOG
 }
 

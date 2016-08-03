@@ -53,7 +53,7 @@ public:
 		return;
 	}
 protected:
-	virtual HHuginn::value_t do_value( void ) override {
+	virtual HHuginn::value_t do_value( HThread*, int ) override {
 		return ( _list->get( _index ) );
 	}
 	virtual bool do_is_valid( void ) override {

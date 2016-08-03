@@ -31,19 +31,22 @@ Copyright:
 
 #include "tools/hhuginn.hxx"
 
+
 namespace yaal {
 
 namespace tools {
 
 namespace huginn {
 
+class HThread;
+
 class HIteratorInterface {
 public:
 	virtual ~HIteratorInterface( void ) {
 		return;
 	}
-	HHuginn::value_t value( void ) {
-		return ( do_value() );
+	HHuginn::value_t value( HThread* thread_, int position_ ) {
+		return ( do_value( thread_, position_ ) );
 	}
 	bool is_valid( void ) {
 		return ( do_is_valid() );
@@ -52,7 +55,7 @@ public:
 		do_next();
 	}
 protected:
-	virtual HHuginn::value_t do_value( void ) = 0;
+	virtual HHuginn::value_t do_value( HThread*, int ) = 0;
 	virtual bool do_is_valid( void ) = 0;
 	virtual void do_next( void ) = 0;
 };
@@ -69,8 +72,8 @@ public:
 		: _impl( yaal::move( impl_ ) ) {
 		return;
 	}
-	value_t value( void ) {
-		return ( _impl->value() );
+	value_t value( huginn::HThread* thread_, int position_ ) {
+		return ( _impl->value( thread_, position_ ) );
 	}
 	bool is_valid( void ) {
 		return ( _impl->is_valid() );
