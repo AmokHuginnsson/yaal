@@ -341,6 +341,20 @@ private:
 	}
 };
 
+template<
+	typename t0_t, typename t1_t, typename t2_t, typename t3_t,
+	typename t4_t, typename t5_t, typename t6_t, typename t7_t,
+	typename t8_t, typename t9_t, typename t10_t, typename t11_t,
+	typename t12_t, typename t13_t, typename t14_t, typename t15_t,
+	typename t16_t, typename t17_t, typename t18_t, typename t19_t,
+	typename t20_t
+>
+inline void swap(
+	yaal::hcore::HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>& a_,
+	yaal::hcore::HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>& b_
+) {
+	a_.swap( b_ );
+}
 
 }
 
