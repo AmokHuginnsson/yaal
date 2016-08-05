@@ -253,18 +253,6 @@ HString::HString( const_iterator first_, const_iterator last_ )
 	M_EPILOG
 }
 
-HString::HString( iterator first_, iterator last_ )
-	: _len() {
-	M_PROLOG
-	int long newSize( last_ - first_ );
-	reserve( newSize );
-	::std::strncpy( MEM, static_cast<const_iterator>( first_ ), static_cast<size_t>( newSize ) );
-	MEM[ newSize ] = 0;
-	SET_SIZE( newSize );
-	return;
-	M_EPILOG
-}
-
 HString::HString( char const* array_, int long size_ )
 	: _len() {
 	M_PROLOG
@@ -491,7 +479,7 @@ char HString::operator[] ( int index_ ) const {
 
 char HString::operator[] ( int long index_ ) const {
 	M_PROLOG
-	if ( index_ > GET_SIZE ) {
+	if ( ( index_ < 0 ) || ( index_ > GET_SIZE ) ) {
 		M_THROW( _errMsgHString_[string_helper::INDEX_OOB], index_ );
 	}
 	return ( MEM[ index_ ] );
@@ -500,7 +488,7 @@ char HString::operator[] ( int long index_ ) const {
 
 char HString::set_at( int long index_, char char_ ) {
 	M_PROLOG
-	if ( index_ >= GET_SIZE ) {
+	if ( ( index_ < 0 ) || ( index_ >= GET_SIZE ) ) {
 		M_THROW( _errMsgHString_[string_helper::INDEX_OOB], index_ );
 	}
 	MEM[ index_ ] = char_;

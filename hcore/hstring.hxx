@@ -169,12 +169,6 @@ public:
 	 * last_ - one past the end of character range to copy.
 	 */
 	HString( const_iterator first_, const_iterator last_ );
-	/*! \brief Construct string based on iterator pair.
-	 *
-	 * first_ - beginning of the character range to copy.
-	 * last_ - one past the end of character range to copy.
-	 */
-	HString( iterator first_, iterator last_ );
 	/*! \brief Construct string based on character array.
 	 *
 	 * array - a character array where to initialize new HString object with.
@@ -264,13 +258,13 @@ public:
 	 * \return character at given position in this string.
 	 */
 	HString operator + ( HString const& ) const;
-	char operator[] ( int const position ) const;
+	char operator[] ( int position ) const;
 	/*! \brief Get character at given position.
 	 *
 	 * \param position - index of a position to get character for.
 	 * \return character at given position in this string.
 	 */
-	char operator[] ( int long const position ) const;
+	char operator[] ( int long position ) const;
 	/*! \brief Check if string is empty (has zero length).
 	 *
 	 * \return True iff this string is empty.
