@@ -751,6 +751,20 @@ public:
 		-- _index;
 		return ( it );
 	}
+	HIterator& operator += ( int long offset_ ) {
+		_index += offset_;
+		return ( *this );
+	}
+	HIterator& operator -= ( int long offset_ ) {
+		_index -= offset_;
+		return ( *this );
+	}
+	HIterator operator + ( int long offset_ ) {
+		return ( HIterator( _owner, _index + offset_ ) );
+	}
+	HIterator operator - ( int long offset_ ) {
+		return ( HIterator( _owner, _index - offset_ ) );
+	}
 	HCharRef operator * ( void ) {
 		return ( HCharRef( *_owner, _index ) );
 	}
