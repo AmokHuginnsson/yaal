@@ -230,7 +230,7 @@ void HIODispatcher::stop( void ) {
 	M_PROLOG
 	HLock l( _mutex );
 	int sigNo = SIGINT;
-	M_ENSURE( _event.write( &sigNo, sizeof ( sigNo ) ) == sizeof ( sigNo ) );
+	M_ENSURE( _event.write( &sigNo, static_cast<int>( sizeof ( sigNo ) ) ) == static_cast<int>( sizeof ( sigNo ) ) );
 	return;
 	M_EPILOG
 }
@@ -238,7 +238,7 @@ void HIODispatcher::stop( void ) {
 int HIODispatcher::handler_interrupt( int sigNo_ ) {
 	M_PROLOG
 	HLock l( _mutex );
-	M_ENSURE( _event.write( &sigNo_, sizeof ( sigNo_ ) ) == sizeof ( sigNo_ ) );
+	M_ENSURE( _event.write( &sigNo_, static_cast<int>( sizeof ( sigNo_ ) ) ) == static_cast<int>( sizeof ( sigNo_ ) ) );
 	return ( 1 );
 	M_EPILOG
 }
@@ -248,7 +248,7 @@ void HIODispatcher::process_interrupt( stream_t& M_DEBUG_CODE( stream_ ) ) {
 	HLock l( _mutex );
 	M_ASSERT( stream_ == _event.out() );
 	int sigNo = 0;
-	M_ENSURE( _event.read( &sigNo, sizeof ( sigNo ) ) == sizeof ( sigNo ) );
+	M_ENSURE( _event.read( &sigNo, static_cast<int>( sizeof ( sigNo ) ) ) == static_cast<int>( sizeof ( sigNo ) ) );
 	if ( sigNo == SIGINT ) {
 		_loop = false;
 	} else if ( sigNo == SIGHUP ) {
