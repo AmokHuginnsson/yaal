@@ -1225,8 +1225,7 @@ HString& HString::shift_right( int long shift_, char const filler_ ) {
 HString& HString::fill( char filler_, int long offset_, int long count_ ) {
 	M_PROLOG
 	if ( count_ == npos ) {
-		/* we maintain zero terminator (even though it is not fillz()) hence - 1 */
-		count_ = ( GET_ALLOC_BYTES - offset_ ) - 1;
+		count_ = ( GET_SIZE - offset_ );
 	}
 	if ( count_ < 0 ) {
 		M_THROW( _errMsgHString_[string_helper::BAD_LENGTH], count_ );
@@ -1254,7 +1253,7 @@ HString& HString::fillz( char filler_, int long offset_, int long count_ ) {
 	M_PROLOG
 	fill( filler_, offset_, count_ );
 	if ( count_ == npos ) {
-		count_ = ( GET_ALLOC_BYTES - offset_ ) - 1;
+		count_ = ( GET_SIZE - offset_ );
 	}
 	MEM[ count_ + offset_ ] = 0;
 	SET_SIZE( count_ + offset_ );
@@ -1705,6 +1704,8 @@ int long kmpsearch( char const* str, int long lenstr, char const* pat, int long 
 	return ( start );
 }
 
+#if ! defined( HAVE_STRCASESTR ) || ( HAVE_STRCASESTR == 0 )
+
 int long kmpcasesearch( char const* str, int long lenstr, char const* pat, int long lenpat ) {
 	HChunk KMPnext( chunk_size<int>( lenpat + 1 ) );
 	int* next( KMPnext.get<int>() );
@@ -1727,6 +1728,8 @@ int long kmpcasesearch( char const* str, int long lenstr, char const* pat, int l
 	}
 	return ( start );
 }
+
+#endif /* #if ! defined( HAVE_STRCASESTR ) || ( HAVE_STRCASESTR == 0 ) */
 
 }
 

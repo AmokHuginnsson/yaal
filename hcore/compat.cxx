@@ -108,7 +108,8 @@ char* strcasestr( char const* haystack, char const* needle ) {
 	);
 	return ( idx >= 0 ? const_cast<char*>( haystack ) + idx : 0 );
 }
-#endif /* not HAVE_STRCASESTR */
+
+#endif /* #if ! defined( HAVE_STRCASESTR ) || ( HAVE_STRCASESTR == 0 ) */
 
 #if defined( HAVE_GETHOSTBYNAME_R )
 #if ! defined( HAVE_GNU_GETHOSTBYNAME_R )
