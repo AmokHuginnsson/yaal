@@ -1239,10 +1239,10 @@ HString& HString::fill( char filler_, int long offset_, int long count_ ) {
 			SET_SIZE( count_ + offset_ );
 		}
 		::std::memset( MEM + offset_, filler_, static_cast<size_t>( count_ ) );
-		MEM[ GET_SIZE ] = 0;
 	} else {
-		clear();
+		SET_SIZE( offset_ );
 	}
+	MEM[ GET_SIZE ] = 0;
 	return ( *this );
 	M_EPILOG
 }
