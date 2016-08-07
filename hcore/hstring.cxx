@@ -1230,14 +1230,12 @@ HString& HString::fill( char filler_, int long offset_, int long count_ ) {
 	if ( count_ < 0 ) {
 		M_THROW( _errMsgHString_[string_helper::BAD_LENGTH], count_ );
 	}
-	if ( offset_ < 0 ) {
+	if ( ( offset_ < 0 ) || ( offset_ > GET_SIZE ) ) {
 		M_THROW( _errMsgHString_[string_helper::BAD_OFFSET], offset_ );
-	}
-	if ( ( offset_ + count_ ) >= GET_ALLOC_BYTES ) {
-		M_THROW( _errMsgHString_[string_helper::OVERFLOW], offset_ + count_ );
 	}
 	if ( filler_ ) {
 		if ( ( count_ + offset_ ) > GET_SIZE ) {
+			reserve( count_ + offset_ );
 			SET_SIZE( count_ + offset_ );
 		}
 		::std::memset( MEM + offset_, filler_, static_cast<size_t>( count_ ) );
