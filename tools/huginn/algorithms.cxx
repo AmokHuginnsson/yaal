@@ -205,28 +205,28 @@ public:
 		if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::list ) ) {
 			v = thread_->object_factory().create_list();
 			HHuginn::HList::values_t& dest( static_cast<HHuginn::HList*>( v.raw() )->value() );
-			while ( it.is_valid() ) {
+			while ( it.is_valid() && thread_->can_continue() ) {
 				dest.push_back( it.value( thread_, position_ ) );
 				it.next();
 			}
 		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::deque ) ) {
 			v = thread_->object_factory().create_deque();
 			HHuginn::HDeque::values_t& dest( static_cast<HHuginn::HDeque*>( v.raw() )->value() );
-			while ( it.is_valid() ) {
+			while ( it.is_valid() && thread_->can_continue() ) {
 				dest.push_back( it.value( thread_, position_ ) );
 				it.next();
 			}
 		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::order ) ) {
 			v = thread_->object_factory().create_order();
 			HHuginn::HOrder::values_t& dest( static_cast<HHuginn::HOrder*>( v.raw() )->value() );
-			while ( it.is_valid() ) {
+			while ( it.is_valid() && thread_->can_continue() ) {
 				dest.insert( it.value( thread_, position_ ) );
 				it.next();
 			}
 		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::set ) ) {
 			v = thread_->object_factory().create_set();
 			HHuginn::HSet::values_t& dest( static_cast<HHuginn::HSet*>( v.raw() )->value() );
-			while ( it.is_valid() ) {
+			while ( it.is_valid() && thread_->can_continue() ) {
 				dest.insert( it.value( thread_, position_ ) );
 				it.next();
 			}
@@ -279,7 +279,7 @@ public:
 		} else {
 			HHuginn::HIterable const* src( static_cast<HHuginn::HIterable const*>( values_[0].raw() ) );
 			HHuginn::HIterable::HIterator it( const_cast<HHuginn::HIterable*>( src )->iterator() );
-			while ( it.is_valid() ) {
+			while ( it.is_valid() && thread_->can_continue() ) {
 				dest.push_back( it.value( thread_, position_ ) );
 				it.next();
 			}

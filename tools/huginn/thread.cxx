@@ -148,7 +148,7 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t&& value_, 
 		 * Uncaught STATE::EXCEPTION becomes STATE::RUNTIME_EXCEPTION!
 		 */
 		HHuginn::HException const* e( dynamic_cast<HHuginn::HException const*>( value_.raw() ) );
-		_exceptionMessage = "Uncaught exception ";
+		_exceptionMessage = "Uncaught exception: ";
 		_exceptionPosition = position_;
 		if ( e ) {
 			_exceptionMessage.append( e->what() );
