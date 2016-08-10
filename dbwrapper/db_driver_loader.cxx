@@ -234,7 +234,7 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 			driver = make_pair( make_pointer<HPlugin>(), make_pointer<ODBConnector>() );
 			log( LOG_LEVEL::NOTICE ) << "Loading [" << _driver_[ driverId_ + 1 ] << "] driver ... ";
 			driver.first->load( _driver_[ driverId_ + 1 ] );
-			cout << "(linking symbols ...) " << flush;
+			log( LOG_LEVEL::NOTICE ) << "(linking symbols ...) " << flush;
 			driver.first->try_resolve( SYMBOL_PREFIX"driver_init", driver.second->driver_init );
 			driver.first->try_resolve( SYMBOL_PREFIX"driver_cleanup", driver.second->driver_cleanup );
 			driver.first->resolve( SYMBOL_PREFIX"db_disconnect", driver.second->db_disconnect );
