@@ -273,9 +273,9 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 			reason << _( "cannot load database driver: " ) << e.what();
 			M_THROW( reason.string(), _dataBaseDriver_ );
 		}
-		if ( driver.first->is_loaded() )
+		if ( driver.first->is_loaded() ) {
 			log( LOG_LEVEL::NOTICE ) << "success." << endl;
-		else {
+		} else {
 			dbwrapper_error();
 			dbwrapper_exit();
 		}
@@ -289,19 +289,22 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 	M_PROLOG
 	errno = 0;
-	cout << "Using dynamic database driver [" << _driver_[ driverId_ + 1 ] << "] ... " << flush;
+	log( LOG_LEVEL::NOTICE ) << "Using dynamic database driver [" << _driver_[ driverId_ + 1 ] << "] ... " << flush;
 	ODBConnector const* pConnector( nullptr );
 	if ( driverId_ != ODBConnector::DRIVER::NONE ) {
 		if ( driverId_ == ODBConnector::DRIVER::DEFAULT ) {
 			for ( int i = 1; i < ODBConnector::DRIVER::TERMINATOR; ++ i ) {
-				if ( ( pConnector = try_load_driver( static_cast<ODBConnector::DRIVER::enum_t>( i ) ) ) )
+				if ( ( pConnector = try_load_driver( static_cast<ODBConnector::DRIVER::enum_t>( i ) ) ) ) {
 					break;
+				}
 			}
-		} else
+		} else {
 			pConnector = try_load_driver( static_cast<ODBConnector::DRIVER::enum_t>( driverId_ ) );
+		}
 	}
-	if ( ! pConnector || ( pConnector->db_connect != null_db_connect ) )
-		cout << _done_ << flush;
+	if ( ! pConnector || ( pConnector->db_connect != null_db_connect ) ) {
+		log( LOG_LEVEL::NOTICE ) << _done_ << flush;
+	}
 	return ( pConnector );
 	M_EPILOG
 }
