@@ -52,6 +52,7 @@ public:
 		static M_YAAL_HCORE_PUBLIC_API compile_t const NONE;
 		static M_YAAL_HCORE_PUBLIC_API compile_t const EXTENDED;
 		static M_YAAL_HCORE_PUBLIC_API compile_t const IGNORE_CASE;
+#undef NEWLINE
 		static M_YAAL_HCORE_PUBLIC_API compile_t const NEWLINE;
 		static M_YAAL_HCORE_PUBLIC_API compile_t const NO_EXCEPTION;
 		static M_YAAL_HCORE_PUBLIC_API compile_t const DEFAULT;
