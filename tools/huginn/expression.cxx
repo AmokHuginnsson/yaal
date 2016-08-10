@@ -820,7 +820,7 @@ void HExpression::store_external_reference( HHuginn::value_t const* value_, hugi
 
 void HExpression::store_function( HHuginn::identifier_id_t identifier_, HHuginn::function_t* function_, huginn::HFrame* frame_, int ) {
 	M_PROLOG
-	frame_->values().push( make_pointer<HHuginn::HFunctionReference>( identifier_, *function_ ) );
+	frame_->values().push( frame_->thread()->object_factory().create_function_reference( identifier_, *function_ ) );
 	return;
 	M_EPILOG
 }

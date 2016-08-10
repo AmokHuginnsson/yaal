@@ -485,24 +485,35 @@ bool equals( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t con
 	bool res( false );
 	if ( ! noneOperand ) {
 		HHuginn::type_id_t typeId( v1_->type_id() );
-		if ( typeId == HHuginn::TYPE::INTEGER ) {
-			res = static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() == static_cast<HHuginn::HInteger const*>( v2_.raw() )->value();
-		} else if ( typeId == HHuginn::TYPE::REAL ) {
-			res = static_cast<HHuginn::HReal const*>( v1_.raw() )->value() == static_cast<HHuginn::HReal const*>( v2_.raw() )->value();
-		} else if ( typeId == HHuginn::TYPE::STRING ) {
-			res = static_cast<HHuginn::HString const*>( v1_.raw() )->value() == static_cast<HHuginn::HString const*>( v2_.raw() )->value();
-		} else if ( typeId == HHuginn::TYPE::NUMBER ) {
-			res = static_cast<HHuginn::HNumber const*>( v1_.raw() )->value() == static_cast<HHuginn::HNumber const*>( v2_.raw() )->value();
-		} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
-			res = static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() == static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value();
-		} else if ( typeId == HHuginn::TYPE::BOOLEAN ) {
-			res = static_cast<HHuginn::HBoolean const*>( v1_.raw() )->value() == static_cast<HHuginn::HBoolean const*>( v2_.raw() )->value();
-		} else {
-			HHuginn::HObject const* o( nullptr );
-			if ( thread_ && ( o = dynamic_cast<HHuginn::HObject const*>( v1_.raw() ) ) ) {
-				res = fallback_compare( o, thread_, "equals", v1_, v2_, position_ );
-			} else {
-				throw HHuginn::HHuginnRuntimeException( "There is no `==' operator for `"_ys.append( v1_->get_class()->name() ).append( "'." ), position_ );
+		switch ( typeId.get() ) {
+			case ( static_cast<int>( HHuginn::TYPE::INTEGER ) ): {
+				res = static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() == static_cast<HHuginn::HInteger const*>( v2_.raw() )->value();
+			} break;
+			case ( static_cast<int>( HHuginn::TYPE::REAL ) ): {
+				res = static_cast<HHuginn::HReal const*>( v1_.raw() )->value() == static_cast<HHuginn::HReal const*>( v2_.raw() )->value();
+			} break;
+			case ( static_cast<int>( HHuginn::TYPE::STRING ) ): {
+				res = static_cast<HHuginn::HString const*>( v1_.raw() )->value() == static_cast<HHuginn::HString const*>( v2_.raw() )->value();
+			} break;
+			case ( static_cast<int>( HHuginn::TYPE::NUMBER ) ): {
+				res = static_cast<HHuginn::HNumber const*>( v1_.raw() )->value() == static_cast<HHuginn::HNumber const*>( v2_.raw() )->value();
+			} break;
+			case ( static_cast<int>( HHuginn::TYPE::CHARACTER ) ): {
+				res = static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() == static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value();
+			} break;
+			case ( static_cast<int>( HHuginn::TYPE::BOOLEAN ) ): {
+				res = static_cast<HHuginn::HBoolean const*>( v1_.raw() )->value() == static_cast<HHuginn::HBoolean const*>( v2_.raw() )->value();
+			} break;
+			case ( static_cast<int>( HHuginn::TYPE::FUNCTION_REFERENCE ) ): {
+				res = static_cast<HHuginn::HFunctionReference const*>( v1_.raw() )->identifier_id() == static_cast<HHuginn::HFunctionReference const*>( v2_.raw() )->identifier_id();
+			} break;
+			default: {
+				HHuginn::HObject const* o( nullptr );
+				if ( thread_ && ( o = dynamic_cast<HHuginn::HObject const*>( v1_.raw() ) ) ) {
+					res = fallback_compare( o, thread_, "equals", v1_, v2_, position_ );
+				} else {
+					throw HHuginn::HHuginnRuntimeException( "There is no `==' operator for `"_ys.append( v1_->get_class()->name() ).append( "'." ), position_ );
+				}
 			}
 		}
 	} else {

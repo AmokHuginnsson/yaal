@@ -657,8 +657,8 @@ HHuginn::HFunctionReference::HFunctionReference(
 	return;
 }
 
-HHuginn::value_t HHuginn::HFunctionReference::do_clone( HRuntime* ) const {
-	return ( make_pointer<HFunctionReference>( _identifierId, _function ) );
+HHuginn::value_t HHuginn::HFunctionReference::do_clone( HRuntime* runtime_ ) const {
+	return ( runtime_->object_factory()->create_function_reference( _identifierId, _function ) );
 }
 
 HHuginn::HClass::HMethod::HMethod(

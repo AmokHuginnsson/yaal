@@ -707,7 +707,7 @@ void OCompiler::track_name_cycle( HHuginn::identifier_id_t identifierId_ ) {
 void OCompiler::create_lambda( executing_parser::position_t position_ ) {
 	M_PROLOG
 	function_info_t fi( create_function_low( position_ ) );
-	HHuginn::value_t fRef( make_pointer<HHuginn::HFunctionReference>( fi.first, fi.second ) );
+	HHuginn::value_t fRef( _runtime->object_factory()->create_function_reference( fi.first, fi.second ) );
 	defer_store_direct( fRef, position_ );
 	return;
 	M_EPILOG
@@ -1899,7 +1899,7 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 			hcore::call(
 				&HExpression::store_direct,
 				current_expression().raw(),
-				make_pointer<HHuginn::HFunctionReference>( refIdentifier, *_runtime->get_function( refIdentifier ) ),
+				_runtime->object_factory()->create_function_reference( refIdentifier, *_runtime->get_function( refIdentifier ) ),
 				_1,
 				position_.get()
 			)

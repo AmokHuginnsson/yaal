@@ -104,6 +104,13 @@ class HObjectFactory final {
 	typedef allocator::shared_pool<shared_reference_t::type> reference_allocator_t;
 	reference_pool_t _referencePool;
 	reference_allocator_t _referenceAllocator;
+	/* function_reference pool */
+	typedef yaal::hcore::HPointer<HHuginn::HFunctionReference> function_reference_ptr_t;
+	typedef function_reference_ptr_t::allocated_shared<allocator::shared_pool<HHuginn::HFunctionReference>> shared_function_reference_t;
+	typedef yaal::hcore::HPool<shared_function_reference_t::size> function_reference_pool_t;
+	typedef allocator::shared_pool<shared_function_reference_t::type> function_reference_allocator_t;
+	function_reference_pool_t _functionReferencePool;
+	function_reference_allocator_t _functionReferenceAllocator;
 	/* bound method pool */
 	typedef yaal::hcore::HPointer<HHuginn::HClass::HBoundMethod> bound_method_ptr_t;
 	typedef bound_method_ptr_t::allocated_shared<allocator::shared_pool<HHuginn::HClass::HBoundMethod>> shared_bound_method_t;
@@ -174,6 +181,9 @@ public:
 	}
 	HHuginn::value_t create_reference( HHuginn::value_t& value_ ) const {
 		return ( yaal::hcore::allocate_pointer<reference_allocator_t, HHuginn::HReference>( _referenceAllocator, value_ ) );
+	}
+	HHuginn::value_t create_function_reference( HHuginn::identifier_id_t identifierId_, HHuginn::function_t const& function_ ) const {
+		return ( yaal::hcore::allocate_pointer<function_reference_allocator_t, HHuginn::HFunctionReference>( _functionReferenceAllocator, identifierId_, function_ ) );
 	}
 	HHuginn::value_t create_bound_method( HHuginn::HClass::HMethod const& method_, HHuginn::value_t const& object_ ) const {
 		return ( yaal::hcore::allocate_pointer<bound_method_allocator_t, HHuginn::HClass::HBoundMethod>( _boundMethodAllocator, method_, object_ ) );
