@@ -1878,7 +1878,7 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 	_usedIdentifiers[refIdentifier].read( position_.get() );
 	bool keyword( false );
 	bool isAssert( refIdentifier == KEYWORD::ASSERT_IDENTIFIER );
-	bool isFieldDefinition( !! _classContext && ( _classContext->_fieldNames.get_size() != _classContext->_fieldDefinitions.get_size() ) );
+	bool isFieldDefinition( !! _classContext && ( _functionContexts.get_size() == 1 ) );
 	if ( ( keyword = huginn::is_keyword( value_ ) ) ) {
 		if ( isAssert ) {
 			fc._isAssert = isAssert;
@@ -1962,7 +1962,7 @@ void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executi
 	if ( huginn::is_restricted( value_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted name." ), position_.get() );
 	}
-	bool isFieldDefinition( !! _classContext && ( _classContext->_fieldNames.get_size() != _classContext->_fieldDefinitions.get_size() ) );
+	bool isFieldDefinition( !! _classContext && ( _functionContexts.get_size() == 1 ) );
 	if ( isFieldDefinition ) {
 		throw HHuginn::HHuginnRuntimeException( "Defining symbol `"_ys.append( value_ ).append( "' in field definition is forbidden." ), position_.get() );
 	}
