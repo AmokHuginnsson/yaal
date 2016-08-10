@@ -1878,6 +1878,7 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 	_usedIdentifiers[refIdentifier].read( position_.get() );
 	bool keyword( false );
 	bool isAssert( refIdentifier == KEYWORD::ASSERT_IDENTIFIER );
+	bool isFieldDefinition( !! _classContext && ( _classContext->_fieldNames.get_size() != _classContext->_fieldDefinitions.get_size() ) );
 	if ( ( keyword = huginn::is_keyword( value_ ) ) ) {
 		if ( isAssert ) {
 			fc._isAssert = isAssert;
@@ -1892,7 +1893,7 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 	if ( ( ! keyword || isAssert ) && huginn::is_builtin( value_ ) ) {
 		/*
 		 * We can do it here (as opposed to *::resolve_symbols()) because built-ins must exist,
-		 * hence h->get_function() always succeeds, and built-ins cannot be overriden
+		 * hence h->get_function() always succeeds, and built-ins cannot be overridden
 		 * so they meaning stays always the same.
 		 */
 		current_expression()->add_execution_step(
@@ -1904,25 +1905,30 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 				position_.get()
 			)
 		);
-	} else if ( refIdentifier == KEYWORD::THIS_IDENTIFIER ) {
-		expression->add_execution_step(
-			hcore::call( &HExpression::get_this, expression.raw(), _1, position_.get() )
-		);
-	} else if ( refIdentifier == KEYWORD::SUPER_IDENTIFIER ) {
-		expression->add_execution_step(
-			hcore::call( &HExpression::get_super, expression.raw(), _1, position_.get() )
-		);
 	} else {
-		int index( expression->add_execution_step( HExpression::execution_step_t() ) );
-		_executionStepsBacklog.emplace_back(
-			OExecutionStep::OPERATION::USE,
-			expression,
-			fc._scopeStack.top(),
-			!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
-			index,
-			refIdentifier,
-			position_.get()
-		);
+		if ( isFieldDefinition ) {
+			throw HHuginn::HHuginnRuntimeException( "Dereferencing symbol `"_ys.append( value_ ).append( "' in field definition is forbidden." ), position_.get() );
+		}
+		if ( refIdentifier == KEYWORD::THIS_IDENTIFIER ) {
+			expression->add_execution_step(
+				hcore::call( &HExpression::get_this, expression.raw(), _1, position_.get() )
+			);
+		} else if ( refIdentifier == KEYWORD::SUPER_IDENTIFIER ) {
+			expression->add_execution_step(
+				hcore::call( &HExpression::get_super, expression.raw(), _1, position_.get() )
+			);
+		} else {
+			int index( expression->add_execution_step( HExpression::execution_step_t() ) );
+			_executionStepsBacklog.emplace_back(
+				OExecutionStep::OPERATION::USE,
+				expression,
+				fc._scopeStack.top(),
+				!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
+				index,
+				refIdentifier,
+				position_.get()
+			);
+		}
 	}
 	fc._valueTypes.push( guess_type( refIdentifier ) );
 	return;
@@ -1955,6 +1961,10 @@ void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executi
 	OFunctionContext& fc( f() );
 	if ( huginn::is_restricted( value_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted name." ), position_.get() );
+	}
+	bool isFieldDefinition( !! _classContext && ( _classContext->_fieldNames.get_size() != _classContext->_fieldDefinitions.get_size() ) );
+	if ( isFieldDefinition ) {
+		throw HHuginn::HHuginnRuntimeException( "Defining symbol `"_ys.append( value_ ).append( "' in field definition is forbidden." ), position_.get() );
 	}
 	HHuginn::identifier_id_t varIdentifier( _runtime->identifier_id( value_ ) );
 	HHuginn::expression_t& expression( current_expression() );
