@@ -71,6 +71,11 @@ struct LexicalCast {};
 template<typename to_t, typename from_t>
 to_t lexical_cast( from_t const& val );
 
+template<typename to_t>
+inline to_t lexical_cast( char* val ) {
+	return ( lexical_cast<to_t, char const*>( val ) );
+}
+
 /*! \brief Generate error message (possibly human readable) based on error code.
  *
  * \param code - error code to describe.

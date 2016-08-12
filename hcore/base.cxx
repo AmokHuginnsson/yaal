@@ -211,9 +211,23 @@ int long long unsigned lexical_cast( HString const& str_ ) {
 }
 
 template<>
+int long long unsigned lexical_cast( char const* const& val ) {
+	M_PROLOG
+	return ( lexical_cast<int long long unsigned, HString>( val ) );
+	M_EPILOG
+}
+
+template<>
 int long unsigned lexical_cast( HString const& val ) {
 	M_PROLOG
 	return ( safe_cast<int long unsigned>( lexical_cast<int long long unsigned>( val ) ) );
+	M_EPILOG
+}
+
+template<>
+int long unsigned lexical_cast( char const* const& val ) {
+	M_PROLOG
+	return ( safe_cast<int long unsigned>( lexical_cast<int long long unsigned, HString>( val ) ) );
 	M_EPILOG
 }
 
@@ -225,9 +239,23 @@ int unsigned lexical_cast( HString const& val ) {
 }
 
 template<>
+int unsigned lexical_cast( char const* const& val ) {
+	M_PROLOG
+	return ( safe_cast<int unsigned>( lexical_cast<int long long unsigned, HString>( val ) ) );
+	M_EPILOG
+}
+
+template<>
 int short unsigned lexical_cast( HString const& val ) {
 	M_PROLOG
 	return ( safe_cast<int short unsigned>( lexical_cast<int long long unsigned>( val ) ) );
+	M_EPILOG
+}
+
+template<>
+int short unsigned lexical_cast( char const* const& val ) {
+	M_PROLOG
+	return ( safe_cast<int short unsigned>( lexical_cast<int long long unsigned, HString>( val ) ) );
 	M_EPILOG
 }
 
@@ -245,6 +273,13 @@ int long long lexical_cast( HString const& str_ ) {
 }
 
 template<>
+int long long lexical_cast( char const* const& val ) {
+	M_PROLOG
+	return ( lexical_cast<int long long, HString>( val ) );
+	M_EPILOG
+}
+
+template<>
 int long lexical_cast( HString const& val ) {
 	M_PROLOG
 	return ( safe_cast<int long>( lexical_cast<int long long>( val ) ) );
@@ -253,13 +288,6 @@ int long lexical_cast( HString const& val ) {
 
 template<>
 int long lexical_cast( char const* const& val ) {
-	M_PROLOG
-	return ( safe_cast<int long>( lexical_cast<int long long, HString>( val ) ) );
-	M_EPILOG
-}
-
-template<>
-int long lexical_cast( char* const& val ) {
 	M_PROLOG
 	return ( safe_cast<int long>( lexical_cast<int long long, HString>( val ) ) );
 	M_EPILOG
@@ -280,13 +308,6 @@ int lexical_cast( char const* const& val ) {
 }
 
 template<>
-int lexical_cast( char* const& val ) {
-	M_PROLOG
-	return ( safe_cast<int>( lexical_cast<int long long, HString>( val ) ) );
-	M_EPILOG
-}
-
-template<>
 int short lexical_cast( HString const& val ) {
 	M_PROLOG
 	return ( safe_cast<int short>( lexical_cast<int long long>( val ) ) );
@@ -301,23 +322,9 @@ int short lexical_cast( char const* const& val ) {
 }
 
 template<>
-int short lexical_cast( char* const& val ) {
-	M_PROLOG
-	return ( safe_cast<int short>( lexical_cast<int long long, HString>( val ) ) );
-	M_EPILOG
-}
-
-template<>
 double long lexical_cast( HString const& val ) {
 	M_PROLOG
 	return ( hcore::strtold( val ) );
-	M_EPILOG
-}
-
-template<>
-float lexical_cast( HString const& val ) {
-	M_PROLOG
-	return ( static_cast<float>( lexical_cast<double long>( val ) ) );
 	M_EPILOG
 }
 
@@ -339,6 +346,20 @@ template<>
 double lexical_cast( char const* const& val ) {
 	M_PROLOG
 	return ( lexical_cast<double, HString>( val ) );
+	M_EPILOG
+}
+
+template<>
+float lexical_cast( HString const& val ) {
+	M_PROLOG
+	return ( static_cast<float>( lexical_cast<double long>( val ) ) );
+	M_EPILOG
+}
+
+template<>
+float lexical_cast( char const* const& val ) {
+	M_PROLOG
+	return ( lexical_cast<float, HString>( val ) );
 	M_EPILOG
 }
 
@@ -382,13 +403,6 @@ bool lexical_cast( char const* const& value_ ) {
 }
 
 template<>
-bool lexical_cast( char* const& value_ ) {
-	M_PROLOG
-	return ( lexical_cast<bool, char const*>( value_ ) );
-	M_EPILOG
-}
-
-template<>
 bool lexical_cast( HString const& value_ ) {
 	M_PROLOG
 	return ( lexical_cast<bool>( value_.raw() ) );
@@ -424,7 +438,21 @@ HString lexical_cast( char const& val_ ) {
 }
 
 template<>
+HString lexical_cast( char unsigned const& val_ ) {
+	M_PROLOG
+	return ( val_ );
+	M_EPILOG
+}
+
+template<>
 HString lexical_cast( int short const& val_ ) {
+	M_PROLOG
+	return ( val_ );
+	M_EPILOG
+}
+
+template<>
+HString lexical_cast( int short unsigned const& val_ ) {
 	M_PROLOG
 	return ( val_ );
 	M_EPILOG
@@ -438,7 +466,42 @@ HString lexical_cast( int const& val_ ) {
 }
 
 template<>
+HString lexical_cast( int unsigned const& val_ ) {
+	M_PROLOG
+	return ( val_ );
+	M_EPILOG
+}
+
+template<>
 HString lexical_cast( int long const& val_ ) {
+	M_PROLOG
+	return ( val_ );
+	M_EPILOG
+}
+
+template<>
+HString lexical_cast( int long unsigned const& val_ ) {
+	M_PROLOG
+	return ( val_ );
+	M_EPILOG
+}
+
+template<>
+HString lexical_cast( int long long const& val_ ) {
+	M_PROLOG
+	return ( val_ );
+	M_EPILOG
+}
+
+template<>
+HString lexical_cast( int long long unsigned const& val_ ) {
+	M_PROLOG
+	return ( val_ );
+	M_EPILOG
+}
+
+template<>
+HString lexical_cast( float const& val_ ) {
 	M_PROLOG
 	return ( val_ );
 	M_EPILOG
@@ -453,6 +516,13 @@ HString lexical_cast( double const& val_ ) {
 
 template<>
 HString lexical_cast( double long const& val_ ) {
+	M_PROLOG
+	return ( val_ );
+	M_EPILOG
+}
+
+template<>
+HString lexical_cast( void* const& val_ ) {
 	M_PROLOG
 	return ( val_ );
 	M_EPILOG
@@ -489,6 +559,21 @@ bool is_binary( char const* const& str_ ) {
 template<>
 bool is_octal( char const* const& str_ ) {
 	return ( is_octal<HString>( str_ ) );
+}
+
+template<>
+bool is_hexadecimal( char* const& val ) {
+	return ( is_hexadecimal<char const*>( val ) );
+}
+
+template<>
+bool is_binary( char* const& val ) {
+	return ( is_binary<char const*>( val ) );
+}
+
+template<>
+bool is_octal( char* const& val ) {
+	return ( is_octal<char const*>( val ) );
 }
 
 }
