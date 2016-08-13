@@ -50,10 +50,10 @@ if [ "x$line" != "x" ] ; then
 fi
 
 shell_env() {
-	cat ${DIR_ROOT}/_aux/${DIR_PREFIX} | sed -e "s/{YAAL_PREFIX}/${YAAL_PREFIX}/g"
+	cat ${DIR_ROOT}/_aux/${1} | sed -e "s/{YAAL_PREFIX}/${YAAL_PREFIX}/g"
 }
 
-YAAL_PREFIX=`echo ${YAAL_PREFIX} | sed -e 's/\//\\\\\//g'`
+YAAL_PREFIX=`echo ${DIR_PREFIX} | sed -e 's/\//\\\\\//g'`
 
 printf "%b\n" "Compilation have been finished !"
 printf "%b\n" "It is need to be added several lines to your .SHELLrc file :"
