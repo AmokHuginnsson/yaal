@@ -190,7 +190,7 @@ uninstall:
 	$(call msg,&& printf "%b$(NL)" "done.$(CL)")
 
 install-environment:
-	@cd $(DIR_ROOT) && ./_aux/msh $(DESTDIR)$(prefix)
+	@cd $(DIR_ROOT) && ./_aux/mkshell --dir-root=$(DIR_ROOT) --dir-prefix=$(DESTDIR)$(prefix)
 
 $(MAIN_LIB_HEADER): $(HDRS) $(DIR_BUILD)/config.hxx
 	@printf "%b" "Making headers ... " && \

@@ -2,7 +2,7 @@
 #
 #---        `yaal' (c) 1978 by Marcin 'Amok' Konarski             ---
 #
-# msh - this file is integral part of `yaal' project.
+# mkshell - this file is integral part of `yaal' project.
 #
 #	i.  You may not make any changes in Copyright information.
 #	ii. You must attach Copyright information to any part of every copy
@@ -24,6 +24,25 @@
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 # FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 
+DIR_ROOT=""
+DIR_PREFIX=""
+
+for arg in "${@}" ; do
+	case ${arg} in
+		--dir-root=*)    DIR_ROOT=`echo ${arg} | sed 's;--dir-root=;;'` ;;
+		--dir-prefix=*)  DIR_PREFIX=`echo ${arg} | sed 's;--dir-prefix=;;'` ;;
+		*)
+			echo "unknown option: ${arg}"
+			exit 1
+		;;
+	esac
+done
+
+if [ -z "${DIR_ROOT}" -o -z "${DIR_PREFIX}" ] ; then
+	printf "%b\n" "Core settings not found!"
+	exit 1
+fi
+
 line=`grep -s LD_LIBRARY_PATH ${HOME}/.profile ${HOME}/.bashrc ${HOME}/.bash_profile ${HOME}/.cshrc ${HOME}/.tcshrc ${HOME}/.login ${HOME}/.zshrc ${HOME}/.zlogin ${HOME}/.zshenv ${HOME}/.zsh/zlogin ${HOME}/.zsh/zshrc ${HOME}/.zsh/zshenv`
 if [ "x$line" != "x" ] ; then
 	printf "%b\n" "Environment have been already set."
@@ -31,10 +50,10 @@ if [ "x$line" != "x" ] ; then
 fi
 
 shell_env() {
-	cat ${DIR_ROOT}/_aux/${1} | sed -e "s/{YAAL_PREFIX}/${YAAL_PREFIX}/g"
+	cat ${DIR_ROOT}/_aux/${DIR_PREFIX} | sed -e "s/{YAAL_PREFIX}/${YAAL_PREFIX}/g"
 }
 
-YAAL_PREFIX=`echo ${1} | sed -e 's/\//\\\\\//g'`
+YAAL_PREFIX=`echo ${YAAL_PREFIX} | sed -e 's/\//\\\\\//g'`
 
 printf "%b\n" "Compilation have been finished !"
 printf "%b\n" "It is need to be added several lines to your .SHELLrc file :"
