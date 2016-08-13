@@ -307,6 +307,8 @@ AC_DEFUN_ONCE([YAAL_DETECT_COMMON_FLAGS], [
 	AC_SUBST(LXXFLAGS_NO_UNDEFINED, [${LXXFLAGS_NO_UNDEFINED}])
 ])
 
-AC_DEFINE_UNQUOTED([SYSCONFDIR], "$sysconfdir", [Path to global system configuration directory.])
-AC_DEFINE_UNQUOTED([LOCALSTATEDIR], "$localstatedir", [Path to data files which the programs modify while they run.])
+SYSCONFDIR=`eval echo ${sysconfdir}`
+AC_DEFINE_UNQUOTED([SYSCONFDIR], "${SYSCONFDIR}", [Path to global system configuration directory.])
+LOCALSTATEDIR=`eval echo ${localstatedir}`
+AC_DEFINE_UNQUOTED([LOCALSTATEDIR], "${LOCALSTATEDIR}", [Path to data files which the programs modify while they run.])
 

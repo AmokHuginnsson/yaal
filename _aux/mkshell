@@ -85,11 +85,7 @@ if [ "$ANSWER" ] ; then
 				fi
 				;;
 			bash)
-				if [ -f ${HOME}/.bashrc -a -f .bash_profile -a !'grep "source \${HOME}/\.bashrc" .bash_profile' ] ; then
-					shell_env shellrc >> ${HOME}/.bashrc
-				else
-					shell_env shellrc >> ${HOME}/.bash_profile
-				fi
+				shell_env shellrc >> ${HOME}/.bashrc
 				;;
 			csh)
 				shell_env shellrc.csh >> ${HOME}/.cshrc
