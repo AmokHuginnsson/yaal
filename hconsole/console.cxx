@@ -580,8 +580,11 @@ void HConsole::addch( int char_ ) {
 	M_EPILOG
 }
 
-void HConsole::refresh( void ) {
+void HConsole::refresh( bool repaint_ ) {
 	M_PROLOG
+	if ( repaint_ ) {
+		::clearok( static_cast<WINDOW*>( _window ), true );
+	}
 	M_ENSURE( ::wrefresh( static_cast<WINDOW*>( _window ) ) != ERR );
 	getmaxyx( static_cast<WINDOW*>( _window ), _height, _width );
 	return;
@@ -920,7 +923,17 @@ char unsigned HConsole::get_attr( void ) const {
 	M_EPILOG
 }
 
-void HConsole::clrscr( void ) {
+void HConsole::clear( void ) {
+	M_PROLOG
+	if ( ! _enabled ) {
+		M_THROW( "not in curses mode", errno );
+	}
+	werase( static_cast<WINDOW*>( _window ) ); /* Always returns OK */
+	return;
+	M_EPILOG
+}
+
+void HConsole::clear_terminal( void ) {
 	M_PROLOG
 	if ( ! _enabled ) {
 		M_THROW( "not in curses mode", errno );

@@ -263,7 +263,7 @@ public:
 	void move( int, int ) const;
 	CURSOR curs_set( CURSOR ) const;
 	void addch( int );
-	void refresh( void );
+	void refresh( bool = false );
 	int endwin( void );
 	void getyx( int&, int& ) const;
 	void clrtoeol( void ) const;
@@ -275,7 +275,8 @@ public:
 	int get_key( void ) const;
 	int kbhit( void ) const;
 	char unsigned get_attr( void ) const;
-	void clrscr( void );
+	void clear_terminal( void );
+	void clear( void );
 	bool is_enabled( void ) const;
 	int wait_for_user_input( int&, mouse::OMouse&, int = 0 ) const;
 	void bell( void ) const;

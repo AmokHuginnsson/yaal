@@ -353,7 +353,7 @@ void HTUIProcess::do_quit( void ) {
 	M_PROLOG
 	_dispatcher.stop();
 	_needRepaint = false;
-	HConsole::get_instance().clrscr();
+	HConsole::get_instance().clear_terminal();
 	return;
 	M_EPILOG
 }

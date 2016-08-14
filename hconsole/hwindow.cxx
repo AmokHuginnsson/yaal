@@ -151,7 +151,7 @@ HStatusBarWidget::ptr_t& HWindow::status_bar( void ) {
 void HWindow::paint( void ) {
 	M_PROLOG
 	if ( _needRepaint )
-		HConsole::get_instance().clrscr();
+		HConsole::get_instance().clear_terminal();
 	if ( ( !! _statusBar ) && ( _statusBar != *_focusedChild ) )
 		_statusBar->paint();
 	_widgets.refresh_all( _needRepaint );
