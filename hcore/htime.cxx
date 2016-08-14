@@ -209,20 +209,27 @@ HTime& HTime::set_datetime(
 
 HTime& HTime::from_string( yaal::hcore::HString const& str_ ) {
 	M_PROLOG
-	char const* err( ::strptime( str_.c_str(), _format.raw(), &_broken ) );
+	struct tm broken;
+	::memcpy( &broken, &_broken, sizeof ( _broken ) );
+	char const* err( ::strptime( str_.c_str(), _format.raw(), &broken ) );
 	if ( ! err ) {
-		err = ::strptime( str_.c_str(), _iso8601DateTimeFormat_, &_broken );
+		::memcpy( &broken, &_broken, sizeof ( _broken ) );
+		err = ::strptime( str_.c_str(), _iso8601DateTimeFormat_, &broken );
 	}
 	if ( ! err ) {
-		err = ::strptime( str_.c_str(), _iso8601DateFormat_, &_broken );
+		::memcpy( &broken, &_broken, sizeof ( _broken ) );
+		err = ::strptime( str_.c_str(), _iso8601DateFormat_, &broken );
 	}
 	if ( ! err ) {
-		err = ::strptime( str_.c_str(), _iso8601TimeFormat_, &_broken );
+		::memcpy( &broken, &_broken, sizeof ( _broken ) );
+		err = ::strptime( str_.c_str(), _iso8601TimeFormat_, &broken );
 	}
 	if ( ! err ) {
-		err = ::strptime( str_.c_str(), _rfc2822DateTimeFormat_, &_broken );
+		::memcpy( &broken, &_broken, sizeof ( _broken ) );
+		err = ::strptime( str_.c_str(), _rfc2822DateTimeFormat_, &broken );
 	}
 	M_ENSURE( err );
+	::memcpy( &_broken, &broken, sizeof ( _broken ) );
 	_broken.tm_isdst = -1;
 	_value = unix_epoch_to_yaal_epoch( _tz == TZ::UTC ? mkgmtime( &_broken ) : mktime( &_broken ) );
 	mkgmtime( &_broken );
