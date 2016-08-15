@@ -341,8 +341,7 @@ public:
 	HIterator& operator = ( HIterator const& );
 	bool operator == ( HIterator const& ) const;
 	bool operator != ( HIterator const& ) const;
-	HXml::HNodeProxy operator* ( void );
-	HXml::HConstNodeProxy operator* ( void ) const;
+	HXml::HNodeProxy operator* ( void ) const;
 private:
 	friend class HXml::HNodeProxy;
 	friend class HXml::HConstIterator;
@@ -415,8 +414,11 @@ public:
 	class HIterator;
 	virtual ~HNodeSet( void ) {}
 	HIterator begin( void );
+	using HConstNodeSet::begin;
 	HIterator end( void );
+	using HConstNodeSet::end;
 	HNodeProxy operator[] ( int );
+	using HConstNodeSet::operator[];
 private:
 	HNodeSet( void );
 	friend class HXml;
@@ -494,6 +496,26 @@ value_t try_attr_val_by_path( HXml::HConstIterator const&, yaal::hcore::HString 
 
 inline void swap( yaal::tools::HXml& a, yaal::tools::HXml& b )
 	{ a.swap( b ); }
+
+}
+
+namespace hcore {
+
+template<>
+struct iterator_traits<tools::HXml::HConstIterator> {
+	typedef tools::HXml::HConstNodeProxy value_type;
+	typedef tools::HXml::HConstNodeProxy reference;
+	typedef tools::HXml::HConstNodeProxy pointer;
+	typedef typename iterator_category::forward category_type;
+};
+
+template<>
+struct iterator_traits<tools::HXml::HIterator> {
+	typedef tools::HXml::HNodeProxy value_type;
+	typedef tools::HXml::HNodeProxy reference;
+	typedef tools::HXml::HNodeProxy pointer;
+	typedef typename iterator_category::forward category_type;
+};
 
 }
 

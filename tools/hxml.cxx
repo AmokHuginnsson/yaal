@@ -1279,7 +1279,7 @@ bool HXml::HConstIterator::operator != ( HXml::HConstIterator const& other ) con
 	return ( _iterator != other._iterator );
 }
 
-HXml::HNodeProxy HXml::HIterator::operator* ( void ) {
+HXml::HNodeProxy HXml::HIterator::operator* ( void ) const {
 	M_PROLOG
 	M_ASSERT( _owner );
 	M_ASSERT( _iterator != _owner->end() );
