@@ -174,7 +174,7 @@ struct HXml::OConvert {
 		_iconvToInternal = _encoder->iconv_out;
 		M_EPILOG
 	}
-	bool operator ! ( void ) const {
+	bool is_initialized( void ) const {
 		return ( ! ( _iconvToExternal && _iconvToInternal ) );
 	}
 };
@@ -368,8 +368,8 @@ HString const& HXml::convert( HString const& data_, way_t way_ ) const {
 	char M_YAAL_TOOLS_HXML_ICONV_CONST* source = const_cast<char M_YAAL_TOOLS_HXML_ICONV_CONST*>( data_.raw() );
 	iconv_t cD = static_cast<iconv_t>( 0 );
 	switch ( way_ ) {
-		case ( TO_EXTERNAL ): { cD = ( *_convert )._iconvToExternal; break; }
-		case ( TO_INTERNAL ): { cD = ( *_convert )._iconvToInternal; break; }
+		case ( TO_EXTERNAL ): { cD = _convert->_iconvToExternal; break; }
+		case ( TO_INTERNAL ): { cD = _convert->_iconvToInternal; break; }
 		default:
 			M_ASSERT( ! _( "unknown conversion way" ) );
 		break;
@@ -703,7 +703,8 @@ void HXml::load( yaal::hcore::HStreamInterface::ptr_t stream, parser_t parser_ )
 void HXml::generate_intermediate_form( bool indent_ ) const {
 	M_PROLOG
 	doc_resource_t doc;
-	M_ENSURE( !! get_root() ); {
+	M_ENSURE( !! get_root() );
+	/* scope for dummy */ {
 		xmlDocPtr pDoc = nullptr;
 		writer_resource_t writer( xmlNewTextWriterDoc( &pDoc, 0 ), xmlFreeTextWriter );
 		if ( ! writer.get() ) {
@@ -727,8 +728,8 @@ void HXml::generate_intermediate_form( bool indent_ ) const {
 				throw HXmlException( "Cannot set indent string." );
 			}
 		}
-		if ( ! (*_convert) ) {
-			(*_convert).init( _encoding );
+		if ( ! _convert->is_initialized() ) {
+			_convert->init( _encoding );
 		}
 		if ( ! _entities.is_empty() ) {
 			rc = xmlTextWriterStartDTD( writer.get(), reinterpret_cast<xmlChar const*>( "workaround" ), nullptr, nullptr );
@@ -894,6 +895,7 @@ void HXml::create_root( yaal::hcore::HString const& name_, yaal::hcore::HString 
 	M_PROLOG
 	M_ASSERT( name_ );
 	_encoding = ( !! encoding_ ) ? encoding_ : _defaultEncoding_;
+	_convert->init( _encoding );
 	tree_t::node_t root = _domTree.create_new_root( HNode( this ) );
 	(**root)._text = name_;
 	return;
