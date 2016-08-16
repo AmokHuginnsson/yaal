@@ -314,12 +314,16 @@ HHuginn::value_t HMatrix::det( huginn::HThread* thread_, HHuginn::value_t* objec
 	verify_arg_count( name, values_, 0, 0, position_ );
 	HHuginn::value_t v;
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
-	if ( o->_data.type() == 0 ) {
-		arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
-		v = thread_->runtime().object_factory()->create_number( m.det() );
-	} else {
-		floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
-		v = thread_->runtime().object_factory()->create_real( m.det() );
+	try {
+		if ( o->_data.type() == 0 ) {
+			arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
+			v = thread_->runtime().object_factory()->create_number( m.det() );
+		} else {
+			floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
+			v = thread_->runtime().object_factory()->create_real( m.det() );
+		}
+	} catch ( HException const& e ) {
+		throw HHuginn::HHuginnRuntimeException( e.what(), position_ );
 	}
 	return ( v );
 	M_EPILOG
@@ -385,19 +389,37 @@ HHuginn::value_t HMatrix::scale_to( huginn::HThread*, HHuginn::value_t* object_,
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::invert( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::inverse( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	char const name[] = "Matrix.invert";
+	char const name[] = "Matrix.inverse";
 	verify_arg_count( name, values_, 0, 0, position_ );
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
-	if ( o->_data.type() == 0 ) {
-		arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
-		m = m._1();
-	} else {
-		floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
-		m = m._1();
+	HHuginn::value_t v;
+	try {
+		if ( o->_data.type() == 0 ) {
+			v = make_pointer<HMatrix>( o->HObject::get_class(), make_resource<arbitrary_precision_matrix_t>( o->_data.get<arbitrary_precision_matrix_ptr_t>()->_1() ) );
+		} else {
+			v = make_pointer<HMatrix>( o->HObject::get_class(), make_resource<floating_point_matrix_t>( o->_data.get<floating_point_matrix_ptr_t>()->_1() ) );
+		}
+	} catch ( HException const& e ) {
+		throw HHuginn::HHuginnRuntimeException( e.what(), position_ );
 	}
-	return ( *object_ );
+	return ( v );
+	M_EPILOG
+}
+
+HHuginn::value_t HMatrix::transpose( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "Matrix.transpose";
+	verify_arg_count( name, values_, 0, 0, position_ );
+	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
+	HHuginn::value_t v;
+	if ( o->_data.type() == 0 ) {
+		v = make_pointer<HMatrix>( o->HObject::get_class(), make_resource<arbitrary_precision_matrix_t>( o->_data.get<arbitrary_precision_matrix_ptr_t>()->T() ) );
+	} else {
+		v = make_pointer<HMatrix>( o->HObject::get_class(), make_resource<floating_point_matrix_t>( o->_data.get<floating_point_matrix_ptr_t>()->T() ) );
+	}
+	return ( v );
 	M_EPILOG
 }
 
@@ -460,7 +482,8 @@ HHuginn::class_t HMatrix::get_class( HRuntime* runtime_ ) {
 				{ "det",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::det, _1, _2, _3, _4 ) ) },
 				{ "scale",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::scale, _1, _2, _3, _4 ) ) },
 				{ "scale_to",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::scale_to, _1, _2, _3, _4 ) ) },
-				{ "invert",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::invert, _1, _2, _3, _4 ) ) },
+				{ "inverse",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::inverse, _1, _2, _3, _4 ) ) },
+				{ "transpose", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::transpose, _1, _2, _3, _4 ) ) },
 				{ "to_string", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::to_string, _1, _2, _3, _4 ) ) }
 			}
 		)

@@ -102,7 +102,6 @@ public:
 		return;
 		M_EPILOG
 	}
-
 	HMatrix( HMatrix const& matrix_ )
 		: _rows( matrix_._rows )
 		, _columns( matrix_._columns )
@@ -114,6 +113,16 @@ public:
 		}
 		data_t tmp( matrix_._data );
 		_data.swap( tmp );
+		return;
+		M_EPILOG
+	}
+	HMatrix( HMatrix&& matrix_ )
+		: _rows( matrix_._rows )
+		, _columns( matrix_._columns )
+		, _data( yaal::move( matrix_._data ) ) {
+		M_PROLOG
+		matrix_._rows = 0;
+		matrix_._columns = 0;
 		return;
 		M_EPILOG
 	}
@@ -160,8 +169,16 @@ public:
 	HMatrix& operator = ( HMatrix const& matrix_ ) {
 		M_PROLOG
 		if ( &matrix_ != this ) {
-			HMatrix<value_type> tmp( matrix_ );
+			HMatrix tmp( matrix_ );
 			swap( tmp );
+		}
+		return ( *this );
+		M_EPILOG
+	}
+	HMatrix& operator = ( HMatrix&& matrix_ ) {
+		M_PROLOG
+		if ( &matrix_ != this ) {
+			swap( matrix_ );
 		}
 		return ( *this );
 		M_EPILOG

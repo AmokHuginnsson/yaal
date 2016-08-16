@@ -80,6 +80,12 @@ public:
 		return;
 		M_EPILOG
 	}
+	HVector( HVector&& vector_ )
+		: _data( yaal::move( vector_._data ) ) {
+		M_PROLOG
+		return;
+		M_EPILOG
+	}
 	~HVector( void ) {
 		M_PROLOG
 		return;
@@ -128,6 +134,12 @@ public:
 		}
 		return ( *this );
 		M_EPILOG
+	}
+	HVector& operator = ( HVector&& vector_ ) {
+		if ( &vector_ != this ) {
+			swap( vector_ );
+		}
+		return ( *this );
 	}
 	void swap( HVector& vector_ ) {
 		M_PROLOG
