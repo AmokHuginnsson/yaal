@@ -53,7 +53,7 @@ class HXmlData;
 
 /*! \brief XML document operation wrapper.
  */
-class HXml {
+class HXml final {
 public:
 	typedef HXml this_type;
 	class HNode;
@@ -100,10 +100,12 @@ public:
 	typedef tree_t::node_t xml_element_t;
 	typedef tree_t::const_node_t const_xml_element_t;
 	HXml( void );
-	virtual ~HXml( void );
+	~HXml( void );
 	HXml( HXml const& );
+	HXml( HXml&& );
 	void swap( HXml& );
 	HXml& operator = ( HXml const& );
+	HXml& operator = ( HXml&& );
 	void init( yaal::hcore::HStreamInterface&, parser_t = PARSER::DEFAULT );
 	void init( yaal::hcore::HStreamInterface::ptr_t, parser_t = PARSER::DEFAULT );
 	void apply_style( yaal::hcore::HString const&, parameters_t const& = parameters_t() );

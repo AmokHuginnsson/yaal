@@ -118,13 +118,14 @@ struct HXml::OConvert {
 	iconv_t _iconvToExternal;
 	iconv_t _iconvToInternal;
 	OConvert( void )
-		: _encoder(),
-		_iconvToExternal( static_cast<iconv_t>( 0 ) ),
-		_iconvToInternal( static_cast<iconv_t>( 0 ) ) { }
+		: _encoder()
+		, _iconvToExternal( static_cast<iconv_t>( 0 ) )
+		, _iconvToInternal( static_cast<iconv_t>( 0 ) ) {
+	}
 	OConvert( OConvert const& convert_ )
-		: _encoder(),
-		_iconvToExternal( static_cast<iconv_t>( 0 ) ),
-		_iconvToInternal( static_cast<iconv_t>( 0 ) ) {
+		: _encoder()
+		, _iconvToExternal( static_cast<iconv_t>( 0 ) )
+		, _iconvToInternal( static_cast<iconv_t>( 0 ) ) {
 		operator = ( convert_ );
 	}
 	OConvert& operator = ( OConvert const& convert_ ) {
@@ -180,7 +181,6 @@ struct HXml::OConvert {
 
 class HXmlData {
 private:
-	friend class HXml;
 	doc_resource_t     _doc;
 	style_resource_t   _style;
 	mutable xpath_context_resource_t _xPathContext;
@@ -191,24 +191,45 @@ public:
 protected:
 	HXmlData( void );
 	HXmlData( HXmlData const& );
-	HXmlData& operator = ( HXmlData const& ) __attribute__(( __noreturn__ ));
+	HXmlData( HXmlData&& );
 	void clear( void ) const;
+private:
+	HXmlData& operator = ( HXmlData const& ) = delete;
+	friend class HXml;
+	template<typename tType, typename... arg_t>
+	friend HResource<tType> yaal::hcore::make_resource( arg_t&&... );
 };
 
 HXmlData::HXmlData( void )
-	: _doc(), _style(), _xPathContext(), _xPathObject(),
-	_nodeSet( nullptr ) {
+	: _doc()
+	, _style()
+	, _xPathContext()
+	, _xPathObject()
+	, _nodeSet( nullptr ) {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
 HXmlData::HXmlData( HXmlData const& xmlData_ )
-	: _doc(), _style(), _xPathContext(), _xPathObject(),
-	_nodeSet( nullptr ) {
+	: _doc( ::xmlCopyDoc( const_cast<xmlDoc*>( xmlData_._doc.get() ), 1 ), &::xmlFreeDoc )
+	, _style( xmlData_._style )
+	, _xPathContext()
+	, _xPathObject()
+	, _nodeSet( nullptr ) {
 	M_PROLOG
-	_doc = doc_resource_t( ::xmlCopyDoc( const_cast<xmlDoc*>( xmlData_._doc.get() ), 1 ), &::xmlFreeDoc );
-	_style = xmlData_._style;
+	return;
+	M_EPILOG
+}
+
+HXmlData::HXmlData( HXmlData&& xmlData_ )
+	: _doc( yaal::move( xmlData_._doc ) )
+	, _style( yaal::move( xmlData_._style ) )
+	, _xPathContext( yaal::move( xmlData_._xPathContext ) )
+	, _xPathObject( yaal::move( xmlData_._xPathObject ) )
+	, _nodeSet( yaal::move( xmlData_._nodeSet ) ) {
+	M_PROLOG
+	xmlData_._nodeSet = nullptr;
 	return;
 	M_EPILOG
 }
@@ -248,33 +269,48 @@ public:
 };
 
 HXml::HXml( void )
-	: _convert( new ( memory::yaal ) HXml::OConvert ),
-	_convertedString(),
-	_varTmpBuffer(),
-	_encoding( _defaultEncoding_ ),
-	_streamId(),
-	_xml(),
-	_entities(),
-	_namespaces(),
-	_domTree() {
+	: _convert( new ( memory::yaal ) HXml::OConvert )
+	, _convertedString()
+	, _varTmpBuffer()
+	, _encoding( _defaultEncoding_ )
+	, _streamId()
+	, _xml( make_resource<HXmlData>() )
+	, _entities()
+	, _namespaces()
+	, _domTree() {
 	M_PROLOG
-	_xml = xml_low_t( new ( memory::yaal ) HXmlData() );
 	return;
 	M_EPILOG
 }
 
 HXml::HXml( HXml const& xml_ )
-	: _convert( xml_._convert ),
-	_convertedString( xml_._convertedString ),
-	_varTmpBuffer( xml_._varTmpBuffer ),
-	_encoding( xml_._encoding ),
-	_streamId( xml_._streamId ),
-	_xml(),
-	_entities( xml_._entities ),
-	_namespaces( xml_._namespaces ),
-	_domTree( xml_._domTree ) {
+	: _convert( xml_._convert )
+	, _convertedString( xml_._convertedString )
+	, _varTmpBuffer( xml_._varTmpBuffer )
+	, _encoding( xml_._encoding )
+	, _streamId( xml_._streamId )
+	, _xml()
+	, _entities( xml_._entities )
+	, _namespaces( xml_._namespaces )
+	, _domTree( xml_._domTree ) {
 	M_PROLOG
 	_xml = xml_low_t( new ( memory::yaal ) HXmlData( *xml_._xml ) );
+	get_root().reset_owner( this );
+	return;
+	M_EPILOG
+}
+
+HXml::HXml( HXml&& xml_ )
+	: _convert( yaal::move( xml_._convert ) )
+	, _convertedString( yaal::move( xml_._convertedString ) )
+	, _varTmpBuffer( yaal::move( xml_._varTmpBuffer ) )
+	, _encoding( yaal::move( xml_._encoding ) )
+	, _streamId( yaal::move( xml_._streamId ) )
+	, _xml( yaal::move( xml_._xml ) )
+	, _entities( yaal::move( xml_._entities ) )
+	, _namespaces( yaal::move( xml_._namespaces ) )
+	, _domTree( yaal::move( xml_._domTree ) ) {
+	M_PROLOG
 	get_root().reset_owner( this );
 	return;
 	M_EPILOG
@@ -284,6 +320,17 @@ HXml& HXml::operator = ( HXml const& xml_ ) {
 	if ( &xml_ != this ) {
 		HXml tmp( xml_ );
 		swap( tmp );
+		get_root().reset_owner( this );
+	}
+	return ( *this );
+}
+
+HXml& HXml::operator = ( HXml&& xml_ ) {
+	if ( &xml_ != this ) {
+		swap( xml_ );
+		get_root().reset_owner( this );
+		xml_.get_root().reset_owner( &xml_ );
+		xml_.clear();
 	}
 	return ( *this );
 }
