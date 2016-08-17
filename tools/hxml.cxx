@@ -174,6 +174,14 @@ struct HXml::OConvert {
 		_iconvToInternal = _encoder->iconv_out;
 		M_EPILOG
 	}
+	void reset( void ) {
+		M_PROLOG
+		_encoder.reset();
+		_iconvToExternal = static_cast<iconv_t>( 0 );
+		_iconvToInternal = static_cast<iconv_t>( 0 );
+		return;
+		M_EPILOG
+	}
 	bool is_initialized( void ) const {
 		return ( ! ( _iconvToExternal && _iconvToInternal ) );
 	}
@@ -269,7 +277,7 @@ public:
 };
 
 HXml::HXml( void )
-	: _convert( new ( memory::yaal ) HXml::OConvert )
+	: _convert( make_pointer<HXml::OConvert>() )
 	, _convertedString()
 	, _varTmpBuffer()
 	, _encoding( _defaultEncoding_ )
@@ -295,7 +303,10 @@ HXml::HXml( HXml const& xml_ )
 	, _domTree( xml_._domTree ) {
 	M_PROLOG
 	_xml = xml_low_t( new ( memory::yaal ) HXmlData( *xml_._xml ) );
-	get_root().reset_owner( this );
+	HNodeProxy root( get_root() );
+	if ( !! root ) {
+		root.reset_owner( this );
+	}
 	return;
 	M_EPILOG
 }
@@ -311,7 +322,10 @@ HXml::HXml( HXml&& xml_ )
 	, _namespaces( yaal::move( xml_._namespaces ) )
 	, _domTree( yaal::move( xml_._domTree ) ) {
 	M_PROLOG
-	get_root().reset_owner( this );
+	HNodeProxy root( get_root() );
+	if ( !! root ) {
+		root.reset_owner( this );
+	}
 	return;
 	M_EPILOG
 }
@@ -320,7 +334,10 @@ HXml& HXml::operator = ( HXml const& xml_ ) {
 	if ( &xml_ != this ) {
 		HXml tmp( xml_ );
 		swap( tmp );
-		get_root().reset_owner( this );
+		HNodeProxy root( get_root() );
+		if ( !! root ) {
+			root.reset_owner( this );
+		}
 	}
 	return ( *this );
 }
@@ -328,8 +345,14 @@ HXml& HXml::operator = ( HXml const& xml_ ) {
 HXml& HXml::operator = ( HXml&& xml_ ) {
 	if ( &xml_ != this ) {
 		swap( xml_ );
-		get_root().reset_owner( this );
-		xml_.get_root().reset_owner( &xml_ );
+		HNodeProxy root( get_root() );
+		if ( !! root ) {
+			root.reset_owner( this );
+		}
+		root = xml_.get_root();
+		if ( !! root ) {
+			root.reset_owner( &xml_ );
+		}
 		xml_.clear();
 	}
 	return ( *this );
@@ -353,8 +376,25 @@ void HXml::swap( HXml& xml_ ) {
 
 HXml::~HXml ( void ) {
 	M_PROLOG
+	clear();
 	return;
 	M_DESTRUCTOR_EPILOG
+}
+
+void HXml::clear( void ) {
+	M_PROLOG
+	/* *FIXME* *TODO*
+	 * Actually clear _convert content, not only a reference to shared object.
+	 * In other words turn _convert into copy-constructible value.
+	 */
+	_convert = make_pointer<OConvert>();
+	_encoding.clear();
+	_domTree.clear();
+	_xml->clear();
+	_entities.clear();
+	_namespaces.clear();
+	return;
+	M_EPILOG
 }
 
 #ifdef HAVE_ICONV_INPUT_CONST
@@ -898,15 +938,6 @@ void HXml::create_root( yaal::hcore::HString const& name_, yaal::hcore::HString 
 	_convert->init( _encoding );
 	tree_t::node_t root = _domTree.create_new_root( HNode( this ) );
 	(**root)._text = name_;
-	return;
-	M_EPILOG
-}
-
-void HXml::clear( void ) {
-	M_PROLOG
-	_encoding.clear();
-	_domTree.clear();
-	_xml->clear();
 	return;
 	M_EPILOG
 }
