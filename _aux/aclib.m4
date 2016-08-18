@@ -161,7 +161,7 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 		HOST_OS_TYPE=[Cygwin]
 		LIB_PREFIX=["cyg"]
 		LIB_EXT=["dll"]
-		TOOLS_LIBS=["${TOOLS_LIBS} -liconv"]
+		HCORE_LIBS=["${HCORE_LIBS} -liconv"]
 	fi
 	AC_DEFINE_UNQUOTED([SYMBOL_PREFIX],${SYMBOL_PREFIX},[Symbol prefix used on this platform.])
 	AC_DEFINE_UNQUOTED([LIB_PREFIX],"${LIB_PREFIX}",[Dynamic library file name prefix used on this platform.])
