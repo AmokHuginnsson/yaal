@@ -126,7 +126,7 @@ void HUDPSocket::bind( int port_, ip_t ip_ ) {
 	address.sin_family = AF_INET;
 	address.sin_port = fwd_htons( static_cast<int short unsigned>( port_ ) );
 	address.sin_addr.s_addr = ip_.raw();
-	M_ENSURE_EX(
+	M_ENSURE(
 		( ::bind( _fileDescriptor, reinterpret_cast<sockaddr*>( &address ), static_cast<socklen_t>( sizeof ( address ) ) ) == 0 ),
 		resolver::ip_to_string( ip_ ) + ":" + port_
 	);
@@ -140,7 +140,7 @@ void HUDPSocket::connect( ip_t ip_, int port_ ) {
 	address.sin_family = AF_INET;
 	address.sin_port = fwd_htons( static_cast<int short unsigned>( port_ ) );
 	address.sin_addr.s_addr = ip_.raw();
-	M_ENSURE_EX(
+	M_ENSURE(
 		( ::connect( _fileDescriptor, reinterpret_cast<sockaddr*>( &address ), static_cast<socklen_t>( sizeof ( address ) ) ) == 0 ),
 		resolver::ip_to_string( ip_ ) + ":" + port_
 	);

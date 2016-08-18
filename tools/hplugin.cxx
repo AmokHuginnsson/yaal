@@ -52,7 +52,7 @@ void HPlugin::load( HString const& path_ ) {
 	_handle = dlopen( ! path_.is_empty() ? path_.raw() : nullptr, RTLD_NOW | RTLD_GLOBAL );
 	if ( _handle == reinterpret_cast<void const*>( -1 ) )
 		_handle = nullptr;
-	M_ENSURE_EX( _handle != nullptr, path_ );
+	M_ENSURE( _handle != nullptr, path_ );
 	return;
 	M_EPILOG
 }
@@ -85,7 +85,7 @@ void* HPlugin::resolve( HString const& symbolName_ ) {
 	M_PROLOG
 	M_ASSERT( _handle );
 	void* sym( nullptr );
-	M_ENSURE_EX( ( sym = try_resolve( symbolName_ ) ) != nullptr, symbolName_ );
+	M_ENSURE( ( sym = try_resolve( symbolName_ ) ) != nullptr, symbolName_ );
 	return ( sym );
 	M_EPILOG
 }

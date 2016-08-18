@@ -214,14 +214,14 @@ HString get_stream_id( HStreamInterface* stream ) {
 
 HStreamInterface& ensure( HStreamInterface& stream_ ) {
 	M_PROLOG
-	M_ENSURE_EX( stream_.is_valid(), get_stream_id( &stream_ ) );
+	M_ENSURE( stream_.is_valid(), get_stream_id( &stream_ ) );
 	return ( stream_ );
 	M_EPILOG
 }
 
 HStreamInterface::ptr_t ensure( HStreamInterface::ptr_t stream_ ) {
 	M_PROLOG
-	M_ENSURE_EX( stream_->is_valid(), get_stream_id( stream_.raw() ) );
+	M_ENSURE( stream_->is_valid(), get_stream_id( stream_.raw() ) );
 	return ( stream_ );
 	M_EPILOG
 }

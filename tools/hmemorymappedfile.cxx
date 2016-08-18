@@ -50,7 +50,7 @@ static void const* const FWD_MAP_FAILED = MAP_FAILED;
 HMemoryMappedFile::HMemoryMappedFile( yaal::hcore::HString const& path_, int long size_ )
 	: _fd( -1 ), _map( nullptr ), _size( 0 ) {
 	M_PROLOG
-	M_ENSURE_EX( ( _fd = ::open( path_.raw(), O_RDWR ) ) >= 0, path_ );
+	M_ENSURE( ( _fd = ::open( path_.raw(), O_RDWR ) ) >= 0, path_ );
 	try {
 		if ( ! size_ ) {
 			M_ENSURE( ( _size = static_cast<int long>( ::lseek( _fd, 0, SEEK_END ) ) ) >= 0 );

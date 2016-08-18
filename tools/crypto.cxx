@@ -101,10 +101,10 @@ void decrypt_3des( yaal::hcore::HStreamInterface& src_, yaal::hcore::HStreamInte
 		if ( nRead > 0 ) {
 			gap = static_cast<char>( nRead % 8 );
 			if ( gap ) {
-				M_ENSURE_EX( gap == 1, "malformed encrypted packet" );
+				M_ENSURE( gap == 1, "malformed encrypted packet" );
 				-- nRead;
 				gap = readBuf[ nRead ];
-				M_ENSURE_EX( ( gap >= 0 ) && ( gap < 8 ) && ( toWrite > 0 ? ( gap <= toWrite ) : ( gap <= nRead ) ), "malformed gap" );
+				M_ENSURE( ( gap >= 0 ) && ( gap < 8 ) && ( toWrite > 0 ? ( gap <= toWrite ) : ( gap <= nRead ) ), "malformed gap" );
 			}
 			toWrite -= ( nRead > 0 ? 0 /* full blocks from previous read */ : gap /* only gap has been read */ );
 			if ( toWrite > 0 )

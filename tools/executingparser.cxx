@@ -451,7 +451,7 @@ void HRuleBase::describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const {
 	int long descriptionLen( rd_.description().get_length() );
 	int long childCount( rd_.children().get_size() );
 	do_describe( rd_, ru_ );
-	M_ENSURE_EX( ( rd_.description().get_length() > descriptionLen ) || ( rd_.children().get_size() > childCount ), "empty rule" );
+	M_ENSURE( ( rd_.description().get_length() > descriptionLen ) || ( rd_.children().get_size() > childCount ), "empty rule" );
 	return;
 	M_EPILOG
 }

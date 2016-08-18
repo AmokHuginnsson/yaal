@@ -567,7 +567,7 @@ void HRing<type_t>::insert( iterator pos_, iterator_t first_, iterator_t last_ )
 	int long curCapacity( get_capacity().get() );
 	using yaal::distance;
 	int long elemCount( distance( first_, last_ ) );
-	M_ENSURE_EX( ( _size + elemCount ) <= curCapacity, _errMsgHRing_[ ERROR::BAD_SIZE ] );
+	M_ENSURE( ( _size + elemCount ) <= curCapacity, _errMsgHRing_[ ERROR::BAD_SIZE ] );
 	insert_space( pos_._index, elemCount );
 	value_type* arr( _buf.get<value_type>() );
 	for ( int long i( pos_._index + _start ); first_ != last_; ++ first_,  ++ i ) {
@@ -585,7 +585,7 @@ void HRing<type_t>::insert( iterator pos_, int long count_, type_t const& value_
 	if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
 		M_THROW( _errMsgHRing_[ ERROR::INVALID_ITERATOR ], pos_._index );
 	int long curCapacity( get_capacity().get() );
-	M_ENSURE_EX( ( _size + count_ ) <= curCapacity, _errMsgHRing_[ ERROR::BAD_SIZE ] );
+	M_ENSURE( ( _size + count_ ) <= curCapacity, _errMsgHRing_[ ERROR::BAD_SIZE ] );
 	insert_space( pos_._index, count_ );
 	value_type* arr( _buf.get<value_type>() );
 	for ( int long i( pos_._index + _start ), last( pos_._index + count_ ); i < last; ++ i ) {
@@ -602,7 +602,7 @@ typename HRing<type_t>::iterator HRing<type_t>::insert( iterator pos_, type_t co
 	if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
 		M_THROW( _errMsgHRing_[ ERROR::INVALID_ITERATOR ], pos_._index );
 	int long curCapacity( get_capacity().get() );
-	M_ENSURE_EX( ( _size + 1 ) <= curCapacity, _errMsgHRing_[ ERROR::BAD_SIZE ] );
+	M_ENSURE( ( _size + 1 ) <= curCapacity, _errMsgHRing_[ ERROR::BAD_SIZE ] );
 	insert_space( pos_._index, 1 );
 	value_type* arr( _buf.get<value_type>() );
 	int long idx( ( pos_._index + _start ) >= curCapacity ? pos_._index + _start - curCapacity : pos_._index + _start );
@@ -741,7 +741,7 @@ typename HRing<type_t>::value_type* HRing<type_t>::space_back( void ) {
 	M_PROLOG
 	int long curCapacity( get_capacity().get() );
 	M_ASSERT( _size <= curCapacity );
-	M_ENSURE_EX( _size < curCapacity, _errMsgHRing_[ ERROR::RING_IS_FULL ] );
+	M_ENSURE( _size < curCapacity, _errMsgHRing_[ ERROR::RING_IS_FULL ] );
 	value_type* arr( _buf.get<value_type>() );
 	int long idx( _start + _size );
 	if ( idx >= curCapacity )
@@ -755,7 +755,7 @@ typename HRing<type_t>::value_type* HRing<type_t>::space_front( void ) {
 	M_PROLOG
 	int long curCapacity( get_capacity().get() );
 	M_ASSERT( _size <= curCapacity );
-	M_ENSURE_EX( _size < curCapacity, _errMsgHRing_[ ERROR::RING_IS_FULL ] );
+	M_ENSURE( _size < curCapacity, _errMsgHRing_[ ERROR::RING_IS_FULL ] );
 	-- _start;
 	if ( _start < 0 )
 		_start = curCapacity - 1;
@@ -767,7 +767,7 @@ typename HRing<type_t>::value_type* HRing<type_t>::space_front( void ) {
 template<typename type_t>
 void HRing<type_t>::pop_back( void ) {
 	M_PROLOG
-	M_ENSURE_EX( _size > 0, _errMsgHRing_[ ERROR::RING_IS_EMPTY ] );
+	M_ENSURE( _size > 0, _errMsgHRing_[ ERROR::RING_IS_EMPTY ] );
 	-- _size;
 	int long cap( get_capacity().get() );
 	int long idx( _start + _size );
@@ -782,7 +782,7 @@ void HRing<type_t>::pop_back( void ) {
 template<typename type_t>
 void HRing<type_t>::pop_front( void ) {
 	M_PROLOG
-	M_ENSURE_EX( _size > 0, _errMsgHRing_[ ERROR::RING_IS_EMPTY ] );
+	M_ENSURE( _size > 0, _errMsgHRing_[ ERROR::RING_IS_EMPTY ] );
 	value_type* arr( _buf.get<value_type>() );
 	M_SAFE( arr[ _start ++ ].~value_type() );
 	if ( _start == get_capacity() )

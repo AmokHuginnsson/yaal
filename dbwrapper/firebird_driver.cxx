@@ -335,7 +335,7 @@ M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query
 	if ( res ) {
 		if ( res->_ok ) {
 			isc_commit_transaction( db->_status, &res->_tr );
-			M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, res ) );
+			M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, res ) );
 		} else {
 			isc_dsql_free_statement( db->_status, &res->_stmt, DSQL_drop );
 			res->_stmt = 0;
@@ -358,7 +358,7 @@ M_EXPORT_SYMBOL void rs_free_query_result( void* data_ ) {
 			isc_dsql_free_statement( db->_status, &res->_stmt, DSQL_drop );
 		}
 		res->_stmt = 0;
-		M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
+		M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
 		M_SAFE( delete res );
 	}
 	return;
@@ -414,14 +414,14 @@ void firebird_rs_free_cursor( void* data_ ) {
 			isc_dsql_free_statement( db->_status, &res->_stmt, DSQL_drop );
 		}
 		res->_stmt = 0;
-		M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
+		M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
 		if ( res->_ok ) {
 			isc_commit_transaction( db->_status, &res->_tr );
 		} else {
 			isc_rollback_transaction( db->_status, &res->_tr );
 		}
 		res->_tr = 0;
-		M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
+		M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
 		M_SAFE( delete res );
 	}
 	return;
@@ -471,7 +471,7 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink& /*dbLink_*/, void* dataR_ 
 	char countBuffer[COUNT_BUF_SIZE];
 	::memset( countBuffer, isc_info_end, COUNT_BUF_SIZE );
 	isc_dsql_sql_info( res->_status, &res->_stmt, static_cast<int short>( sizeof ( items ) ), items, static_cast<int short>( sizeof ( countBuffer ) ), countBuffer );
-	M_ENSURE_EX( ( res->_status[0] != 1 ) || ( res->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
+	M_ENSURE( ( res->_status[0] != 1 ) || ( res->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
 	char statementType( 0 );
 	char const* p( countBuffer );
 	if ( *p == isc_info_sql_stmt_type ) {
@@ -551,13 +551,13 @@ M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 		ok = true;
 	} while ( false );
 	isc_dsql_free_statement( db->_status, &stmt, DSQL_drop );
-	M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, nullptr ) );
+	M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, nullptr ) );
 	if ( ! ok ) {
 		isc_rollback_transaction( db->_status, &tr );
-		M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, nullptr ) );
+		M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, nullptr ) );
 	} else {
 		isc_commit_transaction( db->_status, &tr );
-		M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, nullptr ) );
+		M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, nullptr ) );
 	}
 	return ( nullInd != -1 ? static_cast<int long>( lastInsertId ) : -1 );
 }

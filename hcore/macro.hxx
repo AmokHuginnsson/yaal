@@ -94,9 +94,9 @@ Copyright:
 #ifdef M_NUM_ARGC_COUNTER
 #	error Yaal redefines M_NUM_ARGC_COUNTER macro.
 #endif /* #ifdef M_NUM_ARGC_COUNTER */
-#ifdef M_ENSURE_EX
-#	error Yaal redefines M_ENSURE_EX macro.
-#endif /* #ifdef M_ENSURE_EX */
+#ifdef M_ENSURE_T
+#	error Yaal redefines M_ENSURE_T macro.
+#endif /* #ifdef M_ENSURE_T */
 #ifdef M_ASSERT
 #	error Yaal redefines M_ASSERT macro.
 #endif /* #ifdef M_ASSERT */
@@ -240,8 +240,8 @@ Copyright:
  */
 #define M_ENSURE( ... ) M_MACRO_ARGC( M_ENSURE_, __VA_ARGS__ )
 #define M_ENSURE_1( condition ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<this_type>( __FILE__, __LINE__, __PRETTY_FUNCTION__, error_message( errno ), errno ); } } while ( 0 )
-#define M_ENSURE_2( condition, type ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<type>( __FILE__, __LINE__, __PRETTY_FUNCTION__, error_message( errno ), errno ); } } while ( 0 )
-#define M_ENSURE_EX( condition, comment ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<this_type>( __FILE__, __LINE__, __PRETTY_FUNCTION__, error_message( errno ), errno, comment ); } } while ( 0 )
+#define M_ENSURE_2( condition, comment ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<this_type>( __FILE__, __LINE__, __PRETTY_FUNCTION__, error_message( errno ), errno, comment ); } } while ( 0 )
+#define M_ENSURE_T( condition, type ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<type2>( __FILE__, __LINE__, __PRETTY_FUNCTION__, error_message( errno ), errno ); } } while ( 0 )
 #ifndef NDEBUG
 /*! \brief Run-time assertion tester.
  *

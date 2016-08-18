@@ -108,7 +108,7 @@ int HFile::open( HString const& path_, open_t const& open_ ) {
 
 int HFile::do_open( HString const& path_, open_t const& open_ ) {
 	M_PROLOG
-	M_ENSURE_EX( ! _handle, "stream already opened" );
+	M_ENSURE( ! _handle, "stream already opened" );
 	char const* mode( nullptr );
 	if ( open_ == OPEN::READING ) {
 		mode = "rb";
@@ -148,7 +148,7 @@ int HFile::do_open( HString const& path_, open_t const& open_ ) {
 
 int HFile::open( void* handle_, OWNERSHIP ownership_ ) {
 	M_PROLOG
-	M_ENSURE_EX( ! _handle, "stream already opened" );
+	M_ENSURE( ! _handle, "stream already opened" );
 	M_ENSURE( handle_ || ( ownership_ == OWNERSHIP::NONE ) );
 	_handle = handle_;
 	_ownership = ownership_;

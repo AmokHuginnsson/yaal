@@ -173,7 +173,7 @@ void HSocket::cleanup( void ) {
 	if ( ( !!( _type & TYPE::FILE ) ) && ( _address ) ) {
 		sockaddr_un* addressFile( static_cast<sockaddr_un*>( _address ) );
 		if ( addressFile->sun_path[ 0 ] ) {
-			M_ENSURE_EX( ( ::unlink( addressFile->sun_path ) == 0 ), addressFile->sun_path );
+			M_ENSURE( ( ::unlink( addressFile->sun_path ) == 0 ), addressFile->sun_path );
 		}
 	}
 	return;
@@ -221,7 +221,7 @@ void HSocket::listen( yaal::hcore::HString const& address_, int port_ ) {
 			reinterpret_cast<char*>( &reuseAddr ), static_cast<socklen_t>( sizeof ( reuseAddr ) )
 		) == 0
 	);
-	M_ENSURE_EX(
+	M_ENSURE(
 		( ::bind( _fileDescriptor, static_cast<sockaddr*>( _address ), static_cast<socklen_t>( _addressSize ) ) == 0 ),
 		!!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_
 	);
@@ -302,10 +302,10 @@ void HSocket::connect( yaal::hcore::HString const& address_, int port_ ) {
 			socklen_t optLen( static_cast<socklen_t>( sizeof ( error ) ) );
 			M_ENSURE( ::getsockopt( _fileDescriptor, SOL_SOCKET, SO_ERROR, &error, &optLen ) == 0 );
 		} else if ( ! timeout ) {
-			M_ENSURE_EX( ! "connection timedout"[0], !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
+			M_ENSURE( ! "connection timedout"[0], !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
 		}
 	}
-	M_ENSURE_EX( error == 0, !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
+	M_ENSURE( error == 0, !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
 	errno = saveErrno;
 	_type |= TYPE::CLIENT;
 	_needShutdown = true;

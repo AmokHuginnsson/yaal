@@ -172,7 +172,7 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ ) {
 	int* fileDesOut = pipeOut._res;
 	int* fileDesErr = pipeErr._res;
 	HFSItem image( image_ );
-	M_ENSURE_EX( !! image && image.is_executable(), image_ );
+	M_ENSURE( !! image && image.is_executable(), image_ );
 	M_ENSURE( ( ! ::pipe( fileDesIn ) ) && ( ! ::pipe( fileDesOut ) ) && ( ! ::pipe( fileDesErr ) ) );
 	HChunk argv( chunk_size<char const*>( argv_.size() + 2 ) );
 	HLock stdinLock( cin.acquire() );
@@ -186,7 +186,7 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ ) {
 	::fflush( stdout );
 	cerr << hcore::flush;
 	_pid = ::fork();
-	M_ENSURE_EX( _pid >= 0, "fork()" );
+	M_ENSURE( _pid >= 0, "fork()" );
 	if ( ! _pid ) {
 		close_and_invalidate( fileDesIn[ 1 ] );
 		close_and_invalidate( fileDesOut[ 0 ] );

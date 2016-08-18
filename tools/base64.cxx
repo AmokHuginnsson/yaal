@@ -225,7 +225,7 @@ void base64::decode( yaal::hcore::HStreamInterface& in, yaal::hcore::HStreamInte
 		int const SIZE = static_cast<int>( line.get_length() );
 		for ( int i = 0; i < SIZE; ++ i, ++ pos ) {
 			char ch = ptr[ i ];
-			M_ENSURE_EX( is_base64_character( ch, standardCompliantMode ) || isalpha( ch ), ( HFormat( "char: %c, at position: %ld" ) % ch % pos ).string() );
+			M_ENSURE( is_base64_character( ch, standardCompliantMode ) || isalpha( ch ), ( HFormat( "char: %c, at position: %ld" ) % ch % pos ).string() );
 			if ( is_base64_character( ch, standardCompliantMode	) ) {
 				decodebuf += ch;
 			}

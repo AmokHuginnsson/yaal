@@ -605,7 +605,7 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 			case ( XML_ENTITY_REF_NODE ): {
 				M_ASSERT( node->name );
 				entities_t::const_iterator it( _entities.find( reinterpret_cast<char const*>( node->name ) ) );
-				M_ENSURE_EX( it != _entities.end(), HString( "entity not found: " ) + reinterpret_cast<char const*>( node->name ) + ", at: " + node->line );
+				M_ENSURE( it != _entities.end(), HString( "entity not found: " ) + reinterpret_cast<char const*>( node->name ) + ", at: " + node->line );
 				node_->add_node( HNode( this, HNode::TYPE::ENTITY, reinterpret_cast<char const*>( node->name ), node->line ) );
 			}
 			break;
@@ -647,7 +647,7 @@ void HXml::apply_style( yaal::hcore::HString const& path_, parameters_t const& p
 	M_ASSERT( _xml->_doc.get() );
 	HXsltParserG::get_instance();
 	xsltStylesheet* pstyle( xsltParseStylesheetFile( reinterpret_cast<xmlChar const*>( path_.raw() ) ) );
-	M_ENSURE_EX( pstyle, HString( "failure parsing XSLT file: " ) + path_ );
+	M_ENSURE( pstyle, HString( "failure parsing XSLT file: " ) + path_ );
 	style_resource_t style( pstyle, xsltFreeStylesheet );
 	HResource<char const*[]> parametersHolder( !parameters_.is_empty() ? new char const*[parameters_.get_size() + 1] : nullptr );
 	char const** parameters( parametersHolder.get() );
@@ -1708,7 +1708,7 @@ HString const& node_val( HXml::HConstIterator const& it_ ) {
 HString const& attr_val( HXml::HConstNodeProxy const& node_, yaal::hcore::HString const& name_ ) {
 	M_PROLOG
 	value_t attrValue( try_attr_val( node_, name_ ) );
-	M_ENSURE_EX( attrValue, name_ );
+	M_ENSURE( attrValue, name_ );
 	return ( *attrValue );
 	M_EPILOG
 }
@@ -1716,7 +1716,7 @@ HString const& attr_val( HXml::HConstNodeProxy const& node_, yaal::hcore::HStrin
 HString const& attr_val( HXml::HConstIterator const& it_, yaal::hcore::HString const& name_ ) {
 	M_PROLOG
 	value_t attrValue( try_attr_val( it_, name_ ) );
-	M_ENSURE_EX( attrValue, name_ );
+	M_ENSURE( attrValue, name_ );
 	return ( *attrValue );
 	M_EPILOG
 }
