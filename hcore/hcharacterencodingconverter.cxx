@@ -45,7 +45,7 @@ HCharacterEncodingConverter::HCharacterEncodingConverter( yaal::hcore::HString c
 	, _descriptor( reinterpret_cast<descriptor_t>( iconv_open( _nameTo.c_str(), _nameFrom.c_str() ) ) )
 	, _cache() {
 	M_PROLOG
-	M_ENSURE( _descriptor != INVALID, "iconv_open" );
+	M_ENSURE( _descriptor != INVALID, "iconv_open( "_ys.append( _nameTo ).append( ", " ).append( _nameFrom ).append( " )" ) );
 	return;
 	M_EPILOG
 }
@@ -56,7 +56,7 @@ HCharacterEncodingConverter::HCharacterEncodingConverter( HCharacterEncodingConv
 	, _descriptor( reinterpret_cast<descriptor_t>( iconv_open( _nameTo.c_str(), _nameFrom.c_str() ) ) )
 	, _cache() {
 	M_PROLOG
-	M_ENSURE( _descriptor != INVALID, "iconv_open" );
+	M_ENSURE( _descriptor != INVALID, "iconv_open( "_ys.append( _nameTo ).append( ", " ).append( _nameFrom ).append( " )" ) );
 	return;
 	M_EPILOG
 }

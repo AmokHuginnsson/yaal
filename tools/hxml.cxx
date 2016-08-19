@@ -44,6 +44,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/memory.hxx"
 #include "hcore/hsingleton.hxx"
 #include "hcore/hlog.hxx"
+#include "hcore/hcharacterencodingconverter.hxx"
 #include "tools.hxx"
 #include "streamtools.hxx"
 
@@ -55,7 +56,6 @@ namespace {
 /* char schema_err[] = "bad xml schema"; */
 typedef HResource<xmlDoc, void (*)( xmlDocPtr )> doc_resource_t;
 typedef HResource<xmlTextWriter, void (*)( xmlTextWriterPtr )> writer_resource_t;
-typedef HPointer<xmlCharEncodingHandler> encoder_resource_t;
 typedef HPointer<xsltStylesheet> style_resource_t;
 typedef HResource<xmlXPathContext, void (*)( xmlXPathContextPtr )> xpath_context_resource_t;
 typedef HResource<xmlXPathObject, void (*)( xmlXPathObjectPtr )> xpath_object_resource_t;
@@ -76,116 +76,130 @@ HXml::parser_t const HXml::PARSER::RESOLVE_ENTITIES = HXml::parser_t::new_flag()
 HXml::parser_t const HXml::PARSER::AUTO_XINCLUDE = HXml::parser_t::new_flag();
 
 class HXmlParserG : public HSingleton<HXmlParserG> {
-	HXmlParserG( void );
-	~HXmlParserG( void );
+	virtual ~HXmlParserG( void ) {
+		M_PROLOG
+		xmlCleanupParser();
+		xmlCleanupCharEncodingHandlers();
+		return;
+		M_DESTRUCTOR_EPILOG
+	}
 	friend class HSingleton<HXmlParserG>;
 	friend class HDestructor<HXmlParserG>;
 };
 
-HXmlParserG::HXmlParserG( void ) {
-}
-
-HXmlParserG::~HXmlParserG( void ) {
-	M_PROLOG
-	xmlCleanupParser();
-	xmlCleanupCharEncodingHandlers();
-	return;
-	M_DESTRUCTOR_EPILOG
-}
-
 class HXsltParserG : public HSingleton<HXsltParserG> {
-	HXsltParserG( void );
-	~HXsltParserG( void );
+	HXsltParserG( void ) {
+		exsltRegisterAll();
+		xmlSubstituteEntitiesDefault( 0 );
+//		xmlLoadExtDtdDefaultValue = 1;
+	}
+	virtual ~HXsltParserG( void ) {
+		M_PROLOG
+		xsltCleanupGlobals();
+		return;
+		M_DESTRUCTOR_EPILOG
+	}
 	friend class HSingleton<HXsltParserG>;
 	friend class HDestructor<HXsltParserG>;
 };
 
-HXsltParserG::HXsltParserG( void ) {
-	exsltRegisterAll();
-	xmlSubstituteEntitiesDefault( 0 );
-//	xmlLoadExtDtdDefaultValue = 1;
-}
-
-HXsltParserG::~HXsltParserG( void ) {
-	M_PROLOG
-	xsltCleanupGlobals();
-	return;
-	M_DESTRUCTOR_EPILOG
-}
-
 struct HXml::OConvert {
-	encoder_resource_t _encoder;
-	iconv_t _iconvToExternal;
-	iconv_t _iconvToInternal;
+	typedef HResource<HCharacterEncodingConverter> character_encoding_converter_t;
+	character_encoding_converter_t _encoder;
+	character_encoding_converter_t _decoder;
+	static char const* INTERNAL_ENCODING_NAME;
 	OConvert( void )
 		: _encoder()
-		, _iconvToExternal( static_cast<iconv_t>( 0 ) )
-		, _iconvToInternal( static_cast<iconv_t>( 0 ) ) {
+		, _decoder() {
 	}
 	OConvert( OConvert const& convert_ )
 		: _encoder()
-		, _iconvToExternal( static_cast<iconv_t>( 0 ) )
-		, _iconvToInternal( static_cast<iconv_t>( 0 ) ) {
-		operator = ( convert_ );
-	}
-	OConvert& operator = ( OConvert const& convert_ ) {
-		if ( &convert_ != this ) {
-			_encoder = convert_._encoder;
-			_iconvToExternal = convert_._iconvToExternal;
-			_iconvToInternal = convert_._iconvToInternal;
+		, _decoder() {
+		M_PROLOG
+		if ( !! convert_._encoder ) {
+			M_ASSERT( !! _decoder );
+			try {
+				_encoder = make_resource<HCharacterEncodingConverter>( convert_._encoder->name_from(), convert_._encoder->name_to() );
+				_decoder = make_resource<HCharacterEncodingConverter>( convert_._decoder->name_from(), convert_._decoder->name_to() );
+			} catch ( HCharacterEncodingConverterException const& e ) {
+				throw HXmlException( e.what() );
+			}
+		} else {
+			M_ASSERT( ! _decoder );
 		}
-		return ( *this );
+		return;
+		M_EPILOG
 	}
 	void init( HString const& encoding_ ) {
 		M_PROLOG
-		xmlCharEncodingHandlerPtr encoder = ::xmlFindCharEncodingHandler( encoding_.raw() );
-		if ( ! encoder ) {
-			M_THROW( _( "cannot enable internal conversion" ), errno );
+		try {
+			_encoder = make_resource<HCharacterEncodingConverter>( encoding_, INTERNAL_ENCODING_NAME );
+			_decoder = make_resource<HCharacterEncodingConverter>( INTERNAL_ENCODING_NAME, encoding_ );
+		} catch ( HCharacterEncodingConverterException const& e ) {
+			throw HXmlException( e.what() );
 		}
-		_encoder = encoder_resource_t( encoder, xmlCharEncCloseFunc );
-		_iconvToExternal = _encoder->iconv_in;
-		_iconvToInternal = _encoder->iconv_out;
+		return;
 		M_EPILOG
 	}
-	void init( yaal::hcore::HString const& encoding_, xmlNodePtr root_, yaal::hcore::HString const& fileName_ ) {
+	void infer( yaal::hcore::HString const& encoding_, xmlNodePtr root_, yaal::hcore::HString const& fileName_ ) {
 		M_PROLOG
-		xmlCharEncodingHandlerPtr encoder = nullptr;
+		char const* name( nullptr );
 		if ( !! encoding_ ) {
-			encoder = ::xmlFindCharEncodingHandler( encoding_.raw() );
+			name = ::xmlGetEncodingAlias( encoding_.raw() );
+			if ( ! name ) {
+				if ( ::xmlParseCharEncoding( encoding_.raw() ) > XML_CHAR_ENCODING_NONE ) {
+					name = encoding_.raw();
+				} else {
+					log( LOG_LEVEL::WARNING ) << _( "HXml: Alias not found: `" ) << encoding_ << "' in `"
+						<< fileName_ << ":" << root_->line <<"'." << endl;
+				}
+			}
 		} else {
-			log( LOG_LEVEL::WARNING ) << _( "HXml::WARNING: no encoding declared in `" )
+			log( LOG_LEVEL::WARNING ) << _( "HXml: No encoding declared in `" )
 				<< fileName_ << ":" << root_->line <<"'." << endl;
 		}
-		if ( ! encoder ) {
-			log( LOG_LEVEL::WARNING ) << _( "HXml::WARNING: char encoding handler not found in `" )
+		HString buf;
+		if ( ! name ) {
+			xmlCharEncodingHandlerPtr h( ::xmlFindCharEncodingHandler( encoding_.raw() ) );
+			if ( h ) {
+				buf.assign( h->name );
+				name = buf.raw();
+				::xmlCharEncCloseFunc( h );
+			}
+		}
+		if ( ! name ) {
+			log( LOG_LEVEL::WARNING ) << _( "HXml: Character encoding handler not found in `" )
 				<< fileName_ << ":" << root_->line << "'." << endl;
-			xmlCharEncoding encoding = ::xmlDetectCharEncoding( root_->name,
-					xmlStrlen( root_->name ) );
+			xmlChar* content( xmlNodeGetContent( root_ ) );
+			xmlCharEncoding encoding( ::xmlDetectCharEncoding( content, xmlStrlen( content ) ) );
+			::xmlFree( content );
 			if ( ! encoding ) {
 				M_THROW( _( "cannot detect character encoding" ), errno );
 			}
-			encoder = xmlGetCharEncodingHandler( encoding );
+			name = ::xmlGetCharEncodingName( encoding );
 		}
-		if ( ! encoder ) {
+		if ( ! name ) {
 			M_THROW( _( "cannot enable internal conversion" ), errno );
 		}
-		_encoder = encoder_resource_t( encoder, xmlCharEncCloseFunc );
-		_iconvToExternal = _encoder->iconv_in;
-		_iconvToInternal = _encoder->iconv_out;
+		init( name );
+		return;
 		M_EPILOG
 	}
 	void reset( void ) {
 		M_PROLOG
 		_encoder.reset();
-		_iconvToExternal = static_cast<iconv_t>( 0 );
-		_iconvToInternal = static_cast<iconv_t>( 0 );
+		_decoder.reset();
 		return;
 		M_EPILOG
 	}
 	bool is_initialized( void ) const {
-		return ( ! ( _iconvToExternal && _iconvToInternal ) );
+		return ( ( !!  _encoder ) && ( !! _decoder ) );
 	}
+private:
+	OConvert& operator = ( OConvert const& ) = delete;
 };
+
+char const* HXml::OConvert::INTERNAL_ENCODING_NAME( ::xmlGetCharEncodingName( XML_CHAR_ENCODING_UTF8 ) );
 
 class HXmlData {
 private:
@@ -194,67 +208,51 @@ private:
 	mutable xpath_context_resource_t _xPathContext;
 	mutable xpath_object_resource_t _xPathObject;
 	xmlNodeSetPtr      _nodeSet;
-public:
-	virtual ~HXmlData( void );
 protected:
-	HXmlData( void );
-	HXmlData( HXmlData const& );
-	HXmlData( HXmlData&& );
-	void clear( void ) const;
+	HXmlData( void )
+		: _doc()
+		, _style()
+		, _xPathContext()
+		, _xPathObject()
+		, _nodeSet( nullptr ) {
+		M_PROLOG
+		return;
+		M_EPILOG
+	}
+	HXmlData( HXmlData const& xmlData_ )
+		: _doc( ::xmlCopyDoc( const_cast<xmlDoc*>( xmlData_._doc.get() ), 1 ), &::xmlFreeDoc )
+		, _style( xmlData_._style )
+		, _xPathContext()
+		, _xPathObject()
+		, _nodeSet( nullptr ) {
+		M_PROLOG
+		return;
+		M_EPILOG
+	}
+	HXmlData( HXmlData&& xmlData_ )
+		: _doc( yaal::move( xmlData_._doc ) )
+		, _style( yaal::move( xmlData_._style ) )
+		, _xPathContext( yaal::move( xmlData_._xPathContext ) )
+		, _xPathObject( yaal::move( xmlData_._xPathObject ) )
+		, _nodeSet( yaal::move( xmlData_._nodeSet ) ) {
+		M_PROLOG
+		xmlData_._nodeSet = nullptr;
+		return;
+		M_EPILOG
+	}
+	void clear( void ) const {
+		M_PROLOG
+		_xPathObject.reset();
+		_xPathContext.reset();
+		return;
+		M_EPILOG
+	}
 private:
 	HXmlData& operator = ( HXmlData const& ) = delete;
 	friend class HXml;
 	template<typename tType, typename... arg_t>
 	friend HResource<tType> yaal::hcore::make_resource( arg_t&&... );
 };
-
-HXmlData::HXmlData( void )
-	: _doc()
-	, _style()
-	, _xPathContext()
-	, _xPathObject()
-	, _nodeSet( nullptr ) {
-	M_PROLOG
-	return;
-	M_EPILOG
-}
-
-HXmlData::HXmlData( HXmlData const& xmlData_ )
-	: _doc( ::xmlCopyDoc( const_cast<xmlDoc*>( xmlData_._doc.get() ), 1 ), &::xmlFreeDoc )
-	, _style( xmlData_._style )
-	, _xPathContext()
-	, _xPathObject()
-	, _nodeSet( nullptr ) {
-	M_PROLOG
-	return;
-	M_EPILOG
-}
-
-HXmlData::HXmlData( HXmlData&& xmlData_ )
-	: _doc( yaal::move( xmlData_._doc ) )
-	, _style( yaal::move( xmlData_._style ) )
-	, _xPathContext( yaal::move( xmlData_._xPathContext ) )
-	, _xPathObject( yaal::move( xmlData_._xPathObject ) )
-	, _nodeSet( yaal::move( xmlData_._nodeSet ) ) {
-	M_PROLOG
-	xmlData_._nodeSet = nullptr;
-	return;
-	M_EPILOG
-}
-
-HXmlData::~HXmlData ( void ) {
-	M_PROLOG
-	return;
-	M_DESTRUCTOR_EPILOG
-}
-
-void HXmlData::clear( void ) const {
-	M_PROLOG
-	_xPathObject.reset();
-	_xPathContext.reset();
-	return;
-	M_EPILOG
-}
 
 class HXml::HNameSpace {
 	yaal::hcore::HString _prefix;
@@ -278,7 +276,6 @@ public:
 
 HXml::HXml( void )
 	: _convert( make_pointer<HXml::OConvert>() )
-	, _convertedString()
 	, _varTmpBuffer()
 	, _encoding( _defaultEncoding_ )
 	, _streamId()
@@ -293,7 +290,6 @@ HXml::HXml( void )
 
 HXml::HXml( HXml const& xml_ )
 	: _convert( xml_._convert )
-	, _convertedString( xml_._convertedString )
 	, _varTmpBuffer( xml_._varTmpBuffer )
 	, _encoding( xml_._encoding )
 	, _streamId( xml_._streamId )
@@ -313,7 +309,6 @@ HXml::HXml( HXml const& xml_ )
 
 HXml::HXml( HXml&& xml_ )
 	: _convert( yaal::move( xml_._convert ) )
-	, _convertedString( yaal::move( xml_._convertedString ) )
 	, _varTmpBuffer( yaal::move( xml_._varTmpBuffer ) )
 	, _encoding( yaal::move( xml_._encoding ) )
 	, _streamId( yaal::move( xml_._streamId ) )
@@ -362,7 +357,6 @@ void HXml::swap( HXml& xml_ ) {
 	if ( &xml_ != this ) {
 		using yaal::swap;
 		swap( xml_._convert, _convert );
-		swap( xml_._convertedString, _convertedString );
 		swap( xml_._varTmpBuffer, _varTmpBuffer );
 		swap( xml_._encoding, _encoding );
 		swap( xml_._streamId, _streamId );
@@ -397,43 +391,19 @@ void HXml::clear( void ) {
 	M_EPILOG
 }
 
-#ifdef HAVE_ICONV_INPUT_CONST
-#	define M_YAAL_TOOLS_HXML_ICONV_CONST const
-#else /* HAVE_ICONV_INPUT_CONST */
-#	define M_YAAL_TOOLS_HXML_ICONV_CONST /**/
-#endif /* not HAVE_ICONV_INPUT_CONST */
-
 HString const& HXml::convert( HString const& data_, way_t way_ ) const {
 	M_PROLOG
-	char M_YAAL_TOOLS_HXML_ICONV_CONST* source = const_cast<char M_YAAL_TOOLS_HXML_ICONV_CONST*>( data_.raw() );
-	iconv_t cD = static_cast<iconv_t>( 0 );
+	HCharacterEncodingConverter* cec( nullptr );
 	switch ( way_ ) {
-		case ( TO_EXTERNAL ): { cD = _convert->_iconvToExternal; break; }
-		case ( TO_INTERNAL ): { cD = _convert->_iconvToInternal; break; }
+		case ( TO_EXTERNAL ): { cec = _convert->_decoder.raw(); break; }
+		case ( TO_INTERNAL ): { cec = _convert->_encoder.raw(); break; }
 		default:
 			M_ASSERT( ! _( "unknown conversion way" ) );
 		break;
 	}
-	size_t sizeOut = 0, sizeIn = ::strlen( source );
-	/* The longest single character in any encoding is 6 bytes long. */
-	size_t const ICONV_OUTPUT_BUFFER_LENGTH = 8;
-	/* Additional character for nil terminator. */
-	char output[ ICONV_OUTPUT_BUFFER_LENGTH + 1 ];
-	_convertedString = "";
-	do {
-		::memset( output, 0, ICONV_OUTPUT_BUFFER_LENGTH + 1 );
-		sizeOut = ICONV_OUTPUT_BUFFER_LENGTH;
-		char* out = output;
-		M_ENSURE( ( ::iconv( cD, &source, &sizeIn, &out,
-						&sizeOut ) != static_cast<size_t>( -1 ) )
-				|| ( errno == E2BIG ) );
-		_convertedString += output;
-	} while ( sizeIn );
-	return ( _convertedString );
+	return ( cec->convert( data_ ) );
 	M_EPILOG
 }
-
-#undef M_YAAL_TOOLS_HXML_ICONV_CONST
 
 int HXml::get_node_set_by_path( yaal::hcore::HString const& path_ ) {
 	M_PROLOG
@@ -505,8 +475,7 @@ void HXml::init( yaal::hcore::HStreamInterface& stream, parser_t parser_ ) {
 #ifdef __DEBUGGER_BABUNI__
 	cout << root->name << endl;
 #endif /* __DEBUGGER_BABUNI__ */
-	(*_convert).init( reinterpret_cast<char const *>( doc.get()->encoding ),
-			root, _streamId );
+	(*_convert).infer( reinterpret_cast<char const *>( doc.get()->encoding ), root, _streamId );
 	using yaal::swap;
 	swap( _xml->_doc, doc );
 	parse_dtd( _xml->_doc.get()->intSubset );

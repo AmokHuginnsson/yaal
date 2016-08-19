@@ -88,7 +88,6 @@ private:
 	typedef enum { TO_EXTERNAL, TO_INTERNAL } way_t;
 	typedef yaal::hcore::HResource<HXmlData> xml_low_t;
 	mutable yaal::hcore::HPointer<OConvert> _convert;
-	mutable yaal::hcore::HString _convertedString;
 	yaal::hcore::HString _varTmpBuffer;
 	yaal::hcore::HString _encoding;
 	yaal::hcore::HString _streamId;
