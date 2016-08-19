@@ -159,6 +159,11 @@ obscure system facilities.
 
 *** PostgreSQL.
 
+Run:
+
+  pg_dropcluster --stop 9.5 main
+  pg_createcluster --lc-ctype pl_PL.ISO-8859-2 --lc-collate pl_PL.ISO-8859-2 --lc-time en_DK --encoding latin2 --start 9.5 main
+
 Add:
 
 	listen_addresses=''
@@ -198,6 +203,9 @@ and disable legacy hash:
 Next, setup administrative user for database and user creation:
 
   gsec -user sysdba -password <your_password>
+
+!!! Note: If you cannot login with administrator password you believe you have set during installation,
+try using default Firebird sysdba password 'masterkey' instead.
 
 in gsec tool add new user:
 
