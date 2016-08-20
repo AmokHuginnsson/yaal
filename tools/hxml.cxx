@@ -293,12 +293,11 @@ HXml::HXml( HXml const& xml_ )
 	, _varTmpBuffer( xml_._varTmpBuffer )
 	, _encoding( xml_._encoding )
 	, _streamId( xml_._streamId )
-	, _xml()
+	, _xml( make_resource<HXmlData>( *xml_._xml ) )
 	, _entities( xml_._entities )
 	, _namespaces( xml_._namespaces )
 	, _domTree( xml_._domTree ) {
 	M_PROLOG
-	_xml = xml_low_t( new ( memory::yaal ) HXmlData( *xml_._xml ) );
 	HNodeProxy root( get_root() );
 	if ( !! root ) {
 		root.reset_owner( this );
@@ -384,7 +383,7 @@ void HXml::clear( void ) {
 	_convert = make_pointer<OConvert>();
 	_encoding.clear();
 	_domTree.clear();
-	_xml->clear();
+	_xml = make_resource<HXmlData>();
 	_entities.clear();
 	_namespaces.clear();
 	return;
