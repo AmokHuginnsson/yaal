@@ -13,18 +13,34 @@ Section: doc
 Architecture: any
 Depends: yaal-dev (= ${binary:Version})
 Description: Yet Another Abstraction Layer - general purpose C++ library - documentation for developers.
- <insert long description, indented with spaces>
+ Cross platform C++ library.
+ Yaal stands for: Yet Another Abstraction Layer
+ Library provides unified high level handling of multiple domains:
+ threads, database access, networking, xml DOM operations.
+ Contains fully fledged OO programming language named Huginn.
+ This version of package contains documentation files.
 
 Package: yaal-dev
 Section: libdevel
 Architecture: any
 Depends: yaal (= ${binary:Version})
 Description: Yet Another Abstraction Layer - general purpose C++ library - development package.
- <insert long description, indented with spaces>
+ Cross platform C++ library.
+ Yaal stands for: Yet Another Abstraction Layer
+ Library provides unified high level handling of multiple domains:
+ threads, database access, networking, xml DOM operations.
+ Contains fully fledged OO programming language named Huginn.
+ This version of package contains headers and development,
+ debug versions of the libraries.
 
 Package: yaal
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Yet Another Abstraction Layer - general purpose C++ library - runtime package.
- <insert long description, indented with spaces>
+ Cross platform C++ library.
+ Yaal stands for: Yet Another Abstraction Layer
+ Library provides unified high level handling of multiple domains:
+ threads, database access, networking, xml DOM operations.
+ Contains fully fledged OO programming language named Huginn.
+ This version of package contains runtime files.

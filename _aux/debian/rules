@@ -9,7 +9,7 @@ export PREFIX=/usr
 export SYSCONFDIR=/etc
 export LOCALSTATEDIR=/var
 
-.PHONY: override_dh_auto_clean override_dh_auto_build override_dh_auto_install override_dh_gencontrol override_dh_strip
+.PHONY: override_dh_auto_clean override_dh_auto_build override_dh_auto_install override_dh_gencontrol override_dh_shlibdeps override_dh_strip
 
 dropprivs: ./debian/dropprivs.c
 	$(CC) $(<) -o $(@)
@@ -25,6 +25,9 @@ override_dh_auto_install: dropprivs
 
 override_dh_gencontrol:
 	dh_gencontrol -- -v$(PACKAGE_VERSION)
+
+override_dh_shlibdeps:
+	dh_shlibdeps -Xsqlite3 -Xpostgresql -Xmysql -Xfirebird -Xoracle
 
 override_dh_strip:
 	true
