@@ -80,7 +80,8 @@ typedef yaal::hcore::HExceptionT<HFSItem> HFSItemException;
 class HFSItem::HIterator {
 	yaal::hcore::HString _path;
 	void* _dir;
-	yaal::hcore::HChunk::ptr_t _dirEnt;
+	yaal::u64_t _inode;
+	yaal::hcore::HString _name;
 	HFSItem _item;
 public:
 	HIterator( HIterator const& it_ );
