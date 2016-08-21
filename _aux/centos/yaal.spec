@@ -12,6 +12,8 @@ BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildRequires: make, autoconf, libtool, libxml2-devel libxslt-devel, zlib-devel, openssl-devel, ncurses-devel, doxygen
 Requires: libxml2, libxslt, openssl, zlib, ncurses
 
+%global __requires_exclude_from %{?__requires_exclude:%__requires_exclude|}^.*libyaal_(sqlite3|postgresql|mysql|firebird|oracle)_driver.*$
+
 %description
 
 %package -n yaal-devel

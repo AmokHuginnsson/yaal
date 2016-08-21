@@ -27,7 +27,7 @@ override_dh_gencontrol:
 	dh_gencontrol -- -v$(PACKAGE_VERSION)
 
 override_dh_shlibdeps:
-	dh_shlibdeps -Xsqlite3 -Xpostgresql -Xmysql -Xfirebird -Xoracle
+	dh_shlibdeps -Xyaal_sqlite3_driver -Xyaal_postgresql_driver -Xyaal_mysql_driver -Xyaal_firebird_driver -Xyaal_oracle_driver
 
 override_dh_strip:
 	true
