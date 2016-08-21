@@ -122,7 +122,7 @@ HString make_path( HString const& rcName_, RC_PATHER::PLACEMENT placement_ ) {
 			char* cwd( ::getcwd( nullptr, 0 ) );
 			rcPath.assign( cwd );
 			::free( cwd );
-			rcPath.append( "/" ).append( rcName_ ).append( RC );
+			rcPath.append( "/." ).append( rcName_ ).append( RC );
 		}
 	}
 	return ( rcPath );
