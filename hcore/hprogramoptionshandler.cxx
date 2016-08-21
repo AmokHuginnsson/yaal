@@ -28,6 +28,7 @@ Copyright:
 #include <cstring>  /* strcpy(), strcat() */
 #include <cstdio>   /* fopen() */
 #include <libintl.h> /* gettext() */
+#include <unistd.h> /* getcwd() */
 
 #include "base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
@@ -49,38 +50,42 @@ namespace yaal {
 namespace hcore {
 
 struct RC_PATHER {
-	typedef enum {
+	enum class PLACEMENT {
+		ETC_CONF,
 		ETC,
 		ENV,
+		HOME_ETC_CONF,
 		HOME_ETC,
-		HOME
-	} placement_t;
+		HOME,
+		HOME_CONFIG,
+		LOCAL
+	};
 
-	typedef enum {
-		NONE = 0,
-		GLOBAL = 1,
-		LOCAL = 2
-	} placement_state_t;
+	enum class PHASE {
+		NONE,
+		GLOBAL,
+		USER,
+		LOCAL
+	};
 };
 
 int read_rc_line( HString&, HString&, HFile&, int& );
 
 namespace {
 
-HString make_path( HString const& rcName_,
-		RC_PATHER::placement_t placement_ ) {
+HString make_path( HString const& rcName_, RC_PATHER::PLACEMENT placement_ ) {
 	M_PROLOG
 	static const char RC[] = "rc";
 	HString rcPath;
 	switch ( placement_ ) {
-		case ( RC_PATHER::ETC ): {
-			rcPath = SYSCONFDIR;
-			rcPath += "/";
-			rcPath += rcName_;
-			rcPath += "rc";
-		}
-		break;
-		case ( RC_PATHER::ENV ): {
+		case ( RC_PATHER::PLACEMENT::ETC_CONF ):
+		case ( RC_PATHER::PLACEMENT::ETC ): {
+			rcPath.assign( SYSCONFDIR )
+				.append( ( placement_ == RC_PATHER::PLACEMENT::ETC_CONF ) ? "/conf/" : "/" )
+				.append( rcName_ )
+				.append( RC );
+		} break;
+		case ( RC_PATHER::PLACEMENT::ENV ): {
 			HString envName( rcName_ );
 			envName += RC;
 			envName.upper();
@@ -88,10 +93,11 @@ HString make_path( HString const& rcName_,
 			if ( envPath ) {
 				rcPath = envPath;
 			}
-		}
-		break;
-		case ( RC_PATHER::HOME_ETC ):
-		case ( RC_PATHER::HOME ): {
+		} break;
+		case ( RC_PATHER::PLACEMENT::HOME_ETC_CONF ):
+		case ( RC_PATHER::PLACEMENT::HOME_ETC ):
+		case ( RC_PATHER::PLACEMENT::HOME ):
+		case ( RC_PATHER::PLACEMENT::HOME_CONFIG ): {
 #if ! defined( __MSVCXX__ )
 			char const USER_HOME_ENV[] = "HOME";
 #else /* #if ! defined( __MSVCXX__ ) */
@@ -99,17 +105,25 @@ HString make_path( HString const& rcName_,
 #endif /* #else #if ! defined( __MSVCXX__ ) */
 			char const* homePath( ::getenv( USER_HOME_ENV ) );
 			M_ENSURE( homePath );
-			rcPath = homePath;
-			if ( placement_ == RC_PATHER::HOME_ETC )
-				rcPath += "/etc/conf/";
-			else
-				rcPath += "/.";
-			rcPath += rcName_;
-			rcPath += RC;
+			rcPath.assign( homePath );
+			if ( placement_ == RC_PATHER::PLACEMENT::HOME_ETC_CONF ) {
+				rcPath.append( "/etc/conf/" );
+			} else if ( placement_ == RC_PATHER::PLACEMENT::HOME_ETC ) {
+				rcPath.append( "/etc/" );
+			} else if ( placement_ == RC_PATHER::PLACEMENT::HOME ) {
+				rcPath.append( "/." );
+			} else {
+				M_ASSERT( placement_ == RC_PATHER::PLACEMENT::HOME_CONFIG );
+				rcPath.append( "/.config/" );
+			}
+			rcPath.append( rcName_ ).append( placement_ != RC_PATHER::PLACEMENT::HOME_CONFIG ? RC : ".conf" );
+		}	break;
+		case ( RC_PATHER::PLACEMENT::LOCAL ): {
+			char* cwd( ::getcwd( nullptr, 0 ) );
+			rcPath.assign( cwd );
+			::free( cwd );
+			rcPath.append( "/" ).append( rcName_ ).append( RC );
 		}
-		break;
-		default:
-		break;
 	}
 	return ( rcPath );
 	M_EPILOG
@@ -123,9 +137,9 @@ int rc_open( HString const& rcPath_, HFile& file_ ) {
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	error = file_.open( rcPath_, HFile::OPEN::READING );
 	HString message( rcPath_ );
-	if ( error )
+	if ( error ) {
 		message += " not found, ";
-	else {
+	} else {
 		message = "config read from: " + rcPath_;
 		message += ", ";
 	}
@@ -417,15 +431,19 @@ int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
 	if ( ! setup.is_locked() )
 		setup.add_section( section_, program_options_helper::ORCLoader( *this, rcName_, section_, rc_callback ) );
 	struct OPlacement {
-		RC_PATHER::placement_t _placement;
-		RC_PATHER::placement_state_t _placementBit;
+		RC_PATHER::PLACEMENT _placement;
+		RC_PATHER::PHASE _placementBit;
 	} const placementTab[] = {
-		{ RC_PATHER::ETC, RC_PATHER::GLOBAL },
-		{ RC_PATHER::ENV, RC_PATHER::LOCAL },
-		{ RC_PATHER::HOME_ETC, RC_PATHER::LOCAL },
-		{ RC_PATHER::HOME, RC_PATHER::LOCAL }
+		{ RC_PATHER::PLACEMENT::ETC_CONF, RC_PATHER::PHASE::GLOBAL },
+		{ RC_PATHER::PLACEMENT::ETC, RC_PATHER::PHASE::GLOBAL },
+		{ RC_PATHER::PLACEMENT::ENV, RC_PATHER::PHASE::USER },
+		{ RC_PATHER::PLACEMENT::HOME_ETC_CONF, RC_PATHER::PHASE::USER },
+		{ RC_PATHER::PLACEMENT::HOME_ETC, RC_PATHER::PHASE::USER },
+		{ RC_PATHER::PLACEMENT::HOME, RC_PATHER::PHASE::USER },
+		{ RC_PATHER::PLACEMENT::HOME_CONFIG, RC_PATHER::PHASE::USER },
+		{ RC_PATHER::PLACEMENT::LOCAL, RC_PATHER::PHASE::LOCAL }
 	};
-	RC_PATHER::placement_state_t successStory( RC_PATHER::NONE );
+	RC_PATHER::PHASE successStory( RC_PATHER::PHASE::NONE );
 	HFile rc;
 	HString option, value, message;
 	if ( _options.is_empty() ) {
@@ -439,11 +457,11 @@ int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
 			needLog = false;
 			log( LOG_LEVEL::INFO ) << __FUNCTION__ << ": ";
 		}
-		if ( ( successStory == RC_PATHER::GLOBAL ) && ( placement._placementBit == RC_PATHER::GLOBAL ) ) {
+		if ( ( successStory == RC_PATHER::PHASE::GLOBAL ) && ( placement._placementBit == RC_PATHER::PHASE::GLOBAL ) ) {
 			continue;
 		}
-		if ( successStory == RC_PATHER::LOCAL ) {
-			break;
+		if ( ( successStory == RC_PATHER::PHASE::USER ) && ( placement._placementBit == RC_PATHER::PHASE::USER ) ) {
+			continue;
 		}
 		try {
 			HString rcPath( make_path( rcName_, placement._placement ) );
@@ -473,12 +491,6 @@ int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
 						if ( ! section ) {
 							continue;
 						}
-					}
-					while ( substitute_environment( value ) ) {
-						/* empty loop */
-					}
-					if ( _debugLevel_ >= DEBUG_LEVEL::PRINT_PROGRAM_OPTIONS ) {
-						::fprintf( stderr, "option: [%s], value [%s]\n", option.raw(), value.raw() );
 					}
 					bool optionOK( false );
 					for ( HOption& opt : _options ) {
@@ -680,13 +692,27 @@ int read_rc_line( HString& option_, HString& value_, HFile& file_,
 
 void HProgramOptionsHandler::set_option( HOption& option_, HString const& value_ ) {
 	M_PROLOG
+	HString value( value_ );
+	while ( substitute_environment( value ) ) {
+		/* empty loop */
+	}
+	if ( _debugLevel_ >= DEBUG_LEVEL::PRINT_PROGRAM_OPTIONS ) {
+		HString name;
+		if ( ! option_.long_form().is_empty() ) {
+			name = option_.long_form();
+		} else {
+			name = static_cast<char>( option_.short_form() );
+		}
+		::fprintf( stderr, "option: [%s], value [%s]\n", name.raw(), value.raw() );
+	}
 	if ( option_.value_id() ) {
 		if ( option_.switch_type() == HOption::ARGUMENT::NONE ) {
 			TYPE t( option_.recipient_type() );
 			M_ENSURE( ( t == TYPE::BOOL ) || ( t == TYPE::UNKNOWN ) );
 			option_.set( "true" );
-		} else
-			option_.set( value_ );
+		} else {
+			option_.set( value );
+		}
 	}
 	return;
 	M_EPILOG
