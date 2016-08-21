@@ -191,7 +191,7 @@ HConsoleInitDeinit::HConsoleInitDeinit( void ) {
 			.recipient( _commandComposeDelay_ )
 			.argument_name( "seconds" )
 		);
-		yaal_options().process_rc_file( "yaal", "console", set_hconsole_variables );
+		yaal_options().process_rc_file( "console", set_hconsole_variables );
 		HConsole::set_escdelay( escdelay );
 	} catch ( HException const& e ) {
 		fprintf( stderr, "Failed to initialize yaal-hconsole: %s\n", e.what() );

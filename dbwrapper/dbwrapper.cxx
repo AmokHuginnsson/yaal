@@ -160,7 +160,7 @@ HDBWrapperInitDeinit::HDBWrapperInitDeinit( void ) {
 			.description( "log content of SQL queries" )
 			.recipient( _logSQL_ )
 		);
-		yaal_options().process_rc_file( "yaal", "dbwrapper", set_dbwrapper_variables );
+		yaal_options().process_rc_file( "dbwrapper", set_dbwrapper_variables );
 	} catch ( HException const& e ) {
 		fprintf( stderr, "Failed to initialize yaal-dbwrapper: %s\n", e.what() );
 		exit( 1 );

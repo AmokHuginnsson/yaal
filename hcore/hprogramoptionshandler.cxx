@@ -73,14 +73,14 @@ int read_rc_line( HString&, HString&, HFile&, int& );
 
 namespace {
 
-HString make_path( HString const& rcName_, RC_PATHER::PLACEMENT placement_ ) {
+HString make_path( HString const& sysconfDir_, HString const& rcName_, RC_PATHER::PLACEMENT placement_ ) {
 	M_PROLOG
 	static const char RC[] = "rc";
 	HString rcPath;
 	switch ( placement_ ) {
 		case ( RC_PATHER::PLACEMENT::ETC_CONF ):
 		case ( RC_PATHER::PLACEMENT::ETC ): {
-			rcPath.assign( SYSCONFDIR )
+			rcPath.assign( sysconfDir_ )
 				.append( ( placement_ == RC_PATHER::PLACEMENT::ETC_CONF ) ? "/conf/" : "/" )
 				.append( rcName_ )
 				.append( RC );
@@ -172,24 +172,26 @@ namespace program_options_helper {
 
 struct ORCLoader {
 	HProgramOptionsHandler _optionHandler;
-	HString _path;
 	HString _section;
 	HProgramOptionsHandler::RC_CALLBACK_t rc_callback;
- 	ORCLoader( void ) :
-		_optionHandler(), _path(), _section(), rc_callback( nullptr ) { }
- 	ORCLoader( HProgramOptionsHandler const& optionHandler_, HString const& rcName_,
-		HString const& section_, HProgramOptionsHandler::RC_CALLBACK_t callback )
-		: _optionHandler( optionHandler_ ),
-		_path( rcName_ ), _section( section_ ),
-		rc_callback( callback ) { }
+ 	ORCLoader( void )
+		: _optionHandler()
+		, _section()
+		, rc_callback( nullptr ) {
+	}
+ 	ORCLoader( HProgramOptionsHandler const& optionHandler_, HString const& section_, HProgramOptionsHandler::RC_CALLBACK_t callback )
+		: _optionHandler( optionHandler_ )
+		, _section( section_ )
+		, rc_callback( callback ) {
+	}
  	ORCLoader( ORCLoader const& loader )
-		: _optionHandler( loader._optionHandler ),
-		_path( loader._path ), _section( loader._section ),
-		rc_callback( loader.rc_callback ) {}
+		: _optionHandler( loader._optionHandler )
+		, _section( loader._section )
+		, rc_callback( loader.rc_callback ) {
+	}
 	ORCLoader& operator = ( ORCLoader const& loader ) {
 		if ( &loader != this ) {
 			_optionHandler = loader._optionHandler;
-			_path = loader._path;
 			_section = loader._section;
 			rc_callback = loader.rc_callback;
 		}
@@ -207,8 +209,11 @@ private:
 	rc_loaders_t _rCLoaders;
 	bool _locked;
 	HSetup( void )
-		: _rCLoaders(), _locked( false ) {}
-	virtual ~HSetup( void ) {}
+		: _rCLoaders()
+		, _locked( false ) {
+	}
+	virtual ~HSetup( void ) {
+	}
 public:
 	void add_section( HString const& section_, ORCLoader const& orcLoader_ ) {
 		M_PROLOG
@@ -418,18 +423,19 @@ HProgramOptionsHandler::HOption& HProgramOptionsHandler::HOption::default_value(
 	M_EPILOG
 }
 
-HProgramOptionsHandler::HProgramOptionsHandler( yaal::hcore::HString const& package_ )
+HProgramOptionsHandler::HProgramOptionsHandler( yaal::hcore::HString const& projectName_, yaal::hcore::HString const& sysconfDir_ )
 	: _options()
-	, _package( package_ ) {
+	, _projectName( projectName_ )
+	, _syscondDir( sysconfDir_ ) {
 	return;
 }
 
-int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
-		HString const& section_, RC_CALLBACK_t rc_callback ) {
+int HProgramOptionsHandler::process_rc_file( HString const& section_, RC_CALLBACK_t rc_callback ) {
 	M_PROLOG
 	program_options_helper::HSetup& setup( program_options_helper::HSetup::get_instance() );
-	if ( ! setup.is_locked() )
-		setup.add_section( section_, program_options_helper::ORCLoader( *this, rcName_, section_, rc_callback ) );
+	if ( ! setup.is_locked() ) {
+		setup.add_section( section_, program_options_helper::ORCLoader( *this, section_, rc_callback ) );
+	}
 	struct OPlacement {
 		RC_PATHER::PLACEMENT _placement;
 		RC_PATHER::PHASE _placementBit;
@@ -464,7 +470,7 @@ int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
 			continue;
 		}
 		try {
-			HString rcPath( make_path( rcName_, placement._placement ) );
+			HString rcPath( make_path( _syscondDir, _projectName, placement._placement ) );
 			if ( rcPath.is_empty() ) {
 				continue;
 			}
@@ -582,7 +588,7 @@ namespace {
 
 void process_loader( ORCLoader& loader ) {
 	M_PROLOG
-	loader._optionHandler.process_rc_file( loader._path, loader._section, loader.rc_callback );
+	loader._optionHandler.process_rc_file( loader._section, loader.rc_callback );
 	return;
 	M_EPILOG
 }
@@ -802,7 +808,7 @@ int HProgramOptionsHandler::process_command_line( int argc_,
 void HProgramOptionsHandler::set_from_env( void ) {
 	M_PROLOG
 	for ( options_t::iterator it = _options.begin(), end = _options.end(); it != end; ++ it ) {
-		HString lo( _package );
+		HString lo( _projectName );
 		lo.append( "_" ).append( it->long_form() ).upper().replace( "-", "_" );
 		char const* fromEnv( ::getenv( lo.raw() ) );
 		if ( fromEnv ) {

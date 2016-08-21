@@ -61,7 +61,10 @@ if [ ! -f "${CONFIG_SRC_PATH}" ] ; then
 	CONFIG_SRC_PATH="${DIR_ROOT}/config.hxx"
 fi
 
-sed -e "s/define[ \t]*PACKAGE_/define ${LIB_NAME_UC}_PACKAGE_/g" -e 's/#define[ \t]*LIB_INFIX.*/#undef LIB_INFIX/g' "${CONFIG_SRC_PATH}" > ${DIR_HEADERS}/config.hxx
+sed -e "s/define[ \t]*PACKAGE_/define ${LIB_NAME_UC}_PACKAGE_/g" \
+	-e "s/define[ \t]*SYSCONFDIR/define ${LIB_NAME_UC}_SYSCONFDIR/g" \
+	-e "s/define[ \t]*LOCALSTATEDIR/define ${LIB_NAME_UC}_LOCALSTATEDIR/g" \
+	-e 's/#define[ \t]*LIB_INFIX.*/#undef LIB_INFIX/g' "${CONFIG_SRC_PATH}" > ${DIR_HEADERS}/config.hxx
 
 PROTO=`find ${DIR_HEADERS} ! -path "${DIR_HEADERS}/${LIB_NAME}.hxx" ! -name 'config.hxx' -type f | head -1 | sed -e "s@${DIR_HEADERS}/@@"`
 PROTO_TAG=`echo ${PROTO} | sed -e 's@.*/\([^\.]*\).*@\1@'`

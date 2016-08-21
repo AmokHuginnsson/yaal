@@ -271,7 +271,7 @@ HToolsInitDeinit::HToolsInitDeinit( void ) {
 		int ctr = 0;
 		errno = 0;
 		extendable::set_strtold_impl( &yaal_strtold );
-		yaal_options().process_rc_file ( "yaal", "tools", set_tools_variables );
+		yaal_options().process_rc_file ( "tools", set_tools_variables );
 		for ( ctr = 0; ctr < 256; ctr ++ ) {
 			util::_transTableStripPL_[ ctr ] = static_cast<char>( ctr );
 		}

@@ -541,7 +541,7 @@ void oracle_init( void ) {
 		.recipient( _instanceName_ )
 		.argument_name( "name" )
 	);
-	yaal_options().process_rc_file( "yaal", "oracle", nullptr );
+	yaal_options().process_rc_file( "oracle", nullptr );
 	return;
 }
 

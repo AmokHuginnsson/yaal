@@ -159,11 +159,15 @@ public:
 	typedef HArray<HOption> options_t;
 private:
 	options_t _options;
-	yaal::hcore::HString _package;
+	yaal::hcore::HString _projectName;
+	yaal::hcore::HString _syscondDir;
 public:
 	/*! \brief Trivial default constructor.
+	 *
+	 * \param projectName_ - name of the project that this handler will provide support for.
+	 * \param sysconfDir_ - path to directory where global system configuration files for this project are stored.
 	 */
-	HProgramOptionsHandler( yaal::hcore::HString const& = PACKAGE_NAME );
+	HProgramOptionsHandler( yaal::hcore::HString const& projectName_ = PACKAGE_NAME, yaal::hcore::HString const& sysconfDir_ = SYSCONFDIR );
 	HProgramOptionsHandler& operator()( HOption );
 	/*! \brief Parse command line options and set program setup variables.
 	 *
@@ -181,8 +185,10 @@ public:
 	 *
 	 * process_rc_file gives easy to use API for reading configuration files
 	 * that are common in Unix world.
+	 *
+	 * \param section_ - name of the section of configuration file that should be parsed and applied.
 	 */
-	int process_rc_file( HString const&, HString const&, RC_CALLBACK_t = nullptr );
+	int process_rc_file( HString const& section_, RC_CALLBACK_t = nullptr );
 	options_t const& get_options( void ) const
 		{ return ( _options ); }
 private:

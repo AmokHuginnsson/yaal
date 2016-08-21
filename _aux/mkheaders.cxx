@@ -8,12 +8,12 @@
 #include <iostream>
 #include <fstream>
 #include <cerrno>
-//#include <sys/stat.h>
 
 #ifdef __GNUC__
 #include <dirent.h>
 #include <unistd.h>
 #include <utime.h>
+#include <sys/stat.h>
 #else /* __GNUC__ */
 #ifndef __MSVCXX__
 #error Unknown build environment.
@@ -122,15 +122,23 @@ int main( int argc_, char** argv_ ) {
 		string configOut( dirLibHeaders + "/config.hxx" );
 		ifstream ci( configIn.c_str() );
 		ofstream co( configOut.c_str() );
-		static char const PACKAGE_S[] = "define PACKAGE_";
+		static string const CONFLICTING[] = {
+			"define PACKAGE_",
+			"define SYSCONFDIR",
+			"define LOCALSTATEDIR"
+		};
 		static char const LIB_INFIX[] = "define LIB_INFIX";
 		while ( ! getline( ci, line ).fail() ) {
 			int pos = 0;
-			if ( ( pos = line.find( PACKAGE_S ) ) != string::npos ) {
-				line.erase( pos, sizeof ( PACKAGE_S ) - 1 );
-				line.insert( pos, "define YAAL_PACKAGE_" );
-			} else if ( line.find( LIB_INFIX ) != string::npos )
+			for ( std::string const& conflicting : CONFLICTING ) {
+				if ( ( pos = line.find( conflicting ) ) != string::npos ) {
+					line.erase( pos, conflicting.length() );
+					line.insert( pos, string( "define YAAL_" ).append( conflicting ).append( "_" ) );
+				}
+			}
+			if ( line.find( LIB_INFIX ) != string::npos ) {
 				line = "#undef LIB_INFIX";
+			}
 			co << line << endl;
 		}
 		ci.close();

@@ -336,7 +336,7 @@ HCoreInitDeinit::HCoreInitDeinit( void ) {
 		} else {
 			HException::disable_logging();
 		}
-		yaal_options().process_rc_file( "yaal", "core", set_hcore_variables );
+		yaal_options().process_rc_file( "core", set_hcore_variables );
 		if ( _writeTimeout_ < LOW_TIMEOUT_WARNING ) {
 			log( LOG_LEVEL::WARNING ) << "Low default timout for write operations!" << endl;
 		}

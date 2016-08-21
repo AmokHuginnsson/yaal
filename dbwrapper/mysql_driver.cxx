@@ -349,7 +349,7 @@ HMySQLInitDeinit::HMySQLInitDeinit( void ) {
 		.recipient( _clientCharacterSet_ )
 		.argument_name( "name" )
 	);
-	yaal_options().process_rc_file( "yaal", "mysql", nullptr );
+	yaal_options().process_rc_file( "mysql", nullptr );
 #if defined( HAVE_DECL_MYSQL_AUTODETECT_CHARSET_NAME ) && ( HAVE_DECL_MYSQL_AUTODETECT_CHARSET_NAME == 1 )
 	if ( _clientCharacterSet_ == AUTODETECT_CHARSET ) {
 		_clientCharacterSet_ = MYSQL_AUTODETECT_CHARSET_NAME;
