@@ -73,7 +73,7 @@ make purge
 %{_libdir}/lib*-d.so*
 %{_libdir}/lib*.a
 %{_includedir}/*
-%{_datadir}/pkgconfig
+%{_datadir}/pkgconfig/*
 %{_datadir}/yaal
 
 %files -n yaal-doc
