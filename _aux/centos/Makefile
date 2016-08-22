@@ -11,7 +11,6 @@ TAG=$(VERSION)-$(PACKAGE_VERSION).el$(SYSTEM_RELEASE).$(SYSTEM).$(ARCH)
 SYSTEM_RELEASE=$(shell lsb_release -sr|awk -F '.' '{print $$1}')
 ARTIFACT_DIR=rpm/RPMS/$(ARCH)
 ARTIFACTS=$(ARTIFACT_DIR)/yaal-$(TAG).rpm \
-					$(ARTIFACT_DIR)/yaal-debuginfo-$(TAG).rpm \
 					$(ARTIFACT_DIR)/yaal-devel-$(TAG).rpm \
 					$(ARTIFACT_DIR)/yaal-doc-$(TAG).rpm
 BUNDLE_DIR=yaal-bundle/$(SYSTEM)-$(SYSTEM_RELEASE)/$(ARCH)/$(VERSION)
