@@ -13,6 +13,9 @@ BuildRequires: make, autoconf, libtool, libxml2-devel libxslt-devel, zlib-devel,
 Requires: libxml2, libxslt, openssl, zlib, ncurses
 
 %global __requires_exclude_from %{?__requires_exclude:%__requires_exclude|}^.*libyaal_(sqlite3|postgresql|mysql|firebird|oracle)_driver.*$
+%global _enable_debug_package 0
+%global debug_package %{nil}
+%global __os_install_post /usr/lib/rpm/brp-compress %{nil}
 
 %description
 
@@ -78,7 +81,7 @@ make purge
 
 %files -n yaal-doc
 %defattr(-,root,root,-)
-%{_datadir}/doc
+%{_datadir}/doc/*
 %doc
 
 %changelog
