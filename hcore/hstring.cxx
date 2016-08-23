@@ -1581,7 +1581,7 @@ int long long unsigned stoull_impl( char const* str_, int* endIdx_, int base_ ) 
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	char* end( nullptr );
 	int long long unsigned val( ::strtoull( str_, &end, base_ ) );
-	if ( ! val || ( val == ULONG_MAX ) ) {
+	if ( ! val || ( val == ULLONG_MAX ) ) {
 		if ( ( errno == EINVAL ) || ( end == str_ ) ) {
 			throw HInvalidArgumentException( "Invalid argument in conversion: "_ys.append( str_ ) );
 		} else if ( errno == ERANGE ) {
