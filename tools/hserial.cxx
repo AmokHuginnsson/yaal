@@ -229,7 +229,6 @@ void HSerial::compile_flags( void ) {
 		M_THROW( _eAlreadyOpened_, errno );
 	}
 	termios& tIO = *_tIO.get<termios>();
-	int ctr = 0;
 	if ( !!( _flags & FLAG::DEFAULT ) ) {
 		_flags |= tools::_serialFlags_;
 	}
@@ -240,24 +239,25 @@ void HSerial::compile_flags( void ) {
 	if ( ( !!( _flags & FLAG::FLOW_CONTROL_HARDWARE ) ) && ( !!( _flags & FLAG::FLOW_CONTROL_SOFTWARE ) ) ) {
 		M_THROW( _( "flow control inconsistent" ), _flags.value() );
 	}
+	int ctr( 0 );
 	if ( !!( _flags & FLAG::BITS_PER_BYTE_8 ) ) {
-		ctr ++;
+		++ ctr;
 		tIO.c_cflag = CS8;
 	}
 	if ( !!( _flags & FLAG::BITS_PER_BYTE_7 ) ) {
-		ctr ++;
+		++ ctr;
 		tIO.c_cflag = CS7;
 	}
 	if ( !!( _flags & FLAG::BITS_PER_BYTE_6 ) ) {
-		ctr ++;
+		++ ctr;
 		tIO.c_cflag = CS6;
 	}
 	if ( !!( _flags & FLAG::BITS_PER_BYTE_5 ) ) {
-		ctr ++;
+		++ ctr;
 		tIO.c_cflag = CS5;
 	}
 	if ( ctr != 1 ) {
-		M_THROW( _( "bits per byte inconsistent" ), _flags.value() );
+		M_THROW( to_string( _( "bits per byte inconsistent: " ) ).append( _flags.value() ), ctr );
 	}
 
 	/* compiling settings */

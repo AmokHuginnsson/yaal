@@ -118,32 +118,33 @@ bool set_tools_variables( HString& option_, HString& value_ ) {
 			}
 		}
 	} else if ( ! strcasecmp( option_, "serial_flags" ) ) {
+		_serialFlags_ = HSerial::FLAG::DEFAULT ^ HSerial::FLAG::DEFAULT;
 		HTokenizer t( value_, " \t", HTokenizer::DELIMITED_BY_ANY_OF );
 		for ( HTokenizer::HIterator it = t.begin(), end = t.end(); it != end; ++ it ) {
 			if ( ! strcasecmp( *it, "FLOW_CONTROL_HARDWARE" ) ) {
-				_serialFlags_ = HSerial::FLAG::FLOW_CONTROL_HARDWARE;
+				_serialFlags_ |= HSerial::FLAG::FLOW_CONTROL_HARDWARE;
 			} else if ( ! strcasecmp( *it, "FLOW_CONTROL_SOFTWARE" ) ) {
-				_serialFlags_ = HSerial::FLAG::FLOW_CONTROL_SOFTWARE;
+				_serialFlags_ |= HSerial::FLAG::FLOW_CONTROL_SOFTWARE;
 			} else if ( ! strcasecmp( *it, "ECHO" ) ) {
-				_serialFlags_ = HSerial::FLAG::ECHO;
+				_serialFlags_ |= HSerial::FLAG::ECHO;
 			} else if ( ! strcasecmp( *it, "BITS_PER_BYTE_8" ) ) {
-				_serialFlags_ = HSerial::FLAG::BITS_PER_BYTE_8;
+				_serialFlags_ |= HSerial::FLAG::BITS_PER_BYTE_8;
 			} else if ( ! strcasecmp( *it, "BITS_PER_BYTE_7" ) ) {
-				_serialFlags_ = HSerial::FLAG::BITS_PER_BYTE_7;
+				_serialFlags_ |= HSerial::FLAG::BITS_PER_BYTE_7;
 			} else if ( ! strcasecmp( *it, "BITS_PER_BYTE_6" ) ) {
-				_serialFlags_ = HSerial::FLAG::BITS_PER_BYTE_6;
+				_serialFlags_ |= HSerial::FLAG::BITS_PER_BYTE_6;
 			} else if ( ! strcasecmp( *it, "BITS_PER_BYTE_5" ) ) {
-				_serialFlags_ = HSerial::FLAG::BITS_PER_BYTE_5;
+				_serialFlags_ |= HSerial::FLAG::BITS_PER_BYTE_5;
 			} else if ( ! strcasecmp( *it, "CANONICAL" ) ) {
-				_serialFlags_ = HSerial::FLAG::CANONICAL;
+				_serialFlags_ |= HSerial::FLAG::CANONICAL;
 			} else if ( ! strcasecmp( *it, "STOP_BITS_1" ) ) {
-				_serialFlags_ = HSerial::FLAG::STOP_BITS_1;
+				_serialFlags_ |= HSerial::FLAG::STOP_BITS_1;
 			} else if ( ! strcasecmp( *it, "STOP_BITS_2" ) ) {
-				_serialFlags_ = HSerial::FLAG::STOP_BITS_2;
+				_serialFlags_ |= HSerial::FLAG::STOP_BITS_2;
 			} else if ( ! strcasecmp( *it, "PARITY_CHECK" ) ) {
-				_serialFlags_ = HSerial::FLAG::PARITY_CHECK;
+				_serialFlags_ |= HSerial::FLAG::PARITY_CHECK;
 			} else if ( ! strcasecmp( *it, "PARITY_ODD" ) ) {
-				_serialFlags_ = HSerial::FLAG::PARITY_ODD;
+				_serialFlags_ |= HSerial::FLAG::PARITY_ODD;
 			} else {
 				fail = true;
 			}
