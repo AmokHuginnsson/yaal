@@ -159,7 +159,9 @@ char* basename( char* path_ ) {
 }
 
 char* strptime( char const* source_, char const* format_, struct tm* broken_ ) {
-	istringstream source( source_ );
+	string s( source_ );
+	s.append( "~\b~\b~\b" );
+	istringstream source( s );
 	source.imbue( locale( setlocale( LC_ALL, nullptr ) ) );
 	source >> get_time( broken_, format_ );
 	return ( ! source.fail() ? const_cast<char*>( source_ + static_cast<int>( source.tellg() ) ) : nullptr );
@@ -170,6 +172,7 @@ struct DIR {
 	bool _hasData;
 	int _index;
 	WIN32_FIND_DATA _data;
+	dirent _payload;
 };
 
 DIR* opendir( char const* path_ ) {
@@ -194,34 +197,30 @@ int closedir( DIR* dir_ ) {
 	return ( ok ? 0 : -1 );
 }
 
-int readdir_r( DIR* dir_, struct dirent* entry_, struct dirent** result_ ) {
-	int error( 0 );
-	if ( result_ ) {
-		*result_ = dir_->_hasData ? entry_ : nullptr;
-	}
+struct dirent* readdir( DIR* dir_ ) {
+	bool found( false );
 	if ( dir_->_hasData ) {
-		entry_->d_ino = dir_->_index;
+		dir_->_payload.d_ino = dir_->_index;
 		if ( dir_->_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) {
-			entry_->d_type = DT_DIR;
+			dir_->_payload.d_type = DT_DIR;
 		} else if ( dir_->_data.dwFileAttributes & FILE_ATTRIBUTE_DEVICE ) {
-			entry_->d_type = DT_BLK;
+			dir_->_payload.d_type = DT_BLK;
 		} else if ( dir_->_data.dwFileAttributes & FILE_ATTRIBUTE_NORMAL ) {
-			entry_->d_type = DT_REG;
+			dir_->_payload.d_type = DT_REG;
 		} else if ( dir_->_data.dwFileAttributes & ( FILE_ATTRIBUTE_ARCHIVE | FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM ) ) {
-			entry_->d_type = DT_REG;
+			dir_->_payload.d_type = DT_REG;
 		} else {
-			entry_->d_type = DT_UNKNOWN;
+			dir_->_payload.d_type = DT_UNKNOWN;
 		}
-		strncpy( entry_->d_name, dir_->_data.cFileName, NAME_MAX );
+		strncpy( dir_->_payload.d_name, dir_->_data.cFileName, NAME_MAX );
 		if ( ::FindNextFile( dir_->_handle, &dir_->_data ) ) {
 			++ dir_->_index;
 		} else {
 			dir_->_hasData = false;
 		}
-	}	else {
-		error = 1;
+		found = true;
 	}
-	return ( error );
+	return ( found ? &dir_->_payload : nullptr );
 }
 
 int telldir( DIR* dir_ ) {
@@ -229,12 +228,11 @@ int telldir( DIR* dir_ ) {
 }
 
 void seekdir( DIR* dir_, int pos_ ) {
-	struct dirent de;
 	while ( true ) {
 		if ( dir_->_index == pos_ ) {
 			break;
 		}
-		if ( readdir_r( dir_, &de, nullptr ) != 0 ) {
+		if ( ! readdir( dir_ ) ) {
 			break;
 		}
 	}

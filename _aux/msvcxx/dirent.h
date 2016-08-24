@@ -19,7 +19,7 @@ struct DIR;
 
 DIR* opendir( char const* );
 int closedir( DIR* );
-int readdir_r( struct DIR*, struct dirent*, struct dirent** );
+struct dirent* readdir( struct DIR* );
 int telldir( DIR* );
 void seekdir( DIR*, int );
 

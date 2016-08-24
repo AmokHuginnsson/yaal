@@ -25,6 +25,7 @@ Copyright:
 */
 
 #include <cstring>
+#include <cstdlib>
 #include <iconv.h>
 
 #include "hcore/base.hxx"

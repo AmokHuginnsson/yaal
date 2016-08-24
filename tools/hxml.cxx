@@ -29,7 +29,6 @@ Copyright:
 #include <libintl.h>
 #include <new>
 
-#include <iconv.h>
 #include <libexslt/exslt.h>
 #include <libxml/xmlwriter.h>
 #include <libxml/xinclude.h>

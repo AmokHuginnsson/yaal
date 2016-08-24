@@ -123,17 +123,18 @@ int main( int argc_, char** argv_ ) {
 		ifstream ci( configIn.c_str() );
 		ofstream co( configOut.c_str() );
 		static string const CONFLICTING[] = {
-			"define PACKAGE_",
-			"define SYSCONFDIR",
-			"define LOCALSTATEDIR"
+			"PACKAGE_",
+			"SYSCONFDIR",
+			"LOCALSTATEDIR"
 		};
+		char const DEF[] = "define ";
 		static char const LIB_INFIX[] = "define LIB_INFIX";
 		while ( ! getline( ci, line ).fail() ) {
 			int pos = 0;
 			for ( std::string const& conflicting : CONFLICTING ) {
-				if ( ( pos = line.find( conflicting ) ) != string::npos ) {
-					line.erase( pos, conflicting.length() );
-					line.insert( pos, string( "define YAAL_" ).append( conflicting ).append( "_" ) );
+				if ( ( pos = line.find( DEF + conflicting ) ) != string::npos ) {
+					line.erase( pos, conflicting.length() + sizeof ( DEF ) - 1 );
+					line.insert( pos, string( DEF ).append( "YAAL_" ).append( conflicting ) );
 				}
 			}
 			if ( line.find( LIB_INFIX ) != string::npos ) {
