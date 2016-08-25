@@ -38,7 +38,7 @@ else
 	cd -
 	/bin/rm -rf "${RPM_BUILD_DIR}/%{name}-%{version}"
 	mkdir "${RPM_BUILD_DIR}/%{name}-%{version}"
-	tar cf - --exclude build --exclude _aux/centos/rpm . | tar -x -C "${RPM_BUILD_DIR}/%{name}-%{version}"
+	tar cf - --exclude build --exclude _deploy/centos/rpm . | tar -x -C "${RPM_BUILD_DIR}/%{name}-%{version}"
 	cd -
 fi
 cd "%{name}-%{version}"

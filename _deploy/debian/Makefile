@@ -30,12 +30,12 @@ all: $(VERIFY_DIR)
 	@echo "Explicit target required!" && echo && echo "supported targets: clean package bundle"
 
 $(VERIFY_DIR):
-	@echo "You must run this Makefile from yaal/_aux/debian directory." && false
+	@echo "You must run this Makefile from yaal/_deploy/debian directory." && false
 
 $(CHANGELOG): $(VERIFY_DIR)
 	@/bin/rm -f $(CHANGELOG) && \
 	cd ../../ && \
-	if [ ! -d debian ] ; then cp -a ./_aux/debian . ; fi && \
+	if [ ! -d debian ] ; then cp -a ./_deploy/debian . ; fi && \
 	./_aux/mkchangelog debian/changelog
 
 $(ARTIFACTS_TARGET): $(VERIFY_DIR) $(CHANGELOG)
@@ -58,7 +58,7 @@ bundle: $(VERIFY_DIR) $(OUTPUT_DIR)/tmp/$(BUNDLE_WRAP)
 
 clean: $(VERIFY_DIR)
 	cd ../../ && \
-	if [ ! -d debian ] ; then cp -a ./_aux/debian . ; fi && \
+	if [ ! -d debian ] ; then cp -a ./_deploy/debian . ; fi && \
 	/bin/rm -f debian/changelog && \
 	dch --force-distribution --distribution any --create --newversion 0.0.0 --package yaal cleaner && \
 	dpkg-buildpackage -Tclean && \

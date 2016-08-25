@@ -23,11 +23,11 @@ all: $(VERIFY_DIR)
 	@echo "Explicit target required!" && echo && echo "supported targets: clean package bundle"
 
 $(VERIFY_DIR):
-	@echo "You must run this Makefile from yaal/_aux/centos directory." && false
+	@echo "You must run this Makefile from yaal/_deploy/centos directory." && false
 
 $(ARTIFACTS): $(VERIFY_DIR)
 	@cd ../../ && \
-	rpmbuild -D 'BUILD_ID $(PACKAGE_VERSION)' -D '_topdir $(CURDIR)/rpm' -bb ./_aux/centos/yaal.spec
+	rpmbuild -D 'BUILD_ID $(PACKAGE_VERSION)' -D '_topdir $(CURDIR)/rpm' -bb ./_deploy/centos/yaal.spec
 
 rpm/$(BUNDLE): $(VERIFY_DIR) $(ARTIFACTS)
 	@/bin/rm -rf rpm/yaal-bundle && \

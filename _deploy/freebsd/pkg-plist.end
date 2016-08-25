@@ -6,10 +6,7 @@
 @dir include/yaal
 @dir share/doc/yaal
 @dir share/yaal/_aux/cmake
-@dir share/yaal/_aux/debian
-@dir share/yaal/_aux/freebsd
 @dir share/yaal/_aux/mk
 @dir share/yaal/_aux/msvcxx
-@dir share/yaal/_aux/solaris
 @dir share/yaal/_aux
 @dir share/yaal
