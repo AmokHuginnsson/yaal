@@ -251,7 +251,7 @@ void sub( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 		static_cast<HHuginn::HNumber*>( v1_.raw() )->value() -= static_cast<HHuginn::HNumber const*>( v2_.raw() )->value();
 	} else {
 		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v1_.raw() ) ) {
-			o->call_method( thread_, v1_, "substract", { v2_ }, position_ );
+			o->call_method( thread_, v1_, "subtract", { v2_ }, position_ );
 		} else {
 			throw HHuginn::HHuginnRuntimeException( "There is no `-' operator for `"_ys.append( v1_->get_class()->name() ).append( "'." ), position_ );
 		}
@@ -472,7 +472,7 @@ namespace {
 bool fallback_compare( HHuginn::HObject const* object_, HThread* thread_, char const* methodName_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	HHuginn::value_t v( object_->call_method( thread_, v1_, methodName_, { v2_ }, position_ ) );
 	if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
-		throw HHuginn::HHuginnRuntimeException( "Comparision method `"_ys.append( methodName_ ).append( "' returned non-boolean result `" ).append( v->get_class()->name() ).append( "'." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Comparison method `"_ys.append( methodName_ ).append( "' returned non-boolean result `" ).append( v->get_class()->name() ).append( "'." ), position_ );
 	}
 	HHuginn::HBoolean* b( static_cast<HHuginn::HBoolean*>( v.raw() ) );
 	return ( b->value() );

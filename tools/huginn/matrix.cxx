@@ -252,9 +252,9 @@ HHuginn::value_t HMatrix::add( huginn::HThread*, HHuginn::value_t* object_, HHug
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::substract( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::subtract( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	char const name[] = "Matrix.substract";
+	char const name[] = "Matrix.subtract";
 	verify_arg_count( name, values_, 1, 1, position_ );
 	verify_arg_type( name, values_, 0, (*object_)->get_class(), true, position_ );
 	HHuginn::value_t v;
@@ -477,7 +477,7 @@ HHuginn::class_t HMatrix::get_class( HRuntime* runtime_ ) {
 				{ "get",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::get, _1, _2, _3, _4 ) ) },
 				{ "set",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::set, _1, _2, _3, _4 ) ) },
 				{ "add",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::add, _1, _2, _3, _4 ) ) },
-				{ "substract", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::substract, _1, _2, _3, _4 ) ) },
+				{ "subtract",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::subtract, _1, _2, _3, _4 ) ) },
 				{ "multiply",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::multiply, _1, _2, _3, _4 ) ) },
 				{ "det",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::det, _1, _2, _3, _4 ) ) },
 				{ "scale",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::scale, _1, _2, _3, _4 ) ) },
