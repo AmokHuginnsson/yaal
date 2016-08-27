@@ -40,10 +40,14 @@ bin:
 	@( DO_RELEASE=1 $(MAKE) ; make clean )
 
 install: all
-	@$(call msg,printf "%b\n" "i: you need to become root to do this" && ) \
-	$(call invoke,$(INSTALL) -d -m755 $(DIR_BIN) && $(INSTALL) -m755 $(DIR_BUILD)/$(PRJNAME)/$(EXEC_NAME) $(DIR_BIN)/$(PRJNAME) ) && \
-	$(call invoke,$(INSTALL) -d -m755 $(DIR_SYSCONF) && $(INSTALL) -m644 $(DIR_ROOT)/$(PRJNAME)rc $(DIR_SYSCONF)/ ) && \
-	$(call invoke,$(INSTALL) -d -m755 $(DIR_DOC) && $(INSTALL) -m644 $(DIR_ROOT)/doc/README $(DIR_ROOT)/doc/COPYRIGHT $(DIR_DOC)/ ) \
-	$(call msg,&& printf "%b\n" "i: now if you wish you can suid $(DIR_BIN)/$(PRJNAME)" ) \
-	$(call msg,&& printf "%b$(NL)" "done.$(CL)")
+	@$(call msg_always,printf "%b\n" "i: you need to become root to do this" && ) \
+	$(if $(CLOU_BIN), $(call invoke,$(INSTALL) -d -m755 $(DIR_BIN) $(foreach clou,$(CLOU_BIN),&& $(INSTALL) -m755 $(clou) $(DIR_BIN)/$(patsubst %$(EXEC_NAME),$(PRJNAME),$(clou)) ) ) && ) \
+	$(if $(CLOU_LIB), $(call invoke,$(INSTALL) -d -m755 $(DIR_LIB) && $(INSTALL) -m755 $(CLOU_LIB) $(DIR_LIB)/ ) && ) \
+	$(if $(CLOU_CONF), $(call invoke,$(INSTALL) -d -m755 $(DIR_SYSCONF) && $(INSTALL) -m644 $(CLOU_CONF) $(DIR_SYSCONF)/ ) && ) \
+	$(if $(CLOU_SHARE), $(call invoke,$(INSTALL) -d -m755 $(DIR_SHARE)/$(PRJNAME) && $(INSTALL) -m644 $(CLOU_SHARE) $(DIR_SHARE)/$(PRJNAME)/ ) && ) \
+	$(if $(CLOU_LOCALSTATE), $(call invoke,$(INSTALL) -d -m755 $(DIR_LOCALSTATE)/$(PRJNAME) && $(INSTALL) -m644 $(CLOU_LOCALSTATE) $(DIR_LOCALSTATE)/$(PRJNAME)/ ) && ) \
+	$(if $(CLOU_INCLUDE), $(call invoke,$(INSTALL) -d -m755 $(DIR_HEADERS) && $(INSTALL) -m644 $(CLOU_INCLUDE) $(DIR_HEADERS)/ ) && ) \
+	$(if $(CLOU_DOC), $(call invoke,$(INSTALL) -d -m755 $(DIR_DOC) && $(INSTALL) -m644 $(CLOU_DOC) $(DIR_DOC)/ ) && ) \
+	$(call msg_always,printf "%b\n" "i: now if you wish you can suid $(DIR_BIN)/$(PRJNAME)" && ) \
+	$(call msg_always,printf "%b$(NL)" "done.$(CL)" )
 
