@@ -44,7 +44,11 @@ build/%/$(1): configure $(1).in
 				$$(CONF_$$(*)) \
 				$$(if $$(PREFIX),--prefix=$$(PREFIX)) \
 				$$(if $$(SYSCONFDIR),--sysconfdir=$$(SYSCONFDIR)) \
+				$$(if $$(BINDIR),--bindir=$$(BINDIR)) \
+				$$(if $$(SBINDIR),--sbindir=$$(SBINDIR)) \
+				$$(if $$(DATADIR),--datadir=$$(DATADIR)) \
 				$$(if $$(LIBDIR),--libdir=$$(LIBDIR)) \
+				$$(if $$(INCLUDEDIR),--includedir=$$(INCLUDEDIR)) \
 				$$(if $$(LOCALSTATEDIR),--localstatedir=$$(LOCALSTATEDIR)) \
 				$$(CONFIGURE) | tee -a make.log | awk -v CL="`tput cr;tput dl1`" '{printf CL"%s\r", $$$$0}' ; \
 		else \
@@ -52,7 +56,11 @@ build/%/$(1): configure $(1).in
 				$$(CONF_$$(*)) \
 				$$(if $$(PREFIX),--prefix=$$(PREFIX)) \
 				$$(if $$(SYSCONFDIR),--sysconfdir=$$(SYSCONFDIR)) \
+				$$(if $$(BINDIR),--bindir=$$(BINDIR)) \
+				$$(if $$(SBINDIR),--sbindir=$$(SBINDIR)) \
+				$$(if $$(DATADIR),--datadir=$$(DATADIR)) \
 				$$(if $$(LIBDIR),--libdir=$$(LIBDIR)) \
+				$$(if $$(INCLUDEDIR),--includedir=$$(INCLUDEDIR)) \
 				$$(if $$(LOCALSTATEDIR),--localstatedir=$$(LOCALSTATEDIR)) \
 				$$(CONFIGURE) | tee -a make.log ; \
 		fi ; test -f $$(notdir $$(@)) || exit 1 ; touch -c config.hxx Makefile.mk yaalrc yaal.pc ; true)
