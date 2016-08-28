@@ -34,6 +34,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "thread.hxx"
 #include "helper.hxx"
 #include "exception.hxx"
+#include "keyword.hxx"
 #include "objectfactory.hxx"
 
 using namespace yaal;
@@ -673,18 +674,34 @@ HHuginn::value_t fallback_conversion( HHuginn::type_id_t type_, HThread* thread_
 HHuginn::value_t string( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res;
 	HHuginn::type_id_t typeId( v_->type_id() );
-	if ( typeId == HHuginn::TYPE::STRING ) {
-		res = v_;
-	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
-		res = thread_->object_factory().create_string( static_cast<HHuginn::HNumber const*>( v_.raw() )->value().to_string() );
-	} else if ( typeId == HHuginn::TYPE::REAL ) {
-		res = thread_->object_factory().create_string( static_cast<HHuginn::HReal const*>( v_.raw() )->value() );
-	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
-		res = thread_->object_factory().create_string( static_cast<HHuginn::HCharacter const*>( v_.raw() )->value() );
-	} else if ( typeId == HHuginn::TYPE::INTEGER ) {
-		res = thread_->object_factory().create_string( static_cast<HHuginn::HInteger const*>( v_.raw() )->value() );
-	} else {
-		res = fallback_conversion( type_id( HHuginn::TYPE::STRING ), thread_, v_, position_ );
+	switch ( typeId.get() ) {
+		case ( static_cast<int>( HHuginn::TYPE::STRING ) ): {
+			res = v_;
+		} break;
+		case ( static_cast<int>( HHuginn::TYPE::NUMBER ) ): {
+			res = thread_->object_factory().create_string( static_cast<HHuginn::HNumber const*>( v_.raw() )->value().to_string() );
+		} break;
+		case ( static_cast<int>( HHuginn::TYPE::REAL ) ): {
+			res = thread_->object_factory().create_string( static_cast<HHuginn::HReal const*>( v_.raw() )->value() );
+		} break;
+		case ( static_cast<int>( HHuginn::TYPE::CHARACTER ) ): {
+			res = thread_->object_factory().create_string( static_cast<HHuginn::HCharacter const*>( v_.raw() )->value() );
+		} break;
+		case ( static_cast<int>( HHuginn::TYPE::INTEGER ) ): {
+			res = thread_->object_factory().create_string( static_cast<HHuginn::HInteger const*>( v_.raw() )->value() );
+		} break;
+		case ( static_cast<int>( HHuginn::TYPE::BOOLEAN ) ): {
+			res = thread_->object_factory().create_string( static_cast<HHuginn::HBoolean const*>( v_.raw() )->value() ? KEYWORD::TRUE : KEYWORD::FALSE );
+		} break;
+		case ( static_cast<int>( HHuginn::TYPE::FUNCTION_REFERENCE ) ): {
+			res = thread_->object_factory().create_string( thread_->runtime().identifier_name( static_cast<HHuginn::HFunctionReference const*>( v_.raw() )->identifier_id() ) );
+		} break;
+		case ( static_cast<int>( HHuginn::TYPE::NONE ) ): {
+			res = thread_->object_factory().create_string( KEYWORD::NONE );
+		} break;
+		default: {
+			res = fallback_conversion( type_id( HHuginn::TYPE::STRING ), thread_, v_, position_ );
+		}
 	}
 	return ( res );
 }

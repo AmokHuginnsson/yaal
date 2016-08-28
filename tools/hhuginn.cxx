@@ -40,6 +40,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/huginn/scope.hxx"
 #include "tools/huginn/compiler.hxx"
 #include "tools/huginn/iterator.hxx"
+#include "tools/huginn/keyword.hxx"
 #include "tools/huginn/packagefactory.hxx"
 
 using namespace yaal;
@@ -709,7 +710,7 @@ yaal::hcore::HString to_string( HHuginn::value_t const& value_ ) {
 			str.assign( "'" ).append( static_cast<HHuginn::HCharacter const*>( value_.raw() )->value() ).append( "'" );
 		} break;
 		case ( HHuginn::TYPE::BOOLEAN ): {
-			str = static_cast<HHuginn::HBoolean const*>( value_.raw() )->value() ? "true" : "false";
+			str = static_cast<HHuginn::HBoolean const*>( value_.raw() )->value() ? KEYWORD::TRUE : KEYWORD::FALSE;
 		} break;
 		case ( HHuginn::TYPE::NONE ): {
 			str = "none";
@@ -726,6 +727,19 @@ yaal::hcore::HString to_string( HHuginn::value_t const& value_ ) {
 				str.append( to_string( v ) );
 			}
 			str.append( "]" );
+		} break;
+		case ( HHuginn::TYPE::DEQUE ): {
+			HHuginn::HDeque const* l( static_cast<HHuginn::HDeque const*>( value_.raw() ) );
+			str = "deque(";
+			bool next( false );
+			for ( HHuginn::value_t const& v : l->value() ) {
+				if ( next ) {
+					str.append( ", " );
+				}
+				next = true;
+				str.append( to_string( v ) );
+			}
+			str.append( ")" );
 		} break;
 		case ( HHuginn::TYPE::DICT ): {
 			HHuginn::HDict const* d( static_cast<HHuginn::HDict const*>( value_.raw() ) );
