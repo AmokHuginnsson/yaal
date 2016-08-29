@@ -47,6 +47,8 @@ namespace tools {
 
 namespace huginn {
 
+HHuginn::identifier_id_t const INVALID_IDENTIFIER( -1 );
+
 HRuntime::HRuntime( HHuginn* huginn_ )
 	: _huginn( huginn_ )
 	, _idGenerator( static_cast<type_id_t::value_type>( HHuginn::TYPE::NOT_BOOLEAN ) )
@@ -55,14 +57,28 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			{ KEYWORD::DESTRUCTOR, KEYWORD::DESTRUCTOR_IDENTIFIER },
 			{ KEYWORD::THIS, KEYWORD::THIS_IDENTIFIER },
 			{ KEYWORD::SUPER, KEYWORD::SUPER_IDENTIFIER },
-			{ KEYWORD::ASSERT, KEYWORD::ASSERT_IDENTIFIER }
+			{ KEYWORD::ASSERT, KEYWORD::ASSERT_IDENTIFIER },
+			{ _noneClass_.name(), TYPE_NONE_IDENTIFIER },
+			{ _observerClass_.name(), TYPE_OBSERVER_IDENTIFIER },
+			{ _referenceClass_.name(), TYPE_REFERENCE_IDENTIFIER },
+			{ _functionReferenceClass_.name(), TYPE_FUNCTION_REFERENCE_IDENTIFIER },
+			{ _objectReferenceClass_.name(), TYPE_OBJECT_REFERENCE_IDENTIFIER },
+			{ _methodClass_.name(), TYPE_METHOD_IDENTIFIER },
+			{ _unknownClass_.name(), TYPE_UNKNOWN_IDENTIFIER }
 		} )
 	, _identifierNames( {
 			KEYWORD::CONSTRUCTOR,
 			KEYWORD::DESTRUCTOR,
 			KEYWORD::THIS,
 			KEYWORD::SUPER,
-			KEYWORD::ASSERT
+			KEYWORD::ASSERT,
+			_noneClass_.name(),
+			_observerClass_.name(),
+			_referenceClass_.name(),
+			_functionReferenceClass_.name(),
+			_objectReferenceClass_.name(),
+			_methodClass_.name(),
+			_unknownClass_.name()
 		} )
 	, _objectFactory( new HObjectFactory( this ) )
 	, _none( make_pointer<HHuginn::HValue>( &_noneClass_ ) )
@@ -324,7 +340,9 @@ HHuginn::value_t type( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 	M_PROLOG
 	verify_arg_count( "type", values_, 1, 1, position_ );
 	HHuginn::HValue const* v( values_.front().raw() );
-	return ( thread_->object_factory().create_string( v->get_class()->name() ) );
+	HHuginn::identifier_id_t id( v->get_class()->identifier_id() );
+	HHuginn::function_t* f( thread_->runtime().get_function( id ) );
+	return ( thread_->object_factory().create_function_reference( id, *f ) );
 	M_EPILOG
 }
 
@@ -478,9 +496,16 @@ inline HHuginn::value_t assert( huginn::HThread* thread_, HHuginn::value_t*, HHu
 	M_EPILOG
 }
 
+HHuginn::value_t invalid_instance( yaal::hcore::HString const&, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int ) __attribute__(( noreturn ));
+HHuginn::value_t invalid_instance( yaal::hcore::HString const& name_, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int position_ ) {
+	M_PROLOG
+	throw HHuginn::HHuginnRuntimeException( "Direct creation of instances of `"_ys.append( name_ ).append( "' is not allowed." ), position_ );
+	M_EPILOG
 }
 
-void HRuntime::register_builtin_function( char const* name_, function_t&& function_ ) {
+}
+
+void HRuntime::register_builtin_function( yaal::hcore::HString const& name_, function_t&& function_ ) {
 	M_PROLOG
 	identifier_id_t id( identifier_id( name_ ) );
 	_huginn->register_function( id );
@@ -496,26 +521,45 @@ void HRuntime::register_builtins( void ) {
 	M_ENSURE( identifier_id( KEYWORD::THIS ) == KEYWORD::THIS_IDENTIFIER );
 	M_ENSURE( identifier_id( KEYWORD::SUPER ) == KEYWORD::SUPER_IDENTIFIER );
 	M_ENSURE( identifier_id( KEYWORD::ASSERT ) == KEYWORD::ASSERT_IDENTIFIER );
-	register_builtin_function( "integer", hcore::call( &huginn_builtin::integer, _1, _2, _3, _4 ) );
-	register_builtin_function( "real", hcore::call( &huginn_builtin::real, _1, _2, _3, _4 ) );
-	register_builtin_function( "string", hcore::call( &huginn_builtin::string, _1, _2, _3, _4 ) );
-	register_builtin_function( "number", hcore::call( &huginn_builtin::number, _1, _2, _3, _4 ) );
-	register_builtin_function( "boolean", hcore::call( &huginn_builtin::boolean, _1, _2, _3, _4 ) );
-	register_builtin_function( "character", hcore::call( &huginn_builtin::character, _1, _2, _3, _4 ) );
+	M_ENSURE( identifier_id( _noneClass_.name() ) == TYPE_NONE_IDENTIFIER );
+	M_ENSURE( identifier_id( _observerClass_.name() ) == TYPE_OBSERVER_IDENTIFIER );
+	M_ENSURE( identifier_id( _referenceClass_.name() ) == TYPE_REFERENCE_IDENTIFIER );
+	M_ENSURE( identifier_id( _functionReferenceClass_.name() ) == TYPE_FUNCTION_REFERENCE_IDENTIFIER );
+	M_ENSURE( identifier_id( _objectReferenceClass_.name() ) == TYPE_OBJECT_REFERENCE_IDENTIFIER );
+	M_ENSURE( identifier_id( _methodClass_.name() ) == TYPE_METHOD_IDENTIFIER );
+	M_ENSURE( identifier_id( _unknownClass_.name() ) == TYPE_UNKNOWN_IDENTIFIER );
+	register_builtin_function( type_name( HHuginn::TYPE::INTEGER ), hcore::call( &huginn_builtin::integer, _1, _2, _3, _4 ) );
+	register_builtin_function( type_name( HHuginn::TYPE::REAL ), hcore::call( &huginn_builtin::real, _1, _2, _3, _4 ) );
+	register_builtin_function( type_name( HHuginn::TYPE::STRING ), hcore::call( &huginn_builtin::string, _1, _2, _3, _4 ) );
+	register_builtin_function( type_name( HHuginn::TYPE::NUMBER ), hcore::call( &huginn_builtin::number, _1, _2, _3, _4 ) );
+	register_builtin_function( type_name( HHuginn::TYPE::BOOLEAN ), hcore::call( &huginn_builtin::boolean, _1, _2, _3, _4 ) );
+	register_builtin_function( type_name( HHuginn::TYPE::CHARACTER ), hcore::call( &huginn_builtin::character, _1, _2, _3, _4 ) );
 	register_builtin_function( "size", hcore::call( &huginn_builtin::size, _1, _2, _3, _4 ) );
 	register_builtin_function( "type", hcore::call( &huginn_builtin::type, _1, _2, _3, _4 ) );
 	register_builtin_function( "copy", hcore::call( &huginn_builtin::copy, _1, _2, _3, _4 ) );
 	register_builtin_function( "observe", hcore::call( &huginn_builtin::observe, _1, _2, _3, _4 ) );
 	register_builtin_function( "use", hcore::call( &huginn_builtin::use, _1, _2, _3, _4 ) );
-	register_builtin_function( "list", hcore::call( &huginn_builtin::list, _1, _2, _3, _4 ) );
-	register_builtin_function( "deque", hcore::call( &huginn_builtin::deque, _1, _2, _3, _4 ) );
-	register_builtin_function( "dict", hcore::call( &huginn_builtin::dict, _1, _2, _3, _4 ) );
-	register_builtin_function( "order", hcore::call( &huginn_builtin::order, _1, _2, _3, _4 ) );
-	register_builtin_function( "lookup", hcore::call( &huginn_builtin::lookup, _1, _2, _3, _4 ) );
-	register_builtin_function( "set", hcore::call( &huginn_builtin::set, _1, _2, _3, _4 ) );
+	register_builtin_function( type_name( HHuginn::TYPE::LIST ), hcore::call( &huginn_builtin::list, _1, _2, _3, _4 ) );
+	register_builtin_function( type_name( HHuginn::TYPE::DEQUE ), hcore::call( &huginn_builtin::deque, _1, _2, _3, _4 ) );
+	register_builtin_function( type_name( HHuginn::TYPE::DICT ), hcore::call( &huginn_builtin::dict, _1, _2, _3, _4 ) );
+	register_builtin_function( type_name( HHuginn::TYPE::ORDER ), hcore::call( &huginn_builtin::order, _1, _2, _3, _4 ) );
+	register_builtin_function( type_name( HHuginn::TYPE::LOOKUP ), hcore::call( &huginn_builtin::lookup, _1, _2, _3, _4 ) );
+	register_builtin_function( type_name( HHuginn::TYPE::SET ), hcore::call( &huginn_builtin::set, _1, _2, _3, _4 ) );
 	register_builtin_function( "print", hcore::call( &huginn_builtin::print, _1, _2, _3, _4 ) );
 	register_builtin_function( "input", hcore::call( &huginn_builtin::input, _1, _2, _3, _4 ) );
 	register_builtin_function( "assert", hcore::call( &huginn_builtin::assert, _1, _2, _3, _4 ) );
+	HHuginn::HClass const* efemeral[] = {
+		&_noneClass_,
+		&_observerClass_,
+		&_referenceClass_,
+		&_functionReferenceClass_,
+		&_objectReferenceClass_,
+		&_methodClass_,
+		&_unknownClass_
+	};
+	for ( HHuginn::HClass const* c : efemeral ) {
+		register_builtin_function( c->name(), hcore::call( &huginn_builtin::invalid_instance, c->name(), _1, _2, _3, _4 ) );
+	}
 	_objectFactory->register_builtin_classes();
 	return;
 	M_EPILOG

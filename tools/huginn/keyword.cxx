@@ -29,6 +29,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "keyword.hxx"
 #include "helper.hxx"
+#include "runtime.hxx"
 
 namespace yaal {
 

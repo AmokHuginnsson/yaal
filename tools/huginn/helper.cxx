@@ -286,7 +286,7 @@ HHuginn::HCharacter::value_type get_character( HHuginn::HValue const* value_ ) {
 }
 
 yaal::hcore::HString const& type_name( HHuginn::TYPE type_ ) {
-	static HString const NAME_NONE = "none";
+	static HString const NAME_NONE = "*none*";
 	static HString const NAME_BOOLEAN = "boolean";
 	static HString const NAME_INTEGER = "integer";
 	static HString const NAME_REAL = "real";

@@ -54,7 +54,6 @@ namespace tools {
 
 namespace huginn {
 
-HHuginn::identifier_id_t const INVALID_IDENTIFIER( -1 );
 HStatement::statement_id_t const INVALID_STATEMENT_IDENTIFIER( -1 );
 static int const NOT_TERMINATED( -1 );
 

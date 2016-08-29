@@ -150,7 +150,7 @@ public:
 
 	yaal::hcore::HString const& function_name( void const* ) const;
 private:
-	void register_builtin_function( char const*, function_t&& );
+	void register_builtin_function( yaal::hcore::HString const&, function_t&& );
 private:
 	HRuntime( HRuntime const& ) = delete;
 	HRuntime& operator = ( HRuntime const& ) = delete;
@@ -179,6 +179,15 @@ HHuginn::value_t print( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t c
 HHuginn::value_t input( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 
 }
+
+extern HHuginn::identifier_id_t const INVALID_IDENTIFIER;
+extern HHuginn::identifier_id_t const TYPE_NONE_IDENTIFIER;
+extern HHuginn::identifier_id_t const TYPE_OBSERVER_IDENTIFIER;
+extern HHuginn::identifier_id_t const TYPE_REFERENCE_IDENTIFIER;
+extern HHuginn::identifier_id_t const TYPE_FUNCTION_REFERENCE_IDENTIFIER;
+extern HHuginn::identifier_id_t const TYPE_OBJECT_REFERENCE_IDENTIFIER;
+extern HHuginn::identifier_id_t const TYPE_METHOD_IDENTIFIER;
+extern HHuginn::identifier_id_t const TYPE_UNKNOWN_IDENTIFIER;
 
 }
 

@@ -277,11 +277,13 @@ public:
 	void register_function( identifier_id_t );
 	static void disable_grammar_verification( void );
 private:
+	huginn::HRuntime const& runtime( void ) const;
 	void finalize_compilation( compiler_setup_t );
 	HClass const* commit_class( identifier_id_t );
 	char const* error_message( int ) const;
 	HHuginn( HHuginn const& ) = delete;
 	HHuginn& operator = ( HHuginn const& ) = delete;
+	friend yaal::hcore::HString to_string( HHuginn::value_t const&, HHuginn const* );
 };
 
 typedef yaal::hcore::HExceptionT<HHuginn> HHuginnException;
@@ -349,7 +351,7 @@ private:
 	huginn::HRuntime* _runtime;
 public:
 	HClass( huginn::HRuntime*, type_id_t, identifier_id_t, HClass const*, field_definitions_t const& );
-	HClass( HHuginn::TYPE );
+	HClass( HHuginn::TYPE, HHuginn::identifier_id_t );
 	virtual ~HClass( void ) {
 	}
 	HClass const* super( void ) const {
@@ -911,6 +913,12 @@ private:
 namespace huginn {
 
 extern HHuginn::HClass const _noneClass_;
+extern HHuginn::HClass const _observerClass_;
+extern HHuginn::HClass const _referenceClass_;
+extern HHuginn::HClass const _functionReferenceClass_;
+extern HHuginn::HClass const _objectReferenceClass_;
+extern HHuginn::HClass const _methodClass_;
+extern HHuginn::HClass const _unknownClass_;
 
 inline HHuginn::type_id_t type_id( HHuginn::TYPE type_ ) {
 	return ( HHuginn::type_id_t( static_cast<HHuginn::type_id_t::value_type>( type_ ) ) );
@@ -936,6 +944,7 @@ inline bool operator != ( HHuginn::type_id_t t1_, HHuginn::TYPE t2_ ) {
 }
 
 yaal::hcore::HString to_string( HHuginn::value_t const& );
+yaal::hcore::HString to_string( HHuginn::value_t const&, HHuginn const* );
 
 }
 

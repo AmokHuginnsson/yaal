@@ -443,8 +443,6 @@ private:
 	OCompiler& operator = ( OCompiler const& ) = delete;
 };
 
-extern HHuginn::identifier_id_t const INVALID_IDENTIFIER;
-
 }
 
 }

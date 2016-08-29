@@ -70,13 +70,20 @@ main( args ) {
 
 namespace huginn {
 
-HHuginn::HClass const _noneClass_( HHuginn::TYPE::NONE );
-HHuginn::HClass const _observerClass_( HHuginn::TYPE::OBSERVER );
-HHuginn::HClass const _referenceClass_( HHuginn::TYPE::REFERENCE );
-HHuginn::HClass const _functionReferenceClass_( HHuginn::TYPE::FUNCTION_REFERENCE );
-HHuginn::HClass const _objectReferenceClass_( HHuginn::TYPE::OBJECT_REFERENCE );
-HHuginn::HClass const _methodClass_( HHuginn::TYPE::METHOD );
-HHuginn::HClass const _unknownClass_( HHuginn::TYPE::UNKNOWN );
+HHuginn::identifier_id_t const TYPE_NONE_IDENTIFIER( 5 );
+HHuginn::identifier_id_t const TYPE_OBSERVER_IDENTIFIER( 6 );
+HHuginn::identifier_id_t const TYPE_REFERENCE_IDENTIFIER( 7 );
+HHuginn::identifier_id_t const TYPE_FUNCTION_REFERENCE_IDENTIFIER( 8 );
+HHuginn::identifier_id_t const TYPE_OBJECT_REFERENCE_IDENTIFIER( 9 );
+HHuginn::identifier_id_t const TYPE_METHOD_IDENTIFIER( 10 );
+HHuginn::identifier_id_t const TYPE_UNKNOWN_IDENTIFIER( 11 );
+HHuginn::HClass const _noneClass_( HHuginn::TYPE::NONE, TYPE_NONE_IDENTIFIER );
+HHuginn::HClass const _observerClass_( HHuginn::TYPE::OBSERVER, TYPE_OBSERVER_IDENTIFIER );
+HHuginn::HClass const _referenceClass_( HHuginn::TYPE::REFERENCE, TYPE_REFERENCE_IDENTIFIER );
+HHuginn::HClass const _functionReferenceClass_( HHuginn::TYPE::FUNCTION_REFERENCE, TYPE_FUNCTION_REFERENCE_IDENTIFIER );
+HHuginn::HClass const _objectReferenceClass_( HHuginn::TYPE::OBJECT_REFERENCE, TYPE_OBJECT_REFERENCE_IDENTIFIER );
+HHuginn::HClass const _methodClass_( HHuginn::TYPE::METHOD, TYPE_METHOD_IDENTIFIER );
+HHuginn::HClass const _unknownClass_( HHuginn::TYPE::UNKNOWN, TYPE_UNKNOWN_IDENTIFIER );
 
 char const* _errMsgHHuginn_[ 10 ] = {
 	_( "Operands are not summable: " ),
@@ -89,12 +96,6 @@ char const* _errMsgHHuginn_[ 10 ] = {
 	_( "Operand is not a boolean value." ),
 	_( "Subscript is not an integer." )
 };
-
-namespace exception {
-
-extern HHuginn::class_t _exceptionClass_;
-
-}
 
 }
 
@@ -128,7 +129,7 @@ HHuginn::HObjectReference::HObjectReference( value_t const& value_, int upCastLe
 		HClass const* s( c->super() );
 		if ( ! s ) {
 			throw HHuginnRuntimeException(
-				"`"_ys.append( s->name() ).append( "' does not have superclass." ),
+				"`"_ys.append( c->name() ).append( "' does not have superclass." ),
 				position_
 			);
 		}
@@ -533,6 +534,10 @@ void HHuginn::dump_preprocessed_source( yaal::hcore::HStreamInterface& stream_ )
 	M_EPILOG
 }
 
+HRuntime const& HHuginn::runtime( void ) const {
+	return ( *_runtime );
+}
+
 void HHuginn::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) {
 	M_PROLOG
 	_runtime->dump_vm_state( stream_ );
@@ -691,7 +696,7 @@ HHuginn::value_t HHuginn::HClass::HBoundMethod::do_clone( HRuntime* runtime_ ) c
 	return ( runtime_->object_factory()->create_bound_method( *static_cast<HMethod const*>( this ), _objectHolder ) );
 }
 
-yaal::hcore::HString to_string( HHuginn::value_t const& value_ ) {
+yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn const* huginn_ ) {
 	yaal::hcore::HString str;
 	switch ( static_cast<HHuginn::TYPE>( value_->type_id().get() ) ) {
 		case ( HHuginn::TYPE::STRING ): {
@@ -714,6 +719,13 @@ yaal::hcore::HString to_string( HHuginn::value_t const& value_ ) {
 		} break;
 		case ( HHuginn::TYPE::NONE ): {
 			str = "none";
+		} break;
+		case ( HHuginn::TYPE::FUNCTION_REFERENCE ): {
+			if ( huginn_ ) {
+				str = huginn_->runtime().identifier_name( static_cast<HHuginn::HFunctionReference const*>( value_.raw() )->identifier_id() );
+			} else {
+				str = type_name( HHuginn::TYPE::FUNCTION_REFERENCE );
+			}
 		} break;
 		case ( HHuginn::TYPE::LIST ): {
 			HHuginn::HList const* l( static_cast<HHuginn::HList const*>( value_.raw() ) );
@@ -759,6 +771,10 @@ yaal::hcore::HString to_string( HHuginn::value_t const& value_ ) {
 		}
 	}
 	return ( str );
+}
+
+yaal::hcore::HString to_string( HHuginn::value_t const& value_ ) {
+	return ( to_string( value_, nullptr ) );
 }
 
 }

@@ -73,9 +73,10 @@ HHuginn::HClass::HClass(
 }
 
 HHuginn::HClass::HClass(
-	HHuginn::TYPE typeTag_
+	HHuginn::TYPE typeTag_,
+	HHuginn::identifier_id_t identifierId_
 ) : _typeId( huginn::type_id( typeTag_ ) )
-	, _identifierId( INVALID_IDENTIFIER )
+	, _identifierId( identifierId_ )
 	, _super( nullptr )
 	, _fieldIdentifiers()
 	, _fieldIndexes()
