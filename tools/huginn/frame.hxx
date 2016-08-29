@@ -125,6 +125,9 @@ public:
 		return ( _values );
 	}
 	void reset( void );
+	/*! \brief Cleanup before unwinding caused by C++ exception.
+	 */
+	void cleanup( void );
 	int& ip( void ) {
 		return ( _instructionPointers.top() );
 	}

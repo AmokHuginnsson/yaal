@@ -51,6 +51,21 @@ HThread::HThread( HRuntime* runtime_, yaal::hcore::HThread::id_t id_ )
 	return;
 }
 
+HThread::~HThread( void ) {
+	M_PROLOG
+	/*
+	 * If we have any frames it means that execution was stopped by C++ exception.
+	 * We need to manually unwind stack and while doing it we need to make sure
+	 * frames are in consistent state.
+	 */
+	while ( _currentFrame ) {
+		_currentFrame->cleanup();
+		pop_frame();
+	}
+	return;
+	M_DESTRUCTOR_EPILOG
+}
+
 void HThread::add_frame( void ) {
 	if ( _frameCount == static_cast<int>( _frames.get_size() ) ) {
 		_frames.emplace_back( make_pointer<HFrame>( this, _currentFrame ) );

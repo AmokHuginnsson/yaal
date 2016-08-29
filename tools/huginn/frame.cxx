@@ -99,11 +99,17 @@ void HFrame::set_result( HHuginn::value_t&& result_ ) {
 	M_EPILOG
 }
 
+void HFrame::cleanup( void ) {
+	M_PROLOG
+	_values.clear();
+	_valueCache.clear();
+	_instructionPointers.clear();
+	return;
+	M_EPILOG
+}
+
 void HFrame::reset( void ) {
 	M_PROLOG
-	M_ASSERT( _values.is_empty() );
-	M_ASSERT( _valueCache.is_empty() );
-	M_ASSERT( _instructionPointers.is_empty() );
 	_statementId = INVALID_STATEMENT_IDENTIFIER;
 	_result.reset();
 	_variables.clear();
