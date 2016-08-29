@@ -496,10 +496,18 @@ inline HHuginn::value_t assert( huginn::HThread* thread_, HHuginn::value_t*, HHu
 	M_EPILOG
 }
 
-HHuginn::value_t invalid_instance( yaal::hcore::HString const&, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int ) __attribute__(( noreturn ));
+HHuginn::value_t invalid_instance( yaal::hcore::HString const&, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 HHuginn::value_t invalid_instance( yaal::hcore::HString const& name_, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int position_ ) {
 	M_PROLOG
-	throw HHuginn::HHuginnRuntimeException( "Direct creation of instances of `"_ys.append( name_ ).append( "' is not allowed." ), position_ );
+	/*
+	 * __attribute__(( noreturn )) causes problems with clang.
+	 * Hence this workaound.
+	 * Condition in following if shall always evaluate to `true'.
+	 */
+	if ( position_ >= 0 ) {
+		throw HHuginn::HHuginnRuntimeException( "Direct creation of instances of `"_ys.append( name_ ).append( "' is not allowed." ), position_ );
+	}
+	return ( HHuginn::value_t() );
 	M_EPILOG
 }
 

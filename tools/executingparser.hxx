@@ -362,7 +362,7 @@ public:
 protected:
 	HFollows( rules_t const&, action_t const&, bool );
 	HFollows( rules_t const&, action_position_t const&, bool );
-	virtual bool do_is_optional( void ) const;
+	virtual bool do_is_optional( void ) const override;
 	virtual ptr_t do_clone( void ) const override;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
@@ -481,7 +481,7 @@ public:
 	HAlternative operator[]( action_t const& ) const;
 	HAlternative operator[]( action_position_t const& ) const;
 protected:
-	virtual bool do_is_optional( void ) const;
+	virtual bool do_is_optional( void ) const override;
 	virtual ptr_t do_clone( void ) const override;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
