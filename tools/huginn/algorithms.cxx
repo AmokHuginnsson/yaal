@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
+#include "hcore/safe_cast.hxx"
 #include "runtime.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
@@ -47,20 +48,20 @@ namespace tools {
 namespace huginn {
 
 class HRange : public HHuginn::HIterable {
-	int _from;
-	int _stop;
-	int _step;
+	int long long _from;
+	int long long _stop;
+	int long long _step;
 public:
-	HRange( HHuginn::HClass const* class_, int from_, int stop_, int step_ )
+	HRange( HHuginn::HClass const* class_, int long long from_, int long long stop_, int long long step_ )
 		: HIterable( class_ )
 		, _from( from_ )
 		, _stop( stop_ )
 		, _step( step_ ) {
 	}
-	int step( void ) const {
+	int long long step( void ) const {
 		return ( _step );
 	}
-	int stop( void ) const {
+	int long long stop( void ) const {
 		return ( _stop );
 	}
 	static HHuginn::class_t get_class( HRuntime* huginn_ ) {
@@ -76,7 +77,7 @@ public:
 	}
 protected:
 	virtual int long do_size( void ) const override {
-		return ( ( _stop + _step - ( _from + 1 ) ) / _step );
+		return ( safe_cast<int long>( ( _stop + _step - ( _from + 1 ) ) / _step ) );
 	}
 private:
 	virtual HIterator do_iterator( void ) override;
@@ -87,11 +88,11 @@ private:
 };
 
 class HRangeIterator : public HIteratorInterface {
-	int _i;
+	int long long _i;
 	HRange const* _range;
 	HObjectFactory* _objectFactory;
 public:
-	HRangeIterator( int from_, HRange const* range_ )
+	HRangeIterator( int long long from_, HRange const* range_ )
 		: _i( from_ )
 		, _range( range_ )
 		, _objectFactory( range_->HIterable::get_class()->runtime()->object_factory() ) {
@@ -102,7 +103,7 @@ protected:
 		return ( _objectFactory->create_integer( _i ) );
 	}
 	virtual bool do_is_valid( void ) override {
-		return ( _i < _range->stop() );
+		return ( _range->step() > 0 ? _i < _range->stop() : _i > _range->stop() );
 	}
 	virtual void do_next( void ) override {
 		_i += _range->step();
@@ -323,23 +324,26 @@ private:
 		char const name[] = "Algorithms.range";
 		verify_arg_count( name, values_, 1, 3, position_ );
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, false, position_ );
-		int from( 0 );
-		int stop( 0 );
-		int step( 1 );
+		int long long from( 0 );
+		int long long stop( 0 );
+		int long long step( 1 );
 		int s( static_cast<int>( values_.get_size() ) );
 		switch ( s ) {
 			case ( 1 ): {
-				stop = static_cast<int>( get_integer( values_[0] ) );
+				stop = get_integer( values_[0] );
 			} break;
 			case ( 3 ): {
 				verify_arg_type( name, values_, 2, HHuginn::TYPE::INTEGER, false, position_ );
-				step = static_cast<int>( get_integer( values_[2] ) );
+				step = get_integer( values_[2] );
 			} /* fall-through */
 			case ( 2 ): {
 				verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
-				from = static_cast<int>( get_integer( values_[0] ) );
-				stop = static_cast<int>( get_integer( values_[1] ) );
+				from = get_integer( values_[0] );
+				stop = get_integer( values_[1] );
 			} break;
+		}
+		if ( ( ( step == 0 ) && ( stop != from ) ) || ( ( stop > from ) && ( step < 0 ) ) || ( ( stop < from ) && ( step > 0 ) ) ) {
+			throw HHuginn::HHuginnRuntimeException( "Invalid range.", position_ );
 		}
 		return ( make_pointer<HRange>( _rangeClass.raw(), from, stop, step ) );
 		M_EPILOG
