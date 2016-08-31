@@ -194,6 +194,29 @@ public:
 	static HHuginn::value_t map( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		return ( static_cast<HAlgorithms*>( object_->raw() )->do_map( values_, position_ ) );
 	}
+	static HHuginn::value_t reduce( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+		char const name[] = "Algorithms.reduce";
+		verify_arg_count( name, values_, 2, 3, position_ );
+		verify_arg_collection( name, values_, 0, false, position_ );
+		verify_arg_type( name, values_, 1, HHuginn::TYPE::FUNCTION_REFERENCE, false, position_ );
+		int argCount( static_cast<int>( values_.get_size() ) );
+		HHuginn::value_t accumulator( argCount == 3 ? values_[2] : HHuginn::value_t() );
+		HHuginn::HIterable const* src( static_cast<HHuginn::HIterable const*>( values_[0].raw() ) );
+		if ( ! accumulator && ( src->size() == 0 ) ) {
+			throw HHuginn::HHuginnRuntimeException( "reduce() on empty.", position_ );
+		}
+		HHuginn::function_t function( static_cast<HHuginn::HFunctionReference const*>( values_[1].raw() )->function() );
+		HHuginn::HIterable::HIterator it( const_cast<HHuginn::HIterable*>( src )->iterator() );
+		if ( ! accumulator ) {
+			accumulator = it.value( thread_, position_ );
+			it.next();
+		}
+		while ( it.is_valid() && thread_->can_continue() ) {
+			accumulator = function( thread_, nullptr, HHuginn::values_t( { accumulator, it.value( thread_, position_ ) } ), position_ );
+			it.next();
+		}
+		return ( accumulator );
+	}
 	static HHuginn::value_t materialize( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		char const name[] = "Algorithms.materialize";
 		verify_arg_count( name, values_, 2, 2, position_ );
@@ -366,6 +389,7 @@ HHuginn::value_t HAlgorithmsCreator::do_new_instance( HRuntime* runtime_ ) {
 			HHuginn::field_definitions_t{
 				{ "map",         make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::map, _1, _2, _3, _4 ) ) },
 				{ "materialize", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::materialize, _1, _2, _3, _4 ) ) },
+				{ "reduce",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::reduce, _1, _2, _3, _4 ) ) },
 				{ "range",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::range, _1, _2, _3, _4 ) ) },
 				{ "sorted",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::sorted, _1, _2, _3, _4 ) ) }
 			}
