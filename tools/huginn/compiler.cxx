@@ -247,6 +247,9 @@ void OCompiler::resolve_symbols( void ) {
 			}
 			lastClassId = es._classId;
 		}
+		if ( _submittedImports.find( es._identifier ) != _submittedImports.end() ) {
+			throw HHuginn::HHuginnRuntimeException( "Making a direct reference to a package is forbidden.", es._position );
+		}
 		do {
 			if ( !! aClass ) {
 				int index( aClass->field_index( es._identifier ) );
