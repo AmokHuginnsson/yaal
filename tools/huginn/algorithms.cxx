@@ -64,10 +64,10 @@ public:
 	int long long stop( void ) const {
 		return ( _stop );
 	}
-	static HHuginn::class_t get_class( HRuntime* huginn_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
 		M_PROLOG
 		return (
-			huginn_->create_class(
+			runtime_->create_class(
 				"Range",
 				nullptr,
 				HHuginn::field_definitions_t{}
@@ -127,10 +127,10 @@ public:
 		, _source( source_ )
 		, _transform( transform_ ) {
 	}
-	static HHuginn::class_t get_class( HRuntime* huginn_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
 		M_PROLOG
 		return (
-			huginn_->create_class(
+			runtime_->create_class(
 				"Mapper",
 				nullptr,
 				HHuginn::field_definitions_t{}
@@ -197,7 +197,7 @@ public:
 	static HHuginn::value_t reduce( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		char const name[] = "Algorithms.reduce";
 		verify_arg_count( name, values_, 2, 3, position_ );
-		verify_arg_collection( name, values_, 0, false, position_ );
+		verify_arg_collection( name, values_, 0, false, false, position_ );
 		verify_arg_type( name, values_, 1, HHuginn::TYPE::FUNCTION_REFERENCE, false, position_ );
 		int argCount( static_cast<int>( values_.get_size() ) );
 		HHuginn::value_t accumulator( argCount == 3 ? values_[2] : HHuginn::value_t() );
@@ -220,7 +220,7 @@ public:
 	static HHuginn::value_t materialize( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		char const name[] = "Algorithms.materialize";
 		verify_arg_count( name, values_, 2, 2, position_ );
-		verify_arg_collection( name, values_, 0, false, position_ );
+		verify_arg_collection( name, values_, 0, false, false, position_ );
 		verify_arg_type( name, values_, 1, HHuginn::TYPE::FUNCTION_REFERENCE, false, position_ );
 		HHuginn::HFunctionReference const& fr( *static_cast<HHuginn::HFunctionReference const*>( values_[1].raw() ) );
 		HHuginn::value_t v;
@@ -265,7 +265,7 @@ public:
 	static HHuginn::value_t sorted( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		char const name[] = "Algorithms.sorted";
 		verify_arg_count( name, values_, 1, 2, position_ );
-		HHuginn::type_id_t t( verify_arg_collection( name, values_, 0, false, position_ ) );
+		HHuginn::type_id_t t( verify_arg_collection( name, values_, 0, false, false, position_ ) );
 		HHuginn::value_t key;
 		if ( values_.get_size() > 1 ) {
 			verify_arg_type( name, values_, 1, HHuginn::TYPE::FUNCTION_REFERENCE, false, position_ );
@@ -337,7 +337,7 @@ private:
 		M_PROLOG
 		char const name[] = "Algorithms.map";
 		verify_arg_count( name, values_, 2, 2, position_ );
-		verify_arg_collection( name, values_, 0, false, position_ );
+		verify_arg_collection( name, values_, 0, false, false, position_ );
 		verify_arg_type( name, values_, 1, HHuginn::TYPE::FUNCTION_REFERENCE, false, position_ );
 		return ( make_pointer<HMapper>( _mapperClass.raw(), values_[0], static_cast<HHuginn::HFunctionReference const*>( values_[1].raw() )->function() ) );
 		M_EPILOG

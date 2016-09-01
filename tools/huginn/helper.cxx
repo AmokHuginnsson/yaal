@@ -186,9 +186,20 @@ HHuginn::type_id_t verify_arg_numeric(
 HHuginn::type_id_t verify_arg_collection(
 	yaal::hcore::HString const& name_,
 	HHuginn::values_t const& values_,
-	int no_, bool oneArg_, int position_ ) {
+	int no_, bool oneArg_, bool materialized_, int position_ ) {
 	M_PROLOG
-	if ( ! dynamic_cast<HHuginn::HIterable const*>( values_[no_].raw() ) ) {
+	static HHuginn::TYPE const material[] = {
+		HHuginn::TYPE::LIST,
+		HHuginn::TYPE::DEQUE,
+		HHuginn::TYPE::SET,
+		HHuginn::TYPE::ORDER,
+		HHuginn::TYPE::DICT,
+		HHuginn::TYPE::LOOKUP,
+		HHuginn::TYPE::STRING
+	};
+	HHuginn::TYPE t( static_cast<HHuginn::TYPE>( values_[no_]->type_id().get() ) );
+	if ( ! dynamic_cast<HHuginn::HIterable const*>( values_[no_].raw() )
+		|| ( materialized_ && ( find( begin( material ), end( material ), t ) == end( material ) ) ) ) {
 		HString no;
 		if ( ! oneArg_ ) {
 			no = util::ordinal( no_ + 1 ).append( " " );
@@ -197,7 +208,9 @@ HHuginn::type_id_t verify_arg_collection(
 			""_ys.append( name_ )
 			.append( "() " )
 			.append( no )
-			.append( "argument must be a collection type, not a " )
+			.append( "argument must be a" )
+			.append( materialized_ ? " materialized" : "" )
+			.append( " collection type, not a " )
 			.append( values_[no_]->get_class()->name() )
 			.append( "'." ),
 			position_
@@ -205,6 +218,61 @@ HHuginn::type_id_t verify_arg_collection(
 	}
 	return ( values_[no_]->type_id() );
 	M_EPILOG
+}
+
+template<typename collection_t>
+HHuginn::type_id_t verify_arg_collection_value_type_low(
+	yaal::hcore::HString const& name_,
+	collection_t const& collection_,
+	types_t const& requiredTypes_,
+	bool uniform_,
+	int position_
+) {
+	HHuginn::type_id_t type( _unknownClass_.type_id() );
+	HHuginn::type_id_t curType( _unknownClass_.type_id() );
+	bool first( true );
+	int long long pos( 0 );
+	for ( HHuginn::value_t const& v : collection_.value() ) {
+		curType = v->type_id();
+		if ( find( requiredTypes_.begin(), requiredTypes_.end(), curType ) == requiredTypes_.end() ) {
+			throw HHuginn::HHuginnRuntimeException( to_string( name_ ).append( "() a collection contains value of an unexpected type: " ).append( v->get_class()->name() ).append( ", at position: " ).append( pos ), position_ );
+		}
+		if ( first ) {
+			type = curType;
+			first = false;
+		} else if ( uniform_ ) {
+			if ( curType != type ) {
+				throw HHuginn::HHuginnRuntimeException( to_string( name_ ).append( "() a collection is not uniformly typed: " ).append( v->get_class()->name() ).append( ", at position: " ).append( pos ), position_ );
+			}
+		}
+		++ pos;
+	}
+	return ( type );
+}
+
+HHuginn::type_id_t verify_arg_collection_value_type(
+	yaal::hcore::HString const& name_,
+	HHuginn::values_t const& values_,
+	int no_,
+	bool oneArg_,
+	types_t const& requiredTypes_,
+	bool uniform_,
+	int position_
+) {
+	verify_arg_collection( name_, values_, no_, oneArg_, true, position_ );
+	HHuginn::type_id_t type( _unknownClass_.type_id() );
+	switch ( values_[no_]->type_id().get() ) {
+		case ( static_cast<int>( HHuginn::TYPE::LIST ) ): {
+			type = verify_arg_collection_value_type_low( name_, *static_cast<HHuginn::HList const*>( values_[no_].raw() ), requiredTypes_, uniform_, position_ );
+		} break;
+		case ( static_cast<int>( HHuginn::TYPE::DEQUE ) ): {
+			type = verify_arg_collection_value_type_low( name_, *static_cast<HHuginn::HDeque const*>( values_[no_].raw() ), requiredTypes_, uniform_, position_ );
+		} break;
+		case ( static_cast<int>( HHuginn::TYPE::SET ) ): {
+			type = verify_arg_collection_value_type_low( name_, *static_cast<HHuginn::HSet const*>( values_[no_].raw() ), requiredTypes_, uniform_, position_ );
+		} break;
+	}
+	return ( type );
 }
 
 HHuginn::HString::value_type const& get_string( HHuginn::value_t const& value_ ) {
