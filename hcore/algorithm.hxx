@@ -71,6 +71,56 @@ inline iterator_t find_if( iterator_t it, iterator_t end, condition_t cond ) {
 	return ( it );
 }
 
+/*! \brief Find first element in range that does not meet a given condition.
+ *
+ * \param it - beginning of the range to search through.
+ * \param end - one past the end of the range to search through.
+ * \param cond - condition which check must fail.
+ * \return iterator pointing to found element or end of range.
+ */
+template<typename iterator_t, typename condition_t>
+inline iterator_t find_if_not( iterator_t it, iterator_t end, condition_t cond ) {
+	for ( ; ( it != end ) && cond( *it ); ++ it )
+		;
+	return ( it );
+}
+
+/*! \brief Tell if all element of a range meet predicate condition.
+ *
+ * \param it - beginning of the range to check for the condition.
+ * \param end - one past the end of the range to check for the condition.
+ * \param cond - condition which must be satisfied.
+ * \return True iff every single element from given range fulfills given condition.
+ */
+template<typename iterator_t, typename condition_t>
+inline bool all_of( iterator_t it, iterator_t end, condition_t cond ) {
+	return ( find_if_not( it, end, cond ) == end );
+}
+
+/*! \brief Tell if any of the elements in a range meet predicate condition.
+ *
+ * \param it - beginning of the range to check for the condition.
+ * \param end - one past the end of the range to check for the condition.
+ * \param cond - condition which must be satisfied.
+ * \return True iff at least one element in given range fulfills the condition.
+ */
+template<typename iterator_t, typename condition_t>
+inline bool any_of( iterator_t it, iterator_t end, condition_t cond ) {
+	return ( find_if( it, end, cond ) != end );
+}
+
+/*! \brief Tell if none of the elements in a range meet predicate condition.
+ *
+ * \param it - beginning of the range to check for the condition.
+ * \param end - one past the end of the range to check for the condition.
+ * \param cond - condition which check must fail.
+ * \return True iff none of the element in given range fulfill given condition.
+ */
+template<typename iterator_t, typename condition_t>
+inline bool none_of( iterator_t it, iterator_t end, condition_t cond ) {
+	return ( find_if( it, end, cond ) == end );
+}
+
 /*! \brief Find first occurrence of value from given set in given range of elements.
  *
  * \param it - beginning of the range to search through.
