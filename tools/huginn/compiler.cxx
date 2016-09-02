@@ -270,11 +270,11 @@ void OCompiler::resolve_symbols( void ) {
 			}
 			OScopeContext* sc( es._scope.raw() );
 			HHuginn::identifier_id_t fi( sc->_functionId );
-			int index( -1 );
+			OScopeContext::OLocalVariable localVariable( { -1, nullptr } );
 			while ( sc ) {
 				OScopeContext::local_variables_t::const_iterator it( sc->_variables.find( es._identifier ) );
 				if ( it != sc->_variables.end() ) {
-					index = it->second;
+					localVariable = it->second;
 					break;
 				}
 				if ( sc->_parent && ( sc->_parent->_functionId == fi ) ) {
@@ -287,7 +287,7 @@ void OCompiler::resolve_symbols( void ) {
 				if ( ! sc ) {
 					sc = es._scope.raw();
 					/*
-					 * There are two kind of OScopeContexts:
+					 * There are two kinds of OScopeContexts:
 					 * 1. Real scope context that is equivalent of {...} in program code.
 					 * 2. Virtual scope context that is necessary for proper scoping of `for' and `while' and `if'
 					 *    control variables e.g.:
@@ -305,14 +305,15 @@ void OCompiler::resolve_symbols( void ) {
 					while ( parent->_parent && ( parent->_parent->_statementId == parent->_statementId ) ) {
 						parent = parent->_parent;
 					}
-					M_ASSERT( index == -1 );
-					index = static_cast<int>( sc->_variables.get_size() );
+					M_ASSERT( localVariable._index == -1 );
+					localVariable._index = static_cast<int>( sc->_variables.get_size() );
 					if ( parent != sc ) {
-						index += static_cast<int>( parent->_variables.get_size() );
+						localVariable._index += static_cast<int>( parent->_variables.get_size() );
 					}
-					sc->_variables[es._identifier] = index;
-					if ( ( index + 1 ) > maxLocalVariableCount ) {
-						maxLocalVariableCount = index + 1;
+					localVariable._definedBy = es._expression.raw();
+					sc->_variables[es._identifier] = localVariable;
+					if ( ( localVariable._index + 1 ) > maxLocalVariableCount ) {
+						maxLocalVariableCount = localVariable._index + 1;
 					}
 				}
 				if ( !! es._expression ) {
@@ -323,7 +324,7 @@ void OCompiler::resolve_symbols( void ) {
 							es._expression.raw(),
 							HExpression::ACCESS::REFERENCE,
 							sc->_statementId,
-							index,
+							localVariable._index,
 							_1,
 							es._position
 						)
@@ -332,6 +333,9 @@ void OCompiler::resolve_symbols( void ) {
 				break;
 			} else {
 				if ( sc ) {
+					if ( es._expression.raw() == localVariable._definedBy ) {
+						throw HHuginn::HHuginnRuntimeException( "Symbol `"_ys.append( _runtime->identifier_name( es._identifier ) ).append( "' is not yet defined in this expression." ), es._position );
+					}
 					es._expression->replace_execution_step(
 						es._index,
 						hcore::call(
@@ -339,7 +343,7 @@ void OCompiler::resolve_symbols( void ) {
 							es._expression.raw(),
 							es._operation == OExecutionStep::OPERATION::USE ? HExpression::ACCESS::VALUE : HExpression::ACCESS::REFERENCE,
 							sc->_statementId,
-							index,
+							localVariable._index,
 							_1,
 							es._position
 						)

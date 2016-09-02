@@ -69,7 +69,11 @@ struct OCompiler {
 	 */
 	struct OScopeContext {
 		typedef yaal::hcore::HArray<OActiveScope> active_scopes_t;
-		typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, int> local_variables_t;
+		struct OLocalVariable {
+			int _index;
+			HExpression const* _definedBy;
+		};
+		typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, OLocalVariable> local_variables_t;
 		OScopeContext* _parent;  /*!< parent scope */
 		HHuginn::scope_t _scope; /*!< currently compiled Huginn run-time scope */
 
