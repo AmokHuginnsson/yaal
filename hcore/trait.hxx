@@ -730,6 +730,10 @@ template<typename source, typename destination>
 struct copy_const<source const, destination> {
 	typedef destination const type;
 };
+template<typename source, typename destination>
+struct copy_const<source const&, destination> {
+	typedef destination const& type;
+};
 /*! \endcond */
 
 template<typename T>

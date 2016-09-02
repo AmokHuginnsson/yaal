@@ -38,6 +38,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "objectfactory.hxx"
 #include "packagefactory.hxx"
 #include "matrix.hxx"
+#include "numbersetstatistics.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -51,11 +52,13 @@ namespace huginn {
 
 class HMathematics : public HHuginn::HObject {
 	HHuginn::class_t _matrixClass;
+	HHuginn::class_t _numberSetStatisticsClass;
 	HHuginn::class_t _exceptionClass;
 public:
 	HMathematics( HHuginn::HClass* class_ )
 		: HObject( class_ )
 		, _matrixClass( HMatrix::get_class( class_->runtime() ) )
+		, _numberSetStatisticsClass( HNumberSetStatistics::get_class( class_->runtime() ) )
 		, _exceptionClass( exception::create_class( class_->runtime(), "MathematicsException" ) ) {
 		return;
 	}
@@ -406,6 +409,12 @@ public:
 		return ( make_pointer<HMatrix>( thread_, m->_matrixClass.raw(), values_, position_ ) );
 		M_EPILOG
 	}
+	static HHuginn::value_t statistics( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		HMathematics* m( static_cast<HMathematics*>( object_->raw() ) );
+		return ( make_pointer<HNumberSetStatistics>( thread_, m->_numberSetStatisticsClass.raw(), values_, position_ ) );
+		M_EPILOG
+	}
 };
 
 namespace package_factory {
@@ -442,7 +451,8 @@ HHuginn::value_t HMathematicsCreator::do_new_instance( HRuntime* runtime_ ) {
 				{ "floor",                make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::floor, _1, _2, _3, _4 ) ) },
 				{ "ceil",                 make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::ceil, _1, _2, _3, _4 ) ) },
 				{ "differs_at",           make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::differs_at, _1, _2, _3, _4 ) ) },
-				{ "matrix",               make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::matrix, _1, _2, _3, _4 ) ) }
+				{ "matrix",               make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::matrix, _1, _2, _3, _4 ) ) },
+				{ "statistics",           make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::statistics, _1, _2, _3, _4 ) ) }
 			}
 		)
 	);
