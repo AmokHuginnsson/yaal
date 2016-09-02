@@ -75,12 +75,24 @@ HXml::parser_t const HXml::PARSER::RESOLVE_ENTITIES = HXml::parser_t::new_flag()
 HXml::parser_t const HXml::PARSER::AUTO_XINCLUDE = HXml::parser_t::new_flag();
 
 class HXmlParserG : public HSingleton<HXmlParserG> {
+	HXmlParserG( void ) {
+		static xmlGenericErrorFunc f( &HXmlParserG::log_error );
+		initGenericErrorDefaultFunc( &f );
+	}
 	virtual ~HXmlParserG( void ) {
 		M_PROLOG
 		xmlCleanupParser();
 		xmlCleanupCharEncodingHandlers();
 		return;
 		M_DESTRUCTOR_EPILOG
+	}
+	static void log_error( void*, char const* format_, ... ) __attribute__(( format( printf, 2, 3 ) )) {
+		HString msg;
+		va_list ap;
+		va_start( ap, format_ );
+		msg.vformat( format_, &ap );
+		va_end( ap );
+		log( LOG_LEVEL::WARNING ) << msg << endl;
 	}
 	friend class HSingleton<HXmlParserG>;
 	friend class HDestructor<HXmlParserG>;
