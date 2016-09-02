@@ -790,7 +790,6 @@ class HArray<type_t, allocator_t>::HIterator : public iterator_interface<const_q
 	array_t const* _owner;
 	int long _index;
 public:
-	typedef type_t value_type;
 	typedef iterator_interface<const_qual_t, iterator_category::random_access> base_type;
 	HIterator( void )
 		: base_type()

@@ -564,7 +564,6 @@ class HDeque<type_t, allocator_t>::HIterator : public iterator_interface<const_q
 	deque_t const* _owner;
 	int long _index;
 public:
-	typedef type_t value_type;
 	typedef iterator_interface<const_qual_t, iterator_category::random_access> base_type;
 	HIterator( void ) : base_type(), _owner( nullptr ), _index( 0 ) {}
 	HIterator( HIterator const& it_ ) : base_type(), _owner( it_._owner ), _index( it_._index ) {}
