@@ -353,6 +353,30 @@ HHuginn::HCharacter::value_type get_character( HHuginn::HValue const* value_ ) {
 	return ( static_cast<HHuginn::HCharacter const*>( value_ )->value() );
 }
 
+template<>
+double long get_by_type<double long>( HHuginn::value_t const& value_ ) {
+	M_ENSURE( value_->type_id() == HHuginn::TYPE::REAL );
+	return ( static_cast<HHuginn::HReal const*>( value_.raw() )->value() );
+}
+
+template<>
+double long get_by_type<double long>( HHuginn::value_t& value_ ) {
+	M_ENSURE( value_->type_id() == HHuginn::TYPE::REAL );
+	return ( static_cast<HHuginn::HReal*>( value_.raw() )->value() );
+}
+
+template<>
+yaal::hcore::HNumber const& get_by_type<yaal::hcore::HNumber const&>( HHuginn::value_t const& value_ ) {
+	M_ENSURE( value_->type_id() == HHuginn::TYPE::NUMBER );
+	return ( static_cast<HHuginn::HNumber const*>( value_.raw() )->value() );
+}
+
+template<>
+yaal::hcore::HNumber& get_by_type<yaal::hcore::HNumber&>( HHuginn::value_t& value_ ) {
+	M_ENSURE( value_->type_id() == HHuginn::TYPE::NUMBER );
+	return ( static_cast<HHuginn::HNumber*>( value_.raw() )->value() );
+}
+
 yaal::hcore::HString const& type_name( HHuginn::TYPE type_ ) {
 	static HString const NAME_NONE = "*none*";
 	static HString const NAME_BOOLEAN = "boolean";

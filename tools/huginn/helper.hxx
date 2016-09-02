@@ -68,6 +68,48 @@ HHuginn::HNumber::value_type const& get_number( HHuginn::HValue const* );
 HHuginn::HBoolean::value_type get_boolean( HHuginn::HValue const* );
 HHuginn::HCharacter::value_type get_character( HHuginn::HValue const* );
 
+template<typename data_t>
+data_t get_by_type( HHuginn::value_t const& );
+
+template<typename data_t>
+data_t get_by_type( HHuginn::value_t& );
+
+template<typename data_t, typename iterator_t>
+class HValueUnboxingIterator : public yaal::hcore::iterator_interface<data_t, yaal::hcore::iterator_category::forward> {
+public:
+	typedef HValueUnboxingIterator this_type;
+	typedef yaal::hcore::iterator_interface<data_t, yaal::hcore::iterator_category::forward> base_type;
+	typedef typename trait::strip_reference<typename iterator_t::value_type>::type src_const_qual_t;
+	typedef typename trait::ternary<is_pod<data_t>::value, data_t, typename trait::copy_const<src_const_qual_t, data_t>::type>::type const_qual_t;
+	typedef typename trait::ternary<is_pod<data_t>::value, const_qual_t, const_qual_t&>::type reference_t;
+private:
+	iterator_t _iter;
+public:
+	HValueUnboxingIterator( iterator_t iter_ )
+		: _iter( iter_ ) {
+	}
+	HValueUnboxingIterator( HValueUnboxingIterator const& ) = default;
+	HValueUnboxingIterator& operator = ( HValueUnboxingIterator const& ) = default;
+	HValueUnboxingIterator& operator ++ ( void ) {
+		++ _iter;
+		return ( *this );
+	}
+	bool operator == ( HValueUnboxingIterator const& other_ ) const {
+		return ( _iter == other_._iter );
+	}
+	bool operator != ( HValueUnboxingIterator const& other_ ) const {
+		return ( _iter != other_._iter );
+	}
+	reference_t operator * ( void ) {
+		return ( get_by_type<reference_t>( *_iter ) );
+	}
+};
+
+template<typename data_t, typename iterator_t>
+HValueUnboxingIterator<data_t, iterator_t> value_unboxing_iterator( iterator_t it_ ) {
+	return ( HValueUnboxingIterator<data_t, iterator_t>( it_ ) );
+}
+
 }
 
 }
