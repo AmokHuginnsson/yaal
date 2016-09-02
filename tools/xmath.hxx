@@ -32,6 +32,7 @@ Copyright:
 #include "hcore/pod.hxx"
 #include "hcore/algorithm.hxx"
 #include "hcore/iterator.hxx"
+#include "hcore/hbitflag.hxx"
 
 namespace yaal {
 
@@ -45,20 +46,19 @@ template<typename iterator_t>
 typename hcore::iterator_traits<iterator_t>::value_type
 select( iterator_t, iterator_t, int long );
 
+typedef yaal::hcore::HBitFlag<struct AGGREGATE_TYPE> aggregate_type_t;
 struct AGGREGATE_TYPE {
-	typedef enum {
-		COUNT                         = 1,
-		MINIMUM                       = 2,
-		MAXIMUM                       = 4,
-		SUM                           = 8,
-		AVERAGE                       = 16,
-		VARIANCE                      = 32,
-		POPULATION_VARIANCE           = 64,
-		STANDARD_DEVIATION            = 128,
-		POPULATION_STANDARD_DEVIATION = 256,
-		BASIC = COUNT | MINIMUM | MAXIMUM | SUM | AVERAGE | VARIANCE | POPULATION_VARIANCE | STANDARD_DEVIATION | POPULATION_STANDARD_DEVIATION,
-		MEDIAN                        = 512
-	} type_t;
+	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const COUNT;
+	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const MINIMUM;
+	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const MAXIMUM;
+	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const SUM;
+	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const AVERAGE;
+	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const VARIANCE;
+	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const POPULATION_VARIANCE;
+	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const STANDARD_DEVIATION;
+	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const POPULATION_STANDARD_DEVIATION;
+	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const BASIC;
+	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const MEDIAN;
 };
 
 /*! \brief Provide statistics for set of numbers.
@@ -67,6 +67,7 @@ template<typename numeric_t>
 class HNumberSetStats {
 public:
 	typedef HNumberSetStats this_type;
+	typedef numeric_t value_type;
 private:
 	int long _count;
 	numeric_t _minimum;
@@ -76,7 +77,7 @@ private:
 	numeric_t _median;
 	numeric_t _variance;
 	numeric_t _populationVariance;
-	AGGREGATE_TYPE::type_t _aggregateType;
+	aggregate_type_t _aggregateType;
 public:
 	/*! \brief Construct statictics for given range of numbers.
 	 *
@@ -88,13 +89,15 @@ public:
 	 * One can explicitly request `median' aggregation type.
 	 */
 	template<typename iterator_t>
-	HNumberSetStats( iterator_t, iterator_t, AGGREGATE_TYPE::type_t = AGGREGATE_TYPE::BASIC );
+	HNumberSetStats( iterator_t, iterator_t, aggregate_type_t = AGGREGATE_TYPE::BASIC );
 	int long count( void ) const {
 		M_PROLOG
 		M_ENSURE( _aggregateType & AGGREGATE_TYPE::COUNT );
 		return ( _count );
 		M_EPILOG
 	}
+	HNumberSetStats( HNumberSetStats const& ) = default;
+	HNumberSetStats& operator = ( HNumberSetStats const& ) = default;
 	numeric_t minimum( void ) const {
 		M_PROLOG
 		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::MINIMUM ) && ( _count > 0 ) );
@@ -107,7 +110,7 @@ public:
 		return ( _maximum );
 		M_EPILOG
 	}
-	numeric_t sum( void ) {
+	numeric_t sum( void ) const {
 		M_PROLOG
 		M_ENSURE( _aggregateType & AGGREGATE_TYPE::SUM );
 		return ( _sum );
@@ -153,18 +156,20 @@ public:
 
 template<typename numeric_t>
 template<typename iterator_t>
-HNumberSetStats<numeric_t>::HNumberSetStats( iterator_t first_, iterator_t last_, AGGREGATE_TYPE::type_t aggregateType_ )
+HNumberSetStats<numeric_t>::HNumberSetStats( iterator_t first_, iterator_t last_, aggregate_type_t aggregateType_ )
 	: _count( 0 ), _minimum(), _maximum(), _sum(), _average(),
 	_median(), _variance(), _populationVariance(),
-	_aggregateType( static_cast<AGGREGATE_TYPE::type_t>( aggregateType_ ) ) {
+	_aggregateType( aggregateType_ ) {
 	M_PROLOG
 	numeric_t acc( 0 );
 	for ( iterator_t it( first_ ); it != last_; ++ it, ++ _count ) {
 		if ( _count ) {
-			if ( *it < _minimum )
+			if ( *it < _minimum ) {
 				_minimum = *it;
-			if ( *it > _maximum )
+			}
+			if ( *it > _maximum ) {
 				_maximum = *it;
+			}
 		} else {
 			_minimum = *it;
 			_maximum = *it;
@@ -173,11 +178,13 @@ HNumberSetStats<numeric_t>::HNumberSetStats( iterator_t first_, iterator_t last_
 		acc += ( *it * *it );
 	}
 	_average = _sum / static_cast<numeric_t>( _count );
-	if ( _count > 1 )
+	if ( _count > 1 ) {
 		_variance = acc / static_cast<numeric_t>( _count - 1 ) - ( ( _average * _average * static_cast<numeric_t>( _count ) ) / static_cast<numeric_t>( _count - 1 ) );
+	}
 	_populationVariance = acc / static_cast<numeric_t>( _count ) - _average * _average;
-	if ( ( _count > 0 ) && ( _aggregateType & AGGREGATE_TYPE::MEDIAN ) )
+	if ( ( _count > 0 ) && ( _aggregateType & AGGREGATE_TYPE::MEDIAN ) ) {
 		_median = select( first_, last_, ( _count - 1 ) / 2 );
+	}
 	return;
 	M_EPILOG
 }
@@ -185,7 +192,7 @@ HNumberSetStats<numeric_t>::HNumberSetStats( iterator_t first_, iterator_t last_
 template<typename iterator_t>
 HNumberSetStats<typename trait::ternary<is_floating_point<typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type>::value,
 	typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type,
-	double long>::type> number_set_stats( iterator_t first_, iterator_t last_, AGGREGATE_TYPE::type_t aggregateType_ = AGGREGATE_TYPE::BASIC ) {
+	double long>::type> number_set_stats( iterator_t first_, iterator_t last_, aggregate_type_t aggregateType_ = AGGREGATE_TYPE::BASIC ) {
 	M_PROLOG
 	return ( HNumberSetStats<typename trait::ternary<is_floating_point<typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type>::value,
 		typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type,
@@ -230,7 +237,6 @@ select( iterator_t first_, iterator_t last_, int long kth_ ) {
 	M_ENSURE( ( kth_ >= 0 ) && ( kth_ < aux.get_requested_size() ) );
 	value_t* left( aux.begin() );
 	value_t* right( aux.end() - 1 );
-	value_t* start( left );
 	value_t* kth( left );
 	while ( left != right ) {
 		kth = partition( left, right, bind2nd( less<value_t>(), choose_pivot( left, right, less<value_t>() ) ) );
