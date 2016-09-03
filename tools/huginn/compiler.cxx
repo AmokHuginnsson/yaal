@@ -421,6 +421,10 @@ void OCompiler::detect_misuse( void ) const {
 	HHuginn::identifier_id_t implicitUse[] = {
 		_runtime->identifier_id( "main" ),
 		_runtime->identifier_id( "get_size" ),
+		_runtime->identifier_id( "iterator" ),
+		_runtime->identifier_id( "is_valid" ),
+		_runtime->identifier_id( "value" ),
+		_runtime->identifier_id( "next" ),
 		_runtime->identifier_id( "to_string" ),
 		_runtime->identifier_id( "to_integer" ),
 		_runtime->identifier_id( "to_real" ),

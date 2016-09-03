@@ -67,18 +67,46 @@ void HFor::do_execute( HThread* thread_ ) const {
 	if ( f->can_continue() ) {
 		HHuginn::value_t source( f->result() );
 		HHuginn::HIterable* coll( dynamic_cast<HHuginn::HIterable*>( source.raw() ) );
-		if ( ! coll ) {
-			throw HHuginn::HHuginnRuntimeException( "`For' source is not an iterable.", sourcePosition );
-		}
-		HHuginn::HIterable::HIterator it( coll->iterator() );
-		while ( f->can_continue() && it.is_valid() ) {
-			_control->execute( thread_ );
-			f->commit_variable( it.value( thread_, sourcePosition ), controlPosition );
-			if ( f->can_continue() ) {
-				_loop->execute( thread_ );
+		HHuginn::HObject* obj( nullptr );
+		if ( coll ) {
+			HHuginn::HIterable::HIterator it( coll->iterator() );
+			while ( f->can_continue() && it.is_valid() ) {
+				_control->execute( thread_ );
+				f->commit_variable( it.value( thread_, sourcePosition ), controlPosition );
+				if ( f->can_continue() ) {
+					_loop->execute( thread_ );
+				}
+				f->continue_execution();
+				it.next();
 			}
-			f->continue_execution();
-			it.next();
+		} else if ( ( obj = dynamic_cast<HHuginn::HObject*>( source.raw() ) ) ) {
+			HHuginn::value_t itVal( obj->call_method( thread_, source, "iterator", {}, sourcePosition ) );
+			HHuginn::HObject* it( dynamic_cast<HHuginn::HObject*>( itVal.raw() ) );
+			if ( ! it ) {
+				throw HHuginn::HHuginnRuntimeException( "`For' source returned invalid iterator object.", sourcePosition );
+			}
+			while ( f->can_continue() ) {
+				HHuginn::value_t isValid( it->call_method( thread_, itVal, "is_valid", {}, sourcePosition ) );
+				if ( isValid->type_id() != HHuginn::TYPE::BOOLEAN ) {
+					throw HHuginn::HHuginnRuntimeException( "`For' source iterator is_valid returned non-boolean value.", sourcePosition );
+				}
+				if ( ! ( f->can_continue() && static_cast<HHuginn::HBoolean*>( isValid.raw() )->value() ) ) {
+					break;
+				}
+				HHuginn::value_t value( it->call_method( thread_, itVal, "value", {}, sourcePosition ) );
+				if ( ! f->can_continue() ) {
+					break;
+				}
+				_control->execute( thread_ );
+				f->commit_variable( value, controlPosition );
+				if ( f->can_continue() ) {
+					_loop->execute( thread_ );
+				}
+				f->continue_execution();
+				it->call_method( thread_, itVal, "next", {}, sourcePosition );
+			}
+		} else {
+			throw HHuginn::HHuginnRuntimeException( "`For' source is not an iterable.", sourcePosition );
 		}
 	}
 	thread_->pop_frame();
