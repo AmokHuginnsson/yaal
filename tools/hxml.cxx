@@ -75,10 +75,6 @@ HXml::parser_t const HXml::PARSER::RESOLVE_ENTITIES = HXml::parser_t::new_flag()
 HXml::parser_t const HXml::PARSER::AUTO_XINCLUDE = HXml::parser_t::new_flag();
 
 class HXmlParserG : public HSingleton<HXmlParserG> {
-	HXmlParserG( void ) {
-		static xmlGenericErrorFunc f( &HXmlParserG::log_error );
-		initGenericErrorDefaultFunc( &f );
-	}
 	virtual ~HXmlParserG( void ) {
 		M_PROLOG
 		xmlCleanupParser();
@@ -94,6 +90,14 @@ class HXmlParserG : public HSingleton<HXmlParserG> {
 		va_end( ap );
 		log( LOG_LEVEL::WARNING ) << msg << endl;
 	}
+public:
+	static void init( void ) {
+		HXmlParserG::get_instance();
+		static xmlGenericErrorFunc f( &HXmlParserG::log_error );
+		initGenericErrorDefaultFunc( &f );
+		xmlSetGenericErrorFunc( nullptr, f );
+	}
+private:
 	friend class HSingleton<HXmlParserG>;
 	friend class HDestructor<HXmlParserG>;
 };
@@ -452,7 +456,7 @@ void HXml::init( yaal::hcore::HStreamInterface& stream, parser_t parser_ ) {
 	M_PROLOG
 	int savedErrno = errno;
 	HString error;
-	HXmlParserG::get_instance();
+	HXmlParserG::init();
 	errno = 0;
 	_streamId = get_stream_id( &stream );
 	int LOW_LEVEL_PARSING_OPTIONS( XML_PARSE_DTDLOAD | XML_PARSE_DTDATTR | XML_PARSE_NONET | XML_PARSE_NSCLEAN );
