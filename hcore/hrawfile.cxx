@@ -42,7 +42,7 @@ namespace yaal {
 
 namespace hcore {
 
-char const* const _error_ = _( "file is not opened" );
+static char const* const _error_ = _( "file is not opened" );
 int long _writeTimeout_ = 4 * 1000; /* 4 seconds */
 
 HRawFile::HRawFile( TYPE::raw_file_type_t type_ )
@@ -133,16 +133,18 @@ file_descriptor_t HRawFile::get_file_descriptor( void ) const {
 
 int long HRawFile::read_plain( void* buffer_, int long size_ ) {
 	M_PROLOG
-	if ( _fileDescriptor < 0 )
+	if ( _fileDescriptor < 0 ) {
 		M_THROW( _error_, errno );
+	}
 	return ( ::read( _fileDescriptor, buffer_, static_cast<size_t>( size_ ) ) );
 	M_EPILOG
 }
 
 int long HRawFile::read_ssl( void* buffer_, int long size_ ) {
 	M_PROLOG
-	if ( _fileDescriptor < 0 )
+	if ( _fileDescriptor < 0 ) {
 		M_THROW( _error_, errno );
+	}
 	return ( _ssl->read( buffer_, size_ ) );
 	M_EPILOG
 }
@@ -175,8 +177,9 @@ bool HRawFile::wait_for( ACTION::action_t const& action_, int long* time_ ) {
 
 int long HRawFile::write_plain( void const* buffer_, int long size_ ) {
 	M_PROLOG
-	if ( _fileDescriptor < 0 )
+	if ( _fileDescriptor < 0 ) {
 		M_THROW( _error_, errno );
+	}
 	int long iWritten = 0;
 	int long timeOut( _timeout );
 	do {
@@ -197,8 +200,9 @@ int long HRawFile::write_plain( void const* buffer_, int long size_ ) {
 
 int long HRawFile::write_ssl( void const* buffer_, int long size_ ) {
 	M_PROLOG
-	if ( _fileDescriptor < 0 )
+	if ( _fileDescriptor < 0 ) {
 		M_THROW( _error_, errno );
+	}
 	HClock clk;
 	int long nWritten = 0;
 	int long timeOut( _timeout );

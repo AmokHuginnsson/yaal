@@ -40,6 +40,7 @@ namespace yaal {
 namespace hcore {
 
 namespace {
+static char const* const _error_ = _( "file is not opened" );
 HFile::open_t const NONE = HFile::open_t::new_flag();
 }
 
@@ -229,9 +230,7 @@ int long HFile::read_line( HString& line_, READ read_,
 	if ( readMode == READ::DEFAULTS ) {
 		readMode = READ::BUFFERED_READS;
 	}
-	if ( ! _handle ) {
-		M_THROW( _( "no file is opened" ), errno );
-	}
+	M_ENSURE( _handle, _error_ );
 	int long length( -1 );
 	if ( readMode == READ::BUFFERED_READS ) {
 		length = get_line_length();
@@ -300,7 +299,7 @@ HString const& HFile::get_error( void ) const {
 
 void HFile::do_flush( void ) {
 	M_PROLOG
-	M_ASSERT( _handle );
+	M_ENSURE( _handle, _error_ );
 	M_ENSURE( ::std::fflush( static_cast<FILE*>( _handle ) ) == 0 );
 	return;
 	M_EPILOG
@@ -330,6 +329,7 @@ int HFile::get_file_descriptor( void ) const {
 
 int long HFile::do_read( void* buffer_, int long size_ ) {
 	M_PROLOG
+	M_ENSURE( _handle, _error_ );
 	int long len( static_cast<int long>( ::std::fread( buffer_, sizeof ( char ), static_cast<size_t>( size_ ), static_cast<FILE*>( _handle ) ) ) );
 	return ( len ? len : ( ::std::ferror( static_cast<FILE*>( _handle ) ) ? -1 : len ) );
 	M_EPILOG
@@ -337,7 +337,7 @@ int long HFile::do_read( void* buffer_, int long size_ ) {
 
 int long HFile::do_write( void const* string_, int long size_ ) {
 	M_PROLOG
-	M_ASSERT( _handle );
+	M_ENSURE( _handle, _error_ );
 	int long len( static_cast<int long>( ::std::fwrite( string_, sizeof ( char ), static_cast<size_t>( size_ ), static_cast<FILE*>( _handle ) ) ) );
 	return ( len ? len : ( ::std::ferror( static_cast<FILE*>( _handle ) ) ? -1 : len ) );
 	M_EPILOG
