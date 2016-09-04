@@ -359,7 +359,7 @@ void HExpression::function_call( HFrame* frame_, int position_ ) {
 	} else {
 		HHuginn::HClass::HBoundMethod* m( dynamic_cast<HHuginn::HClass::HBoundMethod*>( f.raw() ) );
 		M_ASSERT( m );
-		frame_->values().push( m->function()( frame_->thread(), m->object(), values, p ) );
+		frame_->values().push( m->call( frame_->thread(), values, p ) );
 	}
 	values.clear();
 	return;

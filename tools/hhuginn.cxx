@@ -688,8 +688,8 @@ HHuginn::HClass::HBoundMethod::HBoundMethod( HMethod const& method_, HHuginn::va
 	return;
 }
 
-HHuginn::value_t* HHuginn::HClass::HBoundMethod::object( void ) {
-	return ( &_objectHolder );
+HHuginn::value_t HHuginn::HClass::HBoundMethod::call( huginn::HThread* thread_, values_t const& arguments_, int position_ ) {
+	return ( _function( thread_, &_objectHolder, arguments_, position_ ) );
 }
 
 HHuginn::value_t HHuginn::HClass::HBoundMethod::do_clone( HRuntime* runtime_ ) const {

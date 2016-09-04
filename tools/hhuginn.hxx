@@ -419,7 +419,7 @@ private:
 class HHuginn::HClass::HMethod : public HHuginn::HValue {
 	typedef HHuginn::HClass::HMethod this_type;
 	typedef HHuginn::HValue base_type;
-private:
+protected:
 	HHuginn::function_t _function;
 public:
 	HMethod( HHuginn::function_t const& );
@@ -437,7 +437,7 @@ private:
 	HHuginn::value_t _objectHolder;
 public:
 	HBoundMethod( HMethod const&, HHuginn::value_t const& );
-	HHuginn::value_t* object( void );
+	HHuginn::value_t call( huginn::HThread*, values_t const&, int );
 private:
 	HBoundMethod( HBoundMethod const& ) = delete;
 	HBoundMethod& operator = ( HBoundMethod const& ) = delete;
@@ -457,6 +457,7 @@ public:
 	virtual ~HObject( void );
 	value_t& field_ref( int );
 	HHuginn::value_t call_method( huginn::HThread*, HHuginn::value_t const&, yaal::hcore::HString const&, HHuginn::values_t const&, int ) const;
+	HHuginn::value_t get_method( huginn::HThread*, HHuginn::value_t const&, yaal::hcore::HString const&, int ) const;
 private:
 	HObject( HObject const& ) = delete;
 	HObject& operator = ( HObject const& ) = delete;

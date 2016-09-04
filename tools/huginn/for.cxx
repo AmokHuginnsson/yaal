@@ -85,15 +85,21 @@ void HFor::do_execute( HThread* thread_ ) const {
 			if ( ! it ) {
 				throw HHuginn::HHuginnRuntimeException( "`For' source returned invalid iterator object.", sourcePosition );
 			}
+			HHuginn::value_t isValidField( it->get_method( thread_, itVal, "is_valid", sourcePosition ) );
+			HHuginn::HClass::HBoundMethod* isValidMethod( static_cast<HHuginn::HClass::HBoundMethod*>( isValidField.raw() ) );
+			HHuginn::value_t valueField( it->get_method( thread_, itVal, "value", sourcePosition ) );
+			HHuginn::HClass::HBoundMethod* valueMethod( static_cast<HHuginn::HClass::HBoundMethod*>( valueField.raw() ) );
+			HHuginn::value_t nextField( it->get_method( thread_, itVal, "next", sourcePosition ) );
+			HHuginn::HClass::HBoundMethod* nextMethod( static_cast<HHuginn::HClass::HBoundMethod*>( nextField.raw() ) );
 			while ( f->can_continue() ) {
-				HHuginn::value_t isValid( it->call_method( thread_, itVal, "is_valid", {}, sourcePosition ) );
+				HHuginn::value_t isValid( isValidMethod->call( thread_, {}, sourcePosition ) );
 				if ( isValid->type_id() != HHuginn::TYPE::BOOLEAN ) {
 					throw HHuginn::HHuginnRuntimeException( "`For' source iterator is_valid returned non-boolean value.", sourcePosition );
 				}
 				if ( ! ( f->can_continue() && static_cast<HHuginn::HBoolean*>( isValid.raw() )->value() ) ) {
 					break;
 				}
-				HHuginn::value_t value( it->call_method( thread_, itVal, "value", {}, sourcePosition ) );
+				HHuginn::value_t value( valueMethod->call( thread_, {}, sourcePosition ) );
 				if ( ! f->can_continue() ) {
 					break;
 				}
@@ -103,7 +109,7 @@ void HFor::do_execute( HThread* thread_ ) const {
 					_loop->execute( thread_ );
 				}
 				f->continue_execution();
-				it->call_method( thread_, itVal, "next", {}, sourcePosition );
+				nextMethod->call( thread_, {}, sourcePosition );
 			}
 		} else {
 			throw HHuginn::HHuginnRuntimeException( "`For' source is not an iterable.", sourcePosition );
