@@ -254,6 +254,16 @@ void OCompiler::resolve_symbols( void ) {
 			if ( !! aClass ) {
 				int index( aClass->field_index( es._identifier ) );
 				if ( index >= 0 ) {
+					if ( ! es._expression ) {
+						throw HHuginn::HHuginnRuntimeException(
+							"Method argument name `"_ys
+								.append( _runtime->identifier_name( es._identifier) )
+								.append( "' conflicts with class `" )
+								.append( _runtime->identifier_name( aClass->identifier_id() ) )
+								.append( "' field name." ),
+							es._position
+						);
+					}
 					es._expression->replace_execution_step(
 						es._index,
 						hcore::call(
