@@ -45,7 +45,7 @@ namespace tools {
 
 namespace huginn {
 
-HNumberSetStatistics::HNumberSetStatistics( HThread*, HHuginn::HClass const* class_, HHuginn::values_t const& values_, int position_ )
+HNumberSetStatistics::HNumberSetStatistics( HHuginn::HClass const* class_, HHuginn::values_t const& values_, int position_ )
 	: HValue( class_ )
 	, _stats() {
 	char const name[] = "NumberSetStatistics.constructor";

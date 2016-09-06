@@ -48,7 +48,7 @@ public:
 private:
 	number_set_stats_t _stats;
 public:
-	HNumberSetStatistics( HThread*, HHuginn::HClass const*, HHuginn::values_t const&, int );
+	HNumberSetStatistics( HHuginn::HClass const*, HHuginn::values_t const&, int );
 	static HHuginn::value_t stat( char const*, xmath::aggregate_type_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::class_t get_class( HRuntime* );
 private:
