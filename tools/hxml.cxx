@@ -1162,6 +1162,9 @@ void HXml::HNodeProxy::reset_owner( HXml const* owner_ ) {
 HXml::HIterator HXml::HNodeProxy::move_node( HXml::HIterator it, HXml::HNodeProxy node ) {
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	if ( ! disjointed( node ) ) {
+		throw HXmlException( "move_node: Cycle created." );
+	}
 	tree_t::HNode::iterator newIt = _node->move_node( it._iterator, node._node );
 	reset_owner( (**_node)._owner );
 	return ( HXml::HIterator( _node, newIt ) );
@@ -1171,6 +1174,9 @@ HXml::HIterator HXml::HNodeProxy::move_node( HXml::HIterator it, HXml::HNodeProx
 HXml::HIterator HXml::HNodeProxy::move_node( HXml::HNodeProxy node ) {
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	if ( ! disjointed( node ) ) {
+		throw HXmlException( "move_node: Cycle created." );
+	}
 	tree_t::HNode::iterator newIt = _node->move_node( node._node );
 	reset_owner( (**_node)._owner );
 	return ( HXml::HIterator( _node, newIt ) );
@@ -1180,6 +1186,9 @@ HXml::HIterator HXml::HNodeProxy::move_node( HXml::HNodeProxy node ) {
 HXml::HIterator HXml::HNodeProxy::replace_node( HXml::HIterator it, HXml::HNodeProxy node ) {
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	if ( ! disjointed( node ) ) {
+		throw HXmlException( "replace_node: Cycle created." );
+	}
 	tree_t::HNode::iterator newIt = _node->replace_node( it._iterator, node._node );
 	reset_owner( (**_node)._owner );
 	return ( HXml::HIterator( _node, newIt ) );
@@ -1189,6 +1198,9 @@ HXml::HIterator HXml::HNodeProxy::replace_node( HXml::HIterator it, HXml::HNodeP
 HXml::HIterator HXml::HNodeProxy::copy_node( HXml::HIterator it, HXml::HNodeProxy node ) {
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	if ( ! disjointed( node ) ) {
+		throw HXmlException( "copy_node: Cycle created." );
+	}
 	tree_t::HNode::iterator newIt = _node->copy_node( it._iterator, node._node );
 	reset_owner( (**_node)._owner );
 	return ( HXml::HIterator( _node, newIt ) );
@@ -1198,6 +1210,9 @@ HXml::HIterator HXml::HNodeProxy::copy_node( HXml::HIterator it, HXml::HNodeProx
 HXml::HIterator HXml::HNodeProxy::copy_node( HXml::HNodeProxy node ) {
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	if ( ! disjointed( node ) ) {
+		throw HXmlException( "copy_node: Cycle created." );
+	}
 	tree_t::HNode::iterator newIt = _node->copy_node( node._node );
 	reset_owner( (**_node)._owner );
 	return ( HXml::HIterator( _node, newIt ) );
