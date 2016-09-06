@@ -120,12 +120,14 @@ HRange::HIterator HRange::do_iterator( void ) {
 
 class HMapper : public HHuginn::HIterable {
 	HHuginn::value_t _source;
-	HHuginn::function_t _transform;
+	HHuginn::function_t _function;
+	HHuginn::value_t _method;
 public:
-	HMapper( HHuginn::HClass const* class_, HHuginn::value_t source_, HHuginn::function_t transform_ )
+	HMapper( HHuginn::HClass const* class_, HHuginn::value_t source_, HHuginn::function_t function_, HHuginn::value_t method_ )
 		: HIterable( class_ )
 		, _source( source_ )
-		, _transform( transform_ ) {
+		, _function( function_ )
+		, _method( method_ ) {
 	}
 	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
 		M_PROLOG
@@ -146,23 +148,19 @@ private:
 	virtual HIterator do_iterator( void ) override;
 private:
 	virtual HHuginn::value_t do_clone( huginn::HRuntime* ) const override {
-		return ( make_pointer<HMapper>( HIterable::get_class(), _source, _transform ) );
+		return ( make_pointer<HMapper>( HIterable::get_class(), _source, _function, _method ) );
 	}
 };
 
 class HMapperIterator : public HIteratorInterface {
+protected:
 	HHuginn::HIterable::HIterator _impl;
-	HHuginn::function_t const& _transform;
 public:
-	HMapperIterator( HHuginn::HIterable::HIterator&& iterator_, HHuginn::function_t const& transform_ )
-		: _impl( yaal::move( iterator_ ) )
-		, _transform( transform_ ) {
+	HMapperIterator( HHuginn::HIterable::HIterator&& iterator_ )
+		: _impl( yaal::move( iterator_ ) ) {
 		return;
 	}
 protected:
-	virtual HHuginn::value_t do_value( HThread* thread_, int position_ ) override {
-		return ( _transform( thread_, nullptr, HHuginn::values_t( { _impl.value( thread_, position_ ) } ), position_ ) );
-	}
 	virtual bool do_is_valid( void ) override {
 		return ( _impl.is_valid() );
 	}
@@ -174,8 +172,41 @@ private:
 	HMapperIterator& operator = ( HMapperIterator const& ) = delete;
 };
 
+class HFunctionMapperIterator : public HMapperIterator {
+	HHuginn::function_t const& _function;
+public:
+	HFunctionMapperIterator( HHuginn::HIterable::HIterator&& iterator_, HHuginn::function_t const& function_ )
+		: HMapperIterator( yaal::move( iterator_ ) )
+		, _function( function_ ) {
+		return;
+	}
+protected:
+	virtual HHuginn::value_t do_value( HThread* thread_, int position_ ) override {
+		return ( _function( thread_, nullptr, HHuginn::values_t( { _impl.value( thread_, position_ ) } ), position_ ) );
+	}
+};
+
+class HMethodMapperIterator : public HMapperIterator {
+	HHuginn::HClass::HBoundMethod& _method;
+public:
+	HMethodMapperIterator( HHuginn::HIterable::HIterator&& iterator_, HHuginn::HClass::HBoundMethod& method_ )
+		: HMapperIterator( yaal::move( iterator_ ) )
+		, _method( method_ ) {
+		return;
+	}
+protected:
+	virtual HHuginn::value_t do_value( HThread* thread_, int position_ ) override {
+		return ( _method.call( thread_, HHuginn::values_t( { _impl.value( thread_, position_ ) } ), position_ ) );
+	}
+};
+
 HMapper::HIterator HMapper::do_iterator( void ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HMapperIterator( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator(), _transform ) );
+	HIterator::iterator_implementation_t impl;
+	if ( !! _function ) {
+		impl.reset( new ( memory::yaal ) HFunctionMapperIterator( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator(), _function ) );
+	} else {
+		impl.reset( new ( memory::yaal ) HMethodMapperIterator( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator(), *static_cast<HHuginn::HClass::HBoundMethod*>( _method.raw() ) ) );
+	}
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
@@ -338,8 +369,14 @@ private:
 		char const name[] = "Algorithms.map";
 		verify_arg_count( name, values_, 2, 2, position_ );
 		verify_arg_collection( name, values_, 0, false, false, position_ );
-		verify_arg_type( name, values_, 1, HHuginn::TYPE::FUNCTION_REFERENCE, false, position_ );
-		return ( make_pointer<HMapper>( _mapperClass.raw(), values_[0], static_cast<HHuginn::HFunctionReference const*>( values_[1].raw() )->function() ) );
+		HHuginn::type_id_t t( verify_arg_type( name, values_, 1, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::METHOD }, false, position_ ) );
+		HHuginn::value_t v;
+		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
+			v = make_pointer<HMapper>( _mapperClass.raw(), values_[0], static_cast<HHuginn::HFunctionReference const*>( values_[1].raw() )->function(), HHuginn::value_t() );
+		} else {
+			v = make_pointer<HMapper>( _mapperClass.raw(), values_[0], HHuginn::function_t(), values_[1] );
+		}
+		return ( v );
 		M_EPILOG
 	}
 	HHuginn::value_t do_range( HHuginn::values_t const& values_, int position_ ) {

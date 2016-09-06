@@ -158,6 +158,48 @@ void verify_arg_type(
 	verify_arg_type( name_, values_, no_, class_->type_id(), class_->name(), oneArg_, position_ );
 }
 
+HHuginn::type_id_t verify_arg_type(
+	yaal::hcore::HString const& name_,
+	HHuginn::values_t const& values_,
+	int no_,
+	types_t const& types_,
+	bool oneArg_,
+	int position_
+) {
+	M_PROLOG
+	HHuginn::type_id_t realType( values_[no_]->type_id() );
+	if ( find( types_.begin(), types_.end(), realType ) == types_.end() ) {
+		HString no;
+		if ( ! oneArg_ ) {
+			no = util::ordinal( no_ + 1 ).append( " " );
+		}
+		HString const& realName( values_[no_]->get_class()->name() );
+		HString reqName;
+		for ( HHuginn::TYPE t : types_ ) {
+			if ( ! reqName.is_empty() ) {
+				reqName.append( ", " );
+			}
+			reqName.append( type_name( t ) );
+		}
+		throw HHuginn::HHuginnRuntimeException(
+			""_ys.append( name_ )
+			.append( "() " )
+			.append( no )
+			.append( "argument must be one of" )
+			.append( " {" )
+			.append( reqName )
+			.append( "}, not " )
+			.append( _vowel_.has( realName[0] ) ? "an" : "a" )
+			.append( " `" )
+			.append( realName )
+			.append( "'." ),
+			position_
+		);
+	}
+	return ( realType );
+	M_EPILOG
+}
+
 HHuginn::type_id_t verify_arg_numeric(
 	yaal::hcore::HString const& name_,
 	HHuginn::values_t const& values_,
