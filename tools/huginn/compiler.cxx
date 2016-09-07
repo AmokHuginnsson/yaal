@@ -539,6 +539,12 @@ void OCompiler::set_import_name( yaal::hcore::HString const& name_, executing_pa
 	if ( ! HPackageFactory::get_instance().is_type_valid( name_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "Package `"_ys.append( name_ ).append( "' does not exist." ), position_.get() );
 	}
+	if ( _submittedImports.find( importIdentifer ) != _submittedImports.end() ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"Package `"_ys.append( _runtime->identifier_name( _importIdentifier ) ).append( "' was already imported." ),
+			position_.get()
+		);
+	}
 	_importIdentifier = importIdentifer;
 	return;
 	M_EPILOG
@@ -553,28 +559,23 @@ void OCompiler::set_import_alias( yaal::hcore::HString const& name_, executing_p
 	if ( _submittedClasses.count( importAliasIdentifer ) > 0 ) {
 		throw HHuginn::HHuginnRuntimeException( "Class `"_ys.append( name_ ).append( "' named is already defined." ), position_.get() );
 	}
+	for ( submitted_imports_t::value_type const& i : _submittedImports ) {
+		if ( i.second == importAliasIdentifer ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"Import alias `"_ys.append( _runtime->identifier_name( importAliasIdentifer ) ).append( "' is already defined." ),
+				position_.get()
+			);
+		}
+	}
 	_importAlias = importAliasIdentifer;
 	_usedIdentifiers[importAliasIdentifer].write( position_.get(), OIdentifierUse::TYPE::PACKAGE );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::commit_import( executing_parser::position_t position_ ) {
+void OCompiler::commit_import( executing_parser::position_t ) {
 	M_PROLOG
-	for ( submitted_imports_t::value_type const& i : _submittedImports ) {
-		if ( i.second == _importAlias ) {
-			throw HHuginn::HHuginnRuntimeException(
-				"Import alias `"_ys.append( _runtime->identifier_name( _importAlias ) ).append( "' is already defined." ),
-				position_.get()
-			);
-		}
-	}
-	if ( ! _submittedImports.insert( make_pair( _importIdentifier, _importAlias ) ).second ) {
-		throw HHuginn::HHuginnRuntimeException(
-			"Package `"_ys.append( _runtime->identifier_name( _importIdentifier ) ).append( "' was already imported." ),
-			position_.get()
-		);
-	}
+	_submittedImports.insert( make_pair( _importIdentifier, _importAlias ) );
 	return;
 	M_EPILOG
 }
