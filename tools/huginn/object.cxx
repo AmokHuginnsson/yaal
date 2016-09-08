@@ -158,7 +158,7 @@ HHuginn::value_t HHuginn::HObject::get_method(
 	int idx( field_index( thread_->runtime().identifier_id( methodName_ ) ) );
 	if ( idx >= 0 ) {
 		res = field( object_, idx );
-		if ( res->type_id() != HHuginn::TYPE::METHOD ) {
+		if ( res->type_id() != HHuginn::TYPE::BOUND_METHOD ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"`"_ys
 				.append( methodName_ )

@@ -76,13 +76,15 @@ HHuginn::identifier_id_t const TYPE_REFERENCE_IDENTIFIER( 7 );
 HHuginn::identifier_id_t const TYPE_FUNCTION_REFERENCE_IDENTIFIER( 8 );
 HHuginn::identifier_id_t const TYPE_OBJECT_REFERENCE_IDENTIFIER( 9 );
 HHuginn::identifier_id_t const TYPE_METHOD_IDENTIFIER( 10 );
-HHuginn::identifier_id_t const TYPE_UNKNOWN_IDENTIFIER( 11 );
+HHuginn::identifier_id_t const TYPE_BOUND_METHOD_IDENTIFIER( 12 );
+HHuginn::identifier_id_t const TYPE_UNKNOWN_IDENTIFIER( 12 );
 HHuginn::HClass const _noneClass_( HHuginn::TYPE::NONE, TYPE_NONE_IDENTIFIER );
 HHuginn::HClass const _observerClass_( HHuginn::TYPE::OBSERVER, TYPE_OBSERVER_IDENTIFIER );
 HHuginn::HClass const _referenceClass_( HHuginn::TYPE::REFERENCE, TYPE_REFERENCE_IDENTIFIER );
 HHuginn::HClass const _functionReferenceClass_( HHuginn::TYPE::FUNCTION_REFERENCE, TYPE_FUNCTION_REFERENCE_IDENTIFIER );
 HHuginn::HClass const _objectReferenceClass_( HHuginn::TYPE::OBJECT_REFERENCE, TYPE_OBJECT_REFERENCE_IDENTIFIER );
 HHuginn::HClass const _methodClass_( HHuginn::TYPE::METHOD, TYPE_METHOD_IDENTIFIER );
+HHuginn::HClass const _boundMethodClass_( HHuginn::TYPE::BOUND_METHOD, TYPE_BOUND_METHOD_IDENTIFIER );
 HHuginn::HClass const _unknownClass_( HHuginn::TYPE::UNKNOWN, TYPE_UNKNOWN_IDENTIFIER );
 
 char const* _errMsgHHuginn_[ 10 ] = {
@@ -674,6 +676,14 @@ HHuginn::HClass::HMethod::HMethod(
 	return;
 }
 
+HHuginn::HClass::HMethod::HMethod(
+	HHuginn::HClass const* class_,
+	function_t const& function_
+) : HValue( class_ )
+	, _function( function_ ) {
+	return;
+}
+
 HHuginn::function_t const& HHuginn::HClass::HMethod::function( void ) const {
 	return ( _function );
 }
@@ -683,7 +693,7 @@ HHuginn::value_t HHuginn::HClass::HMethod::do_clone( HRuntime* ) const {
 }
 
 HHuginn::HClass::HBoundMethod::HBoundMethod( HMethod const& method_, HHuginn::value_t const& object_ )
-	: HMethod( method_.function() )
+	: HMethod( &_boundMethodClass_, method_.function() )
 	, _objectHolder( object_ ) {
 	return;
 }

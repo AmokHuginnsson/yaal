@@ -153,6 +153,7 @@ public:
 		FUNCTION_REFERENCE,
 		OBJECT_REFERENCE,
 		METHOD,
+		BOUND_METHOD,
 		UNKNOWN,
 		NOT_BOOLEAN
 	};
@@ -422,6 +423,7 @@ class HHuginn::HClass::HMethod : public HHuginn::HValue {
 protected:
 	HHuginn::function_t _function;
 public:
+	HMethod( HHuginn::HClass const*, HHuginn::function_t const& );
 	HMethod( HHuginn::function_t const& );
 	HHuginn::function_t const& function( void ) const;
 private:
@@ -919,6 +921,7 @@ extern HHuginn::HClass const _referenceClass_;
 extern HHuginn::HClass const _functionReferenceClass_;
 extern HHuginn::HClass const _objectReferenceClass_;
 extern HHuginn::HClass const _methodClass_;
+extern HHuginn::HClass const _boundMethodClass_;
 extern HHuginn::HClass const _unknownClass_;
 
 inline HHuginn::type_id_t type_id( HHuginn::TYPE type_ ) {

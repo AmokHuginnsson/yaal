@@ -369,7 +369,7 @@ private:
 		char const name[] = "Algorithms.map";
 		verify_arg_count( name, values_, 2, 2, position_ );
 		verify_arg_collection( name, values_, 0, false, false, position_ );
-		HHuginn::type_id_t t( verify_arg_type( name, values_, 1, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::METHOD }, false, position_ ) );
+		HHuginn::type_id_t t( verify_arg_type( name, values_, 1, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::BOUND_METHOD }, false, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
 			v = make_pointer<HMapper>( _mapperClass.raw(), values_[0], static_cast<HHuginn::HFunctionReference const*>( values_[1].raw() )->function(), HHuginn::value_t() );

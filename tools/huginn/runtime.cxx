@@ -64,6 +64,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			{ _functionReferenceClass_.name(), TYPE_FUNCTION_REFERENCE_IDENTIFIER },
 			{ _objectReferenceClass_.name(), TYPE_OBJECT_REFERENCE_IDENTIFIER },
 			{ _methodClass_.name(), TYPE_METHOD_IDENTIFIER },
+			{ _boundMethodClass_.name(), TYPE_BOUND_METHOD_IDENTIFIER },
 			{ _unknownClass_.name(), TYPE_UNKNOWN_IDENTIFIER }
 		} )
 	, _identifierNames( {
@@ -78,6 +79,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			_functionReferenceClass_.name(),
 			_objectReferenceClass_.name(),
 			_methodClass_.name(),
+			_boundMethodClass_.name(),
 			_unknownClass_.name()
 		} )
 	, _objectFactory( new HObjectFactory( this ) )
@@ -535,6 +537,7 @@ void HRuntime::register_builtins( void ) {
 	M_ENSURE( identifier_id( _functionReferenceClass_.name() ) == TYPE_FUNCTION_REFERENCE_IDENTIFIER );
 	M_ENSURE( identifier_id( _objectReferenceClass_.name() ) == TYPE_OBJECT_REFERENCE_IDENTIFIER );
 	M_ENSURE( identifier_id( _methodClass_.name() ) == TYPE_METHOD_IDENTIFIER );
+	M_ENSURE( identifier_id( _boundMethodClass_.name() ) == TYPE_BOUND_METHOD_IDENTIFIER );
 	M_ENSURE( identifier_id( _unknownClass_.name() ) == TYPE_UNKNOWN_IDENTIFIER );
 	register_builtin_function( type_name( HHuginn::TYPE::INTEGER ), hcore::call( &huginn_builtin::integer, _1, _2, _3, _4 ) );
 	register_builtin_function( type_name( HHuginn::TYPE::REAL ), hcore::call( &huginn_builtin::real, _1, _2, _3, _4 ) );
@@ -563,6 +566,7 @@ void HRuntime::register_builtins( void ) {
 		&_functionReferenceClass_,
 		&_objectReferenceClass_,
 		&_methodClass_,
+		&_boundMethodClass_,
 		&_unknownClass_
 	};
 	for ( HHuginn::HClass const* c : efemeral ) {

@@ -348,7 +348,7 @@ void HExpression::function_call( HFrame* frame_, int position_ ) {
 	++ ip;
 	HHuginn::HClass const* c( frame_->values().top()->get_class() );
 	HHuginn::type_id_t t( c->type_id() );
-	if ( ( t != HHuginn::TYPE::FUNCTION_REFERENCE ) && ( t != HHuginn::TYPE::METHOD ) ) {
+	if ( ( t != HHuginn::TYPE::FUNCTION_REFERENCE ) && ( t != HHuginn::TYPE::BOUND_METHOD ) ) {
 		throw HHuginn::HHuginnRuntimeException( "Reference `"_ys.append( c->name() ).append( "' is not a function." ), position_ );
 	}
 	HHuginn::value_t f( yaal::move( frame_->values().top() ) );
@@ -357,8 +357,8 @@ void HExpression::function_call( HFrame* frame_, int position_ ) {
 	if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
 		frame_->values().push( static_cast<HHuginn::HFunctionReference*>( f.raw() )->function()( frame_->thread(), nullptr, values, p ) );
 	} else {
-		HHuginn::HClass::HBoundMethod* m( dynamic_cast<HHuginn::HClass::HBoundMethod*>( f.raw() ) );
-		M_ASSERT( m );
+		M_ASSERT( t == HHuginn::TYPE::BOUND_METHOD );
+		HHuginn::HClass::HBoundMethod* m( static_cast<HHuginn::HClass::HBoundMethod*>( f.raw() ) );
 		frame_->values().push( m->call( frame_->thread(), values, p ) );
 	}
 	values.clear();
