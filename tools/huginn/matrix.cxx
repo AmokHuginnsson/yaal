@@ -423,6 +423,75 @@ HHuginn::value_t HMatrix::transpose( huginn::HThread*, HHuginn::value_t* object_
 	M_EPILOG
 }
 
+template<typename call_t>
+HHuginn::value_t do_matrix_apply( call_t call_, HThread* thread_, HHuginn::values_t const& values_, int position_ );
+
+template<>
+HHuginn::value_t do_matrix_apply( HHuginn::function_t call_, HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
+	return ( call_( thread_, nullptr, values_, position_ ) );
+}
+
+template<>
+HHuginn::value_t do_matrix_apply( HHuginn::HClass::HBoundMethod const* call_, HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
+	return ( const_cast<HHuginn::HClass::HBoundMethod*>( call_ )->call( thread_, values_, position_ ) );
+}
+
+template<typename value_t, typename matrix_t, typename call_t>
+void matrix_apply( HHuginn::value_t store_, huginn::HThread* thread_, matrix_t& matrix_, call_t call_, int position_ ) {
+	HHuginn::value_t rowHolder( thread_->object_factory().create_integer( 0 ) );
+	HHuginn::value_t colHolder( thread_->object_factory().create_integer( 0 ) );
+	HHuginn::HInteger& row( *static_cast<HHuginn::HInteger*>( rowHolder.raw() ) );
+	HHuginn::HInteger& col( *static_cast<HHuginn::HInteger*>( colHolder.raw() ) );
+	value_t& val( *static_cast<value_t*>( store_.raw() ) );
+	HHuginn::value_t res;
+	HHuginn::type_id_t expectedType( store_->type_id() );
+	for ( int r( 0 ), ROWS( matrix_.row() ), COLS( matrix_.col() ); r < ROWS; ++ r ) {
+		for ( int c( 0 ); c < COLS; ++ c ) {
+			row.value() = r;
+			col.value() = c;
+			val.value() = matrix_[r][c];
+			res = do_matrix_apply( call_, thread_, HHuginn::values_t({ rowHolder, colHolder, store_ }), position_ );
+			if ( res->type_id() != expectedType ) {
+				throw HHuginn::HHuginnRuntimeException(
+					"Applied transformation function shall return `"_ys
+						.append( store_->get_class()->name() )
+						.append( "', but result was a `" )
+						.append( res->get_class()->name() )
+						.append( "' instead." ),
+					position_
+				);
+			}
+			matrix_[r][c] = static_cast<value_t*>( res.raw() )->value();
+		}
+	}
+}
+
+HHuginn::value_t HMatrix::apply( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "Matrix.apply";
+	verify_arg_count( name, values_, 1, 1, position_ );
+	HHuginn::type_id_t t( verify_arg_type( name, values_, 0, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::BOUND_METHOD }, false, position_ ) );
+	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
+	HHuginn::value_t v;
+	if ( o->_data.type() == 0 ) {
+		arbitrary_precision_matrix_t& m( *o->_data.get<arbitrary_precision_matrix_ptr_t>() );
+		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
+			matrix_apply<HHuginn::HNumber>( thread_->object_factory().create_number( 0 ), thread_, m, static_cast<HHuginn::HFunctionReference const*>( values_[0].raw() )->function(), position_ );
+		} else {
+			matrix_apply<HHuginn::HNumber>( thread_->object_factory().create_number( 0 ), thread_, m, static_cast<HHuginn::HClass::HBoundMethod const*>( values_[0].raw() ), position_ );
+		}
+	} else {
+		floating_point_matrix_t& m( *o->_data.get<floating_point_matrix_ptr_t>() );
+		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
+			matrix_apply<HHuginn::HReal>( thread_->object_factory().create_real( 0 ), thread_, m, static_cast<HHuginn::HFunctionReference const*>( values_[0].raw() )->function(), position_ );
+		} else {
+			matrix_apply<HHuginn::HReal>( thread_->object_factory().create_real( 0 ), thread_, m, static_cast<HHuginn::HClass::HBoundMethod const*>( values_[0].raw() ), position_ );
+		}
+	}
+	return ( *object_ );
+	M_EPILOG
+}
+
 HHuginn::value_t HMatrix::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.to_string";
@@ -484,6 +553,7 @@ HHuginn::class_t HMatrix::get_class( HRuntime* runtime_ ) {
 				{ "scale_to",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::scale_to, _1, _2, _3, _4 ) ) },
 				{ "inverse",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::inverse, _1, _2, _3, _4 ) ) },
 				{ "transpose", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::transpose, _1, _2, _3, _4 ) ) },
+				{ "apply",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::apply, _1, _2, _3, _4 ) ) },
 				{ "to_string", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::to_string, _1, _2, _3, _4 ) ) }
 			}
 		)

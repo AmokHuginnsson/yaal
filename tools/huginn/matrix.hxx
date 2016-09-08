@@ -61,6 +61,7 @@ public:
 	static HHuginn::value_t scale_to( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t inverse( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t transpose( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+	static HHuginn::value_t apply( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t to_string( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::class_t get_class( HRuntime* );
 private:
