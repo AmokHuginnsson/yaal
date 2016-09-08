@@ -82,7 +82,9 @@ public:
 
 /*! \brief Get upper limit for generated numbers.
  */
-	u64_t range( void ) const;
+	u64_t range( void ) const {
+		return ( _range );
+	}
 
 	void swap( HRandomizer& );
 private:
