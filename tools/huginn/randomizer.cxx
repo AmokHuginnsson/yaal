@@ -70,6 +70,25 @@ HHuginn::value_t HRandomizer::next( huginn::HThread* thread_, HHuginn::value_t* 
 	M_EPILOG
 }
 
+HHuginn::value_t HRandomizer::next_real( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "Randomizer.next_real";
+	verify_arg_count( name, values_, 0, 1, position_ );
+	double long range( 1.L );
+	if ( ! values_.is_empty() ) {
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::REAL, false, position_ );
+		range = static_cast<yaal::u64_t>( get_real( values_[0] ) );
+	}
+	if ( range <= 0.L ) {
+		throw HHuginn::HHuginnRuntimeException( "Invalid range specified: "_ys.append( range ), position_ );
+	}
+	HRandomizer* o( static_cast<HRandomizer*>( object_->raw() ) );
+	yaal::u64_t cap( o->_generator.range() );
+	yaal::u64_t value( o->_generator() );
+	return ( thread_->object_factory().create_real( ( static_cast<double long>( value ) / static_cast<double long>( cap ) ) * range ) );
+	M_EPILOG
+}
+
 HHuginn::class_t HRandomizer::get_class( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
@@ -77,7 +96,8 @@ HHuginn::class_t HRandomizer::get_class( HRuntime* runtime_ ) {
 			"Randomizer",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "next", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HRandomizer::next, _1, _2, _3, _4 ) ) }
+				{ "next",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HRandomizer::next, _1, _2, _3, _4 ) ) },
+				{ "next_real", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HRandomizer::next_real, _1, _2, _3, _4 ) ) }
 			}
 		)
 	);

@@ -45,6 +45,7 @@ public:
 	HRandomizer( HHuginn::HClass const*, yaal::u64_t );
 	HRandomizer( HHuginn::HClass const*, yaal::hcore::HRandomizer const& );
 	static HHuginn::value_t next( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+	static HHuginn::value_t next_real( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::class_t get_class( HRuntime* );
 private:
 	virtual HHuginn::value_t do_clone( huginn::HRuntime* ) const override;

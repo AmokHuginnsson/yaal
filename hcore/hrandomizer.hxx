@@ -79,6 +79,11 @@ public:
  * \return next random number capped to randomizer instance default value.
  */
 	u64_t operator()( void );
+
+/*! \brief Get upper limit for generated numbers.
+ */
+	u64_t range( void ) const;
+
 	void swap( HRandomizer& );
 private:
 	void init( u64_t );

@@ -202,6 +202,10 @@ u64_t HRandomizer::operator()( void ) {
 	M_EPILOG
 }
 
+u64_t HRandomizer::range( void ) const {
+	return ( _range );
+}
+
 namespace randomizer_helper {
 
 HRandomizer make_randomizer( u64_t cap_ ) {
