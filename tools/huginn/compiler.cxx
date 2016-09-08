@@ -514,8 +514,8 @@ void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_
 		}
 	}
 	if ( ! _classContext ) {
-		HHuginn::function_t* f( _runtime->get_function( functionIdentifier ) );
-		if ( f ) {
+		HHuginn::function_t* fun( _runtime->get_function( functionIdentifier ) );
+		if ( fun ) {
 			throw HHuginn::HHuginnRuntimeException( "Function `"_ys.append( name_ ).append( "' was already defined." ), position_.get() );
 		}
 	}
