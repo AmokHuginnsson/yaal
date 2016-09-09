@@ -52,6 +52,7 @@ namespace tools {
 namespace huginn {
 
 class HMathematics : public HHuginn::HObject {
+	typedef yaal::hcore::HNumber const& ( *constant_getter_t )( yaal::hcore::HNumber::integer_t );
 	HHuginn::class_t _matrixClass;
 	HHuginn::class_t _numberSetStatisticsClass;
 	HHuginn::class_t _randomizerClass;
@@ -64,6 +65,45 @@ public:
 		, _randomizerClass( HRandomizer::get_class( class_->runtime() ) )
 		, _exceptionClass( exception::create_class( class_->runtime(), "MathematicsException" ) ) {
 		return;
+	}
+	static HHuginn::value_t get_constant( char const* name_, constant_getter_t constantGetter_, double long real_, huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		HString name( "Mathematics." );
+		name.append( name_ );
+		verify_arg_count( name, values_, 1, 2, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::FUNCTION_REFERENCE, false, position_ );
+		HHuginn::HFunctionReference const& fr( *static_cast<HHuginn::HFunctionReference const*>( values_[0].raw() ) );
+		int precision( 0 );
+		if ( values_.get_size() > 1 ) {
+			verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
+			precision = static_cast<int>( get_integer( values_[1] ) );
+		}
+		if ( precision < 0 ) {
+			throw HHuginn::HHuginnRuntimeException( "Bad precision requested: "_ys.append( precision ), position_ );
+		}
+		HHuginn::value_t v;
+		if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::number ) ) {
+			v = thread_->object_factory().create_number( constantGetter_( precision ) );
+		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::real ) ) {
+			v = thread_->object_factory().create_real( real_ );
+		} else {
+			throw HHuginn::HHuginnRuntimeException(
+				name.append( " can be either `number' or `real' type, not a `" ).append( thread_->runtime().identifier_name( fr.identifier_id() ) ).append( "'." ),
+				position_
+			);
+		}
+		return ( v );
+		M_EPILOG
+	}
+	static HHuginn::value_t pi( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		return ( get_constant( "pi", &number::PI, math::PI, thread_, values_, position_ ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t e( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		return ( get_constant( "e", &number::E, math::E, thread_, values_, position_ ) );
+		M_EPILOG
 	}
 	static HHuginn::value_t square_root( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
@@ -447,6 +487,8 @@ HHuginn::value_t HMathematicsCreator::do_new_instance( HRuntime* runtime_ ) {
 			"Mathematics",
 			nullptr,
 			HHuginn::field_definitions_t{
+				{ "pi",                   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::pi, _1, _2, _3, _4 ) ) },
+				{ "e",                    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::e, _1, _2, _3, _4 ) ) },
 				{ "square_root",          make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::square_root, _1, _2, _3, _4 ) ) },
 				{ "natural_expotential",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::natural_expotential, _1, _2, _3, _4 ) ) },
 				{ "natural_logarithm",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::natural_logarithm, _1, _2, _3, _4 ) ) },
