@@ -514,7 +514,7 @@ public:
 	HReference( HHuginn::value_t& );
 	HHuginn::value_t& value( void ) const;
 private:
-	virtual value_t do_clone( huginn::HRuntime* ) const override;
+	virtual value_t do_clone( huginn::HRuntime* ) const override M_DEBUG_CODE( __attribute__((__noreturn__)) );
 };
 
 class HHuginn::HTernaryEvaluator : public HHuginn::HValue {

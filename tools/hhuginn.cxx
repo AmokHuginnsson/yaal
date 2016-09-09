@@ -604,8 +604,11 @@ HHuginn::value_t& HHuginn::HReference::value( void ) const {
 	return ( _value );
 }
 
-HHuginn::value_t HHuginn::HReference::do_clone( HRuntime* runtime_ ) const {
-	return ( runtime_->object_factory()->create_reference( _value ) );
+HHuginn::value_t HHuginn::HReference::do_clone( HRuntime* ) const {
+	M_ASSERT( 0 && "cloning reference"[0] );
+#if defined( NDEBUG ) || defined( __MSVCXX__ )
+	return ( HHuginn::value_t() );
+#endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
 }
 
 HHuginn::HIterable::HIterable( HClass const* class_ )
@@ -703,7 +706,7 @@ HHuginn::value_t HHuginn::HClass::HBoundMethod::call( huginn::HThread* thread_, 
 }
 
 HHuginn::value_t HHuginn::HClass::HBoundMethod::do_clone( HRuntime* runtime_ ) const {
-	return ( runtime_->object_factory()->create_bound_method( *static_cast<HMethod const*>( this ), _objectHolder ) );
+	return ( runtime_->object_factory()->create_bound_method( *static_cast<HMethod const*>( this ), _objectHolder->clone( runtime_ ) ) );
 }
 
 yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn const* huginn_ ) {
