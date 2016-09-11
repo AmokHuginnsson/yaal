@@ -58,6 +58,23 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			{ KEYWORD::THIS, KEYWORD::THIS_IDENTIFIER },
 			{ KEYWORD::SUPER, KEYWORD::SUPER_IDENTIFIER },
 			{ KEYWORD::ASSERT, KEYWORD::ASSERT_IDENTIFIER },
+			{ type_name( HHuginn::TYPE::INTEGER ), BUILTIN::INTEGER_IDENTIFIER },
+			{ type_name( HHuginn::TYPE::REAL ), BUILTIN::REAL_IDENTIFIER },
+			{ type_name( HHuginn::TYPE::NUMBER ), BUILTIN::NUMBER_IDENTIFIER },
+			{ type_name( HHuginn::TYPE::STRING ), BUILTIN::STRING_IDENTIFIER },
+			{ type_name( HHuginn::TYPE::CHARACTER ), BUILTIN::CHARACTER_IDENTIFIER },
+			{ type_name( HHuginn::TYPE::BOOLEAN ), BUILTIN::BOOLEAN_IDENTIFIER },
+			{ BUILTIN::SIZE, BUILTIN::SIZE_IDENTIFIER },
+			{ BUILTIN::TYPE, BUILTIN::TYPE_IDENTIFIER },
+			{ BUILTIN::COPY, BUILTIN::COPY_IDENTIFIER },
+			{ BUILTIN::OBSERVE, BUILTIN::OBSERVE_IDENTIFIER },
+			{ BUILTIN::USE, BUILTIN::USE_IDENTIFIER },
+			{ type_name( HHuginn::TYPE::LIST ), BUILTIN::LIST_IDENTIFIER },
+			{ type_name( HHuginn::TYPE::DEQUE ), BUILTIN::DEQUE_IDENTIFIER },
+			{ type_name( HHuginn::TYPE::DICT ), BUILTIN::DICT_IDENTIFIER },
+			{ type_name( HHuginn::TYPE::LOOKUP ), BUILTIN::LOOKUP_IDENTIFIER },
+			{ type_name( HHuginn::TYPE::ORDER ), BUILTIN::ORDER_IDENTIFIER },
+			{ type_name( HHuginn::TYPE::SET ), BUILTIN::SET_IDENTIFIER },
 			{ _noneClass_.name(), TYPE_NONE_IDENTIFIER },
 			{ _observerClass_.name(), TYPE_OBSERVER_IDENTIFIER },
 			{ _referenceClass_.name(), TYPE_REFERENCE_IDENTIFIER },
@@ -73,6 +90,23 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			KEYWORD::THIS,
 			KEYWORD::SUPER,
 			KEYWORD::ASSERT,
+			type_name( HHuginn::TYPE::INTEGER ),
+			type_name( HHuginn::TYPE::REAL ),
+			type_name( HHuginn::TYPE::NUMBER ),
+			type_name( HHuginn::TYPE::STRING ),
+			type_name( HHuginn::TYPE::CHARACTER ),
+			type_name( HHuginn::TYPE::BOOLEAN ),
+			BUILTIN::SIZE,
+			BUILTIN::TYPE,
+			BUILTIN::COPY,
+			BUILTIN::OBSERVE,
+			BUILTIN::USE,
+			type_name( HHuginn::TYPE::LIST ),
+			type_name( HHuginn::TYPE::DEQUE ),
+			type_name( HHuginn::TYPE::DICT ),
+			type_name( HHuginn::TYPE::LOOKUP ),
+			type_name( HHuginn::TYPE::ORDER ),
+			type_name( HHuginn::TYPE::SET ),
 			_noneClass_.name(),
 			_observerClass_.name(),
 			_referenceClass_.name(),
@@ -531,6 +565,23 @@ void HRuntime::register_builtins( void ) {
 	M_ENSURE( identifier_id( KEYWORD::THIS ) == KEYWORD::THIS_IDENTIFIER );
 	M_ENSURE( identifier_id( KEYWORD::SUPER ) == KEYWORD::SUPER_IDENTIFIER );
 	M_ENSURE( identifier_id( KEYWORD::ASSERT ) == KEYWORD::ASSERT_IDENTIFIER );
+	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::INTEGER ) ) == BUILTIN::INTEGER_IDENTIFIER );
+	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::REAL ) ) == BUILTIN::REAL_IDENTIFIER );
+	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::NUMBER ) ) == BUILTIN::NUMBER_IDENTIFIER );
+	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::STRING ) ) == BUILTIN::STRING_IDENTIFIER );
+	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::CHARACTER ) ) == BUILTIN::CHARACTER_IDENTIFIER );
+	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::BOOLEAN ) ) == BUILTIN::BOOLEAN_IDENTIFIER );
+	M_ENSURE( identifier_id( BUILTIN::SIZE ) == BUILTIN::SIZE_IDENTIFIER );
+	M_ENSURE( identifier_id( BUILTIN::TYPE ) == BUILTIN::TYPE_IDENTIFIER );
+	M_ENSURE( identifier_id( BUILTIN::COPY ) == BUILTIN::COPY_IDENTIFIER );
+	M_ENSURE( identifier_id( BUILTIN::OBSERVE ) == BUILTIN::OBSERVE_IDENTIFIER );
+	M_ENSURE( identifier_id( BUILTIN::USE ) == BUILTIN::USE_IDENTIFIER );
+	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::LIST ) ) == BUILTIN::LIST_IDENTIFIER );
+	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::DEQUE ) ) == BUILTIN::DEQUE_IDENTIFIER );
+	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::DICT ) ) == BUILTIN::DICT_IDENTIFIER );
+	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::LOOKUP ) ) == BUILTIN::LOOKUP_IDENTIFIER );
+	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::ORDER ) ) == BUILTIN::ORDER_IDENTIFIER );
+	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::SET ) ) == BUILTIN::SET_IDENTIFIER );
 	M_ENSURE( identifier_id( _noneClass_.name() ) == TYPE_NONE_IDENTIFIER );
 	M_ENSURE( identifier_id( _observerClass_.name() ) == TYPE_OBSERVER_IDENTIFIER );
 	M_ENSURE( identifier_id( _referenceClass_.name() ) == TYPE_REFERENCE_IDENTIFIER );
@@ -545,11 +596,11 @@ void HRuntime::register_builtins( void ) {
 	register_builtin_function( type_name( HHuginn::TYPE::NUMBER ), hcore::call( &huginn_builtin::number, _1, _2, _3, _4 ) );
 	register_builtin_function( type_name( HHuginn::TYPE::BOOLEAN ), hcore::call( &huginn_builtin::boolean, _1, _2, _3, _4 ) );
 	register_builtin_function( type_name( HHuginn::TYPE::CHARACTER ), hcore::call( &huginn_builtin::character, _1, _2, _3, _4 ) );
-	register_builtin_function( "size", hcore::call( &huginn_builtin::size, _1, _2, _3, _4 ) );
-	register_builtin_function( "type", hcore::call( &huginn_builtin::type, _1, _2, _3, _4 ) );
-	register_builtin_function( "copy", hcore::call( &huginn_builtin::copy, _1, _2, _3, _4 ) );
-	register_builtin_function( "observe", hcore::call( &huginn_builtin::observe, _1, _2, _3, _4 ) );
-	register_builtin_function( "use", hcore::call( &huginn_builtin::use, _1, _2, _3, _4 ) );
+	register_builtin_function( BUILTIN::SIZE, hcore::call( &huginn_builtin::size, _1, _2, _3, _4 ) );
+	register_builtin_function( BUILTIN::TYPE, hcore::call( &huginn_builtin::type, _1, _2, _3, _4 ) );
+	register_builtin_function( BUILTIN::COPY, hcore::call( &huginn_builtin::copy, _1, _2, _3, _4 ) );
+	register_builtin_function( BUILTIN::OBSERVE, hcore::call( &huginn_builtin::observe, _1, _2, _3, _4 ) );
+	register_builtin_function( BUILTIN::USE, hcore::call( &huginn_builtin::use, _1, _2, _3, _4 ) );
 	register_builtin_function( type_name( HHuginn::TYPE::LIST ), hcore::call( &huginn_builtin::list, _1, _2, _3, _4 ) );
 	register_builtin_function( type_name( HHuginn::TYPE::DEQUE ), hcore::call( &huginn_builtin::deque, _1, _2, _3, _4 ) );
 	register_builtin_function( type_name( HHuginn::TYPE::DICT ), hcore::call( &huginn_builtin::dict, _1, _2, _3, _4 ) );
@@ -558,7 +609,7 @@ void HRuntime::register_builtins( void ) {
 	register_builtin_function( type_name( HHuginn::TYPE::SET ), hcore::call( &huginn_builtin::set, _1, _2, _3, _4 ) );
 	register_builtin_function( "print", hcore::call( &huginn_builtin::print, _1, _2, _3, _4 ) );
 	register_builtin_function( "input", hcore::call( &huginn_builtin::input, _1, _2, _3, _4 ) );
-	register_builtin_function( "assert", hcore::call( &huginn_builtin::assert, _1, _2, _3, _4 ) );
+	register_builtin_function( KEYWORD::ASSERT, hcore::call( &huginn_builtin::assert, _1, _2, _3, _4 ) );
 	HHuginn::HClass const* efemeral[] = {
 		&_noneClass_,
 		&_observerClass_,

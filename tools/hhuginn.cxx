@@ -70,14 +70,14 @@ main( args ) {
 
 namespace huginn {
 
-HHuginn::identifier_id_t const TYPE_NONE_IDENTIFIER( 5 );
-HHuginn::identifier_id_t const TYPE_OBSERVER_IDENTIFIER( 6 );
-HHuginn::identifier_id_t const TYPE_REFERENCE_IDENTIFIER( 7 );
-HHuginn::identifier_id_t const TYPE_FUNCTION_REFERENCE_IDENTIFIER( 8 );
-HHuginn::identifier_id_t const TYPE_OBJECT_REFERENCE_IDENTIFIER( 9 );
-HHuginn::identifier_id_t const TYPE_METHOD_IDENTIFIER( 10 );
-HHuginn::identifier_id_t const TYPE_BOUND_METHOD_IDENTIFIER( 12 );
-HHuginn::identifier_id_t const TYPE_UNKNOWN_IDENTIFIER( 12 );
+HHuginn::identifier_id_t const TYPE_NONE_IDENTIFIER( 22 );
+HHuginn::identifier_id_t const TYPE_OBSERVER_IDENTIFIER( 23 );
+HHuginn::identifier_id_t const TYPE_REFERENCE_IDENTIFIER( 24 );
+HHuginn::identifier_id_t const TYPE_FUNCTION_REFERENCE_IDENTIFIER( 25 );
+HHuginn::identifier_id_t const TYPE_OBJECT_REFERENCE_IDENTIFIER( 26 );
+HHuginn::identifier_id_t const TYPE_METHOD_IDENTIFIER( 27 );
+HHuginn::identifier_id_t const TYPE_BOUND_METHOD_IDENTIFIER( 28 );
+HHuginn::identifier_id_t const TYPE_UNKNOWN_IDENTIFIER( 29 );
 HHuginn::HClass const _noneClass_( HHuginn::TYPE::NONE, TYPE_NONE_IDENTIFIER );
 HHuginn::HClass const _observerClass_( HHuginn::TYPE::OBSERVER, TYPE_OBSERVER_IDENTIFIER );
 HHuginn::HClass const _referenceClass_( HHuginn::TYPE::REFERENCE, TYPE_REFERENCE_IDENTIFIER );

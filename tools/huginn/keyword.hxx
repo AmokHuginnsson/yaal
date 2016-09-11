@@ -70,6 +70,33 @@ extern HHuginn::identifier_id_t const ASSERT_IDENTIFIER;
 
 }
 
+namespace BUILTIN {
+
+extern char const* SIZE;
+extern char const* TYPE;
+extern char const* COPY;
+extern char const* OBSERVE;
+extern char const* USE;
+extern HHuginn::identifier_id_t const INTEGER_IDENTIFIER;
+extern HHuginn::identifier_id_t const REAL_IDENTIFIER;
+extern HHuginn::identifier_id_t const NUMBER_IDENTIFIER;
+extern HHuginn::identifier_id_t const STRING_IDENTIFIER;
+extern HHuginn::identifier_id_t const CHARACTER_IDENTIFIER;
+extern HHuginn::identifier_id_t const BOOLEAN_IDENTIFIER;
+extern HHuginn::identifier_id_t const SIZE_IDENTIFIER;
+extern HHuginn::identifier_id_t const TYPE_IDENTIFIER;
+extern HHuginn::identifier_id_t const COPY_IDENTIFIER;
+extern HHuginn::identifier_id_t const OBSERVE_IDENTIFIER;
+extern HHuginn::identifier_id_t const USE_IDENTIFIER;
+extern HHuginn::identifier_id_t const LIST_IDENTIFIER;
+extern HHuginn::identifier_id_t const DEQUE_IDENTIFIER;
+extern HHuginn::identifier_id_t const DICT_IDENTIFIER;
+extern HHuginn::identifier_id_t const LOOKUP_IDENTIFIER;
+extern HHuginn::identifier_id_t const ORDER_IDENTIFIER;
+extern HHuginn::identifier_id_t const SET_IDENTIFIER;
+
+}
+
 typedef yaal::hcore::HHashSet<yaal::hcore::HString>  words_t;
 
 extern words_t _directives_;

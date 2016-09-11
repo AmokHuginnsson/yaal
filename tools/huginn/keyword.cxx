@@ -69,6 +69,33 @@ HHuginn::identifier_id_t const ASSERT_IDENTIFIER( 4 );
 
 }
 
+namespace BUILTIN {
+
+char const* SIZE = "size";
+char const* TYPE = "type";
+char const* COPY = "copy";
+char const* OBSERVE = "observe";
+char const* USE = "use";
+HHuginn::identifier_id_t const INTEGER_IDENTIFIER( 5 );
+HHuginn::identifier_id_t const REAL_IDENTIFIER( 6 );
+HHuginn::identifier_id_t const NUMBER_IDENTIFIER( 7 );
+HHuginn::identifier_id_t const STRING_IDENTIFIER( 8 );
+HHuginn::identifier_id_t const CHARACTER_IDENTIFIER( 9 );
+HHuginn::identifier_id_t const BOOLEAN_IDENTIFIER( 10 );
+HHuginn::identifier_id_t const SIZE_IDENTIFIER( 11 );
+HHuginn::identifier_id_t const TYPE_IDENTIFIER( 12 );
+HHuginn::identifier_id_t const COPY_IDENTIFIER( 13 );
+HHuginn::identifier_id_t const OBSERVE_IDENTIFIER( 14 );
+HHuginn::identifier_id_t const USE_IDENTIFIER( 15 );
+HHuginn::identifier_id_t const LIST_IDENTIFIER( 16 );
+HHuginn::identifier_id_t const DEQUE_IDENTIFIER( 17 );
+HHuginn::identifier_id_t const DICT_IDENTIFIER( 18 );
+HHuginn::identifier_id_t const LOOKUP_IDENTIFIER( 19 );
+HHuginn::identifier_id_t const ORDER_IDENTIFIER( 20 );
+HHuginn::identifier_id_t const SET_IDENTIFIER( 21 );
+
+}
+
 words_t _directives_ = {{
 	"import"
 }};
@@ -112,11 +139,11 @@ words_t _builtin_ = {{
 	type_name( HHuginn::TYPE::REAL ),
 	type_name( HHuginn::TYPE::SET ),
 	type_name( HHuginn::TYPE::STRING ),
-	"type",
-	"size",
-	"copy",
-	"observe",
-	"use"
+	BUILTIN::TYPE,
+	BUILTIN::SIZE,
+	BUILTIN::COPY,
+	BUILTIN::OBSERVE,
+	BUILTIN::USE
 }};
 
 words_t _standardLibrary_ = {{
