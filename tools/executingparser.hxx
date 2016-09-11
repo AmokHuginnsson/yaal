@@ -1057,7 +1057,7 @@ public:
 	bool operator()( yaal::hcore::HString const& );
 	bool operator()( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	void operator()( void );
-	void execute( void );
+	void execute( void* = nullptr );
 	bool parse( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	int error_position( void ) const;
 	messages_t const& error_messages( void ) const;

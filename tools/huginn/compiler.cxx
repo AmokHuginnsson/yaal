@@ -210,9 +210,32 @@ void OCompiler::OIdentifierUse::write( int position_, TYPE type_ ) {
 	return;
 }
 
+OCompiler::OClassNoter::OClassNoter( OCompiler* compiler_ )
+	: _compiler( compiler_ )
+	, _passThrough( false ) {
+	return;
+}
+
+void OCompiler::OClassNoter::note( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+	M_PROLOG
+	if ( is_restricted( name_ ) ) {
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), position_.get() );
+	}
+	HHuginn::identifier_id_t identifier( _compiler->_runtime->identifier_id( name_ ) );
+	if ( _passThrough ) {
+		_compiler->set_class_name( identifier, position_ );
+	} else {
+		_compiler->_classIdentifiers.push_back( identifier );
+	}
+	return;
+	M_EPILOG
+}
+
 OCompiler::OCompiler( HRuntime* runtime_ )
 	: _functionContexts()
 	, _classContext()
+	, _classIdentifiers()
+	, _classNoter( this )
 	, _submittedClasses()
 	, _submittedImports()
 	, _importIdentifier( INVALID_IDENTIFIER )
@@ -497,7 +520,13 @@ OCompiler::OScopeContext& OCompiler::current_scope_context( void ) {
 }
 
 HHuginn::type_id_t OCompiler::guess_type( HHuginn::identifier_id_t identifierId_ ) {
-	return ( f()._scopeStack.top()->guess_type( identifierId_ ) );
+	HHuginn::type_id_t t( f()._scopeStack.top()->guess_type( identifierId_ ) );
+	if ( t == HHuginn::TYPE::UNKNOWN ) {
+		if ( _runtime->get_function( identifierId_ ) || ( find( _classIdentifiers.begin(), _classIdentifiers.end(), identifierId_ ) != _classIdentifiers.end() ) ) {
+			t = type_id( HHuginn::TYPE::FUNCTION_REFERENCE );
+		}
+	}
+	return ( t );
 }
 
 void OCompiler::note_type( HHuginn::identifier_id_t identifierId_, HHuginn::type_id_t type_ ) {
@@ -586,19 +615,15 @@ void OCompiler::commit_import( executing_parser::position_t ) {
 	M_EPILOG
 }
 
-void OCompiler::set_class_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+void OCompiler::set_class_name( HHuginn::identifier_id_t identifier_, executing_parser::position_t position_ ) {
 	M_PROLOG
+	if ( _submittedClasses.count( identifier_ ) > 0 ) {
+		throw HHuginn::HHuginnRuntimeException( "Class `"_ys.append( _runtime->identifier_name( identifier_ ) ).append( "' is already defined." ), position_.get() );
+	}
 	_classContext = make_resource<OClassContext>();
-	HHuginn::identifier_id_t classIdentifer( _runtime->identifier_id( name_ ) );
-	_usedIdentifiers[classIdentifer].write( position_.get(), OIdentifierUse::TYPE::CLASS );
-	if ( is_restricted( name_ ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), position_.get() );
-	}
-	if ( _submittedClasses.count( classIdentifer ) > 0 ) {
-		throw HHuginn::HHuginnRuntimeException( "Class `"_ys.append( name_ ).append( "' is already defined." ), position_.get() );
-	}
-	_functionContexts.emplace( make_resource<OFunctionContext>( classIdentifer, ++ _statementIdGenerator, false ) );
-	_classContext->_classIdentifier = classIdentifer;
+	_usedIdentifiers[identifier_].write( position_.get(), OIdentifierUse::TYPE::CLASS );
+	_functionContexts.emplace( make_resource<OFunctionContext>( identifier_, ++ _statementIdGenerator, false ) );
+	_classContext->_classIdentifier = identifier_;
 	_classContext->_position = position_;
 	return;
 	M_EPILOG

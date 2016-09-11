@@ -255,11 +255,13 @@ void HExecutingParser::sanitize( void ) {
 	M_EPILOG
 }
 
-void HExecutingParser::execute( void ) {
+void HExecutingParser::execute( void* id_ ) {
 	M_PROLOG
 	M_ENSURE( _matched );
 	for ( execution_steps_t::iterator it( _excutors.begin() ), end( _excutors.end() ); it != end; ++ it ) {
-		it->second();
+		if ( ! id_ || ( it->second.id() == id_ ) ) {
+			it->second();
+		}
 	}
 	return;
 	M_EPILOG

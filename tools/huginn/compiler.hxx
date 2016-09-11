@@ -315,8 +315,29 @@ struct OCompiler {
 		void read( int, TYPE = TYPE::UNKNOWN );
 		void write( int, TYPE );
 	};
+	/*! \brief Class used to gather information about all user defined classes prior to real compilation.
+	 */
+	struct OClassNoter {
+		OCompiler* _compiler;
+		/*! \brief Compilation stage.
+		 *
+		 * false - just note class names.
+		 * true - actual compilation, initialize class definition creation.
+		 */
+		bool _passThrough;
+		/*! \brief Either note user defined class name or forward call to OCompiler::set_class_name.
+		 *
+		 * Depending on compilation stage.
+		 */
+		void note( yaal::hcore::HString const&, executing_parser::position_t );
+		OClassNoter( OCompiler* );
+	private:
+		OClassNoter( OClassNoter const& ) = delete;
+		OClassNoter& operator = ( OClassNoter const& ) = delete;
+	};
 	typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, OIdentifierUse> used_identifiers_t;
 	typedef yaal::hcore::HArray<OExecutionStep> execution_steps_backlog_t;
+	typedef yaal::hcore::HArray<HHuginn::identifier_id_t> class_identifiers_t;
 	typedef yaal::hcore::HResource<OClassContext> class_context_t;
 	typedef yaal::hcore::HHashMap<HHuginn::identifier_id_t, class_context_t> submitted_classes_t;
 	typedef yaal::hcore::HHashMap<HHuginn::identifier_id_t, HHuginn::identifier_id_t> submitted_imports_t;
@@ -324,6 +345,14 @@ struct OCompiler {
 	typedef yaal::hcore::HPair<HHuginn::identifier_id_t, HHuginn::function_t> function_info_t;
 	function_contexts_t _functionContexts;
 	class_context_t _classContext;
+	class_identifiers_t _classIdentifiers;
+	/*! \brief Class noter instance.
+	 *
+	 * Allow learning names of user defined classes prior to real compilation.
+	 * Thanks to the fact that it can be bound directly to executing_parser callback
+	 * it allows to diversificate 
+	 */
+	OClassNoter _classNoter;
 	submitted_classes_t _submittedClasses;
 	submitted_imports_t _submittedImports;
 	HHuginn::identifier_id_t _importIdentifier;
@@ -342,7 +371,7 @@ struct OCompiler {
 	void set_function_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void set_import_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void set_import_alias( yaal::hcore::HString const&, executing_parser::position_t );
-	void set_class_name( yaal::hcore::HString const&, executing_parser::position_t );
+	void set_class_name( HHuginn::identifier_id_t, executing_parser::position_t );
 	void set_base_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void set_field_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void add_field_name( yaal::hcore::HString const&, executing_parser::position_t );

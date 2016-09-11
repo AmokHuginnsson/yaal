@@ -440,7 +440,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		constant( KEYWORD::CLASS ) >> regex(
 			"classIdentifier",
 			identifierPattern,
-			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_class_name, _compiler.get(), _1, _2 ) )
+			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::OClassNoter::note, &(_compiler->_classNoter), _1, _2 ) )
 		) >> -(
 			':' >> regex(
 				"baseIdentifier",
