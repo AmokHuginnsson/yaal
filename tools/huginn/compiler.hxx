@@ -36,6 +36,7 @@ Copyright:
 #include "tools/huginn/frame.hxx"
 #include "tools/huginn/trycatch.hxx"
 #include "tools/huginn/scope.hxx"
+#include "tools/huginn/runtime.hxx"
 #include "tools/hhuginn.hxx"
 
 namespace yaal {
@@ -146,7 +147,21 @@ struct OCompiler {
 	struct OFunctionContext {
 		typedef yaal::hcore::HPointer<OScopeContext> scope_context_t;
 		typedef yaal::hcore::HStack<scope_context_t> scope_stack_t;
-		typedef yaal::hcore::HStack<HHuginn::type_id_t> type_stack_t;
+		struct OValueDesc {
+			HHuginn::type_id_t _type;
+			HHuginn::identifier_id_t _identifier;
+			OValueDesc( HHuginn::type_id_t type_ )
+				: _type( type_ )
+				, _identifier( INVALID_IDENTIFIER ) {
+				return;
+			}
+			OValueDesc( HHuginn::type_id_t type_, HHuginn::identifier_id_t identifierId_ )
+				: _type( type_ )
+				, _identifier( identifierId_ ) {
+				return;
+			}
+		};
+		typedef yaal::hcore::HStack<OValueDesc> type_stack_t;
 		struct OVariableRef {
 			HHuginn::identifier_id_t _identifier;
 			int _executionStepIndex;
@@ -350,7 +365,7 @@ struct OCompiler {
 	 *
 	 * Allow learning names of user defined classes prior to real compilation.
 	 * Thanks to the fact that it can be bound directly to executing_parser callback
-	 * it allows to diversificate 
+	 * it allows the diversification of compilation passes by callback id.
 	 */
 	OClassNoter _classNoter;
 	submitted_classes_t _submittedClasses;
@@ -381,6 +396,7 @@ struct OCompiler {
 	void commit_import( executing_parser::position_t );
 	void submit_class( executing_parser::position_t );
 	void create_lambda( executing_parser::position_t );
+	void commit_assignable( executing_parser::position_t );
 	void save_control_variable( executing_parser::position_t );
 	void commit_catch_control_variable( executing_parser::position_t );
 	void start_function_call( executing_parser::position_t );
