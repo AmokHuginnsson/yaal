@@ -95,14 +95,14 @@ void HException::log( char const* fileName_, int line_,
 			|| ( ( _functionName != functionName_ ) && ( ! _functionName || ::strcmp( _functionName, functionName_ ) ) ) ) {
 		_fileName = fileName_;
 		_functionName = functionName_;
-		if ( _logEnabled || ( _debugLevel_ >= DEBUG_LEVEL::PRINT_EXCEPTION_STACK ) ) {
+		if ( _logEnabled || ( _debugLevel_ >= DEBUG_LEVEL::DUMP_EXCEPTION_STACK ) ) {
 			HString frame;
 			size_t length( ::strlen( fileName_ ) );
 			frame.format(
 						"Exception frame %2d: %16s : %4d : %s\n", _frame,
 						fileName_ + ( length > 16 ? length - 16 : 0 ),
 						line_, functionName_ );
-			if ( _debugLevel_ >= DEBUG_LEVEL::PRINT_EXCEPTION_STACK ) {
+			if ( _debugLevel_ >= DEBUG_LEVEL::DUMP_EXCEPTION_STACK ) {
 				fprintf( ERROR_STREAM, "%s", frame.raw() );
 				fflush( ERROR_STREAM );
 			}

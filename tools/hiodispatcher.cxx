@@ -61,8 +61,9 @@ HIODispatcher::HIODispatcher( int noFileHandlers_, int long latency_ )
 	M_ASSERT( _newIOHandlers.is_empty() );
 	HSignalService& ss = HSignalService::get_instance();
 	HSignalService::handler_t handler( call( &HIODispatcher::handler_interrupt, this, _1 ) );
-	if ( _debugLevel_ < DEBUG_LEVEL::GDB )
+	if ( _debugLevel_ < DEBUG_LEVEL::GDB ) {
 		ss.register_handler( SIGINT, handler, this );
+	}
 	ss.register_handler( SIGHUP, handler, this );
 	register_file_descriptor_handler(
 		_event.out(),
@@ -274,8 +275,9 @@ void HIODispatcher::add_alert_handle( delayed_call_t call_ ) {
 
 void HIODispatcher::handle_alerts( void ) {
 	M_PROLOG
-	for ( delayed_calls_t::iterator it( _alert.begin() ), endIt( _alert.end() ); it != endIt; ++ it )
+	for ( delayed_calls_t::iterator it( _alert.begin() ), endIt( _alert.end() ); it != endIt; ++ it ) {
 		(*it)();
+	}
 	return;
 	M_EPILOG
 }
@@ -283,8 +285,9 @@ void HIODispatcher::handle_alerts( void ) {
 void HIODispatcher::handle_idle( void ) {
 	M_PROLOG
 	++ _idleCycles;
-	for ( delayed_calls_t::iterator it( _idle.begin() ), endIt( _idle.end() ); it != endIt; ++ it )
+	for ( delayed_calls_t::iterator it( _idle.begin() ), endIt( _idle.end() ); it != endIt; ++ it ) {
 		(*it)();
+	}
 	return;
 	M_EPILOG
 }

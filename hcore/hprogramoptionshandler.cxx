@@ -484,7 +484,7 @@ int HProgramOptionsHandler::process_rc_file( HString const& section_, RC_CALLBAC
 						if ( value.is_empty() ) {
 							value.format( "[%s]", section_.raw() );
 							if ( option == value ) {
-								if ( _debugLevel_ >= DEBUG_LEVEL::PRINT_PROGRAM_OPTIONS ) {
+								if ( _debugLevel_ >= DEBUG_LEVEL::DEBUG_MESSAGES ) {
 									::fprintf( stderr, "section: [%s]\n", option.raw() );
 								}
 								log << "section: " << section_ << ", ";
@@ -702,7 +702,7 @@ void HProgramOptionsHandler::set_option( HOption& option_, HString const& value_
 	while ( substitute_environment( value ) ) {
 		/* empty loop */
 	}
-	if ( _debugLevel_ >= DEBUG_LEVEL::PRINT_PROGRAM_OPTIONS ) {
+	if ( _debugLevel_ >= DEBUG_LEVEL::DEBUG_MESSAGES ) {
 		HString name;
 		if ( ! option_.long_form().is_empty() ) {
 			name = option_.long_form();
