@@ -631,7 +631,7 @@ void HRuntime::register_builtins( void ) {
 inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& stream_, HHuginn::HClass const& huginnClass_ ) {
 	M_PROLOG
 	HRuntime const* runtime( huginnClass_.runtime() );
-	stream_ << huginnClass_.name();
+	stream_ << "class: " << huginnClass_.name();
 	if ( huginnClass_.super() ) {
 		stream_ << " : " << huginnClass_.super()->name();
 	}
@@ -667,34 +667,54 @@ inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterfac
 	}
 	newFields.erase( endNew, newFields.end() );
 	derivedFields.erase( endDerived, derivedFields.end() );
+	stream_ << " {";
+	bool next( false );
+	bool verbose( _debugLevel_ >= DEBUG_LEVEL::VERBOSE_MESSAGES );
 	for ( HHuginn::identifier_id_t f : derivedFields ) {
-		stream_ << "\n" << "  " << runtime->identifier_name( f ) << " (derived)";
+		if ( next ) {
+			stream_ << ",";
+		}
+		next = true;
+		stream_ << " " << runtime->identifier_name( f ) << ( verbose ? "(derived)" : "" );
 	}
 	for ( HHuginn::identifier_id_t f : overridenFields ) {
-		stream_ << "\n" << "  " << runtime->identifier_name( f ) << " (overriden)";
+		if ( next ) {
+			stream_ << ",";
+		}
+		next = true;
+		stream_ << " " << runtime->identifier_name( f ) << ( verbose ? "(overriden)" : "" );
 	}
 	for ( HHuginn::identifier_id_t f : newFields ) {
-		stream_ << "\n" << "  " << runtime->identifier_name( f ) << " (new)";
+		if ( next ) {
+			stream_ << ",";
+		}
+		next = true;
+		stream_ << " " << runtime->identifier_name( f ) << ( verbose ? "(new)" : "" );
 	}
+	stream_ << ( next ? " " : "" ) << "}";
 	return ( stream_ );
 	M_EPILOG
 }
 
 void HRuntime::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) {
 	M_PROLOG
-	stream_ << "Huginn VM state for `" << _huginn->source_name() << "'" << endl << "classes:" << endl;
+	stream_ << "Huginn VM state for `" << _huginn->source_name() << "'" << endl;
+	for ( packages_t::value_type const& p : _packages ) {
+		stream_ << "package: " << identifier_name( p.first ) << " = " << p.second->get_class()->name() << endl;
+	}
 	for ( classes_t::value_type const& c : _classes ) {
 		stream_ << *c.second << endl;
 	}
-	stream_ << "functions:" << endl;
 	for ( functions_t::value_type const& f : _functions ) {
 		yaal::hcore::HString const& name( identifier_name( f.first ) );
-		stream_ << name;
-		if ( _builtin_.count( name ) > 0 ) {
-			stream_ <<" (builtin)";
-		}
-		if ( _standardLibrary_.count( name ) > 0 ) {
-			stream_ <<" (standard library)";
+		stream_ << "function: " << name;
+		if ( _debugLevel_ >= DEBUG_LEVEL::VERBOSE_MESSAGES ) {
+			if ( _builtin_.count( name ) > 0 ) {
+				stream_ <<" (builtin)";
+			}
+			if ( _standardLibrary_.count( name ) > 0 ) {
+				stream_ <<" (standard library)";
+			}
 		}
 		stream_ << endl;
 	}
