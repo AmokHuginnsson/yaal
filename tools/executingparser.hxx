@@ -163,6 +163,7 @@ public:
 	void find_recursions( HRuleAggregator& );
 	bool has_action( void ) const;
 	bool skips_ws( void ) const;
+	HRuleBase const* find( yaal::hcore::HString const& ) const;
 	static yaal::hcore::HString::const_iterator skip_space( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const = 0;
@@ -174,6 +175,7 @@ protected:
 	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const = 0;
 	virtual void do_find_recursions( HRuleAggregator& ) = 0;
 	virtual bool do_has_action( void ) const;
+	virtual HRuleBase const* do_find( yaal::hcore::HString const& ) const;
 	void add_execution_step( HExecutingParser*, yaal::hcore::HString::const_iterator, action_t const& ) const;
 	void drop_execution_steps( HExecutingParser*, yaal::hcore::HString::const_iterator ) const;
 	void report_error( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString const& ) const;
@@ -253,6 +255,7 @@ protected:
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
 	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
+	virtual HRuleBase const* do_find( yaal::hcore::HString const& ) const override;
 private:
 	HRule& operator = ( HRule const& ) = delete;
 	template<typename tType, typename... arg_t>
@@ -276,6 +279,7 @@ protected:
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
 	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
+	virtual HRuleBase const* do_find( yaal::hcore::HString const& ) const override;
 private:
 	HRecursiveRule( void );
 	void set_rule( HRuleBase::ptr_t const& );
@@ -370,6 +374,7 @@ protected:
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
 	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
+	virtual HRuleBase const* do_find( yaal::hcore::HString const& ) const override;
 private:
 	void count_optional( void );
 	HFollows( HRuleBase const&, HRuleBase const& );
@@ -410,6 +415,7 @@ protected:
 	virtual void do_rule_use( rule_use_t& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
+	virtual HRuleBase const* do_find( yaal::hcore::HString const& ) const override;
 private:
 	HKleeneBase( HKleeneBase const& ) = delete;
 	HKleeneBase& operator = ( HKleeneBase const& ) = delete;
@@ -489,6 +495,7 @@ protected:
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
 	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
+	virtual HRuleBase const* do_find( yaal::hcore::HString const& ) const override;
 private:
 	void count_optional( void );
 	HAlternative( HRuleBase const&, HRuleBase const& );
@@ -523,6 +530,7 @@ protected:
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
 	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
+	virtual HRuleBase const* do_find( yaal::hcore::HString const& ) const override;
 private:
 	HOptional( HRuleBase const& );
 	HOptional& operator = ( HOptional const& ) = delete;
@@ -553,6 +561,7 @@ protected:
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
 	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
+	virtual HRuleBase const* do_find( yaal::hcore::HString const& ) const override;
 private:
 	HAnd( HRuleBase const&, HRuleBase const& );
 	HAnd& operator = ( HAnd const& ) = delete;
@@ -586,6 +595,7 @@ protected:
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
 	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
+	virtual HRuleBase const* do_find( yaal::hcore::HString const& ) const override;
 private:
 	HNot( HRuleBase const&, HRuleBase const& );
 	HNot& operator = ( HNot const& ) = delete;

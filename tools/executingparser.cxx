@@ -526,6 +526,16 @@ bool HRuleBase::do_has_action( void ) const {
 	return ( ( !! _action ) || ( !! _actionPosition ) );
 }
 
+HRuleBase const* HRuleBase::find( yaal::hcore::HString const& name_ ) const {
+	M_PROLOG
+	return ( do_find( name_ ) );
+	M_EPILOG
+}
+
+HRuleBase const* HRuleBase::do_find( yaal::hcore::HString const& ) const {
+	return ( nullptr );
+}
+
 HNamedRule::HNamedRule( yaal::hcore::HString const& name_, ptr_t rule_ )
 	: _name( name_ )
 	, _rule( rule_ ) {
@@ -870,6 +880,12 @@ void HRule::do_rule_use( rule_use_t& ruleUse_ ) const {
 	M_EPILOG
 }
 
+HRuleBase const* HRule::do_find( yaal::hcore::HString const& name_ ) const {
+	M_PROLOG
+	return ( _rule.name() == name_ ? _rule.rule().raw() : _rule.rule()->find( name_ ) );
+	M_EPILOG
+}
+
 HRecursiveRule::HRecursiveRule( void )
 	: HRuleBase( false )
 	, _rule() {
@@ -955,6 +971,12 @@ void HRecursiveRule::do_find_recursions( HRuleAggregator& recursions_ ) {
 		_rule->find_recursions( recursions_ );
 	}
 	return;
+	M_EPILOG
+}
+
+HRuleBase const* HRecursiveRule::do_find( yaal::hcore::HString const& name_ ) const {
+	M_PROLOG
+	return ( _rule.name() == name_ ? _rule.rule().raw() : _rule.rule()->find( name_ ) );
 	M_EPILOG
 }
 
@@ -1234,6 +1256,16 @@ void HFollows::do_find_recursions( HRuleAggregator& recursions_ ) {
 	M_EPILOG
 }
 
+HRuleBase const* HFollows::do_find( yaal::hcore::HString const& name_ ) const {
+	M_PROLOG
+	HRuleBase const* rule( nullptr );
+	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); ! rule && ( it != end ); ++ it ) {
+		rule = it->rule()->find( name_ );
+	}
+	return ( rule );
+	M_EPILOG
+}
+
 HKleeneBase::HKleeneBase( HRuleBase const& rule_ )
 	: HRuleBase( rule_.skips_ws() )
 	, _rule( rule_ ) {
@@ -1315,6 +1347,12 @@ void HKleeneBase::do_find_recursions( HRuleAggregator& recursions_ ) {
 	M_PROLOG
 	recursions_.verify( _rule );
 	return;
+	M_EPILOG
+}
+
+HRuleBase const* HKleeneBase::do_find( yaal::hcore::HString const& name_ ) const {
+	M_PROLOG
+	return ( _rule.name() == name_ ? _rule.rule().raw() : _rule.rule()->find( name_ ) );
 	M_EPILOG
 }
 
@@ -1637,6 +1675,16 @@ void HAlternative::do_find_recursions( HRuleAggregator& recursions_ ) {
 	M_EPILOG
 }
 
+HRuleBase const* HAlternative::do_find( yaal::hcore::HString const& name_ ) const {
+	M_PROLOG
+	HRuleBase const* rule( nullptr );
+	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); ! rule && ( it != end ); ++ it ) {
+		rule = it->rule()->find( name_ );
+	}
+	return ( rule );
+	M_EPILOG
+}
+
 HOptional::HOptional( HRuleBase const& rule_ )
 	: HRuleBase( rule_.skips_ws() )
 	, _rule( rule_ ) {
@@ -1749,6 +1797,12 @@ bool HOptional::do_detect_recursion( HRecursionDetector& recursionDetector_, boo
 		}
 	}
 	return ( false );
+	M_EPILOG
+}
+
+HRuleBase const* HOptional::do_find( yaal::hcore::HString const& name_ ) const {
+	M_PROLOG
+	return ( _rule.name() == name_ ? _rule.rule().raw() : _rule.rule()->find( name_ ) );
 	M_EPILOG
 }
 
@@ -1901,6 +1955,12 @@ void HAnd::do_find_recursions( HRuleAggregator& recursions_ ) {
 	M_EPILOG
 }
 
+HRuleBase const* HAnd::do_find( yaal::hcore::HString const& name_ ) const {
+	M_PROLOG
+	return ( _rule.name() == name_ ? _rule.rule().raw() : _rule.rule()->find( name_ ) );
+	M_EPILOG
+}
+
 HNot::HNot( HRuleBase const& rule_, HRuleBase const& not_ )
 	: HRuleBase( rule_.skips_ws() )
 	, _rule( rule_ )
@@ -2042,6 +2102,12 @@ void HNot::do_find_recursions( HRuleAggregator& recursions_ ) {
 	recursions_.verify( _rule );
 	recursions_.verify( _not );
 	return;
+	M_EPILOG
+}
+
+HRuleBase const* HNot::do_find( yaal::hcore::HString const& name_ ) const {
+	M_PROLOG
+	return ( _rule.name() == name_ ? _rule.rule().raw() : _rule.rule()->find( name_ ) );
 	M_EPILOG
 }
 
