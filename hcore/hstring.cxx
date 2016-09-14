@@ -715,10 +715,12 @@ HString& HString::assign( HString const& str_, int long offset_, int long length
 
 HString& HString::assign( char const* data_, int long length_ ) {
 	M_PROLOG
-	if ( ! data_ )
+	if ( ! data_ ) {
 		M_THROW( _errMsgHString_[ string_helper::NULL_PTR ], errno );
-	if ( length_ < 0 )
+	}
+	if ( length_ < 0 ) {
 		M_THROW( _errMsgHString_[ string_helper::BAD_LENGTH ], length_ );
+	}
 	int long newSize( static_cast<int long>( ::strnlen( data_, static_cast<size_t>( length_ ) ) ) );
 	reserve( newSize );
 	::memcpy( MEM, data_, static_cast<size_t>( newSize ) );
@@ -730,10 +732,12 @@ HString& HString::assign( char const* data_, int long length_ ) {
 
 HString& HString::assign( const_iterator first_, const_iterator last_ ) {
 	M_PROLOG
-	if ( ! ( first_ && last_ ) )
+	if ( ! ( first_ && last_ ) ) {
 		M_THROW( _errMsgHString_[ string_helper::NULL_PTR ], errno );
-	if ( last_ < first_ )
+	}
+	if ( last_ < first_ ) {
 		M_THROW( _errMsgHString_[ string_helper::BAD_LENGTH ], last_ - first_ );
+	}
 	int long newSize( static_cast<int long>( ::strnlen( first_, static_cast<size_t>( last_ - first_ ) ) ) );
 	reserve( newSize );
 	::memcpy( MEM, first_, static_cast<size_t>( newSize ) );
@@ -773,8 +777,9 @@ HString& HString::format( char const* format_, ... ) {
 
 HString& HString::vformat( char const* format_, void* ap_ ) {
 	M_PROLOG
-	if ( ! format_ )
+	if ( ! format_ ) {
 		M_THROW( _errMsgHString_[ string_helper::NULL_PTR ], errno );
+	}
 	::std::va_list orig;
 	__va_copy( orig, *static_cast< ::std::va_list*>( ap_ ) );
 	int long newSize = vsnprintf( nullptr, 0, format_, *static_cast< ::std::va_list*>( ap_ ) );
@@ -788,34 +793,38 @@ HString& HString::vformat( char const* format_, void* ap_ ) {
 
 int long HString::find( char char_, int long after_ ) const {
 	M_PROLOG
-	if ( after_ >= GET_SIZE )
+	if ( after_ >= GET_SIZE ) {
 		return ( npos );
-	if ( after_ < 0 )
+	}
+	if ( after_ < 0 ) {
 		after_ = 0;
+	}
 	char const* str = static_cast<char const*>( ::std::memchr( MEM + after_, char_, static_cast<size_t>( GET_SIZE - after_ ) ) );
-	if ( ! str )
+	if ( ! str ) {
 		return ( npos );
+	}
 	return ( static_cast<int long>( str - MEM ) );
 	M_EPILOG
 }
 
 int long HString::find( HString const& pattern_, int long after_ ) const {
 	M_PROLOG
-	if ( pattern_.is_empty() )
-		return ( npos );
-	return ( nfind( pattern_, pattern_.get_length(), after_ ) );
+	return ( ! pattern_.is_empty() ? nfind( pattern_, pattern_.get_length(), after_ ) : npos );
 	M_EPILOG
 }
 
 int long HString::nfind( HString const& pattern_, int long patternLength_, int long after_ ) const {
 	M_PROLOG
-	if ( pattern_.is_empty() )
+	if ( pattern_.is_empty() ) {
 		return ( npos );
-	if ( after_ < 0 )
+	}
+	if ( after_ < 0 ) {
 		after_ = 0;
+	}
 	if ( ( ! patternLength_ )
-			|| ( GET_SIZE < ( after_ + patternLength_ ) ) )
+			|| ( GET_SIZE < ( after_ + patternLength_ ) ) ) {
 		return ( npos );
+	}
 	int long idx = string_helper::kmpsearch( MEM + after_,
 			GET_SIZE - after_, pattern_.raw(), patternLength_ );
 	return ( idx >= 0 ? idx + after_ : npos );
@@ -824,31 +833,39 @@ int long HString::nfind( HString const& pattern_, int long patternLength_, int l
 
 int long HString::find_one_of( char const* set_, int long after_ ) const {
 	M_PROLOG
-	if ( ! set_ )
+	if ( ! set_ ) {
 		return ( npos );
-	if ( after_ < 0 )
+	}
+	if ( after_ < 0 ) {
 		after_ = 0;
+	}
 	if ( ( ! set_[0] )
-			|| ( GET_SIZE <= after_ ) )
+			|| ( GET_SIZE <= after_ ) ) {
 		return ( npos );
+	}
 	char const* str( ::std::strpbrk( MEM + after_, set_ ) );
-	if ( ! str )
+	if ( ! str ) {
 		return ( npos );
+	}
 	return ( static_cast<int long>( str - MEM ) );
 	M_EPILOG
 }
 
 int long HString::reverse_find_one_of( char const* set_, int long before_ ) const {
 	M_PROLOG
-	if ( ! set_ )
+	if ( ! set_ ) {
 		return ( npos );
-	if ( before_ < 0 )
+	}
+	if ( before_ < 0 ) {
 		before_ = 0;
-	if ( ( GET_SIZE <= before_ ) || ( ! set_[0] ) )
+	}
+	if ( ( GET_SIZE <= before_ ) || ( ! set_[0] ) ) {
 		return ( npos );
+	}
 	char* str( string_helper::strrnpbrk( MEM, set_, GET_SIZE - before_ ) );
-	if ( ! str )
+	if ( ! str ) {
 		return ( npos );
+	}
 	return ( static_cast<int long>( ( GET_SIZE - 1 ) - ( str - MEM ) ) );
 	M_EPILOG
 }
@@ -872,34 +889,44 @@ int long HString::find_last_one_of( char const* set_, int long before_ ) const {
 
 int long HString::find_other_than( char const* set_, int long after_ ) const {
 	M_PROLOG
-	if ( ! set_ )
+	if ( ! set_ ) {
 		return ( 0 );
-	if ( after_ < 0 )
+	}
+	if ( after_ < 0 ) {
 		after_ = 0;
-	if ( after_ >= GET_SIZE )
+	}
+	if ( after_ >= GET_SIZE ) {
 		return ( npos );
-	if ( ! set_[0] )
+	}
+	if ( ! set_[0] ) {
 		return ( after_ );
+	}
 	int long index = static_cast<int long>( ::std::strspn( MEM + after_, set_ ) );
-	if ( ( index + after_ ) >= GET_SIZE )
+	if ( ( index + after_ ) >= GET_SIZE ) {
 		return ( npos );
+	}
 	return ( index + after_ );
 	M_EPILOG
 }
 
 int long HString::reverse_find_other_than( char const* set_, int long before_ ) const {
 	M_PROLOG
-	if ( ! set_ )
+	if ( ! set_ ) {
 		return ( 0 );
-	if ( before_ < 0 )
+	}
+	if ( before_ < 0 ) {
 		before_ = 0;
-	if ( before_ >= GET_SIZE )
+	}
+	if ( before_ >= GET_SIZE ) {
 		return ( npos );
-	if ( ! set_[0] )
+	}
+	if ( ! set_[0] ) {
 		return ( before_ );
+	}
 	int long index( string_helper::strrnspn( MEM, set_, GET_SIZE - before_ ) );
-	if ( index >= ( GET_SIZE - before_ ) )
+	if ( index >= ( GET_SIZE - before_ ) ) {
 		return ( npos );
+	}
 	return ( ( GET_SIZE - 1 ) - index );
 	M_EPILOG
 }
@@ -926,13 +953,16 @@ int long HString::find_last_other_than( char const* set_, int long before_ ) con
 
 int long HString::reverse_find( char char_, int long before_ ) const {
 	M_PROLOG
-	if ( before_ >= GET_SIZE )
+	if ( before_ >= GET_SIZE ) {
 		return ( npos );
-	if ( before_ < 0 )
+	}
+	if ( before_ < 0 ) {
 		before_ = 0;
+	}
 	char const* str = static_cast<char const*>( ::memrchr( MEM, char_, static_cast<size_t>( GET_SIZE - before_ ) ) );
-	if ( ! str )
+	if ( ! str ) {
 		return ( npos );
+	}
 	return ( static_cast<int long>( ( GET_SIZE - 1 ) - ( str - MEM ) ) );
 	M_EPILOG
 }
@@ -947,6 +977,23 @@ int long HString::find_last( char char_, int long before_ ) const {
 	}
 	char const* str( static_cast<char const*>( ::memrchr( MEM, char_, static_cast<size_t>( before_ + 1 ) ) ) );
 	return ( str ? static_cast<int long>( str - MEM ) : npos );
+	M_EPILOG
+}
+
+int long HString::find_last( HString const& str_, int long before_ ) const {
+	M_PROLOG
+	if ( ( before_ == npos ) || ( before_ >= GET_SIZE ) ) {
+		before_ = GET_SIZE - 1;
+	}
+	if ( before_ < 0 ) {
+		return ( npos );
+	}
+	HString str( MEM, min( GET_SIZE, before_ + str_.get_length() ) );
+	HString pat( str_ );
+	yaal::reverse( EXT_MEM( str ), EXT_MEM( str ) + str.get_length() );
+	yaal::reverse( EXT_MEM( pat ), EXT_MEM( pat ) + pat.get_length() );
+	int long pos( str.find( pat ) );
+	return ( pos != npos ? str.get_length() - ( pos + str_.get_length() ) : npos );
 	M_EPILOG
 }
 
@@ -990,15 +1037,17 @@ HString& HString::replace( HString const& pattern_,
 			if ( newIdx && ( ( index - oldIdx ) != lenPattern ) ) {
 				::std::memmove( MEM + newIdx, srcBuf + oldIdx + lenPattern, static_cast<size_t>( ( index - oldIdx ) - lenPattern ) );
 				newIdx += ( ( index - oldIdx ) - lenPattern );
-			} else if ( ! newIdx )
+			} else if ( ! newIdx ) {
 				newIdx = index;
+			}
 			oldIdx = index;
 			::std::memmove( MEM + newIdx, with, static_cast<size_t>( lenWith ) );
 			newIdx += lenWith;
 			index += lenPattern;
 		}
-		if ( newIdx && ( ( GET_SIZE - oldIdx ) != lenPattern ) )
+		if ( newIdx && ( ( GET_SIZE - oldIdx ) != lenPattern ) ) {
 			::std::memmove( MEM + newIdx, srcBuf + oldIdx + lenPattern, static_cast<size_t>( ( GET_SIZE - oldIdx ) - lenPattern ) );
+		}
 		SET_SIZE( newSize );
 		MEM[ newSize ] = 0;
 	}
@@ -1014,20 +1063,24 @@ HString& HString::replace( int long pos_, int long size_, HString const& replace
 
 HString& HString::replace( int long pos_, int long size_, HString const& replacement, int long offset_, int long len_ ) {
 	M_PROLOG
-	if ( offset_ < 0 )
+	if ( offset_ < 0 ) {
 		M_THROW( _errMsgHString_[string_helper::BAD_OFFSET], offset_ );
+	}
 	return ( replace( pos_, size_, replacement.raw() + offset_, len_ ) );
 	M_EPILOG
 }
 
 HString& HString::replace( int long pos_, int long size_, char const* buffer_, int long len_ ) {
 	M_PROLOG
-	if ( size_ < 0 )
+	if ( size_ < 0 ) {
 		M_THROW( _errMsgHString_[string_helper::BAD_LENGTH], size_ );
-	if ( len_ < 0 )
+	}
+	if ( len_ < 0 ) {
 		M_THROW( _errMsgHString_[string_helper::BAD_LENGTH], len_ );
-	if ( pos_ < 0 )
+	}
+	if ( pos_ < 0 ) {
 		M_THROW( _errMsgHString_[string_helper::BAD_OFFSET], pos_ );
+	}
 	int long oldSize( GET_SIZE );
 	if ( ( pos_ + size_ ) > oldSize ) {
 		M_THROW( _errMsgHString_[string_helper::OVERFLOW], pos_ + size_ );
@@ -1054,16 +1107,18 @@ HString& HString::replace( iterator first_, iterator last_, HString const& repla
 
 HString& HString::upper( void ) {
 	M_PROLOG
-	for ( int long ctr( 0 ), SIZE( GET_SIZE ); ctr < SIZE; ++ ctr )
+	for ( int long ctr( 0 ), SIZE( GET_SIZE ); ctr < SIZE; ++ ctr ) {
 		MEM[ ctr ] = static_cast<char>( ::std::toupper( MEM[ ctr ] ) );
+	}
 	return ( *this );
 	M_EPILOG
 }
 
 HString& HString::lower( void ) {
 	M_PROLOG
-	for ( int long ctr( 0 ), SIZE( GET_SIZE ); ctr < SIZE; ++ ctr )
+	for ( int long ctr( 0 ), SIZE( GET_SIZE ); ctr < SIZE; ++ ctr ) {
 		MEM[ ctr ] = static_cast<char>( ::std::tolower( MEM[ ctr ] ) );
+	}
 	return ( *this );
 	M_EPILOG
 }
@@ -1073,10 +1128,11 @@ HString& HString::reverse( void ) {
 	char char_;
 	for ( int long ctr( 0 ), SIZE( GET_SIZE ); ctr < SIZE; ++ ctr ) {
 		char_ = static_cast<char>( ::std::toupper( MEM[ ctr ] ) );
-		if ( char_ == MEM[ ctr ] )
+		if ( char_ == MEM[ ctr ] ) {
 			MEM[ ctr ] = static_cast<char>( ::std::tolower( MEM[ ctr ] ) );
-		else
+		} else {
 			MEM[ ctr ] = char_;
+		}
 	}
 	return ( *this );
 	M_EPILOG
@@ -1116,8 +1172,9 @@ HString HString::substr( int long from_, int long length_ ) const {
 HString HString::left( int long to_ ) const {
 	M_PROLOG
 	HString str;
-	if ( to_ < 1 )
+	if ( to_ < 1 ) {
 		return ( str );
+	}
 	int long newSize( min( to_, GET_SIZE ) );
 	str.reserve( newSize );
 	::std::strncpy( EXT_MEM( str ), MEM, static_cast<size_t>( newSize ) );
@@ -1138,8 +1195,9 @@ HString HString::mid( int long from_, int long length_ ) const {
 HString HString::right( int long fromEnd_ ) const {
 	M_PROLOG
 	HString str;
-	if ( fromEnd_ < 1 )
+	if ( fromEnd_ < 1 ) {
 		return ( str );
+	}
 	int long newSize( min( fromEnd_, GET_SIZE ) );
 	str.reserve( newSize );
 	::std::strncpy( EXT_MEM( str ), MEM + GET_SIZE - newSize, static_cast<size_t>( newSize ) );
@@ -1152,10 +1210,12 @@ HString HString::right( int long fromEnd_ ) const {
 HString& HString::trim_left( char const* set_ ) {
 	M_PROLOG
 	int cut( 0 );
-	while ( MEM[ cut ] && ::std::strchr( set_, MEM[ cut ] ) )
+	while ( MEM[ cut ] && ::std::strchr( set_, MEM[ cut ] ) ) {
 		++ cut;
-	if ( cut )
+	}
+	if ( cut ) {
 		shift_left( cut );
+	}
 	return ( *this );
 	M_EPILOG
 }
@@ -1164,8 +1224,9 @@ HString& HString::trim_right( char const* set_ ) {
 	M_PROLOG
 	int long cut( 0 );
 	while ( ( cut < GET_SIZE )
-			&& ::std::strchr( set_, MEM[ GET_SIZE - ( cut + 1 ) ] ) )
+			&& ::std::strchr( set_, MEM[ GET_SIZE - ( cut + 1 ) ] ) ) {
 		++ cut;
+	}
 	if ( cut ) {
 		SET_SIZE( GET_SIZE - cut );
 		MEM[ GET_SIZE ] = 0;
@@ -1192,8 +1253,9 @@ HString& HString::shift_left( int long shift_ ) {
 		if ( shift_ < GET_SIZE ) {
 			SET_SIZE( GET_SIZE - shift_ );
 			::std::memmove( MEM, MEM + shift_, static_cast<size_t>( GET_SIZE + 1 ) );
-		} else
+		} else {
 			clear();
+		}
 	}
 	return ( *this );
 	M_EPILOG
@@ -1290,8 +1352,9 @@ HString& HString::insert( int long from_, int long length_, char const* chunk_ )
 	M_PROLOG
 	if ( from_ < 0 ) {
 		if ( chunk_ ) {
-			if ( ( -from_ ) > static_cast<int long>( ::strnlen( chunk_, static_cast<size_t>( length_ ) ) ) )
+			if ( ( -from_ ) > static_cast<int long>( ::strnlen( chunk_, static_cast<size_t>( length_ ) ) ) ) {
 				M_THROW( "negative offset caused chunk overflow", from_ );
+			}
 			chunk_ += -from_;
 		}
 		length_ += from_;
@@ -1299,14 +1362,16 @@ HString& HString::insert( int long from_, int long length_, char const* chunk_ )
 	}
 	if ( ( length_ > 0 ) && ( from_ <= GET_SIZE ) ) {
 		int long chunkLen = chunk_ ? static_cast<int long>( ::strnlen( chunk_, static_cast<size_t>( length_ ) ) ) : 0;
-		if ( chunk_ && ( length_ > chunkLen ) )
+		if ( chunk_ && ( length_ > chunkLen ) ) {
 			M_THROW( "length too big for this chunk (by)", length_ - chunkLen );
+		}
 		int long oldSize( GET_SIZE );
 		int long newSize( oldSize + length_ );
 		reserve( newSize );
 		::std::memmove( MEM + from_ + length_, MEM + from_, static_cast<size_t>( ( oldSize + 1 ) - from_ ) );
-		if ( chunk_ )
+		if ( chunk_ ) {
 			::std::strncpy( MEM + from_, chunk_, static_cast<size_t>( length_ ) );
+		}
 		SET_SIZE( newSize );
 	}
 	return ( *this );
@@ -1588,8 +1653,9 @@ int long long unsigned stoull_impl( char const* str_, int* endIdx_, int base_ ) 
 			throw HOutOfRangeException( "Out of range value in conversion: "_ys.append( str_ ) );
 		}
 	}
-	if ( endIdx_ )
+	if ( endIdx_ ) {
 		*endIdx_ = static_cast<int>( end - str_ );
+	}
 	return ( val );
 	M_EPILOG
 }
@@ -1652,13 +1718,15 @@ namespace string_helper {
 char* strrnpbrk( char const* buffer_,
 		char const* stopSet_, int long length_ ) {
 	M_PROLOG
-	if ( length_ < 1 )
+	if ( length_ < 1 ) {
 		return ( nullptr );
+	}
 	int long stopSetSize( static_cast<int long>( ::std::strlen( stopSet_ ) ) );
 	int long index( length_ - 1 );
 	while ( index >= 0 ) {
-		if ( ::std::memchr( stopSet_, buffer_[ index ], static_cast<size_t>( stopSetSize ) ) )
+		if ( ::std::memchr( stopSet_, buffer_[ index ], static_cast<size_t>( stopSetSize ) ) ) {
 			return ( const_cast<char*>( buffer_ + index ) );
+		}
 		-- index;
 	}
 	return ( nullptr );
@@ -1671,8 +1739,9 @@ int long strrnspn( char const* buffer_, char const* skipSet_,
 	int long skipSetSize( static_cast<int long>( ::std::strlen( skipSet_ ) ) );
 	int long index( length_ - 1 );
 	while ( index >= 0 ) {
-		if ( ! ::std::memchr( skipSet_, buffer_[ index ], static_cast<size_t>( skipSetSize ) ) )
+		if ( ! ::std::memchr( skipSet_, buffer_[ index ], static_cast<size_t>( skipSetSize ) ) ) {
 			return ( index );
+		}
 		-- index;
 	}
 	return ( length_ );
@@ -1684,18 +1753,21 @@ int long kmpsearch( char const* str, int long lenstr, char const* pat, int long 
 	int* next( KMPnext.get<int>() );
 	int b( next[ 0 ] = -1 );
 	for ( int i = 1; i <= lenpat; ++ i ) {
-		while ( ( b > -1 ) && ( pat[ b ] != pat[ i - 1 ] ) )
+		while ( ( b > -1 ) && ( pat[ b ] != pat[ i - 1 ] ) ) {
 			b = next[ b ];
+		}
 		++ b;
 		next[ i ] = ( pat[ i ] == pat[ b ] ) ? next[ b ] : b;
 	}
 	int start( -1 );
 	b = 0;
 	for ( int i = 0; i < lenstr; ++ i ) {
-		while ( ( b > -1 ) && ( pat[ b ] != str[ i ] ) )
+		while ( ( b > -1 ) && ( pat[ b ] != str[ i ] ) ) {
 			b = next[ b ];
-		if ( ++ b < lenpat )
+		}
+		if ( ++ b < lenpat ) {
 			continue;
+		}
 		start = i - b + 1;
 		break;
 	}
@@ -1709,18 +1781,21 @@ int long kmpcasesearch( char const* str, int long lenstr, char const* pat, int l
 	int* next( KMPnext.get<int>() );
 	int b( next[ 0 ] = -1 );
 	for ( int i = 1; i <= lenpat; ++ i ) {
-		while ( ( b > -1 ) && ( tolower( pat[ b ] ) != tolower( pat[ i - 1 ] ) ) )
+		while ( ( b > -1 ) && ( tolower( pat[ b ] ) != tolower( pat[ i - 1 ] ) ) ) {
 			b = next[ b ];
+		}
 		++ b;
 		next[ i ] = ( tolower( pat[ i ] ) == tolower( pat[ b ] ) ) ? next[ b ] : b;
 	}
 	int start( -1 );
 	b = 0;
 	for ( int i = 0; i < lenstr; ++ i ) {
-		while ( ( b > -1 ) && ( tolower( pat[ b ] ) != tolower( str[ i ] ) ) )
+		while ( ( b > -1 ) && ( tolower( pat[ b ] ) != tolower( str[ i ] ) ) ) {
 			b = next[ b ];
-		if ( ++ b < lenpat )
+		}
+		if ( ++ b < lenpat ) {
 			continue;
+		}
 		start = i - b + 1;
 		break;
 	}

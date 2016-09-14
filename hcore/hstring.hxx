@@ -440,14 +440,14 @@ public:
 	 *
 	 * \param character - a character to look for.
 	 * \param offest - position where searching for given character starts.
-	 * \return position of given character in this string if given character is found or HString::npos otherwise.
+	 * \return Position of given character in this string if given character is found or HString::npos otherwise.
 	 */
 	int long find( char character, int long offest = 0 ) const;
-	/*! \brief Find position of given string in this string.
+	/*! \brief Find position of given sub-string in this string.
 	 *
-	 * \param str - a string to look for.
-	 * \param offest - position where searching for given string starts.
-	 * \return position of given string (first character of it) in this string if given string is found or HString::npos otherwise.
+	 * \param str - a sub-string to look for.
+	 * \param offest - position where searching for given sub-string starts.
+	 * \return Position of given sub-string (first character of it) in this string if given sub-string is found or HString::npos otherwise.
 	 */
 	int long find( HString const& str, int long offset = 0 ) const;
 	int long nfind( HString const&, int long, int long = 0 ) const;
@@ -461,7 +461,7 @@ public:
 	 *
 	 * \param character - look for this character in this string.
 	 * \param before - skip that many positions from the end before start looking for given character.
-	 * \param distance from the end to given character if given character can be found or HString::npos otherwise.
+	 * \return Distance from the end to given character if given character can be found or HString::npos otherwise.
 	 */
 	int long reverse_find( char character, int long before = 0 ) const;
 	/*! \brief Find index of last occurrence of given character.
@@ -470,9 +470,18 @@ public:
 	 *
 	 * \param character - look for position of this character in this string.
 	 * \param before - assume that this string is only that long.
-	 * \return index of last occurrence of given character if given character can be found or HString::npos otherwise.
+	 * \return Index of last occurrence of given character if given character can be found or HString::npos otherwise.
 	 */
 	int long find_last( char character, int long before = npos ) const;
+	/*! \brief Find index of last occurrence of given sub-string.
+	 *
+	 * This method is totally different than HString::reverse_find().
+	 *
+	 * \param str - look for position of this sub-strting in this string.
+	 * \param before - assume that this string is only that long.
+	 * \return Index of last occurrence of given sub-string if given sub-string can be found or HString::npos otherwise.
+	 */
+	int long find_last( HString const& str, int long before = npos ) const;
 	int long find_one_of( char const*, int long = 0 ) const;
 	int long reverse_find_one_of( char const*, int long = 0 ) const;
 	int long find_last_one_of( char const*, int long = npos ) const;
