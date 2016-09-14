@@ -72,18 +72,35 @@ private:
 
 namespace string {
 
-inline HHuginn::value_t find( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+typedef int long ( yaal::hcore::HString::*finder_t )( yaal::hcore::HString const&, int long ) const;
+typedef int long ( yaal::hcore::HString::*finder_raw_t )( char const*, int long ) const;
+
+inline HHuginn::value_t find( char const* name_, finder_t finder_, int long default_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	char const name[] = "string.find";
-	verify_arg_count( name, values_, 1, 2, position_ );
-	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, false, position_ );
-	int long startAt( 0 );
+	verify_arg_count( name_, values_, 1, 2, position_ );
+	verify_arg_type( name_, values_, 0, HHuginn::TYPE::STRING, false, position_ );
+	int long startAt( default_ );
 	if ( values_.get_size() > 1 ) {
-		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
+		verify_arg_type( name_, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
 		startAt = static_cast<int long>( get_integer( values_[1] ) );
 	}
 
-	int long pos( get_string( object_->raw() ).find( get_string( values_[0] ), startAt ) );
+	int long pos( (get_string( object_->raw() ).*finder_)( get_string( values_[0] ), startAt ) );
+	return ( thread_->object_factory().create_integer( pos != hcore::HString::npos ? pos : -1 ) );
+	M_EPILOG
+}
+
+inline HHuginn::value_t find_raw( char const* name_, finder_raw_t finder_, int long default_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 1, 2, position_ );
+	verify_arg_type( name_, values_, 0, HHuginn::TYPE::STRING, false, position_ );
+	int long startAt( default_ );
+	if ( values_.get_size() > 1 ) {
+		verify_arg_type( name_, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
+		startAt = static_cast<int long>( get_integer( values_[1] ) );
+	}
+
+	int long pos( (get_string( object_->raw() ).*finder_)( get_string( values_[0] ).raw(), startAt ) );
 	return ( thread_->object_factory().create_integer( pos != hcore::HString::npos ? pos : -1 ) );
 	M_EPILOG
 }
@@ -162,12 +179,17 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 			runtime_->identifier_id( type_name( HHuginn::TYPE::STRING ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "find",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::find, _1, _2, _3, _4 ) ) },
-				{ "replace",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::replace, _1, _2, _3, _4 ) ) },
-				{ "strip",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::strip, _1, _2, _3, _4 ) ) },
-				{ "to_lower", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::to_lower, _1, _2, _3, _4 ) ) },
-				{ "to_upper", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::to_upper, _1, _2, _3, _4 ) ) },
-				{ "clear",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::clear, _1, _2, _3, _4 ) ) }
+				{ "find",                 make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::find,     "string.find",                 static_cast<finder_t>( &HString::find ),      0, _1, _2, _3, _4 ) ) },
+				{ "find_last",            make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::find,     "string.find_last",            static_cast<finder_t>( &HString::find_last ), hcore::HString::npos + 0, _1, _2, _3, _4 ) ) },
+				{ "find_one_of",          make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::find_raw, "string.find_one_of",          static_cast<finder_raw_t>( &HString::find_one_of ), 0, _1, _2, _3, _4 ) ) },
+				{ "find_last_one_of",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::find_raw, "string.find_last_one_of",     static_cast<finder_raw_t>( &HString::find_last_one_of ), hcore::HString::npos + 0, _1, _2, _3, _4 ) ) },
+				{ "find_other_than",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::find_raw, "string.find_other_than",      static_cast<finder_raw_t>( &HString::find_other_than ), 0, _1, _2, _3, _4 ) ) },
+				{ "find_last_other_than", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::find_raw, "string.find_last_other_than", static_cast<finder_raw_t>( &HString::find_last_other_than ), hcore::HString::npos + 0, _1, _2, _3, _4 ) ) },
+				{ "replace",              make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::replace, _1, _2, _3, _4 ) ) },
+				{ "strip",                make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::strip, _1, _2, _3, _4 ) ) },
+				{ "to_lower",             make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::to_lower, _1, _2, _3, _4 ) ) },
+				{ "to_upper",             make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::to_upper, _1, _2, _3, _4 ) ) },
+				{ "clear",                make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::clear, _1, _2, _3, _4 ) ) }
 			}
 		)
 	);
