@@ -1560,13 +1560,21 @@ HXml::HConstNodeProxy HXml::HConstNodeSet::operator[]( int index_ ) const {
 	M_EPILOG
 }
 
+HXml::HConstNodeSet::HConstIterator::HConstIterator( void )
+	: _owner( nullptr )
+	, _iterator( 0 ) {
+	return;
+}
+
 HXml::HConstNodeSet::HConstIterator::HConstIterator( HXml::HConstNodeSet const* owner_, int index_ )
-	: _owner( owner_ ), _iterator( index_ ) {
+	: _owner( owner_ )
+	, _iterator( index_ ) {
 	return;
 }
 
 HXml::HConstNodeSet::HConstIterator::HConstIterator( HXml::HConstNodeSet::HConstIterator const& it_ )
-	: _owner( it_._owner ), _iterator( it_._iterator ) {
+	: _owner( it_._owner )
+	, _iterator( it_._iterator ) {
 	return;
 }
 
@@ -1621,9 +1629,24 @@ HXml::HNodeProxy HXml::HNodeSet::operator[]( int index_ ) {
 	M_EPILOG
 }
 
+HXml::HNodeSet::HIterator::HIterator( void )
+	: HConstIterator() {
+	return;
+}
+
 HXml::HNodeSet::HIterator::HIterator( HXml::HConstNodeSet const* owner_, int index_ )
 	: HConstIterator( owner_, index_ ) {
 	return;
+}
+
+HXml::HNodeSet::HIterator::HIterator( HIterator const& other_ )
+	: HConstIterator( other_ ) {
+	return;
+}
+
+HXml::HNodeSet::HIterator& HXml::HNodeSet::HIterator::operator = ( HXml::HNodeSet::HIterator const& it_ ) {
+	HConstIterator::operator=( it_ );
+	return ( *this );
 }
 
 HXml::HNodeProxy HXml::HNodeSet::HIterator::operator* ( void ) {

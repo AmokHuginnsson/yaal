@@ -466,6 +466,9 @@ class HXml::HNodeSet::HIterator : public HXml::HConstNodeSet::HConstIterator {
 public:
 	typedef HIterator this_type;
 	typedef HXml::HConstNodeSet::HConstIterator base_type;
+	HIterator( void );
+	HIterator( HIterator const& );
+	HIterator& operator = ( HIterator const& );
 	HXml::HNodeProxy operator* ( void );
 private:
 	friend class HXml::HNodeSet;
