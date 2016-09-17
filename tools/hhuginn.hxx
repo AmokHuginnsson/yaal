@@ -193,6 +193,8 @@ private:
 	yaal::hcore::HStreamInterface* _outputStreamRaw;
 	yaal::hcore::HStreamInterface::ptr_t _errorStream;
 	yaal::hcore::HStreamInterface* _errorStreamRaw;
+	yaal::hcore::HStreamInterface::ptr_t _logStream;
+	yaal::hcore::HStreamInterface* _logStreamRaw;
 public:
 	HHuginn( void );
 	virtual ~HHuginn( void );
@@ -269,10 +271,13 @@ public:
 	void set_output_stream( yaal::hcore::HStreamInterface::ptr_t );
 	void set_error_stream( yaal::hcore::HStreamInterface& );
 	void set_error_stream( yaal::hcore::HStreamInterface::ptr_t );
+	void set_log_stream( yaal::hcore::HStreamInterface& );
+	void set_log_stream( yaal::hcore::HStreamInterface::ptr_t );
 	executing_parser::HRule make_engine( void );
 	yaal::hcore::HStreamInterface& input_stream( void );
 	yaal::hcore::HStreamInterface& output_stream( void );
 	yaal::hcore::HStreamInterface& error_stream( void );
+	yaal::hcore::HStreamInterface& log_stream( void );
 	yaal::hcore::HString get_snippet( int, int ) const;
 	void register_class( class_t );
 	void register_function( identifier_id_t );

@@ -32,6 +32,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hhuginn.hxx"
 #include "hcore/hfile.hxx"
+#include "hcore/hlog.hxx"
 #include "tools/huginn/source.hxx"
 #include "tools/huginn/runtime.hxx"
 #include "tools/huginn/objectfactory.hxx"
@@ -199,7 +200,9 @@ HHuginn::HHuginn( void )
 	, _outputStream()
 	, _outputStreamRaw( &cout )
 	, _errorStream()
-	, _errorStreamRaw( &cerr ) {
+	, _errorStreamRaw( &cerr )
+	, _logStream()
+	, _logStreamRaw( &hcore::log ) {
 	M_PROLOG
 	_grammarVerified.store( true );
 	_runtime->register_builtins();
@@ -492,6 +495,22 @@ void HHuginn::set_error_stream( yaal::hcore::HStreamInterface& stream_ ) {
 	M_EPILOG
 }
 
+void HHuginn::set_log_stream( yaal::hcore::HStreamInterface::ptr_t stream_ ) {
+	M_PROLOG
+	_logStream = stream_;
+	_logStreamRaw = _logStream.raw();
+	return;
+	M_EPILOG
+}
+
+void HHuginn::set_log_stream( yaal::hcore::HStreamInterface& stream_ ) {
+	M_PROLOG
+	_logStream.reset();
+	_logStreamRaw = &stream_;
+	return;
+	M_EPILOG
+}
+
 yaal::hcore::HStreamInterface& HHuginn::input_stream( void ) {
 	M_PROLOG
 	M_ENSURE( _inputStreamRaw );
@@ -510,6 +529,13 @@ yaal::hcore::HStreamInterface& HHuginn::error_stream( void ) {
 	M_PROLOG
 	M_ENSURE( _errorStreamRaw );
 	return ( *_errorStreamRaw );
+	M_EPILOG
+}
+
+yaal::hcore::HStreamInterface& HHuginn::log_stream( void ) {
+	M_PROLOG
+	M_ENSURE( _logStreamRaw );
+	return ( *_logStreamRaw );
 	M_EPILOG
 }
 
