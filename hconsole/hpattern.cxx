@@ -45,55 +45,22 @@ struct OPatternState {
 	bool _extended;
 	HPattern::pluggable_flags_t _flags;
 	OPatternState( void )
-		: _ignoreCase( false ), _extended( false ), _flags()
-		{}
+		: _ignoreCase( false )
+		, _extended( false )
+		, _flags() {
+	}
 };
 
 HPattern::HPattern( void )
-	: _initialized( false ),
-	_ignoreCaseDefault( false ), _ignoreCase( false ),
-	_extended( false ), _simpleMatchLength( 0 ), _regex(),
-	_pattern(), _errorCause() {
+	: _initialized( false )
+	, _ignoreCaseDefault( false )
+	, _ignoreCase( false )
+	, _extended( false )
+	, _simpleMatchLength( 0 )
+	, _regex()
+	, _pattern()
+	, _errorCause() {
 	M_PROLOG
-	return;
-	M_EPILOG
-}
-
-HPattern::HPattern( char const* pattern_ )
-	: _initialized( false ),
-	_ignoreCaseDefault( false ), _ignoreCase( false ),
-	_extended( false ), _simpleMatchLength( 0 ), _regex(),
-	_pattern(), _errorCause() {
-	M_PROLOG
-	M_ASSERT( pattern_ );
-	M_ENSURE( pattern_[0] );
-	M_ENSURE( ! parse_re( pattern_ ) );
-	return;
-	M_EPILOG
-}
-
-HPattern::HPattern( HString const& pattern_ )
-	: _initialized( false ),
-	_ignoreCaseDefault( false ), _ignoreCase( false ),
-	_extended( false ), _simpleMatchLength( 0 ), _regex(),
-	_pattern(), _errorCause() {
-	M_PROLOG
-	if ( ! pattern_.is_empty() ) {
-		M_ENSURE( ! parse_re( pattern_ ) );
-	}
-	return;
-	M_EPILOG
-}
-
-HPattern::HPattern( HString const& pattern_, bool ignoreCase_ )
-	: _initialized( false ),
-	_ignoreCaseDefault( ignoreCase_ ), _ignoreCase( false ),
-	_extended( false ), _simpleMatchLength( 0 ), _regex(),
-	_pattern(), _errorCause() {
-	M_PROLOG
-	if ( ! pattern_.is_empty() ) {
-		M_ENSURE( ! parse_re( pattern_ ) );
-	}
 	return;
 	M_EPILOG
 }

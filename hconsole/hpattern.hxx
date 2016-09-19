@@ -61,14 +61,6 @@ private:
 	mutable yaal::hcore::HString _errorCause; /*!< cause of last error */
 public:
 	HPattern( void );
-	HPattern( char const* );
-	HPattern( yaal::hcore::HString const& );
-	/*! \brief Construct pattern with regex rule.
-	 *
-	 * \param pattern - regex rule to construct pattern object.
-	 * \param ignoreCase - shall defualt match policy be: case matters, default ignore case state
-	 */
-	HPattern( yaal::hcore::HString const& pattern, bool ignoreCase );
 	virtual ~HPattern( void );
 	/*! \brief Parse regular expression pattern with configuration and prepare for matches retrieval.
 	 *
