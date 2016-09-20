@@ -50,38 +50,9 @@ OMenuItem::OMenuItem( OMenuItem const& menuItem_ )
 	M_EPILOG
 }
 
-OMenuItem& OMenuItem::operator = ( OMenuItem const& menuItem_ ) {
-	M_PROLOG
-	if ( &menuItem_ != this ) {
-		OMenuItem item( menuItem_ );
-		swap( item );
-	}
-	return ( *this );
-	M_EPILOG
-}
-
-void OMenuItem::reset( void ) {
-	M_PROLOG
-	_call.reset();
-	_label = "";
-	return;
-	M_EPILOG
-}
-
-void OMenuItem::call( void ) {
+void OMenuItem::call( void ) const {
 	M_PROLOG
 	_call();
-	return;
-	M_EPILOG
-}
-
-void OMenuItem::swap( OMenuItem& other ) {
-	M_PROLOG
-	if ( &other != this ) {
-		using yaal::swap;
-		swap( _call, other._call );
-		swap( _label, other._label );
-	}
 	return;
 	M_EPILOG
 }

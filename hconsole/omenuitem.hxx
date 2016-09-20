@@ -47,18 +47,12 @@ public: /* All is public for simpler usage. */
 /* Methods */
 	OMenuItem( void );
 	OMenuItem( OMenuItem const& );
-	OMenuItem& operator = ( OMenuItem const& );
-	void reset( void );
-	void call( void );
-	void swap( OMenuItem& );
+	void call( void ) const;
 	yaal::hcore::HString const& get_string( void ) const;
 	int long get_integer( void ) const M_DEBUG_CODE( __attribute__((__noreturn__)) );
 	double get_real( void ) const M_DEBUG_CODE( __attribute__((__noreturn__)) );
 	yaal::hcore::HTime const& get_time( void ) const M_DEBUG_CODE( __attribute__((__noreturn__)) );
 };
-
-inline void swap( yaal::hconsole::OMenuItem& a, yaal::hconsole::OMenuItem& b )
-	{ a.swap( b ); }
 
 }
 

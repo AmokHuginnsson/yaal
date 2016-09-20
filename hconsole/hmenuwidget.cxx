@@ -86,7 +86,7 @@ int HMenuWidget::do_process_input( int code_ ) {
 	if ( ( code_ == '\r' ) || ( code_ == ' ' ) ) {
 		OMenuItem const* menu( get_selected() );
 		if ( !! menu->_call ) {
-			menu->_call();
+			menu->call();
 		}
 		code_ = 0;
 	}
