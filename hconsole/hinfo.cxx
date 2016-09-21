@@ -38,56 +38,67 @@ namespace yaal {
 namespace hconsole {
 
 HInfoMultiVal::HInfoMultiVal( void )
-	: _type( static_cast<type_mask_t>( TYPE::UNKNOWN ) ),
-	_integer( 0 ), _real( 0 ),
-	_string(), _time( HTime::TZ::LOCAL ) {
+	: _type( static_cast<type_mask_t>( TYPE::UNKNOWN ) )
+	, _integer( 0 )
+	, _real( 0 )
+	, _string()
+	, _time( HTime::TZ::UTC, static_cast<yaal::i64_t>( 0 ) ) {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
 HInfoMultiVal::HInfoMultiVal( int long long data_ )
-	: _type( static_cast<type_mask_t>( TYPE::INT_LONG_LONG ) ),
-	_integer( data_ ), _real( 0 ),
-	_string(), _time( HTime::TZ::LOCAL ) {
+	: _type( static_cast<type_mask_t>( TYPE::INT_LONG_LONG ) )
+	, _integer( data_ )
+	, _real( 0 )
+	, _string()
+	, _time( HTime::TZ::UTC, static_cast<yaal::i64_t>( 0 ) ) {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
 HInfoMultiVal::HInfoMultiVal( double long data_ )
-	: _type( static_cast<type_mask_t>( TYPE::DOUBLE_LONG ) ),
-	_integer( 0 ), _real( data_ ),
-	_string(), _time( HTime::TZ::LOCAL ) {
+	: _type( static_cast<type_mask_t>( TYPE::DOUBLE_LONG ) )
+	, _integer( 0 )
+	, _real( data_ )
+	, _string()
+	, _time( HTime::TZ::UTC, static_cast<yaal::i64_t>( 0 ) ) {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
 HInfoMultiVal::HInfoMultiVal( HString const& string_ )
-	: _type( static_cast<type_mask_t>( TYPE::HSTRING ) ),
-	_integer( 0 ), _real( 0 ),
-	_string( string_ ), _time( HTime::TZ::LOCAL ) {
+	: _type( static_cast<type_mask_t>( TYPE::HSTRING ) )
+	, _integer( 0 )
+	, _real( 0 )
+	, _string( string_ )
+	, _time( HTime::TZ::UTC, static_cast<yaal::i64_t>( 0 ) ) {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
 HInfoMultiVal::HInfoMultiVal( HTime const& time_ )
-	: _type( static_cast<type_mask_t>( TYPE::HTIME ) ),
-	_integer( 0 ), _real( 0 ),
-	_string(), _time( time_ ) {
+	: _type( static_cast<type_mask_t>( TYPE::HTIME ) )
+	, _integer( 0 )
+	, _real( 0 )
+	, _string()
+	, _time( time_ ) {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
 HInfoMultiVal::HInfoMultiVal( HInfoMultiVal const& info_ )
-	: HInfo(), _type( info_._type ),
-	_integer( info_._integer ),
-	_real( info_._real ),
-	_string( info_._string ),
-	_time( info_._time ) {
+	: HInfo()
+	, _type( info_._type )
+	, _integer( info_._integer )
+	, _real( info_._real )
+	, _string( info_._string )
+	, _time( info_._time ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -106,7 +117,7 @@ void HInfoMultiVal::purge( void ) {
 	_integer = 0;
 	_real = 0;
 	_string.clear();
-	_time.set_now();
+	_time.set( 0 );
 	return;
 	M_EPILOG
 }
@@ -188,6 +199,17 @@ HString const& HInfoMultiVal::do_get_string( void ) const {
 
 HTime const& HInfoMultiVal::do_get_time( void ) const {
 	M_PROLOG
+	if ( ! ( _type & static_cast<type_mask_t>( TYPE::HTIME ) ) ) {
+		if ( _type & static_cast<type_mask_t>( TYPE::INT_LONG_LONG ) ) {
+			_time.set( _integer );
+		} else if ( _type & static_cast<type_mask_t>( TYPE::HSTRING ) ) {
+			_time.from_string( _string );
+		} else if ( _type & static_cast<type_mask_t>( TYPE::DOUBLE_LONG ) ) {
+			_time.set( static_cast<int long long>( _real ) );
+		} else {
+			M_ASSERT( ( _time.raw() == 0 ) && ( _type == static_cast<type_mask_t>( TYPE::UNKNOWN ) ) );
+		}
+	}
 	return ( _time );
 	M_EPILOG
 }
