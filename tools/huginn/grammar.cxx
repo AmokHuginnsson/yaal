@@ -107,6 +107,14 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		) >> -( dictLiteralElement >> *( ',' >> dictLiteralElement ) ) >> '}',
 		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MAKE_DICT, _1 ) )
 	);
+	HRule setLiteral(
+		"setLiteral",
+		constant(
+			'{',
+			HRuleBase::action_position_t( hcore::call( &OCompiler::defer_call, _compiler.get(), "set", _1 ) )
+		) >> arg >> *( ',' >> arg ) >> '}',
+		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
+	);
 	HRule parameter(
 		"parameter",
 		regex(
@@ -173,6 +181,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 			>> -( memberAccess >> functionCallOperator )
 		)
 		| ( ( listLiteral | dictLiteral | stringLiteral ) >> -( ( subscriptOperator | memberAccess ) >> dereference ) )
+		| ( setLiteral >> -( memberAccess >> dereference ) )
 		| literalNone | booleanLiteralTrue | booleanLiteralFalse
 		| ( reference >> dereference )
 		| ( lambda >> -( functionCallOperator >> dereference ) )

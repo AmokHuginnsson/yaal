@@ -807,6 +807,19 @@ yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn const* h
 			}
 			str.append( "}" );
 		} break;
+		case ( HHuginn::TYPE::SET ): {
+			HHuginn::HSet const* s( static_cast<HHuginn::HSet const*>( value_.raw() ) );
+			str = "{";
+			bool next( false );
+			for ( HHuginn::value_t const& v : s->value() ) {
+				if ( next ) {
+					str.append( ", " );
+				}
+				next = true;
+				str.append( to_string( v ) );
+			}
+			str.append( "}" );
+		} break;
 		default: {
 			str = value_->get_class()->name();
 		}
