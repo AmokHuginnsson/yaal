@@ -66,14 +66,19 @@ EOF
 
 echo "Generating chagelog for project: \`${PROJECT}'"
 
+HAS_TAGS=0
 git for-each-ref --sort='taggerdate' --format='%(tag)' refs/tags | while read TAG ; do
 	BODY=`git_get_body_from_tag "${TAG}"`
 	if [ ! -z "${BODY}" ] ; then
 		gen_changelog_entry "${TAG}"
 	fi
+	HAS_TAGS=1
 done
 
-LAST_TAG_REV=`git rev-list --tags --max-count=1`
+LAST_TAG_REV=""
+if [ $HAS_TAGS -eq 1 ] ; then
+	LAST_TAG_REV=`git rev-list --tags --max-count=1`
+fi
 HEAD=`git rev-parse HEAD`
 
 if [ "x${HEAD}" != "x${LAST_TAG_REV}" ] ; then
