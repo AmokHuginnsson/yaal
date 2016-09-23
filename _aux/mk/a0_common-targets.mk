@@ -39,6 +39,15 @@ mrproper: clean
 bin:
 	@( DO_RELEASE=1 $(MAKE) ; make clean )
 
+doc: $(DIR_ROOT)/build/doc/$(PRJNAME).1
+
+$(DIR_ROOT)/build/doc/$(PRJNAME).1: $(DIR_ROOT)/build/doc/$(PRJNAME).1.txt
+	a2x -f manpage $(<)
+
+$(DIR_ROOT)/build/doc/$(PRJNAME).1.txt: $(DIR_ROOT)/build/release/$(PRJNAME)/1exec
+	cd $(DIR_ROOT) && mkdir -p $(DIR_ROOT)/build/doc && \
+	$(DIR_ROOT)/_aux/help-to-asciidoc -p $(PRJNAME) -o $(@)
+
 install: all
 	@$(call msg_always,printf "%b\n" "i: you need to become root to do this" && ) \
 	$(if $(CLOU_BIN), $(call invoke,$(INSTALL) -d -m755 $(DIR_BIN) $(foreach clou,$(CLOU_BIN),&& $(INSTALL) -m755 $(clou) $(DIR_BIN)/$(patsubst %$(EXEC_NAME),$(PRJNAME),$(clou)) ) ) && ) \

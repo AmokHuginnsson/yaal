@@ -1,7 +1,6 @@
 SHELL     = /bin/sh
 RELEASE   = $(VERSION).$(SUBVERSION).$(EXTRAVERSION)
 DIR_PKGCONFIG= $(DIR_SHARE)/pkgconfig
-DIR_DOC      = $(DIR_SHARE)/doc/$(PRJNAME)
 DIR_BUILD ?= $(CURDIR)
 FIND      = find
 ARFLAGS   = cr

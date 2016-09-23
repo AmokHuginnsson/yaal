@@ -47,7 +47,7 @@ make purge
 %build
 umask 0077
 %{clearflags}
-make %{?_smp_mflags} debug release doc PREFIX=%{_prefix} SYSCONFDIR=%{_sysconfdir} LIBDIR=%{_libdir} LOCALSTATEDIR=%{_localstatedir}
+make %{?_smp_mflags} debug release doc PREFIX=%{_prefix} SYSCONFDIR=%{_sysconfdir} LIBDIR=%{_libdir} DOCDIR=%{_docdir} MANDIR=%{_mandir} LOCALSTATEDIR=%{_localstatedir}
 
 %install
 rm -rf ${RPM_BUILD_ROOT}

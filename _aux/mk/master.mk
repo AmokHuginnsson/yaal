@@ -48,6 +48,8 @@ build/%/$(1): configure $(1).in
 				$$(if $$(SBINDIR),--sbindir=$$(SBINDIR)) \
 				$$(if $$(DATADIR),--datadir=$$(DATADIR)) \
 				$$(if $$(LIBDIR),--libdir=$$(LIBDIR)) \
+				$$(if $$(DOCDIR),--docdir=$$(DOCDIR)) \
+				$$(if $$(MANDIR),--mandir=$$(MANDIR)) \
 				$$(if $$(INCLUDEDIR),--includedir=$$(INCLUDEDIR)) \
 				$$(if $$(LOCALSTATEDIR),--localstatedir=$$(LOCALSTATEDIR)) \
 				$$(CONFIGURE) | tee -a make.log | awk -v CL="`tput cr;tput dl1`" '{printf CL"%s\r", $$$$0}' ; \
@@ -60,6 +62,8 @@ build/%/$(1): configure $(1).in
 				$$(if $$(SBINDIR),--sbindir=$$(SBINDIR)) \
 				$$(if $$(DATADIR),--datadir=$$(DATADIR)) \
 				$$(if $$(LIBDIR),--libdir=$$(LIBDIR)) \
+				$$(if $$(DOCDIR),--docdir=$$(DOCDIR)) \
+				$$(if $$(MANDIR),--mandir=$$(MANDIR)) \
 				$$(if $$(INCLUDEDIR),--includedir=$$(INCLUDEDIR)) \
 				$$(if $$(LOCALSTATEDIR),--localstatedir=$$(LOCALSTATEDIR)) \
 				$$(CONFIGURE) | tee -a make.log ; \
