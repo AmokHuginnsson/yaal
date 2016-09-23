@@ -17,7 +17,7 @@ def main():
 	parser.add_argument( "-o", "--output", metavar = "path", type = str, required = True, help = "Destination path for result asciidoc file." )
 	args = parser.parse_args()
 	binary = "./build/release/" + args.project + "/1exec"
-	help = subprocess.run( [ binary, "--help" ], check = False, universal_newlines = True, stdout = subprocess.PIPE ).stdout
+	help = subprocess.Popen( [ binary, "--help" ], universal_newlines = True, stdout = subprocess.PIPE ).stdout.read()
 	lines = help.split( "\n" )
 	preamble = []
 	options = []
@@ -110,7 +110,14 @@ def main():
 	authors = set( filter( lambda x : x, subprocess.check_output( [ "git", "log", "--format=%aN <%aE>" ], universal_newlines = True ).split( "\n" ) ) )
 	out.write( ", ".join( list( authors ) ) + "\n\n" )
 	out.write( "RESOURCES\n---------\n" )
-	out.write( subprocess.check_output( [ "git", "remote", "get-url", "origin" ], universal_newlines = True ) + "\n" )
+	remotesRaw = subprocess.check_output( [ "git", "remote", "-v" ], universal_newlines = True )
+	remote = ""
+	for r in remotesRaw.split( "\n" ):
+		w = r.split()
+		if w[0] == "origin":
+			remote = w[1]
+			break
+	out.write( remote + "\n" )
 
 if __name__ == "__main__":
 	try:
