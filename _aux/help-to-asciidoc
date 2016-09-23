@@ -1,0 +1,121 @@
+#! /usr/bin/env python3
+
+import sys
+import subprocess
+import argparse
+
+class Option:
+	def __init__( self_, short_, long_, value_, desc_ ):
+		self_._short = short_
+		self_._long = long_
+		self_._value = value_
+		self_._desc = desc_
+
+def main():
+	parser = argparse.ArgumentParser( description = "Generate asciidoc file based on output of `{prj} --help' call." )
+	parser.add_argument( "-p", "--project", metavar = "name", type = str, required = True, help = "Name of the project to generate asciidoc for." )
+	parser.add_argument( "-o", "--output", metavar = "path", type = str, required = True, help = "Destination path for result asciidoc file." )
+	args = parser.parse_args()
+	binary = "./build/release/" + args.project + "/1exec"
+	help = subprocess.run( [ binary, "--help" ], check = False, universal_newlines = True, stdout = subprocess.PIPE ).stdout
+	lines = help.split( "\n" )
+	preamble = []
+	options = []
+	footer = ""
+	isPreamble = True
+	isOptions = False
+	for l in lines:
+		line = l.strip()
+		optionStart = line.startswith( "-" )
+		if optionStart:
+			isPreamble = False
+			isOptions = True
+		elif isOptions and not l.startswith( " " ):
+			isOptions = False
+		if isPreamble:
+			preamble.append( l )
+		elif isOptions:
+			if optionStart:
+				words = line.split( " " )
+				short = None
+				longFrom = None
+				desc = ""
+				for w in words:
+					if len( desc ) == 0 and w.startswith( "--" ):
+						longFrom = w.strip( "," )
+					elif len( desc ) == 0 and w.startswith( "-" ):
+						short = w.strip( "," )
+					else:
+						desc += ( " " + w )
+				value = None
+				ss = short.split( "=" ) if short else None
+				ls = longFrom.split( "=" ) if longFrom else None
+				if ss and len( ss ) > 1:
+					short = ss[0]
+					value = ss[1]
+				elif ls and len( ls ) > 1:
+					longFrom = ls[0]
+					value = ls[1]
+				if len( desc.strip() ) > 0:
+					options.append( Option( short, longFrom, value, desc.strip() ) )
+				else:
+					o = options[-1]
+					if short:
+						if o._short:
+							o._short += ( ", " + short )
+						else:
+							o._short = short
+					if longFrom:
+						if o._long:
+							o._long += ( ", " + longFrom )
+						else:
+							o._long = longFrom
+			else:
+				options[-1]._desc += ( " " + line )
+		else:
+			footer += ( l + "\n" )
+	usase = preamble[0].replace( binary, args.project )
+	del preamble[0]
+	name = preamble[0].replace( binary, args.project )
+	del preamble[0]
+	if usase.startswith( "Usage: " ):
+		usase = usase[7:]
+
+	out = open( args.output, "w" )
+	out.write( args.project.upper() + "(1)\n" )
+	out.write( "=" * ( len( args.project ) + 3 ) + "\n\n" )
+	out.write( "NAME\n----\n" )
+	out.write( name + "\n\n" )
+	out.write( "SYNOPSIS\n--------\n" )
+	out.write( usase + "\n\n" )
+	out.write( "DESCRIPTION\n-----------" )
+	out.write( "\n".join( preamble[:-1] ) + "\n\n" )
+	if len( options ) > 0:
+		out.write( "OPTIONS\n-------\n" )
+	for o in options:
+		out.write(
+			"*{}{}{}*{}::\n".format(
+				o._short if o._short else "",
+				", " if o._short and o._long else "",
+				o._long if o._long else "",
+				"='" + o._value + "'" if o._value else ""
+			)
+		)
+		out.write( "\t" + o._desc.capitalize() + ( "." if not o._desc.endswith( "." ) else "" ) + "\n\n" )
+
+	if len( footer ) > 1:
+		out.write( footer + "\n" )
+
+	out.write( "AUTHORS\n-------\n" )
+	authors = set( filter( lambda x : x, subprocess.check_output( [ "git", "log", "--format=%aN <%aE>" ], universal_newlines = True ).split( "\n" ) ) )
+	out.write( ", ".join( list( authors ) ) + "\n\n" )
+	out.write( "RESOURCES\n---------\n" )
+	out.write( subprocess.check_output( [ "git", "remote", "get-url", "origin" ], universal_newlines = True ) + "\n" )
+
+if __name__ == "__main__":
+	try:
+		main()
+	except Exception as e:
+		print( e )
+		sys.exit( 1 )
+

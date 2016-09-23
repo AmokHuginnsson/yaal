@@ -48,6 +48,18 @@ install: all
 	$(if $(CLOU_LOCALSTATE), $(call invoke,$(INSTALL) -d -m755 $(DIR_LOCALSTATE)/$(PRJNAME) && $(INSTALL) -m644 $(CLOU_LOCALSTATE) $(DIR_LOCALSTATE)/$(PRJNAME)/ ) && ) \
 	$(if $(CLOU_INCLUDE), $(call invoke,$(INSTALL) -d -m755 $(DIR_HEADERS) && $(INSTALL) -m644 $(CLOU_INCLUDE) $(DIR_HEADERS)/ ) && ) \
 	$(if $(CLOU_DOC), $(call invoke,$(INSTALL) -d -m755 $(DIR_DOC) && $(INSTALL) -m644 $(CLOU_DOC) $(DIR_DOC)/ ) && ) \
+	$(if $(CLOU_BIN), $(call invoke,$(foreach clou,$(CLOU_MAN),$(INSTALL) -d -m755 $(DIR_MAN)/man$(subst .,,$(suffix $(clou))) && $(INSTALL) -m644 $(clou) $(DIR_MAN)/man$(subst .,,$(suffix $(clou)))/ && ) ) ) \
 	$(call msg_always,printf "%b\n" "i: now if you wish you can suid $(DIR_BIN)/$(PRJNAME)" && ) \
 	$(call msg_always,printf "%b$(NL)" "done.$(CL)" )
 
+uninstall:
+	@$(call msg_always,printf "%b\n" "i: you need to become root to do this" && ) \
+	$(if $(CLOU_BIN), $(call invoke,/bin/rm -f $(foreach clou,$(CLOU_BIN),$(DIR_BIN)/$(patsubst %$(EXEC_NAME),$(PRJNAME),$(clou)) ) ) && ) \
+	$(if $(CLOU_LIB), $(call invoke,/bin/rm -f $(addprefix $(DIR_LIB)/,$(notdir $(CLOU_LIB))) ) && ) \
+	$(if $(CLOU_CONF), $(call invoke,/bin/rm -f $(addprefix $(DIR_SYSCONF)/,$(notdir $(CLOU_CONF))) ) && ) \
+	$(if $(CLOU_SHARE), $(call invoke,/bin/rm -rf $(DIR_SHARE)/$(PRJNAME) ) && ) \
+	$(if $(CLOU_LOCALSTATE), $(call invoke,/bin/rm -rf $(DIR_LOCALSTATE)/$(PRJNAME) ) && ) \
+	$(if $(CLOU_INCLUDE), $(call invoke,/bin/rm -fr $(addprefix $(DIR_HEADERS)/,$(notdir $(CLOU_INCLUDE))) ) && ) \
+	$(if $(CLOU_DOC), $(call invoke,/bin/rm -rf $(DIR_DOC) ) && ) \
+	$(if $(CLOU_BIN), $(call invoke,$(foreach clou,$(CLOU_MAN),/bin/rm -f $(DIR_MAN)/man$(subst .,,$(suffix $(clou)))/$(notdir $(clou)) && ) ) ) \
+	$(call msg_always,printf "%b$(NL)" "done.$(CL)" )
