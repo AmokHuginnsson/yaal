@@ -228,6 +228,44 @@ void OCompiler::OClassNoter::note( yaal::hcore::HString const& name_, executing_
 	M_EPILOG
 }
 
+OCompiler::OImportInfo::OImportInfo( void )
+	: _package( INVALID_IDENTIFIER )
+	, _alias( INVALID_IDENTIFIER )
+	, _position( 0 ) {
+	return;
+}
+
+OCompiler::OImportInfo::OImportInfo( OImportInfo&& other_ )
+	: _package( INVALID_IDENTIFIER )
+	, _alias( INVALID_IDENTIFIER )
+	, _position( 0 ) {
+	swap( other_ );
+	return;
+}
+
+OCompiler::OImportInfo& OCompiler::OImportInfo::operator = ( OImportInfo&& other_ ) {
+	_package = yaal::move( other_._package );
+	_alias = yaal::move( other_._alias );
+	_position = yaal::move( other_._position );
+	other_.reset();
+	return ( *this );
+}
+
+void OCompiler::OImportInfo::swap( OImportInfo& other_ ) {
+	using yaal::swap;
+	swap( _package, other_._package );
+	swap( _alias, other_._alias );
+	swap( _position, other_._position );
+	return;
+}
+
+void OCompiler::OImportInfo::reset( void ) {
+	_package = INVALID_IDENTIFIER;
+	_alias = INVALID_IDENTIFIER;
+	_position = 0;
+	return;
+}
+
 OCompiler::OCompiler( HRuntime* runtime_ )
 	: _functionContexts()
 	, _classContext()
@@ -235,13 +273,13 @@ OCompiler::OCompiler( HRuntime* runtime_ )
 	, _classNoter( this )
 	, _submittedClasses()
 	, _submittedImports()
-	, _importIdentifier( INVALID_IDENTIFIER )
-	, _importAlias( INVALID_IDENTIFIER )
+	, _importInfo()
 	, _executionStepsBacklog()
 	, _usedIdentifiers()
 	, _setup( HHuginn::COMPILER::BE_STRICT )
 	, _statementIdGenerator( INVALID_STATEMENT_IDENTIFIER )
 	, _scopeContextCache()
+	, _isModule()
 	, _runtime( runtime_ ) {
 	return;
 }
@@ -267,7 +305,7 @@ void OCompiler::resolve_symbols( void ) {
 			}
 			lastClassId = es._classId;
 		}
-		if ( _submittedImports.find( es._identifier ) != _submittedImports.end() ) {
+		if ( find_if( _submittedImports.begin(), _submittedImports.end(), [&es]( OImportInfo const& info_ ) { return ( info_._package == es._identifier ); } ) != _submittedImports.end() ) {
 			throw HHuginn::HHuginnRuntimeException( "Making a direct reference to a package is forbidden.", es._position );
 		}
 		do {
@@ -471,7 +509,7 @@ void OCompiler::detect_misuse( void ) const {
 		HHuginn::identifier_id_t id( iu.first );
 		OIdentifierUse const& use( iu.second );
 		if ( use._readCount == 0 ) {
-			if ( find( begin( implicitUse ), end( implicitUse ), id ) == end( implicitUse ) ) {
+			if ( ( find( begin( implicitUse ), end( implicitUse ), id ) == end( implicitUse ) ) && ( ! _isModule || ( use._type != OIdentifierUse::TYPE::FUNCTION ) ) ) {
 				throw HHuginn::HHuginnRuntimeException(
 					use_name( use._type )
 						.append( " `" )
@@ -564,20 +602,18 @@ void OCompiler::set_import_name( yaal::hcore::HString const& name_, executing_pa
 	if ( is_restricted( name_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), position_.get() );
 	}
-	HHuginn::identifier_id_t importIdentifer( _runtime->identifier_id( name_ ) );
-	if ( _submittedClasses.count( importIdentifer ) > 0 ) {
+	HHuginn::identifier_id_t importIdentifier( _runtime->identifier_id( name_ ) );
+	if ( _submittedClasses.count( importIdentifier ) > 0 ) {
 		throw HHuginn::HHuginnRuntimeException( "Class `"_ys.append( name_ ).append( "' named is already defined." ), position_.get() );
 	}
-	if ( ! HPackageFactory::get_instance().is_type_valid( name_ ) ) {
-		throw HHuginn::HHuginnRuntimeException( "Package `"_ys.append( name_ ).append( "' does not exist." ), position_.get() );
-	}
-	if ( _submittedImports.find( importIdentifer ) != _submittedImports.end() ) {
+	if ( find_if( _submittedImports.begin(), _submittedImports.end(), [&importIdentifier]( OImportInfo const& info_ ) { return ( info_._package == importIdentifier ); } ) != _submittedImports.end() ) {
 		throw HHuginn::HHuginnRuntimeException(
-			"Package `"_ys.append( _runtime->identifier_name( _importIdentifier ) ).append( "' was already imported." ),
+			"Package `"_ys.append( _runtime->identifier_name( importIdentifier ) ).append( "' was already imported." ),
 			position_.get()
 		);
 	}
-	_importIdentifier = importIdentifer;
+	_importInfo._package = importIdentifier;
+	_importInfo._position = position_.get();
 	return;
 	M_EPILOG
 }
@@ -591,15 +627,13 @@ void OCompiler::set_import_alias( yaal::hcore::HString const& name_, executing_p
 	if ( _submittedClasses.count( importAliasIdentifer ) > 0 ) {
 		throw HHuginn::HHuginnRuntimeException( "Class `"_ys.append( name_ ).append( "' named is already defined." ), position_.get() );
 	}
-	for ( submitted_imports_t::value_type const& i : _submittedImports ) {
-		if ( i.second == importAliasIdentifer ) {
-			throw HHuginn::HHuginnRuntimeException(
-				"Import alias `"_ys.append( _runtime->identifier_name( importAliasIdentifer ) ).append( "' is already defined." ),
-				position_.get()
-			);
-		}
+	if ( find_if( _submittedImports.begin(), _submittedImports.end(), [&importAliasIdentifer]( OImportInfo const& info_ ) { return ( info_._alias == importAliasIdentifer ); } ) != _submittedImports.end() ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"Import alias `"_ys.append( _runtime->identifier_name( importAliasIdentifer ) ).append( "' is already defined." ),
+			position_.get()
+		);
 	}
-	_importAlias = importAliasIdentifer;
+	_importInfo._alias = importAliasIdentifer;
 	_usedIdentifiers[importAliasIdentifer].write( position_.get(), OIdentifierUse::TYPE::PACKAGE );
 	return;
 	M_EPILOG
@@ -607,14 +641,14 @@ void OCompiler::set_import_alias( yaal::hcore::HString const& name_, executing_p
 
 void OCompiler::commit_import( executing_parser::position_t ) {
 	M_PROLOG
-	_submittedImports.insert( make_pair( _importIdentifier, _importAlias ) );
+	_submittedImports.emplace_back( yaal::move( _importInfo ) );
 	return;
 	M_EPILOG
 }
 
 void OCompiler::set_class_name( HHuginn::identifier_id_t identifier_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	if ( _submittedClasses.count( identifier_ ) > 0 ) {
+	if ( ( _submittedClasses.count( identifier_ ) > 0 ) || ( !! _runtime->get_class( identifier_ ) ) ) {
 		throw HHuginn::HHuginnRuntimeException( "Class `"_ys.append( _runtime->identifier_name( identifier_ ) ).append( "' is already defined." ), position_.get() );
 	}
 	_classContext = make_resource<OClassContext>();

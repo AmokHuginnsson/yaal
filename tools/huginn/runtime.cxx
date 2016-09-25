@@ -129,6 +129,24 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 	, _maxLocalVariableCount( 0 ) {
 }
 
+void HRuntime::copy_text( HRuntime const& source_ ) {
+	M_PROLOG
+	M_ASSERT( &source_ != this );
+	_idGenerator = source_._idGenerator;
+	_identifierIds = source_._identifierIds;
+	_identifierNames = source_._identifierNames;
+	_objectFactory = source_._objectFactory;
+	_none = source_._none;
+	_true = source_._true;
+	_false = source_._false;
+	_classes = source_._classes;
+	_functions = source_._functions;
+	_packages = source_._packages;
+	_maxLocalVariableCount = source_._maxLocalVariableCount;
+	return;
+	M_EPILOG
+}
+
 huginn::HThread* HRuntime::current_thread( void ) {
 	M_PROLOG
 	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
@@ -272,6 +290,50 @@ void HRuntime::execute( void ) {
 	_result = call( "main", args, 0 );
 	t->flush_runtime_exception();
 	return;
+	M_EPILOG
+}
+
+namespace {
+namespace package {
+
+HHuginn::value_t value( HHuginn::value_t value_, HString name_, HThread*, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 0, 0, position_ );
+	return ( value_ );
+	M_EPILOG
+}
+
+HHuginn::value_t instance( HHuginn::HClass const* class_, HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	return ( class_->create_instance( thread_, object_, values_, position_ ) );
+	M_EPILOG
+}
+
+}
+}
+
+HHuginn::value_t HRuntime::make_package( yaal::hcore::HString const& name_, HRuntime const& context_ ) {
+	M_PROLOG
+	HHuginn::value_t package;
+	HHuginn::field_definitions_t fds;
+	for ( packages_t::value_type const& p : _packages ) {
+		if ( context_._packages.find( p.first ) == context_._packages.end() ) {
+			fds.emplace_back( identifier_name( p.first ), make_pointer<HHuginn::HClass::HMethod>( hcore::call( &package::value, p.second, identifier_name( p.first ), _1, _2, _3, _4 ) ) );
+		}
+	}
+	for ( classes_t::value_type const& c : _classes ) {
+		if ( context_._classes.find( c.first ) == context_._classes.end() ) {
+			fds.emplace_back( identifier_name( c.first ), make_pointer<HHuginn::HClass::HMethod>( hcore::call( &package::instance, c.second.raw(), _1, _2, _3, _4 ) ) );
+		}
+	}
+	for ( functions_t::value_type const& f : _functions ) {
+		if ( context_._functions.find( f.first ) == context_._functions.end() ) {
+			fds.emplace_back( identifier_name( f.first ), make_pointer<HHuginn::HClass::HMethod>( f.second ) );
+		}
+	}
+	HHuginn::class_t c( create_class( name_, nullptr, fds ) );
+	_huginn->register_class( c );
+	return ( _objectFactory->create_object( c.raw() ) );
 	M_EPILOG
 }
 

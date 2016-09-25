@@ -311,4 +311,7 @@ SYSCONFDIR=`eval echo ${sysconfdir}`
 AC_DEFINE_UNQUOTED([SYSCONFDIR], "${SYSCONFDIR}", [Path to global system configuration directory.])
 LOCALSTATEDIR=`eval echo ${localstatedir}`
 AC_DEFINE_UNQUOTED([LOCALSTATEDIR], "${LOCALSTATEDIR}", [Path to data files which the programs modify while they run.])
+datadir_int=`eval echo ${datadir}`
+DATADIR=`eval echo ${datadir_int}`
+AC_DEFINE_UNQUOTED([DATADIR], "${DATADIR}", [Path to read only application speciffic data files.])
 

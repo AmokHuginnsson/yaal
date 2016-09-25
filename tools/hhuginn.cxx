@@ -33,6 +33,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hhuginn.hxx"
 #include "hcore/hfile.hxx"
 #include "hcore/hlog.hxx"
+#include "tools/stringalgo.hxx"
 #include "tools/huginn/source.hxx"
 #include "tools/huginn/runtime.hxx"
 #include "tools/huginn/objectfactory.hxx"
@@ -68,6 +69,14 @@ main( args ) {
 }
 
 #endif
+
+namespace {
+char const DEFAULT_PATHS[] = DATADIR "/huginn";
+char const* const MODULE_PATHS_RAW( ::getenv( "HUGINNPATH" ) );
+HString MODULE_PATHS_S( MODULE_PATHS_RAW ? hcore::to_string( MODULE_PATHS_RAW ).append( ":" ).append( DEFAULT_PATHS ) : DEFAULT_PATHS );
+
+}
+HHuginn::paths_t const HHuginn::MODULE_PATHS( string::split<HHuginn::paths_t>( MODULE_PATHS_S.raw(), ":", HTokenizer::SKIP_EMPTY ) );
 
 namespace huginn {
 
@@ -263,10 +272,10 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 	class_t cls( _runtime->get_class( identifierId_ ) );
 	OCompiler::OClassContext* cc( _compiler->_submittedClasses.at( identifierId_ ).get() );
 	M_ASSERT( cc->_classIdentifier == identifierId_ );
-	for ( OCompiler::submitted_imports_t::value_type i : _compiler->_submittedImports ) {
-		if ( identifierId_ == i.first ) {
+	for ( OCompiler::submitted_imports_t::value_type const& i : _compiler->_submittedImports ) {
+		if ( identifierId_ == i._package ) {
 			throw HHuginnRuntimeException( "Package of the same name `"_ys.append( name ).append( "' is already imported." ), cc->_position.get() );
-		} else if ( identifierId_ == i.second ) {
+		} else if ( identifierId_ == i._alias ) {
 			throw HHuginnRuntimeException( "Package alias of the same name `"_ys.append( name ).append( "' is already defined." ), cc->_position.get() );
 		}
 	}
@@ -302,10 +311,10 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 	M_EPILOG
 }
 
-void HHuginn::finalize_compilation( compiler_setup_t compilerSetup_ ) {
+void HHuginn::finalize_compilation( paths_t const& paths_, compiler_setup_t compilerSetup_ ) {
 	M_PROLOG
-	for ( OCompiler::submitted_imports_t::value_type i : _compiler->_submittedImports ) {
-		_runtime->register_package( i.second, HPackageFactory::get_instance().create_package( _runtime.raw(), _runtime->identifier_name( i.first ) ) );
+	for ( OCompiler::submitted_imports_t::value_type const& i : _compiler->_submittedImports ) {
+		_runtime->register_package( i._alias, HPackageFactory::get_instance().create_package( _runtime.raw(), paths_, compilerSetup_, _runtime->identifier_name( i._package ), i._position ) );
 	}
 	for ( OCompiler::submitted_classes_t::value_type const& sc : _compiler->_submittedClasses ) {
 		commit_class( sc.first );
@@ -344,7 +353,7 @@ void HHuginn::register_function( identifier_id_t id_ ) {
 	M_EPILOG
 }
 
-bool HHuginn::compile( compiler_setup_t compilerSetup_ ) {
+bool HHuginn::compile( paths_t const& paths_, compiler_setup_t compilerSetup_ ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::PARSED );
 	if ( ( compilerSetup_ & COMPILER::BE_STRICT ) && ( compilerSetup_ & COMPILER::BE_SLOPPY ) ) {
@@ -359,7 +368,7 @@ bool HHuginn::compile( compiler_setup_t compilerSetup_ ) {
 		_engine.execute( &( _compiler->_classNoter ) );
 		_compiler->_classNoter._passThrough = true;
 		_engine.execute();
-		finalize_compilation( compilerSetup_ );
+		finalize_compilation( paths_, compilerSetup_ );
 		_state = STATE::COMPILED;
 		ok = true;
 	} catch ( HHuginnRuntimeException const& e ) {
@@ -367,6 +376,12 @@ bool HHuginn::compile( compiler_setup_t compilerSetup_ ) {
 		_errorPosition = e.position();
 	}
 	return ( ok );
+	M_EPILOG
+}
+
+bool HHuginn::compile( compiler_setup_t compilerSetup_ ) {
+	M_PROLOG
+	return ( compile( paths_t(), compilerSetup_ ) );
 	M_EPILOG
 }
 

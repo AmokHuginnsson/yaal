@@ -69,6 +69,7 @@ class HFunction;
 class HObjectFactory;
 struct OCompiler;
 class HRuntime;
+class HPackageFactory;
 
 namespace ERR_CODE {
 enum {
@@ -134,6 +135,7 @@ public:
 	typedef yaal::hcore::HArray<value_t> values_t;
 	typedef yaal::hcore::HPointer<huginn::HFrame> frame_t;
 	typedef yaal::hcore::HBoundCall<value_t ( huginn::HThread*, value_t*, values_t const&, int )> function_t;
+	typedef yaal::hcore::HArray<yaal::hcore::HString> paths_t;
 	enum class TYPE {
 		NONE,
 		BOOLEAN,
@@ -186,7 +188,6 @@ private:
 	yaal::hcore::HString _errorMessage;
 	int _errorPosition;
 	typedef std::atomic<bool> flag_t;
-	static flag_t _grammarVerified;
 	yaal::hcore::HStreamInterface::ptr_t _inputStream;
 	yaal::hcore::HStreamInterface* _inputStreamRaw;
 	yaal::hcore::HStreamInterface::ptr_t _outputStream;
@@ -195,6 +196,9 @@ private:
 	yaal::hcore::HStreamInterface* _errorStreamRaw;
 	yaal::hcore::HStreamInterface::ptr_t _logStream;
 	yaal::hcore::HStreamInterface* _logStreamRaw;
+	static flag_t _grammarVerified;
+public:
+	static paths_t const MODULE_PATHS;
 public:
 	HHuginn( void );
 	virtual ~HHuginn( void );
@@ -230,6 +234,14 @@ public:
 	 * \return True iff compilation finished with no errors.
 	 */
 	bool compile( compiler_setup_t compilerSetup_ = COMPILER::DEFAULT );
+
+	/*! \brief Compile parsed program.
+	 *
+	 * \param paths_ - paths to Huginn modules directories.
+	 * \param compilerSetup_ - decide how compiler should work.
+	 * \return True iff compilation finished with no errors.
+	 */
+	bool compile( paths_t const& paths_, compiler_setup_t compilerSetup_ = COMPILER::DEFAULT );
 
 	/*! \brief Execute compiled program.
 	 *
@@ -284,12 +296,13 @@ public:
 	static void disable_grammar_verification( void );
 private:
 	huginn::HRuntime const& runtime( void ) const;
-	void finalize_compilation( compiler_setup_t );
+	void finalize_compilation( paths_t const&, compiler_setup_t );
 	HClass const* commit_class( identifier_id_t );
 	char const* error_message( int ) const;
 	HHuginn( HHuginn const& ) = delete;
 	HHuginn& operator = ( HHuginn const& ) = delete;
 	friend yaal::hcore::HString to_string( HHuginn::value_t const&, HHuginn const* );
+	friend class huginn::HPackageFactory;
 };
 
 typedef yaal::hcore::HExceptionT<HHuginn> HHuginnException;

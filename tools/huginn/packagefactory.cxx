@@ -28,6 +28,10 @@ Copyright:
 
 #include "packagefactory.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
+#include "runtime.hxx"
+#include "compiler.hxx"
+#include "hcore/hfile.hxx"
+#include "tools/filesystem.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -80,25 +84,49 @@ void HPackageFactory::register_package_creator( HString const& name_, HPackageCr
 	M_EPILOG
 }
 
-HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, yaal::hcore::HString const& name_ ) {
+HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, HHuginn::paths_t const& paths_, HHuginn::compiler_setup_t compilerSetup_, yaal::hcore::HString const& name_, int position_ ) {
 	M_PROLOG
 	HHuginn::value_t package;
 	creators_t::iterator it = _creators.find( name_ );
 	if ( it != _creators.end() ) {
 		package = it->second._instantiator->new_instance( runtime_ );
+	} else {
+		HHuginn::paths_t paths( paths_ );
+		paths.insert( paths.end(), HHuginn::MODULE_PATHS.begin(), HHuginn::MODULE_PATHS.end() );
+		HString path;
+		HString test;
+		for ( HString const& p : paths ) {
+			test.assign( p ).append( "/" ).append( name_ ).append( ".hgn" );
+			if ( ! p.is_empty() && filesystem::is_regular_file( test ) ) {
+				path = test;
+				break;
+			}
+		}
+		if ( ! path.is_empty() ) {
+			package = load_module( runtime_, paths_, compilerSetup_, path, name_, position_ );
+		} else {
+			throw HHuginn::HHuginnRuntimeException( "Package `"_ys.append( name_ ).append( "' does not exist." ), position_ );
+		}
 	}
 	return ( package );
 	M_EPILOG
 }
 
-bool HPackageFactory::is_type_valid( yaal::hcore::HString const& name_ ) {
+HHuginn::value_t HPackageFactory::load_module( HRuntime* runtime_, HHuginn::paths_t const& paths_, HHuginn::compiler_setup_t compilerSetup_, yaal::hcore::HString const& path_, yaal::hcore::HString const& name_, int position_ ) {
 	M_PROLOG
-	bool valid = false;
-	creators_t::iterator it = _creators.find( name_ );
-	if ( it != _creators.end() ) {
-		valid = true;
+	HFile src( path_, HFile::OPEN::READING );
+	HHuginn loader;
+	HRuntime& rt( const_cast<HRuntime&>( loader.runtime() ) );
+	rt.copy_text( *runtime_ );
+	loader.load( src );
+	loader.preprocess();
+	loader._compiler->_isModule = true;
+	if ( ! ( loader.parse() && loader.compile( paths_, compilerSetup_ ) ) ) {
+		throw HHuginn::HHuginnRuntimeException( loader.error_message(), position_ );
 	}
-	return ( valid );
+	HHuginn::value_t package( rt.make_package( name_, *runtime_ ) );
+	runtime_->copy_text( rt );
+	return ( package );
 	M_EPILOG
 }
 
