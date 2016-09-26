@@ -236,6 +236,9 @@ try {
 			case "LOCALSTATEDIR":
 				LOCALSTATEDIR = parts[1];
 			break;
+			case "DATADIR":
+				DATADIR = parts[1];
+			break;
 			case "FAST":
 				FAST = 1;
 			break;
@@ -248,11 +251,17 @@ try {
 		}
 	}
 
-	if ( SYSCONFDIR.length == 0 )
+	if ( SYSCONFDIR.length == 0 ) {
 		SYSCONFDIR = PREFIX + "/etc";
+	}
 
-	if ( LOCALSTATEDIR.length == 0 )
+	if ( LOCALSTATEDIR.length == 0 ) {
 		LOCALSTATEDIR = PREFIX + "/var";
+	}
+
+	if ( DATADIR.length == 0 ) {
+		DATADIR = PREFIX + "/share";
+	}
 
 	if ( FAST == -1 ) {
 		if ( WScript.FullName.substr( WScript.FullName.length - 11 ).toLowerCase() == "cscript.exe" )
@@ -313,6 +322,7 @@ try {
 		envProc( "PREFIX" ) = PREFIX;
 	envProc( "SYSCONFDIR" ) = SYSCONFDIR;
 	envProc( "LOCALSTATEDIR" ) = LOCALSTATEDIR;
+	envProc( "DATADIR" ) = DATADIR;
 	envProc( "CXX" ) = "";
 	envProc( "CC" ) = "";
 	envProc.remove( "CXX" );

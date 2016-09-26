@@ -77,6 +77,13 @@ else()
 	set( localstatedir "${CMAKE_INSTALL_LOCALSTATEDIR}" )
 endif ()
 
+if ( NOT ( "$ENV{DATADIR}" STREQUAL "" ) )
+	set( CMAKE_INSTALL_FULL_DATADIR  $ENV{DATADIR} CACHE PATH "Path to read only application speciffic data files." FORCE )
+	set( datadir "$ENV{DATADIR}" )
+else()
+	set( datadir "${CMAKE_INSTALL_DATADIR}" )
+endif ()
+
 set( prefix ${CMAKE_INSTALL_PREFIX} )
 set( exec_prefix "\${prefix}" )
 set( libdir "\${prefix}/${CMAKE_INSTALL_LIBDIR}" )
