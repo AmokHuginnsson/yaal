@@ -125,7 +125,8 @@ int main( int argc_, char** argv_ ) {
 		static string const CONFLICTING[] = {
 			"PACKAGE_",
 			"SYSCONFDIR",
-			"LOCALSTATEDIR"
+			"LOCALSTATEDIR",
+			"DATADIR"
 		};
 		char const DEF[] = "define ";
 		static char const LIB_INFIX[] = "define LIB_INFIX";
