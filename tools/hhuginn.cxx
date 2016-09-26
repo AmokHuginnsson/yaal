@@ -26,6 +26,7 @@ Copyright:
 
 #include <libintl.h>
 #include <cstring>
+#include <cstdlib>
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
