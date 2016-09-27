@@ -285,7 +285,7 @@ public:
 	void set_error_stream( yaal::hcore::HStreamInterface::ptr_t );
 	void set_log_stream( yaal::hcore::HStreamInterface& );
 	void set_log_stream( yaal::hcore::HStreamInterface::ptr_t );
-	executing_parser::HRule make_engine( void );
+	executing_parser::HRule make_engine( huginn::HRuntime* = nullptr );
 	yaal::hcore::HStreamInterface& input_stream( void );
 	yaal::hcore::HStreamInterface& output_stream( void );
 	yaal::hcore::HStreamInterface& error_stream( void );
@@ -295,6 +295,7 @@ public:
 	void register_function( identifier_id_t );
 	static void disable_grammar_verification( void );
 private:
+	HHuginn( huginn::HRuntime* );
 	huginn::HRuntime const& runtime( void ) const;
 	void finalize_compilation( paths_t const&, compiler_setup_t );
 	HClass const* commit_class( identifier_id_t );
@@ -396,6 +397,7 @@ public:
 	bool is_complex( void ) const {
 		return ( ! _fieldDefinitions.is_empty() );
 	}
+	void update_runtime( huginn::HRuntime* );
 	huginn::HRuntime* runtime( void ) const {
 		return ( _runtime );
 	}

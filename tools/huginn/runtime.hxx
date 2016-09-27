@@ -150,7 +150,7 @@ public:
 
 	yaal::hcore::HString const& function_name( void const* ) const;
 	void copy_text( HRuntime const& );
-	HHuginn::value_t make_package( yaal::hcore::HString const&, HRuntime const& );
+	HHuginn::class_t make_package( yaal::hcore::HString const&, HRuntime const& );
 private:
 	void register_builtin_function( yaal::hcore::HString const&, function_t&& );
 private:

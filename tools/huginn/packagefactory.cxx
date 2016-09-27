@@ -29,6 +29,7 @@ Copyright:
 #include "packagefactory.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 #include "runtime.hxx"
+#include "objectfactory.hxx"
 #include "compiler.hxx"
 #include "hcore/hfile.hxx"
 #include "tools/filesystem.hxx"
@@ -115,7 +116,7 @@ HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, HHuginn::p
 HHuginn::value_t HPackageFactory::load_module( HRuntime* runtime_, HHuginn::paths_t const& paths_, HHuginn::compiler_setup_t compilerSetup_, yaal::hcore::HString const& path_, yaal::hcore::HString const& name_, int position_ ) {
 	M_PROLOG
 	HFile src( path_, HFile::OPEN::READING );
-	HHuginn loader;
+	HHuginn loader( runtime_ );
 	HRuntime& rt( const_cast<HRuntime&>( loader.runtime() ) );
 	rt.copy_text( *runtime_ );
 	loader.load( src );
@@ -124,9 +125,11 @@ HHuginn::value_t HPackageFactory::load_module( HRuntime* runtime_, HHuginn::path
 	if ( ! ( loader.parse() && loader.compile( paths_, compilerSetup_ ) ) ) {
 		throw HHuginn::HHuginnRuntimeException( loader.error_message(), position_ );
 	}
-	HHuginn::value_t package( rt.make_package( name_, *runtime_ ) );
+	loader._state = HHuginn::STATE::PARSED;
+	HHuginn::class_t c( rt.make_package( name_, *runtime_ ) );
 	runtime_->copy_text( rt );
-	return ( package );
+	runtime_->huginn()->register_class( c );
+	return ( runtime_->object_factory()->create_object( c.raw() ) );
 	M_EPILOG
 }
 

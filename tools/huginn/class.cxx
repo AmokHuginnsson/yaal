@@ -87,6 +87,11 @@ HHuginn::HClass::HClass(
 	M_EPILOG
 }
 
+void HHuginn::HClass::update_runtime( huginn::HRuntime* runtime_ ) {
+	_runtime = runtime_;
+	return;
+}
+
 int HHuginn::HClass::field_index( identifier_id_t identifierId_ ) const {
 	M_PROLOG
 	field_indexes_t::const_iterator it( _fieldIndexes.find( identifierId_ ) );

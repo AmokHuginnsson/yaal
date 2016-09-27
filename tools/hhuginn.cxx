@@ -72,7 +72,7 @@ main( args ) {
 #endif
 
 namespace {
-char const DEFAULT_PATHS[] = DATADIR "/huginn";
+char const DEFAULT_PATHS[] = ".:" DATADIR "/huginn";
 char const* const MODULE_PATHS_RAW( ::getenv( "HUGINNPATH" ) );
 HString MODULE_PATHS_S( MODULE_PATHS_RAW ? hcore::to_string( MODULE_PATHS_RAW ).append( ":" ).append( DEFAULT_PATHS ) : DEFAULT_PATHS );
 
@@ -202,7 +202,30 @@ HHuginn::HHuginn( void )
 	, _runtime( make_resource<HRuntime>( this ) )
 	, _source( make_resource<HSource>() )
 	, _compiler( make_resource<OCompiler>( _runtime.raw() ) )
-	, _engine( make_engine(), _grammarVerified.load() ? HExecutingParser::INIT_MODE::TRUST_GRAMMAR : HExecutingParser::INIT_MODE::VERIFY_GRAMMAR )
+	, _engine( make_engine( _runtime.raw() ), _grammarVerified.load() ? HExecutingParser::INIT_MODE::TRUST_GRAMMAR : HExecutingParser::INIT_MODE::VERIFY_GRAMMAR )
+	, _errorMessage()
+	, _errorPosition( -1 )
+	, _inputStream()
+	, _inputStreamRaw( &cin )
+	, _outputStream()
+	, _outputStreamRaw( &cout )
+	, _errorStream()
+	, _errorStreamRaw( &cerr )
+	, _logStream()
+	, _logStreamRaw( &hcore::log ) {
+	M_PROLOG
+	_grammarVerified.store( true );
+	_runtime->register_builtins();
+	return;
+	M_EPILOG
+}
+
+HHuginn::HHuginn( huginn::HRuntime* runtime_ )
+	: _state( STATE::EMPTY )
+	, _runtime( make_resource<HRuntime>( this ) )
+	, _source( make_resource<HSource>() )
+	, _compiler( make_resource<OCompiler>( _runtime.raw() ) )
+	, _engine( make_engine( runtime_ ), _grammarVerified.load() ? HExecutingParser::INIT_MODE::TRUST_GRAMMAR : HExecutingParser::INIT_MODE::VERIFY_GRAMMAR )
 	, _errorMessage()
 	, _errorPosition( -1 )
 	, _inputStream()

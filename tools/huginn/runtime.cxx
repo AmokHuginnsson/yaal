@@ -135,14 +135,27 @@ void HRuntime::copy_text( HRuntime const& source_ ) {
 	_idGenerator = source_._idGenerator;
 	_identifierIds = source_._identifierIds;
 	_identifierNames = source_._identifierNames;
-	_objectFactory = source_._objectFactory;
-	_none = source_._none;
-	_true = source_._true;
-	_false = source_._false;
-	_classes = source_._classes;
-	_functions = source_._functions;
+	/*
+	 * Order matters.
+	 * Must be the same as order of destruction from HRuntime class destructor.
+	 */
+	_result = source_._result;
+	_argv = source_._argv;
 	_packages = source_._packages;
+	_threads = source_._threads;
+	_functions = source_._functions;
+	_classes = source_._classes;
+	for ( classes_t::value_type const& c : _classes ) {
+		_huginn->register_class( c.second );
+	}
+	_false = source_._false;
+	_true = source_._true;
+	_none = source_._none;
+	_objectFactory = source_._objectFactory;
 	_maxLocalVariableCount = source_._maxLocalVariableCount;
+	for ( classes_t::value_type& c : _classes ) {
+		c.second->update_runtime( this );
+	}
 	return;
 	M_EPILOG
 }
@@ -296,7 +309,7 @@ void HRuntime::execute( void ) {
 namespace {
 namespace package {
 
-HHuginn::value_t value( HHuginn::value_t value_, HString name_, HThread*, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t value( yaal::hcore::HPointerObserver<HHuginn::HValue> value_, HString name_, HThread*, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( name_, values_, 0, 0, position_ );
 	return ( value_ );
@@ -312,13 +325,13 @@ HHuginn::value_t instance( HHuginn::HClass const* class_, HThread* thread_, HHug
 }
 }
 
-HHuginn::value_t HRuntime::make_package( yaal::hcore::HString const& name_, HRuntime const& context_ ) {
+HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRuntime const& context_ ) {
 	M_PROLOG
 	HHuginn::value_t package;
 	HHuginn::field_definitions_t fds;
 	for ( packages_t::value_type const& p : _packages ) {
 		if ( context_._packages.find( p.first ) == context_._packages.end() ) {
-			fds.emplace_back( identifier_name( p.first ), make_pointer<HHuginn::HClass::HMethod>( hcore::call( &package::value, p.second, identifier_name( p.first ), _1, _2, _3, _4 ) ) );
+			fds.emplace_back( identifier_name( p.first ), make_pointer<HHuginn::HClass::HMethod>( hcore::call( &package::value, yaal::hcore::HPointerObserver<HHuginn::HValue>( p.second ), identifier_name( p.first ), _1, _2, _3, _4 ) ) );
 		}
 	}
 	for ( classes_t::value_type const& c : _classes ) {
@@ -333,7 +346,7 @@ HHuginn::value_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 	}
 	HHuginn::class_t c( create_class( name_, nullptr, fds ) );
 	_huginn->register_class( c );
-	return ( _objectFactory->create_object( c.raw() ) );
+	return ( c );
 	M_EPILOG
 }
 
