@@ -44,7 +44,6 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/huginn/compiler.hxx"
 #include "tools/huginn/iterator.hxx"
 #include "tools/huginn/keyword.hxx"
-#include "tools/huginn/packagefactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -338,7 +337,7 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 void HHuginn::finalize_compilation( paths_t const& paths_, compiler_setup_t compilerSetup_ ) {
 	M_PROLOG
 	for ( OCompiler::submitted_imports_t::value_type const& i : _compiler->_submittedImports ) {
-		_runtime->register_package( i._alias, HPackageFactory::get_instance().create_package( _runtime.raw(), paths_, compilerSetup_, _runtime->identifier_name( i._package ), i._position ) );
+		_runtime->register_package( i._package, i._alias, paths_, compilerSetup_, i._position );
 	}
 	for ( OCompiler::submitted_classes_t::value_type const& sc : _compiler->_submittedClasses ) {
 		commit_class( sc.first );

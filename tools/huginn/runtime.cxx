@@ -34,6 +34,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "value_builtin.hxx"
 #include "helper.hxx"
 #include "compiler.hxx"
+#include "packagefactory.hxx"
 #include "tools/util.hxx"
 #include "tools/streamtools.hxx"
 #include "tools/stringalgo.hxx"
@@ -120,9 +121,9 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 	, _none( make_pointer<HHuginn::HValue>( &_noneClass_ ) )
 	, _true( _objectFactory->create_boolean( true ) )
 	, _false( _objectFactory->create_boolean( false ) )
-	, _classes()
-	, _functions()
 	, _threads()
+	, _functions()
+	, _classes()
 	, _packages()
 	, _argv( _objectFactory->create_list() )
 	, _result()
@@ -142,18 +143,16 @@ void HRuntime::copy_text( HRuntime const& source_ ) {
 	_result = source_._result;
 	_argv = source_._argv;
 	_packages = source_._packages;
-	_threads = source_._threads;
-	_functions = source_._functions;
 	_classes = source_._classes;
-	for ( classes_t::value_type const& c : _classes ) {
-		_huginn->register_class( c.second );
-	}
+	_functions = source_._functions;
+	_threads = source_._threads;
 	_false = source_._false;
 	_true = source_._true;
 	_none = source_._none;
 	_objectFactory = source_._objectFactory;
 	_maxLocalVariableCount = source_._maxLocalVariableCount;
 	for ( classes_t::value_type& c : _classes ) {
+		_huginn->register_class( c.second );
 		c.second->update_runtime( this );
 	}
 	return;
@@ -230,9 +229,19 @@ void HRuntime::register_function( identifier_id_t identifier_, function_t functi
 	M_EPILOG
 }
 
-void HRuntime::register_package( identifier_id_t identifier_, value_t package_ ) {
+void HRuntime::register_package( identifier_id_t package_, identifier_id_t alias_, HHuginn::paths_t const& paths_, HHuginn::compiler_setup_t compilerSetup_, int position_ ) {
 	M_PROLOG
-	_packages.insert( make_pair( identifier_, package_ ) );
+	HHuginn::value_t package;
+	for ( packages_t::value_type const& p : _packages ) {
+		if ( p.second->get_class()->identifier_id() == package_ ) {
+			package = p.second;
+			break;
+		}
+	}
+	if ( ! package ) {
+		package = HPackageFactory::get_instance().create_package( this, paths_, compilerSetup_, identifier_name( package_ ), position_ );
+	}
+	_packages.insert( make_pair( alias_, package ) );
 	return;
 	M_EPILOG
 }
@@ -309,7 +318,7 @@ void HRuntime::execute( void ) {
 namespace {
 namespace package {
 
-HHuginn::value_t value( yaal::hcore::HPointerObserver<HHuginn::HValue> value_, HString name_, HThread*, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t value( HHuginn::value_t value_, HString name_, HThread*, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( name_, values_, 0, 0, position_ );
 	return ( value_ );
@@ -327,11 +336,14 @@ HHuginn::value_t instance( HHuginn::HClass const* class_, HThread* thread_, HHug
 
 HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRuntime const& context_ ) {
 	M_PROLOG
-	HHuginn::value_t package;
 	HHuginn::field_definitions_t fds;
-	for ( packages_t::value_type const& p : _packages ) {
-		if ( context_._packages.find( p.first ) == context_._packages.end() ) {
-			fds.emplace_back( identifier_name( p.first ), make_pointer<HHuginn::HClass::HMethod>( hcore::call( &package::value, yaal::hcore::HPointerObserver<HHuginn::HValue>( p.second ), identifier_name( p.first ), _1, _2, _3, _4 ) ) );
+	/* Erasing from lookup invalidated .end() */
+	for ( packages_t::iterator it( _packages.begin() ); it != _packages.end(); ) {
+		if ( context_._packages.find( it->first ) == context_._packages.end() ) {
+			fds.emplace_back( identifier_name( it->first ), make_pointer<HHuginn::HClass::HMethod>( hcore::call( &package::value, it->second, identifier_name( it->first ), _1, _2, _3, _4 ) ) );
+			it = _packages.erase( it );
+		} else {
+			++ it;
 		}
 	}
 	for ( classes_t::value_type const& c : _classes ) {
@@ -339,9 +351,13 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 			fds.emplace_back( identifier_name( c.first ), make_pointer<HHuginn::HClass::HMethod>( hcore::call( &package::instance, c.second.raw(), _1, _2, _3, _4 ) ) );
 		}
 	}
-	for ( functions_t::value_type const& f : _functions ) {
-		if ( context_._functions.find( f.first ) == context_._functions.end() ) {
-			fds.emplace_back( identifier_name( f.first ), make_pointer<HHuginn::HClass::HMethod>( f.second ) );
+	/* Erasing from lookup invalidated .end() */
+	for ( functions_t::iterator it( _functions.begin() ); it != _functions.end(); ) {
+		if ( context_._functions.find( it->first ) == context_._functions.end() ) {
+			fds.emplace_back( identifier_name( it->first ), make_pointer<HHuginn::HClass::HMethod>( it->second ) );
+			it = _functions.erase( it );
+		} else {
+			++ it;
 		}
 	}
 	HHuginn::class_t c( create_class( name_, nullptr, fds ) );

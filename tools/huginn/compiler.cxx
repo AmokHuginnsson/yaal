@@ -428,7 +428,7 @@ void OCompiler::resolve_symbols( void ) {
 							&HExpression::store_function,
 							es._expression.raw(),
 							es._identifier,
-							callable,
+							*callable,
 							_1,
 							es._position
 						)

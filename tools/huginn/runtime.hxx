@@ -71,9 +71,9 @@ private:
 	value_t _none;
 	value_t _true;
 	value_t _false;
-	classes_t _classes;
-	functions_t _functions;
 	threads_t _threads;
+	functions_t _functions;
+	classes_t _classes;
 	packages_t _packages;
 	HHuginn::list_t _argv;
 	value_t _result;
@@ -108,7 +108,7 @@ public:
 	value_t* get_package( identifier_id_t );
 	void register_class_low( class_t );
 	void register_function( identifier_id_t, function_t );
-	void register_package( identifier_id_t, value_t );
+	void register_package( identifier_id_t, identifier_id_t, HHuginn::paths_t const&, HHuginn::compiler_setup_t, int );
 	class_t create_class( identifier_id_t, HHuginn::HClass const*, field_definitions_t const& );
 	class_t create_class( yaal::hcore::HString const&, HHuginn::HClass const*, field_definitions_t const& );
 	class_t create_class( class_constructor_t const& );
