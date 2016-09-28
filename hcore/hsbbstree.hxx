@@ -204,12 +204,13 @@ public:
 			M_THROW( _errMsgHSBBSTree_[ ERROR::NIL_ITERATOR ],
 					static_cast<int>( ERROR::NIL_ITERATOR ) );
 		}
+		HIterator it( it_ );
+		++ it;
 		remove_node( it_._current );
 		HNode* node( static_cast<HNode*>( it_._current ) );
 		M_SAFE( node->~HNode() );
 		_allocator.deallocate( node, 1 );
-		HIterator it( it_ );
-		return ( ++ it );
+		return ( it );
 		M_EPILOG
 	}
 	HIterator find( key_type const& key_ ) const {
