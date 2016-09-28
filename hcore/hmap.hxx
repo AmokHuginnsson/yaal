@@ -193,15 +193,14 @@ public:
 	}
 	iterator erase( iterator const& it ) {
 		M_PROLOG
-		iterator newIt( it );
-		++ newIt;
-		_engine.remove( it._engine );
-		return ( newIt );
+		return ( iterator( _engine.remove( it._engine ) ) );
 		M_EPILOG
 	}
 	iterator erase( iterator first_, iterator const& last_ ) {
 		M_PROLOG
-		while ( first_ != last_ ) {
+		iterator it( first_ );
+		while ( it != last_ ) {
+			++ it;
 			first_ = erase( first_ );
 		}
 		return ( first_ );

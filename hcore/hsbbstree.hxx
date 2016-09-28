@@ -198,7 +198,7 @@ public:
 	void insert( HIterator const& pos_, key_value_type&& key_, bool forceHint_ ) {
 		insert_impl( constructor_move( key_ ), verify_hint( key_get_type::key( key_ ), pos_, forceHint_ ) );
 	}
-	void remove( HIterator const& it_ ) {
+	HIterator remove( HIterator it_ ) {
 		M_PROLOG
 		if ( ! it_._current ) {
 			M_THROW( _errMsgHSBBSTree_[ ERROR::NIL_ITERATOR ],
@@ -208,7 +208,7 @@ public:
 		HNode* node( static_cast<HNode*>( it_._current ) );
 		M_SAFE( node->~HNode() );
 		_allocator.deallocate( node, 1 );
-		return;
+		return ( ++ it_ );
 		M_EPILOG
 	}
 	HIterator find( key_type const& key_ ) const {

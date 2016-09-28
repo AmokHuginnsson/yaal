@@ -138,10 +138,10 @@ public:
 		return ( make_pair( it, ! existed ) );
 		M_EPILOG
 	}
-	void remove( iterator_type const& it_ ) {
+	iterator_type remove( iterator_type const& it_ ) {
 		M_PROLOG
 		_data.erase( it_ );
-		return;
+		return ( it_ );
 		M_EPILOG
 	}
 	iterator_type find( key_type const& key_ ) const {
