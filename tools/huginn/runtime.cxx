@@ -130,7 +130,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 	, _maxLocalVariableCount( 0 ) {
 }
 
-void HRuntime::copy_text( HRuntime const& source_ ) {
+void HRuntime::copy_text( HRuntime& source_ ) {
 	M_PROLOG
 	M_ASSERT( &source_ != this );
 	_idGenerator = source_._idGenerator;
@@ -144,6 +144,9 @@ void HRuntime::copy_text( HRuntime const& source_ ) {
 	_argv = source_._argv;
 	_packages = source_._packages;
 	_classes = source_._classes;
+	using yaal::swap;
+	swap( _functions, source_._functions );
+	source_._functions = _functions;
 	_functions = source_._functions;
 	_threads = source_._threads;
 	_false = source_._false;

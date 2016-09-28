@@ -149,7 +149,7 @@ public:
 	yaal::hcore::HString suggestion( HHuginn::identifier_id_t ) const;
 
 	yaal::hcore::HString const& function_name( void const* ) const;
-	void copy_text( HRuntime const& );
+	void copy_text( HRuntime& );
 	HHuginn::class_t make_package( yaal::hcore::HString const&, HRuntime const& );
 private:
 	void register_builtin_function( yaal::hcore::HString const&, function_t&& );
