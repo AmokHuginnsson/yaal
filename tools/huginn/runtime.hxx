@@ -52,7 +52,14 @@ private:
 	typedef yaal::hcore::HPointer<huginn::HObjectFactory> object_factory_t;
 	typedef yaal::hcore::HLookupMap<identifier_id_t, class_t> classes_t;
 	typedef yaal::hcore::HLookupMap<identifier_id_t, value_t> packages_t;
-	typedef yaal::hcore::HLookupMap<identifier_id_t, function_t> functions_t;
+	/*! \brief A type for storing functions.
+	 *
+	 * Symbol resolving stores pointers to map values (function_t*),
+	 * so we cannot use HLookupMap here as adding and removing entries
+	 * to HLookupMap invalidates old pointers.
+	 */
+	typedef yaal::hcore::HHashMap<identifier_id_t, function_t> functions_store_t;
+	typedef yaal::hcore::HHashSet<identifier_id_t> functions_available_t;
 public:
 	typedef yaal::hcore::HArray<yaal::hcore::HString> identifier_names_t;
 	typedef yaal::hcore::HBoundCall<HHuginn::class_t ( type_id_t )> class_constructor_t;
@@ -72,7 +79,26 @@ private:
 	value_t _true;
 	value_t _false;
 	threads_t _threads;
-	functions_t _functions;
+	/*
+	 * 1.
+	 * Resolved function references are kept by naked/weak/dumb pointer (function_t*) in runtime.
+	 * They must be kept by weak reference to avoid self-referecing cyctle of smart pointers
+	 * in case of recusive call chain: `foo() { foo(); }'.
+	 *
+	 * 2.
+	 * Loading sub-module involves independed symbol resolving stage at end of compilation
+	 * of given submodule.
+	 *
+	 * 3.
+	 * Function definitions loaded from sub-module must not be available in current global namespace.
+	 *
+	 * Because of 1 and 2 we need to have single function definition store shared by all sub-modules.
+	 * Because of 3 we need to keep track which functions are defined in current module only.
+	 *
+	 * Hence use of _functionsStore and _functionsAvailable.
+	 */
+	functions_store_t _functionsStore; /*!< All function ever defined in all sub-modules. */
+	functions_available_t _functionsAvailable; /*!< Functions available in current module context. */
 	classes_t _classes;
 	packages_t _packages;
 	HHuginn::list_t _argv;

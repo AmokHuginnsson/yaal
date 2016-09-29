@@ -122,7 +122,8 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 	, _true( _objectFactory->create_boolean( true ) )
 	, _false( _objectFactory->create_boolean( false ) )
 	, _threads()
-	, _functions()
+	, _functionsStore()
+	, _functionsAvailable()
 	, _classes()
 	, _packages()
 	, _argv( _objectFactory->create_list() )
@@ -145,9 +146,7 @@ void HRuntime::copy_text( HRuntime& source_ ) {
 	_packages = source_._packages;
 	_classes = source_._classes;
 	using yaal::swap;
-	swap( _functions, source_._functions );
-	source_._functions = _functions;
-	_functions = source_._functions;
+	swap( _functionsStore, source_._functionsStore );
 	_threads = source_._threads;
 	_false = source_._false;
 	_true = source_._true;
@@ -183,9 +182,8 @@ HHuginn::value_t HRuntime::result( void ) const {
 HHuginn::function_t* HRuntime::get_function( identifier_id_t identifierId_ ) {
 	M_PROLOG
 	HHuginn::function_t* f( nullptr );
-	functions_t::iterator fi( _functions.find( identifierId_ ) );
-	if ( fi != _functions.end() ) {
-		f = &( fi->second );
+	if ( _functionsAvailable.count( identifierId_ ) > 0 ) {
+		f = &_functionsStore.at( identifierId_ );
 	}
 	return ( f );
 	M_EPILOG
@@ -220,14 +218,16 @@ void HRuntime::set_max_local_variable_count( int maxLocalVariableCount_ ) {
 void HRuntime::register_class_low( class_t class_ ) {
 	M_PROLOG
 	_classes.insert( make_pair( class_->identifier_id(), class_ ) );
-	_functions.insert( make_pair( class_->identifier_id(), hcore::call( &HHuginn::HClass::create_instance, class_.raw(), _1, _2, _3, _4 ) ) );
+	_functionsStore.insert( make_pair( class_->identifier_id(), hcore::call( &HHuginn::HClass::create_instance, class_.raw(), _1, _2, _3, _4 ) ) );
+	_functionsAvailable.insert( class_->identifier_id() );
 	return;
 	M_EPILOG
 }
 
 void HRuntime::register_function( identifier_id_t identifier_, function_t function_ ) {
 	M_PROLOG
-	_functions.insert( make_pair( identifier_, function_ ) );
+	_functionsStore.insert( make_pair( identifier_, function_ ) );
+	_functionsAvailable.insert( identifier_ );
 	return;
 	M_EPILOG
 }
@@ -354,13 +354,9 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 			fds.emplace_back( identifier_name( c.first ), make_pointer<HHuginn::HClass::HMethod>( hcore::call( &package::instance, c.second.raw(), _1, _2, _3, _4 ) ) );
 		}
 	}
-	/* Erasing from lookup invalidated .end() */
-	for ( functions_t::iterator it( _functions.begin() ); it != _functions.end(); ) {
-		if ( context_._functions.find( it->first ) == context_._functions.end() ) {
-			fds.emplace_back( identifier_name( it->first ), make_pointer<HHuginn::HClass::HMethod>( it->second ) );
-			it = _functions.erase( it );
-		} else {
-			++ it;
+	for ( functions_available_t::value_type const& fi : _functionsAvailable ) {
+		if ( context_._functionsAvailable.find( fi ) == context_._functionsAvailable.end() ) {
+			fds.emplace_back( identifier_name( fi ), make_pointer<HHuginn::HClass::HMethod>( _functionsStore.at( fi ) ) );
 		}
 	}
 	HHuginn::class_t c( create_class( name_, nullptr, fds ) );
@@ -371,13 +367,13 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 
 HHuginn::value_t HRuntime::call( yaal::hcore::HString const& name_, values_t const& values_, int position_ ) {
 	M_PROLOG
-	functions_t::const_iterator f( _functions.find( identifier_id( name_ ) ) );
+	HHuginn::identifier_id_t identifier( identifier_id( name_ ) );
 	value_t res;
-	if ( f != _functions.end() ) {
+	if ( _functionsAvailable.count( identifier ) > 0 ) {
 		yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
 		threads_t::iterator t( _threads.find( threadId ) );
 		M_ASSERT( t != _threads.end() );
-		res = f->second( t->second.raw(), nullptr, values_, position_ );
+		res = _functionsStore.at( identifier )( t->second.raw(), nullptr, values_, position_ );
 	} else {
 		throw HHuginn::HHuginnRuntimeException( "Function `"_ys.append( name_ ).append( "(...)' is not defined." ), position_ );
 	}
@@ -647,7 +643,8 @@ void HRuntime::register_builtin_function( yaal::hcore::HString const& name_, fun
 	M_PROLOG
 	identifier_id_t id( identifier_id( name_ ) );
 	_huginn->register_function( id );
-	_functions.insert( make_pair( id, yaal::move( function_ ) ) );
+	_functionsStore.insert( make_pair( id, yaal::move( function_ ) ) );
+	_functionsAvailable.insert( id );
 	return;
 	M_EPILOG
 }
@@ -799,8 +796,8 @@ void HRuntime::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) {
 	for ( classes_t::value_type const& c : _classes ) {
 		stream_ << *c.second << endl;
 	}
-	for ( functions_t::value_type const& f : _functions ) {
-		yaal::hcore::HString const& name( identifier_name( f.first ) );
+	for ( functions_available_t::value_type const& f : _functionsAvailable ) {
+		yaal::hcore::HString const& name( identifier_name( f ) );
 		stream_ << "function: " << name;
 		if ( _debugLevel_ >= DEBUG_LEVEL::VERBOSE_MESSAGES ) {
 			if ( _builtin_.count( name ) > 0 ) {
@@ -836,7 +833,7 @@ yaal::hcore::HString const& HRuntime::function_name( void const* id_ ) const {
 	M_PROLOG
 	static yaal::hcore::HString const unknown( "unknown" );
 	yaal::hcore::HString const* name( &unknown );
-	for ( functions_t::value_type const& f : _functions ) {
+	for ( functions_store_t::value_type const& f : _functionsStore ) {
 		if ( f.second.id() == id_ ) {
 			name = &identifier_name( f.first );
 			break;
