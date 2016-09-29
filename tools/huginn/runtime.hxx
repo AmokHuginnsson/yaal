@@ -60,6 +60,7 @@ private:
 	 */
 	typedef yaal::hcore::HHashMap<identifier_id_t, function_t> functions_store_t;
 	typedef yaal::hcore::HHashSet<identifier_id_t> functions_available_t;
+	typedef yaal::hcore::HArray<HHuginn::class_t> dependencies_t;
 public:
 	typedef yaal::hcore::HArray<yaal::hcore::HString> identifier_names_t;
 	typedef yaal::hcore::HBoundCall<HHuginn::class_t ( type_id_t )> class_constructor_t;
@@ -99,6 +100,7 @@ private:
 	 */
 	functions_store_t _functionsStore; /*!< All function ever defined in all sub-modules. */
 	functions_available_t _functionsAvailable; /*!< Functions available in current module context. */
+	dependencies_t _dependencies;
 	classes_t _classes;
 	packages_t _packages;
 	HHuginn::list_t _argv;
@@ -129,10 +131,10 @@ public:
 	}
 	identifier_id_t identifier_id( yaal::hcore::HString const& );
 	yaal::hcore::HString const& identifier_name( identifier_id_t ) const;
-	function_t* get_function( identifier_id_t );
+	function_t* get_function( identifier_id_t, bool = false );
 	class_t get_class( identifier_id_t );
 	value_t* get_package( identifier_id_t );
-	void register_class_low( class_t );
+	void register_class_low( class_t, bool );
 	void register_function( identifier_id_t, function_t );
 	void register_package( identifier_id_t, identifier_id_t, HHuginn::paths_t const&, HHuginn::compiler_setup_t, int );
 	class_t create_class( identifier_id_t, HHuginn::HClass const*, field_definitions_t const& );

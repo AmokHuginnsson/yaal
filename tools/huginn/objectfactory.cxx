@@ -131,8 +131,6 @@ HObjectFactory::HObjectFactory( HRuntime* runtime_ )
 void HObjectFactory::register_builtin_classes( void ) {
 	M_PROLOG
 	_exception = exception::get_class( _runtime );
-	_conversionException = exception::create_class( _runtime, "ConversionException", _exception.raw() );
-	_arithmeticException = exception::create_class( _runtime, "ArithmeticException", _exception.raw() );
 
 	_runtime->huginn()->register_class( _boolean );
 	_runtime->huginn()->register_class( _integer );
@@ -146,9 +144,11 @@ void HObjectFactory::register_builtin_classes( void ) {
 	_runtime->huginn()->register_class( _order );
 	_runtime->huginn()->register_class( _lookup );
 	_runtime->huginn()->register_class( _set );
-	_runtime->huginn()->register_class( _exception );
-	_runtime->huginn()->register_class( _conversionException );
-	_runtime->huginn()->register_class( _arithmeticException );
+
+	_runtime->huginn()->register_class( _exception, true );
+
+	_conversionException = exception::create_class( _runtime, "ConversionException", _exception.raw() );
+	_arithmeticException = exception::create_class( _runtime, "ArithmeticException", _exception.raw() );
 	return;
 	M_EPILOG
 }

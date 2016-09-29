@@ -124,6 +124,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 	, _threads()
 	, _functionsStore()
 	, _functionsAvailable()
+	, _dependencies()
 	, _classes()
 	, _packages()
 	, _argv( _objectFactory->create_list() )
@@ -145,6 +146,7 @@ void HRuntime::copy_text( HRuntime& source_ ) {
 	_argv = source_._argv;
 	_packages = source_._packages;
 	_classes = source_._classes;
+	_dependencies = source_._dependencies;
 	using yaal::swap;
 	swap( _functionsStore, source_._functionsStore );
 	_threads = source_._threads;
@@ -153,9 +155,9 @@ void HRuntime::copy_text( HRuntime& source_ ) {
 	_none = source_._none;
 	_objectFactory = source_._objectFactory;
 	_maxLocalVariableCount = source_._maxLocalVariableCount;
-	for ( classes_t::value_type& c : _classes ) {
-		_huginn->register_class( c.second );
-		c.second->update_runtime( this );
+	for ( dependencies_t::value_type& c : _dependencies ) {
+		_huginn->register_class( c );
+		c->update_runtime( this );
 	}
 	return;
 	M_EPILOG
@@ -179,10 +181,10 @@ HHuginn::value_t HRuntime::result( void ) const {
 	return ( _result );
 }
 
-HHuginn::function_t* HRuntime::get_function( identifier_id_t identifierId_ ) {
+HHuginn::function_t* HRuntime::get_function( identifier_id_t identifierId_, bool fromAll_ ) {
 	M_PROLOG
 	HHuginn::function_t* f( nullptr );
-	if ( _functionsAvailable.count( identifierId_ ) > 0 ) {
+	if ( fromAll_ || ( _functionsAvailable.count( identifierId_ ) > 0 ) ) {
 		f = &_functionsStore.at( identifierId_ );
 	}
 	return ( f );
@@ -215,11 +217,15 @@ void HRuntime::set_max_local_variable_count( int maxLocalVariableCount_ ) {
 	M_EPILOG
 }
 
-void HRuntime::register_class_low( class_t class_ ) {
+void HRuntime::register_class_low( class_t class_, bool registerContructor_ ) {
 	M_PROLOG
-	_classes.insert( make_pair( class_->identifier_id(), class_ ) );
-	_functionsStore.insert( make_pair( class_->identifier_id(), hcore::call( &HHuginn::HClass::create_instance, class_.raw(), _1, _2, _3, _4 ) ) );
-	_functionsAvailable.insert( class_->identifier_id() );
+	if ( _classes.insert( make_pair( class_->identifier_id(), class_ ) ).second ) {
+		_dependencies.push_back( class_ );
+		_functionsStore.insert( make_pair( class_->identifier_id(), hcore::call( &HHuginn::HClass::create_instance, class_.raw(), _1, _2, _3, _4 ) ) );
+	}
+	if ( registerContructor_ ) {
+		_functionsAvailable.insert( class_->identifier_id() );
+	}
 	return;
 	M_EPILOG
 }
@@ -467,7 +473,7 @@ HHuginn::value_t type( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 	verify_arg_count( "type", values_, 1, 1, position_ );
 	HHuginn::HValue const* v( values_.front().raw() );
 	HHuginn::identifier_id_t id( v->get_class()->identifier_id() );
-	HHuginn::function_t* f( thread_->runtime().get_function( id ) );
+	HHuginn::function_t* f( thread_->runtime().get_function( id, true ) );
 	return ( thread_->object_factory().create_function_reference( id, *f ) );
 	M_EPILOG
 }

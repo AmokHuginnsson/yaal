@@ -61,7 +61,6 @@ public:
 		, _streamClass( HStream::get_class( class_->runtime() ) )
 		, _exceptionClass( exception::create_class( class_->runtime(), "NetworkException" ) ) {
 		class_->runtime()->huginn()->register_class( _streamClass );
-		class_->runtime()->huginn()->register_class( _exceptionClass );
 		return;
 	}
 	static HHuginn::value_t resolve( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {

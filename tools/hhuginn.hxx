@@ -291,7 +291,7 @@ public:
 	yaal::hcore::HStreamInterface& error_stream( void );
 	yaal::hcore::HStreamInterface& log_stream( void );
 	yaal::hcore::HString get_snippet( int, int ) const;
-	void register_class( class_t );
+	void register_class( class_t, bool = false );
 	void register_function( identifier_id_t );
 	static void disable_grammar_verification( void );
 private:
