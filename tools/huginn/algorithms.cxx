@@ -30,12 +30,13 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
 #include "hcore/safe_cast.hxx"
 #include "runtime.hxx"
-#include "iterator.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
 #include "value_builtin.hxx"
 #include "packagefactory.hxx"
 #include "objectfactory.hxx"
+#include "range.hxx"
+#include "mapper.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -46,169 +47,6 @@ namespace yaal {
 namespace tools {
 
 namespace huginn {
-
-class HRange : public HHuginn::HIterable {
-	int long long _from;
-	int long long _stop;
-	int long long _step;
-public:
-	HRange( HHuginn::HClass const* class_, int long long from_, int long long stop_, int long long step_ )
-		: HIterable( class_ )
-		, _from( from_ )
-		, _stop( stop_ )
-		, _step( step_ ) {
-	}
-	int long long step( void ) const {
-		return ( _step );
-	}
-	int long long stop( void ) const {
-		return ( _stop );
-	}
-	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
-		M_PROLOG
-		return (
-			runtime_->create_class(
-				"Range",
-				nullptr,
-				HHuginn::field_definitions_t{}
-			)
-		);
-		M_EPILOG
-	}
-protected:
-	virtual int long do_size( void ) const override {
-		return ( safe_cast<int long>( ( _stop + _step - ( _from + 1 ) ) / _step ) );
-	}
-private:
-	virtual HIterator do_iterator( void ) override;
-private:
-	virtual HHuginn::value_t do_clone( huginn::HRuntime* ) const override {
-		return ( make_pointer<HRange>( HIterable::get_class(), _from, _stop, _step ) );
-	}
-};
-
-class HRangeIterator : public HIteratorInterface {
-	int long long _i;
-	HRange const* _range;
-	HObjectFactory* _objectFactory;
-public:
-	HRangeIterator( int long long from_, HRange const* range_ )
-		: _i( from_ )
-		, _range( range_ )
-		, _objectFactory( range_->HIterable::get_class()->runtime()->object_factory() ) {
-		return;
-	}
-protected:
-	virtual HHuginn::value_t do_value( HThread*, int ) override {
-		return ( _objectFactory->create_integer( _i ) );
-	}
-	virtual bool do_is_valid( void ) override {
-		return ( _range->step() > 0 ? _i < _range->stop() : _i > _range->stop() );
-	}
-	virtual void do_next( void ) override {
-		_i += _range->step();
-	}
-private:
-	HRangeIterator( HRangeIterator const& ) = delete;
-	HRangeIterator& operator = ( HRangeIterator const& ) = delete;
-};
-
-HRange::HIterator HRange::do_iterator( void ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HRangeIterator( _from, this ) );
-	return ( HIterator( yaal::move( impl ) ) );
-}
-
-class HMapper : public HHuginn::HIterable {
-	HHuginn::value_t _source;
-	HHuginn::function_t _function;
-	HHuginn::value_t _method;
-public:
-	HMapper( HHuginn::HClass const* class_, HHuginn::value_t source_, HHuginn::function_t function_, HHuginn::value_t method_ )
-		: HIterable( class_ )
-		, _source( source_ )
-		, _function( function_ )
-		, _method( method_ ) {
-	}
-	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
-		M_PROLOG
-		return (
-			runtime_->create_class(
-				"Mapper",
-				nullptr,
-				HHuginn::field_definitions_t{}
-			)
-		);
-		M_EPILOG
-	}
-protected:
-	virtual int long do_size( void ) const override {
-		return ( static_cast<HHuginn::HIterable const*>( _source.raw() )->size() );
-	}
-private:
-	virtual HIterator do_iterator( void ) override;
-private:
-	virtual HHuginn::value_t do_clone( huginn::HRuntime* ) const override {
-		return ( make_pointer<HMapper>( HIterable::get_class(), _source, _function, _method ) );
-	}
-};
-
-class HMapperIterator : public HIteratorInterface {
-protected:
-	HHuginn::HIterable::HIterator _impl;
-public:
-	HMapperIterator( HHuginn::HIterable::HIterator&& iterator_ )
-		: _impl( yaal::move( iterator_ ) ) {
-		return;
-	}
-protected:
-	virtual bool do_is_valid( void ) override {
-		return ( _impl.is_valid() );
-	}
-	virtual void do_next( void ) override {
-		_impl.next();
-	}
-private:
-	HMapperIterator( HMapperIterator const& ) = delete;
-	HMapperIterator& operator = ( HMapperIterator const& ) = delete;
-};
-
-class HFunctionMapperIterator : public HMapperIterator {
-	HHuginn::function_t const& _function;
-public:
-	HFunctionMapperIterator( HHuginn::HIterable::HIterator&& iterator_, HHuginn::function_t const& function_ )
-		: HMapperIterator( yaal::move( iterator_ ) )
-		, _function( function_ ) {
-		return;
-	}
-protected:
-	virtual HHuginn::value_t do_value( HThread* thread_, int position_ ) override {
-		return ( _function( thread_, nullptr, HHuginn::values_t( { _impl.value( thread_, position_ ) } ), position_ ) );
-	}
-};
-
-class HMethodMapperIterator : public HMapperIterator {
-	HHuginn::HClass::HBoundMethod& _method;
-public:
-	HMethodMapperIterator( HHuginn::HIterable::HIterator&& iterator_, HHuginn::HClass::HBoundMethod& method_ )
-		: HMapperIterator( yaal::move( iterator_ ) )
-		, _method( method_ ) {
-		return;
-	}
-protected:
-	virtual HHuginn::value_t do_value( HThread* thread_, int position_ ) override {
-		return ( _method.call( thread_, HHuginn::values_t( { _impl.value( thread_, position_ ) } ), position_ ) );
-	}
-};
-
-HMapper::HIterator HMapper::do_iterator( void ) {
-	HIterator::iterator_implementation_t impl;
-	if ( !! _function ) {
-		impl.reset( new ( memory::yaal ) HFunctionMapperIterator( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator(), _function ) );
-	} else {
-		impl.reset( new ( memory::yaal ) HMethodMapperIterator( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator(), *static_cast<HHuginn::HClass::HBoundMethod*>( _method.raw() ) ) );
-	}
-	return ( HIterator( yaal::move( impl ) ) );
-}
 
 class HAlgorithms : public HHuginn::HObject {
 	HHuginn::class_t _mapperClass;
