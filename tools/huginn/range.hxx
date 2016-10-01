@@ -71,7 +71,7 @@ protected:
 		return ( safe_cast<int long>( ( _stop + _step - ( _from + 1 ) ) / _step ) );
 	}
 private:
-	virtual HIterator do_iterator( void ) override;
+	virtual HIterator do_iterator( HThread*, int ) override;
 private:
 	virtual HHuginn::value_t do_clone( huginn::HRuntime* ) const override {
 		return ( yaal::hcore::make_pointer<HRange>( HIterable::get_class(), _from, _stop, _step ) );
@@ -96,7 +96,7 @@ protected:
 	virtual bool do_is_valid( void ) override {
 		return ( _range->step() > 0 ? _i < _range->stop() : _i > _range->stop() );
 	}
-	virtual void do_next( void ) override {
+	virtual void do_next( HThread*, int ) override {
 		_i += _range->step();
 	}
 private:
@@ -104,7 +104,7 @@ private:
 	HRangeIterator& operator = ( HRangeIterator const& ) = delete;
 };
 
-HRange::HIterator HRange::do_iterator( void ) {
+HRange::HIterator HRange::do_iterator( HThread*, int ) {
 	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HRangeIterator( _from, this ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }

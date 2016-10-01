@@ -59,7 +59,7 @@ protected:
 	virtual bool do_is_valid( void ) override {
 		return ( _index < _list->size() );
 	}
-	virtual void do_next( void ) override {
+	virtual void do_next( HThread*, int ) override {
 		++ _index;
 	}
 private:
@@ -176,7 +176,7 @@ HHuginn::value_t& HHuginn::HList::get_ref( int long long index_ ) {
 	M_EPILOG
 }
 
-HHuginn::HIterable::HIterator HHuginn::HList::do_iterator( void ) {
+HHuginn::HIterable::HIterator HHuginn::HList::do_iterator( huginn::HThread*, int ) {
 	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::HListIterator( this ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }

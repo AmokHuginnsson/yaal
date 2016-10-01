@@ -61,7 +61,7 @@ protected:
 	virtual bool do_is_valid( void ) override {
 		return ( _it != _lookup->end() );
 	}
-	virtual void do_next( void ) override {
+	virtual void do_next( HThread*, int ) override {
 		++ _it;
 	}
 private:
@@ -212,7 +212,7 @@ void HHuginn::HLookup::insert( HHuginn::value_t const& key_, HHuginn::value_t co
 	M_EPILOG
 }
 
-HHuginn::HIterable::HIterator HHuginn::HLookup::do_iterator( void ) {
+HHuginn::HIterable::HIterator HHuginn::HLookup::do_iterator( huginn::HThread*, int ) {
 	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::HLookupIterator( &_data ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }

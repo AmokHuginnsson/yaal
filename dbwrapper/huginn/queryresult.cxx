@@ -81,7 +81,7 @@ protected:
 	virtual bool do_is_valid( void ) override {
 		return ( _it != _recordSet->end() );
 	}
-	virtual void do_next( void ) override {
+	virtual void do_next( tools::huginn::HThread*, int ) override {
 		++ _it;
 	}
 private:
@@ -141,7 +141,7 @@ HHuginn::value_t HQueryResult::has_next( tools::huginn::HThread* thread_, HHugin
 	M_EPILOG
 }
 
-HHuginn::HIterable::HIterator HQueryResult::do_iterator( void ) {
+HHuginn::HIterable::HIterator HQueryResult::do_iterator( tools::huginn::HThread*, int ) {
 	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HQueryResultIterator( _recordSet, yaal::move( _it ), _runtime ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }

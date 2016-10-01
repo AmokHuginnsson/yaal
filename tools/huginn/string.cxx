@@ -62,7 +62,7 @@ protected:
 	virtual bool do_is_valid( void ) override {
 		return ( _index < _string->value().get_size() );
 	}
-	virtual void do_next( void ) override {
+	virtual void do_next( HThread*, int ) override {
 		++ _index;
 	}
 private:
@@ -211,7 +211,7 @@ HHuginn::value_t HHuginn::HString::do_clone( HRuntime* runtime_ ) const {
 	return ( runtime_->object_factory()->create_string( _value ) );
 }
 
-HHuginn::HIterable::HIterator HHuginn::HString::do_iterator( void ) {
+HHuginn::HIterable::HIterator HHuginn::HString::do_iterator( huginn::HThread*, int ) {
 	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HStringIterator( this ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }

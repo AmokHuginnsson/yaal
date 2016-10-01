@@ -61,7 +61,7 @@ protected:
 	virtual bool do_is_valid( void ) override {
 		return ( _it != _order->end() );
 	}
-	virtual void do_next( void ) override {
+	virtual void do_next( HThread*, int ) override {
 		++ _it;
 	}
 private:
@@ -192,7 +192,7 @@ void HHuginn::HOrder::insert( HHuginn::value_t const& value_, int position_ ) {
 	M_EPILOG
 }
 
-HHuginn::HIterable::HIterator HHuginn::HOrder::do_iterator( void ) {
+HHuginn::HIterable::HIterator HHuginn::HOrder::do_iterator( huginn::HThread*, int ) {
 	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::HOrderIterator( &_data ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }

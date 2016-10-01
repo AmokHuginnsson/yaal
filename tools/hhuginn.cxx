@@ -682,8 +682,8 @@ HHuginn::HIterable::HIterable( HClass const* class_ )
 	return;
 }
 
-HHuginn::HIterable::HIterator HHuginn::HIterable::iterator( void ) {
-	return ( do_iterator() );
+HHuginn::HIterable::HIterator HHuginn::HIterable::iterator( huginn::HThread* thread_, int position_ ) {
+	return ( do_iterator( thread_, position_ ) );
 }
 
 int long HHuginn::HIterable::size( void ) const {

@@ -61,7 +61,7 @@ protected:
 	virtual bool do_is_valid( void ) override {
 		return ( _it != _dict->end() );
 	}
-	virtual void do_next( void ) override {
+	virtual void do_next( HThread*, int ) override {
 		++ _it;
 	}
 private:
@@ -232,7 +232,7 @@ void HHuginn::HDict::insert( HHuginn::value_t const& key_, HHuginn::value_t cons
 	M_EPILOG
 }
 
-HHuginn::HIterable::HIterator HHuginn::HDict::do_iterator( void ) {
+HHuginn::HIterable::HIterator HHuginn::HDict::do_iterator( huginn::HThread*, int ) {
 	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::HDictIterator( &_data ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }

@@ -62,7 +62,7 @@ protected:
 	virtual bool do_is_valid( void ) override {
 		return ( _stream->is_valid() );
 	}
-	virtual void do_next( void ) override {
+	virtual void do_next( HThread*, int ) override {
 		_lineCache = _stream->read_line_impl();
 	}
 private:
@@ -138,7 +138,7 @@ bool HStream::is_valid( void ) const {
 	M_EPILOG
 }
 
-HHuginn::HIterable::HIterator HStream::do_iterator( void ) {
+HHuginn::HIterable::HIterator HStream::do_iterator( HThread*, int ) {
 	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HStreamIterator( this ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }

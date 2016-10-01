@@ -65,7 +65,7 @@ protected:
 		return ( static_cast<HHuginn::HIterable const*>( _source.raw() )->size() );
 	}
 private:
-	virtual HIterator do_iterator( void ) override;
+	virtual HIterator do_iterator( HThread*, int ) override;
 private:
 	virtual HHuginn::value_t do_clone( huginn::HRuntime* ) const override {
 		return ( yaal::hcore::make_pointer<HMapper>( HIterable::get_class(), _source, _function, _method ) );
@@ -84,8 +84,8 @@ protected:
 	virtual bool do_is_valid( void ) override {
 		return ( _impl.is_valid() );
 	}
-	virtual void do_next( void ) override {
-		_impl.next();
+	virtual void do_next( HThread* thread_, int position_ ) override {
+		_impl.next( thread_, position_ );
 	}
 private:
 	HMapperIterator( HMapperIterator const& ) = delete;
@@ -120,12 +120,12 @@ protected:
 	}
 };
 
-HMapper::HIterator HMapper::do_iterator( void ) {
+HMapper::HIterator HMapper::do_iterator( HThread* thread_, int position_ ) {
 	HIterator::iterator_implementation_t impl;
 	if ( !! _function ) {
-		impl.reset( new ( memory::yaal ) HFunctionMapperIterator( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator(), _function ) );
+		impl.reset( new ( memory::yaal ) HFunctionMapperIterator( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), _function ) );
 	} else {
-		impl.reset( new ( memory::yaal ) HMethodMapperIterator( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator(), *static_cast<HHuginn::HClass::HBoundMethod*>( _method.raw() ) ) );
+		impl.reset( new ( memory::yaal ) HMethodMapperIterator( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), *static_cast<HHuginn::HClass::HBoundMethod*>( _method.raw() ) ) );
 	}
 	return ( HIterator( yaal::move( impl ) ) );
 }

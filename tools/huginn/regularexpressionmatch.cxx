@@ -64,7 +64,7 @@ protected:
 	virtual bool do_is_valid( void ) override {
 		return ( _it != _regularExpressionMatch->end() );
 	}
-	virtual void do_next( void ) override {
+	virtual void do_next( HThread*, int ) override {
 		++ _it;
 	}
 private:
@@ -100,7 +100,7 @@ HHuginn::value_t HRegularExpressionMatch::matched( huginn::HThread* thread_, HHu
 	M_EPILOG
 }
 
-HHuginn::HIterable::HIterator HRegularExpressionMatch::do_iterator( void ) {
+HHuginn::HIterable::HIterator HRegularExpressionMatch::do_iterator( huginn::HThread*, int ) {
 	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HRegularExpressionMatchIterator( this, _regex->find( _fast ) ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }

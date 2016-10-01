@@ -49,7 +49,7 @@ public:
 	static HHuginn::value_t matched( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::class_t get_class( HRuntime* );
 protected:
-	virtual HIterator do_iterator( void ) override;
+	virtual HIterator do_iterator( HThread*, int ) override;
 	virtual int long do_size( void ) const override;
 private:
 	virtual HHuginn::value_t do_clone( huginn::HRuntime* ) const override;

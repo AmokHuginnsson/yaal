@@ -69,7 +69,7 @@ void HFor::do_execute( HThread* thread_ ) const {
 		HHuginn::HIterable* coll( dynamic_cast<HHuginn::HIterable*>( source.raw() ) );
 		HHuginn::HObject* obj( nullptr );
 		if ( coll ) {
-			HHuginn::HIterable::HIterator it( coll->iterator() );
+			HHuginn::HIterable::HIterator it( coll->iterator( thread_, sourcePosition ) );
 			while ( f->can_continue() && it.is_valid() ) {
 				_control->execute( thread_ );
 				f->commit_variable( it.value( thread_, sourcePosition ), controlPosition );
@@ -77,7 +77,7 @@ void HFor::do_execute( HThread* thread_ ) const {
 					_loop->execute( thread_ );
 				}
 				f->continue_execution();
-				it.next();
+				it.next( thread_, sourcePosition );
 			}
 		} else if ( ( obj = dynamic_cast<HHuginn::HObject*>( source.raw() ) ) ) {
 			HHuginn::value_t itVal( obj->call_method( thread_, source, "iterator", {}, sourcePosition ) );

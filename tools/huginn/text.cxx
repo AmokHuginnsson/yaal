@@ -88,7 +88,7 @@ public:
 		HString s;
 		HHuginn::HIterable* coll( static_cast<HHuginn::HIterable*>( const_cast<HHuginn::HValue*>( values_[0].raw() ) ) );
 		HString const& sep( get_string( values_[1] ) );
-		HHuginn::HIterable::HIterator it( coll->iterator() );
+		HHuginn::HIterable::HIterator it( coll->iterator( thread_, position_ ) );
 		bool addSep( false );
 		while ( it.is_valid() ) {
 			HHuginn::value_t v( it.value( thread_, position_ ) );
@@ -106,7 +106,7 @@ public:
 			}
 			s.append( get_string( v.raw() ) );
 			addSep = true;
-			it.next();
+			it.next( thread_, position_ );
 		}
 		return ( thread_->runtime().object_factory()->create_string( s ) );
 	}

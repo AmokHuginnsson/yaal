@@ -51,13 +51,13 @@ public:
 	bool is_valid( void ) {
 		return ( do_is_valid() );
 	}
-	void next( void ) {
-		do_next();
+	void next( HThread* thread_, int position_ ) {
+		do_next( thread_, position_ );
 	}
 protected:
 	virtual HHuginn::value_t do_value( HThread*, int ) = 0;
 	virtual bool do_is_valid( void ) = 0;
-	virtual void do_next( void ) = 0;
+	virtual void do_next( HThread*, int ) = 0;
 };
 
 }
@@ -78,8 +78,8 @@ public:
 	bool is_valid( void ) {
 		return ( _impl->is_valid() );
 	}
-	void next( void ) {
-		_impl->next();
+	void next( huginn::HThread* thread_, int position_ ) {
+		_impl->next( thread_, position_ );
 	}
 };
 

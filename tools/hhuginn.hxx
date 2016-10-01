@@ -558,10 +558,10 @@ public:
 	typedef HHuginn::HValue base_type;
 	class HIterator;
 	HIterable( HClass const* );
-	HIterator iterator( void );
+	HIterator iterator( huginn::HThread*, int );
 	int long size( void ) const;
 protected:
-	virtual HIterator do_iterator( void ) = 0;
+	virtual HIterator do_iterator( huginn::HThread*, int ) = 0;
 	virtual int long do_size( void ) const = 0;
 };
 
@@ -654,7 +654,7 @@ public:
 	void to_real( void ) const;
 	void to_string( void ) const;
 protected:
-	virtual HIterator do_iterator( void ) override;
+	virtual HIterator do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( void ) const override;
 private:
 	virtual value_t do_clone( huginn::HRuntime* ) const override;
@@ -725,7 +725,7 @@ public:
 		return ( _data );
 	}
 protected:
-	virtual HIterator do_iterator( void ) override;
+	virtual HIterator do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( void ) const override;
 private:
 	virtual value_t do_clone( huginn::HRuntime* ) const override;
@@ -755,7 +755,7 @@ public:
 		return ( _data );
 	}
 protected:
-	virtual HIterator do_iterator( void ) override;
+	virtual HIterator do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( void ) const override;
 private:
 	virtual value_t do_clone( huginn::HRuntime* ) const override;
@@ -786,7 +786,7 @@ public:
 		return ( _data );
 	}
 protected:
-	virtual HIterator do_iterator( void ) override;
+	virtual HIterator do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( void ) const override;
 private:
 	void verify_key_type( HHuginn::HClass const*, int ) const;
@@ -818,7 +818,7 @@ public:
 		return ( _data );
 	}
 protected:
-	virtual HIterator do_iterator( void ) override;
+	virtual HIterator do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( void ) const override;
 private:
 	void verify_key_type( HHuginn::HClass const*, int ) const;
@@ -853,7 +853,7 @@ public:
 		return ( _data );
 	}
 protected:
-	virtual HIterator do_iterator( void ) override;
+	virtual HIterator do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( void ) const override;
 private:
 	HLookup( HLookup const& ) = delete;
@@ -884,7 +884,7 @@ public:
 		return ( _data );
 	}
 protected:
-	virtual HIterator do_iterator( void ) override;
+	virtual HIterator do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( void ) const override;
 private:
 	HSet( HSet const& ) = delete;
