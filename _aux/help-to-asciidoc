@@ -11,6 +11,12 @@ class Option:
 		self_._value = value_
 		self_._desc = desc_
 
+def escape( str_ ):
+	special = [ "*", "+", "_", "~", "^" ]
+	for s in special:
+		str_ = str_.replace( s, "\\" + s )
+	return ( str_ )
+
 def main():
 	parser = argparse.ArgumentParser( description = "Generate asciidoc file based on output of `{prj} --help' call." )
 	parser.add_argument( "-p", "--project", metavar = "name", type = str, required = True, help = "Name of the project to generate asciidoc for." )
@@ -18,7 +24,7 @@ def main():
 	args = parser.parse_args()
 	binary = "./build/release/" + args.project + "/1exec"
 	help = subprocess.Popen( [ binary, "--help" ], universal_newlines = True, stdout = subprocess.PIPE ).stdout.read()
-	lines = help.split( "\n" )
+	lines = escape( help ).split( "\n" )
 	preamble = []
 	options = []
 	footer = ""
