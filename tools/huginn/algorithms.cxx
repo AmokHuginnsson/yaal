@@ -36,6 +36,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "packagefactory.hxx"
 #include "objectfactory.hxx"
 #include "range.hxx"
+#include "filter.hxx"
 #include "mapper.hxx"
 
 using namespace yaal;
@@ -59,6 +60,9 @@ public:
 		class_->runtime()->huginn()->register_class( _mapperClass );
 		class_->runtime()->huginn()->register_class( _rangeClass );
 		return;
+	}
+	static HHuginn::value_t filter( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+		return ( static_cast<HAlgorithms*>( object_->raw() )->do_filter( values_, position_ ) );
 	}
 	static HHuginn::value_t map( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		return ( static_cast<HAlgorithms*>( object_->raw() )->do_map( values_, position_ ) );
@@ -202,6 +206,21 @@ public:
 		return ( v );
 	}
 private:
+	HHuginn::value_t do_filter( HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "Algorithms.filter";
+		verify_arg_count( name, values_, 2, 2, position_ );
+		verify_arg_collection( name, values_, 0, false, false, position_ );
+		HHuginn::type_id_t t( verify_arg_type( name, values_, 1, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::BOUND_METHOD }, false, position_ ) );
+		HHuginn::value_t v;
+		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
+			v = make_pointer<HFilter>( _mapperClass.raw(), values_[0], static_cast<HHuginn::HFunctionReference const*>( values_[1].raw() )->function(), HHuginn::value_t() );
+		} else {
+			v = make_pointer<HFilter>( _mapperClass.raw(), values_[0], HHuginn::function_t(), values_[1] );
+		}
+		return ( v );
+		M_EPILOG
+	}
 	HHuginn::value_t do_map( HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Algorithms.map";
@@ -262,6 +281,7 @@ HHuginn::value_t HAlgorithmsCreator::do_new_instance( HRuntime* runtime_ ) {
 			"Algorithms",
 			nullptr,
 			HHuginn::field_definitions_t{
+				{ "filter",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::filter, _1, _2, _3, _4 ) ) },
 				{ "map",         make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::map, _1, _2, _3, _4 ) ) },
 				{ "materialize", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::materialize, _1, _2, _3, _4 ) ) },
 				{ "reduce",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::reduce, _1, _2, _3, _4 ) ) },
