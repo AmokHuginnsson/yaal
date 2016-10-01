@@ -50,13 +50,16 @@ namespace tools {
 namespace huginn {
 
 class HAlgorithms : public HHuginn::HObject {
+	HHuginn::class_t _filterClass;
 	HHuginn::class_t _mapperClass;
 	HHuginn::class_t _rangeClass;
 public:
 	HAlgorithms( HHuginn::HClass* class_ )
 		: HObject( class_ )
+		, _filterClass( HFilter::get_class( class_->runtime() ) )
 		, _mapperClass( HMapper::get_class( class_->runtime() ) )
 		, _rangeClass( HRange::get_class( class_->runtime() ) ) {
+		class_->runtime()->huginn()->register_class( _filterClass );
 		class_->runtime()->huginn()->register_class( _mapperClass );
 		class_->runtime()->huginn()->register_class( _rangeClass );
 		return;
@@ -214,9 +217,9 @@ private:
 		HHuginn::type_id_t t( verify_arg_type( name, values_, 1, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::BOUND_METHOD }, false, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-			v = make_pointer<HFilter>( _mapperClass.raw(), values_[0], static_cast<HHuginn::HFunctionReference const*>( values_[1].raw() )->function(), HHuginn::value_t() );
+			v = make_pointer<HFilter>( _filterClass.raw(), values_[0], static_cast<HHuginn::HFunctionReference const*>( values_[1].raw() )->function(), HHuginn::value_t() );
 		} else {
-			v = make_pointer<HFilter>( _mapperClass.raw(), values_[0], HHuginn::function_t(), values_[1] );
+			v = make_pointer<HFilter>( _filterClass.raw(), values_[0], HHuginn::function_t(), values_[1] );
 		}
 		return ( v );
 		M_EPILOG
