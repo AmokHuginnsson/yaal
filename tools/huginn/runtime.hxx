@@ -54,11 +54,11 @@ private:
 	typedef yaal::hcore::HLookupMap<identifier_id_t, value_t> packages_t;
 	/*! \brief A type for storing functions.
 	 *
-	 * Symbol resolving stores pointers to map values (function_t*),
+	 * Symbol resolving stores pointers to map values (value_t*),
 	 * so we cannot use HLookupMap here as adding and removing entries
 	 * to HLookupMap invalidates old pointers.
 	 */
-	typedef yaal::hcore::HHashMap<identifier_id_t, function_t> functions_store_t;
+	typedef yaal::hcore::HHashMap<identifier_id_t, value_t> functions_store_t;
 	typedef yaal::hcore::HHashSet<identifier_id_t> functions_available_t;
 	typedef yaal::hcore::HArray<HHuginn::class_t> dependencies_t;
 public:
@@ -82,7 +82,7 @@ private:
 	threads_t _threads;
 	/*
 	 * 1.
-	 * Resolved function references are kept by naked/weak/dumb pointer (function_t*) in runtime.
+	 * Resolved function references are kept by naked/weak/dumb pointer (value_t*) in runtime.
 	 * They must be kept by weak reference to avoid self-referecing cyctle of smart pointers
 	 * in case of recusive call chain: `foo() { foo(); }'.
 	 *
@@ -131,7 +131,7 @@ public:
 	}
 	identifier_id_t identifier_id( yaal::hcore::HString const& );
 	yaal::hcore::HString const& identifier_name( identifier_id_t ) const;
-	function_t* get_function( identifier_id_t, bool = false );
+	value_t* get_function( identifier_id_t, bool = false );
 	class_t get_class( identifier_id_t );
 	value_t* get_package( identifier_id_t );
 	void register_class_low( class_t, bool );

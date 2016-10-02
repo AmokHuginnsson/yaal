@@ -181,9 +181,9 @@ HHuginn::value_t HRuntime::result( void ) const {
 	return ( _result );
 }
 
-HHuginn::function_t* HRuntime::get_function( identifier_id_t identifierId_, bool fromAll_ ) {
+HHuginn::value_t* HRuntime::get_function( identifier_id_t identifierId_, bool fromAll_ ) {
 	M_PROLOG
-	HHuginn::function_t* f( nullptr );
+	HHuginn::value_t* f( nullptr );
 	if ( fromAll_ || ( _functionsAvailable.count( identifierId_ ) > 0 ) ) {
 		f = &_functionsStore.at( identifierId_ );
 	}
@@ -221,7 +221,10 @@ void HRuntime::register_class_low( class_t class_, bool registerContructor_ ) {
 	M_PROLOG
 	if ( _classes.insert( make_pair( class_->identifier_id(), class_ ) ).second ) {
 		_dependencies.push_back( class_ );
-		_functionsStore.insert( make_pair( class_->identifier_id(), hcore::call( &HHuginn::HClass::create_instance, class_.raw(), _1, _2, _3, _4 ) ) );
+		HHuginn::identifier_id_t identifier( class_->identifier_id() );
+		HHuginn::function_t function( hcore::call( &HHuginn::HClass::create_instance, class_.raw(), _1, _2, _3, _4 ) );
+		HHuginn::value_t functionReference( _objectFactory->create_function_reference( identifier, function ) );
+		_functionsStore.insert( make_pair( identifier, functionReference ) );
 	}
 	if ( registerContructor_ ) {
 		_functionsAvailable.insert( class_->identifier_id() );
@@ -232,7 +235,7 @@ void HRuntime::register_class_low( class_t class_, bool registerContructor_ ) {
 
 void HRuntime::register_function( identifier_id_t identifier_, function_t function_ ) {
 	M_PROLOG
-	_functionsStore.insert( make_pair( identifier_, function_ ) );
+	_functionsStore.insert( make_pair( identifier_, _objectFactory->create_function_reference( identifier_, function_ ) ) );
 	_functionsAvailable.insert( identifier_ );
 	return;
 	M_EPILOG
@@ -362,7 +365,10 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 	}
 	for ( functions_available_t::value_type const& fi : _functionsAvailable ) {
 		if ( context_._functionsAvailable.find( fi ) == context_._functionsAvailable.end() ) {
-			fds.emplace_back( identifier_name( fi ), make_pointer<HHuginn::HClass::HMethod>( _functionsStore.at( fi ) ) );
+			fds.emplace_back(
+				identifier_name( fi ),
+				make_pointer<HHuginn::HClass::HMethod>( static_cast<HHuginn::HFunctionReference const*>( _functionsStore.at( fi ).raw() )->function() )
+			);
 		}
 	}
 	HHuginn::class_t c( create_class( name_, nullptr, fds ) );
@@ -379,7 +385,7 @@ HHuginn::value_t HRuntime::call( yaal::hcore::HString const& name_, values_t con
 		yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
 		threads_t::iterator t( _threads.find( threadId ) );
 		M_ASSERT( t != _threads.end() );
-		res = _functionsStore.at( identifier )( t->second.raw(), nullptr, values_, position_ );
+		res = static_cast<HHuginn::HFunctionReference*>( _functionsStore.at( identifier ).raw() )->function()( t->second.raw(), nullptr, values_, position_ );
 	} else {
 		throw HHuginn::HHuginnRuntimeException( "Function `"_ys.append( name_ ).append( "(...)' is not defined." ), position_ );
 	}
@@ -473,8 +479,8 @@ HHuginn::value_t type( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 	verify_arg_count( "type", values_, 1, 1, position_ );
 	HHuginn::HValue const* v( values_.front().raw() );
 	HHuginn::identifier_id_t id( v->get_class()->identifier_id() );
-	HHuginn::function_t* f( thread_->runtime().get_function( id, true ) );
-	return ( thread_->object_factory().create_function_reference( id, *f ) );
+	HHuginn::value_t* f( thread_->runtime().get_function( id, true ) );
+	return ( *f );
 	M_EPILOG
 }
 
@@ -649,7 +655,7 @@ void HRuntime::register_builtin_function( yaal::hcore::HString const& name_, fun
 	M_PROLOG
 	identifier_id_t id( identifier_id( name_ ) );
 	_huginn->register_function( id );
-	_functionsStore.insert( make_pair( id, yaal::move( function_ ) ) );
+	_functionsStore.insert( make_pair( id, _objectFactory->create_function_reference( id, yaal::move( function_ ) ) ) );
 	_functionsAvailable.insert( id );
 	return;
 	M_EPILOG
@@ -840,7 +846,7 @@ yaal::hcore::HString const& HRuntime::function_name( void const* id_ ) const {
 	static yaal::hcore::HString const unknown( "unknown" );
 	yaal::hcore::HString const* name( &unknown );
 	for ( functions_store_t::value_type const& f : _functionsStore ) {
-		if ( f.second.id() == id_ ) {
+		if ( static_cast<HHuginn::HFunctionReference const*>( f.second.raw() )->function().id() == id_ ) {
 			name = &identifier_name( f.first );
 			break;
 		}

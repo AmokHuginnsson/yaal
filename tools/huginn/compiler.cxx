@@ -420,14 +420,13 @@ void OCompiler::resolve_symbols( void ) {
 				}
 			}
 			if ( ( es._operation == OExecutionStep::OPERATION::USE ) && ! is_keyword( _runtime->identifier_name( es._identifier ) ) ) {
-				HHuginn::function_t* callable( _runtime->get_function( es._identifier ) );
+				HHuginn::value_t* callable( _runtime->get_function( es._identifier ) );
 				if ( !! callable ) {
 					es._expression->replace_execution_step(
 						es._index,
 						hcore::call(
-							&HExpression::store_function,
+							&HExpression::store_value_pointer,
 							es._expression.raw(),
-							es._identifier,
 							callable,
 							_1,
 							es._position
@@ -583,7 +582,7 @@ void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_
 		}
 	}
 	if ( ! _classContext ) {
-		HHuginn::function_t* fun( _runtime->get_function( functionIdentifier ) );
+		HHuginn::value_t* fun( _runtime->get_function( functionIdentifier ) );
 		if ( fun ) {
 			throw HHuginn::HHuginnRuntimeException( "Function `"_ys.append( name_ ).append( "' was already defined." ), position_.get() );
 		}
@@ -2033,7 +2032,7 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 			hcore::call(
 				&HExpression::store_direct,
 				current_expression().raw(),
-				_runtime->object_factory()->create_function_reference( refIdentifier, *_runtime->get_function( refIdentifier ) ),
+				*_runtime->get_function( refIdentifier ),
 				_1,
 				position_.get()
 			)
