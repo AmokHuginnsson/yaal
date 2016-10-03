@@ -132,6 +132,7 @@ public:
 	class HFieldDefinition;
 	typedef yaal::hcore::HArray<HFieldDefinition> field_definitions_t;
 	typedef yaal::hcore::HArray<identifier_id_t> field_identifiers_t;
+	typedef yaal::hcore::HArray<yaal::hcore::HString> field_descriptions_t;
 	typedef yaal::hcore::HArray<value_t> values_t;
 	typedef yaal::hcore::HPointer<huginn::HFrame> frame_t;
 	typedef yaal::hcore::HBoundCall<value_t ( huginn::HThread*, value_t*, values_t const&, int )> function_t;
@@ -341,10 +342,12 @@ public:
 class HHuginn::HFieldDefinition {
 	yaal::hcore::HString _name;
 	value_t _value;
+	yaal::hcore::HString _doc;
 public:
-	HFieldDefinition( yaal::hcore::HString const& name_, value_t const& value_ )
+	HFieldDefinition( yaal::hcore::HString const& name_, value_t const& value_, yaal::hcore::HString const& doc_ = yaal::hcore::HString() )
 		: _name( name_ )
-		, _value( value_ ) {
+		, _value( value_ )
+		, _doc( doc_ ) {
 		return;
 	}
 	yaal::hcore::HString const& name( void ) const {
@@ -352,6 +355,9 @@ public:
 	}
 	value_t const& value( void ) const {
 		return ( _value );
+	}
+	yaal::hcore::HString const& doc( void ) const {
+		return ( _doc );
 	}
 };
 
@@ -368,10 +374,12 @@ private:
 	field_identifiers_t _fieldIdentifiers;
 	field_indexes_t _fieldIndexes;
 	values_t _fieldDefinitions;
+	field_descriptions_t _fieldDescriptions;
+	yaal::hcore::HString _doc;
 	huginn::HRuntime* _runtime;
 public:
-	HClass( huginn::HRuntime*, type_id_t, identifier_id_t, HClass const*, field_definitions_t const& );
-	HClass( HHuginn::TYPE, HHuginn::identifier_id_t );
+	HClass( huginn::HRuntime*, type_id_t, identifier_id_t, HClass const*, field_definitions_t const&, yaal::hcore::HString const& = yaal::hcore::HString() );
+	HClass( HHuginn::TYPE, HHuginn::identifier_id_t, yaal::hcore::HString const& = yaal::hcore::HString() );
 	virtual ~HClass( void ) {
 	}
 	HClass const* super( void ) const {
@@ -402,6 +410,8 @@ public:
 		return ( _runtime );
 	}
 	value_t create_instance( huginn::HThread*, value_t*, values_t const&, int ) const;
+	yaal::hcore::HString const& doc( void ) const;
+	yaal::hcore::HString const& doc( identifier_id_t ) const;
 private:
 	virtual value_t do_create_instance( huginn::HThread*, values_t const&, int ) const;
 	HClass( HClass const& ) = delete;
@@ -905,14 +915,16 @@ private:
 	 * so this holder must have shared ownership.
 	 */
 	HHuginn::function_t _function;
+	yaal::hcore::HString _doc;
 public:
-	HFunctionReference( identifier_id_t, HHuginn::function_t const& );
+	HFunctionReference( identifier_id_t, HHuginn::function_t const&, yaal::hcore::HString const& = yaal::hcore::HString() );
 	identifier_id_t identifier_id( void ) const {
 		return ( _identifierId );
 	}
 	HHuginn::function_t const& function( void ) const {
 		return ( _function );
 	}
+	yaal::hcore::HString const& doc( void ) const;
 private:
 	virtual value_t do_clone( huginn::HRuntime* ) const override;
 };

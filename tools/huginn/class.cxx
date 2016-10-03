@@ -48,13 +48,16 @@ HHuginn::HClass::HClass(
 	type_id_t typeId_,
 	identifier_id_t identifierId_,
 	HClass const* super_,
-	field_definitions_t const& fieldDefinitions_
+	field_definitions_t const& fieldDefinitions_,
+	yaal::hcore::HString const& doc_
 ) : _typeId( typeId_ )
 	, _identifierId( identifierId_ )
 	, _super( super_ )
 	, _fieldIdentifiers()
 	, _fieldIndexes( super_ ? super_->_fieldIndexes : field_indexes_t() )
 	, _fieldDefinitions( super_ ? super_->_fieldDefinitions : values_t() )
+	, _fieldDescriptions( super_ ? super_->_fieldDescriptions : field_descriptions_t() )
+	, _doc( doc_ )
 	, _runtime( runtime_ ) {
 	M_PROLOG
 	for ( field_definitions_t::value_type const& fd : fieldDefinitions_ ) {
@@ -65,8 +68,10 @@ HHuginn::HClass::HClass(
 		);
 		if ( fi->second >= _fieldDefinitions.get_size() ) {
 			_fieldDefinitions.resize( fi->second + 1 );
+			_fieldDescriptions.resize( fi->second + 1 );
 		}
 		_fieldDefinitions[fi->second] = fd.value();
+		_fieldDescriptions[fi->second] = fd.doc();
 	}
 	return;
 	M_EPILOG
@@ -74,13 +79,16 @@ HHuginn::HClass::HClass(
 
 HHuginn::HClass::HClass(
 	HHuginn::TYPE typeTag_,
-	HHuginn::identifier_id_t identifierId_
+	HHuginn::identifier_id_t identifierId_,
+	yaal::hcore::HString const& doc_
 ) : _typeId( huginn::type_id( typeTag_ ) )
 	, _identifierId( identifierId_ )
 	, _super( nullptr )
 	, _fieldIdentifiers()
 	, _fieldIndexes()
 	, _fieldDefinitions()
+	, _fieldDescriptions()
+	, _doc( doc_ )
 	, _runtime( nullptr ) {
 	M_PROLOG
 	return;
@@ -142,6 +150,20 @@ HHuginn::values_t HHuginn::HClass::get_defaults( void ) const {
 bool HHuginn::HClass::is_kind_of( identifier_id_t identifierId_ ) const {
 	M_PROLOG
 	return ( ( identifierId_ == _identifierId ) || ( _super ? _super->is_kind_of( identifierId_ ) : false ) );
+	M_EPILOG
+}
+
+yaal::hcore::HString const& HHuginn::HClass::doc( void ) const {
+	return ( _doc );
+}
+
+yaal::hcore::HString const& HHuginn::HClass::doc( identifier_id_t method_ ) const {
+	M_PROLOG
+	int fieldIndex( field_index( method_ ) );
+	if ( fieldIndex < 0 ) {
+		throw HHuginnException( "Invalid method identifier id." );
+	}
+	return ( _fieldDescriptions[ fieldIndex ] );
 	M_EPILOG
 }
 

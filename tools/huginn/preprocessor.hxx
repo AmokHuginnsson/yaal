@@ -31,6 +31,7 @@ Copyright:
 
 #include "hcore/hstring.hxx"
 #include "hcore/iterator.hxx"
+#include "source.hxx"
 
 namespace yaal {
 
@@ -42,20 +43,31 @@ namespace {
 static char const NEWLINE = '\n';
 }
 
-class HPrepocessor {
+class HPrepocessor final {
 public:
 	typedef HPrepocessor this_type;
 	class HIterator;
 private:
 	yaal::hcore::HString::const_iterator _beg;
 	yaal::hcore::HString::const_iterator _end;
+	HSource::comments_t& _comments;
+	yaal::hcore::HString _comment;
 public:
-	HPrepocessor( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ )
-		: _beg( first_ ), _end( last_ ) {
+	HPrepocessor( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_, HSource::comments_t& comments_ )
+		: _beg( first_ )
+		, _end( last_ )
+		, _comments( comments_ )
+		, _comment() {
 		return;
 	}
-	HIterator begin( void ) const;
-	HIterator end( void ) const;
+	HIterator begin( void );
+	HIterator end( void );
+	yaal::hcore::HString const& comment( void ) const {
+		return ( _comment );
+	}
+private:
+	HPrepocessor( HPrepocessor const& ) = delete;
+	HPrepocessor& operator = ( HPrepocessor const& ) = delete;
 };
 
 class HPrepocessor::HIterator : public yaal::hcore::iterator_interface<char const, yaal::hcore::iterator_category::forward> {
@@ -77,16 +89,22 @@ private:
 		IN_SINGLE_QUOTE,
 		IN_DOUBLE_QUOTE
 	};
-	HPrepocessor const* _owner;
+	HPrepocessor* _owner;
 	yaal::hcore::HString::const_iterator _cur;
 	STATE _state;
 	bool _escape; /*!< Is a QUOTE substate. */
 public:
 	HIterator( void )
-		: _owner( nullptr ), _cur(), _state( STATE::NORMAL ), _escape( false ) {
+		: _owner( nullptr )
+		, _cur()
+		, _state( STATE::NORMAL )
+		, _escape( false ) {
 	}
 	HIterator( HIterator const& it_ )
-		: _owner( it_._owner ), _cur( it_._cur ), _state( it_._state ), _escape( it_._escape ) {
+		: _owner( it_._owner )
+		, _cur( it_._cur )
+		, _state( it_._state )
+		, _escape( it_._escape ) {
 	}
 	HIterator& operator = ( HIterator const& it_ ) {
 		if ( &it_ != this ) {
@@ -133,7 +151,7 @@ public:
 		return ( _cur );
 	}
 private:
-	HIterator( HPrepocessor const* owner_, yaal::hcore::HString::const_iterator pos_ )
+	HIterator( HPrepocessor* owner_, yaal::hcore::HString::const_iterator pos_ )
 		: _owner( owner_ ), _cur( pos_ ), _state( STATE::NORMAL ), _escape( false ) {
 		make_readable();
 		return;

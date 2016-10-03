@@ -43,7 +43,7 @@ namespace huginn {
 /*
  * These cannot be declared inside HPrepocessor body because HIterator is not fully declared there.
  */
-HPrepocessor::HIterator HPrepocessor::begin( void ) const {
+HPrepocessor::HIterator HPrepocessor::begin( void ) {
 	int len( static_cast<int>( _end - _beg ) );
 	char const hashBang[] = "#!";
 	int const hashBangLen( static_cast<int>( sizeof ( hashBang ) - 1 ) );
@@ -57,7 +57,7 @@ HPrepocessor::HIterator HPrepocessor::begin( void ) const {
 	return ( HIterator( this, _beg + offset ) );
 }
 
-HPrepocessor::HIterator HPrepocessor::end( void ) const {
+HPrepocessor::HIterator HPrepocessor::end( void ) {
 	return ( HIterator( this, _end ) );
 }
 
@@ -130,7 +130,9 @@ void HPrepocessor::HIterator::make_readable( void ) {
 	 */
 	yaal::hcore::HString::const_iterator pos( _cur );
 	if ( _state == STATE::NORMAL ) {
+		yaal::hcore::HString::const_iterator preSkip( pos );
 		pos = skip_comment( pos );
+		_owner->_comment.assign( preSkip, pos );
 		if ( *pos == SINGLE_QUOTE ) {
 			_state = STATE::IN_SINGLE_QUOTE;
 		} else if ( *pos == DOUBLE_QUOTE ) {

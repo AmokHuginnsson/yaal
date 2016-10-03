@@ -49,6 +49,7 @@ HSource::HSource( void )
 	, _preprocessed()
 	, _preprocessedSize( 0 )
 	, _skips()
+	, _comments()
 	, _skippedLines( 0 ) {
 	return;
 }
@@ -85,7 +86,7 @@ void HSource::preprocess( void ) {
 	M_PROLOG
 	if ( _origSize > 0 ) {
 		_preprocessed.realloc( _origSize + 1 ); /* + 1 for terminating \0 */
-		HPrepocessor pp( _orig.get<char>(), _orig.get<char>() + _origSize );
+		HPrepocessor pp( _orig.get<char>(), _orig.get<char>() + _origSize, _comments );
 		char* dst( _preprocessed.get<char>() );
 		dst[_origSize] = 0;
 		_skips[0] = 0;
@@ -96,6 +97,9 @@ void HSource::preprocess( void ) {
 			if ( newPos > ( pos + 1 ) ) {
 				skipsTotal += ( newPos - ( pos + 1 ) );
 				_skips[static_cast<int>( dst - _preprocessed.get<char>() )] = skipsTotal;
+				if ( ! pp.comment().is_empty() ) {
+					_comments.insert( make_pair( error_coordinate( newPos ).line() - 1, pp.comment() ) );
+				}
 			}
 			pos = newPos;
 			*dst = *it;
@@ -144,6 +148,19 @@ char const* HSource::error_message( int code_ ) const {
 yaal::hcore::HString HSource::get_snippet( int from_, int len_ ) const {
 	M_PROLOG
 	return ( HString( _preprocessed.get<char>() + from_, len_ ) );
+	M_EPILOG
+}
+
+char const* HSource::get_comment( int position_ ) const {
+	M_PROLOG
+	int origPos( error_position( position_ ) );
+	HHuginn::HErrorCoordinate ec( error_coordinate( origPos ) );
+	char const* comment( nullptr );
+	comments_t::const_iterator it( _comments.find( ec.line() - 1 ) );
+	if ( it != _comments.end() ) {
+		comment = it->second.raw();
+	}
+	return ( comment );
 	M_EPILOG
 }
 

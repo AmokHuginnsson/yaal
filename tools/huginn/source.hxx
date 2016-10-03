@@ -39,15 +39,19 @@ namespace tools {
 
 namespace huginn {
 
-class HSource {
+class HSource final {
+public:
 	typedef HSource this_type;
 	typedef yaal::hcore::HMap<int, int> skips_t;
+	typedef yaal::hcore::HLookupMap<int, yaal::hcore::HString> comments_t;
+private:
 	yaal::hcore::HString _name;
 	yaal::hcore::HChunk _orig;
 	int _origSize;
 	yaal::hcore::HChunk _preprocessed;
 	int _preprocessedSize;
 	skips_t _skips;
+	comments_t _comments;
 	int _skippedLines;
 public:
 	HSource( void );
@@ -57,6 +61,7 @@ public:
 	int error_position( int ) const;
 	HHuginn::HErrorCoordinate error_coordinate( int ) const;
 	yaal::hcore::HString get_snippet( int, int ) const;
+	char const* get_comment( int ) const;
 	yaal::hcore::HString const& name( void ) const;
 	yaal::hcore::HString::const_iterator begin( void ) const;
 	yaal::hcore::HString::const_iterator end( void ) const;

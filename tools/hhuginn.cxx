@@ -727,15 +727,21 @@ HHuginn::value_t HHuginn::HTernaryEvaluator::do_clone( HRuntime* ) const {
 
 HHuginn::HFunctionReference::HFunctionReference(
 	identifier_id_t identifierId_,
-	function_t const& function_
-) : HValue( &_functionReferenceClass_ ),
-	_identifierId( identifierId_ ),
-	_function( function_ ) {
+	function_t const& function_,
+	yaal::hcore::HString const& doc_
+) : HValue( &_functionReferenceClass_ )
+	, _identifierId( identifierId_ )
+	, _function( function_ )
+	, _doc( doc_ ) {
 	return;
 }
 
 HHuginn::value_t HHuginn::HFunctionReference::do_clone( HRuntime* runtime_ ) const {
-	return ( runtime_->object_factory()->create_function_reference( _identifierId, _function ) );
+	return ( runtime_->object_factory()->create_function_reference( _identifierId, _function, _doc ) );
+}
+
+yaal::hcore::HString const& HHuginn::HFunctionReference::doc( void ) const {
+	return ( _doc );
 }
 
 HHuginn::HClass::HMethod::HMethod(
