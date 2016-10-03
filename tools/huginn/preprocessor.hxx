@@ -50,13 +50,11 @@ public:
 private:
 	yaal::hcore::HString::const_iterator _beg;
 	yaal::hcore::HString::const_iterator _end;
-	HSource::comments_t& _comments;
 	yaal::hcore::HString _comment;
 public:
-	HPrepocessor( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_, HSource::comments_t& comments_ )
+	HPrepocessor( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ )
 		: _beg( first_ )
 		, _end( last_ )
-		, _comments( comments_ )
 		, _comment() {
 		return;
 	}

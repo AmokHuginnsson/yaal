@@ -86,7 +86,7 @@ void HSource::preprocess( void ) {
 	M_PROLOG
 	if ( _origSize > 0 ) {
 		_preprocessed.realloc( _origSize + 1 ); /* + 1 for terminating \0 */
-		HPrepocessor pp( _orig.get<char>(), _orig.get<char>() + _origSize, _comments );
+		HPrepocessor pp( _orig.get<char>(), _orig.get<char>() + _origSize );
 		char* dst( _preprocessed.get<char>() );
 		dst[_origSize] = 0;
 		_skips[0] = 0;
