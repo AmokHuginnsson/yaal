@@ -157,8 +157,10 @@ OCompiler::OClassContext::OClassContext( void )
 	, _fieldNames()
 	, _fieldDefinitions()
 	, _methods()
+	, _docs()
 	, _position( 0 )
-	, _basePosition( 0 ) {
+	, _basePosition( 0 )
+	, _doc( nullptr ) {
 	return;
 }
 
@@ -714,11 +716,14 @@ void OCompiler::set_lambda_name( executing_parser::position_t position_ ) {
 
 void OCompiler::create_function( executing_parser::position_t position_ ) {
 	M_PROLOG
+	char const* doc( _runtime->huginn()->get_comment( position_.get() ) );
 	function_info_t fi( create_function_low( position_ ) );
 	if ( !! _classContext ) {
-		_classContext->_methods.insert( make_pair( static_cast<int>( _classContext->_fieldNames.get_size() - 1 ), fi.second ) );
+		int idx( static_cast<int>( _classContext->_fieldNames.get_size() - 1 ) );
+		_classContext->_methods.insert( make_pair( idx, fi.second ) );
+		_classContext->_docs.insert( make_pair( idx, doc ? doc : "" ) );
 	} else {
-		_runtime->register_function( fi.first, fi.second );
+		_runtime->register_function( fi.first, fi.second, doc ? doc : "" );
 	}
 	M_EPILOG
 }
@@ -750,6 +755,7 @@ OCompiler::function_info_t OCompiler::create_function_low( executing_parser::pos
 void OCompiler::submit_class( executing_parser::position_t position_ ) {
 	M_PROLOG
 	pop_function_context();
+	_classContext->_doc = _runtime->huginn()->get_comment( position_.get() );
 	if ( ! _submittedClasses.insert( make_pair( _classContext->_classIdentifier, yaal::move( _classContext ) ) ).second ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"`"_ys.append( _runtime->identifier_name( _classContext->_classIdentifier ) ).append( "' is already defined." ),
@@ -1285,10 +1291,13 @@ void OCompiler::add_default_value( executing_parser::position_t ) {
 	M_EPILOG
 }
 
-void OCompiler::add_field_definition( executing_parser::position_t ) {
+void OCompiler::add_field_definition( executing_parser::position_t position_ ) {
 	M_PROLOG
 	M_ASSERT( !! _classContext );
-	_classContext->_fieldDefinitions.insert( make_pair( static_cast<int>( _classContext->_fieldNames.get_size() - 1 ), current_expression() ) );
+	char const* doc( _runtime->huginn()->get_comment( position_.get() ) );
+	int idx( static_cast<int>( _classContext->_fieldNames.get_size() - 1 ) );
+	_classContext->_fieldDefinitions.insert( make_pair( idx, current_expression() ) );
+	_classContext->_docs.insert( make_pair( idx, doc ? doc : "" ) );
 	reset_expression();
 	return;
 	M_EPILOG

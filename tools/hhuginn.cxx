@@ -88,8 +88,8 @@ HHuginn::identifier_id_t const TYPE_OBJECT_REFERENCE_IDENTIFIER( 26 );
 HHuginn::identifier_id_t const TYPE_METHOD_IDENTIFIER( 27 );
 HHuginn::identifier_id_t const TYPE_BOUND_METHOD_IDENTIFIER( 28 );
 HHuginn::identifier_id_t const TYPE_UNKNOWN_IDENTIFIER( 29 );
-HHuginn::HClass const _noneClass_( HHuginn::TYPE::NONE, TYPE_NONE_IDENTIFIER );
-HHuginn::HClass const _observerClass_( HHuginn::TYPE::OBSERVER, TYPE_OBSERVER_IDENTIFIER );
+HHuginn::HClass const _noneClass_( HHuginn::TYPE::NONE, TYPE_NONE_IDENTIFIER, "Type of `none' value." );
+HHuginn::HClass const _observerClass_( HHuginn::TYPE::OBSERVER, TYPE_OBSERVER_IDENTIFIER, "Type representing a non-owning weak reference to a value." );
 HHuginn::HClass const _referenceClass_( HHuginn::TYPE::REFERENCE, TYPE_REFERENCE_IDENTIFIER );
 HHuginn::HClass const _functionReferenceClass_( HHuginn::TYPE::FUNCTION_REFERENCE, TYPE_FUNCTION_REFERENCE_IDENTIFIER );
 HHuginn::HClass const _objectReferenceClass_( HHuginn::TYPE::OBJECT_REFERENCE, TYPE_OBJECT_REFERENCE_IDENTIFIER );
@@ -319,15 +319,15 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 			OCompiler::OClassContext::expressions_t::const_iterator f( cc->_fieldDefinitions.find( i ) );
 			if ( f != cc->_fieldDefinitions.end() ) {
 				f->second->execute( &t );
-				fieldDefinitions.emplace_back( cc->_fieldNames[i], frame->result() );
+				fieldDefinitions.emplace_back( cc->_fieldNames[i], frame->result(), cc->_docs.at( i ) );
 			} else {
 				OCompiler::OClassContext::methods_t::const_iterator m( cc->_methods.find( i ) );
 				M_ASSERT( m != cc->_methods.end() );
-				fieldDefinitions.emplace_back( cc->_fieldNames[i], make_pointer<HClass::HMethod>( m->second ) );
+				fieldDefinitions.emplace_back( cc->_fieldNames[i], make_pointer<HClass::HMethod>( m->second ), cc->_docs.at( i ) );
 			}
 		}
 		t.pop_frame();
-		cls = _runtime->create_class( identifierId_, super, fieldDefinitions );
+		cls = _runtime->create_class( identifierId_, super, fieldDefinitions, cc->_doc ? cc->_doc : "" );
 		_runtime->register_class_low( cls, true );
 	}
 	return ( cls.raw() );
@@ -485,6 +485,12 @@ yaal::hcore::HString HHuginn::get_snippet( int from_, int len_ ) const {
 	M_EPILOG
 }
 
+char const* HHuginn::get_comment( int pos_ ) const {
+	M_PROLOG
+	return ( _source->get_comment( pos_ ) );
+	M_EPILOG
+}
+
 void HHuginn::set_input_stream( yaal::hcore::HStreamInterface::ptr_t stream_ ) {
 	M_PROLOG
 	_inputStream = stream_;
@@ -609,6 +615,13 @@ HRuntime const& HHuginn::runtime( void ) const {
 void HHuginn::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) {
 	M_PROLOG
 	_runtime->dump_vm_state( stream_ );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::dump_docs( yaal::hcore::HStreamInterface& stream_ ) {
+	M_PROLOG
+	_runtime->dump_docs( stream_ );
 	return;
 	M_EPILOG
 }

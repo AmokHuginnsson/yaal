@@ -278,18 +278,24 @@ struct OCompiler {
 	};
 	typedef yaal::hcore::HResource<OFunctionContext> function_context_t;
 	typedef yaal::hcore::HStack<function_context_t> function_contexts_t;
-	struct OClassContext {
+	struct OClassContext final {
 		typedef yaal::hcore::HArray<yaal::hcore::HString> field_names_t;
 		typedef yaal::hcore::HHashMap<int, HHuginn::expression_t> expressions_t;
 		typedef yaal::hcore::HHashMap<int, HHuginn::function_t> methods_t;
+		typedef yaal::hcore::HHashMap<int, yaal::hcore::HString> docs_t;
 		HHuginn::identifier_id_t _classIdentifier;
 		HHuginn::identifier_id_t _baseName;
 		field_names_t _fieldNames;
 		expressions_t _fieldDefinitions;
 		methods_t _methods;
+		docs_t _docs;
 		executing_parser::position_t _position;
 		executing_parser::position_t _basePosition;
+		char const* _doc;
 		OClassContext( void );
+	private:
+		OClassContext( OClassContext const& ) = delete;
+		OClassContext& operator = ( OClassContext const& ) = delete;
 	};
 	struct OExecutionStep {
 		enum class OPERATION {

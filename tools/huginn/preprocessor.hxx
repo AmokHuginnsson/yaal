@@ -150,8 +150,13 @@ public:
 	}
 private:
 	HIterator( HPrepocessor* owner_, yaal::hcore::HString::const_iterator pos_ )
-		: _owner( owner_ ), _cur( pos_ ), _state( STATE::NORMAL ), _escape( false ) {
-		make_readable();
+		: _owner( owner_ )
+		, _cur( pos_ )
+		, _state( STATE::NORMAL )
+		, _escape( false ) {
+		if ( _cur != _owner->_end ) {
+			make_readable();
+		}
 		return;
 	}
 	friend class HPrepocessor;

@@ -86,16 +86,18 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 			runtime_->identifier_id( type_name( HHuginn::TYPE::CHARACTER ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "to_lower",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &character::to_lower, _1, _2, _3, _4 ) ) },
-				{ "to_upper",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &character::to_upper, _1, _2, _3, _4 ) ) },
-				{ "is_upper",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_upper", static_cast<int(*)(int)>( ::std::isupper ), _1, _2, _3, _4 ) ) },
-				{ "is_lower",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_lower", static_cast<int(*)(int)>( ::std::islower ), _1, _2, _3, _4 ) ) },
-				{ "is_digit",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_digit", static_cast<int(*)(int)>( ::std::isdigit ), _1, _2, _3, _4 ) ) },
-				{ "is_xdigit", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_xdigit", static_cast<int(*)(int)>( ::std::isxdigit ), _1, _2, _3, _4 ) ) },
-				{ "is_space",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_space", static_cast<int(*)(int)>( ::std::isspace ), _1, _2, _3, _4 ) ) },
-				{ "is_alpha",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_alpha", static_cast<int(*)(int)>( ::std::isalpha ), _1, _2, _3, _4 ) ) },
-				{ "is_alnum",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_alnum", static_cast<int(*)(int)>( ::std::isalnum ), _1, _2, _3, _4 ) ) }
-			}
+				{ "to_lower",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &character::to_lower, _1, _2, _3, _4 ) ), "make this character lower case" },
+				{ "to_upper",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &character::to_upper, _1, _2, _3, _4 ) ), "make this character upper case" },
+				{ "is_upper",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_upper", static_cast<int(*)(int)>( ::std::isupper ), _1, _2, _3, _4 ) ), "tell if this character is an upper case character" },
+				{ "is_lower",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_lower", static_cast<int(*)(int)>( ::std::islower ), _1, _2, _3, _4 ) ), "tell if this character is a lower case character" },
+				{ "is_digit",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_digit", static_cast<int(*)(int)>( ::std::isdigit ), _1, _2, _3, _4 ) ), "tell if this character represents decimal digit" },
+				{ "is_xdigit", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_xdigit", static_cast<int(*)(int)>( ::std::isxdigit ), _1, _2, _3, _4 ) ), "tell if this character represents hexadecimal digit" },
+				{ "is_space",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_space", static_cast<int(*)(int)>( ::std::isspace ), _1, _2, _3, _4 ) ), "tell if this character represents whitespace character" },
+				{ "is_alpha",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_alpha", static_cast<int(*)(int)>( ::std::isalpha ), _1, _2, _3, _4 ) ), "tell if this character represents alphabet character" },
+				{ "is_alnum",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_alnum", static_cast<int(*)(int)>( ::std::isalnum ), _1, _2, _3, _4 ) ), "tell if this character represents any alphanumeric character" }
+			},
+			"The character is a scalar type that is used to represent and operate on single characters. "
+			"It supports basic operations of comparisons, case modification and classification."
 		)
 	);
 	return ( c );

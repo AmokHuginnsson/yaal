@@ -233,9 +233,9 @@ void HRuntime::register_class_low( class_t class_, bool registerContructor_ ) {
 	M_EPILOG
 }
 
-void HRuntime::register_function( identifier_id_t identifier_, function_t function_ ) {
+void HRuntime::register_function( identifier_id_t identifier_, function_t function_, yaal::hcore::HString const& doc_ ) {
 	M_PROLOG
-	_functionsStore.insert( make_pair( identifier_, _objectFactory->create_function_reference( identifier_, function_ ) ) );
+	_functionsStore.insert( make_pair( identifier_, _objectFactory->create_function_reference( identifier_, function_, doc_ ) ) );
 	_functionsAvailable.insert( identifier_ );
 	return;
 	M_EPILOG
@@ -258,7 +258,7 @@ void HRuntime::register_package( identifier_id_t package_, identifier_id_t alias
 	M_EPILOG
 }
 
-HHuginn::class_t HRuntime::create_class( identifier_id_t identifier_, HHuginn::HClass const* base_, field_definitions_t const& fieldDefinitions_ ) {
+HHuginn::class_t HRuntime::create_class( identifier_id_t identifier_, HHuginn::HClass const* base_, field_definitions_t const& fieldDefinitions_, yaal::hcore::HString const& doc_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
@@ -266,7 +266,8 @@ HHuginn::class_t HRuntime::create_class( identifier_id_t identifier_, HHuginn::H
 			type_id_t( _idGenerator ),
 			identifier_,
 			base_,
-			fieldDefinitions_
+			fieldDefinitions_,
+			doc_
 		)
 	);
 	++ _idGenerator;
@@ -274,9 +275,9 @@ HHuginn::class_t HRuntime::create_class( identifier_id_t identifier_, HHuginn::H
 	M_EPILOG
 }
 
-HHuginn::class_t HRuntime::create_class( yaal::hcore::HString const& name_, HHuginn::HClass const* base_, field_definitions_t const& fieldDefinitions_ ) {
+HHuginn::class_t HRuntime::create_class( yaal::hcore::HString const& name_, HHuginn::HClass const* base_, field_definitions_t const& fieldDefinitions_, yaal::hcore::HString const& doc_ ) {
 	M_PROLOG
-	return ( create_class( identifier_id( name_ ), base_, fieldDefinitions_ ) );
+	return ( create_class( identifier_id( name_ ), base_, fieldDefinitions_, doc_ ) );
 	M_EPILOG
 }
 
@@ -820,6 +821,29 @@ void HRuntime::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) {
 			}
 		}
 		stream_ << endl;
+	}
+	return;
+	M_EPILOG
+}
+
+void HRuntime::dump_docs( yaal::hcore::HStreamInterface& stream_ ) {
+	M_PROLOG
+	for ( classes_t::value_type const& c : _classes ) {
+		HHuginn::HClass const& cls( *c.second );
+		if ( ! cls.doc().is_empty() ) {
+			stream_ << cls.name() << ":" << cls.doc() << endl;
+		}
+		for ( HHuginn::field_identifiers_t::value_type const& f : cls.field_identifiers() ) {
+			if ( ! cls.doc( f ).is_empty() ) {
+				stream_ << cls.name() << "." << identifier_name( f ) << ":" << cls.doc( f ) << endl;
+			}
+		}
+	}
+	for ( functions_available_t::value_type const& fa : _functionsAvailable ) {
+		HHuginn::HFunctionReference const& f( *static_cast<HHuginn::HFunctionReference const*>( _functionsStore.at( fa ).raw() ) );
+		if ( ! f.doc().is_empty() && ( ( _classes.count( fa ) == 0 ) || _classes.at( fa )->doc().is_empty() ) ) {
+			stream_ << identifier_name( fa ) << ":" << f.doc() << endl;
+		}
 	}
 	return;
 	M_EPILOG

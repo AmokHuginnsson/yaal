@@ -32,6 +32,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "source.hxx"
 #include "preprocessor.hxx"
 #include "tools/streamtools.hxx"
+#include "tools/stringalgo.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -97,8 +98,15 @@ void HSource::preprocess( void ) {
 			if ( newPos > ( pos + 1 ) ) {
 				skipsTotal += ( newPos - ( pos + 1 ) );
 				_skips[static_cast<int>( dst - _preprocessed.get<char>() )] = skipsTotal;
-				if ( ! pp.comment().is_empty() ) {
-					_comments.insert( make_pair( error_coordinate( newPos ).line() - 1, pp.comment() ) );
+				HString comment( pp.comment() );
+				typedef HArray<HString> lines_t;
+				lines_t lines( string::split<lines_t>( comment, "\n", HTokenizer::SKIP_EMPTY ) );
+				for ( HString& l : lines ) {
+					l.trim( "/*\t " );
+				}
+				comment = string::join( lines, " " );
+				if ( ! comment.is_empty() ) {
+					_comments.insert( make_pair( error_coordinate( newPos ).line() - 1, comment ) );
 				}
 			}
 			pos = newPos;
@@ -156,7 +164,7 @@ char const* HSource::get_comment( int position_ ) const {
 	int origPos( error_position( position_ ) );
 	HHuginn::HErrorCoordinate ec( error_coordinate( origPos ) );
 	char const* comment( nullptr );
-	comments_t::const_iterator it( _comments.find( ec.line() - 1 ) );
+	comments_t::const_iterator it( _comments.find( ec.line() - 2 ) );
 	if ( it != _comments.end() ) {
 		comment = it->second.raw();
 	}
