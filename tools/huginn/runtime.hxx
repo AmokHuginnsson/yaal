@@ -171,8 +171,8 @@ public:
 	 *
 	 * \param stream_ - stream where VM state shall be dumped.
 	 */
-	void dump_vm_state( yaal::hcore::HStreamInterface& );
-	void dump_docs( yaal::hcore::HStreamInterface& );
+	void dump_vm_state( yaal::hcore::HStreamInterface& ) const;
+	void dump_docs( yaal::hcore::HStreamInterface& ) const;
 	void register_builtins( void );
 
 	yaal::hcore::HString suggestion( HHuginn::identifier_id_t ) const;

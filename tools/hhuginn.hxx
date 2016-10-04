@@ -260,13 +260,13 @@ public:
 	 *
 	 * \param stream_ - stream where VM state shall be dumped.
 	 */
-	void dump_vm_state( yaal::hcore::HStreamInterface& );
+	void dump_vm_state( yaal::hcore::HStreamInterface& ) const;
 
 	/*! \brief Dump documentation strings into given stream.
 	 *
 	 * \param stream_ - stream where documentation string shall be dumped.
 	 */
-	void dump_docs( yaal::hcore::HStreamInterface& );
+	void dump_docs( yaal::hcore::HStreamInterface& ) const;
 
 	/*! \brief Add argument for main() function.
 	 *
@@ -277,7 +277,7 @@ public:
 	/*! \brief Remove all argument currently held for main() function.
 	 */
 	void clear_arguments( void );
-	void dump_preprocessed_source( yaal::hcore::HStreamInterface& );
+	void dump_preprocessed_source( yaal::hcore::HStreamInterface& ) const;
 	int error_position( void ) const;
 	HErrorCoordinate error_coordinate( void ) const;
 	HErrorCoordinate get_coordinate( int ) const;

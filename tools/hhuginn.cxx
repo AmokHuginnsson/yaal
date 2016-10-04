@@ -601,7 +601,7 @@ HHuginn::value_t HHuginn::result( void ) const {
 	return ( _runtime->result() );
 }
 
-void HHuginn::dump_preprocessed_source( yaal::hcore::HStreamInterface& stream_ ) {
+void HHuginn::dump_preprocessed_source( yaal::hcore::HStreamInterface& stream_ ) const {
 	M_PROLOG
 	_source->dump_preprocessed( stream_ );
 	return;
@@ -612,14 +612,14 @@ HRuntime const& HHuginn::runtime( void ) const {
 	return ( *_runtime );
 }
 
-void HHuginn::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) {
+void HHuginn::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) const {
 	M_PROLOG
 	_runtime->dump_vm_state( stream_ );
 	return;
 	M_EPILOG
 }
 
-void HHuginn::dump_docs( yaal::hcore::HStreamInterface& stream_ ) {
+void HHuginn::dump_docs( yaal::hcore::HStreamInterface& stream_ ) const {
 	M_PROLOG
 	_runtime->dump_docs( stream_ );
 	return;

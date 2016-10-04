@@ -800,7 +800,7 @@ inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterfac
 	M_EPILOG
 }
 
-void HRuntime::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) {
+void HRuntime::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) const {
 	M_PROLOG
 	stream_ << "Huginn VM state for `" << _huginn->source_name() << "'" << endl;
 	for ( packages_t::value_type const& p : _packages ) {
@@ -826,7 +826,7 @@ void HRuntime::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) {
 	M_EPILOG
 }
 
-void HRuntime::dump_docs( yaal::hcore::HStreamInterface& stream_ ) {
+void HRuntime::dump_docs( yaal::hcore::HStreamInterface& stream_ ) const {
 	M_PROLOG
 	for ( classes_t::value_type const& c : _classes ) {
 		HHuginn::HClass const& cls( *c.second );
