@@ -93,7 +93,7 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 				{ "is_exact", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &number::is_exact, _1, _2, _3, _4 ) ), "tell if this number is an exact representation" },
 				{ "is_integral", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &number::is_integral, _1, _2, _3, _4 ) ), "tell if this number does not have any decimal digits" },
 				{ "get_precision", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &number::get_precision, _1, _2, _3, _4 ) ), "get maximum precision of this number" },
-				{ "set_precision", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &number::set_precision, _1, _2, _3, _4 ) ), "set maximum precision of this number (increasing precision works only on numbers that currently have exact representation)" }
+				{ "set_precision", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &number::set_precision, _1, _2, _3, _4 ) ), "( *prec* ) set maximum precision of this number to *prec* (increasing precision works only on numbers that currently have exact representation)" }
 			},
 			"The number is a scalar type that is used to represent and operate on fixed point numbers of arbitrary size. "
 			"It supports basic operations of addition, substraction, multiplication, division, modulo, power, factorial and comparisons, "
