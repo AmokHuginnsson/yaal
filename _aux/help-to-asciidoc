@@ -85,7 +85,7 @@ def main():
 	out.write( args.project.upper() + "(1)\n" )
 	out.write( "=" * ( len( args.project ) + 3 ) + "\n\n" )
 	out.write( "NAME\n----\n" )
-	out.write( "$$" + name + "$$\n\n" )
+	out.write( name + "\n\n" )
 	out.write( "SYNOPSIS\n--------\n" )
 	out.write( "$$" + usage + "$$\n\n" )
 	out.write( "DESCRIPTION\n-----------\n" )
