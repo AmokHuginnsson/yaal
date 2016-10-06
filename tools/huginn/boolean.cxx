@@ -55,8 +55,8 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 			runtime_->identifier_id( type_name( HHuginn::TYPE::BOOLEAN ) ),
 			nullptr,
 			HHuginn::field_definitions_t{},
-			"The boolean is a scalar type that is used to represent and operate on boolean values. "
-			"It supports basic operations of negation, logical `and', `or', and `xor' and comparisons."
+			"The `boolean` is a scalar type that is used to represent and operate on boolean values. "
+			"It supports basic operations of negation, logical \"and\", \"or\", and \"xor\" and comparisons."
 		)
 	);
 	return ( c );

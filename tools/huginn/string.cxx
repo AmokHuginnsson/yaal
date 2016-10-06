@@ -191,7 +191,7 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 				{ "to_upper",             make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::to_upper, _1, _2, _3, _4 ) ), "turn all string's characters to upper case" },
 				{ "clear",                make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::clear, _1, _2, _3, _4 ) ), "erase string content" }
 			},
-			"The string is a scalar type that is used to represent and operate on character strings. "
+			"The `string` is a scalar type that is used to represent and operate on character strings. "
 			"It supports basic operations of addition and comparisons, it also supports subscript and range operators."
 		)
 	);

@@ -129,12 +129,15 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 			runtime_->identifier_id( type_name( HHuginn::TYPE::DEQUE ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "add",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::add, _1, _2, _3, _4 ) ) },
-				{ "pop",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::pop, _1, _2, _3, _4 ) ) },
-				{ "add_front", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::add_front, _1, _2, _3, _4 ) ) },
-				{ "pop_front", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::pop_front, _1, _2, _3, _4 ) ) },
-				{ "clear",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::clear, _1, _2, _3, _4 ) ) }
-			}
+				{ "add",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::add, _1, _2, _3, _4 ) ), "( *elem* ) - add new *elem* at the (right/back) end of the deque, deque grows in size by 1" },
+				{ "pop",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::pop, _1, _2, _3, _4 ) ), "remove last element from the deque, deque shrinks by 1" },
+				{ "add_front", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::add_front, _1, _2, _3, _4 ) ), "( *elem* ) - add new *elem* at the (left/front) begining of the deque, deque grows in size by 1" },
+				{ "pop_front", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::pop_front, _1, _2, _3, _4 ) ), "remove first element from the deque, deque shrinks by 1" },
+				{ "clear",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::clear, _1, _2, _3, _4 ) ), "erase deque's content, deque becomes empty" }
+			},
+			"The `deque` is a collection type that is used to represent and operate on list of values. "
+			"It supports basic subscript and range operators. "
+			"It also supports efficient operations of addition and removal of its elements at its both ends."
 		)
 	);
 	return ( c );

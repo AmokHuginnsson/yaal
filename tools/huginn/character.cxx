@@ -96,7 +96,7 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 				{ "is_alpha",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_alpha", static_cast<int(*)(int)>( ::std::isalpha ), _1, _2, _3, _4 ) ), "tell if this character represents alphabet character" },
 				{ "is_alnum",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_alnum", static_cast<int(*)(int)>( ::std::isalnum ), _1, _2, _3, _4 ) ), "tell if this character represents any alphanumeric character" }
 			},
-			"The character is a scalar type that is used to represent and operate on single characters. "
+			"The `character` is a scalar type that is used to represent and operate on single characters. "
 			"It supports basic operations of comparisons, case modification and classification."
 		)
 	);

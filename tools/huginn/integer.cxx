@@ -55,7 +55,7 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 			runtime_->identifier_id( type_name( HHuginn::TYPE::INTEGER ) ),
 			nullptr,
 			HHuginn::field_definitions_t{},
-			"The integer is a scalar type that is used to represent and operate on integers. "
+			"The `integer` is a scalar type that is used to represent and operate on integers. "
 			"It supports basic operations of addition, substraction, multiplication, division, modulo and comparisons. "
 			"The range of possible values it can hold is [-2^32, 2^32)."
 		)

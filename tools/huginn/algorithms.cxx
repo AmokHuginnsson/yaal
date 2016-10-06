@@ -284,13 +284,14 @@ HHuginn::value_t HAlgorithmsCreator::do_new_instance( HRuntime* runtime_ ) {
 			"Algorithms",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "filter",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::filter, _1, _2, _3, _4 ) ) },
-				{ "map",         make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::map, _1, _2, _3, _4 ) ) },
-				{ "materialize", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::materialize, _1, _2, _3, _4 ) ) },
-				{ "reduce",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::reduce, _1, _2, _3, _4 ) ) },
-				{ "range",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::range, _1, _2, _3, _4 ) ) },
-				{ "sorted",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::sorted, _1, _2, _3, _4 ) ) }
-			}
+				{ "filter",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::filter, _1, _2, _3, _4 ) ), "( *iterable*, *callable* ) - create `Filter` object that iterates over *iterable* and returns only elements for which *callable* returns `boolean` equal `true`" },
+				{ "map",         make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::map, _1, _2, _3, _4 ) ), "( *iterable*, *callable* ) - create `Mapper` object that maps elements from *iterable* transforming each of them with *callable* when iterated over" },
+				{ "materialize", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::materialize, _1, _2, _3, _4 ) ), "( *iterable*, *colType* ) - copy elements from *iterable* to newly created instance of *colType*" },
+				{ "reduce",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::reduce, _1, _2, _3, _4 ) ), "( *iterable*, *callable* [, *init*] ) - iteratively combine all elements from *iterable* using *callable(x,y)* and starting value of *init*" },
+				{ "range",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::range, _1, _2, _3, _4 ) ), "( [*from*,] *until* [, *step*] ) - produce iterable sequence of `integer` values ranging from *from* up until *until* using *step* increments" },
+				{ "sorted",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::sorted, _1, _2, _3, _4 ) ), "( *iterable* [, *callable*] ) - return content of *iterable* as sorted `list`, using *callable* to retrieve keys for element comparison" }
+			},
+			"The `Algorithms` package contains basic low-level algorithms."
 		)
 	);
 	runtime_->huginn()->register_class( c );
