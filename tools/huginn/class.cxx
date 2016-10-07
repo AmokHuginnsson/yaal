@@ -52,27 +52,15 @@ HHuginn::HClass::HClass(
 	yaal::hcore::HString const& doc_
 ) : _typeId( typeId_ )
 	, _identifierId( identifierId_ )
-	, _super( super_ )
+	, _super( nullptr )
 	, _fieldIdentifiers()
-	, _fieldIndexes( super_ ? super_->_fieldIndexes : field_indexes_t() )
-	, _fieldDefinitions( super_ ? super_->_fieldDefinitions : values_t() )
-	, _fieldDescriptions( super_ ? super_->_fieldDescriptions : field_descriptions_t() )
+	, _fieldIndexes()
+	, _fieldDefinitions()
+	, _fieldDescriptions()
 	, _doc( doc_ )
 	, _runtime( runtime_ ) {
 	M_PROLOG
-	for ( field_definitions_t::value_type const& fd : fieldDefinitions_ ) {
-		identifier_id_t identifierId( runtime_->identifier_id( fd.name() ) );
-		_fieldIdentifiers.emplace_back( identifierId );
-		field_indexes_t::const_iterator fi(
-			_fieldIndexes.insert( make_pair( identifierId, static_cast<int>( _fieldIndexes.get_size() ) ) ).first
-		);
-		if ( fi->second >= _fieldDefinitions.get_size() ) {
-			_fieldDefinitions.resize( fi->second + 1 );
-			_fieldDescriptions.resize( fi->second + 1 );
-		}
-		_fieldDefinitions[fi->second] = fd.value();
-		_fieldDescriptions[fi->second] = fd.doc();
-	}
+	redefine( super_, fieldDefinitions_ );
 	return;
 	M_EPILOG
 }
@@ -91,6 +79,30 @@ HHuginn::HClass::HClass(
 	, _doc( doc_ )
 	, _runtime( nullptr ) {
 	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HClass::redefine( HClass const* super_, field_definitions_t const& fieldDefinitions_ ) {
+	M_PROLOG
+	_super = super_;
+	_fieldIdentifiers.clear();
+	_fieldIndexes = ( _super ? _super->_fieldIndexes : field_indexes_t() );
+	_fieldDefinitions = ( _super ? _super->_fieldDefinitions : values_t() );
+	_fieldDescriptions = ( _super ? _super->_fieldDescriptions : field_descriptions_t() );
+	for ( field_definitions_t::value_type const& fd : fieldDefinitions_ ) {
+		identifier_id_t identifierId( _runtime->identifier_id( fd.name() ) );
+		_fieldIdentifiers.emplace_back( identifierId );
+		field_indexes_t::const_iterator fi(
+			_fieldIndexes.insert( make_pair( identifierId, static_cast<int>( _fieldIndexes.get_size() ) ) ).first
+		);
+		if ( fi->second >= _fieldDefinitions.get_size() ) {
+			_fieldDefinitions.resize( fi->second + 1 );
+			_fieldDescriptions.resize( fi->second + 1 );
+		}
+		_fieldDefinitions[fi->second] = fd.value();
+		_fieldDescriptions[fi->second] = fd.doc();
+	}
 	return;
 	M_EPILOG
 }

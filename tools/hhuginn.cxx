@@ -242,6 +242,18 @@ HHuginn::HHuginn( huginn::HRuntime* runtime_ )
 	M_EPILOG
 }
 
+void HHuginn::reset( void ) {
+	M_PROLOG
+	_errorPosition = -1;
+	_errorMessage.clear();
+	_compiler->reset();
+	_source = make_resource<HSource>();
+	_runtime->reset();
+	_state = STATE::EMPTY;
+	return;
+	M_EPILOG
+}
+
 HHuginn::~HHuginn( void ) {
 	M_PROLOG
 	return;
@@ -291,20 +303,19 @@ bool HHuginn::parse( void ) {
 
 HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 	M_PROLOG
-	yaal::hcore::HString const& name( _runtime->identifier_name( identifierId_ ) );
 	class_t cls( _runtime->get_class( identifierId_ ) );
-	OCompiler::OClassContext* cc( _compiler->_submittedClasses.at( identifierId_ ).get() );
-	M_ASSERT( cc->_classIdentifier == identifierId_ );
-	for ( OCompiler::submitted_imports_t::value_type const& i : _compiler->_submittedImports ) {
-		if ( identifierId_ == i._package ) {
-			throw HHuginnRuntimeException( "Package of the same name `"_ys.append( name ).append( "' is already imported." ), cc->_position.get() );
-		} else if ( identifierId_ == i._alias ) {
-			throw HHuginnRuntimeException( "Package alias of the same name `"_ys.append( name ).append( "' is already defined." ), cc->_position.get() );
+	if ( _compiler->_submittedClasses.count( identifierId_ ) > 0 ) {
+		yaal::hcore::HString const& name( _runtime->identifier_name( identifierId_ ) );
+		OCompiler::OClassContext* cc( _compiler->_submittedClasses.at( identifierId_ ).get() );
+		M_ASSERT( cc->_classIdentifier == identifierId_ );
+		for ( OCompiler::submitted_imports_t::value_type const& i : _compiler->_submittedImports ) {
+			if ( identifierId_ == i._package ) {
+				throw HHuginnRuntimeException( "Package of the same name `"_ys.append( name ).append( "' is already imported." ), cc->_position.get() );
+			} else if ( identifierId_ == i._alias ) {
+				throw HHuginnRuntimeException( "Package alias of the same name `"_ys.append( name ).append( "' is already defined." ), cc->_position.get() );
+			}
 		}
-	}
-	if ( ! cls ) {
-		_compiler->track_name_cycle( identifierId_ );
-		if ( _runtime->get_function( identifierId_ ) ) {
+		if ( _runtime->get_function( identifierId_ ) && ! cls ) {
 			throw HHuginnRuntimeException( "Function of the same name `"_ys.append( name ).append( "' is already defined." ), cc->_position.get() );
 		}
 		HClass const* super( nullptr );
@@ -327,8 +338,13 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 			}
 		}
 		t.pop_frame();
-		cls = _runtime->create_class( identifierId_, super, fieldDefinitions, cc->_doc ? cc->_doc : "" );
-		_runtime->register_class_low( cls, true );
+		if ( ! cls ) {
+			cls = _runtime->create_class( identifierId_, super, fieldDefinitions, cc->_doc ? cc->_doc : "" );
+			_runtime->register_class_low( cls, true );
+		} else {
+			cls->redefine( super, fieldDefinitions );
+		}
+		_compiler->_submittedClasses.erase( identifierId_ );
 	}
 	return ( cls.raw() );
 	M_EPILOG
@@ -339,10 +355,16 @@ void HHuginn::finalize_compilation( paths_t const& paths_, compiler_setup_t comp
 	for ( OCompiler::submitted_imports_t::value_type const& i : _compiler->_submittedImports ) {
 		_runtime->register_package( i._package, i._alias, paths_, compilerSetup_, i._position );
 	}
+	typedef HArray<identifier_id_t> identifiers_t;
+	identifiers_t classIdentifiers;
 	for ( OCompiler::submitted_classes_t::value_type const& sc : _compiler->_submittedClasses ) {
-		commit_class( sc.first );
+		_compiler->track_name_cycle( sc.first );
+		classIdentifiers.push_back( sc.first );
 	}
-	_compiler->_submittedClasses.clear();
+	for ( identifier_id_t const& id : classIdentifiers ) {
+		commit_class( id );
+	}
+	M_ASSERT( _compiler->_submittedClasses.is_empty() );
 	if ( compilerSetup_ & COMPILER::BE_STRICT ) {
 		_compiler->detect_misuse();
 	}

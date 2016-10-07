@@ -277,6 +277,10 @@ public:
 	/*! \brief Remove all argument currently held for main() function.
 	 */
 	void clear_arguments( void );
+
+	/*! \brief Reset the interpreter state so it can be used again with new program source.
+	 */
+	void reset( void );
 	void dump_preprocessed_source( yaal::hcore::HStreamInterface& ) const;
 	int error_position( void ) const;
 	HErrorCoordinate error_coordinate( void ) const;
@@ -389,6 +393,7 @@ public:
 	HClass( HHuginn::TYPE, HHuginn::identifier_id_t, yaal::hcore::HString const& = yaal::hcore::HString() );
 	virtual ~HClass( void ) {
 	}
+	void redefine( HClass const*, field_definitions_t const& );
 	HClass const* super( void ) const {
 		return ( _super );
 	}

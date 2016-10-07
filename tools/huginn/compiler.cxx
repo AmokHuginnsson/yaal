@@ -281,9 +281,29 @@ OCompiler::OCompiler( HRuntime* runtime_ )
 	, _setup( HHuginn::COMPILER::BE_STRICT )
 	, _statementIdGenerator( INVALID_STATEMENT_IDENTIFIER )
 	, _scopeContextCache()
-	, _isModule()
+	, _isModule( false )
+	, _isIncremental( false )
 	, _runtime( runtime_ ) {
 	return;
+}
+
+void OCompiler::reset( void ) {
+	M_PROLOG
+	_isModule = false;
+	_isIncremental = true;
+	_scopeContextCache.clear();
+	_statementIdGenerator = INVALID_STATEMENT_IDENTIFIER;
+	_usedIdentifiers.clear();
+	_executionStepsBacklog.clear();
+	_importInfo.reset();
+	_submittedImports.clear();
+	_submittedClasses.clear();
+	_classNoter._passThrough = false;
+	_classIdentifiers.clear();
+	_classContext.reset();
+	_functionContexts.clear();
+	return;
+	M_EPILOG
 }
 
 void OCompiler::set_setup( HHuginn::compiler_setup_t setup_ ) {
@@ -585,7 +605,7 @@ void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_
 	}
 	if ( ! _classContext ) {
 		HHuginn::value_t* fun( _runtime->get_function( functionIdentifier ) );
-		if ( fun ) {
+		if ( fun && ! _isIncremental ) {
 			throw HHuginn::HHuginnRuntimeException( "Function `"_ys.append( name_ ).append( "' was already defined." ), position_.get() );
 		}
 	}
@@ -654,7 +674,7 @@ void OCompiler::commit_import( executing_parser::position_t ) {
 
 void OCompiler::set_class_name( HHuginn::identifier_id_t identifier_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	if ( ( _submittedClasses.count( identifier_ ) > 0 ) || ( !! _runtime->get_class( identifier_ ) ) ) {
+	if ( ( _submittedClasses.count( identifier_ ) > 0 ) || ( !! _runtime->get_class( identifier_ ) && ! _isIncremental ) ) {
 		throw HHuginn::HHuginnRuntimeException( "Class `"_ys.append( _runtime->identifier_name( identifier_ ) ).append( "' is already defined." ), position_.get() );
 	}
 	_classContext = make_resource<OClassContext>();

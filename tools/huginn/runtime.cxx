@@ -132,6 +132,17 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 	, _maxLocalVariableCount( 0 ) {
 }
 
+void HRuntime::reset( void ) {
+	M_PROLOG
+	_maxLocalVariableCount = 0;
+	_result.reset();
+	_argv->clear();
+	_threads.clear();
+	_idGenerator = static_cast<type_id_t::value_type>( HHuginn::TYPE::NOT_BOOLEAN );
+	return;
+	M_EPILOG
+}
+
 void HRuntime::copy_text( HRuntime& source_ ) {
 	M_PROLOG
 	M_ASSERT( &source_ != this );
@@ -235,7 +246,7 @@ void HRuntime::register_class_low( class_t class_, bool registerContructor_ ) {
 
 void HRuntime::register_function( identifier_id_t identifier_, function_t function_, yaal::hcore::HString const& doc_ ) {
 	M_PROLOG
-	_functionsStore.insert( make_pair( identifier_, _objectFactory->create_function_reference( identifier_, function_, doc_ ) ) );
+	_functionsStore[ identifier_ ] = _objectFactory->create_function_reference( identifier_, function_, doc_ );
 	_functionsAvailable.insert( identifier_ );
 	return;
 	M_EPILOG

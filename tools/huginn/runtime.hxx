@@ -50,7 +50,12 @@ private:
 	typedef yaal::hcore::HHashMap<yaal::hcore::HThread::id_t, thread_t> threads_t;
 	typedef yaal::hcore::HLookupMap<yaal::hcore::HString, identifier_id_t> identifier_ids_t;
 	typedef yaal::hcore::HPointer<huginn::HObjectFactory> object_factory_t;
-	typedef yaal::hcore::HLookupMap<identifier_id_t, class_t> classes_t;
+	/*! \brief A type for storing class definitions.
+	 *
+	 * To support incremental mode we need to use collection that does not
+	 * invalidate storage when new elements are added.
+	 */
+	typedef yaal::hcore::HHashMap<identifier_id_t, class_t> classes_t;
 	typedef yaal::hcore::HLookupMap<identifier_id_t, value_t> packages_t;
 	/*! \brief A type for storing functions.
 	 *
@@ -166,6 +171,10 @@ public:
 	/*! \brief Remove all argument currently held for main() function.
 	 */
 	void clear_arguments( void );
+
+	/*! \brief Reset the runtime state so it can be used again with new program source.
+	 */
+	void reset( void );
 
 	/*! \brief Dump Huginn Virtual Machine state onto given stream.
 	 *

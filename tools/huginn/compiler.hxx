@@ -392,9 +392,17 @@ struct OCompiler {
 	HHuginn::compiler_setup_t _setup;
 	HStatement::statement_id_t _statementIdGenerator;
 	scope_context_cache_t _scopeContextCache;
+	/*! \brief Tells if this compiler instance is used for sub-module.
+	 */
 	bool _isModule;
+	/*! \brief Tells if this compiler instance should work in `incremental' mode.
+	 *
+	 * In incremental mode redefinitions override original definitions.
+	 */
+	bool _isIncremental;
 	HRuntime* _runtime;
 	OCompiler( HRuntime* );
+	void reset( void );
 	OFunctionContext& f( void );
 	void set_setup( HHuginn::compiler_setup_t );
 	void detect_misuse( void ) const;
