@@ -97,6 +97,11 @@ extern HHuginn::identifier_id_t const SET_IDENTIFIER;
 
 }
 
+namespace STANDARD_FUNCTIONS {
+extern char const* MAIN;
+extern HHuginn::identifier_id_t const MAIN_IDENTIFIER;
+}
+
 typedef yaal::hcore::HHashSet<yaal::hcore::HString>  words_t;
 
 extern words_t _directives_;

@@ -508,7 +508,7 @@ HString use_name( OCompiler::OIdentifierUse::TYPE type_ ) {
 void OCompiler::detect_misuse( void ) const {
 	M_PROLOG
 	HHuginn::identifier_id_t implicitUse[] = {
-		_runtime->identifier_id( "main" ),
+		STANDARD_FUNCTIONS::MAIN_IDENTIFIER,
 		_runtime->identifier_id( "get_size" ),
 		_runtime->identifier_id( "iterator" ),
 		_runtime->identifier_id( "is_valid" ),

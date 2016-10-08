@@ -83,7 +83,8 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			{ _objectReferenceClass_.name(), TYPE_OBJECT_REFERENCE_IDENTIFIER },
 			{ _methodClass_.name(), TYPE_METHOD_IDENTIFIER },
 			{ _boundMethodClass_.name(), TYPE_BOUND_METHOD_IDENTIFIER },
-			{ _unknownClass_.name(), TYPE_UNKNOWN_IDENTIFIER }
+			{ _unknownClass_.name(), TYPE_UNKNOWN_IDENTIFIER },
+			{ STANDARD_FUNCTIONS::MAIN, STANDARD_FUNCTIONS::MAIN_IDENTIFIER }
 		} )
 	, _identifierNames( {
 			KEYWORD::CONSTRUCTOR,
@@ -115,7 +116,8 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			_objectReferenceClass_.name(),
 			_methodClass_.name(),
 			_boundMethodClass_.name(),
-			_unknownClass_.name()
+			_unknownClass_.name(),
+			STANDARD_FUNCTIONS::MAIN
 		} )
 	, _objectFactory( new HObjectFactory( this ) )
 	, _none( make_pointer<HHuginn::HValue>( &_noneClass_ ) )
@@ -333,7 +335,7 @@ void HRuntime::execute( void ) {
 	}
 	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
 	huginn::HThread* t( _threads.insert( make_pair( threadId, make_pointer<huginn::HThread>( this, threadId ) ) ).first->second.get() );
-	_result = call( "main", args, 0 );
+	_result = call( STANDARD_FUNCTIONS::MAIN_IDENTIFIER, args, 0 );
 	t->flush_runtime_exception();
 	return;
 	M_EPILOG
@@ -389,17 +391,16 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 	M_EPILOG
 }
 
-HHuginn::value_t HRuntime::call( yaal::hcore::HString const& name_, values_t const& values_, int position_ ) {
+HHuginn::value_t HRuntime::call( identifier_id_t identifier_, values_t const& values_, int position_ ) {
 	M_PROLOG
-	HHuginn::identifier_id_t identifier( identifier_id( name_ ) );
 	value_t res;
-	if ( _functionsAvailable.count( identifier ) > 0 ) {
+	if ( _functionsAvailable.count( identifier_ ) > 0 ) {
 		yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
 		threads_t::iterator t( _threads.find( threadId ) );
 		M_ASSERT( t != _threads.end() );
-		res = static_cast<HHuginn::HFunctionReference*>( _functionsStore.at( identifier ).raw() )->function()( t->second.raw(), nullptr, values_, position_ );
+		res = static_cast<HHuginn::HFunctionReference*>( _functionsStore.at( identifier_ ).raw() )->function()( t->second.raw(), nullptr, values_, position_ );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "Function `"_ys.append( name_ ).append( "(...)' is not defined." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Function `"_ys.append( identifier_name( identifier_ ) ).append( "(...)' is not defined." ), position_ );
 	}
 	return ( res );
 	M_EPILOG
@@ -705,6 +706,7 @@ void HRuntime::register_builtins( void ) {
 	M_ENSURE( identifier_id( _methodClass_.name() ) == TYPE_METHOD_IDENTIFIER );
 	M_ENSURE( identifier_id( _boundMethodClass_.name() ) == TYPE_BOUND_METHOD_IDENTIFIER );
 	M_ENSURE( identifier_id( _unknownClass_.name() ) == TYPE_UNKNOWN_IDENTIFIER );
+	M_ENSURE( identifier_id( STANDARD_FUNCTIONS::MAIN ) == STANDARD_FUNCTIONS::MAIN_IDENTIFIER );
 	register_builtin_function( type_name( HHuginn::TYPE::INTEGER ), hcore::call( &huginn_builtin::integer, _1, _2, _3, _4 ) );
 	register_builtin_function( type_name( HHuginn::TYPE::REAL ), hcore::call( &huginn_builtin::real, _1, _2, _3, _4 ) );
 	register_builtin_function( type_name( HHuginn::TYPE::STRING ), hcore::call( &huginn_builtin::string, _1, _2, _3, _4 ) );

@@ -96,6 +96,13 @@ HHuginn::identifier_id_t const SET_IDENTIFIER( 21 );
 
 }
 
+namespace STANDARD_FUNCTIONS {
+
+char const* MAIN = "main";
+HHuginn::identifier_id_t const MAIN_IDENTIFIER( 22 );
+
+}
+
 words_t _directives_ = {{
 	"import"
 }};

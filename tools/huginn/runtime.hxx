@@ -156,6 +156,15 @@ public:
 	 */
 	value_t call( yaal::hcore::HString const& name_, values_t const& argv_, int position_ );
 
+	/*! \brief Call (execute) Huginn function.
+	 *
+	 * \param identifier_ - identifier of the function to call.
+	 * \param argv_ - array of arguments that shall be passed to function call.
+	 * \param position_ - call context information for error reporting.
+	 * \return Result returned by called Huginn function.
+	 */
+	value_t call( identifier_id_t identifier_, values_t const& argv_, int position_ );
+
 	/*! \brief Get value returned by program's main().
 	 *
 	 * \return Value returned by program's main() function.
