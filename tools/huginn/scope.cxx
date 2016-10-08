@@ -50,6 +50,13 @@ int HScope::add_statement( statement_t statement_ ) {
 	M_EPILOG
 }
 
+void HScope::remove_statement( int index_ ) {
+	M_PROLOG
+	_statements.erase( _statements.begin() + index_ );
+	return;
+	M_EPILOG
+}
+
 int HScope::statement_position_at( int index_ ) const {
 	return ( _statements[index_]->position() );
 }

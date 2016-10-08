@@ -82,6 +82,16 @@ void HThread::create_function_frame( HStatement::statement_id_t statementId_, HH
 	M_EPILOG
 }
 
+void HThread::create_incremental_function_frame( HStatement::statement_id_t statementId_, HHuginn::value_t* object_, int upCast_ ) {
+	M_PROLOG
+	add_frame();
+	M_ASSERT( _frameCount == 1 );
+	_runtime->set_incremental_frame( _frames.back() );
+	_currentFrame->init( HFrame::TYPE::FUNCTION, statementId_, object_, upCast_ );
+	return;
+	M_EPILOG
+}
+
 void HThread::create_loop_frame( HStatement::statement_id_t statementId_ ) {
 	M_PROLOG
 	add_frame();

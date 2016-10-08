@@ -55,6 +55,7 @@ public:
 	HThread( HRuntime*, yaal::hcore::HThread::id_t );
 	~HThread( void );
 	void create_function_frame( HStatement::statement_id_t, HHuginn::value_t*, int );
+	void create_incremental_function_frame( HStatement::statement_id_t, HHuginn::value_t*, int );
 	void create_loop_frame( HStatement::statement_id_t );
 	void create_scope_frame( HStatement::statement_id_t );
 	void create_try_catch_frame( HStatement::statement_id_t );

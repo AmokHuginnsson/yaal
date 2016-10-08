@@ -30,6 +30,7 @@ Copyright:
 #define YAAL_TOOLS_HUGINN_RUNTIME_HXX_INCLUDED 1
 
 #include "tools/hhuginn.hxx"
+#include "thread.hxx"
 
 namespace yaal {
 
@@ -110,6 +111,7 @@ private:
 	packages_t _packages;
 	HHuginn::list_t _argv;
 	value_t _result;
+	huginn::HThread::frame_t _incrementalFrame;
 	int _maxLocalVariableCount;
 public:
 	HRuntime( HHuginn* );
@@ -198,6 +200,7 @@ public:
 	yaal::hcore::HString const& function_name( void const* ) const;
 	void copy_text( HRuntime& );
 	HHuginn::class_t make_package( yaal::hcore::HString const&, HRuntime const& );
+	void set_incremental_frame( huginn::HThread::frame_t const& );
 private:
 	void register_builtin_function( yaal::hcore::HString const&, function_t&& );
 private:

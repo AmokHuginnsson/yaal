@@ -753,15 +753,21 @@ OCompiler::function_info_t OCompiler::create_function_low( executing_parser::pos
 	OCompiler::OFunctionContext& fc( f() );
 	M_ASSERT( fc._functionIdentifier != INVALID_IDENTIFIER );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
+	HHuginn::scope_t scope( pop_scope_context() );
+	bool isIncrementalMain( _isIncremental && ( fc._functionIdentifier == STANDARD_FUNCTIONS::MAIN_IDENTIFIER ) && ! _classContext );
+	if ( isIncrementalMain && ( scope->statement_count() > 1 ) ) {
+		scope->remove_statement( 0 );
+	}
 	HHuginn::function_t fun(
 		hcore::call(
 			&HFunction::execute,
 			make_pointer<HFunction>(
 				fc._functionIdentifier,
 				static_cast<int>( fc._parameters.get_size() ),
-				pop_scope_context(),
+				scope,
 				fc._defaultValues
 			),
+			isIncrementalMain ? &huginn::HThread::create_incremental_function_frame : &huginn::HThread::create_function_frame,
 			_1, _2, _3, _4
 		)
 	);

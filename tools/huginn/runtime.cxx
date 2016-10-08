@@ -131,6 +131,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 	, _packages()
 	, _argv( _objectFactory->create_list() )
 	, _result()
+	, _incrementalFrame()
 	, _maxLocalVariableCount( 0 ) {
 }
 
@@ -151,6 +152,7 @@ void HRuntime::copy_text( HRuntime& source_ ) {
 	_idGenerator = source_._idGenerator;
 	_identifierIds = source_._identifierIds;
 	_identifierNames = source_._identifierNames;
+	_incrementalFrame = source_._incrementalFrame;
 	/*
 	 * Order matters.
 	 * Must be the same as order of destruction from HRuntime class destructor.
@@ -388,6 +390,13 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 	HHuginn::class_t c( create_class( name_, nullptr, fds ) );
 	_huginn->register_class( c );
 	return ( c );
+	M_EPILOG
+}
+
+void HRuntime::set_incremental_frame( huginn::HThread::frame_t const& frame_ ) {
+	M_PROLOG
+	_incrementalFrame = frame_;
+	return;
 	M_EPILOG
 }
 

@@ -54,6 +54,7 @@ public:
 		return;
 	}
 	int add_statement( statement_t );
+	void remove_statement( int );
 	void make_inline( void );
 	int statement_position_at( int ) const;
 	int statement_count( void ) const {
