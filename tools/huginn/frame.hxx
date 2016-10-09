@@ -46,7 +46,6 @@ class HFunction;
 class HFrame {
 public:
 	typedef HFrame this_type;
-	typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, HHuginn::value_t> named_variables_t;
 	typedef yaal::hcore::HStack<HHuginn::value_t> values_t;
 	typedef yaal::hcore::HStack<int> instruction_pointers_t;
 	enum class TYPE {
@@ -88,6 +87,7 @@ private:
 public:
 	HFrame( HThread*, HFrame* );
 	void init( TYPE, HStatement::statement_id_t, HHuginn::value_t* = nullptr, int = 0 );
+	void reshape( HThread*, int );
 	HHuginn::value_t get_field( HExpression::ACCESS, int );
 	HHuginn::value_t get_variable( HExpression::ACCESS, HStatement::statement_id_t, int );
 	HHuginn::value_t get_this( void );

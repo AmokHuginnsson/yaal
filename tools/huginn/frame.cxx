@@ -79,6 +79,14 @@ void HFrame::init(
 	M_EPILOG
 }
 
+void HFrame::reshape( HThread* thread_, int size_ ) {
+	M_PROLOG
+	_thread = thread_;
+	_variables.reserve( size_ );
+	return;
+	M_EPILOG
+}
+
 void HFrame::break_execution( STATE state_ ) {
 	_state = state_;
 	_values.clear();

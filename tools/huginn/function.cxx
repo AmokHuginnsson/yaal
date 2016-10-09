@@ -56,7 +56,7 @@ HFunction::HFunction(
 	return;
 }
 
-HHuginn::value_t HFunction::execute( function_frame_creator_t functionFrameCreator_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) const {
+HHuginn::value_t HFunction::execute( function_frame_creator_t functionFrameCreator_, function_frame_popper_t functionFramePopper_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) const {
 	M_PROLOG
 	verify_arg_count(
 		thread_->runtime().identifier_name( _name ),
@@ -105,7 +105,7 @@ HHuginn::value_t HFunction::execute( function_frame_creator_t functionFrameCreat
 		_scope->execute( thread_ );
 	}
 	HHuginn::value_t res( f->result() );
-	thread_->pop_frame();
+	( thread_->*functionFramePopper_ )();
 	return ( res );
 	M_EPILOG
 }

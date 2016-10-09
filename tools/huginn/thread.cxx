@@ -58,9 +58,14 @@ HThread::~HThread( void ) {
 	 * We need to manually unwind stack and while doing it we need to make sure
 	 * frames are in consistent state.
 	 */
+	HFrame const* incrementalFrame( _runtime->incremental_frame().raw() );
 	while ( _currentFrame ) {
 		_currentFrame->cleanup();
-		pop_frame();
+		if ( _currentFrame != incrementalFrame ) {
+			pop_frame();
+		} else {
+			pop_incremental_frame();
+		}
 	}
 	return;
 	M_DESTRUCTOR_EPILOG
@@ -84,9 +89,18 @@ void HThread::create_function_frame( HStatement::statement_id_t statementId_, HH
 
 void HThread::create_incremental_function_frame( HStatement::statement_id_t statementId_, HHuginn::value_t* object_, int upCast_ ) {
 	M_PROLOG
-	add_frame();
-	M_ASSERT( _frameCount == 1 );
+	frame_t incrementalFrame( _runtime->incremental_frame() );
+	M_ASSERT( _frameCount == 0 );
+	M_ASSERT( _frames.get_size() == 0 );
+	if ( !! incrementalFrame ) {
+		_frames.emplace_back( incrementalFrame );
+		_currentFrame = incrementalFrame.raw();
+		++ _frameCount;
+	} else {
+		add_frame();
+	}
 	_runtime->set_incremental_frame( _frames.back() );
+	_currentFrame->reshape( this, _runtime->max_local_variable_count() );
 	_currentFrame->init( HFrame::TYPE::FUNCTION, statementId_, object_, upCast_ );
 	return;
 	M_EPILOG
@@ -130,6 +144,15 @@ void HThread::pop_frame( void ) {
 	 */
 	M_ASSERT( _currentFrame );
 	_currentFrame->reset();
+	_currentFrame = _currentFrame->parent();
+	-- _frameCount;
+	return;
+	M_EPILOG
+}
+
+void HThread::pop_incremental_frame( void ) {
+	M_PROLOG
+	M_ASSERT( _currentFrame );
 	_currentFrame = _currentFrame->parent();
 	-- _frameCount;
 	return;

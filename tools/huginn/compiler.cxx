@@ -755,8 +755,10 @@ OCompiler::function_info_t OCompiler::create_function_low( executing_parser::pos
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	HHuginn::scope_t scope( pop_scope_context() );
 	bool isIncrementalMain( _isIncremental && ( fc._functionIdentifier == STANDARD_FUNCTIONS::MAIN_IDENTIFIER ) && ! _classContext );
-	if ( isIncrementalMain && ( scope->statement_count() > 1 ) ) {
-		scope->remove_statement( 0 );
+	if ( isIncrementalMain ) {
+		for ( int i( scope->statement_count() - 1 ); i > 0; -- i ) {
+			scope->remove_statement( i - 1 );
+		}
 	}
 	HHuginn::function_t fun(
 		hcore::call(
@@ -768,6 +770,7 @@ OCompiler::function_info_t OCompiler::create_function_low( executing_parser::pos
 				fc._defaultValues
 			),
 			isIncrementalMain ? &huginn::HThread::create_incremental_function_frame : &huginn::HThread::create_function_frame,
+			isIncrementalMain ? &huginn::HThread::pop_incremental_frame : &huginn::HThread::pop_frame,
 			_1, _2, _3, _4
 		)
 	);

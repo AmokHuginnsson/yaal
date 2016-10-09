@@ -43,6 +43,7 @@ public:
 	typedef HFunction this_type;
 	typedef HHuginn::expressions_t expressions_t;
 	typedef void ( huginn::HThread::* function_frame_creator_t )( HStatement::statement_id_t, HHuginn::value_t*, int );
+	typedef void ( huginn::HThread::* function_frame_popper_t )( void );
 private:
 	HHuginn::identifier_id_t _name;
 	int _parameterCount;
@@ -51,7 +52,7 @@ private:
 public:
 	HFunction( HHuginn::identifier_id_t, int, HHuginn::scope_t const&, expressions_t const& );
 	HFunction( HFunction&& ) = default;
-	HHuginn::value_t execute( function_frame_creator_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int ) const;
+	HHuginn::value_t execute( function_frame_creator_t, function_frame_popper_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int ) const;
 };
 
 }

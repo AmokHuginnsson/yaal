@@ -201,6 +201,7 @@ public:
 	void copy_text( HRuntime& );
 	HHuginn::class_t make_package( yaal::hcore::HString const&, HRuntime const& );
 	void set_incremental_frame( huginn::HThread::frame_t const& );
+	huginn::HThread::frame_t const& incremental_frame( void ) const;
 private:
 	void register_builtin_function( yaal::hcore::HString const&, function_t&& );
 private:

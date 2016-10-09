@@ -76,6 +76,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			{ type_name( HHuginn::TYPE::LOOKUP ), BUILTIN::LOOKUP_IDENTIFIER },
 			{ type_name( HHuginn::TYPE::ORDER ), BUILTIN::ORDER_IDENTIFIER },
 			{ type_name( HHuginn::TYPE::SET ), BUILTIN::SET_IDENTIFIER },
+			{ STANDARD_FUNCTIONS::MAIN, STANDARD_FUNCTIONS::MAIN_IDENTIFIER },
 			{ _noneClass_.name(), TYPE_NONE_IDENTIFIER },
 			{ _observerClass_.name(), TYPE_OBSERVER_IDENTIFIER },
 			{ _referenceClass_.name(), TYPE_REFERENCE_IDENTIFIER },
@@ -83,8 +84,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			{ _objectReferenceClass_.name(), TYPE_OBJECT_REFERENCE_IDENTIFIER },
 			{ _methodClass_.name(), TYPE_METHOD_IDENTIFIER },
 			{ _boundMethodClass_.name(), TYPE_BOUND_METHOD_IDENTIFIER },
-			{ _unknownClass_.name(), TYPE_UNKNOWN_IDENTIFIER },
-			{ STANDARD_FUNCTIONS::MAIN, STANDARD_FUNCTIONS::MAIN_IDENTIFIER }
+			{ _unknownClass_.name(), TYPE_UNKNOWN_IDENTIFIER }
 		} )
 	, _identifierNames( {
 			KEYWORD::CONSTRUCTOR,
@@ -109,6 +109,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			type_name( HHuginn::TYPE::LOOKUP ),
 			type_name( HHuginn::TYPE::ORDER ),
 			type_name( HHuginn::TYPE::SET ),
+			STANDARD_FUNCTIONS::MAIN,
 			_noneClass_.name(),
 			_observerClass_.name(),
 			_referenceClass_.name(),
@@ -116,8 +117,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			_objectReferenceClass_.name(),
 			_methodClass_.name(),
 			_boundMethodClass_.name(),
-			_unknownClass_.name(),
-			STANDARD_FUNCTIONS::MAIN
+			_unknownClass_.name()
 		} )
 	, _objectFactory( new HObjectFactory( this ) )
 	, _none( make_pointer<HHuginn::HValue>( &_noneClass_ ) )
@@ -137,7 +137,6 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 
 void HRuntime::reset( void ) {
 	M_PROLOG
-	_maxLocalVariableCount = 0;
 	_result.reset();
 	_argv->clear();
 	_threads.clear();
@@ -397,6 +396,12 @@ void HRuntime::set_incremental_frame( huginn::HThread::frame_t const& frame_ ) {
 	M_PROLOG
 	_incrementalFrame = frame_;
 	return;
+	M_EPILOG
+}
+
+huginn::HThread::frame_t const& HRuntime::incremental_frame( void ) const {
+	M_PROLOG
+	return ( _incrementalFrame );
 	M_EPILOG
 }
 

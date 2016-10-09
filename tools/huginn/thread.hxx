@@ -60,6 +60,7 @@ public:
 	void create_scope_frame( HStatement::statement_id_t );
 	void create_try_catch_frame( HStatement::statement_id_t );
 	void pop_frame( void );
+	void pop_incremental_frame( void );
 	HFrame* current_frame( void ) {
 		return ( _currentFrame );
 	}
