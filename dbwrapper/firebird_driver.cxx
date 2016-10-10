@@ -52,8 +52,12 @@ struct OFirebird {
 	ISC_STATUS _status[ MAX_ERROR_COUNT ];
 	HChunk _errorMessageBufer;
 	OFirebird( void )
-		: _db( 0 ), _connectionString(), _status(), _errorMessageBufer()
-		{}
+		: _db( 0 )
+		, _connectionString()
+		, _status()
+		, _errorMessageBufer() {
+		return;
+	}
 private:
 	OFirebird( OFirebird const& );
 	OFirebird& operator = ( OFirebird const& );
@@ -82,11 +86,19 @@ struct OFirebirdResult {
 	HChunk _errorMessageBufer;
 	bool _ok;
 	OFirebirdResult( ODBLink& dbLink_ )
-		: _dbLink( dbLink_ ), _useCount( 1 ), _stmt( 0 ), _tr( 0 ),
-		_descIn(), _descOut(), _cache(),
-		_values(), _status(),
-		_errorMessageBufer(), _ok( false )
-		{}
+		: _dbLink( dbLink_ )
+		, _useCount( 1 )
+		, _stmt( 0 )
+		, _tr( 0 )
+		, _descIn()
+		, _descOut()
+		, _cache()
+		, _values()
+		, _status()
+		, _errorMessageBufer()
+		, _ok( false ) {
+		return;
+	}
 private:
 	OFirebirdResult( OFirebirdResult const& );
 	OFirebirdResult& operator = ( OFirebirdResult const& );
@@ -190,8 +202,9 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 	res->_ok = false;
 	do {
 		isc_start_transaction( db->_status, &res->_tr, 1, &db->_db, sizeof ( OFirebird::_tpb ), OFirebird::_tpb );
-		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
+		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
 			break;
+		}
 		XSQLDA descIn;
 		XSQLDA descOut;
 		memset( &descIn, 0, sizeof ( descIn ) );
@@ -201,8 +214,9 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 		isc_dsql_allocate_statement( db->_status, &db->_db, &res->_stmt );
 		M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ) );
 		isc_dsql_prepare( res->_status, &res->_tr, &res->_stmt, 0, query_, 3, &descOut ); /* Dialect version 3. */
-		if ( ( res->_status[0] == 1 ) && ( res->_status[1] != 0 ) )
+		if ( ( res->_status[0] == 1 ) && ( res->_status[1] != 0 ) ) {
 			break;
+		}
 		isc_dsql_describe_bind( res->_status, &res->_stmt, 1, &descIn );
 		if ( ( res->_status[0] == 1 ) && ( res->_status[1] != 0 ) ) {
 			break;
@@ -232,13 +246,15 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 			out->version = SQLDA_VERSION1;
 			out->sqld = out->sqln = descOut.sqld;
 			isc_dsql_describe( res->_status, &res->_stmt, 1, out );
-			if ( ( res->_status[0] == 1 ) && ( res->_status[1] != 0 ) )
+			if ( ( res->_status[0] == 1 ) && ( res->_status[1] != 0 ) ) {
 				break;
+			}
 			int i( 0 );
 			XSQLVAR* var( nullptr );
 			int valuesMaxBufferSize( 0 );
-			for ( i = 0, var = out->sqlvar; i < out->sqld; ++ i, ++ var )
+			for ( i = 0, var = out->sqlvar; i < out->sqld; ++ i, ++ var ) {
 				valuesMaxBufferSize += var->sqllen;
+			}
 			valuesMaxBufferSize += out->sqld;
 			valuesMaxBufferSize += ( out->sqld * static_cast<int>( sizeof ( short ) ) );
 			res->_cache.realloc( valuesMaxBufferSize );
@@ -265,9 +281,14 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 	return ( res->_ok ? res.release() : nullptr );
 }
 
-void* firebird_query_execute( ODBLink&, void* data_ ) {
+void* firebird_query_execute( ODBLink& dbLink_, void* data_ ) {
+	OFirebird* db( static_cast<OFirebird*>( dbLink_._conn ) );
+	M_ASSERT( db );
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
 	if ( res ) {
+		if ( res->_stmt ) {
+			isc_dsql_free_statement( db->_status, &res->_stmt, DSQL_close );
+		}
 		XSQLDA* in( res->_descIn.get<XSQLDA>() );
 		if ( in ) {
 			isc_dsql_execute2( res->_status, &res->_tr, &res->_stmt, 1, in, nullptr );
@@ -305,8 +326,9 @@ M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query
 				int valuesBufferSize( 0 );
 				int i( 0 );
 				XSQLVAR* var( nullptr );
-				for ( i = 0, var = out->sqlvar; i < out->sqld; ++ i, ++ var )
+				for ( i = 0, var = out->sqlvar; i < out->sqld; ++ i, ++ var ) {
 					valuesBufferSize += ( var->sqllen - static_cast<int>( sizeof ( short ) ) );
+				}
 				valuesBufferSize += out->sqld * static_cast<int>( sizeof ( int ) ); /* for offsets */
 				valuesBufferSize += out->sqld; /* for \0 terminators */
 				OFirebirdResult::chunk_t c( make_pointer<HChunk>() );
@@ -322,22 +344,24 @@ M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query
 						offset += len;
 						buf[offset] = 0;
 						++ offset;
-					} else
+					} else {
 						offsets[i] = -1;
+					}
 				}
 				res->_values.push_back( c );
 			}
-			if ( retcode != 100 )
+			if ( retcode != 100 ) {
 				break;
+			}
 			res->_ok = true;
 		}
 	} while ( false );
 	if ( res ) {
+		isc_dsql_free_statement( db->_status, &res->_stmt, res->_ok ? DSQL_close : DSQL_drop );
 		if ( res->_ok ) {
 			isc_commit_transaction( db->_status, &res->_tr );
 			M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, res ) );
 		} else {
-			isc_dsql_free_statement( db->_status, &res->_stmt, DSQL_drop );
 			res->_stmt = 0;
 			isc_rollback_transaction( db->_status, &res->_tr );
 			res->_tr = 0;
@@ -353,10 +377,10 @@ M_EXPORT_SYMBOL void rs_free_query_result( void* data_ ) {
 	M_ASSERT( res );
 	M_ASSERT( res->_useCount > 0 );
 	-- res->_useCount;
+	if ( res->_stmt ) {
+		isc_dsql_free_statement( db->_status, &res->_stmt, res->_useCount == 0 ? DSQL_drop : DSQL_close );
+	}
 	if ( ! res->_useCount ) {
-		if ( res->_stmt ) {
-			isc_dsql_free_statement( db->_status, &res->_stmt, DSQL_drop );
-		}
 		res->_stmt = 0;
 		M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
 		M_SAFE( delete res );
@@ -405,14 +429,14 @@ M_EXPORT_SYMBOL void query_free( ODBLink&, void* data_ ) {
 
 void firebird_rs_free_cursor( void* data_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
+	OFirebird* db( static_cast<OFirebird*>( res->_dbLink._conn ) );
 	M_ASSERT( res );
 	M_ASSERT( res->_useCount > 0 );
 	-- res->_useCount;
+	if ( res->_stmt ) {
+		isc_dsql_free_statement( db->_status, &res->_stmt, res->_useCount == 0 ? DSQL_drop : DSQL_close );
+	}
 	if ( ! res->_useCount ) {
-		OFirebird* db( static_cast<OFirebird*>( res->_dbLink._conn ) );
-		if ( res->_stmt ) {
-			isc_dsql_free_statement( db->_status, &res->_stmt, DSQL_drop );
-		}
 		res->_stmt = 0;
 		M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
 		if ( res->_ok ) {
@@ -482,9 +506,9 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink& /*dbLink_*/, void* dataR_ 
 		p += len;
 	}
 	int long count( 0 );
-	if ( statementType == isc_info_sql_stmt_select )
+	if ( statementType == isc_info_sql_stmt_select ) {
 		count = res->_values.size();
-	else {
+	} else {
 		int reqCountType( 0 );
 		switch ( statementType )  {
 			case isc_info_sql_stmt_update: reqCountType = isc_info_req_update_count; break;
@@ -505,8 +529,9 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink& /*dbLink_*/, void* dataR_ 
 				p += sizeof ( short );
 				count = isc_vax_integer( p, static_cast<int short>( len ) );
 				p += len;
-				if ( countType == reqCountType )
+				if ( countType == reqCountType ) {
 					break;
+				}
 			}
 			M_ENSURE( countBuffer[totalLen] == isc_info_end );
 		}
@@ -525,8 +550,9 @@ M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 	short nullInd( 0 );
 	do {
 		isc_start_transaction( db->_status, &tr, 1, &db->_db, sizeof ( OFirebird::_tpb ), OFirebird::_tpb );
-		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
+		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
 			break;
+		}
 		XSQLDA desc;
 		XSQLVAR& var( desc.sqlvar[0] );
 		desc.version = SQLDA_VERSION1;
@@ -535,19 +561,23 @@ M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 		isc_dsql_allocate_statement( db->_status, &db->_db, &stmt );
 		M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ) );
 		isc_dsql_prepare( db->_status, &tr, &stmt, 0, LAST_INSERT_ID, 3, &desc ); /* Dialect version 3. */
-		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
+		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
 			break;
+		}
 		isc_dsql_describe( db->_status, &stmt, 1, &desc );
-		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
+		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
 			break;
+		}
 		var.sqlind = &nullInd;
 		var.sqldata = reinterpret_cast<char*>( &lastInsertId );
 		isc_dsql_execute( db->_status, &tr, &stmt, 1, nullptr );
-		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
+		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
 			break;
+		}
 		isc_dsql_fetch( db->_status, &stmt, 1, &desc );
-		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
+		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
 			break;
+		}
 		ok = true;
 	} while ( false );
 	isc_dsql_free_statement( db->_status, &stmt, DSQL_drop );
