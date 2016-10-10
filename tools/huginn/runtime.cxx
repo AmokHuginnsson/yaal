@@ -157,12 +157,13 @@ void HRuntime::copy_text( HRuntime& source_ ) {
 	 * Must be the same as order of destruction from HRuntime class destructor.
 	 */
 	_result = source_._result;
+	_incrementalFrame = source_._incrementalFrame;
 	_argv = source_._argv;
 	_packages = source_._packages;
 	_classes = source_._classes;
 	_dependencies = source_._dependencies;
 	using yaal::swap;
-	swap( _functionsStore, source_._functionsStore );
+	_functionsStore = yaal::move( source_._functionsStore );
 	_threads = source_._threads;
 	_false = source_._false;
 	_true = source_._true;
