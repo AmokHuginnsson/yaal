@@ -1020,17 +1020,17 @@ HString& HString::replace( HString const& pattern_,
 	int long lenPattern( pattern_.get_length() );
 	int long lenWith( with_.get_length() );
 	int long subWP( lenWith - lenPattern );
-	int long index( 0 );
+	int long patPos( 0 );
 	if ( subWP == 0 ) { /* replacement is equal length to pattern */
-		while ( ( index = find( pattern_, index ) ) != npos ) {
-			::std::strncpy( MEM + index, with_.raw(), static_cast<size_t>( lenWith ) );
-			index += lenPattern;
+		while ( ( patPos = find( pattern_, patPos ) ) != npos ) {
+			::std::strncpy( MEM + patPos, with_.raw(), static_cast<size_t>( lenWith ) );
+			patPos += lenPattern;
 		}
 	} else {
 		int long newSize( GET_SIZE );
-		while ( ( index = find( pattern_, index ) ) != npos ) {
+		while ( ( patPos = find( pattern_, patPos ) ) != npos ) {
 			newSize += subWP;
-			index += lenPattern;
+			patPos += lenPattern;
 		}
 		HString s;
 		HString* src( nullptr );
@@ -1042,25 +1042,24 @@ HString& HString::replace( HString const& pattern_,
 		} else { /* replacement is shorter than pattern */
 			src = this;
 		}
-		int long oldIdx( 0 );
-		int long newIdx( 0 );
-		index = 0;
+		int long oldLen( 0 );
+		int long newLen( 0 );
+		patPos = 0;
 		char const* with( with_.raw() );
 		char const* srcBuf( src->raw() );
-		while ( ( index = src->find( pattern_, index ) ) != npos ) {
-			if ( newIdx && ( ( index - oldIdx ) != lenPattern ) ) {
-				::std::memmove( MEM + newIdx, srcBuf + oldIdx + lenPattern, static_cast<size_t>( ( index - oldIdx ) - lenPattern ) );
-				newIdx += ( ( index - oldIdx ) - lenPattern );
-			} else if ( ! newIdx ) {
-				newIdx = index;
+		char* buf( MEM );
+		while ( ( patPos = src->find( pattern_, patPos ) ) != npos ) {
+			if ( patPos > oldLen ) {
+				::memmove( buf + newLen, srcBuf + oldLen, static_cast<size_t>( patPos - oldLen ) );
+				newLen += ( patPos - oldLen );
 			}
-			oldIdx = index;
-			::std::memmove( MEM + newIdx, with, static_cast<size_t>( lenWith ) );
-			newIdx += lenWith;
-			index += lenPattern;
+			::memmove( buf + newLen, with, static_cast<size_t>( lenWith ) );
+			newLen += lenWith;
+			patPos += lenPattern;
+			oldLen = patPos;
 		}
-		if ( newIdx && ( ( GET_SIZE - oldIdx ) != lenPattern ) ) {
-			::std::memmove( MEM + newIdx, srcBuf + oldIdx + lenPattern, static_cast<size_t>( ( GET_SIZE - oldIdx ) - lenPattern ) );
+		if ( oldLen < GET_SIZE ) {
+			::std::memmove( buf + newLen, srcBuf + oldLen, static_cast<size_t>( ( GET_SIZE - oldLen ) ) );
 		}
 		SET_SIZE( newSize );
 		MEM[ newSize ] = 0;
