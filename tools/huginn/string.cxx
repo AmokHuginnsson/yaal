@@ -33,6 +33,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "helper.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
+#include "value_builtin.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -102,6 +103,98 @@ inline HHuginn::value_t find_raw( char const* name_, finder_raw_t finder_, int l
 
 	int long pos( (get_string( object_->raw() ).*finder_)( get_string( values_[0] ).raw(), startAt ) );
 	return ( thread_->object_factory().create_integer( pos != hcore::HString::npos ? pos : -1 ) );
+	M_EPILOG
+}
+
+class HHuginnStringFormatter {
+	static char const FMT_OPEN = '{';
+	static char const FMT_CLOSE = '}';
+	static char const FMT_SPEC = ':';
+private:
+	HThread* _thread;
+	HString const& _format;
+	HString& _result;
+	HString::const_iterator _it;
+	HHuginn::values_t const& _values;
+	int _position;
+public:
+	HHuginnStringFormatter( HThread* thread_, HString const& format_, HString& result_, HHuginn::values_t const& values_, int position_ )
+		: _thread( thread_ )
+		, _format( format_ )
+		, _result( result_ )
+		, _it( _format.begin() )
+		, _values( values_ )
+		, _position( position_ ) {
+		return;
+	}
+	void ensure( bool condResult_, char const* msg_ ) {
+		if ( ! condResult_ ) {
+			throw HHuginn::HHuginnRuntimeException( hcore::to_string( msg_ ).append( _it - _format.begin() ), _position );
+		}
+	}
+	void format( void ) {
+		M_PROLOG
+		int fmtSubstCount( 0 );
+		bool autoIndex( false );
+		HString idxRaw;
+		char const* errMsg( "Invalid format specification at: " );
+		int maxUsedValue( 0 );
+		int valCount( static_cast<int>( _values.get_size() ) );
+		for ( HString::const_iterator end( _format.end() ); _it != end; ++ _it ) {
+			if ( *_it == FMT_OPEN ) {
+				++ _it;
+				ensure( _it != end, "Single '{' encountered in format string at: " );
+				if ( *_it != FMT_OPEN ) {
+					idxRaw.clear();
+					while ( ( _it != end ) && _digit_.has( *_it ) ) {
+						idxRaw.append( *_it );
+						++ _it;
+					}
+					ensure( _it != end, errMsg );
+					if ( *_it == FMT_SPEC ) {
+						++ _it;
+						ensure( _it != end, errMsg );
+					}
+					ensure( *_it == FMT_CLOSE, errMsg );
+					if ( fmtSubstCount > 0 ) {
+						ensure( (  autoIndex && idxRaw.is_empty() ) || ( ! autoIndex && ! idxRaw.is_empty() ), "Cannot mix manual and automatic field numbering at: " );
+					}
+					autoIndex = idxRaw.is_empty();
+					int idx( fmtSubstCount );
+					if ( ! autoIndex ) {
+						try {
+							idx = lexical_cast<int>( idxRaw );
+						} catch ( HException const& e ) {
+							throw HHuginn::HHuginnRuntimeException( e.what(), _position );
+						}
+					}
+					++ fmtSubstCount;
+					maxUsedValue = max( idx, maxUsedValue );
+					ensure( idx < valCount, "Wrong value index at: " );
+					HHuginn::value_t v( value_builtin::string( _thread, _values[idx], _position ) );
+					_result.append( static_cast<HHuginn::HString*>( v.raw() )->value() );
+					continue;
+				}
+			} else if ( *_it == FMT_CLOSE ) {
+				++ _it;
+				ensure( ( _it != end ) && ( *_it == FMT_CLOSE ), "Single '}' encountered in format string at: " );
+			}
+			_result.append( *_it );
+		}
+		ensure( maxUsedValue == ( valCount - 1 ), "Not all values used in format at: " );
+		return;
+		M_EPILOG
+	}
+};
+
+inline HHuginn::value_t format( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	HString const& fmt( static_cast<HHuginn::HString*>( object_->raw() )->value() );
+	HHuginn::value_t v( thread_->object_factory().create_string() );
+	HString& s( static_cast<HHuginn::HString*>( v.raw() )->value() );
+	HHuginnStringFormatter hsf( thread_, fmt, s, values_, position_ );
+	hsf.format();
+	return ( v );
 	M_EPILOG
 }
 
@@ -185,6 +278,7 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 				{ "find_last_one_of",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::find_raw, "string.find_last_one_of",     static_cast<finder_raw_t>( &HString::find_last_one_of ), hcore::HString::npos + 0, _1, _2, _3, _4 ) ), "( *set* ) - find position of any characters from given *set* that appears last just before *before* position in the string" },
 				{ "find_other_than",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::find_raw, "string.find_other_than",      static_cast<finder_raw_t>( &HString::find_other_than ), 0, _1, _2, _3, _4 ) ), "( *set* ) - find position of any of characters that is not present in given *set* that appears first in the string but not sooner than *from*"  },
 				{ "find_last_other_than", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::find_raw, "string.find_last_other_than", static_cast<finder_raw_t>( &HString::find_last_other_than ), hcore::HString::npos + 0, _1, _2, _3, _4 ) ), "( *set* ) - find position of any characters that in not present in given *set* that appears last just before *before* position in the string" },
+				{ "format",               make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::format, _1, _2, _3, _4 ) ), "( *item...* ) - construct string based on *format template* using *item*s as format substitutions" },
 				{ "replace",              make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::replace, _1, _2, _3, _4 ) ), "( *what*, *with* ) - replace all occurrences of *what* substring with *with* substring" },
 				{ "strip",                make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::strip, _1, _2, _3, _4 ) ), "strip( *set* ) - strip all occurrences of characters in *set* from both ends of the string" },
 				{ "to_lower",             make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::to_lower, _1, _2, _3, _4 ) ), "turn all string's characters to lower case" },
