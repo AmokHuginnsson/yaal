@@ -380,7 +380,14 @@ HString::HString( double double_ )
 	M_PROLOG
 	int long newSize( ::snprintf( nullptr, 0, "%f", double_ ) );
 	reserve( newSize );
-	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%f", double_ ) == newSize );
+	char* buf( MEM );
+	M_ENSURE( ::snprintf( buf, static_cast<size_t>( newSize + 1 ), "%f", double_ ) == newSize );
+	if ( ( newSize >= 3 /* "0.0" */ ) && ( strchr( buf, '.' ) != nullptr ) ) {
+		while ( ( buf[newSize - 1] == '0' ) && ( buf[newSize - 2] != '.' ) ) {
+			-- newSize;
+		}
+		buf[newSize] = 0;
+	}
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG
@@ -391,7 +398,14 @@ HString::HString( double long double_ )
 	M_PROLOG
 	int long newSize( ::snprintf( nullptr, 0, "%.12Lf", double_ ) );
 	reserve( newSize );
-	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%.12Lf", double_ ) == newSize );
+	char* buf( MEM );
+	M_ENSURE( ::snprintf( buf, static_cast<size_t>( newSize + 1 ), "%.12Lf", double_ ) == newSize );
+	if ( ( newSize >= 3 /* "0.0" */ ) && ( strchr( buf, '.' ) != nullptr ) ) {
+		while ( ( buf[newSize - 1] == '0' ) && ( buf[newSize - 2] != '.' ) ) {
+			-- newSize;
+		}
+		buf[newSize] = 0;
+	}
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG
