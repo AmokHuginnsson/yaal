@@ -203,7 +203,7 @@ public:
 	void set_incremental_frame( huginn::HThread::frame_t const& );
 	huginn::HThread::frame_t const& incremental_frame( void ) const;
 private:
-	void register_builtin_function( yaal::hcore::HString const&, function_t&& );
+	void register_builtin_function( yaal::hcore::HString const&, function_t&&, yaal::hcore::HString const& = yaal::hcore::HString() );
 private:
 	HRuntime( HRuntime const& ) = delete;
 	HRuntime& operator = ( HRuntime const& ) = delete;

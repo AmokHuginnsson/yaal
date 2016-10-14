@@ -679,18 +679,38 @@ HHuginn::value_t invalid_instance( yaal::hcore::HString const& name_, huginn::HT
 
 }
 
-void HRuntime::register_builtin_function( yaal::hcore::HString const& name_, function_t&& function_ ) {
+void HRuntime::register_builtin_function( yaal::hcore::HString const& name_, function_t&& function_, yaal::hcore::HString const& doc_ ) {
 	M_PROLOG
 	identifier_id_t id( identifier_id( name_ ) );
 	_huginn->register_function( id );
-	_functionsStore.insert( make_pair( id, _objectFactory->create_function_reference( id, yaal::move( function_ ) ) ) );
+	_functionsStore.insert( make_pair( id, _objectFactory->create_function_reference( id, yaal::move( function_ ), doc_ ) ) );
 	_functionsAvailable.insert( id );
 	return;
 	M_EPILOG
 }
 
+namespace {
+HHuginn::HClass const* _coreClasses_[8];
+}
+
 void HRuntime::register_builtins( void ) {
 	M_PROLOG
+	static volatile bool once( false );
+	if ( ! once ) {
+		once = true;
+		HHuginn::HClass const* coreClassesInit[] = {
+			&_noneClass_,
+			&_observerClass_,
+			&_referenceClass_,
+			&_functionReferenceClass_,
+			&_objectReferenceClass_,
+			&_methodClass_,
+			&_boundMethodClass_,
+			&_unknownClass_
+		};
+		static_assert( sizeof ( coreClassesInit ) == sizeof ( _coreClasses_ ), "invalid core classes initializer size" );
+		copy( begin( coreClassesInit ), end( coreClassesInit ), begin( _coreClasses_ ) );
+	}
 	M_ENSURE( identifier_id( KEYWORD::CONSTRUCTOR ) == KEYWORD::CONSTRUCTOR_IDENTIFIER );
 	M_ENSURE( identifier_id( KEYWORD::DESTRUCTOR ) == KEYWORD::DESTRUCTOR_IDENTIFIER );
 	M_ENSURE( identifier_id( KEYWORD::THIS ) == KEYWORD::THIS_IDENTIFIER );
@@ -728,31 +748,21 @@ void HRuntime::register_builtins( void ) {
 	register_builtin_function( type_name( HHuginn::TYPE::NUMBER ), hcore::call( &huginn_builtin::number, _1, _2, _3, _4 ) );
 	register_builtin_function( type_name( HHuginn::TYPE::BOOLEAN ), hcore::call( &huginn_builtin::boolean, _1, _2, _3, _4 ) );
 	register_builtin_function( type_name( HHuginn::TYPE::CHARACTER ), hcore::call( &huginn_builtin::character, _1, _2, _3, _4 ) );
-	register_builtin_function( BUILTIN::SIZE, hcore::call( &huginn_builtin::size, _1, _2, _3, _4 ) );
-	register_builtin_function( BUILTIN::TYPE, hcore::call( &huginn_builtin::type, _1, _2, _3, _4 ) );
-	register_builtin_function( BUILTIN::COPY, hcore::call( &huginn_builtin::copy, _1, _2, _3, _4 ) );
-	register_builtin_function( BUILTIN::OBSERVE, hcore::call( &huginn_builtin::observe, _1, _2, _3, _4 ) );
-	register_builtin_function( BUILTIN::USE, hcore::call( &huginn_builtin::use, _1, _2, _3, _4 ) );
+	register_builtin_function( BUILTIN::SIZE, hcore::call( &huginn_builtin::size, _1, _2, _3, _4 ), "( *expr* ) - get size of given expression *expr*, e.g: a number of elements in a collection" );
+	register_builtin_function( BUILTIN::TYPE, hcore::call( &huginn_builtin::type, _1, _2, _3, _4 ), "( *expr* ) - get type of given expression *expr*" );
+	register_builtin_function( BUILTIN::COPY, hcore::call( &huginn_builtin::copy, _1, _2, _3, _4 ), "( *ref* ) - make a deep copy of a value given given by *ref*" );
+	register_builtin_function( BUILTIN::OBSERVE, hcore::call( &huginn_builtin::observe, _1, _2, _3, _4 ), "( *ref* ) - create an `*observer*` for a value given by *ref*" );
+	register_builtin_function( BUILTIN::USE, hcore::call( &huginn_builtin::use, _1, _2, _3, _4 ), "( *observer* ) - get a reference to a value from given *observer*" );
 	register_builtin_function( type_name( HHuginn::TYPE::LIST ), hcore::call( &huginn_builtin::list, _1, _2, _3, _4 ) );
 	register_builtin_function( type_name( HHuginn::TYPE::DEQUE ), hcore::call( &huginn_builtin::deque, _1, _2, _3, _4 ) );
 	register_builtin_function( type_name( HHuginn::TYPE::DICT ), hcore::call( &huginn_builtin::dict, _1, _2, _3, _4 ) );
 	register_builtin_function( type_name( HHuginn::TYPE::ORDER ), hcore::call( &huginn_builtin::order, _1, _2, _3, _4 ) );
 	register_builtin_function( type_name( HHuginn::TYPE::LOOKUP ), hcore::call( &huginn_builtin::lookup, _1, _2, _3, _4 ) );
 	register_builtin_function( type_name( HHuginn::TYPE::SET ), hcore::call( &huginn_builtin::set, _1, _2, _3, _4 ) );
-	register_builtin_function( "print", hcore::call( &huginn_builtin::print, _1, _2, _3, _4 ) );
-	register_builtin_function( "input", hcore::call( &huginn_builtin::input, _1, _2, _3, _4 ) );
+	register_builtin_function( "print", hcore::call( &huginn_builtin::print, _1, _2, _3, _4 ), "( *str* ) - print a message given by *str* to interpreter's standard output" );
+	register_builtin_function( "input", hcore::call( &huginn_builtin::input, _1, _2, _3, _4 ), "read a line of text from interpreter's standard input" );
 	register_builtin_function( KEYWORD::ASSERT, hcore::call( &huginn_builtin::assert, _1, _2, _3, _4 ) );
-	HHuginn::HClass const* efemeral[] = {
-		&_noneClass_,
-		&_observerClass_,
-		&_referenceClass_,
-		&_functionReferenceClass_,
-		&_objectReferenceClass_,
-		&_methodClass_,
-		&_boundMethodClass_,
-		&_unknownClass_
-	};
-	for ( HHuginn::HClass const* c : efemeral ) {
+	for ( HHuginn::HClass const* c : _coreClasses_ ) {
 		register_builtin_function( c->name(), hcore::call( &huginn_builtin::invalid_instance, c->name(), _1, _2, _3, _4 ) );
 	}
 	_objectFactory->register_builtin_classes();
@@ -834,6 +844,9 @@ void HRuntime::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) const {
 	for ( packages_t::value_type const& p : _packages ) {
 		stream_ << "package: " << identifier_name( p.first ) << " = " << p.second->get_class()->name() << endl;
 	}
+	for ( HHuginn::HClass const* c : _coreClasses_ ) {
+		stream_ << "class: " << c->name() << " {}" << endl;
+	}
 	for ( classes_t::value_type const& c : _classes ) {
 		stream_ << *c.second << endl;
 	}
@@ -856,6 +869,11 @@ void HRuntime::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) const {
 
 void HRuntime::dump_docs( yaal::hcore::HStreamInterface& stream_ ) const {
 	M_PROLOG
+	for ( HHuginn::HClass const* c : _coreClasses_ ) {
+		if ( ! c->doc().is_empty() ) {
+			stream_ << c->name() << ":" << c->doc() << endl;
+		}
+	}
 	for ( classes_t::value_type const& c : _classes ) {
 		HHuginn::HClass const& cls( *c.second );
 		if ( ! cls.doc().is_empty() ) {
