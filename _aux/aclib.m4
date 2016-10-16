@@ -138,7 +138,7 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 	elif test ["x${UNAME_OS_NAME}"] = ["xFreeBSD"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_FREEBSD__], [], [Your operating system is FreeBSD.])
 		HOST_OS_TYPE=[FreeBSD]
-		EXTRA_INCLUDE_PATHS=["-isystem /usr/include ${EXTRA_INCLUDE_PATHS} -I/usr/local/include"]
+		EXTRA_INCLUDE_PATHS=["${EXTRA_INCLUDE_PATHS} -I/usr/local/include"]
 		EXTRA_LIBRARY_PATHS=["${EXTRA_LIBRARY_PATHS} -L/usr/local/lib"]
 	elif test ["x${UNAME_OS_NAME}"] = ["xSunOS"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_SOLARIS__], [], [Your operating system is Solaris.])

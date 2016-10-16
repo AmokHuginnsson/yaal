@@ -38,7 +38,9 @@ Copyright:
 #	define TO_BE_INCLUDED_LATER 1
 #endif /* __HOST_OS_TYPE_FREEBSD__ */
 
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 #include <mysql/mysql.h>
+#pragma GCC diagnostic error "-Wold-style-cast"
 
 #include "hcore/memory.hxx"
 #include "dbwrapper/db_driver.hxx"

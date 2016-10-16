@@ -70,7 +70,7 @@ HMemoryMappedFile::~HMemoryMappedFile( void ) {
 	M_PROLOG
 	if ( _fd >= 0 ) {
 		M_ASSERT( _map );
-		M_ENSURE( ::munmap( _map, static_cast<size_t>( _size ) ) == 0 );
+		M_ENSURE( ::munmap( static_cast<caddr_t>( _map ), static_cast<size_t>( _size ) ) == 0 );
 		M_ENSURE( ::close( _fd ) == 0 );
 	} else {
 		M_ASSERT( ! _map );
