@@ -169,6 +169,8 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 	AC_DEFINE_UNQUOTED([LIB_EXT],"${LIB_EXT}",[Dynamic library file name extension used on this platform.])
 	AC_DEFINE_UNQUOTED([EXE_SUFFIX],${EXE_SUFFIX},[Suffix used for binary program executable on this platform.])
 	AC_SUBST([LIB_EXT],[${LIB_EXT}])
+	AC_SUBST([UNAME_OS_NAME],[${UNAME_OS_NAME}])
+	AC_SUBST([HOST_OS_TYPE],[${HOST_OS_TYPE}])
 
 	if test ["x${HOST_OS_TYPE}"] = ["x"] ; then
 		AC_MSG_ERROR([Cannot recognize host operating system type!])
