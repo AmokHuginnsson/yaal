@@ -77,7 +77,7 @@ HHuginn::value_t HRandomizer::next_real( huginn::HThread* thread_, HHuginn::valu
 	double long range( 1.L );
 	if ( ! values_.is_empty() ) {
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::REAL, false, position_ );
-		range = static_cast<yaal::u64_t>( get_real( values_[0] ) );
+		range = get_real( values_[0] );
 	}
 	if ( range <= 0.L ) {
 		throw HHuginn::HHuginnRuntimeException( "Invalid range specified: "_ys.append( range ), position_ );

@@ -73,6 +73,11 @@ struct OCompiler {
 		struct OLocalVariable {
 			int _index;
 			HExpression const* _definedBy;
+			OLocalVariable( void )
+				: _index( -1 )
+				, _definedBy( nullptr ) {
+				return;
+			}
 		};
 		typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, OLocalVariable> local_variables_t;
 		OScopeContext* _parent;  /*!< parent scope */

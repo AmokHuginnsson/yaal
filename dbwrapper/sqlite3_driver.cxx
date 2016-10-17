@@ -32,7 +32,7 @@ Copyright:
 #include <cstdlib>
 #include <errno.h>
 #include <cstring>
-#include <sys/stat.h>
+#include <unistd.h>
 #include <sqlite3.h>
 
 #include "hcore/base.hxx"
@@ -104,15 +104,14 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, HString const& dataBase_,
 		HString const&, HString const&, HString const& ) {
 	do {
 		HScopedValueReplacement<int> saveErrno( errno, 0 );
-		struct stat s;
 		OSQLite* sQLite( nullptr );
 		dbLink_._conn = sQLite = new ( memory::yaal ) OSQLite;
 		HString dataBase( dataBase_ );
-		if ( ::stat( dataBase.raw(), &s ) ) {
+		if ( ::access( dataBase.raw(), R_OK | W_OK ) ) {
 			char const fileNameExt[] = ".sqlite";
 			dataBase += fileNameExt;
-			if ( ::stat( dataBase.raw(), &s ) ) {
-				sQLite->_errorMessage.format( "Database file `%s' does not exists.", dataBase.raw() );
+			if ( ::access( dataBase.raw(), R_OK | W_OK ) ) {
+				sQLite->_errorMessage.format( "Database file `%s' is not accessible.", dataBase.raw() );
 				break;
 			}
 		}

@@ -1,6 +1,8 @@
 #ifndef YAAL_MSVCXX_SYS_MMAN_H_INCLUDED
 #define YAAL_MSVCXX_SYS_MMAN_H_INCLUDED 1
 
+typedef char* caddr_t;
+
 static int const PROT_NONE  = 0x00;
 static int const PROT_EXEC  = 0x01;
 static int const PROT_WRITE = 0x02;

@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#define YAAL_USES_STAT 1
+
 #include <cstring>
 #include <cstdio>
 #include <cstdlib>
@@ -37,6 +39,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "stringalgo.hxx"
 #include "hfsitem.hxx"
 #include "hcore/hcall.hxx"
+
+#undef YAAL_USES_STAT
 
 using namespace yaal;
 using namespace yaal::hcore;

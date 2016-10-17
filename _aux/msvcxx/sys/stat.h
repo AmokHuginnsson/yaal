@@ -4,6 +4,9 @@
 #include <../ucrt/sys/stat.h>
 
 static int const F_OK = 0;
+static int const X_OK = 1;
+static int const W_OK = 2;
+static int const R_OK = 4;
 
 static int const S_IRUSR = 0400;
 static int const S_IWUSR = 0200;
@@ -61,7 +64,9 @@ inline int lstat( char const* path_, struct stat* s_ )
 inline mode_t umask( mode_t umask_ )
 	{ return ( msvcxx::umask( umask_ ) ); }
 
+#ifdef YAAL_USES_STAT
 #define stat msvcxx::unix_stat
+#endif /* #ifdef YAAL_USES_STAT */
 
 #endif /* not YAAL_MSVCXX_SYS_STAT_H_INCLUDED */
 

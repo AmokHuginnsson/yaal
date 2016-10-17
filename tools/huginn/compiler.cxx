@@ -360,7 +360,7 @@ void OCompiler::resolve_symbols( void ) {
 			}
 			OScopeContext* sc( es._scope.raw() );
 			HHuginn::identifier_id_t fi( sc->_functionId );
-			OScopeContext::OLocalVariable localVariable( { -1, nullptr } );
+			OScopeContext::OLocalVariable localVariable;
 			while ( sc ) {
 				OScopeContext::local_variables_t::const_iterator it( sc->_variables.find( es._identifier ) );
 				if ( it != sc->_variables.end() ) {

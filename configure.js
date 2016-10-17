@@ -198,6 +198,7 @@ try {
 	var PREFIX = "";
 	var SYSCONFDIR = "";
 	var LOCALSTATEDIR = "";
+	var DATADIR = "";
 	var SILENT = 0;
 	var VERBOSE = 0;
 	var VISUAL_STUDIO_VERSION = vcVersion();
