@@ -125,8 +125,8 @@ void HLog::do_rehash( void* src_, char const* processName_ ) {
 	M_ASSERT( processName_ );
 #ifndef HAVE_GETLINE
 	char* ptr = nullptr;
-	int len = 0;
 #endif /* not HAVE_GETLINE */
+	int len( 0 );
 	_realMode = true;
 	FILE* src( static_cast<FILE*>( src_ ) );
 	if ( src ) {
@@ -163,7 +163,8 @@ void HLog::do_rehash( void* src_, char const* processName_ ) {
 				_file::ref() << buf + TIMESTAMP_LENGTH;
 			}
 		}
-		if ( buf[ ::strlen( buf ) - 1 ] == '\n' ) {
+		len = static_cast<int>( ::strlen( buf ) );
+		if ( ( len > 0 ) && ( buf[ len - 1 ] == '\n' ) ) {
 			_type = LOG_LEVEL::MAX;
 		}
 		::fclose( src );
