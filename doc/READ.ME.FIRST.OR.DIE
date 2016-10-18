@@ -3,17 +3,18 @@
 * Supported platforms:
 
 ** Hardware:
-  - x86 aka i386.
   - amd64 aka x64.
+  - x86 aka i386 (soon to be deprecated).
 
 ** Software:
   - Debian (latest development branch, currently `unstable' aka `Sid') (Debian stable releases are not supported!)
-  - Ubuntu (latest development branch and latest stable release, currently 14.04 and 14.10 respectively)
+  - Ubuntu (latest development branch and latest stable release, currently 16.04 and 16.10 respectively)
   - Centos (latest stable release, currently 7)
-  - FreeBSD (latest stable release, currently 10.1-RELEASE)
-  - Oracle Solaris (latest stable release, currently 11.2)
-  - Darwin (latest stable release, 14.3.0)
-  - Windows 7 SP1 with Cygwin (latest available cygwin release, currently 1.7.27)
+  - FreeBSD (latest stable release, currently 11.0-RELEASE)
+  - Oracle Solaris (latest stable release, currently 11.3)
+  - Darwin (latest stable release, 14.5.0)
+  - Windows 7 SP1 with Cygwin (latest available cygwin release, currently 2.5.2)
+  - Windows 7 SP1 with Visual Studio (latest available Visual Studio release, currently 2015)
 
 [For more detailed information regarding platform support
 please look into HTML documentation.]
