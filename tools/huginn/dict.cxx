@@ -129,11 +129,12 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 			runtime_->identifier_id( type_name( HHuginn::TYPE::DICT ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "has_key", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::has_key, _1, _2, _3, _4 ) ) },
-				{ "get", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::get, _1, _2, _3, _4 ) ) },
-				{ "erase", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::erase, _1, _2, _3, _4 ) ) },
-				{ "clear", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::clear, _1, _2, _3, _4 ) ) }
-			}
+				{ "has_key", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::has_key, _1, _2, _3, _4 ) ), "( *key* ) - tell if given *key* can be found in this `dict`" },
+				{ "get", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::get, _1, _2, _3, _4 ) ), "( *key*, *default* ) - get value for given *key* from this `dict`, or *default* if given *key* is not present in the `dict`" },
+				{ "erase", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::erase, _1, _2, _3, _4 ) ), "( *key* ) - remove given *key* from this `dict`" },
+				{ "clear", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::clear, _1, _2, _3, _4 ) ), "erase `dict`'s content, `dict` becomes empty" }
+			},
+			"The `dict` is a collection providing a sorted key to value map. It supports operations of iteration, key-value insertion, key removal and key search. The keys stored in given `dict` instance must be of uniform type."
 		)
 	);
 	return ( c );

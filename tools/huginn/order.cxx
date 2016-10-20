@@ -121,11 +121,12 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 			runtime_->identifier_id( type_name( HHuginn::TYPE::ORDER ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "add",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::add, _1, _2, _3, _4 ) ) },
-				{ "has_key", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::has_key, _1, _2, _3, _4 ) ) },
-				{ "erase",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::erase, _1, _2, _3, _4 ) ) },
-				{ "clear",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::clear, _1, _2, _3, _4 ) ) }
-			}
+				{ "add",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::add, _1, _2, _3, _4 ) ), "( *elem* ) - add given element *elem* to an `order`" },
+				{ "has_key", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::has_key, _1, _2, _3, _4 ) ), "( *elem* ) - tell if given element *elem* is in the `order`" },
+				{ "erase",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::erase, _1, _2, _3, _4 ) ), "( *elem* ) - remove given element *elem* from the `order`" },
+				{ "clear",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::clear, _1, _2, _3, _4 ) ), "erase `order`'s content, `order` becomes empty" }
+			},
+			"The `order` is a collection of sorted values of uniform types. It supports operations of addiion, search and element removal."
 		)
 	);
 	return ( c );

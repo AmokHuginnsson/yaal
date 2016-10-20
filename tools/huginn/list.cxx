@@ -109,11 +109,11 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 			runtime_->identifier_id( type_name( HHuginn::TYPE::LIST ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "add",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::add, _1, _2, _3, _4 ) ), "( *elem* ) - add new *elem* at the end of the list, list grows in size by 1" },
-				{ "pop",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::pop, _1, _2, _3, _4 ) ), "remove last element from the list, list shrinks by 1" },
-				{ "clear", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::clear, _1, _2, _3, _4 ) ), "erase list's content, list becomes empty" }
+				{ "add",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::add, _1, _2, _3, _4 ) ), "( *elem* ) - add new *elem* at the end of the `list`, `list` grows in size by 1" },
+				{ "pop",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::pop, _1, _2, _3, _4 ) ), "remove last element from the `list`, `list` shrinks by 1" },
+				{ "clear", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::clear, _1, _2, _3, _4 ) ), "erase `list`'s content, `list` becomes empty" }
 			},
-			"The `list` is a collection type that is used to represent and operate on list of values. "
+			"The `list` is a collection type that is used to represent and operate on `list` of values. "
 			"It supports basic subscript and range operators. "
 			"It also supports efficient operations of addition and removal of its elements from its (right) end."
 		)

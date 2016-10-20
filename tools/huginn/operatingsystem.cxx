@@ -144,15 +144,16 @@ HHuginn::value_t HOperatingSystemCreator::do_new_instance( HRuntime* runtime_ ) 
 			"OperatingSystem",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "env",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::env, _1, _2, _3, _4 ) ) },
-				{ "exec",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::exec, _1, _2, _3, _4 ) ) },
-				{ "exit",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::exit, _1, _2, _3, _4 ) ) },
-				{ "spawn",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::spawn, _1, _2, _3, _4 ) ) },
-				{ "stdin",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::stream, "OperatingSystem.stdin", &runtime_->huginn()->input_stream(), _1, _2, _3, _4 ) ) },
-				{ "stdout", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::stream, "OperatingSystem.stdout", &runtime_->huginn()->output_stream(), _1, _2, _3, _4 ) ) },
-				{ "stderr", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::stream, "OperatingSystem.stderr", &runtime_->huginn()->error_stream(), _1, _2, _3, _4 ) ) },
-				{ "stdlog", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::stream, "OperatingSystem.stdlog", &runtime_->huginn()->log_stream(), _1, _2, _3, _4 ) ) }
-			}
+				{ "env",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::env, _1, _2, _3, _4 ) ), "( *name* ) - get value of an environment variable named *name*" },
+				{ "exec",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::exec, _1, _2, _3, _4 ) ), "( *prog*, *args*... ) - replace current process space with running image of *prog* providing it with *args* arguments" },
+				{ "exit",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::exit, _1, _2, _3, _4 ) ), "( *status* ) - exit the interpreter with the *status*" },
+				{ "spawn",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::spawn, _1, _2, _3, _4 ) ), "( *prog*, *args*... ) - start a subprocess *prog* providing it with *args* arguments" },
+				{ "stdin",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::stream, "OperatingSystem.stdin", &runtime_->huginn()->input_stream(), _1, _2, _3, _4 ) ), "get access to interpreter's standard input stream" },
+				{ "stdout", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::stream, "OperatingSystem.stdout", &runtime_->huginn()->output_stream(), _1, _2, _3, _4 ) ), "get access to interpreter's standard output stream" },
+				{ "stderr", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::stream, "OperatingSystem.stderr", &runtime_->huginn()->error_stream(), _1, _2, _3, _4 ) ), "get access to interpreter's standard error stream" },
+				{ "stdlog", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::stream, "OperatingSystem.stdlog", &runtime_->huginn()->log_stream(), _1, _2, _3, _4 ) ), "get access to interpreter's standard log stream" }
+			},
+			"The `OperatingSystem` package provides an interface to various operating system functionalities."
 		)
 	);
 	runtime_->huginn()->register_class( c );
