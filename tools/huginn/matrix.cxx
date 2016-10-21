@@ -541,21 +541,22 @@ HHuginn::class_t HMatrix::get_class( HRuntime* runtime_ ) {
 			"Matrix",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "columns",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::columns, _1, _2, _3, _4 ) ) },
-				{ "rows",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::rows, _1, _2, _3, _4 ) ) },
-				{ "get",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::get, _1, _2, _3, _4 ) ) },
-				{ "set",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::set, _1, _2, _3, _4 ) ) },
-				{ "add",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::add, _1, _2, _3, _4 ) ) },
-				{ "subtract",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::subtract, _1, _2, _3, _4 ) ) },
-				{ "multiply",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::multiply, _1, _2, _3, _4 ) ) },
-				{ "det",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::det, _1, _2, _3, _4 ) ) },
-				{ "scale",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::scale, _1, _2, _3, _4 ) ) },
-				{ "scale_to",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::scale_to, _1, _2, _3, _4 ) ) },
-				{ "inverse",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::inverse, _1, _2, _3, _4 ) ) },
-				{ "transpose", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::transpose, _1, _2, _3, _4 ) ) },
-				{ "apply",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::apply, _1, _2, _3, _4 ) ) },
-				{ "to_string", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::to_string, _1, _2, _3, _4 ) ) }
-			}
+				{ "columns",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::columns, _1, _2, _3, _4 ) ), "get column dimension of this `Matrix`" },
+				{ "rows",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::rows, _1, _2, _3, _4 ) ), "get row dimension of this `Matrix`" },
+				{ "get",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::get, _1, _2, _3, _4 ) ), "( *row*, *column* ) - get numeric value present at given *row* and *column* in this `Matrix`" },
+				{ "set",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::set, _1, _2, _3, _4 ) ), "( *row*, *column*, *value* ) - set given numeric *value* at given *row* and *column* in this `Matrix`" },
+				{ "add",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::add, _1, _2, _3, _4 ) ), "( *other* ) - add *other* `Matrix` to this `Matrix`" },
+				{ "subtract",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::subtract, _1, _2, _3, _4 ) ), "( *other* ) - subtract *other* `Matrix` from this `Matrix`" },
+				{ "multiply",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::multiply, _1, _2, _3, _4 ) ), "( *other* ) - multiply this `Matrix` by *other* `Matrix`" },
+				{ "det",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::det, _1, _2, _3, _4 ) ), "find value of determinant of this `Matrix`" },
+				{ "scale",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::scale, _1, _2, _3, _4 ) ), "( *factor* ) - scale all values in this `Matrix` by given *factor*" },
+				{ "scale_to",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::scale_to, _1, _2, _3, _4 ) ), "( *cap* ) - rescale values in this `Matrix` so maximum of its values is equal to *cap*" },
+				{ "inverse",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::inverse, _1, _2, _3, _4 ) ), "find *inverse* of this `Matrix`" },
+				{ "transpose", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::transpose, _1, _2, _3, _4 ) ), "create transposed version of this `Matrix`" },
+				{ "apply",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::apply, _1, _2, _3, _4 ) ), "( *fun* ) - apply unary function *fun* over all values in this `Matrix`" },
+				{ "to_string", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::to_string, _1, _2, _3, _4 ) ), "get string representation of this `Matrix`" }
+			},
+			"The `Matrix` class provides mathematical concept of number matrices. It supports operations of addition, multiplication, subtraction, scaling, inversion and transposition."
 		)
 	);
 	runtime_->huginn()->register_class( c );

@@ -116,8 +116,9 @@ HHuginn::class_t HRegularExpressionMatch::get_class( HRuntime* runtime_ ) {
 			"RegularExpressionMatch",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "matched", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HRegularExpressionMatch::matched, _1, _2, _3, _4 ) ) }
-			}
+				{ "matched", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HRegularExpressionMatch::matched, _1, _2, _3, _4 ) ), "tell if given regular expression pattern matched against given string" }
+			},
+			"The `RegularExpressionMatch` class represents result of regular expression based text search."
 		)
 	);
 	runtime_->huginn()->register_class( c );

@@ -86,9 +86,10 @@ public:
 			runtime_->identifier_id( "CompiledRegularExpression" ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "match", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCompiledRegularExpression::match, _1, _2, _3, _4 ) ) },
-				{ "groups", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCompiledRegularExpression::groups, _1, _2, _3, _4 ) ) }
-			}
+				{ "match", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCompiledRegularExpression::match, _1, _2, _3, _4 ) ), "( *text* ) - find a match of this compiled regular expression in given *text*" },
+				{ "groups", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCompiledRegularExpression::groups, _1, _2, _3, _4 ) ), "( *text* ) - get all matching regular expression groups from this regular expression in given *text*" }
+			},
+			"The `CompiledRegularExpression` class gives access to result of regular expression based text searches."
 		)
 		, _exceptionClass( exceptionClass_ )
 		, _regularExpressionMatchClass( HRegularExpressionMatch::get_class( runtime_ ) ) {

@@ -85,8 +85,9 @@ HHuginn::value_t HRegularExpressionsCreator::do_new_instance( HRuntime* runtime_
 			"RegularExpressions",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "compile", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HRegularExpressions::compile, _1, _2, _3, _4 ) ) }
-			}
+				{ "compile", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HRegularExpressions::compile, _1, _2, _3, _4 ) ), "( *pattern* ) - compile given regular expression pattern to be used for text searches" }
+			},
+			"The `RegularExpressions` package provides support for regular expressions based text searches."
 		)
 	);
 	runtime_->huginn()->register_class( c );

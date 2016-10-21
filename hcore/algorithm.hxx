@@ -715,7 +715,7 @@ inline bool lexicographical_compare( iter1_t it1, iter1_t end1, iter2_t it2, ite
  * \param end1 - one past last element of first range.
  * \param it2 - beginning of second range.
  * \param end2 - one past last element of second range.
- * \return A pair of iteators which point to first differentiating element.
+ * \return A pair of iterators which point to first differentiating element.
  */
 template<typename iter1_t, typename iter2_t>
 inline yaal::hcore::HPair<iter1_t, iter2_t> safe_mismatch( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 ) {
@@ -729,7 +729,7 @@ inline yaal::hcore::HPair<iter1_t, iter2_t> safe_mismatch( iter1_t it1, iter1_t 
  * \param it1 - beginning of first range.
  * \param end1 - one past last element of first range.
  * \param it2 - beginning of second range.
- * \return A pair of iteators which point to first differentiating element.
+ * \return A pair of iterators which point to first differentiating element.
  */
 template<typename iter1_t, typename iter2_t>
 inline yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1, iter2_t it2 ) {
@@ -744,7 +744,7 @@ inline yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1,
  * \param end1 - one past last element of first range.
  * \param it2 - beginning of second range.
  * \param predicate_ - a predicate to test a differences with.
- * \return A pair of iteators which point to first differentiating element.
+ * \return A pair of iterators which point to first differentiating element.
  */
 template<typename iter1_t, typename iter2_t, typename predicate_t>
 inline yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1, iter2_t it2, predicate_t predicate_ ) {

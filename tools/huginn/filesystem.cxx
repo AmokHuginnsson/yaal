@@ -150,13 +150,14 @@ HHuginn::value_t HFileSystemCreator::do_new_instance( HRuntime* runtime_ ) {
 			"FileSystem",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "open",                      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::open, _1, _2, _3, _4 ) ) },
-				{ "reading",                   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::reading, _1, _2, _3, _4 ) ) },
-				{ "writting",                  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::writting, _1, _2, _3, _4 ) ) },
-				{ "rename",                    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::rename, _1, _2, _3, _4 ) ) },
-				{ "remove",                    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::remove, _1, _2, _3, _4 ) ) },
-				{ "current_working_directory", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::current_working_directory, _1, _2, _3, _4 ) ) }
-			}
+				{ "open",                      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::open, _1, _2, _3, _4 ) ), "( *path*, *mode* ) - open file under given *path* in the attached file system, using specified (i/o) *mode*" },
+				{ "reading",                   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::reading, _1, _2, _3, _4 ) ), "a mode for *.open()* method, used to open files for reading" },
+				{ "writting",                  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::writting, _1, _2, _3, _4 ) ), "a mode for *.open()* method, used to open files for writing" },
+				{ "rename",                    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::rename, _1, _2, _3, _4 ) ), "( *oldPath*, *newPath* ) - rename or move file from *oldPath* to *newPath* in attached file system", },
+				{ "remove",                    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::remove, _1, _2, _3, _4 ) ), "( *path* ) - remove file with given *path* from attached file system" },
+				{ "current_working_directory", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::current_working_directory, _1, _2, _3, _4 ) ), "get current working directory path" }
+			},
+			"The `FileSystem` package provides interface to various file system queries and operations."
 		)
 	);
 	runtime_->huginn()->register_class( c );
