@@ -65,8 +65,9 @@ HHuginn::class_t HTime::get_class( HRuntime* runtime_ ) {
 			"Time",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "to_string", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::to_string, _1, _2, _3, _4 ) ) }
-			}
+				{ "to_string", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::to_string, _1, _2, _3, _4 ) ), "get `string` representation of this point-in-time" }
+			},
+			"The `Time` class represent information about point-in-time."
 		)
 	);
 	return ( c );

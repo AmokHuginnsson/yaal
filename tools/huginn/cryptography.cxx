@@ -86,9 +86,10 @@ HHuginn::value_t HCryptographyCreator::do_new_instance( HRuntime* runtime_ ) {
 			"Cryptography",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "md5", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::md5, _1, _2, _3, _4 ) ) },
-				{ "sha1", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::sha1, _1, _2, _3, _4 ) ) }
-			}
+				{ "md5", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::md5, _1, _2, _3, _4 ) ), "( *str* ) - calculare *MD5* sum of given `string`" },
+				{ "sha1", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::sha1, _1, _2, _3, _4 ) ), "( *str* ) - calculare *SHA1* sum of given `string`" }
+			},
+			"The `Cryptography` package provides functionality of a cryptographical nature, like hashing functions."
 		)
 	);
 	runtime_->huginn()->register_class( c );

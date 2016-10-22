@@ -150,11 +150,12 @@ HHuginn::value_t HTextCreator::do_new_instance( HRuntime* runtime_ ) {
 			"Text",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "split",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::split, _1, _2, _3, _4 ) ) },
-				{ "join",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::join, _1, _2, _3, _4 ) ) },
-				{ "distance",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::distance, _1, _2, _3, _4 ) ) },
-				{ "repeat",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::repeat, _1, _2, _3, _4 ) ) }
-			}
+				{ "split",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::split, _1, _2, _3, _4 ) ), "( *str*, *sep* ) - split `string` *str* by separator *sep* into a `list` of `string`s" },
+				{ "join",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::join, _1, _2, _3, _4 ) ), "( *coll*, *sep* ) - join all string from *coll* into one `string` using *sep* as separator" },
+				{ "distance",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::distance, _1, _2, _3, _4 ) ), "( *first*, *second* ) - calculate Damerau-Levenshtein distance between *first* and *second* `string`s" },
+				{ "repeat",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::repeat, _1, _2, _3, _4 ) ), "( *seed*, *count* ) - construct new `string` by repeating *seed* `string` *count* times" }
+			},
+			"The `Text` package provides various text manipulation algorithms."
 		)
 	);
 	runtime_->huginn()->register_class( c );

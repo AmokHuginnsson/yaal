@@ -84,10 +84,11 @@ HHuginn::class_t HClock::get_class( HRuntime* runtime_ ) {
 			"Clock",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "milliseconds", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HClock::milliseconds, _1, _2, _3, _4 ) ) },
-				{ "reset", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HClock::reset, _1, _2, _3, _4 ) ) },
-				{ "to_string", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HClock::to_string, _1, _2, _3, _4 ) ) }
-			}
+				{ "milliseconds", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HClock::milliseconds, _1, _2, _3, _4 ) ), "how many milliseconds esapsed since last `Clock` reset" },
+				{ "reset", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HClock::reset, _1, _2, _3, _4 ) ), "reset `Clock`s elapsed time counter" },
+				{ "to_string", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HClock::to_string, _1, _2, _3, _4 ) ), "get precise `string` representation of elapsed time measured by this `Clock`" }
+			},
+			"The `Clock` provides a stopper watch concept machinery."
 		)
 	);
 	M_EPILOG

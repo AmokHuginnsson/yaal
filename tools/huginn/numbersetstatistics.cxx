@@ -112,16 +112,17 @@ HHuginn::class_t HNumberSetStatistics::get_class( HRuntime* runtime_ ) {
 			"NumberSetStatistics",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "minimum",                       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "minimum",                       AGGREGATE_TYPE::MINIMUM, _1, _2, _3, _4 ) ) },
-				{ "maximum",                       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "maximum",                       AGGREGATE_TYPE::MAXIMUM, _1, _2, _3, _4 ) ) },
-				{ "sum",                           make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "sum",                           AGGREGATE_TYPE::SUM, _1, _2, _3, _4 ) ) },
-				{ "average",                       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "average",                       AGGREGATE_TYPE::AVERAGE, _1, _2, _3, _4 ) ) },
-				{ "median",                        make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "median",                        AGGREGATE_TYPE::MEDIAN, _1, _2, _3, _4 ) ) },
-				{ "variance",                      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "variance",                      AGGREGATE_TYPE::VARIANCE, _1, _2, _3, _4 ) ) },
-				{ "population_variance",           make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "population_variance",           AGGREGATE_TYPE::POPULATION_VARIANCE, _1, _2, _3, _4 ) ) },
-				{ "standard_deviation",            make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "standard_deviation",            AGGREGATE_TYPE::STANDARD_DEVIATION, _1, _2, _3, _4 ) ) },
-				{ "population_standard_deviation", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "population_standard_deviation", AGGREGATE_TYPE::POPULATION_STANDARD_DEVIATION, _1, _2, _3, _4 ) ) }
-			}
+				{ "minimum",                       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "minimum",                       AGGREGATE_TYPE::MINIMUM, _1, _2, _3, _4 ) ), "minimum numeric value in set" },
+				{ "maximum",                       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "maximum",                       AGGREGATE_TYPE::MAXIMUM, _1, _2, _3, _4 ) ), "maximum numeric value in set" },
+				{ "sum",                           make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "sum",                           AGGREGATE_TYPE::SUM, _1, _2, _3, _4 ) ), "sum of all values in set" },
+				{ "average",                       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "average",                       AGGREGATE_TYPE::AVERAGE, _1, _2, _3, _4 ) ), "average value of all numbers in set" },
+				{ "median",                        make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "median",                        AGGREGATE_TYPE::MEDIAN, _1, _2, _3, _4 ) ), "median value in set" },
+				{ "variance",                      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "variance",                      AGGREGATE_TYPE::VARIANCE, _1, _2, _3, _4 ) ), "variance of the set" },
+				{ "population_variance",           make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "population_variance",           AGGREGATE_TYPE::POPULATION_VARIANCE, _1, _2, _3, _4 ) ), "population variance of the numeric set" },
+				{ "standard_deviation",            make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "standard_deviation",            AGGREGATE_TYPE::STANDARD_DEVIATION, _1, _2, _3, _4 ) ), "standard deviation of the numeric set" },
+				{ "population_standard_deviation", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "population_standard_deviation", AGGREGATE_TYPE::POPULATION_STANDARD_DEVIATION, _1, _2, _3, _4 ) ), "population standard deviation of the numeric set" }
+			},
+			"The `NumberSetStatistics` is a class representing results of gathering numerical statistics over some uniformly typed number set."
 		)
 	);
 	runtime_->huginn()->register_class( c );

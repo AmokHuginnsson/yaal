@@ -92,9 +92,10 @@ HHuginn::value_t HDateTimeCreator::do_new_instance( HRuntime* runtime_ ) {
 			"DateTime",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "now", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDateTime::now, _1, _2, _3, _4 ) ) },
-				{ "clock", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDateTime::clock, _1, _2, _3, _4 ) ) }
-			}
+				{ "now", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDateTime::now, _1, _2, _3, _4 ) ), "get information about current point-in-time" },
+				{ "clock", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDateTime::clock, _1, _2, _3, _4 ) ), "create a stopper-watch instance" }
+			},
+			"The `DateTime` package provides date and time handling functionalities."
 		)
 	);
 	runtime_->huginn()->register_class( c );
