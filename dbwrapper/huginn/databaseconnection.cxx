@@ -98,10 +98,11 @@ public:
 			runtime_->identifier_id( "DatabaseConnection" ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "query", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::query, _1, _2, _3, _4 ) ) },
-				{ "table_names", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::table_names, _1, _2, _3, _4 ) ) },
-				{ "column_names", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::column_names, _1, _2, _3, _4 ) ) }
-			}
+				{ "query", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::query, _1, _2, _3, _4 ) ), "( *sql* ) - create query object for given *sql* `string`" },
+				{ "table_names", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::table_names, _1, _2, _3, _4 ) ), "get list of table names available in connected database" },
+				{ "column_names", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::column_names, _1, _2, _3, _4 ) ), "( *table* ) - get list of column names from given *table* in connected database" }
+			},
+			"The `DatabaseConnection` class allows performing various type of queries on connected database."
 		)
 		, _exceptionClass( exceptionClass_ )
 		, _queryClass( huginn::HQuery::get_class( runtime_, exceptionClass_ ) ) {

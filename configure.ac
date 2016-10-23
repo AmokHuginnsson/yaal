@@ -175,16 +175,16 @@ MYSQL_REENTRANT=[""]
 CXXFLAGS_ORIG="${CXXFLAGS}"
 if test ["${MYSQL}"] != ["no"] ; then
 	LIBS=""
-	AC_SEARCH_LIBS([mysql_init],[mysqlclient])
+	AC_CHECK_LIB([mysqlclient],[mysql_init])
 	if test ["x${LIBS}"] = "x" ; then
 		CXXFLAGS=["${CXXFLAGS_ORIG} -L/usr/local/lib/mysql"]
-		unset ac_cv_search_mysql_init
-		AC_SEARCH_LIBS([mysql_init],[mysqlclient],[EXTRA_LIBRARY_PATHS="${EXTRA_LIBRARY_PATHS} -L/usr/local/lib/mysql"])
+		unset ac_cv_lib_mysqlclient_mysql_init
+		AC_CHECK_LIB([mysqlclient],[mysql_init],[EXTRA_LIBRARY_PATHS="${EXTRA_LIBRARY_PATHS} -L/usr/local/lib/mysql"])
 	fi
 	if test ["x${LIBS}"] = "x" ; then
 		CXXFLAGS=["${CXXFLAGS_ORIG} -L/usr/lib64/mysql/"]
-		unset ac_cv_search_mysql_init
-		AC_SEARCH_LIBS([mysql_init],[mysqlclient],[EXTRA_LIBRARY_PATHS="${EXTRA_LIBRARY_PATHS} -L/usr/lib64/mysql/"])
+		unset ac_cv_lib_mysqlclient_mysql_init
+		AC_CHECK_LIB([mysqlclient],[mysql_init],[EXTRA_LIBRARY_PATHS="${EXTRA_LIBRARY_PATHS} -L/usr/lib64/mysql/"])
 	fi
 	if test ["x${LIBS}"] = "x" ; then
 		if test ["${MYSQL}"] = ["yes"] ; then
@@ -207,12 +207,14 @@ fi
 if test ["${ORACLE}"] != ["no"] ; then
 	CXXFLAGS=["${CXXFLAGS} -L${ORACLE_HOME}/lib"]
 	AC_CHECK_LIB([clntsh],[OCIEnvCreate],
-								[EXTRA_LIBRARY_PATHS="${EXTRA_LIBRARY_PATHS} -L${ORACLE_HOME}/lib"],
-								[if test ["${ORACLE}"] = ["yes"] ; then
+								[],[if test ["${ORACLE}"] = ["yes"] ; then
 											AC_MSG_ERROR([Cannot continue without Oracle.])
 										fi;ORACLE=["no"]])
 	CXXFLAGS=["${CXXFLAGS_ORIG}"]
 	LIBS=""
+	if test ["x${ac_cv_lib_clntsh_OCIEnvCreate}"] = ["xyes"] ; then
+		EXTRA_LIBRARY_PATHS="${EXTRA_LIBRARY_PATHS} -L${ORACLE_HOME}/lib"
+	fi
 fi
 
 AC_MSG_RESULT([--- All needed libraries found. ---                     [[70%]]])
@@ -229,7 +231,7 @@ AC_MSG_RESULT([$RESULT])
 AC_MSG_CHECKING([whether `.interp' user section is allowed])
 dnl `
 RESULT=["no"]
-AC_COMPILE_IFELSE([AC_LANG_SOURCE([[void f( void ) { static char const dynamicLinkerPath[]	__attribute__(( __section__(".interp") )) = "/dummy"; }]])],
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[void f( void ) { static char const dynamicLinkerPath[] __attribute__(( __section__(".interp") )) = "/dummy"; }]])],
 	[AC_DEFINE([HAVE_INTERP_ALLOWED],[],[Is `.interp' user secion allowed?])] RESULT=["yes"])
 dnl `
 AC_MSG_RESULT([$RESULT])

@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include "config.hxx"
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
@@ -86,8 +88,25 @@ HHuginn::value_t HDatabaseCreator::do_new_instance( HRuntime* runtime_ ) {
 			"Database",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "connect", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabase::connect, _1, _2, _3, _4 ) ) }
-			}
+				{ "connect", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabase::connect, _1, _2, _3, _4 ) ), "( *DSN* ) - create connection to the database specified by given *DSN*" }
+			},
+			"The `Database` package provides access to various database engines through database agnostic interface. Following drivers are supported:"
+#ifdef HAVE_LIBSQLITE3
+			" SQLite3"
+#endif
+#ifdef HAVE_LIBPQ
+			" PostgreSQL"
+#endif
+#ifdef HAVE_LIBMYSQLCLIENT
+			" MySQL"
+#endif
+#ifdef HAVE_LIBFBCLIENT
+			" Firebird"
+#endif
+#ifdef HAVE_LIBCLNTSH
+			" Oracle"
+#endif
+			"."
 		)
 	);
 	runtime_->huginn()->register_class( c );
