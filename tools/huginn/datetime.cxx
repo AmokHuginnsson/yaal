@@ -55,7 +55,7 @@ public:
 		: HObject( class_ )
 		, _timeClass( HTime::get_class( class_->runtime() ) )
 		, _clockClass( HClock::get_class( class_->runtime() ) )
-		, _exceptionClass( exception::create_class( class_->runtime(), "DateTimeException" ) ) {
+		, _exceptionClass( exception::create_class( class_->runtime(), "DateTimeException", "The `DateTimeException` exception type for `DateTime` package." ) ) {
 		class_->runtime()->huginn()->register_class( _timeClass );
 		class_->runtime()->huginn()->register_class( _clockClass );
 		return;

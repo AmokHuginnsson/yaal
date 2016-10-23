@@ -182,7 +182,7 @@ public:
 	HHuginn::value_t create_reference( HHuginn::value_t& value_ ) const {
 		return ( yaal::hcore::allocate_pointer<reference_allocator_t, HHuginn::HReference>( _referenceAllocator, value_ ) );
 	}
-	HHuginn::value_t create_function_reference( HHuginn::identifier_id_t identifierId_, HHuginn::function_t const& function_, yaal::hcore::HString const& doc_ = yaal::hcore::HString() ) const {
+	HHuginn::value_t create_function_reference( HHuginn::identifier_id_t identifierId_, HHuginn::function_t const& function_, yaal::hcore::HString const& doc_ ) const {
 		return ( yaal::hcore::allocate_pointer<function_reference_allocator_t, HHuginn::HFunctionReference>( _functionReferenceAllocator, identifierId_, function_, doc_ ) );
 	}
 	HHuginn::value_t create_bound_method( HHuginn::HClass::HMethod const& method_, HHuginn::value_t const& object_ ) const {

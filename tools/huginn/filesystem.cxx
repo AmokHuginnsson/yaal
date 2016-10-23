@@ -59,7 +59,7 @@ public:
 	HFileSystem( HHuginn::HClass* class_ )
 		: HObject( class_ )
 		, _streamClass( HStream::get_class( class_->runtime() ) )
-		, _exceptionClass( exception::create_class( class_->runtime(), "FileSystemException" ) ) {
+		, _exceptionClass( exception::create_class( class_->runtime(), "FileSystemException", "The `FileSystemException` exception type for `FileSystem` package." ) ) {
 		return;
 	}
 	static HHuginn::value_t open( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {

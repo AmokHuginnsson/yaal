@@ -56,7 +56,8 @@ public:
 		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_,
 		HHuginn::identifier_id_t identifierId_,
-		HHuginn::HClass const* base_
+		HHuginn::HClass const* base_,
+		yaal::hcore::HString const& doc_
 	) : HHuginn::HClass(
 			runtime_,
 			typeId_,
@@ -65,10 +66,11 @@ public:
 			base_
 				? HHuginn::field_definitions_t{}
 				: HHuginn::field_definitions_t{
-						{ "what", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::what, _1, _2, _3, _4 ) ) },
-						{ "where", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::where, _1, _2, _3, _4 ) ) },
-						{ "message", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::message, _1, _2, _3, _4 ) ) }
-				}
+						{ "what", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::what, _1, _2, _3, _4 ) ), "get exception message" },
+						{ "where", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::where, _1, _2, _3, _4 ) ), "get originating exception position" },
+						{ "message", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::message, _1, _2, _3, _4 ) ), "get exception message" }
+				},
+			doc_
 		) {
 		return;
 	}
@@ -122,7 +124,7 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 			HRuntime::class_constructor_t(
 				[&runtime_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
 					return (
-						make_pointer<HExceptionClass>( runtime_, typeId_, runtime_->identifier_id( "Exception" ), nullptr )
+						make_pointer<HExceptionClass>( runtime_, typeId_, runtime_->identifier_id( "Exception" ), nullptr, "The `Exception` class is a base class for Huginn standard exceptions hierarchy." )
 					);
 				}
 			)
@@ -132,20 +134,21 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 	M_EPILOG
 }
 
-HHuginn::class_t create_class( HRuntime* runtime_, yaal::hcore::HString const& name_, HHuginn::HClass const* base_ ) {
+HHuginn::class_t create_class( HRuntime* runtime_, yaal::hcore::HString const& name_, yaal::hcore::HString const& doc_, HHuginn::HClass const* base_ ) {
 	M_PROLOG
 	HHuginn::identifier_id_t classIdentifier( runtime_->identifier_id( name_ ) );
 	HHuginn::class_t c( runtime_ ? runtime_->get_class( classIdentifier ) : nullptr );
 	if ( ! c ) {
 		c =	runtime_->create_class(
 			HRuntime::class_constructor_t(
-				[&runtime_, &classIdentifier, &base_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
+				[&runtime_, &classIdentifier, &doc_, &base_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
 					return (
 						make_pointer<HExceptionClass>(
 							runtime_,
 							typeId_,
 							classIdentifier,
-							base_ ? base_ : runtime_->object_factory()->exception_class()
+							base_ ? base_ : runtime_->object_factory()->exception_class(),
+							doc_
 						)
 					);
 				}

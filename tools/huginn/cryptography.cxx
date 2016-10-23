@@ -51,7 +51,7 @@ class HCryptography : public HHuginn::HObject {
 public:
 	HCryptography( HHuginn::HClass* class_ )
 		: HObject( class_ )
-		, _exceptionClass( exception::create_class( class_->runtime(), "CryptographyException" ) ) {
+		, _exceptionClass( exception::create_class( class_->runtime(), "CryptographyException", "The `CryptographyException` exception type for `Cryptography` package." ) ) {
 		return;
 	}
 	static HHuginn::value_t md5( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {

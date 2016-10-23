@@ -44,6 +44,7 @@ HHuginn::class_t get_class( HRuntime* );
 HHuginn::class_t create_class(
 	HRuntime*,
 	yaal::hcore::HString const&,
+	yaal::hcore::HString const&,
 	HHuginn::HClass const* = nullptr
 );
 

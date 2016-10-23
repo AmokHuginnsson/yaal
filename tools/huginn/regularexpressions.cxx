@@ -51,7 +51,7 @@ class HRegularExpressions : public HHuginn::HObject {
 public:
 	HRegularExpressions( HHuginn::HClass* class_ )
 		: HObject( class_ )
-		, _exceptionClass( exception::create_class( class_->runtime(), "RegularExpressionException" ) )
+		, _exceptionClass( exception::create_class( class_->runtime(), "RegularExpressionException", "The `RegularExpressionException` exception type for `RegularExpression` package." ) )
 		, _compiledRegularExpressionClass( HCompiledRegularExpression::get_class( class_->runtime(), _exceptionClass ) ) {
 		return;
 	}

@@ -90,16 +90,16 @@ HHuginn::identifier_id_t const TYPE_BOUND_METHOD_IDENTIFIER( 29 );
 HHuginn::identifier_id_t const TYPE_UNKNOWN_IDENTIFIER( 30 );
 HHuginn::HClass const _noneClass_( HHuginn::TYPE::NONE, TYPE_NONE_IDENTIFIER, "A type of `none` value." );
 HHuginn::HClass const _observerClass_( HHuginn::TYPE::OBSERVER, TYPE_OBSERVER_IDENTIFIER, "The `*observer*` is a type representing a reference cycle breaking, non-owning weak \"pointer\" to a value." );
-HHuginn::HClass const _referenceClass_( HHuginn::TYPE::REFERENCE, TYPE_REFERENCE_IDENTIFIER );
+HHuginn::HClass const _referenceClass_( HHuginn::TYPE::REFERENCE, TYPE_REFERENCE_IDENTIFIER, "Write only reference. Allows assign operator to work." );
 HHuginn::HClass const _functionReferenceClass_( HHuginn::TYPE::FUNCTION_REFERENCE, TYPE_FUNCTION_REFERENCE_IDENTIFIER, "The `*function_reference*` is a Huginn's way of providing information about a value's *runtime* type." );
-HHuginn::HClass const _objectReferenceClass_( HHuginn::TYPE::OBJECT_REFERENCE, TYPE_OBJECT_REFERENCE_IDENTIFIER );
-HHuginn::HClass const _methodClass_( HHuginn::TYPE::METHOD, TYPE_METHOD_IDENTIFIER );
+HHuginn::HClass const _objectReferenceClass_( HHuginn::TYPE::OBJECT_REFERENCE, TYPE_OBJECT_REFERENCE_IDENTIFIER, "The `*object_reference*` is a up-casting reference allowing to access super class methods." );
+HHuginn::HClass const _methodClass_( HHuginn::TYPE::METHOD, TYPE_METHOD_IDENTIFIER, "Unbound method." );
 HHuginn::HClass const _boundMethodClass_( HHuginn::TYPE::BOUND_METHOD, TYPE_BOUND_METHOD_IDENTIFIER, "A reference to a callable method with a valid runtime value bound to it." );
-HHuginn::HClass const _unknownClass_( HHuginn::TYPE::UNKNOWN, TYPE_UNKNOWN_IDENTIFIER );
+HHuginn::HClass const _unknownClass_( HHuginn::TYPE::UNKNOWN, TYPE_UNKNOWN_IDENTIFIER, "An erroneous unknown type." );
 
 char const* _errMsgHHuginn_[ 10 ] = {
 	_( "Operands are not summable: " ),
-	_( "Operands are not substractable: " ),
+	_( "Operands are not subtractable: " ),
 	_( "Operands are not multipliable: " ),
 	_( "Operands are not divisible: " ),
 	_( "Operands are not exponentionable." ),

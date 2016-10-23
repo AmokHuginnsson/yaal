@@ -238,7 +238,7 @@ void HRuntime::register_class_low( class_t class_, bool registerContructor_ ) {
 		_dependencies.push_back( class_ );
 		HHuginn::identifier_id_t identifier( class_->identifier_id() );
 		HHuginn::function_t function( hcore::call( &HHuginn::HClass::create_instance, class_.raw(), _1, _2, _3, _4 ) );
-		HHuginn::value_t functionReference( _objectFactory->create_function_reference( identifier, function ) );
+		HHuginn::value_t functionReference( _objectFactory->create_function_reference( identifier, function, "automatic constructor for class: `"_ys.append( identifier_name( identifier ) ).append( "`" ) ) );
 		_functionsStore.insert( make_pair( identifier, functionReference ) );
 	}
 	if ( registerContructor_ ) {
@@ -368,7 +368,11 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 	/* Erasing from lookup invalidated .end() */
 	for ( packages_t::iterator it( _packages.begin() ); it != _packages.end(); ) {
 		if ( context_._packages.find( it->first ) == context_._packages.end() ) {
-			fds.emplace_back( identifier_name( it->first ), make_pointer<HHuginn::HClass::HMethod>( hcore::call( &package::value, it->second, identifier_name( it->first ), _1, _2, _3, _4 ) ) );
+			fds.emplace_back(
+				identifier_name( it->first ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &package::value, it->second, identifier_name( it->first ), _1, _2, _3, _4 ) ),
+				"access package "_ys.append( identifier_name( it->first ) ).append( " imported in submodule" )
+			);
 			it = _packages.erase( it );
 		} else {
 			++ it;
@@ -376,18 +380,23 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 	}
 	for ( classes_t::value_type const& c : _classes ) {
 		if ( context_._classes.find( c.first ) == context_._classes.end() ) {
-			fds.emplace_back( identifier_name( c.first ), make_pointer<HHuginn::HClass::HMethod>( hcore::call( &package::instance, c.second.raw(), _1, _2, _3, _4 ) ) );
+			fds.emplace_back(
+				identifier_name( c.first ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &package::instance, c.second.raw(), _1, _2, _3, _4 ) ),
+				"access class "_ys.append( identifier_name( c.first ) ).append( " imported in submodule" )
+			);
 		}
 	}
 	for ( functions_available_t::value_type const& fi : _functionsAvailable ) {
 		if ( context_._functionsAvailable.find( fi ) == context_._functionsAvailable.end() ) {
 			fds.emplace_back(
 				identifier_name( fi ),
-				make_pointer<HHuginn::HClass::HMethod>( static_cast<HHuginn::HFunctionReference const*>( _functionsStore.at( fi ).raw() )->function() )
+				make_pointer<HHuginn::HClass::HMethod>( static_cast<HHuginn::HFunctionReference const*>( _functionsStore.at( fi ).raw() )->function() ),
+				"access class "_ys.append( identifier_name( fi ) ).append( " imported in submodule" )
 			);
 		}
 	}
-	HHuginn::class_t c( create_class( name_, nullptr, fds ) );
+	HHuginn::class_t c( create_class( name_, nullptr, fds, "The `"_ys.append( name_ ).append( "` is an user defined submodule." ) ) );
 	_huginn->register_class( c );
 	return ( c );
 	M_EPILOG
@@ -742,28 +751,28 @@ void HRuntime::register_builtins( void ) {
 	M_ENSURE( identifier_id( _boundMethodClass_.name() ) == TYPE_BOUND_METHOD_IDENTIFIER );
 	M_ENSURE( identifier_id( _unknownClass_.name() ) == TYPE_UNKNOWN_IDENTIFIER );
 	M_ENSURE( identifier_id( STANDARD_FUNCTIONS::MAIN ) == STANDARD_FUNCTIONS::MAIN_IDENTIFIER );
-	register_builtin_function( type_name( HHuginn::TYPE::INTEGER ), hcore::call( &huginn_builtin::integer, _1, _2, _3, _4 ) );
-	register_builtin_function( type_name( HHuginn::TYPE::REAL ), hcore::call( &huginn_builtin::real, _1, _2, _3, _4 ) );
-	register_builtin_function( type_name( HHuginn::TYPE::STRING ), hcore::call( &huginn_builtin::string, _1, _2, _3, _4 ) );
-	register_builtin_function( type_name( HHuginn::TYPE::NUMBER ), hcore::call( &huginn_builtin::number, _1, _2, _3, _4 ) );
-	register_builtin_function( type_name( HHuginn::TYPE::BOOLEAN ), hcore::call( &huginn_builtin::boolean, _1, _2, _3, _4 ) );
-	register_builtin_function( type_name( HHuginn::TYPE::CHARACTER ), hcore::call( &huginn_builtin::character, _1, _2, _3, _4 ) );
+	register_builtin_function( type_name( HHuginn::TYPE::INTEGER ), hcore::call( &huginn_builtin::integer, _1, _2, _3, _4 ), "( *val* ) - convert *val* value to `integer` type" );
+	register_builtin_function( type_name( HHuginn::TYPE::REAL ), hcore::call( &huginn_builtin::real, _1, _2, _3, _4 ), "( *val* ) - convert *val* value to `real`" );
+	register_builtin_function( type_name( HHuginn::TYPE::STRING ), hcore::call( &huginn_builtin::string, _1, _2, _3, _4 ), "( *val* ) - convert *val* value to `string`" );
+	register_builtin_function( type_name( HHuginn::TYPE::NUMBER ), hcore::call( &huginn_builtin::number, _1, _2, _3, _4 ), "( *val* ) - convert *val* value to `number`" );
+	register_builtin_function( type_name( HHuginn::TYPE::BOOLEAN ), hcore::call( &huginn_builtin::boolean, _1, _2, _3, _4 ), "( *val* ) - convert *val* value to `boolean`" );
+	register_builtin_function( type_name( HHuginn::TYPE::CHARACTER ), hcore::call( &huginn_builtin::character, _1, _2, _3, _4 ), "( *val* ) - convert *val* value to `character`" );
 	register_builtin_function( BUILTIN::SIZE, hcore::call( &huginn_builtin::size, _1, _2, _3, _4 ), "( *expr* ) - get size of given expression *expr*, e.g: a number of elements in a collection" );
 	register_builtin_function( BUILTIN::TYPE, hcore::call( &huginn_builtin::type, _1, _2, _3, _4 ), "( *expr* ) - get type of given expression *expr*" );
 	register_builtin_function( BUILTIN::COPY, hcore::call( &huginn_builtin::copy, _1, _2, _3, _4 ), "( *ref* ) - make a deep copy of a value given given by *ref*" );
 	register_builtin_function( BUILTIN::OBSERVE, hcore::call( &huginn_builtin::observe, _1, _2, _3, _4 ), "( *ref* ) - create an `*observer*` for a value given by *ref*" );
 	register_builtin_function( BUILTIN::USE, hcore::call( &huginn_builtin::use, _1, _2, _3, _4 ), "( *observer* ) - get a reference to a value from given *observer*" );
-	register_builtin_function( type_name( HHuginn::TYPE::LIST ), hcore::call( &huginn_builtin::list, _1, _2, _3, _4 ) );
-	register_builtin_function( type_name( HHuginn::TYPE::DEQUE ), hcore::call( &huginn_builtin::deque, _1, _2, _3, _4 ) );
-	register_builtin_function( type_name( HHuginn::TYPE::DICT ), hcore::call( &huginn_builtin::dict, _1, _2, _3, _4 ) );
-	register_builtin_function( type_name( HHuginn::TYPE::ORDER ), hcore::call( &huginn_builtin::order, _1, _2, _3, _4 ) );
-	register_builtin_function( type_name( HHuginn::TYPE::LOOKUP ), hcore::call( &huginn_builtin::lookup, _1, _2, _3, _4 ) );
-	register_builtin_function( type_name( HHuginn::TYPE::SET ), hcore::call( &huginn_builtin::set, _1, _2, _3, _4 ) );
+	register_builtin_function( type_name( HHuginn::TYPE::LIST ), hcore::call( &huginn_builtin::list, _1, _2, _3, _4 ), "([ *items...* ]) - create `list` collection from *items...*" );
+	register_builtin_function( type_name( HHuginn::TYPE::DEQUE ), hcore::call( &huginn_builtin::deque, _1, _2, _3, _4 ), "([ *items...* ]) - create `deque` collection from *items...*" );
+	register_builtin_function( type_name( HHuginn::TYPE::DICT ), hcore::call( &huginn_builtin::dict, _1, _2, _3, _4 ), "create empty `dict` object" );
+	register_builtin_function( type_name( HHuginn::TYPE::ORDER ), hcore::call( &huginn_builtin::order, _1, _2, _3, _4 ), "([ *items...* ]) - create `order` collection from *items...*" );
+	register_builtin_function( type_name( HHuginn::TYPE::LOOKUP ), hcore::call( &huginn_builtin::lookup, _1, _2, _3, _4 ), "create empty `lookup` object" );
+	register_builtin_function( type_name( HHuginn::TYPE::SET ), hcore::call( &huginn_builtin::set, _1, _2, _3, _4 ), "([ *items...* ]) - create `set` collection from *items...*" );
 	register_builtin_function( "print", hcore::call( &huginn_builtin::print, _1, _2, _3, _4 ), "( *str* ) - print a message given by *str* to interpreter's standard output" );
 	register_builtin_function( "input", hcore::call( &huginn_builtin::input, _1, _2, _3, _4 ), "read a line of text from interpreter's standard input" );
-	register_builtin_function( KEYWORD::ASSERT, hcore::call( &huginn_builtin::assert, _1, _2, _3, _4 ) );
+	register_builtin_function( KEYWORD::ASSERT, hcore::call( &huginn_builtin::assert, _1, _2, _3, _4 ), "( *condition*[, *message*] ) - ensure *condition* is met or bailout with *message*" );
 	for ( HHuginn::HClass const* c : _coreClasses_ ) {
-		register_builtin_function( c->name(), hcore::call( &huginn_builtin::invalid_instance, c->name(), _1, _2, _3, _4 ) );
+		register_builtin_function( c->name(), hcore::call( &huginn_builtin::invalid_instance, c->name(), _1, _2, _3, _4 ), "" );
 	}
 	_objectFactory->register_builtin_classes();
 	return;

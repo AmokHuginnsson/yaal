@@ -355,7 +355,7 @@ class HHuginn::HFieldDefinition {
 	value_t _value;
 	yaal::hcore::HString _doc;
 public:
-	HFieldDefinition( yaal::hcore::HString const& name_, value_t const& value_, yaal::hcore::HString const& doc_ = yaal::hcore::HString() )
+	HFieldDefinition( yaal::hcore::HString const& name_, value_t const& value_, yaal::hcore::HString const& doc_ )
 		: _name( name_ )
 		, _value( value_ )
 		, _doc( doc_ ) {
@@ -389,8 +389,8 @@ private:
 	yaal::hcore::HString _doc;
 	huginn::HRuntime* _runtime;
 public:
-	HClass( huginn::HRuntime*, type_id_t, identifier_id_t, HClass const*, field_definitions_t const&, yaal::hcore::HString const& = yaal::hcore::HString() );
-	HClass( HHuginn::TYPE, HHuginn::identifier_id_t, yaal::hcore::HString const& = yaal::hcore::HString() );
+	HClass( huginn::HRuntime*, type_id_t, identifier_id_t, HClass const*, field_definitions_t const&, yaal::hcore::HString const& );
+	HClass( HHuginn::TYPE, HHuginn::identifier_id_t, yaal::hcore::HString const& );
 	virtual ~HClass( void ) {
 	}
 	void redefine( HClass const*, field_definitions_t const& );
@@ -929,7 +929,7 @@ private:
 	HHuginn::function_t _function;
 	yaal::hcore::HString _doc;
 public:
-	HFunctionReference( identifier_id_t, HHuginn::function_t const&, yaal::hcore::HString const& = yaal::hcore::HString() );
+	HFunctionReference( identifier_id_t, HHuginn::function_t const&, yaal::hcore::HString const& );
 	identifier_id_t identifier_id( void ) const {
 		return ( _identifierId );
 	}

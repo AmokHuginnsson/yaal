@@ -59,7 +59,7 @@ public:
 	HNetwork( HHuginn::HClass* class_ )
 		: HObject( class_ )
 		, _streamClass( HStream::get_class( class_->runtime() ) )
-		, _exceptionClass( exception::create_class( class_->runtime(), "NetworkException" ) ) {
+		, _exceptionClass( exception::create_class( class_->runtime(), "NetworkException", "The `NetworkException` exception type for `Network` package." ) ) {
 		class_->runtime()->huginn()->register_class( _streamClass );
 		return;
 	}

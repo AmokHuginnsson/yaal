@@ -55,7 +55,8 @@ public:
 			runtime_->create_class(
 				"Filter",
 				nullptr,
-				HHuginn::field_definitions_t{}
+				HHuginn::field_definitions_t{},
+				"The `Filter` class represents a *lazy* filtering transformation of one *iterable* into another. Resulting *iterable* produces only values matching predicate."
 			)
 		);
 		M_EPILOG

@@ -60,7 +60,7 @@ class HOperatingSystem : public HHuginn::HObject {
 public:
 	HOperatingSystem( HHuginn::HClass* class_ )
 		: HObject( class_ )
-		, _exceptionClass( exception::create_class( class_->runtime(), "OperatingSystemException" ) )
+		, _exceptionClass( exception::create_class( class_->runtime(), "OperatingSystemException", "The `OperatingSystemException` exception type for `OperatingSystem` package." ) )
 		, _streamClass( HStream::get_class( class_->runtime() ) )
 		, _subprocessClass( HSubprocess::get_class( class_->runtime() ) ) {
 		return;

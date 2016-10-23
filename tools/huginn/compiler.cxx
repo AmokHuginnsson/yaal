@@ -829,7 +829,7 @@ void OCompiler::track_name_cycle( HHuginn::identifier_id_t identifierId_ ) {
 void OCompiler::create_lambda( executing_parser::position_t position_ ) {
 	M_PROLOG
 	function_info_t fi( create_function_low( position_ ) );
-	HHuginn::value_t fRef( _runtime->object_factory()->create_function_reference( fi.first, fi.second ) );
+	HHuginn::value_t fRef( _runtime->object_factory()->create_function_reference( fi.first, fi.second, "Lambda: "_ys.append( _runtime->identifier_name( fi.first ) ) ) );
 	defer_store_direct( fRef, position_ );
 	return;
 	M_EPILOG

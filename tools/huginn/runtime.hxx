@@ -142,10 +142,10 @@ public:
 	class_t get_class( identifier_id_t );
 	value_t* get_package( identifier_id_t );
 	void register_class_low( class_t, bool );
-	void register_function( identifier_id_t, function_t, yaal::hcore::HString const& = yaal::hcore::HString() );
+	void register_function( identifier_id_t, function_t, yaal::hcore::HString const& );
 	void register_package( identifier_id_t, identifier_id_t, HHuginn::paths_t const&, HHuginn::compiler_setup_t, int );
-	class_t create_class( identifier_id_t, HHuginn::HClass const*, field_definitions_t const&, yaal::hcore::HString const& = yaal::hcore::HString() );
-	class_t create_class( yaal::hcore::HString const&, HHuginn::HClass const*, field_definitions_t const&, yaal::hcore::HString const& = yaal::hcore::HString() );
+	class_t create_class( identifier_id_t, HHuginn::HClass const*, field_definitions_t const&, yaal::hcore::HString const& );
+	class_t create_class( yaal::hcore::HString const&, HHuginn::HClass const*, field_definitions_t const&, yaal::hcore::HString const& );
 	class_t create_class( class_constructor_t const& );
 	void execute( void );
 
@@ -203,7 +203,7 @@ public:
 	void set_incremental_frame( huginn::HThread::frame_t const& );
 	huginn::HThread::frame_t const& incremental_frame( void ) const;
 private:
-	void register_builtin_function( yaal::hcore::HString const&, function_t&&, yaal::hcore::HString const& = yaal::hcore::HString() );
+	void register_builtin_function( yaal::hcore::HString const&, function_t&&, yaal::hcore::HString const& );
 private:
 	HRuntime( HRuntime const& ) = delete;
 	HRuntime& operator = ( HRuntime const& ) = delete;
