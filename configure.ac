@@ -179,12 +179,18 @@ if test ["${MYSQL}"] != ["no"] ; then
 	if test ["x${LIBS}"] = "x" ; then
 		CXXFLAGS=["${CXXFLAGS_ORIG} -L/usr/local/lib/mysql"]
 		unset ac_cv_lib_mysqlclient_mysql_init
-		AC_CHECK_LIB([mysqlclient],[mysql_init],[EXTRA_LIBRARY_PATHS="${EXTRA_LIBRARY_PATHS} -L/usr/local/lib/mysql"])
+		AC_CHECK_LIB([mysqlclient],[mysql_init])
+		if test ["x${LIBS}"] != "x" ; then
+			EXTRA_LIBRARY_PATHS="${EXTRA_LIBRARY_PATHS} -L/usr/local/lib/mysql"
+		fi
 	fi
 	if test ["x${LIBS}"] = "x" ; then
 		CXXFLAGS=["${CXXFLAGS_ORIG} -L/usr/lib64/mysql/"]
 		unset ac_cv_lib_mysqlclient_mysql_init
-		AC_CHECK_LIB([mysqlclient],[mysql_init],[EXTRA_LIBRARY_PATHS="${EXTRA_LIBRARY_PATHS} -L/usr/lib64/mysql/"])
+		AC_CHECK_LIB([mysqlclient],[mysql_init])
+		if test ["x${LIBS}"] != "x" ; then
+			EXTRA_LIBRARY_PATHS="${EXTRA_LIBRARY_PATHS} -L/usr/lib64/mysql/"
+		fi
 	fi
 	if test ["x${LIBS}"] = "x" ; then
 		if test ["${MYSQL}"] = ["yes"] ; then
