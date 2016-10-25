@@ -46,6 +46,8 @@ namespace tools {
 
 namespace huginn {
 
+typedef yaal::hcore::HString ( *hash_function_t )( yaal::hcore::HString const& );
+
 class HCryptography : public HHuginn::HObject {
 	HHuginn::class_t _exceptionClass;
 public:
@@ -54,20 +56,11 @@ public:
 		, _exceptionClass( exception::create_class( class_->runtime(), "CryptographyException", "The `CryptographyException` exception type for `Cryptography` package." ) ) {
 		return;
 	}
-	static HHuginn::value_t md5( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t hash( char const* name_, hash_function_t hash_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		char const name[] = "Cryptography.md5";
-		verify_arg_count( name, values_, 1, 1, position_ );
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
-		return ( thread_->object_factory().create_string( hash::md5( get_string( values_[0] ) ) ) );
-		M_EPILOG
-	}
-	static HHuginn::value_t sha1( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
-		M_PROLOG
-		char const name[] = "Cryptography.sha1";
-		verify_arg_count( name, values_, 1, 1, position_ );
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
-		return ( thread_->object_factory().create_string( hash::sha1( get_string( values_[0] ) ) ) );
+		verify_arg_count( name_, values_, 1, 1, position_ );
+		verify_arg_type( name_, values_, 0, HHuginn::TYPE::STRING, true, position_ );
+		return ( thread_->object_factory().create_string( hash_( get_string( values_[0] ) ) ) );
 		M_EPILOG
 	}
 };
@@ -86,8 +79,9 @@ HHuginn::value_t HCryptographyCreator::do_new_instance( HRuntime* runtime_ ) {
 			"Cryptography",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "md5", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::md5, _1, _2, _3, _4 ) ), "( *str* ) - calculare *MD5* sum of given `string`" },
-				{ "sha1", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::sha1, _1, _2, _3, _4 ) ), "( *str* ) - calculare *SHA1* sum of given `string`" }
+				{ "md5", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::hash, "Cryptography.md5", static_cast<hash_function_t>( &tools::hash::md5 ), _1, _2, _3, _4 ) ), "( *str* ) - calculare *MD5* sum of given `string`" },
+				{ "sha1", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::hash, "Cryptography.sha1", static_cast<hash_function_t>( &tools::hash::sha1 ), _1, _2, _3, _4 ) ), "( *str* ) - calculare *SHA1* sum of given `string`" },
+				{ "sha512", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::hash, "Cryptography.sha512", static_cast<hash_function_t>( &tools::hash::sha512 ), _1, _2, _3, _4 ) ), "( *str* ) - calculare *SHA512* sum of given `string`" }
 			},
 			"The `Cryptography` package provides functionality of a cryptographical nature, like hashing functions."
 		)
