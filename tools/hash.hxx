@@ -46,7 +46,7 @@ enum class FUNCTION {
 
 typedef yaal::hcore::HString ( *hash_string_t )( yaal::hcore::HString const& );
 typedef yaal::hcore::HString ( *hash_stream_t )( yaal::hcore::HStreamInterface& );
-typedef yaal::hcore::HString ( *hmac_text_t )( yaal::hcore::HString const&, yaal::hcore::HString const& );
+typedef yaal::hcore::HString ( *hmac_string_t )( yaal::hcore::HString const&, yaal::hcore::HString const& );
 
 /*! \brief Calculate md5 hash of data.
  *
