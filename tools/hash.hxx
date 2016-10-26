@@ -38,6 +38,16 @@ namespace tools {
  */
 namespace hash {
 
+enum class FUNCTION {
+	MD5,
+	SHA1,
+	SHA512
+};
+
+typedef yaal::hcore::HString ( *hash_string_t )( yaal::hcore::HString const& );
+typedef yaal::hcore::HString ( *hash_stream_t )( yaal::hcore::HStreamInterface& );
+typedef yaal::hcore::HString ( *hmac_text_t )( yaal::hcore::HString const&, yaal::hcore::HString const& );
+
 /*! \brief Calculate md5 hash of data.
  *
  * \param source - data source of data which sum is to ba calculated.
@@ -100,6 +110,15 @@ yaal::hcore::HString sha512( yaal::hcore::HStreamInterface::ptr_t source );
  * \return Calculated hash.
  */
 yaal::hcore::HString sha512( yaal::hcore::HString const& source );
+
+/*! \brief Calculate keyed-hash message authentication code (HMAC).
+ *
+ * \param function - a hash function used to generate this HMAC.
+ * \param key - authentication key.
+ * \param message - data for which HMAC shall be generated.
+ * \return HMAC for given message and key using given hash function.
+ */
+yaal::hcore::HString hmac( FUNCTION function, yaal::hcore::HString const& key, yaal::hcore::HString const& message );
 
 }
 

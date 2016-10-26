@@ -75,7 +75,10 @@ public:
 };
 
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _whiteSpace_;
+extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _binDigit_;
+extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _octDigit_;
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _digit_;
+extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _hexDigit_;
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _letter_;
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _lowerCaseLetter_;
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _upperCaseLetter_;

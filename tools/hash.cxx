@@ -25,6 +25,7 @@ Copyright:
 */
 
 #include <cstring>
+#include <cstdio>
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
@@ -35,6 +36,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hstreamblockiterator.hxx"
 #include "hbitmap.hxx"
 #include "hstringstream.hxx"
+#include "hmemory.hxx"
 
 using namespace std;
 using namespace yaal::hcore;
@@ -67,8 +69,9 @@ yaal::hcore::HString md5( HStreamInterface& stream ) {
 		HStreamBlockIterator::HBlock block = *source;
 		++ source;
 		last = static_cast<u32_t>( block.octets() << 3 );
-		if ( ( total + last ) < total )
+		if ( ( total + last ) < total ) {
 			++ totalH;
+		}
 		total += last;
 		if ( last < BLOCK_SIZE ) {
 			u32_t* x = static_cast<u32_t*>( block.data() );
@@ -83,8 +86,9 @@ yaal::hcore::HString md5( HStreamInterface& stream ) {
 			x[ 14 ] = total;
 			x[ 15 ] = totalH;
 			update_md5_state( state, block );
-		} else
+		} else {
 			update_md5_state( state, block );
+		}
 	} while ( last == BLOCK_SIZE );
 	HString result;
 	change_endianess( state, STATE_SIZE );
@@ -128,8 +132,9 @@ yaal::hcore::HString sha1( HStreamInterface& stream ) {
 		HStreamBlockIterator::HBlock block = *source;
 		++ source;
 		last = static_cast<u32_t>( block.octets() << 3 );
-		if ( ( total + last ) < total )
+		if ( ( total + last ) < total ) {
 			++ totalH;
+		}
 		total += last;
 		if ( last < BLOCK_SIZE ) {
 			u32_t* x = static_cast<u32_t*>( block.data() );
@@ -145,8 +150,9 @@ yaal::hcore::HString sha1( HStreamInterface& stream ) {
 			x[ 15 ] = total;
 			change_endianess( x + 14, 2 );
 			update_sha1_state( state, block );
-		} else
+		} else {
 			update_sha1_state( state, block );
+		}
 	} while ( last == BLOCK_SIZE );
 	HString result;
 	result.format( "%08x%08x%08x%08x%08x", state[ 0 ], state[ 1 ], state[ 2 ], state[ 3 ], state[ 4 ] );
@@ -316,8 +322,9 @@ void update_sha1_state( u32_t* state, HStreamBlockIterator::HBlock const& block 
 	::memcpy( x, block.data(), INPUT_CHUNK_SIZE * sizeof ( u32_t ) );
 	u32_t tmp( 0 );
 	change_endianess( x, INPUT_CHUNK_SIZE );
-	for ( int i = INPUT_CHUNK_SIZE; i < WORK_BUFFER_SIZE; ++ i )
+	for ( int i = INPUT_CHUNK_SIZE; i < WORK_BUFFER_SIZE; ++ i ) {
 		tmp = x[ i - 3 ] ^ x[ i - 8 ] ^ x[ i - 14 ] ^ x[ i - 16 ], x[ i ] = M_ROTATE_LEFT( tmp, 1 );
+	}
   for ( int i = 0; i < WORK_BUFFER_SIZE; ++ i ) {
 		u32_t f( 0 );
 		u32_t k( 0 );
@@ -508,6 +515,105 @@ void change_endianess( u64_t* mem, int long size ) {
 			| ( ( mem[ size ] & 0x0000000000ff0000ULL ) << 24 )
 			| ( ( mem[ size ] & 0x000000000000ff00ULL ) << 40 )
 			| ( ( mem[ size ] & 0x00000000000000ffULL ) << 56 );
+}
+
+namespace {
+int hashLenBits( FUNCTION function_ ) {
+	return ( function_ == FUNCTION::MD5 ? 128 : ( function_ == FUNCTION::SHA1 ? 160 : 512 ) );
+}
+int hashLenBytes( FUNCTION function_ ) {
+	return ( hashLenBits( function_ ) >> 3 );
+}
+int hashLenText( FUNCTION function_ ) {
+	return ( hashLenBytes( function_ ) * 2 );
+}
+HChunk parseHash( FUNCTION function_, yaal::hcore::HString const& hash_ ) {
+	M_PROLOG
+	HString hash( hash_ );
+	hash.lower();
+	M_ENSURE( hash.find_other_than( _hexDigit_.data() ) == HString::npos );
+	int expHashLenText( hashLenText( function_ ) );
+	M_ENSURE( hash.get_length() == expHashLenText );
+#if SIZEOF_INT_LONG == 8
+	char const formatSha512[] = "%016lx%016lx%016lx%016lx%016lx%016lx%016lx%016lx";
+#else
+	char const formatSha512[] = "%016llx%016llx%016llx%016llx%016llx%016llx%016llx%016llx";
+#endif
+	char const* format( function_ == FUNCTION::MD5 ? "%08x%08x%08x%08x" : ( function_ == FUNCTION::SHA1 ? "%08x%08x%08x%08x%08x" : formatSha512 ) );
+	HChunk binHash( expHashLenText / 2 );
+	switch ( function_ ) {
+		case ( FUNCTION::MD5 ): {
+			u32_t* bin( binHash.get<u32_t>() );
+			sscanf( hash.raw(), format, &bin[0], &bin[1], &bin[2], &bin[3] );
+			change_endianess( bin, binHash.count_of<u32_t>() );
+		} break;
+		case ( FUNCTION::SHA1 ): {
+			u32_t* bin( binHash.get<u32_t>() );
+			sscanf( hash.raw(), format, &bin[0], &bin[1], &bin[2], &bin[3], &bin[4] );
+			change_endianess( bin, binHash.count_of<u32_t>() );
+		} break;
+		case ( FUNCTION::SHA512 ): {
+			u64_t* bin( binHash.get<u64_t>() );
+			sscanf( hash.raw(), format, &bin[0], &bin[1], &bin[2], &bin[3], &bin[4], &bin[5], &bin[6], &bin[7] );
+			change_endianess( bin, binHash.count_of<u64_t>() );
+		} break;
+		default: {
+			M_ASSERT( !"Invalid code path!"[0] );
+		}
+	}
+	return ( binHash );
+	M_EPILOG
+}
+void memxor( void* dest_, void const* src_, int long size_ ) {
+	char* dst( static_cast<char*>( dest_ ) );
+	char const* src( static_cast<char const*>( src_ ) );
+	for ( int long i( 0 ); i < size_; ++ i ) {
+		dst[i] ^= src[i];
+	}
+	return;
+}
+}
+
+yaal::hcore::HString hmac( FUNCTION function_, yaal::hcore::HString const& key_, yaal::hcore::HString const& message_ ) {
+	M_PROLOG
+	hash_string_t hashString(
+		function_ == FUNCTION::MD5
+			? static_cast<hash_string_t>( &hash::md5 )
+			: ( function_ == FUNCTION::SHA1
+				? static_cast<hash_string_t>( &hash::sha1 )
+				: static_cast<hash_string_t>( &hash::sha512 ) )
+	);
+	hash_stream_t hashStream(
+		function_ == FUNCTION::MD5
+			? static_cast<hash_stream_t>( &hash::md5 )
+			: ( function_ == FUNCTION::SHA1
+				? static_cast<hash_stream_t>( &hash::sha1 )
+				: static_cast<hash_stream_t>( &hash::sha512 ) )
+	);
+	int blockSize( function_ == FUNCTION::SHA512 ? 1024 : 512 );
+	int blockBytes( blockSize >> 3 );
+	HChunk ipad( blockBytes + message_.get_length() );
+	int hashLen( hashLenBytes( function_ ) );
+	HChunk opad( blockBytes + hashLen );
+	::memset( ipad.raw(), 0x36, static_cast<size_t>( blockBytes ) );
+	::memset( opad.raw(), 0x5c, static_cast<size_t>( blockBytes ) );
+	if ( key_.get_length() <= blockBytes ) {
+		memxor( ipad.raw(), key_.raw(), key_.get_length() );
+		memxor( opad.raw(), key_.raw(), key_.get_length() );
+	} else {
+		HChunk keyBinHashed( parseHash( function_, hashString( key_ ) ) );
+		memxor( ipad.raw(), keyBinHashed.raw(), keyBinHashed.get_size() );
+		memxor( opad.raw(), keyBinHashed.raw(), keyBinHashed.get_size() );
+	}
+	::memcpy( ipad.get<char>() + blockBytes, message_.raw(), static_cast<size_t>( message_.length() ) );
+	HMemoryObserver mo( ipad.raw(), blockBytes + message_.get_length() );
+	HMemory m( mo );
+	HChunk ipadHashed( parseHash( function_, hashStream( m ) ) );
+	::memcpy( opad.get<char>() + blockBytes, ipadHashed.raw(), static_cast<size_t>( hashLen ) );
+	HMemoryObserver out( opad.raw(), blockBytes + hashLen );
+	HMemory mout( out );
+	return ( hashStream( mout ) );
+	M_EPILOG
 }
 
 }
