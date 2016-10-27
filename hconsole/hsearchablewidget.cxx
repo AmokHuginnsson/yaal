@@ -41,9 +41,12 @@ namespace yaal {
 namespace hconsole {
 
 HSearchableWidget::HSearchableWidget( HWidgetAttributesInterface const& attrs_ )
-									: HWidget( nullptr, 0, 0, 0, 0, hcore::HString(), attrs_ ),
-	_searchable( false ), _searchActived( false ),
-	_filtered( false ), _backwards( false ), _pattern() {
+	: HWidget( nullptr, 0, 0, 0, 0, hcore::HString(), attrs_ )
+	, _searchable( false )
+	, _searchActived( false )
+	, _filtered( false )
+	, _backwards( false )
+	, _pattern() {
 	M_PROLOG
 	attrs_.apply( *this );
 	return;
@@ -60,17 +63,18 @@ void HSearchableWidget::search( HString const& pattern_, bool backwards_ ) {
 	M_PROLOG
 	HPattern::pluggable_flags_t pf;
 	pf.push_back( make_pair( 'f', &_filtered ) );
-	_searchActived = ! _pattern.parse( pattern_, &pf );
+	_searchActived = _pattern.parse( pattern_, &pf );
 	if ( ! _searchActived ) {
 		if ( _window ) {
 			_window->status_bar()->message( "%s", _pattern.error().raw() );
 		}
 	} else {
 		_backwards = backwards_;
-		if ( _backwards )
+		if ( _backwards ) {
 			go_to_match_previous();
-		else
+		} else {
 			go_to_match();
+		}
 	}
 	schedule_repaint();
 	return;
@@ -85,10 +89,11 @@ void HSearchableWidget::highlight( int row_, int column_,
 	for ( HPattern::HMatchIterator it = _pattern.find( _varTmpBuffer.raw() ),
 			end = _pattern.end(); it != end; ++ it ) {
 		if ( ( _focused && ( ( currentIndex_ != ctr ) || ! current_ ) )
-				|| ( ! _focused && ( currentIndex_ == ctr ) && current_ ) )
+				|| ( ! _focused && ( currentIndex_ == ctr ) && current_ ) ) {
 			cons.set_attr( _attributeSearchHighlight_ >> 8 );
-		else
+		} else {
 			cons.set_attr( _attributeSearchHighlight_ );
+		}
 		cons.mvprintf( row_,
 				static_cast<int>( column_ + ( it->raw() - _varTmpBuffer.raw() ) ),
 				"%.*s", it->size(), it->raw() );

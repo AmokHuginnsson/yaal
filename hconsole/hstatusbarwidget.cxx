@@ -45,23 +45,27 @@ namespace hconsole {
 
 HStatusBarWidget::HStatusBarWidget( HWindow* parent_,
 		yaal::hcore::HString const& label_, int statusBarAttribute_ )
-	: HWidget( parent_, - 2, 0, 2, - 1, label_ ),
-	HEditWidget( nullptr, 0, 0, 0, 0, HString(),
-			HEditWidgetAttributes().mask( _maskLoose_ ).max_history_level( 255 ).label_decoration( HWidget::LABEL::DECORATION::EXPLICIT ) ),
-	_statusBarAttribute( 0 ), _promptLength( 0 ),
-	_mode( PROMPT::NORMAL ),
-	_prompt(), _done( false ), _estimate( false ), _progressSize( 1 ),
-	_lastProgress( -1 ), _lastPercent( - 1 ), _lastMinute( 0 ),
-	_lastSecond( 0 ), _lastStep( 0 ), _currentChoice( -1 ),
-	_message( "" ), /* initialization of this field is required by bar() meth */
-	_start( HTime::TZ::LOCAL ), _choices() {
+	: HWidget( parent_, - 2, 0, 2, - 1, label_ )
+	, HEditWidget( nullptr, 0, 0, 0, 0, HString(),
+			HEditWidgetAttributes().mask( _maskLoose_ ).max_history_level( 255 ).label_decoration( HWidget::LABEL::DECORATION::EXPLICIT ) )
+	, _statusBarAttribute( ( statusBarAttribute_ > 0 ) ? statusBarAttribute_ : _attributeStatusBar_ )
+	, _promptLength( 0 )
+	, _mode( PROMPT::NORMAL )
+	, _prompt()
+	, _done( false )
+	, _estimate( false )
+	, _progressSize( 1 )
+	, _lastProgress( -1 )
+	, _lastPercent( - 1 )
+	, _lastMinute( 0 )
+	, _lastSecond( 0 )
+	, _lastStep( 0 )
+	, _currentChoice( -1 )
+	, _message( "" ) /* initialization of this field is required by bar() meth */
+	, _start( HTime::TZ::LOCAL )
+	, _choices() {
 	M_PROLOG
-	int attribte = 0;
-	if ( statusBarAttribute_ > 0 )
-		_statusBarAttribute = statusBarAttribute_;
-	else
-		_statusBarAttribute = _attributeStatusBar_;
-	attribte = _statusBarAttribute;
+	int attribte( _statusBarAttribute );
 	attribte &= 0x00ff;
 	_attributeFocused._data = attribte;
 	_statusBarAttribute &= 0xff00;
@@ -116,8 +120,9 @@ void HStatusBarWidget::do_paint( void ) {
 			++ current;
 		}
 	}
-	if ( ! _focused )
+	if ( ! _focused ) {
 		cons.move( origRow, origColumn );
+	}
 	if ( _statusBarAttribute & 0xff ) {
 		_attributeEnabled._data = ( _statusBarAttribute & 0x00ff );
 		_statusBarAttribute &= 0xff00;
@@ -258,10 +263,12 @@ void HStatusBarWidget::message( int attribute_, char const* format_, ... ) {
 			va_start( ap, format_ );
 			_varTmpBuffer.vformat( format_, &ap );
 			va_end( ap );
-			if ( ! _varTmpBuffer.is_empty() )
+			if ( ! _varTmpBuffer.is_empty() ) {
 				HConsole::get_instance().bell();
-		} else
+			}
+		} else {
 			_varTmpBuffer.clear();
+		}
 		set_text( _varTmpBuffer );
 		if ( ! ( _statusBarAttribute & 0x00ff ) )
 			_statusBarAttribute |= _attributeEnabled._data;
@@ -280,10 +287,12 @@ void HStatusBarWidget::message( char const* format_, ... ) {
 			va_start( ap, format_ );
 			_varTmpBuffer.vformat( format_, &ap );
 			va_end( ap );
-			if ( ! _varTmpBuffer.is_empty() )
+			if ( ! _varTmpBuffer.is_empty() ) {
 				HConsole::get_instance().bell();
-		} else
+			}
+		} else {
 			_varTmpBuffer.clear();
+		}
 		set_text( _varTmpBuffer );
 		schedule_repaint();
 	}
@@ -296,8 +305,9 @@ void HStatusBarWidget::clear( int attribute_ ) {
 	if ( ! _focused ) {
 		_varTmpBuffer.clear();
 		set_text( _varTmpBuffer );
-		if ( ! ( _statusBarAttribute & 0x00ff ) )
+		if ( ! ( _statusBarAttribute & 0x00ff ) ) {
 			_statusBarAttribute |= _attributeEnabled._data;
+		}
 		_attributeEnabled._data = ( attribute_ & 0x00ff );
 		schedule_repaint();
 	}
@@ -378,20 +388,22 @@ int HStatusBarWidget::process_input_normal( int code_ ) {
 	code_ = 0;
 	switch ( code ) {
 		case ( '\r' ): {
+			HSearchableWidget* searchableControl( nullptr );
+			bool backwards( false );
 			if ( _mode == PROMPT::COMMAND ) {
 				_window->_command = _string;
 			} else if ( _mode == PROMPT::SEARCH ) {
-				bool backwards( _prompt[ 0 ] == '?' );
-				HSearchableWidget* searchableControl( dynamic_cast<HSearchableWidget*>( &(*(*_window->_previousFocusedChild)) ) );
-				if ( searchableControl ) {
-					searchableControl->search( _string, backwards );
-				}
+				backwards = _prompt[ 0 ] == '?';
+				searchableControl = dynamic_cast<HSearchableWidget*>( &(*(*_window->_previousFocusedChild)) );
 			} else if ( _mode == PROMPT::DIALOG ) {
 				if ( ! dialog( _string ) ) {
 					break;
 				}
 			}
 			end_prompt();
+			if ( searchableControl ) {
+				searchableControl->search( _string, backwards );
+			}
 		}
 		break;
 		case ( '\t' ):
@@ -437,7 +449,7 @@ void HStatusBarWidget::end_prompt( void ) {
 	_promptLength = 0;
 	_window->_focusedChild = _window->_previousFocusedChild;
 	_window->_statusBar->kill_focus();
-	(*_window->_focusedChild)->set_focus ( -1 );
+	(*_window->_focusedChild)->set_focus( -1 );
 	return;
 	M_EPILOG
 }

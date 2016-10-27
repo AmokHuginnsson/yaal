@@ -67,12 +67,12 @@ public:
 	 * pattern - regular expression pattern to match against.
 	 * externalFlags - set of external flags that may by set by pattern extra arguments.
 	 */
-	int parse( yaal::hcore::HString const& pattern, pluggable_flags_t* externalFlags = nullptr );
+	bool parse( yaal::hcore::HString const& pattern, pluggable_flags_t* externalFlags = nullptr );
 	/*! \brief Parse naked regular expression pattern and prepare for matches retrieval.
 	 *
 	 * pattern - regular expression pattern to match against.
 	 */
-	int parse_re( yaal::hcore::HString const& pattern );
+	bool parse_re( yaal::hcore::HString const& pattern );
 	yaal::hcore::HString const& error( void ) const;
 	int error_code( void ) const;
 	/*! \brief Find substring matching this patter in given string.

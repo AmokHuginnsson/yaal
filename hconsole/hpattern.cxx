@@ -76,8 +76,9 @@ void HPattern::save_state( void* sp, pluggable_flags_t* f ) {
 	OPatternState& s = *static_cast<OPatternState*>( sp );
 	s._ignoreCase = _ignoreCase;
 	s._extended = _extended;
-	if ( f )
+	if ( f ) {
 		s._flags = *f;
+	}
 	return;
 	M_EPILOG
 }
@@ -87,83 +88,92 @@ void HPattern::restore_state( void* sp, pluggable_flags_t* f ) {
 	OPatternState& s = *static_cast<OPatternState*>( sp );
 	_ignoreCase = s._ignoreCase;
 	_extended = s._extended;
-	if ( f )
+	if ( f ) {
 		*f = s._flags;
+	}
 	return;
 	M_EPILOG
 }
 
-int HPattern::parse( HString const& pattern_, pluggable_flags_t* externalFlags ) {
+bool HPattern::parse( HString const& pattern_, pluggable_flags_t* externalFlags ) {
 	M_PROLOG
 	_errorCause.clear();
 	char const* pattern( pattern_.raw() );
-/* making copy of flags */
-	OPatternState savePoint;
-	save_state( &savePoint, externalFlags );
-/* end of copy */
+
 /* clear all flags */
 	_ignoreCase = _ignoreCaseDefault;
 	_extended = false;
 	if ( externalFlags ) {
-		for ( pluggable_flags_t::iterator it = externalFlags->begin(), endIt = externalFlags->end(); it != endIt; ++ it )
+		for ( pluggable_flags_t::iterator it = externalFlags->begin(), endIt = externalFlags->end(); it != endIt; ++ it ) {
 			*it->second = false;
-	}
-/* FIXME g++ 4.3 bug *///		flags_[ i ] &= FLAG_MASK;
-/* end of clearing */
-/* look for switches at the beginning of pattern */
-	int long ctr( 0 );
-	int err( 0 );
-	while ( pattern[ ctr ] == '\\' ) {
-		if ( set_switch( pattern[ ++ ctr ], externalFlags ) ) {
-			restore_state( &savePoint, externalFlags );
-			err = 1;
-			_errorCause.format( "bad search option '%c'", pattern[ ctr ] );
-			return ( err );
 		}
-		++ ctr;
 	}
-	if ( pattern[ ctr ] == '/' )
-		ctr ++;
-	int long begin = ctr;
-/* end of looking at begin */
-/* making copy of flags */
+
+	OPatternState savePoint;
 	save_state( &savePoint, externalFlags );
-/* end of copy */
-/* look for switches at the end of pattern */
-	int long endMatch( ctr = pattern_.get_length() - 1 );
-	if ( endMatch < 0 )
-		return ( true );
-	while ( ( ctr > 0 ) && ( pattern[ ctr ] != '/' ) ) {
-		if ( set_switch( pattern[ ctr ], externalFlags ) ) {
-			restore_state( &savePoint, externalFlags );
-			ctr = 1;
+
+	bool ok( true );
+	_pattern = pattern_;
+	do {
+		int stop( static_cast<int>( _pattern.get_length() ) );
+		for ( int idx( 0 ); idx < stop; ++ idx ) {
+			if ( _pattern[idx] == '\\' ) {
+				_pattern.erase( idx, 1 );
+				-- stop;
+				if ( idx == stop ) {
+					_errorCause = _( "dangling escape" );
+					ok = false;
+					break;
+				}
+				++ idx;
+			} else if ( _pattern[idx] == '/' ) {
+				stop = idx;
+				break;
+			}
 		}
-		ctr --;
+		if ( ! ok ) {
+			break;
+		}
+
+		if ( stop < 1 ) {
+			_errorCause = _( "empty pattern" );
+			ok = false;
+			break;
+		}
+
+		for ( int idx( stop + 1 ), LEN( static_cast<int>( _pattern.get_length() ) ); idx < LEN; ++ idx ) {
+			if ( ! set_switch( pattern[ idx ], externalFlags ) ) {
+				restore_state( &savePoint, externalFlags );
+				_errorCause.format( "bad search option '%c'", pattern[ idx ] );
+				ok = false;
+				break;
+			}
+		}
+		if ( ! ok ) {
+			break;
+		}
+		_pattern.erase( stop );
+		_simpleMatchLength = static_cast<int>( _pattern.get_length() );
+		if ( _simpleMatchLength < 1 ) {
+			_errorCause = _( "empty pattern" );
+			ok = false;
+		}
+	} while ( false );
+	if ( ok && _extended ) {
+		ok = parse_re( _pattern.raw() );
 	}
-	if ( ctr )
-		endMatch = ctr - 1;
-/* end of looking at end */
-	_errorCause = _pattern = pattern_.mid( begin,
-			( endMatch - begin ) + 1 );
-	_simpleMatchLength = static_cast<int>( _pattern.get_length() );
-	if ( ! _simpleMatchLength ) {
-		err = -1;
-		_errorCause = _( "empty pattern" );
-	}
-	if ( ( ! err ) && _extended )
-		err = parse_re( _pattern.raw() );
-	return ( err );
+	return ( ok );
 	M_EPILOG
 }
 
-int HPattern::parse_re( HString const& pattern_ ) {
+bool HPattern::parse_re( HString const& pattern_ ) {
 	M_PROLOG
 	_errorCause.clear();
 	if ( _regex.compile( pattern_, _ignoreCase ? HRegex::COMPILE::IGNORE_CASE : HRegex::COMPILE::DEFAULT ) ) {
 		_extended = true;
 		_simpleMatchLength = static_cast<int>( pattern_.get_length() );
 	}
-	return ( _regex.error_code() );
+	return ( _regex.error_code() == 0 );
 	M_EPILOG
 }
 
@@ -195,7 +205,7 @@ bool HPattern::set_switch( char const switch_, pluggable_flags_t* externalFlags 
 			break;
 		}
 	}
-	return ( ! ok );
+	return ( ok );
 	M_EPILOG
 }
 
