@@ -148,8 +148,8 @@ struct HXml::OConvert {
 	void init( HString const& encoding_ ) {
 		M_PROLOG
 		try {
-			_encoder = make_resource<HCharacterEncodingConverter>( encoding_, INTERNAL_ENCODING_NAME );
-			_decoder = make_resource<HCharacterEncodingConverter>( INTERNAL_ENCODING_NAME, encoding_ );
+			_encoder = make_resource<HCharacterEncodingConverter>( INTERNAL_ENCODING_NAME, encoding_ );
+			_decoder = make_resource<HCharacterEncodingConverter>( encoding_, INTERNAL_ENCODING_NAME );
 		} catch ( HCharacterEncodingConverterException const& e ) {
 			throw HXmlException( e.what() );
 		}
