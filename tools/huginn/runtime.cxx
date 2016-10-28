@@ -371,7 +371,7 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 			fds.emplace_back(
 				identifier_name( it->first ),
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &package::value, it->second, identifier_name( it->first ), _1, _2, _3, _4 ) ),
-				"access package "_ys.append( identifier_name( it->first ) ).append( " imported in submodule" )
+				"access package "_ys.append( it->second->get_class()->name() ).append( " imported in submodule" )
 			);
 			it = _packages.erase( it );
 		} else {
@@ -389,14 +389,16 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 	}
 	for ( functions_available_t::value_type const& fi : _functionsAvailable ) {
 		if ( context_._functionsAvailable.find( fi ) == context_._functionsAvailable.end() ) {
+			HHuginn::HFunctionReference const* fr( static_cast<HHuginn::HFunctionReference const*>( _functionsStore.at( fi ).raw() ) );
 			fds.emplace_back(
 				identifier_name( fi ),
-				make_pointer<HHuginn::HClass::HMethod>( static_cast<HHuginn::HFunctionReference const*>( _functionsStore.at( fi ).raw() )->function() ),
-				"access class "_ys.append( identifier_name( fi ) ).append( " imported in submodule" )
+				make_pointer<HHuginn::HClass::HMethod>( fr->function() ),
+				! fr->doc().is_empty() ? fr->doc() : "access function "_ys.append( identifier_name( fi ) ).append( " imported in submodule" )
 			);
 		}
 	}
-	HHuginn::class_t c( create_class( name_, nullptr, fds, "The `"_ys.append( name_ ).append( "` is an user defined submodule." ) ) );
+	HString doc( _huginn->get_comment( 1 ) );
+	HHuginn::class_t c( create_class( name_, nullptr, fds, ! doc.is_empty() ? doc : "The `"_ys.append( name_ ).append( "` is an user defined submodule." ) ) );
 	_huginn->register_class( c );
 	return ( c );
 	M_EPILOG
