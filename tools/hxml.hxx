@@ -81,6 +81,7 @@ public:
 		static M_YAAL_TOOLS_PUBLIC_API parser_t const STRIP_COMMENT;
 		static M_YAAL_TOOLS_PUBLIC_API parser_t const RESOLVE_ENTITIES;
 		static M_YAAL_TOOLS_PUBLIC_API parser_t const AUTO_XINCLUDE;
+		static M_YAAL_TOOLS_PUBLIC_API parser_t const IGNORE_CONVERSION_ERRORS;
 	};
 private:
 	struct OConvert;
@@ -133,7 +134,7 @@ private:
 	void generate_intermediate_form( bool ) const;
 	void parse( xml_node_ptr_t, tree_t::node_t, parser_t );
 	void dump_node( void*, HConstNodeProxy const& ) const;
-	yaal::hcore::HString const& convert( yaal::hcore::HString const&, way_t = TO_INTERNAL ) const;
+	yaal::hcore::HString const& convert( yaal::hcore::HString const&, way_t, bool = false ) const;
 	int get_node_set_by_path( yaal::hcore::HString const& );
 	const_xml_element_t get_element_by_id( const_xml_element_t const&, yaal::hcore::HString const& ) const;
 	void parse_dtd( void* );

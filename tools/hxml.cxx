@@ -73,6 +73,7 @@ HXml::parser_t const HXml::PARSER::KEEP_EMPTY = HXml::parser_t::new_flag();
 HXml::parser_t const HXml::PARSER::STRIP_COMMENT = HXml::parser_t::new_flag();
 HXml::parser_t const HXml::PARSER::RESOLVE_ENTITIES = HXml::parser_t::new_flag();
 HXml::parser_t const HXml::PARSER::AUTO_XINCLUDE = HXml::parser_t::new_flag();
+HXml::parser_t const HXml::PARSER::IGNORE_CONVERSION_ERRORS = HXml::parser_t::new_flag();
 
 class HXmlParserG : public HSingleton<HXmlParserG> {
 	virtual ~HXmlParserG( void ) {
@@ -405,7 +406,7 @@ void HXml::clear( void ) {
 	M_EPILOG
 }
 
-HString const& HXml::convert( HString const& data_, way_t way_ ) const {
+HString const& HXml::convert( HString const& data_, way_t way_, bool ignoreErrors_ ) const {
 	M_PROLOG
 	HCharacterEncodingConverter* cec( nullptr );
 	switch ( way_ ) {
@@ -415,7 +416,15 @@ HString const& HXml::convert( HString const& data_, way_t way_ ) const {
 			M_ASSERT( ! _( "unknown conversion way" ) );
 		break;
 	}
-	return ( cec->convert( data_ ) );
+	HString const* result( &data_ );
+	try {
+		result = &cec->convert( data_ );
+	} catch ( ... ) {
+		if ( !ignoreErrors_ ) {
+			throw;
+		}
+	}
+	return ( *result );
 	M_EPILOG
 }
 
@@ -571,8 +580,9 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 						char const* name( reinterpret_cast<char const*>( attribute->name ) );
 						if ( name ) {
 							if ( attribute->children ) {
-								(**node_)._properties[ name ] = attribute->children->content ? convert(
-										reinterpret_cast<char*>( attribute->children->content ) ) : "";
+								(**node_)._properties[ name ] = attribute->children->content
+									? convert( reinterpret_cast<char*>( attribute->children->content ), TO_INTERNAL, parser_ & PARSER::IGNORE_CONVERSION_ERRORS )
+									: "";
 							}
 						}
 						attribute = attribute->next;
@@ -593,14 +603,14 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 			}
 			break;
 			case ( XML_TEXT_NODE ): if ( node->content ) {
-				_varTmpBuffer = convert( reinterpret_cast<char*>( node->content ) );
+				_varTmpBuffer = convert( reinterpret_cast<char*>( node->content ), TO_INTERNAL, parser_ & PARSER::IGNORE_CONVERSION_ERRORS );
 				if ( ( parser_ & PARSER::KEEP_EMPTY ) || ( _varTmpBuffer.find_other_than( _whiteSpace_.data() ) >= 0 ) ) {
 					node_->add_node( HNode( this, HNode::TYPE::CONTENT, _varTmpBuffer, node->line ) );
 				}
 			}
 			break;
 			case ( XML_COMMENT_NODE ): if ( ! ( parser_ & PARSER::STRIP_COMMENT ) && node->content ) {
-				_varTmpBuffer = convert( reinterpret_cast<char*>( node->content ) );
+				_varTmpBuffer = convert( reinterpret_cast<char*>( node->content ), TO_INTERNAL, parser_ & PARSER::IGNORE_CONVERSION_ERRORS );
 				node_->add_node( HNode( this, HNode::TYPE::COMMENT, _varTmpBuffer, node->line ) );
 			}
 			break;
