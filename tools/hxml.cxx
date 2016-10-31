@@ -562,8 +562,8 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 					xmlNs* nsDef( node->nsDef );
 					while ( nsDef ) {
 						HNameSpace ns(
-							nsDef->prefix ? reinterpret_cast<char const*>( node->nsDef->prefix ) : "",
-							nsDef->href ? reinterpret_cast<char const*>( node->nsDef->href ) : ""
+							nsDef->prefix ? reinterpret_cast<char const*>( nsDef->prefix ) : "",
+							nsDef->href ? reinterpret_cast<char const*>( nsDef->href ) : ""
 						);
 						namespaces_t::iterator it( _namespaces.insert( ns ).first );
 						HNode::namespace_definitions_t& n( (**node_)._namespaceDefinitions );
@@ -573,7 +573,11 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 						nsDef = nsDef->next;
 					}
 				}
-				(**node_)._text = reinterpret_cast<char const*>( node->name );
+				(**node_)._text.clear();
+				if ( node->ns && node->ns->prefix ) {
+					(**node_)._text.assign( reinterpret_cast<char const*>( node->ns->prefix ) ).append( ":" );
+				}
+				(**node_)._text.append( reinterpret_cast<char const*>( node->name ) );
 				if ( node->properties ) {
 					xmlAttrPtr attribute = node->properties;
 					while ( attribute ) {
@@ -841,7 +845,19 @@ void HXml::dump_node( void* writer_p, HConstNodeProxy const& node_ ) const {
 	M_PROLOG
 	writer_resource_t& writer = *static_cast<writer_resource_t*>( writer_p );
 	HString const& str = node_.get_name();
-	int rc = xmlTextWriterStartElement( writer.get(), reinterpret_cast<xmlChar const*>( str.raw() ) );
+	int rc( 0 );
+	int long nsIdx( str.find( ':' ) );
+	if ( nsIdx != HString::npos ) {
+		HString pref( nsIdx != HString::npos ? str.left( nsIdx ) : "" );
+		HString name( str.mid( nsIdx + 1 ) );
+		rc = xmlTextWriterStartElementNS(
+			writer.get(), reinterpret_cast<xmlChar const*>( pref.raw() ),
+			reinterpret_cast<xmlChar const*>( name.raw() ),
+			nullptr
+		);
+	} else {
+		rc = xmlTextWriterStartElement( writer.get(), reinterpret_cast<xmlChar const*>( str.raw() ) );
+	}
 	if ( rc < 0 ) {
 		throw HXmlException( HString( "Unable to write start element: " ) + str );
 	}
@@ -856,14 +872,11 @@ void HXml::dump_node( void* writer_p, HConstNodeProxy const& node_ ) const {
 			throw HXmlException( HString( "Unable to write a property: " ) + str + ", with value: " + pvalue );
 		}
 	}
-	HString prefix;
 	for ( HNameSpace const* ns : (*(node_._node))->_namespaceDefinitions ) {
-		prefix = "xmlns";
-		if ( ! ns->prefix().is_empty() ) {
-			prefix.append( ":" ).append( ns->prefix() );
-		}
-		rc = xmlTextWriterWriteAttribute( writer.get(),
-			reinterpret_cast<xmlChar const*>( prefix.raw() ),
+		rc = xmlTextWriterWriteAttributeNS( writer.get(),
+			reinterpret_cast<xmlChar const*>( ! ns->prefix().is_empty() ? "xmlns" : nullptr ),
+			reinterpret_cast<xmlChar const*>( ! ns->prefix().is_empty() ? ns->prefix().raw() : "xmlns" ),
+			nullptr,
 			reinterpret_cast<xmlChar const*>( ns->href().raw() )
 		);
 		if ( rc < 0 ) {
