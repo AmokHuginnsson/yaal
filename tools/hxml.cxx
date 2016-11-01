@@ -600,6 +600,10 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 			}
 			break;
 			case ( XML_ENTITY_REF_NODE ): {
+				/*
+				 * This case can only happen when XML_PARSE_NOENT (HXml::PARSER::RESOLVE_ENTITIES) is NOT set,
+				 * which means DOM tree build by parser can still containg some entity references.
+				 */
 				M_ASSERT( node->name );
 				entities_t::const_iterator it( _entities.find( reinterpret_cast<char const*>( node->name ) ) );
 				M_ENSURE( it != _entities.end(), HString( "entity not found: " ) + reinterpret_cast<char const*>( node->name ) + ", at: " + node->line );
@@ -702,19 +706,21 @@ void HXml::parse( HString const& xPath_, parser_t parser_ ) {
 	get_node_set_by_path( xPath );
 	_domTree.clear();
 	int ctr = 0;
-	while ( xPath[ ctr ] )
-		ctr ++;
-	ctr --;
+	while ( xPath[ ctr ] ) {
+		++ ctr;
+	}
+	-- ctr;
 	M_ASSERT( ctr >= 0 );
 	if ( _xml->_nodeSet ) {
 		if ( xPath != FULL_TREE ) {
 			tree_t::node_t root = _domTree.create_new_root( HNode( this ) );
 			(**root)._text = "xpath_result_set";
-			for ( ctr = 0; ctr < _xml->_nodeSet->nodeNr; ++ ctr )
-				parse( _xml->_nodeSet->nodeTab[ ctr ],
-						root, parser_ );
-		} else
+			for ( ctr = 0; ctr < _xml->_nodeSet->nodeNr; ++ ctr ) {
+				parse( _xml->_nodeSet->nodeTab[ ctr ], root, parser_ );
+			}
+		} else {
 			parse( xmlDocGetRootElement( _xml->_doc.get() ), nullptr, parser_ );
+		}
 	}
 	M_EPILOG
 }
@@ -793,12 +799,8 @@ void HXml::generate_intermediate_form( bool indent_ ) const {
 		}
 	}
 	_xml->clear();
-	if ( _xml->_doc.get() ) {
-		xmlFreeNode( xmlDocSetRootElement( const_cast<xmlDoc*>( _xml->_doc.get() ), xmlDocGetRootElement( doc.get() ) ) );
-	} else {
-		using yaal::swap;
-		swap( const_cast<doc_resource_t&>( _xml->_doc ), doc );
-	}
+	using yaal::swap;
+	swap( const_cast<doc_resource_t&>( _xml->_doc ), doc );
 	return;
 	M_EPILOG
 }
@@ -814,12 +816,25 @@ void HXml::save( yaal::hcore::HStreamInterface& stream, bool indent_ ) const {
 		outputbuffer_resource_t obuf( ::xmlOutputBufferCreateIO( writer_callback,
 							nullptr, &stream, ::xmlFindCharEncodingHandler( _encoding.raw() ) ),
 				xmlOutputBufferClose );
-		M_ENSURE( ::xsltSaveResultTo( obuf.get(),
-					const_cast<xmlDoc*>( _xml->_doc.get() ), const_cast<xsltStylesheet*>( _xml->_style.get() ) ) != -1 );
+		M_ENSURE(
+			::xsltSaveResultTo(
+				obuf.get(),
+				const_cast<xmlDoc*>( _xml->_doc.get() ),
+				const_cast<xsltStylesheet*>( _xml->_style.get() )
+			) != -1
+		);
 	} else {
-		M_ENSURE( ::xmlSaveFileTo( ::xmlOutputBufferCreateIO( writer_callback,
-						nullptr, &stream, ::xmlFindCharEncodingHandler( _encoding.raw() ) ),
-					const_cast<xmlDoc*>( _xml->_doc.get() ), _encoding.raw() ) != -1 );
+		M_ENSURE(
+			::xmlSaveFileTo(
+				::xmlOutputBufferCreateIO(
+					writer_callback,
+					nullptr,
+					&stream,
+					::xmlFindCharEncodingHandler( _encoding.raw() )
+				),
+				const_cast<xmlDoc*>( _xml->_doc.get() ), _encoding.raw()
+			) != -1
+		);
 	}
 	return;
 	M_EPILOG
