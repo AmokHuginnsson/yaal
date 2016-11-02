@@ -83,6 +83,13 @@ public:
 		static M_YAAL_TOOLS_PUBLIC_API parser_t const AUTO_XINCLUDE;
 		static M_YAAL_TOOLS_PUBLIC_API parser_t const IGNORE_CONVERSION_ERRORS;
 	};
+	struct GENERATOR;
+	typedef yaal::hcore::HBitFlag<GENERATOR> generator_t;
+	struct GENERATOR {
+		static M_YAAL_TOOLS_PUBLIC_API generator_t const DEFAULT;
+		static M_YAAL_TOOLS_PUBLIC_API generator_t const INDENT;
+		static M_YAAL_TOOLS_PUBLIC_API generator_t const STRIP_ENTITIES;
+	};
 private:
 	struct OConvert;
 	typedef void* xml_node_ptr_t;
@@ -93,6 +100,8 @@ private:
 	yaal::hcore::HString _encoding;
 	yaal::hcore::HString _streamId;
 	xml_low_t _xml;
+	yaal::hcore::HString _externalId;
+	yaal::hcore::HString _systemId;
 	entities_t _entities;
 	namespaces_t _namespaces;
 	tree_t _domTree;
@@ -117,8 +126,8 @@ public:
 	HConstNodeProxy const get_root( void ) const;
 	void load( yaal::hcore::HStreamInterface&, parser_t = PARSER::DEFAULT );
 	void load( yaal::hcore::HStreamInterface::ptr_t, parser_t = PARSER::DEFAULT );
-	void save( yaal::hcore::HStreamInterface&, bool = false ) const;
-	void save( yaal::hcore::HStreamInterface::ptr_t, bool = false ) const;
+	void save( yaal::hcore::HStreamInterface&, generator_t = GENERATOR::DEFAULT ) const;
+	void save( yaal::hcore::HStreamInterface::ptr_t, generator_t = GENERATOR::DEFAULT ) const;
 	void create_root( yaal::hcore::HString const&, yaal::hcore::HString const& = yaal::hcore::HString() );
 	void clear( void );
 	HConstNodeProxy get_element_by_id( yaal::hcore::HString const& ) const;
@@ -131,7 +140,7 @@ public:
 private:
 	static int writer_callback( void*, char const*, int );
 	static int reader_callback( void*, char*, int );
-	void generate_intermediate_form( bool ) const;
+	void generate_intermediate_form( generator_t ) const;
 	void parse( xml_node_ptr_t, tree_t::node_t, parser_t );
 	void dump_node( void*, HConstNodeProxy const& ) const;
 	yaal::hcore::HString const& convert( yaal::hcore::HString const&, way_t, bool = false ) const;

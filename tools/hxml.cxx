@@ -75,6 +75,10 @@ HXml::parser_t const HXml::PARSER::RESOLVE_ENTITIES = HXml::parser_t::new_flag()
 HXml::parser_t const HXml::PARSER::AUTO_XINCLUDE = HXml::parser_t::new_flag();
 HXml::parser_t const HXml::PARSER::IGNORE_CONVERSION_ERRORS = HXml::parser_t::new_flag();
 
+HXml::generator_t const HXml::GENERATOR::DEFAULT = HXml::generator_t::new_flag();
+HXml::generator_t const HXml::GENERATOR::INDENT = HXml::generator_t::new_flag();
+HXml::generator_t const HXml::GENERATOR::STRIP_ENTITIES = HXml::generator_t::new_flag();
+
 class HXmlParserG : public HSingleton<HXmlParserG> {
 	virtual ~HXmlParserG( void ) {
 		M_PROLOG
@@ -296,6 +300,8 @@ HXml::HXml( void )
 	, _encoding( _defaultEncoding_ )
 	, _streamId()
 	, _xml( make_resource<HXmlData>() )
+	, _externalId()
+	, _systemId()
 	, _entities()
 	, _namespaces()
 	, _domTree() {
@@ -310,6 +316,8 @@ HXml::HXml( HXml const& xml_ )
 	, _encoding( xml_._encoding )
 	, _streamId( xml_._streamId )
 	, _xml( make_resource<HXmlData>( *xml_._xml ) )
+	, _externalId( xml_._externalId )
+	, _systemId( xml_._systemId )
 	, _entities( xml_._entities )
 	, _namespaces( xml_._namespaces )
 	, _domTree( xml_._domTree ) {
@@ -328,6 +336,8 @@ HXml::HXml( HXml&& xml_ )
 	, _encoding( yaal::move( xml_._encoding ) )
 	, _streamId( yaal::move( xml_._streamId ) )
 	, _xml( yaal::move( xml_._xml ) )
+	, _externalId( yaal::move( xml_._externalId ) )
+	, _systemId( yaal::move( xml_._systemId ) )
 	, _entities( yaal::move( xml_._entities ) )
 	, _namespaces( yaal::move( xml_._namespaces ) )
 	, _domTree( yaal::move( xml_._domTree ) ) {
@@ -376,6 +386,8 @@ void HXml::swap( HXml& xml_ ) {
 		swap( xml_._encoding, _encoding );
 		swap( xml_._streamId, _streamId );
 		swap( xml_._xml, _xml );
+		swap( xml_._externalId, _externalId );
+		swap( xml_._systemId, _systemId );
 		swap( xml_._entities, _entities );
 		swap( xml_._namespaces, _namespaces );
 		swap( xml_._domTree, _domTree );
@@ -400,6 +412,8 @@ void HXml::clear( void ) {
 	_encoding.clear();
 	_domTree.clear();
 	_xml = make_resource<HXmlData>();
+	_externalId.clear();
+	_systemId.clear();
 	_entities.clear();
 	_namespaces.clear();
 	return;
@@ -501,7 +515,6 @@ void HXml::init( yaal::hcore::HStreamInterface& stream, parser_t parser_ ) {
 	(*_convert).infer( reinterpret_cast<char const *>( doc.get()->encoding ), root, _streamId );
 	using yaal::swap;
 	swap( _xml->_doc, doc );
-	parse_dtd( _xml->_doc.get()->intSubset );
 	return;
 	M_EPILOG
 }
@@ -510,6 +523,8 @@ void HXml::parse_dtd( void* dtd_ ) {
 	M_PROLOG
 	if ( dtd_ ) {
 		xmlDtdPtr dtd( static_cast<xmlDtdPtr>( dtd_ ) );
+		_externalId = reinterpret_cast<char const*>( dtd->ExternalID );
+		_systemId = reinterpret_cast<char const*>( dtd->SystemID );
 		xmlNodePtr node( dtd->children );
 		while ( node ) {
 			if ( ( node->type == XML_ENTITY_DECL ) && ( node->name && node->content ) ) {
@@ -642,8 +657,11 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 
 void HXml::apply_style( yaal::hcore::HString const& path_, parameters_t const& parameters_ ) {
 	M_PROLOG
+	if ( !! _xml->_doc ) {
+		parse_dtd( _xml->_doc.get()->intSubset );
+	}
 	if ( !! get_root() ) {
-		generate_intermediate_form( false );
+		generate_intermediate_form( HXml::GENERATOR::DEFAULT );
 	}
 	M_ASSERT( _xml->_doc.get() );
 	HXsltParserG::get_instance();
@@ -711,6 +729,7 @@ void HXml::parse( HString const& xPath_, parser_t parser_ ) {
 	}
 	-- ctr;
 	M_ASSERT( ctr >= 0 );
+	parse_dtd( _xml->_doc.get()->intSubset );
 	if ( _xml->_nodeSet ) {
 		if ( xPath != FULL_TREE ) {
 			tree_t::node_t root = _domTree.create_new_root( HNode( this ) );
@@ -743,7 +762,7 @@ void HXml::load( yaal::hcore::HStreamInterface::ptr_t stream, parser_t parser_ )
 	M_EPILOG
 }
 
-void HXml::generate_intermediate_form( bool indent_ ) const {
+void HXml::generate_intermediate_form( generator_t generator_ ) const {
 	M_PROLOG
 	doc_resource_t doc;
 	M_ENSURE( !! get_root() );
@@ -760,7 +779,7 @@ void HXml::generate_intermediate_form( bool indent_ ) const {
 		if ( rc < 0 ) {
 			throw HXmlException( HString( "Unable to start document with encoding: " ) + _encoding );
 		}
-		if ( indent_ ) {
+		if ( generator_ & HXml::GENERATOR::INDENT ) {
 			rc = xmlTextWriterSetIndent( writer.get(), 1 );
 			if ( rc < 0 ) {
 				throw HXmlException( "Unable to enable indenting." );
@@ -774,11 +793,19 @@ void HXml::generate_intermediate_form( bool indent_ ) const {
 		if ( ! _convert->is_initialized() ) {
 			_convert->init( _encoding );
 		}
-		if ( ! _entities.is_empty() ) {
-			rc = xmlTextWriterStartDTD( writer.get(), reinterpret_cast<xmlChar const*>( "workaround" ), nullptr, nullptr );
+		bool needDTD( ( ! _externalId.is_empty() ) || ( ! _systemId.is_empty() ) || ( ! _entities.is_empty() && ! ( generator_ & HXml::GENERATOR::STRIP_ENTITIES ) ) );
+		if ( needDTD ) {
+			rc = xmlTextWriterStartDTD(
+				writer.get(),
+				reinterpret_cast<xmlChar const*>( get_root().get_name().raw() ),
+				! _externalId.is_empty() ? reinterpret_cast<xmlChar const*>( _externalId.raw() ) : nullptr,
+				! _systemId.is_empty() ? reinterpret_cast<xmlChar const*>( _systemId.raw() ) : nullptr
+			);
 			if ( rc < 0 ) {
 				throw HXmlException( "Unable to start DTD section." );
 			}
+		}
+		if ( ! ( generator_ & HXml::GENERATOR::STRIP_ENTITIES ) ) {
 			for ( entities_t::const_iterator it( _entities.begin() ), end( _entities.end() ); it != end; ++ it ) {
 				rc = xmlTextWriterWriteDTDInternalEntity( writer.get(), 0,
 						reinterpret_cast<xmlChar const*>( it->first.raw() ),
@@ -787,6 +814,8 @@ void HXml::generate_intermediate_form( bool indent_ ) const {
 					throw HXmlException( HString( "Cannot save entity declaration: " ) + it->first );
 				}
 			}
+		}
+		if ( needDTD ) {
 			rc = xmlTextWriterEndDTD( writer.get() );
 			if ( rc < 0 ) {
 				throw HXmlException( "Unable to end DTD section." );
@@ -805,12 +834,12 @@ void HXml::generate_intermediate_form( bool indent_ ) const {
 	M_EPILOG
 }
 
-void HXml::save( yaal::hcore::HStreamInterface& stream, bool indent_ ) const {
+void HXml::save( yaal::hcore::HStreamInterface& stream, generator_t generator_ ) const {
 	M_PROLOG
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	M_ENSURE( stream.is_valid() );
 	/* flush writer to DOM. */
-	generate_intermediate_form( indent_ );
+	generate_intermediate_form( generator_ );
 	M_ASSERT( _xml->_doc.get() );
 	if ( _xml->_style.get() ) {
 		outputbuffer_resource_t obuf( ::xmlOutputBufferCreateIO( writer_callback,
@@ -840,10 +869,10 @@ void HXml::save( yaal::hcore::HStreamInterface& stream, bool indent_ ) const {
 	M_EPILOG
 }
 
-void HXml::save( yaal::hcore::HStreamInterface::ptr_t stream, bool indent_ ) const {
+void HXml::save( yaal::hcore::HStreamInterface::ptr_t stream, generator_t generator_ ) const {
 	M_PROLOG
 	M_ENSURE( stream->is_valid() );
-	save( *stream, indent_ );
+	save( *stream, generator_ );
 	return;
 	M_EPILOG
 }
