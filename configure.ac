@@ -138,7 +138,7 @@ AC_CHECK_ALIGNOF([time_t])
 dnl Now we can look for all needed libraries.
 AC_MSG_RESULT([--- Looking for needed libraries ... ---                [[67%]]])
 AC_SEARCH_LIBS([pthread_create],[thr pthread],,[AC_MSG_ERROR([Cannot build without threading library.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
-AC_CHECK_LIB([ssl],[SSL_load_error_strings],,[AC_MSG_ERROR([Cannot continue without OpenSSL library.])]) LIBS=""
+AC_CHECK_LIB([ssl],[SSL_CTX_new],,[AC_MSG_ERROR([Cannot continue without OpenSSL library.])]) LIBS=""
 PKG_CHECK_MODULES(PCRE, [libpcre libpcreposix], [true], [true])
 AC_SEARCH_LIBS([clock_gettime],[rt]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([timer_create],[rt]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
