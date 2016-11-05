@@ -24,6 +24,7 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <cstring>
 #include <unistd.h> /* read(), write() for BIO */
 #include <openssl/rsa.h>       /* SSLeay stuff */
 #include <openssl/crypto.h>
@@ -52,6 +53,45 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "system.hxx"
 #include "hlog.hxx"
 
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+namespace {
+BIO_METHOD* BIO_meth_new( int type_, char const* name_ ) {
+	static BIO_METHOD method = {
+		type_,
+		name_,
+		nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
+	};
+	return ( &method );
+}
+void BIO_meth_free( BIO_METHOD* ) {
+}
+void BIO_meth_set_write( BIO_METHOD* method_, int (*write_)( BIO*, char const*, int ) ) {
+	method_->bwrite = write_;
+}
+void BIO_meth_set_read( BIO_METHOD* method_, int (*read_)( BIO*, char*, int ) ) {
+	method_->bread = read_;
+}
+void BIO_meth_set_ctrl( BIO_METHOD* method_, int long (*ctrl_)( BIO*, int, int long, void* ) ) {
+	method_->ctrl = ctrl_;
+}
+void BIO_meth_set_create( BIO_METHOD* method_, int (*create_)( BIO* ) ) {
+	method_->create = create_;
+}
+void BIO_meth_set_destroy( BIO_METHOD* method_, int (*destroy_)( BIO* ) ) {
+	method_->destroy = destroy_;
+}
+void BIO_set_init( BIO* bio_, int init_ ) {
+	bio_->init = init_;
+}
+void BIO_set_data( BIO* bio_, void* data_ ) {
+	bio_->ptr = data_;
+}
+void* BIO_get_data( BIO* bio_ ) {
+	return ( bio_->ptr );
+}
+}
+#endif
+
 namespace yaal {
 
 namespace hcore {
@@ -69,8 +109,9 @@ namespace openssl_helper {
 inline HString& format_error_message( HString& buffer_, int err = 0 ) {
 	int long unsigned code( 0 );
 	buffer_ = err ? ERR_error_string( static_cast<unsigned int>( err ), nullptr ) : "";
-	while ( ( code = ERR_get_error() ) )
+	while ( ( code = ERR_get_error() ) ) {
 		buffer_.append( ( buffer_.is_empty() ? "" : "\n" ) ).append( ERR_error_string( code, nullptr ) );
+	}
 	return ( buffer_ );
 }
 
@@ -80,7 +121,9 @@ int HOpenSSL::OSSLContext::_instances = 0;
 HMutex HOpenSSL::OSSLContext::_mutex( HMutex::TYPE::RECURSIVE );
 HOpenSSL::OSSLContext::mutexes_t HOpenSSL::OSSLContext::_sslLibMutexes;
 
-HOpenSSL::OSSLContext::OSSLContext( void ) : _context( nullptr ), _users( 0 ) {
+HOpenSSL::OSSLContext::OSSLContext( void )
+	: _context( nullptr )
+	, _users( 0 ) {
 }
 
 
@@ -92,11 +135,12 @@ namespace {
 
 int bio_read( BIO* bio_, char* buf_, int size_ ) {
 	M_PROLOG
-	int nRead( static_cast<int>( ::read( static_cast<int>( reinterpret_cast<int long>( bio_->ptr ) ), buf_, static_cast<size_t>( size_ ) ) ) );
-	if ( ( nRead < 0 ) && ( errno == EAGAIN ) )
+	int nRead( static_cast<int>( ::read( static_cast<int>( reinterpret_cast<int long>( BIO_get_data( bio_ ) ) ), buf_, static_cast<size_t>( size_ ) ) ) );
+	if ( ( nRead < 0 ) && ( errno == EAGAIN ) ) {
 		BIO_set_retry_read( bio_ );
-	else
+	} else {
 		BIO_clear_retry_flags( bio_ );
+	}
 	return ( nRead );
 	M_EPILOG
 }
@@ -108,32 +152,13 @@ int bio_write( BIO* bio_, char const* buf_, int size_ ) {
 	VALGRIND_MAKE_MEM_DEFINED( buf_, size_ );
 #	pragma GCC diagnostic error "-Wold-style-cast"
 #endif /* #ifdef HAVE_VALGRIND_MEMCHECK_H */
-	int nWritten( static_cast<int>( ::write( static_cast<int>( reinterpret_cast<int long>( bio_->ptr ) ), buf_, static_cast<size_t>( size_ ) ) ) );
-	if ( ( nWritten < 0 ) && ( errno == EAGAIN ) )
+	int nWritten( static_cast<int>( ::write( static_cast<int>( reinterpret_cast<int long>( BIO_get_data( bio_ ) ) ), buf_, static_cast<size_t>( size_ ) ) ) );
+	if ( ( nWritten < 0 ) && ( errno == EAGAIN ) ) {
 		BIO_set_retry_write( bio_ );
-	else
+	} else {
 		BIO_clear_retry_flags( bio_ );
+	}
 	return ( nWritten );
-	M_EPILOG
-}
-
-int bio_puts( BIO*, char const* ) __attribute__(( __noreturn__ ));
-int bio_puts( BIO*, char const* ) {
-	M_PROLOG
-	M_ENSURE( 0 && "BIO_puts call not implemented!" );
-#ifdef __MSVCXX__
-	return ( -1 );
-#endif /* #ifdef __MSVCXX__ */
-	M_EPILOG
-}
-
-int bio_gets( BIO*, char*, int ) __attribute__(( __noreturn__ ));
-int bio_gets( BIO*, char*, int ) {
-	M_PROLOG
-	M_ENSURE( 0 && "BIO_gets call not implemented!" );
-#ifdef __MSVCXX__
-	return ( -1 );
-#endif /* #ifdef __MSVCXX__ */
 	M_EPILOG
 }
 
@@ -158,7 +183,7 @@ int long bio_ctrl( BIO*, int cmd_, int long, void* ) {
 
 int bio_create( BIO* bio_ ) {
 	M_PROLOG
-	bio_->init = 1;
+	BIO_set_init( bio_, 1 );
 	return ( 1 );
 	M_EPILOG
 }
@@ -171,18 +196,8 @@ int bio_destroy( BIO* ) {
 
 }
 
-BIO_METHOD fd_method = {
-	BIO_TYPE_SOURCE_SINK,
-	"yaal-stream",
-	bio_write,
-	bio_read,
-	bio_puts,
-	bio_gets,
-	bio_ctrl,
-	bio_create,
-	bio_destroy,
-	nullptr
-};
+typedef HResource<BIO_METHOD, void (*) ( BIO_METHOD* )> bio_method_t;
+bio_method_t _fdMethod_;
 
 void HOpenSSL::OSSLContext::init( void ) {
 	M_PROLOG
@@ -199,21 +214,31 @@ void HOpenSSL::OSSLContext::init( void ) {
 		CRYPTO_set_locking_callback( &HOpenSSL::OSSLContext::libssl_rule_mutex );
 		CRYPTO_set_id_callback( &get_thread_id );
 		SSL_library_init();
+		_fdMethod_ = bio_method_t( BIO_meth_new( BIO_TYPE_SOURCE_SINK, "yaal-stream" ), &BIO_meth_free );
+		BIO_meth_set_write( _fdMethod_.get(), &bio_write );
+		BIO_meth_set_read( _fdMethod_.get(), &bio_read );
+		BIO_meth_set_ctrl( _fdMethod_.get(), &bio_ctrl );
+		BIO_meth_set_create( _fdMethod_.get(), &bio_create );
+		BIO_meth_set_destroy( _fdMethod_.get(), &bio_destroy );
 	}
 	SSL_METHOD const* method( static_cast<SSL_METHOD const*>( select_method() ) );
 	SSL_CTX* ctx( nullptr );
 	HString buffer;
 	ERR_clear_error();
 	_context = ctx = SSL_CTX_new( const_cast<SSL_METHOD*>( method ) );
-	if ( ! _context )
+	if ( ! _context ) {
 		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) );
+	}
 	++ _instances;
-	if ( SSL_CTX_use_PrivateKey_file( ctx, _sSLKey.raw(), SSL_FILETYPE_PEM ) <= 0 )
+	if ( SSL_CTX_use_PrivateKey_file( ctx, _sSLKey.raw(), SSL_FILETYPE_PEM ) <= 0 ) {
 		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) + ", key: `" + _sSLKey + "'" );
-	if ( SSL_CTX_use_certificate_file( ctx, _sSLCert.raw(), SSL_FILETYPE_PEM ) <= 0 )
+	}
+	if ( SSL_CTX_use_certificate_file( ctx, _sSLCert.raw(), SSL_FILETYPE_PEM ) <= 0 ) {
 		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) + ": cert: `" + _sSLCert + "'" );
-	if ( ! SSL_CTX_check_private_key( ctx ) )
+	}
+	if ( ! SSL_CTX_check_private_key( ctx ) ) {
 		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) );
+	}
 	return;
 	M_EPILOG
 }
@@ -226,13 +251,17 @@ HOpenSSL::OSSLContext::~OSSLContext( void ) {
 	M_PROLOG
 	HLock lock( _mutex );
 	M_ENSURE( ! _users );
-	if ( _context )
+	if ( _context ) {
 		SSL_CTX_free( static_cast<SSL_CTX*>( _context ) );
+	}
 	_context = nullptr;
 	-- _instances;
 	if ( _instances == 0 ) {
+		_fdMethod_.reset();
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 		ERR_remove_state( static_cast<int unsigned>( system::getpid() ) );
 		ERR_remove_state( 0 );
+#endif
 		ENGINE_cleanup();
 		CONF_modules_finish();
 		CONF_modules_free();
@@ -244,9 +273,12 @@ HOpenSSL::OSSLContext::~OSSLContext( void ) {
 		for ( int i( 0 ), SIZE( static_cast<int>( _sslLibMutexes.size() ) ); i < SIZE; ++ i ) {
 			mutex_info_t& m( _sslLibMutexes[ i ] );
 			if ( m.second > 0 ) {
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 				log_trace << "A ssl lock " << CRYPTO_get_lock_name( i ) << " still holds " << m.second << "locks." <<endl;
-				while ( m.second -- )
+#endif
+				while ( m.second -- ) {
 					m.first->unlock();
+				}
 			}
 		}
 		_sslLibMutexes.clear();
@@ -261,8 +293,9 @@ void* HOpenSSL::OSSLContext::create_ssl( void ) {
 	M_ASSERT( _context );
 	SSL* ssl( SSL_new( static_cast<SSL_CTX*>( _context ) ) );
 	HString buffer;
-	if ( ! ssl )
+	if ( ! ssl ) {
 		throw HOpenSSLException( openssl_helper::format_error_message( buffer ) );
+	}
 	++ _users;
 	return ( ssl );
 	M_EPILOG
@@ -330,14 +363,15 @@ HOpenSSL::HOpenSSL( int fileDescriptor_, TYPE type_ )
 	try {
 		SSL* ssl( static_cast<SSL*>( _ctx->create_ssl() ) );
 		_ssl = ssl;
-		BIO* bio( BIO_new( &fd_method ) );
+		BIO* bio( BIO_new( _fdMethod_.get() ) );
 		M_ENSURE( bio );
-		bio->ptr = reinterpret_cast<void*>( fileDescriptor_ );
+		BIO_set_data( bio, reinterpret_cast<void*>( fileDescriptor_ ) );
 		SSL_set_bio( ssl, bio, bio );
 		accept_or_connect();
 	} catch ( HOpenSSLException const& ) {
-		if ( _ssl )
+		if ( _ssl ) {
 			_ctx->consume_ssl( _ssl );
+		}
 		_ssl = nullptr;
 		throw;
 	}
