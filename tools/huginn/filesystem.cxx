@@ -73,9 +73,9 @@ public:
 		return ( thread_->object_factory().create_integer( OPERATIONS::READING + 0 ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t writting( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t writing( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		verify_arg_count( "FileSystem.writting", values_, 0, 0, position_ );
+		verify_arg_count( "FileSystem.writing", values_, 0, 0, position_ );
 		return ( thread_->object_factory().create_integer( OPERATIONS::WRITTING + 0 ) );
 		M_EPILOG
 	}
@@ -114,7 +114,7 @@ private:
 		int operation( static_cast<int>( get_integer( values_[1] ) ) );
 		if ( ( operation != OPERATIONS::READING ) && ( operation != OPERATIONS::WRITTING ) ) {
 			throw HHuginn::HHuginnRuntimeException(
-				HString( name ).append( "(): second argument must be either FileSystem.reading() or FileSystem.writting()" ),
+				HString( name ).append( "(): second argument must be either FileSystem.reading() or FileSystem.writing()" ),
 				position_
 			);
 		}
@@ -152,7 +152,7 @@ HHuginn::value_t HFileSystemCreator::do_new_instance( HRuntime* runtime_ ) {
 			HHuginn::field_definitions_t{
 				{ "open",                      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::open, _1, _2, _3, _4 ) ), "( *path*, *mode* ) - open file under given *path* in the attached file system, using specified (i/o) *mode*" },
 				{ "reading",                   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::reading, _1, _2, _3, _4 ) ), "a mode for *.open()* method, used to open files for reading" },
-				{ "writting",                  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::writting, _1, _2, _3, _4 ) ), "a mode for *.open()* method, used to open files for writing" },
+				{ "writing",                   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::writing, _1, _2, _3, _4 ) ), "a mode for *.open()* method, used to open files for writing" },
 				{ "rename",                    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::rename, _1, _2, _3, _4 ) ), "( *oldPath*, *newPath* ) - rename or move file from *oldPath* to *newPath* in attached file system", },
 				{ "remove",                    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::remove, _1, _2, _3, _4 ) ), "( *path* ) - remove file with given *path* from attached file system" },
 				{ "current_working_directory", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::current_working_directory, _1, _2, _3, _4 ) ), "get current working directory path" }
