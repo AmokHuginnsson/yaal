@@ -204,15 +204,20 @@ void ensure_limit( int resource_, char const* message_, bool autoSanity_ ) {
 	}
 	if ( static_cast<int long>( rl.rlim_cur ) == static_cast<int long>( FWD_RLIM_INFINITY ) ) {
 		if ( autoSanity_ ) {
+#ifndef __HOST_OS_TYPE_CYGWIN__
 			system::HResourceInfo mem( system::get_memory_size_info() );
-			int nProc( system::get_core_count_info() );
+#endif /* #ifndef __HOST_OS_TYPE_CYGWIN__ */
 			switch ( resource_ ) {
+#ifndef __HOST_OS_TYPE_CYGWIN__
+#if ( HAVE_DECL_RLIMIT_AS == 1 )
 				case ( RLIMIT_AS ): {
 					rl.rlim_cur = rl.rlim_max = static_cast<rlim_t>( ( mem.total() / 10 ) * 9 );
 				} break;
+#endif /* #if ( HAVE_DECL_RLIMIT_AS == 1 ) */
 				case ( RLIMIT_DATA ): {
 					rl.rlim_cur = rl.rlim_max = static_cast<rlim_t>( ( mem.total() / 10 ) * 9 );
 				} break;
+#endif /* #ifndef __HOST_OS_TYPE_CYGWIN__ */
 				case ( RLIMIT_STACK ): {
 					static int const MAX_STACK_SIZE( 8 * 1024 * 1024 );
 					rl.rlim_cur = rl.rlim_max = MAX_STACK_SIZE;
@@ -221,10 +226,16 @@ void ensure_limit( int resource_, char const* message_, bool autoSanity_ ) {
 					static int const MAX_OPEN_FILES( 1024 );
 					rl.rlim_cur = rl.rlim_max = MAX_OPEN_FILES;
 				} break;
+#if ( HAVE_DECL_RLIMIT_NPROC == 1 )
 				case ( RLIMIT_NPROC ): {
 					static int const PROC_PER_CORE( 128 );
+					int nProc( system::get_core_count_info() );
 					rl.rlim_cur = rl.rlim_max = static_cast<rlim_t>( nProc * PROC_PER_CORE );
 				} break;
+#endif /* #if ( HAVE_DECL_RLIMIT_NPROC == 1 ) */
+				default: {
+					M_ASSERT( !"Invalid resource type!"[0] );
+				}
 			}
 			if ( ::setrlimit( resource_, &rl ) != 0 ) {
 				::perror( SYSCALL_FAILURE );
