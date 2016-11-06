@@ -13,7 +13,7 @@ PRIVILEGES_SANITY
 
 AC_MSG_RESULT([--- Welcome to yaal configurator ---                     [[0%]]])
 
-AC_ARG_WITH([console-mouse],[AC_HELP_STRING([--with-console-mouse],[Compile with console mouse support, default is `yes' if apriopriate library can be found.])],[CONSOLE_MOUSE=$withval],[CONSOLE_MOUSE="auto"])
+AC_ARG_WITH([console-mouse],[AC_HELP_STRING([--with-console-mouse],[Compile with console mouse support, default is `yes' if appropriate library can be found.])],[CONSOLE_MOUSE=$withval],[CONSOLE_MOUSE="auto"])
 dnl ` <- this one fixes syntax highlighting in vim.
 AC_ARG_WITH([sqlite3],[AC_HELP_STRING([--with-sqlite3],[Compile with SQLite3 driver, default is `yes' if SQLite3 can be found.])],[SQLITE3=$withval],[SQLITE3="auto"])
 dnl `
@@ -32,6 +32,7 @@ AC_ARG_ENABLE([reldeb],[AC_HELP_STRING([--enable-reldeb],[Compile with full opti
 AC_ARG_ENABLE([relassert],[AC_HELP_STRING([--enable-relassert],[Compile with full optimizations but keep assertion checks.])],[DO_TARGET="RELASSERT" LIB_INFIX="-ra"])
 AC_ARG_ENABLE([profiling],[AC_HELP_STRING([--enable-profiling],[Provide support for profiling tools.])],[DO_TARGET="PROFILING" LIB_INFIX="-p"])
 AC_ARG_ENABLE([coverage],[AC_HELP_STRING([--enable-coverage],[Get ready to gather coverage data.])],[DO_TARGET="COVERAGE" LIB_INFIX="-c"])
+AC_ARG_ENABLE([auto-sanity],[AC_HELP_STRING([--enable-auto-sanity],[Try to automatically sanitize user enviroment.])],[AC_DEFINE_UNQUOTED(YAAL_AUTO_SANITY,1,[Enable automatic enviroment sanitization.])])
 
 AC_MSG_RESULT([--- Initialization ... ---                               [[6%]]])
 
@@ -51,7 +52,7 @@ YAAL_CHECK_GIT
 dnl We select default language.
 AC_LANG([C++])
 
-dnl Cheching for machine type.
+dnl Checking for machine type.
 AC_MSG_RESULT([--- Checking for machine type ... ---                   [[14%]]])
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
@@ -81,7 +82,7 @@ else
 	AC_DEFINE_UNQUOTED([__DYNAMIC_LINKER__],["$DYNAMIC_LINKER"],[Path to your dynamic linker.])
 fi
 
-AC_MSG_RESULT([--- Looking standrad development software ... ---       [[33%]]])
+AC_MSG_RESULT([--- Looking standard development software ... ---       [[33%]]])
 
 m4_ifndef([PKG_PROG_PKG_CONFIG], [m4_fatal([Cannot self-test for pkg-config, macro PKG_PROG_PKG_CONFIG is not available.])])
 PKG_PROG_PKG_CONFIG()
@@ -238,7 +239,7 @@ AC_MSG_CHECKING([whether `.interp' user section is allowed])
 dnl `
 RESULT=["no"]
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([[void f( void ) { static char const dynamicLinkerPath[] __attribute__(( __section__(".interp") )) = "/dummy"; }]])],
-	[AC_DEFINE([HAVE_INTERP_ALLOWED],[],[Is `.interp' user secion allowed?])] RESULT=["yes"])
+	[AC_DEFINE([HAVE_INTERP_ALLOWED],[],[Is `.interp' user section allowed?])] RESULT=["yes"])
 dnl `
 AC_MSG_RESULT([$RESULT])
 

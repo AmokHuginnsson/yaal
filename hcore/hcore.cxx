@@ -47,6 +47,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hopenssl.hxx"
 #include "hsocket.hxx"
 #include "pod.hxx"
+#include "system.hxx"
 #include "commit_id.hxx"
 
 namespace yaal {
@@ -195,16 +196,82 @@ namespace {
 
 static char const SYSCALL_FAILURE[] = "syscall failure - bailng out";
 
-void ensure_limit( int resource_, char const* message_ ) {
+void ensure_limit( int resource_, char const* message_, bool autoSanity_ ) {
 	rlimit rl = { 0, 0 };
 	if ( ::getrlimit( resource_, &rl ) != 0 ) {
 		::perror( SYSCALL_FAILURE );
 		::exit( 1 );
 	}
 	if ( static_cast<int long>( rl.rlim_cur ) == static_cast<int long>( FWD_RLIM_INFINITY ) ) {
-		::perror( message_ );
-		::exit( 1 );
+		if ( autoSanity_ ) {
+			system::HResourceInfo mem( system::get_memory_size_info() );
+			int nProc( system::get_core_count_info() );
+			switch ( resource_ ) {
+				case ( RLIMIT_AS ): {
+					rl.rlim_cur = rl.rlim_max = static_cast<rlim_t>( ( mem.total() / 10 ) * 9 );
+				} break;
+				case ( RLIMIT_DATA ): {
+					rl.rlim_cur = rl.rlim_max = static_cast<rlim_t>( ( mem.total() / 10 ) * 9 );
+				} break;
+				case ( RLIMIT_STACK ): {
+					static int const MAX_STACK_SIZE( 8 * 1024 * 1024 );
+					rl.rlim_cur = rl.rlim_max = MAX_STACK_SIZE;
+				} break;
+				case ( RLIMIT_NOFILE ): {
+					static int const MAX_OPEN_FILES( 1024 );
+					rl.rlim_cur = rl.rlim_max = MAX_OPEN_FILES;
+				} break;
+				case ( RLIMIT_NPROC ): {
+					static int const PROC_PER_CORE( 128 );
+					rl.rlim_cur = rl.rlim_max = static_cast<rlim_t>( nProc * PROC_PER_CORE );
+				} break;
+			}
+			if ( ::setrlimit( resource_, &rl ) != 0 ) {
+				::perror( SYSCALL_FAILURE );
+				::exit( 1 );
+			}
+			log( LOG_LEVEL::WARNING ) << message_ << " - setting limit automatically - " << rl.rlim_cur << endl;
+		} else {
+			HString message( message_ );
+			message.append( " - bailing out" );
+			::perror( message.raw() );
+			::exit( 1 );
+		}
 	}
+}
+
+void sanitize( bool autoSanity_ ) {
+	mode_t const modestUmask( S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IWOTH | S_IXOTH );
+	mode_t const lockOutUmask( S_IRUSR | S_IWUSR | S_IXUSR | modestUmask );
+	mode_t curUmask( ::umask( lockOutUmask ) );
+	if ( ::umask( curUmask ) != lockOutUmask ) {
+		::perror( SYSCALL_FAILURE );
+		exit( 1 );
+	}
+	if ( ( ~curUmask ) & ( S_IROTH | S_IWOTH | S_IXOTH ) ) {
+		if ( autoSanity_ ) {
+			if ( ::umask( modestUmask ) != curUmask ) {
+				::perror( SYSCALL_FAILURE );
+				exit( 1 );
+			}
+			log( LOG_LEVEL::WARNING ) << "running with too permissive umask - setting umask automatically" << endl;
+		} else {
+			::perror( "running with too permissive umask - bailing out" );
+			::exit( 1 );
+		}
+	}
+#ifndef __HOST_OS_TYPE_CYGWIN__
+#if ( HAVE_DECL_RLIMIT_AS == 1 )
+	ensure_limit( RLIMIT_AS, "unlimited VM size", autoSanity_ );
+#endif /* #if ( HAVE_DECL_RLIMIT_AS == 1 ) */
+	ensure_limit( RLIMIT_DATA, "unlimited data size", autoSanity_ );
+#endif /* #ifndef __HOST_OS_TYPE_CYGWIN__ */
+	ensure_limit( RLIMIT_STACK, "unlimited stack size", autoSanity_ );
+	ensure_limit( RLIMIT_NOFILE, "unlimited open descriptors count", autoSanity_ );
+#if ( HAVE_DECL_RLIMIT_NPROC == 1 )
+	ensure_limit( RLIMIT_NPROC, "unlimited process count", autoSanity_ );
+#endif /* #if ( HAVE_DECL_RLIMIT_NPROC == 1 ) */
+	return;
 }
 
 }
@@ -221,27 +288,14 @@ HCoreInitDeinit::HCoreInitDeinit( void ) {
 			::perror( "running with super-user privileges - bailing out" );
 			::exit( 1 );
 		}
-		mode_t const lockOutUmask( S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IWOTH | S_IXOTH );
-		mode_t curUmask( ::umask( lockOutUmask ) );
-		if ( ::umask( curUmask ) != lockOutUmask ) {
-			::perror( SYSCALL_FAILURE );
-			exit( 1 );
+		bool autoSanity( false );
+		if ( ::getenv( "YAAL_AUTO_SANITY" ) ) {
+			autoSanity = true;
 		}
-		if ( ( ~curUmask ) & ( S_IROTH | S_IWOTH | S_IXOTH )  ) {
-			::perror( "running with too permissive umask - bailing out" );
-			::exit( 1 );
-		}
-	#ifndef __HOST_OS_TYPE_CYGWIN__
-	#if ( HAVE_DECL_RLIMIT_AS == 1 )
-		ensure_limit( RLIMIT_AS, "unlimited VM size - bailing out" );
-	#endif /* #if ( HAVE_DECL_RLIMIT_AS == 1 ) */
-		ensure_limit( RLIMIT_DATA, "unlimited data size - bailing out" );
-	#endif /* #ifndef __HOST_OS_TYPE_CYGWIN__ */
-		ensure_limit( RLIMIT_STACK, "unlimited stack size - bailing out" );
-		ensure_limit( RLIMIT_NOFILE, "unlimited open descriptors count - bailing out" );
-	#if ( HAVE_DECL_RLIMIT_NPROC == 1 )
-		ensure_limit( RLIMIT_NPROC, "unlimited process count - bailing out" );
-	#endif /* #if ( HAVE_DECL_RLIMIT_NPROC == 1 ) */
+#ifdef YAAL_AUTO_SANITY
+		autoSanity = true;
+#endif
+		sanitize( autoSanity );
 		init_locale();
 		char* env( ::getenv( "YAAL_DEBUG" ) );
 		if ( env ) {

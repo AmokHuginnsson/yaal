@@ -30,11 +30,11 @@ git.branch          master
 destroot.umask      0022
 
 build.env           CCACHE_DIR=${workpath}/ccache
-build.cmd           umask 0077 && make PREFIX=${prefix} DESTDIR=${destroot} SYSCONFDIR=${prefix}/etc LOCALSTATEDIR=${prefix}/var debug release doc
+build.cmd           umask 0077 && make PREFIX=${prefix} DESTDIR=${destroot} SYSCONFDIR=${prefix}/etc LOCALSTATEDIR=${prefix}/var CONFIGURE="--enable-auto-sanity" debug release doc
 build.pre_args
 
 destroot.env        CCACHE_DIR=${workpath}/ccache
-destroot.cmd        umask 0077 && make PREFIX=${prefix} DESTDIR=${destroot} SYSCONFDIR=${prefix}/etc LOCALSTATEDIR=${prefix}/var install
+destroot.cmd        umask 0077 && make PREFIX=${prefix} DESTDIR=${destroot} SYSCONFDIR=${prefix}/etc LOCALSTATEDIR=${prefix}/var CONFIGURE="--enable-auto-sanity" install
 destroot.post_args
 
 pre-test {
