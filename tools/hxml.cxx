@@ -47,6 +47,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools.hxx"
 #include "streamtools.hxx"
 
+#define LIBXML_BROKEN_NS_VERSION 20708
+
 using namespace yaal::hcore;
 using namespace yaal::tools;
 
@@ -573,17 +575,27 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 				} else {
 					node_ = _domTree.create_new_root( HNode( this, node->line ) );
 				}
-				if ( node->nsDef ) {
-					xmlNs* nsDef( node->nsDef );
+				if ( node->nsDef
+#if LIBXML_VERSION <= LIBXML_BROKEN_NS_VERSION
+					|| node->ns
+#endif
+				) {
+					xmlNs* nsDef( node->nsDef
+#if LIBXML_VERSION <= LIBXML_BROKEN_NS_VERSION
+						? node->nsDef : node->ns
+#endif
+					);
 					while ( nsDef ) {
 						HNameSpace ns(
 							nsDef->prefix ? reinterpret_cast<char const*>( nsDef->prefix ) : "",
 							nsDef->href ? reinterpret_cast<char const*>( nsDef->href ) : ""
 						);
 						namespaces_t::iterator it( _namespaces.insert( ns ).first );
-						HNode::namespace_definitions_t& n( (**node_)._namespaceDefinitions );
-						if ( find( n.begin(), n.end(), &*it ) == n.end() ) {
-							n.push_back( &*it );
+						if ( node->nsDef ) {
+							HNode::namespace_definitions_t& n( (**node_)._namespaceDefinitions );
+							if ( find( n.begin(), n.end(), &*it ) == n.end() ) {
+								n.push_back( &*it );
+							}
 						}
 						nsDef = nsDef->next;
 					}
@@ -827,6 +839,7 @@ void HXml::generate_intermediate_form( generator_t generator_ ) const {
 			throw HXmlException( "Unable to end document." );
 		}
 	}
+	xmlReconciliateNs( doc.get(), xmlDocGetRootElement( doc.get() ) );
 	_xml->clear();
 	using yaal::swap;
 	swap( const_cast<doc_resource_t&>( _xml->_doc ), doc );
@@ -894,9 +907,21 @@ void HXml::dump_node( void* writer_p, HConstNodeProxy const& node_ ) const {
 	if ( nsIdx != HString::npos ) {
 		HString pref( nsIdx != HString::npos ? str.left( nsIdx ) : "" );
 		HString name( str.mid( nsIdx + 1 ) );
+#if LIBXML_VERSION <= LIBXML_BROKEN_NS_VERSION
+		HString href;
+		for ( HNameSpace const& ns : _namespaces ) {
+			if ( ns.prefix() == pref ) {
+				href = ns.href();
+				break;
+			}
+		}
+#endif
 		rc = xmlTextWriterStartElementNS(
 			writer.get(), reinterpret_cast<xmlChar const*>( pref.raw() ),
 			reinterpret_cast<xmlChar const*>( name.raw() ),
+#if LIBXML_VERSION <= LIBXML_BROKEN_NS_VERSION
+			! href.is_empty() ? reinterpret_cast<xmlChar const*>( href.raw() ) :
+#endif
 			nullptr
 		);
 	} else {
