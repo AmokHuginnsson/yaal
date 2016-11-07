@@ -24,6 +24,7 @@ struct rlimit {
 
 int getrusage( rusage_who_t, struct rusage* );
 int getrlimit( rlimit_resource_t, struct rlimit* );
+int setrlimit( rlimit_resource_t, struct rlimit const* );
 
 #ifdef YAAL_MSVCXX_SYS_STATVFS_H_INCLUDED
 #define close M_CONCAT( close, __COUNTER__ )

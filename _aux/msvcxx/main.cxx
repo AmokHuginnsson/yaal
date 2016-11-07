@@ -406,6 +406,11 @@ int getrlimit( rlimit_resource_t, struct rlimit* ) {
 	return ( 0 );
 }
 
+int setrlimit( rlimit_resource_t, struct rlimit const* ) {
+	errno = ENOSYS;
+	return ( 0 );
+}
+
 int long sysconf( int id_ ) {
 	int long result( -1 );
 	static int const PASS_BUF_SIZE( 1024 );

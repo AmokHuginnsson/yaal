@@ -49,6 +49,7 @@
 ?DEFAULT@COMPILE@HRegex@hcore@yaal@@2V?$HBitFlag@UCOMPILE@HRegex@hcore@yaal@@@34@B
 ?DEFAULT@COMPILER@HHuginn@tools@yaal@@2V?$HBitFlag@UCOMPILER@HHuginn@tools@yaal@@@hcore@4@B
 ?DEFAULT@FLAG@HSerial@tools@yaal@@2V?$HBitFlag@UFLAG@HSerial@tools@yaal@@@hcore@4@B
+?DEFAULT@GENERATOR@HXml@tools@yaal@@2V?$HBitFlag@UGENERATOR@HXml@tools@yaal@@@hcore@4@B
 ?DEFAULT@HTokenizer@hcore@yaal@@2V?$HBitFlag@VHTokenizer@hcore@yaal@@@23@B
 ?DEFAULT@MATCH@HRegex@hcore@yaal@@2V?$HBitFlag@UMATCH@HRegex@hcore@yaal@@@34@B
 ?DEFAULT@PARSER@HXml@tools@yaal@@2V?$HBitFlag@UPARSER@HXml@tools@yaal@@@hcore@4@B
@@ -69,6 +70,7 @@
 ?IGNORE_CASE@COMPILE@HRegex@hcore@yaal@@2V?$HBitFlag@UCOMPILE@HRegex@hcore@yaal@@@34@B
 ?IGNORE_CONVERSION_ERRORS@PARSER@HXml@tools@yaal@@2V?$HBitFlag@UPARSER@HXml@tools@yaal@@@hcore@4@B
 ?INCLUDE_EMPTY@HTokenizer@hcore@yaal@@2V?$HBitFlag@VHTokenizer@hcore@yaal@@@23@B
+?INDENT@GENERATOR@HXml@tools@yaal@@2V?$HBitFlag@UGENERATOR@HXml@tools@yaal@@@hcore@4@B
 ?KEEP_EMPTY@PARSER@HXml@tools@yaal@@2V?$HBitFlag@UPARSER@HXml@tools@yaal@@@hcore@4@B
 ?MANAGED_IO@SystemIO@msvcxx@@2HB
 ?MAXIMUM@AGGREGATE_TYPE@xmath@tools@yaal@@2V?$HBitFlag@UAGGREGATE_TYPE@xmath@tools@yaal@@@hcore@4@B
@@ -107,6 +109,7 @@
 ?STOP_BITS_1@FLAG@HSerial@tools@yaal@@2V?$HBitFlag@UFLAG@HSerial@tools@yaal@@@hcore@4@B
 ?STOP_BITS_2@FLAG@HSerial@tools@yaal@@2V?$HBitFlag@UFLAG@HSerial@tools@yaal@@@hcore@4@B
 ?STRIP_COMMENT@PARSER@HXml@tools@yaal@@2V?$HBitFlag@UPARSER@HXml@tools@yaal@@@hcore@4@B
+?STRIP_ENTITIES@GENERATOR@HXml@tools@yaal@@2V?$HBitFlag@UGENERATOR@HXml@tools@yaal@@@hcore@4@B
 ?SUM@AGGREGATE_TYPE@xmath@tools@yaal@@2V?$HBitFlag@UAGGREGATE_TYPE@xmath@tools@yaal@@@hcore@4@B
 ?TRUNCATE@OPEN@HFile@hcore@yaal@@2V?$HBitFlag@UOPEN@HFile@hcore@yaal@@@34@B
 ?VARIANCE@AGGREGATE_TYPE@xmath@tools@yaal@@2V?$HBitFlag@UAGGREGATE_TYPE@xmath@tools@yaal@@@hcore@4@B
@@ -118,6 +121,7 @@
 ?_attributeStatusBar_@hconsole@yaal@@3HA
 ?_autoRehash@HLog@hcore@yaal@@0_NA
 ?_baudRate_@tools@yaal@@3W4SPEED@HSerial@12@A
+?_binDigit_@hcore@yaal@@3VHCharacterClass@12@B
 ?_characterClass_@hcore@yaal@@3PAPBVHCharacterClass@12@A
 ?_collectorConnectionTimeOut_@tools@yaal@@3HA
 ?_commandComposeCharacter_@hconsole@yaal@@3DA
@@ -143,6 +147,7 @@
 ?_errMsgHStaticArray_@hcore@yaal@@3QBQBDB
 ?_errMsgHVector_@hcore@yaal@@3PAPBDA
 ?_exitStatus@HSignalService@tools@yaal@@0HA
+?_hexDigit_@hcore@yaal@@3VHCharacterClass@12@B
 ?_ignoreSignalSIGINT_@tools@yaal@@3_NA
 ?_ignoreSignalSIGQUIT_@tools@yaal@@3_NA
 ?_ignoreSignalSIGTSTP_@tools@yaal@@3_NA
@@ -181,6 +186,7 @@
 ?_maskLetters_@hconsole@yaal@@3QBDB
 ?_maskLoose_@hconsole@yaal@@3QBDB
 ?_mutex@HAlarm@tools@yaal@@0VHMutex@hcore@3@A
+?_octDigit_@hcore@yaal@@3VHCharacterClass@12@B
 ?_primes_@hcore@yaal@@3QBJB
 ?_resolveHostnames@HSocket@hcore@yaal@@2_NA
 ?_rfc2822DateTimeFormat_@hcore@yaal@@3QBDB
@@ -253,7 +259,9 @@
 __CTA1H
 __TI1H
 ___local_stdio_printf_options
+___local_stdio_scanf_options
 __vfprintf_l
+__vsscanf_l
 _acosl
 _asinl
 _atanl
@@ -274,6 +282,7 @@ _sinhl
 _sinl
 _snprintf
 _sqrtl
+_sscanf
 _tanhl
 _tanl
 _vfprintf
