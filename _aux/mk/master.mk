@@ -123,7 +123,7 @@ do-purge: mrproper-all
 		CMakeFiles CMakeCache.txt cmake_install.cmake install_manifest.txt \
 		tags GPATH GRTAGS GSYMS GTAGS make.log *.vcproj.* *.vcproj *.vcxproj.* *.vcxproj \
 		*.sln *.suo *.ncb *.sdf *.dir _UpgradeReport_Files UpgradeLog.XML debug release *.so \
-		ipch Win32 *.sln.cache build.stamp && \
+		ipch Win32 *.sln.cache build.stamp* && \
 	if [ "x${OSTYPE}" != "xcygwin" ] ; then /bin/rm -f Makefile ; fi
 
 purge: purge-local do-purge

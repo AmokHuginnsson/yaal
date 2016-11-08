@@ -258,6 +258,7 @@
 ?yellow@ansi@yaal@@3VHSequence@12@B
 __CTA1H
 __TI1H
+___isa_available_default
 ___local_stdio_printf_options
 ___local_stdio_scanf_options
 __vfprintf_l

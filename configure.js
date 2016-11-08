@@ -61,24 +61,27 @@ function boostInfo( install_path ) {
 	var fs = new ActiveXObject( "Scripting.FileSystemObject" );
 	var versions = [ "1.43", "1.42", "1.41", "1.40", "1.39", "1.38.0", "1.37.0", "1.36.0", "1.35.0" ];
 	for ( var idx in versions ) {
-		if ( this.exists )
+		if ( this.exists ) {
 			break;
+		}
 		for ( var k in keyPrefix ) {
 			var testPath = keyPrefix[k] + versions[ idx ] + "\\InstallRoot";
 			var boostKey = checkKey( testPath );
 			if ( boostKey.exists || ( install_path != null ) ) {
-				if ( install_path != null )
+				if ( install_path != null ) {
 					this.installPath = install_path;
-				else
+				} else {
 					this.installPath = boostKey.value;
+				}
 				this.version.TAG = versions[ idx ];
 				var dir = fs.GetFolder( this.installPath + "/lib" );
 				var fl = new Enumerator( dir.files );
 				var TAG = "boost_program_options";
 				var foundFirstOfAKind = false;
 				var names = new Array();
-				for ( ; ! fl.atEnd(); fl.moveNext() )
+				for ( ; ! fl.atEnd(); fl.moveNext() ) {
 					names.push( fl.item().name );
+				}
 				names.sort();
 				for ( var i in names ) {
 					var index = 0;
@@ -97,8 +100,9 @@ function boostInfo( install_path ) {
 							}
 							break;
 						}
-					} else if ( foundFirstOfAKind )
+					} else if ( foundFirstOfAKind ) {
 						break;
+					}
 				}
 				break;
 			}
@@ -137,8 +141,9 @@ function makeBoostDesc( boostInfo ) {
 
 function msg( str ) {
 	if ( str != null ) {
-		while ( ( str.length > 0 ) && ( ( str.charAt( str.length - 1 ) == '\n' ) || ( str.charAt( str.length - 1 ) == '\r' ) ) )
+		while ( ( str.length > 0 ) && ( ( str.charAt( str.length - 1 ) == '\n' ) || ( str.charAt( str.length - 1 ) == '\r' ) ) ) {
 			str = str.substr( 0, str.length - 1 );
+		}
 		if ( ! FAST ) {
 			globalMessageBuffer += ( str + "\n" );
 		} else if ( str.length > 0 ) {
@@ -165,8 +170,9 @@ if ( ! Array.prototype.filter ) {
 		for ( var i = 0; i < len; ++ i ) {
 			if ( i in this ) {
 				var val = this[i]; // in case fun mutates this
-				if ( fun.call( thisp, val, i, this ) )
+				if ( fun.call( thisp, val, i, this ) ) {
 					res.push( val );
+				}
 			}
 		}
 		return res;
@@ -199,6 +205,7 @@ try {
 	var SYSCONFDIR = "";
 	var LOCALSTATEDIR = "";
 	var DATADIR = "";
+	var BUILD_TYPE = "debug";
 	var SILENT = 0;
 	var VERBOSE = 0;
 	var VISUAL_STUDIO_VERSION = vcVersion();
@@ -240,6 +247,9 @@ try {
 			case "DATADIR":
 				DATADIR = parts[1];
 			break;
+			case "BUILD_TYPE":
+				BUILD_TYPE = parts[1];
+			break;
 			case "FAST":
 				FAST = 1;
 			break;
@@ -265,10 +275,11 @@ try {
 	}
 
 	if ( FAST == -1 ) {
-		if ( WScript.FullName.substr( WScript.FullName.length - 11 ).toLowerCase() == "cscript.exe" )
+		if ( WScript.FullName.substr( WScript.FullName.length - 11 ).toLowerCase() == "cscript.exe" ) {
 			FAST = 1;
-		else
+		} else {
 			FAST = 0;
+		}
 	}
 
 	if ( ( VISUAL_STUDIO_VERSION == null ) || ( VISUAL_STUDIO_VERSION == "" ) ) {
@@ -276,8 +287,9 @@ try {
 		terminate( 1 );
 	}
 	var eol = dirRoot.charAt( dirRoot.length - 1 );
-	if ( ( eol != "\\" ) && ( eol != "/" ) )
+	if ( ( eol != "\\" ) && ( eol != "/" ) ) {
 		dirRoot += "/";
+	}
 
 	msg( "Project root: " + dirRoot );
 	msg( "CMake generator: " + VISUAL_STUDIO_VERSION );
@@ -297,8 +309,9 @@ try {
 			+ "-" + boostInfo.version.lib;
 
 		eol = boostInfo.installPath.charAt( boostInfo.installPath.length - 1 );
-		if ( ( eol != "\\" ) && ( eol != "/" ) )
+		if ( ( eol != "\\" ) && ( eol != "/" ) ) {
 			boostInfo.installPath += "/";
+		}
 		boostInfo.installPath = boostInfo.installPath.replace( /\\/gm, "/" );
 
 		msg( makeBoostDesc( boostInfo ) );
@@ -306,21 +319,27 @@ try {
 
 	var shell = WScript.createObject( "WScript.Shell" );
 	var cmdline = "cmake -G \"" + VISUAL_STUDIO_VERSION + "\" ";
-	if ( VERBOSE )
+	cmdline += "-DCMAKE_BUILD_TYPE=" + BUILD_TYPE + " ";
+	if ( VERBOSE ) {
 		cmdline += "-DVERBOSE=1 ";
-	if ( EXTRA_INCLUDE_PATH != null )
+	}
+	if ( EXTRA_INCLUDE_PATH != null ) {
 		cmdline += ( "-DCMAKE_INCLUDE_PATH=" + EXTRA_INCLUDE_PATH + " " );
-	if ( EXTRA_LIBRARY_PATH != null )
+	}
+	if ( EXTRA_LIBRARY_PATH != null ) {
 		cmdline += ( "-DCMAKE_LIBRARY_PATH=" + EXTRA_LIBRARY_PATH + " " );
-	if ( BOOST_INSTALL_PATH != null )
+	}
+	if ( BOOST_INSTALL_PATH != null ) {
 		cmdline += ( "-DBOOST_INSTALL_PATH=" + BOOST_INSTALL_PATH + " " );
+	}
 	cmdline += CMAKELISTS_PATH;
 	envSys = shell.environment( "System" );
 	envProc = shell.environment( "Process" );
 	envUser = shell.environment( "User" );
 	envProc( "PATH" ) = ( envSys( "PATH" ) + ";" + envProc( "PATH" ) ).split( ";", 1000 ).filter( ( function( obj ){ return ( ! String( obj ).match( "cygwin|unix" ) ); } ) ).join( ";" );
-	if ( PREFIX.length > 0 )
+	if ( PREFIX.length > 0 ) {
 		envProc( "PREFIX" ) = PREFIX;
+	}
 	envProc( "SYSCONFDIR" ) = SYSCONFDIR;
 	envProc( "LOCALSTATEDIR" ) = LOCALSTATEDIR;
 	envProc( "DATADIR" ) = DATADIR;
@@ -337,17 +356,19 @@ try {
 	while ( ( ! ( eoo = cmd.stdout.AtEndOfStream ) ) || ( ! ( eoe = cmd.stderr.AtEndOfStream ) ) ) {
 		if ( ! eoo ) {
 			var out = cmd.stdout.readLine();
-			if ( FAST )
+			if ( FAST ) {
 				msg( out );
-			else
+			} else {
 				outBuf += ( out + "\n" );
+			}
 		}
 		if ( ! eoe ) {
 			var err = cmd.stderr.readLine();
-			if ( FAST )
+			if ( FAST ) {
 				msg( err );
-			else
+			} else {
 				errBuf += ( err + "\n" );
+			}
 		}
 	}
 	if ( ! FAST ) {
