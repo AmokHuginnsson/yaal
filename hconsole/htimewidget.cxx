@@ -35,11 +35,16 @@ namespace yaal {
 
 namespace hconsole {
 
+namespace {
+static int const TIME_WIDTH = 10; // " HH:MM:SS "
+}
+
 HTimeWidget::HTimeWidget( HWindow* parent_, int row_, int column_,
-		int height_, int width_, yaal::hcore::HString const& label_,
+		yaal::hcore::HString const& label_,
 		HWidgetAttributesInterface const& attr_ )
-	: HWidget( parent_, row_, column_, height_, width_, label_ ),
-	_time( HTime::TZ::LOCAL ), _selectedTime( HTime::TZ::LOCAL ) {
+	: HWidget( parent_, row_, column_, 1, TIME_WIDTH, label_ )
+	, _time( HTime::TZ::LOCAL )
+	, _selectedTime( HTime::TZ::LOCAL ) {
 	M_PROLOG
 	attr_.apply( *this );
 	return;
@@ -54,6 +59,9 @@ HTimeWidget::~HTimeWidget ( void ) {
 
 void HTimeWidget::do_paint( void ) {
 	M_PROLOG
+	HConsole& cons = HConsole::get_instance();
+	draw_label();
+	cons.mvprintf( _rowRaw, _columnRaw, " %s ", _time.string().c_str() );
 	return;
 	M_EPILOG
 }
@@ -67,6 +75,15 @@ int HTimeWidget::do_process_input( int code_ ) {
 bool HTimeWidget::do_click( mouse::OMouse& ) {
 	M_PROLOG
 	return ( false );
+	M_EPILOG
+}
+
+void HTimeWidget::do_set_data( HInfo const& data_ ) {
+	M_PROLOG
+	_time = data_.get_time();
+	_time.set_format( _iso8601TimeFormat_ );
+	_selectedTime = _time;
+	return;
 	M_EPILOG
 }
 

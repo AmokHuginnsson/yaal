@@ -46,13 +46,14 @@ private:
 	yaal::hcore::HTime _time;
 	yaal::hcore::HTime _selectedTime;
 public:
-	HTimeWidget( HWindow*, int, int, int, int, yaal::hcore::HString const&,
+	HTimeWidget( HWindow*, int, int, yaal::hcore::HString const&,
 			HWidgetAttributesInterface const& = HWidgetAttributesInterface() );
 	virtual ~HTimeWidget( void );
 protected:
 	virtual void do_paint( void ) override;
 	virtual int do_process_input( int ) override;
 	virtual bool do_click( mouse::OMouse& ) override;
+	virtual void do_set_data( HInfo const& ) override;
 };
 
 }
