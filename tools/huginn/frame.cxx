@@ -75,6 +75,7 @@ void HFrame::init(
 	_upCast = upCast_;
 	_result = _thread->runtime().none_value();
 	_number = _parent ? ( _parent->_number + ( ( type_ == TYPE::FUNCTION ) ? 1 : 0 ) ) : 1;
+	_state = STATE::NORMAL;
 	return;
 	M_EPILOG
 }
