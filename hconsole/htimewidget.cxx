@@ -36,7 +36,7 @@ namespace yaal {
 namespace hconsole {
 
 namespace {
-static int const TIME_WIDTH( sizeof ( " HH:MM:SS " ) - 1 );
+static int const TIME_WIDTH( static_cast<int>( sizeof ( " HH:MM:SS " ) ) - 1 );
 static int const IDX_HOUR( 0 );
 static int const IDX_MINUTE( 1 );
 static int const IDX_SECOND( 2 );
