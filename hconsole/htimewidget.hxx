@@ -45,6 +45,7 @@ public:
 private:
 	yaal::hcore::HTime _time;
 	yaal::hcore::HTime _selectedTime;
+	int _activeItemIdx;
 public:
 	HTimeWidget( HWindow*, int, int, yaal::hcore::HString const&,
 			HWidgetAttributesInterface const& = HWidgetAttributesInterface() );

@@ -36,7 +36,11 @@ namespace yaal {
 namespace hconsole {
 
 namespace {
-static int const TIME_WIDTH = 10; // " HH:MM:SS "
+static int const TIME_WIDTH( sizeof ( " HH:MM:SS " ) - 1 );
+static int const IDX_HOUR( 0 );
+static int const IDX_MINUTE( 1 );
+static int const IDX_SECOND( 2 );
+static int const TIME_ITEMS( 3 );
 }
 
 HTimeWidget::HTimeWidget( HWindow* parent_, int row_, int column_,
@@ -44,7 +48,8 @@ HTimeWidget::HTimeWidget( HWindow* parent_, int row_, int column_,
 		HWidgetAttributesInterface const& attr_ )
 	: HWidget( parent_, row_, column_, 1, TIME_WIDTH, label_ )
 	, _time( HTime::TZ::LOCAL )
-	, _selectedTime( HTime::TZ::LOCAL ) {
+	, _selectedTime( HTime::TZ::LOCAL )
+	, _activeItemIdx( IDX_HOUR ) {
 	M_PROLOG
 	attr_.apply( *this );
 	return;
@@ -62,13 +67,49 @@ void HTimeWidget::do_paint( void ) {
 	HConsole& cons = HConsole::get_instance();
 	draw_label();
 	cons.mvprintf( _rowRaw, _columnRaw, " %s ", _time.string().c_str() );
+	if ( _focused ) {
+		int val( _activeItemIdx == IDX_HOUR ? _time.get_hour() : ( _activeItemIdx == IDX_MINUTE ? _time.get_minute() : _time.get_second() ) );
+		set_attr_shortcut();
+		cons.mvprintf( _rowRaw, _columnRaw + 1 + _activeItemIdx * 3, "%02d", val );
+	}
 	return;
 	M_EPILOG
 }
 
 int HTimeWidget::do_process_input( int code_ ) {
 	M_PROLOG
-	return ( code_ );
+	int code( 0 );
+	switch ( code_ ) {
+		case ( KEY_CODES::LEFT ): {
+			-- _activeItemIdx;
+			if ( _activeItemIdx < 0 ) {
+				_activeItemIdx += TIME_ITEMS;
+			}
+		} break;
+		case ( KEY_CODES::RIGHT ): {
+			++ _activeItemIdx;
+			_activeItemIdx %= TIME_ITEMS;
+		} break;
+		case ( KEY_CODES::UP ):
+		case ( KEY_CODES::DOWN ): {
+			int mod( code_ == KEY_CODES::UP ? +1 : -1 );
+			switch ( _activeItemIdx ) {
+				case ( IDX_HOUR ):   _time.mod_hour( mod );   break;
+				case ( IDX_MINUTE ): _time.mod_minute( mod ); break;
+				case ( IDX_SECOND ): _time.mod_second( mod ); break;
+			}
+		} break;
+		default: {
+			code = code_;
+		}
+	}
+	if ( !code ) {
+		schedule_repaint();
+		if ( _window ) {
+			_window->status_bar()->clear( COLORS::FG_LIGHTGRAY );
+		}
+	}
+	return ( code );
 	M_EPILOG
 }
 
