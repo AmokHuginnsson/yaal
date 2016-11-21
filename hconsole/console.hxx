@@ -306,7 +306,7 @@ private:
 	friend class yaal::hcore::HDestructor<HConsole>;
 };
 
-typedef yaal::hcore::HExceptionT<HConsole, yaal::hcore::HSingletonException> HConsoleException;
+typedef yaal::hcore::HExceptionT<HConsole, yaal::hcore::HExceptionT<yaal::hcore::HSingleton<HConsole>>> HConsoleException;
 
 }
 

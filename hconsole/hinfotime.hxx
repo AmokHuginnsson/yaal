@@ -41,7 +41,6 @@ public:
 	typedef HInfoTime this_type;
 	typedef HInfo base_type;
 	HInfoTime( yaal::hcore::HTime& );
-	HInfoTime( HInfoTime const& );
 	virtual ~HInfoTime( void );
 protected:
 	virtual int long long do_get_integer( void ) const override;

@@ -785,24 +785,23 @@ bool volatile registered = register_creator();
 }
 
 HInfoString::HInfoString( HString& string_ )
-	: _data( string_ )
-	{ }
+	: _data( string_ ) {
+}
 
-HInfoString::HInfoString( HInfoString const& info_ )
-	: HInfo(), _data( info_._data )
-	{ }
+HInfoString::~HInfoString( void ) {
+}
 
-HInfoString::~HInfoString( void )
-	{ }
+HString const& HInfoString::do_get_string( void ) const {
+	return ( _data );
+}
 
-HString const& HInfoString::do_get_string( void ) const
-	{ return ( _data ); }
+int long long HInfoString::do_get_integer( void ) const {
+	return ( lexical_cast<int long long>( _data ) );
+}
 
-int long long HInfoString::do_get_integer( void ) const
-	{ return ( lexical_cast<int long long>( _data ) ); }
-
-double long HInfoString::do_get_real( void ) const
-	{ return ( lexical_cast<double long>( _data ) ); }
+double long HInfoString::do_get_real( void ) const {
+	return ( lexical_cast<double long>( _data ) );
+}
 
 HTime const& HInfoString::do_get_time( void ) const {
 	M_ASSERT( 0 && "impossible inplace conversion requested" );

@@ -685,7 +685,12 @@ void HConsole::printf( char const* format_, ... ) const {
 	M_PROLOG
 	va_list ap;
 	va_start( ap, format_ );
-	vprintf( format_, &ap );
+	try {
+		vprintf( format_, &ap );
+	} catch ( ... ) {
+		va_end( ap );
+		throw;
+	}
 	va_end( ap );
 	return;
 	M_EPILOG
@@ -696,7 +701,12 @@ void HConsole::mvprintf( int row_, int column_, char const* format_,
 	M_PROLOG
 	va_list ap;
 	va_start( ap, format_ );
-	vmvprintf( row_, column_, format_, &ap );
+	try {
+		vmvprintf( row_, column_, format_, &ap );
+	} catch ( ... ) {
+		va_end( ap );
+		throw;
+	}
 	va_end( ap );
 	return;
 	M_EPILOG
@@ -707,7 +717,12 @@ void HConsole::cmvprintf( int row_, int column_, int attribute_,
 	M_PROLOG
 	va_list ap;
 	va_start( ap, format_ );
-	vcmvprintf( row_, column_, attribute_, format_, &ap );
+	try {
+		vcmvprintf( row_, column_, attribute_, format_, &ap );
+	} catch ( ... ) {
+		va_end( ap );
+		throw;
+	}
 	va_end( ap );
 	return;
 	M_EPILOG

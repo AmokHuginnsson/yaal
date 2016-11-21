@@ -50,7 +50,6 @@ public:
 	typedef HInfoString this_type;
 	typedef HInfo base_type;
 	HInfoString( yaal::hcore::HString& );
-	HInfoString( HInfoString const& );
 	virtual ~HInfoString( void );
 protected:
 	virtual int long long do_get_integer( void ) const override;

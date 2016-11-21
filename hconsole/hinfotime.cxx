@@ -40,10 +40,6 @@ HInfoTime::HInfoTime( HTime& string_ )
 	: _data( string_ ) {
 }
 
-HInfoTime::HInfoTime( HInfoTime const& info_ )
-	: HInfo(), _data( info_._data ) {
-}
-
 HInfoTime::~HInfoTime( void ) {
 	return;
 }
