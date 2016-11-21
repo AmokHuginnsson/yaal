@@ -328,9 +328,9 @@ HWidget::ptr_t HDateWidgetCreator::do_new_instance( HWindow* window_, yaal::tool
 	HWidgetAttributes attrs;
 	prepare_attributes( attrs, node_ );
 	OResource r( get_resource( node_ ) );
-	HWidget* edit( new ( memory::yaal ) HDateWidget( window_, r._row, r._column, r._label, attrs ) );
-	apply_resources( edit->get_pointer(), node_ );
-	return ( edit->get_pointer() );
+	HDateWidget* date( create_widget<HDateWidget>( window_, r._row, r._column, r._label, attrs ) );
+	apply_resources( date->get_pointer(), node_ );
+	return ( date->get_pointer() );
 	M_EPILOG
 }
 

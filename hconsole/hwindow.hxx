@@ -28,8 +28,8 @@ Copyright:
 #define YAAL_HCONSOLE_HWINDOW_HXX_INCLUDED 1
 
 #include "hcore/hpointer.hxx"
-#include "hconsole/hwidget.hxx"
 #include "hconsole/hwidgetlist.hxx"
+#include "hconsole/hwidget.hxx"
 #include "hconsole/hhandler.hxx"
 #include "hconsole/hstatusbarwidget.hxx"
 #include "hconsole/hwindowfactory.hxx"
@@ -83,7 +83,7 @@ public:
 	 */
 	bool handler_search( HEvent const& );
 	int click( mouse::OMouse& );
-	int add_widget( HWidget::ptr_t, int );
+	void add_widget( HWidget::ptr_t );
 	HStatusBarWidget::ptr_t& status_bar( void );
 	hcore::HString get_command( void );
 	bool is_initialised( void ) const;
@@ -143,6 +143,13 @@ private:
 		return ( TYPE::WINDOW );
 	}
 };
+
+template<typename widget_t, typename window_t, typename... args_t>
+widget_t* create_widget( window_t* window_, args_t&&... args_ ) {
+	HWidget::ptr_t w( yaal::hcore::make_pointer<widget_t>( window_, yaal::forward<args_t>( args_ )... ) );
+	window_->add_widget( w );
+	return ( dynamic_cast<widget_t*>( w.raw() ) );
+}
 
 }
 

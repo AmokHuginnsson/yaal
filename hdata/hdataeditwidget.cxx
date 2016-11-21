@@ -155,10 +155,10 @@ HWidget::ptr_t HDataEditWidgetCreator::do_new_instance( HWindow* window_, yaal::
 	M_ENSURE( window );
 	prepare_attributes( attrs, node_ );
 	OResource r( get_resource( node_ ) );
-	HDataEditWidget* list( new ( memory::yaal ) HDataEditWidget( window, r._row, r._column, r._height, r._width, r._label, attrs ) );
-	apply_resources( list->get_pointer(), node_ );
-	apply_role( window, list, node_ );
-	return ( list->get_pointer() );
+	HDataEditWidget* edit( create_widget<HDataEditWidget>( window, r._row, r._column, r._height, r._width, r._label, attrs ) );
+	apply_resources( edit->get_pointer(), node_ );
+	apply_role( window, edit, node_ );
+	return ( edit->get_pointer() );
 	M_EPILOG
 }
 

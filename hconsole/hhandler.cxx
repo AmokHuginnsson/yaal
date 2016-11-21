@@ -37,10 +37,10 @@ namespace yaal {
 namespace hconsole {
 
 HHandler::HHandler( int keyHandlers_, int commandHandlers_ )
-	: _preprocessHandlers( keyHandlers_ ),
-		_postprocessHandlers( keyHandlers_ ),
-		_commandHandlers( commandHandlers_ ),
-		_command() {
+	: _preprocessHandlers( keyHandlers_ )
+	, _postprocessHandlers( keyHandlers_ )
+	, _commandHandlers( commandHandlers_ )
+	, _command() {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -52,7 +52,7 @@ HHandler::~HHandler ( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
-int HHandler::register_preprocess_handler( int codeCount_, int const* codes_,
+void HHandler::register_preprocess_handler( int codeCount_, int const* codes_,
 		HANDLER_t HANDLER ) {
 	M_PROLOG
 	if ( codes_ ) {
@@ -62,11 +62,11 @@ int HHandler::register_preprocess_handler( int codeCount_, int const* codes_,
 	} else {
 		_preprocessHandlers[ codeCount_ ] = HANDLER;
 	}
-	return ( 0 );
+	return;
 	M_EPILOG
 }
 
-int HHandler::register_postprocess_handler( int codeCount_, int const* codes_,
+void HHandler::register_postprocess_handler( int codeCount_, int const* codes_,
 		HANDLER_t HANDLER ) {
 	M_PROLOG
 	if ( codes_ ) {
@@ -76,7 +76,7 @@ int HHandler::register_postprocess_handler( int codeCount_, int const* codes_,
 	} else {
 		_postprocessHandlers[ codeCount_ ] = HANDLER;
 	}
-	return ( 0 );
+	return;
 	M_EPILOG
 }
 

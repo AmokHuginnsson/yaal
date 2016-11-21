@@ -57,10 +57,10 @@ HWidget::ptr_t HDataDateWidgetCreator::do_new_instance( HWindow* window_, yaal::
 	M_ENSURE( window );
 	prepare_attributes( attrs, node_ );
 	OResource r( get_resource( node_ ) );
-	HDataDateWidget* list( new ( memory::yaal ) HDataDateWidget( window, r._row, r._column, r._height, r._width, r._label, attrs ) );
-	apply_resources( list->get_pointer(), node_ );
-	apply_role( window, list, node_ );
-	return ( list->get_pointer() );
+	HDataDateWidget* date( create_widget<HDataDateWidget>( window, r._row, r._column, r._height, r._width, r._label, attrs ) );
+	apply_resources( date->get_pointer(), node_ );
+	apply_role( window, date, node_ );
+	return ( date->get_pointer() );
 	M_EPILOG
 }
 

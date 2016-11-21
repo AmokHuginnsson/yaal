@@ -98,7 +98,7 @@ HStatusBarWidget* HWindow::init_bar( char const* label_ ) {
 
 HStatusBarWidget* HWindow::do_init_bar( char const* label_ ) {
 	M_PROLOG
-	return ( new ( memory::yaal ) HStatusBarWidget( this, label_ ) );
+	return ( create_widget<HStatusBarWidget>( this, label_ ) );
 	M_EPILOG
 }
 
@@ -134,13 +134,15 @@ bool HWindow::process_input( HKeyPressEvent const& keyPress_ ) {
 	M_EPILOG
 }
 
-int HWindow::add_widget( HWidget::ptr_t widget_, int shortCut_ ) {
+void HWindow::add_widget( HWidget::ptr_t widget_ ) {
 	M_PROLOG
-	if ( _preprocessHandlers.find( shortCut_ ) != _preprocessHandlers.end() )
-		M_THROW( _( "shortcut occupied" ), shortCut_ );
+	int shortCut( KEY<>::meta_r( widget_->get_shortcut() ) );
+	if ( _preprocessHandlers.find( shortCut ) != _preprocessHandlers.end() ) {
+		M_THROW( _( "shortcut occupied" ), shortCut );
+	}
 	_widgets.add_widget( widget_ );
-	register_postprocess_handler( shortCut_, nullptr, call( &HWindow::handler_jump_direct, this, _1 ) );
-	return ( 0 );
+	register_postprocess_handler( shortCut, nullptr, call( &HWindow::handler_jump_direct, this, _1 ) );
+	return;
 	M_EPILOG
 }
 
@@ -150,10 +152,12 @@ HStatusBarWidget::ptr_t& HWindow::status_bar( void ) {
 
 void HWindow::paint( void ) {
 	M_PROLOG
-	if ( _needRepaint )
+	if ( _needRepaint ) {
 		HConsole::get_instance().clear_terminal();
-	if ( ( !! _statusBar ) && ( _statusBar != *_focusedChild ) )
+	}
+	if ( ( !! _statusBar ) && ( _statusBar != *_focusedChild ) ) {
 		_statusBar->paint();
+	}
 	_widgets.refresh_all( _needRepaint );
 	_needRepaint = false;
 	return;
@@ -235,12 +239,15 @@ bool HWindow::handler_search( HEvent const& event_ ) {
 
 int HWindow::click( mouse::OMouse& mouse_ ) {
 	M_PROLOG
-	if ( ! mouse_._buttons )
-		return ( 1 );
-	if ( (*_focusedChild) == _statusBar )
-		return ( 1 );
-	_widgets.hit_test_all( mouse_ );
-	return ( 0 );
+	int ret( 0 );
+	if ( ! mouse_._buttons ) {
+		ret = 1;
+	} else if ( (*_focusedChild) == _statusBar ) {
+		ret = 1;
+	} else {
+		_widgets.hit_test_all( mouse_ );
+	}
+	return ( ret );
 	M_EPILOG
 }
 

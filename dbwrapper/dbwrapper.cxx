@@ -37,13 +37,11 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/hstring.hxx"
 #include "hcore/hprogramoptionshandler.hxx"
 #include "hcore/hcore.hxx"
-#include "hconsole/hconsole.hxx"
 #include "tools/tools.hxx"
 #include "dbwrapper.hxx"
 #include "db_driver_loader.hxx"
 
 using namespace yaal::hcore;
-using namespace yaal::hconsole;
 using namespace yaal::tools;
 
 namespace yaal {

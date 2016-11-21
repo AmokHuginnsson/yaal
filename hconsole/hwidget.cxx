@@ -104,9 +104,6 @@ HWidget::HWidget( HWindow* parent_, int row_, int column_,
 		_labelPosition = LABEL::POSITION::SIDE_BY_SIDE;
 	}
 	set_attributes( attr_ );
-	if ( _window ) {
-		_window->add_widget( HWidget::ptr_t( this ), KEY<>::meta_r( _label[ _shortcutIndex ] ) );
-	}
 	return;
 	M_EPILOG
 }
@@ -517,6 +514,10 @@ yaal::hcore::HString const& HWidget::resource_id( void ) const {
 
 yaal::hcore::HString const& HWidget::get_label( void ) const {
 	return ( _label );
+}
+
+int HWidget::get_shortcut( void ) const {
+	return ( _label[_shortcutIndex] );
 }
 
 HWindow* HWidget::get_window( void ) const {

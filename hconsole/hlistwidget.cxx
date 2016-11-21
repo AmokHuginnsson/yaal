@@ -1584,7 +1584,7 @@ HWidget::ptr_t HListWidgetCreator::do_new_instance( HWindow* window_, yaal::tool
 	HListWidgetAttributes attrs;
 	prepare_attributes( attrs, node_ );
 	OResource r( get_resource( node_ ) );
-	HWidget* list( new ( memory::yaal ) HListWidget( window_, r._row, r._column, r._height, r._width, r._label, attrs ) );
+	HListWidget* list( create_widget<HListWidget>( window_, r._row, r._column, r._height, r._width, r._label, attrs ) );
 	apply_resources( list->get_pointer(), node_ );
 	return ( list->get_pointer() );
 	M_EPILOG

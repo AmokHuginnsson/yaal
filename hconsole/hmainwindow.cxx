@@ -63,13 +63,16 @@ void HMainWindow::do_init( void ) {
 		return;
 	}
 	HWindow::do_init();
-	_menu = new ( memory::yaal ) HMenuWidget( this, 1, 1, -2, - cons.get_width() / 2 - 1, "&Menu" );
+	_menu = create_widget<HMenuWidget>( this, 1, 1, -2, - cons.get_width() / 2 - 1, "&Menu" );
 	_menu->enable( true );
 	_menu->set_focus();
-	HWindowListWidget* windowList = new ( memory::yaal ) HWindowListWidget( this, 1,
-			- cons.get_width() / 2 + 1, - 2, - 1, "&Opened window list",
+	HWindowListWidget* windowList(
+		create_widget<HWindowListWidget>(
+			this, 1, - cons.get_width() / 2 + 1, - 2, - 1, "&Opened window list",
 			make_pointer<HAsIsValueListModel<HWindow::ptr_t> >( _windowList ),
-			_foregroundWindow );
+			_foregroundWindow
+		)
+	);
 	windowList->add_column( -1, make_resource<HListWidget::HColumnInfo>( "&Okno", 1 ) );
 	windowList->enable( true );
 	_menu->init( _tuiProcess );

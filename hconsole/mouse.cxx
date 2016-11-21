@@ -77,16 +77,17 @@ int hunt_tty( int offset_ ) {
 	/* this hack allows to guess current controlling virtual terminal screen */
 	int vC( 0 );
 	char const* ttyName( ttyname( STDIN_FILENO ) );
-	if ( ttyName && ! ::strncmp( ttyName, "/dev/ttyv", static_cast<size_t>( 8 + offset_ ) ) )
+	if ( ttyName && ! ::strncmp( ttyName, "/dev/ttyv", static_cast<size_t>( 8 + offset_ ) ) ) {
 		vC = lexical_cast<int>( ttyName + 8 + offset_ );
-	else {
+	} else {
 		ttyName = ::getenv( "STY" );
 		if ( ttyName ) {
 			char const* ptr = nullptr;
-			if ( ( ptr = ::strstr( ttyName, ".tty" ) ) )
+			if ( ( ptr = ::strstr( ttyName, ".tty" ) ) ) {
 				vC = lexical_cast<int>( ptr + 4 + offset_ );
-			else if ( ( ptr = ::strstr( ttyName, ".pts" ) ) )
+			} else if ( ( ptr = ::strstr( ttyName, ".pts" ) ) ) {
 				vC = lexical_cast<int>( ptr + 4 + offset_ );
+			}
 		} else {
 			throw HConsoleException( "cannot find controlling virtual console", errno );
 		}
@@ -140,9 +141,9 @@ int console_mouse_get( OMouse& mouse_ ) {
 	M_PROLOG
 	mouse_info mouse;
 	mouse.operation = MOUSE_GETINFO;
-	if ( ::ioctl( _mouse_, FWD_CONS_MOUSECTL, &mouse ) < 0 )
+	if ( ::ioctl( _mouse_, FWD_CONS_MOUSECTL, &mouse ) < 0 ) {
 		throw HMouseException( "cannot get mouse data", errno );
-	else {
+	} else {
 		mouse_._buttons = mouse.u.data.buttons;
 		mouse_._row = mouse.u.data.y / 16;
 		mouse_._column = mouse.u.data.x / 8;
@@ -153,8 +154,9 @@ int console_mouse_get( OMouse& mouse_ ) {
 
 int console_mouse_close( void ) {
 	M_PROLOG
-	if ( ! _mouse_ )
+	if ( ! _mouse_ ) {
 		throw HMouseException( "mouse not opened", errno );
+	}
 	TEMP_FAILURE_RETRY( hcore::system::close( _mouse_ ) );
 	_mouse_ = 0;
 	return ( 0 );
@@ -187,8 +189,9 @@ int console_mouse_open( void ) {
 int console_mouse_get( OMouse& mouse_ ) {
 	M_PROLOG
 	Gpm_Event event;
-	if ( Gpm_GetEvent( &event ) != 1 )
+	if ( Gpm_GetEvent( &event ) != 1 ) {
 		throw HMouseException( _( "cannot retrieve event") , errno );
+	}
 	mouse_._buttons = 0;
 	mouse_._buttons |= ( ( event.buttons & GPM_B_LEFT ) ? MOUSE_BITS::BUTTON::ONE : 0 );
 	mouse_._buttons |= ( ( event.buttons & GPM_B_MIDDLE ) ? MOUSE_BITS::BUTTON::TWO : 0 );
@@ -203,8 +206,9 @@ int console_mouse_get( OMouse& mouse_ ) {
 
 int console_mouse_close( void ) {
 	M_PROLOG
-	while ( Gpm_Close() )
+	while ( Gpm_Close() ) {
 		;
+	}
 	return ( 0 );
 	M_EPILOG
 }
@@ -214,8 +218,9 @@ int console_mouse_close( void ) {
 int console_mouse_open( void ) {
 	M_PROLOG
 	volatile int a( 1 );
-	if ( a )
+	if ( a ) {
 		throw HMouseException( _( "console mouse support not compiled" ) );
+	}
 	return ( 0 );
 	M_EPILOG
 }
@@ -223,8 +228,9 @@ int console_mouse_open( void ) {
 int console_mouse_get( OMouse& ) {
 	M_PROLOG
 	volatile int a( 1 );
-	if ( a )
+	if ( a ) {
 		throw HMouseException( _( "console mouse support not compiled" ) );
+	}
 	return ( 0 );
 	M_EPILOG
 }
@@ -251,8 +257,7 @@ int x_mouse_open( void ) {
 	mmask_t mouseMask( mousemask( desiredMouseMask, nullptr ) );
 	if ( ! mouseMask ) {
 		throw HMouseException( "mousemask() returned 0", errno );
-	}
-	else if ( ( mouseMask & strictlyRequiredMask ) < strictlyRequiredMask ) {
+	} else if ( ( mouseMask & strictlyRequiredMask ) < strictlyRequiredMask ) {
 		HString error;
 		error.format( "could not set up appropriate mask: B1C = %lu, B2C = %lu, B3C = %lu, B1DC = %lu",
 				mouseMask & BUTTON1_CLICKED, mouseMask & BUTTON2_CLICKED,
@@ -261,8 +266,9 @@ int x_mouse_open( void ) {
 	}
 	mouseinterval( 200 );
 #if defined( HAVE_DECL_HAS_MOUSE ) && ( HAVE_DECL_HAS_MOUSE == 1 )
-	if ( ! has_mouse() )
+	if ( ! has_mouse() ) {
 		throw HMouseException( "Mouse driver failed to initialize properly." );
+	}
 #endif /* #if defined( HAVE_DECL_HAS_MOUSE ) && ( HAVE_DECL_HAS_MOUSE == 1 ) */
 	return ( 0 );
 	M_EPILOG
@@ -271,9 +277,9 @@ int x_mouse_open( void ) {
 int x_mouse_get( OMouse& mouse_ ) {
 	M_PROLOG
 	MEVENT mouse;
-	if ( getmouse( &mouse ) != OK )
+	if ( getmouse( &mouse ) != OK ) {
 		throw HMouseException( "cannot get mouse data", errno );
-	else {
+	} else {
 		mouse_._buttons = 0;
 		mouse_._buttons |= ( ( mouse.bstate & BUTTON1_CLICKED ) ? MOUSE_BITS::BUTTON::ONE : 0 );
 		mouse_._buttons |= ( ( mouse.bstate & BUTTON1_DOUBLE_CLICKED ) ? MOUSE_BITS::BUTTON::ONE_2 : 0 );

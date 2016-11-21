@@ -91,7 +91,7 @@ void HDataWindow::do_init( void ) {
 
 HStatusBarWidget* HDataWindow::do_init_bar( char const* label_ ) {
 	M_PROLOG
-	return ( new ( memory::yaal ) HDataStatusBarWidget( this, label_ ) );
+	return ( create_widget<HDataStatusBarWidget>( this, label_ ) );
 	M_EPILOG
 }
 

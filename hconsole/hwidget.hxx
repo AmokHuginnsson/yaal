@@ -39,8 +39,8 @@ namespace yaal {
 namespace hconsole {
 
 class HWindow;
-
 class HWidget;
+
 class HWidgetAttributesInterface {
 public:
 	virtual ~HWidgetAttributesInterface( void ) {}
@@ -384,6 +384,12 @@ public:
  * \return Current label text.
  */
 	yaal::hcore::HString const& get_label( void ) const;
+
+/*! \brief Get shortcut key for this widget.
+ *
+ * \return Shortcut key code for this widget.
+ */
+	int get_shortcut( void ) const;
 
 /*! \brief Get this widget parent window (owner).
  *

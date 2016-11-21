@@ -52,19 +52,24 @@ char const _maskExtended_[]     = "^[0-9a-zA-Z±¡æÆêÊ³£ñÑóÓ¶¦¼¬¿¯\\.\\(\\) -]*$";
 char const _maskLoose_[]        = ".*";
 char const* const _maskDefault_ = _maskLetters_;
 
-HEditWidget::HEditWidget( HWindow* parent_,
-		int row_, int column_, int height_, int width_,
-		yaal::hcore::HString const& label_, HWidgetAttributesInterface const& attr_ )
-					: HWidget( parent_, row_, column_, height_,
-							width_, label_, attr_ ),
-					_replace( false ),
-					_multiLine( height_ > 1 ? true : false ),
-					_readOnly( false ), _rightAligned( false ),
-					_password( false ),
-					_maxStringSize( 127 ), _cursorPosition ( 0 ),
-					_widgetOffset( 0 ), _maxHistoryLevel( 8 ),
-					_mask(), _string(),
-					_infoString( _string ), _history(), _historyIt() {
+HEditWidget::HEditWidget(
+	HWindow* parent_, int row_, int column_, int height_, int width_,
+	yaal::hcore::HString const& label_, HWidgetAttributesInterface const& attr_
+) : HWidget( parent_, row_, column_, height_, width_, label_, attr_ )
+	, _replace( false )
+	, _multiLine( height_ > 1 ? true : false )
+	, _readOnly( false )
+	, _rightAligned( false )
+	, _password( false )
+	, _maxStringSize( 127 )
+	, _cursorPosition ( 0 )
+	, _widgetOffset( 0 )
+	, _maxHistoryLevel( 8 )
+	, _mask()
+	, _string()
+	, _infoString( _string )
+	, _history()
+	, _historyIt() {
 	M_PROLOG
 	attr_.apply( *this );
 	_varTmpBuffer.reserve( _maxStringSize );
@@ -160,14 +165,16 @@ void HEditWidget::set_bits( int const* maxlen,
 	M_PROLOG
 	bool wantRepaint( false );
 	if ( maxlen ) {
-		if ( *maxlen < 1 )
+		if ( *maxlen < 1 ) {
 			M_THROW( _( "buffer size is ridiculously low" ), *maxlen );
+		}
 		_maxStringSize = *maxlen;
 	}
 	if ( val ) {
 		int length( static_cast<int>( val->get_length() ) );
-		if ( length > _maxStringSize )
+		if ( length > _maxStringSize ) {
 			M_THROW( _( "initial value too big" ), length - _maxStringSize );
+		}
 		set_text( *val );
 	}
 	if ( mask ) {
@@ -207,8 +214,9 @@ int HEditWidget::find_eow( int length_ ) {
 	int index = static_cast<int>( _string.find_other_than( _wordSeparator_, _widgetOffset + _cursorPosition ) );
 	if ( index >= 0 ) {
 		index = static_cast<int>( _string.find_one_of( _wordSeparator_, index ) );
-		if ( index < 0 )
+		if ( index < 0 ) {
 			index = length_;
+		}
 	}
 	return ( index );
 	M_EPILOG
@@ -571,8 +579,9 @@ void HEditWidget::set_text( HString const& string_ ) {
 	if ( length >= _widthRaw ) {
 		_cursorPosition = _widthRaw - 1;
 		_widgetOffset = ( length - _widthRaw ) + 1;
-	} else
+	} else {
 		_cursorPosition = length;
+	}
 	schedule_repaint();
 	return;
 	M_EPILOG
@@ -602,25 +611,25 @@ bool HEditWidget::do_click( mouse::OMouse & mouse_ ) {
 }
 
 HEditWidgetAttributes::HEditWidgetAttributes( void )
-	: HWidgetAttributes(),
-	_replace( false ),
-	_replaceSet( false ),
-	_multiLine( false ),
-	_multiLineSet( false ),
-	_readOnly( false ),
-	_readOnlySet( false ),
-	_rightAligned( false ),
-	_rightAlignedSet( false ),
-	_password( false ),
-	_passwordSet( false ),
-	_maxStringSize( 127 ),
-	_maxStringSizeSet( false ),
-	_maxHistoryLevel( 8 ),
-	_maxHistoryLevelSet( false ),
-	_mask( _maskDefault_ ),
-	_maskSet( false ),
-	_text( _maskDefault_ ),
-	_textSet( false ) {
+	: HWidgetAttributes()
+	, _replace( false )
+	, _replaceSet( false )
+	, _multiLine( false )
+	, _multiLineSet( false )
+	, _readOnly( false )
+	, _readOnlySet( false )
+	, _rightAligned( false )
+	, _rightAlignedSet( false )
+	, _password( false )
+	, _passwordSet( false )
+	, _maxStringSize( 127 )
+	, _maxStringSizeSet( false )
+	, _maxHistoryLevel( 8 )
+	, _maxHistoryLevelSet( false )
+	, _mask( _maskDefault_ )
+	, _maskSet( false )
+	, _text( _maskDefault_ )
+	, _textSet( false ) {
 	return;
 }
 
@@ -722,7 +731,7 @@ HWidget::ptr_t HEditWidgetCreator::do_new_instance( HWindow* window_, yaal::tool
 	HEditWidgetAttributes attrs;
 	prepare_attributes( attrs, node_ );
 	OResource r( get_resource( node_ ) );
-	HWidget* edit( new ( memory::yaal ) HEditWidget( window_, r._row, r._column, r._height, r._width, r._label, attrs ) );
+	HEditWidget* edit( create_widget<HEditWidget>( window_, r._row, r._column, r._height, r._width, r._label, attrs ) );
 	apply_resources( edit->get_pointer(), node_ );
 	return ( edit->get_pointer() );
 	M_EPILOG
