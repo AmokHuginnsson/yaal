@@ -861,25 +861,31 @@ void HExpression::store_character( char value_, HFrame* frame_, int ) {
 }
 
 void HExpression::do_execute( huginn::HThread* thread_ ) const {
-	M_PROLOG
-	M_ASSERT( _operations.is_empty() );
-	HFrame* f( thread_->current_frame() );
-	f->start_expression();
-	for ( execution_step_t const& e : _executionSteps ) {
-		e( f );
-		if ( ! thread_->can_continue() ) {
-			break;
+	try {
+		M_ASSERT( _operations.is_empty() );
+		HFrame* f( thread_->current_frame() );
+		f->start_expression();
+		for ( execution_step_t const& e : _executionSteps ) {
+			e( f );
+			if ( ! thread_->can_continue() ) {
+				break;
+			}
 		}
-	}
-	if ( f->state() != HFrame::STATE::EXCEPTION ) {
-		f->set_result( yaal::move( f->values().top() ) );
-		M_ASSERT( f->ip() == static_cast<int>( _instructions.get_size() ) );
-		f->values().pop();
-	} else {
-		f->values().clear();
-	}
-	f->end_expression();
-	return;
+		if ( f->state() != HFrame::STATE::EXCEPTION ) {
+			f->set_result( yaal::move( f->values().top() ) );
+			M_ASSERT( f->ip() == static_cast<int>( _instructions.get_size() ) );
+			f->values().pop();
+		} else {
+			f->values().clear();
+		}
+		f->end_expression();
+		return;
+	} catch ( HHuginn::HHuginnRuntimeException const& e ) {
+		if ( e.position() <= 0 ) {
+			throw HHuginn::HHuginnRuntimeException( e.message(), position() );
+		} else {
+			throw;
+		}
 	M_EPILOG
 }
 
