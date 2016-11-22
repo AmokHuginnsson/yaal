@@ -52,23 +52,20 @@ namespace {
 
 ODBConnector::DRIVER::enum_t db_driver_from_string( HString const& dbType_ ) {
 	M_PROLOG
-	ODBConnector::DRIVER::enum_t driver( ODBConnector::DRIVER::NONE );
-	if ( ! ( strcasecmp( dbType_, "none" )
-				&& strcasecmp( dbType_, "null" )
-				&& strcasecmp( dbType_, "dummy" ) ) )
-		driver = ODBConnector::DRIVER::NONE;
-	else if ( ! strcasecmp( dbType_, "SQLite3" ) )
+	ODBConnector::DRIVER::enum_t driver( ODBConnector::DRIVER::DEFAULT );
+	if ( ! strcasecmp( dbType_, "SQLite3" ) ) {
 		driver = ODBConnector::DRIVER::SQLITE3;
-	else if ( ! strcasecmp( dbType_, "PostgreSQL" ) )
+	} else if ( ! strcasecmp( dbType_, "PostgreSQL" ) ) {
 		driver = ODBConnector::DRIVER::POSTGRESQL;
-	else if ( ! strcasecmp( dbType_, "MySQL" ) )
+	} else if ( ! strcasecmp( dbType_, "MySQL" ) ) {
 		driver = ODBConnector::DRIVER::MYSQL;
-	else if ( ! strcasecmp( dbType_, "Firebird" ) )
+	} else if ( ! strcasecmp( dbType_, "Firebird" ) ) {
 		driver = ODBConnector::DRIVER::FIREBIRD;
-	else if ( ! strcasecmp( dbType_, "Oracle" ) )
+	} else if ( ! strcasecmp( dbType_, "Oracle" ) ) {
 		driver = ODBConnector::DRIVER::ORACLE;
-	else
+	} else {
 		throw HDataBaseException( "unsupported database type: " + dbType_ );
+	}
 	return ( driver );
 	M_EPILOG
 }
@@ -81,8 +78,9 @@ HDataBase::ptr_t connect( yaal::hcore::HString const& dsn_ ) {
 	M_PROLOG
 	char const SCHEMA_SEPARATOR[] = "://";
 	int dbTypeEnd( static_cast<int>( dsn_.find( SCHEMA_SEPARATOR ) ) );
-	if ( dbTypeEnd == HString::npos )
+	if ( dbTypeEnd == HString::npos ) {
 		throw HDataBaseException( "bad database uri: " + dsn_ );
+	}
 	HString dbType( dsn_.raw(), dbTypeEnd );
 	dbType.lower();
 	ODBConnector::DRIVER::enum_t driver( db_driver_from_string( dbType ) );
@@ -95,19 +93,22 @@ HDataBase::ptr_t connect( yaal::hcore::HString const& dsn_ ) {
 		HString userPass( connectionString.raw(), userPassEnd );
 		int userEnd( static_cast<int>( userPass.find( ':' ) ) );
 		userName = userPass.left( userEnd );
-		if ( userEnd != HString::npos )
+		if ( userEnd != HString::npos ) {
 			password = userPass.substr( userEnd + 1 );
+		}
 		dbHostSpec = connectionString.substr( userPassEnd + 1 );
-	} else
+	} else {
 		dbHostSpec = connectionString;
+	}
 	int hostSpecEnd( static_cast<int>( dbHostSpec.find( '/' ) ) );
 	HString hostSpec;
 	HString database;
 	if ( hostSpecEnd != HString::npos ) {
 		hostSpec = dbHostSpec.left( hostSpecEnd );
 		database = dbHostSpec.substr( hostSpecEnd + 1 );
-	} else
+	} else {
 		throw HDataBaseException( "bad database uri: " + dsn_ );
+	}
 	HDataBase::ptr_t db( HDataBase::get_connector( driver ) );
 	db->connect( database, userName, password, hostSpec );
 	return ( db );
@@ -117,7 +118,7 @@ HDataBase::ptr_t connect( yaal::hcore::HString const& dsn_ ) {
 }
 
 bool _logSQL_ = false;
-ODBConnector::DRIVER::enum_t _dataBaseDriver_ = ODBConnector::DRIVER::NONE;
+ODBConnector::DRIVER::enum_t _dataBaseDriver_ = ODBConnector::DRIVER::DEFAULT;
 
 namespace {
 

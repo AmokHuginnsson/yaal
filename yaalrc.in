@@ -258,7 +258,7 @@ log_sql true
 
 # select data base driver
 # accepted drivers are:
-# SQLite3, PostgreSQL, MySQL, Firebird, Oracle, null, none
+# SQLite3, PostgreSQL, MySQL, Firebird, Oracle
 # last two drivers disables database interface completely,
 # it can by useful for programs that does not use databases
 # or for debugging purposes

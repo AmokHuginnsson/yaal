@@ -42,8 +42,9 @@ struct ODBLink {
 	void* _conn;
 	bool _valid;
 	ODBLink( void )
-		: _conn( nullptr ), _valid( false )
-		{}
+		: _conn( nullptr )
+		, _valid( false ) {
+	}
 	void clear( void ) {
 		_conn = nullptr;
 		_valid = false;
@@ -59,8 +60,6 @@ struct ODBConnector {
 	struct DRIVER {
 		typedef enum {
 			DEFAULT = -1,
-			NONE = 0,
-			DUMMY = 0,
 			SQLITE3,
 			POSTGRESQL,
 			MYSQL,
