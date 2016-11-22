@@ -234,6 +234,9 @@ select( iterator_t first_, iterator_t last_, int long kth_ ) {
 	M_ENSURE( first_ != last_ );
 	aux_t aux( first_, last_ );
 	M_ENSURE( aux.get_size() == aux.get_requested_size() );
+	if ( aux.get_requested_size() == 0 ) {
+		return ( *first_ );
+	}
 	M_ENSURE( ( kth_ >= 0 ) && ( kth_ < aux.get_requested_size() ) );
 	value_t* left( aux.begin() );
 	value_t* right( aux.end() - 1 );

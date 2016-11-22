@@ -55,7 +55,11 @@ private:
 public:
 	template<typename iter_t>
 	HAuxiliaryBuffer( iter_t first_, iter_t last_ )
-		: _data( nullptr ), _size( 0 ), _requestedSize( 0 ), _allocated( 0 ), _initialized( false ) {
+		: _data( nullptr )
+		, _size( 0 )
+		, _requestedSize( 0 )
+		, _allocated( 0 )
+		, _initialized( false ) {
 		init( first_, last_ );
 		return;
 	}
