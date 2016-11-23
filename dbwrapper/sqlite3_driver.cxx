@@ -195,7 +195,10 @@ void* yaal_sqlite3_db_fetch_query_result( ODBLink& dbLink_, char const* query_ )
 			query_, &data, &result->_rows,
 			&result->_columns, &errmsg );
 	result->_data = data;
-	result->_errorMessage = errmsg;
+	if ( errmsg ) {
+		result->_errorMessage = errmsg;
+		sqlite3_free( errmsg );
+	}
 	return ( result );
 }
 M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink&, char const* );
