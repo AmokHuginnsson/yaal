@@ -81,7 +81,8 @@ HRecordSet::ptr_t HDataBase::execute_query( HString const& query_, HRecordSet::C
 	}
 	void* result( cursor_ == HRecordSet::CURSOR::RANDOM_ACCESS ? (_connector->db_fetch_query_result)( _dbLink, query_.raw() ) : (_connector->db_query)( _dbLink, query_.raw() ) );
 	if ( (_connector->dbrs_errno)( _dbLink, result ) ) {
-		HString message( "SQL error: "_ys.append( (_connector->dbrs_error)( _dbLink, result ) ) );
+		HString message( "SQL execute error: '"_ys.append( query_ ).append( "': " ).append( (_connector->dbrs_error)( _dbLink, result ) ) );
+		log( LOG_LEVEL::ERROR ) << message << endl;
 		if ( result ) {
 			if ( cursor_ == HRecordSet::CURSOR::RANDOM_ACCESS ) {
 				(_connector->rs_free_query_result)( result );
@@ -102,8 +103,12 @@ HQuery::ptr_t HDataBase::prepare_query( HString const& query_ ) {
 	}
 	void* result( (_connector->db_prepare_query)( _dbLink, query_.raw() ) );
 	if ( (_connector->dbrs_errno)( _dbLink, result ) ) {
-		log( LOG_LEVEL::ERROR ) << "SQL prepare error: " << query_ << endl;
-		throw HSQLException( HString( "SQL error: " ) + (_connector->dbrs_error)( _dbLink, result ) );
+		HString message( "SQL prepare error: '"_ys.append( query_ ).append( "': " ).append( (_connector->dbrs_error)( _dbLink, result ) ) );
+		log( LOG_LEVEL::ERROR ) << message << endl;
+		if ( result ) {
+			(_connector->rs_free_cursor)( result );
+		}
+		throw HSQLException( message );
 	}
 	return ( make_pointer<HQuery>( get_pointer(), _connector, query_, result ) );
 	M_EPILOG
