@@ -42,6 +42,9 @@ using namespace yaal::dbwrapper;
 
 namespace {
 static char const LAST_INSERT_ID[] = "SELECT CAST( RDB$GET_CONTEXT('USER_SESSION', 'LAST_INSERT_ID') AS BIGINT ) FROM RDB$DATABASE;";
+bool is_err( ISC_STATUS const* status_ ) {
+	return ( ( status_[0] == 1 ) && ( status_[1] != 0 ) );
+}
 }
 
 struct OFirebird {
@@ -144,8 +147,9 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& d
 	*pdpb ++ = static_cast<char>( passLen );
 	::strncpy( pdpb, password_.raw(), static_cast<size_t>( passLen ) );
 	isc_attach_database( db->_status, dbLen, dataBase_.raw(), &db->_db, dpbLen, dpb );
-	if ( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ) )
+	if ( ! is_err( db->_status ) ) {
 		dbLink_._valid = true;
+	}
 	dbLink_._conn = db.release();
 	return ( dbLink_._valid );
 }
@@ -156,7 +160,7 @@ M_EXPORT_SYMBOL void db_disconnect( ODBLink& dbLink_ ) {
 	M_ASSERT( db );
 	if ( db->_db ) {
 		isc_detach_database( db->_status, &db->_db );
-		M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ) );
+		M_ENSURE( ! is_err( db->_status ) );
 	}
 	M_SAFE( delete db );
 	dbLink_.clear();
@@ -202,7 +206,7 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 	res->_ok = false;
 	do {
 		isc_start_transaction( db->_status, &res->_tr, 1, &db->_db, sizeof ( OFirebird::_tpb ), OFirebird::_tpb );
-		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
+		if ( is_err( db->_status ) ) {
 			break;
 		}
 		XSQLDA descIn;
@@ -212,13 +216,13 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 		descIn.version = SQLDA_VERSION1;
 		descOut.version = SQLDA_VERSION1;
 		isc_dsql_allocate_statement( db->_status, &db->_db, &res->_stmt );
-		M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ) );
+		M_ENSURE( ! is_err( db->_status ) );
 		isc_dsql_prepare( res->_status, &res->_tr, &res->_stmt, 0, query_, 3, &descOut ); /* Dialect version 3. */
-		if ( ( res->_status[0] == 1 ) && ( res->_status[1] != 0 ) ) {
+		if ( is_err( res->_status ) ) {
 			break;
 		}
 		isc_dsql_describe_bind( res->_status, &res->_stmt, 1, &descIn );
-		if ( ( res->_status[0] == 1 ) && ( res->_status[1] != 0 ) ) {
+		if ( is_err( res->_status ) ) {
 			break;
 		}
 		if ( descIn.sqld > 0 ) {
@@ -227,7 +231,7 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 			in->version = SQLDA_VERSION1;
 			in->sqln = in->sqld = descIn.sqld;
 			isc_dsql_describe_bind( res->_status, &res->_stmt, 1, in );
-			if ( ( res->_status[0] == 1 ) && ( res->_status[1] != 0 ) ) {
+			if ( is_err( res->_status ) ) {
 				break;
 			}
 			int i( 0 );
@@ -237,7 +241,7 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 			}
 		}
 		isc_dsql_describe( res->_status, &res->_stmt, 1, &descOut );
-		if ( ( res->_status[0] == 1 ) && ( res->_status[1] != 0 ) ) {
+		if ( is_err( res->_status ) ) {
 			break;
 		}
 		if ( descOut.sqld > 0 ) {
@@ -246,7 +250,7 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 			out->version = SQLDA_VERSION1;
 			out->sqld = out->sqln = descOut.sqld;
 			isc_dsql_describe( res->_status, &res->_stmt, 1, out );
-			if ( ( res->_status[0] == 1 ) && ( res->_status[1] != 0 ) ) {
+			if ( is_err( res->_status ) ) {
 				break;
 			}
 			int i( 0 );
@@ -277,6 +281,9 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 		res->_stmt = 0;
 		isc_rollback_transaction( db->_status, &res->_tr );
 		res->_tr = 0;
+		if ( ! is_err( db->_status ) && is_err( res->_status ) ) {
+			copy( begin( res->_status ), end( res->_status ), begin( db->_status ) );
+		}
 	}
 	return ( res->_ok ? res.release() : nullptr );
 }
@@ -295,7 +302,7 @@ void* firebird_query_execute( ODBLink& dbLink_, void* data_ ) {
 		} else {
 			isc_dsql_execute( res->_status, &res->_tr, &res->_stmt, 1, nullptr );
 		}
-		if ( ( res->_status[0] == 1 ) && ( res->_status[1] != 0 ) ) {
+		if ( is_err( res->_status ) ) {
 			res->_ok = false;
 		}
 	}
@@ -360,11 +367,14 @@ M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query
 		isc_dsql_free_statement( db->_status, &res->_stmt, res->_ok ? DSQL_close : DSQL_drop );
 		if ( res->_ok ) {
 			isc_commit_transaction( db->_status, &res->_tr );
-			M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, res ) );
+			M_ENSURE( ! is_err( db->_status ), dbrs_error( dbLink_, res ) );
 		} else {
 			res->_stmt = 0;
 			isc_rollback_transaction( db->_status, &res->_tr );
 			res->_tr = 0;
+		}
+		if ( ! is_err( db->_status ) && is_err( res->_status ) ) {
+			copy( begin( res->_status ), end( res->_status ), begin( db->_status ) );
 		}
 	}
 	return ( res && res->_ok ? rs.release() : nullptr );
@@ -382,7 +392,7 @@ M_EXPORT_SYMBOL void rs_free_query_result( void* data_ ) {
 	}
 	if ( ! res->_useCount ) {
 		res->_stmt = 0;
-		M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
+		M_ENSURE( ! is_err( db->_status ), dbrs_error( res->_dbLink, res ) );
 		M_SAFE( delete res );
 	}
 	return;
@@ -438,14 +448,14 @@ void firebird_rs_free_cursor( void* data_ ) {
 	}
 	if ( ! res->_useCount ) {
 		res->_stmt = 0;
-		M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
+		M_ENSURE( ! is_err( db->_status ), dbrs_error( res->_dbLink, res ) );
 		if ( res->_ok ) {
 			isc_commit_transaction( db->_status, &res->_tr );
 		} else {
 			isc_rollback_transaction( db->_status, &res->_tr );
 		}
 		res->_tr = 0;
-		M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
+		M_ENSURE( ! is_err( db->_status ), dbrs_error( res->_dbLink, res ) );
 		M_SAFE( delete res );
 	}
 	return;
@@ -495,7 +505,7 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink& /*dbLink_*/, void* dataR_ 
 	char countBuffer[COUNT_BUF_SIZE];
 	::memset( countBuffer, isc_info_end, COUNT_BUF_SIZE );
 	isc_dsql_sql_info( res->_status, &res->_stmt, static_cast<int short>( sizeof ( items ) ), items, static_cast<int short>( sizeof ( countBuffer ) ), countBuffer );
-	M_ENSURE( ( res->_status[0] != 1 ) || ( res->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
+	M_ENSURE( ! is_err( res->_status ), dbrs_error( res->_dbLink, res ) );
 	char statementType( 0 );
 	char const* p( countBuffer );
 	if ( *p == isc_info_sql_stmt_type ) {
@@ -550,7 +560,7 @@ M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 	short nullInd( 0 );
 	do {
 		isc_start_transaction( db->_status, &tr, 1, &db->_db, sizeof ( OFirebird::_tpb ), OFirebird::_tpb );
-		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
+		if ( is_err( db->_status ) ) {
 			break;
 		}
 		XSQLDA desc;
@@ -559,35 +569,35 @@ M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 		desc.sqln = 1;
 		desc.sqld = 1;
 		isc_dsql_allocate_statement( db->_status, &db->_db, &stmt );
-		M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ) );
+		M_ENSURE( ! is_err( db->_status ) );
 		isc_dsql_prepare( db->_status, &tr, &stmt, 0, LAST_INSERT_ID, 3, &desc ); /* Dialect version 3. */
-		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
+		if ( is_err( db->_status ) ) {
 			break;
 		}
 		isc_dsql_describe( db->_status, &stmt, 1, &desc );
-		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
+		if ( is_err( db->_status ) ) {
 			break;
 		}
 		var.sqlind = &nullInd;
 		var.sqldata = reinterpret_cast<char*>( &lastInsertId );
 		isc_dsql_execute( db->_status, &tr, &stmt, 1, nullptr );
-		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
+		if ( is_err( db->_status ) ) {
 			break;
 		}
 		isc_dsql_fetch( db->_status, &stmt, 1, &desc );
-		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
+		if ( is_err( db->_status ) ) {
 			break;
 		}
 		ok = true;
 	} while ( false );
 	isc_dsql_free_statement( db->_status, &stmt, DSQL_drop );
-	M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, nullptr ) );
+	M_ENSURE( ! is_err( db->_status ), dbrs_error( dbLink_, nullptr ) );
 	if ( ! ok ) {
 		isc_rollback_transaction( db->_status, &tr );
-		M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, nullptr ) );
+		M_ENSURE( ! is_err( db->_status ), dbrs_error( dbLink_, nullptr ) );
 	} else {
 		isc_commit_transaction( db->_status, &tr );
-		M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, nullptr ) );
+		M_ENSURE( ! is_err( db->_status ), dbrs_error( dbLink_, nullptr ) );
 	}
 	return ( nullInd != -1 ? static_cast<int long>( lastInsertId ) : -1 );
 }

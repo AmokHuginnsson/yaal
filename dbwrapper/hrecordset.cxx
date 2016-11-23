@@ -233,11 +233,30 @@ HRecordSet::HIterator& HRecordSet::HIterator::operator ++ ( void ) {
 	M_EPILOG
 }
 
+HRecordSet::HIterator& HRecordSet::HIterator::operator -- ( void ) {
+	M_PROLOG
+	M_ASSERT( _owner );
+	M_ENSURE( _cursorPosition != INVALID_CURSOR );
+	M_ENSURE( _owner->_cursor == HRecordSet::CURSOR::RANDOM_ACCESS );
+	-- _cursorPosition;
+	return ( *this );
+	M_EPILOG
+}
+
 HRecordSet::HIterator HRecordSet::HIterator::operator ++ ( int ) {
 	M_PROLOG
 	M_ASSERT( _owner );
 	HIterator it( *this );
 	operator ++ ();
+	return ( it );
+	M_EPILOG
+}
+
+HRecordSet::HIterator HRecordSet::HIterator::operator -- ( int ) {
+	M_PROLOG
+	M_ASSERT( _owner );
+	HIterator it( *this );
+	operator -- ();
 	return ( it );
 	M_EPILOG
 }
