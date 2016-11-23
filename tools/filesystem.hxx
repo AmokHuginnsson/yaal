@@ -56,6 +56,7 @@ void remove( path_t const& );
 void rename( path_t const&, path_t const& );
 path_t dirname( path_t const& );
 path_t basename( path_t const& );
+path_t readlink( path_t const& );
 
 namespace path {
 

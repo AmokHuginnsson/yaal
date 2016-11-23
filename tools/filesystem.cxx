@@ -229,6 +229,26 @@ path_t basename( path_t const& path_ ) {
 	M_EPILOG
 }
 
+path_t readlink( path_t const& path_ ) {
+	M_PROLOG
+	HString path;
+	int len( 0 );
+	static int const MIN_BUF_SIZE( 8 );
+	int alloc( MIN_BUF_SIZE );
+	HChunk buffer;
+	do {
+		alloc <<= 1;
+		buffer.realloc( alloc, HChunk::STRATEGY::EXACT );
+		len = static_cast<int>( ::readlink( path_.raw(), buffer.get<char>(), static_cast<size_t>( alloc ) ) );
+	} while ( len >= alloc );
+	if ( len < 0 ) {
+		throw HFileSystemException( "readlink failed: `"_ys.append( path_ ).append( "'" ) );
+	}
+	path.assign( buffer.get<char>(), len );
+	return ( path );
+	M_EPILOG
+}
+
 void remove( path_t const& path_ ) {
 	int err( ::unlink( path_.c_str() ) );
 	if ( ( err != 0 ) && ( errno != ENOENT ) ) {
