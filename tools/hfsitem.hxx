@@ -59,6 +59,7 @@ public:
 	yaal::hcore::HTime accessed( void ) const;
 	yaal::hcore::HString get_user( void ) const;
 	yaal::hcore::HString get_group( void ) const;
+	u64_t id( void ) const;
 	int get_permissions( void ) const;
 	int get_uid( void ) const;
 	int get_gid( void ) const;

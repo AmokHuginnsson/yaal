@@ -92,11 +92,20 @@ int long HFSItem::size( void ) const {
 	M_EPILOG
 }
 
+u64_t HFSItem::id( void ) const {
+	M_PROLOG
+	struct stat s;
+	do_stat( &s );
+	return ( static_cast<u64_t>( s.st_ino ) );
+	M_EPILOG
+}
+
 int HFSItem::get_permissions( void ) const {
 	M_PROLOG
 	struct stat s;
 	do_stat( &s );
-	return ( static_cast<int>( s.st_mode ) );
+	static u32_t const FILE_MODE_BITS( 07777 );
+	return ( static_cast<int>( s.st_mode & FILE_MODE_BITS ) );
 	M_EPILOG
 }
 
