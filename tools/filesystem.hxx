@@ -57,6 +57,8 @@ void rename( path_t const&, path_t const& );
 path_t dirname( path_t const& );
 path_t basename( path_t const& );
 path_t readlink( path_t const& );
+void chmod( path_t const&, u32_t );
+void chdir( path_t const& );
 
 namespace path {
 

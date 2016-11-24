@@ -295,6 +295,24 @@ void create_directory( path_t const& path_, u32_t mode_, DIRECTORY_MODIFICATION 
 	M_EPILOG
 }
 
+void chmod( path_t const& path_, u32_t mode_ ) {
+	M_PROLOG
+	if ( ::chmod( path_.raw(), static_cast<mode_t>( mode_ ) ) < 0 ) {
+		throw HFileSystemException( "chmod failed: `"_ys.append( path_ ).append( "'" ) );
+	}
+	return;
+	M_EPILOG
+}
+
+void chdir( path_t const& path_ ) {
+	M_PROLOG
+	if ( ::chdir( path_.raw() ) < 0 ) {
+		throw HFileSystemException( "chdir failed: `"_ys.append( path_ ).append( "'" ) );
+	}
+	return;
+	M_EPILOG
+}
+
 void remove_directory( path_t const& path_, DIRECTORY_MODIFICATION directoryModification_ ) {
 	HString path( normalize_path( path_ ) );
 	M_ENSURE( ! path.is_empty() );
