@@ -223,21 +223,6 @@ struct dirent* readdir( DIR* dir_ ) {
 	return ( found ? &dir_->_payload : nullptr );
 }
 
-int telldir( DIR* dir_ ) {
-	return ( dir_->_index );
-}
-
-void seekdir( DIR* dir_, int pos_ ) {
-	while ( true ) {
-		if ( dir_->_index == pos_ ) {
-			break;
-		}
-		if ( ! readdir( dir_ ) ) {
-			break;
-		}
-	}
-}
-
 PSID get_base_sid( char* buffer_, int size_ ) {
 	/* Open the access token associated with the calling process. */
 	HANDLE hToken( nullptr );

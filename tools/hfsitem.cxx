@@ -220,6 +220,7 @@ HFSItem::HIterator HFSItem::end( void ) {
 HFSItem::HIterator::HIterator( HString const& path_ )
 	: _path( path_ )
 	, _dir( nullptr )
+	, _pos( -1 )
 	, _inode( 0 )
 	, _name()
 	, _item( "" ) {
@@ -235,13 +236,19 @@ HFSItem::HIterator::HIterator( HString const& path_ )
 HFSItem::HIterator::HIterator( HIterator const& it_ )
 	: _path( it_._path )
 	, _dir( nullptr )
+	, _pos( -1 )
 	, _inode( it_._inode )
 	, _name( it_._name )
 	, _item( "" ) {
 	M_PROLOG
 	if ( it_._dir ) {
 		_dir = ::opendir( _path.raw() );
-		seekdir( static_cast<DIR*>( _dir ), telldir( static_cast<DIR*>( it_._dir ) ) );
+		while ( _pos < it_._pos ) {
+			operator ++();
+			if ( _inode == it_._inode ) {
+				break;
+			}
+		}
 		_item.set_path( it_._item._path, it_._item._nameLen );
 	}
 	return;
@@ -271,6 +278,7 @@ void HFSItem::HIterator::swap( HFSItem::HIterator& o ) {
 		using yaal::swap;
 		swap( _path, o._path );
 		swap( _dir, o._dir );
+		swap( _pos, o._pos );
 		swap( _inode, o._inode );
 		swap( _name, o._name );
 		swap( _item, o._item );
@@ -302,6 +310,7 @@ HFSItem::HIterator& HFSItem::HIterator::operator++( void ) {
 	do {
 		result = readdir( static_cast<DIR*>( _dir ) );
 	} while ( result && ( ! ( ::memcmp( result->d_name, ".\0", 2 ) && ::memcmp( result->d_name, "..\0", 3 ) ) ) );
+	++ _pos;
 	if ( result ) {
 		_inode = result->d_ino;
 		_name = result->d_name;

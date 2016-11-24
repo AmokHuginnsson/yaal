@@ -20,8 +20,6 @@ struct DIR;
 DIR* opendir( char const* );
 int closedir( DIR* );
 struct dirent* readdir( struct DIR* );
-int telldir( DIR* );
-void seekdir( DIR*, int );
 
 #endif /* not YAAL_MSVCXX_DIRENT_H_INCLUDED */
 
