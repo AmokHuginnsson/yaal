@@ -57,6 +57,7 @@ static int const _XOPEN_NAME_MAX = 2048;
 #define gai_strerror msvcxx::windows_strerror
 
 uid_t getuid( void );
+int readlink( char const*, char*, size_t );
 int setenv( char const*, char const*, int );
 int unsetenv( char const* );
 int long sysconf( int );

@@ -257,6 +257,13 @@ uid_t getuid( void ) {
 	return ( uid );
 }
 
+int readlink( char const* path_, char* buffer_, size_t size_ ) {
+	int len( static_cast<int>( yaal::min( ::strlen( path_ ),  size_ - 1 ) ) );
+	::strncpy( buffer_, path_, static_cast<size_t>( len ) );
+	buffer_[len] = 0;
+	return ( len );
+}
+
 bool get_system_account_name( int id_, char* buf_, int size_ ) {
 	static int const SID_SIZE( 128 );
 	static int const TOKEN_USER_SIZE( sizeof ( TOKEN_USER ) + SID_SIZE );

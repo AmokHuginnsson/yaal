@@ -349,6 +349,7 @@ int unix_stat( char const* path_, struct stat* s_ ) {
 			owner_t owner( get_path_owner( path ) );
 			s_->st_uid = owner.first;
 			s_->st_gid = owner.second;
+			s_->st_ctime = s_->st_mtime = yaal::max( s_->st_ctime, s_->st_mtime );
 		}
 	}
 	return ( res );
