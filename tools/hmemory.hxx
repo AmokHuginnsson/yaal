@@ -41,8 +41,8 @@ public:
 	void* get_memory( void ) const {
 		return ( do_get_memory() );
 	}
-	void commit( int long size_ ) {
-		do_commit( size_ );
+	void commit( int long valid_, int long read_, int long write_, int long size_ ) {
+		do_commit( valid_, read_, write_, size_ );
 		return;
 	}
 	virtual ~HMemoryHandlingStrategyInterface( void ) {
@@ -51,7 +51,7 @@ public:
 protected:
 	virtual int long do_get_size( void ) const = 0;
 	virtual void* do_get_memory( void ) const = 0;
-	virtual void do_commit( int long ) = 0;
+	virtual void do_commit( int long, int long, int long, int long ) = 0;
 };
 
 class HMemoryObserver : public HMemoryHandlingStrategyInterface {
@@ -64,7 +64,8 @@ public:
 	 * \param size - size of memory block in octets.
 	 */
 	HMemoryObserver( void* ptr, int long size )
-		: _block( ptr ), _size( size ) {
+		: _block( ptr )
+		, _size( size ) {
 		M_ASSERT( size > 0 );
 		M_ASSERT( ptr );
 	}
@@ -75,8 +76,9 @@ protected:
 	virtual void* do_get_memory( void ) const override {
 		return ( _block );
 	}
-	virtual void do_commit( int long size_ ) override {
-		M_ENSURE( size_ <= _size );
+	virtual void do_commit( int long valid_, int long M_DEBUG_CODE( read_ ), int long M_DEBUG_CODE( write_ ), int long size_ ) override {
+		M_ASSERT( ( valid_ == ( write_ - read_ ) ) || ( valid_ == ( ( _size - read_ ) + write_ ) ) );
+		M_ENSURE( size_ <= ( _size - valid_ ) );
 		return;
 	}
 private:
@@ -99,8 +101,10 @@ protected:
 	virtual void* do_get_memory( void ) const override {
 		return ( _chunk.raw() );
 	}
-	virtual void do_commit( int long size_ ) override {
-		_chunk.realloc( _size = size_ );
+	virtual void do_commit( int long M_DEBUG_CODE( valid_ ), int long M_DEBUG_CODE( read_ ), int long write_, int long size_ ) override {
+		M_ASSERT( write_ >= read_ );
+		M_ASSERT( valid_ == ( write_ - read_ ) );
+		_chunk.realloc( _size = write_ + size_ );
 	}
 private:
 	HMemoryProvider( HMemoryProvider const& ) = delete;
