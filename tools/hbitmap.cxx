@@ -96,28 +96,35 @@ HBitmap::HBitmap( int long size_ )
 	M_EPILOG
 }
 
-HBitmap::HBitmap( HBitmap const& b )
-	: _allocatedBytes( 0 ), _size( 0 ), _data( nullptr ) {
+HBitmap::HBitmap( HBitmap const& b_ )
+	: _allocatedBytes( 0 )
+	, _size( 0 )
+	, _data( nullptr ) {
 	M_PROLOG
-	operator = ( b );
+	if ( b_._allocatedBytes ) {
+		copy( b_.block(), b_._size );
+	} else {
+		use( const_cast<void*>( b_.block() ), b_._size );
+	}
 	return;
 	M_EPILOG
 }
 
-HBitmap& HBitmap::operator = ( HBitmap const& b ) {
+HBitmap& HBitmap::operator = ( HBitmap const& b_ ) {
 	M_PROLOG
-	if ( &b != this ) {
-		if ( b._allocatedBytes )
-			copy( b.block(), b._size );
-		else {
+	if ( &b_ != this ) {
+		if ( b_._allocatedBytes ) {
+			copy( b_.block(), b_._size );
+		} else {
 			/*
 			 * The source is just reference to some external memory,
 			 * so it is meant to be writeable.
 			 */
-			if ( b._size )
-				use( const_cast<void*>( b.block() ), b._size );
-			else
+			if ( b_._size ) {
+				use( const_cast<void*>( b_.block() ), b_._size );
+			} else {
 				clear();
+			}
 		}
 	}
 	return ( *this );
@@ -156,10 +163,11 @@ void HBitmap::ensure_pool( int long newSize ) {
 	M_PROLOG
 	_size = newSize;
 	int long newPoolSize = octets_for_bits( _size );
-	if ( _allocatedBytes )
+	if ( _allocatedBytes ) {
 		static_cast<HChunk*>( _data )->realloc( newPoolSize );
-	else
+	} else {
 		_data = new ( memory::yaal ) HChunk( newPoolSize, HChunk::STRATEGY::GEOMETRIC );
+	}
 	_allocatedBytes = newPoolSize;
 	M_ENSURE( _data );
 	return;
@@ -207,28 +215,50 @@ u8_t _maskBitKeepRight_[ 8 ] = {
 	obinary<000000001>::value
 };
 
-void HBitmap::fill( int long offset, int long amount, bool bit ) {
+void HBitmap::fill( int long offset_, int long amount_, bool bit_ ) {
 	M_PROLOG
-	int long byteOffset = octets_for_bits( offset );
-	int long til = offset + amount;
-	int long byteAmount = ( octets_for_bits( offset + amount ) - byteOffset ) - ( ( offset & 7 ) ? 1 : 0 ) - ( ( til & 7 ) ? 1 : 0 );
+	M_ENSURE( ( offset_ >= 0 ) && ( amount_ >= 0 ) );
+	int long lastBit( offset_ + amount_ - 1 );
+	M_ENSURE( lastBit < _size );
+	if ( amount_ == 0 ) {
+		return;
+	}
+	int long firstByte( offset_ >> 3 );
+	int long lastByte( lastBit >> 3 );
+	int long byteAmount( ( lastByte - firstByte ) - 1 );
 	u8_t* data( static_cast<u8_t*>( block() ) );
-	if ( byteAmount > 0 ) {
-		u8_t filler( static_cast<u8_t>( bit ? 0xff : 0 ) );
-		::memset( data + byteOffset, filler, static_cast<size_t>( byteAmount ) );
-	}
-	if ( offset & 7 ) {
-		if ( bit ) {
-			data[ byteOffset - 1 ] = static_cast<u8_t>( data[ byteOffset - 1 ] | _maskBitKeepRight_[ ( offset & 7 ) - 1 ] );
+	if ( lastByte != firstByte ) {
+		if ( offset_ & 7 ) {
+			if ( bit_ ) {
+				data[ firstByte ] = static_cast<u8_t>( data[ firstByte ] | _maskBitKeepRight_[ ( offset_ & 7 ) ] );
+			} else {
+				data[ firstByte ] = static_cast<u8_t>( data[ firstByte ] & _maskBitKeepLeft_[ ( offset_ & 7 ) - 1 ] );
+			}
+			++ firstByte;
 		} else {
-			data[ byteOffset - 1 ] = static_cast<u8_t>( data[ byteOffset - 1 ] & _maskBitKeepLeft_[ ( offset & 7 ) - 1 ] );
+			++ byteAmount;
 		}
-	}
-	if ( til & 7 ) {
-		if ( bit ) {
-			data[ byteOffset + byteAmount ] = static_cast<u8_t>( data[ byteOffset - 1 ] | _maskBitKeepLeft_[ ( til & 7 ) - 1 ] );
+		/*
+		 * 012345670123456701234567
+		 * xxxxxxxxxxxxxxxxxxxx
+		 *        ^ lastBit
+		 */
+		if ( ( lastBit & 7 ) != 7 ) {
+			if ( bit_ ) {
+				data[ lastByte ] = static_cast<u8_t>( data[ lastByte ] | _maskBitKeepLeft_[ lastBit & 7 ] );
+			} else {
+				data[ lastByte ] = static_cast<u8_t>( data[ lastByte ] & _maskBitKeepRight_[ ( lastBit & 7 ) + 1 ] );
+			}
 		} else {
-			data[ byteOffset + byteOffset ] = static_cast<u8_t>( data[ byteOffset - 1 ] & _maskBitKeepRight_[ ( til & 7 ) - 1 ] );
+			++ byteAmount;
+		}
+		if ( byteAmount > 0 ) {
+			u8_t filler( static_cast<u8_t>( bit_ ? 0xff : 0 ) );
+			::memset( data + firstByte, filler, static_cast<size_t>( byteAmount ) );
+		}
+	} else {
+		for ( int long i( offset_ ); i <= lastBit; ++ i ) {
+			set( i, bit_ );
 		}
 	}
 	return;
