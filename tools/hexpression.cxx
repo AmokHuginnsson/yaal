@@ -715,6 +715,8 @@ double long* HExpression::compile( HString const& formula_ ) {
 		_error = UNEXPECTED_TERMINATION;
 	}
 	if ( _error != OK ) {
+		_equationTree.clear();
+		_constantsPool.clear();
 		throw HExpressionException( _syntaxError_ );
 	}
 	return ( _variables );
@@ -778,7 +780,7 @@ char const* HExpression::get_error( void ) const {
 		case ( PREMATURE_TERMINATION ):
 			return ( _( "premature termination" ) );
 		default :
-			M_THROW ( _( "enknown error code" ), _error );
+			M_THROW ( _( "unknown error code" ), _error );
 		break;
 	}
 	return ( nullptr );
