@@ -274,8 +274,7 @@ void HBitmap::reserve( int long size_ ) {
 
 bool HBitmap::operator == ( HBitmap const& b ) const {
 	M_PROLOG
-	M_ASSERT( _size == b._size );
-	return ( ( _data == b._data ) || ! ::memcmp( block(), b.block(), static_cast<size_t>( octets_for_bits( _size ) ) ) );
+	return ( ( _size == b._size ) && ! ::memcmp( block(), b.block(), static_cast<size_t>( octets_for_bits( _size ) ) ) );
 	M_EPILOG
 }
 
