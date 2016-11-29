@@ -495,24 +495,20 @@ void HBitmap::set( int long number_, bool state_ ) {
 void HBitmap::rotate_right( int long start_,
 		int long len_, int long val_ ) {
 	M_ASSERT( ( val_ > 0 ) && ( val_ < len_ ) && ( start_ >= 0 ) && ( len_ > 0 ) );
-	int long byteCount = ( len_ + start_ ) / 8;
-	if ( ( len_ + start_ ) % 8 )
-		byteCount++;
 	HBitmap tmp( *this );
-	for ( int long i = 0; i < len_; i++ )
-		set( start_ + i, tmp.get( start_ + ( i + val_ ) % len_ ) );
+	for ( int long i( 0 ); i < len_; ++ i ) {
+		set( start_ + ( i + val_ ) % len_, tmp.get( start_ + i ) );
+	}
 	return ;
 }
 
 void HBitmap::rotate_left( int long start_,
 		int long len_, int long val_ ) {
 	M_ASSERT( ( val_ > 0 ) && ( val_ < len_ ) && ( start_ >= 0 ) && ( len_ > 0 ) );
-	int long byteCount = ( len_ + start_ ) / 8;
-	if ( ( len_ + start_ ) % 8 )
-		byteCount++;
 	HBitmap tmp( *this );
-	for ( int long i = 0; i < len_; i++ )
-		set( start_ + ( i + val_ ) % len_, tmp.get( start_ + i ) );
+	for ( int long i( 0 ); i < len_; ++ i ) {
+		set( start_ + i, tmp.get( start_ + ( i + val_ ) % len_ ) );
+	}
 	return ;
 }
 
