@@ -55,7 +55,9 @@ HBitmap::HBit HBitmap::HIterator<HBitmap::HBit>::operator* ( void ) const {
 }
 
 HBitmap::HBitmap( void )
-	: _allocatedBytes( 0 ), _size( 0 ), _data( nullptr ) {
+	: _allocatedBytes( 0 )
+	, _size( 0 )
+	, _data( nullptr ) {
 	return;
 }
 
@@ -79,8 +81,9 @@ void const* HBitmap::raw( void ) const {
 }
 
 void HBitmap::clear( void ) {
-	if ( _allocatedBytes )
+	if ( _allocatedBytes ) {
 		M_SAFE( delete static_cast<HChunk*>( _data ) );
+	}
 	_data = nullptr;
 	_allocatedBytes = 0;
 	_size = 0;
@@ -88,7 +91,9 @@ void HBitmap::clear( void ) {
 }
 
 HBitmap::HBitmap( int long size_ )
-	: _allocatedBytes( 0 ), _size( 0 ), _data( nullptr ) {
+	: _allocatedBytes( 0 )
+	, _size( 0 )
+	, _data( nullptr ) {
 	M_PROLOG
 	M_ASSERT( size_ > 0 );
 	ensure_pool( size_ );
@@ -303,8 +308,9 @@ HBitmap& HBitmap::operator |= ( HBitmap const& b ) {
 	M_ASSERT( _size == b._size );
 	char* dst = static_cast<char*>( block() );
 	char const* src = static_cast<char const*>( b.block() );
-	for ( int long i = 0; i < _size; ++ i )
+	for ( int long i( 0 ), amount( octets_for_bits( _size ) ); i < amount; ++ i ) {
 		dst[ i ] = static_cast<char>( dst[ i ] | src[ i ] );
+	}
 	return ( *this );
 	M_EPILOG
 }
@@ -314,8 +320,9 @@ HBitmap& HBitmap::operator &= ( HBitmap const& b ) {
 	M_ASSERT( _size == b._size );
 	char* dst = static_cast<char*>( block() );
 	char const* src = static_cast<char const*>( b.block() );
-	for ( int long i = 0; i < _size; ++ i )
+	for ( int long i( 0 ), amount( octets_for_bits( _size ) ); i < amount; ++ i ) {
 		dst[ i ] = static_cast<char>( dst[ i ] & src[ i ] );
+	}
 	return ( *this );
 	M_EPILOG
 }
@@ -325,8 +332,9 @@ HBitmap& HBitmap::operator ^= ( HBitmap const& b ) {
 	M_ASSERT( _size == b._size );
 	char* dst = static_cast<char*>( block() );
 	char const* src = static_cast<char const*>( b.block() );
-	for ( int long i = 0; i < _size; ++ i )
+	for ( int long i( 0 ), amount( octets_for_bits( _size ) ); i < amount; ++ i ) {
 		dst[ i ] = static_cast<char>( dst[ i ] ^ src[ i ] );
+	}
 	return ( *this );
 	M_EPILOG
 }
@@ -358,8 +366,9 @@ HBitmap HBitmap::operator ^ ( HBitmap const& b ) const {
 HBitmap& HBitmap::operator += ( HBitmap const& bmp ) {
 	M_PROLOG
 	/* Super slow !!! FIXME */
-	for ( HBitmap::const_iterator it( bmp.begin() ), endIt( bmp.end() ); it != endIt; ++ it )
+	for ( HBitmap::const_iterator it( bmp.begin() ), endIt( bmp.end() ); it != endIt; ++ it ) {
 		push_back( *it );
+	}
 	return ( *this );
 	M_EPILOG
 }
@@ -465,8 +474,9 @@ bool HBitmap::get( int long number_ ) const {
 	char const* address = static_cast<char const*>( block() );
 	int short offset( static_cast<short>( number_ & 7 ) );
 	int short state(static_cast<short>( *( address + byteNo ) & _maskBitSetByte_[ offset ] ) );
-	if ( state )
+	if ( state ) {
 		state = 1;
+	}
 	return ( state ? true : false );
 	M_EPILOG
 }
@@ -484,10 +494,11 @@ void HBitmap::set( int long number_, bool state_ ) {
 	else
 		*( address + byteNo ) &= _maskBitClear_[ offset ];
 	*/
-	if ( state_ )
+	if ( state_ ) {
 		*( address + byteNo ) = static_cast<char unsigned>( *( address + byteNo ) | _maskBitSetByte_[ offset ] );
-	else
+	} else {
 		*( address + byteNo ) = static_cast<char unsigned>( *( address + byteNo ) & _maskBitClearByte_[ offset ] );
+	}
 	return;
 	M_EPILOG
 }
