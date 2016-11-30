@@ -172,8 +172,8 @@ HHuginn::value_t HHuginn::HObjectReference::field( int index_ ) {
 	M_PROLOG
 	HObject* o( static_cast<HObject*>( _object.raw() ) );
 	value_t v;
-	if ( _class != o->get_class() ) {
-		v = _class->get_defaults()[index_];
+	if ( o->get_class()->is_overriden( _class, index_ ) ) {
+		v = _class->get_default( index_ );
 	} else {
 		v = o->field_ref( index_ );
 	}

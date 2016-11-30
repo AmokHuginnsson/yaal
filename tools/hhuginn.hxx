@@ -412,10 +412,14 @@ public:
 		return ( _fieldDefinitions[index_] );
 	}
 	values_t get_defaults( void ) const;
+	value_t get_default( int ) const;
 	function_t const& function( int ) const;
 	bool is_kind_of( identifier_id_t ) const;
 	bool is_complex( void ) const {
 		return ( ! _fieldDefinitions.is_empty() );
+	}
+	bool is_overriden( HClass const* super_, int index_ ) const {
+		return ( _fieldDefinitions[index_] != super_->_fieldDefinitions[index_] );
 	}
 	void update_runtime( huginn::HRuntime* );
 	huginn::HRuntime* runtime( void ) const {

@@ -159,6 +159,12 @@ HHuginn::values_t HHuginn::HClass::get_defaults( void ) const {
 	M_EPILOG
 }
 
+HHuginn::value_t HHuginn::HClass::get_default( int index_ ) const {
+	M_PROLOG
+	return ( _fieldDefinitions[index_]->clone( _runtime ) );
+	M_EPILOG
+}
+
 bool HHuginn::HClass::is_kind_of( identifier_id_t identifierId_ ) const {
 	M_PROLOG
 	return ( ( identifierId_ == _identifierId ) || ( _super ? _super->is_kind_of( identifierId_ ) : false ) );
