@@ -68,11 +68,11 @@ bool const initHFileSystemException __attribute__((used)) = HFileSystemException
 
 namespace {
 
-bool do_stat( struct stat* s, path_t const& path_ ) {
+bool do_stat( struct stat* s, path_t const& path_, bool resolve_ = true ) {
 	M_PROLOG
 	::memset( s, 0, sizeof ( *s ) );
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
-	bool success( ( ::stat( path_.raw(), s ) == 0 ) || ( ::lstat( path_.raw(), s ) == 0 ) );
+	bool success( ( resolve_ && ( ::stat( path_.raw(), s ) == 0 ) ) || ( ::lstat( path_.raw(), s ) == 0 ) );
 	if ( ! success && ( errno != ENOENT ) ) {
 		throw HFileSystemException( to_string( "Cannot acquire metadata for `" ).append( path_ ).append( "'" ) );
 	}
@@ -162,7 +162,7 @@ bool is_directory( path_t const& path_ ) {
 bool is_symbolic_link( path_t const& path_ ) {
 	M_PROLOG
 	struct stat s;
-	return ( do_stat( &s, path_ ) && S_ISLNK( s.st_mode ) );
+	return ( do_stat( &s, path_, false ) && S_ISLNK( s.st_mode ) );
 	M_EPILOG
 }
 
