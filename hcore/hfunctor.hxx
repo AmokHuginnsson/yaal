@@ -571,12 +571,12 @@ struct object_resolver {
 	template<typename return_t>
 	struct invoke<return_t, SMART> {
 		template<typename METHOD_t, typename CLASS_t, typename... arg_t>
-		static return_t go( METHOD_t method_, CLASS_t object_, arg_t&&... arg_ ) {
+		static return_t go( METHOD_t method_, CLASS_t&& object_, arg_t&&... arg_ ) {
 			return ( (*object_.*method_)( yaal::forward<arg_t>( arg_ )... ) );
 		}
 		template<typename CLASS_t, typename dummy_t>
-		static CLASS_t* id( CLASS_t object_, dummy_t ) {
-			return ( reinterpret_cast<CLASS_t*>( object_.raw() ) );
+		static CLASS_t const* id( CLASS_t const& object_, dummy_t ) {
+			return ( reinterpret_cast<CLASS_t const*>( object_.raw() ) );
 		}
 	};
 	template<typename return_t>
@@ -593,7 +593,7 @@ struct object_resolver {
 	template<typename return_t>
 	struct invoke<return_t, PTR> {
 		template<typename METHOD_t, typename CLASS_t, typename... arg_t>
-		static return_t go( METHOD_t method_, CLASS_t object_, arg_t&&... arg_ ) {
+		static return_t go( METHOD_t method_, CLASS_t&& object_, arg_t&&... arg_ ) {
 			return ( (object_->*method_)( yaal::forward<arg_t>( arg_ )... ) );
 		}
 		template<typename CLASS_t, typename dummy_t>
@@ -639,6 +639,8 @@ public:
 		: _object( yaal::forward<CLASS_t>( object_ ) ), _method( yaal::forward<METHOD_t>( method_ ) ) {
 		return;
 	}
+	HFunctor( HFunctor const& ) = default;
+	HFunctor( HFunctor&& ) = default;
 
 	template<typename arg0_t, typename... arg_t>
 	return_t operator()( arg0_t&& arg0_, arg_t&&... arg_ ) {
