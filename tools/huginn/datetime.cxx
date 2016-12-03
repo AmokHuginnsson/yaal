@@ -32,6 +32,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/huginn/thread.hxx"
 #include "tools/huginn/time.hxx"
 #include "tools/huginn/clock.hxx"
+#include "tools/sleep.hxx"
 #include "helper.hxx"
 #include "exception.hxx"
 #include "packagefactory.hxx"
@@ -76,6 +77,19 @@ public:
 		return ( make_pointer<HClock>( dt->_clockClass.raw() ) );
 		M_EPILOG
 	}
+	static HHuginn::value_t sleep( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "DateTime.sleep";
+		verify_arg_count( name, values_, 1, 1, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, true, position_ );
+		int long long nanoseconds( get_integer( values_[0] ) );
+		if ( nanoseconds < 0 ) {
+			throw HHuginn::HHuginnRuntimeException( "Negative sleep time: "_ys.append( nanoseconds ), position_ );
+		}
+		sleep_for( time::duration( nanoseconds, time::UNIT::NANOSECOND ) );
+		return ( *object_ );
+		M_EPILOG
+	}
 };
 
 namespace package_factory {
@@ -92,8 +106,9 @@ HHuginn::value_t HDateTimeCreator::do_new_instance( HRuntime* runtime_ ) {
 			"DateTime",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "now", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDateTime::now, _1, _2, _3, _4 ) ), "get information about current point-in-time" },
-				{ "clock", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDateTime::clock, _1, _2, _3, _4 ) ), "create a stopper-watch instance" }
+				{ "now",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDateTime::now, _1, _2, _3, _4 ) ), "get information about current point-in-time" },
+				{ "clock", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDateTime::clock, _1, _2, _3, _4 ) ), "create a stopper-watch instance" },
+				{ "sleep", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDateTime::sleep, _1, _2, _3, _4 ) ), "( *nanoseconds* ) - suspend program execution for specified amount of *nanoseconds*" }
 			},
 			"The `DateTime` package provides date and time handling functionalities."
 		)
