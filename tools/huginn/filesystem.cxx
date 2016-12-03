@@ -40,6 +40,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 
 using namespace yaal;
 using namespace yaal::hcore;
+using namespace yaal::tools::filesystem;
 using namespace yaal::tools::huginn;
 
 namespace yaal {
@@ -47,6 +48,8 @@ namespace yaal {
 namespace tools {
 
 namespace huginn {
+
+typedef yaal::hcore::HString (*str_transform_func_t)( yaal::hcore::HString const& );
 
 class HFileSystem : public HHuginn::HObject {
 	struct OPERATIONS {
@@ -85,22 +88,65 @@ public:
 		return ( thread_->object_factory().create_string( filesystem::current_working_directory() ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t rename( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t rename( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "FileSystem.rename";
 		verify_arg_count( name, values_, 2, 2, position_ );
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, false, position_ );
 		verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, false, position_ );
-		filesystem::rename( get_string( values_[0] ), get_string( values_[1] ) );
+		try {
+			filesystem::rename( get_string( values_[0] ), get_string( values_[1] ) );
+		} catch ( HFileSystemException const& e ) {
+			HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
+			thread_->raise( fsc->_exceptionClass.raw(), e.what(), position_ );
+		}
 		return ( *object_ );
 		M_EPILOG
 	}
-	static HHuginn::value_t remove( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t remove( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "FileSystem.remove";
 		verify_arg_count( name, values_, 1, 1, position_ );
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
-		filesystem::remove( get_string( values_[0] ) );
+		try {
+			filesystem::remove( get_string( values_[0] ) );
+		} catch ( HFileSystemException const& e ) {
+			HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
+			thread_->raise( fsc->_exceptionClass.raw(), e.what(), position_ );
+		}
+		return ( *object_ );
+		M_EPILOG
+	}
+	static HHuginn::value_t path_transform( char const* name_, str_transform_func_t pathTransformFunc_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( name_, values_, 1, 1, position_ );
+		verify_arg_type( name_, values_, 0, HHuginn::TYPE::STRING, true, position_ );
+		HHuginn::value_t v( thread_->runtime().none_value() );
+		try {
+			v = thread_->object_factory().create_string( pathTransformFunc_( get_string( values_[0] ) ) );
+		} catch ( HFileSystemException const& e ) {
+			HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
+			thread_->raise( fsc->_exceptionClass.raw(), e.what(), position_ );
+		}
+		return ( v );
+		M_EPILOG
+	}
+	static HHuginn::value_t chmod( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "FileSystem.chmod";
+		verify_arg_count( name, values_, 2, 2, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, false, position_ );
+		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
+		try {
+			int long long mode( get_integer( values_[1] ) );
+			if ( ( mode < 0 ) || ( mode > 07777 ) ) {
+				throw HHuginn::HHuginnRuntimeException( "Bad mode: "_ys.append( mode ), position_ );
+			}
+			filesystem::chmod( get_string( values_[0] ), static_cast<u32_t>( mode ) );
+		} catch ( HFileSystemException const& e ) {
+			HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
+			thread_->raise( fsc->_exceptionClass.raw(), e.what(), position_ );
+		}
 		return ( *object_ );
 		M_EPILOG
 	}
@@ -155,6 +201,10 @@ HHuginn::value_t HFileSystemCreator::do_new_instance( HRuntime* runtime_ ) {
 				{ "writing",                   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::writing, _1, _2, _3, _4 ) ), "a mode for *.open()* method, used to open files for writing" },
 				{ "rename",                    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::rename, _1, _2, _3, _4 ) ), "( *oldPath*, *newPath* ) - rename or move file from *oldPath* to *newPath* in attached file system", },
 				{ "remove",                    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::remove, _1, _2, _3, _4 ) ), "( *path* ) - remove file with given *path* from attached file system" },
+				{ "readlink",                  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::path_transform, "FileSystem.readlink", &filesystem::readlink, _1, _2, _3, _4 ) ), "( *path* ) - get resolved symbolic links or canonical file name for given *path*" },
+				{ "basename",                  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::path_transform, "FileSystem.basename", &filesystem::basename, _1, _2, _3, _4 ) ), "( *path* ) - strip directory from filename for given *path*" },
+				{ "dirname",                   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::path_transform, "FileSystem.dirname", &filesystem::dirname, _1, _2, _3, _4 ) ), "( *path* ) - strip last component from file name for given *path*" },
+				{ "chmod",                     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::chmod, _1, _2, _3, _4 ) ), "( *path*, *mode* ) - change file mode bits for file *path* to new mode *mode*" },
 				{ "current_working_directory", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::current_working_directory, _1, _2, _3, _4 ) ), "get current working directory path" }
 			},
 			"The `FileSystem` package provides interface to various file system queries and operations."
