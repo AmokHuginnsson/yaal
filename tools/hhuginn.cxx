@@ -899,6 +899,19 @@ yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn const* h
 			}
 			str.append( "}" );
 		} break;
+		case ( HHuginn::TYPE::ORDER ): {
+			HHuginn::HOrder const* l( static_cast<HHuginn::HOrder const*>( value_.raw() ) );
+			str = "order(";
+			bool next( false );
+			for ( HHuginn::value_t const& v : l->value() ) {
+				if ( next ) {
+					str.append( ", " );
+				}
+				next = true;
+				str.append( to_string( v ) );
+			}
+			str.append( ")" );
+		} break;
 		default: {
 			str = value_->get_class()->name();
 		}
