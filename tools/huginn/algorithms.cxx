@@ -74,22 +74,30 @@ public:
 		char const name[] = "Algorithms.reduce";
 		verify_arg_count( name, values_, 2, 3, position_ );
 		verify_arg_collection( name, values_, 0, false, false, position_ );
-		verify_arg_type( name, values_, 1, HHuginn::TYPE::FUNCTION_REFERENCE, false, position_ );
+		HHuginn::type_id_t t( verify_arg_type( name, values_, 1, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::BOUND_METHOD }, false, position_ ) );
 		int argCount( static_cast<int>( values_.get_size() ) );
 		HHuginn::value_t accumulator( argCount == 3 ? values_[2] : HHuginn::value_t() );
 		HHuginn::HIterable const* src( static_cast<HHuginn::HIterable const*>( values_[0].raw() ) );
 		if ( ! accumulator && ( src->size() == 0 ) ) {
 			throw HHuginn::HHuginnRuntimeException( "reduce() on empty.", position_ );
 		}
-		HHuginn::function_t function( static_cast<HHuginn::HFunctionReference const*>( values_[1].raw() )->function() );
 		HHuginn::HIterable::HIterator it( const_cast<HHuginn::HIterable*>( src )->iterator( thread_, position_ ) );
 		if ( ! accumulator ) {
 			accumulator = it.value( thread_, position_ );
 			it.next( thread_, position_ );
 		}
-		while ( it.is_valid() && thread_->can_continue() ) {
-			accumulator = function( thread_, nullptr, HHuginn::values_t( { accumulator, it.value( thread_, position_ ) } ), position_ );
-			it.next( thread_, position_ );
+		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
+			HHuginn::function_t function( static_cast<HHuginn::HFunctionReference const*>( values_[1].raw() )->function() );
+			while ( it.is_valid() && thread_->can_continue() ) {
+				accumulator = function( thread_, nullptr, HHuginn::values_t( { accumulator, it.value( thread_, position_ ) } ), position_ );
+				it.next( thread_, position_ );
+			}
+		} else {
+			HHuginn::HClass::HBoundMethod* boundMethod( const_cast<HHuginn::HClass::HBoundMethod*>( static_cast<HHuginn::HClass::HBoundMethod const*>( values_[1].raw() ) ) );
+			while ( it.is_valid() && thread_->can_continue() ) {
+				accumulator = boundMethod->call( thread_, HHuginn::values_t( { accumulator, it.value( thread_, position_ ) } ), position_ );
+				it.next( thread_, position_ );
+			}
 		}
 		return ( accumulator );
 	}
