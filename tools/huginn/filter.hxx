@@ -63,7 +63,7 @@ public:
 	}
 protected:
 	virtual int long do_size( void ) const override {
-		return ( static_cast<HHuginn::HIterable const*>( _source.raw() )->size() );
+		throw HHuginn::HHuginnRuntimeException( "Getting size of `Filter' is an invalid operation.", 0 );
 	}
 private:
 	virtual HIterator do_iterator( HThread*, int ) override;
