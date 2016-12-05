@@ -273,6 +273,8 @@ SystemIO::SystemIO( void )
 	WSADATA wsaData;
 	WORD wVersionRequested( MAKEWORD( 2, 2 ) );
 	int err( WSAStartup( wVersionRequested, &wsaData ) );
+	setenv( "TZ", "", 1 );
+	_tzset();
 }
 
 SystemIO& SystemIO::get_instance( void ) {
