@@ -92,6 +92,9 @@ path_t current_working_directory( void ) {
 path_t normalize_path( path_t const& path_ ) {
 	M_PROLOG
 	HString path( path_ );
+#ifdef __MSVCXX__
+	path.replace( "\\", "/" );
+#endif /* #ifdef __MSVCXX__ */
 	bool absolute( ! path.is_empty() && path[0] == '/' );
 	int origLen( -1 );
 	while ( origLen != static_cast<int>( path.get_length() ) ) {
@@ -190,6 +193,9 @@ i64_t file_size( path_t const& path_ ) {
 path_t dirname( path_t const& path_ ) {
 	M_PROLOG
 	path_t dname( path_ );
+#ifdef __MSVCXX__
+	dname.replace( "\\", "/" );
+#endif /* #ifdef __MSVCXX__ */
 	bool degenerated( false );
 	if ( dname.is_empty() ) {
 		degenerated = true;
@@ -216,6 +222,9 @@ path_t dirname( path_t const& path_ ) {
 path_t basename( path_t const& path_ ) {
 	M_PROLOG
 	path_t bname( path_ );
+#ifdef __MSVCXX__
+	bname.replace( "\\", "/" );
+#endif /* #ifdef __MSVCXX__ */
 	if ( ( bname != path::ROOT )
 		&& ( bname != path::CURRENT )
 		&& ( bname != path::PARENT ) ) {
