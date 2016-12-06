@@ -350,6 +350,20 @@ int unix_stat( char const* path_, struct stat* s_ ) {
 			s_->st_uid = owner.first;
 			s_->st_gid = owner.second;
 			s_->st_ctime = s_->st_mtime = yaal::max( s_->st_ctime, s_->st_mtime );
+			OFSTRUCT of;
+			HFILE hf( ::OpenFile( path_, &of, 0 ) );
+			if ( hf != HFILE_ERROR ) {
+				HANDLE h( reinterpret_cast<HANDLE>( hf ) );
+				BY_HANDLE_FILE_INFORMATION fi;
+				if ( ::GetFileInformationByHandle( h, &fi ) ) {
+#if SIZE_INO_T == 8
+					s_->st_ino = ( static_cast<_ino_t>( fi.nFileIndexHigh ) << 32 ) | static_cast<_ino_t>( fi.nFileIndexLow );
+#else
+					s_->st_ino = static_cast<_ino_t>( fi.nFileIndexLow );
+#endif
+				}
+				::CloseHandle( h );
+			}
 		}
 	}
 	return ( res );
