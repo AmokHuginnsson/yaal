@@ -258,9 +258,37 @@ uid_t getuid( void ) {
 }
 
 int readlink( char const* path_, char* buffer_, size_t size_ ) {
-	int len( static_cast<int>( yaal::min( ::strlen( path_ ),  size_ - 1 ) ) );
-	::strncpy( buffer_, path_, static_cast<size_t>( len ) );
-	buffer_[len] = 0;
+	int len( -1 );
+	HANDLE h( ::CreateFile( path_, GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr ) );
+	if ( h != INVALID_HANDLE_VALUE ) {
+		/* Try to resolve cygwin symlink. */
+		char tag[] = "!<symlink>\xFF\xFE";
+		static int const tagSize( sizeof ( tag ) - 1 );
+		DWORD sz( ::GetFileSize( h, nullptr ) );
+		if ( sz != INVALID_FILE_SIZE ) {
+			int linkSize( static_cast<int>( sz - tagSize ) / 2 );
+			if ( ( sz <= ( _XOPEN_NAME_MAX * 2 + tagSize ) ) && ( linkSize < static_cast<int>( size_ ) ) ) {
+				HChunk buf( static_cast<int>( sz ) );
+				DWORD nRead( 0 );
+				char* p( buf.get<char>() );
+				if ( ::ReadFile( h, p, sz, &nRead, nullptr ) && ( nRead == sz ) && ( ::strncmp( p, tag, tagSize ) == 0 ) ) {
+					len = 0;
+					p += tagSize;
+					while ( len < linkSize ) {
+						buffer_[len] = p[len * 2];
+						++ len;
+					}
+					buffer_[len] = 0;
+				}
+			} else {
+				len = static_cast<int>( size_ );
+			}
+		}
+		if ( len < 0 ) {
+			len = static_cast<int>( ::GetFinalPathNameByHandle( h, buffer_, size_, VOLUME_NAME_NONE ) );
+		}
+		::CloseHandle( h );
+	}
 	return ( len );
 }
 
