@@ -37,7 +37,6 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hfsitem.hxx"
 #include "hcore/memory.hxx"
 #include "hcore/system.hxx"
-#include "tools/filesystem.hxx"
 
 #undef YAAL_USES_STAT
 
@@ -47,6 +46,10 @@ using namespace yaal::hcore;
 namespace yaal {
 
 namespace tools {
+
+namespace {
+bool const initHFSItemException __attribute__((used)) = HFSItemException::decode_errno();
+}
 
 HFSItem::HFSItem( HString const& root_ )
 	: _nameLen( static_cast<int>( root_.get_length() ) ), _path( root_ ) {
@@ -60,13 +63,17 @@ HFSItem::~HFSItem( void ) {
 
 bool HFSItem::is_directory( void ) const {
 	M_PROLOG
-	return ( filesystem::is_directory( _path ) );
+	struct stat s;
+	do_stat( &s );
+	return ( S_ISDIR( s.st_mode ) );
 	M_EPILOG
 }
 
 bool HFSItem::is_file( void ) const {
 	M_PROLOG
-	return ( filesystem::is_regular_file( _path ) );
+	struct stat s;
+	do_stat( &s );
+	return ( S_ISREG( s.st_mode ) );
 	M_EPILOG
 }
 
@@ -206,7 +213,9 @@ void HFSItem::swap( HFSItem& o ) {
 
 HFSItem::HIterator HFSItem::begin( void ) {
 	M_PROLOG
-	M_ENSURE( is_directory() );
+	if ( ! is_directory() ) {
+		throw HFSItemException( "is_directory failed: "_ys.append( _path ), ENOTDIR );
+	}
 	return ( HIterator( _path ) );
 	M_EPILOG
 }
@@ -227,6 +236,9 @@ HFSItem::HIterator::HIterator( HString const& path_ )
 	M_PROLOG
 	if ( ! _path.is_empty() ) {
 		_dir = ::opendir( _path.raw() );
+		if ( _dir == nullptr ) {
+			throw HFSItemException( "opendir failed: "_ys.append( _path ) );
+		}
 		operator ++();
 	}
 	return;
@@ -243,6 +255,9 @@ HFSItem::HIterator::HIterator( HIterator const& it_ )
 	M_PROLOG
 	if ( it_._dir ) {
 		_dir = ::opendir( _path.raw() );
+		if ( _dir == nullptr ) {
+			throw HFSItemException( "opendir failed: "_ys.append( _path ) );
+		}
 		while ( _pos < it_._pos ) {
 			operator ++();
 			if ( _inode == it_._inode ) {
