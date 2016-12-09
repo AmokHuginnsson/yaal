@@ -68,15 +68,14 @@ bool const initHFileSystemException __attribute__((used)) = HFileSystemException
 
 namespace {
 
-bool do_stat( struct stat* s, path_t const& path_, bool resolve_ = true ) {
+void do_stat( struct stat* s, path_t const& path_, bool resolve_ = true ) {
 	M_PROLOG
 	::memset( s, 0, sizeof ( *s ) );
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
-	bool success( ( resolve_ && ( ::stat( path_.raw(), s ) == 0 ) ) || ( ::lstat( path_.raw(), s ) == 0 ) );
-	if ( ! success && ( errno != ENOENT ) ) {
+	if ( ! ( ( resolve_ && ( ::stat( path_.raw(), s ) == 0 ) ) || ( ::lstat( path_.raw(), s ) == 0 ) ) ) {
 		throw HFileSystemException( to_string( "Cannot acquire metadata for `" ).append( path_ ).append( "'" ) );
 	}
-	return ( success );
+	return;
 	M_EPILOG
 }
 
@@ -155,38 +154,79 @@ bool exists( path_t const& path_ ) {
 	return ( err == 0 );
 }
 
+FILE_TYPE file_type( path_t const& path_, bool resolve_ ) {
+	M_PROLOG
+	struct stat s;
+	do_stat( &s, path_, resolve_ );
+	FILE_TYPE ft( FILE_TYPE::REGULAR );
+	if ( S_ISDIR( s.st_mode ) ) {
+		ft = FILE_TYPE::DIRECTORY;
+	} else if ( S_ISLNK( s.st_mode ) ) {
+		ft = FILE_TYPE::SYMBOLIC_LINK;
+	} else if ( S_ISSOCK( s.st_mode ) ) {
+		ft = FILE_TYPE::SOCKET;
+	} else if ( S_ISFIFO( s.st_mode ) ) {
+		ft = FILE_TYPE::FIFO;
+	} else if ( S_ISCHR( s.st_mode ) ) {
+		ft = FILE_TYPE::CHARACTER_DEVICE;
+	} else if ( S_ISBLK( s.st_mode ) ) {
+		ft = FILE_TYPE::BLOCK_DEVICE;
+	}
+	return ( ft );
+	M_EPILOG
+}
+
+char const* file_type_name( FILE_TYPE fileType_ ) {
+	char const* name( "unknown" );
+	switch ( fileType_ ) {
+		case ( FILE_TYPE::REGULAR ):          name = "regular";   break;
+		case ( FILE_TYPE::DIRECTORY ):        name = "directory"; break;
+		case ( FILE_TYPE::SYMBOLIC_LINK ):    name = "symlink";   break;
+		case ( FILE_TYPE::SOCKET ):           name = "socket";    break;
+		case ( FILE_TYPE::FIFO ):             name = "fifo";      break;
+		case ( FILE_TYPE::CHARACTER_DEVICE ): name = "chardev";   break;
+		case ( FILE_TYPE::BLOCK_DEVICE ):     name = "blockdev";  break;
+	}
+	return ( name );
+}
+
 bool is_directory( path_t const& path_ ) {
 	M_PROLOG
 	struct stat s;
-	return ( do_stat( &s, path_ ) && S_ISDIR( s.st_mode ) );
+	do_stat( &s, path_ );
+	return ( S_ISDIR( s.st_mode ) );
 	M_EPILOG
 }
 
 bool is_symbolic_link( path_t const& path_ ) {
 	M_PROLOG
 	struct stat s;
-	return ( do_stat( &s, path_, false ) && S_ISLNK( s.st_mode ) );
+	do_stat( &s, path_, false );
+	return ( S_ISLNK( s.st_mode ) );
 	M_EPILOG
 }
 
 bool is_regular_file( path_t const& path_ ) {
 	M_PROLOG
 	struct stat s;
-	return ( do_stat( &s, path_ ) && S_ISREG( s.st_mode ) );
+	do_stat( &s, path_ );
+	return ( S_ISREG( s.st_mode ) );
 	M_EPILOG
 }
 
 bool is_other( path_t const& path_ ) {
 	M_PROLOG
 	struct stat s;
-	return ( do_stat( &s, path_ ) && ! ( S_ISREG( s.st_mode ) || S_ISDIR( s.st_mode ) || S_ISLNK( s.st_mode ) ) );
+	do_stat( &s, path_ );
+	return ( ! ( S_ISREG( s.st_mode ) || S_ISDIR( s.st_mode ) || S_ISLNK( s.st_mode ) ) );
 	M_EPILOG
 }
 
 i64_t file_size( path_t const& path_ ) {
 	M_PROLOG
 	struct stat s;
-	return ( do_stat( &s, path_ ) ? static_cast<i64_t>( s.st_size ) : -1 );
+	do_stat( &s, path_ );
+	return ( static_cast<i64_t>( s.st_size ) );
 	M_EPILOG
 }
 
@@ -347,34 +387,34 @@ void remove_directory( path_t const& path_, DIRECTORY_MODIFICATION directoryModi
 }
 
 find_result find( yaal::hcore::HString const& in, yaal::hcore::HString const& pattern_,
-		int minDepth_, int maxDepth_, FILE_TYPE::enum_t fileType_ ) {
+		int minDepth_, int maxDepth_, FIND_TYPE::enum_t fileType_ ) {
 	HRegex regex( pattern_ );
 	return ( find( in, regex, minDepth_, maxDepth_, fileType_ ) );
 }
 
 find_result find( yaal::hcore::HString const& in, yaal::hcore::HRegex const& pattern_,
-		int minDepth_, int maxDepth_, FILE_TYPE::enum_t fileType_ ) {
+		int minDepth_, int maxDepth_, FIND_TYPE::enum_t fileType_ ) {
 	find_result result;
 	HFSItem p( in );
 	if ( !! p ) {
 		if ( is_directory( p.get_path() ) ) {
 			for ( HFSItem::HIterator it( p.begin() ), end( p.end() ); it != end; ++ it ) {
 				if ( is_directory( it->get_path() ) ) {
-					if ( ( minDepth_ == 0 ) && ( fileType_ & FILE_TYPE::DIRECTORY ) && pattern_.matches( it->get_path() ) ) {
+					if ( ( minDepth_ == 0 ) && ( fileType_ & FIND_TYPE::DIRECTORY ) && pattern_.matches( it->get_path() ) ) {
 						result.emplace_back( it->get_path() );
 					}
 					if ( maxDepth_ > 0 ) {
-						find_result sub( find( it->get_path(), pattern_, minDepth_ > 0 ? minDepth_ - 1 : 0, maxDepth_ - 1 ) );
+						find_result sub( find( it->get_path(), pattern_, minDepth_ > 0 ? minDepth_ - 1 : 0, maxDepth_ - 1, fileType_ ) );
 						result.insert( result.end(), sub.begin(), sub.end() );
 					}
 				} else {
-					if ( ( minDepth_ == 0 ) && ( fileType_ & FILE_TYPE::REGULAR_FILE ) && pattern_.matches( it->get_path() ) ) {
+					if ( ( minDepth_ == 0 ) && ( fileType_ & FIND_TYPE::REGULAR_FILE ) && pattern_.matches( it->get_path() ) ) {
 						result.emplace_back( it->get_path() );
 					}
 				}
 			}
 		} else {
-			if ( ( minDepth_ == 0 ) && ( fileType_ & FILE_TYPE::REGULAR_FILE ) && pattern_.matches( in ) ) {
+			if ( ( minDepth_ == 0 ) && ( fileType_ & FIND_TYPE::REGULAR_FILE ) && pattern_.matches( in ) ) {
 				result.emplace_back( in );
 			}
 		}

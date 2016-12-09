@@ -98,9 +98,12 @@ HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, HHuginn::p
 		HString test;
 		for ( HString const& p : paths ) {
 			test.assign( p ).append( "/" ).append( name_ ).append( ".hgn" );
-			if ( ! p.is_empty() && filesystem::is_regular_file( test ) ) {
-				path = test;
-				break;
+			try {
+				if ( ! p.is_empty() && filesystem::is_regular_file( test ) ) {
+					path = test;
+					break;
+				}
+			} catch ( filesystem::HFileSystemException const& ) {
 			}
 		}
 		if ( ! path.is_empty() ) {

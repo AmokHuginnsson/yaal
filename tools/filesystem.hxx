@@ -39,6 +39,16 @@ namespace tools {
 
 namespace filesystem {
 
+enum class FILE_TYPE {
+	REGULAR,
+	DIRECTORY,
+	SYMBOLIC_LINK,
+	SOCKET,
+	FIFO,
+	CHARACTER_DEVICE,
+	BLOCK_DEVICE
+};
+
 struct FileSystem {};
 typedef yaal::hcore::HExceptionT<FileSystem> HFileSystemException;
 typedef yaal::hcore::HString path_t;
@@ -47,6 +57,8 @@ path_t normalize_path( path_t const& );
 
 path_t current_working_directory( void );
 bool exists( path_t const& );
+FILE_TYPE file_type( path_t const&, bool = false );
+char const* file_type_name( FILE_TYPE );
 bool is_directory( path_t const& );
 bool is_symbolic_link( path_t const& );
 bool is_regular_file( path_t const& );
@@ -77,7 +89,9 @@ enum class DIRECTORY_MODIFICATION {
 void create_directory( path_t const&, u32_t, DIRECTORY_MODIFICATION = DIRECTORY_MODIFICATION::EXACT );
 void remove_directory( path_t const&, DIRECTORY_MODIFICATION = DIRECTORY_MODIFICATION::EXACT );
 
-struct FILE_TYPE {
+typedef yaal::hcore::HArray<path_t> find_result;
+
+struct FIND_TYPE {
 	typedef enum {
 		REGULAR_FILE = 1,
 		DIRECTORY = 2,
@@ -85,12 +99,10 @@ struct FILE_TYPE {
 	} enum_t;
 };
 
-typedef yaal::hcore::HArray<path_t> find_result;
-
 find_result find( yaal::hcore::HString const&, yaal::hcore::HString const&,
-		int = 0, int = meta::max_signed<int>::value, FILE_TYPE::enum_t = FILE_TYPE::ALL );
+		int = 0, int = meta::max_signed<int>::value, FIND_TYPE::enum_t = FIND_TYPE::ALL );
 find_result find( yaal::hcore::HString const&, yaal::hcore::HRegex const&,
-		int = 0, int = meta::max_signed<int>::value, FILE_TYPE::enum_t = FILE_TYPE::ALL );
+		int = 0, int = meta::max_signed<int>::value, FIND_TYPE::enum_t = FIND_TYPE::ALL );
 
 }
 
