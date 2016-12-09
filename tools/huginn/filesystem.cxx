@@ -31,6 +31,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "runtime.hxx"
 #include "thread.hxx"
 #include "stream.hxx"
+#include "time.hxx"
+#include "filestat.hxx"
 #include "objectfactory.hxx"
 #include "directoryscan.hxx"
 #include "helper.hxx"
@@ -59,12 +61,16 @@ class HFileSystem : public HHuginn::HObject {
 	};
 	HHuginn::class_t _streamClass;
 	HHuginn::class_t _directoryScanClass;
+	HHuginn::class_t _timeClass;
+	HHuginn::class_t _fileStatClass;
 	HHuginn::class_t _exceptionClass;
 public:
 	HFileSystem( HHuginn::HClass* class_ )
 		: HObject( class_ )
 		, _streamClass( HStream::get_class( class_->runtime() ) )
 		, _directoryScanClass( HDirectoryScan::get_class( class_->runtime() ) )
+		, _timeClass( huginn::HTime::get_class( class_->runtime() ) )
+		, _fileStatClass( HFileStat::get_class( class_->runtime() ) )
 		, _exceptionClass( exception::create_class( class_->runtime(), "FileSystemException", "The `FileSystemException` exception type for `FileSystem` package." ) ) {
 		return;
 	}
@@ -168,6 +174,16 @@ public:
 		return ( v );
 		M_EPILOG
 	}
+	static HHuginn::value_t stat( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "FileSystem.stat";
+		verify_arg_count( name, values_, 1, 1, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
+		HHuginn::value_t v( thread_->runtime().none_value() );
+		HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
+		return ( make_pointer<HFileStat>( fsc->_fileStatClass.raw(), fsc->_exceptionClass.raw(), fsc->_timeClass.raw(), get_string( values_[0] ) ) );
+		M_EPILOG
+	}
 private:
 	HHuginn::value_t do_open( huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
@@ -224,6 +240,7 @@ HHuginn::value_t HFileSystemCreator::do_new_instance( HRuntime* runtime_ ) {
 				{ "dirname",                   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::path_transform, "FileSystem.dirname", &filesystem::dirname, _1, _2, _3, _4 ) ), "( *path* ) - strip last component from file name for given *path*" },
 				{ "chmod",                     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::chmod, _1, _2, _3, _4 ) ), "( *path*, *mode* ) - change file mode bits for file *path* to new mode *mode*" },
 				{ "dir",                       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::dir, _1, _2, _3, _4 ) ), "( *path* ) - list content of the directory given by *path*" },
+				{ "stat",                      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::stat, _1, _2, _3, _4 ) ), "( *path* ) - get metadata information for file given by *path*" },
 				{ "current_working_directory", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::current_working_directory, _1, _2, _3, _4 ) ), "get current working directory path" }
 			},
 			"The `FileSystem` package provides interface to various file system queries and operations."

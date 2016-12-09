@@ -31,6 +31,7 @@ Copyright:
 
 #include "tools/hhuginn.hxx"
 #include "tools/huginn/iterator.hxx"
+#include "tools/filesystem.hxx"
 #include "tools/hfsitem.hxx"
 
 namespace yaal {
@@ -41,11 +42,11 @@ namespace huginn {
 
 class HDirectoryScan : public HHuginn::HIterable {
 	typedef yaal::hcore::HResource<yaal::tools::HFSItem::HIterator> fs_iter_t;
-	yaal::hcore::HString _path;
+	yaal::tools::filesystem::path_t _path;
 	fs_iter_t _it;
 	fs_iter_t _end;
 public:
-	HDirectoryScan( HHuginn::HClass const* class_, yaal::hcore::HString const& path_ )
+	HDirectoryScan( HHuginn::HClass const* class_, yaal::tools::filesystem::path_t const& path_ )
 		: HIterable( class_ )
 		, _path( path_ )
 		, _it()
