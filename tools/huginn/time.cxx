@@ -83,6 +83,47 @@ HHuginn::value_t HTime::set( char const* name_, time_set_t timeSet_, huginn::HTh
 	M_EPILOG
 }
 
+HHuginn::value_t HTime::set_datetime( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "Time.set_datetime";
+	verify_arg_count( name, values_, 6, 6, position_ );
+	for ( int i( 0 ); i < 6; ++ i ) {
+		verify_arg_type( name, values_, i, HHuginn::TYPE::INTEGER, false, position_ );
+	}
+	try {
+		static_cast<HTime*>( object_->raw() )->_time.set_datetime(
+			static_cast<int>( get_integer( values_[0] ) ),
+			static_cast<int>( get_integer( values_[1] ) ),
+			static_cast<int>( get_integer( values_[2] ) ),
+			static_cast<int>( get_integer( values_[3] ) ),
+			static_cast<int>( get_integer( values_[4] ) ),
+			static_cast<int>( get_integer( values_[5] ) )
+		);
+	} catch ( HTimeException const& e ) {
+		HRuntime& r( thread_->runtime() );
+		HHuginn::HClass const* ec( r.get_class( r.identifier_id( "DateTimeException" ) ).raw() );
+		thread_->raise( ec, e.what(), position_ );
+	}
+	return ( *object_ );
+	M_EPILOG
+}
+
+HHuginn::value_t HTime::from_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "Time.from_string";
+	verify_arg_count( name, values_, 1, 1, position_ );
+	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
+	try {
+		static_cast<HTime*>( object_->raw() )->_time.from_string( get_string( values_[0] ) );
+	} catch ( HTimeException const& e ) {
+		HRuntime& r( thread_->runtime() );
+		HHuginn::HClass const* ec( r.get_class( r.identifier_id( "DateTimeException" ) ).raw() );
+		thread_->raise( ec, e.what(), position_ );
+	}
+	return ( *object_ );
+	M_EPILOG
+}
+
 HHuginn::value_t HTime::get( char const* name_, time_get_t timeGet_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "Time."_ys.append( name_ ), values_, 0, 0, position_ );
@@ -126,23 +167,24 @@ HHuginn::class_t HTime::get_class( HRuntime* runtime_ ) {
 			"Time",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "mod_year",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_year",   &hcore::HTime::mod_year, _1, _2, _3, _4 ) ),   "( *num* ) - modify time value by *num* of years" },
-				{ "mod_month",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_month",  &hcore::HTime::mod_month, _1, _2, _3, _4 ) ),  "( *num* ) - modify time value by *num* of months" },
-				{ "mod_day",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_day",    &hcore::HTime::mod_day, _1, _2, _3, _4 ) ),    "( *num* ) - modify time value by *num* of days" },
-				{ "mod_hour",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_hour",   &hcore::HTime::mod_hour, _1, _2, _3, _4 ) ),   "( *num* ) - modify time value by *num* of hours" },
-				{ "mod_minute", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_minute", &hcore::HTime::mod_minute, _1, _2, _3, _4 ) ), "( *num* ) - modify time value by *num* of minutes" },
-				{ "mod_second", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_second", &hcore::HTime::mod_second, _1, _2, _3, _4 ) ), "( *num* ) - modify time value by *num* of seconds" },
-				{ "set_time",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::set, "set_time",   &hcore::HTime::set_time, _1, _2, _3, _4 ) ),   "( *hh*, *mm*, *ss* ) - set time value to *hh*:*mm*:*ss*" },
-				{ "set_date",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::set, "set_date",   &hcore::HTime::set_date, _1, _2, _3, _4 ) ),   "( *YYYY*, *MM*, *DD* ) - set date value to *YYYY*-*MM*-*DD*" },
-				{ "get_year",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::get, "get_year",   &hcore::HTime::get_year, _1, _2, _3, _4 ) ),   "get number of years from time" },
-				{ "get_day",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::get, "get_day",    &hcore::HTime::get_day, _1, _2, _3, _4 ) ),    "get number of days from time" },
-				{ "get_hour",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::get, "get_hour",   &hcore::HTime::get_hour, _1, _2, _3, _4 ) ),   "get number of hours from time" },
-				{ "get_minute", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::get, "get_minute", &hcore::HTime::get_minute, _1, _2, _3, _4 ) ), "get number of minutes from time" },
-				{ "get_second", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::get, "get_second", &hcore::HTime::get_second, _1, _2, _3, _4 ) ), "get number of seconds from time" },
-				{ "get_month",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::get_month, _1, _2, _3, _4 ) ),                                    "get number of months from time" },
-				{ "get_month",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::get_month, _1, _2, _3, _4 ) ),                                    "get number of months from time" },
-				{ "subtract",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::subtract, _1, _2, _3, _4 ) ),                                     "( *time* ) - calculate time difference between this and *time* time points" },
-				{ "to_string",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::to_string, _1, _2, _3, _4 ) ),                                    "get `string` representation of this point-in-time" }
+				{ "mod_year",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_year",   &hcore::HTime::mod_year, _1, _2, _3, _4 ) ),   "( *num* ) - modify time value by *num* of years" },
+				{ "mod_month",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_month",  &hcore::HTime::mod_month, _1, _2, _3, _4 ) ),  "( *num* ) - modify time value by *num* of months" },
+				{ "mod_day",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_day",    &hcore::HTime::mod_day, _1, _2, _3, _4 ) ),    "( *num* ) - modify time value by *num* of days" },
+				{ "mod_hour",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_hour",   &hcore::HTime::mod_hour, _1, _2, _3, _4 ) ),   "( *num* ) - modify time value by *num* of hours" },
+				{ "mod_minute",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_minute", &hcore::HTime::mod_minute, _1, _2, _3, _4 ) ), "( *num* ) - modify time value by *num* of minutes" },
+				{ "mod_second",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_second", &hcore::HTime::mod_second, _1, _2, _3, _4 ) ), "( *num* ) - modify time value by *num* of seconds" },
+				{ "set_time",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::set, "set_time",   &hcore::HTime::set_time, _1, _2, _3, _4 ) ),   "( *hh*, *mm*, *ss* ) - set time value to *hh*:*mm*:*ss*" },
+				{ "set_date",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::set, "set_date",   &hcore::HTime::set_date, _1, _2, _3, _4 ) ),   "( *YYYY*, *MM*, *DD* ) - set date value to *YYYY*-*MM*-*DD*" },
+				{ "get_year",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::get, "get_year",   &hcore::HTime::get_year, _1, _2, _3, _4 ) ),   "get number of years from time" },
+				{ "get_day",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::get, "get_day",    &hcore::HTime::get_day, _1, _2, _3, _4 ) ),    "get number of days from time" },
+				{ "get_hour",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::get, "get_hour",   &hcore::HTime::get_hour, _1, _2, _3, _4 ) ),   "get number of hours from time" },
+				{ "get_minute",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::get, "get_minute", &hcore::HTime::get_minute, _1, _2, _3, _4 ) ), "get number of minutes from time" },
+				{ "get_second",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::get, "get_second", &hcore::HTime::get_second, _1, _2, _3, _4 ) ), "get number of seconds from time" },
+				{ "set_datetime", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::set_datetime, _1, _2, _3, _4 ) ),                                 "( *YYYY*, *MM*, *DD*, *hh*, *mm*, *ss* ) - set date value to *YYYY*-*MM*-*DD* *hh*:*mm*:*ss*" },
+				{ "get_month",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::get_month, _1, _2, _3, _4 ) ),                                    "get number of months from time" },
+				{ "subtract",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::subtract, _1, _2, _3, _4 ) ),                                     "( *time* ) - calculate time difference between this and *time* time points" },
+				{ "from_string",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::from_string, _1, _2, _3, _4 ) ),                                  "( *str* ) - set time from parsed `string` *str*" },
+				{ "to_string",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::to_string, _1, _2, _3, _4 ) ),                                    "get `string` representation of this point-in-time" }
 			},
 			"The `Time` class represent information about point-in-time."
 		)

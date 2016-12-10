@@ -49,9 +49,11 @@ public:
 	static HHuginn::value_t mod( char const*, time_mod_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t get( char const*, time_get_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t set( char const*, time_set_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+	static HHuginn::value_t set_datetime( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t get_month( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
-	static HHuginn::value_t to_string( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t subtract( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+	static HHuginn::value_t from_string( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+	static HHuginn::value_t to_string( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::class_t get_class( HRuntime* );
 private:
 	virtual HHuginn::value_t do_clone( huginn::HRuntime* ) const override;
