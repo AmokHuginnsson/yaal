@@ -375,7 +375,8 @@ HTime& HTime::operator -= ( HTime const& time_ ) {
 #else
 	time_t t( static_cast<time_t>( _value ) );
 #endif
-	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != nullptr );
+	_tz = TZ::UTC;
+	M_ENSURE( gmtime_r( &t, &_broken ) != nullptr );
 	mkgmtime( &_broken );
 	return ( *this );
 	M_EPILOG
