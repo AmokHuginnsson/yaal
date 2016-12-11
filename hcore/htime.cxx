@@ -59,7 +59,11 @@ inline i64_t yaal_epoch_to_unix_epoch( i64_t time_ ) {
 }
 
 HTime::HTime( TZ tz_, char const* format_ )
-	: _value(), _broken(), _tz( tz_ ), _format( format_ ), _cache() {
+	: _value()
+	, _broken()
+	, _tz( tz_ )
+	, _format( format_ )
+	, _cache() {
 	M_PROLOG
 	set_now();
 	return;
@@ -75,7 +79,11 @@ HTime::HTime( yaal::hcore::HString const& strTime_, char const* format_ )
 }
 
 HTime::HTime( TZ tz_, yaal::hcore::HString const& strTime_, char const* format_ )
-	: _value(), _broken(), _tz( tz_ ), _format( format_ ), _cache() {
+	: _value()
+	, _broken()
+	, _tz( tz_ )
+	, _format( format_ )
+	, _cache() {
 	M_PROLOG
 	from_string( strTime_ );
 	return;
@@ -83,8 +91,11 @@ HTime::HTime( TZ tz_, yaal::hcore::HString const& strTime_, char const* format_ 
 }
 
 HTime::HTime( HTime const& time_ )
-	: _value( time_._value ), _broken( time_._broken ), _tz( time_._tz ),
-	_format( time_._format ), _cache() {
+	: _value( time_._value )
+	, _broken( time_._broken )
+	, _tz( time_._tz )
+	, _format( time_._format )
+	, _cache() {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -96,7 +107,11 @@ HTime::HTime( i64_t time_, char const* format_ )
 }
 
 HTime::HTime( TZ tz_, i64_t time_, char const* format_ )
-	: _value( time_ ), _broken(), _tz( tz_ ), _format( format_ ), _cache() {
+	: _value( time_ )
+	, _broken()
+	, _tz( tz_ )
+	, _format( format_ )
+	, _cache() {
 	M_PROLOG
 	time_t t( static_cast<time_t>( yaal_epoch_to_unix_epoch( _value ) ) );
 	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != nullptr );
@@ -113,7 +128,11 @@ HTime::HTime( int year_, int month_, int day_,
 
 HTime::HTime( TZ tz_, int year_, int month_, int day_,
 		int hour_, int minute_, int second_, char const* format_ )
-	: _value(), _broken(), _tz( tz_ ), _format( format_ ), _cache() {
+	: _value()
+	, _broken()
+	, _tz( tz_ )
+	, _format( format_ )
+	, _cache() {
 	M_PROLOG
 	set_datetime( year_, month_, day_, hour_, minute_, second_ );
 	return;

@@ -145,9 +145,9 @@ HHuginn::HOrder::HOrder( HHuginn::HClass const* class_ )
 }
 
 HHuginn::HOrder::HOrder( HHuginn::HClass const* class_, values_t const& data_, HHuginn::HClass const* keyType_ )
-	: HIterable( class_ ),
-	_data(),
-	_keyType( keyType_ ) {
+	: HIterable( class_ )
+	, _data( &value_builtin::less_low )
+	, _keyType( keyType_ ) {
 	HRuntime* huginn( class_->runtime() );
 	for ( values_t::value_type const& v : data_ ) {
 		_data.insert( _data.end(), v->clone( huginn ) );

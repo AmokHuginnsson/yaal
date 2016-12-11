@@ -145,7 +145,7 @@ HHuginn::HSet::HSet( HHuginn::HClass const* class_ )
 
 HHuginn::HSet::HSet( HHuginn::HClass const* class_, values_t const& data_ )
 	: HIterable( class_ )
-	, _data() {
+	, _data( &value_builtin::hash, &value_builtin::key_equals ) {
 	HRuntime* huginn( class_->runtime() );
 	for ( values_t::value_type const& v : data_ ) {
 		_data.insert( v->clone( huginn ) );
