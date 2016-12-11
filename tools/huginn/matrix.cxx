@@ -173,7 +173,7 @@ HHuginn::value_t HMatrix::get( huginn::HThread* thread_, HHuginn::value_t* objec
 			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), position_ );
 		}
 		if ( ( col < 0 ) || ( col >= m.col() ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Bad col: "_ys.append( col ), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), position_ );
 		}
 		v = thread_->runtime().object_factory()->create_number( m[row][col] );
 	} else {
@@ -182,7 +182,7 @@ HHuginn::value_t HMatrix::get( huginn::HThread* thread_, HHuginn::value_t* objec
 			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), position_ );
 		}
 		if ( ( col < 0 ) || ( col >= m.col() ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Bad col: "_ys.append( col ), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), position_ );
 		}
 		v = thread_->runtime().object_factory()->create_real( m[row][col] );
 	}
@@ -206,7 +206,7 @@ HHuginn::value_t HMatrix::set( huginn::HThread*, HHuginn::value_t* object_, HHug
 			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), position_ );
 		}
 		if ( ( col < 0 ) || ( col >= m.col() ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Bad col: "_ys.append( col ), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), position_ );
 		}
 		m[row][col] = get_number( values_[2] );
 	} else {
@@ -216,7 +216,7 @@ HHuginn::value_t HMatrix::set( huginn::HThread*, HHuginn::value_t* object_, HHug
 			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), position_ );
 		}
 		if ( ( col < 0 ) || ( col >= m.col() ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Bad col: "_ys.append( col ), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), position_ );
 		}
 		m[row][col] = get_real( values_[2] );
 	}

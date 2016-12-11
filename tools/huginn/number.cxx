@@ -97,7 +97,7 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 			},
 			"The `number` is a scalar type that is used to represent and operate on fixed point numbers of arbitrary size. "
 			"It supports basic operations of addition, subtraction, multiplication, division, modulo, power, factorial and comparisons, "
-			"it can also be used as an argument in funcions and algorithms from Mathematics package. "
+			"it can also be used as an argument in functions and algorithms from Mathematics package. "
 			"The range of possible values it can hold is limited only by size of your hardware resources."
 		)
 	);

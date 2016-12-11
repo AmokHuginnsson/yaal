@@ -56,7 +56,7 @@ public:
 				"Filter",
 				nullptr,
 				HHuginn::field_definitions_t{},
-				"The `Filter` class represents a *lazy* filtering transformation of one *iterable* into another. Resulting *iterable* produces only values matching predicate."
+				"The `Filter` class represents a *lazy* filtering transformation of one *iterable* into another. Resulting *iterable* produces only values matching supplied predicate."
 			)
 		);
 		M_EPILOG

@@ -40,7 +40,7 @@ M_YAAL_HCORE_PUBLIC_API extern double long PI;
 M_YAAL_HCORE_PUBLIC_API extern double long E;
 
 double long square_root_impl( double long );
-double long natural_expotential_impl( double long );
+double long natural_exponential_impl( double long );
 double long natural_logarithm_impl( double long );
 double long sinus_impl( double long );
 double long cosinus_impl( double long );
@@ -62,8 +62,8 @@ T square_root( T val_ ) {
 }
 
 template<typename T>
-T natural_expotential( T val_ ) {
-	return ( static_cast<T>( natural_expotential_impl( val_ ) ) );
+T natural_exponential( T val_ ) {
+	return ( static_cast<T>( natural_exponential_impl( val_ ) ) );
 }
 
 template<typename T>

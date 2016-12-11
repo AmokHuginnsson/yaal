@@ -85,14 +85,14 @@ HHuginn::value_t HCryptographyCreator::do_new_instance( HRuntime* runtime_ ) {
 			"Cryptography",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "md5", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::hash, "Cryptography.md5", static_cast<tools::hash::hash_string_t>( &tools::hash::md5 ), _1, _2, _3, _4 ) ), "( *str* ) - calculare *MD5* sum of given `string`" },
-				{ "sha1", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::hash, "Cryptography.sha1", static_cast<tools::hash::hash_string_t>( &tools::hash::sha1 ), _1, _2, _3, _4 ) ), "( *str* ) - calculare *SHA1* sum of given `string`" },
-				{ "sha512", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::hash, "Cryptography.sha512", static_cast<tools::hash::hash_string_t>( &tools::hash::sha512 ), _1, _2, _3, _4 ) ), "( *str* ) - calculare *SHA512* sum of given `string`" },
+				{ "md5", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::hash, "Cryptography.md5", static_cast<tools::hash::hash_string_t>( &tools::hash::md5 ), _1, _2, _3, _4 ) ), "( *str* ) - calculate *MD5* sum of given `string`" },
+				{ "sha1", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::hash, "Cryptography.sha1", static_cast<tools::hash::hash_string_t>( &tools::hash::sha1 ), _1, _2, _3, _4 ) ), "( *str* ) - calculate *SHA1* sum of given `string`" },
+				{ "sha512", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::hash, "Cryptography.sha512", static_cast<tools::hash::hash_string_t>( &tools::hash::sha512 ), _1, _2, _3, _4 ) ), "( *str* ) - calculate *SHA512* sum of given `string`" },
 				{ "hmac_md5", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::hmac, "Cryptography.hmac_md5", hash::FUNCTION::MD5, _1, _2, _3, _4 ) ), "( *key*, *str* ) - calculate *HMAC-MD5* verification code for given `string` *str* using given *key*" },
 				{ "hmac_sha1", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::hmac, "Cryptography.hmac_sha1", hash::FUNCTION::SHA1, _1, _2, _3, _4 ) ), "( *key*, *str* ) - calculate *HMAC-SHA1* verification code for given `string` *str* using given *key*" },
 				{ "hmac_sha512", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::hmac, "Cryptography.hmac_sha512", hash::FUNCTION::SHA512, _1, _2, _3, _4 ) ), "( *key*, *str* ) - calculate *HMAC-SHA512* verification code for given `string` *str* using given *key*" }
 			},
-			"The `Cryptography` package provides functionality of a cryptographical nature, like hashing functions."
+			"The `Cryptography` package provides functionality of a cryptographic nature, like hashing functions."
 		)
 	);
 	runtime_->huginn()->register_class( c );

@@ -835,7 +835,7 @@ inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterfac
 			stream_ << ",";
 		}
 		next = true;
-		stream_ << " " << runtime->identifier_name( f ) << ( verbose ? "(overriden)" : "" );
+		stream_ << " " << runtime->identifier_name( f ) << ( verbose ? "(overridden)" : "" );
 	}
 	for ( HHuginn::identifier_id_t f : newFields ) {
 		if ( next ) {

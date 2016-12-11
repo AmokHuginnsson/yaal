@@ -128,18 +128,18 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t natural_expotential( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t natural_exponential( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		char const name[] = "Mathematics.natural_expotential";
+		char const name[] = "Mathematics.natural_exponential";
 		verify_arg_count( name, values_, 1, 1, position_ );
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
-			v = thread_->object_factory().create_number( math::natural_expotential( val ) );
+			v = thread_->object_factory().create_number( math::natural_exponential( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
-			v = thread_->object_factory().create_real( math::natural_expotential( val ) );
+			v = thread_->object_factory().create_real( math::natural_exponential( val ) );
 		}
 		return ( v );
 		M_EPILOG
@@ -490,7 +490,7 @@ HHuginn::value_t HMathematicsCreator::do_new_instance( HRuntime* runtime_ ) {
 				{ "pi",                   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::pi, _1, _2, _3, _4 ) ), "( *type* [, *precision*] ) - get value of $\\pi$ of type *type*, potentially with given *precision*" },
 				{ "e",                    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::e, _1, _2, _3, _4 ) ), "( *type* [, *precision*] ) - get value of $e$ of type *type*, potentially with given *precision*" },
 				{ "square_root",          make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::square_root, _1, _2, _3, _4 ) ), "( *value* ) - calculate square root of given *value*" },
-				{ "natural_expotential",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::natural_expotential, _1, _2, _3, _4 ) ), "( *x* ) - calculate value of $e^x$ (value of natural expotential of *x*)" },
+				{ "natural_exponential",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::natural_exponential, _1, _2, _3, _4 ) ), "( *x* ) - calculate value of $e^x$ (value of natural exponential of *x*)" },
 				{ "natural_logarithm",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::natural_logarithm, _1, _2, _3, _4 ) ), "( *x* ) - find natural logarithm of value *x*" },
 				{ "sinus",                make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::sinus, _1, _2, _3, _4 ) ), "( *arg* ) - calculate value of *sine* function of *arg* argument" },
 				{ "cosinus",              make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::cosinus, _1, _2, _3, _4 ) ), "( *arg* ) - calculate value of *cosine* function of *arg* argument" },

@@ -193,7 +193,7 @@ HHuginn::class_t HFileStat::get_class( HRuntime* runtime_ ) {
 				{ "modified", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileStat::get_times, "modified", &HFSItem::modified, _1, _2, _3, _4 ) ), "get file's data modification `time`" },
 				{ "accessed", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileStat::get_times, "accessed", &HFSItem::accessed, _1, _2, _3, _4 ) ), "get file's last access `time`" }
 			},
-			"The `FileStat` is a class representing results of gathering numerical statistics over some uniformly typed number set."
+			"The `FileStat` class allows obtaining metadata information about various file system objects."
 		)
 	);
 	runtime_->huginn()->register_class( c );

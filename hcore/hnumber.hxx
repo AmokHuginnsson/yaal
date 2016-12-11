@@ -303,7 +303,7 @@ yaal::hcore::HNumber binomial_coefficient( int long long, int long long );
 namespace math {
 
 yaal::hcore::HNumber square_root( yaal::hcore::HNumber const& );
-yaal::hcore::HNumber natural_expotential( yaal::hcore::HNumber const& );
+yaal::hcore::HNumber natural_exponential( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber natural_logarithm( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber sinus( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber cosinus( yaal::hcore::HNumber const& );

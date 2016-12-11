@@ -292,7 +292,7 @@ double long HExpression::functions( tree_t::const_node_t node_ ) {
 			retVal = arcus_cotangens( leftValue );
 		break;
 		case ( FUNCTION::EXP ):
-			retVal = natural_expotential( leftValue );
+			retVal = natural_exponential( leftValue );
 		break;
 		case ( FUNCTION::SQRT ): {
 			if ( leftValue < 0 ) {

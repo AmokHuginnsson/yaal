@@ -143,7 +143,7 @@ struct HNumber::ElementaryFunctions {
 		return ( n );
 		M_EPILOG
 	}
-	static yaal::hcore::HNumber natural_expotential( yaal::hcore::HNumber const& value_ ) {
+	static yaal::hcore::HNumber natural_exponential( yaal::hcore::HNumber const& value_ ) {
 		M_PROLOG
 		integer_t precision( value_.get_precision() * 2 );
 		HNumber input( value_, precision );
@@ -424,7 +424,7 @@ struct HNumber::ElementaryFunctions {
 	static yaal::hcore::HNumber hyperbolic_sinus( yaal::hcore::HNumber const& value_ ) {
 		M_PROLOG
 		HNumber v( value_, value_.get_precision() + 1 );
-		v = natural_expotential( v ) - natural_expotential( -v );
+		v = natural_exponential( v ) - natural_exponential( -v );
 		v /= number::N2;
 		v.set_precision( value_.get_precision() );
 		return ( v );
@@ -433,7 +433,7 @@ struct HNumber::ElementaryFunctions {
 	static yaal::hcore::HNumber hyperbolic_cosinus( yaal::hcore::HNumber const& value_ ) {
 		M_PROLOG
 		HNumber v( value_, value_.get_precision() + 1 );
-		v = natural_expotential( v ) + natural_expotential( -v );
+		v = natural_exponential( v ) + natural_exponential( -v );
 		v /= number::N2;
 		v.round( value_.get_precision() );
 		v.set_precision( value_.get_precision() );
@@ -443,8 +443,8 @@ struct HNumber::ElementaryFunctions {
 	static yaal::hcore::HNumber hyperbolic_tangens( yaal::hcore::HNumber const& value_ ) {
 		M_PROLOG
 		HNumber v( value_, value_.get_precision() + 10 );
-		HNumber p( natural_expotential( v ) );
-		HNumber n( natural_expotential( -v ) );
+		HNumber p( natural_exponential( v ) );
+		HNumber n( natural_exponential( -v ) );
 		v = p - n;
 		v /= ( p + n );
 		v.round( value_.get_precision() );
@@ -455,8 +455,8 @@ struct HNumber::ElementaryFunctions {
 	static yaal::hcore::HNumber hyperbolic_cotangens( yaal::hcore::HNumber const& value_ ) {
 		M_PROLOG
 		HNumber v( value_, value_.get_precision() + 10 );
-		HNumber p( natural_expotential( v ) );
-		HNumber n( natural_expotential( -v ) );
+		HNumber p( natural_exponential( v ) );
+		HNumber n( natural_exponential( -v ) );
 		v = p + n;
 		v /= ( p - n );
 		v.round( value_.get_precision() );
@@ -679,7 +679,7 @@ yaal::hcore::HNumber const& PI( yaal::hcore::HNumber::integer_t precision_ ) {
 HNumericConstantCache ECache(
 	HNumericConstantCache::approximator_t(
 		[]( yaal::hcore::HNumber::integer_t precision_ ) -> yaal::hcore::HNumber {
-			return ( natural_expotential( yaal::hcore::HNumber( 1, precision_ ) ) );
+			return ( natural_exponential( yaal::hcore::HNumber( 1, precision_ ) ) );
 		}
 	),
 	HNumber( "2.7182818284590452353602874713526624977572470936999595749669676277240766303535475945713821785251664274274663919320030599218174136" )
@@ -724,9 +724,9 @@ yaal::hcore::HNumber square_root( yaal::hcore::HNumber const& value_ ) {
 	M_EPILOG
 }
 
-yaal::hcore::HNumber natural_expotential( yaal::hcore::HNumber const& value_ ) {
+yaal::hcore::HNumber natural_exponential( yaal::hcore::HNumber const& value_ ) {
 	M_PROLOG
-	return ( yaal::hcore::HNumber::ElementaryFunctions::natural_expotential( value_ ) );
+	return ( yaal::hcore::HNumber::ElementaryFunctions::natural_exponential( value_ ) );
 	M_EPILOG
 }
 

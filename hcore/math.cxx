@@ -43,7 +43,7 @@ double long square_root_impl( double long val_ ) {
 	return ( sqrtl( val_ ) );
 }
 
-double long natural_expotential_impl( double long val_ ) {
+double long natural_exponential_impl( double long val_ ) {
 	return ( expl( val_ ) );
 }
 
