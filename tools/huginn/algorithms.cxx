@@ -59,9 +59,6 @@ public:
 		, _filterClass( HFilter::get_class( class_->runtime() ) )
 		, _mapperClass( HMapper::get_class( class_->runtime() ) )
 		, _rangeClass( HRange::get_class( class_->runtime() ) ) {
-		class_->runtime()->huginn()->register_class( _filterClass );
-		class_->runtime()->huginn()->register_class( _mapperClass );
-		class_->runtime()->huginn()->register_class( _rangeClass );
 		return;
 	}
 	static HHuginn::value_t filter( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {

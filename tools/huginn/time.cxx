@@ -189,6 +189,7 @@ HHuginn::class_t HTime::get_class( HRuntime* runtime_ ) {
 			"The `Time` class represent information about point-in-time."
 		)
 	);
+	runtime_->huginn()->register_class( c );
 	return ( c );
 	M_EPILOG
 }

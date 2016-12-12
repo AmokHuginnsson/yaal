@@ -57,7 +57,7 @@ public:
 	}
 	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
 		M_PROLOG
-		return (
+		HHuginn::class_t c(
 			runtime_->create_class(
 				"Range",
 				nullptr,
@@ -65,6 +65,8 @@ public:
 				"The `Range` class represents *lazy* *iterable* range of integer values."
 			)
 		);
+		runtime_->huginn()->register_class( c );
+		return ( c );
 		M_EPILOG
 	}
 protected:

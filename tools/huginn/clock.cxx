@@ -79,7 +79,7 @@ HHuginn::value_t HClock::to_string( huginn::HThread* thread_, HHuginn::value_t* 
 
 HHuginn::class_t HClock::get_class( HRuntime* runtime_ ) {
 	M_PROLOG
-	return (
+	HHuginn::class_t c(
 		runtime_->create_class(
 			"Clock",
 			nullptr,
@@ -91,6 +91,8 @@ HHuginn::class_t HClock::get_class( HRuntime* runtime_ ) {
 			"The `Clock` provides a stopper watch concept machinery."
 		)
 	);
+	runtime_->huginn()->register_class( c );
+	return ( c );
 	M_EPILOG
 }
 

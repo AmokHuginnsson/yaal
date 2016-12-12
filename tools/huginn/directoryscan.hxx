@@ -60,7 +60,7 @@ public:
 	}
 	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
 		M_PROLOG
-		return (
+		HHuginn::class_t c(
 			runtime_->create_class(
 				"DirectoryScan",
 				nullptr,
@@ -68,6 +68,8 @@ public:
 				"The `DirectoryScan` class represents ongoing directory scan operation."
 			)
 		);
+		runtime_->huginn()->register_class( c );
+		return ( c );
 		M_EPILOG
 	}
 protected:

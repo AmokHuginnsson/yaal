@@ -60,7 +60,6 @@ public:
 		: HObject( class_ )
 		, _streamClass( HStream::get_class( class_->runtime() ) )
 		, _exceptionClass( exception::create_class( class_->runtime(), "NetworkException", "The `NetworkException` exception type for `Network` package." ) ) {
-		class_->runtime()->huginn()->register_class( _streamClass );
 		return;
 	}
 	static HHuginn::value_t resolve( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {

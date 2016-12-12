@@ -51,7 +51,7 @@ public:
 	}
 	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
 		M_PROLOG
-		return (
+		HHuginn::class_t c(
 			runtime_->create_class(
 				"Mapper",
 				nullptr,
@@ -59,6 +59,8 @@ public:
 				"The `Mapper` class represent *lazy* transformation of one *iterable* into another. Resulting *iterable* produces values from original *iterable* transformed by user supplied unary function."
 			)
 		);
+		runtime_->huginn()->register_class( c );
+		return ( c );
 		M_EPILOG
 	}
 protected:
