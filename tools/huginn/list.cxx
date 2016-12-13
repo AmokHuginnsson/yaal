@@ -32,6 +32,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "iterator.hxx"
 #include "helper.hxx"
 #include "objectfactory.hxx"
+#include "value_builtin.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -99,6 +100,22 @@ inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHug
 	M_EPILOG
 }
 
+inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "list.equals";
+	verify_arg_count( name, values_, 1, 1, position_ );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
+	verify_arg_type( name, values_, 0, (*object_)->get_class(), true, position_ );
+	HHuginn::HList::values_t const& l( static_cast<HHuginn::HList*>( object_->raw() )->value() );
+	HHuginn::HList::values_t const& r( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
+	bool equal( l.get_size() == r.get_size() );
+	for ( int long i( 0 ), c( l.get_size() ); equal && ( i < c ); ++ i ) {
+		equal = value_builtin::equals( thread_, l[i], r[i], position_ );
+	}
+	return ( thread_->object_factory().create_boolean( equal ) );
+	M_EPILOG
+}
+
 HHuginn::class_t get_class( HRuntime* );
 HHuginn::class_t get_class( HRuntime* runtime_ ) {
 	M_PROLOG
@@ -109,9 +126,10 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 			runtime_->identifier_id( type_name( HHuginn::TYPE::LIST ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "add",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::add, _1, _2, _3, _4 ) ), "( *elem* ) - add new *elem* at the end of the `list`, `list` grows in size by 1" },
-				{ "pop",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::pop, _1, _2, _3, _4 ) ), "remove last element from the `list`, `list` shrinks by 1" },
-				{ "clear", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::clear, _1, _2, _3, _4 ) ), "erase `list`'s content, `list` becomes empty" }
+				{ "add",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::add, _1, _2, _3, _4 ) ), "( *elem* ) - add new *elem* at the end of the `list`, `list` grows in size by 1" },
+				{ "pop",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::pop, _1, _2, _3, _4 ) ), "remove last element from the `list`, `list` shrinks by 1" },
+				{ "clear",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::clear, _1, _2, _3, _4 ) ), "erase `list`'s content, `list` becomes empty" },
+				{ "equals", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::equals, _1, _2, _3, _4 ) ), "( *other* ) - test if *other* `list` has the same content" }
 			},
 			"The `list` is a collection type that is used to represent and operate on `list` of values. "
 			"It supports basic subscript and range operators. "
