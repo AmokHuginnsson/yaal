@@ -166,6 +166,20 @@ void HPackageFactory::cleanup_globals( void ) {
 	M_EPILOG
 }
 
+void initialize_packages( void ) {
+	M_PROLOG
+	HPackageFactory::get_instance().initialize_globals();
+	return;
+	M_EPILOG
+}
+
+void cleanup_packages( void ) {
+	M_PROLOG
+	HPackageFactory::get_instance().cleanup_globals();
+	return;
+	M_EPILOG
+}
+
 }
 
 }

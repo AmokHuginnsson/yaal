@@ -980,6 +980,9 @@ inline yaal::hcore::HString const& type_name( HHuginn::type_id_t type_ ) {
 	return ( type_name( static_cast<HHuginn::TYPE>( type_.get() ) ) );
 }
 
+void initialize_packages( void );
+void cleanup_packages( void );
+
 }
 
 inline bool operator == ( HHuginn::TYPE t1_, HHuginn::type_id_t t2_ ) {
