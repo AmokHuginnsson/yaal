@@ -642,16 +642,18 @@ yaal::hcore::HNumber find_pi( yaal::hcore::HNumber::integer_t precision_ ) {
 
 	HNumber v;
 	HNumber e;
-	HNumber denominator;
+	HNumber numeratorBase( number::N1 );
+	HNumber denominator( number::N1 );
 
-	for ( int long long i( 0 ); true; ++ i ) {
-		e = factorial( 6LL * i ) * ( a * i + b );
+	for ( HNumber i( number::N0 ); true; ++ i ) {
+		e = numeratorBase * ( a * i + b );
 		e.set_precision( precision_ + 6 );
-		denominator = factorial( 3LL * i ) * ( factorial( i ) ^ 3 ) * ( c ^ i );
 		e /= denominator;
 		if ( e == number::N0 ) {
 			break;
 		}
+		numeratorBase *= ( ( i * 48 + 24 ) * ( i * 6 + 1 ) * ( i * 6 + 5 ) );
+		denominator *= ( c * ( ( i + 1 ) ^ 3 ) );
 		if ( plus ) {
 			v += e;
 		} else {
