@@ -73,9 +73,8 @@ namespace list {
 inline HHuginn::value_t add( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "list.add", values_, 1, 1, position_ );
-	HHuginn::HList* l( dynamic_cast<HHuginn::HList*>( object_->raw() ) );
-	M_ASSERT( l != nullptr );
-	l->push_back( values_[0] );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
+	static_cast<HHuginn::HList*>( object_->raw() )->push_back( values_[0] );
 	return ( *object_ );
 	M_EPILOG
 }
@@ -83,9 +82,8 @@ inline HHuginn::value_t add( huginn::HThread*, HHuginn::value_t* object_, HHugin
 inline HHuginn::value_t pop( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "list.pop", values_, 0, 0, position_ );
-	HHuginn::HList* l( dynamic_cast<HHuginn::HList*>( object_->raw() ) );
-	M_ASSERT( l != nullptr );
-	l->pop_back();
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
+	static_cast<HHuginn::HList*>( object_->raw() )->pop_back();
 	return ( *object_ );
 	M_EPILOG
 }
@@ -93,9 +91,8 @@ inline HHuginn::value_t pop( huginn::HThread*, HHuginn::value_t* object_, HHugin
 inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "list.clear", values_, 0, 0, position_ );
-	HHuginn::HList* l( dynamic_cast<HHuginn::HList*>( object_->raw() ) );
-	M_ASSERT( l != nullptr );
-	l->clear();
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
+	static_cast<HHuginn::HList*>( object_->raw() )->clear();
 	return ( *object_ );
 	M_EPILOG
 }

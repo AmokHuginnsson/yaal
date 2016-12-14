@@ -74,9 +74,8 @@ namespace lookup {
 inline HHuginn::value_t has_key( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "lookup.has_key", values_, 1, 1, position_ );
-	HHuginn::HLookup* l( dynamic_cast<HHuginn::HLookup*>( object_->raw() ) );
-	M_ASSERT( l != nullptr );
-	bool hasKey( l->has_key( values_[0] ) );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LOOKUP );
+	bool hasKey( static_cast<HHuginn::HLookup*>( object_->raw() )->has_key( values_[0] ) );
 	return ( thread_->object_factory().create_boolean( hasKey ) );
 	M_EPILOG
 }
@@ -84,8 +83,8 @@ inline HHuginn::value_t has_key( huginn::HThread* thread_, HHuginn::value_t* obj
 inline HHuginn::value_t get( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "lookup.get", values_, 1, 2, position_ );
-	HHuginn::HLookup* l( dynamic_cast<HHuginn::HLookup*>( object_->raw() ) );
-	M_ASSERT( l != nullptr );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LOOKUP );
+	HHuginn::HLookup* l( static_cast<HHuginn::HLookup*>( object_->raw() ) );
 	HHuginn::value_t v;
 	if ( values_.get_size() > 1 ) {
 		bool hasKey( l->try_get( values_[0], v ) );
@@ -102,9 +101,8 @@ inline HHuginn::value_t get( huginn::HThread*, HHuginn::value_t* object_, HHugin
 inline HHuginn::value_t erase( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "lookup.erase", values_, 1, 1, position_ );
-	HHuginn::HLookup* l( dynamic_cast<HHuginn::HLookup*>( object_->raw() ) );
-	M_ASSERT( l != nullptr );
-	l->erase( values_[0] );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LOOKUP );
+	static_cast<HHuginn::HLookup*>( object_->raw() )->erase( values_[0] );
 	return ( *object_ );
 	M_EPILOG
 }
@@ -112,9 +110,8 @@ inline HHuginn::value_t erase( huginn::HThread*, HHuginn::value_t* object_, HHug
 inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "lookup.clear", values_, 0, 0, position_ );
-	HHuginn::HLookup* l( dynamic_cast<HHuginn::HLookup*>( object_->raw() ) );
-	M_ASSERT( l != nullptr );
-	l->value().clear();
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LOOKUP );
+	static_cast<HHuginn::HLookup*>( object_->raw() )->value().clear();
 	return ( *object_ );
 	M_EPILOG
 }

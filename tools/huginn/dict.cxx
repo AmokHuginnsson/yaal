@@ -74,9 +74,8 @@ namespace dict {
 inline HHuginn::value_t has_key( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "dict.has_key", values_, 1, 1, position_ );
-	HHuginn::HDict* d( dynamic_cast<HHuginn::HDict*>( object_->raw() ) );
-	M_ASSERT( d != nullptr );
-	bool hasKey( d->has_key( values_[0], position_ ) );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DICT );
+	bool hasKey( static_cast<HHuginn::HDict*>( object_->raw() )->has_key( values_[0], position_ ) );
 	return ( thread_->object_factory().create_boolean( hasKey ) );
 	M_EPILOG
 }
@@ -84,8 +83,8 @@ inline HHuginn::value_t has_key( huginn::HThread* thread_, HHuginn::value_t* obj
 inline HHuginn::value_t get( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "dict.get", values_, 1, 2, position_ );
-	HHuginn::HDict* d( dynamic_cast<HHuginn::HDict*>( object_->raw() ) );
-	M_ASSERT( d != nullptr );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DICT );
+	HHuginn::HDict* d( static_cast<HHuginn::HDict*>( object_->raw() ) );
 	HHuginn::value_t v;
 	if ( values_.get_size() > 1 ) {
 		bool hasKey( d->try_get( values_[0], v, position_ ) );
@@ -102,9 +101,8 @@ inline HHuginn::value_t get( huginn::HThread*, HHuginn::value_t* object_, HHugin
 inline HHuginn::value_t erase( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "dict.erase", values_, 1, 1, position_ );
-	HHuginn::HDict* d( dynamic_cast<HHuginn::HDict*>( object_->raw() ) );
-	M_ASSERT( d != nullptr );
-	d->erase( values_[0], position_ );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DICT );
+	static_cast<HHuginn::HDict*>( object_->raw() )->erase( values_[0], position_ );
 	return ( *object_ );
 	M_EPILOG
 }
@@ -112,9 +110,8 @@ inline HHuginn::value_t erase( huginn::HThread*, HHuginn::value_t* object_, HHug
 inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "dict.clear", values_, 0, 0, position_ );
-	HHuginn::HDict* d( dynamic_cast<HHuginn::HDict*>( object_->raw() ) );
-	M_ASSERT( d != nullptr );
-	d->value().clear();
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DICT );
+	static_cast<HHuginn::HDict*>( object_->raw() )->value().clear();
 	return ( *object_ );
 	M_EPILOG
 }

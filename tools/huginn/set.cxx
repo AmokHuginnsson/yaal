@@ -74,9 +74,8 @@ namespace set {
 inline HHuginn::value_t add( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "set.add", values_, 1, 1, position_ );
-	HHuginn::HSet* s( dynamic_cast<HHuginn::HSet*>( object_->raw() ) );
-	M_ASSERT( s != nullptr );
-	s->insert( values_[0] );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
+	static_cast<HHuginn::HSet*>( object_->raw() )->insert( values_[0] );
 	return ( *object_ );
 	M_EPILOG
 }
@@ -84,9 +83,8 @@ inline HHuginn::value_t add( huginn::HThread*, HHuginn::value_t* object_, HHugin
 inline HHuginn::value_t has_key( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "set.has_key", values_, 1, 1, position_ );
-	HHuginn::HSet* s( dynamic_cast<HHuginn::HSet*>( object_->raw() ) );
-	M_ASSERT( s != nullptr );
-	bool hasKey( s->has_key( values_[0] ) );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
+	bool hasKey( static_cast<HHuginn::HSet*>( object_->raw() )->has_key( values_[0] ) );
 	return ( thread_->object_factory().create_boolean( hasKey ) );
 	M_EPILOG
 }
@@ -94,9 +92,8 @@ inline HHuginn::value_t has_key( huginn::HThread* thread_, HHuginn::value_t* obj
 inline HHuginn::value_t erase( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "set.erase", values_, 1, 1, position_ );
-	HHuginn::HSet* s( dynamic_cast<HHuginn::HSet*>( object_->raw() ) );
-	M_ASSERT( s != nullptr );
-	s->erase( values_[0] );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
+	static_cast<HHuginn::HSet*>( object_->raw() )->erase( values_[0] );
 	return ( *object_ );
 	M_EPILOG
 }
@@ -104,9 +101,8 @@ inline HHuginn::value_t erase( huginn::HThread*, HHuginn::value_t* object_, HHug
 inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "set.clear", values_, 0, 0, position_ );
-	HHuginn::HSet* s( dynamic_cast<HHuginn::HSet*>( object_->raw() ) );
-	M_ASSERT( s != nullptr );
-	s->value().clear();
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
+	static_cast<HHuginn::HSet*>( object_->raw() )->value().clear();
 	return ( *object_ );
 	M_EPILOG
 }
