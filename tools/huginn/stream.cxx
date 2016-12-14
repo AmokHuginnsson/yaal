@@ -144,7 +144,7 @@ HHuginn::HIterable::HIterator HStream::do_iterator( HThread*, int ) {
 }
 
 int long HStream::do_size( void ) const {
-	return ( 0 );
+	throw HHuginn::HHuginnRuntimeException( "Getting size of `Stream' is an invalid operation.", 0 );
 }
 
 HHuginn::class_t HStream::get_class( HRuntime* runtime_ ) {
