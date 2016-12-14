@@ -105,7 +105,7 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	char const name[] = "list.equals";
 	verify_arg_count( name, values_, 1, 1, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
-	verify_arg_type( name, values_, 0, (*object_)->get_class(), true, position_ );
+	verify_arg_type( name, values_, 0, HHuginn::TYPE::LIST, true, position_ );
 	HHuginn::HList::values_t const& l( static_cast<HHuginn::HList*>( object_->raw() )->value() );
 	HHuginn::HList::values_t const& r( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
 	bool equal( l.get_size() == r.get_size() );

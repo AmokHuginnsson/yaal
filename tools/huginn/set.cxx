@@ -111,6 +111,22 @@ inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHug
 	M_EPILOG
 }
 
+inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "set.equals";
+	verify_arg_count( name, values_, 1, 1, position_ );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
+	verify_arg_type( name, values_, 0, HHuginn::TYPE::SET, true, position_ );
+	HHuginn::HSet::values_t const& l( static_cast<HHuginn::HSet*>( object_->raw() )->value() );
+	HHuginn::HSet::values_t const& r( static_cast<HHuginn::HSet const*>( values_[0].raw() )->value() );
+	bool equal( l.get_size() == r.get_size() );
+	for ( HHuginn::HSet::values_t::const_iterator lit( l.begin() ), rit( r.begin() ), end( l.end() ); equal && ( lit != end ); ++ lit, ++ rit ) {
+		equal = value_builtin::equals( thread_, *lit, *rit, position_ );
+	}
+	return ( thread_->object_factory().create_boolean( equal ) );
+	M_EPILOG
+}
+
 HHuginn::class_t get_class( HRuntime* );
 HHuginn::class_t get_class( HRuntime* runtime_ ) {
 	M_PROLOG
@@ -124,7 +140,8 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 				{ "add",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &set::add, _1, _2, _3, _4 ) ), "( *elem* ) - add given element *elem* to a `set`" },
 				{ "has_key", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &set::has_key, _1, _2, _3, _4 ) ), "( *elem* ) - tell if given element *elem* is present in the `set`" },
 				{ "erase",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &set::erase, _1, _2, _3, _4 ) ), "( *elem* ) - remove given element *elem* from the `set`" },
-				{ "clear",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &set::clear, _1, _2, _3, _4 ) ), "erase `set`'s content, `set` becomes empty" }
+				{ "clear",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &set::clear, _1, _2, _3, _4 ) ), "erase `set`'s content, `set` becomes empty" },
+				{ "equals",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &set::equals, _1, _2, _3, _4 ) ), "( *other* ) - test if *other* `set` has the same content" }
 			},
 			"The `set` is a collection of unique elements of varying types. It supports operation of element insertion, removal and search."
 		)
