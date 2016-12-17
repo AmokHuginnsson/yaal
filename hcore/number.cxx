@@ -641,38 +641,41 @@ yaal::hcore::HNumber find_pi( yaal::hcore::HNumber::integer_t precision_ ) {
 
 	bool plus( true );
 
-	HNumber v;
-	HNumber e;
-	HNumber numeratorBase( number::N1 );
+	HNumber va;
+	HNumber vb;
+	HNumber e( number::N1 );
 	HNumber denominator( number::N1 );
 	HNumber a1( number::N0 );
 	HNumber k1( 120 );
 	HNumber k2( 5424 );
 	HNumber k3( 15552 );
 
+	HNumber::integer_t extraPrec( precision_ / 125 );
 	for ( HNumber i( number::N0 ); true; ++ i ) {
-		e = numeratorBase * ( a1 + b );
-		e.set_precision( precision_ + 6 );
+		e.set_precision( precision_ + extraPrec + 6 );
+		denominator.set_precision( precision_ + extraPrec + 6 );
 		e /= denominator;
 		if ( e == number::N0 ) {
 			break;
 		}
-		numeratorBase *= k1;
-		denominator *= ( c * ( ( i + 1 ) ^ 3 ) );
+		if ( plus ) {
+			va += ( e * i );
+			vb += e;
+		} else {
+			va -= ( e * i );
+			vb -= e;
+		}
+		e *= k1;
+		denominator = ( c * ( ( i + 1 ) ^ 3 ) );
 		k1 += k2;
 		k2 += k3;
 		k3 += k;
 		a1 += a;
-		if ( plus ) {
-			v += e;
-		} else {
-			v -= e;
-		}
 		plus = !plus;
 	}
-	e = v;
+	e = va * a + vb * b;
 	e *= square_root( HNumber( 10005, precision_ + 6 ) );
-	v = 4270934400_yn;
+	HNumber v( 4270934400_yn );
 	v.set_precision( precision_ );
 	v /= e;
 	v.round( precision_ );
