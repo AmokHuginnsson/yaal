@@ -67,7 +67,7 @@ public:
 	HPipedChild( void );
 	~HPipedChild( void );
 	void spawn( yaal::hcore::HString const&, argv_t const& = argv_t() );
-	STATUS finish( void );
+	STATUS finish( int = 0 );
 	bool is_running( void ) const;
 	int get_pid( void ) const;
 	yaal::hcore::HStreamInterface& in( void );

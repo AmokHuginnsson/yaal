@@ -38,6 +38,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hfsitem.hxx"
 #include "hcore/hrawfile.hxx"
 #include "hcore/hfile.hxx"
+#include "hcore/hclock.hxx"
+#include "hcore/duration.hxx"
 #include "util.hxx"
 #include "halarm.hxx"
 #ifdef __HOST_OS_TYPE_CYGWIN__
@@ -71,7 +73,7 @@ static void close_and_invalidate( int& fd_ ) {
 	M_EPILOG
 }
 
-int HPipedChild::_killGracePeriod = 1000;
+int HPipedChild::_killGracePeriod = static_cast<int>( time::in_units<time::UNIT::MILLISECOND>( time::duration( 1, time::UNIT::SECOND ) ) );
 
 HPipedChild::HPipedChild( void )
 	: _pid( -1 )
@@ -111,7 +113,7 @@ inline int FWD_WTERMSIG( T val_ ) {
 #pragma GCC diagnostic error "-Wold-style-cast"
 }
 
-HPipedChild::STATUS HPipedChild::finish( void ) {
+HPipedChild::STATUS HPipedChild::finish( int finishIn_ ) {
 	M_PROLOG
 	close_and_invalidate( _err );
 	close_and_invalidate( _out );
@@ -124,7 +126,16 @@ HPipedChild::STATUS HPipedChild::finish( void ) {
 		/* Work around for buggy child process handling in Cygwin. */
 		sleep_for( duration( 16, time::UNIT::MILLISECOND ), true );
 #endif /* #ifdef __HOST_OS_TYPE_CYGWIN__ */
-		M_ENSURE( ( pid = ::waitpid( _pid, &status, WNOHANG | WUNTRACED | WCONTINUED ) ) != -1 );
+		if ( finishIn_ > 0 ) {
+			HClock clock;
+			int elapsed( 0 );
+			while ( ( pid != _pid ) && ( ( elapsed = static_cast<int>( clock.get_time_elapsed( time::UNIT::SECOND ) ) ) < finishIn_ ) ) {
+				HAlarm alarm( time::in_units<time::UNIT::MILLISECOND>( time::duration( finishIn_ - elapsed, time::UNIT::SECOND ) ) );
+				M_ENSURE( ( ( pid = ::waitpid( _pid, &status, WUNTRACED | WCONTINUED ) ) != -1 ) || ( errno == EINTR ) );
+			}
+		} else {
+			M_ENSURE( ( pid = ::waitpid( _pid, &status, WNOHANG | WUNTRACED | WCONTINUED ) ) != -1 );
+		}
 		if ( pid != _pid ) {
 			M_ENSURE( hcore::system::kill( _pid, SIGTERM ) == 0 ); {
 				HAlarm alarm( _killGracePeriod );
