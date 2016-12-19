@@ -60,6 +60,7 @@ public:
 				{ "is_alive", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::is_alive, _1, _2, _3, _4 ) ), "tell if given subprocess is alive and running" },
 				{ "kill",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::kill, _1, _2, _3, _4 ) ), "kill this sub-process" },
 				{ "get_pid",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::get_pid, _1, _2, _3, _4 ) ), "get operating system Process IDentification-number of this subprocess" },
+				{ "wait",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::wait, _1, _2, _3, _4 ) ), "wait for this subprocess to finish is execution and return its exit status" },
 				{ "in",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::stream, "Subprocess.in", &HPipedChild::stream_in, _1, _2, _3, _4 ) ), "standard input stream of a subprocess" },
 				{ "out",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::stream, "Subprocess.out", &HPipedChild::stream_out, _1, _2, _3, _4 ) ), "standard output stream of a subprocess" },
 				{ "err",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::stream, "Subprocess.err", &HPipedChild::stream_err, _1, _2, _3, _4 ) ), "standard error stream of a subprocess" }
@@ -128,6 +129,26 @@ HHuginn::value_t HSubprocess::get_pid(
 	verify_arg_count( name, values_, 0, 0, position_ );
 	HSubprocess* o( static_cast<HSubprocess*>( object_->raw() ) );
 	return ( thread_->runtime().object_factory()->create_integer( o->_pipedChild.get_pid() ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HSubprocess::wait(
+	huginn::HThread* thread_,
+	HHuginn::value_t* object_,
+	HHuginn::values_t const& values_,
+	int position_
+) {
+	M_PROLOG
+	char const name[] = "Subprocess.wait";
+	verify_arg_count( name, values_, 1, 1, position_ );
+	verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, true, position_ );
+	HSubprocess* o( static_cast<HSubprocess*>( object_->raw() ) );
+	int waitFor( static_cast<int>( get_integer( values_[0] ) ) );
+	if ( waitFor < 0 ) {
+		throw HHuginn::HHuginnRuntimeException( "invalid wait time: "_ys.append( waitFor ), position_ );
+	}
+	HPipedChild::STATUS s( o->_pipedChild.finish( waitFor ) );
+	return ( thread_->runtime().object_factory()->create_integer( s.value ) );
 	M_EPILOG
 }
 
