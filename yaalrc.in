@@ -161,12 +161,6 @@ serial_baudrate B115200
 #             PARITY_ODD CR2NL ECHO CANONICAL STOP_BITS_1 STOP_BITS_2
 serial_flags FLOW_CONTROL_HARDWARE BITS_PER_BYTE_8
 
-# collector_connection_timeout
-# type: integer, default: 9999
-# time in seconds, after this time elapses process gives up an attempt
-# to connect to collector port
-collector_connection_timeout 8
-
 ### tools END
 
 ### console BEGIN

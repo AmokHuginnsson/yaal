@@ -66,7 +66,6 @@ HString _serialDevice_;
 HString _defaultEncoding_ = "ISO-8859-2";
 HSerial::SPEED _baudRate_ = HSerial::SPEED::B_115200;
 HSerial::flag_t _serialFlags_ = HSerial::flag_t( HSerial::FLAG::FLOW_CONTROL_HARDWARE ) | HSerial::FLAG::BITS_PER_BYTE_8;
-int _collectorConnectionTimeOut_ = 9999;
 bool _ignoreSignalSIGINT_ = false;
 bool _ignoreSignalSIGTSTP_ = false;
 bool _ignoreSignalSIGQUIT_ = false;
@@ -261,13 +260,6 @@ HToolsInitDeinit::HToolsInitDeinit( void ) {
 			.description( "size for compression buffer used in zlib library" )
 			.recipient( _zBufferSize_ )
 			.argument_name( "numBytes" )
-		)(
-			HProgramOptionsHandler::HOption()
-			.long_form( "collector_connection_timeout" )
-			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
-			.description( "timeout on collector device read" )
-			.recipient( _collectorConnectionTimeOut_ )
-			.argument_name( "seconds" )
 		);
 		int ctr = 0;
 		errno = 0;

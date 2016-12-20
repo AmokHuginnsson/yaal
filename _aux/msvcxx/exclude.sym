@@ -123,7 +123,6 @@
 ?_baudRate_@tools@yaal@@3W4SPEED@HSerial@12@A
 ?_binDigit_@hcore@yaal@@3VHCharacterClass@12@B
 ?_characterClass_@hcore@yaal@@3PAPBVHCharacterClass@12@A
-?_collectorConnectionTimeOut_@tools@yaal@@3HA
 ?_commandComposeCharacter_@hconsole@yaal@@3DA
 ?_commandComposeDelay_@hconsole@yaal@@3HA
 ?_compressionLevel_@tools@yaal@@3HA
