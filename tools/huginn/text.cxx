@@ -78,9 +78,9 @@ public:
 		) {
 			throw HHuginn::HHuginnRuntimeException(
 				""_ys.append( name )
-				.append( "() first argument must be a flat uniform collection of strings, not a " )
-				.append( values_[0]->get_class()->name() )
-				.append( "'." ),
+				.append( "() first argument must be a flat uniform collection of strings, not " )
+				.append( a_type_name( values_[0]->get_class() ) )
+				.append( "." ),
 				position_
 			);
 		}
@@ -95,9 +95,9 @@ public:
 			if ( v->type_id() != HHuginn::TYPE::STRING ) {
 				throw HHuginn::HHuginnRuntimeException(
 					""_ys.append( name )
-					.append( "() first argument must be a flat uniform collection of strings, but it contains a " )
-					.append( v->get_class()->name() )
-					.append( "'." ),
+					.append( "() first argument must be a flat uniform collection of strings, but it contains " )
+					.append( a_type_name( v->get_class() ) )
+					.append( "." ),
 					position_
 				);
 			}

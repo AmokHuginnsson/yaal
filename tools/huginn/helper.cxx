@@ -34,6 +34,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 
 using namespace yaal;
 using namespace yaal::hcore;
+using namespace yaal::tools;
+using namespace yaal::tools::util;
 
 namespace yaal {
 
@@ -62,11 +64,11 @@ bool is_restricted( yaal::hcore::HString const& name_ ) {
 void operands_type_mismatch( char const* op_, HHuginn::type_id_t t1_, HHuginn::type_id_t t2_, int pos_ ) {
 	hcore::HString msg( "Operand types for `" );
 	msg.append( op_ )
-		.append( "' do not match: " )
+		.append( "' do not match: `" )
 		.append( type_name( t1_ ) )
-		.append( " vs " )
+		.append( "' vs `" )
 		.append( type_name( t2_ ) )
-		.append( "." ),
+		.append( "'." ),
 	throw HHuginn::HHuginnRuntimeException( msg, pos_ );
 }
 
@@ -106,7 +108,26 @@ void verify_arg_count( yaal::hcore::HString const& name_, HHuginn::values_t cons
 	M_EPILOG
 }
 
+yaal::hcore::HString a_type_name( HHuginn::TYPE type_ ) {
+	M_PROLOG
+	hcore::HString tn( type_name( type_ ) );
+	hcore::HString atn( article( tn ) );
+	atn.append( " `" ).append( tn ).append( "'" );
+	return ( atn );
+	M_EPILOG
+}
+
+yaal::hcore::HString a_type_name( HHuginn::HClass const* class_ ) {
+	M_PROLOG
+	hcore::HString const& cn( class_->name() );
+	hcore::HString atn( article( cn ) );
+	atn.append( " `" ).append( cn ).append( "'" );
+	return ( atn );
+	M_EPILOG
+}
+
 namespace {
+
 void verify_arg_type(
 	yaal::hcore::HString const& name_,
 	HHuginn::values_t const& values_,
@@ -122,40 +143,36 @@ void verify_arg_type(
 		if ( ! oneArg_ ) {
 			no = util::ordinal( no_ + 1 ).append( " " );
 		}
-		HString const& realName( values_[no_]->get_class()->name() );
 		throw HHuginn::HHuginnRuntimeException(
 			""_ys.append( name_ )
 			.append( "() " )
 			.append( no )
 			.append( "argument must be " )
-			.append( _vowel_.has( reqName_[0] ) ? "an" : "a" )
-			.append( " `" )
 			.append( reqName_ )
-			.append( "', not " )
-			.append( _vowel_.has( realName[0] ) ? "an" : "a" )
-			.append( " `" )
-			.append( realName )
-			.append( "'." ),
+			.append( ", not " )
+			.append( a_type_name( values_[no_]->get_class() ) )
+			.append( "." ),
 			position_
 		);
 	}
 	return;
 	M_EPILOG
 }
+
 }
 
 void verify_arg_type(
 	yaal::hcore::HString const& name_,
 	HHuginn::values_t const& values_,
 	int no_, HHuginn::TYPE type_, bool oneArg_, int position_ ) {
-	verify_arg_type( name_, values_, no_, HHuginn::type_id_t( static_cast<HHuginn::type_id_t::value_type>( type_ ) ), type_name( type_ ), oneArg_, position_ );
+	verify_arg_type( name_, values_, no_, HHuginn::type_id_t( static_cast<HHuginn::type_id_t::value_type>( type_ ) ), a_type_name( type_ ), oneArg_, position_ );
 }
 
 void verify_arg_type(
 	yaal::hcore::HString const& name_,
 	HHuginn::values_t const& values_,
 	int no_, HHuginn::HClass const* class_, bool oneArg_, int position_ ) {
-	verify_arg_type( name_, values_, no_, class_->type_id(), class_->name(), oneArg_, position_ );
+	verify_arg_type( name_, values_, no_, class_->type_id(), a_type_name( class_ ), oneArg_, position_ );
 }
 
 HHuginn::type_id_t verify_arg_type(
@@ -173,13 +190,12 @@ HHuginn::type_id_t verify_arg_type(
 		if ( ! oneArg_ ) {
 			no = util::ordinal( no_ + 1 ).append( " " );
 		}
-		HString const& realName( values_[no_]->get_class()->name() );
 		HString reqName;
 		for ( HHuginn::TYPE t : types_ ) {
 			if ( ! reqName.is_empty() ) {
 				reqName.append( ", " );
 			}
-			reqName.append( type_name( t ) );
+			reqName.append( a_type_name( t ) );
 		}
 		throw HHuginn::HHuginnRuntimeException(
 			""_ys.append( name_ )
@@ -189,10 +205,8 @@ HHuginn::type_id_t verify_arg_type(
 			.append( " {" )
 			.append( reqName )
 			.append( "}, not " )
-			.append( _vowel_.has( realName[0] ) ? "an" : "a" )
-			.append( " `" )
-			.append( realName )
-			.append( "'." ),
+			.append( a_type_name( values_[no_]->get_class() ) )
+			.append( "." ),
 			position_
 		);
 	}
@@ -215,9 +229,9 @@ HHuginn::type_id_t verify_arg_numeric(
 			""_ys.append( name_ )
 			.append( "() " )
 			.append( no )
-			.append( "argument must be a numeric type, either `number' or `real', not a " )
-			.append( values_[no_]->get_class()->name() )
-			.append( "'." ),
+			.append( "argument must be a numeric type, either a `number' or a `real', not " )
+			.append( a_type_name( values_[no_]->get_class() ) )
+			.append( "." ),
 			position_
 		);
 	}
@@ -252,9 +266,9 @@ HHuginn::type_id_t verify_arg_collection(
 			.append( no )
 			.append( "argument must be a" )
 			.append( materialized_ ? " materialized" : "" )
-			.append( " collection type, not a " )
-			.append( values_[no_]->get_class()->name() )
-			.append( "'." ),
+			.append( " collection type, not " )
+			.append( a_type_name( values_[no_]->get_class() ) )
+			.append( "." ),
 			position_
 		);
 	}
@@ -277,14 +291,28 @@ HHuginn::type_id_t verify_arg_collection_value_type_low(
 	for ( HHuginn::value_t const& v : collection_.value() ) {
 		curType = v->type_id();
 		if ( find( requiredTypes_.begin(), requiredTypes_.end(), curType ) == requiredTypes_.end() ) {
-			throw HHuginn::HHuginnRuntimeException( to_string( name_ ).append( "() a collection contains value of an unexpected type: " ).append( v->get_class()->name() ).append( ", at position: " ).append( pos ), position_ );
+			throw HHuginn::HHuginnRuntimeException(
+				to_string( name_ )
+					.append( "() a collection contains value of an unexpected type: " )
+					.append( a_type_name( v->get_class() ) )
+					.append( ", at position: " )
+					.append( pos ),
+				position_
+			);
 		}
 		if ( first ) {
 			type = curType;
 			first = false;
 		} else if ( uniform_ ) {
 			if ( curType != type ) {
-				throw HHuginn::HHuginnRuntimeException( to_string( name_ ).append( "() a collection is not uniformly typed: " ).append( v->get_class()->name() ).append( ", at position: " ).append( pos ), position_ );
+				throw HHuginn::HHuginnRuntimeException(
+					to_string( name_ )
+						.append( "() a collection is not uniformly typed: " )
+						.append( a_type_name( v->get_class() ) )
+						.append( ", at position: " )
+						.append( pos ),
+					position_
+				);
 			}
 		}
 		++ pos;

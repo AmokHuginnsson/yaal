@@ -537,7 +537,7 @@ HHuginn::value_t observe( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t
 	HHuginn::value_t const& v( values_.front() );
 	if ( v->type_id() == HHuginn::TYPE::OBSERVER ) {
 		throw HHuginn::HHuginnRuntimeException(
-			"Making observer out of observer.",
+			"Making an *observer* out of an *observer*.",
 			position_
 		);
 	}

@@ -63,6 +63,17 @@ HString& usun_ogonki( HString& string_ ) {
 	M_EPILOG
 }
 
+char const* article( char const* word_ ) {
+	while ( ( *word_ != 0 ) && ! _letter_.has( *word_ ) ) {
+		++ word_;
+	}
+	return( *word_ ? ( _vowel_.has( *word_ ) ? "an" : "a" ) : "" );
+}
+
+char const* article( yaal::hcore::HString const& word_ ) {
+	return ( article( word_.raw() ) );
+}
+
 double long atof_ex( HString const& string_, bool parse_ ) {
 	M_PROLOG
 	double long value( 0 );
