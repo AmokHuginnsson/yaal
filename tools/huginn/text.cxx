@@ -30,6 +30,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
 #include "runtime.hxx"
 #include "tools/stringalgo.hxx"
+#include "tools/hstringstream.hxx"
+#include "tools/streamtools.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
@@ -48,11 +50,15 @@ namespace huginn {
 
 class HText : public HHuginn::HObject {
 public:
+	enum class BASE {
+		HEX, OCT, BIN
+	};
 	HText( HHuginn::HClass* class_ )
 		: HObject( class_ ) {
 		return;
 	}
 	static HHuginn::value_t split( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
 		char const name[] = "Text.split";
 		verify_arg_count( name, values_, 2, 2, position_ );
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, false, position_ );
@@ -65,8 +71,10 @@ public:
 			static_cast<HHuginn::HList*>( l.raw() )->push_back( of->create_string( s ) );
 		}
 		return ( l );
+		M_EPILOG
 	}
 	static HHuginn::value_t join( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
 		char const name[] = "Text.join";
 		verify_arg_count( name, values_, 2, 2, position_ );
 		HHuginn::type_id_t t( values_[0]->type_id() );
@@ -109,15 +117,19 @@ public:
 			it.next( thread_, position_ );
 		}
 		return ( thread_->runtime().object_factory()->create_string( s ) );
+		M_EPILOG
 	}
 	static HHuginn::value_t distance( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
 		char const name[] = "Text.distance";
 		verify_arg_count( name, values_, 2, 2, position_ );
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, false, position_ );
 		verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, false, position_ );
 		return ( thread_->runtime().object_factory()->create_integer( string::distance::levenshtein_damerau( get_string( values_[0] ), get_string( values_[1] ) ) ) );
+		M_EPILOG
 	}
 	static HHuginn::value_t repeat( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
 		char const name[] = "Text.repeat";
 		verify_arg_count( name, values_, 2, 2, position_ );
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, false, position_ );
@@ -133,6 +145,32 @@ public:
 			out.append( s );
 		}
 		return ( thread_->runtime().object_factory()->create_string( out ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t int_base_to_str( char const* name_, BASE base_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		HString name( "Text." );
+		name.append( name_ );
+		verify_arg_count( name, values_, 1, 1, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, true, position_ );
+		HStringStream ss;
+		HHuginn::HInteger::value_type v( get_integer( values_[0] ) );
+		switch ( base_ ) {
+			case ( BASE::HEX ): ss << "0x" << hex << v; break;
+			case ( BASE::OCT ): ss << "0o" << oct << v; break;
+			case ( BASE::BIN ): {
+				HStringStream bs;
+				bs << bin << v;
+				HString s( bs.string() );
+				s.trim_left( "0" );
+				if ( s.is_empty() ) {
+					s.assign( "0" );
+				}
+				ss << "0b" << s;
+			} break;
+		}
+		return ( thread_->runtime().object_factory()->create_string( ss.string() ) );
+		M_EPILOG
 	}
 };
 
@@ -150,10 +188,13 @@ HHuginn::value_t HTextCreator::do_new_instance( HRuntime* runtime_ ) {
 			"Text",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "split",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::split, _1, _2, _3, _4 ) ), "( *str*, *sep* ) - split `string` *str* by separator *sep* into a `list` of `string`s" },
-				{ "join",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::join, _1, _2, _3, _4 ) ), "( *coll*, *sep* ) - join all string from *coll* into one `string` using *sep* as separator" },
-				{ "distance",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::distance, _1, _2, _3, _4 ) ), "( *first*, *second* ) - calculate Damerau-Levenshtein distance between *first* and *second* `string`s" },
-				{ "repeat",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::repeat, _1, _2, _3, _4 ) ), "( *seed*, *count* ) - construct new `string` by repeating *seed* `string` *count* times" }
+				{ "split",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::split, _1, _2, _3, _4 ) ), "( *str*, *sep* ) - split `string` *str* by separator *sep* into a `list` of `string`s" },
+				{ "join",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::join, _1, _2, _3, _4 ) ), "( *coll*, *sep* ) - join all string from *coll* into one `string` using *sep* as separator" },
+				{ "distance", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::distance, _1, _2, _3, _4 ) ), "( *first*, *second* ) - calculate Damerau-Levenshtein distance between *first* and *second* `string`s" },
+				{ "repeat",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::repeat, _1, _2, _3, _4 ) ), "( *seed*, *count* ) - construct new `string` by repeating *seed* `string` *count* times" },
+				{ "hex",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::int_base_to_str, "hex", HText::BASE::HEX, _1, _2, _3, _4 ) ), "( *int* ) - convert *int* value to a `string` using hexadecimal representation" },
+				{ "oct",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::int_base_to_str, "oct", HText::BASE::OCT, _1, _2, _3, _4 ) ), "( *int* ) - convert *int* value to a `string` using octal representation" },
+				{ "bin",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::int_base_to_str, "bin", HText::BASE::BIN, _1, _2, _3, _4 ) ), "( *int* ) - convert *int* value to a `string` using binary representation" }
 			},
 			"The `Text` package provides various text manipulation algorithms."
 		)
