@@ -1089,8 +1089,13 @@ HFollows::HFollows( HFollows const& predecessors_, HRuleBase const& successor_ )
 	, _rules()
 	, _optional( false ) {
 	M_PROLOG
-	for ( rules_t::const_iterator it( predecessors_._rules.begin() ), end( predecessors_._rules.end() ); it != end; ++ it )
-		_rules.push_back( *it );
+	if ( ! predecessors_._action && ! predecessors_._actionPosition ) {
+		for ( rules_t::const_iterator it( predecessors_._rules.begin() ), end( predecessors_._rules.end() ); it != end; ++ it ) {
+			_rules.push_back( *it );
+		}
+	} else {
+		_rules.push_back( predecessors_ );
+	}
 	_rules.push_back( successor_ );
 	HRuleAggregator rra( this );
 	count_optional();
@@ -1508,8 +1513,12 @@ HAlternative::HAlternative( HAlternative const& alternative_, HRuleBase const& c
 	, _rules()
 	, _optional( false ) {
 	M_PROLOG
-	for ( rules_t::const_iterator it( alternative_._rules.begin() ), end( alternative_._rules.end() ); it != end; ++ it ) {
-		_rules.push_back( *it );
+	if ( ! alternative_._action && ! alternative_._actionPosition ) {
+		for ( rules_t::const_iterator it( alternative_._rules.begin() ), end( alternative_._rules.end() ); it != end; ++ it ) {
+			_rules.push_back( *it );
+		}
+	} else {
+		_rules.push_back( alternative_ );
 	}
 	_rules.push_back( choice_ );
 	HRuleAggregator rra( this );
