@@ -37,6 +37,36 @@ namespace tools {
 
 namespace huginn {
 
+template<typename T>
+class HObjectPool final {
+private:
+	typedef yaal::hcore::HPointer<T> object_ptr_t;
+	typedef typename object_ptr_t::template allocated_shared<allocator::shared_pool<T>> shared_t;
+	typedef yaal::hcore::HPool<shared_t::size> pool_t;
+	typedef allocator::shared_pool<typename shared_t::type> allocator_t;
+	pool_t _pool;
+	allocator_t _allocator;
+	HHuginn::HClass const* _class;
+public:
+	HObjectPool( HHuginn::HClass const* class_ = nullptr )
+		: _pool()
+		, _allocator( _pool )
+		, _class( class_ ) {
+		return;
+	}
+	template<typename... arg_t>
+	HHuginn::value_t create( arg_t&&... arg_ ) const {
+		return ( yaal::hcore::allocate_pointer<allocator_t, T>( _allocator, _class, yaal::forward<arg_t>( arg_ )... ) );
+	}
+	template<typename... arg_t>
+	HHuginn::value_t create_nc( arg_t&&... arg_ ) const {
+		return ( yaal::hcore::allocate_pointer<allocator_t, T>( _allocator, yaal::forward<arg_t>( arg_ )... ) );
+	}
+private:
+	HObjectPool( HObjectPool const& ) = delete;
+	HObjectPool& operator = ( HObjectPool const& ) = delete;
+};
+
 class HObjectFactory final {
 	HRuntime* _runtime;
 	HHuginn::class_t _boolean;
@@ -55,76 +85,22 @@ class HObjectFactory final {
 	HHuginn::class_t _conversionException;
 	HHuginn::class_t _arithmeticException;
 	/* Pools */
-	/* string pool */
-	typedef yaal::hcore::HPointer<HHuginn::HString> string_ptr_t;
-	typedef string_ptr_t::allocated_shared<allocator::shared_pool<HHuginn::HString>> shared_string_t;
-	typedef yaal::hcore::HPool<shared_string_t::size> string_pool_t;
-	typedef allocator::shared_pool<shared_string_t::type> string_allocator_t;
-	string_pool_t _stringPool;
-	string_allocator_t _stringAllocator;
-	/* integer pool */
-	typedef yaal::hcore::HPointer<HHuginn::HInteger> integer_ptr_t;
-	typedef integer_ptr_t::allocated_shared<allocator::shared_pool<HHuginn::HInteger>> shared_integer_t;
-	typedef yaal::hcore::HPool<shared_integer_t::size> integer_pool_t;
-	typedef allocator::shared_pool<shared_integer_t::type> integer_allocator_t;
-	integer_pool_t _integerPool;
-	integer_allocator_t _integerAllocator;
-	/* boolean pool */
-	typedef yaal::hcore::HPointer<HHuginn::HBoolean> boolean_ptr_t;
-	typedef boolean_ptr_t::allocated_shared<allocator::shared_pool<HHuginn::HBoolean>> shared_boolean_t;
-	typedef yaal::hcore::HPool<shared_boolean_t::size> boolean_pool_t;
-	typedef allocator::shared_pool<shared_boolean_t::type> boolean_allocator_t;
-	boolean_pool_t _booleanPool;
-	boolean_allocator_t _booleanAllocator;
-	/* real pool */
-	typedef yaal::hcore::HPointer<HHuginn::HReal> real_ptr_t;
-	typedef real_ptr_t::allocated_shared<allocator::shared_pool<HHuginn::HReal>> shared_real_t;
-	typedef yaal::hcore::HPool<shared_real_t::size> real_pool_t;
-	typedef allocator::shared_pool<shared_real_t::type> real_allocator_t;
-	real_pool_t _realPool;
-	real_allocator_t _realAllocator;
-	/* number pool */
-	typedef yaal::hcore::HPointer<HHuginn::HNumber> number_ptr_t;
-	typedef number_ptr_t::allocated_shared<allocator::shared_pool<HHuginn::HNumber>> shared_number_t;
-	typedef yaal::hcore::HPool<shared_number_t::size> number_pool_t;
-	typedef allocator::shared_pool<shared_number_t::type> number_allocator_t;
-	number_pool_t _numberPool;
-	number_allocator_t _numberAllocator;
-	/* character pool */
-	typedef yaal::hcore::HPointer<HHuginn::HCharacter> character_ptr_t;
-	typedef character_ptr_t::allocated_shared<allocator::shared_pool<HHuginn::HCharacter>> shared_character_t;
-	typedef yaal::hcore::HPool<shared_character_t::size> character_pool_t;
-	typedef allocator::shared_pool<shared_character_t::type> character_allocator_t;
-	character_pool_t _characterPool;
-	character_allocator_t _characterAllocator;
-	/* reference pool */
-	typedef yaal::hcore::HPointer<HHuginn::HReference> reference_ptr_t;
-	typedef reference_ptr_t::allocated_shared<allocator::shared_pool<HHuginn::HReference>> shared_reference_t;
-	typedef yaal::hcore::HPool<shared_reference_t::size> reference_pool_t;
-	typedef allocator::shared_pool<shared_reference_t::type> reference_allocator_t;
-	reference_pool_t _referencePool;
-	reference_allocator_t _referenceAllocator;
-	/* function_reference pool */
-	typedef yaal::hcore::HPointer<HHuginn::HFunctionReference> function_reference_ptr_t;
-	typedef function_reference_ptr_t::allocated_shared<allocator::shared_pool<HHuginn::HFunctionReference>> shared_function_reference_t;
-	typedef yaal::hcore::HPool<shared_function_reference_t::size> function_reference_pool_t;
-	typedef allocator::shared_pool<shared_function_reference_t::type> function_reference_allocator_t;
-	function_reference_pool_t _functionReferencePool;
-	function_reference_allocator_t _functionReferenceAllocator;
-	/* bound method pool */
-	typedef yaal::hcore::HPointer<HHuginn::HClass::HBoundMethod> bound_method_ptr_t;
-	typedef bound_method_ptr_t::allocated_shared<allocator::shared_pool<HHuginn::HClass::HBoundMethod>> shared_bound_method_t;
-	typedef yaal::hcore::HPool<shared_bound_method_t::size> bound_method_pool_t;
-	typedef allocator::shared_pool<shared_bound_method_t::type> bound_method_allocator_t;
-	bound_method_pool_t _boundMethodPool;
-	bound_method_allocator_t _boundMethodAllocator;
-	/* object pool */
-	typedef yaal::hcore::HPointer<HHuginn::HObject> object_ptr_t;
-	typedef object_ptr_t::allocated_shared<allocator::shared_pool<HHuginn::HObject>> shared_object_t;
-	typedef yaal::hcore::HPool<shared_object_t::size> object_pool_t;
-	typedef allocator::shared_pool<shared_object_t::type> object_allocator_t;
-	object_pool_t _objectPool;
-	object_allocator_t _objectAllocator;
+	HObjectPool<HHuginn::HString> _stringPool;
+	HObjectPool<HHuginn::HInteger> _integerPool;
+	HObjectPool<HHuginn::HBoolean> _booleanPool;
+	HObjectPool<HHuginn::HReal> _realPool;
+	HObjectPool<HHuginn::HNumber> _numberPool;
+	HObjectPool<HHuginn::HCharacter> _characterPool;
+	HObjectPool<HHuginn::HList> _listPool;
+	HObjectPool<HHuginn::HDeque> _dequePool;
+	HObjectPool<HHuginn::HDict> _dictPool;
+	HObjectPool<HHuginn::HLookup> _lookupPool;
+	HObjectPool<HHuginn::HOrder> _orderPool;
+	HObjectPool<HHuginn::HSet> _setPool;
+	HObjectPool<HHuginn::HReference> _referencePool;
+	HObjectPool<HHuginn::HFunctionReference> _functionReferencePool;
+	HObjectPool<HHuginn::HClass::HBoundMethod> _boundMethodPool;
+	HObjectPool<HHuginn::HObject> _objectPool;
 public:
 	HObjectFactory( HRuntime* );
 	void register_builtin_classes( void );
@@ -132,67 +108,67 @@ public:
 		return ( *_runtime );
 	}
 	HHuginn::value_t create_boolean( HHuginn::HBoolean::value_type value_ ) const {
-		return ( yaal::hcore::allocate_pointer<boolean_allocator_t, HHuginn::HBoolean>( _booleanAllocator, _boolean.raw(), value_ ) );
+		return ( _booleanPool.create( value_ ) );
 	}
 	HHuginn::value_t create_integer( HHuginn::HInteger::value_type value_ ) const {
-		return ( yaal::hcore::allocate_pointer<integer_allocator_t, HHuginn::HInteger>( _integerAllocator, _integer.raw(), value_ ) );
+		return ( _integerPool.create( value_ ) );
 	}
 	HHuginn::value_t create_string( yaal::hcore::HString const& value_ = yaal::hcore::HString() ) const {
-		return ( yaal::hcore::allocate_pointer<string_allocator_t, HHuginn::HString>( _stringAllocator, _string.raw(), value_ ) );
+		return ( _stringPool.create( value_ ) );
 	}
 	HHuginn::value_t create_real( HHuginn::HReal::value_type value_ ) const {
-		return ( yaal::hcore::allocate_pointer<real_allocator_t, HHuginn::HReal>( _realAllocator, _real.raw(), value_ ) );
+		return ( _realPool.create( value_ ) );
 	}
 	HHuginn::value_t create_number( HHuginn::HNumber::value_type const& value_ ) const {
-		return ( yaal::hcore::allocate_pointer<number_allocator_t, HHuginn::HNumber>( _numberAllocator, _number.raw(), value_ ) );
+		return ( _numberPool.create( value_ ) );
 	}
 	HHuginn::value_t create_character( HHuginn::HCharacter::value_type value_ ) const {
-		return ( yaal::hcore::allocate_pointer<character_allocator_t, HHuginn::HCharacter>( _characterAllocator, _character.raw(), value_ ) );
+		return ( _characterPool.create( value_ ) );
 	}
 	HHuginn::value_t create_list( HHuginn::values_t const& values_ = HHuginn::values_t() ) const {
-		return ( yaal::hcore::make_pointer<HHuginn::HList>( _list.raw(), values_ ) );
+		return ( _listPool.create( values_ ) );
 	}
 	HHuginn::value_t create_deque( HHuginn::HDeque::values_t const& values_ = HHuginn::HDeque::values_t() ) const {
-		return ( yaal::hcore::make_pointer<HHuginn::HDeque>( _deque.raw(), values_ ) );
+		return ( _dequePool.create( values_ ) );
 	}
 	HHuginn::value_t create_dict( void ) const {
-		return ( yaal::hcore::make_pointer<HHuginn::HDict>( _dict.raw() ) );
+		return ( _dictPool.create() );
 	}
 	HHuginn::value_t create_dict( HHuginn::HDict::values_t const& data_, HHuginn::HClass const* keyType_ ) const {
-		return ( yaal::hcore::make_pointer<HHuginn::HDict>( _dict.raw(), data_, keyType_ ) );
+		return ( _dictPool.create( data_, keyType_ ) );
 	}
 	HHuginn::value_t create_order( void ) const {
-		return ( yaal::hcore::make_pointer<HHuginn::HOrder>( _order.raw() ) );
+		return ( _orderPool.create() );
 	}
 	HHuginn::value_t create_order( HHuginn::HOrder::values_t const& data_, HHuginn::HClass const* keyType_ ) const {
-		return ( yaal::hcore::make_pointer<HHuginn::HOrder>( _order.raw(), data_, keyType_ ) );
+		return ( _orderPool.create( data_, keyType_ ) );
 	}
 	HHuginn::value_t create_lookup( void ) const {
-		return ( yaal::hcore::make_pointer<HHuginn::HLookup>( _lookup.raw() ) );
+		return ( _lookupPool.create() );
 	}
 	HHuginn::value_t create_lookup( HHuginn::HLookup::values_t const& data_ ) const {
-		return ( yaal::hcore::make_pointer<HHuginn::HLookup>( _lookup.raw(), data_ ) );
+		return ( _lookupPool.create( data_ ) );
 	}
 	HHuginn::value_t create_set( void ) const {
-		return ( yaal::hcore::make_pointer<HHuginn::HSet>( _set.raw() ) );
+		return ( _setPool.create() );
 	}
 	HHuginn::value_t create_set( HHuginn::HSet::values_t const& data_ ) const {
-		return ( yaal::hcore::make_pointer<HHuginn::HSet>( _set.raw(), data_ ) );
+		return ( _setPool.create( data_ ) );
 	}
 	HHuginn::value_t create_reference( HHuginn::value_t& value_ ) const {
-		return ( yaal::hcore::allocate_pointer<reference_allocator_t, HHuginn::HReference>( _referenceAllocator, value_ ) );
+		return ( _referencePool.create_nc( value_ ) );
 	}
 	HHuginn::value_t create_function_reference( HHuginn::identifier_id_t identifierId_, HHuginn::function_t const& function_, yaal::hcore::HString const& doc_ ) const {
-		return ( yaal::hcore::allocate_pointer<function_reference_allocator_t, HHuginn::HFunctionReference>( _functionReferenceAllocator, identifierId_, function_, doc_ ) );
+		return ( _functionReferencePool.create_nc( identifierId_, function_, doc_ ) );
 	}
 	HHuginn::value_t create_bound_method( HHuginn::HClass::HMethod const& method_, HHuginn::value_t const& object_ ) const {
-		return ( yaal::hcore::allocate_pointer<bound_method_allocator_t, HHuginn::HClass::HBoundMethod>( _boundMethodAllocator, method_, object_ ) );
+		return ( _boundMethodPool.create_nc( method_, object_ ) );
 	}
 	HHuginn::value_t create_object( HHuginn::HClass const* class_ ) const {
-		return ( yaal::hcore::allocate_pointer<object_allocator_t, HHuginn::HObject>( _objectAllocator, class_ ) );
+		return ( _objectPool.create_nc( class_ ) );
 	}
 	HHuginn::value_t create_object( HHuginn::HClass const* class_, HHuginn::HObject::fields_t const& fields_ ) const {
-		return ( yaal::hcore::allocate_pointer<object_allocator_t, HHuginn::HObject>( _objectAllocator, class_, fields_ ) );
+		return ( _objectPool.create_nc( class_, fields_ ) );
 	}
 	HHuginn::HClass const* boolean_class( void ) const {
 		return ( _boolean.raw() );
