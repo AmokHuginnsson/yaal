@@ -85,7 +85,7 @@ void HResource::build_menu_item( HXml::HConstNodeProxy const& xmlNode_,
 	M_PROLOG
 	char const* const error = _( "malformed resource file (menu section)" );
 	char const* const unexpected = _( ": unexpected node: " );
-	if ( ! xmlNode_.has_childs() ) {
+	if ( ! xmlNode_.has_children() ) {
 		M_THROW ( HString ( error ) + unexpected, xmlNode_.get_line() );
 	}
 
@@ -137,7 +137,7 @@ void HResource::create_window( yaal::hcore::HString const& id_ ) {
 	}
 	HWindow::ptr_t win( HWindowFactory::get_instance().create_window( _tui, xmlWin ) );
 	if ( ! win ) {
-		M_THROW( _( "failed to contruct window, at: " ), xmlWin.get_line() );
+		M_THROW( _( "failed to construct window, at: " ), xmlWin.get_line() );
 	}
 	_tui->add_window( win );
 	return;

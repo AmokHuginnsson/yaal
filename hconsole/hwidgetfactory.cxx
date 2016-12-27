@@ -211,9 +211,9 @@ void HWidgetCreatorInterface::prepare_attributes( HWidgetAttributesInterface& at
 				wa.label_decoration( labelDecoration );
 			}
 		} else if ( name == ATTRIBUTE_NAME ) {
-			wa.attribure_focused( make_attr( "focused", n, _attributeFocused_ ) );
-			wa.attribure_enabled( make_attr( "enabled", n, _attributeEnabled_ ) );
-			wa.attribure_disabled( make_attr( "disabled", n, _attributeDisabled_ ) );
+			wa.attribute_focused( make_attr( "focused", n, _attributeFocused_ ) );
+			wa.attribute_enabled( make_attr( "enabled", n, _attributeEnabled_ ) );
+			wa.attribute_disabled( make_attr( "disabled", n, _attributeDisabled_ ) );
 		} else if ( ! do_prepare_attributes( attrs_, n ) ) {
 			if ( ( name != POSITION_NAME ) && ( name != LABEL_NAME ) ) {
 				log << "unknown " << node_.get_name() << " attribute name: " << name << ", at: " << n.get_line() << endl;

@@ -90,7 +90,7 @@ public:
 			EXPLICIT
 		};
 	};
-	static OAttribute const DEFAULT_ATTRS; /*!< Default HWidget attribites (colors of label and data fore/back-ground) */
+	static OAttribute const DEFAULT_ATTRS; /*!< Default HWidget attributes (colors of label and data fore/back-ground) */
 	typedef yaal::hcore::HPointer<HWidget> ptr_t;
 protected:
 	bool _enabled;    /*!< Tells if widget is enabled, focus can go only to enabled widget. */
@@ -357,7 +357,7 @@ public:
  */
 	void schedule_repaint( void );
 
-/*! \brief Mark this widget as no longer synchronized with its internel model.
+/*! \brief Mark this widget as no longer synchronized with its internal model.
  */
 	void invalidate( void );
 
@@ -447,9 +447,9 @@ public:
 	HWidgetAttributes& draw_label( bool );
 	HWidgetAttributes& label_position( HWidget::LABEL::POSITION );
 	HWidgetAttributes& label_decoration( HWidget::LABEL::DECORATION );
-	HWidgetAttributes& attribure_enabled( HWidget::OAttribute const& );
-	HWidgetAttributes& attribure_disabled( HWidget::OAttribute const& );
-	HWidgetAttributes& attribure_focused( HWidget::OAttribute const& );
+	HWidgetAttributes& attribute_enabled( HWidget::OAttribute const& );
+	HWidgetAttributes& attribute_disabled( HWidget::OAttribute const& );
+	HWidgetAttributes& attribute_focused( HWidget::OAttribute const& );
 };
 
 class HWidgetEvent : public HEvent {

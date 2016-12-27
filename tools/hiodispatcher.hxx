@@ -58,7 +58,7 @@ private:
 	typedef yaal::hcore::HArray<stream_t> dropped_io_handlers_t;
 	typedef yaal::hcore::HArray<delayed_call_t> delayed_calls_t;
 	typedef yaal::hcore::HArray<new_io_handler_t> new_io_handlers_t;
-	bool _initialised; /*!< did process has necessery initialisation */
+	bool _initialised; /*!< did process has necessary initialisation */
 	bool _loop;        /*!< indicates if main loop continues */
 	int _idleCycles;   /*!< full select()'s without io activity */
 	int long _latency; /*!< timeout between recall (milliseconds) */

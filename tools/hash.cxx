@@ -47,7 +47,7 @@ namespace tools {
 
 namespace hash {
 
-void change_endianess( u32_t*, int long );
+void change_endianness( u32_t*, int long );
 void update_md5_state( u32_t*, HStreamBlockIterator::HBlock const& );
 
 yaal::hcore::HString md5( HStreamInterface& stream ) {
@@ -91,7 +91,7 @@ yaal::hcore::HString md5( HStreamInterface& stream ) {
 		}
 	} while ( last == BLOCK_SIZE );
 	HString result;
-	change_endianess( state, STATE_SIZE );
+	change_endianness( state, STATE_SIZE );
 	result.format( "%08x%08x%08x%08x", state[ 0 ], state[ 1 ], state[ 2 ], state[ 3 ] );
 	return ( result );
 	M_EPILOG
@@ -148,7 +148,7 @@ yaal::hcore::HString sha1( HStreamInterface& stream ) {
 			}
 			x[ 14 ] = totalH;
 			x[ 15 ] = total;
-			change_endianess( x + 14, 2 );
+			change_endianness( x + 14, 2 );
 			update_sha1_state( state, block );
 		} else {
 			update_sha1_state( state, block );
@@ -321,7 +321,7 @@ void update_sha1_state( u32_t* state, HStreamBlockIterator::HBlock const& block 
 	u32_t x[ WORK_BUFFER_SIZE ];
 	::memcpy( x, block.data(), INPUT_CHUNK_SIZE * sizeof ( u32_t ) );
 	u32_t tmp( 0 );
-	change_endianess( x, INPUT_CHUNK_SIZE );
+	change_endianness( x, INPUT_CHUNK_SIZE );
 	for ( int i = INPUT_CHUNK_SIZE; i < WORK_BUFFER_SIZE; ++ i ) {
 		tmp = x[ i - 3 ] ^ x[ i - 8 ] ^ x[ i - 14 ] ^ x[ i - 16 ], x[ i ] = M_ROTATE_LEFT( tmp, 1 );
 	}
@@ -358,7 +358,7 @@ void update_sha1_state( u32_t* state, HStreamBlockIterator::HBlock const& block 
 #undef M_ROTATE_LEFT
 }
 
-void change_endianess( u32_t* mem, int long size ) {
+void change_endianness( u32_t* mem, int long size ) {
 	while ( size -- )
 		mem[ size ] =
 			  ( ( mem[ size ] & 0xff000000 ) >> 24 )
@@ -367,7 +367,7 @@ void change_endianess( u32_t* mem, int long size ) {
 			| ( ( mem[ size ] & 0x000000ff ) << 24 );
 }
 
-void change_endianess( u64_t*, int long );
+void change_endianness( u64_t*, int long );
 
 void update_sha512_state( u64_t*, HStreamBlockIterator::HBlock const& );
 
@@ -406,7 +406,7 @@ yaal::hcore::HString sha512( HStreamInterface& stream ) {
 			}
 			x[ 14 ] = totalH;
 			x[ 15 ] = total;
-			change_endianess( x + 14, 2 );
+			change_endianness( x + 14, 2 );
 			update_sha512_state( state, block );
 		} else {
 			update_sha512_state( state, block );
@@ -468,7 +468,7 @@ void update_sha512_state( u64_t* state, HStreamBlockIterator::HBlock const& bloc
 	u64_t h( state[ 7 ] );
 	u64_t x[ ROUND_COUNT ];
 	::memcpy( x, block.data(), INPUT_CHUNK_SIZE * sizeof ( u64_t ) );
-	change_endianess( x, INPUT_CHUNK_SIZE );
+	change_endianness( x, INPUT_CHUNK_SIZE );
 	for ( int i( INPUT_CHUNK_SIZE ); i < ROUND_COUNT; ++ i ) {
 		u64_t s0 = M_ROTATE_RIGHT64( x[i - 15 ], 1 ) ^ M_ROTATE_RIGHT64( x[i - 15], 8 ) ^ ( x[i - 15] >> 7 );
 		u64_t s1 = M_ROTATE_RIGHT64( x[i - 2], 19 ) ^ M_ROTATE_RIGHT64( x[i - 2], 61 ) ^ ( x[i - 2] >> 6 );
@@ -504,7 +504,7 @@ void update_sha512_state( u64_t* state, HStreamBlockIterator::HBlock const& bloc
 #undef M_ROTATE_RIGHT64
 }
 
-void change_endianess( u64_t* mem, int long size ) {
+void change_endianness( u64_t* mem, int long size ) {
 	while ( size -- )
 		mem[ size ] =
 			  ( ( mem[ size ] & 0xff00000000000000ULL ) >> 56 )
@@ -545,17 +545,17 @@ HChunk parseHash( FUNCTION function_, yaal::hcore::HString const& hash_ ) {
 		case ( FUNCTION::MD5 ): {
 			u32_t* bin( binHash.get<u32_t>() );
 			sscanf( hash.raw(), format, &bin[0], &bin[1], &bin[2], &bin[3] );
-			change_endianess( bin, binHash.count_of<u32_t>() );
+			change_endianness( bin, binHash.count_of<u32_t>() );
 		} break;
 		case ( FUNCTION::SHA1 ): {
 			u32_t* bin( binHash.get<u32_t>() );
 			sscanf( hash.raw(), format, &bin[0], &bin[1], &bin[2], &bin[3], &bin[4] );
-			change_endianess( bin, binHash.count_of<u32_t>() );
+			change_endianness( bin, binHash.count_of<u32_t>() );
 		} break;
 		case ( FUNCTION::SHA512 ): {
 			u64_t* bin( binHash.get<u64_t>() );
 			sscanf( hash.raw(), format, &bin[0], &bin[1], &bin[2], &bin[3], &bin[4], &bin[5], &bin[6], &bin[7] );
-			change_endianess( bin, binHash.count_of<u64_t>() );
+			change_endianness( bin, binHash.count_of<u64_t>() );
 		} break;
 		default: {
 			M_ASSERT( !"Invalid code path!"[0] );

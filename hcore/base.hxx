@@ -28,7 +28,7 @@ Copyright:
  * \brief Basic declarations used across whole library.
  *
  * This file holds main #defines, macros and global variables
- * used acros whole yaal.
+ * used across whole yaal.
  */
 
 #ifndef YAAL_HCORE_BASE_HXX_INCLUDED
@@ -66,7 +66,7 @@ struct LexicalCast {};
  *
  * \tparam to_t - destination type.
  * \param val - value to be converted to destination type.
- * \return val equvalent in to_t representation.
+ * \return val equivalent in to_t representation.
  */
 template<typename to_t, typename from_t>
 to_t lexical_cast( from_t const& val );
@@ -90,7 +90,7 @@ char const* error_message( int code );
  *
  * \tparam to_t - destination type.
  * \param val - value to be converted to destination type.
- * \return val equvalent in to_t representation.
+ * \return val equivalent in to_t representation.
  */
 template<typename to_t, typename from_t>
 to_t bit_cast( from_t val_ ) {

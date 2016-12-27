@@ -35,7 +35,7 @@ namespace yaal {
 
 namespace tools {
 
-/*! \brief Mathematical expression analyser and evaluator.
+/*! \brief Mathematical expression analyzer and evaluator.
  */
 class HExpression final {
 public:

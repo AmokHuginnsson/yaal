@@ -246,7 +246,7 @@ public:
 	HConstNodeSet get_elements_by_path( yaal::hcore::HString const& ) const;
 	HConstNodeSet get_elements_by_name( yaal::hcore::HString const& ) const;
 	HXml::HNode::TYPE get_type() const;
-	bool has_childs( void ) const;
+	bool has_children( void ) const;
 	int long child_count( void ) const;
 	int get_level( void ) const;
 	int get_line( void ) const;

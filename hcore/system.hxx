@@ -86,21 +86,21 @@ class HResourceInfo {
 public:
 	/*! \brief Construct resource info object.
 	 *
-	 * \param available_ - amount of resouce available for allocation.
-	 * \param free_ - amount of free resouce.
+	 * \param available_ - amount of resource available for allocation.
+	 * \param free_ - amount of free resource.
 	 * \param total_ - total amount of reource.
 	 */
 	HResourceInfo( i64_t available_ = 0, i64_t free_ = 0, i64_t total_ = 0 )
 		: _available( available_ ), _free( free_ ), _total( total_) {}
 	/*! \brief Get information about amount of resource available for allocation.
 	 *
-	 * \return Amount of available resouce.
+	 * \return Amount of available resource.
 	 */
 	i64_t available( void ) const
 		{ return ( _available ); }
 	/*! \brief Get information about amount of free resource.
 	 *
-	 * \return Free resouce size.
+	 * \return Free resource size.
 	 */
 	i64_t free( void ) const
 		{ return ( _free ); }
@@ -112,22 +112,22 @@ public:
 		{ return ( _total ); }
 };
 
-/*! \brief Get amount of free/avaialable for allocation memory.
+/*! \brief Get amount of free/available for allocation memory.
  *
  * \return Available memory size in bytes.
  */
 HResourceInfo get_memory_size_info( void );
 
-/*! \brief Get amount of free/avaialable disk space on given filesystem.
+/*! \brief Get amount of free/available disk space on given filesystem.
  *
  * \param path - path to filesystem to be checked for free space.
  * \return Available disk space in bytes.
  */
 HResourceInfo get_disk_space_info( yaal::hcore::HString const& );
 
-/*! \brief Get number of avaialable CPU cores.
+/*! \brief Get number of available CPU cores.
  *
- * \return Number of avaialable CPU cores.
+ * \return Number of available CPU cores.
  */
 int get_core_count_info( void );
 

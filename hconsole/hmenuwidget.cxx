@@ -116,7 +116,7 @@ void HMenuWidget::set_data( HMenuWidget::data_ptr_t data_ ) {
 	_view.clear();
 	node = static_cast<menu_model_t*>( _model.get() )->get_data()->get_root();
 	on_model_changed();
-	if ( ! _selected && node->has_childs() ) {
+	if ( ! _selected && node->has_children() ) {
 		_selected = &*_view.get_root()->begin();
 	}
 	schedule_repaint();

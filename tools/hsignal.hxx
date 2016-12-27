@@ -40,7 +40,7 @@ namespace tools {
 
 namespace signal {
 
-namespace result_agregator {
+namespace result_aggregator {
 
 template<typename return_t>
 class HLast {
@@ -83,14 +83,14 @@ enum class POSITION {
 /*! \brief Implementation of signals and slot system.
  */
 template<typename signature_t,
-	typename result_agregator_t = signal::result_agregator::HLast<typename trait::return_type<signature_t>::type>,
+	typename result_aggregator_t = signal::result_aggregator::HLast<typename trait::return_type<signature_t>::type>,
 	typename group_by = int>
 class HSignal final {
 public:
 	typedef HSignal<signature_t> this_type;
-	typedef result_agregator_t result_agregator;
+	typedef result_aggregator_t result_aggregator;
 	typedef typename trait::return_type<signature_t>::type result_type;
-	typedef typename result_agregator_t::result_type agregated_result_type;
+	typedef typename result_aggregator_t::result_type aggregated_result_type;
 	typedef yaal::hcore::HBoundCall<signature_t> call_t;
 	typedef yaal::hcore::HBoundCall<result_type ( call_t& )> callback_t;
 	class HSlot;
@@ -146,7 +146,7 @@ public:
 	result_type operator()( arg_t&&... arg_ ) {
 		M_PROLOG
 		callback_t c( call( static_cast<result_type ( call_t::* )( arg_t&&... )>( &HSlot::call_t::operator() ), hcore::_1, yaal::forward<arg_t>( arg_ )... ) );
-		return ( result_agregator()(
+		return ( result_aggregator()(
 					HIterator<callback_t>( _slotsPre.begin(), c, this, HIterator<callback_t>::STATE::PRE ),
 					HIterator<callback_t>( _slotsPost.end(), c, this, HIterator<callback_t>::STATE::POST ) ) );
 		M_EPILOG
@@ -189,10 +189,10 @@ private:
 	friend class HSlot;
 };
 
-template<typename signature_t, typename result_agregator_t, typename group_by>
-class HSignal<signature_t, result_agregator_t, group_by>::HSlot {
+template<typename signature_t, typename result_aggregator_t, typename group_by>
+class HSignal<signature_t, result_aggregator_t, group_by>::HSlot {
 public:
-	typedef HSignal<signature_t, result_agregator_t, group_by> signal_t;
+	typedef HSignal<signature_t, result_aggregator_t, group_by> signal_t;
 	typedef typename signal_t::call_t call_t;
 	typedef typename signal_t::callback_t callback_t;
 	typedef typename signal_t::result_type result_type;
@@ -246,14 +246,14 @@ private:
 	HSlot( HSlot const& ) = delete;
 	HSlot& operator = ( HSlot const& ) = delete;
 	template<typename callback_t>
-	friend class HSignal<signature_t, result_agregator_t, group_by>::HIterator;
+	friend class HSignal<signature_t, result_aggregator_t, group_by>::HIterator;
 };
 
-template<typename signature_t, typename result_agregator_t, typename group_by>
-class HSignal<signature_t, result_agregator_t, group_by>::HConnection {
+template<typename signature_t, typename result_aggregator_t, typename group_by>
+class HSignal<signature_t, result_aggregator_t, group_by>::HConnection {
 public:
-	typedef typename HSignal<signature_t, result_agregator_t, group_by>::HConnection this_type;
-	typedef typename HSignal<signature_t, result_agregator_t, group_by>::slot_t slot_t;
+	typedef typename HSignal<signature_t, result_aggregator_t, group_by>::HConnection this_type;
+	typedef typename HSignal<signature_t, result_aggregator_t, group_by>::slot_t slot_t;
 private:
 	slot_t _slot;
 public:
@@ -280,23 +280,23 @@ public:
 	}
 };
 
-template<typename signature_t, typename result_agregator_t, typename group_by>
+template<typename signature_t, typename result_aggregator_t, typename group_by>
 template<typename callback_t>
-class HSignal<signature_t, result_agregator_t, group_by>::HIterator
-	: public yaal::hcore::iterator_interface<typename trait::return_type<result_agregator_t>::type, yaal::hcore::iterator_category::forward> {
+class HSignal<signature_t, result_aggregator_t, group_by>::HIterator
+	: public yaal::hcore::iterator_interface<typename trait::return_type<result_aggregator_t>::type, yaal::hcore::iterator_category::forward> {
 public:
-	typedef typename HSignal<signature_t, result_agregator_t, group_by>::template HIterator<callback_t> this_type;
-	typedef yaal::hcore::iterator_interface<typename trait::return_type<result_agregator_t>::type, yaal::hcore::iterator_category::forward> base_type;
+	typedef typename HSignal<signature_t, result_aggregator_t, group_by>::template HIterator<callback_t> this_type;
+	typedef yaal::hcore::iterator_interface<typename trait::return_type<result_aggregator_t>::type, yaal::hcore::iterator_category::forward> base_type;
 	typedef typename trait::return_type<signature_t>::type result_type;
-	typedef typename HSignal<signature_t, result_agregator_t, group_by>::slots_t slots_t;
-	typedef typename HSignal<signature_t, result_agregator_t, group_by>::ordered_slots_t ordered_slots_t;
+	typedef typename HSignal<signature_t, result_aggregator_t, group_by>::slots_t slots_t;
+	typedef typename HSignal<signature_t, result_aggregator_t, group_by>::ordered_slots_t ordered_slots_t;
 	enum class STATE {
 		PRE,
 		PRIO,
 		POST
 	};
 private:
-	typedef HSignal<signature_t, result_agregator_t, group_by> owner_t;
+	typedef HSignal<signature_t, result_aggregator_t, group_by> owner_t;
 	typename slots_t::iterator _it;
 	typename ordered_slots_t::iterator _itPrio;
 	callback_t _callback;
@@ -372,11 +372,11 @@ private:
 		validate();
 		return;
 	}
-	friend class HSignal<signature_t, result_agregator_t, group_by>;
+	friend class HSignal<signature_t, result_aggregator_t, group_by>;
 };
 
-template<typename signature_t, typename result_agregator_t, typename group_by>
-inline void swap( HSignal<signature_t, result_agregator_t, group_by>& a, HSignal<signature_t, result_agregator_t, group_by>& b ) {
+template<typename signature_t, typename result_aggregator_t, typename group_by>
+inline void swap( HSignal<signature_t, result_aggregator_t, group_by>& a, HSignal<signature_t, result_aggregator_t, group_by>& b ) {
 	a.swap( b );
 }
 

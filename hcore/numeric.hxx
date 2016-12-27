@@ -191,7 +191,7 @@ template<int long a0, int long a1, int long a2, int long a3,
 	int long a20>
 int long const max<a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20>::value;
 
-/*! \brief Staticaly determine mimimum of a set.
+/*! \brief Staticaly determine minimum of a set.
  *
  * \tparam a0, a1, ..., a9 - list of integers to find minimum.
  * \retval value - minimum integer from given set.
@@ -291,7 +291,7 @@ struct power<base,0,helper> {
 
 /*! \brief Perform compile time ternary operator on integers.
  *
- * \tparam condition - staticly checkable condition that tells which type will be used.
+ * \tparam condition - statically checkable condition that tells which type will be used.
  * \tparam value_for_true - value to be used if condition is true.
  * \tparam value_for_false - value to be used if condition is false.
  * \retval value - conditional value.
@@ -335,7 +335,7 @@ struct less {
 
 /*! \brief Helper for reporting range errors in (unsigned_)integer_cast<>.
  */
-template<typename T, T val, bool vaild>
+template<typename T, T val, bool valid>
 struct out_of_range;
 
 /*! \cond */

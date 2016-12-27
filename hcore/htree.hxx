@@ -4,7 +4,7 @@
   htree.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
-  ii. You must atttach Copyright information to any part of every copy
+  ii. You must attach Copyright information to any part of every copy
       of this software.
 
 Copyright:
@@ -82,7 +82,7 @@ public:
 			return ( _branch.size() );
 			M_EPILOG
 		}
-		bool has_childs( void ) const {
+		bool has_children( void ) const {
 			M_PROLOG
 			return ( ! _branch.is_empty() );
 			M_EPILOG
@@ -806,7 +806,7 @@ public:
 		M_ASSERT( _owner );
 		if ( ! _track.is_empty() ) {
 			const_qual_node_ptr_t node( _track.get_size() > 1 ? *_track.back() : _owner->_root );
-			if ( node->has_childs() ) {
+			if ( node->has_children() ) {
 				list_it_t last( node->_branch.end() );
 				_track.push_back( -- last );
 			} else {
@@ -874,7 +874,7 @@ private:
 	void descent( const_qual_node_t* n_, list_it_t const& start_ ) {
 		M_PROLOG
 		_track.push_back( start_ );
-		while ( n_ && n_->has_childs() ) {
+		while ( n_ && n_->has_children() ) {
 			_track.push_back( n_->_branch.begin() );
 			n_ = n_->_branch.head();
 		}

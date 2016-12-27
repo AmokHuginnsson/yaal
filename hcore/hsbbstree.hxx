@@ -45,7 +45,7 @@ extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHSBBSTree_[];
  *
  * HSBBSTree is implementation of self balancing binary search tree data structure.
  * Implementation of core engine for HMap<> and HSet<> classes.
- * HSBBSTree is not ment to be used directly.
+ * HSBBSTree is not meant to be used directly.
  */
 class HSBBSTreeBase {
 public:

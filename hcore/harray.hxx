@@ -245,7 +245,7 @@ public:
 		return;
 		M_EPILOG
 	}
-	/*! \brief Assing contents of another array to this array.
+	/*! \brief Assign contents of another array to this array.
 	 *
 	 * \param arr_ - other array that's contents will be assigned to this array.
 	 * \return Self.
@@ -405,9 +405,9 @@ public:
 		return;
 		M_EPILOG
 	}
-	/*! \brief Add element at end of this array contructing it directly in place.
+	/*! \brief Add element at end of this array constructing it directly in place.
 	 *
-	 * \param arg_ - arguments passed to value_type constuctor.
+	 * \param arg_ - arguments passed to value_type constructor.
 	 */
 	template<typename... arg_t>
 	void emplace_back( arg_t&&... arg_ ) {
@@ -610,10 +610,10 @@ public:
 		return ( pos_ );
 		M_EPILOG
 	}
-	/*! \brief Insert value at given position, contructing it directly in place.
+	/*! \brief Insert value at given position, constructing it directly in place.
 	 *
 	 * \param pos_ - insert given value at this position.
-	 * \param arg_ - arguments passed to value_type constuctor.
+	 * \param arg_ - arguments passed to value_type constructor.
 	 * \return Iterator pointing to newly inserted element.
 	 */
 	template<typename... arg_t>

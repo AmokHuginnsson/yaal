@@ -139,14 +139,18 @@ public:
 	/*! \brief Create an empty list.
 	 */
 	HList( void )
-		: _allocator( allocator_type() ), _size( 0 ), _hook( nullptr ) {
+		: _allocator( allocator_type() )
+		, _size( 0 )
+		, _hook( nullptr ) {
 		return;
 	}
 
 	/*! \brief Create an empty list.
 	 */
 	explicit HList( allocator_type const& allocator_ )
-		: _allocator( allocator_ ), _size( 0 ), _hook( nullptr ) {
+		: _allocator( allocator_ )
+		, _size( 0 )
+		, _hook( nullptr ) {
 		return;
 	}
 
@@ -155,10 +159,13 @@ public:
 	 * \param count_ - number of element for newly created list.
 	 */
 	explicit HList( int long count_ )
-		: _allocator( allocator_type() ), _size( 0 ), _hook( nullptr ) {
+		: _allocator( allocator_type() )
+		, _size( 0 )
+		, _hook( nullptr ) {
 		M_PROLOG
-		while ( count_ -- )
+		while ( count_ -- ) {
 			add_tail();
+		}
 		return;
 		M_EPILOG
 	}
@@ -168,10 +175,13 @@ public:
 	 * \param count_ - number of element for newly created list.
 	 */
 	HList( int long count_, allocator_type const& allocator_ )
-		: _allocator( allocator_ ), _size( 0 ), _hook( nullptr ) {
+		: _allocator( allocator_ )
+		, _size( 0 )
+		, _hook( nullptr ) {
 		M_PROLOG
-		while ( count_ -- )
+		while ( count_ -- ) {
 			add_tail();
+		}
 		return;
 		M_EPILOG
 	}
@@ -183,7 +193,9 @@ public:
 	 * \param list_ - an existing list to copy.
 	 */
 	HList( HList const& list_ )
-		: _allocator( list_._allocator ), _size( 0 ), _hook( nullptr ) {
+		: _allocator( list_._allocator )
+		, _size( 0 )
+		, _hook( nullptr ) {
 		M_PROLOG
 		( *this ) = list_;
 		return;
@@ -191,7 +203,9 @@ public:
 	}
 
 	HList( HList&& list_ )
-		: _allocator(), _size( 0 ), _hook( nullptr ) {
+		: _allocator()
+		, _size( 0 )
+		, _hook( nullptr ) {
 		M_PROLOG
 		swap( list_ );
 		return;
@@ -199,7 +213,9 @@ public:
 	}
 
 	HList( HList const& list_, allocator_type const& allocator_ )
-		: _allocator( allocator_ ), _size( 0 ), _hook( nullptr ) {
+		: _allocator( allocator_ )
+		, _size( 0 )
+		, _hook( nullptr ) {
 		M_PROLOG
 		( *this ) = list_;
 		return;
@@ -212,7 +228,9 @@ public:
 	 * \param value_ - list initializer value.
 	 */
 	HList( int long count_, type_t const& value_, allocator_type const& allocator_ = allocator_type() )
-		: _allocator( allocator_ ), _size( 0 ), _hook( nullptr ) {
+		: _allocator( allocator_ )
+		, _size( 0 )
+		, _hook( nullptr ) {
 		M_PROLOG
 		resize( count_, value_ );
 		return;
@@ -226,7 +244,9 @@ public:
 	 */
 	template<typename iter_t>
 	HList( iter_t first_, iter_t last_, allocator_type const& allocator_ = allocator_type() )
-		: _allocator( allocator_ ), _size( 0 ), _hook( nullptr ) {
+		: _allocator( allocator_ )
+		, _size( 0 )
+		, _hook( nullptr ) {
 		M_PROLOG
 		initialize( first_, last_, typename trait::add_pointer<typename is_integral<iter_t>::type>::type() );
 		return;
@@ -240,7 +260,9 @@ public:
 	 */
 	template<typename T>
 	HList( std::initializer_list<T> constants_ )
-		: _allocator(), _size( 0 ), _hook( nullptr ) {
+		: _allocator()
+		, _size( 0 )
+		, _hook( nullptr ) {
 		M_PROLOG
 		initialize( constants_.begin(), constants_.end(), static_cast<trait::false_type*>( nullptr ) );
 		return;
@@ -1049,18 +1071,24 @@ private:
 public:
 	typedef iterator_interface<const_qual_t, iterator_category::forward> base_type;
 	HIterator( void )
-		: base_type(), _owner( nullptr ), _current( nullptr ) {
+		: base_type()
+		, _owner( nullptr )
+		, _current( nullptr ) {
 		return;
 	}
 	HIterator( HIterator const& iterator_ )
-		: base_type(), _owner( iterator_._owner ), _current( iterator_._current ) {
+		: base_type()
+		, _owner( iterator_._owner )
+		, _current( iterator_._current ) {
 		M_PROLOG
 		return;
 		M_EPILOG
 	}
 	template<typename other_const_qual_t>
 	HIterator( HIterator<other_const_qual_t> const& iterator_ )
-		: base_type(), _owner( iterator_._owner ), _current( iterator_._current ) {
+		: base_type()
+		, _owner( iterator_._owner )
+		, _current( iterator_._current ) {
 		M_PROLOG
 		static_assert( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value,
 				"assigning const_iterator to non-const iterator" );

@@ -25,7 +25,7 @@ Copyright:
 */
 
 /*! \file hcore/algorithm.hxx
- * \brief Basic alogrithms definitions.
+ * \brief Basic algorithms definitions.
  */
 
 #ifndef YAAL_HCORE_ALGORITHM_HXX_INCLUDED
@@ -61,7 +61,7 @@ inline iterator_t find( iterator_t it, iterator_t end, value_t const& v ) {
  *
  * \param it - beginning of the range to search through.
  * \param end - one past the end of the range to search through.
- * \param cond - condition which must be satified.
+ * \param cond - condition which must be satisfied.
  * \return iterator pointing to found element or end of range.
  */
 template<typename iterator_t, typename condition_t>
@@ -218,8 +218,8 @@ inline int long count( iterator_t it, iterator_t end, value_t const& v ) {
  *
  * \param it - beginning of the range to search through.
  * \param end - one past the end of the range to search through.
- * \param cond - condition which must be satified.
- * \return Number of elements in range that satify a given condition.
+ * \param cond - condition which must be satisfied.
+ * \return Number of elements in range that satisfy a given condition.
  */
 template<typename iterator_t, typename condition_t>
 inline int long count_if( iterator_t it, iterator_t end, condition_t cond ) {
@@ -298,7 +298,7 @@ inline dst_iter_t remove_transform_if( src_iter_t it, src_iter_t end, dst_iter_t
 	return ( dst );
 }
 
-/*! \brief Replace elements in destination container by elements from source range conditionaly transformed.
+/*! \brief Replace elements in destination container by elements from source range conditionally transformed.
  *
  * \param it - beginning of source range.
  * \param end - one past the end of source range.
@@ -382,11 +382,11 @@ inline void replace_copy( iterator_t it, iterator_t end, output_iterator_t out, 
 	return;
 }
 
-/*! \brief Copies one range onto the another but with replacing all occurrences of value satifying a given predicate with new value.
+/*! \brief Copies one range onto the another but with replacing all occurrences of value satisfying a given predicate with new value.
  * \param it - beginning of range to copy.
  * \param end - one past the end of range to copy.
  * \param out_ - beginning of output range.
- * \param predicate_ - replace all elements that satify this predicate.
+ * \param predicate_ - replace all elements that satisfy this predicate.
  * \param newVal_ - a value that shall replace old values.
  */
 template<typename iterator_t, typename output_iterator_t, typename predicate_t, typename value_t>
@@ -1657,12 +1657,12 @@ inline bool is_heap( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 	bool isHeap( true );
 	int long size( last_ - first_ );
 
-	int long childs( 0 );
+	int long children( 0 );
 
-	while ( isHeap && ( childs < size ) ) {
-		int long roots( childs );
-		childs = ( childs * 2 ) + 1;
-		for ( int long r( roots ), c( childs ); ( r < childs ) && ( c < size ); ++ r, ++ c ) {
+	while ( isHeap && ( children < size ) ) {
+		int long roots( children );
+		children = ( children * 2 ) + 1;
+		for ( int long r( roots ), c( children ); ( r < children ) && ( c < size ); ++ r, ++ c ) {
 			if ( comp_( *( first_ + r ), *( first_ + c ) ) ) {
 				isHeap = false;
 				break;
@@ -2173,7 +2173,7 @@ inline iterator_t unique( iterator_t first_, iterator_t last_ ) {
 	return ( unique( first_, last_, equal_to<typename hcore::iterator_traits<iterator_t>::value_type>() ) );
 }
 
-/*! \brief Randomly shuffle elements in range using given funcion as source of randomness.
+/*! \brief Randomly shuffle elements in range using given function as source of randomness.
  *
  * \param first_ - beginning of range of elements to shuffle.
  * \param last_ - one past the end of range of elements to shuffle.
@@ -2204,7 +2204,7 @@ inline void random_shuffle( iterator_t first_, iterator_t last_ ) {
 	return;
 }
 
-/*! \brief Randomly copy subset of elements from one range onto another range using given funcion as source of randomness.
+/*! \brief Randomly copy subset of elements from one range onto another range using given function as source of randomness.
  *
  * \param srcFirst_ - beginning of range of elements to copy from.
  * \param srcLast_ - one past the end of range of elements to copy from.

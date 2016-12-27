@@ -55,7 +55,7 @@ public:
 			OK = 0,            /*!< No error. */
 			BAD_INDEX,         /*!< Index of of bounds. */
 			BAD_SEQUENCE_SIZE, /*!< Paired sequence size is invalid. */
-			COUNT_NOT_MATCH    /*!< Specifed count does not match with container size. */
+			COUNT_NOT_MATCH    /*!< Specified count does not match with container size. */
 		} error_t;
 	};
 	typedef value_type* iterator;

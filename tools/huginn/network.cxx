@@ -51,7 +51,7 @@ namespace huginn {
 class HNetwork : public HHuginn::HObject {
 	struct OPERATIONS {
 		static int const READING = 1;
-		static int const WRITTING = 2;
+		static int const WRITING = 2;
 	};
 	HHuginn::class_t _streamClass;
 	HHuginn::class_t _exceptionClass;

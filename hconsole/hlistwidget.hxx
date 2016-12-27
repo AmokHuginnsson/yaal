@@ -209,7 +209,7 @@ private:
  * and allow user to specify type of elements stored in this array.
  *
  * Former approach is more flexible while the latter is easier to implement.
- * Unfortunatelly latter approach badly limits model type traits
+ * Unfortunately latter approach badly limits model type traits
  * (i.e. one would have to use list of arrays of window pointers instead
  * of plain list of window pointers, vide HWindowListWidget).
  *

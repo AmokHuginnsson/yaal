@@ -57,7 +57,7 @@ typedef yaal::hcore::HString (*str_transform_func_t)( yaal::hcore::HString const
 class HFileSystem : public HHuginn::HObject {
 	struct OPERATIONS {
 		static int const READING = 1;
-		static int const WRITTING = 2;
+		static int const WRITING = 2;
 	};
 	HHuginn::class_t _streamClass;
 	HHuginn::class_t _directoryScanClass;
@@ -88,7 +88,7 @@ public:
 	static HHuginn::value_t writing( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "FileSystem.writing", values_, 0, 0, position_ );
-		return ( thread_->object_factory().create_integer( OPERATIONS::WRITTING + 0 ) );
+		return ( thread_->object_factory().create_integer( OPERATIONS::WRITING + 0 ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t current_working_directory( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
@@ -192,7 +192,7 @@ private:
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, false, position_ );
 		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
 		int operation( static_cast<int>( get_integer( values_[1] ) ) );
-		if ( ( operation != OPERATIONS::READING ) && ( operation != OPERATIONS::WRITTING ) ) {
+		if ( ( operation != OPERATIONS::READING ) && ( operation != OPERATIONS::WRITING ) ) {
 			throw HHuginn::HHuginnRuntimeException(
 				HString( name ).append( "(): second argument must be either FileSystem.reading() or FileSystem.writing()" ),
 				position_

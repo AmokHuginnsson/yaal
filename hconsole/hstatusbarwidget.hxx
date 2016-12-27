@@ -67,7 +67,7 @@ protected:
 	/* progress bar data */
 	bool   _done;
 	bool   _estimate;     /* was time left count ? */
-	double _progressSize; /* number of steps in progess bar */
+	double _progressSize; /* number of steps in progress bar */
 	int    _lastProgress; /* last drawed step */
 	int    _lastPercent;  /* last written percent */
 	int    _lastMinute;   /* all last* variables help */

@@ -242,7 +242,7 @@ void HRawFile::do_flush( void ) {
 void HRawFile::set_timeout( int long timeout_ ) {
 	_timeout = timeout_;
 	if ( _timeout < LOW_TIMEOUT_WARNING ) {
-		log( LOG_LEVEL::WARNING ) << "Low timout for write operations!" << endl;
+		log( LOG_LEVEL::WARNING ) << "Low timeout for write operations!" << endl;
 	}
 	return;
 }

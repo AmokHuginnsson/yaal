@@ -62,7 +62,7 @@ HWindow::HWindow( yaal::hcore::HString const& title_ )
 HWindow::~HWindow( void ) {
 	M_PROLOG
 #ifdef __DEBUGGER_BABUNI__
-	log << "destroing window: " << _title << endl;
+	log << "destroying window: " << _title << endl;
 #endif /* __DEBUGGER_BABUNI__ */
 	return;
 	M_DESTRUCTOR_EPILOG

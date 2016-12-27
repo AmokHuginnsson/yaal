@@ -37,7 +37,7 @@ namespace yaal {
 
 namespace hcore {
 
-/*! \brief printf() like but type safe string formating.
+/*! \brief printf() like but type safe string formatting.
  */
 class HFormat {
 	typedef HFormat this_type;

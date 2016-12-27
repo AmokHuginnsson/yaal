@@ -629,7 +629,7 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 			case ( XML_ENTITY_REF_NODE ): {
 				/*
 				 * This case can only happen when XML_PARSE_NOENT (HXml::PARSER::RESOLVE_ENTITIES) is NOT set,
-				 * which means DOM tree build by parser can still containg some entity references.
+				 * which means DOM tree build by parser can still containing some entity references.
 				 */
 				M_ASSERT( node->name );
 				entities_t::const_iterator it( _entities.find( reinterpret_cast<char const*>( node->name ) ) );
@@ -653,7 +653,7 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 			case ( XML_XINCLUDE_END ):
 				/*
 				 * We support xinclude but we do anything special about them
-				 * except automatical parsing.
+				 * except automatic parsing.
 				 */
 			break;
 			default:
@@ -1311,10 +1311,10 @@ HXml::HIterator HXml::HNodeProxy::copy_node( HXml::HNodeProxy node ) {
 	M_EPILOG
 }
 
-bool HXml::HConstNodeProxy::has_childs( void ) const {
+bool HXml::HConstNodeProxy::has_children( void ) const {
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
-	return ( _node->has_childs() );
+	return ( _node->has_children() );
 	M_EPILOG
 }
 
@@ -1749,7 +1749,7 @@ HXml::HNodeProxy HXml::HNodeSet::HIterator::operator* ( void ) {
 
 char const* HXml::error_message( int code ) const {
 	M_PROLOG
-	char const* msg = "Unknow error code";
+	char const* msg = "Unknown error code";
 	switch ( code ) {
 		case ( EILSEQ ):
 			msg = "An invalid multibyte sequence has been encountered in the input.";

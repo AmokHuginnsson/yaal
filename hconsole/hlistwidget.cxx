@@ -75,9 +75,16 @@ char const* default_format( TYPE type_ ) {
 HListWidget::HColumnInfo::HColumnInfo( yaal::hcore::HString const& name_,
 		int width_, BITS::ALIGN align_, TYPE type_,
 		yaal::hcore::HString const& format_, HWidget* widget_ )
-	: _descending( false ), _widthRaw( 0 ), _width( width_ ), _align( align_ ),
-	_shortcutIndex( 0 ), _shortcut( 0 ), _type( type_ ), _format( ! format_.is_empty() ? format_ : default_format( _type ) ),
-	_name( name_ ), _widget( widget_ ) {
+	: _descending( false )
+	, _widthRaw( 0 )
+	, _width( width_ )
+	, _align( align_ )
+	, _shortcutIndex( 0 )
+	, _shortcut( 0 )
+	, _type( type_ )
+	, _format( ! format_.is_empty() ? format_ : default_format( _type ) )
+	, _name( name_ )
+	, _widget( widget_ ) {
 	M_PROLOG
 	int shortcutIndex( static_cast<int>( _name.find( '&' ) ) );
 	if ( shortcutIndex != HString::npos ) {
@@ -101,13 +108,22 @@ HListWidget::HColumnInfo::~HColumnInfo( void ) {
 HListWidget::HListWidget( HWindow* parent_, int row_, int column_,
 		int height_, int width_, yaal::hcore::HString const& label_, HWidgetAttributesInterface const& attr_,
 		HAbstractListModel::ptr_t const& data_ )
-	: HWidget( parent_, row_, column_, height_, width_, label_, attr_ ),
-	HSearchableWidget( attr_ ),
-	_checkable( false ), _sortable( true ),
-	_drawHeader( true ), _editable( false ),
-	_widgetOffset( 0 ), _cursorPosition( 0 ), _visibleColumn( false ),
-	_header(), _sortColumn( -1 ), _match(), _cellEditor(),
-	_cursor(), _firstVisibleRow(), _model( data_ ) {
+	: HWidget( parent_, row_, column_, height_, width_, label_, attr_ )
+	, HSearchableWidget( attr_ )
+	, _checkable( false )
+	, _sortable( true )
+	, _drawHeader( true )
+	, _editable( false )
+	, _widgetOffset( 0 )
+	, _cursorPosition( 0 )
+	, _visibleColumn( false )
+	, _header()
+	, _sortColumn( -1 )
+	, _match()
+	, _cellEditor()
+	, _cursor()
+	, _firstVisibleRow()
+	, _model( data_ ) {
 	M_PROLOG
 	attr_.apply( *this );
 	_model->set_widget( this );
@@ -321,7 +337,7 @@ void HListWidget::draw_cell( iterator_t& it_, int row_, int column_, int columnO
 			set_attr_data();
 	}
 	cons.mvprintf( _rowRaw + row_, _columnRaw + columnOffset_, _varTmpBuffer.raw()	);
-	if ( _searchActived )
+	if ( _searchActivated )
 		highlight( _rowRaw + row_,
 				_columnRaw + columnOffset_, _match._matchNumber,
 				( it_ == _match._currentMatch )
@@ -980,7 +996,7 @@ void HListWidget::go_to_match( void ) {
 	char const* outcome( nullptr );
 	iterator_t cursorOrig = _cursor;
 	iterator_t firstVisibleRowOrig = _firstVisibleRow;
-	if ( ! _searchActived ) {
+	if ( ! _searchActivated ) {
 		return;
 	}
 	if ( _match._currentMatch != _cursor ) {
@@ -1061,10 +1077,12 @@ void HListWidget::go_to_match_previous( void ) {
 	char const* outcome( nullptr );
 	iterator_t cursorOrig = _cursor;
 	iterator_t firstVisibleRowOrig = _firstVisibleRow;
-	if ( ! _searchActived )
+	if ( ! _searchActivated ) {
 		return;
-	if ( _match._currentMatch != _cursor )
+	}
+	if ( _match._currentMatch != _cursor ) {
 		_match._matchNumber = -1;
+	}
 	_match._currentMatch = _cursor;
 	while ( count -- ) {
 		for ( ctr = _match._columnWithMatch; ctr >= 0; ctr -- ) {
@@ -1497,15 +1515,15 @@ bool CompareListWidgetItems<HInfoItem>::operator() ( HInfoItem const& left_,
 }
 
 HListWidgetAttributes::HListWidgetAttributes( void )
-	: HSearchableWidgetAttributes(),
-	_checkable( false ),
-	_checkableSet( false ),
-	_sortable( false ),
-	_sortableSet( false ),
-	_drawHeader( false ),
-	_drawHeaderSet( false ),
-	_editable( false ),
-	_editableSet( false ) {
+	: HSearchableWidgetAttributes()
+	, _checkable( false )
+	, _checkableSet( false )
+	, _sortable( false )
+	, _sortableSet( false )
+	, _drawHeader( false )
+	, _drawHeaderSet( false )
+	, _editable( false )
+	, _editableSet( false ) {
 }
 
 void HListWidgetAttributes::do_apply( HWidget& widget_ ) const {

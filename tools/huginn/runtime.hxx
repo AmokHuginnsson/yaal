@@ -93,7 +93,7 @@ private:
 	 * in case of recusive call chain: `foo() { foo(); }'.
 	 *
 	 * 2.
-	 * Loading sub-module involves independed symbol resolving stage at end of compilation
+	 * Loading sub-module involves independent symbol resolving stage at end of compilation
 	 * of given submodule.
 	 *
 	 * 3.

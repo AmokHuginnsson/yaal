@@ -106,7 +106,7 @@ struct same_type<T1, T1> {
 
 /*! \brief Perform compile time ternary operator on types.
  *
- * \tparam condition - staticly checkable condition that tells which type will be used.
+ * \tparam condition - statically checkable condition that tells which type will be used.
  * \tparam type_for_true - type to be used if condition is true.
  * \tparam type_for_false - type to be used if condition is false.
  * \retval type - conditional type.

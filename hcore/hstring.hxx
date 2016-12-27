@@ -244,7 +244,7 @@ public:
 	 */
 	HString( void const* pointer );
 	HString& operator = ( HString const& );
-	/*! \brief Move assignemnt operator.
+	/*! \brief Move assignment operator.
 	 *
 	 * Move "value" of a string to another string.
 	 */

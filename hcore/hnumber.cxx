@@ -738,14 +738,14 @@ bool HNumber::operator >= ( HNumber const& other ) const {
 	return ( other <= *this );
 }
 
-bool HNumber::mutate_addition( i32_t* res, integer_t ressize,
+bool HNumber::mutate_addition( i32_t* res, integer_t resSize,
 		i32_t const* const addends[], integer_t* missingIntegral, integer_t* missingFractional, bool sub ) const {
 	i32_t e[ 2 ];
 	i32_t const* const epx[] = {
 		addends[ 0 ] - ( missingIntegral ? missingIntegral[ 0 ] : 0 ) - 1,
 		addends[ 1 ] - ( missingIntegral ? missingIntegral[ 1 ] : 0 ) - 1
 	};
-	integer_t idx( ressize - 1 ); /* index of first processed leaf */
+	integer_t idx( resSize - 1 ); /* index of first processed leaf */
 	integer_t side( 0 );
 	integer_t off( 0 );
 	if ( missingFractional ) {
@@ -869,8 +869,8 @@ HNumber& HNumber::operator += ( HNumber const& addend_ ) {
 		_precision = addendExact ? _precision : addend_._precision;
 	}
 	( dps <= _precision ) || ( dps = _precision );
-	integer_t ressize = ips + dps + 1; /* + 1 for possible carrier */
-	_cache.realloc( chunk_size<i32_t>( ressize ) );
+	integer_t resSize = ips + dps + 1; /* + 1 for possible carrier */
+	_cache.realloc( chunk_size<i32_t>( resSize ) );
 	::memset( _cache.raw(), 0, static_cast<size_t>( _cache.get_size() ) );
 	i32_t* res( _cache.get<i32_t>() );
 	i32_t const* addend1( _canonical.get<i32_t>() );
@@ -889,13 +889,13 @@ HNumber& HNumber::operator += ( HNumber const& addend_ ) {
 		swap( addends[0], addends[1] );
 		swp = true;
 	}
-	mutate_addition( res, ressize, addends, missingIntegral, missingFractional, sub );
+	mutate_addition( res, resSize, addends, missingIntegral, missingFractional, sub );
 	_integralPartSize = ips;
-	if ( ressize > 0 ) {
+	if ( resSize > 0 ) {
 		_negative = sub ? ( _negative ? ! swp : swp ) : ( _negative && addend_._negative );
 		++ _integralPartSize;
 	}
-	_leafCount = ressize;
+	_leafCount = resSize;
 	_canonical.swap( _cache );
 	normalize( augendExact && addendExact );
 	return ( *this );
@@ -1072,7 +1072,7 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 		 * We use "long division" pen and paper algorithm
 		 * with smart guessing of quotient digits taken from TAOCP.
 		 *
-		 * Eamples of special cases that have to be handled.
+		 * Examples of special cases that have to be handled.
 		 * (each digit is one leaf)
 		 *
 		 * 1 / 3

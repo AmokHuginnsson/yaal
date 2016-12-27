@@ -418,7 +418,7 @@ public:
 	bool is_complex( void ) const {
 		return ( ! _fieldDefinitions.is_empty() );
 	}
-	bool is_overriden( HClass const* super_, int index_ ) const {
+	bool is_overridden( HClass const* super_, int index_ ) const {
 		return ( _fieldDefinitions[index_] != super_->_fieldDefinitions[index_] );
 	}
 	void update_runtime( huginn::HRuntime* );

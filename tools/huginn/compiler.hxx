@@ -431,7 +431,7 @@ struct OCompiler {
 	void start_function_call( executing_parser::position_t );
 	void close_function_call( executing_parser::position_t );
 	void set_type_name( yaal::hcore::HString const&, executing_parser::position_t );
-	void add_paramater( yaal::hcore::HString const&, executing_parser::position_t );
+	void add_parameter( yaal::hcore::HString const&, executing_parser::position_t );
 
 	/*! \brief Verify that there are no holes in default argument definitions in function parameters.
 	 *

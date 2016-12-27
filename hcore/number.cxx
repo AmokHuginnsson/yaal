@@ -499,7 +499,7 @@ public:
 	typedef HArray<number_t> consecutive_t;
 	typedef HMap<int long long, number_t> isolated_t;
 	static int const FORCED_CONSECUTIVE_SIZE = 4096;
-	static int const CONSECUTIVE_STRECH_SIZE = 128;
+	static int const CONSECUTIVE_STRETCH_SIZE = 128;
 	static int const DIVIDE_AND_CONQUER_CUT_OFF = 32;
 private:
 	consecutive_t _consecutive;
@@ -525,7 +525,7 @@ public:
 		HNumber const* res( nullptr );
 		HLock l( _mutex );
 		if ( value_ >= _consecutive.get_size() ) {
-			if ( ( value_ <= FORCED_CONSECUTIVE_SIZE ) || ( value_ <= ( _consecutive.get_size() + CONSECUTIVE_STRECH_SIZE ) ) ) {
+			if ( ( value_ <= FORCED_CONSECUTIVE_SIZE ) || ( value_ <= ( _consecutive.get_size() + CONSECUTIVE_STRETCH_SIZE ) ) ) {
 				for ( int long long i( _consecutive.get_size() ); i <= value_; ++ i ) {
 					number_t n( make_resource<HNumber>( *_consecutive.back() ) );
 					*n *=i;

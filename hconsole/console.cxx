@@ -209,7 +209,7 @@ struct ATTR {
 		/*
 		 * On broken terminals we use trick to get bright background,
 		 * first we swap foreground and background colors and then
-		 * we add REVERSE attribure.
+		 * we add REVERSE attribute.
 		 */
 		if ( attr_ & COLORS::BG_BLINK ) {
 			attr = (
@@ -496,7 +496,7 @@ void HConsole::leave_curses( void ) {
 	curs_set( CURSOR::VISIBLE );
 	refresh();
 /*	reset_shell_mode(); */
-/* see comment near def_shell_mode(), ( automagicly by endwin() ) */
+/* see comment near def_shell_mode(), ( automagically by endwin() ) */
 /*
 	if ( static_cast<WINDOW*>( _window ) )
 		delwin ( static_cast<WINDOW*>( static_cast<WINDOW*>( _window ) ) );

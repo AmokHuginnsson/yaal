@@ -24,7 +24,7 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 /*! \file hcore/hcore/algorithm_low.hxx
- * \brief Implementation of low level alogrithms.
+ * \brief Implementation of low level algorithms.
  */
 
 #ifndef YAAL_HCORE_ALGORITHM_IMPL_HXX_INCLUDED

@@ -43,7 +43,7 @@ namespace hconsole {
 HSearchableWidget::HSearchableWidget( HWidgetAttributesInterface const& attrs_ )
 	: HWidget( nullptr, 0, 0, 0, 0, hcore::HString(), attrs_ )
 	, _searchable( false )
-	, _searchActived( false )
+	, _searchActivated( false )
 	, _filtered( false )
 	, _backwards( false )
 	, _pattern() {
@@ -63,8 +63,8 @@ void HSearchableWidget::search( HString const& pattern_, bool backwards_ ) {
 	M_PROLOG
 	HPattern::pluggable_flags_t pf;
 	pf.push_back( make_pair( 'f', &_filtered ) );
-	_searchActived = _pattern.parse( pattern_, &pf );
-	if ( ! _searchActived ) {
+	_searchActivated = _pattern.parse( pattern_, &pf );
+	if ( ! _searchActivated ) {
 		if ( _window ) {
 			_window->status_bar()->message( "%s", _pattern.error().raw() );
 		}
@@ -111,9 +111,9 @@ void HSearchableWidget::set_searchable( bool searchable_ ) {
 }
 
 HSearchableWidgetAttributes::HSearchableWidgetAttributes( void )
-	: HWidgetAttributes(),
-	_searchable( false ),
-	_searchableSet( false ) {
+	: HWidgetAttributes()
+	, _searchable( false )
+	, _searchableSet( false ) {
 	return;
 }
 

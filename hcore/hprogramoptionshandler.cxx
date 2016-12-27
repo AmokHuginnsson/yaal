@@ -559,7 +559,7 @@ void HProgramOptionsHandler::verify_new_option( HOption& option_ ) {
 	}
 	for ( options_t::const_iterator it( _options.begin() ), end( _options.end() ); it != end; ++ it ) {
 		/*
-		 * This complicated test is to allow for option aliasses:
+		 * This complicated test is to allow for option aliases:
 		 * -q, --quiet
 		 * -q, --silent
 		 */
@@ -732,7 +732,7 @@ int HProgramOptionsHandler::process_command_line( int argc_,
 	HString optName;
 	HString optValue;
 	int invalid( 0 );
-	int nonOption( 1 ); /* 1 because atgv[0] -- a program name is first non-option */
+	int nonOption( 1 ); /* 1 because argv[0] -- a program name is first non-option */
 	options_t::iterator it;
 	for ( int i( 1 ); i < argc_; ++ i ) {
 		char const* arg( argv_[i] );

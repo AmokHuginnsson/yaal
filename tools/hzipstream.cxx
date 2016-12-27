@@ -39,7 +39,7 @@ namespace yaal {
 
 namespace tools {
 
-int _compressionLevel_ = Z_DEFAULT_COMPRESSION; /* Library dafault, it is the same as 6. */
+int _compressionLevel_ = Z_DEFAULT_COMPRESSION; /* Library default, it is the same as 6. */
 int long _zBufferSize_ = 256 * 1024; /* As advised in the documentation. */
 
 HZipStream::HZipStream( MODE mode_ )

@@ -32,7 +32,7 @@ AC_ARG_ENABLE([reldeb],[AC_HELP_STRING([--enable-reldeb],[Compile with full opti
 AC_ARG_ENABLE([relassert],[AC_HELP_STRING([--enable-relassert],[Compile with full optimizations but keep assertion checks.])],[DO_TARGET="RELASSERT" LIB_INFIX="-ra"])
 AC_ARG_ENABLE([profiling],[AC_HELP_STRING([--enable-profiling],[Provide support for profiling tools.])],[DO_TARGET="PROFILING" LIB_INFIX="-p"])
 AC_ARG_ENABLE([coverage],[AC_HELP_STRING([--enable-coverage],[Get ready to gather coverage data.])],[DO_TARGET="COVERAGE" LIB_INFIX="-c"])
-AC_ARG_ENABLE([auto-sanity],[AC_HELP_STRING([--enable-auto-sanity],[Try to automatically sanitize user enviroment.])],[AC_DEFINE_UNQUOTED(YAAL_AUTO_SANITY,1,[Enable automatic enviroment sanitization.])])
+AC_ARG_ENABLE([auto-sanity],[AC_HELP_STRING([--enable-auto-sanity],[Try to automatically sanitize user environment.])],[AC_DEFINE_UNQUOTED(YAAL_AUTO_SANITY,1,[Enable automatic environment sanitization.])])
 
 AC_MSG_RESULT([--- Initialization ... ---                               [[6%]]])
 

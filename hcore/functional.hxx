@@ -247,7 +247,7 @@ struct negate : public unary_function<tType, tType> {
  */
 template<typename tType>
 struct equal_to : public binary_function<bool, tType, tType> {
-	/*! \brief Comparation executor.
+	/*! \brief Comparison executor.
 	 *
 	 * \param left_ - first of the objects to compare.
 	 * \param right_ - second of the objects to compare.
@@ -264,7 +264,7 @@ struct equal_to : public binary_function<bool, tType, tType> {
  */
 template<typename tType>
 struct not_equal_to : public binary_function<bool, tType, tType> {
-	/*! \brief Comparation executor.
+	/*! \brief Comparison executor.
 	 *
 	 * \param left_ - first of the objects to compare.
 	 * \param right_ - second of the objects to compare.
@@ -281,7 +281,7 @@ struct not_equal_to : public binary_function<bool, tType, tType> {
  */
 template<typename tType>
 struct less : public binary_function<bool, tType, tType> {
-	/*! \brief Comparation executor.
+	/*! \brief Comparison executor.
 	 *
 	 * \param left_ - first of the objects to compare.
 	 * \param right_ - second of the objects to compare.
@@ -298,7 +298,7 @@ struct less : public binary_function<bool, tType, tType> {
  */
 template<typename tType>
 struct greater : public binary_function<bool, tType, tType> {
-	/*! \brief Comparation executor.
+	/*! \brief Comparison executor.
 	 *
 	 * \param left_ - first of the objects to compare.
 	 * \param right_ - second of the objects to compare.
@@ -315,7 +315,7 @@ struct greater : public binary_function<bool, tType, tType> {
  */
 template<typename tType>
 struct less_equal : public binary_function<bool, tType, tType> {
-	/*! \brief Comparation executor.
+	/*! \brief Comparison executor.
 	 *
 	 * \param left_ - first of the objects to compare.
 	 * \param right_ - second of the objects to compare.
@@ -332,7 +332,7 @@ struct less_equal : public binary_function<bool, tType, tType> {
  */
 template<typename tType>
 struct greater_equal : public binary_function<bool, tType, tType> {
-	/*! \brief Comparation executor.
+	/*! \brief Comparison executor.
 	 *
 	 * \param left_ - first of the objects to compare.
 	 * \param right_ - second of the objects to compare.

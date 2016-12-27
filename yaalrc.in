@@ -17,7 +17,7 @@
 # char       - [a-z]
 # int        - [0-9]+
 # string     - [^ ].*
-# enumerator - string choosen from predefined string set
+# enumerator - string chosen from predefined string set
 # bit field  - (sub)set of given set of predefined strings
 #
 # example:

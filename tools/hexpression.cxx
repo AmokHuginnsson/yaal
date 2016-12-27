@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-  analyser.cxx - this file is integral part of `yaal' project.
+  hexpression.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -210,7 +210,7 @@ void HExpression::swap( HExpression& ex ) {
 double long HExpression::count_branch( tree_t::const_node_t node_ ) {
 	M_PROLOG
 	double long value( 0 );
-	if ( node_->has_childs() ) {
+	if ( node_->has_children() ) {
 		value = ( this->*( (*node_)->METHOD ) )( node_ );
 	} else {
 		int index( (*node_)->_variables.head() );

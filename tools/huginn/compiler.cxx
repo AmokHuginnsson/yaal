@@ -649,18 +649,18 @@ void OCompiler::set_import_alias( yaal::hcore::HString const& name_, executing_p
 	if ( is_restricted( name_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), position_.get() );
 	}
-	HHuginn::identifier_id_t importAliasIdentifer( _runtime->identifier_id( name_ ) );
-	if ( _submittedClasses.count( importAliasIdentifer ) > 0 ) {
+	HHuginn::identifier_id_t importAliasIdentifier( _runtime->identifier_id( name_ ) );
+	if ( _submittedClasses.count( importAliasIdentifier ) > 0 ) {
 		throw HHuginn::HHuginnRuntimeException( "Class `"_ys.append( name_ ).append( "' named is already defined." ), position_.get() );
 	}
-	if ( find_if( _submittedImports.begin(), _submittedImports.end(), [&importAliasIdentifer]( OImportInfo const& info_ ) { return ( info_._alias == importAliasIdentifer ); } ) != _submittedImports.end() ) {
+	if ( find_if( _submittedImports.begin(), _submittedImports.end(), [&importAliasIdentifier]( OImportInfo const& info_ ) { return ( info_._alias == importAliasIdentifier ); } ) != _submittedImports.end() ) {
 		throw HHuginn::HHuginnRuntimeException(
-			"Import alias `"_ys.append( _runtime->identifier_name( importAliasIdentifer ) ).append( "' is already defined." ),
+			"Import alias `"_ys.append( _runtime->identifier_name( importAliasIdentifier ) ).append( "' is already defined." ),
 			position_.get()
 		);
 	}
-	_importInfo._alias = importAliasIdentifer;
-	_usedIdentifiers[importAliasIdentifer].write( position_.get(), OIdentifierUse::TYPE::PACKAGE );
+	_importInfo._alias = importAliasIdentifier;
+	_usedIdentifiers[importAliasIdentifier].write( position_.get(), OIdentifierUse::TYPE::PACKAGE );
 	return;
 	M_EPILOG
 }
@@ -691,9 +691,9 @@ void OCompiler::set_base_name( yaal::hcore::HString const& name_, executing_pars
 	if ( is_builtin( name_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), position_.get() );
 	}
-	HHuginn::identifier_id_t baseClassIdentifer( _runtime->identifier_id( name_ ) );
-	_usedIdentifiers[baseClassIdentifer].read( position_.get() );
-	_classContext->_baseName = baseClassIdentifer;
+	HHuginn::identifier_id_t baseClassIdentifier( _runtime->identifier_id( name_ ) );
+	_usedIdentifiers[baseClassIdentifier].read( position_.get() );
+	_classContext->_baseName = baseClassIdentifier;
 	_classContext->_basePosition = position_;
 	return;
 	M_EPILOG
@@ -717,8 +717,8 @@ void OCompiler::set_field_name( yaal::hcore::HString const& name_, executing_par
 	if ( is_restricted( name_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), position_.get() );
 	}
-	HHuginn::identifier_id_t fieldIdentifer( _runtime->identifier_id( name_ ) );
-	_usedIdentifiers[fieldIdentifer].write( position_.get(), OIdentifierUse::TYPE::FIELD );
+	HHuginn::identifier_id_t fieldIdentifier( _runtime->identifier_id( name_ ) );
+	_usedIdentifiers[fieldIdentifier].write( position_.get(), OIdentifierUse::TYPE::FIELD );
 	add_field_name( name_, position_ );
 	return;
 	M_EPILOG
@@ -846,25 +846,25 @@ void OCompiler::verify_default_argument( executing_parser::position_t position_ 
 	M_EPILOG
 }
 
-void OCompiler::add_paramater( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+void OCompiler::add_parameter( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	HHuginn::identifier_id_t parameterIdentifer( _runtime->identifier_id( name_ ) );
-	if ( find( fc._parameters.begin(), fc._parameters.end(), parameterIdentifer ) != fc._parameters.end() ) {
+	HHuginn::identifier_id_t parameterIdentifier( _runtime->identifier_id( name_ ) );
+	if ( find( fc._parameters.begin(), fc._parameters.end(), parameterIdentifier ) != fc._parameters.end() ) {
 		throw HHuginn::HHuginnRuntimeException( "Parameter `"_ys.append( name_ ).append( "' was already defined." ), position_.get() );
 	}
 	verify_default_argument( position_ );
-	_usedIdentifiers[parameterIdentifer].write( position_.get(), OIdentifierUse::TYPE::VARIABLE );
+	_usedIdentifiers[parameterIdentifier].write( position_.get(), OIdentifierUse::TYPE::VARIABLE );
 	_executionStepsBacklog.emplace_back(
 		OExecutionStep::OPERATION::DEFINE,
 		HHuginn::expression_t(),
 		fc._scopeStack.top(),
 		!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
 		-1,
-		parameterIdentifer,
+		parameterIdentifier,
 		position_.get()
 	);
-	fc._parameters.push_back( parameterIdentifer );
+	fc._parameters.push_back( parameterIdentifier );
 	return;
 	M_EPILOG
 }

@@ -65,9 +65,9 @@ HStatusBarWidget::HStatusBarWidget( HWindow* parent_,
 	, _start( HTime::TZ::LOCAL )
 	, _choices() {
 	M_PROLOG
-	int attribte( _statusBarAttribute );
-	attribte &= 0x00ff;
-	_attributeFocused._data = attribte;
+	int attribute( _statusBarAttribute );
+	attribute &= 0x00ff;
+	_attributeFocused._data = attribute;
 	_statusBarAttribute &= 0xff00;
 	return;
 	M_EPILOG

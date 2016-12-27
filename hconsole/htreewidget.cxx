@@ -66,7 +66,7 @@ void HTreeWidget::expand( tree_view_t::node_t node ) {
 void HTreeWidget::collapse( tree_view_t::node_t node ) {
 	M_PROLOG
 	(**node)._unfolded = false;
-  if ( ! node->has_childs() )
+  if ( ! node->has_children() )
 		return;
 	for ( tree_view_t::HNode::iterator it = node->begin(); it != node->end(); ++ it )
 		collapse( &*it );
@@ -150,16 +150,16 @@ int HTreeWidget::draw_node( tree_view_t::node_t node_, int row_ ) {
 		(**node_)._columnRaw = _columnRaw + node_->get_level() * 2 - 1;
 		(**node_)._widthRaw = static_cast<int>( str.get_length() ) + 2;
 		set_attr_data();
-		if ( ! ( (**node_)._unfolded || ! node_->has_childs() ) )
+		if ( ! ( (**node_)._unfolded || ! node_->has_children() ) )
 			cons.mvprintf( row, (**node_)._columnRaw, "+" );
-		else if ( node_->has_childs() )
+		else if ( node_->has_children() )
 			cons.mvprintf( row, (**node_)._columnRaw, "-" );
 		if ( node_ == _selected )
 			cons.set_attr( _enabled ? ( _focused ? ~_attributeFocused._data
 						: ~ _attributeEnabled._data ) : ~ _attributeDisabled._data );
 		cons.mvprintf( row, (**node_)._columnRaw + 1, str.raw() );
 	}
-	if ( node_->has_childs() && ( (**node_)._unfolded || ! node_->get_level() ) ) {
+	if ( node_->has_children() && ( (**node_)._unfolded || ! node_->get_level() ) ) {
 		for ( tree_view_t::HNode::iterator it = node_->begin(); it != node_->end(); ++ it )
 			row = draw_node( &*it, row );
 	}
@@ -176,13 +176,13 @@ int HTreeWidget::do_process_input( int code_ ) {
 	switch ( code_ ) {
 		case ( KEY_CODES::HOME ):
 			node = _view.get_root();
-			if ( node->has_childs() ) {
+			if ( node->has_children() ) {
 				_selected = &*node->begin();
 			}
 		break;
 		case ( KEY_CODES::END ):
 			node = _view.get_root();
-			if ( node->has_childs() ) {
+			if ( node->has_children() ) {
 				_selected = &*prev( node->end() );
 			}
 		break;
@@ -199,7 +199,7 @@ int HTreeWidget::do_process_input( int code_ ) {
 			} else {
 				node = _selected;
 				while ( (**node)._unfolded ) {
-					if ( node->has_childs() ) {
+					if ( node->has_children() ) {
 						_selected = &*node->begin();
 						node = _selected;
 						_selected = previous( node, true );
@@ -211,7 +211,7 @@ int HTreeWidget::do_process_input( int code_ ) {
 		break;
 		case ( KEY_CODES::RIGHT ): {
 			wasFolded = ! (**node)._unfolded;
-			if ( node->has_childs() ) {
+			if ( node->has_children() ) {
 				(**node)._unfolded = true;
 				if ( wasFolded ) {
 					break;
@@ -222,7 +222,7 @@ int HTreeWidget::do_process_input( int code_ ) {
 		/* no break */
 		case ( KEY_CODES::DOWN ): {
 			if ( (**node)._unfolded ) {
-				if ( node->has_childs() ) {
+				if ( node->has_children() ) {
 					_selected = &*node->begin();
 				}
 			} else {
@@ -251,7 +251,7 @@ int HTreeWidget::do_process_input( int code_ ) {
 		break;
 		case ( ' ' ):
 		case ( '\r' ):
-			if ( node->has_childs() ) {
+			if ( node->has_children() ) {
 				(**node)._unfolded = ! (**node)._unfolded;
 			} else {
 				errorCode = code_;
@@ -296,7 +296,7 @@ bool HTreeWidget::do_click( tree_view_t::node_t node_, OMouse& mouse_ ) {
 		_selected = node_;
 		return ( true );
 	}
-	if ( node_->has_childs() && ( (**node_)._unfolded || ! node_->get_level() ) ) {
+	if ( node_->has_children() && ( (**node_)._unfolded || ! node_->get_level() ) ) {
 		for ( tree_view_t::HNode::iterator it = node_->begin(); it != node_->end(); ++ it )
 			if ( do_click( &*it, mouse_ ) )
 				return ( true );

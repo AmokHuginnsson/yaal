@@ -232,7 +232,7 @@ void HRuntime::set_max_local_variable_count( int maxLocalVariableCount_ ) {
 	M_EPILOG
 }
 
-void HRuntime::register_class_low( class_t class_, bool registerContructor_ ) {
+void HRuntime::register_class_low( class_t class_, bool registerConstructor_ ) {
 	M_PROLOG
 	if ( _classes.insert( make_pair( class_->identifier_id(), class_ ) ).second ) {
 		_dependencies.push_back( class_ );
@@ -241,7 +241,7 @@ void HRuntime::register_class_low( class_t class_, bool registerContructor_ ) {
 		HHuginn::value_t functionReference( _objectFactory->create_function_reference( identifier, function, "automatic constructor for class: `"_ys.append( identifier_name( identifier ) ).append( "`" ) ) );
 		_functionsStore.insert( make_pair( identifier, functionReference ) );
 	}
-	if ( registerContructor_ ) {
+	if ( registerConstructor_ ) {
 		_functionsAvailable.insert( class_->identifier_id() );
 	}
 	return;
@@ -805,16 +805,16 @@ inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterfac
 		}
 		hierarhy.pop();
 	}
-	HHuginn::field_identifiers_t overridenFields;
+	HHuginn::field_identifiers_t overriddenFields;
 	for ( HHuginn::identifier_id_t f : derivedFields ) {
 		if ( find( newFields.begin(), newFields.end(), f ) != newFields.end() ) {
-			overridenFields.push_back( f );
+			overriddenFields.push_back( f );
 		}
 	}
 
 	HHuginn::field_identifiers_t::iterator endDerived( derivedFields.end() );
 	HHuginn::field_identifiers_t::iterator endNew( newFields.end() );
-	for ( HHuginn::identifier_id_t f : overridenFields ) {
+	for ( HHuginn::identifier_id_t f : overriddenFields ) {
 		endDerived = remove( derivedFields.begin(), endDerived, f );
 		endNew = remove( newFields.begin(), endNew, f );
 	}
@@ -830,7 +830,7 @@ inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterfac
 		next = true;
 		stream_ << " " << runtime->identifier_name( f ) << ( verbose ? "(derived)" : "" );
 	}
-	for ( HHuginn::identifier_id_t f : overridenFields ) {
+	for ( HHuginn::identifier_id_t f : overriddenFields ) {
 		if ( next ) {
 			stream_ << ",";
 		}

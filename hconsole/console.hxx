@@ -34,7 +34,7 @@ Copyright:
 
 namespace yaal {
 
-/*! \brief User inteface.
+/*! \brief User interface.
  *
  * This namespace contains library API required to build
  * terminal based user interface (TUI).

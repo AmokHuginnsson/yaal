@@ -42,11 +42,11 @@ namespace tools {
  */
 namespace des {
 
-extern const u8_t _beginingPermutation_[];
+extern const u8_t _beginningPermutation_[];
 extern const u8_t _endingPermutation_[];
 extern const u8_t _keyPermutation_[];
 extern const u8_t _countOfMoves_[];
-extern const u8_t _permutationOfCompresion_[];
+extern const u8_t _permutationOfCompression_[];
 extern const u8_t _permutationOfExpanding_[];
 extern const u8_t _pBlockPermutation_[];
 extern const u8_t _sBlock_[][ 4 ][ 16 ];
@@ -90,12 +90,12 @@ void HDes::generate_keys( u8_t const* password_, int len_ ) {
 		low.rotate_left( 28, 28, _countOfMoves_[ key ] );
 		for ( int i( 0 ); i < DES::BLOCK_SIZE; ++ i )
 			tmpKey[ i ] = iKeyHigh[ i ];
-		permutate( tmpKey, _permutationOfCompresion_, 48 );
+		permutate( tmpKey, _permutationOfCompression_, 48 );
 		for ( int i( 0 ); i < 6; ++ i )
 			reinterpret_cast<u8_t*>( _IKeys[ 0 ][ key ] )[ i ] = tmpKey[ i ];
 		for ( int i( 0 ); i < DES::BLOCK_SIZE; ++ i )
 			tmpKey[ i ] = iKeyLow[ i ];
-		permutate( tmpKey, _permutationOfCompresion_, 48 );
+		permutate( tmpKey, _permutationOfCompression_, 48 );
 		for ( int i( 0 ); i < 6; ++ i )
 			reinterpret_cast<u8_t*>( _IKeys[ 1 ][ key ] )[ i ] = tmpKey[ i ];
 	}
@@ -124,7 +124,7 @@ void HDes::crypt( u8_t* buffer_, int long size_, action_t const& action_ ) {
 }
 
 void HDes::_3des( u32_t* block_, int action_ ) {
-	permutate( reinterpret_cast<u8_t*>( block_ ), _beginingPermutation_, 64 );
+	permutate( reinterpret_cast<u8_t*>( block_ ), _beginningPermutation_, 64 );
 	_des( block_, action_, 0 );
 	_des( block_, 1 - action_, 1 );
 	_des( block_, action_, 0 );
@@ -197,7 +197,7 @@ void HDes::permutate( u8_t* buffer_, const u8_t* tab_, int len_ ) const {
 
 namespace des {
 
-const u8_t _beginingPermutation_[] = {
+const u8_t _beginningPermutation_[] = {
 				57, 49, 41, 33, 25, 17, 9, 1, 59, 51, 43, 35, 27, 19, 11, 3,
 				61, 53, 45, 37, 29, 21, 13, 5, 63, 55, 47, 39, 31, 23, 15, 7,
 				56, 48, 40, 32, 24, 16, 8, 0, 58, 50, 42, 34, 26, 18, 10, 2,
@@ -225,8 +225,8 @@ const u8_t _countOfMoves_[] = {
 				1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1
 	};
 
-/* commpresion permutation */
-const u8_t _permutationOfCompresion_[] = {
+/* compression permutation */
+const u8_t _permutationOfCompression_[] = {
 				13, 16, 10, 23, 0, 4, 2, 27, 14, 5, 20, 9,
 				22, 18, 11, 3, 25, 7, 15, 6, 26, 19, 12, 1,
 				40, 51, 30, 36, 46, 54, 29, 39, 50, 44, 32, 47,

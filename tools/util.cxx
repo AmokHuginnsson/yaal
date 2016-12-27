@@ -80,15 +80,15 @@ double long atof_ex( HString const& string_, bool parse_ ) {
 	HString str = string_;
 	str.replace ( ",", "." ).replace ( " ", "" ).replace ( "\t", "" );
 	if ( parse_ ) {
-		HExpression analyser;
+		HExpression analyzer;
 		try {
-			if ( analyser.compile( str ) ) {
-				value = analyser.evaluate();
+			if ( analyzer.compile( str ) ) {
+				value = analyzer.evaluate();
 			} else {
-				throw HExpressionException( HString( analyser.get_error() ) + " for: " + string_ + ", at: " + analyser.get_error_token() );
+				throw HExpressionException( HString( analyzer.get_error() ) + " for: " + string_ + ", at: " + analyzer.get_error_token() );
 			}
 		} catch ( HExpressionException const& e ) {
-			throw HExpressionException( HString( e.what() ) + " - " + analyser.get_error() + " for: " + string_ + ", at: " + analyser.get_error_token() );
+			throw HExpressionException( HString( e.what() ) + " - " + analyzer.get_error() + " for: " + string_ + ", at: " + analyzer.get_error_token() );
 		}
 	} else {
 		value = ::strtold( str.raw(), nullptr );

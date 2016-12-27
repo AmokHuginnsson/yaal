@@ -48,14 +48,14 @@ void IO::schedule_read( void ) {
 
 void IO::sync( void ) {
 	if ( _type != TYPE::SOCKET_DGRAM ) {
-		DWORD iTransfered( 0 );
-		if ( ! ::GetOverlappedResult( _handle, &_overlapped, &iTransfered, true ) ) {
+		DWORD iTransferred( 0 );
+		if ( ! ::GetOverlappedResult( _handle, &_overlapped, &iTransferred, true ) ) {
 			log_windows_error( "GetOverlappedResult(sync)" );
 		} else {
 			if ( _connected ) {
-				if ( ( static_cast<int>( iTransfered ) < _readRequest ) && ( ::GetLastError() != ERROR_HANDLE_EOF ) ) {
+				if ( ( static_cast<int>( iTransferred ) < _readRequest ) && ( ::GetLastError() != ERROR_HANDLE_EOF ) ) {
 					stringstream ss;
-					ss << "iTransfered: " << iTransfered << ", _readRequest: " << _readRequest;
+					ss << "iTransferred: " << iTransferred << ", _readRequest: " << _readRequest;
 					log_windows_error( ( ss.str() + "GetOverlappedResult(bad read)" ).c_str() );
 				} else {
 					_ready = true;
@@ -237,8 +237,8 @@ bool IO::is_connected( void ) const {
 int IO::connect( void ) {
 	M_ASSERT( ! _connected );
 	if ( ! _nonBlocking ) {
-		DWORD iTransfered( 0 );
-		if ( ! ::GetOverlappedResult( _handle, &_overlapped, &iTransfered, true ) ) {
+		DWORD iTransferred( 0 );
+		if ( ! ::GetOverlappedResult( _handle, &_overlapped, &iTransferred, true ) ) {
 			log_windows_error( "GetOverlappedResult(connect)" );
 		}
 		_connected = true;

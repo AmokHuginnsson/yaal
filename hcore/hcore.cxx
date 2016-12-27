@@ -403,7 +403,7 @@ HCoreInitDeinit::HCoreInitDeinit( void ) {
 		}
 		yaal_options().process_rc_file( "core", set_hcore_variables );
 		if ( _writeTimeout_ < LOW_TIMEOUT_WARNING ) {
-			log( LOG_LEVEL::WARNING ) << "Low default timout for write operations!" << endl;
+			log( LOG_LEVEL::WARNING ) << "Low default timeout for write operations!" << endl;
 		}
 	} catch ( HException const& e ) {
 		fprintf( stderr, "Failed to initialize yaal-hcore: %s\n", e.what() );

@@ -111,7 +111,7 @@ HWidget::HWidget( HWindow* parent_, int row_, int column_,
 HWidget::~HWidget( void ) {
 	M_PROLOG
 #ifdef __DEBUGGER_BABUNI__
-	log << "destroing widget: " << _label << endl;
+	log << "destroying widget: " << _label << endl;
 #endif /* __DEBUGGER_BABUNI__ */
 	_window = nullptr;
 	return;
@@ -580,19 +580,19 @@ HWidgetAttributes& HWidgetAttributes::label_decoration( HWidget::LABEL::DECORATI
 	return ( *this );
 }
 
-HWidgetAttributes& HWidgetAttributes::attribure_enabled( HWidget::OAttribute const& attributeEnabled_ ) {
+HWidgetAttributes& HWidgetAttributes::attribute_enabled( HWidget::OAttribute const& attributeEnabled_ ) {
 	_attributeEnabled = attributeEnabled_;
 	_attributeEnabledSet = true;
 	return ( *this );
 }
 
-HWidgetAttributes& HWidgetAttributes::attribure_disabled( HWidget::OAttribute const& attributeDisabled_ ) {
+HWidgetAttributes& HWidgetAttributes::attribute_disabled( HWidget::OAttribute const& attributeDisabled_ ) {
 	_attributeDisabled = attributeDisabled_;
 	_attributeDisabledSet = true;
 	return ( *this );
 }
 
-HWidgetAttributes& HWidgetAttributes::attribure_focused( HWidget::OAttribute const& attributeFocused_ ) {
+HWidgetAttributes& HWidgetAttributes::attribute_focused( HWidget::OAttribute const& attributeFocused_ ) {
 	_attributeFocused = attributeFocused_;
 	_attributeFocusedSet = true;
 	return ( *this );

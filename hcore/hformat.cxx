@@ -734,7 +734,7 @@ HFormat::HFormatImpl::conversion_t HFormat::HFormatImpl::get_conversion( HString
 	M_ENSURE( i < s.get_length() );
 	struct OLength {
 		char const* _label;
-		conversion_t _converion;
+		conversion_t _conversion;
 	} length[] = {
 		{ "hh", CONVERSION::BYTE },
 		{ "h", CONVERSION::SHORT },
@@ -804,7 +804,7 @@ HFormat::HFormatImpl::conversion_t HFormat::HFormatImpl::get_conversion( HString
 		case ( 3 ):
 		case ( 4 ): {
 			if ( !!( conversion & CONVERSION::INT ) ) {
-				conversion |= length[ lenMod ]._converion;
+				conversion |= length[ lenMod ]._conversion;
 			} else {
 				M_THROW( BAD_LEN_MOD, lenMod );
 			}

@@ -24,7 +24,7 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 /*! \file tools/htwowaymap.hxx
- * \brief Declaration and implmentation of HTwoWayMap<> class template.
+ * \brief Declaration and implementation of HTwoWayMap<> class template.
  */
 
 #ifndef YAAL_TOOLS_HTWOWAYMAP_HXX_INCLUDED

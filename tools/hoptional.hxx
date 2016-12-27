@@ -39,7 +39,7 @@ namespace yaal {
 namespace tools {
 
 /*! \brief HOptional<> class template - an optional value.
- * Provide interface for values that can be unitialized.
+ * Provide interface for values that can be uninitialized.
  */
 template<typename type_t>
 class HOptional final {

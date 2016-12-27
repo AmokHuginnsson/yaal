@@ -81,8 +81,8 @@ public:
 			{ return ( &_object ); }
 		tType* operator->( void )
 			{ return ( &_object ); }
-		template<typename assgnee_t>
-		tType& operator = ( assgnee_t const& v_ ) {
+		template<typename assignee_t>
+		tType& operator = ( assignee_t const& v_ ) {
 			_object = v_;
 			return ( _object );
 		}

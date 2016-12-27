@@ -229,7 +229,7 @@ HToolsInitDeinit::HToolsInitDeinit( void ) {
 			HProgramOptionsHandler::HOption()
 			.long_form( "default_encoding" )
 			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
-			.description( "dafault character encoding used in text documents" )
+			.description( "default character encoding used in text documents" )
 			.recipient( _defaultEncoding_ )
 			.argument_name( "encoding" )
 		)(

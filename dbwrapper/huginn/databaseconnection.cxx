@@ -117,7 +117,7 @@ public:
 private:
 	virtual HHuginn::value_t do_create_instance( tools::huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) const {
 		M_PROLOG
-		char const n[] = "DatabaseConnection.contructor";
+		char const n[] = "DatabaseConnection.constructor";
 		verify_arg_count( n, values_, 1, 1, position_ );
 		verify_arg_type( n, values_, 0, HHuginn::TYPE::STRING, true, position_ );
 		HHuginn::value_t v( thread_->runtime().none_value() );

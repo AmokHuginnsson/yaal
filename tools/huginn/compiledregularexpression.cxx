@@ -101,7 +101,7 @@ public:
 private:
 	virtual HHuginn::value_t do_create_instance( huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) const {
 		M_PROLOG
-		char const n[] = "CompiledRegularExpression.contructor";
+		char const n[] = "CompiledRegularExpression.constructor";
 		verify_arg_count( n, values_, 1, 1, position_ );
 		verify_arg_type( n, values_, 0, HHuginn::TYPE::STRING, true, position_ );
 		HCompiledRegularExpression::regex_t regex(

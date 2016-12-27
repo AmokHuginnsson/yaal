@@ -161,7 +161,7 @@ Copyright:
 #define M_NUM_ARGC( ... ) M_EXPAND( M_NUM_ARGC_COUNTER( __VA_ARGS__, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 ) )
 #define M_NUM_ARGC_COUNTER( a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, N, ... ) N
 /*! \endcond */
-/*! \brief Create uniqe C++ identifier from two other identifier.
+/*! \brief Create unique C++ identifier from two other identifier.
  *
  * \param a - first part of identifier.
  * \param b - second part of identifier (usually __LINE__ or __COUNTER__).

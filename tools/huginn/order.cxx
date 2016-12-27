@@ -139,7 +139,7 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 				{ "clear",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::clear, _1, _2, _3, _4 ) ), "erase `order`'s content, `order` becomes empty" },
 				{ "equals",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::equals, _1, _2, _3, _4 ) ), "( *other* ) - test if *other* `order` has the same content" }
 			},
-			"The `order` is a collection of sorted values of uniform types. It supports operations of addiion, search and element removal."
+			"The `order` is a collection of sorted values of uniform types. It supports operations of addition, search and element removal."
 		)
 	);
 	return ( c );

@@ -26,7 +26,7 @@ Copyright:
 /*! \file hcore/hexception.hxx
  * \brief HException and HExceptionT<> class declaration.
  *
- * Auto-exception-hierachy stuff is decalred here.
+ * Auto-exception-hierarchy stuff is decalred here.
  */
 
 #ifndef YAAL_HCORE_HEXCEPTION_HXX_INCLUDED
