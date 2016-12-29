@@ -156,7 +156,7 @@ HHuginn::class_t create_class( HRuntime* runtime_, yaal::hcore::HString const& n
 		);
 	}
 	if ( runtime_ ) {
-		runtime_->huginn()->register_class( c, true );
+		runtime_->huginn()->register_class( c, HHuginn::ACCESS::PUBLIC );
 	}
 	return ( c );
 	M_EPILOG

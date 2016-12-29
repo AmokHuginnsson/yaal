@@ -141,7 +141,7 @@ void HObjectFactory::register_builtin_classes( void ) {
 	_runtime->huginn()->register_class( _lookup );
 	_runtime->huginn()->register_class( _set );
 
-	_runtime->huginn()->register_class( _exception, true );
+	_runtime->huginn()->register_class( _exception, HHuginn::ACCESS::PUBLIC );
 
 	_conversionException = exception::create_class( _runtime, "ConversionException", "The `ConversionException` is an exception class used to signal invalid conversion attempts." );
 	_arithmeticException = exception::create_class( _runtime, "ArithmeticException", "The `ArithmeticException` is an exception class used to signal erroneous arithmetic operation." );

@@ -173,6 +173,16 @@ public:
 	typedef yaal::hcore::HResource<huginn::HSource> source_t;
 	typedef yaal::hcore::HResource<huginn::OCompiler> compiler_t;
 	typedef yaal::hcore::HResource<huginn::HRuntime> runtime_t;
+	/*! \brief Huginn class (constructor) access specification.
+	 *
+	 * The class (constructor) access mode is inferred from class definition context
+	 * and cannot be set manually by user.
+	 */
+	enum class ACCESS {
+		PRIVATE,
+		PACKAGE,
+		PUBLIC
+	};
 private:
 	enum class STATE {
 		EMPTY,
@@ -303,7 +313,7 @@ public:
 	yaal::hcore::HStreamInterface& log_stream( void );
 	yaal::hcore::HString get_snippet( int, int ) const;
 	char const* get_comment( int ) const;
-	void register_class( class_t, bool = false );
+	void register_class( class_t, ACCESS = ACCESS::PRIVATE );
 	void register_function( identifier_id_t );
 	static void disable_grammar_verification( void );
 private:
@@ -426,6 +436,7 @@ public:
 		return ( _runtime );
 	}
 	value_t create_instance( huginn::HThread*, value_t*, values_t const&, int ) const;
+	value_t access_violation( huginn::HThread*, value_t*, values_t const&, int ) const __attribute__((noreturn));
 	yaal::hcore::HString const& doc( void ) const;
 	yaal::hcore::HString const& doc( identifier_id_t ) const;
 private:

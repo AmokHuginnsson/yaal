@@ -340,7 +340,7 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 		t.pop_frame();
 		if ( ! cls ) {
 			cls = _runtime->create_class( identifierId_, super, fieldDefinitions, cc->_doc ? cc->_doc : "" );
-			_runtime->register_class_low( cls, true );
+			_runtime->register_class_low( cls, ACCESS::PUBLIC );
 		} else {
 			cls->redefine( super, fieldDefinitions );
 		}
@@ -373,10 +373,10 @@ void HHuginn::finalize_compilation( paths_t const& paths_, compiler_setup_t comp
 	M_EPILOG
 }
 
-void HHuginn::register_class( class_t class_, bool registerConstructor_ ) {
+void HHuginn::register_class( class_t class_, ACCESS classConstructorAccess_ ) {
 	M_PROLOG
 	M_ENSURE( _state != STATE::COMPILED );
-	_runtime->register_class_low( class_, registerConstructor_ );
+	_runtime->register_class_low( class_, classConstructorAccess_ );
 	OCompiler::OIdentifierUse& ciu( _compiler->_usedIdentifiers[class_->identifier_id()] );
 	ciu.write( 0, OCompiler::OIdentifierUse::TYPE::CLASS );
 	ciu.read( 0 );

@@ -141,7 +141,7 @@ public:
 	value_t* get_function( identifier_id_t, bool = false );
 	class_t get_class( identifier_id_t );
 	value_t* get_package( identifier_id_t );
-	void register_class_low( class_t, bool );
+	void register_class_low( class_t, HHuginn::ACCESS );
 	void register_function( identifier_id_t, function_t, yaal::hcore::HString const& );
 	void register_package( identifier_id_t, identifier_id_t, HHuginn::paths_t const&, HHuginn::compiler_setup_t, int );
 	class_t create_class( identifier_id_t, HHuginn::HClass const*, field_definitions_t const&, yaal::hcore::HString const& );

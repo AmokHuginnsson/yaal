@@ -138,6 +138,12 @@ HHuginn::value_t HHuginn::HClass::create_instance( huginn::HThread* thread_, val
 	M_EPILOG
 }
 
+HHuginn::value_t HHuginn::HClass::access_violation( huginn::HThread*, value_t*, values_t const&, int position_ ) const {
+	M_PROLOG
+	throw HHuginn::HHuginnRuntimeException( "Explicit construction of class `"_ys.append( name() ).append( "' objects (instances) is forbidden." ), position_ );
+	M_EPILOG
+}
+
 HHuginn::value_t HHuginn::HClass::do_create_instance( huginn::HThread* thread_, values_t const& values_, int position_ ) const {
 	M_PROLOG
 	value_t v( thread_->runtime().object_factory()->create_object( this ) );
