@@ -330,7 +330,7 @@ void HExpression::set_variable( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::function_call( HFrame* frame_, int position_ ) {
+HHuginn::values_t& HExpression::grab_args( HFrame* frame_ ) {
 	M_PROLOG
 	int& ip( frame_->ip() );
 	M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );
@@ -344,24 +344,49 @@ void HExpression::function_call( HFrame* frame_, int position_ ) {
 		M_ASSERT( ! frame_->values().is_empty() );
 	}
 	M_ASSERT( _instructions[ip]._operator == OPERATOR::FUNCTION_CALL );
+	reverse( values.begin(), values.end() );
+	return ( values );
+	M_EPILOG
+}
+
+void HExpression::function_call( HFrame* frame_, int position_ ) {
+	M_PROLOG
+	HHuginn::values_t& args( grab_args( frame_ ) );
+	int& ip( frame_->ip() );
 	int p( _instructions[ip]._position );
 	++ ip;
-	HHuginn::HClass const* c( frame_->values().top()->get_class() );
+	HFrame::values_t& values( frame_->values() );
+	HHuginn::HClass const* c( values.top()->get_class() );
 	HHuginn::type_id_t t( c->type_id() );
 	if ( ( t != HHuginn::TYPE::FUNCTION_REFERENCE ) && ( t != HHuginn::TYPE::BOUND_METHOD ) ) {
 		throw HHuginn::HHuginnRuntimeException( "Reference `"_ys.append( c->name() ).append( "' is not a function." ), position_ );
 	}
-	HHuginn::value_t f( yaal::move( frame_->values().top() ) );
-	frame_->values().pop();
-	reverse( values.begin(), values.end() );
+	HHuginn::value_t f( yaal::move( values.top() ) );
+	values.pop();
 	if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-		frame_->values().push( static_cast<HHuginn::HFunctionReference*>( f.raw() )->function()( frame_->thread(), nullptr, values, p ) );
+		values.push( static_cast<HHuginn::HFunctionReference*>( f.raw() )->function()( frame_->thread(), nullptr, args, p ) );
 	} else {
 		M_ASSERT( t == HHuginn::TYPE::BOUND_METHOD );
 		HHuginn::HClass::HBoundMethod* m( static_cast<HHuginn::HClass::HBoundMethod*>( f.raw() ) );
-		frame_->values().push( m->call( frame_->thread(), values, p ) );
+		values.push( m->call( frame_->thread(), args, p ) );
 	}
-	values.clear();
+	args.clear();
+	return;
+	M_EPILOG
+}
+
+void HExpression::create_closure( HFrame* frame_, int ) {
+	M_PROLOG
+	HFrame::values_t& values( frame_->values() );
+	HHuginn::value_t f( yaal::move( values.top() ) );
+	values.pop();
+	HHuginn::values_t& args( grab_args( frame_ ) );
+	++ frame_->ip();
+	M_ASSERT( f->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE );
+	HObjectFactory& of( frame_->thread()->object_factory() );
+	HHuginn::value_t closure( of.create_object( &_noneClass_, args ) );
+	values.push( of.create_bound_method( static_cast<HHuginn::HFunctionReference*>( f.raw() )->function(), closure ) );
+	args.clear();
 	return;
 	M_EPILOG
 }

@@ -127,14 +127,37 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		"nameList",
 		parameter >> ( * ( ',' >> parameter ) )
 	);
+	HRule capture(
+		"capture",
+		regex(
+			"captureIdentifier",
+			identifierPattern,
+			HRegex::action_string_position_t( hcore::call( &OCompiler::add_capture, _compiler.get(), _1, _2 ) )
+		)
+	);
+	HRule captureList(
+		"captureList",
+		capture >> ( * ( ',' >> capture ) )
+	);
 	HRule scope( "scope" );
+	/*
+	 * There are two kinds of lambdas in Huginn language:
+	 * 1. Pure lambda functions (called Lambda(s) for short)
+	 * 2. Referentially opaque lambda functions (called Closure(s) for short).
+	 *
+	 * Implementation of Lambdas is trivial, lambda body is turned into ordinary
+	 * function during compilation time and stored as single value in run-time.
+	 *
+	 * Closures require different approach, i.e.: all "captures" must be used
+	 * twice, once in call/use context, and once in lambda body context.
+	 * Hence each Closure constitutes a separate class which instance is created
+	 * on Closure definition site.
+	 */
 	HRule lambda(
 		"lambda",
-		constant(
-			'@',
+		( '@' >> -( '[' >> captureList >> ']' ) )[
 			e_p::HRegex::action_position_t( hcore::call( &OCompiler::set_lambda_name, _compiler.get(), _1 ) )
-		) >> '(' >> -nameList >>
-		constant( ')', HRuleBase::action_position_t( hcore::call( &OCompiler::verify_default_argument, _compiler.get(), _1 ) ) )
+		] >> '(' >> -nameList >> constant( ')', HRuleBase::action_position_t( hcore::call( &OCompiler::verify_default_argument, _compiler.get(), _1 ) ) )
 		>> scope,
 		HRuleBase::action_position_t( hcore::call( &OCompiler::create_lambda, _compiler.get(), _1 ) )
 	);
@@ -162,7 +185,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	);
 	HRule memberAccess(
 		"memberAccess",
-		constant( '.' )[HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::MEMBER_ACCESS, _1 ) )] >> regex(
+		constant( '.', HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::MEMBER_ACCESS, _1 ) ) ) >> regex(
 			"member",
 			identifierPattern,
 			e_p::HStringLiteral::action_string_position_t( hcore::call( &OCompiler::defer_get_field_reference, _compiler.get(), _1, _2 ) )
@@ -192,13 +215,13 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	);
 	HRule negation(
 		"negation",
-		( constant( '-' )[HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::NEGATE, _1 ) )] >> factorial )[
+		( constant( '-', HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::NEGATE, _1 ) ) ) >> factorial )[
 			e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::NEGATE, _1 ) )
 		] | factorial
 	);
 	HRule booleanNot(
 		"booleanNot", (
-			constant( '!' )[HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::BOOLEAN_NOT, _1 ) )]
+			constant( '!', HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::BOOLEAN_NOT, _1 ) ) )
 			>> negation
 		)[
 			e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::BOOLEAN_NOT, _1 ) )
@@ -264,7 +287,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		"booleanAnd",
 		equality[e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::start_subexpression, _compiler.get(), _1 ) )] >> *(
 			/* compare action */ (
-				constant( "&&" )[e_p::HString::action_position_t( hcore::call( &OCompiler::add_subexpression, _compiler.get(), OPERATOR::BOOLEAN_AND, _1 ) )]
+				constant( "&&", e_p::HString::action_position_t( hcore::call( &OCompiler::add_subexpression, _compiler.get(), OPERATOR::BOOLEAN_AND, _1 ) ) )
 				>> equality
 			)[HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::BOOLEAN_AND, _1 ) )]
 		),
@@ -274,7 +297,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		"booleanOr",
 		HRule( booleanAnd, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::start_subexpression, _compiler.get(), _1 ) ) ) >> *(
 			/* compare action */ (
-				constant( "||" )[e_p::HString::action_position_t( hcore::call( &OCompiler::add_subexpression, _compiler.get(), OPERATOR::BOOLEAN_OR, _1 ) )]
+				constant( "||", e_p::HString::action_position_t( hcore::call( &OCompiler::add_subexpression, _compiler.get(), OPERATOR::BOOLEAN_OR, _1 ) ) )
 				>> booleanAnd
 			)[HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::BOOLEAN_OR, _1 ) )]
 		),
@@ -284,7 +307,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		"booleanXor",
 		booleanOr >> -(
 			/* compare action */ (
-				constant( "^^" )[e_p::HString::action_string_position_t( hcore::call( &OCompiler::defer_str_oper, _compiler.get(), _1, _2 ) )]
+				constant( "^^", e_p::HString::action_string_position_t( hcore::call( &OCompiler::defer_str_oper, _compiler.get(), _1, _2 ) ) )
 				>> booleanOr
 			)[HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::BOOLEAN_XOR, _1 ) )]
 		)
@@ -293,9 +316,9 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		"ternary",
 		HRule( booleanXor, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::start_subexpression, _compiler.get(), _1 ) ) ) >> -(
 			/* ternary action */ (
-				constant( '?' )[e_p::HString::action_position_t( hcore::call( &OCompiler::add_subexpression, _compiler.get(), OPERATOR::TERNARY, _1 ) )]
+				constant( '?', e_p::HString::action_position_t( hcore::call( &OCompiler::add_subexpression, _compiler.get(), OPERATOR::TERNARY, _1 ) ) )
 				>> expression
-				>> constant( ':' )[e_p::HString::action_position_t( hcore::call( &OCompiler::add_subexpression, _compiler.get(), OPERATOR::TERNARY, _1 ) )]
+				>> constant( ':', e_p::HString::action_position_t( hcore::call( &OCompiler::add_subexpression, _compiler.get(), OPERATOR::TERNARY, _1 ) ) )
 				>> expression
 			)[HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::TERNARY, _1 ) )]
 		),

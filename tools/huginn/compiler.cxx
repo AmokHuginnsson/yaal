@@ -127,6 +127,7 @@ OCompiler::OFunctionContext::OFunctionContext(
 	bool isLambda_
 ) : _functionIdentifier( functionId_ )
 	, _parameters()
+	, _captures()
 	, _defaultValues()
 	, _lastDefaultValuePosition( -1 )
 	, _scopeStack()
@@ -278,6 +279,7 @@ OCompiler::OCompiler( HRuntime* runtime_ )
 	, _importInfo()
 	, _executionStepsBacklog()
 	, _usedIdentifiers()
+	, _capturesLog()
 	, _setup( HHuginn::COMPILER::BE_STRICT )
 	, _statementIdGenerator( INVALID_STATEMENT_IDENTIFIER )
 	, _scopeContextCache()
@@ -293,6 +295,7 @@ void OCompiler::reset( void ) {
 	_isIncremental = true;
 	_scopeContextCache.clear();
 	_statementIdGenerator = INVALID_STATEMENT_IDENTIFIER;
+	_capturesLog.clear();
 	_usedIdentifiers.clear();
 	_executionStepsBacklog.clear();
 	_importInfo.reset();
@@ -351,6 +354,24 @@ void OCompiler::resolve_symbols( void ) {
 							es._expression.raw(),
 							es._operation == OExecutionStep::OPERATION::USE ? HExpression::ACCESS::VALUE : HExpression::ACCESS::REFERENCE,
 							index,
+							_1,
+							es._position
+						)
+					);
+					break;
+				}
+			}
+			captures_log_t::const_iterator cli( _capturesLog.find( es._scope->_functionId ) );
+			if ( cli != _capturesLog.end() ) {
+				OFunctionContext::parameter_names_t::const_iterator ci( find( cli->second.begin(), cli->second.end(), es._identifier ) );
+				if ( ci != cli->second.end() ) {
+					es._expression->replace_execution_step(
+						es._index,
+						hcore::call(
+							&HExpression::get_field_direct,
+							es._expression.raw(),
+							es._operation == OExecutionStep::OPERATION::USE ? HExpression::ACCESS::VALUE : HExpression::ACCESS::REFERENCE,
+							static_cast<int>( distance( cli->second.begin(), ci ) ),
 							_1,
 							es._position
 						)
@@ -726,10 +747,14 @@ void OCompiler::set_field_name( yaal::hcore::HString const& name_, executing_par
 
 void OCompiler::set_lambda_name( executing_parser::position_t position_ ) {
 	M_PROLOG
+	OCompiler::OFunctionContext& fc( f() );
 	HHuginn::HErrorCoordinate ec( _runtime->huginn()->get_coordinate( position_.get() ) );
 	using yaal::hcore::to_string;
 	HHuginn::identifier_id_t id( _runtime->identifier_id( to_string( "@" ).append( ec.line() ).append( ":" ).append( ec.column() ) ) );
 	_functionContexts.emplace( make_resource<OFunctionContext>( id, ++ _statementIdGenerator, true ) );
+	if ( ! fc._captures.is_empty() ) {
+		_capturesLog.insert( make_pair( f()._functionIdentifier, yaal::move( fc._captures ) ) );
+	}
 	return;
 	M_EPILOG
 }
@@ -831,6 +856,11 @@ void OCompiler::create_lambda( executing_parser::position_t position_ ) {
 	function_info_t fi( create_function_low( position_ ) );
 	HHuginn::value_t fRef( _runtime->object_factory()->create_function_reference( fi.first, fi.second, "Lambda: "_ys.append( _runtime->identifier_name( fi.first ) ) ) );
 	defer_store_direct( fRef, position_ );
+	if ( _capturesLog.find( fi.first ) != _capturesLog.end() ) {
+		defer_action( &HExpression::create_closure, position_ );
+		current_expression()->commit_oper( OPERATOR::FUNCTION_CALL );
+		f()._valueTypes.top()._type = _boundMethodClass_.type_id();
+	}
 	return;
 	M_EPILOG
 }
@@ -850,6 +880,10 @@ void OCompiler::add_parameter( yaal::hcore::HString const& name_, executing_pars
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	HHuginn::identifier_id_t parameterIdentifier( _runtime->identifier_id( name_ ) );
+	captures_log_t::const_iterator cli( _capturesLog.find( fc._functionIdentifier ) );
+	if ( ( cli != _capturesLog.end() ) && ( find( cli->second.begin(), cli->second.end(), parameterIdentifier ) != cli->second.end() ) ) {
+		throw HHuginn::HHuginnRuntimeException( "Symbol `"_ys.append( name_ ).append( "' is a already used as a capture." ), position_.get() );
+	}
 	if ( find( fc._parameters.begin(), fc._parameters.end(), parameterIdentifier ) != fc._parameters.end() ) {
 		throw HHuginn::HHuginnRuntimeException( "Parameter `"_ys.append( name_ ).append( "' was already defined." ), position_.get() );
 	}
@@ -865,6 +899,25 @@ void OCompiler::add_parameter( yaal::hcore::HString const& name_, executing_pars
 		position_.get()
 	);
 	fc._parameters.push_back( parameterIdentifier );
+	return;
+	M_EPILOG
+}
+
+void OCompiler::add_capture( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+	M_PROLOG
+	OFunctionContext& fc( f() );
+	HHuginn::identifier_id_t captureIdentifer( _runtime->identifier_id( name_ ) );
+	if ( find( fc._captures.begin(), fc._captures.end(), captureIdentifer ) != fc._captures.end() ) {
+		throw HHuginn::HHuginnRuntimeException( "Capture `"_ys.append( name_ ).append( "' was already defined." ), position_.get() );
+	}
+	HHuginn::expression_t& expression( current_expression() );
+	if ( fc._captures.is_empty() ) {
+		expression->oper( OPERATOR::FUNCTION_CALL, position_.get() );
+	}
+	defer_get_reference( name_, position_ );
+	fc._valueTypes.pop();
+	expression->oper( OPERATOR::FUNCTION_ARGUMENT, position_.get() );
+	fc._captures.push_back( captureIdentifer );
 	return;
 	M_EPILOG
 }

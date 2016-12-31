@@ -187,6 +187,10 @@ struct OCompiler {
 		 */
 		parameter_names_t _parameters;
 
+		/*! \param Names of captures for currently compiled lambda function.
+		 */
+		parameter_names_t _captures;
+
 		/*! \brief Default values for parameters of currently compiled function.
 		 */
 		HFunction::expressions_t _defaultValues;
@@ -371,6 +375,7 @@ struct OCompiler {
 		void swap( OImportInfo& );
 		void reset( void );
 	};
+	typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, OFunctionContext::parameter_names_t> captures_log_t;
 	typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, OIdentifierUse> used_identifiers_t;
 	typedef yaal::hcore::HArray<OExecutionStep> execution_steps_backlog_t;
 	typedef yaal::hcore::HArray<HHuginn::identifier_id_t> class_identifiers_t;
@@ -394,6 +399,7 @@ struct OCompiler {
 	OImportInfo _importInfo;
 	execution_steps_backlog_t _executionStepsBacklog;
 	used_identifiers_t _usedIdentifiers;
+	captures_log_t _capturesLog;
 	HHuginn::compiler_setup_t _setup;
 	HStatement::statement_id_t _statementIdGenerator;
 	scope_context_cache_t _scopeContextCache;
@@ -432,6 +438,7 @@ struct OCompiler {
 	void close_function_call( executing_parser::position_t );
 	void set_type_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void add_parameter( yaal::hcore::HString const&, executing_parser::position_t );
+	void add_capture( yaal::hcore::HString const&, executing_parser::position_t );
 
 	/*! \brief Verify that there are no holes in default argument definitions in function parameters.
 	 *

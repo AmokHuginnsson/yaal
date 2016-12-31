@@ -178,7 +178,10 @@ HHuginn::value_t HHuginn::HObjectReference::field( int index_ ) {
 		v = o->field_ref( index_ );
 	}
 	if ( v->type_id() == TYPE::METHOD ) {
-		v = _class->runtime()->object_factory()->create_bound_method( *static_cast<HClass::HMethod*>( v.raw() ), _object );
+		v = _class->runtime()->object_factory()->create_bound_method(
+			static_cast<HClass::HMethod*>( v.raw() )->function(),
+			_object
+		);
 	}
 	return ( v );
 	M_EPILOG
@@ -669,7 +672,12 @@ HHuginn::value_t HHuginn::HValue::do_field( HHuginn::value_t const& object_, int
 	M_PROLOG
 	value_t const& f( _class->field( index_ ) );
 	M_ASSERT( f->type_id() == TYPE::METHOD );
-	return ( _class->runtime()->object_factory()->create_bound_method( *static_cast<HClass::HMethod const*>( f.raw() ), object_ ) );
+	return (
+		_class->runtime()->object_factory()->create_bound_method(
+			static_cast<HClass::HMethod const*>( f.raw() )->function(),
+			object_
+		)
+	);
 	M_EPILOG
 }
 
@@ -802,8 +810,8 @@ HHuginn::value_t HHuginn::HClass::HMethod::do_clone( HRuntime* ) const {
 	return ( make_pointer<HMethod>( _function ) );
 }
 
-HHuginn::HClass::HBoundMethod::HBoundMethod( HMethod const& method_, HHuginn::value_t const& object_ )
-	: HMethod( &_boundMethodClass_, method_.function() )
+HHuginn::HClass::HBoundMethod::HBoundMethod( HHuginn::function_t const& method_, HHuginn::value_t const& object_ )
+	: HMethod( &_boundMethodClass_, method_ )
 	, _objectHolder( object_ ) {
 	return;
 }
@@ -813,7 +821,12 @@ HHuginn::value_t HHuginn::HClass::HBoundMethod::call( huginn::HThread* thread_, 
 }
 
 HHuginn::value_t HHuginn::HClass::HBoundMethod::do_clone( HRuntime* runtime_ ) const {
-	return ( runtime_->object_factory()->create_bound_method( *static_cast<HMethod const*>( this ), _objectHolder->clone( runtime_ ) ) );
+	return (
+		runtime_->object_factory()->create_bound_method(
+			static_cast<HMethod const*>( this )->function(),
+			_objectHolder->clone( runtime_ )
+		)
+	);
 }
 
 yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn const* huginn_ ) {

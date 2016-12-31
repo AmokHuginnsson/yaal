@@ -161,7 +161,7 @@ public:
 	HHuginn::value_t create_function_reference( HHuginn::identifier_id_t identifierId_, HHuginn::function_t const& function_, yaal::hcore::HString const& doc_ ) const {
 		return ( _functionReferencePool.create_nc( identifierId_, function_, doc_ ) );
 	}
-	HHuginn::value_t create_bound_method( HHuginn::HClass::HMethod const& method_, HHuginn::value_t const& object_ ) const {
+	HHuginn::value_t create_bound_method( HHuginn::function_t const& method_, HHuginn::value_t const& object_ ) const {
 		return ( _boundMethodPool.create_nc( method_, object_ ) );
 	}
 	HHuginn::value_t create_object( HHuginn::HClass const* class_ ) const {

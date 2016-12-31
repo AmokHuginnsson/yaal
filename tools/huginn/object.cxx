@@ -140,7 +140,12 @@ HHuginn::value_t HHuginn::HObject::do_field( HHuginn::value_t const& object_, in
 	value_t const& f( _fields[index_] );
 	bool isMethod( f->type_id() == TYPE::METHOD );
 	if ( isMethod ) {
-		return ( get_class()->runtime()->object_factory()->create_bound_method( *static_cast<HClass::HMethod const*>( f.raw() ), object_ ) );
+		return (
+			get_class()->runtime()->object_factory()->create_bound_method(
+				static_cast<HClass::HMethod const*>( f.raw() )->function(),
+				object_
+			)
+		);
 	}
 	return ( f );
 	M_EPILOG

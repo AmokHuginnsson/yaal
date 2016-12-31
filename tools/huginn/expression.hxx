@@ -79,6 +79,7 @@ public:
 	void make_dict( huginn::HFrame*, int );
 	void get_field_direct( ACCESS, int, huginn::HFrame*, int );
 	void get_variable_direct( ACCESS, HStatement::statement_id_t, int, huginn::HFrame*, int );
+	void create_closure( huginn::HFrame*, int );
 	void get_this( huginn::HFrame*, int );
 	void get_super( huginn::HFrame*, int );
 	void set_variable( huginn::HFrame*, int );
@@ -107,6 +108,7 @@ public:
 	void store_character( char, huginn::HFrame*, int );
 	bool is_empty( void ) const;
 protected:
+	HHuginn::values_t& grab_args( HFrame* );
 	virtual void do_execute( huginn::HThread* ) const override;
 private:
 	HExpression( HExpression const& ) = delete;

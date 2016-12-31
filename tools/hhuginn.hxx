@@ -495,7 +495,7 @@ class HHuginn::HClass::HBoundMethod : public HHuginn::HClass::HMethod {
 private:
 	HHuginn::value_t _objectHolder;
 public:
-	HBoundMethod( HMethod const&, HHuginn::value_t const& );
+	HBoundMethod( HHuginn::function_t const&, HHuginn::value_t const& );
 	HHuginn::value_t call( huginn::HThread*, values_t const&, int );
 private:
 	HBoundMethod( HBoundMethod const& ) = delete;
