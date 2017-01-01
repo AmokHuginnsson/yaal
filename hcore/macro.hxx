@@ -258,7 +258,7 @@ Copyright:
 # define M_DEBUG_CODE( code ) /**/
 # define M_NDEBUG_CODE( code ) code
 #endif /* #else #ifndef NDEBUG */
-/*! \brief Run given code exactly once at the end of currnt scope.
+/*! \brief Run given code exactly once at the end of current scope.
  *
  * \param code - code to be run.
  */

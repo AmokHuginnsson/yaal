@@ -24,7 +24,7 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 /*! \file tools/executingparser.hxx
- * Dleclaration of executing_parser namespace.
+ * Declaration of executing_parser namespace.
  */
 
 #ifndef YAAL_TOOLS_EXECUTINGPARSER_HXX_INCLUDED
@@ -54,7 +54,7 @@ class HExecutingParser;
  * this language is purely functional, there is no concept of state or values here.
  *
  * Once a grammar rule is declared it cannot be modified unless first declaration was empty
- * and following definition uses %= oparator to denote creation of recursive rule,
+ * and following definition uses %= operator to denote creation of recursive rule,
  * still %= operator can be used only once per rule.
  */
 namespace executing_parser {
@@ -1061,7 +1061,7 @@ private:
 	bool _matched;
 	int long _errorPosition;
 	messages_t _errorMessages;
-	yaal::hcore::HString::const_iterator _inputStart; /*!< Ephemeric! */
+	yaal::hcore::HString::const_iterator _inputStart; /*!< Ephemeral! */
 public:
 	HExecutingParser( executing_parser::HRuleBase const&, INIT_MODE = INIT_MODE::VERIFY_GRAMMAR );
 	bool operator()( yaal::hcore::HString const& );

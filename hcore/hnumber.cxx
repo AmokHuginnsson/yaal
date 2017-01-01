@@ -1232,7 +1232,7 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 
 					/*
 					 * If dividendSample is still not enough to produce next quotient leaf
-					 * then fetch next leaf from divident to dividendSample.
+					 * then fetch next leaf from dividend to dividendSample.
 					 */
 					bool extra( false );
 					if ( leafcmp( dividendSample, divisor, divSampleLen ) < 0 ) { /* We establish that normalizedDivisor <= multiplierSample. */

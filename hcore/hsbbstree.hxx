@@ -396,11 +396,13 @@ class HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::HIterator {
 	HAbstractNode* _current;
 public:
 	HIterator( void )
-		: _owner( nullptr ), _current( nullptr ) {
+		: _owner( nullptr )
+		, _current( nullptr ) {
 		return;
 	}
 	HIterator( HIterator const & iterator_ )
-		: _owner( iterator_._owner ), _current ( iterator_._current ) {
+		: _owner( iterator_._owner )
+		, _current ( iterator_._current ) {
 		return;
 	}
 	HIterator& operator = ( HIterator const& iterator_ ) {

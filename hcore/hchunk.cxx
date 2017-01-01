@@ -38,12 +38,14 @@ namespace yaal {
 namespace hcore {
 
 HChunk::HChunk( void )
-	: _size( 0 ), _data( nullptr ) {
+	: _size( 0 )
+	, _data( nullptr ) {
 	return;
 }
 
 HChunk::HChunk( int long size_, STRATEGY strategy_ )
-	: _size( 0 ), _data( nullptr ) {
+	: _size( 0 )
+	, _data( nullptr ) {
 	M_PROLOG
 	realloc( size_, strategy_ );
 	return;
@@ -51,7 +53,8 @@ HChunk::HChunk( int long size_, STRATEGY strategy_ )
 }
 
 HChunk::HChunk( HChunk&& chunk_ )
-	: _size( 0 ), _data( nullptr ) {
+	: _size( 0 )
+	, _data( nullptr ) {
 	M_PROLOG
 	swap( chunk_ );
 	return;
@@ -76,21 +79,24 @@ HChunk::~HChunk( void ) {
 }
 
 void HChunk::free( void ) {
-	if ( _data )
+	if ( _data ) {
 		memory::free( _data );
+	}
 	_size = 0;
 	return;
 }
 
 void* HChunk::realloc( int long size_, STRATEGY strategy_ ) {
-	if ( size_ < 1 )
+	if ( size_ < 1 ) {
 		M_THROW( "bad size", size_ );
+	}
 	if ( size_ > _size ) {
 		int long newSize( 0 );
 		if ( strategy_ == STRATEGY::GEOMETRIC ) {
 			newSize = 1;
-			while ( newSize < size_ )
+			while ( newSize < size_ ) {
 				newSize <<= 1;
+			}
 		} else {
 			M_ASSERT( strategy_ == STRATEGY::EXACT );
 			newSize = size_;

@@ -36,7 +36,7 @@ namespace yaal {
 
 namespace tools {
 
-/*! \brief 3DES cropto algorithm functions.
+/*! \brief 3DES crypto algorithm functions.
  */
 namespace crypto {
 

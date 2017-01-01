@@ -26,8 +26,8 @@ Copyright:
 
 /* YAAL_PRIVATE_IMPLEMENTATION_DETAIL */
 
-#ifndef YAAL_TOOLS_HUGINN_DIRERCTORYSCAN_HXX_INCLUDED
-#define YAAL_TOOLS_HUGINN_DIRERCTORYSCAN_HXX_INCLUDED 1
+#ifndef YAAL_TOOLS_HUGINN_DIRECTORYSCAN_HXX_INCLUDED
+#define YAAL_TOOLS_HUGINN_DIRECTORYSCAN_HXX_INCLUDED 1
 
 #include "tools/hhuginn.hxx"
 #include "tools/huginn/iterator.hxx"
@@ -121,5 +121,5 @@ HDirectoryScan::HIterator HDirectoryScan::do_iterator( HThread*, int ) {
 
 }
 
-#endif /* #ifndef YAAL_TOOLS_HUGINN_DIRERCTORYSCAN_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_HUGINN_DIRECTORYSCAN_HXX_INCLUDED */
 

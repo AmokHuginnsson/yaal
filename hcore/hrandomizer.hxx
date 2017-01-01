@@ -40,7 +40,7 @@ namespace hcore {
 
 /*! \brief Pseudo-random number generator.
  *
- * Congurent pseudo random number generator class.
+ * Congruent pseudo random number generator class.
  */
 class HRandomizer final {
 public:

@@ -181,7 +181,7 @@ bool HWindow::handler_jump_direct( HEvent const& event_ ) {
 		/*
 		 * call below is _magic_, HWidgetList::next_enabled() takes char as an
 		 * argument, so code_ & 0x0ff is passed into the function,
-		 * code_ is consrtructed from ordinary char by KEY_META_ macro,
+		 * code_ is constructed from ordinary char by KEY_META_ macro,
 		 * see console.h for details
 		 */
 		HWidgetList::cyclic_iterator it = _focusedChild;

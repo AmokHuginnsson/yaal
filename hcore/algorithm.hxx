@@ -283,7 +283,7 @@ inline dst_iter_t remove_transform( src_iter_t it, src_iter_t end, dst_iter_t ds
  * \param it - beginning of source range.
  * \param end - one past the end of source range.
  * \param dst - beginning of destination container.
- * \param predicate_ - predicate used to filter out unwantted elements.
+ * \param predicate_ - predicate used to filter out unwanted elements.
  * \param op - transforming operation, an unary function.
  * \return one past end of output range.
  */
@@ -676,14 +676,14 @@ inline bool equal( iter1_t it1, iter1_t end1, iter2_t it2, predicate_t predicate
 	return ( it1 == end1 );
 }
 
-/*! \brief Checks if one range is lexicographicaly before another range.
+/*! \brief Checks if one range is lexicographically before another range.
  *
  * \param it1 - beginning of first range.
  * \param end1 - one past last element of first range.
  * \param it2 - beginning of second range.
  * \param end2 - one past last element of second range.
  * \param compare - comparison function.
- * \return true if and only if first range is lexicographicaly before second range.
+ * \return true if and only if first range is lexicographically before second range.
  */
 template<typename iter1_t, typename iter2_t, typename compare_t>
 inline bool lexicographical_compare( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2, compare_t compare ) {
@@ -693,13 +693,13 @@ inline bool lexicographical_compare( iter1_t it1, iter1_t end1, iter2_t it2, ite
 	return ( ( ( it1 != end1 ) && ( it2 != end2 ) && compare( *it1, *it2 ) ) || ( ( it1 == end1 ) && ( it2 != end2 ) ) );
 }
 
-/*! \brief Checks if one range is lexicographicaly before another range.
+/*! \brief Checks if one range is lexicographically before another range.
  *
  * \param it1 - beginning of first range.
  * \param end1 - one past last element of first range.
  * \param it2 - beginning of second range.
  * \param end2 - one past last element of second range.
- * \return true if and only if first range is lexicographicaly before second range.
+ * \return true if and only if first range is lexicographically before second range.
  */
 template<typename iter1_t, typename iter2_t>
 inline bool lexicographical_compare( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 ) {
@@ -788,7 +788,7 @@ inline iterator_t rotate( iterator_t first_, iterator_t mid_, iterator_t last_ )
  * \param first_ - beginning of range to rotate, or beginning of first range to "swap".
  * \param mid_ - the rotation point, or one past end of first range to "swap" and beginning of the second range.
  * \param last_ - one past end of range to rotate, or one past end of the second range to "swap".
- * \param out_ - beginning of detination range.
+ * \param out_ - beginning of destination range.
  * \return A rotation point that could be used to revert the operation, or new beginning of new second range.
  */
 template<typename iterator_t, typename out_it_t>
@@ -1251,7 +1251,7 @@ inline void generate( iterator_t it, iterator_t const& end, generator_t generato
 /*! \brief Fill specified range with n run-time generated values.
  *
  * \param it - beginning of the container.
- * \param count - numer of the elements to be generated.
+ * \param count - number of the elements to be generated.
  * \param generator - function object that creates new values for range.
  */
 template<typename iterator_t, typename generator_t>
@@ -1263,7 +1263,7 @@ inline void generate_n( iterator_t it, int long count, generator_t generator ) {
 
 /*! \brief Reverses order of elements in range.
  *
- * \param it - beginning of range of elemnts to be reverted.
+ * \param it - beginning of range of elements to be reverted.
  * \param end - one past last element of range to be reverted.
  */
 template<typename iterator_t>
@@ -1282,11 +1282,11 @@ inline void reverse( iterator_t it, iterator_t end ) {
 	return;
 }
 
-/*! \brief Generate next, in lexographical order, permutation of the range of elements.
+/*! \brief Generate next, in lexicographical order, permutation of the range of elements.
  *
- * \param it - beginning of range of elemnts for permutation.
+ * \param it - beginning of range of elements for permutation.
  * \param end - one past last element of range for permutation.
- * \return true iff last, in lexographical order, permutation has been generated.
+ * \return true iff last, in lexicographical order, permutation has been generated.
  */
 template<typename iterator_t>
 inline bool next_permutation( iterator_t it, iterator_t end ) {
@@ -1323,11 +1323,11 @@ inline bool next_permutation( iterator_t it, iterator_t end ) {
 	return ( gotNext );
 }
 
-/*! \brief Generate previous, in lexographical order, permutation of the range of elements.
+/*! \brief Generate previous, in lexicographical order, permutation of the range of elements.
  *
- * \param it - beginning of range of elemnts for permutation.
+ * \param it - beginning of range of elements for permutation.
  * \param end - one past last element of range for permutation.
- * \return true iff first, in lexographical order, permutation has been generated.
+ * \return true iff first, in lexicographical order, permutation has been generated.
  */
 template<typename iterator_t>
 inline bool prev_permutation( iterator_t it, iterator_t end ) {
@@ -1366,7 +1366,7 @@ inline bool prev_permutation( iterator_t it, iterator_t end ) {
 
 /*! \brief Calculate sum of elements in range.
  *
- * \param it - beginning of range of elemnts to summed up.
+ * \param it - beginning of range of elements to summed up.
  * \param end - one past last element of range to be summed up.
  * \param ret - starting value for sum operation.
  * \return Sum of all elements in [it, end) + ret.
@@ -1380,7 +1380,7 @@ inline return_t accumulate( iterator_t it, iterator_t end, return_t ret ) {
 
 /*! \brief Calculate generalized sum of elements in range.
  *
- * \param it - beginning of range of elemnts to summed up.
+ * \param it - beginning of range of elements to summed up.
  * \param end - one past last element of range to be summed up.
  * \param ret - starting value for sum operation.
  * \param oper - operator used to calculate generalized sum.
@@ -1398,9 +1398,9 @@ inline return_t accumulate( iterator_t it, iterator_t end, return_t ret, operato
  * Calculate inner product of two ranges as sum of products of respective pairs
  * of elements from both ranges.
  *
- * \param itLeft - beginning of first range of elemnts to calculate inner product.
+ * \param itLeft - beginning of first range of elements to calculate inner product.
  * \param endLeft - one past last element of first range to calculate inner product.
- * \param itRight - beginning of second range of elemnts to calculate inner product.
+ * \param itRight - beginning of second range of elements to calculate inner product.
  * \param endRight - one past last element of second range to calculate inner product.
  * \param ret - starting value for sum operation.
  * \return Inner product of all elements in ranges [itLeft, endLeft) and [itRight, endRight) + ret.
@@ -1419,9 +1419,9 @@ inline return_t inner_product( iter_left_t itLeft, iter_left_t endLeft,
  * as generalized sum of generalized products of respective pairs
  * of elements from both ranges.
  *
- * \param itLeft - beginning of first range of elemnts to calculate inner product.
+ * \param itLeft - beginning of first range of elements to calculate inner product.
  * \param endLeft - one past last element of first range to calculate inner product.
- * \param itRight - beginning of second range of elemnts to calculate inner product.
+ * \param itRight - beginning of second range of elements to calculate inner product.
  * \param endRight - one past last element of second range to calculate inner product.
  * \param ret - starting value for sum operation.
  * \param sumator - generalized sum operator.
@@ -2119,7 +2119,7 @@ inline bool is_sorted( iterator_t first_, iterator_t last_ ) {
  * \param first_ - beginning of range of elements to filter.
  * \param last_ - one past the end of range of elements to filter.
  * \param dest_ - beginning of destination range.
- * \param comp_ - uniqeness test predicate.
+ * \param comp_ - uniqueness test predicate.
  */
 template<typename iterator_t, typename iter_out_t, typename compare_t>
 inline iterator_t unique_copy( iterator_t first_, iterator_t last_, iter_out_t dest_, compare_t comp_ ) {
@@ -2145,7 +2145,7 @@ inline iterator_t unique_copy( iterator_t first_, iterator_t last_, iter_out_t d
  * \param first_ - beginning of range of elements to filter.
  * \param last_ - one past the end of range of elements to filter.
  * \param dest_ - beginning of destination range.
- * \param comp_ - uniqeness test predicate.
+ * \param comp_ - uniqueness test predicate.
  */
 template<typename iterator_t, typename iter_out_t>
 inline iterator_t unique_copy( iterator_t first_, iterator_t last_, iter_out_t dest_ ) {
@@ -2156,7 +2156,7 @@ inline iterator_t unique_copy( iterator_t first_, iterator_t last_, iter_out_t d
  *
  * \param first_ - beginning of range of elements to filter.
  * \param last_ - one past the end of range of elements to filter.
- * \param comp_ - uniqeness test predicate.
+ * \param comp_ - uniqueness test predicate.
  */
 template<typename iterator_t, typename compare_t>
 inline iterator_t unique( iterator_t first_, iterator_t last_, compare_t comp_ ) {

@@ -26,7 +26,7 @@ Copyright:
 /*! \file hcore/hexception.hxx
  * \brief HException and HExceptionT<> class declaration.
  *
- * Auto-exception-hierarchy stuff is decalred here.
+ * Auto-exception-hierarchy stuff is declared here.
  */
 
 #ifndef YAAL_HCORE_HEXCEPTION_HXX_INCLUDED
@@ -78,7 +78,7 @@ private:
 	int  _frame; /*!< Frame counter for step-by-step unwinding with logging. */
 	char const* _fileName; /*!< Log each frame only once. */
 	char const* _functionName; /*!< Log each frame only once. */
-	HString _message; /*!< Exception messege. */
+	HString _message; /*!< Exception message. */
 	/*! \brief Construct exception object.
 	 *
 	 * \param fileName_ - source code file name where exception has been generated.
@@ -135,7 +135,7 @@ HString type_name( bool stripTemplateParams_ = false ) {
 	return ( typeName );
 }
 
-/*! \brief Template used to create type specyfic exceptions.
+/*! \brief Template used to create type specific exceptions.
  */
 template<typename tType, typename base_type_t = HException>
 class HExceptionT : public base_type_t {
@@ -213,7 +213,7 @@ namespace exception_auto_hierarchy {
 template<typename tType>
 struct parent_exception;
 
-/*! \brief Meta-function, parent_exception helper, gets existing parent exception or creates newone.
+/*! \brief Meta-function, parent_exception helper, gets existing parent exception or creates a new one.
  */
 template<typename tType>
 struct void_to_exception {

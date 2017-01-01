@@ -53,12 +53,12 @@ struct OFirebird {
 	isc_db_handle _db;
 	HChunk _connectionString;
 	ISC_STATUS _status[ MAX_ERROR_COUNT ];
-	HChunk _errorMessageBufer;
+	HChunk _errorMessageBuffer;
 	OFirebird( void )
 		: _db( 0 )
 		, _connectionString()
 		, _status()
-		, _errorMessageBufer() {
+		, _errorMessageBuffer() {
 		return;
 	}
 private:
@@ -86,7 +86,7 @@ struct OFirebirdResult {
 	HChunk _cache;
 	values_t _values;
 	ISC_STATUS _status[ OFirebird::MAX_ERROR_COUNT ];
-	HChunk _errorMessageBufer;
+	HChunk _errorMessageBuffer;
 	bool _ok;
 	OFirebirdResult( ODBLink& dbLink_ )
 		: _dbLink( dbLink_ )
@@ -98,7 +98,7 @@ struct OFirebirdResult {
 		, _cache()
 		, _values()
 		, _status()
-		, _errorMessageBufer()
+		, _errorMessageBuffer()
 		, _ok( false ) {
 		return;
 	}
@@ -183,7 +183,7 @@ M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* result_ ) 
 	M_ASSERT( db || res );
 	static int const MIN_ERROR_BUFFER_SIZE( 512 ); /* no documentation is available why 512 is correct here :( */
 	ISC_STATUS const* status( res && res->_stmt ? res->_status : db->_status );
-	HChunk& errBuf( res && res->_stmt ? res->_errorMessageBufer : db->_errorMessageBufer );
+	HChunk& errBuf( res && res->_stmt ? res->_errorMessageBuffer : db->_errorMessageBuffer );
 	errBuf.realloc( MIN_ERROR_BUFFER_SIZE );
 	char* msg( errBuf.get<char>() );
 	int msgLen( 0 );

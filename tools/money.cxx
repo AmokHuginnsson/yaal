@@ -449,10 +449,12 @@ int modulo_ASCII( HString const& aSCIINumber_, int modulo_ ) {
 	int long tmpLength = 0;
 	int long length = aSCIINumber_.get_length();
 	HString tmpString, tmpNumber = aSCIINumber_;
-	if ( length < 0 )
+	if ( length < 0 ) {
 		M_THROW( "bad ASCII number length", length );
-	if ( ! modulo_ )
-		M_THROW( "zero denominatior", modulo_ );
+	}
+	if ( ! modulo_ ) {
+		M_THROW( "zero denominator", modulo_ );
+	}
 	while ( tmpNumber.get_length() > STEP_LENGTH ) {
 		tmpString = tmpNumber.mid( step * STEP_LENGTH, STEP_LENGTH );
 		tmpLength = tmpString.get_length();

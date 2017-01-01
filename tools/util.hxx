@@ -87,7 +87,7 @@ yaal::hcore::HString get_token( yaal::hcore::HString const&, yaal::hcore::HStrin
 yaal::hcore::HString cardinal( int );
 yaal::hcore::HString ordinal( int );
 
-/*! \brief Helper structure for displaing program help and current configuration.
+/*! \brief Helper structure for displaying program help and current configuration.
  */
 struct OOptionInfo {
 	yaal::hcore::HProgramOptionsHandler const& _opt;

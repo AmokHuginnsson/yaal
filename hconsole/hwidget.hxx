@@ -111,8 +111,8 @@ protected:
 	                     to parent window (top or bottom border). */
 	int _column;    /*!< Widget left coordinate relative
 	                     to parent window (left or right border). */
-	int _height;    /*!< Height or coorinate of bottom of widget. */
-	int _width;     /*!< Width or coorinate of right of widget. */
+	int _height;    /*!< Height or coordinate of bottom of widget. */
+	int _width;     /*!< Width or coordinate of right of widget. */
 	int _rowRaw;    /*!< Widget top coordinate relative
 	                     to parent window (after repositioning). */
 	int _columnRaw; /*!< Widget left coordinate relative
@@ -139,8 +139,8 @@ public:
  * \param parent - The parent window for this widget.
  * \param row - Widget top coordinate relative to parent window (top or bottom border)
  * \param col - Widget left coordinate relative to parent window (left or right border).
- * \param height - Height or coorinate of bottom of widget.
- * \param width - Width or coorinate of right of widget.
+ * \param height - Height or coordinate of bottom of widget.
+ * \param width - Width or coordinate of right of widget.
  * \param label - Widget title.
  * \param attributes - Additional attributes for this widget.
  */
@@ -320,7 +320,7 @@ public:
  */
 	void set_label_position( LABEL::POSITION labelPosition );
 
-/*! \brief Set label decoraton mode.
+/*! \brief Set label decoration mode.
  *
  * \param decoration - New decoration mode for label in this widget.
  */
@@ -399,7 +399,7 @@ public:
 
 /*! \brief Register event listener.
  *
- * \param liserner - event listener to register.
+ * \param listener - event listener to register.
  */
 	void register_event_listener( event_listener_t const& );
 

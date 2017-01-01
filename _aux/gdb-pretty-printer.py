@@ -494,7 +494,7 @@ class YaalHCoreHSetPrinter:
 	def display_hint( self ):
 		return 'array'
 
-class HashContainterIterator( object ):
+class HashContainerIterator( object ):
 	def __init__( self, owner_, atom_, index_, size_ ):
 		self._owner = owner_
 		self._atom = atom_
@@ -520,7 +520,7 @@ class HashContainterIterator( object ):
 class YaalHCoreHHashMapPrinter:
 	"Print a yaal::hcore::HHashMap"
 
-	class Iterator( HashContainterIterator ):
+	class Iterator( HashContainerIterator ):
 		def __iter__( self ):
 			return self
 
@@ -571,7 +571,7 @@ class YaalHCoreHHashMapPrinter:
 class YaalHCoreHHashSetPrinter:
 	"Print a yaal::hcore::HHashSet"
 
-	class Iterator( HashContainterIterator ):
+	class Iterator( HashContainerIterator ):
 		def __iter__( self ):
 			return self
 

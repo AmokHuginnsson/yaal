@@ -80,7 +80,7 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void ) {
 	/* ensure backup went ok */
 	M_ENSURE( ( hStdIn >= 0 ) && ( hStdOut >= 0 ) && ( hStdErr >= 0 ) );
 
-	/* Overwrite *standard* descrptors with our communication pipe descriptors. */
+	/* Overwrite *standard* descriptors with our communication pipe descriptors. */
 	M_ENSURE( ::dup2( _in[0], stdinFd ) == 0 );
 	M_ENSURE( ::dup2( _out[1], stdoutFd ) == 0 );
 	M_ENSURE( ::dup2( _err[1], stderrFd ) == 0 );

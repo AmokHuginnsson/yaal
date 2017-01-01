@@ -25,7 +25,7 @@ Copyright:
 */
 
 /*! \file hcore/duration.hxx
- * \brief Declaraion of time duration related type and functions.
+ * \brief Declaration of time duration related type and functions.
  */
 
 #ifndef YAAL_HCORE_DURATION_HXX_INCLUDED
@@ -41,7 +41,7 @@ namespace hcore {
 
 namespace time {
 
-/*! \brief Resolution units for time mesurement.
+/*! \brief Resolution units for time measurement.
  */
 enum class UNIT {
 	NANOSECOND,

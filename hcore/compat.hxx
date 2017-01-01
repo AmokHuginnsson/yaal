@@ -171,7 +171,7 @@ static int const LOGIN_NAME_MAX = 16;
 #endif /* #elif defined( __MSVCXX__ ) #ifdef __GNUC__ */
 
 /*
- * gcc ver 4.5.2 bocomes 4005002
+ * gcc ver 4.5.2 becomes 4005002
  *
  * Expected use:
  *

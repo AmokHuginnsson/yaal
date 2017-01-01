@@ -237,7 +237,7 @@ int console_mouse_get( OMouse& ) {
 
 int console_mouse_close( void ) {
 	M_PROLOG
-/* I cannot throw exception here bacause exception was probably
+/* I cannot throw exception here because exception was probably
  * thrown by console_mouse_open in enter_curses and now this
  * function is probably called from leave_curses from exception
  * catch block, so new exception would be recursive and would

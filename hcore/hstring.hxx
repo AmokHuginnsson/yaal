@@ -116,7 +116,7 @@ private:
 		char _mem[ INPLACE_BUFFER_SIZE ];
 		char* _ptr;
 	};
-	static_assert( sizeof ( HString::_mem ) == sizeof ( HString::_len ), "buffer views are missaligned" );
+	static_assert( sizeof ( HString::_mem ) == sizeof ( HString::_len ), "buffer views are misaligned" );
 public:
 	static int long const npos = -1;
 	typedef HIterator iterator; /*!< mutable iterator for string characters */
@@ -304,12 +304,12 @@ public:
 	 * \return pointer to raw character data stored in this string.
 	 */
 	char const* data( void ) const;
-	/*! \brief Get access to first chaacter in the string.
+	/*! \brief Get access to first character in the string.
 	 *
 	 * String must be non-empty.
 	 */
 	char front( void ) const;
-	/*! \brief Get access to last chaacter in the string.
+	/*! \brief Get access to last character in the string.
 	 *
 	 * String must be non-empty.
 	 */
@@ -416,7 +416,7 @@ public:
 	/*! \brief Erase old content and assign a substring of given string.
 	 *
 	 * \param str - assign substring of this string.
-	 * \param offset - an offset of a substing to get.
+	 * \param offset - an offset of a substring to get.
 	 * \param length - a length of substring to get.
 	 * \return Self.
 	 */
@@ -442,14 +442,14 @@ public:
 	/*! \brief Find position of given character in this string.
 	 *
 	 * \param character - a character to look for.
-	 * \param offest - position where searching for given character starts.
+	 * \param offset - position where searching for given character starts.
 	 * \return Position of given character in this string if given character is found or HString::npos otherwise.
 	 */
-	int long find( char character, int long offest = 0 ) const;
+	int long find( char character, int long offset = 0 ) const;
 	/*! \brief Find position of given sub-string in this string.
 	 *
 	 * \param str - a sub-string to look for.
-	 * \param offest - position where searching for given sub-string starts.
+	 * \param offset - position where searching for given sub-string starts.
 	 * \return Position of given sub-string (first character of it) in this string if given sub-string is found or HString::npos otherwise.
 	 */
 	int long find( HString const& str, int long offset = 0 ) const;
@@ -480,7 +480,7 @@ public:
 	 *
 	 * This method is totally different than HString::reverse_find().
 	 *
-	 * \param str - look for position of this sub-strting in this string.
+	 * \param str - look for position of this sub-string in this string.
 	 * \param before - assume that this string is only that long.
 	 * \return Index of last occurrence of given sub-string if given sub-string can be found or HString::npos otherwise.
 	 */
@@ -600,7 +600,7 @@ public:
 	 */
 	HString& shift_left( int long len );
 	HString& shift_right( int long, char const = ' ' );
-	/*! \brief Fill portion of string with constatnt value.
+	/*! \brief Fill portion of string with constant value.
 	 *
 	 * \param value - use this value as a filler.
 	 * \param position - start at this position.
@@ -608,7 +608,7 @@ public:
 	 * \return Self.
 	 */
 	HString& fill( char value = '\0', int long position = 0, int long length = npos );
-	/*! \brief Fill portion of string with constatnt value and finish with \0 (zero) byte.
+	/*! \brief Fill portion of string with constant value and finish with \0 (zero) byte.
 	 *
 	 * \param value - use this value as a filler.
 	 * \param position - start at this position.
@@ -659,16 +659,16 @@ public:
 	HString& insert( int long pos, char const* str, int long len );
 	/*! \brief Insert n copies of value before given position.
 	 *
-	 * \param postition - where put inserted block.
+	 * \param position - where put inserted block.
 	 * \param n - number of bytes to insert.
 	 * \param value - copies of this value shall be inserted.
 	 */
-	HString& insert( int long postition, int long n, char value );
+	HString& insert( int long position, int long n, char value );
 	HString& append( HString const& );
 	/*! \brief Append a substring of given string to this string.
 	 *
 	 * \param str - append substring of this string.
-	 * \param offset - an offset of a substing to get.
+	 * \param offset - an offset of a substring to get.
 	 * \param length - a length of substring to get.
 	 * \return Self.
 	 */

@@ -194,7 +194,7 @@ static int long const FWD_RLIM_INFINITY = static_cast<int long>( RLIM_INFINITY )
 
 namespace {
 
-static char const SYSCALL_FAILURE[] = "syscall failure - bailng out";
+static char const SYSCALL_FAILURE[] = "syscall failure - bailing out";
 
 void ensure_limit( int resource_, char const* message_, bool autoSanity_ ) {
 	rlimit rl = { 0, 0 };

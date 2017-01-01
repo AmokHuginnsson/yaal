@@ -370,7 +370,7 @@ struct logical_or : public binary_function<bool, bool, bool> {
 	}
 };
 
-/*! \brief Callculate `exclusive or' logical value.
+/*! \brief Calculate `exclusive or' logical value.
  *
  * \param p - first predicate.
  * \param q - second predicate.
@@ -389,7 +389,7 @@ struct logical_exor : public binary_function<bool, bool, bool> {
 	}
 };
 
-/*! \brief Callculate logical biconditional value.
+/*! \brief Calculate logical biconditional value.
  *
  * \param p - first predicate.
  * \param q - second predicate.

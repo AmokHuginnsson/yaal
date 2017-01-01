@@ -69,7 +69,10 @@ private:
 		int _index; /*!< This block index in HPool<>. */
 	public:
 		HPoolBlock( int index_ )
-			: _mem(), _free( 0 ), _used( 0 ), _index( index_ ) {
+			: _mem()
+			, _free( 0 )
+			, _used( 0 )
+			, _index( index_ ) {
 			/* Create linked list of free object memory places. */
 			u8_t* p( reinterpret_cast<u8_t*>( _mem ) );
 			for ( int i( 0 ); i < OBJECTS_PER_BLOCK; ++ i, p += OBJECT_SPACE ) {
@@ -163,7 +166,7 @@ public:
 			}
 			if ( pb != _poolBlocks[_free] ) {
 				using yaal::swap;
-				/* Oreder of swaps matters. */
+				/* Order of swaps matters. */
 				swap( _poolBlocks[pb->_index], _poolBlocks[_free] );
 				swap( pb->_index, _poolBlocks[pb->_index]->_index );
 			}

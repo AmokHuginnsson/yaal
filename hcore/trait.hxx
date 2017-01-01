@@ -635,9 +635,9 @@ struct strip {
 	typedef typename strip_cv<typename strip_reference<T>::type>::type type;
 };
 
-/*! \brief Remove first dimmension from array type.
+/*! \brief Remove first dimension from array type.
  *
- * \tparam T - type to remove first array dimmension from.
+ * \tparam T - type to remove first array dimension from.
  */
 template<typename T>
 struct remove_extent {

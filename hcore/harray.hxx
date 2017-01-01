@@ -44,7 +44,7 @@ namespace hcore {
 
 extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHArray_[];
 
-/*! \brief Simplest compund data structure.
+/*! \brief Simplest compound data structure.
  *
  * \tparam type_t - type of objects that will be stored in array.
  * \tparam allocator_t - type of internal allocator used for all array's allocations.
@@ -234,7 +234,7 @@ public:
 		return;
 		M_DESTRUCTOR_EPILOG
 	}
-	/*! \brief Remove all elemets from array.
+	/*! \brief Remove all elements from array.
 	 */
 	void clear( void ) {
 		M_PROLOG

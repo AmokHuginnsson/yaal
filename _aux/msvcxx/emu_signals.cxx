@@ -255,7 +255,7 @@ BOOL WINAPI win_console_handler( DWORD controlType_ ) {
 	return ( 1 );
 }
 
-DWORD signo_to_cosole_control( int signo_ ) {
+DWORD signo_to_console_control( int signo_ ) {
 	DWORD consoleControl( 0 );
 	switch ( signo_ ) {
 		case ( SIGINT ): consoleControl = CTRL_C_EVENT; break;
@@ -278,7 +278,7 @@ int sigaction( int signo, struct sigaction* sa_, void* ) {
 			if ( ( signo == SIGINT ) || ( signo == SIGQUIT ) || ( signo == SIGKILL ) || ( signo == SIGTERM ) || ( signo == SIGTERM ) || ( signo == SIGPWR ) ) {
 				if ( ! _signalDispatcher_.is_console_event_enabled() )
 					SetConsoleCtrlHandler( &win_console_handler, 1 );
-				_signalDispatcher_.set_enabled_console_event( signo_to_cosole_control( signo ), true );
+				_signalDispatcher_.set_enabled_console_event( signo_to_console_control( signo ), true );
 			}
 			signal( signo, win_signal_handler );
 			if ( signo == SIGABRT )
@@ -286,7 +286,7 @@ int sigaction( int signo, struct sigaction* sa_, void* ) {
 		} else {
 			if ( ( signo == SIGINT ) || ( signo == SIGQUIT ) || ( signo == SIGKILL ) || ( signo == SIGTERM ) || ( signo == SIGTERM ) || ( signo == SIGPWR ) ) {
 				if ( _signalDispatcher_.is_console_event_enabled() ) {
-					_signalDispatcher_.set_enabled_console_event( signo_to_cosole_control( signo ), false );
+					_signalDispatcher_.set_enabled_console_event( signo_to_console_control( signo ), false );
 					if ( ! _signalDispatcher_.is_console_event_enabled() )
 						SetConsoleCtrlHandler( &win_console_handler, 0 );
 				}
@@ -327,7 +327,7 @@ char const* strsignal( int signum_ ) {
 		case ( SIGUSR1 ): name = "user signal 1";        break;
 		case ( SIGSTOP ): name = "stopped";              break;
 		case ( SIGTSTP ): name = "suspended";            break;
-		case ( SIGCONT ): name = "contunued";            break;
+		case ( SIGCONT ): name = "continued";            break;
 	}
 	return ( name );
 }

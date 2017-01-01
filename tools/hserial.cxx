@@ -267,7 +267,7 @@ void HSerial::compile_flags( void ) {
  *   CRTSCTS : output hardware flow control (only used if the cable has
  *             all necessary lines. See sect. 7 of Serial-HOWTO)
  *             CS8     : 8n1 (8bit, no parity, 1 stopbit)
- *             CLOCAL  : local connection, no modem contol
+ *             CLOCAL  : local connection, no modem control
  *             CREAD   : enable receiving characters
  */
 /*

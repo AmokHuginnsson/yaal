@@ -332,8 +332,11 @@ public:
 		/*! \brief Create a root node.
 		 */
 		HNode( tree_t* tree_ )
-			: _data(), _branch( ref_branch_allocator_type( &tree_->_branchAllocator ) ),
-			_trunk( nullptr ), _tree( tree_ ), _allocator( allocator_type( &tree_->_allocator ) ) {
+			: _data()
+			, _branch( ref_branch_allocator_type( &tree_->_branchAllocator ) )
+			, _trunk( nullptr )
+			, _tree( tree_ )
+			, _allocator( allocator_type( &tree_->_allocator ) ) {
 			M_PROLOG
 			M_ASSERT( tree_ );
 			return;
@@ -342,8 +345,11 @@ public:
 		/*! \brief Create a root node.
 		 */
 		HNode( tree_t* tree_, value_type const& value_ )
-			: _data( value_ ), _branch( ref_branch_allocator_type( &tree_->_branchAllocator ) ),
-			_trunk( nullptr ), _tree( tree_ ), _allocator( allocator_type( &tree_->_allocator ) ) {
+			: _data( value_ )
+			, _branch( ref_branch_allocator_type( &tree_->_branchAllocator ) )
+			, _trunk( nullptr )
+			, _tree( tree_ )
+			, _allocator( allocator_type( &tree_->_allocator ) ) {
 			M_PROLOG
 			M_ASSERT( tree_ );
 			return;
@@ -352,8 +358,11 @@ public:
 		/*! \brief  Create a child node.
 		 */
 		HNode( HNode* node_ )
-			: _data(), _branch( node_->_branch.get_allocator() ),
-			_trunk( node_ ), _tree( nullptr ), _allocator( node_->_allocator ) {
+			: _data()
+			, _branch( node_->_branch.get_allocator() )
+			, _trunk( node_ )
+			, _tree( nullptr )
+			, _allocator( node_->_allocator ) {
 			M_PROLOG
 			M_ASSERT( node_ );
 			return;
@@ -362,7 +371,11 @@ public:
 		/*! \brief Clone node.
 		 */
 		HNode( value_t const& data, ref_branch_allocator_type const& branchAllocator_, allocator_type const& allocator_ )
-			: _data( data ), _branch( branchAllocator_ ), _trunk( nullptr ), _tree( nullptr ), _allocator( allocator_ ) {
+			: _data( data )
+			, _branch( branchAllocator_ )
+			, _trunk( nullptr )
+			, _tree( nullptr )
+			, _allocator( allocator_ ) {
 			M_PROLOG
 			return;
 			M_EPILOG
@@ -370,8 +383,11 @@ public:
 		/*! \brief  Clone a child node.
 		 */
 		HNode( node_t node_, value_t const& data )
-			: _data( data ), _branch( node_->_branch.get_allocator() ),
-			_trunk( node_ ), _tree( nullptr ), _allocator( node_->_allocator ) {
+			: _data( data )
+			, _branch( node_->_branch.get_allocator() )
+			, _trunk( node_ )
+			, _tree( nullptr )
+			, _allocator( node_->_allocator ) {
 			M_PROLOG
 			M_ASSERT( node_ );
 			return;
@@ -445,19 +461,25 @@ private:
 	HNode* _root; /* self explanary */
 public:
 	explicit HTree( allocator_type const& allocator_ = allocator_type() )
-		: _allocator( allocator_ ), _branchAllocator(), _root( nullptr ) {
+		: _allocator( allocator_ )
+		, _branchAllocator()
+		, _root( nullptr ) {
 		M_PROLOG
 		return;
 		M_EPILOG
 	}
 	explicit HTree( branch_allocator_type const& allocator_ )
-		: _allocator(), _branchAllocator( allocator_ ), _root( nullptr ) {
+		: _allocator()
+		, _branchAllocator( allocator_ )
+		, _root( nullptr ) {
 		M_PROLOG
 		return;
 		M_EPILOG
 	}
 	HTree( allocator_type const& allocator_, branch_allocator_type const& branchAllocator_ )
-		: _allocator( allocator_ ), _branchAllocator( branchAllocator_ ), _root( nullptr ) {
+		: _allocator( allocator_ )
+		, _branchAllocator( branchAllocator_ )
+		, _root( nullptr ) {
 		M_PROLOG
 		return;
 		M_EPILOG
@@ -469,7 +491,9 @@ public:
 		M_DESTRUCTOR_EPILOG
 	}
 	HTree( HTree const& t )
-		: _allocator( t._allocator ), _branchAllocator( t._branchAllocator ), _root( nullptr ) {
+		: _allocator( t._allocator )
+		, _branchAllocator( t._branchAllocator )
+		, _root( nullptr ) {
 		M_PROLOG
 		if ( t._root ) {
 			typename HNode::allocator_type allocator( &_allocator );
@@ -480,14 +504,18 @@ public:
 		M_EPILOG
 	}
 	HTree( HTree&& tree_ )
-		: _allocator(), _branchAllocator(), _root( nullptr ) {
+		: _allocator()
+		, _branchAllocator()
+		, _root( nullptr ) {
 		M_PROLOG
 		swap( tree_ );
 		return;
 		M_EPILOG
 	}
 	HTree( HTree const& t, allocator_type const& allocator_ )
-		: _allocator( allocator_ ), _branchAllocator( t._branchAllocator ), _root( nullptr ) {
+		: _allocator( allocator_ )
+		, _branchAllocator( t._branchAllocator )
+		, _root( nullptr ) {
 		M_PROLOG
 		if ( t._root ) {
 			typename HNode::allocator_type allocator( &_allocator );
@@ -647,16 +675,22 @@ class HTree<value_t, allocator_t, sequence_t>::HNode::HIterator
 	list_it_t _iterator;
 public:
 	HIterator( void )
-		: base_type(), _owner( nullptr ), _iterator() {
+		: base_type()
+		, _owner( nullptr )
+		, _iterator() {
 		return;
 	}
 	HIterator( HIterator const& it )
-		: base_type(), _owner( it._owner ), _iterator( it._iterator ) {
+		: base_type()
+		, _owner( it._owner )
+		, _iterator( it._iterator ) {
 		return;
 	}
 	template<typename other_const_qual_t>
 	HIterator( HIterator<other_const_qual_t> const& it )
-		: base_type(), _owner( it._owner ), _iterator( it._iterator ) {
+		: base_type()
+		, _owner( it._owner )
+		, _iterator( it._iterator ) {
 		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
 		return;
 	}
@@ -736,7 +770,9 @@ private:
 	template<typename other_const_qual_t>
 	friend class HIterator;
 	HIterator( const_node_t owner_, list_it_t const& iterator_ )
-		: base_type(), _owner( owner_ ), _iterator( iterator_ ) {
+		: base_type()
+		, _owner( owner_ )
+		, _iterator( iterator_ ) {
 		return;
 	}
 };
@@ -757,16 +793,22 @@ class HTree<value_t, allocator_t, sequence_t>::HIterator : public iterator_inter
 	it_stack_t _track;
 public:
 	HIterator( void )
-		: base_type(), _owner( nullptr ), _track() {
+		: base_type()
+		, _owner( nullptr )
+		, _track() {
 		return;
 	}
 	HIterator( HIterator const& it )
-		: base_type(), _owner( it._owner ), _track( it._track ) {
+		: base_type()
+		, _owner( it._owner )
+		, _track( it._track ) {
 		return;
 	}
 	template<typename other_const_qual_t>
 	HIterator( HIterator<other_const_qual_t> const& it )
-		: base_type(), _owner( it._owner ), _track( it._track.begin(), it._track.end() ) {
+		: base_type()
+		, _owner( it._owner )
+		, _track( it._track.begin(), it._track.end() ) {
 		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
 		return;
 	}
@@ -868,7 +910,9 @@ private:
 	template<typename other_const_qual_t>
 	friend class HIterator;
 	HIterator( owner_t owner_ )
-		: base_type(), _owner( owner_ ), _track() {
+		: base_type()
+		, _owner( owner_ )
+		, _track() {
 		return;
 	}
 	void descent( const_qual_node_t* n_, list_it_t const& start_ ) {
@@ -884,8 +928,9 @@ private:
 };
 
 template<typename value_t, typename allocator_t, template <typename, typename> class sequence_t>
-inline void swap( yaal::hcore::HTree<value_t, allocator_t, sequence_t>& a, yaal::hcore::HTree<value_t, allocator_t, sequence_t>& b )
-	{ a.swap( b ); }
+inline void swap( yaal::hcore::HTree<value_t, allocator_t, sequence_t>& a, yaal::hcore::HTree<value_t, allocator_t, sequence_t>& b ) {
+	a.swap( b );
+}
 
 }
 

@@ -75,11 +75,13 @@ private:
 		HAtom* _next;
 		value_type _value;
 		HAtom( value_type const& value_ )
-			: _next( nullptr ), _value( value_ ) {
+			: _next( nullptr )
+			, _value( value_ ) {
 			return;
 		}
 		HAtom( value_type&& value_ )
-			: _next( nullptr ), _value( yaal::move( value_ ) ) {
+			: _next( nullptr )
+			, _value( yaal::move( value_ ) ) {
 			return;
 		}
 		HAtom( HAtom const& );
@@ -120,10 +122,15 @@ public:
 		int long _index;
 		typename owner_t::HAtom* _atom;
 	public:
-		HIterator( void ) : _owner( nullptr ), _index( 0 ), _atom( nullptr ) {}
+		HIterator( void )
+			: _owner( nullptr )
+			, _index( 0 )
+			, _atom( nullptr ) {
+		}
 		HIterator( HIterator const& it_ )
-			: _owner( it_._owner ), _index( it_._index ),
-			_atom( it_._atom ) {
+			: _owner( it_._owner )
+			, _index( it_._index )
+			, _atom( it_._atom ) {
 		}
 		HIterator& operator = ( HIterator const& it_ ) {
 			if ( &it_ != this ) {
