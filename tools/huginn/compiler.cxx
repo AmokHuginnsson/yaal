@@ -1627,7 +1627,13 @@ void OCompiler::dispatch_power( executing_parser::position_t position_ ) {
 			operands_type_mismatch( op_to_str( OPERATOR::POWER ), t2, t1, p );
 		}
 		if ( ! ( is_numeric_congruent( t1 ) && is_numeric_congruent( t2 ) ) ) {
-			throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_EXP], p );
+			throw HHuginn::HHuginnRuntimeException(
+				hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_EXP] )
+					.append( type_name( t2 ) )
+					.append( ", " )
+					.append( type_name( t1 ) ),
+				p
+			);
 		}
 		fc._valueTypes.push( congruent( t1, t2 ) );
 		hasPower = true;
@@ -1698,7 +1704,13 @@ void OCompiler::dispatch_compare( executing_parser::position_t position_ ) {
 		operands_type_mismatch( os, t2, t1, p );
 	}
 	if ( ! ( is_comparable_congruent( t1 ) && is_comparable_congruent( t2 ) ) ) {
-		throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_CMP], p );
+		throw HHuginn::HHuginnRuntimeException(
+			hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_CMP] )
+				.append( type_name( t2 ) )
+				.append( ", " )
+				.append( type_name( t1 ) ),
+			p
+		);
 	}
 	fc._valueTypes.push( type_id( HHuginn::TYPE::BOOLEAN ) );
 	return;
@@ -1722,7 +1734,13 @@ void OCompiler::dispatch_boolean( expression_action_t const& action_, executing_
 	HHuginn::type_id_t t2( fc._valueTypes.top()._type );
 	fc._valueTypes.pop();
 	if ( ! ( is_boolean_congruent( t1 ) && is_boolean_congruent( t2 ) ) ) {
-		throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OPS_NOT_BOOL], p );
+		throw HHuginn::HHuginnRuntimeException(
+			hcore::to_string( _errMsgHHuginn_[ERR_CODE::OPS_NOT_BOOL] )
+				.append( type_name( t2 ) )
+				.append( ", " )
+				.append( type_name( t1 ) ),
+			p
+		);
 	}
 	fc._valueTypes.push( type_id( HHuginn::TYPE::BOOLEAN ) );
 	return;
@@ -1743,7 +1761,10 @@ void OCompiler::dispatch_ternary( void ) {
 	HHuginn::type_id_t t0( fc._valueTypes.top()._type );
 	fc._valueTypes.pop();
 	if ( ! is_boolean_congruent( t0 ) ) {
-		throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL], p );
+		throw HHuginn::HHuginnRuntimeException(
+			hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL] ).append( type_name( t0 ) ),
+			p
+		);
 	}
 	fc._valueTypes.push( type_id( HHuginn::TYPE::UNKNOWN ) );
 	return;
@@ -2043,8 +2064,9 @@ void OCompiler::dispatch_action( OPERATOR oper_, executing_parser::position_t po
 			defer_action( &HExpression::boolean_not, position_ );
 			current_expression()->commit_oper( o );
 			fc._operations.pop();
-			if ( ! is_boolean_congruent( fc._valueTypes.top()._type ) ) {
-				throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL], p );
+			HHuginn::type_id_t t( fc._valueTypes.top()._type );
+			if ( ! is_boolean_congruent( t ) ) {
+				throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL] ).append( type_name( t ) ), p );
 			}
 		} break;
 		case ( OPERATOR::TERNARY ): { dispatch_ternary(); } break;

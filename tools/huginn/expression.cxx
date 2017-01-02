@@ -805,7 +805,7 @@ void HExpression::boolean_not( HFrame* frame_, int ) {
 	++ frame_->ip();
 	HHuginn::value_t& v( frame_->values().top() );
 	if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
-		throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL], p );
+		throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL] ).append( v->get_class()->name() ), p );
 	}
 	if ( v.unique() ) {
 		static_cast<HHuginn::HBoolean*>( v.raw() )->flip();

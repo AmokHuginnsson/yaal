@@ -102,11 +102,11 @@ char const* _errMsgHHuginn_[ 10 ] = {
 	_( "Operands are not subtractable: " ),
 	_( "Operands are not multipliable: " ),
 	_( "Operands are not divisible: " ),
-	_( "Operands are not exponentionable." ),
-	_( "Operands are not comparable." ),
-	_( "Operands are not boolean values." ),
-	_( "Operand is not a boolean value." ),
-	_( "Subscript is not an integer." )
+	_( "Operands are not exponentiationable: " ),
+	_( "Operands are not comparable: " ),
+	_( "Operands are not boolean values: " ),
+	_( "Operand is not a boolean value: " ),
+	_( "Subscript is not an integer: " )
 };
 
 }
@@ -750,7 +750,7 @@ HHuginn::value_t HHuginn::HTernaryEvaluator::execute( huginn::HThread* thread_ )
 	HFrame* f( thread_->current_frame() );
 	value_t v( f->result() );
 	if ( v->type_id() != TYPE::BOOLEAN ) {
-		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL], _condition->position() );
+		throw HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL] ).append( v->get_class()->name() ), _condition->position() );
 	}
 	if ( static_cast<HBoolean*>( v.raw() )->value() ) {
 		_ifTrue->execute( thread_ );

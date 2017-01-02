@@ -60,7 +60,7 @@ HHuginn::value_t subscript(
 	HObjectFactory& of( *thread_->runtime().object_factory() );
 	if ( ( baseType == HHuginn::TYPE::LIST ) || ( baseType == HHuginn::TYPE::DEQUE ) || ( baseType == HHuginn::TYPE::STRING ) ) {
 		if ( index_->type_id() != HHuginn::TYPE::INTEGER ) {
-			throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::IDX_NOT_INT], position_ );
+			throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::IDX_NOT_INT] ).append( index_->get_class()->name() ), position_ );
 		}
 		HHuginn::HInteger const* i( static_cast<HHuginn::HInteger const*>( index_.raw() ) );
 		int long long index( i->value() );
