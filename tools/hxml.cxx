@@ -978,7 +978,7 @@ void HXml::dump_node( void* writer_p, HConstNodeProxy const& node_ ) const {
 			rc = xmlTextWriterWriteFormatRaw( writer.get(),
 					"&%s;", reinterpret_cast<xmlChar const*>( name.raw() ) );
 			if ( rc < 0 ) {
-				throw HXmlException( HString( "Unable to write an entity referenc: " ) + name );
+				throw HXmlException( HString( "Unable to write an entity reference: " ) + name );
 			}
 		} else {
 			M_ASSERT( type == HXml::HNode::TYPE::COMMENT );

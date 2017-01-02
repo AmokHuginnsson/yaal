@@ -234,7 +234,7 @@ public:
 protected:
 	class HNodeWidget;
 	friend class HNodeWidget;
-	/*! \brief Basic operatable element of TUI Tree control representing single tree node.
+	/*! \brief Basic manipulable element of TUI Tree control representing single tree node.
 	 */
 	class HNodeWidget {
 	protected:

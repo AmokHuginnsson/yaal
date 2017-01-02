@@ -678,7 +678,7 @@ bool HExpression::terminal_production( tree_t::node_t node_ ) {
 		 * indexes, positive and negative 0 index would conflict so
 		 * we shift negative indexes by 1, so 0 becomes -1, 1 becomes -2,
 		 * 2 becomes -3, and so on and so forth.
-		 * HArray::size() returns current access/addition peak for revelant pool,
+		 * HArray::size() returns current access/addition peak for relevant pool,
 		 * so to get index of lately added value we need to decrement size by 1. */
 		(**node_)._variables.push_back( static_cast<int>( - ( _constantsPool.size() - 1 ) - 1 ) );
 		return ( true );

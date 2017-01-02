@@ -24,7 +24,7 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 /*! \file hcore/assert.hxx
- * \brief Declarations of assertion tesing helpers: HFailedAssertion, failed_assert.
+ * \brief Declarations of assertion testing helpers: HFailedAssertion, failed_assert.
  */
 
 #ifndef YAAL_HCORE_ASSERT_HXX_INCLUDED
@@ -38,8 +38,8 @@ namespace hcore {
 
 /*! \brief Failed assertion exception.
  *
- * In \e DEBUG build failuers in assertions does not abort the
- * process, insead the throw instance of HFailedAssertion.
+ * In \e DEBUG build failures in assertions does not abort the
+ * process, instead the throw instance of HFailedAssertion.
  */
 class HFailedAssertion {
 	char const* _what;

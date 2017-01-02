@@ -48,12 +48,20 @@ namespace tools {
 static int const LOW_LATENCY_WARNING = 100;
 
 HIODispatcher::HIODispatcher( int noFileHandlers_, int long latency_ )
-	: _initialised( false ), _loop( true ), _idleCycles( 0 ),
-	_latency( latency_ ),
-	_select( chunk_size<int>( noFileHandlers_ ) * 2 ), /* * 2 because 1 for readers and 1 for writters */
-	_readers(), _writers(),
-	_alert(), _idle(), _droppedIOHandlers( noFileHandlers_ ), _newIOHandlers( noFileHandlers_ ),
-	_callbackContext( false ), _event(), _mutex() {
+	: _initialized( false )
+	, _loop( true )
+	, _idleCycles( 0 )
+	, _latency( latency_ )
+	, _select( chunk_size<int>( noFileHandlers_ ) * 2 ) /* * 2 because 1 for readers and 1 for writers */
+	, _readers()
+	, _writers()
+	, _alert()
+	, _idle()
+	, _droppedIOHandlers( noFileHandlers_ )
+	, _newIOHandlers( noFileHandlers_ )
+	, _callbackContext( false )
+	, _event()
+	, _mutex() {
 	M_PROLOG
 	_droppedIOHandlers.clear();
 	_newIOHandlers.clear();

@@ -49,13 +49,13 @@ public:
 	typedef HHandler base_type;
 	typedef yaal::hcore::HPointer<HWindow> ptr_t;
 protected:
-	bool _initialised;                                           /*!< was window properly initialised? */
-	bool _needRepaint;                                           /*!< \brief Does this window need to be repainted? */
-	hcore::HString _title;                                       /*!< title of window */
+	bool _initialized;                                  /*!< was window properly initialized? */
+	bool _needRepaint;                                  /*!< \brief Does this window need to be repainted? */
+	hcore::HString _title;                              /*!< title of window */
 	HWidgetList::cyclic_iterator _focusedChild;         /*!< points to widget that has focus */
 	HWidgetList::cyclic_iterator _previousFocusedChild; /*!< widget that had focus before
-	                                                                  focus went to status bar */
-	HWidgetList _widgets;                                        /*!< list of all widget inside _this_ wind */
+	                                                         focus went to status bar */
+	HWidgetList _widgets;                               /*!< list of all widget inside _this_ wind */
 	HStatusBarWidget::ptr_t _statusBar;
 	HTUIProcess* _tuiProcess;
 public:
@@ -86,7 +86,7 @@ public:
 	void add_widget( HWidget::ptr_t );
 	HStatusBarWidget::ptr_t& status_bar( void );
 	hcore::HString get_command( void );
-	bool is_initialised( void ) const;
+	bool is_initialized( void ) const;
 	void update_all( void );
 	yaal::hcore::HString const& get_title( void ) const;
 	HStatusBarWidget* init_bar( char const* );

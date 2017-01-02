@@ -206,7 +206,7 @@ private:
 
 HExecutingParser::HExecutingParser( executing_parser::HRuleBase const& rule_, INIT_MODE initMode_ )
 	: _grammar( rule_.clone() )
-	, _excutors()
+	, _executors()
 	, _matched( false )
 	, _errorPosition( yaal::hcore::HString::npos )
 	, _errorMessages()
@@ -258,7 +258,7 @@ void HExecutingParser::sanitize( void ) {
 void HExecutingParser::execute( void* id_ ) {
 	M_PROLOG
 	M_ENSURE( _matched );
-	for ( execution_steps_t::iterator it( _excutors.begin() ), end( _excutors.end() ); it != end; ++ it ) {
+	for ( execution_steps_t::iterator it( _executors.begin() ), end( _executors.end() ); it != end; ++ it ) {
 		if ( ! id_ || ( it->second.id() == id_ ) ) {
 			it->second();
 		}
@@ -269,7 +269,7 @@ void HExecutingParser::execute( void* id_ ) {
 
 bool HExecutingParser::parse( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
-	_excutors.clear();
+	_executors.clear();
 	_inputStart = first_;
 	_errorPosition = yaal::hcore::HString::npos;
 	_errorMessages.clear();
@@ -289,23 +289,23 @@ bool HExecutingParser::parse( yaal::hcore::HString::const_iterator first_, yaal:
 
 void HExecutingParser::add_execution_step( yaal::hcore::HString::const_iterator position_, executor_t const& executor_ ) {
 	M_PROLOG
-	_excutors.push_back( make_pair( position_, executor_ ) );
+	_executors.push_back( make_pair( position_, executor_ ) );
 	return;
 	M_EPILOG
 }
 
 void HExecutingParser::drop_execution_steps( yaal::hcore::HString::const_iterator it_ ) {
 	M_PROLOG
-	execution_steps_t::iterator e( end( _excutors ) );
+	execution_steps_t::iterator e( end( _executors ) );
 	execution_steps_t::iterator it(
 		lower_bound(
-			begin( _excutors ), e, it_,
+			begin( _executors ), e, it_,
 			[]( execution_step_t const& s_, yaal::hcore::HString::const_iterator i ) {
 				return ( s_.first < i );
 			}
 		)
 	);
-	_excutors.erase( it, e );
+	_executors.erase( it, e );
 	return;
 	M_EPILOG
 }

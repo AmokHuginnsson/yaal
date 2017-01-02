@@ -37,7 +37,7 @@ namespace hcore {
 
 char const* _errMsgHInterval_[ 3 ] = {
 	_( "ok" ),
-/* HInterval::ERROR::REVERSED_EDNPOINTS */ _( "reversed endpoints" ),
+/* HInterval::ERROR::REVERSED_ENDPOINTS */ _( "reversed endpoints" ),
 /* HInterval::ERROR::DIVISION_BY_ZERO */   _( "division by zero" )
 };
 

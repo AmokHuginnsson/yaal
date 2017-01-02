@@ -48,7 +48,7 @@ HWidgetList::HWidgetList( cyclic_iterator& focused_ )
 	M_EPILOG
 }
 
-void HWidgetList::next_enabled( char shorcut_ ) {
+void HWidgetList::next_enabled( char shortcut_ ) {
 	M_PROLOG
 	bool loop( true );
 	HWidgetList::cyclic_iterator it( _focused );
@@ -56,7 +56,7 @@ void HWidgetList::next_enabled( char shorcut_ ) {
 		++ _focused;
 		if ( dynamic_cast<HStatusBarWidget*>( &(*(*_focused))) )
 			continue;
-		loop = ! (*_focused)->set_focus( shorcut_ );
+		loop = ! (*_focused)->set_focus( shortcut_ );
 		if ( _focused == it )
 			loop = false;
 	} while ( loop );

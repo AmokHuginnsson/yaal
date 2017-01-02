@@ -24,7 +24,7 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 /*! \file hcore/hhashcontainer.hxx
- * \brief Declaration of HHashContainer<>, a halper for HHash* and HMultiHash* classes.
+ * \brief Declaration of HHashContainer<>, a helper for HHash* and HMultiHash* classes.
  */
 
 #ifndef YAAL_HCORE_HHASHCONTAINER_HXX_INCLUDED

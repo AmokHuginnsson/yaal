@@ -40,7 +40,7 @@ namespace yaal {
 
 namespace hcore {
 
-/* Due to extream vitality of this struct,
+/* Due to extreme vitality of this structure,
  * none of the methods are guarded. */
 
 /*! \brief Types of reference counters.

@@ -110,7 +110,7 @@ public:
 	 * \return True iff this regex object is valid.
 	 */
 	bool is_valid( void ) const;
-	/*! \brief Get oryginal regex patter for this regex object.
+	/*! \brief Get original regex patter for this regex object.
 	 *
 	 * \return Original regex pattern.
 	 */

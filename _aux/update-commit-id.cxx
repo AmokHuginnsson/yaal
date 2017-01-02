@@ -39,7 +39,7 @@ int main( int argc_, char** argv_ ) try {
 		putenv( e );
 	}
 	if ( argc_ != 3 ) {
-		throw runtime_error( string( argv_[0] ).append( " requres exactly 2 arguments!" ) );
+		throw runtime_error( string( argv_[0] ).append( " requires exactly 2 arguments!" ) );
 	}
 	string masterPath( argv_[1] );
 	masterPath.append( "/.git/refs/heads/master" );

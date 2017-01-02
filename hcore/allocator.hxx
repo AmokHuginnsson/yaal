@@ -59,7 +59,7 @@ struct system final {
 	}
 	template<typename U>
 	system( system<U> const& ) {
-		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatible allocator types" );
 	}
 	void swap( system& ) {
 	}
@@ -85,12 +85,12 @@ struct system final {
  */
 	template<typename U>
 	bool operator == ( system<U> const& ) const {
-		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatible allocator types" );
 		return ( true );
 	}
 	template<typename U>
 	bool operator != ( system<U> const& ) const {
-		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatible allocator types" );
 		return ( false );
 	}
 	void construct( pointer p, const_reference t ) {
@@ -129,7 +129,7 @@ struct pool final {
 	template<typename U>
 	pool( pool<U> const& )
 		: _pool() {
-		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatible allocator types" );
 	}
 	void swap( pool& pool_ ) {
 		if ( &pool_ != this ) {
@@ -159,12 +159,12 @@ struct pool final {
  */
 	template<typename U>
 	bool operator == ( pool<U> const& pool_ ) const {
-		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatible allocator types" );
 		return ( this == &pool_ );
 	}
 	template<typename U>
 	bool operator != ( pool<U> const& pool_ ) const {
-		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatible allocator types" );
 		return ( this != &pool_ );
 	}
 	void construct( pointer p, const_reference t ) {
@@ -203,7 +203,7 @@ struct shared_pool final {
 	template<typename U>
 	shared_pool( shared_pool<U> const& other_ )
 		: _pool( other_._pool ) {
-		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatible allocator types" );
 	}
 	void swap( shared_pool& pool_ ) {
 		if ( &pool_ != this ) {
@@ -233,12 +233,12 @@ struct shared_pool final {
  */
 	template<typename U>
 	bool operator == ( shared_pool<U> const& pool_ ) const {
-		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatible allocator types" );
 		return ( _pool == pool_->_pool );
 	}
 	template<typename U>
 	bool operator != ( shared_pool<U> const& pool_ ) const {
-		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatible allocator types" );
 		return ( _pool != pool_->_pool );
 	}
 	void construct( pointer p, const_reference t ) {
@@ -270,17 +270,17 @@ struct ref final {
 	};
 	explicit ref( allocator_type* allocator_ )
 		: _allocator( allocator_ ) {
-		static_assert( sizeof ( T ) == sizeof ( typename allocator_type::value_type ), "incompatibile allocator types" );
+		static_assert( sizeof ( T ) == sizeof ( typename allocator_type::value_type ), "incompatible allocator types" );
 	}
 	ref( ref const& ref_ )
 		: _allocator( ref_._allocator ) {
-		static_assert( sizeof ( T ) == sizeof ( typename allocator_type::value_type ), "incompatibile allocator types" );
+		static_assert( sizeof ( T ) == sizeof ( typename allocator_type::value_type ), "incompatible allocator types" );
 	}
 	template<typename U>
 	ref( ref<U, allocator_type> const& ref_ )
 		: _allocator( ref_._allocator ) {
-		static_assert( sizeof ( T ) == sizeof ( typename allocator_type::value_type ), "incompatibile allocator types" );
-		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
+		static_assert( sizeof ( T ) == sizeof ( typename allocator_type::value_type ), "incompatible allocator types" );
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatible allocator types" );
 	}
 	void swap( ref& ref_ ) {
 		if ( &ref_ != this ) {
@@ -310,12 +310,12 @@ struct ref final {
  */
 	template<typename U>
 	bool operator == ( ref<U, allocator_type> const& ref_ ) const {
-		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatible allocator types" );
 		return ( *_allocator == *ref_._allocator );
 	}
 	template<typename U>
 	bool operator != ( ref<U, allocator_type> const& ref_ ) const {
-		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatible allocator types" );
 		return ( *_allocator != *ref_._allocator );
 	}
 	void construct( pointer p, const_reference t ) {

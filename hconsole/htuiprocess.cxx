@@ -116,8 +116,8 @@ void HTUIProcess::init_tui( yaal::hcore::HString const& processName_, HWindow::p
 	}
 	_mainWindow = mainWindow;
 	add_window( mainWindow );
-	if ( ! mainWindow->is_initialised() ) {
-		M_THROW( _( "window has not been initialised" ), errno );
+	if ( ! mainWindow->is_initialized() ) {
+		M_THROW( _( "window has not been initialized" ), errno );
 	}
 	_foregroundWindow = hcore::cyclic_iterator( *_windows );
 	_commandHandlers[ "quit" ] = call( &HTUIProcess::handler_quit, this, _1 );
@@ -179,8 +179,8 @@ void HTUIProcess::add_window( HWindow::ptr_t window_ ) {
 	_foregroundWindow = cyclic_iterator( &*_windows, prev( _windows->end() ) );
 	M_ASSERT( _foregroundWindow != _windows->end() );
 	_mainWindow->update_all();
-	if ( ! (*_foregroundWindow)->is_initialised() ) {
-		M_THROW( _( "window has not been initialised" ), errno );
+	if ( ! (*_foregroundWindow)->is_initialized() ) {
+		M_THROW( _( "window has not been initialized" ), errno );
 	}
 	repaint( true );
 	return;

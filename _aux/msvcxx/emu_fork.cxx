@@ -62,7 +62,7 @@ M_EXPORT_SYMBOL
 int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void ) {
 	/* Make a backup of original descriptors. */
 	HLock stdinLock( hcore::cin.acquire() );
-	HLock sdtoutLock( hcore::cout.acquire() );
+	HLock stdoutLock( hcore::cout.acquire() );
 	HLock stderrLock( hcore::cerr.acquire() );
 	int stdinFd( _fileno( stdin ) );
 	int stdoutFd( _fileno( stdout ) );

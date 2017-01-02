@@ -1255,7 +1255,7 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 					}
 
 					/*
-					 * Stright from The Art of Computer Programming,
+					 * Straight from The Art of Computer Programming,
 					 * 4.3. MULTIPLE-PRECISION ARITHMETIC,
 					 * 4.3.1. The Classical Algorithms,
 					 * Algorithm D, step B3:

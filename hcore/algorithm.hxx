@@ -1424,17 +1424,17 @@ inline return_t inner_product( iter_left_t itLeft, iter_left_t endLeft,
  * \param itRight - beginning of second range of elements to calculate inner product.
  * \param endRight - one past last element of second range to calculate inner product.
  * \param ret - starting value for sum operation.
- * \param sumator - generalized sum operator.
+ * \param summator - generalized sum operator.
  * \param multiplicator - generalized multiplication operator.
  * \return Generalized inner product of all elements in ranges [itLeft, endLeft) and [itRight, endRight) + ret.
  */
 template<typename iter_left_t, typename iter_right_t, typename return_t,
-	typename sumator_t, typename multiplicator_t>
+	typename summator_t, typename multiplicator_t>
 inline return_t inner_product( iter_left_t itLeft, iter_left_t endLeft,
 		iter_right_t itRight, return_t ret,
-		sumator_t sumator, multiplicator_t multiplicator ) {
+		summator_t summator, multiplicator_t multiplicator ) {
 	for ( ; itLeft != endLeft; ++ itLeft, ++ itRight )
-		ret = sumator( ret, multiplicator( *itLeft, *itRight ) );
+		ret = summator( ret, multiplicator( *itLeft, *itRight ) );
 	return ( ret );
 }
 

@@ -260,7 +260,7 @@ int HTreeWidget::do_process_input( int code_ ) {
 		case ( '\t' ):
 			_focused = false;	/* very  */
 			schedule_repaint();	/* magic */
-		/* no break on purpouse, see hlistwidget.c */
+		/* no break on purpose, see hlistwidget.c */
 		default :
 			errorCode = code_;
 		break;

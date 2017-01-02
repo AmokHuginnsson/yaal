@@ -28,7 +28,7 @@ Copyright:
  * \brief Infrastructure for handling program options.
  * This file contains HProgramOptionsHandler class.
  * Declaration of HOption structure.
- * Declaration of command line hadling routines.
+ * Declaration of command line handling routines.
  */
 
 #ifndef YAAL_HCORE_PROGRAMOPTIONSHANDLER_HXX_INCLUDED

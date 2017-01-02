@@ -203,18 +203,18 @@ void HStatusBarWidget::update_progress( double step_, char const* title_ ) {
 		return;
 	if ( step_ < 0 )
 		step_ = ++ _lastStep;
-	HTime stoper( now - _start );
+	HTime stopper( now - _start );
 	if ( _estimate ) {
 		if ( step_ != 0.0 )
-			now.set( static_cast<time_t>( ( _progressSize / step_ ) * static_cast<double>( stoper.raw() ) ) );
-		left = now - stoper;
+			now.set( static_cast<time_t>( ( _progressSize / step_ ) * static_cast<double>( stopper.raw() ) ) );
+		left = now - stopper;
 	}
 	/* 6 for "[100%]", 10 for elapse, 10 for estimate, 2 for || */
 	int maxBar( _widthRaw - ( 6 + 10 + 2 + ( _estimate ? 10 : 0 ) ) );
 	int nextPercent( static_cast<int>( ( 100. * step_ / _progressSize ) ) );
 	int nextStep( static_cast<int>( ( maxBar * step_ / _progressSize ) ) );
-	int nextMinute( stoper.get_minute() );
-	int nextSecond( stoper.get_second() );
+	int nextMinute( stopper.get_minute() );
+	int nextSecond( stopper.get_second() );
 	if ( nextStep >= maxBar )
 		nextStep = maxBar, _done = true;
 	if ( nextPercent >= 100 )
@@ -229,11 +229,11 @@ void HStatusBarWidget::update_progress( double step_, char const* title_ ) {
 			_varTmpBuffer.format ( "|%%-%ds|%%s%%s[%%3d%%s]", maxBar );
 			_string.format( _varTmpBuffer.raw(), "-",
 					( step_ != 0.0 ? ( left.string().raw() ) : "(?\?:?\?:?\?)" ),
-					stoper.string().raw(),	nextPercent, "%%" );
+					stopper.string().raw(),	nextPercent, "%%" );
 		} else {
 			_varTmpBuffer.format ( "|%%-%ds|%%s[%%3d%%s]", maxBar );
 			_string.format( _varTmpBuffer.raw(), "-",
-					stoper.string().raw(), nextPercent, "%%" );
+					stopper.string().raw(), nextPercent, "%%" );
 		}
 		_string.fill( '-', 1, maxBar );
 		if ( nextStep > 0 )

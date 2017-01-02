@@ -31,7 +31,7 @@ Copyright:
 
 namespace yaal {
 
-/*! \brief Wrapper for standarized database access.
+/*! \brief Wrapper for standardized database access.
  *
  * The dbwrapper allows its user to transparently access
  * any kind of relational database that are available for Unix.

@@ -43,15 +43,20 @@ namespace yaal {
 namespace hconsole {
 
 HWindow::HWindow( yaal::hcore::HString const& title_ )
-	: _initialised( false ),
-	_needRepaint( false ), _title( title_ ), _focusedChild(),
-	_previousFocusedChild(), _widgets( _focusedChild ),
-	_statusBar(), _tuiProcess( nullptr ) {
+	: _initialized( false )
+	, _needRepaint( false )
+	, _title( title_ )
+	, _focusedChild()
+	, _previousFocusedChild()
+	, _widgets( _focusedChild )
+	, _statusBar()
+	, _tuiProcess( nullptr ) {
 	M_PROLOG
 	int cmds [] = { ':', KEY<':'>::command };
 	int search [] = { '/', KEY<'/'>::command, '?', KEY<'?'>::command };
-	if ( ! HConsole::get_instance().is_enabled() )
-		M_THROW( "console not initialised.", errno );
+	if ( ! HConsole::get_instance().is_enabled() ) {
+		M_THROW( "console not initialized.", errno );
+	}
 	register_postprocess_handler( '\t', nullptr, call( &HWindow::handler_jump_tab, this, _1 ) );
 	register_postprocess_handler( 2, cmds, call( &HWindow::handler_command, this, _1 ) );
 	register_postprocess_handler( 4, search, call( &HWindow::handler_search, this, _1 ) );
@@ -85,7 +90,7 @@ void HWindow::do_init( void ) {
 	string.format( " [%s]& \n", _title.raw() );
 	_statusBar = init_bar( string.raw() )->get_pointer();
 	_statusBar->enable( true );
-	_initialised = true;
+	_initialized = true;
 	return;
 	M_EPILOG
 }
@@ -260,8 +265,8 @@ HString HWindow::get_command( void ) {
 	M_EPILOG
 }
 
-bool HWindow::is_initialised( void ) const {
-	return ( _initialised );
+bool HWindow::is_initialized( void ) const {
+	return ( _initialized );
 }
 
 void HWindow::update_all( void ) {

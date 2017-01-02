@@ -24,7 +24,7 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 /*! \file hcore/hqueue.hxx
- * \brief HQueue<> class template implementataion.
+ * \brief HQueue<> class template implementation.
  */
 
 #ifndef YAAL_HCORE_HQUEUE_HXX_INCLUDED

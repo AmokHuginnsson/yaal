@@ -38,7 +38,7 @@ namespace yaal {
 
 namespace hcore {
 
-/*! \brief HSBBSTree util, a helper for HMultiSet<> instatiations.
+/*! \brief HSBBSTree util, a helper for HMultiSet<> instantiations.
  */
 template<typename type_t>
 struct multiset_helper {
@@ -54,7 +54,7 @@ struct multiset_helper {
  * data structure that holds set of (non-unique) keys.
  *
  * \tparam type_t - type of values held in set.
- * \tparam helper_t - HSBBSTree plugable code.
+ * \tparam helper_t - HSBBSTree pluggable code.
  */
 template<typename type_t, typename compare_t = less<type_t>, typename allocator_t = allocator::system<type_t> >
 class HMultiSet final {

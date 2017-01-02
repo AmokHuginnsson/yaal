@@ -25,7 +25,7 @@ Copyright:
 */
 
 /*! \file hcore/resolver.hxx
- * \brief All name resolution relared classes and free function reside here.
+ * \brief All name resolution related classes and free function reside here.
  *
  * HIP and resolver belongs here.
  */

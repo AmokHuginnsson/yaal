@@ -46,7 +46,7 @@ class HProgramOptionsHandler;
 
 namespace tools {
 
-/*! \brief Small but useful utils.
+/*! \brief Small but useful utilities.
  */
 namespace util {
 

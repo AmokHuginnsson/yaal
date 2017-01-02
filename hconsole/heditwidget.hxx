@@ -83,10 +83,10 @@ protected:
 	bool _password;        /*!< should be entered text visible */
 	int  _maxStringSize;   /*!< maximum length of text in widget */
 	int  _cursorPosition;  /*!< cursor position relative to widget beginning */
-	int  _widgetOffset;   /*!< when content is bigger than widget size
+	int  _widgetOffset;    /*!< when content is bigger than widget size
 	                            this variable keeps offset of first
 	                            character shown */
-	int  _maxHistoryLevel; /*!< how many instertions should history keep */
+	int  _maxHistoryLevel; /*!< how many insertions should history keep */
 	yaal::hcore::HRegex _mask; /*!< regular expression describing what
 	                                   characters and in what way can be entered */
 	hcore::HString _string; /*!< widget content */
@@ -113,7 +113,7 @@ public:
 	void set_text( yaal::hcore::HString const& );
 	yaal::hcore::HString const& get_text( void ) const;
 	void set_mask( yaal::hcore::HString const& );
-	/*! \brief Set varius bits of internal structure.
+	/*! \brief Set various bits of internal structure.
 	 *
 	 * \param maxlen - maximum string length.
 	 * \param val - initial content.

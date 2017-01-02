@@ -42,7 +42,7 @@ namespace hcore {
 
 extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHHashMap_[];
 
-/*! \brief HHashContainer util, a helper for HHashMap<> instatiations.
+/*! \brief HHashContainer util, a helper for HHashMap<> instantiations.
  */
 template<typename key_t, typename value_t>
 struct hashmap_helper {
@@ -83,7 +83,7 @@ public:
 		 */
 		typedef enum {
 			OK = 0,     /*!< No error. */
-			INVALID_KEY /*!< Dereferencing nono-existing key. */
+			INVALID_KEY /*!< Dereferencing non-existing key. */
 		} error_t;
 	};
 private:

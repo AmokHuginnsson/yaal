@@ -40,7 +40,7 @@ namespace yaal {
 
 namespace hcore {
 
-/*! \brief HHashContainer util, a helper for HHashSet<> instatiations.
+/*! \brief HHashContainer util, a helper for HHashSet<> instantiations.
  */
 template<typename type_t>
 struct hashset_helper {

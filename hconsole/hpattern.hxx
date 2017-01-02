@@ -53,7 +53,7 @@ public:
 private:
 	bool _initialized;             /*!< is pattern initialized */
 	bool _ignoreCaseDefault;       /*!< default value for ignore case switch */
-	bool _ignoreCase;              /*!< self explanary */
+	bool _ignoreCase;              /*!< self explanatory */
 	bool _extended;                /*!< simple strstr or extended RE */
 	int  _simpleMatchLength;       /*!< length of simple strstr pattern */
 	yaal::hcore::HRegex  _regex;   /*!< regular expression for search patterns */

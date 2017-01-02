@@ -149,7 +149,7 @@ path_t normalize_path( path_t const& path_ ) {
 bool exists( path_t const& path_ ) {
 	int err( ::access( path_.c_str(), F_OK ) );
 	if ( ( err != 0 ) && ( errno != ENOENT ) ) {
-		throw HFileSystemException( to_string( "Failed to determine `" ).append( path_ ).append( "'s onthological status." ) );
+		throw HFileSystemException( to_string( "Failed to determine `" ).append( path_ ).append( "'s ontological status." ) );
 	}
 	return ( err == 0 );
 }

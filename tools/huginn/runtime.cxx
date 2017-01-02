@@ -678,7 +678,7 @@ HHuginn::value_t invalid_instance( yaal::hcore::HString const& name_, huginn::HT
 	M_PROLOG
 	/*
 	 * __attribute__(( noreturn )) causes problems with clang.
-	 * Hence this workaound.
+	 * Hence this workaround.
 	 * Condition in following if shall always evaluate to `true'.
 	 */
 	if ( position_ >= 0 ) {
@@ -789,21 +789,21 @@ inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterfac
 		stream_ << " : " << huginnClass_.super()->name();
 	}
 	HHuginn::field_identifiers_t newFields( huginnClass_.field_identifiers() );
-	typedef HStack<HHuginn::HClass const*> hierarhy_t;
-	hierarhy_t hierarhy;
+	typedef HStack<HHuginn::HClass const*> hierarchy_t;
+	hierarchy_t hierarchy;
 	HHuginn::HClass const* super( huginnClass_.super() );
 	while ( super ) {
-		hierarhy.push( super );
+		hierarchy.push( super );
 		super = super->super();
 	}
 	HHuginn::field_identifiers_t derivedFields;
-	while ( ! hierarhy.is_empty() ) {
-		for ( HHuginn::identifier_id_t f : hierarhy.top()->field_identifiers() ) {
+	while ( ! hierarchy.is_empty() ) {
+		for ( HHuginn::identifier_id_t f : hierarchy.top()->field_identifiers() ) {
 			if ( find( derivedFields.begin(), derivedFields.end(), f ) == derivedFields.end() ) {
 				derivedFields.push_back( f );
 			}
 		}
-		hierarhy.pop();
+		hierarchy.pop();
 	}
 	HHuginn::field_identifiers_t overriddenFields;
 	for ( HHuginn::identifier_id_t f : derivedFields ) {

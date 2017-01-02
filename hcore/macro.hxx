@@ -248,7 +248,7 @@ Copyright:
  * This macro has meaning only in debug build.
  *
  * \param condition - condition to be tested.
- * \post Normal progam flow is continued only if condition is met, otherwise HFailedAssertion exception is thrown.
+ * \post Normal program flow is continued only if condition is met, otherwise HFailedAssertion exception is thrown.
  */
 #	define M_ASSERT( condition ) do { if ( ! ( condition ) ) yaal::hcore::failed_assert( __FILE__, __LINE__, __PRETTY_FUNCTION__, #condition ); } while ( 0 )
 # define M_DEBUG_CODE( code ) code
@@ -263,7 +263,7 @@ Copyright:
  * \param code - code to be run.
  */
 #if defined( HAVE_DECL_TEMP_FAILURE_RETRY ) && ( HAVE_DECL_TEMP_FAILURE_RETRY == 1 )
-/*! \brief Reinmplement TEMP_FAILURE_RETRY macro.
+/*! \brief Reimplement TEMP_FAILURE_RETRY macro.
  * Some of the original implementations use C-style-casts which messes our build.
  */
 #	define M_TEMP_FAILURE_RETRY( expr ) ( __extension__( { \

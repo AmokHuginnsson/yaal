@@ -79,7 +79,7 @@ private:
 	numeric_t _populationVariance;
 	aggregate_type_t _aggregateType;
 public:
-	/*! \brief Construct statictics for given range of numbers.
+	/*! \brief Construct statistics for given range of numbers.
 	 *
 	 * Following aggregate types are implicit:
 	 * `count', `minimum', `maximum', `sum', `average'

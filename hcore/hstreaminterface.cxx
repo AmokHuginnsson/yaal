@@ -479,7 +479,7 @@ int long HStreamInterface::semantic_read(
 			/* nRead can be one of the following:
 			 * nRead > 0 - a successful read, we shall check for stop char and possibly continue reading.
 			 * nRead == 0 - stream is blocking and has just been closed or has no data to read and is internally non-blocking.
-			 * nRead < 0 - an error occurred, read opration could be externally interrupted.
+			 * nRead < 0 - an error occurred, read operation could be externally interrupted.
 			 */
 		} while ( ( nRead > 0 ) /* We increment _offset only if read succeeded. */
 				&& ( ! ( byDelim = ( ::memchr( set_, buffer[ _offset ++ ], static_cast<size_t>( setLen ) ) ? isStopSet_ : ! isStopSet_ ) ) )
@@ -535,7 +535,7 @@ HStreamInterface& HStreamInterface::do_input( HString& word ) {
 
 bool HStreamInterface::read_word( void ) {
 	M_PROLOG
-	/* Regarding _whiteSpace_.size() + 1, about "+ 1" see comment in semantic_read in analoguous context */
+	/* Regarding _whiteSpace_.size() + 1, about "+ 1" see comment in semantic_read in analogous context */
 	if ( ! _skipWS ) {
 		int peeked( HStreamInterface::do_peek() );
 		if ( ( peeked == INVALID_CHARACTER )
@@ -649,7 +649,7 @@ HStreamInterface& HStreamInterface::do_input( bool& b ) {
 
 HStreamInterface& HStreamInterface::do_input( char& char_ ) {
 	M_PROLOG
-	/* Regarding _whiteSpace_.size() + 1, about "+ 1" see comment in semantic_read in analoguous context */
+	/* Regarding _whiteSpace_.size() + 1, about "+ 1" see comment in semantic_read in analogous context */
 	char c( 0 );
 	do {
 		read( &c, 1 );

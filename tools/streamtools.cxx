@@ -242,7 +242,7 @@ int long HTee::do_write( void const* data_, int long size_ ) {
 
 int long HTee::do_read( void*, int long ) {
 	M_PROLOG
-	M_ASSERT( 0 && "oparation makes no sense for tee stream" );
+	M_ASSERT( 0 && "operation makes no sense for tee stream" );
 #if defined( NDEBUG ) || defined( __MSVCXX__ )
 	return ( -1 );
 #endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */

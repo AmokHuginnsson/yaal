@@ -80,7 +80,7 @@ public:
 	 */
 	HQuery::ptr_t prepare_query( yaal::hcore::HString const& query_ );
 
-	/*! \brief Get error messege for last error that occurred on this connection.
+	/*! \brief Get error message for last error that occurred on this connection.
 	 *
 	 * \return Error message for last error that occurred.
 	 */

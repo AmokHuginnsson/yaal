@@ -772,15 +772,15 @@ int HListWidget::process_input_view( int code_ ) {
  * to another widget */
 		default : {
 			int columns( static_cast<int>( _header.size() ) );
-			int selectedolumn( 0 );
-			for ( ; selectedolumn < columns; ++ selectedolumn ) {
-				if ( tolower( code_ ) == tolower( _header[ selectedolumn ]->_shortcut ) ) {
+			int selectedColumn( 0 );
+			for ( ; selectedColumn < columns; ++ selectedColumn ) {
+				if ( tolower( code_ ) == tolower( _header[ selectedColumn ]->_shortcut ) ) {
 					break;
 				}
 			}
-			if ( selectedolumn < columns ) {
+			if ( selectedColumn < columns ) {
 				errorCode = 0;
-				sort_by_column( selectedolumn,
+				sort_by_column( selectedColumn,
 						code_ == tolower( code_ ) ? OSortHelper::ASCENDING : OSortHelper::DESCENDING );
 			} else {
 				errorCode = code_;
@@ -1573,9 +1573,9 @@ HListWidgetAttributes& HListWidgetAttributes::editable( bool editable_ ) {
 	M_EPILOG
 }
 
-HListWidgetAttributes& HListWidgetAttributes::sortable( bool stortable_ ) {
+HListWidgetAttributes& HListWidgetAttributes::sortable( bool sortable_ ) {
 	M_PROLOG
-	_sortable = stortable_;
+	_sortable = sortable_;
 	_sortableSet = true;
 	return ( *this );
 	M_EPILOG

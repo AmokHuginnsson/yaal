@@ -123,7 +123,7 @@ HBitmap& HBitmap::operator = ( HBitmap const& b_ ) {
 		} else {
 			/*
 			 * The source is just reference to some external memory,
-			 * so it is meant to be writeable.
+			 * so it is meant to be writable.
 			 */
 			if ( b_._size ) {
 				use( const_cast<void*>( b_.block() ), b_._size );

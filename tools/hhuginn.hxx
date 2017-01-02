@@ -161,7 +161,7 @@ public:
 		NOT_BOOLEAN
 	};
 	struct COMPILER;
-	/*! \brief Bits used for specyfying how compiler should work.
+	/*! \brief Bits used for specifying how compiler should work.
 	 */
 	typedef yaal::hcore::HBitFlag<COMPILER> compiler_setup_t;
 	struct COMPILER {

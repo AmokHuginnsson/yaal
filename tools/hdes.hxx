@@ -68,7 +68,7 @@ private:
 	void generate_keys( u8_t const*, int );
 	void _des( u32_t* /* block */, int /* action */, int /* part */ );
 	void _3des( u32_t* /* block */, int /* action */ );
-	void permutate( u8_t* /* buffer */, const u8_t* /* tab */, int /* len */ ) const;
+	void permute( u8_t* /* buffer */, const u8_t* /* tab */, int /* len */ ) const;
 };
 
 }

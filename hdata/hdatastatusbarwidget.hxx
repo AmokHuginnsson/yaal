@@ -40,7 +40,7 @@ namespace hdata {
 /*! \brief Implementation of database enabled TUI Statusbar control class.
  *
  * DataStatusBar Control provides display of progress bars, allows
- * invocation of commands and specyfing search patterns.
+ * invocation of commands and specifying search patterns.
  * Additionally it provides document status presentation.
  */
 class HDataStatusBarWidget : public hconsole::HStatusBarWidget {

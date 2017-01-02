@@ -1057,7 +1057,7 @@ private:
 	typedef yaal::hcore::HPair<yaal::hcore::HString::const_iterator, executor_t> execution_step_t;
 	typedef yaal::hcore::HArray<execution_step_t> execution_steps_t;
 	grammar_t _grammar;
-	execution_steps_t _excutors;
+	execution_steps_t _executors;
 	bool _matched;
 	int long _errorPosition;
 	messages_t _errorMessages;

@@ -209,15 +209,15 @@ public:
 	 * Using this method cause HThread::finish() to throw a HThreadException.
 	 *
 	 * \param message_ - exception message.
-	 * \param code_ - additional excepion information code.
+	 * \param code_ - additional exception information code.
 	 */
 	void stack_exception( yaal::hcore::HString const& message_, int code_ = 0 );
-	/*! \brief Get operationg system level working thread ID for this HThread object.
+	/*! \brief Get operating system level working thread ID for this HThread object.
 	 *
 	 * \return Thread ID for this HThread object.
 	 */
 	id_t get_id( void ) const;
-	/*! \brief Get operationg system level working thread ID for calling thread.
+	/*! \brief Get operating system level working thread ID for calling thread.
 	 *
 	 * \return Working thread ID.
 	 */
@@ -241,7 +241,7 @@ private:
 
 typedef HExceptionT<HThread> HThreadException;
 
-/*! \brief HLock Implementats automatic multi-threaded synchronization primitive.
+/*! \brief HLock implements automatic multi-threaded synchronization primitive.
  *
  * Scope based automation of locking and unlocking of Mutexes.
  */
@@ -264,7 +264,7 @@ private:
 	HLock& operator = ( HLock const& ) = delete;
 };
 
-/*! \brief Asynchronous notification mechanizm.
+/*! \brief Asynchronous notification mechanism.
  */
 class HEvent {
 public:

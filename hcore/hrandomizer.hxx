@@ -92,7 +92,7 @@ private:
 	void init( u64_t const*, int );
 };
 
-/*! \brief Helper namespace for HRandomizer related utils.
+/*! \brief Helper namespace for HRandomizer related utilities.
  */
 namespace randomizer_helper {
 

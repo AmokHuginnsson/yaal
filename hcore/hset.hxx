@@ -40,7 +40,7 @@ namespace yaal {
 
 namespace hcore {
 
-/*! \brief HSBBSTree util, a helper for HSet<> instatiations.
+/*! \brief HSBBSTree utility, a helper for HSet<> instantiations.
  */
 template<typename type_t>
 struct set_helper {
@@ -56,7 +56,7 @@ struct set_helper {
  * data structure that holds set of keys.
  *
  * \tparam type_t - type of values held in set.
- * \tparam helper_t - HSBBSTree plugable code.
+ * \tparam helper_t - HSBBSTree pluggable code.
  */
 template<typename type_t, typename compare_t = less<type_t>, typename allocator_t = allocator::system<type_t> >
 class HSet final {

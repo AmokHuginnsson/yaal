@@ -84,8 +84,8 @@ private:
 	/*
 	 * 1.
 	 * Resolved function references are kept by naked/weak/dumb pointer (value_t*) in runtime.
-	 * They must be kept by weak reference to avoid self-referecing cycle of smart pointers
-	 * in case of recusive call chain: `foo() { foo(); }'.
+	 * They must be kept by weak reference to avoid self-referencing cycle of smart pointers
+	 * in case of recursive call chain: `foo() { foo(); }'.
 	 *
 	 * 2.
 	 * Loading sub-module involves independent symbol resolving stage at end of compilation

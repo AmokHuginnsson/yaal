@@ -298,7 +298,7 @@ int main( int, char const** ) {
 	struct hostent h, * ph( 0 );
 	::gethostbyname_r( "", &h, p, 0, &ph, &i );
 	return ( 0 );
-}]])], [AC_DEFINE([HAVE_GNU_GETHOSTBYNAME_R],[],[Is gethostbyname_r a GNU flavour?])] RESULT=["yes"])
+}]])], [AC_DEFINE([HAVE_GNU_GETHOSTBYNAME_R],[],[Is gethostbyname_r a GNU flavor?])] RESULT=["yes"])
 AC_MSG_RESULT([$RESULT])
 
 AC_MSG_CHECKING([whether gethostbyaddr_r is GNU variant])
@@ -310,7 +310,7 @@ int main( int, char const** ) {
 	struct hostent h, * ph( 0 );
 	::gethostbyaddr_r( 0, 0, 0, &h, p, 0, &ph, &i );
 	return ( 0 );
-}]])], [AC_DEFINE([HAVE_GNU_GETHOSTBYADDR_R],[],[Is gethostbyaddr_r a GNU flavour?])] RESULT=["yes"])
+}]])], [AC_DEFINE([HAVE_GNU_GETHOSTBYADDR_R],[],[Is gethostbyaddr_r a GNU flavor?])] RESULT=["yes"])
 AC_MSG_RESULT([$RESULT])
 
 DEFAULT_DRIVER=["null"]

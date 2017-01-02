@@ -62,7 +62,7 @@ public:
 		static M_YAAL_TOOLS_PUBLIC_API flag_t const ECHO;
 		static M_YAAL_TOOLS_PUBLIC_API flag_t const CR2NL;
 	};
-	/*! \brief Serial port data trnsmission speeds.
+	/*! \brief Serial port data transmission speeds.
 	 */
 	enum class SPEED {
 		DEFAULT,

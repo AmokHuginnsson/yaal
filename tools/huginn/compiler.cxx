@@ -823,9 +823,9 @@ void OCompiler::submit_class( executing_parser::position_t position_ ) {
 void OCompiler::track_name_cycle( HHuginn::identifier_id_t identifierId_ ) {
 	M_PROLOG
 	typedef yaal::hcore::HHashSet<HHuginn::identifier_id_t> names_t;
-	typedef yaal::hcore::HArray<HHuginn::identifier_id_t> hierarhy_t;
+	typedef yaal::hcore::HArray<HHuginn::identifier_id_t> hierarchy_t;
 	names_t names;
-	hierarhy_t hierarhy;
+	hierarchy_t hierarchy;
 	OClassContext const* cc( _submittedClasses.at( identifierId_ ).get() );
 	names.insert( identifierId_ );
 	while ( cc->_baseName != INVALID_IDENTIFIER ) {
@@ -836,10 +836,10 @@ void OCompiler::track_name_cycle( HHuginn::identifier_id_t identifierId_ ) {
 				cc->_basePosition.get()
 			);
 		}
-		hierarhy.push_back( cc->_baseName );
+		hierarchy.push_back( cc->_baseName );
 		if ( ! names.insert( cc->_baseName ).second ) {
 			hcore::HString hier( _runtime->identifier_name( identifierId_ ) );
-			for ( HHuginn::identifier_id_t n : hierarhy ) {
+			for ( HHuginn::identifier_id_t n : hierarchy ) {
 				hier.append( "->" );
 				hier.append( _runtime->identifier_name( n ) );
 			}
@@ -906,8 +906,8 @@ void OCompiler::add_parameter( yaal::hcore::HString const& name_, executing_pars
 void OCompiler::add_capture( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	HHuginn::identifier_id_t captureIdentifer( _runtime->identifier_id( name_ ) );
-	if ( find( fc._captures.begin(), fc._captures.end(), captureIdentifer ) != fc._captures.end() ) {
+	HHuginn::identifier_id_t captureIdentifier( _runtime->identifier_id( name_ ) );
+	if ( find( fc._captures.begin(), fc._captures.end(), captureIdentifier ) != fc._captures.end() ) {
 		throw HHuginn::HHuginnRuntimeException( "Capture `"_ys.append( name_ ).append( "' was already defined." ), position_.get() );
 	}
 	HHuginn::expression_t& expression( current_expression() );
@@ -917,7 +917,7 @@ void OCompiler::add_capture( yaal::hcore::HString const& name_, executing_parser
 	defer_get_reference( name_, position_ );
 	fc._valueTypes.pop();
 	expression->oper( OPERATOR::FUNCTION_ARGUMENT, position_.get() );
-	fc._captures.push_back( captureIdentifer );
+	fc._captures.push_back( captureIdentifier );
 	return;
 	M_EPILOG
 }

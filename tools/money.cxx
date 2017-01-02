@@ -94,7 +94,7 @@ char const _tenths_[][ 10 ] = {
 	"ninety "
 };
 
-char const _houndred_[] = "hundred ";
+char const _hundred_[] = "hundred ";
 
 namespace currency {
 
@@ -198,7 +198,7 @@ char const _tenths_[][ 24 ] = {
 	"sto "
 };
 
-char const _houndreds_[][ 16 ] = {
+char const _hundreds_[][ 16 ] = {
 	"sto-zero ",
 	"sto ",
 	"dwie¶cie ",
@@ -360,7 +360,7 @@ HString in_words_en( HNumber const& kwota_, CURRENCY currency_ ) {
 			} break;
 			case ( 2 ) : {
 				if ( digit ) {
-					tmp.assign( en::_numbers_[ static_cast<int>( digit ) ] ).append( en::_houndred_ );
+					tmp.assign( en::_numbers_[ static_cast<int>( digit ) ] ).append( en::_hundred_ );
 					inWords = tmp + inWords;
 				}
 			} break;
@@ -428,7 +428,7 @@ HString in_words_pl( HNumber const& kwota_, CURRENCY currency_ ) {
 			} break;
 			case ( 2 ) : {
 				if ( digit ) {
-					inWords = pl::_houndreds_[ static_cast<int>( digit ) ] + inWords;
+					inWords = pl::_hundreds_[ static_cast<int>( digit ) ] + inWords;
 				}
 			} break;
 			default:

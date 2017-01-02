@@ -62,7 +62,7 @@ void HMenuWidget::init( HTUIProcess* process_ ) {
 	M_PROLOG
 	M_ASSERT( process_ );
 	if ( _view.get_root() ) {
-		M_THROW( "menu already initialised", errno );
+		M_THROW( "menu already initialized", errno );
 	}
 	_process = process_;
 	return;

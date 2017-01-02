@@ -1,7 +1,7 @@
 /*
----           `gameground' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-  packagefactory.cxx - this file is integral part of `gameground' project.
+  packagefactory.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -73,13 +73,13 @@ HPackageFactory::~HPackageFactory( void ) {
 	return;
 }
 
-void HPackageFactory::register_package_creator( HString const& name_, HPackageCreatorInterface* instatiator_ ) {
+void HPackageFactory::register_package_creator( HString const& name_, HPackageCreatorInterface* instantiator_ ) {
 	M_PROLOG
 	creators_t::iterator it = _creators.find( name_ );
 	if ( it != _creators.end() )
 		M_THROW( _( "Package already registered" ), errno );
 	OCreator creator;
-	creator._instantiator = instatiator_;
+	creator._instantiator = instantiator_;
 	_creators[ name_ ] = creator;
 	return;
 	M_EPILOG

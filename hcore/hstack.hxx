@@ -24,7 +24,7 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 /*! \file hcore/hstack.hxx
- * \brief HStack<> class template implementataion.
+ * \brief HStack<> class template implementation.
  */
 
 #ifndef YAAL_HCORE_HSTACK_HXX_INCLUDED

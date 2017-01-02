@@ -458,7 +458,7 @@ public:
 private:
 	allocator_type _allocator;
 	branch_allocator_type _branchAllocator;
-	HNode* _root; /* self explanary */
+	HNode* _root; /* self explanatory */
 public:
 	explicit HTree( allocator_type const& allocator_ = allocator_type() )
 		: _allocator( allocator_ )

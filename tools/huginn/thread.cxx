@@ -133,9 +133,9 @@ void HThread::create_try_catch_frame( HStatement::statement_id_t statementId_ ) 
 void HThread::pop_frame( void ) {
 	M_PROLOG
 	/*
-	 * Order of those lines matter and is extreamely non-trivial!
+	 * Order of those lines matter and is extremely non-trivial!
 	 *
-	 * Whan removing a frame it is possible that
+	 * When removing a frame it is possible that
 	 * non-trivial destructor of user class is invoked.
 	 * This destructor body will create another frame on top of currently
 	 * removed frame.

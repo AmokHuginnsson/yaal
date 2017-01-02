@@ -46,10 +46,10 @@ inline bool operator()( key_type const& left, key_type const& right ) const
 	{  return ( *left < *right );  }
 };
 
-/*! \brief Bijective relation of elemnets.
+/*! \brief Bijective relation of elements.
  *
  * HTwoWayMap<> is a template representing pair of sets with unambiguous
- * ono-to-one correspondence between their elements.
+ * one-to-one correspondence between their elements.
  *
  * \tparam left_type_t - type of elements in "left" set in map.
  * \tparam right_type_t - type of elements in "right" set in map.

@@ -316,7 +316,7 @@ struct HNumber::ElementaryFunctions {
 		M_EPILOG
 	}
 	/*
-	 * arcsin(x) power series converges extreamly slowly near 1.
+	 * arcsin(x) power series converges extremely slowly near 1.
 	 * we will use arctan(x) to get result faster.
 	 * arcsin(x) = arctan(x/sqrt(1-x^2));
 	 * for 1 and -1 we return values from definition

@@ -104,7 +104,7 @@ void HResource::build_menu_item( HXml::HConstNodeProxy const& xmlNode_,
 					if ( command == "create_window" ) {
 						HXml::HNode::properties_t::const_iterator paramIt = props.find( "param" );
 						if ( ! ( paramIt != props.end() ) ) {
-							M_THROW( "create_window command requires perameter", xmlNode_.get_line() );
+							M_THROW( "create_window command requires parameter", xmlNode_.get_line() );
 						}
 						(**node_)._call = call( &HResource::create_window, this, paramIt->second );
 					} else {

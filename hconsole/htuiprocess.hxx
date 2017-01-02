@@ -56,9 +56,9 @@ public:
 	typedef hcore::HCyclicIterator<model_t> cyclic_iterator;
 protected:
 	yaal::tools::HIODispatcher _dispatcher;
-	window_t _mainWindow;                 /* self explanary */
-	cyclic_iterator _foregroundWindow; /* self explanary */
-	model_ptr_t _windows;                       /* current existing windows */
+	window_t _mainWindow;              /* self explanatory */
+	cyclic_iterator _foregroundWindow; /* self explanatory */
+	model_ptr_t _windows;              /* current existing windows */
 	bool _needRepaint;
 	call_queue_t _callQueue;
 	HResource::ptr_t _resource;

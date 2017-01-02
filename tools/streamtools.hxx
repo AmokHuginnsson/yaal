@@ -25,9 +25,9 @@ Copyright:
 */
 
 /*! \file tools/streamtools.hxx
- * \brief Various yaal::hcore::HStreamInterface utils.
+ * \brief Various yaal::hcore::HStreamInterface utilities.
  *
- * HBinaryFormatter - `bin' mainpulator for yaal::hcore::HStreamInterface.
+ * HBinaryFormatter - `bin' manipulator for yaal::hcore::HStreamInterface.
  */
 
 #ifndef YAAL_TOOLS_STREAMTOOLS_HXX_INCLUDED

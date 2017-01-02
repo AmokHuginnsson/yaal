@@ -52,7 +52,7 @@ private:
 		 */
 		typedef enum {
 			OK = 0, /*!< no error. */
-			REVERSED_EDNPOINTS = 1,
+			REVERSED_ENDPOINTS = 1,
 			DIVISION_BY_ZERO = 2
 		} error_t;
 	};
@@ -60,11 +60,15 @@ private:
 	value_type _supremum;
 public:
 	HInterval( void )
-		: _infimum(), _supremum() {}
+		: _infimum()
+		, _supremum() {
+	}
 	HInterval( value_type const& begin_, value_type const& end_ )
-		: _infimum( begin_ ), _supremum( end_ ) {
-		if ( _supremum < _infimum )
-			M_THROW( _errMsgHInterval_[ERROR::REVERSED_EDNPOINTS], static_cast<int>( _infimum - _supremum ) );
+		: _infimum( begin_ )
+		, _supremum( end_ ) {
+		if ( _supremum < _infimum ) {
+			M_THROW( _errMsgHInterval_[ERROR::REVERSED_ENDPOINTS], static_cast<int>( _infimum - _supremum ) );
+		}
 	}
 	value_type inf( void ) const {
 		return ( _infimum );

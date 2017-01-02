@@ -39,7 +39,7 @@ namespace yaal {
 
 namespace tools {
 
-/*! \brief Input/output (fd) event listner and notification dispatcher.
+/*! \brief Input/output (fd) event listener and notification dispatcher.
  */
 class HIODispatcher {
 public:
@@ -58,9 +58,9 @@ private:
 	typedef yaal::hcore::HArray<stream_t> dropped_io_handlers_t;
 	typedef yaal::hcore::HArray<delayed_call_t> delayed_calls_t;
 	typedef yaal::hcore::HArray<new_io_handler_t> new_io_handlers_t;
-	bool _initialised; /*!< did process has necessary initialisation */
+	bool _initialized; /*!< did process has necessary initialization */
 	bool _loop;        /*!< indicates if main loop continues */
-	int _idleCycles;   /*!< full select()'s without io activity */
+	int _idleCycles;   /*!< full select()'s without i/o activity */
 	int long _latency; /*!< timeout between recall (milliseconds) */
 	yaal::hcore::HChunk _select;
 	io_handlers_t _readers;
@@ -73,7 +73,7 @@ private:
 	yaal::hcore::HPipe _event;
 	yaal::hcore::HMutex _mutex;
 public:
-	/*! \brief Create new io-dispatcher object.
+	/*! \brief Create new I/O-dispatcher object.
 	 *
 	 * \param initialFdBuckets - initial number of file descriptor buckets.
 	 * \param latency - how long should dispatcher sleep during select, between invoking idle actions.

@@ -96,7 +96,7 @@ namespace yaal {
 
 namespace hcore {
 
-/*! \brief OpenSSL libraary wrapper helpers.
+/*! \brief OpenSSL library wrapper helpers.
  */
 namespace openssl_helper {
 

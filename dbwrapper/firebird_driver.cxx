@@ -265,7 +265,7 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 			char* valBuf( res->_cache.get<char>() );
 			for ( i = 0, var = out->sqlvar; i < out->sqld; ++ i, ++ var ) {
 				var->sqldata = valBuf;
-				valBuf += var->sqllen; /* vlaue buffer */
+				valBuf += var->sqllen; /* value buffer */
 				++ valBuf; /* \0 terminator */
 				var->sqlind = reinterpret_cast<short*>( valBuf ); /* nullptr indicator */
 				valBuf += sizeof ( short );

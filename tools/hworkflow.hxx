@@ -140,7 +140,7 @@ public:
 	 */
 	void windup( WINDUP_MODE windupMode );
 
-	/*! \brief Just like windoup(...) but not wait for threads to join.
+	/*! \brief Just like windup(...) but not wait for threads to join.
 	 */
 	void schedule_windup( WINDUP_MODE windupMode );
 

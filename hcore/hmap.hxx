@@ -45,7 +45,7 @@ namespace hcore {
 
 extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHMap_[];
 
-/*! \brief HSBBSTree util, a helper for HMap<> instatiations.
+/*! \brief HSBBSTree util, a helper for HMap<> instantiations.
  */
 template<typename key_t, typename value_t>
 struct map_helper {
@@ -93,7 +93,7 @@ public:
 		 */
 		typedef enum {
 			OK = 0,     /*!< No error. */
-			INVALID_KEY /*!< Dereferencing nono-existing key. */
+			INVALID_KEY /*!< Dereferencing non-existing key. */
 		} error_t;
 	};
 private:

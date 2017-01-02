@@ -88,7 +88,7 @@ public:
 	 *
 	 * \param available_ - amount of resource available for allocation.
 	 * \param free_ - amount of free resource.
-	 * \param total_ - total amount of reource.
+	 * \param total_ - total amount of resource.
 	 */
 	HResourceInfo( i64_t available_ = 0, i64_t free_ = 0, i64_t total_ = 0 )
 		: _available( available_ ), _free( free_ ), _total( total_) {}

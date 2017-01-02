@@ -262,7 +262,7 @@ void HSignalService::catch_signal( int sigNo_ ) {
 
 	/*
 	 * FreeBSD does not wake sigwait on signal with installed
-	 * default hadlers with IGNORE action.
+	 * default handlers with IGNORE action.
 	 * FreeBSD does not wake sigwait even if one specify IGNORED
 	 * signal as blocked.
 	 */
@@ -330,7 +330,7 @@ void HSignalService::call_handler( int sigNo_ ) {
 
 namespace {
 
-/* singnal handler definitions */
+/* signal handler definitions */
 
 int HBaseSignalHandlers::signal_INT ( int signum_ ) {
 	M_PROLOG
@@ -406,7 +406,7 @@ int HBaseSignalHandlers::signal_CONT( int signum_ ) {
 	M_PROLOG
 	catch_signal_low( SIGTSTP );
 	HString message;
-	message = "Process was resurected: ";
+	message = "Process was resurrected: ";
 	message += ::strsignal( signum_ );
 	message += '.';
 	log( LOG_LEVEL::INFO ) << message << endl;

@@ -187,7 +187,7 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ ) {
 	M_ENSURE( ( ! ::pipe( fileDesIn ) ) && ( ! ::pipe( fileDesOut ) ) && ( ! ::pipe( fileDesErr ) ) );
 	HChunk argv( chunk_size<char const*>( argv_.size() + 2 ) );
 	HLock stdinLock( cin.acquire() );
-	HLock sdtoutLock( cout.acquire() );
+	HLock stdoutLock( cout.acquire() );
 	HLock stderrLock( cerr.acquire() );
 	int const stdinFd( fileno( stdin ) );
 	int const stdoutFd( fileno( stdout ) );

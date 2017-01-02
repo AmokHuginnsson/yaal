@@ -125,7 +125,7 @@ struct OCompiler {
 		 */
 		int _terminatedAt;
 
-		/*! \brief Identificator of currently compiled statement.
+		/*! \brief Identifier of currently compiled statement.
 		 */
 		HStatement::statement_id_t _statementId;
 

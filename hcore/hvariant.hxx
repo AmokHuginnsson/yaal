@@ -42,7 +42,7 @@ namespace hcore {
 /*! \brief Multi type container.
  *
  * A variant type without non-empty guarantee.
- * Represent variable that can be used as one of staticaly declared types.
+ * Represent variable that can be used as one of statically declared types.
  *
  * \tparam t0_t, t1_t, ... t9_t - component types.
  */

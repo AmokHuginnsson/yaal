@@ -71,7 +71,7 @@ struct logical_xnor {
 	static bool const value = ( p && q ) || ( ! ( p || q ) );
 };
 
-/*! \brief Test if givent type is a signed type.
+/*! \brief Test if given type is a signed type.
  *
  * \tparam T - type to perform the test on.
  * \retval value - true iff T is a signed type.
@@ -145,7 +145,7 @@ struct to_bool {
 	static bool const value = integer ? true : false;
 };
 
-/*! \brief Staticaly determine maximum of a set.
+/*! \brief Statically determine maximum of a set.
  *
  * \tparam a0, a1, ..., a9 - list of integers to find maximum.
  * \retval value - maximum integer from given set.
@@ -191,7 +191,7 @@ template<int long a0, int long a1, int long a2, int long a3,
 	int long a20>
 int long const max<a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20>::value;
 
-/*! \brief Staticaly determine minimum of a set.
+/*! \brief Statically determine minimum of a set.
  *
  * \tparam a0, a1, ..., a9 - list of integers to find minimum.
  * \retval value - minimum integer from given set.
@@ -271,7 +271,7 @@ struct obinary<0> {
 };
 /*! \endcond */
 
-/*! \brief Compile time power finction calculator.
+/*! \brief Compile time power function calculator.
  *
  * \tparam base - base of power function.
  * \tparam exponent - exponent of power function.

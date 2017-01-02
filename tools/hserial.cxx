@@ -51,7 +51,7 @@ namespace yaal {
 namespace tools {
 
 namespace {
-	char const* const _eAlreadyOpened_ = _( "serial port already openend" );
+	char const* const _eAlreadyOpened_ = _( "serial port already opened" );
 	char const* const _eNotOpened_ = _( "serial port not opened" );
 	HSerial::flag_t drop = HSerial::flag_t::new_flag();
 }
@@ -272,8 +272,8 @@ void HSerial::compile_flags( void ) {
  */
 /*
  *   statement above is *FALSE*, I cannot use cfsetispeed and cfsetospeed,
- *   i *MUST* use it. On newer systes c_cflag and BAUDRATE simply does not work.
- *   Newwer interface for setting speed (baudrate)
+ *   i *MUST* use it. On newer systems c_cflag and BAUDRATE simply does not work.
+ *   Newer interface for setting speed (baudrate)
  */
 	tIO.c_cflag |= CSIZE | CREAD /* | CLOCAL */;
 	if ( !!( _flags & FLAG::FLOW_CONTROL_HARDWARE ) ) {

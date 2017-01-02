@@ -355,35 +355,35 @@ HHuginn::value_t HMatrix::scale_to( huginn::HThread*, HHuginn::value_t* object_,
 	if ( o->_data.type() == 0 ) {
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::NUMBER, true, position_ );
 		arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
-		HNumber extream;
+		HNumber extremum;
 		for ( int r( 0 ), rows( m.row() ), cols( m.col() ); r < rows; ++ r ) {
 			for ( int c( 0 ); c < cols; ++ c ) {
 				HNumber n( m[r][c] );
 				n.abs();
-				if ( n > extream ) {
-					extream = n;
+				if ( n > extremum ) {
+					extremum = n;
 				}
 			}
 		}
-		if ( extream == number::N0 ) {
+		if ( extremum == number::N0 ) {
 			throw HHuginn::HHuginnRuntimeException( "Zeroed matrix cannot be scaled.", position_ );
 		}
-		m *= get_number( values_[0] ) / extream;
+		m *= get_number( values_[0] ) / extremum;
 	} else {
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::REAL, true, position_ );
 		floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
-		double long extream( 0.L );
+		double long extremum( 0.L );
 		for ( int r( 0 ), rows( m.row() ), cols( m.col() ); r < rows; ++ r ) {
 			for ( int c( 0 ); c < cols; ++ c ) {
-				if ( abs( m[r][c] ) > extream ) {
-					extream = abs( m[r][c] );
+				if ( abs( m[r][c] ) > extremum ) {
+					extremum = abs( m[r][c] );
 				}
 			}
 		}
-		if ( extream == 0.L ) {
+		if ( extremum == 0.L ) {
 			throw HHuginn::HHuginnRuntimeException( "Zeroed matrix cannot be scaled.", position_ );
 		}
-		m *= get_real( values_[0] ) / extream;
+		m *= get_real( values_[0] ) / extremum;
 	}
 	return ( *object_ );
 	M_EPILOG

@@ -273,7 +273,7 @@ public:
 	 * \return True iff this string is empty.
 	 */
 	bool operator ! ( void ) const;
-	/*! \brief Set givent character at given position.
+	/*! \brief Set given character at given position.
 	 *
 	 * \param position - index of a position where given character shall be set.
 	 * \param character - character to be set at given position.
@@ -528,7 +528,7 @@ public:
 	/*! \brief Replace range in this string with supplied string.
 	 *
 	 * \param first_ - where replaced range starts.
-	 * \param last_ - whare replaced range ends.
+	 * \param last_ - where replaced range ends.
 	 * \param replacement - replacement for given part.
 	 * \return Self.
 	 */

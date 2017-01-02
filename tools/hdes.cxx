@@ -77,8 +77,8 @@ void HDes::generate_keys( u8_t const* password_, int len_ ) {
 		iKeyHigh[ i ] = password_[ i % len_ ];
 		iKeyLow[ i ] = password_[ ( i + DES::BLOCK_SIZE ) % len_ ];
 	}
-	permutate( iKeyHigh, _keyPermutation_, 56 );
-	permutate( iKeyLow, _keyPermutation_, 56 );
+	permute( iKeyHigh, _keyPermutation_, 56 );
+	permute( iKeyLow, _keyPermutation_, 56 );
 	HBitmap hi;
 	HBitmap low;
 	hi.use( iKeyHigh, 2 * DES::HALF_KEY_SIZE );
@@ -90,12 +90,12 @@ void HDes::generate_keys( u8_t const* password_, int len_ ) {
 		low.rotate_left( 28, 28, _countOfMoves_[ key ] );
 		for ( int i( 0 ); i < DES::BLOCK_SIZE; ++ i )
 			tmpKey[ i ] = iKeyHigh[ i ];
-		permutate( tmpKey, _permutationOfCompression_, 48 );
+		permute( tmpKey, _permutationOfCompression_, 48 );
 		for ( int i( 0 ); i < 6; ++ i )
 			reinterpret_cast<u8_t*>( _IKeys[ 0 ][ key ] )[ i ] = tmpKey[ i ];
 		for ( int i( 0 ); i < DES::BLOCK_SIZE; ++ i )
 			tmpKey[ i ] = iKeyLow[ i ];
-		permutate( tmpKey, _permutationOfCompression_, 48 );
+		permute( tmpKey, _permutationOfCompression_, 48 );
 		for ( int i( 0 ); i < 6; ++ i )
 			reinterpret_cast<u8_t*>( _IKeys[ 1 ][ key ] )[ i ] = tmpKey[ i ];
 	}
@@ -124,11 +124,11 @@ void HDes::crypt( u8_t* buffer_, int long size_, action_t const& action_ ) {
 }
 
 void HDes::_3des( u32_t* block_, int action_ ) {
-	permutate( reinterpret_cast<u8_t*>( block_ ), _beginningPermutation_, 64 );
+	permute( reinterpret_cast<u8_t*>( block_ ), _beginningPermutation_, 64 );
 	_des( block_, action_, 0 );
 	_des( block_, 1 - action_, 1 );
 	_des( block_, action_, 0 );
-	permutate( reinterpret_cast<u8_t*>( block_ ), _endingPermutation_, 64 );
+	permute( reinterpret_cast<u8_t*>( block_ ), _endingPermutation_, 64 );
 	return;
 }
 
@@ -154,7 +154,7 @@ void HDes::_des( u32_t* block_, int action_, int part_ ) {
 			endKey = _IKeys[ part_ ][ cycle ];
 		else
 			endKey = _IKeys[ part_ ][ 15 - cycle ];
-		permutate( reinterpret_cast<u8_t*>( bufT ), _permutationOfExpanding_, 48 );
+		permute( reinterpret_cast<u8_t*>( bufT ), _permutationOfExpanding_, 48 );
 		bufT[ 0 ] = bufT[ 0 ] ^ endKey[ 0 ];
 		reinterpret_cast<u16_t*>( bufT )[ 2 ] = static_cast<u16_t>( reinterpret_cast<u16_t*>( bufT )[ 2 ]
 				^ reinterpret_cast<u16_t*>( endKey )[ 2 ] );
@@ -171,7 +171,7 @@ void HDes::_des( u32_t* block_, int action_, int part_ ) {
 			reinterpret_cast<u8_t*>( buf )[ ctr >> 1 ] = static_cast<u8_t>( reinterpret_cast<u8_t*>( buf )[ ctr >> 1 ] | mask );
 			/* FIXME g++ 4.3 bug *///buf[ ctr >> 1 ] |= mask;
 		}
-		permutate( reinterpret_cast<u8_t*>( buf ), _pBlockPermutation_, 32 );
+		permute( reinterpret_cast<u8_t*>( buf ), _pBlockPermutation_, 32 );
 		bufT[ 0 ] = buf[ 0 ] ^ bufL[ 0 ];
 		bufL[ 0 ] = bufR[ 0 ];
 		bufR[ 0 ] = bufT[ 0 ];
@@ -181,7 +181,7 @@ void HDes::_des( u32_t* block_, int action_, int part_ ) {
 	return;
 }
 
-void HDes::permutate( u8_t* buffer_, const u8_t* tab_, int len_ ) const {
+void HDes::permute( u8_t* buffer_, const u8_t* tab_, int len_ ) const {
 	int ctr = 0;
 	u8_t bufTmp[ DES::BLOCK_SIZE ];
 	::memset( bufTmp, 0, DES::BLOCK_SIZE );

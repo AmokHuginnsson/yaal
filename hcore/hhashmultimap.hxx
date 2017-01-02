@@ -40,7 +40,7 @@ namespace yaal {
 
 namespace hcore {
 
-/*! \brief HHashContainer util, a helper for HHashMultiMap<> instatiations.
+/*! \brief HHashContainer util, a helper for HHashMultiMap<> instantiations.
  */
 template<typename key_t, typename value_t>
 struct hashmultimap_helper {
