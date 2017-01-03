@@ -246,28 +246,33 @@ AC_MSG_RESULT([$RESULT])
 AC_MSG_CHECKING([whether strftime() returns required buffer size])
 RESULT=["no"]
 AC_RUN_IFELSE([AC_LANG_SOURCE([[#include <ctime>
-int main( int, char const** )
-	{
+#include <unistd.h>
+#include <sys/wait.h>
+int main( int, char const** ) {
 	time_t t( time( NULL ) );
 	struct tm broken;
 	localtime_r( &t, &broken );
-	int size( strftime( NULL, 1024, "%Y-%m-%d %T", &broken ) );
-	return ( ! size );
-	}]])], [AC_DEFINE([HAVE_SMART_STRFTIME],[],[Can your strftime calculate output length?])] [RESULT=["yes"]])
+	pid_t pid( fork() );
+	if ( ! pid ) {
+		return ( strftime( NULL, 1024, "%Y-%m-%d %T", &broken ) );
+	}
+	int status( 0 );
+	waitpid( pid, &status, 0 );
+	return ( WIFEXITED( status ) ? WEXITSTATUS( status ) - 19 : 1 );
+}]])], [AC_DEFINE([HAVE_SMART_STRFTIME],[],[Can your strftime calculate output length?])] [RESULT=["yes"]])
 AC_MSG_RESULT([$RESULT])
 
 AC_MSG_CHECKING([whether contents of input buffer for iconv() is const])
 RESULT=["no"]
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <iconv.h>
-int main( int, char const** )
-	{
+int main( int, char const** ) {
 	iconv_t conv( 0 );
 	size_t size( 0 );
 	char const* in( NULL );
 	char* out( NULL );
 	iconv( conv, &in, &size, &out, &size );
 	return ( 0 );
-	}]])], [AC_DEFINE([HAVE_ICONV_INPUT_CONST],[],[Is your iconv() input args const?])] RESULT=["yes"])
+}]])], [AC_DEFINE([HAVE_ICONV_INPUT_CONST],[],[Is your iconv() input args const?])] RESULT=["yes"])
 AC_MSG_RESULT([$RESULT])
 
 AC_MSG_CHECKING([whether basename is declared in cstring])

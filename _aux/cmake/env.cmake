@@ -19,12 +19,26 @@ endif ( NOT CMAKE_HOST_WIN32 )
 # Does strftime support getting required buffer lenght?
 
 check_cxx_source_compiles( "#include <ctime>
-int main( int, char const* const* ) {
-	time_t t( time( nullptr ) );
+#ifndef _MSC_VER
+#include <unistd.h>
+#include <sys/wait.h>
+#endif
+int main( int, char const** ) {
+	time_t t( time( NULL ) );
 	struct tm broken;
 	localtime_r( &t, &broken );
+#ifndef _MSC_VER
+	pid_t pid( fork() );
+	if ( ! pid ) {
+		return ( strftime( NULL, 1024, \"%Y-%m-%d %T\", &broken ) );
+	}
+	int status( 0 );
+	waitpid( pid, &status, 0 );
+	return ( WIFEXITED( status ) ? WEXITSTATUS( status ) - 19 : 1 );
+#else
 	int size( strftime( nullptr, 1024, \"%Y-%m-%d %T\", &broken ) );
-	return ( ! size );
+	return ( size - 19 );
+#endif
 }" HAVE_SMART_STRFTIME )
 
 # Is iconv()'s source buffer a pointer to const type?
