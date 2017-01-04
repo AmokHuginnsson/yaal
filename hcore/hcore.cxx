@@ -188,7 +188,7 @@ void init_locale( char const* package_ ) {
 
 namespace {
 #pragma GCC diagnostic ignored "-Wold-style-cast"
-static int long const FWD_RLIM_INFINITY = static_cast<int long>( RLIM_INFINITY );
+static i64_t const FWD_RLIM_INFINITY = static_cast<i64_t>( RLIM_INFINITY );
 #pragma GCC diagnostic error "-Wold-style-cast"
 }
 
@@ -202,7 +202,7 @@ void ensure_limit( int resource_, char const* message_, bool autoSanity_ ) {
 		::perror( SYSCALL_FAILURE );
 		::exit( 1 );
 	}
-	if ( static_cast<int long>( rl.rlim_cur ) == static_cast<int long>( FWD_RLIM_INFINITY ) ) {
+	if ( static_cast<i64_t>( rl.rlim_cur ) == FWD_RLIM_INFINITY ) {
 		if ( autoSanity_ ) {
 #ifndef __HOST_OS_TYPE_CYGWIN__
 			system::HResourceInfo mem( system::get_memory_size_info() );
