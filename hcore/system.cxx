@@ -32,6 +32,9 @@ Copyright:
 #include <grp.h>
 #include <sys/statvfs.h>
 #include <sys/resource.h>
+#ifdef __HOST_OS_TYPE_CYGWIN__
+#include <ctime> /* nanosleep */
+#endif /* #ifdef __HOST_OS_TYPE_CYGWIN__ */
 
 #include "config.hxx"
 
@@ -72,7 +75,17 @@ int getpid( void ) {
 }
 
 int kill( int pid_, int signal_ ) {
-	return ( ::kill( pid_, signal_ ) );
+	int result( ::kill( pid_, signal_ ) );
+#ifdef __HOST_OS_TYPE_CYGWIN__
+	/* Work around for buggy child process handling in Cygwin. */
+	int retriesLeft( 32 );
+	while ( ( retriesLeft -- > 0 ) && ( result == -1 ) && ( errno == ESRCH ) ) {
+		timespec ts{ 0, 1000 * 1000 }; /* sleep for 1 millisecond */
+		::nanosleep( &ts, nullptr );
+		result = ::kill( pid_, signal_ );
+	}
+#endif /* #ifdef __HOST_OS_TYPE_CYGWIN__ */
+	return ( result );
 }
 
 namespace {

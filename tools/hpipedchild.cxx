@@ -122,10 +122,6 @@ HPipedChild::STATUS HPipedChild::finish( int finishIn_ ) {
 	if ( _pid > 0 ) {
 		int status( 0 );
 		int pid( 0 );
-#ifdef __HOST_OS_TYPE_CYGWIN__
-		/* Work around for buggy child process handling in Cygwin. */
-		sleep_for( duration( 16, time::UNIT::MILLISECOND ), true );
-#endif /* #ifdef __HOST_OS_TYPE_CYGWIN__ */
 		if ( finishIn_ > 0 ) {
 			HClock clock;
 			int elapsed( 0 );
