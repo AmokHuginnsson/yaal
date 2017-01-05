@@ -107,6 +107,26 @@ inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHug
 	M_EPILOG
 }
 
+inline HHuginn::value_t update( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "order.update";
+	verify_arg_count( name, values_, 1, 1, position_ );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::ORDER );
+	verify_arg_type( name, values_, 0, HHuginn::TYPE::ORDER, true, position_ );
+	HHuginn::HOrder& l( *static_cast<HHuginn::HOrder*>( object_->raw() ) );
+	HHuginn::HOrder const& r( *static_cast<HHuginn::HOrder const*>( values_[0].raw() ) );
+	if ( r.key_type()->type_id() != HHuginn::TYPE::NONE ) {
+		l.verify_key_type( r.key_type(), position_ );
+	}
+	HHuginn::HOrder::values_t& lv( l.value() );
+	HHuginn::HOrder::values_t const& rv( r.value() );
+	for ( HHuginn::HOrder::values_t::const_iterator it( rv.begin() ), end( rv.end() ); it != end; ++ it ) {
+		lv.insert( *it );
+	}
+	return ( *object_ );
+	M_EPILOG
+}
+
 inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "order.equals";
@@ -133,11 +153,12 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 			runtime_->identifier_id( type_name( HHuginn::TYPE::ORDER ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "add",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::add, _1, _2, _3, _4 ) ), "( *elem* ) - add given element *elem* to an `order`" },
+				{ "add",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::add, _1, _2, _3, _4 ) ),     "( *elem* ) - add given element *elem* to an `order`" },
 				{ "has_key", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::has_key, _1, _2, _3, _4 ) ), "( *elem* ) - tell if given element *elem* is in the `order`" },
-				{ "erase",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::erase, _1, _2, _3, _4 ) ), "( *elem* ) - remove given element *elem* from the `order`" },
-				{ "clear",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::clear, _1, _2, _3, _4 ) ), "erase `order`'s content, `order` becomes empty" },
-				{ "equals",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::equals, _1, _2, _3, _4 ) ), "( *other* ) - test if *other* `order` has the same content" }
+				{ "erase",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::erase, _1, _2, _3, _4 ) ),   "( *elem* ) - remove given element *elem* from the `order`" },
+				{ "clear",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::clear, _1, _2, _3, _4 ) ),   "erase `order`'s content, `order` becomes empty" },
+				{ "update",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `order` with values from *other* `order`" },
+				{ "equals",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `order` has the same content" }
 			},
 			"The `order` is a collection of sorted values of uniform types. It supports operations of addition, search and element removal."
 		)
@@ -172,12 +193,12 @@ int long HHuginn::HOrder::do_size( void ) const {
 	return ( _data.get_size() );
 }
 
-void HHuginn::HOrder::verify_key_type( HHuginn::HHuginn::HClass const* typeId_, int position_ ) const {
-	if ( ( _keyType->type_id() != TYPE::NONE ) && ( typeId_ != _keyType ) ) {
-		throw HHuginnRuntimeException( "Non-uniform key types.", position_ );
+void HHuginn::HOrder::verify_key_type( HHuginn::HHuginn::HClass const* keyType_, int position_ ) const {
+	if ( ( _keyType->type_id() != TYPE::NONE ) && ( keyType_ != _keyType ) ) {
+		throw HHuginnRuntimeException( "Non-uniform key types, got "_ys.append( a_type_name( keyType_ ) ).append( " instead of " ).append( a_type_name( _keyType ) ).append( "." ), position_ );
 	}
-	if ( ! OCompiler::is_comparable( typeId_->type_id() ) ) {
-		throw HHuginnRuntimeException( "Key type `"_ys.append( typeId_->name() ).append( "' is not a comparable." ), position_ );
+	if ( ! OCompiler::is_comparable( keyType_->type_id() ) ) {
+		throw HHuginnRuntimeException( "Key type `"_ys.append( keyType_->name() ).append( "' is not a comparable." ), position_ );
 	}
 	return;
 }
@@ -204,6 +225,10 @@ void HHuginn::HOrder::insert( HHuginn::value_t const& value_, int position_ ) {
 	_keyType = value_->get_class();
 	return;
 	M_EPILOG
+}
+
+HHuginn::HClass const* HHuginn::HOrder::key_type( void ) const {
+	return ( _keyType );
 }
 
 HHuginn::HIterable::HIterator HHuginn::HOrder::do_iterator( huginn::HThread*, int ) {

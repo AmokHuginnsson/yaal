@@ -816,17 +816,18 @@ public:
 	bool has_key( HHuginn::value_t const&, int ) const;
 	bool try_get( HHuginn::value_t const& key_, HHuginn::value_t& result_, int position_ );
 	void erase( HHuginn::value_t const&, int );
+	HHuginn::HClass const* key_type( void ) const;
 	values_t const& value( void ) const {
 		return ( _data );
 	}
 	values_t& value( void ) {
 		return ( _data );
 	}
+	void verify_key_type( HHuginn::HClass const*, int ) const;
 protected:
 	virtual HIterator do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( void ) const override;
 private:
-	void verify_key_type( HHuginn::HClass const*, int ) const;
 	HDict( HDict const& ) = delete;
 	HDict& operator = ( HDict const& ) = delete;
 private:
@@ -848,17 +849,18 @@ public:
 	void insert( HHuginn::value_t const&, int );
 	bool has_key( HHuginn::value_t const&, int ) const;
 	void erase( HHuginn::value_t const&, int );
+	HHuginn::HClass const* key_type( void ) const;
 	values_t const& value( void ) const {
 		return ( _data );
 	}
 	values_t& value( void ) {
 		return ( _data );
 	}
+	void verify_key_type( HHuginn::HClass const*, int ) const;
 protected:
 	virtual HIterator do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( void ) const override;
 private:
-	void verify_key_type( HHuginn::HClass const*, int ) const;
 	HOrder( HOrder const& ) = delete;
 	HOrder& operator = ( HOrder const& ) = delete;
 private:

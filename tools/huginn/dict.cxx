@@ -116,6 +116,26 @@ inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHug
 	M_EPILOG
 }
 
+inline HHuginn::value_t update( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "dict.update";
+	verify_arg_count( name, values_, 1, 1, position_ );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DICT );
+	verify_arg_type( name, values_, 0, HHuginn::TYPE::DICT, true, position_ );
+	HHuginn::HDict& l( *static_cast<HHuginn::HDict*>( object_->raw() ) );
+	HHuginn::HDict const& r( *static_cast<HHuginn::HDict const*>( values_[0].raw() ) );
+	if ( r.key_type()->type_id() != HHuginn::TYPE::NONE ) {
+		l.verify_key_type( r.key_type(), position_ );
+	}
+	HHuginn::HDict::values_t& lv( l.value() );
+	HHuginn::HDict::values_t const& rv( r.value() );
+	for ( HHuginn::HDict::values_t::const_iterator it( rv.begin() ), end( rv.end() ); it != end; ++ it ) {
+		lv.insert( *it );
+	}
+	return ( *object_ );
+	M_EPILOG
+}
+
 inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "dict.equals";
@@ -146,6 +166,7 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 				{ "get",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::get, _1, _2, _3, _4 ) ),     "( *key*, *default* ) - get value for given *key* from this `dict`, or *default* if given *key* is not present in the `dict`" },
 				{ "erase",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::erase, _1, _2, _3, _4 ) ),   "( *key* ) - remove given *key* from this `dict`" },
 				{ "clear",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::clear, _1, _2, _3, _4 ) ),   "erase `dict`'s content, `dict` becomes empty" },
+				{ "update",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `dict` with key/value pairs from *other* `dict`" },
 				{ "equals",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `dict` has the same content" }
 			},
 			"The `dict` is a collection providing a sorted key to value map. It supports operations of iteration, key-value insertion, key removal and key search. The keys stored in given `dict` instance must be of uniform type."
@@ -183,7 +204,7 @@ int long HHuginn::HDict::do_size( void ) const {
 
 void HHuginn::HDict::verify_key_type( HHuginn::HClass const* keyType_, int position_ ) const {
 	if ( ( _keyType->type_id() != TYPE::NONE ) && ( keyType_ != _keyType ) ) {
-		throw HHuginnRuntimeException( "Non-uniform key types.", position_ );
+		throw HHuginnRuntimeException( "Non-uniform key types, got "_ys.append( a_type_name( keyType_ ) ).append( " instead of " ).append( a_type_name( _keyType ) ).append( "." ), position_ );
 	}
 	if ( ! OCompiler::is_comparable( keyType_->type_id() ) ) {
 		throw HHuginnRuntimeException( "Key type `"_ys.append( keyType_->name() ).append( "' is not a comparable." ), position_ );
@@ -245,6 +266,10 @@ void HHuginn::HDict::insert( HHuginn::value_t const& key_, HHuginn::value_t cons
 	_keyType = key_->get_class();
 	return;
 	M_EPILOG
+}
+
+HHuginn::HClass const* HHuginn::HDict::key_type( void ) const {
+	return ( _keyType );
 }
 
 HHuginn::HIterable::HIterator HHuginn::HDict::do_iterator( huginn::HThread*, int ) {

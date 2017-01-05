@@ -116,6 +116,21 @@ inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHug
 	M_EPILOG
 }
 
+inline HHuginn::value_t update( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "lookup.update";
+	verify_arg_count( name, values_, 1, 1, position_ );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LOOKUP );
+	verify_arg_type( name, values_, 0, HHuginn::TYPE::LOOKUP, true, position_ );
+	HHuginn::HLookup::values_t& l( static_cast<HHuginn::HLookup*>( object_->raw() )->value() );
+	HHuginn::HLookup::values_t const& r( static_cast<HHuginn::HLookup const*>( values_[0].raw() )->value() );
+	for ( HHuginn::HLookup::values_t::const_iterator it( r.begin() ), end( r.end() ); it != end; ++ it ) {
+		l.insert( *it );
+	}
+	return ( *object_ );
+	M_EPILOG
+}
+
 inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "lookup.equals";
@@ -146,6 +161,7 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 				{ "get",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &lookup::get, _1, _2, _3, _4 ) ),     "( *key*, *default* ) - get value for given *key* from this `lookup`, or *default* if given *key* is not present in the `lookup`" },
 				{ "erase",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &lookup::erase, _1, _2, _3, _4 ) ),   "( *key* ) - remove given *key* from this `lookup`" },
 				{ "clear",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &lookup::clear, _1, _2, _3, _4 ) ),   "erase `lookup`'s content, `lookup` becomes empty" },
+				{ "update",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &lookup::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `lookup` with key/value pairs from *other* `lookup`" },
 				{ "equals",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &lookup::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `lookup` has the same content" }
 			},
 			"The `lookup` is a collection providing a sorted key to value map. It supports operations of iteration, key-value insertion, key removal and key search."
