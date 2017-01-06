@@ -126,7 +126,7 @@ HPipedChild::STATUS HPipedChild::finish( int finishIn_ ) {
 			HClock clock;
 			int elapsed( 0 );
 			while ( ( pid != _pid ) && ( ( elapsed = static_cast<int>( clock.get_time_elapsed( time::UNIT::SECOND ) ) ) < finishIn_ ) ) {
-				HAlarm alarm( time::in_units<time::UNIT::MILLISECOND>( time::duration( finishIn_ - elapsed, time::UNIT::SECOND ) ) );
+				HAlarm alarm( static_cast<int>( time::in_units<time::UNIT::MILLISECOND>( time::duration( finishIn_ - elapsed, time::UNIT::SECOND ) ) ) );
 				M_ENSURE( ( ( pid = ::waitpid( _pid, &status, WUNTRACED | WCONTINUED ) ) != -1 ) || ( errno == EINTR ) );
 			}
 		} else {
