@@ -124,26 +124,35 @@ int connect( int fd_, struct sockaddr* addr_, socklen_t len_ ) {
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
-	if ( addr_->sa_family == PF_UNIX ) {
-		char const* path( addr_->sa_data + 2 );
-		string n( "\\\\.\\pipe" );
-		n += path;
-		std::replace( n.begin(), n.end(), '/', '\\' );
-		HANDLE h( ::CreateFile( n.c_str(), ( GENERIC_READ | GENERIC_WRITE ) & ( ~SYNCHRONIZE ), 0, nullptr, OPEN_EXISTING, FILE_FLAG_OVERLAPPED | FILE_FLAG_NO_BUFFERING, 0 ) );
-		if ( h == INVALID_HANDLE_VALUE ) {
-			log_windows_error( "CreateNamedPipe" );
-			ret = -1;
-		} else
-			io.set_handle( h );
-	} else {
-		M_ASSERT( ( io.type() == IO::TYPE::SOCKET ) || ( io.type() == IO::TYPE::SOCKET_DGRAM ) );
-		SOCKET s( reinterpret_cast<SOCKET>( io.handle() ) );
-		ret = ::connect( s, const_cast<sockaddr const*>( addr_ ), static_cast<int>( len_ ) );
-		if ( WSAEventSelect( s, io.event(), FD_ACCEPT | FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE | FD_OOB ) )
-			log_windows_error( "WSAEventSelect" );
+	do {
+		if ( addr_->sa_family == PF_UNIX ) {
+			char const* path( addr_->sa_data + 2 );
+			string n( "\\\\.\\pipe" );
+			n += path;
+			std::replace( n.begin(), n.end(), '/', '\\' );
+			HANDLE h( ::CreateFile( n.c_str(), ( GENERIC_READ | GENERIC_WRITE ) & ( ~SYNCHRONIZE ), 0, nullptr, OPEN_EXISTING, FILE_FLAG_OVERLAPPED | FILE_FLAG_NO_BUFFERING, 0 ) );
+			if ( h == INVALID_HANDLE_VALUE ) {
+				log_windows_error( "CreateNamedPipe" );
+				ret = -1;
+			} else {
+				io.set_handle( h );
+			}
+		} else {
+			M_ASSERT( ( io.type() == IO::TYPE::SOCKET ) || ( io.type() == IO::TYPE::SOCKET_DGRAM ) );
+			SOCKET s( reinterpret_cast<SOCKET>( io.handle() ) );
+			ret = ::connect( s, const_cast<sockaddr const*>( addr_ ), static_cast<int>( len_ ) );
+			if ( ret != 0 ) {
+				break;
+			}
+			if ( ::WSAEventSelect( s, io.event(), FD_ACCEPT | FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE | FD_OOB ) ) {
+				log_windows_error( "WSAEventSelect" );
+				ret = -1;
+			}
+		}
+	} while ( false );
+	if ( ! ret ) {
+		ret = io.connect();
 	}
-	if ( ! ret )
-	 ret = io.connect();
 	return ( ret );
 }
 

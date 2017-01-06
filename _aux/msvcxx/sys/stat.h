@@ -52,6 +52,18 @@ constexpr bool S_ISSOCK( mode_t mode_ ) {
 	return ( is_file_type( mode_, TYPE_SOCK ) );
 }
 
+constexpr bool S_ISFIFO( mode_t mode_ ) {
+	return ( is_file_type( mode_, TYPE_FIFO ) );
+}
+
+constexpr bool S_ISBLK( mode_t mode_ ) {
+	return ( is_file_type( mode_, TYPE_BLK ) );
+}
+
+constexpr bool S_ISCHR( mode_t mode_ ) {
+	return ( is_file_type( mode_, TYPE_CHR ) );
+}
+
 namespace msvcxx {
 struct unix_stat : public stat {};
 int unix_stat( char const*, struct stat* );

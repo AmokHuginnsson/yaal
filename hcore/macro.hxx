@@ -241,7 +241,8 @@ Copyright:
 #define M_ENSURE( ... ) M_MACRO_ARGC( M_ENSURE_, __VA_ARGS__ )
 #define M_ENSURE_1( condition ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<this_type>( __FILE__, __LINE__, __PRETTY_FUNCTION__, error_message( errno ), errno ); } } while ( 0 )
 #define M_ENSURE_2( condition, comment ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<this_type>( __FILE__, __LINE__, __PRETTY_FUNCTION__, error_message( errno ), errno, comment ); } } while ( 0 )
-#define M_ENSURE_T( condition, type ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<type2>( __FILE__, __LINE__, __PRETTY_FUNCTION__, error_message( errno ), errno ); } } while ( 0 )
+#define M_ENSURE_3( condition, comment, errNo ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<this_type>( __FILE__, __LINE__, __PRETTY_FUNCTION__, error_message( errNo ), errNo, comment ); } } while ( 0 )
+#define M_ENSURE_T( condition, type ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<type>( __FILE__, __LINE__, __PRETTY_FUNCTION__, error_message( errno ), errno ); } } while ( 0 )
 #ifndef NDEBUG
 /*! \brief Run-time assertion tester.
  *

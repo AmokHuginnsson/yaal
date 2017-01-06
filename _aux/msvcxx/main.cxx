@@ -44,6 +44,11 @@ int ESCDELAY = 0;
 static int const MAX_SYMBOL_NAME_LEN( 2048 );
 namespace {
 SystemIO const& _systemIOInit_( SystemIO::get_instance() );
+namespace limits {
+rlimit _data_{ RLIM_INFINITY, RLIM_INFINITY };
+rlimit _stack_{ RLIM_INFINITY, RLIM_INFINITY };
+rlimit _nofile_{ RLIM_INFINITY, RLIM_INFINITY };
+}
 }
 
 namespace abi {
@@ -421,13 +426,36 @@ int getrusage( rusage_who_t who_, struct rusage* usage_ ) {
 	return ( err );
 }
 
-int getrlimit( rlimit_resource_t, struct rlimit* ) {
+int getrlimit( rlimit_resource_t limType_, struct rlimit* rl_ ) {
 	errno = ENOSYS;
+	rl_->rlim_cur = rl_->rlim_max = RLIM_INFINITY;
+	switch ( limType_ ) {
+		case ( RLIMIT_DATA ): {
+			*rl_ = limits::_data_;
+		} break;
+		case ( RLIMIT_STACK ): {
+			*rl_ = limits::_stack_;
+		} break;
+		case ( RLIMIT_NOFILE ): {
+			*rl_ = limits::_nofile_;
+		} break;
+	}
 	return ( 0 );
 }
 
-int setrlimit( rlimit_resource_t, struct rlimit const* ) {
+int setrlimit( rlimit_resource_t limType_, struct rlimit const* rl_ ) {
 	errno = ENOSYS;
+	switch ( limType_ ) {
+		case ( RLIMIT_DATA ): {
+			limits::_data_ = *rl_;
+		} break;
+		case ( RLIMIT_STACK ): {
+			limits::_stack_ = *rl_;
+		} break;
+		case ( RLIMIT_NOFILE ): {
+			limits::_nofile_ = *rl_;
+		} break;
+	}
 	return ( 0 );
 }
 
