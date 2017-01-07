@@ -19,17 +19,25 @@ namespace msvcxx {
 static int const IO_BUFFER_SIZE( 256 );
 
 IO::IO( TYPE::type_t t_, HANDLE h_, HANDLE e_, std::string const& p_ )
-: _type( t_ ), _handle( h_ ), _overlapped(),
-	_readRequest( 0 ), _inBuffer( 0 ), _buffer( IO_BUFFER_SIZE ),
-	_connected( ( t_ == TYPE::TERMINAL ) || ( t_ == TYPE::PIPE ) ),
-	_scheduled( false ), _ready( false ), _nonBlocking( false ), _path( p_ ) {
+	: _type( t_ )
+	, _handle( h_ )
+	, _overlapped()
+	, _readRequest( 0 )
+	, _inBuffer( 0 )
+	, _buffer( IO_BUFFER_SIZE )
+	, _connected( ( t_ == TYPE::TERMINAL ) || ( t_ == TYPE::PIPE ) )
+	, _scheduled( false )
+	, _ready( false )
+	, _nonBlocking( false )
+	, _path( p_ ) {
 	_overlapped.hEvent = e_ ? e_ : ::CreateEvent( nullptr, true, false, nullptr );
 }
 
 IO::~IO( void ) {
 	M_PROLOG
-	if ( _overlapped.hEvent )
+	if ( _overlapped.hEvent ) {
 		::CloseHandle( _overlapped.hEvent );
+	}
 	M_DESTRUCTOR_EPILOG
 }
 
@@ -38,8 +46,9 @@ void IO::schedule_read( void ) {
 		DWORD nRead( 0 );
 		if ( _connected && ! _scheduled && ( _readRequest == 0 ) ) {
 			BOOL status( ::ReadFile( _handle, _buffer.raw(), _readRequest = 1, &nRead, &_overlapped ) );
-			if ( status && ( nRead == 1 ) )
+			if ( status && ( nRead == 1 ) ) {
 				_ready = true;
+			}
 		}
 		_scheduled = ! _ready;
 	}
@@ -60,8 +69,9 @@ void IO::sync( void ) {
 				} else {
 					_ready = true;
 				}
-			} else
+			} else {
 				_connected = _ready = true;
+			}
 			_scheduled = false;
 		}
 	}
@@ -77,12 +87,14 @@ int long IO::read( void* buf_, int long size_ ) {
 			nRead = std::min<int>( _inBuffer, static_cast<int>( size_ ) );
 			::memcpy( buf_, _buffer.raw(), nRead );
 			_inBuffer -= nRead;
-			if ( _inBuffer > 0 )
+			if ( _inBuffer > 0 ) {
 				::memmove( _buffer.raw(), _buffer.get<char>() + nRead, _inBuffer );
+			}
 		} else {
 			int off( 0 );
-			if ( _scheduled && ! _ready )
+			if ( _scheduled && ! _ready ) {
 				sync();
+			}
 			bool ok( false );
 			if ( _ready ) {
 				_ready = false;
@@ -95,12 +107,17 @@ int long IO::read( void* buf_, int long size_ ) {
 			if ( size_ > 0 ) {
 				DWORD iRead( 0 );
 				if ( _readRequest == 0 ) { /* No pending read operation. */
-					if ( _buffer.get_size() < ( size_ + off ) )
+					if ( _buffer.get_size() < ( size_ + off ) ) {
 						_buffer.realloc( size_ + off );
+					}
 					ok = ::ReadFile( _handle, _buffer.get<char>() + off, _readRequest = size_, &iRead, &_overlapped ) ?
 true : false;
 				}
-				if ( ! ok || ( _readRequest > 0 ) || ( ! _nonBlocking ) ) { /* Previous read operation still pending. */
+				DWORD errCode( ::GetLastError() );
+				if (
+						( ! ok && ( ( errCode == ERROR_IO_PENDING ) || ( errCode == ERROR_IO_INCOMPLETE ) ) )
+						|| ( ok && ( ( _readRequest > 0 ) || ( ! _nonBlocking )	) )
+				) { /* Previous read operation still pending. */
 					ok = ::GetOverlappedResult( _handle, &_overlapped, &iRead, ! _nonBlocking ) ? true : false;
 				}
 				if ( ok ) { /* We got all data from requested read. */
@@ -110,16 +127,18 @@ true : false;
 					if ( _inBuffer > 0 ) {
 						::memmove( _buffer.raw(), _buffer.get<char>() + iRead, _inBuffer );
 						_readRequest = 0;
-					} else
+					} else {
 						_readRequest -= iRead;
+					}
 				} else {
 					/* Read still pending, handle errors. */
-					DWORD errCode( ::GetLastError() );
+					errCode = ::GetLastError();
 					if ( ( errCode == ERROR_IO_PENDING ) || ( errCode == ERROR_IO_INCOMPLETE ) ) {
-						if ( off > 0 )
+						if ( off > 0 ) {
 							ok = true;
-						else
+						} else {
 							get_socket_errno() = EAGAIN;
+						}
 					} else if ( errCode == ERROR_HANDLE_EOF ) {
 						ok = true;
 						iRead = 0;
@@ -128,8 +147,9 @@ true : false;
 					}
 				}
 				nRead = ok ? iRead + off : -1;
-			} else
+			} else {
 				nRead = ok ? off : -1;
+			}
 		}
 	}
 	return ( nRead );
@@ -142,10 +162,12 @@ int long IO::write( void const* buf_, int long size_ ) {
 	if ( ! ok ) {
 		if ( ::GetLastError() == ERROR_IO_PENDING ) {
 			ok = ::GetOverlappedResult( _handle, &_overlapped, &iWritten, true ) ? true : false;
-			if ( ! ok )
+			if ( ! ok ) {
 				log_windows_error( "GetOverlappedResult(write)" );
-		} else
+			}
+		} else {
 			log_windows_error( "GetOverlappedResult(WriteFile)" );
+		}
 	}
 	return ( ok ? iWritten : -1 );
 }
@@ -154,11 +176,11 @@ int IO::close( void ) {
 	int ret( 0 );
 	_connected = false;
 	if ( reinterpret_cast<SOCKET>( _handle ) != -1 ) {
-		if ( ( _type == IO::TYPE::PIPE ) || ( _type == IO::TYPE::NAMED_PIPE ) )
+		if ( ( _type == IO::TYPE::PIPE ) || ( _type == IO::TYPE::NAMED_PIPE ) ) {
 			ret = ::CloseHandle( _handle ) ? 0 : -1;
-		else if ( ( _type == IO::TYPE::SOCKET ) || ( _type == IO::TYPE::SOCKET_DGRAM ) )
+		} else if ( ( _type == IO::TYPE::SOCKET ) || ( _type == IO::TYPE::SOCKET_DGRAM ) ) {
 			ret = ::closesocket( reinterpret_cast<SOCKET>( _handle ) );
-		else {
+		} else {
 			M_ASSERT( ! "invalid HANDLE type" );
 		}
 	}
@@ -169,10 +191,12 @@ int IO::fcntl( int cmd_, int arg_ ) {
 	int ret( 0 );
 	if ( cmd_ == F_SETFL ) {
 		_nonBlocking = ( ( arg_ & O_NONBLOCK ) ? true : false );
-		if ( ( _nonBlocking ) && ( ( _type == IO::TYPE::NAMED_PIPE ) || ( _type == IO::TYPE::PIPE ) ) )
+		if ( ( _nonBlocking ) && ( ( _type == IO::TYPE::NAMED_PIPE ) || ( _type == IO::TYPE::PIPE ) ) ) {
 			schedule_read();
-	} else if ( cmd_ == F_GETFL )
+		}
+	} else if ( cmd_ == F_GETFL ) {
 		ret = _nonBlocking ? O_NONBLOCK : 0;
+	}
 	return ( ret );
 }
 
@@ -242,10 +266,11 @@ int IO::connect( void ) {
 			log_windows_error( "GetOverlappedResult(connect)" );
 		}
 		_connected = true;
-	} else if ( _type == TYPE::SOCKET )
+	} else if ( _type == TYPE::SOCKET ) {
 		get_socket_errno() = WSAEINPROGRESS;
-	else
+	} else {
 		_connected = true;
+	}
 	_scheduled = false;
 	_ready = false;
 	return ( _connected ? 0 : -1 );
@@ -290,8 +315,9 @@ SystemIO::io_t& SystemIO::create_io( IO::TYPE::type_t type_, HANDLE h_, HANDLE e
 SystemIO::io_t& SystemIO::get_io( int id_ ) {
 	CLock l( _mutex );
 	io_table_t::iterator i( _ioTable.find( id_ ) );
-	if ( i != _ioTable.end() )
+	if ( i != _ioTable.end() ) {
 		return ( *i );
+	}
 	M_ASSERT( id_ < MANAGED_IO );
 	HANDLE h( reinterpret_cast<HANDLE>( _get_osfhandle( id_ ) ) );
 	return ( *( _ioTable.insert( std::make_pair( id_, io_ptr_t( new IO( IO::TYPE::TERMINAL, h, h ) ) ) ) ).first );
