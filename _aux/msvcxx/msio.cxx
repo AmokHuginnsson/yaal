@@ -106,19 +106,21 @@ int long IO::read( void* buf_, int long size_ ) {
 			}
 			if ( size_ > 0 ) {
 				DWORD iRead( 0 );
+				DWORD errCode( 0 );
 				if ( _readRequest == 0 ) { /* No pending read operation. */
 					if ( _buffer.get_size() < ( size_ + off ) ) {
 						_buffer.realloc( size_ + off );
 					}
-					ok = ::ReadFile( _handle, _buffer.get<char>() + off, _readRequest = size_, &iRead, &_overlapped ) ?
-true : false;
+					ok = ::ReadFile( _handle, _buffer.get<char>() + off, _readRequest = size_, &iRead, &_overlapped ) ? true : false;
+					errCode = ::GetLastError();
 				}
-				DWORD errCode( ::GetLastError() );
 				if (
 						( ! ok && ( ( errCode == ERROR_IO_PENDING ) || ( errCode == ERROR_IO_INCOMPLETE ) ) )
+						|| ( ! ok && ( errCode == 0 ) )
 						|| ( ok && ( ( _readRequest > 0 ) || ( ! _nonBlocking )	) )
 				) { /* Previous read operation still pending. */
 					ok = ::GetOverlappedResult( _handle, &_overlapped, &iRead, ! _nonBlocking ) ? true : false;
+					errCode = ::GetLastError();
 				}
 				if ( ok ) { /* We got all data from requested read. */
 					iRead = std::min( _readRequest, std::min<int>( iRead, static_cast<int>( size_ ) ) );
@@ -132,7 +134,6 @@ true : false;
 					}
 				} else {
 					/* Read still pending, handle errors. */
-					errCode = ::GetLastError();
 					if ( ( errCode == ERROR_IO_PENDING ) || ( errCode == ERROR_IO_INCOMPLETE ) ) {
 						if ( off > 0 ) {
 							ok = true;
