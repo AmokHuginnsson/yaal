@@ -206,6 +206,7 @@ try {
 	var LOCALSTATEDIR = "";
 	var DATADIR = "";
 	var BUILD_TYPE = "debug";
+	var YAAL_AUTO_SANITY = 0;
 	var SILENT = 0;
 	var VERBOSE = 0;
 	var VISUAL_STUDIO_VERSION = vcVersion();
@@ -249,6 +250,9 @@ try {
 			break;
 			case "BUILD_TYPE":
 				BUILD_TYPE = parts[1];
+			break;
+			case "YAAL_AUTO_SANITY":
+				YAAL_AUTO_SANITY = 1;
 			break;
 			case "FAST":
 				FAST = 1;
@@ -318,21 +322,24 @@ try {
 	}
 
 	var shell = WScript.createObject( "WScript.Shell" );
-	var cmdline = "cmake -G \"" + VISUAL_STUDIO_VERSION + "\" ";
-	cmdline += "-DCMAKE_BUILD_TYPE=" + BUILD_TYPE + " ";
+	var cmdline = "cmake -G \"" + VISUAL_STUDIO_VERSION + "\"";
+	cmdline += " -DCMAKE_BUILD_TYPE=" + BUILD_TYPE;
+	if ( YAAL_AUTO_SANITY ) {
+		cmdline += " -DYAAL_AUTO_SANITY=1";
+	}
 	if ( VERBOSE ) {
-		cmdline += "-DVERBOSE=1 ";
+		cmdline += " -DVERBOSE=1";
 	}
 	if ( EXTRA_INCLUDE_PATH != null ) {
-		cmdline += ( "-DCMAKE_INCLUDE_PATH=" + EXTRA_INCLUDE_PATH + " " );
+		cmdline += ( " -DCMAKE_INCLUDE_PATH=" + EXTRA_INCLUDE_PATH );
 	}
 	if ( EXTRA_LIBRARY_PATH != null ) {
-		cmdline += ( "-DCMAKE_LIBRARY_PATH=" + EXTRA_LIBRARY_PATH + " " );
+		cmdline += ( " -DCMAKE_LIBRARY_PATH=" + EXTRA_LIBRARY_PATH );
 	}
 	if ( BOOST_INSTALL_PATH != null ) {
-		cmdline += ( "-DBOOST_INSTALL_PATH=" + BOOST_INSTALL_PATH + " " );
+		cmdline += ( " -DBOOST_INSTALL_PATH=" + BOOST_INSTALL_PATH );
 	}
-	cmdline += CMAKELISTS_PATH;
+	cmdline += ( " " + CMAKELISTS_PATH );
 	envSys = shell.environment( "System" );
 	envProc = shell.environment( "Process" );
 	envUser = shell.environment( "User" );

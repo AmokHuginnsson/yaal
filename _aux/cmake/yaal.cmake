@@ -5,6 +5,8 @@ include( common )
 
 set( PACKAGE_VERSION "\"${PROJECT_VERSION}.${PROJECT_SUBVERSION}.${PROJECT_EXTRAVERSION}\"" )
 
+option(YAAL_AUTO_SANITY "Enable automatic environment sanitization." OFF)
+
 include( types )
 
 if ( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )

@@ -30,9 +30,9 @@ build.stamp.debug build.stamp.release: sln-$$(subst build.stamp.,,$$(@)) $(INPUT
 	test -f build/debug/yaal_hdata-d.dll -o -f build/release/yaal_hdata.dll -o -f build/debug/$(PROJECT_NAME)/1exec.exe -o -f build/release/$(PROJECT_NAME)/1exec.exe && touch $(@) && \
 	test -f $(@)
 
-sln-debug sln-release: ./configure.js ./local.js
+sln-debug sln-release: ./configure.js
 	if [ ! -f $(PROJECT_NAME).sln ] ; then \
-		cscript ./configure.js BUILD_TYPE=$(subst .sln,,$(subst sln-,,$(@))) ; \
+		cscript ./configure.js BUILD_TYPE=$(subst .sln,,$(subst sln-,,$(@))) $(EXTRA_FLAGS) ; \
 	fi ; \
 	test -f $(PROJECT_NAME).sln
 
