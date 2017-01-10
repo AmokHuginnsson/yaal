@@ -1,2 +1,5 @@
-yaal (Yet Another Abstraction Layer) is general purpose
-C++ library.
+yaal is a general purpose, cross platform C++ library,
+yaal stands for: Yet Another Abstraction Layer.
+The yaal library provides unified high level handling of multiple domains:
+threads, database access, networking, xml DOM operations and more.
+Contains fully fledged OO programming language named Huginn.

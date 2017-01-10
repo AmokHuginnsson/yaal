@@ -8,5 +8,5 @@ BASEDIR="/opt"
 VENDOR="codestation.org"
 EMAIL="amok@codestation.org"
 HOTLINE="https://codestation.org/repo/yaal.git"
-DESC="yaal (Yet Another Abstraction Layer) is general purpose C++ library."
+DESC="yaal (Yet Another Abstraction Layer) is a general purpose C++ library."
 
