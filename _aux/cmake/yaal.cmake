@@ -1,6 +1,12 @@
 cmake_minimum_required( VERSION 3.4 )
 
 project( yaal CXX )
+
+set( CPACK_PACKAGE_DESCRIPTION_SUMMARY "yaal (Yet Another Abstraction Layer) - a general purpose C++ library.")
+set( CPACK_WIX_UPGRADE_GUID "436f6465-5374-6174-696f-6e207961616c" )
+set( CPACK_RESOURCE_FILE_WELCOME "doc/PROGRAMMER.READ.ME" )
+set( CPACK_RESOURCE_FILE_README "doc/READ.ME.FIRST.OR.DIE" )
+
 include( common )
 
 set( PACKAGE_VERSION "\"${PROJECT_VERSION}.${PROJECT_SUBVERSION}.${PROJECT_EXTRAVERSION}\"" )
