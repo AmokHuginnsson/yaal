@@ -58,3 +58,11 @@ macro ( today RESULT )
 	endif (WIN32)
 endmacro ( today )
 
+function( prepend var prefix )
+	set( listVar "" )
+	foreach( f ${ARGN} )
+		list( APPEND listVar "${prefix}/${f}" )
+	endforeach()
+	set( ${var} "${listVar}" PARENT_SCOPE )
+endfunction()
+
