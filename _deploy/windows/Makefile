@@ -26,9 +26,11 @@ $(VERIFY_DIR):
 
 $(ARTIFACTS): $(VERIFY_DIR)
 	@cd ../../ && \
-	make -f msvcxx.mk EXTRA_FLAGS=YAAL_AUTO_SANITY=1 release && \
+	make -f msvcxx.mk EXTRA_FLAGS=BUILD_PACKAGE=1 debug release && \
 	mkdir -p $(DEPLOY_DIR) && \
-	"$(CPACK)" -B `cygpath -wa $(DEPLOY_DIR)` . && \
+	cd build/release && \
+	"$(CPACK)" -B `cygpath -wa ../../$(DEPLOY_DIR)` && \
+	cd - && \
 	mv -f $(DEPLOY_DIR)/yaal-$(VERSION)-win32.msi $(DEPLOY_DIR)/../$(@)
 
 msi/$(BUNDLE): $(VERIFY_DIR) $(ARTIFACTS)

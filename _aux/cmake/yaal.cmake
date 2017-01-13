@@ -4,14 +4,18 @@ project( yaal CXX )
 
 set( CPACK_PACKAGE_DESCRIPTION_SUMMARY "yaal (Yet Another Abstraction Layer) - a general purpose C++ library.")
 set( CPACK_WIX_UPGRADE_GUID "436f6465-5374-6174-696f-6e207961616c" )
-set( CPACK_RESOURCE_FILE_WELCOME "doc/PROGRAMMER.READ.ME" )
-set( CPACK_RESOURCE_FILE_README "doc/READ.ME.FIRST.OR.DIE" )
+set( CPACK_RESOURCE_FILE_WELCOME "${CMAKE_HOME_DIRECTORY}/doc/PROGRAMMER.READ.ME" )
+set( CPACK_RESOURCE_FILE_README "${CMAKE_HOME_DIRECTORY}/doc/READ.ME.FIRST.OR.DIE" )
 
 include( common )
 
 set( PACKAGE_VERSION "\"${PROJECT_VERSION}.${PROJECT_SUBVERSION}.${PROJECT_EXTRAVERSION}\"" )
 
-option(YAAL_AUTO_SANITY "Enable automatic environment sanitization." OFF)
+option( YAAL_AUTO_SANITY "Enable automatic environment sanitization." OFF )
+
+if ( DEFINED BUILD_PACKAGE )
+	set( YAAL_AUTO_SANITY true )
+endif()
 
 include( types )
 
@@ -238,7 +242,7 @@ function( yaal_make_component name )
 			COMMAND makedef
 				--source ${TARGET_PATH}/${name}${LIB_INFIX}.sym
 				--destination ${TARGET_PATH}/${name}${LIB_INFIX}.def
-				--exclude _aux/msvcxx/exclude.sym
+				--exclude ${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/exclude.sym
 			MAIN_DEPENDENCY ${TARGET_PATH}/${name}${LIB_INFIX}.sym
 			DEPENDS makedef
 		)
@@ -315,7 +319,7 @@ if ( CMAKE_HOST_WIN32 )
 		COMMAND makedef
 			--source ${TARGET_PATH}/msvcxx.sym
 			--destination ${TARGET_PATH}/hcore${LIB_INFIX}.def
-			--exclude _aux/msvcxx/exclude.sym
+			--exclude ${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/exclude.sym
 			--append true
 		DEPENDS hcore-static ${TARGET_PATH}/msvcxx.sym
 		APPEND
@@ -331,6 +335,7 @@ if ( CMAKE_HOST_WIN32 )
 	add_custom_command(
 		OUTPUT ${HEADER_TARGET}
 		COMMAND mkheaders ${CMAKE_HOME_DIRECTORY} ${TARGET_PATH} "${HEADERS}"
+		WORKING_DIRECTORY ${CMAKE_HOME_DIRECTORY}
 		MAIN_DEPENDENCY ${TARGET_PATH}/config.hxx
 		DEPENDS mkheaders ${HEADERS}
 	)
@@ -403,11 +408,18 @@ if ( CMAKE_HOST_WIN32 )
 	install( TARGETS update-commit-id COMPONENT private RUNTIME DESTINATION ${RUNTIME_DESTINATION} )
 	install( TARGETS ${COMPONENTS} ${DRIVERS} RUNTIME DESTINATION ${RUNTIME_DESTINATION} COMPONENT runtime LIBRARY DESTINATION bin COMPONENT runtime )
 	install( TARGETS ${COMPONENTS} ARCHIVE DESTINATION lib COMPONENT devel )
-	if ( DEFINED YAAL_AUTO_SANITY )
+	if ( DEFINED BUILD_PACKAGE )
 		install( FILES ${TARGET_PATH}/yaalrc DESTINATION . COMPONENT configuration )
 		set( EXTRA_DEPENDENCIES history5.dll iconv.dll libeay32.dll libexslt.dll libiconv-2.dll libintl-2.dll libwinpthread.dll libxml2.dll libxslt.dll readline5.dll regex2.dll sqlite3.dll ssleay32.dll zlib1.dll )
-		prepend( EXTRA_DEPENDENCIES ${CMAKE_INSTALL_PREFIX}/${RUNTIME_DESTINATION} ${EXTRA_DEPENDENCIES} )
+		prepend( EXTRA_DEPENDENCIES ${CMAKE_INSTALL_PREFIX}/${RUNTIME_DESTINATION}/ ${EXTRA_DEPENDENCIES} )
+		append( DRIVERS_REAL _driver ${DRIVERS} )
+		prepend( DEBUG_LIBS build/debug/yaal_ ${COMPONENTS} ${DRIVERS_REAL} )
+		append( DEBUG_LIBS -d.dll ${DEBUG_LIBS} )
+		prepend( DEBUG_ARCHIVE build/debug/yaal_ ${COMPONENTS} )
+		append( DEBUG_ARCHIVE -d.lib ${DEBUG_ARCHIVE} )
 		install( FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} ${EXTRA_DEPENDENCIES} DESTINATION bin COMPONENT dependencies )
+		install( FILES ${DEBUG_LIBS} DESTINATION ${RUNTIME_DESTINATION} COMPONENT devel )
+		install( FILES ${DEBUG_ARCHIVE} DESTINATION lib COMPONENT devel )
 	endif()
 else()
 	install( TARGETS ${COMPONENTS} ${DRIVERS} RUNTIME DESTINATION ${RUNTIME_DESTINATION} LIBRARY DESTINATION lib ARCHIVE DESTINATION lib )
@@ -416,4 +428,10 @@ endif()
 install( DIRECTORY ${TARGET_PATH}/include/yaal DESTINATION include COMPONENT devel )
 install( FILES ${TARGET_PATH}/yaalrc DESTINATION ${CMAKE_INSTALL_FULL_SYSCONFDIR} )
 install( FILES ${TARGET_PATH}/yaal.pc DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/pkgconfig )
+
+#message("CMAKE_HOME_DIRECTORY = ${CMAKE_HOME_DIRECTORY}")
+#message("TARGET_PATH = ${TARGET_PATH}")
+#message("CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}")
+#message("CMAKE_BINARY_DIR = ${CMAKE_BINARY_DIR}")
+#message( "CMAKE_INSTALL_PREFIX = ${CMAKE_INSTALL_PREFIX}" )
 

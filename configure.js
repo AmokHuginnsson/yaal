@@ -7,8 +7,9 @@
  *
  ******************************************************************/
 
+var shell = WScript.createObject( "WScript.Shell" );
+var fs = new ActiveXObject( "Scripting.FileSystemObject" );
 var globalMessageBuffer = "";
-var fs = null;
 var dirRoot = null;
 var withUt = false;
 var ForReading = 1;
@@ -20,8 +21,7 @@ function checkKey( key ) {
 	var has = false;
 	var value;
 	try {
-		var regEdit = WScript.createObject( "WScript.Shell" );
-		value = regEdit.regRead( key );
+		value = shell.regRead( key );
 		has = true;
 	} catch ( ex ) {
 	}
@@ -31,7 +31,6 @@ function checkKey( key ) {
 function isBoostUsed( buildDefinitionPath ) {
 	var used = false;
 	try {
-		var fs = new ActiveXObject( "Scripting.FileSystemObject" );
 		var bd = fs.openTextFile( "./" + buildDefinitionPath + "/CMakeLists.txt", ForReading );
 		while ( ! bd.AtEndOfStream ) {
 			var line = bd.readLine();
@@ -58,7 +57,6 @@ function boostInfo( install_path ) {
 	}
 	this.version = new versionInfo();
 	this.exists = false;
-	var fs = new ActiveXObject( "Scripting.FileSystemObject" );
 	var versions = [ "1.43", "1.42", "1.41", "1.40", "1.39", "1.38.0", "1.37.0", "1.36.0", "1.35.0" ];
 	for ( var idx in versions ) {
 		if ( this.exists ) {
@@ -180,23 +178,9 @@ if ( ! Array.prototype.filter ) {
 }
 
 try {
-	fs = new ActiveXObject( "Scripting.FileSystemObject" );
-	dirRoot = fs.GetFolder(".").path.replace( /\\/gm, "/" );
-
-	if ( ! fs.FileExists( dirRoot + "/configure.ac" ) ) {
-		WScript.echo( "This script must be runned from project main directory." );
-		WScript.quit( 1 );
-	}
-
-} catch ( ex ) {
-	WScript.echo( ex.description );
-	WScript.quit( 1 );
-}
-
-try {
 
 	var args = WScript.Arguments;
-	var CMAKELISTS_PATH = "";
+	var PROJECT_ROOT = "";
 	var BOOST_INSTALL_PATH = null;
 	var BOOST_VERSION = null;
 	var EXTRA_INCLUDE_PATH = "";
@@ -206,13 +190,37 @@ try {
 	var LOCALSTATEDIR = "";
 	var DATADIR = "";
 	var BUILD_TYPE = "debug";
+	var BUILD_PACKAGE = 1;
 	var YAAL_AUTO_SANITY = 0;
 	var SILENT = 0;
 	var VERBOSE = 0;
 	var VISUAL_STUDIO_VERSION = vcVersion();
 
+	for ( var i = 0; i < args.count(); ++ i ) {
+		var parts = args.Item(i).split('=');
+		if ( parts[0].toUpperCase() == "PROJECT_ROOT" ) {
+			PROJECT_ROOT = parts[1];
+		}
+	}
+
 	try {
-		var conf = fs.openTextFile( "local.js", ForReading );
+		if ( PROJECT_ROOT == "" ) {
+			dirRoot = fs.GetFolder(".").path.replace( /\\/gm, "/" );
+		} else {
+			dirRoot = PROJECT_ROOT;
+		}
+
+		if ( ! fs.FileExists( dirRoot + "/configure.ac" ) ) {
+			WScript.echo( "This script must be runned on project main directory, not: `" + dirRoot + "'." );
+			WScript.quit( 1 );
+		}
+	} catch ( ex ) {
+		WScript.echo( ex.description );
+		WScript.quit( 1 );
+	}
+
+	try {
+		var conf = fs.openTextFile( dirRoot + "/local.js", ForReading );
 		eval( conf.readAll() );
 	} catch ( e ) {
 		msg( "Reading configuration: " + e.description );
@@ -221,9 +229,6 @@ try {
 	for ( var i = 0; i < args.count(); ++ i ) {
 		var parts = args.Item(i).split('=');
 		switch ( parts[0].toUpperCase() ) {
-			case "CMAKELISTS_PATH":
-				CMAKELISTS_PATH = parts[1];
-			break;
 			case "EXTRA_INCLUDE_PATH":
 				EXTRA_INCLUDE_PATH = parts[1];
 			break;
@@ -253,6 +258,9 @@ try {
 			break;
 			case "YAAL_AUTO_SANITY":
 				YAAL_AUTO_SANITY = 1;
+			break;
+			case "BUILD_PACKAGE":
+				BUILD_PACKAGE = 1;
 			break;
 			case "FAST":
 				FAST = 1;
@@ -297,9 +305,9 @@ try {
 
 	msg( "Project root: " + dirRoot );
 	msg( "CMake generator: " + VISUAL_STUDIO_VERSION );
-	msg( "CMakeLists.txt path: " + CMAKELISTS_PATH );
+	msg( "CMakeLists.txt path: " + PROJECT_ROOT );
 
-	if ( isBoostUsed( CMAKELISTS_PATH ) ) {
+	if ( isBoostUsed( PROJECT_ROOT ) ) {
 		var boostInfo = new boostInfo( BOOST_INSTALL_PATH );
 
 		if ( ! boostInfo.exists ) {
@@ -321,9 +329,11 @@ try {
 		msg( makeBoostDesc( boostInfo ) );
 	}
 
-	var shell = WScript.createObject( "WScript.Shell" );
 	var cmdline = "cmake -G \"" + VISUAL_STUDIO_VERSION + "\"";
 	cmdline += " -DCMAKE_BUILD_TYPE=" + BUILD_TYPE;
+	if ( BUILD_PACKAGE ) {
+		cmdline += " -DBUILD_PACKAGE=1";
+	}
 	if ( YAAL_AUTO_SANITY ) {
 		cmdline += " -DYAAL_AUTO_SANITY=1";
 	}
@@ -339,7 +349,7 @@ try {
 	if ( BOOST_INSTALL_PATH != null ) {
 		cmdline += ( " -DBOOST_INSTALL_PATH=" + BOOST_INSTALL_PATH );
 	}
-	cmdline += ( " " + CMAKELISTS_PATH );
+	cmdline += ( " " + PROJECT_ROOT );
 	envSys = shell.environment( "System" );
 	envProc = shell.environment( "Process" );
 	envUser = shell.environment( "User" );

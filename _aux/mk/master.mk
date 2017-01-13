@@ -120,7 +120,7 @@ do-purge: mrproper-all
 	/bin/rm -rf aclocal.m4 autom4te.cache build config.cache config.status \
 		configure.lineno configure.scan configure Makefile.mk config.hxx config.hxx.in \
 		config.h config.h.in config.log dirs.d doc/html \
-		CMakeFiles CMakeCache.txt cmake_install.cmake install_manifest.txt \
+		CMakeFiles CMakeCache.txt CPack*Config.cmake cmake_install.cmake install_manifest*.txt \
 		tags GPATH GRTAGS GSYMS GTAGS make.log *.vcproj.* *.vcproj *.vcxproj.* *.vcxproj \
 		*.sln *.suo *.ncb *.sdf *.dir _UpgradeReport_Files UpgradeLog.XML debug release *.so \
 		ipch Win32 *.sln.cache build.stamp* && \
