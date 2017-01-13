@@ -385,6 +385,9 @@ public:
 			verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
 			to = static_cast<int>( get_integer( values_[1] ) );
 		}
+		if ( to < 0 ) {
+			throw HHuginn::HHuginnRuntimeException( "Invalid requested round value: "_ys.append( to ), position_ );
+		}
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
@@ -394,12 +397,10 @@ public:
 				thread_->raise( static_cast<HMathematics*>( object_->raw() )->_exceptionClass.raw(), e.what(), position_ );
 			}
 		} else {
-			if ( to == 0 ) {
-				double long val( get_real( values_[0] ) );
-				v = thread_->object_factory().create_real( roundl( val ) );
-			} else {
-				thread_->raise( static_cast<HMathematics*>( object_->raw() )->_exceptionClass.raw(), "rounding to nth place on real is not supported", position_ );
-			}
+			double long val( get_real( values_[0] ) );
+			double long order( powl( 10.L, static_cast<double long>( to ) ) );
+			val = to == 0 ? roundl( val ) : roundl( val * order ) / order;
+			v = thread_->object_factory().create_real( val );
 		}
 		return ( v );
 		M_EPILOG
