@@ -40,9 +40,9 @@ build/debug/$(PROJECT_NAME).sln build/release/$(PROJECT_NAME).sln: ./configure.j
 install: install-debug
 
 install-debug install-release: $$(subst install-,,$$(@))
-	@export VS_VER="x`awk '/# Visual Studio /{print $$4}' $(PROJECT_NAME).sln`" ; \
+	@export VS_VER="x`awk '/# Visual Studio /{print $$4}' build/$(subst install-,,$(@))/$(PROJECT_NAME).sln`" ; \
 	if [ "$${VS_VER}" = "x14" ] ; then \
-		"$(CMAKE)" --build . --target install --config $(subst install-,,$(@)) ; \
+		"$(CMAKE)" --build build/$(subst install-,,$(@)) --target install --config $(subst install-,,$(@)) ; \
 	else \
 		echo "Unsupported Visual Studio C++ version ($${VS_VER})!" && false ; \
 	fi

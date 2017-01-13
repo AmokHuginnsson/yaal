@@ -190,7 +190,7 @@ try {
 	var LOCALSTATEDIR = "";
 	var DATADIR = "";
 	var BUILD_TYPE = "debug";
-	var BUILD_PACKAGE = 1;
+	var BUILD_PACKAGE = 0;
 	var YAAL_AUTO_SANITY = 0;
 	var SILENT = 0;
 	var VERBOSE = 0;

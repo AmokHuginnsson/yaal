@@ -9,6 +9,3 @@ Debug
 static
 dropprivs
 debian
-_deploy/freebsd/pkg-plist
-_deploy/freebsd/work
-_deploy/freebsd/*.tbz
