@@ -126,6 +126,7 @@ public:
 	class HException;
 	class HObjectReference;
 	class HTernaryEvaluator;
+	class HValueHashHelper;
 	typedef yaal::hcore::HPointer<huginn::HExpression> expression_t;
 	typedef yaal::hcore::HArray<HHuginn::expression_t> expressions_t;
 	class HErrorCoordinate;
@@ -866,28 +867,53 @@ private:
 	virtual value_t do_clone( huginn::HThread*, int ) const override;
 };
 
+class HHuginn::HValueHashHelper final {
+	huginn::HThread* _thread;
+	int _position;
+public:
+	HValueHashHelper( void );
+	void anchor( huginn::HThread* thread_, int position_ ) {
+		_thread = thread_;
+		_position = position_;
+	}
+	int long operator()( HHuginn::value_t const& ) const;
+	bool operator()( HHuginn::value_t const&, HHuginn::value_t const& ) const;
+	void detach( void ) {
+		_thread = nullptr;
+		_position = 0;
+	}
+private:
+	HValueHashHelper( HValueHashHelper const& ) = delete;
+	HValueHashHelper& operator = ( HValueHashHelper const& ) = delete;
+};
+
 class HHuginn::HLookup : public HHuginn::HIterable {
 public:
 	typedef HHuginn::HLookup this_type;
 	typedef HHuginn::HIterable base_type;
-	typedef int long (*hash_t)( HHuginn::value_t const& );
-	typedef bool (*equals_t)( HHuginn::value_t const&, HHuginn::value_t const& );
-	typedef yaal::hcore::HHashMap<HHuginn::value_t, HHuginn::value_t, hash_t, equals_t> values_t;
+	typedef yaal::hcore::HHashMap<HHuginn::value_t, HHuginn::value_t, HValueHashHelper&, HValueHashHelper&> values_t;
 private:
+	mutable HValueHashHelper _helper;
 	values_t _data;
 public:
 	HLookup( HHuginn::HClass const* );
-	void insert( HHuginn::value_t const&, HHuginn::value_t const& );
-	bool has_key( HHuginn::value_t const& ) const;
-	void erase( HHuginn::value_t const& );
-	value_t get( HHuginn::value_t const&, int );
-	value_t& get_ref( HHuginn::value_t const& );
-	bool try_get( HHuginn::value_t const& key_, HHuginn::value_t& result_ );
+	void insert( huginn::HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
+	bool has_key( huginn::HThread*, HHuginn::value_t const&, int ) const;
+	void erase( huginn::HThread*, HHuginn::value_t const&, int );
+	value_t get( huginn::HThread*, HHuginn::value_t const&, int );
+	value_t& get_ref( huginn::HThread*, HHuginn::value_t const&, int );
+	bool try_get( huginn::HThread*, HHuginn::value_t const&, HHuginn::value_t&, int );
 	values_t const& value( void ) const {
 		return ( _data );
 	}
 	values_t& value( void ) {
 		return ( _data );
+	}
+	void anchor( huginn::HThread* thread_, int position_ ) {
+		_helper.anchor( thread_, position_ );
+	}
+	void detach( void ) {
+		_helper.detach();
 	}
 protected:
 	virtual HIterator do_iterator( huginn::HThread*, int ) override;
@@ -903,21 +929,26 @@ class HHuginn::HSet : public HHuginn::HIterable {
 public:
 	typedef HHuginn::HSet this_type;
 	typedef HHuginn::HIterable base_type;
-	typedef int long (*hash_t)( HHuginn::value_t const& );
-	typedef bool (*equals_t)( HHuginn::value_t const&, HHuginn::value_t const& );
-	typedef yaal::hcore::HHashSet<HHuginn::value_t, hash_t, equals_t> values_t;
+	typedef yaal::hcore::HHashSet<HHuginn::value_t, HValueHashHelper&, HValueHashHelper&> values_t;
 private:
+	mutable HValueHashHelper _helper;
 	values_t _data;
 public:
 	HSet( HHuginn::HClass const* );
-	void insert( HHuginn::value_t const& );
-	bool has_key( HHuginn::value_t const& ) const;
-	void erase( HHuginn::value_t const& );
+	void insert( huginn::HThread*, HHuginn::value_t const&, int );
+	bool has_key( huginn::HThread*, HHuginn::value_t const&, int ) const;
+	void erase( huginn::HThread*, HHuginn::value_t const&, int );
 	values_t const& value( void ) const {
 		return ( _data );
 	}
 	values_t& value( void ) {
 		return ( _data );
+	}
+	void anchor( huginn::HThread* thread_, int position_ ) {
+		_helper.anchor( thread_, position_ );
+	}
+	void detach( void ) {
+		_helper.detach();
 	}
 protected:
 	virtual HIterator do_iterator( huginn::HThread*, int ) override;

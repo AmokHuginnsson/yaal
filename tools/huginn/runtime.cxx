@@ -606,12 +606,12 @@ HHuginn::value_t lookup( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::v
 	M_EPILOG
 }
 
-HHuginn::value_t set( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int ) {
+HHuginn::value_t set( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	HHuginn::value_t v( thread_->object_factory().create_set() );
 	HHuginn::HSet* s( static_cast<HHuginn::HSet*>( v.raw() ) );
 	for ( HHuginn::value_t const& e : values_ ) {
-		s->insert( e );
+		s->insert( thread_, e, position_ );
 	}
 	return ( v );
 	M_EPILOG

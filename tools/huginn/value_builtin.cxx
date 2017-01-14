@@ -87,7 +87,7 @@ HHuginn::value_t subscript(
 		res = ( subscript_ == HExpression::ACCESS::VALUE ? d->get( index_, position_ ) : of.create_reference( d->get_ref( index_, position_ ) ) );
 	} else if ( baseType == HHuginn::TYPE::LOOKUP ) {
 		HHuginn::HLookup* l( static_cast<HHuginn::HLookup*>( base_.raw() ) );
-		res = ( subscript_ == HExpression::ACCESS::VALUE ? l->get( index_, position_ ) : of.create_reference( l->get_ref( index_ ) ) );
+		res = ( subscript_ == HExpression::ACCESS::VALUE ? l->get( thread_, index_, position_ ) : of.create_reference( l->get_ref( thread_, index_, position_ ) ) );
 	} else {
 		throw HHuginn::HHuginnRuntimeException( "Subscript is not supported on `"_ys.append( base_->get_class()->name() ).append( "'." ), position_ );
 	}
@@ -452,7 +452,7 @@ HHuginn::value_t neg( HThread* thread_, HHuginn::value_t const& v_, int position
 	return ( res );
 }
 
-int long hash( HHuginn::value_t const& v_ ) {
+int long hash( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	int long rt( 0 );
 	HHuginn::type_id_t typeId( v_->type_id() );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
@@ -468,7 +468,34 @@ int long hash( HHuginn::value_t const& v_ ) {
 	} else if ( typeId == HHuginn::TYPE::BOOLEAN ) {
 		rt = hcore::hash<bool>()( static_cast<HHuginn::HBoolean const*>( v_.raw() )->value() );
 	} else if ( typeId != HHuginn::TYPE::NONE ) {
-		throw HHuginn::HHuginnRuntimeException( "There is no `hash' operator for `"_ys.append( v_->get_class()->name() ).append( "'." ), 0 );
+		HHuginn::value_t res;
+		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v_.raw() ) ) {
+			res = o->call_method( thread_, v_, "hash", HHuginn::values_t(), position_ );
+			if ( res->type_id() != HHuginn::TYPE::INTEGER ) {
+				throw HHuginn::HHuginnRuntimeException(
+					"User supplied `hash' function returned an invalid type `"_ys
+						.append( res->get_class()->name() )
+						.append( "' instead of an `integer'." ),
+					position_
+				);
+			}
+		} else {
+			HHuginn::HClass const* c( v_->get_class() );
+			int idx( c->field_index( thread_->runtime().identifier_id( "hash" ) ) );
+			if ( idx >= 0 ) {
+				HHuginn::HClass::HMethod const& m( *static_cast<HHuginn::HClass::HMethod const*>( c->field( idx ).raw() ) );
+				res = m.function()( thread_, const_cast<HHuginn::value_t*>( &v_ ), HHuginn::values_t{}, position_ );
+				M_ASSERT( res->type_id() == HHuginn::TYPE::INTEGER );
+			} else {
+				throw HHuginn::HHuginnRuntimeException(
+					"There is no `hash' operator for "_ys
+						.append( a_type_name( v_->get_class() ) )
+						.append( "." ),
+					position_
+				);
+			}
+		}
+		rt = hcore::hash<int long long>()( static_cast<HHuginn::HInteger const*>( res.raw() )->value() );
 	}
 	return ( rt );
 }
@@ -534,10 +561,6 @@ bool equals( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t con
 		res = v1_->type_id() == v2_->type_id();
 	}
 	return ( res );
-}
-
-bool key_equals( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) {
-	return ( ( v1_->type_id() == v2_->type_id() ) && equals( nullptr, v1_, v2_, 0 ) );
 }
 
 bool less_low( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) {

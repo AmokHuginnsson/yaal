@@ -130,11 +130,14 @@ public:
 			}
 		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::set ) ) {
 			v = thread_->object_factory().create_set();
-			HHuginn::HSet::values_t& dest( static_cast<HHuginn::HSet*>( v.raw() )->value() );
+			HHuginn::HSet* set( static_cast<HHuginn::HSet*>( v.raw() ) );
+			HHuginn::HSet::values_t& dest( set->value() );
+			set->anchor( thread_, position_ );
 			while ( it.is_valid() && thread_->can_continue() ) {
 				dest.insert( it.value( thread_, position_ ) );
 				it.next( thread_, position_ );
 			}
+			set->detach();
 		} else {
 			throw HHuginn::HHuginnRuntimeException( "Invalid materialized type: `"_ys.append( thread_->runtime().function_name( fr.function().id() ) ).append( "'." ), position_ );
 		}
