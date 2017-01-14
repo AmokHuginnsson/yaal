@@ -48,7 +48,7 @@ namespace tools {
 
 namespace huginn {
 
-class HNetwork : public HHuginn::HObject {
+class HNetwork : public HHuginn::HValue {
 	struct OPERATIONS {
 		static int const READING = 1;
 		static int const WRITING = 2;
@@ -57,7 +57,7 @@ class HNetwork : public HHuginn::HObject {
 	HHuginn::class_t _exceptionClass;
 public:
 	HNetwork( HHuginn::HClass* class_ )
-		: HObject( class_ )
+		: HValue( class_ )
 		, _streamClass( HStream::get_class( class_->runtime() ) )
 		, _exceptionClass( exception::create_class( class_->runtime(), "NetworkException", "The `NetworkException` exception type for `Network` package." ) ) {
 		return;

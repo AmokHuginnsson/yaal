@@ -45,7 +45,7 @@ namespace tools {
 namespace huginn {
 
 HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass const* class_, HHuginn::values_t const& values_, int position_ )
-	: HObject( class_ )
+	: HValue( class_ )
 	, _data() {
 	char const name[] = "Matrix.constructor";
 	verify_arg_count( name, values_, 1, meta::max_signed<int>::value, position_ );
@@ -114,12 +114,12 @@ HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass const* class_, HHugi
 }
 
 HMatrix::HMatrix( HHuginn::HClass const* class_, arbitrary_precision_matrix_ptr_t&& data_ )
-	: HObject( class_ )
+	: HValue( class_ )
 	, _data( yaal::move( data_ ) ) {
 }
 
 HMatrix::HMatrix( HHuginn::HClass const* class_, floating_point_matrix_ptr_t&& data_ )
-	: HObject( class_ )
+	: HValue( class_ )
 	, _data( yaal::move( data_ ) ) {
 }
 
@@ -397,9 +397,9 @@ HHuginn::value_t HMatrix::inverse( huginn::HThread*, HHuginn::value_t* object_, 
 	HHuginn::value_t v;
 	try {
 		if ( o->_data.type() == 0 ) {
-			v = make_pointer<HMatrix>( o->HObject::get_class(), make_resource<arbitrary_precision_matrix_t>( o->_data.get<arbitrary_precision_matrix_ptr_t>()->_1() ) );
+			v = make_pointer<HMatrix>( o->HValue::get_class(), make_resource<arbitrary_precision_matrix_t>( o->_data.get<arbitrary_precision_matrix_ptr_t>()->_1() ) );
 		} else {
-			v = make_pointer<HMatrix>( o->HObject::get_class(), make_resource<floating_point_matrix_t>( o->_data.get<floating_point_matrix_ptr_t>()->_1() ) );
+			v = make_pointer<HMatrix>( o->HValue::get_class(), make_resource<floating_point_matrix_t>( o->_data.get<floating_point_matrix_ptr_t>()->_1() ) );
 		}
 	} catch ( HException const& e ) {
 		throw HHuginn::HHuginnRuntimeException( e.what(), position_ );
@@ -415,9 +415,9 @@ HHuginn::value_t HMatrix::transpose( huginn::HThread*, HHuginn::value_t* object_
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	HHuginn::value_t v;
 	if ( o->_data.type() == 0 ) {
-		v = make_pointer<HMatrix>( o->HObject::get_class(), make_resource<arbitrary_precision_matrix_t>( o->_data.get<arbitrary_precision_matrix_ptr_t>()->T() ) );
+		v = make_pointer<HMatrix>( o->HValue::get_class(), make_resource<arbitrary_precision_matrix_t>( o->_data.get<arbitrary_precision_matrix_ptr_t>()->T() ) );
 	} else {
-		v = make_pointer<HMatrix>( o->HObject::get_class(), make_resource<floating_point_matrix_t>( o->_data.get<floating_point_matrix_ptr_t>()->T() ) );
+		v = make_pointer<HMatrix>( o->HValue::get_class(), make_resource<floating_point_matrix_t>( o->_data.get<floating_point_matrix_ptr_t>()->T() ) );
 	}
 	return ( v );
 	M_EPILOG
@@ -568,9 +568,9 @@ HHuginn::value_t HMatrix::do_clone( huginn::HRuntime* ) const {
 	M_PROLOG
 	HHuginn::value_t v;
 	if ( _data.type() == 0 ) {
-		v = make_pointer<HMatrix>( HObject::get_class(), make_resource<arbitrary_precision_matrix_t>( *( _data.get<arbitrary_precision_matrix_ptr_t>() ) ) );
+		v = make_pointer<HMatrix>( HValue::get_class(), make_resource<arbitrary_precision_matrix_t>( *( _data.get<arbitrary_precision_matrix_ptr_t>() ) ) );
 	} else {
-		v = make_pointer<HMatrix>( HObject::get_class(), make_resource<floating_point_matrix_t>( *( _data.get<floating_point_matrix_ptr_t>() ) ) );
+		v = make_pointer<HMatrix>( HValue::get_class(), make_resource<floating_point_matrix_t>( *( _data.get<floating_point_matrix_ptr_t>() ) ) );
 	}
 	return ( v );
 	M_EPILOG

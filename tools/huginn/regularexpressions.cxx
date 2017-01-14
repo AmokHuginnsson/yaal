@@ -45,12 +45,12 @@ namespace tools {
 
 namespace huginn {
 
-class HRegularExpressions : public HHuginn::HObject {
+class HRegularExpressions : public HHuginn::HValue {
 	HHuginn::class_t _exceptionClass;
 	HHuginn::class_t _compiledRegularExpressionClass;
 public:
 	HRegularExpressions( HHuginn::HClass* class_ )
-		: HObject( class_ )
+		: HValue( class_ )
 		, _exceptionClass( exception::create_class( class_->runtime(), "RegularExpressionException", "The `RegularExpressionException` exception type for `RegularExpression` package." ) )
 		, _compiledRegularExpressionClass( HCompiledRegularExpression::get_class( class_->runtime(), _exceptionClass ) ) {
 		return;

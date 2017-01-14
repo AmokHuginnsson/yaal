@@ -39,7 +39,7 @@ namespace tools {
 
 namespace huginn {
 
-class HCompiledRegularExpression : public HHuginn::HObject {
+class HCompiledRegularExpression : public HHuginn::HValue {
 public:
 	typedef yaal::hcore::HResource<yaal::hcore::HRegex> regex_t;
 private:

@@ -38,7 +38,7 @@ namespace tools {
 
 namespace huginn {
 
-class HClock : public HHuginn::HObject {
+class HClock : public HHuginn::HValue {
 	yaal::hcore::HClock _clock;
 public:
 	HClock( HHuginn::HClass* );

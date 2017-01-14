@@ -54,7 +54,7 @@ namespace huginn {
 
 typedef yaal::hcore::HString (*str_transform_func_t)( yaal::hcore::HString const& );
 
-class HFileSystem : public HHuginn::HObject {
+class HFileSystem : public HHuginn::HValue {
 	struct OPERATIONS {
 		static int const READING = 1;
 		static int const WRITING = 2;
@@ -66,7 +66,7 @@ class HFileSystem : public HHuginn::HObject {
 	HHuginn::class_t _exceptionClass;
 public:
 	HFileSystem( HHuginn::HClass* class_ )
-		: HObject( class_ )
+		: HValue( class_ )
 		, _streamClass( HStream::get_class( class_->runtime() ) )
 		, _directoryScanClass( HDirectoryScan::get_class( class_->runtime() ) )
 		, _timeClass( huginn::HTime::get_class( class_->runtime() ) )

@@ -78,7 +78,7 @@ public:
 };
 
 HSubprocess::HSubprocess( HHuginn::HClass const* class_, HHuginn::values_t const& argv_ )
-	: HHuginn::HObject( class_ )
+	: HHuginn::HValue( class_ )
 	, _pipedChild() {
 	HPipedChild::argv_t argv;
 	hcore::HString program( get_string( argv_[0] ) );

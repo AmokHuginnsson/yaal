@@ -48,13 +48,13 @@ namespace tools {
 
 namespace huginn {
 
-class HText : public HHuginn::HObject {
+class HText : public HHuginn::HValue {
 public:
 	enum class BASE {
 		HEX, OCT, BIN
 	};
 	HText( HHuginn::HClass* class_ )
-		: HObject( class_ ) {
+		: HValue( class_ ) {
 		return;
 	}
 	static HHuginn::value_t split( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {

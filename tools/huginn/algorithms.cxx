@@ -49,13 +49,13 @@ namespace tools {
 
 namespace huginn {
 
-class HAlgorithms : public HHuginn::HObject {
+class HAlgorithms : public HHuginn::HValue {
 	HHuginn::class_t _filterClass;
 	HHuginn::class_t _mapperClass;
 	HHuginn::class_t _rangeClass;
 public:
 	HAlgorithms( HHuginn::HClass* class_ )
-		: HObject( class_ )
+		: HValue( class_ )
 		, _filterClass( HFilter::get_class( class_->runtime() ) )
 		, _mapperClass( HMapper::get_class( class_->runtime() ) )
 		, _rangeClass( HRange::get_class( class_->runtime() ) ) {

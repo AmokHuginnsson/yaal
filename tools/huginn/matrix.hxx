@@ -38,7 +38,7 @@ namespace tools {
 
 namespace huginn {
 
-class HMatrix : public HHuginn::HObject {
+class HMatrix : public HHuginn::HValue {
 	typedef yaal::hcore::HMatrix<yaal::hcore::HNumber> arbitrary_precision_matrix_t;
 	typedef yaal::hcore::HResource<arbitrary_precision_matrix_t> arbitrary_precision_matrix_ptr_t;
 	typedef yaal::hcore::HMatrix<double long> floating_point_matrix_t;

@@ -47,13 +47,13 @@ namespace tools {
 
 namespace huginn {
 
-class HDateTime : public HHuginn::HObject {
+class HDateTime : public HHuginn::HValue {
 	HHuginn::class_t _timeClass;
 	HHuginn::class_t _clockClass;
 	HHuginn::class_t _exceptionClass;
 public:
 	HDateTime( HHuginn::HClass* class_ )
-		: HObject( class_ )
+		: HValue( class_ )
 		, _timeClass( HTime::get_class( class_->runtime() ) )
 		, _clockClass( HClock::get_class( class_->runtime() ) )
 		, _exceptionClass( exception::create_class( class_->runtime(), "DateTimeException", "The `DateTimeException` exception type for `DateTime` package." ) ) {

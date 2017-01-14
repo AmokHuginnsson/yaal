@@ -38,7 +38,7 @@ namespace dbwrapper {
 
 namespace huginn {
 
-class HQuery : public tools::HHuginn::HObject {
+class HQuery : public tools::HHuginn::HValue {
 	dbwrapper::HQuery::ptr_t _query;
 public:
 	HQuery( tools::HHuginn::HClass const*, dbwrapper::HQuery::ptr_t const& );

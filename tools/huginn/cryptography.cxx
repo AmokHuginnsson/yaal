@@ -46,11 +46,11 @@ namespace tools {
 
 namespace huginn {
 
-class HCryptography : public HHuginn::HObject {
+class HCryptography : public HHuginn::HValue {
 	HHuginn::class_t _exceptionClass;
 public:
 	HCryptography( HHuginn::HClass* class_ )
-		: HObject( class_ )
+		: HValue( class_ )
 		, _exceptionClass( exception::create_class( class_->runtime(), "CryptographyException", "The `CryptographyException` exception type for `Cryptography` package." ) ) {
 		return;
 	}

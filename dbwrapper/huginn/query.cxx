@@ -48,7 +48,7 @@ namespace huginn {
 HQuery::HQuery(
 	HHuginn::HClass const* class_,
 	dbwrapper::HQuery::ptr_t const& query_
-) : HObject( class_ )
+) : HValue( class_ )
 	, _query( query_ ) {
 	return;
 }
@@ -93,7 +93,7 @@ HHuginn::value_t HQuery::bind( tools::huginn::HThread* thread_, HHuginn::value_t
 	verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, false, position_ );
 	verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, false, position_ );
 	HQuery* q( static_cast<HQuery*>( object_->raw() ) );
-	HQueryClass const* qc( static_cast<HQueryClass const*>( q->HObject::get_class() ) );
+	HQueryClass const* qc( static_cast<HQueryClass const*>( q->HValue::get_class() ) );
 	HHuginn::value_t v( thread_->runtime().none_value() );
 	try {
 		q->_query->bind( static_cast<int>( get_integer( values_[0] ) ), get_string( values_[1] ) );
@@ -110,7 +110,7 @@ HHuginn::value_t HQuery::execute( tools::huginn::HThread* thread_, HHuginn::valu
 	char const name[] = "Query.execute";
 	verify_arg_count( name, values_, 0, 0, position_ );
 	HQuery* q( static_cast<HQuery*>( object_->raw() ) );
-	HQueryClass const* qc( static_cast<HQueryClass const*>( q->HObject::get_class() ) );
+	HQueryClass const* qc( static_cast<HQueryClass const*>( q->HValue::get_class() ) );
 	HHuginn::value_t v( thread_->runtime().none_value() );
 	try {
 		HRecordSet::ptr_t rs( q->_query->execute() );

@@ -220,6 +220,40 @@ HHuginn::value_t range(
 	return ( res );
 }
 
+namespace {
+void fallback_arithmetic( HThread* thread_, char const* methodName_, char const* oper_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, int position_ ) {
+	HHuginn::HObject* o( nullptr );
+	HHuginn::value_t v;
+	HHuginn::type_id_t t( v1_->type_id() );
+	if ( thread_ && ( o = dynamic_cast<HHuginn::HObject*>( v1_.raw() ) ) ) {
+		v = o->call_method( thread_, v1_, methodName_, { v2_ }, position_ );
+		if ( v->type_id() != t ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"Arithmetic method `"_ys
+					.append( methodName_ )
+					.append( "' on " )
+					.append( a_type_name( t ) )
+					.append( "returned result of incompatible type " )
+					.append( a_type_name( v->get_class() ) )
+					.append( "." ),
+				position_
+			);
+		}
+	} else {
+		HHuginn::HClass const* c( v1_->get_class() );
+		int idx( c->field_index( thread_->runtime().identifier_id( methodName_ ) ) );
+		if ( idx >= 0 ) {
+			HHuginn::HClass::HMethod const& m( *static_cast<HHuginn::HClass::HMethod const*>( c->field( idx ).raw() ) );
+			v = m.function()( thread_, &v1_, HHuginn::values_t{ v2_ }, position_ );
+			M_ASSERT( v->type_id() == t );
+		} else {
+			throw HHuginn::HHuginnRuntimeException( "There is no `"_ys.append( oper_ ).append( "' operator for " ).append( a_type_name( t ) ).append( "." ), position_ );
+		}
+	}
+	return;
+}
+}
+
 void add( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type_id() == v2_->type_id() );
 	HHuginn::type_id_t typeId( v1_->type_id() );
@@ -232,11 +266,7 @@ void add( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		static_cast<HHuginn::HNumber*>( v1_.raw() )->value() += static_cast<HHuginn::HNumber const*>( v2_.raw() )->value();
 	} else {
-		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v1_.raw() ) ) {
-			o->call_method( thread_, v1_, "add", { v2_ }, position_ );
-		} else {
-			throw HHuginn::HHuginnRuntimeException( "There is no `+' operator for `"_ys.append( v1_->get_class()->name() ).append( "'." ), position_ );
-		}
+		fallback_arithmetic( thread_, "add", "+", v1_, v2_, position_ );
 	}
 	return;
 }
@@ -251,11 +281,7 @@ void sub( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		static_cast<HHuginn::HNumber*>( v1_.raw() )->value() -= static_cast<HHuginn::HNumber const*>( v2_.raw() )->value();
 	} else {
-		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v1_.raw() ) ) {
-			o->call_method( thread_, v1_, "subtract", { v2_ }, position_ );
-		} else {
-			throw HHuginn::HHuginnRuntimeException( "There is no `-' operator for `"_ys.append( v1_->get_class()->name() ).append( "'." ), position_ );
-		}
+		fallback_arithmetic( thread_, "subtract", "-", v1_, v2_, position_ );
 	}
 	return;
 }
@@ -270,11 +296,7 @@ void mul( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		static_cast<HHuginn::HNumber*>( v1_.raw() )->value() *= static_cast<HHuginn::HNumber const*>( v2_.raw() )->value();
 	} else {
-		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v1_.raw() ) ) {
-			o->call_method( thread_, v1_, "multiply", { v2_ }, position_ );
-		} else {
-			throw HHuginn::HHuginnRuntimeException( "There is no `*' operator for `"_ys.append( v1_->get_class()->name() ).append( "'." ), position_ );
-		}
+		fallback_arithmetic( thread_, "multiply", "*", v1_, v2_, position_ );
 	}
 	return;
 }
@@ -304,13 +326,7 @@ void div( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 			v1_ = thread_->runtime().none_value();
 		}
 	} else {
-		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v1_.raw() ) ) {
-			o->call_method( thread_, v1_, "divide", { v2_ }, position_ );
-		} else {
-			HHuginn::HClass const* c( v1_->get_class() );
-			v1_ = thread_->runtime().none_value();
-			throw HHuginn::HHuginnRuntimeException( "There is no `/' operator for `"_ys.append( c->name() ).append( "'." ), position_ );
-		}
+		fallback_arithmetic( thread_, "divide", "/", v1_, v2_, position_ );
 	}
 	HRuntime& rt( thread_->runtime() );
 	if ( v1_ == rt.none_value() ) {
@@ -344,13 +360,7 @@ void mod( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 			v1_ = thread_->runtime().none_value();
 		}
 	} else {
-		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v1_.raw() ) ) {
-			o->call_method( thread_, v1_, "modulo", { v2_ }, position_ );
-		} else {
-			HHuginn::HClass const* c( v1_->get_class() );
-			v1_ = thread_->runtime().none_value();
-			throw HHuginn::HHuginnRuntimeException( "There is no `%' operator for `"_ys.append( c->name() ).append( "'." ), position_ );
-		}
+		fallback_arithmetic( thread_, "modulo", "%", v1_, v2_, position_ );
 	}
 	HRuntime& rt( thread_->runtime() );
 	if ( v1_ == rt.none_value() ) {
@@ -369,13 +379,7 @@ void pow( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		static_cast<HHuginn::HNumber*>( v1_.raw() )->value() ^= static_cast<HHuginn::HNumber const*>( v2_.raw() )->value().to_integer();
 	} else {
-		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v1_.raw() ) ) {
-			o->call_method( thread_, v1_, "power", { v2_ }, position_ );
-		} else {
-			HHuginn::HClass const* c( v1_->get_class() );
-			v1_ = thread_->runtime().none_value();
-			throw HHuginn::HHuginnRuntimeException( "There is no `^' operator for `"_ys.append( c->name() ).append( "'." ), position_ );
-		}
+		fallback_arithmetic( thread_, "power", "^", v1_, v2_, position_ );
 	}
 	return;
 }
@@ -636,8 +640,10 @@ namespace {
 
 HHuginn::value_t fallback_conversion( HHuginn::type_id_t type_, HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res;
+	HString methodName( "to_" );
+	methodName.append( type_name( type_ ) );
 	if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v_.raw() ) ) {
-		res = o->call_method( thread_, v_, "to_"_ys.append( type_name( type_ ) ), HHuginn::values_t(), position_ );
+		res = o->call_method( thread_, v_, methodName, HHuginn::values_t(), position_ );
 		if ( res->type_id() != type_ ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"User conversion method returned invalid type `"_ys
@@ -649,14 +655,22 @@ HHuginn::value_t fallback_conversion( HHuginn::type_id_t type_, HThread* thread_
 			);
 		}
 	} else {
-		throw HHuginn::HHuginnRuntimeException(
-			"Conversion from `"_ys
-			.append( v_->get_class()->name() )
-			.append( "' to `" )
-			.append( type_name( type_ ) )
-			.append( "' is not supported." ),
-			position_
-		);
+		HHuginn::HClass const* c( v_->get_class() );
+		int idx( c->field_index( thread_->runtime().identifier_id( methodName ) ) );
+		if ( idx >= 0 ) {
+			HHuginn::HClass::HMethod const& m( *static_cast<HHuginn::HClass::HMethod const*>( c->field( idx ).raw() ) );
+			res = m.function()( thread_, const_cast<HHuginn::value_t*>( &v_ ), HHuginn::values_t{}, position_ );
+			M_ASSERT( res->type_id() == type_ );
+		} else {
+			throw HHuginn::HHuginnRuntimeException(
+				"Conversion from `"_ys
+				.append( v_->get_class()->name() )
+				.append( "' to `" )
+				.append( type_name( type_ ) )
+				.append( "' is not supported." ),
+				position_
+			);
+		}
 	}
 	return ( res );
 }

@@ -44,7 +44,7 @@ namespace tools {
 namespace huginn {
 
 HClock::HClock( HHuginn::HClass* class_ )
-	: HObject( class_ )
+	: HValue( class_ )
 	, _clock() {
 	return;
 }

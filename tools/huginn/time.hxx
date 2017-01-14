@@ -42,7 +42,7 @@ typedef yaal::hcore::HTime& ( yaal::hcore::HTime::*time_mod_t )( int );
 typedef yaal::hcore::HTime& ( yaal::hcore::HTime::*time_set_t )( int, int, int );
 typedef int ( yaal::hcore::HTime::*time_get_t )( void ) const;
 
-class HTime : public HHuginn::HObject {
+class HTime : public HHuginn::HValue {
 	yaal::hcore::HTime _time;
 public:
 	HTime( HHuginn::HClass const*, yaal::hcore::HTime const& );

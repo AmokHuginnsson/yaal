@@ -45,7 +45,7 @@ namespace tools {
 namespace huginn {
 
 HCompiledRegularExpression::HCompiledRegularExpression( HHuginn::HClass const* class_, regex_t regex_ )
-	: HHuginn::HObject( class_ )
+	: HHuginn::HValue( class_ )
 	, _regex( yaal::move( regex_ ) ) {
 	return;
 }
@@ -129,7 +129,7 @@ HHuginn::value_t HCompiledRegularExpression::do_match(
 	char const name[] = "CompiledRegularExpression.match";
 	verify_arg_count( name, values_, 1, 1, position_ );
 	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
-	HCompiledRegularExpressionClass const* creClass( static_cast<HCompiledRegularExpressionClass const*>( HObject::get_class() ) );
+	HCompiledRegularExpressionClass const* creClass( static_cast<HCompiledRegularExpressionClass const*>( HValue::get_class() ) );
 	return ( make_pointer<HRegularExpressionMatch>( creClass->regular_expression_match_class(), make_resource<HRegex>( _regex->copy() ), values_[0] ) );
 }
 
@@ -179,7 +179,7 @@ HHuginn::class_t HCompiledRegularExpression::get_class( HRuntime* runtime_, HHug
 
 HHuginn::value_t HCompiledRegularExpression::do_clone( huginn::HRuntime* ) const {
 	M_PROLOG
-	return ( make_pointer<HCompiledRegularExpression>( HObject::get_class(), make_resource<HRegex>( _regex->copy() ) ) );
+	return ( make_pointer<HCompiledRegularExpression>( HValue::get_class(), make_resource<HRegex>( _regex->copy() ) ) );
 	M_EPILOG
 }
 

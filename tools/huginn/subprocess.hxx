@@ -38,7 +38,7 @@ namespace tools {
 
 namespace huginn {
 
-class HSubprocess : public HHuginn::HObject {
+class HSubprocess : public HHuginn::HValue {
 private:
 	HPipedChild _pipedChild;
 public:

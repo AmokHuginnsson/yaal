@@ -51,7 +51,7 @@ namespace tools {
 
 namespace huginn {
 
-class HMathematics : public HHuginn::HObject {
+class HMathematics : public HHuginn::HValue {
 	typedef yaal::hcore::HNumber const& ( *constant_getter_t )( yaal::hcore::HNumber::integer_t );
 	HHuginn::class_t _matrixClass;
 	HHuginn::class_t _numberSetStatisticsClass;
@@ -59,7 +59,7 @@ class HMathematics : public HHuginn::HObject {
 	HHuginn::class_t _exceptionClass;
 public:
 	HMathematics( HHuginn::HClass* class_ )
-		: HObject( class_ )
+		: HValue( class_ )
 		, _matrixClass( HMatrix::get_class( class_->runtime() ) )
 		, _numberSetStatisticsClass( HNumberSetStatistics::get_class( class_->runtime() ) )
 		, _randomizerClass( HRandomizer::get_class( class_->runtime() ) )

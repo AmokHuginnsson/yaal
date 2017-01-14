@@ -39,7 +39,7 @@ namespace dbwrapper {
 
 namespace huginn {
 
-class HDatabaseConnection : public tools::HHuginn::HObject {
+class HDatabaseConnection : public tools::HHuginn::HValue {
 public:
 private:
 	yaal::dbwrapper::database_ptr_t _database;
