@@ -167,13 +167,9 @@ HHuginn::HDeque::HDeque( HHuginn::HClass const* class_ )
 	return;
 }
 
-HHuginn::HDeque::HDeque( HHuginn::HClass const* class_, values_t const& data_ )
+HHuginn::HDeque::HDeque( HHuginn::HClass const* class_, values_t&& data_ )
 	: HIterable( class_ )
-	, _data() {
-	HRuntime* runtime( class_->runtime() );
-	for ( values_t::value_type const& v : data_ ) {
-		_data.push_back( v->clone( runtime ) );
-	}
+	, _data( yaal::move( data_ ) ) {
 	return;
 }
 
@@ -232,8 +228,12 @@ HHuginn::HIterable::HIterator HHuginn::HDeque::do_iterator( huginn::HThread*, in
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HDeque::do_clone( HRuntime* runtime_ ) const {
-	return ( runtime_->object_factory()->create_deque( _data ) );
+HHuginn::value_t HHuginn::HDeque::do_clone( huginn::HThread* thread_, int position_ ) const {
+	values_t data;
+	for ( values_t::value_type const& v : _data ) {
+		data.push_back( v->clone( thread_, position_ ) );
+	}
+	return ( thread_->runtime().object_factory()->create_deque( yaal::move( data ) ) );
 }
 
 }

@@ -78,11 +78,6 @@ typedef typename memory::aligned<BUFFER_SIZE, holder_t>::type buffer_t;
 
 }
 
-HHuginn::HObject::HObject( HClass const* class_ )
-	: HValue( class_ )
-	, _fields( class_->get_defaults() ) {
-}
-
 HHuginn::HObject::HObject( HClass const* class_, fields_t const& fields_ )
 	: HValue( class_ )
 	, _fields( fields_ ) {
@@ -201,13 +196,13 @@ HHuginn::value_t HHuginn::HObject::call_method(
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HObject::do_clone( HRuntime* runtime_ ) const {
+HHuginn::value_t HHuginn::HObject::do_clone( huginn::HThread* thread_, int position_ ) const {
 	M_PROLOG
 	values_t fields;
 	for ( value_t const& v : _fields ) {
-		fields.push_back( v->clone( runtime_ ) );
+		fields.push_back( v->clone( thread_, position_ ) );
 	}
-	return ( runtime_->object_factory()->create_object( get_class(), fields ) );
+	return ( thread_->runtime().object_factory()->create_object( get_class(), fields ) );
 	M_EPILOG
 }
 

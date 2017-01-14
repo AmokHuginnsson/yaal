@@ -73,8 +73,8 @@ HHuginn::HBoolean::HBoolean( HHuginn::HClass const* class_, HHuginn::HBoolean::v
 	return;
 }
 
-HHuginn::value_t HHuginn::HBoolean::do_clone( HRuntime* runtime_ ) const {
-	return ( runtime_->object_factory()->create_boolean( _value ) );
+HHuginn::value_t HHuginn::HBoolean::do_clone( huginn::HThread* thread_, int ) const {
+	return ( thread_->runtime().object_factory()->create_boolean( _value ) );
 }
 
 }

@@ -194,7 +194,7 @@ HHuginn::class_t HTime::get_class( HRuntime* runtime_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HTime::do_clone( huginn::HRuntime* ) const {
+HHuginn::value_t HTime::do_clone( huginn::HThread*, int ) const {
 	M_PROLOG
 	return ( make_pointer<HTime>( HValue::get_class(), _time ) );
 	M_EPILOG

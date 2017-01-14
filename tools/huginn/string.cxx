@@ -303,8 +303,8 @@ HHuginn::HString::HString( HHuginn::HClass const* class_, yaal::hcore::HString c
 	return;
 }
 
-HHuginn::value_t HHuginn::HString::do_clone( HRuntime* runtime_ ) const {
-	return ( runtime_->object_factory()->create_string( _value ) );
+HHuginn::value_t HHuginn::HString::do_clone( huginn::HThread* thread_, int ) const {
+	return ( thread_->runtime().object_factory()->create_string( _value ) );
 }
 
 HHuginn::HIterable::HIterator HHuginn::HString::do_iterator( huginn::HThread*, int ) {

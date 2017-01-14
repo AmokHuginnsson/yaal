@@ -229,7 +229,8 @@ void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifier
 	++ frame_->ip();
 	HHuginn::value_t v( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	HRuntime& rt( frame_->thread()->runtime() );
+	HThread* t( frame_->thread() );
+	HRuntime& rt( t->runtime() );
 	if ( v->get_class()->is_complex() ) {
 		int fi( v->field_index( identifierId_ ) );
 		if ( fi < 0 ) {
@@ -273,7 +274,7 @@ void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifier
 				);
 			}
 			if ( access_ == ACCESS::VALUE ) {
-				frame_->values().push( oref->field( fi ) );
+				frame_->values().push( oref->field( t, fi, position_ ) );
 			} else {
 				throw HHuginn::HHuginnRuntimeException( "Changing upcasted reference.", p );
 			}
@@ -437,7 +438,7 @@ void HExpression::plus( HFrame* frame_, int ) {
 		operands_type_mismatch( op_to_str( OPERATOR::PLUS ), v1->type_id(), v2->type_id(), p );
 	}
 	if ( ! v1.unique() ) {
-		v1 = v1->clone( &frame_->thread()->runtime() );
+		v1 = v1->clone( frame_->thread(), p );
 	}
 	value_builtin::add( frame_->thread(), v1, v2, p );
 	return;
@@ -457,7 +458,7 @@ void HExpression::minus( HFrame* frame_, int ) {
 		operands_type_mismatch( op_to_str( OPERATOR::MINUS ), v1->type_id(), v2->type_id(), p );
 	}
 	if ( ! v1.unique() ) {
-		v1 = v1->clone( &frame_->thread()->runtime() );
+		v1 = v1->clone( frame_->thread(), p );
 	}
 	value_builtin::sub( frame_->thread(), v1, v2, p );
 	return;
@@ -477,7 +478,7 @@ void HExpression::mul( HFrame* frame_, int ) {
 		operands_type_mismatch( op_to_str( OPERATOR::MULTIPLY ), v1->type_id(), v2->type_id(), p );
 	}
 	if ( ! v1.unique() ) {
-		v1 = v1->clone( &frame_->thread()->runtime() );
+		v1 = v1->clone( frame_->thread(), p );
 	}
 	value_builtin::mul( frame_->thread(), v1, v2, p );
 	return;
@@ -497,7 +498,7 @@ void HExpression::div( HFrame* frame_, int ) {
 		operands_type_mismatch( op_to_str( OPERATOR::DIVIDE ), v1->type_id(), v2->type_id(), p );
 	}
 	if ( ! v1.unique() ) {
-		v1 = v1->clone( &frame_->thread()->runtime() );
+		v1 = v1->clone( frame_->thread(), p );
 	}
 	value_builtin::div( frame_->thread(), v1, v2, p );
 	return;
@@ -517,7 +518,7 @@ void HExpression::mod( HFrame* frame_, int ) {
 		operands_type_mismatch( op_to_str( OPERATOR::MODULO ), v1->type_id(), v2->type_id(), p );
 	}
 	if ( ! v1.unique() ) {
-		v1 = v1->clone( &frame_->thread()->runtime() );
+		v1 = v1->clone( frame_->thread(), p );
 	}
 	value_builtin::mod( frame_->thread(), v1, v2, p );
 	return;
@@ -561,7 +562,7 @@ void HExpression::power( HFrame* frame_, int ) {
 			operands_type_mismatch( op_to_str( OPERATOR::POWER ), v1->type_id(), v2->type_id(), p );
 		}
 		if ( ! v1.unique() ) {
-			v1 = v1->clone( &frame_->thread()->runtime() );
+			v1 = v1->clone( frame_->thread(), p );
 		}
 		value_builtin::pow( frame_->thread(), v1, v2, p );
 	}

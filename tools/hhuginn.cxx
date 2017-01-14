@@ -168,12 +168,12 @@ int HHuginn::HObjectReference::field_index( identifier_id_t identifierId_ ) cons
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HObjectReference::field( int index_ ) {
+HHuginn::value_t HHuginn::HObjectReference::field( huginn::HThread* thread_, int index_, int position_ ) {
 	M_PROLOG
 	HObject* o( static_cast<HObject*>( _object.raw() ) );
 	value_t v;
 	if ( o->get_class()->is_overridden( _class, index_ ) ) {
-		v = _class->get_default( index_ );
+		v = _class->get_default( thread_, index_, position_ );
 	} else {
 		v = o->field_ref( index_ );
 	}
@@ -187,9 +187,9 @@ HHuginn::value_t HHuginn::HObjectReference::field( int index_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HObjectReference::do_clone( HRuntime* runtime_ ) const {
+HHuginn::value_t HHuginn::HObjectReference::do_clone( huginn::HThread* thread_, int position_ ) const {
 	M_PROLOG
-	return ( make_pointer<HObjectReference>( _object->clone( runtime_ ), _class ) );
+	return ( make_pointer<HObjectReference>( _object->clone( thread_, position_ ), _class ) );
 	M_EPILOG
 }
 
@@ -681,13 +681,13 @@ HHuginn::value_t HHuginn::HValue::do_field( HHuginn::value_t const& object_, int
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HValue::clone( HRuntime* runtime_ ) const {
-	return ( do_clone( runtime_ ) );
+HHuginn::value_t HHuginn::HValue::clone( huginn::HThread* thread_, int position_ ) const {
+	return ( do_clone( thread_, position_ ) );
 }
 
-HHuginn::value_t HHuginn::HValue::do_clone( HRuntime* runtime_ ) const {
+HHuginn::value_t HHuginn::HValue::do_clone( huginn::HThread* thread_, int ) const {
 	M_ASSERT( _class->type_id() == TYPE::NONE );
-	return ( runtime_->none_value() );
+	return ( thread_->runtime().none_value() );
 }
 
 HHuginn::HObserver::HObserver( HHuginn::value_t const& value_ )
@@ -700,7 +700,7 @@ HHuginn::value_t HHuginn::HObserver::value( void ) const {
 	return ( _value );
 }
 
-HHuginn::value_t HHuginn::HObserver::do_clone( HRuntime* ) const {
+HHuginn::value_t HHuginn::HObserver::do_clone( huginn::HThread*, int ) const {
 	return ( make_pointer<HObserver>( _value ) );
 }
 
@@ -713,7 +713,7 @@ HHuginn::value_t& HHuginn::HReference::value( void ) const {
 	return ( _value );
 }
 
-HHuginn::value_t HHuginn::HReference::do_clone( HRuntime* ) const {
+HHuginn::value_t HHuginn::HReference::do_clone( huginn::HThread*, int ) const {
 	M_ASSERT( 0 && "cloning reference"[0] );
 #if defined( NDEBUG ) || defined( __MSVCXX__ )
 	return ( HHuginn::value_t() );
@@ -761,7 +761,7 @@ HHuginn::value_t HHuginn::HTernaryEvaluator::execute( huginn::HThread* thread_ )
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HTernaryEvaluator::do_clone( HRuntime* ) const {
+HHuginn::value_t HHuginn::HTernaryEvaluator::do_clone( huginn::HThread*, int ) const {
 	M_ASSERT( 0 && "cloning ternary evaluator"[0] );
 #if defined( NDEBUG ) || defined( __MSVCXX__ )
 	return ( HHuginn::value_t() );
@@ -779,8 +779,8 @@ HHuginn::HFunctionReference::HFunctionReference(
 	return;
 }
 
-HHuginn::value_t HHuginn::HFunctionReference::do_clone( HRuntime* runtime_ ) const {
-	return ( runtime_->object_factory()->create_function_reference( _identifierId, _function, _doc ) );
+HHuginn::value_t HHuginn::HFunctionReference::do_clone( huginn::HThread* thread_, int ) const {
+	return ( thread_->runtime().object_factory()->create_function_reference( _identifierId, _function, _doc ) );
 }
 
 yaal::hcore::HString const& HHuginn::HFunctionReference::doc( void ) const {
@@ -806,7 +806,7 @@ HHuginn::function_t const& HHuginn::HClass::HMethod::function( void ) const {
 	return ( _function );
 }
 
-HHuginn::value_t HHuginn::HClass::HMethod::do_clone( HRuntime* ) const {
+HHuginn::value_t HHuginn::HClass::HMethod::do_clone( huginn::HThread*, int ) const {
 	return ( make_pointer<HMethod>( _function ) );
 }
 
@@ -820,11 +820,11 @@ HHuginn::value_t HHuginn::HClass::HBoundMethod::call( huginn::HThread* thread_, 
 	return ( _function( thread_, &_objectHolder, arguments_, position_ ) );
 }
 
-HHuginn::value_t HHuginn::HClass::HBoundMethod::do_clone( HRuntime* runtime_ ) const {
+HHuginn::value_t HHuginn::HClass::HBoundMethod::do_clone( huginn::HThread* thread_, int position_ ) const {
 	return (
-		runtime_->object_factory()->create_bound_method(
+		thread_->runtime().object_factory()->create_bound_method(
 			static_cast<HMethod const*>( this )->function(),
-			_objectHolder->clone( runtime_ )
+			_objectHolder->clone( thread_, position_ )
 		)
 	);
 }

@@ -172,16 +172,6 @@ HHuginn::HSet::HSet( HHuginn::HClass const* class_ )
 	return;
 }
 
-HHuginn::HSet::HSet( HHuginn::HClass const* class_, values_t const& data_ )
-	: HIterable( class_ )
-	, _data( &value_builtin::hash, &value_builtin::key_equals ) {
-	HRuntime* huginn( class_->runtime() );
-	for ( values_t::value_type const& v : data_ ) {
-		_data.insert( v->clone( huginn ) );
-	}
-	return;
-}
-
 int long HHuginn::HSet::do_size( void ) const {
 	return ( _data.get_size() );
 }
@@ -211,8 +201,13 @@ HHuginn::HIterable::HIterator HHuginn::HSet::do_iterator( huginn::HThread*, int 
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HSet::do_clone( HRuntime* runtime_ ) const {
-	return ( runtime_->object_factory()->create_set( _data ) );
+HHuginn::value_t HHuginn::HSet::do_clone( huginn::HThread* thread_, int position_ ) const {
+	HHuginn::value_t set( thread_->runtime().object_factory()->create_set() );
+	values_t& data( static_cast<HSet*>( set.raw() )->value() );
+	for ( values_t::value_type const& v : _data ) {
+		data.insert( v->clone( thread_, position_ ) );
+	}
+	return ( set );
 }
 
 }

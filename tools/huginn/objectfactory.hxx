@@ -125,35 +125,29 @@ public:
 	HHuginn::value_t create_character( HHuginn::HCharacter::value_type value_ ) const {
 		return ( _characterPool.create( value_ ) );
 	}
-	HHuginn::value_t create_list( HHuginn::values_t const& values_ = HHuginn::values_t() ) const {
-		return ( _listPool.create( values_ ) );
+	HHuginn::value_t create_list( HHuginn::values_t&& values_ = HHuginn::values_t() ) const {
+		return ( _listPool.create( yaal::move( values_ ) ) );
 	}
-	HHuginn::value_t create_deque( HHuginn::HDeque::values_t const& values_ = HHuginn::HDeque::values_t() ) const {
-		return ( _dequePool.create( values_ ) );
+	HHuginn::value_t create_deque( HHuginn::HDeque::values_t&& values_ = HHuginn::HDeque::values_t() ) const {
+		return ( _dequePool.create( yaal::move( values_ ) ) );
 	}
 	HHuginn::value_t create_dict( void ) const {
 		return ( _dictPool.create() );
 	}
-	HHuginn::value_t create_dict( HHuginn::HDict::values_t const& data_, HHuginn::HClass const* keyType_ ) const {
-		return ( _dictPool.create( data_, keyType_ ) );
+	HHuginn::value_t create_dict( HHuginn::HDict::values_t&& data_, HHuginn::HClass const* keyType_ ) const {
+		return ( _dictPool.create( yaal::move( data_ ), keyType_ ) );
 	}
 	HHuginn::value_t create_order( void ) const {
 		return ( _orderPool.create() );
 	}
-	HHuginn::value_t create_order( HHuginn::HOrder::values_t const& data_, HHuginn::HClass const* keyType_ ) const {
-		return ( _orderPool.create( data_, keyType_ ) );
+	HHuginn::value_t create_order( HHuginn::HOrder::values_t&& data_, HHuginn::HClass const* keyType_ ) const {
+		return ( _orderPool.create( yaal::move( data_ ), keyType_ ) );
 	}
 	HHuginn::value_t create_lookup( void ) const {
 		return ( _lookupPool.create() );
 	}
-	HHuginn::value_t create_lookup( HHuginn::HLookup::values_t const& data_ ) const {
-		return ( _lookupPool.create( data_ ) );
-	}
 	HHuginn::value_t create_set( void ) const {
 		return ( _setPool.create() );
-	}
-	HHuginn::value_t create_set( HHuginn::HSet::values_t const& data_ ) const {
-		return ( _setPool.create( data_ ) );
 	}
 	HHuginn::value_t create_reference( HHuginn::value_t& value_ ) const {
 		return ( _referencePool.create_nc( value_ ) );
@@ -163,9 +157,6 @@ public:
 	}
 	HHuginn::value_t create_bound_method( HHuginn::function_t const& method_, HHuginn::value_t const& object_ ) const {
 		return ( _boundMethodPool.create_nc( method_, object_ ) );
-	}
-	HHuginn::value_t create_object( HHuginn::HClass const* class_ ) const {
-		return ( _objectPool.create_nc( class_ ) );
 	}
 	HHuginn::value_t create_object( HHuginn::HClass const* class_, HHuginn::HObject::fields_t const& fields_ ) const {
 		return ( _objectPool.create_nc( class_, fields_ ) );

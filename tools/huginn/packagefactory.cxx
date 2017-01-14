@@ -132,7 +132,8 @@ HHuginn::value_t HPackageFactory::load_module( HRuntime* runtime_, HHuginn::path
 	HHuginn::class_t c( rt.make_package( name_, *runtime_ ) );
 	runtime_->copy_text( rt );
 	runtime_->huginn()->register_class( c );
-	return ( runtime_->object_factory()->create_object( c.raw() ) );
+	huginn::HThread t( runtime_, hcore::HThread::get_current_thread_id() );
+	return ( runtime_->object_factory()->create_object( c.raw(), c->get_defaults( &t, position_ ) ) );
 	M_EPILOG
 }
 

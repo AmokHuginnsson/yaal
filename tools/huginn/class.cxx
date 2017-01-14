@@ -146,7 +146,7 @@ HHuginn::value_t HHuginn::HClass::access_violation( huginn::HThread*, value_t*, 
 
 HHuginn::value_t HHuginn::HClass::do_create_instance( huginn::HThread* thread_, values_t const& values_, int position_ ) const {
 	M_PROLOG
-	value_t v( thread_->runtime().object_factory()->create_object( this ) );
+	value_t v( thread_->runtime().object_factory()->create_object( this, get_defaults( thread_, position_ ) ) );
 	int constructorIdx( field_index( KEYWORD::CONSTRUCTOR_IDENTIFIER ) );
 	if ( constructorIdx >= 0 ) {
 		function( constructorIdx )( thread_, &v, values_, position_ );
@@ -155,19 +155,19 @@ HHuginn::value_t HHuginn::HClass::do_create_instance( huginn::HThread* thread_, 
 	M_EPILOG
 }
 
-HHuginn::values_t HHuginn::HClass::get_defaults( void ) const {
+HHuginn::values_t HHuginn::HClass::get_defaults( huginn::HThread* thread_, int position_ ) const {
 	M_PROLOG
 	values_t defaults;
 	for ( value_t const& v : _fieldDefinitions ) {
-		defaults.push_back( v->clone( _runtime ) );
+		defaults.push_back( v->clone( thread_, position_ ) );
 	}
 	return ( defaults );
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HClass::get_default( int index_ ) const {
+HHuginn::value_t HHuginn::HClass::get_default( huginn::HThread* thread_, int index_, int position_ ) const {
 	M_PROLOG
-	return ( _fieldDefinitions[index_]->clone( _runtime ) );
+	return ( _fieldDefinitions[index_]->clone( thread_, position_ ) );
 	M_EPILOG
 }
 

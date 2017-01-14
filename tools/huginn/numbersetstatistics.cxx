@@ -130,7 +130,7 @@ HHuginn::class_t HNumberSetStatistics::get_class( HRuntime* runtime_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HNumberSetStatistics::do_clone( huginn::HRuntime* ) const {
+HHuginn::value_t HNumberSetStatistics::do_clone( huginn::HThread*, int ) const {
 	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on NumberSetStatistics.", 0 );
 }
 

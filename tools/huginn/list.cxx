@@ -147,14 +147,9 @@ HHuginn::HList::HList( HHuginn::HClass const* class_ )
 	return;
 }
 
-HHuginn::HList::HList( HHuginn::HClass const* class_, values_t const& data_ )
+HHuginn::HList::HList( HHuginn::HClass const* class_, values_t&& data_ )
 	: HIterable( class_ )
-	, _data() {
-	_data.reserve( data_.get_size() );
-	HRuntime* runtime( class_->runtime() );
-	for ( values_t::value_type const& v : data_ ) {
-		_data.push_back( v->clone( runtime ) );
-	}
+	, _data( yaal::move( data_ ) ) {
 	return;
 }
 
@@ -199,8 +194,13 @@ HHuginn::HIterable::HIterator HHuginn::HList::do_iterator( huginn::HThread*, int
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HList::do_clone( HRuntime* runtime_ ) const {
-	return ( runtime_->object_factory()->create_list( _data ) );
+HHuginn::value_t HHuginn::HList::do_clone( huginn::HThread* thread_, int position_ ) const {
+	values_t data;
+	data.reserve( _data.get_size() );
+	for ( values_t::value_type const& v : _data ) {
+		data.push_back( v->clone( thread_, position_ ) );
+	}
+	return ( thread_->runtime().object_factory()->create_list( yaal::move( data ) ) );
 }
 
 }

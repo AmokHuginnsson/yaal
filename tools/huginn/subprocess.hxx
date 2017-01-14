@@ -51,7 +51,7 @@ public:
 	static HHuginn::value_t stream( char const*, stream_getter_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::class_t get_class( HRuntime* );
 private:
-	virtual HHuginn::value_t do_clone( huginn::HRuntime* ) const override __attribute__((noreturn));
+	virtual HHuginn::value_t do_clone( huginn::HThread*, int ) const override __attribute__((noreturn));
 };
 
 }

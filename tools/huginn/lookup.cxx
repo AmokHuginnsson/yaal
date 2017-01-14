@@ -181,16 +181,6 @@ HHuginn::HLookup::HLookup( HHuginn::HClass const* class_ )
 	return;
 }
 
-HHuginn::HLookup::HLookup( HHuginn::HClass const* class_, values_t const& data_ )
-	: HIterable( class_ )
-	, _data( &value_builtin::hash, &value_builtin::key_equals ) {
-	HRuntime* runtime( class_->runtime() );
-	for ( values_t::value_type const& v : data_ ) {
-		_data.insert( make_pair( v.first->clone( runtime ), v.second->clone( runtime ) ) );
-	}
-	return;
-}
-
 int long HHuginn::HLookup::do_size( void ) const {
 	return ( _data.get_size() );
 }
@@ -248,8 +238,13 @@ HHuginn::HIterable::HIterator HHuginn::HLookup::do_iterator( huginn::HThread*, i
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HLookup::do_clone( HRuntime* runtime_ ) const {
-	return ( runtime_->object_factory()->create_lookup( _data ) );
+HHuginn::value_t HHuginn::HLookup::do_clone( huginn::HThread* thread_, int position_ ) const {
+	HHuginn::value_t lookup( thread_->runtime().object_factory()->create_lookup() );
+	values_t& data( static_cast<HLookup*>( lookup.raw() )->value() );
+	for ( values_t::value_type const& v : _data ) {
+		data.insert( make_pair( v.first->clone( thread_, position_ ), v.second->clone( thread_, position_ ) ) );
+	}
+	return ( lookup );
 }
 
 }

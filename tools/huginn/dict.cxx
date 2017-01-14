@@ -187,14 +187,10 @@ HHuginn::HDict::HDict( HHuginn::HClass const* class_ )
 	return;
 }
 
-HHuginn::HDict::HDict( HHuginn::HClass const* class_, values_t const& data_, HHuginn::HClass const* keyType_ )
+HHuginn::HDict::HDict( HHuginn::HClass const* class_, values_t&& data_, HHuginn::HClass const* keyType_ )
 	: HIterable( class_ )
-	, _data( &value_builtin::less_low )
+	, _data( yaal::move( data_ ) )
 	, _keyType( keyType_ ) {
-	HRuntime* runtime( class_->runtime() );
-	for ( values_t::value_type const& v : data_ ) {
-		_data.insert( _data.end(), make_pair( v.first->clone( runtime ), v.second->clone( runtime ) ) );
-	}
 	return;
 }
 
@@ -277,8 +273,12 @@ HHuginn::HIterable::HIterator HHuginn::HDict::do_iterator( huginn::HThread*, int
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HDict::do_clone( HRuntime* runtime_ ) const {
-	return ( runtime_->object_factory()->create_dict( _data, _keyType ) );
+HHuginn::value_t HHuginn::HDict::do_clone( huginn::HThread* thread_, int position_ ) const {
+	values_t data( &value_builtin::less_low );
+	for ( values_t::value_type const& v : _data ) {
+		data.insert( data.end(), make_pair( v.first->clone( thread_, position_ ), v.second->clone( thread_, position_ ) ) );
+	}
+	return ( thread_->runtime().object_factory()->create_dict( yaal::move( data ), _keyType ) );
 }
 
 }

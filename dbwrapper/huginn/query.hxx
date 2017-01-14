@@ -46,7 +46,7 @@ public:
 	static tools::HHuginn::value_t execute( tools::huginn::HThread*, tools::HHuginn::value_t* object_, tools::HHuginn::values_t const&, int );
 	static tools::HHuginn::class_t get_class( tools::huginn::HRuntime*, tools::HHuginn::class_t const& );
 private:
-	virtual tools::HHuginn::value_t do_clone( tools::huginn::HRuntime* ) const override __attribute__((noreturn));
+	virtual tools::HHuginn::value_t do_clone( tools::huginn::HThread*, int ) const override __attribute__((noreturn));
 };
 
 }
