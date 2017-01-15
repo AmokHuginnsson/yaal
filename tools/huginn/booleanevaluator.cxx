@@ -59,7 +59,10 @@ bool HBooleanEvaluator::execute( huginn::HThread* thread_ ) {
 		}
 		HHuginn::value_t result( f->result() );
 		if ( result->type_id() != HHuginn::TYPE::BOOLEAN ) {
-			throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OPS_NOT_BOOL], e->position() );
+			throw HHuginn::HHuginnRuntimeException(
+				hcore::to_string( _errMsgHHuginn_[ERR_CODE::OPS_NOT_BOOL] ).append( type_name( result->type_id() ) ),
+				e->position()
+			);
 		}
 		bool v( static_cast<HHuginn::HBoolean*>( result.raw() )->value() );
 		if ( ( ( _operator == OPERATOR::BOOLEAN_AND ) && ! v ) || ( ( _operator == OPERATOR::BOOLEAN_OR ) && v ) ) {

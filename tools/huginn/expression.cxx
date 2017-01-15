@@ -791,7 +791,13 @@ void HExpression::boolean_xor( HFrame* frame_, int ) {
 	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	if ( ( v1->type_id() != HHuginn::TYPE::BOOLEAN ) || ( v2->type_id() != HHuginn::TYPE::BOOLEAN ) ) {
-		throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OPS_NOT_BOOL], p );
+		throw HHuginn::HHuginnRuntimeException(
+			hcore::to_string( _errMsgHHuginn_[ERR_CODE::OPS_NOT_BOOL] )
+				.append( type_name( v1->type_id() ) )
+				.append( ", " )
+				.append( type_name( v2->type_id() ) ),
+			p
+		);
 	}
 	frame_->values().push( value_builtin::boolean_xor( frame_->thread(), v1, v2, p ) );
 	return;

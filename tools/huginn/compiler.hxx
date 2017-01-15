@@ -371,9 +371,10 @@ struct OCompiler {
 		int _position;
 		OImportInfo( void );
 		OImportInfo( OImportInfo&& );
-		OImportInfo& operator = ( OImportInfo&& );
 		void swap( OImportInfo& );
 		void reset( void );
+	private:
+		OImportInfo& operator = ( OImportInfo&& ) = delete;
 	};
 	typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, OFunctionContext::parameter_names_t> captures_log_t;
 	typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, OIdentifierUse> used_identifiers_t;

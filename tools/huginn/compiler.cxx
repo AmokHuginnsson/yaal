@@ -246,14 +246,6 @@ OCompiler::OImportInfo::OImportInfo( OImportInfo&& other_ )
 	return;
 }
 
-OCompiler::OImportInfo& OCompiler::OImportInfo::operator = ( OImportInfo&& other_ ) {
-	_package = yaal::move( other_._package );
-	_alias = yaal::move( other_._alias );
-	_position = yaal::move( other_._position );
-	other_.reset();
-	return ( *this );
-}
-
 void OCompiler::OImportInfo::swap( OImportInfo& other_ ) {
 	using yaal::swap;
 	swap( _package, other_._package );
@@ -542,11 +534,6 @@ void OCompiler::detect_misuse( void ) const {
 		_runtime->identifier_id( "to_character" ),
 		_runtime->identifier_id( "to_boolean" )
 	};
-	HHuginn::identifier_id_t implicitDefinition[] = {
-		KEYWORD::CONSTRUCTOR_IDENTIFIER,
-		KEYWORD::THIS_IDENTIFIER,
-		KEYWORD::SUPER_IDENTIFIER
-	};
 	for ( used_identifiers_t::value_type const& iu : _usedIdentifiers ) {
 		HHuginn::identifier_id_t id( iu.first );
 		OIdentifierUse const& use( iu.second );
@@ -565,18 +552,6 @@ void OCompiler::detect_misuse( void ) const {
 						.append( _runtime->suggestion( id ) )
 						.append( "'?)." ),
 					use._writePosition
-				);
-			}
-		} else if ( ( use._writeCount == 0 ) && ( use._type != OIdentifierUse::TYPE::VARIABLE ) && ( use._type != OIdentifierUse::TYPE::UNKNOWN ) ) {
-			if ( find( begin( implicitDefinition ), end( implicitDefinition ), id ) == end( implicitDefinition ) ) {
-				throw HHuginn::HHuginnRuntimeException(
-					use_name( use._type )
-						.append( " `" )
-						.append( _runtime->identifier_name( id ) )
-						.append( "' was never defined (did you mean `" )
-						.append( _runtime->suggestion( id ) )
-						.append( "'?)." ),
-					use._readPosition
 				);
 			}
 		}
@@ -810,12 +785,9 @@ void OCompiler::submit_class( executing_parser::position_t position_ ) {
 	M_PROLOG
 	pop_function_context();
 	_classContext->_doc = _runtime->huginn()->get_comment( position_.get() );
-	if ( ! _submittedClasses.insert( make_pair( _classContext->_classIdentifier, yaal::move( _classContext ) ) ).second ) {
-		throw HHuginn::HHuginnRuntimeException(
-			"`"_ys.append( _runtime->identifier_name( _classContext->_classIdentifier ) ).append( "' is already defined." ),
-			position_.get()
-		);
-	}
+	bool inserted( _submittedClasses.insert( make_pair( _classContext->_classIdentifier, yaal::move( _classContext ) ) ).second );
+	M_ASSERT( inserted );
+	static_cast<void>( inserted );
 	return;
 	M_EPILOG
 }
@@ -1652,7 +1624,11 @@ void OCompiler::dispatch_factorial( executing_parser::position_t position_ ) {
 	M_ASSERT( ! fc._valueTypes.is_empty() );
 	defer_action( &HExpression::factorial, position_ );
 	if ( ! is_numeric_congruent( fc._valueTypes.top()._type ) ) {
-		throw HHuginn::HHuginnRuntimeException( "Operand is not a numeric value.", position_.get() );
+		throw HHuginn::HHuginnRuntimeException(
+			hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_NUM] )
+				.append( type_name( fc._valueTypes.top()._type ) ),
+			position_.get()
+		);
 	}
 	return;
 	M_EPILOG
@@ -1670,7 +1646,11 @@ void OCompiler::dispatch_negate( executing_parser::position_t position_ ) {
 	current_expression()->commit_oper( OPERATOR::NEGATE );
 	fc._operations.pop();
 	if ( ! is_numeric_congruent( fc._valueTypes.top()._type ) ) {
-		throw HHuginn::HHuginnRuntimeException( "Operand is not a numeric value.", p );
+		throw HHuginn::HHuginnRuntimeException(
+			hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_NUM] )
+				.append( type_name( fc._valueTypes.top()._type ) ),
+			p
+		);
 	}
 	return;
 	M_EPILOG
@@ -2040,7 +2020,11 @@ void OCompiler::dispatch_action( OPERATOR oper_, executing_parser::position_t po
 			if ( o == OPERATOR::ABSOLUTE ) {
 				M_ASSERT( ! fc._valueTypes.is_empty() );
 				if ( ! is_numeric_congruent( fc._valueTypes.top()._type ) ) {
-					throw HHuginn::HHuginnRuntimeException( "Operand is not a numeric value.", p );
+					throw HHuginn::HHuginnRuntimeException(
+						hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_NUM] )
+							.append( type_name( fc._valueTypes.top()._type ) ),
+						p
+					);
 				}
 			}
 		} break;

@@ -104,6 +104,7 @@ char const* _errMsgHHuginn_[ 10 ] = {
 	_( "Operands are not divisible: " ),
 	_( "Operands are not exponentiationable: " ),
 	_( "Operands are not comparable: " ),
+	_( "Operand is not a numeric value: " ),
 	_( "Operands are not boolean values: " ),
 	_( "Operand is not a boolean value: " ),
 	_( "Subscript is not an integer: " )
