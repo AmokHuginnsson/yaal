@@ -49,7 +49,7 @@ HNumberSetStatistics::HNumberSetStatistics( HHuginn::HClass const* class_, HHugi
 	: HValue( class_ )
 	, _stats() {
 	char const name[] = "NumberSetStatistics.constructor";
-	verify_arg_count( name, values_, 1, 1, position_ );
+	verify_signature( name, values_, { HHuginn::TYPE::LIST }, position_ );
 	HHuginn::type_id_t t( values_[0]->type_id() );
 	HHuginn::type_id_t vt( verify_arg_collection_value_type( name, values_, 0, ARITY::UNARY, { HHuginn::TYPE::REAL, HHuginn::TYPE::NUMBER }, UNIFORMITY::REQUIRED, position_ ) );
 	if ( t == HHuginn::TYPE::LIST ) {

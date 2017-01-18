@@ -368,6 +368,24 @@ HHuginn::type_id_t verify_arg_collection_value_type(
 		case ( static_cast<int>( HHuginn::TYPE::SET ) ): {
 			type = verify_arg_collection_value_type_low( name_, *static_cast<HHuginn::HSet const*>( values_[no_].raw() ), requiredTypes_, uniformity_, position_ );
 		} break;
+		case ( static_cast<int>( HHuginn::TYPE::ORDER ) ): {
+			HHuginn::HOrder::values_t const& o( static_cast<HHuginn::HOrder const*>( values_[no_].raw() )->value() );
+			if ( ! o.is_empty() ) {
+				HHuginn::HClass const* c( (*o.begin())->get_class() );
+				if ( find( requiredTypes_.begin(), requiredTypes_.end(), c->type_id() ) == requiredTypes_.end() ) {
+					throw HHuginn::HHuginnRuntimeException(
+						to_string( name_ )
+							.append( "() a collection contains value of an unexpected type: " )
+							.append( a_type_name( c ) )
+							.append( "." ),
+						position_
+					);
+				}
+			}
+		} break;
+		default: {
+			M_ASSERT( !"Invalid code path - invalid collection type"[0] );
+		}
 	}
 	return ( type );
 }
