@@ -139,9 +139,7 @@ HHuginn::value_t HSubprocess::wait(
 	int position_
 ) {
 	M_PROLOG
-	char const name[] = "Subprocess.wait";
-	verify_arg_count( name, values_, 1, 1, position_ );
-	verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, true, position_ );
+	verify_signature( "Subprocess.wait", values_, { HHuginn::TYPE::INTEGER }, position_ );
 	HSubprocess* o( static_cast<HSubprocess*>( object_->raw() ) );
 	int waitFor( static_cast<int>( get_integer( values_[0] ) ) );
 	if ( waitFor < 0 ) {

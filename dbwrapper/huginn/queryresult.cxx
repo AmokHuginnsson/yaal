@@ -106,9 +106,7 @@ HHuginn::value_t HQueryResult::column_name(
 	int position_
 ) {
 	M_PROLOG
-	char const name[] = "QueryResult.column_name";
-	verify_arg_count( name, values_, 1, 1, position_ );
-	verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, true, position_ );
+	verify_signature( "QueryResult.column_name", values_, { HHuginn::TYPE::INTEGER }, position_ );
 	HQueryResult* qr( static_cast<HQueryResult*>( object_->raw() ) );
 	return ( thread_->object_factory().create_string( qr->_recordSet->get_column_name( static_cast<int>( get_integer( values_[0] ) ) ) ) );
 	M_EPILOG

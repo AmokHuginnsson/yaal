@@ -56,16 +56,13 @@ public:
 	}
 	static HHuginn::value_t hash( char const* name_, tools::hash::hash_string_t hash_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		verify_arg_count( name_, values_, 1, 1, position_ );
-		verify_arg_type( name_, values_, 0, HHuginn::TYPE::STRING, true, position_ );
+		verify_signature( name_, values_, { HHuginn::TYPE::STRING }, position_ );
 		return ( thread_->object_factory().create_string( hash_( get_string( values_[0] ) ) ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t hmac( char const* name_, hash::FUNCTION hashType_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		verify_arg_count( name_, values_, 2, 2, position_ );
-		verify_arg_type( name_, values_, 0, HHuginn::TYPE::STRING, false, position_ );
-		verify_arg_type( name_, values_, 1, HHuginn::TYPE::STRING, false, position_ );
+		verify_signature( name_, values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, position_ );
 		return ( thread_->object_factory().create_string( hash::hmac( hashType_, get_string( values_[0] ), get_string( values_[1] ) ) ) );
 		M_EPILOG
 	}

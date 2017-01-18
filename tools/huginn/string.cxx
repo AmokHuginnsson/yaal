@@ -79,10 +79,10 @@ typedef int long ( yaal::hcore::HString::*finder_raw_t )( char const*, int long 
 inline HHuginn::value_t find( char const* name_, finder_t finder_, int long default_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( name_, values_, 1, 2, position_ );
-	verify_arg_type( name_, values_, 0, HHuginn::TYPE::STRING, false, position_ );
+	verify_arg_type( name_, values_, 0, HHuginn::TYPE::STRING, ARITY::MULTIPLE, position_ );
 	int long startAt( default_ );
 	if ( values_.get_size() > 1 ) {
-		verify_arg_type( name_, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
+		verify_arg_type( name_, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, position_ );
 		startAt = static_cast<int long>( get_integer( values_[1] ) );
 	}
 
@@ -94,10 +94,10 @@ inline HHuginn::value_t find( char const* name_, finder_t finder_, int long defa
 inline HHuginn::value_t find_raw( char const* name_, finder_raw_t finder_, int long default_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( name_, values_, 1, 2, position_ );
-	verify_arg_type( name_, values_, 0, HHuginn::TYPE::STRING, false, position_ );
+	verify_arg_type( name_, values_, 0, HHuginn::TYPE::STRING, ARITY::MULTIPLE, position_ );
 	int long startAt( default_ );
 	if ( values_.get_size() > 1 ) {
-		verify_arg_type( name_, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
+		verify_arg_type( name_, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, position_ );
 		startAt = static_cast<int long>( get_integer( values_[1] ) );
 	}
 
@@ -200,10 +200,7 @@ inline HHuginn::value_t format( huginn::HThread* thread_, HHuginn::value_t* obje
 
 inline HHuginn::value_t replace( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	char const name[] = "string.replace";
-	verify_arg_count( name, values_, 2, 2, position_ );
-	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, false, position_ );
-	verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, false, position_ );
+	verify_signature( "string.replace", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, position_ );
 	static_cast<HHuginn::HString*>( object_->raw() )->value().replace( get_string( values_[0] ), get_string( values_[1] ) );
 	return ( *object_ );
 	M_EPILOG
@@ -215,7 +212,7 @@ inline HHuginn::value_t strip( huginn::HThread* thread_, HHuginn::value_t* objec
 	verify_arg_count( name, values_, 0, 1, position_ );
 	char const* trimChars( nullptr );
 	if ( values_.get_size() > 0 ) {
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, ARITY::UNARY, position_ );
 		trimChars = get_string( values_[0] ).raw();
 	}
 	HString dest( get_string( object_->raw() ) );

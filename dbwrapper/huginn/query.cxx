@@ -88,10 +88,7 @@ public:
 
 HHuginn::value_t HQuery::bind( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	char const name[] = "Query.bind";
-	verify_arg_count( name, values_, 2, 2, position_ );
-	verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, false, position_ );
-	verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, false, position_ );
+	verify_signature( "Query.bind", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::STRING }, position_ );
 	HQuery* q( static_cast<HQuery*>( object_->raw() ) );
 	HQueryClass const* qc( static_cast<HQueryClass const*>( q->HValue::get_class() ) );
 	HHuginn::value_t v( thread_->runtime().none_value() );

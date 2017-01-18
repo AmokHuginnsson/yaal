@@ -547,9 +547,7 @@ HHuginn::value_t observe( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t
 
 HHuginn::value_t use( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	static char const name[] = "use";
-	verify_arg_count( name, values_, 1, 1, position_ );
-	verify_arg_type( name, values_, 0, HHuginn::TYPE::OBSERVER, true, position_ );
+	verify_signature( "use", values_, { HHuginn::TYPE::OBSERVER }, position_ );
 	HHuginn::HObserver const* o( static_cast<HHuginn::HObserver const*>( values_.front().raw() ) );
 	HHuginn::value_t v( o->value() );
 	if ( !v ) {
@@ -659,8 +657,8 @@ inline HHuginn::value_t assert( huginn::HThread* thread_, HHuginn::value_t*, HHu
 	M_PROLOG
 	char const name[] = "assert";
 	verify_arg_count( name, values_, 2, 3, position_ );
-	verify_arg_type( name, values_, 0, HHuginn::TYPE::BOOLEAN, false, position_ );
-	verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, false, position_ );
+	verify_arg_type( name, values_, 0, HHuginn::TYPE::BOOLEAN, ARITY::MULTIPLE, position_ );
+	verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, ARITY::MULTIPLE, position_ );
 	if ( ! get_boolean( values_[0] ) ) {
 		int argc( static_cast<int>( values_.get_size() ) );
 		HString message( get_string( values_[argc - 1] ) );

@@ -71,9 +71,7 @@ inline HHuginn::value_t get_precision( huginn::HThread* thread_, HHuginn::value_
 
 inline HHuginn::value_t set_precision( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	char const name[] = "number.set_precision";
-	verify_arg_count( name, values_, 1, 1, position_ );
-	verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, true, position_ );
+	verify_signature( "number.set_precision", values_, { HHuginn::TYPE::INTEGER }, position_ );
 	int precision = static_cast<int>( get_integer( values_[0] ) );
 	static_cast<HHuginn::HNumber*>( object_->raw() )->value().set_precision( precision );
 	return ( *object_ );

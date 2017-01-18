@@ -150,13 +150,13 @@ void verify_arg_type(
 	int no_,
 	HHuginn::type_id_t type_,
 	yaal::hcore::HString const& reqName_,
-	bool oneArg_,
+	ARITY argsArity_,
 	int position_
 ) {
 	M_PROLOG
 	if ( values_[no_]->type_id() != type_ ) {
 		HString no;
-		if ( ! oneArg_ ) {
+		if ( argsArity_ == ARITY::MULTIPLE ) {
 			no = util::ordinal( no_ + 1 ).append( " " );
 		}
 		throw HHuginn::HHuginnRuntimeException(
@@ -180,15 +180,26 @@ void verify_arg_type(
 void verify_arg_type(
 	yaal::hcore::HString const& name_,
 	HHuginn::values_t const& values_,
-	int no_, HHuginn::TYPE type_, bool oneArg_, int position_ ) {
-	verify_arg_type( name_, values_, no_, HHuginn::type_id_t( static_cast<HHuginn::type_id_t::value_type>( type_ ) ), a_type_name( type_ ), oneArg_, position_ );
+	int no_, HHuginn::TYPE type_, ARITY argsArity_, int position_ ) {
+	verify_arg_type( name_, values_, no_, HHuginn::type_id_t( static_cast<HHuginn::type_id_t::value_type>( type_ ) ), a_type_name( type_ ), argsArity_, position_ );
 }
 
 void verify_arg_type(
 	yaal::hcore::HString const& name_,
 	HHuginn::values_t const& values_,
-	int no_, HHuginn::HClass const* class_, bool oneArg_, int position_ ) {
-	verify_arg_type( name_, values_, no_, class_->type_id(), a_type_name( class_ ), oneArg_, position_ );
+	int no_, HHuginn::HClass const* class_, ARITY argsArity_, int position_ ) {
+	verify_arg_type( name_, values_, no_, class_->type_id(), a_type_name( class_ ), argsArity_, position_ );
+}
+
+void verify_signature( yaal::hcore::HString const& name_, HHuginn::values_t const& values_, types_t const& types_, int position_ ) {
+	int const COUNT( static_cast<int>( types_.get_size() ) );
+	verify_arg_count( name_, values_, COUNT, COUNT, position_ );
+	ARITY arity( COUNT == 1 ? ARITY::UNARY : ARITY::MULTIPLE );
+	for ( int i( 0 ); i < COUNT; ++ i ) {
+		if ( types_[i] != HHuginn::TYPE::UNKNOWN ) {
+			verify_arg_type( name_, values_, i, types_[i], arity, position_ );
+		}
+	}
 }
 
 HHuginn::type_id_t verify_arg_type(
@@ -196,14 +207,14 @@ HHuginn::type_id_t verify_arg_type(
 	HHuginn::values_t const& values_,
 	int no_,
 	types_t const& types_,
-	bool oneArg_,
+	ARITY argsArity_,
 	int position_
 ) {
 	M_PROLOG
 	HHuginn::type_id_t realType( values_[no_]->type_id() );
 	if ( find( types_.begin(), types_.end(), realType ) == types_.end() ) {
 		HString no;
-		if ( ! oneArg_ ) {
+		if ( argsArity_ == ARITY::MULTIPLE ) {
 			no = util::ordinal( no_ + 1 ).append( " " );
 		}
 		HString reqName;
@@ -233,12 +244,12 @@ HHuginn::type_id_t verify_arg_type(
 HHuginn::type_id_t verify_arg_numeric(
 	yaal::hcore::HString const& name_,
 	HHuginn::values_t const& values_,
-	int no_, bool oneArg_, int position_ ) {
+	int no_, ARITY argsArity_, int position_ ) {
 	M_PROLOG
 	HHuginn::type_id_t t( values_[no_]->type_id() );
 	if ( ( t != HHuginn::TYPE::NUMBER ) && ( t != HHuginn::TYPE::REAL ) ) {
 		HString no;
-		if ( ! oneArg_ ) {
+		if ( argsArity_ == ARITY::MULTIPLE ) {
 			no = util::ordinal( no_ + 1 ).append( " " );
 		}
 		throw HHuginn::HHuginnRuntimeException(
@@ -258,7 +269,7 @@ HHuginn::type_id_t verify_arg_numeric(
 HHuginn::type_id_t verify_arg_collection(
 	yaal::hcore::HString const& name_,
 	HHuginn::values_t const& values_,
-	int no_, bool oneArg_, bool materialized_, int position_ ) {
+	int no_, ARITY argsArity_, ONTICALLY ontically_, int position_ ) {
 	M_PROLOG
 	static HHuginn::TYPE const material[] = {
 		HHuginn::TYPE::LIST,
@@ -271,9 +282,9 @@ HHuginn::type_id_t verify_arg_collection(
 	};
 	HHuginn::TYPE t( static_cast<HHuginn::TYPE>( values_[no_]->type_id().get() ) );
 	if ( ! dynamic_cast<HHuginn::HIterable const*>( values_[no_].raw() )
-		|| ( materialized_ && ( find( begin( material ), end( material ), t ) == end( material ) ) ) ) {
+		|| ( ( ontically_ == ONTICALLY::MATERIALIZED ) && ( find( begin( material ), end( material ), t ) == end( material ) ) ) ) {
 		HString no;
-		if ( ! oneArg_ ) {
+		if ( argsArity_ == ARITY::MULTIPLE ) {
 			no = util::ordinal( no_ + 1 ).append( " " );
 		}
 		throw HHuginn::HHuginnRuntimeException(
@@ -281,7 +292,7 @@ HHuginn::type_id_t verify_arg_collection(
 			.append( "() " )
 			.append( no )
 			.append( "argument must be a" )
-			.append( materialized_ ? " materialized" : "" )
+			.append( ( ontically_ == ONTICALLY::MATERIALIZED ) ? " materialized" : "" )
 			.append( " collection type, not " )
 			.append( a_type_name( values_[no_]->get_class() ) )
 			.append( "." ),
@@ -297,7 +308,7 @@ HHuginn::type_id_t verify_arg_collection_value_type_low(
 	yaal::hcore::HString const& name_,
 	collection_t const& collection_,
 	types_t const& requiredTypes_,
-	bool uniform_,
+	UNIFORMITY uniformity_,
 	int position_
 ) {
 	HHuginn::type_id_t type( _unknownClass_.type_id() );
@@ -319,7 +330,7 @@ HHuginn::type_id_t verify_arg_collection_value_type_low(
 		if ( first ) {
 			type = curType;
 			first = false;
-		} else if ( uniform_ ) {
+		} else if ( uniformity_ == UNIFORMITY::REQUIRED ) {
 			if ( curType != type ) {
 				throw HHuginn::HHuginnRuntimeException(
 					to_string( name_ )
@@ -340,22 +351,22 @@ HHuginn::type_id_t verify_arg_collection_value_type(
 	yaal::hcore::HString const& name_,
 	HHuginn::values_t const& values_,
 	int no_,
-	bool oneArg_,
+	ARITY argsArity_,
 	types_t const& requiredTypes_,
-	bool uniform_,
+	UNIFORMITY uniformity_,
 	int position_
 ) {
-	verify_arg_collection( name_, values_, no_, oneArg_, true, position_ );
+	verify_arg_collection( name_, values_, no_, argsArity_, ONTICALLY::MATERIALIZED, position_ );
 	HHuginn::type_id_t type( _unknownClass_.type_id() );
 	switch ( values_[no_]->type_id().get() ) {
 		case ( static_cast<int>( HHuginn::TYPE::LIST ) ): {
-			type = verify_arg_collection_value_type_low( name_, *static_cast<HHuginn::HList const*>( values_[no_].raw() ), requiredTypes_, uniform_, position_ );
+			type = verify_arg_collection_value_type_low( name_, *static_cast<HHuginn::HList const*>( values_[no_].raw() ), requiredTypes_, uniformity_, position_ );
 		} break;
 		case ( static_cast<int>( HHuginn::TYPE::DEQUE ) ): {
-			type = verify_arg_collection_value_type_low( name_, *static_cast<HHuginn::HDeque const*>( values_[no_].raw() ), requiredTypes_, uniform_, position_ );
+			type = verify_arg_collection_value_type_low( name_, *static_cast<HHuginn::HDeque const*>( values_[no_].raw() ), requiredTypes_, uniformity_, position_ );
 		} break;
 		case ( static_cast<int>( HHuginn::TYPE::SET ) ): {
-			type = verify_arg_collection_value_type_low( name_, *static_cast<HHuginn::HSet const*>( values_[no_].raw() ), requiredTypes_, uniform_, position_ );
+			type = verify_arg_collection_value_type_low( name_, *static_cast<HHuginn::HSet const*>( values_[no_].raw() ), requiredTypes_, uniformity_, position_ );
 		} break;
 	}
 	return ( type );

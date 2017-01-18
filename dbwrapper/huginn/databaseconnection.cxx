@@ -117,9 +117,7 @@ public:
 private:
 	virtual HHuginn::value_t do_create_instance( tools::huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) const {
 		M_PROLOG
-		char const n[] = "DatabaseConnection.constructor";
-		verify_arg_count( n, values_, 1, 1, position_ );
-		verify_arg_type( n, values_, 0, HHuginn::TYPE::STRING, true, position_ );
+		verify_signature( "DatabaseConnection.constructor", values_, { HHuginn::TYPE::STRING }, position_ );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		try {
 			dbwrapper::database_ptr_t db( dbwrapper::util::connect( get_string( values_[0] ) ) );
@@ -137,9 +135,7 @@ HHuginn::value_t HDatabaseConnection::do_query(
 	HHuginn::values_t const& values_,
 	int position_
 ) {
-	char const name[] = "DatabaseConnection.query";
-	verify_arg_count( name, values_, 1, 1, position_ );
-	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
+	verify_signature( "DatabaseConnection.query", values_, { HHuginn::TYPE::STRING }, position_ );
 	HDatabaseConnectionClass const* dbcClass( static_cast<HDatabaseConnectionClass const*>( HValue::get_class() ) );
 	HHuginn::value_t v( thread_->runtime().none_value() );
 	try {
@@ -178,9 +174,7 @@ HHuginn::value_t HDatabaseConnection::do_column_names(
 	HHuginn::values_t const& values_,
 	int position_
 ) {
-	char const name[] = "DatabaseConnection.column_names";
-	verify_arg_count( name, values_, 1, 1, position_ );
-	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
+	verify_signature( "DatabaseConnection.column_names", values_, { HHuginn::TYPE::STRING }, position_ );
 	HDatabaseConnectionClass const* dbcClass( static_cast<HDatabaseConnectionClass const*>( HValue::get_class() ) );
 	HHuginn::value_t v( thread_->runtime().none_value() );
 	try {

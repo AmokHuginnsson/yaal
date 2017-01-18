@@ -118,10 +118,8 @@ inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHug
 
 inline HHuginn::value_t update( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	char const name[] = "dict.update";
-	verify_arg_count( name, values_, 1, 1, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DICT );
-	verify_arg_type( name, values_, 0, HHuginn::TYPE::DICT, true, position_ );
+	verify_signature( "dict.update", values_, { HHuginn::TYPE::DICT }, position_ );
 	HHuginn::HDict& l( *static_cast<HHuginn::HDict*>( object_->raw() ) );
 	HHuginn::HDict const& r( *static_cast<HHuginn::HDict const*>( values_[0].raw() ) );
 	if ( r.key_type()->type_id() != HHuginn::TYPE::NONE ) {
@@ -138,10 +136,8 @@ inline HHuginn::value_t update( huginn::HThread*, HHuginn::value_t* object_, HHu
 
 inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	char const name[] = "dict.equals";
-	verify_arg_count( name, values_, 1, 1, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DICT );
-	verify_arg_type( name, values_, 0, HHuginn::TYPE::DICT, true, position_ );
+	verify_signature( "dict.equals", values_, { HHuginn::TYPE::DICT }, position_ );
 	HHuginn::HDict::values_t const& l( static_cast<HHuginn::HDict*>( object_->raw() )->value() );
 	HHuginn::HDict::values_t const& r( static_cast<HHuginn::HDict const*>( values_[0].raw() )->value() );
 	bool equal( l.get_size() == r.get_size() );

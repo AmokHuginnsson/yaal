@@ -51,7 +51,7 @@ HNumberSetStatistics::HNumberSetStatistics( HHuginn::HClass const* class_, HHugi
 	char const name[] = "NumberSetStatistics.constructor";
 	verify_arg_count( name, values_, 1, 1, position_ );
 	HHuginn::type_id_t t( values_[0]->type_id() );
-	HHuginn::type_id_t vt( verify_arg_collection_value_type( name, values_, 0, true, { HHuginn::TYPE::REAL, HHuginn::TYPE::NUMBER }, true, position_ ) );
+	HHuginn::type_id_t vt( verify_arg_collection_value_type( name, values_, 0, ARITY::UNARY, { HHuginn::TYPE::REAL, HHuginn::TYPE::NUMBER }, UNIFORMITY::REQUIRED, position_ ) );
 	if ( t == HHuginn::TYPE::LIST ) {
 		HHuginn::HList::values_t const& src( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
 		if ( vt == HHuginn::TYPE::REAL ) {

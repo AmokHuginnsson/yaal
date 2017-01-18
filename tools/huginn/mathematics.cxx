@@ -71,11 +71,11 @@ public:
 		HString name( "Mathematics." );
 		name.append( name_ );
 		verify_arg_count( name, values_, 1, 2, position_ );
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::FUNCTION_REFERENCE, false, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::FUNCTION_REFERENCE, ARITY::MULTIPLE, position_ );
 		HHuginn::HFunctionReference const& fr( *static_cast<HHuginn::HFunctionReference const*>( values_[0].raw() ) );
 		int precision( 0 );
 		if ( values_.get_size() > 1 ) {
-			verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
+			verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, position_ );
 			precision = static_cast<int>( get_integer( values_[1] ) );
 		}
 		if ( precision < 0 ) {
@@ -109,7 +109,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.square_root";
 		verify_arg_count( name, values_, 1, 1, position_ );
-		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
@@ -132,7 +132,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.natural_exponential";
 		verify_arg_count( name, values_, 1, 1, position_ );
-		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
@@ -148,7 +148,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.natural_logarithm";
 		verify_arg_count( name, values_, 1, 1, position_ );
-		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
@@ -171,7 +171,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.sinus";
 		verify_arg_count( name, values_, 1, 1, position_ );
-		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
@@ -187,7 +187,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.cosinus";
 		verify_arg_count( name, values_, 1, 1, position_ );
-		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
@@ -203,7 +203,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.tangens";
 		verify_arg_count( name, values_, 1, 1, position_ );
-		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
@@ -219,7 +219,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.tangens";
 		verify_arg_count( name, values_, 1, 1, position_ );
-		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
@@ -235,7 +235,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.arcus_sinus";
 		verify_arg_count( name, values_, 1, 1, position_ );
-		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
@@ -251,7 +251,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.arcus_cosinus";
 		verify_arg_count( name, values_, 1, 1, position_ );
-		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
@@ -267,7 +267,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.arcus_tangens";
 		verify_arg_count( name, values_, 1, 1, position_ );
-		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
@@ -283,7 +283,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.arcus_cotangens";
 		verify_arg_count( name, values_, 1, 1, position_ );
-		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
@@ -299,7 +299,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.hyperbolic_sinus";
 		verify_arg_count( name, values_, 1, 1, position_ );
-		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
@@ -315,7 +315,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.hyperbolic_cosinus";
 		verify_arg_count( name, values_, 1, 1, position_ );
-		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
@@ -331,7 +331,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.hyperbolic_tangens";
 		verify_arg_count( name, values_, 1, 1, position_ );
-		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
@@ -347,7 +347,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.hyperbolic_cotangens";
 		verify_arg_count( name, values_, 1, 1, position_ );
-		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
@@ -363,7 +363,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.sigmoid";
 		verify_arg_count( name, values_, 1, 1, position_ );
-		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
@@ -379,10 +379,10 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.round";
 		verify_arg_count( name, values_, 1, 2, position_ );
-		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, false, position_ ) );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::MULTIPLE, position_ ) );
 		int to( 0 );
 		if ( values_.get_size() > 1 ) {
-			verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
+			verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, position_ );
 			to = static_cast<int>( get_integer( values_[1] ) );
 		}
 		if ( to < 0 ) {
@@ -409,7 +409,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.floor";
 		verify_arg_count( name, values_, 1, 1, position_ );
-		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
@@ -425,7 +425,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.ceil";
 		verify_arg_count( name, values_, 1, 1, position_ );
-		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
@@ -439,10 +439,7 @@ public:
 	}
 	static HHuginn::value_t differs_at( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		char const name[] = "Mathematics.differs_at";
-		verify_arg_count( name, values_, 2, 2, position_ );
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::NUMBER, false, position_ );
-		verify_arg_type( name, values_, 1, HHuginn::TYPE::NUMBER, false, position_ );
+		verify_signature( "Mathematics.differs_at", values_, { HHuginn::TYPE::NUMBER, HHuginn::TYPE::NUMBER }, position_ );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		return ( thread_->object_factory().create_integer( number::differs_at( get_number( values_[0] ), get_number( values_[1] ) ) ) );
 		M_EPILOG
@@ -465,7 +462,7 @@ public:
 		verify_arg_count( name, values_, 0, 1, position_ );
 		yaal::u64_t cap( meta::max_unsigned<yaal::u64_t>::value );
 		if ( ! values_.is_empty() ) {
-			verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, false, position_ );
+			verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, ARITY::UNARY, position_ );
 			cap = static_cast<yaal::u64_t>( get_integer( values_[0] ) );
 		}
 		HMathematics* m( static_cast<HMathematics*>( object_->raw() ) );

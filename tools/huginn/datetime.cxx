@@ -77,9 +77,7 @@ public:
 	}
 	static HHuginn::value_t sleep( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		char const name[] = "DateTime.sleep";
-		verify_arg_count( name, values_, 1, 1, position_ );
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, true, position_ );
+		verify_signature( "DateTime.sleep", values_, { HHuginn::TYPE::INTEGER }, position_ );
 		int long long nanoseconds( get_integer( values_[0] ) );
 		if ( nanoseconds < 0 ) {
 			throw HHuginn::HHuginnRuntimeException( "Negative sleep time: "_ys.append( nanoseconds ), position_ );

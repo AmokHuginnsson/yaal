@@ -62,7 +62,7 @@ HHuginn::value_t HRandomizer::next( huginn::HThread* thread_, HHuginn::value_t* 
 	verify_arg_count( name, values_, 0, 1, position_ );
 	yaal::u64_t cap( 0 );
 	if ( ! values_.is_empty() ) {
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, false, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, ARITY::UNARY, position_ );
 		cap = static_cast<yaal::u64_t>( get_integer( values_[0] ) );
 	}
 	HRandomizer* o( static_cast<HRandomizer*>( object_->raw() ) );
@@ -76,7 +76,7 @@ HHuginn::value_t HRandomizer::next_real( huginn::HThread* thread_, HHuginn::valu
 	verify_arg_count( name, values_, 0, 1, position_ );
 	double long range( 1.L );
 	if ( ! values_.is_empty() ) {
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::REAL, false, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::REAL, ARITY::UNARY, position_ );
 		range = get_real( values_[0] );
 	}
 	if ( range <= 0.L ) {

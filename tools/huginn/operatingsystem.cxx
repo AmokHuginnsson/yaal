@@ -67,9 +67,7 @@ public:
 	}
 	static HHuginn::value_t env( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		char const name[] = "OperatingSystem.env";
-		verify_arg_count( name, values_, 1, 1, position_ );
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
+		verify_signature( "OperatingSystem.env", values_, { HHuginn::TYPE::STRING }, position_ );
 		char const* val( ::getenv( get_string( values_[0] ).raw() ) );
 		HRuntime& rt( thread_->runtime() );
 		return ( val ? rt.object_factory()->create_string( val ) : rt.none_value() );
@@ -85,7 +83,7 @@ public:
 		char** argv( argvHolder.get() );
 		argv[argc] = nullptr;
 		for ( int i( 0 ); i < argc; ++ i ) {
-			verify_arg_type( name, values_, i, HHuginn::TYPE::STRING, false, position_ );
+			verify_arg_type( name, values_, i, HHuginn::TYPE::STRING, argc == 1 ? ARITY::UNARY : ARITY::MULTIPLE, position_ );
 			argv[i] = const_cast<char*>( get_string( values_[i] ).raw() );
 		}
 		::execvp( argv[0], argv );
@@ -95,9 +93,7 @@ public:
 	}
 	static HHuginn::value_t exit( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		char const name[] = "OperatingSystem.exit";
-		verify_arg_count( name, values_, 1, 1, position_ );
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, true, position_ );
+		verify_signature( "OperatingSystem.exit", values_, { HHuginn::TYPE::INTEGER }, position_ );
 		HHuginn::HInteger::value_type val( get_integer( values_[0] ) );
 		::exit( static_cast<int>( val ) );
 		return ( thread_->runtime().none_value() );
@@ -109,7 +105,7 @@ public:
 		verify_arg_count( name, values_, 1, meta::max_signed<int short>::value, position_ );
  		int argc( static_cast<int>( values_.get_size() ) );
 		for ( int i( 0 ); i < argc; ++ i ) {
-			verify_arg_type( name, values_, i, HHuginn::TYPE::STRING, argc == 1, position_ );
+			verify_arg_type( name, values_, i, HHuginn::TYPE::STRING, argc == 1 ? ARITY::UNARY : ARITY::MULTIPLE, position_ );
 		}
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		try {

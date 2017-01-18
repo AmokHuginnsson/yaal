@@ -50,10 +50,7 @@ HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass const* class_, HHugi
 	char const name[] = "Matrix.constructor";
 	verify_arg_count( name, values_, 1, meta::max_signed<int>::value, position_ );
 	if ( values_[0]->type_id() != HHuginn::TYPE::LIST ) {
-		verify_arg_count( name, values_, 1, 3, position_ );
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::FUNCTION_REFERENCE, false, position_ );
-		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
-		verify_arg_type( name, values_, 2, HHuginn::TYPE::INTEGER, false, position_ );
+		verify_signature( name, values_, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER }, position_ );
 		HHuginn::HFunctionReference const& fr( *static_cast<HHuginn::HFunctionReference const*>( values_[0].raw() ) );
 		int myRows( static_cast<int>( get_integer( values_[1] ) ) );
 		if ( myRows < 1 ) {
@@ -86,7 +83,7 @@ HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass const* class_, HHugi
 			throw HHuginn::HHuginnRuntimeException( "Matrix must have numeric data, either `number' or `real'.", position_ );
 		}
 		for ( int r( 0 ); r < myRows; ++ r ) {
-			verify_arg_type( name, values_, r, HHuginn::TYPE::LIST, false, position_ );
+			verify_arg_type( name, values_, r, HHuginn::TYPE::LIST, ARITY::MULTIPLE, position_ );
 			int otherCols( 0 );
 			if ( ( otherCols = static_cast<int>( ( rowData = &get_list( values_[r] ) )->get_size() ) ) != cols ) {
 				throw HHuginn::HHuginnRuntimeException(
@@ -159,10 +156,7 @@ HHuginn::value_t HMatrix::rows( huginn::HThread* thread_, HHuginn::value_t* obje
 
 HHuginn::value_t HMatrix::get( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	char const name[] = "Matrix.get";
-	verify_arg_count( name, values_, 2, 2, position_ );
-	verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, false, position_ );
-	verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
+	verify_signature( "Matrix.get", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER }, position_ );
 	int row( static_cast<int>( get_integer( values_[0] ) ) );
 	int col( static_cast<int>( get_integer( values_[1] ) ) );
 	HHuginn::value_t v;
@@ -193,14 +187,12 @@ HHuginn::value_t HMatrix::get( huginn::HThread* thread_, HHuginn::value_t* objec
 HHuginn::value_t HMatrix::set( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.set";
-	verify_arg_count( name, values_, 3, 3, position_ );
-	verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, false, position_ );
-	verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
+	verify_signature( name, values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER, HHuginn::TYPE::UNKNOWN }, position_ );
 	int row( static_cast<int>( get_integer( values_[0] ) ) );
 	int col( static_cast<int>( get_integer( values_[1] ) ) );
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	if ( o->_data.type() == 0 ) {
-		verify_arg_type( name, values_, 2, HHuginn::TYPE::NUMBER, false, position_ );
+		verify_arg_type( name, values_, 2, HHuginn::TYPE::NUMBER, ARITY::MULTIPLE, position_ );
 		arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
 		if ( ( row < 0 ) || ( row >= m.row() ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), position_ );
@@ -210,7 +202,7 @@ HHuginn::value_t HMatrix::set( huginn::HThread*, HHuginn::value_t* object_, HHug
 		}
 		m[row][col] = get_number( values_[2] );
 	} else {
-		verify_arg_type( name, values_, 2, HHuginn::TYPE::REAL, false, position_ );
+		verify_arg_type( name, values_, 2, HHuginn::TYPE::REAL, ARITY::MULTIPLE, position_ );
 		floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
 		if ( ( row < 0 ) || ( row >= m.row() ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), position_ );
@@ -228,7 +220,7 @@ HHuginn::value_t HMatrix::add( huginn::HThread*, HHuginn::value_t* object_, HHug
 	M_PROLOG
 	char const name[] = "Matrix.add";
 	verify_arg_count( name, values_, 1, 1, position_ );
-	verify_arg_type( name, values_, 0, (*object_)->get_class(), true, position_ );
+	verify_arg_type( name, values_, 0, (*object_)->get_class(), ARITY::UNARY, position_ );
 	HHuginn::value_t v;
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	HMatrix const* arg( static_cast<HMatrix const*>( values_[0].raw() ) );
@@ -256,7 +248,7 @@ HHuginn::value_t HMatrix::subtract( huginn::HThread*, HHuginn::value_t* object_,
 	M_PROLOG
 	char const name[] = "Matrix.subtract";
 	verify_arg_count( name, values_, 1, 1, position_ );
-	verify_arg_type( name, values_, 0, (*object_)->get_class(), true, position_ );
+	verify_arg_type( name, values_, 0, (*object_)->get_class(), ARITY::UNARY, position_ );
 	HHuginn::value_t v;
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	HMatrix const* arg( static_cast<HMatrix const*>( values_[0].raw() ) );
@@ -284,7 +276,7 @@ HHuginn::value_t HMatrix::multiply( huginn::HThread*, HHuginn::value_t* object_,
 	M_PROLOG
 	char const name[] = "Matrix.multiply";
 	verify_arg_count( name, values_, 1, 1, position_ );
-	verify_arg_type( name, values_, 0, (*object_)->get_class(), true, position_ );
+	verify_arg_type( name, values_, 0, (*object_)->get_class(), ARITY::UNARY, position_ );
 	HHuginn::value_t v;
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	HMatrix const* arg( static_cast<HMatrix const*>( values_[0].raw() ) );
@@ -335,11 +327,11 @@ HHuginn::value_t HMatrix::scale( huginn::HThread*, HHuginn::value_t* object_, HH
 	verify_arg_count( name, values_, 1, 1, position_ );
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	if ( o->_data.type() == 0 ) {
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::NUMBER, true, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::NUMBER, ARITY::UNARY, position_ );
 		arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
 		m *= get_number( values_[0] );
 	} else {
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::REAL, true, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::REAL, ARITY::UNARY, position_ );
 		floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
 		m *= get_real( values_[0] );
 	}
@@ -353,7 +345,7 @@ HHuginn::value_t HMatrix::scale_to( huginn::HThread*, HHuginn::value_t* object_,
 	verify_arg_count( name, values_, 1, 1, position_ );
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	if ( o->_data.type() == 0 ) {
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::NUMBER, true, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::NUMBER, ARITY::UNARY, position_ );
 		arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
 		HNumber extremum;
 		for ( int r( 0 ), rows( m.row() ), cols( m.col() ); r < rows; ++ r ) {
@@ -370,7 +362,7 @@ HHuginn::value_t HMatrix::scale_to( huginn::HThread*, HHuginn::value_t* object_,
 		}
 		m *= get_number( values_[0] ) / extremum;
 	} else {
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::REAL, true, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::REAL, ARITY::UNARY, position_ );
 		floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
 		double long extremum( 0.L );
 		for ( int r( 0 ), rows( m.row() ), cols( m.col() ); r < rows; ++ r ) {
@@ -470,7 +462,7 @@ HHuginn::value_t HMatrix::apply( huginn::HThread* thread_, HHuginn::value_t* obj
 	M_PROLOG
 	char const name[] = "Matrix.apply";
 	verify_arg_count( name, values_, 1, 1, position_ );
-	HHuginn::type_id_t t( verify_arg_type( name, values_, 0, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::BOUND_METHOD }, false, position_ ) );
+	HHuginn::type_id_t t( verify_arg_type( name, values_, 0, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::BOUND_METHOD }, ARITY::UNARY, position_ ) );
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	HHuginn::value_t v;
 	if ( o->_data.type() == 0 ) {

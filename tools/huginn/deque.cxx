@@ -117,10 +117,8 @@ inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHug
 
 inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	char const name[] = "deque.equals";
-	verify_arg_count( name, values_, 1, 1, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
-	verify_arg_type( name, values_, 0, HHuginn::TYPE::DEQUE, true, position_ );
+	verify_signature( "deque.equals", values_, { HHuginn::TYPE::DEQUE }, position_ );
 	HHuginn::HDeque::values_t const& l( static_cast<HHuginn::HDeque*>( object_->raw() )->value() );
 	HHuginn::HDeque::values_t const& r( static_cast<HHuginn::HDeque const*>( values_[0].raw() )->value() );
 	bool equal( l.get_size() == r.get_size() );

@@ -103,7 +103,7 @@ private:
 		M_PROLOG
 		char const n[] = "CompiledRegularExpression.constructor";
 		verify_arg_count( n, values_, 1, 1, position_ );
-		verify_arg_type( n, values_, 0, HHuginn::TYPE::STRING, true, position_ );
+		verify_arg_type( n, values_, 0, HHuginn::TYPE::STRING, ARITY::UNARY, position_ );
 		HCompiledRegularExpression::regex_t regex(
 			make_resource<HRegex>(
 				get_string( values_[0] ),
@@ -126,9 +126,7 @@ HHuginn::value_t HCompiledRegularExpression::do_match(
 	HHuginn::values_t const& values_,
 	int position_
 ) {
-	char const name[] = "CompiledRegularExpression.match";
-	verify_arg_count( name, values_, 1, 1, position_ );
-	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
+	verify_signature( "CompiledRegularExpression.match", values_, { HHuginn::TYPE::STRING }, position_ );
 	HCompiledRegularExpressionClass const* creClass( static_cast<HCompiledRegularExpressionClass const*>( HValue::get_class() ) );
 	return ( make_pointer<HRegularExpressionMatch>( creClass->regular_expression_match_class(), make_resource<HRegex>( _regex->copy() ), values_[0] ) );
 }
@@ -138,9 +136,7 @@ HHuginn::value_t HCompiledRegularExpression::do_groups(
 	HHuginn::values_t const& values_,
 	int position_
 ) {
-	char const name[] = "CompiledRegularExpression.groups";
-	verify_arg_count( name, values_, 1, 1, position_ );
-	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
+	verify_signature( "CompiledRegularExpression.groups", values_, { HHuginn::TYPE::STRING }, position_ );
 	yaal::hcore::HString const& string( get_string( values_[0] ) );
 	HRegex::groups_t g( _regex->groups( string ) );
 	HRuntime& rt( thread_->runtime() );

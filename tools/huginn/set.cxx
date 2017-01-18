@@ -109,10 +109,8 @@ inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHug
 
 inline HHuginn::value_t update( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	char const name[] = "set.update";
-	verify_arg_count( name, values_, 1, 1, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
-	verify_arg_type( name, values_, 0, HHuginn::TYPE::SET, true, position_ );
+	verify_signature( "set.update", values_, { HHuginn::TYPE::SET }, position_ );
 	HHuginn::HSet* s( static_cast<HHuginn::HSet*>( object_->raw() ) );
 	HHuginn::HSet::values_t& l( s->value() );
 	HHuginn::HSet::values_t const& r( static_cast<HHuginn::HSet const*>( values_[0].raw() )->value() );
@@ -127,10 +125,8 @@ inline HHuginn::value_t update( huginn::HThread* thread_, HHuginn::value_t* obje
 
 inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	char const name[] = "set.equals";
-	verify_arg_count( name, values_, 1, 1, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
-	verify_arg_type( name, values_, 0, HHuginn::TYPE::SET, true, position_ );
+	verify_signature( "set.equals", values_, { HHuginn::TYPE::SET }, position_ );
 	HHuginn::HSet::values_t const& l( static_cast<HHuginn::HSet*>( object_->raw() )->value() );
 	HHuginn::HSet::values_t const& r( static_cast<HHuginn::HSet const*>( values_[0].raw() )->value() );
 	bool equal( l.get_size() == r.get_size() );

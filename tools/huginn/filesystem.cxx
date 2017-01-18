@@ -99,10 +99,7 @@ public:
 	}
 	static HHuginn::value_t rename( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		char const name[] = "FileSystem.rename";
-		verify_arg_count( name, values_, 2, 2, position_ );
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, false, position_ );
-		verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, false, position_ );
+		verify_signature( "FileSystem.rename", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, position_ );
 		try {
 			filesystem::rename( get_string( values_[0] ), get_string( values_[1] ) );
 		} catch ( HFileSystemException const& e ) {
@@ -114,9 +111,7 @@ public:
 	}
 	static HHuginn::value_t remove( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		char const name[] = "FileSystem.remove";
-		verify_arg_count( name, values_, 1, 1, position_ );
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
+		verify_signature( "FileSystem.remove", values_, { HHuginn::TYPE::STRING }, position_ );
 		try {
 			filesystem::remove( get_string( values_[0] ) );
 		} catch ( HFileSystemException const& e ) {
@@ -128,8 +123,7 @@ public:
 	}
 	static HHuginn::value_t path_transform( char const* name_, str_transform_func_t pathTransformFunc_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		verify_arg_count( name_, values_, 1, 1, position_ );
-		verify_arg_type( name_, values_, 0, HHuginn::TYPE::STRING, true, position_ );
+		verify_signature( name_, values_, { HHuginn::TYPE::STRING }, position_ );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		try {
 			v = thread_->object_factory().create_string( pathTransformFunc_( get_string( values_[0] ) ) );
@@ -142,10 +136,7 @@ public:
 	}
 	static HHuginn::value_t chmod( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		char const name[] = "FileSystem.chmod";
-		verify_arg_count( name, values_, 2, 2, position_ );
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, false, position_ );
-		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
+		verify_signature( "FileSystem.chmod", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::INTEGER }, position_ );
 		try {
 			int long long mode( get_integer( values_[1] ) );
 			if ( ( mode < 0 ) || ( mode > 07777 ) ) {
@@ -161,9 +152,7 @@ public:
 	}
 	static HHuginn::value_t dir( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		char const name[] = "FileSystem.dir";
-		verify_arg_count( name, values_, 1, 1, position_ );
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
+		verify_signature( "FileSystem.dir", values_, { HHuginn::TYPE::STRING }, position_ );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
 		try {
@@ -176,9 +165,7 @@ public:
 	}
 	static HHuginn::value_t stat( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		char const name[] = "FileSystem.stat";
-		verify_arg_count( name, values_, 1, 1, position_ );
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
+		verify_signature( "FileSystem.stat", values_, { HHuginn::TYPE::STRING }, position_ );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
 		return ( make_pointer<HFileStat>( fsc->_fileStatClass.raw(), fsc->_exceptionClass.raw(), fsc->_timeClass.raw(), get_string( values_[0] ) ) );
@@ -188,9 +175,7 @@ private:
 	HHuginn::value_t do_open( huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "FileSystem.open";
-		verify_arg_count( name, values_, 2, 2, position_ );
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, false, position_ );
-		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
+		verify_signature( name, values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::INTEGER }, position_ );
 		int operation( static_cast<int>( get_integer( values_[1] ) ) );
 		if ( ( operation != OPERATIONS::READING ) && ( operation != OPERATIONS::WRITING ) ) {
 			throw HHuginn::HHuginnRuntimeException(

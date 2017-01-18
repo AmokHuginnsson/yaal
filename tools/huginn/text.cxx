@@ -59,10 +59,7 @@ public:
 	}
 	static HHuginn::value_t split( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		char const name[] = "Text.split";
-		verify_arg_count( name, values_, 2, 2, position_ );
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, false, position_ );
-		verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, false, position_ );
+		verify_signature( "Text.split", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, position_ );
 		typedef HArray<HString> strings_t;
 		strings_t strings( string::split<strings_t>( get_string( values_[0] ), get_string( values_[1] ) ) );
 		HObjectFactory* of( thread_->runtime().object_factory() );
@@ -92,7 +89,7 @@ public:
 				position_
 			);
 		}
-		verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, false, position_ );
+		verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, ARITY::MULTIPLE, position_ );
 		HString s;
 		HHuginn::HIterable* coll( static_cast<HHuginn::HIterable*>( const_cast<HHuginn::HValue*>( values_[0].raw() ) ) );
 		HString const& sep( get_string( values_[1] ) );
@@ -121,19 +118,13 @@ public:
 	}
 	static HHuginn::value_t distance( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		char const name[] = "Text.distance";
-		verify_arg_count( name, values_, 2, 2, position_ );
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, false, position_ );
-		verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, false, position_ );
+		verify_signature( "Text.distance", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, position_ );
 		return ( thread_->runtime().object_factory()->create_integer( string::distance::levenshtein_damerau( get_string( values_[0] ), get_string( values_[1] ) ) ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t repeat( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		char const name[] = "Text.repeat";
-		verify_arg_count( name, values_, 2, 2, position_ );
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, false, position_ );
-		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
+		verify_signature( "Text.repeat", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::INTEGER }, position_ );
 		HString out;
 		HString const& s( get_string( values_[0] ) );
 		int count( static_cast<int>( get_integer( values_[1] ) ) );
@@ -151,8 +142,7 @@ public:
 		M_PROLOG
 		HString name( "Text." );
 		name.append( name_ );
-		verify_arg_count( name, values_, 1, 1, position_ );
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, true, position_ );
+		verify_signature( name, values_, { HHuginn::TYPE::INTEGER }, position_ );
 		HStringStream ss;
 		HHuginn::HInteger::value_type v( get_integer( values_[0] ) );
 		switch ( base_ ) {
