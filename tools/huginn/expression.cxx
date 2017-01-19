@@ -415,12 +415,13 @@ void HExpression::make_dict( HFrame* frame_, int ) {
 	M_ASSERT( _instructions[ip]._operator == OPERATOR::FUNCTION_CALL );
 	++ ip;
 	reverse( values.begin(), values.end() );
-	HHuginn::value_t dict( frame_->thread()->object_factory().create_dict() );
-	HHuginn::HDict* m( static_cast<HHuginn::HDict*>( dict.raw() ) );
+	HThread* t( frame_->thread() );
+	HHuginn::value_t v( t->object_factory().create_dict() );
+	HHuginn::HDict* dict( static_cast<HHuginn::HDict*>( v.raw() ) );
 	for ( int i( 0 ), S( static_cast<int>( values.get_size() ) ); i < S; i += 2 ) {
-		m->insert( values[i]._value, values[i + 1]._value, values[i]._position );
+		dict->insert( t, values[i]._value, values[i + 1]._value, values[i]._position );
 	}
-	frame_->values().push( dict );
+	frame_->values().push( v );
 	return;
 	M_EPILOG
 }

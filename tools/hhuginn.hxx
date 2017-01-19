@@ -823,20 +823,19 @@ class HHuginn::HDict : public HHuginn::HIterable {
 public:
 	typedef HHuginn::HDict this_type;
 	typedef HHuginn::HIterable base_type;
-	typedef bool (*cmp_t)( HHuginn::value_t const&, HHuginn::value_t const& );
-	typedef yaal::hcore::HMap<HHuginn::value_t, HHuginn::value_t, cmp_t> values_t;
+	typedef yaal::hcore::HMap<HHuginn::value_t, HHuginn::value_t, HValueLessHelper&> values_t;
 private:
+	mutable HValueLessHelper _helper;
 	values_t _data;
 	HHuginn::HClass const* _keyType;
 public:
 	HDict( HHuginn::HClass const* );
-	HDict( HHuginn::HClass const*, values_t&&, HHuginn::HClass const* );
-	value_t get( HHuginn::value_t const&, int );
-	value_t& get_ref( HHuginn::value_t const&, int );
-	void insert( HHuginn::value_t const&, HHuginn::value_t const&, int );
-	bool has_key( HHuginn::value_t const&, int ) const;
-	bool try_get( HHuginn::value_t const& key_, HHuginn::value_t& result_, int position_ );
-	void erase( HHuginn::value_t const&, int );
+	value_t get( huginn::HThread*, HHuginn::value_t const&, int );
+	value_t& get_ref( huginn::HThread*, HHuginn::value_t const&, int );
+	void insert( huginn::HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
+	bool has_key( huginn::HThread*, HHuginn::value_t const&, int ) const;
+	bool try_get( huginn::HThread*, HHuginn::value_t const& key_, HHuginn::value_t& result_, int position_ );
+	void erase( huginn::HThread*, HHuginn::value_t const&, int );
 	HHuginn::HClass const* key_type( void ) const;
 	values_t const& value( void ) const {
 		return ( _data );
@@ -845,6 +844,12 @@ public:
 		return ( _data );
 	}
 	void verify_key_type( HHuginn::HClass const*, int ) const;
+	void anchor( huginn::HThread* thread_, int position_ ) {
+		_helper.anchor( thread_, position_ );
+	}
+	void detach( void ) {
+		_helper.detach();
+	}
 protected:
 	virtual HIterator do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( void ) const override;
@@ -859,17 +864,16 @@ class HHuginn::HOrder : public HHuginn::HIterable {
 public:
 	typedef HHuginn::HOrder this_type;
 	typedef HHuginn::HIterable base_type;
-	typedef bool (*cmp_t)( HHuginn::value_t const&, HHuginn::value_t const& );
-	typedef yaal::hcore::HSet<HHuginn::value_t, cmp_t> values_t;
+	typedef yaal::hcore::HSet<HHuginn::value_t, HValueLessHelper&> values_t;
 private:
+	mutable HValueLessHelper _helper;
 	values_t _data;
 	HHuginn::HClass const* _keyType;
 public:
 	HOrder( HHuginn::HClass const* );
-	HOrder( HHuginn::HClass const*, values_t&&, HHuginn::HClass const* );
-	void insert( HHuginn::value_t const&, int );
-	bool has_key( HHuginn::value_t const&, int ) const;
-	void erase( HHuginn::value_t const&, int );
+	void insert( huginn::HThread*, HHuginn::value_t const&, int );
+	bool has_key( huginn::HThread*, HHuginn::value_t const&, int ) const;
+	void erase( huginn::HThread*, HHuginn::value_t const&, int );
 	HHuginn::HClass const* key_type( void ) const;
 	values_t const& value( void ) const {
 		return ( _data );
@@ -878,6 +882,12 @@ public:
 		return ( _data );
 	}
 	void verify_key_type( HHuginn::HClass const*, int ) const;
+	void anchor( huginn::HThread* thread_, int position_ ) {
+		_helper.anchor( thread_, position_ );
+	}
+	void detach( void ) {
+		_helper.detach();
+	}
 protected:
 	virtual HIterator do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( void ) const override;

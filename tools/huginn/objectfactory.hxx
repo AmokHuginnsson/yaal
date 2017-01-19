@@ -134,14 +134,8 @@ public:
 	HHuginn::value_t create_dict( void ) const {
 		return ( _dictPool.create() );
 	}
-	HHuginn::value_t create_dict( HHuginn::HDict::values_t&& data_, HHuginn::HClass const* keyType_ ) const {
-		return ( _dictPool.create( yaal::move( data_ ), keyType_ ) );
-	}
 	HHuginn::value_t create_order( void ) const {
 		return ( _orderPool.create() );
-	}
-	HHuginn::value_t create_order( HHuginn::HOrder::values_t&& data_, HHuginn::HClass const* keyType_ ) const {
-		return ( _orderPool.create( yaal::move( data_ ), keyType_ ) );
 	}
 	HHuginn::value_t create_lookup( void ) const {
 		return ( _lookupPool.create() );

@@ -123,11 +123,14 @@ public:
 			}
 		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::order ) ) {
 			v = thread_->object_factory().create_order();
-			HHuginn::HOrder::values_t& dest( static_cast<HHuginn::HOrder*>( v.raw() )->value() );
+			HHuginn::HOrder* order( static_cast<HHuginn::HOrder*>( v.raw() ) );
+			HHuginn::HOrder::values_t& dest( order->value() );
+			order->anchor( thread_, position_ );
 			while ( it.is_valid() && thread_->can_continue() ) {
 				dest.insert( it.value( thread_, position_ ) );
 				it.next( thread_, position_ );
 			}
+			order->detach();
 		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::set ) ) {
 			v = thread_->object_factory().create_set();
 			HHuginn::HSet* set( static_cast<HHuginn::HSet*>( v.raw() ) );

@@ -71,11 +71,11 @@ private:
 
 namespace order {
 
-inline HHuginn::value_t add( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t add( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "order.add", values_, 1, 1, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::ORDER );
-	static_cast<HHuginn::HOrder*>( object_->raw() )->insert( values_[0], position_ );
+	static_cast<HHuginn::HOrder*>( object_->raw() )->insert( thread_, values_[0], position_ );
 	return ( *object_ );
 	M_EPILOG
 }
@@ -84,16 +84,16 @@ inline HHuginn::value_t has_key( huginn::HThread* thread_, HHuginn::value_t* obj
 	M_PROLOG
 	verify_arg_count( "order.has_key", values_, 1, 1, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::ORDER );
-	bool hasKey( static_cast<HHuginn::HOrder*>( object_->raw() )->has_key( values_[0], position_ ) );
+	bool hasKey( static_cast<HHuginn::HOrder*>( object_->raw() )->has_key( thread_, values_[0], position_ ) );
 	return ( thread_->object_factory().create_boolean( hasKey ) );
 	M_EPILOG
 }
 
-inline HHuginn::value_t erase( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t erase( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "order.erase", values_, 1, 1, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::ORDER );
-	static_cast<HHuginn::HOrder*>( object_->raw() )->erase( values_[0], position_ );
+	static_cast<HHuginn::HOrder*>( object_->raw() )->erase( thread_, values_[0], position_ );
 	return ( *object_ );
 	M_EPILOG
 }
@@ -107,7 +107,7 @@ inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHug
 	M_EPILOG
 }
 
-inline HHuginn::value_t update( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t update( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::ORDER );
 	verify_signature( "order.update", values_, { HHuginn::TYPE::ORDER }, position_ );
@@ -118,9 +118,11 @@ inline HHuginn::value_t update( huginn::HThread*, HHuginn::value_t* object_, HHu
 	}
 	HHuginn::HOrder::values_t& lv( l.value() );
 	HHuginn::HOrder::values_t const& rv( r.value() );
+	l.anchor( thread_, position_ );
 	for ( HHuginn::HOrder::values_t::const_iterator it( rv.begin() ), end( rv.end() ); it != end; ++ it ) {
 		lv.insert( *it );
 	}
+	l.detach();
 	return ( *object_ );
 	M_EPILOG
 }
@@ -169,15 +171,9 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 
 HHuginn::HOrder::HOrder( HHuginn::HClass const* class_ )
 	: HIterable( class_ )
-	, _data( &value_builtin::less_low )
+	, _helper()
+	, _data( _helper )
 	, _keyType( &huginn::_noneClass_ ) {
-	return;
-}
-
-HHuginn::HOrder::HOrder( HHuginn::HClass const* class_, values_t&& data_, HHuginn::HClass const* keyType_ )
-	: HIterable( class_ )
-	, _data( yaal::move( data_ ) )
-	, _keyType( keyType_ ) {
 	return;
 }
 
@@ -195,25 +191,32 @@ void HHuginn::HOrder::verify_key_type( HHuginn::HHuginn::HClass const* keyType_,
 	return;
 }
 
-bool HHuginn::HOrder::has_key( HHuginn::value_t const& value_, int position_ ) const {
+bool HHuginn::HOrder::has_key( huginn::HThread* thread_, HHuginn::value_t const& value_, int position_ ) const {
 	M_PROLOG
 	verify_key_type( value_->get_class(), position_ );
-	return ( _data.find( value_ ) != _data.end() );
+	_helper.anchor( thread_, position_ );
+	bool has( _data.find( value_ ) != _data.end() );
+	_helper.detach();
+	return ( has );
 	M_EPILOG
 }
 
-void HHuginn::HOrder::erase( HHuginn::value_t const& value_, int position_ ) {
+void HHuginn::HOrder::erase( huginn::HThread* thread_, HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
 	verify_key_type( value_->get_class(), position_ );
+	_helper.anchor( thread_, position_ );
 	_data.erase( value_ );
+	_helper.detach();
 	return;
 	M_EPILOG
 }
 
-void HHuginn::HOrder::insert( HHuginn::value_t const& value_, int position_ ) {
+void HHuginn::HOrder::insert( huginn::HThread* thread_, HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
 	verify_key_type( value_->get_class(), position_ );
+	_helper.anchor( thread_, position_ );
 	_data.insert( value_ );
+	_helper.detach();
 	_keyType = value_->get_class();
 	return;
 	M_EPILOG
@@ -229,11 +232,16 @@ HHuginn::HIterable::HIterator HHuginn::HOrder::do_iterator( huginn::HThread*, in
 }
 
 HHuginn::value_t HHuginn::HOrder::do_clone( huginn::HThread* thread_, int position_ ) const {
-	values_t data( &value_builtin::less_low );
+	HHuginn::value_t res( thread_->runtime().object_factory()->create_order() );
+	HHuginn::HOrder* order( static_cast<HHuginn::HOrder*>( res.raw() ) );
+	values_t&  data( order->value() );
+	order->_keyType = _keyType;
+	order->anchor( thread_, position_ );
 	for ( values_t::value_type const& v : _data ) {
 		data.insert( data.end(), v->clone( thread_, position_ ) );
 	}
-	return ( thread_->runtime().object_factory()->create_order( yaal::move( data ), _keyType ) );
+	order->detach();
+	return ( res );
 }
 
 }

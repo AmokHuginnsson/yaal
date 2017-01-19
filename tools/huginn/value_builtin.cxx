@@ -84,7 +84,7 @@ HHuginn::value_t subscript(
 		}
 	} else if ( baseType == HHuginn::TYPE::DICT ) {
 		HHuginn::HDict* d( static_cast<HHuginn::HDict*>( base_.raw() ) );
-		res = ( subscript_ == HExpression::ACCESS::VALUE ? d->get( index_, position_ ) : of.create_reference( d->get_ref( index_, position_ ) ) );
+		res = ( subscript_ == HExpression::ACCESS::VALUE ? d->get( thread_, index_, position_ ) : of.create_reference( d->get_ref( thread_, index_, position_ ) ) );
 	} else if ( baseType == HHuginn::TYPE::LOOKUP ) {
 		HHuginn::HLookup* l( static_cast<HHuginn::HLookup*>( base_.raw() ) );
 		res = ( subscript_ == HExpression::ACCESS::VALUE ? l->get( thread_, index_, position_ ) : of.create_reference( l->get_ref( thread_, index_, position_ ) ) );
@@ -561,10 +561,6 @@ bool equals( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t con
 		res = v1_->type_id() == v2_->type_id();
 	}
 	return ( res );
-}
-
-bool less_low( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) {
-	return ( less( nullptr, v1_, v2_, 0 ) );
 }
 
 bool less( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {

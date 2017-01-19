@@ -591,7 +591,7 @@ HHuginn::value_t order( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::va
 	HHuginn::value_t v( thread_->object_factory().create_order() );
 	HHuginn::HOrder* o( static_cast<HHuginn::HOrder*>( v.raw() ) );
 	for ( HHuginn::value_t const& e : values_ ) {
-		o->insert( e, position_ );
+		o->insert( thread_, e, position_ );
 	}
 	return ( v );
 	M_EPILOG
