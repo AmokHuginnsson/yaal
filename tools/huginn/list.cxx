@@ -81,11 +81,29 @@ inline HHuginn::value_t add( huginn::HThread*, HHuginn::value_t* object_, HHugin
 
 inline HHuginn::value_t append( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_signature( "list.append", values_, { HHuginn::TYPE::LIST }, position_ );
+	char const name[] = "list.append";
+	verify_arg_count( name, values_, 1, 1, position_ );
+	HHuginn::type_id_t t( verify_arg_type( name, values_, 0, { HHuginn::TYPE::LIST, HHuginn::TYPE::DEQUE, HHuginn::TYPE::ORDER, HHuginn::TYPE::SET }, ARITY::UNARY, position_ ) );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
-	HHuginn::HList::values_t const& src( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
 	HHuginn::HList::values_t& dst( static_cast<HHuginn::HList*>( object_->raw() )->value() );
-	dst.insert( dst.end(), src.begin(), src.end() );
+	switch( t.get() ) {
+		case ( static_cast<int>( HHuginn::TYPE::LIST ) ): {
+			HHuginn::HList::values_t const& src( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
+			dst.insert( dst.end(), src.begin(), src.end() );
+		} break;
+		case ( static_cast<int>( HHuginn::TYPE::DEQUE ) ): {
+			HHuginn::HDeque::values_t const& src( static_cast<HHuginn::HDeque const*>( values_[0].raw() )->value() );
+			dst.insert( dst.end(), src.begin(), src.end() );
+		} break;
+		case ( static_cast<int>( HHuginn::TYPE::ORDER ) ): {
+			HHuginn::HOrder::values_t const& src( static_cast<HHuginn::HOrder const*>( values_[0].raw() )->value() );
+			dst.insert( dst.end(), src.begin(), src.end() );
+		} break;
+		case ( static_cast<int>( HHuginn::TYPE::SET ) ): {
+			HHuginn::HSet::values_t const& src( static_cast<HHuginn::HSet const*>( values_[0].raw() )->value() );
+			dst.insert( dst.end(), src.begin(), src.end() );
+		} break;
+	}
 	return ( *object_ );
 	M_EPILOG
 }
@@ -144,7 +162,7 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 			HHuginn::field_definitions_t{
 				{ "add",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::add, _1, _2, _3, _4 ) ),    "( *elem* ) - add new *elem* at the end of the `list`, `list` grows in size by 1" },
 				{ "pop",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::pop, _1, _2, _3, _4 ) ),    "remove last element from the `list`, `list` shrinks by 1" },
-				{ "append", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::append, _1, _2, _3, _4 ) ), "( *other* ) - append all elements from *other* `list` at the on of this `list`" },
+				{ "append", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::append, _1, _2, _3, _4 ) ), "( *other* ) - append all elements from *other* collection at the end of this `list`" },
 				{ "insert", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::insert, _1, _2, _3, _4 ) ), "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
 				{ "clear",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::clear, _1, _2, _3, _4 ) ),  "erase `list`'s content, `list` becomes empty" },
 				{ "equals", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::equals, _1, _2, _3, _4 ) ), "( *other* ) - test if *other* `list` has the same content" }

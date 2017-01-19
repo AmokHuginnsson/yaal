@@ -88,6 +88,74 @@ inline HHuginn::value_t pop( huginn::HThread*, HHuginn::value_t* object_, HHugin
 	M_EPILOG
 }
 
+inline HHuginn::value_t append( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "deque.append";
+	verify_arg_count( name, values_, 1, 1, position_ );
+	HHuginn::type_id_t t( verify_arg_type( name, values_, 0, { HHuginn::TYPE::LIST, HHuginn::TYPE::DEQUE, HHuginn::TYPE::ORDER, HHuginn::TYPE::SET }, ARITY::UNARY, position_ ) );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
+	HHuginn::HDeque::values_t& dst( static_cast<HHuginn::HDeque*>( object_->raw() )->value() );
+	switch( t.get() ) {
+		case ( static_cast<int>( HHuginn::TYPE::LIST ) ): {
+			HHuginn::HList::values_t const& src( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
+			dst.insert( dst.end(), src.begin(), src.end() );
+		} break;
+		case ( static_cast<int>( HHuginn::TYPE::DEQUE ) ): {
+			HHuginn::HDeque::values_t const& src( static_cast<HHuginn::HDeque const*>( values_[0].raw() )->value() );
+			dst.insert( dst.end(), src.begin(), src.end() );
+		} break;
+		case ( static_cast<int>( HHuginn::TYPE::ORDER ) ): {
+			HHuginn::HOrder::values_t const& src( static_cast<HHuginn::HOrder const*>( values_[0].raw() )->value() );
+			dst.insert( dst.end(), src.begin(), src.end() );
+		} break;
+		case ( static_cast<int>( HHuginn::TYPE::SET ) ): {
+			HHuginn::HSet::values_t const& src( static_cast<HHuginn::HSet const*>( values_[0].raw() )->value() );
+			dst.insert( dst.end(), src.begin(), src.end() );
+		} break;
+	}
+	return ( *object_ );
+	M_EPILOG
+}
+
+inline HHuginn::value_t prepend( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "deque.prepend";
+	verify_arg_count( name, values_, 1, 1, position_ );
+	HHuginn::type_id_t t( verify_arg_type( name, values_, 0, { HHuginn::TYPE::LIST, HHuginn::TYPE::DEQUE, HHuginn::TYPE::ORDER, HHuginn::TYPE::SET }, ARITY::UNARY, position_ ) );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
+	HHuginn::HDeque::values_t& dst( static_cast<HHuginn::HDeque*>( object_->raw() )->value() );
+	switch( t.get() ) {
+		case ( static_cast<int>( HHuginn::TYPE::LIST ) ): {
+			HHuginn::HList::values_t const& src( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
+			dst.insert( dst.begin(), src.begin(), src.end() );
+		} break;
+		case ( static_cast<int>( HHuginn::TYPE::DEQUE ) ): {
+			HHuginn::HDeque::values_t const& src( static_cast<HHuginn::HDeque const*>( values_[0].raw() )->value() );
+			dst.insert( dst.begin(), src.begin(), src.end() );
+		} break;
+		case ( static_cast<int>( HHuginn::TYPE::ORDER ) ): {
+			HHuginn::HOrder::values_t const& src( static_cast<HHuginn::HOrder const*>( values_[0].raw() )->value() );
+			dst.insert( dst.begin(), src.begin(), src.end() );
+		} break;
+		case ( static_cast<int>( HHuginn::TYPE::SET ) ): {
+			HHuginn::HSet::values_t const& src( static_cast<HHuginn::HSet const*>( values_[0].raw() )->value() );
+			dst.insert( dst.begin(), src.begin(), src.end() );
+		} break;
+	}
+	return ( *object_ );
+	M_EPILOG
+}
+
+inline HHuginn::value_t insert( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_signature( "deque.insert", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::UNKNOWN }, position_ );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
+	HHuginn::HDeque::values_t& dst( static_cast<HHuginn::HDeque*>( object_->raw() )->value() );
+	dst.insert( dst.begin() + get_integer( values_[0] ), values_[1] );
+	return ( *object_ );
+	M_EPILOG
+}
+
 inline HHuginn::value_t add_front( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "deque.add_front", values_, 1, 1, position_ );
@@ -139,12 +207,15 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 			runtime_->identifier_id( type_name( HHuginn::TYPE::DEQUE ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "add",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::add, _1, _2, _3, _4 ) ), "( *elem* ) - add new *elem* at the (right/back) end of the `deque`, `deque` grows in size by 1" },
-				{ "pop",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::pop, _1, _2, _3, _4 ) ), "remove last element from the deque, deque shrinks by 1" },
+				{ "add",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::add, _1, _2, _3, _4 ) ),       "( *elem* ) - add new *elem* at the (right/back) end of the `deque`, `deque` grows in size by 1" },
+				{ "pop",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::pop, _1, _2, _3, _4 ) ),       "remove last element from the deque, deque shrinks by 1" },
 				{ "add_front", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::add_front, _1, _2, _3, _4 ) ), "( *elem* ) - add new *elem* at the (left/front) beginning of the `deque`, `deque` grows in size by 1" },
 				{ "pop_front", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::pop_front, _1, _2, _3, _4 ) ), "remove first element from the `deque`, `deque` shrinks by 1" },
-				{ "clear",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::clear, _1, _2, _3, _4 ) ), "erase `deque`'s content, `deque` becomes empty" },
-				{ "equals",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::equals, _1, _2, _3, _4 ) ), "( *other* ) - test if *other* `deque` has the same content" }
+				{ "append",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::append, _1, _2, _3, _4 ) ),    "( *other* ) - append all elements from *other* collection at the end of this `deque`" },
+				{ "prepend",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::prepend, _1, _2, _3, _4 ) ),   "( *other* ) - prepend all elements from *other* collection in front of this `deque`" },
+				{ "insert",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::insert, _1, _2, _3, _4 ) ),    "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
+				{ "clear",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::clear, _1, _2, _3, _4 ) ),     "erase `deque`'s content, `deque` becomes empty" },
+				{ "equals",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::equals, _1, _2, _3, _4 ) ),    "( *other* ) - test if *other* `deque` has the same content" }
 			},
 			"The `deque` is a collection type that is used to represent and operate on list of values. "
 			"It supports basic subscript and range operators. "
