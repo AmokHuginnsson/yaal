@@ -138,14 +138,40 @@ HBinder<function_t, value_t, 1> bind2nd( function_t func, value_t value ) {
 	return ( HBinder<function_t, value_t, 1>( func, value ) );
 }
 
+/*! \brief A reference type wrapper.
+ *
+ * Pass arguments by reference instead of by value with this trait.
+ *
+ * \tparam basic_t - type to be wrapper as reference.
+ */
+template<typename basic_t>
+class reference {
+	basic_t* _ref;
+public:
+	explicit reference( basic_t& obj ) : _ref( &obj ) {}
+	operator basic_t& ( void ) const
+		{ return ( *_ref ); }
+	basic_t& operator->( void )
+		{ return ( *_ref ); }
+	template<typename basic_assignable_t>
+	basic_t& operator = ( basic_assignable_t const& v ) {
+		*_ref = v;
+		return ( *_ref );
+	}
+	template<typename... args_t>
+	decltype ( (*_ref)( trait::declval<args_t>()... ) ) operator()( args_t&&... args_ ) const {
+		return ( (*_ref)( yaal::forward<args_t>( args_ )... ) );
+	}
+};
+
 /*! \brief Convenience function, returns trait::reference<> object.
  *
  * \param obj - object that trait::reference<> shall be based on.
  * \return trait::reference<> wrapper of \e obj object.
  */
 template<typename basic_t>
-trait::reference<basic_t> ref( basic_t& obj ) {
-	return ( trait::reference<basic_t>( obj ) );
+reference<basic_t> ref( basic_t& obj ) {
+	return ( reference<basic_t>( obj ) );
 }
 
 /*! \brief Convenience function, returns trait::reference<const> object.
@@ -154,8 +180,8 @@ trait::reference<basic_t> ref( basic_t& obj ) {
  * \return trait::reference<const> wrapper of \e obj object.
  */
 template<typename basic_t>
-trait::reference<basic_t const> cref( basic_t const& obj ) {
-	return ( trait::reference<basic_t const>( obj ) );
+reference<basic_t const> cref( basic_t const& obj ) {
+	return ( reference<basic_t const>( obj ) );
 }
 
 /*! \brief Meta function functor plus operator.

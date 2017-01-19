@@ -750,28 +750,6 @@ struct make_const_ref_ptr {
 							T const>::type>::type type;
 };
 
-/*! \brief A reference type wrapper.
- *
- * Pass arguments by reference instead of by value with this trait.
- *
- * \tparam basic_t - type to be wrapper as reference.
- */
-template<typename basic_t>
-class reference {
-	basic_t* _ref;
-public:
-	explicit reference( basic_t& obj ) : _ref( &obj ) {}
-	operator basic_t& ( void ) const
-		{ return ( *_ref ); }
-	basic_t& operator->( void )
-		{ return ( *_ref ); }
-	template<typename basic_assignable_t>
-	basic_t& operator = ( basic_assignable_t const& v ) {
-		*_ref = v;
-		return ( *_ref );
-	}
-};
-
 /*! \brief Check if given class has been derived from another given class.
  *
  * \tparam derived_t - suspected derived type.

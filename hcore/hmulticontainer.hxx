@@ -41,7 +41,7 @@ struct HMultiContainerStorage {
 		typedef value_type_t data_type;
 		typedef data_type stored_type;
 		typedef yaal::hcore::HPair<key_type_t, value_type_t> value_type;
-		typedef yaal::hcore::HPair<key_type_t, trait::reference<value_type_t> > accessor_elem_t;
+		typedef yaal::hcore::HPair<key_type_t, reference<value_type_t> > accessor_elem_t;
 		template<typename const_qual_t>
 		struct const_aware_type {
 			typedef typename trait::ternary<trait::same_type<const_qual_t, const_qual_t const>::value,
