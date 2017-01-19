@@ -193,7 +193,9 @@ public:
 			}
 		}
 		if ( ! key ) {
-			sort( dest.begin(), dest.end(), &value_builtin::less_low );
+			HHuginn::HValueLessHelper less;
+			less.anchor( thread_, position_ );
+			sort( dest.begin(), dest.end(), cref( less ) );
 		} else {
 			HHuginn::values_t l( 1 );
 			HHuginn::values_t r( 1 );

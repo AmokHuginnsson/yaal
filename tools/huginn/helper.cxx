@@ -57,6 +57,17 @@ bool HHuginn::HValueHashHelper::operator()( HHuginn::value_t const& v1_, HHuginn
 	return ( ( v1_->type_id() == v2_->type_id() ) && huginn::value_builtin::equals( _thread, v1_, v2_, _position ) );
 }
 
+HHuginn::HValueLessHelper::HValueLessHelper( void )
+	: _thread( nullptr )
+	, _position( 0 ) {
+}
+
+bool HHuginn::HValueLessHelper::operator()( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) const {
+	M_ASSERT( _thread != nullptr );
+	M_ASSERT( v1_->type_id() == v2_->type_id() );
+	return ( huginn::value_builtin::less( _thread, v1_, v2_, _position ) );
+}
+
 namespace huginn {
 
 bool is_keyword( yaal::hcore::HString const& name_ ) {

@@ -128,6 +128,7 @@ public:
 	class HObjectReference;
 	class HTernaryEvaluator;
 	class HValueHashHelper;
+	class HValueLessHelper;
 	typedef yaal::hcore::HPointer<huginn::HExpression> expression_t;
 	typedef yaal::hcore::HArray<HHuginn::expression_t> expressions_t;
 	class HErrorCoordinate;
@@ -797,6 +798,25 @@ protected:
 	virtual int long do_size( void ) const override;
 private:
 	virtual value_t do_clone( huginn::HThread*, int ) const override;
+};
+
+class HHuginn::HValueLessHelper final {
+	huginn::HThread* _thread;
+	int _position;
+public:
+	HValueLessHelper( void );
+	void anchor( huginn::HThread* thread_, int position_ ) {
+		_thread = thread_;
+		_position = position_;
+	}
+	bool operator()( HHuginn::value_t const&, HHuginn::value_t const& ) const;
+	void detach( void ) {
+		_thread = nullptr;
+		_position = 0;
+	}
+private:
+	HValueLessHelper( HValueLessHelper const& ) = delete;
+	HValueLessHelper& operator = ( HValueLessHelper const& ) = delete;
 };
 
 class HHuginn::HDict : public HHuginn::HIterable {
