@@ -3,7 +3,7 @@ cmake_minimum_required( VERSION 3.4 )
 include( CheckCXXCompilerFlag )
 
 function( use_cxx_compiler_flag flag )
-	string( REGEX REPLACE "[,-]+" "" name "${flag}" )
+	string( REGEX REPLACE "[,=-]+" "" name "${flag}" )
 	string( REGEX REPLACE "\\+\\+" "XX" name ${name} )
 	if ( ${flag} MATCHES "-Wl,.*" )
 		set( CMAKE_REQUIRED_FLAGS "-Werror ${flag} -pedantic-errors" )

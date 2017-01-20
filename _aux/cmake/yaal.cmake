@@ -287,6 +287,8 @@ add_dependencies( hdata hconsole dbwrapper tools hcore )
 
 set( RUNTIME_DESTINATION lib )
 set( HEADER_TARGET "${TARGET_PATH}/include/yaal/yaal.hxx" )
+set( SSL_KEYS_DIR "db/${PROJECT_NAME}/keys/" )
+set( SSL_KEYS "${SSL_KEYS_DIR}/key ${SSL_KEYS_DIR}/pem" )
 
 if ( CMAKE_HOST_WIN32 )
 	set( RUNTIME_DESTINATION bin )
@@ -359,9 +361,16 @@ else ( CMAKE_HOST_WIN32 )
 	)
 endif ( CMAKE_HOST_WIN32 )
 
+add_custom_command(
+	OUTPUT ${SSL_KEYS}
+	COMMAND ./_aux/gen-keys ${TARGET_PATH}/${SSL_KEYS_DIR}
+	DEPENDS _aux/gen-keys
+)
+
 add_dependencies( hcore commit_id )
 
 add_custom_target( headers ALL DEPENDS ${HEADER_TARGET} )
+add_custom_target( ssl_keys ALL DEPENDS ${SSL_KEYS} )
 
 if ( NOT CMAKE_HOST_WIN32 )
 	add_definitions( -DHAVE_CONFIG_H )
@@ -410,7 +419,7 @@ if ( CMAKE_HOST_WIN32 )
 	install( TARGETS ${COMPONENTS} ${DRIVERS} RUNTIME DESTINATION ${RUNTIME_DESTINATION} COMPONENT runtime LIBRARY DESTINATION bin COMPONENT runtime )
 	install( TARGETS ${COMPONENTS} ARCHIVE DESTINATION lib COMPONENT devel )
 	if ( DEFINED BUILD_PACKAGE )
-		install( FILES ${TARGET_PATH}/yaalrc DESTINATION . COMPONENT configuration )
+		install( FILES ${TARGET_PATH}/yaalrc DESTINATION etc COMPONENT configuration )
 		set( EXTRA_DEPENDENCIES history5.dll iconv.dll libeay32.dll libexslt.dll libiconv-2.dll libintl-2.dll libwinpthread.dll libxml2.dll libxslt.dll readline5.dll regex2.dll sqlite3.dll ssleay32.dll zlib1.dll )
 		prepend( EXTRA_DEPENDENCIES ${CMAKE_INSTALL_PREFIX}/${RUNTIME_DESTINATION}/ ${EXTRA_DEPENDENCIES} )
 		append( DRIVERS_REAL _driver ${DRIVERS} )
@@ -427,6 +436,7 @@ else()
 endif()
 
 install( DIRECTORY ${TARGET_PATH}/include/yaal DESTINATION include COMPONENT devel )
+install( DIRECTORY ${TARGET_PATH}/db DESTINATION ${localstatedir} )
 install( FILES ${TARGET_PATH}/yaalrc DESTINATION ${CMAKE_INSTALL_FULL_SYSCONFDIR} )
 install( FILES ${TARGET_PATH}/yaal.pc DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/pkgconfig )
 
