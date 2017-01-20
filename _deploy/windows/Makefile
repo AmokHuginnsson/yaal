@@ -50,5 +50,6 @@ clean: $(VERIFY_DIR)
 	@/bin/rm -f $(BUNDLE_WRAP) $(BUNDLE) && \
 	/bin/rm -rf msi yaal-bundle && \
 	cd ../../ && \
+	while ! /bin/rm -rf build ; do true ; done && \
 	make purge
 
