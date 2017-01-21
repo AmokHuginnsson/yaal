@@ -151,7 +151,7 @@ inline HHuginn::value_t insert( huginn::HThread*, HHuginn::value_t* object_, HHu
 	verify_signature( "deque.insert", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::UNKNOWN }, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
 	HHuginn::HDeque::values_t& dst( static_cast<HHuginn::HDeque*>( object_->raw() )->value() );
-	dst.insert( dst.begin() + get_integer( values_[0] ), values_[1] );
+	dst.insert( dst.begin() + static_cast<int long>( get_integer( values_[0] ) ), values_[1] );
 	return ( *object_ );
 	M_EPILOG
 }

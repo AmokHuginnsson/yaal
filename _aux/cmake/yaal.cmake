@@ -294,7 +294,7 @@ if ( CMAKE_HOST_WIN32 )
 	set( RUNTIME_DESTINATION bin )
 	add_dependencies( hcore msvcxx )
 	add_dependencies( hcore-static msvcxx )
-	target_link_libraries( hcore msvcxx libintl libwinpthread.lib iconv libeay32 ssleay32 Dbghelp regex Ws2_32 Psapi )
+	target_link_libraries( hcore msvcxx libintl libwinpthread.lib iconv libssl libcrypto Dbghelp regex Ws2_32 Psapi )
 	target_link_libraries( tools hcore libxml2 libxslt libexslt zlib libintl Ws2_32 )
 	target_link_libraries( dbwrapper tools hcore )
 	target_link_libraries( hconsole tools hcore curses libintl )
@@ -362,7 +362,7 @@ else ( CMAKE_HOST_WIN32 )
 endif ( CMAKE_HOST_WIN32 )
 
 add_custom_command(
-	OUTPUT ${SSL_KEYS}
+	OUTPUT ${SSL_KEYS_DIR}/pem
 	COMMAND ./_aux/gen-keys ${TARGET_PATH}/${SSL_KEYS_DIR}
 	DEPENDS _aux/gen-keys
 )
@@ -420,7 +420,7 @@ if ( CMAKE_HOST_WIN32 )
 	install( TARGETS ${COMPONENTS} ARCHIVE DESTINATION lib COMPONENT devel )
 	if ( DEFINED BUILD_PACKAGE )
 		install( FILES ${TARGET_PATH}/yaalrc DESTINATION etc COMPONENT configuration )
-		set( EXTRA_DEPENDENCIES history5.dll iconv.dll libeay32.dll libexslt.dll libiconv-2.dll libintl-2.dll libwinpthread.dll libxml2.dll libxslt.dll readline5.dll regex2.dll sqlite3.dll ssleay32.dll zlib1.dll )
+		set( EXTRA_DEPENDENCIES history5.dll iconv.dll crypto-1_1.dll libexslt.dll libiconv-2.dll libintl-2.dll libwinpthread.dll libxml2.dll libxslt.dll readline5.dll regex2.dll sqlite3.dll libssl-1_1.dll zlib1.dll )
 		prepend( EXTRA_DEPENDENCIES ${CMAKE_INSTALL_PREFIX}/${RUNTIME_DESTINATION}/ ${EXTRA_DEPENDENCIES} )
 		append( DRIVERS_REAL _driver ${DRIVERS} )
 		prepend( DEBUG_LIBS build/debug/yaal_ ${COMPONENTS} ${DRIVERS_REAL} )
