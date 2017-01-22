@@ -31,7 +31,7 @@ set SUBJECT=%SUBJECT%/emailAddress=%EMAIL_ADDRESS%/
 
 openssl genpkey -algorithm rsa -pkeyopt rsa_keygen_bits:2048 -out key
 if %errorlevel% neq 0 exit /b %errorlevel%
-openssl req -config %PREFIX%/bin/openssl.cnf -x509 -new -key key -out pem -days 3652 -subj "%SUBJECT%"
+openssl req -x509 -new -key key -out pem -days 3652 -subj "%SUBJECT%"
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 cd "%OLDPWD%"

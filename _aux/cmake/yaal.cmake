@@ -363,14 +363,14 @@ endif ( CMAKE_HOST_WIN32 )
 
 add_custom_command(
 	OUTPUT ${SSL_KEYS_DIR}/pem
-	COMMAND ./_aux/gen-keys ${TARGET_PATH}/${SSL_KEYS_DIR}
+	COMMAND ${CMAKE_HOME_DIRECTORY}/_aux/gen-keys ${TARGET_PATH}/${SSL_KEYS_DIR}
 	DEPENDS _aux/gen-keys
 )
 
 add_dependencies( hcore commit_id )
 
 add_custom_target( headers ALL DEPENDS ${HEADER_TARGET} )
-add_custom_target( ssl_keys ALL DEPENDS ${SSL_KEYS} )
+add_custom_target( ssl_keys ALL DEPENDS ${SSL_KEYS_DIR}/pem )
 
 if ( NOT CMAKE_HOST_WIN32 )
 	add_definitions( -DHAVE_CONFIG_H )
