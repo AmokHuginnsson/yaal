@@ -743,6 +743,9 @@ void OCompiler::create_function( executing_parser::position_t position_ ) {
 		_classContext->_methods.insert( make_pair( idx, fi.second ) );
 		_classContext->_docs.insert( make_pair( idx, doc ? doc : "" ) );
 	} else {
+		if ( !! _runtime->get_class( fi.first ) ) {
+			throw HHuginn::HHuginnRuntimeException( "Class of the same name `"_ys.append( _runtime->identifier_name( fi.first ) ).append( "' is already defined." ), position_.get() );
+		}
 		_runtime->register_function( fi.first, fi.second, doc ? doc : "" );
 	}
 	M_EPILOG
