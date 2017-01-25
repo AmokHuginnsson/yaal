@@ -43,6 +43,7 @@ HThread::HThread( HRuntime* runtime_, yaal::hcore::HThread::id_t id_ )
 	: _frames()
 	, _currentFrame( nullptr )
 	, _frameCount( 0 )
+	, _functionFrameCount( 0 )
 	, _id( id_ )
 	, _runtime( runtime_ )
 	, _objectFactory( *_runtime->object_factory() )
@@ -82,6 +83,7 @@ void HThread::add_frame( void ) {
 void HThread::create_function_frame( HStatement::statement_id_t statementId_, HHuginn::value_t* object_, int upCast_ ) {
 	M_PROLOG
 	add_frame();
+	++ _functionFrameCount;
 	_currentFrame->init( HFrame::TYPE::FUNCTION, statementId_, object_, upCast_ );
 	return;
 	M_EPILOG
@@ -143,6 +145,9 @@ void HThread::pop_frame( void ) {
 	 * destructors in the process) and only then we update _currentFrame marker.
 	 */
 	M_ASSERT( _currentFrame );
+	if ( _currentFrame->type() == HFrame::TYPE::FUNCTION ) {
+		-- _functionFrameCount;
+	}
 	_currentFrame->reset();
 	_currentFrame = _currentFrame->parent();
 	-- _frameCount;

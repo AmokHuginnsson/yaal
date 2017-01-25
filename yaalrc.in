@@ -104,6 +104,11 @@ child_kill_grace_period 1000
 # specify default character encoding used in text documents
 default_encoding "ISO-8859-2"
 
+# huginn_max_call_stack_size
+# type: interpreter, default: 1024
+# default maximum call stack size for Huginn interpreter
+huginn_max_call_stack_size 1024
+
 # compression_level
 # type: integer, default: -1
 # valid levels [-1..9]

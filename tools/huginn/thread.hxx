@@ -46,6 +46,7 @@ private:
 	frames_t _frames;
 	HFrame* _currentFrame;
 	int _frameCount;
+	int _functionFrameCount;
 	yaal::hcore::HThread::id_t _id;
 	HRuntime* _runtime;
 	HObjectFactory& _objectFactory;
@@ -87,6 +88,9 @@ public:
 	}
 	HObjectFactory& object_factory( void ) const {
 		return ( _objectFactory );
+	}
+	int call_stack_size( void ) const {
+		return ( _functionFrameCount );
 	}
 private:
 	void add_frame( void );

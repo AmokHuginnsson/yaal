@@ -108,6 +108,7 @@ private:
 	value_t _result;
 	huginn::HThread::frame_t _incrementalFrame;
 	int _maxLocalVariableCount;
+	int _maxCallStackSize;
 public:
 	HRuntime( HHuginn* );
 	huginn::HThread* current_thread( void );
@@ -128,8 +129,12 @@ public:
 		return ( _objectFactory.raw() );
 	}
 	void set_max_local_variable_count( int );
-	int max_local_variable_count() const {
+	void set_max_call_stack_size( int );
+	int max_local_variable_count( void ) const {
 		return ( _maxLocalVariableCount );
+	}
+	int max_call_stack_size( void ) const {
+		return ( _maxCallStackSize );
 	}
 	identifier_id_t identifier_id( yaal::hcore::HString const& );
 	yaal::hcore::HString const& identifier_name( identifier_id_t ) const;

@@ -294,6 +294,10 @@ public:
 	/*! \brief Reset the interpreter state so it can be used again with new program source.
 	 */
 	void reset( void );
+
+	/*! \brief Set maximum call stack size for this interpreter instance.
+	 */
+	void set_max_call_stack_size( int );
 	void dump_preprocessed_source( yaal::hcore::HStreamInterface& ) const;
 	int error_position( void ) const;
 	HErrorCoordinate error_coordinate( void ) const;

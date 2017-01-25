@@ -114,6 +114,9 @@ public:
 	bool has_catch( void ) const {
 		return ( _type == TYPE::TRY_CATCH );
 	}
+	TYPE type( void ) const {
+		return ( _type );
+	}
 	STATE state( void ) const {
 		return ( _state );
 	}

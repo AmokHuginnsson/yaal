@@ -248,6 +248,13 @@ HToolsInitDeinit::HToolsInitDeinit( void ) {
 			.argument_name( "milliseconds" )
 		)(
 			HProgramOptionsHandler::HOption()
+			.long_form( "huginn_max_call_stack_size" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+			.description( "default maximum call stack size for Huginn interpreter" )
+			.recipient( _huginnMaxCallStack_ )
+			.argument_name( "count" )
+		)(
+			HProgramOptionsHandler::HOption()
 			.long_form( "compression_level" )
 			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
 			.description( "default compression level for zlib library" )

@@ -38,6 +38,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/util.hxx"
 #include "tools/streamtools.hxx"
 #include "tools/stringalgo.hxx"
+#include "tools/tools.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -132,7 +133,8 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 	, _argv( _objectFactory->create_list() )
 	, _result()
 	, _incrementalFrame()
-	, _maxLocalVariableCount( 0 ) {
+	, _maxLocalVariableCount( 0 )
+	, _maxCallStackSize( _huginnMaxCallStack_ ) {
 }
 
 void HRuntime::reset( void ) {
@@ -170,6 +172,7 @@ void HRuntime::copy_text( HRuntime& source_ ) {
 	_none = source_._none;
 	_objectFactory = source_._objectFactory;
 	_maxLocalVariableCount = source_._maxLocalVariableCount;
+	_maxCallStackSize = source_._maxCallStackSize;
 	for ( dependencies_t::value_type& c : _dependencies ) {
 		_huginn->register_class( c );
 		c->update_runtime( this );
@@ -231,6 +234,18 @@ void HRuntime::set_max_local_variable_count( int maxLocalVariableCount_ ) {
 	return;
 	M_EPILOG
 }
+
+void HRuntime::set_max_call_stack_size( int maxCallStackSize_ ) {
+	M_PROLOG
+	static int const MIN_CALL_STACK_SIZE( 128 );
+	if ( maxCallStackSize_ < MIN_CALL_STACK_SIZE ) {
+		throw HHuginnException( "Invalid max call stack size: "_ys.append( maxCallStackSize_ ) );
+	}
+	_maxCallStackSize = maxCallStackSize_;
+	return;
+	M_EPILOG
+}
+
 
 void HRuntime::register_class_low( class_t class_, HHuginn::ACCESS classConstructorAccess_ ) {
 	M_PROLOG

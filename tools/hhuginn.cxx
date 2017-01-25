@@ -78,6 +78,9 @@ HString MODULE_PATHS_S( MODULE_PATHS_RAW ? hcore::to_string( MODULE_PATHS_RAW ).
 }
 HHuginn::paths_t const HHuginn::MODULE_PATHS( string::split<HHuginn::paths_t>( MODULE_PATHS_S.raw(), ":", HTokenizer::SKIP_EMPTY ) );
 
+static int const DEFAULT_MAX_CALL_STACK( 1024 );
+int _huginnMaxCallStack_( DEFAULT_MAX_CALL_STACK );
+
 namespace huginn {
 
 HHuginn::identifier_id_t const TYPE_NONE_IDENTIFIER( 23 );
@@ -262,6 +265,10 @@ HHuginn::~HHuginn( void ) {
 	M_PROLOG
 	return;
 	M_DESTRUCTOR_EPILOG
+}
+
+void HHuginn::set_max_call_stack_size( int maxCallStackSize_ ) {
+	_runtime->set_max_call_stack_size( maxCallStackSize_ );
 }
 
 void HHuginn::load( yaal::hcore::HStreamInterface& stream_, yaal::hcore::HString const& name_, int skippedLines_ ) {
