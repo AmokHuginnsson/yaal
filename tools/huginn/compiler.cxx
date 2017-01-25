@@ -277,6 +277,7 @@ OCompiler::OCompiler( HRuntime* runtime_ )
 	, _scopeContextCache()
 	, _isModule( false )
 	, _isIncremental( false )
+	, _mainStatementCount( 0 )
 	, _runtime( runtime_ ) {
 	return;
 }
@@ -284,6 +285,7 @@ OCompiler::OCompiler( HRuntime* runtime_ )
 void OCompiler::reset( void ) {
 	M_PROLOG
 	_isModule = false;
+	/* _mainStatementCount shall be preserved. */
 	_isIncremental = true;
 	_scopeContextCache.clear();
 	_statementIdGenerator = INVALID_STATEMENT_IDENTIFIER;
@@ -759,10 +761,11 @@ OCompiler::function_info_t OCompiler::create_function_low( executing_parser::pos
 	HHuginn::scope_t scope( pop_scope_context() );
 	bool isIncrementalMain( _isIncremental && ( fc._functionIdentifier == STANDARD_FUNCTIONS::MAIN_IDENTIFIER ) && ! _classContext );
 	if ( isIncrementalMain ) {
-		for ( int i( scope->statement_count() - 1 ); i > 0; -- i ) {
+		for ( int i( _mainStatementCount ); i > 0; -- i ) {
 			scope->remove_statement( i - 1 );
 		}
 	}
+	_mainStatementCount += scope->statement_count();
 	HHuginn::function_t fun(
 		hcore::call(
 			&HFunction::execute,
