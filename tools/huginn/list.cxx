@@ -113,7 +113,11 @@ inline HHuginn::value_t insert( huginn::HThread*, HHuginn::value_t* object_, HHu
 	verify_signature( "list.insert", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::UNKNOWN }, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
 	HHuginn::HList::values_t& dst( static_cast<HHuginn::HList*>( object_->raw() )->value() );
-	dst.insert( dst.begin() + static_cast<int long>( get_integer( values_[0] ) ), values_[1] );
+	HHuginn::HInteger::value_type pos( get_integer( values_[0] ) );
+	if ( ( pos < 0 ) || ( pos > dst.get_size() ) ) {
+		throw HHuginn::HHuginnRuntimeException( "invalid insertion position: "_ys.append( pos ), position_ );
+	}
+	dst.insert( dst.begin() + static_cast<int long>( pos ), values_[1] );
 	return ( *object_ );
 	M_EPILOG
 }
