@@ -249,11 +249,11 @@ HHuginn::HHuginn( huginn::HRuntime* runtime_ )
 	M_EPILOG
 }
 
-void HHuginn::reset( void ) {
+void HHuginn::reset( int undoSteps_ ) {
 	M_PROLOG
 	_errorPosition = -1;
 	_errorMessage.clear();
-	_compiler->reset();
+	_compiler->reset( undoSteps_ );
 	_source = make_resource<HSource>();
 	_runtime->reset();
 	_state = STATE::EMPTY;
@@ -419,6 +419,7 @@ bool HHuginn::compile( paths_t const& paths_, compiler_setup_t compilerSetup_ ) 
 		compilerSetup_ |= COMPILER::BE_STRICT;
 	}
 	bool ok( false );
+	int mainStatementCount( _compiler->_mainStatementCount );
 	try {
 		_compiler->set_setup( compilerSetup_ );
 		_engine.execute( &( _compiler->_classNoter ) );
@@ -428,6 +429,7 @@ bool HHuginn::compile( paths_t const& paths_, compiler_setup_t compilerSetup_ ) 
 		_state = STATE::COMPILED;
 		ok = true;
 	} catch ( HHuginnRuntimeException const& e ) {
+		_compiler->_mainStatementCount = mainStatementCount;
 		_errorMessage = e.message();
 		_errorPosition = e.position();
 	}

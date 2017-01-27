@@ -417,7 +417,7 @@ struct OCompiler {
 	int _mainStatementCount;
 	HRuntime* _runtime;
 	OCompiler( HRuntime* );
-	void reset( void );
+	void reset( int );
 	OFunctionContext& f( void );
 	void set_setup( HHuginn::compiler_setup_t );
 	void detect_misuse( void ) const;

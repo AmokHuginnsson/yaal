@@ -292,8 +292,10 @@ public:
 	void clear_arguments( void );
 
 	/*! \brief Reset the interpreter state so it can be used again with new program source.
+	 *
+	 * \param undoSteps_ - number of statements in main() loop to undo for incremental mode.
 	 */
-	void reset( void );
+	void reset( int undoSteps_ = 0 );
 
 	/*! \brief Set maximum call stack size for this interpreter instance.
 	 */

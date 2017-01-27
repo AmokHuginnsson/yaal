@@ -282,10 +282,10 @@ OCompiler::OCompiler( HRuntime* runtime_ )
 	return;
 }
 
-void OCompiler::reset( void ) {
+void OCompiler::reset( int undoSteps_ ) {
 	M_PROLOG
 	_isModule = false;
-	/* _mainStatementCount shall be preserved. */
+	_mainStatementCount -= undoSteps_;
 	_isIncremental = true;
 	_scopeContextCache.clear();
 	_statementIdGenerator = INVALID_STATEMENT_IDENTIFIER;
