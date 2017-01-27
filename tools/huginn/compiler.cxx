@@ -764,8 +764,8 @@ OCompiler::function_info_t OCompiler::create_function_low( executing_parser::pos
 		for ( int i( _mainStatementCount ); i > 0; -- i ) {
 			scope->remove_statement( i - 1 );
 		}
+		_mainStatementCount += scope->statement_count();
 	}
-	_mainStatementCount += scope->statement_count();
 	HHuginn::function_t fun(
 		hcore::call(
 			&HFunction::execute,
