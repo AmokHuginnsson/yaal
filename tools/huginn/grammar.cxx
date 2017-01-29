@@ -139,7 +139,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		"captureList",
 		capture >> ( * ( ',' >> capture ) )
 	);
-	HRule scope( "scope" );
+	HRule statement( "statement" );
 	/*
 	 * There are two kinds of lambdas in Huginn language:
 	 * 1. Pure lambda functions (called Lambda(s) for short)
@@ -158,7 +158,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		( '@' >> -( '[' >> captureList >> ']' ) )[
 			e_p::HRegex::action_position_t( hcore::call( &OCompiler::set_lambda_name, _compiler.get(), _1 ) )
 		] >> '(' >> -nameList >> constant( ')', HRuleBase::action_position_t( hcore::call( &OCompiler::verify_default_argument, _compiler.get(), _1 ) ) )
-		>> scope,
+		>> '{' >> *statement  >> '}',
 		HRuleBase::action_position_t( hcore::call( &OCompiler::create_lambda, _compiler.get(), _1 ) )
 	);
 	HRule rangeOper(
@@ -351,6 +351,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		"expressionStatement",
 		HRule( expression, HRuleBase::action_position_t( hcore::call( &OCompiler::commit_expression, _compiler.get(), _1 ) ) ) >> ';'
 	);
+	HRule scope( "scope", constant( '{', HRuleBase::action_position_t( hcore::call( &OCompiler::create_scope, _compiler.get(), _1 ) ) ) >> *statement >> '}' );
 	HRule catchStatement(
 		"catchStatement",
 		constant( KEYWORD::CATCH ) >> '(' >>
@@ -434,7 +435,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		-( defaultStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::commit_else_clause, _compiler.get(), _1 ) )] ) >> '}'
 	);
 	HRule returnStatement( "returnStatement", constant( KEYWORD::RETURN ) >> -( '(' >> expression >> ')' ) >> ';' );
-	HRule statement( "statement",
+	statement %= (
 		ifStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_if_statement, _compiler.get(), _1 ) )]
 		| whileStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_while_statement, _compiler.get(), _1 ) )]
 		| forStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_for_statement, _compiler.get(), _1 ) )]
@@ -447,7 +448,6 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		| expressionStatement
 		| scope[HRuleBase::action_position_t( hcore::call( &OCompiler::commit_scope, _compiler.get(), _1 ) )]
 	);
-	scope %= ( constant( '{', HRuleBase::action_position_t( hcore::call( &OCompiler::create_scope, _compiler.get(), _1 ) ) ) >> *statement >> '}' );
 	HRule functionDefinition(
 		"functionDefinition",
 		regex(
@@ -456,7 +456,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_function_name, _compiler.get(), _1, _2 ) )
 		) >> '(' >> -nameList >>
 		constant( ')', HRuleBase::action_position_t( hcore::call( &OCompiler::verify_default_argument, _compiler.get(), _1 ) ) )
-		>> scope,
+		>> '{' >> *statement >> '}',
 		HRuleBase::action_position_t( hcore::call( &OCompiler::create_function, _compiler.get(), _1 ) )
 	);
 	HRule field(

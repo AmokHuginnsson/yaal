@@ -617,6 +617,7 @@ void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_
 	if ( !! _classContext ) {
 		add_field_name( name_, position_ );
 	}
+	create_scope( position_ );
 	return;
 	M_EPILOG
 }
@@ -732,6 +733,7 @@ void OCompiler::set_lambda_name( executing_parser::position_t position_ ) {
 	if ( ! fc._captures.is_empty() ) {
 		_capturesLog.insert( make_pair( f()._functionIdentifier, yaal::move( fc._captures ) ) );
 	}
+	create_scope( position_ );
 	return;
 	M_EPILOG
 }
