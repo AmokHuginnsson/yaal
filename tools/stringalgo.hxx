@@ -40,7 +40,9 @@ namespace tools {
 
 namespace string {
 
-template<typename collection>
+typedef yaal::hcore::HArray<yaal::hcore::HString> tokens_t;
+
+template<typename collection = tokens_t>
 collection split(
 		yaal::hcore::HString const& string_,
 		yaal::hcore::HString const& separator_,

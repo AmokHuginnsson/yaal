@@ -32,6 +32,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "expression.hxx"
 #include "scope.hxx"
 #include "iterator.hxx"
+#include "keyword.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -80,16 +81,16 @@ void HFor::do_execute( HThread* thread_ ) const {
 				it.next( thread_, sourcePosition );
 			}
 		} else if ( ( obj = dynamic_cast<HHuginn::HObject*>( source.raw() ) ) ) {
-			HHuginn::value_t itVal( obj->call_method( thread_, source, "iterator", {}, sourcePosition ) );
+			HHuginn::value_t itVal( obj->call_method( thread_, source, INTERFACE::ITERATOR, {}, sourcePosition ) );
 			HHuginn::HObject* it( dynamic_cast<HHuginn::HObject*>( itVal.raw() ) );
 			if ( ! it ) {
 				throw HHuginn::HHuginnRuntimeException( "`For' source returned invalid iterator object.", sourcePosition );
 			}
-			HHuginn::value_t isValidField( it->get_method( thread_, itVal, "is_valid", sourcePosition ) );
+			HHuginn::value_t isValidField( it->get_method( thread_, itVal, INTERFACE::IS_VALID, sourcePosition ) );
 			HHuginn::HClass::HBoundMethod* isValidMethod( static_cast<HHuginn::HClass::HBoundMethod*>( isValidField.raw() ) );
-			HHuginn::value_t valueField( it->get_method( thread_, itVal, "value", sourcePosition ) );
+			HHuginn::value_t valueField( it->get_method( thread_, itVal, INTERFACE::VALUE, sourcePosition ) );
 			HHuginn::HClass::HBoundMethod* valueMethod( static_cast<HHuginn::HClass::HBoundMethod*>( valueField.raw() ) );
-			HHuginn::value_t nextField( it->get_method( thread_, itVal, "next", sourcePosition ) );
+			HHuginn::value_t nextField( it->get_method( thread_, itVal, INTERFACE::NEXT, sourcePosition ) );
 			HHuginn::HClass::HBoundMethod* nextMethod( static_cast<HHuginn::HClass::HBoundMethod*>( nextField.raw() ) );
 			while ( f->can_continue() ) {
 				HHuginn::value_t isValid( isValidMethod->call( thread_, {}, sourcePosition ) );

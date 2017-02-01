@@ -96,6 +96,28 @@ HHuginn::identifier_id_t const SET_IDENTIFIER( 21 );
 
 }
 
+namespace INTERFACE {
+
+char const* GET_SIZE = "get_size";
+char const* ITERATOR = "iterator";
+char const* IS_VALID = "is_valid";
+char const* NEXT = "next";
+char const* VALUE = "value";
+char const* HASH = "hash";
+char const* EQUALS = "equals";
+char const* LESS = "less";
+char const* GREATER = "greater";
+char const* LESS_OR_EQUAL = "less_or_equal";
+char const* GREATER_OR_EQUAL = "greater_or_equal";
+char const* ADD = "add";
+char const* SUBTRACT = "subtract";
+char const* MULTIPLY = "multiply";
+char const* DIVIDE = "divide";
+char const* MODULO = "modulo";
+char const* POWER = "power";
+
+}
+
 namespace STANDARD_FUNCTIONS {
 
 char const* MAIN = "main";

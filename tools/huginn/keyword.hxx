@@ -97,6 +97,28 @@ extern HHuginn::identifier_id_t const SET_IDENTIFIER;
 
 }
 
+namespace INTERFACE {
+
+extern char const* GET_SIZE;
+extern char const* ITERATOR;
+extern char const* VALUE;
+extern char const* NEXT;
+extern char const* IS_VALID;
+extern char const* HASH;
+extern char const* EQUALS;
+extern char const* LESS;
+extern char const* GREATER;
+extern char const* LESS_OR_EQUAL;
+extern char const* GREATER_OR_EQUAL;
+extern char const* ADD;
+extern char const* SUBTRACT;
+extern char const* MULTIPLY;
+extern char const* DIVIDE;
+extern char const* MODULO;
+extern char const* POWER;
+
+}
+
 namespace STANDARD_FUNCTIONS {
 extern char const* MAIN;
 extern HHuginn::identifier_id_t const MAIN_IDENTIFIER;

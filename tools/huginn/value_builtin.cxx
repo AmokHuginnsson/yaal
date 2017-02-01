@@ -232,8 +232,8 @@ void fallback_arithmetic( HThread* thread_, char const* methodName_, char const*
 				"Arithmetic method `"_ys
 					.append( methodName_ )
 					.append( "' on " )
-					.append( a_type_name( t ) )
-					.append( "returned result of incompatible type " )
+					.append( a_type_name( v1_->get_class() ) )
+					.append( " returned result of incompatible type " )
 					.append( a_type_name( v->get_class() ) )
 					.append( "." ),
 				position_
@@ -266,7 +266,7 @@ void add( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		static_cast<HHuginn::HNumber*>( v1_.raw() )->value() += static_cast<HHuginn::HNumber const*>( v2_.raw() )->value();
 	} else {
-		fallback_arithmetic( thread_, "add", "+", v1_, v2_, position_ );
+		fallback_arithmetic( thread_, INTERFACE::ADD, op_to_str( OPERATOR::PLUS ), v1_, v2_, position_ );
 	}
 	return;
 }
@@ -281,7 +281,7 @@ void sub( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		static_cast<HHuginn::HNumber*>( v1_.raw() )->value() -= static_cast<HHuginn::HNumber const*>( v2_.raw() )->value();
 	} else {
-		fallback_arithmetic( thread_, "subtract", "-", v1_, v2_, position_ );
+		fallback_arithmetic( thread_, INTERFACE::SUBTRACT, op_to_str( OPERATOR::MINUS ), v1_, v2_, position_ );
 	}
 	return;
 }
@@ -296,7 +296,7 @@ void mul( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		static_cast<HHuginn::HNumber*>( v1_.raw() )->value() *= static_cast<HHuginn::HNumber const*>( v2_.raw() )->value();
 	} else {
-		fallback_arithmetic( thread_, "multiply", "*", v1_, v2_, position_ );
+		fallback_arithmetic( thread_, INTERFACE::MULTIPLY, op_to_str( OPERATOR::MULTIPLY ), v1_, v2_, position_ );
 	}
 	return;
 }
@@ -326,7 +326,7 @@ void div( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 			v1_ = thread_->runtime().none_value();
 		}
 	} else {
-		fallback_arithmetic( thread_, "divide", "/", v1_, v2_, position_ );
+		fallback_arithmetic( thread_, INTERFACE::DIVIDE, op_to_str( OPERATOR::DIVIDE ), v1_, v2_, position_ );
 	}
 	HRuntime& rt( thread_->runtime() );
 	if ( v1_ == rt.none_value() ) {
@@ -360,7 +360,7 @@ void mod( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 			v1_ = thread_->runtime().none_value();
 		}
 	} else {
-		fallback_arithmetic( thread_, "modulo", "%", v1_, v2_, position_ );
+		fallback_arithmetic( thread_, INTERFACE::MODULO, op_to_str( OPERATOR::MODULO ), v1_, v2_, position_ );
 	}
 	HRuntime& rt( thread_->runtime() );
 	if ( v1_ == rt.none_value() ) {
@@ -379,7 +379,7 @@ void pow( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		static_cast<HHuginn::HNumber*>( v1_.raw() )->value() ^= static_cast<HHuginn::HNumber const*>( v2_.raw() )->value().to_integer();
 	} else {
-		fallback_arithmetic( thread_, "power", "^", v1_, v2_, position_ );
+		fallback_arithmetic( thread_, INTERFACE::POWER, op_to_str( OPERATOR::POWER ), v1_, v2_, position_ );
 	}
 	return;
 }
@@ -470,7 +470,7 @@ int long hash( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	} else if ( typeId != HHuginn::TYPE::NONE ) {
 		HHuginn::value_t res;
 		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v_.raw() ) ) {
-			res = o->call_method( thread_, v_, "hash", HHuginn::values_t(), position_ );
+			res = o->call_method( thread_, v_, INTERFACE::HASH, HHuginn::values_t(), position_ );
 			if ( res->type_id() != HHuginn::TYPE::INTEGER ) {
 				throw HHuginn::HHuginnRuntimeException(
 					"User supplied `hash' function returned an invalid type `"_ys
@@ -481,7 +481,7 @@ int long hash( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 			}
 		} else {
 			HHuginn::HClass const* c( v_->get_class() );
-			int idx( c->field_index( thread_->runtime().identifier_id( "hash" ) ) );
+			int idx( c->field_index( thread_->runtime().identifier_id( INTERFACE::HASH ) ) );
 			if ( idx >= 0 ) {
 				HHuginn::HClass::HMethod const& m( *static_cast<HHuginn::HClass::HMethod const*>( c->field( idx ).raw() ) );
 				res = m.function()( thread_, const_cast<HHuginn::value_t*>( &v_ ), HHuginn::values_t{}, position_ );
@@ -554,7 +554,7 @@ bool equals( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t con
 				res = static_cast<HHuginn::HFunctionReference const*>( v1_.raw() )->identifier_id() == static_cast<HHuginn::HFunctionReference const*>( v2_.raw() )->identifier_id();
 			} break;
 			default: {
-				res = fallback_compare( thread_, "equals", "==", v1_, v2_, position_ );
+				res = fallback_compare( thread_, INTERFACE::EQUALS, op_to_str( OPERATOR::EQUALS ), v1_, v2_, position_ );
 			}
 		}
 	} else {
@@ -578,7 +578,7 @@ bool less( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
 		res = static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() ) < static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value() );
 	} else {
-		res = fallback_compare( thread_, "less", "<", v1_, v2_, position_ );
+		res = fallback_compare( thread_, INTERFACE::LESS, op_to_str( OPERATOR::LESS ), v1_, v2_, position_ );
 	}
 	return ( res );
 }
@@ -598,7 +598,7 @@ bool greater( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t co
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
 		res = static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() ) > static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value() );
 	} else {
-		res = fallback_compare( thread_, "greater", ">", v1_, v2_, position_ );
+		res = fallback_compare( thread_, INTERFACE::GREATER, op_to_str( OPERATOR::GREATER ), v1_, v2_, position_ );
 	}
 	return ( res );
 }
@@ -618,7 +618,7 @@ bool less_or_equal( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::valu
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
 		res = static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() ) <= static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value() );
 	} else {
-		res = fallback_compare( thread_, "less_or_equal", "<=", v1_, v2_, position_ );
+		res = fallback_compare( thread_, INTERFACE::LESS_OR_EQUAL, op_to_str( OPERATOR::LESS_OR_EQUAL ), v1_, v2_, position_ );
 	}
 	return ( res );
 }
@@ -638,7 +638,7 @@ bool greater_or_equal( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::v
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
 		res = static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() ) >= static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value() );
 	} else {
-		res = fallback_compare( thread_, "greater_or_equal", ">=", v1_, v2_, position_ );
+		res = fallback_compare( thread_, INTERFACE::GREATER_OR_EQUAL, op_to_str( OPERATOR::GREATER_OR_EQUAL ), v1_, v2_, position_ );
 	}
 	return ( res );
 }

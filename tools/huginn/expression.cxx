@@ -221,7 +221,7 @@ void HExpression::get_super( huginn::HFrame* frame_, int position_ ) {
 	M_EPILOG
 }
 
-void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifierId_, huginn::HFrame* frame_, int position_ ) {
+void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifierId_, huginn::HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::MEMBER_ACCESS );
@@ -252,10 +252,10 @@ void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifier
 			if ( o != nullptr ) {
 				frame_->values().push( rt.object_factory()->create_reference( o->field_ref( fi ) ) );
 			} else {
-				throw HHuginn::HHuginnRuntimeException( "Assignment to read-only location.", position_ );
+				throw HHuginn::HHuginnRuntimeException( "Assignment to read-only location.", p );
 			}
 		} else {
-			throw HHuginn::HHuginnRuntimeException( "Assignment to temporary.", position_ );
+			throw HHuginn::HHuginnRuntimeException( "Assignment to temporary.", p );
 		}
 	} else {
 		HHuginn::HObjectReference* oref( dynamic_cast<HHuginn::HObjectReference*>( v.raw() ) );
@@ -274,7 +274,7 @@ void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifier
 				);
 			}
 			if ( access_ == ACCESS::VALUE ) {
-				frame_->values().push( oref->field( t, fi, position_ ) );
+				frame_->values().push( oref->field( t, fi, p ) );
 			} else {
 				throw HHuginn::HHuginnRuntimeException( "Changing upcasted reference.", p );
 			}
