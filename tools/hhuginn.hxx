@@ -756,7 +756,6 @@ public:
 private:
 	values_t _data;
 public:
-	HList( HHuginn::HClass const* );
 	HList( HHuginn::HClass const*, values_t&& );
 	void push_back( value_t const& );
 	void pop_back( void );
@@ -784,7 +783,6 @@ public:
 private:
 	values_t _data;
 public:
-	HDeque( HHuginn::HClass const* );
 	HDeque( HHuginn::HClass const*, values_t&& );
 	void push_back( value_t const& );
 	void pop_back( void );

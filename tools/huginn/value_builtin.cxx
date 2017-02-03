@@ -473,9 +473,9 @@ int long hash( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 			res = o->call_method( thread_, v_, INTERFACE::HASH, HHuginn::values_t(), position_ );
 			if ( res->type_id() != HHuginn::TYPE::INTEGER ) {
 				throw HHuginn::HHuginnRuntimeException(
-					"User supplied `hash' function returned an invalid type `"_ys
-						.append( res->get_class()->name() )
-						.append( "' instead of an `integer'." ),
+					"User supplied `hash' function returned an invalid type "_ys
+						.append( a_type_name( res->get_class() ) )
+						.append( " instead of an `integer'." ),
 					position_
 				);
 			}
@@ -507,7 +507,10 @@ bool fallback_compare( HThread* thread_, char const* methodName_, char const* op
 	if ( thread_ && ( o = dynamic_cast<HHuginn::HObject const*>( v1_.raw() ) ) ) {
 		v = o->call_method( thread_, v1_, methodName_, { v2_ }, position_ );
 		if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
-			throw HHuginn::HHuginnRuntimeException( "Comparison method `"_ys.append( methodName_ ).append( "' returned non-boolean result `" ).append( v->get_class()->name() ).append( "'." ), position_ );
+			throw HHuginn::HHuginnRuntimeException(
+				"Comparison method `"_ys.append( methodName_ ).append( "' returned non-boolean result of " ).append( a_type_name( v->get_class() ) ).append( " type." ),
+				position_
+			);
 		}
 	} else {
 		HHuginn::HClass const* c( v1_->get_class() );
@@ -665,11 +668,11 @@ HHuginn::value_t fallback_conversion( HHuginn::type_id_t type_, HThread* thread_
 		res = o->call_method( thread_, v_, methodName, HHuginn::values_t(), position_ );
 		if ( res->type_id() != type_ ) {
 			throw HHuginn::HHuginnRuntimeException(
-				"User conversion method returned invalid type `"_ys
-				.append( res->get_class()->name() )
-				.append( "' instead of `" )
-				.append( type_name( type_ ) )
-				.append( "'." ),
+				"User conversion method returned invalid type "_ys
+				.append( a_type_name( res->get_class() ) )
+				.append( " instead of " )
+				.append( a_type_name( type_ ) )
+				.append( "." ),
 				position_
 			);
 		}

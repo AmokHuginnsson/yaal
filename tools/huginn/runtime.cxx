@@ -189,12 +189,6 @@ huginn::HThread* HRuntime::current_thread( void ) {
 	M_EPILOG
 }
 
-huginn::HFrame* HRuntime::current_frame( void ) {
-	M_PROLOG
-	return ( current_thread()->current_frame() );
-	M_EPILOG
-}
-
 HHuginn::value_t HRuntime::result( void ) const {
 	return ( _result );
 }
@@ -516,10 +510,19 @@ HHuginn::value_t size( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 		s = iterable->size();
 	} else {
 		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v ) ) {
-			s = get_integer( value_builtin::integer( thread_, o->call_method( thread_, val, "get_size", HHuginn::values_t(), position_ ), position_ ) );
+			HHuginn::value_t res( o->call_method( thread_, val, INTERFACE::GET_SIZE, HHuginn::values_t(), position_ ) );
+			if ( res->type_id() != HHuginn::TYPE::INTEGER ) {
+				throw HHuginn::HHuginnRuntimeException(
+					"User supplied `get_size' method returned an invalid type "_ys
+						.append( a_type_name( res->get_class() ) )
+						.append( " instead of an `integer'." ),
+					position_
+				);
+			}
+			s = get_integer( res );
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
-				"Getting size of `"_ys.append( v->get_class()->name() ).append( "'s is not supported." ),
+				"Getting size of "_ys.append( a_type_name( v->get_class() ) ).append( "s is not supported." ),
 				position_
 			);
 		}

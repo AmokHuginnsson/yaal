@@ -879,7 +879,7 @@ yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn const* h
 					str.append( ", " );
 				}
 				next = true;
-				str.append( to_string( v ) );
+				str.append( to_string( v, huginn_ ) );
 			}
 			str.append( "]" );
 		} break;
@@ -892,7 +892,7 @@ yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn const* h
 					str.append( ", " );
 				}
 				next = true;
-				str.append( to_string( v ) );
+				str.append( to_string( v, huginn_ ) );
 			}
 			str.append( ")" );
 		} break;
@@ -905,7 +905,7 @@ yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn const* h
 					str.append( ", " );
 				}
 				next = true;
-				str.append( to_string( v.first ) ).append( ": " ).append( to_string( v.second ) );
+				str.append( to_string( v.first, huginn_ ) ).append( ": " ).append( to_string( v.second, huginn_ ) );
 			}
 			str.append( "}" );
 		} break;
@@ -918,7 +918,7 @@ yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn const* h
 					str.append( ", " );
 				}
 				next = true;
-				str.append( to_string( v ) );
+				str.append( to_string( v, huginn_ ) );
 			}
 			str.append( "}" );
 		} break;
@@ -931,7 +931,7 @@ yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn const* h
 					str.append( ", " );
 				}
 				next = true;
-				str.append( to_string( v ) );
+				str.append( to_string( v, huginn_ ) );
 			}
 			str.append( ")" );
 		} break;

@@ -112,7 +112,6 @@ private:
 public:
 	HRuntime( HHuginn* );
 	huginn::HThread* current_thread( void );
-	huginn::HFrame* current_frame( void );
 	HHuginn* huginn( void ) const {
 		return ( _huginn );
 	}

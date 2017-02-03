@@ -184,12 +184,6 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 
 }
 
-HHuginn::HList::HList( HHuginn::HClass const* class_ )
-	: HIterable( class_ )
-	, _data() {
-	return;
-}
-
 HHuginn::HList::HList( HHuginn::HClass const* class_, values_t&& data_ )
 	: HIterable( class_ )
 	, _data( yaal::move( data_ ) ) {
