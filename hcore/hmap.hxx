@@ -85,6 +85,8 @@ public:
 	typedef HPair<iterator, bool> insert_result;
 	typedef engine_t engine_type;
 	typedef typename engine_type::allocator_type allocator_type;
+	static int const NODE_SIZE = engine_type::NODE_SIZE;
+	typedef typename engine_type::node_type node_type;
 	typedef HMap<key_type_t, value_type_t, compare_t, allocator_t, engine_t> this_type;
 	/*! \brief Error codes for HMap<> operations.
 	 */

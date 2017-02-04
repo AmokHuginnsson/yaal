@@ -66,6 +66,8 @@ public:
 	typedef compare_t compare_type;
 	typedef HSBBSTree<value_type, compare_type, set_helper<value_type>, allocator_t> engine_type;
 	typedef typename engine_type::allocator_type allocator_type;
+	static int const NODE_SIZE = engine_type::NODE_SIZE;
+	typedef typename engine_type::node_type node_type;
 	typedef HSet<type_t, compare_t, allocator_t> this_type;
 	/*! \brief Iterator for HSet<> data structure.
 	 */

@@ -74,6 +74,8 @@ private:
 	multimap_engine_t _engine;
 public:
 	typedef typename multimap_engine_t::allocator_type allocator_type;
+	static int const NODE_SIZE = multimap_engine_t::NODE_SIZE;
+	typedef typename multimap_engine_t::node_type node_type;
 	typedef HMultiMap<key_type_t, value_type_t, compare_t, allocator_t, storage_policy_t> this_type;
 	HMultiMap( void )
 		: _engine() {

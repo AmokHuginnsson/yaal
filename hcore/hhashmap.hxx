@@ -91,6 +91,8 @@ private:
 	engine_t _engine;
 public:
 	typedef typename engine_t::allocator_type allocator_type;
+	static int const NODE_SIZE = engine_t::NODE_SIZE;
+	typedef typename engine_t::node_type node_type;
 	typedef HHashMap<key_type, data_type, hasher_type, equal_key_type, allocator_t> this_type;
 	HHashMap( void )
 		: _engine( hasher_type(), equal_key_type(), allocator_type() ) {

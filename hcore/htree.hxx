@@ -448,6 +448,8 @@ public:
 
 	typedef typename allocator_t::template rebind<HNode>::other allocator_type;
 	typedef typename ref_branch_allocator_type::allocator_type branch_allocator_type;
+	static int const NODE_SIZE = sizeof ( HNode );
+	typedef HNode node_type;
 
 	template<typename const_qual_t>
 	class HIterator;

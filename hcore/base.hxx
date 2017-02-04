@@ -128,6 +128,11 @@ public:
 	}
 };
 
+template<int const N>
+struct Int2Type {
+	enum { value = N };
+};
+
 /*! \brief Helper to find number of elements in C array.
  */
 template <typename T, int long unsigned N>
