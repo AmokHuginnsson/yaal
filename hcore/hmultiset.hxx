@@ -67,7 +67,7 @@ private:
 	typedef HSBBSTree<elem_t, compare_type, multiset_helper<elem_t>, allocator_t> engine_t;
 public:
 	typedef typename engine_t::allocator_type allocator_type;
-	static int const NODE_SIZE = engine_t::NODE_SIZE;
+	typedef typename engine_t::node_size node_size;
 	typedef typename engine_t::node_type node_type;
 	typedef HMultiSet<type_t, compare_t, allocator_t> this_type;
 	/*! \brief Iterator for HMultiSet<> data structure.

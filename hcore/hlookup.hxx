@@ -55,7 +55,7 @@ public:
 	typedef compare_t compare_type;
 	typedef key_get_t key_get_type;
 	typedef allocator_t allocator_type;
-	static int const NODE_SIZE = sizeof ( key_value_type );
+	typedef trait::delayed_sizeof<key_value_type> node_size;
 	typedef key_value_type node_type;
 	typedef typename key_get_type::key_type key_type;
 	typedef HArray<key_value_type> data_type;

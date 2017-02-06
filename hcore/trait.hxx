@@ -55,6 +55,16 @@ static_assert( sizeof ( true_type ) != sizeof ( false_type ), "true_type and fal
  */
 class no_type {};
 
+/*! \brief Allow getting sizeof given type on incomplete types.
+ *
+ * \tparam T - a type to get size of.
+ * \retval A size of T type.
+ */
+template<typename T>
+struct delayed_sizeof {
+	static int const value = sizeof ( T );
+};
+
 /*! \brief Conditionally expose given type.
  *
  * \tparam condition - condition on which given type should be exposed.

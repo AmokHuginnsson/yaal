@@ -124,7 +124,7 @@ private:
 
 public:
 	typedef typename allocator_t::template rebind<HElement>::other allocator_type;
-	static int const NODE_SIZE = sizeof ( HElement );
+	typedef trait::delayed_sizeof<HElement> node_size;
 	typedef HElement node_type;
 
 private:

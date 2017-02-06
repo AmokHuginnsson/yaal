@@ -171,7 +171,7 @@ private:
 	};
 public:
 	typedef typename allocator_t::template rebind<HNode>::other allocator_type;
-	static int const NODE_SIZE = sizeof ( HNode );
+	typedef trait::delayed_sizeof<HNode> node_size;
 	typedef HNode node_type;
 private:
 	compare_type _compare;

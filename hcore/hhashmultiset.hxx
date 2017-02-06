@@ -65,7 +65,7 @@ public:
 	typedef HPair<type_t, int long> elem_t;
 	typedef HHashContainer<elem_t, hasher_type, equal_key_type, hashmultiset_helper<elem_t>, allocator_t> engine_t;
 	typedef typename engine_t::allocator_type allocator_type;
-	static int const NODE_SIZE = engine_t::NODE_SIZE;
+	typedef typename engine_t::node_size node_size;
 	typedef typename engine_t::node_type node_type;
 	typedef HHashMultiSet<value_type, hasher_type, equal_key_type, allocator_t> this_type;
 	class HIterator : public iterator_interface<value_type const, iterator_category::forward> {

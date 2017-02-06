@@ -114,7 +114,7 @@ private:
 	};
 public:
 	typedef typename allocator_t::template rebind<HAtom>::other allocator_type;
-	static int const NODE_SIZE = sizeof ( HAtom );
+	typedef trait::delayed_sizeof<HAtom> node_size;
 	typedef HAtom node_type;
 	/*! \brief Iterator for HHashContainer data structure.
 	 */

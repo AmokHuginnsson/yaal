@@ -87,7 +87,7 @@ private:
 	hashmultimap_engine_t _engine;
 public:
 	typedef typename hashmultimap_engine_t::allocator_type allocator_type;
-	static int const NODE_SIZE = hashmultimap_engine_t::NODE_SIZE;
+	typedef typename hashmultimap_engine_t::node_size node_size;
 	typedef typename hashmultimap_engine_t::node_type node_type;
 	HHashMultiMap( void )
 		: _engine() {
