@@ -81,8 +81,8 @@ public:
 		: _engine() {
 		return;
 	}
-	explicit HMultiMap( compare_type const& compare_ )
-		: _engine( compare_ ) {
+	explicit HMultiMap( compare_type const& compare_, allocator_type const& allocator_ = allocator_type() )
+		: _engine( compare_, allocator_ ) {
 		return;
 	}
 	explicit HMultiMap( allocator_type const& allocator_ )

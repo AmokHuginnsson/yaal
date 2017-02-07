@@ -104,8 +104,8 @@ public:
 	HMap( void )
 		: _engine( compare_type(), allocator_type() )
 		{}
-	explicit HMap( compare_type const& compare_ )
-		: _engine( compare_, allocator_type() )
+	explicit HMap( compare_type const& compare_, allocator_type const& allocator_ = allocator_type() )
+		: _engine( compare_, allocator_ )
 		{}
 	explicit HMap( allocator_type const& allocator_ )
 		: _engine( compare_type(), allocator_ )

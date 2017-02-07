@@ -98,8 +98,8 @@ public:
 		: _engine( hasher_type(), equal_key_type(), allocator_type() ) {
 		return;
 	}
-	explicit HHashMap( hasher_type const& hasher_, equal_key_type const& equals_ = equal_key_type() )
-		: _engine( hasher_, equals_, allocator_type() ) {
+	explicit HHashMap( hasher_type const& hasher_, equal_key_type const& equals_ = equal_key_type(), allocator_type const& allocator_ = allocator_type() )
+		: _engine( hasher_, equals_, allocator_ ) {
 		return;
 	}
 	explicit HHashMap( allocator_type const& allocator_ )

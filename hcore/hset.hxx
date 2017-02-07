@@ -133,8 +133,8 @@ public:
 		: _engine( compare_type(), allocator_type() ) {
 		return;
 	}
-	explicit HSet( compare_type const& compare_ )
-		: _engine( compare_, allocator_type() ) {
+	explicit HSet( compare_type const& compare_, allocator_type const& allocator_ = allocator_type() )
+		: _engine( compare_, allocator_ ) {
 		return;
 	}
 	explicit HSet( allocator_type const& allocator_ )

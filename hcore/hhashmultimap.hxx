@@ -93,8 +93,8 @@ public:
 		: _engine() {
 		return;
 	}
-	explicit HHashMultiMap( hasher_type const& hasher_, equal_key_type const& equals_ = equal_key_type() )
-		: _engine( hasher_, equals_ ) {
+	HHashMultiMap( hasher_type const& hasher_, equal_key_type const& equals_ = equal_key_type(), allocator_type const& allocator_ = allocator_type() )
+		: _engine( hasher_, equals_, allocator_ ) {
 		return;
 	}
 	explicit HHashMultiMap( allocator_type const& allocator_ )
