@@ -165,10 +165,10 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 
 }
 
-HHuginn::HSet::HSet( HHuginn::HClass const* class_ )
+HHuginn::HSet::HSet( HHuginn::HClass const* class_, allocator_t const& allocator_ )
 	: HIterable( class_ )
 	, _helper()
-	, _data( _helper, _helper ) {
+	, _data( _helper, _helper, allocator_ ) {
 	return;
 }
 

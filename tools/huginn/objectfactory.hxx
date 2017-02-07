@@ -37,34 +37,82 @@ namespace tools {
 
 namespace huginn {
 
+enum class POOL_TYPE {
+	SCALAR,
+	COLLECTION,
+	CLASSLESS
+};
+
 template<typename T>
-class HObjectPool final {
-private:
+class HObjectPoolBase {
+protected:
 	typedef yaal::hcore::HPointer<T> object_ptr_t;
 	typedef typename object_ptr_t::template allocated_shared<allocator::shared_pool<T>> shared_t;
 	typedef yaal::hcore::HPool<shared_t::size> pool_t;
 	typedef allocator::shared_pool<typename shared_t::type> allocator_t;
 	pool_t _pool;
 	allocator_t _allocator;
+public:
+	HObjectPoolBase( void )
+		: _pool()
+		, _allocator( _pool ) {
+	}
+};
+
+template<typename T, POOL_TYPE const = POOL_TYPE::SCALAR>
+class HObjectPool;
+
+template<typename T>
+class HObjectPool<T, POOL_TYPE::SCALAR> : public HObjectPoolBase<T> {
 	HHuginn::HClass const* _class;
 public:
-	HObjectPool( HHuginn::HClass const* class_ = nullptr )
-		: _pool()
-		, _allocator( _pool )
-		, _class( class_ ) {
+	typedef HObjectPoolBase<T> base_type;
+	typedef typename base_type::allocator_t allocator_t;
+	HObjectPool( HHuginn::HClass const* class_ )
+		: _class( class_ ) {
 		return;
 	}
 	template<typename... arg_t>
 	HHuginn::value_t create( arg_t&&... arg_ ) const {
-		return ( yaal::hcore::allocate_pointer<allocator_t, T>( _allocator, _class, yaal::forward<arg_t>( arg_ )... ) );
-	}
-	template<typename... arg_t>
-	HHuginn::value_t create_nc( arg_t&&... arg_ ) const {
-		return ( yaal::hcore::allocate_pointer<allocator_t, T>( _allocator, yaal::forward<arg_t>( arg_ )... ) );
+		return ( yaal::hcore::allocate_pointer<allocator_t, T>( this->_allocator, _class, yaal::forward<arg_t>( arg_ )... ) );
 	}
 private:
 	HObjectPool( HObjectPool const& ) = delete;
 	HObjectPool& operator = ( HObjectPool const& ) = delete;
+};
+
+template<typename T>
+class HObjectPool<T, POOL_TYPE::COLLECTION> : public HObjectPoolBase<T> {
+	HHuginn::HClass const* _class;
+	typename T::pool_t _nodePool;
+	typename T::allocator_t _nodeAllocator;
+public:
+	typedef HObjectPoolBase<T> base_type;
+	typedef typename base_type::allocator_t allocator_t;
+	HObjectPool( HHuginn::HClass const* class_ )
+		: _class( class_ )
+		, _nodePool()
+		, _nodeAllocator( _nodePool ) {
+		return;
+	}
+	template<typename... arg_t>
+	HHuginn::value_t create( arg_t&&... arg_ ) const {
+		return ( yaal::hcore::allocate_pointer<allocator_t, T>( this->_allocator, _class, _nodeAllocator, yaal::forward<arg_t>( arg_ )... ) );
+	}
+private:
+	HObjectPool( HObjectPool const& ) = delete;
+	HObjectPool& operator = ( HObjectPool const& ) = delete;
+};
+
+template<typename T>
+class HObjectPool<T, POOL_TYPE::CLASSLESS> : public HObjectPoolBase<T> {
+public:
+	typedef HObjectPoolBase<T> base_type;
+	typedef typename base_type::allocator_t allocator_t;
+	template<typename... arg_t>
+	HHuginn::value_t create( arg_t&&... arg_ ) const {
+		return ( yaal::hcore::allocate_pointer<allocator_t, T>( this->_allocator, yaal::forward<arg_t>( arg_ )... ) );
+	}
 };
 
 class HObjectFactory final {
@@ -93,14 +141,14 @@ class HObjectFactory final {
 	HObjectPool<HHuginn::HCharacter> _characterPool;
 	HObjectPool<HHuginn::HList> _listPool;
 	HObjectPool<HHuginn::HDeque> _dequePool;
-	HObjectPool<HHuginn::HDict> _dictPool;
-	HObjectPool<HHuginn::HLookup> _lookupPool;
-	HObjectPool<HHuginn::HOrder> _orderPool;
-	HObjectPool<HHuginn::HSet> _setPool;
-	HObjectPool<HHuginn::HReference> _referencePool;
-	HObjectPool<HHuginn::HFunctionReference> _functionReferencePool;
-	HObjectPool<HHuginn::HClass::HBoundMethod> _boundMethodPool;
-	HObjectPool<HHuginn::HObject> _objectPool;
+	HObjectPool<HHuginn::HDict, POOL_TYPE::COLLECTION> _dictPool;
+	HObjectPool<HHuginn::HLookup, POOL_TYPE::COLLECTION> _lookupPool;
+	HObjectPool<HHuginn::HOrder, POOL_TYPE::COLLECTION> _orderPool;
+	HObjectPool<HHuginn::HSet, POOL_TYPE::COLLECTION> _setPool;
+	HObjectPool<HHuginn::HReference, POOL_TYPE::CLASSLESS> _referencePool;
+	HObjectPool<HHuginn::HFunctionReference, POOL_TYPE::CLASSLESS> _functionReferencePool;
+	HObjectPool<HHuginn::HClass::HBoundMethod, POOL_TYPE::CLASSLESS> _boundMethodPool;
+	HObjectPool<HHuginn::HObject, POOL_TYPE::CLASSLESS> _objectPool;
 public:
 	HObjectFactory( HRuntime* );
 	void register_builtin_classes( void );
@@ -144,16 +192,16 @@ public:
 		return ( _setPool.create() );
 	}
 	HHuginn::value_t create_reference( HHuginn::value_t& value_ ) const {
-		return ( _referencePool.create_nc( value_ ) );
+		return ( _referencePool.create( value_ ) );
 	}
 	HHuginn::value_t create_function_reference( HHuginn::identifier_id_t identifierId_, HHuginn::function_t const& function_, yaal::hcore::HString const& doc_ ) const {
-		return ( _functionReferencePool.create_nc( identifierId_, function_, doc_ ) );
+		return ( _functionReferencePool.create( identifierId_, function_, doc_ ) );
 	}
 	HHuginn::value_t create_bound_method( HHuginn::function_t const& method_, HHuginn::value_t const& object_ ) const {
-		return ( _boundMethodPool.create_nc( method_, object_ ) );
+		return ( _boundMethodPool.create( method_, object_ ) );
 	}
 	HHuginn::value_t create_object( HHuginn::HClass const* class_, HHuginn::HObject::fields_t const& fields_ ) const {
-		return ( _objectPool.create_nc( class_, fields_ ) );
+		return ( _objectPool.create( class_, fields_ ) );
 	}
 	HHuginn::HClass const* boolean_class( void ) const {
 		return ( _boolean.raw() );

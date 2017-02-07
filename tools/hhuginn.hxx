@@ -827,13 +827,16 @@ class HHuginn::HDict : public HHuginn::HIterable {
 public:
 	typedef HHuginn::HDict this_type;
 	typedef HHuginn::HIterable base_type;
-	typedef yaal::hcore::HMap<HHuginn::value_t, HHuginn::value_t, HValueLessHelper&> values_t;
+	typedef yaal::hcore::HMap<HHuginn::value_t, HHuginn::value_t, HValueLessHelper&> values_prototype_t;
+	typedef yaal::hcore::HPool<values_prototype_t::node_size::value> pool_t;
+	typedef allocator::shared_pool<values_prototype_t::node_type> allocator_t;
+	typedef yaal::hcore::HMap<HHuginn::value_t, HHuginn::value_t, HValueLessHelper&, allocator_t> values_t;
 private:
 	mutable HValueLessHelper _helper;
 	values_t _data;
 	HHuginn::HClass const* _keyType;
 public:
-	HDict( HHuginn::HClass const* );
+	HDict( HHuginn::HClass const*, allocator_t const& );
 	value_t get( huginn::HThread*, HHuginn::value_t const&, int );
 	value_t& get_ref( huginn::HThread*, HHuginn::value_t const&, int );
 	void insert( huginn::HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
@@ -868,13 +871,16 @@ class HHuginn::HOrder : public HHuginn::HIterable {
 public:
 	typedef HHuginn::HOrder this_type;
 	typedef HHuginn::HIterable base_type;
-	typedef yaal::hcore::HSet<HHuginn::value_t, HValueLessHelper&> values_t;
+	typedef yaal::hcore::HSet<HHuginn::value_t, HValueLessHelper&> values_prototype_t;
+	typedef yaal::hcore::HPool<values_prototype_t::node_size::value> pool_t;
+	typedef allocator::shared_pool<values_prototype_t::node_type> allocator_t;
+	typedef yaal::hcore::HSet<HHuginn::value_t, HValueLessHelper&, allocator_t> values_t;
 private:
 	mutable HValueLessHelper _helper;
 	values_t _data;
 	HHuginn::HClass const* _keyType;
 public:
-	HOrder( HHuginn::HClass const* );
+	HOrder( HHuginn::HClass const*, allocator_t const& );
 	void insert( huginn::HThread*, HHuginn::value_t const&, int );
 	bool has_key( huginn::HThread*, HHuginn::value_t const&, int ) const;
 	void erase( huginn::HThread*, HHuginn::value_t const&, int );
@@ -926,12 +932,15 @@ class HHuginn::HLookup : public HHuginn::HIterable {
 public:
 	typedef HHuginn::HLookup this_type;
 	typedef HHuginn::HIterable base_type;
-	typedef yaal::hcore::HHashMap<HHuginn::value_t, HHuginn::value_t, HValueHashHelper&, HValueHashHelper&> values_t;
+	typedef yaal::hcore::HHashMap<HHuginn::value_t, HHuginn::value_t, HValueHashHelper&, HValueHashHelper&> values_prototype_t;
+	typedef yaal::hcore::HPool<values_prototype_t::node_size::value> pool_t;
+	typedef allocator::shared_pool<values_prototype_t::node_type> allocator_t;
+	typedef yaal::hcore::HHashMap<HHuginn::value_t, HHuginn::value_t, HValueHashHelper&, HValueHashHelper&, allocator_t> values_t;
 private:
 	mutable HValueHashHelper _helper;
 	values_t _data;
 public:
-	HLookup( HHuginn::HClass const* );
+	HLookup( HHuginn::HClass const*, allocator_t const& );
 	void insert( huginn::HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 	bool has_key( huginn::HThread*, HHuginn::value_t const&, int ) const;
 	void erase( huginn::HThread*, HHuginn::value_t const&, int );
@@ -964,12 +973,15 @@ class HHuginn::HSet : public HHuginn::HIterable {
 public:
 	typedef HHuginn::HSet this_type;
 	typedef HHuginn::HIterable base_type;
-	typedef yaal::hcore::HHashSet<HHuginn::value_t, HValueHashHelper&, HValueHashHelper&> values_t;
+	typedef yaal::hcore::HHashSet<HHuginn::value_t, HValueHashHelper&, HValueHashHelper&> values_prototype_t;
+	typedef yaal::hcore::HPool<values_prototype_t::node_size::value> pool_t;
+	typedef allocator::shared_pool<values_prototype_t::node_type> allocator_t;
+	typedef yaal::hcore::HHashSet<HHuginn::value_t, HValueHashHelper&, HValueHashHelper&, allocator_t> values_t;
 private:
 	mutable HValueHashHelper _helper;
 	values_t _data;
 public:
-	HSet( HHuginn::HClass const* );
+	HSet( HHuginn::HClass const*, allocator_t const& );
 	void insert( huginn::HThread*, HHuginn::value_t const&, int );
 	bool has_key( huginn::HThread*, HHuginn::value_t const&, int ) const;
 	void erase( huginn::HThread*, HHuginn::value_t const&, int );
