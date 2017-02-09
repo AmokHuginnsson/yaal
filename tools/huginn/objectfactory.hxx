@@ -43,19 +43,38 @@ enum class POOL_TYPE {
 	CLASSLESS
 };
 
+class HPoolHolderInterface {
+public:
+	virtual ~HPoolHolderInterface( void ) {}
+};
+
+template<int const size>
+class HPoolHolder : public HPoolHolderInterface {
+	typedef yaal::hcore::HPool<size> pool_t;
+	pool_t _pool;
+public:
+	HPoolHolder( void )
+		: _pool() {
+	}
+	pool_t& get( void ) {
+		return ( _pool );
+	}
+};
+
+typedef yaal::hcore::HResource<HPoolHolderInterface> pool_holder_t;
+typedef yaal::hcore::HHashMap<int, pool_holder_t> pool_holders_t;
+
 template<typename T>
 class HObjectPoolBase {
 protected:
 	typedef yaal::hcore::HPointer<T> object_ptr_t;
 	typedef typename object_ptr_t::template allocated_shared<allocator::shared_pool<T>> shared_t;
-	typedef yaal::hcore::HPool<shared_t::size> pool_t;
+	typedef HPoolHolder<shared_t::size> pool_t;
 	typedef allocator::shared_pool<typename shared_t::type> allocator_t;
-	pool_t _pool;
 	allocator_t _allocator;
 public:
-	HObjectPoolBase( void )
-		: _pool()
-		, _allocator( _pool ) {
+	HObjectPoolBase( pool_holders_t& poolHolders_ )
+		: _allocator( static_cast<pool_t*>( poolHolders_.insert( make_pair( shared_t::size + 0, yaal::hcore::make_resource<pool_t>() ) ).first->second.get() )->get() ) {
 	}
 };
 
@@ -70,8 +89,9 @@ class HObjectPool<T, POOL_TYPE::SCALAR> : public HObjectPoolBase<T> {
 public:
 	typedef HObjectPoolBase<T> base_type;
 	typedef typename base_type::allocator_t allocator_t;
-	HObjectPool( HHuginn::HClass const* class_ )
-		: _class( class_ ) {
+	HObjectPool( pool_holders_t& poolHolders_, HHuginn::HClass const* class_ )
+		: base_type( poolHolders_ )
+		, _class( class_ ) {
 		return;
 	}
 	template<typename... arg_t>
@@ -93,8 +113,9 @@ class HObjectPool<T, POOL_TYPE::COLLECTION> : public HObjectPoolBase<T> {
 public:
 	typedef HObjectPoolBase<T> base_type;
 	typedef typename base_type::allocator_t allocator_t;
-	HObjectPool( HHuginn::HClass const* class_ )
-		: _class( class_ )
+	HObjectPool( pool_holders_t& poolHolders_, HHuginn::HClass const* class_ )
+		: base_type( poolHolders_ )
+		, _class( class_ )
 		, _nodePool()
 		, _nodeAllocator( _nodePool ) {
 		return;
@@ -115,6 +136,10 @@ class HObjectPool<T, POOL_TYPE::CLASSLESS> : public HObjectPoolBase<T> {
 public:
 	typedef HObjectPoolBase<T> base_type;
 	typedef typename base_type::allocator_t allocator_t;
+	HObjectPool( pool_holders_t& poolHolders_ )
+		: base_type( poolHolders_ ) {
+		return;
+	}
 	template<typename... arg_t>
 	HHuginn::value_t create( arg_t&&... arg_ ) const {
 		return ( yaal::hcore::allocate_pointer<allocator_t, T>( this->_allocator, yaal::forward<arg_t>( arg_ )... ) );
@@ -139,6 +164,7 @@ class HObjectFactory final {
 	HHuginn::class_t _conversionException;
 	HHuginn::class_t _arithmeticException;
 	/* Pools */
+	pool_holders_t _memoryPools;
 	HObjectPool<HHuginn::HString> _stringPool;
 	HObjectPool<HHuginn::HInteger> _integerPool;
 	HObjectPool<HHuginn::HBoolean> _booleanPool;
