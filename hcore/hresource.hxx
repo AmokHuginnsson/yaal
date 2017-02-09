@@ -61,6 +61,7 @@ struct OResourceHolder;
 
 template<typename T, typename deleter>
 struct OResourceHolder<T, deleter, true> {
+	typedef T type;
 	T* _resource;
 	OResourceHolder( void )
 		: _resource( nullptr ) {
@@ -71,11 +72,11 @@ struct OResourceHolder<T, deleter, true> {
 	void do_delete( void ) {
 		deleter()( _resource );
 	}
-	void swap( OResourceHolder& other ) {
-		if ( &other != this ) {
-			using yaal::swap;
-			swap( _resource, other._resource );
-		}
+	template<typename real_t>
+	void swap( real_t& other ) {
+		T* tmp( _resource );
+		_resource = static_cast<T*>( other._resource );
+		other._resource = static_cast<typename real_t::type*>( tmp );
 		return;
 	}
 	OResourceHolder( OResourceHolder const& ) = default;
@@ -84,6 +85,7 @@ struct OResourceHolder<T, deleter, true> {
 
 template<typename T, typename deleter>
 struct OResourceHolder<T, deleter, false> {
+	typedef T type;
 	T* _resource;
 	deleter _deleter;
 	OResourceHolder( void )
@@ -95,12 +97,13 @@ struct OResourceHolder<T, deleter, false> {
 	void do_delete( void ) {
 		_deleter( _resource );
 	}
-	void swap( OResourceHolder& other ) {
-		if ( &other != this ) {
-			using yaal::swap;
-			swap( _resource, other._resource );
-			swap( _deleter, other._deleter );
-		}
+	template<typename real_t>
+	void swap( real_t& other ) {
+		T* tmp( _resource );
+		_resource = static_cast<T*>( other._resource );
+		other._resource = static_cast<typename real_t::type*>( tmp );
+		using yaal::swap;
+		swap( _deleter, other._deleter );
 		return;
 	}
 	OResourceHolder( OResourceHolder const& ) = default;
@@ -150,9 +153,18 @@ public:
 		pass( yaal::move( src_ ) );
 		return;
 	}
-	template<typename real_t>
-	HResource( HResource<real_t, free_t>&& src_ )
+	template<typename real_type_t, typename real_free_t>
+	HResource( HResource<real_type_t, real_free_t>&& src_ )
 		: _holder() {
+		static_assert( trait::is_kind_of<real_type_t, type_t>::value, "Unrelated types." );
+		static_assert(
+			trait::same_type<real_free_t, free_t>::value
+			|| (
+				trait::same_type<free_t, resource_helper::HResourceDeleter<type_t>>::value
+				&& trait::same_type<real_free_t, resource_helper::HResourceDeleter<real_type_t>>::value
+			),
+			"Incompatible deleters."
+		);
 		pass( yaal::move( src_ ) );
 		return;
 	}
@@ -163,8 +175,17 @@ public:
 		}
 		return ( *this );
 	}
-	template<typename real_t>
-	HResource& operator = ( HResource<real_t, free_t>&& src_ ) {
+	template<typename real_type_t, typename real_free_t>
+	HResource& operator = ( HResource<real_type_t, real_free_t>&& src_ ) {
+		static_assert( trait::is_kind_of<real_type_t, type_t>::value, "Unrelated types." );
+		static_assert(
+			trait::same_type<real_free_t, free_t>::value
+			|| (
+				trait::same_type<free_t, resource_helper::HResourceDeleter<type_t>>::value
+				&& trait::same_type<real_free_t, resource_helper::HResourceDeleter<real_type_t>>::value
+			),
+			"Incompatible deleters."
+		);
 		if ( &reinterpret_cast<HResource&>( src_ ) != this ) {
 			pass( yaal::move( src_ ) );
 		}
@@ -229,20 +250,18 @@ public:
 		return ( _holder._resource == nullptr );
 	}
 	void swap( HResource& other_ ) {
-		if ( &other_ != this ) {
-			_holder.swap( other_._holder );
-		}
+		_holder.swap( other_._holder );
 		return;
 	}
 private:
 	template<typename alien_t>
 	void pass( alien_t&& src_ ) {
-		HResource& src = reinterpret_cast<HResource&>( src_ );
-		using yaal::swap;
-		_holder.swap( src._holder );
+		_holder.swap( src_._holder );
 		src_.reset();
 		return;
 	}
+	template<typename real_type_t, typename real_free_t>
+	friend class HResource;
 };
 
 template<typename tType, typename... arg_t>
