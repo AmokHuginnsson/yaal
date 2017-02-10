@@ -35,6 +35,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/sleep.hxx"
 #include "helper.hxx"
 #include "exception.hxx"
+#include "objectfactory.hxx"
 #include "packagefactory.hxx"
 
 using namespace yaal;
@@ -59,20 +60,20 @@ public:
 		, _exceptionClass( exception::create_class( class_->runtime(), "DateTimeException", "The `DateTimeException` exception type for `DateTime` package." ) ) {
 		return;
 	}
-	static HHuginn::value_t now( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t now( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "DateTime.now", values_, 0, 0, position_ );
 		HDateTime* dt( dynamic_cast<HDateTime*>( object_->raw() ) );
 		M_ASSERT( dt );
-		return ( make_pointer<huginn::HTime>( dt->_timeClass.raw(), now_local() ) );
+		return ( thread_->object_factory().create<huginn::HTime>( dt->_timeClass.raw(), now_local() ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t clock( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t clock( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "DateTime.clock", values_, 0, 0, position_ );
 		HDateTime* dt( dynamic_cast<HDateTime*>( object_->raw() ) );
 		M_ASSERT( dt );
-		return ( make_pointer<HClock>( dt->_clockClass.raw() ) );
+		return ( thread_->object_factory().create<HClock>( dt->_clockClass.raw() ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t sleep( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
@@ -102,15 +103,15 @@ HHuginn::value_t HDateTimeCreator::do_new_instance( HRuntime* runtime_ ) {
 			"DateTime",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "now",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDateTime::now, _1, _2, _3, _4 ) ), "get information about current point-in-time" },
-				{ "clock", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDateTime::clock, _1, _2, _3, _4 ) ), "create a stopper-watch instance" },
-				{ "sleep", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDateTime::sleep, _1, _2, _3, _4 ) ), "( *nanoseconds* ) - suspend program execution for specified amount of *nanoseconds*" }
+				{ "now",   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HDateTime::now, _1, _2, _3, _4 ) ),   "get information about current point-in-time" },
+				{ "clock", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HDateTime::clock, _1, _2, _3, _4 ) ), "create a stopper-watch instance" },
+				{ "sleep", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HDateTime::sleep, _1, _2, _3, _4 ) ), "( *nanoseconds* ) - suspend program execution for specified amount of *nanoseconds*" }
 			},
 			"The `DateTime` package provides date and time handling functionalities."
 		)
 	);
 	runtime_->huginn()->register_class( c );
-	return ( make_pointer<HDateTime>( c.raw() ) );
+	return ( runtime_->object_factory()->create<HDateTime>( c.raw() ) );
 	M_EPILOG
 }
 

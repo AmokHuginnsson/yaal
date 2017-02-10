@@ -66,19 +66,19 @@ public:
 			base_
 				? HHuginn::field_definitions_t{}
 				: HHuginn::field_definitions_t{
-						{ "what", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::what, _1, _2, _3, _4 ) ), "get exception message" },
-						{ "where", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::where, _1, _2, _3, _4 ) ), "get originating exception position" },
-						{ "message", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::message, _1, _2, _3, _4 ) ), "get exception message" }
+						{ "what",    runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::what, _1, _2, _3, _4 ) ),    "get exception message" },
+						{ "where",   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::where, _1, _2, _3, _4 ) ),   "get originating exception position" },
+						{ "message", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::message, _1, _2, _3, _4 ) ), "get exception message" }
 				},
 			doc_
 		) {
 		return;
 	}
 private:
-	virtual HHuginn::value_t do_create_instance( huginn::HThread*, HHuginn::values_t const& values_, int position_ ) const {
+	virtual HHuginn::value_t do_create_instance( huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) const {
 		M_PROLOG
 		verify_signature( name() + ".constructor", values_, { HHuginn::TYPE::STRING }, position_ );
-		return ( make_pointer<HHuginn::HException>( this, get_string( values_[0] ) ) );
+		return ( thread_->object_factory().create<HHuginn::HException>( this, get_string( values_[0] ) ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t what( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
@@ -183,8 +183,8 @@ void HHuginn::HException::set_where( yaal::hcore::HString const& where_ ) {
 	_where = where_;
 }
 
-HHuginn::value_t HHuginn::HException::do_clone( huginn::HThread*, int ) const {
-	HHuginn::value_t e( make_pointer<HException>( get_class(), _message ) );
+HHuginn::value_t HHuginn::HException::do_clone( huginn::HThread* thread_, int ) const {
+	HHuginn::value_t e( thread_->object_factory().create<HException>( get_class(), _message ) );
 	static_cast<HException*>( e.raw() )->set_where( _where );
 	return ( e );
 }

@@ -148,6 +148,7 @@ public:
 
 class HObjectFactory final {
 	HRuntime* _runtime;
+	pool_holders_t _memoryPools;
 	HHuginn::class_t _boolean;
 	HHuginn::class_t _integer;
 	HHuginn::class_t _string;
@@ -164,7 +165,6 @@ class HObjectFactory final {
 	HHuginn::class_t _conversionException;
 	HHuginn::class_t _arithmeticException;
 	/* Pools */
-	pool_holders_t _memoryPools;
 	HObjectPool<HHuginn::HString> _stringPool;
 	HObjectPool<HHuginn::HInteger> _integerPool;
 	HObjectPool<HHuginn::HBoolean> _booleanPool;
@@ -246,6 +246,20 @@ public:
 	}
 	HHuginn::HClass const* arithmetic_exception_class( void ) const {
 		return ( _arithmeticException.raw() );
+	}
+	template<typename T, typename... args_t>
+	HHuginn::value_t create( args_t&&... args_ )  {
+		typedef yaal::hcore::HPointer<T> object_ptr_t;
+		typedef typename object_ptr_t::template allocated_shared<allocator::shared_pool<T>> shared_t;
+		typedef HPoolHolder<shared_t::size> pool_t;
+		typedef allocator::shared_pool<typename shared_t::type> allocator_t;
+		pool_holders_t::iterator it( _memoryPools.find( shared_t::size + 0 ) );
+		if ( it == _memoryPools.end() ) {
+			it = _memoryPools.insert( yaal::hcore::make_pair( shared_t::size + 0, yaal::hcore::make_resource<pool_t>() ) ).first;
+		}
+		pool_holder_t& pool( it->second );
+		allocator_t allocator( static_cast<pool_t*>( pool.get() )->get() );
+		return ( yaal::hcore::allocate_pointer<allocator_t, T>( allocator, yaal::forward<args_t>( args_ )... ) );
 	}
 private:
 	HObjectFactory( HObjectFactory const& ) = delete;

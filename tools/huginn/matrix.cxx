@@ -381,7 +381,7 @@ HHuginn::value_t HMatrix::scale_to( huginn::HThread*, HHuginn::value_t* object_,
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::inverse( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::inverse( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.inverse";
 	verify_arg_count( name, values_, 0, 0, position_ );
@@ -389,9 +389,9 @@ HHuginn::value_t HMatrix::inverse( huginn::HThread*, HHuginn::value_t* object_, 
 	HHuginn::value_t v;
 	try {
 		if ( o->_data.type() == 0 ) {
-			v = make_pointer<HMatrix>( o->HValue::get_class(), make_resource<arbitrary_precision_matrix_t>( o->_data.get<arbitrary_precision_matrix_ptr_t>()->_1() ) );
+			v = thread_->object_factory().create<HMatrix>( o->HValue::get_class(), make_resource<arbitrary_precision_matrix_t>( o->_data.get<arbitrary_precision_matrix_ptr_t>()->_1() ) );
 		} else {
-			v = make_pointer<HMatrix>( o->HValue::get_class(), make_resource<floating_point_matrix_t>( o->_data.get<floating_point_matrix_ptr_t>()->_1() ) );
+			v = thread_->object_factory().create<HMatrix>( o->HValue::get_class(), make_resource<floating_point_matrix_t>( o->_data.get<floating_point_matrix_ptr_t>()->_1() ) );
 		}
 	} catch ( HException const& e ) {
 		throw HHuginn::HHuginnRuntimeException( e.what(), position_ );
@@ -400,16 +400,16 @@ HHuginn::value_t HMatrix::inverse( huginn::HThread*, HHuginn::value_t* object_, 
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::transpose( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::transpose( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.transpose";
 	verify_arg_count( name, values_, 0, 0, position_ );
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	HHuginn::value_t v;
 	if ( o->_data.type() == 0 ) {
-		v = make_pointer<HMatrix>( o->HValue::get_class(), make_resource<arbitrary_precision_matrix_t>( o->_data.get<arbitrary_precision_matrix_ptr_t>()->T() ) );
+		v = thread_->object_factory().create<HMatrix>( o->HValue::get_class(), make_resource<arbitrary_precision_matrix_t>( o->_data.get<arbitrary_precision_matrix_ptr_t>()->T() ) );
 	} else {
-		v = make_pointer<HMatrix>( o->HValue::get_class(), make_resource<floating_point_matrix_t>( o->_data.get<floating_point_matrix_ptr_t>()->T() ) );
+		v = thread_->object_factory().create<HMatrix>( o->HValue::get_class(), make_resource<floating_point_matrix_t>( o->_data.get<floating_point_matrix_ptr_t>()->T() ) );
 	}
 	return ( v );
 	M_EPILOG
@@ -533,20 +533,20 @@ HHuginn::class_t HMatrix::get_class( HRuntime* runtime_ ) {
 			"Matrix",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "columns",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::columns, _1, _2, _3, _4 ) ), "get column dimension of this `Matrix`" },
-				{ "rows",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::rows, _1, _2, _3, _4 ) ), "get row dimension of this `Matrix`" },
-				{ "get",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::get, _1, _2, _3, _4 ) ), "( *row*, *column* ) - get numeric value present at given *row* and *column* in this `Matrix`" },
-				{ "set",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::set, _1, _2, _3, _4 ) ), "( *row*, *column*, *value* ) - set given numeric *value* at given *row* and *column* in this `Matrix`" },
-				{ "add",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::add, _1, _2, _3, _4 ) ), "( *other* ) - add *other* `Matrix` to this `Matrix`" },
-				{ "subtract",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::subtract, _1, _2, _3, _4 ) ), "( *other* ) - subtract *other* `Matrix` from this `Matrix`" },
-				{ "multiply",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::multiply, _1, _2, _3, _4 ) ), "( *other* ) - multiply this `Matrix` by *other* `Matrix`" },
-				{ "det",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::det, _1, _2, _3, _4 ) ), "find value of determinant of this `Matrix`" },
-				{ "scale",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::scale, _1, _2, _3, _4 ) ), "( *factor* ) - scale all values in this `Matrix` by given *factor*" },
-				{ "scale_to",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::scale_to, _1, _2, _3, _4 ) ), "( *cap* ) - rescale values in this `Matrix` so maximum of its values is equal to *cap*" },
-				{ "inverse",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::inverse, _1, _2, _3, _4 ) ), "find *inverse* of this `Matrix`" },
-				{ "transpose", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::transpose, _1, _2, _3, _4 ) ), "create transposed version of this `Matrix`" },
-				{ "apply",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::apply, _1, _2, _3, _4 ) ), "( *fun* ) - apply unary function *fun* over all values in this `Matrix`" },
-				{ "to_string", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::to_string, _1, _2, _3, _4 ) ), "get string representation of this `Matrix`" }
+				{ "columns",   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::columns, _1, _2, _3, _4 ) ),   "get column dimension of this `Matrix`" },
+				{ "rows",      runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::rows, _1, _2, _3, _4 ) ),      "get row dimension of this `Matrix`" },
+				{ "get",       runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::get, _1, _2, _3, _4 ) ),       "( *row*, *column* ) - get numeric value present at given *row* and *column* in this `Matrix`" },
+				{ "set",       runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::set, _1, _2, _3, _4 ) ),       "( *row*, *column*, *value* ) - set given numeric *value* at given *row* and *column* in this `Matrix`" },
+				{ "add",       runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::add, _1, _2, _3, _4 ) ),       "( *other* ) - add *other* `Matrix` to this `Matrix`" },
+				{ "subtract",  runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::subtract, _1, _2, _3, _4 ) ),  "( *other* ) - subtract *other* `Matrix` from this `Matrix`" },
+				{ "multiply",  runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::multiply, _1, _2, _3, _4 ) ),  "( *other* ) - multiply this `Matrix` by *other* `Matrix`" },
+				{ "det",       runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::det, _1, _2, _3, _4 ) ),       "find value of determinant of this `Matrix`" },
+				{ "scale",     runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::scale, _1, _2, _3, _4 ) ),     "( *factor* ) - scale all values in this `Matrix` by given *factor*" },
+				{ "scale_to",  runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::scale_to, _1, _2, _3, _4 ) ),  "( *cap* ) - rescale values in this `Matrix` so maximum of its values is equal to *cap*" },
+				{ "inverse",   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::inverse, _1, _2, _3, _4 ) ),   "find *inverse* of this `Matrix`" },
+				{ "transpose", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::transpose, _1, _2, _3, _4 ) ), "create transposed version of this `Matrix`" },
+				{ "apply",     runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::apply, _1, _2, _3, _4 ) ),     "( *fun* ) - apply unary function *fun* over all values in this `Matrix`" },
+				{ "to_string", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMatrix::to_string, _1, _2, _3, _4 ) ), "get string representation of this `Matrix`" }
 			},
 			"The `Matrix` class provides mathematical concept of number matrices. It supports operations of addition, multiplication, subtraction, scaling, inversion and transposition."
 		)
@@ -556,13 +556,13 @@ HHuginn::class_t HMatrix::get_class( HRuntime* runtime_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::do_clone( huginn::HThread*, int ) const {
+HHuginn::value_t HMatrix::do_clone( huginn::HThread* thread_, int ) const {
 	M_PROLOG
 	HHuginn::value_t v;
 	if ( _data.type() == 0 ) {
-		v = make_pointer<HMatrix>( HValue::get_class(), make_resource<arbitrary_precision_matrix_t>( *( _data.get<arbitrary_precision_matrix_ptr_t>() ) ) );
+		v = thread_->object_factory().create<HMatrix>( HValue::get_class(), make_resource<arbitrary_precision_matrix_t>( *( _data.get<arbitrary_precision_matrix_ptr_t>() ) ) );
 	} else {
-		v = make_pointer<HMatrix>( HValue::get_class(), make_resource<floating_point_matrix_t>( *( _data.get<floating_point_matrix_ptr_t>() ) ) );
+		v = thread_->object_factory().create<HMatrix>( HValue::get_class(), make_resource<floating_point_matrix_t>( *( _data.get<floating_point_matrix_ptr_t>() ) ) );
 	}
 	return ( v );
 	M_EPILOG

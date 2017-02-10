@@ -61,11 +61,11 @@ public:
 		, _rangeClass( HRange::get_class( class_->runtime() ) ) {
 		return;
 	}
-	static HHuginn::value_t filter( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
-		return ( static_cast<HAlgorithms*>( object_->raw() )->do_filter( values_, position_ ) );
+	static HHuginn::value_t filter( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+		return ( static_cast<HAlgorithms*>( object_->raw() )->do_filter( thread_, values_, position_ ) );
 	}
-	static HHuginn::value_t map( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
-		return ( static_cast<HAlgorithms*>( object_->raw() )->do_map( values_, position_ ) );
+	static HHuginn::value_t map( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+		return ( static_cast<HAlgorithms*>( object_->raw() )->do_map( thread_, values_, position_ ) );
 	}
 	static HHuginn::value_t reduce( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		char const name[] = "Algorithms.reduce";
@@ -146,8 +146,8 @@ public:
 		}
 		return ( v );
 	}
-	static HHuginn::value_t range( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
-		return ( static_cast<HAlgorithms*>( object_->raw() )->do_range( values_, position_ ) );
+	static HHuginn::value_t range( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+		return ( static_cast<HAlgorithms*>( object_->raw() )->do_range( thread_, values_, position_ ) );
 	}
 	static HHuginn::value_t sorted( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		char const name[] = "Algorithms.sorted";
@@ -222,7 +222,7 @@ public:
 		return ( v );
 	}
 private:
-	HHuginn::value_t do_filter( HHuginn::values_t const& values_, int position_ ) {
+	HHuginn::value_t do_filter( HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Algorithms.filter";
 		verify_arg_count( name, values_, 2, 2, position_ );
@@ -230,14 +230,14 @@ private:
 		HHuginn::type_id_t t( verify_arg_type( name, values_, 1, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::BOUND_METHOD }, ARITY::MULTIPLE, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-			v = make_pointer<HFilter>( _filterClass.raw(), values_[0], static_cast<HHuginn::HFunctionReference const*>( values_[1].raw() )->function(), HHuginn::value_t() );
+			v = thread_->object_factory().create<HFilter>( _filterClass.raw(), values_[0], static_cast<HHuginn::HFunctionReference const*>( values_[1].raw() )->function(), HHuginn::value_t() );
 		} else {
-			v = make_pointer<HFilter>( _filterClass.raw(), values_[0], HHuginn::function_t(), values_[1] );
+			v = thread_->object_factory().create<HFilter>( _filterClass.raw(), values_[0], HHuginn::function_t(), values_[1] );
 		}
 		return ( v );
 		M_EPILOG
 	}
-	HHuginn::value_t do_map( HHuginn::values_t const& values_, int position_ ) {
+	HHuginn::value_t do_map( HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Algorithms.map";
 		verify_arg_count( name, values_, 2, 2, position_ );
@@ -245,14 +245,14 @@ private:
 		HHuginn::type_id_t t( verify_arg_type( name, values_, 1, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::BOUND_METHOD }, ARITY::MULTIPLE, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-			v = make_pointer<HMapper>( _mapperClass.raw(), values_[0], static_cast<HHuginn::HFunctionReference const*>( values_[1].raw() )->function(), HHuginn::value_t() );
+			v = thread_->object_factory().create<HMapper>( _mapperClass.raw(), values_[0], static_cast<HHuginn::HFunctionReference const*>( values_[1].raw() )->function(), HHuginn::value_t() );
 		} else {
-			v = make_pointer<HMapper>( _mapperClass.raw(), values_[0], HHuginn::function_t(), values_[1] );
+			v = thread_->object_factory().create<HMapper>( _mapperClass.raw(), values_[0], HHuginn::function_t(), values_[1] );
 		}
 		return ( v );
 		M_EPILOG
 	}
-	HHuginn::value_t do_range( HHuginn::values_t const& values_, int position_ ) {
+	HHuginn::value_t do_range( HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Algorithms.range";
 		verify_arg_count( name, values_, 1, 3, position_ );
@@ -278,7 +278,7 @@ private:
 		if ( ( ( step == 0 ) && ( stop != from ) ) || ( ( stop > from ) && ( step < 0 ) ) || ( ( stop < from ) && ( step > 0 ) ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Invalid range.", position_ );
 		}
-		return ( make_pointer<HRange>( _rangeClass.raw(), from, stop, step ) );
+		return ( thread_->object_factory().create<HRange>( _rangeClass.raw(), from, stop, step ) );
 		M_EPILOG
 	}
 };
@@ -297,18 +297,18 @@ HHuginn::value_t HAlgorithmsCreator::do_new_instance( HRuntime* runtime_ ) {
 			"Algorithms",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "filter",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::filter, _1, _2, _3, _4 ) ), "( *iterable*, *callable* ) - create `Filter` object that iterates over *iterable* and returns only elements for which *callable* returns `boolean` equal `true`" },
-				{ "map",         make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::map, _1, _2, _3, _4 ) ), "( *iterable*, *callable* ) - create `Mapper` object that maps elements from *iterable* transforming each of them with *callable* when iterated over" },
-				{ "materialize", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::materialize, _1, _2, _3, _4 ) ), "( *iterable*, *colType* ) - copy elements from *iterable* to newly created instance of *colType*" },
-				{ "reduce",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::reduce, _1, _2, _3, _4 ) ), "( *iterable*, *callable* [, *init*] ) - iteratively combine all elements from *iterable* using *callable(x,y)* and starting value of *init*" },
-				{ "range",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::range, _1, _2, _3, _4 ) ), "( [*from*,] *until* [, *step*] ) - produce iterable sequence of `integer` values ranging from *from* up until *until* using *step* increments" },
-				{ "sorted",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::sorted, _1, _2, _3, _4 ) ), "( *iterable* [, *callable*] ) - return content of *iterable* as sorted `list`, using *callable* to retrieve keys for element comparison" }
+				{ "filter",      runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::filter, _1, _2, _3, _4 ) ),      "( *iterable*, *callable* ) - create `Filter` object that iterates over *iterable* and returns only elements for which *callable* returns `boolean` equal `true`" },
+				{ "map",         runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::map, _1, _2, _3, _4 ) ),         "( *iterable*, *callable* ) - create `Mapper` object that maps elements from *iterable* transforming each of them with *callable* when iterated over" },
+				{ "materialize", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::materialize, _1, _2, _3, _4 ) ), "( *iterable*, *colType* ) - copy elements from *iterable* to newly created instance of *colType*" },
+				{ "reduce",      runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::reduce, _1, _2, _3, _4 ) ),      "( *iterable*, *callable* [, *init*] ) - iteratively combine all elements from *iterable* using *callable(x,y)* and starting value of *init*" },
+				{ "range",       runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::range, _1, _2, _3, _4 ) ),       "( [*from*,] *until* [, *step*] ) - produce iterable sequence of `integer` values ranging from *from* up until *until* using *step* increments" },
+				{ "sorted",      runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::sorted, _1, _2, _3, _4 ) ),      "( *iterable* [, *callable*] ) - return content of *iterable* as sorted `list`, using *callable* to retrieve keys for element comparison" }
 			},
 			"The `Algorithms` package contains basic low-level algorithms."
 		)
 	);
 	runtime_->huginn()->register_class( c );
-	return ( make_pointer<HAlgorithms>( c.raw() ) );
+	return ( runtime_->object_factory()->create<HAlgorithms>( c.raw() ) );
 	M_EPILOG
 }
 

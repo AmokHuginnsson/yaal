@@ -29,6 +29,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "thread.hxx"
 #include "runtime.hxx"
+#include "objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -215,7 +216,7 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t&& value_, 
 
 void HThread::raise( HHuginn::HClass const* class_, yaal::hcore::HString const& message_, int position_ ) {
 	M_PROLOG
-	HHuginn::value_t e( make_pointer<HHuginn::HException>( class_, message_ ) );
+	HHuginn::value_t e( _runtime->object_factory()->create<HHuginn::HException>( class_, message_ ) );
 	static_cast<HHuginn::HException*>( e.raw() )->set_where( _runtime->huginn()->where( position_ ) );
 	break_execution( HFrame::STATE::EXCEPTION, yaal::move( e ), 0, position_ );
 	return;

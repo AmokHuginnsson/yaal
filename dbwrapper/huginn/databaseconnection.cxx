@@ -98,9 +98,9 @@ public:
 			runtime_->identifier_id( "DatabaseConnection" ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "query", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::query, _1, _2, _3, _4 ) ), "( *sql* ) - create query object for given *sql* `string`" },
-				{ "table_names", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::table_names, _1, _2, _3, _4 ) ), "get list of table names available in connected database" },
-				{ "column_names", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::column_names, _1, _2, _3, _4 ) ), "( *table* ) - get list of column names from given *table* in connected database" }
+				{ "query",        runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::query, _1, _2, _3, _4 ) ),        "( *sql* ) - create query object for given *sql* `string`" },
+				{ "table_names",  runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::table_names, _1, _2, _3, _4 ) ),  "get list of table names available in connected database" },
+				{ "column_names", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::column_names, _1, _2, _3, _4 ) ), "( *table* ) - get list of column names from given *table* in connected database" }
 			},
 			"The `DatabaseConnection` class allows performing various type of queries on connected database."
 		)
@@ -121,7 +121,7 @@ private:
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		try {
 			dbwrapper::database_ptr_t db( dbwrapper::util::connect( get_string( values_[0] ) ) );
-			v = make_pointer<HDatabaseConnection>( this, db );
+			v = thread_->object_factory().create<HDatabaseConnection>( this, db );
 		} catch ( HException const& e ) {
 			thread_->raise( exception_class(), e.what(), position_ );
 		}
@@ -140,7 +140,7 @@ HHuginn::value_t HDatabaseConnection::do_query(
 	HHuginn::value_t v( thread_->runtime().none_value() );
 	try {
 		dbwrapper::HQuery::ptr_t q( _database->prepare_query( get_string( values_[0] ) ) );
-		v = make_pointer<huginn::HQuery>( dbcClass->query_class(), q );
+		v = thread_->object_factory().create<huginn::HQuery>( dbcClass->query_class(), q );
 	} catch ( HException const& e ) {
 		thread_->raise( dbcClass->exception_class(), e.what(), position_ );
 	}

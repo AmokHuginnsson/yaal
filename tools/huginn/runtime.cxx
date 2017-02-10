@@ -121,7 +121,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			_unknownClass_.name()
 		} )
 	, _objectFactory( new HObjectFactory( this ) )
-	, _none( make_pointer<HHuginn::HValue>( &_noneClass_ ) )
+	, _none( _objectFactory->create<HHuginn::HValue>( &_noneClass_ ) )
 	, _true( _objectFactory->create_boolean( true ) )
 	, _false( _objectFactory->create_boolean( false ) )
 	, _threads()
@@ -379,7 +379,7 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 		if ( context_._packages.find( it->first ) == context_._packages.end() ) {
 			fds.emplace_back(
 				identifier_name( it->first ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &package::value, it->second, identifier_name( it->first ), _1, _2, _3, _4 ) ),
+				object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &package::value, it->second, identifier_name( it->first ), _1, _2, _3, _4 ) ),
 				"access package "_ys.append( it->second->get_class()->name() ).append( " imported in submodule" )
 			);
 			it = _packages.erase( it );
@@ -391,7 +391,7 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 		if ( context_._classes.find( c.first ) == context_._classes.end() ) {
 			fds.emplace_back(
 				identifier_name( c.first ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &package::instance, c.second.raw(), _1, _2, _3, _4 ) ),
+				object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &package::instance, c.second.raw(), _1, _2, _3, _4 ) ),
 				"access class "_ys.append( identifier_name( c.first ) ).append( " imported in submodule" )
 			);
 		}
@@ -401,7 +401,7 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 			HHuginn::HFunctionReference const* fr( static_cast<HHuginn::HFunctionReference const*>( _functionsStore.at( fi ).raw() ) );
 			fds.emplace_back(
 				identifier_name( fi ),
-				make_pointer<HHuginn::HClass::HMethod>( fr->function() ),
+				object_factory()->create<HHuginn::HClass::HMethod>( fr->function() ),
 				! fr->doc().is_empty() ? fr->doc() : "access function "_ys.append( identifier_name( fi ) ).append( " imported in submodule" )
 			);
 		}
@@ -549,7 +549,7 @@ HHuginn::value_t copy( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 	M_EPILOG
 }
 
-HHuginn::value_t observe( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t observe( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "observe", values_, 1, 1, position_ );
 	HHuginn::value_t const& v( values_.front() );
@@ -559,7 +559,7 @@ HHuginn::value_t observe( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t
 			position_
 		);
 	}
-	return ( make_pointer<HHuginn::HObserver>( v ) );
+	return ( thread_->object_factory().create<HHuginn::HObserver>( v ) );
 	M_EPILOG
 }
 

@@ -137,8 +137,8 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_EPILOG
 }
 
-HHuginn::class_t get_class( HRuntime* );
-HHuginn::class_t get_class( HRuntime* runtime_ ) {
+HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
+HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
@@ -147,12 +147,12 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 			runtime_->identifier_id( type_name( HHuginn::TYPE::SET ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "add",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &set::add, _1, _2, _3, _4 ) ),     "( *elem* ) - add given element *elem* to a `set`" },
-				{ "has_key", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &set::has_key, _1, _2, _3, _4 ) ), "( *elem* ) - tell if given element *elem* is present in the `set`" },
-				{ "erase",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &set::erase, _1, _2, _3, _4 ) ),   "( *elem* ) - remove given element *elem* from the `set`" },
-				{ "clear",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &set::clear, _1, _2, _3, _4 ) ),   "erase `set`'s content, `set` becomes empty" },
-				{ "update",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &set::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `set` with values from *other* `set`" },
-				{ "equals",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &set::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `set` has the same content" }
+				{ "add",     objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &set::add, _1, _2, _3, _4 ) ),     "( *elem* ) - add given element *elem* to a `set`" },
+				{ "has_key", objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &set::has_key, _1, _2, _3, _4 ) ), "( *elem* ) - tell if given element *elem* is present in the `set`" },
+				{ "erase",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &set::erase, _1, _2, _3, _4 ) ),   "( *elem* ) - remove given element *elem* from the `set`" },
+				{ "clear",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &set::clear, _1, _2, _3, _4 ) ),   "erase `set`'s content, `set` becomes empty" },
+				{ "update",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &set::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `set` with values from *other* `set`" },
+				{ "equals",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &set::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `set` has the same content" }
 			},
 			"The `set` is a collection of unique elements of varying types. It supports operation of element insertion, removal and search."
 		)

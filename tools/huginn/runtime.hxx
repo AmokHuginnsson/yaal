@@ -75,6 +75,9 @@ private:
 	 * User class needs to be able to use built-in types in its destructor.
 	 * Hence order of two following fields:
 	 * _objectFactory and _classes
+	 *
+	 * Also _objectFactory contains memory pools used everywhere else
+	 * so it must be practically first to create - last to destroy.
 	 */
 	object_factory_t _objectFactory;
 	value_t _none;

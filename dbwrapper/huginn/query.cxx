@@ -32,6 +32,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/huginn/runtime.hxx"
 #include "tools/huginn/thread.hxx"
 #include "tools/huginn/helper.hxx"
+#include "tools/huginn/objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -69,8 +70,8 @@ public:
 			runtime_->identifier_id( "Query" ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "bind", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQuery::bind, _1, _2, _3, _4 ) ), "( *index*, *value* ) - bind given *value* for query variable at given *index*" },
-				{ "execute", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQuery::execute, _1, _2, _3, _4 ) ), "execute query" }
+				{ "bind",    runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HQuery::bind, _1, _2, _3, _4 ) ),    "( *index*, *value* ) - bind given *value* for query variable at given *index*" },
+				{ "execute", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HQuery::execute, _1, _2, _3, _4 ) ), "execute query" }
 			},
 			"The `Query` class represents compiled database query. It is used for actual query execution."
 		)
@@ -111,7 +112,7 @@ HHuginn::value_t HQuery::execute( tools::huginn::HThread* thread_, HHuginn::valu
 	HHuginn::value_t v( thread_->runtime().none_value() );
 	try {
 		HRecordSet::ptr_t rs( q->_query->execute() );
-		v = make_pointer<HQueryResult>( qc->query_result_class(), rs );
+		v = thread_->object_factory().create<HQueryResult>( qc->query_result_class(), rs );
 	} catch ( HException const& e ) {
 		thread_->raise( qc->exception_class(), e.what(), position_ );
 	}

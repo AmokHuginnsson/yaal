@@ -153,24 +153,24 @@ HHuginn::class_t HTime::get_class( HRuntime* runtime_ ) {
 			"Time",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "mod_year",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_year",   &hcore::HTime::mod_year, _1, _2, _3, _4 ) ),   "( *num* ) - modify time value by *num* of years" },
-				{ "mod_month",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_month",  &hcore::HTime::mod_month, _1, _2, _3, _4 ) ),  "( *num* ) - modify time value by *num* of months" },
-				{ "mod_day",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_day",    &hcore::HTime::mod_day, _1, _2, _3, _4 ) ),    "( *num* ) - modify time value by *num* of days" },
-				{ "mod_hour",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_hour",   &hcore::HTime::mod_hour, _1, _2, _3, _4 ) ),   "( *num* ) - modify time value by *num* of hours" },
-				{ "mod_minute",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_minute", &hcore::HTime::mod_minute, _1, _2, _3, _4 ) ), "( *num* ) - modify time value by *num* of minutes" },
-				{ "mod_second",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_second", &hcore::HTime::mod_second, _1, _2, _3, _4 ) ), "( *num* ) - modify time value by *num* of seconds" },
-				{ "set_time",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::set, "set_time",   &hcore::HTime::set_time, _1, _2, _3, _4 ) ),   "( *hh*, *mm*, *ss* ) - set time value to *hh*:*mm*:*ss*" },
-				{ "set_date",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::set, "set_date",   &hcore::HTime::set_date, _1, _2, _3, _4 ) ),   "( *YYYY*, *MM*, *DD* ) - set date value to *YYYY*-*MM*-*DD*" },
-				{ "get_year",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::get, "get_year",   &hcore::HTime::get_year, _1, _2, _3, _4 ) ),   "get number of years from time" },
-				{ "get_day",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::get, "get_day",    &hcore::HTime::get_day, _1, _2, _3, _4 ) ),    "get number of days from time" },
-				{ "get_hour",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::get, "get_hour",   &hcore::HTime::get_hour, _1, _2, _3, _4 ) ),   "get number of hours from time" },
-				{ "get_minute",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::get, "get_minute", &hcore::HTime::get_minute, _1, _2, _3, _4 ) ), "get number of minutes from time" },
-				{ "get_second",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::get, "get_second", &hcore::HTime::get_second, _1, _2, _3, _4 ) ), "get number of seconds from time" },
-				{ "set_datetime", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::set_datetime, _1, _2, _3, _4 ) ),                                 "( *YYYY*, *MM*, *DD*, *hh*, *mm*, *ss* ) - set date value to *YYYY*-*MM*-*DD* *hh*:*mm*:*ss*" },
-				{ "get_month",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::get_month, _1, _2, _3, _4 ) ),                                    "get number of months from time" },
-				{ "subtract",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::subtract, _1, _2, _3, _4 ) ),                                     "( *time* ) - calculate time difference between this and *time* time points" },
-				{ "from_string",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::from_string, _1, _2, _3, _4 ) ),                                  "( *str* ) - set time from parsed `string` *str*" },
-				{ "to_string",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::to_string, _1, _2, _3, _4 ) ),                                    "get `string` representation of this point-in-time" }
+				{ "mod_year",     runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_year",   &hcore::HTime::mod_year, _1, _2, _3, _4 ) ),   "( *num* ) - modify time value by *num* of years" },
+				{ "mod_month",    runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_month",  &hcore::HTime::mod_month, _1, _2, _3, _4 ) ),  "( *num* ) - modify time value by *num* of months" },
+				{ "mod_day",      runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_day",    &hcore::HTime::mod_day, _1, _2, _3, _4 ) ),    "( *num* ) - modify time value by *num* of days" },
+				{ "mod_hour",     runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_hour",   &hcore::HTime::mod_hour, _1, _2, _3, _4 ) ),   "( *num* ) - modify time value by *num* of hours" },
+				{ "mod_minute",   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_minute", &hcore::HTime::mod_minute, _1, _2, _3, _4 ) ), "( *num* ) - modify time value by *num* of minutes" },
+				{ "mod_second",   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HTime::mod, "mod_second", &hcore::HTime::mod_second, _1, _2, _3, _4 ) ), "( *num* ) - modify time value by *num* of seconds" },
+				{ "set_time",     runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HTime::set, "set_time",   &hcore::HTime::set_time, _1, _2, _3, _4 ) ),   "( *hh*, *mm*, *ss* ) - set time value to *hh*:*mm*:*ss*" },
+				{ "set_date",     runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HTime::set, "set_date",   &hcore::HTime::set_date, _1, _2, _3, _4 ) ),   "( *YYYY*, *MM*, *DD* ) - set date value to *YYYY*-*MM*-*DD*" },
+				{ "get_year",     runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HTime::get, "get_year",   &hcore::HTime::get_year, _1, _2, _3, _4 ) ),   "get number of years from time" },
+				{ "get_day",      runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HTime::get, "get_day",    &hcore::HTime::get_day, _1, _2, _3, _4 ) ),    "get number of days from time" },
+				{ "get_hour",     runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HTime::get, "get_hour",   &hcore::HTime::get_hour, _1, _2, _3, _4 ) ),   "get number of hours from time" },
+				{ "get_minute",   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HTime::get, "get_minute", &hcore::HTime::get_minute, _1, _2, _3, _4 ) ), "get number of minutes from time" },
+				{ "get_second",   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HTime::get, "get_second", &hcore::HTime::get_second, _1, _2, _3, _4 ) ), "get number of seconds from time" },
+				{ "set_datetime", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HTime::set_datetime, _1, _2, _3, _4 ) ),                                 "( *YYYY*, *MM*, *DD*, *hh*, *mm*, *ss* ) - set date value to *YYYY*-*MM*-*DD* *hh*:*mm*:*ss*" },
+				{ "get_month",    runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HTime::get_month, _1, _2, _3, _4 ) ),                                    "get number of months from time" },
+				{ "subtract",     runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HTime::subtract, _1, _2, _3, _4 ) ),                                     "( *time* ) - calculate time difference between this and *time* time points" },
+				{ "from_string",  runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HTime::from_string, _1, _2, _3, _4 ) ),                                  "( *str* ) - set time from parsed `string` *str*" },
+				{ "to_string",    runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HTime::to_string, _1, _2, _3, _4 ) ),                                    "get `string` representation of this point-in-time" }
 			},
 			"The `Time` class represent information about point-in-time."
 		)
@@ -180,9 +180,9 @@ HHuginn::class_t HTime::get_class( HRuntime* runtime_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HTime::do_clone( huginn::HThread*, int ) const {
+HHuginn::value_t HTime::do_clone( huginn::HThread* thread_, int ) const {
 	M_PROLOG
-	return ( make_pointer<HTime>( HValue::get_class(), _time ) );
+	return ( thread_->object_factory().create<HTime>( HValue::get_class(), _time ) );
 	M_EPILOG
 }
 

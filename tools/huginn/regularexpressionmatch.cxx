@@ -116,7 +116,7 @@ HHuginn::class_t HRegularExpressionMatch::get_class( HRuntime* runtime_ ) {
 			"RegularExpressionMatch",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "matched", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HRegularExpressionMatch::matched, _1, _2, _3, _4 ) ), "tell if given regular expression pattern matched against given string" }
+				{ "matched", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HRegularExpressionMatch::matched, _1, _2, _3, _4 ) ), "tell if given regular expression pattern matched against given string" }
 			},
 			"The `RegularExpressionMatch` class represents result of regular expression based text search."
 		)
@@ -126,9 +126,9 @@ HHuginn::class_t HRegularExpressionMatch::get_class( HRuntime* runtime_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HRegularExpressionMatch::do_clone( huginn::HThread*, int ) const {
+HHuginn::value_t HRegularExpressionMatch::do_clone( huginn::HThread* thread_, int ) const {
 	M_PROLOG
-	return ( make_pointer<HRegularExpressionMatch>( HIterable::get_class(), make_resource<HRegex>( _regex->copy() ), _string ) );
+	return ( thread_->object_factory().create<HRegularExpressionMatch>( HIterable::get_class(), make_resource<HRegex>( _regex->copy() ), _string ) );
 	M_EPILOG
 }
 

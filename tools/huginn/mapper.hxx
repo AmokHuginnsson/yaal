@@ -70,8 +70,8 @@ protected:
 private:
 	virtual HIterator do_iterator( HThread*, int ) override;
 private:
-	virtual HHuginn::value_t do_clone( huginn::HThread*, int ) const override {
-		return ( yaal::hcore::make_pointer<HMapper>( HIterable::get_class(), _source, _function, _method ) );
+	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, int ) const override {
+		return ( thread_->object_factory().create<HMapper>( HIterable::get_class(), _source, _function, _method ) );
 	}
 };
 

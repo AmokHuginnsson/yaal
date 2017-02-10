@@ -96,8 +96,8 @@ HHuginn::class_t HRandomizer::get_class( HRuntime* runtime_ ) {
 			"Randomizer",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "next",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HRandomizer::next, _1, _2, _3, _4 ) ), "([ *range* ]) - get next `integer` random number, possibly restricted to given range" },
-				{ "next_real", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HRandomizer::next_real, _1, _2, _3, _4 ) ), "([ *range* ]) - get next `real` random number, possibly restricted to given range" }
+				{ "next",      runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HRandomizer::next, _1, _2, _3, _4 ) ),      "([ *range* ]) - get next `integer` random number, possibly restricted to given range" },
+				{ "next_real", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HRandomizer::next_real, _1, _2, _3, _4 ) ), "([ *range* ]) - get next `real` random number, possibly restricted to given range" }
 			},
 			"The `Randomizer` class represents a random number generator concept. `Randomizer` can generate uniform distribution of either `integer` or `real` values from given range."
 		)
@@ -107,8 +107,8 @@ HHuginn::class_t HRandomizer::get_class( HRuntime* runtime_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HRandomizer::do_clone( huginn::HThread*, int ) const {
-	return ( make_pointer<HRandomizer>( HValue::get_class(), _generator ) );
+HHuginn::value_t HRandomizer::do_clone( huginn::HThread* thread_, int ) const {
+	return ( thread_->object_factory().create<HRandomizer>( HValue::get_class(), _generator ) );
 }
 
 }

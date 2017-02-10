@@ -447,16 +447,16 @@ public:
 	static HHuginn::value_t matrix( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		HMathematics* m( static_cast<HMathematics*>( object_->raw() ) );
-		return ( make_pointer<HMatrix>( thread_, m->_matrixClass.raw(), values_, position_ ) );
+		return ( thread_->object_factory().create<HMatrix>( thread_, m->_matrixClass.raw(), values_, position_ ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t statistics( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t statistics( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		HMathematics* m( static_cast<HMathematics*>( object_->raw() ) );
-		return ( make_pointer<HNumberSetStatistics>( m->_numberSetStatisticsClass.raw(), values_, position_ ) );
+		return ( thread_->object_factory().create<HNumberSetStatistics>( m->_numberSetStatisticsClass.raw(), values_, position_ ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t randomizer( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t randomizer( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.randomizer";
 		verify_arg_count( name, values_, 0, 1, position_ );
@@ -466,7 +466,7 @@ public:
 			cap = static_cast<yaal::u64_t>( get_integer( values_[0] ) );
 		}
 		HMathematics* m( static_cast<HMathematics*>( object_->raw() ) );
-		return ( make_pointer<huginn::HRandomizer>( m->_randomizerClass.raw(), cap ) );
+		return ( thread_->object_factory().create<huginn::HRandomizer>( m->_randomizerClass.raw(), cap ) );
 		M_EPILOG
 	}
 };
@@ -485,37 +485,37 @@ HHuginn::value_t HMathematicsCreator::do_new_instance( HRuntime* runtime_ ) {
 			"Mathematics",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "pi",                   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::pi, _1, _2, _3, _4 ) ), "( *type* [, *precision*] ) - get value of $\\pi$ of type *type*, potentially with given *precision*" },
-				{ "e",                    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::e, _1, _2, _3, _4 ) ), "( *type* [, *precision*] ) - get value of $e$ of type *type*, potentially with given *precision*" },
-				{ "square_root",          make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::square_root, _1, _2, _3, _4 ) ), "( *value* ) - calculate square root of given *value*" },
-				{ "natural_exponential",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::natural_exponential, _1, _2, _3, _4 ) ), "( *x* ) - calculate value of $e^x$ (value of natural exponential of *x*)" },
-				{ "natural_logarithm",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::natural_logarithm, _1, _2, _3, _4 ) ), "( *x* ) - find natural logarithm of value *x*" },
-				{ "sinus",                make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::sinus, _1, _2, _3, _4 ) ), "( *arg* ) - calculate value of *sine* function of *arg* argument" },
-				{ "cosinus",              make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::cosinus, _1, _2, _3, _4 ) ), "( *arg* ) - calculate value of *cosine* function of *arg* argument" },
-				{ "tangens",              make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::tangens, _1, _2, _3, _4 ) ), "( *arg* ) - calculate value of *tangent* function of *arg* argument" },
-				{ "cotangens",            make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::cotangens, _1, _2, _3, _4 ) ), "( *arg* ) - calculate value of *cotangent* function of *arg* argument" },
-				{ "arcus_sinus",          make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::arcus_sinus, _1, _2, _3, _4 ) ), "( *arg* ) - calculate value of *arcus sine* function of *arg* argument" },
-				{ "arcus_cosinus",        make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::arcus_cosinus, _1, _2, _3, _4 ) ), "( *arg* ) - calculate value of *arcus cosine* function of *arg* argument" },
-				{ "arcus_tangens",        make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::arcus_tangens, _1, _2, _3, _4 ) ), "( *arg* ) - calculate value of *arcus tangent* function of *arg* argument" },
-				{ "arcus_cotangens",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::arcus_cotangens, _1, _2, _3, _4 ) ), "( *arg* ) - calculate value of *arcus cotangent* function of *arg* argument" },
-				{ "hyperbolic_sinus",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::hyperbolic_sinus, _1, _2, _3, _4 ) ), "( *arg* ) - calculate value of *hyperbolic sine* function of *arg* argument" },
-				{ "hyperbolic_cosinus",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::hyperbolic_cosinus, _1, _2, _3, _4 ) ), "( *arg* ) - calculate value of *hyperbolic cosine* function of *arg* argument" },
-				{ "hyperbolic_tangens",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::hyperbolic_tangens, _1, _2, _3, _4 ) ), "( *arg* ) - calculate value of *hyperbolic tangent* function of *arg* argument" },
-				{ "hyperbolic_cotangens", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::hyperbolic_cotangens, _1, _2, _3, _4 ) ), "( *arg* ) - calculate value of *hyperbolic cotangent* function of *arg* argument" },
-				{ "sigmoid",              make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::sigmoid, _1, _2, _3, _4 ) ), "( *arg* ) - calculate value of *sigmoid* function of *arg* argument" },
-				{ "round",                make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::round, _1, _2, _3, _4 ) ), "( *value*[, *precision*] ) - round *value*, potentially to given *precision*" },
-				{ "floor",                make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::floor, _1, _2, _3, _4 ) ), "( *value* ) - get largest integral value not greater than *value*" },
-				{ "ceil",                 make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::ceil, _1, _2, _3, _4 ) ), "( *value* ) - get smallest integral value not less than *value*" },
-				{ "differs_at",           make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::differs_at, _1, _2, _3, _4 ) ), "( *first*, *second* ) - tell at which decimal position *first* and *second* values have first occurrence of different digit" },
-				{ "matrix",               make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::matrix, _1, _2, _3, _4 ) ), "( *type*, *rows*, *cols* ) - create instance of Matrix class of values of type *type* and *rows* rows and *cols* columns" },
-				{ "statistics",           make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::statistics, _1, _2, _3, _4 ) ), "( *iterable* ) - calculate numerical statistics over given iterable *iterable* of uniformly types values" },
-				{ "randomizer",           make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::randomizer, _1, _2, _3, _4 ) ), "([ *cap* ]) - create random number generator which output values are capped at *cap*" }
+				{ "pi",                   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::pi, _1, _2, _3, _4 ) ),                   "( *type* [, *precision*] ) - get value of $\\pi$ of type *type*, potentially with given *precision*" },
+				{ "e",                    runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::e, _1, _2, _3, _4 ) ),                    "( *type* [, *precision*] ) - get value of $e$ of type *type*, potentially with given *precision*" },
+				{ "square_root",          runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::square_root, _1, _2, _3, _4 ) ),          "( *value* ) - calculate square root of given *value*" },
+				{ "natural_exponential",  runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::natural_exponential, _1, _2, _3, _4 ) ),  "( *x* ) - calculate value of $e^x$ (value of natural exponential of *x*)" },
+				{ "natural_logarithm",    runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::natural_logarithm, _1, _2, _3, _4 ) ),    "( *x* ) - find natural logarithm of value *x*" },
+				{ "sinus",                runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::sinus, _1, _2, _3, _4 ) ),                "( *arg* ) - calculate value of *sine* function of *arg* argument" },
+				{ "cosinus",              runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::cosinus, _1, _2, _3, _4 ) ),              "( *arg* ) - calculate value of *cosine* function of *arg* argument" },
+				{ "tangens",              runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::tangens, _1, _2, _3, _4 ) ),              "( *arg* ) - calculate value of *tangent* function of *arg* argument" },
+				{ "cotangens",            runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::cotangens, _1, _2, _3, _4 ) ),            "( *arg* ) - calculate value of *cotangent* function of *arg* argument" },
+				{ "arcus_sinus",          runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::arcus_sinus, _1, _2, _3, _4 ) ),          "( *arg* ) - calculate value of *arcus sine* function of *arg* argument" },
+				{ "arcus_cosinus",        runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::arcus_cosinus, _1, _2, _3, _4 ) ),        "( *arg* ) - calculate value of *arcus cosine* function of *arg* argument" },
+				{ "arcus_tangens",        runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::arcus_tangens, _1, _2, _3, _4 ) ),        "( *arg* ) - calculate value of *arcus tangent* function of *arg* argument" },
+				{ "arcus_cotangens",      runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::arcus_cotangens, _1, _2, _3, _4 ) ),      "( *arg* ) - calculate value of *arcus cotangent* function of *arg* argument" },
+				{ "hyperbolic_sinus",     runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::hyperbolic_sinus, _1, _2, _3, _4 ) ),     "( *arg* ) - calculate value of *hyperbolic sine* function of *arg* argument" },
+				{ "hyperbolic_cosinus",   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::hyperbolic_cosinus, _1, _2, _3, _4 ) ),   "( *arg* ) - calculate value of *hyperbolic cosine* function of *arg* argument" },
+				{ "hyperbolic_tangens",   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::hyperbolic_tangens, _1, _2, _3, _4 ) ),   "( *arg* ) - calculate value of *hyperbolic tangent* function of *arg* argument" },
+				{ "hyperbolic_cotangens", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::hyperbolic_cotangens, _1, _2, _3, _4 ) ), "( *arg* ) - calculate value of *hyperbolic cotangent* function of *arg* argument" },
+				{ "sigmoid",              runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::sigmoid, _1, _2, _3, _4 ) ),              "( *arg* ) - calculate value of *sigmoid* function of *arg* argument" },
+				{ "round",                runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::round, _1, _2, _3, _4 ) ),                "( *value*[, *precision*] ) - round *value*, potentially to given *precision*" },
+				{ "floor",                runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::floor, _1, _2, _3, _4 ) ),                "( *value* ) - get largest integral value not greater than *value*" },
+				{ "ceil",                 runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::ceil, _1, _2, _3, _4 ) ),                 "( *value* ) - get smallest integral value not less than *value*" },
+				{ "differs_at",           runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::differs_at, _1, _2, _3, _4 ) ),           "( *first*, *second* ) - tell at which decimal position *first* and *second* values have first occurrence of different digit" },
+				{ "matrix",               runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::matrix, _1, _2, _3, _4 ) ),               "( *type*, *rows*, *cols* ) - create instance of Matrix class of values of type *type* and *rows* rows and *cols* columns" },
+				{ "statistics",           runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::statistics, _1, _2, _3, _4 ) ),           "( *iterable* ) - calculate numerical statistics over given iterable *iterable* of uniformly types values" },
+				{ "randomizer",           runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::randomizer, _1, _2, _3, _4 ) ),           "([ *cap* ]) - create random number generator which output values are capped at *cap*" }
 			},
 			"The `Mathematics` package provides essential mathematical functions and classes. All of those functions and classes work with values of both `real` and `number` types."
 		)
 	);
 	runtime_->huginn()->register_class( c );
-	return ( make_pointer<HMathematics>( c.raw() ) );
+	return ( runtime_->object_factory()->create<HMathematics>( c.raw() ) );
 	M_EPILOG
 }
 

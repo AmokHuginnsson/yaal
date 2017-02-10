@@ -57,13 +57,13 @@ public:
 			runtime_->identifier_id( "Subprocess" ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "is_alive", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::is_alive, _1, _2, _3, _4 ) ), "tell if given subprocess is alive and running" },
-				{ "kill",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::kill, _1, _2, _3, _4 ) ), "kill this sub-process" },
-				{ "get_pid",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::get_pid, _1, _2, _3, _4 ) ), "get operating system Process IDentification-number of this subprocess" },
-				{ "wait",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::wait, _1, _2, _3, _4 ) ), "wait for this subprocess to finish is execution and return its exit status" },
-				{ "in",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::stream, "Subprocess.in", &HPipedChild::stream_in, _1, _2, _3, _4 ) ), "standard input stream of a subprocess" },
-				{ "out",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::stream, "Subprocess.out", &HPipedChild::stream_out, _1, _2, _3, _4 ) ), "standard output stream of a subprocess" },
-				{ "err",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::stream, "Subprocess.err", &HPipedChild::stream_err, _1, _2, _3, _4 ) ), "standard error stream of a subprocess" }
+				{ "is_alive", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::is_alive, _1, _2, _3, _4 ) ), "tell if given subprocess is alive and running" },
+				{ "kill",     runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::kill, _1, _2, _3, _4 ) ),     "kill this sub-process" },
+				{ "get_pid",  runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::get_pid, _1, _2, _3, _4 ) ),  "get operating system Process IDentification-number of this subprocess" },
+				{ "wait",     runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::wait, _1, _2, _3, _4 ) ),     "wait for this subprocess to finish is execution and return its exit status" },
+				{ "in",       runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::stream, "Subprocess.in", &HPipedChild::stream_in, _1, _2, _3, _4 ) ),   "standard input stream of a subprocess" },
+				{ "out",      runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::stream, "Subprocess.out", &HPipedChild::stream_out, _1, _2, _3, _4 ) ), "standard output stream of a subprocess" },
+				{ "err",      runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::stream, "Subprocess.err", &HPipedChild::stream_err, _1, _2, _3, _4 ) ), "standard error stream of a subprocess" }
 			},
 			"The `Subprocess` class represents a system process spawned from this interpreter instance. It allows for a basic process life management."
 		)
@@ -153,7 +153,7 @@ HHuginn::value_t HSubprocess::wait(
 HHuginn::value_t HSubprocess::stream(
 	char const* name_,
 	stream_getter_t streamGetter_,
-	huginn::HThread*,
+	huginn::HThread* thread_,
 	HHuginn::value_t* object_,
 	HHuginn::values_t const& values_,
 	int position_
@@ -163,7 +163,7 @@ HHuginn::value_t HSubprocess::stream(
 	HSubprocess* o( static_cast<HSubprocess*>( object_->raw() ) );
 	HSubprocessClass const* c( static_cast<HSubprocessClass const*>( o->HHuginn::HValue::get_class() ) );
 	HHuginn::HClass const* sc( c->stream_class() );
-	return ( make_pointer<HStream>( sc, (o->_pipedChild.*streamGetter_)() ) );
+	return ( thread_->object_factory().create<HStream>( sc, (o->_pipedChild.*streamGetter_)() ) );
 	M_EPILOG
 }
 

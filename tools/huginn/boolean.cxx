@@ -45,8 +45,8 @@ namespace huginn {
 
 namespace boolean {
 
-HHuginn::class_t get_class( HRuntime* );
-HHuginn::class_t get_class( HRuntime* runtime_ ) {
+HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
+HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(

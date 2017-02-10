@@ -141,8 +141,8 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_EPILOG
 }
 
-HHuginn::class_t get_class( HRuntime* );
-HHuginn::class_t get_class( HRuntime* runtime_ ) {
+HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
+HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
@@ -151,12 +151,12 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 			runtime_->identifier_id( type_name( HHuginn::TYPE::ORDER ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "add",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::add, _1, _2, _3, _4 ) ),     "( *elem* ) - add given element *elem* to an `order`" },
-				{ "has_key", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::has_key, _1, _2, _3, _4 ) ), "( *elem* ) - tell if given element *elem* is in the `order`" },
-				{ "erase",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::erase, _1, _2, _3, _4 ) ),   "( *elem* ) - remove given element *elem* from the `order`" },
-				{ "clear",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::clear, _1, _2, _3, _4 ) ),   "erase `order`'s content, `order` becomes empty" },
-				{ "update",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `order` with values from *other* `order`" },
-				{ "equals",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `order` has the same content" }
+				{ "add",     objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &order::add, _1, _2, _3, _4 ) ),     "( *elem* ) - add given element *elem* to an `order`" },
+				{ "has_key", objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &order::has_key, _1, _2, _3, _4 ) ), "( *elem* ) - tell if given element *elem* is in the `order`" },
+				{ "erase",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &order::erase, _1, _2, _3, _4 ) ),   "( *elem* ) - remove given element *elem* from the `order`" },
+				{ "clear",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &order::clear, _1, _2, _3, _4 ) ),   "erase `order`'s content, `order` becomes empty" },
+				{ "update",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &order::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `order` with values from *other* `order`" },
+				{ "equals",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &order::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `order` has the same content" }
 			},
 			"The `order` is a collection of sorted values of uniform types. It supports operations of addition, search and element removal."
 		)

@@ -146,8 +146,8 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_EPILOG
 }
 
-HHuginn::class_t get_class( HRuntime* );
-HHuginn::class_t get_class( HRuntime* runtime_ ) {
+HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
+HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
@@ -156,12 +156,12 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 			runtime_->identifier_id( type_name( HHuginn::TYPE::LOOKUP ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "has_key", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &lookup::has_key, _1, _2, _3, _4 ) ), "( *key* ) - tell if given *key* can be found in this `lookup`" },
-				{ "get",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &lookup::get, _1, _2, _3, _4 ) ),     "( *key*, *default* ) - get value for given *key* from this `lookup`, or *default* if given *key* is not present in the `lookup`" },
-				{ "erase",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &lookup::erase, _1, _2, _3, _4 ) ),   "( *key* ) - remove given *key* from this `lookup`" },
-				{ "clear",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &lookup::clear, _1, _2, _3, _4 ) ),   "erase `lookup`'s content, `lookup` becomes empty" },
-				{ "update",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &lookup::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `lookup` with key/value pairs from *other* `lookup`" },
-				{ "equals",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &lookup::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `lookup` has the same content" }
+				{ "has_key", objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &lookup::has_key, _1, _2, _3, _4 ) ), "( *key* ) - tell if given *key* can be found in this `lookup`" },
+				{ "get",     objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &lookup::get, _1, _2, _3, _4 ) ),     "( *key*, *default* ) - get value for given *key* from this `lookup`, or *default* if given *key* is not present in the `lookup`" },
+				{ "erase",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &lookup::erase, _1, _2, _3, _4 ) ),   "( *key* ) - remove given *key* from this `lookup`" },
+				{ "clear",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &lookup::clear, _1, _2, _3, _4 ) ),   "erase `lookup`'s content, `lookup` becomes empty" },
+				{ "update",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &lookup::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `lookup` with key/value pairs from *other* `lookup`" },
+				{ "equals",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &lookup::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `lookup` has the same content" }
 			},
 			"The `lookup` is a collection providing a sorted key to value map. It supports operations of iteration, key-value insertion, key removal and key search."
 		)

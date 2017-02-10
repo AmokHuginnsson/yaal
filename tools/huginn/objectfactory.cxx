@@ -41,71 +41,71 @@ namespace tools {
 namespace huginn {
 
 namespace boolean {
-HHuginn::class_t get_class( HRuntime* );
+HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
 }
 
 namespace integer {
-HHuginn::class_t get_class( HRuntime* );
+HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
 }
 
 namespace string {
-HHuginn::class_t get_class( HRuntime* );
+HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
 }
 
 namespace real {
-HHuginn::class_t get_class( HRuntime* );
+HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
 }
 
 namespace number {
-HHuginn::class_t get_class( HRuntime* );
+HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
 }
 
 namespace character {
-HHuginn::class_t get_class( HRuntime* );
+HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
 }
 
 namespace list {
-HHuginn::class_t get_class( HRuntime* );
+HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
 }
 
 namespace deque {
-HHuginn::class_t get_class( HRuntime* );
+HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
 }
 
 namespace dict {
-HHuginn::class_t get_class( HRuntime* );
+HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
 }
 
 namespace order {
-HHuginn::class_t get_class( HRuntime* );
+HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
 }
 
 namespace lookup {
-HHuginn::class_t get_class( HRuntime* );
+HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
 }
 
 namespace set {
-HHuginn::class_t get_class( HRuntime* );
+HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
 }
 
 HObjectFactory::HObjectFactory( HRuntime* runtime_ )
 	: _runtime( runtime_ )
-	, _boolean( boolean::get_class( runtime_ ) )
-	, _integer( integer::get_class( runtime_ ) )
-	, _string( string::get_class( runtime_ ) )
-	, _real( real::get_class( runtime_ ) )
-	, _number( number::get_class( runtime_ ) )
-	, _character( character::get_class( runtime_ ) )
-	, _list( list::get_class( runtime_ ) )
-	, _deque( deque::get_class( runtime_ ) )
-	, _dict( dict::get_class( runtime_ ) )
-	, _order( order::get_class( runtime_ ) )
-	, _lookup( lookup::get_class( runtime_ ) )
-	, _set( set::get_class( runtime_ ) )
+	, _memoryPools()
+	, _boolean( boolean::get_class( runtime_, this ) )
+	, _integer( integer::get_class( runtime_, this ) )
+	, _string( string::get_class( runtime_, this ) )
+	, _real( real::get_class( runtime_, this ) )
+	, _number( number::get_class( runtime_, this ) )
+	, _character( character::get_class( runtime_, this ) )
+	, _list( list::get_class( runtime_, this ) )
+	, _deque( deque::get_class( runtime_, this ) )
+	, _dict( dict::get_class( runtime_, this ) )
+	, _order( order::get_class( runtime_, this ) )
+	, _lookup( lookup::get_class( runtime_, this ) )
+	, _set( set::get_class( runtime_, this ) )
 	, _exception()
 	, _conversionException()
 	, _arithmeticException()
-	, _memoryPools()
 	, _stringPool( _memoryPools, _string.raw() )
 	, _integerPool( _memoryPools, _integer.raw() )
 	, _booleanPool( _memoryPools, _boolean.raw() )

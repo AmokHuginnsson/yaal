@@ -79,8 +79,8 @@ protected:
 private:
 	virtual HIterator do_iterator( HThread*, int ) override;
 private:
-	virtual HHuginn::value_t do_clone( huginn::HThread*, int ) const override {
-		return ( yaal::hcore::make_pointer<HDirectoryScan>( HIterable::get_class(), _path ) );
+	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, int ) const override {
+		return ( thread_->object_factory().create<HDirectoryScan>( HIterable::get_class(), _path ) );
 	}
 };
 

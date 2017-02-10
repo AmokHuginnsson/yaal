@@ -95,7 +95,7 @@ private:
 			HSocket* s( static_cast<HSocket*>( stream.raw() ) );
 			try {
 				s->connect( get_string( values_[0] ), port );
-				v = make_pointer<HStream>( _streamClass.raw(), stream );
+				v = thread_->object_factory().create<HStream>( _streamClass.raw(), stream );
 			} catch ( HResolverException const& e ) {
 				thread_->raise( _exceptionClass.raw(), e.what(), position_ );
 			} catch ( HSocketException const& e ) {
@@ -121,14 +121,14 @@ HHuginn::value_t HNetworkCreator::do_new_instance( HRuntime* runtime_ ) {
 			"Network",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "connect", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNetwork::connect, _1, _2, _3, _4 ) ), "( *host*, *port* ) - create a TCP connection to given *host* at given *port*" },
-				{ "resolve", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNetwork::resolve, _1, _2, _3, _4 ) ), "( *hostName* ) - resolve IP address of given *hostName*" }
+				{ "connect", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNetwork::connect, _1, _2, _3, _4 ) ), "( *host*, *port* ) - create a TCP connection to given *host* at given *port*" },
+				{ "resolve", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNetwork::resolve, _1, _2, _3, _4 ) ), "( *hostName* ) - resolve IP address of given *hostName*" }
 			},
 			"The `Network` package provides access to various networking related functionalities."
 		)
 	);
 	runtime_->huginn()->register_class( c );
-	return ( make_pointer<HNetwork>( c.raw() ) );
+	return ( runtime_->object_factory()->create<HNetwork>( c.raw() ) );
 	M_EPILOG
 }
 

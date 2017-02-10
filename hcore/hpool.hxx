@@ -68,6 +68,9 @@ private:
 		int _used; /*!< number of allocated object in this block pool*/
 		int _index; /*!< This block index in HPool<>. */
 	public:
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#pragma GCC diagnostic ignored "-Wlarger-than="
 		HPoolBlock( int index_ )
 			: _mem()
 			, _free( 0 )
@@ -80,6 +83,7 @@ private:
 				*( p + OBJECT_SPACE - 1 ) = static_cast<u8_t>( i );
 			}
 		}
+#pragma GCC diagnostic pop
 		void* alloc( void ) {
 			void* p( reinterpret_cast<char*>( _mem ) + OBJECT_SPACE * _free );
 			_free = *static_cast<u8_t*>( p );

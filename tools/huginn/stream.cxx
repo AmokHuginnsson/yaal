@@ -152,9 +152,9 @@ HHuginn::class_t HStream::get_class( HRuntime* runtime_ ) {
 			name,
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "read", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HStream::read, _1, _2, _3, _4 ) ), "read all data from given stream" },
-				{ "read_line", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HStream::read_line, _1, _2, _3, _4 ) ), "read single line of text from given stream" },
-				{ "write", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HStream::write, _1, _2, _3, _4 ) ), "( *value* ) - write given value info this stream" }
+				{ "read",      runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HStream::read, _1, _2, _3, _4 ) ),      "read all data from given stream" },
+				{ "read_line", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HStream::read_line, _1, _2, _3, _4 ) ), "read single line of text from given stream" },
+				{ "write",     runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HStream::write, _1, _2, _3, _4 ) ),     "( *value* ) - write given value info this stream" }
 			},
 			"The `Stream` class gives an interface for stream based I/O operations."
 		);

@@ -34,6 +34,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/huginn/thread.hxx"
 #include "tools/huginn/helper.hxx"
 #include "tools/huginn/exception.hxx"
+#include "tools/huginn/objectfactory.hxx"
 #include "tools/huginn/packagefactory.hxx"
 #include "databaseconnection.hxx"
 
@@ -86,7 +87,7 @@ HHuginn::value_t HDatabaseCreator::do_new_instance( HRuntime* runtime_ ) {
 			"Database",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "connect", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabase::connect, _1, _2, _3, _4 ) ), "( *DSN* ) - create connection to the database specified by given *DSN*" }
+				{ "connect", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HDatabase::connect, _1, _2, _3, _4 ) ), "( *DSN* ) - create connection to the database specified by given *DSN*" }
 			},
 			"The `Database` package provides access to various database engines through database agnostic interface. Following drivers are supported:"
 #ifdef HAVE_LIBSQLITE3
@@ -108,7 +109,7 @@ HHuginn::value_t HDatabaseCreator::do_new_instance( HRuntime* runtime_ ) {
 		)
 	);
 	runtime_->huginn()->register_class( c );
-	return ( make_pointer<HDatabase>( c.raw() ) );
+	return ( runtime_->object_factory()->create<HDatabase>( c.raw() ) );
 	M_EPILOG
 }
 

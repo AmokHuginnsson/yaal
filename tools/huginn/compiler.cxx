@@ -1072,7 +1072,7 @@ void OCompiler::commit_boolean( OPERATOR operator_, executing_parser::position_t
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	if ( fc.expressions_stack().top().get_size() > 1 ) {
-		HHuginn::value_t And( make_pointer<HBooleanEvaluator>( _runtime, fc.expressions_stack().top(), operator_ ) );
+		HHuginn::value_t And( _runtime->object_factory()->create<HBooleanEvaluator>( _runtime, fc.expressions_stack().top(), operator_ ) );
 		fc.expressions_stack().pop();
 		M_ASSERT( ! fc._valueTypes.is_empty() && fc._valueTypes.top()._type == HHuginn::TYPE::BOOLEAN );
 		fc._valueTypes.pop();
@@ -1095,7 +1095,7 @@ void OCompiler::commit_ternary( executing_parser::position_t position_ ) {
 	HFunction::expressions_t const& exprs( fc.expressions_stack().top() );
 	if ( exprs.get_size() > 1 ) {
 		M_ASSERT( exprs.get_size() == 3 );
-		HHuginn::value_t ternary( make_pointer<HHuginn::HTernaryEvaluator>( exprs[0], exprs[1], exprs[2] ) );
+		HHuginn::value_t ternary( _runtime->object_factory()->create<HHuginn::HTernaryEvaluator>( exprs[0], exprs[1], exprs[2] ) );
 		fc.expressions_stack().pop();
 		M_ASSERT( ! fc._valueTypes.is_empty() && fc._valueTypes.top()._type == HHuginn::TYPE::UNKNOWN );
 		fc._valueTypes.pop();
