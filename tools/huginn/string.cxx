@@ -138,7 +138,7 @@ public:
 		bool autoIndex( false );
 		HString idxRaw;
 		char const* errMsg( "Invalid format specification at: " );
-		int maxUsedValue( 0 );
+		int maxUsedValue( -1 );
 		int valCount( static_cast<int>( _values.get_size() ) );
 		for ( HString::const_iterator end( _format.end() ); _it != end; ++ _it ) {
 			if ( *_it == FMT_OPEN ) {
