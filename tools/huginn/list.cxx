@@ -46,11 +46,11 @@ namespace huginn {
 
 class HListIterator : public HIteratorInterface {
 	HHuginn::HList* _list;
-	int _index;
+	int long _index;
 public:
 	HListIterator( HHuginn::HList* list_ )
-		: _list( list_ ),
-		_index( 0 ) {
+		: _list( list_ )
+		, _index( 0 ) {
 		return;
 	}
 protected:

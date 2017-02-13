@@ -48,7 +48,7 @@ namespace huginn {
 class HStringIterator : public HIteratorInterface {
 	HHuginn::HString* _string;
 	HObjectFactory* _objectFactory;
-	int _index;
+	int long _index;
 public:
 	HStringIterator( HHuginn::HString* string_ )
 		: _string( string_ )

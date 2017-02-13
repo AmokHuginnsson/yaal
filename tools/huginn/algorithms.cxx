@@ -38,6 +38,13 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "range.hxx"
 #include "filter.hxx"
 #include "mapper.hxx"
+#include "list.hxx"
+#include "deque.hxx"
+#include "dict.hxx"
+#include "order.hxx"
+#include "lookup.hxx"
+#include "set.hxx"
+#include "string.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -53,12 +60,26 @@ class HAlgorithms : public HHuginn::HValue {
 	HHuginn::class_t _filterClass;
 	HHuginn::class_t _mapperClass;
 	HHuginn::class_t _rangeClass;
+	HHuginn::class_t _reversedListClass;
+	HHuginn::class_t _reversedDequeClass;
+	HHuginn::class_t _reversedDictClass;
+	HHuginn::class_t _reversedLookupClass;
+	HHuginn::class_t _reversedOrderClass;
+	HHuginn::class_t _reversedSetClass;
+	HHuginn::class_t _reversedStringClass;
 public:
 	HAlgorithms( HHuginn::HClass* class_ )
 		: HValue( class_ )
 		, _filterClass( HFilter::get_class( class_->runtime() ) )
 		, _mapperClass( HMapper::get_class( class_->runtime() ) )
-		, _rangeClass( HRange::get_class( class_->runtime() ) ) {
+		, _rangeClass( HRange::get_class( class_->runtime() ) )
+		, _reversedListClass( HReversedList::get_class( class_->runtime() ) )
+		, _reversedDequeClass( HReversedDeque::get_class( class_->runtime() ) )
+		, _reversedDictClass( HReversedDict::get_class( class_->runtime() ) )
+		, _reversedLookupClass( HReversedLookup::get_class( class_->runtime() ) )
+		, _reversedOrderClass( HReversedOrder::get_class( class_->runtime() ) )
+		, _reversedSetClass( HReversedSet::get_class( class_->runtime() ) )
+		, _reversedStringClass( HReversedString::get_class( class_->runtime() ) ) {
 		return;
 	}
 	static HHuginn::value_t filter( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
@@ -221,6 +242,40 @@ public:
 		}
 		return ( v );
 	}
+	static HHuginn::value_t reversed( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+		char const name[] = "Algorithms.reversed";
+		verify_arg_count( name, values_, 1, 1, position_ );
+		HHuginn::type_id_t t( verify_arg_collection( name, values_, 0, ARITY::UNARY, ONTICALLY::MATERIALIZED, position_ ) );
+		HHuginn::value_t v;
+		HAlgorithms* a( static_cast<HAlgorithms*>( object_->raw() ) );
+		switch ( t.get() ) {
+			case ( static_cast<int>( HHuginn::TYPE::LIST ) ): {
+				v = thread_->object_factory().create<HReversedList>( a->_reversedListClass.raw(), values_[0] );
+			} break;
+			case ( static_cast<int>( HHuginn::TYPE::DEQUE ) ): {
+				v = thread_->object_factory().create<HReversedDeque>( a->_reversedDequeClass.raw(), values_[0] );
+			} break;
+			case ( static_cast<int>( HHuginn::TYPE::DICT ) ): {
+				v = thread_->object_factory().create<HReversedDict>( a->_reversedDictClass.raw(), values_[0] );
+			} break;
+			case ( static_cast<int>( HHuginn::TYPE::LOOKUP ) ): {
+				v = thread_->object_factory().create<HReversedLookup>( a->_reversedLookupClass.raw(), values_[0] );
+			} break;
+			case ( static_cast<int>( HHuginn::TYPE::ORDER ) ): {
+				v = thread_->object_factory().create<HReversedOrder>( a->_reversedOrderClass.raw(), values_[0] );
+			} break;
+			case ( static_cast<int>( HHuginn::TYPE::SET ) ): {
+				v = thread_->object_factory().create<HReversedSet>( a->_reversedSetClass.raw(), values_[0] );
+			} break;
+			case ( static_cast<int>( HHuginn::TYPE::STRING ) ): {
+				v = thread_->object_factory().create<HReversedString>( a->_reversedStringClass.raw(), values_[0] );
+			} break;
+			default: {
+				M_ASSERT( !"Invalid code path!"[0] );
+			}
+		}
+		return ( v );
+	}
 private:
 	HHuginn::value_t do_filter( HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
@@ -302,7 +357,8 @@ HHuginn::value_t HAlgorithmsCreator::do_new_instance( HRuntime* runtime_ ) {
 				{ "materialize", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::materialize, _1, _2, _3, _4 ) ), "( *iterable*, *colType* ) - copy elements from *iterable* to newly created instance of *colType*" },
 				{ "reduce",      runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::reduce, _1, _2, _3, _4 ) ),      "( *iterable*, *callable* [, *init*] ) - iteratively combine all elements from *iterable* using *callable(x,y)* and starting value of *init*" },
 				{ "range",       runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::range, _1, _2, _3, _4 ) ),       "( [*from*,] *until* [, *step*] ) - produce iterable sequence of `integer` values ranging from *from* up until *until* using *step* increments" },
-				{ "sorted",      runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::sorted, _1, _2, _3, _4 ) ),      "( *iterable* [, *callable*] ) - return content of *iterable* as sorted `list`, using *callable* to retrieve keys for element comparison" }
+				{ "sorted",      runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::sorted, _1, _2, _3, _4 ) ),      "( *iterable* [, *callable*] ) - return content of *iterable* as sorted `list`, using *callable* to retrieve keys for element comparison" },
+				{ "reversed",    runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::reversed, _1, _2, _3, _4 ) ),    "( *coll* ) - create reversed iterable view of a *coll* materialized collection" }
 			},
 			"The `Algorithms` package contains basic low-level algorithms."
 		)
