@@ -309,14 +309,39 @@ HRegex::HMatchIterator HRegex::end( void ) const {
 	return ( HMatchIterator( this, nullptr, -1, 0 ) );
 }
 
-bool HRegex::matches( HString const& str_ ) const {
-	return ( find( str_ ) != end() );
+HRegex::HMatchResult HRegex::matches( HString const& str_ ) const {
+	return ( HMatchResult( find( str_ ), end() ) );
 }
 
 HRegex::groups_t HRegex::groups( yaal::hcore::HString const& string_ ) const {
 	M_PROLOG
 	return ( groups_impl( string_.raw() ) );
 	M_EPILOG
+}
+
+HRegex::HMatchResult::HMatchResult( HRegex::HMatchIterator const& it_, HRegex::HMatchIterator const& end_ )
+	: _it( it_ )
+	, _end( end_ ) {
+}
+
+HRegex::HMatchResult::operator safe_bool_t() const {
+	return ( _it != _end ? &SemanticContext::member : nullptr );
+}
+
+HRegex::HMatchIterator HRegex::HMatchResult::begin( void ) const {
+	return ( _it );
+}
+
+HRegex::HMatchIterator HRegex::HMatchResult::end( void ) const {
+	return ( _end );
+}
+
+HRegex::HMatchIterator HRegex::HMatchResult::cbegin( void ) const {
+	return ( _it );
+}
+
+HRegex::HMatchIterator HRegex::HMatchResult::cend( void ) const {
+	return ( _end );
 }
 
 HRegex::HMatch::HMatch( int start_, int size_ )

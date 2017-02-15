@@ -65,6 +65,7 @@ public:
 		static M_YAAL_HCORE_PUBLIC_API match_t const NOT_END_OF_LINE;
 		static M_YAAL_HCORE_PUBLIC_API match_t const DEFAULT;
 	};
+	class HMatchResult;
 	class HMatch;
 	class HMatchIterator;
 	typedef HMatchIterator iterator;
@@ -135,7 +136,7 @@ public:
 	 * \param string_ - string to check against the regex.
 	 * \return True iff given string matches this regex.
 	 */
-	bool matches( HString const& string_ ) const;
+	HMatchResult matches( HString const& string_ ) const;
 	groups_t groups( HString const& string_ ) const;
 	void swap( HRegex& );
 	void clear( void );
@@ -178,6 +179,24 @@ public:
 	HMatchIterator& operator = ( HMatchIterator const& );
 private:
 	HMatchIterator( HRegex const*, char const*, int, int );
+	friend class HRegex;
+};
+
+/*! \brief Abstraction of HRegex::matches() result.
+ */
+class HRegex::HMatchResult {
+	struct SemanticContext { SemanticContext const& member( SemanticContext& ) const { return ( *this ); } };
+	typedef SemanticContext const& ( SemanticContext::* safe_bool_t )( SemanticContext& ) const;
+	HRegex::HMatchIterator _it;
+	HRegex::HMatchIterator _end;
+public:
+	HRegex::HMatchIterator begin( void ) const;
+	HRegex::HMatchIterator end( void ) const;
+	HRegex::HMatchIterator cbegin( void ) const;
+	HRegex::HMatchIterator cend( void ) const;
+	operator safe_bool_t() const;
+private:
+	HMatchResult( HRegex::HMatchIterator const&, HRegex::HMatchIterator const& );
 	friend class HRegex;
 };
 
