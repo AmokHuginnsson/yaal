@@ -37,6 +37,7 @@ Copyright:
 #include "hcore/hstring.hxx"
 #include "hcore/hbitflag.hxx"
 #include "hcore/harray.hxx"
+#include "hcore/hboundcall.hxx"
 
 namespace yaal {
 
@@ -71,6 +72,7 @@ public:
 	typedef HMatchIterator iterator;
 	typedef HRegex this_type;
 	typedef yaal::hcore::HArray<HMatch> groups_t;
+	typedef yaal::hcore::HBoundCall<yaal::hcore::HString ( yaal::hcore::HString const& )> replacer_t;
 private:
 	bool    _initialized;          /*!< is regex initialized */
 	HString _pattern;              /*!< original regex pattern */
@@ -138,6 +140,8 @@ public:
 	 */
 	HMatchResult matches( HString const& string_ ) const;
 	groups_t groups( HString const& string_ ) const;
+	yaal::hcore::HString replace( yaal::hcore::HString const&, yaal::hcore::HString const& );
+	yaal::hcore::HString replace( yaal::hcore::HString const&, replacer_t const& );
 	void swap( HRegex& );
 	void clear( void );
 	HRegex copy( void ) const;

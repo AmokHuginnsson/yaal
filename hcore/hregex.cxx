@@ -293,6 +293,68 @@ HRegex::groups_t HRegex::groups_impl( char const* string_ ) const {
 	M_EPILOG
 }
 
+yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, yaal::hcore::HString const& replacement_ ) {
+	M_PROLOG
+	static char const errMsg[] = "Malformed back-reference in replacement string.";
+	static char const BACK_REF( '$' );
+	HString res;
+	int end( 0 );
+	while ( true ) {
+		groups_t g( groups_impl( text_.raw() + end ) );
+		if ( g.is_empty() ) {
+			res.append( text_, end );
+			break;
+		}
+		res.append( text_, end, g[0].start() );
+		for ( HString::const_iterator r( replacement_.begin() ), e( replacement_.end() ); r != e; ) {
+			if ( *r == BACK_REF ) {
+				++ r;
+				if ( r == e ) {
+					throw HRegexException( errMsg );
+				}
+				if ( *r == BACK_REF ) {
+					res.append( BACK_REF );
+					++ r;
+				} else {
+					HString idS;
+					while ( ( r != e ) && _digit_.has( *r ) ) {
+						idS.append( *r );
+						++ r;
+					}
+					if ( idS.is_empty() ) {
+						throw HRegexException( errMsg );
+					}
+					int id( lexical_cast<int>( idS ) );
+					if ( id >= g.get_size() ) {
+						throw HRegexException( "Invalid back-reference number in replacement string: "_ys.append( id ).append( "." ) );
+					}
+					res.append( text_, end + g[id].start(), g[id].size() );
+				}
+			} else {
+				res.append( *r );
+				++ r;
+			}
+		}
+		end += ( g[0].start() + g[0].size() );
+	}
+	return ( res );
+	M_EPILOG
+}
+
+yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, replacer_t const& replacer_ ) {
+	M_PROLOG
+	HString res;
+	int end( 0 );
+	for ( yaal::hcore::HRegex::HMatch const& m : matches( text_ ) ) {
+		res.append( text_, end, m.start() - end );
+		res.append( replacer_( text_.substr( m.start(), m.size() ) ) );
+		end = m.start() + m.size();
+	}
+	res.append( text_, end );
+	return ( res );
+	M_EPILOG
+}
+
 HRegex::HMatchIterator HRegex::find( char const* str_ ) const {
 	M_ASSERT( str_ );
 	int len( 0 );
@@ -386,6 +448,10 @@ HRegex::HMatchIterator& HRegex::HMatchIterator::operator = ( HRegex::HMatchItera
 
 HRegex::HMatch const* HRegex::HMatchIterator::operator->( void ) const {
 	return ( &_match );
+}
+
+HRegex::HMatch const& HRegex::HMatchIterator::operator* ( void ) const {
+	return ( _match );
 }
 
 bool HRegex::HMatchIterator::operator != ( HMatchIterator const& mi_ ) const {
