@@ -72,6 +72,7 @@ HRegex::compile_t const HRegex::COMPILE::DEFAULT = HRegex::COMPILE::NONE;
 HRegex::match_t const HRegex::MATCH::NONE = HRegex::match_t::new_flag();
 HRegex::match_t const HRegex::MATCH::NOT_BEGINNING_OF_LINE = HRegex::match_t::new_flag();
 HRegex::match_t const HRegex::MATCH::NOT_END_OF_LINE = HRegex::match_t::new_flag();
+HRegex::match_t const HRegex::MATCH::OVERLAPPING = HRegex::match_t::new_flag();
 HRegex::match_t const HRegex::MATCH::DEFAULT = HRegex::MATCH::NONE;
 
 HRegex::HRegex( void )
@@ -243,7 +244,7 @@ int HRegex::error_code( void ) const {
 	return ( _lastError );
 }
 
-char const* HRegex::matches_impl( char const* string_, int* matchLength_ ) const {
+char const* HRegex::matches_impl( char const* string_, int* matchLength_, match_t match_ ) const {
 	M_PROLOG
 	M_ASSERT( string_ && matchLength_ );
 	if ( ! _initialized ) {
@@ -253,7 +254,11 @@ char const* HRegex::matches_impl( char const* string_, int* matchLength_ ) const
 	char const* ptr = nullptr;
 	int matchLength = 0;
 	regmatch_t match;
-	_lastError = ::regexec( _compiled.get<regex_t>(), string_, 1, &match, 0 );
+	_lastError = ::regexec(
+		_compiled.get<regex_t>(),
+		string_, 1, &match,
+		( ( match_ & MATCH::NOT_BEGINNING_OF_LINE ) ? REG_NOTBOL : 0 ) | ( ( match_ & MATCH::NOT_END_OF_LINE ) ? REG_NOTEOL : 0 )
+	);
 	if ( ! _lastError ) {
 		matchLength = static_cast<int>( match.rm_eo - match.rm_so );
 		ptr = string_ + match.rm_so;
@@ -264,7 +269,7 @@ char const* HRegex::matches_impl( char const* string_, int* matchLength_ ) const
 	M_EPILOG
 }
 
-HRegex::groups_t HRegex::groups_impl( char const* string_ ) const {
+HRegex::groups_t HRegex::groups_impl( char const* string_, match_t match_ ) const {
 	M_PROLOG
 	groups_t g;
 	typedef yaal::hcore::HArray<regmatch_t> matches_t;
@@ -275,7 +280,7 @@ HRegex::groups_t HRegex::groups_impl( char const* string_ ) const {
 		string_,
 		static_cast<size_t>( expectedGroupCount ),
 		matchesBuffer.data(),
-		0
+		( ( match_ & MATCH::NOT_BEGINNING_OF_LINE ) ? REG_NOTBOL : 0 ) | ( ( match_ & MATCH::NOT_END_OF_LINE ) ? REG_NOTEOL : 0 )
 	);
 	if ( ! _lastError ) {
 		int groupCount( 0 );
@@ -293,14 +298,14 @@ HRegex::groups_t HRegex::groups_impl( char const* string_ ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, yaal::hcore::HString const& replacement_ ) {
+yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, yaal::hcore::HString const& replacement_, match_t match_ ) {
 	M_PROLOG
 	static char const errMsg[] = "Malformed back-reference in replacement string.";
 	static char const BACK_REF( '$' );
 	HString res;
 	int end( 0 );
 	while ( true ) {
-		groups_t g( groups_impl( text_.raw() + end ) );
+		groups_t g( groups_impl( text_.raw() + end, match_ ) );
 		if ( g.is_empty() ) {
 			res.append( text_, end );
 			break;
@@ -341,11 +346,11 @@ yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, yaal::h
 	M_EPILOG
 }
 
-yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, replacer_t const& replacer_ ) {
+yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, replacer_t const& replacer_, match_t match_ ) {
 	M_PROLOG
 	HString res;
 	int end( 0 );
-	for ( yaal::hcore::HRegex::HMatch const& m : matches( text_ ) ) {
+	for ( yaal::hcore::HRegex::HMatch const& m : matches( text_, match_ ) ) {
 		res.append( text_, end, m.start() - end );
 		res.append( replacer_( text_.substr( m.start(), m.size() ) ) );
 		end = m.start() + m.size();
@@ -355,29 +360,29 @@ yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, replace
 	M_EPILOG
 }
 
-HRegex::HMatchIterator HRegex::find( char const* str_ ) const {
+HRegex::HMatchIterator HRegex::find( char const* str_, match_t match_ ) const {
 	M_ASSERT( str_ );
 	int len( 0 );
-	char const* start( matches_impl( str_, &len ) );
-	HMatchIterator it( this, str_, start ? static_cast<int>( start - str_ ) : -1, len );
+	char const* start( matches_impl( str_, &len, match_ ) );
+	HMatchIterator it( this, match_, str_, start ? static_cast<int>( start - str_ ) : -1, len );
 	return ( it );
 }
 
-HRegex::HMatchIterator HRegex::find( HString const& str_ ) const {
-	return ( find( str_.raw() ) );
+HRegex::HMatchIterator HRegex::find( HString const& str_, match_t match_ ) const {
+	return ( find( str_.raw(), match_ ) );
 }
 
 HRegex::HMatchIterator HRegex::end( void ) const {
-	return ( HMatchIterator( this, nullptr, -1, 0 ) );
+	return ( HMatchIterator( this, MATCH::NONE, nullptr, -1, 0 ) );
 }
 
-HRegex::HMatchResult HRegex::matches( HString const& str_ ) const {
-	return ( HMatchResult( find( str_ ), end() ) );
+HRegex::HMatchResult HRegex::matches( HString const& str_, match_t match_ ) const {
+	return ( HMatchResult( find( str_, match_ ), end() ) );
 }
 
-HRegex::groups_t HRegex::groups( yaal::hcore::HString const& string_ ) const {
+HRegex::groups_t HRegex::groups( yaal::hcore::HString const& string_, match_t match_ ) const {
 	M_PROLOG
-	return ( groups_impl( string_.raw() ) );
+	return ( groups_impl( string_.raw(), match_ ) );
 	M_EPILOG
 }
 
@@ -421,11 +426,13 @@ int HRegex::HMatch::size( void ) const {
 
 HRegex::HMatchIterator::HMatchIterator(
 	HRegex const* owner_,
+	HRegex::match_t flags_,
 	char const* string_,
 	int start_,
 	int len_
 ) : base_type()
 	, _owner( owner_ )
+	, _flags( flags_ )
 	, _string( string_ )
 	, _match( start_, len_ ) {
 }
@@ -433,6 +440,7 @@ HRegex::HMatchIterator::HMatchIterator(
 HRegex::HMatchIterator::HMatchIterator( HMatchIterator const& it_ )
 	: base_type()
 	, _owner( it_._owner )
+	, _flags( it_._flags )
 	, _string( it_._string )
 	, _match( it_._match ) {
 }
@@ -440,6 +448,7 @@ HRegex::HMatchIterator::HMatchIterator( HMatchIterator const& it_ )
 HRegex::HMatchIterator& HRegex::HMatchIterator::operator = ( HRegex::HMatchIterator const& it_ ) {
 	if ( &it_ != this ) {
 		_owner = it_._owner;
+		_flags = it_._flags;
 		_match = it_._match;
 		_string = it_._string;
 	}
@@ -471,7 +480,7 @@ bool HRegex::HMatchIterator::operator == ( HMatchIterator const& mi_ ) const {
 HRegex::HMatchIterator& HRegex::HMatchIterator::operator ++ ( void ) {
 	M_PROLOG
 	M_ASSERT( _string && ( _match._start >= 0 ) );
-	char const* match( _owner->matches_impl( _string + _match._start + 1, &_match._size ) );
+	char const* match( _owner->matches_impl( _string + _match._start + ( ( _flags & MATCH::OVERLAPPING ) ? 1 : _match._size ), &_match._size, _flags ) );
 	_match._start = match ? static_cast<int>( match - _string ) : -1;
 	return ( *this );
 	M_EPILOG

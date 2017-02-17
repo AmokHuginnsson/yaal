@@ -64,6 +64,7 @@ public:
 		static M_YAAL_HCORE_PUBLIC_API match_t const NONE;
 		static M_YAAL_HCORE_PUBLIC_API match_t const NOT_BEGINNING_OF_LINE;
 		static M_YAAL_HCORE_PUBLIC_API match_t const NOT_END_OF_LINE;
+		static M_YAAL_HCORE_PUBLIC_API match_t const OVERLAPPING;
 		static M_YAAL_HCORE_PUBLIC_API match_t const DEFAULT;
 	};
 	class HMatchResult;
@@ -130,18 +131,18 @@ public:
 	 * Parameter must be raw memory pointer for HMatchIterator returns
 	 * raw memory pointers to input string while dereferenced.
 	 */
-	HMatchIterator find( char const* string_ ) const;
-	HMatchIterator find( HString const& string_ ) const;
+	HMatchIterator find( char const* string_, match_t = MATCH::DEFAULT ) const;
+	HMatchIterator find( HString const& string_, match_t = MATCH::DEFAULT ) const;
 	HMatchIterator end( void ) const;
 	/*! \brief Tell if given string matches regex.
 	 *
 	 * \param string_ - string to check against the regex.
 	 * \return True iff given string matches this regex.
 	 */
-	HMatchResult matches( HString const& string_ ) const;
-	groups_t groups( HString const& string_ ) const;
-	yaal::hcore::HString replace( yaal::hcore::HString const&, yaal::hcore::HString const& );
-	yaal::hcore::HString replace( yaal::hcore::HString const&, replacer_t const& );
+	HMatchResult matches( HString const& string_, match_t = MATCH::DEFAULT ) const;
+	groups_t groups( HString const& string_, match_t = MATCH::DEFAULT ) const;
+	yaal::hcore::HString replace( yaal::hcore::HString const&, yaal::hcore::HString const&, match_t = MATCH::DEFAULT );
+	yaal::hcore::HString replace( yaal::hcore::HString const&, replacer_t const&, match_t = MATCH::DEFAULT );
 	void swap( HRegex& );
 	void clear( void );
 	HRegex copy( void ) const;
@@ -149,8 +150,8 @@ private:
 	HRegex( HRegex const& ) = delete;
 	HRegex& operator = ( HRegex const& ) = delete;
 	void error_clear( void ) const;
-	char const* matches_impl( char const*, int* ) const;
-	groups_t groups_impl( char const* ) const;
+	char const* matches_impl( char const*, int*, match_t ) const;
+	groups_t groups_impl( char const*, match_t ) const;
 };
 
 /*! \brief Instance of single match for given regex.
@@ -170,6 +171,7 @@ private:
  */
 class HRegex::HMatchIterator : public iterator_interface<HMatch, iterator_category::forward> {
 	HRegex const* _owner;
+	HRegex::match_t _flags;
 	char const* _string;
 	HRegex::HMatch _match;
 public:
@@ -182,7 +184,7 @@ public:
 	HMatchIterator( HMatchIterator const& );
 	HMatchIterator& operator = ( HMatchIterator const& );
 private:
-	HMatchIterator( HRegex const*, char const*, int, int );
+	HMatchIterator( HRegex const*, match_t, char const*, int, int );
 	friend class HRegex;
 };
 
