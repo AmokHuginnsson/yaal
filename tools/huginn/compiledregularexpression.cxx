@@ -70,6 +70,16 @@ HHuginn::value_t HCompiledRegularExpression::match(
 	return ( cre->do_match( thread_, values_, position_ ) );
 }
 
+HHuginn::value_t HCompiledRegularExpression::replace(
+	huginn::HThread* thread_,
+	HHuginn::value_t* object_,
+	HHuginn::values_t const& values_,
+	int position_
+) {
+	HCompiledRegularExpression* cre( static_cast<HCompiledRegularExpression*>( object_->raw() ) );
+	return ( cre->do_replace( thread_, values_, position_ ) );
+}
+
 class HCompiledRegularExpressionClass : public HHuginn::HClass {
 	HHuginn::class_t const& _exceptionClass;
 	HHuginn::class_t _regularExpressionMatchClass;
@@ -86,8 +96,9 @@ public:
 			runtime_->identifier_id( "CompiledRegularExpression" ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "match",  runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HCompiledRegularExpression::match, _1, _2, _3, _4 ) ),  "( *text* ) - find a match of this compiled regular expression in given *text*" },
-				{ "groups", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HCompiledRegularExpression::groups, _1, _2, _3, _4 ) ), "( *text* ) - get all matching regular expression groups from this regular expression in given *text*" }
+				{ "match",   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HCompiledRegularExpression::match, _1, _2, _3, _4 ) ),   "( *text* ) - find a match of this compiled regular expression in given *text*" },
+				{ "groups",  runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HCompiledRegularExpression::groups, _1, _2, _3, _4 ) ),  "( *text* ) - get all matching regular expression groups from this regular expression in given *text*" },
+				{ "replace", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HCompiledRegularExpression::replace, _1, _2, _3, _4 ) ), "( *text*, *replacement* ) - replace each occurrence of matched groups in *text* with *replacement* pattern" }
 			},
 			"The `CompiledRegularExpression` class gives access to result of regular expression based text searches."
 		)
@@ -97,6 +108,9 @@ public:
 	}
 	HHuginn::HClass const* regular_expression_match_class( void ) const {
 		return ( _regularExpressionMatchClass.raw() );
+	}
+	HHuginn::HClass const* exception_class( void ) const {
+		return ( _exceptionClass.raw() );
 	}
 private:
 	virtual HHuginn::value_t do_create_instance( huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) const {
@@ -129,6 +143,22 @@ HHuginn::value_t HCompiledRegularExpression::do_match(
 	verify_signature( "CompiledRegularExpression.match", values_, { HHuginn::TYPE::STRING }, position_ );
 	HCompiledRegularExpressionClass const* creClass( static_cast<HCompiledRegularExpressionClass const*>( HValue::get_class() ) );
 	return ( thread_->object_factory().create<HRegularExpressionMatch>( creClass->regular_expression_match_class(), make_resource<HRegex>( _regex->copy() ), values_[0] ) );
+}
+
+HHuginn::value_t HCompiledRegularExpression::do_replace(
+	huginn::HThread* thread_,
+	HHuginn::values_t const& values_,
+	int position_
+) {
+	verify_signature( "CompiledRegularExpression.replace", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, position_ );
+	HHuginn::value_t v;
+	try {
+		v = thread_->object_factory().create_string( _regex->replace( get_string( values_[0] ), get_string( values_[1] ) ) );
+	} catch ( HException const& e ) {
+		HCompiledRegularExpressionClass const* creClass( static_cast<HCompiledRegularExpressionClass const*>( HValue::get_class() ) );
+		thread_->raise( creClass->exception_class(), e.what(), position_ );
+	}
+	return ( v );
 }
 
 HHuginn::value_t HCompiledRegularExpression::do_groups(
