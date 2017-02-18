@@ -49,7 +49,6 @@ include( packages )
 
 cxx_search_libraries( HCORE_LIBS timer_create rt )
 
-check_include_file_cxx( pcreposix.h HAVE_PCREPOSIX_H )
 check_include_file_cxx( execinfo.h HAVE_EXECINFO_H )
 check_include_file_cxx( termio.h HAVE_TERMIO_H )
 check_include_file_cxx( tty.h HAVE_TTY_H )

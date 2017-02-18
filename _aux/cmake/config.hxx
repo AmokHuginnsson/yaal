@@ -94,7 +94,6 @@
 #define DATADIR "@CMAKE_INSTALL_FULL_DATADIR@"
 #cmakedefine01 HAVE_OPENSSL_SSL_H
 #cmakedefine01 HAVE_LIBXML2_LIBXML_XMLVERSION_H
-#cmakedefine01 HAVE_PCREPOSIX_H
 #cmakedefine HAVE_EXECINFO_H
 #cmakedefine HAVE_TERMIO_H
 #cmakedefine HAVE_TTY_H

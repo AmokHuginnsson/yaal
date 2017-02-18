@@ -51,7 +51,6 @@ public:
 	typedef HBitFlag<COMPILE> compile_t;
 	struct COMPILE {
 		static M_YAAL_HCORE_PUBLIC_API compile_t const NONE;
-		static M_YAAL_HCORE_PUBLIC_API compile_t const EXTENDED;
 		static M_YAAL_HCORE_PUBLIC_API compile_t const IGNORE_CASE;
 #undef NEWLINE
 		static M_YAAL_HCORE_PUBLIC_API compile_t const NEWLINE;
@@ -75,15 +74,13 @@ public:
 	typedef yaal::hcore::HArray<HMatch> groups_t;
 	typedef yaal::hcore::HBoundCall<yaal::hcore::HString ( yaal::hcore::HString const& )> replacer_t;
 private:
-	bool    _initialized;          /*!< is regex initialized */
-	HString _pattern;              /*!< original regex pattern */
-	compile_t _flags;              /*!< flags used to compile this regex */
-	HChunk  _compiled;             /*!< compiled regular expression for search patterns */
+	HString _pattern;       /*!< original regex pattern */
+	compile_t _flags;       /*!< flags used to compile this regex */
+	void*   _impl;          /*!< compiled regular expression for search patterns */
+	void*   _extra;         /*!< extra implementation data */
 	mutable int _lastError;
 	/* All fields below are conceptually a memory cache. */
-	mutable HChunk _errorBuffer;   /*!< buffer for error message */
-	mutable HString _errorCause;   /*!< cause of last error */
-	mutable HString _errorMessage; /*!< error message of last operation */
+	HString _errorMessage;  /*!< error message of last operation */
 public:
 	/*! \brief Create uninitialized regex object.
 	 */
@@ -149,7 +146,7 @@ public:
 private:
 	HRegex( HRegex const& ) = delete;
 	HRegex& operator = ( HRegex const& ) = delete;
-	void error_clear( void ) const;
+	void error_clear( void );
 	char const* matches_impl( char const*, int*, match_t ) const;
 	groups_t groups_impl( char const*, match_t ) const;
 };
@@ -217,18 +214,6 @@ inline void swap( HRegex& a, HRegex& b ) {
 }
 
 }
-
-#ifdef YAAL_USE_PCRE
-#	define YAAL_REGEX_WORD_START "\\b"
-#	define YAAL_REGEX_WORD_END   "\\b"
-#elif defined ( __HOST_OS_TYPE_DARWIN__ )
-#	define YAAL_REGEX_WORD_START "[[:<:]]"
-#	define YAAL_REGEX_WORD_END   "[[:>:]]"
-#else /* Not PCRE and not Darwin. */
-#	define YAAL_REGEX_WORD_START "\\<"
-#	define YAAL_REGEX_WORD_END   "\\>"
-#endif
-
 
 #endif /* #ifndef YAAL_HCORE_HREGEX_HXX_INCLUDED */
 

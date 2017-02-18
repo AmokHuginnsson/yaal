@@ -152,7 +152,7 @@ bool substitute_environment( HString& string_ ) {
 	M_PROLOG
 	bool envVarRefFound = false;
 	if ( ! string_.is_empty() ) {
-		HRegex pattern( "[$][{][^{}]+[}]", HRegex::COMPILE::EXTENDED );
+		HRegex pattern( "[$][{][^{}]+[}]" );
 		HRegex::HMatchIterator it = pattern.find( string_.raw() );
 		if ( it != pattern.end() ) {
 			HString var = string_.mid( it->start(), it->size() );

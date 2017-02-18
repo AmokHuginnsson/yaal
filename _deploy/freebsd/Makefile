@@ -19,6 +19,7 @@ LICENSE_FILE=../../doc/COPYRIGHT
 LICENSE_PERMS=dist-mirror no-dist-sell pkg-mirror no-pkg-sell
 
 LIB_DEPENDS= \
+	libpcre.so:${PORTSDIR}/devel/pcre \
 	libxml2.so:${PORTSDIR}/textproc/libxml2 \
 	libxslt.so:${PORTSDIR}/textproc/libxslt
 BUILD_DEPENDS= \

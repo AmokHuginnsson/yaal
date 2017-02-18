@@ -3963,7 +3963,7 @@ HString string( yaal::hcore::HString const& string_, HString::action_position_t 
 
 HRegex::HRegex( hcore::HString const& string_, bool skipWS_ )
 	: HRuleBase( skipWS_ )
-	, _regex( make_pointer<hcore::HRegex>( string_, hcore::HRegex::COMPILE::EXTENDED ) )
+	, _regex( make_pointer<hcore::HRegex>( string_ ) )
 	, _actionString()
 	, _actionStringPosition() {
 	return;
@@ -3971,7 +3971,7 @@ HRegex::HRegex( hcore::HString const& string_, bool skipWS_ )
 
 HRegex::HRegex( hcore::HString const& string_, action_t const& action_, bool skipWS_ )
 	: HRuleBase( action_, skipWS_ )
-	, _regex( make_pointer<hcore::HRegex>( string_, hcore::HRegex::COMPILE::EXTENDED ) )
+	, _regex( make_pointer<hcore::HRegex>( string_ ) )
 	, _actionString()
 	, _actionStringPosition() {
 	return;
@@ -3979,7 +3979,7 @@ HRegex::HRegex( hcore::HString const& string_, action_t const& action_, bool ski
 
 HRegex::HRegex( hcore::HString const& string_, action_position_t const& action_, bool skipWS_ )
 	: HRuleBase( action_, skipWS_ )
-	, _regex( make_pointer<hcore::HRegex>( string_, hcore::HRegex::COMPILE::EXTENDED ) )
+	, _regex( make_pointer<hcore::HRegex>( string_ ) )
 	, _actionString()
 	, _actionStringPosition() {
 	return;
@@ -3987,7 +3987,7 @@ HRegex::HRegex( hcore::HString const& string_, action_position_t const& action_,
 
 HRegex::HRegex( hcore::HString const& string_, action_string_t const& action_, bool skipWS_ )
 	: HRuleBase( skipWS_ )
-	, _regex( make_pointer<hcore::HRegex>( string_, hcore::HRegex::COMPILE::EXTENDED ) )
+	, _regex( make_pointer<hcore::HRegex>( string_ ) )
 	, _actionString( action_ )
 	, _actionStringPosition() {
 	return;
@@ -3995,7 +3995,7 @@ HRegex::HRegex( hcore::HString const& string_, action_string_t const& action_, b
 
 HRegex::HRegex( hcore::HString const& string_, action_string_position_t const& action_, bool skipWS_ )
 	: HRuleBase( skipWS_ )
-	, _regex( make_pointer<hcore::HRegex>( string_, hcore::HRegex::COMPILE::EXTENDED ) )
+	, _regex( make_pointer<hcore::HRegex>( string_ ) )
 	, _actionString()
 	, _actionStringPosition( action_ ) {
 	return;

@@ -121,7 +121,7 @@ private:
 		HCompiledRegularExpression::regex_t regex(
 			make_resource<HRegex>(
 				get_string( values_[0] ),
-				HRegex::COMPILE::EXTENDED | HRegex::COMPILE::NO_EXCEPTION
+				HRegex::COMPILE::NO_EXCEPTION
 			)
 		);
 		HHuginn::value_t v( thread_->runtime().none_value() );

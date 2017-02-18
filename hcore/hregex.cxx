@@ -28,12 +28,7 @@ Copyright:
 
 #include "config.hxx"
 
-#ifdef YAAL_USE_PCRE
-#	include <pcreposix.h>
-#else /* #ifdef YAAL_USE_PCRE */
-#	include <sys/types.h> /* why? - because POSIX says so :/ */
-#	include <regex.h>     /* this one is obvious */
-#endif /* #else #ifdef YAAL_USE_PCRE */
+#include <pcre.h>
 #include <libintl.h>
 
 #include "base.hxx"
@@ -64,7 +59,6 @@ char const* _errMsgHRegex_[ 3 ] = {
 };
 
 HRegex::compile_t const HRegex::COMPILE::NONE = HRegex::compile_t::new_flag();
-HRegex::compile_t const HRegex::COMPILE::EXTENDED = HRegex::compile_t::new_flag();
 HRegex::compile_t const HRegex::COMPILE::IGNORE_CASE = HRegex::compile_t::new_flag();
 HRegex::compile_t const HRegex::COMPILE::NEWLINE = HRegex::compile_t::new_flag();
 HRegex::compile_t const HRegex::COMPILE::NO_EXCEPTION = HRegex::compile_t::new_flag();
@@ -76,13 +70,11 @@ HRegex::match_t const HRegex::MATCH::OVERLAPPING = HRegex::match_t::new_flag();
 HRegex::match_t const HRegex::MATCH::DEFAULT = HRegex::MATCH::NONE;
 
 HRegex::HRegex( void )
-	: _initialized( false )
-	, _pattern()
+	: _pattern()
 	, _flags( COMPILE::DEFAULT )
-	, _compiled( sizeof ( regex_t ) )
+	, _impl( nullptr )
+	, _extra( nullptr )
 	, _lastError( 0 )
-	, _errorBuffer()
-	, _errorCause()
 	, _errorMessage() {
 	M_PROLOG
 	return;
@@ -90,16 +82,15 @@ HRegex::HRegex( void )
 }
 
 HRegex::HRegex( HRegex&& reg_ )
-	: _initialized( reg_._initialized )
-	, _pattern( yaal::move( reg_._pattern ) )
+	: _pattern( yaal::move( reg_._pattern ) )
 	, _flags( yaal::move( reg_._flags ) )
-	, _compiled( yaal::move( reg_._compiled ) )
+	, _impl( yaal::move( reg_._impl ) )
+	, _extra( yaal::move( reg_._extra ) )
 	, _lastError( reg_._lastError )
-	, _errorBuffer( yaal::move( reg_._errorBuffer ) )
-	, _errorCause( yaal::move( reg_._errorCause ) )
 	, _errorMessage( yaal::move( reg_._errorMessage ) ) {
 	M_PROLOG
-	reg_._initialized = false;
+	reg_._extra = nullptr;
+	reg_._impl = nullptr;
 	reg_._flags = COMPILE::DEFAULT;
 	reg_._lastError = 0;
 	return;
@@ -107,13 +98,11 @@ HRegex::HRegex( HRegex&& reg_ )
 }
 
 HRegex::HRegex( HString const& pattern_, compile_t flags_ )
-	: _initialized( false )
-	, _pattern()
+	: _pattern()
 	, _flags( flags_ )
-	, _compiled( sizeof ( regex_t ) )
+	, _impl( nullptr )
+	, _extra( nullptr )
 	, _lastError( 0 )
-	, _errorBuffer()
-	, _errorCause()
 	, _errorMessage() {
 	M_PROLOG
 	compile( pattern_, flags_ );
@@ -141,13 +130,11 @@ HRegex& HRegex::operator = ( yaal::hcore::HRegex&& reg_ ) {
 void HRegex::swap( HRegex& reg_ ) {
 	if ( &reg_ != this ) {
 		using yaal::swap;
-		swap( _initialized, reg_._initialized );
 		swap( _pattern, reg_._pattern );
 		swap( _flags, reg_._flags );
-		swap( _compiled, reg_._compiled );
+		swap( _impl, reg_._impl );
+		swap( _extra, reg_._extra );
 		swap( _lastError, reg_._lastError );
-		swap( _errorBuffer, reg_._errorBuffer );
-		swap( _errorCause, reg_._errorCause );
 		swap( _errorMessage, reg_._errorMessage );
 	}
 	return;
@@ -155,14 +142,17 @@ void HRegex::swap( HRegex& reg_ ) {
 
 void HRegex::clear( void ) {
 	M_PROLOG
-	if ( _initialized ) {
-		::regfree( _compiled.get<regex_t>() );
+	if ( _extra ) {
+		::pcre_free_study( static_cast<pcre_extra*>( _extra ) );
+		_extra = nullptr;
 	}
-	_initialized = false;
+	if ( _impl ) {
+		::pcre_free( static_cast<pcre*>( _impl ) );
+		_impl = nullptr;
+	}
 	_lastError = 0;
 	_pattern.clear();
 	_flags = COMPILE::DEFAULT;
-	_errorCause.clear();
 	_errorMessage.clear();
 	return;
 	M_EPILOG
@@ -175,10 +165,9 @@ HRegex HRegex::copy( void ) const {
 	M_EPILOG
 }
 
-void HRegex::error_clear( void ) const {
+void HRegex::error_clear( void ) {
 	M_PROLOG
 	_lastError = 0;
-	_errorCause.clear();
 	_errorMessage.clear();
 	return;
 	M_EPILOG
@@ -190,22 +179,26 @@ bool HRegex::compile( HString const& pattern_, compile_t flags_ ) {
 		throw HRegexException( _errMsgHRegex_[ ERROR::EMPTY_PATTERN ] );
 	}
 	error_clear();
-	if ( _initialized ) {
-		::regfree( _compiled.get<regex_t>() );
-	}
-	int cflags( 0 );
-	cflags |= ( ( flags_ & COMPILE::EXTENDED ) ? REG_EXTENDED : 0 );
-	cflags |= ( ( flags_ & COMPILE::IGNORE_CASE ) ? REG_ICASE : 0 );
-	cflags |= ( ( flags_ & COMPILE::NEWLINE ) ? REG_NEWLINE : 0 );
-	_lastError = ::regcomp( _compiled.get<regex_t>(), pattern_.raw(), cflags );
+	clear();
+	int options( 0 );
+	options |= ( ( flags_ & COMPILE::IGNORE_CASE ) ? PCRE_CASELESS : 0 );
+	options |= ( ( flags_ & COMPILE::NEWLINE ) ? PCRE_MULTILINE : 0 );
+	char const* errMsg( nullptr );
+	int offset( 0 );
+	_impl = ::pcre_compile2( pattern_.raw(), options, &_lastError, &errMsg, &offset, nullptr );
 	if ( ! _lastError ) {
-		_initialized = true;
+		_extra = ::pcre_study( static_cast<pcre*>( _impl ), PCRE_STUDY_EXTRA_NEEDED | PCRE_STUDY_JIT_COMPILE, &errMsg );
+		if ( errMsg ) {
+			_lastError = 10; /* according to manual "this code is not in use" */
+		}
+	}
+	if ( ! ( _lastError || errMsg ) ) {
 		_pattern = pattern_;
 	} else {
-		_errorCause = pattern_;
-		_initialized = false;
+		_errorMessage.assign( pattern_ ).append( ":" ).append( offset ).append( ": " ).append( errMsg ? errMsg : "" ).append( errMsg ? ", " : "" ).append( _lastError );
+		clear();
 		if ( ! ( flags_ & COMPILE::NO_EXCEPTION ) ) {
-			throw HRegexException( error() );
+			throw HRegexException( _errorMessage );
 		}
 	}
 	return ( _lastError == 0 );
@@ -217,26 +210,10 @@ HString const& HRegex::pattern( void ) const {
 }
 
 bool HRegex::is_valid( void ) const {
-	return ( _initialized );
+	return ( _extra != nullptr );
 }
 
 HString const& HRegex::error( void ) const {
-	if ( _errorMessage.is_empty() ) {
-		if ( _lastError ) {
-			int long size( static_cast<int long>( ::regerror( _lastError, _compiled.get<regex_t>(), nullptr, 0 ) ) + 1 );
-			_errorBuffer.realloc( size + 1 );
-			M_ENSURE( static_cast<int>( ::regerror( _lastError, _compiled.get<regex_t>(),
-							_errorBuffer.get<char>(), static_cast<size_t>( size ) ) ) < size );
-			_errorMessage = _errorBuffer.get<char>();
-			if ( ! _errorCause.is_empty() ) {
-				_errorMessage += ": `";
-				_errorMessage += _errorCause;
-				_errorMessage += "'";
-			}
-		} else {
-			_errorMessage = _errMsgHRegex_[ ERROR::OK ];
-		}
-	}
 	return ( _errorMessage );
 }
 
@@ -247,24 +224,26 @@ int HRegex::error_code( void ) const {
 char const* HRegex::matches_impl( char const* string_, int* matchLength_, match_t match_ ) const {
 	M_PROLOG
 	M_ASSERT( string_ && matchLength_ );
-	if ( ! _initialized ) {
+	if ( _extra == nullptr ) {
 		throw HRegexException( _errMsgHRegex_[ ERROR::UNINITIALIZED ] );
 	}
-	error_clear();
 	char const* ptr = nullptr;
 	int matchLength = 0;
-	regmatch_t match;
-	_lastError = ::regexec(
-		_compiled.get<regex_t>(),
-		string_, 1, &match,
-		( ( match_ & MATCH::NOT_BEGINNING_OF_LINE ) ? REG_NOTBOL : 0 ) | ( ( match_ & MATCH::NOT_END_OF_LINE ) ? REG_NOTEOL : 0 )
+	int match[3] = { -1, -1, -1 };
+	_lastError = ::pcre_exec(
+		static_cast<pcre*>( _impl ),
+		static_cast<pcre_extra*>( _extra ),
+		string_,
+		static_cast<int>( strlen( string_ ) ),
+		0,
+		( ( match_ & MATCH::NOT_BEGINNING_OF_LINE ) ? PCRE_NOTBOL : 0 ) | ( ( match_ & MATCH::NOT_END_OF_LINE ) ? PCRE_NOTEOL : 0 ),
+		match, 3
 	);
-	if ( ! _lastError ) {
-		matchLength = static_cast<int>( match.rm_eo - match.rm_so );
-		ptr = string_ + match.rm_so;
+	if ( ( _lastError >= 0 ) && ( match[0] >= 0 ) ) {
+		matchLength = static_cast<int>( match[1] - match[0] );
+		ptr = string_ + match[0];
 	}
 	( *matchLength_ ) = matchLength;
-	error_clear();
 	return ( ptr );
 	M_EPILOG
 }
@@ -272,26 +251,31 @@ char const* HRegex::matches_impl( char const* string_, int* matchLength_, match_
 HRegex::groups_t HRegex::groups_impl( char const* string_, match_t match_ ) const {
 	M_PROLOG
 	groups_t g;
-	typedef yaal::hcore::HArray<regmatch_t> matches_t;
+	typedef yaal::hcore::HArray<int> matches_t;
 	int expectedGroupCount( static_cast<int>( count( _pattern.begin(), _pattern.end(), '(' ) + 1 ) );
-	matches_t matchesBuffer( expectedGroupCount );
-	_lastError = ::regexec(
-		_compiled.get<regex_t>(),
+	matches_t matchesBuffer( expectedGroupCount * 3, -1 );
+	_lastError = ::pcre_exec(
+		static_cast<pcre*>( _impl ),
+		static_cast<pcre_extra*>( _extra ),
 		string_,
-		static_cast<size_t>( expectedGroupCount ),
+		static_cast<int>( strlen( string_ ) ),
+		0,
+		( ( match_ & MATCH::NOT_BEGINNING_OF_LINE ) ? PCRE_NOTBOL : 0 ) | ( ( match_ & MATCH::NOT_END_OF_LINE ) ? PCRE_NOTEOL : 0 ),
 		matchesBuffer.data(),
-		( ( match_ & MATCH::NOT_BEGINNING_OF_LINE ) ? REG_NOTBOL : 0 ) | ( ( match_ & MATCH::NOT_END_OF_LINE ) ? REG_NOTEOL : 0 )
+		expectedGroupCount * 3
 	);
-	if ( ! _lastError ) {
+	if ( _lastError >= 0 ) {
 		int groupCount( 0 );
-		for ( regmatch_t const& m : matchesBuffer ) {
-			if ( m.rm_so >= 0 ) {
+		for ( int i( 0 ); i < expectedGroupCount; ++ i ) {
+			if ( matchesBuffer[i * 2] >= 0 ) {
 				++ groupCount;
 			}
 		}
-		g.reserve( groupCount );
-		for ( regmatch_t const& m : matchesBuffer ) {
-			g.emplace_back( static_cast<int>( m.rm_so ), static_cast<int>( m.rm_eo - m.rm_so ) );
+		if ( groupCount > 0 ) {
+			g.reserve( groupCount );
+			for ( int i( 0 ); i < groupCount; ++ i ) {
+				g.emplace_back( matchesBuffer[i * 2], matchesBuffer[i * 2 + 1] - matchesBuffer[i * 2] );
+			}
 		}
 	}
 	return ( g );
@@ -303,14 +287,14 @@ yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, yaal::h
 	static char const errMsg[] = "Malformed back-reference in replacement string.";
 	static char const BACK_REF( '$' );
 	HString res;
-	int end( 0 );
+	int endPos( 0 );
 	while ( true ) {
-		groups_t g( groups_impl( text_.raw() + end, match_ ) );
+		groups_t g( groups_impl( text_.raw() + endPos, match_ ) );
 		if ( g.is_empty() ) {
-			res.append( text_, end );
+			res.append( text_, endPos );
 			break;
 		}
-		res.append( text_, end, g[0].start() );
+		res.append( text_, endPos, g[0].start() );
 		for ( HString::const_iterator r( replacement_.begin() ), e( replacement_.end() ); r != e; ) {
 			if ( *r == BACK_REF ) {
 				++ r;
@@ -333,14 +317,14 @@ yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, yaal::h
 					if ( id >= g.get_size() ) {
 						throw HRegexException( "Invalid back-reference number in replacement string: "_ys.append( id ).append( "." ) );
 					}
-					res.append( text_, end + g[id].start(), g[id].size() );
+					res.append( text_, endPos + g[id].start(), g[id].size() );
 				}
 			} else {
 				res.append( *r );
 				++ r;
 			}
 		}
-		end += ( g[0].start() + g[0].size() );
+		endPos += ( g[0].start() + g[0].size() );
 	}
 	return ( res );
 	M_EPILOG
@@ -349,13 +333,13 @@ yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, yaal::h
 yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, replacer_t const& replacer_, match_t match_ ) {
 	M_PROLOG
 	HString res;
-	int end( 0 );
+	int endPos( 0 );
 	for ( yaal::hcore::HRegex::HMatch const& m : matches( text_, match_ ) ) {
-		res.append( text_, end, m.start() - end );
+		res.append( text_, endPos, m.start() - endPos );
 		res.append( replacer_( text_.substr( m.start(), m.size() ) ) );
-		end = m.start() + m.size();
+		endPos = m.start() + m.size();
 	}
-	res.append( text_, end );
+	res.append( text_, endPos );
 	return ( res );
 	M_EPILOG
 }

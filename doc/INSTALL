@@ -6,6 +6,7 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
 
   required libraries:
     - pthread (libpthread)
+    - PRCE (libpcre)
     - ssl (libssl)
     - rt (librt)
     - xml (libxml2)
