@@ -360,8 +360,18 @@ HRegex::HMatchIterator HRegex::end( void ) const {
 	return ( HMatchIterator( this, MATCH::NONE, nullptr, -1, 0 ) );
 }
 
+HRegex::HMatchResult HRegex::matches( char const* str_, match_t match_ ) const {
+	return ( HMatchResult( find( str_, match_ ), end() ) );
+}
+
 HRegex::HMatchResult HRegex::matches( HString const& str_, match_t match_ ) const {
 	return ( HMatchResult( find( str_, match_ ), end() ) );
+}
+
+HRegex::groups_t HRegex::groups( char const* string_, match_t match_ ) const {
+	M_PROLOG
+	return ( groups_impl( string_, match_ ) );
+	M_EPILOG
 }
 
 HRegex::groups_t HRegex::groups( yaal::hcore::HString const& string_, match_t match_ ) const {

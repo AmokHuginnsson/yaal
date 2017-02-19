@@ -136,7 +136,9 @@ public:
 	 * \param string_ - string to check against the regex.
 	 * \return True iff given string matches this regex.
 	 */
+	HMatchResult matches( char const* string_, match_t = MATCH::DEFAULT ) const;
 	HMatchResult matches( HString const& string_, match_t = MATCH::DEFAULT ) const;
+	groups_t groups( char const* string_, match_t = MATCH::DEFAULT ) const;
 	groups_t groups( HString const& string_, match_t = MATCH::DEFAULT ) const;
 	yaal::hcore::HString replace( yaal::hcore::HString const&, yaal::hcore::HString const&, match_t = MATCH::DEFAULT );
 	yaal::hcore::HString replace( yaal::hcore::HString const&, replacer_t const&, match_t = MATCH::DEFAULT );

@@ -62,7 +62,6 @@
 ?E@math@yaal@@3OA
 ?ECHO@FLAG@HSerial@tools@yaal@@2V?$HBitFlag@UFLAG@HSerial@tools@yaal@@@hcore@4@B
 ?EDITABLE@FLAG@HListWidget@hconsole@yaal@@2V?$HBitFlag@UFLAG@HListWidget@hconsole@yaal@@@hcore@4@B
-?EXTENDED@COMPILE@HRegex@hcore@yaal@@2V?$HBitFlag@UCOMPILE@HRegex@hcore@yaal@@@34@B
 ?FILE@TYPE@HSocket@hcore@yaal@@2V?$HBitFlag@UTYPE@HSocket@hcore@yaal@@@34@B
 ?FLOW_CONTROL_HARDWARE@FLAG@HSerial@tools@yaal@@2V?$HBitFlag@UFLAG@HSerial@tools@yaal@@@hcore@4@B
 ?FLOW_CONTROL_SOFTWARE@FLAG@HSerial@tools@yaal@@2V?$HBitFlag@UFLAG@HSerial@tools@yaal@@@hcore@4@B
@@ -94,6 +93,7 @@
 ?NOT_END_OF_LINE@MATCH@HRegex@hcore@yaal@@2V?$HBitFlag@UMATCH@HRegex@hcore@yaal@@@34@B
 ?NO_EXCEPTION@COMPILE@HRegex@hcore@yaal@@2V?$HBitFlag@UCOMPILE@HRegex@hcore@yaal@@@34@B
 ?N_1@number@hcore@yaal@@3VHNumber@23@B
+?OVERLAPPING@MATCH@HRegex@hcore@yaal@@2V?$HBitFlag@UMATCH@HRegex@hcore@yaal@@@34@B
 ?PARITY_CHECK@FLAG@HSerial@tools@yaal@@2V?$HBitFlag@UFLAG@HSerial@tools@yaal@@@hcore@4@B
 ?PARITY_ODD@FLAG@HSerial@tools@yaal@@2V?$HBitFlag@UFLAG@HSerial@tools@yaal@@@hcore@4@B
 ?PI@math@yaal@@3OA
