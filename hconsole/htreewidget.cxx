@@ -174,23 +174,23 @@ int HTreeWidget::do_process_input( int code_ ) {
 	code_ = HWidget::do_process_input( code_ );
 	tree_view_t::node_t node = _selected;
 	switch ( code_ ) {
-		case ( KEY_CODES::HOME ):
+		case ( KEY_CODE::HOME ):
 			node = _view.get_root();
 			if ( node->has_children() ) {
 				_selected = &*node->begin();
 			}
 		break;
-		case ( KEY_CODES::END ):
+		case ( KEY_CODE::END ):
 			node = _view.get_root();
 			if ( node->has_children() ) {
 				_selected = &*prev( node->end() );
 			}
 		break;
-		case ( KEY_CODES::PAGE_UP ):
+		case ( KEY_CODE::PAGE_UP ):
 			break;
-		case ( KEY_CODES::PAGE_DOWN ):
+		case ( KEY_CODE::PAGE_DOWN ):
 			break;
-		case ( KEY_CODES::UP ): {
+		case ( KEY_CODE::UP ): {
 			_selected = previous( node );
 			if ( _selected == node ) {
 				if ( node->get_level() > 1 ) {
@@ -209,7 +209,7 @@ int HTreeWidget::do_process_input( int code_ ) {
 			}
 		}
 		break;
-		case ( KEY_CODES::RIGHT ): {
+		case ( KEY_CODE::RIGHT ): {
 			wasFolded = ! (**node)._unfolded;
 			if ( node->has_children() ) {
 				(**node)._unfolded = true;
@@ -220,7 +220,7 @@ int HTreeWidget::do_process_input( int code_ ) {
 		}
 		/* when node is unfolded, right key works as down key */
 		/* no break */
-		case ( KEY_CODES::DOWN ): {
+		case ( KEY_CODE::DOWN ): {
 			if ( (**node)._unfolded ) {
 				if ( node->has_children() ) {
 					_selected = &*node->begin();
@@ -242,7 +242,7 @@ int HTreeWidget::do_process_input( int code_ ) {
 			}
 		}
 		break;
-		case ( KEY_CODES::LEFT ):
+		case ( KEY_CODE::LEFT ):
 			if ( (**node)._unfolded && node->get_level() ) {
 				(**node)._unfolded = false;
 			} else if ( node->get_level() > 1 ) {
@@ -269,7 +269,7 @@ int HTreeWidget::do_process_input( int code_ ) {
 	if ( ! errorCode ) {
 		schedule_repaint();
 		if ( _window ) {
-			_window->status_bar()->clear( COLORS::FG_LIGHTGRAY );
+			_window->status_bar()->clear( COLOR::FG_LIGHTGRAY );
 		}
 	}
 	return ( code_ );

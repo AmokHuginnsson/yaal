@@ -67,7 +67,7 @@ HStatusBarWidget::HStatusBarWidget( HWindow* parent_,
 	M_PROLOG
 	int attribute( _statusBarAttribute );
 	attribute &= 0x00ff;
-	_attributeFocused._data = attribute;
+	_attributeFocused._data = static_cast<COLOR::color_t>( attribute );
 	_statusBarAttribute &= 0xff00;
 	return;
 	M_EPILOG
@@ -113,7 +113,7 @@ void HStatusBarWidget::do_paint( void ) {
 			if ( current == _currentChoice ) {
 				cons.set_attr( _statusBarAttribute >> 8 );
 			} else {
-				cons.set_attr( COLORS::FG_LIGHTGRAY );
+				cons.set_attr( COLOR::FG_LIGHTGRAY );
 			}
 			cons.mvprintf( _rowRaw, colRaw, "[%s] ", c.first.c_str() );
 			colRaw += ( static_cast<int>( c.first.get_length() ) + 3 );
@@ -124,7 +124,7 @@ void HStatusBarWidget::do_paint( void ) {
 		cons.move( origRow, origColumn );
 	}
 	if ( _statusBarAttribute & 0xff ) {
-		_attributeEnabled._data = ( _statusBarAttribute & 0x00ff );
+		_attributeEnabled._data = static_cast<COLOR::color_t>( _statusBarAttribute & 0x00ff );
 		_statusBarAttribute &= 0xff00;
 	}
 	return;
@@ -133,7 +133,7 @@ void HStatusBarWidget::do_paint( void ) {
 
 int HStatusBarWidget::do_process_input( int code_ ) {
 	M_PROLOG
-	if ( ( code_ == KEY_CODES::BACKSPACE )
+	if ( ( code_ == KEY_CODE::BACKSPACE )
 			&& ( _mode != PROMPT::MENU ) && ( _mode != PROMPT::DIALOG )
 			&& ! _string.get_length() ) {
 		end_prompt();
@@ -270,9 +270,10 @@ void HStatusBarWidget::message( int attribute_, char const* format_, ... ) {
 			_varTmpBuffer.clear();
 		}
 		set_text( _varTmpBuffer );
-		if ( ! ( _statusBarAttribute & 0x00ff ) )
+		if ( ! ( _statusBarAttribute & 0x00ff ) ) {
 			_statusBarAttribute |= _attributeEnabled._data;
-		_attributeEnabled._data = ( attribute_ & 0x00ff );
+		}
+		_attributeEnabled._data = static_cast<COLOR::color_t>( attribute_ & 0x00ff );
 		schedule_repaint();
 	}
 	return;
@@ -308,7 +309,7 @@ void HStatusBarWidget::clear( int attribute_ ) {
 		if ( ! ( _statusBarAttribute & 0x00ff ) ) {
 			_statusBarAttribute |= _attributeEnabled._data;
 		}
-		_attributeEnabled._data = ( attribute_ & 0x00ff );
+		_attributeEnabled._data = static_cast<COLOR::color_t>( attribute_ & 0x00ff );
 		schedule_repaint();
 	}
 	return;
@@ -421,14 +422,14 @@ int HStatusBarWidget::process_input_menu( int code_ ) {
 	M_PROLOG
 	M_ASSERT( _mode == PROMPT::MENU );
 	switch ( code_ ) {
-		case ( KEY_CODES::LEFT ): {
+		case ( KEY_CODE::LEFT ): {
 			-- _currentChoice;
 			if ( _currentChoice < 0 ) {
 				_currentChoice = static_cast<int>( _choices.get_size() - 1 );
 			}
 			schedule_repaint();
 		} break;
-		case ( KEY_CODES::RIGHT ): {
+		case ( KEY_CODE::RIGHT ): {
 			++ _currentChoice;
 			_currentChoice %= static_cast<int>( _choices.get_size() );
 			schedule_repaint();

@@ -229,7 +229,7 @@ void HListWidget::draw_header( int columns_ ) {
 				cons.set_attr( _attributeDisabled._data );
 				for ( int row = 0; row < ( _heightRaw + hR ); ++ row ) {
 					cons.move( _rowRaw + row, _columnRaw + columnOffset - 1 );
-					cons.addch( GLYPHS::LINE::SINGLE::VERTICAL );
+					cons.addch( GLYPH::LINE::SINGLE::VERTICAL );
 				}
 			}
 		}
@@ -265,11 +265,11 @@ void HListWidget::draw_scroll( int posX_ ) {
 	HConsole& cons = HConsole::get_instance();
 	if ( _widgetOffset ) {
 		cons.move( _rowRaw, posX_ );
-		cons.addch( GLYPHS::ARROW::UP );
+		cons.addch( GLYPH::ARROW::UP );
 	}
 	if ( ( size - _widgetOffset ) > _heightRaw ) {
 		cons.move( _rowRaw + _heightRaw - 1, posX_ );
-		cons.addch( GLYPHS::ARROW::DOWN );
+		cons.addch( GLYPH::ARROW::DOWN );
 	}
 	scaled = _heightRaw - 3;
 	scaled *= static_cast<double>(
@@ -654,7 +654,7 @@ bool HListWidget::commit_edit( void ) {
 			} catch ( HLexicalCastException const& e ) {
 				ok = false;
 				if ( _window ) {
-					_window->status_bar()->message( COLORS::FG_RED, "%s", e.what() );
+					_window->status_bar()->message( COLOR::FG_RED, "%s", e.what() );
 				}
 			}
 		} break;
@@ -664,12 +664,12 @@ bool HListWidget::commit_edit( void ) {
 			} catch ( HExpressionException const& e ) {
 				ok = false;
 				if ( _window ) {
-					_window->status_bar()->message( COLORS::FG_RED, "%s", e.what() );
+					_window->status_bar()->message( COLOR::FG_RED, "%s", e.what() );
 				}
 			} catch ( HLexicalCastException const& e ) {
 				ok = false;
 				if ( _window ) {
-					_window->status_bar()->message( COLORS::FG_RED, "%s", e.what() );
+					_window->status_bar()->message( COLOR::FG_RED, "%s", e.what() );
 				}
 			}
 		} break;
@@ -719,7 +719,7 @@ int HListWidget::process_input_edit( int code_ ) {
 				schedule_repaint();
 			}
 		} break;
-		case ( KEY_CODES::ESCAPE ): {
+		case ( KEY_CODE::ESCAPE ): {
 			_cellEditor._editing = false;
 			schedule_repaint();
 		} break;
@@ -742,26 +742,26 @@ int HListWidget::process_input_view( int code_ ) {
 	code_ = HWidget::do_process_input( code_ );
 	_varTmpBuffer.clear();
 	switch ( code_ ) {
-		case ( KEY_CODES::PAGE_UP ):   handle_key_page_up();   break;
-		case ( KEY_CODES::PAGE_DOWN ): handle_key_page_down(); break;
-		case ( KEY_CODES::UP ):        handle_key_up();        break;
-		case ( KEY_CODES::HOME ):      handle_key_home();      break;
-		case ( KEY_CODES::END ):       handle_key_end();       break;
-		case ( KEY_CODES::DOWN ):      handle_key_down();      break;
+		case ( KEY_CODE::PAGE_UP ):   handle_key_page_up();   break;
+		case ( KEY_CODE::PAGE_DOWN ): handle_key_page_down(); break;
+		case ( KEY_CODE::UP ):        handle_key_up();        break;
+		case ( KEY_CODE::HOME ):      handle_key_home();      break;
+		case ( KEY_CODE::END ):       handle_key_end();       break;
+		case ( KEY_CODE::DOWN ):      handle_key_down();      break;
 		case ( KEY<'n'>::ctrl ):       handle_key_ctrl_n();    break;
 		case ( KEY<'p'>::ctrl ):       handle_key_ctrl_p();    break;
 		case ( ' ' ):                  handle_key_space();     break;
-		case ( KEY_CODES::INSERT ): {
+		case ( KEY_CODE::INSERT ): {
 			if ( _editable ) {
 				handle_key_insert();
 			}
 		} break;
-		case ( KEY_CODES::DELETE ): {
+		case ( KEY_CODE::DELETE ): {
 			if ( _editable ) {
 				handle_key_delete();
 			}
 		} break;
-		case ( KEY_CODES::F2 ): {
+		case ( KEY_CODE::F2 ): {
 			if ( _editable ) {
 				handle_key_edit();
 			}
@@ -792,7 +792,7 @@ int HListWidget::process_input_view( int code_ ) {
 	if ( ! errorCode ) {
 		schedule_repaint();
 		if ( _window ) {
-			_window->status_bar()->message( COLORS::FG_LIGHTGRAY, "%s", _varTmpBuffer.raw() );
+			_window->status_bar()->message( COLOR::FG_LIGHTGRAY, "%s", _varTmpBuffer.raw() );
 		}
 	}
 	if ( get_cursor_position() != origCursorPosition ) {

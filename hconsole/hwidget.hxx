@@ -61,8 +61,8 @@ class HWidget : public yaal::hcore::HPointerFromThisInterface<HWidget> {
 public:
 	typedef HWidget this_type;
 	struct OAttribute {
-		int _label;
-		int _data;
+		COLOR::color_t _label;
+		COLOR::color_t _data;
 		bool operator == ( OAttribute const& attr_ ) const;
 	};
 /*! \brief Various configuration bits for HWidget hierarchy.

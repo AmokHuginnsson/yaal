@@ -152,23 +152,23 @@ HWidget::OAttribute make_attr( yaal::hcore::HString const& type_, yaal::tools::H
 	HWidget::OAttribute attr( init_ );
 	xml::value_t a( xml::try_attr_val( node_, "foreground_label_" + type_ ) );
 	if ( !! a ) {
-		attr._label &= 0xf0;
-		attr._label |= COLORS::from_string( *a );
+		int v( attr._label & 0xf0 );
+		attr._label = static_cast<COLOR::color_t>( v | COLOR::from_string( *a ) );
 	}
 	a = xml::try_attr_val( node_, "background_label_" + type_ );
 	if ( !! a ) {
-		attr._label &= 0x0f;
-		attr._label |= COLORS::fg_to_bg( COLORS::from_string( *a ) );
+		int v( attr._label & 0x0f );
+		attr._label = static_cast<COLOR::color_t>( v | COLOR::fg_to_bg( COLOR::from_string( *a ) ) );
 	}
 	a = xml::try_attr_val( node_, "foreground_data_" + type_ );
 	if ( !! a ) {
-		attr._data &= 0xf0;
-		attr._data |= COLORS::from_string( *a );
+		int v( attr._data & 0xf0 );
+		attr._data = static_cast<COLOR::color_t>( v | COLOR::from_string( *a ) );
 	}
 	a = xml::try_attr_val( node_, "background_data_" + type_ );
 	if ( !! a ) {
-		attr._data &= 0x0f;
-		attr._data |= COLORS::fg_to_bg( COLORS::from_string( *a ) );
+		int v( attr._data & 0x0f );
+		attr._data = static_cast<COLOR::color_t>( v | COLOR::fg_to_bg( COLOR::from_string( *a ) ) );
 	}
 	return ( attr );
 	M_EPILOG

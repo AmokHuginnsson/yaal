@@ -60,113 +60,114 @@ M_VCSID( "$Id: " __TID__ " $" )
 #	error "No ncurses header available."
 #endif /* not HAVE_NCURSES_CURSES_H */
 
-#undef COLORS
+#undef COLOR
 
 using namespace yaal::hcore;
 using namespace yaal::meta;
 using namespace yaal::tools;
+using namespace yaal::ansi;
 
 namespace yaal {
 
 namespace hconsole {
 
-STATIC_ASSERT( KEY_CODES::SPECIAL_KEY > KEY_MAX );
+STATIC_ASSERT( KEY_CODE::SPECIAL_KEY > KEY_MAX );
 
 #ifdef HAVE_ASCII_GRAPHICS
-int GLYPHS::ARROW::DOWN;
-int GLYPHS::ARROW::UP;
-int GLYPHS::ARROW::LEFT;
-int GLYPHS::ARROW::RIGHT;
-int GLYPHS::ARROW::HORIZONTAL;
-int GLYPHS::ARROW::VERTICAL;
+int GLYPH::ARROW::DOWN;
+int GLYPH::ARROW::UP;
+int GLYPH::ARROW::LEFT;
+int GLYPH::ARROW::RIGHT;
+int GLYPH::ARROW::HORIZONTAL;
+int GLYPH::ARROW::VERTICAL;
 
-int GLYPHS::CHECKER::SPARSE;
-int GLYPHS::CHECKER::MEDIUM;
-int GLYPHS::CHECKER::DENSE;
+int GLYPH::CHECKER::SPARSE;
+int GLYPH::CHECKER::MEDIUM;
+int GLYPH::CHECKER::DENSE;
 
-int GLYPHS::LINE::SINGLE::VERTICAL;
-int GLYPHS::LINE::SINGLE::HORIZONTAL;
-int GLYPHS::LINE::SINGLE::BOTTOM_LEFT;
-int GLYPHS::LINE::SINGLE::BOTTOM_RIGHT;
-int GLYPHS::LINE::SINGLE::TOP_LEFT;
-int GLYPHS::LINE::SINGLE::TOP_RIGHT;
-int GLYPHS::LINE::SINGLE::VERTICAL_LEFT;
-int GLYPHS::LINE::SINGLE::VERTICAL_RIGHT;
-int GLYPHS::LINE::SINGLE::HORIZONTAL_TOP;
-int GLYPHS::LINE::SINGLE::HORIZONTAL_BOTTOM;
-int GLYPHS::LINE::SINGLE::CROSS;
+int GLYPH::LINE::SINGLE::VERTICAL;
+int GLYPH::LINE::SINGLE::HORIZONTAL;
+int GLYPH::LINE::SINGLE::BOTTOM_LEFT;
+int GLYPH::LINE::SINGLE::BOTTOM_RIGHT;
+int GLYPH::LINE::SINGLE::TOP_LEFT;
+int GLYPH::LINE::SINGLE::TOP_RIGHT;
+int GLYPH::LINE::SINGLE::VERTICAL_LEFT;
+int GLYPH::LINE::SINGLE::VERTICAL_RIGHT;
+int GLYPH::LINE::SINGLE::HORIZONTAL_TOP;
+int GLYPH::LINE::SINGLE::HORIZONTAL_BOTTOM;
+int GLYPH::LINE::SINGLE::CROSS;
 
-int GLYPHS::LINE::DOUBLE::VERTICAL;
-int GLYPHS::LINE::DOUBLE::HORIZONTAL;
-int GLYPHS::LINE::DOUBLE::BOTTOM_LEFT;
-int GLYPHS::LINE::DOUBLE::BOTTOM_RIGHT;
-int GLYPHS::LINE::DOUBLE::TOP_LEFT;
-int GLYPHS::LINE::DOUBLE::TOP_RIGHT;
-int GLYPHS::LINE::DOUBLE::VERTICAL_LEFT;
-int GLYPHS::LINE::DOUBLE::VERTICAL_RIGHT;
-int GLYPHS::LINE::DOUBLE::HORIZONTAL_TOP;
-int GLYPHS::LINE::DOUBLE::HORIZONTAL_BOTTOM;
-int GLYPHS::LINE::DOUBLE::CROSS;
+int GLYPH::LINE::DOUBLE::VERTICAL;
+int GLYPH::LINE::DOUBLE::HORIZONTAL;
+int GLYPH::LINE::DOUBLE::BOTTOM_LEFT;
+int GLYPH::LINE::DOUBLE::BOTTOM_RIGHT;
+int GLYPH::LINE::DOUBLE::TOP_LEFT;
+int GLYPH::LINE::DOUBLE::TOP_RIGHT;
+int GLYPH::LINE::DOUBLE::VERTICAL_LEFT;
+int GLYPH::LINE::DOUBLE::VERTICAL_RIGHT;
+int GLYPH::LINE::DOUBLE::HORIZONTAL_TOP;
+int GLYPH::LINE::DOUBLE::HORIZONTAL_BOTTOM;
+int GLYPH::LINE::DOUBLE::CROSS;
 
-int GLYPHS::MATH::NOT_EQUAL;
-int GLYPHS::MATH::LESS_EQUAL;
-int GLYPHS::MATH::GREATER_EQUAL;
-int GLYPHS::MATH::APPROXIMATELY;
-int GLYPHS::MATH::PI;
+int GLYPH::MATH::NOT_EQUAL;
+int GLYPH::MATH::LESS_EQUAL;
+int GLYPH::MATH::GREATER_EQUAL;
+int GLYPH::MATH::APPROXIMATELY;
+int GLYPH::MATH::PI;
 
 #if 0
-int const GLYPHS::MATH::SQUARE_ROOT   = static_cast<int>( ACS_ );
-int const GLYPHS::MATH::INFINITY      = static_cast<int>( ACS_ );
+int const GLYPH::MATH::SQUARE_ROOT   = static_cast<int>( ACS_ );
+int const GLYPH::MATH::INFINITY      = static_cast<int>( ACS_ );
 #endif
 
-int GLYPHS::FACE::WHITE = '@';
-int GLYPHS::FACE::BLACK = '@';
+int GLYPH::FACE::WHITE = '@';
+int GLYPH::FACE::BLACK = '@';
 #else /* than HAVE_ASCII_GRAPHICS */
 #error No ASCII box drawing.
 #endif /* not HAVE_ASCII_GRAPHICS */
 
 namespace {
 void init_glyphs( void ) {
-	GLYPHS::ARROW::DOWN       = static_cast<int>( ACS_DARROW );
-	GLYPHS::ARROW::UP         = static_cast<int>( ACS_UARROW );
-	GLYPHS::ARROW::LEFT       = static_cast<int>( ACS_LARROW );
-	GLYPHS::ARROW::RIGHT      = static_cast<int>( ACS_RARROW );
-	GLYPHS::ARROW::HORIZONTAL = static_cast<int>( ACS_HLINE );
-	GLYPHS::ARROW::VERTICAL   = static_cast<int>( ACS_VLINE );
+	GLYPH::ARROW::DOWN       = static_cast<int>( ACS_DARROW );
+	GLYPH::ARROW::UP         = static_cast<int>( ACS_UARROW );
+	GLYPH::ARROW::LEFT       = static_cast<int>( ACS_LARROW );
+	GLYPH::ARROW::RIGHT      = static_cast<int>( ACS_RARROW );
+	GLYPH::ARROW::HORIZONTAL = static_cast<int>( ACS_HLINE );
+	GLYPH::ARROW::VERTICAL   = static_cast<int>( ACS_VLINE );
 
-	GLYPHS::CHECKER::SPARSE = static_cast<int>( ACS_BOARD );
-	GLYPHS::CHECKER::MEDIUM = static_cast<int>( ACS_BOARD );
-	GLYPHS::CHECKER::DENSE  = static_cast<int>( ACS_CKBOARD );
+	GLYPH::CHECKER::SPARSE = static_cast<int>( ACS_BOARD );
+	GLYPH::CHECKER::MEDIUM = static_cast<int>( ACS_BOARD );
+	GLYPH::CHECKER::DENSE  = static_cast<int>( ACS_CKBOARD );
 
-	GLYPHS::LINE::SINGLE::VERTICAL          = static_cast<int>( ACS_VLINE );
-	GLYPHS::LINE::SINGLE::HORIZONTAL        = static_cast<int>( ACS_HLINE );
-	GLYPHS::LINE::SINGLE::BOTTOM_LEFT       = static_cast<int>( ACS_URCORNER );
-	GLYPHS::LINE::SINGLE::BOTTOM_RIGHT      = static_cast<int>( ACS_ULCORNER );
-	GLYPHS::LINE::SINGLE::TOP_LEFT          = static_cast<int>( ACS_LRCORNER );
-	GLYPHS::LINE::SINGLE::TOP_RIGHT         = static_cast<int>( ACS_LLCORNER );
-	GLYPHS::LINE::SINGLE::VERTICAL_LEFT     = static_cast<int>( ACS_RTEE );
-	GLYPHS::LINE::SINGLE::VERTICAL_RIGHT    = static_cast<int>( ACS_LTEE );
-	GLYPHS::LINE::SINGLE::HORIZONTAL_TOP    = static_cast<int>( ACS_BTEE );
-	GLYPHS::LINE::SINGLE::HORIZONTAL_BOTTOM = static_cast<int>( ACS_TTEE );
-	GLYPHS::LINE::SINGLE::CROSS             = static_cast<int>( ACS_PLUS );
+	GLYPH::LINE::SINGLE::VERTICAL          = static_cast<int>( ACS_VLINE );
+	GLYPH::LINE::SINGLE::HORIZONTAL        = static_cast<int>( ACS_HLINE );
+	GLYPH::LINE::SINGLE::BOTTOM_LEFT       = static_cast<int>( ACS_URCORNER );
+	GLYPH::LINE::SINGLE::BOTTOM_RIGHT      = static_cast<int>( ACS_ULCORNER );
+	GLYPH::LINE::SINGLE::TOP_LEFT          = static_cast<int>( ACS_LRCORNER );
+	GLYPH::LINE::SINGLE::TOP_RIGHT         = static_cast<int>( ACS_LLCORNER );
+	GLYPH::LINE::SINGLE::VERTICAL_LEFT     = static_cast<int>( ACS_RTEE );
+	GLYPH::LINE::SINGLE::VERTICAL_RIGHT    = static_cast<int>( ACS_LTEE );
+	GLYPH::LINE::SINGLE::HORIZONTAL_TOP    = static_cast<int>( ACS_BTEE );
+	GLYPH::LINE::SINGLE::HORIZONTAL_BOTTOM = static_cast<int>( ACS_TTEE );
+	GLYPH::LINE::SINGLE::CROSS             = static_cast<int>( ACS_PLUS );
 
-	GLYPHS::LINE::DOUBLE::VERTICAL          = static_cast<int>( ACS_VLINE );
-	GLYPHS::LINE::DOUBLE::HORIZONTAL        = static_cast<int>( ACS_HLINE );
-	GLYPHS::LINE::DOUBLE::BOTTOM_LEFT       = static_cast<int>( ACS_URCORNER );
-	GLYPHS::LINE::DOUBLE::BOTTOM_RIGHT      = static_cast<int>( ACS_ULCORNER );
-	GLYPHS::LINE::DOUBLE::TOP_LEFT          = static_cast<int>( ACS_LRCORNER );
-	GLYPHS::LINE::DOUBLE::TOP_RIGHT         = static_cast<int>( ACS_LLCORNER );
-	GLYPHS::LINE::DOUBLE::VERTICAL_LEFT     = static_cast<int>( ACS_RTEE );
-	GLYPHS::LINE::DOUBLE::VERTICAL_RIGHT    = static_cast<int>( ACS_LTEE );
-	GLYPHS::LINE::DOUBLE::HORIZONTAL_TOP    = static_cast<int>( ACS_BTEE );
-	GLYPHS::LINE::DOUBLE::HORIZONTAL_BOTTOM = static_cast<int>( ACS_TTEE );
-	GLYPHS::LINE::DOUBLE::CROSS             = static_cast<int>( ACS_PLUS );
+	GLYPH::LINE::DOUBLE::VERTICAL          = static_cast<int>( ACS_VLINE );
+	GLYPH::LINE::DOUBLE::HORIZONTAL        = static_cast<int>( ACS_HLINE );
+	GLYPH::LINE::DOUBLE::BOTTOM_LEFT       = static_cast<int>( ACS_URCORNER );
+	GLYPH::LINE::DOUBLE::BOTTOM_RIGHT      = static_cast<int>( ACS_ULCORNER );
+	GLYPH::LINE::DOUBLE::TOP_LEFT          = static_cast<int>( ACS_LRCORNER );
+	GLYPH::LINE::DOUBLE::TOP_RIGHT         = static_cast<int>( ACS_LLCORNER );
+	GLYPH::LINE::DOUBLE::VERTICAL_LEFT     = static_cast<int>( ACS_RTEE );
+	GLYPH::LINE::DOUBLE::VERTICAL_RIGHT    = static_cast<int>( ACS_LTEE );
+	GLYPH::LINE::DOUBLE::HORIZONTAL_TOP    = static_cast<int>( ACS_BTEE );
+	GLYPH::LINE::DOUBLE::HORIZONTAL_BOTTOM = static_cast<int>( ACS_TTEE );
+	GLYPH::LINE::DOUBLE::CROSS             = static_cast<int>( ACS_PLUS );
 
-	GLYPHS::MATH::NOT_EQUAL     = static_cast<int>( ACS_NEQUAL );
-	GLYPHS::MATH::LESS_EQUAL    = static_cast<int>( ACS_LEQUAL );
-	GLYPHS::MATH::GREATER_EQUAL = static_cast<int>( ACS_GEQUAL );
-	GLYPHS::MATH::APPROXIMATELY = '~';
-	GLYPHS::MATH::PI            = static_cast<int>( ACS_PI );
+	GLYPH::MATH::NOT_EQUAL     = static_cast<int>( ACS_NEQUAL );
+	GLYPH::MATH::LESS_EQUAL    = static_cast<int>( ACS_LEQUAL );
+	GLYPH::MATH::GREATER_EQUAL = static_cast<int>( ACS_GEQUAL );
+	GLYPH::MATH::APPROXIMATELY = '~';
+	GLYPH::MATH::PI            = static_cast<int>( ACS_PI );
 	return;
 }
 }
@@ -186,11 +187,11 @@ struct ATTR {
 			static_cast<int>(
 				COLOR_PAIR(
 					static_cast<int unsigned>(
-						( ( attr_ & COLORS::BG_MASK ) >> 1 )            /* background */
-						| ( attr_ & COLORS::FG_MASK )                   /* foreground */
+						( ( attr_ & COLOR::BG_MASK ) >> 1 )            /* background */
+						| ( attr_ & COLOR::FG_MASK )                   /* foreground */
 					)
-				) | ( ( attr_ & COLORS::FG_BOLD ) ? A_BOLD : 0 )    /* brighter foreground */
-					| ( ( attr_ & COLORS::BG_BLINK ) ? A_BLINK : 0 )  /* brighter background */
+				) | ( ( attr_ & COLOR::FG_BOLD ) ? A_BOLD : 0 )    /* brighter foreground */
+					| ( ( attr_ & COLOR::BG_BLINK ) ? A_BLINK : 0 )  /* brighter background */
 			)
 		);
 	}
@@ -199,8 +200,8 @@ struct ATTR {
 			static_cast<int>(
 				( color_ & static_cast<int>( obinary<0111>::value ) )
 				| ( ( color_ & static_cast<int>( obinary<0111000>::value ) ) << 1 )
-				| ( ( attr_ & static_cast<int>( A_BOLD ) ) ? COLORS::FG_BOLD : 0 )
-				| ( attr_ & static_cast<int>( A_BLINK ) ? COLORS::BG_BLINK : 0 )
+				| ( ( attr_ & static_cast<int>( A_BOLD ) ) ? COLOR::FG_BOLD : 0 )
+				| ( attr_ & static_cast<int>( A_BLINK ) ? COLOR::BG_BLINK : 0 )
 			)
 		);
 	}
@@ -211,15 +212,15 @@ struct ATTR {
 		 * first we swap foreground and background colors and then
 		 * we add REVERSE attribute.
 		 */
-		if ( attr_ & COLORS::BG_BLINK ) {
+		if ( attr_ & COLOR::BG_BLINK ) {
 			attr = (
 				static_cast<int>(
 					COLOR_PAIR(
 						static_cast<int unsigned>(
-								( ( attr_ & COLORS::FG_MASK ) << 3 )
-							| ( ( attr_ & COLORS::BG_MASK ) >> 4 )
+								( ( attr_ & COLOR::FG_MASK ) << 3 )
+							| ( ( attr_ & COLOR::BG_MASK ) >> 4 )
 						)
-					) | ( ( attr_ & COLORS::FG_BOLD ) ? A_BLINK : 0 )
+					) | ( ( attr_ & COLOR::FG_BOLD ) ? A_BLINK : 0 )
 						| A_BOLD | A_REVERSE
 				)
 			);
@@ -234,8 +235,8 @@ struct ATTR {
 			attr = static_cast<int>(
 				( ( color_ & static_cast<int>( obinary<0111>::value ) ) << 4 )
 				| ( ( color_ & static_cast<int>( obinary<0111000>::value ) ) >> 3 )
-				| ( attr_ & static_cast<int>( A_BLINK ) ? COLORS::FG_BOLD : 0 )
-				| COLORS::BG_BLINK
+				| ( attr_ & static_cast<int>( A_BLINK ) ? COLOR::FG_BOLD : 0 )
+				| COLOR::BG_BLINK
 			);
 		} else {
 			attr = decode( color_, attr_ );
@@ -244,26 +245,26 @@ struct ATTR {
 	}
 };
 
-int COLORS::fg_to_bg( int fg_ ) {
+COLOR::color_t COLOR::fg_to_bg( COLOR::color_t fg_ ) {
 	M_PROLOG
-	int bg( 0 );
+	color_t bg( ATTR_DEFAULT );
 	switch ( fg_ ) {
-		case ( FG_BLACK ):         bg = BG_BLACK; break;
-		case ( FG_RED ):           bg = BG_RED; break;
-		case ( FG_GREEN ):         bg = BG_GREEN; break;
-		case ( FG_BROWN ):         bg = BG_BROWN; break;
-		case ( FG_BLUE ):          bg = BG_BLUE; break;
-		case ( FG_MAGENTA ):       bg = BG_MAGENTA; break;
-		case ( FG_CYAN ):          bg = BG_CYAN; break;
-		case ( FG_LIGHTGRAY ):     bg = BG_LIGHTGRAY; break;
-		case ( FG_GRAY ):          bg = BG_GRAY; break;
-		case ( FG_BRIGHTRED ):     bg = BG_BRIGHTRED; break;
-		case ( FG_BRIGHTGREEN ):   bg = BG_BRIGHTGREEN; break;
-		case ( FG_YELLOW ):        bg = BG_YELLOW; break;
-		case ( FG_BRIGHTBLUE ):    bg = BG_BRIGHTBLUE; break;
+		case ( FG_BLACK ):         bg = BG_BLACK;         break;
+		case ( FG_RED ):           bg = BG_RED;           break;
+		case ( FG_GREEN ):         bg = BG_GREEN;         break;
+		case ( FG_BROWN ):         bg = BG_BROWN;         break;
+		case ( FG_BLUE ):          bg = BG_BLUE;          break;
+		case ( FG_MAGENTA ):       bg = BG_MAGENTA;       break;
+		case ( FG_CYAN ):          bg = BG_CYAN;          break;
+		case ( FG_LIGHTGRAY ):     bg = BG_LIGHTGRAY;     break;
+		case ( FG_GRAY ):          bg = BG_GRAY;          break;
+		case ( FG_BRIGHTRED ):     bg = BG_BRIGHTRED;     break;
+		case ( FG_BRIGHTGREEN ):   bg = BG_BRIGHTGREEN;   break;
+		case ( FG_YELLOW ):        bg = BG_YELLOW;        break;
+		case ( FG_BRIGHTBLUE ):    bg = BG_BRIGHTBLUE;    break;
 		case ( FG_BRIGHTMAGENTA ): bg = BG_BRIGHTMAGENTA; break;
-		case ( FG_BRIGHTCYAN ):    bg = BG_BRIGHTCYAN; break;
-		case ( FG_WHITE ):         bg = BG_WHITE; break;
+		case ( FG_BRIGHTCYAN ):    bg = BG_BRIGHTCYAN;    break;
+		case ( FG_WHITE ):         bg = BG_WHITE;         break;
 		default: {
 			M_THROW( "Invalid color:", fg_ );
 		}
@@ -272,10 +273,10 @@ int COLORS::fg_to_bg( int fg_ ) {
 	M_EPILOG
 }
 
-int COLORS::from_string( yaal::hcore::HString const& name_ ) {
+COLOR::color_t COLOR::from_string( yaal::hcore::HString const& name_ ) {
 	HString name( name_ );
 	name.lower();
-	int color( ATTR_DEFAULT );
+	color_t color( ATTR_DEFAULT );
 	if ( name == "black" ) {
 		color = FG_BLACK;
 	} else if ( name == "gray" ) {
@@ -312,6 +313,35 @@ int COLORS::from_string( yaal::hcore::HString const& name_ ) {
 		throw HConsoleException( "Bad color name: `"_ys.append( name_ ).append( "'." ) );
 	}
 	return ( color );
+}
+
+yaal::ansi::HSequence const& COLOR::to_ansi( color_t color_ ) {
+	M_PROLOG
+	HSequence const* seq( nullptr );
+	switch ( color_ ) {
+		case ( ATTR_DEFAULT ):     seq = &ansi::reset;         break;
+		case ( FG_BLACK ):         seq = &ansi::black;         break;
+		case ( FG_RED ):           seq = &ansi::red;           break;
+		case ( FG_GREEN ):         seq = &ansi::green;         break;
+		case ( FG_BROWN ):         seq = &ansi::brown;         break;
+		case ( FG_BLUE ):          seq = &ansi::blue;          break;
+		case ( FG_MAGENTA ):       seq = &ansi::magenta;       break;
+		case ( FG_CYAN ):          seq = &ansi::cyan;          break;
+		case ( FG_LIGHTGRAY ):     seq = &ansi::lightgray;     break;
+		case ( FG_GRAY ):          seq = &ansi::gray;          break;
+		case ( FG_BRIGHTRED ):     seq = &ansi::brightred;     break;
+		case ( FG_BRIGHTGREEN ):   seq = &ansi::brightgreen;   break;
+		case ( FG_YELLOW ):        seq = &ansi::yellow;        break;
+		case ( FG_BRIGHTBLUE ):    seq = &ansi::brightblue;    break;
+		case ( FG_BRIGHTMAGENTA ): seq = &ansi::brightmagenta; break;
+		case ( FG_BRIGHTCYAN ):    seq = &ansi::brightcyan;    break;
+		case ( FG_WHITE ):         seq = &ansi::white;         break;
+		default: {
+			seq = &ansi::reset;
+		}
+	}
+	return ( *seq );
+	M_EPILOG
 }
 
 namespace {
@@ -431,7 +461,7 @@ void HConsole::enter_curses( void ) {
 		}
 	}
 	_enabled = true;
-	set_attr( COLORS::ATTR_NORMAL );
+	set_attr( COLOR::ATTR_NORMAL );
 	set_background( _screenBackground_ );
 	if ( ::getenv( "YAAL_NO_MOUSE" ) ) {
 		_useMouse_ = USE_MOUSE::NO;
@@ -481,8 +511,8 @@ void HConsole::leave_curses( void ) {
 		static_cast<void>( mouse::mouse_close() );
 		_mouseDes = -1;
 	}
-	set_attr( COLORS::ATTR_NORMAL );
-	set_background( COLORS::ATTR_NORMAL );
+	set_attr( COLOR::ATTR_NORMAL );
+	set_background( COLOR::ATTR_NORMAL );
 	M_ENSURE( ::wprintw( static_cast<WINDOW*>( _window ), "" ) != ERR );
 	M_ENSURE( ::fflush( nullptr ) == 0 );
 	flushinp(); /* Always returns OK */
@@ -543,8 +573,8 @@ void HConsole::set_background( int color_ ) const {
 		static_cast<WINDOW*>( _window ),
 		' ' | static_cast<chtype>(
 			_brokenBrightBackground
-				? ATTR::encode_fix( COLORS::FG_BLACK | color_ )
-				: ATTR::encode( COLORS::FG_BLACK | color_ )
+				? ATTR::encode_fix( COLOR::FG_BLACK | color_ )
+				: ATTR::encode( COLOR::FG_BLACK | color_ )
 		)
 	); /* meaningless value from macro */
 	return;
@@ -746,47 +776,47 @@ void HConsole::addstr( char const* str_ ) const {
 void HConsole::ungetch( int code_ ) {
 	M_PROLOG
 	switch ( code_ ) {
-		case ( KEY_CODES::PAGE_DOWN ): code_ = KEY_NPAGE;     break;
-		case ( KEY_CODES::PAGE_UP ):   code_ = KEY_PPAGE;     break;
-		case ( KEY_CODES::HOME ):      code_ = KEY_HOME;      break;
-		case ( KEY_CODES::END ):       code_ = KEY_END;       break;
-		case ( KEY_CODES::BACKSPACE ): code_ = KEY_BACKSPACE; break;
-		case ( KEY_CODES::UP ):        code_ = KEY_UP;        break;
-		case ( KEY_CODES::DOWN ):      code_ = KEY_DOWN;      break;
-		case ( KEY_CODES::LEFT ):      code_ = KEY_LEFT;      break;
-		case ( KEY_CODES::RIGHT ):     code_ = KEY_RIGHT;     break;
-		case ( KEY_CODES::DELETE ):    code_ = KEY_DC;        break;
-		case ( KEY_CODES::INSERT ):    code_ = KEY_IC;        break;
-		case ( KEY_CODES::F1 ):        code_ = KEY_F(1);      break;
-		case ( KEY_CODES::F2 ):        code_ = KEY_F(2);      break;
-		case ( KEY_CODES::F3 ):        code_ = KEY_F(3);      break;
-		case ( KEY_CODES::F4 ):        code_ = KEY_F(4);      break;
-		case ( KEY_CODES::F5 ):        code_ = KEY_F(5);      break;
-		case ( KEY_CODES::F6 ):        code_ = KEY_F(6);      break;
-		case ( KEY_CODES::F7 ):        code_ = KEY_F(7);      break;
-		case ( KEY_CODES::F8 ):        code_ = KEY_F(8);      break;
-		case ( KEY_CODES::F9 ):        code_ = KEY_F(9);      break;
-		case ( KEY_CODES::F10 ):       code_ = KEY_F(10);      break;
-		case ( KEY_CODES::F11 ):       code_ = KEY_F(11);      break;
-		case ( KEY_CODES::F12 ):       code_ = KEY_F(12);      break;
-		case ( KEY_CODES::F13 ):       code_ = KEY_F(13);      break;
-		case ( KEY_CODES::F14 ):       code_ = KEY_F(14);      break;
-		case ( KEY_CODES::F15 ):       code_ = KEY_F(15);      break;
-		case ( KEY_CODES::F16 ):       code_ = KEY_F(16);      break;
-		case ( KEY_CODES::F17 ):       code_ = KEY_F(17);      break;
-		case ( KEY_CODES::F18 ):       code_ = KEY_F(18);      break;
-		case ( KEY_CODES::F19 ):       code_ = KEY_F(19);      break;
-		case ( KEY_CODES::F20 ):       code_ = KEY_F(20);      break;
-		case ( KEY_CODES::F21 ):       code_ = KEY_F(21);      break;
-		case ( KEY_CODES::F22 ):       code_ = KEY_F(22);      break;
-		case ( KEY_CODES::F23 ):       code_ = KEY_F(23);      break;
-		case ( KEY_CODES::F24 ):       code_ = KEY_F(24);      break;
-		case ( KEY_CODES::MOUSE ):     code_ = KEY_MOUSE;     break;
+		case ( KEY_CODE::PAGE_DOWN ): code_ = KEY_NPAGE;     break;
+		case ( KEY_CODE::PAGE_UP ):   code_ = KEY_PPAGE;     break;
+		case ( KEY_CODE::HOME ):      code_ = KEY_HOME;      break;
+		case ( KEY_CODE::END ):       code_ = KEY_END;       break;
+		case ( KEY_CODE::BACKSPACE ): code_ = KEY_BACKSPACE; break;
+		case ( KEY_CODE::UP ):        code_ = KEY_UP;        break;
+		case ( KEY_CODE::DOWN ):      code_ = KEY_DOWN;      break;
+		case ( KEY_CODE::LEFT ):      code_ = KEY_LEFT;      break;
+		case ( KEY_CODE::RIGHT ):     code_ = KEY_RIGHT;     break;
+		case ( KEY_CODE::DELETE ):    code_ = KEY_DC;        break;
+		case ( KEY_CODE::INSERT ):    code_ = KEY_IC;        break;
+		case ( KEY_CODE::F1 ):        code_ = KEY_F(1);      break;
+		case ( KEY_CODE::F2 ):        code_ = KEY_F(2);      break;
+		case ( KEY_CODE::F3 ):        code_ = KEY_F(3);      break;
+		case ( KEY_CODE::F4 ):        code_ = KEY_F(4);      break;
+		case ( KEY_CODE::F5 ):        code_ = KEY_F(5);      break;
+		case ( KEY_CODE::F6 ):        code_ = KEY_F(6);      break;
+		case ( KEY_CODE::F7 ):        code_ = KEY_F(7);      break;
+		case ( KEY_CODE::F8 ):        code_ = KEY_F(8);      break;
+		case ( KEY_CODE::F9 ):        code_ = KEY_F(9);      break;
+		case ( KEY_CODE::F10 ):       code_ = KEY_F(10);      break;
+		case ( KEY_CODE::F11 ):       code_ = KEY_F(11);      break;
+		case ( KEY_CODE::F12 ):       code_ = KEY_F(12);      break;
+		case ( KEY_CODE::F13 ):       code_ = KEY_F(13);      break;
+		case ( KEY_CODE::F14 ):       code_ = KEY_F(14);      break;
+		case ( KEY_CODE::F15 ):       code_ = KEY_F(15);      break;
+		case ( KEY_CODE::F16 ):       code_ = KEY_F(16);      break;
+		case ( KEY_CODE::F17 ):       code_ = KEY_F(17);      break;
+		case ( KEY_CODE::F18 ):       code_ = KEY_F(18);      break;
+		case ( KEY_CODE::F19 ):       code_ = KEY_F(19);      break;
+		case ( KEY_CODE::F20 ):       code_ = KEY_F(20);      break;
+		case ( KEY_CODE::F21 ):       code_ = KEY_F(21);      break;
+		case ( KEY_CODE::F22 ):       code_ = KEY_F(22);      break;
+		case ( KEY_CODE::F23 ):       code_ = KEY_F(23);      break;
+		case ( KEY_CODE::F24 ):       code_ = KEY_F(24);      break;
+		case ( KEY_CODE::MOUSE ):     code_ = KEY_MOUSE;     break;
 		default:
 		break;
 	}
-	if ( code_ >= KEY_CODES::COMMAND_BASE ) {
-		code_ -= KEY_CODES::COMMAND_BASE;
+	if ( code_ >= KEY_CODE::COMMAND_BASE ) {
+		code_ -= KEY_CODE::COMMAND_BASE;
 		M_ENSURE( ::ungetch( code_ ) != ERR );
 		code_ = KEY<>::ctrl_r( _commandComposeCharacter_ );
 	}
@@ -807,88 +837,88 @@ int HConsole::get_key( void ) const {
 	M_ENSURE( noecho() != ERR );
 	M_ENSURE( ::fflush( nullptr ) == 0 );
 	int key( wgetch( static_cast<WINDOW*>( _window ) ) );
-	M_ASSERT( key < KEY_CODES::SPECIAL_KEY );
-	if ( key == KEY_CODES::ESCAPE ) {
+	M_ASSERT( key < KEY_CODE::SPECIAL_KEY );
+	if ( key == KEY_CODE::ESCAPE ) {
 		M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), true ) != ERR );
 		key = wgetch( static_cast<WINDOW*>( _window ) );
 		M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), false ) != ERR );
 		if ( key == ERR ) {
-			key = KEY_CODES::ESCAPE;
+			key = KEY_CODE::ESCAPE;
 		} else {
 			key = KEY<>::meta_r( key );
 		}
 	}
 	if ( key == KEY<>::ctrl_r( _commandComposeCharacter_ ) ) {
 		origCursState = curs_set( CURSOR::INVISIBLE );
-		cmvprintf( _height - 1, -1, COLORS::FG_WHITE, "ctrl-%c", _commandComposeCharacter_ );
+		cmvprintf( _height - 1, -1, COLOR::FG_WHITE, "ctrl-%c", _commandComposeCharacter_ );
 		wtimeout( static_cast<WINDOW*>( _window ), _commandComposeDelay_ * 100 );
 		key = wgetch( static_cast<WINDOW*>( _window ) );
 		wtimeout( static_cast<WINDOW*>( _window ), -1 );
 		if ( key == ERR ) {
 			key = KEY<>::ctrl_r( _commandComposeCharacter_ );
-			cmvprintf( _height - 1, 0, COLORS::FG_LIGHTGRAY, "      " );
+			cmvprintf( _height - 1, 0, COLOR::FG_LIGHTGRAY, "      " );
 		} else {
 			int character = 0;
-			if ( key < KEY_CODES::ESCAPE ) {
-				key = KEY<>::command_r( character = key + KEY_CODES::CONTROL_BASE );
-			} else if ( key == KEY_CODES::ESCAPE ) {
+			if ( key < KEY_CODE::ESCAPE ) {
+				key = KEY<>::command_r( character = key + KEY_CODE::CONTROL_BASE );
+			} else if ( key == KEY_CODE::ESCAPE ) {
 				M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), true ) != ERR );
 				key = wgetch( static_cast<WINDOW*>( _window ) );
 				M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), false ) != ERR );
 				if ( key == ERR ) {
-					key = KEY<>::command_r( character = KEY_CODES::ESCAPE );
+					key = KEY<>::command_r( character = KEY_CODE::ESCAPE );
 				} else {
 					key = KEY<>::command_r( KEY<>::meta_r( character = key ) );
 				}
 			} else {
 				key = KEY<>::command_r( character = key );
 			}
-			cmvprintf( _height - 1, 6, COLORS::FG_WHITE, " %c", character );
+			cmvprintf( _height - 1, 6, COLOR::FG_WHITE, " %c", character );
 		}
 		curs_set( origCursState );
 	}
 	M_ENSURE( echo() != ERR );
-	M_ASSERT( ( key < KEY_CODES::SPECIAL_KEY ) || ( key > KEY_CODES::META_BASE ) );
+	M_ASSERT( ( key < KEY_CODE::SPECIAL_KEY ) || ( key > KEY_CODE::META_BASE ) );
 	switch ( key ) {
-		case ( KEY_NPAGE ):     key = KEY_CODES::PAGE_DOWN; break;
-		case ( KEY_PPAGE ):     key = KEY_CODES::PAGE_UP;   break;
-		case ( KEY_HOME ):      key = KEY_CODES::HOME;      break;
+		case ( KEY_NPAGE ):     key = KEY_CODE::PAGE_DOWN; break;
+		case ( KEY_PPAGE ):     key = KEY_CODE::PAGE_UP;   break;
+		case ( KEY_HOME ):      key = KEY_CODE::HOME;      break;
 		case ( 347 ):
-		case ( KEY_END ):       key = KEY_CODES::END;       break;
+		case ( KEY_END ):       key = KEY_CODE::END;       break;
 		case ( 8 ):
 		case ( 127 ):
-		case ( KEY_BACKSPACE ): key = KEY_CODES::BACKSPACE; break;
-		case ( KEY_UP ):        key = KEY_CODES::UP;        break;
-		case ( KEY_DOWN ):      key = KEY_CODES::DOWN;      break;
-		case ( KEY_LEFT ):      key = KEY_CODES::LEFT;      break;
-		case ( KEY_RIGHT ):     key = KEY_CODES::RIGHT;     break;
-		case ( KEY_DC ):        key = KEY_CODES::DELETE;    break;
-		case ( KEY_IC ):        key = KEY_CODES::INSERT;    break;
-		case ( KEY_F(1) ):      key = KEY_CODES::F1;        break;
-		case ( KEY_F(2) ):      key = KEY_CODES::F2;        break;
-		case ( KEY_F(3) ):      key = KEY_CODES::F3;        break;
-		case ( KEY_F(4) ):      key = KEY_CODES::F4;        break;
-		case ( KEY_F(5) ):      key = KEY_CODES::F5;        break;
-		case ( KEY_F(6) ):      key = KEY_CODES::F6;        break;
-		case ( KEY_F(7) ):      key = KEY_CODES::F7;        break;
-		case ( KEY_F(8) ):      key = KEY_CODES::F8;        break;
-		case ( KEY_F(9) ):      key = KEY_CODES::F9;        break;
-		case ( KEY_F(10) ):     key = KEY_CODES::F10;       break;
-		case ( KEY_F(11) ):     key = KEY_CODES::F11;       break;
-		case ( KEY_F(12) ):     key = KEY_CODES::F12;       break;
-		case ( KEY_F(13) ):     key = KEY_CODES::F13;       break;
-		case ( KEY_F(14) ):     key = KEY_CODES::F14;       break;
-		case ( KEY_F(15) ):     key = KEY_CODES::F15;       break;
-		case ( KEY_F(16) ):     key = KEY_CODES::F16;       break;
-		case ( KEY_F(17) ):     key = KEY_CODES::F17;       break;
-		case ( KEY_F(18) ):     key = KEY_CODES::F18;       break;
-		case ( KEY_F(19) ):     key = KEY_CODES::F19;       break;
-		case ( KEY_F(20) ):     key = KEY_CODES::F20;       break;
-		case ( KEY_F(21) ):     key = KEY_CODES::F21;       break;
-		case ( KEY_F(22) ):     key = KEY_CODES::F22;       break;
-		case ( KEY_F(23) ):     key = KEY_CODES::F23;       break;
-		case ( KEY_F(24) ):     key = KEY_CODES::F24;       break;
-		case ( KEY_MOUSE ):     key = KEY_CODES::MOUSE;     break;
+		case ( KEY_BACKSPACE ): key = KEY_CODE::BACKSPACE; break;
+		case ( KEY_UP ):        key = KEY_CODE::UP;        break;
+		case ( KEY_DOWN ):      key = KEY_CODE::DOWN;      break;
+		case ( KEY_LEFT ):      key = KEY_CODE::LEFT;      break;
+		case ( KEY_RIGHT ):     key = KEY_CODE::RIGHT;     break;
+		case ( KEY_DC ):        key = KEY_CODE::DELETE;    break;
+		case ( KEY_IC ):        key = KEY_CODE::INSERT;    break;
+		case ( KEY_F(1) ):      key = KEY_CODE::F1;        break;
+		case ( KEY_F(2) ):      key = KEY_CODE::F2;        break;
+		case ( KEY_F(3) ):      key = KEY_CODE::F3;        break;
+		case ( KEY_F(4) ):      key = KEY_CODE::F4;        break;
+		case ( KEY_F(5) ):      key = KEY_CODE::F5;        break;
+		case ( KEY_F(6) ):      key = KEY_CODE::F6;        break;
+		case ( KEY_F(7) ):      key = KEY_CODE::F7;        break;
+		case ( KEY_F(8) ):      key = KEY_CODE::F8;        break;
+		case ( KEY_F(9) ):      key = KEY_CODE::F9;        break;
+		case ( KEY_F(10) ):     key = KEY_CODE::F10;       break;
+		case ( KEY_F(11) ):     key = KEY_CODE::F11;       break;
+		case ( KEY_F(12) ):     key = KEY_CODE::F12;       break;
+		case ( KEY_F(13) ):     key = KEY_CODE::F13;       break;
+		case ( KEY_F(14) ):     key = KEY_CODE::F14;       break;
+		case ( KEY_F(15) ):     key = KEY_CODE::F15;       break;
+		case ( KEY_F(16) ):     key = KEY_CODE::F16;       break;
+		case ( KEY_F(17) ):     key = KEY_CODE::F17;       break;
+		case ( KEY_F(18) ):     key = KEY_CODE::F18;       break;
+		case ( KEY_F(19) ):     key = KEY_CODE::F19;       break;
+		case ( KEY_F(20) ):     key = KEY_CODE::F20;       break;
+		case ( KEY_F(21) ):     key = KEY_CODE::F21;       break;
+		case ( KEY_F(22) ):     key = KEY_CODE::F22;       break;
+		case ( KEY_F(23) ):     key = KEY_CODE::F23;       break;
+		case ( KEY_F(24) ):     key = KEY_CODE::F24;       break;
+		case ( KEY_MOUSE ):     key = KEY_CODE::MOUSE;     break;
 		default:
 		break;
 	}
@@ -1044,7 +1074,7 @@ int HConsole::on_quit( int ) {
 	M_PROLOG
 	if ( is_enabled() ) {
 		if ( tools::_ignoreSignalSIGQUIT_ ) {
-			cmvprintf( get_height() - 1, 0, COLORS::FG_BRIGHTRED,
+			cmvprintf( get_height() - 1, 0, COLOR::FG_BRIGHTRED,
 					"Hard Quit is disabled by yaal configuration." );
 		} else {
 			leave_curses();
@@ -1058,7 +1088,7 @@ int HConsole::on_tstp( int ) {
 	M_PROLOG
 	if ( is_enabled() ) {
 		if ( tools::_ignoreSignalSIGTSTP_ ) {
-			cmvprintf( get_height() - 1, 0, COLORS::FG_BRIGHTRED,
+			cmvprintf( get_height() - 1, 0, COLOR::FG_BRIGHTRED,
 					"Suspend is disabled by yaal configuration." );
 		} else {
 			leave_curses();

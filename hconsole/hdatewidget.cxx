@@ -103,7 +103,7 @@ void HDateWidget::do_paint( void ) {
 		++ rowOffset;
 		int firstDayOfMonthInWeekIdx( get_first_day_of_month_in_week_index() );
 		int weeksInMonth( ( _time.get_days_in_month() + firstDayOfMonthInWeekIdx + HTime::DAYS_IN_WEEK - 1 ) / HTime::DAYS_IN_WEEK );
-		cons.set_attr( COLORS::ATTR_NORMAL );
+		cons.set_attr( COLOR::ATTR_NORMAL );
 		cons.mvprintf( _rowRaw + rowOffset + 5, _columnRaw, "%*c", CAL_EDIT_WIDTH, ' ' );
 		set_attr_data();
 		for ( int i( 0 ); i < weeksInMonth; ++ i ) {
@@ -163,28 +163,28 @@ int HDateWidget::do_process_input( int code_ ) {
 	M_PROLOG
 	bool unknown( false );
 	switch ( code_ ) {
-		case ( KEY_CODES::DOWN ): {
+		case ( KEY_CODE::DOWN ): {
 			on_key_down();
 		} break;
-		case ( KEY_CODES::UP ): {
+		case ( KEY_CODE::UP ): {
 			on_key_up();
 		} break;
-		case ( KEY_CODES::LEFT ): {
+		case ( KEY_CODE::LEFT ): {
 			on_key_left();
 		} break;
-		case ( KEY_CODES::RIGHT ): {
+		case ( KEY_CODE::RIGHT ): {
 			on_key_right();
 		} break;
-		case ( KEY_CODES::PAGE_DOWN ): {
+		case ( KEY_CODE::PAGE_DOWN ): {
 			on_key_page_down();
 		} break;
-		case ( KEY_CODES::PAGE_UP ): {
+		case ( KEY_CODE::PAGE_UP ): {
 			on_key_page_up();
 		} break;
 		case ( '\r' ): {
 			on_key_enter();
 		} break;
-		case ( KEY_CODES::ESCAPE ): {
+		case ( KEY_CODE::ESCAPE ): {
 			on_key_enter();
 			break;
 		}
@@ -196,7 +196,7 @@ int HDateWidget::do_process_input( int code_ ) {
 		code_ = 0;
 		schedule_repaint();
 		if ( _window ) {
-			_window->status_bar()->clear( COLORS::FG_LIGHTGRAY );
+			_window->status_bar()->clear( COLOR::FG_LIGHTGRAY );
 		}
 	}
 	return ( code_ );

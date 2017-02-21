@@ -80,19 +80,19 @@ int HTimeWidget::do_process_input( int code_ ) {
 	M_PROLOG
 	int code( 0 );
 	switch ( code_ ) {
-		case ( KEY_CODES::LEFT ): {
+		case ( KEY_CODE::LEFT ): {
 			-- _activeItemIdx;
 			if ( _activeItemIdx < 0 ) {
 				_activeItemIdx += TIME_ITEMS;
 			}
 		} break;
-		case ( KEY_CODES::RIGHT ): {
+		case ( KEY_CODE::RIGHT ): {
 			++ _activeItemIdx;
 			_activeItemIdx %= TIME_ITEMS;
 		} break;
-		case ( KEY_CODES::UP ):
-		case ( KEY_CODES::DOWN ): {
-			int mod( code_ == KEY_CODES::UP ? +1 : -1 );
+		case ( KEY_CODE::UP ):
+		case ( KEY_CODE::DOWN ): {
+			int mod( code_ == KEY_CODE::UP ? +1 : -1 );
 			switch ( _activeItemIdx ) {
 				case ( IDX_HOUR ):   _time.mod_hour( mod );   break;
 				case ( IDX_MINUTE ): _time.mod_minute( mod ); break;
@@ -106,7 +106,7 @@ int HTimeWidget::do_process_input( int code_ ) {
 	if ( !code ) {
 		schedule_repaint();
 		if ( _window ) {
-			_window->status_bar()->clear( COLORS::FG_LIGHTGRAY );
+			_window->status_bar()->clear( COLOR::FG_LIGHTGRAY );
 		}
 	}
 	return ( code );

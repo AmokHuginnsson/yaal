@@ -47,23 +47,23 @@ namespace yaal {
 namespace hconsole {
 
 int _latency_ = 1;
-int _screenBackground_ = COLORS::BG_BLACK;
+int _screenBackground_ = COLOR::BG_BLACK;
 HWidget::OAttribute _attributeDisabled_ = {
-	COLORS::FG_GREEN | COLORS::BG_BLACK | COLORS::BG_BLINK,
-	COLORS::FG_LIGHTGRAY | COLORS::BG_BLACK | COLORS::BG_BLINK
+	static_cast<COLOR::color_t>( COLOR::FG_GREEN | COLOR::BG_BLACK | COLOR::BG_BLINK ),
+	static_cast<COLOR::color_t>( COLOR::FG_LIGHTGRAY | COLOR::BG_BLACK | COLOR::BG_BLINK )
 };
 HWidget::OAttribute _attributeEnabled_ = {
-	COLORS::FG_BRIGHTGREEN | COLORS::BG_BLACK | COLORS::BG_BLINK,
-	COLORS::FG_WHITE | COLORS::BG_BLACK | COLORS::BG_BLINK
+	static_cast<COLOR::color_t>( COLOR::FG_BRIGHTGREEN | COLOR::BG_BLACK | COLOR::BG_BLINK ),
+	static_cast<COLOR::color_t>( COLOR::FG_WHITE | COLOR::BG_BLACK | COLOR::BG_BLINK )
 };
 HWidget::OAttribute _attributeFocused_ = {
-	COLORS::FG_BRIGHTGREEN | COLORS::BG_BLACK | COLORS::BG_BLINK,
-	COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY
+	static_cast<COLOR::color_t>( COLOR::FG_BRIGHTGREEN | COLOR::BG_BLACK | COLOR::BG_BLINK ),
+	static_cast<COLOR::color_t>( COLOR::FG_BLACK | COLOR::BG_LIGHTGRAY )
 };
-int _attributeStatusBar_ = ( COLORS::FG_WHITE | COLORS::BG_BLACK ) << 8
-															| ( COLORS::FG_LIGHTGRAY | COLORS::BG_BLACK );
-int _attributeSearchHighlight_ = ( COLORS::FG_BLACK | COLORS::BG_BROWN | COLORS::BG_BLINK ) << 8
-																		| ( COLORS::FG_BLACK | COLORS::BG_BROWN );
+int _attributeStatusBar_ = ( COLOR::FG_WHITE | COLOR::BG_BLACK ) << 8
+															| ( COLOR::FG_LIGHTGRAY | COLOR::BG_BLACK );
+int _attributeSearchHighlight_ = ( COLOR::FG_BLACK | COLOR::BG_BROWN | COLOR::BG_BLINK ) << 8
+																		| ( COLOR::FG_BLACK | COLOR::BG_BROWN );
 USE_MOUSE _useMouse_ = USE_MOUSE::AUTO;
 char _commandComposeCharacter_ = 'x';
 int  _commandComposeDelay_ = 16;
@@ -82,22 +82,22 @@ inline void set_color_bits( int& word_, int bits_, int what_ ) {
 
 namespace {
 
-int get_color_bits( HString& value_, int what_ ) {
+COLOR::color_t get_color_bits( HString& value_, int what_ ) {
 	M_PROLOG
 	HTokenizer t( value_, " \t", HTokenizer::DELIMITED_BY_ANY_OF );
 	HString str = t[ what_ ];
-	return ( ! str.is_empty() ? COLORS::from_string( str ) : 0 );
+	return ( ! str.is_empty() ? COLOR::from_string( str ) : COLOR::ATTR_DEFAULT );
 	M_EPILOG
 }
 
 void set_color( HString& value_, HWidget::OAttribute& attribute_ ) {
 	M_PROLOG
-	int labelBg( get_color_bits( value_, 1 ) );
-	int labelFg( get_color_bits( value_, 0 ) );
-	int dataBg( get_color_bits( value_, 3 ) );
-	int dataFg( get_color_bits( value_, 2 ) );
-	attribute_._label = static_cast<u8_t>( COLORS::fg_to_bg( labelBg ) | labelFg );
-	attribute_._data = static_cast<u8_t>( COLORS::fg_to_bg( dataBg ) | dataFg );
+	COLOR::color_t labelBg( get_color_bits( value_, 1 ) );
+	COLOR::color_t labelFg( get_color_bits( value_, 0 ) );
+	COLOR::color_t dataBg( get_color_bits( value_, 3 ) );
+	COLOR::color_t dataFg( get_color_bits( value_, 2 ) );
+	attribute_._label = static_cast<COLOR::color_t>( COLOR::fg_to_bg( labelBg ) | labelFg );
+	attribute_._data = static_cast<COLOR::color_t>( COLOR::fg_to_bg( dataBg ) | dataFg );
 	return;
 	M_EPILOG
 }
@@ -131,7 +131,7 @@ bool set_hconsole_variables( HString& option_, HString& value_ ) {
 			}
 		}
 	} else if ( ! strcasecmp( option_, "screen_background" ) ) {
-		_screenBackground_ = COLORS::fg_to_bg( get_color_bits( value_, 0 ) );
+		_screenBackground_ = COLOR::fg_to_bg( get_color_bits( value_, 0 ) );
 	} else if ( ! strcasecmp( option_, "attribute_disabled" ) ) {
 		set_color( value_, _attributeDisabled_ );
 	} else if ( ! strcasecmp( option_, "attribute_enabled" ) ) {

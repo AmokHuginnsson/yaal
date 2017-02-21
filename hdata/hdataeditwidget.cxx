@@ -76,29 +76,29 @@ int HDataEditWidget::do_process_input( int code_ ) {
 	switch ( code_ ) {
 		case ( '\t' ):
 		case ( '\r' ):
-		case ( KEY_CODES::LEFT ):
-		case ( KEY_CODES::RIGHT ):
+		case ( KEY_CODE::LEFT ):
+		case ( KEY_CODE::RIGHT ):
 		case ( KEY < 'a' >::ctrl ):
-		case ( KEY_CODES::HOME ):
+		case ( KEY_CODE::HOME ):
 		case ( KEY < 'e' >::ctrl ):
-		case ( KEY_CODES::END ):
-		case ( KEY_CODES::INSERT ):
+		case ( KEY_CODE::END ):
+		case ( KEY_CODE::INSERT ):
 		case ( KEY < 'f' >::meta ):
 		case ( KEY < 'b' >::meta ):
 			noChange = true;
 		break;
-		case ( KEY_CODES::PAGE_UP ):
-		case ( KEY_CODES::PAGE_DOWN ):
-		case ( KEY_CODES::UP ):
-		case ( KEY_CODES::DOWN ):
+		case ( KEY_CODE::PAGE_UP ):
+		case ( KEY_CODE::PAGE_DOWN ):
+		case ( KEY_CODE::UP ):
+		case ( KEY_CODE::DOWN ):
 			if ( _multiLine )
 				noChange = true;
 		break;
-		case ( KEY_CODES::BACKSPACE ):
+		case ( KEY_CODE::BACKSPACE ):
 			if ( ! ( _widgetOffset + _cursorPosition ) )
 				noChange = true;
 		break;
-		case ( KEY_CODES::DELETE ):
+		case ( KEY_CODE::DELETE ):
 			if ( _string.is_empty() )
 				noChange = true;
 		break;
@@ -113,7 +113,7 @@ int HDataEditWidget::do_process_input( int code_ ) {
 		if ( is_valid() ) {
 			_attributeFocused = _attributeCache;
 		} else {
-			_attributeFocused._data = COLORS::FG_BROWN | COLORS::BG_LIGHTGRAY;
+			_attributeFocused._data = static_cast<COLOR::color_t>( COLOR::FG_BROWN | COLOR::BG_LIGHTGRAY );
 		}
 	}
 	return ( code_ );

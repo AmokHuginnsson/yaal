@@ -45,7 +45,7 @@ namespace hconsole {
 
 static int const LABEL_DECORATION_SIZE( static_cast<int>( sizeof ( "  :" ) - 1 ) );
 
-HWidget::OAttribute const HWidget::DEFAULT_ATTRS = { -1, -1 };
+HWidget::OAttribute const HWidget::DEFAULT_ATTRS = { COLOR::ATTR_DEFAULT, COLOR::ATTR_DEFAULT };
 bool HWidget::OAttribute::operator == ( OAttribute const& attr_ ) const {
 	return ( ( _label == attr_._label ) && ( _data == attr_._data ) );
 }

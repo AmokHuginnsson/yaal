@@ -37,7 +37,7 @@ namespace hconsole {
 
 HLogPad::HLogLine::HLogLine( void )
 	: _type( NONE )
-	, _attribute( COLORS::ATTR_NORMAL )
+	, _attribute( COLOR::ATTR_NORMAL )
 	, _text() {
 	M_PROLOG
 	return;
@@ -77,8 +77,8 @@ void HLogPad::do_paint( void ) {
 	draw_label();
 	_varTmpBuffer.reserve( _widthRaw );
 	_varTmpBuffer.fillz( ' ', 0, _widthRaw );
-	int bg( _focused ? COLORS::BG_GRAY : COLORS::BG_BLACK );
-	_attribute = COLORS::ATTR_NORMAL | bg;
+	int bg( _focused ? COLOR::BG_GRAY : COLOR::BG_BLACK );
+	_attribute = COLOR::ATTR_NORMAL | bg;
 	for ( int i( 0 ); i < _heightRaw; ++ i )
 		cons.cmvprintf( _rowRaw + i, _columnRaw, _attribute, _varTmpBuffer.raw() );
 	if ( ! _contents.is_empty() ) {
@@ -195,32 +195,32 @@ int HLogPad::do_process_input( int code_ ) {
 	M_PROLOG
 	int code = 0;
 	switch ( code_ ) {
-		case ( KEY_CODES::DOWN ): {
+		case ( KEY_CODE::DOWN ): {
 			if ( _lines > ( _heightRaw + _offsetRow ) ) {
 				++ _offsetRow;
 			}
 		} break;
-		case ( KEY_CODES::UP ): {
+		case ( KEY_CODE::UP ): {
 			if ( _offsetRow > 0 ) {
 				-- _offsetRow;
 			}
 		} break;
-		case ( KEY_CODES::LEFT ): {
+		case ( KEY_CODE::LEFT ): {
 			if ( _offsetColumn > 0 ) {
 				-- _offsetColumn;
 			}
 		} break;
-		case ( KEY_CODES::RIGHT ): {
+		case ( KEY_CODE::RIGHT ): {
 			++ _offsetColumn;
 			if ( _offsetColumn < 0 ) {
 				_offsetColumn = 0;
 			}
 		} break;
-		case ( KEY_CODES::HOME ): {
+		case ( KEY_CODE::HOME ): {
 			_offsetRow = 0;
 			_offsetColumn = 0;
 		} break;
-		case ( KEY_CODES::END ): {
+		case ( KEY_CODE::END ): {
 			_offsetColumn = 0;
 			if ( _lines > _heightRaw ) {
 				_offsetRow = _lines - _heightRaw;

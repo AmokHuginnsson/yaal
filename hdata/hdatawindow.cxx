@@ -64,7 +64,7 @@ HDataWindow::HDataWindow( HString const& title_, HDataProcess* owner_ )
 	register_postprocess_handler( KEY<'d'>::command, nullptr, call( &HDataWindow::handler_delete, this, _1 ) );
 	register_postprocess_handler( KEY<'w'>::command, nullptr, call( &HDataWindow::handler_save, this, _1 ) );
 	register_postprocess_handler( KEY<'r'>::ctrl, nullptr, call( &HDataWindow::handler_requery, this, _1 ) );
-	register_postprocess_handler( KEY_CODES::ESCAPE, nullptr, call( &HDataWindow::handler_cancel, this, _1 ) );
+	register_postprocess_handler( KEY_CODE::ESCAPE, nullptr, call( &HDataWindow::handler_cancel, this, _1 ) );
 	return;
 	M_EPILOG
 }
@@ -82,7 +82,7 @@ void HDataWindow::do_init( void ) {
 	_mainWidget->set_focus();
 	if ( _mainWidget ) {
 		_mainWidget->load();
-		_mainWidget->process_input( KEY_CODES::HOME );
+		_mainWidget->process_input( KEY_CODE::HOME );
 	}
 	paint();
 	return;
@@ -147,7 +147,7 @@ void HDataWindow::sync( void ) {
 bool HDataWindow::handler_add_new( hconsole::HEvent const& ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::VIEW ) {
-		_statusBar->message( COLORS::FG_BRIGHTRED, "%s",
+		_statusBar->message( COLOR::FG_BRIGHTRED, "%s",
 				_( "You cannot add new record now." ) );
 		return ( true );
 	}
@@ -162,12 +162,12 @@ bool HDataWindow::handler_add_new( hconsole::HEvent const& ) {
 bool HDataWindow::handler_edit( hconsole::HEvent const& ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::VIEW ) {
-		_statusBar->message( COLORS::FG_BRIGHTRED, "%s",
+		_statusBar->message( COLOR::FG_BRIGHTRED, "%s",
 				_( "You cannot start editing of this record." ) );
 		return ( true );
 	}
 	if ( ! _crud->get_size() ) {
-		_statusBar->message( COLORS::FG_BRIGHTRED, "%s",
+		_statusBar->message( COLOR::FG_BRIGHTRED, "%s",
 				_( "There is nothing to edit." ) );
 		return ( true );
 	}
@@ -180,12 +180,12 @@ bool HDataWindow::handler_edit( hconsole::HEvent const& ) {
 bool HDataWindow::handler_delete( hconsole::HEvent const& ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::VIEW ) {
-		_statusBar->message( COLORS::FG_BRIGHTRED, "%s",
+		_statusBar->message( COLOR::FG_BRIGHTRED, "%s",
 				_( "You cannot delete this record." ) );
 		return ( true );
 	}
 	if ( ! _crud->get_size() ) {
-		_statusBar->message( COLORS::FG_BRIGHTRED, "%s",
+		_statusBar->message( COLOR::FG_BRIGHTRED, "%s",
 				_( "There is nothing to remove." ) );
 		return ( true );
 	}
@@ -201,14 +201,14 @@ bool HDataWindow::handler_delete( hconsole::HEvent const& ) {
 bool HDataWindow::handler_save( hconsole::HEvent const& ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::EDIT ) {
-		_statusBar->message( COLORS::FG_BRIGHTRED, "%s", _( "There is nothing to save." ) );
+		_statusBar->message( COLOR::FG_BRIGHTRED, "%s", _( "There is nothing to save." ) );
 		return ( true );
 	}
 	if ( ( _mode == HCRUDDescriptor::MODE::CREATE ) || ( _mode == HCRUDDescriptor::MODE::UPDATE ) ) {
 		for ( HDataWidget* dw : _editModeWidgets ) {
 			HDataEditWidget* dew( dynamic_cast<HDataEditWidget*>( dw ) );
 			if ( dew && ! dew->is_valid() ) {
-				_statusBar->message( COLORS::FG_BRIGHTRED, _( "Invalid value in: %s" ), dew->get_label().raw() );
+				_statusBar->message( COLOR::FG_BRIGHTRED, _( "Invalid value in: %s" ), dew->get_label().raw() );
 				return ( true );
 			}
 		}
@@ -221,7 +221,7 @@ bool HDataWindow::handler_save( hconsole::HEvent const& ) {
 	sync();
 	HRecordSet::ptr_t rs = _crud->execute( _mode );
 	if ( rs->get_errno() ) {
-		_statusBar->message( COLORS::FG_BRIGHTRED, "%s", rs->get_error() );
+		_statusBar->message( COLOR::FG_BRIGHTRED, "%s", rs->get_error() );
 	} else {
 		if ( _mode == HCRUDDescriptor::MODE::CREATE ) {
 			id = rs->get_insert_id();
@@ -241,7 +241,7 @@ bool HDataWindow::handler_save( hconsole::HEvent const& ) {
 bool HDataWindow::handler_requery( hconsole::HEvent const& ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::VIEW ) {
-		_statusBar->message( COLORS::FG_BRIGHTRED, "%s",
+		_statusBar->message( COLOR::FG_BRIGHTRED, "%s",
 				_( "Finish your current operation first." ) );
 		return ( true );
 	}
@@ -266,7 +266,7 @@ bool HDataWindow::handler_cancel( hconsole::HEvent const& ) {
 	}
 	_modified = false;
 	_statusBar->paint();
-	_statusBar->message( COLORS::FG_BRIGHTRED, "%s", _( "Dropping all changes." ) );
+	_statusBar->message( COLOR::FG_BRIGHTRED, "%s", _( "Dropping all changes." ) );
 	reload_record();
 	return ( true );
 	M_EPILOG

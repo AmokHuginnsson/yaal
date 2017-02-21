@@ -232,8 +232,8 @@ bool HWindow::handler_search( HEvent const& event_ ) {
 	char prompt[] = "/\0";
 	bool consumed( false );
 	if ( (*_focusedChild)->is_searchable() ) {
-		if ( code >= KEY_CODES::COMMAND_BASE )
-			code -= KEY_CODES::COMMAND_BASE;
+		if ( code >= KEY_CODE::COMMAND_BASE )
+			code -= KEY_CODE::COMMAND_BASE;
 		prompt [ 0 ] = static_cast<char>( code );
 		_statusBar->set_prompt ( prompt, HStatusBarWidget::PROMPT::SEARCH );
 		consumed = true;

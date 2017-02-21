@@ -101,7 +101,7 @@ void HTUIProcess::init_tui( yaal::hcore::HString const& processName_, HWindow::p
 	register_postprocess_handler( CTRLS_COUNT, ctrls, call( &HTUIProcess::handler_refresh, this, _1 ) );
 	register_postprocess_handler( KEY<'x'>::command, nullptr, call( &HTUIProcess::handler_quit, this, _1 ) );
 	if ( _useMouse_ != USE_MOUSE::NO ) {
-		register_postprocess_handler( KEY_CODES::MOUSE, nullptr, call( &HTUIProcess::handler_mouse, this, _1 ) );
+		register_postprocess_handler( KEY_CODE::MOUSE, nullptr, call( &HTUIProcess::handler_mouse, this, _1 ) );
 	}
 	if ( !! mainWindow_ ) {
 		mainWindow = mainWindow_;
@@ -211,7 +211,7 @@ void HTUIProcess::process_stdin( HIODispatcher::stream_t& ) {
 		}
 		if ( ! command.is_empty() && !! (*_foregroundWindow) ) {
 			(*_foregroundWindow)->status_bar()->message(
-				COLORS::FG_RED, "unknown command: `%s'", command.raw()
+				COLOR::FG_RED, "unknown command: `%s'", command.raw()
 			);
 		}
 	}
@@ -223,22 +223,22 @@ void HTUIProcess::process_stdin( HIODispatcher::stream_t& ) {
 	_needRepaint = true;
 	if ( code ) {
 		if ( code > KEY<KEY<0>::meta>::command ) {
-			cons.cmvprintf( 0, 0, COLORS::FG_GREEN, "COMMAND-META-%c: %5d       ", code - KEY<KEY<0>::meta>::command, code );
+			cons.cmvprintf( 0, 0, COLOR::FG_GREEN, "COMMAND-META-%c: %5d       ", code - KEY<KEY<0>::meta>::command, code );
 		} else if ( code > KEY<0>::command ) {
-			cons.cmvprintf( 0, 0, COLORS::FG_GREEN, "     COMMAND-%c: %5d       ", code - KEY<0>::command, code );
+			cons.cmvprintf( 0, 0, COLOR::FG_GREEN, "     COMMAND-%c: %5d       ", code - KEY<0>::command, code );
 		} else if ( code > KEY<0>::meta ) {
-			cons.cmvprintf( 0, 0, COLORS::FG_GREEN, "        META-%c: %5d       ", code - KEY<0>::meta, code );
-		} else if ( code < KEY_CODES::ESC ) {
-			cons.cmvprintf( 0, 0, COLORS::FG_GREEN, "        CTRL-%c: %5d       ", code + KEY_CODES::CONTROL_BASE, code );
+			cons.cmvprintf( 0, 0, COLOR::FG_GREEN, "        META-%c: %5d       ", code - KEY<0>::meta, code );
+		} else if ( code < KEY_CODE::ESC ) {
+			cons.cmvprintf( 0, 0, COLOR::FG_GREEN, "        CTRL-%c: %5d       ", code + KEY_CODE::CONTROL_BASE, code );
 		} else {
-			cons.cmvprintf( 0, 0, COLORS::FG_GREEN, "             %c: %5d       ", code, code );
+			cons.cmvprintf( 0, 0, COLOR::FG_GREEN, "             %c: %5d       ", code, code );
 		}
 	} else {
-		cons.cmvprintf( 0, 0, COLORS::FG_GREEN, "                           " );
+		cons.cmvprintf( 0, 0, COLOR::FG_GREEN, "                           " );
 	}
 #endif /* __DEBUGGER_BABUNI__ */
 	if ( ! consumed && !! (*_foregroundWindow) )
-		(*_foregroundWindow)->status_bar()->message( COLORS::FG_RED,
+		(*_foregroundWindow)->status_bar()->message( COLOR::FG_RED,
 				"unknown function, err code(%d)", code );
 	return;
 	M_EPILOG
@@ -261,7 +261,7 @@ void HTUIProcess::handler_idle( void ) {
 	HString clock( HTime( HTime::TZ::LOCAL ).string() );
 	cons.cmvprintf(
 		0, static_cast<int>( cons.get_width() - clock.get_length() ),
-		COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY, clock.raw()
+		COLOR::FG_BLACK | COLOR::BG_LIGHTGRAY, clock.raw()
 	);
 	_needRepaint = true;
 #endif /* __DEBUG__ */
@@ -294,7 +294,7 @@ bool HTUIProcess::handler_mouse( HEvent const& ) {
 	}
 #ifdef __DEBUGGER_BABUNI__
 	HConsole::get_instance().cmvprintf(
-		0, 0,	COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
+		0, 0,	COLOR::FG_BLACK | COLOR::BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
 		mouse._buttons, mouse._row, mouse._column
 	);
 	_needRepaint = true;

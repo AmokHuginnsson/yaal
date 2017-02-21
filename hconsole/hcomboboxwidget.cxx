@@ -103,7 +103,7 @@ void HComboboxWidget::do_paint( void ) {
 		HEditWidget::do_paint();
 		cons.move( _rowRaw, _columnRaw + width - 1 );
 		set_attr_label();
-		cons.addch( GLYPHS::ARROW::DOWN );
+		cons.addch( GLYPH::ARROW::DOWN );
 		cons.move( _rowRaw, _columnRaw + HEditWidget::_cursorPosition );
 	} else {
 		int height( _height );
@@ -137,11 +137,11 @@ int HComboboxWidget::do_process_input( int code_ ) {
 	int code( 0 );
 	if ( _mode == MODE::EDITCONTROL ) {
 		switch ( code_ ) {
-			case ( KEY_CODES::UP ): {
+			case ( KEY_CODE::UP ): {
 				_mode = MODE::LISTCONTROL;
 				save_selection();
 			} break;
-			case ( KEY_CODES::DOWN ): {
+			case ( KEY_CODE::DOWN ): {
 				_mode = MODE::LISTCONTROL;
 				save_selection();
 			} break;
@@ -153,7 +153,7 @@ int HComboboxWidget::do_process_input( int code_ ) {
 	} else {
 		if ( code_ == '\r' ) {
 			close_combo( ACTION::APPLY );
-		} else if ( code_ == KEY_CODES::ESCAPE ) {
+		} else if ( code_ == KEY_CODE::ESCAPE ) {
 			close_combo( ACTION::CANCEL );
 		} else {
 			code = HListWidget::do_process_input( code_ );

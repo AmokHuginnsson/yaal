@@ -239,8 +239,8 @@ void HDataListWidget::do_add_new( void ) {
 		item[i].set_integer( -1 );
 	}
 	_dataModel->add_tail( item );
-	process_input( KEY_CODES::HOME );
-	process_input( KEY_CODES::END );
+	process_input( KEY_CODE::HOME );
+	process_input( KEY_CODE::END );
 	return;
 	M_EPILOG
 }
@@ -249,8 +249,8 @@ void HDataListWidget::do_cancel_new( void ) {
 	M_PROLOG
 	_dataModel->remove_tail();
 	if ( _dataModel->size() ) {
-		process_input( KEY_CODES::HOME );
-		process_input( KEY_CODES::END );
+		process_input( KEY_CODE::HOME );
+		process_input( KEY_CODE::END );
 	}
 	return;
 	M_EPILOG

@@ -456,20 +456,20 @@ int HEditWidget::do_process_input( int code_ ) {
 	int oldCursorPosition( _cursorPosition );
 	int length( static_cast<int>( _varTmpBuffer.get_length() ) );
 	switch ( code_ ) {
-		case ( KEY_CODES::PAGE_UP ):
+		case ( KEY_CODE::PAGE_UP ):
 			_historyIt = hcore::cyclic_iterator( _history );
 			errorCode = HISTORY_OPERATION;
 		break;
-		case ( KEY_CODES::PAGE_DOWN ):
+		case ( KEY_CODE::PAGE_DOWN ):
 			_historyIt = hcore::cyclic_iterator( _history );
 			-- _historyIt;
 			errorCode = HISTORY_OPERATION;
 		break;
-		case ( KEY_CODES::UP ):
+		case ( KEY_CODE::UP ):
 			++ _historyIt;
 			errorCode = HISTORY_OPERATION;
 		break;
-		case ( KEY_CODES::DOWN ):
+		case ( KEY_CODE::DOWN ):
 			-- _historyIt;
 			errorCode = HISTORY_OPERATION;
 		break;
@@ -496,31 +496,31 @@ int HEditWidget::do_process_input( int code_ ) {
 			errorCode = DATA_ENTER;
 		}
 		break;
-		case ( KEY_CODES::LEFT ):
+		case ( KEY_CODE::LEFT ):
 			errorCode = move_left();
 		break;
 		case ( KEY<'a'>::ctrl ):
-		case ( KEY_CODES::HOME ):
+		case ( KEY_CODE::HOME ):
 			_cursorPosition = 0;
 			_widgetOffset = 0;
 		break;
 		case ( KEY<'e'>::ctrl ):
-		case ( KEY_CODES::END ):
+		case ( KEY_CODE::END ):
 			errorCode = go_to_end( length );
 		break;
-		case ( KEY_CODES::RIGHT ):
+		case ( KEY_CODE::RIGHT ):
 			errorCode = move_right( length );
 		break;
 		case ( KEY<'u'>::ctrl ):
 			errorCode = kill_line();
 		break;
-		case ( KEY_CODES::DELETE ):
+		case ( KEY_CODE::DELETE ):
 			errorCode = delete_char( length );
 		break;
-		case ( KEY_CODES::BACKSPACE ):
+		case ( KEY_CODE::BACKSPACE ):
 			errorCode = kill_char();
 		break;
-		case ( KEY_CODES::INSERT ):
+		case ( KEY_CODE::INSERT ):
 			_replace = ! _replace;
 		break;
 		case ( KEY<'f'>::meta ):
@@ -545,14 +545,14 @@ int HEditWidget::do_process_input( int code_ ) {
 	if ( ! errorCode ) {
 		if ( _mask.is_valid() && ! _mask.matches( _varTmpBuffer ) ) {
 			if ( _window ) {
-				_window->status_bar()->message( COLORS::BG_BROWN, "%s", _mask.error().raw() );
+				_window->status_bar()->message( COLOR::BG_BROWN, "%s", _mask.error().raw() );
 			}
 			errorCode = 1;
 		} else {
 			code_ = 0;
 			_string = _varTmpBuffer;
 			if ( _window ) {
-				_window->status_bar()->clear( COLORS::FG_LIGHTGRAY );
+				_window->status_bar()->clear( COLOR::FG_LIGHTGRAY );
 			}
 			schedule_repaint();
 		}

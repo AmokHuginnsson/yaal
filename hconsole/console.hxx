@@ -29,6 +29,7 @@ Copyright:
 
 #include "hcore/hsingleton.hxx"
 #include "hcore/hpipe.hxx"
+#include "tools/ansi.hxx"
 #include "tools/signals.hxx"
 #include "hconsole/mouse.hxx"
 
@@ -43,7 +44,7 @@ namespace hconsole {
 
 /*! \brief Special key codes.
  */
-struct KEY_CODES {
+struct KEY_CODE {
 	static int const ESCAPE       = 27;
 	/* Coincidentally KEY_MAX from ncurses is 0777 which is 511. */
 	static int const SPECIAL_KEY  = 0x400;
@@ -90,7 +91,7 @@ struct KEY_CODES {
 
 /*! \brief Quasi graphic glyphs.
  */
-struct GLYPHS {
+struct GLYPH {
 	struct ARROW {
 		static int DOWN;
 		static int UP;
@@ -158,8 +159,8 @@ enum class CURSOR {
 
 /*! \brief TUI colors definitions.
  */
-struct COLORS {
-	enum {
+struct COLOR {
+	typedef enum {
 		FG_BLACK         = 0,
 		FG_RED           = 1,
 		FG_GREEN         = 2,
@@ -199,9 +200,10 @@ struct COLORS {
 		BG_MASK          = 0x70,
 		ATTR_NORMAL      = ( FG_LIGHTGRAY | BG_BLACK ),
 		ATTR_DEFAULT     = -1
-	};
-	static int fg_to_bg( int );
-	static int from_string( yaal::hcore::HString const& );
+	} color_t;
+	static color_t fg_to_bg( color_t );
+	static color_t from_string( yaal::hcore::HString const& );
+	static yaal::ansi::HSequence const& to_ansi( color_t );
 };
 
 /*! \brief Get special key code values.
@@ -213,17 +215,17 @@ struct COLORS {
  */
 template<int code = 0>
 struct KEY {
-	static int const meta = code + KEY_CODES::META_BASE;
+	static int const meta = code + KEY_CODE::META_BASE;
 	static int meta_r( int code_ ) {
-		return ( code_ + KEY_CODES::META_BASE );
+		return ( code_ + KEY_CODE::META_BASE );
 	}
-	static int const ctrl = code - KEY_CODES::CONTROL_BASE;
+	static int const ctrl = code - KEY_CODE::CONTROL_BASE;
 	static int ctrl_r( int code_ ) {
-		return ( code_ - KEY_CODES::CONTROL_BASE );
+		return ( code_ - KEY_CODE::CONTROL_BASE );
 	}
-	static int const command = code + KEY_CODES::COMMAND_BASE;
+	static int const command = code + KEY_CODE::COMMAND_BASE;
 	static int command_r( int code_ ) {
-		return ( code_ + KEY_CODES::COMMAND_BASE );
+		return ( code_ + KEY_CODE::COMMAND_BASE );
 	}
 };
 
