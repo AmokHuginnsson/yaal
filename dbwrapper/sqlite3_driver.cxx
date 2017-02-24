@@ -334,7 +334,7 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink& dbLink_, void* dataR_ ) {
 	if ( result && ( result->_columns > 0 ) )
 		return ( result->_rows );
 	else
-		return ( ::sqlite3_changes( static_cast<OSQLite*>( dbLink_._conn )->_db ) );
+		return ( sqlite3_changes( static_cast<OSQLite*>( dbLink_._conn )->_db ) );
 }
 
 M_EXPORT_SYMBOL int long dbrs_id( ODBLink&, void* );
