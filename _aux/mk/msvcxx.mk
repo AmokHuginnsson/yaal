@@ -21,7 +21,7 @@ debug: build/debug/stamp
 release: build/release/stamp
 
 build/debug/stamp build/release/stamp: $$(subst stamp,$(PROJECT_NAME).sln,$$(@)) $(INPUTS)
-	@export VS_VER="x`awk '/# Visual Studio /{print $$4}' $(dir $(@))/$(PROJECT_NAME).sln`" ; \
+	export VS_VER="x`awk '/# Visual Studio /{gsub(/\\r/, "", $$4); print $$4}' $(dir $(@))/$(PROJECT_NAME).sln`" ; \
 	if [ "$${VS_VER}" = "x14" ] ; then \
 		"$(CMAKE)" --build $(dir $(@)) --config $(patsubst build/%/stamp,%,$(@)) ; \
 	else \
@@ -40,7 +40,7 @@ build/debug/$(PROJECT_NAME).sln build/release/$(PROJECT_NAME).sln: ./configure.j
 install: install-debug
 
 install-debug install-release: $$(subst install-,,$$(@))
-	@export VS_VER="x`awk '/# Visual Studio /{print $$4}' build/$(subst install-,,$(@))/$(PROJECT_NAME).sln`" ; \
+	@export VS_VER="x`awk '/# Visual Studio /{gsub(/\\r/, "", $$4); print $$4}' build/$(subst install-,,$(@))/$(PROJECT_NAME).sln`" ; \
 	if [ "$${VS_VER}" = "x14" ] ; then \
 		"$(CMAKE)" --build build/$(subst install-,,$(@)) --target install --config $(subst install-,,$(@)) ; \
 	else \
@@ -48,7 +48,7 @@ install-debug install-release: $$(subst install-,,$$(@))
 	fi
 
 clean-debug clean-release: build/$$(subst clean-,,$$(@))/$(PROJECT_NAME).sln
-	@export VS_VER="x`awk '/# Visual Studio /{print $$4}' $(PROJECT_NAME).sln`" ; \
+	@export VS_VER="x`awk '/# Visual Studio /{gsub(/\\r/, "", $$4); print $$4}' $(PROJECT_NAME).sln`" ; \
 	if [ "$${VS_VER}" = "x14" ] ; then \
 		"$(CMAKE)" --build build/$(subst clean-,,$(@)) --target clean ; \
 	else \
