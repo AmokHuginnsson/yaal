@@ -7,9 +7,7 @@
 #define LOCALSTATEDIR "@CMAKE_INSTALL_FULL_LOCALSTATEDIR@"
 #define DATADIR "@CMAKE_INSTALL_FULL_DATADIR@"
 #define LIB_INFIX "@LIB_INFIX@"
-#define SIZEOF_CHTYPE @SIZEOF_CHTYPE@
-#cmakedefine HAVE_SGI_STL_EXTENSIONS
-#cmakedefine01 HAVE_DECL_RTLD_NEXT
+#cmakedefine HAVE_LOCAL_HXX
 #ifndef __GNUC__
 #define __attribute__( x ) /**/
 #endif /* not __GNUC__ */
@@ -34,5 +32,8 @@
 #define HAVE_PRETTY_FUNCTION 1
 #include <yaal/cleanup.hxx>
 #endif /* __MSVCXX__ */
+#ifdef HAVE_LOCAL_HXX
+#include "local.hxx"
+#endif /* HAVE_LOCAL_HXX */
 #endif /* not @PROJECT_NAME_UC@_CONFIG_HXX_INCLUDED */
 
