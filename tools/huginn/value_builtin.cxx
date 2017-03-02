@@ -377,7 +377,17 @@ void pow( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 		HHuginn::HReal::value_type& val( static_cast<HHuginn::HReal*>( v1_.raw() )->value() );
 		val = ::powl( val, static_cast<HHuginn::HReal const*>( v2_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
-		static_cast<HHuginn::HNumber*>( v1_.raw() )->value() ^= static_cast<HHuginn::HNumber const*>( v2_.raw() )->value().to_integer();
+		do {
+			HNumber const& exp( static_cast<HHuginn::HNumber const*>( v2_.raw() )->value() );
+			int long long expV( 0 );
+			try {
+				expV = exp.to_integer();
+			} catch ( HNumberException const& ) {
+				thread_->raise( thread_->runtime().object_factory()->arithmetic_exception_class(), "Exponent too big: "_ys.append( exp.to_string() ), position_ );
+				break;
+			}
+			static_cast<HHuginn::HNumber*>( v1_.raw() )->value() ^= expV;
+		} while ( false );
 	} else {
 		fallback_arithmetic( thread_, INTERFACE::POWER, op_to_str( OPERATOR::POWER ), v1_, v2_, position_ );
 	}
