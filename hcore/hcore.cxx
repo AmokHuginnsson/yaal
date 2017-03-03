@@ -177,11 +177,11 @@ void init_locale( char const* package_ ) {
 	char* gettextPath( ::getenv( "GETTEXT_PATH" ) );
 	if ( gettextPath ) {
 		bindtextdomain( package_ ? package_ : PACKAGE_NAME, gettextPath );
-		if ( package_ ) {
-			textdomain( package_ );
-			setlocale( LC_ALL, "" );
-		}
 	}
+	if ( package_ ) {
+		textdomain( package_ );
+	}
+	setlocale( LC_ALL, "" );
 	return;
 	M_EPILOG
 }
