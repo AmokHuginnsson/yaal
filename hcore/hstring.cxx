@@ -270,9 +270,11 @@ HString::HString( char const* array_, int long size_ )
 HString::HString( char char_ )
 	: _len() {
 	M_PROLOG
-	_mem[ 0 ] = char_;
-	_mem[ 1 ] = 0;
-	SET_SIZE( 1 );
+	if ( char_ ) {
+		_mem[ 0 ] = char_;
+		_mem[ 1 ] = 0;
+		SET_SIZE( 1 );
+	}
 	return;
 	M_EPILOG
 }
@@ -280,9 +282,11 @@ HString::HString( char char_ )
 HString::HString( char unsigned charUnsigned_ )
 	: _len() {
 	M_PROLOG
-	_mem[ 0 ] = static_cast<char>( charUnsigned_ );
-	_mem[ 1 ] = 0;
-	SET_SIZE( 1 );
+	if ( charUnsigned_ ) {
+		_mem[ 0 ] = static_cast<char>( charUnsigned_ );
+		_mem[ 1 ] = 0;
+		SET_SIZE( 1 );
+	}
 	return;
 	M_EPILOG
 }
