@@ -2135,6 +2135,9 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 			throw HHuginn::HHuginnRuntimeException( "Keyword `"_ys.append( value_ ).append( "' can be used only in class context." ), position_.get() );
 		}
 	}
+	if ( _isIncremental && ( refIdentifier == STANDARD_FUNCTIONS::MAIN_IDENTIFIER ) ) {
+		throw HHuginn::HHuginnRuntimeException( "Referencing main() function in incremental mode is forbidden.", position_.get() );
+	}
 	HHuginn::expression_t& expression( current_expression() );
 	if ( ( ! keyword || isAssert ) && huginn::is_builtin( value_ ) ) {
 		/*
