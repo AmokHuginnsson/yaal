@@ -304,11 +304,16 @@ void mul( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 void div( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type_id() == v2_->type_id() );
 	HHuginn::type_id_t typeId( v1_->type_id() );
+	char const* err( "Division by zero." );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
+		HHuginn::HInteger::value_type& numerator( static_cast<HHuginn::HInteger*>( v1_.raw() )->value() );
 		HHuginn::HInteger::value_type denominator( static_cast<HHuginn::HInteger const*>( v2_.raw() )->value() );
-		if ( denominator != 0 ) {
-			static_cast<HHuginn::HInteger*>( v1_.raw() )->value() /= denominator;
+		if ( ( denominator != 0 ) && ( ( numerator != meta::min_signed<HHuginn::HInteger::value_type>::value ) || ( denominator != -1 ) ) ) {
+			numerator /= denominator;
 		} else {
+			if ( denominator ) {
+				err = "Division overflow.";
+			}
 			v1_ = thread_->runtime().none_value();
 		}
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
@@ -330,18 +335,23 @@ void div( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 	}
 	HRuntime& rt( thread_->runtime() );
 	if ( v1_ == rt.none_value() ) {
-		thread_->raise( rt.object_factory()->arithmetic_exception_class(), "Division by zero.", position_ );
+		thread_->raise( rt.object_factory()->arithmetic_exception_class(), err, position_ );
 	}
 }
 
 void mod( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type_id() == v2_->type_id() );
 	HHuginn::type_id_t typeId( v1_->type_id() );
+	char const* err( "Division by zero." );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
+		HHuginn::HInteger::value_type& numerator( static_cast<HHuginn::HInteger*>( v1_.raw() )->value() );
 		HHuginn::HInteger::value_type denominator( static_cast<HHuginn::HInteger const*>( v2_.raw() )->value() );
-		if ( denominator != 0 ) {
-			static_cast<HHuginn::HInteger*>( v1_.raw() )->value() %= denominator;
+		if ( ( denominator != 0 ) && ( ( numerator != meta::min_signed<HHuginn::HInteger::value_type>::value ) || ( denominator != -1 ) ) ) {
+			numerator %= denominator;
 		} else {
+			if ( denominator ) {
+				err = "Division overflow.";
+			}
 			v1_ = thread_->runtime().none_value();
 		}
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
@@ -364,7 +374,7 @@ void mod( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 	}
 	HRuntime& rt( thread_->runtime() );
 	if ( v1_ == rt.none_value() ) {
-		thread_->raise( rt.object_factory()->arithmetic_exception_class(), "Division by zero.", position_ );
+		thread_->raise( rt.object_factory()->arithmetic_exception_class(), err, position_ );
 	}
 	return;
 }
@@ -420,8 +430,10 @@ HHuginn::value_t abs( HThread* thread_, HHuginn::value_t const& v_, int position
 		int long long v( static_cast<HHuginn::HInteger const*>( v_.raw() )->value() );
 		if ( v >= 0 ) {
 			res = v_;
-		} else {
+		} else if ( v != meta::min_signed<HHuginn::HInteger::value_type>::value ) {
 			res = thread_->object_factory().create_integer( -v );
+		} else {
+			thread_->raise( thread_->runtime().object_factory()->arithmetic_exception_class(), "Integer overflow.", position_ );
 		}
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
 		double long v( static_cast<HHuginn::HReal const*>( v_.raw() )->value() );
@@ -447,7 +459,12 @@ HHuginn::value_t neg( HThread* thread_, HHuginn::value_t const& v_, int position
 	HHuginn::value_t res;
 	HHuginn::type_id_t typeId( v_->type_id() );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
-		res = thread_->object_factory().create_integer( -static_cast<HHuginn::HInteger const*>( v_.raw() )->value() );
+		HHuginn::HInteger::value_type v( static_cast<HHuginn::HInteger const*>( v_.raw() )->value() );
+		if ( v != meta::min_signed<HHuginn::HInteger::value_type>::value ) {
+			res = thread_->object_factory().create_integer( -v );
+		} else {
+			thread_->raise( thread_->runtime().object_factory()->arithmetic_exception_class(), "Integer overflow.", position_ );
+		}
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
 		res = thread_->object_factory().create_real( -static_cast<HHuginn::HReal const*>( v_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
@@ -766,7 +783,13 @@ HHuginn::value_t integer( HThread* thread_, HHuginn::value_t const& v_, int posi
 		}
 		res = thread_->object_factory().create_integer( v );
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
-		res = thread_->object_factory().create_integer( static_cast<HHuginn::HNumber const*>( v_.raw() )->value().to_integer() );
+		int long long v( 0 );
+		try {
+			v = static_cast<HHuginn::HNumber const*>( v_.raw() )->value().to_integer();
+		} catch ( HException const& e ) {
+			thread_->raise( thread_->object_factory().conversion_exception_class(), e.what(), position_ );
+		}
+		res = thread_->object_factory().create_integer( v );
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
 		res = thread_->object_factory().create_integer( static_cast<int long long>( static_cast<HHuginn::HReal const*>( v_.raw() )->value() ) );
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
