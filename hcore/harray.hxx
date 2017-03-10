@@ -37,6 +37,7 @@ Copyright:
 #include "hcore/allocator.hxx"
 #include "hcore/algorithm.hxx"
 #include "hcore/pod.hxx"
+#include "hcore/safe_int.hxx"
 
 namespace yaal {
 
@@ -347,7 +348,7 @@ public:
 		}
 		if ( capacity_ > _capacity ) {
 			int long newCapacity( _capacity ? max( capacity_, _capacity * 2 ) : capacity_ );
-			value_type* newBuf( static_cast<value_type*>( ::operator new ( static_cast<size_t>( newCapacity * static_cast<int>( sizeof ( value_type ) ) ), memory::yaal ) ) );
+			value_type* newBuf( static_cast<value_type*>( ::operator new ( static_cast<size_t>( yaal::safe_int::mul<int long>( newCapacity, static_cast<int>( sizeof ( value_type ) ) ) ), memory::yaal ) ) );
 			for ( int long i( 0 ); i < _size; ++ i )
 				new ( newBuf + i ) value_type( yaal::move( _buf[ i ] ) );
 			for ( int long i( 0 ); i < _size; ++ i )

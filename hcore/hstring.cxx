@@ -40,7 +40,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "memory.hxx"
 #include "hchunk.hxx"
 #include "hcore.hxx"
-#include "safe_cast.hxx"
+#include "safe_int.hxx"
 
 namespace yaal {
 
@@ -1616,19 +1616,19 @@ HString to_string( void const* val_ ) {
 
 int stoi( HString const& str_, int* endIdx_, int base_ ) {
 	M_PROLOG
-	return ( safe_cast<int>( stoll( str_, endIdx_, base_ ) ) );
+	return ( safe_int::cast<int>( stoll( str_, endIdx_, base_ ) ) );
 	M_EPILOG
 }
 
 int long stol( HString const& str_, int* endIdx_, int base_ ) {
 	M_PROLOG
-	return ( safe_cast<int long>( stoll( str_, endIdx_, base_ ) ) );
+	return ( safe_int::cast<int long>( stoll( str_, endIdx_, base_ ) ) );
 	M_EPILOG
 }
 
 int long unsigned stoul( HString const& str_, int* endIdx_, int base_ ) {
 	M_PROLOG
-	return ( safe_cast<int long unsigned>( stoull( str_, endIdx_, base_ ) ) );
+	return ( safe_int::cast<int long unsigned>( stoull( str_, endIdx_, base_ ) ) );
 	M_EPILOG
 }
 

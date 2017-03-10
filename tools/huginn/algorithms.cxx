@@ -28,7 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
-#include "hcore/safe_cast.hxx"
+#include "hcore/safe_int.hxx"
 #include "runtime.hxx"
 #include "helper.hxx"
 #include "thread.hxx"

@@ -62,7 +62,7 @@ public:
 	}
 protected:
 	virtual int long do_size( void ) const override {
-		return ( safe_cast<int long>( static_cast<HHuginn::HDeque const*>( _deque.raw() )->size() ) );
+		return ( safe_int::cast<int long>( static_cast<HHuginn::HDeque const*>( _deque.raw() )->size() ) );
 	}
 private:
 	virtual HIterator do_iterator( HThread*, int ) override;

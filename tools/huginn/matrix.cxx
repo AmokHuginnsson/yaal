@@ -33,6 +33,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "thread.hxx"
 #include "objectfactory.hxx"
 #include "value_builtin.hxx"
+#include "hcore/safe_int.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -52,15 +53,15 @@ HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass const* class_, HHugi
 	if ( values_[0]->type_id() != HHuginn::TYPE::LIST ) {
 		verify_signature( name, values_, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER }, position_ );
 		HHuginn::HFunctionReference const& fr( *static_cast<HHuginn::HFunctionReference const*>( values_[0].raw() ) );
-		int myRows( static_cast<int>( get_integer( values_[1] ) ) );
-		if ( myRows < 1 ) {
-			throw HHuginn::HHuginnRuntimeException( "Invalid number of rows in matrix specification: "_ys.append( myRows ).append( "." ), position_ );
-		}
-		int cols( static_cast<int>( get_integer( values_[2] ) ) );
-		if ( cols < 1 ) {
-			throw HHuginn::HHuginnRuntimeException( "Invalid number of columns in matrix specification: "_ys.append( cols ).append( "." ), position_ );
-		}
 		try {
+			int myRows( safe_int::cast<int>( get_integer( values_[1] ) ) );
+			if ( myRows < 1 ) {
+				throw HHuginn::HHuginnRuntimeException( "Invalid number of rows in matrix specification: "_ys.append( myRows ).append( "." ), position_ );
+			}
+			int cols( safe_int::cast<int>( get_integer( values_[2] ) ) );
+			if ( cols < 1 ) {
+				throw HHuginn::HHuginnRuntimeException( "Invalid number of columns in matrix specification: "_ys.append( cols ).append( "." ), position_ );
+			}
 			if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::number ) ) {
 				_data = data_t( make_resource<arbitrary_precision_matrix_t>( myRows, cols ) );
 			} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::real ) ) {
@@ -72,14 +73,17 @@ HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass const* class_, HHugi
 			throw HHuginn::HHuginnRuntimeException( e.what(), position_ );
 		}
 	} else {
-		int myRows( static_cast<int>( values_.get_size() ) );
 		HHuginn::HList::values_t const* rowData( nullptr );
-		int cols( static_cast<int>( ( rowData = &get_list( values_[0] ) )->get_size() ) );
-		if ( cols < 1 ) {
-			throw HHuginn::HHuginnRuntimeException( "Invalid number of columns in matrix specification: "_ys.append( cols ).append( "." ), position_ );
-		}
-		HHuginn::type_id_t t( (*rowData)[0]->type_id() );
+		HHuginn::type_id_t t( static_cast<int>( HHuginn::TYPE::UNKNOWN ) );
+		int myRows( 0 );
+		int cols( 0 );
 		try {
+			myRows = safe_int::cast<int>( values_.get_size() );
+			cols = safe_int::cast<int>( ( rowData = &get_list( values_[0] ) )->get_size() );
+			if ( cols < 1 ) {
+				throw HHuginn::HHuginnRuntimeException( "Invalid number of columns in matrix specification: "_ys.append( cols ).append( "." ), position_ );
+			}
+			t = (*rowData)[0]->type_id();
 			if ( t == HHuginn::TYPE::NUMBER ) {
 				_data = data_t( make_resource<arbitrary_precision_matrix_t>( myRows, cols ) );
 			} else if ( t == HHuginn::TYPE::REAL ) {

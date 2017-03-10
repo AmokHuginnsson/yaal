@@ -71,7 +71,7 @@ public:
 	}
 protected:
 	virtual int long do_size( void ) const override {
-		return ( safe_cast<int long>( ( _stop + _step - ( _from + 1 ) ) / _step ) );
+		return ( safe_int::cast<int long>( ( _stop + _step - ( _from + 1 ) ) / _step ) );
 	}
 private:
 	virtual HIterator do_iterator( HThread*, int ) override;
