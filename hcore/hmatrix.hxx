@@ -398,47 +398,41 @@ value_type HMatrix<value_type>::det( void ) const {
 	int exchanges( 0 );
 	value_type scalar;
 	HMatrix<value_type> matrix( *this );
-	for ( int ctrRow( 0 ); ctrRow < _rows; ctrRow ++ ) {
-		if ( matrix [ ctrRow ] [ ctrRow ] != 0 )
-			continue;
-		using yaal::swap;
-		int ctrLocRow( 0 );
-		for ( ctrLocRow = 0; ctrLocRow < ctrRow; ctrLocRow ++ )
-			if ( ( matrix [ ctrRow ] [ ctrLocRow ] != 0 )
-					&& ( matrix [ ctrLocRow ] [ ctrRow ] != 0 ) ) {
-				swap( matrix._data[ ctrLocRow ], matrix._data[ ctrRow ] );
-				++ exchanges ;
-				break;
-			}
-		if ( ctrLocRow == ctrRow ) {
-			for ( ctrLocRow = ctrRow; ctrLocRow < _rows; ctrLocRow ++ ) {
-				if ( matrix[ ctrRow ][ ctrLocRow ] != 0 ) {
-					swap( matrix._data[ ctrLocRow ], matrix._data[ ctrRow ] );
-					++ exchanges;
-					break;
-				}
+	row_t tmp( _columns );
+	for ( int r( 0 ); r < _rows; ++ r ) {
+		value_type maxVal( 0 );
+		value_type tmpVal( 0 );
+		int maxRow( 0 );
+		for ( int k( r ); k < _rows; ++ k ) {
+			tmpVal = abs( matrix[k][r] );
+			if ( tmpVal > maxVal ) {
+				maxVal = tmpVal;
+				maxRow = k;
 			}
 		}
-	}
-	row_t tmp( _columns );
-	for ( int ctrRow( 0 ); ctrRow < _rows; ctrRow ++ )
-		if ( matrix [ ctrRow ] [ ctrRow ] == 0 )
+		if ( maxVal == 0 ) {
 			return ( 0 );
-	for ( int ctrRow( 0 ); ctrRow < _rows; ctrRow ++ ) {
-		if ( matrix[ ctrRow ][ ctrRow ] == 0 )
-			return ( 0 );
-		for ( int ctrLocRow( ctrRow + 1 ); ctrLocRow < _rows; ctrLocRow ++ ) {
-			scalar = -matrix[ ctrLocRow ][ ctrRow ] / matrix[ ctrRow ][ ctrRow ];
-			tmp = matrix._data[ ctrRow ];
+		}
+		if ( r != maxRow ) {
+			using yaal::swap;
+			swap( matrix._data[r], matrix._data[maxRow] );
+			++ exchanges;
+		}
+		value_type const& pivot( matrix[ r ][ r ] );
+		for ( int k( r + 1 ); k < _rows; ++ k ) {
+			scalar = -matrix[ k ][ r ] / pivot;
+			tmp = matrix._data[ r ];
 			tmp *= scalar;
-			matrix._data[ ctrLocRow ] += tmp;
+			matrix._data[ k ] += tmp;
 		}
 	}
 	scalar = 1;
-	for ( int ctrRow( 0 ); ctrRow < _rows; ctrRow ++ )
-		scalar *= matrix [ ctrRow ] [ ctrRow ];
-	if ( exchanges % 2 )
+	for ( int r( 0 ); r < _rows; ++ r ) {
+		scalar *= matrix[ r ][ r ];
+	}
+	if ( exchanges % 2 ) {
 		scalar = -scalar;
+	}
 	return ( scalar );
 	M_EPILOG
 }
