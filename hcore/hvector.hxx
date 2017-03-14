@@ -224,7 +224,7 @@ public:
 	}
 	HVector& operator /= ( value_type const& scalar_ ) {
 		M_PROLOG
-		if ( ! scalar_ ) {
+		if ( scalar_ == 0 ) {
 			M_THROW( _errMsgHVector_[ERROR::DIVISION_BY_ZERO], 0 );
 		}
 		yaal::transform( _data.begin(), _data.end(), _data.begin(), bind2nd( yaal::divides<value_type>(), scalar_ ) );

@@ -140,10 +140,10 @@ HHuginn::value_t HMatrix::columns( huginn::HThread* thread_, HHuginn::value_t* o
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	if ( o->_data.type() == 0 ) {
 		arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
-		v = thread_->runtime().object_factory()->create_integer( m.col() );
+		v = thread_->runtime().object_factory()->create_integer( m.columns() );
 	} else {
 		floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
-		v = thread_->runtime().object_factory()->create_integer( m.col() );
+		v = thread_->runtime().object_factory()->create_integer( m.columns() );
 	}
 	return ( v );
 	M_EPILOG
@@ -157,10 +157,10 @@ HHuginn::value_t HMatrix::rows( huginn::HThread* thread_, HHuginn::value_t* obje
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	if ( o->_data.type() == 0 ) {
 		arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
-		v = thread_->runtime().object_factory()->create_integer( m.row() );
+		v = thread_->runtime().object_factory()->create_integer( m.rows() );
 	} else {
 		floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
-		v = thread_->runtime().object_factory()->create_integer( m.row() );
+		v = thread_->runtime().object_factory()->create_integer( m.rows() );
 	}
 	return ( v );
 	M_EPILOG
@@ -175,19 +175,19 @@ HHuginn::value_t HMatrix::get( huginn::HThread* thread_, HHuginn::value_t* objec
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	if ( o->_data.type() == 0 ) {
 		arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
-		if ( ( row < 0 ) || ( row >= m.row() ) ) {
+		if ( ( row < 0 ) || ( row >= m.rows() ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), position_ );
 		}
-		if ( ( col < 0 ) || ( col >= m.col() ) ) {
+		if ( ( col < 0 ) || ( col >= m.columns() ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), position_ );
 		}
 		v = thread_->runtime().object_factory()->create_number( m[row][col] );
 	} else {
 		floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
-		if ( ( row < 0 ) || ( row >= m.row() ) ) {
+		if ( ( row < 0 ) || ( row >= m.rows() ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), position_ );
 		}
-		if ( ( col < 0 ) || ( col >= m.col() ) ) {
+		if ( ( col < 0 ) || ( col >= m.columns() ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), position_ );
 		}
 		v = thread_->runtime().object_factory()->create_real( m[row][col] );
@@ -206,20 +206,20 @@ HHuginn::value_t HMatrix::set( huginn::HThread*, HHuginn::value_t* object_, HHug
 	if ( o->_data.type() == 0 ) {
 		verify_arg_type( name, values_, 2, HHuginn::TYPE::NUMBER, ARITY::MULTIPLE, position_ );
 		arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
-		if ( ( row < 0 ) || ( row >= m.row() ) ) {
+		if ( ( row < 0 ) || ( row >= m.rows() ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), position_ );
 		}
-		if ( ( col < 0 ) || ( col >= m.col() ) ) {
+		if ( ( col < 0 ) || ( col >= m.columns() ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), position_ );
 		}
 		m[row][col] = get_number( values_[2] );
 	} else {
 		verify_arg_type( name, values_, 2, HHuginn::TYPE::REAL, ARITY::MULTIPLE, position_ );
 		floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
-		if ( ( row < 0 ) || ( row >= m.row() ) ) {
+		if ( ( row < 0 ) || ( row >= m.rows() ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), position_ );
 		}
-		if ( ( col < 0 ) || ( col >= m.col() ) ) {
+		if ( ( col < 0 ) || ( col >= m.columns() ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), position_ );
 		}
 		m[row][col] = get_real( values_[2] );
@@ -360,7 +360,7 @@ HHuginn::value_t HMatrix::scale_to( huginn::HThread*, HHuginn::value_t* object_,
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::NUMBER, ARITY::UNARY, position_ );
 		arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
 		HNumber extremum;
-		for ( int r( 0 ), rows( m.row() ), cols( m.col() ); r < rows; ++ r ) {
+		for ( int r( 0 ), rows( m.rows() ), cols( m.columns() ); r < rows; ++ r ) {
 			for ( int c( 0 ); c < cols; ++ c ) {
 				HNumber n( m[r][c] );
 				n.abs();
@@ -377,7 +377,7 @@ HHuginn::value_t HMatrix::scale_to( huginn::HThread*, HHuginn::value_t* object_,
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::REAL, ARITY::UNARY, position_ );
 		floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
 		double long extremum( 0.L );
-		for ( int r( 0 ), rows( m.row() ), cols( m.col() ); r < rows; ++ r ) {
+		for ( int r( 0 ), rows( m.rows() ), cols( m.columns() ); r < rows; ++ r ) {
 			for ( int c( 0 ); c < cols; ++ c ) {
 				if ( abs( m[r][c] ) > extremum ) {
 					extremum = abs( m[r][c] );
@@ -401,9 +401,9 @@ HHuginn::value_t HMatrix::inverse( huginn::HThread* thread_, HHuginn::value_t* o
 	HHuginn::value_t v;
 	try {
 		if ( o->_data.type() == 0 ) {
-			v = thread_->object_factory().create<HMatrix>( o->HValue::get_class(), make_resource<arbitrary_precision_matrix_t>( o->_data.get<arbitrary_precision_matrix_ptr_t>()->_1() ) );
+			v = thread_->object_factory().create<HMatrix>( o->HValue::get_class(), make_resource<arbitrary_precision_matrix_t>( o->_data.get<arbitrary_precision_matrix_ptr_t>()->inverse() ) );
 		} else {
-			v = thread_->object_factory().create<HMatrix>( o->HValue::get_class(), make_resource<floating_point_matrix_t>( o->_data.get<floating_point_matrix_ptr_t>()->_1() ) );
+			v = thread_->object_factory().create<HMatrix>( o->HValue::get_class(), make_resource<floating_point_matrix_t>( o->_data.get<floating_point_matrix_ptr_t>()->inverse() ) );
 		}
 	} catch ( HException const& e ) {
 		throw HHuginn::HHuginnRuntimeException( e.what(), position_ );
@@ -419,9 +419,9 @@ HHuginn::value_t HMatrix::transpose( huginn::HThread* thread_, HHuginn::value_t*
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	HHuginn::value_t v;
 	if ( o->_data.type() == 0 ) {
-		v = thread_->object_factory().create<HMatrix>( o->HValue::get_class(), make_resource<arbitrary_precision_matrix_t>( o->_data.get<arbitrary_precision_matrix_ptr_t>()->T() ) );
+		v = thread_->object_factory().create<HMatrix>( o->HValue::get_class(), make_resource<arbitrary_precision_matrix_t>( o->_data.get<arbitrary_precision_matrix_ptr_t>()->transpose() ) );
 	} else {
-		v = thread_->object_factory().create<HMatrix>( o->HValue::get_class(), make_resource<floating_point_matrix_t>( o->_data.get<floating_point_matrix_ptr_t>()->T() ) );
+		v = thread_->object_factory().create<HMatrix>( o->HValue::get_class(), make_resource<floating_point_matrix_t>( o->_data.get<floating_point_matrix_ptr_t>()->transpose() ) );
 	}
 	return ( v );
 	M_EPILOG
@@ -449,7 +449,7 @@ void matrix_apply( HHuginn::value_t store_, huginn::HThread* thread_, matrix_t& 
 	value_t& val( *static_cast<value_t*>( store_.raw() ) );
 	HHuginn::value_t res;
 	HHuginn::type_id_t expectedType( store_->type_id() );
-	for ( int r( 0 ), ROWS( matrix_.row() ), COLS( matrix_.col() ); r < ROWS; ++ r ) {
+	for ( int r( 0 ), ROWS( matrix_.rows() ), COLS( matrix_.columns() ); r < ROWS; ++ r ) {
 		for ( int c( 0 ); c < COLS; ++ c ) {
 			row.value() = r;
 			col.value() = c;
@@ -504,7 +504,7 @@ HHuginn::value_t HMatrix::to_string( huginn::HThread* thread_, HHuginn::value_t*
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	if ( o->_data.type() == 0 ) {
 		arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
-		for ( int r( 0 ), rows( m.row() ), cols( m.col() ); r < rows; ++ r ) {
+		for ( int r( 0 ), rows( m.rows() ), cols( m.columns() ); r < rows; ++ r ) {
 			if ( r > 0 ) {
 				s.append( ", " );
 			}
@@ -519,7 +519,7 @@ HHuginn::value_t HMatrix::to_string( huginn::HThread* thread_, HHuginn::value_t*
 		}
 	} else {
 		floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
-		for ( int r( 0 ), rows( m.row() ), cols( m.col() ); r < rows; ++ r ) {
+		for ( int r( 0 ), rows( m.rows() ), cols( m.columns() ); r < rows; ++ r ) {
 			if ( r > 0 ) {
 				s.append( ", " );
 			}
