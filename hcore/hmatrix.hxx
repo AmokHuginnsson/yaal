@@ -126,6 +126,19 @@ public:
 		return;
 		M_EPILOG
 	}
+	HMatrix( std::initializer_list<row_t> constants_ )
+		: _rows( constants_.size() )
+		, _columns( constants_.begin()->dim() )
+		, _data( constants_ ) {
+		int rn( 0 );
+		for ( row_t const& r : _data ) {
+			if ( r.dim() != _columns ) {
+				M_THROW( _errMsgHMatrix_[ERROR::DIM_NOT_MATCH_COLUMNS], rn );
+			}
+			++ rn;
+		}
+		return;
+	}
 	void swap( HMatrix& matrix_ ) {
 		M_PROLOG
 		if ( &matrix_ != this ) {
@@ -133,15 +146,6 @@ public:
 			swap( _rows, matrix_._rows );
 			swap( _columns, matrix_._columns );
 			swap( _data, matrix_._data );
-		}
-		return;
-		M_EPILOG
-	}
-	void set( value_type const** scalar_ ) {
-		M_PROLOG
-		int ctr;
-		for ( ctr = 0; ctr < _rows; ctr++ ) {
-			this->_data[ ctr ]->set( scalar_[ ctr ] );
 		}
 		return;
 		M_EPILOG
@@ -326,7 +330,7 @@ public:
 		M_PROLOG
 		check_dimensions_rows_columns( matrix_._rows, matrix_._columns );
 		for ( int ctr( 0 ); ctr < _rows; ++ ctr ) {
-			if ( this->_data[ ctr ] != matrix_ [ ctr ] ) {
+			if ( this->_data[ ctr ] != matrix_._data[ ctr ] ) {
 				return ( false );
 			}
 		}
@@ -336,7 +340,7 @@ public:
 
 	bool operator != ( HMatrix const& matrix_ ) const {
 		M_PROLOG
-		return ( ! ( * this == matrix_ ) );
+		return ( ! operator == ( matrix_ ) );
 		M_EPILOG
 	}
 	HRowRef operator[] ( int idx ) {

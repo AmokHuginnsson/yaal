@@ -86,6 +86,12 @@ public:
 		return;
 		M_EPILOG
 	}
+	HVector( std::initializer_list<value_type> constants_ )
+		: _data( constants_ ) {
+		M_PROLOG
+		return;
+		M_EPILOG
+	}
 	~HVector( void ) {
 		M_PROLOG
 		return;
@@ -265,7 +271,7 @@ public:
 	}
 	bool operator != ( HVector const& vector_ ) const {
 		M_PROLOG
-		return ( ! ( *this == vector_ ) );
+		return ( ! operator == ( vector_ ) );
 		M_EPILOG
 	}
 	iterator begin( void ) {
