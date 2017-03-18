@@ -249,7 +249,9 @@ void const* HOpenSSL::OSSLContext::select_method( void ) const {
 
 HOpenSSL::OSSLContext::~OSSLContext( void ) {
 	M_PROLOG
+#ifndef __HOST_OS_TYPE_SOLARIS__
 	HLock lock( _mutex );
+#endif /* #ifndef __HOST_OS_TYPE_SOLARIS__ */
 	M_ENSURE( ! _users );
 	if ( _context ) {
 		SSL_CTX_free( static_cast<SSL_CTX*>( _context ) );
@@ -270,6 +272,7 @@ HOpenSSL::OSSLContext::~OSSLContext( void ) {
 		EVP_cleanup();
 		CRYPTO_cleanup_all_ex_data();
 		CRYPTO_set_locking_callback( nullptr );
+#ifndef __HOST_OS_TYPE_SOLARIS__
 		for ( int i( 0 ), SIZE( static_cast<int>( _sslLibMutexes.size() ) ); i < SIZE; ++ i ) {
 			mutex_info_t& m( _sslLibMutexes[ i ] );
 			if ( m.second > 0 ) {
@@ -282,6 +285,7 @@ HOpenSSL::OSSLContext::~OSSLContext( void ) {
 			}
 		}
 		_sslLibMutexes.clear();
+#endif /* #ifndef __HOST_OS_TYPE_SOLARIS__ */
 	}
 	return;
 	M_DESTRUCTOR_EPILOG
