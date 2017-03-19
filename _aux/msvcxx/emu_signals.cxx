@@ -233,6 +233,10 @@ int sigemptyset( sigset_t* set_ ) {
 	return ( 0 );
 }
 
+int sigpending( sigset_t* ) {
+	return ( 0 );
+}
+
 void win_signal_handler( int signo ) {
 	if ( signo == SIGABRT_COMPAT )
 		signo = SIGABRT;

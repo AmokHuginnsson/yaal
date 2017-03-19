@@ -107,8 +107,15 @@ void reset_signal_low( int sigNo_ ) {
 	act.sa_handler = FWD_SIG_DFL;
 	M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
 	M_ENSURE( sigaddset_fwd( &act.sa_mask, sigNo_ ) == 0 );
-	M_ENSURE( sigaction( sigNo_, &act, nullptr ) == 0 );
+	sigset_t pending;
+	sigemptyset( &pending );
+	M_ENSURE( sigpending( &pending ) == 0 );
+	if ( sigismember( &pending, sigNo_ ) ) {
+		int dummy( 0 );
+		M_ENSURE( sigwait( &pending, &dummy ) == 0 );
+	}
 	M_ENSURE( pthread_sigmask( SIG_UNBLOCK, &act.sa_mask, nullptr ) == 0 );
+	M_ENSURE( sigaction( sigNo_, &act, nullptr ) == 0 );
 	return;
 	M_EPILOG
 }
@@ -123,7 +130,6 @@ void catch_signal_low( int sigNo_ ) {
 	M_ENSURE( sigaddset_fwd( &act.sa_mask, sigNo_ ) == 0 );
 	M_ENSURE( sigaction( sigNo_, &act, nullptr ) == 0 );
 	M_ENSURE( pthread_sigmask( SIG_BLOCK, &act.sa_mask, nullptr ) == 0 );
-
 	return;
 	M_EPILOG
 }
@@ -192,7 +198,9 @@ void HSignalService::stop( void ) {
 		reset_signal_low( SIGALRM );
 		HSet<int> signals;
 		transform( _handlers.begin(), _handlers.end(), insert_iterator( signals ), select1st<handlers_t::value_type>() );
-		for_each( signals.begin(), signals.end(), call( &HSignalService::reset_signal, this, _1 ) );
+		for ( int sigNo : signals ) {
+			reset_signal( sigNo );
+		}
 	}
 	return;
 	M_EPILOG
