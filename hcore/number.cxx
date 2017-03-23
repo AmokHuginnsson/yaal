@@ -168,7 +168,7 @@ struct HNumber::ElementaryFunctions {
 		HNumber d( number::N1, precision );
 
 		HNumber e;
-		for ( HNumber i( number::N2 ); true; ++ i ) {
+		for ( HNumber i( number::N2, precision ); true; ++ i ) {
 			e = ( a *= input ) / ( d *= i );
 			a.set_precision( precision );
 			d.set_precision( precision );
@@ -217,7 +217,7 @@ struct HNumber::ElementaryFunctions {
 
 		/* Sum the series. */
 		HNumber e;
-		for ( HNumber i( number::N3 ); true; i += number::N2 ) {
+		for ( HNumber i( number::N3, precision ); true; i += number::N2 ) {
 			e = ( n *= m ) / i;
 			n.set_precision( precision );
 			if ( e == number::N0 ) {
