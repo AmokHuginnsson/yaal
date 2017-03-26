@@ -76,7 +76,7 @@ public:
 		return ( _impl->value( thread_, position_ ) );
 	}
 	bool is_valid( void ) {
-		return ( _impl->is_valid() );
+		return ( !! _impl && _impl->is_valid() );
 	}
 	void next( huginn::HThread* thread_, int position_ ) {
 		_impl->next( thread_, position_ );

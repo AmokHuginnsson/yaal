@@ -44,6 +44,23 @@ namespace tools {
 
 namespace huginn {
 
+namespace {
+void raise( hcore::HException const& exception_, huginn::HThread* thread_, int position_ ) {
+	M_PROLOG
+	HRuntime& r( thread_->runtime() );
+	HHuginn::HClass const* c( r.get_class( r.identifier_id( "OperatingSystemException" ) ).raw() );
+	if ( ! c ) {
+		c = r.get_class( r.identifier_id( "FileSystemException" ) ).raw();
+	}
+	if ( ! c ) {
+		c = r.object_factory()->exception_class();
+	}
+	thread_->raise( c, exception_.what(), position_ );
+	return;
+	M_EPILOG
+}
+}
+
 class HStreamIterator : public HIteratorInterface {
 	HStream* _stream;
 	HString _lineCache;
@@ -62,8 +79,12 @@ protected:
 	virtual bool do_is_valid( void ) override {
 		return ( _stream->is_valid() );
 	}
-	virtual void do_next( HThread*, int ) override {
-		_lineCache = _stream->read_line_impl();
+	virtual void do_next( HThread* thread_, int position_ ) override {
+		try {
+			_lineCache = _stream->read_line_impl();
+		} catch ( HException const& e ) {
+			raise( e, thread_, position_ );
+		}
 	}
 private:
 	HStreamIterator( HStreamIterator const& ) = delete;
@@ -134,9 +155,14 @@ bool HStream::is_valid( void ) const {
 	M_EPILOG
 }
 
-HHuginn::HIterable::HIterator HStream::do_iterator( HThread*, int ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HStreamIterator( this ) );
-	return ( HIterator( yaal::move( impl ) ) );
+HHuginn::HIterable::HIterator HStream::do_iterator( HThread* thread_, int position_ ) {
+	try {
+		HIterator::iterator_implementation_t impl( new ( memory::yaal ) HStreamIterator( this ) );
+		return ( HIterator( yaal::move( impl ) ) );
+	} catch ( HException const& e ) {
+		raise( e, thread_, position_ );
+	}
+	return ( HIterator::iterator_implementation_t( nullptr ) );
 }
 
 int long HStream::do_size( void ) const {

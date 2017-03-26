@@ -131,14 +131,14 @@ public:
 		if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::list ) ) {
 			v = thread_->object_factory().create_list();
 			HHuginn::HList::values_t& dest( static_cast<HHuginn::HList*>( v.raw() )->value() );
-			while ( it.is_valid() && thread_->can_continue() ) {
+			while ( thread_->can_continue() && it.is_valid() ) {
 				dest.push_back( it.value( thread_, position_ ) );
 				it.next( thread_, position_ );
 			}
 		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::deque ) ) {
 			v = thread_->object_factory().create_deque();
 			HHuginn::HDeque::values_t& dest( static_cast<HHuginn::HDeque*>( v.raw() )->value() );
-			while ( it.is_valid() && thread_->can_continue() ) {
+			while ( thread_->can_continue() && it.is_valid() ) {
 				dest.push_back( it.value( thread_, position_ ) );
 				it.next( thread_, position_ );
 			}
@@ -147,7 +147,7 @@ public:
 			HHuginn::HOrder* order( static_cast<HHuginn::HOrder*>( v.raw() ) );
 			HHuginn::HOrder::values_t& dest( order->value() );
 			order->anchor( thread_, position_ );
-			while ( it.is_valid() && thread_->can_continue() ) {
+			while ( thread_->can_continue() && it.is_valid() ) {
 				dest.insert( it.value( thread_, position_ ) );
 				it.next( thread_, position_ );
 			}
@@ -157,7 +157,7 @@ public:
 			HHuginn::HSet* set( static_cast<HHuginn::HSet*>( v.raw() ) );
 			HHuginn::HSet::values_t& dest( set->value() );
 			set->anchor( thread_, position_ );
-			while ( it.is_valid() && thread_->can_continue() ) {
+			while ( thread_->can_continue() && it.is_valid() ) {
 				dest.insert( it.value( thread_, position_ ) );
 				it.next( thread_, position_ );
 			}
