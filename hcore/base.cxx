@@ -43,63 +43,19 @@ namespace yaal {
 
 exit_flag_t _isKilled_{ false };
 
-bool is_hexadecimal( char const* str_, int len_ ) {
-	if ( ( len_ >= 4 ) && ( str_[ 0 ] == '-' ) ) { /* -0x0 */
-		++ str_;
-		-- len_;
-	}
-	return ( ( len_ >= 3 )
-			&& ( str_[ 0 ] == '0' )
-			&& ( ( str_[1] == 'x' ) || ( str_[1] == 'X' ) )
-			&& ( ( ( str_[2] >= '0' ) && ( str_[2] <= '9' ) )
-				|| ( ( str_[2] >= 'a' ) && ( str_[2] <= 'f' ) )
-				|| ( ( str_[2] >= 'A' ) && ( str_[2] <= 'F' ) ) ) );
-}
-
 template<>
 bool is_hexadecimal( HString const& str_ ) {
-	return ( is_hexadecimal( str_.raw(), static_cast<int>( str_.get_length() ) ) );
-}
-
-bool is_binary( char const* str_, int len_ ) {
-	if ( ( len_ >= 4 ) && ( str_[ 0 ] == '-' ) ) { /* -0b0 */
-		++ str_;
-		-- len_;
-	}
-	return ( ( len_ >= 3 )
-			&& ( str_[ 0 ] == '0' )
-			&& ( ( str_[1] == 'b' ) || ( str_[1] == 'B' ) )
-			&& ( ( ( str_[2] >= '0' ) && ( str_[2] <= '1' ) ) ) );
+	return ( is_hexadecimal( str_.begin(), str_.end() ) );
 }
 
 template<>
 bool is_binary( HString const& str_ ) {
-	return ( is_binary( str_.raw(), static_cast<int>( str_.get_length() ) ) );
-}
-
-bool is_octal( char const* str_, int len_ ) {
-	if ( ( len_ >= 3 ) && ( str_[ 0 ] == '-' ) ) { /* -07 */
-		++ str_;
-		-- len_;
-	}
-	bool octal( false );
-	if ( str_[0] == '0' ) {
-		++ str_;
-		-- len_;
-		if ( str_[0] == 'o' ) {
-			++ str_;
-			-- len_;
-		}
-		if ( ( len_ > 0 ) && ( str_[0] >= '0' ) && ( str_[0] <= '7' ) ) {
-			octal = true;
-		}
-	}
-	return ( octal );
+	return ( is_binary( str_.begin(), str_.end() ) );
 }
 
 template<>
 bool is_octal( HString const& str_ ) {
-	return ( is_octal( str_.raw(), static_cast<int>( str_.get_length() ) ) );
+	return ( is_octal( str_.begin(), str_.end() ) );
 }
 
 static int const MAX_VALID_BINARY_INTEGER_LENGTH = 130; /* 128 bits + '-' + terminator */

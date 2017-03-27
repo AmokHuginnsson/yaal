@@ -34,7 +34,7 @@ Copyright:
 #ifndef YAAL_HCORE_ITERATOR_HXX_INCLUDED
 #define YAAL_HCORE_ITERATOR_HXX_INCLUDED 1
 
-#include "hcore/hexception.hxx"
+#include "hcore/assert.hxx"
 #include "hcore/trait.hxx"
 #include "hcore/algorithm_low.hxx"
 

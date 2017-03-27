@@ -2944,13 +2944,13 @@ yaal::hcore::HString::const_iterator HInteger::do_parse( HExecutingParser* execu
 		typedef bool ( *digit_test_func_t )( char );
 		digit_test_func_t is_digit_test( &is_dec_digit );
 		int skip( *scan == '-' ? 1 : 0 );
-		bool isBin( is_binary( scan, static_cast<int>( last_ - scan ) ) );
-		if ( is_hexadecimal( scan, static_cast<int>( last_ - scan ) ) ) {
+		bool isBin( is_binary( scan, last_ ) );
+		if ( is_hexadecimal( scan, last_ ) ) {
 			skip += 2;
 			is_digit_test = &is_hex_digit;
-		} else if ( is_octal( scan, static_cast<int>( last_ - scan ) ) ) {
+		} else if ( is_octal( scan, last_ ) ) {
 			skip += 1;
-			if ( ( scan[skip] == 'o' ) || ( scan[skip] == 'O' ) ) {
+			if ( ( *( scan + skip ) == 'o' ) || ( *( scan + skip ) == 'O' ) ) {
 				skip += 1;
 			}
 			is_digit_test = &is_oct_digit;

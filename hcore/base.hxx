@@ -138,15 +138,76 @@ struct Int2Type {
 template <typename T, int long unsigned N>
 char ( &YaalArrayElementCountHelper( T ( &YaalArrayElementCountHelperArray )[N] ) )[N];
 
+template<typename iter_t>
+bool is_hexadecimal( iter_t it_, iter_t end_ ) {
+	int len( static_cast<int>( end_ - it_ ) );
+	bool isHex( false );
+	if ( ( len >= 4 ) && ( *it_ == '-' ) ) { /* -0x0 */
+		++ it_;
+		-- len;
+	}
+	if ( len >= 3 ) {
+		if ( *it_ == '0' ) {
+			++ it_;
+			if ( ( *it_ == 'x' ) || ( *it_ == 'X' ) ) {
+				++ it_;
+				isHex = (
+					( ( *it_ >= '0' ) && ( *it_ <= '9' ) )
+					|| ( ( *it_ >= 'a' ) && ( *it_ <= 'f' ) )
+					|| ( ( *it_ >= 'A' ) && ( *it_ <= 'F' ) )
+				);
+			}
+		}
+	}
+	return ( isHex );
+}
+
+template<typename iter_t>
+bool is_binary( iter_t it_, iter_t end_ ) {
+	int len( static_cast<int>( end_ - it_ ) );
+	bool isBin( false );
+	if ( ( len >= 4 ) && ( *it_ == '-' ) ) { /* -0b0 */
+		++ it_;
+		-- len;
+	}
+	if ( len >= 3 ) {
+		if ( *it_ == '0' ) {
+			++ it_;
+			if ( ( *it_ == 'b' ) || ( *it_ == 'B' ) ) {
+				++ it_;
+				isBin = ( ( *it_ == '0' ) || ( *it_ == '1' ) );
+			}
+		}
+	}
+	return ( isBin );
+}
+
+template<typename iter_t>
+bool is_octal( iter_t it_, iter_t end_ ) {
+	int len( static_cast<int>( end_ - it_ ) );
+	bool isOctal( false );
+	if ( ( len >= 3 ) && ( *it_ == '-' ) ) { /* -07 */
+		++ it_;
+		-- len;
+	}
+	if ( *it_ == '0' ) {
+		++ it_;
+		-- len;
+		if ( ( *it_ == 'o' ) || ( *it_ == 'O' ) ) {
+			++ it_;
+			-- len;
+		}
+		isOctal = ( ( len > 0 ) && ( *it_ >= '0' ) && ( *it_ <= '7' ) );
+	}
+	return ( isOctal );
+}
+
 template<typename type_t>
 bool is_hexadecimal( type_t const& );
 template<typename type_t>
 bool is_binary( type_t const& );
 template<typename type_t>
 bool is_octal( type_t const& );
-bool is_hexadecimal( char const*, int );
-bool is_binary( char const*, int );
-bool is_octal( char const*, int );
 
 }
 
