@@ -165,6 +165,7 @@ yaal::hcore::HString const HExceptionT<tType, base_type_t>::_name = type_name<tT
 
 typedef HExceptionT<void> HRuntimeException;
 typedef HExceptionT<HString> HStringException;
+typedef HExceptionT<HUTF8String> HUTF8StringException;
 typedef HExceptionT<LexicalCast> HLexicalCastException;
 struct InvalidKey {};
 typedef HExceptionT<InvalidKey> HInvalidKeyException;

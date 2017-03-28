@@ -25,7 +25,7 @@ Copyright:
 */
 
 /*! \file hcore/hstring.hxx
- * \brief Declaration of HString class.
+ * \brief Declaration of HString class and HUTF8String class.
  *
  * All HString related free functions are included here.
  * HCharacterClass also resides here.
@@ -110,7 +110,7 @@ private:
 	static int const INPLACE_BUFFER_SIZE = sizeof ( char* ) + sizeof ( int_native_t ) + sizeof ( int_native_t );
 	static int const ALLOC_FLAG_INDEX = INPLACE_BUFFER_SIZE - 1;
 	static int const MAX_INPLACE_CAPACITY = INPLACE_BUFFER_SIZE - 2; /* -1 for terminating NIL, -1 for ALLOC_FLAG byte. */
-	STATIC_ASSERT( sizeof ( int long ) == sizeof ( char* ) );
+	static_assert( sizeof ( int_native_t ) == sizeof ( char* ), "invalid native integer type definition" );
 	union {
 		int_native_t _len[ 3 ];
 		char _mem[ INPLACE_BUFFER_SIZE ];
@@ -808,6 +808,49 @@ private:
 	}
 };
 
+/*! \brief HUTF8String is a class representing UTF-8 string buffer.
+ *
+ * This class does not allow mutating operations.
+ */
+class HUTF8String final {
+public:
+	typedef HUTF8String this_type;
+private:
+	struct OBufferMeta {
+		int_native_t _size;
+		int _refCount;
+	};
+	int _byteCount;
+	int _offset;
+	int _characterCount;
+	union {
+		OBufferMeta* _meta;
+		char* _ptr;
+	};
+public:
+	HUTF8String( void );
+	HUTF8String( HString const& );
+	HUTF8String( char const* );
+	HUTF8String( HString::const_iterator, HString::const_iterator );
+	HUTF8String( HUTF8String const& );
+	HUTF8String( HUTF8String&& );
+	HUTF8String& operator = ( HUTF8String const& );
+	HUTF8String& operator = ( HUTF8String&& );
+	~HUTF8String( void );
+	bool operator == ( HUTF8String const& ) const;
+	bool operator != ( HUTF8String const& ) const;
+	bool operator == ( char const* ) const;
+	bool operator != ( char const* ) const;
+	void swap( HUTF8String& );
+	char const* c_str( void ) const;
+	char const* raw( void ) const;
+	bool is_empty( void ) const;
+	bool empty( void ) const;
+	int long byte_count( void ) const;
+	int long character_count( void ) const;
+	void reset( void );
+};
+
 HString operator "" _ys ( char const*, size_t );
 HString operator + ( char const*, HString const& );
 bool operator == ( char const*, HString const& );
@@ -816,6 +859,8 @@ bool operator >= ( char const*, HString const& );
 bool operator <= ( char const*, HString const& );
 bool operator > ( char const*, HString const& );
 bool operator < ( char const*, HString const& );
+bool operator == ( char const*, HUTF8String const& );
+bool operator != ( char const*, HUTF8String const& );
 int strcasecmp( HString const&, HString const& );
 HString to_string( char );
 HString to_string( char unsigned );
@@ -857,6 +902,10 @@ inline void swap( yaal::hcore::HString& a, yaal::hcore::HString& b ) {
 }
 
 inline void swap( yaal::hcore::HString::HCharRef a, yaal::hcore::HString::HCharRef b ) {
+	a.swap( b );
+}
+
+inline void swap( yaal::hcore::HUTF8String& a, yaal::hcore::HUTF8String& b ) {
 	a.swap( b );
 }
 
