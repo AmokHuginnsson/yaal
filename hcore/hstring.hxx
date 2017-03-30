@@ -41,7 +41,7 @@ Copyright:
 #include "hcore/base.hxx"
 #include "hcore/pod.hxx"
 #include "hcore/numeric.hxx"
-#include "hcore/assert.hxx"
+#include "hcore/iterator.hxx"
 
 namespace yaal {
 
@@ -811,21 +811,47 @@ private:
 /*! \brief HUTF8String is a class representing UTF-8 string buffer.
  *
  * This class does not allow mutating operations.
+ * HUTF8String provides reference counting based (shallow) copy operation.
+ * It also provides cheap substring via "views".
+ * Characters viewable in given HUTF8String instance are "active".
+ *
+ * Let's say that:
+ * U - is a head of UTF-8 sequence
+ * u - is a tail of UTF-8 sequence
+ * a - is an ASCII character
+ * then, if:
+ * HUTF8String s( "aaaUuaUuuaa" );
+ *
+ * s has 11 bytes, but
+ * s has 8 charactes
+ *
+ * and if s._offset == 3 and s._byteCount == 6
+ * then s is a view and:
+ *
+ * s has 6 bytes, but
+ * s has 3 charactes
+ *
  */
 class HUTF8String final {
 public:
 	typedef HUTF8String this_type;
+	class HIterator;
+	typedef HIterator iterator;
+	typedef HIterator const_iterator;
+	typedef HReverseIterator<HIterator> reverse_iterator;
+	typedef reverse_iterator const_reverse_iterator;
 private:
 	struct OBufferMeta {
-		int_native_t _size;
-		int _refCount;
+		int_native_t _size; /*!< buffer (_ptr) size not including OBufferMeta */
+		int _refCount;      /*!< number of copies of this string */
+		yaal::i8_t _rank;   /*!< maximum number of bytes used per character */
 	};
-	int _byteCount;
-	int _offset;
-	int _characterCount;
+	int _characterCount;  /*!< active utf-8 character count */
+	int _offset;          /*!< active string start offset counted in bytes!! */
+	int _byteCount;       /*!< raw active bytes count */
 	union {
-		OBufferMeta* _meta;
-		char* _ptr;
+		OBufferMeta* _meta; /*!< this string metadata view */
+		char* _ptr;         /*!< shared memory buffer containing metadata at its beginning */
 	};
 public:
 	HUTF8String( void );
@@ -849,6 +875,84 @@ public:
 	int long byte_count( void ) const;
 	int long character_count( void ) const;
 	void reset( void );
+	HIterator begin( void ) const;
+	HIterator end( void ) const;
+	HIterator cbegin( void ) const;
+	HIterator cend( void ) const;
+	reverse_iterator rbegin( void ) const;
+	reverse_iterator rend( void ) const;
+	reverse_iterator crbegin( void ) const;
+	reverse_iterator crend( void ) const;
+};
+
+class HUTF8String::HIterator final : public iterator_interface<yaal::u32_t, iterator_category::random_access> {
+public:
+	typedef u32_t reference;
+private:
+	union {
+		OBufferMeta* _meta; /*!< this string metadata view */
+		char* _ptr;         /*!< shared memory buffer containing metadata at its beginning */
+	};
+	int _characterIndex;
+	int _byteIndex;
+public:
+	HIterator( void );
+	HIterator( HIterator const& );
+	HIterator( HIterator&& );
+	~HIterator( void );
+	HIterator& operator = ( HIterator const& );
+	HIterator& operator = ( HIterator&& );
+	bool operator == ( HIterator const& other_ ) const {
+		return ( _characterIndex == other_._characterIndex );
+	}
+	bool operator != ( HIterator const& other_ ) const {
+		return ( _characterIndex != other_._characterIndex );
+	}
+	bool operator < ( HIterator const& other_ ) const {
+		return ( _characterIndex < other_._characterIndex );
+	}
+	bool operator <= ( HIterator const& other_ ) const {
+		return ( _characterIndex <= other_._characterIndex );
+	}
+	bool operator > ( HIterator const& other_ ) const {
+		return ( _characterIndex > other_._characterIndex );
+	}
+	bool operator >= ( HIterator const& other_ ) const {
+		return ( _characterIndex >= other_._characterIndex );
+	}
+	HIterator& operator ++ ( void );
+	HIterator operator ++ ( int ) {
+		HIterator it( *this );
+		operator ++ ();
+		return ( it );
+	}
+	HIterator& operator -- ( void );
+	HIterator operator -- ( int ) {
+		HIterator it( *this );
+		operator -- ();
+		return ( it );
+	}
+	HIterator& operator += ( int long );
+	HIterator operator + ( int long by_ ) const {
+		HIterator it( *this );
+		it += by_;
+		return ( it );
+	}
+	HIterator& operator -= ( int long );
+	HIterator operator - ( int long by_ ) const {
+		HIterator it( *this );
+		it -= by_;
+		return ( it );
+	}
+	int long operator - ( HIterator const& other_ ) const {
+		return ( _characterIndex - other_._characterIndex );
+	}
+	yaal::u32_t operator * ( void ) const;
+	void swap( HIterator& );
+private:
+	HIterator( char*, int, int );
+	void reset( void );
+	friend class HUTF8String;
 };
 
 HString operator "" _ys ( char const*, size_t );

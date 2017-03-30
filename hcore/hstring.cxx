@@ -41,6 +41,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hchunk.hxx"
 #include "hcore.hxx"
 #include "safe_int.hxx"
+#include "numeric.hxx"
 
 namespace yaal {
 
@@ -1513,22 +1514,30 @@ void HString::HCharRef::swap( HCharRef& charRef_ ) {
 
 namespace utf8 {
 
-static u8_t ENC_1_BYTES_MASK( 0x80 );
-static u8_t ENC_2_BYTES_MASK( 0xe0 );
-static u8_t ENC_2_BYTES_VALUE( 0xc0 );
-static u8_t ENC_3_BYTES_MASK( 0xf0 );
-static u8_t ENC_3_BYTES_VALUE( 0xe0 );
-static u8_t ENC_4_BYTES_MASK( 0xf8 );
-static u8_t ENC_4_BYTES_VALUE( 0xf0 );
-static u8_t TAIL_BYTES_MASK( 0xc0 );
-static u8_t TAIL_BYTES_VALUE( 0x80 );
+static u8_t ENC_1_BYTES_MARK_MASK(  meta::obinary<010000000>::value );
+
+static u8_t ENC_2_BYTES_MARK_VALUE( meta::obinary<011000000>::value );
+static u8_t ENC_2_BYTES_VALUE_MASK( meta::obinary<000011111>::value );
+static u8_t ENC_2_BYTES_MARK_MASK(  meta::obinary<011100000>::value );
+
+static u8_t ENC_3_BYTES_MARK_VALUE( meta::obinary<011100000>::value );
+static u8_t ENC_3_BYTES_VALUE_MASK( meta::obinary<000001111>::value );
+static u8_t ENC_3_BYTES_MARK_MASK(  meta::obinary<011110000>::value );
+
+static u8_t ENC_4_BYTES_MARK_VALUE( meta::obinary<011110000>::value );
+static u8_t ENC_4_BYTES_VALUE_MASK( meta::obinary<000000111>::value );
+static u8_t ENC_4_BYTES_MARK_MASK(  meta::obinary<011111000>::value );
+
+static u8_t TAIL_BYTES_MARK_MASK(   meta::obinary<011000000>::value );
+static u8_t TAIL_BYTES_VALUE_MASK(  meta::obinary<000111111>::value );
+static u8_t TAIL_BYTES_MARK_VALUE(  meta::obinary<010000000>::value );
 
 }
 
 HUTF8String::HUTF8String( void )
-	: _byteCount( 0 )
+	: _characterCount( 0 )
 	, _offset( 0 )
-	, _characterCount( 0 )
+	, _byteCount( 0 )
 	, _ptr( nullptr ) {
 	return;
 }
@@ -1548,21 +1557,25 @@ HUTF8String::HUTF8String( char const* str_ )
 	int characterCount( 0 );
 	char const* p( str_ );
 	int charBytesLeft( 0 );
+	int rank( 1 );
 	while( p && *p ) {
 		if ( charBytesLeft == 0 ) {
-			if ( ! ( *p & utf8::ENC_1_BYTES_MASK ) ) {
+			if ( ! ( *p & utf8::ENC_1_BYTES_MARK_MASK ) ) {
 				++ characterCount;
-			} else if ( ( *p & utf8::ENC_2_BYTES_MASK ) == utf8::ENC_2_BYTES_VALUE ) {
+			} else if ( ( *p & utf8::ENC_2_BYTES_MARK_MASK ) == utf8::ENC_2_BYTES_MARK_VALUE ) {
 				charBytesLeft = 1;
-			} else if ( ( *p & utf8::ENC_3_BYTES_MASK ) == utf8::ENC_3_BYTES_VALUE ) {
+				rank = max( rank, 2 );
+			} else if ( ( *p & utf8::ENC_3_BYTES_MARK_MASK ) == utf8::ENC_3_BYTES_MARK_VALUE ) {
 				charBytesLeft = 2;
-			} else if ( ( *p & utf8::ENC_4_BYTES_MASK ) == utf8::ENC_4_BYTES_VALUE ) {
+				rank = max( rank, 3 );
+			} else if ( ( *p & utf8::ENC_4_BYTES_MARK_MASK ) == utf8::ENC_4_BYTES_MARK_VALUE ) {
 				charBytesLeft = 3;
+				rank = max( rank, 3 );
 			} else {
 				throw HUTF8StringException( "Invalid UTF-8 head sequence at: "_ys.append( byteCount ) );
 			}
 		} else {
-			if ( ( *p & utf8::TAIL_BYTES_MASK ) == utf8::TAIL_BYTES_VALUE ) {
+			if ( ( *p & utf8::TAIL_BYTES_MARK_MASK ) == utf8::TAIL_BYTES_MARK_VALUE ) {
 				-- charBytesLeft;
 				if ( ! charBytesLeft ) {
 					++ characterCount;
@@ -1577,6 +1590,7 @@ HUTF8String::HUTF8String( char const* str_ )
 	_ptr = memory::calloc<char>( byteCount + 1 + static_cast<int>( sizeof( OBufferMeta ) ) );
 	_meta->_refCount = 1;
 	_meta->_size = byteCount;
+	_meta->_rank = static_cast<i8_t>( rank );
 	_byteCount = byteCount;
 	_characterCount = characterCount;
 	::strncpy( _ptr + sizeof ( OBufferMeta ), str_, static_cast<size_t>( byteCount ) );
@@ -1585,9 +1599,9 @@ HUTF8String::HUTF8String( char const* str_ )
 }
 
 HUTF8String::HUTF8String( HUTF8String const& str_ )
-	: _byteCount( str_._byteCount )
+	: _characterCount( str_._characterCount )
 	, _offset( str_._offset )
-	, _characterCount( str_._characterCount )
+	, _byteCount( str_._byteCount )
 	, _ptr( str_._ptr ) {
 	if ( _ptr ) {
 		++ _meta->_refCount;
@@ -1596,9 +1610,9 @@ HUTF8String::HUTF8String( HUTF8String const& str_ )
 }
 
 HUTF8String::HUTF8String( HUTF8String&& str_ )
-	: _byteCount( yaal::move( str_._byteCount ) )
+	: _characterCount( yaal::move( str_._characterCount ) )
 	, _offset( yaal::move( str_._offset ) )
-	, _characterCount( yaal::move( str_._characterCount ) )
+	, _byteCount( yaal::move( str_._byteCount ) )
 	, _ptr( yaal::move( str_._ptr ) ) {
 	str_._ptr = nullptr;
 	str_.reset();
@@ -1621,9 +1635,9 @@ void HUTF8String::reset( void ) {
 			memory::free( _ptr );
 		}
 	}
-	_characterCount = 0;
-	_offset = 0;
 	_byteCount = 0;
+	_offset = 0;
+	_characterCount = 0;
 	return;
 	M_EPILOG
 }
@@ -1631,9 +1645,9 @@ void HUTF8String::reset( void ) {
 void HUTF8String::swap( HUTF8String& other_ ) {
 	M_PROLOG
 	using yaal::swap;
-	swap( _byteCount, other_._byteCount );
-	swap( _offset, other_._offset );
 	swap( _characterCount, other_._characterCount );
+	swap( _offset, other_._offset );
+	swap( _byteCount, other_._byteCount );
 	swap( _ptr, other_._ptr );
 	return;
 	M_EPILOG
@@ -1713,6 +1727,38 @@ int long HUTF8String::character_count( void ) const {
 	return ( _characterCount );
 }
 
+HUTF8String::HIterator HUTF8String::begin( void ) const {
+	return ( HIterator( _ptr, _offset, 0 ) );
+}
+
+HUTF8String::HIterator HUTF8String::end( void ) const {
+	return ( HIterator( _ptr, _offset + _byteCount, _characterCount ) );
+}
+
+HUTF8String::HIterator HUTF8String::cbegin( void ) const {
+	return ( HIterator( _ptr, _offset, 0 ) );
+}
+
+HUTF8String::HIterator HUTF8String::cend( void ) const {
+	return ( HIterator( _ptr, _offset + _byteCount, _characterCount ) );
+}
+
+HUTF8String::reverse_iterator HUTF8String::rbegin( void ) const {
+	return ( end() );
+}
+
+HUTF8String::reverse_iterator HUTF8String::rend( void ) const {
+	return ( begin() );
+}
+
+HUTF8String::reverse_iterator HUTF8String::crbegin( void ) const {
+	return ( end() );
+}
+
+HUTF8String::reverse_iterator HUTF8String::crend( void ) const {
+	return ( begin() );
+}
+
 bool operator == ( char const* left_, HUTF8String const& right_ ) {
 	M_PROLOG
 	return ( right_.operator == ( left_ ) );
@@ -1723,6 +1769,156 @@ bool operator != ( char const* left_, HUTF8String const& right_ ) {
 	M_PROLOG
 	return ( right_.operator != ( left_ ) );
 	M_EPILOG
+}
+
+HUTF8String::HIterator::HIterator( void )
+	: _ptr( nullptr )
+	, _characterIndex( 0 )
+	, _byteIndex( 0 ) {
+	return;
+}
+
+HUTF8String::HIterator::HIterator( HIterator const& other_ )
+	: _ptr( other_._ptr )
+	, _characterIndex( other_._characterIndex )
+	, _byteIndex( other_._byteIndex ) {
+	if ( _ptr ) {
+		++ _meta->_refCount;
+	}
+	return;
+}
+
+HUTF8String::HIterator::HIterator( HIterator&& other_ )
+	: _ptr( yaal::move( other_._ptr ) )
+	, _characterIndex( yaal::move( other_._characterIndex ) )
+	, _byteIndex( yaal::move( other_._byteIndex ) ) {
+	other_._ptr = nullptr;
+	other_.reset();
+	return;
+}
+
+HUTF8String::HIterator::HIterator( char* data_, int byteIndex_, int characterIndex_ )
+	: _ptr( data_ )
+	, _characterIndex( characterIndex_ )
+	, _byteIndex( byteIndex_ ) {
+	M_PROLOG
+	if ( _ptr ) {
+		++ _meta->_refCount;
+	}
+	return;
+	M_EPILOG
+}
+
+HUTF8String::HIterator::~HIterator( void ) {
+	M_PROLOG
+	reset();
+	return;
+	M_DESTRUCTOR_EPILOG
+}
+
+HUTF8String::HIterator& HUTF8String::HIterator::operator = ( HIterator const& other_ ) {
+	reset();
+	if ( other_._ptr ) {
+		HIterator tmp( other_ );
+		swap( tmp );
+	}
+	return ( *this );
+}
+
+HUTF8String::HIterator& HUTF8String::HIterator::operator = ( HIterator&& other_ ) {
+	swap( other_ );
+	other_.reset();
+	return ( *this );
+}
+
+void HUTF8String::HIterator::swap( HIterator& other_ ) {
+	using yaal::swap;
+	swap( _ptr, other_._ptr );
+	swap( _characterIndex, other_._characterIndex );
+	swap( _byteIndex, other_._byteIndex );
+	return;
+}
+
+void HUTF8String::HIterator::reset( void ) {
+	M_PROLOG
+	M_ASSERT( ( _ptr == nullptr ) || ( ( _ptr != nullptr ) && ( _meta->_refCount > 0 ) ) );
+	if ( _ptr ) {
+		-- _meta->_refCount;
+		if ( _meta->_refCount == 0 ) {
+			memory::free( _ptr );
+		}
+	}
+	_byteIndex = 0;
+	_characterIndex = 0;
+	return;
+	M_EPILOG
+}
+
+HUTF8String::HIterator& HUTF8String::HIterator::operator ++ ( void ) {
+	M_ASSERT( _ptr );
+	char const* p( _ptr + sizeof ( HUTF8String::OBufferMeta ) + _byteIndex );
+	int inc( 1 );
+	if ( ! ( *p & utf8::ENC_1_BYTES_MARK_MASK ) ) {
+	} else if ( ( *p & utf8::ENC_2_BYTES_MARK_MASK ) == utf8::ENC_2_BYTES_MARK_VALUE ) {
+		inc = 2;
+	} else if ( ( *p & utf8::ENC_3_BYTES_MARK_MASK ) == utf8::ENC_3_BYTES_MARK_VALUE ) {
+		inc = 3;
+	} else {
+		inc = 4;
+	}
+	_byteIndex += inc;
+	++ _characterIndex;
+	return ( *this );
+}
+
+HUTF8String::HIterator& HUTF8String::HIterator::operator -- ( void ) {
+	M_ASSERT( _ptr );
+	-- _byteIndex;
+	char const* p( _ptr + sizeof ( HUTF8String::OBufferMeta ) + _byteIndex );
+	while ( ( *p & utf8::TAIL_BYTES_MARK_MASK ) == utf8::TAIL_BYTES_MARK_VALUE ) {
+		-- _byteIndex;
+		-- p;
+	}
+	-- _characterIndex;
+	return ( *this );
+}
+
+HUTF8String::HIterator& HUTF8String::HIterator::operator += ( int long by_ ) {
+	advance( *this, by_ );
+	return ( *this );
+}
+
+HUTF8String::HIterator& HUTF8String::HIterator::operator -= ( int long by_ ) {
+	advance( *this, -by_ );
+	return ( *this );
+}
+
+yaal::u32_t HUTF8String::HIterator::operator * ( void ) const {
+	M_ASSERT( _ptr );
+	char const* p( _ptr + sizeof ( HUTF8String::OBufferMeta ) + _byteIndex );
+	u32_t character( static_cast<u8_t>( *p ) );
+	if ( ! ( *p & utf8::ENC_1_BYTES_MARK_MASK ) ) {
+	} else if ( ( *p & utf8::ENC_2_BYTES_MARK_MASK ) == utf8::ENC_2_BYTES_MARK_VALUE ) {
+		character &= utf8::ENC_2_BYTES_VALUE_MASK;
+		character <<= 6;
+		++ p;
+		character |= ( static_cast<u8_t>( *p ) & utf8::TAIL_BYTES_VALUE_MASK );
+	} else if ( ( *p & utf8::ENC_3_BYTES_MARK_MASK ) == utf8::ENC_3_BYTES_MARK_VALUE ) {
+		character &= utf8::ENC_3_BYTES_VALUE_MASK;
+		for ( int i( 0 ); i < 2; ++ i ) {
+			character <<= 6;
+			++ p;
+			character |= ( static_cast<u8_t>( *p ) & utf8::TAIL_BYTES_VALUE_MASK );
+		}
+	} else {
+		character &= utf8::ENC_4_BYTES_VALUE_MASK;
+		for ( int i( 0 ); i < 3; ++ i ) {
+			character <<= 6;
+			++ p;
+			character |= ( static_cast<u8_t>( *p ) & utf8::TAIL_BYTES_VALUE_MASK );
+		}
+	}
+	return ( character );
 }
 
 #undef SET_ALLOC_BYTES
