@@ -1691,7 +1691,7 @@ bool HUTF8String::operator == ( char const* other_ ) const {
 	bool same( false );
 	if ( byteCount == _byteCount ) {
 		if ( _ptr ) {
-			same = other_ && ( ::strncmp( _ptr + sizeof ( OBufferMeta ) + _offset, other_, static_cast<size_t>( _byteCount ) + 1 ) == 0 );
+			same = other_ && ( ::strncmp( _ptr + sizeof ( OBufferMeta ) + _offset, other_, static_cast<size_t>( _byteCount ) ) == 0 );
 		} else {
 			same = ! other_;
 		}
@@ -1712,11 +1712,12 @@ bool HUTF8String::empty( void ) const {
 }
 
 char const* HUTF8String::c_str( void ) const {
-	return ( _ptr ? _ptr + sizeof ( OBufferMeta ) : nullptr );
+	M_ASSERT( ! _ptr || ( ( _offset + _byteCount ) == _meta->_size ) );
+	return ( _ptr ? _ptr + sizeof ( OBufferMeta ) + _offset : nullptr );
 }
 
 char const* HUTF8String::raw( void ) const {
-	return ( _ptr ? _ptr + sizeof ( OBufferMeta ) : nullptr );
+	return ( _ptr ? _ptr + sizeof ( OBufferMeta ) + _offset : nullptr );
 }
 
 int long HUTF8String::byte_count( void ) const {
@@ -1757,6 +1758,18 @@ HUTF8String::reverse_iterator HUTF8String::crbegin( void ) const {
 
 HUTF8String::reverse_iterator HUTF8String::crend( void ) const {
 	return ( begin() );
+}
+
+HUTF8String HUTF8String::substr( int long from_, int long len_ ) const {
+	HIterator it( begin() );
+	it += from_;
+	HIterator endIt( it );
+	endIt += len_;
+	HUTF8String s( *this );
+	s._offset = it._byteIndex;
+	s._byteCount = endIt._byteIndex - it._byteIndex;
+	s._characterCount = safe_int::cast<int>( len_ );
+	return ( s );
 }
 
 bool operator == ( char const* left_, HUTF8String const& right_ ) {
@@ -1884,12 +1897,28 @@ HUTF8String::HIterator& HUTF8String::HIterator::operator -- ( void ) {
 }
 
 HUTF8String::HIterator& HUTF8String::HIterator::operator += ( int long by_ ) {
-	advance( *this, by_ );
+	if ( by_ > 0 ) {
+		while ( by_ -- ) {
+			operator ++ ();
+		}
+	} else {
+		while ( by_ ++ ) {
+			operator -- ();
+		}
+	}
 	return ( *this );
 }
 
 HUTF8String::HIterator& HUTF8String::HIterator::operator -= ( int long by_ ) {
-	advance( *this, -by_ );
+	if ( by_ > 0 ) {
+		while ( by_ -- ) {
+			operator -- ();
+		}
+	} else {
+		while ( by_ ++ ) {
+			operator ++ ();
+		}
+	}
 	return ( *this );
 }
 

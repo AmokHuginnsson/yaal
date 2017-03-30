@@ -883,6 +883,7 @@ public:
 	reverse_iterator rend( void ) const;
 	reverse_iterator crbegin( void ) const;
 	reverse_iterator crend( void ) const;
+	HUTF8String substr( int long, int long = HString::npos ) const;
 };
 
 class HUTF8String::HIterator final : public iterator_interface<yaal::u32_t, iterator_category::random_access> {
