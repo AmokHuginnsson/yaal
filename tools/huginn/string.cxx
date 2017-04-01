@@ -101,7 +101,7 @@ inline HHuginn::value_t find_raw( char const* name_, finder_raw_t finder_, int l
 		startAt = static_cast<int long>( get_integer( values_[1] ) );
 	}
 
-	int long pos( (get_string( object_->raw() ).*finder_)( get_string( values_[0] ).raw(), startAt ) );
+	int long pos( (get_string( object_->raw() ).*finder_)( get_string( values_[0] ).c_str(), startAt ) );
 	return ( thread_->object_factory().create_integer( pos != hcore::HString::npos ? pos : -1 ) );
 	M_EPILOG
 }
@@ -213,7 +213,7 @@ inline HHuginn::value_t strip( huginn::HThread* thread_, HHuginn::value_t* objec
 	char const* trimChars( nullptr );
 	if ( values_.get_size() > 0 ) {
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, ARITY::UNARY, position_ );
-		trimChars = get_string( values_[0] ).raw();
+		trimChars = get_string( values_[0] ).c_str();
 	}
 	HString dest( get_string( object_->raw() ) );
 	int long len( dest.get_length() );

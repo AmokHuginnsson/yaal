@@ -211,9 +211,9 @@ void HListWidget::draw_header( int columns_ ) {
 				_varTmpBuffer.format( "%%-%ds",
 							columnInfo->_widthRaw );
 				cons.mvprintf( _rowRaw, _columnRaw + columnOffset,
-							_varTmpBuffer.raw(),
+							_varTmpBuffer.c_str(),
 								columnInfo->_name.left(
-									columnInfo->_widthRaw ).raw() );
+									columnInfo->_widthRaw ).c_str() );
 				set_attr_shortcut();
 				cons.mvprintf( _rowRaw,
 							_columnRaw + columnOffset + columnInfo->_shortcutIndex,
@@ -238,7 +238,7 @@ void HListWidget::draw_header( int columns_ ) {
 		_varTmpBuffer.format( " %d/%d ", _widgetOffset + _cursorPosition + 1, static_cast<int>( _model->size() ) );
 		if ( _labelLength < _widthRaw ) {
 			int clip = static_cast<int>( ( ( _widthRaw - _labelLength ) < _varTmpBuffer.get_length() ) ? _varTmpBuffer.get_length() - ( _widthRaw - _labelLength ) : 0 );
-			cons.mvprintf( _rowRaw - 1, static_cast<int>( _columnRaw + _widthRaw + clip - _varTmpBuffer.get_length() ), _varTmpBuffer.raw() + clip );
+			cons.mvprintf( _rowRaw - 1, static_cast<int>( _columnRaw + _widthRaw + clip - _varTmpBuffer.get_length() ), _varTmpBuffer.c_str() + clip );
 		}
 	}
 	return;
@@ -252,7 +252,7 @@ void HListWidget::draw_background( int from_ ) {
 	_varTmpBuffer.reserve( _widthRaw );
 	_varTmpBuffer.fillz( '.', 0, _widthRaw );
 	for ( ; ctr < _heightRaw; ctr ++ ) {
-		HConsole::get_instance().mvprintf( _rowRaw + ctr, _columnRaw, _varTmpBuffer.raw() );
+		HConsole::get_instance().mvprintf( _rowRaw + ctr, _columnRaw, _varTmpBuffer.c_str() );
 	}
 	return;
 	M_EPILOG
@@ -336,7 +336,7 @@ void HListWidget::draw_cell( iterator_t& it_, int row_, int column_, int columnO
 		else
 			set_attr_data();
 	}
-	cons.mvprintf( _rowRaw + row_, _columnRaw + columnOffset_, _varTmpBuffer.raw()	);
+	cons.mvprintf( _rowRaw + row_, _columnRaw + columnOffset_, _varTmpBuffer.c_str()	);
 	if ( _searchActivated )
 		highlight( _rowRaw + row_,
 				_columnRaw + columnOffset_, _match._matchNumber,
@@ -792,7 +792,7 @@ int HListWidget::process_input_view( int code_ ) {
 	if ( ! errorCode ) {
 		schedule_repaint();
 		if ( _window ) {
-			_window->status_bar()->message( COLOR::FG_LIGHTGRAY, "%s", _varTmpBuffer.raw() );
+			_window->status_bar()->message( COLOR::FG_LIGHTGRAY, "%s", _varTmpBuffer.c_str() );
 		}
 	}
 	if ( get_cursor_position() != origCursorPosition ) {
@@ -1010,7 +1010,7 @@ void HListWidget::go_to_match( void ) {
 			get_text_for_cell( _cursor, columnWithMatch, TYPE::HSTRING );
 			highlightStart = nullptr;
 			matchNumber = 0;
-			for ( HPattern::HMatchIterator it = _pattern.find( _varTmpBuffer.raw() ),
+			for ( HPattern::HMatchIterator it = _pattern.find( _varTmpBuffer.c_str() ),
 					end = _pattern.end(); it != end; ++ it, ++ matchNumber ) {
 				if ( matchNumber > _match._matchNumber ) {
 					highlightStart = it->raw();
@@ -1090,8 +1090,8 @@ void HListWidget::go_to_match_previous( void ) {
 			highlightStart = nullptr;
 			ctrLoc = 0;
 			if ( _match._matchNumber < 0 )
-				_match._matchNumber = static_cast<int>( distance( _pattern.find( _varTmpBuffer.raw() ), _pattern.end() ) );
-			for ( HPattern::HMatchIterator it = _pattern.find( _varTmpBuffer.raw() ),
+				_match._matchNumber = static_cast<int>( distance( _pattern.find( _varTmpBuffer.c_str() ), _pattern.end() ) );
+			for ( HPattern::HMatchIterator it = _pattern.find( _varTmpBuffer.c_str() ),
 					end = _pattern.end(); it != end; ++ it, ++ ctrLoc ) {
 				if ( ctrLoc == ( _match._matchNumber - 1 ) ) {
 					highlightStart = it->raw();

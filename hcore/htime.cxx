@@ -230,7 +230,7 @@ HTime& HTime::from_string( yaal::hcore::HString const& str_ ) {
 	M_PROLOG
 	struct tm broken;
 	::memcpy( &broken, &_broken, sizeof ( _broken ) );
-	char const* end( ::strptime( str_.c_str(), _format.raw(), &broken ) );
+	char const* end( ::strptime( str_.c_str(), _format.c_str(), &broken ) );
 	if ( ! end ) {
 		::memcpy( &broken, &_broken, sizeof ( _broken ) );
 		end = ::strptime( str_.c_str(), _iso8601DateTimeFormat_, &broken );
@@ -468,16 +468,16 @@ HString HTime::to_string( HString const& format_ ) const {
 	HString const& format( ! format_.is_empty() ? format_ : _format );
 #ifdef HAVE_SMART_STRFTIME
 	static int const MIN_TIME_STRING_LENGTH( 32 );
-	int long size( static_cast<int long>( ::strftime( nullptr, 1024, format.raw(), &_broken ) + 1 ) );
+	int long size( static_cast<int long>( ::strftime( nullptr, 1024, format.c_str(), &_broken ) + 1 ) );
 	if ( size < 2 )
 		M_THROW( "bad format", errno );
 	_cache.realloc( max<int long>( size, MIN_TIME_STRING_LENGTH ) );
 	M_ENSURE( static_cast<int>( ::strftime( _cache.get<char>(),
-					static_cast<size_t>( size ), format.raw(), &_broken ) ) < size );
+					static_cast<size_t>( size ), format.c_str(), &_broken ) ) < size );
 #else /* HAVE_SMART_STRFTIME */
 	static int const MIN_TIME_STRING_LENGTH( 64 );
 	_cache.realloc( MIN_TIME_STRING_LENGTH ); /* FIXME that is pretty dumb hack */
-	int long size( static_cast<int long>( ::strftime( _cache.get<char>(), MIN_TIME_STRING_LENGTH - 1, format.raw(), &_broken ) ) + 1 );
+	int long size( static_cast<int long>( ::strftime( _cache.get<char>(), MIN_TIME_STRING_LENGTH - 1, format.c_str(), &_broken ) ) + 1 );
 	if ( size < 2 )
 		M_THROW( "bad format", errno );
 #endif /* not HAVE_SMART_STRFTIME */

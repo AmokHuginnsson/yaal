@@ -63,7 +63,7 @@ void HStringStream::str( HString const& s_ ) {
 }
 
 char const* HStringStream::raw( void ) const {
-	return ( _buffer.raw() );
+	return ( _buffer.c_str() );
 }
 
 yaal::hcore::HString const& HStringStream::string( void ) const {
@@ -97,7 +97,7 @@ int long HStringStream::do_read( void* buffer_, int long size_ ) {
 	int long length( _buffer.get_length() );
 	int long toCopy( yaal::min( length - _offset, size_ ) );
 	if ( length > 0 ) {
-		::strncpy( static_cast<char*>( buffer_ ), _buffer.raw() + _offset, static_cast<size_t>( toCopy ) );
+		::strncpy( static_cast<char*>( buffer_ ), _buffer.c_str() + _offset, static_cast<size_t>( toCopy ) );
 	}
 	_offset += toCopy;
 	if ( _offset >= length ) {

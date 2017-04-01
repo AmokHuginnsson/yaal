@@ -263,7 +263,7 @@ void HWidget::do_draw_label( void ) {
 		++ col;
 	}
 
-	cons.mvprintf( _rowRaw, col, _label.raw() );
+	cons.mvprintf( _rowRaw, col, _label.c_str() );
 	set_attr_shortcut();
 	cons.mvprintf( _rowRaw, col + _shortcutIndex,
 				"%c", _label[ _shortcutIndex ] );

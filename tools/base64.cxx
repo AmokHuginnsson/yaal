@@ -110,7 +110,7 @@ yaal::hcore::HString base64_raw_encode( char const* ptr, int long length, bool s
 
 yaal::hcore::HString base64::encode( yaal::hcore::HString const& message, bool standardCompliantMode ) {
 	M_PROLOG
-	return ( base64_raw_encode( message.raw(), message.get_length(), standardCompliantMode ) );
+	return ( base64_raw_encode( message.c_str(), message.get_length(), standardCompliantMode ) );
 	M_EPILOG
 }
 
@@ -129,7 +129,7 @@ int long base64_raw_decode( yaal::hcore::HString const& message, char* output, i
 	M_PROLOG
 	int shifts[] = { 18, 12, 6, 0 };
 	u32_t coder = 0;
-	char const* ptr = message.raw();
+	char const* ptr = message.c_str();
 	int long length = message.get_length();
 	int long size( 0 );
 	int long i( 0 );
@@ -185,7 +185,7 @@ void base64::encode( yaal::hcore::HStreamInterface& in, yaal::hcore::HStreamInte
 		line = base64_raw_encode( buf, size, standardCompliantMode );
 		if ( wrap_ ) {
 			int long nRead( line.get_length() );
-			char const* ptr = line.raw();
+			char const* ptr = line.c_str();
 			while ( ( offset + nRead ) >= wrap_ ) {
 				int long nWrite( wrap_ - offset );
 				out.write( ptr, nWrite );
@@ -221,7 +221,7 @@ void base64::decode( yaal::hcore::HStreamInterface& in, yaal::hcore::HStreamInte
 	HString decodebuf( BASE64LINELEN + 1, 0 );
 	int long pos( 0 );
 	while ( in.read_until_n( line, BUF_LEN ) ) {
-		char const* ptr = line.raw();
+		char const* ptr = line.c_str();
 		int const SIZE = static_cast<int>( line.get_length() );
 		for ( int i = 0; i < SIZE; ++ i, ++ pos ) {
 			char ch = ptr[ i ];

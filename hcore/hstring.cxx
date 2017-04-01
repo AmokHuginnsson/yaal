@@ -176,7 +176,7 @@ HString::HString( HString const& string_ )
 	if ( ! string_.is_empty() ) {
 		int long newSize( string_.get_length() );
 		reserve( newSize );
-		::std::strncpy( MEM, string_.raw(), static_cast<size_t>( newSize ) );
+		::std::strncpy( MEM, string_.c_str(), static_cast<size_t>( newSize ) );
 		SET_SIZE( newSize );
 	}
 	return;
@@ -449,7 +449,7 @@ HString& HString::operator = ( HString const& string_ ) {
 			reserve( newSize );
 		}
 		if ( newSize ) {
-			::std::strncpy( MEM, string_.raw(), static_cast<size_t>( newSize ) );
+			::std::strncpy( MEM, string_.c_str(), static_cast<size_t>( newSize ) );
 		}
 		MEM[ newSize ] = 0;
 		SET_SIZE( newSize );
@@ -478,7 +478,7 @@ HString& HString::operator += ( HString const& string_ ) {
 		int long oldSize( GET_SIZE );
 		int long newSize( oldSize + otherSize );
 		reserve( newSize );
-		::std::strcpy( MEM + oldSize, string_.raw() );
+		::std::strcpy( MEM + oldSize, string_.c_str() );
 		SET_SIZE( newSize );
 	}
 	return ( *this );
@@ -522,7 +522,7 @@ bool HString::operator == ( HString const& other_ ) const {
 	M_PROLOG
 	return ( ( this == &other_ )
 			|| ( ( GET_SIZE == other_.get_length() )
-				&& ( ! ( GET_SIZE && ::std::strcmp( MEM, other_.raw() ) ) ) ) );
+				&& ( ! ( GET_SIZE && ::std::strcmp( MEM, other_.c_str() ) ) ) ) );
 	M_EPILOG
 }
 
@@ -534,13 +534,13 @@ bool HString::operator != (  HString const& other_ ) const {
 
 bool HString::operator >= ( HString const& other_ ) const {
 	M_PROLOG
-	return ( ::std::strcoll( MEM, other_.raw() ) >= 0 );
+	return ( ::std::strcoll( MEM, other_.c_str() ) >= 0 );
 	M_EPILOG
 }
 
 bool HString::operator <= ( HString const& other_ ) const {
 	M_PROLOG
-	return ( ::std::strcoll( MEM, other_.raw() ) <= 0 );
+	return ( ::std::strcoll( MEM, other_.c_str() ) <= 0 );
 	M_EPILOG
 }
 
@@ -598,10 +598,6 @@ bool operator <= ( char const* left_, HString const& right_ ) {
 	M_PROLOG
 	return ( right_.operator >= ( left_ ) );
 	M_EPILOG
-}
-
-char const* HString::raw( void ) const {
-	return ( MEM );
 }
 
 char const* HString::c_str( void ) const {
@@ -724,7 +720,7 @@ HString& HString::assign( HString const& str_, int long offset_, int long length
 	if ( offset_ < s ) {
 		newSize = ( length_ > ( s - offset_ ) ) ? s - offset_ : length_;
 		reserve( newSize );
-		::memcpy( MEM, str_.raw() + offset_, static_cast<size_t>( newSize ) );
+		::memcpy( MEM, str_.c_str() + offset_, static_cast<size_t>( newSize ) );
 	}
 	MEM[ newSize ] = 0;
 	SET_SIZE( newSize );
@@ -845,7 +841,7 @@ int long HString::nfind( HString const& pattern_, int long patternLength_, int l
 		return ( npos );
 	}
 	int long idx = string_helper::kmpsearch( MEM + after_,
-			GET_SIZE - after_, pattern_.raw(), patternLength_ );
+			GET_SIZE - after_, pattern_.c_str(), patternLength_ );
 	return ( idx >= 0 ? idx + after_ : npos );
 	M_EPILOG
 }
@@ -1028,7 +1024,7 @@ HString& HString::replace( HString const& pattern_,
 	int long patPos( 0 );
 	if ( subWP == 0 ) { /* replacement is equal length to pattern */
 		while ( ( patPos = find( pattern_, patPos ) ) != npos ) {
-			::std::strncpy( MEM + patPos, with_.raw(), static_cast<size_t>( lenWith ) );
+			::std::strncpy( MEM + patPos, with_.c_str(), static_cast<size_t>( lenWith ) );
 			patPos += lenPattern;
 		}
 	} else {
@@ -1050,8 +1046,8 @@ HString& HString::replace( HString const& pattern_,
 		int long oldLen( 0 );
 		int long newLen( 0 );
 		patPos = 0;
-		char const* with( with_.raw() );
-		char const* srcBuf( src->raw() );
+		char const* with( with_.c_str() );
+		char const* srcBuf( src->c_str() );
 		char* buf( MEM );
 		while ( ( patPos = src->find( pattern_, patPos ) ) != npos ) {
 			if ( patPos > oldLen ) {
@@ -1075,7 +1071,7 @@ HString& HString::replace( HString const& pattern_,
 
 HString& HString::replace( int long pos_, int long size_, HString const& replacement ) {
 	M_PROLOG
-	return ( replace( pos_, size_, replacement.raw(), replacement.get_length() ) );
+	return ( replace( pos_, size_, replacement.c_str(), replacement.get_length() ) );
 	M_EPILOG
 }
 
@@ -1084,7 +1080,7 @@ HString& HString::replace( int long pos_, int long size_, HString const& replace
 	if ( offset_ < 0 ) {
 		M_THROW( _errMsgHString_[string_helper::BAD_OFFSET], offset_ );
 	}
-	return ( replace( pos_, size_, replacement.raw() + offset_, len_ ) );
+	return ( replace( pos_, size_, replacement.c_str() + offset_, len_ ) );
 	M_EPILOG
 }
 
@@ -1362,7 +1358,7 @@ HString& HString::erase( int long from_, int long length_ ) {
 
 HString& HString::insert( int long from_, HString const& str_ ) {
 	M_PROLOG
-	return ( insert( from_, str_.get_length(), str_.raw() ) );
+	return ( insert( from_, str_.get_length(), str_.c_str() ) );
 	M_EPILOG
 }
 
@@ -1419,7 +1415,7 @@ HString& HString::insert( int long from_, int long length_, char char_ ) {
 
 HString& HString::append( HString const& str_ ) {
 	M_PROLOG
-	return ( append( str_.raw(), str_.get_length() ) );
+	return ( append( str_.c_str(), str_.get_length() ) );
 	M_EPILOG
 }
 
@@ -1436,7 +1432,7 @@ HString& HString::append( HString const& str_, int long idx_, int long len_ ) {
 	}
 	if ( ( len_ > 0 ) && ( idx_ < str_.get_length() ) ) {
 		append(
-			str_.raw() + ( idx_ >= 0 ? idx_ : 0 ),
+			str_.c_str() + ( idx_ >= 0 ? idx_ : 0 ),
 			( ( idx_ + len_ ) < str_.get_length() ) ? len_ : str_.get_length() - idx_
 		);
 	}
@@ -2092,7 +2088,7 @@ int long long stoll_impl( char const* str_, int* endIdx_, int base_ ) {
 
 int long long stoll( HString const& str_, int* endIdx_, int base_ ) {
 	M_PROLOG
-	return ( stoll_impl( str_.raw(), endIdx_, base_ ) );
+	return ( stoll_impl( str_.c_str(), endIdx_, base_ ) );
 	M_EPILOG
 }
 
@@ -2118,7 +2114,7 @@ int long long unsigned stoull_impl( char const* str_, int* endIdx_, int base_ ) 
 
 int long long unsigned stoull( HString const& str_, int* endIdx_, int base_ ) {
 	M_PROLOG
-	return ( stoull_impl( str_.raw(), endIdx_, base_ ) );
+	return ( stoull_impl( str_.c_str(), endIdx_, base_ ) );
 	M_EPILOG
 }
 
@@ -2263,7 +2259,7 @@ int long kmpcasesearch( char const* str, int long lenstr, char const* pat, int l
 }
 
 int strcasecmp( HString const& left, HString const& right ) {
-	return ( ::strcasecmp( left.raw(), right.raw() ) );
+	return ( ::strcasecmp( left.c_str(), right.c_str() ) );
 }
 
 }

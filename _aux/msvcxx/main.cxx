@@ -137,7 +137,7 @@ int setenv( char const* name_, char const* value_, int replace_ ) {
 	if ( !orig || replace_ ) {
 		HString s( name_ );
 		s.append( "=" ).append( value_ );
-		ret = ::putenv( s.raw() );
+		ret = ::putenv( s.c_str() );
 	}
 	return ( ret );
 }
@@ -184,7 +184,7 @@ DIR* opendir( char const* path_ ) {
 	WIN32_FIND_DATA d;
 	HString path( path_ );
 	path.append( "/*" );
-	HANDLE h( ::FindFirstFile( path.raw(), &d ) );
+	HANDLE h( ::FindFirstFile( path.c_str(), &d ) );
 	DIR* dir( nullptr );
 	if ( h != INVALID_HANDLE_VALUE ) {
 		dir = memory::calloc<DIR>( 1 );
@@ -311,7 +311,7 @@ bool get_system_account_name( int id_, char* buf_, int size_ ) {
 			sidStr.erase( sidStr.find_last( '-' ) + 1 );
 			sidStr += id_;
 			PSID newSid( nullptr );
-			if ( ::ConvertStringSidToSid( sidStr.raw(), &newSid ) ) {
+			if ( ::ConvertStringSidToSid( sidStr.c_str(), &newSid ) ) {
 				DWORD size( size_ );
 				static int const DUMMY_BUFFER_SIZE = 128;
 				char dummy[DUMMY_BUFFER_SIZE];

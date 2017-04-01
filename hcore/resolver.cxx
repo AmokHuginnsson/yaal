@@ -70,7 +70,7 @@ ip_t resolver::get_ip( HString const& hostName_ ) {
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 #if defined( HAVE_GETADDRINFO ) && ( HAVE_GETADDRINFO != 0 )
 	addrinfo* addrInfo( nullptr );
-	errno = ::getaddrinfo( hostName_.raw(), nullptr, nullptr, &addrInfo );
+	errno = ::getaddrinfo( hostName_.c_str(), nullptr, nullptr, &addrInfo );
 	M_ENSURE( ! errno && addrInfo, hostName_ );
 	ip = ip_t( static_cast<sockaddr_in*>( static_cast<void*>( addrInfo->ai_addr ) )->sin_addr.s_addr );
 	::freeaddrinfo( addrInfo );
@@ -80,7 +80,7 @@ ip_t resolver::get_ip( HString const& hostName_ ) {
 	int size( static_cast<int>( _cache->get_size() ) );
 	_cache->realloc( size );
 	int error( 0 );
-	while ( ::gethostbyname_r( hostName_.raw(), &hostName,
+	while ( ::gethostbyname_r( hostName_.c_str(), &hostName,
 				_cache->raw(), size,
 				&hostNameStatus, &error ) == ERANGE )
 		_cache->realloc( size <<= 1 );

@@ -68,7 +68,7 @@ public:
 	static HHuginn::value_t env( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "OperatingSystem.env", values_, { HHuginn::TYPE::STRING }, position_ );
-		char const* val( ::getenv( get_string( values_[0] ).raw() ) );
+		char const* val( ::getenv( get_string( values_[0] ).c_str() ) );
 		HRuntime& rt( thread_->runtime() );
 		return ( val ? rt.object_factory()->create_string( val ) : rt.none_value() );
 		M_EPILOG
@@ -84,7 +84,7 @@ public:
 		argv[argc] = nullptr;
 		for ( int i( 0 ); i < argc; ++ i ) {
 			verify_arg_type( name, values_, i, HHuginn::TYPE::STRING, argc == 1 ? ARITY::UNARY : ARITY::MULTIPLE, position_ );
-			argv[i] = const_cast<char*>( get_string( values_[i] ).raw() );
+			argv[i] = const_cast<char*>( get_string( values_[i] ).c_str() );
 		}
 		::execvp( argv[0], argv );
 		thread_->raise( static_cast<HOperatingSystem*>( object_->raw() )->_exceptionClass.raw(), strerror( errno ), position_ );

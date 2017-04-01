@@ -1052,7 +1052,7 @@ int HConsole::on_terminal_resize( int signum_ ) {
 	if ( is_enabled() ) {
 		notify_terminal();
 	} else {
-		::fprintf( stderr, "\n%s", message.raw() );
+		::fprintf( stderr, "\n%s", message.c_str() );
 	}
 	return ( 0 );
 	M_EPILOG

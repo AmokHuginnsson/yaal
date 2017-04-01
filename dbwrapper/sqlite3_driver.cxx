@@ -107,15 +107,15 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, HString const& dataBase_,
 		OSQLite* sQLite( nullptr );
 		dbLink_._conn = sQLite = new ( memory::yaal ) OSQLite;
 		HString dataBase( dataBase_ );
-		if ( ::access( dataBase.raw(), R_OK | W_OK ) ) {
+		if ( ::access( dataBase.c_str(), R_OK | W_OK ) ) {
 			char const fileNameExt[] = ".sqlite";
 			dataBase += fileNameExt;
-			if ( ::access( dataBase.raw(), R_OK | W_OK ) ) {
-				sQLite->_errorMessage.format( "Database file `%s' is not accessible.", dataBase.raw() );
+			if ( ::access( dataBase.c_str(), R_OK | W_OK ) ) {
+				sQLite->_errorMessage.format( "Database file `%s' is not accessible.", dataBase.c_str() );
 				break;
 			}
 		}
-		sQLite->_errorCode = ::sqlite3_open( dataBase.raw(), &sQLite->_db );
+		sQLite->_errorCode = ::sqlite3_open( dataBase.c_str(), &sQLite->_db );
 		if ( sQLite->_errorCode )
 			sQLite->_errorMessage = ::sqlite3_errmsg( sQLite->_db );
 		else {
@@ -171,10 +171,10 @@ M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* result_ ) 
 	M_ASSERT( sQLite );
 	char const* msg = "";
 	if ( r && ! r->_errorMessage.is_empty() ) {
-		msg = r->_errorMessage.raw();
+		msg = r->_errorMessage.c_str();
 	} else if ( sQLite ) {
 		if ( ! sQLite->_errorMessage.is_empty() ) {
-			msg = sQLite->_errorMessage.raw();
+			msg = sQLite->_errorMessage.c_str();
 		} else {
 			msg = sqlite3_errmsg( sQLite->_db );
 		}

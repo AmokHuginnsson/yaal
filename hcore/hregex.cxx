@@ -185,7 +185,7 @@ bool HRegex::compile( HString const& pattern_, compile_t flags_ ) {
 	options |= ( ( flags_ & COMPILE::NEWLINE ) ? PCRE_MULTILINE : 0 );
 	char const* errMsg( nullptr );
 	int offset( 0 );
-	_impl = ::pcre_compile2( pattern_.raw(), options, &_lastError, &errMsg, &offset, nullptr );
+	_impl = ::pcre_compile2( pattern_.c_str(), options, &_lastError, &errMsg, &offset, nullptr );
 	if ( ! _lastError ) {
 		_extra = ::pcre_study( static_cast<pcre*>( _impl ), PCRE_STUDY_EXTRA_NEEDED | PCRE_STUDY_JIT_COMPILE, &errMsg );
 		if ( errMsg ) {
@@ -289,7 +289,7 @@ yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, yaal::h
 	HString res;
 	int endPos( 0 );
 	while ( true ) {
-		groups_t g( groups_impl( text_.raw() + endPos, match_ ) );
+		groups_t g( groups_impl( text_.c_str() + endPos, match_ ) );
 		if ( g.is_empty() ) {
 			res.append( text_, endPos );
 			break;
@@ -353,7 +353,7 @@ HRegex::HMatchIterator HRegex::find( char const* str_, match_t match_ ) const {
 }
 
 HRegex::HMatchIterator HRegex::find( HString const& str_, match_t match_ ) const {
-	return ( find( str_.raw(), match_ ) );
+	return ( find( str_.c_str(), match_ ) );
 }
 
 HRegex::HMatchIterator HRegex::end( void ) const {
@@ -376,7 +376,7 @@ HRegex::groups_t HRegex::groups( char const* string_, match_t match_ ) const {
 
 HRegex::groups_t HRegex::groups( yaal::hcore::HString const& string_, match_t match_ ) const {
 	M_PROLOG
-	return ( groups_impl( string_.raw(), match_ ) );
+	return ( groups_impl( string_.c_str(), match_ ) );
 	M_EPILOG
 }
 

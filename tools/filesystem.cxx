@@ -72,7 +72,7 @@ void do_stat( struct stat* s, path_t const& path_, bool resolve_ = true ) {
 	M_PROLOG
 	::memset( s, 0, sizeof ( *s ) );
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
-	if ( ! ( ( resolve_ && ( ::stat( path_.raw(), s ) == 0 ) ) || ( ::lstat( path_.raw(), s ) == 0 ) ) ) {
+	if ( ! ( ( resolve_ && ( ::stat( path_.c_str(), s ) == 0 ) ) || ( ::lstat( path_.c_str(), s ) == 0 ) ) ) {
 		throw HFileSystemException( to_string( "Cannot acquire metadata for `" ).append( path_ ).append( "'" ) );
 	}
 	return;
@@ -240,7 +240,7 @@ path_t dirname( path_t const& path_ ) {
 	if ( dname.is_empty() ) {
 		degenerated = true;
 	}	else if ( dname != path::ROOT ) {
-		dname.trim_right( path::SEPARATOR_STR.raw() );
+		dname.trim_right( path::SEPARATOR_STR.c_str() );
 		if ( ! dname.is_empty() ) {
 			int long delimPos( dname.find_last( path::SEPARATOR ) );
 			if ( delimPos != HString::npos ) {
@@ -268,7 +268,7 @@ path_t basename( path_t const& path_ ) {
 	if ( ( bname != path::ROOT )
 		&& ( bname != path::CURRENT )
 		&& ( bname != path::PARENT ) ) {
-		bname.trim_right( path::SEPARATOR_STR.raw() );
+		bname.trim_right( path::SEPARATOR_STR.c_str() );
 		int long delimPos( bname.find_last( path::SEPARATOR ) );
 		if ( delimPos != HString::npos ) {
 			bname.shift_left( delimPos + 1 );
@@ -288,7 +288,7 @@ path_t readlink( path_t const& path_ ) {
 	do {
 		alloc <<= 1;
 		buffer.realloc( alloc, HChunk::STRATEGY::EXACT );
-		len = static_cast<int>( ::readlink( path_.raw(), buffer.get<char>(), static_cast<size_t>( alloc ) ) );
+		len = static_cast<int>( ::readlink( path_.c_str(), buffer.get<char>(), static_cast<size_t>( alloc ) ) );
 	} while ( len >= alloc );
 	if ( len < 0 ) {
 		throw HFileSystemException( "readlink failed: `"_ys.append( path_ ).append( "'" ) );
@@ -346,7 +346,7 @@ void create_directory( path_t const& path_, u32_t mode_, DIRECTORY_MODIFICATION 
 
 void chmod( path_t const& path_, u32_t mode_ ) {
 	M_PROLOG
-	if ( ::chmod( path_.raw(), static_cast<mode_t>( mode_ ) ) < 0 ) {
+	if ( ::chmod( path_.c_str(), static_cast<mode_t>( mode_ ) ) < 0 ) {
 		throw HFileSystemException( "chmod failed: `"_ys.append( path_ ).append( "'" ) );
 	}
 	return;
@@ -355,7 +355,7 @@ void chmod( path_t const& path_, u32_t mode_ ) {
 
 void chdir( path_t const& path_ ) {
 	M_PROLOG
-	if ( ::chdir( path_.raw() ) < 0 ) {
+	if ( ::chdir( path_.c_str() ) < 0 ) {
 		throw HFileSystemException( "chdir failed: `"_ys.append( path_ ).append( "'" ) );
 	}
 	return;

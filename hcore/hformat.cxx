@@ -412,28 +412,28 @@ HString HFormat::string( void ) const {
 			}
 			if ( !!( conv & HFormatImpl::CONVERSION::INT ) ) {
 				if ( !!( conv & HFormatImpl::CONVERSION::BYTE ) ) {
-					_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<char>::get( *_impl->_args, it->_position ) );
+					_impl->_buffer.format( fmt.c_str(), HFormatImpl::variant_shell<char>::get( *_impl->_args, it->_position ) );
 				} else if ( !!( conv & HFormatImpl::CONVERSION::SHORT ) ) {
-					_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<int short>::get( *_impl->_args, it->_position ) );
+					_impl->_buffer.format( fmt.c_str(), HFormatImpl::variant_shell<int short>::get( *_impl->_args, it->_position ) );
 				} else if ( !!( conv & HFormatImpl::CONVERSION::LONG ) ) {
-					_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<int long>::get( *_impl->_args, it->_position ) );
+					_impl->_buffer.format( fmt.c_str(), HFormatImpl::variant_shell<int long>::get( *_impl->_args, it->_position ) );
 				} else if ( !!( conv & HFormatImpl::CONVERSION::LONG_LONG ) ) {
-					_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<int long long>::get( *_impl->_args, it->_position ) );
+					_impl->_buffer.format( fmt.c_str(), HFormatImpl::variant_shell<int long long>::get( *_impl->_args, it->_position ) );
 				} else {
 					M_ASSERT( conv == HFormatImpl::CONVERSION::INT );
-					_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<int>::get( *_impl->_args, it->_position ) );
+					_impl->_buffer.format( fmt.c_str(), HFormatImpl::variant_shell<int>::get( *_impl->_args, it->_position ) );
 				}
 			} else if ( !!( conv & HFormatImpl::CONVERSION::STRING ) ) {
-				_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<HString>::get( *_impl->_args, it->_position ).raw() );
+				_impl->_buffer.format( fmt.c_str(), HFormatImpl::variant_shell<HString>::get( *_impl->_args, it->_position ).c_str() );
 			} else if ( !!( conv & HFormatImpl::CONVERSION::POINTER ) ) {
-				_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<void const*>::get( *_impl->_args, it->_position ) );
+				_impl->_buffer.format( fmt.c_str(), HFormatImpl::variant_shell<void const*>::get( *_impl->_args, it->_position ) );
 			} else if ( !!( conv & HFormatImpl::CONVERSION::CHAR ) ) {
-				_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<char>::get( *_impl->_args, it->_position ) );
+				_impl->_buffer.format( fmt.c_str(), HFormatImpl::variant_shell<char>::get( *_impl->_args, it->_position ) );
 			} else if ( !!( conv & HFormatImpl::CONVERSION::DOUBLE ) ) {
 				if ( !!( conv & ( HFormatImpl::CONVERSION::LONG ) ) ) {
-					_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<double long>::get( *_impl->_args, it->_position ) );
+					_impl->_buffer.format( fmt.c_str(), HFormatImpl::variant_shell<double long>::get( *_impl->_args, it->_position ) );
 				} else {
-					_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<double>::get( *_impl->_args, it->_position ) );
+					_impl->_buffer.format( fmt.c_str(), HFormatImpl::variant_shell<double>::get( *_impl->_args, it->_position ) );
 				}
 			}
 			_impl->_string += _impl->_buffer;
@@ -858,8 +858,8 @@ HString str( HFormat const& format_ ) {
 
 char const* HFormat::HFormatImpl::error_message( int ) const {
 	M_PROLOG
-	_errorMessage.format( _( "format: %s, at: %d" ), _format.raw(), _positionIndex );
-	return ( _errorMessage.raw() );
+	_errorMessage.format( _( "format: %s, at: %d" ), _format.c_str(), _positionIndex );
+	return ( _errorMessage.c_str() );
 	M_EPILOG
 }
 

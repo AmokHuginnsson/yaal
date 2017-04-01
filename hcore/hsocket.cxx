@@ -343,7 +343,7 @@ void HSocket::make_address( yaal::hcore::HString const& address_, int port_ ) {
 	} else /* _type & TYPE::FILE */ {
 		sockaddr_un* addressFile( static_cast<sockaddr_un*>( _address ) );
 		addressFile->sun_family = AF_UNIX;
-		::strncpy( addressFile->sun_path, address_.raw(),
+		::strncpy( addressFile->sun_path, address_.c_str(),
 				sizeof ( addressFile->sun_path ) );
 		addressFile->sun_path[ sizeof ( addressFile->sun_path ) - 1 ] = 0;
 		_addressSize = static_cast<int>( FWD_SUN_LEN( addressFile ) );

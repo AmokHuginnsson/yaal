@@ -128,7 +128,7 @@ int HFile::do_open( HString const& path_, open_t const& open_ ) {
 	}
 	int saveErrno( errno );
 	_path = path_;
-	_handle = ::std::fopen( path_.raw(), mode );
+	_handle = ::std::fopen( path_.c_str(), mode );
 	int error( 0 );
 	if ( ! _handle ) {
 		saveErrno = error = errno;

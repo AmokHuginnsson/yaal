@@ -138,7 +138,7 @@ HString HStream::read_impl( int long size_ ) {
 
 void HStream::write_impl( HString const& val_ ) {
 	M_PROLOG
-	_stream->write( val_.raw(), val_.get_length() );
+	_stream->write( val_.c_str(), val_.get_length() );
 	M_EPILOG
 }
 

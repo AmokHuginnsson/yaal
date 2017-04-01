@@ -102,7 +102,7 @@ void HStatusBarWidget::do_paint( void ) {
 		cons.getyx( origRow, origColumn );
 	if ( _promptLength ) {
 		cons.set_attr( _statusBarAttribute >> 8 );
-		cons.mvprintf( _rowRaw, 0, _prompt.raw() );
+		cons.mvprintf( _rowRaw, 0, _prompt.c_str() );
 	}
 	if ( _mode != PROMPT::MENU ) {
 		HEditWidget::do_paint();
@@ -227,13 +227,13 @@ void HStatusBarWidget::update_progress( double step_, char const* title_ ) {
 		bar( title_ );
 		if ( _estimate ) {
 			_varTmpBuffer.format ( "|%%-%ds|%%s%%s[%%3d%%s]", maxBar );
-			_string.format( _varTmpBuffer.raw(), "-",
-					( step_ != 0.0 ? ( left.string().raw() ) : "(?\?:?\?:?\?)" ),
-					stopper.string().raw(),	nextPercent, "%%" );
+			_string.format( _varTmpBuffer.c_str(), "-",
+					( step_ != 0.0 ? ( left.string().c_str() ) : "(?\?:?\?:?\?)" ),
+					stopper.string().c_str(),	nextPercent, "%%" );
 		} else {
 			_varTmpBuffer.format ( "|%%-%ds|%%s[%%3d%%s]", maxBar );
-			_string.format( _varTmpBuffer.raw(), "-",
-					stopper.string().raw(), nextPercent, "%%" );
+			_string.format( _varTmpBuffer.c_str(), "-",
+					stopper.string().c_str(), nextPercent, "%%" );
 		}
 		_string.fill( '-', 1, maxBar );
 		if ( nextStep > 0 )
@@ -243,7 +243,7 @@ void HStatusBarWidget::update_progress( double step_, char const* title_ ) {
 			_string.erase( length - 6, 5 );
 			_string.insert( length - 6, 4, "done" );
 		}
-		cons.mvprintf( _rowRaw, _columnRaw, _string.raw() );
+		cons.mvprintf( _rowRaw, _columnRaw, _string.c_str() );
 		_string.clear();
 		_lastProgress = nextStep;
 		_lastPercent = nextPercent;
@@ -323,7 +323,7 @@ void HStatusBarWidget::bar( char const* bar_ ) {
 	if ( bar_ ) {
 		_message.format( "%-*s", cons.get_width() - ( _labelLength + 1 ), bar_ );
 	}
-	cons.mvprintf( cons.get_height() - 2, _labelLength, _message.raw() );
+	cons.mvprintf( cons.get_height() - 2, _labelLength, _message.c_str() );
 	return;
 	M_EPILOG
 }

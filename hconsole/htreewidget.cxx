@@ -131,7 +131,7 @@ void HTreeWidget::do_paint( void ) {
 	_varTmpBuffer.reserve( _widthRaw );
 	_varTmpBuffer.fillz( '_', 0, _widthRaw );
 	for ( ctr = 0; ctr < _heightRaw; ctr ++ )
-		cons.mvprintf( _rowRaw + ctr, _columnRaw, _varTmpBuffer.raw() );
+		cons.mvprintf( _rowRaw + ctr, _columnRaw, _varTmpBuffer.c_str() );
 	if ( _view.get_root() )
 		draw_node( _view.get_root(), _rowRaw );
 	return;
@@ -157,7 +157,7 @@ int HTreeWidget::draw_node( tree_view_t::node_t node_, int row_ ) {
 		if ( node_ == _selected )
 			cons.set_attr( _enabled ? ( _focused ? ~_attributeFocused._data
 						: ~ _attributeEnabled._data ) : ~ _attributeDisabled._data );
-		cons.mvprintf( row, (**node_)._columnRaw + 1, str.raw() );
+		cons.mvprintf( row, (**node_)._columnRaw + 1, str.c_str() );
 	}
 	if ( node_->has_children() && ( (**node_)._unfolded || ! node_->get_level() ) ) {
 		for ( tree_view_t::HNode::iterator it = node_->begin(); it != node_->end(); ++ it )

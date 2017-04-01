@@ -84,7 +84,7 @@ HPair<int, char const*> preparse_integer( HString const& str_, char* alternate_ 
 	 * 1010b ->  2
 	 */
 	int base( 10 );
-	char const* str( str_.raw() );
+	char const* str( str_.c_str() );
 	int long len( str_.get_length() );
 	if ( is_hexadecimal( str_ ) ) {
 		base = 16;
@@ -361,7 +361,7 @@ bool lexical_cast( char const* const& value_ ) {
 template<>
 bool lexical_cast( HString const& value_ ) {
 	M_PROLOG
-	return ( lexical_cast<bool>( value_.raw() ) );
+	return ( lexical_cast<bool>( value_.c_str() ) );
 	M_EPILOG
 }
 
@@ -375,7 +375,7 @@ char lexical_cast( HString const& val ) {
 template<>
 char const* lexical_cast( HString const& val ) {
 	M_PROLOG
-	return ( val.raw() );
+	return ( val.c_str() );
 	M_EPILOG
 }
 

@@ -476,7 +476,7 @@ void HNumber::from_string( HString const& number_ ) {
 	/* ! - represent known but invalid character, ? - represent unknown character */
 	integer_t start( static_cast<integer_t>( number_.find_one_of( VALID_CHARACTERS ) ) );
 	M_ENSURE( start != HString::npos ); /* exclude "!!!!" */
-	char const* src = number_.raw();
+	char const* src = number_.c_str();
 	_negative = ( src[ start ] == VALID_CHARACTERS[ A_MINUS ] ); /* "!!!-???" */
 	if ( _negative ) {
 		++ start;

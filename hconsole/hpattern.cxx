@@ -98,7 +98,7 @@ void HPattern::restore_state( void* sp, pluggable_flags_t* f ) {
 bool HPattern::parse( HString const& pattern_, pluggable_flags_t* externalFlags ) {
 	M_PROLOG
 	_errorCause.clear();
-	char const* pattern( pattern_.raw() );
+	char const* pattern( pattern_.c_str() );
 
 /* clear all flags */
 	_ignoreCase = _ignoreCaseDefault;
@@ -160,7 +160,7 @@ bool HPattern::parse( HString const& pattern_, pluggable_flags_t* externalFlags 
 		}
 	} while ( false );
 	if ( ok && _extended ) {
-		ok = parse_re( _pattern.raw() );
+		ok = parse_re( _pattern.c_str() );
 	}
 	return ( ok );
 	M_EPILOG
@@ -229,9 +229,9 @@ char const* HPattern::matches( char const* string_,
 			}
 		} else {
 			if ( _ignoreCase ) {
-				ptr = ::strcasestr( string_, _pattern.raw() );
+				ptr = ::strcasestr( string_, _pattern.c_str() );
 			} else {
-				ptr = ::strstr( string_, _pattern.raw() );
+				ptr = ::strstr( string_, _pattern.c_str() );
 			}
 			if ( ptr ) {
 				matchLength = _simpleMatchLength;
@@ -254,7 +254,7 @@ HPattern::HMatchIterator HPattern::find( char const* str_ ) const {
 }
 
 HPattern::HMatchIterator HPattern::find( HString const& str_ ) const {
-	return ( find( str_.raw() ) );
+	return ( find( str_.c_str() ) );
 }
 
 HPattern::HMatchIterator HPattern::end( void ) const {

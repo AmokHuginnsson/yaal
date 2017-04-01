@@ -90,7 +90,7 @@ bool set_tools_variables( HString& option_, HString& value_ ) {
 		decode_set_env( value_ );
 	} else if ( ! strcasecmp( option_, "serial_baudrate" ) ) {
 		if ( ( value_.get_length() > 1 ) && ( value_ [ 0 ] == 'B' ) ) {
-			int baudRate( lexical_cast<int>( value_.raw() + 1 ) );
+			int baudRate( lexical_cast<int>( value_.c_str() + 1 ) );
 			switch ( baudRate ) {
 				case ( 115200 ): _baudRate_ = HSerial::SPEED::B_115200; break;
 #if ( HAVE_DECL_B76800 )

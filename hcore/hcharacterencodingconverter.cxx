@@ -172,7 +172,7 @@ yaal::hcore::HString const& HCharacterEncodingConverter::convert( char const* da
 
 yaal::hcore::HString const& HCharacterEncodingConverter::convert( yaal::hcore::HString const& data_ ) {
 	M_PROLOG
-	return ( convert( data_.raw(), data_.get_length() ) );
+	return ( convert( data_.c_str(), data_.get_length() ) );
 	M_EPILOG
 }
 

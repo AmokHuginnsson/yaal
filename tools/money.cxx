@@ -320,7 +320,7 @@ HString in_words_en( HNumber const& kwota_, CURRENCY currency_ ) {
 			int sub( ( length - i ) > 1 ? 2 : 1 );
 			form = lexical_cast<int>( string.mid( ( length - i ) - sub, sub ) );
 			if ( ( i > 5 ) && ( ( length - i ) > 2 ) &&
-					! ::strncmp( string.raw() + ( length - i ) - 3, "000", 3 ) ) {
+					! ::strncmp( string.c_str() + ( length - i ) - 3, "000", 3 ) ) {
 				continue;
 			}
 		}
@@ -384,7 +384,7 @@ HString in_words_pl( HNumber const& kwota_, CURRENCY currency_ ) {
 			int sub( ( length - i ) > 1 ? 2 : 1 );
 			form = lexical_cast<int>( string.mid( ( length - i ) - sub, sub ) );
 			if ( ( i > 5 ) && ( ( length - i ) > 2 ) &&
-					! ::strncmp( string.raw() + ( length - i ) - 3, "000", 3 ) ) {
+					! ::strncmp( string.c_str() + ( length - i ) - 3, "000", 3 ) ) {
 				continue;
 			}
 		}
@@ -476,7 +476,7 @@ int modulo_ASCII( HString const& aSCIINumber_, int modulo_ ) {
 
 char const* get_last_error( void ) {
 	if ( ! _lastErrorMessage_.is_empty() )
-		return ( _lastErrorMessage_.raw() );
+		return ( _lastErrorMessage_.c_str() );
 	return ( "" );
 }
 

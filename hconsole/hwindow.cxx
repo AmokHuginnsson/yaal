@@ -87,8 +87,8 @@ void HWindow::do_init( void ) {
 	if ( _tuiProcess ) {
 		_tuiProcess->schedule_repaint();
 	}
-	string.format( " [%s]& \n", _title.raw() );
-	_statusBar = init_bar( string.raw() )->get_pointer();
+	string.format( " [%s]& \n", _title.c_str() );
+	_statusBar = init_bar( string.c_str() )->get_pointer();
 	_statusBar->enable( true );
 	_initialized = true;
 	return;

@@ -202,10 +202,10 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ ) {
 				|| ( ::dup2( fileDesOut[ 1 ], stdoutFd ) < 0 )
 				|| ( ::dup2( fileDesErr[ 1 ], stderrFd ) < 0 ) )
 			M_THROW( "dup2", errno );
-		argv.get<char const*>()[ 0 ] = image_.raw();
+		argv.get<char const*>()[ 0 ] = image_.c_str();
 		int i( 1 );
 		for ( argv_t::const_iterator it( argv_.begin() ), end( argv_.end() ); it != end; ++ it, ++ i )
-			argv.get<char const*>()[ i ] = it->raw();
+			argv.get<char const*>()[ i ] = it->c_str();
 		::execv( argv.get<char const*>()[ 0 ], const_cast<char* const*>( argv.get<char const*>() ) );
 		M_ENSURE( !"execv"[0] );
 	} else {

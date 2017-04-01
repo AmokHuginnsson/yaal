@@ -128,7 +128,7 @@ void HEditWidget::do_paint( void ) {
 		_varTmpBuffer.reserve( _widthRaw );
 		_varTmpBuffer.fill( ' ', len, _widthRaw - len );
 	}
-	cons.mvprintf( _rowRaw, _columnRaw, _varTmpBuffer.raw() );
+	cons.mvprintf( _rowRaw, _columnRaw, _varTmpBuffer.c_str() );
 	if ( _focused ) {
 		cons.move( _rowRaw, _columnRaw + ( _password ? 0 : _cursorPosition ) );
 		cons.curs_set( _replace ? CURSOR::VERY_VISIBLE : CURSOR::VISIBLE );
@@ -545,7 +545,7 @@ int HEditWidget::do_process_input( int code_ ) {
 	if ( ! errorCode ) {
 		if ( _mask.is_valid() && ! _mask.matches( _varTmpBuffer ) ) {
 			if ( _window ) {
-				_window->status_bar()->message( COLOR::BG_BROWN, "%s", _mask.error().raw() );
+				_window->status_bar()->message( COLOR::BG_BROWN, "%s", _mask.error().c_str() );
 			}
 			errorCode = 1;
 		} else {

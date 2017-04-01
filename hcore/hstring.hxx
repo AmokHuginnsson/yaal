@@ -287,11 +287,6 @@ public:
 	char set_at( int long position, char character );
 	/*! \brief Get access to raw character data stored in this string.
 	 *
-	 * \return pointer to raw character data stored in this string.
-	 */
-	char const* raw( void ) const;
-	/*! \brief Get access to raw character data stored in this string.
-	 *
 	 * An alias for HString::raw().
 	 *
 	 * \return pointer to raw character data stored in this string.
@@ -795,7 +790,7 @@ public:
 		return ( HCharRef( *_owner, _index ) );
 	}
 	operator HString::const_iterator ( void ) const {
-		return ( _owner->raw() + _index );
+		return ( _owner->c_str() + _index );
 	}
 	int long operator - ( HIterator const& it_ ) const {
 		return ( _index - it_._index );

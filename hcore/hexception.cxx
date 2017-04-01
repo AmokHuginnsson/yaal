@@ -82,7 +82,7 @@ HException::~HException( void ) {
 }
 
 void HException::print_error( void ) const {
-	fprintf( ERROR_STREAM, "\nException: %s, %d.\n", _message.raw(), _code );
+	fprintf( ERROR_STREAM, "\nException: %s, %d.\n", _message.c_str(), _code );
 	fflush( ERROR_STREAM );
 	return;
 }
@@ -103,7 +103,7 @@ void HException::log( char const* fileName_, int line_,
 						fileName_ + ( length > 16 ? length - 16 : 0 ),
 						line_, functionName_ );
 			if ( _debugLevel_ >= DEBUG_LEVEL::DUMP_EXCEPTION_STACK ) {
-				fprintf( ERROR_STREAM, "%s", frame.raw() );
+				fprintf( ERROR_STREAM, "%s", frame.c_str() );
 				fflush( ERROR_STREAM );
 			}
 			if ( _logEnabled ) {
@@ -116,7 +116,7 @@ void HException::log( char const* fileName_, int line_,
 }
 
 char const* HException::what( void ) const {
-	return ( _message.raw() );
+	return ( _message.c_str() );
 }
 
 int HException::code( void ) const {

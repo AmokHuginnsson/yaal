@@ -329,7 +329,7 @@ HResourceInfo get_disk_space_info( yaal::hcore::HString const& path_ ) {
 	M_PROLOG
 	struct statvfs svfs;
 	::memset( &svfs, 0, sizeof ( svfs ) );
-	M_ENSURE( ::statvfs( path_.raw(), &svfs ) == 0 );
+	M_ENSURE( ::statvfs( path_.c_str(), &svfs ) == 0 );
 	return ( HResourceInfo( static_cast<i64_t>( svfs.f_bavail ) * static_cast<i64_t>( svfs.f_frsize ),
 				static_cast<i64_t>( svfs.f_bfree ) * static_cast<i64_t>( svfs.f_frsize ),
 				static_cast<i64_t>( svfs.f_blocks ) * static_cast<i64_t>( svfs.f_frsize ) ) );

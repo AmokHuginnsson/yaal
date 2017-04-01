@@ -208,7 +208,7 @@ bool HDataWindow::handler_save( hconsole::HEvent const& ) {
 		for ( HDataWidget* dw : _editModeWidgets ) {
 			HDataEditWidget* dew( dynamic_cast<HDataEditWidget*>( dw ) );
 			if ( dew && ! dew->is_valid() ) {
-				_statusBar->message( COLOR::FG_BRIGHTRED, _( "Invalid value in: %s" ), dew->get_label().raw() );
+				_statusBar->message( COLOR::FG_BRIGHTRED, _( "Invalid value in: %s" ), dew->get_label().c_str() );
 				return ( true );
 			}
 		}

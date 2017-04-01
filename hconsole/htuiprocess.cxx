@@ -211,7 +211,7 @@ void HTUIProcess::process_stdin( HIODispatcher::stream_t& ) {
 		}
 		if ( ! command.is_empty() && !! (*_foregroundWindow) ) {
 			(*_foregroundWindow)->status_bar()->message(
-				COLOR::FG_RED, "unknown command: `%s'", command.raw()
+				COLOR::FG_RED, "unknown command: `%s'", command.c_str()
 			);
 		}
 	}
@@ -261,7 +261,7 @@ void HTUIProcess::handler_idle( void ) {
 	HString clock( HTime( HTime::TZ::LOCAL ).string() );
 	cons.cmvprintf(
 		0, static_cast<int>( cons.get_width() - clock.get_length() ),
-		COLOR::FG_BLACK | COLOR::BG_LIGHTGRAY, clock.raw()
+		COLOR::FG_BLACK | COLOR::BG_LIGHTGRAY, clock.c_str()
 	);
 	_needRepaint = true;
 #endif /* __DEBUG__ */

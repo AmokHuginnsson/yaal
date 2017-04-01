@@ -435,7 +435,7 @@ bool HExpression::translate( HString const& formula_ ) {
 			for ( ctr = 0; ctr < 16; ctr++ ) {
 				if (
 					strncmp(
-						formula_.raw() + index,
+						formula_.c_str() + index,
 						_functionsMnemonics_[ ctr ],
 						static_cast<size_t>( _functionMnemonicsLength_[ ctr ] )
 					) == 0
@@ -672,7 +672,7 @@ bool HExpression::terminal_production( tree_t::node_t node_ ) {
 		++ digits;
 	}
 	if ( digits > 0 ) {
-		double long value( ::strtold( _formula.raw() + offset, nullptr ) );
+		double long value( ::strtold( _formula.c_str() + offset, nullptr ) );
 		_constantsPool.push_back( value );
 		/* We save variables as positive indexes and constants as negative
 		 * indexes, positive and negative 0 index would conflict so

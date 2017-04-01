@@ -67,7 +67,7 @@ HStreamInterface& HStreamInterface::do_output( HString const& string_ ) {
 	_wordCache = string_;
 	int long len( reformat() );
 	if ( len > 0 )
-		do_write( _wordCache.raw(), len );
+		do_write( _wordCache.c_str(), len );
 	return ( *this );
 	M_EPILOG
 }
@@ -77,7 +77,7 @@ HStreamInterface& HStreamInterface::do_output( char const* string_ ) {
 	_wordCache = string_;
 	int long len( reformat() );
 	if ( len > 0 )
-		do_write( _wordCache.raw(), len );
+		do_write( _wordCache.c_str(), len );
 	return ( *this );
 	M_EPILOG
 }
@@ -86,7 +86,7 @@ HStreamInterface& HStreamInterface::do_output( bool bool_ ) {
 	M_PROLOG
 	_wordCache = _boolAlpha ? ( bool_ ? "true" : "false" ) : ( bool_ ? "1" : "0" );
 	int long len( reformat() );
-	do_write( _wordCache.raw(), len );
+	do_write( _wordCache.c_str(), len );
 	return ( *this );
 	M_EPILOG
 }
@@ -95,7 +95,7 @@ HStreamInterface& HStreamInterface::do_output( char char_ ) {
 	M_PROLOG
 	_wordCache = char_;
 	int long len( reformat() );
-	do_write( _wordCache.raw(), len );
+	do_write( _wordCache.c_str(), len );
 	return ( *this );
 	M_EPILOG
 }
@@ -104,7 +104,7 @@ HStreamInterface& HStreamInterface::do_output( char unsigned charUnsigned_ ) {
 	M_PROLOG
 	_wordCache = charUnsigned_;
 	int long len( reformat() );
-	do_write( _wordCache.raw(), len );
+	do_write( _wordCache.c_str(), len );
 	return ( *this );
 	M_EPILOG
 }
@@ -141,7 +141,7 @@ HStreamInterface& HStreamInterface::do_output( int long longInteger_ ) {
 	M_PROLOG
 	_wordCache.format( _base == BASES::DEC ? "%ld" : ( _base == BASES::HEX ) ? "%lx" : "%lo", longInteger_ );
 	int long len( reformat() );
-	do_write( _wordCache.raw(), len );
+	do_write( _wordCache.c_str(), len );
 	return ( *this );
 	M_EPILOG
 }
@@ -150,7 +150,7 @@ HStreamInterface& HStreamInterface::do_output( int long long longLongInteger_ ) 
 	M_PROLOG
 	_wordCache.format( _base == BASES::DEC ? "%lld" : ( _base == BASES::HEX ) ? "%llx" : "%llo", longLongInteger_ );
 	int long len( reformat() );
-	do_write( _wordCache.raw(), len );
+	do_write( _wordCache.c_str(), len );
 	return ( *this );
 	M_EPILOG
 }
@@ -187,7 +187,7 @@ HStreamInterface& HStreamInterface::do_output( int long unsigned unsignedLongInt
 	M_PROLOG
 	_wordCache.format( _base == BASES::DEC ? "%lu" : ( _base == BASES::HEX ) ? "%lx" : "%lo", unsignedLongInteger_ );
 	int long len( reformat() );
-	do_write( _wordCache.raw(), len );
+	do_write( _wordCache.c_str(), len );
 	return ( *this );
 	M_EPILOG
 }
@@ -196,7 +196,7 @@ HStreamInterface& HStreamInterface::do_output( int long long unsigned unsignedLo
 	M_PROLOG
 	_wordCache.format( _base == BASES::DEC ? "%llu" : ( _base == BASES::HEX ) ? "%llx" : "%llo", unsignedLongLongInteger_ );
 	int long len( reformat() );
-	do_write( _wordCache.raw(), len );
+	do_write( _wordCache.c_str(), len );
 	return ( *this );
 	M_EPILOG
 }
@@ -222,7 +222,7 @@ HStreamInterface& HStreamInterface::do_output( double double_ ) {
 	_wordCache.format( "%f", double_ );
 	apply_precision();
 	int long len( reformat() );
-	do_write( _wordCache.raw(), len );
+	do_write( _wordCache.c_str(), len );
 	return ( *this );
 	M_EPILOG
 }
@@ -232,7 +232,7 @@ HStreamInterface& HStreamInterface::do_output( double long longDouble_ ) {
 	_wordCache.format( "%.12Lf", longDouble_ );
 	apply_precision();
 	int long len( reformat() );
-	do_write( _wordCache.raw(), len );
+	do_write( _wordCache.c_str(), len );
 	return ( *this );
 	M_EPILOG
 }
@@ -242,7 +242,7 @@ HStreamInterface& HStreamInterface::do_output( float float_ ) {
 	_wordCache.format( "%f", float_ );
 	apply_precision();
 	int long len( reformat() );
-	do_write( _wordCache.raw(), len );
+	do_write( _wordCache.c_str(), len );
 	return ( *this );
 	M_EPILOG
 }
@@ -251,7 +251,7 @@ HStreamInterface& HStreamInterface::do_output( void const* ptr_ ) {
 	M_PROLOG
 	_wordCache.format( "0x%lx", reinterpret_cast<int long unsigned>( ptr_ ) );
 	int long len( reformat() );
-	do_write( _wordCache.raw(), len );
+	do_write( _wordCache.c_str(), len );
 	return ( *this );
 	M_EPILOG
 }

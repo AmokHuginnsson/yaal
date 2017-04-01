@@ -49,7 +49,7 @@ HPlugin::~HPlugin( void ) {
 
 void HPlugin::load( HString const& path_ ) {
 	M_PROLOG
-	_handle = dlopen( ! path_.is_empty() ? path_.raw() : nullptr, RTLD_NOW | RTLD_GLOBAL );
+	_handle = dlopen( ! path_.is_empty() ? path_.c_str() : nullptr, RTLD_NOW | RTLD_GLOBAL );
 	if ( _handle == reinterpret_cast<void const*>( -1 ) )
 		_handle = nullptr;
 	M_ENSURE( _handle != nullptr, path_ );
@@ -77,7 +77,7 @@ char const* HPlugin::error_message( int ) {
 
 void* HPlugin::try_resolve( HString const& symbolName_ ) {
 	M_PROLOG
-	return ( dlsym( _handle, symbolName_.raw() ) );
+	return ( dlsym( _handle, symbolName_.c_str() ) );
 	M_EPILOG
 }
 

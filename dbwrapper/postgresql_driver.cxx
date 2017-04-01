@@ -117,7 +117,7 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& d
 	dbLink_._conn = connection = PQsetdbLogin( nullptr /* host */,
 			nullptr /* port */, nullptr /* options */,
 			nullptr /* debugging tty */,
-			dataBase_.raw(), login_.raw(), password_.raw() );
+			dataBase_.c_str(), login_.c_str(), password_.c_str() );
 	if ( PQstatus( connection ) == CONNECTION_OK )
 		dbLink_._valid = true;
 	return ( dbLink_._valid );

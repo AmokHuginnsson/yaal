@@ -166,7 +166,7 @@ char const* HSource::get_comment( int position_ ) const {
 	char const* comment( nullptr );
 	comments_t::const_iterator it( _comments.find( ec.line() - 2 ) );
 	if ( it != _comments.end() ) {
-		comment = it->second.raw();
+		comment = it->second.c_str();
 	}
 	return ( comment );
 	M_EPILOG

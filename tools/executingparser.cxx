@@ -2538,16 +2538,16 @@ yaal::hcore::HString::const_iterator HReal::do_parse( HExecutingParser* executin
 	if ( ( ( _parse == PARSE::GREEDY ) && ( state >= INTEGRAL ) ) || ( ( _parse == PARSE::STRICT ) && ( state >= DOT ) ) ) {
 		position_t pos( position( executingParser_, start ) );
 		if ( !! _actionDouble ) {
-			double d( ::strtod( _cache.raw(), nullptr ) );
+			double d( ::strtod( _cache.c_str(), nullptr ) );
 			add_execution_step( executingParser_, start, call( _actionDouble, d ) );
 		} else if ( !! _actionDoublePosition ) {
-			double d( ::strtod( _cache.raw(), nullptr ) );
+			double d( ::strtod( _cache.c_str(), nullptr ) );
 			add_execution_step( executingParser_, start, call( _actionDoublePosition, d, pos ) );
 		} else if ( !! _actionDoubleLong ) {
-			double long dl( ::strtold( _cache.raw(), nullptr ) );
+			double long dl( ::strtold( _cache.c_str(), nullptr ) );
 			add_execution_step( executingParser_, start, call( _actionDoubleLong, dl ) );
 		} else if ( !! _actionDoubleLongPosition ) {
-			double long dl( ::strtold( _cache.raw(), nullptr ) );
+			double long dl( ::strtold( _cache.c_str(), nullptr ) );
 			add_execution_step( executingParser_, start, call( _actionDoubleLongPosition, dl, pos ) );
 		} else if ( !! _actionNumber ) {
 			add_execution_step( executingParser_, start, call( _actionNumber, yaal::move( _cache ) ) );

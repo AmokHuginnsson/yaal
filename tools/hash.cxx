@@ -544,17 +544,17 @@ HChunk parseHash( FUNCTION function_, yaal::hcore::HString const& hash_ ) {
 	switch ( function_ ) {
 		case ( FUNCTION::MD5 ): {
 			u32_t* bin( binHash.get<u32_t>() );
-			sscanf( hash.raw(), format, &bin[0], &bin[1], &bin[2], &bin[3] );
+			sscanf( hash.c_str(), format, &bin[0], &bin[1], &bin[2], &bin[3] );
 			change_endianness( bin, binHash.count_of<u32_t>() );
 		} break;
 		case ( FUNCTION::SHA1 ): {
 			u32_t* bin( binHash.get<u32_t>() );
-			sscanf( hash.raw(), format, &bin[0], &bin[1], &bin[2], &bin[3], &bin[4] );
+			sscanf( hash.c_str(), format, &bin[0], &bin[1], &bin[2], &bin[3], &bin[4] );
 			change_endianness( bin, binHash.count_of<u32_t>() );
 		} break;
 		case ( FUNCTION::SHA512 ): {
 			u64_t* bin( binHash.get<u64_t>() );
-			sscanf( hash.raw(), format, &bin[0], &bin[1], &bin[2], &bin[3], &bin[4], &bin[5], &bin[6], &bin[7] );
+			sscanf( hash.c_str(), format, &bin[0], &bin[1], &bin[2], &bin[3], &bin[4], &bin[5], &bin[6], &bin[7] );
 			change_endianness( bin, binHash.count_of<u64_t>() );
 		} break;
 		default: {
@@ -598,14 +598,14 @@ yaal::hcore::HString hmac( FUNCTION function_, yaal::hcore::HString const& key_,
 	::memset( ipad.raw(), 0x36, static_cast<size_t>( blockBytes ) );
 	::memset( opad.raw(), 0x5c, static_cast<size_t>( blockBytes ) );
 	if ( key_.get_length() <= blockBytes ) {
-		memxor( ipad.raw(), key_.raw(), key_.get_length() );
-		memxor( opad.raw(), key_.raw(), key_.get_length() );
+		memxor( ipad.raw(), key_.c_str(), key_.get_length() );
+		memxor( opad.raw(), key_.c_str(), key_.get_length() );
 	} else {
 		HChunk keyBinHashed( parseHash( function_, hashString( key_ ) ) );
 		memxor( ipad.raw(), keyBinHashed.raw(), keyBinHashed.get_size() );
 		memxor( opad.raw(), keyBinHashed.raw(), keyBinHashed.get_size() );
 	}
-	::memcpy( ipad.get<char>() + blockBytes, message_.raw(), static_cast<size_t>( message_.length() ) );
+	::memcpy( ipad.get<char>() + blockBytes, message_.c_str(), static_cast<size_t>( message_.length() ) );
 	HMemoryObserver mo( ipad.raw(), blockBytes + message_.get_length() );
 	HMemory m( mo );
 	HChunk ipadHashed( parseHash( function_, hashStream( m ) ) );

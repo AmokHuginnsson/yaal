@@ -71,7 +71,7 @@ char const* article( char const* word_ ) {
 }
 
 char const* article( yaal::hcore::HString const& word_ ) {
-	return ( article( word_.raw() ) );
+	return ( article( word_.c_str() ) );
 }
 
 double long atof_ex( HString const& string_, bool parse_ ) {
@@ -91,7 +91,7 @@ double long atof_ex( HString const& string_, bool parse_ ) {
 			throw HExpressionException( HString( e.what() ) + " - " + analyzer.get_error() + " for: " + string_ + ", at: " + analyzer.get_error_token() );
 		}
 	} else {
-		value = ::strtold( str.raw(), nullptr );
+		value = ::strtold( str.c_str(), nullptr );
 	}
 	return ( value );
 	M_EPILOG
@@ -277,7 +277,7 @@ void show_help( OOptionInfo const& info, HStreamInterface& out_ ) {
 		}
 		char const* comma( is_byte( o.short_form() ) && ! o.long_form().is_empty() ? "," : " " );
 		if ( ! description ) {
-			description = o.description().raw();
+			description = o.description().c_str();
 		}
 		/* if long form word exist, build full form of long form */
 		HString lf;
@@ -316,7 +316,7 @@ void show_help( OOptionInfo const& info, HStreamInterface& out_ ) {
 				lf.clear();
 				extraLFL = 0;
 				comma = " ";
-				if ( description == o.description().raw() ) {
+				if ( description == o.description().c_str() ) {
 					description = "";
 				}
 			}
@@ -324,7 +324,7 @@ void show_help( OOptionInfo const& info, HStreamInterface& out_ ) {
 				sf.clear();
 				extraSFL = 0;
 				comma = " ";
-				if ( description == o.description().raw() ) {
+				if ( description == o.description().c_str() ) {
 					description = "";
 				}
 			}
@@ -363,7 +363,7 @@ void show_help( OOptionInfo const& info, HStreamInterface& out_ ) {
 					HProgramOptionsHandler::HOption const& n = opts[ i + 1 ];
 					if ( ( ! o.long_form().is_empty() && ! n.long_form().is_empty() && ( o.long_form() == n.long_form() ) )
 							|| ( is_byte( o.short_form() ) && is_byte( n.short_form() ) && ( o.short_form() == n.short_form() ) ) ) {
-						description = desc.raw();
+						description = desc.c_str();
 						break;
 					}
 				}
@@ -422,11 +422,11 @@ void dump_configuration( OOptionInfo const& info, HStreamInterface& out_ ) {
 			HProgramOptionsHandler::HOption const& p = opts[ i - 1 ];
 			if ( !o.long_form().is_empty() && !p.long_form().is_empty()
 					&& ( o.long_form() == p.long_form() )
-					&& ( o.description().raw() == description ) )
+					&& ( o.description().c_str() == description ) )
 				description = "";
 			if ( is_byte( o.short_form() ) && is_byte( p.short_form() )
 					&& ( o.short_form() == p.short_form() )
-					&& ( o.description().raw() == description ) )
+					&& ( o.description().c_str() == description ) )
 				description = "";
 		}
 		static int const MAXIMUM_LINE_LENGTH = 72;
@@ -457,7 +457,7 @@ void dump_configuration( OOptionInfo const& info, HStreamInterface& out_ ) {
 		}
 		out_ << "\n";
 		if ( ! description ) {
-			description = o.description().raw();
+			description = o.description().c_str();
 		}
 		desc = description;
 		bool loop = true;
@@ -473,7 +473,7 @@ void dump_configuration( OOptionInfo const& info, HStreamInterface& out_ ) {
 				out_ << "# " << desc.left( eol ) << "\n";
 				desc.shift_left( eol );
 				desc.trim_left();
-				description = desc.raw();
+				description = desc.c_str();
 			} else {
 				out_ << "# " << desc << "\n";
 				description = nullptr;

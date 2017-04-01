@@ -151,11 +151,11 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& /
 			break;
 		if ( ( oracle->_status = OCILogon( oracle->_environment,
 					oracle->_error, &oracle->_serviceContext,
-					reinterpret_cast<OraText const*>( login_.raw() ),
+					reinterpret_cast<OraText const*>( login_.c_str() ),
 					static_cast<ub4>( login_.get_length() ),
-					reinterpret_cast<OraText const*>( password_.raw() ),
+					reinterpret_cast<OraText const*>( password_.c_str() ),
 					static_cast<ub4>( password_.get_length() ),
-					reinterpret_cast<OraText const*>( _instanceName_.raw() ),
+					reinterpret_cast<OraText const*>( _instanceName_.c_str() ),
 					static_cast<ub4>( _instanceName_.get_length() ) ) ) == OCI_SUCCESS )
 			dbLink_._valid = true;
 	} while ( false );
@@ -238,7 +238,7 @@ void* oracle_db_prepare_query( ODBLink& dbLink_, char const* query_, ub4 mode_ )
 	queryObj->_sql.trim_right( ";" );
 	oracle->_status = OCIStmtPrepare2( oracle->_serviceContext,
 			&queryObj->_statement, oracle->_error,
-			reinterpret_cast<OraText const*>( queryObj->_sql.raw() ),
+			reinterpret_cast<OraText const*>( queryObj->_sql.c_str() ),
 			static_cast<ub4>( queryObj->_sql.get_length() ), nullptr, 0, OCI_NTV_SYNTAX, OCI_DEFAULT );
 	queryObj->_error = oracle->_error;
 	if ( ( oracle->_status != OCI_SUCCESS )
@@ -528,7 +528,7 @@ M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 M_EXPORT_SYMBOL char const* rs_column_name( void*, int );
 M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ ) {
 	OQuery* query = static_cast<OQuery*>( dataR_ );
-	return ( query->_fieldInfos[field_]._name.raw() );
+	return ( query->_fieldInfos[field_]._name.c_str() );
 }
 
 void oracle_init( void ) __attribute__((__constructor__));

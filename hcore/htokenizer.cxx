@@ -109,14 +109,14 @@ int long HTokenizer::skip_empty( int long start_ ) const {
 	if ( _behavior & DELIMITED_BY_WHOLE_STRING ) {
 		if ( start_ != HString::npos ) {
 			int long delimLen( _delimiter.get_length() );
-			char const* delimRaw( _delimiter.raw() );
-			char const* ptr( _string.raw() );
+			char const* delimRaw( _delimiter.c_str() );
+			char const* ptr( _string.c_str() );
 			while ( ! ::strncmp( delimRaw, ptr + start_, static_cast<size_t>( delimLen ) ) )
 				start_ += delimLen;
 		}
 	} else {
 		if ( start_ != HString::npos )
-			start_ = _string.find_other_than( _delimiter.raw(), start_ );
+			start_ = _string.find_other_than( _delimiter.c_str(), start_ );
 	}
 	if ( start_ >= _string.get_length() )
 		start_ = HString::npos;
@@ -141,7 +141,7 @@ HTokenizer::HIterator& HTokenizer::HIterator::operator ++ ( void ) {
 		if ( _start != HString::npos )
 			_start += _owner->_delimiter.get_length();
 	} else {
-		_start = _owner->_string.find_one_of( _owner->_delimiter.raw(), _start );
+		_start = _owner->_string.find_one_of( _owner->_delimiter.c_str(), _start );
 		if ( _start != HString::npos )
 			++ _start;
 	}
@@ -156,7 +156,7 @@ HString const& HTokenizer::HIterator::operator* ( void ) const {
 	M_ENSURE( _start != HString::npos );
 	M_ASSERT( _start >= 0 );
 	_buffer.clear();
-	int long end( ( _owner->_behavior & HTokenizer::DELIMITED_BY_WHOLE_STRING ) ? _owner->_string.find( _owner->_delimiter, _start ) : _owner->_string.find_one_of( _owner->_delimiter.raw(), _start ) );
+	int long end( ( _owner->_behavior & HTokenizer::DELIMITED_BY_WHOLE_STRING ) ? _owner->_string.find( _owner->_delimiter, _start ) : _owner->_string.find_one_of( _owner->_delimiter.c_str(), _start ) );
 	_buffer = _owner->_string.mid( _start, end != HString::npos ? ( end - _start ) : meta::max_signed<int long>::value );
 	M_ASSERT( ( _owner->_behavior & HTokenizer::INCLUDE_EMPTY ) || ! _buffer.is_empty()  );
 	return ( _buffer );

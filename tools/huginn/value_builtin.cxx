@@ -200,7 +200,7 @@ HHuginn::value_t range(
 				hcore::HString const& s( static_cast<HHuginn::HString*>( base_.raw() )->value() );
 				hcore::HString& r( static_cast<HHuginn::HString*>( res.raw() )->value() );
 				if ( step == 1 ) {
-					r.assign( s.raw() + from, to - from );
+					r.assign( s.c_str() + from, to - from );
 				} else {
 					if ( step > 0 ) {
 						for ( int long i( from ); i < to; i += step ) {
