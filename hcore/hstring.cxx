@@ -1524,9 +1524,47 @@ static u8_t ENC_4_BYTES_MARK_VALUE( meta::obinary<011110000>::value );
 static u8_t ENC_4_BYTES_VALUE_MASK( meta::obinary<000000111>::value );
 static u8_t ENC_4_BYTES_MARK_MASK(  meta::obinary<011111000>::value );
 
-static u8_t TAIL_BYTES_MARK_MASK(   meta::obinary<011000000>::value );
-static u8_t TAIL_BYTES_VALUE_MASK(  meta::obinary<000111111>::value );
 static u8_t TAIL_BYTES_MARK_VALUE(  meta::obinary<010000000>::value );
+static u8_t TAIL_BYTES_VALUE_MASK(  meta::obinary<000111111>::value );
+static u8_t TAIL_BYTES_MARK_MASK(   meta::obinary<011000000>::value );
+
+static u32_t MAX_1_BYTE_CODE_POINT( 0x00007f );
+static u32_t MAX_2_BYTE_CODE_POINT( 0x0007ff );
+static u32_t MAX_3_BYTE_CODE_POINT( 0x00ffff );
+static u32_t MAX_4_BYTE_CODE_POINT( 0x10ffff );
+
+inline int rank( u32_t value_ ) {
+	int r( 0 );
+	if ( value_ <= MAX_1_BYTE_CODE_POINT ) {
+		r = 1;
+	} else if ( value_ <= MAX_2_BYTE_CODE_POINT ) {
+		r = 2;
+	} else if ( value_ <= MAX_3_BYTE_CODE_POINT ) {
+		r = 3;
+	} else if ( value_ <= MAX_4_BYTE_CODE_POINT ) {
+		r = 4;
+	} else {
+		throw HOutOfRangeException( "Unicode code point is out of range: "_ys.append( value_ ) );
+	}
+	return ( r );
+}
+
+namespace {
+
+void encode( u32_t codePoint_, char*& dest_ ) {
+	int r( rank( codePoint_ ) );
+	dest_ += r;
+	char* p( dest_ - 1 );
+	u8_t head[] = { 0, 0, ENC_2_BYTES_MARK_VALUE, ENC_3_BYTES_MARK_VALUE, ENC_4_BYTES_MARK_VALUE };
+	switch( r ) {
+		case ( 4 ): { *p = static_cast<char>( TAIL_BYTES_MARK_VALUE | ( TAIL_BYTES_VALUE_MASK & codePoint_ ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
+		case ( 3 ): { *p = static_cast<char>( TAIL_BYTES_MARK_VALUE | ( TAIL_BYTES_VALUE_MASK & codePoint_ ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
+		case ( 2 ): { *p = static_cast<char>( TAIL_BYTES_MARK_VALUE | ( TAIL_BYTES_VALUE_MASK & codePoint_ ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
+		case ( 1 ): { *p = static_cast<char>( head[r] | codePoint_ ); } /* no break - fall through */
+	}
+}
+
+}
 
 }
 
@@ -1538,12 +1576,32 @@ HUTF8String::HUTF8String( void )
 	return;
 }
 
-HUTF8String::HUTF8String( HString const& )
-	: HUTF8String() {
+HUTF8String::HUTF8String( HString const& str_ )
+	: HUTF8String( str_.begin(), str_.end() ) {
 }
 
-HUTF8String::HUTF8String( HString::const_iterator, HString::const_iterator )
+HUTF8String::HUTF8String( HString::const_iterator it_, HString::const_iterator end_ )
 	: HUTF8String() {
+	M_PROLOG
+	u32_t maxCodePoint( 0 );
+	int byteCount( 0 );
+	for ( HString::const_iterator it( it_ ); it != end_; ++ it ) {
+		byteCount += utf8::rank( static_cast<u32_t>( *it ) ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
+		maxCodePoint = max( static_cast<u32_t>( *it ), maxCodePoint ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
+	}
+	if ( byteCount > 0 ) {
+		_ptr = memory::calloc<char>( byteCount + 1 + static_cast<int>( sizeof( OBufferMeta ) ) );
+		_meta->_refCount = 1;
+		_meta->_size = byteCount;
+		_meta->_rank = static_cast<i8_t>( utf8::rank( maxCodePoint ) );
+		_byteCount = byteCount;
+		_characterCount = static_cast<int>( end_ - it_ );
+		char* p( _ptr + sizeof ( OBufferMeta ) );
+		for ( ; it_ != end_; ++ it_ ) {
+			utf8::encode( static_cast<u32_t>( *it_), p ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
+		}
+	}
+	M_EPILOG
 }
 
 HUTF8String::HUTF8String( char const* str_ )
