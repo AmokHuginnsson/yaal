@@ -46,9 +46,10 @@ class HFormat {
 	format_impl_ptr_t _impl;
 public:
 	HFormat( HString const& = HString() );
-	HFormat( format_impl_ptr_t );
 	HFormat( HFormat const& );
+	HFormat( HFormat&& );
 	HFormat& operator = ( HFormat const& );
+	HFormat& operator = ( HFormat&& );
 	void swap( HFormat& );
 	HFormat operator % ( char );
 	HFormat operator % ( char unsigned );
@@ -68,6 +69,8 @@ public:
 	HFormat operator % ( void const* );
 	HString string( void ) const;
 	HString format( void ) const;
+private:
+	HFormat( format_impl_ptr_t );
 };
 
 typedef HExceptionT<HFormat> HFormatException;
@@ -85,13 +88,18 @@ class HStreamFormatProxy {
 	class HStreamFormatProxyImpl {
 		HFormat _format;
 		HStreamInterface& _stream;
-		HStreamFormatProxyImpl( HStreamInterface& s, HFormat const& f ) : _format( f ), _stream( s ) {}
+		HStreamFormatProxyImpl( HStreamInterface& s, HFormat const& f )
+			: _format( f )
+			, _stream( s ) {
+		}
 		friend class HStreamFormatProxy;
 	};
 	typedef HPointer<HStreamFormatProxyImpl> stream_format_proxy_impl_t;
 	stream_format_proxy_impl_t _impl;
 public:
-	HStreamFormatProxy( HStreamInterface& s, HFormat const& f ) : _impl( new ( memory::yaal ) HStreamFormatProxyImpl( s, f ) ) {}
+	HStreamFormatProxy( HStreamInterface& s, HFormat const& f )
+		: _impl( new ( memory::yaal ) HStreamFormatProxyImpl( s, f ) ) {
+	}
 	template<typename tType>
 	HStreamFormatProxy operator % ( tType const& v ) {
 		M_PROLOG

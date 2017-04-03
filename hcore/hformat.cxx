@@ -32,7 +32,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hformat.hxx"
 #include "hcore/memory.hxx"
-#include "hlist.hxx"
+#include "harray.hxx"
 #include "hmap.hxx"
 #include "hset.hxx"
 #include "hvariant.hxx"
@@ -89,8 +89,8 @@ private:
 			, _const() {
 		}
 	};
-	typedef HList<OToken> tokens_t;
-	typedef HMap<int, OToken*> positions_t;
+	typedef HArray<OToken> tokens_t;
+	typedef HMap<int, int> positions_t;
 	typedef HPointer<positions_t> positions_ptr_t;
 	typedef HVariant<bool, char, int short, int, int long, int long long, void const*, float, double, double long, HString> format_arg_t;
 	typedef HMap<int, format_arg_t> args_t;
@@ -105,8 +105,6 @@ private:
 	mutable HString _errorMessage;
 	HFormatImpl( HString const& );
 	HFormatImpl( HFormatImpl const& );
-	HFormatImpl& operator = ( HFormatImpl const& );
-	void swap( HFormatImpl& );
 	int next_token( conversion_t const& );
 	static bool has_conversion( HString const&, int );
 	OToken next_conversion( HString const&, int& );
@@ -132,6 +130,7 @@ private:
 public:
 	char const* error_message( int = 0 ) const;
 private:
+	HFormatImpl& operator = ( HFormatImpl const& ) = delete;
 	friend class HFormat;
 	template<typename tType, typename... arg_t>
 	friend yaal::hcore::HPointer<tType> yaal::hcore::make_pointer( arg_t&&... );
@@ -177,40 +176,10 @@ HFormat::HFormatImpl::HFormatImpl( HFormatImpl const& fi )
 	, _buffer( fi._buffer )
 	, _string( fi._string )
 	, _tokens( fi._tokens )
-	, _positions( make_pointer<positions_t>() )
-	, _args( make_pointer<args_t>() )
+	, _positions( make_pointer<positions_t>( *fi._positions ) )
+	, _args( make_pointer<args_t>( *fi._args ) )
 	, _errorMessage( fi._errorMessage ) {
-	M_PROLOG
-	*_positions = *fi._positions;
-	*_args = *fi._args;
-	M_EPILOG
-}
-
-HFormat::HFormatImpl& HFormat::HFormatImpl::operator = ( HFormat::HFormatImpl const& fi ) {
-	M_PROLOG
-	if ( &fi != this ) {
-		HFormatImpl tmp( fi );
-		swap( tmp );
-	}
-	return ( *this );
-	M_EPILOG
-}
-
-void HFormat::HFormatImpl::swap( HFormat::HFormatImpl& fi ) {
-	M_PROLOG
-	if ( &fi != this ) {
-		using yaal::swap;
-		swap( _positionIndex, fi._positionIndex );
-		swap( _format, fi._format );
-		swap( _buffer, fi._buffer );
-		swap( _string, fi._string );
-		swap( _tokens, fi._tokens );
-		swap( _positions, fi._positions );
-		swap( _args, fi._args );
-		swap( _errorMessage, fi._errorMessage );
-	}
 	return;
-	M_EPILOG
 }
 
 namespace {
@@ -259,7 +228,7 @@ HFormat::HFormat( HString const& aFmt_ )
 	idx_t precIdxs;
 	int pos = 0;
 	/* positions are 1 based, but we want to index argument 0 based */
-	for ( HFormatImpl::tokens_t::iterator it( _impl->_tokens.begin() ), end( _impl->_tokens.end() ); it != end; ++ it, ++ pos ) {
+	for ( HFormatImpl::tokens_t::iterator beg( _impl->_tokens.begin() ), it( _impl->_tokens.begin() ), end( _impl->_tokens.end() ); it != end; ++ it, ++ pos ) {
 		if ( it->_conversion == HFormatImpl::CONVERSION::CONSTANT ) {
 			-- pos;
 			continue;
@@ -273,7 +242,7 @@ HFormat::HFormat( HString const& aFmt_ )
 		}
 		if ( it->_width < 0 ) {
 			widthIdxs.insert( - ( it->_width + 2 ) );
-			_impl->_positions->insert( make_pair( - ( it->_width + 2 ), static_cast<HFormatImpl::OToken*>( nullptr ) ) );
+			_impl->_positions->insert( make_pair( - ( it->_width + 2 ), -1 ) );
 			++ pos;
 		}
 		if ( it->_precision == -1 ) {
@@ -281,7 +250,7 @@ HFormat::HFormat( HString const& aFmt_ )
 		}
 		if ( it->_precision < 0 ) {
 			precIdxs.insert( - ( it->_precision + 2 ) );
-			_impl->_positions->insert( make_pair( - ( it->_precision + 2 ), static_cast<HFormatImpl::OToken*>( nullptr ) ) );
+			_impl->_positions->insert( make_pair( - ( it->_precision + 2 ), -1 ) );
 			++ pos;
 		}
 		if ( it->_position > 0 ) {
@@ -289,7 +258,7 @@ HFormat::HFormat( HString const& aFmt_ )
 		} else {
 			it->_position = pos;
 		}
-		_impl->_positions->insert( make_pair( it->_position, &*it ) );
+		_impl->_positions->insert( make_pair( it->_position, static_cast<int>( it - beg ) ) );
 		if ( firstToken ) {
 			anyTokenHaveExplicitIndex = thisTokenHasExplicitIndex;
 		}
@@ -308,22 +277,35 @@ HFormat::HFormat( HString const& aFmt_ )
 	M_EPILOG
 }
 
-HFormat::HFormat( format_impl_ptr_t fi )
-	: _impl( fi ) {
+HFormat::HFormat( format_impl_ptr_t impl_ )
+	: _impl( impl_ ) {
 }
 
-HFormat::HFormat( HFormat const& fi )
-	: _impl( new ( memory::yaal ) HFormat::HFormatImpl( *(fi._impl) ) ) {
+HFormat::HFormat( HFormat const& other_ )
+	: _impl( make_pointer<HFormat::HFormatImpl>( *(other_._impl) ) ) {
 }
 
-HFormat& HFormat::operator = ( HFormat const& fi ) {
+HFormat::HFormat( HFormat&& other_ )
+	: _impl( yaal::move( other_._impl ) ) {
+	return;
+}
+
+HFormat& HFormat::operator = ( HFormat const& other_ ) {
 	M_PROLOG
-	if ( &fi != this ) {
-		HFormat tmp( fi );
+	if ( &other_ != this ) {
+		HFormat tmp( other_ );
 		swap( tmp );
 	}
 	return ( *this );
 	M_EPILOG
+}
+
+HFormat& HFormat::operator = ( HFormat&& other_ ) {
+	if ( &other_ != this ) {
+		swap( other_ );
+		other_._impl.reset();
+	}
+	return ( *this );
 }
 
 void HFormat::swap( HFormat& fi ) {
@@ -597,7 +579,8 @@ int HFormat::HFormatImpl::next_token( HFormatImpl::conversion_t const& conv ) {
 	}
 	positions_t::const_iterator it = _positions->find( _positionIndex );
 	M_ENSURE( it != _positions->end() );
-	OToken* t = it->second;
+	int pos( it->second );
+	OToken* t( pos >= 0 ? &_tokens[pos] : nullptr );
 	M_ENSURE(
 		( t && (
 			( conv == t->_conversion )
