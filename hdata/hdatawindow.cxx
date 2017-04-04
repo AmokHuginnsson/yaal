@@ -147,8 +147,7 @@ void HDataWindow::sync( void ) {
 bool HDataWindow::handler_add_new( hconsole::HEvent const& ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::VIEW ) {
-		_statusBar->message( COLOR::FG_BRIGHTRED, "%s",
-				_( "You cannot add new record now." ) );
+		_statusBar->message( COLOR::FG_BRIGHTRED, _( "You cannot add new record now." ) );
 		return ( true );
 	}
 	_mode = HCRUDDescriptor::MODE::CREATE;
@@ -162,13 +161,11 @@ bool HDataWindow::handler_add_new( hconsole::HEvent const& ) {
 bool HDataWindow::handler_edit( hconsole::HEvent const& ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::VIEW ) {
-		_statusBar->message( COLOR::FG_BRIGHTRED, "%s",
-				_( "You cannot start editing of this record." ) );
+		_statusBar->message( COLOR::FG_BRIGHTRED, _( "You cannot start editing of this record." ) );
 		return ( true );
 	}
 	if ( ! _crud->get_size() ) {
-		_statusBar->message( COLOR::FG_BRIGHTRED, "%s",
-				_( "There is nothing to edit." ) );
+		_statusBar->message( COLOR::FG_BRIGHTRED, _( "There is nothing to edit." ) );
 		return ( true );
 	}
 	_mode = HCRUDDescriptor::MODE::UPDATE;
@@ -180,13 +177,11 @@ bool HDataWindow::handler_edit( hconsole::HEvent const& ) {
 bool HDataWindow::handler_delete( hconsole::HEvent const& ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::VIEW ) {
-		_statusBar->message( COLOR::FG_BRIGHTRED, "%s",
-				_( "You cannot delete this record." ) );
+		_statusBar->message( COLOR::FG_BRIGHTRED, _( "You cannot delete this record." ) );
 		return ( true );
 	}
 	if ( ! _crud->get_size() ) {
-		_statusBar->message( COLOR::FG_BRIGHTRED, "%s",
-				_( "There is nothing to remove." ) );
+		_statusBar->message( COLOR::FG_BRIGHTRED, _( "There is nothing to remove." ) );
 		return ( true );
 	}
 	if ( _mainWidget ) {
@@ -201,14 +196,14 @@ bool HDataWindow::handler_delete( hconsole::HEvent const& ) {
 bool HDataWindow::handler_save( hconsole::HEvent const& ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::EDIT ) {
-		_statusBar->message( COLOR::FG_BRIGHTRED, "%s", _( "There is nothing to save." ) );
+		_statusBar->message( COLOR::FG_BRIGHTRED, _( "There is nothing to save." ) );
 		return ( true );
 	}
 	if ( ( _mode == HCRUDDescriptor::MODE::CREATE ) || ( _mode == HCRUDDescriptor::MODE::UPDATE ) ) {
 		for ( HDataWidget* dw : _editModeWidgets ) {
 			HDataEditWidget* dew( dynamic_cast<HDataEditWidget*>( dw ) );
 			if ( dew && ! dew->is_valid() ) {
-				_statusBar->message( COLOR::FG_BRIGHTRED, _( "Invalid value in: %s" ), dew->get_label().c_str() );
+				_statusBar->message( COLOR::FG_BRIGHTRED, _( "Invalid value in: %s" ), dew->get_label() );
 				return ( true );
 			}
 		}
@@ -221,7 +216,7 @@ bool HDataWindow::handler_save( hconsole::HEvent const& ) {
 	sync();
 	HRecordSet::ptr_t rs = _crud->execute( _mode );
 	if ( rs->get_errno() ) {
-		_statusBar->message( COLOR::FG_BRIGHTRED, "%s", rs->get_error() );
+		_statusBar->message( COLOR::FG_BRIGHTRED, rs->get_error() );
 	} else {
 		if ( _mode == HCRUDDescriptor::MODE::CREATE ) {
 			id = rs->get_insert_id();
@@ -241,8 +236,7 @@ bool HDataWindow::handler_save( hconsole::HEvent const& ) {
 bool HDataWindow::handler_requery( hconsole::HEvent const& ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::VIEW ) {
-		_statusBar->message( COLOR::FG_BRIGHTRED, "%s",
-				_( "Finish your current operation first." ) );
+		_statusBar->message( COLOR::FG_BRIGHTRED, _( "Finish your current operation first." ) );
 		return ( true );
 	}
 	set_mode( DOCUMENT::VIEW );
@@ -266,7 +260,7 @@ bool HDataWindow::handler_cancel( hconsole::HEvent const& ) {
 	}
 	_modified = false;
 	_statusBar->paint();
-	_statusBar->message( COLOR::FG_BRIGHTRED, "%s", _( "Dropping all changes." ) );
+	_statusBar->message( COLOR::FG_BRIGHTRED, _( "Dropping all changes." ) );
 	reload_record();
 	return ( true );
 	M_EPILOG

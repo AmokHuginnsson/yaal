@@ -29,6 +29,7 @@ Copyright:
 
 #include "hcore/hsingleton.hxx"
 #include "hcore/hpipe.hxx"
+#include "hcore/hformat.hxx"
 #include "tools/ansi.hxx"
 #include "tools/signals.hxx"
 #include "hconsole/mouse.hxx"
@@ -201,6 +202,8 @@ struct COLOR {
 		ATTR_NORMAL      = ( FG_LIGHTGRAY | BG_BLACK ),
 		ATTR_DEFAULT     = -1
 	} color_t;
+	static color_t complementary( color_t );
+	static color_t combine( color_t, color_t );
 	static color_t fg_to_bg( color_t );
 	static color_t from_string( yaal::hcore::HString const& );
 	static yaal::ansi::HSequence const& to_ansi( color_t );
@@ -242,7 +245,7 @@ struct EVENT {
 
 /*! \brief Low level TUI description and modifier.
  */
-class M_YAAL_HCONSOLE_PUBLIC_API HConsole : public yaal::hcore::HSingleton<HConsole> {
+class M_YAAL_HCONSOLE_PUBLIC_API HConsole : public yaal::hcore::HSingleton<HConsole>, yaal::hcore::HFormatter {
 public:
 	typedef HConsole this_type;
 	typedef yaal::hcore::HSingleton<HConsole> base_type;
@@ -260,8 +263,8 @@ public:
 	int get_width( void ) const;
 	void enter_curses( void );
 	void leave_curses( void );
-	void set_attr( int ) const;
-	void set_background( int ) const;
+	void set_attr( COLOR::color_t ) const;
+	void set_background( COLOR::color_t ) const;
 	void move( int, int ) const;
 	CURSOR curs_set( CURSOR ) const;
 	void addch( int );
@@ -269,14 +272,23 @@ public:
 	int endwin( void );
 	void getyx( int&, int& ) const;
 	void clrtoeol( void ) const;
-	void addstr( char const* ) const;
-	void printf( char const*, ... ) const;
-	void mvprintf( int, int, char const*, ... ) const;
-	void cmvprintf( int, int, int, char const*, ... ) const;
+	void addstr( yaal::hcore::HString const& ) const;
+	template<typename... T>
+	void printf( T const&... a_ ) const {
+		return ( addstr( do_format( a_... ) ) );
+	}
+	template<typename... T>
+	void mvprintf( int row_, int col_, T const&... a_ ) const {
+		return ( do_mvprintf( row_, col_, do_format( a_... ) ) );
+	}
+	template<typename... T>
+	void cmvprintf( int row_, int col_, COLOR::color_t attr_, T const&... a_ ) const {
+		return ( do_cmvprintf( row_, col_, attr_, do_format( a_... ) ) );
+	}
 	void ungetch( int );
 	int get_key( void ) const;
 	int kbhit( void ) const;
-	char unsigned get_attr( void ) const;
+	COLOR::color_t get_attr( void ) const;
 	void clear_terminal( void );
 	void clear( void );
 	bool is_enabled( void ) const;
@@ -295,9 +307,8 @@ public:
 	int on_mouse( int );
 	static void set_escdelay( int );
 protected:
-	void vmvprintf( int, int, char const*, void* ) const;
-	void vcmvprintf( int, int, int, char const*, void* ) const;
-	void vprintf( char const*, void* ) const;
+	void do_mvprintf( int, int, yaal::hcore::HString const& ) const;
+	void do_cmvprintf( int, int, COLOR::color_t, yaal::hcore::HString const& ) const;
 	void init( void );
 private:
 	HConsole( void );

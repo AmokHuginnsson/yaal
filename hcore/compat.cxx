@@ -49,11 +49,6 @@ Copyright:
 #include <cstring>
 #endif /* #if ! defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 ) || ! defined( HAVE_STRNLEN ) || ( HAVE_STRNLEN == 0 ) */
 
-#if ! defined( HAVE_ASPRINTF ) || ( HAVE_ASPRINTF == 0 )
-#include <cstdio>
-#include <cstdarg>
-#endif /* not HAVE_ASPRINTF */
-
 #if ( defined( HAVE_GETHOSTBYNAME_R ) && ( ! defined( HAVE_GNU_GETHOSTBYNAME_R ) ) ) || ( defined( HAVE_GETHOSTBYADDR_R ) && ( ! defined( HAVE_GNU_GETHOSTBYADDR_R ) ) )
 #include <cerrno>
 #endif /* ( HAVE_GETHOSTBYNAME_R && not HAVE_GNU_GETHOSTBYNAME_R ) || ( HAVE_GETHOSTBYADDR_R && not HAVE_GNU_GETHOSTBYADDR_R ) */

@@ -45,7 +45,7 @@ namespace hdata {
  */
 class HDataStatusBarWidget : public hconsole::HStatusBarWidget {
 public:
-	HDataStatusBarWidget( HDataWindow*, yaal::hcore::HString const&, int = -1 );
+	HDataStatusBarWidget( HDataWindow*, yaal::hcore::HString const&, OAttribute const& = hconsole::_attributeStatusBar_ );
 	virtual void do_draw_label ( void ) override;
 };
 

@@ -47,7 +47,7 @@ namespace yaal {
 namespace hconsole {
 
 int _latency_ = 1;
-int _screenBackground_ = COLOR::BG_BLACK;
+COLOR::color_t _screenBackground_ = COLOR::BG_BLACK;
 HWidget::OAttribute _attributeDisabled_ = {
 	static_cast<COLOR::color_t>( COLOR::FG_GREEN | COLOR::BG_BLACK | COLOR::BG_BLINK ),
 	static_cast<COLOR::color_t>( COLOR::FG_LIGHTGRAY | COLOR::BG_BLACK | COLOR::BG_BLINK )
@@ -60,10 +60,14 @@ HWidget::OAttribute _attributeFocused_ = {
 	static_cast<COLOR::color_t>( COLOR::FG_BRIGHTGREEN | COLOR::BG_BLACK | COLOR::BG_BLINK ),
 	static_cast<COLOR::color_t>( COLOR::FG_BLACK | COLOR::BG_LIGHTGRAY )
 };
-int _attributeStatusBar_ = ( COLOR::FG_WHITE | COLOR::BG_BLACK ) << 8
-															| ( COLOR::FG_LIGHTGRAY | COLOR::BG_BLACK );
-int _attributeSearchHighlight_ = ( COLOR::FG_BLACK | COLOR::BG_BROWN | COLOR::BG_BLINK ) << 8
-																		| ( COLOR::FG_BLACK | COLOR::BG_BROWN );
+HWidget::OAttribute _attributeStatusBar_ = {
+	static_cast<COLOR::color_t>( COLOR::FG_WHITE | COLOR::BG_BLACK ),
+	static_cast<COLOR::color_t>( COLOR::FG_LIGHTGRAY | COLOR::BG_BLACK )
+};
+HWidget::OAttribute _attributeSearchHighlight_ = {
+	static_cast<COLOR::color_t>( COLOR::FG_BLACK | COLOR::BG_BROWN | COLOR::BG_BLINK ),
+	static_cast<COLOR::color_t>( COLOR::FG_BLACK | COLOR::BG_BROWN )
+};
 USE_MOUSE _useMouse_ = USE_MOUSE::AUTO;
 char _commandComposeCharacter_ = 'x';
 int  _commandComposeDelay_ = 16;
@@ -98,17 +102,6 @@ void set_color( HString& value_, HWidget::OAttribute& attribute_ ) {
 	COLOR::color_t dataFg( get_color_bits( value_, 2 ) );
 	attribute_._label = static_cast<COLOR::color_t>( COLOR::fg_to_bg( labelBg ) | labelFg );
 	attribute_._data = static_cast<COLOR::color_t>( COLOR::fg_to_bg( dataBg ) | dataFg );
-	return;
-	M_EPILOG
-}
-
-void set_color( HString& value_, int& attribute_ ) {
-	M_PROLOG
-	int ctr = 0;
-	int tab[ 4 ] = { 2, 3, 0, 1 };
-	for ( ctr = 0; ctr < 4; ctr ++ )
-		set_color_bits( attribute_,
-				get_color_bits( value_, ctr ), tab [ ctr ] );
 	return;
 	M_EPILOG
 }

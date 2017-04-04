@@ -34,12 +34,12 @@ namespace yaal {
 namespace hconsole {
 
 extern M_YAAL_HCONSOLE_PUBLIC_API int _latency_;
-extern M_YAAL_HCONSOLE_PUBLIC_API int _screenBackground_;
+extern M_YAAL_HCONSOLE_PUBLIC_API COLOR::color_t _screenBackground_;
 extern M_YAAL_HCONSOLE_PUBLIC_API HWidget::OAttribute _attributeDisabled_;
 extern M_YAAL_HCONSOLE_PUBLIC_API HWidget::OAttribute _attributeEnabled_;
 extern M_YAAL_HCONSOLE_PUBLIC_API HWidget::OAttribute _attributeFocused_;
-extern M_YAAL_HCONSOLE_PUBLIC_API int _attributeStatusBar_;
-extern M_YAAL_HCONSOLE_PUBLIC_API int _attributeSearchHighlight_;
+extern M_YAAL_HCONSOLE_PUBLIC_API HWidget::OAttribute _attributeStatusBar_;
+extern M_YAAL_HCONSOLE_PUBLIC_API HWidget::OAttribute _attributeSearchHighlight_;
 enum class USE_MOUSE {
 	YES,
 	NO,

@@ -57,7 +57,7 @@ HLogPad::HLogPad( HWindow* parent_, int row_, int column_,
 	, _lines( 0 )
 	, _offsetRow( 0 )
 	, _offsetColumn( 0 )
-	, _attribute( 0 )
+	, _attribute( COLOR::ATTR_NORMAL )
 	, _contents() {
 	M_PROLOG
 	attr_.apply( *this );
@@ -77,36 +77,42 @@ void HLogPad::do_paint( void ) {
 	draw_label();
 	_varTmpBuffer.reserve( _widthRaw );
 	_varTmpBuffer.fillz( ' ', 0, _widthRaw );
-	int bg( _focused ? COLOR::BG_GRAY : COLOR::BG_BLACK );
-	_attribute = COLOR::ATTR_NORMAL | bg;
-	for ( int i( 0 ); i < _heightRaw; ++ i )
+	COLOR::color_t bg( _focused ? COLOR::BG_GRAY : COLOR::BG_BLACK );
+	_attribute = COLOR::combine( COLOR::ATTR_NORMAL, bg );
+	for ( int i( 0 ); i < _heightRaw; ++ i ) {
 		cons.cmvprintf( _rowRaw + i, _columnRaw, _attribute, _varTmpBuffer.c_str() );
+	}
 	if ( ! _contents.is_empty() ) {
 		int ctr( 0 ); /* number of text lines in _contents iterated so far */
 		int row( 0 ); /* number of lines printed so far */
 		int cursor( 0 ); /* end of portion of currently printed line */
 		int column( 0 ); /* total length of currently printed line */
 		for ( contents_t::iterator it( _contents.begin() ), end( _contents.end() ); ( it != end ) && ( row < _heightRaw ); ++ it ) {
-			if ( it->_type == HLogLine::ATTRIBUTE )
-				_attribute = it->_attribute | bg;
-			else {
+			if ( it->_type == HLogLine::ATTRIBUTE ) {
+				_attribute = COLOR::combine( it->_attribute, bg );
+			} else {
 				if ( ( ctr >= _offsetRow ) && ( cursor < _widthRaw ) ) {
-					if ( _offsetColumn > column )
+					if ( _offsetColumn > column ) {
 						_varTmpBuffer = it->_text.mid( _offsetColumn - column );
-					else
+					} else {
 						_varTmpBuffer = it->_text;
-					if ( ( cursor + _varTmpBuffer.get_length() ) > _widthRaw )
+					}
+					if ( ( cursor + _varTmpBuffer.get_length() ) > _widthRaw ) {
 						_varTmpBuffer.set_at( _widthRaw - cursor, 0 );
-					if ( _varTmpBuffer[ 0 ] )
+					}
+					if ( _varTmpBuffer[ 0 ] ) {
 						cons.cmvprintf( _rowRaw + row,
 								_columnRaw + cursor, _attribute, _varTmpBuffer.c_str() );
-				} else
+					}
+				} else {
 					_varTmpBuffer = "";
+				}
 				if ( it->_type == HLogLine::TEXT_EOL ) {
 					cursor = 0;
 					column = 0;
-					if ( ctr >= _offsetRow )
+					if ( ctr >= _offsetRow ) {
 						++ row;
+					}
 					++ ctr;
 				} else {
 					cursor += static_cast<int>( _varTmpBuffer.get_length() );
@@ -129,7 +135,7 @@ void HLogPad::add( HLogLine const& ll_ ) {
 	M_EPILOG
 }
 
-void HLogPad::add( int attribute_ ) {
+void HLogPad::add( COLOR::color_t attribute_ ) {
 	M_PROLOG
 	HLogLine logLine;
 	logLine._type = HLogLine::ATTRIBUTE;
@@ -183,7 +189,7 @@ void HLogPad::add( yaal::hcore::HString const& text_ ) {
 	M_EPILOG
 }
 
-void HLogPad::add( int attribute_, yaal::hcore::HString const& text_ ) {
+void HLogPad::add( COLOR::color_t attribute_, yaal::hcore::HString const& text_ ) {
 	M_PROLOG
 	add( attribute_ );
 	add( text_ );

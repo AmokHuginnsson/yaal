@@ -545,7 +545,7 @@ int HEditWidget::do_process_input( int code_ ) {
 	if ( ! errorCode ) {
 		if ( _mask.is_valid() && ! _mask.matches( _varTmpBuffer ) ) {
 			if ( _window ) {
-				_window->status_bar()->message( COLOR::BG_BROWN, "%s", _mask.error().c_str() );
+				_window->status_bar()->message( COLOR::BG_BROWN, "%s", _mask.error() );
 			}
 			errorCode = 1;
 		} else {

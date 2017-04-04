@@ -339,19 +339,19 @@ public:
  *
  * \return Attribute of widgets label.
  */
-	int attr_label( void ) const;
+	COLOR::color_t attr_label( void ) const;
 
 /*! \brief Retrieve attribute (widgets) of a widgets shortcut highlight.
  *
  * \return Attribute of widgets shortcut highlight.
  */
-	int attr_shortcut( void ) const;
+	COLOR::color_t attr_shortcut( void ) const;
 
 /*! \brief Retrieve attribute (widgets) of a widgets data.
  *
  * \return Attribute of widgets data.
  */
-	int attr_data( void ) const;
+	COLOR::color_t attr_data( void ) const;
 
 /*! \brief Schedule full paint on next refresh cycle.
  */

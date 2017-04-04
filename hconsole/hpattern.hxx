@@ -93,7 +93,7 @@ public:
 	 */
 	bool matches( yaal::hcore::HString const& string_ ) const;
 private:
-	char const* matches( char const*, int long* = nullptr /* match length */ ) const;
+	char const* matches( char const*, int* = nullptr /* match length */ ) const;
 	bool set_switch( char const, pluggable_flags_t* );
 	void save_state( void*, pluggable_flags_t* );
 	void restore_state( void*, pluggable_flags_t* );
@@ -102,13 +102,13 @@ private:
 /*! \brief Instance of single match for given pattern.
  */
 class HPattern::HMatch {
-	int long _size;
+	int _size;
 	char const* _start;
 public:
-	int long size() const;
+	int size() const;
 	char const* raw() const;
 private:
-	HMatch( char const*, int long );
+	HMatch( char const*, int );
 	friend class HPattern::HMatchIterator;
 };
 
@@ -127,7 +127,7 @@ public:
 	HMatchIterator( HMatchIterator const& );
 	HMatchIterator& operator = ( HMatchIterator const& );
 private:
-	HMatchIterator( HPattern const*, char const*, int long );
+	HMatchIterator( HPattern const*, char const*, int );
 	friend class HPattern;
 };
 

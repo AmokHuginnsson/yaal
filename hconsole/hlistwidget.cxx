@@ -319,29 +319,46 @@ void HListWidget::draw_cell( iterator_t& it_, int row_, int column_, int columnO
 	}
 	if ( row_ == _cursorPosition ) {
 		M_ASSERT( it_ == _cursor );
-		if ( checked_ )
-			cons.set_attr( ! _enabled
-					? ( ! _focused ? ~_attributeFocused._label
-						: ~_attributeEnabled._label )
-					: ~_attributeDisabled._label );
-		else
-			cons.set_attr( _enabled ? ( _focused ? ~_attributeFocused._data
-						: ~_attributeEnabled._data ) : ~_attributeDisabled._data );
+		if ( checked_ ) {
+			cons.set_attr(
+				COLOR::complementary(
+					! _enabled
+					? ( ! _focused ? _attributeFocused._label
+						: _attributeEnabled._label )
+					: _attributeDisabled._label
+				)
+			);
+		} else {
+			cons.set_attr(
+				COLOR::complementary(
+					_enabled ? ( _focused ? _attributeFocused._data
+						: _attributeEnabled._data ) : _attributeDisabled._data
+				)
+			);
+		}
 	} else {
-		if ( checked_ )
-			cons.set_attr( _enabled
-					? ( _focused ? ~_attributeFocused._label
-						: ~_attributeEnabled._label )
-					: ~_attributeDisabled._label );
-		else
+		if ( checked_ ) {
+			cons.set_attr(
+				COLOR::complementary(
+					_enabled
+					? ( _focused ? _attributeFocused._label
+						: _attributeEnabled._label )
+					: _attributeDisabled._label
+				)
+			);
+		} else {
 			set_attr_data();
+		}
 	}
 	cons.mvprintf( _rowRaw + row_, _columnRaw + columnOffset_, _varTmpBuffer.c_str()	);
-	if ( _searchActivated )
-		highlight( _rowRaw + row_,
-				_columnRaw + columnOffset_, _match._matchNumber,
-				( it_ == _match._currentMatch )
-				&& ( column_ == _match._columnWithMatch ) );
+	if ( _searchActivated ) {
+		highlight(
+			_rowRaw + row_,
+			_columnRaw + columnOffset_, _match._matchNumber,
+			( it_ == _match._currentMatch )
+			&& ( column_ == _match._columnWithMatch )
+		);
+	}
 	return;
 	M_EPILOG
 }
@@ -748,9 +765,9 @@ int HListWidget::process_input_view( int code_ ) {
 		case ( KEY_CODE::HOME ):      handle_key_home();      break;
 		case ( KEY_CODE::END ):       handle_key_end();       break;
 		case ( KEY_CODE::DOWN ):      handle_key_down();      break;
-		case ( KEY<'n'>::ctrl ):       handle_key_ctrl_n();    break;
-		case ( KEY<'p'>::ctrl ):       handle_key_ctrl_p();    break;
-		case ( ' ' ):                  handle_key_space();     break;
+		case ( KEY<'n'>::ctrl ):      handle_key_ctrl_n();    break;
+		case ( KEY<'p'>::ctrl ):      handle_key_ctrl_p();    break;
+		case ( ' ' ):                 handle_key_space();     break;
 		case ( KEY_CODE::INSERT ): {
 			if ( _editable ) {
 				handle_key_insert();
@@ -766,7 +783,7 @@ int HListWidget::process_input_view( int code_ ) {
 				handle_key_edit();
 			}
 		} break;
-		case ( '\t' ):                 handle_key_tab();
+		case ( '\t' ):                handle_key_tab();
 /* there is no break in previous `case():', because this list must give up
  * its focus and be refreshed and parent window must give focus
  * to another widget */
@@ -789,14 +806,14 @@ int HListWidget::process_input_view( int code_ ) {
 		break;
 	}
 	code_ = errorCode;
+	if ( get_cursor_position() != origCursorPosition ) {
+		selection_change();
+	}
 	if ( ! errorCode ) {
 		schedule_repaint();
 		if ( _window ) {
-			_window->status_bar()->message( COLOR::FG_LIGHTGRAY, "%s", _varTmpBuffer.c_str() );
+			_window->status_bar()->message( COLOR::FG_LIGHTGRAY, _varTmpBuffer );
 		}
-	}
-	if ( get_cursor_position() != origCursorPosition ) {
-		selection_change();
 	}
 	return ( code_ );
 	M_EPILOG
@@ -1010,7 +1027,7 @@ void HListWidget::go_to_match( void ) {
 			get_text_for_cell( _cursor, columnWithMatch, TYPE::HSTRING );
 			highlightStart = nullptr;
 			matchNumber = 0;
-			for ( HPattern::HMatchIterator it = _pattern.find( _varTmpBuffer.c_str() ),
+			for ( HPattern::HMatchIterator it = _pattern.find( _varTmpBuffer ),
 					end = _pattern.end(); it != end; ++ it, ++ matchNumber ) {
 				if ( matchNumber > _match._matchNumber ) {
 					highlightStart = it->raw();
@@ -1090,8 +1107,8 @@ void HListWidget::go_to_match_previous( void ) {
 			highlightStart = nullptr;
 			ctrLoc = 0;
 			if ( _match._matchNumber < 0 )
-				_match._matchNumber = static_cast<int>( distance( _pattern.find( _varTmpBuffer.c_str() ), _pattern.end() ) );
-			for ( HPattern::HMatchIterator it = _pattern.find( _varTmpBuffer.c_str() ),
+				_match._matchNumber = static_cast<int>( distance( _pattern.find( _varTmpBuffer ), _pattern.end() ) );
+			for ( HPattern::HMatchIterator it = _pattern.find( _varTmpBuffer ),
 					end = _pattern.end(); it != end; ++ it, ++ ctrLoc ) {
 				if ( ctrLoc == ( _match._matchNumber - 1 ) ) {
 					highlightStart = it->raw();

@@ -38,7 +38,7 @@ namespace yaal {
 namespace hdata {
 
 HDataStatusBarWidget::HDataStatusBarWidget( HDataWindow* parent_,
-		yaal::hcore::HString const& label_, int statusBarAttribute_ )
+		yaal::hcore::HString const& label_, OAttribute const& statusBarAttribute_ )
 	: HWidget( parent_, - 2, 0, 2, - 1, label_ ),
 	HStatusBarWidget( nullptr, HString(), statusBarAttribute_ ) {
 	M_PROLOG

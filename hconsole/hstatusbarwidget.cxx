@@ -44,11 +44,11 @@ namespace yaal {
 namespace hconsole {
 
 HStatusBarWidget::HStatusBarWidget( HWindow* parent_,
-		yaal::hcore::HString const& label_, int statusBarAttribute_ )
+		yaal::hcore::HString const& label_, HWidget::OAttribute const& statusBarAttribute_ )
 	: HWidget( parent_, - 2, 0, 2, - 1, label_ )
 	, HEditWidget( nullptr, 0, 0, 0, 0, HString(),
 			HEditWidgetAttributes().mask( _maskLoose_ ).max_history_level( 255 ).label_decoration( HWidget::LABEL::DECORATION::EXPLICIT ) )
-	, _statusBarAttribute( ( statusBarAttribute_ > 0 ) ? statusBarAttribute_ : _attributeStatusBar_ )
+	, _statusBarAttribute( statusBarAttribute_ )
 	, _promptLength( 0 )
 	, _mode( PROMPT::NORMAL )
 	, _prompt()
@@ -65,10 +65,8 @@ HStatusBarWidget::HStatusBarWidget( HWindow* parent_,
 	, _start( HTime::TZ::LOCAL )
 	, _choices() {
 	M_PROLOG
-	int attribute( _statusBarAttribute );
-	attribute &= 0x00ff;
-	_attributeFocused._data = static_cast<COLOR::color_t>( attribute );
-	_statusBarAttribute &= 0xff00;
+	_attributeFocused._data = _statusBarAttribute._data;
+	_statusBarAttribute._data = COLOR::ATTR_DEFAULT;
 	return;
 	M_EPILOG
 }
@@ -101,8 +99,8 @@ void HStatusBarWidget::do_paint( void ) {
 	if ( ! _focused )
 		cons.getyx( origRow, origColumn );
 	if ( _promptLength ) {
-		cons.set_attr( _statusBarAttribute >> 8 );
-		cons.mvprintf( _rowRaw, 0, _prompt.c_str() );
+		cons.set_attr( _statusBarAttribute._label );
+		cons.mvprintf( _rowRaw, 0, _prompt );
 	}
 	if ( _mode != PROMPT::MENU ) {
 		HEditWidget::do_paint();
@@ -111,11 +109,11 @@ void HStatusBarWidget::do_paint( void ) {
 		int current( 0 );
 		for ( choice_t const& c : _choices ) {
 			if ( current == _currentChoice ) {
-				cons.set_attr( _statusBarAttribute >> 8 );
+				cons.set_attr( _statusBarAttribute._label );
 			} else {
 				cons.set_attr( COLOR::FG_LIGHTGRAY );
 			}
-			cons.mvprintf( _rowRaw, colRaw, "[%s] ", c.first.c_str() );
+			cons.mvprintf( _rowRaw, colRaw, "[%s] ", c.first );
 			colRaw += ( static_cast<int>( c.first.get_length() ) + 3 );
 			++ current;
 		}
@@ -123,9 +121,9 @@ void HStatusBarWidget::do_paint( void ) {
 	if ( ! _focused ) {
 		cons.move( origRow, origColumn );
 	}
-	if ( _statusBarAttribute & 0xff ) {
-		_attributeEnabled._data = static_cast<COLOR::color_t>( _statusBarAttribute & 0x00ff );
-		_statusBarAttribute &= 0xff00;
+	if ( _statusBarAttribute._data != COLOR::ATTR_DEFAULT ) {
+		_attributeEnabled._data = _statusBarAttribute._data;
+		_statusBarAttribute._data = COLOR::ATTR_DEFAULT;
 	}
 	return;
 	M_EPILOG
@@ -255,44 +253,30 @@ void HStatusBarWidget::update_progress( double step_, char const* title_ ) {
 	M_EPILOG
 }
 
-void HStatusBarWidget::message( int attribute_, char const* format_, ... ) {
+void HStatusBarWidget::do_message( COLOR::color_t attribute_, yaal::hcore::HString const& message_ ) {
 	M_PROLOG
 	if ( ! _focused ) {
-		if ( format_ ) {
-			va_list ap;
-			va_start( ap, format_ );
-			_varTmpBuffer.vformat( format_, &ap );
-			va_end( ap );
-			if ( ! _varTmpBuffer.is_empty() ) {
-				HConsole::get_instance().bell();
-			}
-		} else {
-			_varTmpBuffer.clear();
+		_varTmpBuffer = message_;
+		if ( ! _varTmpBuffer.is_empty() ) {
+			HConsole::get_instance().bell();
 		}
 		set_text( _varTmpBuffer );
-		if ( ! ( _statusBarAttribute & 0x00ff ) ) {
-			_statusBarAttribute |= _attributeEnabled._data;
+		if ( _statusBarAttribute._data == COLOR::ATTR_DEFAULT ) {
+			_statusBarAttribute._data = _attributeEnabled._data;
 		}
-		_attributeEnabled._data = static_cast<COLOR::color_t>( attribute_ & 0x00ff );
+		_attributeEnabled._data = attribute_;
 		schedule_repaint();
 	}
 	return;
 	M_EPILOG
 }
 
-void HStatusBarWidget::message( char const* format_, ... ) {
+void HStatusBarWidget::do_message( yaal::hcore::HString const& message_ ) {
 	M_PROLOG
 	if ( ! _focused ) {
-		if ( format_ ) {
-			va_list ap;
-			va_start( ap, format_ );
-			_varTmpBuffer.vformat( format_, &ap );
-			va_end( ap );
-			if ( ! _varTmpBuffer.is_empty() ) {
-				HConsole::get_instance().bell();
-			}
-		} else {
-			_varTmpBuffer.clear();
+		_varTmpBuffer = message_;
+		if ( ! _varTmpBuffer.is_empty() ) {
+			HConsole::get_instance().bell();
 		}
 		set_text( _varTmpBuffer );
 		schedule_repaint();
@@ -301,15 +285,15 @@ void HStatusBarWidget::message( char const* format_, ... ) {
 	M_EPILOG
 }
 
-void HStatusBarWidget::clear( int attribute_ ) {
+void HStatusBarWidget::clear( COLOR::color_t attribute_ ) {
 	M_PROLOG
 	if ( ! _focused ) {
 		_varTmpBuffer.clear();
 		set_text( _varTmpBuffer );
-		if ( ! ( _statusBarAttribute & 0x00ff ) ) {
-			_statusBarAttribute |= _attributeEnabled._data;
+		if ( _statusBarAttribute._data == COLOR::ATTR_DEFAULT ) {
+			_statusBarAttribute._data = _attributeEnabled._data;
 		}
-		_attributeEnabled._data = static_cast<COLOR::color_t>( attribute_ & 0x00ff );
+		_attributeEnabled._data = attribute_;
 		schedule_repaint();
 	}
 	return;

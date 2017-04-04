@@ -404,26 +404,26 @@ bool HWidget::do_hit_test( int row_, int column_ ) const {
 	M_EPILOG
 }
 
-int HWidget::attr_label( void ) const {
+COLOR::color_t HWidget::attr_label( void ) const {
 	M_PROLOG
 	return ( _enabled ? ( _focused ? _attributeFocused._label : _attributeEnabled._label ) : _attributeDisabled._label );
 	M_EPILOG
 }
 
-int HWidget::attr_shortcut( void ) const {
+COLOR::color_t HWidget::attr_shortcut( void ) const {
 	M_PROLOG
 	/*
 	 * *FIXME*
 	 *
 	 * Shortcut does not have separate attribute,
 	 * it is just label attribute reverted with respect to enabled/focused state.
-	 * (maybe?) Add true shortcut attribute .
+	 * (maybe?) Add true shortcut attribute.
 	 */
 	return ( ! _enabled ? ( ! _focused ? _attributeFocused._label : _attributeEnabled._label ) : _attributeDisabled._label );
 	M_EPILOG
 }
 
-int HWidget::attr_data( void ) const {
+COLOR::color_t HWidget::attr_data( void ) const {
 	M_PROLOG
 	return ( _enabled ? ( _focused ? _attributeFocused._data : _attributeEnabled._data ) : _attributeDisabled._data );
 	M_EPILOG

@@ -24,7 +24,6 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <cstdarg>
 #include <cstdlib> /* getenv */
 #include <cstring>
 #include <csignal>  /* signal handling */
@@ -271,6 +270,14 @@ COLOR::color_t COLOR::fg_to_bg( COLOR::color_t fg_ ) {
 	}
 	return ( bg );
 	M_EPILOG
+}
+
+COLOR::color_t COLOR::complementary( COLOR::color_t attr_ ) {
+	return ( static_cast<COLOR::color_t>( ~attr_ ) );
+}
+
+COLOR::color_t COLOR::combine( COLOR::color_t part1_, COLOR::color_t part2_ ) {
+	return ( static_cast<COLOR::color_t>( part1_ | part2_ ) );
 }
 
 COLOR::color_t COLOR::from_string( yaal::hcore::HString const& name_ ) {
@@ -548,7 +555,7 @@ inline void fwd_wattrset( WINDOW* win_, T val_ ) {
 #pragma GCC diagnostic error "-Wsign-conversion"
 }
 
-void HConsole::set_attr( int attr_ ) const {
+void HConsole::set_attr( COLOR::color_t attr_ ) const {
 	M_PROLOG
 	if ( ! _enabled ) {
 		M_THROW( "not in curses mode", errno );
@@ -564,7 +571,7 @@ void HConsole::set_attr( int attr_ ) const {
 	M_EPILOG
 }
 
-void HConsole::set_background( int color_ ) const {
+void HConsole::set_background( COLOR::color_t color_ ) const {
 	M_PROLOG
 	if ( ! _enabled ) {
 		M_THROW( "not in curses mode", errno );
@@ -660,8 +667,8 @@ yaal::hcore::HStreamInterface::ptr_t const& HConsole::get_event_source( void ) c
 	return ( _event->out() );
 }
 
-void HConsole::vmvprintf( int row_, int column_,
-							 char const* format_, void* ap_ ) const {
+#undef addstr
+void HConsole::do_mvprintf( int row_, int column_, yaal::hcore::HString const& str_ ) const {
 	M_PROLOG
 	if ( ! _enabled ) {
 		M_THROW( "not in curses mode", errno );
@@ -681,79 +688,21 @@ void HConsole::vmvprintf( int row_, int column_,
 	} else {
 		move( row_, column_ );
 	}
-	va_list& ap( *static_cast<va_list*>( ap_ ) );
-	M_ENSURE( vw_printw( static_cast<WINDOW*>( _window ), format_, ap ) != ERR );
+	addstr( str_ );
 	move( origRow, origColumn );
 	return;
 	M_EPILOG
 }
 
-void HConsole::vcmvprintf( int row_, int column_, int attribute_,
-							 char const* format_, void* ap_ ) const {
+void HConsole::do_cmvprintf( int row_, int column_, COLOR::color_t attribute_, yaal::hcore::HString const& str_ ) const {
 	M_PROLOG
-	if ( ! _enabled )
+	if ( ! _enabled ) {
 		M_THROW( "not in curses mode", errno );
-	int origAttribute( get_attr() );
+	}
+	COLOR::color_t origAttribute( get_attr() );
 	set_attr( attribute_ );
-	vmvprintf( row_, column_, format_, ap_ );
+	do_mvprintf( row_, column_, str_ );
 	set_attr( origAttribute );
-	return;
-	M_EPILOG
-}
-
-void HConsole::vprintf( char const* format_, void* ap_ ) const {
-	M_PROLOG
-	va_list& ap = *static_cast<va_list*>( ap_ );
-	if ( ! _enabled )
-		M_THROW( "not in curses mode", errno );
-	M_ENSURE( vw_printw( static_cast<WINDOW*>( _window ), format_, ap ) != ERR );
-	return;
-	M_EPILOG
-}
-
-void HConsole::printf( char const* format_, ... ) const {
-	M_PROLOG
-	va_list ap;
-	va_start( ap, format_ );
-	try {
-		vprintf( format_, &ap );
-	} catch ( ... ) {
-		va_end( ap );
-		throw;
-	}
-	va_end( ap );
-	return;
-	M_EPILOG
-}
-
-void HConsole::mvprintf( int row_, int column_, char const* format_,
-		... ) const {
-	M_PROLOG
-	va_list ap;
-	va_start( ap, format_ );
-	try {
-		vmvprintf( row_, column_, format_, &ap );
-	} catch ( ... ) {
-		va_end( ap );
-		throw;
-	}
-	va_end( ap );
-	return;
-	M_EPILOG
-}
-
-void HConsole::cmvprintf( int row_, int column_, int attribute_,
-							 char const* format_, ... ) const {
-	M_PROLOG
-	va_list ap;
-	va_start( ap, format_ );
-	try {
-		vcmvprintf( row_, column_, attribute_, format_, &ap );
-	} catch ( ... ) {
-		va_end( ap );
-		throw;
-	}
-	va_end( ap );
 	return;
 	M_EPILOG
 }
@@ -762,13 +711,12 @@ inline int waddstr_fwd( WINDOW* win_, char const* str_ ) {
 	return ( ::waddstr( win_, str_ ) );
 }
 
-#undef addstr
-void HConsole::addstr( char const* str_ ) const {
+void HConsole::addstr( yaal::hcore::HString const& str_ ) const {
 	M_PROLOG
 	if ( ! _enabled ) {
 		M_THROW( "not in curses mode", errno );
 	}
-	M_ENSURE( waddstr_fwd( static_cast<WINDOW*>( _window ), str_ ) != ERR );
+	M_ENSURE( waddstr_fwd( static_cast<WINDOW*>( _window ), str_.c_str() ) != ERR );
 	return;
 	M_EPILOG
 }
@@ -873,7 +821,7 @@ int HConsole::get_key( void ) const {
 			} else {
 				key = KEY<>::command_r( character = key );
 			}
-			cmvprintf( _height - 1, 6, COLOR::FG_WHITE, " %c", character );
+			cmvprintf( _height - 1, 6, COLOR::FG_WHITE, " %c", static_cast<char>( character ) );
 		}
 		curs_set( origCursState );
 	}
@@ -947,7 +895,7 @@ inline void fwd_attr_get( WINDOW* win_, T1& val1_, T2& val2_, void* ) {
 #pragma GCC diagnostic error "-Wold-style-cast"
 }
 
-char unsigned HConsole::get_attr( void ) const {
+COLOR::color_t HConsole::get_attr( void ) const {
 	M_PROLOG
 	if ( ! _enabled ) {
 		M_THROW( "not in curses mode", errno );
@@ -964,7 +912,7 @@ char unsigned HConsole::get_attr( void ) const {
 			? ATTR::decode_fix( static_cast<int>( color ), static_cast<int>( attr ) )
 			: ATTR::decode( static_cast<int>( color ), static_cast<int>( attr ) )
 	);
-	return ( static_cast<char unsigned>( attribute ) );
+	return ( static_cast<COLOR::color_t>( attribute ) );
 	M_EPILOG
 }
 

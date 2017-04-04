@@ -90,9 +90,9 @@ void HSearchableWidget::highlight( int row_, int column_,
 			end = _pattern.end(); it != end; ++ it ) {
 		if ( ( _focused && ( ( currentIndex_ != ctr ) || ! current_ ) )
 				|| ( ! _focused && ( currentIndex_ == ctr ) && current_ ) ) {
-			cons.set_attr( _attributeSearchHighlight_ >> 8 );
+			cons.set_attr( _attributeSearchHighlight_._label );
 		} else {
-			cons.set_attr( _attributeSearchHighlight_ );
+			cons.set_attr( _attributeSearchHighlight_._data );
 		}
 		cons.mvprintf( row_,
 				static_cast<int>( column_ + ( it->raw() - _varTmpBuffer.c_str() ) ),
