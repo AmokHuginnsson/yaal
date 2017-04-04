@@ -73,6 +73,38 @@ private:
 	HFormat( format_impl_ptr_t );
 };
 
+/*! \brief Simplify creation of printf like interface in library classes.
+ */
+class HFormatter {
+private:
+	mutable HFormat _format;
+protected:
+	HFormatter( void )
+		: _format() {
+	}
+	virtual ~HFormatter( void ) {}
+	template<typename... item_t>
+	yaal::hcore::HString do_format( yaal::hcore::HString const& format_, item_t const&... item_ ) const {
+		_format = HFormat( format_ );
+		format_impl( item_... );
+		return ( _format.string() );
+	}
+protected:
+	template<typename head_t, typename... item_t>
+	void format_impl( head_t const& head_, item_t const&... item_ ) const {
+		M_PROLOG
+		_format % head_;
+		format_impl( item_... );
+		return;
+		M_EPILOG
+	}
+	void format_impl( void ) const {
+		M_PROLOG
+		return;
+		M_EPILOG
+	}
+};
+
 typedef HExceptionT<HFormat> HFormatException;
 
 HFormat operator "" _yf ( char const*, size_t );
