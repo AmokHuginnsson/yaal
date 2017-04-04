@@ -75,7 +75,7 @@ protected:
 	void on_key_page_up( void );
 	void on_key_enter( void );
 	void close_calendar( ACTION );
-	char const* week_day_name( int );
+	yaal::hcore::HString const& week_day_name( int );
 	int get_first_day_of_month_in_week_index( void ) const;
 };
 

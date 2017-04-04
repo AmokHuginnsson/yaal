@@ -83,7 +83,6 @@ public:
 	 * Parameter must be raw memory pointer for HMatchIterator returns
 	 * raw memory pointers to input string while dereferenced.
 	 */
-	HMatchIterator find( char const* string_ ) const;
 	HMatchIterator find( yaal::hcore::HString const& string_ ) const;
 	HMatchIterator end( void ) const;
 	/*! \brief Tell if given string matches pattern.

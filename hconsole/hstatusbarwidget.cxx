@@ -224,14 +224,13 @@ void HStatusBarWidget::update_progress( double step_, char const* title_ ) {
 		schedule_repaint();
 		bar( title_ );
 		if ( _estimate ) {
-			_varTmpBuffer.format ( "|%%-%ds|%%s%%s[%%3d%%s]", maxBar );
-			_string.format( _varTmpBuffer.c_str(), "-",
-					( step_ != 0.0 ? ( left.string().c_str() ) : "(?\?:?\?:?\?)" ),
-					stopper.string().c_str(),	nextPercent, "%%" );
+			_varTmpBuffer.format( "|%%-%ds|%%s%%s[%%3d%%s]", maxBar );
+			_string = do_format( _varTmpBuffer, "-",
+					( step_ != 0.0 ? ( left.string() ) : "(?\?:?\?:?\?)" ),
+					stopper.string(), nextPercent, "%%" );
 		} else {
-			_varTmpBuffer.format ( "|%%-%ds|%%s[%%3d%%s]", maxBar );
-			_string.format( _varTmpBuffer.c_str(), "-",
-					stopper.string().c_str(), nextPercent, "%%" );
+			_varTmpBuffer.format( "|%%-%ds|%%s[%%3d%%s]", maxBar );
+			_string = do_format( _varTmpBuffer, "-", stopper.string(), nextPercent, "%%" );
 		}
 		_string.fill( '-', 1, maxBar );
 		if ( nextStep > 0 )
@@ -241,7 +240,7 @@ void HStatusBarWidget::update_progress( double step_, char const* title_ ) {
 			_string.erase( length - 6, 5 );
 			_string.insert( length - 6, 4, "done" );
 		}
-		cons.mvprintf( _rowRaw, _columnRaw, _string.c_str() );
+		cons.mvprintf( _rowRaw, _columnRaw, _string );
 		_string.clear();
 		_lastProgress = nextStep;
 		_lastPercent = nextPercent;
@@ -307,7 +306,7 @@ void HStatusBarWidget::bar( char const* bar_ ) {
 	if ( bar_ ) {
 		_message.format( "%-*s", cons.get_width() - ( _labelLength + 1 ), bar_ );
 	}
-	cons.mvprintf( cons.get_height() - 2, _labelLength, _message.c_str() );
+	cons.mvprintf( cons.get_height() - 2, _labelLength, _message );
 	return;
 	M_EPILOG
 }

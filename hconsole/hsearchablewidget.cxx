@@ -66,7 +66,7 @@ void HSearchableWidget::search( HString const& pattern_, bool backwards_ ) {
 	_searchActivated = _pattern.parse( pattern_, &pf );
 	if ( ! _searchActivated ) {
 		if ( _window ) {
-			_window->status_bar()->message( "%s", _pattern.error().c_str() );
+			_window->status_bar()->message( "%s", _pattern.error() );
 		}
 	} else {
 		_backwards = backwards_;
@@ -86,7 +86,7 @@ void HSearchableWidget::highlight( int row_, int column_,
 	M_PROLOG
 	int long ctr( 0 );
 	HConsole& cons = HConsole::get_instance();
-	for ( HPattern::HMatchIterator it = _pattern.find( _varTmpBuffer.c_str() ),
+	for ( HPattern::HMatchIterator it = _pattern.find( _varTmpBuffer ),
 			end = _pattern.end(); it != end; ++ it ) {
 		if ( ( _focused && ( ( currentIndex_ != ctr ) || ! current_ ) )
 				|| ( ! _focused && ( currentIndex_ == ctr ) && current_ ) ) {

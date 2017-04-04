@@ -128,7 +128,7 @@ void HEditWidget::do_paint( void ) {
 		_varTmpBuffer.reserve( _widthRaw );
 		_varTmpBuffer.fill( ' ', len, _widthRaw - len );
 	}
-	cons.mvprintf( _rowRaw, _columnRaw, _varTmpBuffer.c_str() );
+	cons.mvprintf( _rowRaw, _columnRaw, _varTmpBuffer );
 	if ( _focused ) {
 		cons.move( _rowRaw, _columnRaw + ( _password ? 0 : _cursorPosition ) );
 		cons.curs_set( _replace ? CURSOR::VERY_VISIBLE : CURSOR::VISIBLE );

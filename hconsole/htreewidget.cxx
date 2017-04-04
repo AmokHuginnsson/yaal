@@ -123,17 +123,19 @@ HTreeWidget::~HTreeWidget( void ) {
 
 void HTreeWidget::do_paint( void ) {
 	M_PROLOG
-	int ctr = 0;
 	HConsole& cons = HConsole::get_instance();
-	if ( _focused )
-		cons.curs_set ( CURSOR::INVISIBLE );
+	if ( _focused ) {
+		cons.curs_set( CURSOR::INVISIBLE );
+	}
 	draw_label();
 	_varTmpBuffer.reserve( _widthRaw );
 	_varTmpBuffer.fillz( '_', 0, _widthRaw );
-	for ( ctr = 0; ctr < _heightRaw; ctr ++ )
-		cons.mvprintf( _rowRaw + ctr, _columnRaw, _varTmpBuffer.c_str() );
-	if ( _view.get_root() )
+	for ( int ctr( 0 ); ctr < _heightRaw; ++ ctr ) {
+		cons.mvprintf( _rowRaw + ctr, _columnRaw, _varTmpBuffer );
+	}
+	if ( _view.get_root() ) {
 		draw_node( _view.get_root(), _rowRaw );
+	}
 	return;
 	M_EPILOG
 }
@@ -150,21 +152,23 @@ int HTreeWidget::draw_node( tree_view_t::node_t node_, int row_ ) {
 		(**node_)._columnRaw = _columnRaw + node_->get_level() * 2 - 1;
 		(**node_)._widthRaw = static_cast<int>( str.get_length() ) + 2;
 		set_attr_data();
-		if ( ! ( (**node_)._unfolded || ! node_->has_children() ) )
+		if ( ! ( (**node_)._unfolded || ! node_->has_children() ) ) {
 			cons.mvprintf( row, (**node_)._columnRaw, "+" );
-		else if ( node_->has_children() )
+		} else if ( node_->has_children() ) {
 			cons.mvprintf( row, (**node_)._columnRaw, "-" );
+		}
 		if ( node_ == _selected )
 			cons.set_attr(
 				COLOR::complementary(
 					_enabled ? ( _focused ? _attributeFocused._data : _attributeEnabled._data ) : _attributeDisabled._data
 				)
 			);
-		cons.mvprintf( row, (**node_)._columnRaw + 1, str.c_str() );
+		cons.mvprintf( row, (**node_)._columnRaw + 1, str );
 	}
 	if ( node_->has_children() && ( (**node_)._unfolded || ! node_->get_level() ) ) {
-		for ( tree_view_t::HNode::iterator it = node_->begin(); it != node_->end(); ++ it )
+		for ( tree_view_t::HNode::iterator it = node_->begin(); it != node_->end(); ++ it ) {
 			row = draw_node( &*it, row );
+		}
 	}
 	return ( row );
 	M_EPILOG

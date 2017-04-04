@@ -89,7 +89,7 @@ protected:
 		format_impl( item_... );
 		return ( _format.string() );
 	}
-protected:
+private:
 	template<typename head_t, typename... item_t>
 	void format_impl( head_t const& head_, item_t const&... item_ ) const {
 		M_PROLOG
@@ -103,7 +103,30 @@ protected:
 		return;
 		M_EPILOG
 	}
+public:
+	template<typename head_t, typename... item_t>
+	static void format_impl( HFormat& format_, head_t const& head_, item_t const&... item_ ) {
+		M_PROLOG
+		format_ % head_;
+		format_impl( format_, item_... );
+		return;
+		M_EPILOG
+	}
+	static void format_impl( HFormat& ) {
+		M_PROLOG
+		return;
+		M_EPILOG
+	}
 };
+
+template<typename... item_t>
+yaal::hcore::HString format( yaal::hcore::HString const& format_, item_t const&... item_ ) {
+	M_PROLOG
+	HFormat f( format_ );
+	HFormatter::format_impl( f, item_... );
+	return ( f.string() );
+	M_EPILOG
+}
 
 typedef HExceptionT<HFormat> HFormatException;
 

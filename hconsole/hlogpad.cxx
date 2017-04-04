@@ -80,7 +80,7 @@ void HLogPad::do_paint( void ) {
 	COLOR::color_t bg( _focused ? COLOR::BG_GRAY : COLOR::BG_BLACK );
 	_attribute = COLOR::combine( COLOR::ATTR_NORMAL, bg );
 	for ( int i( 0 ); i < _heightRaw; ++ i ) {
-		cons.cmvprintf( _rowRaw + i, _columnRaw, _attribute, _varTmpBuffer.c_str() );
+		cons.cmvprintf( _rowRaw + i, _columnRaw, _attribute, _varTmpBuffer );
 	}
 	if ( ! _contents.is_empty() ) {
 		int ctr( 0 ); /* number of text lines in _contents iterated so far */
@@ -102,7 +102,7 @@ void HLogPad::do_paint( void ) {
 					}
 					if ( _varTmpBuffer[ 0 ] ) {
 						cons.cmvprintf( _rowRaw + row,
-								_columnRaw + cursor, _attribute, _varTmpBuffer.c_str() );
+								_columnRaw + cursor, _attribute, _varTmpBuffer );
 					}
 				} else {
 					_varTmpBuffer = "";

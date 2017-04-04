@@ -89,7 +89,7 @@ public:
 	bool is_initialized( void ) const;
 	void update_all( void );
 	yaal::hcore::HString const& get_title( void ) const;
-	HStatusBarWidget* init_bar( char const* );
+	HStatusBarWidget* init_bar( yaal::hcore::HString const& );
 	HWidget* get_focused_child( void ) const;
 
 /*! \brief Schedule paint request on next refresh cycle.
@@ -102,7 +102,7 @@ public:
 	void reorder_widgets( HWidgetList::widget_order_t const& );
 protected:
 	virtual void do_init( void );
-	virtual HStatusBarWidget* do_init_bar( char const* );
+	virtual HStatusBarWidget* do_init_bar( yaal::hcore::HString const& );
 private:
 	friend bool HWidget::set_focus( char );
 	friend void HStatusBarWidget::set_prompt(  yaal::hcore::HString const&,

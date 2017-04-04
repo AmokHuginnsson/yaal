@@ -98,7 +98,7 @@ protected:
 	bool handler_cancel( hconsole::HEvent const& );
 	bool on_sel_change( yaal::hconsole::HEvent const& );
 	virtual void do_init( void ) override;
-	virtual hconsole::HStatusBarWidget* do_init_bar( char const* ) override;
+	virtual hconsole::HStatusBarWidget* do_init_bar( yaal::hcore::HString const& ) override;
 private:
 	HDataWindow( HDataWindow const& ) = delete;
 	HDataWindow& operator = ( HDataWindow const& ) = delete;

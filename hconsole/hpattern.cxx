@@ -160,7 +160,7 @@ bool HPattern::parse( HString const& pattern_, pluggable_flags_t* externalFlags 
 		}
 	} while ( false );
 	if ( ok && _extended ) {
-		ok = parse_re( _pattern.c_str() );
+		ok = parse_re( _pattern );
 	}
 	return ( ok );
 	M_EPILOG
@@ -245,16 +245,12 @@ char const* HPattern::matches( char const* string_,
 	M_EPILOG
 }
 
-HPattern::HMatchIterator HPattern::find( char const* str_ ) const {
+HPattern::HMatchIterator HPattern::find( HString const& str_ ) const {
 	M_ASSERT( str_ );
 	int len( 0 );
-	char const* start( matches( str_, &len ) );
+	char const* start( matches( str_.c_str(), &len ) );
 	HMatchIterator it( this, start, len );
 	return ( it );
-}
-
-HPattern::HMatchIterator HPattern::find( HString const& str_ ) const {
-	return ( find( str_.c_str() ) );
 }
 
 HPattern::HMatchIterator HPattern::end( void ) const {

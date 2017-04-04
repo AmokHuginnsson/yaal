@@ -89,7 +89,7 @@ void HDataWindow::do_init( void ) {
 	M_EPILOG
 }
 
-HStatusBarWidget* HDataWindow::do_init_bar( char const* label_ ) {
+HStatusBarWidget* HDataWindow::do_init_bar( yaal::hcore::HString const& label_ ) {
 	M_PROLOG
 	return ( create_widget<HDataStatusBarWidget>( this, label_ ) );
 	M_EPILOG

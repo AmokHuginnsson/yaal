@@ -210,14 +210,19 @@ void HListWidget::draw_header( int columns_ ) {
 				set_attr_label();
 				_varTmpBuffer.format( "%%-%ds",
 							columnInfo->_widthRaw );
-				cons.mvprintf( _rowRaw, _columnRaw + columnOffset,
-							_varTmpBuffer.c_str(),
-								columnInfo->_name.left(
-									columnInfo->_widthRaw ).c_str() );
+				cons.mvprintf(
+					_rowRaw,
+					_columnRaw + columnOffset,
+					_varTmpBuffer,
+					columnInfo->_name.left( columnInfo->_widthRaw )
+				);
 				set_attr_shortcut();
-				cons.mvprintf( _rowRaw,
-							_columnRaw + columnOffset + columnInfo->_shortcutIndex,
-							"%c", columnInfo->_shortcut );
+				cons.mvprintf(
+					_rowRaw,
+					_columnRaw + columnOffset + columnInfo->_shortcutIndex,
+					"%c",
+					columnInfo->_shortcut
+				);
 				if ( _sortColumn == colNo )
 					cons.mvprintf( _rowRaw,
 								_columnRaw + columnOffset
@@ -238,7 +243,7 @@ void HListWidget::draw_header( int columns_ ) {
 		_varTmpBuffer.format( " %d/%d ", _widgetOffset + _cursorPosition + 1, static_cast<int>( _model->size() ) );
 		if ( _labelLength < _widthRaw ) {
 			int clip = static_cast<int>( ( ( _widthRaw - _labelLength ) < _varTmpBuffer.get_length() ) ? _varTmpBuffer.get_length() - ( _widthRaw - _labelLength ) : 0 );
-			cons.mvprintf( _rowRaw - 1, static_cast<int>( _columnRaw + _widthRaw + clip - _varTmpBuffer.get_length() ), _varTmpBuffer.c_str() + clip );
+			cons.mvprintf( _rowRaw - 1, static_cast<int>( _columnRaw + _widthRaw + clip - _varTmpBuffer.get_length() ), _varTmpBuffer.substr( clip ) );
 		}
 	}
 	return;
@@ -252,7 +257,7 @@ void HListWidget::draw_background( int from_ ) {
 	_varTmpBuffer.reserve( _widthRaw );
 	_varTmpBuffer.fillz( '.', 0, _widthRaw );
 	for ( ; ctr < _heightRaw; ctr ++ ) {
-		HConsole::get_instance().mvprintf( _rowRaw + ctr, _columnRaw, _varTmpBuffer.c_str() );
+		HConsole::get_instance().mvprintf( _rowRaw + ctr, _columnRaw, _varTmpBuffer );
 	}
 	return;
 	M_EPILOG
@@ -350,7 +355,7 @@ void HListWidget::draw_cell( iterator_t& it_, int row_, int column_, int columnO
 			set_attr_data();
 		}
 	}
-	cons.mvprintf( _rowRaw + row_, _columnRaw + columnOffset_, _varTmpBuffer.c_str()	);
+	cons.mvprintf( _rowRaw + row_, _columnRaw + columnOffset_, _varTmpBuffer );
 	if ( _searchActivated ) {
 		highlight(
 			_rowRaw + row_,

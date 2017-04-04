@@ -82,7 +82,7 @@ void HDateWidget::do_paint( void ) {
 	}
 	draw_label();
 	if ( _mode == MODE::VIEW ) {
-		cons.mvprintf( _rowRaw, _columnRaw, " %s ", _time.string().c_str() );
+		cons.mvprintf( _rowRaw, _columnRaw, " %s ", _time.string() );
 		_heightRaw = 1;
 		_widthRaw = CAL_VIEW_WIDTH;
 	} else {
@@ -95,7 +95,7 @@ void HDateWidget::do_paint( void ) {
 		int rowOffset( 0 );
 		HString month( _time.to_string( "%B %Y" ) );
 		center( month, 3 * HTime::DAYS_IN_WEEK + 1 );
-		cons.mvprintf( _rowRaw + rowOffset, _columnRaw, month.c_str() );
+		cons.mvprintf( _rowRaw + rowOffset, _columnRaw, month );
 		++ rowOffset;
 		for ( int i( 0 ); i < HTime::DAYS_IN_WEEK; ++ i ) {
 			cons.mvprintf( _rowRaw + rowOffset, _columnRaw + i * 3, " %s ", week_day_name( ( i + 1 ) % HTime::DAYS_IN_WEEK ) );
@@ -296,7 +296,7 @@ bool HDateWidget::do_click( mouse::OMouse& mouse_ ) {
 	M_EPILOG
 }
 
-char const* HDateWidget::week_day_name( int day_ ) {
+yaal::hcore::HString const& HDateWidget::week_day_name( int day_ ) {
 	M_PROLOG
 	tm broken;
 	::memset( &broken, 0, sizeof ( broken ) );
@@ -306,7 +306,7 @@ char const* HDateWidget::week_day_name( int day_ ) {
 	strftime( weekDayAbbrevBuf, WEEK_DAY_NAME_ABBREV_SIZE, "%a", &broken );
 	weekDayAbbrevBuf[2] = 0;
 	_varTmpBuffer = weekDayAbbrevBuf;
-	return ( _varTmpBuffer.c_str() );
+	return ( _varTmpBuffer );
 	M_EPILOG
 }
 

@@ -66,7 +66,7 @@ void HTimeWidget::do_paint( void ) {
 	M_PROLOG
 	HConsole& cons = HConsole::get_instance();
 	draw_label();
-	cons.mvprintf( _rowRaw, _columnRaw, " %s ", _time.string().c_str() );
+	cons.mvprintf( _rowRaw, _columnRaw, " %s ", _time.string() );
 	if ( _focused ) {
 		int val( _activeItemIdx == IDX_HOUR ? _time.get_hour() : ( _activeItemIdx == IDX_MINUTE ? _time.get_minute() : _time.get_second() ) );
 		set_attr_shortcut();

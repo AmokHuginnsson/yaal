@@ -261,7 +261,7 @@ void HTUIProcess::handler_idle( void ) {
 	HString clock( HTime( HTime::TZ::LOCAL ).string() );
 	cons.cmvprintf(
 		0, static_cast<int>( cons.get_width() - clock.get_length() ),
-		COLOR::combine( COLOR::FG_BLACK, COLOR::BG_LIGHTGRAY ), clock.c_str()
+		COLOR::combine( COLOR::FG_BLACK, COLOR::BG_LIGHTGRAY ), clock
 	);
 	_needRepaint = true;
 #endif /* __DEBUG__ */
