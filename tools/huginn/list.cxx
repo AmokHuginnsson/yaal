@@ -70,9 +70,9 @@ private:
 
 namespace list {
 
-inline HHuginn::value_t add( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t push( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "list.add", values_, 1, 1, position_ );
+	verify_arg_count( "list.push", values_, 1, 1, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
 	static_cast<HHuginn::HList*>( object_->raw() )->push_back( values_[0] );
 	return ( *object_ );
@@ -164,8 +164,9 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			runtime_->identifier_id( type_name( HHuginn::TYPE::LIST ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "add",    objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &list::add, _1, _2, _3, _4 ) ),    "( *elem* ) - add new *elem* at the end of the `list`, `list` grows in size by 1" },
+				{ "push",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &list::push, _1, _2, _3, _4 ) ),   "( *elem* ) - add new *elem* at the end of the `list`, `list` grows in size by 1" },
 				{ "pop",    objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &list::pop, _1, _2, _3, _4 ) ),    "remove last element from the `list`, `list` shrinks by 1" },
+				{ "add",    objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &list::append, _1, _2, _3, _4 ) ), "( *other* ) - append all elements from *other* collection at the end of this `list`" },
 				{ "append", objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &list::append, _1, _2, _3, _4 ) ), "( *other* ) - append all elements from *other* collection at the end of this `list`" },
 				{ "insert", objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &list::insert, _1, _2, _3, _4 ) ), "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
 				{ "clear",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &list::clear, _1, _2, _3, _4 ) ),  "erase `list`'s content, `list` becomes empty" },

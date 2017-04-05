@@ -71,9 +71,9 @@ private:
 
 namespace order {
 
-inline HHuginn::value_t add( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t insert( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "order.add", values_, 1, 1, position_ );
+	verify_arg_count( "order.insert", values_, 1, 1, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::ORDER );
 	static_cast<HHuginn::HOrder*>( object_->raw() )->insert( thread_, values_[0], position_ );
 	return ( *object_ );
@@ -151,10 +151,11 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			runtime_->identifier_id( type_name( HHuginn::TYPE::ORDER ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "add",     objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &order::add, _1, _2, _3, _4 ) ),     "( *elem* ) - add given element *elem* to an `order`" },
+				{ "insert",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &order::insert, _1, _2, _3, _4 ) ),  "( *elem* ) - insert given element *elem* into an `order`" },
 				{ "has_key", objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &order::has_key, _1, _2, _3, _4 ) ), "( *elem* ) - tell if given element *elem* is in the `order`" },
 				{ "erase",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &order::erase, _1, _2, _3, _4 ) ),   "( *elem* ) - remove given element *elem* from the `order`" },
 				{ "clear",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &order::clear, _1, _2, _3, _4 ) ),   "erase `order`'s content, `order` becomes empty" },
+				{ "add",     objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &order::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `order` with values added from *other* `order`" },
 				{ "update",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &order::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `order` with values from *other* `order`" },
 				{ "equals",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &order::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `order` has the same content" }
 			},

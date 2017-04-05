@@ -164,6 +164,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 				{ "get",     objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &dict::get, _1, _2, _3, _4 ) ),     "( *key*, *default* ) - get value for given *key* from this `dict`, or *default* if given *key* is not present in the `dict`" },
 				{ "erase",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &dict::erase, _1, _2, _3, _4 ) ),   "( *key* ) - remove given *key* from this `dict`" },
 				{ "clear",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &dict::clear, _1, _2, _3, _4 ) ),   "erase `dict`'s content, `dict` becomes empty" },
+				{ "add",     objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &dict::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `dict` with key/value pairs from *other* `dict`" },
 				{ "update",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &dict::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `dict` with key/value pairs from *other* `dict`" },
 				{ "equals",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &dict::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `dict` has the same content" }
 			},

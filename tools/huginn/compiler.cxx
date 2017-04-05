@@ -1467,6 +1467,10 @@ bool OCompiler::is_numeric( HHuginn::type_id_t type_ ) {
 	return ( ( type_ == HHuginn::TYPE::INTEGER ) || ( type_ == HHuginn::TYPE::REAL ) || ( type_ == HHuginn::TYPE::NUMBER ) );
 }
 
+bool OCompiler::is_collection( HHuginn::type_id_t type_ ) {
+	return ( ( type_ == HHuginn::TYPE::LIST ) || ( type_ == HHuginn::TYPE::DEQUE ) || ( type_ == HHuginn::TYPE::DICT ) || ( type_ == HHuginn::TYPE::LOOKUP ) || ( type_ == HHuginn::TYPE::ORDER ) || ( type_ == HHuginn::TYPE::SET ) );
+}
+
 bool OCompiler::is_comparable( HHuginn::type_id_t type_ ) {
 	return (
 		is_numeric( type_ )
@@ -1500,7 +1504,7 @@ bool OCompiler::is_integer_congruent( HHuginn::type_id_t type_ ) {
 }
 
 bool OCompiler::is_summable( HHuginn::type_id_t type_ ) {
-	return ( is_numeric_congruent( type_ ) || ( type_ == HHuginn::TYPE::STRING ) );
+	return ( is_numeric_congruent( type_ ) || ( type_ == HHuginn::TYPE::STRING ) || is_collection( type_ ) );
 }
 
 bool OCompiler::are_congruous( HHuginn::type_id_t t1_, HHuginn::type_id_t t2_ ) {

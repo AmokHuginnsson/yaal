@@ -452,6 +452,7 @@ struct OCompiler {
 	void verify_default_argument( executing_parser::position_t );
 	void track_name_cycle( HHuginn::identifier_id_t );
 	static bool is_numeric( HHuginn::type_id_t );
+	static bool is_collection( HHuginn::type_id_t );
 	static bool is_numeric_congruent( HHuginn::type_id_t );
 	static bool is_summable( HHuginn::type_id_t );
 	static bool is_comparable( HHuginn::type_id_t );
