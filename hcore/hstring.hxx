@@ -837,7 +837,8 @@ public:
 	typedef reverse_iterator const_reverse_iterator;
 private:
 	struct OBufferMeta {
-		int_native_t _size; /*!< buffer (_ptr) size not including OBufferMeta */
+		int _allocated;     /*!< buffer (_ptr) size not including OBufferMeta */
+		int _used;          /*!< number of bytes used bu this instance */
 		int _refCount;      /*!< number of copies of this string */
 		yaal::i8_t _rank;   /*!< maximum number of bytes used per character */
 	};
@@ -855,6 +856,7 @@ public:
 	HUTF8String( HString::const_iterator, HString::const_iterator );
 	HUTF8String( HUTF8String const& );
 	HUTF8String( HUTF8String&& );
+	HUTF8String& operator = ( HString const& );
 	HUTF8String& operator = ( HUTF8String const& );
 	HUTF8String& operator = ( HUTF8String&& );
 	~HUTF8String( void );
@@ -869,6 +871,8 @@ public:
 	bool empty( void ) const;
 	int long byte_count( void ) const;
 	int long character_count( void ) const;
+	void assign( HString const& );
+	void assign( HString::const_iterator, HString::const_iterator );
 	void reset( void );
 	HIterator begin( void ) const;
 	HIterator end( void ) const;
@@ -879,6 +883,14 @@ public:
 	reverse_iterator crbegin( void ) const;
 	reverse_iterator crend( void ) const;
 	HUTF8String substr( int long, int long = HString::npos ) const;
+private:
+	/*! Allocate memory buffer.
+	 *
+	 * Used from assign( it, it ) and from ctor( char const* ).
+	 *
+	 * \param size_ - number of bytes to be allocated NOT INCLUDING terminating NIL or OBufferMeta.
+	 */
+	void alloc( int long size_ );
 };
 
 class HUTF8String::HIterator final : public iterator_interface<yaal::u32_t, iterator_category::random_access> {

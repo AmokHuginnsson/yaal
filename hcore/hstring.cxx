@@ -1583,24 +1583,8 @@ HUTF8String::HUTF8String( HString const& str_ )
 HUTF8String::HUTF8String( HString::const_iterator it_, HString::const_iterator end_ )
 	: HUTF8String() {
 	M_PROLOG
-	u32_t maxCodePoint( 0 );
-	int byteCount( 0 );
-	for ( HString::const_iterator it( it_ ); it != end_; ++ it ) {
-		byteCount += utf8::rank( static_cast<u32_t>( *it ) ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
-		maxCodePoint = max( static_cast<u32_t>( *it ), maxCodePoint ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
-	}
-	if ( byteCount > 0 ) {
-		_ptr = memory::calloc<char>( byteCount + 1 + static_cast<int>( sizeof( OBufferMeta ) ) );
-		_meta->_refCount = 1;
-		_meta->_size = byteCount;
-		_meta->_rank = static_cast<i8_t>( utf8::rank( maxCodePoint ) );
-		_byteCount = byteCount;
-		_characterCount = static_cast<int>( end_ - it_ );
-		char* p( _ptr + sizeof ( OBufferMeta ) );
-		for ( ; it_ != end_; ++ it_ ) {
-			utf8::encode( static_cast<u32_t>( *it_), p ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
-		}
-	}
+	assign( it_, end_ );
+	return;
 	M_EPILOG
 }
 
@@ -1641,13 +1625,13 @@ HUTF8String::HUTF8String( char const* str_ )
 		++ p;
 		++ byteCount;
 	}
-	_ptr = memory::calloc<char>( byteCount + 1 + static_cast<int>( sizeof( OBufferMeta ) ) );
-	_meta->_refCount = 1;
-	_meta->_size = byteCount;
-	_meta->_rank = static_cast<i8_t>( rank );
-	_byteCount = byteCount;
-	_characterCount = characterCount;
-	::strncpy( _ptr + sizeof ( OBufferMeta ), str_, static_cast<size_t>( byteCount ) );
+	if ( byteCount > 0 ) {
+		alloc( byteCount );
+		_meta->_rank = static_cast<i8_t>( rank );
+		_byteCount = byteCount;
+		_characterCount = characterCount;
+		::strncpy( _ptr + sizeof ( OBufferMeta ), str_, static_cast<size_t>( byteCount ) );
+	}
 	return;
 	M_EPILOG
 }
@@ -1689,6 +1673,7 @@ void HUTF8String::reset( void ) {
 			memory::free( _ptr );
 		}
 	}
+	_ptr = nullptr;
 	_byteCount = 0;
 	_offset = 0;
 	_characterCount = 0;
@@ -1704,6 +1689,13 @@ void HUTF8String::swap( HUTF8String& other_ ) {
 	swap( _byteCount, other_._byteCount );
 	swap( _ptr, other_._ptr );
 	return;
+	M_EPILOG
+}
+
+HUTF8String& HUTF8String::operator = ( HString const& str_ ) {
+	M_PROLOG
+	assign( str_ );
+	return ( *this );
 	M_EPILOG
 }
 
@@ -1757,6 +1749,60 @@ bool HUTF8String::operator != ( char const* other_ ) const {
 	return ( ! operator == ( other_ ) );
 }
 
+void HUTF8String::alloc( int long size_ ) {
+	M_PROLOG
+	M_ASSERT( size_ > 0 );
+	if ( _ptr && ( _meta->_refCount > 1 ) ) {
+		reset();
+	}
+	int oldSize( _ptr ? _meta->_allocated : 0 );
+	if ( size_ > oldSize ) {
+		int long newSize( oldSize ? oldSize : 1 );
+		while ( newSize < size_ ) {
+			newSize *= 2;
+		}
+		int size( safe_int::cast<int>( newSize + 1 + static_cast<int>( sizeof ( OBufferMeta ) ) ) );
+		_ptr = memory::realloc<char>( _ptr, size );
+		_meta->_refCount = 1;
+		_meta->_allocated = static_cast<int>( newSize );
+		_meta->_used = static_cast<int>( size_ );
+	}
+	_ptr[ static_cast<int>( sizeof ( OBufferMeta ) ) + size_ ] = 0;
+	return;
+	M_EPILOG
+}
+
+void HUTF8String::assign( HString::const_iterator it_, HString::const_iterator end_ ) {
+	M_PROLOG
+	u32_t maxCodePoint( 0 );
+	int byteCount( 0 );
+	for ( HString::const_iterator it( it_ ); it != end_; ++ it ) {
+		byteCount += utf8::rank( static_cast<u8_t>( *it ) ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
+		maxCodePoint = max( static_cast<u32_t>( static_cast<u8_t>( *it ) ), maxCodePoint ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
+	}
+	if ( byteCount > 0 ) {
+		alloc( byteCount );
+		char* p( _ptr + sizeof ( OBufferMeta ) );
+		for ( ; it_ != end_; ++ it_ ) {
+			utf8::encode( static_cast<u8_t>( *it_), p ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
+		}
+	}
+	if ( _ptr ) {
+		_meta->_rank = static_cast<i8_t>( utf8::rank( maxCodePoint ) );
+	}
+	_byteCount = byteCount;
+	_characterCount = static_cast<int>( end_ - it_ );
+	return;
+	M_EPILOG
+}
+
+void HUTF8String::assign( HString const& str_ ) {
+	M_PROLOG
+	assign( str_.begin(), str_.end() );
+	return;
+	M_EPILOG
+}
+
 bool HUTF8String::is_empty( void ) const {
 	return ( _characterCount == 0 );
 }
@@ -1766,7 +1812,7 @@ bool HUTF8String::empty( void ) const {
 }
 
 char const* HUTF8String::c_str( void ) const {
-	M_ASSERT( ! _ptr || ( ( _offset + _byteCount ) == _meta->_size ) );
+	M_ASSERT( ! _ptr || ( ( _offset + _byteCount ) == _meta->_used ) );
 	return ( _ptr ? _ptr + sizeof ( OBufferMeta ) + _offset : nullptr );
 }
 
