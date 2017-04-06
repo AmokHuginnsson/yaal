@@ -45,6 +45,7 @@ HStreamInterface::HStreamInterface( void )
 	: _cache( 1, HChunk::STRATEGY::GEOMETRIC )
 	, _offset( 0 )
 	, _wordCache()
+	, _conversionCache()
 	, _fill( ' ' )
 	, _width( 0 )
 	, _precision( 6 )
@@ -65,9 +66,9 @@ HStreamInterface::~HStreamInterface( void ) {
 HStreamInterface& HStreamInterface::do_output( HString const& string_ ) {
 	M_PROLOG
 	_wordCache = string_;
-	int long len( reformat() );
-	if ( len > 0 )
-		do_write( _wordCache.c_str(), len );
+	reformat();
+	_conversionCache = _wordCache;
+	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
 	return ( *this );
 	M_EPILOG
 }
@@ -75,9 +76,9 @@ HStreamInterface& HStreamInterface::do_output( HString const& string_ ) {
 HStreamInterface& HStreamInterface::do_output( char const* string_ ) {
 	M_PROLOG
 	_wordCache = string_;
-	int long len( reformat() );
-	if ( len > 0 )
-		do_write( _wordCache.c_str(), len );
+	reformat();
+	_conversionCache = _wordCache;
+	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
 	return ( *this );
 	M_EPILOG
 }
@@ -85,8 +86,9 @@ HStreamInterface& HStreamInterface::do_output( char const* string_ ) {
 HStreamInterface& HStreamInterface::do_output( bool bool_ ) {
 	M_PROLOG
 	_wordCache = _boolAlpha ? ( bool_ ? "true" : "false" ) : ( bool_ ? "1" : "0" );
-	int long len( reformat() );
-	do_write( _wordCache.c_str(), len );
+	reformat();
+	_conversionCache = _wordCache;
+	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
 	return ( *this );
 	M_EPILOG
 }
@@ -94,8 +96,9 @@ HStreamInterface& HStreamInterface::do_output( bool bool_ ) {
 HStreamInterface& HStreamInterface::do_output( char char_ ) {
 	M_PROLOG
 	_wordCache = char_;
-	int long len( reformat() );
-	do_write( _wordCache.c_str(), len );
+	reformat();
+	_conversionCache = _wordCache;
+	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
 	return ( *this );
 	M_EPILOG
 }
@@ -103,8 +106,9 @@ HStreamInterface& HStreamInterface::do_output( char char_ ) {
 HStreamInterface& HStreamInterface::do_output( char unsigned charUnsigned_ ) {
 	M_PROLOG
 	_wordCache = charUnsigned_;
-	int long len( reformat() );
-	do_write( _wordCache.c_str(), len );
+	reformat();
+	_conversionCache = _wordCache;
+	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
 	return ( *this );
 	M_EPILOG
 }
@@ -140,8 +144,9 @@ HStreamInterface& HStreamInterface::do_output( int unsigned unsignedInteger_ ) {
 HStreamInterface& HStreamInterface::do_output( int long longInteger_ ) {
 	M_PROLOG
 	_wordCache.format( _base == BASES::DEC ? "%ld" : ( _base == BASES::HEX ) ? "%lx" : "%lo", longInteger_ );
-	int long len( reformat() );
-	do_write( _wordCache.c_str(), len );
+	reformat();
+	_conversionCache = _wordCache;
+	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
 	return ( *this );
 	M_EPILOG
 }
@@ -149,16 +154,17 @@ HStreamInterface& HStreamInterface::do_output( int long longInteger_ ) {
 HStreamInterface& HStreamInterface::do_output( int long long longLongInteger_ ) {
 	M_PROLOG
 	_wordCache.format( _base == BASES::DEC ? "%lld" : ( _base == BASES::HEX ) ? "%llx" : "%llo", longLongInteger_ );
-	int long len( reformat() );
-	do_write( _wordCache.c_str(), len );
+	reformat();
+	_conversionCache = _wordCache;
+	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
 	return ( *this );
 	M_EPILOG
 }
 
-int long HStreamInterface::reformat( void ) {
+void HStreamInterface::reformat( void ) {
 	M_PROLOG
-	int len( static_cast<int>( _wordCache.get_length() ) );
 	if ( _width ) {
+		int len( static_cast<int>( _wordCache.get_length() ) );
 		if ( _width > len ) {
 			switch ( _adjust ) {
 				case ( ADJUST::LEFT ): {
@@ -175,19 +181,19 @@ int long HStreamInterface::reformat( void ) {
 					break;
 				}
 			}
-			len = _width;
 		}
 		_width = 0;
 	}
-	return ( len );
+	return;
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_output( int long unsigned unsignedLongInteger_ ) {
 	M_PROLOG
 	_wordCache.format( _base == BASES::DEC ? "%lu" : ( _base == BASES::HEX ) ? "%lx" : "%lo", unsignedLongInteger_ );
-	int long len( reformat() );
-	do_write( _wordCache.c_str(), len );
+	reformat();
+	_conversionCache = _wordCache;
+	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
 	return ( *this );
 	M_EPILOG
 }
@@ -195,8 +201,9 @@ HStreamInterface& HStreamInterface::do_output( int long unsigned unsignedLongInt
 HStreamInterface& HStreamInterface::do_output( int long long unsigned unsignedLongLongInteger_ ) {
 	M_PROLOG
 	_wordCache.format( _base == BASES::DEC ? "%llu" : ( _base == BASES::HEX ) ? "%llx" : "%llo", unsignedLongLongInteger_ );
-	int long len( reformat() );
-	do_write( _wordCache.c_str(), len );
+	reformat();
+	_conversionCache = _wordCache;
+	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
 	return ( *this );
 	M_EPILOG
 }
@@ -221,8 +228,9 @@ HStreamInterface& HStreamInterface::do_output( double double_ ) {
 	M_PROLOG
 	_wordCache.format( "%f", double_ );
 	apply_precision();
-	int long len( reformat() );
-	do_write( _wordCache.c_str(), len );
+	reformat();
+	_conversionCache = _wordCache;
+	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
 	return ( *this );
 	M_EPILOG
 }
@@ -231,8 +239,9 @@ HStreamInterface& HStreamInterface::do_output( double long longDouble_ ) {
 	M_PROLOG
 	_wordCache.format( "%.12Lf", longDouble_ );
 	apply_precision();
-	int long len( reformat() );
-	do_write( _wordCache.c_str(), len );
+	reformat();
+	_conversionCache = _wordCache;
+	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
 	return ( *this );
 	M_EPILOG
 }
@@ -241,8 +250,9 @@ HStreamInterface& HStreamInterface::do_output( float float_ ) {
 	M_PROLOG
 	_wordCache.format( "%f", float_ );
 	apply_precision();
-	int long len( reformat() );
-	do_write( _wordCache.c_str(), len );
+	reformat();
+	_conversionCache = _wordCache;
+	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
 	return ( *this );
 	M_EPILOG
 }
@@ -250,8 +260,9 @@ HStreamInterface& HStreamInterface::do_output( float float_ ) {
 HStreamInterface& HStreamInterface::do_output( void const* ptr_ ) {
 	M_PROLOG
 	_wordCache.format( "0x%lx", reinterpret_cast<int long unsigned>( ptr_ ) );
-	int long len( reformat() );
-	do_write( _wordCache.c_str(), len );
+	reformat();
+	_conversionCache = _wordCache;
+	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
 	return ( *this );
 	M_EPILOG
 }

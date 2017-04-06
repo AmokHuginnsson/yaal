@@ -96,19 +96,20 @@ public:
 	};
 	typedef HStreamInterface& ( *manipulator_t )( HStreamInterface& );
 protected:
-	HChunk _cache; /*!< Read buffer. */
-	int _offset; /*!< Position of where continued read (another read_until invocation after interrupted one) shall store consecutive bytes. */
+	HChunk _cache;  /*!< Read buffer. */
+	int _offset;    /*!< Position of where continued read (another read_until invocation after interrupted one) shall store consecutive bytes. */
 	HString _wordCache; /*!< Cache for operator >> () and operator << (). */
-	int _fill; /*!< Fill character for output operations. */
-	int _width; /*!< Next output operation width. */
+	HUTF8String _conversionCache; /*!< Cache used for converting between UTF-8 and UCS */
+	int _fill;      /*!< Fill character for output operations. */
+	int _width;     /*!< Next output operation width. */
 	int _precision; /*!< Set number of significant digits to display for all subsequent outputs of floating point type values. */
 	BASES _base;
 	FLOAT_FORMAT _floatFormat;
 	ADJUST _adjust;
 	bool _skipWS;
 	bool _boolAlpha;
-	bool _valid; /*!< Tells if further low-level IO is possible. */
-	bool _fail; /*!< Tells if most recently performed data extraction failed at logical level. */
+	bool _valid;    /*!< Tells if further low-level IO is possible. */
+	bool _fail;     /*!< Tells if most recently performed data extraction failed at logical level. */
 public:
 	HStreamInterface( void );
 	virtual ~HStreamInterface( void );
@@ -422,7 +423,7 @@ private:
 	bool read_integer( void );
 	bool read_floatint_point( void );
 	int long semantic_read( yaal::hcore::HString&, int long, char const*, bool, bool );
-	int long reformat( void );
+	void reformat( void );
 	void apply_precision( void );
 	virtual int long do_write( void const*, int long ) = 0;
 	virtual int long do_read( void*, int long ) = 0;
