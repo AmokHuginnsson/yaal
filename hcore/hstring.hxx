@@ -576,19 +576,19 @@ public:
 	 * \param set - set of characters that shall be removed.
 	 * \return Self.
 	 */
-	HString& trim_left( char const* set = _whiteSpace_.data() );
+	HString& trim_left( HString const& set = _whiteSpace_.data() );
 	/*! \brief Trim all consecutive occurrences of given characters from end of the string.
 	 *
 	 * \param set - set of characters that shall be removed.
 	 * \return Self.
 	 */
-	HString& trim_right( char const* set = _whiteSpace_.data() );
+	HString& trim_right( HString const& set = _whiteSpace_.data() );
 	/*! \brief Trim all consecutive occurrences of given characters from both beginning and end of the string.
 	 *
 	 * \param set - set of characters that shall be removed.
 	 * \return Self.
 	 */
-	HString& trim( char const* set = _whiteSpace_.data() );
+	HString& trim( HString const& set = _whiteSpace_.data() );
 	/*! \brief Remove first N characters from this string.
 	 * \param len - remove that many characters from beginning of this string.
 	 * \return Self.
@@ -879,7 +879,7 @@ public:
 	bool operator == ( char const* ) const;
 	bool operator != ( char const* ) const;
 	void swap( HUTF8String& );
-	char const* c_str( void ) const;
+	char const* x_str( void ) const;
 	char const* raw( void ) const;
 	bool is_empty( void ) const;
 	bool empty( void ) const;

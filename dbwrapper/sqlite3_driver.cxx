@@ -40,6 +40,7 @@ Copyright:
 #include "hcore/memory.hxx"
 #include "hcore/compat.hxx"
 #include "hcore/hstring.hxx"
+#include "hcore/hformat.hxx"
 #include "dbwrapper/db_driver.hxx"
 
 using namespace yaal;
@@ -107,18 +108,20 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, HString const& dataBase_,
 		OSQLite* sQLite( nullptr );
 		dbLink_._conn = sQLite = new ( memory::yaal ) OSQLite;
 		HString dataBase( dataBase_ );
-		if ( ::access( dataBase.c_str(), R_OK | W_OK ) ) {
+		HUTF8String utf8( dataBase );
+		if ( ::access( utf8.x_str(), R_OK | W_OK ) ) {
 			char const fileNameExt[] = ".sqlite";
 			dataBase += fileNameExt;
-			if ( ::access( dataBase.c_str(), R_OK | W_OK ) ) {
-				sQLite->_errorMessage.format( "Database file `%s' is not accessible.", dataBase.c_str() );
+			utf8 = dataBase;
+			if ( ::access( utf8.x_str(), R_OK | W_OK ) ) {
+				sQLite->_errorMessage = format( "Database file `%s' is not accessible.", dataBase );
 				break;
 			}
 		}
-		sQLite->_errorCode = ::sqlite3_open( dataBase.c_str(), &sQLite->_db );
-		if ( sQLite->_errorCode )
+		sQLite->_errorCode = ::sqlite3_open( utf8.x_str(), &sQLite->_db );
+		if ( sQLite->_errorCode ) {
 			sQLite->_errorMessage = ::sqlite3_errmsg( sQLite->_db );
-		else {
+		} else {
 			void* ptr( yaal_sqlite3_db_fetch_query_result( dbLink_, "PRAGMA empty_result_callbacks = ON;" ) );
 			if ( ptr ) {
 				yaal_sqlite3_rs_free_query_result( ptr );

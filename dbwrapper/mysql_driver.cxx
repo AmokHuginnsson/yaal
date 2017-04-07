@@ -124,10 +124,14 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& d
 	if ( mySQL ) {
 		int unsigned protocol( MYSQL_PROTOCOL_SOCKET );
 		if ( ! ( mysql_options( mySQL, MYSQL_OPT_PROTOCOL, &protocol ) || mysql_options( mySQL, MYSQL_SET_CHARSET_NAME, _clientCharacterSet_.c_str() ) ) ) {
+			HUTF8String dataBase( dataBase_ );
+			HUTF8String login( login_ );
+			HUTF8String password( password_ );
 			if ( mysql_real_connect( mySQL, nullptr,
-						login_.c_str(), password_.c_str(), dataBase_.c_str(),
-						0, nullptr, CLIENT_IGNORE_SPACE | CLIENT_IGNORE_SIGPIPE ) )
+						login.x_str(), password.x_str(), dataBase.x_str(),
+						0, nullptr, CLIENT_IGNORE_SPACE | CLIENT_IGNORE_SIGPIPE ) ) {
 				dbLink_._valid = true;
+			}
 		}
 	}
 	return ( dbLink_._valid );

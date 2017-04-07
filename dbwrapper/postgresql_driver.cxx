@@ -58,8 +58,8 @@ struct OPostgreSQLResult {
 	ODBLink& _link;
 	int _useCount;
 	PGresult* _result;
-	HString _id;
-	HString _query;
+	HUTF8String _id;
+	HUTF8String _query;
 	int _index;
 	int _total;
 	params_t _params;
@@ -114,10 +114,13 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink&, yaal::hcore::HString const&,
 M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& dataBase_,
 		yaal::hcore::HString const& login_, yaal::hcore::HString const& password_, yaal::hcore::HString const& ) {
 	PGconn* connection( nullptr );
+	HUTF8String dataBase( dataBase_ );
+	HUTF8String login( login_ );
+	HUTF8String password( password_ );
 	dbLink_._conn = connection = PQsetdbLogin( nullptr /* host */,
 			nullptr /* port */, nullptr /* options */,
 			nullptr /* debugging tty */,
-			dataBase_.c_str(), login_.c_str(), password_.c_str() );
+			dataBase.x_str(), login.x_str(), password.x_str() );
 	if ( PQstatus( connection ) == CONNECTION_OK )
 		dbLink_._valid = true;
 	return ( dbLink_._valid );
@@ -181,9 +184,9 @@ M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
 	OPostgreSQLResult* result( new ( memory::yaal ) OPostgreSQLResult( dbLink_ ) );
 	result->_randomAccess = false;
 	PGconn* conn( static_cast<PGconn*>( dbLink_._conn ) );
-	PGresult* r( ::PQprepare( conn, result->_id.c_str(), query_, 0, nullptr ) );
-	result->_result = ::PQdescribePrepared( conn, result->_id.c_str() );
-	::PQsendQueryPrepared( conn, result->_id.c_str(), 0, nullptr, nullptr, nullptr, 0 );
+	PGresult* r( ::PQprepare( conn, result->_id.x_str(), query_, 0, nullptr ) );
+	result->_result = ::PQdescribePrepared( conn, result->_id.x_str() );
+	::PQsendQueryPrepared( conn, result->_id.x_str(), 0, nullptr, nullptr, nullptr, 0 );
 	::PQclear( r );
 /*	::PQsetSingleRowMode( conn ); */
 	return ( result );
@@ -215,7 +218,7 @@ M_EXPORT_SYMBOL void* query_execute( ODBLink& dbLink_, void* data_ ) {
 	OPostgreSQLResult* pr( static_cast<OPostgreSQLResult*>( data_ ) );
 	bool ok( true );
 	if ( ! pr->_result ) {
-		PGresult* r( ::PQprepare( conn, pr->_id.c_str(), pr->_query.c_str(), static_cast<int>( pr->_params.get_size() ), nullptr ) );
+		PGresult* r( ::PQprepare( conn, pr->_id.x_str(), pr->_query.x_str(), static_cast<int>( pr->_params.get_size() ), nullptr ) );
 		ExecStatusType status = PQresultStatus( r );
 		::PQclear( r );
 		if ( ( ( status == PGRES_COMMAND_OK ) || ( status == PGRES_TUPLES_OK ) ) ? 0 : status ) {
@@ -227,8 +230,8 @@ M_EXPORT_SYMBOL void* query_execute( ODBLink& dbLink_, void* data_ ) {
 		if ( pr->_result ) {
 			::PQclear( pr->_result );
 		}
-		pr->_result = ::PQdescribePrepared( conn, pr->_id.c_str() );
-		::PQsendQueryPrepared( conn, pr->_id.c_str(), static_cast<int>( pr->_params.get_size() ), pr->_params.data(), nullptr, nullptr, 0 );
+		pr->_result = ::PQdescribePrepared( conn, pr->_id.x_str() );
+		::PQsendQueryPrepared( conn, pr->_id.x_str(), static_cast<int>( pr->_params.get_size() ), pr->_params.data(), nullptr, nullptr, 0 );
 		++ pr->_useCount;
 		pr->_requireSync = true;
 	}

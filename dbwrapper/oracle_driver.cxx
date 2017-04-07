@@ -149,12 +149,14 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& /
 					reinterpret_cast<void**>( &oracle->_error ),
 					OCI_HTYPE_ERROR, 0, nullptr ) ) != OCI_SUCCESS )
 			break;
+		HUTF8String login( login_ );
+		HUTF8String password( password_ );
 		if ( ( oracle->_status = OCILogon( oracle->_environment,
 					oracle->_error, &oracle->_serviceContext,
-					reinterpret_cast<OraText const*>( login_.c_str() ),
-					static_cast<ub4>( login_.get_length() ),
-					reinterpret_cast<OraText const*>( password_.c_str() ),
-					static_cast<ub4>( password_.get_length() ),
+					reinterpret_cast<OraText const*>( login.x_str() ),
+					static_cast<ub4>( login.byte_count() ),
+					reinterpret_cast<OraText const*>( password.x_str() ),
+					static_cast<ub4>( password.byte_count() ),
 					reinterpret_cast<OraText const*>( _instanceName_.c_str() ),
 					static_cast<ub4>( _instanceName_.get_length() ) ) ) == OCI_SUCCESS )
 			dbLink_._valid = true;

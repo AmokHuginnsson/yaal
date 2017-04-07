@@ -72,7 +72,8 @@ void do_stat( struct stat* s, path_t const& path_, bool resolve_ = true ) {
 	M_PROLOG
 	::memset( s, 0, sizeof ( *s ) );
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
-	if ( ! ( ( resolve_ && ( ::stat( path_.c_str(), s ) == 0 ) ) || ( ::lstat( path_.c_str(), s ) == 0 ) ) ) {
+	HUTF8String utf8( path_ );
+	if ( ! ( ( resolve_ && ( ::stat( utf8.x_str(), s ) == 0 ) ) || ( ::lstat( utf8.x_str(), s ) == 0 ) ) ) {
 		throw HFileSystemException( to_string( "Cannot acquire metadata for `" ).append( path_ ).append( "'" ) );
 	}
 	return;
@@ -147,7 +148,8 @@ path_t normalize_path( path_t const& path_ ) {
 }
 
 bool exists( path_t const& path_ ) {
-	int err( ::access( path_.c_str(), F_OK ) );
+	HUTF8String utf8( path_ );
+	int err( ::access( utf8.x_str(), F_OK ) );
 	if ( ( err != 0 ) && ( errno != ENOENT ) ) {
 		throw HFileSystemException( to_string( "Failed to determine `" ).append( path_ ).append( "'s ontological status." ) );
 	}
@@ -240,7 +242,7 @@ path_t dirname( path_t const& path_ ) {
 	if ( dname.is_empty() ) {
 		degenerated = true;
 	}	else if ( dname != path::ROOT ) {
-		dname.trim_right( path::SEPARATOR_STR.c_str() );
+		dname.trim_right( path::SEPARATOR_STR );
 		if ( ! dname.is_empty() ) {
 			int long delimPos( dname.find_last( path::SEPARATOR ) );
 			if ( delimPos != HString::npos ) {
@@ -268,7 +270,7 @@ path_t basename( path_t const& path_ ) {
 	if ( ( bname != path::ROOT )
 		&& ( bname != path::CURRENT )
 		&& ( bname != path::PARENT ) ) {
-		bname.trim_right( path::SEPARATOR_STR.c_str() );
+		bname.trim_right( path::SEPARATOR_STR );
 		int long delimPos( bname.find_last( path::SEPARATOR ) );
 		if ( delimPos != HString::npos ) {
 			bname.shift_left( delimPos + 1 );
@@ -288,7 +290,8 @@ path_t readlink( path_t const& path_ ) {
 	do {
 		alloc <<= 1;
 		buffer.realloc( alloc, HChunk::STRATEGY::EXACT );
-		len = static_cast<int>( ::readlink( path_.c_str(), buffer.get<char>(), static_cast<size_t>( alloc ) ) );
+		HUTF8String utf8( path_ );
+		len = static_cast<int>( ::readlink( utf8.x_str(), buffer.get<char>(), static_cast<size_t>( alloc ) ) );
 	} while ( len >= alloc );
 	if ( len < 0 ) {
 		throw HFileSystemException( "readlink failed: `"_ys.append( path_ ).append( "'" ) );
@@ -299,7 +302,8 @@ path_t readlink( path_t const& path_ ) {
 }
 
 void remove( path_t const& path_ ) {
-	int err( ::unlink( path_.c_str() ) );
+	HUTF8String utf8( path_ );
+	int err( ::unlink( utf8.x_str() ) );
 	if ( ( err != 0 ) && ( errno != ENOENT ) ) {
 		throw HFileSystemException( to_string( "Failed to remove: `" ).append( path_ ).append( "'" ) );
 	}
@@ -307,7 +311,9 @@ void remove( path_t const& path_ ) {
 }
 
 void rename( path_t const& old_, path_t const& new_ ) {
-	int err( ::rename( old_.c_str(), new_.c_str() ) );
+	HUTF8String oldUtf8( old_ );
+	HUTF8String newUtf8( new_ );
+	int err( ::rename( oldUtf8.x_str(), newUtf8.x_str() ) );
 	if ( err != 0 ) {
 		throw HFileSystemException( to_string( "Failed to rename: `" ).append( old_ ).append( "' to `" ).append( new_ ).append( "'" ) );
 	}
@@ -320,7 +326,8 @@ void create_directory( path_t const& path_, u32_t mode_, DIRECTORY_MODIFICATION 
 	M_ENSURE( ! path.is_empty() );
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	if ( directoryModification_ == DIRECTORY_MODIFICATION::EXACT ) {
-		int err( ::mkdir( path.c_str(), static_cast<mode_t>( mode_ ) ) );
+		HUTF8String utf8( path );
+		int err( ::mkdir( utf8.x_str(), static_cast<mode_t>( mode_ ) ) );
 		if ( ( err != 0 ) && ( ( errno != EEXIST ) || ! is_directory( path ) ) ) {
 			throw HFileSystemException( to_string( "Failed to create directory `" ).append( path ).append( "'" ) );
 		}
@@ -346,7 +353,8 @@ void create_directory( path_t const& path_, u32_t mode_, DIRECTORY_MODIFICATION 
 
 void chmod( path_t const& path_, u32_t mode_ ) {
 	M_PROLOG
-	if ( ::chmod( path_.c_str(), static_cast<mode_t>( mode_ ) ) < 0 ) {
+	HUTF8String utf8( path_ );
+	if ( ::chmod( utf8.x_str(), static_cast<mode_t>( mode_ ) ) < 0 ) {
 		throw HFileSystemException( "chmod failed: `"_ys.append( path_ ).append( "'" ) );
 	}
 	return;
@@ -355,7 +363,8 @@ void chmod( path_t const& path_, u32_t mode_ ) {
 
 void chdir( path_t const& path_ ) {
 	M_PROLOG
-	if ( ::chdir( path_.c_str() ) < 0 ) {
+	HUTF8String utf8( path_ );
+	if ( ::chdir( utf8.x_str() ) < 0 ) {
 		throw HFileSystemException( "chdir failed: `"_ys.append( path_ ).append( "'" ) );
 	}
 	return;
@@ -367,7 +376,8 @@ void remove_directory( path_t const& path_, DIRECTORY_MODIFICATION directoryModi
 	M_ENSURE( ! path.is_empty() );
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	if ( directoryModification_ == DIRECTORY_MODIFICATION::EXACT ) {
-		int err( ::rmdir( path.c_str() ) );
+		HUTF8String utf8( path );
+		int err( ::rmdir( utf8.x_str() ) );
 		if ( ( err != 0 ) && ( ( errno != ENOENT ) || is_directory( path ) ) ) {
 			throw HFileSystemException( to_string( "Failed to remove directory `" ).append( path ).append( "'" ) );
 		}

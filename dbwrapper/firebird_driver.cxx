@@ -128,9 +128,12 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& d
 		yaal::hcore::HString const& login_, yaal::hcore::HString const& password_, yaal::hcore::HString const& ) {
 	typedef HResource<OFirebird> firebird_resource_guard_t;
 	firebird_resource_guard_t db( new OFirebird );
-	int short dbLen( static_cast<int short>( dataBase_.get_length() ) );
-	int short loginLen( static_cast<int short>( login_.get_length() ) );
-	int short passLen( static_cast<int short>( password_.get_length() ) );
+	HUTF8String dataBase( dataBase_ );
+	HUTF8String login( login_ );
+	HUTF8String password( password_ );
+	int short dbLen( static_cast<int short>( dataBase.byte_count() ) );
+	int short loginLen( static_cast<int short>( login.byte_count() ) );
+	int short passLen( static_cast<int short>( password.byte_count() ) );
 	static int short const DPB_VER_LEN( 1 );
 	static int short const DPB_CLUSTER_HEADER_LEN( 2 );
 	static int short const CLUSTER_COUNT( 2 ); /* login and password as clusters */
@@ -141,12 +144,12 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& d
 	*pdpb ++ = isc_dpb_version1;
 	*pdpb ++ = isc_dpb_user_name;
 	*pdpb ++ = static_cast<char>( loginLen );
-	::strncpy( pdpb, login_.c_str(), static_cast<size_t>( loginLen ) );
+	::strncpy( pdpb, login.x_str(), static_cast<size_t>( loginLen ) );
 	pdpb += loginLen;
 	*pdpb ++ = isc_dpb_password;
 	*pdpb ++ = static_cast<char>( passLen );
-	::strncpy( pdpb, password_.c_str(), static_cast<size_t>( passLen ) );
-	isc_attach_database( db->_status, dbLen, dataBase_.c_str(), &db->_db, dpbLen, dpb );
+	::strncpy( pdpb, password.x_str(), static_cast<size_t>( passLen ) );
+	isc_attach_database( db->_status, dbLen, dataBase.x_str(), &db->_db, dpbLen, dpb );
 	if ( ! is_err( db->_status ) ) {
 		dbLink_._valid = true;
 	}

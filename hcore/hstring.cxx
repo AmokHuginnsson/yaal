@@ -1221,10 +1221,10 @@ HString HString::right( int long fromEnd_ ) const {
 	M_EPILOG
 }
 
-HString& HString::trim_left( char const* set_ ) {
+HString& HString::trim_left( HString const& set_ ) {
 	M_PROLOG
 	int cut( 0 );
-	while ( MEM[ cut ] && ::std::strchr( set_, MEM[ cut ] ) ) {
+	while ( MEM[ cut ] && ( set_.find( MEM[ cut ] ) != npos ) ) {
 		++ cut;
 	}
 	if ( cut ) {
@@ -1234,11 +1234,10 @@ HString& HString::trim_left( char const* set_ ) {
 	M_EPILOG
 }
 
-HString& HString::trim_right( char const* set_ ) {
+HString& HString::trim_right( HString const& set_ ) {
 	M_PROLOG
 	int long cut( 0 );
-	while ( ( cut < GET_SIZE )
-			&& ::std::strchr( set_, MEM[ GET_SIZE - ( cut + 1 ) ] ) ) {
+	while ( ( cut < GET_SIZE ) && ( set_.find( MEM[ GET_SIZE - ( cut + 1 ) ] ) != npos ) ) {
 		++ cut;
 	}
 	if ( cut ) {
@@ -1250,7 +1249,7 @@ HString& HString::trim_right( char const* set_ ) {
 	M_EPILOG
 }
 
-HString& HString::trim( char const* set_ ) {
+HString& HString::trim( HString const& set_ ) {
 	M_PROLOG
 	trim_left( set_ );
 	trim_right( set_ );
@@ -1766,8 +1765,8 @@ void HUTF8String::alloc( int long size_ ) {
 		::memset( _ptr + static_cast<int>( sizeof ( OBufferMeta ) ) + oldSize, 0, static_cast<size_t>( newSize - oldSize ) );
 		_meta->_refCount = 1;
 		_meta->_allocated = static_cast<int>( newSize );
-		_meta->_used = static_cast<int>( size_ );
 	}
+	_meta->_used = static_cast<int>( size_ );
 	_ptr[ static_cast<int>( sizeof ( OBufferMeta ) ) + size_ ] = 0;
 	return;
 	M_EPILOG
@@ -1812,7 +1811,7 @@ bool HUTF8String::empty( void ) const {
 	return ( _characterCount == 0 );
 }
 
-char const* HUTF8String::c_str( void ) const {
+char const* HUTF8String::x_str( void ) const {
 	M_ASSERT( ! _ptr || ( ( _offset + _byteCount ) == _meta->_used ) );
 	return ( _ptr ? _ptr + sizeof ( OBufferMeta ) + _offset : nullptr );
 }

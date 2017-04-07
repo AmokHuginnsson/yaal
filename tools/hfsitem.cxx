@@ -142,8 +142,9 @@ yaal::hcore::HTime HFSItem::accessed( void ) const {
 
 void HFSItem::do_stat( void* buf ) const {
 	M_PROLOG
-	M_ENSURE( ( ::stat( _path.c_str(),
-					static_cast<struct stat*>( buf ) ) == 0 ) || ( ::lstat( _path.c_str(),
+	HUTF8String utf8( _path );
+	M_ENSURE( ( ::stat( utf8.x_str(),
+					static_cast<struct stat*>( buf ) ) == 0 ) || ( ::lstat( utf8.x_str(),
 					static_cast<struct stat*>( buf ) ) == 0 ) );
 	return;
 	M_EPILOG
@@ -197,8 +198,9 @@ void HFSItem::set_path( HString const& path_, int nameLen_ ) {
 
 bool HFSItem::operator ! ( void ) const {
 	struct stat dummy;
-	return ( ! ( ( ::stat( _path.c_str(),
-						&dummy ) == 0 ) || ( ::lstat( _path.c_str(),
+	HUTF8String utf8( _path );
+	return ( ! ( ( ::stat( utf8.x_str(),
+						&dummy ) == 0 ) || ( ::lstat( utf8.x_str(),
 							&dummy ) == 0 ) ) );
 }
 
@@ -235,7 +237,8 @@ HFSItem::HIterator::HIterator( HString const& path_ )
 	, _item( "" ) {
 	M_PROLOG
 	if ( ! _path.is_empty() ) {
-		_dir = ::opendir( _path.c_str() );
+		HUTF8String utf8( _path );
+		_dir = ::opendir( utf8.x_str() );
 		if ( _dir == nullptr ) {
 			throw HFSItemException( "opendir failed: "_ys.append( _path ) );
 		}
@@ -254,7 +257,8 @@ HFSItem::HIterator::HIterator( HIterator const& it_ )
 	, _item( "" ) {
 	M_PROLOG
 	if ( it_._dir ) {
-		_dir = ::opendir( _path.c_str() );
+		HUTF8String utf8( _path );
+		_dir = ::opendir( utf8.x_str() );
 		if ( _dir == nullptr ) {
 			throw HFSItemException( "opendir failed: "_ys.append( _path ) );
 		}
