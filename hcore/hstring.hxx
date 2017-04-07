@@ -836,12 +836,26 @@ public:
 	typedef HReverseIterator<HIterator> reverse_iterator;
 	typedef reverse_iterator const_reverse_iterator;
 private:
+
+#ifndef __sun__
+#	pragma pack( push, 1 )
+#else /* #ifndef __sun__ */
+#	pragma pack( 1 )
+#endif /* #else #ifndef __sun__ */
+
 	struct OBufferMeta {
 		int _allocated;     /*!< buffer (_ptr) size not including OBufferMeta */
 		int _used;          /*!< number of bytes used bu this instance */
 		int _refCount;      /*!< number of copies of this string */
 		yaal::i8_t _rank;   /*!< maximum number of bytes used per character */
 	};
+
+#ifndef __sun__
+#	pragma pack( pop )
+#else /* #ifndef __sun__ */
+#	pragma pack()
+#endif /* #else #ifndef __sun__ */
+
 	int _characterCount;  /*!< active utf-8 character count */
 	int _offset;          /*!< active string start offset counted in bytes!! */
 	int _byteCount;       /*!< raw active bytes count */

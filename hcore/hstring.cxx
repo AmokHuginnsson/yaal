@@ -1763,6 +1763,7 @@ void HUTF8String::alloc( int long size_ ) {
 		}
 		int size( safe_int::cast<int>( newSize + 1 + static_cast<int>( sizeof ( OBufferMeta ) ) ) );
 		_ptr = memory::realloc<char>( _ptr, size );
+		::memset( _ptr + static_cast<int>( sizeof ( OBufferMeta ) ) + oldSize, 0, static_cast<size_t>( newSize - oldSize ) );
 		_meta->_refCount = 1;
 		_meta->_allocated = static_cast<int>( newSize );
 		_meta->_used = static_cast<int>( size_ );
