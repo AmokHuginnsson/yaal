@@ -259,10 +259,10 @@ M_EXPORT_SYMBOL void* db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 sqlite3_destructor_type SQLITE_STATIC_FWD{ SQLITE_STATIC };
 #pragma GCC diagnostic error "-Wold-style-cast"
 
-M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HString const& );
-M_EXPORT_SYMBOL void query_bind( ODBLink&, void* data_, int argNo_, yaal::hcore::HString const& value_ ) {
+M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HUTF8String const& );
+M_EXPORT_SYMBOL void query_bind( ODBLink&, void* data_, int argNo_, yaal::hcore::HUTF8String const& value_ ) {
 	OSQLiteResult* result( static_cast<OSQLiteResult*>( data_ ) );
-	sqlite3_bind_text( static_cast<sqlite3_stmt*>( result->_data ), argNo_, value_.c_str(), static_cast<int>( value_.get_length() ), SQLITE_STATIC_FWD );
+	sqlite3_bind_text( static_cast<sqlite3_stmt*>( result->_data ), argNo_, value_.x_str(), static_cast<int>( value_.byte_count() ), SQLITE_STATIC_FWD );
 	return;
 }
 

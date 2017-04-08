@@ -424,13 +424,13 @@ M_EXPORT_SYMBOL void* db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 	return ( oracle_db_prepare_query( dbLink_, query_, 0 ) );
 }
 
-M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HString const& );
-M_EXPORT_SYMBOL void query_bind( ODBLink& dbLink_, void* data_, int attrNo_, yaal::hcore::HString const& value_ ) {
+M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HUTF8String const& );
+M_EXPORT_SYMBOL void query_bind( ODBLink& dbLink_, void* data_, int attrNo_, yaal::hcore::HUTF8String const& value_ ) {
 	OQuery* query( static_cast<OQuery*>( data_ ) );
 	OCIBind* dummy( nullptr );
 	query->_inNullInd.push_back( 0 );
 	if ( ( ( *query->_status ) = OCIBindByPos( query->_statement, &dummy, query->_error,
-			static_cast<ub4>( attrNo_ ), const_cast<char*>( value_.c_str() ), static_cast<sb4>( value_.get_size() ) + 1,
+			static_cast<ub4>( attrNo_ ), const_cast<char*>( value_.x_str() ), static_cast<sb4>( value_.byte_count() ) + 1,
 			SQLT_STR, &query->_inNullInd.back(), nullptr, nullptr, 0, nullptr, OCI_DEFAULT ) ) != OCI_SUCCESS ) {
 		log( LOG_LEVEL::ERROR ) << _logTag_ <<  __FUNCTION__ << ": " << dbrs_error( dbLink_, query ) << endl;
 	}

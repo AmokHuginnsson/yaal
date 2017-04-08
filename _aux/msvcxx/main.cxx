@@ -137,15 +137,17 @@ int setenv( char const* name_, char const* value_, int replace_ ) {
 	if ( !orig || replace_ ) {
 		HString s( name_ );
 		s.append( "=" ).append( value_ );
-		ret = ::putenv( s.c_str() );
+		HUTF8String utf8( s );
+		ret = ::putenv( utf8.x_str() );
 	}
 	return ( ret );
 }
 
 int unsetenv( char const* name_ ) {
-	string n( name_ );
+	HString n( name_ );
 	n += "=";
-	int ret( putenv( n.c_str() ) );
+	HUTF8String utf8( n );
+	int ret( ::putenv( utf8.x_str() ) );
 	return ( ret );
 }
 
@@ -184,7 +186,8 @@ DIR* opendir( char const* path_ ) {
 	WIN32_FIND_DATA d;
 	HString path( path_ );
 	path.append( "/*" );
-	HANDLE h( ::FindFirstFile( path.c_str(), &d ) );
+	HUTF8String utf8( path );
+	HANDLE h( ::FindFirstFile( utf8.x_str(), &d ) );
 	DIR* dir( nullptr );
 	if ( h != INVALID_HANDLE_VALUE ) {
 		dir = memory::calloc<DIR>( 1 );
@@ -311,7 +314,8 @@ bool get_system_account_name( int id_, char* buf_, int size_ ) {
 			sidStr.erase( sidStr.find_last( '-' ) + 1 );
 			sidStr += id_;
 			PSID newSid( nullptr );
-			if ( ::ConvertStringSidToSid( sidStr.c_str(), &newSid ) ) {
+			HUTF8String utf8( sidStr );
+			if ( ::ConvertStringSidToSid( utf8.x_str(), &newSid ) ) {
 				DWORD size( size_ );
 				static int const DUMMY_BUFFER_SIZE = 128;
 				char dummy[DUMMY_BUFFER_SIZE];

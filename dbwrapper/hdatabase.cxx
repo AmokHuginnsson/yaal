@@ -32,6 +32,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hdatabase.hxx"
 #include "hcore/memory.hxx"
 #include "hcore/hlog.hxx"
+#include "hcore/hformat.hxx"
 #include "db_driver_loader.hxx"
 #include "dbwrapper.hxx"
 
@@ -79,7 +80,8 @@ HRecordSet::ptr_t HDataBase::execute_query( HString const& query_, HRecordSet::C
 	if ( _logSQL_ ) {
 		log << "SQL: " << query_ << endl;
 	}
-	void* result( cursor_ == HRecordSet::CURSOR::RANDOM_ACCESS ? (_connector->db_fetch_query_result)( _dbLink, query_.c_str() ) : (_connector->db_query)( _dbLink, query_.c_str() ) );
+	HUTF8String utf8( query_ );
+	void* result( cursor_ == HRecordSet::CURSOR::RANDOM_ACCESS ? (_connector->db_fetch_query_result)( _dbLink, utf8.x_str() ) : (_connector->db_query)( _dbLink, utf8.x_str() ) );
 	if ( (_connector->dbrs_errno)( _dbLink, result ) ) {
 		HString message( "SQL execute error: '"_ys.append( query_ ).append( "': " ).append( (_connector->dbrs_error)( _dbLink, result ) ) );
 		log( LOG_LEVEL::ERROR ) << message << endl;
@@ -101,7 +103,8 @@ HQuery::ptr_t HDataBase::prepare_query( HString const& query_ ) {
 	if ( ! _dbLink._valid ) {
 		M_THROW( "not connected to database", errno );
 	}
-	void* result( (_connector->db_prepare_query)( _dbLink, query_.c_str() ) );
+	HUTF8String utf8( query_ );
+	void* result( (_connector->db_prepare_query)( _dbLink, utf8.x_str() ) );
 	if ( (_connector->dbrs_errno)( _dbLink, result ) ) {
 		HString message( "SQL prepare error: '"_ys.append( query_ ).append( "': " ).append( (_connector->dbrs_error)( _dbLink, result ) ) );
 		log( LOG_LEVEL::ERROR ) << message << endl;
@@ -150,8 +153,7 @@ HDataBase::column_list_t HDataBase::get_columns( yaal::hcore::HString const& tab
 	M_PROLOG
 	M_ASSERT( _connector->_columnListQuery );
 	column_list_t cl;
-	HString q;
-	q.format( _connector->_columnListQuery, tableName_.c_str() );
+	HString q( format( _connector->_columnListQuery, tableName_ ) );
 	HRecordSet::ptr_t rs( const_cast<HDataBase*>( this )->execute_query( q ) );
 	for ( HRecordSet::iterator it( rs->begin() ), end( rs->end() ); it != end; ++ it ) {
 		cl.push_back( *it[_connector->_columnNameIndex] );

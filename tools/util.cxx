@@ -255,7 +255,7 @@ void show_help( OOptionInfo const& info, HStreamInterface& out_ ) {
 	int cols( columns - ( longestLongLength + longestShortLength + 2 + 2 + 2 ) );
 	/* display each option description */
 	int const COUNT( static_cast<int>( opts.size() ) );
-	char const* description( nullptr );
+	HString description;
 	for ( int i( 0 ); i < COUNT; ++ i ) {
 		HProgramOptionsHandler::HOption const& o = opts[ i ];
 		if ( ! ( is_byte( o.short_form() ) || ! o.long_form().is_empty() ) ) {
@@ -277,7 +277,7 @@ void show_help( OOptionInfo const& info, HStreamInterface& out_ ) {
 		}
 		char const* comma( is_byte( o.short_form() ) && ! o.long_form().is_empty() ? "," : " " );
 		if ( ! description ) {
-			description = o.description().c_str();
+			description = o.description();
 		}
 		/* if long form word exist, build full form of long form */
 		HString lf;
@@ -316,7 +316,7 @@ void show_help( OOptionInfo const& info, HStreamInterface& out_ ) {
 				lf.clear();
 				extraLFL = 0;
 				comma = " ";
-				if ( description == o.description().c_str() ) {
+				if ( description == o.description() ) {
 					description = "";
 				}
 			}
@@ -324,7 +324,7 @@ void show_help( OOptionInfo const& info, HStreamInterface& out_ ) {
 				sf.clear();
 				extraSFL = 0;
 				comma = " ";
-				if ( description == o.description().c_str() ) {
+				if ( description == o.description() ) {
 					description = "";
 				}
 			}
@@ -363,14 +363,14 @@ void show_help( OOptionInfo const& info, HStreamInterface& out_ ) {
 					HProgramOptionsHandler::HOption const& n = opts[ i + 1 ];
 					if ( ( ! o.long_form().is_empty() && ! n.long_form().is_empty() && ( o.long_form() == n.long_form() ) )
 							|| ( is_byte( o.short_form() ) && is_byte( n.short_form() ) && ( o.short_form() == n.short_form() ) ) ) {
-						description = desc.c_str();
+						description = desc;
 						break;
 					}
 				}
 				out_ << setw( static_cast<int>( longestLongLength + longestShortLength + 2 + 2 + 2 ) ) << "";
 			} else {
 				out_ << desc << "\n";
-				description = nullptr;
+				description.clear();
 				loop = false;
 			}
 		} while ( loop );
@@ -410,7 +410,7 @@ void dump_configuration( OOptionInfo const& info, HStreamInterface& out_ ) {
 "# example:\n"
 "# log_path ${HOME}/var/log/program.log\n\n";
 	HString desc;
-	char const* description = nullptr;
+	HString description;
 	HProgramOptionsHandler::options_t const& opts = info._opt.get_options();
 	int const COUNT = static_cast<int>( opts.size() );
 	for ( int i = 0; i < COUNT; ++ i ) {
@@ -422,11 +422,11 @@ void dump_configuration( OOptionInfo const& info, HStreamInterface& out_ ) {
 			HProgramOptionsHandler::HOption const& p = opts[ i - 1 ];
 			if ( !o.long_form().is_empty() && !p.long_form().is_empty()
 					&& ( o.long_form() == p.long_form() )
-					&& ( o.description().c_str() == description ) )
+					&& ( o.description() == description ) )
 				description = "";
 			if ( is_byte( o.short_form() ) && is_byte( p.short_form() )
 					&& ( o.short_form() == p.short_form() )
-					&& ( o.description().c_str() == description ) )
+					&& ( o.description() == description ) )
 				description = "";
 		}
 		static int const MAXIMUM_LINE_LENGTH = 72;
@@ -456,8 +456,8 @@ void dump_configuration( OOptionInfo const& info, HStreamInterface& out_ ) {
 			out_ << ", default: " << o.default_value();
 		}
 		out_ << "\n";
-		if ( ! description ) {
-			description = o.description().c_str();
+		if ( description.is_empty() ) {
+			description = o.description();
 		}
 		desc = description;
 		bool loop = true;
@@ -473,10 +473,10 @@ void dump_configuration( OOptionInfo const& info, HStreamInterface& out_ ) {
 				out_ << "# " << desc.left( eol ) << "\n";
 				desc.shift_left( eol );
 				desc.trim_left();
-				description = desc.c_str();
+				description = desc;
 			} else {
 				out_ << "# " << desc << "\n";
-				description = nullptr;
+				description.clear();
 				loop = false;
 			}
 		} while ( loop );

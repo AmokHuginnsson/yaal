@@ -201,13 +201,13 @@ M_EXPORT_SYMBOL void* db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 	return ( result );
 }
 
-M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HString const& );
-M_EXPORT_SYMBOL void query_bind( ODBLink&, void* data_, int argNo_, yaal::hcore::HString const& param_ ) {
+M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HUTF8String const& );
+M_EXPORT_SYMBOL void query_bind( ODBLink&, void* data_, int argNo_, yaal::hcore::HUTF8String const& param_ ) {
 	OPostgreSQLResult* pr( static_cast<OPostgreSQLResult*>( data_ ) );
 	if ( argNo_ >= static_cast<int>( pr->_params.get_size() ) ) {
 		pr->_params.resize( argNo_ );
 	}
-	pr->_params[argNo_ - 1] = param_.c_str();
+	pr->_params[argNo_ - 1] = param_.x_str();
 	return;
 }
 

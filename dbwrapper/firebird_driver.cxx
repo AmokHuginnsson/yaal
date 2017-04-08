@@ -411,16 +411,16 @@ M_EXPORT_SYMBOL void* db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 	return ( firebird_db_prepare_query( dbLink_, query_ ) );
 }
 
-M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HString const& );
-M_EXPORT_SYMBOL void query_bind( ODBLink&, void* data_, int paramNo_, yaal::hcore::HString const& value_ ) {
+M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HUTF8String const& );
+M_EXPORT_SYMBOL void query_bind( ODBLink&, void* data_, int paramNo_, yaal::hcore::HUTF8String const& value_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
 	M_ASSERT( res );
 	XSQLDA* in( res->_descIn.get<XSQLDA>() );
 	int paramIdx( paramNo_ - 1 );
 	if ( paramIdx < in->sqld ) {
 		XSQLVAR* var( in->sqlvar + paramIdx );
-		var->sqldata = const_cast<char*>( value_.c_str() );
-		var->sqllen = static_cast<ISC_SHORT>( value_.get_size() );
+		var->sqldata = const_cast<char*>( value_.x_str() );
+		var->sqllen = static_cast<ISC_SHORT>( value_.byte_count() );
 	}
 	return;
 }

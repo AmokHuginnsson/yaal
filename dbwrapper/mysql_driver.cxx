@@ -223,16 +223,16 @@ M_EXPORT_SYMBOL void* db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 	return ( mysql_db_prepare_query( dbLink_, query_ ) );
 }
 
-M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HString const& );
-M_EXPORT_SYMBOL void query_bind( ODBLink&, void* data_, int argNo_, yaal::hcore::HString const& value_ ) {
+M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HUTF8String const& );
+M_EXPORT_SYMBOL void query_bind( ODBLink&, void* data_, int argNo_, yaal::hcore::HUTF8String const& value_ ) {
 	OMySQLResult* pq( static_cast<OMySQLResult*>( data_ ) );
 	if ( argNo_ > static_cast<int>( pq->_params.get_size() ) ) {
 		pq->_params.resize( argNo_ );
 	}
 	::memset( &pq->_params[argNo_ - 1], 0, sizeof ( OMySQLResult::binds_t::value_type ) );
 	pq->_params[argNo_ - 1].buffer_type = MYSQL_TYPE_STRING;
-	pq->_params[argNo_ - 1].buffer = const_cast<char*>( value_.c_str() );
-	pq->_params[argNo_ - 1].buffer_length = static_cast<int unsigned>( value_.get_size() );
+	pq->_params[argNo_ - 1].buffer = const_cast<char*>( value_.x_str() );
+	pq->_params[argNo_ - 1].buffer_length = static_cast<int unsigned>( value_.byte_count() );
 	return;
 }
 
