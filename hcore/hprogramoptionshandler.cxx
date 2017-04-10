@@ -89,7 +89,8 @@ HString make_path( HString const& sysconfDir_, HString const& rcName_, RC_PATHER
 			HString envName( rcName_ );
 			envName += RC;
 			envName.upper();
-			char const* envPath( ::getenv( envName.c_str() ) );
+			HUTF8String utf8( envName );
+			char const* envPath( ::getenv( utf8.x_str() ) );
 			if ( envPath ) {
 				rcPath = envPath;
 			}
@@ -153,11 +154,12 @@ bool substitute_environment( HString& string_ ) {
 	bool envVarRefFound = false;
 	if ( ! string_.is_empty() ) {
 		HRegex pattern( "[$][{][^{}]+[}]" );
-		HRegex::HMatchIterator it = pattern.find( string_.c_str() );
+		HRegex::HMatchIterator it = pattern.find( string_ );
 		if ( it != pattern.end() ) {
 			HString var = string_.mid( it->start(), it->size() );
 			HString name = var.mid( 2, it->size() - 3 );
-			char const* start = ::getenv( name.c_str() );
+			HUTF8String utf8( name );
+			char const* start = ::getenv( utf8.x_str() );
 			string_.replace( var, start ? start : "" );
 			envVarRefFound = true;
 		}
@@ -482,10 +484,10 @@ int HProgramOptionsHandler::process_rc_file( HString const& section_, RC_CALLBAC
 				while ( read_rc_line( option, value, rc, line ) ) {
 					if ( ! section_.is_empty() ) {
 						if ( value.is_empty() ) {
-							value.format( "[%s]", section_.c_str() );
+							value.assign( "[" ).append( section_ ).append( "]" );
 							if ( option == value ) {
 								if ( _debugLevel_ >= DEBUG_LEVEL::DEBUG_MESSAGES ) {
-									::fprintf( stderr, "section: [%s]\n", option.c_str() );
+									cerr << "section: [" << option << "]" << endl;
 								}
 								log << "section: " << section_ << ", ";
 								section = true;
@@ -512,10 +514,10 @@ int HProgramOptionsHandler::process_rc_file( HString const& section_, RC_CALLBAC
 							log << "failed." << endl;
 						}
 						message.format( "Error: unknown option found: `%s', "
-									"with value: `%s', on line %d.\n",
+									"with value: `%s', on line %d.",
 									option.c_str(), value.c_str(), line );
-						log( LOG_LEVEL::ERROR ) << message;
-						::fputs( message.c_str(), stderr );
+						log( LOG_LEVEL::ERROR ) << message << endl;
+						cerr << message << endl;
 					}
 				}
 			}
@@ -675,8 +677,9 @@ int read_rc_line( HString& option_, HString& value_, HFile& file_,
 			int long endOfOption = index;
 			index = option_.find_other_than( _keyValueSep_, index );
 			if ( ( index > 0 ) && option_[ index ] ) {
-				if ( count( option_.c_str() + endOfOption, option_.c_str() + index, '=' ) > 1 )
+				if ( count( option_.begin() + endOfOption, option_.begin() + index, '=' ) > 1 ) {
 					throw HProgramOptionsHandlerException( "Syntax error: redundant `=' sign.", line_ );
+				}
 				/* we have found a non-whitespace, so there certainly is a value */
 				end = ( length - 1 ) - option_.reverse_find_other_than( _whiteSpace_.data() );
 				/* now we strip apostrophe or quotation marks */
@@ -709,7 +712,7 @@ void HProgramOptionsHandler::set_option( HOption& option_, HString const& value_
 		} else {
 			name = static_cast<char>( option_.short_form() );
 		}
-		::fprintf( stderr, "option: [%s], value [%s]\n", name.c_str(), value.c_str() );
+		cerr << "option: [" << name << "], value [" << value <<  "]" << endl;
 	}
 	if ( option_.value_id() ) {
 		if ( option_.switch_type() == HOption::ARGUMENT::NONE ) {
@@ -807,10 +810,12 @@ int HProgramOptionsHandler::process_command_line( int argc_,
 
 void HProgramOptionsHandler::set_from_env( void ) {
 	M_PROLOG
+	HUTF8String utf8;
 	for ( options_t::iterator it = _options.begin(), end = _options.end(); it != end; ++ it ) {
 		HString lo( _projectName );
 		lo.append( "_" ).append( it->long_form() ).upper().replace( "-", "_" );
-		char const* fromEnv( ::getenv( lo.c_str() ) );
+		utf8 = lo;
+		char const* fromEnv( ::getenv( utf8.x_str() ) );
 		if ( fromEnv ) {
 			set_option( *it, fromEnv );
 		}

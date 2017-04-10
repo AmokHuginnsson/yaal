@@ -1626,6 +1626,7 @@ HUTF8String::HUTF8String( char const* str_ )
 	}
 	if ( byteCount > 0 ) {
 		alloc( byteCount );
+		_meta->_used = byteCount;
 		_meta->_rank = static_cast<i8_t>( rank );
 		_byteCount = byteCount;
 		_characterCount = characterCount;
@@ -1766,7 +1767,6 @@ void HUTF8String::alloc( int long size_ ) {
 		_meta->_refCount = 1;
 		_meta->_allocated = static_cast<int>( newSize );
 	}
-	_meta->_used = static_cast<int>( size_ );
 	_ptr[ static_cast<int>( sizeof ( OBufferMeta ) ) + size_ ] = 0;
 	return;
 	M_EPILOG
@@ -1788,6 +1788,7 @@ void HUTF8String::assign( HString::const_iterator it_, HString::const_iterator e
 		}
 	}
 	if ( _ptr ) {
+		_meta->_used = byteCount;
 		_meta->_rank = static_cast<i8_t>( utf8::rank( maxCodePoint ) );
 	}
 	_byteCount = byteCount;

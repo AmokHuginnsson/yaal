@@ -25,6 +25,7 @@ Copyright:
 */
 
 #include <cstring>
+#include <cstdio>
 #include <libintl.h>
 
 #include "hcore/base.hxx"
@@ -202,7 +203,7 @@ bool does_intersect( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 ) {
 }
 
 HFormat::HFormat( HString const& aFmt_ )
-	: _impl(  make_pointer<HFormatImpl>( aFmt_ ) ) {
+	: _impl( make_pointer<HFormatImpl>( aFmt_ ) ) {
 	M_PROLOG
 	HFormatImpl::OToken t;
 	int idx = 0;
@@ -320,102 +321,115 @@ void HFormat::swap( HFormat& fi ) {
 
 HString HFormat::string( void ) const {
 	M_PROLOG
-	HString fmt;
+	static int const MAX_FMT_SIZE( 64 );
+	char fmt[MAX_FMT_SIZE];
 	M_ENSURE( _impl->_positions->size() == _impl->_args->size() );
 	_impl->_string.clear();
 	for ( HFormatImpl::tokens_t::const_iterator it = _impl->_tokens.begin(), end = _impl->_tokens.end(); it != end; ++ it ) {
+		char* fp( fmt );
 		HFormatImpl::conversion_t conv = it->_conversion;
 		if ( conv == HFormatImpl::CONVERSION::CONSTANT ) {
 			_impl->_string += it->_const;
 		} else {
-			fmt = "%";
+			*fp++ = '%';
 			if ( !!( it->_flag & HFormatImpl::FLAG::ALTERNATE ) ) {
-				fmt += "#";
+				*fp++ = '#';
 			}
 			if ( !!( it->_flag & HFormatImpl::FLAG::ZERO_PADDED ) ) {
-				fmt += "0";
+				*fp++ = '0';
 			}
 			if ( !!( it->_flag & HFormatImpl::FLAG::SPACE_PADDED ) ) {
-				fmt += " ";
+				*fp++ = ' ';
 			}
 			if ( !!( it->_flag & HFormatImpl::FLAG::SIGN_PREFIX ) ) {
-				fmt += "+";
+				*fp++ = '+';
 			}
 			if ( !!( it->_flag & HFormatImpl::FLAG::LEFT_ALIGNED ) ) {
-				fmt += "-";
+				*fp++ = '-';
 			}
+			int w( 0 );
 			if ( it->_width > 0 ) {
-				fmt += it->_width;
+				w = it->_width;
 			} else if ( it->_width < 0 ) {
-				fmt += HFormatImpl::variant_shell<int>::get( *_impl->_args, - ( it->_width + 2 ) );
+				w = HFormatImpl::variant_shell<int>::get( *_impl->_args, - ( it->_width + 2 ) );
+			}
+			if ( w > 0 ) {
+				fp += snprintf( fp, static_cast<size_t>( ( MAX_FMT_SIZE - 1 ) - ( fp - fmt ) ), "%d", w );
 			}
 			if ( it->_precision ) {
-				fmt += ".";
+				*fp++ = '.';
 			}
+			int p( 0 );
 			if ( it->_precision > 0 ) {
-				fmt += it->_precision;
+				p = it->_precision;
 			} else if ( it->_precision < 0 ) {
-				fmt += HFormatImpl::variant_shell<int>::get( *_impl->_args, - ( it->_precision + 2 ) );
+				p = HFormatImpl::variant_shell<int>::get( *_impl->_args, - ( it->_precision + 2 ) );
+			}
+			if ( p > 0 ) {
+				fp += snprintf( fp, static_cast<size_t>( ( MAX_FMT_SIZE - 1 ) - ( fp - fmt ) ), "%d", p );
 			}
 			if ( !!( conv & HFormatImpl::CONVERSION::BYTE ) ) {
-				fmt += "hh";
+				*fp++ = 'h';
+				*fp++ = 'h';
 			}
 			if ( !!( conv & HFormatImpl::CONVERSION::SHORT ) ) {
-				fmt += "h";
+				*fp++ = 'h';
 			}
 			if ( !!( conv & HFormatImpl::CONVERSION::LONG ) ) {
 				if ( !!( conv & HFormatImpl::CONVERSION::INT ) ) {
-					fmt += "l";
+					*fp++ = 'l';
 				} else {
 					M_ASSERT( !!( conv & HFormatImpl::CONVERSION::DOUBLE ) );
-					fmt += "L";
+					*fp++ = 'L';
 				}
 			}
 			if ( !!( conv & HFormatImpl::CONVERSION::LONG_LONG ) ) {
-				fmt += "ll";
+				*fp++ = 'l';
+				*fp++ = 'l';
 			}
 			if ( !!( conv & HFormatImpl::CONVERSION::OCTAL ) ) {
-				fmt += "o";
+				*fp++ = 'o';
 			} else if ( !!( conv & HFormatImpl::CONVERSION::HEXADECIMAL ) ) {
-				fmt += "x";
+				*fp++ = 'x';
 			} else if ( !!( conv & HFormatImpl::CONVERSION::UNSIGNED ) ) {
-				fmt += "u";
+				*fp++ = 'u';
 			} else if ( !!( conv & HFormatImpl::CONVERSION::INT ) ) {
-				fmt += "d";
+				*fp++ = 'd';
 			}
 			if ( !!( conv & HFormatImpl::CONVERSION::DOUBLE ) ) {
-				fmt += "f";
+				*fp++ = 'f';
 			}
 			if ( !!( conv & HFormatImpl::CONVERSION::STRING ) ) {
-				fmt += "s";
+				*fp++ = 's';
 			}
 			if ( !!( conv & HFormatImpl::CONVERSION::CHAR ) ) {
-				fmt += "c";
+				*fp++ = 'c';
 			}
+			*fp = 0;
 			if ( !!( conv & HFormatImpl::CONVERSION::INT ) ) {
 				if ( !!( conv & HFormatImpl::CONVERSION::BYTE ) ) {
-					_impl->_buffer.format( fmt.c_str(), HFormatImpl::variant_shell<char>::get( *_impl->_args, it->_position ) );
+					_impl->_buffer.format( fmt, HFormatImpl::variant_shell<char>::get( *_impl->_args, it->_position ) );
 				} else if ( !!( conv & HFormatImpl::CONVERSION::SHORT ) ) {
-					_impl->_buffer.format( fmt.c_str(), HFormatImpl::variant_shell<int short>::get( *_impl->_args, it->_position ) );
+					_impl->_buffer.format( fmt, HFormatImpl::variant_shell<int short>::get( *_impl->_args, it->_position ) );
 				} else if ( !!( conv & HFormatImpl::CONVERSION::LONG ) ) {
-					_impl->_buffer.format( fmt.c_str(), HFormatImpl::variant_shell<int long>::get( *_impl->_args, it->_position ) );
+					_impl->_buffer.format( fmt, HFormatImpl::variant_shell<int long>::get( *_impl->_args, it->_position ) );
 				} else if ( !!( conv & HFormatImpl::CONVERSION::LONG_LONG ) ) {
-					_impl->_buffer.format( fmt.c_str(), HFormatImpl::variant_shell<int long long>::get( *_impl->_args, it->_position ) );
+					_impl->_buffer.format( fmt, HFormatImpl::variant_shell<int long long>::get( *_impl->_args, it->_position ) );
 				} else {
 					M_ASSERT( conv == HFormatImpl::CONVERSION::INT );
-					_impl->_buffer.format( fmt.c_str(), HFormatImpl::variant_shell<int>::get( *_impl->_args, it->_position ) );
+					_impl->_buffer.format( fmt, HFormatImpl::variant_shell<int>::get( *_impl->_args, it->_position ) );
 				}
 			} else if ( !!( conv & HFormatImpl::CONVERSION::STRING ) ) {
-				_impl->_buffer.format( fmt.c_str(), HFormatImpl::variant_shell<HString>::get( *_impl->_args, it->_position ).c_str() );
+				_impl->_buffer.format( fmt, HFormatImpl::variant_shell<HString>::get( *_impl->_args, it->_position ).c_str() );
 			} else if ( !!( conv & HFormatImpl::CONVERSION::POINTER ) ) {
-				_impl->_buffer.format( fmt.c_str(), HFormatImpl::variant_shell<void const*>::get( *_impl->_args, it->_position ) );
+				_impl->_buffer.format( fmt, HFormatImpl::variant_shell<void const*>::get( *_impl->_args, it->_position ) );
 			} else if ( !!( conv & HFormatImpl::CONVERSION::CHAR ) ) {
-				_impl->_buffer.format( fmt.c_str(), HFormatImpl::variant_shell<char>::get( *_impl->_args, it->_position ) );
+				_impl->_buffer.format( fmt, HFormatImpl::variant_shell<char>::get( *_impl->_args, it->_position ) );
 			} else if ( !!( conv & HFormatImpl::CONVERSION::DOUBLE ) ) {
 				if ( !!( conv & ( HFormatImpl::CONVERSION::LONG ) ) ) {
-					_impl->_buffer.format( fmt.c_str(), HFormatImpl::variant_shell<double long>::get( *_impl->_args, it->_position ) );
+					_impl->_buffer.format( fmt, HFormatImpl::variant_shell<double long>::get( *_impl->_args, it->_position ) );
 				} else {
-					_impl->_buffer.format( fmt.c_str(), HFormatImpl::variant_shell<double>::get( *_impl->_args, it->_position ) );
+					_impl->_buffer.format( fmt, HFormatImpl::variant_shell<double>::get( *_impl->_args, it->_position ) );
 				}
 			}
 			_impl->_string += _impl->_buffer;

@@ -258,6 +258,7 @@ private:
 	int _mouseDes;
 	void* _window;
 	yaal::hcore::HPipe::ptr_t _event;
+	mutable yaal::hcore::HUTF8String _utf8;
 public:
 	int get_height( void ) const;
 	int get_width( void ) const;

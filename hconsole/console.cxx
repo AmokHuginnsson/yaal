@@ -374,7 +374,8 @@ HConsole::HConsole( void )
 	, _height( 0 )
 	, _mouseDes( -1 )
 	, _window( nullptr )
-	, _event() {
+	, _event()
+	, _utf8() {
 	return;
 }
 
@@ -716,7 +717,8 @@ void HConsole::addstr( yaal::hcore::HString const& str_ ) const {
 	if ( ! _enabled ) {
 		M_THROW( "not in curses mode", errno );
 	}
-	M_ENSURE( waddstr_fwd( static_cast<WINDOW*>( _window ), str_.c_str() ) != ERR );
+	_utf8 = str_;
+	M_ENSURE( waddstr_fwd( static_cast<WINDOW*>( _window ), _utf8.x_str() ) != ERR );
 	return;
 	M_EPILOG
 }
@@ -1000,7 +1002,7 @@ int HConsole::on_terminal_resize( int signum_ ) {
 	if ( is_enabled() ) {
 		notify_terminal();
 	} else {
-		::fprintf( stderr, "\n%s", message.c_str() );
+		cerr << endl << message;
 	}
 	return ( 0 );
 	M_EPILOG
