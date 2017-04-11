@@ -176,7 +176,7 @@ HString::HString( HString const& string_ )
 	if ( ! string_.is_empty() ) {
 		int long newSize( string_.get_length() );
 		reserve( newSize );
-		::std::strncpy( MEM, string_.c_str(), static_cast<size_t>( newSize ) );
+		::std::strncpy( MEM, EXT_MEM( string_ ), static_cast<size_t>( newSize ) );
 		SET_SIZE( newSize );
 	}
 	return;
@@ -225,6 +225,23 @@ void HString::reserve( int long preallocate_ ) {
 			SET_SIZE( origSize );
 		}
 	}
+	return;
+	M_EPILOG
+}
+
+HString::HString( HUTF8String const& str_ )
+	: _len() {
+	M_PROLOG
+	int long newSize( str_.character_count() );
+	reserve( newSize );
+	int i( 0 );
+	for ( u32_t codePoint : str_ ) {
+		MEM[i] = static_cast<char>( codePoint );
+		++ i;
+	}
+	M_ASSERT( i == newSize );
+	MEM[ newSize ] = 0;
+	SET_SIZE( newSize );
 	return;
 	M_EPILOG
 }
@@ -449,7 +466,7 @@ HString& HString::operator = ( HString const& string_ ) {
 			reserve( newSize );
 		}
 		if ( newSize ) {
-			::std::strncpy( MEM, string_.c_str(), static_cast<size_t>( newSize ) );
+			::std::strncpy( MEM, EXT_MEM( string_ ), static_cast<size_t>( newSize ) );
 		}
 		MEM[ newSize ] = 0;
 		SET_SIZE( newSize );
@@ -478,7 +495,7 @@ HString& HString::operator += ( HString const& string_ ) {
 		int long oldSize( GET_SIZE );
 		int long newSize( oldSize + otherSize );
 		reserve( newSize );
-		::std::strcpy( MEM + oldSize, string_.c_str() );
+		::std::strcpy( MEM + oldSize, EXT_MEM( string_ ) );
 		SET_SIZE( newSize );
 	}
 	return ( *this );
@@ -522,7 +539,7 @@ bool HString::operator == ( HString const& other_ ) const {
 	M_PROLOG
 	return ( ( this == &other_ )
 			|| ( ( GET_SIZE == other_.get_length() )
-				&& ( ! ( GET_SIZE && ::std::strcmp( MEM, other_.c_str() ) ) ) ) );
+				&& ( ! ( GET_SIZE && ::std::strcmp( MEM, EXT_MEM( other_ ) ) ) ) ) );
 	M_EPILOG
 }
 
@@ -534,13 +551,13 @@ bool HString::operator != (  HString const& other_ ) const {
 
 bool HString::operator >= ( HString const& other_ ) const {
 	M_PROLOG
-	return ( ::std::strcoll( MEM, other_.c_str() ) >= 0 );
+	return ( ::std::strcoll( MEM, EXT_MEM( other_ ) ) >= 0 );
 	M_EPILOG
 }
 
 bool HString::operator <= ( HString const& other_ ) const {
 	M_PROLOG
-	return ( ::std::strcoll( MEM, other_.c_str() ) <= 0 );
+	return ( ::std::strcoll( MEM, EXT_MEM( other_ ) ) <= 0 );
 	M_EPILOG
 }
 
@@ -720,7 +737,7 @@ HString& HString::assign( HString const& str_, int long offset_, int long length
 	if ( offset_ < s ) {
 		newSize = ( length_ > ( s - offset_ ) ) ? s - offset_ : length_;
 		reserve( newSize );
-		::memcpy( MEM, str_.c_str() + offset_, static_cast<size_t>( newSize ) );
+		::memcpy( MEM, EXT_MEM( str_ ) + offset_, static_cast<size_t>( newSize ) );
 	}
 	MEM[ newSize ] = 0;
 	SET_SIZE( newSize );
@@ -841,7 +858,7 @@ int long HString::nfind( HString const& pattern_, int long patternLength_, int l
 		return ( npos );
 	}
 	int long idx = string_helper::kmpsearch( MEM + after_,
-			GET_SIZE - after_, pattern_.c_str(), patternLength_ );
+			GET_SIZE - after_, EXT_MEM( pattern_ ), patternLength_ );
 	return ( idx >= 0 ? idx + after_ : npos );
 	M_EPILOG
 }
@@ -1024,7 +1041,7 @@ HString& HString::replace( HString const& pattern_,
 	int long patPos( 0 );
 	if ( subWP == 0 ) { /* replacement is equal length to pattern */
 		while ( ( patPos = find( pattern_, patPos ) ) != npos ) {
-			::std::strncpy( MEM + patPos, with_.c_str(), static_cast<size_t>( lenWith ) );
+			::std::strncpy( MEM + patPos, EXT_MEM( with_ ), static_cast<size_t>( lenWith ) );
 			patPos += lenPattern;
 		}
 	} else {
@@ -1046,8 +1063,8 @@ HString& HString::replace( HString const& pattern_,
 		int long oldLen( 0 );
 		int long newLen( 0 );
 		patPos = 0;
-		char const* with( with_.c_str() );
-		char const* srcBuf( src->c_str() );
+		char const* with( EXT_MEM( with_ ) );
+		char const* srcBuf( EXT_MEM( (*src) ) );
 		char* buf( MEM );
 		while ( ( patPos = src->find( pattern_, patPos ) ) != npos ) {
 			if ( patPos > oldLen ) {
@@ -1071,7 +1088,7 @@ HString& HString::replace( HString const& pattern_,
 
 HString& HString::replace( int long pos_, int long size_, HString const& replacement ) {
 	M_PROLOG
-	return ( replace( pos_, size_, replacement.c_str(), replacement.get_length() ) );
+	return ( replace( pos_, size_, EXT_MEM( replacement ), replacement.get_length() ) );
 	M_EPILOG
 }
 
@@ -1080,7 +1097,7 @@ HString& HString::replace( int long pos_, int long size_, HString const& replace
 	if ( offset_ < 0 ) {
 		M_THROW( _errMsgHString_[string_helper::BAD_OFFSET], offset_ );
 	}
-	return ( replace( pos_, size_, replacement.c_str() + offset_, len_ ) );
+	return ( replace( pos_, size_, EXT_MEM( replacement ) + offset_, len_ ) );
 	M_EPILOG
 }
 
@@ -1357,7 +1374,7 @@ HString& HString::erase( int long from_, int long length_ ) {
 
 HString& HString::insert( int long from_, HString const& str_ ) {
 	M_PROLOG
-	return ( insert( from_, str_.get_length(), str_.c_str() ) );
+	return ( insert( from_, str_.get_length(), EXT_MEM( str_ ) ) );
 	M_EPILOG
 }
 
@@ -1414,7 +1431,7 @@ HString& HString::insert( int long from_, int long length_, char char_ ) {
 
 HString& HString::append( HString const& str_ ) {
 	M_PROLOG
-	return ( append( str_.c_str(), str_.get_length() ) );
+	return ( append( EXT_MEM( str_ ), str_.get_length() ) );
 	M_EPILOG
 }
 
@@ -1431,7 +1448,7 @@ HString& HString::append( HString const& str_, int long idx_, int long len_ ) {
 	}
 	if ( ( len_ > 0 ) && ( idx_ < str_.get_length() ) ) {
 		append(
-			str_.c_str() + ( idx_ >= 0 ? idx_ : 0 ),
+			EXT_MEM( str_ ) + ( idx_ >= 0 ? idx_ : 0 ),
 			( ( idx_ + len_ ) < str_.get_length() ) ? len_ : str_.get_length() - idx_
 		);
 	}
@@ -1827,6 +1844,10 @@ int long HUTF8String::byte_count( void ) const {
 
 int long HUTF8String::character_count( void ) const {
 	return ( _characterCount );
+}
+
+int HUTF8String::rank( void ) const {
+	return ( _ptr ? _meta->_rank : 0 );
 }
 
 HUTF8String::HIterator HUTF8String::begin( void ) const {

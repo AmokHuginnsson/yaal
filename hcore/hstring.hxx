@@ -97,6 +97,8 @@ struct CHARACTER_CLASS {
 };
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const* _characterClass_[];
 
+class HUTF8String;
+
 /*! \brief Implementation of high level string operations.
  */
 class HString final {
@@ -161,6 +163,11 @@ public:
 	 * Used in copy-on-write implementation.
 	 */
 	void materialize( void );
+	/*! \brief Construct string based on UTF-8 string.
+	 *
+	 * str - an UTF-8 encoded string.
+	 */
+	HString( HUTF8String const& str );
 	/*! \brief Construct string based on raw old style C string.
 	 *
 	 * str - old style C string to base new HString on.
@@ -885,6 +892,7 @@ public:
 	bool empty( void ) const;
 	int long byte_count( void ) const;
 	int long character_count( void ) const;
+	int rank( void ) const;
 	void assign( HString const& );
 	void assign( HString::const_iterator, HString::const_iterator );
 	void reset( void );
