@@ -123,7 +123,8 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& d
 	dbLink_._conn = mySQL = mysql_init( nullptr );
 	if ( mySQL ) {
 		int unsigned protocol( MYSQL_PROTOCOL_SOCKET );
-		if ( ! ( mysql_options( mySQL, MYSQL_OPT_PROTOCOL, &protocol ) || mysql_options( mySQL, MYSQL_SET_CHARSET_NAME, _clientCharacterSet_.c_str() ) ) ) {
+		HUTF8String utf8( _clientCharacterSet_ );
+		if ( ! ( mysql_options( mySQL, MYSQL_OPT_PROTOCOL, &protocol ) || mysql_options( mySQL, MYSQL_SET_CHARSET_NAME, utf8.x_str() ) ) ) {
 			HUTF8String dataBase( dataBase_ );
 			HUTF8String login( login_ );
 			HUTF8String password( password_ );

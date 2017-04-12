@@ -1611,20 +1611,20 @@ HUTF8String::HUTF8String( char const* str_ )
 	int characterCount( 0 );
 	char const* p( str_ );
 	int charBytesLeft( 0 );
-	int rank( 1 );
+	int r( 1 );
 	while( p && *p ) {
 		if ( charBytesLeft == 0 ) {
 			if ( ! ( *p & utf8::ENC_1_BYTES_MARK_MASK ) ) {
 				++ characterCount;
 			} else if ( ( *p & utf8::ENC_2_BYTES_MARK_MASK ) == utf8::ENC_2_BYTES_MARK_VALUE ) {
 				charBytesLeft = 1;
-				rank = max( rank, 2 );
+				r = max( r, 2 );
 			} else if ( ( *p & utf8::ENC_3_BYTES_MARK_MASK ) == utf8::ENC_3_BYTES_MARK_VALUE ) {
 				charBytesLeft = 2;
-				rank = max( rank, 3 );
+				r = max( r, 3 );
 			} else if ( ( *p & utf8::ENC_4_BYTES_MARK_MASK ) == utf8::ENC_4_BYTES_MARK_VALUE ) {
 				charBytesLeft = 3;
-				rank = max( rank, 3 );
+				r = max( r, 3 );
 			} else {
 				throw HUTF8StringException( "Invalid UTF-8 head sequence at: "_ys.append( byteCount ) );
 			}
@@ -1644,7 +1644,7 @@ HUTF8String::HUTF8String( char const* str_ )
 	if ( byteCount > 0 ) {
 		alloc( byteCount );
 		_meta->_used = byteCount;
-		_meta->_rank = static_cast<i8_t>( rank );
+		_meta->_rank = static_cast<i8_t>( r );
 		_byteCount = byteCount;
 		_characterCount = characterCount;
 		::strncpy( _ptr + sizeof ( OBufferMeta ), str_, static_cast<size_t>( byteCount ) );

@@ -68,7 +68,8 @@ public:
 	static HHuginn::value_t env( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "OperatingSystem.env", values_, { HHuginn::TYPE::STRING }, position_ );
-		char const* val( ::getenv( get_string( values_[0] ).c_str() ) );
+		HUTF8String utf8(  get_string( values_[0] ) );
+		char const* val( ::getenv( utf8.x_str() ) );
 		HRuntime& rt( thread_->runtime() );
 		return ( val ? rt.object_factory()->create_string( val ) : rt.none_value() );
 		M_EPILOG
@@ -82,9 +83,13 @@ public:
 		HResource<char*[]> argvHolder( new char*[argc + 1] );
 		char** argv( argvHolder.get() );
 		argv[argc] = nullptr;
+		typedef yaal::hcore::HArray<HUTF8String> utf8_strings_t;
+		utf8_strings_t argvDataHolder;
+		argvDataHolder.reserve( argc );
 		for ( int i( 0 ); i < argc; ++ i ) {
 			verify_arg_type( name, values_, i, HHuginn::TYPE::STRING, argc == 1 ? ARITY::UNARY : ARITY::MULTIPLE, position_ );
-			argv[i] = const_cast<char*>( get_string( values_[i] ).c_str() );
+			argvDataHolder.emplace_back( get_string( values_[i] ) );
+			argv[i] = const_cast<char*>( argvDataHolder.back().x_str() );
 		}
 		::execvp( argv[0], argv );
 		thread_->raise( static_cast<HOperatingSystem*>( object_->raw() )->_exceptionClass.raw(), strerror( errno ), position_ );

@@ -325,7 +325,7 @@ private:
 					.append( "]' throws `" )
 					.append( e.what() ).append( "' in `" )
 					.append( __PRETTY_FUNCTION__ )
-					.append( "'." ).c_str()
+					.append( "'." )
 			);
 		} catch ( ... ) {
 			kill_interior(
@@ -335,7 +335,7 @@ private:
 					.append( type_ )
 					.append( "]' throws in `" )
 					.append( __PRETTY_FUNCTION__ )
-					.append("'." ).c_str()
+					.append("'." )
 			);
 		}
 	}

@@ -163,12 +163,10 @@ HString demangle( char const* symbolName_ ) {
 	return ( symbol );
 }
 
-void kill_interior( char const* msg_ ) {
+void kill_interior( yaal::hcore::HString const& msg_ ) {
 	yaal::_isKilled_ = true;
-	if ( msg_ ) {
-		hcore::log << "FATAL ERROR: " << msg_ << endl;
-		cerr << "FATAL ERROR: " << msg_ << endl;
-	}
+	hcore::log << "FATAL ERROR: " << msg_ << endl;
+	cerr << "FATAL ERROR: " << msg_ << endl;
 #ifndef NDEBUG
 	if ( _debugLevel_ >= DEBUG_LEVEL::ABORT_ON_ASSERT ) {
 		::abort();

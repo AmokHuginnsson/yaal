@@ -57,8 +57,9 @@ using namespace des;
 
 HDes::HDes( HString const& password_ ) {
 	flush_keys();
-	generate_keys( reinterpret_cast<u8_t const*>( password_.c_str() ),
-			static_cast<int>( password_.get_length() ) );
+	HUTF8String utf8( password_ );
+	generate_keys( reinterpret_cast<u8_t const*>( utf8.x_str() ),
+			static_cast<int>( utf8.byte_count() ) );
 	return;
 }
 

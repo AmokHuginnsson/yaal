@@ -476,8 +476,7 @@ void HNumber::from_string( HString const& number_ ) {
 	/* ! - represent known but invalid character, ? - represent unknown character */
 	integer_t start( static_cast<integer_t>( number_.find_one_of( VALID_CHARACTERS ) ) );
 	M_ENSURE( start != HString::npos ); /* exclude "!!!!" */
-	char const* src = number_.c_str();
-	_negative = ( src[ start ] == VALID_CHARACTERS[ A_MINUS ] ); /* "!!!-???" */
+	_negative = ( number_[ start ] == VALID_CHARACTERS[ A_MINUS ] ); /* "!!!-???" */
 	if ( _negative ) {
 		++ start;
 	}
@@ -520,14 +519,14 @@ void HNumber::from_string( HString const& number_ ) {
 			int digitInLeaf( 0 );
 			if ( dot != HString::npos ) { /* scan fractional part */
 				idx = _integralPartSize;
-				for ( integer_t i( dot + 1 ); i < end; ++ i, ++ digitInLeaf ) {
-					M_ASSERT( src[ i ] >= VALID_CHARACTERS[ A_ZERO ] );
+				for ( HString::const_iterator it( number_.begin() + dot + 1 ), endIt( number_.begin() + end ); it != endIt; ++ it, ++ digitInLeaf ) {
+					M_ASSERT( *it >= VALID_CHARACTERS[ A_ZERO ] );
 					if ( digitInLeaf == DECIMAL_DIGITS_IN_LEAF_CONST ) {
 						dst[idx ++] = leaf;
 						digitInLeaf = 0;
 						leaf = 0;
 					}
-					leaf += ( ( src[ i ] - VALID_CHARACTERS[ A_ZERO ] ) * DECIMAL_SHIFT[ ( DECIMAL_DIGITS_IN_LEAF_CONST - digitInLeaf ) - 1 ] );
+					leaf += ( ( *it - VALID_CHARACTERS[ A_ZERO ] ) * DECIMAL_SHIFT[ ( DECIMAL_DIGITS_IN_LEAF_CONST - digitInLeaf ) - 1 ] );
 				}
 				if ( idx < _leafCount ) {
 					dst[idx] = leaf;
@@ -537,15 +536,17 @@ void HNumber::from_string( HString const& number_ ) {
 				idx = _integralPartSize - 1;
 				leaf = 0;
 				digitInLeaf = 0;
-				for ( integer_t i( ( dot != HString::npos ? dot : end ) - 1 ); i >= start; -- i, ++ digitInLeaf ) {
-					M_ASSERT( src[ i ] >= VALID_CHARACTERS[ A_ZERO ] );
+				integer_t lastIntDigIdx( ( dot != HString::npos ? dot : end ) - 1 );
+				HString::const_iterator it( number_.begin() + lastIntDigIdx );
+				for ( integer_t i( lastIntDigIdx ); i >= start; -- i, -- it, ++ digitInLeaf ) {
+					M_ASSERT( *it >= VALID_CHARACTERS[ A_ZERO ] );
 					if ( digitInLeaf == DECIMAL_DIGITS_IN_LEAF_CONST ) {
 						M_ASSERT( idx >= 0 );
 						dst[idx --] = leaf;
 						digitInLeaf = 0;
 						leaf = 0;
 					}
-					leaf += ( ( src[ i ] - VALID_CHARACTERS[ A_ZERO ] ) * DECIMAL_SHIFT[ digitInLeaf ] );
+					leaf += ( ( *it - VALID_CHARACTERS[ A_ZERO ] ) * DECIMAL_SHIFT[ digitInLeaf ] );
 				}
 				if ( idx >= 0 ) {
 					dst[idx] = leaf;

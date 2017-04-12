@@ -206,18 +206,18 @@ Copyright:
 #define M_DESTRUCTOR_EPILOG } \
 	catch ( yaal::hcore::HException& e ) { \
 		e.log( __FILE__, __LINE__, __PRETTY_FUNCTION__ ); \
-		yaal::hcore::kill_interior( ( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": destructor of `" + yaal::hcore::type_name( this ) + "' throws `" + e.what() + "' in `" + __PRETTY_FUNCTION__ + "'." ).c_str() ); \
+		yaal::hcore::kill_interior( yaal::hcore::HString( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": destructor of `" ).append( yaal::hcore::type_name( this ) ).append( "' throws `" ).append( e.what() ).append( "' in `" ).append( __PRETTY_FUNCTION__ ).append( "'." ) ); \
 	} catch ( ... ) { \
-		yaal::hcore::kill_interior( ( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": destructor of `" + yaal::hcore::type_name( this ) + "' throws in `" + __PRETTY_FUNCTION__ + "'." ).c_str() ); \
+		yaal::hcore::kill_interior( yaal::hcore::HString( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": destructor of `" ).append( yaal::hcore::type_name( this ) ).append( "' throws in `" ).append( __PRETTY_FUNCTION__ ).append( "'." ) ); \
 	}
 #define M_SAFE( code ) do { \
 	try { \
 		code; \
 	} catch ( yaal::hcore::HException& e ) { \
 		e.log( __FILE__, __LINE__, __PRETTY_FUNCTION__ ); \
-		yaal::hcore::kill_interior( ( yaal::hcore::HString( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": `" #code "' throws `" ) + e.what() + "' in `" + __PRETTY_FUNCTION__ + "'." ).c_str() ); \
+		yaal::hcore::kill_interior( yaal::hcore::HString( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": `" #code "' throws `" ).append( e.what() ).append( "' in `" ).append( __PRETTY_FUNCTION__ ).append( "'." ) ); \
 	} catch ( ... ) { \
-		yaal::hcore::kill_interior( ( yaal::hcore::HString( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": `" #code "' throws in `" ) + __PRETTY_FUNCTION__ + "'." ).c_str() ); \
+		yaal::hcore::kill_interior( yaal::hcore::HString( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": `" #code "' throws in `" ).append( __PRETTY_FUNCTION__ ).append( "'." ) ); \
 	} \
 } while ( 0 )
 /*! \brief Last statement in <tt>int main( int, char** )</tt>.

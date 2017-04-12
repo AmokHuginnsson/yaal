@@ -42,6 +42,7 @@ class HStream : public HHuginn::HIterable {
 	yaal::hcore::HStreamInterface::ptr_t _stream;
 	yaal::hcore::HChunk _buffer;
 	yaal::hcore::HString _lineBuffer;
+	yaal::hcore::HUTF8String _converter;
 public:
 	HStream( HHuginn::HClass const*, yaal::hcore::HStreamInterface::ptr_t );
 	static HHuginn::value_t read( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );

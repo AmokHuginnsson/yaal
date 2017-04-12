@@ -95,7 +95,8 @@ HStream::HStream( HHuginn::HClass const* class_, HStreamInterface::ptr_t stream_
 	: HIterable( class_ )
 	, _stream( stream_ )
 	, _buffer()
-	, _lineBuffer() {
+	, _lineBuffer()
+	, _converter() {
 	return;
 }
 
@@ -138,7 +139,8 @@ HString HStream::read_impl( int long size_ ) {
 
 void HStream::write_impl( HString const& val_ ) {
 	M_PROLOG
-	_stream->write( val_.c_str(), val_.get_length() );
+	_converter = val_;
+	_stream->write( _converter.x_str(), _converter.byte_count() );
 	M_EPILOG
 }
 

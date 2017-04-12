@@ -30,6 +30,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcruddescriptor.hxx"
 #include "hdatabase.hxx"
 #include "tools/stringalgo.hxx"
+#include "hcore/hformat.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -124,7 +125,7 @@ void HCRUDDescriptor::build_query( MODE mode_ ) {
 	_query.reset();
 	switch ( mode_ ) {
 		case ( MODE::READ ): {
-			_SQL.format( "SELECT %s FROM %s", _columns.c_str(), _table.c_str() );
+			_SQL = format( "SELECT %s FROM %s", _columns, _table );
 			OFilter const& readFilter( _filter[static_cast<int>( MODE::READ )] );
 			if ( readFilter._condition != OFilter::CONDITION::NONE ) {
 				_SQL.append( " WHERE " ).append( readFilter._column ).append( cond_to_str( readFilter._condition ) );

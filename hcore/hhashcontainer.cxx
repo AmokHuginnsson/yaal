@@ -45,12 +45,10 @@ int long const x_tag_g_pulPrimes[ 32 ] = {
 
 template<>
 int long hash<HString>::operator () ( HString const& string_ ) const {
-	char const* buffer( string_.c_str() );
-	int long size( string_.get_length() );
 	int long h( 0 );
-	while ( size -- ) {
-		h += buffer[ size ];
-		h <<= 3;
+	for ( char c : string_ ) {
+		h *= 101;
+		h += c;
 	}
 	return ( h );
 }

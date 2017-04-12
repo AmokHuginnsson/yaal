@@ -197,7 +197,7 @@ public:
 	}
 };
 
-void kill_interior( char const* = nullptr );
+void kill_interior( yaal::hcore::HString const& );
 
 /*
  * A,     AE,      AE = ET<A, E>

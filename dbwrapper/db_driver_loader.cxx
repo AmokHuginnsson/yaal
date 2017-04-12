@@ -68,7 +68,7 @@ void dbwrapper_error( void ) {
 	HString message;
 	message = HPlugin().error_message( 0 );
 	log( LOG_LEVEL::ERROR ) << message << endl;
-	::fprintf( stderr, "(%s), ", message.c_str() );
+	cerr << "(" << message << "), ";
 	return;
 	M_EPILOG
 }
