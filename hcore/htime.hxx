@@ -97,7 +97,7 @@ private:
 	i64_t _value;
 	tm _broken;
 	TZ _tz;
-	HString _format;
+	HUTF8String _format;
 	mutable HChunk _cache;
 public:
 	/*! \brief Construct HTime object based on current moment in time.
@@ -123,7 +123,7 @@ public:
 	HTime& set_tz( TZ );
 	HTime& set_now( void );
 	HTime& set( i64_t );
-	HTime& set_format( char const* = _iso8601DateTimeFormat_ );
+	HTime& set_format( HUTF8String const& = _iso8601DateTimeFormat_ );
 	HTime& set_time( int = 0, int = 0, int = 0 );
 	HTime& set_date( int, int = 1, int = 1 );
 	HTime& set_datetime( int, int = 1, int = 1, int = 0, int = 0, int = 0 );
@@ -154,7 +154,7 @@ public:
 	bool operator < ( HTime const& ) const;
 	bool operator > ( HTime const& ) const;
 	HString string( void ) const;
-	HString to_string( HString const& = HString() ) const;
+	HString to_string( HUTF8String const& = HUTF8String() ) const;
 	i64_t raw( void ) const;
 };
 

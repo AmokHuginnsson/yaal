@@ -487,7 +487,8 @@ int HProgramOptionsHandler::process_rc_file( HString const& section_, RC_CALLBAC
 							value.assign( "[" ).append( section_ ).append( "]" );
 							if ( option == value ) {
 								if ( _debugLevel_ >= DEBUG_LEVEL::DEBUG_MESSAGES ) {
-									cerr << "section: [" << option << "]" << endl;
+									HUTF8String utf8( option );
+									::fprintf( stderr, "section: [%s]\n", utf8.x_str() );
 								}
 								log << "section: " << section_ << ", ";
 								section = true;
@@ -514,10 +515,11 @@ int HProgramOptionsHandler::process_rc_file( HString const& section_, RC_CALLBAC
 							log << "failed." << endl;
 						}
 						message.format( "Error: unknown option found: `%s', "
-									"with value: `%s', on line %d.",
+									"with value: `%s', on line %d.\n",
 									option.c_str(), value.c_str(), line );
-						log( LOG_LEVEL::ERROR ) << message << endl;
-						cerr << message << endl;
+						log( LOG_LEVEL::ERROR ) << message;
+						HUTF8String utf8( message );
+						::fputs( utf8.x_str(), stderr );
 					}
 				}
 			}
@@ -712,7 +714,9 @@ void HProgramOptionsHandler::set_option( HOption& option_, HString const& value_
 		} else {
 			name = static_cast<char>( option_.short_form() );
 		}
-		cerr << "option: [" << name << "], value [" << value <<  "]" << endl;
+		HUTF8String utf8Name( name );
+		HUTF8String utf8Value( value );
+		::fprintf( stderr, "option: [%s], value [%s]\n", utf8Name.x_str(), utf8Value.x_str() );
 	}
 	if ( option_.value_id() ) {
 		if ( option_.switch_type() == HOption::ARGUMENT::NONE ) {

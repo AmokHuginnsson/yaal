@@ -105,14 +105,17 @@ void set_env( HString const& name_, HString const& value_, bool overwrite_ ) {
 	M_PROLOG
 	int const TRUE = 1;
 	int const FALSE = 0;
-	M_ENSURE( ::setenv( name_.c_str(), value_.c_str(), overwrite_ ? TRUE : FALSE ) == 0 );
+	HUTF8String name( name_ );
+	HUTF8String value( value_ );
+	M_ENSURE( ::setenv( name.x_str(), value.x_str(), overwrite_ ? TRUE : FALSE ) == 0 );
 	return;
 	M_EPILOG
 }
 
 void unset_env( HString const& name_ ) {
 	M_PROLOG
-	M_ENSURE( ::unsetenv( name_.c_str() ) == 0 );
+	HUTF8String utf8( name_ );
+	M_ENSURE( ::unsetenv( utf8.x_str() ) == 0 );
 	return;
 	M_EPILOG
 }
@@ -144,8 +147,9 @@ namespace {
 double long std_strtold( HString const& str_, int* endIdx_ ) {
 	char* endPtr( nullptr );
 	double long value( ::strtold( str_.c_str(), &endPtr ) );
-	if ( endIdx_ )
+	if ( endIdx_ ) {
 		*endIdx_ = static_cast<int>( endPtr - str_.c_str() );
+	}
 	return ( value );
 }
 
@@ -245,7 +249,8 @@ void ensure_limit( int resource_, char const* message_, bool autoSanity_ ) {
 		} else {
 			HString message( message_ );
 			message.append( " - bailing out" );
-			::perror( message.c_str() );
+			HUTF8String utf8( message );
+			::perror( utf8.x_str() );
 			::exit( 1 );
 		}
 	}

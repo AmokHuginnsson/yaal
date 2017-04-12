@@ -1831,11 +1831,11 @@ bool HUTF8String::empty( void ) const {
 
 char const* HUTF8String::x_str( void ) const {
 	M_ASSERT( ! _ptr || ( ( _offset + _byteCount ) == _meta->_used ) );
-	return ( _ptr ? _ptr + sizeof ( OBufferMeta ) + _offset : nullptr );
+	return ( _ptr ? _ptr + sizeof ( OBufferMeta ) + _offset : "" );
 }
 
 char const* HUTF8String::raw( void ) const {
-	return ( _ptr ? _ptr + sizeof ( OBufferMeta ) + _offset : nullptr );
+	return ( _ptr ? _ptr + sizeof ( OBufferMeta ) + _offset : "" );
 }
 
 int long HUTF8String::byte_count( void ) const {
