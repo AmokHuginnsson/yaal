@@ -1800,8 +1800,8 @@ void HUTF8String::assign( HString::const_iterator it_, HString::const_iterator e
 	if ( byteCount > 0 ) {
 		alloc( byteCount );
 		char* p( _ptr + sizeof ( OBufferMeta ) );
-		for ( ; it_ != end_; ++ it_ ) {
-			utf8::encode( static_cast<u8_t>( *it_), p ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
+		for ( HString::const_iterator it( it_ ); it != end_; ++ it ) {
+			utf8::encode( static_cast<u8_t>( *it ), p ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
 		}
 	}
 	if ( _ptr ) {
@@ -1883,10 +1883,22 @@ HUTF8String::reverse_iterator HUTF8String::crend( void ) const {
 }
 
 HUTF8String HUTF8String::substr( int long from_, int long len_ ) const {
+	if ( len_ == HString::npos ) {
+		len_ = HString::MAX_STRING_LENGTH;
+	}
+	if ( from_ < 0 ) {
+		from_ = 0;
+	}
+	if ( ( len_ + from_ ) > _characterCount ) {
+		len_ = _characterCount - from_;
+	}
+	if ( from_ >= _characterCount ) {
+		from_ = 0;
+		len_ = 0;
+	}
 	HIterator it( begin() );
 	it += from_;
-	HIterator endIt( it );
-	endIt += len_;
+	HIterator endIt( len_ < ( _characterCount - from_ ) ? it + len_ : end() );
 	HUTF8String s( *this );
 	s._offset = it._byteIndex;
 	s._byteCount = endIt._byteIndex - it._byteIndex;
