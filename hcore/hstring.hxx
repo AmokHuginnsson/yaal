@@ -874,6 +874,7 @@ public:
 	HUTF8String( void );
 	HUTF8String( HString const& );
 	HUTF8String( char const* );
+	HUTF8String( const_iterator, const_iterator );
 	HUTF8String( HString::const_iterator, HString::const_iterator );
 	HUTF8String( HUTF8String const& );
 	HUTF8String( HUTF8String&& );

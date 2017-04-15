@@ -1653,6 +1653,21 @@ HUTF8String::HUTF8String( char const* str_ )
 	M_EPILOG
 }
 
+HUTF8String::HUTF8String( const_iterator beg_, const_iterator end_ )
+	: HUTF8String() {
+	M_PROLOG
+	M_ASSERT( beg_._ptr == end_._ptr );
+	if ( beg_._ptr ) {
+		_ptr = beg_._ptr;
+		++ _meta->_refCount;
+		_characterCount = end_._characterIndex - beg_._characterIndex;
+		_offset = beg_._byteIndex;
+		_byteCount = end_._byteIndex - beg_._byteIndex;
+	}
+	return;
+	M_EPILOG
+}
+
 HUTF8String::HUTF8String( HUTF8String const& str_ )
 	: _characterCount( str_._characterCount )
 	, _offset( str_._offset )
