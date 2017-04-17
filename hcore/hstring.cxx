@@ -41,7 +41,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hchunk.hxx"
 #include "hcore.hxx"
 #include "safe_int.hxx"
-#include "numeric.hxx"
+#include "utf8.hxx"
 
 namespace yaal {
 
@@ -68,8 +68,8 @@ int long kmpcasesearch( char const*, int long, char const*, int long );
 
 }
 
-bool HCharacterClass::has( char char_ ) const {
-	return ( ::memchr( _data, char_, static_cast<size_t>( _size ) ) != nullptr );
+bool HCharacterClass::has( u32_t char_ ) const {
+	return ( ( char_ < 256 ) && ( ::memchr( _data, static_cast<u8_t>( char_ ), static_cast<size_t>( _size ) ) != nullptr ) );
 }
 
 #undef D_WHITE_SPACE
@@ -1524,62 +1524,19 @@ void HString::HCharRef::swap( HCharRef& charRef_ ) {
 	M_EPILOG
 }
 
-namespace utf8 {
-
-static u8_t ENC_1_BYTES_MARK_MASK(  meta::obinary<010000000>::value );
-
-static u8_t ENC_2_BYTES_MARK_VALUE( meta::obinary<011000000>::value );
-static u8_t ENC_2_BYTES_VALUE_MASK( meta::obinary<000011111>::value );
-static u8_t ENC_2_BYTES_MARK_MASK(  meta::obinary<011100000>::value );
-
-static u8_t ENC_3_BYTES_MARK_VALUE( meta::obinary<011100000>::value );
-static u8_t ENC_3_BYTES_VALUE_MASK( meta::obinary<000001111>::value );
-static u8_t ENC_3_BYTES_MARK_MASK(  meta::obinary<011110000>::value );
-
-static u8_t ENC_4_BYTES_MARK_VALUE( meta::obinary<011110000>::value );
-static u8_t ENC_4_BYTES_VALUE_MASK( meta::obinary<000000111>::value );
-static u8_t ENC_4_BYTES_MARK_MASK(  meta::obinary<011111000>::value );
-
-static u8_t TAIL_BYTES_MARK_VALUE(  meta::obinary<010000000>::value );
-static u8_t TAIL_BYTES_VALUE_MASK(  meta::obinary<000111111>::value );
-static u8_t TAIL_BYTES_MARK_MASK(   meta::obinary<011000000>::value );
-
-static u32_t MAX_1_BYTE_CODE_POINT( 0x00007f );
-static u32_t MAX_2_BYTE_CODE_POINT( 0x0007ff );
-static u32_t MAX_3_BYTE_CODE_POINT( 0x00ffff );
-static u32_t MAX_4_BYTE_CODE_POINT( 0x10ffff );
-
-inline int rank( u32_t value_ ) {
-	int r( 0 );
-	if ( value_ <= MAX_1_BYTE_CODE_POINT ) {
-		r = 1;
-	} else if ( value_ <= MAX_2_BYTE_CODE_POINT ) {
-		r = 2;
-	} else if ( value_ <= MAX_3_BYTE_CODE_POINT ) {
-		r = 3;
-	} else if ( value_ <= MAX_4_BYTE_CODE_POINT ) {
-		r = 4;
-	} else {
-		throw HOutOfRangeException( "Unicode code point is out of range: "_ys.append( value_ ) );
-	}
-	return ( r );
-}
-
 namespace {
 
 void encode( u32_t codePoint_, char*& dest_ ) {
-	int r( rank( codePoint_ ) );
+	int r( utf8::rank( codePoint_ ) );
 	dest_ += r;
 	char* p( dest_ - 1 );
-	u8_t head[] = { 0, 0, ENC_2_BYTES_MARK_VALUE, ENC_3_BYTES_MARK_VALUE, ENC_4_BYTES_MARK_VALUE };
+	u8_t head[] = { 0, 0, utf8::ENC_2_BYTES_MARK_VALUE, utf8::ENC_3_BYTES_MARK_VALUE, utf8::ENC_4_BYTES_MARK_VALUE };
 	switch( r ) {
-		case ( 4 ): { *p = static_cast<char>( TAIL_BYTES_MARK_VALUE | ( TAIL_BYTES_VALUE_MASK & codePoint_ ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
-		case ( 3 ): { *p = static_cast<char>( TAIL_BYTES_MARK_VALUE | ( TAIL_BYTES_VALUE_MASK & codePoint_ ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
-		case ( 2 ): { *p = static_cast<char>( TAIL_BYTES_MARK_VALUE | ( TAIL_BYTES_VALUE_MASK & codePoint_ ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
+		case ( 4 ): { *p = static_cast<char>( utf8::TAIL_BYTES_MARK_VALUE | ( utf8::TAIL_BYTES_VALUE_MASK & codePoint_ ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
+		case ( 3 ): { *p = static_cast<char>( utf8::TAIL_BYTES_MARK_VALUE | ( utf8::TAIL_BYTES_VALUE_MASK & codePoint_ ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
+		case ( 2 ): { *p = static_cast<char>( utf8::TAIL_BYTES_MARK_VALUE | ( utf8::TAIL_BYTES_VALUE_MASK & codePoint_ ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
 		case ( 1 ): { *p = static_cast<char>( head[r] | codePoint_ ); } /* no break - fall through */
 	}
-}
-
 }
 
 }
@@ -1624,7 +1581,7 @@ HUTF8String::HUTF8String( char const* str_ )
 				r = max( r, 3 );
 			} else if ( ( *p & utf8::ENC_4_BYTES_MARK_MASK ) == utf8::ENC_4_BYTES_MARK_VALUE ) {
 				charBytesLeft = 3;
-				r = max( r, 3 );
+				r = max( r, 4 );
 			} else {
 				throw HUTF8StringException( "Invalid UTF-8 head sequence at: "_ys.append( byteCount ) );
 			}
@@ -1816,7 +1773,7 @@ void HUTF8String::assign( HString::const_iterator it_, HString::const_iterator e
 		alloc( byteCount );
 		char* p( _ptr + sizeof ( OBufferMeta ) );
 		for ( HString::const_iterator it( it_ ); it != end_; ++ it ) {
-			utf8::encode( static_cast<u8_t>( *it ), p ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
+			encode( static_cast<u8_t>( *it ), p ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
 		}
 	}
 	if ( _ptr ) {
@@ -1935,7 +1892,7 @@ bool operator != ( char const* left_, HUTF8String const& right_ ) {
 
 HUTF8String::HIterator::HIterator( void )
 	: _ptr( nullptr )
-	, _characterIndex( 0 )
+	, _characterIndex( -1 )
 	, _byteIndex( 0 ) {
 	return;
 }
@@ -1979,18 +1936,22 @@ HUTF8String::HIterator::~HIterator( void ) {
 }
 
 HUTF8String::HIterator& HUTF8String::HIterator::operator = ( HIterator const& other_ ) {
+	M_PROLOG
 	reset();
 	if ( other_._ptr ) {
 		HIterator tmp( other_ );
 		swap( tmp );
 	}
 	return ( *this );
+	M_EPILOG
 }
 
 HUTF8String::HIterator& HUTF8String::HIterator::operator = ( HIterator&& other_ ) {
+	M_PROLOG
 	swap( other_ );
 	other_.reset();
 	return ( *this );
+	M_EPILOG
 }
 
 void HUTF8String::HIterator::swap( HIterator& other_ ) {
@@ -2010,6 +1971,7 @@ void HUTF8String::HIterator::reset( void ) {
 			memory::free( _ptr );
 		}
 	}
+	_ptr = nullptr;
 	_byteIndex = 0;
 	_characterIndex = 0;
 	return;
@@ -2283,37 +2245,36 @@ double long stold( HString const& str_, int* endIdx_ ) {
 	return ( hcore::strtold( str_, endIdx_ ) );
 }
 
-bool is_whitespace( char char_ ) {
+bool is_whitespace( u32_t char_ ) {
 	return ( _whiteSpace_.has( char_ ) );
 }
 
-bool is_digit( char char_ ) {
+bool is_digit( u32_t char_ ) {
 	return ( _digit_.has( char_ ) );
 }
 
-bool is_dec_digit( char char_ ) {
+bool is_dec_digit( u32_t char_ ) {
 	return ( _digit_.has( char_ ) );
 }
 
-bool is_hex_digit( char char_ ) {
+bool is_hex_digit( u32_t char_ ) {
 	return ( _hexDigit_.has( char_ ) );
 }
 
-bool is_oct_digit( char char_ ) {
+bool is_oct_digit( u32_t char_ ) {
 	return ( _octDigit_.has( char_ ) );
 }
 
-bool is_bin_digit( char char_ ) {
+bool is_bin_digit( u32_t char_ ) {
 	return ( _binDigit_.has( char_ ) );
 }
 
-bool is_letter( char char_ ) {
+bool is_letter( u32_t char_ ) {
 	return ( _letter_.has( char_ ) );
 }
 
-bool is_alpha( char char_ ) {
-	char unsigned c( static_cast<char unsigned>( char_ ) );
-	return ( ( c > ' ' ) && ( c <= 127 ) );
+bool is_alpha( u32_t char_ ) {
+	return ( ( char_ > ' ' ) && ( char_ <= 127 ) );
 }
 
 namespace string_helper {

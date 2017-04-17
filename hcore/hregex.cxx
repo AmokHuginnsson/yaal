@@ -37,6 +37,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hregex.hxx"
 #include "harray.hxx"
 #include "hchunk.hxx"
+#include "utf8.hxx"
 
 namespace yaal {
 
@@ -75,7 +76,8 @@ HRegex::HRegex( void )
 	, _impl( nullptr )
 	, _extra( nullptr )
 	, _lastError( 0 )
-	, _errorMessage() {
+	, _errorMessage()
+	, _utf8ConversionCache() {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -87,7 +89,8 @@ HRegex::HRegex( HRegex&& reg_ )
 	, _impl( yaal::move( reg_._impl ) )
 	, _extra( yaal::move( reg_._extra ) )
 	, _lastError( reg_._lastError )
-	, _errorMessage( yaal::move( reg_._errorMessage ) ) {
+	, _errorMessage( yaal::move( reg_._errorMessage ) )
+	, _utf8ConversionCache( yaal::move( reg_._utf8ConversionCache ) ) {
 	M_PROLOG
 	reg_._extra = nullptr;
 	reg_._impl = nullptr;
@@ -103,7 +106,8 @@ HRegex::HRegex( HString const& pattern_, compile_t flags_ )
 	, _impl( nullptr )
 	, _extra( nullptr )
 	, _lastError( 0 )
-	, _errorMessage() {
+	, _errorMessage()
+	, _utf8ConversionCache() {
 	M_PROLOG
 	compile( pattern_, flags_ );
 	return;
@@ -136,6 +140,7 @@ void HRegex::swap( HRegex& reg_ ) {
 		swap( _extra, reg_._extra );
 		swap( _lastError, reg_._lastError );
 		swap( _errorMessage, reg_._errorMessage );
+		swap( _utf8ConversionCache, reg_._utf8ConversionCache );
 	}
 	return;
 }
@@ -180,12 +185,13 @@ bool HRegex::compile( HString const& pattern_, compile_t flags_ ) {
 	}
 	error_clear();
 	clear();
-	int options( 0 );
+	int options( PCRE_UTF8 );
 	options |= ( ( flags_ & COMPILE::IGNORE_CASE ) ? PCRE_CASELESS : 0 );
 	options |= ( ( flags_ & COMPILE::NEWLINE ) ? PCRE_MULTILINE : 0 );
 	char const* errMsg( nullptr );
 	int offset( 0 );
-	_impl = ::pcre_compile2( pattern_.c_str(), options, &_lastError, &errMsg, &offset, nullptr );
+	_utf8ConversionCache = pattern_;
+	_impl = ::pcre_compile2( _utf8ConversionCache.x_str(), options, &_lastError, &errMsg, &offset, nullptr );
 	if ( ! _lastError ) {
 		_extra = ::pcre_study( static_cast<pcre*>( _impl ), PCRE_STUDY_EXTRA_NEEDED | PCRE_STUDY_JIT_COMPILE, &errMsg );
 		if ( errMsg ) {
@@ -221,30 +227,29 @@ int HRegex::error_code( void ) const {
 	return ( _lastError );
 }
 
-char const* HRegex::matches_impl( char const* string_, int* matchLength_, match_t match_ ) const {
+HUTF8String HRegex::matches_impl( HUTF8String const& str_, int& start_, int& matchLength_, match_t match_ ) const {
 	M_PROLOG
-	M_ASSERT( string_ && matchLength_ );
 	if ( _extra == nullptr ) {
 		throw HRegexException( _errMsgHRegex_[ ERROR::UNINITIALIZED ] );
 	}
-	char const* ptr = nullptr;
-	int matchLength = 0;
-	int match[3] = { -1, -1, -1 };
+	start_ = NO_MATCH;
+	matchLength_ = 0;
+	char const* str( str_.x_str() );
+	int match[3] = { NO_MATCH, NO_MATCH, NO_MATCH };
 	_lastError = ::pcre_exec(
 		static_cast<pcre*>( _impl ),
 		static_cast<pcre_extra*>( _extra ),
-		string_,
-		static_cast<int>( strlen( string_ ) ),
+		str,
+		static_cast<int>( str_.byte_count() ),
 		0,
 		( ( match_ & MATCH::NOT_BEGINNING_OF_LINE ) ? PCRE_NOTBOL : 0 ) | ( ( match_ & MATCH::NOT_END_OF_LINE ) ? PCRE_NOTEOL : 0 ),
 		match, 3
 	);
 	if ( ( _lastError >= 0 ) && ( match[0] >= 0 ) ) {
-		matchLength = static_cast<int>( match[1] - match[0] );
-		ptr = string_ + match[0];
+		start_ = utf8::count_characters( str, match[0] );
+		matchLength_ = utf8::count_characters( str + match[0], static_cast<int>( match[1] - match[0] ) );
 	}
-	( *matchLength_ ) = matchLength;
-	return ( ptr );
+	return ( start_ != NO_MATCH ? str_.substr( start_ + matchLength_ ) : HUTF8String() );
 	M_EPILOG
 }
 
@@ -253,7 +258,7 @@ HRegex::groups_t HRegex::groups_impl( char const* string_, match_t match_ ) cons
 	groups_t g;
 	typedef yaal::hcore::HArray<int> matches_t;
 	int expectedGroupCount( static_cast<int>( count( _pattern.begin(), _pattern.end(), '(' ) + 1 ) );
-	matches_t matchesBuffer( expectedGroupCount * 3, -1 );
+	matches_t matchesBuffer( expectedGroupCount * 3, NO_MATCH );
 	_lastError = ::pcre_exec(
 		static_cast<pcre*>( _impl ),
 		static_cast<pcre_extra*>( _extra ),
@@ -306,7 +311,7 @@ yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, yaal::h
 					++ r;
 				} else {
 					HString idS;
-					while ( ( r != e ) && _digit_.has( *r ) ) {
+					while ( ( r != e ) && _digit_.has( static_cast<u32_t>( *r ) ) ) { /* *TODO* *FIXME* Remove static_cast after UCS in HString is implemented. */
 						idS.append( *r );
 						++ r;
 					}
@@ -344,27 +349,20 @@ yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, replace
 	M_EPILOG
 }
 
-HRegex::HMatchIterator HRegex::find( char const* str_, match_t match_ ) const {
-	M_ASSERT( str_ );
+HRegex::HMatchIterator HRegex::find( HUTF8String const& str_, match_t match_ ) const {
+	_utf8ConversionCache = str_;
+	int start( 0 );
 	int len( 0 );
-	char const* start( matches_impl( str_, &len, match_ ) );
-	HMatchIterator it( this, match_, str_, start ? static_cast<int>( start - str_ ) : -1, len );
+	HUTF8String match( matches_impl( _utf8ConversionCache, start, len, match_ ) );
+	HMatchIterator it( this, match_, match, start, len );
 	return ( it );
 }
 
-HRegex::HMatchIterator HRegex::find( HString const& str_, match_t match_ ) const {
-	return ( find( str_.c_str(), match_ ) );
-}
-
 HRegex::HMatchIterator HRegex::end( void ) const {
-	return ( HMatchIterator( this, MATCH::NONE, nullptr, -1, 0 ) );
+	return ( HMatchIterator( this, MATCH::NONE, HUTF8String(), NO_MATCH, 0 ) );
 }
 
-HRegex::HMatchResult HRegex::matches( char const* str_, match_t match_ ) const {
-	return ( HMatchResult( find( str_, match_ ), end() ) );
-}
-
-HRegex::HMatchResult HRegex::matches( HString const& str_, match_t match_ ) const {
+HRegex::HMatchResult HRegex::matches( HUTF8String const& str_, match_t match_ ) const {
 	return ( HMatchResult( find( str_, match_ ), end() ) );
 }
 
@@ -421,7 +419,7 @@ int HRegex::HMatch::size( void ) const {
 HRegex::HMatchIterator::HMatchIterator(
 	HRegex const* owner_,
 	HRegex::match_t flags_,
-	char const* string_,
+	HUTF8String const& string_,
 	int start_,
 	int len_
 ) : base_type()
@@ -473,9 +471,11 @@ bool HRegex::HMatchIterator::operator == ( HMatchIterator const& mi_ ) const {
 
 HRegex::HMatchIterator& HRegex::HMatchIterator::operator ++ ( void ) {
 	M_PROLOG
-	M_ASSERT( _string && ( _match._start >= 0 ) );
-	char const* match( _owner->matches_impl( _string + _match._start + ( ( _flags & MATCH::OVERLAPPING ) ? 1 : _match._size ), &_match._size, _flags ) );
-	_match._start = match ? static_cast<int>( match - _string ) : -1;
+	M_ASSERT( _match._start != NO_MATCH );
+	int start( NO_MATCH );
+	int matchSize( _match._size );
+	_string = _owner->matches_impl( _string, start, _match._size, _flags );
+	_match._start = start != NO_MATCH ? _match._start + start + matchSize : NO_MATCH;
 	return ( *this );
 	M_EPILOG
 }

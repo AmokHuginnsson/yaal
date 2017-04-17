@@ -66,6 +66,7 @@ public:
 		static M_YAAL_HCORE_PUBLIC_API match_t const OVERLAPPING;
 		static M_YAAL_HCORE_PUBLIC_API match_t const DEFAULT;
 	};
+	static int const NO_MATCH = -1;
 	class HMatchResult;
 	class HMatch;
 	class HMatchIterator;
@@ -81,6 +82,7 @@ private:
 	mutable int _lastError;
 	/* All fields below are conceptually a memory cache. */
 	HString _errorMessage;  /*!< error message of last operation */
+	mutable HUTF8String _utf8ConversionCache;
 public:
 	/*! \brief Create uninitialized regex object.
 	 */
@@ -128,16 +130,14 @@ public:
 	 * Parameter must be raw memory pointer for HMatchIterator returns
 	 * raw memory pointers to input string while dereferenced.
 	 */
-	HMatchIterator find( char const* string_, match_t = MATCH::DEFAULT ) const;
-	HMatchIterator find( HString const& string_, match_t = MATCH::DEFAULT ) const;
+	HMatchIterator find( HUTF8String const& string_, match_t = MATCH::DEFAULT ) const;
 	HMatchIterator end( void ) const;
 	/*! \brief Tell if given string matches regex.
 	 *
 	 * \param string_ - string to check against the regex.
 	 * \return True iff given string matches this regex.
 	 */
-	HMatchResult matches( char const* string_, match_t = MATCH::DEFAULT ) const;
-	HMatchResult matches( HString const& string_, match_t = MATCH::DEFAULT ) const;
+	HMatchResult matches( HUTF8String const& string_, match_t = MATCH::DEFAULT ) const;
 	groups_t groups( char const* string_, match_t = MATCH::DEFAULT ) const;
 	groups_t groups( HString const& string_, match_t = MATCH::DEFAULT ) const;
 	yaal::hcore::HString replace( yaal::hcore::HString const&, yaal::hcore::HString const&, match_t = MATCH::DEFAULT );
@@ -149,7 +149,7 @@ private:
 	HRegex( HRegex const& ) = delete;
 	HRegex& operator = ( HRegex const& ) = delete;
 	void error_clear( void );
-	char const* matches_impl( char const*, int*, match_t ) const;
+	HUTF8String matches_impl( HUTF8String const&, int&, int&, match_t ) const;
 	groups_t groups_impl( char const*, match_t ) const;
 };
 
@@ -171,7 +171,7 @@ private:
 class HRegex::HMatchIterator : public iterator_interface<HMatch, iterator_category::forward> {
 	HRegex const* _owner;
 	HRegex::match_t _flags;
-	char const* _string;
+	HUTF8String _string;
 	HRegex::HMatch _match;
 public:
 	typedef iterator_interface<HMatch, iterator_category::forward> base_type;
@@ -183,7 +183,7 @@ public:
 	HMatchIterator( HMatchIterator const& );
 	HMatchIterator& operator = ( HMatchIterator const& );
 private:
-	HMatchIterator( HRegex const*, match_t, char const*, int, int );
+	HMatchIterator( HRegex const*, match_t, HUTF8String const&, int, int );
 	friend class HRegex;
 };
 

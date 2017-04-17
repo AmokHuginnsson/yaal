@@ -64,10 +64,10 @@ HString& usun_ogonki( HString& string_ ) {
 }
 
 char const* article( char const* word_ ) {
-	while ( ( *word_ != 0 ) && ! _letter_.has( *word_ ) ) {
+	while ( ( *word_ != 0 ) && ! _letter_.has( static_cast<u32_t>( *word_ ) ) ) { /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 		++ word_;
 	}
-	return( *word_ ? ( _vowel_.has( *word_ ) ? "an" : "a" ) : "" );
+	return( *word_ ? ( _vowel_.has( static_cast<u32_t>( *word_ ) ) ? "an" : "a" ) : "" ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 }
 
 char const* article( yaal::hcore::HString const& word_ ) {

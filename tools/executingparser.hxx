@@ -155,7 +155,7 @@ public:
 	}
 	ptr_t clone( void ) const;
 	bool is_optional( void ) const;
-	yaal::hcore::HString::const_iterator parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const;
+	yaal::hcore::HUTF8String::const_iterator parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator ) const;
 	void describe( HRuleDescription&, rule_use_t const& ) const;
 	void detach( HRuleBase const*, visited_t&, bool& );
 	void rule_use( rule_use_t& ) const;
@@ -164,9 +164,9 @@ public:
 	bool has_action( void ) const;
 	bool skips_ws( void ) const;
 	HRuleBase const* find( yaal::hcore::HString const& ) const;
-	static yaal::hcore::HString::const_iterator skip_space( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
+	static yaal::hcore::HUTF8String::const_iterator skip_space( yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator );
 protected:
-	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const = 0;
+	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator ) const = 0;
 	virtual ptr_t do_clone( void ) const = 0;
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual bool do_is_optional( void ) const;
@@ -176,10 +176,10 @@ protected:
 	virtual void do_find_recursions( HRuleAggregator& ) = 0;
 	virtual bool do_has_action( void ) const;
 	virtual HRuleBase const* do_find( yaal::hcore::HString const& ) const;
-	void add_execution_step( HExecutingParser*, yaal::hcore::HString::const_iterator, action_t const& ) const;
-	void drop_execution_steps( HExecutingParser*, yaal::hcore::HString::const_iterator ) const;
-	void report_error( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString const& ) const;
-	executing_parser::position_t position( HExecutingParser*, yaal::hcore::HString::const_iterator ) const;
+	void add_execution_step( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, action_t const& ) const;
+	void drop_execution_steps( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator ) const;
+	void report_error( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HString const& ) const;
+	executing_parser::position_t position( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator ) const;
 	friend class yaal::tools::HExecutingParser;
 private:
 	HRuleBase& operator = ( HRuleBase const& );
@@ -247,7 +247,7 @@ public:
 protected:
 	HRule( yaal::hcore::HString const&, ptr_t const&, action_t const& );
 	HRule( yaal::hcore::HString const&, ptr_t const&, action_position_t const& );
-	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
+	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator ) const override;
 	virtual ptr_t do_clone( void ) const override;
 	virtual bool do_is_optional( void ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
@@ -271,7 +271,7 @@ public:
 private:
 	HNamedRule _rule;
 protected:
-	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
+	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator ) const override;
 	virtual HRuleBase::ptr_t do_clone( void ) const override;
 	virtual bool do_is_optional( void ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
@@ -303,7 +303,7 @@ public:
 	HRuleRef( HRuleBase::ptr_t );
 	HRuleBase::ptr_t get_rule( void ) const;
 protected:
-	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
+	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator ) const override;
 	virtual HRuleBase::ptr_t do_clone( void ) const override;
 	virtual bool do_is_optional( void ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override M_DEBUG_CODE( __attribute__((__noreturn__)) );
@@ -368,7 +368,7 @@ protected:
 	HFollows( rules_t const&, action_position_t const&, bool );
 	virtual bool do_is_optional( void ) const override;
 	virtual ptr_t do_clone( void ) const override;
-	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
+	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_rule_use( rule_use_t& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
@@ -411,7 +411,7 @@ protected:
 	HKleeneBase( HNamedRule const&, action_t const& );
 	HKleeneBase( HNamedRule const&, action_position_t const& );
 	HKleeneBase( HNamedRule const&, action_t const&, action_position_t const& ); /*!< for use in copy constructor of derived class */
-	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
+	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator ) const override;
 	virtual void do_rule_use( rule_use_t& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
@@ -489,7 +489,7 @@ public:
 protected:
 	virtual bool do_is_optional( void ) const override;
 	virtual ptr_t do_clone( void ) const override;
-	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
+	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_rule_use( rule_use_t& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
@@ -524,7 +524,7 @@ protected:
 	HOptional( HNamedRule const&, action_position_t const& );
 	virtual bool do_is_optional( void ) const override;
 	virtual ptr_t do_clone( void ) const override;
-	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
+	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_rule_use( rule_use_t& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
@@ -555,7 +555,7 @@ protected:
 	HAnd( HNamedRule const&, HNamedRule const&, action_position_t const& );
 	virtual bool do_is_optional( void ) const override;
 	virtual ptr_t do_clone( void ) const override;
-	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
+	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_rule_use( rule_use_t& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
@@ -589,7 +589,7 @@ protected:
 	HNot( HNamedRule const&, HNamedRule const&, action_position_t const& );
 	virtual bool do_is_optional( void ) const override;
 	virtual ptr_t do_clone( void ) const override;
-	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
+	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_rule_use( rule_use_t& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
@@ -666,7 +666,7 @@ protected:
 	HReal( action_string_t const&, PARSE = PARSE::GREEDY );
 	HReal( action_string_position_t const&, PARSE = PARSE::GREEDY );
 	virtual ptr_t do_clone( void ) const override;
-	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
+	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
 	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
@@ -743,7 +743,7 @@ protected:
 	HInteger( action_string_t const& );
 	HInteger( action_string_position_t const& );
 	virtual ptr_t do_clone( void ) const override;
-	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
+	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
 	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
@@ -781,7 +781,7 @@ protected:
 	HStringLiteral( action_string_t const& );
 	HStringLiteral( action_string_position_t const& );
 	virtual ptr_t do_clone( void ) const override;
-	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
+	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
 	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
@@ -819,7 +819,7 @@ protected:
 	HCharacterLiteral( action_character_t const& );
 	HCharacterLiteral( action_character_position_t const& );
 	virtual ptr_t do_clone( void ) const override;
-	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
+	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
 	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
@@ -862,7 +862,7 @@ protected:
 	HCharacter( yaal::hcore::HString const&, action_character_t const&, bool );
 	HCharacter( yaal::hcore::HString const&, action_character_position_t const&, bool );
 	virtual ptr_t do_clone( void ) const override;
-	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
+	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
 	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
@@ -914,7 +914,7 @@ protected:
 	HString( dictionary_t const&, action_string_t const&, bool, WORD_BOUNDARY );
 	HString( dictionary_t const&, action_string_position_t const&, bool, WORD_BOUNDARY );
 	virtual ptr_t do_clone( void ) const override;
-	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
+	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
 	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
@@ -976,7 +976,7 @@ protected:
 	HRegex( regex_t const&, action_string_t const&, bool );
 	HRegex( regex_t const&, action_string_position_t const&, bool );
 	virtual ptr_t do_clone( void ) const override;
-	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const override;
+	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
 	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
@@ -1046,22 +1046,23 @@ public:
 		TRUST_GRAMMAR
 	};
 	class HProxy {
-		static void add_execution_step( HExecutingParser*, yaal::hcore::HString::const_iterator, executor_t const& );
-		static void drop_execution_steps( HExecutingParser*, yaal::hcore::HString::const_iterator );
-		static void report_error( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString const& );
-		static int position( HExecutingParser*, yaal::hcore::HString::const_iterator );
+		static void add_execution_step( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, executor_t const& );
+		static void drop_execution_steps( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator );
+		static void report_error( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HString const& );
+		static int position( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator );
 		friend class executing_parser::HRuleBase;
 	};
 private:
 	typedef executing_parser::HRuleBase::ptr_t grammar_t;
-	typedef yaal::hcore::HPair<yaal::hcore::HString::const_iterator, executor_t> execution_step_t;
+	typedef yaal::hcore::HPair<yaal::hcore::HUTF8String::const_iterator, executor_t> execution_step_t;
 	typedef yaal::hcore::HArray<execution_step_t> execution_steps_t;
 	grammar_t _grammar;
 	execution_steps_t _executors;
 	bool _matched;
 	int long _errorPosition;
 	messages_t _errorMessages;
-	yaal::hcore::HString::const_iterator _inputStart; /*!< Ephemeral! */
+	yaal::hcore::HUTF8String _buffer;
+	yaal::hcore::HUTF8String::const_iterator _inputStart; /*!< Ephemeral! */
 public:
 	HExecutingParser( executing_parser::HRuleBase const&, INIT_MODE = INIT_MODE::VERIFY_GRAMMAR );
 	bool operator()( yaal::hcore::HString const& );
@@ -1069,13 +1070,15 @@ public:
 	void operator()( void );
 	void execute( void* = nullptr );
 	bool parse( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
+	bool parse( yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator );
 	int error_position( void ) const;
 	messages_t const& error_messages( void ) const;
 private:
-	void add_execution_step( yaal::hcore::HString::const_iterator, executor_t const& );
-	void drop_execution_steps( yaal::hcore::HString::const_iterator );
-	void report_error( yaal::hcore::HString::const_iterator, yaal::hcore::HString const& );
-	int position( yaal::hcore::HString::const_iterator );
+	bool do_parse( void );
+	void add_execution_step( yaal::hcore::HUTF8String::const_iterator, executor_t const& );
+	void drop_execution_steps( yaal::hcore::HUTF8String::const_iterator );
+	void report_error( yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HString const& );
+	int position( yaal::hcore::HUTF8String::const_iterator );
 	void sanitize( void );
 	HExecutingParser( HExecutingParser const& );
 	HExecutingParser& operator = ( HExecutingParser const& );

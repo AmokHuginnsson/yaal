@@ -218,7 +218,7 @@ char const* HPattern::matches( char const* string_,
 	int matchLength = 0;
 	if ( _simpleMatchLength ) {
 		if ( _extended ) {
-			HRegex::HMatchIterator it( _regex.find( string_ ) );
+			HRegex::HMatchIterator it( _regex.find( HString( string_ ) ) );
 			if ( it != _regex.end() ) {
 				matchLength = it->size();
 				if ( matchLength > 0 ) {

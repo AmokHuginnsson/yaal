@@ -210,7 +210,8 @@ HExecutingParser::HExecutingParser( executing_parser::HRuleBase const& rule_, IN
 	, _matched( false )
 	, _errorPosition( yaal::hcore::HString::npos )
 	, _errorMessages()
-	, _inputStart( nullptr ) {
+	, _buffer()
+	, _inputStart() {
 	M_PROLOG
 	if ( initMode_ == INIT_MODE::VERIFY_GRAMMAR ) {
 		sanitize();
@@ -269,38 +270,46 @@ void HExecutingParser::execute( void* id_ ) {
 
 bool HExecutingParser::parse( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
+	_buffer.assign( first_, last_ );
+	return ( do_parse() );
+	M_EPILOG
+}
+
+
+bool HExecutingParser::do_parse( void ) {
+	M_PROLOG
 	_executors.clear();
-	_inputStart = first_;
+	_inputStart = _buffer.begin();
 	_errorPosition = yaal::hcore::HString::npos;
 	_errorMessages.clear();
-	yaal::hcore::HString::const_iterator it( _grammar->parse( this, first_, last_ ) );
-	if ( ( it != first_ ) && ( position( it ) != _errorPosition ) && ( executing_parser::HRuleBase::skip_space( it, last_ ) == last_ ) ) {
-		it = last_;
+	yaal::hcore::HUTF8String::const_iterator it( _grammar->parse( this, _buffer.begin(), _buffer.end() ) );
+	if ( ( it != _buffer.begin() ) && ( position( it ) != _errorPosition ) && ( executing_parser::HRuleBase::skip_space( it, _buffer.end() ) == _buffer.end() ) ) {
+		it = _buffer.end();
 		_errorPosition = yaal::hcore::HString::npos;
 		_errorMessages.clear();
 	} else if ( _errorPosition == yaal::hcore::HString::npos ) {
 		report_error( it, "failed to consume input" );
 	}
-	_inputStart = nullptr;
-	_matched = ( it == last_ ) && ( ( first_ != last_ ) || _grammar->is_optional() );
+	_inputStart = HUTF8String::const_iterator();
+	_matched = ( it == _buffer.end() ) && ( ( _buffer.begin() != _buffer.end() ) || _grammar->is_optional() );
 	return ( _matched );
 	M_EPILOG
 }
 
-void HExecutingParser::add_execution_step( yaal::hcore::HString::const_iterator position_, executor_t const& executor_ ) {
+void HExecutingParser::add_execution_step( yaal::hcore::HUTF8String::const_iterator position_, executor_t const& executor_ ) {
 	M_PROLOG
 	_executors.push_back( make_pair( position_, executor_ ) );
 	return;
 	M_EPILOG
 }
 
-void HExecutingParser::drop_execution_steps( yaal::hcore::HString::const_iterator it_ ) {
+void HExecutingParser::drop_execution_steps( yaal::hcore::HUTF8String::const_iterator it_ ) {
 	M_PROLOG
 	execution_steps_t::iterator e( end( _executors ) );
 	execution_steps_t::iterator it(
 		lower_bound(
 			begin( _executors ), e, it_,
-			[]( execution_step_t const& s_, yaal::hcore::HString::const_iterator i ) {
+			[]( execution_step_t const& s_, yaal::hcore::HUTF8String::const_iterator i ) {
 				return ( s_.first < i );
 			}
 		)
@@ -310,7 +319,7 @@ void HExecutingParser::drop_execution_steps( yaal::hcore::HString::const_iterato
 	M_EPILOG
 }
 
-void HExecutingParser::report_error( yaal::hcore::HString::const_iterator position_, yaal::hcore::HString const& message_ ) {
+void HExecutingParser::report_error( yaal::hcore::HUTF8String::const_iterator position_, yaal::hcore::HString const& message_ ) {
 	M_PROLOG
 	int long pos( position( position_ ) );
 	if ( pos > _errorPosition ) {
@@ -324,7 +333,7 @@ void HExecutingParser::report_error( yaal::hcore::HString::const_iterator positi
 	M_EPILOG
 }
 
-int HExecutingParser::position( yaal::hcore::HString::const_iterator position_ ) {
+int HExecutingParser::position( yaal::hcore::HUTF8String::const_iterator position_ ) {
 	return ( static_cast<int>( position_ - _inputStart ) );
 }
 
@@ -340,28 +349,28 @@ HExecutingParser::messages_t const& HExecutingParser::error_messages( void ) con
 	M_EPILOG
 }
 
-void HExecutingParser::HProxy::add_execution_step( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator position_, executor_t const& executor_ ) {
+void HExecutingParser::HProxy::add_execution_step( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator position_, executor_t const& executor_ ) {
 	M_PROLOG
 	executingParser_->add_execution_step( position_, executor_ );
 	return;
 	M_EPILOG
 }
 
-void HExecutingParser::HProxy::drop_execution_steps( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator position_ ) {
+void HExecutingParser::HProxy::drop_execution_steps( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator position_ ) {
 	M_PROLOG
 	executingParser_->drop_execution_steps( position_ );
 	return;
 	M_EPILOG
 }
 
-void HExecutingParser::HProxy::report_error( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator position_, yaal::hcore::HString const& message_ ) {
+void HExecutingParser::HProxy::report_error( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator position_, yaal::hcore::HString const& message_ ) {
 	M_PROLOG
 	executingParser_->report_error( position_, message_ );
 	return;
 	M_EPILOG
 }
 
-int HExecutingParser::HProxy::position( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator position_ ) {
+int HExecutingParser::HProxy::position( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator position_ ) {
 	M_PROLOG
 	return ( executingParser_->position( position_ ) );
 	M_EPILOG
@@ -409,40 +418,40 @@ bool HRuleBase::is_optional( void ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HRuleBase::parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HRuleBase::parse( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator first_, yaal::hcore::HUTF8String::const_iterator last_ ) const {
 	M_PROLOG
-	M_ASSERT( first_ && last_ );
-	yaal::hcore::HString::const_iterator it( do_parse( executingParser_, first_, last_ ) );
+	M_ASSERT( ( first_ != HUTF8String::const_iterator() ) && ( last_ != HUTF8String::const_iterator() ) );
+	yaal::hcore::HUTF8String::const_iterator it( do_parse( executingParser_, first_, last_ ) );
 	if ( it == first_ ) {
 		HExecutingParser::HProxy::drop_execution_steps( executingParser_, first_ );
 	}
-	M_ASSERT( it );
+	M_ASSERT( it != HUTF8String::const_iterator() );
 	return ( it );
 	M_EPILOG
 }
 
-void HRuleBase::add_execution_step( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator position_, action_t const& executor_ ) const {
+void HRuleBase::add_execution_step( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator position_, action_t const& executor_ ) const {
 	M_PROLOG
 	HExecutingParser::HProxy::add_execution_step( executingParser_, position_, executor_ );
 	return;
 	M_EPILOG
 }
 
-void HRuleBase::drop_execution_steps( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator position_ ) const {
+void HRuleBase::drop_execution_steps( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator position_ ) const {
 	M_PROLOG
 	HExecutingParser::HProxy::drop_execution_steps( executingParser_, position_ );
 	return;
 	M_EPILOG
 }
 
-void HRuleBase::report_error( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator position_, yaal::hcore::HString const& message_ ) const {
+void HRuleBase::report_error( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator position_, yaal::hcore::HString const& message_ ) const {
 	M_PROLOG
 	HExecutingParser::HProxy::report_error( executingParser_, position_, message_ );
 	return;
 	M_EPILOG
 }
 
-executing_parser::position_t HRuleBase::position( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator position_ ) const {
+executing_parser::position_t HRuleBase::position( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator position_ ) const {
 	M_PROLOG
 	return ( executing_parser::position_t( HExecutingParser::HProxy::position( executingParser_, position_ ) ) );
 	M_EPILOG
@@ -476,10 +485,10 @@ bool HRuleBase::do_is_optional( void ) const {
 	return ( false );
 }
 
-yaal::hcore::HString::const_iterator HRuleBase::skip_space( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+yaal::hcore::HUTF8String::const_iterator HRuleBase::skip_space( yaal::hcore::HUTF8String::const_iterator first_, yaal::hcore::HUTF8String::const_iterator last_ ) {
 	M_PROLOG
-	M_ASSERT( first_ && last_ );
-	while ( ( first_ != last_ ) && isspace( *first_ ) ) {
+	M_ASSERT( ( first_ != HUTF8String::const_iterator() ) && ( last_ != HUTF8String::const_iterator() ) );
+	while ( ( first_ != last_ ) && isspace( static_cast<int>( *first_ ) ) ) {
 		++ first_;
 	}
 	return ( first_ );
@@ -804,10 +813,10 @@ HRule::ptr_t HRule::do_clone( void ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HRule::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HRule::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
 	M_PROLOG
-	yaal::hcore::HString::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
-	yaal::hcore::HString::const_iterator scan( !! _rule ? _rule->parse( executingParser_, start, last_ ) : start );
+	yaal::hcore::HUTF8String::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
+	yaal::hcore::HUTF8String::const_iterator scan( !! _rule ? _rule->parse( executingParser_, start, last_ ) : start );
 	if ( scan != start ) {
 		if ( !! _action ) {
 			add_execution_step( executingParser_, start, _action );
@@ -904,7 +913,7 @@ void HRecursiveRule::set_rule( HRuleBase::ptr_t const& rule_ ) {
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HRecursiveRule::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HRecursiveRule::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
 	M_PROLOG
 	M_ENSURE( !! _rule );
 	return ( _rule->parse( executingParser_, first_, last_ ) );
@@ -987,7 +996,7 @@ HRuleRef::HRuleRef( HRuleBase::ptr_t rule_ )
 	return;
 }
 
-yaal::hcore::HString::const_iterator HRuleRef::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HRuleRef::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
 	M_PROLOG
 	HRuleBase::ptr_t r( _rule );
 	M_ASSERT( !! r );
@@ -1188,15 +1197,15 @@ void HFollows::do_rule_use( rule_use_t& ruleUse_ ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HFollows::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HFollows::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
 	M_PROLOG
-	yaal::hcore::HString::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
-	yaal::hcore::HString::const_iterator scan( start );
+	yaal::hcore::HUTF8String::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
+	yaal::hcore::HUTF8String::const_iterator scan( start );
 	bool matched( true );
 	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
-		yaal::hcore::HString::const_iterator old( scan );
+		yaal::hcore::HUTF8String::const_iterator old( scan );
 		scan = (*it)->parse( executingParser_, scan, last_ );
-		M_ASSERT( scan );
+		M_ASSERT( scan != HUTF8String::const_iterator() );
 		if ( ( scan == old ) && ( !(*it)->is_optional() ) ) {
 			matched = false;
 			break;
@@ -1295,11 +1304,11 @@ HKleeneBase::HKleeneBase( HNamedRule const& rule_, action_t const& action_, acti
 	return;
 }
 
-yaal::hcore::HString::const_iterator HKleeneBase::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HKleeneBase::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
 	M_PROLOG
-	yaal::hcore::HString::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
-	yaal::hcore::HString::const_iterator scan( start );
-	yaal::hcore::HString::const_iterator oldScan( scan );
+	yaal::hcore::HUTF8String::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
+	yaal::hcore::HUTF8String::const_iterator scan( start );
+	yaal::hcore::HUTF8String::const_iterator oldScan( scan );
 	while ( scan != last_ ) {
 		scan = _rule->parse( executingParser_, scan, last_ );
 		if ( scan == oldScan ) {
@@ -1584,9 +1593,9 @@ HAlternative HAlternative::operator[]( action_position_t const& action_ ) const 
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HAlternative::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
-	yaal::hcore::HString::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
-	yaal::hcore::HString::const_iterator scan( start );
+yaal::hcore::HUTF8String::const_iterator HAlternative::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
+	yaal::hcore::HUTF8String::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
+	yaal::hcore::HUTF8String::const_iterator scan( start );
 	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
 		if ( ( scan = (*it)->parse( executingParser_, start, last_ ) ) != start ) {
 			break;
@@ -1738,10 +1747,10 @@ HOptional HOptional::operator[]( action_position_t const& action_ ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HOptional::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HOptional::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
 	M_PROLOG
-	yaal::hcore::HString::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
-	yaal::hcore::HString::const_iterator scan( !! _rule ? _rule->parse( executingParser_, start, last_ ) : start );
+	yaal::hcore::HUTF8String::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
+	yaal::hcore::HUTF8String::const_iterator scan( !! _rule ? _rule->parse( executingParser_, start, last_ ) : start );
 	if ( scan != start ) {
 		if ( !! _action ) {
 			add_execution_step( executingParser_, start, _action );
@@ -1870,11 +1879,11 @@ HAnd HAnd::operator[]( action_position_t const& action_ ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HAnd::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HAnd::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
 	M_PROLOG
-	yaal::hcore::HString::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
-	yaal::hcore::HString::const_iterator scan( !! _rule ? _rule->parse( executingParser_, start, last_ ) : start );
-	yaal::hcore::HString::const_iterator andScan( !! _and ? _and->parse( executingParser_, scan, last_ ) : scan );
+	yaal::hcore::HUTF8String::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
+	yaal::hcore::HUTF8String::const_iterator scan( !! _rule ? _rule->parse( executingParser_, start, last_ ) : start );
+	yaal::hcore::HUTF8String::const_iterator andScan( !! _and ? _and->parse( executingParser_, scan, last_ ) : scan );
 	if ( ( scan != start ) && ( andScan != scan ) ) {
 		drop_execution_steps( executingParser_, scan );
 		if ( !! _action ) {
@@ -2018,11 +2027,11 @@ HNot HNot::operator[]( action_position_t const& action_ ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HNot::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HNot::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
 	M_PROLOG
-	yaal::hcore::HString::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
-	yaal::hcore::HString::const_iterator scan( !! _rule ? _rule->parse( executingParser_, start, last_ ) : start );
-	yaal::hcore::HString::const_iterator notScan( !! _not ? _not->parse( executingParser_, scan, last_ ) : scan );
+	yaal::hcore::HUTF8String::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
+	yaal::hcore::HUTF8String::const_iterator scan( !! _rule ? _rule->parse( executingParser_, start, last_ ) : start );
+	yaal::hcore::HUTF8String::const_iterator notScan( !! _not ? _not->parse( executingParser_, scan, last_ ) : scan );
 	if ( ( scan != start ) && ( notScan == scan ) ) {
 		if ( !! _action ) {
 			add_execution_step( executingParser_, start, _action );
@@ -2482,19 +2491,19 @@ bool HReal::do_has_action( void ) const {
 	);
 }
 
-yaal::hcore::HString::const_iterator HReal::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HReal::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
 	M_PROLOG
-	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
-	yaal::hcore::HString::const_iterator scan( start );
+	yaal::hcore::HUTF8String::const_iterator start( skip_space( first_, last_ ) );
+	yaal::hcore::HUTF8String::const_iterator scan( start );
 	_cache.clear();
 	real_paring_state_t state( START );
 	if ( scan != last_ ) {
 		while ( scan != last_ ) {
 			bool stop( false );
-			char ch( *scan );
+			u32_t ch( *scan );
 			switch ( state ) {
 				case ( START ): {
-					if ( isdigit( ch ) ) {
+					if ( isdigit( static_cast<int>( ch ) ) ) {
 						state = INTEGRAL;
 					} else if ( ch == '-' ) {
 						state = MINUS;
@@ -2506,7 +2515,7 @@ yaal::hcore::HString::const_iterator HReal::do_parse( HExecutingParser* executin
 				} break;
 				case ( MINUS ):
 				case ( INTEGRAL ): {
-					if ( isdigit( ch ) ) {
+					if ( isdigit( static_cast<int>( ch ) ) ) {
 						state = INTEGRAL;
 					} else if ( ch == '.' ) {
 						state = DOT;
@@ -2516,7 +2525,7 @@ yaal::hcore::HString::const_iterator HReal::do_parse( HExecutingParser* executin
 				} break;
 				case ( DOT ):
 				case ( DECIMAL ): {
-					if ( isdigit( ch ) ) {
+					if ( isdigit( static_cast<int>( ch ) ) ) {
 						state = DECIMAL;
 					} else {
 						stop = true;
@@ -2529,7 +2538,7 @@ yaal::hcore::HString::const_iterator HReal::do_parse( HExecutingParser* executin
 			if ( stop ) {
 				break;
 			}
-			_cache.push_back( *scan );
+			_cache.push_back( static_cast<char>( *scan ) );
 			++ scan;
 		}
 	} else {
@@ -2929,10 +2938,10 @@ bool HInteger::do_has_action( void ) const {
 	);
 }
 
-yaal::hcore::HString::const_iterator HInteger::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HInteger::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
 	M_PROLOG
-	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
-	yaal::hcore::HString::const_iterator scan( start );
+	yaal::hcore::HUTF8String::const_iterator start( skip_space( first_, last_ ) );
+	yaal::hcore::HUTF8String::const_iterator scan( start );
 	_cache.clear();
 	bool valid( true );
 	do {
@@ -2941,7 +2950,7 @@ yaal::hcore::HString::const_iterator HInteger::do_parse( HExecutingParser* execu
 			valid = false;
 			break;
 		}
-		typedef bool ( *digit_test_func_t )( char );
+		typedef bool ( *digit_test_func_t )( u32_t );
 		digit_test_func_t is_digit_test( &is_dec_digit );
 		int skip( *scan == '-' ? 1 : 0 );
 		bool isBin( is_binary( scan, last_ ) );
@@ -2970,7 +2979,7 @@ yaal::hcore::HString::const_iterator HInteger::do_parse( HExecutingParser* execu
 			valid = false;
 			break;
 		}
-		_cache.assign( start, scan - start );
+		_cache = HUTF8String( start, scan );
 	} while ( false );
 	if ( valid ) {
 		try {
@@ -3138,19 +3147,18 @@ namespace {
 /*
  * Only printable characters and horizontal tab are valid in string or character literals.
  */
-bool is_known_character( char char_ ) {
-	char unsigned c( static_cast<char unsigned>( char_ ) );
-	return ( ( c >= ' ' ) || ( c == '\t' ) );
+bool is_known_character( u32_t char_ ) {
+	return ( ( char_ >= ' ' ) || ( char_ == '\t' ) );
 }
 
 }
 
-yaal::hcore::HString::const_iterator HStringLiteral::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HStringLiteral::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
 	M_PROLOG
-	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
-	yaal::hcore::HString::const_iterator scan( start );
+	yaal::hcore::HUTF8String::const_iterator start( skip_space( first_, last_ ) );
+	yaal::hcore::HUTF8String::const_iterator scan( start );
 	bool valid( false );
-	yaal::hcore::HString::const_iterator from( nullptr );
+	yaal::hcore::HUTF8String::const_iterator from;
 	do {
 		if ( scan == last_ ) {
 			scan = first_;
@@ -3181,7 +3189,7 @@ yaal::hcore::HString::const_iterator HStringLiteral::do_parse( HExecutingParser*
 		}
 	} while ( false );
 	if ( valid ) {
-		_cache.assign( from, scan );
+		_cache = HUTF8String( from, scan );
 		++ scan;
 		unescape( _cache, _escapes_ );
 		position_t pos( position( executingParser_, start ) );
@@ -3317,12 +3325,12 @@ bool HCharacterLiteral::do_has_action( void ) const {
 	return ( HRuleBase::do_has_action() || ( !! _actionCharacter ) || ( !! _actionCharacterPosition ) );
 }
 
-yaal::hcore::HString::const_iterator HCharacterLiteral::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HCharacterLiteral::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
 	M_PROLOG
-	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
-	yaal::hcore::HString::const_iterator scan( start );
+	yaal::hcore::HUTF8String::const_iterator start( skip_space( first_, last_ ) );
+	yaal::hcore::HUTF8String::const_iterator scan( start );
 	bool valid( false );
-	yaal::hcore::HString::const_iterator from( nullptr );
+	yaal::hcore::HUTF8String::const_iterator from;
 	do {
 		if ( scan == last_ ) {
 			scan = first_;
@@ -3356,7 +3364,7 @@ yaal::hcore::HString::const_iterator HCharacterLiteral::do_parse( HExecutingPars
 		}
 	} while ( false );
 	if ( valid ) {
-		_cache.assign( from, scan );
+		_cache = HUTF8String( from, scan );
 		++ scan;
 		unescape( _cache, _escapes_ );
 		position_t pos( position( executingParser_, start ) );
@@ -3506,7 +3514,7 @@ bool character_skip_ws( yaal::hcore::HString const& characters_, HRuleBase::WHIT
 	if ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) {
 		skipWS = true;
 		for ( char c : characters_ ) {
-			if ( _whiteSpace_.has( c ) ) {
+			if ( _whiteSpace_.has( static_cast<u32_t>( c ) ) ) {
 				skipWS = false;
 				break;
 			}
@@ -3530,19 +3538,19 @@ HCharacter HCharacter::operator() ( WHITE_SPACE whiteSpace_ ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HCharacter::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HCharacter::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
 	M_PROLOG
-	yaal::hcore::HString::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
-	yaal::hcore::HString::const_iterator scan( start );
+	yaal::hcore::HUTF8String::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
+	yaal::hcore::HUTF8String::const_iterator scan( start );
 	bool matched( false );
 	if ( scan != last_ ) {
-		char c( *scan );
-		if ( _characters.is_empty() || ( _characters.find( *scan ) != hcore::HString::npos ) ) {
+		u32_t c( *scan );
+		if ( _characters.is_empty() || ( _characters.find( static_cast<char>( *scan ) ) != hcore::HString::npos ) ) { /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 			position_t pos( position( executingParser_, start ) );
 			if ( !! _actionCharacter ) {
-				add_execution_step( executingParser_, start, call( _actionCharacter, c ) );
+				add_execution_step( executingParser_, start, call( _actionCharacter, static_cast<char>( c ) ) );
 			} else if ( !! _actionCharacterPosition ) {
-				add_execution_step( executingParser_, start, call( _actionCharacterPosition, c, pos ) );
+				add_execution_step( executingParser_, start, call( _actionCharacterPosition, static_cast<char>( c ), pos ) );
 			} else if ( !! _action ) {
 				add_execution_step( executingParser_, start, call( _action ) );
 			} else if ( !! _actionPosition ) {
@@ -3774,18 +3782,18 @@ bool HString::do_has_action( void ) const {
 	return ( HRuleBase::do_has_action() || ( !! _actionString ) || ( !! _actionStringPosition ) );
 }
 
-hcore::HString::const_iterator HString::do_parse( HExecutingParser* executingParser_, hcore::HString::const_iterator first_, hcore::HString::const_iterator last_ ) const {
+hcore::HUTF8String::const_iterator HString::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
 	M_PROLOG
 	M_ASSERT( ! _dictionary.is_empty() );
-	yaal::hcore::HString::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
-	yaal::hcore::HString::const_iterator scan( start );
+	yaal::hcore::HUTF8String::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
+	yaal::hcore::HUTF8String::const_iterator scan( start );
 	bool matched( false );
 	if ( scan != last_ ) {
 		for ( yaal::hcore::HString const& s : _dictionary ) {
 			matched = true;
 			scan = start;
 			for ( hcore::HString::const_iterator it( s.begin() ), end( s.end() ); it != end; ++ it, ++ scan ) {
-				if ( ( scan == last_ ) || ( *scan != *it ) ) {
+				if ( ( scan == last_ ) || ( *scan != static_cast<u32_t>( *it ) ) ) {
 					matched = false;
 					break;
 				}
@@ -3874,8 +3882,8 @@ void HString::do_find_recursions( HRuleAggregator& ) {
 HString string( yaal::hcore::HString const& string_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! _whiteSpace_.has( string_.front() ) ) );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
+	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! _whiteSpace_.has( static_cast<u32_t>( string_.front() ) ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 	return ( HString( string_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -3883,8 +3891,8 @@ HString string( yaal::hcore::HString const& string_, HRuleBase::WHITE_SPACE whit
 HString string( yaal::hcore::HString const& string_, HString::action_string_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! _whiteSpace_.has( string_.front() ) ) );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
+	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! _whiteSpace_.has( static_cast<u32_t>( string_.front() ) ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -3892,8 +3900,8 @@ HString string( yaal::hcore::HString const& string_, HString::action_string_t co
 HString string( yaal::hcore::HString const& string_, HString::action_string_position_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! _whiteSpace_.has( string_.front() ) ) );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
+	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! _whiteSpace_.has( static_cast<u32_t>( string_.front() ) ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -3901,8 +3909,8 @@ HString string( yaal::hcore::HString const& string_, HString::action_string_posi
 HString string( yaal::hcore::HString const& string_, HString::action_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! _whiteSpace_.has( string_.front() ) ) );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
+	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! _whiteSpace_.has( static_cast<u32_t>( string_.front() ) ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -3910,8 +3918,8 @@ HString string( yaal::hcore::HString const& string_, HString::action_t const& ac
 HString string( yaal::hcore::HString const& string_, HString::action_position_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! _whiteSpace_.has( string_.front() ) ) );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
+	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! _whiteSpace_.has( static_cast<u32_t>( string_.front() ) ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -3919,8 +3927,8 @@ HString string( yaal::hcore::HString const& string_, HString::action_position_t 
 HString string( yaal::hcore::HString const& string_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
-	bool skipWS( ! _whiteSpace_.has( string_.front() ) );
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	bool skipWS( ! _whiteSpace_.has( static_cast<u32_t>( string_.front() ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 	return ( HString( string_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -3928,8 +3936,8 @@ HString string( yaal::hcore::HString const& string_, HString::WORD_BOUNDARY word
 HString string( yaal::hcore::HString const& string_, HString::action_string_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
-	bool skipWS( ! _whiteSpace_.has( string_.front() ) );
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	bool skipWS( ! _whiteSpace_.has( static_cast<u32_t>( string_.front() ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -3937,8 +3945,8 @@ HString string( yaal::hcore::HString const& string_, HString::action_string_t co
 HString string( yaal::hcore::HString const& string_, HString::action_string_position_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
-	bool skipWS( ! _whiteSpace_.has( string_.front() ) );
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	bool skipWS( ! _whiteSpace_.has( static_cast<u32_t>( string_.front() ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -3946,8 +3954,8 @@ HString string( yaal::hcore::HString const& string_, HString::action_string_posi
 HString string( yaal::hcore::HString const& string_, HString::action_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
-	bool skipWS( ! _whiteSpace_.has( string_.front() ) );
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	bool skipWS( ! _whiteSpace_.has( static_cast<u32_t>( string_.front() ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -3955,8 +3963,8 @@ HString string( yaal::hcore::HString const& string_, HString::action_t const& ac
 HString string( yaal::hcore::HString const& string_, HString::action_position_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
-	bool skipWS( ! _whiteSpace_.has( string_.front() ) );
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	bool skipWS( ! _whiteSpace_.has( static_cast<u32_t>( string_.front() ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -4073,19 +4081,23 @@ bool HRegex::do_has_action( void ) const {
 	return ( HRuleBase::do_has_action() || ( !! _actionString ) || ( !! _actionStringPosition ) );
 }
 
-hcore::HString::const_iterator HRegex::do_parse( HExecutingParser* executingParser_, hcore::HString::const_iterator first_, hcore::HString::const_iterator last_ ) const {
+hcore::HUTF8String::const_iterator HRegex::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
 	M_PROLOG
-	yaal::hcore::HString::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
-	yaal::hcore::HString::const_iterator scan( start );
+	yaal::hcore::HUTF8String::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
+	yaal::hcore::HUTF8String::const_iterator scan( start );
 	bool matched( false );
 	if ( scan != last_ ) {
-		hcore::HRegex::HMatchIterator it( _regex->find( scan ) );
+		hcore::HRegex::HMatchIterator it( _regex->find( HUTF8String( scan, last_ ) ) );
 		if ( ( it != _regex->end() ) && ( it->size() <= ( last_ - scan ) ) ) {
 			position_t pos( position( executingParser_, start ) );
 			if ( !! _actionString ) {
-				add_execution_step( executingParser_, start, call( _actionString, hcore::HString( scan + it->start(), it->size() ) ) );
+				HUTF8String::const_iterator from( scan + it->start() );
+				HUTF8String::const_iterator to( from + it->size() );
+				add_execution_step( executingParser_, start, call( _actionString, hcore::HUTF8String( from, to ) ) );
 			} else if ( !! _actionStringPosition ) {
-				add_execution_step( executingParser_, start, call( _actionStringPosition, hcore::HString( scan + it->start(), it->size() ), pos ) );
+				HUTF8String::const_iterator from( scan + it->start() );
+				HUTF8String::const_iterator to( from + it->size() );
+				add_execution_step( executingParser_, start, call( _actionStringPosition, hcore::HUTF8String( from, to ), pos ) );
 			} else if ( !! _action ) {
 				add_execution_step( executingParser_, start, call( _action ) );
 			} else if ( !! _actionPosition ) {

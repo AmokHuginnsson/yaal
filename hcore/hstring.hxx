@@ -71,7 +71,7 @@ public:
 	int size( void ) const {
 		return ( _size );
 	}
-	bool has( char ) const;
+	bool has( u32_t ) const;
 };
 
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _whiteSpace_;
@@ -934,21 +934,27 @@ public:
 	HIterator& operator = ( HIterator const& );
 	HIterator& operator = ( HIterator&& );
 	bool operator == ( HIterator const& other_ ) const {
-		return ( _characterIndex == other_._characterIndex );
+		M_ASSERT( ( _ptr && other_._ptr && ( _ptr == other_._ptr ) ) || ! ( _ptr || other_._ptr ) );
+		return ( ( _ptr == other_._ptr ) && ( _characterIndex == other_._characterIndex ) );
 	}
 	bool operator != ( HIterator const& other_ ) const {
-		return ( _characterIndex != other_._characterIndex );
+		M_ASSERT( ( _ptr && other_._ptr && ( _ptr == other_._ptr ) ) || ! ( _ptr && other_._ptr ) );
+		return ( ( _ptr != other_._ptr ) || ( _characterIndex != other_._characterIndex ) );
 	}
 	bool operator < ( HIterator const& other_ ) const {
+		M_ASSERT( _ptr && other_._ptr && ( _ptr == other_._ptr ) );
 		return ( _characterIndex < other_._characterIndex );
 	}
 	bool operator <= ( HIterator const& other_ ) const {
+		M_ASSERT( _ptr && other_._ptr && ( _ptr == other_._ptr ) );
 		return ( _characterIndex <= other_._characterIndex );
 	}
 	bool operator > ( HIterator const& other_ ) const {
+		M_ASSERT( _ptr && other_._ptr && ( _ptr == other_._ptr ) );
 		return ( _characterIndex > other_._characterIndex );
 	}
 	bool operator >= ( HIterator const& other_ ) const {
+		M_ASSERT( _ptr && other_._ptr && ( _ptr == other_._ptr ) );
 		return ( _characterIndex >= other_._characterIndex );
 	}
 	HIterator& operator ++ ( void );
@@ -1023,14 +1029,14 @@ int long long unsigned stoull( HString const&, int* = nullptr, int = 10 );
 float stof( HString const&, int* = nullptr );
 double stod( HString const&, int* = nullptr );
 double long stold( HString const&, int* = nullptr );
-bool is_whitespace( char );
-bool is_digit( char );
-bool is_dec_digit( char );
-bool is_hex_digit( char );
-bool is_oct_digit( char );
-bool is_bin_digit( char );
-bool is_letter( char );
-bool is_alpha( char );
+bool is_whitespace( u32_t );
+bool is_digit( u32_t );
+bool is_dec_digit( u32_t );
+bool is_hex_digit( u32_t );
+bool is_oct_digit( u32_t );
+bool is_bin_digit( u32_t );
+bool is_letter( u32_t );
+bool is_alpha( u32_t );
 
 inline void swap( yaal::hcore::HString& a, yaal::hcore::HString& b ) {
 	a.swap( b );
