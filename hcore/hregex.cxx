@@ -260,17 +260,18 @@ HUTF8String HRegex::matches_impl( HUTF8String const& str_, int& start_, int& mat
 	M_EPILOG
 }
 
-HRegex::groups_t HRegex::groups_impl( char const* string_, match_t match_ ) const {
+HRegex::groups_t HRegex::groups_impl( HUTF8String const& string_, match_t match_ ) const {
 	M_PROLOG
 	groups_t g;
 	typedef yaal::hcore::HArray<int> matches_t;
 	int expectedGroupCount( static_cast<int>( count( _pattern.begin(), _pattern.end(), '(' ) + 1 ) );
 	matches_t matchesBuffer( expectedGroupCount * 3, NO_MATCH );
+	char const* str( string_.x_str() );
 	_lastError = ::pcre_exec(
 		static_cast<pcre*>( _impl ),
 		static_cast<pcre_extra*>( _extra ),
-		string_,
-		static_cast<int>( strlen( string_ ) ),
+		str,
+		static_cast<int>( string_.byte_count() ),
 		0,
 		( ( match_ & MATCH::NOT_BEGINNING_OF_LINE ) ? PCRE_NOTBOL : 0 ) | ( ( match_ & MATCH::NOT_END_OF_LINE ) ? PCRE_NOTEOL : 0 ),
 		matchesBuffer.data(),
@@ -286,7 +287,10 @@ HRegex::groups_t HRegex::groups_impl( char const* string_, match_t match_ ) cons
 		if ( groupCount > 0 ) {
 			g.reserve( groupCount );
 			for ( int i( 0 ); i < groupCount; ++ i ) {
-				g.emplace_back( matchesBuffer[i * 2], matchesBuffer[i * 2 + 1] - matchesBuffer[i * 2] );
+				g.emplace_back(
+					utf8::count_characters( str, matchesBuffer[i * 2] ),
+					utf8::count_characters( str + matchesBuffer[i * 2], static_cast<int>( matchesBuffer[i * 2 + 1] - matchesBuffer[i * 2] ) )
+				);
 			}
 		}
 	}
@@ -299,9 +303,12 @@ yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, yaal::h
 	static char const errMsg[] = "Malformed back-reference in replacement string.";
 	static char const BACK_REF( '$' );
 	HString res;
+	int offset( 0 );
 	int endPos( 0 );
+	_utf8ConversionCache = text_;
 	while ( true ) {
-		groups_t g( groups_impl( text_.c_str() + endPos, match_ ) );
+		_utf8ConversionCache = _utf8ConversionCache.substr( offset );
+		groups_t g( groups_impl( _utf8ConversionCache, match_ ) );
 		if ( g.is_empty() ) {
 			res.append( text_, endPos );
 			break;
@@ -336,7 +343,8 @@ yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, yaal::h
 				++ r;
 			}
 		}
-		endPos += ( g[0].start() + g[0].size() );
+		offset = ( g[0].start() + g[0].size() );
+		endPos += offset;
 	}
 	return ( res );
 	M_EPILOG
@@ -373,15 +381,10 @@ HRegex::HMatchResult HRegex::matches( HUTF8String const& str_, match_t match_ ) 
 	return ( HMatchResult( find( str_, match_ ), end() ) );
 }
 
-HRegex::groups_t HRegex::groups( char const* string_, match_t match_ ) const {
+HRegex::groups_t HRegex::groups( yaal::hcore::HUTF8String const& string_, match_t match_ ) const {
 	M_PROLOG
-	return ( groups_impl( string_, match_ ) );
-	M_EPILOG
-}
-
-HRegex::groups_t HRegex::groups( yaal::hcore::HString const& string_, match_t match_ ) const {
-	M_PROLOG
-	return ( groups_impl( string_.c_str(), match_ ) );
+	_utf8ConversionCache = string_;
+	return ( groups_impl( _utf8ConversionCache, match_ ) );
 	M_EPILOG
 }
 

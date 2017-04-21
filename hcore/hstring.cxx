@@ -1780,8 +1780,9 @@ void HUTF8String::assign( HString::const_iterator it_, HString::const_iterator e
 		_meta->_used = byteCount;
 		_meta->_rank = static_cast<i8_t>( utf8::rank( maxCodePoint ) );
 	}
-	_byteCount = byteCount;
 	_characterCount = static_cast<int>( end_ - it_ );
+	_offset = 0;
+	_byteCount = byteCount;
 	return;
 	M_EPILOG
 }
@@ -1864,12 +1865,14 @@ HUTF8String HUTF8String::substr( int long from_, int long len_ ) const {
 	if ( ( len_ + from_ ) > _characterCount ) {
 		len_ = _characterCount - from_;
 	}
+	HIterator it( begin() );
 	if ( from_ >= _characterCount ) {
 		from_ = 0;
 		len_ = 0;
+		it = end();
+	} else {
+		it += from_;
 	}
-	HIterator it( begin() );
-	it += from_;
 	HIterator endIt( len_ < ( _characterCount - from_ ) ? it + len_ : end() );
 	HUTF8String s( *this );
 	s._offset = it._byteIndex;

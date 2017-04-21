@@ -138,8 +138,7 @@ public:
 	 * \return True iff given string matches this regex.
 	 */
 	HMatchResult matches( HUTF8String const& string_, match_t = MATCH::DEFAULT ) const;
-	groups_t groups( char const* string_, match_t = MATCH::DEFAULT ) const;
-	groups_t groups( HString const& string_, match_t = MATCH::DEFAULT ) const;
+	groups_t groups( HUTF8String const& string_, match_t = MATCH::DEFAULT ) const;
 	yaal::hcore::HString replace( yaal::hcore::HString const&, yaal::hcore::HString const&, match_t = MATCH::DEFAULT );
 	yaal::hcore::HString replace( yaal::hcore::HString const&, replacer_t const&, match_t = MATCH::DEFAULT );
 	void swap( HRegex& );
@@ -151,7 +150,7 @@ private:
 	void error_clear( void );
 	void reset( void );
 	HUTF8String matches_impl( HUTF8String const&, int&, int&, match_t ) const;
-	groups_t groups_impl( char const*, match_t ) const;
+	groups_t groups_impl( HUTF8String const&, match_t ) const;
 };
 
 /*! \brief Instance of single match for given regex.
