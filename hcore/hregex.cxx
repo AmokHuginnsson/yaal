@@ -147,6 +147,14 @@ void HRegex::swap( HRegex& reg_ ) {
 
 void HRegex::clear( void ) {
 	M_PROLOG
+	reset();
+	error_clear();
+	return;
+	M_EPILOG
+}
+
+void HRegex::reset( void ) {
+	M_PROLOG
 	if ( _extra ) {
 		::pcre_free_study( static_cast<pcre_extra*>( _extra ) );
 		_extra = nullptr;
@@ -155,10 +163,8 @@ void HRegex::clear( void ) {
 		::pcre_free( static_cast<pcre*>( _impl ) );
 		_impl = nullptr;
 	}
-	_lastError = 0;
 	_pattern.clear();
 	_flags = COMPILE::DEFAULT;
-	_errorMessage.clear();
 	return;
 	M_EPILOG
 }
@@ -183,7 +189,6 @@ bool HRegex::compile( HString const& pattern_, compile_t flags_ ) {
 	if ( pattern_.is_empty() ) {
 		throw HRegexException( _errMsgHRegex_[ ERROR::EMPTY_PATTERN ] );
 	}
-	error_clear();
 	clear();
 	int options( PCRE_UTF8 );
 	options |= ( ( flags_ & COMPILE::IGNORE_CASE ) ? PCRE_CASELESS : 0 );
@@ -202,10 +207,12 @@ bool HRegex::compile( HString const& pattern_, compile_t flags_ ) {
 		_pattern = pattern_;
 	} else {
 		_errorMessage.assign( pattern_ ).append( ":" ).append( offset ).append( ": " ).append( errMsg ? errMsg : "" ).append( errMsg ? ", " : "" ).append( _lastError );
-		clear();
 		if ( ! ( flags_ & COMPILE::NO_EXCEPTION ) ) {
-			throw HRegexException( _errorMessage );
+			HString msg( yaal::move( _errorMessage ) );
+			clear();
+			throw HRegexException( msg );
 		}
+		reset();
 	}
 	return ( _lastError == 0 );
 	M_EPILOG

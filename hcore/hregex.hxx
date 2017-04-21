@@ -149,6 +149,7 @@ private:
 	HRegex( HRegex const& ) = delete;
 	HRegex& operator = ( HRegex const& ) = delete;
 	void error_clear( void );
+	void reset( void );
 	HUTF8String matches_impl( HUTF8String const&, int&, int&, match_t ) const;
 	groups_t groups_impl( char const*, match_t ) const;
 };
