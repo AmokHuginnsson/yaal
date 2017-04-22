@@ -503,7 +503,7 @@ int HProgramOptionsHandler::process_rc_file( HString const& section_, RC_CALLBAC
 					}
 					bool optionOK( false );
 					for ( HOption& opt : _options ) {
-						if ( ! strcasecmp( option, opt.long_form() ) ) {
+						if ( ! stricasecmp( option, opt.long_form() ) ) {
 							optionOK = true;
 							set_option( opt, value );
 						}
@@ -568,7 +568,7 @@ void HProgramOptionsHandler::verify_new_option( HOption& option_ ) {
 		 * -q, --silent
 		 */
 		if ( option_.value_id() != it->value_id() ) {
-			if ( ! option_.long_form().is_empty() && ! it->long_form().is_empty() && ! strcasecmp( it->long_form(), option_.long_form() ) ) {
+			if ( ! option_.long_form().is_empty() && ! it->long_form().is_empty() && ! stricasecmp( it->long_form(), option_.long_form() ) ) {
 				throw HProgramOptionsHandlerException( "duplicated long option: "_ys + option_.long_form() );
 			}
 			if ( it->short_form() == sf ) {

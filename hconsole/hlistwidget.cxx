@@ -1014,7 +1014,7 @@ void HListWidget::go_to_match( void ) {
 	int columns( static_cast<int>( _header.size() ) );
 	int widgetOffsetOrig( _widgetOffset );
 	int cursorPositionOrig( _cursorPosition );
-	char const* highlightStart( nullptr );
+	int highlightStart( HPattern::NO_MATCH );
 	char const* outcome( nullptr );
 	iterator_t cursorOrig = _cursor;
 	iterator_t firstVisibleRowOrig = _firstVisibleRow;
@@ -1030,21 +1030,23 @@ void HListWidget::go_to_match( void ) {
 	while ( count -- ) {
 		for ( columnWithMatch = _match._columnWithMatch; columnWithMatch < columns; ++ columnWithMatch ) {
 			get_text_for_cell( _cursor, columnWithMatch, TYPE::HSTRING );
-			highlightStart = nullptr;
+			highlightStart = HPattern::NO_MATCH;
 			matchNumber = 0;
 			for ( HPattern::HMatchIterator it = _pattern.find( _varTmpBuffer ),
 					end = _pattern.end(); it != end; ++ it, ++ matchNumber ) {
 				if ( matchNumber > _match._matchNumber ) {
-					highlightStart = it->raw();
+					highlightStart = it->start();
 					break;
 				}
 			}
-			if ( highlightStart )
+			if ( highlightStart != HPattern::NO_MATCH ) {
 				break;
+			}
 			_match._matchNumber = -1;
 		}
-		if ( highlightStart )
+		if ( highlightStart != HPattern::NO_MATCH ) {
 			break;
+		}
 		_match._columnWithMatch = 0;
 /* this part is from process_input, but slightly modified */
 		if ( get_cursor_position() < ( size - 1 ) ) {
@@ -1063,7 +1065,7 @@ void HListWidget::go_to_match( void ) {
 		}
 /* end od it */
 	}
-	if ( highlightStart ) {
+	if ( highlightStart != HPattern::NO_MATCH ) {
 		if ( moveFirstRow ) {
 			increment( _firstVisibleRow, moveFirstRow );
 		}
@@ -1095,7 +1097,7 @@ void HListWidget::go_to_match_previous( void ) {
 	int columns = static_cast<int>( _header.size() );
 	int widgetOffsetOrig( _widgetOffset );
 	int cursorPositionOrig( _cursorPosition );
-	char const* highlightStart( nullptr );
+	int highlightStart( HPattern::NO_MATCH );
 	char const* outcome( nullptr );
 	iterator_t cursorOrig = _cursor;
 	iterator_t firstVisibleRowOrig = _firstVisibleRow;
@@ -1109,27 +1111,29 @@ void HListWidget::go_to_match_previous( void ) {
 	while ( count -- ) {
 		for ( ctr = _match._columnWithMatch; ctr >= 0; ctr -- ) {
 			get_text_for_cell( _cursor, ctr, TYPE::HSTRING );
-			highlightStart = nullptr;
+			highlightStart = HPattern::NO_MATCH;
 			ctrLoc = 0;
 			if ( _match._matchNumber < 0 )
 				_match._matchNumber = static_cast<int>( distance( _pattern.find( _varTmpBuffer ), _pattern.end() ) );
 			for ( HPattern::HMatchIterator it = _pattern.find( _varTmpBuffer ),
 					end = _pattern.end(); it != end; ++ it, ++ ctrLoc ) {
 				if ( ctrLoc == ( _match._matchNumber - 1 ) ) {
-					highlightStart = it->raw();
+					highlightStart = it->start();
 					break;
 				}
 				if ( ctrLoc >= _match._matchNumber ) {
-					highlightStart = nullptr;
+					highlightStart = HPattern::NO_MATCH;
 					break;
 				}
 			}
-			if ( highlightStart )
+			if ( highlightStart != HPattern::NO_MATCH ) {
 				break;
+			}
 			_match._matchNumber = -1;
 		}
-		if ( highlightStart )
+		if ( highlightStart != HPattern::NO_MATCH ) {
 			break;
+		}
 		_match._columnWithMatch = columns - 1;
 /* this part is from process_input, but slightly modified */
 		if ( get_cursor_position() > 0 ) {
@@ -1157,7 +1161,7 @@ void HListWidget::go_to_match_previous( void ) {
 		}
 /* end od it */
 	}
-	if ( highlightStart ) {
+	if ( highlightStart != HPattern::NO_MATCH ) {
 		if ( moveFirstRow )
 			cyclic_decrement( _model, _firstVisibleRow, moveFirstRow );
 		_match._columnWithMatch = ctr;
@@ -1351,7 +1355,7 @@ bool compare_cells( HInfo const& left_, HInfo const& right_, OSortHelper& sortHe
 			lower = left_.get_real() < right_.get_real();
 		break;
 		case ( TYPE::HSTRING ):
-			lower = strcasecmp( left_.get_string(), right_.get_string() ) < 0;
+			lower = stricasecmp( left_.get_string(), right_.get_string() ) < 0;
 		break;
 		case ( TYPE::HTIME ):
 			lower = left_.get_time().raw() < right_.get_time().raw();

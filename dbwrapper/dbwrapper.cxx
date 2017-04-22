@@ -53,15 +53,15 @@ namespace {
 ODBConnector::DRIVER::enum_t db_driver_from_string( HString const& dbType_ ) {
 	M_PROLOG
 	ODBConnector::DRIVER::enum_t driver( ODBConnector::DRIVER::DEFAULT );
-	if ( ! strcasecmp( dbType_, "SQLite3" ) ) {
+	if ( ! stricasecmp( dbType_, "SQLite3" ) ) {
 		driver = ODBConnector::DRIVER::SQLITE3;
-	} else if ( ! strcasecmp( dbType_, "PostgreSQL" ) ) {
+	} else if ( ! stricasecmp( dbType_, "PostgreSQL" ) ) {
 		driver = ODBConnector::DRIVER::POSTGRESQL;
-	} else if ( ! strcasecmp( dbType_, "MySQL" ) ) {
+	} else if ( ! stricasecmp( dbType_, "MySQL" ) ) {
 		driver = ODBConnector::DRIVER::MYSQL;
-	} else if ( ! strcasecmp( dbType_, "Firebird" ) ) {
+	} else if ( ! stricasecmp( dbType_, "Firebird" ) ) {
 		driver = ODBConnector::DRIVER::FIREBIRD;
-	} else if ( ! strcasecmp( dbType_, "Oracle" ) ) {
+	} else if ( ! stricasecmp( dbType_, "Oracle" ) ) {
 		driver = ODBConnector::DRIVER::ORACLE;
 	} else {
 		throw HDataBaseException( "unsupported database type: " + dbType_ );
@@ -125,9 +125,9 @@ namespace {
 bool set_dbwrapper_variables( HString& option_, HString& value_ ) {
 	M_PROLOG
 	bool fail( false );
-	if ( ! strcasecmp( option_, "set_env" ) ) {
+	if ( ! stricasecmp( option_, "set_env" ) ) {
 		decode_set_env( value_ );
-	} else if ( ! strcasecmp( option_, "data_base_driver" ) ) {
+	} else if ( ! stricasecmp( option_, "data_base_driver" ) ) {
 		try {
 			dbwrapper::_dataBaseDriver_ = db_driver_from_string( value_ );
 		} catch ( HDataBaseException const& ) {

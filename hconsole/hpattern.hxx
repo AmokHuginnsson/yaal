@@ -50,6 +50,7 @@ public:
 	typedef yaal::hcore::HPair<char, bool*> flag_desc_t;
 	typedef yaal::hcore::HArray<flag_desc_t> pluggable_flags_t;
 	typedef HPattern this_type;
+	static int const NO_MATCH = yaal::hcore::HRegex::NO_MATCH;
 private:
 	bool _initialized;             /*!< is pattern initialized */
 	bool _ignoreCaseDefault;       /*!< default value for ignore case switch */
@@ -92,7 +93,7 @@ public:
 	 */
 	bool matches( yaal::hcore::HString const& string_ ) const;
 private:
-	char const* matches( char const*, int* = nullptr /* match length */ ) const;
+	int matches( yaal::hcore::HString const&, int& /* match length */ ) const;
 	bool set_switch( char const, pluggable_flags_t* );
 	void save_state( void*, pluggable_flags_t* );
 	void restore_state( void*, pluggable_flags_t* );
@@ -101,13 +102,13 @@ private:
 /*! \brief Instance of single match for given pattern.
  */
 class HPattern::HMatch {
+	int _start;
 	int _size;
-	char const* _start;
 public:
+	int start() const;
 	int size() const;
-	char const* raw() const;
 private:
-	HMatch( char const*, int );
+	HMatch( int, int );
 	friend class HPattern::HMatchIterator;
 };
 
@@ -126,7 +127,7 @@ public:
 	HMatchIterator( HMatchIterator const& );
 	HMatchIterator& operator = ( HMatchIterator const& );
 private:
-	HMatchIterator( HPattern const*, char const*, int );
+	HMatchIterator( HPattern const*, int, int );
 	friend class HPattern;
 };
 

@@ -94,10 +94,8 @@ void HSearchableWidget::highlight( int row_, int column_,
 		} else {
 			cons.set_attr( _attributeSearchHighlight_._data );
 		}
-		cons.mvprintf( row_,
-				static_cast<int>( column_ + ( it->raw() - _varTmpBuffer.c_str() ) ),
-				"%.*s", it->size(), it->raw() );
-		ctr ++;
+		cons.mvprintf( row_, column_ + it->start(), "%.*s", it->size(), _varTmpBuffer.substr( it->start(), it->size() ) );
+		++ ctr;
 	}
 	return;
 	M_EPILOG

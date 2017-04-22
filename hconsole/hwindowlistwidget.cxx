@@ -82,8 +82,7 @@ template<>
 bool compare_cells( HWindow::ptr_t const& left_, HWindow::ptr_t const& right_, OSortHelper & sortHelper_ ) {
 	M_PROLOG
 	sortHelper_.progress();
-	return ( strcasecmp ( left_->get_title(),
-			 right_->get_title() ) > 0 );
+	return ( stricasecmp( left_->get_title(), right_->get_title() ) > 0 );
 	M_EPILOG
 }
 
@@ -143,7 +142,7 @@ bool CompareListWidgetItems<HWindow::ptr_t>::operator() ( HWindow::ptr_t const& 
 	M_PROLOG
 	HWindow::ptr_t const& left = _sortHelper._order == OSortHelper::ASCENDING ? left_ : right_;
 	HWindow::ptr_t const& right = _sortHelper._order == OSortHelper::ASCENDING ? right_ : left_;
-	return ( strcasecmp( left->get_title(), right->get_title() ) > 0 );
+	return ( stricasecmp( left->get_title(), right->get_title() ) > 0 );
 	M_EPILOG
 }
 

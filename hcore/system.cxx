@@ -232,7 +232,7 @@ HResourceInfo get_memory_size_info( void ) {
 			if ( t.begin() != t.end() ) {
 				tokens = *t.begin();
 				for ( TagVar const& tagVar : tagVars ) {
-					if ( ! strcasecmp( tokens, tagVar._tag ) ) {
+					if ( ! stricasecmp( tokens, tagVar._tag ) ) {
 						HTokenizer::iterator it( t.begin() );
 						++ it;
 						if ( it != t.end() ) {

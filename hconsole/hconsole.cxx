@@ -109,11 +109,11 @@ void set_color( HString& value_, HWidget::OAttribute& attribute_ ) {
 bool set_hconsole_variables( HString& option_, HString& value_ ) {
 	M_PROLOG
 	bool fail( false );
-	if ( ! strcasecmp( option_, "set_env" ) ) {
+	if ( ! stricasecmp( option_, "set_env" ) ) {
 		decode_set_env( value_ );
-	} else if ( ! strcasecmp( option_, "use_mouse" ) ) {
+	} else if ( ! stricasecmp( option_, "use_mouse" ) ) {
 		/* enable mouse support */
-		if ( ! strcasecmp( value_, "auto" ) ) {
+		if ( ! stricasecmp( value_, "auto" ) ) {
 			_useMouse_ = USE_MOUSE::AUTO;
 		} else {
 			bool useMouse( lexical_cast<bool>( value_ ) );
@@ -123,17 +123,17 @@ bool set_hconsole_variables( HString& option_, HString& value_ ) {
 				_useMouse_ = USE_MOUSE::NO;
 			}
 		}
-	} else if ( ! strcasecmp( option_, "screen_background" ) ) {
+	} else if ( ! stricasecmp( option_, "screen_background" ) ) {
 		_screenBackground_ = COLOR::fg_to_bg( get_color_bits( value_, 0 ) );
-	} else if ( ! strcasecmp( option_, "attribute_disabled" ) ) {
+	} else if ( ! stricasecmp( option_, "attribute_disabled" ) ) {
 		set_color( value_, _attributeDisabled_ );
-	} else if ( ! strcasecmp( option_, "attribute_enabled" ) ) {
+	} else if ( ! stricasecmp( option_, "attribute_enabled" ) ) {
 		set_color( value_, _attributeEnabled_ );
-	} else if ( ! strcasecmp( option_, "attribute_focused" ) ) {
+	} else if ( ! stricasecmp( option_, "attribute_focused" ) ) {
 		set_color( value_, _attributeFocused_ );
-	} else if ( ! strcasecmp( option_, "attribute_statusbar" ) ) {
+	} else if ( ! stricasecmp( option_, "attribute_statusbar" ) ) {
 		set_color( value_, _attributeStatusBar_ );
-	} else if ( ! strcasecmp( option_, "attribute_search_highlight" ) ) {
+	} else if ( ! stricasecmp( option_, "attribute_search_highlight" ) ) {
 		set_color( value_, _attributeSearchHighlight_ );
 	} else {
 		fail = true;

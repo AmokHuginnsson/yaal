@@ -98,7 +98,6 @@ void HPattern::restore_state( void* sp, pluggable_flags_t* f ) {
 bool HPattern::parse( HString const& pattern_, pluggable_flags_t* externalFlags ) {
 	M_PROLOG
 	_errorCause.clear();
-	char const* pattern( pattern_.c_str() );
 
 /* clear all flags */
 	_ignoreCase = _ignoreCaseDefault;
@@ -142,9 +141,9 @@ bool HPattern::parse( HString const& pattern_, pluggable_flags_t* externalFlags 
 		}
 
 		for ( int idx( stop + 1 ), LEN( static_cast<int>( _pattern.get_length() ) ); idx < LEN; ++ idx ) {
-			if ( ! set_switch( pattern[ idx ], externalFlags ) ) {
+			if ( ! set_switch( pattern_[ idx ], externalFlags ) ) {
 				restore_state( &savePoint, externalFlags );
-				_errorCause.format( "bad search option '%c'", pattern[ idx ] );
+				_errorCause.format( "bad search option '%c'", pattern_[ idx ] );
 				ok = false;
 				break;
 			}
@@ -209,71 +208,74 @@ bool HPattern::set_switch( char const switch_, pluggable_flags_t* externalFlags 
 	M_EPILOG
 }
 
-char const* HPattern::matches( char const* string_,
-		int* matchLength_ ) const {
+int HPattern::matches( yaal::hcore::HString const& string_, int& matchLength_ ) const {
 	M_PROLOG
 	M_ASSERT( string_ );
 	_errorCause.clear();
-	char const* ptr = nullptr;
-	int matchLength = 0;
+	int start( NO_MATCH );
+	matchLength_ = 0;
 	if ( _simpleMatchLength ) {
 		if ( _extended ) {
 			HRegex::HMatchIterator it( _regex.find( HString( string_ ) ) );
 			if ( it != _regex.end() ) {
-				matchLength = it->size();
-				if ( matchLength > 0 ) {
-					ptr = string_ + it->start();
+				matchLength_ = it->size();
+				if ( matchLength_ > 0 ) {
+					start = it->start();
 				}
 			} else {
 				_errorCause = _pattern;
 			}
 		} else {
 			if ( _ignoreCase ) {
-				ptr = ::strcasestr( string_, _pattern.c_str() );
+				int long pos( icasesearch( string_, _pattern ) );
+				if ( pos != HString::npos ) {
+					start = static_cast<int>( pos );
+				}
 			} else {
-				ptr = ::strstr( string_, _pattern.c_str() );
+				int long pos( string_.find( _pattern ) );
+				if ( pos != HString::npos ) {
+					start = static_cast<int>( pos );
+				}
 			}
-			if ( ptr ) {
-				matchLength = _simpleMatchLength;
+			if ( start != NO_MATCH ) {
+				matchLength_ = _simpleMatchLength;
 			}
 		}
 	}
-	if ( matchLength_ ) {
-		( *matchLength_ ) = matchLength;
-	}
-	return ( ptr );
+	return ( start );
 	M_EPILOG
 }
 
 HPattern::HMatchIterator HPattern::find( HString const& str_ ) const {
 	M_ASSERT( str_ );
 	int len( 0 );
-	char const* start( matches( str_.c_str(), &len ) );
+	int start( matches( str_, len ) );
 	HMatchIterator it( this, start, len );
 	return ( it );
 }
 
 HPattern::HMatchIterator HPattern::end( void ) const {
-	return ( HMatchIterator( this, nullptr, 0 ) );
+	return ( HMatchIterator( this, NO_MATCH, 0 ) );
 }
 
 bool HPattern::matches( HString const& str_ ) const {
 	return ( find( str_ ) != end() );
 }
 
-HPattern::HMatch::HMatch( char const* start_, int size_ )
-	: _size( size_ ), _start( start_ ) {
+HPattern::HMatch::HMatch( int start_, int size_ )
+	: _start( start_ )
+	, _size( size_ ) {
+}
+
+int HPattern::HMatch::start( void ) const {
+	return ( _start );
 }
 
 int HPattern::HMatch::size( void ) const {
 	return ( _size );
 }
 
-char const* HPattern::HMatch::raw( void ) const {
-	return ( _start );
-}
-
-HPattern::HMatchIterator::HMatchIterator( HPattern const* owner_, char const* start_, int len_ )
+HPattern::HMatchIterator::HMatchIterator( HPattern const* owner_, int start_, int len_ )
 	: base_type()
 	, _owner( owner_ )
 	, _match( start_, len_ ) {
@@ -313,8 +315,8 @@ bool HPattern::HMatchIterator::operator == ( HMatchIterator const& mi_ ) const {
 
 HPattern::HMatchIterator& HPattern::HMatchIterator::operator ++ ( void ) {
 	M_PROLOG
-	M_ASSERT( _match._start );
-	_match._start = _owner->matches( _match._start + 1, &_match._size );
+	M_ASSERT( _match._start != NO_MATCH );
+	_match._start = _owner->matches( _match._start + 1, _match._size );
 	return ( *this );
 	M_EPILOG
 }

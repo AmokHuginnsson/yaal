@@ -2375,7 +2375,12 @@ int long kmpcasesearch( char const* str, int long lenstr, char const* pat, int l
 
 }
 
-int strcasecmp( HString const& left, HString const& right ) {
+int long icasesearch( HString const& haystack_, HString const& needle_ ) {
+	char const* p(::strcasestr( haystack_.c_str(), needle_.c_str() ) );
+	return ( p != nullptr ? p - haystack_.c_str() : HString::npos );
+}
+
+int stricasecmp( HString const& left, HString const& right ) {
 	return ( ::strcasecmp( left.c_str(), right.c_str() ) );
 }
 

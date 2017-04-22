@@ -90,7 +90,7 @@ namespace {
 bool set_hcore_variables( HString& option_, HString& value_ ) {
 	M_PROLOG
 	bool fail( false );
-	if ( ! strcasecmp( option_, "set_env" ) ) {
+	if ( ! stricasecmp( option_, "set_env" ) ) {
 		decode_set_env( value_ );
 	} else {
 		fail = true;
@@ -327,7 +327,7 @@ HCoreInitDeinit::HCoreInitDeinit( void ) {
 			.setter(
 				[]( yaal::hcore::HString const& value_ ) {
 					for ( int l( LOG_LEVEL::MIN ); l <= LOG_LEVEL::MAX; ++ l ) {
-						if ( ! strcasecmp( value_, LOG_LEVEL::name( static_cast<LOG_LEVEL::priority_t>( l ) ) ) ) {
+						if ( ! stricasecmp( value_, LOG_LEVEL::name( static_cast<LOG_LEVEL::priority_t>( l ) ) ) ) {
 							HLog::_logLevel = static_cast<LOG_LEVEL::priority_t>( l );
 							return;
 						}
