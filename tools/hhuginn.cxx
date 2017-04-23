@@ -76,7 +76,7 @@ char const* const MODULE_PATHS_RAW( ::getenv( "HUGINNPATH" ) );
 HString MODULE_PATHS_S( MODULE_PATHS_RAW ? hcore::to_string( MODULE_PATHS_RAW ).append( ":" ).append( DEFAULT_PATHS ) : DEFAULT_PATHS );
 
 }
-HHuginn::paths_t const HHuginn::MODULE_PATHS( string::split<HHuginn::paths_t>( MODULE_PATHS_S.c_str(), ":", HTokenizer::SKIP_EMPTY ) );
+HHuginn::paths_t const HHuginn::MODULE_PATHS( string::split<HHuginn::paths_t>( MODULE_PATHS_S, ":", HTokenizer::SKIP_EMPTY ) );
 
 static int const DEFAULT_MAX_CALL_STACK( 1024 );
 int _huginnMaxCallStack_( DEFAULT_MAX_CALL_STACK );

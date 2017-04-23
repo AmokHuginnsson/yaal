@@ -47,7 +47,6 @@ private:
 public:
 	HStringStream( void );
 	HStringStream( yaal::hcore::HString const& );
-	char const* raw( void ) const;
 	yaal::hcore::HString const& string( void ) const;
 	void set_buffer( yaal::hcore::HString const& );
 	yaal::hcore::HString const& str( void ) const;

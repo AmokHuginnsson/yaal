@@ -62,10 +62,6 @@ void HStringStream::str( HString const& s_ ) {
 	M_EPILOG
 }
 
-char const* HStringStream::raw( void ) const {
-	return ( _buffer.c_str() );
-}
-
 yaal::hcore::HString const& HStringStream::string( void ) const {
 	return ( _buffer );
 }
