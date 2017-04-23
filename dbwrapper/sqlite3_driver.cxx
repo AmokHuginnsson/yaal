@@ -59,10 +59,13 @@ M_EXPORT_SYMBOL int COLUMN_NAME_INDEX = 1;
 
 struct OSQLite {
 	int _errorCode;
-	HString _errorMessage;
+	HUTF8String _errorMessage;
 	sqlite3* _db;
 	OSQLite( void )
-		: _errorCode( 0 ), _errorMessage(), _db( nullptr ) {}
+		: _errorCode( 0 )
+		, _errorMessage()
+		, _db( nullptr ) {
+	}
 private:
 	OSQLite( OSQLite const& );
 	OSQLite& operator = ( OSQLite const& );
@@ -74,14 +77,20 @@ struct OSQLiteResult {
 	int _columns;
 	void* _data;
 	int _errorCode;
-	HString _errorMessage;
+	HUTF8String _errorMessage;
 	bool _randomAccess;
 	bool _stepped;
 	bool _last;
 	OSQLiteResult( void )
-		: _useCount( 1 ), _rows( 0 ), _columns( 0 ), _data( nullptr ),
-		_errorCode( 0 ), _errorMessage(), _randomAccess( false ),
-		_stepped( false ), _last( false ) {
+		: _useCount( 1 )
+		, _rows( 0 )
+		, _columns( 0 )
+		, _data( nullptr )
+		, _errorCode( 0 )
+		, _errorMessage()
+		, _randomAccess( false )
+		, _stepped( false )
+		, _last( false ) {
 		return;
 	}
 private:
@@ -120,7 +129,7 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, HString const& dataBase_,
 		}
 		sQLite->_errorCode = ::sqlite3_open( utf8.x_str(), &sQLite->_db );
 		if ( sQLite->_errorCode ) {
-			sQLite->_errorMessage = ::sqlite3_errmsg( sQLite->_db );
+			sQLite->_errorMessage = HUTF8String( ::sqlite3_errmsg( sQLite->_db ) );
 		} else {
 			void* ptr( yaal_sqlite3_db_fetch_query_result( dbLink_, "PRAGMA empty_result_callbacks = ON;" ) );
 			if ( ptr ) {
@@ -174,10 +183,10 @@ M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* result_ ) 
 	M_ASSERT( sQLite );
 	char const* msg = "";
 	if ( r && ! r->_errorMessage.is_empty() ) {
-		msg = r->_errorMessage.c_str();
+		msg = r->_errorMessage.x_str();
 	} else if ( sQLite ) {
 		if ( ! sQLite->_errorMessage.is_empty() ) {
-			msg = sQLite->_errorMessage.c_str();
+			msg = sQLite->_errorMessage.x_str();
 		} else {
 			msg = sqlite3_errmsg( sQLite->_db );
 		}
@@ -199,7 +208,7 @@ void* yaal_sqlite3_db_fetch_query_result( ODBLink& dbLink_, char const* query_ )
 			&result->_columns, &errmsg );
 	result->_data = data;
 	if ( errmsg ) {
-		result->_errorMessage = errmsg;
+		result->_errorMessage = HUTF8String( errmsg );
 		sqlite3_free( errmsg );
 	}
 	return ( result );
@@ -240,7 +249,7 @@ void* yaal_db_query( ODBLink& dbLink_, char const* query_ ) {
 	result->_data = stmt;
 	result->_columns = sqlite3_column_count( stmt );
 	if ( result->_errorCode != SQLITE_OK ) {
-		result->_errorMessage = sqlite3_errmsg( sQLite->_db );
+		result->_errorMessage = HUTF8String( sqlite3_errmsg( sQLite->_db ) );
 	}
 	return ( result );
 }

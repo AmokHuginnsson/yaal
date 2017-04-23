@@ -37,6 +37,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hprogramoptionshandler.hxx"
 #include "functional.hxx"
 #include "hstring.hxx"
+#include "hformat.hxx"
 #include "hchunk.hxx"
 #include "hregex.hxx"
 #include "hlog.hxx"
@@ -514,9 +515,11 @@ int HProgramOptionsHandler::process_rc_file( HString const& section_, RC_CALLBAC
 							needLog = true;
 							log << "failed." << endl;
 						}
-						message.format( "Error: unknown option found: `%s', "
-									"with value: `%s', on line %d.\n",
-									option.c_str(), value.c_str(), line );
+						message = format(
+							"Error: unknown option found: `%s', "
+							"with value: `%s', on line %d.\n",
+							option, value, line
+						);
 						log( LOG_LEVEL::ERROR ) << message;
 						HUTF8String utf8( message );
 						::fputs( utf8.x_str(), stderr );

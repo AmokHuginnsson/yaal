@@ -61,16 +61,18 @@ public:
 
 namespace {
 
-void do_buf_3_to_4( HString& out, u32_t const& in, int mode, int long pad = 0 ) {
-	char buf[ 5 ] = { 0, 0, 0, 0, 0 };
+void do_buf_3_to_4( HChunk& out, int long& outSize, u32_t in, int mode, int long pad = 0 ) {
+	static int const ENC_OUT_SIZE( 4 );
+	out.realloc( outSize + ENC_OUT_SIZE );
+	char* buf( out.get<char>() + outSize );
 	buf[ 0 ] = _base64EncodeTable_[mode][ ( in >> 18 ) & 63 ];
 	buf[ 1 ] = _base64EncodeTable_[mode][ ( in >> 12 ) & 63 ];
 	buf[ 2 ] = _base64EncodeTable_[mode][ ( in >> 6 ) & 63 ];
 	buf[ 3 ] = _base64EncodeTable_[mode][ in & 63 ];
 	if ( pad ) {
-		::memset( ( ( buf + sizeof ( buf ) ) - pad ) - 1, '=', static_cast<size_t>( pad ) );
+		::memset( ( buf + ENC_OUT_SIZE - pad ), '=', static_cast<size_t>( pad ) );
 	}
-	out += buf;
+	outSize += ENC_OUT_SIZE;
 	return;
 }
 
@@ -85,32 +87,36 @@ void do_buf_4_to_3( char* out, u32_t const& in, int size = 3 ) {
 	return;
 }
 
-yaal::hcore::HString base64_raw_encode( char const* ptr, int long length, bool standardCompliantMode ) {
+void base64_raw_encode( HChunk& output_, int long& outputSize_, char const* ptr, int long length, bool standardCompliantMode ) {
 	M_PROLOG
 	int shifts[] = { 16, 8, 0 };
-	static int const PREALLOCATE = 128;
-	HString output( PREALLOCATE, 0 );
+	static int const PREALLOCATE( 128 );
+	output_.realloc( PREALLOCATE );
+	outputSize_ = 0;
 	u32_t coder = 0;
 	for ( int long i = 0; i < length; ++ i ) {
 		int shift = shifts[ i % 3 ];
 		coder |= static_cast<u32_t>( static_cast<u8_t>( ptr[ i ] ) << shift );
 		if ( ! shift ) {
-			do_buf_3_to_4( output, coder, standardCompliantMode ? 1 : 0 );
+			do_buf_3_to_4( output_, outputSize_, coder, standardCompliantMode ? 1 : 0 );
 			coder = 0;
 		}
 	}
 	if ( length % 3 ) {
-		do_buf_3_to_4( output, coder, standardCompliantMode ? 1 : 0, 3 - ( length % 3 ) );
+		do_buf_3_to_4( output_, outputSize_, coder, standardCompliantMode ? 1 : 0, 3 - ( length % 3 ) );
 	}
-	return ( output );
+	return;
 	M_EPILOG
 }
 
 }
 
-yaal::hcore::HString base64::encode( yaal::hcore::HString const& message, bool standardCompliantMode ) {
+yaal::hcore::HString base64::encode( yaal::hcore::HUTF8String const& message, bool standardCompliantMode ) {
 	M_PROLOG
-	return ( base64_raw_encode( message.c_str(), message.get_length(), standardCompliantMode ) );
+	HChunk c;
+	int long size( 0 );
+	base64_raw_encode( c, size, message.raw(), message.byte_count(), standardCompliantMode );
+	return ( HString( c.get<char>(), size ) );
 	M_EPILOG
 }
 
@@ -125,24 +131,22 @@ inline bool is_base64_character( char ch_, bool standardCompliantMode_ ) {
 
 namespace {
 
-int long base64_raw_decode( yaal::hcore::HString const& message, char* output, int long bufSize, bool standardCompliantMode ) {
+int long base64_raw_decode( char const* input, int long inputSize, char* output, int long bufSize, bool standardCompliantMode ) {
 	M_PROLOG
 	int shifts[] = { 18, 12, 6, 0 };
 	u32_t coder = 0;
-	char const* ptr = message.c_str();
-	int long length = message.get_length();
 	int long size( 0 );
 	int long i( 0 );
-	M_ENSURE( ( ( ( ( length * 3 ) / 4 ) + 1 ) <= bufSize ) || ( ! length ) );
-	for ( ; ( i < length ) && ( ptr[ i ] != '=' ); ++ i ) {
-		char ch = ptr[ i ];
+	M_ENSURE( ( ( ( ( inputSize * 3 ) / 4 ) + 1 ) <= bufSize ) || ( ! inputSize ) );
+	for ( ; ( i < inputSize ) && ( input[ i ] != '=' ); ++ i ) {
+		char ch = input[ i ];
 		M_ENSURE( is_base64_character( ch, standardCompliantMode ) );
 		int shift = shifts[ i % 4 ];
 		/*
 		 * static_cast<u8_t>() is done for clipping.
 		 * static_cast<u32_t>() is done to silence (spurious) clang warning.
 		 */
-		coder |= static_cast<u32_t>( static_cast<u8_t>( ( _base64DecodeTable_[standardCompliantMode ? 1 : 0][ static_cast<u8_t>( ptr[ i ] ) ] ) ) << shift );
+		coder |= static_cast<u32_t>( static_cast<u8_t>( ( _base64DecodeTable_[standardCompliantMode ? 1 : 0][ static_cast<u8_t>( input[ i ] ) ] ) ) << shift );
 		if ( ! shift ) {
 			do_buf_4_to_3( output + size, coder );
 			size += 3;
@@ -163,12 +167,19 @@ int long base64_raw_decode( yaal::hcore::HString const& message, char* output, i
 yaal::hcore::HString base64::decode( yaal::hcore::HString const& message, bool standardCompliantMode ) {
 	M_PROLOG
 	int long len = message.get_length();
-	HChunk buf;
+	HChunk output;
 	if ( len > 0 ) {
-		buf.realloc( len, HChunk::STRATEGY::EXACT );
-		base64_raw_decode( message, buf.get<char>(), buf.get_size(), standardCompliantMode );
+		output.realloc( len, HChunk::STRATEGY::EXACT );
+		HChunk input( len );
+		char* inputBuffer( input.get<char>() );
+		int i( 0 );
+		for ( char ch : message ) {
+			inputBuffer[i] = ch;
+			++ i;
+		}
+		base64_raw_decode( inputBuffer, len, output.get<char>(), output.get_size(), standardCompliantMode );
 	}
-	return ( buf.get<char>() );
+	return ( output.get<char>() );
 	M_EPILOG
 }
 
@@ -177,31 +188,31 @@ void base64::encode( yaal::hcore::HStreamInterface& in, yaal::hcore::HStreamInte
 	M_ENSURE( wrap_ >= 0 );
 	int const BASE64LINELEN = 57;
 	char buf[BASE64LINELEN];
-	int long size( 0 );
-	HString line( 80, 0 );
+	int long inputSize( 0 );
+	int long outputSize( 0 );
+	HChunk output;
 	int long offset( 0 );
 	bool needEndl( false );
-	while ( ( size = in.read( buf, sizeof ( buf ) ) ) > 0 ) {
-		line = base64_raw_encode( buf, size, standardCompliantMode );
+	while ( ( inputSize = in.read( buf, sizeof ( buf ) ) ) > 0 ) {
+		base64_raw_encode( output, outputSize, buf, inputSize, standardCompliantMode );
+		char const* ptr = output.get<char>();
 		if ( wrap_ ) {
-			int long nRead( line.get_length() );
-			char const* ptr = line.c_str();
-			while ( ( offset + nRead ) >= wrap_ ) {
+			while ( ( offset + outputSize ) >= wrap_ ) {
 				int long nWrite( wrap_ - offset );
 				out.write( ptr, nWrite );
 				ptr += nWrite;
-				nRead -= nWrite;
+				outputSize -= nWrite;
 				offset = 0;
 				out << endl;
 				needEndl = false;
 			}
-			if ( nRead > 0 ) {
-				out.write( ptr, nRead );
-				offset = nRead;
+			if ( outputSize > 0 ) {
+				out.write( ptr, outputSize );
+				offset = outputSize;
 				needEndl = true;
 			}
 		} else {
-			out << line << flush;
+			out.write( ptr, outputSize );
 		}
 	}
 	if ( wrap_ && needEndl ) {
@@ -215,31 +226,30 @@ void base64::decode( yaal::hcore::HStreamInterface& in, yaal::hcore::HStreamInte
 	M_PROLOG
 	int const BASE64LINELEN = 76;
 	int const BUF_LEN = 80;
-	char buf[BUF_LEN];
-	int long size( 0 );
+	char outputBuffer[BUF_LEN];
 	HString line( BUF_LEN, 0 );
-	HString decodebuf( BASE64LINELEN + 1, 0 );
+	HChunk buffer( BASE64LINELEN + 1 );
+	char* inputBuffer( buffer.get<char>() );
+	int inputSize( 0 );
 	int long pos( 0 );
 	while ( in.read_until_n( line, BUF_LEN ) ) {
-		char const* ptr = line.c_str();
-		int const SIZE = static_cast<int>( line.get_length() );
-		for ( int i = 0; i < SIZE; ++ i, ++ pos ) {
-			char ch = ptr[ i ];
+		for ( char ch : line ) {
 			M_ENSURE( is_base64_character( ch, standardCompliantMode ) || isalpha( ch ), ( HFormat( "char: %c, at position: %ld" ) % ch % pos ).string() );
 			if ( is_base64_character( ch, standardCompliantMode	) ) {
-				decodebuf += ch;
+				inputBuffer[inputSize++] = ch;
 			}
-			if ( decodebuf.get_length() >= BASE64LINELEN ) {
-				M_ASSERT( decodebuf.get_length() == BASE64LINELEN );
-				size = base64_raw_decode( decodebuf, buf, sizeof ( buf ), standardCompliantMode );
-				out.write( buf, size );
-				decodebuf.clear();
+			if ( inputSize >= BASE64LINELEN ) {
+				M_ASSERT( inputSize == BASE64LINELEN );
+				int long outputSize( base64_raw_decode( inputBuffer, inputSize, outputBuffer, sizeof ( outputBuffer ), standardCompliantMode ) );
+				out.write( outputBuffer, outputSize );
+				inputSize = 0;
 			}
+			++ pos;
 		}
 	}
-	if ( decodebuf.get_length() > 0 ) {
-		size = base64_raw_decode( decodebuf, buf, sizeof ( buf ), standardCompliantMode );
-		out.write( buf, size );
+	if ( inputSize > 0 ) {
+		int long outputSize( base64_raw_decode( inputBuffer, inputSize, outputBuffer, sizeof ( outputBuffer ), standardCompliantMode ) );
+		out.write( outputBuffer, outputSize );
 	}
 	return;
 	M_EPILOG

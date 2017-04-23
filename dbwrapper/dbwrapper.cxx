@@ -81,7 +81,7 @@ HDataBase::ptr_t connect( yaal::hcore::HString const& dsn_ ) {
 	if ( dbTypeEnd == HString::npos ) {
 		throw HDataBaseException( "bad database uri: " + dsn_ );
 	}
-	HString dbType( dsn_.c_str(), dbTypeEnd );
+	HString dbType( dsn_.left( dbTypeEnd ) );
 	dbType.lower();
 	ODBConnector::DRIVER::enum_t driver( db_driver_from_string( dbType ) );
 	HString connectionString = dsn_.substr( dbTypeEnd + static_cast<int>( sizeof ( SCHEMA_SEPARATOR ) ) - 1 );
@@ -90,7 +90,7 @@ HDataBase::ptr_t connect( yaal::hcore::HString const& dsn_ ) {
 	HString password;
 	HString dbHostSpec;
 	if ( userPassEnd != HString::npos ) {
-		HString userPass( connectionString.c_str(), userPassEnd );
+		HString userPass( connectionString.left( userPassEnd ) );
 		int userEnd( static_cast<int>( userPass.find( ':' ) ) );
 		userName = userPass.left( userEnd );
 		if ( userEnd != HString::npos ) {

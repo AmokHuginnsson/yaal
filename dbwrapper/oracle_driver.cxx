@@ -85,13 +85,19 @@ struct OQuery {
 		int _size;
 		char* _buffer;
 		sb2 _isNull;
-		HString _name;
+		HUTF8String _name;
 		OFieldInfo( void )
-			: _size( 0 ), _buffer( nullptr ), _isNull( 0 ), _name()
-			{}
+			: _size( 0 )
+			, _buffer( nullptr )
+			, _isNull( 0 )
+			, _name() {
+		}
 		OFieldInfo( OFieldInfo const& fi_ )
-			: _size( fi_._size ), _buffer( fi_._buffer ), _isNull( fi_._isNull ), _name( fi_._name )
-			{}
+			: _size( fi_._size )
+			, _buffer( fi_._buffer )
+			, _isNull( fi_._isNull )
+			, _name( fi_._name ) {
+		}
 		OFieldInfo& operator = ( OFieldInfo const& fi_ ) {
 			if ( &fi_ != this ) {
 				_size = fi_._size;
@@ -112,11 +118,20 @@ struct OQuery {
 	HChunk _buffer;
 	ub4 _mode;
 	HString _sql;
+	HUTF8String _utf8ConversionCache;
 	in_null_ind_t _inNullInd;
 	OQuery( int* status_ )
-		: _useCount( 1 ), _status( status_ ), _error( nullptr ), _statement( nullptr ),
-		_fieldInfos(), _buffer(), _mode(), _sql(), _inNullInd()
-		{}
+		: _useCount( 1 )
+		, _status( status_ )
+		, _error( nullptr )
+		, _statement( nullptr )
+		, _fieldInfos()
+		, _buffer()
+		, _mode()
+		, _sql()
+		, _utf8ConversionCache()
+		, _inNullInd() {
+	}
 private:
 	OQuery( OQuery const& );
 	OQuery& operator = ( OQuery const& );
@@ -151,14 +166,15 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& /
 			break;
 		HUTF8String login( login_ );
 		HUTF8String password( password_ );
+		HUTF8String instance( _instanceName_ );
 		if ( ( oracle->_status = OCILogon( oracle->_environment,
 					oracle->_error, &oracle->_serviceContext,
 					reinterpret_cast<OraText const*>( login.x_str() ),
 					static_cast<ub4>( login.byte_count() ),
 					reinterpret_cast<OraText const*>( password.x_str() ),
 					static_cast<ub4>( password.byte_count() ),
-					reinterpret_cast<OraText const*>( _instanceName_.c_str() ),
-					static_cast<ub4>( _instanceName_.get_length() ) ) ) == OCI_SUCCESS )
+					reinterpret_cast<OraText const*>( instance.x_str() ),
+					static_cast<ub4>( instance.byte_count() ) ) ) == OCI_SUCCESS )
 			dbLink_._valid = true;
 	} while ( false );
 	return ( dbLink_._valid );
@@ -238,10 +254,11 @@ void* oracle_db_prepare_query( ODBLink& dbLink_, char const* query_, ub4 mode_ )
 	queryObj->_sql = transform_sql( query_, &placeholder_generator );
 	queryObj->_sql.trim();
 	queryObj->_sql.trim_right( ";" );
+	queryObj->_utf8ConversionCache = queryObj->_sql;
 	oracle->_status = OCIStmtPrepare2( oracle->_serviceContext,
 			&queryObj->_statement, oracle->_error,
-			reinterpret_cast<OraText const*>( queryObj->_sql.c_str() ),
-			static_cast<ub4>( queryObj->_sql.get_length() ), nullptr, 0, OCI_NTV_SYNTAX, OCI_DEFAULT );
+			reinterpret_cast<OraText const*>( queryObj->_utf8ConversionCache.x_str() ),
+			static_cast<ub4>( queryObj->_utf8ConversionCache.byte_count() ), nullptr, 0, OCI_NTV_SYNTAX, OCI_DEFAULT );
 	queryObj->_error = oracle->_error;
 	if ( ( oracle->_status != OCI_SUCCESS )
 			&& ( oracle->_status != OCI_SUCCESS_WITH_INFO ) ) {
@@ -339,7 +356,7 @@ void* oracle_query_execute( ODBLink& dbLink_, void* data_ ) {
 									OCI_ATTR_NAME, query->_error ) ) == OCI_SUCCESS ) {
 						if ( nameLength >= 0 ) {
 							name[ nameLength ] = 0;
-							fi._name = reinterpret_cast<char const*>( name );
+							fi._name = HUTF8String( reinterpret_cast<char const*>( name ) );
 						} else {
 							fail = true;
 							break;
@@ -530,7 +547,7 @@ M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 M_EXPORT_SYMBOL char const* rs_column_name( void*, int );
 M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ ) {
 	OQuery* query = static_cast<OQuery*>( dataR_ );
-	return ( query->_fieldInfos[field_]._name.c_str() );
+	return ( query->_fieldInfos[field_]._name.x_str() );
 }
 
 void oracle_init( void ) __attribute__((__constructor__));

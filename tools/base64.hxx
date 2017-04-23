@@ -39,7 +39,7 @@ namespace tools {
  */
 struct base64 {
 	typedef base64 this_type;
-	static yaal::hcore::HString encode( yaal::hcore::HString const&, bool = false );
+	static yaal::hcore::HString encode( yaal::hcore::HUTF8String const&, bool = false );
 	static yaal::hcore::HString decode( yaal::hcore::HString const&, bool = false );
 	static void encode( yaal::hcore::HStreamInterface&, yaal::hcore::HStreamInterface&, bool = false, int = 0 );
 	static void decode( yaal::hcore::HStreamInterface&, yaal::hcore::HStreamInterface&, bool = false );
