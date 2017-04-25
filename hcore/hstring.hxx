@@ -487,12 +487,12 @@ public:
 	 * \return Index of last occurrence of given sub-string if given sub-string can be found or HString::npos otherwise.
 	 */
 	int long find_last( HString const& str, int long before = npos ) const;
-	int long find_one_of( char const*, int long = 0 ) const;
-	int long reverse_find_one_of( char const*, int long = 0 ) const;
-	int long find_last_one_of( char const*, int long = npos ) const;
-	int long find_other_than( char const*, int long = 0 ) const;
-	int long reverse_find_other_than( char const*, int long = 0 ) const;
-	int long find_last_other_than( char const*, int long = npos ) const;
+	int long find_one_of( HString const&, int long = 0 ) const;
+	int long reverse_find_one_of( HString const&, int long = 0 ) const;
+	int long find_last_one_of( HString const&, int long = npos ) const;
+	int long find_other_than( HString const&, int long = 0 ) const;
+	int long reverse_find_other_than( HString const&, int long = 0 ) const;
+	int long find_last_other_than( HString const&, int long = npos ) const;
 	/*! \brief Replace each occurrence of given pattern with replacement.
 	 *
 	 * \param pattern - search and replace all occurrences of this pattern.

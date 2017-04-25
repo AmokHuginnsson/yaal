@@ -103,7 +103,7 @@ private:
 	tokens_t _tokens;
 	positions_ptr_t _positions;
 	args_ptr_t _args;
-	mutable HString _errorMessage;
+	mutable HUTF8String _errorMessage;
 	HFormatImpl( HString const& );
 	HFormatImpl( HFormatImpl const& );
 	int next_token( conversion_t const& );
@@ -855,8 +855,9 @@ HString str( HFormat const& format_ ) {
 
 char const* HFormat::HFormatImpl::error_message( int ) const {
 	M_PROLOG
-	_errorMessage.format( _( "format: %s, at: %d" ), _format.c_str(), _positionIndex );
-	return ( _errorMessage.c_str() );
+	_buffer.assign( "format: " ).append( _format ).append( ", at: " ).append( _positionIndex );
+	_errorMessage = _buffer;
+	return ( _errorMessage.x_str() );
 	M_EPILOG
 }
 

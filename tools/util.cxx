@@ -63,15 +63,9 @@ HString& usun_ogonki( HString& string_ ) {
 	M_EPILOG
 }
 
-char const* article( char const* word_ ) {
-	while ( ( *word_ != 0 ) && ! _letter_.has( static_cast<u32_t>( *word_ ) ) ) { /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
-		++ word_;
-	}
-	return( *word_ ? ( _vowel_.has( static_cast<u32_t>( *word_ ) ) ? "an" : "a" ) : "" ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
-}
-
-char const* article( yaal::hcore::HString const& word_ ) {
-	return ( article( word_.c_str() ) );
+yaal::hcore::HString article( yaal::hcore::HString const& word_ ) {
+	int long pos( word_.find_one_of( _letter_.data() ) );
+	return( pos != HString::npos ? ( _vowel_.has( static_cast<u32_t>( word_[pos] ) ) ? "an" : "a" ) : "" ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 }
 
 double long atof_ex( HString const& string_, bool parse_ ) {

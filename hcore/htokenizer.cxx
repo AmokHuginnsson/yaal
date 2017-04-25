@@ -44,22 +44,31 @@ HTokenizer::behavior_t const HTokenizer::DELIMITED_BY_WHOLE_STRING = HTokenizer:
 HTokenizer::behavior_t const HTokenizer::DELIMITED_BY_MASK = HTokenizer::DELIMITED_BY_ANY_OF | HTokenizer::DELIMITED_BY_WHOLE_STRING;
 
 HTokenizer::HTokenizer( HString const& str_, HString const& delim_, behavior_t const& behavior_ )
-	: _behavior( behavior_ ), _string( str_ ), _delimiter( delim_ ), _buffer() {
+	: _behavior( behavior_ )
+	, _string( str_ )
+	, _delimiter( delim_ )
+	, _buffer() {
 	M_PROLOG
-	if ( ( _behavior & INCLUDE_EMPTY ) && ( _behavior & SKIP_EMPTY ) )
+	if ( ( _behavior & INCLUDE_EMPTY ) && ( _behavior & SKIP_EMPTY ) ) {
 		throw HTokenizerException( "bad empty item handling specified" );
-	if ( ! ( _behavior & HANDLE_EMPTY_MASK ) )
+	}
+	if ( ! ( _behavior & HANDLE_EMPTY_MASK ) ) {
 		_behavior = static_cast<behavior_t>( _behavior | INCLUDE_EMPTY );
-	if ( ( _behavior & DELIMITED_BY_ANY_OF ) && ( _behavior & DELIMITED_BY_WHOLE_STRING ) )
+	}
+	if ( ( _behavior & DELIMITED_BY_ANY_OF ) && ( _behavior & DELIMITED_BY_WHOLE_STRING ) ) {
 		throw HTokenizerException( "bad delimited by specified" );
-	if ( ! ( _behavior & DELIMITED_BY_MASK ) )
+	}
+	if ( ! ( _behavior & DELIMITED_BY_MASK ) ) {
 		_behavior = static_cast<behavior_t>( _behavior | DELIMITED_BY_WHOLE_STRING );
+	}
 	return;
 	M_EPILOG
 }
 
 HTokenizer::HTokenizer( HString const& delim_, behavior_t const& behavior_ )
-	: _behavior( behavior_ ), _string(), _delimiter( delim_ ), _buffer() {
+	: _behavior( behavior_ )
+	, _string(), _delimiter( delim_ )
+	, _buffer() {
 }
 
 void HTokenizer::assign( HString const& str_ ) {
@@ -109,27 +118,32 @@ int long HTokenizer::skip_empty( int long start_ ) const {
 	if ( _behavior & DELIMITED_BY_WHOLE_STRING ) {
 		if ( start_ != HString::npos ) {
 			int long delimLen( _delimiter.get_length() );
-			char const* delimRaw( _delimiter.c_str() );
-			char const* ptr( _string.c_str() );
-			while ( ! ::strncmp( delimRaw, ptr + start_, static_cast<size_t>( delimLen ) ) )
+			while ( _string.find( _delimiter, start_ ) == start_ ) {
 				start_ += delimLen;
+			}
 		}
 	} else {
-		if ( start_ != HString::npos )
-			start_ = _string.find_other_than( _delimiter.c_str(), start_ );
+		if ( start_ != HString::npos ) {
+			start_ = _string.find_other_than( _delimiter, start_ );
+		}
 	}
-	if ( start_ >= _string.get_length() )
+	if ( start_ >= _string.get_length() ) {
 		start_ = HString::npos;
+	}
 	return ( start_ );
 	M_EPILOG
 }
 
 HTokenizer::HIterator::HIterator( HTokenizer const* owner_, int long start_ )
-	: _owner( owner_ ), _start( start_ ), _buffer() {
+	: _owner( owner_ )
+	, _start( start_ )
+	, _buffer() {
 }
 
 HTokenizer::HIterator::HIterator( HTokenizer::HIterator const& it_ )
-	: _owner( it_._owner ), _start( it_._start ), _buffer( it_._buffer ) {
+	: _owner( it_._owner )
+	, _start( it_._start )
+	, _buffer( it_._buffer ) {
 }
 
 HTokenizer::HIterator& HTokenizer::HIterator::operator ++ ( void ) {
@@ -138,15 +152,18 @@ HTokenizer::HIterator& HTokenizer::HIterator::operator ++ ( void ) {
 	M_ASSERT( _start >= 0 );
 	if ( _owner->_behavior & HTokenizer::DELIMITED_BY_WHOLE_STRING ) {
 		_start = _owner->_string.find( _owner->_delimiter, _start );
-		if ( _start != HString::npos )
+		if ( _start != HString::npos ) {
 			_start += _owner->_delimiter.get_length();
+		}
 	} else {
-		_start = _owner->_string.find_one_of( _owner->_delimiter.c_str(), _start );
-		if ( _start != HString::npos )
+		_start = _owner->_string.find_one_of( _owner->_delimiter, _start );
+		if ( _start != HString::npos ) {
 			++ _start;
+		}
 	}
-	if ( _owner->_behavior & HTokenizer::SKIP_EMPTY )
+	if ( _owner->_behavior & HTokenizer::SKIP_EMPTY ) {
 		_start = _owner->skip_empty( _start );
+	}
 	return ( *this );
 	M_EPILOG
 }
@@ -156,7 +173,7 @@ HString const& HTokenizer::HIterator::operator* ( void ) const {
 	M_ENSURE( _start != HString::npos );
 	M_ASSERT( _start >= 0 );
 	_buffer.clear();
-	int long end( ( _owner->_behavior & HTokenizer::DELIMITED_BY_WHOLE_STRING ) ? _owner->_string.find( _owner->_delimiter, _start ) : _owner->_string.find_one_of( _owner->_delimiter.c_str(), _start ) );
+	int long end( ( _owner->_behavior & HTokenizer::DELIMITED_BY_WHOLE_STRING ) ? _owner->_string.find( _owner->_delimiter, _start ) : _owner->_string.find_one_of( _owner->_delimiter, _start ) );
 	_buffer = _owner->_string.mid( _start, end != HString::npos ? ( end - _start ) : meta::max_signed<int long>::value );
 	M_ASSERT( ( _owner->_behavior & HTokenizer::INCLUDE_EMPTY ) || ! _buffer.is_empty()  );
 	return ( _buffer );

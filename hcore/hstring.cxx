@@ -863,66 +863,10 @@ int long HString::nfind( HString const& pattern_, int long patternLength_, int l
 	M_EPILOG
 }
 
-int long HString::find_one_of( char const* set_, int long after_ ) const {
+int long HString::find_one_of( HString const& set_, int long after_ ) const {
 	M_PROLOG
-	if ( ! set_ ) {
+	if ( set_.is_empty() ) {
 		return ( npos );
-	}
-	if ( after_ < 0 ) {
-		after_ = 0;
-	}
-	if ( ( ! set_[0] )
-			|| ( GET_SIZE <= after_ ) ) {
-		return ( npos );
-	}
-	char const* str( ::std::strpbrk( MEM + after_, set_ ) );
-	if ( ! str ) {
-		return ( npos );
-	}
-	return ( static_cast<int long>( str - MEM ) );
-	M_EPILOG
-}
-
-int long HString::reverse_find_one_of( char const* set_, int long before_ ) const {
-	M_PROLOG
-	if ( ! set_ ) {
-		return ( npos );
-	}
-	if ( before_ < 0 ) {
-		before_ = 0;
-	}
-	if ( ( GET_SIZE <= before_ ) || ( ! set_[0] ) ) {
-		return ( npos );
-	}
-	char* str( string_helper::strrnpbrk( MEM, set_, GET_SIZE - before_ ) );
-	if ( ! str ) {
-		return ( npos );
-	}
-	return ( static_cast<int long>( ( GET_SIZE - 1 ) - ( str - MEM ) ) );
-	M_EPILOG
-}
-
-int long HString::find_last_one_of( char const* set_, int long before_ ) const {
-	M_PROLOG
-	M_ASSERT( set_ != nullptr );
-	if ( ( before_ == npos ) || ( before_ >= GET_SIZE ) ) {
-		before_ = GET_SIZE - 1;
-	}
-	if ( ( before_ < 0 ) || ( ! set_[0] ) ) {
-		return ( npos );
-	}
-	char* str( string_helper::strrnpbrk( MEM, set_, before_ + 1 ) );
-	if ( ! str ) {
-		return ( npos );
-	}
-	return ( static_cast<int long>( str - MEM ) );
-	M_EPILOG
-}
-
-int long HString::find_other_than( char const* set_, int long after_ ) const {
-	M_PROLOG
-	if ( ! set_ ) {
-		return ( 0 );
 	}
 	if ( after_ < 0 ) {
 		after_ = 0;
@@ -930,21 +874,18 @@ int long HString::find_other_than( char const* set_, int long after_ ) const {
 	if ( after_ >= GET_SIZE ) {
 		return ( npos );
 	}
-	if ( ! set_[0] ) {
-		return ( after_ );
-	}
-	int long index = static_cast<int long>( ::std::strspn( MEM + after_, set_ ) );
-	if ( ( index + after_ ) >= GET_SIZE ) {
+	char const* str( ::std::strpbrk( MEM + after_, set_.c_str() ) );
+	if ( ! str ) {
 		return ( npos );
 	}
-	return ( index + after_ );
+	return ( static_cast<int long>( str - MEM ) );
 	M_EPILOG
 }
 
-int long HString::reverse_find_other_than( char const* set_, int long before_ ) const {
+int long HString::reverse_find_one_of( HString const& set_, int long before_ ) const {
 	M_PROLOG
-	if ( ! set_ ) {
-		return ( 0 );
+	if ( set_.is_empty() ) {
+		return ( npos );
 	}
 	if ( before_ < 0 ) {
 		before_ = 0;
@@ -952,10 +893,61 @@ int long HString::reverse_find_other_than( char const* set_, int long before_ ) 
 	if ( before_ >= GET_SIZE ) {
 		return ( npos );
 	}
-	if ( ! set_[0] ) {
+	char* str( string_helper::strrnpbrk( MEM, set_.c_str(), GET_SIZE - before_ ) );
+	if ( ! str ) {
+		return ( npos );
+	}
+	return ( static_cast<int long>( ( GET_SIZE - 1 ) - ( str - MEM ) ) );
+	M_EPILOG
+}
+
+int long HString::find_last_one_of( HString const& set_, int long before_ ) const {
+	M_PROLOG
+	if ( ( before_ == npos ) || ( before_ >= GET_SIZE ) ) {
+		before_ = GET_SIZE - 1;
+	}
+	if ( ( before_ < 0 ) || set_.is_empty() ) {
+		return ( npos );
+	}
+	char* str( string_helper::strrnpbrk( MEM, set_.c_str(), before_ + 1 ) );
+	if ( ! str ) {
+		return ( npos );
+	}
+	return ( static_cast<int long>( str - MEM ) );
+	M_EPILOG
+}
+
+int long HString::find_other_than( HString const& set_, int long after_ ) const {
+	M_PROLOG
+	if ( after_ < 0 ) {
+		after_ = 0;
+	}
+	if ( after_ >= GET_SIZE ) {
+		return ( npos );
+	}
+	if ( set_.is_empty() ) {
+		return ( after_ );
+	}
+	int long index = static_cast<int long>( ::std::strspn( MEM + after_, set_.c_str() ) );
+	if ( ( index + after_ ) >= GET_SIZE ) {
+		return ( npos );
+	}
+	return ( index + after_ );
+	M_EPILOG
+}
+
+int long HString::reverse_find_other_than( HString const& set_, int long before_ ) const {
+	M_PROLOG
+	if ( before_ < 0 ) {
+		before_ = 0;
+	}
+	if ( before_ >= GET_SIZE ) {
+		return ( npos );
+	}
+	if ( set_.is_empty() ) {
 		return ( before_ );
 	}
-	int long index( string_helper::strrnspn( MEM, set_, GET_SIZE - before_ ) );
+	int long index( string_helper::strrnspn( MEM, set_.c_str(), GET_SIZE - before_ ) );
 	if ( index >= ( GET_SIZE - before_ ) ) {
 		return ( npos );
 	}
@@ -963,19 +955,18 @@ int long HString::reverse_find_other_than( char const* set_, int long before_ ) 
 	M_EPILOG
 }
 
-int long HString::find_last_other_than( char const* set_, int long before_ ) const {
+int long HString::find_last_other_than( HString const& set_, int long before_ ) const {
 	M_PROLOG
-	M_ASSERT( set_ != nullptr );
 	if ( ( before_ == npos ) || ( before_ >= GET_SIZE ) ) {
 		before_ = GET_SIZE - 1;
 	}
 	if ( before_ < 0 ) {
 		return ( npos );
 	}
-	if ( ! set_[0] ) {
+	if ( set_.is_empty() ) {
 		return ( before_ );
 	}
-	int long index( string_helper::strrnspn( MEM, set_, before_ + 1 ) );
+	int long index( string_helper::strrnspn( MEM, set_.c_str(), before_ + 1 ) );
 	if ( index > before_ ) {
 		return ( npos );
 	}
