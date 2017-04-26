@@ -82,7 +82,7 @@ HException::~HException( void ) {
 }
 
 void HException::print_error( void ) const {
-	fprintf( ERROR_STREAM, "\nException: %s, %d.\n", _message.c_str(), _code );
+	fprintf( ERROR_STREAM, "\nException: %s, %d.\n", _message.x_str(), _code );
 	fflush( ERROR_STREAM );
 	return;
 }
@@ -96,18 +96,23 @@ void HException::log( char const* fileName_, int line_,
 		_fileName = fileName_;
 		_functionName = functionName_;
 		if ( _logEnabled || ( _debugLevel_ >= DEBUG_LEVEL::DUMP_EXCEPTION_STACK ) ) {
-			HString frame;
+			static int const MAX_FRAME_DESC_SIZE( 4096 );
+			char frameDesc[MAX_FRAME_DESC_SIZE];
 			size_t length( ::strlen( fileName_ ) );
-			frame.format(
-						"Exception frame %2d: %16s : %4d : %s\n", _frame,
-						fileName_ + ( length > 16 ? length - 16 : 0 ),
-						line_, functionName_ );
+			int size(
+				snprintf(
+					frameDesc, MAX_FRAME_DESC_SIZE,
+					"Exception frame %2d: %16s : %4d : %s\n", _frame,
+					fileName_ + ( length > 16 ? length - 16 : 0 ),
+					line_, functionName_
+				)
+			);
 			if ( _debugLevel_ >= DEBUG_LEVEL::DUMP_EXCEPTION_STACK ) {
-				fprintf( ERROR_STREAM, "%s", frame.c_str() );
+				fwrite( frameDesc, 1, static_cast<size_t>( size ), ERROR_STREAM );
 				fflush( ERROR_STREAM );
 			}
 			if ( _logEnabled ) {
-				hcore::log << frame;
+				hcore::log << frameDesc;
 			}
 		}
 		++ _frame;
@@ -116,7 +121,7 @@ void HException::log( char const* fileName_, int line_,
 }
 
 char const* HException::what( void ) const {
-	return ( _message.c_str() );
+	return ( _message.x_str() );
 }
 
 int HException::code( void ) const {

@@ -90,9 +90,10 @@ yaal::hcore::HString md5( HStreamInterface& stream ) {
 			update_md5_state( state, block );
 		}
 	} while ( last == BLOCK_SIZE );
-	HString result;
 	change_endianness( state, STATE_SIZE );
-	result.format( "%08x%08x%08x%08x", state[ 0 ], state[ 1 ], state[ 2 ], state[ 3 ] );
+	static int const RESULT_SIZE( 4 * 8 + 1 );
+	char result[RESULT_SIZE];
+	snprintf( result, RESULT_SIZE, "%08x%08x%08x%08x", state[ 0 ], state[ 1 ], state[ 2 ], state[ 3 ] );
 	return ( result );
 	M_EPILOG
 }
@@ -154,8 +155,9 @@ yaal::hcore::HString sha1( HStreamInterface& stream ) {
 			update_sha1_state( state, block );
 		}
 	} while ( last == BLOCK_SIZE );
-	HString result;
-	result.format( "%08x%08x%08x%08x%08x", state[ 0 ], state[ 1 ], state[ 2 ], state[ 3 ], state[ 4 ] );
+	static int const RESULT_SIZE( 5 * 8 + 1 );
+	char result[RESULT_SIZE];
+	snprintf( result, RESULT_SIZE, "%08x%08x%08x%08x%08x", state[ 0 ], state[ 1 ], state[ 2 ], state[ 3 ], state[ 4 ] );
 	return ( result );
 	M_EPILOG
 }
@@ -412,13 +414,14 @@ yaal::hcore::HString sha512( HStreamInterface& stream ) {
 			update_sha512_state( state, block );
 		}
 	} while ( last == BLOCK_SIZE );
-	HString result;
 #if SIZEOF_INT_LONG == 8
 	char const format[] = "%016lx%016lx%016lx%016lx%016lx%016lx%016lx%016lx";
 #else
 	char const format[] = "%016llx%016llx%016llx%016llx%016llx%016llx%016llx%016llx";
 #endif
-	result.format( format, state[ 0 ], state[ 1 ], state[ 2 ], state[ 3 ], state[ 4 ], state[ 5 ], state[ 6 ], state[ 7 ] );
+	static int const RESULT_SIZE( 8 * 16 + 1 );
+	char result[RESULT_SIZE];
+	snprintf( result, RESULT_SIZE, format, state[ 0 ], state[ 1 ], state[ 2 ], state[ 3 ], state[ 4 ], state[ 5 ], state[ 6 ], state[ 7 ] );
 	return ( result );
 	M_EPILOG
 }

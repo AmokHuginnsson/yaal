@@ -35,6 +35,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hwindow.hxx"
 #include "hconsole.hxx"
 #include "hsearchablewidget.hxx"
+#include "hcore/hformat.hxx"
 #include "hcore/hlog.hxx"
 
 using namespace yaal::hcore;
@@ -224,12 +225,12 @@ void HStatusBarWidget::update_progress( double step_, char const* title_ ) {
 		schedule_repaint();
 		bar( title_ );
 		if ( _estimate ) {
-			_varTmpBuffer.format( "|%%-%ds|%%s%%s[%%3d%%s]", maxBar );
+			_varTmpBuffer = format( "|%%-%ds|%%s%%s[%%3d%%s]", maxBar );
 			_string = do_format( _varTmpBuffer, "-",
 					( step_ != 0.0 ? ( left.string() ) : "(?\?:?\?:?\?)" ),
 					stopper.string(), nextPercent, "%%" );
 		} else {
-			_varTmpBuffer.format( "|%%-%ds|%%s[%%3d%%s]", maxBar );
+			_varTmpBuffer = format( "|%%-%ds|%%s[%%3d%%s]", maxBar );
 			_string = do_format( _varTmpBuffer, "-", stopper.string(), nextPercent, "%%" );
 		}
 		_string.fill( '-', 1, maxBar );
@@ -304,7 +305,7 @@ void HStatusBarWidget::bar( char const* bar_ ) {
 	HConsole& cons = HConsole::get_instance();
 	set_attr_data();
 	if ( bar_ ) {
-		_message.format( "%-*s", cons.get_width() - ( _labelLength + 1 ), bar_ );
+		_message = format( "%-*s", cons.get_width() - ( _labelLength + 1 ), bar_ );
 	}
 	cons.mvprintf( cons.get_height() - 2, _labelLength, _message );
 	return;

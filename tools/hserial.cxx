@@ -358,8 +358,7 @@ void HSerial::flush( int type_ ) {
 				M_THROW( "tcflush ( TCIOFLUSH )", errno );
 			break;
 			default : {
-				errMsg.format( "tcflush ( %d )", type_ );
-				M_THROW( errMsg, errno );
+				M_THROW( "tcflush( "_ys.append( type_ ).append( " )" ), errno );
 			}
 			break;
 		}

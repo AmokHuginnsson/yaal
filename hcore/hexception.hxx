@@ -74,11 +74,13 @@ struct DEBUG_LEVEL {
  */
 class HException {
 private:
-	int  _code; /*!< Numeric code for given exception type/cause. */
+	int  _code;  /*!< Numeric code for given exception type/cause. */
 	int  _frame; /*!< Frame counter for step-by-step unwinding with logging. */
-	char const* _fileName; /*!< Log each frame only once. */
+	char const* _fileName;     /*!< Log each frame only once. */
 	char const* _functionName; /*!< Log each frame only once. */
-	HString _message; /*!< Exception message. */
+	HUTF8String _message;      /*!< Exception message. */
+	static bool _logEnabled;
+protected:
 	/*! \brief Construct exception object.
 	 *
 	 * \param fileName_ - source code file name where exception has been generated.
@@ -88,8 +90,6 @@ private:
 	 * \param code_ - error code.
 	 * \param name_ - type name this exception.
 	 */
-	static bool _logEnabled;
-protected:
 	HException( char const* fileName_, int line_, char const* functionName_,
 			HString const& message_, int const code_ = 0, HString const& name_ = HString() );
 	HException( HException const& );

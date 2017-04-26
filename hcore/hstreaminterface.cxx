@@ -25,6 +25,7 @@ Copyright:
 */
 
 #include <cstring>
+#include <cstdio>
 #include <cctype>
 
 #include "base.hxx"
@@ -38,7 +39,9 @@ namespace yaal {
 
 namespace hcore {
 
-static int const INVALID_CHARACTER = -256;
+static int const INVALID_CHARACTER( -256 );
+static int const MAX_INTEGER_DIGIT_COUNT( 64 );
+static int const MAX_FLOAT_DIGIT_COUNT( 8192 );
 char const HStreamInterface::eols[] = "\r\n"; /* order matters */
 
 HStreamInterface::HStreamInterface( void )
@@ -143,7 +146,9 @@ HStreamInterface& HStreamInterface::do_output( int unsigned unsignedInteger_ ) {
 
 HStreamInterface& HStreamInterface::do_output( int long longInteger_ ) {
 	M_PROLOG
-	_wordCache.format( _base == BASES::DEC ? "%ld" : ( _base == BASES::HEX ) ? "%lx" : "%lo", longInteger_ );
+	char buffer[MAX_INTEGER_DIGIT_COUNT];
+	snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, _base == BASES::DEC ? "%ld" : ( _base == BASES::HEX ) ? "%lx" : "%lo", longInteger_ );
+	_wordCache = buffer;
 	reformat();
 	_conversionCache = _wordCache;
 	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
@@ -153,7 +158,9 @@ HStreamInterface& HStreamInterface::do_output( int long longInteger_ ) {
 
 HStreamInterface& HStreamInterface::do_output( int long long longLongInteger_ ) {
 	M_PROLOG
-	_wordCache.format( _base == BASES::DEC ? "%lld" : ( _base == BASES::HEX ) ? "%llx" : "%llo", longLongInteger_ );
+	char buffer[MAX_INTEGER_DIGIT_COUNT];
+	snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, _base == BASES::DEC ? "%lld" : ( _base == BASES::HEX ) ? "%llx" : "%llo", longLongInteger_ );
+	_wordCache = buffer;
 	reformat();
 	_conversionCache = _wordCache;
 	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
@@ -190,7 +197,9 @@ void HStreamInterface::reformat( void ) {
 
 HStreamInterface& HStreamInterface::do_output( int long unsigned unsignedLongInteger_ ) {
 	M_PROLOG
-	_wordCache.format( _base == BASES::DEC ? "%lu" : ( _base == BASES::HEX ) ? "%lx" : "%lo", unsignedLongInteger_ );
+	char buffer[MAX_INTEGER_DIGIT_COUNT];
+	snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, _base == BASES::DEC ? "%lu" : ( _base == BASES::HEX ) ? "%lx" : "%lo", unsignedLongInteger_ );
+	_wordCache = buffer;
 	reformat();
 	_conversionCache = _wordCache;
 	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
@@ -200,7 +209,9 @@ HStreamInterface& HStreamInterface::do_output( int long unsigned unsignedLongInt
 
 HStreamInterface& HStreamInterface::do_output( int long long unsigned unsignedLongLongInteger_ ) {
 	M_PROLOG
-	_wordCache.format( _base == BASES::DEC ? "%llu" : ( _base == BASES::HEX ) ? "%llx" : "%llo", unsignedLongLongInteger_ );
+	char buffer[MAX_INTEGER_DIGIT_COUNT];
+	snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, _base == BASES::DEC ? "%llu" : ( _base == BASES::HEX ) ? "%llx" : "%llo", unsignedLongLongInteger_ );
+	_wordCache = buffer;
 	reformat();
 	_conversionCache = _wordCache;
 	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
@@ -226,7 +237,9 @@ void HStreamInterface::apply_precision( void ) {
 
 HStreamInterface& HStreamInterface::do_output( double double_ ) {
 	M_PROLOG
-	_wordCache.format( "%f", double_ );
+	char buffer[MAX_FLOAT_DIGIT_COUNT];
+	snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, "%f", double_ );
+	_wordCache = buffer;
 	apply_precision();
 	reformat();
 	_conversionCache = _wordCache;
@@ -237,7 +250,9 @@ HStreamInterface& HStreamInterface::do_output( double double_ ) {
 
 HStreamInterface& HStreamInterface::do_output( double long longDouble_ ) {
 	M_PROLOG
-	_wordCache.format( "%.12Lf", longDouble_ );
+	char buffer[MAX_FLOAT_DIGIT_COUNT];
+	snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, "%.12Lf", longDouble_ );
+	_wordCache = buffer;
 	apply_precision();
 	reformat();
 	_conversionCache = _wordCache;
@@ -248,7 +263,9 @@ HStreamInterface& HStreamInterface::do_output( double long longDouble_ ) {
 
 HStreamInterface& HStreamInterface::do_output( float float_ ) {
 	M_PROLOG
-	_wordCache.format( "%f", float_ );
+	char buffer[MAX_FLOAT_DIGIT_COUNT];
+	snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, "%f", float_ );
+	_wordCache = buffer;
 	apply_precision();
 	reformat();
 	_conversionCache = _wordCache;
@@ -259,7 +276,9 @@ HStreamInterface& HStreamInterface::do_output( float float_ ) {
 
 HStreamInterface& HStreamInterface::do_output( void const* ptr_ ) {
 	M_PROLOG
-	_wordCache.format( "0x%lx", reinterpret_cast<int long unsigned>( ptr_ ) );
+	char buffer[MAX_INTEGER_DIGIT_COUNT];
+	snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, "0x%lx", reinterpret_cast<int long unsigned>( ptr_ ) );
+	_wordCache = buffer;
 	reformat();
 	_conversionCache = _wordCache;
 	do_write( _conversionCache.raw(), _conversionCache.byte_count() );

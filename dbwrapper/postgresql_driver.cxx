@@ -87,8 +87,9 @@ OPostgreSQLResult::statement_id_source_t OPostgreSQLResult::_statementIdSource =
 
 namespace {
 HString placeholder_generator( int no_ ) {
-	HString placeholder;
-	placeholder.format( "$%d", no_ );
+	static int const PLACEHOLDER_SIZE( 16 );
+	char placeholder[PLACEHOLDER_SIZE];
+	snprintf( placeholder, PLACEHOLDER_SIZE, "$%d", no_ );
 	return ( placeholder );
 }
 }

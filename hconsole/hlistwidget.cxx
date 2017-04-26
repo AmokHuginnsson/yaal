@@ -33,6 +33,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hlistwidget.hxx"
 #include "hcore/memory.hxx"
+#include "hcore/hformat.hxx"
 #include "hcore/hlog.hxx"
 #include "hconsole.hxx"
 #include "tools/hxml.hxx"
@@ -208,8 +209,7 @@ void HListWidget::draw_header( int columns_ ) {
 			if ( _drawHeader ) {
 				_varTmpBuffer = columnInfo->_name;
 				set_attr_label();
-				_varTmpBuffer.format( "%%-%ds",
-							columnInfo->_widthRaw );
+				_varTmpBuffer = format( "%%-%ds", columnInfo->_widthRaw );
 				cons.mvprintf(
 					_rowRaw,
 					_columnRaw + columnOffset,
@@ -240,7 +240,7 @@ void HListWidget::draw_header( int columns_ ) {
 		}
 	}
 	if ( _labelPosition == LABEL::POSITION::STACKED ) {
-		_varTmpBuffer.format( " %d/%d ", _widgetOffset + _cursorPosition + 1, static_cast<int>( _model->size() ) );
+		_varTmpBuffer = format( " %d/%d ", _widgetOffset + _cursorPosition + 1, static_cast<int>( _model->size() ) );
 		if ( _labelLength < _widthRaw ) {
 			int clip = static_cast<int>( ( ( _widthRaw - _labelLength ) < _varTmpBuffer.get_length() ) ? _varTmpBuffer.get_length() - ( _widthRaw - _labelLength ) : 0 );
 			cons.mvprintf( _rowRaw - 1, static_cast<int>( _columnRaw + _widthRaw + clip - _varTmpBuffer.get_length() ), _varTmpBuffer.substr( clip ) );

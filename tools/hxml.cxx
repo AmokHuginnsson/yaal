@@ -690,9 +690,15 @@ void HXml::apply_style( yaal::hcore::HString const& path_, parameters_t const& p
 	HResource<char const*[]> parametersHolder( !parameters_.is_empty() ? new char const*[parameters_.get_size() * 2 + 1] : nullptr );
 	char const** parameters( parametersHolder.get() );
 	int parIdx( 0 );
+	typedef yaal::hcore::HPair<yaal::hcore::HUTF8String, yaal::hcore::HUTF8String> utf8_parameter_t;
+	typedef yaal::hcore::HArray<utf8_parameter_t> utf8_parameters_t;
+	utf8_parameters_t utf8Parameters;
+	utf8Parameters.reserve( parameters_.get_size() );
 	for ( parameter_t const& p : parameters_ ) {
-		parameters[parIdx ++] = p.first.c_str();
-		parameters[parIdx ++] = p.second.c_str();
+		utf8Parameters.emplace_back( p.first, p.second );
+		utf8_parameter_t const& utf8p( utf8Parameters.back() );
+		parameters[parIdx ++] = utf8p.first.x_str();
+		parameters[parIdx ++] = utf8p.second.x_str();
 	}
 	if ( parIdx > 0 ) {
 		parameters[parIdx] = nullptr;

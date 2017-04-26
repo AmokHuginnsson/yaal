@@ -47,6 +47,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/hstring.hxx"
 #include "hcore/hcore.hxx"
 #include "hcore/hlog.hxx"
+#include "hcore/hformat.hxx"
 #include "hcore/system.hxx"
 
 #ifdef HAVE_CURSES_H
@@ -113,7 +114,6 @@ int console_mouse_open( void ) {
 	M_PROLOG
 	int vC = 0;
 	char tty[] = "/dev/ttyv0";
-	HString error;
 	mouse_info mouse;
 	mouse.operation = MOUSE_MODE;
 	mouse.u.mode.mode = 0;
@@ -122,13 +122,12 @@ int console_mouse_open( void ) {
 	tty[ 9 ] = static_cast<char>( '0' + vC );
 	_mouse_ = ::open( tty, O_RDWR );
 	if ( _mouse_ < 0 ) {
-		error.format( _( "cannot open mouse, %s" ), error_message( errno ) );
-		throw HMouseException( error, vC );
+		throw HMouseException( to_string( _( "cannot open mouse, " ) ).append( error_message( errno ) ), vC );
 	}
 	if ( ::ioctl( _mouse_, FWD_CONS_MOUSECTL, &mouse ) < 0 ) {
-		error.format( _( "cannot setup mouse mode, %s" ), error_message( errno ) );
+		int err( errno );
 		TEMP_FAILURE_RETRY( hcore::system::close( _mouse_ ) );
-		throw HMouseException( error, errno );
+		throw HMouseException( to_string( _( "cannot setup mouse mode, " ) ).append( err ), err );
 	}
 
 	log( LOG_LEVEL::INFO ) << "i have opened device: `" << tty << '\'' << endl;
@@ -168,7 +167,6 @@ int console_mouse_close( void ) {
 int console_mouse_open( void ) {
 	M_PROLOG
 	int vC = 0;
-	HString error;
 	Gpm_Connect gpm;
 	gpm.minMod = 0;
 	gpm.maxMod = 0;
@@ -178,8 +176,7 @@ int console_mouse_open( void ) {
 	gpm.defaultMask = static_cast<int short unsigned>( ~gpm.eventMask );
 	gpm_zerobased = true;
 	if ( Gpm_Open( &gpm, vC ) == -1 ) {
-		error.format( "Can't open mouse connection: %s", error_message( errno ) );
-		throw HMouseException( error, vC );
+		throw HMouseException( "Can't open mouse connection: "_ys.append( error_message( errno ) ), vC );
 	}
 	log( LOG_LEVEL::INFO ) << "i have opened device: `" << vC << '\'' << endl;
 	return ( gpm_fd );
@@ -258,11 +255,15 @@ int x_mouse_open( void ) {
 	if ( ! mouseMask ) {
 		throw HMouseException( "mousemask() returned 0", errno );
 	} else if ( ( mouseMask & strictlyRequiredMask ) < strictlyRequiredMask ) {
-		HString error;
-		error.format( "could not set up appropriate mask: B1C = %lu, B2C = %lu, B3C = %lu, B1DC = %lu",
-				mouseMask & BUTTON1_CLICKED, mouseMask & BUTTON2_CLICKED,
-				mouseMask & BUTTON3_CLICKED, mouseMask & BUTTON1_DOUBLE_CLICKED );
-		throw ( HMouseException( error ) );
+		throw (
+			HMouseException(
+				format(
+					"could not set up appropriate mask: B1C = %lu, B2C = %lu, B3C = %lu, B1DC = %lu",
+					mouseMask & BUTTON1_CLICKED, mouseMask & BUTTON2_CLICKED,
+					mouseMask & BUTTON3_CLICKED, mouseMask & BUTTON1_DOUBLE_CLICKED
+				)
+			)
+		);
 	}
 	mouseinterval( 200 );
 #if defined( HAVE_DECL_HAS_MOUSE ) && ( HAVE_DECL_HAS_MOUSE == 1 )

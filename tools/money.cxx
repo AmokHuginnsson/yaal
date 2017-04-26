@@ -25,6 +25,7 @@ Copyright:
 */
 
 #include <cstring>
+#include <cstdio>
 #include <cctype>
 
 #include "hcore/base.hxx"
@@ -443,10 +444,12 @@ static HString _lastErrorMessage_;
 
 int modulo_ASCII( HString const& aSCIINumber_, int modulo_ ) {
 	M_PROLOG
-	int ctr = 0, number = 0, step = 0;
-	int long tmpLength = 0;
-	int long length = aSCIINumber_.get_length();
-	HString tmpString, tmpNumber = aSCIINumber_;
+	int number( 0 );
+	int step( 0 );
+	int long tmpLength( 0 );
+	int long length( aSCIINumber_.get_length() );
+	HString tmpString;
+	HString tmpNumber( aSCIINumber_ );
 	if ( length < 0 ) {
 		M_THROW( "bad ASCII number length", length );
 	}
@@ -458,10 +461,10 @@ int modulo_ASCII( HString const& aSCIINumber_, int modulo_ ) {
 		tmpLength = tmpString.get_length();
 		number = lexical_cast<int>( tmpString );
 		number %= modulo_;
-		tmpString.format ( "%d", number );
+		tmpString = number;
 		tmpNumber.shift_left( tmpLength - tmpString.get_length() );
 		tmpLength = tmpString.get_length();
-		for ( ctr = 0; ctr < tmpLength; ctr ++ ) {
+		for ( int ctr( 0 ); ctr < tmpLength; ctr ++ ) {
 			tmpNumber.set_at( ctr, tmpString[ ctr ] );
 		}
 /*		M_LOG ( tmpNumber ); */
@@ -478,23 +481,24 @@ yaal::hcore::HString const& get_last_error( void ) {
 
 bool verify_IBAN( HString const& IBAN_ ) {
 	M_PROLOG
-	int ctr = 0;
 	int long length = IBAN_.get_length();
 	char pattern[ 2 ] = "\0";
 	HString IBAN, tmpString;
 	bool valid( false );
 	do {
 		if ( length < MIN_IBAN_LENGTH ) {
-			_lastErrorMessage_.format( "IBAN: Number too short (%d).", static_cast<int>( length ) );
+			_lastErrorMessage_.assign( "IBAN: Number too short (" ).append( static_cast<int>( length ) ).append( ")." );
 			break;
 		}
 		IBAN.reserve( length );
-		for ( ctr = 0; ctr < length; ctr ++ )
-			if ( isalnum( IBAN_[ ctr ] ) )
-				IBAN += IBAN_[ ctr ];
+		for ( int i( 0 ); i < length; ++ i ) {
+			if ( isalnum( IBAN_[ i ] ) ) {
+				IBAN += IBAN_[ i ];
+			}
+		}
 		length = IBAN.get_length();
 		if ( length < MIN_IBAN_LENGTH ) {
-			_lastErrorMessage_.format( "IBAN: Number too short (%d).", static_cast<int>( length ) );
+			_lastErrorMessage_.assign( "IBAN: Number too short (" ).append( static_cast<int>( length ) ).append( ")." );
 			break;
 		}
 		if ( ! ( isalpha( IBAN[ 0 ] ) && isalpha( IBAN[ 1 ] ) ) ) {
@@ -506,18 +510,20 @@ bool verify_IBAN( HString const& IBAN_ ) {
 		IBAN += tmpString;
 	/*	M_LOG ( IBAN ); */
 		IBAN.lower();
-		for ( ctr = 0; ctr < length; ctr ++ ) {
-			if ( isalpha ( IBAN[ ctr ] ) ) {
-				tmpString.format( "%02d", ( IBAN[ ctr ] - 'a' ) + 10 );
-				pattern[ 0 ] = IBAN[ ctr ];
-				IBAN.replace( pattern, tmpString );
+		for ( int i( 0 ); i < length; ++ i ) {
+			if ( isalpha ( IBAN[ i ] ) ) {
+				static int const DIGIT_PAIR_BUF_SIZE( 3 );
+				char digitPairBuf[DIGIT_PAIR_BUF_SIZE];
+				snprintf( digitPairBuf, DIGIT_PAIR_BUF_SIZE, "%02d", ( IBAN[ i ] - 'a' ) + 10 );
+				pattern[ 0 ] = IBAN[ i ];
+				IBAN.replace( pattern, digitPairBuf );
 				length = IBAN.get_length();
 			}
 		}
 	/*	M_LOG ( IBAN ); */
-		ctr = modulo_ASCII( IBAN, 97 );
-		if ( ctr != 1 ) {
-			_lastErrorMessage_.format( "IBAN: bad checksum: %d", ctr );
+		int sum( modulo_ASCII( IBAN, 97 ) );
+		if ( sum != 1 ) {
+			_lastErrorMessage_.assign( "IBAN: bad checksum: " ).append( sum );
 			break;
 		}
 		valid = true;

@@ -55,8 +55,9 @@ static char const _logTag_[] = "Oracle: ";
 HString _instanceName_;
 
 HString placeholder_generator( int no_ ) {
-	HString placeholder;
-	placeholder.format( ":%d", no_ );
+	static int const PLACEHOLDER_SIZE( 16 );
+	char placeholder[PLACEHOLDER_SIZE];
+	snprintf( placeholder, PLACEHOLDER_SIZE, ":%d", no_ );
 	return ( placeholder );
 }
 
