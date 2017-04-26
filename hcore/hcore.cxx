@@ -173,7 +173,7 @@ double long std_strtold( HString const& str_, int* endIdx_ ) {
 	char* endPtr( nullptr );
 	double long value( ::strtold( buf, &endPtr ) );
 	if ( endIdx_ ) {
-		*endIdx_ = static_cast<int>( endPtr - str_.c_str() ) + skip;
+		*endIdx_ = static_cast<int>( endPtr - buf ) + skip;
 	}
 	return ( value );
 }

@@ -350,7 +350,7 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 		}
 		t.pop_frame();
 		if ( ! cls ) {
-			cls = _runtime->create_class( identifierId_, super, fieldDefinitions, cc->_doc ? cc->_doc : "" );
+			cls = _runtime->create_class( identifierId_, super, fieldDefinitions, cc->_doc ? *cc->_doc : "" );
 			_runtime->register_class_low( cls, ACCESS::PUBLIC );
 		} else {
 			cls->redefine( super, fieldDefinitions );
@@ -520,7 +520,7 @@ yaal::hcore::HString HHuginn::get_snippet( int from_, int len_ ) const {
 	M_EPILOG
 }
 
-char const* HHuginn::get_comment( int pos_ ) const {
+yaal::hcore::HString const& HHuginn::get_comment( int pos_ ) const {
 	M_PROLOG
 	return ( _source->get_comment( pos_ ) );
 	M_EPILOG

@@ -61,6 +61,8 @@ public:
 	HString const& convert( HString const& );
 	HString const& convert( char const*, int long );
 	HString const& convert( char const* );
+private:
+	void init( void );
 };
 
 typedef yaal::hcore::HExceptionT<HCharacterEncodingConverter> HCharacterEncodingConverterException;

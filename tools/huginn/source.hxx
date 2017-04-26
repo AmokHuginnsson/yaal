@@ -61,7 +61,7 @@ public:
 	int error_position( int ) const;
 	HHuginn::HErrorCoordinate error_coordinate( int ) const;
 	yaal::hcore::HString get_snippet( int, int ) const;
-	char const* get_comment( int ) const;
+	yaal::hcore::HString const& get_comment( int ) const;
 	yaal::hcore::HString const& name( void ) const;
 	yaal::hcore::HString::const_iterator begin( void ) const;
 	yaal::hcore::HString::const_iterator end( void ) const;

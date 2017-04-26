@@ -749,17 +749,17 @@ void OCompiler::set_lambda_name( executing_parser::position_t position_ ) {
 
 void OCompiler::create_function( executing_parser::position_t position_ ) {
 	M_PROLOG
-	char const* doc( _runtime->huginn()->get_comment( position_.get() ) );
+	HString const& doc( _runtime->huginn()->get_comment( position_.get() ) );
 	function_info_t fi( create_function_low( position_ ) );
 	if ( !! _classContext ) {
 		int idx( static_cast<int>( _classContext->_fieldNames.get_size() - 1 ) );
 		_classContext->_methods.insert( make_pair( idx, fi.second ) );
-		_classContext->_docs.insert( make_pair( idx, doc ? doc : "" ) );
+		_classContext->_docs.insert( make_pair( idx, doc ) );
 	} else {
 		if ( !! _runtime->get_class( fi.first ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Class of the same name `"_ys.append( _runtime->identifier_name( fi.first ) ).append( "' is already defined." ), position_.get() );
 		}
-		_runtime->register_function( fi.first, fi.second, doc ? doc : "" );
+		_runtime->register_function( fi.first, fi.second, doc );
 	}
 	M_EPILOG
 }
@@ -801,7 +801,7 @@ OCompiler::function_info_t OCompiler::create_function_low( executing_parser::pos
 void OCompiler::submit_class( executing_parser::position_t position_ ) {
 	M_PROLOG
 	pop_function_context();
-	_classContext->_doc = _runtime->huginn()->get_comment( position_.get() );
+	_classContext->_doc = &_runtime->huginn()->get_comment( position_.get() );
 	bool inserted( _submittedClasses.insert( make_pair( _classContext->_classIdentifier, yaal::move( _classContext ) ) ).second );
 	M_ASSERT( inserted );
 	static_cast<void>( inserted );
@@ -1365,10 +1365,10 @@ void OCompiler::add_default_value( executing_parser::position_t ) {
 void OCompiler::add_field_definition( executing_parser::position_t position_ ) {
 	M_PROLOG
 	M_ASSERT( !! _classContext );
-	char const* doc( _runtime->huginn()->get_comment( position_.get() ) );
+	HString const& doc( _runtime->huginn()->get_comment( position_.get() ) );
 	int idx( static_cast<int>( _classContext->_fieldNames.get_size() - 1 ) );
 	_classContext->_fieldDefinitions.insert( make_pair( idx, current_expression() ) );
-	_classContext->_docs.insert( make_pair( idx, doc ? doc : "" ) );
+	_classContext->_docs.insert( make_pair( idx, doc ) );
 	reset_expression();
 	return;
 	M_EPILOG

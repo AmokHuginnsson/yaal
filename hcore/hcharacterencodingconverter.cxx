@@ -33,6 +33,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hcharacterencodingconverter.hxx"
+#include "algorithm.hxx"
 
 namespace yaal {
 
@@ -40,13 +41,24 @@ namespace hcore {
 
 static HCharacterEncodingConverter::descriptor_t const INVALID( static_cast<HCharacterEncodingConverter::descriptor_t>( -1 ) );
 
+namespace {
+
+/*
+ * An actual longest encoding name is:
+ * Extended_UNIX_Code_Packed_Format_for_Japanese
+ * which is 45 bytes long.
+ */
+static int const CHARSET_NAME_SIZE( 64 );
+
+}
+
 HCharacterEncodingConverter::HCharacterEncodingConverter( yaal::hcore::HString const& nameFrom_, yaal::hcore::HString const& nameTo_ )
 	: _nameFrom( nameFrom_ )
 	, _nameTo( nameTo_ )
-	, _descriptor( reinterpret_cast<descriptor_t>( iconv_open( _nameTo.c_str(), _nameFrom.c_str() ) ) )
+	, _descriptor( INVALID )
 	, _cache() {
 	M_PROLOG
-	M_ENSURE( _descriptor != INVALID, "iconv_open( "_ys.append( _nameTo ).append( ", " ).append( _nameFrom ).append( " )" ) );
+	init();
 	return;
 	M_EPILOG
 }
@@ -54,10 +66,10 @@ HCharacterEncodingConverter::HCharacterEncodingConverter( yaal::hcore::HString c
 HCharacterEncodingConverter::HCharacterEncodingConverter( HCharacterEncodingConverter const& other_ )
 	: _nameFrom( other_._nameFrom )
 	, _nameTo( other_._nameTo )
-	, _descriptor( reinterpret_cast<descriptor_t>( iconv_open( _nameTo.c_str(), _nameFrom.c_str() ) ) )
+	, _descriptor( INVALID )
 	, _cache() {
 	M_PROLOG
-	M_ENSURE( _descriptor != INVALID, "iconv_open( "_ys.append( _nameTo ).append( ", " ).append( _nameFrom ).append( " )" ) );
+	init();
 	return;
 	M_EPILOG
 }
@@ -69,6 +81,21 @@ HCharacterEncodingConverter::HCharacterEncodingConverter( HCharacterEncodingConv
 	, _cache( yaal::move( other_._cache ) ) {
 	M_PROLOG
 	other_._descriptor = INVALID;
+	return;
+	M_EPILOG
+}
+
+void HCharacterEncodingConverter::init( void ) {
+	M_PROLOG
+	char from[CHARSET_NAME_SIZE];
+	char to[CHARSET_NAME_SIZE];
+	M_ENSURE( ( _nameFrom.get_length() < ( CHARSET_NAME_SIZE - 1 ) ) && ( _nameTo.get_length() < ( CHARSET_NAME_SIZE - 1 ) ) );
+	copy( _nameFrom.begin(), _nameFrom.end(), from );
+	from[ _nameFrom.get_length() ] = 0;
+	copy( _nameTo.begin(), _nameTo.end(), to );
+	to[ _nameTo.get_length() ] = 0;
+	_descriptor = reinterpret_cast<descriptor_t>( iconv_open( to, from ) );
+	M_ENSURE( _descriptor != INVALID, "iconv_open( "_ys.append( _nameTo ).append( ", " ).append( _nameFrom ).append( " )" ) );
 	return;
 	M_EPILOG
 }

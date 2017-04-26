@@ -300,7 +300,7 @@ struct OCompiler {
 		docs_t _docs;
 		executing_parser::position_t _position;
 		executing_parser::position_t _basePosition;
-		char const* _doc;
+		yaal::hcore::HString const* _doc;
 		OClassContext( void );
 	private:
 		OClassContext( OClassContext const& ) = delete;

@@ -159,16 +159,13 @@ yaal::hcore::HString HSource::get_snippet( int from_, int len_ ) const {
 	M_EPILOG
 }
 
-char const* HSource::get_comment( int position_ ) const {
+yaal::hcore::HString const& HSource::get_comment( int position_ ) const {
 	M_PROLOG
 	int origPos( error_position( position_ ) );
 	HHuginn::HErrorCoordinate ec( error_coordinate( origPos ) );
-	char const* comment( nullptr );
 	comments_t::const_iterator it( _comments.find( ec.line() - 2 ) );
-	if ( it != _comments.end() ) {
-		comment = it->second.c_str();
-	}
-	return ( comment );
+	static HString const noComment;
+	return ( it != _comments.end() ? it->second : noComment );
 	M_EPILOG
 }
 
