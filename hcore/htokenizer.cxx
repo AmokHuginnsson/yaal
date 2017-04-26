@@ -30,6 +30,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "htokenizer.hxx"
+#include "algorithm.hxx"
 
 namespace yaal {
 
@@ -118,8 +119,13 @@ int long HTokenizer::skip_empty( int long start_ ) const {
 	if ( _behavior & DELIMITED_BY_WHOLE_STRING ) {
 		if ( start_ != HString::npos ) {
 			int long delimLen( _delimiter.get_length() );
-			while ( _string.find( _delimiter, start_ ) == start_ ) {
+			HString::const_iterator from( _string.begin() + start_ );
+			HString::const_iterator to( from + delimLen );
+			HString::const_iterator endIt( _string.end() );
+			while ( ( to <= endIt ) && equal( from, to, _delimiter.begin() ) ) {
 				start_ += delimLen;
+				from += delimLen;
+				to += delimLen;
 			}
 		}
 	} else {

@@ -137,8 +137,9 @@ HExpression::HExpression( void )
 	, _variables()
 	, _constantsPool()
 	, _terminalIndexes()
-	, _formula()
-	, _equationTree() {
+	, _formulaCache()
+	, _equationTree()
+	, _formula( nullptr ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -151,8 +152,9 @@ HExpression::HExpression( HString const& formula )
 	, _variables()
 	, _constantsPool()
 	, _terminalIndexes()
-	, _formula()
-	, _equationTree() {
+	, _formulaCache()
+	, _equationTree()
+	, _formula( nullptr ) {
 	M_PROLOG
 	compile( formula );
 	return;
@@ -172,8 +174,9 @@ HExpression::HExpression( HExpression const& ex )
 	, _variables()
 	, _constantsPool( ex._constantsPool )
 	, _terminalIndexes( ex._terminalIndexes )
-	, _formula( ex._formula )
-	, _equationTree( ex._equationTree ) {
+	, _formulaCache()
+	, _equationTree( ex._equationTree )
+	, _formula( nullptr ) {
 	M_PROLOG
 	yaal::copy( ex._variables, ex._variables + MAX_VARIABLE_COUNT, _variables );
 	return;
@@ -200,7 +203,8 @@ void HExpression::swap( HExpression& ex ) {
 		yaal::swap_ranges( _variables, _variables + MAX_VARIABLE_COUNT, ex._variables );
 		_constantsPool.swap( ex._constantsPool );
 		_terminalIndexes.swap( ex._terminalIndexes );
-		_formula.swap( ex._formula );
+		_formulaCache.swap( ex._formulaCache );
+		swap( _formula, ex._formula );
 		_equationTree.swap( ex._equationTree );
 	}
 	return;
@@ -423,42 +427,41 @@ double long HExpression::bracket( tree_t::const_node_t node_ ) {
 
 bool HExpression::translate( HString const& formula_ ) {
 	M_PROLOG
-	int index = 0, realIndex = 0, ctr = 0;
-	int long length = formula_.get_length();
-	_formula.reserve( length );
-	_formula.fillz( '\0', 0, length );
+	int index( 0 );
+	int realIndex( 0 );
+	int long length( formula_.get_length() );
+	_formulaCache.realloc( length + 1 );
+	char* formula( _formulaCache.get<char>() );
+	_formula = formula;
 	_terminalIndexes.resize( length + 1 );
 	while ( index < length ) {
 		_terminalIndexes[ realIndex ] = index;
-		if ( ( formula_[ index ] >= 'a' )
-				&& ( formula_[ index ] <= 'z' ) ) {
-			for ( ctr = 0; ctr < 16; ctr++ ) {
+		if ( ( formula_[ index ] >= 'a' ) && ( formula_[ index ] <= 'z' ) ) {
+			bool isFunc( false );
+			for ( int funcIdx( 0 ); funcIdx < countof( _functionsMnemonics_ ); ++ funcIdx ) {
 				if (
-					strncmp(
-						formula_.c_str() + index,
-						_functionsMnemonics_[ ctr ],
-						static_cast<size_t>( _functionMnemonicsLength_[ ctr ] )
-					) == 0
+					formula_.substr( index, _functionMnemonicsLength_[ funcIdx ] ) == _functionsMnemonics_[ funcIdx ]
 				) {
-					_formula.set_at( realIndex, static_cast<char>( ctr + 1 ) );
+					formula[ realIndex ] = static_cast<char>( funcIdx + 1 );
+					index += _functionMnemonicsLength_[ funcIdx ];
+					++ realIndex;
+					isFunc = true;
 					break;
 				}
 			}
-			if ( ctr < 16 ) {
-				index += _functionMnemonicsLength_[ ctr ];
-				realIndex ++;
-			} else {
+			if ( ! isFunc ) {
 				_error = UNKNOWN_MNEMONIC;
 				_index = realIndex;
 				return ( false );
 			}
 		} else {
-			_formula.set_at( realIndex, formula_[ index ] );
-			index ++;
-			realIndex ++;
+			formula[ realIndex ] = formula_[ index ];
+			++ index;
+			++ realIndex;
 		}
 		_length = realIndex;
 	}
+	formula[_length] = 0;
 	_terminalIndexes[ realIndex ] = index;
 	return ( true );
 	M_EPILOG
@@ -672,7 +675,7 @@ bool HExpression::terminal_production( tree_t::node_t node_ ) {
 		++ digits;
 	}
 	if ( digits > 0 ) {
-		double long value( ::strtold( _formula.c_str() + offset, nullptr ) );
+		double long value( ::strtold( _formula + offset, nullptr ) );
 		_constantsPool.push_back( value );
 		/* We save variables as positive indexes and constants as negative
 		 * indexes, positive and negative 0 index would conflict so

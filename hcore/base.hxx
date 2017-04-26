@@ -190,7 +190,7 @@ bool is_octal( iter_t it_, iter_t end_ ) {
 		++ it_;
 		-- len;
 	}
-	if ( *it_ == '0' ) {
+	if ( ( len >= 2 ) && ( *it_ == '0' ) ) {
 		++ it_;
 		-- len;
 		if ( ( *it_ == 'o' ) || ( *it_ == 'O' ) ) {

@@ -633,7 +633,8 @@ private:
 	action_string_t _actionString;
 	action_string_position_t _actionStringPosition;
 	PARSE _parse;
-	mutable yaal::hcore::HString _cache;
+	mutable yaal::hcore::HString _stringCache;
+	mutable yaal::hcore::HChunk _cache;
 	typedef enum {
 		START = 0,
 		MINUS = 1,

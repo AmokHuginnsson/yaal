@@ -48,6 +48,16 @@ using namespace yaal::hcore;
 
 namespace yaal {
 
+namespace hcore {
+
+namespace hidden {
+
+double long std_strtold( HString const&, int* );
+
+}
+
+}
+
 namespace tools {
 
 namespace util {
@@ -85,7 +95,7 @@ double long atof_ex( HString const& string_, bool parse_ ) {
 			throw HExpressionException( HString( e.what() ) + " - " + analyzer.get_error() + " for: " + string_ + ", at: " + analyzer.get_error_token() );
 		}
 	} else {
-		value = ::strtold( str.c_str(), nullptr );
+		value = hidden::std_strtold( str, nullptr );
 	}
 	return ( value );
 	M_EPILOG

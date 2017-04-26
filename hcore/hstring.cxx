@@ -2176,6 +2176,18 @@ int long unsigned stoul( HString const& str_, int* endIdx_, int base_ ) {
 	M_EPILOG
 }
 
+namespace hidden {
+
+int copy_digits( HString const&, char*, int );
+
+}
+
+namespace {
+
+static int const MAX_INTEGER_DIGIT_COUNT( 160 );
+
+}
+
 int long long stoll_impl( char const*, int*, int );
 int long long stoll_impl( char const* str_, int* endIdx_, int base_ ) {
 	M_PROLOG
@@ -2197,7 +2209,13 @@ int long long stoll_impl( char const* str_, int* endIdx_, int base_ ) {
 
 int long long stoll( HString const& str_, int* endIdx_, int base_ ) {
 	M_PROLOG
-	return ( stoll_impl( str_.c_str(), endIdx_, base_ ) );
+	char buf[MAX_INTEGER_DIGIT_COUNT];
+	int skip( hidden::copy_digits( str_, buf, MAX_INTEGER_DIGIT_COUNT ) );
+	int long long result( stoll_impl( buf, endIdx_, base_ ) );
+	if ( endIdx_ ) {
+		*endIdx_ += skip;
+	}
+	return ( result );
 	M_EPILOG
 }
 
@@ -2223,7 +2241,13 @@ int long long unsigned stoull_impl( char const* str_, int* endIdx_, int base_ ) 
 
 int long long unsigned stoull( HString const& str_, int* endIdx_, int base_ ) {
 	M_PROLOG
-	return ( stoull_impl( str_.c_str(), endIdx_, base_ ) );
+	char buf[MAX_INTEGER_DIGIT_COUNT];
+	int skip( hidden::copy_digits( str_, buf, MAX_INTEGER_DIGIT_COUNT ) );
+	int long long unsigned result( stoull_impl( buf, endIdx_, base_ ) );
+	if ( endIdx_ ) {
+		*endIdx_ += skip;
+	}
+	return ( result );
 	M_EPILOG
 }
 
@@ -2236,6 +2260,17 @@ double stod( HString const& str_, int* endIdx_ ) {
 }
 
 double long stold( HString const& str_, int* endIdx_ ) {
+	/*
+	 * Try to call smart version of float parser if it is available.
+	 *
+	 * hcore::strtold can redirect call to either:
+	 *
+	 * ::strtold() - standard C library float parser
+	 *
+	 * - or -
+	 *
+	 * yaal::atof_ex - a full fledged expression parser (if it is available by linking with yaal::tools library)
+	 */
 	return ( hcore::strtold( str_, endIdx_ ) );
 }
 

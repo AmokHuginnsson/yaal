@@ -30,6 +30,7 @@ Copyright:
 #include "hcore/hstring.hxx"
 #include "hcore/htree.hxx"
 #include "hcore/harray.hxx"
+#include "hcore/hchunk.hxx"
 
 namespace yaal {
 
@@ -71,8 +72,9 @@ private:
 	constants_t _constantsPool;
 	typedef hcore::HArray<int> terminal_indexes_t;
 	terminal_indexes_t _terminalIndexes;
-	hcore::HString _formula;
+	yaal::hcore::HChunk _formulaCache;
 	tree_t _equationTree;
+	char const* _formula;
 public:
 	/*{*/
 	HExpression( void );

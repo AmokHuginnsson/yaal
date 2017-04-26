@@ -2236,6 +2236,7 @@ HReal::HReal( PARSE parse_ )
 	, _actionString()
 	, _actionStringPosition()
 	, _parse( parse_ )
+	, _stringCache()
 	, _cache() {
 	return;
 }
@@ -2251,6 +2252,7 @@ HReal::HReal( action_t const& action_, PARSE parse_ )
 	, _actionString()
 	, _actionStringPosition()
 	, _parse( parse_ )
+	, _stringCache()
 	, _cache() {
 	return;
 }
@@ -2266,6 +2268,7 @@ HReal::HReal( action_position_t const& action_, PARSE parse_ )
 	, _actionString()
 	, _actionStringPosition()
 	, _parse( parse_ )
+	, _stringCache()
 	, _cache() {
 	return;
 }
@@ -2281,6 +2284,7 @@ HReal::HReal( action_double_t const& action_, PARSE parse_ )
 	, _actionString()
 	, _actionStringPosition()
 	, _parse( parse_ )
+	, _stringCache()
 	, _cache() {
 	return;
 }
@@ -2296,6 +2300,7 @@ HReal::HReal( action_double_position_t const& action_, PARSE parse_ )
 	, _actionString()
 	, _actionStringPosition()
 	, _parse( parse_ )
+	, _stringCache()
 	, _cache() {
 	return;
 }
@@ -2311,6 +2316,7 @@ HReal::HReal( action_double_long_t const& action_, PARSE parse_ )
 	, _actionString()
 	, _actionStringPosition()
 	, _parse( parse_ )
+	, _stringCache()
 	, _cache() {
 	return;
 }
@@ -2326,6 +2332,7 @@ HReal::HReal( action_double_long_position_t const& action_, PARSE parse_ )
 	, _actionString()
 	, _actionStringPosition()
 	, _parse( parse_ )
+	, _stringCache()
 	, _cache() {
 	return;
 }
@@ -2341,6 +2348,7 @@ HReal::HReal( action_number_t const& action_, PARSE parse_ )
 	, _actionString()
 	, _actionStringPosition()
 	, _parse( parse_ )
+	, _stringCache()
 	, _cache() {
 	return;
 }
@@ -2356,6 +2364,7 @@ HReal::HReal( action_number_position_t const& action_, PARSE parse_ )
 	, _actionString()
 	, _actionStringPosition()
 	, _parse( parse_ )
+	, _stringCache()
 	, _cache() {
 	return;
 }
@@ -2371,6 +2380,7 @@ HReal::HReal( action_string_t const& action_, PARSE parse_ )
 	, _actionString( action_ )
 	, _actionStringPosition()
 	, _parse( parse_ )
+	, _stringCache()
 	, _cache() {
 	return;
 }
@@ -2386,6 +2396,7 @@ HReal::HReal( action_string_position_t const& action_, PARSE parse_ )
 	, _actionString()
 	, _actionStringPosition( action_ )
 	, _parse( parse_ )
+	, _stringCache()
 	, _cache() {
 	return;
 }
@@ -2401,7 +2412,8 @@ HReal::HReal( HReal const& real_ )
 	, _actionString( real_._actionString )
 	, _actionStringPosition( real_._actionStringPosition )
 	, _parse( real_._parse )
-	, _cache( real_._cache ) {
+	, _stringCache( real_._stringCache )
+	, _cache() {
 	return;
 }
 
@@ -2495,7 +2507,7 @@ yaal::hcore::HUTF8String::const_iterator HReal::do_parse( HExecutingParser* exec
 	M_PROLOG
 	yaal::hcore::HUTF8String::const_iterator start( skip_space( first_, last_ ) );
 	yaal::hcore::HUTF8String::const_iterator scan( start );
-	_cache.clear();
+	_stringCache.clear();
 	real_paring_state_t state( START );
 	if ( scan != last_ ) {
 		while ( scan != last_ ) {
@@ -2538,7 +2550,7 @@ yaal::hcore::HUTF8String::const_iterator HReal::do_parse( HExecutingParser* exec
 			if ( stop ) {
 				break;
 			}
-			_cache.push_back( static_cast<char>( *scan ) );
+			_stringCache.push_back( static_cast<char>( *scan ) );
 			++ scan;
 		}
 	} else {
@@ -2546,26 +2558,31 @@ yaal::hcore::HUTF8String::const_iterator HReal::do_parse( HExecutingParser* exec
 	}
 	if ( ( ( _parse == PARSE::GREEDY ) && ( state >= INTEGRAL ) ) || ( ( _parse == PARSE::STRICT ) && ( state >= DOT ) ) ) {
 		position_t pos( position( executingParser_, start ) );
+		if ( !! _actionDouble || !! _actionDoublePosition || !! _actionDoubleLong || !! _actionDoubleLongPosition ) {
+			_cache.realloc( _stringCache.get_length() + 1 );
+			copy( _stringCache.begin(), _stringCache.end(), _cache.get<char>() );
+			_cache.get<char>()[ _stringCache.get_length() ] = 0;
+		}
 		if ( !! _actionDouble ) {
-			double d( ::strtod( _cache.c_str(), nullptr ) );
+			double d( ::strtod( _cache.get<char>(), nullptr ) );
 			add_execution_step( executingParser_, start, call( _actionDouble, d ) );
 		} else if ( !! _actionDoublePosition ) {
-			double d( ::strtod( _cache.c_str(), nullptr ) );
+			double d( ::strtod( _cache.get<char>(), nullptr ) );
 			add_execution_step( executingParser_, start, call( _actionDoublePosition, d, pos ) );
 		} else if ( !! _actionDoubleLong ) {
-			double long dl( ::strtold( _cache.c_str(), nullptr ) );
+			double long dl( ::strtold( _cache.get<char>(), nullptr ) );
 			add_execution_step( executingParser_, start, call( _actionDoubleLong, dl ) );
 		} else if ( !! _actionDoubleLongPosition ) {
-			double long dl( ::strtold( _cache.c_str(), nullptr ) );
+			double long dl( ::strtold( _cache.get<char>(), nullptr ) );
 			add_execution_step( executingParser_, start, call( _actionDoubleLongPosition, dl, pos ) );
 		} else if ( !! _actionNumber ) {
-			add_execution_step( executingParser_, start, call( _actionNumber, yaal::move( _cache ) ) );
+			add_execution_step( executingParser_, start, call( _actionNumber, yaal::move( _stringCache ) ) );
 		} else if ( !! _actionNumberPosition ) {
-			add_execution_step( executingParser_, start, call( _actionNumberPosition, yaal::move( _cache ), pos ) );
+			add_execution_step( executingParser_, start, call( _actionNumberPosition, yaal::move( _stringCache ), pos ) );
 		} else if ( !! _actionString ) {
-			add_execution_step( executingParser_, start, call( _actionString, yaal::move( _cache ) ) );
+			add_execution_step( executingParser_, start, call( _actionString, yaal::move( _stringCache ) ) );
 		} else if ( !! _actionStringPosition ) {
-			add_execution_step( executingParser_, start, call( _actionStringPosition, yaal::move( _cache ), pos ) );
+			add_execution_step( executingParser_, start, call( _actionStringPosition, yaal::move( _stringCache ), pos ) );
 		} else if ( !! _action ) {
 			add_execution_step( executingParser_, start, call( _action ) );
 		} else if ( !! _actionPosition ) {

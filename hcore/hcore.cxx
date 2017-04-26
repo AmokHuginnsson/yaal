@@ -41,6 +41,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "memory.hxx"
 #include "hlog.hxx"
 #include "hstring.hxx"
+#include "utf8.hxx"
 #include "htokenizer.hxx"
 #include "hprogramoptionshandler.hxx"
 #include "hsingleton.hxx"
@@ -142,13 +143,37 @@ void decode_set_env( HString line ) {
 	M_EPILOG
 }
 
-namespace {
+namespace hidden {
 
+int copy_digits( HString const&, char*, int );
+int copy_digits( HString const& str_, char* buf_, int size_ ) {
+	int skip( 0 );
+	HString::const_iterator it( str_.begin() );
+	HString::const_iterator end( str_.end() );
+	while ( ( it != end ) && _whiteSpace_.has( static_cast<u32_t>( *it ) ) ) { /* *TODO* *FIXME* Remove static_cast after UCS in HString is implemented. */
+		++ skip;
+		++ it;
+	}
+	for (
+		int i( 0 ), LIMIT( min( size_ - 1, static_cast<int>( end - it ) ) );
+		( i < LIMIT ) && ( static_cast<u32_t>( *it ) < utf8::MAX_1_BYTE_CODE_POINT );
+		++ i, ++ it, ++ buf_
+	) { /* *TODO* *FIXME* Remove static_cast after UCS in HString is implemented. */
+		*buf_ = static_cast<char>( *it );
+	}
+	*buf_ = 0;
+	return ( skip );
+}
+
+double long std_strtold( HString const&, int* );
 double long std_strtold( HString const& str_, int* endIdx_ ) {
+	static int const MAX_FLOAT_DIGIT_COUNT( 8192 );
+	char buf[MAX_FLOAT_DIGIT_COUNT];
+	int skip( copy_digits( str_, buf, MAX_FLOAT_DIGIT_COUNT ) );
 	char* endPtr( nullptr );
-	double long value( ::strtold( str_.c_str(), &endPtr ) );
+	double long value( ::strtold( buf, &endPtr ) );
 	if ( endIdx_ ) {
-		*endIdx_ = static_cast<int>( endPtr - str_.c_str() );
+		*endIdx_ = static_cast<int>( endPtr - str_.c_str() ) + skip;
 	}
 	return ( value );
 }
@@ -159,7 +184,7 @@ double long std_strtold( HString const& str_, int* endIdx_ ) {
  */
 namespace extendable {
 
-yaal_strtold_t acting_strtold = &std_strtold;
+yaal_strtold_t acting_strtold = &hidden::std_strtold;
 
 void set_strtold_impl( yaal_strtold_t newStrtold_ ) {
 	acting_strtold = newStrtold_;
