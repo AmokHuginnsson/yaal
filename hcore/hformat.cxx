@@ -631,6 +631,9 @@ HFormat::HFormatImpl::OToken HFormat::HFormatImpl::next_conversion( HString cons
 		t._precision = get_precision( s, i );
 	}
 	t._conversion = get_conversion( s, i );
+	if ( t._conversion == CONVERSION::CONSTANT ) {
+		t._const = "%";
+	}
 	return ( t );
 	M_EPILOG
 }
@@ -783,6 +786,7 @@ HFormat::HFormatImpl::conversion_t HFormat::HFormatImpl::get_conversion( HString
 		} break;
 		case ( '%' ): {
 			if ( s[ i - 1 ] == '%' ) {
+				conversion = CONVERSION::CONSTANT;
 				break;
 			}
 		}
