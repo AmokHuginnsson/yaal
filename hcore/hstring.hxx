@@ -435,12 +435,6 @@ public:
 	 * \param fill_ - fill allocated space with given character.
 	 */
 	HString& assign( int long size_, char fill_ );
-	/*! \brief Replace contents of this string with result of `C' printf() style format.
-	 *
-	 * \param frmt - `C's printf() style format specification.
-	 */
-	HString& format( char const* frmt, ... ) __attribute__(( format( printf, 2, 3 ) ));
-	HString& vformat( char const*, void* ) __attribute__(( format( printf, 2, 0 ) ));
 	/*! \brief Find position of given character in this string.
 	 *
 	 * \param character - a character to look for.

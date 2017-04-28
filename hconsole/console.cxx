@@ -521,7 +521,7 @@ void HConsole::leave_curses( void ) {
 	}
 	set_attr( COLOR::ATTR_NORMAL );
 	set_background( COLOR::ATTR_NORMAL );
-	M_ENSURE( ::wprintw( static_cast<WINDOW*>( _window ), "" ) != ERR );
+	M_ENSURE( ::waddstr( static_cast<WINDOW*>( _window ), "" ) != ERR );
 	M_ENSURE( ::fflush( nullptr ) == 0 );
 	flushinp(); /* Always returns OK */
 	M_ENSURE( ::intrflush( static_cast<WINDOW*>( _window ), true ) != ERR );
@@ -708,17 +708,13 @@ void HConsole::do_cmvprintf( int row_, int column_, COLOR::color_t attribute_, y
 	M_EPILOG
 }
 
-inline int waddstr_fwd( WINDOW* win_, char const* str_ ) {
-	return ( ::waddstr( win_, str_ ) );
-}
-
 void HConsole::addstr( yaal::hcore::HString const& str_ ) const {
 	M_PROLOG
 	if ( ! _enabled ) {
 		M_THROW( "not in curses mode", errno );
 	}
 	_utf8 = str_;
-	M_ENSURE( waddstr_fwd( static_cast<WINDOW*>( _window ), _utf8.x_str() ) != ERR );
+	M_ENSURE( ::waddstr( static_cast<WINDOW*>( _window ), _utf8.x_str() ) != ERR );
 	return;
 	M_EPILOG
 }

@@ -792,37 +792,6 @@ HString& HString::assign( int long size_, char fill_ ) {
 	M_EPILOG
 }
 
-HString& HString::format( char const* format_, ... ) {
-	M_PROLOG
-	::std::va_list ap;
-	va_start( ap, format_ );
-	try {
-		vformat( format_, &ap );
-	} catch ( ... ) {
-		va_end( ap );
-		throw;
-	}
-	va_end( ap );
-	return ( *this );
-	M_EPILOG
-}
-
-HString& HString::vformat( char const* format_, void* ap_ ) {
-	M_PROLOG
-	if ( ! format_ ) {
-		M_THROW( _errMsgHString_[ string_helper::NULL_PTR ], errno );
-	}
-	::std::va_list orig;
-	__va_copy( orig, *static_cast< ::std::va_list*>( ap_ ) );
-	int long newSize = vsnprintf( nullptr, 0, format_, *static_cast< ::std::va_list*>( ap_ ) );
-	reserve( newSize );
-	M_ENSURE( vsnprintf( MEM, static_cast<size_t>( newSize + 1 ), format_, orig ) == newSize );
-	SET_SIZE( newSize );
-	va_end( orig );
-	return ( *this );
-	M_EPILOG
-}
-
 int long HString::find( char char_, int long after_ ) const {
 	M_PROLOG
 	if ( after_ >= GET_SIZE ) {

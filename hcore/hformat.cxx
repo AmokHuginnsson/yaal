@@ -406,33 +406,49 @@ HString HFormat::string( void ) const {
 				*fp++ = 'c';
 			}
 			*fp = 0;
+			static int const MAX_FLOAT_DIGIT_COUNT( 8192 );
+			char buffer[MAX_FLOAT_DIGIT_COUNT] = "\0";
 			if ( !!( conv & HFormatImpl::CONVERSION::INT ) ) {
 				if ( !!( conv & HFormatImpl::CONVERSION::BYTE ) ) {
-					_impl->_buffer.format( fmt, HFormatImpl::variant_shell<char>::get( *_impl->_args, it->_position ) );
+					snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, HFormatImpl::variant_shell<char>::get( *_impl->_args, it->_position ) );
 				} else if ( !!( conv & HFormatImpl::CONVERSION::SHORT ) ) {
-					_impl->_buffer.format( fmt, HFormatImpl::variant_shell<int short>::get( *_impl->_args, it->_position ) );
+					snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, HFormatImpl::variant_shell<int short>::get( *_impl->_args, it->_position ) );
 				} else if ( !!( conv & HFormatImpl::CONVERSION::LONG ) ) {
-					_impl->_buffer.format( fmt, HFormatImpl::variant_shell<int long>::get( *_impl->_args, it->_position ) );
+					snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, HFormatImpl::variant_shell<int long>::get( *_impl->_args, it->_position ) );
 				} else if ( !!( conv & HFormatImpl::CONVERSION::LONG_LONG ) ) {
-					_impl->_buffer.format( fmt, HFormatImpl::variant_shell<int long long>::get( *_impl->_args, it->_position ) );
+					snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, HFormatImpl::variant_shell<int long long>::get( *_impl->_args, it->_position ) );
 				} else {
 					M_ASSERT( conv == HFormatImpl::CONVERSION::INT );
-					_impl->_buffer.format( fmt, HFormatImpl::variant_shell<int>::get( *_impl->_args, it->_position ) );
+					snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, HFormatImpl::variant_shell<int>::get( *_impl->_args, it->_position ) );
 				}
 			} else if ( !!( conv & HFormatImpl::CONVERSION::STRING ) ) {
-				_impl->_buffer.format( fmt, HFormatImpl::variant_shell<HString>::get( *_impl->_args, it->_position ).c_str() );
+				HString const& s( HFormatImpl::variant_shell<HString>::get( *_impl->_args, it->_position ) );
+				int len( static_cast<int>( s.get_length() ) );
+				if ( p ) {
+					len = min( p, len );
+				}
+				_impl->_buffer.clear();
+				bool leftAligned( !!( it->_flag & HFormatImpl::FLAG::LEFT_ALIGNED ) );
+				int spaces( w > len ? w - len : 0 );
+				if ( ( spaces > 0 ) && ! leftAligned ) {
+					_impl->_buffer.append( spaces, ' ' );
+				}
+				_impl->_buffer.append( s, 0, len );
+				if ( ( spaces > 0 ) && leftAligned ) {
+					_impl->_buffer.append( spaces, ' ' );
+				}
 			} else if ( !!( conv & HFormatImpl::CONVERSION::POINTER ) ) {
-				_impl->_buffer.format( fmt, HFormatImpl::variant_shell<void const*>::get( *_impl->_args, it->_position ) );
+				snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, HFormatImpl::variant_shell<void const*>::get( *_impl->_args, it->_position ) );
 			} else if ( !!( conv & HFormatImpl::CONVERSION::CHAR ) ) {
-				_impl->_buffer.format( fmt, HFormatImpl::variant_shell<char>::get( *_impl->_args, it->_position ) );
+				snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, HFormatImpl::variant_shell<char>::get( *_impl->_args, it->_position ) );
 			} else if ( !!( conv & HFormatImpl::CONVERSION::DOUBLE ) ) {
 				if ( !!( conv & ( HFormatImpl::CONVERSION::LONG ) ) ) {
-					_impl->_buffer.format( fmt, HFormatImpl::variant_shell<double long>::get( *_impl->_args, it->_position ) );
+					snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, HFormatImpl::variant_shell<double long>::get( *_impl->_args, it->_position ) );
 				} else {
-					_impl->_buffer.format( fmt, HFormatImpl::variant_shell<double>::get( *_impl->_args, it->_position ) );
+					snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, HFormatImpl::variant_shell<double>::get( *_impl->_args, it->_position ) );
 				}
 			}
-			_impl->_string += _impl->_buffer;
+			_impl->_string.append( buffer[0] ? buffer : _impl->_buffer );
 		}
 	}
 	return ( _impl->_string );

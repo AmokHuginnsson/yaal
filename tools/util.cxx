@@ -517,13 +517,14 @@ void dump_configuration( OOptionInfo const& info, HStreamInterface& out_ ) {
 
 void failure( int exitStatus_, char const* format_, ... ) {
 	M_PROLOG
-	HString msg;
+	static int const MAX_FAILURE_MESSAGE_LENGTH( 4096 );
+	char msg[MAX_FAILURE_MESSAGE_LENGTH];
 	va_list ap;
 	va_start( ap, format_ );
-	vfprintf( stderr, format_, ap );
-	msg.vformat( format_, &ap );
-	log << "failure: " << msg;
+	int size( vsnprintf( msg, MAX_FAILURE_MESSAGE_LENGTH, format_, ap ) );
 	va_end( ap );
+	fwrite( msg, 1, static_cast<size_t>( size ), stderr );
+	log << "failure: " << msg;
 	throw ( exitStatus_ );
 	M_EPILOG
 }

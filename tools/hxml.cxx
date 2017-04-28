@@ -92,10 +92,11 @@ class HXmlParserG : public HSingleton<HXmlParserG> {
 		M_DESTRUCTOR_EPILOG
 	}
 	static void log_error( void*, char const* format_, ... ) __attribute__(( format( printf, 2, 3 ) )) {
-		HString msg;
+		static int const MAX_ERROR_MESSAGE_LENGTH( 4096 );
+		char msg[MAX_ERROR_MESSAGE_LENGTH];
 		va_list ap;
 		va_start( ap, format_ );
-		msg.vformat( format_, &ap );
+		vsnprintf( msg, MAX_ERROR_MESSAGE_LENGTH, format_, ap );
 		va_end( ap );
 		log( LOG_LEVEL::WARNING ) << msg << endl;
 	}
