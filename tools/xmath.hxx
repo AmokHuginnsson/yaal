@@ -53,9 +53,9 @@ struct AGGREGATE_TYPE {
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const MAXIMUM;
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const SUM;
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const AVERAGE;
-	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const VARIANCE;
+	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const SAMPLE_VARIANCE;
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const POPULATION_VARIANCE;
-	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const STANDARD_DEVIATION;
+	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const SAMPLE_STANDARD_DEVIATION;
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const POPULATION_STANDARD_DEVIATION;
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const BASIC;
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const MEDIAN;
@@ -75,7 +75,7 @@ private:
 	numeric_t _sum;
 	numeric_t _average;
 	numeric_t _median;
-	numeric_t _variance;
+	numeric_t _sampleVariance;
 	numeric_t _populationVariance;
 	aggregate_type_t _aggregateType;
 public:
@@ -83,7 +83,7 @@ public:
 	 *
 	 * Following aggregate types are implicit:
 	 * `count', `minimum', `maximum', `sum', `average'
-	 * and `variance' (`population variance',
+	 * and `sample_variance' (`population sample_variance',
 	 * `standard deviation', `population standard deviation').
 	 *
 	 * One can explicitly request `median' aggregation type.
@@ -128,10 +128,10 @@ public:
 		return ( _median );
 		M_EPILOG
 	}
-	numeric_t variance( void ) const {
+	numeric_t sample_variance( void ) const {
 		M_PROLOG
-		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::VARIANCE ) && ( _count > 1 ) );
-		return ( _variance );
+		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::SAMPLE_VARIANCE ) && ( _count > 1 ) );
+		return ( _sampleVariance );
 		M_EPILOG
 	}
 	numeric_t population_variance( void ) const {
@@ -140,10 +140,10 @@ public:
 		return ( _populationVariance );
 		M_EPILOG
 	}
-	numeric_t standard_deviation( void ) const {
+	numeric_t sample_standard_deviation( void ) const {
 		M_PROLOG
-		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::STANDARD_DEVIATION ) && ( _count > 1 ) );
-		return ( math::square_root( _variance ) );
+		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::SAMPLE_STANDARD_DEVIATION ) && ( _count > 1 ) );
+		return ( math::square_root( _sampleVariance ) );
 		M_EPILOG
 	}
 	numeric_t population_standard_deviation( void ) const {
@@ -158,7 +158,7 @@ template<typename numeric_t>
 template<typename iterator_t>
 HNumberSetStats<numeric_t>::HNumberSetStats( iterator_t first_, iterator_t last_, aggregate_type_t aggregateType_ )
 	: _count( 0 ), _minimum(), _maximum(), _sum(), _average(),
-	_median(), _variance(), _populationVariance(),
+	_median(), _sampleVariance(), _populationVariance(),
 	_aggregateType( aggregateType_ ) {
 	M_PROLOG
 	numeric_t acc( 0 );
@@ -179,7 +179,7 @@ HNumberSetStats<numeric_t>::HNumberSetStats( iterator_t first_, iterator_t last_
 	}
 	_average = _sum / static_cast<numeric_t>( _count );
 	if ( _count > 1 ) {
-		_variance = acc / static_cast<numeric_t>( _count - 1 ) - ( ( _average * _average * static_cast<numeric_t>( _count ) ) / static_cast<numeric_t>( _count - 1 ) );
+		_sampleVariance = ( acc - _average * _average * static_cast<numeric_t>( _count ) ) / static_cast<numeric_t>( _count - 1 );
 	}
 	_populationVariance = acc / static_cast<numeric_t>( _count ) - _average * _average;
 	if ( ( _count > 0 ) && ( _aggregateType & AGGREGATE_TYPE::MEDIAN ) ) {

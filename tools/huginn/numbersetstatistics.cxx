@@ -77,12 +77,12 @@ typename stats_t::value_type stats_impl( stats_t const& stats_, aggregate_type_t
 		res = stats_.average();
 	} else if ( aggregateType_ == AGGREGATE_TYPE::MEDIAN ) {
 		res = stats_.median();
-	} else if ( aggregateType_ == AGGREGATE_TYPE::VARIANCE ) {
-		res = stats_.variance();
+	} else if ( aggregateType_ == AGGREGATE_TYPE::SAMPLE_VARIANCE ) {
+		res = stats_.sample_variance();
 	} else if ( aggregateType_ == AGGREGATE_TYPE::POPULATION_VARIANCE ) {
 		res = stats_.population_variance();
-	} else if ( aggregateType_ == AGGREGATE_TYPE::STANDARD_DEVIATION ) {
-		res = stats_.standard_deviation();
+	} else if ( aggregateType_ == AGGREGATE_TYPE::SAMPLE_STANDARD_DEVIATION ) {
+		res = stats_.sample_standard_deviation();
 	} else if ( aggregateType_ == AGGREGATE_TYPE::POPULATION_STANDARD_DEVIATION ) {
 		res = stats_.population_standard_deviation();
 	}
@@ -117,9 +117,9 @@ HHuginn::class_t HNumberSetStatistics::get_class( HRuntime* runtime_ ) {
 				{ "sum",                           runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "sum",                           AGGREGATE_TYPE::SUM, _1, _2, _3, _4 ) ),                           "a sum of all values in set" },
 				{ "average",                       runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "average",                       AGGREGATE_TYPE::AVERAGE, _1, _2, _3, _4 ) ),                       "an average value of all numbers in set" },
 				{ "median",                        runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "median",                        AGGREGATE_TYPE::MEDIAN, _1, _2, _3, _4 ) ),                        "a median value in set" },
-				{ "variance",                      runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "variance",                      AGGREGATE_TYPE::VARIANCE, _1, _2, _3, _4 ) ),                      "a variance of the set" },
-				{ "population_variance",           runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "population_variance",           AGGREGATE_TYPE::POPULATION_VARIANCE, _1, _2, _3, _4 ) ),           "a population variance of the numeric set" },
-				{ "standard_deviation",            runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "standard_deviation",            AGGREGATE_TYPE::STANDARD_DEVIATION, _1, _2, _3, _4 ) ),            "a standard deviation of the numeric set" },
+				{ "sample_variance",               runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "sample_variance",               AGGREGATE_TYPE::SAMPLE_VARIANCE, _1, _2, _3, _4 ) ),               "a sample_variance of the set" },
+				{ "population_variance",           runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "population_variance",           AGGREGATE_TYPE::POPULATION_VARIANCE, _1, _2, _3, _4 ) ),           "a population sample_variance of the numeric set" },
+				{ "sample_standard_deviation",     runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "sample_standard_deviation",     AGGREGATE_TYPE::SAMPLE_STANDARD_DEVIATION, _1, _2, _3, _4 ) ),     "a standard deviation of the numeric set" },
 				{ "population_standard_deviation", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "population_standard_deviation", AGGREGATE_TYPE::POPULATION_STANDARD_DEVIATION, _1, _2, _3, _4 ) ), "a population standard deviation of the numeric set" }
 			},
 			"The `NumberSetStatistics` is a class representing results of gathering numerical statistics over some uniformly typed number set."
