@@ -29,6 +29,7 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
+#include "hcore/algorithm.hxx"
 #include "preprocessor.hxx"
 
 using namespace yaal;
@@ -48,10 +49,10 @@ HPrepocessor::HIterator HPrepocessor::begin( void ) {
 	char const hashBang[] = "#!";
 	int const hashBangLen( static_cast<int>( sizeof ( hashBang ) - 1 ) );
 	int offset( 0 );
-	if ( ( len >= hashBangLen ) && ! strncmp( _beg, hashBang, hashBangLen ) ) {
-		char const* nl( static_cast<char const*>( ::memchr( _beg, NEWLINE, static_cast<size_t>( len ) ) ) );
-		if ( nl ) {
-			offset = static_cast<int>( nl + 1 - _beg );
+	if ( ( len >= hashBangLen ) && equal( _beg, _beg + hashBangLen, hashBang ) ) {
+		hcore::HString::const_iterator nlIt( find( _beg, _end, NEWLINE ) );
+		if ( nlIt != _end ) {
+			offset = static_cast<int>( nlIt + 1 - _beg );
 		}
 	}
 	return ( HIterator( this, _beg + offset ) );

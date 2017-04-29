@@ -141,7 +141,7 @@ public:
 		M_ASSERT( it_._owner == _owner );
 		return ( it_._cur != _cur );
 	}
-	value_type const& operator * ( void ) const {
+	trait::strip_const<value_type>::type operator * ( void ) const {
 		M_ASSERT( _owner );
 		return ( *_cur );
 	}

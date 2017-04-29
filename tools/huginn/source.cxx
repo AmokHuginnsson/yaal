@@ -46,9 +46,7 @@ namespace huginn {
 HSource::HSource( void )
 	: _name()
 	, _orig()
-	, _origSize( 0 )
 	, _preprocessed()
-	, _preprocessedSize( 0 )
 	, _skips()
 	, _comments()
 	, _skippedLines( 0 ) {
@@ -60,15 +58,18 @@ void HSource::load( yaal::hcore::HStreamInterface& stream_, yaal::hcore::HString
 	static int const PAGE_SIZE( static_cast<int>( system::get_page_size() ) );
 	int nRead( 0 );
 	int block( 0 );
-	M_ASSERT( _origSize == 0 );
+	M_ASSERT( _orig.is_empty() );
+	HChunk readBuffer;
+	int readSize( 0 );
 	do {
-		_orig.realloc( ( block + 1 ) * PAGE_SIZE );
-		nRead = static_cast<int>( stream_.read( _orig.get<char>() + block * PAGE_SIZE, PAGE_SIZE ) );
+		readBuffer.realloc( ( block + 1 ) * PAGE_SIZE );
+		nRead = static_cast<int>( stream_.read( readBuffer.get<char>() + block * PAGE_SIZE, PAGE_SIZE ) );
 		M_ENSURE( nRead >= 0 );
-		_origSize += nRead;
+		readSize += nRead;
 		++ block;
 	} while ( nRead == PAGE_SIZE );
 	_name = name_.is_empty() ? get_stream_id( &stream_ ) : name_;
+	_orig.assign( readBuffer.get<char>(), readSize );
 	_skippedLines = skippedLines_;
 	return;
 	M_EPILOG
@@ -85,19 +86,16 @@ yaal::hcore::HString const& HSource::name( void ) const {
  */
 void HSource::preprocess( void ) {
 	M_PROLOG
-	if ( _origSize > 0 ) {
-		_preprocessed.realloc( _origSize + 1 ); /* + 1 for terminating \0 */
-		HPrepocessor pp( _orig.get<char>(), _orig.get<char>() + _origSize );
-		char* dst( _preprocessed.get<char>() );
-		dst[_origSize] = 0;
+	if ( ! _orig.is_empty() ) {
+		HPrepocessor pp( _orig.begin(), _orig.end() );
 		_skips[0] = 0;
 		int pos( -1 );
 		int skipsTotal( 0 );
-		for ( HPrepocessor::HIterator it( pp.begin() ), endIt( pp.end() ); it != endIt; ++ it, ++ dst ) {
-			int newPos( static_cast<int>( it.raw() - _orig.get<char>() ) );
+		for ( HPrepocessor::HIterator it( pp.begin() ), endIt( pp.end() ); it != endIt; ++ it ) {
+			int newPos( static_cast<int>( it.raw() - _orig.begin() ) );
 			if ( newPos > ( pos + 1 ) ) {
 				skipsTotal += ( newPos - ( pos + 1 ) );
-				_skips[static_cast<int>( dst - _preprocessed.get<char>() )] = skipsTotal;
+				_skips[static_cast<int>( _preprocessed.get_length() )] = skipsTotal;
 				HString comment( pp.comment() );
 				typedef HArray<HString> lines_t;
 				lines_t lines( string::split<lines_t>( comment, "\n", HTokenizer::SKIP_EMPTY ) );
@@ -110,9 +108,8 @@ void HSource::preprocess( void ) {
 				}
 			}
 			pos = newPos;
-			*dst = *it;
+			_preprocessed.push_back( *it );
 		}
-		_preprocessedSize = static_cast<int>( dst - _preprocessed.get<char>() );
 	}
 	return;
 	M_EPILOG
@@ -121,7 +118,7 @@ void HSource::preprocess( void ) {
 int HSource::error_position( int position_ ) const {
 	M_PROLOG
 	int errorPosition( 0 );
-	if ( _origSize > 0 ) {
+	if ( ! _orig.is_empty() ) {
 		skips_t::const_iterator it( _skips.upper_bound( position_ ) );
 		-- it;
 		M_ENSURE( it != _skips.end() );
@@ -133,14 +130,11 @@ int HSource::error_position( int position_ ) const {
 
 HHuginn::HErrorCoordinate HSource::error_coordinate( int position_ ) const {
 	M_PROLOG
-	char const* src( _orig.get<char>() );
 	/* +1 because we count lines starting from 1 (not starting from 0) */
-	int line( static_cast<int>( count( src, src + position_, NEWLINE ) ) + 1 );
+	int line( static_cast<int>( count( _orig.begin(), _orig.begin() + position_, NEWLINE ) ) + 1 );
 	int lastNewlinePosition( 0 );
 	if ( line > 1 ) {
-		char const* nl( static_cast<char const*>( ::memrchr( src, NEWLINE, static_cast<size_t>( position_ ) ) ) );
-		M_ASSERT( nl );
-		int nlPos( static_cast<int>( nl - src ) );
+		int nlPos( static_cast<int>( _orig.find_last( NEWLINE, position_ ) ) );
 		++ nlPos;
 		lastNewlinePosition = nlPos;
 	}
@@ -155,7 +149,7 @@ char const* HSource::error_message( int code_ ) const {
 
 yaal::hcore::HString HSource::get_snippet( int from_, int len_ ) const {
 	M_PROLOG
-	return ( HString( _preprocessed.get<char>() + from_, len_ ) );
+	return ( _preprocessed.substr( from_, len_ ) );
 	M_EPILOG
 }
 
@@ -171,26 +165,19 @@ yaal::hcore::HString const& HSource::get_comment( int position_ ) const {
 
 yaal::hcore::HString::const_iterator HSource::begin( void ) const {
 	M_PROLOG
-	return ( _origSize > 0 ? _preprocessed.get<char const>() : _orig.get<char const>() );
+	return ( _preprocessed.begin() );
 	M_EPILOG
 }
 
 yaal::hcore::HString::const_iterator HSource::end( void ) const {
 	M_PROLOG
-	return ( _origSize > 0 ? _preprocessed.get<char const>() + _preprocessedSize : _orig.get<char const>() );
+	return ( _preprocessed.end() );
 	M_EPILOG
 }
 
 void HSource::dump_preprocessed( yaal::hcore::HStreamInterface& stream_ ) const {
 	M_PROLOG
-	static int const PAGE_SIZE( static_cast<int>( system::get_page_size() ) );
-	int totalWritten( 0 );
-	do {
-		int nWritten( static_cast<int>( stream_.write( _preprocessed.get<char>() + totalWritten,
-						_preprocessedSize - totalWritten >= PAGE_SIZE ? PAGE_SIZE : _preprocessedSize - totalWritten ) ) );
-		M_ENSURE( nWritten >= 0 );
-		totalWritten += nWritten;
-	} while ( totalWritten < _preprocessedSize );
+	stream_<< _preprocessed;
 	return;
 	M_EPILOG
 }

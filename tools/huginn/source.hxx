@@ -46,10 +46,8 @@ public:
 	typedef yaal::hcore::HLookupMap<int, yaal::hcore::HString> comments_t;
 private:
 	yaal::hcore::HString _name;
-	yaal::hcore::HChunk _orig;
-	int _origSize;
-	yaal::hcore::HChunk _preprocessed;
-	int _preprocessedSize;
+	yaal::hcore::HString _orig;
+	yaal::hcore::HString _preprocessed;
 	skips_t _skips;
 	comments_t _comments;
 	int _skippedLines;

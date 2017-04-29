@@ -185,6 +185,9 @@ public:
 		return;
 		M_EPILOG
 	}
+private:
+	HHuginnStringFormatter( HHuginnStringFormatter const& ) = delete;
+	HHuginnStringFormatter& operator = ( HHuginnStringFormatter const& ) = delete;
 };
 
 inline HHuginn::value_t format( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {

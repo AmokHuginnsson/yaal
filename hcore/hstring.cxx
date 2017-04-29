@@ -259,12 +259,12 @@ HString::HString( char const* str_ )
 	M_EPILOG
 }
 
-HString::HString( const_iterator first_, const_iterator last_ )
+HString::HString( HConstIterator first_, HConstIterator last_ )
 	: _len() {
 	M_PROLOG
 	int long newSize( last_ - first_ );
 	reserve( newSize );
-	::std::strncpy( MEM, first_, static_cast<size_t>( newSize ) );
+	::std::strncpy( MEM, first_._owner->c_str() + first_._index, static_cast<size_t>( newSize ) );
 	MEM[ newSize ] = 0;
 	SET_SIZE( newSize );
 	return;
@@ -637,11 +637,11 @@ char HString::back( void ) const {
 }
 
 HString::const_iterator HString::begin( void ) const {
-	return ( MEM );
+	return ( HConstIterator( this, 0 ) );
 }
 
 HString::const_iterator HString::end( void ) const {
-	return ( MEM + get_length() );
+	return ( HConstIterator( this, get_length() ) );
 }
 
 HString::iterator HString::begin( void ) {
@@ -764,15 +764,15 @@ HString& HString::assign( char const* data_, int long length_ ) {
 
 HString& HString::assign( const_iterator first_, const_iterator last_ ) {
 	M_PROLOG
-	if ( ! ( first_ && last_ ) ) {
+	if ( ! ( first_._owner && last_._owner ) ) {
 		M_THROW( _errMsgHString_[ string_helper::NULL_PTR ], errno );
 	}
 	if ( last_ < first_ ) {
 		M_THROW( _errMsgHString_[ string_helper::BAD_LENGTH ], last_ - first_ );
 	}
-	int long newSize( static_cast<int long>( ::strnlen( first_, static_cast<size_t>( last_ - first_ ) ) ) );
+	int long newSize( static_cast<int long>( ::strnlen( first_._owner->c_str() + first_._index, static_cast<size_t>( last_ - first_ ) ) ) );
 	reserve( newSize );
-	::memcpy( MEM, first_, static_cast<size_t>( newSize ) );
+	::memcpy( MEM, first_._owner->c_str() + first_._index, static_cast<size_t>( newSize ) );
 	MEM[ newSize ] = 0;
 	SET_SIZE( newSize );
 	return ( *this );
@@ -1092,7 +1092,7 @@ HString& HString::replace( iterator first_, iterator last_, HString const& repla
 	M_PROLOG
 	M_ENSURE( first_._owner == this );
 	M_ENSURE( last_._owner == this );
-	return ( replace( static_cast<HString::const_iterator>( first_ ) - MEM, last_ - first_, replacement ) );
+	return ( replace( first_._index, last_ - first_, replacement ) );
 	M_EPILOG
 }
 
@@ -1447,7 +1447,7 @@ HString& HString::append( char const* buf_, int long len_ ) {
 
 HString& HString::append( const_iterator first_, const_iterator last_ ) {
 	M_PROLOG
-	return ( append( first_, static_cast<int long>( last_ - first_ ) ) );
+	return ( append( first_._owner->c_str() + first_._index, static_cast<int long>( last_ - first_ ) ) );
 	M_EPILOG
 }
 

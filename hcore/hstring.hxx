@@ -106,6 +106,7 @@ public:
 	static_assert( sizeof ( int long ) <= sizeof ( int_native_t ), "length type overflows native integer type" );
 	static int long const MAX_STRING_LENGTH = ( meta::max_signed<int long>::value / 2 ) - 1;
 	typedef HString this_type;
+	class HConstIterator;
 	class HIterator;
 	class HCharRef;
 private:
@@ -122,7 +123,7 @@ private:
 public:
 	static int long const npos = -1;
 	typedef HIterator iterator; /*!< mutable iterator for string characters */
-	typedef char const* const_iterator; /*!< const iterator for string characters */
+	typedef HConstIterator const_iterator; /*!< const iterator for string characters */
 	/*! \brief Trivial constructor.
 	 *
 	 * \post Empty string is constructed.
@@ -178,7 +179,7 @@ public:
 	 * first_ - beginning of the character range to copy.
 	 * last_ - one past the end of character range to copy.
 	 */
-	HString( const_iterator first_, const_iterator last_ );
+	HString( HConstIterator first_, HConstIterator last_ );
 	/*! \brief Construct string based on character array.
 	 *
 	 * array - a character array where to initialize new HString object with.
@@ -294,18 +295,9 @@ public:
 	char set_at( int long position, char character );
 	/*! \brief Get access to raw character data stored in this string.
 	 *
-	 * An alias for HString::raw().
-	 *
 	 * \return pointer to raw character data stored in this string.
 	 */
 	char const* c_str( void ) const;
-	/*! \brief Get access to raw character data stored in this string.
-	 *
-	 * An alias for HString::raw().
-	 *
-	 * \return pointer to raw character data stored in this string.
-	 */
-	char const* data( void ) const;
 	/*! \brief Get access to first character in the string.
 	 *
 	 * String must be non-empty.
@@ -712,94 +704,130 @@ private:
 	}
 };
 
-class HString::HIterator {
-	HString* _owner;
+class HString::HConstIterator : public yaal::hcore::iterator_interface<char, yaal::hcore::iterator_category::random_access> {
+protected:
+	HString const* _owner;
 	int long _index;
 public:
-	HIterator( void )
-		: _owner( nullptr ), _index( 0 ) {
+	HConstIterator( void )
+		: _owner( nullptr )
+		, _index( 0 ) {
 		return;
 	}
-	HIterator( HIterator const& it_ )
-		: _owner( it_._owner ), _index( it_._index ) {
+	HConstIterator( HConstIterator const& it_ )
+		: _owner( it_._owner )
+		, _index( it_._index ) {
 		return;
 	}
-	HIterator& operator = ( HIterator const& it_ ) {
-		if ( &it_ != this ) {
-			_owner = it_._owner;
-			_index = it_._index;
-		}
+	HConstIterator& operator = ( HConstIterator const& it_ ) {
+		_owner = it_._owner;
+		_index = it_._index;
 		return ( *this );
 	}
-	bool operator == ( HIterator const& it_ ) const {
+	bool operator == ( HConstIterator const& it_ ) const {
 		M_ASSERT( _owner == it_._owner );
 		return ( _index == it_._index );
 	}
-	bool operator != ( HIterator const& it_ ) const {
+	bool operator != ( HConstIterator const& it_ ) const {
 		M_ASSERT( _owner == it_._owner );
 		return ( _index != it_._index );
 	}
-	HIterator& operator ++ ( void ) {
+	HConstIterator& operator ++ ( void ) {
 		M_ASSERT( _owner );
 		++ _index;
 		return ( *this );
 	}
-	HIterator& operator -- ( void ) {
+	HConstIterator& operator -- ( void ) {
 		M_ASSERT( _owner );
 		-- _index;
 		return ( *this );
 	}
-	HIterator operator ++ ( int ) {
-		HIterator it( *this );
+	HConstIterator operator ++ ( int ) {
+		HConstIterator it( *this );
 		++ _index;
 		return ( it );
 	}
-	HIterator operator -- ( int ) {
-		HIterator it( *this );
+	HConstIterator operator -- ( int ) {
+		HConstIterator it( *this );
 		-- _index;
 		return ( it );
 	}
-	HIterator& operator += ( int offset_ ) {
+	HConstIterator& operator += ( int offset_ ) {
 		_index += offset_;
 		return ( *this );
 	}
-	HIterator& operator += ( int long offset_ ) {
+	HConstIterator& operator += ( int long offset_ ) {
 		_index += offset_;
 		return ( *this );
 	}
-	HIterator& operator -= ( int offset_ ) {
+	HConstIterator& operator -= ( int offset_ ) {
 		_index -= offset_;
 		return ( *this );
 	}
-	HIterator& operator -= ( int long offset_ ) {
+	HConstIterator& operator -= ( int long offset_ ) {
 		_index -= offset_;
 		return ( *this );
 	}
-	HIterator operator + ( int offset_ ) {
-		return ( HIterator( _owner, _index + offset_ ) );
+	HConstIterator operator + ( int offset_ ) {
+		return ( HConstIterator( _owner, _index + offset_ ) );
 	}
-	HIterator operator + ( int long offset_ ) {
-		return ( HIterator( _owner, _index + offset_ ) );
+	HConstIterator operator + ( int long offset_ ) {
+		return ( HConstIterator( _owner, _index + offset_ ) );
 	}
-	HIterator operator - ( int offset_ ) {
-		return ( HIterator( _owner, _index - offset_ ) );
+	HConstIterator operator - ( int offset_ ) {
+		return ( HConstIterator( _owner, _index - offset_ ) );
 	}
-	HIterator operator - ( int long offset_ ) {
-		return ( HIterator( _owner, _index - offset_ ) );
+	HConstIterator operator - ( int long offset_ ) {
+		return ( HConstIterator( _owner, _index - offset_ ) );
+	}
+	bool operator < ( HConstIterator const& it_ ) const {
+		return ( _index < it_._index );
+	}
+	bool operator <= ( HConstIterator const& it_ ) const {
+		return ( _index <= it_._index );
+	}
+	bool operator > ( HConstIterator const& it_ ) const {
+		return ( _index > it_._index );
+	}
+	bool operator >= ( HConstIterator const& it_ ) const {
+		return ( _index >= it_._index );
+	}
+	int long operator - ( HConstIterator const& it_ ) const {
+		return ( _index - it_._index );
+	}
+	char operator * ( void ) const {
+		return ( (*_owner)[ _index ] );
+	}
+private:
+	friend class HString;
+	HConstIterator( HString const* owner_, int long index_ )
+		: _owner( owner_ ), _index( index_ ) {
+		return;
+	}
+};
+
+class HString::HIterator : public HString::HConstIterator {
+public:
+	HIterator( void )
+		: HConstIterator() {
+		return;
+	}
+	HIterator( HConstIterator const& it_ )
+		: HConstIterator( it_._owner,  it_._index ) {
+		return;
+	}
+	HIterator& operator = ( HIterator const& it_ ) {
+		_owner = it_._owner;
+		_index = it_._index;
+		return ( *this );
 	}
 	HCharRef operator * ( void ) {
-		return ( HCharRef( *_owner, _index ) );
-	}
-	operator HString::const_iterator ( void ) const {
-		return ( _owner->c_str() + _index );
-	}
-	int long operator - ( HIterator const& it_ ) const {
-		return ( _index - it_._index );
+		return ( HCharRef( *const_cast<HString*>( _owner ), _index ) );
 	}
 private:
 	friend class HString;
 	HIterator( HString* owner_, int long index_ )
-		: _owner( owner_ ), _index( index_ ) {
+		: HConstIterator( owner_,  index_ ) {
 		return;
 	}
 };
