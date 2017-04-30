@@ -213,35 +213,35 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		"factorial",
 		atom >> -( ( ( constant( '!' ) & "==" ) | ( constant( '!' ) ^ '=' ) )[HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FACTORIAL, _1 ) )] )
 	);
-	HRule negation(
-		"negation",
-		( constant( '-', HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::NEGATE, _1 ) ) ) >> factorial )[
-			e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::NEGATE, _1 ) )
-		] | factorial
-	);
 	HRule booleanNot(
 		"booleanNot", (
 			constant( '!', HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::BOOLEAN_NOT, _1 ) ) )
-			>> negation
+			>> factorial
 		)[
 			e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::BOOLEAN_NOT, _1 ) )
-		] | negation
+		] | factorial
 	);
+	HRule negation( "negation" );
 	HRule power(
 		"power",
 		booleanNot >> (
-			* ( constant( '^', e_p::HCharacter::action_character_position_t( hcore::call( &OCompiler::defer_oper, _compiler.get(), _1, _2 ) ) ) >> booleanNot )
+			* ( constant( '^', e_p::HCharacter::action_character_position_t( hcore::call( &OCompiler::defer_oper, _compiler.get(), _1, _2 ) ) ) >> negation )
 		),
 		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::POWER, _1 ) )
 	);
+	negation %= (
+		( constant( '-', HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::NEGATE, _1 ) ) ) >> negation )[
+			e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::NEGATE, _1 ) )
+		] | power
+	);
 	HRule multiplication(
 		"multiplication",
-		power >> (
+		negation >> (
 			* (
 					(
 					characters(
 						"*/%", e_p::HCharacter::action_character_position_t( hcore::call( &OCompiler::defer_oper, _compiler.get(), _1, _2 ) )
-					) >> power
+					) >> negation
 				)[e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MULTIPLY, _1 ) )]
 			)
 		)
