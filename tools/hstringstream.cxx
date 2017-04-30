@@ -39,16 +39,23 @@ namespace yaal {
 namespace tools {
 
 HStringStream::HStringStream( void )
-	: _used( false ), _offset( 0 ), _buffer( "" ) {
+	: _used( false )
+	, _offset( 0 )
+	, _buffer()
+	, _utf8() {
 }
 
 HStringStream::HStringStream( HString const& init_ )
-	: _used( false ), _offset( 0 ), _buffer( init_ ) {
+	: _used( false )
+	, _offset( 0 )
+	, _buffer( init_ )
+	, _utf8() {
 }
 
 void HStringStream::set_buffer( HString const& s_ ) {
 	M_PROLOG
 	_buffer.assign( s_ );
+	_utf8.reset();
 	_offset = 0;
 	_used = false;
 	return;
@@ -74,6 +81,7 @@ int long HStringStream::do_write( void const* buffer_, int long size_ ) {
 	M_PROLOG
 	if ( _used ) {
 		_buffer.clear();
+		_utf8.reset();
 		_offset = 0;
 		_used = false;
 	}
@@ -92,13 +100,17 @@ int long HStringStream::do_read( void* buffer_, int long size_ ) {
 	M_PROLOG
 	int long length( _buffer.get_length() );
 	int long toCopy( yaal::min( length - _offset, size_ ) );
+	if ( length != _utf8.character_count() ) {
+		_utf8 = _buffer;
+	}
 	if ( length > 0 ) {
-		::strncpy( static_cast<char*>( buffer_ ), _buffer.c_str() + _offset, static_cast<size_t>( toCopy ) );
+		::strncpy( static_cast<char*>( buffer_ ), _utf8.x_str() + _offset, static_cast<size_t>( toCopy ) );
 	}
 	_offset += toCopy;
 	if ( _offset >= length ) {
 		_offset = 0;
 		_buffer.clear();
+		_utf8.reset();
 		_used = true;
 	}
 	return ( toCopy );
@@ -113,6 +125,7 @@ void HStringStream::use( void ) const {
 void HStringStream::reset( void ) {
 	M_PROLOG
 	_buffer.clear();
+	_utf8.reset();
 	_offset = 0;
 	_used = false;
 	clear();

@@ -44,6 +44,7 @@ private:
 	mutable bool _used; /* FIXME Confirm mutable is necessary here. */
 	mutable int long _offset;
 	mutable yaal::hcore::HString _buffer;
+	mutable yaal::hcore::HUTF8String _utf8;
 public:
 	HStringStream( void );
 	HStringStream( yaal::hcore::HString const& );
