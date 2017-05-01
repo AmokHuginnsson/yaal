@@ -164,18 +164,18 @@ yaal::hcore::HString const& HCharacterEncodingConverter::name_to( void ) const {
 #	define M_YAAL_ICONV_CONST /**/
 #endif /* not HAVE_ICONV_INPUT_CONST */
 
-yaal::hcore::HString const& HCharacterEncodingConverter::convert( char const* data_, int long size_ ) {
+void HCharacterEncodingConverter::convert( char const* data_, int long size_, HChunk& to_ ) {
 	M_PROLOG
 	char M_YAAL_ICONV_CONST* source( const_cast<char M_YAAL_ICONV_CONST*>( data_ ) );
 	iconv_t cD( reinterpret_cast<iconv_t>( _descriptor ) );
 	size_t sizeIn( static_cast<size_t>( size_ ) );
 	size_t sizeOut( 0 );
+	int totalSize( 0 );
 	/* The longest single character in any encoding is 6 bytes long. */
 	size_t const ICONV_OUTPUT_BUFFER_LENGTH = 8;
 	/* Additional character for nil terminator. */
 	char output[ ICONV_OUTPUT_BUFFER_LENGTH + 1 ];
-	_cache.clear();
-	do {
+	while ( sizeIn ) {
 		::memset( output, 0, ICONV_OUTPUT_BUFFER_LENGTH + 1 );
 		sizeOut = ICONV_OUTPUT_BUFFER_LENGTH;
 		char* out = output;
@@ -183,25 +183,24 @@ yaal::hcore::HString const& HCharacterEncodingConverter::convert( char const* da
 			( ::iconv( cD, &source, &sizeIn, &out, &sizeOut ) != static_cast<size_t>( -1 ) ) || ( errno == E2BIG ),
 			"iconv"
 		);
-		_cache += output;
-	} while ( sizeIn );
-	return ( _cache );
+		int nWritten( static_cast<int>( ICONV_OUTPUT_BUFFER_LENGTH - sizeOut ) );
+		_cache.realloc( totalSize + nWritten );
+		::memcpy( _cache.get<char>() + totalSize, output, static_cast<size_t>( nWritten ) );
+		totalSize += nWritten;
+	}
+	if ( totalSize > 0 ) {
+		to_.realloc( totalSize + 1 );
+		char* dst( to_.get<char>() );
+		::memcpy( dst, _cache.raw(), static_cast<size_t>( totalSize ) );
+		dst[totalSize] = 0;
+	} else if ( to_.get_size() > 0 ) {
+		to_.get<char>()[0] = 0;
+	}
+	return;
 	M_EPILOG
 }
 
 #undef M_YAAL_ICONV_CONST
-
-yaal::hcore::HString const& HCharacterEncodingConverter::convert( char const* data_ ) {
-	M_PROLOG
-	return ( convert( data_, static_cast<int>( ::strlen( data_ ) ) ) );
-	M_EPILOG
-}
-
-yaal::hcore::HString const& HCharacterEncodingConverter::convert( yaal::hcore::HString const& data_ ) {
-	M_PROLOG
-	return ( convert( data_.c_str(), data_.get_length() ) );
-	M_EPILOG
-}
 
 }
 

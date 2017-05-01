@@ -43,7 +43,6 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/memory.hxx"
 #include "hcore/hsingleton.hxx"
 #include "hcore/hlog.hxx"
-#include "hcore/hcharacterencodingconverter.hxx"
 #include "hcore/hstaticarray.hxx"
 #include "hcore/hformat.hxx"
 #include "tools.hxx"
@@ -128,103 +127,56 @@ class HXsltParserG : public HSingleton<HXsltParserG> {
 	friend class HDestructor<HXsltParserG>;
 };
 
-struct HXml::OConvert {
-	typedef HResource<HCharacterEncodingConverter> character_encoding_converter_t;
-	character_encoding_converter_t _encoder;
-	character_encoding_converter_t _decoder;
-	static char const* INTERNAL_ENCODING_NAME;
-	OConvert( void )
-		: _encoder()
-		, _decoder() {
-	}
-	OConvert( OConvert const& convert_ )
-		: _encoder()
-		, _decoder() {
-		M_PROLOG
-		if ( !! convert_._encoder ) {
-			M_ASSERT( !! _decoder );
-			try {
-				_encoder = make_resource<HCharacterEncodingConverter>( convert_._encoder->name_from(), convert_._encoder->name_to() );
-				_decoder = make_resource<HCharacterEncodingConverter>( convert_._decoder->name_from(), convert_._decoder->name_to() );
-			} catch ( HCharacterEncodingConverterException const& e ) {
-				throw HXmlException( e.what() );
-			}
-		} else {
-			M_ASSERT( ! _decoder );
-		}
-		return;
-		M_EPILOG
-	}
-	void init( HString const& encoding_ ) {
-		M_PROLOG
-		try {
-			_encoder = make_resource<HCharacterEncodingConverter>( INTERNAL_ENCODING_NAME, encoding_ );
-			_decoder = make_resource<HCharacterEncodingConverter>( encoding_, INTERNAL_ENCODING_NAME );
-		} catch ( HCharacterEncodingConverterException const& e ) {
-			throw HXmlException( e.what() );
-		}
-		return;
-		M_EPILOG
-	}
-	void infer( yaal::hcore::HString const& encoding_, xmlNodePtr root_, yaal::hcore::HString const& fileName_ ) {
-		M_PROLOG
-		char const* name( nullptr );
-		if ( !! encoding_ ) {
-			name = ::xmlGetEncodingAlias( encoding_.c_str() );
-			if ( ! name ) {
-				if ( ::xmlParseCharEncoding( encoding_.c_str() ) > XML_CHAR_ENCODING_NONE ) {
-					name = encoding_.c_str();
+namespace {
+
+void verify_encoding( yaal::hcore::HString const& encoding_, xmlNodePtr root_ = nullptr, yaal::hcore::HString const& fileName_ = HString() ) {
+	M_PROLOG
+	bool ok( false );
+	HUTF8String utf8( encoding_ );
+	if ( ! encoding_.is_empty() ) {
+		ok = ::xmlGetEncodingAlias( utf8.x_str() ) != nullptr;
+		if ( ! ok ) {
+			if ( ::xmlParseCharEncoding( utf8.x_str() ) > XML_CHAR_ENCODING_NONE ) {
+				ok = true;
+			} else {
+				log( LOG_LEVEL::WARNING ) << _( "HXml: Encoding alias not found: `" ) << encoding_ << "'";
+				if ( root_ ) {
+					log << " in `" << fileName_ << ":" << root_->line <<"'." << endl;
 				} else {
-					log( LOG_LEVEL::WARNING ) << _( "HXml: Alias not found: `" ) << encoding_ << "' in `"
-						<< fileName_ << ":" << root_->line <<"'." << endl;
+					log << "." << endl;
 				}
 			}
-		} else {
-			log( LOG_LEVEL::WARNING ) << _( "HXml: No encoding declared in `" )
-				<< fileName_ << ":" << root_->line <<"'." << endl;
 		}
-		HString buf;
-		if ( ! name ) {
-			xmlCharEncodingHandlerPtr h( ::xmlFindCharEncodingHandler( encoding_.c_str() ) );
-			if ( h ) {
-				buf.assign( h->name );
-				name = buf.c_str();
-				::xmlCharEncCloseFunc( h );
-			}
-		}
-		if ( ! name ) {
-			log( LOG_LEVEL::WARNING ) << _( "HXml: Character encoding handler not found in `" )
-				<< fileName_ << ":" << root_->line << "'." << endl;
-			xmlChar* content( xmlNodeGetContent( root_ ) );
-			xmlCharEncoding encoding( ::xmlDetectCharEncoding( content, xmlStrlen( content ) ) );
-			::xmlFree( content );
-			if ( ! encoding ) {
-				M_THROW( _( "cannot detect character encoding" ), errno );
-			}
-			name = ::xmlGetCharEncodingName( encoding );
-		}
-		if ( ! name ) {
-			M_THROW( _( "cannot enable internal conversion" ), errno );
-		}
-		init( name );
-		return;
-		M_EPILOG
+	} else if ( root_ ) {
+		log( LOG_LEVEL::WARNING ) << _( "HXml: No encoding declared in `" )
+			<< fileName_ << ":" << root_->line <<"'." << endl;
 	}
-	void reset( void ) {
-		M_PROLOG
-		_encoder.reset();
-		_decoder.reset();
-		return;
-		M_EPILOG
+	if ( ! ok ) {
+		xmlCharEncodingHandlerPtr h( ::xmlFindCharEncodingHandler( utf8.x_str() ) );
+		if ( h ) {
+			ok = true;
+			::xmlCharEncCloseFunc( h );
+		}
 	}
-	bool is_initialized( void ) const {
-		return ( ( !!  _encoder ) && ( !! _decoder ) );
+	if ( ! ok && root_ ) {
+		log( LOG_LEVEL::WARNING ) << _( "HXml: Character encoding handler not found in `" )
+			<< fileName_ << ":" << root_->line << "'." << endl;
+		xmlChar* content( xmlNodeGetContent( root_ ) );
+		xmlCharEncoding encoding( ::xmlDetectCharEncoding( content, xmlStrlen( content ) ) );
+		::xmlFree( content );
+		if ( ! encoding ) {
+			throw HXmlException( _( "cannot detect character encoding" ) );
+		}
+		ok = ::xmlGetCharEncodingName( encoding ) != nullptr;
 	}
-private:
-	OConvert& operator = ( OConvert const& ) = delete;
-};
+	if ( ! ok ) {
+		throw HXmlException( _( "cannot enable internal conversion" ) );
+	}
+	return;
+	M_EPILOG
+}
 
-char const* HXml::OConvert::INTERNAL_ENCODING_NAME( ::xmlGetCharEncodingName( XML_CHAR_ENCODING_UTF8 ) );
+}
 
 class HXmlData {
 private:
@@ -234,6 +186,7 @@ private:
 	mutable xpath_context_resource_t _xPathContext;
 	mutable xpath_object_resource_t _xPathObject;
 	xmlNodeSetPtr      _nodeSet;
+	mutable yaal::hcore::HString _ucs;
 	mutable utf8_t _utf8;
 protected:
 	HXmlData( void )
@@ -242,6 +195,7 @@ protected:
 		, _xPathContext()
 		, _xPathObject()
 		, _nodeSet( nullptr )
+		, _ucs()
 		, _utf8() {
 		M_PROLOG
 		return;
@@ -253,6 +207,7 @@ protected:
 		, _xPathContext()
 		, _xPathObject()
 		, _nodeSet( nullptr )
+		, _ucs()
 		, _utf8() {
 		M_PROLOG
 		return;
@@ -264,6 +219,7 @@ protected:
 		, _xPathContext( yaal::move( xmlData_._xPathContext ) )
 		, _xPathObject( yaal::move( xmlData_._xPathObject ) )
 		, _nodeSet( yaal::move( xmlData_._nodeSet ) )
+		, _ucs( yaal::move( xmlData_._ucs ) )
 		, _utf8( yaal::move( xmlData_._utf8 ) ) {
 		M_PROLOG
 		xmlData_._nodeSet = nullptr;
@@ -305,8 +261,7 @@ public:
 };
 
 HXml::HXml( void )
-	: _convert( make_pointer<HXml::OConvert>() )
-	, _varTmpBuffer()
+	: _varTmpBuffer()
 	, _encoding( _defaultEncoding_ )
 	, _streamId()
 	, _xml( make_resource<HXmlData>() )
@@ -321,8 +276,7 @@ HXml::HXml( void )
 }
 
 HXml::HXml( HXml const& xml_ )
-	: _convert( xml_._convert )
-	, _varTmpBuffer( xml_._varTmpBuffer )
+	: _varTmpBuffer( xml_._varTmpBuffer )
 	, _encoding( xml_._encoding )
 	, _streamId( xml_._streamId )
 	, _xml( make_resource<HXmlData>( *xml_._xml ) )
@@ -341,8 +295,7 @@ HXml::HXml( HXml const& xml_ )
 }
 
 HXml::HXml( HXml&& xml_ )
-	: _convert( yaal::move( xml_._convert ) )
-	, _varTmpBuffer( yaal::move( xml_._varTmpBuffer ) )
+	: _varTmpBuffer( yaal::move( xml_._varTmpBuffer ) )
 	, _encoding( yaal::move( xml_._encoding ) )
 	, _streamId( yaal::move( xml_._streamId ) )
 	, _xml( yaal::move( xml_._xml ) )
@@ -391,7 +344,6 @@ HXml& HXml::operator = ( HXml&& xml_ ) {
 void HXml::swap( HXml& xml_ ) {
 	if ( &xml_ != this ) {
 		using yaal::swap;
-		swap( xml_._convert, _convert );
 		swap( xml_._varTmpBuffer, _varTmpBuffer );
 		swap( xml_._encoding, _encoding );
 		swap( xml_._streamId, _streamId );
@@ -414,11 +366,6 @@ HXml::~HXml ( void ) {
 
 void HXml::clear( void ) {
 	M_PROLOG
-	/* *FIXME* *TODO*
-	 * Actually clear _convert content, not only a reference to shared object.
-	 * In other words turn _convert into copy-constructible value.
-	 */
-	_convert = make_pointer<OConvert>();
 	_encoding.clear();
 	_domTree.clear();
 	_xml = make_resource<HXmlData>();
@@ -430,49 +377,44 @@ void HXml::clear( void ) {
 	M_EPILOG
 }
 
-HString const& HXml::convert( HString const& data_, way_t way_, bool ignoreErrors_ ) const {
+HString const& HXml::convert( char const* data_, bool ignoreErrors_ ) const {
 	M_PROLOG
-	HCharacterEncodingConverter* cec( nullptr );
-	switch ( way_ ) {
-		case ( TO_EXTERNAL ): { cec = _convert->_decoder.raw(); break; }
-		case ( TO_INTERNAL ): { cec = _convert->_encoder.raw(); break; }
-		default:
-			M_ASSERT( ! _( "unknown conversion way" ) );
-		break;
-	}
-	HString const* result( &data_ );
 	try {
-		result = &cec->convert( data_ );
+		_xml->_ucs.assign( data_ );
 	} catch ( ... ) {
 		if ( !ignoreErrors_ ) {
 			throw;
 		}
 	}
-	return ( *result );
+	return ( _xml->_ucs );
 	M_EPILOG
 }
 
 int HXml::get_node_set_by_path( yaal::hcore::HString const& path_ ) {
 	M_PROLOG
-	_varTmpBuffer = path_;
-	int long length = _varTmpBuffer.get_length() - 1;
 	xpath_context_resource_t ctx( xmlXPathNewContext( _xml->_doc.get() ), xmlXPathFreeContext );
 	int setSize = 0;
 	_xml->_nodeSet = nullptr;
 	if ( ctx.get() ) {
 		xmlXPathObjectPtr objPtr = nullptr;
-		while ( ! _varTmpBuffer.is_empty() ) {
+		_xml->_utf8[0] = path_;
+		int len( static_cast<int>( _xml->_utf8[0].byte_count() ) );
+		HChunk pathBuf( len + 1 );
+		char* path( pathBuf.get<char>() );
+		memcpy( path, _xml->_utf8[0].x_str(), static_cast<size_t>( len ) );
+		while ( path[0] ) {
 			objPtr = xmlXPathEvalExpression(
-					reinterpret_cast<xmlChar const*>( _varTmpBuffer.c_str() ),
-					ctx.get() );
+				reinterpret_cast<xmlChar const*>( path ),
+				ctx.get()
+			);
 			if ( objPtr ) {
 				break;
 			}
-			_varTmpBuffer.set_at( length --, 0 );
+			-- len;
+			path[len] = 0;
 		}
 		xpath_object_resource_t obj( objPtr, xmlXPathFreeObject );
 		if ( obj.get() ) {
-			_varTmpBuffer = path_;
 			_xml->_nodeSet = obj.get()->nodesetval;
 			using yaal::swap;
 			swap( _xml->_xPathObject, obj );
@@ -521,7 +463,7 @@ void HXml::init( yaal::hcore::HStreamInterface& stream, parser_t parser_ ) {
 #ifdef __DEBUGGER_BABUNI__
 	cout << root->name << endl;
 #endif /* __DEBUGGER_BABUNI__ */
-	(*_convert).infer( reinterpret_cast<char const *>( doc.get()->encoding ), root, _streamId );
+	verify_encoding( reinterpret_cast<char const *>( doc.get()->encoding ), root, _streamId );
 	using yaal::swap;
 	swap( _xml->_doc, doc );
 	return;
@@ -619,7 +561,7 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 						if ( name ) {
 							if ( attribute->children ) {
 								(**node_)._properties[ name ] = attribute->children->content
-									? convert( reinterpret_cast<char*>( attribute->children->content ), TO_INTERNAL, parser_ & PARSER::IGNORE_CONVERSION_ERRORS )
+									? convert( reinterpret_cast<char*>( attribute->children->content ), parser_ & PARSER::IGNORE_CONVERSION_ERRORS )
 									: "";
 							}
 						}
@@ -645,14 +587,14 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 			}
 			break;
 			case ( XML_TEXT_NODE ): if ( node->content ) {
-				_varTmpBuffer = convert( reinterpret_cast<char*>( node->content ), TO_INTERNAL, parser_ & PARSER::IGNORE_CONVERSION_ERRORS );
+				_varTmpBuffer = convert( reinterpret_cast<char*>( node->content ), parser_ & PARSER::IGNORE_CONVERSION_ERRORS );
 				if ( ( parser_ & PARSER::KEEP_EMPTY ) || ( _varTmpBuffer.find_other_than( _whiteSpace_.data() ) >= 0 ) ) {
 					node_->add_node( HNode( this, HNode::TYPE::CONTENT, _varTmpBuffer, node->line ) );
 				}
 			}
 			break;
 			case ( XML_COMMENT_NODE ): if ( ! ( parser_ & PARSER::STRIP_COMMENT ) && node->content ) {
-				_varTmpBuffer = convert( reinterpret_cast<char*>( node->content ), TO_INTERNAL, parser_ & PARSER::IGNORE_CONVERSION_ERRORS );
+				_varTmpBuffer = convert( reinterpret_cast<char*>( node->content ), parser_ & PARSER::IGNORE_CONVERSION_ERRORS );
 				node_->add_node( HNode( this, HNode::TYPE::COMMENT, _varTmpBuffer, node->line ) );
 			}
 			break;
@@ -818,9 +760,7 @@ void HXml::generate_intermediate_form( generator_t generator_ ) const {
 				throw HXmlException( "Cannot set indent string." );
 			}
 		}
-		if ( ! _convert->is_initialized() ) {
-			_convert->init( _encoding );
-		}
+		verify_encoding( _encoding );
 		bool needDTD( ( ! _externalId.is_empty() ) || ( ! _systemId.is_empty() ) || ( ! _entities.is_empty() && ! ( generator_ & HXml::GENERATOR::STRIP_ENTITIES ) ) );
 		if ( needDTD ) {
 			_xml->_utf8[0] = get_root().get_name();
@@ -839,9 +779,10 @@ void HXml::generate_intermediate_form( generator_t generator_ ) const {
 		if ( ! ( generator_ & HXml::GENERATOR::STRIP_ENTITIES ) ) {
 			for ( entities_t::const_iterator it( _entities.begin() ), end( _entities.end() ); it != end; ++ it ) {
 				_xml->_utf8[0] = it->first;
+				_xml->_utf8[1] = it->second;
 				rc = xmlTextWriterWriteDTDInternalEntity( writer.get(), 0,
 						reinterpret_cast<xmlChar const*>( _xml->_utf8[0].x_str() ),
-						reinterpret_cast<xmlChar const*>( convert( it->second, TO_EXTERNAL ).c_str() ) );
+						reinterpret_cast<xmlChar const*>( _xml->_utf8[1].x_str() ) );
 				if ( rc < 0 ) {
 					throw HXmlException( HString( "Cannot save entity declaration: " ) + it->first );
 				}
@@ -962,9 +903,10 @@ void HXml::dump_node( void* writer_p, HConstNodeProxy const& node_ ) const {
 		HString const& pname = it->first;
 		HString const& pvalue = it->second;
 		_xml->_utf8[0] = pname;
+		_xml->_utf8[1] = pvalue;
 		rc = xmlTextWriterWriteAttribute( writer.get(),
 				reinterpret_cast<xmlChar const*>( _xml->_utf8[0].x_str() ),
-				reinterpret_cast<xmlChar const*>( convert( pvalue, TO_EXTERNAL ).c_str() ) );
+				reinterpret_cast<xmlChar const*>( _xml->_utf8[1].x_str() ) );
 		if ( rc < 0 ) {
 			throw HXmlException( HString( "Unable to write a property: " ) + str + ", with value: " + pvalue );
 		}
@@ -993,12 +935,13 @@ void HXml::dump_node( void* writer_p, HConstNodeProxy const& node_ ) const {
 			dump_node( writer_p, *it );
 		} else if ( type == HXml::HNode::TYPE::CONTENT ) {
 			HString const& value = (*it).get_value();
+			_xml->_utf8[0] = value;
 			if ( ! value.is_empty() && ( value[0] == '&' ) && ( value[value.get_length() - 1] == ';' ) ) {
 				rc = xmlTextWriterWriteRaw( writer.get(),
-						reinterpret_cast<xmlChar const*>( convert( value, TO_EXTERNAL ).c_str() ) );
+						reinterpret_cast<xmlChar const*>( _xml->_utf8[0].x_str() ) );
 			} else {
 				rc = xmlTextWriterWriteString( writer.get(),
-						reinterpret_cast<xmlChar const*>( convert( value, TO_EXTERNAL ).c_str() ) );
+						reinterpret_cast<xmlChar const*>( _xml->_utf8[0].x_str() ) );
 			}
 			if ( rc < 0 ) {
 				throw HXmlException( HString( "Unable to write a node value: " ) + value );
@@ -1018,8 +961,9 @@ void HXml::dump_node( void* writer_p, HConstNodeProxy const& node_ ) const {
 				throw HXmlException( "Unable to write start comment." );
 			}
 			HString const& value = (*it).get_value();
+			_xml->_utf8[0] = value;
 			rc = xmlTextWriterWriteString( writer.get(),
-					reinterpret_cast<xmlChar const*>( convert( value, TO_EXTERNAL ).c_str() ) );
+					reinterpret_cast<xmlChar const*>( _xml->_utf8[0].x_str() ) );
 			if ( rc < 0 ) {
 				throw HXmlException( HString( "Unable to write a comment value: " ) + value );
 			}
@@ -1040,8 +984,9 @@ void HXml::dump_node( void* writer_p, HConstNodeProxy const& node_ ) const {
 void HXml::create_root( yaal::hcore::HString const& name_, yaal::hcore::HString const& encoding_ ) {
 	M_PROLOG
 	M_ASSERT( name_ );
-	_encoding = ( !! encoding_ ) ? encoding_ : _defaultEncoding_;
-	_convert->init( _encoding );
+	HString const& encoding( ! encoding_.is_empty() ? encoding_ : _defaultEncoding_ );
+	verify_encoding( encoding );
+	_encoding = encoding;
 	tree_t::node_t root = _domTree.create_new_root( HNode( this ) );
 	(**root)._text = name_;
 	return;

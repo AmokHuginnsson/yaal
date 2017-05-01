@@ -293,11 +293,6 @@ public:
 	bool operator > ( HString const& ) const;
 	bool operator < ( HString const& ) const;
 	char set_at( int long position, char character );
-	/*! \brief Get access to raw character data stored in this string.
-	 *
-	 * \return pointer to raw character data stored in this string.
-	 */
-	char const* c_str( void ) const;
 	/*! \brief Get access to first character in the string.
 	 *
 	 * String must be non-empty.

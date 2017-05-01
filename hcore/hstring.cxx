@@ -64,7 +64,6 @@ enum {
 char* strrnpbrk( char const*, char const*, int long );
 int long strrnspn( char const*, char const*, int long );
 int long kmpsearch( char const*, int long, char const*, int long );
-int long kmpcasesearch( char const*, int long, char const*, int long );
 
 }
 
@@ -264,7 +263,7 @@ HString::HString( HConstIterator first_, HConstIterator last_ )
 	M_PROLOG
 	int long newSize( last_ - first_ );
 	reserve( newSize );
-	::std::strncpy( MEM, first_._owner->c_str() + first_._index, static_cast<size_t>( newSize ) );
+	::std::strncpy( MEM, EXT_MEM( (*first_._owner) ) + first_._index, static_cast<size_t>( newSize ) );
 	MEM[ newSize ] = 0;
 	SET_SIZE( newSize );
 	return;
@@ -617,10 +616,6 @@ bool operator <= ( char const* left_, HString const& right_ ) {
 	M_EPILOG
 }
 
-char const* HString::c_str( void ) const {
-	return ( MEM );
-}
-
 char HString::front( void ) const {
 	if ( GET_SIZE == 0 ) {
 		M_THROW( _errMsgHString_[string_helper::INDEX_OOB], 0 );
@@ -770,9 +765,9 @@ HString& HString::assign( const_iterator first_, const_iterator last_ ) {
 	if ( last_ < first_ ) {
 		M_THROW( _errMsgHString_[ string_helper::BAD_LENGTH ], last_ - first_ );
 	}
-	int long newSize( static_cast<int long>( ::strnlen( first_._owner->c_str() + first_._index, static_cast<size_t>( last_ - first_ ) ) ) );
+	int long newSize( static_cast<int long>( ::strnlen( EXT_MEM( (*first_._owner) ) + first_._index, static_cast<size_t>( last_ - first_ ) ) ) );
 	reserve( newSize );
-	::memcpy( MEM, first_._owner->c_str() + first_._index, static_cast<size_t>( newSize ) );
+	::memcpy( MEM, EXT_MEM( (*first_._owner) ) + first_._index, static_cast<size_t>( newSize ) );
 	MEM[ newSize ] = 0;
 	SET_SIZE( newSize );
 	return ( *this );
@@ -843,7 +838,7 @@ int long HString::find_one_of( HString const& set_, int long after_ ) const {
 	if ( after_ >= GET_SIZE ) {
 		return ( npos );
 	}
-	char const* str( ::std::strpbrk( MEM + after_, set_.c_str() ) );
+	char const* str( ::std::strpbrk( MEM + after_, EXT_MEM( set_ ) ) );
 	if ( ! str ) {
 		return ( npos );
 	}
@@ -862,7 +857,7 @@ int long HString::reverse_find_one_of( HString const& set_, int long before_ ) c
 	if ( before_ >= GET_SIZE ) {
 		return ( npos );
 	}
-	char* str( string_helper::strrnpbrk( MEM, set_.c_str(), GET_SIZE - before_ ) );
+	char* str( string_helper::strrnpbrk( MEM, EXT_MEM( set_ ), GET_SIZE - before_ ) );
 	if ( ! str ) {
 		return ( npos );
 	}
@@ -878,7 +873,7 @@ int long HString::find_last_one_of( HString const& set_, int long before_ ) cons
 	if ( ( before_ < 0 ) || set_.is_empty() ) {
 		return ( npos );
 	}
-	char* str( string_helper::strrnpbrk( MEM, set_.c_str(), before_ + 1 ) );
+	char* str( string_helper::strrnpbrk( MEM, EXT_MEM( set_ ), before_ + 1 ) );
 	if ( ! str ) {
 		return ( npos );
 	}
@@ -897,7 +892,7 @@ int long HString::find_other_than( HString const& set_, int long after_ ) const 
 	if ( set_.is_empty() ) {
 		return ( after_ );
 	}
-	int long index = static_cast<int long>( ::std::strspn( MEM + after_, set_.c_str() ) );
+	int long index = static_cast<int long>( ::std::strspn( MEM + after_, EXT_MEM( set_ ) ) );
 	if ( ( index + after_ ) >= GET_SIZE ) {
 		return ( npos );
 	}
@@ -916,7 +911,7 @@ int long HString::reverse_find_other_than( HString const& set_, int long before_
 	if ( set_.is_empty() ) {
 		return ( before_ );
 	}
-	int long index( string_helper::strrnspn( MEM, set_.c_str(), GET_SIZE - before_ ) );
+	int long index( string_helper::strrnspn( MEM, EXT_MEM( set_ ), GET_SIZE - before_ ) );
 	if ( index >= ( GET_SIZE - before_ ) ) {
 		return ( npos );
 	}
@@ -935,7 +930,7 @@ int long HString::find_last_other_than( HString const& set_, int long before_ ) 
 	if ( set_.is_empty() ) {
 		return ( before_ );
 	}
-	int long index( string_helper::strrnspn( MEM, set_.c_str(), before_ + 1 ) );
+	int long index( string_helper::strrnspn( MEM, EXT_MEM( set_ ), before_ + 1 ) );
 	if ( index > before_ ) {
 		return ( npos );
 	}
@@ -1447,7 +1442,7 @@ HString& HString::append( char const* buf_, int long len_ ) {
 
 HString& HString::append( const_iterator first_, const_iterator last_ ) {
 	M_PROLOG
-	return ( append( first_._owner->c_str() + first_._index, static_cast<int long>( last_ - first_ ) ) );
+	return ( append( EXT_MEM( (*first_._owner) ) + first_._index, static_cast<int long>( last_ - first_ ) ) );
 	M_EPILOG
 }
 
@@ -2338,26 +2333,26 @@ int long kmpsearch( char const* str, int long lenstr, char const* pat, int long 
 	return ( start );
 }
 
-#if ! defined( HAVE_STRCASESTR ) || ( HAVE_STRCASESTR == 0 )
+}
 
-int long kmpcasesearch( char const* str, int long lenstr, char const* pat, int long lenpat ) {
-	HChunk KMPnext( chunk_size<int>( lenpat + 1 ) );
+int long icasesearch( HString const& haystack_, HString const& needle_ ) {
+	HChunk KMPnext( chunk_size<int>( needle_.get_length() + 1 ) );
 	int* next( KMPnext.get<int>() );
 	int b( next[ 0 ] = -1 );
-	for ( int i = 1; i <= lenpat; ++ i ) {
-		while ( ( b > -1 ) && ( tolower( pat[ b ] ) != tolower( pat[ i - 1 ] ) ) ) {
+	for ( int long i( 1 ), needleLen( needle_.get_length() ); i <= needleLen; ++ i ) {
+		while ( ( b > -1 ) && ( tolower( needle_[ b ] ) != tolower( needle_[ i - 1 ] ) ) ) {
 			b = next[ b ];
 		}
 		++ b;
-		next[ i ] = ( tolower( pat[ i ] ) == tolower( pat[ b ] ) ) ? next[ b ] : b;
+		next[ i ] = ( tolower( needle_[ i ] ) == tolower( needle_[ b ] ) ) ? next[ b ] : b;
 	}
-	int start( -1 );
+	int long start( -1 );
 	b = 0;
-	for ( int i = 0; i < lenstr; ++ i ) {
-		while ( ( b > -1 ) && ( tolower( pat[ b ] ) != tolower( str[ i ] ) ) ) {
+	for ( int long i( 0 ), haystackLen( haystack_.get_length() ); i < haystackLen; ++ i ) {
+		while ( ( b > -1 ) && ( tolower( needle_[ b ] ) != tolower( haystack_[i] ) ) ) {
 			b = next[ b ];
 		}
-		if ( ++ b < lenpat ) {
+		if ( ++ b < needle_.get_length() ) {
 			continue;
 		}
 		start = i - b + 1;
@@ -2366,17 +2361,13 @@ int long kmpcasesearch( char const* str, int long lenstr, char const* pat, int l
 	return ( start );
 }
 
-#endif /* #if ! defined( HAVE_STRCASESTR ) || ( HAVE_STRCASESTR == 0 ) */
-
-}
-
-int long icasesearch( HString const& haystack_, HString const& needle_ ) {
-	char const* p(::strcasestr( haystack_.c_str(), needle_.c_str() ) );
-	return ( p != nullptr ? p - haystack_.c_str() : HString::npos );
-}
-
-int stricasecmp( HString const& left, HString const& right ) {
-	return ( ::strcasecmp( left.c_str(), right.c_str() ) );
+int stricasecmp( HString const& left_, HString const& right_ ) {
+	int long len( min( left_.get_length(), right_.get_length() ) );
+	int diff( 0 );
+	for ( int long i( 0 ); ( diff == 0 ) && ( i < len ); ++ i ) {
+		diff = tolower( left_[i] ) - tolower( right_[i] );
+	}
+	return ( diff );
 }
 
 }

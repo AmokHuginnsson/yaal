@@ -33,6 +33,7 @@ Copyright:
 
 #include "hcore/hstring.hxx"
 #include "hcore/hexception.hxx"
+#include "hcore/hchunk.hxx"
 
 namespace yaal {
 
@@ -46,7 +47,7 @@ private:
 	yaal::hcore::HString _nameFrom;
 	yaal::hcore::HString _nameTo;
 	descriptor_t _descriptor;
-	yaal::hcore::HString _cache;
+	yaal::hcore::HChunk _cache;
 public:
 	HCharacterEncodingConverter( yaal::hcore::HString const&, yaal::hcore::HString const& );
 	HCharacterEncodingConverter( HCharacterEncodingConverter const& );
@@ -58,9 +59,7 @@ public:
 	void reset( void );
 	HString const& name_from( void ) const;
 	HString const& name_to( void ) const;
-	HString const& convert( HString const& );
-	HString const& convert( char const*, int long );
-	HString const& convert( char const* );
+	void convert( char const*, int long, yaal::hcore::HChunk& );
 private:
 	void init( void );
 };

@@ -91,11 +91,8 @@ public:
 		static M_YAAL_TOOLS_PUBLIC_API generator_t const STRIP_ENTITIES;
 	};
 private:
-	struct OConvert;
 	typedef void* xml_node_ptr_t;
-	typedef enum { TO_EXTERNAL, TO_INTERNAL } way_t;
 	typedef yaal::hcore::HResource<HXmlData> xml_low_t;
-	mutable yaal::hcore::HPointer<OConvert> _convert;
 	yaal::hcore::HString _varTmpBuffer;
 	yaal::hcore::HString _encoding;
 	yaal::hcore::HString _streamId;
@@ -143,7 +140,7 @@ private:
 	void generate_intermediate_form( generator_t ) const;
 	void parse( xml_node_ptr_t, tree_t::node_t, parser_t );
 	void dump_node( void*, HConstNodeProxy const& ) const;
-	yaal::hcore::HString const& convert( yaal::hcore::HString const&, way_t, bool = false ) const;
+	yaal::hcore::HString const& convert( char const*, bool = false ) const;
 	int get_node_set_by_path( yaal::hcore::HString const& );
 	const_xml_element_t get_element_by_id( const_xml_element_t const&, yaal::hcore::HString const& ) const;
 	void parse_dtd( void* );
