@@ -41,7 +41,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "memory.hxx"
 #include "hlog.hxx"
 #include "hstring.hxx"
-#include "utf8.hxx"
+#include "unicode.hxx"
 #include "htokenizer.hxx"
 #include "hprogramoptionshandler.hxx"
 #include "hsingleton.hxx"
@@ -115,8 +115,8 @@ void set_env( HString const& name_, HString const& value_, bool overwrite_ ) {
 
 void unset_env( HString const& name_ ) {
 	M_PROLOG
-	HUTF8String utf8( name_ );
-	M_ENSURE( ::unsetenv( utf8.x_str() ) == 0 );
+	HUTF8String unicode( name_ );
+	M_ENSURE( ::unsetenv( unicode.x_str() ) == 0 );
 	return;
 	M_EPILOG
 }
@@ -156,7 +156,7 @@ int copy_digits( HString const& str_, char* buf_, int size_ ) {
 	}
 	for (
 		int i( 0 ), LIMIT( min( size_ - 1, static_cast<int>( end - it ) ) );
-		( i < LIMIT ) && ( static_cast<u32_t>( *it ) < utf8::MAX_1_BYTE_CODE_POINT );
+		( i < LIMIT ) && ( static_cast<u32_t>( *it ) < unicode::MAX_1_BYTE_CODE_POINT );
 		++ i, ++ it, ++ buf_
 	) { /* *TODO* *FIXME* Remove static_cast after UCS in HString is implemented. */
 		*buf_ = static_cast<char>( *it );
@@ -274,8 +274,8 @@ void ensure_limit( int resource_, char const* message_, bool autoSanity_ ) {
 		} else {
 			HString message( message_ );
 			message.append( " - bailing out" );
-			HUTF8String utf8( message );
-			::perror( utf8.x_str() );
+			HUTF8String unicode( message );
+			::perror( unicode.x_str() );
 			::exit( 1 );
 		}
 	}

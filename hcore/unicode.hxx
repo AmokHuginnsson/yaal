@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-  utf8.hxx - this file is integral part of `yaal' project.
+  unicode.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -36,7 +36,7 @@ Copyright:
 
 namespace yaal {
 
-namespace utf8 {
+namespace unicode {
 
 static u8_t const ENC_1_BYTES_MARK_MASK(  meta::obinary<010000000>::value );
 
@@ -64,13 +64,13 @@ static u32_t const MAX_4_BYTE_CODE_POINT( 0x10ffff );
 inline int count_characters( char const* str_, int size_ ) {
 	int cc( 0 );
 	for ( char const* end( str_ + size_ ); str_ < end; ++ cc ) {
-		if ( ! ( *str_ & utf8::ENC_1_BYTES_MARK_MASK ) ) {
+		if ( ! ( *str_ & unicode::ENC_1_BYTES_MARK_MASK ) ) {
 			++ str_;
-		} else if ( ( *str_ & utf8::ENC_2_BYTES_MARK_MASK ) == utf8::ENC_2_BYTES_MARK_VALUE ) {
+		} else if ( ( *str_ & unicode::ENC_2_BYTES_MARK_MASK ) == unicode::ENC_2_BYTES_MARK_VALUE ) {
 			str_ += 2;
-		} else if ( ( *str_ & utf8::ENC_3_BYTES_MARK_MASK ) == utf8::ENC_3_BYTES_MARK_VALUE ) {
+		} else if ( ( *str_ & unicode::ENC_3_BYTES_MARK_MASK ) == unicode::ENC_3_BYTES_MARK_VALUE ) {
 			str_ += 3;
-		} else if ( ( *str_ & utf8::ENC_4_BYTES_MARK_MASK ) == utf8::ENC_4_BYTES_MARK_VALUE ) {
+		} else if ( ( *str_ & unicode::ENC_4_BYTES_MARK_MASK ) == unicode::ENC_4_BYTES_MARK_VALUE ) {
 			str_ += 4;
 		} else {
 			M_ASSERT( !"Invalid UTF-8 head sequence."[0] );
@@ -80,6 +80,20 @@ inline int count_characters( char const* str_, int size_ ) {
 }
 
 inline int rank( u32_t value_ ) {
+	int r( 0 );
+	if ( value_ <= MAX_1_BYTE_CODE_POINT ) {
+		r = 1;
+	} else if ( value_ <= MAX_2_BYTE_CODE_POINT ) {
+		r = 2;
+	} else if ( value_ <= MAX_4_BYTE_CODE_POINT ) {
+		r = 4;
+	} else {
+		throw yaal::hcore::HOutOfRangeException( yaal::hcore::to_string( "Unicode code point is out of range: " ).append( value_ ) );
+	}
+	return ( r );
+}
+
+inline int utf8_length( u32_t value_ ) {
 	int r( 0 );
 	if ( value_ <= MAX_1_BYTE_CODE_POINT ) {
 		r = 1;

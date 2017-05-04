@@ -41,7 +41,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hchunk.hxx"
 #include "hcore.hxx"
 #include "safe_int.hxx"
-#include "utf8.hxx"
+#include "unicode.hxx"
 
 namespace yaal {
 
@@ -1721,7 +1721,7 @@ void HUTF8String::assign( HString::const_iterator it_, HString::const_iterator e
 	u32_t maxCodePoint( 0 );
 	int byteCount( 0 );
 	for ( HString::const_iterator it( it_ ); it != end_; ++ it ) {
-		byteCount += utf8::rank( static_cast<u8_t>( *it ) ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
+		byteCount += unicode::utf8_length( static_cast<u8_t>( *it ) ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
 		maxCodePoint = max( static_cast<u32_t>( static_cast<u8_t>( *it ) ), maxCodePoint ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
 	}
 	if ( byteCount > 0 ) {
@@ -1733,7 +1733,7 @@ void HUTF8String::assign( HString::const_iterator it_, HString::const_iterator e
 	}
 	if ( _ptr ) {
 		_meta->_used = byteCount;
-		_meta->_rank = static_cast<i8_t>( utf8::rank( maxCodePoint ) );
+		_meta->_rank = static_cast<i8_t>( unicode::rank( maxCodePoint ) );
 	}
 	_characterCount = static_cast<int>( end_ - it_ );
 	_offset = 0;
@@ -1940,10 +1940,10 @@ HUTF8String::HIterator& HUTF8String::HIterator::operator ++ ( void ) {
 	M_ASSERT( _ptr );
 	char const* p( _ptr + sizeof ( HUTF8String::OBufferMeta ) + _byteIndex );
 	int inc( 1 );
-	if ( ! ( *p & utf8::ENC_1_BYTES_MARK_MASK ) ) {
-	} else if ( ( *p & utf8::ENC_2_BYTES_MARK_MASK ) == utf8::ENC_2_BYTES_MARK_VALUE ) {
+	if ( ! ( *p & unicode::ENC_1_BYTES_MARK_MASK ) ) {
+	} else if ( ( *p & unicode::ENC_2_BYTES_MARK_MASK ) == unicode::ENC_2_BYTES_MARK_VALUE ) {
 		inc = 2;
-	} else if ( ( *p & utf8::ENC_3_BYTES_MARK_MASK ) == utf8::ENC_3_BYTES_MARK_VALUE ) {
+	} else if ( ( *p & unicode::ENC_3_BYTES_MARK_MASK ) == unicode::ENC_3_BYTES_MARK_VALUE ) {
 		inc = 3;
 	} else {
 		inc = 4;
@@ -1957,7 +1957,7 @@ HUTF8String::HIterator& HUTF8String::HIterator::operator -- ( void ) {
 	M_ASSERT( _ptr );
 	-- _byteIndex;
 	char const* p( _ptr + sizeof ( HUTF8String::OBufferMeta ) + _byteIndex );
-	while ( ( *p & utf8::TAIL_BYTES_MARK_MASK ) == utf8::TAIL_BYTES_MARK_VALUE ) {
+	while ( ( *p & unicode::TAIL_BYTES_MARK_MASK ) == unicode::TAIL_BYTES_MARK_VALUE ) {
 		-- _byteIndex;
 		-- p;
 	}

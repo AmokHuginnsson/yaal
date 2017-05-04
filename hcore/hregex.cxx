@@ -37,7 +37,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hregex.hxx"
 #include "harray.hxx"
 #include "hchunk.hxx"
-#include "utf8.hxx"
+#include "unicode.hxx"
 
 namespace yaal {
 
@@ -253,8 +253,8 @@ HUTF8String HRegex::matches_impl( HUTF8String const& str_, int& start_, int& mat
 		match, 3
 	);
 	if ( ( _lastError >= 0 ) && ( match[0] >= 0 ) ) {
-		start_ = utf8::count_characters( str, match[0] );
-		matchLength_ = utf8::count_characters( str + match[0], static_cast<int>( match[1] - match[0] ) );
+		start_ = unicode::count_characters( str, match[0] );
+		matchLength_ = unicode::count_characters( str + match[0], static_cast<int>( match[1] - match[0] ) );
 	}
 	return ( start_ != NO_MATCH ? str_.substr( start_ + matchLength_ ) : HUTF8String() );
 	M_EPILOG
@@ -288,8 +288,8 @@ HRegex::groups_t HRegex::groups_impl( HUTF8String const& string_, match_t match_
 			g.reserve( groupCount );
 			for ( int i( 0 ); i < groupCount; ++ i ) {
 				g.emplace_back(
-					utf8::count_characters( str, matchesBuffer[i * 2] ),
-					utf8::count_characters( str + matchesBuffer[i * 2], static_cast<int>( matchesBuffer[i * 2 + 1] - matchesBuffer[i * 2] ) )
+					unicode::count_characters( str, matchesBuffer[i * 2] ),
+					unicode::count_characters( str + matchesBuffer[i * 2], static_cast<int>( matchesBuffer[i * 2 + 1] - matchesBuffer[i * 2] ) )
 				);
 			}
 		}
