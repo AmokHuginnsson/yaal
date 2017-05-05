@@ -67,6 +67,202 @@ int long kmpsearch( char const*, int long, char const*, int long );
 
 }
 
+namespace {
+
+template<typename iterator_t, typename U>
+inline void copy_n_cast( iterator_t src_, int long size_, U* dst_ ) {
+	for ( int long i( 0 ); i < size_; ++ i, ++ src_, ++ dst_ ) {
+		*dst_ = static_cast<U>( *src_ );
+	}
+	return;
+}
+
+template<typename iterator_t, typename U>
+inline void copy_n_cast_backward( iterator_t src_, int long size_, U* dst_ ) {
+	src_ += ( size_ - 1 );
+	dst_ += ( size_ - 1 );
+	for ( int long i( 0 ); i < size_; ++ i, -- src_, -- dst_ ) {
+		*dst_ = static_cast<U>( *src_ );
+	}
+	return;
+}
+
+namespace adaptive {
+
+inline void fill( void* mem_, int rank_, int long offset_, int long size_, u32_t codePoint_ ) {
+	if ( rank_ == 1 ) {
+		::memset( static_cast<char*>( mem_ ) + offset_, static_cast<int>( codePoint_ ), static_cast<size_t>( size_ ) );
+	} else if ( rank_ == 2 ) {
+		yaal::fill_n( static_cast<yaal::u16_t*>( mem_ ) + offset_, size_, static_cast<u16_t>( codePoint_ ) );
+	} else {
+		yaal::fill_n( static_cast<yaal::u32_t*>( mem_ ) + offset_, size_, codePoint_ );
+	}
+	return;
+}
+
+inline void copy( void* dest_, int destRank_, int long destOffset_, void const* src_, int srcRank_, int long srcOffset_, int long size_ ) {
+	if ( destRank_ == srcRank_ ) {
+		::memcpy( static_cast<char*>( dest_ ) + destOffset_ * destRank_, static_cast<char const*>( src_ ) + srcOffset_ * srcRank_ /* == destRank_ */, static_cast<size_t>( size_ * destRank_ ) );
+	} else {
+		switch ( destRank_ * 4 + srcRank_ ) {
+			case ( 4 * 2 + 1 ): /* UCS-1 to UCS-2 */ {
+				yaal::copy_n( static_cast<yaal::u8_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u16_t*>( dest_ ) + destOffset_ );
+			} break;
+			case ( 4 * 4 + 1 ): /* UCS-1 to UCS-4 */ {
+				yaal::copy_n( static_cast<yaal::u8_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u32_t*>( dest_ ) + destOffset_ );
+			} break;
+			case ( 4 * 4 + 2 ): /* UCS-2 to UCS-4 */ {
+				yaal::copy_n( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u32_t*>( dest_ ) + destOffset_ );
+			} break;
+			case ( 4 * 1 + 2 ): /* UCS-2 to UCS-1 */ {
+				copy_n_cast( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
+			} break;
+			case ( 4 * 1 + 4 ): /* UCS-4 to UCS-1 */ {
+				copy_n_cast( static_cast<yaal::u32_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
+			} break;
+			case ( 4 * 2 + 4 ): /* UCS-4 to UCS-2 */ {
+				copy_n_cast( static_cast<yaal::u32_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u16_t*>( dest_ ) + destOffset_ );
+			} break;
+		}
+	}
+	return;
+}
+
+inline void copy_backward( void* dest_, int destRank_, int long destOffset_, void const* src_, int srcRank_, int long srcOffset_, int long size_ ) {
+	if ( destRank_ == srcRank_ ) {
+		::memcpy( static_cast<char*>( dest_ ) + destOffset_ * destRank_, static_cast<char const*>( src_ ) + srcOffset_ * srcRank_ /* == destRank_ */, static_cast<size_t>( size_ * destRank_ ) );
+	} else {
+		switch ( destRank_ * 4 + srcRank_ ) {
+			case ( 4 * 2 + 1 ): /* UCS-1 to UCS-2 */ {
+				copy_n_cast_backward( static_cast<yaal::u8_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u16_t*>( dest_ ) + destOffset_ );
+			} break;
+			case ( 4 * 4 + 1 ): /* UCS-1 to UCS-4 */ {
+				copy_n_cast_backward( static_cast<yaal::u8_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u32_t*>( dest_ ) + destOffset_ );
+			} break;
+			case ( 4 * 4 + 2 ): /* UCS-2 to UCS-4 */ {
+				copy_n_cast_backward( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u32_t*>( dest_ ) + destOffset_ );
+			} break;
+			case ( 4 * 1 + 2 ): /* UCS-2 to UCS-1 */ {
+				copy_n_cast_backward( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
+			} break;
+			case ( 4 * 1 + 4 ): /* UCS-4 to UCS-1 */ {
+				copy_n_cast_backward( static_cast<yaal::u32_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
+			} break;
+			case ( 4 * 2 + 4 ): /* UCS-4 to UCS-2 */ {
+				copy_n_cast_backward( static_cast<yaal::u32_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u16_t*>( dest_ ) + destOffset_ );
+			} break;
+		}
+	}
+	return;
+}
+
+}
+
+namespace utf8 {
+
+struct OUTF8StringStats {
+	int long _characterCount;
+	int long _byteCount;
+	int _rank;
+};
+
+OUTF8StringStats get_string_stats( char const* str_, int long size_ ) {
+	OUTF8StringStats s{ 0, 0, 0 };
+	int byteCount( 0 );
+	int characterCount( 0 );
+	int charBytesLeft( 0 );
+	int rank( 1 );
+	char const* p( str_ );
+	while( *p && ( byteCount < size_ ) ) {
+		if ( charBytesLeft == 0 ) {
+			if ( ! ( *p & unicode::ENC_1_BYTES_MARK_MASK ) ) {
+				++ characterCount;
+			} else if ( ( *p & unicode::ENC_2_BYTES_MARK_MASK ) == unicode::ENC_2_BYTES_MARK_VALUE ) {
+				charBytesLeft = 1;
+				rank = max( rank, 2 );
+			} else if ( ( *p & unicode::ENC_3_BYTES_MARK_MASK ) == unicode::ENC_3_BYTES_MARK_VALUE ) {
+				charBytesLeft = 2;
+				rank = max( rank, 4 ); /* not a bug, 3 byte UTF-8 sequence has a rank == 4 */
+			} else if ( ( *p & unicode::ENC_4_BYTES_MARK_MASK ) == unicode::ENC_4_BYTES_MARK_VALUE ) {
+				charBytesLeft = 3;
+				rank = max( rank, 4 );
+			} else {
+				throw HUTF8StringException( "Invalid UTF-8 head sequence at: "_ys.append( byteCount ) );
+			}
+		} else {
+			if ( ( *p & unicode::TAIL_BYTES_MARK_MASK ) == unicode::TAIL_BYTES_MARK_VALUE ) {
+				-- charBytesLeft;
+				if ( ! charBytesLeft ) {
+					++ characterCount;
+				}
+			} else {
+				throw HUTF8StringException( "Invalid UTF-8 tail sequence at: "_ys.append( byteCount ) );
+			}
+		}
+		++ p;
+		++ byteCount;
+	}
+	if ( charBytesLeft > 0 ) {
+		throw HUTF8StringException( "Truncated UTF-8 tail sequence at: "_ys.append( byteCount ) );
+	}
+	s._byteCount = byteCount;
+	s._characterCount = characterCount;
+	s._rank = rank;
+	return ( s );
+}
+
+void encode( u32_t codePoint_, char*& dest_ ) {
+	int r( unicode::utf8_length( codePoint_ ) );
+	dest_ += r;
+	char* p( dest_ - 1 );
+	u8_t head[] = { 0, 0, unicode::ENC_2_BYTES_MARK_VALUE, unicode::ENC_3_BYTES_MARK_VALUE, unicode::ENC_4_BYTES_MARK_VALUE };
+	switch( r ) {
+		case ( 4 ): { *p = static_cast<char>( unicode::TAIL_BYTES_MARK_VALUE | ( unicode::TAIL_BYTES_VALUE_MASK & codePoint_ ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
+		case ( 3 ): { *p = static_cast<char>( unicode::TAIL_BYTES_MARK_VALUE | ( unicode::TAIL_BYTES_VALUE_MASK & codePoint_ ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
+		case ( 2 ): { *p = static_cast<char>( unicode::TAIL_BYTES_MARK_VALUE | ( unicode::TAIL_BYTES_VALUE_MASK & codePoint_ ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
+		case ( 1 ): { *p = static_cast<char>( head[r] | codePoint_ ); } /* no break - fall through */
+	}
+}
+
+u32_t decode_forward( char const* ptr_ ) {
+	u32_t character( static_cast<u8_t>( *ptr_ ) );
+	if ( ! ( *ptr_ & unicode::ENC_1_BYTES_MARK_MASK ) ) {
+	} else if ( ( *ptr_ & unicode::ENC_2_BYTES_MARK_MASK ) == unicode::ENC_2_BYTES_MARK_VALUE ) {
+		character &= unicode::ENC_2_BYTES_VALUE_MASK;
+		character <<= 6;
+		++ ptr_;
+		character |= ( static_cast<u8_t>( *ptr_ ) & unicode::TAIL_BYTES_VALUE_MASK );
+	} else if ( ( *ptr_ & unicode::ENC_3_BYTES_MARK_MASK ) == unicode::ENC_3_BYTES_MARK_VALUE ) {
+		character &= unicode::ENC_3_BYTES_VALUE_MASK;
+		for ( int i( 0 ); i < 2; ++ i ) {
+			character <<= 6;
+			++ ptr_;
+			character |= ( static_cast<u8_t>( *ptr_ ) & unicode::TAIL_BYTES_VALUE_MASK );
+		}
+	} else {
+		character &= unicode::ENC_4_BYTES_VALUE_MASK;
+		for ( int i( 0 ); i < 3; ++ i ) {
+			character <<= 6;
+			++ ptr_;
+			character |= ( static_cast<u8_t>( *ptr_ ) & unicode::TAIL_BYTES_VALUE_MASK );
+		}
+	}
+	++ ptr_;
+	return ( character );
+}
+
+template<typename T>
+void decode( T* dst_, char const* str_, int long size_ ) {
+	for ( int long i( 0 ); i < size_; ++ i, ++ dst_ ) {
+		*dst_ = static_cast<T>( decode_forward( str_ ) );
+	}
+	return;
+}
+
+}
+
+}
+
 bool HCharacterClass::has( u32_t char_ ) const {
 	return ( ( char_ < 256 ) && ( ::memchr( _data, static_cast<u8_t>( char_ ), static_cast<size_t>( _size ) ) != nullptr ) );
 }
@@ -1479,23 +1675,6 @@ void HString::HCharRef::swap( HCharRef& charRef_ ) {
 	M_EPILOG
 }
 
-namespace {
-
-void encode( u32_t codePoint_, char*& dest_ ) {
-	int r( utf8::rank( codePoint_ ) );
-	dest_ += r;
-	char* p( dest_ - 1 );
-	u8_t head[] = { 0, 0, utf8::ENC_2_BYTES_MARK_VALUE, utf8::ENC_3_BYTES_MARK_VALUE, utf8::ENC_4_BYTES_MARK_VALUE };
-	switch( r ) {
-		case ( 4 ): { *p = static_cast<char>( utf8::TAIL_BYTES_MARK_VALUE | ( utf8::TAIL_BYTES_VALUE_MASK & codePoint_ ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
-		case ( 3 ): { *p = static_cast<char>( utf8::TAIL_BYTES_MARK_VALUE | ( utf8::TAIL_BYTES_VALUE_MASK & codePoint_ ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
-		case ( 2 ): { *p = static_cast<char>( utf8::TAIL_BYTES_MARK_VALUE | ( utf8::TAIL_BYTES_VALUE_MASK & codePoint_ ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
-		case ( 1 ): { *p = static_cast<char>( head[r] | codePoint_ ); } /* no break - fall through */
-	}
-}
-
-}
-
 HUTF8String::HUTF8String( void )
 	: _characterCount( 0 )
 	, _offset( 0 )
@@ -1519,47 +1698,14 @@ HUTF8String::HUTF8String( HString::const_iterator it_, HString::const_iterator e
 HUTF8String::HUTF8String( char const* str_ )
 	: HUTF8String() {
 	M_PROLOG
-	int byteCount( 0 );
-	int characterCount( 0 );
-	char const* p( str_ );
-	int charBytesLeft( 0 );
-	int r( 1 );
-	while( p && *p ) {
-		if ( charBytesLeft == 0 ) {
-			if ( ! ( *p & utf8::ENC_1_BYTES_MARK_MASK ) ) {
-				++ characterCount;
-			} else if ( ( *p & utf8::ENC_2_BYTES_MARK_MASK ) == utf8::ENC_2_BYTES_MARK_VALUE ) {
-				charBytesLeft = 1;
-				r = max( r, 2 );
-			} else if ( ( *p & utf8::ENC_3_BYTES_MARK_MASK ) == utf8::ENC_3_BYTES_MARK_VALUE ) {
-				charBytesLeft = 2;
-				r = max( r, 3 );
-			} else if ( ( *p & utf8::ENC_4_BYTES_MARK_MASK ) == utf8::ENC_4_BYTES_MARK_VALUE ) {
-				charBytesLeft = 3;
-				r = max( r, 4 );
-			} else {
-				throw HUTF8StringException( "Invalid UTF-8 head sequence at: "_ys.append( byteCount ) );
-			}
-		} else {
-			if ( ( *p & utf8::TAIL_BYTES_MARK_MASK ) == utf8::TAIL_BYTES_MARK_VALUE ) {
-				-- charBytesLeft;
-				if ( ! charBytesLeft ) {
-					++ characterCount;
-				}
-			} else {
-				throw HUTF8StringException( "Invalid UTF-8 tail sequence at: "_ys.append( byteCount ) );
-			}
-		}
-		++ p;
-		++ byteCount;
-	}
-	if ( byteCount > 0 ) {
-		alloc( byteCount );
-		_meta->_used = byteCount;
-		_meta->_rank = static_cast<i8_t>( r );
-		_byteCount = byteCount;
-		_characterCount = characterCount;
-		::strncpy( _ptr + sizeof ( OBufferMeta ), str_, static_cast<size_t>( byteCount ) );
+	utf8::OUTF8StringStats s( utf8::get_string_stats( str_, static_cast<int long>( strlen( str_ ) ) ) );
+	if ( s._byteCount > 0 ) {
+		alloc( s._byteCount );
+		_meta->_used = s._byteCount;
+		_meta->_rank = static_cast<i8_t>( s._rank );
+		_byteCount = s._byteCount;
+		_characterCount = s._characterCount;
+		::strncpy( _ptr + sizeof ( OBufferMeta ), str_, static_cast<size_t>( s._byteCount ) );
 	}
 	return;
 	M_EPILOG
@@ -1993,30 +2139,8 @@ HUTF8String::HIterator& HUTF8String::HIterator::operator -= ( int long by_ ) {
 
 yaal::u32_t HUTF8String::HIterator::operator * ( void ) const {
 	M_ASSERT( _ptr );
-	char const* p( _ptr + sizeof ( HUTF8String::OBufferMeta ) + _byteIndex );
-	u32_t character( static_cast<u8_t>( *p ) );
-	if ( ! ( *p & utf8::ENC_1_BYTES_MARK_MASK ) ) {
-	} else if ( ( *p & utf8::ENC_2_BYTES_MARK_MASK ) == utf8::ENC_2_BYTES_MARK_VALUE ) {
-		character &= utf8::ENC_2_BYTES_VALUE_MASK;
-		character <<= 6;
-		++ p;
-		character |= ( static_cast<u8_t>( *p ) & utf8::TAIL_BYTES_VALUE_MASK );
-	} else if ( ( *p & utf8::ENC_3_BYTES_MARK_MASK ) == utf8::ENC_3_BYTES_MARK_VALUE ) {
-		character &= utf8::ENC_3_BYTES_VALUE_MASK;
-		for ( int i( 0 ); i < 2; ++ i ) {
-			character <<= 6;
-			++ p;
-			character |= ( static_cast<u8_t>( *p ) & utf8::TAIL_BYTES_VALUE_MASK );
-		}
-	} else {
-		character &= utf8::ENC_4_BYTES_VALUE_MASK;
-		for ( int i( 0 ); i < 3; ++ i ) {
-			character <<= 6;
-			++ p;
-			character |= ( static_cast<u8_t>( *p ) & utf8::TAIL_BYTES_VALUE_MASK );
-		}
-	}
-	return ( character );
+	char const* ptr( _ptr + sizeof ( HUTF8String::OBufferMeta ) + _byteIndex );
+	return ( decode_forward( ptr ) );
 }
 
 #undef SET_ALLOC_BYTES
