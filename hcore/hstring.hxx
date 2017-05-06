@@ -100,11 +100,30 @@ extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const* _characterClass_[];
 class HUTF8String;
 
 /*! \brief Implementation of high level string operations.
+ *
+ * HString uses adaptive UCS-n (n in {1, 2, 4}) representation,
+ * which means that single character can be represented by
+ * either 1, or 2 or 4 bytes.
+ *
+ * HString uses constant length character representation, which means
+ * that the `n` in UCS-n, or string `rank` is determined by the
+ * oldes code point (a character value) stored in given string.
+ *
+ * One of the consequences is that change of a single character
+ * value in given string may result in reallocation and up
+ * to 4 times more memory usage to hold the string.
+ *
+ * HString never exposes its internal data buffer.
+ * Consequently HString does not need to store "terminating NIL" byte.
  */
 class HString final {
 public:
 	static_assert( sizeof ( int long ) <= sizeof ( int_native_t ), "length type overflows native integer type" );
-	static int long const MAX_STRING_LENGTH = ( meta::max_signed<int long>::value / 2 ) - 1;
+	/*
+	 * Divide by for because max string rank is 4 and string of rank
+	 * 4 requires 4 bytes per character and MAX_STRING_LENGTH is expressed in number of characters.
+	 */
+	static int long const MAX_STRING_LENGTH = ( meta::max_signed<int long>::value / 4 ) - 1;
 	typedef HString this_type;
 	class HConstIterator;
 	class HIterator;
@@ -112,7 +131,7 @@ public:
 private:
 	static int const INPLACE_BUFFER_SIZE = sizeof ( char* ) + sizeof ( int_native_t ) + sizeof ( int_native_t );
 	static int const ALLOC_FLAG_INDEX = INPLACE_BUFFER_SIZE - 1;
-	static int const MAX_INPLACE_CAPACITY = INPLACE_BUFFER_SIZE - 2; /* -1 for terminating NIL, -1 for ALLOC_FLAG byte. */
+	static int const MAX_INPLACE_CAPACITY = INPLACE_BUFFER_SIZE - 1; /* -1 for ALLOC_FLAG byte. */
 	static_assert( sizeof ( int_native_t ) == sizeof ( char* ), "invalid native integer type definition" );
 	union {
 		int_native_t _len[ 3 ];
@@ -146,7 +165,7 @@ public:
 	 * \param size_ - capacity of newly constructed string.
 	 * \param fill_ - fill allocated space with given character.
 	 */
-	HString( int long size_, char fill_ );
+	HString( int long size_, yaal::u32_t fill_ );
 	/*! \brief Destroy string object and deallocate all resources.
 	 */
 	~HString( void );
@@ -155,10 +174,11 @@ public:
 	 * String capacity is always size of (2^n)-1 or MAX_INPLACE_CAPACITY.
 	 *
 	 * \param capacity - new string capacity.
+	 * \param rank - what is expected string rank, string rank is number of bytes required to represent single character.
 	 *
 	 * \post String capacity has value of smallest (2^n)-1 greater or equal to \e size.
 	 */
-	void reserve( int long capacity );
+	void reserve( int long capacity, int rank );
 	/*! \brief Materialize string.
 	 *
 	 * Used in copy-on-write implementation.
@@ -679,6 +699,7 @@ public:
 	 */
 	void pop_back( void );
 private:
+	void from_utf8( int long, char const*, int long );
 	void substr( HString&, int long, int long ) const;
 };
 

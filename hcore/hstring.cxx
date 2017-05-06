@@ -32,6 +32,8 @@ Copyright:
 #include <cstdio>
 #include <libintl.h>
 
+#include "config.hxx"
+
 #include "base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
@@ -306,15 +308,28 @@ HCharacterClass const _vowel_ = HCharacterClass( D_VOWEL, static_cast<int>( size
 
 HCharacterClass const* _characterClass_[] = { &_whiteSpace_, &_digit_, &_letter_, &_lowerCaseLetter_, &_upperCaseLetter_, &_word_, &_vowel_ };
 
-static int const ALLOC_BIT_MASK = 128;
+static int const ALLOC_BIT_MASK = meta::obinary<010000000>::value;
+static int const RANK_BIT_MASK =  meta::obinary<001100000>::value;
 #undef IS_INPLACE
 #define IS_INPLACE ( ! ( _mem[ ALLOC_FLAG_INDEX ] & ALLOC_BIT_MASK ) )
+#undef GET_RANK
+#define GET_RANK ( ( _mem[ ALLOC_FLAG_INDEX ] & RANK_BIT_MASK ) >> 5 )
 #undef EXT_IS_INPLACE
 #define EXT_IS_INPLACE( base ) ( ! ( base._mem[ ALLOC_FLAG_INDEX ] & ALLOC_BIT_MASK ) )
-#undef MEM
-#define MEM ( IS_INPLACE ? _mem : _ptr )
-#undef EXT_MEM
-#define EXT_MEM( base ) ( EXT_IS_INPLACE( base ) ? base._mem : base._ptr )
+#undef EXT_GET_RANK
+#define EXT_GET_RANK( base ) ( ( base._mem[ ALLOC_FLAG_INDEX ] & RANK_BIT_MASK ) >> 5 )
+#undef MEM_1
+#define MEM_1 ( IS_INPLACE ? _mem : _ptr )
+#undef EXT_MEM_1
+#define EXT_MEM_1( base ) ( EXT_IS_INPLACE( base ) ? base._mem : base._ptr )
+#undef MEM_2
+#define MEM_2 reinterpret_cast<yaal::u16_t*>( IS_INPLACE ? _mem : _ptr )
+#undef EXT_MEM_2
+#define EXT_MEM_2( base ) reinterpret_cast<yaal::u16_t*>( EXT_IS_INPLACE( base ) ? base._mem : base._ptr )
+#undef MEM_4
+#define MEM_4 reinterpret_cast<yaal::u32_t*>( IS_INPLACE ? _mem : _ptr )
+#undef EXT_MEM_4
+#define EXT_MEM_4( base ) reinterpret_cast<yaal::u32_t*>( EXT_IS_INPLACE( base ) ? base._mem : base._ptr )
 #undef GET_SIZE
 #define GET_SIZE ( IS_INPLACE ? _mem[ ALLOC_FLAG_INDEX ] : static_cast<int long>( _len[ 1 ] ) )
 #undef SET_SIZE
@@ -327,13 +342,22 @@ static int const ALLOC_BIT_MASK = 128;
 	do { \
 		( EXT_IS_INPLACE( base ) ? base._mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( size ) : base._len[ 1 ] = ( size ) ); \
 	} while ( 0 )
+
 #undef GET_ALLOC_BYTES
-#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY + 1 : _len[ 2 ] & static_cast<int long>( static_cast<int long unsigned>( -1 ) >> 1 ) )
 #undef SET_ALLOC_BYTES
-#define SET_ALLOC_BYTES( capacity ) \
+#if TARGET_CPU_BITS >= 64
+#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY + 1 : _len[ 2 ] & static_cast<int long>( static_cast<int long unsigned>( -1 ) >> 3 ) )
+#define SET_ALLOC_BYTES( capacity, rank ) \
 	do { \
-		_len[ 2 ] = ( capacity ); _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( _mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK ); \
+		_len[ 2 ] = ( capacity ); _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( _mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK | ( rank << 5 ) ); \
 	} while ( 0 )
+#else /* #if TARGET_CPU_BITS >= 64 */
+#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY + 1 : ( _len[ 2 ] & static_cast<int long>( static_cast<int long unsigned>( -1 ) >> 3 ) ) << 3 )
+#define SET_ALLOC_BYTES( capacity, rank ) \
+	do { \
+		_len[ 2 ] = ( capacity >> 3 ); _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( _mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK | ( rank << 5 ) ); \
+	} while ( 0 )
+#endif /* #else #if TARGET_CPU_BITS >= 64 */
 
 char const* _errMsgHString_[ 7 ] = {
 	_( "ok" ),
@@ -369,9 +393,10 @@ HString::HString( HString const& string_ )
 	: _len() {
 	M_PROLOG
 	if ( ! string_.is_empty() ) {
+		int rank( EXT_GET_RANK( string_ ) );
 		int long newSize( string_.get_length() );
-		reserve( newSize );
-		::std::strncpy( MEM, EXT_MEM( string_ ), static_cast<size_t>( newSize ) );
+		reserve( newSize, rank );
+		::std::memcpy( MEM_1, EXT_MEM_1( string_ ), static_cast<size_t>( newSize * rank ) );
 		SET_SIZE( newSize );
 	}
 	return;
@@ -384,41 +409,66 @@ HString::HString( HString&& string_ )
 	::memset( string_._mem, 0, INPLACE_BUFFER_SIZE );
 }
 
-HString::HString( int long preallocate_, char fill_ )
+HString::HString( int long preallocate_, u32_t fill_ )
 	: _len() {
 	M_PROLOG
-	reserve( preallocate_ );
-	::std::memset( MEM, fill_, static_cast<size_t>( preallocate_ ) );
+	int rank( unicode::rank( fill_ ) );
+	reserve( preallocate_, rank );
+	adaptive::fill( MEM_1, rank, 0, preallocate_, fill_ );
 	SET_SIZE( fill_ ? preallocate_ : 0 );
 	return;
 	M_EPILOG
 }
 
-void HString::reserve( int long preallocate_ ) {
+void HString::reserve( int long preallocate_, int rank_ ) {
 	M_PROLOG
+	M_ASSERT( ( rank_ >= 0 ) && ( rank_ <= 4 ) && ( rank_ != 3 ) );
 	if ( ( preallocate_ < 0 ) || ( preallocate_ > MAX_STRING_LENGTH ) ) {
 		M_THROW( _( "bad new buffer size requested" ), preallocate_ );
 	}
 	/* Increase requested buffer size to accommodate space terminating NIL. */
 	++ preallocate_;
 	int long oldAllocBytes( GET_ALLOC_BYTES );
-	if ( preallocate_ > oldAllocBytes ) {
+	int oldRank( GET_RANK );
+#if 0
+	int long reqAllocBytes( safe_int::mul( preallocate_, rank_ ) );
+#endif
+	int long reqAllocBytes( preallocate_* rank_ );
+	if ( reqAllocBytes > MAX_STRING_LENGTH ) {
+		M_THROW( _( "requested allocation size is too big" ), preallocate_ );
+	}
+	if ( reqAllocBytes > oldAllocBytes ) {
 		int long newAllocBytes = 1;
-		while ( newAllocBytes < preallocate_ ) {
+		while ( newAllocBytes < reqAllocBytes ) {
 			newAllocBytes <<= 1;
 		}
+#if TARGET_CPU_BITS < 64
+		/*
+		 * 7 because we drop 3 youngest bits in SET_ALLOC_BYTES.
+		 * We drop those bits to make room for `rank` bits
+		 * and `IN_PLACE` mark bit.
+		 */
+		M_ASSERT( ! ( newAllocBytes & 7 ) );
+#endif /* #if TARGET_CPU_BITS < 64 */
 		if ( ! IS_INPLACE ) {
 			_ptr = memory::realloc<char>( _ptr, newAllocBytes );
-			SET_ALLOC_BYTES( newAllocBytes );
+			SET_ALLOC_BYTES( newAllocBytes, rank_ );
 			::std::memset( _ptr + oldAllocBytes, 0, static_cast<size_t>( newAllocBytes - oldAllocBytes ) );
 		} else {
 			char* newMem( memory::calloc<char>( newAllocBytes ) );
 			int long origSize( GET_SIZE );
 			::std::strncpy( newMem, _mem, static_cast<size_t>( origSize ) );
 			_ptr = newMem;
-			SET_ALLOC_BYTES( newAllocBytes );
+			SET_ALLOC_BYTES( newAllocBytes, rank_ );
 			SET_SIZE( origSize );
 		}
+	} else {
+		SET_ALLOC_BYTES( oldAllocBytes, rank_ );
+	}
+	if ( rank_ > oldRank ) {
+		adaptive::copy_backward( MEM_1, rank_, 0, MEM_1, oldRank, 0, GET_SIZE );
+	} else if ( rank_ < oldRank ) {
+		adaptive::copy( MEM_1, rank_, 0, MEM_1, oldRank, 0, GET_SIZE );
 	}
 	return;
 	M_EPILOG
@@ -428,15 +478,42 @@ HString::HString( HUTF8String const& str_ )
 	: _len() {
 	M_PROLOG
 	int long newSize( str_.character_count() );
-	reserve( newSize );
-	int i( 0 );
-	for ( u32_t codePoint : str_ ) {
-		MEM[i] = static_cast<char>( codePoint );
-		++ i;
+	reserve( newSize, str_.rank() );
+	switch ( str_.rank() ) {
+		case ( 1 ): {
+			::memcpy( MEM_1, str_.raw(), static_cast<size_t>( newSize ) );
+		} break;
+		case ( 2 ): {
+			copy_n_cast( str_.begin(), newSize, MEM_2 );
+		} break;
+		case ( 4 ): {
+			yaal::copy_n( str_.begin(), newSize, MEM_4 );
+		} break;
 	}
-	M_ASSERT( i == newSize );
-	MEM[ newSize ] = 0;
 	SET_SIZE( newSize );
+	return;
+	M_EPILOG
+}
+
+void HString::from_utf8( int long offset_, const char* str_, int long size_ ) {
+	M_PROLOG
+	if ( size_ > 0 ) {
+		utf8::OUTF8StringStats s( utf8::get_string_stats( str_, size_ ) );
+		int rank( max( GET_RANK, s._rank ) );
+		reserve( offset_ + s._characterCount, rank );
+		switch ( rank ) {
+			case ( 1 ): {
+				utf8::decode( MEM_1 + offset_, str_, s._characterCount );
+			} break;
+			case ( 2 ): {
+				utf8::decode( MEM_2 + offset_, str_, s._characterCount );
+			} break;
+			case ( 4 ): {
+				utf8::decode( MEM_4 + offset_, str_, s._characterCount );
+			} break;
+		}
+		SET_SIZE( s._characterCount );
+	}
 	return;
 	M_EPILOG
 }
@@ -444,12 +521,8 @@ HString::HString( HUTF8String const& str_ )
 HString::HString( char const* str_ )
 	: _len() {
 	M_PROLOG
-	if ( str_ ) {
-		int long newSize( static_cast<int long>( ::std::strlen( str_ ) ) );
-		reserve( newSize );
-		::std::strncpy( MEM, str_, static_cast<size_t>( newSize ) );
-		SET_SIZE( newSize );
-	}
+	int long len( str_ ? static_cast<int long>( ::std::strlen( str_ ) ) : 0 );
+	from_utf8( 0, str_, len );
 	return;
 	M_EPILOG
 }
@@ -458,9 +531,9 @@ HString::HString( HConstIterator first_, HConstIterator last_ )
 	: _len() {
 	M_PROLOG
 	int long newSize( last_ - first_ );
-	reserve( newSize );
-	::std::strncpy( MEM, EXT_MEM( (*first_._owner) ) + first_._index, static_cast<size_t>( newSize ) );
-	MEM[ newSize ] = 0;
+	int rank( EXT_GET_RANK( (*first_._owner) ) );
+	reserve( newSize, rank );
+	adaptive::copy( MEM_1, rank, 0, EXT_MEM_1( (*first_._owner) ), rank, first_._index, newSize );
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG
@@ -469,13 +542,8 @@ HString::HString( HConstIterator first_, HConstIterator last_ )
 HString::HString( char const* array_, int long size_ )
 	: _len() {
 	M_PROLOG
-	if ( array_ ) {
-		int long newSize( static_cast<int long>( ::strnlen( array_, static_cast<size_t>( size_ ) ) ) );
-		reserve( newSize );
-		::std::strncpy( MEM, array_, static_cast<size_t>( newSize ) );
-		MEM[ newSize ] = 0;
-		SET_SIZE( newSize );
-	}
+	int long len( static_cast<int long>( ::strnlen( array_, static_cast<size_t>( size_ ) ) ) );
+	from_utf8( 0, array_, len );
 	return;
 	M_EPILOG
 }
@@ -508,8 +576,8 @@ HString::HString( int short shortInt_ )
 	: _len() {
 	M_PROLOG
 	int long newSize( ::snprintf( nullptr, 0, "%hd", shortInt_ ) );
-	reserve( newSize );
-	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%hd", shortInt_ ) == newSize );
+	reserve( newSize + 1, 1 );
+	M_ENSURE( ::snprintf( MEM_1, static_cast<size_t>( newSize + 1 ), "%hd", shortInt_ ) == newSize );
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG
@@ -519,8 +587,8 @@ HString::HString( int short unsigned unsignedShortInt_ )
 	: _len() {
 	M_PROLOG
 	int long newSize( ::snprintf( nullptr, 0, "%hu", unsignedShortInt_ ) );
-	reserve( newSize );
-	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%hu", unsignedShortInt_ ) == newSize );
+	reserve( newSize + 1, 1 );
+	M_ENSURE( ::snprintf( MEM_1, static_cast<size_t>( newSize + 1 ), "%hu", unsignedShortInt_ ) == newSize );
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG
@@ -530,8 +598,8 @@ HString::HString( int int_ )
 	: _len() {
 	M_PROLOG
 	int long newSize( ::snprintf( nullptr, 0, "%d", int_ ) );
-	reserve( newSize );
-	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%d", int_ ) == newSize );
+	reserve( newSize + 1, 1 );
+	M_ENSURE( ::snprintf( MEM_1, static_cast<size_t>( newSize + 1 ), "%d", int_ ) == newSize );
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG
@@ -541,8 +609,8 @@ HString::HString( int unsigned int_ )
 	: _len() {
 	M_PROLOG
 	int long newSize( ::snprintf( nullptr, 0, "%u", int_ ) );
-	reserve( newSize );
-	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%u", int_ ) == newSize );
+	reserve( newSize + 1, 1 );
+	M_ENSURE( ::snprintf( MEM_1, static_cast<size_t>( newSize + 1 ), "%u", int_ ) == newSize );
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG
@@ -552,8 +620,8 @@ HString::HString( int long long_ )
 	: _len() {
 	M_PROLOG
 	int long newSize( ::snprintf( nullptr, 0, "%ld", long_ ) );
-	reserve( newSize );
-	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%ld", long_ ) == newSize );
+	reserve( newSize + 1, 1 );
+	M_ENSURE( ::snprintf( MEM_1, static_cast<size_t>( newSize + 1 ), "%ld", long_ ) == newSize );
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG
@@ -563,8 +631,8 @@ HString::HString( int long unsigned long_ )
 	: _len() {
 	M_PROLOG
 	int long newSize( ::snprintf( nullptr, 0, "%lu", long_ ) );
-	reserve( newSize );
-	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%lu", long_ ) == newSize );
+	reserve( newSize + 1, 1 );
+	M_ENSURE( ::snprintf( MEM_1, static_cast<size_t>( newSize + 1 ), "%lu", long_ ) == newSize );
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG
@@ -574,8 +642,8 @@ HString::HString( int long long longLong_ )
 	: _len() {
 	M_PROLOG
 	int long newSize( ::snprintf( nullptr, 0, "%lld", longLong_ ) );
-	reserve( newSize );
-	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%lld", longLong_ ) == newSize );
+	reserve( newSize + 1, 1 );
+	M_ENSURE( ::snprintf( MEM_1, static_cast<size_t>( newSize + 1 ), "%lld", longLong_ ) == newSize );
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG
@@ -585,8 +653,8 @@ HString::HString( int long long unsigned longLong_ )
 	: _len() {
 	M_PROLOG
 	int long newSize( ::snprintf( nullptr, 0, "%llu", longLong_ ) );
-	reserve( newSize );
-	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%llu", longLong_ ) == newSize );
+	reserve( newSize + 1, 1 );
+	M_ENSURE( ::snprintf( MEM_1, static_cast<size_t>( newSize + 1 ), "%llu", longLong_ ) == newSize );
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG
@@ -596,8 +664,8 @@ HString::HString( double double_ )
 	: _len() {
 	M_PROLOG
 	int long newSize( ::snprintf( nullptr, 0, "%f", double_ ) );
-	reserve( newSize );
-	char* buf( MEM );
+	reserve( newSize + 1, 1 );
+	char* buf( MEM_1 );
 	M_ENSURE( ::snprintf( buf, static_cast<size_t>( newSize + 1 ), "%f", double_ ) == newSize );
 	if ( ( newSize >= 3 /* "0.0" */ ) && ( strchr( buf, '.' ) != nullptr ) ) {
 		while ( ( buf[newSize - 1] == '0' ) && ( buf[newSize - 2] != '.' ) ) {
@@ -614,8 +682,8 @@ HString::HString( double long double_ )
 	: _len() {
 	M_PROLOG
 	int long newSize( ::snprintf( nullptr, 0, "%.12Lf", double_ ) );
-	reserve( newSize );
-	char* buf( MEM );
+	reserve( newSize + 1, 1 );
+	char* buf( MEM_1 );
 	M_ENSURE( ::snprintf( buf, static_cast<size_t>( newSize + 1 ), "%.12Lf", double_ ) == newSize );
 	if ( ( newSize >= 3 /* "0.0" */ ) && ( strchr( buf, '.' ) != nullptr ) ) {
 		while ( ( buf[newSize - 1] == '0' ) && ( buf[newSize - 2] != '.' ) ) {
@@ -636,8 +704,8 @@ HString::HString( void const* ptrVoid_ )
 	 * Well, that sucks.
 	 */
 	int long newSize( ::snprintf( nullptr, 0, "0x%lx", reinterpret_cast<int long>( ptrVoid_ ) ) );
-	reserve( newSize );
-	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "0x%lx", reinterpret_cast<int long>( ptrVoid_ ) ) == newSize );
+	reserve( newSize + 1, 1 );
+	M_ENSURE( ::snprintf( MEM_1, static_cast<size_t>( newSize + 1 ), "0x%lx", reinterpret_cast<int long>( ptrVoid_ ) ) == newSize );
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG
@@ -657,13 +725,11 @@ HString& HString::operator = ( HString const& string_ ) {
 	M_PROLOG
 	if ( this != &string_ ) {
 		int long newSize( string_.get_length() );
-		if ( newSize >= GET_ALLOC_BYTES ) {
-			reserve( newSize );
+		int rank( EXT_GET_RANK( string_ ) );
+		if ( newSize > 0 ) {
+			reserve( newSize, rank );
+			::std::memcpy( MEM_1, EXT_MEM_1( string_ ), static_cast<size_t>( newSize * rank ) );
 		}
-		if ( newSize ) {
-			::std::strncpy( MEM, EXT_MEM( string_ ), static_cast<size_t>( newSize ) );
-		}
-		MEM[ newSize ] = 0;
 		SET_SIZE( newSize );
 	}
 	return ( *this );
