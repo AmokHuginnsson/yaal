@@ -682,7 +682,7 @@ int read_rc_line( HString& option_, HString& value_, HFile& file_,
 			int long endOfOption = index;
 			index = option_.find_other_than( _keyValueSep_, index );
 			if ( ( index > 0 ) && option_[ index ] ) {
-				if ( count( option_.begin() + endOfOption, option_.begin() + index, '=' ) > 1 ) {
+				if ( count( option_.begin() + endOfOption, option_.begin() + index, U'=' ) > 1 ) {
 					throw HProgramOptionsHandlerException( "Syntax error: redundant `=' sign.", line_ );
 				}
 				/* we have found a non-whitespace, so there certainly is a value */

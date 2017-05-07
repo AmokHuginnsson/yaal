@@ -106,7 +106,7 @@ protected:
 	virtual int long do_read_while( yaal::hcore::HString&, char const* ) override;
 	virtual int long do_read_while_n( yaal::hcore::HString&, int long, char const* ) override;
 	virtual int do_peek( void ) override;
-	virtual HStreamInterface& do_set_fill( int ) override;
+	virtual HStreamInterface& do_set_fill( code_point_t ) override;
 	virtual HStreamInterface& do_set_width( int ) override;
 	virtual HStreamInterface& do_set_precision( int ) override;
 	virtual HStreamInterface& do_set_base( BASES ) override;
@@ -116,7 +116,7 @@ protected:
 	virtual HStreamInterface& do_set_boolalpha( bool ) override;
 	virtual bool do_get_skipws( void ) const override;
 	virtual bool do_get_boolalpha( void ) const override;
-	virtual int do_get_fill( void ) const override;
+	virtual code_point_t do_get_fill( void ) const override;
 	virtual int do_get_width( void ) const override;
 	virtual int do_get_precision( void ) const override;
 	virtual BASES do_get_base( void ) const override;

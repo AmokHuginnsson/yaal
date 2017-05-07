@@ -30,6 +30,7 @@ Copyright:
 #define YAAL_HCORE_NUMBER_HXX_INCLUDED 1
 
 #include "hcore/pod.hxx"
+#include "hcore/hstring.hxx"
 
 namespace yaal {
 
@@ -42,7 +43,7 @@ int const HARDCODED_MINIMUM_PRECISION = 16;
 int const A_MINUS = 0;
 int const A_DOT = 1;
 int const A_ZERO = 2;
-extern char const VALID_CHARACTERS[];
+extern HString const VALID_CHARACTERS;
 extern i32_t const DECIMAL_SHIFT[];
 
 }

@@ -48,7 +48,7 @@ namespace hcore {
 
 namespace number {
 
-char const VALID_CHARACTERS[] = "-.0123456789";
+HString const VALID_CHARACTERS( "-.0123456789" );
 i32_t const DECIMAL_SHIFT[] = {
 	/* 0 */ 1l,
 	/* 1 */ 10l,

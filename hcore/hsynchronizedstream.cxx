@@ -361,7 +361,7 @@ int HSynchronizedStream::do_peek( void ) {
 	M_EPILOG
 }
 
-HStreamInterface& HSynchronizedStream::do_set_fill( int val_ ) {
+HStreamInterface& HSynchronizedStream::do_set_fill( code_point_t val_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	return ( HStreamInterface::do_set_fill( val_ ) );
@@ -431,7 +431,7 @@ bool HSynchronizedStream::do_get_boolalpha( void ) const {
 	M_EPILOG
 }
 
-int HSynchronizedStream::do_get_fill( void ) const {
+code_point_t HSynchronizedStream::do_get_fill( void ) const {
 	M_PROLOG
 	HLock l( _mutex );
 	return ( HStreamInterface::do_get_fill() );

@@ -79,7 +79,7 @@ inline int count_characters( char const* str_, int size_ ) {
 	return ( cc );
 }
 
-inline int rank( u32_t value_ ) {
+inline int rank( code_point_t value_ ) {
 	int r( 0 );
 	if ( value_ <= MAX_1_BYTE_CODE_POINT ) {
 		r = 1;
@@ -93,7 +93,7 @@ inline int rank( u32_t value_ ) {
 	return ( r );
 }
 
-inline int utf8_length( u32_t value_ ) {
+inline int utf8_length( code_point_t value_ ) {
 	int r( 0 );
 	if ( value_ <= MAX_1_BYTE_CODE_POINT ) {
 		r = 1;

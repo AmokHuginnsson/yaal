@@ -264,7 +264,7 @@ HRegex::groups_t HRegex::groups_impl( HUTF8String const& string_, match_t match_
 	M_PROLOG
 	groups_t g;
 	typedef yaal::hcore::HArray<int> matches_t;
-	int expectedGroupCount( static_cast<int>( count( _pattern.begin(), _pattern.end(), '(' ) + 1 ) );
+	int expectedGroupCount( static_cast<int>( count( _pattern.begin(), _pattern.end(), U'(' ) + 1 ) );
 	matches_t matchesBuffer( expectedGroupCount * 3, NO_MATCH );
 	char const* str( string_.x_str() );
 	_lastError = ::pcre_exec(

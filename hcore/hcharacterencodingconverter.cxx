@@ -34,6 +34,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hcharacterencodingconverter.hxx"
 #include "algorithm.hxx"
+#include "safe_int.hxx"
 
 namespace yaal {
 
@@ -90,9 +91,9 @@ void HCharacterEncodingConverter::init( void ) {
 	char from[CHARSET_NAME_SIZE];
 	char to[CHARSET_NAME_SIZE];
 	M_ENSURE( ( _nameFrom.get_length() < ( CHARSET_NAME_SIZE - 1 ) ) && ( _nameTo.get_length() < ( CHARSET_NAME_SIZE - 1 ) ) );
-	copy( _nameFrom.begin(), _nameFrom.end(), from );
+	transform( _nameFrom.begin(), _nameFrom.end(), from, static_cast<char(*)( yaal::u32_t )>( &safe_int::cast<char> ) );
 	from[ _nameFrom.get_length() ] = 0;
-	copy( _nameTo.begin(), _nameTo.end(), to );
+	transform( _nameTo.begin(), _nameTo.end(), to, static_cast<char(*)( yaal::u32_t )>( &safe_int::cast<char> ) );
 	to[ _nameTo.get_length() ] = 0;
 	_descriptor = reinterpret_cast<descriptor_t>( iconv_open( to, from ) );
 	M_ENSURE( _descriptor != INVALID, "iconv_open( "_ys.append( _nameTo ).append( ", " ).append( _nameFrom ).append( " )" ) );

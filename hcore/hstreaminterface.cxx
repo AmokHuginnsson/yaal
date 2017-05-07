@@ -175,16 +175,16 @@ void HStreamInterface::reformat( void ) {
 		if ( _width > len ) {
 			switch ( _adjust ) {
 				case ( ADJUST::LEFT ): {
-					_wordCache.insert( len, _width - len, static_cast<char>( _fill ) );
+					_wordCache.insert( len, _width - len, _fill );
 				} break;
 				case ( ADJUST::RIGHT ): {
-					_wordCache.insert( 0, _width - len, static_cast<char>( _fill ) );
+					_wordCache.insert( 0, _width - len, _fill );
 				} break;
 				case ( ADJUST::CENTER ): {
 					int pre( ( _width - len ) / 2 );
-					_wordCache.insert( 0, pre, static_cast<char>( _fill ) );
+					_wordCache.insert( 0, pre, _fill );
 					int post( ( _width - len ) - pre );
-					_wordCache.insert( pre + len, post, static_cast<char>( _fill ) );
+					_wordCache.insert( pre + len, post, _fill );
 					break;
 				}
 			}
@@ -404,9 +404,9 @@ HStreamInterface::HManipulator setprecision( int width_ ) {
 	M_EPILOG
 }
 
-HStreamInterface::HManipulator setfill( int fill_ ) {
+HStreamInterface::HManipulator setfill( code_point_t fill_ ) {
 	M_PROLOG
-	return ( HStreamInterface::HManipulator( fill_, &HStreamInterface::HManipulator::set_fill ) );
+	return ( HStreamInterface::HManipulator( static_cast<int>( fill_ ), &HStreamInterface::HManipulator::set_fill ) );
 	M_EPILOG
 }
 
@@ -869,7 +869,7 @@ void HStreamInterface::flush( void ) {
 	M_EPILOG
 }
 
-HStreamInterface& HStreamInterface::do_set_fill( int fill_ ) {
+HStreamInterface& HStreamInterface::do_set_fill( code_point_t fill_ ) {
 	M_PROLOG
 	_fill = fill_;
 	return ( *this );
@@ -933,7 +933,7 @@ bool HStreamInterface::do_get_boolalpha( void ) const {
 	return ( _boolAlpha );
 }
 
-int HStreamInterface::do_get_fill( void ) const {
+code_point_t HStreamInterface::do_get_fill( void ) const {
 	return ( _fill );
 }
 
@@ -970,7 +970,7 @@ void HStreamInterface::HManipulator::operator()( HStreamInterface& iface_ ) cons
 
 void HStreamInterface::HManipulator::set_fill( HStreamInterface& iface_ ) const {
 	M_PROLOG
-	iface_.set_fill( _value );
+	iface_.set_fill( static_cast<code_point_t>( _value ) );
 	return;
 	M_EPILOG
 }

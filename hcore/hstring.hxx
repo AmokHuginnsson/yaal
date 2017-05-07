@@ -41,9 +41,18 @@ Copyright:
 #include "hcore/base.hxx"
 #include "hcore/pod.hxx"
 #include "hcore/numeric.hxx"
+#include "hcore/htaggedpod.hxx"
 #include "hcore/iterator.hxx"
 
 namespace yaal {
+
+/*! \brief Unicode code point representation type.
+ */
+typedef yaal::u32_t code_point_t;
+#if 0
+/* Alternative type safe version. */
+typedef yaal::hcore::HTaggedPOD<yaal::u32_t, struct code_point_tag> code_point_t;
+#endif
 
 namespace hcore {
 
@@ -71,7 +80,7 @@ public:
 	int size( void ) const {
 		return ( _size );
 	}
-	bool has( u32_t ) const;
+	bool has( code_point_t ) const;
 };
 
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _whiteSpace_;
@@ -165,7 +174,7 @@ public:
 	 * \param size_ - capacity of newly constructed string.
 	 * \param fill_ - fill allocated space with given character.
 	 */
-	HString( int long size_, yaal::u32_t fill_ );
+	HString( int long size_, code_point_t fill_ );
 	/*! \brief Destroy string object and deallocate all resources.
 	 */
 	~HString( void );
@@ -289,13 +298,13 @@ public:
 	 * \return character at given position in this string.
 	 */
 	HString operator + ( HString const& ) const;
-	char operator[] ( int position ) const;
+	code_point_t operator[] ( int position ) const;
 	/*! \brief Get character at given position.
 	 *
 	 * \param position - index of a position to get character for.
 	 * \return character at given position in this string.
 	 */
-	char operator[] ( int long position ) const;
+	code_point_t operator[] ( int long position ) const;
 	/*! \brief Check if string is empty (has zero length).
 	 *
 	 * \return True iff this string is empty.
@@ -312,17 +321,17 @@ public:
 	bool operator <= ( HString const& ) const;
 	bool operator > ( HString const& ) const;
 	bool operator < ( HString const& ) const;
-	char set_at( int long position, char character );
+	void set_at( int long position, code_point_t character );
 	/*! \brief Get access to first character in the string.
 	 *
 	 * String must be non-empty.
 	 */
-	char front( void ) const;
+	code_point_t front( void ) const;
 	/*! \brief Get access to last character in the string.
 	 *
 	 * String must be non-empty.
 	 */
-	char back( void ) const;
+	code_point_t back( void ) const;
 	/*! \brief Get maximum number of characters that can be stored in any string.
 	 *
 	 * Alias for HString::get_max_size().
@@ -441,14 +450,14 @@ public:
 	 * \param size_ - number of copies of given character to make.
 	 * \param fill_ - fill allocated space with given character.
 	 */
-	HString& assign( int long size_, char fill_ );
+	HString& assign( int long size_, code_point_t fill_ );
 	/*! \brief Find position of given character in this string.
 	 *
 	 * \param character - a character to look for.
 	 * \param offset - position where searching for given character starts.
 	 * \return Position of given character in this string if given character is found or HString::npos otherwise.
 	 */
-	int long find( char character, int long offset = 0 ) const;
+	int long find( code_point_t character, int long offset = 0 ) const;
 	/*! \brief Find position of given sub-string in this string.
 	 *
 	 * \param str - a sub-string to look for.
@@ -469,7 +478,7 @@ public:
 	 * \param before - skip that many positions from the end before start looking for given character.
 	 * \return Distance from the end to given character if given character can be found or HString::npos otherwise.
 	 */
-	int long reverse_find( char character, int long before = 0 ) const;
+	int long reverse_find( code_point_t character, int long before = 0 ) const;
 	/*! \brief Find index of last occurrence of given character.
 	 *
 	 * This method is totally different than HString::reverse_find().
@@ -478,7 +487,7 @@ public:
 	 * \param before - assume that this string is only that long.
 	 * \return Index of last occurrence of given character if given character can be found or HString::npos otherwise.
 	 */
-	int long find_last( char character, int long before = npos ) const;
+	int long find_last( code_point_t character, int long before = npos ) const;
 	/*! \brief Find index of last occurrence of given sub-string.
 	 *
 	 * This method is totally different than HString::reverse_find().
@@ -610,7 +619,7 @@ public:
 	 * \param count - fill that many bytes.
 	 * \return Self.
 	 */
-	HString& fill( char value = '\0', int long position = 0, int long length = npos );
+	HString& fill( code_point_t value = '\0', int long position = 0, int long length = npos );
 	/*! \brief Fill portion of string with constant value and finish with \0 (zero) byte.
 	 *
 	 * \param value - use this value as a filler.
@@ -618,7 +627,7 @@ public:
 	 * \param count - fill that many bytes.
 	 * \return Self.
 	 */
-	HString& fillz( char value = '\0', int long position = 0, int long count = npos );
+	HString& fillz( code_point_t value = '\0', int long position = 0, int long count = npos );
 	/*! \brief Erase part of the string.
 	 *
 	 * \param position_ - start position for part to be erased.
@@ -666,7 +675,7 @@ public:
 	 * \param n - number of bytes to insert.
 	 * \param value - copies of this value shall be inserted.
 	 */
-	HString& insert( int long position, int long n, char value );
+	HString& insert( int long position, int long n, code_point_t value );
 	HString& append( HString const& );
 	/*! \brief Append a substring of given string to this string.
 	 *
@@ -676,7 +685,7 @@ public:
 	 * \return Self.
 	 */
 	HString& append( HString const&, int long idx_, int long len_ = npos );
-	HString& append( int long count_, char val_ );
+	HString& append( int long count_, code_point_t val_ );
 	/*! \brief Append new data from buffer to already existing data in this string.
 	 *
 	 * \param data - data to be appended to this string.
@@ -694,7 +703,7 @@ public:
 	 *
 	 * \param character_ - character to be appended.
 	 */
-	void push_back( char character_ );
+	void push_back( code_point_t character_ );
 	/*! \brief Remove single character from end of this string.
 	 */
 	void pop_back( void );
@@ -707,15 +716,16 @@ class HString::HCharRef {
 	HString& _string;
 	int long _index;
 public:
-	operator char ( void ) {
+	operator code_point_t ( void ) {
 		return ( _string[ _index ] );
 	}
-	HCharRef& operator = ( char ch_ );
+	HCharRef& operator = ( code_point_t ch_ );
 	void swap( HCharRef& );
 private:
 	friend class HString;
 	HCharRef( HString& string_, int long index_ )
-		: _string( string_ ), _index( index_ ) {
+		: _string( string_ )
+		, _index( index_ ) {
 		return;
 	}
 };
@@ -811,7 +821,7 @@ public:
 	int long operator - ( HConstIterator const& it_ ) const {
 		return ( _index - it_._index );
 	}
-	char operator * ( void ) const {
+	code_point_t operator * ( void ) const {
 		return ( (*_owner)[ _index ] );
 	}
 private:
@@ -954,9 +964,9 @@ private:
 	void alloc( int long size_ );
 };
 
-class HUTF8String::HIterator final : public iterator_interface<yaal::u32_t, iterator_category::random_access> {
+class HUTF8String::HIterator final : public iterator_interface<code_point_t, iterator_category::random_access> {
 public:
-	typedef u32_t reference;
+	typedef code_point_t reference;
 private:
 	union {
 		OBufferMeta* _meta; /*!< this string metadata view */
@@ -1022,7 +1032,7 @@ public:
 	int long operator - ( HIterator const& other_ ) const {
 		return ( _characterIndex - other_._characterIndex );
 	}
-	yaal::u32_t operator * ( void ) const;
+	code_point_t operator * ( void ) const;
 	void swap( HIterator& );
 private:
 	HIterator( char*, int, int );
@@ -1068,14 +1078,14 @@ int long long unsigned stoull( HString const&, int* = nullptr, int = 10 );
 float stof( HString const&, int* = nullptr );
 double stod( HString const&, int* = nullptr );
 double long stold( HString const&, int* = nullptr );
-bool is_whitespace( u32_t );
-bool is_digit( u32_t );
-bool is_dec_digit( u32_t );
-bool is_hex_digit( u32_t );
-bool is_oct_digit( u32_t );
-bool is_bin_digit( u32_t );
-bool is_letter( u32_t );
-bool is_alpha( u32_t );
+bool is_whitespace( code_point_t );
+bool is_digit( code_point_t );
+bool is_dec_digit( code_point_t );
+bool is_hex_digit( code_point_t );
+bool is_oct_digit( code_point_t );
+bool is_bin_digit( code_point_t );
+bool is_letter( code_point_t );
+bool is_alpha( code_point_t );
 
 inline void swap( yaal::hcore::HString& a, yaal::hcore::HString& b ) {
 	a.swap( b );

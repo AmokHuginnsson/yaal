@@ -91,13 +91,36 @@ inline void copy_n_cast_backward( iterator_t src_, int long size_, U* dst_ ) {
 
 namespace adaptive {
 
-inline void fill( void* mem_, int rank_, int long offset_, int long size_, u32_t codePoint_ ) {
+inline code_point_t get( void const* mem_, int rank_, int long index_ ) {
+	code_point_t codePoint( 0 );
+	if ( rank_ == 1 ) {
+		codePoint = static_cast<code_point_t>( static_cast<char const*>( mem_ )[index_] );
+	} else if ( rank_ == 2 ) {
+		codePoint = static_cast<yaal::u16_t const*>( mem_ )[index_];
+	} else {
+		codePoint = static_cast<yaal::u32_t const*>( mem_ )[index_];
+	}
+	return ( codePoint );
+}
+
+inline void set( void* mem_, int rank_, int long index_, code_point_t codePoint_ ) {
+	if ( rank_ == 1 ) {
+		static_cast<char*>( mem_ )[index_] = static_cast<char>( codePoint_ );
+	} else if ( rank_ == 2 ) {
+		static_cast<yaal::u16_t*>( mem_ )[index_] = static_cast<yaal::u16_t>( codePoint_ );
+	} else {
+		static_cast<yaal::u32_t*>( mem_ )[index_] = codePoint_;
+	}
+	return;
+}
+
+inline void fill( void* mem_, int rank_, int long offset_, int long size_, code_point_t codePoint_ ) {
 	if ( rank_ == 1 ) {
 		::memset( static_cast<char*>( mem_ ) + offset_, static_cast<int>( codePoint_ ), static_cast<size_t>( size_ ) );
 	} else if ( rank_ == 2 ) {
 		yaal::fill_n( static_cast<yaal::u16_t*>( mem_ ) + offset_, size_, static_cast<u16_t>( codePoint_ ) );
 	} else {
-		yaal::fill_n( static_cast<yaal::u32_t*>( mem_ ) + offset_, size_, codePoint_ );
+		yaal::fill_n( static_cast<code_point_t*>( mem_ ) + offset_, size_, codePoint_ );
 	}
 	return;
 }
@@ -111,19 +134,19 @@ inline void copy( void* dest_, int destRank_, int long destOffset_, void const* 
 				yaal::copy_n( static_cast<yaal::u8_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u16_t*>( dest_ ) + destOffset_ );
 			} break;
 			case ( 4 * 4 + 1 ): /* UCS-1 to UCS-4 */ {
-				yaal::copy_n( static_cast<yaal::u8_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u32_t*>( dest_ ) + destOffset_ );
+				yaal::copy_n( static_cast<yaal::u8_t const*>( src_ ) + srcOffset_, size_, static_cast<code_point_t*>( dest_ ) + destOffset_ );
 			} break;
 			case ( 4 * 4 + 2 ): /* UCS-2 to UCS-4 */ {
-				yaal::copy_n( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u32_t*>( dest_ ) + destOffset_ );
+				yaal::copy_n( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<code_point_t*>( dest_ ) + destOffset_ );
 			} break;
 			case ( 4 * 1 + 2 ): /* UCS-2 to UCS-1 */ {
 				copy_n_cast( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
 			} break;
 			case ( 4 * 1 + 4 ): /* UCS-4 to UCS-1 */ {
-				copy_n_cast( static_cast<yaal::u32_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
+				copy_n_cast( static_cast<code_point_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
 			} break;
 			case ( 4 * 2 + 4 ): /* UCS-4 to UCS-2 */ {
-				copy_n_cast( static_cast<yaal::u32_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u16_t*>( dest_ ) + destOffset_ );
+				copy_n_cast( static_cast<code_point_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u16_t*>( dest_ ) + destOffset_ );
 			} break;
 		}
 	}
@@ -139,19 +162,19 @@ inline void copy_backward( void* dest_, int destRank_, int long destOffset_, voi
 				copy_n_cast_backward( static_cast<yaal::u8_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u16_t*>( dest_ ) + destOffset_ );
 			} break;
 			case ( 4 * 4 + 1 ): /* UCS-1 to UCS-4 */ {
-				copy_n_cast_backward( static_cast<yaal::u8_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u32_t*>( dest_ ) + destOffset_ );
+				copy_n_cast_backward( static_cast<yaal::u8_t const*>( src_ ) + srcOffset_, size_, static_cast<code_point_t*>( dest_ ) + destOffset_ );
 			} break;
 			case ( 4 * 4 + 2 ): /* UCS-2 to UCS-4 */ {
-				copy_n_cast_backward( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u32_t*>( dest_ ) + destOffset_ );
+				copy_n_cast_backward( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<code_point_t*>( dest_ ) + destOffset_ );
 			} break;
 			case ( 4 * 1 + 2 ): /* UCS-2 to UCS-1 */ {
 				copy_n_cast_backward( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
 			} break;
 			case ( 4 * 1 + 4 ): /* UCS-4 to UCS-1 */ {
-				copy_n_cast_backward( static_cast<yaal::u32_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
+				copy_n_cast_backward( static_cast<code_point_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
 			} break;
 			case ( 4 * 2 + 4 ): /* UCS-4 to UCS-2 */ {
-				copy_n_cast_backward( static_cast<yaal::u32_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u16_t*>( dest_ ) + destOffset_ );
+				copy_n_cast_backward( static_cast<code_point_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u16_t*>( dest_ ) + destOffset_ );
 			} break;
 		}
 	}
@@ -213,7 +236,7 @@ OUTF8StringStats get_string_stats( char const* str_, int long size_ ) {
 	return ( s );
 }
 
-void encode( u32_t codePoint_, char*& dest_ ) {
+void encode( code_point_t codePoint_, char*& dest_ ) {
 	int r( unicode::utf8_length( codePoint_ ) );
 	dest_ += r;
 	char* p( dest_ - 1 );
@@ -226,8 +249,8 @@ void encode( u32_t codePoint_, char*& dest_ ) {
 	}
 }
 
-u32_t decode_forward( char const* ptr_ ) {
-	u32_t character( static_cast<u8_t>( *ptr_ ) );
+code_point_t decode_forward( char const* ptr_ ) {
+	code_point_t character( static_cast<u8_t>( *ptr_ ) );
 	if ( ! ( *ptr_ & unicode::ENC_1_BYTES_MARK_MASK ) ) {
 	} else if ( ( *ptr_ & unicode::ENC_2_BYTES_MARK_MASK ) == unicode::ENC_2_BYTES_MARK_VALUE ) {
 		character &= unicode::ENC_2_BYTES_VALUE_MASK;
@@ -265,7 +288,7 @@ void decode( T* dst_, char const* str_, int long size_ ) {
 
 }
 
-bool HCharacterClass::has( u32_t char_ ) const {
+bool HCharacterClass::has( code_point_t char_ ) const {
 	return ( ( char_ < 256 ) && ( ::memchr( _data, static_cast<u8_t>( char_ ), static_cast<size_t>( _size ) ) != nullptr ) );
 }
 
@@ -327,9 +350,9 @@ static int const RANK_BIT_MASK =  meta::obinary<001100000>::value;
 #undef EXT_MEM_2
 #define EXT_MEM_2( base ) reinterpret_cast<yaal::u16_t*>( EXT_IS_INPLACE( base ) ? base._mem : base._ptr )
 #undef MEM_4
-#define MEM_4 reinterpret_cast<yaal::u32_t*>( IS_INPLACE ? _mem : _ptr )
+#define MEM_4 reinterpret_cast<code_point_t*>( IS_INPLACE ? _mem : _ptr )
 #undef EXT_MEM_4
-#define EXT_MEM_4( base ) reinterpret_cast<yaal::u32_t*>( EXT_IS_INPLACE( base ) ? base._mem : base._ptr )
+#define EXT_MEM_4( base ) reinterpret_cast<code_point_t*>( EXT_IS_INPLACE( base ) ? base._mem : base._ptr )
 #undef GET_SIZE
 #define GET_SIZE ( IS_INPLACE ? _mem[ ALLOC_FLAG_INDEX ] : static_cast<int long>( _len[ 1 ] ) )
 #undef SET_SIZE
@@ -409,7 +432,7 @@ HString::HString( HString&& string_ )
 	::memset( string_._mem, 0, INPLACE_BUFFER_SIZE );
 }
 
-HString::HString( int long preallocate_, u32_t fill_ )
+HString::HString( int long preallocate_, code_point_t fill_ )
 	: _len() {
 	M_PROLOG
 	int rank( unicode::rank( fill_ ) );
@@ -755,8 +778,10 @@ HString& HString::operator += ( HString const& string_ ) {
 	if ( otherSize ) {
 		int long oldSize( GET_SIZE );
 		int long newSize( oldSize + otherSize );
-		reserve( newSize );
-		::std::strcpy( MEM + oldSize, EXT_MEM( string_ ) );
+		int otherRank( EXT_GET_RANK( string_ ) );
+		int rank( max( GET_RANK, otherRank ) );
+		reserve( newSize, rank );
+		adaptive::copy( MEM_1, rank, oldSize, EXT_MEM_1( string_ ), otherRank, 0, otherSize );
 		SET_SIZE( newSize );
 	}
 	return ( *this );
@@ -770,29 +795,35 @@ HString HString::operator + ( HString const& other_ ) const {
 	M_EPILOG
 }
 
-char HString::operator[] ( int index_ ) const {
+code_point_t HString::operator[] ( int index_ ) const {
 	return ( operator[] ( static_cast<int long>( index_ ) ) );
 }
 
-char HString::operator[] ( int long index_ ) const {
+code_point_t HString::operator[] ( int long index_ ) const {
 	M_PROLOG
 	if ( ( index_ < 0 ) || ( index_ > GET_SIZE ) ) {
 		M_THROW( _errMsgHString_[string_helper::INDEX_OOB], index_ );
 	}
-	return ( MEM[ index_ ] );
+	return ( adaptive::get( MEM_1, GET_RANK, index_ ) );
 	M_EPILOG
 }
 
-char HString::set_at( int long index_, char char_ ) {
+void HString::set_at( int long index_, code_point_t char_ ) {
 	M_PROLOG
-	if ( ( index_ < 0 ) || ( index_ >= GET_SIZE ) ) {
+	int long curSize( GET_SIZE );
+	if ( ( index_ < 0 ) || ( index_ >= curSize ) ) {
 		M_THROW( _errMsgHString_[string_helper::INDEX_OOB], index_ );
 	}
-	MEM[ index_ ] = char_;
+	int rank( GET_RANK );
+	int charRank( unicode::rank( char_ ) );
+	if ( charRank > rank ) {
+		reserve( curSize, rank = charRank );
+	}
+	adaptive::set( MEM_1, rank, index_, char_ );
 	if ( ! char_ ) {
 		SET_SIZE( index_ );
 	}
-	return ( char_ );
+	return;
 	M_EPILOG
 }
 
@@ -878,19 +909,19 @@ bool operator <= ( char const* left_, HString const& right_ ) {
 	M_EPILOG
 }
 
-char HString::front( void ) const {
+code_point_t HString::front( void ) const {
 	if ( GET_SIZE == 0 ) {
 		M_THROW( _errMsgHString_[string_helper::INDEX_OOB], 0 );
 	}
-	return ( MEM[0] );
+	return ( adaptive::get( MEM_1, GET_RANK, 0 ) );
 }
 
-char HString::back( void ) const {
+code_point_t HString::back( void ) const {
 	int long s( GET_SIZE );
 	if ( s == 0 ) {
 		M_THROW( _errMsgHString_[string_helper::INDEX_OOB], s - 1 );
 	}
-	return ( MEM[s - 1] );
+	return ( adaptive::get( MEM_1, GET_RANK, s - 1 ) );
 }
 
 HString::const_iterator HString::begin( void ) const {
@@ -922,7 +953,6 @@ bool HString::operator ! ( void ) const {
 }
 
 void HString::clear( void ) {
-	MEM[0] = 0;
 	SET_SIZE( 0 );
 	return;
 }
@@ -960,7 +990,7 @@ int long HString::capacity( void ) const {
 
 int long HString::get_capacity( void ) const {
 	M_PROLOG
-	return ( GET_ALLOC_BYTES - 1 );
+	return ( GET_ALLOC_BYTES );
 	M_EPILOG
 }
 
@@ -1930,11 +1960,11 @@ void HUTF8String::alloc( int long size_ ) {
 
 void HUTF8String::assign( HString::const_iterator it_, HString::const_iterator end_ ) {
 	M_PROLOG
-	u32_t maxCodePoint( 0 );
+	code_point_t maxCodePoint( 0 );
 	int byteCount( 0 );
 	for ( HString::const_iterator it( it_ ); it != end_; ++ it ) {
 		byteCount += unicode::utf8_length( static_cast<u8_t>( *it ) ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
-		maxCodePoint = max( static_cast<u32_t>( static_cast<u8_t>( *it ) ), maxCodePoint ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
+		maxCodePoint = max( static_cast<code_point_t>( static_cast<u8_t>( *it ) ), maxCodePoint ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
 	}
 	if ( byteCount > 0 ) {
 		alloc( byteCount );
@@ -2203,7 +2233,7 @@ HUTF8String::HIterator& HUTF8String::HIterator::operator -= ( int long by_ ) {
 	return ( *this );
 }
 
-yaal::u32_t HUTF8String::HIterator::operator * ( void ) const {
+code_point_t HUTF8String::HIterator::operator * ( void ) const {
 	M_ASSERT( _ptr );
 	char const* ptr( _ptr + sizeof ( HUTF8String::OBufferMeta ) + _byteIndex );
 	return ( decode_forward( ptr ) );
@@ -2428,35 +2458,35 @@ double long stold( HString const& str_, int* endIdx_ ) {
 	return ( hcore::strtold( str_, endIdx_ ) );
 }
 
-bool is_whitespace( u32_t char_ ) {
+bool is_whitespace( code_point_t char_ ) {
 	return ( _whiteSpace_.has( char_ ) );
 }
 
-bool is_digit( u32_t char_ ) {
+bool is_digit( code_point_t char_ ) {
 	return ( _digit_.has( char_ ) );
 }
 
-bool is_dec_digit( u32_t char_ ) {
+bool is_dec_digit( code_point_t char_ ) {
 	return ( _digit_.has( char_ ) );
 }
 
-bool is_hex_digit( u32_t char_ ) {
+bool is_hex_digit( code_point_t char_ ) {
 	return ( _hexDigit_.has( char_ ) );
 }
 
-bool is_oct_digit( u32_t char_ ) {
+bool is_oct_digit( code_point_t char_ ) {
 	return ( _octDigit_.has( char_ ) );
 }
 
-bool is_bin_digit( u32_t char_ ) {
+bool is_bin_digit( code_point_t char_ ) {
 	return ( _binDigit_.has( char_ ) );
 }
 
-bool is_letter( u32_t char_ ) {
+bool is_letter( code_point_t char_ ) {
 	return ( _letter_.has( char_ ) );
 }
 
-bool is_alpha( u32_t char_ ) {
+bool is_alpha( code_point_t char_ ) {
 	return ( ( char_ > ' ' ) && ( char_ <= 127 ) );
 }
 

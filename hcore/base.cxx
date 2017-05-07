@@ -356,7 +356,10 @@ bool lexical_cast( char const* const& value_ ) {
 template<>
 char lexical_cast( HString const& val ) {
 	M_PROLOG
-	return ( val.is_empty() ? static_cast<char>( 0 ) : val[ 0 ] );
+	if ( val.get_length() != 1 ) {
+		M_THROW( "bad string size", val.get_length() );
+	}
+	return ( safe_int::cast<char>( val[ 0 ] ) );
 	M_EPILOG
 }
 

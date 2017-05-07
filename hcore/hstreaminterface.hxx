@@ -100,7 +100,7 @@ protected:
 	int _offset;    /*!< Position of where continued read (another read_until invocation after interrupted one) shall store consecutive bytes. */
 	HString _wordCache; /*!< Cache for operator >> () and operator << (). */
 	HUTF8String _conversionCache; /*!< Cache used for converting between UTF-8 and UCS */
-	int _fill;      /*!< Fill character for output operations. */
+	code_point_t _fill;  /*!< Fill character for output operations. */
 	int _width;     /*!< Next output operation width. */
 	int _precision; /*!< Set number of significant digits to display for all subsequent outputs of floating point type values. */
 	BASES _base;
@@ -312,7 +312,7 @@ public:
 	HStreamInterface& set_boolalpha( bool boolalpha_ ) {
 		return ( do_set_boolalpha( boolalpha_ ) );
 	}
-	HStreamInterface& set_fill( int val_ ) {
+	HStreamInterface& set_fill( code_point_t val_ ) {
 		return ( do_set_fill( val_ ) );
 	}
 	HStreamInterface& set_width( int val_ ) {
@@ -336,7 +336,7 @@ public:
 	bool get_boolalpha( void ) const {
 		return ( do_get_boolalpha() );
 	}
-	int get_fill( void ) const {
+	code_point_t get_fill( void ) const {
 		return ( do_get_fill() );
 	}
 	int get_width( void ) const {
@@ -396,7 +396,7 @@ protected:
 	virtual int long do_read_while( yaal::hcore::HString&, char const* );
 	virtual int long do_read_while_n( yaal::hcore::HString&, int long, char const* );
 	virtual int do_peek( void );
-	virtual HStreamInterface& do_set_fill( int );
+	virtual HStreamInterface& do_set_fill( code_point_t );
 	virtual HStreamInterface& do_set_width( int );
 	virtual HStreamInterface& do_set_precision( int );
 	virtual HStreamInterface& do_set_base( BASES );
@@ -406,7 +406,7 @@ protected:
 	virtual HStreamInterface& do_set_boolalpha( bool );
 	virtual bool do_get_skipws( void ) const;
 	virtual bool do_get_boolalpha( void ) const;
-	virtual int do_get_fill( void ) const;
+	virtual code_point_t do_get_fill( void ) const;
 	virtual int do_get_width( void ) const;
 	virtual int do_get_precision( void ) const;
 	virtual BASES do_get_base( void ) const;
@@ -435,7 +435,7 @@ private:
 	friend HStreamInterface& flush( HStreamInterface& );
 };
 
-HStreamInterface::HManipulator setfill( int );
+HStreamInterface::HManipulator setfill( code_point_t );
 HStreamInterface::HManipulator setw( int );
 HStreamInterface::HManipulator setprecision( int );
 

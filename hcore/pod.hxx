@@ -128,6 +128,24 @@ struct is_integral<int short unsigned> {
 };
 
 template<>
+struct is_integral<char> {
+	static bool const value = true;
+	typedef trait::true_type type;
+};
+
+template<>
+struct is_integral<char signed> {
+	static bool const value = true;
+	typedef trait::true_type type;
+};
+
+template<>
+struct is_integral<char unsigned> {
+	static bool const value = true;
+	typedef trait::true_type type;
+};
+
+template<>
 struct is_integral<int long> {
 	static bool const value = true;
 	typedef trait::true_type type;
