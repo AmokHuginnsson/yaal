@@ -129,7 +129,7 @@ class HString final {
 public:
 	static_assert( sizeof ( int long ) <= sizeof ( int_native_t ), "length type overflows native integer type" );
 	/*
-	 * Divide by for because max string rank is 4 and string of rank
+	 * Divide by 4 because max string rank is 4 and string of rank
 	 * 4 requires 4 bytes per character and MAX_STRING_LENGTH is expressed in number of characters.
 	 */
 	static int long const MAX_STRING_LENGTH = ( meta::max_signed<int long>::value / 4 ) - 1;
