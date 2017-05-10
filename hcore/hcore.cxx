@@ -156,7 +156,7 @@ int copy_digits( HString const& str_, char* buf_, int size_ ) {
 	}
 	for (
 		int i( 0 ), LIMIT( min( size_ - 1, static_cast<int>( end - it ) ) );
-		( i < LIMIT ) && ( static_cast<u32_t>( *it ) < unicode::MAX_1_BYTE_CODE_POINT );
+		( i < LIMIT ) && ( static_cast<u32_t>( *it ) < unicode::UTF8_MAX_1_BYTE_CODE_POINT );
 		++ i, ++ it, ++ buf_
 	) { /* *TODO* *FIXME* Remove static_cast after UCS in HString is implemented. */
 		*buf_ = static_cast<char>( *it );

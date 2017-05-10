@@ -145,7 +145,7 @@ private:
 	union {
 		int_native_t _len[ 3 ];
 		char _mem[ INPLACE_BUFFER_SIZE ];
-		char* _ptr;
+		void* _ptr;
 	};
 	static_assert( sizeof ( HString::_mem ) == sizeof ( HString::_len ), "buffer views are misaligned" );
 public:
@@ -178,7 +178,7 @@ public:
 	/*! \brief Destroy string object and deallocate all resources.
 	 */
 	~HString( void );
-	/*! \brief Increases string capacity.
+	/*! \brief Increases string capacity for given rank.
 	 *
 	 * String capacity is always size of (2^n)-1 or MAX_INPLACE_CAPACITY.
 	 *
@@ -188,6 +188,15 @@ public:
 	 * \post String capacity has value of smallest (2^n)-1 greater or equal to \e size.
 	 */
 	void reserve( int long capacity, int rank );
+	/*! \brief Increases string capacity for current rank.
+	 *
+	 * String capacity is always size of (2^n)-1 or MAX_INPLACE_CAPACITY.
+	 *
+	 * \param capacity - new string capacity.
+	 *
+	 * \post String capacity has value of smallest (2^n)-1 greater or equal to \e size.
+	 */
+	void reserve( int long capacity );
 	/*! \brief Materialize string.
 	 *
 	 * Used in copy-on-write implementation.
@@ -611,7 +620,7 @@ public:
 	 * \return Self.
 	 */
 	HString& shift_left( int long len );
-	HString& shift_right( int long, char const = ' ' );
+	HString& shift_right( int long, code_point_t = ' ' );
 	/*! \brief Fill portion of string with constant value.
 	 *
 	 * \param value - use this value as a filler.
@@ -710,6 +719,7 @@ public:
 private:
 	void from_utf8( int long, char const*, int long );
 	void substr( HString&, int long, int long ) const;
+	void resize( int long capacity, int rank );
 };
 
 class HString::HCharRef {
@@ -730,7 +740,7 @@ private:
 	}
 };
 
-class HString::HConstIterator : public yaal::hcore::iterator_interface<char, yaal::hcore::iterator_category::random_access> {
+class HString::HConstIterator : public yaal::hcore::iterator_interface<code_point_t, yaal::hcore::iterator_category::random_access> {
 protected:
 	HString const* _owner;
 	int long _index;

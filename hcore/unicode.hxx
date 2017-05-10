@@ -56,10 +56,14 @@ static u8_t const TAIL_BYTES_MARK_VALUE(  meta::obinary<010000000>::value );
 static u8_t const TAIL_BYTES_VALUE_MASK(  meta::obinary<000111111>::value );
 static u8_t const TAIL_BYTES_MARK_MASK(   meta::obinary<011000000>::value );
 
-static u32_t const MAX_1_BYTE_CODE_POINT( 0x00007f );
-static u32_t const MAX_2_BYTE_CODE_POINT( 0x0007ff );
-static u32_t const MAX_3_BYTE_CODE_POINT( 0x00ffff );
-static u32_t const MAX_4_BYTE_CODE_POINT( 0x10ffff );
+static u32_t const UCS_MAX_1_BYTE_CODE_POINT( 0x0000ff );
+static u32_t const UCS_MAX_2_BYTE_CODE_POINT( 0x00ffff );
+static u32_t const UCS_MAX_4_BYTE_CODE_POINT( 0x10ffff );
+
+static u32_t const UTF8_MAX_1_BYTE_CODE_POINT( 0x00007f );
+static u32_t const UTF8_MAX_2_BYTE_CODE_POINT( 0x0007ff );
+static u32_t const UTF8_MAX_3_BYTE_CODE_POINT( 0x00ffff );
+static u32_t const UTF8_MAX_4_BYTE_CODE_POINT( 0x10ffff );
 
 inline int count_characters( char const* str_, int size_ ) {
 	int cc( 0 );
@@ -81,11 +85,11 @@ inline int count_characters( char const* str_, int size_ ) {
 
 inline int rank( code_point_t value_ ) {
 	int r( 0 );
-	if ( value_ <= MAX_1_BYTE_CODE_POINT ) {
+	if ( value_ <= UCS_MAX_1_BYTE_CODE_POINT ) {
 		r = 1;
-	} else if ( value_ <= MAX_2_BYTE_CODE_POINT ) {
+	} else if ( value_ <= UCS_MAX_2_BYTE_CODE_POINT ) {
 		r = 2;
-	} else if ( value_ <= MAX_4_BYTE_CODE_POINT ) {
+	} else if ( value_ <= UCS_MAX_4_BYTE_CODE_POINT ) {
 		r = 4;
 	} else {
 		throw yaal::hcore::HOutOfRangeException( yaal::hcore::to_string( "Unicode code point is out of range: " ).append( value_ ) );
@@ -94,19 +98,19 @@ inline int rank( code_point_t value_ ) {
 }
 
 inline int utf8_length( code_point_t value_ ) {
-	int r( 0 );
-	if ( value_ <= MAX_1_BYTE_CODE_POINT ) {
-		r = 1;
-	} else if ( value_ <= MAX_2_BYTE_CODE_POINT ) {
-		r = 2;
-	} else if ( value_ <= MAX_3_BYTE_CODE_POINT ) {
-		r = 3;
-	} else if ( value_ <= MAX_4_BYTE_CODE_POINT ) {
-		r = 4;
+	int l( 0 );
+	if ( value_ <= UTF8_MAX_1_BYTE_CODE_POINT ) {
+		l = 1;
+	} else if ( value_ <= UTF8_MAX_2_BYTE_CODE_POINT ) {
+		l = 2;
+	} else if ( value_ <= UTF8_MAX_3_BYTE_CODE_POINT ) {
+		l = 3;
+	} else if ( value_ <= UTF8_MAX_4_BYTE_CODE_POINT ) {
+		l = 4;
 	} else {
 		throw yaal::hcore::HOutOfRangeException( yaal::hcore::to_string( "Unicode code point is out of range: " ).append( value_ ) );
 	}
-	return ( r );
+	return ( l );
 }
 
 }

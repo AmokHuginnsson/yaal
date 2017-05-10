@@ -129,7 +129,7 @@ int preparse_integer( HString const& str_, char* alternate_ ) {
 		-- skip;
 	}
 	int const maxDigits( base == 10 ? MAX_VALID_DECIMAL_INTEGER_LENGTH : ( base == 16 ? MAX_VALID_HEXADECIMAL_INTEGER_LENGTH : ( base == 8 ? MAX_VALID_OCTAL_INTEGER_LENGTH : MAX_VALID_BINARY_INTEGER_LENGTH ) ) );
-	for ( int i( 0 ); ( i < len ) && ( static_cast<u32_t>( *it ) < unicode::MAX_1_BYTE_CODE_POINT ); ++ i, ++ it, ++ alternate_ ) { /* *TODO* *FIXME* Remove static_cast after UCS in HString is implemented. */
+	for ( int i( 0 ); ( i < len ) && ( static_cast<u32_t>( *it ) < unicode::UTF8_MAX_1_BYTE_CODE_POINT ); ++ i, ++ it, ++ alternate_ ) { /* *TODO* *FIXME* Remove static_cast after UCS in HString is implemented. */
 		if ( i > maxDigits ) {
 			M_THROW( "too many "_ys.append( base == 10 ? "decimal" : ( base == 16 ) ? "hexadecimal" : ( base == 8 ? "octal" : "binary" ) ).append( " digits: " ).append( str_ ), len );
 		}
