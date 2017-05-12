@@ -474,7 +474,6 @@ public:
 	 * \return Position of given sub-string (first character of it) in this string if given sub-string is found or HString::npos otherwise.
 	 */
 	int long find( HString const& str, int long offset = 0 ) const;
-	int long nfind( HString const&, int long, int long = 0 ) const;
 	/*! \brief Find distance from the end of last occurrence of given character.
 	 *
 	 * HString::reverse_find() is really 100% equivalent of HString::find() on reversed string,
