@@ -63,7 +63,6 @@ enum {
 
 /*! \brief HString class helpers, utility functions.
  */
-char* strrnpbrk( char const*, char const*, int long );
 int long strrnspn( char const*, char const*, int long );
 
 }
@@ -113,6 +112,30 @@ inline int long kmpsearch_impl( haystack_t const* str, int long lenstr, needle_t
 		break;
 	}
 	return ( start );
+}
+
+template<typename str_ucs_t, typename set_ucs_t>
+inline int long find_one_of_impl( str_ucs_t const* str_, int long size_, set_ucs_t const* set_, int long setSize_ ) {
+	for ( int long i( 0 ); i < size_; ++ i ) {
+		for ( int long s( 0 ); s < setSize_; ++ s ) {
+			if ( static_cast<code_point_t>( str_[i] ) == static_cast<code_point_t>( set_[s] ) ) {
+				return ( i );
+			}
+		}
+	}
+	return ( HString::npos );
+}
+
+template<typename str_ucs_t, typename set_ucs_t>
+inline int long find_last_one_of_impl( str_ucs_t const* str_, int long size_, set_ucs_t const* set_, int long setSize_ ) {
+	for ( int long i( size_ - 1 ); i >= 0; -- i ) {
+		for ( int long s( 0 ); s < setSize_; ++ s ) {
+			if ( static_cast<code_point_t>( str_[i] ) == static_cast<code_point_t>( set_[s] ) ) {
+				return ( i );
+			}
+		}
+	}
+	return ( HString::npos );
 }
 
 namespace adaptive {
@@ -358,7 +381,7 @@ int long find( void const* mem_, int rank_, int long size_, int long after_, cod
 			}
 		} break;
 	}
-	return ( pos );
+	return ( pos != HString::npos ? pos + after_ : pos );
 }
 
 inline int long kmpsearch( void const* haystack_, int haystackRank_, int long haystackSize_, int long after_, void const* needle_, int needleRank_, int long needleSize_ ) {
@@ -390,6 +413,74 @@ inline int long kmpsearch( void const* haystack_, int haystackRank_, int long ha
 		} break;
 		case ( 4 * 4 + 4 ): /* UCS-4 and UCS-4 */ {
 			pos = kmpsearch_impl( static_cast<yaal::u32_t const*>( haystack_ ) + after_, haystackSize_ - after_, static_cast<yaal::u32_t const*>( needle_ ), needleSize_ );
+		} break;
+	}
+	return ( pos != HString::npos ? pos + after_ : pos );
+}
+
+inline int long find_one_of( void const* mem_, int rank_, int long size_, int long after_, void const* set_, int setRank_, int long setSize_ ) {
+	int long pos( HString::npos );
+	switch ( 4 * rank_ + setRank_ ) {
+		case ( 4 * 1 + 1 ): /* UCS-1 and UCS-1 */ {
+			pos = find_one_of_impl( static_cast<yaal::u8_t const*>( mem_ ) + after_, size_ - after_, static_cast<yaal::u8_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 2 + 1 ): /* UCS-2 and UCS-1 */ {
+			pos = find_one_of_impl( static_cast<yaal::u16_t const*>( mem_ ) + after_, size_ - after_, static_cast<yaal::u8_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 4 + 1 ): /* UCS-4 and UCS-1 */ {
+			pos = find_one_of_impl( static_cast<yaal::u32_t const*>( mem_ ) + after_, size_ - after_, static_cast<yaal::u8_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 1 + 2 ): /* UCS-1 and UCS-2 */ {
+			pos = find_one_of_impl( static_cast<yaal::u8_t const*>( mem_ ) + after_, size_ - after_, static_cast<yaal::u16_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 2 + 2 ): /* UCS-2 and UCS-2 */ {
+			pos = find_one_of_impl( static_cast<yaal::u16_t const*>( mem_ ) + after_, size_ - after_, static_cast<yaal::u16_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 4 + 2 ): /* UCS-4 and UCS-2 */ {
+			pos = find_one_of_impl( static_cast<yaal::u32_t const*>( mem_ ) + after_, size_ - after_, static_cast<yaal::u16_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 1 + 4 ): /* UCS-1 and UCS-4 */ {
+			pos = find_one_of_impl( static_cast<yaal::u8_t const*>( mem_ ) + after_, size_ - after_, static_cast<yaal::u32_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 2 + 4 ): /* UCS-2 and UCS-4 */ {
+			pos = find_one_of_impl( static_cast<yaal::u16_t const*>( mem_ ) + after_, size_ - after_, static_cast<yaal::u32_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 4 + 4 ): /* UCS-4 and UCS-4 */ {
+			pos = find_one_of_impl( static_cast<yaal::u32_t const*>( mem_ ) + after_, size_ - after_, static_cast<yaal::u32_t const*>( set_ ), setSize_ );
+		} break;
+	}
+	return ( pos != HString::npos ? pos + after_ : pos );
+}
+
+inline int long find_last_one_of( void const* mem_, int rank_, int long size_, int long before_, void const* set_, int setRank_, int long setSize_ ) {
+	int long pos( HString::npos );
+	switch ( 4 * rank_ + setRank_ ) {
+		case ( 4 * 1 + 1 ): /* UCS-1 and UCS-1 */ {
+			pos = find_last_one_of_impl( static_cast<yaal::u8_t const*>( mem_ ), size_ - before_, static_cast<yaal::u8_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 2 + 1 ): /* UCS-2 and UCS-1 */ {
+			pos = find_last_one_of_impl( static_cast<yaal::u16_t const*>( mem_ ), size_ - before_, static_cast<yaal::u8_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 4 + 1 ): /* UCS-4 and UCS-1 */ {
+			pos = find_last_one_of_impl( static_cast<yaal::u32_t const*>( mem_ ), size_ - before_, static_cast<yaal::u8_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 1 + 2 ): /* UCS-1 and UCS-2 */ {
+			pos = find_last_one_of_impl( static_cast<yaal::u8_t const*>( mem_ ), size_ - before_, static_cast<yaal::u16_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 2 + 2 ): /* UCS-2 and UCS-2 */ {
+			pos = find_last_one_of_impl( static_cast<yaal::u16_t const*>( mem_ ), size_ - before_, static_cast<yaal::u16_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 4 + 2 ): /* UCS-4 and UCS-2 */ {
+			pos = find_last_one_of_impl( static_cast<yaal::u32_t const*>( mem_ ), size_ - before_, static_cast<yaal::u16_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 1 + 4 ): /* UCS-1 and UCS-4 */ {
+			pos = find_last_one_of_impl( static_cast<yaal::u8_t const*>( mem_ ), size_ - before_, static_cast<yaal::u32_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 2 + 4 ): /* UCS-2 and UCS-4 */ {
+			pos = find_last_one_of_impl( static_cast<yaal::u16_t const*>( mem_ ), size_ - before_, static_cast<yaal::u32_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 4 + 4 ): /* UCS-4 and UCS-4 */ {
+			pos = find_last_one_of_impl( static_cast<yaal::u32_t const*>( mem_ ), size_ - before_, static_cast<yaal::u32_t const*>( set_ ), setSize_ );
 		} break;
 	}
 	return ( pos );
@@ -1341,11 +1432,7 @@ int long HString::find_one_of( HString const& set_, int long after_ ) const {
 	if ( after_ >= GET_SIZE ) {
 		return ( npos );
 	}
-	char const* str( ::std::strpbrk( MEM_off + after_, EXT_MEM_off( set_ ) ) );
-	if ( ! str ) {
-		return ( npos );
-	}
-	return ( static_cast<int long>( str - MEM_off ) );
+	return ( adaptive::find_one_of( MEM, GET_RANK, GET_SIZE, after_, EXT_MEM( set_ ), EXT_GET_RANK( set_ ), EXT_GET_SIZE( set_ ) ) );
 	M_EPILOG
 }
 
@@ -1360,11 +1447,8 @@ int long HString::reverse_find_one_of( HString const& set_, int long before_ ) c
 	if ( before_ >= GET_SIZE ) {
 		return ( npos );
 	}
-	char* str( string_helper::strrnpbrk( MEM_off, EXT_MEM_off( set_ ), GET_SIZE - before_ ) );
-	if ( ! str ) {
-		return ( npos );
-	}
-	return ( static_cast<int long>( ( GET_SIZE - 1 ) - ( str - MEM_off ) ) );
+	int long pos( find_last_one_of( set_, ( GET_SIZE - before_ ) - 1 ) );
+	return ( pos != npos ? ( GET_SIZE - 1 ) - pos : pos );
 	M_EPILOG
 }
 
@@ -1376,11 +1460,7 @@ int long HString::find_last_one_of( HString const& set_, int long before_ ) cons
 	if ( ( before_ < 0 ) || set_.is_empty() ) {
 		return ( npos );
 	}
-	char* str( string_helper::strrnpbrk( MEM_off, EXT_MEM_off( set_ ), before_ + 1 ) );
-	if ( ! str ) {
-		return ( npos );
-	}
-	return ( static_cast<int long>( str - MEM_off ) );
+	return ( adaptive::find_last_one_of( MEM, GET_RANK, GET_SIZE, before_, EXT_MEM( set_ ), EXT_GET_RANK( set_ ), EXT_GET_SIZE( set_ ) ) );
 	M_EPILOG
 }
 
@@ -2711,26 +2791,6 @@ bool is_alpha( code_point_t char_ ) {
 }
 
 namespace string_helper {
-
-/* all str* and mem* functions takes const pointer as argument and returns
-   non const pointer */
-char* strrnpbrk( char const* buffer_,
-		char const* stopSet_, int long length_ ) {
-	M_PROLOG
-	if ( length_ < 1 ) {
-		return ( nullptr );
-	}
-	int long stopSetSize( static_cast<int long>( ::std::strlen( stopSet_ ) ) );
-	int long index( length_ - 1 );
-	while ( index >= 0 ) {
-		if ( ::std::memchr( stopSet_, buffer_[ index ], static_cast<size_t>( stopSetSize ) ) ) {
-			return ( const_cast<char*>( buffer_ + index ) );
-		}
-		-- index;
-	}
-	return ( nullptr );
-	M_EPILOG
-}
 
 int long strrnspn( char const* buffer_, char const* skipSet_,
 		int long length_ ) {
