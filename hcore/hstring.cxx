@@ -114,6 +114,16 @@ inline int long kmpsearch_impl( haystack_t const* str, int long lenstr, needle_t
 	return ( start );
 }
 
+template<typename str_ucs_t, typename value_t>
+inline int long find_last_impl( str_ucs_t const* str_, int long size_, value_t v ) {
+	for ( int long i( size_ - 1 ); i >= 0; -- i ) {
+		if ( static_cast<code_point_t>( str_[i] ) == static_cast<code_point_t>( v ) ) {
+			return ( i );
+		}
+	}
+	return ( HString::npos );
+}
+
 template<typename str_ucs_t, typename set_ucs_t>
 inline int long find_one_of_impl( str_ucs_t const* str_, int long size_, set_ucs_t const* set_, int long setSize_ ) {
 	for ( int long i( 0 ); i < size_; ++ i ) {
@@ -136,6 +146,42 @@ inline int long find_last_one_of_impl( str_ucs_t const* str_, int long size_, se
 		}
 	}
 	return ( HString::npos );
+}
+
+template<typename str_ucs_t, typename set_ucs_t>
+inline int long find_other_than_impl( str_ucs_t const* str_, int long size_, set_ucs_t const* set_, int long setSize_ ) {
+	int long pos( HString::npos );
+	for ( int long i( 0 ); i < size_; ++ i ) {
+		int long s( 0 );
+		for ( ; s < setSize_; ++ s ) {
+			if ( static_cast<code_point_t>( str_[i] ) == static_cast<code_point_t>( set_[s] ) ) {
+				break;
+			}
+		}
+		if ( s == setSize_ ) {
+			pos = i;
+			break;
+		}
+	}
+	return ( pos );
+}
+
+template<typename str_ucs_t, typename set_ucs_t>
+inline int long find_last_other_than_impl( str_ucs_t const* str_, int long size_, set_ucs_t const* set_, int long setSize_ ) {
+	int long pos( HString::npos );
+	for ( int long i( size_ - 1 ); i >= 0; -- i ) {
+		int long s( 0 );
+		for ( ; s < setSize_; ++ s ) {
+			if ( static_cast<code_point_t>( str_[i] ) == static_cast<code_point_t>( set_[s] ) ) {
+				break;
+			}
+		}
+		if ( s == setSize_ ) {
+			pos = i;
+			break;
+		}
+	}
+	return ( pos );
 }
 
 namespace adaptive {
@@ -365,23 +411,49 @@ int long find( void const* mem_, int rank_, int long size_, int long after_, cod
 		} break;
 		case ( 4 * 2 + 1 ): /* UCS-2 and UCS-1 */
 		case ( 4 * 2 + 2 ): /* UCS-2 and UCS-2 */ {
-			yaal::u16_t const* m( static_cast<yaal::u16_t const*>( mem_ ) );
-			yaal::u16_t const* p( yaal::find( m + after_,  m + size_, static_cast<yaal::u16_t>( value_ ) ) );
-			if ( p != ( m + size_ ) ) {
+			yaal::u16_t const* m( static_cast<yaal::u16_t const*>( mem_ ) + after_ );
+			yaal::u16_t const* e( m + size_ - after_ );
+			yaal::u16_t const* p( yaal::find( m, e, static_cast<yaal::u16_t>( value_ ) ) );
+			if ( p != e ) {
 				pos = p - m;
 			}
 		} break;
 		case ( 4 * 4 + 1 ): /* UCS-4 and UCS-1 */
 		case ( 4 * 4 + 2 ): /* UCS-4 and UCS-2 */
 		case ( 4 * 4 + 4 ): /* UCS-4 and UCS-4 */ {
-			yaal::u32_t const* m( static_cast<yaal::u32_t const*>( mem_ ) );
-			yaal::u32_t const* p( yaal::find( m + after_,  m + size_, value_ ) );
-			if ( p != ( m + size_ ) ) {
+			yaal::u32_t const* m( static_cast<yaal::u32_t const*>( mem_ ) + after_ );
+			yaal::u32_t const* e( m + size_ - after_ );
+			yaal::u32_t const* p( yaal::find( m, e, value_ ) );
+			if ( p != e ) {
 				pos = p - m;
 			}
 		} break;
 	}
 	return ( pos != HString::npos ? pos + after_ : pos );
+}
+
+int long find_last( void const* mem_, int rank_, int long before_, code_point_t value_ ) {
+	int valueRank( unicode::rank( value_ ) );
+	int long pos( HString::npos );
+	switch ( 4 * rank_ + valueRank ) {
+		case ( 4 * 1 + 1 ): /* UCS-1 and UCS-1 */ {
+			char const* m( static_cast<char const*>( mem_ ) );
+			char const* p( static_cast<char const*>( ::memrchr( m, static_cast<yaal::u8_t>( value_ ), static_cast<size_t>( before_ ) ) ) );
+			if ( p ) {
+				pos = p - m;
+			}
+		} break;
+		case ( 4 * 2 + 1 ): /* UCS-2 and UCS-1 */
+		case ( 4 * 2 + 2 ): /* UCS-2 and UCS-2 */ {
+			pos = find_last_impl( static_cast<yaal::u16_t const*>( mem_ ), before_, static_cast<yaal::u16_t>( value_ ) );
+		} break;
+		case ( 4 * 4 + 1 ): /* UCS-4 and UCS-1 */
+		case ( 4 * 4 + 2 ): /* UCS-4 and UCS-2 */
+		case ( 4 * 4 + 4 ): /* UCS-4 and UCS-4 */ {
+			pos = find_last_impl( static_cast<yaal::u32_t const*>( mem_ ), before_, value_ );
+		} break;
+	}
+	return ( pos );
 }
 
 inline int long kmpsearch( void const* haystack_, int haystackRank_, int long haystackSize_, int long after_, void const* needle_, int needleRank_, int long needleSize_ ) {
@@ -452,35 +524,103 @@ inline int long find_one_of( void const* mem_, int rank_, int long size_, int lo
 	return ( pos != HString::npos ? pos + after_ : pos );
 }
 
-inline int long find_last_one_of( void const* mem_, int rank_, int long size_, int long before_, void const* set_, int setRank_, int long setSize_ ) {
+inline int long find_last_one_of( void const* mem_, int rank_, int long before_, void const* set_, int setRank_, int long setSize_ ) {
 	int long pos( HString::npos );
 	switch ( 4 * rank_ + setRank_ ) {
 		case ( 4 * 1 + 1 ): /* UCS-1 and UCS-1 */ {
-			pos = find_last_one_of_impl( static_cast<yaal::u8_t const*>( mem_ ), size_ - before_, static_cast<yaal::u8_t const*>( set_ ), setSize_ );
+			pos = find_last_one_of_impl( static_cast<yaal::u8_t const*>( mem_ ), before_, static_cast<yaal::u8_t const*>( set_ ), setSize_ );
 		} break;
 		case ( 4 * 2 + 1 ): /* UCS-2 and UCS-1 */ {
-			pos = find_last_one_of_impl( static_cast<yaal::u16_t const*>( mem_ ), size_ - before_, static_cast<yaal::u8_t const*>( set_ ), setSize_ );
+			pos = find_last_one_of_impl( static_cast<yaal::u16_t const*>( mem_ ), before_, static_cast<yaal::u8_t const*>( set_ ), setSize_ );
 		} break;
 		case ( 4 * 4 + 1 ): /* UCS-4 and UCS-1 */ {
-			pos = find_last_one_of_impl( static_cast<yaal::u32_t const*>( mem_ ), size_ - before_, static_cast<yaal::u8_t const*>( set_ ), setSize_ );
+			pos = find_last_one_of_impl( static_cast<yaal::u32_t const*>( mem_ ), before_, static_cast<yaal::u8_t const*>( set_ ), setSize_ );
 		} break;
 		case ( 4 * 1 + 2 ): /* UCS-1 and UCS-2 */ {
-			pos = find_last_one_of_impl( static_cast<yaal::u8_t const*>( mem_ ), size_ - before_, static_cast<yaal::u16_t const*>( set_ ), setSize_ );
+			pos = find_last_one_of_impl( static_cast<yaal::u8_t const*>( mem_ ), before_, static_cast<yaal::u16_t const*>( set_ ), setSize_ );
 		} break;
 		case ( 4 * 2 + 2 ): /* UCS-2 and UCS-2 */ {
-			pos = find_last_one_of_impl( static_cast<yaal::u16_t const*>( mem_ ), size_ - before_, static_cast<yaal::u16_t const*>( set_ ), setSize_ );
+			pos = find_last_one_of_impl( static_cast<yaal::u16_t const*>( mem_ ), before_, static_cast<yaal::u16_t const*>( set_ ), setSize_ );
 		} break;
 		case ( 4 * 4 + 2 ): /* UCS-4 and UCS-2 */ {
-			pos = find_last_one_of_impl( static_cast<yaal::u32_t const*>( mem_ ), size_ - before_, static_cast<yaal::u16_t const*>( set_ ), setSize_ );
+			pos = find_last_one_of_impl( static_cast<yaal::u32_t const*>( mem_ ), before_, static_cast<yaal::u16_t const*>( set_ ), setSize_ );
 		} break;
 		case ( 4 * 1 + 4 ): /* UCS-1 and UCS-4 */ {
-			pos = find_last_one_of_impl( static_cast<yaal::u8_t const*>( mem_ ), size_ - before_, static_cast<yaal::u32_t const*>( set_ ), setSize_ );
+			pos = find_last_one_of_impl( static_cast<yaal::u8_t const*>( mem_ ), before_, static_cast<yaal::u32_t const*>( set_ ), setSize_ );
 		} break;
 		case ( 4 * 2 + 4 ): /* UCS-2 and UCS-4 */ {
-			pos = find_last_one_of_impl( static_cast<yaal::u16_t const*>( mem_ ), size_ - before_, static_cast<yaal::u32_t const*>( set_ ), setSize_ );
+			pos = find_last_one_of_impl( static_cast<yaal::u16_t const*>( mem_ ), before_, static_cast<yaal::u32_t const*>( set_ ), setSize_ );
 		} break;
 		case ( 4 * 4 + 4 ): /* UCS-4 and UCS-4 */ {
-			pos = find_last_one_of_impl( static_cast<yaal::u32_t const*>( mem_ ), size_ - before_, static_cast<yaal::u32_t const*>( set_ ), setSize_ );
+			pos = find_last_one_of_impl( static_cast<yaal::u32_t const*>( mem_ ), before_, static_cast<yaal::u32_t const*>( set_ ), setSize_ );
+		} break;
+	}
+	return ( pos );
+}
+
+inline int long find_other_than( void const* mem_, int rank_, int long size_, int long after_, void const* set_, int setRank_, int long setSize_ ) {
+	int long pos( HString::npos );
+	switch ( 4 * rank_ + setRank_ ) {
+		case ( 4 * 1 + 1 ): /* UCS-1 and UCS-1 */ {
+			pos = find_other_than_impl( static_cast<yaal::u8_t const*>( mem_ ) + after_, size_ - after_, static_cast<yaal::u8_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 2 + 1 ): /* UCS-2 and UCS-1 */ {
+			pos = find_other_than_impl( static_cast<yaal::u16_t const*>( mem_ ) + after_, size_ - after_, static_cast<yaal::u8_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 4 + 1 ): /* UCS-4 and UCS-1 */ {
+			pos = find_other_than_impl( static_cast<yaal::u32_t const*>( mem_ ) + after_, size_ - after_, static_cast<yaal::u8_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 1 + 2 ): /* UCS-1 and UCS-2 */ {
+			pos = find_other_than_impl( static_cast<yaal::u8_t const*>( mem_ ) + after_, size_ - after_, static_cast<yaal::u16_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 2 + 2 ): /* UCS-2 and UCS-2 */ {
+			pos = find_other_than_impl( static_cast<yaal::u16_t const*>( mem_ ) + after_, size_ - after_, static_cast<yaal::u16_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 4 + 2 ): /* UCS-4 and UCS-2 */ {
+			pos = find_other_than_impl( static_cast<yaal::u32_t const*>( mem_ ) + after_, size_ - after_, static_cast<yaal::u16_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 1 + 4 ): /* UCS-1 and UCS-4 */ {
+			pos = find_other_than_impl( static_cast<yaal::u8_t const*>( mem_ ) + after_, size_ - after_, static_cast<yaal::u32_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 2 + 4 ): /* UCS-2 and UCS-4 */ {
+			pos = find_other_than_impl( static_cast<yaal::u16_t const*>( mem_ ) + after_, size_ - after_, static_cast<yaal::u32_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 4 + 4 ): /* UCS-4 and UCS-4 */ {
+			pos = find_other_than_impl( static_cast<yaal::u32_t const*>( mem_ ) + after_, size_ - after_, static_cast<yaal::u32_t const*>( set_ ), setSize_ );
+		} break;
+	}
+	return ( pos != HString::npos ? pos + after_ : pos );
+}
+
+inline int long find_last_other_than( void const* mem_, int rank_, int long before_, void const* set_, int setRank_, int long setSize_ ) {
+	int long pos( HString::npos );
+	switch ( 4 * rank_ + setRank_ ) {
+		case ( 4 * 1 + 1 ): /* UCS-1 and UCS-1 */ {
+			pos = find_last_other_than_impl( static_cast<yaal::u8_t const*>( mem_ ), before_, static_cast<yaal::u8_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 2 + 1 ): /* UCS-2 and UCS-1 */ {
+			pos = find_last_other_than_impl( static_cast<yaal::u16_t const*>( mem_ ), before_, static_cast<yaal::u8_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 4 + 1 ): /* UCS-4 and UCS-1 */ {
+			pos = find_last_other_than_impl( static_cast<yaal::u32_t const*>( mem_ ), before_, static_cast<yaal::u8_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 1 + 2 ): /* UCS-1 and UCS-2 */ {
+			pos = find_last_other_than_impl( static_cast<yaal::u8_t const*>( mem_ ), before_, static_cast<yaal::u16_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 2 + 2 ): /* UCS-2 and UCS-2 */ {
+			pos = find_last_other_than_impl( static_cast<yaal::u16_t const*>( mem_ ), before_, static_cast<yaal::u16_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 4 + 2 ): /* UCS-4 and UCS-2 */ {
+			pos = find_last_other_than_impl( static_cast<yaal::u32_t const*>( mem_ ), before_, static_cast<yaal::u16_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 1 + 4 ): /* UCS-1 and UCS-4 */ {
+			pos = find_last_other_than_impl( static_cast<yaal::u8_t const*>( mem_ ), before_, static_cast<yaal::u32_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 2 + 4 ): /* UCS-2 and UCS-4 */ {
+			pos = find_last_other_than_impl( static_cast<yaal::u16_t const*>( mem_ ), before_, static_cast<yaal::u32_t const*>( set_ ), setSize_ );
+		} break;
+		case ( 4 * 4 + 4 ): /* UCS-4 and UCS-4 */ {
+			pos = find_last_other_than_impl( static_cast<yaal::u32_t const*>( mem_ ), before_, static_cast<yaal::u32_t const*>( set_ ), setSize_ );
 		} break;
 	}
 	return ( pos );
@@ -1460,7 +1600,7 @@ int long HString::find_last_one_of( HString const& set_, int long before_ ) cons
 	if ( ( before_ < 0 ) || set_.is_empty() ) {
 		return ( npos );
 	}
-	return ( adaptive::find_last_one_of( MEM, GET_RANK, GET_SIZE, before_, EXT_MEM( set_ ), EXT_GET_RANK( set_ ), EXT_GET_SIZE( set_ ) ) );
+	return ( adaptive::find_last_one_of( MEM, GET_RANK, before_, EXT_MEM( set_ ), EXT_GET_RANK( set_ ), EXT_GET_SIZE( set_ ) ) );
 	M_EPILOG
 }
 
@@ -1475,11 +1615,7 @@ int long HString::find_other_than( HString const& set_, int long after_ ) const 
 	if ( set_.is_empty() ) {
 		return ( after_ );
 	}
-	int long index = static_cast<int long>( ::std::strspn( MEM_off + after_, EXT_MEM_off( set_ ) ) );
-	if ( ( index + after_ ) >= GET_SIZE ) {
-		return ( npos );
-	}
-	return ( index + after_ );
+	return ( adaptive::find_other_than( MEM, GET_RANK, GET_SIZE, after_, EXT_MEM( set_ ), EXT_GET_RANK( set_ ), EXT_GET_SIZE( set_ ) ) );
 	M_EPILOG
 }
 
@@ -1494,11 +1630,8 @@ int long HString::reverse_find_other_than( HString const& set_, int long before_
 	if ( set_.is_empty() ) {
 		return ( before_ );
 	}
-	int long index( string_helper::strrnspn( MEM_off, EXT_MEM_off( set_ ), GET_SIZE - before_ ) );
-	if ( index >= ( GET_SIZE - before_ ) ) {
-		return ( npos );
-	}
-	return ( ( GET_SIZE - 1 ) - index );
+	int long pos( find_last_other_than( set_, ( GET_SIZE - before_ ) - 1 ) );
+	return ( pos != npos ? ( GET_SIZE - 1 ) - pos : pos );
 	M_EPILOG
 }
 
@@ -1513,11 +1646,7 @@ int long HString::find_last_other_than( HString const& set_, int long before_ ) 
 	if ( set_.is_empty() ) {
 		return ( before_ );
 	}
-	int long index( string_helper::strrnspn( MEM_off, EXT_MEM_off( set_ ), before_ + 1 ) );
-	if ( index > before_ ) {
-		return ( npos );
-	}
-	return ( index );
+	return ( adaptive::find_last_other_than( MEM, GET_RANK, before_, EXT_MEM( set_ ), EXT_GET_RANK( set_ ), EXT_GET_SIZE( set_ ) ) );
 	M_EPILOG
 }
 
@@ -1529,11 +1658,8 @@ int long HString::reverse_find( code_point_t char_, int long before_ ) const {
 	if ( before_ < 0 ) {
 		before_ = 0;
 	}
-	char const* str = static_cast<char const*>( ::memrchr( MEM_off, char_, static_cast<size_t>( GET_SIZE - before_ ) ) );
-	if ( ! str ) {
-		return ( npos );
-	}
-	return ( static_cast<int long>( ( GET_SIZE - 1 ) - ( str - MEM_off ) ) );
+	int long pos( find_last( char_, ( GET_SIZE - before_ ) - 1 ) );
+	return ( pos != npos ? ( GET_SIZE - 1 ) - pos : pos );
 	M_EPILOG
 }
 
@@ -1545,8 +1671,7 @@ int long HString::find_last( code_point_t char_, int long before_ ) const {
 	if ( before_ < 0 ) {
 		return ( npos );
 	}
-	char const* str( static_cast<char const*>( ::memrchr( MEM_off, char_, static_cast<size_t>( before_ + 1 ) ) ) );
-	return ( str ? static_cast<int long>( str - MEM_off ) : npos );
+	return ( adaptive::find_last( MEM, GET_RANK, before_, char_ ) );
 	M_EPILOG
 }
 
