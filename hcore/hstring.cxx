@@ -114,6 +114,33 @@ inline int long kmpsearch_impl( haystack_t const* str, int long lenstr, needle_t
 	return ( start );
 }
 
+template<typename haystack_t, typename needle_t>
+inline int long kmpsearch_last_impl( haystack_t const* str, int long lenstr, needle_t const* pat, int long lenpat ) {
+	HChunk KMPnext( chunk_size<int long>( lenpat + 1 ) );
+	int long* next( KMPnext.get<int long>() );
+	int long b( next[ 0 ] = -1 );
+	for ( int long i = 1; i <= lenpat; ++ i ) {
+		while ( ( b > -1 ) && ( pat[ lenpat - b - 1 ] != pat[ lenpat - i ] ) ) {
+			b = next[ b ];
+		}
+		++ b;
+		next[ i ] = ( pat[ lenpat - i - 1 ] == pat[ lenpat - b - 1 ] ) ? next[ b ] : b;
+	}
+	int long start( HString::npos );
+	b = 0;
+	for ( int long i = 0; i < lenstr; ++ i ) {
+		while ( ( b > -1 ) && ( static_cast<code_point_t>( pat[ lenpat - b - 1 ] ) != static_cast<code_point_t>( str[ lenstr - i - 1 ] ) ) ) {
+			b = next[ b ];
+		}
+		if ( ++ b < lenpat ) {
+			continue;
+		}
+		start = lenstr - i + b - 2;
+		break;
+	}
+	return ( start );
+}
+
 template<typename str_ucs_t, typename value_t>
 inline int long find_last_impl( str_ucs_t const* str_, int long size_, value_t v ) {
 	for ( int long i( size_ - 1 ); i >= 0; -- i ) {
@@ -488,6 +515,40 @@ inline int long kmpsearch( void const* haystack_, int haystackRank_, int long ha
 		} break;
 	}
 	return ( pos != HString::npos ? pos + after_ : pos );
+}
+
+inline int long kmpsearch_last( void const* haystack_, int haystackRank_, int long before_, void const* needle_, int needleRank_, int long needleSize_ ) {
+	int long pos( HString::npos );
+	switch ( 4 * haystackRank_ + needleRank_ ) {
+		case ( 4 * 1 + 1 ): /* UCS-1 and UCS-1 */ {
+			pos = kmpsearch_last_impl( static_cast<yaal::u8_t const*>( haystack_ ), before_, static_cast<yaal::u8_t const*>( needle_ ), needleSize_ );
+		} break;
+		case ( 4 * 2 + 1 ): /* UCS-2 and UCS-1 */ {
+			pos = kmpsearch_last_impl( static_cast<yaal::u16_t const*>( haystack_ ), before_, static_cast<yaal::u8_t const*>( needle_ ), needleSize_ );
+		} break;
+		case ( 4 * 4 + 1 ): /* UCS-4 and UCS-1 */ {
+			pos = kmpsearch_last_impl( static_cast<yaal::u32_t const*>( haystack_ ), before_, static_cast<yaal::u8_t const*>( needle_ ), needleSize_ );
+		} break;
+		case ( 4 * 1 + 2 ): /* UCS-1 and UCS-2 */ {
+			pos = kmpsearch_last_impl( static_cast<yaal::u8_t const*>( haystack_ ), before_, static_cast<yaal::u16_t const*>( needle_ ), needleSize_ );
+		} break;
+		case ( 4 * 2 + 2 ): /* UCS-2 and UCS-2 */ {
+			pos = kmpsearch_last_impl( static_cast<yaal::u16_t const*>( haystack_ ), before_, static_cast<yaal::u16_t const*>( needle_ ), needleSize_ );
+		} break;
+		case ( 4 * 4 + 2 ): /* UCS-4 and UCS-2 */ {
+			pos = kmpsearch_last_impl( static_cast<yaal::u32_t const*>( haystack_ ), before_, static_cast<yaal::u16_t const*>( needle_ ), needleSize_ );
+		} break;
+		case ( 4 * 1 + 4 ): /* UCS-1 and UCS-4 */ {
+			pos = kmpsearch_last_impl( static_cast<yaal::u8_t const*>( haystack_ ), before_, static_cast<yaal::u32_t const*>( needle_ ), needleSize_ );
+		} break;
+		case ( 4 * 2 + 4 ): /* UCS-2 and UCS-4 */ {
+			pos = kmpsearch_last_impl( static_cast<yaal::u16_t const*>( haystack_ ), before_, static_cast<yaal::u32_t const*>( needle_ ), needleSize_ );
+		} break;
+		case ( 4 * 4 + 4 ): /* UCS-4 and UCS-4 */ {
+			pos = kmpsearch_last_impl( static_cast<yaal::u32_t const*>( haystack_ ), before_, static_cast<yaal::u32_t const*>( needle_ ), needleSize_ );
+		} break;
+	}
+	return ( pos );
 }
 
 inline int long find_one_of( void const* mem_, int rank_, int long size_, int long after_, void const* set_, int setRank_, int long setSize_ ) {
@@ -1675,7 +1736,7 @@ int long HString::find_last( code_point_t char_, int long before_ ) const {
 	M_EPILOG
 }
 
-int long HString::find_last( HString const& str_, int long before_ ) const {
+int long HString::find_last( HString const& pattern_, int long before_ ) const {
 	M_PROLOG
 	if ( ( before_ == npos ) || ( before_ >= GET_SIZE ) ) {
 		before_ = GET_SIZE - 1;
@@ -1683,12 +1744,13 @@ int long HString::find_last( HString const& str_, int long before_ ) const {
 	if ( before_ < 0 ) {
 		return ( npos );
 	}
-	HString str( MEM_off, min( GET_SIZE, before_ + str_.get_length() ) );
-	HString pat( str_ );
-	yaal::reverse( EXT_MEM_off( str ), EXT_MEM_off( str ) + str.get_length() );
-	yaal::reverse( EXT_MEM_off( pat ), EXT_MEM_off( pat ) + pat.get_length() );
-	int long pos( str.find( pat ) );
-	return ( pos != npos ? str.get_length() - ( pos + str_.get_length() ) : npos );
+	int long patternLength( EXT_GET_SIZE( pattern_ ) );
+	if ( ( ! patternLength ) || ( patternLength > before_ ) ) {
+		return ( npos );
+	}
+	return (
+		adaptive::kmpsearch_last( MEM, GET_RANK, before_, EXT_MEM( pattern_ ), EXT_GET_RANK( pattern_ ), patternLength )
+	);
 	M_EPILOG
 }
 
