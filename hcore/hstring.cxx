@@ -44,6 +44,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore.hxx"
 #include "safe_int.hxx"
 #include "unicode.hxx"
+#include "htls.hxx"
 
 namespace yaal {
 
@@ -299,6 +300,34 @@ inline void copy_backward( void* dest_, int destRank_, int long destOffset_, voi
 				copy_n_cast_backward( static_cast<code_point_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u16_t*>( dest_ ) + destOffset_ );
 			} break;
 		}
+	}
+	return;
+}
+
+inline void move( void* dest_, int destRank_, int long destOffset_, void const* src_, int srcRank_, int long srcOffset_, int long size_ ) {
+	void* destStart( static_cast<char*>( dest_ ) + destOffset_ * destRank_ );
+	void* destEnd( static_cast<char*>( destStart ) + size_ * destRank_ );
+	void const* srcStart( static_cast<char const*>( src_ ) + srcOffset_ * srcRank_ );
+	void const* srcEnd( static_cast<char const*>( srcStart ) + size_ * srcRank_ );
+	if ( ( destEnd < srcStart ) || ( srcEnd < destStart ) ) {
+		copy( dest_, destRank_, destOffset_, src_, srcRank_, srcOffset_, size_ );
+	} else if ( srcStart == destStart ) {
+		if ( destRank_ <= srcRank_ ) {
+			copy( dest_, destRank_, destOffset_, src_, srcRank_, srcOffset_, size_ );
+		} else {
+			copy_backward( dest_, destRank_, destOffset_, src_, srcRank_, srcOffset_, size_ );
+		}
+	} else {
+		typedef HTLS<HChunk> cache_t;
+		static cache_t _cache_;
+		HChunk& cache( *_cache_ );
+		int long cacheSize( cache.get_size() );
+		if ( ( destRank_ * size_ ) > cacheSize ) {
+			cache.realloc( destRank_ * size_ );
+		}
+		void* mem( cache.raw() );
+		copy( mem, destRank_, 0, src_, srcRank_, srcOffset_, size_ );
+		copy( dest_, destRank_, destOffset_, mem, destRank_, 0, size_ );
 	}
 	return;
 }
@@ -1764,13 +1793,22 @@ HString& HString::replace( HString const& pattern_,
 	int long lenWith( with_.get_length() );
 	int long subWP( lenWith - lenPattern );
 	int long patPos( 0 );
+	int rank( GET_RANK );
+	int long oldSize( GET_SIZE );
+	int withRank( EXT_GET_RANK( with_ ) );
+	int newRank( max( rank, withRank ) );
 	if ( subWP == 0 ) { /* replacement is equal length to pattern */
+		bool needReserve( newRank > rank );
 		while ( ( patPos = find( pattern_, patPos ) ) != npos ) {
-			::std::strncpy( MEM_off + patPos, EXT_MEM_off( with_ ), static_cast<size_t>( lenWith ) );
+			if ( needReserve ) {
+				needReserve = false;
+				reserve( GET_SIZE, newRank );
+			}
+			adaptive::copy( MEM, newRank, patPos, EXT_MEM( with_ ), withRank, 0, lenWith );
 			patPos += lenPattern;
 		}
 	} else {
-		int long newSize( GET_SIZE );
+		int long newSize( oldSize );
 		while ( ( patPos = find( pattern_, patPos ) ) != npos ) {
 			newSize += subWP;
 			patPos += lenPattern;
@@ -1780,54 +1818,48 @@ HString& HString::replace( HString const& pattern_,
 		if ( subWP > 0 ) { /* replacement is longer than pattern */
 			s = *this;
 			s.materialize();
-			resize( newSize );
 			src = &s;
 		} else { /* replacement is shorter than pattern */
 			src = this;
+			rank = newRank;
 		}
+		reserve( oldSize, newRank );
 		int long oldLen( 0 );
 		int long newLen( 0 );
 		patPos = 0;
-		char const* with( EXT_MEM_off( with_ ) );
-		char const* srcBuf( EXT_MEM_off( (*src) ) );
-		char* buf( MEM_off );
+		void const* with( EXT_MEM( with_ ) );
+		void const* srcBuf( EXT_MEM( (*src) ) );
+		void* buf( MEM );
 		while ( ( patPos = src->find( pattern_, patPos ) ) != npos ) {
 			if ( patPos > oldLen ) {
-				::memmove( buf + newLen, srcBuf + oldLen, static_cast<size_t>( patPos - oldLen ) );
+				adaptive::move( buf, newRank, newLen, srcBuf, rank, oldLen, patPos - oldLen );
 				newLen += ( patPos - oldLen );
 			}
-			::memmove( buf + newLen, with, static_cast<size_t>( lenWith ) );
+			adaptive::copy( buf, newRank, newLen, with, withRank, 0, lenWith );
 			newLen += lenWith;
 			patPos += lenPattern;
 			oldLen = patPos;
 		}
 		if ( oldLen < GET_SIZE ) {
-			::std::memmove( buf + newLen, srcBuf + oldLen, static_cast<size_t>( ( GET_SIZE - oldLen ) ) );
+			adaptive::move( buf, newRank, newLen, srcBuf, rank, oldLen, GET_SIZE - oldLen );
 		}
 		SET_SIZE( newSize );
-		MEM_off[ newSize ] = 0;
 	}
 	return ( *this );
 	M_EPILOG
 }
 
-HString& HString::replace( int long pos_, int long size_, HString const& replacement ) {
+HString& HString::replace( int long pos_, int long size_, HString const& replacement_ ) {
 	M_PROLOG
-	return ( replace( pos_, size_, EXT_MEM_off( replacement ), replacement.get_length() ) );
+	return ( replace( pos_, size_, replacement_, 0, replacement_.get_length() ) );
 	M_EPILOG
 }
 
-HString& HString::replace( int long pos_, int long size_, HString const& replacement, int long offset_, int long len_ ) {
+void HString::replace_check( int long pos_, int long size_, int long offset_, int long len_ ) {
 	M_PROLOG
 	if ( offset_ < 0 ) {
 		M_THROW( _errMsgHString_[string_helper::BAD_OFFSET], offset_ );
 	}
-	return ( replace( pos_, size_, EXT_MEM_off( replacement ) + offset_, len_ ) );
-	M_EPILOG
-}
-
-HString& HString::replace( int long pos_, int long size_, char const* buffer_, int long len_ ) {
-	M_PROLOG
 	if ( size_ < 0 ) {
 		M_THROW( _errMsgHString_[string_helper::BAD_LENGTH], size_ );
 	}
@@ -1841,6 +1873,30 @@ HString& HString::replace( int long pos_, int long size_, char const* buffer_, i
 	if ( ( pos_ + size_ ) > oldSize ) {
 		M_THROW( _errMsgHString_[string_helper::OVERFLOW], pos_ + size_ );
 	}
+	return;
+	M_EPILOG
+}
+
+HString& HString::replace( int long pos_, int long size_, HString const& replacement_, int long offset_, int long len_ ) {
+	M_PROLOG
+	replace_check( pos_, size_, offset_, len_ );
+	int long oldSize( GET_SIZE );
+	int withRank( EXT_GET_RANK( replacement_ ) );
+	int rank( GET_RANK );
+	int long newSize( oldSize + ( len_ - size_ ) );
+	if ( ( withRank > rank ) || ( len_ > size_ ) ) {
+		resize( newSize, rank = max( rank, withRank ) );
+	}
+	adaptive::move( MEM, rank, pos_ + len_, MEM, rank, pos_ + size_, oldSize - ( pos_ + size_ ) );
+	adaptive::copy( MEM, rank, pos_, EXT_MEM( replacement_ ), withRank, offset_, len_ );
+	return ( *this );
+	M_EPILOG
+}
+
+HString& HString::replace( int long pos_, int long size_, char const* buffer_, int long len_ ) {
+	M_PROLOG
+	replace_check( pos_, size_, 0, len_ );
+	int long oldSize( GET_SIZE );
 	int long newSize( oldSize + ( len_ - size_ ) );
 	if ( len_ > size_ ) {
 		resize( newSize );
@@ -1848,7 +1904,6 @@ HString& HString::replace( int long pos_, int long size_, char const* buffer_, i
 	::memmove( MEM_off + pos_ + len_, MEM_off + pos_ + size_, static_cast<size_t>( oldSize - ( pos_ + size_ ) ) );
 	::memcpy( MEM_off + pos_, buffer_, static_cast<size_t>( len_ ) );
 	SET_SIZE( newSize );
-	MEM_off[ newSize ] = 0;
 	return ( *this );
 	M_EPILOG
 }
@@ -2225,7 +2280,7 @@ HString& HString::append( const_iterator first_, const_iterator last_ ) {
 	M_EPILOG
 }
 
-void HString::push_back( char character_ ) {
+void HString::push_back( code_point_t character_ ) {
 	M_PROLOG
 	append( 1, character_ );
 	return;
@@ -2239,7 +2294,7 @@ void HString::pop_back( void ) {
 	M_EPILOG
 }
 
-HString::HCharRef& HString::HCharRef::operator = ( char ch_ ) {
+HString::HCharRef& HString::HCharRef::operator = ( code_point_t ch_ ) {
 	M_PROLOG
 	_string.set_at( _index, ch_ );
 	return ( *this );
@@ -2249,8 +2304,8 @@ HString::HCharRef& HString::HCharRef::operator = ( char ch_ ) {
 void HString::HCharRef::swap( HCharRef& charRef_ ) {
 	M_PROLOG
 	if ( &charRef_ != this ) {
-		char l( _string[_index] );
-		char r( charRef_._string[charRef_._index] );
+		code_point_t l( _string[_index] );
+		code_point_t r( charRef_._string[charRef_._index] );
 		_string.set_at( _index, r );
 		charRef_._string.set_at( charRef_._index, l );
 	}
@@ -2284,10 +2339,10 @@ HUTF8String::HUTF8String( char const* str_ )
 	utf8::OUTF8StringStats s( utf8::get_string_stats( str_, static_cast<int long>( strlen( str_ ) ) ) );
 	if ( s._byteCount > 0 ) {
 		alloc( s._byteCount );
-		_meta->_used = s._byteCount;
+		_meta->_used = safe_int::cast<int>( s._byteCount );
 		_meta->_rank = static_cast<i8_t>( s._rank );
-		_byteCount = s._byteCount;
-		_characterCount = s._characterCount;
+		_byteCount = safe_int::cast<int>( s._byteCount );
+		_characterCount = safe_int::cast<int>( s._characterCount );
 		::strncpy( _ptr + sizeof ( OBufferMeta ), str_, static_cast<size_t>( s._byteCount ) );
 	}
 	return;
@@ -2457,7 +2512,7 @@ void HUTF8String::assign( HString::const_iterator it_, HString::const_iterator e
 		alloc( byteCount );
 		char* p( _ptr + sizeof ( OBufferMeta ) );
 		for ( HString::const_iterator it( it_ ); it != end_; ++ it ) {
-			encode( static_cast<u8_t>( *it ), p ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
+			utf8::encode( static_cast<u8_t>( *it ), p ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
 		}
 	}
 	if ( _ptr ) {
@@ -2723,7 +2778,7 @@ HUTF8String::HIterator& HUTF8String::HIterator::operator -= ( int long by_ ) {
 code_point_t HUTF8String::HIterator::operator * ( void ) const {
 	M_ASSERT( _ptr );
 	char const* ptr( _ptr + sizeof ( HUTF8String::OBufferMeta ) + _byteIndex );
-	return ( decode_forward( ptr ) );
+	return ( utf8::decode_forward( ptr ) );
 }
 
 #undef SET_ALLOC_BYTES
@@ -3001,16 +3056,16 @@ int long icasesearch( HString const& haystack_, HString const& needle_ ) {
 	int* next( KMPnext.get<int>() );
 	int b( next[ 0 ] = -1 );
 	for ( int long i( 1 ), needleLen( needle_.get_length() ); i <= needleLen; ++ i ) {
-		while ( ( b > -1 ) && ( tolower( needle_[ b ] ) != tolower( needle_[ i - 1 ] ) ) ) {
+		while ( ( b > -1 ) && ( tolower( static_cast<int>( needle_[ b ] ) ) != tolower( static_cast<int>( needle_[ i - 1 ] ) ) ) ) {
 			b = next[ b ];
 		}
 		++ b;
-		next[ i ] = ( tolower( needle_[ i ] ) == tolower( needle_[ b ] ) ) ? next[ b ] : b;
+		next[ i ] = ( tolower( static_cast<int>( needle_[ i ] ) ) == tolower( static_cast<int>( needle_[ b ] ) ) ) ? next[ b ] : b;
 	}
 	int long start( -1 );
 	b = 0;
 	for ( int long i( 0 ), haystackLen( haystack_.get_length() ); i < haystackLen; ++ i ) {
-		while ( ( b > -1 ) && ( tolower( needle_[ b ] ) != tolower( haystack_[i] ) ) ) {
+		while ( ( b > -1 ) && ( tolower( static_cast<int>( needle_[ b ] ) ) != tolower( static_cast<int>( haystack_[i] ) ) ) ) {
 			b = next[ b ];
 		}
 		if ( ++ b < needle_.get_length() ) {
@@ -3026,7 +3081,7 @@ int stricasecmp( HString const& left_, HString const& right_ ) {
 	int long len( min( left_.get_length(), right_.get_length() ) );
 	int diff( 0 );
 	for ( int long i( 0 ); ( diff == 0 ) && ( i < len ); ++ i ) {
-		diff = tolower( left_[i] ) - tolower( right_[i] );
+		diff = tolower( static_cast<int>( left_[i] ) ) - tolower( static_cast<int>( right_[i] ) );
 	}
 	return ( diff );
 }
