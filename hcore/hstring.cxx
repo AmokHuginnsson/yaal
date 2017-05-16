@@ -2029,22 +2029,20 @@ HString HString::right( int long fromEnd_ ) const {
 		return ( str );
 	}
 	int long newSize( min( fromEnd_, GET_SIZE ) );
-	str.resize( newSize );
-	::std::strncpy( EXT_MEM_off( str ), MEM_off + GET_SIZE - newSize, static_cast<size_t>( newSize ) );
-	EXT_MEM_off( str )[ newSize ] = 0;
-	EXT_SET_SIZE( str, newSize );
+	int rank( GET_RANK );
+	str.resize( newSize, rank );
+	adaptive::copy( EXT_MEM( str ), rank, 0, MEM, rank, GET_SIZE - newSize, newSize );
 	return ( str );
 	M_EPILOG
 }
 
 HString& HString::trim_left( HString const& set_ ) {
 	M_PROLOG
-	int cut( 0 );
-	while ( MEM_off[ cut ] && ( set_.find( MEM_off[ cut ] ) != npos ) ) {
-		++ cut;
-	}
-	if ( cut ) {
+	int long cut( find_other_than( set_ ) );
+	if ( cut != npos ) {
 		shift_left( cut );
+	} else {
+		clear();
 	}
 	return ( *this );
 	M_EPILOG
@@ -2052,15 +2050,12 @@ HString& HString::trim_left( HString const& set_ ) {
 
 HString& HString::trim_right( HString const& set_ ) {
 	M_PROLOG
-	int long cut( 0 );
-	while ( ( cut < GET_SIZE ) && ( set_.find( MEM_off[ GET_SIZE - ( cut + 1 ) ] ) != npos ) ) {
-		++ cut;
+	int long cut( find_last_other_than( set_ ) );
+	if ( cut != npos ) {
+		SET_SIZE( cut + 1 );
+	} else {
+		clear();
 	}
-	if ( cut ) {
-		SET_SIZE( GET_SIZE - cut );
-		MEM_off[ GET_SIZE ] = 0;
-	}
-	M_ASSERT( GET_SIZE >= 0 );
 	return ( *this );
 	M_EPILOG
 }
@@ -2079,9 +2074,12 @@ HString& HString::shift_left( int long shift_ ) {
 		M_THROW( "bad left shift length", shift_ );
 	}
 	if ( shift_ ) {
-		if ( shift_ < GET_SIZE ) {
-			SET_SIZE( GET_SIZE - shift_ );
-			::std::memmove( MEM_off, MEM_off + shift_, static_cast<size_t>( GET_SIZE + 1 ) );
+		int long oldSize( GET_SIZE );
+		if ( shift_ < oldSize ) {
+			int rank( GET_RANK );
+			int long newSize( oldSize - shift_ );
+			adaptive::move( MEM, rank, 0, MEM, rank, shift_, newSize );
+			SET_SIZE( newSize );
 		} else {
 			clear();
 		}
@@ -2090,7 +2088,7 @@ HString& HString::shift_left( int long shift_ ) {
 	M_EPILOG
 }
 
-HString& HString::shift_right( int long shift_, char const filler_ ) {
+HString& HString::shift_right( int long shift_, code_point_t filler_ ) {
 	M_PROLOG
 	if ( shift_ < 0 ) {
 		M_THROW( "bad right shift length", shift_ );
@@ -2098,14 +2096,14 @@ HString& HString::shift_right( int long shift_, char const filler_ ) {
 	if ( shift_ ) {
 		int long oldSize( GET_SIZE );
 		int long newSize( oldSize + shift_ );
-		resize( newSize );
-		::std::memmove( MEM_off + shift_, MEM_off, static_cast<size_t>( oldSize + 1 ) );
+		int rank( max( GET_RANK, unicode::rank( filler_ ) ) );
+		resize( newSize, rank );
+		adaptive::move( MEM, rank, shift_, MEM, rank, 0, oldSize );
 		/* using SET_SIZE twice is not a bug or mistake,
 		 * fill() depends on size and modifies it
 		 * so it must have new size before and we need to
 		 * undo fill()'s size modification after fill() is done.
 		 */
-		SET_SIZE( newSize );
 		fill( filler_, 0, shift_ );
 		SET_SIZE( newSize );
 	}
@@ -2113,7 +2111,7 @@ HString& HString::shift_right( int long shift_, char const filler_ ) {
 	M_EPILOG
 }
 
-HString& HString::fill( char filler_, int long offset_, int long count_ ) {
+HString& HString::fill( code_point_t filler_, int long offset_, int long count_ ) {
 	M_PROLOG
 	if ( count_ == npos ) {
 		count_ = ( GET_SIZE - offset_ );
@@ -2125,26 +2123,23 @@ HString& HString::fill( char filler_, int long offset_, int long count_ ) {
 		M_THROW( _errMsgHString_[string_helper::BAD_OFFSET], offset_ );
 	}
 	if ( filler_ ) {
-		if ( ( count_ + offset_ ) > GET_SIZE ) {
-			resize( count_ + offset_ );
-			SET_SIZE( count_ + offset_ );
-		}
-		::std::memset( MEM_off + offset_, filler_, static_cast<size_t>( count_ ) );
+		int rank( max( GET_RANK, unicode::rank( filler_ ) ) );
+		int long newSize( max( count_ + offset_, GET_SIZE ) );
+		resize( newSize, rank );
+		adaptive::fill( MEM, rank, offset_, count_, filler_ );
 	} else {
 		SET_SIZE( offset_ );
 	}
-	MEM_off[ GET_SIZE ] = 0;
 	return ( *this );
 	M_EPILOG
 }
 
-HString& HString::fillz( char filler_, int long offset_, int long count_ ) {
+HString& HString::fillz( code_point_t filler_, int long offset_, int long count_ ) {
 	M_PROLOG
 	fill( filler_, offset_, count_ );
 	if ( count_ == npos ) {
 		count_ = ( GET_SIZE - offset_ );
 	}
-	MEM_off[ count_ + offset_ ] = 0;
 	SET_SIZE( count_ + offset_ );
 	return ( *this );
 	M_EPILOG
@@ -2163,9 +2158,10 @@ HString& HString::erase( int long from_, int long length_ ) {
 		length_ = GET_SIZE - from_;
 	}
 	if ( ( length_ > 0 ) && ( from_ < GET_SIZE ) ) {
-		::std::memmove( MEM_off + from_, MEM_off + from_ + length_, static_cast<size_t>( GET_SIZE - ( from_ + length_ ) ) );
+		int rank( GET_RANK );
+		int long oldSize( GET_SIZE );
+		adaptive::move( MEM, rank, from_, MEM, rank, from_ + length_, oldSize - ( from_ + length_ ) );
 		SET_SIZE( GET_SIZE - length_ );
-		MEM_off[ GET_SIZE ] = 0;
 	}
 	return ( *this );
 	M_EPILOG
@@ -2219,19 +2215,18 @@ HString& HString::insert( int long from_, char const* chunk_, int long length_ )
 	M_EPILOG
 }
 
-HString& HString::insert( int long from_, int long length_, char char_ ) {
+HString& HString::insert( int long from_, int long length_, code_point_t char_ ) {
 	M_PROLOG
 	insert( from_, length_ );
-	if ( ( from_ + length_ ) > 0 )
+	if ( ( from_ + length_ ) > 0 ) {
 		fill( char_, from_, length_ );
+	}
 	return ( *this );
 	M_EPILOG
 }
 
 HString& HString::append( HString const& string_ ) {
 	M_PROLOG
-	if ( otherSize ) {
-	}
 	return ( append( string_, 0 ) );
 	M_EPILOG
 }
@@ -2264,7 +2259,7 @@ HString& HString::append( HString const& string_, int long from_, int long len_ 
 	M_EPILOG
 }
 
-HString& HString::append( int long count_, char val_ ) {
+HString& HString::append( int long count_, code_point_t val_ ) {
 	M_PROLOG
 	if ( val_ ) {
 		int long oldSize( GET_SIZE );

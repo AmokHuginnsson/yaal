@@ -34,6 +34,11 @@ Copyright:
 #include "hcore/iterator.hxx"
 #include "hcore/hbitflag.hxx"
 
+/* *FIXME* *TODO* Rename `average` -> `arithmetic_mean` */
+/* *TODO* Add `mode`. */
+/* *TODO* Add `interquartile_range`. */
+/* *TODO* Add `mean_absolute_deviation`. */
+
 namespace yaal {
 
 namespace tools {
