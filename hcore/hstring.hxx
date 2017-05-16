@@ -716,7 +716,7 @@ public:
 	 */
 	void pop_back( void );
 private:
-	void from_utf8( int long, char const*, int long );
+	void from_utf8( int long, int long, char const*, int long );
 	void substr( HString&, int long, int long ) const;
 	void resize( int long capacity, int rank );
 	void replace_check( int long, int long, int long, int long );

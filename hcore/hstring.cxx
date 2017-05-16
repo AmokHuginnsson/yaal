@@ -71,9 +71,18 @@ int long strrnspn( char const*, char const*, int long );
 namespace {
 
 template<typename iterator_t, typename U>
-inline void copy_n_cast( iterator_t src_, int long size_, U* dst_ ) {
+inline void copy_n_safe_cast( iterator_t src_, int long size_, U* dst_ ) {
 	for ( int long i( 0 ); i < size_; ++ i, ++ src_, ++ dst_ ) {
 		*dst_ = safe_int::cast<U>( *src_ );
+	}
+	return;
+}
+
+template<typename data_t, typename transform_t>
+inline void transform_n_cast( data_t* data_, int long size_, transform_t transform_ ) {
+	typedef typename trait::argument_type<transform_t, 0>::type arg_t;
+	for ( int long i( 0 ); i < size_; ++ i, ++ data_ ) {
+		*data_ = static_cast<data_t>( transform_( static_cast<arg_t>( *data_ ) ) );
 	}
 	return;
 }
@@ -263,13 +272,13 @@ inline void copy( void* dest_, int destRank_, int long destOffset_, void const* 
 				yaal::copy_n( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<code_point_t*>( dest_ ) + destOffset_ );
 			} break;
 			case ( 4 * 1 + 2 ): /* UCS-2 to UCS-1 */ {
-				copy_n_cast( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
+				copy_n_safe_cast( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
 			} break;
 			case ( 4 * 1 + 4 ): /* UCS-4 to UCS-1 */ {
-				copy_n_cast( static_cast<code_point_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
+				copy_n_safe_cast( static_cast<code_point_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
 			} break;
 			case ( 4 * 2 + 4 ): /* UCS-4 to UCS-2 */ {
-				copy_n_cast( static_cast<code_point_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u16_t*>( dest_ ) + destOffset_ );
+				copy_n_safe_cast( static_cast<code_point_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u16_t*>( dest_ ) + destOffset_ );
 			} break;
 		}
 	}
@@ -716,6 +725,22 @@ inline int long find_last_other_than( void const* mem_, int rank_, int long befo
 	return ( pos );
 }
 
+typedef int ( *transformer_t )( int );
+inline void transform( void* mem_, int rank_, int long size_, transformer_t mod_ ) {
+	switch ( rank_ ) {
+		case ( 1 ): {
+			transform_n_cast( static_cast<yaal::u8_t*>( mem_ ), size_, mod_ );
+		} break;
+		case ( 2 ): {
+			transform_n_cast( static_cast<yaal::u16_t*>( mem_ ), size_, mod_ );
+		} break;
+		case ( 4 ): {
+			transform_n_cast( static_cast<yaal::u32_t*>( mem_ ), size_, mod_ );
+		} break;
+	}
+	return;
+}
+
 }
 
 namespace utf8 {
@@ -879,7 +904,7 @@ static yaal::u8_t const RANK_BIT_MASK =  meta::obinary<001100000>::value;
 #undef MEM
 #define MEM ( IS_INPLACE ? _mem : _ptr )
 #undef EXT_MEM
-#define EXT_MEM( base ) ( EXT_IS_INPLACE( base ) ? static_cast<void const*>( base._mem ) : base._ptr )
+#define EXT_MEM( base ) ( EXT_IS_INPLACE( base ) ? base._mem : base._ptr )
 #undef GET_SIZE
 #define GET_SIZE ( IS_INPLACE ? _mem[ ALLOC_FLAG_INDEX ] : static_cast<int long>( _len[ 1 ] ) )
 #undef EXT_GET_SIZE
@@ -1064,7 +1089,7 @@ HString::HString( HUTF8String const& str_ )
 			::memcpy( MEM, str_.raw(), static_cast<size_t>( newSize ) );
 		} break;
 		case ( 2 ): {
-			copy_n_cast( str_.begin(), newSize, static_cast<yaal::u16_t*>( MEM ) );
+			copy_n_safe_cast( str_.begin(), newSize, static_cast<yaal::u16_t*>( MEM ) );
 		} break;
 		case ( 4 ): {
 			yaal::copy_n( str_.begin(), newSize, static_cast<yaal::u32_t*>( MEM ) );
@@ -1074,23 +1099,25 @@ HString::HString( HUTF8String const& str_ )
 	M_EPILOG
 }
 
-void HString::from_utf8( int long offset_, const char* str_, int long size_ ) {
+void HString::from_utf8( int long offset_, int long onto_, const char* str_, int long size_ ) {
 	M_PROLOG
-	if ( size_ > 0 ) {
-		utf8::OUTF8StringStats s( utf8::get_string_stats( str_, size_ ) );
-		int rank( max( GET_RANK, s._rank ) );
-		resize( offset_ + s._characterCount, rank );
-		switch ( rank ) {
-			case ( 1 ): {
-				utf8::decode( static_cast<yaal::u8_t*>( MEM ) + offset_, str_, s._characterCount );
-			} break;
-			case ( 2 ): {
-				utf8::decode( static_cast<yaal::u16_t*>( MEM ) + offset_, str_, s._characterCount );
-			} break;
-			case ( 4 ): {
-				utf8::decode( static_cast<yaal::u32_t*>( MEM ) + offset_, str_, s._characterCount );
-			} break;
-		}
+	M_ASSERT( offset_ < size_ );
+	int long oldSize( GET_SIZE );
+	utf8::OUTF8StringStats s( utf8::get_string_stats( str_, size_ ) );
+	int rank( max( GET_RANK, s._rank ) );
+	int long newSize( ( oldSize - onto_ ) + s._characterCount );
+	resize( newSize, rank );
+	adaptive::move( MEM, rank, offset_ + s._characterCount, MEM, rank, offset_ + onto_, ( oldSize - offset_ ) - onto_ );
+	switch ( rank ) {
+		case ( 1 ): {
+			utf8::decode( static_cast<yaal::u8_t*>( MEM ) + offset_, str_, s._characterCount );
+		} break;
+		case ( 2 ): {
+			utf8::decode( static_cast<yaal::u16_t*>( MEM ) + offset_, str_, s._characterCount );
+		} break;
+		case ( 4 ): {
+			utf8::decode( static_cast<yaal::u32_t*>( MEM ) + offset_, str_, s._characterCount );
+		} break;
 	}
 	return;
 	M_EPILOG
@@ -1588,7 +1615,7 @@ HString& HString::assign( char const* data_, int long length_ ) {
 		M_THROW( _errMsgHString_[ string_helper::BAD_LENGTH ], length_ );
 	}
 	int long len( static_cast<int long>( ::strnlen( data_, static_cast<size_t>( length_ ) ) ) );
-	from_utf8( 0, data_, len );
+	from_utf8( 0, 0, data_, len );
 	return ( *this );
 	M_EPILOG
 }
@@ -1896,55 +1923,49 @@ HString& HString::replace( int long pos_, int long size_, HString const& replace
 HString& HString::replace( int long pos_, int long size_, char const* buffer_, int long len_ ) {
 	M_PROLOG
 	replace_check( pos_, size_, 0, len_ );
-	int long oldSize( GET_SIZE );
-	int long newSize( oldSize + ( len_ - size_ ) );
-	if ( len_ > size_ ) {
-		resize( newSize );
-	}
-	::memmove( MEM_off + pos_ + len_, MEM_off + pos_ + size_, static_cast<size_t>( oldSize - ( pos_ + size_ ) ) );
-	::memcpy( MEM_off + pos_, buffer_, static_cast<size_t>( len_ ) );
-	SET_SIZE( newSize );
+	from_utf8( pos_, size_, buffer_, len_ );
 	return ( *this );
 	M_EPILOG
 }
 
-HString& HString::replace( iterator first_, iterator last_, HString const& replacement ) {
+HString& HString::replace( iterator first_, iterator last_, HString const& replacement_ ) {
 	M_PROLOG
 	M_ENSURE( first_._owner == this );
 	M_ENSURE( last_._owner == this );
-	return ( replace( first_._index, last_ - first_, replacement ) );
+	return ( replace( first_._index, last_ - first_, replacement_ ) );
 	M_EPILOG
 }
 
 HString& HString::upper( void ) {
 	M_PROLOG
-	for ( int long ctr( 0 ), SIZE( GET_SIZE ); ctr < SIZE; ++ ctr ) {
-		MEM_off[ ctr ] = static_cast<char>( ::std::toupper( MEM_off[ ctr ] ) );
-	}
+	adaptive::transform( MEM, GET_RANK, GET_SIZE, &::std::toupper );
 	return ( *this );
 	M_EPILOG
 }
 
 HString& HString::lower( void ) {
 	M_PROLOG
-	for ( int long ctr( 0 ), SIZE( GET_SIZE ); ctr < SIZE; ++ ctr ) {
-		MEM_off[ ctr ] = static_cast<char>( ::std::tolower( MEM_off[ ctr ] ) );
-	}
+	adaptive::transform( MEM, GET_RANK, GET_SIZE, &::std::tolower );
 	return ( *this );
 	M_EPILOG
 }
 
+namespace {
+int case_swap( int char_ ) {
+	int c( 0 );
+	int u( toupper( char_ ) );
+	if ( u != char_ ) {
+		c = u;
+	} else {
+		c = tolower( char_ );
+	}
+	return ( c );
+}
+}
+
 HString& HString::reverse( void ) {
 	M_PROLOG
-	char char_;
-	for ( int long ctr( 0 ), SIZE( GET_SIZE ); ctr < SIZE; ++ ctr ) {
-		char_ = static_cast<char>( ::std::toupper( MEM_off[ ctr ] ) );
-		if ( char_ == MEM_off[ ctr ] ) {
-			MEM_off[ ctr ] = static_cast<char>( ::std::tolower( MEM_off[ ctr ] ) );
-		} else {
-			MEM_off[ ctr ] = char_;
-		}
-	}
+	adaptive::transform( MEM, GET_RANK, GET_SIZE, &case_swap );
 	return ( *this );
 	M_EPILOG
 }
@@ -1963,10 +1984,9 @@ void HString::substr( HString& dest_, int long from_, int long length_ ) const {
 		if ( ( newSize + from_ ) > GET_SIZE ) {
 			newSize = GET_SIZE - from_;
 		}
-		dest_.resize( newSize );
-		::std::strncpy( EXT_MEM_off( dest_ ), MEM_off + from_, static_cast<size_t>( newSize ) );
-		EXT_MEM_off( dest_ )[ newSize ] = 0;
-		EXT_SET_SIZE( dest_, newSize );
+		int rank( GET_RANK );
+		dest_.resize( newSize, rank );
+		adaptive::copy( EXT_MEM( dest_ ), rank, 0, MEM, rank, from_, newSize );
 	}
 	return;
 	M_EPILOG
@@ -1987,10 +2007,9 @@ HString HString::left( int long to_ ) const {
 		return ( str );
 	}
 	int long newSize( min( to_, GET_SIZE ) );
-	str.resize( newSize );
-	::std::strncpy( EXT_MEM_off( str ), MEM_off, static_cast<size_t>( newSize ) );
-	EXT_MEM_off( str )[ newSize ] = 0;
-	EXT_SET_SIZE( str, newSize );
+	int rank( GET_RANK );
+	str.resize( newSize, rank );
+	adaptive::copy( EXT_MEM( str ), rank, 0, MEM, rank, 0, newSize );
 	return ( str );
 	M_EPILOG
 }
