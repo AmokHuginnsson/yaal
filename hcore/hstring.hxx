@@ -545,6 +545,15 @@ public:
 	 * \return Self.
 	 */
 	HString& replace( int long pos_, int long size_, char const* buffer_, int long len_ );
+	/*! \brief Replace part of a this string with supplied character buffer.
+	 *
+	 * \param pos_ - where replaced part starts.
+	 * \param size_ - size of replaced part.
+	 * \param count_ - length of replacement.
+	 * \param value_ - copies of this value shall be used of replacement.
+	 * \return Self.
+	 */
+	HString& replace( int long pos_, int long size_, int long count_, code_point_t value_ );
 	/*! \brief Replace range in this string with supplied string.
 	 *
 	 * \param first_ - where replaced range starts.
@@ -652,14 +661,15 @@ public:
 	HString& insert( int long pos, HString const& str );
 	/*! \brief Insert given string at given position.
 	 *
-	 * \param pos - position where given string has to be inserted.
-	 * \param len - length of string to be inserted.
-	 * \param str - string to be inserted.
+	 * \param pos_ - position where given string has to be inserted.
+	 * \param str_ - a (sub-) string to be inserted.
+	 * \param offset_ - an offset of a substring to insert.
+	 * \param len_ - length of a (sub-) string to be inserted.
 	 * \return Self.
 	 *
 	 * \pre \e str real length must not be smaller than \e len.
 	 */
-	HString& insert( int long pos, int long len, char const* str = nullptr );
+	HString& insert( int long pos_, HString const& str_, int long offset_, int long len_ = npos );
 	/*! \brief Insert given string at given position.
 	 *
 	 * \param pos - position where given string has to be inserted.
@@ -693,6 +703,12 @@ public:
 	 * \return Self.
 	 */
 	HString& append( HString const&, int long idx_, int long len_ = npos );
+	/*! \brief Append n copies of value at end of the string.
+	 *
+	 * \param position - where put inserted block.
+	 * \param n - number of bytes to insert.
+	 * \param value - copies of this value shall be inserted.
+	 */
 	HString& append( int long count_, code_point_t val_ );
 	/*! \brief Append new data from buffer to already existing data in this string.
 	 *

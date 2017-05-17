@@ -913,14 +913,18 @@ static yaal::u8_t const RANK_BIT_MASK =  meta::obinary<001100000>::value;
 #define SET_SIZE( size ) \
 	do { \
 		( IS_INPLACE ? _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( size ) : _len[ 1 ] = ( size ) ); \
+		if ( ( size ) == 0 ) { \
+			_mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( ( _mem[ ALLOC_FLAG_INDEX ] & ~RANK_BIT_MASK ) | ( 1 << 5 ) ); \
+		} \
 	} while ( 0 )
 #undef EXT_SET_SIZE
 #define EXT_SET_SIZE( base, size ) \
 	do { \
 		( EXT_IS_INPLACE( base ) ? base._mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( size ) : base._len[ 1 ] = ( size ) ); \
+		if ( ( size ) == 0 ) { \
+			base._mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( ( base._mem[ ALLOC_FLAG_INDEX ] & ~RANK_BIT_MASK ) | ( 1 << 5 ) ); \
+		} \
 	} while ( 0 )
-#undef SET_RANK
-#define SET_RANK( rank ) ( _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( ( _mem[ ALLOC_FLAG_INDEX ] & ~RANK_BIT_MASK ) | ( ( rank ) << 5 ) ) )
 #undef GET_ALLOC_BYTES
 #undef SET_ALLOC_BYTES
 #if TARGET_CPU_BITS >= 64
@@ -1528,7 +1532,6 @@ bool HString::operator ! ( void ) const {
 
 void HString::clear( void ) {
 	SET_SIZE( 0 );
-	SET_RANK( 1 );
 	return;
 }
 
@@ -1920,6 +1923,22 @@ HString& HString::replace( int long pos_, int long size_, HString const& replace
 	M_EPILOG
 }
 
+HString& HString::replace( int long pos_, int long size_, int long count_, code_point_t value_ ) {
+	M_PROLOG
+	replace_check( pos_, size_, 0, 0 );
+	int long oldSize( GET_SIZE );
+	int withRank( unicode::rank( value_ ) );
+	int rank( GET_RANK );
+	int long newSize( oldSize + ( count_ - size_ ) );
+	if ( ( withRank > rank ) || ( count_ > size_ ) ) {
+		resize( newSize, rank = max( rank, withRank ) );
+	}
+	adaptive::move( MEM, rank, pos_ + count_, MEM, rank, pos_ + size_, oldSize - ( pos_ + size_ ) );
+	adaptive::fill( MEM, rank, pos_, count_, value_ );
+	return ( *this );
+	M_EPILOG
+}
+
 HString& HString::replace( int long pos_, int long size_, char const* buffer_, int long len_ ) {
 	M_PROLOG
 	replace_check( pos_, size_, 0, len_ );
@@ -2167,51 +2186,27 @@ HString& HString::erase( int long from_, int long length_ ) {
 	M_EPILOG
 }
 
+HString& HString::insert( int long from_, HString const& str_, int long offset_, int long length_ ) {
+	M_PROLOG
+	return ( replace( from_, 0, str_, offset_, length_ ) );
+	M_EPILOG
+}
+
 HString& HString::insert( int long from_, HString const& str_ ) {
 	M_PROLOG
-	return ( insert( from_, str_.get_length(), EXT_MEM_off( str_ ) ) );
-	M_EPILOG
-}
-
-HString& HString::insert( int long from_, int long length_, char const* chunk_ ) {
-	M_PROLOG
-	if ( from_ < 0 ) {
-		if ( chunk_ ) {
-			if ( ( -from_ ) > static_cast<int long>( ::strnlen( chunk_, static_cast<size_t>( length_ ) ) ) ) {
-				M_THROW( "negative offset caused chunk overflow", from_ );
-			}
-			chunk_ += -from_;
-		}
-		length_ += from_;
-		from_ = 0;
-	}
-	if ( ( length_ > 0 ) && ( from_ <= GET_SIZE ) ) {
-		int long chunkLen = chunk_ ? static_cast<int long>( ::strnlen( chunk_, static_cast<size_t>( length_ ) ) ) : 0;
-		if ( chunk_ && ( length_ > chunkLen ) ) {
-			M_THROW( "length too big for this chunk (by)", length_ - chunkLen );
-		}
-		int long oldSize( GET_SIZE );
-		int long newSize( oldSize + length_ );
-		resize( newSize );
-		::std::memmove( MEM_off + from_ + length_, MEM_off + from_, static_cast<size_t>( ( oldSize + 1 ) - from_ ) );
-		if ( chunk_ ) {
-			::std::strncpy( MEM_off + from_, chunk_, static_cast<size_t>( length_ ) );
-		}
-		SET_SIZE( newSize );
-	}
-	return ( *this );
-	M_EPILOG
-}
-
-HString& HString::insert( int long from_, char const* chunk_ ) {
-	M_PROLOG
-	return ( insert( from_, static_cast<int long>( ::strlen( chunk_ ) ), chunk_ ) );
+	return ( insert( from_, str_, 0, str_.get_length() ) );
 	M_EPILOG
 }
 
 HString& HString::insert( int long from_, char const* chunk_, int long length_ ) {
 	M_PROLOG
-	return ( insert( from_, length_, chunk_ ) );
+	return ( replace( from_, 0, chunk_, length_ ) );
+	M_EPILOG
+}
+
+HString& HString::insert( int long from_, char const* chunk_ ) {
+	M_PROLOG
+	return ( insert( from_, chunk_, static_cast<int long>( ::strlen( chunk_ ) ) ) );
 	M_EPILOG
 }
 
@@ -2233,64 +2228,25 @@ HString& HString::append( HString const& string_ ) {
 
 HString& HString::append( HString const& string_, int long from_, int long len_ ) {
 	M_PROLOG
-	if ( len_ == npos ) {
-		len_ = MAX_STRING_LENGTH;
-	}
-	if ( len_ < 0 ) {
-		M_THROW( _errMsgHString_[string_helper::BAD_LENGTH], len_ );
-	}
-	if ( from_ < 0 ) {
-		M_THROW( _errMsgHString_[string_helper::BAD_OFFSET], from_ );
-	}
-	int long otherSize( string_.get_length() );
-	if ( ( from_ + len_ ) > otherSize ) {
-		len_ = otherSize - from_;
-	}
-	if ( len_ > 0 ) {
-		int long oldSize( GET_SIZE );
-		int long newSize( oldSize + otherSize );
-		int otherRank( EXT_GET_RANK( string_ ) );
-		int rank( max( GET_RANK, otherRank ) );
-		resize( newSize, rank );
-		adaptive::copy( MEM, rank, oldSize, EXT_MEM( string_ ), otherRank, from_, len_ );
-		SET_SIZE( newSize );
-	}
-	return ( *this );
+	return ( replace( GET_SIZE, 0, string_, from_, len_ ) );
 	M_EPILOG
 }
 
 HString& HString::append( int long count_, code_point_t val_ ) {
 	M_PROLOG
-	if ( val_ ) {
-		int long oldSize( GET_SIZE );
-		int long newSize( oldSize + count_ );
-		resize( newSize );
-		::memset( MEM_off + oldSize, val_, static_cast<size_t>( count_ ) );
-		MEM_off[ newSize ] = 0;
-		SET_SIZE( newSize );
-	}
-	return ( *this );
+	return ( replace( GET_SIZE, 0, count_, val_ ) );
 	M_EPILOG
 }
 
 HString& HString::append( char const* buf_, int long len_ ) {
 	M_PROLOG
-	M_ASSERT( len_ >= 0 );
-	if ( len_ > 0 ) {
-		int long oldSize( GET_SIZE );
-		int long newSize( oldSize + len_ );
-		resize( newSize );
-		::memmove( MEM_off + oldSize, buf_, static_cast<size_t>( len_ ) );
-		MEM_off[ newSize ] = 0;
-		SET_SIZE( newSize );
-	}
-	return ( *this );
+	return ( replace( GET_SIZE, 0, buf_, len_ ) );
 	M_EPILOG
 }
 
 HString& HString::append( const_iterator first_, const_iterator last_ ) {
 	M_PROLOG
-	return ( append( EXT_MEM_off( (*first_._owner) ) + first_._index, static_cast<int long>( last_ - first_ ) ) );
+	return ( append( (*first_._owner), first_._index, last_ - first_ ) );
 	M_EPILOG
 }
 
