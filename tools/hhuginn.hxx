@@ -709,7 +709,7 @@ class HHuginn::HCharacter : public HHuginn::HValue {
 public:
 	typedef HHuginn::HCharacter this_type;
 	typedef HHuginn::HValue base_type;
-	typedef char value_type;
+	typedef yaal::code_point_t value_type;
 private:
 	value_type _value;
 public:

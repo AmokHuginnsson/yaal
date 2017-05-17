@@ -62,12 +62,15 @@ namespace tools {
 
 namespace util {
 
-char _transTableStripPL_[ 256 ];
+code_point_translation_t _transTableStripPL_;
 
 HString& usun_ogonki( HString& string_ ) {
 	M_PROLOG
 	for ( HString::HIterator it( string_.begin() ), end( string_.end() ); it != end; ++ it ) {
-		*it = _transTableStripPL_[ static_cast<char unsigned>( *it ) ];
+		code_point_translation_t::const_iterator t( _transTableStripPL_.find( *it ) );
+		if ( t != _transTableStripPL_.end() ) {
+			*it = t->second;
+		}
 	}
 	return ( string_ );
 	M_EPILOG
@@ -362,7 +365,7 @@ void show_help( OOptionInfo const& info, HStreamInterface& out_ ) {
 				out_ << desc.left( eol ) << "\n";
 				desc.shift_left( eol );
 				desc.trim_left();
-				desc.insert( 0, 2, "  " );
+				desc.insert( 0, "  ", 2 );
 				if ( i < ( COUNT - 1 ) ) {
 					HProgramOptionsHandler::HOption const& n = opts[ i + 1 ];
 					if ( ( ! o.long_form().is_empty() && ! n.long_form().is_empty() && ( o.long_form() == n.long_form() ) )

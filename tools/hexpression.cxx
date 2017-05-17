@@ -27,6 +27,7 @@ Copyright:
 #include <cmath>
 #include <cstring>
 #include <cstdlib>
+#include <cctype>
 #include <limits>
 #include <libintl.h>
 
@@ -454,10 +455,14 @@ bool HExpression::translate( HString const& formula_ ) {
 				_index = realIndex;
 				return ( false );
 			}
-		} else {
-			formula[ realIndex ] = formula_[ index ];
+		} else if ( isascii( static_cast<int>( formula_[ index ] ) ) ) {
+			formula[ realIndex ] = static_cast<char>( formula_[ index ] );
 			++ index;
 			++ realIndex;
+		} else {
+			_error = UNEXPECTED_TOKEN;
+			_index = realIndex;
+			return ( false );
 		}
 		_length = realIndex;
 	}

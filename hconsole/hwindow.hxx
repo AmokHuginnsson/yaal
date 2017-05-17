@@ -104,7 +104,7 @@ protected:
 	virtual void do_init( void );
 	virtual HStatusBarWidget* do_init_bar( yaal::hcore::HString const& );
 private:
-	friend bool HWidget::set_focus( char );
+	friend bool HWidget::set_focus( int );
 	friend void HStatusBarWidget::set_prompt(  yaal::hcore::HString const&,
 			HStatusBarWidget::PROMPT );
 	friend void HStatusBarWidget::end_prompt( void );

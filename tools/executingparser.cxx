@@ -2512,7 +2512,7 @@ yaal::hcore::HUTF8String::const_iterator HReal::do_parse( HExecutingParser* exec
 	if ( scan != last_ ) {
 		while ( scan != last_ ) {
 			bool stop( false );
-			u32_t ch( *scan );
+			code_point_t ch( *scan );
 			switch ( state ) {
 				case ( START ): {
 					if ( isdigit( static_cast<int>( ch ) ) ) {
@@ -2550,7 +2550,7 @@ yaal::hcore::HUTF8String::const_iterator HReal::do_parse( HExecutingParser* exec
 			if ( stop ) {
 				break;
 			}
-			_stringCache.push_back( static_cast<char>( *scan ) );
+			_stringCache.push_back( *scan );
 			++ scan;
 		}
 	} else {
@@ -2560,8 +2560,12 @@ yaal::hcore::HUTF8String::const_iterator HReal::do_parse( HExecutingParser* exec
 		position_t pos( position( executingParser_, start ) );
 		if ( !! _actionDouble || !! _actionDoublePosition || !! _actionDoubleLong || !! _actionDoubleLongPosition ) {
 			_cache.realloc( _stringCache.get_length() + 1 );
-			copy( _stringCache.begin(), _stringCache.end(), _cache.get<char>() );
-			_cache.get<char>()[ _stringCache.get_length() ] = 0;
+			char* p( _cache.get<char>() );
+			for ( code_point_t c : _stringCache ) {
+				*p = static_cast<char>( c );
+				++ p;
+			}
+			*p = 0;
 		}
 		if ( !! _actionDouble ) {
 			double d( ::strtod( _cache.get<char>(), nullptr ) );
@@ -3530,8 +3534,8 @@ bool character_skip_ws( yaal::hcore::HString const& characters_, HRuleBase::WHIT
 	bool skipWS( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP );
 	if ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) {
 		skipWS = true;
-		for ( char c : characters_ ) {
-			if ( _whiteSpace_.has( static_cast<u32_t>( c ) ) ) {
+		for ( code_point_t c : characters_ ) {
+			if ( _whiteSpace_.has( c ) ) {
 				skipWS = false;
 				break;
 			}
@@ -3562,12 +3566,12 @@ yaal::hcore::HUTF8String::const_iterator HCharacter::do_parse( HExecutingParser*
 	bool matched( false );
 	if ( scan != last_ ) {
 		u32_t c( *scan );
-		if ( _characters.is_empty() || ( _characters.find( static_cast<char>( *scan ) ) != hcore::HString::npos ) ) { /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+		if ( _characters.is_empty() || ( _characters.find( *scan ) != hcore::HString::npos ) ) {
 			position_t pos( position( executingParser_, start ) );
 			if ( !! _actionCharacter ) {
-				add_execution_step( executingParser_, start, call( _actionCharacter, static_cast<char>( c ) ) );
+				add_execution_step( executingParser_, start, call( _actionCharacter, c ) );
 			} else if ( !! _actionCharacterPosition ) {
-				add_execution_step( executingParser_, start, call( _actionCharacterPosition, static_cast<char>( c ), pos ) );
+				add_execution_step( executingParser_, start, call( _actionCharacterPosition, c, pos ) );
 			} else if ( !! _action ) {
 				add_execution_step( executingParser_, start, call( _action ) );
 			} else if ( !! _actionPosition ) {

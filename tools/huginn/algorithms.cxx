@@ -205,7 +205,7 @@ public:
 			}
 		} else if ( t == HHuginn::TYPE::STRING ) {
 			HString const& s( get_string( values_[0] ) );
-			for ( char c : s ) {
+			for ( code_point_t c : s ) {
 				dest.push_back( thread_->object_factory().create_character( c ) );
 			}
 		} else {

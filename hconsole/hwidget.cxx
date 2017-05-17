@@ -144,10 +144,10 @@ int HWidget::do_process_input( int code_ ) {
 	M_EPILOG
 }
 
-bool HWidget::set_focus( char shortCut_ ) {
+bool HWidget::set_focus( int shortCut_ ) {
 	M_PROLOG
 	bool focusChanged( false );
-	if ( _enabled && ( ( shortCut_ <= 0 ) || ( _label[ _shortcutIndex ] == shortCut_ ) ) ) {
+	if ( _enabled && ( ( shortCut_ <= 0 ) || ( _label[ _shortcutIndex ] == static_cast<code_point_t>( shortCut_ ) ) ) ) {
 		bool oldFocus( _focused );
 		_focused = true;
 		if ( ! shortCut_ && _window ) {
@@ -517,7 +517,7 @@ yaal::hcore::HString const& HWidget::get_label( void ) const {
 }
 
 int HWidget::get_shortcut( void ) const {
-	return ( _label[_shortcutIndex] );
+	return ( static_cast<int>( _label[_shortcutIndex] ) );
 }
 
 HWindow* HWidget::get_window( void ) const {

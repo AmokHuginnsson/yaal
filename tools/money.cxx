@@ -492,7 +492,7 @@ bool verify_IBAN( HString const& IBAN_ ) {
 		}
 		IBAN.reserve( length );
 		for ( int i( 0 ); i < length; ++ i ) {
-			if ( isalnum( IBAN_[ i ] ) ) {
+			if ( isalnum( static_cast<int>( IBAN_[ i ] ) ) ) {
 				IBAN += IBAN_[ i ];
 			}
 		}
@@ -501,7 +501,7 @@ bool verify_IBAN( HString const& IBAN_ ) {
 			_lastErrorMessage_.assign( "IBAN: Number too short (" ).append( static_cast<int>( length ) ).append( ")." );
 			break;
 		}
-		if ( ! ( isalpha( IBAN[ 0 ] ) && isalpha( IBAN[ 1 ] ) ) ) {
+		if ( ! ( isalpha( static_cast<int>( IBAN[ 0 ] ) ) && isalpha( static_cast<int>( IBAN[ 1 ] ) ) ) ) {
 			_lastErrorMessage_ = "IBAN: No country code present.";
 			break;
 		}
@@ -511,11 +511,11 @@ bool verify_IBAN( HString const& IBAN_ ) {
 	/*	M_LOG ( IBAN ); */
 		IBAN.lower();
 		for ( int i( 0 ); i < length; ++ i ) {
-			if ( isalpha ( IBAN[ i ] ) ) {
+			if ( isalpha( static_cast<int>( IBAN[ i ] ) ) ) {
 				static int const DIGIT_PAIR_BUF_SIZE( 3 );
 				char digitPairBuf[DIGIT_PAIR_BUF_SIZE];
 				snprintf( digitPairBuf, DIGIT_PAIR_BUF_SIZE, "%02d", ( IBAN[ i ] - 'a' ) + 10 );
-				pattern[ 0 ] = IBAN[ i ];
+				pattern[ 0 ] = static_cast<char>( IBAN[ i ] );
 				IBAN.replace( pattern, digitPairBuf );
 				length = IBAN.get_length();
 			}

@@ -1382,7 +1382,7 @@ void OCompiler::mark_expression_position( executing_parser::position_t position_
 	M_EPILOG
 }
 
-void OCompiler::defer_oper( char operator_, executing_parser::position_t position_ ) {
+void OCompiler::defer_oper( code_point_t operator_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OPERATOR o( OPERATOR::NONE );
 	switch ( operator_ ) {
@@ -2304,7 +2304,7 @@ void OCompiler::defer_store_number( yaal::hcore::HString const& value_, executin
 	M_EPILOG
 }
 
-void OCompiler::defer_store_character( char value_, executing_parser::position_t position_ ) {
+void OCompiler::defer_store_character( code_point_t value_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {

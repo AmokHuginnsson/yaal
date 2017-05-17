@@ -120,7 +120,7 @@ yaal::hcore::HString base64::encode( yaal::hcore::HUTF8String const& message, bo
 	M_EPILOG
 }
 
-inline bool is_base64_character( char ch_, bool standardCompliantMode_ ) {
+inline bool is_base64_character( code_point_t ch_, bool standardCompliantMode_ ) {
 	return ( ( ( ch_ >= 'A' ) && ( ch_ <= 'Z' ) )
 				|| ( ( ch_ >= 'a' ) && ( ch_ <= 'z' ) )
 				|| ( ( ch_ >= '0' ) && ( ch_ <= '9' ) )
@@ -139,8 +139,6 @@ int long base64_raw_decode( char const* input, int long inputSize, char* output,
 	int long i( 0 );
 	M_ENSURE( ( ( ( ( inputSize * 3 ) / 4 ) + 1 ) <= bufSize ) || ( ! inputSize ) );
 	for ( ; ( i < inputSize ) && ( input[ i ] != '=' ); ++ i ) {
-		char ch = input[ i ];
-		M_ENSURE( is_base64_character( ch, standardCompliantMode ) );
 		int shift = shifts[ i % 4 ];
 		/*
 		 * static_cast<u8_t>() is done for clipping.
@@ -173,9 +171,14 @@ yaal::hcore::HString base64::decode( yaal::hcore::HString const& message, bool s
 		HChunk input( len );
 		char* inputBuffer( input.get<char>() );
 		int i( 0 );
-		for ( char ch : message ) {
-			inputBuffer[i] = ch;
-			++ i;
+		int pos( 0 );
+		for ( code_point_t ch : message ) {
+			M_ENSURE( is_base64_character( ch, standardCompliantMode ) || isspace( static_cast<int>( ch ) ), ( HFormat( "char: %c, at position: %ld" ) % ch % pos ).string() );
+			if ( is_base64_character( ch, standardCompliantMode ) ) {
+				inputBuffer[i] = static_cast<char>( ch );
+				++ i;
+			}
+			++ pos;
 		}
 		base64_raw_decode( inputBuffer, len, output.get<char>(), output.get_size(), standardCompliantMode );
 	}
@@ -233,10 +236,10 @@ void base64::decode( yaal::hcore::HStreamInterface& in, yaal::hcore::HStreamInte
 	int inputSize( 0 );
 	int long pos( 0 );
 	while ( in.read_until_n( line, BUF_LEN ) ) {
-		for ( char ch : line ) {
-			M_ENSURE( is_base64_character( ch, standardCompliantMode ) || isalpha( ch ), ( HFormat( "char: %c, at position: %ld" ) % ch % pos ).string() );
+		for ( code_point_t ch : line ) {
+			M_ENSURE( is_base64_character( ch, standardCompliantMode ) || isspace( static_cast<int>( ch ) ), ( HFormat( "char: %c, at position: %ld" ) % ch % pos ).string() );
 			if ( is_base64_character( ch, standardCompliantMode	) ) {
-				inputBuffer[inputSize++] = ch;
+				inputBuffer[inputSize++] = static_cast<char>( ch );
 			}
 			if ( inputSize >= BASE64LINELEN ) {
 				M_ASSERT( inputSize == BASE64LINELEN );

@@ -35,6 +35,7 @@ Copyright:
 #include "hcore/algorithm.hxx"
 #include "hcore/hboundcall.hxx"
 #include "hcore/hfile.hxx"
+#include "hcore/hhashmap.hxx"
 
 namespace yaal {
 
@@ -49,6 +50,8 @@ namespace tools {
 /*! \brief Small but useful utilities.
  */
 namespace util {
+
+typedef yaal::hcore::HHashMap<yaal::code_point_t, yaal::code_point_t> code_point_translation_t;
 
 class HScopeExitCall {
 public:

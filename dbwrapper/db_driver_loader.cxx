@@ -226,7 +226,7 @@ yaal::hcore::HString transform_sql( yaal::hcore::HString sql_, place_holder_gene
 	bool inSingleQuote( false );
 	bool inDoubleQuote( false );
 	for ( int pos( 0 ), i( 0 ); i < len; ++ i, ++ pos ) {
-		char currChar( sql_[pos] );
+		code_point_t currChar( sql_[pos] );
 		if ( inSingleQuote ) {
 			if ( currChar == '\'' ) {
 				inSingleQuote = false;

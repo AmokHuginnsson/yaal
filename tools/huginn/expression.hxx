@@ -105,7 +105,7 @@ public:
 	void store_integer( int long long, huginn::HFrame*, int );
 	void store_string( yaal::hcore::HString const&, huginn::HFrame*, int );
 	void store_number( yaal::hcore::HString const&, huginn::HFrame*, int );
-	void store_character( char, huginn::HFrame*, int );
+	void store_character( code_point_t, huginn::HFrame*, int );
 	bool is_empty( void ) const;
 protected:
 	HHuginn::values_t& grab_args( HFrame* );

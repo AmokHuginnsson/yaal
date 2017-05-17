@@ -416,7 +416,7 @@ int HEditWidget::insert_char( int code_, int length_ ) {
 		if ( ! _replace ) {
 			_varTmpBuffer.insert( _widgetOffset+ _cursorPosition, 1 );
 		}
-		_varTmpBuffer.set_at( _cursorPosition + _widgetOffset, static_cast<char>( code_ ) );
+		_varTmpBuffer.set_at( _cursorPosition + _widgetOffset, static_cast<code_point_t>( code_ ) );
 		_cursorPosition ++;
 		if ( _cursorPosition >= _widthRaw ) {
 			_cursorPosition = _widthRaw - 1;

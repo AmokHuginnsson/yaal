@@ -491,7 +491,7 @@ int long hash( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		rt = hcore::hash<double long>()( static_cast<HHuginn::HNumber const*>( v_.raw() )->value().to_floating_point() );
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
-		rt = hcore::hash<char>()( static_cast<HHuginn::HCharacter const*>( v_.raw() )->value() );
+		rt = hcore::hash<code_point_t>()( static_cast<HHuginn::HCharacter const*>( v_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::BOOLEAN ) {
 		rt = hcore::hash<bool>()( static_cast<HHuginn::HBoolean const*>( v_.raw() )->value() );
 	} else if ( typeId != HHuginn::TYPE::NONE ) {
@@ -831,7 +831,7 @@ HHuginn::value_t character( HThread* thread_, HHuginn::value_t const& v_, int po
 	if ( typeId == HHuginn::TYPE::CHARACTER ) {
 		res = v_;
 	} else if ( typeId == HHuginn::TYPE::INTEGER ) {
-		res = thread_->object_factory().create_character( static_cast<char>( static_cast<HHuginn::HCharacter const*>( v_.raw() )->value() ) );
+		res = thread_->object_factory().create_character( static_cast<HHuginn::HCharacter const*>( v_.raw() )->value() );
 	} else {
 		res = fallback_conversion( type_id( HHuginn::TYPE::CHARACTER ), thread_, v_, position_ );
 	}

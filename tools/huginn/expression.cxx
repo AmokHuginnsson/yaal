@@ -890,7 +890,7 @@ void HExpression::store_number( yaal::hcore::HString const& value_, HFrame* fram
 	M_EPILOG
 }
 
-void HExpression::store_character( char value_, HFrame* frame_, int ) {
+void HExpression::store_character( code_point_t value_, HFrame* frame_, int ) {
 	M_PROLOG
 	frame_->values().push( frame_->thread()->object_factory().create_character( value_ ) );
 	return;

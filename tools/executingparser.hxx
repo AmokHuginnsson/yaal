@@ -802,8 +802,8 @@ class HCharacterLiteral : public HRuleBase {
 public:
 	typedef HCharacterLiteral this_type;
 	typedef HRuleBase base_type;
-	typedef yaal::hcore::HBoundCall<void ( char )> action_character_t;
-	typedef yaal::hcore::HBoundCall<void ( char, position_t )> action_character_position_t;
+	typedef yaal::hcore::HBoundCall<void ( code_point_t )> action_character_t;
+	typedef yaal::hcore::HBoundCall<void ( code_point_t, position_t )> action_character_position_t;
 private:
 	action_character_t _actionCharacter;
 	action_character_position_t _actionCharacterPosition;
@@ -840,8 +840,8 @@ class HCharacter : public HRuleBase {
 public:
 	typedef HCharacter this_type;
 	typedef HRuleBase base_type;
-	typedef yaal::hcore::HBoundCall<void ( char )> action_character_t;
-	typedef yaal::hcore::HBoundCall<void ( char, position_t )> action_character_position_t;
+	typedef yaal::hcore::HBoundCall<void ( code_point_t )> action_character_t;
+	typedef yaal::hcore::HBoundCall<void ( code_point_t, position_t )> action_character_position_t;
 private:
 	yaal::hcore::HString _characters;
 	action_character_t _actionCharacter;

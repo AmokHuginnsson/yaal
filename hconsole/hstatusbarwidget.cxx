@@ -239,7 +239,7 @@ void HStatusBarWidget::update_progress( double step_, char const* title_ ) {
 		if ( _done ) {
 			int length = static_cast<int>( _string.get_length() );
 			_string.erase( length - 6, 5 );
-			_string.insert( length - 6, 4, "done" );
+			_string.insert( length - 6, "done", 4 );
 		}
 		cons.mvprintf( _rowRaw, _columnRaw, _string );
 		_string.clear();

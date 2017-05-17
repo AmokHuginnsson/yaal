@@ -40,7 +40,7 @@ namespace tools {
 namespace huginn {
 
 namespace {
-static char const NEWLINE = '\n';
+static code_point_t const NEWLINE = '\n';
 }
 
 class HPrepocessor final {
@@ -68,10 +68,10 @@ private:
 	HPrepocessor& operator = ( HPrepocessor const& ) = delete;
 };
 
-class HPrepocessor::HIterator : public yaal::hcore::iterator_interface<char const, yaal::hcore::iterator_category::forward> {
+class HPrepocessor::HIterator : public yaal::hcore::iterator_interface<code_point_t const, yaal::hcore::iterator_category::forward> {
 public:
 	typedef HIterator this_type;
-	typedef yaal::hcore::iterator_interface<char const, yaal::hcore::iterator_category::forward> base_type;
+	typedef yaal::hcore::iterator_interface<code_point_t const, yaal::hcore::iterator_category::forward> base_type;
 private:
 	static char const COMMENT_START_CHAR1 = '/';
 	static char const COMMENT_START_CHAR2 = '*';
@@ -161,7 +161,7 @@ private:
 	}
 	friend class HPrepocessor;
 	void make_readable( void );
-	yaal::hcore::HString::const_iterator try_skip_whitespace( yaal::hcore::HString::const_iterator, char );
+	yaal::hcore::HString::const_iterator try_skip_whitespace( yaal::hcore::HString::const_iterator, code_point_t );
 	yaal::hcore::HString::const_iterator skip_whitespace( yaal::hcore::HString::const_iterator );
 	yaal::hcore::HString::const_iterator skip_comment( yaal::hcore::HString::const_iterator );
 };

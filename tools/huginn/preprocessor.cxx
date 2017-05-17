@@ -46,10 +46,10 @@ namespace huginn {
  */
 HPrepocessor::HIterator HPrepocessor::begin( void ) {
 	int len( static_cast<int>( _end - _beg ) );
-	char const hashBang[] = "#!";
-	int const hashBangLen( static_cast<int>( sizeof ( hashBang ) - 1 ) );
+	static HString const hashBang( "#!" );
+	int const hashBangLen( static_cast<int>( hashBang.get_length() ) );
 	int offset( 0 );
-	if ( ( len >= hashBangLen ) && equal( _beg, _beg + hashBangLen, hashBang ) ) {
+	if ( ( len >= hashBangLen ) && equal( _beg, _beg + hashBangLen, hashBang.begin() ) ) {
 		hcore::HString::const_iterator nlIt( find( _beg, _end, NEWLINE ) );
 		if ( nlIt != _end ) {
 			offset = static_cast<int>( nlIt + 1 - _beg );
@@ -167,7 +167,7 @@ yaal::hcore::HString::const_iterator HPrepocessor::HIterator::skip_whitespace( y
 	return ( pos );
 }
 
-yaal::hcore::HString::const_iterator HPrepocessor::HIterator::try_skip_whitespace( yaal::hcore::HString::const_iterator pos_, char quote_ ) {
+yaal::hcore::HString::const_iterator HPrepocessor::HIterator::try_skip_whitespace( yaal::hcore::HString::const_iterator pos_, code_point_t quote_ ) {
 	yaal::hcore::HString::const_iterator pos( pos_ );
 	/* We are at closing quote character. */
 	++ pos;

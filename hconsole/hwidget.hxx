@@ -176,7 +176,7 @@ public:
  * \param shortcut - Alphanumeric portion of keypress event that possibly holds shortcut to this widget.
  * \return True iff focus was successfully switched to this widget.
  */
-	virtual bool set_focus( char shortcut = 0 ); /* focused and shortcut char match */
+	virtual bool set_focus( int shortcut = 0 ); /* focused and shortcut char match */
 
 /*! \brief Focus managing method (lose).
  *

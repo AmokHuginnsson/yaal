@@ -52,7 +52,7 @@ inline HHuginn::value_t to_lower( huginn::HThread*, HHuginn::value_t* object_, H
 	char const name[] = "character.to_lower";
 	verify_arg_count( name, values_, 0, 0, position_ );
 	HHuginn::HCharacter* c( static_cast<HHuginn::HCharacter*>( object_->raw() ) );
-	c->set( static_cast<HHuginn::HCharacter::value_type>( std::tolower( c->value() ) ) );
+	c->set( static_cast<HHuginn::HCharacter::value_type>( std::tolower( static_cast<int>( c->value() ) ) ) );
 	return ( *object_ );
 	M_EPILOG
 }
@@ -62,7 +62,7 @@ inline HHuginn::value_t to_upper( huginn::HThread*, HHuginn::value_t* object_, H
 	char const name[] = "character.to_upper";
 	verify_arg_count( name, values_, 0, 0, position_ );
 	HHuginn::HCharacter* c( static_cast<HHuginn::HCharacter*>( object_->raw() ) );
-	c->set( static_cast<HHuginn::HCharacter::value_type>( std::toupper( c->value() ) ) );
+	c->set( static_cast<HHuginn::HCharacter::value_type>( std::toupper( static_cast<int>( c->value() ) ) ) );
 	return ( *object_ );
 	M_EPILOG
 }
@@ -71,7 +71,7 @@ inline HHuginn::value_t is_of_a_kind( char const* name, int (*isofakind)(int), h
 	M_PROLOG
 	verify_arg_count( name, values_, 0, 0, position_ );
 	HHuginn::HCharacter* c( static_cast<HHuginn::HCharacter*>( object_->raw() ) );
-	return ( thread_->object_factory().create_boolean( isofakind( c->value() ) != 0 ) );
+	return ( thread_->object_factory().create_boolean( isofakind( static_cast<int>( c->value() ) ) != 0 ) );
 	M_EPILOG
 }
 

@@ -351,7 +351,7 @@ public:
 		int _width;
 		BITS::ALIGN _align;
 		int _shortcutIndex;
-		char _shortcut;
+		code_point_t _shortcut;
 		TYPE _type;
 		hcore::HFormat _format;
 		hcore::HString _name;

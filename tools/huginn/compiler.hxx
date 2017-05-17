@@ -503,7 +503,7 @@ struct OCompiler {
 	void defer_get_reference( yaal::hcore::HString const&, executing_parser::position_t );
 	void defer_get_field_reference( yaal::hcore::HString const&, executing_parser::position_t );
 	void defer_make_variable( yaal::hcore::HString const&, executing_parser::position_t );
-	void defer_oper( char, executing_parser::position_t );
+	void defer_oper( code_point_t, executing_parser::position_t );
 	void defer_str_oper( yaal::hcore::HString const&, executing_parser::position_t );
 	void defer_oper_direct( OPERATOR, executing_parser::position_t );
 	void dispatch_action( OPERATOR, executing_parser::position_t );
@@ -526,7 +526,7 @@ struct OCompiler {
 	void defer_store_integer( int long long, executing_parser::position_t );
 	void defer_store_string( yaal::hcore::HString const&, executing_parser::position_t );
 	void defer_store_number( yaal::hcore::HString const&, executing_parser::position_t );
-	void defer_store_character( char, executing_parser::position_t );
+	void defer_store_character( code_point_t, executing_parser::position_t );
 	void defer_call( yaal::hcore::HString const&, executing_parser::position_t );
 private:
 	OCompiler( OCompiler const& ) = delete;

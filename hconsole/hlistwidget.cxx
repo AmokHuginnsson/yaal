@@ -223,11 +223,12 @@ void HListWidget::draw_header( int columns_ ) {
 					"%c",
 					columnInfo->_shortcut
 				);
-				if ( _sortColumn == colNo )
+				if ( _sortColumn == colNo ) {
 					cons.mvprintf( _rowRaw,
 								_columnRaw + columnOffset
 								+ columnInfo->_widthRaw - 2,
 								"%c", columnInfo->_descending ? '^' : 'v' );
+				}
 			}
 			columnOffset += columnInfo->_widthRaw;
 			if ( colNo < columns_ ) {
@@ -796,7 +797,7 @@ int HListWidget::process_input_view( int code_ ) {
 			int columns( static_cast<int>( _header.size() ) );
 			int selectedColumn( 0 );
 			for ( ; selectedColumn < columns; ++ selectedColumn ) {
-				if ( tolower( code_ ) == tolower( _header[ selectedColumn ]->_shortcut ) ) {
+				if ( tolower( code_ ) == tolower( static_cast<int>( _header[ selectedColumn ]->_shortcut ) ) ) {
 					break;
 				}
 			}

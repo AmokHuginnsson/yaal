@@ -77,7 +77,7 @@ bool _leaveCtrlQ_ = false;
 bool _leaveCtrlBackSlash_ = false;
 
 namespace util {
-extern char _transTableStripPL_ [ 256 ];
+extern code_point_translation_t _transTableStripPL_;
 }
 
 namespace {
@@ -89,7 +89,7 @@ bool set_tools_variables( HString& option_, HString& value_ ) {
 	if ( ! stricasecmp( option_, "set_env" ) ) {
 		decode_set_env( value_ );
 	} else if ( ! stricasecmp( option_, "serial_baudrate" ) ) {
-		if ( ( value_.get_length() > 1 ) && ( value_ [ 0 ] == 'B' ) ) {
+		if ( ( value_.get_length() > 1 ) && ( value_[ 0 ] == 'B' ) ) {
 			int baudRate( lexical_cast<int>( value_.substr( 1 ) ) );
 			switch ( baudRate ) {
 				case ( 115200 ): _baudRate_ = HSerial::SPEED::B_115200; break;
@@ -268,31 +268,27 @@ HToolsInitDeinit::HToolsInitDeinit( void ) {
 			.recipient( _zBufferSize_ )
 			.argument_name( "numBytes" )
 		);
-		int ctr = 0;
 		errno = 0;
 		extendable::set_strtold_impl( &yaal_strtold );
 		yaal_options().process_rc_file ( "tools", set_tools_variables );
-		for ( ctr = 0; ctr < 256; ctr ++ ) {
-			util::_transTableStripPL_[ ctr ] = static_cast<char>( ctr );
-		}
-		util::_transTableStripPL_[ static_cast<char unsigned>( '±' ) ] = 'a';
-		util::_transTableStripPL_[ static_cast<char unsigned>( '¡' ) ] = 'A';
-		util::_transTableStripPL_[ static_cast<char unsigned>( 'æ' ) ] = 'c';
-		util::_transTableStripPL_[ static_cast<char unsigned>( 'Æ' ) ] = 'C';
-		util::_transTableStripPL_[ static_cast<char unsigned>( 'ê' ) ] = 'e';
-		util::_transTableStripPL_[ static_cast<char unsigned>( 'Ê' ) ] = 'E';
-		util::_transTableStripPL_[ static_cast<char unsigned>( '³' ) ] = 'l';
-		util::_transTableStripPL_[ static_cast<char unsigned>( '£' ) ] = 'L';
-		util::_transTableStripPL_[ static_cast<char unsigned>( 'ñ' ) ] = 'n';
-		util::_transTableStripPL_[ static_cast<char unsigned>( 'Ñ' ) ] = 'N';
-		util::_transTableStripPL_[ static_cast<char unsigned>( 'ó' ) ] = 'o';
-		util::_transTableStripPL_[ static_cast<char unsigned>( 'Ó' ) ] = 'O';
-		util::_transTableStripPL_[ static_cast<char unsigned>( '¶' ) ] = 's';
-		util::_transTableStripPL_[ static_cast<char unsigned>( '¦' ) ] = 'S';
-		util::_transTableStripPL_[ static_cast<char unsigned>( '¼' ) ] = 'z';
-		util::_transTableStripPL_[ static_cast<char unsigned>( '¬' ) ] = 'Z';
-		util::_transTableStripPL_[ static_cast<char unsigned>( '¿' ) ] = 'z';
-		util::_transTableStripPL_[ static_cast<char unsigned>( '¯' ) ] = 'Z';
+		util::_transTableStripPL_.insert( make_pair( static_cast<code_point_t>( '±' ), static_cast<code_point_t>( 'a' ) ) );
+		util::_transTableStripPL_.insert( make_pair( static_cast<code_point_t>( '¡' ), static_cast<code_point_t>( 'A' ) ) );
+		util::_transTableStripPL_.insert( make_pair( static_cast<code_point_t>( 'æ' ), static_cast<code_point_t>( 'c' ) ) );
+		util::_transTableStripPL_.insert( make_pair( static_cast<code_point_t>( 'Æ' ), static_cast<code_point_t>( 'C' ) ) );
+		util::_transTableStripPL_.insert( make_pair( static_cast<code_point_t>( 'ê' ), static_cast<code_point_t>( 'e' ) ) );
+		util::_transTableStripPL_.insert( make_pair( static_cast<code_point_t>( 'Ê' ), static_cast<code_point_t>( 'E' ) ) );
+		util::_transTableStripPL_.insert( make_pair( static_cast<code_point_t>( '³' ), static_cast<code_point_t>( 'l' ) ) );
+		util::_transTableStripPL_.insert( make_pair( static_cast<code_point_t>( '£' ), static_cast<code_point_t>( 'L' ) ) );
+		util::_transTableStripPL_.insert( make_pair( static_cast<code_point_t>( 'ñ' ), static_cast<code_point_t>( 'n' ) ) );
+		util::_transTableStripPL_.insert( make_pair( static_cast<code_point_t>( 'Ñ' ), static_cast<code_point_t>( 'N' ) ) );
+		util::_transTableStripPL_.insert( make_pair( static_cast<code_point_t>( 'ó' ), static_cast<code_point_t>( 'o' ) ) );
+		util::_transTableStripPL_.insert( make_pair( static_cast<code_point_t>( 'Ó' ), static_cast<code_point_t>( 'O' ) ) );
+		util::_transTableStripPL_.insert( make_pair( static_cast<code_point_t>( '¶' ), static_cast<code_point_t>( 's' ) ) );
+		util::_transTableStripPL_.insert( make_pair( static_cast<code_point_t>( '¦' ), static_cast<code_point_t>( 'S' ) ) );
+		util::_transTableStripPL_.insert( make_pair( static_cast<code_point_t>( '¼' ), static_cast<code_point_t>( 'z' ) ) );
+		util::_transTableStripPL_.insert( make_pair( static_cast<code_point_t>( '¬' ), static_cast<code_point_t>( 'Z' ) ) );
+		util::_transTableStripPL_.insert( make_pair( static_cast<code_point_t>( '¿' ), static_cast<code_point_t>( 'z' ) ) );
+		util::_transTableStripPL_.insert( make_pair( static_cast<code_point_t>( '¯' ), static_cast<code_point_t>( 'Z' ) ) );
 	} catch ( HException const& e ) {
 		fprintf( stderr, "Failed to initialize yaal-tools: %s\n", e.what() );
 		exit( 1 );
