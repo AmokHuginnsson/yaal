@@ -325,7 +325,7 @@ yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, yaal::h
 					++ r;
 				} else {
 					HString idS;
-					while ( ( r != e ) && _digit_.has( static_cast<u32_t>( *r ) ) ) { /* *TODO* *FIXME* Remove static_cast after UCS in HString is implemented. */
+					while ( ( r != e ) && character_class( CHARACTER_CLASS::DIGIT ).has( static_cast<u32_t>( *r ) ) ) { /* *TODO* *FIXME* Remove static_cast after UCS in HString is implemented. */
 						idS.append( *r );
 						++ r;
 					}

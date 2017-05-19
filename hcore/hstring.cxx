@@ -809,7 +809,7 @@ void encode( code_point_t codePoint_, char*& dest_ ) {
 	}
 }
 
-code_point_t decode_forward( char const* ptr_ ) {
+code_point_t decode_forward( char const*& ptr_ ) {
 	code_point_t character( static_cast<u8_t>( *ptr_ ) );
 	if ( ! ( *ptr_ & unicode::ENC_1_BYTES_MARK_MASK ) ) {
 	} else if ( ( *ptr_ & unicode::ENC_2_BYTES_MARK_MASK ) == unicode::ENC_2_BYTES_MARK_VALUE ) {
@@ -852,9 +852,14 @@ bool HCharacterClass::has( code_point_t char_ ) const {
 	return ( ( char_ < 256 ) && ( ::memchr( _data, static_cast<u8_t>( char_ ), static_cast<size_t>( _size ) ) != nullptr ) );
 }
 
+bool HCharacterClass::hasz( code_point_t char_ ) const {
+	return ( ( char_ < 256 ) && ( ::memchr( _data, static_cast<u8_t>( char_ ), static_cast<size_t>( _size ) + 1 ) != nullptr ) );
+}
+
+HCharacterClass const& character_class( CHARACTER_CLASS::character_class_t characterClass_ ) {
 #undef D_WHITE_SPACE
 #define D_WHITE_SPACE "\a\b \t\v\f\r\n"
-HCharacterClass const _whiteSpace_ = HCharacterClass( D_WHITE_SPACE, static_cast<int>( sizeof ( D_WHITE_SPACE ) - 1 ) );
+	static HCharacterClass const whiteSpace = HCharacterClass( D_WHITE_SPACE, static_cast<int>( sizeof ( D_WHITE_SPACE ) - 1 ) );
 #undef D_WHITE_SPACE
 #undef D_LOWER_CASE_LETTER
 #undef D_UPPER_CASE_LETTER
@@ -871,15 +876,15 @@ HCharacterClass const _whiteSpace_ = HCharacterClass( D_WHITE_SPACE, static_cast
 #define D_DEC_DIGIT D_OCT_DIGIT "89"
 #undef D_HEX_DIGIT
 #define D_HEX_DIGIT D_DEC_DIGIT "aAbBcCdDeEfF"
-HCharacterClass const _binDigit_ = HCharacterClass( D_BIN_DIGIT, static_cast<int>( sizeof ( D_BIN_DIGIT ) - 1 ) );
-HCharacterClass const _octDigit_ = HCharacterClass( D_OCT_DIGIT, static_cast<int>( sizeof ( D_OCT_DIGIT ) - 1 ) );
-HCharacterClass const _digit_ = HCharacterClass( D_DEC_DIGIT, static_cast<int>( sizeof ( D_DEC_DIGIT ) - 1 ) );
-HCharacterClass const _hexDigit_ = HCharacterClass( D_HEX_DIGIT, static_cast<int>( sizeof ( D_HEX_DIGIT ) - 1 ) );
-HCharacterClass const _letter_ = HCharacterClass( D_LETTER, static_cast<int>( sizeof ( D_LETTER ) - 1 ) );
-HCharacterClass const _lowerCaseLetter_ = HCharacterClass( D_LOWER_CASE_LETTER, static_cast<int>( sizeof ( D_LOWER_CASE_LETTER ) - 1 ) );
-HCharacterClass const _upperCaseLetter_ = HCharacterClass( D_UPPER_CASE_LETTER, static_cast<int>( sizeof ( D_UPPER_CASE_LETTER ) - 1 ) );
-HCharacterClass const _word_ = HCharacterClass( D_LETTER D_DEC_DIGIT "_", static_cast<int>( sizeof ( D_LETTER D_DEC_DIGIT "_" ) - 1 ) );
-HCharacterClass const _vowel_ = HCharacterClass( D_VOWEL, static_cast<int>( sizeof ( D_VOWEL ) - 1 ) );
+	static HCharacterClass const binDigit = HCharacterClass( D_BIN_DIGIT, static_cast<int>( sizeof ( D_BIN_DIGIT ) - 1 ) );
+	static HCharacterClass const octDigit = HCharacterClass( D_OCT_DIGIT, static_cast<int>( sizeof ( D_OCT_DIGIT ) - 1 ) );
+	static HCharacterClass const digit = HCharacterClass( D_DEC_DIGIT, static_cast<int>( sizeof ( D_DEC_DIGIT ) - 1 ) );
+	static HCharacterClass const hexDigit = HCharacterClass( D_HEX_DIGIT, static_cast<int>( sizeof ( D_HEX_DIGIT ) - 1 ) );
+	static HCharacterClass const letter = HCharacterClass( D_LETTER, static_cast<int>( sizeof ( D_LETTER ) - 1 ) );
+	static HCharacterClass const lowerCaseLetter = HCharacterClass( D_LOWER_CASE_LETTER, static_cast<int>( sizeof ( D_LOWER_CASE_LETTER ) - 1 ) );
+	static HCharacterClass const upperCaseLetter = HCharacterClass( D_UPPER_CASE_LETTER, static_cast<int>( sizeof ( D_UPPER_CASE_LETTER ) - 1 ) );
+	static HCharacterClass const word = HCharacterClass( D_LETTER D_DEC_DIGIT "_", static_cast<int>( sizeof ( D_LETTER D_DEC_DIGIT "_" ) - 1 ) );
+	static HCharacterClass const vowel = HCharacterClass( D_VOWEL, static_cast<int>( sizeof ( D_VOWEL ) - 1 ) );
 #undef D_HEX_DIGIT
 #undef D_DEC_DIGIT
 #undef D_OCT_DIGIT
@@ -888,8 +893,20 @@ HCharacterClass const _vowel_ = HCharacterClass( D_VOWEL, static_cast<int>( size
 #undef D_VOWEL
 #undef D_LOWER_CASE_LETTER
 #undef D_UPPER_CASE_LETTER
-
-HCharacterClass const* _characterClass_[] = { &_whiteSpace_, &_digit_, &_letter_, &_lowerCaseLetter_, &_upperCaseLetter_, &_word_, &_vowel_ };
+	static HCharacterClass const* characterClass[] = {
+		&whiteSpace,
+		&binDigit,
+		&octDigit,
+		&digit,
+		&hexDigit,
+		&letter,
+		&lowerCaseLetter,
+		&upperCaseLetter,
+		&word,
+		&vowel
+	};
+	return ( *characterClass[characterClass_] );
+}
 
 static yaal::u8_t const ALLOC_BIT_MASK = meta::obinary<010000000>::value;
 static yaal::u8_t const RANK_BIT_MASK =  meta::obinary<001100000>::value;
@@ -906,21 +923,23 @@ static yaal::u8_t const RANK_BIT_MASK =  meta::obinary<001100000>::value;
 #undef EXT_MEM
 #define EXT_MEM( base ) ( EXT_IS_INPLACE( base ) ? base._mem : base._ptr )
 #undef GET_SIZE
-#define GET_SIZE ( IS_INPLACE ? _mem[ ALLOC_FLAG_INDEX ] : static_cast<int long>( _len[ 1 ] ) )
+#define GET_SIZE ( IS_INPLACE ? ( _mem[ ALLOC_FLAG_INDEX ] & ~RANK_BIT_MASK ) : static_cast<int long>( _len[ 1 ] ) )
 #undef EXT_GET_SIZE
-#define EXT_GET_SIZE( base ) ( EXT_IS_INPLACE( base ) ? base._mem[ ALLOC_FLAG_INDEX ] : static_cast<int long>( base._len[ 1 ] ) )
+#define EXT_GET_SIZE( base ) ( EXT_IS_INPLACE( base ) ? ( base._mem[ ALLOC_FLAG_INDEX ] & ~RANK_BIT_MASK ) : static_cast<int long>( base._len[ 1 ] ) )
+#undef SET_RANK
+#define SET_RANK( rank ) ( _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( ( _mem[ ALLOC_FLAG_INDEX ] & ~RANK_BIT_MASK ) | ( 1 << 5 ) ) )
 #undef SET_SIZE
 #define SET_SIZE( size ) \
 	do { \
-		( IS_INPLACE ? _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( size ) : _len[ 1 ] = ( size ) ); \
+		( IS_INPLACE ? _mem[ ALLOC_FLAG_INDEX ] = ( _mem[ ALLOC_FLAG_INDEX ] & RANK_BIT_MASK ) | static_cast<char>( size ) : _len[ 1 ] = ( size ) ); \
 		if ( ( size ) == 0 ) { \
-			_mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( ( _mem[ ALLOC_FLAG_INDEX ] & ~RANK_BIT_MASK ) | ( 1 << 5 ) ); \
+			SET_RANK( 1 ); \
 		} \
 	} while ( 0 )
 #undef EXT_SET_SIZE
 #define EXT_SET_SIZE( base, size ) \
 	do { \
-		( EXT_IS_INPLACE( base ) ? base._mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( size ) : base._len[ 1 ] = ( size ) ); \
+		( EXT_IS_INPLACE( base ) ? base._mem[ ALLOC_FLAG_INDEX ] = ( base._mem[ ALLOC_FLAG_INDEX ] & RANK_BIT_MASK ) | static_cast<char>( size ) : base._len[ 1 ] = ( size ) ); \
 		if ( ( size ) == 0 ) { \
 			base._mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( ( base._mem[ ALLOC_FLAG_INDEX ] & ~RANK_BIT_MASK ) | ( 1 << 5 ) ); \
 		} \
@@ -928,28 +947,39 @@ static yaal::u8_t const RANK_BIT_MASK =  meta::obinary<001100000>::value;
 #undef GET_ALLOC_BYTES
 #undef SET_ALLOC_BYTES
 #if TARGET_CPU_BITS >= 64
-#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY + 1 : _len[ 2 ] & static_cast<int long>( static_cast<int long unsigned>( -1 ) >> 3 ) )
+#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY : _len[ 2 ] & static_cast<int long>( static_cast<int long unsigned>( -1 ) >> 3 ) )
 #define SET_ALLOC_BYTES( capacity, rank ) \
 	do { \
 		_len[ 2 ] = ( capacity ); _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( _mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK | ( ( rank ) << 5 ) ); \
 	} while ( 0 )
 #else /* #if TARGET_CPU_BITS >= 64 */
-#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY + 1 : ( _len[ 2 ] & static_cast<int long>( static_cast<int long unsigned>( -1 ) >> 3 ) ) << 3 )
+#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY : ( _len[ 2 ] & static_cast<int long>( static_cast<int long unsigned>( -1 ) >> 3 ) ) << 3 )
 #define SET_ALLOC_BYTES( capacity, rank ) \
 	do { \
 		_len[ 2 ] = ( ( capacity ) >> 3 ); _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( _mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK | ( ( rank ) << 5 ) ); \
 	} while ( 0 )
 #endif /* #else #if TARGET_CPU_BITS >= 64 */
 
+namespace {
+
+namespace hidden {
 char const* _errMsgHString_[ 7 ] = {
-	_( "ok" ),
-	_( "nullptr pointer used for string operations" ),
-	_( "use of uninitialized string" ),
-	_( "index out of bound" ),
-	_( "bad length" ),
-	_( "bad offset" ),
-	_( "overflow" )
+	( "ok" ),
+	( "nullptr pointer used for string operations" ),
+	( "use of uninitialized string" ),
+	( "index out of bound" ),
+	( "bad length" ),
+	( "bad offset" ),
+	( "overflow" )
 };
+}
+
+char const* err_msg( int no_ ) {
+	char const* em( _( hidden::_errMsgHString_[no_] ) );
+	return ( em ? em : hidden::_errMsgHString_[no_] );
+}
+
+}
 
 #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002
 # pragma GCC diagnostic ignored "-Weffc++"
@@ -1057,7 +1087,7 @@ void HString::reserve( int long const preallocate_, int const rank_ ) {
 			SET_SIZE( origSize );
 		}
 	} else {
-		SET_ALLOC_BYTES( oldAllocBytes, ( preallocate_ > 0 ) ? rank_ : 1 );
+		SET_RANK( ( preallocate_ > 0 ) ? rank_ : 1 );
 	}
 	if ( rank_ > oldRank ) {
 		adaptive::copy_backward( MEM, rank_, 0, MEM, oldRank, 0, GET_SIZE );
@@ -1105,8 +1135,8 @@ HString::HString( HUTF8String const& str_ )
 
 void HString::from_utf8( int long offset_, int long onto_, const char* str_, int long size_ ) {
 	M_PROLOG
-	M_ASSERT( offset_ < size_ );
 	int long oldSize( GET_SIZE );
+	M_ASSERT( offset_ <= oldSize );
 	utf8::OUTF8StringStats s( utf8::get_string_stats( str_, size_ ) );
 	int rank( max( GET_RANK, s._rank ) );
 	int long newSize( ( oldSize - onto_ ) + s._characterCount );
@@ -1366,7 +1396,7 @@ code_point_t HString::operator[] ( int index_ ) const {
 code_point_t HString::operator[] ( int long index_ ) const {
 	M_PROLOG
 	if ( ( index_ < 0 ) || ( index_ > GET_SIZE ) ) {
-		M_THROW( _errMsgHString_[string_helper::INDEX_OOB], index_ );
+		M_THROW( err_msg( string_helper::INDEX_OOB ), index_ );
 	}
 	return ( adaptive::get( MEM, GET_RANK, index_ ) );
 	M_EPILOG
@@ -1376,7 +1406,7 @@ void HString::set_at( int long index_, code_point_t char_ ) {
 	M_PROLOG
 	int long curSize( GET_SIZE );
 	if ( ( index_ < 0 ) || ( index_ >= curSize ) ) {
-		M_THROW( _errMsgHString_[string_helper::INDEX_OOB], index_ );
+		M_THROW( err_msg( string_helper::INDEX_OOB ), index_ );
 	}
 	int rank( GET_RANK );
 	int charRank( unicode::rank( char_ ) );
@@ -1489,7 +1519,7 @@ bool operator <= ( char const* left_, HString const& right_ ) {
 
 code_point_t HString::front( void ) const {
 	if ( GET_SIZE == 0 ) {
-		M_THROW( _errMsgHString_[string_helper::INDEX_OOB], 0 );
+		M_THROW( err_msg( string_helper::INDEX_OOB ), 0 );
 	}
 	return ( adaptive::get( MEM, GET_RANK, 0 ) );
 }
@@ -1497,7 +1527,7 @@ code_point_t HString::front( void ) const {
 code_point_t HString::back( void ) const {
 	int long s( GET_SIZE );
 	if ( s == 0 ) {
-		M_THROW( _errMsgHString_[string_helper::INDEX_OOB], s - 1 );
+		M_THROW( err_msg( string_helper::INDEX_OOB ), s - 1 );
 	}
 	return ( adaptive::get( MEM, GET_RANK, s - 1 ) );
 }
@@ -1592,10 +1622,10 @@ HString& HString::assign( HString const& str_, int long offset_, int long length
 		length_ = MAX_STRING_LENGTH;
 	}
 	if ( length_ < 0 ) {
-		M_THROW( _errMsgHString_[string_helper::BAD_LENGTH], length_ );
+		M_THROW( err_msg( string_helper::BAD_LENGTH ), length_ );
 	}
 	if ( offset_ < 0 ) {
-		M_THROW( _errMsgHString_[string_helper::BAD_OFFSET], offset_ );
+		M_THROW( err_msg( string_helper::BAD_OFFSET ), offset_ );
 	}
 	int long s( EXT_GET_SIZE( str_ ) );
 	if ( offset_ > s ) {
@@ -1612,10 +1642,10 @@ HString& HString::assign( HString const& str_, int long offset_, int long length
 HString& HString::assign( char const* data_, int long length_ ) {
 	M_PROLOG
 	if ( ! data_ ) {
-		M_THROW( _errMsgHString_[ string_helper::NULL_PTR ], errno );
+		M_THROW( err_msg(  string_helper::NULL_PTR  ), errno );
 	}
 	if ( length_ < 0 ) {
-		M_THROW( _errMsgHString_[ string_helper::BAD_LENGTH ], length_ );
+		M_THROW( err_msg(  string_helper::BAD_LENGTH  ), length_ );
 	}
 	int long len( static_cast<int long>( ::strnlen( data_, static_cast<size_t>( length_ ) ) ) );
 	from_utf8( 0, 0, data_, len );
@@ -1626,10 +1656,10 @@ HString& HString::assign( char const* data_, int long length_ ) {
 HString& HString::assign( const_iterator first_, const_iterator last_ ) {
 	M_PROLOG
 	if ( ! ( first_._owner && last_._owner ) ) {
-		M_THROW( _errMsgHString_[ string_helper::NULL_PTR ], errno );
+		M_THROW( err_msg(  string_helper::NULL_PTR  ), errno );
 	}
 	if ( last_ < first_ ) {
-		M_THROW( _errMsgHString_[ string_helper::BAD_LENGTH ], last_ - first_ );
+		M_THROW( err_msg(  string_helper::BAD_LENGTH  ), last_ - first_ );
 	}
 	return ( assign( *first_._owner, first_._index, last_._index - first_._index ) );
 	M_EPILOG
@@ -1638,7 +1668,7 @@ HString& HString::assign( const_iterator first_, const_iterator last_ ) {
 HString& HString::assign( int long size_, code_point_t fill_ ) {
 	M_PROLOG
 	if ( size_ < 0 ) {
-		M_THROW( _errMsgHString_[string_helper::BAD_LENGTH], size_ );
+		M_THROW( err_msg( string_helper::BAD_LENGTH ), size_ );
 	}
 	int rank( unicode::rank( fill_ ) );
 	resize( size_, rank );
@@ -1885,23 +1915,26 @@ HString& HString::replace( int long pos_, int long size_, HString const& replace
 	M_EPILOG
 }
 
-void HString::replace_check( int long pos_, int long size_, int long offset_, int long len_ ) {
+void HString::replace_check( int long pos_, int long destSize_, int long offset_, int long len_, int long srcSize_ ) {
 	M_PROLOG
 	if ( offset_ < 0 ) {
-		M_THROW( _errMsgHString_[string_helper::BAD_OFFSET], offset_ );
+		M_THROW( err_msg( string_helper::BAD_OFFSET ), offset_ );
 	}
-	if ( size_ < 0 ) {
-		M_THROW( _errMsgHString_[string_helper::BAD_LENGTH], size_ );
+	if ( destSize_ < 0 ) {
+		M_THROW( err_msg( string_helper::BAD_LENGTH ), destSize_ );
 	}
 	if ( len_ < 0 ) {
-		M_THROW( _errMsgHString_[string_helper::BAD_LENGTH], len_ );
+		M_THROW( err_msg( string_helper::BAD_LENGTH ), len_ );
 	}
 	if ( pos_ < 0 ) {
-		M_THROW( _errMsgHString_[string_helper::BAD_OFFSET], pos_ );
+		M_THROW( err_msg( string_helper::BAD_OFFSET ), pos_ );
 	}
 	int long oldSize( GET_SIZE );
-	if ( ( pos_ + size_ ) > oldSize ) {
-		M_THROW( _errMsgHString_[string_helper::OVERFLOW], pos_ + size_ );
+	if ( ( pos_ + destSize_ ) > oldSize ) {
+		M_THROW( err_msg( string_helper::OVERFLOW ), pos_ + destSize_ );
+	}
+	if ( offset_ > srcSize_ ) {
+		M_THROW( err_msg( string_helper::BAD_OFFSET ), offset_ );
 	}
 	return;
 	M_EPILOG
@@ -1909,7 +1942,13 @@ void HString::replace_check( int long pos_, int long size_, int long offset_, in
 
 HString& HString::replace( int long pos_, int long size_, HString const& replacement_, int long offset_, int long len_ ) {
 	M_PROLOG
-	replace_check( pos_, size_, offset_, len_ );
+	if ( len_ == npos ) {
+		len_ = MAX_STRING_LENGTH;
+	}
+	replace_check( pos_, size_, offset_, len_, replacement_.get_length() );
+	if ( len_ > ( replacement_.get_length() + offset_ ) ) {
+		len_ = replacement_.get_length() - offset_;
+	}
 	int long oldSize( GET_SIZE );
 	int withRank( EXT_GET_RANK( replacement_ ) );
 	int rank( GET_RANK );
@@ -1925,7 +1964,7 @@ HString& HString::replace( int long pos_, int long size_, HString const& replace
 
 HString& HString::replace( int long pos_, int long size_, int long count_, code_point_t value_ ) {
 	M_PROLOG
-	replace_check( pos_, size_, 0, 0 );
+	replace_check( pos_, size_, 0, 0, MAX_STRING_LENGTH );
 	int long oldSize( GET_SIZE );
 	int withRank( unicode::rank( value_ ) );
 	int rank( GET_RANK );
@@ -1941,7 +1980,7 @@ HString& HString::replace( int long pos_, int long size_, int long count_, code_
 
 HString& HString::replace( int long pos_, int long size_, char const* buffer_, int long len_ ) {
 	M_PROLOG
-	replace_check( pos_, size_, 0, len_ );
+	replace_check( pos_, size_, 0, len_, len_ );
 	from_utf8( pos_, size_, buffer_, len_ );
 	return ( *this );
 	M_EPILOG
@@ -2136,10 +2175,10 @@ HString& HString::fill( code_point_t filler_, int long offset_, int long count_ 
 		count_ = ( GET_SIZE - offset_ );
 	}
 	if ( count_ < 0 ) {
-		M_THROW( _errMsgHString_[string_helper::BAD_LENGTH], count_ );
+		M_THROW( err_msg( string_helper::BAD_LENGTH ), count_ );
 	}
 	if ( ( offset_ < 0 ) || ( offset_ > GET_SIZE ) ) {
-		M_THROW( _errMsgHString_[string_helper::BAD_OFFSET], offset_ );
+		M_THROW( err_msg( string_helper::BAD_OFFSET ), offset_ );
 	}
 	if ( filler_ ) {
 		int rank( max( GET_RANK, unicode::rank( filler_ ) ) );
@@ -2906,7 +2945,7 @@ int long long stoll_impl( char const* str_, int* endIdx_, int base_ ) {
 int long long stoll( HString const& str_, int* endIdx_, int base_ ) {
 	M_PROLOG
 	char buf[MAX_INTEGER_DIGIT_COUNT];
-	int skip( hidden::copy_digits( str_, buf, MAX_INTEGER_DIGIT_COUNT ) );
+	int skip( hcore::hidden::copy_digits( str_, buf, MAX_INTEGER_DIGIT_COUNT ) );
 	int long long result( stoll_impl( buf, endIdx_, base_ ) );
 	if ( endIdx_ ) {
 		*endIdx_ += skip;
@@ -2938,7 +2977,7 @@ int long long unsigned stoull_impl( char const* str_, int* endIdx_, int base_ ) 
 int long long unsigned stoull( HString const& str_, int* endIdx_, int base_ ) {
 	M_PROLOG
 	char buf[MAX_INTEGER_DIGIT_COUNT];
-	int skip( hidden::copy_digits( str_, buf, MAX_INTEGER_DIGIT_COUNT ) );
+	int skip( hcore::hidden::copy_digits( str_, buf, MAX_INTEGER_DIGIT_COUNT ) );
 	int long long unsigned result( stoull_impl( buf, endIdx_, base_ ) );
 	if ( endIdx_ ) {
 		*endIdx_ += skip;
@@ -2971,31 +3010,31 @@ double long stold( HString const& str_, int* endIdx_ ) {
 }
 
 bool is_whitespace( code_point_t char_ ) {
-	return ( _whiteSpace_.has( char_ ) );
+	return ( character_class( CHARACTER_CLASS::WHITESPACE ).has( char_ ) );
 }
 
 bool is_digit( code_point_t char_ ) {
-	return ( _digit_.has( char_ ) );
+	return ( character_class( CHARACTER_CLASS::DIGIT ).has( char_ ) );
 }
 
 bool is_dec_digit( code_point_t char_ ) {
-	return ( _digit_.has( char_ ) );
+	return ( character_class( CHARACTER_CLASS::DIGIT ).has( char_ ) );
 }
 
 bool is_hex_digit( code_point_t char_ ) {
-	return ( _hexDigit_.has( char_ ) );
+	return ( character_class( CHARACTER_CLASS::HEX_DIGIT ).has( char_ ) );
 }
 
 bool is_oct_digit( code_point_t char_ ) {
-	return ( _octDigit_.has( char_ ) );
+	return ( character_class( CHARACTER_CLASS::OCT_DIGIT ).has( char_ ) );
 }
 
 bool is_bin_digit( code_point_t char_ ) {
-	return ( _binDigit_.has( char_ ) );
+	return ( character_class( CHARACTER_CLASS::BIN_DIGIT ).has( char_ ) );
 }
 
 bool is_letter( code_point_t char_ ) {
-	return ( _letter_.has( char_ ) );
+	return ( character_class( CHARACTER_CLASS::LETTER ).has( char_ ) );
 }
 
 bool is_alpha( code_point_t char_ ) {

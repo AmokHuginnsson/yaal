@@ -2996,7 +2996,7 @@ yaal::hcore::HUTF8String::const_iterator HInteger::do_parse( HExecutingParser* e
 			valid = false;
 			break;
 		}
-		if ( ( scan != last_ ) && ( _word_.has( *scan ) ) ) {
+		if ( ( scan != last_ ) && ( character_class( CHARACTER_CLASS::WORD ).has( *scan ) ) ) {
 			valid = false;
 			break;
 		}
@@ -3535,7 +3535,7 @@ bool character_skip_ws( yaal::hcore::HString const& characters_, HRuleBase::WHIT
 	if ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) {
 		skipWS = true;
 		for ( code_point_t c : characters_ ) {
-			if ( _whiteSpace_.has( c ) ) {
+			if ( character_class( CHARACTER_CLASS::WHITESPACE ).has( c ) ) {
 				skipWS = false;
 				break;
 			}
@@ -3820,7 +3820,7 @@ hcore::HUTF8String::const_iterator HString::do_parse( HExecutingParser* executin
 				}
 			}
 			if ( matched && ( _wordBoundary == WORD_BOUNDARY::REQUIRED ) && ( scan != last_ ) ) {
-				matched = exor( _word_.has( *( scan - 1 ) ), _word_.has( *scan ) );
+				matched = exor( character_class( CHARACTER_CLASS::WORD ).has( *( scan - 1 ) ), character_class( CHARACTER_CLASS::WORD ).has( *scan ) );
 			}
 			if ( matched ) {
 				position_t pos( position( executingParser_, start ) );
@@ -3903,8 +3903,8 @@ void HString::do_find_recursions( HRuleAggregator& ) {
 HString string( yaal::hcore::HString const& string_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! _whiteSpace_.has( static_cast<u32_t>( string_.front() ) ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! character_class( CHARACTER_CLASS::WHITESPACE ).has( static_cast<u32_t>( string_.front() ) ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class( CHARACTER_CLASS::WORD ).has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 	return ( HString( string_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -3912,8 +3912,8 @@ HString string( yaal::hcore::HString const& string_, HRuleBase::WHITE_SPACE whit
 HString string( yaal::hcore::HString const& string_, HString::action_string_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! _whiteSpace_.has( static_cast<u32_t>( string_.front() ) ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! character_class( CHARACTER_CLASS::WHITESPACE ).has( static_cast<u32_t>( string_.front() ) ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class( CHARACTER_CLASS::WORD ).has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -3921,8 +3921,8 @@ HString string( yaal::hcore::HString const& string_, HString::action_string_t co
 HString string( yaal::hcore::HString const& string_, HString::action_string_position_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! _whiteSpace_.has( static_cast<u32_t>( string_.front() ) ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! character_class( CHARACTER_CLASS::WHITESPACE ).has( static_cast<u32_t>( string_.front() ) ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class( CHARACTER_CLASS::WORD ).has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -3930,8 +3930,8 @@ HString string( yaal::hcore::HString const& string_, HString::action_string_posi
 HString string( yaal::hcore::HString const& string_, HString::action_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! _whiteSpace_.has( static_cast<u32_t>( string_.front() ) ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! character_class( CHARACTER_CLASS::WHITESPACE ).has( static_cast<u32_t>( string_.front() ) ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class( CHARACTER_CLASS::WORD ).has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -3939,8 +3939,8 @@ HString string( yaal::hcore::HString const& string_, HString::action_t const& ac
 HString string( yaal::hcore::HString const& string_, HString::action_position_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! _whiteSpace_.has( static_cast<u32_t>( string_.front() ) ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! character_class( CHARACTER_CLASS::WHITESPACE ).has( static_cast<u32_t>( string_.front() ) ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class( CHARACTER_CLASS::WORD ).has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -3948,8 +3948,8 @@ HString string( yaal::hcore::HString const& string_, HString::action_position_t 
 HString string( yaal::hcore::HString const& string_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
-	bool skipWS( ! _whiteSpace_.has( static_cast<u32_t>( string_.front() ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class( CHARACTER_CLASS::WORD ).has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	bool skipWS( ! character_class( CHARACTER_CLASS::WHITESPACE ).has( static_cast<u32_t>( string_.front() ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 	return ( HString( string_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -3957,8 +3957,8 @@ HString string( yaal::hcore::HString const& string_, HString::WORD_BOUNDARY word
 HString string( yaal::hcore::HString const& string_, HString::action_string_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
-	bool skipWS( ! _whiteSpace_.has( static_cast<u32_t>( string_.front() ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class( CHARACTER_CLASS::WORD ).has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	bool skipWS( ! character_class( CHARACTER_CLASS::WHITESPACE ).has( static_cast<u32_t>( string_.front() ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -3966,8 +3966,8 @@ HString string( yaal::hcore::HString const& string_, HString::action_string_t co
 HString string( yaal::hcore::HString const& string_, HString::action_string_position_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
-	bool skipWS( ! _whiteSpace_.has( static_cast<u32_t>( string_.front() ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class( CHARACTER_CLASS::WORD ).has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	bool skipWS( ! character_class( CHARACTER_CLASS::WHITESPACE ).has( static_cast<u32_t>( string_.front() ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -3975,8 +3975,8 @@ HString string( yaal::hcore::HString const& string_, HString::action_string_posi
 HString string( yaal::hcore::HString const& string_, HString::action_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
-	bool skipWS( ! _whiteSpace_.has( static_cast<u32_t>( string_.front() ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class( CHARACTER_CLASS::WORD ).has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	bool skipWS( ! character_class( CHARACTER_CLASS::WHITESPACE ).has( static_cast<u32_t>( string_.front() ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -3984,8 +3984,8 @@ HString string( yaal::hcore::HString const& string_, HString::action_t const& ac
 HString string( yaal::hcore::HString const& string_, HString::action_position_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( _word_.has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
-	bool skipWS( ! _whiteSpace_.has( static_cast<u32_t>( string_.front() ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class( CHARACTER_CLASS::WORD ).has( static_cast<u32_t>( string_.back() ) ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	bool skipWS( ! character_class( CHARACTER_CLASS::WHITESPACE ).has( static_cast<u32_t>( string_.front() ) ) ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }

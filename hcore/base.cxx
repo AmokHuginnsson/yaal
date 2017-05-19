@@ -89,7 +89,7 @@ int preparse_integer( HString const& str_, char* alternate_ ) {
 	 */
 	HString::const_iterator it( str_.begin() );
 	int len( safe_int::cast<int>( str_.get_length() ) );
-	while ( ( len > 0 ) && _whiteSpace_.has( static_cast<u32_t>( *it ) ) ) { /* *TODO* *FIXME* Remove static_cast after UCS in HString is implemented. */
+	while ( ( len > 0 ) && character_class( CHARACTER_CLASS::WHITESPACE ).has( static_cast<u32_t>( *it ) ) ) { /* *TODO* *FIXME* Remove static_cast after UCS in HString is implemented. */
 		++ it;
 		-- len;
 	}

@@ -664,7 +664,7 @@ int read_rc_line( HString& option_, HString& value_, HFile& file_,
 		if ( ! option_[ index ] )
 			continue; /* empty line */
 		/* we are looking for first non-whitespace on the line */
-		index = option_.find_other_than( _whiteSpace_.data() );
+		index = option_.find_other_than( character_class( CHARACTER_CLASS::WHITESPACE ).data() );
 		if ( ! option_[ index ] || ( option_[ index ] == '#' ) )
 			continue; /* there is only white spaces or comments on that line */
 		/* at this point we know we have _some_ option */
@@ -686,7 +686,7 @@ int read_rc_line( HString& option_, HString& value_, HFile& file_,
 					throw HProgramOptionsHandlerException( "Syntax error: redundant `=' sign.", line_ );
 				}
 				/* we have found a non-whitespace, so there certainly is a value */
-				end = ( length - 1 ) - option_.reverse_find_other_than( _whiteSpace_.data() );
+				end = ( length - 1 ) - option_.reverse_find_other_than( character_class( CHARACTER_CLASS::WHITESPACE ).data() );
 				/* now we strip apostrophe or quotation marks */
 				if ( ( ( option_[ end ] == '\'' )
 							|| ( option_[ end ] == '"' ) )

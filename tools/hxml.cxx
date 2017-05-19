@@ -588,7 +588,7 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 			break;
 			case ( XML_TEXT_NODE ): if ( node->content ) {
 				_varTmpBuffer = convert( reinterpret_cast<char*>( node->content ), parser_ & PARSER::IGNORE_CONVERSION_ERRORS );
-				if ( ( parser_ & PARSER::KEEP_EMPTY ) || ( _varTmpBuffer.find_other_than( _whiteSpace_.data() ) >= 0 ) ) {
+				if ( ( parser_ & PARSER::KEEP_EMPTY ) || ( _varTmpBuffer.find_other_than( character_class( CHARACTER_CLASS::WHITESPACE ).data() ) >= 0 ) ) {
 					node_->add_node( HNode( this, HNode::TYPE::CONTENT, _varTmpBuffer, node->line ) );
 				}
 			}

@@ -569,18 +569,18 @@ bool HStreamInterface::read_word( void ) {
 	if ( ! _skipWS ) {
 		int peeked( HStreamInterface::do_peek() );
 		if ( ( peeked == INVALID_CHARACTER )
-				|| ( ::memchr( _whiteSpace_.data(), peeked, static_cast<size_t>( _whiteSpace_.size() + 1 ) ) ) ) {
+				|| character_class( CHARACTER_CLASS::WHITESPACE ).hasz( static_cast<code_point_t>( peeked ) ) ) {
 			_fail = true;
 		}
 	}
 	if ( good() ) {
-		read_while_retry( _wordCache, _whiteSpace_.data() );
+		read_while_retry( _wordCache, character_class( CHARACTER_CLASS::WHITESPACE ).data() );
 		if ( _skipWS ) {
 			_wordCache.clear();
 		}
 		if ( good() ) {
-			read_until_retry( _wordCache, _whiteSpace_.data(), false );
-			_wordCache.trim_right( _whiteSpace_.data() );
+			read_until_retry( _wordCache, character_class( CHARACTER_CLASS::WHITESPACE ).data(), false );
+			_wordCache.trim_right( character_class( CHARACTER_CLASS::WHITESPACE ).data() );
 		}
 	}
 	return ( _wordCache.get_length() > 0 );
@@ -589,7 +589,7 @@ bool HStreamInterface::read_word( void ) {
 
 bool HStreamInterface::read_integer( void ) {
 	M_PROLOG
-	read_while_retry( _wordCache, _whiteSpace_.data() );
+	read_while_retry( _wordCache, character_class( CHARACTER_CLASS::WHITESPACE ).data() );
 	_wordCache.clear();
 	do {
 		if ( ! good() ) {
@@ -617,7 +617,7 @@ bool HStreamInterface::read_integer( void ) {
 				break;
 			}
 		}
-		read_while_retry( _wordCache, _digit_.data() );
+		read_while_retry( _wordCache, character_class( CHARACTER_CLASS::DIGIT ).data() );
 		if ( _base != BASES::DEC ) {
 			_wordCache.insert( 0, _base == BASES::HEX ? "0x" : "0o" );
 		}
@@ -632,7 +632,7 @@ bool HStreamInterface::read_integer( void ) {
 bool HStreamInterface::read_floatint_point( void ) {
 	M_PROLOG
 	do {
-		read_while_retry( _wordCache, _whiteSpace_.data() );
+		read_while_retry( _wordCache, character_class( CHARACTER_CLASS::WHITESPACE ).data() );
 		_wordCache.clear();
 		if ( ! good() ) {
 			break;
@@ -645,7 +645,7 @@ bool HStreamInterface::read_floatint_point( void ) {
 		if ( neg ) {
 			read( &sink, 1 );
 		}
-		read_while_retry( _wordCache, _digit_.data() );
+		read_while_retry( _wordCache, character_class( CHARACTER_CLASS::DIGIT ).data() );
 		if ( ! good() ) {
 			break;
 		}
@@ -658,7 +658,7 @@ bool HStreamInterface::read_floatint_point( void ) {
 		}
 		if ( dot ) {
 			HString decimal;
-			read_while_retry( decimal, _digit_.data() );
+			read_while_retry( decimal, character_class( CHARACTER_CLASS::DIGIT ).data() );
 			if ( ! decimal.is_empty() ) {
 				_wordCache += sink;
 				_wordCache += decimal;
@@ -683,7 +683,7 @@ HStreamInterface& HStreamInterface::do_input( char& char_ ) {
 	char c( 0 );
 	do {
 		read( &c, 1 );
-	} while ( good() && _skipWS && ::memchr( _whiteSpace_.data(), c, static_cast<size_t>( _whiteSpace_.size() + 1 ) ) );
+	} while ( good() && _skipWS && character_class( CHARACTER_CLASS::WHITESPACE ).hasz( code_point_t( c ) ) );
 	char_ = c;
 	return ( *this );
 	M_EPILOG

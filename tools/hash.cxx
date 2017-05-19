@@ -534,7 +534,7 @@ HChunk parseHash( FUNCTION function_, yaal::hcore::HString const& hash_ ) {
 	M_PROLOG
 	HString hash( hash_ );
 	hash.lower();
-	M_ENSURE( hash.find_other_than( _hexDigit_.data() ) == HString::npos );
+	M_ENSURE( hash.find_other_than( character_class( CHARACTER_CLASS::HEX_DIGIT ).data() ) == HString::npos );
 	int const expHashLenText( hashLenText( function_ ) );
 	M_ENSURE( hash.get_length() == expHashLenText );
 #if SIZEOF_INT_LONG == 8

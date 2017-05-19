@@ -150,7 +150,7 @@ int copy_digits( HString const& str_, char* buf_, int size_ ) {
 	int skip( 0 );
 	HString::const_iterator it( str_.begin() );
 	HString::const_iterator end( str_.end() );
-	while ( ( it != end ) && _whiteSpace_.has( static_cast<u32_t>( *it ) ) ) { /* *TODO* *FIXME* Remove static_cast after UCS in HString is implemented. */
+	while ( ( it != end ) && character_class( CHARACTER_CLASS::WHITESPACE ).has( static_cast<u32_t>( *it ) ) ) { /* *TODO* *FIXME* Remove static_cast after UCS in HString is implemented. */
 		++ skip;
 		++ it;
 	}

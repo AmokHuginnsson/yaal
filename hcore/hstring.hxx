@@ -81,30 +81,24 @@ public:
 		return ( _size );
 	}
 	bool has( code_point_t ) const;
+	bool hasz( code_point_t ) const;
 };
 
-extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _whiteSpace_;
-extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _binDigit_;
-extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _octDigit_;
-extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _digit_;
-extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _hexDigit_;
-extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _letter_;
-extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _lowerCaseLetter_;
-extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _upperCaseLetter_;
-extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _word_;
-extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _vowel_;
 struct CHARACTER_CLASS {
 	typedef enum {
-		WHITE_SPACE = 0,
-		DIGIT = 1,
-		LETTER = 2,
-		LOWER_CASE_LETTER = 3,
-		UPPER_CASE_LETTER = 4,
-		WORD = 5,
-		VOWEL = 6
+		WHITESPACE = 0,
+		BIN_DIGIT = 1,
+		OCT_DIGIT = 2,
+		DIGIT = 3,
+		HEX_DIGIT = 4,
+		LETTER = 5,
+		LOWER_CASE_LETTER = 6,
+		UPPER_CASE_LETTER = 7,
+		WORD = 8,
+		VOWEL = 9
 	} character_class_t;
 };
-extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const* _characterClass_[];
+HCharacterClass const& character_class( CHARACTER_CLASS::character_class_t );
 
 class HUTF8String;
 
@@ -610,19 +604,19 @@ public:
 	 * \param set - set of characters that shall be removed.
 	 * \return Self.
 	 */
-	HString& trim_left( HString const& set = _whiteSpace_.data() );
+	HString& trim_left( HString const& set = character_class( CHARACTER_CLASS::WHITESPACE ).data() );
 	/*! \brief Trim all consecutive occurrences of given characters from end of the string.
 	 *
 	 * \param set - set of characters that shall be removed.
 	 * \return Self.
 	 */
-	HString& trim_right( HString const& set = _whiteSpace_.data() );
+	HString& trim_right( HString const& set = character_class( CHARACTER_CLASS::WHITESPACE ).data() );
 	/*! \brief Trim all consecutive occurrences of given characters from both beginning and end of the string.
 	 *
 	 * \param set - set of characters that shall be removed.
 	 * \return Self.
 	 */
-	HString& trim( HString const& set = _whiteSpace_.data() );
+	HString& trim( HString const& set = character_class( CHARACTER_CLASS::WHITESPACE ).data() );
 	/*! \brief Remove first N characters from this string.
 	 * \param len - remove that many characters from beginning of this string.
 	 * \return Self.
@@ -735,7 +729,7 @@ private:
 	void from_utf8( int long, int long, char const*, int long );
 	void substr( HString&, int long, int long ) const;
 	void resize( int long capacity, int rank );
-	void replace_check( int long, int long, int long, int long );
+	void replace_check( int long, int long, int long, int long, int long );
 };
 
 class HString::HCharRef {

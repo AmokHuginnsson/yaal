@@ -77,8 +77,8 @@ HString& usun_ogonki( HString& string_ ) {
 }
 
 yaal::hcore::HString article( yaal::hcore::HString const& word_ ) {
-	int long pos( word_.find_one_of( _letter_.data() ) );
-	return( pos != HString::npos ? ( _vowel_.has( static_cast<u32_t>( word_[pos] ) ) ? "an" : "a" ) : "" ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	int long pos( word_.find_one_of( character_class( CHARACTER_CLASS::LETTER ).data() ) );
+	return( pos != HString::npos ? ( character_class( CHARACTER_CLASS::VOWEL ).has( static_cast<u32_t>( word_[pos] ) ) ? "an" : "a" ) : "" ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
 }
 
 double long atof_ex( HString const& string_, bool parse_ ) {
@@ -350,14 +350,14 @@ void show_help( OOptionInfo const& info, HStreamInterface& out_ ) {
 			int words( 0 );
 			while ( ( ws < cols ) && ( ws >= 0 ) ) {
 				eol = ws;
-				ws = static_cast<int>( desc.find_one_of( _whiteSpace_.data(), ws ) );
+				ws = static_cast<int>( desc.find_one_of( character_class( CHARACTER_CLASS::WHITESPACE ).data(), ws ) );
 				if ( ( ws < 0 ) && ( words < 2 ) ) {
 					eol = static_cast<int>( desc.get_length() );
 				}
 				if ( ( ws < 0 ) || ( ws > cols ) )
 					break;
 				eol = ws;
-				ws = static_cast<int>( desc.find_other_than( _whiteSpace_.data(), ws ) );
+				ws = static_cast<int>( desc.find_other_than( character_class( CHARACTER_CLASS::WHITESPACE ).data(), ws ) );
 				if ( ws > 0 )
 					++ words;
 			}
@@ -471,10 +471,10 @@ void dump_configuration( OOptionInfo const& info, HStreamInterface& out_ ) {
 		do {
 			int eol = 0;
 			while ( ( eol < MAXIMUM_LINE_LENGTH ) && ( eol >= 0 ) ) {
-				eol = static_cast<int>( desc.find_one_of( _whiteSpace_.data(), eol ) );
+				eol = static_cast<int>( desc.find_one_of( character_class( CHARACTER_CLASS::WHITESPACE ).data(), eol ) );
 				if ( ( eol < 0 ) || ( eol > MAXIMUM_LINE_LENGTH ) )
 					break;
-				eol = static_cast<int>( desc.find_other_than( _whiteSpace_.data(), eol ) );
+				eol = static_cast<int>( desc.find_other_than( character_class( CHARACTER_CLASS::WHITESPACE ).data(), eol ) );
 			}
 			if ( eol >= MAXIMUM_LINE_LENGTH ) {
 				out_ << "# " << desc.left( eol ) << "\n";
