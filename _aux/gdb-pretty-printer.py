@@ -140,14 +140,20 @@ class YaalHCoreHStringPrinter:
 		self._val = val_
 
 	def to_string( self ):
-		AFL = self._val['ALLOC_FLAG_INDEX']
-		inplace = not ( self._val['_mem'][AFL] & 128 )
-		s = ""
+		AFI = self._val['ALLOC_FLAG_INDEX']
+		inplace = not ( self._val['_mem'][AFI] & 128 )
+		rank = ( self._val['_mem'][AFI] & 96 ) / 32
+		l = 0
+		k = None
 		if inplace:
-			s = self._val['_mem'].string()
+			k = "_mem"
+			l = self._val['_mem'][AFI] & 31
 		else:
-			s = self._val['_ptr'].string()
-		return s
+			k = "_ptr"
+			l = self._val['_mem'].cast( gdb.lookup_type( 'yaal::int_native_t' ).pointer() )[1]
+		e = "UCS-{}".format( rank )
+		s = self._val[k].cast( gdb.lookup_type( 'yaal::u{}_t'.format( rank * 8 ) ).pointer() )
+		return  "".join( map( lambda i : chr( s[i] ), range( 0, l ) ) )
 
 	def display_hint( self ):
 		return 'string'
