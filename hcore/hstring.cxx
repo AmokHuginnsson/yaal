@@ -468,8 +468,8 @@ int long find( void const* mem_, int rank_, int long size_, int long after_, cod
 	int long pos( HString::npos );
 	switch ( 4 * rank_ + valueRank ) {
 		case ( 4 * 1 + 1 ): /* UCS-1 and UCS-1 */ {
-			char const* m( static_cast<char const*>( mem_ ) );
-			char const* p( static_cast<char const*>( ::std::memchr( m + after_, static_cast<yaal::u8_t>( value_ ), static_cast<size_t>( size_ - after_ ) ) ) );
+			char const* m( static_cast<char const*>( mem_ ) + after_ );
+			char const* p( static_cast<char const*>( ::std::memchr( m, static_cast<yaal::u8_t>( value_ ), static_cast<size_t>( size_ - after_ ) ) ) );
 			if ( p ) {
 				pos = p - m;
 			}
@@ -1057,7 +1057,7 @@ void HString::reserve( int long const preallocate_, int const rank_ ) {
 #if 0
 	int long reqAllocBytes( safe_int::mul( preallocate_, rank_ ) );
 #endif
-	int long reqAllocBytes( preallocate_* rank_ );
+	int long reqAllocBytes( preallocate_ * rank_ );
 	if ( reqAllocBytes > MAX_STRING_LENGTH ) {
 		M_THROW( _( "requested allocation size is too big" ), preallocate_ );
 	}
@@ -1567,7 +1567,7 @@ void HString::clear( void ) {
 
 int long HString::get_length( void ) const {
 	M_PROLOG
-	M_ASSERT( ! GET_SIZE || ( GET_SIZE < GET_ALLOC_BYTES ) );
+	M_ASSERT( ! GET_SIZE || ( GET_SIZE <= GET_ALLOC_BYTES ) );
 	return ( GET_SIZE );
 	M_EPILOG
 }
@@ -1750,7 +1750,7 @@ int long HString::find_last_one_of( HString const& set_, int long before_ ) cons
 	if ( ( before_ < 0 ) || set_.is_empty() ) {
 		return ( npos );
 	}
-	return ( adaptive::find_last_one_of( MEM, GET_RANK, before_, EXT_MEM( set_ ), EXT_GET_RANK( set_ ), EXT_GET_SIZE( set_ ) ) );
+	return ( adaptive::find_last_one_of( MEM, GET_RANK, before_ + 1, EXT_MEM( set_ ), EXT_GET_RANK( set_ ), EXT_GET_SIZE( set_ ) ) );
 	M_EPILOG
 }
 
@@ -1796,7 +1796,7 @@ int long HString::find_last_other_than( HString const& set_, int long before_ ) 
 	if ( set_.is_empty() ) {
 		return ( before_ );
 	}
-	return ( adaptive::find_last_other_than( MEM, GET_RANK, before_, EXT_MEM( set_ ), EXT_GET_RANK( set_ ), EXT_GET_SIZE( set_ ) ) );
+	return ( adaptive::find_last_other_than( MEM, GET_RANK, before_ + 1, EXT_MEM( set_ ), EXT_GET_RANK( set_ ), EXT_GET_SIZE( set_ ) ) );
 	M_EPILOG
 }
 
@@ -1821,7 +1821,7 @@ int long HString::find_last( code_point_t char_, int long before_ ) const {
 	if ( before_ < 0 ) {
 		return ( npos );
 	}
-	return ( adaptive::find_last( MEM, GET_RANK, before_, char_ ) );
+	return ( adaptive::find_last( MEM, GET_RANK, before_ + 1, char_ ) );
 	M_EPILOG
 }
 
@@ -1838,7 +1838,7 @@ int long HString::find_last( HString const& pattern_, int long before_ ) const {
 		return ( npos );
 	}
 	return (
-		adaptive::kmpsearch_last( MEM, GET_RANK, before_, EXT_MEM( pattern_ ), EXT_GET_RANK( pattern_ ), patternLength )
+		adaptive::kmpsearch_last( MEM, GET_RANK, before_ + 1, EXT_MEM( pattern_ ), EXT_GET_RANK( pattern_ ), patternLength )
 	);
 	M_EPILOG
 }
