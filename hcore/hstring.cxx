@@ -148,7 +148,7 @@ inline int long kmpsearch_last_impl( haystack_t const* str, int long lenstr, nee
 		start = lenstr - i + b - 2;
 		break;
 	}
-	return ( start );
+	return ( start - lenpat + 1 );
 }
 
 template<typename str_ucs_t, typename value_t>
@@ -935,15 +935,15 @@ static yaal::u8_t const RANK_BIT_MASK =  meta::obinary<001100000>::value;
 #undef SET_ALLOC_BYTES
 #if TARGET_CPU_BITS >= 64
 #define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY : _len[ 2 ] & static_cast<int long>( static_cast<int long unsigned>( -1 ) >> 3 ) )
-#define SET_ALLOC_BYTES( capacity, rank ) \
+#define SET_ALLOC_BYTES( capacity ) \
 	do { \
-		_len[ 2 ] = ( capacity ); _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( _mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK | ( ( ( rank ) - 1 ) << 5 ) ); \
+		_len[ 2 ] = ( capacity ); _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( _mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK ); \
 	} while ( 0 )
 #else /* #if TARGET_CPU_BITS >= 64 */
 #define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY : ( _len[ 2 ] & static_cast<int long>( static_cast<int long unsigned>( -1 ) >> 3 ) ) << 3 )
-#define SET_ALLOC_BYTES( capacity, rank ) \
+#define SET_ALLOC_BYTES( capacity ) \
 	do { \
-		_len[ 2 ] = ( ( capacity ) >> 3 ); _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( _mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK | ( ( ( rank ) - 1 ) << 5 ) ); \
+		_len[ 2 ] = ( ( capacity ) >> 3 ); _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( _mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK ); \
 	} while ( 0 )
 #endif /* #else #if TARGET_CPU_BITS >= 64 */
 
@@ -1063,23 +1063,25 @@ void HString::reserve( int long const preallocate_, int const rank_ ) {
 #endif /* #if TARGET_CPU_BITS < 64 */
 		if ( ! IS_INPLACE ) {
 			_ptr = memory::realloc<char>( _ptr, newAllocBytes );
-			SET_ALLOC_BYTES( newAllocBytes, rank_ );
+			SET_ALLOC_BYTES( newAllocBytes );
+			SET_RANK( rank_ );
 			::std::memset( static_cast<char*>( _ptr ) + oldAllocBytes, 0, static_cast<size_t>( newAllocBytes - oldAllocBytes ) );
 		} else {
 			char* newMem( memory::calloc<char>( newAllocBytes ) );
 			int long origSize( GET_SIZE );
 			::std::strncpy( newMem, _mem, static_cast<size_t>( origSize ) );
 			_ptr = newMem;
-			SET_ALLOC_BYTES( newAllocBytes, rank_ );
+			SET_ALLOC_BYTES( newAllocBytes );
 			SET_SIZE( origSize );
+			SET_RANK( rank_ );
 		}
 	} else {
 		SET_RANK( ( preallocate_ > 0 ) ? rank_ : 1 );
 	}
 	if ( rank_ > oldRank ) {
-		adaptive::copy_backward( MEM, rank_, 0, MEM, oldRank, 0, GET_SIZE );
+		adaptive::copy_backward( MEM, rank_, 0, MEM, oldRank, 0, min( GET_SIZE, preallocate_ ) );
 	} else if ( rank_ < oldRank ) {
-		adaptive::copy( MEM, rank_, 0, MEM, oldRank, 0, GET_SIZE );
+		adaptive::copy( MEM, rank_, 0, MEM, oldRank, 0, min( GET_SIZE, preallocate_ ) );
 	}
 	return;
 	M_EPILOG
