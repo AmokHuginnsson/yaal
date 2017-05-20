@@ -113,6 +113,29 @@ inline int utf8_length( code_point_t value_ ) {
 	return ( l );
 }
 
+namespace CODE_POINTS {
+
+static code_point_t const LATIN_CAPITAL_LETTER_A_WITH_OGONEK    = 260;
+static code_point_t const LATIN_SMALL_LETTER_A_WITH_OGONEK      = 261;
+static code_point_t const LATIN_CAPITAL_LETTER_C_WITH_ACUTE     = 262;
+static code_point_t const LATIN_SMALL_LETTER_C_WITH_ACUTE       = 263;
+static code_point_t const LATIN_CAPITAL_LETTER_E_WITH_OGONEK    = 280;
+static code_point_t const LATIN_SMALL_LETTER_E_WITH_OGONEK      = 281;
+static code_point_t const LATIN_CAPITAL_LETTER_L_WITH_STROKE    = 321;
+static code_point_t const LATIN_SMALL_LETTER_L_WITH_STROKE      = 322;
+static code_point_t const LATIN_CAPITAL_LETTER_N_WITH_ACUTE     = 323;
+static code_point_t const LATIN_SMALL_LETTER_N_WITH_ACUTE       = 324;
+static code_point_t const LATIN_CAPITAL_LETTER_O_WITH_ACUTE     = 211;
+static code_point_t const LATIN_SMALL_LETTER_O_WITH_ACUTE       = 243;
+static code_point_t const LATIN_CAPITAL_LETTER_S_WITH_ACUTE     = 346;
+static code_point_t const LATIN_SMALL_LETTER_S_WITH_ACUTE       = 347;
+static code_point_t const LATIN_CAPITAL_LETTER_Z_WITH_ACUTE     = 377;
+static code_point_t const LATIN_SMALL_LETTER_Z_WITH_ACUTE       = 378;
+static code_point_t const LATIN_CAPITAL_LETTER_Z_WITH_DOT_ABOVE = 379;
+static code_point_t const LATIN_SMALL_LETTER_Z_WITH_DOT_ABOVE   = 380;
+
+}
+
 }
 
 }
