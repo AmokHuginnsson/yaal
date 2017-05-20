@@ -341,61 +341,48 @@ inline void move( void* dest_, int destRank_, int long destOffset_, void const* 
 	return;
 }
 
-inline bool equal( void const* left_, int leftRank_, int long leftSize_, void const* right_, int rightRank_, int long rightSize_ ) {
+inline bool equal( void const* left_, int leftRank_, void const* right_, int rightRank_, int long size_ ) {
 	bool res( false );
 	switch ( 4 * leftRank_ + rightRank_ ) {
-		case ( 4 * 1 + 1 ): /* UCS-1 and UCS-1 */ {
-			res = yaal::safe_equal(
-				static_cast<yaal::u8_t const*>( left_ ), static_cast<yaal::u8_t const*>( left_ ) + leftSize_,
-				static_cast<yaal::u8_t const*>( right_ ), static_cast<yaal::u8_t const*>( right_ ) + rightSize_
-			);
+		case ( 4 * 1 + 1 ): /* UCS-1 and UCS-1 */
+		case ( 4 * 2 + 2 ): /* UCS-2 and UCS-2 */
+		case ( 4 * 4 + 4 ): /* UCS-4 and UCS-4 */ {
+			res = !::memcmp( left_, right_, static_cast<size_t>( size_ * leftRank_ ) );
 		} break;
 		case ( 4 * 2 + 1 ): /* UCS-2 and UCS-1 */ {
-			res = yaal::safe_equal(
-				static_cast<yaal::u16_t const*>( left_ ), static_cast<yaal::u16_t const*>( left_ ) + leftSize_,
-				static_cast<yaal::u8_t const*>( right_ ), static_cast<yaal::u8_t const*>( right_ ) + rightSize_
+			res = yaal::equal(
+				static_cast<yaal::u16_t const*>( left_ ), static_cast<yaal::u16_t const*>( left_ ) + size_,
+				static_cast<yaal::u8_t const*>( right_ )
 			);
 		} break;
 		case ( 4 * 4 + 1 ): /* UCS-4 and UCS-1 */ {
-			res = yaal::safe_equal(
-				static_cast<yaal::u32_t const*>( left_ ), static_cast<yaal::u32_t const*>( left_ ) + leftSize_,
-				static_cast<yaal::u8_t const*>( right_ ), static_cast<yaal::u8_t const*>( right_ ) + rightSize_
+			res = yaal::equal(
+				static_cast<yaal::u32_t const*>( left_ ), static_cast<yaal::u32_t const*>( left_ ) + size_,
+				static_cast<yaal::u8_t const*>( right_ )
 			);
 		} break;
 		case ( 4 * 1 + 2 ): /* UCS-1 and UCS-2 */ {
-			res = yaal::safe_equal(
-				static_cast<yaal::u8_t const*>( left_ ), static_cast<yaal::u8_t const*>( left_ ) + leftSize_,
-				static_cast<yaal::u16_t const*>( right_ ), static_cast<yaal::u16_t const*>( right_ ) + rightSize_
-			);
-		} break;
-		case ( 4 * 2 + 2 ): /* UCS-2 and UCS-2 */ {
-			res = yaal::safe_equal(
-				static_cast<yaal::u16_t const*>( left_ ), static_cast<yaal::u16_t const*>( left_ ) + leftSize_,
-				static_cast<yaal::u16_t const*>( right_ ), static_cast<yaal::u16_t const*>( right_ ) + rightSize_
+			res = yaal::equal(
+				static_cast<yaal::u8_t const*>( left_ ), static_cast<yaal::u8_t const*>( left_ ) + size_,
+				static_cast<yaal::u16_t const*>( right_ )
 			);
 		} break;
 		case ( 4 * 4 + 2 ): /* UCS-4 and UCS-2 */ {
-			res = yaal::safe_equal(
-				static_cast<yaal::u32_t const*>( left_ ), static_cast<yaal::u32_t const*>( left_ ) + leftSize_,
-				static_cast<yaal::u16_t const*>( right_ ), static_cast<yaal::u16_t const*>( right_ ) + rightSize_
+			res = yaal::equal(
+				static_cast<yaal::u32_t const*>( left_ ), static_cast<yaal::u32_t const*>( left_ ) + size_,
+				static_cast<yaal::u16_t const*>( right_ )
 			);
 		} break;
 		case ( 4 * 1 + 4 ): /* UCS-1 and UCS-4 */ {
-			res = yaal::safe_equal(
-				static_cast<yaal::u8_t const*>( left_ ), static_cast<yaal::u8_t const*>( left_ ) + leftSize_,
-				static_cast<yaal::u32_t const*>( right_ ), static_cast<yaal::u32_t const*>( right_ ) + rightSize_
+			res = yaal::equal(
+				static_cast<yaal::u8_t const*>( left_ ), static_cast<yaal::u8_t const*>( left_ ) + size_,
+				static_cast<yaal::u32_t const*>( right_ )
 			);
 		} break;
 		case ( 4 * 2 + 4 ): /* UCS-2 and UCS-4 */ {
-			res = yaal::safe_equal(
-				static_cast<yaal::u16_t const*>( left_ ), static_cast<yaal::u16_t const*>( left_ ) + leftSize_,
-				static_cast<yaal::u32_t const*>( right_ ), static_cast<yaal::u32_t const*>( right_ ) + rightSize_
-			);
-		} break;
-		case ( 4 * 4 + 4 ): /* UCS-4 and UCS-4 */ {
-			res = yaal::safe_equal(
-				static_cast<yaal::u32_t const*>( left_ ), static_cast<yaal::u32_t const*>( left_ ) + leftSize_,
-				static_cast<yaal::u32_t const*>( right_ ), static_cast<yaal::u32_t const*>( right_ ) + rightSize_
+			res = yaal::equal(
+				static_cast<yaal::u16_t const*>( left_ ), static_cast<yaal::u16_t const*>( left_ ) + size_,
+				static_cast<yaal::u32_t const*>( right_ )
 			);
 		} break;
 	}
@@ -913,11 +900,11 @@ static yaal::u8_t const RANK_BIT_MASK =  meta::obinary<001100000>::value;
 #undef IS_INPLACE
 #define IS_INPLACE ( ! ( _mem[ ALLOC_FLAG_INDEX ] & ALLOC_BIT_MASK ) )
 #undef GET_RANK
-#define GET_RANK ( ( _mem[ ALLOC_FLAG_INDEX ] & RANK_BIT_MASK ) >> 5 )
+#define GET_RANK ( ( ( _mem[ ALLOC_FLAG_INDEX ] & RANK_BIT_MASK ) >> 5 ) + 1 )
 #undef EXT_IS_INPLACE
 #define EXT_IS_INPLACE( base ) ( ! ( base._mem[ ALLOC_FLAG_INDEX ] & ALLOC_BIT_MASK ) )
 #undef EXT_GET_RANK
-#define EXT_GET_RANK( base ) ( ( base._mem[ ALLOC_FLAG_INDEX ] & RANK_BIT_MASK ) >> 5 )
+#define EXT_GET_RANK( base ) ( ( ( base._mem[ ALLOC_FLAG_INDEX ] & RANK_BIT_MASK ) >> 5 ) + 1 )
 #undef MEM
 #define MEM ( IS_INPLACE ? _mem : _ptr )
 #undef EXT_MEM
@@ -927,7 +914,7 @@ static yaal::u8_t const RANK_BIT_MASK =  meta::obinary<001100000>::value;
 #undef EXT_GET_SIZE
 #define EXT_GET_SIZE( base ) ( EXT_IS_INPLACE( base ) ? ( base._mem[ ALLOC_FLAG_INDEX ] & ~RANK_BIT_MASK ) : static_cast<int long>( base._len[ 1 ] ) )
 #undef SET_RANK
-#define SET_RANK( rank ) ( _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( ( _mem[ ALLOC_FLAG_INDEX ] & ~RANK_BIT_MASK ) | ( 1 << 5 ) ) )
+#define SET_RANK( rank ) ( _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( ( _mem[ ALLOC_FLAG_INDEX ] & ~RANK_BIT_MASK ) | ( ( ( rank ) - 1 ) << 5 ) ) )
 #undef SET_SIZE
 #define SET_SIZE( size ) \
 	do { \
@@ -941,7 +928,7 @@ static yaal::u8_t const RANK_BIT_MASK =  meta::obinary<001100000>::value;
 	do { \
 		( EXT_IS_INPLACE( base ) ? base._mem[ ALLOC_FLAG_INDEX ] = ( base._mem[ ALLOC_FLAG_INDEX ] & RANK_BIT_MASK ) | static_cast<char>( size ) : base._len[ 1 ] = ( size ) ); \
 		if ( ( size ) == 0 ) { \
-			base._mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( ( base._mem[ ALLOC_FLAG_INDEX ] & ~RANK_BIT_MASK ) | ( 1 << 5 ) ); \
+			base._mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( base._mem[ ALLOC_FLAG_INDEX ] & ~RANK_BIT_MASK ); \
 		} \
 	} while ( 0 )
 #undef GET_ALLOC_BYTES
@@ -950,13 +937,13 @@ static yaal::u8_t const RANK_BIT_MASK =  meta::obinary<001100000>::value;
 #define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY : _len[ 2 ] & static_cast<int long>( static_cast<int long unsigned>( -1 ) >> 3 ) )
 #define SET_ALLOC_BYTES( capacity, rank ) \
 	do { \
-		_len[ 2 ] = ( capacity ); _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( _mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK | ( ( rank ) << 5 ) ); \
+		_len[ 2 ] = ( capacity ); _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( _mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK | ( ( ( rank ) - 1 ) << 5 ) ); \
 	} while ( 0 )
 #else /* #if TARGET_CPU_BITS >= 64 */
 #define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY : ( _len[ 2 ] & static_cast<int long>( static_cast<int long unsigned>( -1 ) >> 3 ) ) << 3 )
 #define SET_ALLOC_BYTES( capacity, rank ) \
 	do { \
-		_len[ 2 ] = ( ( capacity ) >> 3 ); _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( _mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK | ( ( rank ) << 5 ) ); \
+		_len[ 2 ] = ( ( capacity ) >> 3 ); _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( _mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK | ( ( ( rank ) - 1 ) << 5 ) ); \
 	} while ( 0 )
 #endif /* #else #if TARGET_CPU_BITS >= 64 */
 
@@ -1395,7 +1382,7 @@ code_point_t HString::operator[] ( int index_ ) const {
 
 code_point_t HString::operator[] ( int long index_ ) const {
 	M_PROLOG
-	if ( ( index_ < 0 ) || ( index_ > GET_SIZE ) ) {
+	if ( ( index_ < 0 ) || ( index_ >= GET_SIZE ) ) {
 		M_THROW( err_msg( string_helper::INDEX_OOB ), index_ );
 	}
 	return ( adaptive::get( MEM, GET_RANK, index_ ) );
@@ -1429,7 +1416,7 @@ bool HString::operator == ( HString const& other_ ) const {
 		( this == &other_ )
 		|| (
 			( thisSize == otherSize )
-			&& adaptive::equal( MEM, GET_RANK, thisSize, EXT_MEM( other_ ), EXT_GET_RANK( other_ ), otherSize )
+			&& adaptive::equal( MEM, GET_RANK, EXT_MEM( other_ ), EXT_GET_RANK( other_ ), thisSize )
 		)
 	);
 	M_EPILOG
@@ -1883,7 +1870,7 @@ HString& HString::replace( HString const& pattern_,
 			src = this;
 			rank = newRank;
 		}
-		reserve( oldSize, newRank );
+		reserve( newSize, newRank );
 		int long oldLen( 0 );
 		int long newLen( 0 );
 		patPos = 0;

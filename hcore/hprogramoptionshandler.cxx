@@ -661,12 +661,14 @@ int read_rc_line( HString& option_, HString& value_, HFile& file_,
 	while ( file_.read_line( option_ ) >= 0 ) {
 		line_ ++;
 		index = 0;
-		if ( ! option_[ index ] )
+		if ( option_.is_empty() ) {
 			continue; /* empty line */
+		}
 		/* we are looking for first non-whitespace on the line */
 		index = option_.find_other_than( character_class( CHARACTER_CLASS::WHITESPACE ).data() );
-		if ( ! option_[ index ] || ( option_[ index ] == '#' ) )
+		if ( ! option_[ index ] || ( option_[ index ] == '#' ) ) {
 			continue; /* there is only white spaces or comments on that line */
+		}
 		/* at this point we know we have _some_ option */
 		strip_comment( option_ );
 		/* strip comment from end of line */

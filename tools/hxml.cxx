@@ -463,7 +463,8 @@ void HXml::init( yaal::hcore::HStreamInterface& stream, parser_t parser_ ) {
 #ifdef __DEBUGGER_BABUNI__
 	cout << root->name << endl;
 #endif /* __DEBUGGER_BABUNI__ */
-	verify_encoding( reinterpret_cast<char const *>( doc.get()->encoding ), root, _streamId );
+	char const* enc( reinterpret_cast<char const *>( doc.get()->encoding ) );
+	verify_encoding( enc ? enc : "", root, _streamId );
 	using yaal::swap;
 	swap( _xml->_doc, doc );
 	return;
@@ -474,8 +475,8 @@ void HXml::parse_dtd( void* dtd_ ) {
 	M_PROLOG
 	if ( dtd_ ) {
 		xmlDtdPtr dtd( static_cast<xmlDtdPtr>( dtd_ ) );
-		_externalId = reinterpret_cast<char const*>( dtd->ExternalID );
-		_systemId = reinterpret_cast<char const*>( dtd->SystemID );
+		_externalId = dtd->ExternalID ? reinterpret_cast<char const*>( dtd->ExternalID ) : "";
+		_systemId = dtd->SystemID ? reinterpret_cast<char const*>( dtd->SystemID ) : "";
 		xmlNodePtr node( dtd->children );
 		while ( node ) {
 			if ( ( node->type == XML_ENTITY_DECL ) && ( node->name && node->content ) ) {
@@ -692,18 +693,13 @@ void HXml::parse( HString const& xPath_, parser_t parser_ ) {
 	HString xPath( xPath_.is_empty() ? FULL_TREE : _xml->_utf8[0].x_str() );
 	get_node_set_by_path( xPath );
 	_domTree.clear();
-	int ctr = 0;
-	while ( xPath[ ctr ] ) {
-		++ ctr;
-	}
-	-- ctr;
-	M_ASSERT( ctr >= 0 );
+	M_ASSERT( xPath.get_length() > 0 );
 	parse_dtd( _xml->_doc.get()->intSubset );
 	if ( _xml->_nodeSet ) {
 		if ( xPath != FULL_TREE ) {
 			tree_t::node_t root = _domTree.create_new_root( HNode( this ) );
 			(**root)._text = "xpath_result_set";
-			for ( ctr = 0; ctr < _xml->_nodeSet->nodeNr; ++ ctr ) {
+			for ( int ctr = 0; ctr < _xml->_nodeSet->nodeNr; ++ ctr ) {
 				parse( _xml->_nodeSet->nodeTab[ ctr ], root, parser_ );
 			}
 		} else {

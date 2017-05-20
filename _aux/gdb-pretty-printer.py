@@ -142,7 +142,7 @@ class YaalHCoreHStringPrinter:
 	def to_string( self ):
 		AFI = self._val['ALLOC_FLAG_INDEX']
 		inplace = not ( self._val['_mem'][AFI] & 128 )
-		rank = ( self._val['_mem'][AFI] & 96 ) / 32
+		rank = ( ( self._val['_mem'][AFI] & 96 ) / 32 ) + 1
 		l = 0
 		k = None
 		if inplace:
