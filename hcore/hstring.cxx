@@ -1832,68 +1832,46 @@ int long HString::find_last( HString const& pattern_, int long before_ ) const {
 	M_EPILOG
 }
 
-HString& HString::replace( HString const& pattern_,
-		HString const& with_ ) {
+HString& HString::replace( HString const& pattern_, HString const& with_ ) {
 	M_PROLOG
 	if ( pattern_.is_empty() ) {
 		return ( *this );
 	}
+	typedef yaal::hcore::HArray<int long> pattern_offsets_t;
+	pattern_offsets_t patternOffsets;
 	int long lenPattern( pattern_.get_length() );
+	int long patPos( 0 );
+	while ( ( patPos = find( pattern_, patPos ) ) != npos ) {
+		patternOffsets.push_back( patPos );
+		patPos += lenPattern;
+	}
 	int long lenWith( with_.get_length() );
 	int long subWP( lenWith - lenPattern );
-	int long patPos( 0 );
-	int rank( GET_RANK );
 	int long oldSize( GET_SIZE );
+	int long newSize( oldSize + subWP * patternOffsets.get_size() );
 	int withRank( EXT_GET_RANK( with_ ) );
-	int newRank( max( rank, withRank ) );
-	if ( subWP == 0 ) { /* replacement is equal length to pattern */
-		bool needReserve( newRank > rank );
-		while ( ( patPos = find( pattern_, patPos ) ) != npos ) {
-			if ( needReserve ) {
-				needReserve = false;
-				reserve( GET_SIZE, newRank );
-			}
-			adaptive::copy( MEM, newRank, patPos, EXT_MEM( with_ ), withRank, 0, lenWith );
-			patPos += lenPattern;
-		}
-	} else {
-		int long newSize( oldSize );
-		while ( ( patPos = find( pattern_, patPos ) ) != npos ) {
-			newSize += subWP;
-			patPos += lenPattern;
-		}
-		HString s;
-		HString* src( nullptr );
-		if ( subWP > 0 ) { /* replacement is longer than pattern */
-			s = *this;
-			s.materialize();
-			src = &s;
-		} else { /* replacement is shorter than pattern */
-			src = this;
-			rank = newRank;
-		}
-		reserve( newSize, newRank );
-		int long oldLen( 0 );
-		int long newLen( 0 );
-		patPos = 0;
-		void const* with( EXT_MEM( with_ ) );
-		void const* srcBuf( EXT_MEM( (*src) ) );
-		void* buf( MEM );
-		while ( ( patPos = src->find( pattern_, patPos ) ) != npos ) {
-			if ( patPos > oldLen ) {
-				adaptive::move( buf, newRank, newLen, srcBuf, rank, oldLen, patPos - oldLen );
-				newLen += ( patPos - oldLen );
-			}
-			adaptive::copy( buf, newRank, newLen, with, withRank, 0, lenWith );
-			newLen += lenWith;
-			patPos += lenPattern;
-			oldLen = patPos;
-		}
-		if ( oldLen < GET_SIZE ) {
-			adaptive::move( buf, newRank, newLen, srcBuf, rank, oldLen, GET_SIZE - oldLen );
-		}
-		SET_SIZE( newSize );
+	int rank( max( GET_RANK, withRank ) );
+	reserve( max( oldSize, newSize ), rank );
+	void* dst( MEM );
+	void const* src( EXT_MEM( with_ ) );
+	int long extraOffset( 0 );
+	if ( newSize > oldSize ) {
+		extraOffset = newSize - oldSize;
+		adaptive::move( dst, rank, extraOffset, dst, rank, 0, oldSize );
 	}
+	int long srcOffset( 0 );
+	int long dstOffset( 0 );
+	for ( int long offset : patternOffsets ) {
+		int long unchangedLength( offset - srcOffset );
+		adaptive::move( dst, rank, dstOffset, dst, rank, srcOffset + extraOffset, unchangedLength );
+		dstOffset += unchangedLength;
+		srcOffset += unchangedLength;
+		adaptive::copy( dst, rank, dstOffset, src, withRank, 0, lenWith );
+		dstOffset += lenWith;
+		srcOffset += lenPattern;
+	}
+	adaptive::move( dst, rank, dstOffset, dst, rank, srcOffset + extraOffset, oldSize - srcOffset );
+	SET_SIZE( newSize );
 	return ( *this );
 	M_EPILOG
 }
