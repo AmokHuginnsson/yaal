@@ -1028,9 +1028,9 @@ HString::HString( int long preallocate_, code_point_t fill_ )
  * S(2, 2) -> resize(0, 2) = S(0, 1)
  * S(2, 2)[22] -> reserve(2, 1) = ex
  * S(2, 2)[22] -> reserve(1, 1) = ex
- * S(2, 2)[12] -> reserve(1, 1) = S(2, 1)
- * S(2, 2)[11] -> reserve(2, 1) = S(2,1)
- * S(2, 2)[11) -> reserve(1, 1) = S(2,1)
+ * S(2, 2)[12] -> reserve(1, 1) = S(2, 1) // needs down-ranking with trimming
+ * S(2, 2)[11] -> reserve(2, 1) = S(2, 1)
+ * S(2, 2)[11) -> reserve(1, 1) = S(2, 1)
  */
 void HString::reserve( int long const preallocate_, int const rank_ ) {
 	M_PROLOG
@@ -1079,9 +1079,9 @@ void HString::reserve( int long const preallocate_, int const rank_ ) {
 		SET_RANK( ( preallocate_ > 0 ) ? rank_ : 1 );
 	}
 	if ( rank_ > oldRank ) {
-		adaptive::copy_backward( MEM, rank_, 0, MEM, oldRank, 0, min( GET_SIZE, preallocate_ ) );
+		adaptive::copy_backward( MEM, rank_, 0, MEM, oldRank, 0, GET_SIZE );
 	} else if ( rank_ < oldRank ) {
-		adaptive::copy( MEM, rank_, 0, MEM, oldRank, 0, min( GET_SIZE, preallocate_ ) );
+		adaptive::copy( MEM, rank_, 0, MEM, oldRank, 0, GET_SIZE );
 	}
 	return;
 	M_EPILOG
@@ -1096,7 +1096,9 @@ void HString::reserve( int long preallocate_ ) {
 
 void HString::resize( int long const preallocate_, int const rank_ ) {
 	M_PROLOG
-	reserve( preallocate_, rank_ );
+	if ( preallocate_ > 0 ) {
+		reserve( preallocate_, rank_ );
+	}
 	SET_SIZE( preallocate_ );
 	return;
 	M_EPILOG
@@ -1920,9 +1922,7 @@ HString& HString::replace( int long pos_, int long size_, HString const& replace
 	int withRank( EXT_GET_RANK( replacement_ ) );
 	int rank( GET_RANK );
 	int long newSize( oldSize + ( len_ - size_ ) );
-	if ( ( withRank > rank ) || ( len_ > size_ ) ) {
-		resize( newSize, rank = max( rank, withRank ) );
-	}
+	resize( newSize, rank = max( rank, withRank ) );
 	adaptive::move( MEM, rank, pos_ + len_, MEM, rank, pos_ + size_, oldSize - ( pos_ + size_ ) );
 	adaptive::copy( MEM, rank, pos_, EXT_MEM( replacement_ ), withRank, offset_, len_ );
 	return ( *this );
@@ -1936,9 +1936,7 @@ HString& HString::replace( int long pos_, int long size_, int long count_, code_
 	int withRank( unicode::rank( value_ ) );
 	int rank( GET_RANK );
 	int long newSize( oldSize + ( count_ - size_ ) );
-	if ( ( withRank > rank ) || ( count_ > size_ ) ) {
-		resize( newSize, rank = max( rank, withRank ) );
-	}
+	resize( newSize, rank = max( rank, withRank ) );
 	adaptive::move( MEM, rank, pos_ + count_, MEM, rank, pos_ + size_, oldSize - ( pos_ + size_ ) );
 	adaptive::fill( MEM, rank, pos_, count_, value_ );
 	return ( *this );
