@@ -102,7 +102,7 @@ inline int long kmpsearch_impl( haystack_t const* str, int long lenstr, needle_t
 	HChunk KMPnext( chunk_size<int long>( lenpat + 1 ) );
 	int long* next( KMPnext.get<int long>() );
 	int long b( next[ 0 ] = -1 );
-	for ( int long i = 1; i <= lenpat; ++ i ) {
+	for ( int long i = 1; i < lenpat; ++ i ) {
 		while ( ( b > -1 ) && ( pat[ b ] != pat[ i - 1 ] ) ) {
 			b = next[ b ];
 		}
@@ -129,7 +129,7 @@ inline int long kmpsearch_last_impl( haystack_t const* str, int long lenstr, nee
 	HChunk KMPnext( chunk_size<int long>( lenpat + 1 ) );
 	int long* next( KMPnext.get<int long>() );
 	int long b( next[ 0 ] = -1 );
-	for ( int long i = 1; i <= lenpat; ++ i ) {
+	for ( int long i = 1; i < lenpat; ++ i ) {
 		while ( ( b > -1 ) && ( pat[ lenpat - b - 1 ] != pat[ lenpat - i ] ) ) {
 			b = next[ b ];
 		}
@@ -1639,7 +1639,7 @@ HString& HString::assign( char const* data_, int long length_ ) {
 		M_THROW( err_msg(  string_helper::BAD_LENGTH  ), length_ );
 	}
 	int long len( static_cast<int long>( ::strnlen( data_, static_cast<size_t>( length_ ) ) ) );
-	from_utf8( 0, 0, data_, len );
+	from_utf8( 0, GET_SIZE, data_, len );
 	return ( *this );
 	M_EPILOG
 }
@@ -1915,7 +1915,7 @@ HString& HString::replace( int long pos_, int long size_, HString const& replace
 		len_ = MAX_STRING_LENGTH;
 	}
 	replace_check( pos_, size_, offset_, len_, replacement_.get_length() );
-	if ( len_ > ( replacement_.get_length() + offset_ ) ) {
+	if ( ( offset_ + len_ ) > replacement_.get_length() ) {
 		len_ = replacement_.get_length() - offset_;
 	}
 	int long oldSize( GET_SIZE );
