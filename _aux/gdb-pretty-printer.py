@@ -18,6 +18,9 @@ def yaal_lookup_function( val_ ):
 	regex = re.compile( "^yaal::hcore::HString$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHStringPrinter( val_ )
+	regex = re.compile( "^yaal::hcore::HUTF8String$" )
+	if regex.match( lookup_tag ):
+		return YaalHCoreHUTF8StringPrinter( val_ )
 	regex = re.compile( "^yaal::hcore::HTime$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHTimePrinter( val_ )
@@ -154,6 +157,19 @@ class YaalHCoreHStringPrinter:
 		e = "UCS-{}".format( rank )
 		s = self._val[k].cast( gdb.lookup_type( 'yaal::u{}_t'.format( rank * 8 ) ).pointer() )
 		return  "".join( map( lambda i : chr( s[i] ), range( 0, l ) ) )
+
+	def display_hint( self ):
+		return 'string'
+
+class YaalHCoreHUTF8StringPrinter:
+	"Print a yaal::hcore::HUTF8String"
+
+	def __init__( self, val_ ):
+		self._val = val_
+
+	def to_string( self ):
+		BuferMetaSize = gdb.lookup_type( 'yaal::hcore::HUTF8String::OBufferMeta' ).sizeof
+		return ( self._val['_ptr'] + BuferMetaSize ).string( "utf-8" )
 
 	def display_hint( self ):
 		return 'string'
