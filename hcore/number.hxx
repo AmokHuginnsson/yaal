@@ -44,6 +44,8 @@ int const A_MINUS = 0;
 int const A_DOT = 1;
 int const A_ZERO = 2;
 extern HString const VALID_CHARACTERS;
+extern HString const DIGITS_AND_DOT;
+extern HString const DIGITS;
 extern i32_t const DECIMAL_SHIFT[];
 
 }

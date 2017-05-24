@@ -49,6 +49,9 @@ namespace hcore {
 namespace number {
 
 HString const VALID_CHARACTERS( "-.0123456789" );
+HString const DIGITS_AND_DOT( VALID_CHARACTERS.substr( A_DOT ) );
+HString const DIGITS( VALID_CHARACTERS.substr( A_ZERO ) );
+
 i32_t const DECIMAL_SHIFT[] = {
 	/* 0 */ 1l,
 	/* 1 */ 10l,

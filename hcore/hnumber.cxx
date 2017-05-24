@@ -482,7 +482,7 @@ void HNumber::from_string( HString const& number_ ) {
 	}
 	integer_t len( static_cast<integer_t>( number_.get_length() ) );
 	M_ENSURE( start < len ); /* exclude "!!-" */
-	M_ENSURE( number_.find_one_of( VALID_CHARACTERS + A_DOT, start ) == start ); /* exclude "--" and "-!!" */
+	M_ENSURE( number_.find_one_of( DIGITS_AND_DOT, start ) == start ); /* exclude "--" and "-!!" */
 	integer_t idx( static_cast<integer_t>( number_.find_other_than( "0", start ) ) ); /* skip leading 0s */
 	_integralPartSize = 0;
 	_leafCount = 0;
@@ -491,17 +491,17 @@ void HNumber::from_string( HString const& number_ ) {
 			integer_t firstValid( start );
 			start = idx;
 			integer_t dot( static_cast<integer_t>( number_.find( VALID_CHARACTERS[ A_DOT ], start ) ) );
-			idx = static_cast<integer_t>( number_.find_other_than( VALID_CHARACTERS + A_DOT, start ) );
+			idx = static_cast<integer_t>( number_.find_other_than( DIGITS_AND_DOT, start ) );
 			if ( ( idx != HString::npos ) && ( idx < dot ) ) { /* "!!232.!!!" */
 				dot = HString::npos;
 			}
-			integer_t digit( static_cast<integer_t>( number_.find_one_of( VALID_CHARACTERS + A_ZERO, start ) ) );
+			integer_t digit( static_cast<integer_t>( number_.find_one_of( DIGITS, start ) ) );
 			if ( ( digit == HString::npos ) && ( firstValid < start ) ) {
 				break;
 			}
 			M_ENSURE( digit != HString::npos ); /* must have digit */
 			M_ENSURE( ( digit - start ) <= 1 ); /* exclude "-..!!" and "..!!" */
-			integer_t end( static_cast<integer_t>( number_.find_other_than( VALID_CHARACTERS + ( dot >= 0 ? A_ZERO : A_DOT ), dot >= 0 ? dot + 1 : start ) ) );
+			integer_t end( static_cast<integer_t>( number_.find_other_than( dot >= 0 ? DIGITS : DIGITS_AND_DOT, dot >= 0 ? dot + 1 : start ) ) );
 			( end != HString::npos ) || ( end = len );
 			if ( dot != HString::npos ) {
 				idx = static_cast<integer_t>( number_.reverse_find_other_than( "0", len - end ) );
