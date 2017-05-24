@@ -1090,6 +1090,10 @@ HString to_string( void const* );
 inline HString to_string( HString const& v_ ) {
 	return ( v_ );
 }
+void copy_ascii( HString const&, char*, int );
+void copy_ascii( HString::const_iterator, HString::const_iterator, char*, int );
+void copy_all_to_ascii( HString const&, char*, int );
+void copy_all_to_ascii( HString::const_iterator, HString::const_iterator, char*, int );
 int stoi( HString const&, int* = nullptr, int = 10 );
 int long stol( HString const&, int* = nullptr, int = 10 );
 int long unsigned stoul( HString const&, int* = nullptr, int = 10 );

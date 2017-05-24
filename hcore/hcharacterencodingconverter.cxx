@@ -91,10 +91,8 @@ void HCharacterEncodingConverter::init( void ) {
 	char from[CHARSET_NAME_SIZE];
 	char to[CHARSET_NAME_SIZE];
 	M_ENSURE( ( _nameFrom.get_length() < ( CHARSET_NAME_SIZE - 1 ) ) && ( _nameTo.get_length() < ( CHARSET_NAME_SIZE - 1 ) ) );
-	transform( _nameFrom.begin(), _nameFrom.end(), from, static_cast<char(*)( yaal::u32_t )>( &safe_int::cast<char> ) );
-	from[ _nameFrom.get_length() ] = 0;
-	transform( _nameTo.begin(), _nameTo.end(), to, static_cast<char(*)( yaal::u32_t )>( &safe_int::cast<char> ) );
-	to[ _nameTo.get_length() ] = 0;
+	copy_all_to_ascii( _nameFrom, from, CHARSET_NAME_SIZE );
+	copy_all_to_ascii( _nameTo, to, CHARSET_NAME_SIZE );
 	_descriptor = reinterpret_cast<descriptor_t>( iconv_open( to, from ) );
 	M_ENSURE( _descriptor != INVALID, "iconv_open( "_ys.append( _nameTo ).append( ", " ).append( _nameFrom ).append( " )" ) );
 	return;

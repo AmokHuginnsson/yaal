@@ -145,23 +145,17 @@ void decode_set_env( HString line ) {
 
 namespace hidden {
 
+inline HString::const_iterator skip_whitespace( HString const& str_ ) {
+	int long nonWhiteSpace( str_.find_other_than( character_class( CHARACTER_CLASS::WHITESPACE ).data() ) );
+	return ( str_.begin() + ( nonWhiteSpace != HString::npos ? nonWhiteSpace : 0 ) );
+}
+
 int copy_digits( HString const&, char*, int );
 int copy_digits( HString const& str_, char* buf_, int size_ ) {
-	int skip( 0 );
-	HString::const_iterator it( str_.begin() );
+	HString::const_iterator it( skip_whitespace( str_ ) );
 	HString::const_iterator end( str_.end() );
-	while ( ( it != end ) && character_class( CHARACTER_CLASS::WHITESPACE ).has( static_cast<u32_t>( *it ) ) ) { /* *TODO* *FIXME* Remove static_cast after UCS in HString is implemented. */
-		++ skip;
-		++ it;
-	}
-	for (
-		int i( 0 ), LIMIT( min( size_ - 1, static_cast<int>( end - it ) ) );
-		( i < LIMIT ) && ( static_cast<u32_t>( *it ) < unicode::UTF8_MAX_1_BYTE_CODE_POINT );
-		++ i, ++ it, ++ buf_
-	) { /* *TODO* *FIXME* Remove static_cast after UCS in HString is implemented. */
-		*buf_ = static_cast<char>( *it );
-	}
-	*buf_ = 0;
+	int skip( static_cast<int>( it - str_.begin() ) );
+	copy_ascii( it, end, buf_, size_ );
 	return ( skip );
 }
 

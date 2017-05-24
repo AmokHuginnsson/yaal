@@ -2894,6 +2894,51 @@ HString to_string( void const* val_ ) {
 	M_EPILOG
 }
 
+namespace {
+
+void copy_ascii_impl( HString::const_iterator it_, HString::const_iterator end_, char* buffer_, int size_, bool all_ ) {
+	for (
+		int i( 0 ), LIMIT( min( size_ - 1, static_cast<int>( end_ - it_ ) ) );
+		( i < LIMIT ) && ( all_ || ( static_cast<u32_t>( *it_ ) < unicode::UTF8_MAX_1_BYTE_CODE_POINT ) );
+		++ i, ++ it_, ++ buffer_
+	) { /* *TODO* *FIXME* Remove static_cast after UCS in HString is implemented. */
+		*buffer_ = safe_int::cast<char>( *it_ );
+	}
+	*buffer_ = 0;
+	return;
+}
+
+}
+
+void copy_ascii( HString const& string_, char* buffer_, int size_ ) {
+	M_PROLOG
+	copy_ascii( string_.begin(), string_.end(), buffer_, size_ );
+	return;
+	M_EPILOG
+}
+
+void copy_ascii( HString::const_iterator it_, HString::const_iterator end_, char* buffer_, int size_ ) {
+	M_PROLOG
+	copy_ascii_impl( it_, end_, buffer_, size_, true );
+	return;
+	M_EPILOG
+}
+
+void copy_all_to_ascii( HString const& string_, char* buffer_, int size_ ) {
+	M_PROLOG
+	copy_all_to_ascii( string_.begin(), string_.end(), buffer_, size_ );
+	return;
+	M_EPILOG
+}
+
+void copy_all_to_ascii( HString::const_iterator it_, HString::const_iterator end_, char* buffer_, int size_ ) {
+	M_PROLOG
+	copy_ascii_impl( it_, end_, buffer_, size_, false );
+	return;
+	M_EPILOG
+}
+
+
 int stoi( HString const& str_, int* endIdx_, int base_ ) {
 	M_PROLOG
 	return ( safe_int::cast<int>( stoll( str_, endIdx_, base_ ) ) );
