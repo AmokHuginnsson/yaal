@@ -683,7 +683,7 @@ int read_rc_line( HString& option_, HString& value_, HFile& file_,
 			/* have a value :-o */
 			int long endOfOption = index;
 			index = option_.find_other_than( _keyValueSep_, index );
-			if ( ( index > 0 ) && option_[ index ] ) {
+			if ( ( index > 0 ) && option_[ index ].get() ) {
 				if ( count( option_.begin() + endOfOption, option_.begin() + index, '='_ycp ) > 1 ) {
 					throw HProgramOptionsHandlerException( "Syntax error: redundant `=' sign.", line_ );
 				}

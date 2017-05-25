@@ -156,10 +156,6 @@ YAAL_DEFINE_OPER( <= )
 YAAL_DEFINE_OPER( < )
 YAAL_DEFINE_OPER( >= )
 YAAL_DEFINE_OPER( > )
-#pragma GCC diagnostic ignored "-Weffc++"
-YAAL_DEFINE_OPER( && )
-YAAL_DEFINE_OPER( || )
-#pragma GCC diagnostic error "-Weffc++"
 #undef YAAL_DEFINE_OPER
 #define YAAL_DEFINE_OPER( OP ) \
 	HTaggedPOD operator OP ( void ) const { \
