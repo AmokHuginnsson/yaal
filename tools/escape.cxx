@@ -71,7 +71,7 @@ void escape( yaal::hcore::HString& string_, EscapeTable const& et_, code_point_t
 		int pos( 0 );
 		code_point_t* ptr( cache.get<code_point_t>() );
 		for ( HString::const_iterator it( string_.begin() ), end( string_.end() ); it != end; ++ it, ++ pos ) {
-			code_point_t ch( unicode::rank( *it ) == 1 ? static_cast<code_point_t>( et_._rawToSafe[static_cast<char unsigned>( *it )] ) : *it );
+			code_point_t ch( unicode::rank( *it ) == 1 ? code_point_t( static_cast<yaal::u32_t>( et_._rawToSafe[static_cast<char unsigned>( (*it).get() )] ) ) : *it );
 			if ( ( pos + 1 ) >= cacheSize ) {
 				cache.realloc( cacheSize * 2 );
 				cacheSize = static_cast<int>( cache.get_size() ) / CODE_POINT_SIZE;
@@ -109,7 +109,7 @@ void unescape( yaal::hcore::HString& string_, EscapeTable const& et_, code_point
 				if ( ! ( it != end ) ) {
 					break;
 				}
-				ptr[pos] = unicode::rank( *it ) == 1 ? static_cast<code_point_t>( et_._safeToRaw[static_cast<char unsigned>( *it )] ) : *it;
+				ptr[pos] = unicode::rank( *it ) == 1 ? code_point_t(static_cast<yaal::u32_t>( et_._safeToRaw[static_cast<char unsigned>( (*it).get() )] ) ) : *it;
 			} else
 				ptr[pos] = *it;
 		}

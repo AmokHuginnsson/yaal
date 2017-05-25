@@ -159,7 +159,7 @@ void HPrepocessor::HIterator::make_readable( void ) {
 yaal::hcore::HString::const_iterator HPrepocessor::HIterator::skip_whitespace( yaal::hcore::HString::const_iterator pos_ ) {
 	yaal::hcore::HString::const_iterator pos( pos_ );
 	while ( pos != _owner->_end ) {
-		if ( ! is_whitespace( static_cast<u32_t>( *pos ) ) ) { /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+		if ( ! is_whitespace( *pos ) ) {
 			break;
 		}
 		++ pos;

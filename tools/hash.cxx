@@ -546,31 +546,25 @@ HChunk parseHash( FUNCTION function_, yaal::hcore::HString const& hash_ ) {
 	HChunk binHash( expHashLenText / 2 );
 	switch ( function_ ) {
 		case ( FUNCTION::MD5 ): {
-			char hashText[hashLenText( FUNCTION::MD5 ) + 1];
-			for ( int i( 0 ); i < expHashLenText; ++ i ) {
-				hashText[i] = static_cast<char>( hash_[i] );
-			}
-			hashText[expHashLenText] = 0;
+			static int const bufSize( hashLenText( FUNCTION::MD5 ) + 1 );
+			char hashText[bufSize];
+			copy_ascii( hash_, hashText, bufSize );
 			u32_t* bin( binHash.get<u32_t>() );
 			sscanf( hashText, format, &bin[0], &bin[1], &bin[2], &bin[3] );
 			change_endianness( bin, binHash.count_of<u32_t>() );
 		} break;
 		case ( FUNCTION::SHA1 ): {
-			char hashText[hashLenText( FUNCTION::SHA1 ) + 1];
-			for ( int i( 0 ); i < expHashLenText; ++ i ) {
-				hashText[i] = static_cast<char>( hash_[i] );
-			}
-			hashText[expHashLenText] = 0;
+			static int const bufSize( hashLenText( FUNCTION::SHA1 ) + 1 );
+			char hashText[bufSize];
+			copy_ascii( hash_, hashText, bufSize );
 			u32_t* bin( binHash.get<u32_t>() );
 			sscanf( hashText, format, &bin[0], &bin[1], &bin[2], &bin[3], &bin[4] );
 			change_endianness( bin, binHash.count_of<u32_t>() );
 		} break;
 		case ( FUNCTION::SHA512 ): {
-			char hashText[hashLenText( FUNCTION::SHA512 ) + 1];
-			for ( int i( 0 ); i < expHashLenText; ++ i ) {
-				hashText[i] = static_cast<char>( hash_[i] );
-			}
-			hashText[expHashLenText] = 0;
+			static int const bufSize( hashLenText( FUNCTION::SHA512 ) + 1 );
+			char hashText[bufSize];
+			copy_ascii( hash_, hashText, bufSize );
 			u64_t* bin( binHash.get<u64_t>() );
 			sscanf( hashText, format, &bin[0], &bin[1], &bin[2], &bin[3], &bin[4], &bin[5], &bin[6], &bin[7] );
 			change_endianness( bin, binHash.count_of<u64_t>() );

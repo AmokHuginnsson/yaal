@@ -455,8 +455,8 @@ bool HExpression::translate( HString const& formula_ ) {
 				_index = realIndex;
 				return ( false );
 			}
-		} else if ( isascii( static_cast<int>( formula_[ index ] ) ) ) {
-			formula[ realIndex ] = static_cast<char>( formula_[ index ] );
+		} else if ( is_ascii( formula_[ index ] ) ) {
+			formula[ realIndex ] = static_cast<char>( formula_[ index ].get() );
 			++ index;
 			++ realIndex;
 		} else {

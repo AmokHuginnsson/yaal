@@ -46,9 +46,9 @@ int long const x_tag_g_pulPrimes[ 32 ] = {
 template<>
 int long hash<HString>::operator () ( HString const& string_ ) const {
 	int long h( 0 );
-	for ( yaal::u32_t c : string_ ) {
+	for ( code_point_t c : string_ ) {
 		h *= 101;
-		h += c;
+		h += c.get();
 	}
 	return ( h );
 }

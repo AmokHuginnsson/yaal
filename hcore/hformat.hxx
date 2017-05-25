@@ -65,6 +65,7 @@ public:
 	HFormat operator % ( double );
 	HFormat operator % ( double long );
 	HFormat operator % ( char const* );
+	HFormat operator % ( code_point_t );
 	HFormat operator % ( HString const& );
 	HFormat operator % ( void const* );
 	HString string( void ) const;

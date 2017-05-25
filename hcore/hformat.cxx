@@ -54,6 +54,7 @@ private:
 		static conversion_t const DOUBLE;
 		static conversion_t const STRING;
 		static conversion_t const CHAR;
+		static conversion_t const CODE_POINT;
 		static conversion_t const POINTER;
 		static conversion_t const CONSTANT;
 		static conversion_t const BYTE;
@@ -93,7 +94,7 @@ private:
 	typedef HArray<OToken> tokens_t;
 	typedef HMap<int, int> positions_t;
 	typedef HPointer<positions_t> positions_ptr_t;
-	typedef HVariant<bool, char, int short, int, int long, int long long, void const*, float, double, double long, HString> format_arg_t;
+	typedef HVariant<bool, char, code_point_t, int short, int, int long, int long long, void const*, float, double, double long, HString> format_arg_t;
 	typedef HMap<int, format_arg_t> args_t;
 	typedef HPointer<args_t> args_ptr_t;
 	int _positionIndex;
@@ -131,6 +132,7 @@ private:
 public:
 	char const* error_message( int = 0 ) const;
 private:
+	void format_string( yaal::hcore::HString const&, flag_t, int, int ) const;
 	HFormatImpl& operator = ( HFormatImpl const& ) = delete;
 	friend class HFormat;
 	template<typename tType, typename... arg_t>
@@ -142,6 +144,7 @@ HFormat::HFormatImpl::conversion_t const HFormat::HFormatImpl::CONVERSION::INT =
 HFormat::HFormatImpl::conversion_t const HFormat::HFormatImpl::CONVERSION::DOUBLE = HFormat::HFormatImpl::conversion_t::new_flag();
 HFormat::HFormatImpl::conversion_t const HFormat::HFormatImpl::CONVERSION::STRING = HFormat::HFormatImpl::conversion_t::new_flag();
 HFormat::HFormatImpl::conversion_t const HFormat::HFormatImpl::CONVERSION::CHAR = HFormat::HFormatImpl::conversion_t::new_flag();
+HFormat::HFormatImpl::conversion_t const HFormat::HFormatImpl::CONVERSION::CODE_POINT = HFormat::HFormatImpl::conversion_t::new_flag();
 HFormat::HFormatImpl::conversion_t const HFormat::HFormatImpl::CONVERSION::POINTER = HFormat::HFormatImpl::conversion_t::new_flag();
 HFormat::HFormatImpl::conversion_t const HFormat::HFormatImpl::CONVERSION::CONSTANT = HFormat::HFormatImpl::conversion_t::new_flag();
 HFormat::HFormatImpl::conversion_t const HFormat::HFormatImpl::CONVERSION::BYTE = HFormat::HFormatImpl::conversion_t::new_flag();
@@ -405,6 +408,9 @@ HString HFormat::string( void ) const {
 			if ( !!( conv & HFormatImpl::CONVERSION::CHAR ) ) {
 				*fp++ = 'c';
 			}
+			if ( !!( conv & HFormatImpl::CONVERSION::CODE_POINT ) ) {
+				*fp++ = 'C';
+			}
 			*fp = 0;
 			static int const MAX_FLOAT_DIGIT_COUNT( 8192 );
 			char buffer[MAX_FLOAT_DIGIT_COUNT] = "\0";
@@ -423,24 +429,13 @@ HString HFormat::string( void ) const {
 				}
 			} else if ( !!( conv & HFormatImpl::CONVERSION::STRING ) ) {
 				HString const& s( HFormatImpl::variant_shell<HString>::get( *_impl->_args, it->_position ) );
-				int len( static_cast<int>( s.get_length() ) );
-				if ( p ) {
-					len = min( p, len );
-				}
-				_impl->_buffer.clear();
-				bool leftAligned( !!( it->_flag & HFormatImpl::FLAG::LEFT_ALIGNED ) );
-				int spaces( w > len ? w - len : 0 );
-				if ( ( spaces > 0 ) && ! leftAligned ) {
-					_impl->_buffer.append( spaces, ' ' );
-				}
-				_impl->_buffer.append( s, 0, len );
-				if ( ( spaces > 0 ) && leftAligned ) {
-					_impl->_buffer.append( spaces, ' ' );
-				}
+				_impl->format_string( s, it->_flag, p, w );
 			} else if ( !!( conv & HFormatImpl::CONVERSION::POINTER ) ) {
 				snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, HFormatImpl::variant_shell<void const*>::get( *_impl->_args, it->_position ) );
 			} else if ( !!( conv & HFormatImpl::CONVERSION::CHAR ) ) {
 				snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, HFormatImpl::variant_shell<char>::get( *_impl->_args, it->_position ) );
+			} else if ( !!( conv & HFormatImpl::CONVERSION::CODE_POINT ) ) {
+				_impl->format_string( HFormatImpl::variant_shell<code_point_t>::get( *_impl->_args, it->_position ), it->_flag, p, w );
 			} else if ( !!( conv & HFormatImpl::CONVERSION::DOUBLE ) ) {
 				if ( !!( conv & ( HFormatImpl::CONVERSION::LONG ) ) ) {
 					snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, HFormatImpl::variant_shell<double long>::get( *_impl->_args, it->_position ) );
@@ -471,6 +466,15 @@ HFormat HFormat::operator % ( char c ) {
 HFormat HFormat::operator % ( char unsigned cu ) {
 	M_PROLOG
 	return ( operator % ( static_cast<char>( cu ) ) );
+	M_EPILOG
+}
+
+HFormat HFormat::operator % ( code_point_t c ) {
+	M_PROLOG
+	M_ENSURE( ! _impl->_format.is_empty() );
+	int idx = _impl->next_token( HFormatImpl::CONVERSION::CODE_POINT );
+	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( c ) ) );
+	return ( _impl );
 	M_EPILOG
 }
 
@@ -768,7 +772,7 @@ HFormat::HFormatImpl::conversion_t HFormat::HFormatImpl::get_conversion( HString
 		}
 	}
 	M_ENSURE( i < s.get_length() );
-	switch ( s[ i ] ) {
+	switch ( s[ i ].get() ) {
 		case ( 'd' ):
 		case ( 'i' ): {
 			conversion = CONVERSION::INT;
@@ -794,6 +798,9 @@ HFormat::HFormatImpl::conversion_t HFormat::HFormatImpl::get_conversion( HString
 		case ( 'c' ): {
 			conversion = CONVERSION::CHAR;
 		} break;
+		case ( 'C' ): {
+			conversion = CONVERSION::CODE_POINT;
+		} break;
 		case ( 's' ): {
 			conversion = CONVERSION::STRING;
 		} break;
@@ -809,7 +816,7 @@ HFormat::HFormatImpl::conversion_t HFormat::HFormatImpl::get_conversion( HString
 		/* % conversion can only occur immediately after %, eg: %% is ok but %*% is not */
 		/* no break */
 		default: {
-			M_THROW( "bad conversion", s[ i ]  );
+			M_THROW( "bad conversion", s[ i ].get()  );
 			break;
 		}
 	}
@@ -847,7 +854,7 @@ HFormat::HFormatImpl::flag_t HFormat::HFormatImpl::get_flag( HString const& s, i
 	flag_t flag = FLAG::NONE;
 	bool done = false;
 	for ( ; ! done && ( i < len ); ++ i ) {
-		switch ( s[ i ] ) {
+		switch ( s[ i ].get() ) {
 			case ( '#' ): flag |= FLAG::ALTERNATE; break;
 			case ( '0' ): flag |= FLAG::ZERO_PADDED; break;
 			case ( '-' ): flag |= FLAG::LEFT_ALIGNED; break;
@@ -860,6 +867,26 @@ HFormat::HFormatImpl::flag_t HFormat::HFormatImpl::get_flag( HString const& s, i
 	}
 	-- i;
 	return ( flag );
+	M_EPILOG
+}
+
+void HFormat::HFormatImpl::format_string( yaal::hcore::HString const& string_, flag_t flag_, int precision_, int width_ ) const {
+	M_PROLOG
+	int len( static_cast<int>( string_.get_length() ) );
+	if ( precision_ ) {
+		len = min( precision_, len );
+	}
+	_buffer.clear();
+	bool leftAligned( !!( flag_ & HFormatImpl::FLAG::LEFT_ALIGNED ) );
+	int spaces( width_ > len ? width_ - len : 0 );
+	if ( ( spaces > 0 ) && ! leftAligned ) {
+		_buffer.append( spaces, ' '_ycp );
+	}
+	_buffer.append( string_, 0, len );
+	if ( ( spaces > 0 ) && leftAligned ) {
+		_buffer.append( spaces, ' '_ycp );
+	}
+	return;
 	M_EPILOG
 }
 

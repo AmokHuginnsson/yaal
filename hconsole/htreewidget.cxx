@@ -129,7 +129,7 @@ void HTreeWidget::do_paint( void ) {
 	}
 	draw_label();
 	_varTmpBuffer.reserve( _widthRaw );
-	_varTmpBuffer.fillz( '_', 0, _widthRaw );
+	_varTmpBuffer.fillz( '_'_ycp, 0, _widthRaw );
 	for ( int ctr( 0 ); ctr < _heightRaw; ++ ctr ) {
 		cons.mvprintf( _rowRaw + ctr, _columnRaw, _varTmpBuffer );
 	}

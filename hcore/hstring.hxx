@@ -48,11 +48,16 @@ namespace yaal {
 
 /*! \brief Unicode code point representation type.
  */
-typedef yaal::u32_t code_point_t;
-#if 0
-/* Alternative type safe version. */
 typedef yaal::hcore::HTaggedPOD<yaal::u32_t, struct code_point_tag> code_point_t;
-#endif
+inline code_point_t operator "" _ycp ( char char_ ) {
+	return ( code_point_t( static_cast<yaal::u32_t>( char_ ) ) );
+}
+inline code_point_t operator "" _ycp ( int long long unsigned char_ ) {
+	return ( code_point_t( static_cast<yaal::u32_t>( char_ ) ) );
+}
+inline code_point_t operator "" _ycp ( char32_t codePoint_ ) {
+	return ( code_point_t( codePoint_ ) );
+}
 
 namespace hcore {
 
@@ -218,9 +223,14 @@ public:
 	 * size - at most that many characters from array are used.
 	 */
 	HString( char const* array, int long size );
-	/*! \brief Construct new HString from single character.
+	/*! \brief Construct new HString from single code point.
 	 *
-	 * ch - character to initialize new string with.
+	 * ch - a code point to initialize new string with.
+	 */
+	HString( code_point_t ch );
+	/*! \brief Construct new HString from a single character.
+	 *
+	 * ch - a character to initialize new string with.
 	 */
 	HString( char ch );
 	/*! \brief Construct new HString from single unsigned character.
@@ -622,7 +632,7 @@ public:
 	 * \return Self.
 	 */
 	HString& shift_left( int long len );
-	HString& shift_right( int long, code_point_t = ' ' );
+	HString& shift_right( int long, code_point_t = ' '_ycp );
 	/*! \brief Fill portion of string with constant value.
 	 *
 	 * \param value - use this value as a filler.
@@ -630,7 +640,7 @@ public:
 	 * \param count - fill that many bytes.
 	 * \return Self.
 	 */
-	HString& fill( code_point_t value = '\0', int long position = 0, int long length = npos );
+	HString& fill( code_point_t value = 0_ycp, int long position = 0, int long length = npos );
 	/*! \brief Fill portion of string with constant value and finish with \0 (zero) byte.
 	 *
 	 * \param value - use this value as a filler.
@@ -638,7 +648,7 @@ public:
 	 * \param count - fill that many bytes.
 	 * \return Self.
 	 */
-	HString& fillz( code_point_t value = '\0', int long position = 0, int long count = npos );
+	HString& fillz( code_point_t value = 0_ycp, int long position = 0, int long count = npos );
 	/*! \brief Erase part of the string.
 	 *
 	 * \param position_ - start position for part to be erased.
@@ -730,6 +740,10 @@ private:
 	void substr( HString&, int long, int long ) const;
 	void resize( int long capacity, int rank );
 	void replace_check( int long, int long, int long, int long, int long );
+	HString& assign( int long, char ) = delete;
+	HString& append( int long, char ) = delete;
+	HString& insert( int long, int long, char ) = delete;
+	HString& replace( int long, int long, int long, char ) = delete;
 };
 
 class HString::HCharRef {
@@ -739,7 +753,28 @@ public:
 	operator code_point_t ( void ) {
 		return ( _string[ _index ] );
 	}
+	code_point_t get( void ) const {
+		return ( _string[ _index ] );
+	}
 	HCharRef& operator = ( code_point_t ch_ );
+	bool operator == ( HCharRef const& other_ ) const {
+		return ( get() == other_.get() );
+	}
+	bool operator != ( HCharRef const& other_ ) const {
+		return ( get() != other_.get() );
+	}
+	bool operator < ( HCharRef const& other_ ) const {
+		return ( get() < other_.get() );
+	}
+	bool operator <= ( HCharRef const& other_ ) const {
+		return ( get() <= other_.get() );
+	}
+	bool operator > ( HCharRef const& other_ ) const {
+		return ( get() > other_.get() );
+	}
+	bool operator >= ( HCharRef const& other_ ) const {
+		return ( get() >= other_.get() );
+	}
 	void swap( HCharRef& );
 private:
 	friend class HString;
@@ -1109,7 +1144,11 @@ bool is_hex_digit( code_point_t );
 bool is_oct_digit( code_point_t );
 bool is_bin_digit( code_point_t );
 bool is_letter( code_point_t );
+bool is_upper( code_point_t );
+bool is_lower( code_point_t );
 bool is_alpha( code_point_t );
+bool is_alnum( code_point_t );
+bool is_ascii( code_point_t );
 
 inline void swap( yaal::hcore::HString& a, yaal::hcore::HString& b ) {
 	a.swap( b );

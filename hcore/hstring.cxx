@@ -78,6 +78,14 @@ inline void copy_n_safe_cast( iterator_t src_, int long size_, U* dst_ ) {
 	return;
 }
 
+template<typename iterator_t, typename U>
+inline void copy_n_unpack( iterator_t src_, int long size_, U* dst_ ) {
+	for ( int long i( 0 ); i < size_; ++ i, ++ src_, ++ dst_ ) {
+		*dst_ = static_cast<U>( (*src_).get() );
+	}
+	return;
+}
+
 template<typename data_t, typename transform_t>
 inline void transform_n_cast( data_t* data_, int long size_, transform_t transform_ ) {
 	typedef typename trait::argument_type<transform_t, 0>::type arg_t;
@@ -262,33 +270,33 @@ namespace adaptive {
 inline code_point_t get( void const* mem_, int rank_, int long index_ ) {
 	code_point_t codePoint( 0 );
 	if ( rank_ == 1 ) {
-		codePoint = static_cast<code_point_t>( static_cast<char const*>( mem_ )[index_] );
+		codePoint = code_point_t( static_cast<yaal::u32_t>( static_cast<char const*>( mem_ )[index_] ) );
 	} else if ( rank_ == 2 ) {
-		codePoint = static_cast<yaal::u16_t const*>( mem_ )[index_];
+		codePoint = code_point_t( static_cast<yaal::u16_t const*>( mem_ )[index_] );
 	} else {
-		codePoint = static_cast<yaal::u32_t const*>( mem_ )[index_];
+		codePoint = code_point_t( static_cast<yaal::u32_t const*>( mem_ )[index_] );
 	}
 	return ( codePoint );
 }
 
 inline void set( void* mem_, int rank_, int long index_, code_point_t codePoint_ ) {
 	if ( rank_ == 1 ) {
-		static_cast<char*>( mem_ )[index_] = static_cast<char>( codePoint_ );
+		static_cast<char*>( mem_ )[index_] = static_cast<char>( codePoint_.get() );
 	} else if ( rank_ == 2 ) {
-		static_cast<yaal::u16_t*>( mem_ )[index_] = static_cast<yaal::u16_t>( codePoint_ );
+		static_cast<yaal::u16_t*>( mem_ )[index_] = static_cast<yaal::u16_t>( codePoint_.get() );
 	} else {
-		static_cast<yaal::u32_t*>( mem_ )[index_] = codePoint_;
+		static_cast<yaal::u32_t*>( mem_ )[index_] = codePoint_.get();
 	}
 	return;
 }
 
 inline void fill( void* mem_, int rank_, int long offset_, int long size_, code_point_t codePoint_ ) {
 	if ( rank_ == 1 ) {
-		::memset( static_cast<char*>( mem_ ) + offset_, static_cast<int>( codePoint_ ), static_cast<size_t>( size_ ) );
+		::memset( static_cast<char*>( mem_ ) + offset_, static_cast<int>( codePoint_.get() ), static_cast<size_t>( size_ ) );
 	} else if ( rank_ == 2 ) {
-		yaal::fill_n( static_cast<yaal::u16_t*>( mem_ ) + offset_, size_, static_cast<u16_t>( codePoint_ ) );
+		yaal::fill_n( static_cast<yaal::u16_t*>( mem_ ) + offset_, size_, static_cast<u16_t>( codePoint_.get() ) );
 	} else {
-		yaal::fill_n( static_cast<code_point_t*>( mem_ ) + offset_, size_, codePoint_ );
+		yaal::fill_n( static_cast<yaal::u32_t*>( mem_ ) + offset_, size_, codePoint_.get() );
 	}
 	return;
 }
@@ -302,19 +310,19 @@ inline void copy( void* dest_, int destRank_, int long destOffset_, void const* 
 				yaal::copy_n( static_cast<yaal::u8_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u16_t*>( dest_ ) + destOffset_ );
 			} break;
 			case ( 4 * 4 + 1 ): /* UCS-1 to UCS-4 */ {
-				yaal::copy_n( static_cast<yaal::u8_t const*>( src_ ) + srcOffset_, size_, static_cast<code_point_t*>( dest_ ) + destOffset_ );
+				yaal::copy_n( static_cast<yaal::u8_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u32_t*>( dest_ ) + destOffset_ );
 			} break;
 			case ( 4 * 4 + 2 ): /* UCS-2 to UCS-4 */ {
-				yaal::copy_n( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<code_point_t*>( dest_ ) + destOffset_ );
+				yaal::copy_n( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u32_t*>( dest_ ) + destOffset_ );
 			} break;
 			case ( 4 * 1 + 2 ): /* UCS-2 to UCS-1 */ {
 				copy_n_safe_cast( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
 			} break;
 			case ( 4 * 1 + 4 ): /* UCS-4 to UCS-1 */ {
-				copy_n_safe_cast( static_cast<code_point_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
+				copy_n_safe_cast( static_cast<yaal::u32_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
 			} break;
 			case ( 4 * 2 + 4 ): /* UCS-4 to UCS-2 */ {
-				copy_n_safe_cast( static_cast<code_point_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u16_t*>( dest_ ) + destOffset_ );
+				copy_n_safe_cast( static_cast<yaal::u32_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u16_t*>( dest_ ) + destOffset_ );
 			} break;
 		}
 	}
@@ -330,19 +338,19 @@ inline void copy_backward( void* dest_, int destRank_, int long destOffset_, voi
 				copy_n_cast_backward( static_cast<yaal::u8_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u16_t*>( dest_ ) + destOffset_ );
 			} break;
 			case ( 4 * 4 + 1 ): /* UCS-1 to UCS-4 */ {
-				copy_n_cast_backward( static_cast<yaal::u8_t const*>( src_ ) + srcOffset_, size_, static_cast<code_point_t*>( dest_ ) + destOffset_ );
+				copy_n_cast_backward( static_cast<yaal::u8_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u32_t*>( dest_ ) + destOffset_ );
 			} break;
 			case ( 4 * 4 + 2 ): /* UCS-2 to UCS-4 */ {
-				copy_n_cast_backward( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<code_point_t*>( dest_ ) + destOffset_ );
+				copy_n_cast_backward( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u32_t*>( dest_ ) + destOffset_ );
 			} break;
 			case ( 4 * 1 + 2 ): /* UCS-2 to UCS-1 */ {
 				copy_n_cast_backward( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
 			} break;
 			case ( 4 * 1 + 4 ): /* UCS-4 to UCS-1 */ {
-				copy_n_cast_backward( static_cast<code_point_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
+				copy_n_cast_backward( static_cast<yaal::u32_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
 			} break;
 			case ( 4 * 2 + 4 ): /* UCS-4 to UCS-2 */ {
-				copy_n_cast_backward( static_cast<code_point_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u16_t*>( dest_ ) + destOffset_ );
+				copy_n_cast_backward( static_cast<yaal::u32_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u16_t*>( dest_ ) + destOffset_ );
 			} break;
 		}
 	}
@@ -492,7 +500,7 @@ int long find( void const* mem_, int rank_, int long size_, int long after_, cod
 	switch ( 4 * rank_ + valueRank ) {
 		case ( 4 * 1 + 1 ): /* UCS-1 and UCS-1 */ {
 			char const* m( static_cast<char const*>( mem_ ) + after_ );
-			char const* p( static_cast<char const*>( ::std::memchr( m, static_cast<yaal::u8_t>( value_ ), static_cast<size_t>( size_ - after_ ) ) ) );
+			char const* p( static_cast<char const*>( ::std::memchr( m, static_cast<yaal::u8_t>( value_.get() ), static_cast<size_t>( size_ - after_ ) ) ) );
 			if ( p ) {
 				pos = p - m;
 			}
@@ -501,7 +509,7 @@ int long find( void const* mem_, int rank_, int long size_, int long after_, cod
 		case ( 4 * 2 + 2 ): /* UCS-2 and UCS-2 */ {
 			yaal::u16_t const* m( static_cast<yaal::u16_t const*>( mem_ ) + after_ );
 			yaal::u16_t const* e( m + size_ - after_ );
-			yaal::u16_t const* p( yaal::find( m, e, static_cast<yaal::u16_t>( value_ ) ) );
+			yaal::u16_t const* p( yaal::find( m, e, static_cast<yaal::u16_t>( value_.get() ) ) );
 			if ( p != e ) {
 				pos = p - m;
 			}
@@ -511,7 +519,7 @@ int long find( void const* mem_, int rank_, int long size_, int long after_, cod
 		case ( 4 * 4 + 4 ): /* UCS-4 and UCS-4 */ {
 			yaal::u32_t const* m( static_cast<yaal::u32_t const*>( mem_ ) + after_ );
 			yaal::u32_t const* e( m + size_ - after_ );
-			yaal::u32_t const* p( yaal::find( m, e, value_ ) );
+			yaal::u32_t const* p( yaal::find( m, e, value_.get() ) );
 			if ( p != e ) {
 				pos = p - m;
 			}
@@ -526,19 +534,19 @@ int long find_last( void const* mem_, int rank_, int long before_, code_point_t 
 	switch ( 4 * rank_ + valueRank ) {
 		case ( 4 * 1 + 1 ): /* UCS-1 and UCS-1 */ {
 			char const* m( static_cast<char const*>( mem_ ) );
-			char const* p( static_cast<char const*>( ::memrchr( m, static_cast<yaal::u8_t>( value_ ), static_cast<size_t>( before_ ) ) ) );
+			char const* p( static_cast<char const*>( ::memrchr( m, static_cast<yaal::u8_t>( value_.get() ), static_cast<size_t>( before_ ) ) ) );
 			if ( p ) {
 				pos = p - m;
 			}
 		} break;
 		case ( 4 * 2 + 1 ): /* UCS-2 and UCS-1 */
 		case ( 4 * 2 + 2 ): /* UCS-2 and UCS-2 */ {
-			pos = find_last_impl( static_cast<yaal::u16_t const*>( mem_ ), before_, static_cast<yaal::u16_t>( value_ ) );
+			pos = find_last_impl( static_cast<yaal::u16_t const*>( mem_ ), before_, static_cast<yaal::u16_t>( value_.get() ) );
 		} break;
 		case ( 4 * 4 + 1 ): /* UCS-4 and UCS-1 */
 		case ( 4 * 4 + 2 ): /* UCS-4 and UCS-2 */
 		case ( 4 * 4 + 4 ): /* UCS-4 and UCS-4 */ {
-			pos = find_last_impl( static_cast<yaal::u32_t const*>( mem_ ), before_, value_ );
+			pos = find_last_impl( static_cast<yaal::u32_t const*>( mem_ ), before_, value_.get() );
 		} break;
 	}
 	return ( pos );
@@ -825,10 +833,10 @@ void encode( code_point_t codePoint_, char*& dest_ ) {
 	char* p( dest_ - 1 );
 	u8_t head[] = { 0, 0, unicode::ENC_2_BYTES_MARK_VALUE, unicode::ENC_3_BYTES_MARK_VALUE, unicode::ENC_4_BYTES_MARK_VALUE };
 	switch( r ) {
-		case ( 4 ): { *p = static_cast<char>( unicode::TAIL_BYTES_MARK_VALUE | ( unicode::TAIL_BYTES_VALUE_MASK & codePoint_ ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
-		case ( 3 ): { *p = static_cast<char>( unicode::TAIL_BYTES_MARK_VALUE | ( unicode::TAIL_BYTES_VALUE_MASK & codePoint_ ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
-		case ( 2 ): { *p = static_cast<char>( unicode::TAIL_BYTES_MARK_VALUE | ( unicode::TAIL_BYTES_VALUE_MASK & codePoint_ ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
-		case ( 1 ): { *p = static_cast<char>( head[r] | codePoint_ ); } /* no break - fall through */
+		case ( 4 ): { *p = static_cast<char>( unicode::TAIL_BYTES_MARK_VALUE | ( unicode::TAIL_BYTES_VALUE_MASK & codePoint_.get() ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
+		case ( 3 ): { *p = static_cast<char>( unicode::TAIL_BYTES_MARK_VALUE | ( unicode::TAIL_BYTES_VALUE_MASK & codePoint_.get() ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
+		case ( 2 ): { *p = static_cast<char>( unicode::TAIL_BYTES_MARK_VALUE | ( unicode::TAIL_BYTES_VALUE_MASK & codePoint_.get() ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
+		case ( 1 ): { *p = static_cast<char>( head[r] | codePoint_.get() ); } /* no break - fall through */
 	}
 }
 
@@ -862,7 +870,7 @@ code_point_t decode_forward( char const*& ptr_ ) {
 template<typename T>
 void decode( T* dst_, char const* str_, int long size_ ) {
 	for ( int long i( 0 ); i < size_; ++ i, ++ dst_ ) {
-		*dst_ = static_cast<T>( decode_forward( str_ ) );
+		*dst_ = static_cast<T>( decode_forward( str_ ).get() );
 	}
 	return;
 }
@@ -872,11 +880,11 @@ void decode( T* dst_, char const* str_, int long size_ ) {
 }
 
 bool HCharacterClass::has( code_point_t char_ ) const {
-	return ( ( char_ < 256 ) && ( ::memchr( _data, static_cast<u8_t>( char_ ), static_cast<size_t>( _size ) ) != nullptr ) );
+	return ( ( char_.get() < 256 ) && ( ::memchr( _data, static_cast<u8_t>( char_.get() ), static_cast<size_t>( _size ) ) != nullptr ) );
 }
 
 bool HCharacterClass::hasz( code_point_t char_ ) const {
-	return ( ( char_ < 256 ) && ( ::memchr( _data, static_cast<u8_t>( char_ ), static_cast<size_t>( _size ) + 1 ) != nullptr ) );
+	return ( ( char_.get() < 256 ) && ( ::memchr( _data, static_cast<u8_t>( char_.get() ), static_cast<size_t>( _size ) + 1 ) != nullptr ) );
 }
 
 HCharacterClass const& character_class( CHARACTER_CLASS::character_class_t characterClass_ ) {
@@ -1150,10 +1158,10 @@ HString::HString( HUTF8String const& str_ )
 			::memcpy( MEM, str_.raw(), static_cast<size_t>( newSize ) );
 		} break;
 		case ( 2 ): {
-			copy_n_safe_cast( str_.begin(), newSize, static_cast<yaal::u16_t*>( MEM ) );
+			copy_n_unpack( str_.begin(), newSize, static_cast<yaal::u16_t*>( MEM ) );
 		} break;
 		case ( 4 ): {
-			yaal::copy_n( str_.begin(), newSize, static_cast<yaal::u32_t*>( MEM ) );
+			copy_n_unpack( str_.begin(), newSize, static_cast<yaal::u32_t*>( MEM ) );
 		} break;
 	}
 	return;
@@ -1208,6 +1216,18 @@ HString::HString( char const* array_, int long size_ )
 	: _len() {
 	M_PROLOG
 	assign( array_, size_ );
+	return;
+	M_EPILOG
+}
+
+HString::HString( code_point_t codePoint_ )
+	: _len() {
+	M_PROLOG
+	if ( codePoint_.get() ) {
+		int rank( unicode::rank( codePoint_ ) );
+		resize( 1, rank );
+		adaptive::set( MEM, rank, 0, codePoint_ );
+	}
 	return;
 	M_EPILOG
 }
@@ -2181,7 +2201,7 @@ HString& HString::fill( code_point_t filler_, int long offset_, int long count_ 
 	if ( ( offset_ < 0 ) || ( offset_ > GET_SIZE ) ) {
 		M_THROW( err_msg( string_helper::BAD_OFFSET ), offset_ );
 	}
-	if ( filler_ ) {
+	if ( filler_.get() ) {
 		int rank( max( GET_RANK, unicode::rank( filler_ ) ) );
 		int long newSize( max( count_ + offset_, GET_SIZE ) );
 		resize( newSize, rank );
@@ -2515,14 +2535,14 @@ void HUTF8String::assign( HString::const_iterator it_, HString::const_iterator e
 	code_point_t maxCodePoint( 0 );
 	int byteCount( 0 );
 	for ( HString::const_iterator it( it_ ); it != end_; ++ it ) {
-		byteCount += unicode::utf8_length( static_cast<u8_t>( *it ) ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
-		maxCodePoint = max( static_cast<code_point_t>( static_cast<u8_t>( *it ) ), maxCodePoint ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
+		byteCount += unicode::utf8_length( *it );
+		maxCodePoint = max( *it, maxCodePoint );
 	}
 	if ( byteCount > 0 ) {
 		alloc( byteCount );
 		char* p( _ptr + sizeof ( OBufferMeta ) );
 		for ( HString::const_iterator it( it_ ); it != end_; ++ it ) {
-			utf8::encode( static_cast<u8_t>( *it ), p ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
+			utf8::encode( *it, p ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
 		}
 	}
 	if ( _ptr ) {
@@ -2899,10 +2919,10 @@ namespace {
 void copy_ascii_impl( HString::const_iterator it_, HString::const_iterator end_, char* buffer_, int size_, bool all_ ) {
 	for (
 		int i( 0 ), LIMIT( min( size_ - 1, static_cast<int>( end_ - it_ ) ) );
-		( i < LIMIT ) && ( all_ || ( static_cast<u32_t>( *it_ ) < unicode::UTF8_MAX_1_BYTE_CODE_POINT ) );
+		( i < LIMIT ) && ( all_ || is_ascii( *it_ ) );
 		++ i, ++ it_, ++ buffer_
 	) { /* *TODO* *FIXME* Remove static_cast after UCS in HString is implemented. */
-		*buffer_ = safe_int::cast<char>( *it_ );
+		*buffer_ = safe_int::cast<char>( (*it_).get() );
 	}
 	*buffer_ = 0;
 	return;
@@ -3083,8 +3103,24 @@ bool is_letter( code_point_t char_ ) {
 	return ( character_class( CHARACTER_CLASS::LETTER ).has( char_ ) );
 }
 
+bool is_upper( code_point_t char_ ) {
+	return ( ::std::isupper( static_cast<int>( char_.get() ) ) );
+}
+
+bool is_lower( code_point_t char_ ) {
+	return ( ::std::islower( static_cast<int>( char_.get() ) ) );
+}
+
 bool is_alpha( code_point_t char_ ) {
-	return ( ( char_ > ' ' ) && ( char_ <= 127 ) );
+	return ( ( char_ > ' ' ) && ( char_ <= unicode::UTF8_MAX_1_BYTE_CODE_POINT ) );
+}
+
+bool is_alnum( code_point_t char_ ) {
+	return ( ::std::isalnum( static_cast<int>( char_.get() ) ) );
+}
+
+bool is_ascii( code_point_t char_ ) {
+	return ( char_ <= unicode::UTF8_MAX_1_BYTE_CODE_POINT );
 }
 
 namespace string_helper {
@@ -3111,16 +3147,16 @@ int long icasesearch( HString const& haystack_, HString const& needle_ ) {
 	int* next( KMPnext.get<int>() );
 	int b( next[ 0 ] = -1 );
 	for ( int long i( 1 ), needleLen( needle_.get_length() ); i <= needleLen; ++ i ) {
-		while ( ( b > -1 ) && ( tolower( static_cast<int>( needle_[ b ] ) ) != tolower( static_cast<int>( needle_[ i - 1 ] ) ) ) ) {
+		while ( ( b > -1 ) && ( tolower( static_cast<int>( needle_[ b ].get() ) ) != tolower( static_cast<int>( needle_[ i - 1 ].get() ) ) ) ) {
 			b = next[ b ];
 		}
 		++ b;
-		next[ i ] = ( tolower( static_cast<int>( needle_[ i ] ) ) == tolower( static_cast<int>( needle_[ b ] ) ) ) ? next[ b ] : b;
+		next[ i ] = ( tolower( static_cast<int>( needle_[ i ].get() ) ) == tolower( static_cast<int>( needle_[ b ].get() ) ) ) ? next[ b ] : b;
 	}
 	int long start( -1 );
 	b = 0;
 	for ( int long i( 0 ), haystackLen( haystack_.get_length() ); i < haystackLen; ++ i ) {
-		while ( ( b > -1 ) && ( tolower( static_cast<int>( needle_[ b ] ) ) != tolower( static_cast<int>( haystack_[i] ) ) ) ) {
+		while ( ( b > -1 ) && ( tolower( static_cast<int>( needle_[ b ].get() ) ) != tolower( static_cast<int>( haystack_[i].get() ) ) ) ) {
 			b = next[ b ];
 		}
 		if ( ++ b < needle_.get_length() ) {
@@ -3136,7 +3172,7 @@ int stricasecmp( HString const& left_, HString const& right_ ) {
 	int long len( min( left_.get_length(), right_.get_length() ) );
 	int diff( 0 );
 	for ( int long i( 0 ); ( diff == 0 ) && ( i < len ); ++ i ) {
-		diff = tolower( static_cast<int>( left_[i] ) ) - tolower( static_cast<int>( right_[i] ) );
+		diff = tolower( static_cast<int>( left_[i].get() ) ) - tolower( static_cast<int>( right_[i].get() ) );
 	}
 	return ( diff );
 }

@@ -45,10 +45,10 @@ struct EscapeTable {
 	EscapeTable( char const*, int, char const*, int );
 };
 
-void escape( yaal::hcore::HString&, EscapeTable const&, yaal::code_point_t = '\\' );
-void unescape( yaal::hcore::HString&, EscapeTable const&, yaal::code_point_t = '\\' );
-yaal::hcore::HString escape_copy( yaal::hcore::HString, EscapeTable const&, yaal::code_point_t = '\\' );
-yaal::hcore::HString unescape_copy( yaal::hcore::HString, EscapeTable const&, yaal::code_point_t = '\\' );
+void escape( yaal::hcore::HString&, EscapeTable const&, yaal::code_point_t = '\\'_ycp );
+void unescape( yaal::hcore::HString&, EscapeTable const&, yaal::code_point_t = '\\'_ycp );
+yaal::hcore::HString escape_copy( yaal::hcore::HString, EscapeTable const&, yaal::code_point_t = '\\'_ycp );
+yaal::hcore::HString unescape_copy( yaal::hcore::HString, EscapeTable const&, yaal::code_point_t = '\\'_ycp );
 
 }
 

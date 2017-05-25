@@ -233,9 +233,9 @@ void HStatusBarWidget::update_progress( double step_, char const* title_ ) {
 			_varTmpBuffer = format( "|%%-%ds|%%s[%%3d%%s]", maxBar );
 			_string = do_format( _varTmpBuffer, "-", stopper.string(), nextPercent, "%%" );
 		}
-		_string.fill( '-', 1, maxBar );
+		_string.fill( '-'_ycp, 1, maxBar );
 		if ( nextStep > 0 )
-			_string.fill( '=', 1, nextStep );
+			_string.fill( '='_ycp, 1, nextStep );
 		if ( _done ) {
 			int length = static_cast<int>( _string.get_length() );
 			_string.erase( length - 6, 5 );

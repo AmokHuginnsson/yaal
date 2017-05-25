@@ -52,7 +52,7 @@ inline HHuginn::value_t to_lower( huginn::HThread*, HHuginn::value_t* object_, H
 	char const name[] = "character.to_lower";
 	verify_arg_count( name, values_, 0, 0, position_ );
 	HHuginn::HCharacter* c( static_cast<HHuginn::HCharacter*>( object_->raw() ) );
-	c->set( static_cast<HHuginn::HCharacter::value_type>( std::tolower( static_cast<int>( c->value() ) ) ) );
+	c->set( HHuginn::HCharacter::value_type( static_cast<yaal::u32_t>( std::tolower( static_cast<int>( c->value().get() ) ) ) ) );
 	return ( *object_ );
 	M_EPILOG
 }
@@ -62,16 +62,16 @@ inline HHuginn::value_t to_upper( huginn::HThread*, HHuginn::value_t* object_, H
 	char const name[] = "character.to_upper";
 	verify_arg_count( name, values_, 0, 0, position_ );
 	HHuginn::HCharacter* c( static_cast<HHuginn::HCharacter*>( object_->raw() ) );
-	c->set( static_cast<HHuginn::HCharacter::value_type>( std::toupper( static_cast<int>( c->value() ) ) ) );
+	c->set( HHuginn::HCharacter::value_type( static_cast<yaal::u32_t>( std::toupper( static_cast<int>( c->value().get() ) ) ) ) );
 	return ( *object_ );
 	M_EPILOG
 }
 
-inline HHuginn::value_t is_of_a_kind( char const* name, int (*isofakind)(int), huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t is_of_a_kind( char const* name, bool (*isofakind)( code_point_t ), huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( name, values_, 0, 0, position_ );
 	HHuginn::HCharacter* c( static_cast<HHuginn::HCharacter*>( object_->raw() ) );
-	return ( thread_->object_factory().create_boolean( isofakind( static_cast<int>( c->value() ) ) != 0 ) );
+	return ( thread_->object_factory().create_boolean( isofakind( c->value() ) != 0 ) );
 	M_EPILOG
 }
 
@@ -88,13 +88,13 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			HHuginn::field_definitions_t{
 				{ "to_lower",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &character::to_lower, _1, _2, _3, _4 ) ), "make this character lower case" },
 				{ "to_upper",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &character::to_upper, _1, _2, _3, _4 ) ), "make this character upper case" },
-				{ "is_upper",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_upper", static_cast<int(*)(int)>( ::std::isupper ), _1, _2, _3, _4 ) ),   "tell if this character is an upper case character" },
-				{ "is_lower",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_lower", static_cast<int(*)(int)>( ::std::islower ), _1, _2, _3, _4 ) ),   "tell if this character is a lower case character" },
-				{ "is_digit",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_digit", static_cast<int(*)(int)>( ::std::isdigit ), _1, _2, _3, _4 ) ),   "tell if this character represents decimal digit" },
-				{ "is_xdigit", objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_xdigit", static_cast<int(*)(int)>( ::std::isxdigit ), _1, _2, _3, _4 ) ), "tell if this character represents a hexadecimal digit" },
-				{ "is_space",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_space", static_cast<int(*)(int)>( ::std::isspace ), _1, _2, _3, _4 ) ),   "tell if this character represents a white space character" },
-				{ "is_alpha",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_alpha", static_cast<int(*)(int)>( ::std::isalpha ), _1, _2, _3, _4 ) ),   "tell if this character represents an alphabet character" },
-				{ "is_alnum",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_alnum", static_cast<int(*)(int)>( ::std::isalnum ), _1, _2, _3, _4 ) ),   "tell if this character represents any alphanumeric character" }
+				{ "is_upper",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_upper",  hcore::is_upper, _1, _2, _3, _4 ) ),      "tell if this character is an upper case character" },
+				{ "is_lower",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_lower",  hcore::is_lower, _1, _2, _3, _4 ) ),      "tell if this character is a lower case character" },
+				{ "is_digit",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_digit",  hcore::is_digit, _1, _2, _3, _4 ) ),      "tell if this character represents decimal digit" },
+				{ "is_xdigit", objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_xdigit", hcore::is_hex_digit, _1, _2, _3, _4 ) ),  "tell if this character represents a hexadecimal digit" },
+				{ "is_space",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_space",  hcore::is_whitespace, _1, _2, _3, _4 ) ), "tell if this character represents a white space character" },
+				{ "is_alpha",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_alpha",  hcore::is_alpha, _1, _2, _3, _4 ) ),      "tell if this character represents an alphabet character" },
+				{ "is_alnum",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &character::is_of_a_kind, "character.is_alnum",  hcore::is_alnum, _1, _2, _3, _4 ) ),      "tell if this character represents any alphanumeric character" }
 			},
 			"The `character` is a scalar type that is used to represent and operate on single characters. "
 			"It supports basic operations of comparisons, case modification and classification."

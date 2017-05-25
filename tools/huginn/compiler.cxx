@@ -1385,7 +1385,7 @@ void OCompiler::mark_expression_position( executing_parser::position_t position_
 void OCompiler::defer_oper( code_point_t operator_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OPERATOR o( OPERATOR::NONE );
-	switch ( operator_ ) {
+	switch ( operator_.get() ) {
 		case ( '+' ): o = OPERATOR::PLUS;        break;
 		case ( '-' ): o = OPERATOR::MINUS;       break;
 		case ( '*' ): o = OPERATOR::MULTIPLY;    break;

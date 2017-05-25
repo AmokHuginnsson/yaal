@@ -300,7 +300,7 @@ HString money_string( HNumber const& amount_ ) {
 	HNumber n( amount_ );
 	n.round( 2 );
 	HString string( n.to_string() );
-	int long pos( string.reverse_find( '.' ) );
+	int long pos( string.reverse_find( '.'_ycp ) );
 	if ( pos == HString::npos )
 		string += ".00";
 	else if ( pos == 1 )
@@ -327,7 +327,7 @@ HString in_words_en( HNumber const& kwota_, CURRENCY currency_ ) {
 		if ( i == 2 ) {
 			continue;
 		}
-		char digit( static_cast<char>( string[ ( length - i ) - 1 ] - '0' ) );
+		char digit( static_cast<char>( string[ ( length - i ) - 1 ].get() - '0' ) );
 		switch ( i % 3 ) {
 			case ( 0 ) : {
 				int unitIdx( i / 3 );
@@ -353,7 +353,7 @@ HString in_words_en( HNumber const& kwota_, CURRENCY currency_ ) {
 				if ( form > 19 ) {
 					tmp.assign( en::_tenths_[ static_cast<int>( digit ) ] );
 					if ( form % 10 ) {
-						tmp.set_at( tmp.get_length() - 1, '-' );
+						tmp.set_at( tmp.get_length() - 1, '-'_ycp );
 					}
 					inWords = tmp + inWords;
 				}
@@ -390,7 +390,7 @@ HString in_words_pl( HNumber const& kwota_, CURRENCY currency_ ) {
 		if ( i == 2 ) {
 			continue;
 		}
-		char digit( static_cast<char>( string[ ( length - i ) - 1 ] - '0' ) );
+		char digit( static_cast<char>( string[ ( length - i ) - 1 ].get() - '0' ) );
 		switch ( i % 3 ) {
 			case ( 0 ) : {
 				int unitIdx( i / 3 );
@@ -492,7 +492,7 @@ bool verify_IBAN( HString const& IBAN_ ) {
 		}
 		IBAN.reserve( length );
 		for ( int i( 0 ); i < length; ++ i ) {
-			if ( isalnum( static_cast<int>( IBAN_[ i ] ) ) ) {
+			if ( is_alnum( IBAN_[ i ] ) ) {
 				IBAN += IBAN_[ i ];
 			}
 		}
@@ -501,7 +501,7 @@ bool verify_IBAN( HString const& IBAN_ ) {
 			_lastErrorMessage_.assign( "IBAN: Number too short (" ).append( static_cast<int>( length ) ).append( ")." );
 			break;
 		}
-		if ( ! ( isalpha( static_cast<int>( IBAN[ 0 ] ) ) && isalpha( static_cast<int>( IBAN[ 1 ] ) ) ) ) {
+		if ( ! ( is_alpha( IBAN[ 0 ] ) && is_alpha( IBAN[ 1 ] ) ) ) {
 			_lastErrorMessage_ = "IBAN: No country code present.";
 			break;
 		}
@@ -511,11 +511,11 @@ bool verify_IBAN( HString const& IBAN_ ) {
 	/*	M_LOG ( IBAN ); */
 		IBAN.lower();
 		for ( int i( 0 ); i < length; ++ i ) {
-			if ( isalpha( static_cast<int>( IBAN[ i ] ) ) ) {
+			if ( is_alpha( IBAN[ i ] ) ) {
 				static int const DIGIT_PAIR_BUF_SIZE( 3 );
 				char digitPairBuf[DIGIT_PAIR_BUF_SIZE];
-				snprintf( digitPairBuf, DIGIT_PAIR_BUF_SIZE, "%02d", ( IBAN[ i ] - 'a' ) + 10 );
-				pattern[ 0 ] = static_cast<char>( IBAN[ i ] );
+				snprintf( digitPairBuf, DIGIT_PAIR_BUF_SIZE, "%02d", ( IBAN[ i ].get() - 'a' ) + 10 );
+				pattern[ 0 ] = static_cast<char>( IBAN[ i ].get() );
 				IBAN.replace( pattern, digitPairBuf );
 				length = IBAN.get_length();
 			}

@@ -173,9 +173,9 @@ yaal::hcore::HString base64::decode( yaal::hcore::HString const& message, bool s
 		int i( 0 );
 		int pos( 0 );
 		for ( code_point_t ch : message ) {
-			M_ENSURE( is_base64_character( ch, standardCompliantMode ) || isspace( static_cast<int>( ch ) ), ( HFormat( "char: %c, at position: %ld" ) % ch % pos ).string() );
+			M_ENSURE( is_base64_character( ch, standardCompliantMode ) || is_whitespace( ch ), format( "char: %C, at position: %ld", ch, pos ) );
 			if ( is_base64_character( ch, standardCompliantMode ) ) {
-				inputBuffer[i] = static_cast<char>( ch );
+				inputBuffer[i] = static_cast<char>( ch.get() );
 				++ i;
 			}
 			++ pos;
@@ -230,16 +230,16 @@ void base64::decode( yaal::hcore::HStreamInterface& in, yaal::hcore::HStreamInte
 	int const BASE64LINELEN = 76;
 	int const BUF_LEN = 80;
 	char outputBuffer[BUF_LEN];
-	HString line( BUF_LEN, 0 );
+	HString line( BUF_LEN, 0_ycp );
 	HChunk buffer( BASE64LINELEN + 1 );
 	char* inputBuffer( buffer.get<char>() );
 	int inputSize( 0 );
 	int long pos( 0 );
 	while ( in.read_until_n( line, BUF_LEN ) ) {
 		for ( code_point_t ch : line ) {
-			M_ENSURE( is_base64_character( ch, standardCompliantMode ) || isspace( static_cast<int>( ch ) ), ( HFormat( "char: %c, at position: %ld" ) % ch % pos ).string() );
+			M_ENSURE( is_base64_character( ch, standardCompliantMode ) || is_whitespace( ch ), format( "char: %C, at position: %ld", ch, pos ) );
 			if ( is_base64_character( ch, standardCompliantMode	) ) {
-				inputBuffer[inputSize++] = static_cast<char>( ch );
+				inputBuffer[inputSize++] = static_cast<char>( ch.get() );
 			}
 			if ( inputSize >= BASE64LINELEN ) {
 				M_ASSERT( inputSize == BASE64LINELEN );

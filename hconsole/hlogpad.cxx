@@ -76,7 +76,7 @@ void HLogPad::do_paint( void ) {
 	HConsole& cons = HConsole::get_instance();
 	draw_label();
 	_varTmpBuffer.reserve( _widthRaw );
-	_varTmpBuffer.fillz( ' ', 0, _widthRaw );
+	_varTmpBuffer.fillz( ' '_ycp, 0, _widthRaw );
 	COLOR::color_t bg( _focused ? COLOR::BG_GRAY : COLOR::BG_BLACK );
 	_attribute = COLOR::combine( COLOR::ATTR_NORMAL, bg );
 	for ( int i( 0 ); i < _heightRaw; ++ i ) {
@@ -98,9 +98,9 @@ void HLogPad::do_paint( void ) {
 						_varTmpBuffer = it->_text;
 					}
 					if ( ( cursor + _varTmpBuffer.get_length() ) > _widthRaw ) {
-						_varTmpBuffer.set_at( _widthRaw - cursor, 0 );
+						_varTmpBuffer.set_at( _widthRaw - cursor, 0_ycp );
 					}
-					if ( _varTmpBuffer[ 0 ] ) {
+					if ( ! _varTmpBuffer.is_empty() ) {
 						cons.cmvprintf( _rowRaw + row,
 								_columnRaw + cursor, _attribute, _varTmpBuffer );
 					}

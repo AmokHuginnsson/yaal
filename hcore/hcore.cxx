@@ -137,7 +137,7 @@ void decode_set_env( HString line ) {
 		return;
 	}
 	HString val = line.mid( valPos );
-	line.set_at( eon, '\0' );
+	line.set_at( eon, 0_ycp );
 	set_env( line, val );
 	return;
 	M_EPILOG

@@ -110,12 +110,12 @@ struct HNumber::ElementaryFunctions {
 			digits >>= 1;
 			++ digits;
 			if ( aboveOne ) {
-				s.fillz( '0', 0, digits );
-				s.set_at( 0, odd ? '2' : '6' );
+				s.fillz( '0'_ycp, 0, digits );
+				s.set_at( 0, odd ? '2'_ycp : '6'_ycp );
 			} else {
-				s.fillz( '0', 0, digits + 1 );
-				s.set_at( 0, '.' );
-				s.set_at( digits, odd ? '2' : '6' );
+				s.fillz( '0'_ycp, 0, digits + 1 );
+				s.set_at( 0, '.'_ycp );
+				s.set_at( digits, odd ? '2'_ycp : '6'_ycp );
 			}
 			/* Newton's method of finding square root. */
 			n = s;

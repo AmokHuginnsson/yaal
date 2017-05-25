@@ -627,7 +627,7 @@ void strip_comment( HString& line_ ) {
 	bool apostrophe = false, quotation = false;
 	int long ctr = 0, length = line_.get_length();
 	for ( ctr = 0; ctr < length; ctr ++ ) {
-		switch ( line_[ ctr ] ) {
+		switch ( line_[ ctr ].get() ) {
 			case ( '\'' ):
 				apostrophe = ! apostrophe;
 			break;
@@ -636,7 +636,7 @@ void strip_comment( HString& line_ ) {
 			break;
 			case ( '#' ): {
 				if ( ! ( quotation || apostrophe ) ) {
-					line_.set_at( ctr, 0 );
+					line_.set_at( ctr, 0_ycp );
 					return;
 				}
 			}
@@ -684,7 +684,7 @@ int read_rc_line( HString& option_, HString& value_, HFile& file_,
 			int long endOfOption = index;
 			index = option_.find_other_than( _keyValueSep_, index );
 			if ( ( index > 0 ) && option_[ index ] ) {
-				if ( count( option_.begin() + endOfOption, option_.begin() + index, U'=' ) > 1 ) {
+				if ( count( option_.begin() + endOfOption, option_.begin() + index, '='_ycp ) > 1 ) {
 					throw HProgramOptionsHandlerException( "Syntax error: redundant `=' sign.", line_ );
 				}
 				/* we have found a non-whitespace, so there certainly is a value */
@@ -695,10 +695,10 @@ int read_rc_line( HString& option_, HString& value_, HFile& file_,
 						&& ( option_[ end ] == option_[ index ] ) )
 					index ++, end --;
 				if ( ( end + 1 ) < length )
-					option_.set_at( end + 1, 0 );
+					option_.set_at( end + 1, 0_ycp );
 				value_ = option_.mid( index );
 			}
-			option_.set_at( endOfOption, 0 );
+			option_.set_at( endOfOption, 0_ycp );
 		}
 		return ( 1 );
 	}

@@ -227,8 +227,9 @@ void HStreamInterface::apply_precision( void ) {
 		if ( ( nonZero != HString::npos ) && ( nonZero >= dot  ) ) {
 			int len( static_cast<int>( _wordCache.get_length() ) );
 			int cap( max( _floatFormat == FLOAT_FORMAT::FIXED ? _precision + 1 : 0, nonZero + ( nonZero == dot ? 0 : 1 ) ) ); /* + 1 for a dot */
-			if ( cap < len )
-				_wordCache.set_at( cap, 0 );
+			if ( cap < len ) {
+				_wordCache.set_at( cap, 0_ycp );
+			}
 		}
 	}
 	return;
@@ -406,7 +407,7 @@ HStreamInterface::HManipulator setprecision( int width_ ) {
 
 HStreamInterface::HManipulator setfill( code_point_t fill_ ) {
 	M_PROLOG
-	return ( HStreamInterface::HManipulator( static_cast<int>( fill_ ), &HStreamInterface::HManipulator::set_fill ) );
+	return ( HStreamInterface::HManipulator( static_cast<int>( fill_.get() ), &HStreamInterface::HManipulator::set_fill ) );
 	M_EPILOG
 }
 
@@ -569,7 +570,7 @@ bool HStreamInterface::read_word( void ) {
 	if ( ! _skipWS ) {
 		int peeked( HStreamInterface::do_peek() );
 		if ( ( peeked == INVALID_CHARACTER )
-				|| character_class( CHARACTER_CLASS::WHITESPACE ).hasz( static_cast<code_point_t>( peeked ) ) ) {
+				|| character_class( CHARACTER_CLASS::WHITESPACE ).hasz( code_point_t( static_cast<yaal::u32_t>( peeked ) ) ) ) {
 			_fail = true;
 		}
 	}
@@ -683,7 +684,7 @@ HStreamInterface& HStreamInterface::do_input( char& char_ ) {
 	char c( 0 );
 	do {
 		read( &c, 1 );
-	} while ( good() && _skipWS && character_class( CHARACTER_CLASS::WHITESPACE ).hasz( code_point_t( c ) ) );
+	} while ( good() && _skipWS && character_class( CHARACTER_CLASS::WHITESPACE ).hasz( code_point_t( static_cast<yaal::u32_t>( c ) ) ) );
 	char_ = c;
 	return ( *this );
 	M_EPILOG
@@ -970,7 +971,7 @@ void HStreamInterface::HManipulator::operator()( HStreamInterface& iface_ ) cons
 
 void HStreamInterface::HManipulator::set_fill( HStreamInterface& iface_ ) const {
 	M_PROLOG
-	iface_.set_fill( static_cast<code_point_t>( _value ) );
+	iface_.set_fill( code_point_t( static_cast<yaal::u32_t>( _value ) ) );
 	return;
 	M_EPILOG
 }

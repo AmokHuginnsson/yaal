@@ -89,7 +89,7 @@ int preparse_integer( HString const& str_, char* alternate_ ) {
 	 */
 	HString::const_iterator it( str_.begin() );
 	int len( safe_int::cast<int>( str_.get_length() ) );
-	while ( ( len > 0 ) && character_class( CHARACTER_CLASS::WHITESPACE ).has( static_cast<u32_t>( *it ) ) ) { /* *TODO* *FIXME* Remove static_cast after UCS in HString is implemented. */
+	while ( ( len > 0 ) && character_class( CHARACTER_CLASS::WHITESPACE ).has( *it ) ) {
 		++ it;
 		-- len;
 	}
@@ -129,11 +129,11 @@ int preparse_integer( HString const& str_, char* alternate_ ) {
 		-- skip;
 	}
 	int const maxDigits( base == 10 ? MAX_VALID_DECIMAL_INTEGER_LENGTH : ( base == 16 ? MAX_VALID_HEXADECIMAL_INTEGER_LENGTH : ( base == 8 ? MAX_VALID_OCTAL_INTEGER_LENGTH : MAX_VALID_BINARY_INTEGER_LENGTH ) ) );
-	for ( int i( 0 ); ( i < len ) && ( static_cast<u32_t>( *it ) < unicode::UTF8_MAX_1_BYTE_CODE_POINT ); ++ i, ++ it, ++ alternate_ ) { /* *TODO* *FIXME* Remove static_cast after UCS in HString is implemented. */
+	for ( int i( 0 ); ( i < len ) && is_ascii( *it ); ++ i, ++ it, ++ alternate_ ) {
 		if ( i > maxDigits ) {
 			M_THROW( "too many "_ys.append( base == 10 ? "decimal" : ( base == 16 ) ? "hexadecimal" : ( base == 8 ? "octal" : "binary" ) ).append( " digits: " ).append( str_ ), len );
 		}
-		*alternate_ = static_cast<char>( *it );
+		*alternate_ = static_cast<char>( (*it).get() );
 	}
 	*alternate_ = 0;
 	return ( base );
@@ -359,7 +359,7 @@ char lexical_cast( HString const& val ) {
 	if ( val.get_length() != 1 ) {
 		M_THROW( "bad string size", val.get_length() );
 	}
-	return ( safe_int::cast<char>( val[ 0 ] ) );
+	return ( safe_int::cast<char>( val[ 0 ].get() ) );
 	M_EPILOG
 }
 

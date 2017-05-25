@@ -84,7 +84,7 @@ HWidget::HWidget( HWindow* parent_, int row_, int column_,
 	}
 	_shortcutIndex = static_cast<int>( _label.find( '&' ) );
 	if ( _shortcutIndex > -1 ) {
-		_label.set_at( _shortcutIndex, 0 );
+		_label.set_at( _shortcutIndex, 0_ycp );
 		_label += label_.substr( _shortcutIndex + 1 );
 	} else {
 		_shortcutIndex = 0;
@@ -95,7 +95,7 @@ HWidget::HWidget( HWindow* parent_, int row_, int column_,
 			_labelPosition = LABEL::POSITION::SIDE_BY_SIDE;
 		} else {
 			_labelPosition = LABEL::POSITION::STACKED;
-			_label.set_at( -- _labelLength, 0 );
+			_label.set_at( -- _labelLength, 0_ycp );
 		}
 		if ( _labelDecoration == LABEL::DECORATION::AUTO ) {
 			_labelLength += LABEL_DECORATION_SIZE;
@@ -147,7 +147,7 @@ int HWidget::do_process_input( int code_ ) {
 bool HWidget::set_focus( int shortCut_ ) {
 	M_PROLOG
 	bool focusChanged( false );
-	if ( _enabled && ( ( shortCut_ <= 0 ) || ( _label[ _shortcutIndex ] == static_cast<code_point_t>( shortCut_ ) ) ) ) {
+	if ( _enabled && ( ( shortCut_ <= 0 ) || ( _label[ _shortcutIndex ] == code_point_t( static_cast<yaal::u32_t>( shortCut_ ) ) ) ) ) {
 		bool oldFocus( _focused );
 		_focused = true;
 		if ( ! shortCut_ && _window ) {
@@ -517,7 +517,7 @@ yaal::hcore::HString const& HWidget::get_label( void ) const {
 }
 
 int HWidget::get_shortcut( void ) const {
-	return ( static_cast<int>( _label[_shortcutIndex] ) );
+	return ( static_cast<int>( _label[_shortcutIndex].get() ) );
 }
 
 HWindow* HWidget::get_window( void ) const {

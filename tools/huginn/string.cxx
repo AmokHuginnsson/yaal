@@ -146,7 +146,7 @@ public:
 				ensure( _it != end, "Single '{' encountered in format string at: " );
 				if ( *_it != FMT_OPEN ) {
 					idxRaw.clear();
-					while ( ( _it != end ) && character_class( CHARACTER_CLASS::DIGIT ).has( static_cast<u32_t>( *_it ) ) ) { /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+					while ( ( _it != end ) && is_digit( *_it ) ) {
 						idxRaw.append( *_it );
 						++ _it;
 					}

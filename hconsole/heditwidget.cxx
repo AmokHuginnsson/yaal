@@ -126,7 +126,7 @@ void HEditWidget::do_paint( void ) {
 	int long len( _varTmpBuffer.get_length() );
 	if ( len < _widthRaw ) {
 		_varTmpBuffer.reserve( _widthRaw );
-		_varTmpBuffer.fill( ' ', len, _widthRaw - len );
+		_varTmpBuffer.fill( ' '_ycp, len, _widthRaw - len );
 	}
 	cons.mvprintf( _rowRaw, _columnRaw, _varTmpBuffer );
 	if ( _focused ) {
@@ -243,7 +243,7 @@ int HEditWidget::go_to_eow( int length_ ) {
 int HEditWidget::kill_line( void ) {
 	M_PROLOG
 	if ( ! _readOnly ) {
-		_varTmpBuffer.set_at( 0, 0 );
+		_varTmpBuffer.set_at( 0, 0_ycp );
 		_widgetOffset = 0;
 		_cursorPosition = 0;
 	}
@@ -369,7 +369,7 @@ int HEditWidget::delete_word( int length_ ) {
 	if ( ! err ) {
 		int oldIndex = ( _widgetOffset + _cursorPosition );
 		if ( oldIndex >= length_ ) {
-			_varTmpBuffer.set_at( 0, 0 );
+			_varTmpBuffer.set_at( 0, 0_ycp );
 			_widgetOffset = 0;
 			_cursorPosition = 0;
 		} else {
@@ -416,7 +416,7 @@ int HEditWidget::insert_char( int code_, int length_ ) {
 		if ( ! _replace ) {
 			_varTmpBuffer.insert( _widgetOffset+ _cursorPosition, 1 );
 		}
-		_varTmpBuffer.set_at( _cursorPosition + _widgetOffset, static_cast<code_point_t>( code_ ) );
+		_varTmpBuffer.set_at( _cursorPosition + _widgetOffset, code_point_t( static_cast<yaal::u32_t>( code_ ) ) );
 		_cursorPosition ++;
 		if ( _cursorPosition >= _widthRaw ) {
 			_cursorPosition = _widthRaw - 1;

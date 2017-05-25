@@ -606,7 +606,7 @@ bool less( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		res = static_cast<HHuginn::HNumber const*>( v1_.raw() )->value() < static_cast<HHuginn::HNumber const*>( v2_.raw() )->value();
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
-		res = static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() ) < static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value() );
+		res = static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() < static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value();
 	} else {
 		res = fallback_compare( thread_, INTERFACE::LESS, op_to_str( OPERATOR::LESS ), v1_, v2_, position_ );
 	}
@@ -626,7 +626,7 @@ bool greater( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t co
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		res = static_cast<HHuginn::HNumber const*>( v1_.raw() )->value() > static_cast<HHuginn::HNumber const*>( v2_.raw() )->value();
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
-		res = static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() ) > static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value() );
+		res = static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() > static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value();
 	} else {
 		res = fallback_compare( thread_, INTERFACE::GREATER, op_to_str( OPERATOR::GREATER ), v1_, v2_, position_ );
 	}
@@ -646,7 +646,7 @@ bool less_or_equal( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::valu
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		res = static_cast<HHuginn::HNumber const*>( v1_.raw() )->value() <= static_cast<HHuginn::HNumber const*>( v2_.raw() )->value();
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
-		res = static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() ) <= static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value() );
+		res = static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() <= static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value();
 	} else {
 		res = fallback_compare( thread_, INTERFACE::LESS_OR_EQUAL, op_to_str( OPERATOR::LESS_OR_EQUAL ), v1_, v2_, position_ );
 	}
@@ -666,7 +666,7 @@ bool greater_or_equal( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::v
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		res = static_cast<HHuginn::HNumber const*>( v1_.raw() )->value() >= static_cast<HHuginn::HNumber const*>( v2_.raw() )->value();
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
-		res = static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() ) >= static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value() );
+		res = static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() >= static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value();
 	} else {
 		res = fallback_compare( thread_, INTERFACE::GREATER_OR_EQUAL, op_to_str( OPERATOR::GREATER_OR_EQUAL ), v1_, v2_, position_ );
 	}
@@ -793,7 +793,7 @@ HHuginn::value_t integer( HThread* thread_, HHuginn::value_t const& v_, int posi
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
 		res = thread_->object_factory().create_integer( static_cast<int long long>( static_cast<HHuginn::HReal const*>( v_.raw() )->value() ) );
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
-		res = thread_->object_factory().create_integer( static_cast<int long long>( static_cast<HHuginn::HCharacter const*>( v_.raw() )->value() ) );
+		res = thread_->object_factory().create_integer( static_cast<int long long>( static_cast<HHuginn::HCharacter const*>( v_.raw() )->value().get() ) );
 	} else if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = v_;
 	} else {

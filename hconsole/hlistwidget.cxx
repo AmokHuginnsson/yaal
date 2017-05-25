@@ -256,7 +256,7 @@ void HListWidget::draw_background( int from_ ) {
 	int ctr = from_;
 	set_attr_data();
 	_varTmpBuffer.reserve( _widthRaw );
-	_varTmpBuffer.fillz( '.', 0, _widthRaw );
+	_varTmpBuffer.fillz( '.'_ycp, 0, _widthRaw );
 	for ( ; ctr < _heightRaw; ctr ++ ) {
 		HConsole::get_instance().mvprintf( _rowRaw + ctr, _columnRaw, _varTmpBuffer );
 	}
@@ -294,9 +294,9 @@ void HListWidget::draw_cell( iterator_t& it_, int row_, int column_, int columnO
 		case ( BITS::ALIGN::LEFT ): {
 			if ( len < columnInfo_->_widthRaw ) {
 				_varTmpBuffer.reserve( columnInfo_->_widthRaw );
-				_varTmpBuffer.fillz( '_', len, columnInfo_->_widthRaw - len );
+				_varTmpBuffer.fillz( '_'_ycp, len, columnInfo_->_widthRaw - len );
 			} else if ( len > columnInfo_->_widthRaw ) {
-				_varTmpBuffer.set_at( columnInfo_->_widthRaw, 0 );
+				_varTmpBuffer.set_at( columnInfo_->_widthRaw, 0_ycp );
 			}
 		}
 		break;
@@ -305,10 +305,10 @@ void HListWidget::draw_cell( iterator_t& it_, int row_, int column_, int columnO
 				_varTmpBuffer = _varTmpBuffer.right(
 						columnInfo_->_widthRaw );
 			else if ( len < columnInfo_->_widthRaw ) {
-				_varTmpBuffer.insert( 0, ( columnInfo_->_widthRaw - len ) / 2, '_' );
+				_varTmpBuffer.insert( 0, ( columnInfo_->_widthRaw - len ) / 2, '_'_ycp );
 				len = static_cast<int>( _varTmpBuffer.get_length() );
 				_varTmpBuffer.reserve( columnInfo_->_widthRaw );
-				_varTmpBuffer.fillz( '_', len, columnInfo_->_widthRaw - len );
+				_varTmpBuffer.fillz( '_'_ycp, len, columnInfo_->_widthRaw - len );
 			}
 		}
 		break;
@@ -316,7 +316,7 @@ void HListWidget::draw_cell( iterator_t& it_, int row_, int column_, int columnO
 			if ( len > columnInfo_->_widthRaw )
 				_varTmpBuffer.erase( 0, len - columnInfo_->_widthRaw );
 			else if ( len < columnInfo_->_widthRaw )
-				_varTmpBuffer.insert( 0, ( columnInfo_->_widthRaw - len ) - 1, '_' );
+				_varTmpBuffer.insert( 0, ( columnInfo_->_widthRaw - len ) - 1, '_'_ycp );
 		}
 		break;
 		default :
@@ -797,7 +797,7 @@ int HListWidget::process_input_view( int code_ ) {
 			int columns( static_cast<int>( _header.size() ) );
 			int selectedColumn( 0 );
 			for ( ; selectedColumn < columns; ++ selectedColumn ) {
-				if ( tolower( code_ ) == tolower( static_cast<int>( _header[ selectedColumn ]->_shortcut ) ) ) {
+				if ( tolower( code_ ) == tolower( static_cast<int>( _header[ selectedColumn ]->_shortcut.get() ) ) ) {
 					break;
 				}
 			}

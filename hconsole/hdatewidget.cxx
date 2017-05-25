@@ -43,8 +43,8 @@ void center( HString& str_, int toLen_ ) {
 	int len( static_cast<int>( str_.get_length() ) );
 	if ( len < toLen_ ) {
 		int diff( toLen_  - len );
-		str_.insert( 0, diff / 2, ' ' );
-		str_.append( diff / 2 + diff % 2, ' ' );
+		str_.insert( 0, diff / 2, ' '_ycp );
+		str_.append( diff / 2 + diff % 2, ' '_ycp );
 	}
 }
 

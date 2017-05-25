@@ -526,7 +526,7 @@ void HNumber::from_string( HString const& number_ ) {
 						digitInLeaf = 0;
 						leaf = 0;
 					}
-					leaf += ( static_cast<int>( *it - VALID_CHARACTERS[ A_ZERO ] ) * DECIMAL_SHIFT[ ( DECIMAL_DIGITS_IN_LEAF_CONST - digitInLeaf ) - 1 ] ); /* *TODO* Remove static_cast if code point is i32_t instead of u32_t. */
+					leaf += ( static_cast<int>( ( *it - VALID_CHARACTERS[ A_ZERO ] ).get() ) * DECIMAL_SHIFT[ ( DECIMAL_DIGITS_IN_LEAF_CONST - digitInLeaf ) - 1 ] ); /* *TODO* Remove static_cast if code point is i32_t instead of u32_t. */
 				}
 				if ( idx < _leafCount ) {
 					dst[idx] = leaf;
@@ -546,7 +546,7 @@ void HNumber::from_string( HString const& number_ ) {
 						digitInLeaf = 0;
 						leaf = 0;
 					}
-					leaf += ( static_cast<int>( *it - VALID_CHARACTERS[ A_ZERO ] ) * DECIMAL_SHIFT[ digitInLeaf ] ); /* *TODO* Remove static_cast if code point is i32_t instead of u32_t. */
+					leaf += ( static_cast<int>( ( *it - VALID_CHARACTERS[ A_ZERO ] ).get() ) * DECIMAL_SHIFT[ digitInLeaf ] ); /* *TODO* Remove static_cast if code point is i32_t instead of u32_t. */
 				}
 				if ( idx >= 0 ) {
 					dst[idx] = leaf;
@@ -572,7 +572,7 @@ HString HNumber::to_string( void ) const {
 	_cache.realloc( _leafCount * DECIMAL_DIGITS_IN_LEAF_CONST + 3 ); /* + 1 for '.', + 1 for '-' and + 1 for terminating NIL */
 	char* ptr( _cache.get<char>() );
 	if ( _negative ) {
-		*ptr ++ = static_cast<char>( VALID_CHARACTERS[ A_MINUS ] );
+		*ptr ++ = static_cast<char>( VALID_CHARACTERS[ A_MINUS ].get() );
 	}
 	integer_t leaf( 0 );
 	for ( ; leaf < _integralPartSize; ++ leaf ) {
@@ -580,9 +580,9 @@ HString HNumber::to_string( void ) const {
 	}
 	if ( _leafCount > _integralPartSize ) {
 		if ( ! _integralPartSize ) {
-			*ptr ++ = static_cast<char>( VALID_CHARACTERS[ A_ZERO ] );
+			*ptr ++ = static_cast<char>( VALID_CHARACTERS[ A_ZERO ].get() );
 		}
-		*ptr ++ = static_cast<char>( VALID_CHARACTERS[ A_DOT ] );
+		*ptr ++ = static_cast<char>( VALID_CHARACTERS[ A_DOT ].get() );
 	}
 	for ( ; leaf < _leafCount; ++ leaf ) {
 		ptr += snprintf( ptr, DECIMAL_DIGITS_IN_LEAF_CONST + 1, ZFORMAT, src[ leaf ] );

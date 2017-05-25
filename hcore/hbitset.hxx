@@ -208,7 +208,7 @@ YAAL_DEFINE_OPER( ^ )
 	word_t const* raw( void ) const {
 		return ( _buf );
 	}
-	HString to_string( char falseChar_ = '0', char trueChar_ = '1' ) const {
+	HString to_string( code_point_t falseChar_ = '0'_ycp, code_point_t trueChar_ = '1'_ycp ) const {
 		M_PROLOG
 		HString s( SIZE, falseChar_ );
 		for ( int i( 0 ); i < SIZE; ++ i ) {

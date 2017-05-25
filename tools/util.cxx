@@ -78,7 +78,7 @@ HString& usun_ogonki( HString& string_ ) {
 
 yaal::hcore::HString article( yaal::hcore::HString const& word_ ) {
 	int long pos( word_.find_one_of( character_class( CHARACTER_CLASS::LETTER ).data() ) );
-	return( pos != HString::npos ? ( character_class( CHARACTER_CLASS::VOWEL ).has( static_cast<u32_t>( word_[pos] ) ) ? "an" : "a" ) : "" ); /* *TODO* *FIXME* Remove static cast after UCS in HString is implemented. */
+	return( pos != HString::npos ? ( character_class( CHARACTER_CLASS::VOWEL ).has( word_[pos] ) ? "an" : "a" ) : "" );
 }
 
 double long atof_ex( HString const& string_, bool parse_ ) {

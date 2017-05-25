@@ -141,7 +141,7 @@ bool HPattern::parse( HString const& pattern_, pluggable_flags_t* externalFlags 
 		}
 
 		for ( int idx( stop + 1 ), LEN( static_cast<int>( _pattern.get_length() ) ); idx < LEN; ++ idx ) {
-			if ( ! ( isascii( static_cast<int>( pattern_[ idx ] ) ) && set_switch( static_cast<char>( pattern_[ idx ] ), externalFlags ) ) ) {
+			if ( ! ( is_ascii( pattern_[ idx ] ) && set_switch( static_cast<char>( pattern_[ idx ].get() ), externalFlags ) ) ) {
 				restore_state( &savePoint, externalFlags );
 				_errorCause.assign( "bad search option '" ).append( pattern_[ idx ] ).append( "'" );
 				ok = false;

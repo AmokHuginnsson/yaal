@@ -40,7 +40,7 @@ namespace tools {
 namespace huginn {
 
 namespace {
-static code_point_t const NEWLINE = '\n';
+static code_point_t const NEWLINE = '\n'_ycp;
 }
 
 class HPrepocessor final {

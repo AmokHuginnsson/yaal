@@ -264,7 +264,7 @@ HRegex::groups_t HRegex::groups_impl( HUTF8String const& string_, match_t match_
 	M_PROLOG
 	groups_t g;
 	typedef yaal::hcore::HArray<int> matches_t;
-	int expectedGroupCount( static_cast<int>( count( _pattern.begin(), _pattern.end(), U'(' ) + 1 ) );
+	int expectedGroupCount( static_cast<int>( count( _pattern.begin(), _pattern.end(), '('_ycp ) + 1 ) );
 	matches_t matchesBuffer( expectedGroupCount * 3, NO_MATCH );
 	char const* str( string_.x_str() );
 	_lastError = ::pcre_exec(
@@ -325,8 +325,8 @@ yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, yaal::h
 					++ r;
 				} else {
 					HString idS;
-					while ( ( r != e ) && character_class( CHARACTER_CLASS::DIGIT ).has( static_cast<u32_t>( *r ) ) ) { /* *TODO* *FIXME* Remove static_cast after UCS in HString is implemented. */
-						idS.append( *r );
+					while ( ( r != e ) && character_class( CHARACTER_CLASS::DIGIT ).has( *r ) ) {
+						idS.push_back( *r );
 						++ r;
 					}
 					if ( idS.is_empty() ) {
@@ -339,7 +339,7 @@ yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, yaal::h
 					res.append( text_, endPos + g[id].start(), g[id].size() );
 				}
 			} else {
-				res.append( *r );
+				res.push_back( *r );
 				++ r;
 			}
 		}
