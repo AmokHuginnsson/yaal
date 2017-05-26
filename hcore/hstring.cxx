@@ -1940,47 +1940,47 @@ HString& HString::replace( int long pos_, int long size_, HString const& replace
 	M_EPILOG
 }
 
-void HString::replace_check( int long pos_, int long destSize_, int long offset_, int long len_, int long srcSize_ ) {
+void HString::replace_check( int long thisOffset_, int long onto_, int long srcOffset_, int long srcUsedSize_, int long srcRealSize_ ) {
 	M_PROLOG
-	if ( offset_ < 0 ) {
-		M_THROW( err_msg( string_helper::BAD_OFFSET ), offset_ );
+	if ( srcOffset_ < 0 ) {
+		M_THROW( err_msg( string_helper::BAD_OFFSET ), srcOffset_ );
 	}
-	if ( destSize_ < 0 ) {
-		M_THROW( err_msg( string_helper::BAD_LENGTH ), destSize_ );
+	if ( onto_ < 0 ) {
+		M_THROW( err_msg( string_helper::BAD_LENGTH ), onto_ );
 	}
-	if ( len_ < 0 ) {
-		M_THROW( err_msg( string_helper::BAD_LENGTH ), len_ );
+	if ( srcUsedSize_ < 0 ) {
+		M_THROW( err_msg( string_helper::BAD_LENGTH ), srcUsedSize_ );
 	}
-	if ( pos_ < 0 ) {
-		M_THROW( err_msg( string_helper::BAD_OFFSET ), pos_ );
+	if ( thisOffset_ < 0 ) {
+		M_THROW( err_msg( string_helper::BAD_OFFSET ), thisOffset_ );
 	}
 	int long oldSize( GET_SIZE );
-	if ( ( pos_ + destSize_ ) > oldSize ) {
-		M_THROW( err_msg( string_helper::OVERFLOW ), pos_ + destSize_ );
+	if ( ( thisOffset_ + onto_ ) > oldSize ) {
+		M_THROW( err_msg( string_helper::OVERFLOW ), thisOffset_ + onto_ );
 	}
-	if ( offset_ > srcSize_ ) {
-		M_THROW( err_msg( string_helper::BAD_OFFSET ), offset_ );
+	if ( srcOffset_ > srcRealSize_ ) {
+		M_THROW( err_msg( string_helper::BAD_OFFSET ), srcOffset_ );
 	}
 	return;
 	M_EPILOG
 }
 
-HString& HString::replace( int long pos_, int long size_, HString const& replacement_, int long offset_, int long len_ ) {
+HString& HString::replace( int long thisOffset_, int long onto_, HString const& replacement_, int long srcOffset_, int long srcUsedSize_ ) {
 	M_PROLOG
-	if ( len_ == npos ) {
-		len_ = MAX_STRING_LENGTH;
+	if ( srcUsedSize_ == npos ) {
+		srcUsedSize_ = MAX_STRING_LENGTH;
 	}
-	replace_check( pos_, size_, offset_, len_, replacement_.get_length() );
-	if ( ( offset_ + len_ ) > replacement_.get_length() ) {
-		len_ = replacement_.get_length() - offset_;
+	replace_check( thisOffset_, onto_, srcOffset_, srcUsedSize_, replacement_.get_length() );
+	if ( ( srcOffset_ + srcUsedSize_ ) > replacement_.get_length() ) {
+		srcUsedSize_ = replacement_.get_length() - srcOffset_;
 	}
 	int long oldSize( GET_SIZE );
 	int withRank( EXT_GET_RANK( replacement_ ) );
 	int rank( GET_RANK );
-	int long newSize( oldSize + ( len_ - size_ ) );
+	int long newSize( oldSize + ( srcUsedSize_ - onto_ ) );
 	resize( newSize, rank = max( rank, withRank ) );
-	adaptive::move( MEM, rank, pos_ + len_, MEM, rank, pos_ + size_, oldSize - ( pos_ + size_ ) );
-	adaptive::copy( MEM, rank, pos_, EXT_MEM( replacement_ ), withRank, offset_, len_ );
+	adaptive::move( MEM, rank, thisOffset_ + srcUsedSize_, MEM, rank, thisOffset_ + onto_, oldSize - ( thisOffset_ + onto_ ) );
+	adaptive::copy( MEM, rank, thisOffset_, EXT_MEM( replacement_ ), withRank, srcOffset_, srcUsedSize_ );
 	return ( *this );
 	M_EPILOG
 }
@@ -2272,11 +2272,7 @@ HString& HString::insert( int long from_, char const* chunk_ ) {
 
 HString& HString::insert( int long from_, int long length_, code_point_t char_ ) {
 	M_PROLOG
-	insert( from_, length_ );
-	if ( ( from_ + length_ ) > 0 ) {
-		fill( char_, from_, length_ );
-	}
-	return ( *this );
+	return ( replace( from_, 0, length_, char_ ) );
 	M_EPILOG
 }
 
