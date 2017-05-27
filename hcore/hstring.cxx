@@ -1113,7 +1113,7 @@ void HString::reserve( int long const preallocate_, int const rank_ ) {
 		} else {
 			char* newMem( memory::calloc<char>( newAllocBytes ) );
 			int long origSize( GET_SIZE );
-			::std::strncpy( newMem, _mem, static_cast<size_t>( origSize ) );
+			::std::memcpy( newMem, _mem, static_cast<size_t>( origSize * oldRank ) );
 			_ptr = newMem;
 			SET_ALLOC_BYTES( newAllocBytes );
 			SET_SIZE( origSize );
@@ -1749,7 +1749,7 @@ int long HString::find( HString const& pattern_, int long after_ ) const {
 	}
 	int long patternLength( EXT_GET_SIZE( pattern_ ) );
 	if ( ( ! patternLength )
-			|| ( ( after_ + patternLength ) >= GET_SIZE ) ) {
+			|| ( ( after_ + patternLength ) > GET_SIZE ) ) {
 		return ( npos );
 	}
 	return (
@@ -3108,7 +3108,7 @@ bool is_lower( code_point_t char_ ) {
 }
 
 bool is_alpha( code_point_t char_ ) {
-	return ( ( char_ > ' ' ) && ( char_ <= unicode::UTF8_MAX_1_BYTE_CODE_POINT ) );
+	return ( ::std::isalpha( static_cast<int>( char_.get() ) ) );
 }
 
 bool is_alnum( code_point_t char_ ) {

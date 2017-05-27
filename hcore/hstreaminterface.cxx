@@ -221,7 +221,7 @@ HStreamInterface& HStreamInterface::do_output( int long long unsigned unsignedLo
 
 void HStreamInterface::apply_precision( void ) {
 	M_PROLOG
-	int dot( static_cast<int>( _wordCache.find( '.' ) ) );
+	int dot( static_cast<int>( _wordCache.find( '.'_ycp ) ) );
 	if ( dot != HString::npos ) {
 		int nonZero( static_cast<int>( _wordCache.find_last_other_than( "0" ) ) );
 		if ( ( nonZero != HString::npos ) && ( nonZero >= dot  ) ) {

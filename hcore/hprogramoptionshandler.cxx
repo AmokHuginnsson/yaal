@@ -751,7 +751,7 @@ int HProgramOptionsHandler::process_command_line( int argc_,
 		optValue.clear();
 		if ( ( arg[0] == '-' ) && ( arg[1] == '-' ) ) {
 			optName.assign( arg + 2 );
-			int long optNameEnd( optName.find( '=' ) );
+			int long optNameEnd( optName.find( '='_ycp ) );
 			if ( optNameEnd != HString::npos ) {
 				optValue = optName.substr( optNameEnd + 1 );
 				optName.erase( optNameEnd );

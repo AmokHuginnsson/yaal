@@ -134,10 +134,12 @@ void HPrepocessor::HIterator::make_readable( void ) {
 		yaal::hcore::HString::const_iterator preSkip( pos );
 		pos = skip_comment( pos );
 		_owner->_comment.assign( preSkip, pos );
-		if ( *pos == SINGLE_QUOTE ) {
-			_state = STATE::IN_SINGLE_QUOTE;
-		} else if ( *pos == DOUBLE_QUOTE ) {
-			_state = STATE::IN_DOUBLE_QUOTE;
+		if ( pos != _owner->_end ) {
+			if ( *pos == SINGLE_QUOTE ) {
+				_state = STATE::IN_SINGLE_QUOTE;
+			} else if ( *pos == DOUBLE_QUOTE ) {
+				_state = STATE::IN_DOUBLE_QUOTE;
+			}
 		}
 	} else {
 		/* We are in quote state. */

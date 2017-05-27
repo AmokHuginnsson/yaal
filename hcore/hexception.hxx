@@ -128,7 +128,7 @@ template<typename tType>
 HString type_name( bool stripTemplateParams_ = false ) {
 	HString typeName( demangle( typeid( tType ).name() ) );
 	if ( stripTemplateParams_ ) {
-		int long idx( typeName.find( '<' ) );
+		int long idx( typeName.find( '<'_ycp ) );
 		if ( idx != HString::npos )
 			typeName.erase( idx );
 	}

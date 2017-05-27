@@ -861,7 +861,7 @@ void HXml::dump_node( void* writer_p, HConstNodeProxy const& node_ ) const {
 	writer_resource_t& writer = *static_cast<writer_resource_t*>( writer_p );
 	HString const& str = node_.get_name();
 	int rc( 0 );
-	int long nsIdx( str.find( ':' ) );
+	int long nsIdx( str.find( ':'_ycp ) );
 	if ( nsIdx != HString::npos ) {
 		HString pref( nsIdx != HString::npos ? str.left( nsIdx ) : "" );
 		HString name( str.mid( nsIdx + 1 ) );
@@ -1837,7 +1837,7 @@ value_t try_attr_val_by_path( HXml::HConstNodeProxy const& node_, yaal::hcore::H
 	M_PROLOG
 	xml::value_t v;
 	if ( node_.get_type() == HXml::HNode::TYPE::NODE ) {
-		int attrPos( static_cast<int>( path_.find_last( '/' ) ) );
+		int attrPos( static_cast<int>( path_.find_last( '/'_ycp ) ) );
 		M_ENSURE( attrPos != HString::npos );
 		HString path( path_.left( attrPos ) );
 		HString attr( path_.mid( attrPos + 1 ) );

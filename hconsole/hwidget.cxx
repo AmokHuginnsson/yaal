@@ -82,7 +82,7 @@ HWidget::HWidget( HWindow* parent_, int row_, int column_,
 	if ( ! HConsole::get_instance().is_enabled() ) {
 		M_THROW( "not in curses mode.", errno );
 	}
-	_shortcutIndex = static_cast<int>( _label.find( '&' ) );
+	_shortcutIndex = static_cast<int>( _label.find( '&'_ycp ) );
 	if ( _shortcutIndex > -1 ) {
 		_label.set_at( _shortcutIndex, 0_ycp );
 		_label += label_.substr( _shortcutIndex + 1 );

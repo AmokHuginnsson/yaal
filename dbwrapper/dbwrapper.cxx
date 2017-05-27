@@ -85,13 +85,13 @@ HDataBase::ptr_t connect( yaal::hcore::HString const& dsn_ ) {
 	dbType.lower();
 	ODBConnector::DRIVER::enum_t driver( db_driver_from_string( dbType ) );
 	HString connectionString = dsn_.substr( dbTypeEnd + static_cast<int>( sizeof ( SCHEMA_SEPARATOR ) ) - 1 );
-	int userPassEnd( static_cast<int>( connectionString.find( '@' ) ) );
+	int userPassEnd( static_cast<int>( connectionString.find( '@'_ycp ) ) );
 	HString userName;
 	HString password;
 	HString dbHostSpec;
 	if ( userPassEnd != HString::npos ) {
 		HString userPass( connectionString.left( userPassEnd ) );
-		int userEnd( static_cast<int>( userPass.find( ':' ) ) );
+		int userEnd( static_cast<int>( userPass.find( ':'_ycp ) ) );
 		userName = userPass.left( userEnd );
 		if ( userEnd != HString::npos ) {
 			password = userPass.substr( userEnd + 1 );
@@ -100,7 +100,7 @@ HDataBase::ptr_t connect( yaal::hcore::HString const& dsn_ ) {
 	} else {
 		dbHostSpec = connectionString;
 	}
-	int hostSpecEnd( static_cast<int>( dbHostSpec.find( '/' ) ) );
+	int hostSpecEnd( static_cast<int>( dbHostSpec.find( '/'_ycp ) ) );
 	HString hostSpec;
 	HString database;
 	if ( hostSpecEnd != HString::npos ) {

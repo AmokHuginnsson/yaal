@@ -667,7 +667,7 @@ bool HFormat::HFormatImpl::has_constant( HString const& s, int i ) {
 HFormat::HFormatImpl::OToken HFormat::HFormatImpl::next_constant( HString const& s, int& i ) {
 	M_PROLOG
 	OToken t;
-	int token = static_cast<int>( s.find( '%', i ) );
+	int token = static_cast<int>( s.find( '%'_ycp, i ) );
 	t._const = s.mid( i, token > 0 ? token - i : meta::max_signed<int>::value );
 	i += static_cast<int>( t._const.get_length() );
 	t._conversion = CONVERSION::CONSTANT;

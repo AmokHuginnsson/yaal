@@ -87,7 +87,7 @@ HListWidget::HColumnInfo::HColumnInfo( yaal::hcore::HString const& name_,
 	, _name( name_ )
 	, _widget( widget_ ) {
 	M_PROLOG
-	int shortcutIndex( static_cast<int>( _name.find( '&' ) ) );
+	int shortcutIndex( static_cast<int>( _name.find( '&'_ycp ) ) );
 	if ( shortcutIndex != HString::npos ) {
 		_name.erase( shortcutIndex, 1 );
 	} else {

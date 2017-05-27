@@ -142,7 +142,7 @@ void HDataListWidget::do_load( int long id_ ) {
 				if ( !! row[i] ) {
 					HString const& s( *row[i] );
 					bool datePart( s.find_one_of( "/-" ) != HString::npos );
-					bool timePart( s.find( ':' ) != HString::npos );
+					bool timePart( s.find( ':'_ycp ) != HString::npos );
 					if ( ! datePart && timePart ) {
 						format = _iso8601TimeFormat_;
 					} else if ( ! timePart && datePart ) {

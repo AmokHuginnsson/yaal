@@ -740,6 +740,8 @@ private:
 	void substr( HString&, int long, int long ) const;
 	void resize( int long capacity, int rank );
 	void replace_check( int long, int long, int long, int long, int long );
+	int long find( char, int long = 0 ) const = delete;
+	int long find_last( char, int long = npos ) const = delete;
 	HString& assign( int long, char ) = delete;
 	HString& append( int long, char ) = delete;
 	HString& insert( int long, int long, char ) = delete;

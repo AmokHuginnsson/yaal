@@ -62,18 +62,15 @@ void escape( yaal::hcore::HString& string_, EscapeTable const& et_, code_point_t
 		typedef HTLS<HChunk> cache_t;
 		static cache_t _cache_;
 		HChunk& cache( *_cache_ );
-		int cacheSize( static_cast<int>( cache.get_size() ) );
 		static int const CODE_POINT_SIZE( static_cast<int>( sizeof ( code_point_t ) ) );
-		if ( string_.get_length() > cacheSize ) {
-			cache.realloc( chunk_size<code_point_t>( string_.get_length() ) );
-			cacheSize = static_cast<int>( cache.get_size() ) / CODE_POINT_SIZE;
-		}
+		cache.realloc( chunk_size<code_point_t>( string_.get_length() ) );
+		int cacheSize( static_cast<int>( cache.get_size() ) / CODE_POINT_SIZE );
 		int pos( 0 );
 		code_point_t* ptr( cache.get<code_point_t>() );
 		for ( HString::const_iterator it( string_.begin() ), end( string_.end() ); it != end; ++ it, ++ pos ) {
 			code_point_t ch( unicode::rank( *it ) == 1 ? code_point_t( static_cast<yaal::u32_t>( et_._rawToSafe[static_cast<char unsigned>( (*it).get() )] ) ) : *it );
 			if ( ( pos + 1 ) >= cacheSize ) {
-				cache.realloc( cacheSize * 2 );
+				cache.realloc( chunk_size<code_point_t>( cacheSize * 2 ) );
 				cacheSize = static_cast<int>( cache.get_size() ) / CODE_POINT_SIZE;
 				ptr = cache.get<code_point_t>();
 			}
@@ -97,10 +94,7 @@ void unescape( yaal::hcore::HString& string_, EscapeTable const& et_, code_point
 		typedef HTLS<HChunk> cache_t;
 		static cache_t _cache_;
 		HChunk& cache( *_cache_ );
-		int cacheSize( static_cast<int>( cache.get_size() ) );
-		if ( string_.get_length() > cacheSize ) {
-			cache.realloc( chunk_size<code_point_t>( string_.get_length() ) );
-		}
+		cache.realloc( chunk_size<code_point_t>( string_.get_length() ) );
 		int pos( 0 );
 		code_point_t* ptr( cache.get<code_point_t>() );
 		for ( HString::const_iterator it( string_.begin() ), end( string_.end() ); it != end; ++ it, ++ pos ) {
@@ -110,8 +104,9 @@ void unescape( yaal::hcore::HString& string_, EscapeTable const& et_, code_point
 					break;
 				}
 				ptr[pos] = unicode::rank( *it ) == 1 ? code_point_t(static_cast<yaal::u32_t>( et_._safeToRaw[static_cast<char unsigned>( (*it).get() )] ) ) : *it;
-			} else
+			} else {
 				ptr[pos] = *it;
+			}
 		}
 		string_.clear();
 		for ( int long i( 0 ); i < pos; ++ i ) {
