@@ -154,9 +154,8 @@ class YaalHCoreHStringPrinter:
 		else:
 			k = "_ptr"
 			l = self._val['_mem'].cast( gdb.lookup_type( 'yaal::int_native_t' ).pointer() )[1]
-		e = "UCS-{}".format( rank )
 		s = self._val[k].cast( gdb.lookup_type( 'yaal::u{}_t'.format( rank * 8 ) ).pointer() )
-		return  "".join( map( lambda i : chr( s[i] ), range( 0, l ) ) )
+		return "".join( map( lambda i : chr( s[i] ), range( l ) ) )
 
 	def display_hint( self ):
 		return 'string'
