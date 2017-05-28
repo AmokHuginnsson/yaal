@@ -1533,7 +1533,15 @@ HString::const_iterator HString::begin( void ) const {
 	return ( HConstIterator( this, 0 ) );
 }
 
+HString::const_iterator HString::cbegin( void ) const {
+	return ( HConstIterator( this, 0 ) );
+}
+
 HString::const_iterator HString::end( void ) const {
+	return ( HConstIterator( this, get_length() ) );
+}
+
+HString::const_iterator HString::cend( void ) const {
 	return ( HConstIterator( this, get_length() ) );
 }
 

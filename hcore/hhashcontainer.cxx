@@ -54,6 +54,11 @@ int long hash<HString>::operator () ( HString const& string_ ) const {
 }
 
 template<>
+int long hash<code_point_t>::operator () ( code_point_t const& val_ ) const {
+	return ( static_cast<int long>( val_.get() ) );
+}
+
+template<>
 int long hash<double long>::operator () ( double long const& val_ ) const {
 	return ( static_cast<int long>( reinterpret_cast<int long long const&>( static_cast<double const&>( val_ ) ) ) );
 }

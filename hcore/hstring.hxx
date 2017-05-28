@@ -372,11 +372,13 @@ public:
 	 * \return Iterator pointing to beginning of this string.
 	 */
 	const_iterator begin( void ) const;
+	const_iterator cbegin( void ) const;
 	/*! \brief Get iterator pointing to end (one past last character) of this string.
 	 *
 	 * \return Iterator pointing to end (terminating \0) of this string.
 	 */
 	const_iterator end( void ) const;
+	const_iterator cend( void ) const;
 	/*! \brief Check if string is empty (has zero length).
 	 *
 	 * \return True iff this string is empty.
