@@ -105,94 +105,57 @@ inline void copy_n_cast_backward( iterator_t src_, int long size_, U* dst_ ) {
 	return;
 }
 
-template<typename haystack_t, typename needle_t>
-inline int long kmpsearch_impl( haystack_t const* string_, int long stringLength_, needle_t const* pattern_, int long patternLength_ ) {
-	HChunk KMPnextCache( chunk_size<int long>( patternLength_ + 1 ) );
-	int long* KMPnext( KMPnextCache.get<int long>() );
-
-	KMPnext[ 0 ] = -1;
-	int long KMPnextIndex( 1 );
-	int long candidate( 0 );
-
-	while ( KMPnextIndex < patternLength_ ) {
-		if ( pattern_[ KMPnextIndex ] == pattern_[ candidate ] ) {
-			KMPnext[ KMPnextIndex ] = KMPnext[ candidate ];
-		} else {
-			KMPnext[ KMPnextIndex ] = candidate;
-			candidate = KMPnext[ candidate ];
-			while ( ( candidate >= 0 ) && ( pattern_[ KMPnextIndex ] != pattern_[ candidate ] ) ) {
-				candidate = KMPnext[ candidate ];
-			}
-		}
-		++ KMPnextIndex;
-		++ candidate;
-	}
-	KMPnext[ KMPnextIndex ] = candidate;
-
-	int long matchStart( 0 ); /* index in string_ */
-	int long consideredCharacterIndex( 0 ); /* index in pattern_ */
-	while ( ( matchStart + consideredCharacterIndex ) < stringLength_ ) {
-		if ( pattern_[ consideredCharacterIndex ] == string_[ matchStart + consideredCharacterIndex ] ) {
-			++ consideredCharacterIndex;
-			if ( consideredCharacterIndex == patternLength_ ) {
-				return ( matchStart );
-			}
-		} else {
-			if ( KMPnext[ consideredCharacterIndex ] > -1 ) {
-				matchStart += ( consideredCharacterIndex - KMPnext[ consideredCharacterIndex ] );
-				consideredCharacterIndex = KMPnext[ consideredCharacterIndex ];
-			} else {
-				matchStart += ( consideredCharacterIndex + 1 );
-				consideredCharacterIndex = 0;
-			}
-		}
-	}
+#define KMP_SEARCH( direction_haystack, direction_needle, direction_result, transform ) \
+	HChunk KMPnextCache( chunk_size<int long>( needleLength_ + 1 ) ); \
+	int long* KMPnext( KMPnextCache.get<int long>() ); \
+\
+	KMPnext[ 0 ] = -1; \
+	int long KMPnextIndex( 1 ); \
+	int long candidate( 0 ); \
+\
+	while ( KMPnextIndex < needleLength_ ) { \
+		if ( transform( needle_[ direction_needle KMPnextIndex ] ) == transform( needle_[ direction_needle candidate ] ) ) { \
+			KMPnext[ KMPnextIndex ] = KMPnext[ candidate ]; \
+		} else { \
+			KMPnext[ KMPnextIndex ] = candidate; \
+			candidate = KMPnext[ candidate ]; \
+			while ( ( candidate >= 0 ) && ( transform( needle_[ direction_needle KMPnextIndex ] ) != transform( needle_[ direction_needle candidate ] ) ) ) { \
+				candidate = KMPnext[ candidate ]; \
+			} \
+		} \
+		++ KMPnextIndex; \
+		++ candidate; \
+	} \
+	KMPnext[ KMPnextIndex ] = candidate; \
+\
+	int long matchStart( 0 ); /* index in string_ */ \
+	int long consideredCharacterIndex( 0 ); /* index in needle_ */ \
+	while ( ( matchStart + consideredCharacterIndex ) < haystackLength_ ) { \
+		if ( transform( needle_[ direction_needle consideredCharacterIndex ] ) == transform( haystack_[ direction_haystack ( matchStart + consideredCharacterIndex ) ] ) ) { \
+			++ consideredCharacterIndex; \
+			if ( consideredCharacterIndex == needleLength_ ) { \
+				return ( direction_result matchStart ); \
+			} \
+		} else { \
+			if ( KMPnext[ consideredCharacterIndex ] > -1 ) { \
+				matchStart += ( consideredCharacterIndex - KMPnext[ consideredCharacterIndex ] ); \
+				consideredCharacterIndex = KMPnext[ consideredCharacterIndex ]; \
+			} else { \
+				matchStart += ( consideredCharacterIndex + 1 ); \
+				consideredCharacterIndex = 0; \
+			} \
+		} \
+	} \
 	return ( -1 );
+
+template<typename haystack_t, typename needle_t>
+inline int long kmpsearch_impl( haystack_t const* haystack_, int long haystackLength_, needle_t const* needle_, int long needleLength_ ) {
+	KMP_SEARCH(,,,)
 }
 
 template<typename haystack_t, typename needle_t>
-inline int long kmpsearch_last_impl( haystack_t const* string_, int long stringLength_, needle_t const* pattern_, int long patternLength_ ) {
-	HChunk KMPnextCache( chunk_size<int long>( patternLength_ + 1 ) );
-	int long* KMPnext( KMPnextCache.get<int long>() );
-
-	KMPnext[ 0 ] = -1;
-	int long KMPnextIndex( 1 );
-	int long candidate( 0 );
-
-	while ( KMPnextIndex < patternLength_ ) {
-		if ( pattern_[ patternLength_ - 1 - KMPnextIndex ] == pattern_[ patternLength_ - 1 - candidate ] ) {
-			KMPnext[ KMPnextIndex ] = KMPnext[ candidate ];
-		} else {
-			KMPnext[ KMPnextIndex ] = candidate;
-			candidate = KMPnext[ candidate ];
-			while ( ( candidate >= 0 ) && ( pattern_[ patternLength_ - 1 - KMPnextIndex ] != pattern_[ patternLength_ - 1 - candidate ] ) ) {
-				candidate = KMPnext[ candidate ];
-			}
-		}
-		++ KMPnextIndex;
-		++ candidate;
-	}
-	KMPnext[ KMPnextIndex ] = candidate;
-
-	int long matchStart( 0 ); /* index in string_ */
-	int long consideredCharacterIndex( 0 ); /* index in pattern_ */
-	while ( ( matchStart + consideredCharacterIndex ) < stringLength_ ) {
-		if ( pattern_[ patternLength_ - 1 - consideredCharacterIndex ] == string_[ stringLength_ - 1 - ( matchStart + consideredCharacterIndex ) ] ) {
-			++ consideredCharacterIndex;
-			if ( consideredCharacterIndex == patternLength_ ) {
-				return ( stringLength_ - patternLength_ - matchStart );
-			}
-		} else {
-			if ( KMPnext[ consideredCharacterIndex ] > -1 ) {
-				matchStart += ( consideredCharacterIndex - KMPnext[ consideredCharacterIndex ] );
-				consideredCharacterIndex = KMPnext[ consideredCharacterIndex ];
-			} else {
-				matchStart += ( consideredCharacterIndex + 1 );
-				consideredCharacterIndex = 0;
-			}
-		}
-	}
-	return ( -1 );
+inline int long kmpsearch_last_impl( haystack_t const* haystack_, int long haystackLength_, needle_t const* needle_, int long needleLength_ ) {
+	KMP_SEARCH( haystackLength_ - 1 -, needleLength_ - 1 -, haystackLength_ - needleLength_ -, )
 }
 
 template<typename str_ucs_t, typename value_t>
@@ -3128,30 +3091,14 @@ int long strrnspn( char const* buffer_, char const* skipSet_,
 
 }
 
+inline int to_lower( code_point_t codePoint_ ) {
+	return ( ::std::tolower( static_cast<int>( codePoint_.get() ) ) );
+}
+
 int long icasesearch( HString const& haystack_, HString const& needle_ ) {
-	HChunk KMPnext( chunk_size<int>( needle_.get_length() + 1 ) );
-	int* next( KMPnext.get<int>() );
-	int b( next[ 0 ] = -1 );
-	for ( int long i( 1 ), needleLen( needle_.get_length() ); i <= needleLen; ++ i ) {
-		while ( ( b > -1 ) && ( tolower( static_cast<int>( needle_[ b ].get() ) ) != tolower( static_cast<int>( needle_[ i - 1 ].get() ) ) ) ) {
-			b = next[ b ];
-		}
-		++ b;
-		next[ i ] = ( tolower( static_cast<int>( needle_[ i ].get() ) ) == tolower( static_cast<int>( needle_[ b ].get() ) ) ) ? next[ b ] : b;
-	}
-	int long start( -1 );
-	b = 0;
-	for ( int long i( 0 ), haystackLen( haystack_.get_length() ); i < haystackLen; ++ i ) {
-		while ( ( b > -1 ) && ( tolower( static_cast<int>( needle_[ b ].get() ) ) != tolower( static_cast<int>( haystack_[i].get() ) ) ) ) {
-			b = next[ b ];
-		}
-		if ( ++ b < needle_.get_length() ) {
-			continue;
-		}
-		start = i - b + 1;
-		break;
-	}
-	return ( start );
+	int long haystackLength_( haystack_.get_length() );
+	int long needleLength_( needle_.get_length() );
+	KMP_SEARCH(,,, to_lower )
 }
 
 int stricasecmp( HString const& left_, HString const& right_ ) {
