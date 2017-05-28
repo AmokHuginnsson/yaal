@@ -1680,6 +1680,7 @@ HString& HString::assign( HString const& str_, int long offset_, int long length
 	}
 	int long newSize( min( length_, s - offset_ ) );
 	int rank( EXT_GET_RANK( str_ ) );
+	clear();
 	resize( newSize, rank );
 	adaptive::copy( MEM, rank, 0, EXT_MEM( str_ ), rank, offset_, newSize );
 	return ( *this );
@@ -1695,6 +1696,7 @@ HString& HString::assign( char const* data_, int long length_ ) {
 		M_THROW( err_msg(  string_helper::BAD_LENGTH  ), length_ );
 	}
 	int long len( static_cast<int long>( ::strnlen( data_, static_cast<size_t>( length_ ) ) ) );
+	clear();
 	from_utf8( 0, GET_SIZE, data_, len );
 	return ( *this );
 	M_EPILOG
@@ -1718,6 +1720,7 @@ HString& HString::assign( int long size_, code_point_t fill_ ) {
 		M_THROW( err_msg( string_helper::BAD_LENGTH ), size_ );
 	}
 	int rank( unicode::rank( fill_ ) );
+	clear();
 	resize( size_, rank );
 	adaptive::fill( MEM, rank, 0, size_, fill_ );
 	if ( ! fill_ ) {

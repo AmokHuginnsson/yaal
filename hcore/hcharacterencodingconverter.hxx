@@ -39,6 +39,8 @@ namespace yaal {
 
 namespace hcore {
 
+class HCharacterEncodingConversionResult;
+
 class HCharacterEncodingConverter final {
 public:
 	typedef HCharacterEncodingConverter this_type;
@@ -59,12 +61,25 @@ public:
 	void reset( void );
 	HString const& name_from( void ) const;
 	HString const& name_to( void ) const;
-	void convert( char const*, int long, yaal::hcore::HChunk& );
+	void convert( char const*, int long, HCharacterEncodingConversionResult& );
 private:
 	void init( void );
 };
 
 typedef yaal::hcore::HExceptionT<HCharacterEncodingConverter> HCharacterEncodingConverterException;
+
+class HCharacterEncodingConversionResult {
+	yaal::hcore::HChunk _data;
+	int long _size;
+public:
+	HCharacterEncodingConversionResult( void );
+	char const* c_str( void ) const;
+	int long size( void ) const;
+private:
+	friend void HCharacterEncodingConverter::convert( char const*, int long, HCharacterEncodingConversionResult& );
+	HCharacterEncodingConversionResult( HCharacterEncodingConversionResult const& ) = delete;
+	HCharacterEncodingConversionResult& operator = ( HCharacterEncodingConversionResult const& ) = delete;
+};
 
 inline void swap( yaal::hcore::HCharacterEncodingConverter& a_, yaal::hcore::HCharacterEncodingConverter& b_ ) {
 	a_.swap( b_ );

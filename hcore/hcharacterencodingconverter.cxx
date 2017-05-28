@@ -157,15 +157,15 @@ yaal::hcore::HString const& HCharacterEncodingConverter::name_to( void ) const {
 	return ( _nameTo );
 }
 
+void HCharacterEncodingConverter::convert( char const* data_, int long size_, HCharacterEncodingConversionResult& result_ ) {
+	M_PROLOG
 #ifdef HAVE_ICONV_INPUT_CONST
 #	define M_YAAL_ICONV_CONST const
 #else /* HAVE_ICONV_INPUT_CONST */
 #	define M_YAAL_ICONV_CONST /**/
 #endif /* not HAVE_ICONV_INPUT_CONST */
-
-void HCharacterEncodingConverter::convert( char const* data_, int long size_, HChunk& to_ ) {
-	M_PROLOG
 	char M_YAAL_ICONV_CONST* source( const_cast<char M_YAAL_ICONV_CONST*>( data_ ) );
+#undef M_YAAL_ICONV_CONST
 	iconv_t cD( reinterpret_cast<iconv_t>( _descriptor ) );
 	size_t sizeIn( static_cast<size_t>( size_ ) );
 	size_t sizeOut( 0 );
@@ -188,18 +188,30 @@ void HCharacterEncodingConverter::convert( char const* data_, int long size_, HC
 		totalSize += nWritten;
 	}
 	if ( totalSize > 0 ) {
-		to_.realloc( totalSize + 1 );
-		char* dst( to_.get<char>() );
+		result_._data.realloc( totalSize + 1 );
+		char* dst( result_._data.get<char>() );
 		::memcpy( dst, _cache.raw(), static_cast<size_t>( totalSize ) );
 		dst[totalSize] = 0;
-	} else if ( to_.get_size() > 0 ) {
-		to_.get<char>()[0] = 0;
+	} else if ( result_._data.get_size() > 0 ) {
+		result_._data.get<char>()[0] = 0;
 	}
+	result_._size = totalSize;
 	return;
 	M_EPILOG
 }
 
-#undef M_YAAL_ICONV_CONST
+HCharacterEncodingConversionResult::HCharacterEncodingConversionResult( void )
+	: _data()
+	, _size( 0 ) {
+}
+
+char const* HCharacterEncodingConversionResult::c_str( void ) const {
+	return ( _data.get<char>() );
+}
+
+int long HCharacterEncodingConversionResult::size( void ) const {
+	return ( _size );
+}
 
 }
 

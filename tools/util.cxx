@@ -62,12 +62,13 @@ namespace tools {
 
 namespace util {
 
-code_point_translation_t _transTableStripPL_;
+extern code_point_translation_t _transTableStripPL_;
 
 HString& usun_ogonki( HString& string_ ) {
 	M_PROLOG
 	for ( HString::HIterator it( string_.begin() ), end( string_.end() ); it != end; ++ it ) {
-		code_point_translation_t::const_iterator t( _transTableStripPL_.find( *it ) );
+		code_point_t cp( *it );
+		code_point_translation_t::const_iterator t( _transTableStripPL_.find( cp ) );
 		if ( t != _transTableStripPL_.end() ) {
 			*it = t->second;
 		}

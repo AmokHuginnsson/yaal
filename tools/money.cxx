@@ -161,56 +161,56 @@ currency_end_t const _currencyEnd_[] = {
 
 namespace pl {
 
-char const _numbers_[][ 16 ] = {
+char const _numbers_[][ 20 ] = {
 	"zero ",
 	"jeden ",
 	"dwa ",
 	"trzy ",
 	"cztery ",
-	"pi赕 ",
-	"sze舵 ",
+	"pi臋膰 ",
+	"sze艣膰 ",
 	"siedem ",
 	"osiem ",
-	"dziewi赕 ",
-	"dziesi赕 ",
-	"jedena禼ie ",
-	"dwana禼ie ",
-	"trzyna禼ie ",
-	"czterna禼ie ",
-	"pi阾na禼ie ",
-	"szesna禼ie ",
-	"siedemna禼ie ",
-	"osiemna禼ie ",
-	"dziewi阾na禼ie ",
-	"dwadzie禼ia "
+	"dziewi臋膰 ",
+	"dziesi臋膰 ",
+	"jedena艣cie ",
+	"dwana艣cie ",
+	"trzyna艣cie ",
+	"czterna艣cie ",
+	"pi臋tna艣cie ",
+	"szesna艣cie ",
+	"siedemna艣cie ",
+	"osiemna艣cie ",
+	"dziewi臋tna艣cie ",
+	"dwadzie艣cia "
 };
 
 char const _tenths_[][ 24 ] = {
-	"dziesi赕-zero ",
-	"dziesi赕 ",
-	"dwadzie禼ia ",
-	"trzydzie禼i ",
-	"czterdzie禼i ",
-	"pi赕dziesi眛 ",
-	"sze舵dziesi眛 ",
-	"siedemdziesi眛 ",
-	"osiemdziesi眛 ",
-	"dziewi赕dziesi眛 ",
+	"dziesi臋膰-zero ",
+	"dziesi臋膰 ",
+	"dwadzie艣cia ",
+	"trzydzie艣ci ",
+	"czterdzie艣ci ",
+	"pi臋膰dziesi膮t ",
+	"sze艣膰dziesi膮t ",
+	"siedemdziesi膮t ",
+	"osiemdziesi膮t ",
+	"dziewi臋膰dziesi膮t ",
 	"sto "
 };
 
 char const _hundreds_[][ 16 ] = {
 	"sto-zero ",
 	"sto ",
-	"dwie禼ie ",
+	"dwie艣cie ",
 	"trzysta ",
 	"czterysta ",
-	"pi赕set ",
-	"sze舵set ",
+	"pi臋膰set ",
+	"sze艣膰set ",
 	"siedemset ",
 	"osiemset ",
-	"dziewi赕set ",
-	"tysi眂 "
+	"dziewi臋膰set ",
+	"tysi膮c "
 };
 
 namespace currency {
@@ -221,8 +221,8 @@ char const _dollar_[][ 12 ] = {
 };
 
 char const _dollarEnd_[][3][6] = {
-	{ "", "y", "體" },
-	{ " ", "y ", "體 " }
+	{ "", "y", "贸w" },
+	{ " ", "y ", "贸w " }
 };
 
 char const _pound_[][ 12 ] = {
@@ -231,8 +231,8 @@ char const _pound_[][ 12 ] = {
 };
 
 char const _poundEnd_[][3][6] = {
-	{ "", "y", "體" },
-	{ " ", "y ", "體 " }
+	{ "", "y", "贸w" },
+	{ " ", "y ", "贸w " }
 };
 
 char const _euro_[][ 12 ] = {
@@ -241,13 +241,13 @@ char const _euro_[][ 12 ] = {
 };
 
 char const _euroEnd_[][3][6] = {
-	{ "", "y", "體" },
+	{ "", "y", "贸w" },
 	{ " ", " ", " " }
 };
 
 char const _pln_[][ 12 ] = {
 	"grosz",
-	"z硂t"
+	"z艂ot"
 };
 
 char const _plnEnd_[][3][6] = {
@@ -284,13 +284,13 @@ char _unit_[][ 12 ] = {
 };
 
 char _unitEnd_[][ 3 ][ 6 ] = {
-	{ "眂 ", "眂e ", "阠y " },
-	{ " ", "y ", "體 " },
-	{ " ", "y ", "體 " },
-	{ " ", "y ", "體 " },
-	{ " ", "y ", "體 " },
-	{ " ", "y ", "體 " },
-	{ " ", "y ", "體 " }
+	{ "膮c ", "膮ce ", "臋cy " },
+	{ " ", "y ", "贸w " },
+	{ " ", "y ", "贸w " },
+	{ " ", "y ", "贸w " },
+	{ " ", "y ", "贸w " },
+	{ " ", "y ", "贸w " },
+	{ " ", "y ", "贸w " }
 };
 
 }

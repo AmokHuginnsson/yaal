@@ -34,6 +34,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools.hxx"
 #include "hcore/hcore.hxx"
+#include "hcore/unicode.hxx"
 #include "hcore/hprogramoptionshandler.hxx"    /* read conf from rc */
 #include "hcore/hlog.hxx"       /* log object */
 #include "hcore/hstring.hxx"    /* HString class */
@@ -77,7 +78,7 @@ bool _leaveCtrlQ_ = false;
 bool _leaveCtrlBackSlash_ = false;
 
 namespace util {
-extern code_point_translation_t _transTableStripPL_;
+code_point_translation_t _transTableStripPL_;
 }
 
 namespace {
@@ -271,24 +272,24 @@ HToolsInitDeinit::HToolsInitDeinit( void ) {
 		errno = 0;
 		extendable::set_strtold_impl( &yaal_strtold );
 		yaal_options().process_rc_file( "tools", set_tools_variables );
-		util::_transTableStripPL_.insert( make_pair( '±'_ycp, 'a'_ycp ) );
-		util::_transTableStripPL_.insert( make_pair( '¡'_ycp, 'A'_ycp ) );
-		util::_transTableStripPL_.insert( make_pair( 'æ'_ycp, 'c'_ycp ) );
-		util::_transTableStripPL_.insert( make_pair( 'Æ'_ycp, 'C'_ycp ) );
-		util::_transTableStripPL_.insert( make_pair( 'ê'_ycp, 'e'_ycp ) );
-		util::_transTableStripPL_.insert( make_pair( 'Ê'_ycp, 'E'_ycp ) );
-		util::_transTableStripPL_.insert( make_pair( '³'_ycp, 'l'_ycp ) );
-		util::_transTableStripPL_.insert( make_pair( '£'_ycp, 'L'_ycp ) );
-		util::_transTableStripPL_.insert( make_pair( 'ñ'_ycp, 'n'_ycp ) );
-		util::_transTableStripPL_.insert( make_pair( 'Ñ'_ycp, 'N'_ycp ) );
-		util::_transTableStripPL_.insert( make_pair( 'ó'_ycp, 'o'_ycp ) );
-		util::_transTableStripPL_.insert( make_pair( 'Ó'_ycp, 'O'_ycp ) );
-		util::_transTableStripPL_.insert( make_pair( '¶'_ycp, 's'_ycp ) );
-		util::_transTableStripPL_.insert( make_pair( '¦'_ycp, 'S'_ycp ) );
-		util::_transTableStripPL_.insert( make_pair( '¼'_ycp, 'z'_ycp ) );
-		util::_transTableStripPL_.insert( make_pair( '¬'_ycp, 'Z'_ycp ) );
-		util::_transTableStripPL_.insert( make_pair( '¿'_ycp, 'z'_ycp ) );
-		util::_transTableStripPL_.insert( make_pair( '¯'_ycp, 'Z'_ycp ) );
+		util::_transTableStripPL_.insert( make_pair( unicode::CODE_POINTS::LATIN_SMALL_LETTER_A_WITH_OGONEK,      'a'_ycp ) );
+		util::_transTableStripPL_.insert( make_pair( unicode::CODE_POINTS::LATIN_CAPITAL_LETTER_A_WITH_OGONEK,    'A'_ycp ) );
+		util::_transTableStripPL_.insert( make_pair( unicode::CODE_POINTS::LATIN_SMALL_LETTER_C_WITH_ACUTE,       'c'_ycp ) );
+		util::_transTableStripPL_.insert( make_pair( unicode::CODE_POINTS::LATIN_CAPITAL_LETTER_C_WITH_ACUTE,     'C'_ycp ) );
+		util::_transTableStripPL_.insert( make_pair( unicode::CODE_POINTS::LATIN_SMALL_LETTER_E_WITH_OGONEK,      'e'_ycp ) );
+		util::_transTableStripPL_.insert( make_pair( unicode::CODE_POINTS::LATIN_CAPITAL_LETTER_E_WITH_OGONEK,    'E'_ycp ) );
+		util::_transTableStripPL_.insert( make_pair( unicode::CODE_POINTS::LATIN_SMALL_LETTER_L_WITH_STROKE,      'l'_ycp ) );
+		util::_transTableStripPL_.insert( make_pair( unicode::CODE_POINTS::LATIN_CAPITAL_LETTER_L_WITH_STROKE,    'L'_ycp ) );
+		util::_transTableStripPL_.insert( make_pair( unicode::CODE_POINTS::LATIN_SMALL_LETTER_N_WITH_ACUTE,       'n'_ycp ) );
+		util::_transTableStripPL_.insert( make_pair( unicode::CODE_POINTS::LATIN_CAPITAL_LETTER_N_WITH_ACUTE,     'N'_ycp ) );
+		util::_transTableStripPL_.insert( make_pair( unicode::CODE_POINTS::LATIN_SMALL_LETTER_O_WITH_ACUTE,       'o'_ycp ) );
+		util::_transTableStripPL_.insert( make_pair( unicode::CODE_POINTS::LATIN_CAPITAL_LETTER_O_WITH_ACUTE,     'O'_ycp ) );
+		util::_transTableStripPL_.insert( make_pair( unicode::CODE_POINTS::LATIN_SMALL_LETTER_S_WITH_ACUTE,       's'_ycp ) );
+		util::_transTableStripPL_.insert( make_pair( unicode::CODE_POINTS::LATIN_CAPITAL_LETTER_S_WITH_ACUTE,     'S'_ycp ) );
+		util::_transTableStripPL_.insert( make_pair( unicode::CODE_POINTS::LATIN_SMALL_LETTER_Z_WITH_ACUTE,       'z'_ycp ) );
+		util::_transTableStripPL_.insert( make_pair( unicode::CODE_POINTS::LATIN_CAPITAL_LETTER_Z_WITH_ACUTE,     'Z'_ycp ) );
+		util::_transTableStripPL_.insert( make_pair( unicode::CODE_POINTS::LATIN_SMALL_LETTER_Z_WITH_DOT_ABOVE,   'z'_ycp ) );
+		util::_transTableStripPL_.insert( make_pair( unicode::CODE_POINTS::LATIN_CAPITAL_LETTER_Z_WITH_DOT_ABOVE, 'Z'_ycp ) );
 	} catch ( HException const& e ) {
 		fprintf( stderr, "Failed to initialize yaal-tools: %s\n", e.what() );
 		exit( 1 );
