@@ -267,7 +267,8 @@ M_EXPORT_SYMBOL void rs_free_cursor( void* data_ ) {
 
 M_EXPORT_SYMBOL char const* rs_get( void*, int long, int );
 M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
-	return ( ::PQgetvalue( static_cast<OPostgreSQLResult*>( data_ )->_result, static_cast<int>( row_ ), column_ ) );
+	OPostgreSQLResult* pr( static_cast<OPostgreSQLResult*>( data_ ) );
+	return ( ! ::PQgetisnull( pr->_result, static_cast<int>( row_ ), column_ ) ? ::PQgetvalue( pr->_result, static_cast<int>( row_ ), column_ ) : nullptr );
 }
 
 M_EXPORT_SYMBOL bool rs_next( void* );
@@ -294,7 +295,7 @@ M_EXPORT_SYMBOL bool rs_next( void* data_ ) {
 M_EXPORT_SYMBOL char const* rs_get_field( void*, int );
 M_EXPORT_SYMBOL char const* rs_get_field( void* data_, int field_ ) {
 	OPostgreSQLResult* pr( static_cast<OPostgreSQLResult*>( data_ ) );
-	return ( ::PQgetvalue( pr->_result, pr->_index, field_ ) );
+	return ( ! ::PQgetisnull( pr->_result, pr->_index, field_ ) ? ::PQgetvalue( pr->_result, pr->_index, field_ ) : nullptr );
 }
 
 M_EXPORT_SYMBOL int rs_fields_count( void* );
