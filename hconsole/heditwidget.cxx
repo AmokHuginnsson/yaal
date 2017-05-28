@@ -45,10 +45,10 @@ namespace yaal {
 
 namespace hconsole {
 
-char const _maskLetters_[]      = "^[a-zA-Z±¡æÆêÊ³£ñÑóÓ¶¦¼¬¿¯]*$";
+char const _maskLetters_[]      = "^[a-zA-ZÄ…Ä„Ä‡Ä†Ä™Ä˜Å‚ÅÅ„ÅƒÃ³Ã“Å›ÅšÅºÅ¹Å¼Å»]*$";
 char const _maskDigits_[]       = "^[0-9]*$";
 char const _maskAlpha_[]        = "^[a-zA-Z0-9]*$";
-char const _maskExtended_[]     = "^[0-9a-zA-Z±¡æÆêÊ³£ñÑóÓ¶¦¼¬¿¯\\.\\(\\) -]*$";
+char const _maskExtended_[]     = "^[0-9a-zA-ZÄ…Ä„Ä‡Ä†Ä™Ä˜Å‚ÅÅ„ÅƒÃ³Ã“Å›ÅšÅºÅ¹Å¼Å»\\.\\(\\) -]*$";
 char const _maskLoose_[]        = ".*";
 char const* const _maskDefault_ = _maskLetters_;
 
