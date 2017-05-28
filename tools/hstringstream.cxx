@@ -104,7 +104,7 @@ int long HStringStream::do_read( void* buffer_, int long size_ ) {
 		_utf8 = _buffer;
 	}
 	if ( length > 0 ) {
-		::strncpy( static_cast<char*>( buffer_ ), _utf8.x_str() + _offset, static_cast<size_t>( toCopy ) );
+		::strncpy( static_cast<char*>( buffer_ ), _utf8.c_str() + _offset, static_cast<size_t>( toCopy ) );
 	}
 	_offset += toCopy;
 	if ( _offset >= length ) {

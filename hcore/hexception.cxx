@@ -82,7 +82,7 @@ HException::~HException( void ) {
 }
 
 void HException::print_error( void ) const {
-	fprintf( ERROR_STREAM, "\nException: %s, %d.\n", _message.x_str(), _code );
+	fprintf( ERROR_STREAM, "\nException: %s, %d.\n", _message.c_str(), _code );
 	fflush( ERROR_STREAM );
 	return;
 }
@@ -121,7 +121,7 @@ void HException::log( char const* fileName_, int line_,
 }
 
 char const* HException::what( void ) const {
-	return ( _message.x_str() );
+	return ( _message.c_str() );
 }
 
 int HException::code( void ) const {

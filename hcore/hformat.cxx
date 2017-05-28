@@ -904,7 +904,7 @@ char const* HFormat::HFormatImpl::error_message( int ) const {
 	M_PROLOG
 	_buffer.assign( "format: " ).append( _format ).append( ", at: " ).append( _positionIndex );
 	_errorMessage = _buffer;
-	return ( _errorMessage.x_str() );
+	return ( _errorMessage.c_str() );
 	M_EPILOG
 }
 

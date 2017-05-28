@@ -2491,7 +2491,7 @@ void HUTF8String::assign( HString::const_iterator it_, HString::const_iterator e
 		alloc( byteCount );
 		char* p( _ptr + sizeof ( OBufferMeta ) );
 		for ( HString::const_iterator it( it_ ); it != end_; ++ it ) {
-			utf8::encode( *it, p ); /* *FIXME* remove static_cast after implementation of UCS in HString is complete. */
+			utf8::encode( *it, p );
 		}
 	}
 	if ( _ptr ) {
@@ -2520,7 +2520,7 @@ bool HUTF8String::empty( void ) const {
 	return ( _characterCount == 0 );
 }
 
-char const* HUTF8String::x_str( void ) const {
+char const* HUTF8String::c_str( void ) const {
 	M_ASSERT( ! _ptr || ( ( _offset + _byteCount ) == _meta->_used ) );
 	return ( _ptr ? _ptr + sizeof ( OBufferMeta ) + _offset : "" );
 }
@@ -2870,7 +2870,7 @@ void copy_ascii_impl( HString::const_iterator it_, HString::const_iterator end_,
 		int i( 0 ), LIMIT( min( size_ - 1, static_cast<int>( end_ - it_ ) ) );
 		( i < LIMIT ) && ( all_ || is_ascii( *it_ ) );
 		++ i, ++ it_, ++ buffer_
-	) { /* *TODO* *FIXME* Remove static_cast after UCS in HString is implemented. */
+	) {
 		*buffer_ = safe_int::cast<char>( (*it_).get() );
 	}
 	*buffer_ = 0;

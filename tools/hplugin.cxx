@@ -50,7 +50,7 @@ HPlugin::~HPlugin( void ) {
 void HPlugin::load( HString const& path_ ) {
 	M_PROLOG
 	HUTF8String utf8( path_ );
-	_handle = dlopen( ! path_.is_empty() ? utf8.x_str() : nullptr, RTLD_NOW | RTLD_GLOBAL );
+	_handle = dlopen( ! path_.is_empty() ? utf8.c_str() : nullptr, RTLD_NOW | RTLD_GLOBAL );
 	if ( _handle == reinterpret_cast<void const*>( -1 ) )
 		_handle = nullptr;
 	M_ENSURE( _handle != nullptr, path_ );
@@ -79,7 +79,7 @@ char const* HPlugin::error_message( int ) {
 void* HPlugin::try_resolve( HString const& symbolName_ ) {
 	M_PROLOG
 	HUTF8String utf8( symbolName_ );
-	return ( dlsym( _handle, utf8.x_str() ) );
+	return ( dlsym( _handle, utf8.c_str() ) );
 	M_EPILOG
 }
 

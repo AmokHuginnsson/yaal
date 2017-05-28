@@ -69,7 +69,7 @@ public:
 		M_PROLOG
 		verify_signature( "OperatingSystem.env", values_, { HHuginn::TYPE::STRING }, position_ );
 		HUTF8String utf8(  get_string( values_[0] ) );
-		char const* val( ::getenv( utf8.x_str() ) );
+		char const* val( ::getenv( utf8.c_str() ) );
 		HRuntime& rt( thread_->runtime() );
 		return ( val ? rt.object_factory()->create_string( val ) : rt.none_value() );
 		M_EPILOG
@@ -89,7 +89,7 @@ public:
 		for ( int i( 0 ); i < argc; ++ i ) {
 			verify_arg_type( name, values_, i, HHuginn::TYPE::STRING, argc == 1 ? ARITY::UNARY : ARITY::MULTIPLE, position_ );
 			argvDataHolder.emplace_back( get_string( values_[i] ) );
-			argv[i] = const_cast<char*>( argvDataHolder.back().x_str() );
+			argv[i] = const_cast<char*>( argvDataHolder.back().c_str() );
 		}
 		::execvp( argv[0], argv );
 		thread_->raise( static_cast<HOperatingSystem*>( object_->raw() )->_exceptionClass.raw(), strerror( errno ), position_ );

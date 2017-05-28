@@ -196,7 +196,7 @@ bool HRegex::compile( HString const& pattern_, compile_t flags_ ) {
 	char const* errMsg( nullptr );
 	int offset( 0 );
 	_utf8ConversionCache = pattern_;
-	_impl = ::pcre_compile2( _utf8ConversionCache.x_str(), options, &_lastError, &errMsg, &offset, nullptr );
+	_impl = ::pcre_compile2( _utf8ConversionCache.c_str(), options, &_lastError, &errMsg, &offset, nullptr );
 	if ( ! _lastError ) {
 		_extra = ::pcre_study( static_cast<pcre*>( _impl ), PCRE_STUDY_EXTRA_NEEDED | PCRE_STUDY_JIT_COMPILE, &errMsg );
 		if ( errMsg ) {
@@ -241,7 +241,7 @@ HUTF8String HRegex::matches_impl( HUTF8String const& str_, int& start_, int& mat
 	}
 	start_ = NO_MATCH;
 	matchLength_ = 0;
-	char const* str( str_.x_str() );
+	char const* str( str_.c_str() );
 	int match[3] = { NO_MATCH, NO_MATCH, NO_MATCH };
 	_lastError = ::pcre_exec(
 		static_cast<pcre*>( _impl ),
@@ -266,7 +266,7 @@ HRegex::groups_t HRegex::groups_impl( HUTF8String const& string_, match_t match_
 	typedef yaal::hcore::HArray<int> matches_t;
 	int expectedGroupCount( static_cast<int>( count( _pattern.begin(), _pattern.end(), '('_ycp ) + 1 ) );
 	matches_t matchesBuffer( expectedGroupCount * 3, NO_MATCH );
-	char const* str( string_.x_str() );
+	char const* str( string_.c_str() );
 	_lastError = ::pcre_exec(
 		static_cast<pcre*>( _impl ),
 		static_cast<pcre_extra*>( _extra ),

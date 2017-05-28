@@ -231,22 +231,22 @@ HTime& HTime::from_string( yaal::hcore::HString const& str_ ) {
 	struct tm broken;
 	::memcpy( &broken, &_broken, sizeof ( _broken ) );
 	HUTF8String str( str_ );
-	char const* end( ::strptime( str.x_str(), _format.x_str(), &broken ) );
+	char const* end( ::strptime( str.c_str(), _format.c_str(), &broken ) );
 	if ( ! end ) {
 		::memcpy( &broken, &_broken, sizeof ( _broken ) );
-		end = ::strptime( str.x_str(), _iso8601DateTimeFormat_, &broken );
+		end = ::strptime( str.c_str(), _iso8601DateTimeFormat_, &broken );
 	}
 	if ( ! end ) {
 		::memcpy( &broken, &_broken, sizeof ( _broken ) );
-		end = ::strptime( str.x_str(), _iso8601DateFormat_, &broken );
+		end = ::strptime( str.c_str(), _iso8601DateFormat_, &broken );
 	}
 	if ( ! end ) {
 		::memcpy( &broken, &_broken, sizeof ( _broken ) );
-		end = ::strptime( str.x_str(), _iso8601TimeFormat_, &broken );
+		end = ::strptime( str.c_str(), _iso8601TimeFormat_, &broken );
 	}
 	if ( ! end ) {
 		::memcpy( &broken, &_broken, sizeof ( _broken ) );
-		end = ::strptime( str.x_str(), _rfc2822DateTimeFormat_, &broken );
+		end = ::strptime( str.c_str(), _rfc2822DateTimeFormat_, &broken );
 	}
 	if ( ! end ) {
 		throw HTimeException( "Could not parse `"_ys.append( str_ ).append( "' as `" ).append( _format ).append( "'." ) );
@@ -469,16 +469,16 @@ HString HTime::to_string( HUTF8String const& format_ ) const {
 	HUTF8String const& format( ! format_.is_empty() ? format_ : _format );
 #ifdef HAVE_SMART_STRFTIME
 	static int const MIN_TIME_STRING_LENGTH( 32 );
-	int long size( static_cast<int long>( ::strftime( nullptr, 1024, format.x_str(), &_broken ) + 1 ) );
+	int long size( static_cast<int long>( ::strftime( nullptr, 1024, format.c_str(), &_broken ) + 1 ) );
 	if ( size < 2 )
 		M_THROW( "bad format", errno );
 	_cache.realloc( max<int long>( size, MIN_TIME_STRING_LENGTH ) );
 	M_ENSURE( static_cast<int>( ::strftime( _cache.get<char>(),
-					static_cast<size_t>( size ), format.x_str(), &_broken ) ) < size );
+					static_cast<size_t>( size ), format.c_str(), &_broken ) ) < size );
 #else /* HAVE_SMART_STRFTIME */
 	static int const MIN_TIME_STRING_LENGTH( 64 );
 	_cache.realloc( MIN_TIME_STRING_LENGTH ); /* FIXME that is pretty dumb hack */
-	int long size( static_cast<int long>( ::strftime( _cache.get<char>(), MIN_TIME_STRING_LENGTH - 1, format.x_str(), &_broken ) ) + 1 );
+	int long size( static_cast<int long>( ::strftime( _cache.get<char>(), MIN_TIME_STRING_LENGTH - 1, format.c_str(), &_broken ) ) + 1 );
 	if ( size < 2 )
 		M_THROW( "bad format", errno );
 #endif /* not HAVE_SMART_STRFTIME */

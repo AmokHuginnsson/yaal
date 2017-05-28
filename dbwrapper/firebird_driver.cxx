@@ -144,12 +144,12 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& d
 	*pdpb ++ = isc_dpb_version1;
 	*pdpb ++ = isc_dpb_user_name;
 	*pdpb ++ = static_cast<char>( loginLen );
-	::strncpy( pdpb, login.x_str(), static_cast<size_t>( loginLen ) );
+	::strncpy( pdpb, login.c_str(), static_cast<size_t>( loginLen ) );
 	pdpb += loginLen;
 	*pdpb ++ = isc_dpb_password;
 	*pdpb ++ = static_cast<char>( passLen );
-	::strncpy( pdpb, password.x_str(), static_cast<size_t>( passLen ) );
-	isc_attach_database( db->_status, dbLen, dataBase.x_str(), &db->_db, dpbLen, dpb );
+	::strncpy( pdpb, password.c_str(), static_cast<size_t>( passLen ) );
+	isc_attach_database( db->_status, dbLen, dataBase.c_str(), &db->_db, dpbLen, dpb );
 	if ( ! is_err( db->_status ) ) {
 		dbLink_._valid = true;
 	}
@@ -419,7 +419,7 @@ M_EXPORT_SYMBOL void query_bind( ODBLink&, void* data_, int paramNo_, yaal::hcor
 	int paramIdx( paramNo_ - 1 );
 	if ( paramIdx < in->sqld ) {
 		XSQLVAR* var( in->sqlvar + paramIdx );
-		var->sqldata = const_cast<char*>( value_.x_str() );
+		var->sqldata = const_cast<char*>( value_.c_str() );
 		var->sqllen = static_cast<ISC_SHORT>( value_.byte_count() );
 	}
 	return;

@@ -612,14 +612,14 @@ yaal::hcore::HString hmac( FUNCTION function_, yaal::hcore::HString const& key_,
 	::memset( ipad.raw(), 0x36, static_cast<size_t>( blockBytes ) );
 	::memset( opad.raw(), 0x5c, static_cast<size_t>( blockBytes ) );
 	if ( key_.get_length() <= blockBytes ) {
-		memxor( ipad.raw(), key.x_str(), key.byte_count() );
-		memxor( opad.raw(), key.x_str(), key.byte_count() );
+		memxor( ipad.raw(), key.c_str(), key.byte_count() );
+		memxor( opad.raw(), key.c_str(), key.byte_count() );
 	} else {
 		HChunk keyBinHashed( parseHash( function_, hashString( key_ ) ) );
 		memxor( ipad.raw(), keyBinHashed.raw(), keyBinHashed.get_size() );
 		memxor( opad.raw(), keyBinHashed.raw(), keyBinHashed.get_size() );
 	}
-	::memcpy( ipad.get<char>() + blockBytes, message.x_str(), static_cast<size_t>( message.byte_count() ) );
+	::memcpy( ipad.get<char>() + blockBytes, message.c_str(), static_cast<size_t>( message.byte_count() ) );
 	HMemoryObserver mo( ipad.raw(), blockBytes + message.byte_count() );
 	HMemory m( mo );
 	HChunk ipadHashed( parseHash( function_, hashStream( m ) ) );

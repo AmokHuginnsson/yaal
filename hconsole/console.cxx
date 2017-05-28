@@ -714,7 +714,7 @@ void HConsole::addstr( yaal::hcore::HString const& str_ ) const {
 		M_THROW( "not in curses mode", errno );
 	}
 	_utf8 = str_;
-	M_ENSURE( ::waddstr( static_cast<WINDOW*>( _window ), _utf8.x_str() ) != ERR );
+	M_ENSURE( ::waddstr( static_cast<WINDOW*>( _window ), _utf8.c_str() ) != ERR );
 	return;
 	M_EPILOG
 }

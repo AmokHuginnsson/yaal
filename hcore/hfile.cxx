@@ -129,7 +129,7 @@ int HFile::do_open( HString const& path_, open_t const& open_ ) {
 	int saveErrno( errno );
 	_path = path_;
 	HUTF8String utf8( path_ );
-	_handle = ::std::fopen( utf8.x_str(), mode );
+	_handle = ::std::fopen( utf8.c_str(), mode );
 	int error( 0 );
 	if ( ! _handle ) {
 		saveErrno = error = errno;

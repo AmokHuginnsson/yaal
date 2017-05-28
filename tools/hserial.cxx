@@ -109,7 +109,7 @@ void HSerial::open( void ) {
 	compile();
 	/* O_NONBLOCK allow open device even if nothing seats on other side */
 	HUTF8String utf8( _devicePath );
-	_fileDescriptor = ::open( utf8.x_str(), O_RDWR | O_NOCTTY | O_NONBLOCK );
+	_fileDescriptor = ::open( utf8.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK );
 	M_ENSURE( _fileDescriptor >= 0, _devicePath );
 	if ( ! ::isatty( _fileDescriptor ) ) {
 		M_THROW( HString( _devicePath ).append( _( " is not a tty device" ) ), _fileDescriptor );

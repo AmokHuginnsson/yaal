@@ -124,12 +124,12 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& d
 	if ( mySQL ) {
 		int unsigned protocol( MYSQL_PROTOCOL_SOCKET );
 		HUTF8String utf8( _clientCharacterSet_ );
-		if ( ! ( mysql_options( mySQL, MYSQL_OPT_PROTOCOL, &protocol ) || mysql_options( mySQL, MYSQL_SET_CHARSET_NAME, utf8.x_str() ) ) ) {
+		if ( ! ( mysql_options( mySQL, MYSQL_OPT_PROTOCOL, &protocol ) || mysql_options( mySQL, MYSQL_SET_CHARSET_NAME, utf8.c_str() ) ) ) {
 			HUTF8String dataBase( dataBase_ );
 			HUTF8String login( login_ );
 			HUTF8String password( password_ );
 			if ( mysql_real_connect( mySQL, nullptr,
-						login.x_str(), password.x_str(), dataBase.x_str(),
+						login.c_str(), password.c_str(), dataBase.c_str(),
 						0, nullptr, CLIENT_IGNORE_SPACE | CLIENT_IGNORE_SIGPIPE ) ) {
 				dbLink_._valid = true;
 			}
@@ -232,7 +232,7 @@ M_EXPORT_SYMBOL void query_bind( ODBLink&, void* data_, int argNo_, yaal::hcore:
 	}
 	::memset( &pq->_params[argNo_ - 1], 0, sizeof ( OMySQLResult::binds_t::value_type ) );
 	pq->_params[argNo_ - 1].buffer_type = MYSQL_TYPE_STRING;
-	pq->_params[argNo_ - 1].buffer = const_cast<char*>( value_.x_str() );
+	pq->_params[argNo_ - 1].buffer = const_cast<char*>( value_.c_str() );
 	pq->_params[argNo_ - 1].buffer_length = static_cast<int unsigned>( value_.byte_count() );
 	return;
 }

@@ -81,7 +81,7 @@ HRecordSet::ptr_t HDataBase::execute_query( HString const& query_, HRecordSet::C
 		log << "SQL: " << query_ << endl;
 	}
 	HUTF8String utf8( query_ );
-	void* result( cursor_ == HRecordSet::CURSOR::RANDOM_ACCESS ? (_connector->db_fetch_query_result)( _dbLink, utf8.x_str() ) : (_connector->db_query)( _dbLink, utf8.x_str() ) );
+	void* result( cursor_ == HRecordSet::CURSOR::RANDOM_ACCESS ? (_connector->db_fetch_query_result)( _dbLink, utf8.c_str() ) : (_connector->db_query)( _dbLink, utf8.c_str() ) );
 	if ( (_connector->dbrs_errno)( _dbLink, result ) ) {
 		HString message( "SQL execute error: '"_ys.append( query_ ).append( "': " ).append( (_connector->dbrs_error)( _dbLink, result ) ) );
 		log( LOG_LEVEL::ERROR ) << message << endl;
@@ -104,7 +104,7 @@ HQuery::ptr_t HDataBase::prepare_query( HString const& query_ ) {
 		M_THROW( "not connected to database", errno );
 	}
 	HUTF8String utf8( query_ );
-	void* result( (_connector->db_prepare_query)( _dbLink, utf8.x_str() ) );
+	void* result( (_connector->db_prepare_query)( _dbLink, utf8.c_str() ) );
 	if ( (_connector->dbrs_errno)( _dbLink, result ) ) {
 		HString message( "SQL prepare error: '"_ys.append( query_ ).append( "': " ).append( (_connector->dbrs_error)( _dbLink, result ) ) );
 		log( LOG_LEVEL::ERROR ) << message << endl;

@@ -118,16 +118,16 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, HString const& dataBase_,
 		dbLink_._conn = sQLite = new ( memory::yaal ) OSQLite;
 		HString dataBase( dataBase_ );
 		HUTF8String utf8( dataBase );
-		if ( ::access( utf8.x_str(), R_OK | W_OK ) ) {
+		if ( ::access( utf8.c_str(), R_OK | W_OK ) ) {
 			char const fileNameExt[] = ".sqlite";
 			dataBase += fileNameExt;
 			utf8 = dataBase;
-			if ( ::access( utf8.x_str(), R_OK | W_OK ) ) {
+			if ( ::access( utf8.c_str(), R_OK | W_OK ) ) {
 				sQLite->_errorMessage = format( "Database file `%s' is not accessible.", dataBase );
 				break;
 			}
 		}
-		sQLite->_errorCode = ::sqlite3_open( utf8.x_str(), &sQLite->_db );
+		sQLite->_errorCode = ::sqlite3_open( utf8.c_str(), &sQLite->_db );
 		if ( sQLite->_errorCode ) {
 			sQLite->_errorMessage = HUTF8String( ::sqlite3_errmsg( sQLite->_db ) );
 		} else {
@@ -183,10 +183,10 @@ M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* result_ ) 
 	M_ASSERT( sQLite );
 	char const* msg = "";
 	if ( r && ! r->_errorMessage.is_empty() ) {
-		msg = r->_errorMessage.x_str();
+		msg = r->_errorMessage.c_str();
 	} else if ( sQLite ) {
 		if ( ! sQLite->_errorMessage.is_empty() ) {
-			msg = sQLite->_errorMessage.x_str();
+			msg = sQLite->_errorMessage.c_str();
 		} else {
 			msg = sqlite3_errmsg( sQLite->_db );
 		}
@@ -271,7 +271,7 @@ sqlite3_destructor_type SQLITE_STATIC_FWD{ SQLITE_STATIC };
 M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HUTF8String const& );
 M_EXPORT_SYMBOL void query_bind( ODBLink&, void* data_, int argNo_, yaal::hcore::HUTF8String const& value_ ) {
 	OSQLiteResult* result( static_cast<OSQLiteResult*>( data_ ) );
-	sqlite3_bind_text( static_cast<sqlite3_stmt*>( result->_data ), argNo_, value_.x_str(), static_cast<int>( value_.byte_count() ), SQLITE_STATIC_FWD );
+	sqlite3_bind_text( static_cast<sqlite3_stmt*>( result->_data ), argNo_, value_.c_str(), static_cast<int>( value_.byte_count() ), SQLITE_STATIC_FWD );
 	return;
 }
 

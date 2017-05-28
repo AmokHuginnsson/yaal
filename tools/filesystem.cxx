@@ -73,7 +73,7 @@ void do_stat( struct stat* s, path_t const& path_, bool resolve_ = true ) {
 	::memset( s, 0, sizeof ( *s ) );
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	HUTF8String utf8( path_ );
-	if ( ! ( ( resolve_ && ( ::stat( utf8.x_str(), s ) == 0 ) ) || ( ::lstat( utf8.x_str(), s ) == 0 ) ) ) {
+	if ( ! ( ( resolve_ && ( ::stat( utf8.c_str(), s ) == 0 ) ) || ( ::lstat( utf8.c_str(), s ) == 0 ) ) ) {
 		throw HFileSystemException( to_string( "Cannot acquire metadata for `" ).append( path_ ).append( "'" ) );
 	}
 	return;
@@ -149,7 +149,7 @@ path_t normalize_path( path_t const& path_ ) {
 
 bool exists( path_t const& path_ ) {
 	HUTF8String utf8( path_ );
-	int err( ::access( utf8.x_str(), F_OK ) );
+	int err( ::access( utf8.c_str(), F_OK ) );
 	if ( ( err != 0 ) && ( errno != ENOENT ) ) {
 		throw HFileSystemException( to_string( "Failed to determine `" ).append( path_ ).append( "'s ontological status." ) );
 	}
@@ -291,7 +291,7 @@ path_t readlink( path_t const& path_ ) {
 		alloc <<= 1;
 		buffer.realloc( alloc, HChunk::STRATEGY::EXACT );
 		HUTF8String utf8( path_ );
-		len = static_cast<int>( ::readlink( utf8.x_str(), buffer.get<char>(), static_cast<size_t>( alloc ) ) );
+		len = static_cast<int>( ::readlink( utf8.c_str(), buffer.get<char>(), static_cast<size_t>( alloc ) ) );
 	} while ( len >= alloc );
 	if ( len < 0 ) {
 		throw HFileSystemException( "readlink failed: `"_ys.append( path_ ).append( "'" ) );
@@ -303,7 +303,7 @@ path_t readlink( path_t const& path_ ) {
 
 void remove( path_t const& path_ ) {
 	HUTF8String utf8( path_ );
-	int err( ::unlink( utf8.x_str() ) );
+	int err( ::unlink( utf8.c_str() ) );
 	if ( ( err != 0 ) && ( errno != ENOENT ) ) {
 		throw HFileSystemException( to_string( "Failed to remove: `" ).append( path_ ).append( "'" ) );
 	}
@@ -313,7 +313,7 @@ void remove( path_t const& path_ ) {
 void rename( path_t const& old_, path_t const& new_ ) {
 	HUTF8String oldUtf8( old_ );
 	HUTF8String newUtf8( new_ );
-	int err( ::rename( oldUtf8.x_str(), newUtf8.x_str() ) );
+	int err( ::rename( oldUtf8.c_str(), newUtf8.c_str() ) );
 	if ( err != 0 ) {
 		throw HFileSystemException( to_string( "Failed to rename: `" ).append( old_ ).append( "' to `" ).append( new_ ).append( "'" ) );
 	}
@@ -327,7 +327,7 @@ void create_directory( path_t const& path_, u32_t mode_, DIRECTORY_MODIFICATION 
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	if ( directoryModification_ == DIRECTORY_MODIFICATION::EXACT ) {
 		HUTF8String utf8( path );
-		int err( ::mkdir( utf8.x_str(), static_cast<mode_t>( mode_ ) ) );
+		int err( ::mkdir( utf8.c_str(), static_cast<mode_t>( mode_ ) ) );
 		if ( ( err != 0 ) && ( ( errno != EEXIST ) || ! is_directory( path ) ) ) {
 			throw HFileSystemException( to_string( "Failed to create directory `" ).append( path ).append( "'" ) );
 		}
@@ -354,7 +354,7 @@ void create_directory( path_t const& path_, u32_t mode_, DIRECTORY_MODIFICATION 
 void chmod( path_t const& path_, u32_t mode_ ) {
 	M_PROLOG
 	HUTF8String utf8( path_ );
-	if ( ::chmod( utf8.x_str(), static_cast<mode_t>( mode_ ) ) < 0 ) {
+	if ( ::chmod( utf8.c_str(), static_cast<mode_t>( mode_ ) ) < 0 ) {
 		throw HFileSystemException( "chmod failed: `"_ys.append( path_ ).append( "'" ) );
 	}
 	return;
@@ -364,7 +364,7 @@ void chmod( path_t const& path_, u32_t mode_ ) {
 void chdir( path_t const& path_ ) {
 	M_PROLOG
 	HUTF8String utf8( path_ );
-	if ( ::chdir( utf8.x_str() ) < 0 ) {
+	if ( ::chdir( utf8.c_str() ) < 0 ) {
 		throw HFileSystemException( "chdir failed: `"_ys.append( path_ ).append( "'" ) );
 	}
 	return;
@@ -377,7 +377,7 @@ void remove_directory( path_t const& path_, DIRECTORY_MODIFICATION directoryModi
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	if ( directoryModification_ == DIRECTORY_MODIFICATION::EXACT ) {
 		HUTF8String utf8( path );
-		int err( ::rmdir( utf8.x_str() ) );
+		int err( ::rmdir( utf8.c_str() ) );
 		if ( ( err != 0 ) && ( ( errno != ENOENT ) || is_directory( path ) ) ) {
 			throw HFileSystemException( to_string( "Failed to remove directory `" ).append( path ).append( "'" ) );
 		}

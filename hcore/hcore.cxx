@@ -108,7 +108,7 @@ void set_env( HString const& name_, HString const& value_, bool overwrite_ ) {
 	int const FALSE = 0;
 	HUTF8String name( name_ );
 	HUTF8String value( value_ );
-	M_ENSURE( ::setenv( name.x_str(), value.x_str(), overwrite_ ? TRUE : FALSE ) == 0 );
+	M_ENSURE( ::setenv( name.c_str(), value.c_str(), overwrite_ ? TRUE : FALSE ) == 0 );
 	return;
 	M_EPILOG
 }
@@ -116,7 +116,7 @@ void set_env( HString const& name_, HString const& value_, bool overwrite_ ) {
 void unset_env( HString const& name_ ) {
 	M_PROLOG
 	HUTF8String unicode( name_ );
-	M_ENSURE( ::unsetenv( unicode.x_str() ) == 0 );
+	M_ENSURE( ::unsetenv( unicode.c_str() ) == 0 );
 	return;
 	M_EPILOG
 }
@@ -269,7 +269,7 @@ void ensure_limit( int resource_, char const* message_, bool autoSanity_ ) {
 			HString message( message_ );
 			message.append( " - bailing out" );
 			HUTF8String unicode( message );
-			::perror( unicode.x_str() );
+			::perror( unicode.c_str() );
 			::exit( 1 );
 		}
 	}

@@ -992,7 +992,7 @@ public:
 	bool operator == ( char const* ) const;
 	bool operator != ( char const* ) const;
 	void swap( HUTF8String& );
-	char const* x_str( void ) const;
+	char const* c_str( void ) const;
 	char const* raw( void ) const;
 	bool is_empty( void ) const;
 	bool empty( void ) const;

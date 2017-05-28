@@ -91,7 +91,7 @@ HString make_path( HString const& sysconfDir_, HString const& rcName_, RC_PATHER
 			envName += RC;
 			envName.upper();
 			HUTF8String utf8( envName );
-			char const* envPath( ::getenv( utf8.x_str() ) );
+			char const* envPath( ::getenv( utf8.c_str() ) );
 			if ( envPath ) {
 				rcPath = envPath;
 			}
@@ -160,7 +160,7 @@ bool substitute_environment( HString& string_ ) {
 			HString var = string_.mid( it->start(), it->size() );
 			HString name = var.mid( 2, it->size() - 3 );
 			HUTF8String utf8( name );
-			char const* start = ::getenv( utf8.x_str() );
+			char const* start = ::getenv( utf8.c_str() );
 			string_.replace( var, start ? start : "" );
 			envVarRefFound = true;
 		}
@@ -489,7 +489,7 @@ int HProgramOptionsHandler::process_rc_file( HString const& section_, RC_CALLBAC
 							if ( option == value ) {
 								if ( _debugLevel_ >= DEBUG_LEVEL::DEBUG_MESSAGES ) {
 									HUTF8String utf8( option );
-									::fprintf( stderr, "section: [%s]\n", utf8.x_str() );
+									::fprintf( stderr, "section: [%s]\n", utf8.c_str() );
 								}
 								log << "section: " << section_ << ", ";
 								section = true;
@@ -522,7 +522,7 @@ int HProgramOptionsHandler::process_rc_file( HString const& section_, RC_CALLBAC
 						);
 						log( LOG_LEVEL::ERROR ) << message;
 						HUTF8String utf8( message );
-						::fputs( utf8.x_str(), stderr );
+						::fputs( utf8.c_str(), stderr );
 					}
 				}
 			}
@@ -721,7 +721,7 @@ void HProgramOptionsHandler::set_option( HOption& option_, HString const& value_
 		}
 		HUTF8String utf8Name( name );
 		HUTF8String utf8Value( value );
-		::fprintf( stderr, "option: [%s], value [%s]\n", utf8Name.x_str(), utf8Value.x_str() );
+		::fprintf( stderr, "option: [%s], value [%s]\n", utf8Name.c_str(), utf8Value.c_str() );
 	}
 	if ( option_.value_id() ) {
 		if ( option_.switch_type() == HOption::ARGUMENT::NONE ) {
@@ -824,7 +824,7 @@ void HProgramOptionsHandler::set_from_env( void ) {
 		HString lo( _projectName );
 		lo.append( "_" ).append( it->long_form() ).upper().replace( "-", "_" );
 		utf8 = lo;
-		char const* fromEnv( ::getenv( utf8.x_str() ) );
+		char const* fromEnv( ::getenv( utf8.c_str() ) );
 		if ( fromEnv ) {
 			set_option( *it, fromEnv );
 		}

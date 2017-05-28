@@ -204,14 +204,14 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ ) {
 			M_THROW( "dup2", errno );
 		}
 		HUTF8String utf8Image( image_ );
-		argv.get<char const*>()[ 0 ] = utf8Image.x_str();
+		argv.get<char const*>()[ 0 ] = utf8Image.c_str();
 		int i( 1 );
 		typedef HArray<HUTF8String> utf8_strings_t;
 		utf8_strings_t utf8Argv;
 		utf8Argv.reserve( argv.get_size() );
 		for ( argv_t::const_iterator it( argv_.begin() ), end( argv_.end() ); it != end; ++ it, ++ i ) {
 			utf8Argv.emplace_back( *it );
-			argv.get<char const*>()[ i ] = utf8Argv.back().x_str();
+			argv.get<char const*>()[ i ] = utf8Argv.back().c_str();
 		}
 		::execv( argv.get<char const*>()[ 0 ], const_cast<char* const*>( argv.get<char const*>() ) );
 		M_ENSURE( !"execv"[0] );

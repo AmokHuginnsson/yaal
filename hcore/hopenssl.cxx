@@ -231,11 +231,11 @@ void HOpenSSL::OSSLContext::init( void ) {
 	}
 	++ _instances;
 	HUTF8String utf8( _sSLKey );
-	if ( SSL_CTX_use_PrivateKey_file( ctx, utf8.x_str(), SSL_FILETYPE_PEM ) <= 0 ) {
+	if ( SSL_CTX_use_PrivateKey_file( ctx, utf8.c_str(), SSL_FILETYPE_PEM ) <= 0 ) {
 		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) + ", key: `" + _sSLKey + "'" );
 	}
 	utf8 = _sSLCert;
-	if ( SSL_CTX_use_certificate_file( ctx, utf8.x_str(), SSL_FILETYPE_PEM ) <= 0 ) {
+	if ( SSL_CTX_use_certificate_file( ctx, utf8.c_str(), SSL_FILETYPE_PEM ) <= 0 ) {
 		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) + ": cert: `" + _sSLCert + "'" );
 	}
 	if ( ! SSL_CTX_check_private_key( ctx ) ) {

@@ -170,11 +170,11 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& /
 		HUTF8String instance( _instanceName_ );
 		if ( ( oracle->_status = OCILogon( oracle->_environment,
 					oracle->_error, &oracle->_serviceContext,
-					reinterpret_cast<OraText const*>( login.x_str() ),
+					reinterpret_cast<OraText const*>( login.c_str() ),
 					static_cast<ub4>( login.byte_count() ),
-					reinterpret_cast<OraText const*>( password.x_str() ),
+					reinterpret_cast<OraText const*>( password.c_str() ),
 					static_cast<ub4>( password.byte_count() ),
-					reinterpret_cast<OraText const*>( instance.x_str() ),
+					reinterpret_cast<OraText const*>( instance.c_str() ),
 					static_cast<ub4>( instance.byte_count() ) ) ) == OCI_SUCCESS )
 			dbLink_._valid = true;
 	} while ( false );
@@ -258,7 +258,7 @@ void* oracle_db_prepare_query( ODBLink& dbLink_, char const* query_, ub4 mode_ )
 	queryObj->_utf8ConversionCache = queryObj->_sql;
 	oracle->_status = OCIStmtPrepare2( oracle->_serviceContext,
 			&queryObj->_statement, oracle->_error,
-			reinterpret_cast<OraText const*>( queryObj->_utf8ConversionCache.x_str() ),
+			reinterpret_cast<OraText const*>( queryObj->_utf8ConversionCache.c_str() ),
 			static_cast<ub4>( queryObj->_utf8ConversionCache.byte_count() ), nullptr, 0, OCI_NTV_SYNTAX, OCI_DEFAULT );
 	queryObj->_error = oracle->_error;
 	if ( ( oracle->_status != OCI_SUCCESS )
@@ -448,7 +448,7 @@ M_EXPORT_SYMBOL void query_bind( ODBLink& dbLink_, void* data_, int attrNo_, yaa
 	OCIBind* dummy( nullptr );
 	query->_inNullInd.push_back( 0 );
 	if ( ( ( *query->_status ) = OCIBindByPos( query->_statement, &dummy, query->_error,
-			static_cast<ub4>( attrNo_ ), const_cast<char*>( value_.x_str() ), static_cast<sb4>( value_.byte_count() ) + 1,
+			static_cast<ub4>( attrNo_ ), const_cast<char*>( value_.c_str() ), static_cast<sb4>( value_.byte_count() ) + 1,
 			SQLT_STR, &query->_inNullInd.back(), nullptr, nullptr, 0, nullptr, OCI_DEFAULT ) ) != OCI_SUCCESS ) {
 		log( LOG_LEVEL::ERROR ) << _logTag_ <<  __FUNCTION__ << ": " << dbrs_error( dbLink_, query ) << endl;
 	}
@@ -548,7 +548,7 @@ M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 M_EXPORT_SYMBOL char const* rs_column_name( void*, int );
 M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ ) {
 	OQuery* query = static_cast<OQuery*>( dataR_ );
-	return ( query->_fieldInfos[field_]._name.x_str() );
+	return ( query->_fieldInfos[field_]._name.c_str() );
 }
 
 void oracle_init( void ) __attribute__((__constructor__));
