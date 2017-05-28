@@ -93,8 +93,10 @@ HListWidget::HColumnInfo::HColumnInfo( yaal::hcore::HString const& name_,
 	} else {
 		shortcutIndex = 0;
 	}
-	_shortcutIndex = shortcutIndex;
-	_shortcut = _name[ shortcutIndex ];
+	if ( shortcutIndex < _name.get_length() ) {
+		_shortcutIndex = shortcutIndex;
+		_shortcut = _name[ shortcutIndex ];
+	}
 	return;
 	M_EPILOG
 }
@@ -220,7 +222,7 @@ void HListWidget::draw_header( int columns_ ) {
 				cons.mvprintf(
 					_rowRaw,
 					_columnRaw + columnOffset + columnInfo->_shortcutIndex,
-					"%c",
+					"%C",
 					columnInfo->_shortcut
 				);
 				if ( _sortColumn == colNo ) {

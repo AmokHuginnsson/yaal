@@ -32,8 +32,8 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hstreaminterface.hxx"
-
-#include "hcore/hstring.hxx"
+#include "hstring.hxx"
+#include "unicode.hxx"
 
 namespace yaal {
 
@@ -89,6 +89,16 @@ HStreamInterface& HStreamInterface::do_output( char const* string_ ) {
 HStreamInterface& HStreamInterface::do_output( bool bool_ ) {
 	M_PROLOG
 	_wordCache = _boolAlpha ? ( bool_ ? "true" : "false" ) : ( bool_ ? "1" : "0" );
+	reformat();
+	_conversionCache = _wordCache;
+	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	return ( *this );
+	M_EPILOG
+}
+
+HStreamInterface& HStreamInterface::do_output( code_point_t char_ ) {
+	M_PROLOG
+	_wordCache = char_;
 	reformat();
 	_conversionCache = _wordCache;
 	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
@@ -672,8 +682,30 @@ bool HStreamInterface::read_floatint_point( void ) {
 
 HStreamInterface& HStreamInterface::do_input( bool& b ) {
 	M_PROLOG
-	if ( read_word() )
+	if ( read_word() ) {
 		b = lexical_cast<bool>( _wordCache );
+	}
+	return ( *this );
+	M_EPILOG
+}
+
+HStreamInterface& HStreamInterface::do_input( code_point_t& char_ ) {
+	M_PROLOG
+	/* Regarding _whiteSpace_.size() + 1, about "+ 1" see comment in semantic_read in analogous context */
+	char c( 0 );
+	do {
+		read( &c, 1 );
+	} while ( good() && _skipWS && character_class( CHARACTER_CLASS::WHITESPACE ).hasz( code_point_t( static_cast<yaal::u32_t>( c ) ) ) );
+	yaal::u32_t character( static_cast<u8_t>( c ) );
+	static u8_t const mask[] = { 0xff, unicode::ENC_2_BYTES_VALUE_MASK, unicode::ENC_3_BYTES_VALUE_MASK, unicode::ENC_4_BYTES_VALUE_MASK };
+	int tailLength( unicode::utf8_declared_length( c ) - 1 );
+	character &= mask[tailLength];
+	for ( int i( 0 ); i < tailLength; ++ i ) {
+		character <<= 6;
+		read( &c, 1 );
+		character |= ( static_cast<u8_t>( c ) & unicode::TAIL_BYTES_VALUE_MASK );
+	}
+	char_ = code_point_t( character );
 	return ( *this );
 	M_EPILOG
 }
@@ -701,24 +733,27 @@ HStreamInterface& HStreamInterface::do_input( char unsigned& cu ) {
 
 HStreamInterface& HStreamInterface::do_input( int short& is ) {
 	M_PROLOG
-	if ( read_integer() )
+	if ( read_integer() ) {
 		is = lexical_cast<int short>( _wordCache );
+	}
 	return ( *this );
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_input( int short unsigned& isu ) {
 	M_PROLOG
-	if ( read_integer() )
+	if ( read_integer() ) {
 		isu = lexical_cast<int short unsigned>( _wordCache );
+	}
 	return ( *this );
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_input( int& i ) {
 	M_PROLOG
-	if ( read_integer() )
+	if ( read_integer() ) {
 		i = lexical_cast<int>( _wordCache );
+	}
 	return ( *this );
 	M_EPILOG
 }
@@ -752,40 +787,45 @@ HStreamInterface& HStreamInterface::do_input( int long unsigned& ilu ) {
 
 HStreamInterface& HStreamInterface::do_input( int long long& ill ) {
 	M_PROLOG
-	if ( read_integer() )
+	if ( read_integer() ) {
 		ill = lexical_cast<int long long>( _wordCache );
+	}
 	return ( *this );
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_input( int long long unsigned& illu ) {
 	M_PROLOG
-	if ( read_integer() )
+	if ( read_integer() ) {
 		illu = lexical_cast<int long long unsigned>( _wordCache );
+	}
 	return ( *this );
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_input( double& d ) {
 	M_PROLOG
-	if ( read_floatint_point() )
+	if ( read_floatint_point() ) {
 		d = lexical_cast<double>( _wordCache );
+	}
 	return ( *this );
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_input( double long& dl ) {
 	M_PROLOG
-	if ( read_floatint_point() )
+	if ( read_floatint_point() ) {
 		dl = lexical_cast<double long>( _wordCache );
+	}
 	return ( *this );
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_input( float& f ) {
 	M_PROLOG
-	if ( read_floatint_point() )
+	if ( read_floatint_point() ) {
 		f = lexical_cast<float>( _wordCache );
+	}
 	return ( *this );
 	M_EPILOG
 }
@@ -822,12 +862,14 @@ int long HStreamInterface::read( void* buffer_, int long size_ ) {
 	}
 	if ( size_ > 0 ) {
 		int long physRead( do_read( static_cast<char*>( buffer_ ) + nRead, size_ ) );
-		if ( physRead >= 0 )
+		if ( physRead >= 0 ) {
 			nRead += physRead;
-		else if ( ! nRead )
+		} else if ( ! nRead ) {
 			nRead = physRead;
-		if ( ! physRead )
+		}
+		if ( ! physRead ) {
 			_valid = false;
+		}
 	}
 	return ( nRead );
 	M_EPILOG

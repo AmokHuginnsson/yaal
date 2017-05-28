@@ -122,6 +122,9 @@ public:
 	HStreamInterface& operator << ( bool val_ ) {
 		return ( do_output( val_ ) );
 	}
+	HStreamInterface& operator << ( code_point_t val_ ) {
+		return ( do_output( val_ ) );
+	}
 	HStreamInterface& operator << ( char val_ ) {
 		return ( do_output( val_ ) );
 	}
@@ -174,6 +177,9 @@ public:
 		return ( do_input( val_ ) );
 	}
 	HStreamInterface& operator >> ( bool& val_ ) {
+		return ( do_input( val_ ) );
+	}
+	HStreamInterface& operator >> ( code_point_t& val_ ) {
 		return ( do_input( val_ ) );
 	}
 	HStreamInterface& operator >> ( char& val_ ) {
@@ -358,6 +364,7 @@ protected:
 	virtual HStreamInterface& do_output( HString const& );
 	virtual HStreamInterface& do_output( char const* );
 	virtual HStreamInterface& do_output( bool );
+	virtual HStreamInterface& do_output( code_point_t );
 	virtual HStreamInterface& do_output( char );
 	virtual HStreamInterface& do_output( char unsigned );
 	virtual HStreamInterface& do_output( int short );
@@ -376,6 +383,7 @@ protected:
 	virtual HStreamInterface& do_output( HManipulator const& );
 	virtual HStreamInterface& do_input( HString& );
 	virtual HStreamInterface& do_input( bool& );
+	virtual HStreamInterface& do_input( code_point_t& );
 	virtual HStreamInterface& do_input( char& );
 	virtual HStreamInterface& do_input( char unsigned & );
 	virtual HStreamInterface& do_input( int short& );

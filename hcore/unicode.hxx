@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-/*! \file hcore/utf.hxx
- * \brief UTF-8 namespace definitions.
+/*! \file hcore/unicode.hxx
+ * \brief Unicode and UTF-8 namespace definitions.
  */
 
 #ifndef YAAL_HCORE_UTF8_HXX_INCLUDED
@@ -65,20 +65,26 @@ static u32_t const UTF8_MAX_2_BYTE_CODE_POINT( 0x0007ff );
 static u32_t const UTF8_MAX_3_BYTE_CODE_POINT( 0x00ffff );
 static u32_t const UTF8_MAX_4_BYTE_CODE_POINT( 0x10ffff );
 
+inline int utf8_declared_length( char head_ ) {
+	int length( 0 );
+	if ( ! ( head_ & unicode::ENC_1_BYTES_MARK_MASK ) ) {
+		length = 1;
+	} else if ( ( head_ & unicode::ENC_2_BYTES_MARK_MASK ) == unicode::ENC_2_BYTES_MARK_VALUE ) {
+		length = 2;
+	} else if ( ( head_ & unicode::ENC_3_BYTES_MARK_MASK ) == unicode::ENC_3_BYTES_MARK_VALUE ) {
+		length = 3;
+	} else if ( ( head_ & unicode::ENC_4_BYTES_MARK_MASK ) == unicode::ENC_4_BYTES_MARK_VALUE ) {
+		length = 4;
+	} else {
+		M_ASSERT( !"Invalid UTF-8 head sequence."[0] );
+	}
+	return ( length );
+}
+
 inline int count_characters( char const* str_, int size_ ) {
 	int cc( 0 );
 	for ( char const* end( str_ + size_ ); str_ < end; ++ cc ) {
-		if ( ! ( *str_ & unicode::ENC_1_BYTES_MARK_MASK ) ) {
-			++ str_;
-		} else if ( ( *str_ & unicode::ENC_2_BYTES_MARK_MASK ) == unicode::ENC_2_BYTES_MARK_VALUE ) {
-			str_ += 2;
-		} else if ( ( *str_ & unicode::ENC_3_BYTES_MARK_MASK ) == unicode::ENC_3_BYTES_MARK_VALUE ) {
-			str_ += 3;
-		} else if ( ( *str_ & unicode::ENC_4_BYTES_MARK_MASK ) == unicode::ENC_4_BYTES_MARK_VALUE ) {
-			str_ += 4;
-		} else {
-			M_ASSERT( !"Invalid UTF-8 head sequence."[0] );
-		}
+		str_ += utf8_declared_length( *str_ );
 	}
 	return ( cc );
 }

@@ -270,7 +270,7 @@ namespace adaptive {
 inline code_point_t get( void const* mem_, int rank_, int long index_ ) {
 	code_point_t codePoint( 0 );
 	if ( rank_ == 1 ) {
-		codePoint = code_point_t( static_cast<yaal::u32_t>( static_cast<char const*>( mem_ )[index_] ) );
+		codePoint = code_point_t( static_cast<yaal::u8_t const*>( mem_ )[index_] );
 	} else if ( rank_ == 2 ) {
 		codePoint = code_point_t( static_cast<yaal::u16_t const*>( mem_ )[index_] );
 	} else {
@@ -281,7 +281,7 @@ inline code_point_t get( void const* mem_, int rank_, int long index_ ) {
 
 inline void set( void* mem_, int rank_, int long index_, code_point_t codePoint_ ) {
 	if ( rank_ == 1 ) {
-		static_cast<char*>( mem_ )[index_] = static_cast<char>( codePoint_.get() );
+		static_cast<yaal::u8_t*>( mem_ )[index_] = static_cast<yaal::u8_t>( codePoint_.get() );
 	} else if ( rank_ == 2 ) {
 		static_cast<yaal::u16_t*>( mem_ )[index_] = static_cast<yaal::u16_t>( codePoint_.get() );
 	} else {
@@ -842,26 +842,13 @@ void encode( code_point_t codePoint_, char*& dest_ ) {
 
 code_point_t decode_forward( char const*& ptr_ ) {
 	code_point_t character( static_cast<u8_t>( *ptr_ ) );
-	if ( ! ( *ptr_ & unicode::ENC_1_BYTES_MARK_MASK ) ) {
-	} else if ( ( *ptr_ & unicode::ENC_2_BYTES_MARK_MASK ) == unicode::ENC_2_BYTES_MARK_VALUE ) {
-		character &= unicode::ENC_2_BYTES_VALUE_MASK;
+	static u8_t const mask[] = { 0xff, unicode::ENC_2_BYTES_VALUE_MASK, unicode::ENC_3_BYTES_VALUE_MASK, unicode::ENC_4_BYTES_VALUE_MASK };
+	int tailLength( unicode::utf8_declared_length( *ptr_ ) - 1 );
+	character &= mask[tailLength];
+	for ( int i( 0 ); i < tailLength; ++ i ) {
 		character <<= 6;
 		++ ptr_;
 		character |= ( static_cast<u8_t>( *ptr_ ) & unicode::TAIL_BYTES_VALUE_MASK );
-	} else if ( ( *ptr_ & unicode::ENC_3_BYTES_MARK_MASK ) == unicode::ENC_3_BYTES_MARK_VALUE ) {
-		character &= unicode::ENC_3_BYTES_VALUE_MASK;
-		for ( int i( 0 ); i < 2; ++ i ) {
-			character <<= 6;
-			++ ptr_;
-			character |= ( static_cast<u8_t>( *ptr_ ) & unicode::TAIL_BYTES_VALUE_MASK );
-		}
-	} else {
-		character &= unicode::ENC_4_BYTES_VALUE_MASK;
-		for ( int i( 0 ); i < 3; ++ i ) {
-			character <<= 6;
-			++ ptr_;
-			character |= ( static_cast<u8_t>( *ptr_ ) & unicode::TAIL_BYTES_VALUE_MASK );
-		}
 	}
 	++ ptr_;
 	return ( character );

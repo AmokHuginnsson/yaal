@@ -95,6 +95,13 @@ HStreamInterface& HSynchronizedStream::do_output( bool val_ ) {
 	M_EPILOG
 }
 
+HStreamInterface& HSynchronizedStream::do_output( code_point_t val_ ) {
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_output( val_ ) );
+	M_EPILOG
+}
+
 HStreamInterface& HSynchronizedStream::do_output( char val_ ) {
 	M_PROLOG
 	HLock l( _mutex );
@@ -215,6 +222,13 @@ HStreamInterface& HSynchronizedStream::do_input( HString& val_ ) {
 }
 
 HStreamInterface& HSynchronizedStream::do_input( bool& val_ ) {
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_input( val_ ) );
+	M_EPILOG
+}
+
+HStreamInterface& HSynchronizedStream::do_input( code_point_t& val_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	return ( HStreamInterface::do_input( val_ ) );

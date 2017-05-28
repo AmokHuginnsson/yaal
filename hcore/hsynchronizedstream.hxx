@@ -68,6 +68,7 @@ protected:
 	virtual HStreamInterface& do_output( HString const& ) override;
 	virtual HStreamInterface& do_output( char const* ) override;
 	virtual HStreamInterface& do_output( bool ) override;
+	virtual HStreamInterface& do_output( code_point_t ) override;
 	virtual HStreamInterface& do_output( char ) override;
 	virtual HStreamInterface& do_output( char unsigned ) override;
 	virtual HStreamInterface& do_output( int short ) override;
@@ -86,6 +87,7 @@ protected:
 	virtual HStreamInterface& do_output( HManipulator const& ) override;
 	virtual HStreamInterface& do_input( HString& ) override;
 	virtual HStreamInterface& do_input( bool& ) override;
+	virtual HStreamInterface& do_input( code_point_t& ) override;
 	virtual HStreamInterface& do_input( char& ) override;
 	virtual HStreamInterface& do_input( char unsigned& ) override;
 	virtual HStreamInterface& do_input( int short& ) override;

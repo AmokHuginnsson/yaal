@@ -266,7 +266,7 @@ void HWidget::do_draw_label( void ) {
 	cons.mvprintf( _rowRaw, col, _label );
 	set_attr_shortcut();
 	cons.mvprintf( _rowRaw, col + _shortcutIndex,
-				"%c", _label[ _shortcutIndex ] );
+				"%C", _label[ _shortcutIndex ] );
 	set_attr_data();
 	if ( _labelPosition == LABEL::POSITION::SIDE_BY_SIDE ) {
 		_columnRaw += _labelLength;
