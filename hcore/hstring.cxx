@@ -912,17 +912,9 @@ static yaal::u8_t const RANK_BIT_MASK =  meta::obinary<001100000>::value;
 #undef SET_SIZE
 #define SET_SIZE( size ) \
 	do { \
-		( IS_INPLACE ? _mem[ ALLOC_FLAG_INDEX ] = ( _mem[ ALLOC_FLAG_INDEX ] & RANK_BIT_MASK ) | static_cast<char>( size ) : _len[ 1 ] = ( size ) ); \
+		( IS_INPLACE ? _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( ( _mem[ ALLOC_FLAG_INDEX ] & RANK_BIT_MASK ) | static_cast<char>( size ) ) : _len[ 1 ] = ( size ) ); \
 		if ( ( size ) == 0 ) { \
 			SET_RANK( 1 ); \
-		} \
-	} while ( 0 )
-#undef EXT_SET_SIZE
-#define EXT_SET_SIZE( base, size ) \
-	do { \
-		( EXT_IS_INPLACE( base ) ? base._mem[ ALLOC_FLAG_INDEX ] = ( base._mem[ ALLOC_FLAG_INDEX ] & RANK_BIT_MASK ) | static_cast<char>( size ) : base._len[ 1 ] = ( size ) ); \
-		if ( ( size ) == 0 ) { \
-			base._mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( base._mem[ ALLOC_FLAG_INDEX ] & ~RANK_BIT_MASK ); \
 		} \
 	} while ( 0 )
 #undef GET_ALLOC_BYTES
@@ -2770,7 +2762,6 @@ code_point_t HUTF8String::HIterator::operator * ( void ) const {
 
 #undef SET_ALLOC_BYTES
 #undef GET_ALLOC_BYTES
-#undef EXT_SET_SIZE
 #undef SET_SIZE
 #undef GET_SIZE
 #undef EXT_MEM_off
