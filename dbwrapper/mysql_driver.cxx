@@ -83,9 +83,16 @@ struct OMySQLResult {
 	MYSQL_ROW _row;
 	bool _randomAccess;
 	OMySQLResult( ODBLink& link_ )
-		: _link( link_ ), _useCount( 1 ), _statement( nullptr ), _params(),
-		_results(), _fields(), _buffer(), _result( nullptr ),
-		_row(), _randomAccess( false ) {
+		: _link( link_ )
+		, _useCount( 1 )
+		, _statement( nullptr )
+		, _params()
+		, _results()
+		, _fields()
+		, _buffer()
+		, _result( nullptr )
+		, _row()
+		, _randomAccess( false ) {
 		return;
 	}
 private:
@@ -263,8 +270,7 @@ M_EXPORT_SYMBOL void* query_execute( ODBLink& dbLink_, void* data_ ) {
 
 void mysql_query_free( void* data_ ) {
 	OMySQLResult* pq( static_cast<OMySQLResult*>( data_ ) );
-	M_ASSERT( pq->_useCount > 0 );
-	-- pq->_useCount;
+	M_ASSERT( pq->_useCount >= 0 );
 	if ( ! pq->_useCount ) {
 		if ( pq->_result ) {
 			::mysql_free_result( pq->_result );
@@ -276,14 +282,25 @@ void mysql_query_free( void* data_ ) {
 	}
 	return;
 }
+
 M_EXPORT_SYMBOL void query_free( ODBLink&, void* );
 M_EXPORT_SYMBOL void query_free( ODBLink&, void* data_ ) {
+	OMySQLResult* pq( static_cast<OMySQLResult*>( data_ ) );
+	M_ASSERT( pq->_useCount > 0 );
+	-- pq->_useCount;
 	mysql_query_free( data_ );
 	return;
 }
 
 M_EXPORT_SYMBOL void rs_free_cursor( void* );
 M_EXPORT_SYMBOL void rs_free_cursor( void* data_ ) {
+	OMySQLResult* pq( static_cast<OMySQLResult*>( data_ ) );
+	M_ASSERT( pq->_useCount > 0 );
+	-- pq->_useCount;
+	if ( pq->_result ) {
+		::mysql_free_result( pq->_result );
+		pq->_result = nullptr;
+	}
 	mysql_query_free( data_ );
 	return;
 }
