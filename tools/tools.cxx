@@ -64,7 +64,7 @@ double long yaal_strtold( HString const& str_, int* endIdx_ ) {
 namespace tools {
 
 HString _serialDevice_;
-HString _defaultEncoding_ = "ISO-8859-2";
+HString _defaultEncoding_ = "UTF-8";
 HSerial::SPEED _baudRate_ = HSerial::SPEED::B_115200;
 HSerial::flag_t _serialFlags_ = HSerial::flag_t( HSerial::FLAG::FLOW_CONTROL_HARDWARE ) | HSerial::FLAG::BITS_PER_BYTE_8;
 bool _ignoreSignalSIGINT_ = false;

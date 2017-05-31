@@ -86,5 +86,5 @@ check: $(SRCS) $(HDRS)
 	fi
 
 spell: $(SRCS) $(HDRS)
-	@cd $(DIR_ROOT) && codespell -e iso8859-2 -q 7 $(SRCS) $(HDRS)
+	@cd $(DIR_ROOT) && codespell -e UTF-8 -q 7 $(SRCS) $(HDRS)
 

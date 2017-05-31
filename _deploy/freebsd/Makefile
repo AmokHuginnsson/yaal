@@ -97,7 +97,7 @@ pre-install:
 	${CAT} pkg-plist.end >> $(PLIST)
 
 do-install:
-	@cd $(WRKSRC) && $(MAKE) $(BUILD_ENV) DEFAULT_TARGET=debug LC_CTYPE=pl_PL.ISO8859-2 test
+	@cd $(WRKSRC) && $(MAKE) $(BUILD_ENV) DEFAULT_TARGET=debug LC_CTYPE=pl_PL.UTF-8 test
 
 .include <bsd.port.mk>
 

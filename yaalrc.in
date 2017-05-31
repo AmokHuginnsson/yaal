@@ -100,9 +100,9 @@ kill_grace_period 1000
 child_kill_grace_period 1000
 
 # default_encoding
-# type: string, default: ISO-8859-2
+# type: string, default: UTF-8
 # specify default character encoding used in text documents
-default_encoding "ISO-8859-2"
+default_encoding "UTF-8"
 
 # huginn_max_call_stack_size
 # type: interpreter, default: 1024

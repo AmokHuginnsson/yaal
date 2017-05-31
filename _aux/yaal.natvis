@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-2"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 	<Type Name="yaal::hcore::HString">
 		<DisplayString Condition="(_mem[ALLOC_FLAG_INDEX] &amp; 128) == 0">{_mem}</DisplayString>
