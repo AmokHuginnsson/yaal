@@ -43,10 +43,6 @@ inline char const* basename( char const* x ) {
 }
 #endif /* #if ! defined( HAVE_BASENAME_ARG_CONST ) */
 
-#if ! defined( HAVE_STRCASESTR ) || ( HAVE_STRCASESTR == 0 )
-char* strcasestr( char const*, char const* );
-#endif /* #if ! defined( HAVE_STRCASESTR ) || ( HAVE_STRCASESTR == 0 ) */
-
 #if ! defined( HAVE_DECL_TEMP_FAILURE_RETRY ) || ( HAVE_DECL_TEMP_FAILURE_RETRY == 0 )
 #define TEMP_FAILURE_RETRY(x) (x)
 #endif /* #if ! defined( HAVE_DECL_TEMP_FAILURE_RETRY ) || ( HAVE_DECL_TEMP_FAILURE_RETRY == 0 ) */

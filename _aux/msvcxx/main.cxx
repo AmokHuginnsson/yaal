@@ -311,7 +311,7 @@ bool get_system_account_name( int id_, char* buf_, int size_ ) {
 		if ( ::ConvertSidToStringSid( sid, &sidStrBuffer ) ) {
 			HString sidStr( sidStrBuffer );
 			::LocalFree( sidStrBuffer );
-			sidStr.erase( sidStr.find_last( '-' ) + 1 );
+			sidStr.erase( sidStr.find_last( '-'_ycp ) + 1 );
 			sidStr += id_;
 			PSID newSid( nullptr );
 			HUTF8String utf8( sidStr );

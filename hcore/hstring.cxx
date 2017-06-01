@@ -3052,19 +3052,19 @@ bool is_letter( code_point_t char_ ) {
 }
 
 bool is_upper( code_point_t char_ ) {
-	return ( ::std::isupper( static_cast<int>( char_.get() ) ) );
+	return ( ::std::isupper( static_cast<int>( char_.get() ) ) ? true : false );
 }
 
 bool is_lower( code_point_t char_ ) {
-	return ( ::std::islower( static_cast<int>( char_.get() ) ) );
+	return ( ::std::islower( static_cast<int>( char_.get() ) ) ? true : false );
 }
 
 bool is_alpha( code_point_t char_ ) {
-	return ( ::std::isalpha( static_cast<int>( char_.get() ) ) );
+	return ( ::std::isalpha( static_cast<int>( char_.get() ) ) ? true : false );
 }
 
 bool is_alnum( code_point_t char_ ) {
-	return ( ::std::isalnum( static_cast<int>( char_.get() ) ) );
+	return ( ::std::isalnum( static_cast<int>( char_.get() ) ) ? true : false );
 }
 
 bool is_ascii( code_point_t char_ ) {

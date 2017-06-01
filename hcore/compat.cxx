@@ -83,29 +83,6 @@ int long strnlen( char const* str_, int long maxLen_ ) {
 }
 #endif /* #if ! defined( HAVE_STRNLEN ) || ( HAVE_STRNLEN == 0 ) */
 
-#if ! defined( HAVE_STRCASESTR ) || ( HAVE_STRCASESTR == 0 )
-#include <cstring>
-namespace yaal {
-namespace hcore {
-namespace string_helper {
-int long kmpcasesearch( char const*, int long, char const*, int long );
-}
-}
-}
-char* strcasestr( char const* haystack, char const* needle ) {
-	int long idx(
-		::yaal::hcore::string_helper::kmpcasesearch(
-			haystack,
-			static_cast<int long>( ::std::strlen( haystack ) ),
-			needle,
-			static_cast<int long>( ::std::strlen( needle ) )
-		)
-	);
-	return ( idx >= 0 ? const_cast<char*>( haystack ) + idx : 0 );
-}
-
-#endif /* #if ! defined( HAVE_STRCASESTR ) || ( HAVE_STRCASESTR == 0 ) */
-
 #if defined( HAVE_GETHOSTBYNAME_R )
 #if ! defined( HAVE_GNU_GETHOSTBYNAME_R )
 #include <cstdlib>

@@ -416,7 +416,7 @@ AC_LANG([C++])
 if test ["${ac_cv_type_sighandler_t}"] = ["no"] -a ["${ac_cv_type___sighandler_t}"] = ["no"] -a ["x${HOST_OS_TYPE}"] != ["xDarwin"] ; then
 	AC_CHECK_TYPES([SIG_PF],[],[AC_MSG_ERROR([Cannot continue without signal handler type definition.])],[#include <signal.h>])
 fi
-AC_CHECK_FUNCS([clock_gettime timer_create getline memrchr strnlen getaddrinfo getnameinfo gethostbyname_r gethostbyaddr_r strcasestr pthread_setname_np pthread_set_name_np prctl])
+AC_CHECK_FUNCS([clock_gettime timer_create getline memrchr strnlen getaddrinfo getnameinfo gethostbyname_r gethostbyaddr_r pthread_setname_np pthread_set_name_np prctl])
 AC_CHECK_DECLS([strtold, ERR],[],[],[#include <cstdlib>])
 AC_CHECK_DECLS([deflateInit],[],[],[#include <zlib.h>])
 AC_CHECK_DECLS([RLIMIT_AS, RLIMIT_NPROC],[],[],[#include <sys/resource.h>])
