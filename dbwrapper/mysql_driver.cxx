@@ -45,6 +45,7 @@ Copyright:
 #include "hcore/memory.hxx"
 #include "dbwrapper/db_driver.hxx"
 #include "hcore/hprogramoptionshandler.hxx"
+#include "hcore/hregex.hxx"
 #include "hcore/hcore.hxx"
 #include "hcore/hlog.hxx"
 
@@ -199,6 +200,12 @@ void* mysql_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 	OMySQLResult* query( new ( memory::yaal ) OMySQLResult( dbLink_ ) );
 	query->_statement = mysql_stmt_init( static_cast<MYSQL*>( dbLink_._conn ) );
 	query->_randomAccess = false;
+	HRegex isSelect( "\\bSELECT\\b", HRegex::COMPILE::IGNORE_CASE );
+	HRegex isInsert( "\\bINSERT\\b", HRegex::COMPILE::IGNORE_CASE );
+	if ( isSelect.matches( query_ ) && ! isInsert.matches( query_ ) ) {
+		int long unsigned type( CURSOR_TYPE_READ_ONLY );
+		mysql_stmt_attr_set( query->_statement, STMT_ATTR_CURSOR_TYPE, static_cast<void*>( &type ) );
+	}
 	if ( ! mysql_stmt_prepare( query->_statement, query_, static_cast<int unsigned>( ::strlen( query_ ) ) ) ) {
 		query->_result = mysql_stmt_result_metadata( query->_statement );
 		int numFields( query->_result ? static_cast<int>( mysql_num_fields( query->_result ) ) : 0 );
