@@ -48,7 +48,7 @@ int long hash<HString>::operator () ( HString const& string_ ) const {
 	int long h( 0 );
 	for ( code_point_t c : string_ ) {
 		h *= 101;
-		h += c.get();
+		h += static_cast<int>( c.get() );
 	}
 	return ( h );
 }
