@@ -328,9 +328,9 @@ inline void move( void* dest_, int destRank_, int long destOffset_, void const* 
 	if ( ( destEnd < srcStart ) || ( srcEnd < destStart ) ) {
 		copy( dest_, destRank_, destOffset_, src_, srcRank_, srcOffset_, size_ );
 	} else if ( srcStart == destStart ) {
-		if ( destRank_ <= srcRank_ ) {
+		if ( destRank_ < srcRank_ ) {
 			copy( dest_, destRank_, destOffset_, src_, srcRank_, srcOffset_, size_ );
-		} else {
+		} else if ( destRank_ > srcRank_ ) {
 			copy_backward( dest_, destRank_, destOffset_, src_, srcRank_, srcOffset_, size_ );
 		}
 	} else {
@@ -752,7 +752,7 @@ OUTF8StringStats get_string_stats( char const* str_, int long size_ ) {
 	int charBytesLeft( 0 );
 	int rank( 1 );
 	char const* p( str_ );
-	while( *p && ( byteCount < size_ ) ) {
+	while( ( byteCount < size_ ) && *p ) {
 		if ( charBytesLeft == 0 ) {
 			if ( ! ( *p & unicode::ENC_1_BYTES_MARK_MASK ) ) {
 				++ characterCount;
