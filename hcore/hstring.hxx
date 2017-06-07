@@ -311,13 +311,13 @@ public:
 	 * \return character at given position in this string.
 	 */
 	HString operator + ( HString const& ) const;
-	code_point_t operator[] ( int position ) const;
+	code_point_t const operator[] ( int position ) const;
 	/*! \brief Get character at given position.
 	 *
 	 * \param position - index of a position to get character for.
 	 * \return character at given position in this string.
 	 */
-	code_point_t operator[] ( int long position ) const;
+	code_point_t const operator[] ( int long position ) const;
 	/*! \brief Check if string is empty (has zero length).
 	 *
 	 * \return True iff this string is empty.

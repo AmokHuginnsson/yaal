@@ -1378,11 +1378,11 @@ HString HString::operator + ( HString const& other_ ) const {
 	M_EPILOG
 }
 
-code_point_t HString::operator[] ( int index_ ) const {
+code_point_t const HString::operator[] ( int index_ ) const {
 	return ( operator[] ( static_cast<int long>( index_ ) ) );
 }
 
-code_point_t HString::operator[] ( int long index_ ) const {
+code_point_t const HString::operator[] ( int long index_ ) const {
 	M_PROLOG
 	if ( ( index_ < 0 ) || ( index_ >= GET_SIZE ) ) {
 		M_THROW( err_msg( string_helper::INDEX_OOB ), index_ );
