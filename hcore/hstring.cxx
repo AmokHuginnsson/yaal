@@ -50,9 +50,11 @@ namespace yaal {
 
 namespace hcore {
 
-namespace string_helper {
+/*! \brief HString class helpers, utility functions.
+ */
+namespace {
 
-enum {
+enum ERROR {
 	OK = 0,
 	NULL_PTR,
 	UNINITIALIZED,
@@ -61,14 +63,6 @@ enum {
 	BAD_OFFSET,
 	OVERFLOW
 };
-
-/*! \brief HString class helpers, utility functions.
- */
-int long strrnspn( char const*, char const*, int long );
-
-}
-
-namespace {
 
 template<typename iterator_t, typename U>
 inline void copy_n_safe_cast( iterator_t src_, int long size_, U* dst_ ) {
@@ -1385,7 +1379,7 @@ code_point_t const HString::operator[] ( int index_ ) const {
 code_point_t const HString::operator[] ( int long index_ ) const {
 	M_PROLOG
 	if ( ( index_ < 0 ) || ( index_ >= GET_SIZE ) ) {
-		M_THROW( err_msg( string_helper::INDEX_OOB ), index_ );
+		M_THROW( err_msg( ERROR::INDEX_OOB ), index_ );
 	}
 	return ( adaptive::get( MEM, GET_RANK, index_ ) );
 	M_EPILOG
@@ -1395,7 +1389,7 @@ void HString::set_at( int long index_, code_point_t char_ ) {
 	M_PROLOG
 	int long curSize( GET_SIZE );
 	if ( ( index_ < 0 ) || ( index_ >= curSize ) ) {
-		M_THROW( err_msg( string_helper::INDEX_OOB ), index_ );
+		M_THROW( err_msg( ERROR::INDEX_OOB ), index_ );
 	}
 	int rank( GET_RANK );
 	int charRank( unicode::rank( char_ ) );
@@ -1508,7 +1502,7 @@ bool operator <= ( char const* left_, HString const& right_ ) {
 
 code_point_t HString::front( void ) const {
 	if ( GET_SIZE == 0 ) {
-		M_THROW( err_msg( string_helper::INDEX_OOB ), 0 );
+		M_THROW( err_msg( ERROR::INDEX_OOB ), 0 );
 	}
 	return ( adaptive::get( MEM, GET_RANK, 0 ) );
 }
@@ -1516,7 +1510,7 @@ code_point_t HString::front( void ) const {
 code_point_t HString::back( void ) const {
 	int long s( GET_SIZE );
 	if ( s == 0 ) {
-		M_THROW( err_msg( string_helper::INDEX_OOB ), s - 1 );
+		M_THROW( err_msg( ERROR::INDEX_OOB ), s - 1 );
 	}
 	return ( adaptive::get( MEM, GET_RANK, s - 1 ) );
 }
@@ -1619,10 +1613,10 @@ HString& HString::assign( HString const& str_, int long offset_, int long length
 		length_ = MAX_STRING_LENGTH;
 	}
 	if ( length_ < 0 ) {
-		M_THROW( err_msg( string_helper::BAD_LENGTH ), length_ );
+		M_THROW( err_msg( ERROR::BAD_LENGTH ), length_ );
 	}
 	if ( offset_ < 0 ) {
-		M_THROW( err_msg( string_helper::BAD_OFFSET ), offset_ );
+		M_THROW( err_msg( ERROR::BAD_OFFSET ), offset_ );
 	}
 	int long s( EXT_GET_SIZE( str_ ) );
 	if ( offset_ > s ) {
@@ -1640,10 +1634,10 @@ HString& HString::assign( HString const& str_, int long offset_, int long length
 HString& HString::assign( char const* data_, int long length_ ) {
 	M_PROLOG
 	if ( ! data_ ) {
-		M_THROW( err_msg(  string_helper::NULL_PTR  ), errno );
+		M_THROW( err_msg(  ERROR::NULL_PTR  ), errno );
 	}
 	if ( length_ < 0 ) {
-		M_THROW( err_msg(  string_helper::BAD_LENGTH  ), length_ );
+		M_THROW( err_msg(  ERROR::BAD_LENGTH  ), length_ );
 	}
 	int long len( static_cast<int long>( ::strnlen( data_, static_cast<size_t>( length_ ) ) ) );
 	clear();
@@ -1655,10 +1649,10 @@ HString& HString::assign( char const* data_, int long length_ ) {
 HString& HString::assign( const_iterator first_, const_iterator last_ ) {
 	M_PROLOG
 	if ( ! ( first_._owner && last_._owner ) ) {
-		M_THROW( err_msg(  string_helper::NULL_PTR  ), errno );
+		M_THROW( err_msg(  ERROR::NULL_PTR  ), errno );
 	}
 	if ( last_ < first_ ) {
-		M_THROW( err_msg(  string_helper::BAD_LENGTH  ), last_ - first_ );
+		M_THROW( err_msg(  ERROR::BAD_LENGTH  ), last_ - first_ );
 	}
 	return ( assign( *first_._owner, first_._index, last_._index - first_._index ) );
 	M_EPILOG
@@ -1667,7 +1661,7 @@ HString& HString::assign( const_iterator first_, const_iterator last_ ) {
 HString& HString::assign( int long size_, code_point_t fill_ ) {
 	M_PROLOG
 	if ( size_ < 0 ) {
-		M_THROW( err_msg( string_helper::BAD_LENGTH ), size_ );
+		M_THROW( err_msg( ERROR::BAD_LENGTH ), size_ );
 	}
 	int rank( unicode::rank( fill_ ) );
 	clear();
@@ -1896,23 +1890,23 @@ HString& HString::replace( int long pos_, int long size_, HString const& replace
 void HString::replace_check( int long thisOffset_, int long onto_, int long srcOffset_, int long srcUsedSize_, int long srcRealSize_ ) {
 	M_PROLOG
 	if ( srcOffset_ < 0 ) {
-		M_THROW( err_msg( string_helper::BAD_OFFSET ), srcOffset_ );
+		M_THROW( err_msg( ERROR::BAD_OFFSET ), srcOffset_ );
 	}
 	if ( onto_ < 0 ) {
-		M_THROW( err_msg( string_helper::BAD_LENGTH ), onto_ );
+		M_THROW( err_msg( ERROR::BAD_LENGTH ), onto_ );
 	}
 	if ( srcUsedSize_ < 0 ) {
-		M_THROW( err_msg( string_helper::BAD_LENGTH ), srcUsedSize_ );
+		M_THROW( err_msg( ERROR::BAD_LENGTH ), srcUsedSize_ );
 	}
 	if ( thisOffset_ < 0 ) {
-		M_THROW( err_msg( string_helper::BAD_OFFSET ), thisOffset_ );
+		M_THROW( err_msg( ERROR::BAD_OFFSET ), thisOffset_ );
 	}
 	int long oldSize( GET_SIZE );
 	if ( ( thisOffset_ + onto_ ) > oldSize ) {
-		M_THROW( err_msg( string_helper::OVERFLOW ), thisOffset_ + onto_ );
+		M_THROW( err_msg( ERROR::OVERFLOW ), thisOffset_ + onto_ );
 	}
 	if ( srcOffset_ > srcRealSize_ ) {
-		M_THROW( err_msg( string_helper::BAD_OFFSET ), srcOffset_ );
+		M_THROW( err_msg( ERROR::BAD_OFFSET ), srcOffset_ );
 	}
 	return;
 	M_EPILOG
@@ -2149,10 +2143,10 @@ HString& HString::fill( code_point_t filler_, int long offset_, int long count_ 
 		count_ = ( GET_SIZE - offset_ );
 	}
 	if ( count_ < 0 ) {
-		M_THROW( err_msg( string_helper::BAD_LENGTH ), count_ );
+		M_THROW( err_msg( ERROR::BAD_LENGTH ), count_ );
 	}
 	if ( ( offset_ < 0 ) || ( offset_ > GET_SIZE ) ) {
-		M_THROW( err_msg( string_helper::BAD_OFFSET ), offset_ );
+		M_THROW( err_msg( ERROR::BAD_OFFSET ), offset_ );
 	}
 	if ( filler_.get() ) {
 		int rank( max( GET_RANK, unicode::rank( filler_ ) ) );
@@ -3069,25 +3063,6 @@ bool is_alnum( code_point_t char_ ) {
 
 bool is_ascii( code_point_t char_ ) {
 	return ( char_ <= unicode::UTF8_MAX_1_BYTE_CODE_POINT );
-}
-
-namespace string_helper {
-
-int long strrnspn( char const* buffer_, char const* skipSet_,
-		int long length_ ) {
-	M_PROLOG
-	int long skipSetSize( static_cast<int long>( ::std::strlen( skipSet_ ) ) );
-	int long index( length_ - 1 );
-	while ( index >= 0 ) {
-		if ( ! ::std::memchr( skipSet_, buffer_[ index ], static_cast<size_t>( skipSetSize ) ) ) {
-			return ( index );
-		}
-		-- index;
-	}
-	return ( length_ );
-	M_EPILOG
-}
-
 }
 
 inline int to_lower( code_point_t codePoint_ ) {
