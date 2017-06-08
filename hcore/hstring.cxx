@@ -272,13 +272,13 @@ inline void copy( void* dest_, int destRank_, int long destOffset_, void const* 
 			case ( 4 * 4 + 2 ): /* UCS-2 to UCS-4 */ {
 				yaal::copy_n( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u32_t*>( dest_ ) + destOffset_ );
 			} break;
-			case ( 4 * 1 + 2 ): /* UCS-2 to UCS-1 */ {
+			case ( 4 * 1 + 2 ): /* UCS-2 to UCS-1 (Used only in down-ranking through HString::reserve().) */ {
 				copy_n_safe_cast( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
 			} break;
-			case ( 4 * 1 + 4 ): /* UCS-4 to UCS-1 */ {
+			case ( 4 * 1 + 4 ): /* UCS-4 to UCS-1 (Used only in down-ranking through HString::reserve().) */ {
 				copy_n_safe_cast( static_cast<yaal::u32_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
 			} break;
-			case ( 4 * 2 + 4 ): /* UCS-4 to UCS-2 */ {
+			case ( 4 * 2 + 4 ): /* UCS-4 to UCS-2 (Used only in down-ranking through HString::reserve().) */ {
 				copy_n_safe_cast( static_cast<yaal::u32_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u16_t*>( dest_ ) + destOffset_ );
 			} break;
 		}
@@ -286,58 +286,50 @@ inline void copy( void* dest_, int destRank_, int long destOffset_, void const* 
 	return;
 }
 
+/* Used only in up-ranking through HString::reserve(). */
 inline void copy_backward( void* dest_, int destRank_, int long destOffset_, void const* src_, int srcRank_, int long srcOffset_, int long size_ ) {
-	if ( destRank_ == srcRank_ ) {
-		::memcpy( static_cast<char*>( dest_ ) + destOffset_ * destRank_, static_cast<char const*>( src_ ) + srcOffset_ * srcRank_ /* == destRank_ */, static_cast<size_t>( size_ * destRank_ ) );
-	} else {
-		switch ( 4 * destRank_ + srcRank_ ) {
-			case ( 4 * 2 + 1 ): /* UCS-1 to UCS-2 */ {
-				copy_n_cast_backward( static_cast<yaal::u8_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u16_t*>( dest_ ) + destOffset_ );
-			} break;
-			case ( 4 * 4 + 1 ): /* UCS-1 to UCS-4 */ {
-				copy_n_cast_backward( static_cast<yaal::u8_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u32_t*>( dest_ ) + destOffset_ );
-			} break;
-			case ( 4 * 4 + 2 ): /* UCS-2 to UCS-4 */ {
-				copy_n_cast_backward( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u32_t*>( dest_ ) + destOffset_ );
-			} break;
-			case ( 4 * 1 + 2 ): /* UCS-2 to UCS-1 */ {
-				copy_n_cast_backward( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
-			} break;
-			case ( 4 * 1 + 4 ): /* UCS-4 to UCS-1 */ {
-				copy_n_cast_backward( static_cast<yaal::u32_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u8_t*>( dest_ ) + destOffset_ );
-			} break;
-			case ( 4 * 2 + 4 ): /* UCS-4 to UCS-2 */ {
-				copy_n_cast_backward( static_cast<yaal::u32_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u16_t*>( dest_ ) + destOffset_ );
-			} break;
-		}
+	switch ( 4 * destRank_ + srcRank_ ) {
+		case ( 4 * 2 + 1 ): /* UCS-1 to UCS-2 */ {
+			copy_n_cast_backward( static_cast<yaal::u8_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u16_t*>( dest_ ) + destOffset_ );
+		} break;
+		case ( 4 * 4 + 1 ): /* UCS-1 to UCS-4 */ {
+			copy_n_cast_backward( static_cast<yaal::u8_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u32_t*>( dest_ ) + destOffset_ );
+		} break;
+		case ( 4 * 4 + 2 ): /* UCS-2 to UCS-4 */ {
+			copy_n_cast_backward( static_cast<yaal::u16_t const*>( src_ ) + srcOffset_, size_, static_cast<yaal::u32_t*>( dest_ ) + destOffset_ );
+		} break;
+		case ( 4 * 1 + 2 ): /* UCS-2 to UCS-1 */
+		case ( 4 * 1 + 4 ): /* UCS-4 to UCS-1 */
+		case ( 4 * 2 + 4 ): /* UCS-4 to UCS-2 */ {
+			M_ASSERT( !"Bad code path - overwrite while shrinking!"[0] );
+		} break;
+		default: {
+			M_ASSERT( !"Bad code path - backward copy instead of plain copy!"[0] );
+		} break;
 	}
 	return;
 }
 
-inline void move( void* dest_, int destRank_, int long destOffset_, void const* src_, int srcRank_, int long srcOffset_, int long size_ ) {
-	void* destStart( static_cast<char*>( dest_ ) + destOffset_ * destRank_ );
-	void* destEnd( static_cast<char*>( destStart ) + size_ * destRank_ );
-	void const* srcStart( static_cast<char const*>( src_ ) + srcOffset_ * srcRank_ );
-	void const* srcEnd( static_cast<char const*>( srcStart ) + size_ * srcRank_ );
+inline void move( void* dest_, int long destOffset_, void const* src_, int long srcOffset_, int rank_, int long size_ ) {
+	void* destStart( static_cast<char*>( dest_ ) + destOffset_ * rank_ );
+	void* destEnd( static_cast<char*>( destStart ) + size_ * rank_ );
+	void const* srcStart( static_cast<char const*>( src_ ) + srcOffset_ * rank_ );
+	void const* srcEnd( static_cast<char const*>( srcStart ) + size_ * rank_ );
 	if ( ( destEnd < srcStart ) || ( srcEnd < destStart ) ) {
-		copy( dest_, destRank_, destOffset_, src_, srcRank_, srcOffset_, size_ );
-	} else if ( srcStart == destStart ) {
-		if ( destRank_ < srcRank_ ) {
-			copy( dest_, destRank_, destOffset_, src_, srcRank_, srcOffset_, size_ );
-		} else if ( destRank_ > srcRank_ ) {
-			copy_backward( dest_, destRank_, destOffset_, src_, srcRank_, srcOffset_, size_ );
-		}
-	} else {
+		/* Memory ranges do not overlap. */
+		copy( dest_, rank_, destOffset_, src_, rank_, srcOffset_, size_ );
+	} else if ( srcStart != destStart ) {
+		/* Memory ranges do overlap. */
 		typedef HTLS<HChunk> cache_t;
 		static cache_t _cache_;
 		HChunk& cache( *_cache_ );
 		int long cacheSize( cache.get_size() );
-		if ( ( destRank_ * size_ ) > cacheSize ) {
-			cache.realloc( destRank_ * size_ );
+		if ( ( rank_ * size_ ) > cacheSize ) {
+			cache.realloc( rank_ * size_ );
 		}
 		void* mem( cache.raw() );
-		copy( mem, destRank_, 0, src_, srcRank_, srcOffset_, size_ );
-		copy( dest_, destRank_, destOffset_, mem, destRank_, 0, size_ );
+		copy( mem, rank_, 0, src_, rank_, srcOffset_, size_ );
+		copy( dest_, rank_, destOffset_, mem, rank_, 0, size_ );
 	}
 	return;
 }
@@ -1112,7 +1104,7 @@ void HString::from_utf8( int long offset_, int long onto_, const char* str_, int
 	int rank( max( GET_RANK, s._rank ) );
 	int long newSize( ( oldSize - onto_ ) + s._characterCount );
 	resize( newSize, rank );
-	adaptive::move( MEM, rank, offset_ + s._characterCount, MEM, rank, offset_ + onto_, ( oldSize - offset_ ) - onto_ );
+	adaptive::move( MEM, offset_ + s._characterCount, MEM, offset_ + onto_, rank, ( oldSize - offset_ ) - onto_ );
 	switch ( rank ) {
 		case ( 1 ): {
 			utf8::decode( static_cast<yaal::u8_t*>( MEM ) + offset_, str_, s._characterCount );
@@ -1862,20 +1854,20 @@ HString& HString::replace( HString const& pattern_, HString const& with_ ) {
 	int long extraOffset( 0 );
 	if ( newSize > oldSize ) {
 		extraOffset = newSize - oldSize;
-		adaptive::move( dst, rank, extraOffset, dst, rank, 0, oldSize );
+		adaptive::move( dst, extraOffset, dst, 0, rank, oldSize );
 	}
 	int long srcOffset( 0 );
 	int long dstOffset( 0 );
 	for ( int long offset : patternOffsets ) {
 		int long unchangedLength( offset - srcOffset );
-		adaptive::move( dst, rank, dstOffset, dst, rank, srcOffset + extraOffset, unchangedLength );
+		adaptive::move( dst, dstOffset, dst, srcOffset + extraOffset, rank, unchangedLength );
 		dstOffset += unchangedLength;
 		srcOffset += unchangedLength;
 		adaptive::copy( dst, rank, dstOffset, src, withRank, 0, lenWith );
 		dstOffset += lenWith;
 		srcOffset += lenPattern;
 	}
-	adaptive::move( dst, rank, dstOffset, dst, rank, srcOffset + extraOffset, oldSize - srcOffset );
+	adaptive::move( dst, dstOffset, dst, srcOffset + extraOffset, rank, oldSize - srcOffset );
 	SET_SIZE( newSize );
 	return ( *this );
 	M_EPILOG
@@ -1926,7 +1918,7 @@ HString& HString::replace( int long thisOffset_, int long onto_, HString const& 
 	int rank( GET_RANK );
 	int long newSize( oldSize + ( srcUsedSize_ - onto_ ) );
 	resize( newSize, rank = max( rank, withRank ) );
-	adaptive::move( MEM, rank, thisOffset_ + srcUsedSize_, MEM, rank, thisOffset_ + onto_, oldSize - ( thisOffset_ + onto_ ) );
+	adaptive::move( MEM, thisOffset_ + srcUsedSize_, MEM, thisOffset_ + onto_, rank, oldSize - ( thisOffset_ + onto_ ) );
 	adaptive::copy( MEM, rank, thisOffset_, EXT_MEM( replacement_ ), withRank, srcOffset_, srcUsedSize_ );
 	return ( *this );
 	M_EPILOG
@@ -1940,7 +1932,7 @@ HString& HString::replace( int long pos_, int long size_, int long count_, code_
 	int rank( GET_RANK );
 	int long newSize( oldSize + ( count_ - size_ ) );
 	resize( newSize, rank = max( rank, withRank ) );
-	adaptive::move( MEM, rank, pos_ + count_, MEM, rank, pos_ + size_, oldSize - ( pos_ + size_ ) );
+	adaptive::move( MEM, pos_ + count_, MEM, pos_ + size_, rank, oldSize - ( pos_ + size_ ) );
 	adaptive::fill( MEM, rank, pos_, count_, value_ );
 	return ( *this );
 	M_EPILOG
@@ -2104,7 +2096,7 @@ HString& HString::shift_left( int long shift_ ) {
 		if ( shift_ < oldSize ) {
 			int rank( GET_RANK );
 			int long newSize( oldSize - shift_ );
-			adaptive::move( MEM, rank, 0, MEM, rank, shift_, newSize );
+			adaptive::move( MEM, 0, MEM, shift_, rank, newSize );
 			SET_SIZE( newSize );
 		} else {
 			clear();
@@ -2124,7 +2116,7 @@ HString& HString::shift_right( int long shift_, code_point_t filler_ ) {
 		int long newSize( oldSize + shift_ );
 		int rank( max( GET_RANK, unicode::rank( filler_ ) ) );
 		resize( newSize, rank );
-		adaptive::move( MEM, rank, shift_, MEM, rank, 0, oldSize );
+		adaptive::move( MEM, shift_, MEM, 0, rank, oldSize );
 		/* using SET_SIZE twice is not a bug or mistake,
 		 * fill() depends on size and modifies it
 		 * so it must have new size before and we need to
@@ -2186,7 +2178,7 @@ HString& HString::erase( int long from_, int long length_ ) {
 	if ( ( length_ > 0 ) && ( from_ < GET_SIZE ) ) {
 		int rank( GET_RANK );
 		int long oldSize( GET_SIZE );
-		adaptive::move( MEM, rank, from_, MEM, rank, from_ + length_, oldSize - ( from_ + length_ ) );
+		adaptive::move( MEM, from_, MEM, from_ + length_, rank, oldSize - ( from_ + length_ ) );
 		SET_SIZE( GET_SIZE - length_ );
 	}
 	return ( *this );
