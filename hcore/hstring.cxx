@@ -312,25 +312,8 @@ inline void copy_backward( void* dest_, int destRank_, int long destOffset_, voi
 
 inline void move( void* dest_, int long destOffset_, void const* src_, int long srcOffset_, int rank_, int long size_ ) {
 	void* destStart( static_cast<char*>( dest_ ) + destOffset_ * rank_ );
-	void* destEnd( static_cast<char*>( destStart ) + size_ * rank_ );
 	void const* srcStart( static_cast<char const*>( src_ ) + srcOffset_ * rank_ );
-	void const* srcEnd( static_cast<char const*>( srcStart ) + size_ * rank_ );
-	if ( ( destEnd < srcStart ) || ( srcEnd < destStart ) ) {
-		/* Memory ranges do not overlap. */
-		copy( dest_, rank_, destOffset_, src_, rank_, srcOffset_, size_ );
-	} else if ( srcStart != destStart ) {
-		/* Memory ranges do overlap. */
-		typedef HTLS<HChunk> cache_t;
-		static cache_t _cache_;
-		HChunk& cache( *_cache_ );
-		int long cacheSize( cache.get_size() );
-		if ( ( rank_ * size_ ) > cacheSize ) {
-			cache.realloc( rank_ * size_ );
-		}
-		void* mem( cache.raw() );
-		copy( mem, rank_, 0, src_, rank_, srcOffset_, size_ );
-		copy( dest_, rank_, destOffset_, mem, rank_, 0, size_ );
-	}
+	::memmove( destStart, srcStart, static_cast<size_t>( rank_ * size_ ) );
 	return;
 }
 
