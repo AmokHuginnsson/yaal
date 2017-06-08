@@ -154,7 +154,7 @@ AC_CHECK_LIB([z],[deflateEnd],,[AC_MSG_ERROR([Cannot continue without zlib libra
 PKG_CHECK_MODULES(XSLT, [libxslt],,[AC_MSG_ERROR([Cannot continue without XSLT library.])])
 PKG_CHECK_MODULES(EXSLT, [libexslt],,[AC_MSG_ERROR([Cannot continue without EXSLT library.])])
 AC_SEARCH_LIBS([dlopen],[dl],,[AC_MSG_ERROR([Cannot continue without dynamic dynamic linker library.])]) TOOLS_LIBS="${TOOLS_LIBS} ${LIBS}" LIBS=""
-AC_CHECK_LIB([ncurses],[initscr],,[AC_MSG_ERROR([Cannot continue without ncurses library.])]) LIBS=""
+AC_SEARCH_LIBS([initscr],[ncursesw ncurses],,[AC_MSG_ERROR([Cannot continue without ncurses library.])]) HCONSOLE_LIBS="${HCONSOLE_LIBS} ${LIBS}" LIBS=""
 AC_CHECK_LIB([tinfo],[curs_set]) HCONSOLE_LIBS="${HCONSOLE_LIBS} ${LIBS}" LIBS=""
 AC_CHECK_LIB([gpm],[Gpm_Open]) HCONSOLE_LIBS="${HCONSOLE_LIBS} ${LIBS}" LIBS=""
 

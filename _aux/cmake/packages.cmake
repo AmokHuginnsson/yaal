@@ -4,3 +4,5 @@ find_package( LibXslt REQUIRED )
 find_package( OpenSSL REQUIRED )
 find_package( ZLIB REQUIRED )
 find_package( Curses REQUIRED )
+string( REPLACE "libcurses." "libncursesw." CURSES_LIBRARIES "${CURSES_LIBRARIES}" )
+

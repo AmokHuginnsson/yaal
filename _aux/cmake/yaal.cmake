@@ -345,7 +345,7 @@ else ( CMAKE_HOST_WIN32 )
 	target_link_libraries( hcore ${OPENSSL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${HCORE_LIBS} nsl )
 	target_link_libraries( tools hcore ${LIBXML2_LIBRARIES} ${LIBXSLT_LIBRARIES} exslt dl z )
 	target_link_libraries( dbwrapper tools hcore )
-	target_link_libraries( hconsole tools hcore ncurses gpm )
+	target_link_libraries( hconsole tools hcore ${CURSES_LIBRARIES} gpm )
 	target_link_libraries( hdata hconsole dbwrapper tools hcore )
 	add_custom_command(
 		OUTPUT ${HEADER_TARGET}

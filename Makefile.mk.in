@@ -93,9 +93,9 @@ LIBS_tools     = $(LIBS_BASE) -l$(LIB_NAME)_hcore$(LIB_INFIX) -lpthread -lz @RDY
 DEPS_dbwrapper = $(TARGET_hcore) $(TARGET_tools)
 LIBS_dbwrapper = $(LIBS_BASE) -l$(LIB_NAME)_tools$(LIB_INFIX) -l$(LIB_NAME)_hcore$(LIB_INFIX) $(HCORE_LIBS)
 DEPS_hconsole  = $(TARGET_hcore) $(TARGET_tools)
-LIBS_hconsole  = $(LIBS_BASE) -l$(LIB_NAME)_tools$(LIB_INFIX) -l$(LIB_NAME)_hcore$(LIB_INFIX) -lncurses @HCONSOLE_LIBS@ $(HCORE_LIBS)
+LIBS_hconsole  = $(LIBS_BASE) -l$(LIB_NAME)_tools$(LIB_INFIX) -l$(LIB_NAME)_hcore$(LIB_INFIX) @HCONSOLE_LIBS@ $(HCORE_LIBS)
 DEPS_hdata     = $(TARGET_dbwrapper) $(TARGET_hconsole)
-LIBS_hdata     = $(LIBS_BASE) -l$(LIB_NAME)_hconsole$(LIB_INFIX) -l$(LIB_NAME)_dbwrapper$(LIB_INFIX) -l$(LIB_NAME)_tools$(LIB_INFIX) -l$(LIB_NAME)_hcore$(LIB_INFIX) -lncurses $(HCORE_LIBS)
+LIBS_hdata     = $(LIBS_BASE) -l$(LIB_NAME)_hconsole$(LIB_INFIX) -l$(LIB_NAME)_dbwrapper$(LIB_INFIX) -l$(LIB_NAME)_tools$(LIB_INFIX) -l$(LIB_NAME)_hcore$(LIB_INFIX) @HCONSOLE_LIBS@ $(HCORE_LIBS)
 
 DEPS_sqlite3_driver    = $(TARGET_hcore)
 LIBS_sqlite3_driver    = $(LIBS_BASE) -lsqlite3 $(if $(findstring dll,$(LIB_EXT)),-l$(LIB_NAME)_hcore$(LIB_INFIX))
