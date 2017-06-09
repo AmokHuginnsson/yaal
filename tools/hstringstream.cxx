@@ -98,16 +98,15 @@ void HStringStream::do_flush( void ) {
 
 int long HStringStream::do_read( void* buffer_, int long size_ ) {
 	M_PROLOG
-	int long length( _buffer.get_length() );
-	int long toCopy( yaal::min( length - _offset, size_ ) );
-	if ( length != _utf8.character_count() ) {
+	if ( _buffer.get_length() != _utf8.character_count() ) {
 		_utf8 = _buffer;
 	}
-	if ( length > 0 ) {
+	int long toCopy( yaal::min( _utf8.byte_count() - _offset, size_ ) );
+	if ( toCopy > 0 ) {
 		::strncpy( static_cast<char*>( buffer_ ), _utf8.c_str() + _offset, static_cast<size_t>( toCopy ) );
+		_offset += toCopy;
 	}
-	_offset += toCopy;
-	if ( _offset >= length ) {
+	if ( _offset >= _utf8.byte_count() ) {
 		_offset = 0;
 		_buffer.clear();
 		_utf8.reset();
