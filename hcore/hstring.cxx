@@ -27,7 +27,7 @@ Copyright:
 #include <cstring>
 #include <cstdlib>
 #include <climits>
-#include <cctype>
+#include <cwctype>
 #include <cstdarg>
 #include <cstdio>
 #include <libintl.h>
@@ -688,7 +688,7 @@ inline int long find_last_other_than( void const* mem_, int rank_, int long befo
 	return ( pos );
 }
 
-typedef int ( *transformer_t )( int );
+typedef wint_t ( *transformer_t )( wint_t );
 inline void transform( void* mem_, int rank_, int long size_, transformer_t mod_ ) {
 	switch ( rank_ ) {
 		case ( 1 ): {
@@ -1939,26 +1939,26 @@ HString& HString::replace( iterator first_, iterator last_, HString const& repla
 
 HString& HString::upper( void ) {
 	M_PROLOG
-	adaptive::transform( MEM, GET_RANK, GET_SIZE, &::std::toupper );
+	adaptive::transform( MEM, GET_RANK, GET_SIZE, &::std::towupper );
 	return ( *this );
 	M_EPILOG
 }
 
 HString& HString::lower( void ) {
 	M_PROLOG
-	adaptive::transform( MEM, GET_RANK, GET_SIZE, &::std::tolower );
+	adaptive::transform( MEM, GET_RANK, GET_SIZE, &::std::towlower );
 	return ( *this );
 	M_EPILOG
 }
 
 namespace {
-int case_swap( int char_ ) {
-	int c( 0 );
-	int u( toupper( char_ ) );
+wint_t case_swap( wint_t char_ ) {
+	wint_t c( 0 );
+	wint_t u( towupper( char_ ) );
 	if ( u != char_ ) {
 		c = u;
 	} else {
-		c = tolower( char_ );
+		c = towlower( char_ );
 	}
 	return ( c );
 }

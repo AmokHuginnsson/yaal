@@ -24,7 +24,7 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <cctype>
+#include <cwctype>
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
@@ -52,7 +52,7 @@ inline HHuginn::value_t to_lower( huginn::HThread*, HHuginn::value_t* object_, H
 	char const name[] = "character.to_lower";
 	verify_arg_count( name, values_, 0, 0, position_ );
 	HHuginn::HCharacter* c( static_cast<HHuginn::HCharacter*>( object_->raw() ) );
-	c->set( HHuginn::HCharacter::value_type( static_cast<yaal::u32_t>( std::tolower( static_cast<int>( c->value().get() ) ) ) ) );
+	c->set( HHuginn::HCharacter::value_type( static_cast<yaal::u32_t>( std::towlower( static_cast<wint_t>( c->value().get() ) ) ) ) );
 	return ( *object_ );
 	M_EPILOG
 }
@@ -62,7 +62,7 @@ inline HHuginn::value_t to_upper( huginn::HThread*, HHuginn::value_t* object_, H
 	char const name[] = "character.to_upper";
 	verify_arg_count( name, values_, 0, 0, position_ );
 	HHuginn::HCharacter* c( static_cast<HHuginn::HCharacter*>( object_->raw() ) );
-	c->set( HHuginn::HCharacter::value_type( static_cast<yaal::u32_t>( std::toupper( static_cast<int>( c->value().get() ) ) ) ) );
+	c->set( HHuginn::HCharacter::value_type( static_cast<yaal::u32_t>( std::towupper( static_cast<wint_t>( c->value().get() ) ) ) ) );
 	return ( *object_ );
 	M_EPILOG
 }
