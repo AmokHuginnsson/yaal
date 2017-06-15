@@ -3021,27 +3021,27 @@ bool is_letter( code_point_t char_ ) {
 }
 
 bool is_upper( code_point_t char_ ) {
-	return ( ::std::isupper( static_cast<int>( char_.get() ) ) ? true : false );
+	return ( ::std::iswupper( static_cast<wint_t>( char_.get() ) ) ? true : false );
 }
 
 bool is_lower( code_point_t char_ ) {
-	return ( ::std::islower( static_cast<int>( char_.get() ) ) ? true : false );
+	return ( ::std::iswlower( static_cast<wint_t>( char_.get() ) ) ? true : false );
 }
 
 bool is_alpha( code_point_t char_ ) {
-	return ( ::std::isalpha( static_cast<int>( char_.get() ) ) ? true : false );
+	return ( ::std::iswalpha( static_cast<wint_t>( char_.get() ) ) ? true : false );
 }
 
 bool is_alnum( code_point_t char_ ) {
-	return ( ::std::isalnum( static_cast<int>( char_.get() ) ) ? true : false );
+	return ( ::std::iswalnum( static_cast<wint_t>( char_.get() ) ) ? true : false );
 }
 
 bool is_ascii( code_point_t char_ ) {
 	return ( char_ <= unicode::UTF8_MAX_1_BYTE_CODE_POINT );
 }
 
-inline int to_lower( code_point_t codePoint_ ) {
-	return ( ::std::tolower( static_cast<int>( codePoint_.get() ) ) );
+inline wint_t to_lower( code_point_t codePoint_ ) {
+	return ( ::std::towlower( static_cast<wint_t>( codePoint_.get() ) ) );
 }
 
 int long icasesearch( HString const& haystack_, HString const& needle_ ) {
