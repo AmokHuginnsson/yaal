@@ -196,11 +196,6 @@ public:
 	 * \post String capacity has value of smallest (2^n)-1 greater or equal to \e size.
 	 */
 	void reserve( int long capacity );
-	/*! \brief Materialize string.
-	 *
-	 * Used in copy-on-write implementation.
-	 */
-	void materialize( void );
 	/*! \brief Construct string based on UTF-8 string.
 	 *
 	 * str - an UTF-8 encoded string.

@@ -1083,21 +1083,25 @@ void HString::from_utf8( int long offset_, int long onto_, const char* str_, int
 	M_PROLOG
 	int long oldSize( GET_SIZE );
 	M_ASSERT( offset_ <= oldSize );
-	utf8::OUTF8StringStats s( utf8::get_string_stats( str_, size_ ) );
-	int rank( max( GET_RANK, s._rank ) );
-	int long newSize( ( oldSize - onto_ ) + s._characterCount );
-	resize( newSize, rank );
-	adaptive::move( MEM, offset_ + s._characterCount, MEM, offset_ + onto_, rank, ( oldSize - offset_ ) - onto_ );
-	switch ( rank ) {
-		case ( 1 ): {
-			utf8::decode( static_cast<yaal::u8_t*>( MEM ) + offset_, str_, s._characterCount );
-		} break;
-		case ( 2 ): {
-			utf8::decode( static_cast<yaal::u16_t*>( MEM ) + offset_, str_, s._characterCount );
-		} break;
-		case ( 4 ): {
-			utf8::decode( static_cast<yaal::u32_t*>( MEM ) + offset_, str_, s._characterCount );
-		} break;
+	try {
+		utf8::OUTF8StringStats s( utf8::get_string_stats( str_, size_ ) );
+		int rank( max( GET_RANK, s._rank ) );
+		int long newSize( ( oldSize - onto_ ) + s._characterCount );
+		resize( newSize, rank );
+		adaptive::move( MEM, offset_ + s._characterCount, MEM, offset_ + onto_, rank, ( oldSize - offset_ ) - onto_ );
+		switch ( rank ) {
+			case ( 1 ): {
+				utf8::decode( static_cast<yaal::u8_t*>( MEM ) + offset_, str_, s._characterCount );
+			} break;
+			case ( 2 ): {
+				utf8::decode( static_cast<yaal::u16_t*>( MEM ) + offset_, str_, s._characterCount );
+			} break;
+			case ( 4 ): {
+				utf8::decode( static_cast<yaal::u32_t*>( MEM ) + offset_, str_, s._characterCount );
+			} break;
+		}
+	} catch ( HUTF8StringException const& e ) {
+		throw HStringException( e.what() );
 	}
 	return;
 	M_EPILOG
@@ -1307,12 +1311,6 @@ HString::HString( void const* ptrVoid_ )
 #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002
 # pragma GCC diagnostic error "-Weffc++"
 #endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002 */
-
-void HString::materialize( void ) {
-	M_PROLOG
-	return;
-	M_EPILOG
-}
 
 HString& HString::operator = ( HString const& string_ ) {
 	M_PROLOG
@@ -3054,7 +3052,7 @@ int stricasecmp( HString const& left_, HString const& right_ ) {
 	int long len( min( left_.get_length(), right_.get_length() ) );
 	int diff( 0 );
 	for ( int long i( 0 ); ( diff == 0 ) && ( i < len ); ++ i ) {
-		diff = tolower( static_cast<int>( left_[i].get() ) ) - tolower( static_cast<int>( right_[i].get() ) );
+		diff = static_cast<int>( towlower( static_cast<wint_t>( left_[i].get() ) ) ) - static_cast<int>( towlower( static_cast<wint_t>( right_[i].get() ) ) );
 	}
 	return ( diff );
 }
