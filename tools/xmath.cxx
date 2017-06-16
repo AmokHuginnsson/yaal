@@ -45,7 +45,7 @@ aggregate_type_t const AGGREGATE_TYPE::COUNT = aggregate_type_t::new_flag();
 aggregate_type_t const AGGREGATE_TYPE::MINIMUM = aggregate_type_t::new_flag();
 aggregate_type_t const AGGREGATE_TYPE::MAXIMUM = aggregate_type_t::new_flag();
 aggregate_type_t const AGGREGATE_TYPE::SUM = aggregate_type_t::new_flag();
-aggregate_type_t const AGGREGATE_TYPE::AVERAGE = aggregate_type_t::new_flag();
+aggregate_type_t const AGGREGATE_TYPE::ARITHMETIC_MEAN = aggregate_type_t::new_flag();
 aggregate_type_t const AGGREGATE_TYPE::SAMPLE_VARIANCE = aggregate_type_t::new_flag();
 aggregate_type_t const AGGREGATE_TYPE::POPULATION_VARIANCE = aggregate_type_t::new_flag();
 aggregate_type_t const AGGREGATE_TYPE::SAMPLE_STANDARD_DEVIATION = aggregate_type_t::new_flag();
@@ -54,7 +54,7 @@ aggregate_type_t const AGGREGATE_TYPE::BASIC = AGGREGATE_TYPE::COUNT
 	| AGGREGATE_TYPE::MINIMUM
 	| AGGREGATE_TYPE::MAXIMUM
 	| AGGREGATE_TYPE::SUM
-	| AGGREGATE_TYPE::AVERAGE
+	| AGGREGATE_TYPE::ARITHMETIC_MEAN
 	| AGGREGATE_TYPE::SAMPLE_VARIANCE
 	| AGGREGATE_TYPE::POPULATION_VARIANCE
 	| AGGREGATE_TYPE::SAMPLE_STANDARD_DEVIATION

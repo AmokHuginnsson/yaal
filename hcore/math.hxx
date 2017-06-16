@@ -36,6 +36,8 @@ namespace yaal {
  */
 namespace math {
 
+/* *TODO* Add error_function() -- erfl(). */
+
 M_YAAL_HCORE_PUBLIC_API extern double long PI;
 M_YAAL_HCORE_PUBLIC_API extern double long E;
 

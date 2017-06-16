@@ -34,7 +34,6 @@ Copyright:
 #include "hcore/iterator.hxx"
 #include "hcore/hbitflag.hxx"
 
-/* *FIXME* *TODO* Rename `average` -> `arithmetic_mean` */
 /* *TODO* Add `mode`. */
 /* *TODO* Add `interquartile_range`. */
 /* *TODO* Add `mean_absolute_deviation`. */
@@ -57,7 +56,7 @@ struct AGGREGATE_TYPE {
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const MINIMUM;
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const MAXIMUM;
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const SUM;
-	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const AVERAGE;
+	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const ARITHMETIC_MEAN;
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const SAMPLE_VARIANCE;
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const POPULATION_VARIANCE;
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const SAMPLE_STANDARD_DEVIATION;
@@ -78,7 +77,7 @@ private:
 	numeric_t _minimum;
 	numeric_t _maximum;
 	numeric_t _sum;
-	numeric_t _average;
+	numeric_t _arithmeticMean;
 	numeric_t _median;
 	numeric_t _sampleVariance;
 	numeric_t _populationVariance;
@@ -87,7 +86,7 @@ public:
 	/*! \brief Construct statistics for given range of numbers.
 	 *
 	 * Following aggregate types are implicit:
-	 * `count', `minimum', `maximum', `sum', `average'
+	 * `count', `minimum', `maximum', `sum', `arithmetic_mean'
 	 * and `sample_variance' (`population sample_variance',
 	 * `standard deviation', `population standard deviation').
 	 *
@@ -121,10 +120,10 @@ public:
 		return ( _sum );
 		M_EPILOG
 	}
-	numeric_t average( void ) const {
+	numeric_t arithmetic_mean( void ) const {
 		M_PROLOG
-		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::AVERAGE ) && ( _count > 0 ) );
-		return ( _average );
+		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::ARITHMETIC_MEAN ) && ( _count > 0 ) );
+		return ( _arithmeticMean );
 		M_EPILOG
 	}
 	numeric_t median( void ) const {
@@ -162,7 +161,7 @@ public:
 template<typename numeric_t>
 template<typename iterator_t>
 HNumberSetStats<numeric_t>::HNumberSetStats( iterator_t first_, iterator_t last_, aggregate_type_t aggregateType_ )
-	: _count( 0 ), _minimum(), _maximum(), _sum(), _average(),
+	: _count( 0 ), _minimum(), _maximum(), _sum(), _arithmeticMean(),
 	_median(), _sampleVariance(), _populationVariance(),
 	_aggregateType( aggregateType_ ) {
 	M_PROLOG
@@ -182,11 +181,11 @@ HNumberSetStats<numeric_t>::HNumberSetStats( iterator_t first_, iterator_t last_
 		_sum += *it;
 		acc += ( *it * *it );
 	}
-	_average = _sum / static_cast<numeric_t>( _count );
+	_arithmeticMean = _sum / static_cast<numeric_t>( _count );
 	if ( _count > 1 ) {
-		_sampleVariance = ( acc - _average * _average * static_cast<numeric_t>( _count ) ) / static_cast<numeric_t>( _count - 1 );
+		_sampleVariance = ( acc - _arithmeticMean * _arithmeticMean * static_cast<numeric_t>( _count ) ) / static_cast<numeric_t>( _count - 1 );
 	}
-	_populationVariance = acc / static_cast<numeric_t>( _count ) - _average * _average;
+	_populationVariance = acc / static_cast<numeric_t>( _count ) - _arithmeticMean * _arithmeticMean;
 	if ( ( _count > 0 ) && ( _aggregateType & AGGREGATE_TYPE::MEDIAN ) ) {
 		_median = select( first_, last_, ( _count - 1 ) / 2 );
 	}

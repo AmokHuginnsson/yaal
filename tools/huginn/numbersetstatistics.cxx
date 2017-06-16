@@ -73,8 +73,8 @@ typename stats_t::value_type stats_impl( stats_t const& stats_, aggregate_type_t
 		res = stats_.maximum();
 	} else if ( aggregateType_ == AGGREGATE_TYPE::SUM ) {
 		res = stats_.sum();
-	} else if ( aggregateType_ == AGGREGATE_TYPE::AVERAGE ) {
-		res = stats_.average();
+	} else if ( aggregateType_ == AGGREGATE_TYPE::ARITHMETIC_MEAN ) {
+		res = stats_.arithmetic_mean();
 	} else if ( aggregateType_ == AGGREGATE_TYPE::MEDIAN ) {
 		res = stats_.median();
 	} else if ( aggregateType_ == AGGREGATE_TYPE::SAMPLE_VARIANCE ) {
@@ -115,7 +115,7 @@ HHuginn::class_t HNumberSetStatistics::get_class( HRuntime* runtime_ ) {
 				{ "minimum",                       runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "minimum",                       AGGREGATE_TYPE::MINIMUM, _1, _2, _3, _4 ) ),                       "a minimum numeric value in set" },
 				{ "maximum",                       runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "maximum",                       AGGREGATE_TYPE::MAXIMUM, _1, _2, _3, _4 ) ),                       "a maximum numeric value in set" },
 				{ "sum",                           runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "sum",                           AGGREGATE_TYPE::SUM, _1, _2, _3, _4 ) ),                           "a sum of all values in set" },
-				{ "average",                       runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "average",                       AGGREGATE_TYPE::AVERAGE, _1, _2, _3, _4 ) ),                       "an average value of all numbers in set" },
+				{ "arithmetic_mean",               runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "arithmetic_mean",               AGGREGATE_TYPE::ARITHMETIC_MEAN, _1, _2, _3, _4 ) ),               "an arithmetic mean of all numbers in set" },
 				{ "median",                        runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "median",                        AGGREGATE_TYPE::MEDIAN, _1, _2, _3, _4 ) ),                        "a median value in set" },
 				{ "sample_variance",               runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "sample_variance",               AGGREGATE_TYPE::SAMPLE_VARIANCE, _1, _2, _3, _4 ) ),               "a sample_variance of the set" },
 				{ "population_variance",           runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "population_variance",           AGGREGATE_TYPE::POPULATION_VARIANCE, _1, _2, _3, _4 ) ),           "a population sample_variance of the numeric set" },
