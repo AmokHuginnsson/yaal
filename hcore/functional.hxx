@@ -107,8 +107,9 @@ private:
 public:
 	HBinder( function_t, value_t );
 	template<typename tType>
-	result_type operator()( tType value ) const
-		{ return ( _call( bound_no ? value : _value, bound_no ? _value : value ) ); }
+	result_type operator()( tType value ) const {
+		return ( bound_no == 0 ? _call( _value, value ) : _call( value, _value ) );
+	}
 };
 
 template<typename function_t, typename value_t, int bound_no>

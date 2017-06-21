@@ -1875,22 +1875,26 @@ inline void stable_sort( iterator_t first_, iterator_t last_ ) {
 /*! \cond */
 /* naive */
 template<typename iterator_t, typename compare_t>
-inline typename hcore::iterator_traits<iterator_t>::value_type choose_pivot( iterator_t first_, iterator_t last_, compare_t comp_ ) {
+inline iterator_t choose_pivot( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 	iterator_t mid( first_ + ( last_ - first_ ) / 2 );
 	if ( comp_( *first_, *last_ ) ) {
 		if ( comp_( *first_, *mid ) ) {
-			if ( comp_( *last_, *mid ) )
+			if ( comp_( *last_, *mid ) ) {
 				mid = last_;
-		} else
+			}
+		} else {
 			mid = first_;
+		}
 	} else {
 		if ( comp_( *last_, *mid ) ) {
-			if ( comp_( *first_, *mid ) )
+			if ( comp_( *first_, *mid ) ) {
 				mid = first_;
-		} else
+			}
+		} else {
 			mid = last_;
+		}
 	}
-	return ( *mid );
+	return ( mid );
 }
 /*! \endcond */
 
@@ -1903,17 +1907,57 @@ inline typename hcore::iterator_traits<iterator_t>::value_type choose_pivot( ite
  */
 template<typename iterator_t, typename predicate_t>
 inline iterator_t partition( iterator_t first_, iterator_t last_, predicate_t predicate_ ) {
+	first_ = find_if_not( first_, last_, predicate_ );
 	iterator_t fit( first_ );
-	using yaal::swap;
-	for ( ; first_ != last_; ++ first_ ) {
-		if ( predicate_( *first_ ) ) {
-			swap( *first_, *fit );
-			++ fit;
+	if ( first_ != last_ ) {
+		for ( ++ first_; first_ != last_; ++ first_ ) {
+			if ( predicate_( *first_ ) ) {
+				using yaal::swap;
+				swap( *first_, *fit );
+				++ fit;
+			}
 		}
 	}
-	if ( ( fit != last_ ) &&  predicate_( *fit ) )
-		++ fit;
 	return ( fit );
+}
+
+/*! \brief Reorder range of elements so element at given position would be preserved if range were to be sorted.
+ *
+ * \param first_ - beginning of the range to reorder.
+ * \param nth_ - element at this position shall acquire ordered position.
+ * \param last_ - one past the end of the range to reorder.
+ * \param comp_ - comparison operator used for reordering.
+ */
+template<typename iterator_t, typename compare_t>
+inline void nth_element( iterator_t first_, iterator_t nth_, iterator_t last_, compare_t comp_ ) {
+	while ( true ) {
+		iterator_t pivotIt( choose_pivot( first_, last_ - 1, comp_ ) );
+		using yaal::swap;
+		swap( *pivotIt, *( last_ - 1 ) );
+		pivotIt = partition( first_, last_ - 1, bind2nd( comp_, *( last_ - 1 ) ) );
+		swap( *pivotIt, *( last_ - 1 ) );
+		if ( pivotIt == nth_ ) {
+			break;
+		}
+		if ( pivotIt < nth_ ) {
+			first_ = pivotIt + 1;
+		} else {
+			last_ = pivotIt;
+		}
+	}
+	return;
+}
+
+/*! \brief Reorder range of elements so element at given position would be preserved if range were to be sorted.
+ *
+ * \param first_ - beginning of the range to reorder.
+ * \param nth_ - element at this position shall acquire ordered position.
+ * \param last_ - one past the end of the range to reorder.
+ */
+template<typename iterator_t>
+inline void nth_element( iterator_t first_, iterator_t nth_, iterator_t last_ ) {
+	nth_element( first_, nth_, last_, less<typename hcore::iterator_traits<iterator_t>::value_type>() );
+	return;
 }
 
 /*! \cond */
@@ -2028,7 +2072,7 @@ inline void sort( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 		} else {
 			iterator_t l( first_ );
 			iterator_t r( last_ - 1 );
-			typename hcore::iterator_traits<iterator_t>::value_type pivot( choose_pivot( l, r, comp_ ) );
+			typename hcore::iterator_traits<iterator_t>::value_type pivot( *choose_pivot( l, r, comp_ ) );
 			using yaal::swap;
 			while ( l != r ) {
 				for ( ; ( l != r ) && comp_( *l, pivot ); ++ l )
