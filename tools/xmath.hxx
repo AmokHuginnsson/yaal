@@ -47,8 +47,11 @@ namespace tools {
 namespace xmath {
 
 template<typename iterator_t>
-typename hcore::iterator_traits<iterator_t>::value_type
-select( iterator_t, iterator_t, int long );
+yaal::hcore::HPair<
+	typename hcore::iterator_traits<iterator_t>::value_type,
+	typename hcore::iterator_traits<iterator_t>::value_type
+>
+select( iterator_t, iterator_t, int long, bool );
 
 typedef yaal::hcore::HBitFlag<struct AGGREGATE_TYPE> aggregate_type_t;
 struct AGGREGATE_TYPE {
@@ -161,9 +164,15 @@ public:
 template<typename numeric_t>
 template<typename iterator_t>
 HNumberSetStats<numeric_t>::HNumberSetStats( iterator_t first_, iterator_t last_, aggregate_type_t aggregateType_ )
-	: _count( 0 ), _minimum(), _maximum(), _sum(), _arithmeticMean(),
-	_median(), _sampleVariance(), _populationVariance(),
-	_aggregateType( aggregateType_ ) {
+	: _count( 0 )
+	, _minimum()
+	, _maximum()
+	, _sum()
+	, _arithmeticMean()
+	, _median()
+	, _sampleVariance()
+	, _populationVariance()
+	, _aggregateType( aggregateType_ ) {
 	M_PROLOG
 	numeric_t acc( 0 );
 	for ( iterator_t it( first_ ); it != last_; ++ it, ++ _count ) {
@@ -187,7 +196,14 @@ HNumberSetStats<numeric_t>::HNumberSetStats( iterator_t first_, iterator_t last_
 	}
 	_populationVariance = acc / static_cast<numeric_t>( _count ) - _arithmeticMean * _arithmeticMean;
 	if ( ( _count > 0 ) && ( _aggregateType & AGGREGATE_TYPE::MEDIAN ) ) {
-		_median = select( first_, last_, ( _count - 1 ) / 2 );
+		typedef yaal::hcore::HPair<numeric_t, numeric_t> middle_t;
+		if ( _count % 2 ) {
+			middle_t m( select( first_, last_, _count / 2, false ) );
+			_median = m.first;
+		} else {
+			middle_t m( select( first_, last_, _count / 2 - 1, true ) );
+			_median = ( m.first + m.second ) / 2.;
+		}
 	}
 	return;
 	M_EPILOG
@@ -230,8 +246,11 @@ inline number_t round_up( number_t const& n ) {
 }
 
 template<typename iterator_t>
-typename hcore::iterator_traits<iterator_t>::value_type
-select( iterator_t first_, iterator_t last_, int long kth_ ) {
+yaal::hcore::HPair<
+	typename hcore::iterator_traits<iterator_t>::value_type,
+	typename hcore::iterator_traits<iterator_t>::value_type
+>
+select( iterator_t first_, iterator_t last_, int long kth_, bool two_ ) {
 	M_PROLOG
 	typedef typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type value_t;
 	typedef hcore::HAuxiliaryBuffer<value_t> aux_t;
@@ -239,25 +258,21 @@ select( iterator_t first_, iterator_t last_, int long kth_ ) {
 	aux_t aux( first_, last_ );
 	M_ENSURE( aux.get_size() == aux.get_requested_size() );
 	if ( aux.get_requested_size() == 0 ) {
-		return ( *first_ );
+		return ( yaal::hcore::make_pair( *first_, 0 ) );
 	}
 	M_ENSURE( ( kth_ >= 0 ) && ( kth_ < aux.get_requested_size() ) );
 	value_t* left( aux.begin() );
-	value_t* right( aux.end() - 1 );
-	value_t* kth( left );
-	while ( left != right ) {
-		kth = partition( left, right, bind2nd( less<value_t>(), choose_pivot( left, right, less<value_t>() ) ) );
-		int long idx( kth - left );
-		if ( idx == kth_ )
-			break;
-		if ( kth_ < idx ) {
-			right = kth - 1;
-		} else {
-			kth_ -= ( idx + 1 );
-			left = kth + 1;
-		}
+	value_t* right( aux.end() );
+	value_t* kth( left + kth_ );
+	nth_element( left, kth, right );
+	value_t v0( *kth );
+	value_t v1( 0 );
+	if ( two_ ) {
+		++ kth;
+		nth_element( left, kth, right );
+		v1 = *kth;
 	}
-	return ( *kth );
+	return ( yaal::hcore::make_pair( v0, v1 ) );
 	M_EPILOG
 }
 
