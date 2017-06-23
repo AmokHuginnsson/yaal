@@ -375,6 +375,22 @@ public:
 		return ( v );
 		M_EPILOG
 	}
+	static HHuginn::value_t error_function( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "Mathematics.error_function";
+		verify_arg_count( name, values_, 1, 1, position_ );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
+		HHuginn::value_t v;
+		if ( t == HHuginn::TYPE::NUMBER ) {
+			HNumber val( get_number( values_[0] ) );
+			v = thread_->object_factory().create_number( math::error_function( val ) );
+		} else {
+			double long val( get_real( values_[0] ) );
+			v = thread_->object_factory().create_real( math::error_function( val ) );
+		}
+		return ( v );
+		M_EPILOG
+	}
 	static HHuginn::value_t round( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.round";
@@ -503,6 +519,7 @@ HHuginn::value_t HMathematicsCreator::do_new_instance( HRuntime* runtime_ ) {
 				{ "hyperbolic_tangens",   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::hyperbolic_tangens, _1, _2, _3, _4 ) ),   "( *arg* ) - calculate value of *hyperbolic tangent* function of *arg* argument" },
 				{ "hyperbolic_cotangens", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::hyperbolic_cotangens, _1, _2, _3, _4 ) ), "( *arg* ) - calculate value of *hyperbolic cotangent* function of *arg* argument" },
 				{ "sigmoid",              runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::sigmoid, _1, _2, _3, _4 ) ),              "( *arg* ) - calculate value of *sigmoid* function of *arg* argument" },
+				{ "error_function",       runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::error_function, _1, _2, _3, _4 ) ),       "( *arg* ) - calculate value of *(Gaussian) error function* of *arg* argument" },
 				{ "round",                runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::round, _1, _2, _3, _4 ) ),                "( *value*[, *precision*] ) - round *value*, potentially to given *precision*" },
 				{ "floor",                runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::floor, _1, _2, _3, _4 ) ),                "( *value* ) - get largest integral value not greater than *value*" },
 				{ "ceil",                 runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::ceil, _1, _2, _3, _4 ) ),                 "( *value* ) - get smallest integral value not less than *value*" },
