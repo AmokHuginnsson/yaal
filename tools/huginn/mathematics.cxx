@@ -112,7 +112,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber val( get_number( values_[0] ) );
+			HNumber const& val( get_number( values_[0] ) );
 			if ( val >= number::N0 ) {
 				v = thread_->object_factory().create_number( math::square_root( val ) );
 			}
@@ -135,7 +135,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber val( get_number( values_[0] ) );
+			HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::natural_exponential( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -151,7 +151,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber val( get_number( values_[0] ) );
+			HNumber const& val( get_number( values_[0] ) );
 			if ( val > number::N0 ) {
 				v = thread_->object_factory().create_number( math::natural_logarithm( val ) );
 			}
@@ -174,7 +174,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber val( get_number( values_[0] ) );
+			HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::sinus( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -190,7 +190,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber val( get_number( values_[0] ) );
+			HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::cosinus( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -206,7 +206,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber val( get_number( values_[0] ) );
+			HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::tangens( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -222,7 +222,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber val( get_number( values_[0] ) );
+			HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::cotangens( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -238,7 +238,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber val( get_number( values_[0] ) );
+			HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::arcus_sinus( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -254,7 +254,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber val( get_number( values_[0] ) );
+			HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::arcus_cosinus( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -270,7 +270,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber val( get_number( values_[0] ) );
+			HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::arcus_tangens( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -286,7 +286,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber val( get_number( values_[0] ) );
+			HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::arcus_cotangens( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -302,7 +302,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber val( get_number( values_[0] ) );
+			HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::hyperbolic_sinus( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -318,7 +318,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber val( get_number( values_[0] ) );
+			HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::hyperbolic_cosinus( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -334,7 +334,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber val( get_number( values_[0] ) );
+			HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::hyperbolic_tangens( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -350,7 +350,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber val( get_number( values_[0] ) );
+			HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::hyperbolic_cotangens( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -366,7 +366,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber val( get_number( values_[0] ) );
+			HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::sigmoid( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -382,11 +382,32 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber val( get_number( values_[0] ) );
+			HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::error_function( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
 			v = thread_->object_factory().create_real( math::error_function( val ) );
+		}
+		return ( v );
+		M_EPILOG
+	}
+	static HHuginn::value_t cumulative_distribution_function( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "Mathematics.cumulative_distribution_function";
+		verify_arg_count( name, values_, 3, 3, position_ );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::MULTIPLE, position_ ) );
+		verify_signature( name, values_, t == HHuginn::TYPE::REAL ? types_t{ HHuginn::TYPE::REAL, HHuginn::TYPE::REAL, HHuginn::TYPE::REAL } : types_t{ HHuginn::TYPE::NUMBER, HHuginn::TYPE::NUMBER, HHuginn::TYPE::NUMBER, }, position_ );
+		HHuginn::value_t v;
+		if ( t == HHuginn::TYPE::NUMBER ) {
+			HNumber const& val( get_number( values_[0] ) );
+			HNumber const& mu( get_number( values_[1] ) );
+			HNumber const& sigma( get_number( values_[2] ) );
+			v = thread_->object_factory().create_number( xmath::cumulative_distribution_function( val, mu, sigma ) );
+		} else {
+			double long val( get_real( values_[0] ) );
+			double long mu( get_real( values_[1] ) );
+			double long sigma( get_real( values_[2] ) );
+			v = thread_->object_factory().create_real( xmath::cumulative_distribution_function( val, mu, sigma ) );
 		}
 		return ( v );
 		M_EPILOG
@@ -520,6 +541,10 @@ HHuginn::value_t HMathematicsCreator::do_new_instance( HRuntime* runtime_ ) {
 				{ "hyperbolic_cotangens", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::hyperbolic_cotangens, _1, _2, _3, _4 ) ), "( *arg* ) - calculate value of *hyperbolic cotangent* function of *arg* argument" },
 				{ "sigmoid",              runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::sigmoid, _1, _2, _3, _4 ) ),              "( *arg* ) - calculate value of *sigmoid* function of *arg* argument" },
 				{ "error_function",       runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::error_function, _1, _2, _3, _4 ) ),       "( *arg* ) - calculate value of *(Gaussian) error function* of *arg* argument" },
+				{ "cumulative_distribution_function",
+					runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::cumulative_distribution_function, _1, _2, _3, _4 ) ),
+					"( *arg*, *mu*, *sigma* ) - calculate value of *cumulative distribution function* for normal distribution of *arg* argument, *mu* arithmetic mean and *sigma* standard deviation"
+				},
 				{ "round",                runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::round, _1, _2, _3, _4 ) ),                "( *value*[, *precision*] ) - round *value*, potentially to given *precision*" },
 				{ "floor",                runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::floor, _1, _2, _3, _4 ) ),                "( *value* ) - get largest integral value not greater than *value*" },
 				{ "ceil",                 runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::ceil, _1, _2, _3, _4 ) ),                 "( *value* ) - get smallest integral value not less than *value*" },

@@ -245,6 +245,15 @@ inline number_t round_up( number_t const& n ) {
 	return ( ( ( ( n - 1 ) / M ) + 1 ) * M );
 }
 
+template<typename number_t>
+number_t cumulative_distribution_function( number_t const& x_, number_t const& mu_, number_t const& sigma_ ) {
+	static number_t const sqrt2( yaal::math::square_root( number_t( 2 ) ) );
+	static number_t const halve( number_t( 0.5 ) );
+	static number_t const one( number_t( 1 ) );
+	number_t arg( ( x_ - mu_ ) / ( sigma_ * sqrt2 ) );
+	return ( halve * ( one + yaal::math::error_function( arg ) ) );
+}
+
 template<typename iterator_t>
 yaal::hcore::HPair<
 	typename hcore::iterator_traits<iterator_t>::value_type,
