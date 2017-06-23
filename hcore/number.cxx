@@ -491,6 +491,11 @@ struct HNumber::ElementaryFunctions {
 		return ( v );
 		M_EPILOG
 	}
+	static yaal::hcore::HNumber error_function( yaal::hcore::HNumber const& value_ ) {
+		M_PROLOG
+		return ( math::error_function( value_.to_floating_point() ) );
+		M_EPILOG
+	}
 };
 
 namespace number {
@@ -831,6 +836,13 @@ yaal::hcore::HNumber sigmoid( yaal::hcore::HNumber const& value_ ) {
 	M_EPILOG
 }
 
+yaal::hcore::HNumber error_function( yaal::hcore::HNumber const& value_ ) {
+	M_PROLOG
+	return ( yaal::hcore::HNumber::ElementaryFunctions::error_function( value_ ) );
+	M_EPILOG
 }
 
 }
+
+}
+

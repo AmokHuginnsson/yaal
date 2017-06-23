@@ -112,6 +112,10 @@ double long sigmoid_impl( double long val_ ) {
 	return ( v );
 }
 
+double long error_function_impl( double long val_ ) {
+	return ( erfl( val_ ) );
+}
+
 }
 
 }

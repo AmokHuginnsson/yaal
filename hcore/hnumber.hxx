@@ -318,6 +318,7 @@ yaal::hcore::HNumber hyperbolic_cosinus( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber hyperbolic_tangens( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber hyperbolic_cotangens( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber sigmoid( yaal::hcore::HNumber const& );
+yaal::hcore::HNumber error_function( yaal::hcore::HNumber const& );
 
 }
 

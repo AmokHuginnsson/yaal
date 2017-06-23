@@ -36,8 +36,6 @@ namespace yaal {
  */
 namespace math {
 
-/* *TODO* Add error_function() -- erfl(). */
-
 M_YAAL_HCORE_PUBLIC_API extern double long PI;
 M_YAAL_HCORE_PUBLIC_API extern double long E;
 
@@ -57,6 +55,7 @@ double long hyperbolic_cosinus_impl( double long );
 double long hyperbolic_tangens_impl( double long );
 double long hyperbolic_cotangens_impl( double long );
 double long sigmoid_impl( double long );
+double long error_function_impl( double long );
 
 template<typename T>
 T square_root( T val_ ) {
@@ -136,6 +135,11 @@ T hyperbolic_cotangens( T val_ ) {
 template<typename T>
 T sigmoid( T val_ ) {
 	return ( static_cast<T>( sigmoid_impl( val_ ) ) );
+}
+
+template<typename T>
+T error_function( T val_ ) {
+	return ( static_cast<T>( error_function_impl( val_ ) ) );
 }
 
 }
