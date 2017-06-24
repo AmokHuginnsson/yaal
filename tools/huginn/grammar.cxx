@@ -44,7 +44,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	M_PROLOG
 	using namespace executing_parser;
 	namespace e_p = executing_parser;
-	hcore::HString identifierPattern( "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b" );
+	hcore::HString identifierPattern( "[a-zA-Z\\x{0391}-\\x{03c9}_][a-zA-Z\\x{0391}-\\x{03c9}0-9_]*" );
 	HRule expression( "expression", e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::mark_expression_position, _compiler.get(), _1 ) ) );
 	HRule absoluteValue( "absoluteValue",
 		constant( '|', e_p::HCharacter::action_character_position_t( hcore::call( &OCompiler::defer_oper, _compiler.get(), _1, _2 ) ) )
