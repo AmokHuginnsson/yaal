@@ -2464,6 +2464,8 @@ void HUTF8String::assign( HString::const_iterator it_, HString::const_iterator e
 	if ( _ptr ) {
 		_meta->_used = byteCount;
 		_meta->_rank = static_cast<i8_t>( unicode::rank( maxCodePoint ) );
+		char* p( _ptr + sizeof ( OBufferMeta ) );
+		p[byteCount] = 0;
 	}
 	_characterCount = static_cast<int>( end_ - it_ );
 	_offset = 0;
