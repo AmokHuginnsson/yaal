@@ -66,6 +66,7 @@ public:
 		static M_YAAL_HCORE_PUBLIC_API match_t const OVERLAPPING;
 		static M_YAAL_HCORE_PUBLIC_API match_t const DEFAULT;
 	};
+#undef NO_MATCH
 	static int const NO_MATCH = -1;
 	class HMatchResult;
 	class HMatch;

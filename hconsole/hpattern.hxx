@@ -50,6 +50,7 @@ public:
 	typedef yaal::hcore::HPair<char, bool*> flag_desc_t;
 	typedef yaal::hcore::HArray<flag_desc_t> pluggable_flags_t;
 	typedef HPattern this_type;
+#undef NO_MATCH
 	static int const NO_MATCH = yaal::hcore::HRegex::NO_MATCH;
 private:
 	bool _initialized;             /*!< is pattern initialized */
