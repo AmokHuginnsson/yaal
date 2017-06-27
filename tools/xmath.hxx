@@ -36,7 +36,6 @@ Copyright:
 
 /* *TODO* Add `mode`. */
 /* *TODO* Add `interquartile_range`. */
-/* *TODO* Add `mean_absolute_deviation`. */
 
 namespace yaal {
 
@@ -45,13 +44,6 @@ namespace tools {
 /*! \brief Meta-function (template) implementation of various math functions.
  */
 namespace xmath {
-
-template<typename iterator_t>
-yaal::hcore::HPair<
-	typename hcore::iterator_traits<iterator_t>::value_type,
-	typename hcore::iterator_traits<iterator_t>::value_type
->
-select( iterator_t, iterator_t, int long, bool );
 
 typedef yaal::hcore::HBitFlag<struct AGGREGATE_TYPE> aggregate_type_t;
 struct AGGREGATE_TYPE {
@@ -66,6 +58,7 @@ struct AGGREGATE_TYPE {
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const POPULATION_STANDARD_DEVIATION;
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const BASIC;
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const MEDIAN;
+	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const MEAN_ABSOLUTE_DEVIATION;
 };
 
 /*! \brief Provide statistics for set of numbers.
@@ -82,6 +75,7 @@ private:
 	numeric_t _sum;
 	numeric_t _arithmeticMean;
 	numeric_t _median;
+	numeric_t _meanAbsoluteDeviation;
 	numeric_t _sampleVariance;
 	numeric_t _populationVariance;
 	aggregate_type_t _aggregateType;
@@ -96,7 +90,31 @@ public:
 	 * One can explicitly request `median' aggregation type.
 	 */
 	template<typename iterator_t>
-	HNumberSetStats( iterator_t, iterator_t, aggregate_type_t = AGGREGATE_TYPE::BASIC );
+	HNumberSetStats( iterator_t first_, iterator_t last_, aggregate_type_t aggregateType_ = AGGREGATE_TYPE::BASIC )
+		: _count( 0 )
+		, _minimum()
+		, _maximum()
+		, _sum()
+		, _arithmeticMean()
+		, _median()
+		, _meanAbsoluteDeviation()
+		, _sampleVariance()
+		, _populationVariance()
+		, _aggregateType( aggregateType_ ) {
+		M_PROLOG
+		if ( _aggregateType & ( AGGREGATE_TYPE::MEDIAN | AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION ) ) {
+			typedef hcore::HAuxiliaryBuffer<numeric_t> aux_t;
+			M_ENSURE( first_ != last_ );
+			aux_t aux( first_, last_ );
+			M_ENSURE( aux.get_size() == aux.get_requested_size() );
+			calculate_basic_stats( aux.begin(), aux.end() );
+			calculate_extra_stats( aux.begin(), aux.end() );
+		} else {
+			calculate_basic_stats( first_, last_ );
+		}
+		return;
+		M_EPILOG
+	}
 	int long count( void ) const {
 		M_PROLOG
 		M_ENSURE( _aggregateType & AGGREGATE_TYPE::COUNT );
@@ -159,55 +177,84 @@ public:
 		return ( math::square_root( _populationVariance ) );
 		M_EPILOG
 	}
-};
-
-template<typename numeric_t>
-template<typename iterator_t>
-HNumberSetStats<numeric_t>::HNumberSetStats( iterator_t first_, iterator_t last_, aggregate_type_t aggregateType_ )
-	: _count( 0 )
-	, _minimum()
-	, _maximum()
-	, _sum()
-	, _arithmeticMean()
-	, _median()
-	, _sampleVariance()
-	, _populationVariance()
-	, _aggregateType( aggregateType_ ) {
-	M_PROLOG
-	numeric_t acc( 0 );
-	for ( iterator_t it( first_ ); it != last_; ++ it, ++ _count ) {
-		if ( _count ) {
-			if ( *it < _minimum ) {
+	numeric_t mean_absolute_deviation( void ) const {
+		M_PROLOG
+		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION ) && ( _count > 0 ) );
+		return ( _meanAbsoluteDeviation );
+		M_EPILOG
+	}
+private:
+	template<typename iterator_t>
+	void calculate_basic_stats( iterator_t first_, iterator_t last_ ) {
+		M_PROLOG
+		numeric_t acc( 0 );
+		for ( iterator_t it( first_ ); it != last_; ++ it, ++ _count ) {
+			if ( _count ) {
+				if ( *it < _minimum ) {
+					_minimum = *it;
+				}
+				if ( *it > _maximum ) {
+					_maximum = *it;
+				}
+			} else {
 				_minimum = *it;
-			}
-			if ( *it > _maximum ) {
 				_maximum = *it;
 			}
-		} else {
-			_minimum = *it;
-			_maximum = *it;
+			_sum += *it;
+			acc += ( *it * *it );
 		}
-		_sum += *it;
-		acc += ( *it * *it );
-	}
-	_arithmeticMean = _sum / static_cast<numeric_t>( _count );
-	if ( _count > 1 ) {
-		_sampleVariance = ( acc - _arithmeticMean * _arithmeticMean * static_cast<numeric_t>( _count ) ) / static_cast<numeric_t>( _count - 1 );
-	}
-	_populationVariance = acc / static_cast<numeric_t>( _count ) - _arithmeticMean * _arithmeticMean;
-	if ( ( _count > 0 ) && ( _aggregateType & AGGREGATE_TYPE::MEDIAN ) ) {
-		typedef yaal::hcore::HPair<numeric_t, numeric_t> middle_t;
-		if ( _count % 2 ) {
-			middle_t m( select( first_, last_, _count / 2, false ) );
-			_median = m.first;
-		} else {
-			middle_t m( select( first_, last_, _count / 2 - 1, true ) );
-			_median = ( m.first + m.second ) / 2.;
+		_arithmeticMean = _sum / static_cast<numeric_t>( _count );
+		if ( _count > 1 ) {
+			_sampleVariance = ( acc - _arithmeticMean * _arithmeticMean * static_cast<numeric_t>( _count ) ) / static_cast<numeric_t>( _count - 1 );
 		}
+		_populationVariance = acc / static_cast<numeric_t>( _count ) - _arithmeticMean * _arithmeticMean;
+		return;
+		M_EPILOG
 	}
-	return;
-	M_EPILOG
-}
+	template<typename iterator_t>
+	void calculate_extra_stats( iterator_t first_, iterator_t last_ ) {
+		M_PROLOG
+		if ( ( _count > 0 ) && ( _aggregateType & AGGREGATE_TYPE::MEDIAN ) ) {
+			typedef yaal::hcore::HPair<numeric_t, numeric_t> middle_t;
+			if ( _count % 2 ) {
+				middle_t m( select( first_, last_, _count / 2, false ) );
+				_median = m.first;
+			} else {
+				middle_t m( select( first_, last_, _count / 2 - 1, true ) );
+				_median = ( m.first + m.second ) / 2.;
+			}
+		}
+		if ( ( _count > 0 ) && ( _aggregateType & AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION ) ) {
+			numeric_t acc( 0 );
+			for ( iterator_t it( first_ ); it != last_; ++ it ) {
+				acc += abs( *it - _arithmeticMean );
+			}
+			_meanAbsoluteDeviation = acc / static_cast<numeric_t>( _count );
+		}
+		return;
+		M_EPILOG
+	}
+	yaal::hcore::HPair<numeric_t, numeric_t>
+	select( numeric_t* left_, numeric_t* right_, int long kth_, bool two_ ) {
+		M_PROLOG
+		int long long size( right_ - left_ );
+		if ( size == 0 ) {
+			return ( yaal::hcore::make_pair( 0, 0 ) );
+		}
+		M_ENSURE( ( kth_ >= 0 ) && ( kth_ < size ) );
+		numeric_t* kth( left_ + kth_ );
+		nth_element( left_, kth, right_ );
+		numeric_t v0( *kth );
+		numeric_t v1( 0 );
+		if ( two_ ) {
+			++ kth;
+			nth_element( left_, kth, right_ );
+			v1 = *kth;
+		}
+		return ( yaal::hcore::make_pair( v0, v1 ) );
+		M_EPILOG
+	}
+};
 
 template<typename iterator_t>
 HNumberSetStats<typename trait::ternary<is_floating_point<typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type>::value,
@@ -252,37 +299,6 @@ number_t cumulative_distribution_function( number_t const& x_, number_t const& m
 	static number_t const one( number_t( 1 ) );
 	number_t arg( ( x_ - mu_ ) / ( sigma_ * sqrt2 ) );
 	return ( halve * ( one + yaal::math::error_function( arg ) ) );
-}
-
-template<typename iterator_t>
-yaal::hcore::HPair<
-	typename hcore::iterator_traits<iterator_t>::value_type,
-	typename hcore::iterator_traits<iterator_t>::value_type
->
-select( iterator_t first_, iterator_t last_, int long kth_, bool two_ ) {
-	M_PROLOG
-	typedef typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type value_t;
-	typedef hcore::HAuxiliaryBuffer<value_t> aux_t;
-	M_ENSURE( first_ != last_ );
-	aux_t aux( first_, last_ );
-	M_ENSURE( aux.get_size() == aux.get_requested_size() );
-	if ( aux.get_requested_size() == 0 ) {
-		return ( yaal::hcore::make_pair( *first_, 0 ) );
-	}
-	M_ENSURE( ( kth_ >= 0 ) && ( kth_ < aux.get_requested_size() ) );
-	value_t* left( aux.begin() );
-	value_t* right( aux.end() );
-	value_t* kth( left + kth_ );
-	nth_element( left, kth, right );
-	value_t v0( *kth );
-	value_t v1( 0 );
-	if ( two_ ) {
-		++ kth;
-		nth_element( left, kth, right );
-		v1 = *kth;
-	}
-	return ( yaal::hcore::make_pair( v0, v1 ) );
-	M_EPILOG
 }
 
 template<typename iterator_t>

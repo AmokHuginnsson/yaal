@@ -55,10 +55,10 @@ HNumberSetStatistics::HNumberSetStatistics( HHuginn::HClass const* class_, HHugi
 	if ( t == HHuginn::TYPE::LIST ) {
 		HHuginn::HList::values_t const& src( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
 		if ( vt == HHuginn::TYPE::REAL ) {
-			_stats = number_set_stats_t( make_resource<number_set_stats_real_t>( value_unboxing_iterator<double long>( src.begin() ), value_unboxing_iterator<double long>( src.end() ), AGGREGATE_TYPE::BASIC | AGGREGATE_TYPE::MEDIAN ) );
+			_stats = number_set_stats_t( make_resource<number_set_stats_real_t>( value_unboxing_iterator<double long>( src.begin() ), value_unboxing_iterator<double long>( src.end() ), AGGREGATE_TYPE::BASIC | AGGREGATE_TYPE::MEDIAN | AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION ) );
 		} else {
 			M_ASSERT( vt == HHuginn::TYPE::NUMBER );
-			_stats = number_set_stats_t( make_resource<number_set_stats_number_t>( value_unboxing_iterator<yaal::hcore::HNumber>( src.begin() ), value_unboxing_iterator<yaal::hcore::HNumber>( src.end() ), AGGREGATE_TYPE::BASIC | AGGREGATE_TYPE::MEDIAN ) );
+			_stats = number_set_stats_t( make_resource<number_set_stats_number_t>( value_unboxing_iterator<yaal::hcore::HNumber>( src.begin() ), value_unboxing_iterator<yaal::hcore::HNumber>( src.end() ), AGGREGATE_TYPE::BASIC | AGGREGATE_TYPE::MEDIAN | AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION ) );
 		}
 	}
 	return;
@@ -85,6 +85,8 @@ typename stats_t::value_type stats_impl( stats_t const& stats_, aggregate_type_t
 		res = stats_.sample_standard_deviation();
 	} else if ( aggregateType_ == AGGREGATE_TYPE::POPULATION_STANDARD_DEVIATION ) {
 		res = stats_.population_standard_deviation();
+	} else if ( aggregateType_ == AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION ) {
+		res = stats_.mean_absolute_deviation();
 	}
 	return ( res );
 }
@@ -120,7 +122,8 @@ HHuginn::class_t HNumberSetStatistics::get_class( HRuntime* runtime_ ) {
 				{ "sample_variance",               runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "sample_variance",               AGGREGATE_TYPE::SAMPLE_VARIANCE, _1, _2, _3, _4 ) ),               "a sample_variance of the set" },
 				{ "population_variance",           runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "population_variance",           AGGREGATE_TYPE::POPULATION_VARIANCE, _1, _2, _3, _4 ) ),           "a population sample_variance of the numeric set" },
 				{ "sample_standard_deviation",     runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "sample_standard_deviation",     AGGREGATE_TYPE::SAMPLE_STANDARD_DEVIATION, _1, _2, _3, _4 ) ),     "a standard deviation of the numeric set" },
-				{ "population_standard_deviation", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "population_standard_deviation", AGGREGATE_TYPE::POPULATION_STANDARD_DEVIATION, _1, _2, _3, _4 ) ), "a population standard deviation of the numeric set" }
+				{ "population_standard_deviation", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "population_standard_deviation", AGGREGATE_TYPE::POPULATION_STANDARD_DEVIATION, _1, _2, _3, _4 ) ), "a population standard deviation of the numeric set" },
+				{ "mean_absolute_deviation",       runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "mean_absolute_deviation",       AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION, _1, _2, _3, _4 ) ),       "a mean absolute deviation of the numeric set" }
 			},
 			"The `NumberSetStatistics` is a class representing results of gathering numerical statistics over some uniformly typed number set."
 		)
