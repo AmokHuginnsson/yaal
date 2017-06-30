@@ -42,6 +42,7 @@ namespace hcore {
 static int const INVALID_CHARACTER( -256 );
 static int const MAX_INTEGER_DIGIT_COUNT( 64 );
 static int const MAX_FLOAT_DIGIT_COUNT( 8192 );
+static int const MAX_FLOAT_FORMAT_SIZE( 64 );
 char const HStreamInterface::eols[] = "\r\n"; /* order matters */
 
 HStreamInterface::HStreamInterface( void )
@@ -249,7 +250,11 @@ void HStreamInterface::apply_precision( void ) {
 HStreamInterface& HStreamInterface::do_output( double double_ ) {
 	M_PROLOG
 	char buffer[MAX_FLOAT_DIGIT_COUNT];
-	snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, "%f", double_ );
+	char fmt[MAX_FLOAT_FORMAT_SIZE] = "%f";
+	if ( _floatFormat != FLOAT_FORMAT::NATURAL ) {
+		snprintf( fmt, MAX_FLOAT_FORMAT_SIZE, "%%.%d%c", _precision, _floatFormat == FLOAT_FORMAT::FIXED ? 'f' : 'e' );
+	}
+	snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, double_ );
 	_wordCache = buffer;
 	apply_precision();
 	reformat();
@@ -262,7 +267,11 @@ HStreamInterface& HStreamInterface::do_output( double double_ ) {
 HStreamInterface& HStreamInterface::do_output( double long longDouble_ ) {
 	M_PROLOG
 	char buffer[MAX_FLOAT_DIGIT_COUNT];
-	snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, "%.12Lf", longDouble_ );
+	char fmt[MAX_FLOAT_FORMAT_SIZE] = "%.12Lf";
+	if ( _floatFormat != FLOAT_FORMAT::NATURAL ) {
+		snprintf( fmt, MAX_FLOAT_FORMAT_SIZE, "%%.%dL%c", _precision, _floatFormat == FLOAT_FORMAT::FIXED ? 'f' : 'e' );
+	}
+	snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, longDouble_ );
 	_wordCache = buffer;
 	apply_precision();
 	reformat();
@@ -275,7 +284,11 @@ HStreamInterface& HStreamInterface::do_output( double long longDouble_ ) {
 HStreamInterface& HStreamInterface::do_output( float float_ ) {
 	M_PROLOG
 	char buffer[MAX_FLOAT_DIGIT_COUNT];
-	snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, "%f", float_ );
+	char fmt[MAX_FLOAT_FORMAT_SIZE] = "%f";
+	if ( _floatFormat != FLOAT_FORMAT::NATURAL ) {
+		snprintf( fmt, MAX_FLOAT_FORMAT_SIZE, "%%.%d%c", _precision, _floatFormat == FLOAT_FORMAT::FIXED ? 'f' : 'e' );
+	}
+	snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, float_ );
 	_wordCache = buffer;
 	apply_precision();
 	reformat();

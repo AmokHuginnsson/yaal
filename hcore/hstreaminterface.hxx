@@ -85,9 +85,9 @@ public:
 		OCT
 	};
 	enum class FLOAT_FORMAT {
-		NATURAL,
-		FIXED,
-		SCIENTIFIC
+		NATURAL,   /*!< Use as many decimal digits as it makes sense for given value. */
+		FIXED,     /*!< Use exactly `precision` count decimal digits. */
+		SCIENTIFIC /*!< Use scientific notation (1.2345e+009). */
 	};
 	enum class ADJUST {
 		LEFT,
