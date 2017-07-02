@@ -35,7 +35,6 @@ Copyright:
 #include "hcore/hbitflag.hxx"
 
 /* *TODO* Add `mode`. */
-/* *TODO* Add `interquartile_range`. */
 
 namespace yaal {
 
@@ -59,6 +58,7 @@ struct AGGREGATE_TYPE {
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const BASIC;
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const MEDIAN;
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const MEAN_ABSOLUTE_DEVIATION;
+	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const INTERQUARTILE_RANGE;
 };
 
 /*! \brief Provide statistics for set of numbers.
@@ -75,6 +75,7 @@ private:
 	numeric_t _sum;
 	numeric_t _arithmeticMean;
 	numeric_t _median;
+	numeric_t _interquartileRange;
 	numeric_t _meanAbsoluteDeviation;
 	numeric_t _sampleVariance;
 	numeric_t _populationVariance;
@@ -97,6 +98,7 @@ public:
 		, _sum()
 		, _arithmeticMean()
 		, _median()
+		, _interquartileRange()
 		, _meanAbsoluteDeviation()
 		, _sampleVariance()
 		, _populationVariance()
@@ -183,6 +185,24 @@ public:
 		return ( _meanAbsoluteDeviation );
 		M_EPILOG
 	}
+	numeric_t range( void ) const {
+		M_PROLOG
+		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::MINIMUM ) && ( _aggregateType & AGGREGATE_TYPE::MAXIMUM ) && ( _count > 0 ) );
+		return ( _maximum - _minimum );
+		M_EPILOG
+	}
+	numeric_t mid_range( void ) const {
+		M_PROLOG
+		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::MINIMUM ) && ( _aggregateType & AGGREGATE_TYPE::MAXIMUM ) && ( _count > 0 ) );
+		return ( ( _maximum + _minimum ) / 2 );
+		M_EPILOG
+	}
+	numeric_t interquartile_range( void ) const {
+		M_PROLOG
+		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::INTERQUARTILE_RANGE ) && ( _count > 0 ) );
+		return ( _interquartileRange );
+		M_EPILOG
+	}
 private:
 	template<typename iterator_t>
 	void calculate_basic_stats( iterator_t first_, iterator_t last_ ) {
@@ -214,14 +234,27 @@ private:
 	template<typename iterator_t>
 	void calculate_extra_stats( iterator_t first_, iterator_t last_ ) {
 		M_PROLOG
+		typedef yaal::hcore::HPair<numeric_t, numeric_t> middle_t;
 		if ( ( _count > 0 ) && ( _aggregateType & AGGREGATE_TYPE::MEDIAN ) ) {
-			typedef yaal::hcore::HPair<numeric_t, numeric_t> middle_t;
 			if ( _count % 2 ) {
 				middle_t m( select( first_, last_, _count / 2, false ) );
 				_median = m.first;
 			} else {
 				middle_t m( select( first_, last_, _count / 2 - 1, true ) );
 				_median = ( m.first + m.second ) / 2.;
+			}
+		}
+		if ( ( _count > 0 ) && ( _aggregateType & AGGREGATE_TYPE::INTERQUARTILE_RANGE ) ) {
+			int long halfCount( _count / 2 );
+			bool hasMiddle( !! ( _count % 2 ) );
+			if ( halfCount % 2 ) {
+				middle_t fm( select( first_, last_, halfCount / 2, false ) );
+				middle_t lm( select( first_, last_, halfCount + ( hasMiddle ? 1 : 0 ) + halfCount / 2, false ) );
+				_interquartileRange = lm.first - fm.first;
+			} else {
+				middle_t fm( select( first_, last_, halfCount / 2 - 1, true ) );
+				middle_t lm( select( first_, last_, halfCount + ( hasMiddle ? 1 : 0 ) + halfCount / 2 - 1, true ) );
+				_interquartileRange = ( lm.first + lm.second ) / 2 - ( fm.first + fm.second ) / 2;
 			}
 		}
 		if ( ( _count > 0 ) && ( _aggregateType & AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION ) ) {

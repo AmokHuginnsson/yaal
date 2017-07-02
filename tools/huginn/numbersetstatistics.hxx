@@ -40,6 +40,10 @@ namespace huginn {
 
 class HNumberSetStatistics : public HHuginn::HValue {
 public:
+	enum class DERIVATIVE_STAT {
+		RANGE,
+		MID_RANGE
+	};
 	typedef yaal::tools::xmath::HNumberSetStats<double long> number_set_stats_real_t;
 	typedef yaal::hcore::HResource<number_set_stats_real_t> number_set_stats_real_ptr_t;
 	typedef yaal::tools::xmath::HNumberSetStats<yaal::hcore::HNumber> number_set_stats_number_t;
@@ -50,6 +54,8 @@ private:
 public:
 	HNumberSetStatistics( HHuginn::HClass const*, HHuginn::values_t const&, int );
 	static HHuginn::value_t stat( char const*, xmath::aggregate_type_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+	static HHuginn::value_t derivative_stat( char const*, DERIVATIVE_STAT, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+	static HHuginn::value_t count( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::class_t get_class( HRuntime* );
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread*, int ) const override __attribute__((noreturn));

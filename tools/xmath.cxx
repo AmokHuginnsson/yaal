@@ -61,6 +61,7 @@ aggregate_type_t const AGGREGATE_TYPE::BASIC = AGGREGATE_TYPE::COUNT
 	| AGGREGATE_TYPE::POPULATION_STANDARD_DEVIATION;
 aggregate_type_t const AGGREGATE_TYPE::MEDIAN = aggregate_type_t::new_flag();
 aggregate_type_t const AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION = aggregate_type_t::new_flag();
+aggregate_type_t const AGGREGATE_TYPE::INTERQUARTILE_RANGE = aggregate_type_t::new_flag();
 
 }
 

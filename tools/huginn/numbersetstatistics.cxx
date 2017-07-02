@@ -55,10 +55,10 @@ HNumberSetStatistics::HNumberSetStatistics( HHuginn::HClass const* class_, HHugi
 	if ( t == HHuginn::TYPE::LIST ) {
 		HHuginn::HList::values_t const& src( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
 		if ( vt == HHuginn::TYPE::REAL ) {
-			_stats = number_set_stats_t( make_resource<number_set_stats_real_t>( value_unboxing_iterator<double long>( src.begin() ), value_unboxing_iterator<double long>( src.end() ), AGGREGATE_TYPE::BASIC | AGGREGATE_TYPE::MEDIAN | AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION ) );
+			_stats = number_set_stats_t( make_resource<number_set_stats_real_t>( value_unboxing_iterator<double long>( src.begin() ), value_unboxing_iterator<double long>( src.end() ), AGGREGATE_TYPE::BASIC | AGGREGATE_TYPE::MEDIAN | AGGREGATE_TYPE::INTERQUARTILE_RANGE | AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION ) );
 		} else {
 			M_ASSERT( vt == HHuginn::TYPE::NUMBER );
-			_stats = number_set_stats_t( make_resource<number_set_stats_number_t>( value_unboxing_iterator<yaal::hcore::HNumber>( src.begin() ), value_unboxing_iterator<yaal::hcore::HNumber>( src.end() ), AGGREGATE_TYPE::BASIC | AGGREGATE_TYPE::MEDIAN | AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION ) );
+			_stats = number_set_stats_t( make_resource<number_set_stats_number_t>( value_unboxing_iterator<yaal::hcore::HNumber>( src.begin() ), value_unboxing_iterator<yaal::hcore::HNumber>( src.end() ), AGGREGATE_TYPE::BASIC | AGGREGATE_TYPE::MEDIAN | AGGREGATE_TYPE::INTERQUARTILE_RANGE | AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION ) );
 		}
 	}
 	return;
@@ -77,6 +77,8 @@ typename stats_t::value_type stats_impl( stats_t const& stats_, aggregate_type_t
 		res = stats_.arithmetic_mean();
 	} else if ( aggregateType_ == AGGREGATE_TYPE::MEDIAN ) {
 		res = stats_.median();
+	} else if ( aggregateType_ == AGGREGATE_TYPE::INTERQUARTILE_RANGE ) {
+		res = stats_.interquartile_range();
 	} else if ( aggregateType_ == AGGREGATE_TYPE::SAMPLE_VARIANCE ) {
 		res = stats_.sample_variance();
 	} else if ( aggregateType_ == AGGREGATE_TYPE::POPULATION_VARIANCE ) {
@@ -87,6 +89,17 @@ typename stats_t::value_type stats_impl( stats_t const& stats_, aggregate_type_t
 		res = stats_.population_standard_deviation();
 	} else if ( aggregateType_ == AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION ) {
 		res = stats_.mean_absolute_deviation();
+	}
+	return ( res );
+}
+
+template<typename stats_t>
+typename stats_t::value_type derivative_stats_impl( stats_t const& stats_, HNumberSetStatistics::DERIVATIVE_STAT derivativeStats_ ) {
+	typename stats_t::value_type res( 0 );
+	if ( derivativeStats_ == HNumberSetStatistics::DERIVATIVE_STAT::RANGE ) {
+		res = stats_.range();
+	} else if ( derivativeStats_ == HNumberSetStatistics::DERIVATIVE_STAT::MID_RANGE ) {
+		res = stats_.mid_range();
 	}
 	return ( res );
 }
@@ -107,6 +120,38 @@ HHuginn::value_t HNumberSetStatistics::stat( char const* name_, xmath::aggregate
 	M_EPILOG
 }
 
+HHuginn::value_t HNumberSetStatistics::derivative_stat( char const* name_, DERIVATIVE_STAT derivativeStats_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "NumberSetStatistics."_ys.append( name_ ), values_, 0, 0, position_ );
+	HHuginn::value_t v;
+	HNumberSetStatistics* o( static_cast<HNumberSetStatistics*>( object_->raw() ) );
+	if ( o->_stats.type() == 0 ) {
+		number_set_stats_real_t& nss( *( o->_stats.get<number_set_stats_real_ptr_t>().raw() ) );
+		v = thread_->runtime().object_factory()->create_real( derivative_stats_impl( nss, derivativeStats_ ) );
+	} else {
+		number_set_stats_number_t& nss( *( o->_stats.get<number_set_stats_number_ptr_t>().raw() ) );
+		v = thread_->runtime().object_factory()->create_number( derivative_stats_impl( nss, derivativeStats_ ) );
+	}
+	return ( v );
+	M_EPILOG
+}
+
+HHuginn::value_t HNumberSetStatistics::count( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "NumberSetStatistics.count", values_, 0, 0, position_ );
+	HHuginn::value_t v;
+	HNumberSetStatistics* o( static_cast<HNumberSetStatistics*>( object_->raw() ) );
+	if ( o->_stats.type() == 0 ) {
+		number_set_stats_real_t& nss( *( o->_stats.get<number_set_stats_real_ptr_t>().raw() ) );
+		v = thread_->runtime().object_factory()->create_integer( nss.count() );
+	} else {
+		number_set_stats_number_t& nss( *( o->_stats.get<number_set_stats_number_ptr_t>().raw() ) );
+		v = thread_->runtime().object_factory()->create_integer( nss.count() );
+	}
+	return ( v );
+	M_EPILOG
+}
+
 HHuginn::class_t HNumberSetStatistics::get_class( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
@@ -114,16 +159,20 @@ HHuginn::class_t HNumberSetStatistics::get_class( HRuntime* runtime_ ) {
 			"NumberSetStatistics",
 			nullptr,
 			HHuginn::field_definitions_t{
+				{ "count",                         runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::count, _1, _2, _3, _4 ) ), "a number of elements in given numeric set" },
 				{ "minimum",                       runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "minimum",                       AGGREGATE_TYPE::MINIMUM, _1, _2, _3, _4 ) ),                       "a minimum numeric value in set" },
 				{ "maximum",                       runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "maximum",                       AGGREGATE_TYPE::MAXIMUM, _1, _2, _3, _4 ) ),                       "a maximum numeric value in set" },
 				{ "sum",                           runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "sum",                           AGGREGATE_TYPE::SUM, _1, _2, _3, _4 ) ),                           "a sum of all values in set" },
 				{ "arithmetic_mean",               runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "arithmetic_mean",               AGGREGATE_TYPE::ARITHMETIC_MEAN, _1, _2, _3, _4 ) ),               "an arithmetic mean of all numbers in set" },
 				{ "median",                        runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "median",                        AGGREGATE_TYPE::MEDIAN, _1, _2, _3, _4 ) ),                        "a median value in set" },
+				{ "interquartile_range",           runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "interquartile_range",           AGGREGATE_TYPE::INTERQUARTILE_RANGE, _1, _2, _3, _4 ) ),           "an interquartile range of given set of values" },
 				{ "sample_variance",               runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "sample_variance",               AGGREGATE_TYPE::SAMPLE_VARIANCE, _1, _2, _3, _4 ) ),               "a sample_variance of the set" },
 				{ "population_variance",           runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "population_variance",           AGGREGATE_TYPE::POPULATION_VARIANCE, _1, _2, _3, _4 ) ),           "a population sample_variance of the numeric set" },
 				{ "sample_standard_deviation",     runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "sample_standard_deviation",     AGGREGATE_TYPE::SAMPLE_STANDARD_DEVIATION, _1, _2, _3, _4 ) ),     "a standard deviation of the numeric set" },
 				{ "population_standard_deviation", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "population_standard_deviation", AGGREGATE_TYPE::POPULATION_STANDARD_DEVIATION, _1, _2, _3, _4 ) ), "a population standard deviation of the numeric set" },
-				{ "mean_absolute_deviation",       runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "mean_absolute_deviation",       AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION, _1, _2, _3, _4 ) ),       "a mean absolute deviation of the numeric set" }
+				{ "mean_absolute_deviation",       runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::stat, "mean_absolute_deviation",       AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION, _1, _2, _3, _4 ) ),       "a mean absolute deviation of the numeric set" },
+				{ "range",     runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::derivative_stat, "range",     DERIVATIVE_STAT::RANGE,     _1, _2, _3, _4 ) ), "a range of values in the numeric set" },
+				{ "mid_range", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HNumberSetStatistics::derivative_stat, "mid_range", DERIVATIVE_STAT::MID_RANGE, _1, _2, _3, _4 ) ), "a mid range value of the numbers in the given set" }
 			},
 			"The `NumberSetStatistics` is a class representing results of gathering numerical statistics over some uniformly typed number set."
 		)
