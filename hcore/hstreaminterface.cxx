@@ -53,7 +53,7 @@ HStreamInterface::HStreamInterface( void )
 	, _fill( ' ' )
 	, _width( 0 )
 	, _precision( 6 )
-	, _base( BASES::DEC )
+	, _base( BASE::DEC )
 	, _floatFormat( FLOAT_FORMAT::NATURAL )
 	, _adjust( ADJUST::RIGHT )
 	, _skipWS( true )
@@ -158,7 +158,7 @@ HStreamInterface& HStreamInterface::do_output( int unsigned unsignedInteger_ ) {
 HStreamInterface& HStreamInterface::do_output( int long longInteger_ ) {
 	M_PROLOG
 	char buffer[MAX_INTEGER_DIGIT_COUNT];
-	snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, _base == BASES::DEC ? "%ld" : ( _base == BASES::HEX ) ? "%lx" : "%lo", longInteger_ );
+	snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, _base == BASE::DEC ? "%ld" : ( _base == BASE::HEX ) ? "%lx" : "%lo", longInteger_ );
 	_wordCache = buffer;
 	reformat();
 	_conversionCache = _wordCache;
@@ -170,7 +170,7 @@ HStreamInterface& HStreamInterface::do_output( int long longInteger_ ) {
 HStreamInterface& HStreamInterface::do_output( int long long longLongInteger_ ) {
 	M_PROLOG
 	char buffer[MAX_INTEGER_DIGIT_COUNT];
-	snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, _base == BASES::DEC ? "%lld" : ( _base == BASES::HEX ) ? "%llx" : "%llo", longLongInteger_ );
+	snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, _base == BASE::DEC ? "%lld" : ( _base == BASE::HEX ) ? "%llx" : "%llo", longLongInteger_ );
 	_wordCache = buffer;
 	reformat();
 	_conversionCache = _wordCache;
@@ -209,7 +209,7 @@ void HStreamInterface::reformat( void ) {
 HStreamInterface& HStreamInterface::do_output( int long unsigned unsignedLongInteger_ ) {
 	M_PROLOG
 	char buffer[MAX_INTEGER_DIGIT_COUNT];
-	snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, _base == BASES::DEC ? "%lu" : ( _base == BASES::HEX ) ? "%lx" : "%lo", unsignedLongInteger_ );
+	snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, _base == BASE::DEC ? "%lu" : ( _base == BASE::HEX ) ? "%lx" : "%lo", unsignedLongInteger_ );
 	_wordCache = buffer;
 	reformat();
 	_conversionCache = _wordCache;
@@ -221,7 +221,7 @@ HStreamInterface& HStreamInterface::do_output( int long unsigned unsignedLongInt
 HStreamInterface& HStreamInterface::do_output( int long long unsigned unsignedLongLongInteger_ ) {
 	M_PROLOG
 	char buffer[MAX_INTEGER_DIGIT_COUNT];
-	snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, _base == BASES::DEC ? "%llu" : ( _base == BASES::HEX ) ? "%llx" : "%llo", unsignedLongLongInteger_ );
+	snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, _base == BASE::DEC ? "%llu" : ( _base == BASE::HEX ) ? "%llx" : "%llo", unsignedLongLongInteger_ );
 	_wordCache = buffer;
 	reformat();
 	_conversionCache = _wordCache;
@@ -340,19 +340,19 @@ HStreamInterface& flush( HStreamInterface& file_ ) {
 
 HStreamInterface& dec( HStreamInterface& iface_ ) {
 	M_PROLOG
-	return ( iface_.set_base( HStreamInterface::BASES::DEC ) );
+	return ( iface_.set_base( HStreamInterface::BASE::DEC ) );
 	M_EPILOG
 }
 
 HStreamInterface& hex( HStreamInterface& iface_ ) {
 	M_PROLOG
-	return ( iface_.set_base( HStreamInterface::BASES::HEX ) );
+	return ( iface_.set_base( HStreamInterface::BASE::HEX ) );
 	M_EPILOG
 }
 
 HStreamInterface& oct( HStreamInterface& iface_ ) {
 	M_PROLOG
-	return ( iface_.set_base( HStreamInterface::BASES::OCT ) );
+	return ( iface_.set_base( HStreamInterface::BASE::OCT ) );
 	M_EPILOG
 }
 
@@ -627,7 +627,7 @@ bool HStreamInterface::read_integer( void ) {
 		if ( ! good() ) {
 			break;
 		}
-		if ( _base != BASES::DEC ) {
+		if ( _base != BASE::DEC ) {
 			char zero( 0 );
 			do_input( zero );
 			if ( zero != '0' ) {
@@ -636,14 +636,14 @@ bool HStreamInterface::read_integer( void ) {
 			}
 			char base( 0 );
 			do_input( base );
-			if ( ( ( _base == BASES::HEX ) && ( tolower( base ) != 'x' ) ) || ( ( _base == BASES::OCT ) && ( tolower( base ) != 'o' ) ) ) {
+			if ( ( ( _base == BASE::HEX ) && ( tolower( base ) != 'x' ) ) || ( ( _base == BASE::OCT ) && ( tolower( base ) != 'o' ) ) ) {
 				_fail = true;
 				break;
 			}
 		}
 		read_while_retry( _wordCache, character_class( CHARACTER_CLASS::DIGIT ).data() );
-		if ( _base != BASES::DEC ) {
-			_wordCache.insert( 0, _base == BASES::HEX ? "0x" : "0o" );
+		if ( _base != BASE::DEC ) {
+			_wordCache.insert( 0, _base == BASE::HEX ? "0x" : "0o" );
 		}
 		if ( neg ) {
 			_wordCache.insert( 0, "-" );
@@ -946,7 +946,7 @@ HStreamInterface& HStreamInterface::do_set_precision( int precision_ ) {
 	M_EPILOG
 }
 
-HStreamInterface& HStreamInterface::do_set_base( BASES base_ ) {
+HStreamInterface& HStreamInterface::do_set_base( BASE base_ ) {
 	M_PROLOG
 	_base = base_;
 	return ( *this );
@@ -1001,7 +1001,7 @@ int HStreamInterface::do_get_precision( void ) const {
 	return ( _precision );
 }
 
-HStreamInterface::BASES HStreamInterface::do_get_base( void ) const {
+HStreamInterface::BASE HStreamInterface::do_get_base( void ) const {
 	return ( _base );
 }
 

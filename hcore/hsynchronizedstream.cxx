@@ -396,7 +396,7 @@ HStreamInterface& HSynchronizedStream::do_set_precision( int val_ ) {
 	M_EPILOG
 }
 
-HStreamInterface& HSynchronizedStream::do_set_base( BASES val_ ) {
+HStreamInterface& HSynchronizedStream::do_set_base( BASE val_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	return ( HStreamInterface::do_set_base( val_ ) );
@@ -466,7 +466,7 @@ int HSynchronizedStream::do_get_precision( void ) const {
 	M_EPILOG
 }
 
-HStreamInterface::BASES HSynchronizedStream::do_get_base( void ) const {
+HStreamInterface::BASE HSynchronizedStream::do_get_base( void ) const {
 	M_PROLOG
 	HLock l( _mutex );
 	return ( HStreamInterface::do_get_base() );
