@@ -572,8 +572,13 @@ template<typename tType>
 class HBackInsertionConcept {
 public:
 	template<typename elem_t>
-	static void insert( tType& coll, elem_t const& elem )
-		{ coll.push_back( elem ); }
+	static void insert( tType& coll, elem_t const& elem ) {
+		coll.push_back( elem );
+	}
+	template<typename elem_t>
+	static void insert( tType& coll, elem_t&& elem ) {
+		coll.push_back( yaal::move( elem ) );
+	}
 };
 
 /*! \brief (Front)Insertion concept for HInsertingIterator.
@@ -584,8 +589,13 @@ template<typename tType>
 class HFrontInsertionConcept {
 public:
 	template<typename elem_t>
-	static void insert( tType& coll, elem_t const& elem )
-		{ coll.push_front( elem ); }
+	static void insert( tType& coll, elem_t const& elem ) {
+		coll.push_front( elem );
+	}
+	template<typename elem_t>
+	static void insert( tType& coll, elem_t&& elem ) {
+		coll.push_front( yaal::move( elem ) );
+	}
 };
 
 /*! \brief Insertion concept for HInsertingIterator.
@@ -596,8 +606,13 @@ template<typename tType>
 class HInsertionConcept {
 public:
 	template<typename elem_t>
-	static void insert( tType& coll, elem_t const& elem )
-		{ coll.insert( elem ); }
+	static void insert( tType& coll, elem_t const& elem ) {
+		coll.insert( elem );
+	}
+	template<typename elem_t>
+	static void insert( tType& coll, elem_t&& elem ) {
+		coll.insert( yaal::move( elem ) );
+	}
 };
 
 /*! \brief (Push)Insertion concept for HInsertingIterator.
@@ -608,8 +623,13 @@ template<typename tType>
 class HPushInsertionConcept {
 public:
 	template<typename elem_t>
-	static void insert( tType& coll, elem_t const& elem )
-		{ coll.push( elem ); }
+	static void insert( tType& coll, elem_t const& elem ) {
+		coll.push( elem );
+	}
+	template<typename elem_t>
+	static void insert( tType& coll, elem_t&& elem ) {
+		coll.push( yaal::move( elem ) );
+	}
 };
 
 /*! \brief Iterator class that allows extending existing collections.
@@ -640,6 +660,11 @@ public:
 		inserter_type::insert( _coll, elem_ );
 		return ( *this );
 	}
+	template<typename arg_t>
+	this_type& operator = ( arg_t&& elem_ ) {
+		inserter_type::insert( _coll, yaal::move( elem_ ) );
+		return ( *this );
+	}
 };
 
 /*! \brief Back inserting iterator class.
@@ -662,6 +687,11 @@ public:
 	template<typename arg_t>
 	HBackInsertIterator<tType>& operator = ( arg_t const& elem_ ) {
 		typename base_type::inserter_type::insert( this->_coll, elem_ );
+		return ( *this );
+	}
+	template<typename arg_t>
+	HBackInsertIterator<tType>& operator = ( arg_t&& elem_ ) {
+		typename base_type::inserter_type::insert( this->_coll, yaal::move( elem_ ) );
 		return ( *this );
 	}
 };
@@ -688,6 +718,11 @@ public:
 		typename base_type::inserter_type::insert( this->_coll, elem_ );
 		return ( *this );
 	}
+	template<typename arg_t>
+	HFrontInsertIterator<tType>& operator = ( arg_t&& elem_ ) {
+		typename base_type::inserter_type::insert( this->_coll, yaal::move( elem_ ) );
+		return ( *this );
+	}
 };
 
 /*! \brief Key based inserting iterator class.
@@ -712,6 +747,11 @@ public:
 		typename base_type::inserter_type::insert( this->_coll, elem_ );
 		return ( *this );
 	}
+	template<typename arg_t>
+	HInsertIterator<tType>& operator = ( arg_t&& elem_ ) {
+		typename base_type::inserter_type::insert( this->_coll, yaal::move( elem_ ) );
+		return ( *this );
+	}
 };
 
 /*! \brief Push based inserting iterator class.
@@ -734,6 +774,11 @@ public:
 	template<typename arg_t>
 	HPushInsertIterator<tType>& operator = ( arg_t const& elem_ ) {
 		typename base_type::inserter_type::insert( this->_coll, elem_ );
+		return ( *this );
+	}
+	template<typename arg_t>
+	HPushInsertIterator<tType>& operator = ( arg_t&& elem_ ) {
+		typename base_type::inserter_type::insert( this->_coll, yaal::move( elem_ ) );
 		return ( *this );
 	}
 };
