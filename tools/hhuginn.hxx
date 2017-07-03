@@ -110,6 +110,7 @@ public:
 	class HFunctionReference;
 	class HValue;
 	typedef yaal::hcore::HPointer<HValue> value_t;
+	typedef yaal::hcore::HPointerObserver<HValue> value_ref_t;
 	class HBoolean;
 	class HInteger;
 	class HReal;

@@ -848,16 +848,9 @@ void HExpression::store_direct( HHuginn::value_t const& value_, HFrame* frame_, 
 	M_EPILOG
 }
 
-void HExpression::store_external_reference( HHuginn::value_t const* value_, huginn::HFrame* frame_, int ) {
+void HExpression::store_external_reference( HHuginn::value_ref_t const& value_, huginn::HFrame* frame_, int ) {
 	M_PROLOG
-	frame_->values().push( *value_ );
-	return;
-	M_EPILOG
-}
-
-void HExpression::store_value_pointer( HHuginn::value_t* valuePointer_, huginn::HFrame* frame_, int ) {
-	M_PROLOG
-	frame_->values().push( *valuePointer_ );
+	frame_->values().push( value_ );
 	return;
 	M_EPILOG
 }

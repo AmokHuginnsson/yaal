@@ -462,9 +462,9 @@ void OCompiler::resolve_symbols( void ) {
 					es._expression->replace_execution_step(
 						es._index,
 						hcore::call(
-							&HExpression::store_value_pointer,
+							&HExpression::store_external_reference,
 							es._expression.raw(),
-							callable,
+							HHuginn::value_ref_t( *callable ),
 							_1,
 							es._position
 						)
@@ -478,7 +478,7 @@ void OCompiler::resolve_symbols( void ) {
 							hcore::call(
 								&HExpression::store_external_reference,
 								es._expression.raw(),
-								p,
+								HHuginn::value_ref_t( *p ),
 								_1,
 								es._position
 							)
