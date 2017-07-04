@@ -47,7 +47,7 @@ private:
 	HHuginn::expression_t _source;
 	HHuginn::scope_t _loop;
 public:
-	HFor( HStatement::statement_id_t, HHuginn::expression_t const&, HHuginn::expression_t const&, HHuginn::scope_t const&, int );
+	HFor( HStatement::statement_id_t, HHuginn::expression_t const&, HHuginn::expression_t const&, HHuginn::scope_t const&, int, int );
 protected:
 	virtual void do_execute( HThread* ) const override;
 };

@@ -175,6 +175,7 @@ public:
 	};
 	class HHuginnRuntimeException;
 	typedef yaal::hcore::HResource<huginn::HSource> source_t;
+	typedef yaal::hcore::HArray<source_t> sources_t;
 	typedef yaal::hcore::HResource<huginn::OCompiler> compiler_t;
 	typedef yaal::hcore::HResource<huginn::HRuntime> runtime_t;
 	/*! \brief Huginn class (constructor) access specification.
@@ -197,11 +198,12 @@ private:
 	};
 	STATE _state;
 	runtime_t _runtime;
-	source_t _source;
+	sources_t _sources;
 	compiler_t _compiler;
 	HExecutingParser _engine;
 	yaal::hcore::HString _errorMessage;
 	int _errorPosition;
+	int _errorFileId;
 	typedef std::atomic<bool> flag_t;
 	yaal::hcore::HStreamInterface::ptr_t _inputStream;
 	yaal::hcore::HStreamInterface* _inputStreamRaw;
@@ -304,9 +306,9 @@ public:
 	void dump_preprocessed_source( yaal::hcore::HStreamInterface& ) const;
 	int error_position( void ) const;
 	HErrorCoordinate error_coordinate( void ) const;
-	HErrorCoordinate get_coordinate( int ) const;
-	yaal::hcore::HString source_name( void ) const;
-	yaal::hcore::HString where( int ) const;
+	HErrorCoordinate get_coordinate( int, int ) const;
+	yaal::hcore::HString source_name( int ) const;
+	yaal::hcore::HString where( int, int ) const;
 	yaal::hcore::HString error_message( void ) const;
 	void set_input_stream( yaal::hcore::HStreamInterface& );
 	void set_input_stream( yaal::hcore::HStreamInterface::ptr_t );
@@ -363,11 +365,14 @@ public:
 	typedef HHuginn::HHuginnRuntimeException this_type;
 private:
 	yaal::hcore::HString _message;
+	int _fileId;
 	int _position;
 public:
+	HHuginnRuntimeException( yaal::hcore::HString const&, int, int );
 	HHuginnRuntimeException( yaal::hcore::HString const&, int );
 	yaal::hcore::HString const& message( void ) const;
 	int position( void ) const;
+	int file_id( void ) const;
 };
 
 class HHuginn::HFieldDefinition {

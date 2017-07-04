@@ -57,6 +57,7 @@ HFrame::HFrame(
 	, _number( 0 )
 	, _type( TYPE::SCOPE )
 	, _state( STATE::NORMAL )
+	, _fileId( INVALID_FILE_ID )
 	, _statementId( INVALID_STATEMENT_IDENTIFIER ) {
 	_variables.reserve( _thread->runtime().max_local_variable_count() );
 	return;
@@ -64,12 +65,14 @@ HFrame::HFrame(
 
 void HFrame::init(
 	TYPE type_,
+	int fileId_,
 	HStatement::statement_id_t statementId_,
 	HHuginn::value_t* object_,
 	int upCast_
 ) {
 	M_PROLOG
 	_type = type_;
+	_fileId = fileId_;
 	_statementId = statementId_;
 	_object = object_;
 	_upCast = upCast_;

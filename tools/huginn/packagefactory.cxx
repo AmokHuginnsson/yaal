@@ -31,6 +31,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 #include "runtime.hxx"
 #include "objectfactory.hxx"
 #include "compiler.hxx"
+#include "source.hxx"
 #include "hcore/hfile.hxx"
 #include "tools/filesystem.hxx"
 
@@ -125,13 +126,18 @@ HHuginn::value_t HPackageFactory::load_module( HRuntime* runtime_, HHuginn::path
 	loader.load( src );
 	loader.preprocess();
 	loader._compiler->_isModule = true;
+	HHuginn& h( *runtime_->huginn() );
+	int fileId( h._compiler->_fileId );
+	loader._compiler->_fileId = ( fileId == MAIN_FILE_ID ? static_cast<int>( h._sources.get_size() - 1 ) : fileId );
 	if ( ! ( loader.parse() && loader.compile( paths_, compilerSetup_ ) ) ) {
 		throw HHuginn::HHuginnRuntimeException( loader.error_message(), position_ );
 	}
+	h._compiler->_fileId = loader._compiler->_fileId;
 	loader._state = HHuginn::STATE::PARSED;
 	HHuginn::class_t c( rt.make_package( name_, *runtime_ ) );
 	runtime_->copy_text( rt );
-	runtime_->huginn()->register_class( c );
+	h.register_class( c );
+	h._sources.insert( h._sources.end(), make_move_iterator( loader._sources.begin() ), make_move_iterator( loader._sources.end() ) );
 	huginn::HThread t( runtime_, hcore::HThread::get_current_thread_id() );
 	return ( runtime_->object_factory()->create_object( c.raw(), c->get_defaults( &t, position_ ) ) );
 	M_EPILOG

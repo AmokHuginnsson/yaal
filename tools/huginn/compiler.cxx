@@ -63,9 +63,10 @@ OCompiler::OActiveScope::OActiveScope( HHuginn::scope_t& scope_, HHuginn::expres
 OCompiler::OScopeContext::OScopeContext(
 	OFunctionContext* functionContext_,
 	HStatement::statement_id_t statementId_,
+	int fileId_,
 	int position_
 ) : _parent( ! functionContext_->_scopeStack.is_empty() ? functionContext_->_scopeStack.top().raw() : nullptr )
-	, _scope( make_pointer<HScope>( statementId_, position_ ) )
+	, _scope( make_pointer<HScope>( statementId_, fileId_, position_ ) )
 	, _expressionsStack()
 	, _variableTypes()
 	, _exceptionType( INVALID_IDENTIFIER )
@@ -77,7 +78,7 @@ OCompiler::OScopeContext::OScopeContext(
 	, _statementId( statementId_ )
 	, _functionId( functionContext_->_functionIdentifier )
 	, _variables() {
-	_expressionsStack.emplace( 1, make_pointer<HExpression>() );
+	_expressionsStack.emplace( 1, make_pointer<HExpression>( fileId_ ) );
 	return;
 }
 
@@ -124,6 +125,7 @@ void OCompiler::OScopeContext::note_type( HHuginn::identifier_id_t identifierId_
 OCompiler::OFunctionContext::OFunctionContext(
 	HHuginn::identifier_id_t functionId_,
 	HStatement::statement_id_t statementId_,
+	int fileId_,
 	bool isLambda_
 ) : _functionIdentifier( functionId_ )
 	, _parameters()
@@ -142,7 +144,7 @@ OCompiler::OFunctionContext::OFunctionContext(
 	, _lastMemberName()
 	, _isLambda( isLambda_ )
 	, _inline( true ) {
-	_scopeStack.emplace( make_pointer<OScopeContext>( this, statementId_, 0 ) );
+	_scopeStack.emplace( make_pointer<OScopeContext>( this, statementId_, fileId_, 0 ) );
 	return;
 }
 
@@ -276,6 +278,7 @@ OCompiler::OCompiler( HRuntime* runtime_ )
 	, _statementIdGenerator( INVALID_STATEMENT_IDENTIFIER )
 	, _scopeContextCache()
 	, _isModule( false )
+	, _fileId( INVALID_FILE_ID )
 	, _isIncremental( false )
 	, _mainStatementCount( 0 )
 	, _runtime( runtime_ ) {
@@ -284,6 +287,7 @@ OCompiler::OCompiler( HRuntime* runtime_ )
 
 void OCompiler::reset( int undoSteps_ ) {
 	M_PROLOG
+	_fileId = INVALID_FILE_ID;
 	_isModule = false;
 	_mainStatementCount -= undoSteps_;
 	_isIncremental = true;
@@ -305,6 +309,7 @@ void OCompiler::reset( int undoSteps_ ) {
 
 void OCompiler::set_setup( HHuginn::compiler_setup_t setup_ ) {
 	_setup = setup_;
+	++ _fileId;
 	return;
 }
 
@@ -622,7 +627,7 @@ void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_
 			! _classContext ? OIdentifierUse::TYPE::FUNCTION : OIdentifierUse::TYPE::METHOD
 		);
 	}
-	_functionContexts.emplace( make_resource<OFunctionContext>( functionIdentifier, ++ _statementIdGenerator, false ) );
+	_functionContexts.emplace( make_resource<OFunctionContext>( functionIdentifier, ++ _statementIdGenerator, _fileId, false ) );
 	if ( !! _classContext ) {
 		add_field_name( name_, position_ );
 	}
@@ -687,7 +692,7 @@ void OCompiler::set_class_name( HHuginn::identifier_id_t identifier_, executing_
 	}
 	_classContext = make_resource<OClassContext>();
 	_usedIdentifiers[identifier_].write( position_.get(), OIdentifierUse::TYPE::CLASS );
-	_functionContexts.emplace( make_resource<OFunctionContext>( identifier_, ++ _statementIdGenerator, false ) );
+	_functionContexts.emplace( make_resource<OFunctionContext>( identifier_, ++ _statementIdGenerator, _fileId, false ) );
 	_classContext->_classIdentifier = identifier_;
 	_classContext->_position = position_;
 	return;
@@ -735,10 +740,10 @@ void OCompiler::set_field_name( yaal::hcore::HString const& name_, executing_par
 void OCompiler::set_lambda_name( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OCompiler::OFunctionContext& fc( f() );
-	HHuginn::HErrorCoordinate ec( _runtime->huginn()->get_coordinate( position_.get() ) );
+	HHuginn::HErrorCoordinate ec( _runtime->huginn()->get_coordinate( MAIN_FILE_ID, position_.get() ) );
 	using yaal::hcore::to_string;
 	HHuginn::identifier_id_t id( _runtime->identifier_id( to_string( "@" ).append( ec.line() ).append( ":" ).append( ec.column() ) ) );
-	_functionContexts.emplace( make_resource<OFunctionContext>( id, ++ _statementIdGenerator, true ) );
+	_functionContexts.emplace( make_resource<OFunctionContext>( id, ++ _statementIdGenerator, _fileId, true ) );
 	if ( ! fc._captures.is_empty() ) {
 		_capturesLog.insert( make_pair( f()._functionIdentifier, yaal::move( fc._captures ) ) );
 	}
@@ -917,7 +922,7 @@ void OCompiler::create_scope( executing_parser::position_t position_ ) {
 	if ( ! fc._inline ) {
 		++ _statementIdGenerator;
 	}
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, _statementIdGenerator, position_.get() ) );
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, _statementIdGenerator, _fileId, position_.get() ) );
 	fc._inline = false;
 	return;
 	M_EPILOG
@@ -940,7 +945,7 @@ void OCompiler::commit_catch( executing_parser::position_t ) {
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	HHuginn::scope_t scope( pop_scope_context() ); /* don't squash! pop_scope_context() changes fc._scopeStack */
 	OScopeContext& sc( *fc._scopeStack.top() );
-	HTryCatch::HCatch c( sc._statementId, sc._exceptionType, current_expression(), scope );
+	HTryCatch::HCatch c( sc._statementId, sc._exceptionType, current_expression(), scope, _fileId );
 	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	fc._scopeStack.top()->_catches.emplace_back( c );
@@ -951,7 +956,7 @@ void OCompiler::commit_catch( executing_parser::position_t ) {
 
 void OCompiler::reset_expression( void ) {
 	M_PROLOG
-	current_expression() = make_pointer<HExpression>();
+	current_expression() = make_pointer<HExpression>( _fileId );
 	OFunctionContext& fc( f() );
 	M_ASSERT( fc._operations.is_empty() );
 	M_ASSERT( fc._variables.is_empty() );
@@ -1017,7 +1022,7 @@ void OCompiler::start_if_statement( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	if ( fc._scopeStack.top()->_scopeChain.is_empty() ) {
-		fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, position_.get() ) );
+		fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, position_.get() ) );
 	}
 	fc._inline = true;
 	return;
@@ -1038,7 +1043,7 @@ void OCompiler::start_loop_statement( executing_parser::position_t position_ ) {
 	fc._inline = true;
 	++ fc._loopCount;
 	++ fc._loopSwitchCount;
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, position_.get() ) );
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, position_.get() ) );
 	return;
 	M_EPILOG
 }
@@ -1047,14 +1052,14 @@ void OCompiler::start_switch_statement( executing_parser::position_t position_ )
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	++ fc._loopSwitchCount;
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, position_.get() ) );
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, position_.get() ) );
 	return;
 	M_EPILOG
 }
 
 void OCompiler::start_subexpression( executing_parser::position_t position_ ) {
 	M_PROLOG
-	f().expressions_stack().emplace( 1, make_pointer<HExpression>( position_.get() ) );
+	f().expressions_stack().emplace( 1, make_pointer<HExpression>( _fileId, position_.get() ) );
 	return;
 	M_EPILOG
 }
@@ -1062,7 +1067,7 @@ void OCompiler::start_subexpression( executing_parser::position_t position_ ) {
 void OCompiler::add_subexpression( OPERATOR op_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	fc.expressions_stack().top().emplace_back( make_pointer<HExpression>( position_.get() ) );
+	fc.expressions_stack().top().emplace_back( make_pointer<HExpression>( _fileId, position_.get() ) );
 	fc._operations.emplace( op_, position_.get() );
 	return;
 	M_EPILOG
@@ -1118,7 +1123,7 @@ void OCompiler::add_return_statement( executing_parser::position_t position_ ) {
 	if ( e->is_empty() ) {
 		e->add_execution_step( hcore::call( &HExpression::store_direct, e.raw(), _runtime->none_value(), _1, position_.get() ) );
 	}
-	terminate_scope( make_pointer<HReturn>( e, position_.get() ) );
+	terminate_scope( make_pointer<HReturn>( e, _fileId, position_.get() ) );
 	reset_expression();
 	return;
 	M_EPILOG
@@ -1127,7 +1132,7 @@ void OCompiler::add_return_statement( executing_parser::position_t position_ ) {
 void OCompiler::add_throw_statement( executing_parser::position_t position_ ) {
 	M_PROLOG
 	M_ASSERT( ! f()._scopeStack.is_empty() );
-	terminate_scope( make_pointer<HThrow>( _runtime->huginn(), current_expression(), position_.get() ) );
+	terminate_scope( make_pointer<HThrow>( _runtime->huginn(), current_expression(), _fileId, position_.get() ) );
 	reset_expression();
 	return;
 	M_EPILOG
@@ -1140,7 +1145,7 @@ void OCompiler::add_break_statement( executing_parser::position_t position_ ) {
 	if ( fc._loopSwitchCount == 0 ) {
 		throw HHuginn::HHuginnRuntimeException( "Invalid context for `break' statement.", position_.get() );
 	}
-	terminate_scope( make_pointer<HBreak>( HFrame::STATE::BREAK, position_.get() ) );
+	terminate_scope( make_pointer<HBreak>( HFrame::STATE::BREAK, _fileId, position_.get() ) );
 	reset_expression();
 	return;
 	M_EPILOG
@@ -1153,7 +1158,7 @@ void OCompiler::add_continue_statement( executing_parser::position_t position_ )
 	if ( fc._loopCount == 0 ) {
 		throw HHuginn::HHuginnRuntimeException( "Invalid context for `continue' statement.", position_.get() );
 	}
-	terminate_scope( make_pointer<HBreak>( HFrame::STATE::CONTINUE, position_.get() ) );
+	terminate_scope( make_pointer<HBreak>( HFrame::STATE::CONTINUE, _fileId, position_.get() ) );
 	reset_expression();
 	return;
 	M_EPILOG
@@ -1166,7 +1171,7 @@ void OCompiler::add_while_statement( executing_parser::position_t position_ ) {
 	HHuginn::scope_t scope( pop_scope_context() );
 	OScopeContext& sc( current_scope_context() );
 	HScope::statement_t whileStatement(
-		make_pointer<HWhile>( sc._statementId, current_expression(), scope, position_.get() )
+		make_pointer<HWhile>( sc._statementId, current_expression(), scope, _fileId, position_.get() )
 	);
 	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );
@@ -1195,7 +1200,7 @@ void OCompiler::save_control_variable( executing_parser::position_t position_ ) 
 	M_PROLOG
 	commit_assignable( position_ );
 	OFunctionContext& fc( f() );
-	fc.expressions_stack().top().emplace_back( make_pointer<HExpression>() );
+	fc.expressions_stack().top().emplace_back( make_pointer<HExpression>( _fileId ) );
 	M_EPILOG
 }
 
@@ -1234,7 +1239,7 @@ void OCompiler::close_function_call( executing_parser::position_t position_ ) {
 void OCompiler::set_type_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, position_.get() ) );
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, position_.get() ) );
 	OScopeContext& sc( current_scope_context() );
 	sc._exceptionType = _runtime->identifier_id( name_ );
 	return;
@@ -1250,7 +1255,7 @@ void OCompiler::add_for_statement( executing_parser::position_t position_ ) {
 	HHuginn::expression_t source( fc.expressions_stack().top().back() );
 	fc.expressions_stack().top().pop_back();
 	HScope::statement_t forStatement(
-		make_pointer<HFor>( sc._statementId, current_expression(), source, scope, position_.get() )
+		make_pointer<HFor>( sc._statementId, current_expression(), source, scope, _fileId, position_.get() )
 	);
 	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );
@@ -1289,7 +1294,7 @@ void OCompiler::add_if_statement( executing_parser::position_t position_ ) {
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	OScopeContext& sc( *fc._scopeStack.top() );
-	HScope::statement_t ifStatement( make_pointer<HIf>( sc._statementId, sc._scopeChain, sc._else, position_.get() ) );
+	HScope::statement_t ifStatement( make_pointer<HIf>( sc._statementId, sc._scopeChain, sc._else, _fileId, position_.get() ) );
 	sc._scopeChain.clear();
 	sc._else.reset();
 	pop_scope_context_low();
@@ -1308,7 +1313,7 @@ void OCompiler::add_try_catch_statement( executing_parser::position_t position_ 
 	HStatement::statement_id_t statementId( fc._scopeStack.top()->_statementId );
 	HHuginn::scope_t scope( pop_scope_context() );
 	HScope::statement_t tryCatchStatement(
-		make_pointer<HTryCatch>( statementId, scope, catches, position_.get() )
+		make_pointer<HTryCatch>( statementId, scope, catches, _fileId, position_.get() )
 	);
 	current_scope()->add_statement( tryCatchStatement );
 	reset_expression();
@@ -1330,6 +1335,7 @@ void OCompiler::add_switch_statement( executing_parser::position_t position_ ) {
 			current_expression(),
 			contexts,
 			Default,
+			_fileId,
 			position_.get()
 		)
 	);
@@ -1377,7 +1383,7 @@ void OCompiler::add_field_definition( executing_parser::position_t position_ ) {
 void OCompiler::mark_expression_position( executing_parser::position_t position_ ) {
 	M_PROLOG
 	M_ASSERT( ! f()._scopeStack.is_empty() );
-	current_expression()->set_position( position_.get() );
+	current_expression()->set_position( _fileId, position_.get() );
 	return;
 	M_EPILOG
 }
@@ -2113,7 +2119,7 @@ void OCompiler::make_reference( executing_parser::position_t position_ ) {
 		HExpression& expression( *current_expression() );
 		expression.pop_execution_step();
 		expression.add_execution_step(
-			hcore::call( &HExpression::get_field, current_expression().raw(), HExpression::ACCESS::REFERENCE, fc._lastMemberName, _1, position_.get() )
+			hcore::call( &HExpression::get_field, current_expression().raw(), HExpression::ACCESS::REFERENCE, fc._lastMemberName, _1, _fileId )
 		);
 	}
 	fc._variables.emplace( INVALID_IDENTIFIER, -1 );
@@ -2201,7 +2207,7 @@ void OCompiler::defer_get_field_reference( yaal::hcore::HString const& value_, e
 	}
 	HExpression& expression( *current_expression() );
 	expression.add_execution_step(
-		hcore::call( &HExpression::get_field, current_expression().raw(), HExpression::ACCESS::VALUE, refIdentifier, _1, position_.get() )
+		hcore::call( &HExpression::get_field, current_expression().raw(), HExpression::ACCESS::VALUE, refIdentifier, _1, _fileId )
 	);
 	expression.commit_oper( OPERATOR::MEMBER_ACCESS );
 	fc._lastMemberName = refIdentifier;

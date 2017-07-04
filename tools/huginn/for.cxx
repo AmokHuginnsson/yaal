@@ -48,8 +48,9 @@ HFor::HFor(
 	HHuginn::expression_t const& control_,
 	HHuginn::expression_t const& source_,
 	HHuginn::scope_t const& loop_,
+	int fileId_,
 	int statementPosition_
-) : HStatement( id_, statementPosition_ )
+) : HStatement( id_, fileId_, statementPosition_ )
 	, _control( control_ )
 	, _source( source_ )
 	, _loop( loop_ ) {
@@ -59,7 +60,7 @@ HFor::HFor(
 
 void HFor::do_execute( HThread* thread_ ) const {
 	M_PROLOG
-	thread_->create_loop_frame( id() );
+	thread_->create_loop_frame( file_id(), id() );
 	HFrame* f( thread_->current_frame() );
 	f->add_variable( HHuginn::value_t() );
 	_source->execute( thread_ );

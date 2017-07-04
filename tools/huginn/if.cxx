@@ -43,8 +43,9 @@ HIf::HIf(
 	HStatement::statement_id_t id_,
 	OCompiler::OScopeContext::active_scopes_t const& ifClause_,
 	HHuginn::scope_t const& elseClause_,
+	int fileId_,
 	int position_
-) : HStatement( id_, position_ ),
+) : HStatement( id_, fileId_, position_ ),
 	_ifClauses( ifClause_ ),
 	_elseClause( elseClause_ ) {
 	for ( OCompiler::OActiveScope& as : _ifClauses ) {
@@ -58,7 +59,7 @@ HIf::HIf(
 
 void HIf::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
-	thread_->create_scope_frame( id() );
+	thread_->create_scope_frame( file_id(), id() );
 	HFrame* f( thread_->current_frame() );
 	bool done( false );
 	for (

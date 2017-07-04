@@ -47,12 +47,14 @@ public:
 		HHuginn::identifier_id_t _type;
 		HHuginn::expression_t _control;
 		HHuginn::scope_t _scope;
+		int _fileId;
 	public:
 		HCatch(
 			HStatement::statement_id_t,
 			HHuginn::identifier_id_t,
 			HHuginn::expression_t const&,
-			HHuginn::scope_t const&
+			HHuginn::scope_t const&,
+			int
 		);
 		void execute( HThread*, HHuginn::value_t ) const;
 		HHuginn::identifier_id_t type( void ) const {
@@ -64,7 +66,7 @@ private:
 	HHuginn::scope_t _try;
 	catches_t _catches;
 public:
-	HTryCatch( HStatement::statement_id_t, HHuginn::scope_t const&, catches_t const&, int );
+	HTryCatch( HStatement::statement_id_t, HHuginn::scope_t const&, catches_t const&, int, int );
 protected:
 	virtual void do_execute( HThread* ) const override;
 };

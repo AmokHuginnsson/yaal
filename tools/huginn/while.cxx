@@ -43,8 +43,9 @@ HWhile::HWhile(
 	HStatement::statement_id_t id_,
 	HHuginn::expression_t const& condition_,
 	HHuginn::scope_t const& loop_,
+	int fileId_,
 	int position_
-) : HStatement( id_, position_ )
+) : HStatement( id_, fileId_, position_ )
 	, _condition( condition_ )
 	, _loop( loop_ ) {
 	_loop->make_inline();
@@ -53,7 +54,7 @@ HWhile::HWhile(
 
 void HWhile::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
-	thread_->create_loop_frame( _loop->id() );
+	thread_->create_loop_frame( _loop->file_id(), _loop->id() );
 	HFrame* f( thread_->current_frame() );
 	while ( f->can_continue() ) {
 		_condition->execute( thread_ );

@@ -49,7 +49,7 @@ private:
 	statement_list_t _statements;
 	bool _inline;
 public:
-	HScope( statement_id_t, int );
+	HScope( statement_id_t, int, int );
 	virtual ~HScope( void ) {
 		return;
 	}

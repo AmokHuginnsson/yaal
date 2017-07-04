@@ -60,7 +60,7 @@ private:
 	instructions_t _instructions;
 	operations_t _operations;
 public:
-	HExpression( int = 0 );
+	HExpression( int = MAIN_FILE_ID, int = 0 );
 	int add_execution_step( execution_step_t const& );
 	void replace_execution_step( int, execution_step_t const& );
 	void pop_execution_step( void );

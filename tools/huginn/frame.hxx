@@ -83,10 +83,11 @@ private:
 	int _number;
 	TYPE _type;
 	STATE _state;
+	int _fileId;
 	HStatement::statement_id_t _statementId;
 public:
 	HFrame( HThread*, HFrame* );
-	void init( TYPE, HStatement::statement_id_t, HHuginn::value_t* = nullptr, int = 0 );
+	void init( TYPE, int, HStatement::statement_id_t, HHuginn::value_t* = nullptr, int = 0 );
 	void reshape( HThread*, int );
 	HHuginn::value_t get_field( HExpression::ACCESS, int );
 	HHuginn::value_t get_variable( HExpression::ACCESS, HStatement::statement_id_t, int );
@@ -142,6 +143,9 @@ public:
 	}
 	HHuginn::values_t& value_cache( void ) {
 		return ( _valueCache );
+	}
+	int file_id( void ) const {
+		return ( _fileId );
 	}
 private:
 	HFrame( HFrame const& ) = delete;

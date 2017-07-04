@@ -39,8 +39,8 @@ namespace tools {
 
 namespace huginn {
 
-HThrow::HThrow( HHuginn* huginn_, HHuginn::expression_t const& expression_, int position_ )
-	: HStatement( INVALID_STATEMENT_IDENTIFIER, position_ )
+HThrow::HThrow( HHuginn* huginn_, HHuginn::expression_t const& expression_, int fileId_, int position_ )
+	: HStatement( INVALID_STATEMENT_IDENTIFIER, fileId_, position_ )
 	, _huginn( huginn_ )
 	, _expression( expression_ ) {
 	return;
@@ -54,7 +54,7 @@ void HThrow::do_execute( HThread* thread_ ) const {
 	HHuginn::value_t v( thread_->current_frame()->result() );
 	HHuginn::HException* e( dynamic_cast<HHuginn::HException*>( v.raw() ) );
 	if ( e != nullptr ) {
-		e->set_where( _huginn->where( position() ) );
+		e->set_where( _huginn->where( file_id(), position() ) );
 	}
 	thread_->break_execution( HFrame::STATE::EXCEPTION, yaal::move( v ), 0, position() );
 	return;

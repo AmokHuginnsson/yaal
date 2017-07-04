@@ -36,8 +36,8 @@ namespace tools {
 
 namespace huginn {
 
-HScope::HScope( statement_id_t id_, int position_ )
-	: HStatement( id_, position_ )
+HScope::HScope( statement_id_t id_, int fileId_, int position_ )
+	: HStatement( id_, fileId_, position_ )
 	, _statements()
 	, _inline( false ) {
 	return;
@@ -64,7 +64,7 @@ int HScope::statement_position_at( int index_ ) const {
 void HScope::do_execute( HThread* thread_ ) const {
 	M_PROLOG
 	if ( ! _inline ) {
-		thread_->create_scope_frame( id() );
+		thread_->create_scope_frame( file_id(), id() );
 	}
 	HFrame* f( thread_->current_frame() );
 	for ( statement_t const& s : _statements ) {

@@ -867,7 +867,7 @@ inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterfac
 
 void HRuntime::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) const {
 	M_PROLOG
-	stream_ << "Huginn VM state for `" << _huginn->source_name() << "'" << endl;
+	stream_ << "Huginn VM state for `" << _huginn->source_name( MAIN_FILE_ID ) << "'" << endl;
 	for ( packages_t::value_type const& p : _packages ) {
 		stream_ << "package: " << identifier_name( p.first ) << " = " << p.second->get_class()->name() << endl;
 	}

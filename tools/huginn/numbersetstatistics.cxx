@@ -54,6 +54,9 @@ HNumberSetStatistics::HNumberSetStatistics( HHuginn::HClass const* class_, HHugi
 	HHuginn::type_id_t vt( verify_arg_collection_value_type( name, values_, 0, ARITY::UNARY, { HHuginn::TYPE::REAL, HHuginn::TYPE::NUMBER }, UNIFORMITY::REQUIRED, position_ ) );
 	if ( t == HHuginn::TYPE::LIST ) {
 		HHuginn::HList::values_t const& src( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
+		if ( src.is_empty() ) {
+			throw HHuginn::HHuginnRuntimeException( "Cannot aggregate statistics over empty set.", position_ );
+		}
 		if ( vt == HHuginn::TYPE::REAL ) {
 			_stats = number_set_stats_t( make_resource<number_set_stats_real_t>( value_unboxing_iterator<double long>( src.begin() ), value_unboxing_iterator<double long>( src.end() ), AGGREGATE_TYPE::BASIC | AGGREGATE_TYPE::MEDIAN | AGGREGATE_TYPE::INTERQUARTILE_RANGE | AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION ) );
 		} else {

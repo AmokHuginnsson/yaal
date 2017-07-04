@@ -45,18 +45,20 @@ HTryCatch::HCatch::HCatch(
 	HStatement::statement_id_t id_,
 	HHuginn::identifier_id_t type_,
 	HHuginn::expression_t const& control_,
-	HHuginn::scope_t const& scope_
+	HHuginn::scope_t const& scope_,
+	int fileId_
 ) : _id( id_ )
 	, _type( type_ )
 	, _control( control_ )
-	, _scope( scope_ ) {
+	, _scope( scope_ )
+	, _fileId( fileId_ ) {
 	_scope->make_inline();
 	return;
 }
 
 void HTryCatch::HCatch::execute( HThread* thread_, HHuginn::value_t value_ ) const {
 	M_PROLOG
-	thread_->create_scope_frame( _id );
+	thread_->create_scope_frame( _fileId, _id );
 	HFrame* f( thread_->current_frame() );
 	_control->execute( thread_ );
 	f->commit_variable( value_, _control->position() );
@@ -68,8 +70,8 @@ void HTryCatch::HCatch::execute( HThread* thread_, HHuginn::value_t value_ ) con
 	M_EPILOG
 }
 
-HTryCatch::HTryCatch( HStatement::statement_id_t id_, HHuginn::scope_t const& try_, catches_t const& catches_, int position_ )
-	: HStatement( id_, position_ )
+HTryCatch::HTryCatch( HStatement::statement_id_t id_, HHuginn::scope_t const& try_, catches_t const& catches_, int fileId_, int position_ )
+	: HStatement( id_, fileId_, position_ )
 	, _try( try_ )
 	, _catches( catches_ ) {
 	_try->make_inline();
@@ -78,7 +80,7 @@ HTryCatch::HTryCatch( HStatement::statement_id_t id_, HHuginn::scope_t const& tr
 
 void HTryCatch::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
-	thread_->create_try_catch_frame( id() );
+	thread_->create_try_catch_frame( file_id(), id() );
 	_try->execute( thread_ );
 	if ( thread_->has_exception() ) {
 		HFrame* f( thread_->current_frame() );

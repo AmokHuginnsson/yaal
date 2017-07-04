@@ -119,8 +119,16 @@ HHuginn::compiler_setup_t const HHuginn::COMPILER::DEFAULT = HHuginn::compiler_s
 HHuginn::compiler_setup_t const HHuginn::COMPILER::BE_STRICT = HHuginn::compiler_setup_t::new_flag();
 HHuginn::compiler_setup_t const HHuginn::COMPILER::BE_SLOPPY = HHuginn::compiler_setup_t::new_flag();
 
+HHuginn::HHuginnRuntimeException::HHuginnRuntimeException( yaal::hcore::HString const& message_, int fileId_, int position_ )
+	: _message( message_ )
+	, _fileId( fileId_ )
+	, _position( position_ ) {
+	return;
+}
+
 HHuginn::HHuginnRuntimeException::HHuginnRuntimeException( yaal::hcore::HString const& message_, int position_ )
 	: _message( message_ )
+	, _fileId( MAIN_FILE_ID )
 	, _position( position_ ) {
 	return;
 }
@@ -131,6 +139,10 @@ yaal::hcore::HString const& HHuginn::HHuginnRuntimeException::message( void ) co
 
 int HHuginn::HHuginnRuntimeException::position( void ) const {
 	return ( _position );
+}
+
+int HHuginn::HHuginnRuntimeException::file_id( void ) const {
+	return ( _fileId );
 }
 
 HHuginn::HObjectReference::HObjectReference( value_t const& value_, int upCastLevel_, bool upCast_, int position_ )
@@ -206,11 +218,12 @@ void HHuginn::disable_grammar_verification( void ) {
 HHuginn::HHuginn( void )
 	: _state( STATE::EMPTY )
 	, _runtime( make_resource<HRuntime>( this ) )
-	, _source( make_resource<HSource>() )
+	, _sources()
 	, _compiler( make_resource<OCompiler>( _runtime.raw() ) )
 	, _engine( make_engine( _runtime.raw() ), _grammarVerified.load() ? HExecutingParser::INIT_MODE::TRUST_GRAMMAR : HExecutingParser::INIT_MODE::VERIFY_GRAMMAR )
 	, _errorMessage()
-	, _errorPosition( -1 )
+	, _errorPosition( INVALID_POSITION )
+	, _errorFileId( INVALID_FILE_ID )
 	, _inputStream()
 	, _inputStreamRaw( &cin )
 	, _outputStream()
@@ -220,6 +233,7 @@ HHuginn::HHuginn( void )
 	, _logStream()
 	, _logStreamRaw( &hcore::log ) {
 	M_PROLOG
+	_sources.emplace_back( make_resource<HSource>() );
 	_grammarVerified.store( true );
 	_runtime->register_builtins();
 	return;
@@ -229,11 +243,12 @@ HHuginn::HHuginn( void )
 HHuginn::HHuginn( huginn::HRuntime* runtime_ )
 	: _state( STATE::EMPTY )
 	, _runtime( make_resource<HRuntime>( this ) )
-	, _source( make_resource<HSource>() )
+	, _sources()
 	, _compiler( make_resource<OCompiler>( _runtime.raw() ) )
 	, _engine( make_engine( runtime_ ), _grammarVerified.load() ? HExecutingParser::INIT_MODE::TRUST_GRAMMAR : HExecutingParser::INIT_MODE::VERIFY_GRAMMAR )
 	, _errorMessage()
-	, _errorPosition( -1 )
+	, _errorPosition( INVALID_POSITION )
+	, _errorFileId( INVALID_FILE_ID )
 	, _inputStream()
 	, _inputStreamRaw( &cin )
 	, _outputStream()
@@ -243,6 +258,7 @@ HHuginn::HHuginn( huginn::HRuntime* runtime_ )
 	, _logStream()
 	, _logStreamRaw( &hcore::log ) {
 	M_PROLOG
+	_sources.emplace_back( make_resource<HSource>() );
 	_grammarVerified.store( true );
 	_runtime->register_builtins();
 	return;
@@ -251,10 +267,12 @@ HHuginn::HHuginn( huginn::HRuntime* runtime_ )
 
 void HHuginn::reset( int undoSteps_ ) {
 	M_PROLOG
-	_errorPosition = -1;
+	_errorPosition = INVALID_POSITION;
+	_errorFileId = INVALID_FILE_ID;
 	_errorMessage.clear();
 	_compiler->reset( undoSteps_ );
-	_source = make_resource<HSource>();
+	_compiler->_fileId = INVALID_FILE_ID;
+	_sources[0] = make_resource<HSource>();
 	_runtime->reset();
 	_state = STATE::EMPTY;
 	return;
@@ -274,7 +292,7 @@ void HHuginn::set_max_call_stack_size( int maxCallStackSize_ ) {
 void HHuginn::load( yaal::hcore::HStreamInterface& stream_, yaal::hcore::HString const& name_, int skippedLines_ ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::EMPTY );
-	_source->load( stream_, name_, skippedLines_ );
+	_sources.front()->load( stream_, name_, skippedLines_ );
 	_state = STATE::LOADED;
 	return;
 	M_EPILOG
@@ -283,7 +301,7 @@ void HHuginn::load( yaal::hcore::HStreamInterface& stream_, yaal::hcore::HString
 void HHuginn::load( yaal::hcore::HStreamInterface& stream_, int skippedLines_ ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::EMPTY );
-	_source->load( stream_, hcore::HString(), skippedLines_ );
+	_sources.front()->load( stream_, hcore::HString(), skippedLines_ );
 	_state = STATE::LOADED;
 	return;
 	M_EPILOG
@@ -292,7 +310,7 @@ void HHuginn::load( yaal::hcore::HStreamInterface& stream_, int skippedLines_ ) 
 void HHuginn::preprocess( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::LOADED );
-	_source->preprocess();
+	_sources.front()->preprocess();
 	_state = STATE::PREPROCESSED;
 	return;
 	M_EPILOG
@@ -301,10 +319,11 @@ void HHuginn::preprocess( void ) {
 bool HHuginn::parse( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::PREPROCESSED );
-	bool ok( _engine.parse( _source->begin(), _source->end() ) );
+	bool ok( _engine.parse( _sources.front()->begin(), _sources.front()->end() ) );
 	if ( ! ok ) {
 		_errorMessage = _engine.error_messages()[0];
 		_errorPosition = _engine.error_position();
+		_errorFileId = MAIN_FILE_ID;
 	} else {
 		_state = STATE::PARSED;
 	}
@@ -335,7 +354,7 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 		}
 		field_definitions_t fieldDefinitions;
 		huginn::HThread t( _runtime.raw(), hcore::HThread::get_current_thread_id() );
-		t.create_function_frame( INVALID_STATEMENT_IDENTIFIER, nullptr, 0 );
+		t.create_function_frame( INVALID_FILE_ID, INVALID_STATEMENT_IDENTIFIER, nullptr, 0 );
 		HFrame* frame( t.current_frame() );
 		for ( int i( 0 ), size( static_cast<int>( cc->_fieldNames.get_size() ) ); i < size; ++ i ) {
 			OCompiler::OClassContext::expressions_t::const_iterator f( cc->_fieldDefinitions.find( i ) );
@@ -432,6 +451,7 @@ bool HHuginn::compile( paths_t const& paths_, compiler_setup_t compilerSetup_ ) 
 		_compiler->_mainStatementCount = mainStatementCount;
 		_errorMessage = e.message();
 		_errorPosition = e.position();
+		_errorFileId = e.file_id();
 	}
 	return ( ok );
 	M_EPILOG
@@ -453,21 +473,22 @@ bool HHuginn::execute( void ) {
 	} catch ( HHuginnRuntimeException const& e ) {
 		_errorMessage = e.message();
 		_errorPosition = e.position();
+		_errorFileId = e.file_id();
 	}
 	return ( ok );
 	M_EPILOG
 }
 
-yaal::hcore::HString HHuginn::source_name( void ) const {
+yaal::hcore::HString HHuginn::source_name( int fileId_ ) const {
 	M_PROLOG
-	return ( _source->name() );
+	return ( _sources[fileId_]->name() );
 	M_EPILOG
 }
 
-yaal::hcore::HString HHuginn::where( int position_ ) const {
+yaal::hcore::HString HHuginn::where( int fileId_, int position_ ) const {
 	M_PROLOG
-	hcore::HString w( source_name() );
-	HHuginn::HErrorCoordinate ec( get_coordinate( position_ ) );
+	hcore::HString w( source_name( fileId_ ) );
+	HHuginn::HErrorCoordinate ec( get_coordinate( fileId_, position_ ) );
 	w.append( ":" ).append( ec.line() ).append( ":" ).append( ec.column() );
 	return ( w );
 	M_EPILOG
@@ -475,25 +496,25 @@ yaal::hcore::HString HHuginn::where( int position_ ) const {
 
 int HHuginn::error_position( void ) const {
 	M_PROLOG
-	return ( _source->error_position( _errorPosition ) );
+	return ( _sources[_errorFileId]->error_position( _errorPosition ) );
 	M_EPILOG
 }
 
 HHuginn::HErrorCoordinate HHuginn::error_coordinate( void ) const {
 	M_PROLOG
-	return ( _source->error_coordinate( error_position() ) );
+	return ( _sources[_errorFileId]->error_coordinate( error_position() ) );
 	M_EPILOG
 }
 
-HHuginn::HErrorCoordinate HHuginn::get_coordinate( int position_ ) const {
+HHuginn::HErrorCoordinate HHuginn::get_coordinate( int fileId_, int position_ ) const {
 	M_PROLOG
-	return ( _source->error_coordinate( _source->error_position( position_ ) ) );
+	return ( _sources[fileId_]->error_coordinate( _sources[fileId_]->error_position( position_ ) ) );
 	M_EPILOG
 }
 
 yaal::hcore::HString HHuginn::error_message( void ) const {
 	M_PROLOG
-	hcore::HString message( _source->name() );
+	hcore::HString message( _sources[_errorFileId]->name() );
 	HErrorCoordinate coord( error_coordinate() );
 	if ( ! _errorMessage.is_empty() ) {
 		message
@@ -516,13 +537,13 @@ char const* HHuginn::error_message( int code_ ) const {
 
 yaal::hcore::HString HHuginn::get_snippet( int from_, int len_ ) const {
 	M_PROLOG
-	return ( _source->get_snippet( from_, len_ ) );
+	return ( _sources.front()->get_snippet( from_, len_ ) );
 	M_EPILOG
 }
 
 yaal::hcore::HString const& HHuginn::get_comment( int pos_ ) const {
 	M_PROLOG
-	return ( _source->get_comment( pos_ ) );
+	return ( _sources.front()->get_comment( pos_ ) );
 	M_EPILOG
 }
 
@@ -638,7 +659,7 @@ HHuginn::value_t HHuginn::result( void ) const {
 
 void HHuginn::dump_preprocessed_source( yaal::hcore::HStreamInterface& stream_ ) const {
 	M_PROLOG
-	_source->dump_preprocessed( stream_ );
+	_sources.front()->dump_preprocessed( stream_ );
 	return;
 	M_EPILOG
 }

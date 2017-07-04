@@ -37,8 +37,8 @@ namespace tools {
 
 namespace huginn {
 
-HReturn::HReturn( HHuginn::expression_t const& expression_, int position_ )
-	: HStatement( INVALID_STATEMENT_IDENTIFIER, position_ )
+HReturn::HReturn( HHuginn::expression_t const& expression_, int fileId_, int position_ )
+	: HStatement( INVALID_STATEMENT_IDENTIFIER, fileId_, position_ )
 	, _expression( expression_ ) {
 	return;
 }

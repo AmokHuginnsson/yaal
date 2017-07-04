@@ -42,7 +42,7 @@ class HFunction {
 public:
 	typedef HFunction this_type;
 	typedef HHuginn::expressions_t expressions_t;
-	typedef void ( huginn::HThread::* function_frame_creator_t )( HStatement::statement_id_t, HHuginn::value_t*, int );
+	typedef void ( huginn::HThread::* function_frame_creator_t )( int, HStatement::statement_id_t, HHuginn::value_t*, int );
 	typedef void ( huginn::HThread::* function_frame_popper_t )( void );
 private:
 	HHuginn::identifier_id_t _name;

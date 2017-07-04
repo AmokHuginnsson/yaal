@@ -139,7 +139,7 @@ struct OCompiler {
 		 */
 		local_variables_t _variables;
 
-		OScopeContext( OFunctionContext*, HStatement::statement_id_t, int );
+		OScopeContext( OFunctionContext*, HStatement::statement_id_t, int, int );
 		HHuginn::expression_t& expression( void );
 		HHuginn::type_id_t guess_type( HHuginn::identifier_id_t ) const;
 		void note_type( HHuginn::identifier_id_t, HHuginn::type_id_t );
@@ -282,7 +282,7 @@ struct OCompiler {
 		 */
 		bool _inline;
 
-		OFunctionContext( HHuginn::identifier_id_t, HStatement::statement_id_t, bool );
+		OFunctionContext( HHuginn::identifier_id_t, HStatement::statement_id_t, int, bool );
 		expressions_stack_t& expressions_stack( void );
 	};
 	typedef yaal::hcore::HResource<OFunctionContext> function_context_t;
@@ -407,6 +407,9 @@ struct OCompiler {
 	/*! \brief Tells if this compiler instance is used for sub-module.
 	 */
 	bool _isModule;
+	/*! \brief Number of currently compiled source file, used for sub-modules.
+	 */
+	int _fileId;
 	/*! \brief Tells if this compiler instance should work in `incremental' mode.
 	 *
 	 * In incremental mode redefinitions override original definitions.

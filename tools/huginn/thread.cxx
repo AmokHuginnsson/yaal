@@ -81,16 +81,16 @@ void HThread::add_frame( void ) {
 	++ _frameCount;
 }
 
-void HThread::create_function_frame( HStatement::statement_id_t statementId_, HHuginn::value_t* object_, int upCast_ ) {
+void HThread::create_function_frame( int fileId_, HStatement::statement_id_t statementId_, HHuginn::value_t* object_, int upCast_ ) {
 	M_PROLOG
 	add_frame();
 	++ _functionFrameCount;
-	_currentFrame->init( HFrame::TYPE::FUNCTION, statementId_, object_, upCast_ );
+	_currentFrame->init( HFrame::TYPE::FUNCTION, fileId_, statementId_, object_, upCast_ );
 	return;
 	M_EPILOG
 }
 
-void HThread::create_incremental_function_frame( HStatement::statement_id_t statementId_, HHuginn::value_t* object_, int upCast_ ) {
+void HThread::create_incremental_function_frame( int fileId_, HStatement::statement_id_t statementId_, HHuginn::value_t* object_, int upCast_ ) {
 	M_PROLOG
 	frame_t incrementalFrame( _runtime->incremental_frame() );
 	M_ASSERT( _frameCount == 0 );
@@ -104,31 +104,31 @@ void HThread::create_incremental_function_frame( HStatement::statement_id_t stat
 	}
 	_runtime->set_incremental_frame( _frames.back() );
 	_currentFrame->reshape( this, _runtime->max_local_variable_count() );
-	_currentFrame->init( HFrame::TYPE::FUNCTION, statementId_, object_, upCast_ );
+	_currentFrame->init( HFrame::TYPE::FUNCTION, fileId_, statementId_, object_, upCast_ );
 	return;
 	M_EPILOG
 }
 
-void HThread::create_loop_frame( HStatement::statement_id_t statementId_ ) {
+void HThread::create_loop_frame( int fileId_, HStatement::statement_id_t statementId_ ) {
 	M_PROLOG
 	add_frame();
-	_currentFrame->init( HFrame::TYPE::LOOP, statementId_ );
+	_currentFrame->init( HFrame::TYPE::LOOP, fileId_, statementId_ );
 	return;
 	M_EPILOG
 }
 
-void HThread::create_scope_frame( HStatement::statement_id_t statementId_ ) {
+void HThread::create_scope_frame( int fileId_, HStatement::statement_id_t statementId_ ) {
 	M_PROLOG
 	add_frame();
-	_currentFrame->init( HFrame::TYPE::SCOPE, statementId_ );
+	_currentFrame->init( HFrame::TYPE::SCOPE, fileId_, statementId_ );
 	return;
 	M_EPILOG
 }
 
-void HThread::create_try_catch_frame( HStatement::statement_id_t statementId_ ) {
+void HThread::create_try_catch_frame( int fileId_, HStatement::statement_id_t statementId_ ) {
 	M_PROLOG
 	add_frame();
-	_currentFrame->init( HFrame::TYPE::TRY_CATCH, statementId_ );
+	_currentFrame->init( HFrame::TYPE::TRY_CATCH, fileId_, statementId_ );
 	return;
 	M_EPILOG
 }
@@ -217,7 +217,7 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t&& value_, 
 void HThread::raise( HHuginn::HClass const* class_, yaal::hcore::HString const& message_, int position_ ) {
 	M_PROLOG
 	HHuginn::value_t e( _runtime->object_factory()->create<HHuginn::HException>( class_, message_ ) );
-	static_cast<HHuginn::HException*>( e.raw() )->set_where( _runtime->huginn()->where( position_ ) );
+	static_cast<HHuginn::HException*>( e.raw() )->set_where( _runtime->huginn()->where( current_frame()->file_id(), position_ ) );
 	break_execution( HFrame::STATE::EXCEPTION, yaal::move( e ), 0, position_ );
 	return;
 	M_EPILOG

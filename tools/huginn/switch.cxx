@@ -44,8 +44,9 @@ HSwitch::HSwitch(
 	HHuginn::expression_t const& expression_,
 	cases_t const& cases_,
 	HHuginn::scope_t const& default_,
+	int fileId_,
 	int position_
-) : HStatement( id_, position_ ),
+) : HStatement( id_, fileId_, position_ ),
 	_expression( expression_ ),
 	_cases( cases_ ),
 	_default( default_ ) {
@@ -54,7 +55,7 @@ HSwitch::HSwitch(
 
 void HSwitch::do_execute( HThread* thread_ ) const {
 	M_PROLOG
-	thread_->create_loop_frame( id() );
+	thread_->create_loop_frame( file_id(), id() );
 	HFrame* f( thread_->current_frame() );
 	_expression->execute( thread_ );
 	if ( f->can_continue() ) {

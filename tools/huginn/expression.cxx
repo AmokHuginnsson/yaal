@@ -45,8 +45,8 @@ namespace tools {
 
 namespace huginn {
 
-HExpression::HExpression( int position_ )
-	: HStatement( INVALID_STATEMENT_IDENTIFIER, position_ )
+HExpression::HExpression( int fileId_, int position_ )
+	: HStatement( INVALID_STATEMENT_IDENTIFIER, fileId_, position_ )
 	, _executionSteps()
 	, _instructions()
 	, _operations() {
@@ -242,6 +242,7 @@ void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifier
 				.append( "' member (did you mean `" )
 				.append( rt.suggestion( identifierId_ ) )
 				.append( "'?)." ),
+				file_id(),
 				p
 			);
 		}
