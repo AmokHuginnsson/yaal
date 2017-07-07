@@ -110,7 +110,7 @@ HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, HHuginn::p
 		if ( ! path.is_empty() ) {
 			package = load_module( runtime_, paths_, compilerSetup_, path, name_, position_ );
 		} else {
-			throw HHuginn::HHuginnRuntimeException( "Package `"_ys.append( name_ ).append( "' does not exist." ), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Package `"_ys.append( name_ ).append( "' does not exist." ), MAIN_FILE_ID, position_ );
 		}
 	}
 	return ( package );
@@ -127,10 +127,10 @@ HHuginn::value_t HPackageFactory::load_module( HRuntime* runtime_, HHuginn::path
 	loader.preprocess();
 	loader._compiler->_isModule = true;
 	HHuginn& h( *runtime_->huginn() );
-	int fileId( h._compiler->_fileId );
-	loader._compiler->_fileId = ( fileId == MAIN_FILE_ID ? static_cast<int>( h._sources.get_size() - 1 ) : fileId );
+	int fileId( h._compiler->_fileId == MAIN_FILE_ID ? static_cast<int>( h._sources.get_size() - 1 ) : h._compiler->_fileId );
+	loader._compiler->_fileId = fileId;
 	if ( ! ( loader.parse() && loader.compile( paths_, compilerSetup_ ) ) ) {
-		throw HHuginn::HHuginnRuntimeException( loader.error_message(), position_ );
+		throw HHuginn::HHuginnRuntimeException( loader.error_message(), fileId, position_ );
 	}
 	h._compiler->_fileId = loader._compiler->_fileId;
 	loader._state = HHuginn::STATE::PARSED;

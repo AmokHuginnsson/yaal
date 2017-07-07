@@ -516,6 +516,7 @@ HHuginn::value_t size( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 					"User supplied `get_size' method returned an invalid type "_ys
 						.append( a_type_name( res->get_class() ) )
 						.append( " instead of an `integer'." ),
+					thread_->current_frame()->file_id(),
 					position_
 				);
 			}
@@ -523,6 +524,7 @@ HHuginn::value_t size( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
 				"Getting size of "_ys.append( a_type_name( v->get_class() ) ).append( "s is not supported." ),
+				thread_->current_frame()->file_id(),
 				position_
 			);
 		}
@@ -556,6 +558,7 @@ HHuginn::value_t observe( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::
 	if ( v->type_id() == HHuginn::TYPE::OBSERVER ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Making an *observer* out of an *observer*.",
+			thread_->current_frame()->file_id(),
 			position_
 		);
 	}
@@ -654,6 +657,7 @@ HHuginn::value_t print( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::va
 	} else {
 		throw HHuginn::HHuginnRuntimeException(
 			"Printing `"_ys.append( v->get_class()->name() ).append( "'s is not supported." ),
+			thread_->current_frame()->file_id(),
 			position_
 		);
 	}
@@ -683,14 +687,14 @@ inline HHuginn::value_t assert( huginn::HThread* thread_, HHuginn::value_t*, HHu
 		if ( argc > 2 ) {
 			message.append( " " ).append( get_string( values_[1] ) );
 		}
-		throw HHuginn::HHuginnRuntimeException( message, position_ );
+		throw HHuginn::HHuginnRuntimeException( message, thread_->current_frame()->file_id(), position_ );
 	}
 	return ( thread_->runtime().none_value() );
 	M_EPILOG
 }
 
 HHuginn::value_t invalid_instance( yaal::hcore::HString const&, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
-HHuginn::value_t invalid_instance( yaal::hcore::HString const& name_, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int position_ ) {
+HHuginn::value_t invalid_instance( yaal::hcore::HString const& name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const&, int position_ ) {
 	M_PROLOG
 	/*
 	 * __attribute__(( noreturn )) causes problems with clang.
@@ -698,7 +702,7 @@ HHuginn::value_t invalid_instance( yaal::hcore::HString const& name_, huginn::HT
 	 * Condition in following if shall always evaluate to `true'.
 	 */
 	if ( position_ >= 0 ) {
-		throw HHuginn::HHuginnRuntimeException( "Direct creation of instances of `"_ys.append( name_ ).append( "' is not allowed." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Direct creation of instances of `"_ys.append( name_ ).append( "' is not allowed." ), thread_->current_frame()->file_id(), position_ );
 	}
 	return ( HHuginn::value_t() );
 	M_EPILOG

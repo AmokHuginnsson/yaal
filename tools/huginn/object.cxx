@@ -102,7 +102,7 @@ HHuginn::HObject::~HObject( void ) {
 				)->function()( t, &nonOwning, values_t{}, 0 );
 			} catch ( HHuginnRuntimeException const& e ) {
 				t->break_execution( HFrame::STATE::RUNTIME_EXCEPTION );
-				t->set_exception( e.message(), e.position() );
+				t->set_exception( e.message(), e.file_id(), e.position() );
 				c = nullptr;
 			}
 		}
@@ -113,7 +113,7 @@ HHuginn::HObject::~HObject( void ) {
 					c->function( destructorIdx )( t, &nonOwning, values_t{}, 0 );
 				} catch ( HHuginnRuntimeException const& e ) {
 					t->break_execution( HFrame::STATE::RUNTIME_EXCEPTION );
-					t->set_exception( e.message(), e.position() );
+					t->set_exception( e.message(), e.file_id(), e.position() );
 					break;
 				}
 			}
@@ -161,20 +161,22 @@ HHuginn::value_t HHuginn::HObject::get_method(
 		if ( res->type_id() != HHuginn::TYPE::BOUND_METHOD ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"`"_ys
-				.append( methodName_ )
-				.append( "' in class `" )
-				.append( get_class()->name() )
-				.append( "' is not a method." ),
+					.append( methodName_ )
+					.append( "' in class `" )
+					.append( get_class()->name() )
+					.append( "' is not a method." ),
+				thread_->current_frame()->file_id(),
 				position_
 			);
 		}
 	} else {
 		throw HHuginn::HHuginnRuntimeException(
 			"Class `"_ys
-			.append( get_class()->name() )
-			.append( "' does not have `" )
-			.append( methodName_ )
-			.append( "' method." ),
+				.append( get_class()->name() )
+				.append( "' does not have `" )
+				.append( methodName_ )
+				.append( "' method." ),
+			thread_->current_frame()->file_id(),
 			position_
 		);
 	}

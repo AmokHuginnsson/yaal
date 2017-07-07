@@ -61,6 +61,7 @@ bool HBooleanEvaluator::execute( huginn::HThread* thread_ ) {
 		if ( result->type_id() != HHuginn::TYPE::BOOLEAN ) {
 			throw HHuginn::HHuginnRuntimeException(
 				hcore::to_string( _errMsgHHuginn_[ERR_CODE::OPS_NOT_BOOL] ).append( type_name( result->type_id() ) ),
+				e->file_id(),
 				e->position()
 			);
 		}

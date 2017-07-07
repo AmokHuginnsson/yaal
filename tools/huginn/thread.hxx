@@ -51,6 +51,7 @@ private:
 	HRuntime* _runtime;
 	HObjectFactory& _objectFactory;
 	yaal::hcore::HString _exceptionMessage;
+	int _exceptionFileId;
 	int _exceptionPosition;
 public:
 	HThread( HRuntime*, yaal::hcore::HThread::id_t );
@@ -68,8 +69,8 @@ public:
 	HFrame const* current_frame( void ) const {
 		return ( _currentFrame );
 	}
-	void break_execution( HFrame::STATE, HHuginn::value_t&& = HHuginn::value_t(), int = 0, int = 0 );
-	void set_exception( yaal::hcore::HString const&, int );
+	void break_execution( HFrame::STATE, HHuginn::value_t&& = HHuginn::value_t(), int = 0, int = MAIN_FILE_ID, int = 0 );
+	void set_exception( yaal::hcore::HString const&, int, int );
 	bool can_continue( void ) const {
 		M_PROLOG
 		M_ASSERT( _currentFrame );

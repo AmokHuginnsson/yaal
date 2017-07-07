@@ -60,13 +60,13 @@ HHuginn::value_t subscript(
 	HObjectFactory& of( *thread_->runtime().object_factory() );
 	if ( ( baseType == HHuginn::TYPE::LIST ) || ( baseType == HHuginn::TYPE::DEQUE ) || ( baseType == HHuginn::TYPE::STRING ) ) {
 		if ( index_->type_id() != HHuginn::TYPE::INTEGER ) {
-			throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::IDX_NOT_INT] ).append( index_->get_class()->name() ), position_ );
+			throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::IDX_NOT_INT] ).append( index_->get_class()->name() ), thread_->current_frame()->file_id(), position_ );
 		}
 		HHuginn::HInteger const* i( static_cast<HHuginn::HInteger const*>( index_.raw() ) );
 		int long long index( i->value() );
 		int long size( static_cast<HHuginn::HIterable*>( base_.raw() )->size() );
 		if ( ( index < -size ) || ( index >= size ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Bad index.", position_ );
+			throw HHuginn::HHuginnRuntimeException( "Bad index.", thread_->current_frame()->file_id(), position_ );
 		}
 		if ( index < 0 ) {
 			index += size;
@@ -89,7 +89,7 @@ HHuginn::value_t subscript(
 		HHuginn::HLookup* l( static_cast<HHuginn::HLookup*>( base_.raw() ) );
 		res = ( subscript_ == HExpression::ACCESS::VALUE ? l->get( thread_, index_, position_ ) : of.create_reference( l->get_ref( thread_, index_, position_ ) ) );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "Subscript is not supported on `"_ys.append( base_->get_class()->name() ).append( "'." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Subscript is not supported on `"_ys.append( base_->get_class()->name() ).append( "'." ), thread_->current_frame()->file_id(), position_ );
 	}
 	return ( res );
 }
@@ -109,13 +109,13 @@ HHuginn::value_t range(
 	HHuginn::value_t res;
 	if ( ( baseType == HHuginn::TYPE::LIST ) || ( baseType == HHuginn::TYPE::DEQUE ) || ( baseType == HHuginn::TYPE::STRING ) ) {
 		if ( !! from_ && ( from_->type_id() != HHuginn::TYPE::INTEGER ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Range operand `from' is not an integer.", position_ );
+			throw HHuginn::HHuginnRuntimeException( "Range operand `from' is not an integer.", thread_->current_frame()->file_id(), position_ );
 		}
 		if ( !! to_ && ( to_->type_id() != HHuginn::TYPE::INTEGER ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Range operand `to' is not an integer.", position_ );
+			throw HHuginn::HHuginnRuntimeException( "Range operand `to' is not an integer.", thread_->current_frame()->file_id(), position_ );
 		}
 		if ( !! step_ && ( step_->type_id() != HHuginn::TYPE::INTEGER ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Range operand `step' is not an integer.", position_ );
+			throw HHuginn::HHuginnRuntimeException( "Range operand `step' is not an integer.", thread_->current_frame()->file_id(), position_ );
 		}
 		int long size( static_cast<HHuginn::HIterable*>( base_.raw() )->size() );
 		if ( baseType == HHuginn::TYPE::LIST ) {
@@ -128,7 +128,7 @@ HHuginn::value_t range(
 		HHuginn::HInteger const* integer( static_cast<HHuginn::HInteger const*>( step_.raw() ) );
 		int long step( integer ? static_cast<int long>( integer->value() ) : 1 );
 		if ( step == 0 ) {
-			throw HHuginn::HHuginnRuntimeException( "Range step cannot be zero.", position_ );
+			throw HHuginn::HHuginnRuntimeException( "Range step cannot be zero.", thread_->current_frame()->file_id(), position_ );
 		}
 		HHuginn::HInteger const* integerFrom = static_cast<HHuginn::HInteger const*>( from_.raw() );
 		HHuginn::HInteger const* integerTo = static_cast<HHuginn::HInteger const*>( to_.raw() );
@@ -215,7 +215,7 @@ HHuginn::value_t range(
 			}
 		} while ( false );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "Range operator is not supported on `"_ys.append( base_->get_class()->name() ).append( "'." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Range operator is not supported on `"_ys.append( base_->get_class()->name() ).append( "'." ), thread_->current_frame()->file_id(), position_ );
 	}
 	return ( res );
 }
@@ -236,6 +236,7 @@ void fallback_arithmetic( HThread* thread_, char const* methodName_, char const*
 					.append( " returned result of incompatible type " )
 					.append( a_type_name( v->get_class() ) )
 					.append( "." ),
+				thread_->current_frame()->file_id(),
 				position_
 			);
 		}
@@ -247,7 +248,7 @@ void fallback_arithmetic( HThread* thread_, char const* methodName_, char const*
 			v = m.function()( thread_, &v1_, HHuginn::values_t{ v2_ }, position_ );
 			M_ASSERT( v->type_id() == t );
 		} else {
-			throw HHuginn::HHuginnRuntimeException( "There is no `"_ys.append( oper_ ).append( "' operator for " ).append( a_type_name( t ) ).append( "." ), position_ );
+			throw HHuginn::HHuginnRuntimeException( "There is no `"_ys.append( oper_ ).append( "' operator for " ).append( a_type_name( t ) ).append( "." ), thread_->current_frame()->file_id(), position_ );
 		}
 	}
 	return;
@@ -418,7 +419,7 @@ HHuginn::value_t factorial( HThread* thread_, HHuginn::value_t const& v_, int po
 			res = thread_->object_factory().create_number( number::factorial( n.to_integer() ) );
 		}
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "There is no `!` operator for `"_ys.append( v_->get_class()->name() ).append( "'." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "There is no `!` operator for `"_ys.append( v_->get_class()->name() ).append( "'." ), thread_->current_frame()->file_id(), position_ );
 	}
 	return ( res );
 }
@@ -450,7 +451,7 @@ HHuginn::value_t abs( HThread* thread_, HHuginn::value_t const& v_, int position
 			res = thread_->object_factory().create_number( -v );
 		}
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "There is no |.| operator for `"_ys.append( v_->get_class()->name() ).append( "'." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "There is no |.| operator for `"_ys.append( v_->get_class()->name() ).append( "'." ), thread_->current_frame()->file_id(), position_ );
 	}
 	return ( res );
 }
@@ -473,7 +474,7 @@ HHuginn::value_t neg( HThread* thread_, HHuginn::value_t const& v_, int position
 		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v_.raw() ) ) {
 			o->call_method( thread_, v_, "negate", {}, position_ );
 		} else {
-			throw HHuginn::HHuginnRuntimeException( "There is no `negate` operator for `"_ys.append( v_->get_class()->name() ).append( "'." ), position_ );
+			throw HHuginn::HHuginnRuntimeException( "There is no `negate` operator for `"_ys.append( v_->get_class()->name() ).append( "'." ), thread_->current_frame()->file_id(), position_ );
 		}
 	}
 	return ( res );
@@ -503,6 +504,7 @@ int long hash( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 					"User supplied `hash' function returned an invalid type "_ys
 						.append( a_type_name( res->get_class() ) )
 						.append( " instead of an `integer'." ),
+					thread_->current_frame()->file_id(),
 					position_
 				);
 			}
@@ -518,6 +520,7 @@ int long hash( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 					"There is no `hash' operator for "_ys
 						.append( a_type_name( v_->get_class() ) )
 						.append( "." ),
+					thread_->current_frame()->file_id(),
 					position_
 				);
 			}
@@ -536,6 +539,7 @@ bool fallback_compare( HThread* thread_, char const* methodName_, char const* op
 		if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"Comparison method `"_ys.append( methodName_ ).append( "' returned non-boolean result of " ).append( a_type_name( v->get_class() ) ).append( " type." ),
+				thread_->current_frame()->file_id(),
 				position_
 			);
 		}
@@ -547,7 +551,7 @@ bool fallback_compare( HThread* thread_, char const* methodName_, char const* op
 			v = m.function()( thread_, const_cast<HHuginn::value_t*>( &v1_ ), HHuginn::values_t{ v2_ }, position_ );
 			M_ASSERT( v->type_id() == HHuginn::TYPE::BOOLEAN );
 		} else {
-			throw HHuginn::HHuginnRuntimeException( "There is no `"_ys.append( oper_ ).append( "' operator for `" ).append( v1_->get_class()->name() ).append( "'." ), position_ );
+			throw HHuginn::HHuginnRuntimeException( "There is no `"_ys.append( oper_ ).append( "' operator for `" ).append( v1_->get_class()->name() ).append( "'." ), thread_->current_frame()->file_id(), position_ );
 		}
 	}
 	HHuginn::HBoolean* b( static_cast<HHuginn::HBoolean*>( v.raw() ) );
@@ -696,10 +700,11 @@ HHuginn::value_t fallback_conversion( HHuginn::type_id_t type_, HThread* thread_
 		if ( res->type_id() != type_ ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"User conversion method returned invalid type "_ys
-				.append( a_type_name( res->get_class() ) )
-				.append( " instead of " )
-				.append( a_type_name( type_ ) )
-				.append( "." ),
+					.append( a_type_name( res->get_class() ) )
+					.append( " instead of " )
+					.append( a_type_name( type_ ) )
+					.append( "." ),
+				thread_->current_frame()->file_id(),
 				position_
 			);
 		}
@@ -713,10 +718,11 @@ HHuginn::value_t fallback_conversion( HHuginn::type_id_t type_, HThread* thread_
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
 				"Conversion from `"_ys
-				.append( v_->get_class()->name() )
-				.append( "' to `" )
-				.append( type_name( type_ ) )
-				.append( "' is not supported." ),
+					.append( v_->get_class()->name() )
+					.append( "' to `" )
+					.append( type_name( type_ ) )
+					.append( "' is not supported." ),
+				thread_->current_frame()->file_id(),
 				position_
 			);
 		}

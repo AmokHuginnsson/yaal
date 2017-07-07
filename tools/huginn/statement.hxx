@@ -62,7 +62,7 @@ public:
 	}
 	void execute( HThread* thread_ ) const {
 		if ( _isKilled_ ) {
-			throw HHuginn::HHuginnRuntimeException( "Killed interior.", _position );
+			throw HHuginn::HHuginnRuntimeException( "Killed interior.", _fileId, _position );
 		}
 		do_execute( thread_ );
 		return;

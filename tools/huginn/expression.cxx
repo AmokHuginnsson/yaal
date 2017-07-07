@@ -253,10 +253,10 @@ void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifier
 			if ( o != nullptr ) {
 				frame_->values().push( rt.object_factory()->create_reference( o->field_ref( fi ) ) );
 			} else {
-				throw HHuginn::HHuginnRuntimeException( "Assignment to read-only location.", p );
+				throw HHuginn::HHuginnRuntimeException( "Assignment to read-only location.", file_id(), p );
 			}
 		} else {
-			throw HHuginn::HHuginnRuntimeException( "Assignment to temporary.", p );
+			throw HHuginn::HHuginnRuntimeException( "Assignment to temporary.", file_id(), p );
 		}
 	} else {
 		HHuginn::HObjectReference* oref( dynamic_cast<HHuginn::HObjectReference*>( v.raw() ) );
@@ -271,16 +271,17 @@ void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifier
 					.append( "' member (did you mean `" )
 					.append( rt.suggestion( identifierId_ ) )
 					.append( "'?)." ),
+					file_id(),
 					p
 				);
 			}
 			if ( access_ == ACCESS::VALUE ) {
 				frame_->values().push( oref->field( t, fi, p ) );
 			} else {
-				throw HHuginn::HHuginnRuntimeException( "Changing upcasted reference.", p );
+				throw HHuginn::HHuginnRuntimeException( "Changing upcasted reference.", file_id(), p );
 			}
 		} else {
-			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( v->get_class()->name() ).append( "' is not a compound object." ), p );
+			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( v->get_class()->name() ).append( "' is not a compound object." ), file_id(), p );
 		}
 	}
 	return;
@@ -303,7 +304,7 @@ void HExpression::set_variable( HFrame* frame_, int ) {
 		frame_->values().pop();
 		if ( dst->type_id() != HHuginn::TYPE::REFERENCE ) {
 			M_ASSERT( dst->type_id() == HHuginn::TYPE::CHARACTER );
-			throw HHuginn::HHuginnRuntimeException( "String does not support item assignment.", p );
+			throw HHuginn::HHuginnRuntimeException( "String does not support item assignment.", file_id(), p );
 		}
 		HHuginn::value_t& ref( static_cast<HHuginn::HReference*>( dst.raw() )->value() );
 		if ( operation._operator == OPERATOR::ASSIGN ) {
@@ -361,13 +362,13 @@ void HExpression::function_call( HFrame* frame_, int position_ ) {
 	HHuginn::HClass const* c( values.top()->get_class() );
 	HHuginn::type_id_t t( c->type_id() );
 	if ( ( t != HHuginn::TYPE::FUNCTION_REFERENCE ) && ( t != HHuginn::TYPE::BOUND_METHOD ) ) {
-		throw HHuginn::HHuginnRuntimeException( "Reference `"_ys.append( c->name() ).append( "' is not a function." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Reference `"_ys.append( c->name() ).append( "' is not a function." ), file_id(), position_ );
 	}
 	HHuginn::value_t f( yaal::move( values.top() ) );
 	values.pop();
 	HThread* thread( frame_->thread() );
 	if ( thread->call_stack_size() >= thread->runtime().max_call_stack_size() ) {
-		throw HHuginn::HHuginnRuntimeException( "Call stack size limit exceeded: "_ys.append( thread->call_stack_size() + 1 ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Call stack size limit exceeded: "_ys.append( thread->call_stack_size() + 1 ), file_id(), position_ );
 	}
 	if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
 		values.push( static_cast<HHuginn::HFunctionReference*>( f.raw() )->function()( thread, nullptr, args, p ) );
@@ -634,7 +635,7 @@ void HExpression::range( HFrame* frame_, int ) {
 	if ( ! select && ( rangeOpCount > 0 ) ) {
 		HHuginn::type_id_t t( base->type_id() );
 		if ( ( t != HHuginn::TYPE::LIST ) && ( t != HHuginn::TYPE::DEQUE ) && ( t != HHuginn::TYPE::STRING ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Range operator not supported on `"_ys.append( base->get_class()->name() ).append( "'." ), p );
+			throw HHuginn::HHuginnRuntimeException( "Range operator not supported on `"_ys.append( base->get_class()->name() ).append( "'." ), file_id(), p );
 		}
 		frame_->values().push( yaal::move( base ) );
 	} else {
@@ -802,6 +803,7 @@ void HExpression::boolean_xor( HFrame* frame_, int ) {
 				.append( type_name( v1->type_id() ) )
 				.append( ", " )
 				.append( type_name( v2->type_id() ) ),
+			file_id(),
 			p
 		);
 	}
@@ -818,7 +820,7 @@ void HExpression::boolean_not( HFrame* frame_, int ) {
 	++ frame_->ip();
 	HHuginn::value_t& v( frame_->values().top() );
 	if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
-		throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL] ).append( v->get_class()->name() ), p );
+		throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL] ).append( v->get_class()->name() ), file_id(), p );
 	}
 	if ( v.unique() ) {
 		static_cast<HHuginn::HBoolean*>( v.raw() )->flip();
@@ -913,7 +915,7 @@ void HExpression::do_execute( huginn::HThread* thread_ ) const {
 		return;
 	} catch ( HHuginn::HHuginnRuntimeException const& e ) {
 		if ( e.position() <= 0 ) {
-			throw HHuginn::HHuginnRuntimeException( e.message(), position() );
+			throw HHuginn::HHuginnRuntimeException( e.message(), file_id(), position() );
 		} else {
 			throw;
 		}

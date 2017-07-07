@@ -56,7 +56,7 @@ void HThrow::do_execute( HThread* thread_ ) const {
 	if ( e != nullptr ) {
 		e->set_where( _huginn->where( file_id(), position() ) );
 	}
-	thread_->break_execution( HFrame::STATE::EXCEPTION, yaal::move( v ), 0, position() );
+	thread_->break_execution( HFrame::STATE::EXCEPTION, yaal::move( v ), 0, file_id(), position() );
 	return;
 	M_EPILOG
 }

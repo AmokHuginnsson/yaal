@@ -141,7 +141,7 @@ void HFrame::commit_variable( HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
 	if ( _result->type_id() != HHuginn::TYPE::REFERENCE ) {
 		M_ASSERT( _result->type_id() == HHuginn::TYPE::CHARACTER );
-		throw HHuginn::HHuginnRuntimeException( "String does not support item assignment.", position_ );
+		throw HHuginn::HHuginnRuntimeException( "String does not support item assignment.", _fileId, position_ );
 	}
 	static_cast<HHuginn::HReference*>( _result.raw() )->value() = value_;
 	return;
@@ -206,7 +206,7 @@ HHuginn::value_t HFrame::get_super( int position_ ) {
 	M_PROLOG
 	HHuginn::value_t* obj( object() );
 	M_ASSERT( obj && !! *obj );
-	return ( _thread->runtime().object_factory()->create<HHuginn::HObjectReference>( *obj, _upCast, true, position_ ) );
+	return ( _thread->runtime().object_factory()->create<HHuginn::HObjectReference>( *obj, _upCast, true, _fileId, position_ ) );
 	M_EPILOG
 }
 

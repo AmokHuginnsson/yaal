@@ -49,6 +49,7 @@ HThread::HThread( HRuntime* runtime_, yaal::hcore::HThread::id_t id_ )
 	, _runtime( runtime_ )
 	, _objectFactory( *_runtime->object_factory() )
 	, _exceptionMessage()
+	, _exceptionFileId( INVALID_FILE_ID )
 	, _exceptionPosition( 0 ) {
 	return;
 }
@@ -165,7 +166,7 @@ void HThread::pop_incremental_frame( void ) {
 	M_EPILOG
 }
 
-void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t&& value_, int level_, int position_ ) {
+void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t&& value_, int level_, int fileId_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( state_ != HFrame::STATE::NORMAL );
 	int level( 0 );
@@ -203,6 +204,7 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t&& value_, 
 		 */
 		HHuginn::HException const* e( dynamic_cast<HHuginn::HException const*>( value_.raw() ) );
 		_exceptionMessage = "Uncaught exception: ";
+		_exceptionFileId = fileId_;
 		_exceptionPosition = position_;
 		if ( e ) {
 			_exceptionMessage.append( e->what() );
@@ -217,15 +219,17 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t&& value_, 
 void HThread::raise( HHuginn::HClass const* class_, yaal::hcore::HString const& message_, int position_ ) {
 	M_PROLOG
 	HHuginn::value_t e( _runtime->object_factory()->create<HHuginn::HException>( class_, message_ ) );
-	static_cast<HHuginn::HException*>( e.raw() )->set_where( _runtime->huginn()->where( current_frame()->file_id(), position_ ) );
-	break_execution( HFrame::STATE::EXCEPTION, yaal::move( e ), 0, position_ );
+	int fileId( current_frame()->file_id() );
+	static_cast<HHuginn::HException*>( e.raw() )->set_where( _runtime->huginn()->where( fileId, position_ ) );
+	break_execution( HFrame::STATE::EXCEPTION, yaal::move( e ), 0, fileId, position_ );
 	return;
 	M_EPILOG
 }
 
-void HThread::set_exception( yaal::hcore::HString const& message_, int position_ ) {
+void HThread::set_exception( yaal::hcore::HString const& message_, int fileId_, int position_ ) {
 	M_PROLOG
 	_exceptionMessage = message_;
+	_exceptionFileId = fileId_;
 	_exceptionPosition = position_;
 	return;
 	M_EPILOG
@@ -243,10 +247,12 @@ bool HThread::has_runtime_exception( void ) const {
 void HThread::flush_runtime_exception( void ) {
 	M_PROLOG
 	if ( has_runtime_exception() ) {
+		int fileId( _exceptionFileId );
+		_exceptionFileId = INVALID_FILE_ID;
 		int position( _exceptionPosition );
 		_exceptionPosition = 0;
 		HString message( yaal::move( _exceptionMessage ) );
-		throw HHuginn::HHuginnRuntimeException( message, position );
+		throw HHuginn::HHuginnRuntimeException( message, fileId, position );
 	}
 	M_EPILOG
 }

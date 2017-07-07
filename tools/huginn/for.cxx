@@ -85,7 +85,7 @@ void HFor::do_execute( HThread* thread_ ) const {
 			HHuginn::value_t itVal( obj->call_method( thread_, source, INTERFACE::ITERATOR, {}, sourcePosition ) );
 			HHuginn::HObject* it( dynamic_cast<HHuginn::HObject*>( itVal.raw() ) );
 			if ( ! it ) {
-				throw HHuginn::HHuginnRuntimeException( "`For' source returned invalid iterator object.", sourcePosition );
+				throw HHuginn::HHuginnRuntimeException( "`For' source returned invalid iterator object.", file_id(), sourcePosition );
 			}
 			HHuginn::value_t isValidField( it->get_method( thread_, itVal, INTERFACE::IS_VALID, sourcePosition ) );
 			HHuginn::HClass::HBoundMethod* isValidMethod( static_cast<HHuginn::HClass::HBoundMethod*>( isValidField.raw() ) );
@@ -96,7 +96,7 @@ void HFor::do_execute( HThread* thread_ ) const {
 			while ( f->can_continue() ) {
 				HHuginn::value_t isValid( isValidMethod->call( thread_, {}, sourcePosition ) );
 				if ( isValid->type_id() != HHuginn::TYPE::BOOLEAN ) {
-					throw HHuginn::HHuginnRuntimeException( "`For' source iterator is_valid returned non-boolean value.", sourcePosition );
+					throw HHuginn::HHuginnRuntimeException( "`For' source iterator is_valid returned non-boolean value.", file_id(), sourcePosition );
 				}
 				if ( ! ( f->can_continue() && static_cast<HHuginn::HBoolean*>( isValid.raw() )->value() ) ) {
 					break;
@@ -114,7 +114,7 @@ void HFor::do_execute( HThread* thread_ ) const {
 				nextMethod->call( thread_, {}, sourcePosition );
 			}
 		} else {
-			throw HHuginn::HHuginnRuntimeException( "`For' source is not an iterable.", sourcePosition );
+			throw HHuginn::HHuginnRuntimeException( "`For' source is not an iterable.", file_id(), sourcePosition );
 		}
 	}
 	thread_->pop_frame();

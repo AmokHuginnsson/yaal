@@ -551,7 +551,7 @@ private:
 	value_t _object;
 	HClass const* _class;
 public:
-	HObjectReference( value_t const&, int, bool, int );
+	HObjectReference( value_t const&, int, bool, int, int );
 	HObjectReference( value_t const&, HClass const* );
 	int field_index( identifier_id_t ) const;
 	value_t field( huginn::HThread*, int, int );

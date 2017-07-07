@@ -145,7 +145,7 @@ int HHuginn::HHuginnRuntimeException::file_id( void ) const {
 	return ( _fileId );
 }
 
-HHuginn::HObjectReference::HObjectReference( value_t const& value_, int upCastLevel_, bool upCast_, int position_ )
+HHuginn::HObjectReference::HObjectReference( value_t const& value_, int upCastLevel_, bool upCast_, int fileId_, int position_ )
 	: HValue( &_objectReferenceClass_ )
 	, _object( value_ )
 	, _class( nullptr ) {
@@ -158,6 +158,7 @@ HHuginn::HObjectReference::HObjectReference( value_t const& value_, int upCastLe
 		if ( ! s ) {
 			throw HHuginnRuntimeException(
 				"`"_ys.append( c->name() ).append( "' does not have superclass." ),
+				fileId_,
 				position_
 			);
 		}
@@ -781,7 +782,7 @@ HHuginn::value_t HHuginn::HTernaryEvaluator::execute( huginn::HThread* thread_ )
 	HFrame* f( thread_->current_frame() );
 	value_t v( f->result() );
 	if ( v->type_id() != TYPE::BOOLEAN ) {
-		throw HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL] ).append( v->get_class()->name() ), _condition->position() );
+		throw HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL] ).append( v->get_class()->name() ), f->file_id(), _condition->position() );
 	}
 	if ( static_cast<HBoolean*>( v.raw() )->value() ) {
 		_ifTrue->execute( thread_ );
