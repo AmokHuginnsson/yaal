@@ -73,7 +73,7 @@ namespace order {
 
 inline HHuginn::value_t insert( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "order.insert", values_, 1, 1, position_ );
+	verify_arg_count( "order.insert", values_, 1, 1, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::ORDER );
 	static_cast<HHuginn::HOrder*>( object_->raw() )->insert( thread_, values_[0], position_ );
 	return ( *object_ );
@@ -82,7 +82,7 @@ inline HHuginn::value_t insert( huginn::HThread* thread_, HHuginn::value_t* obje
 
 inline HHuginn::value_t has_key( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "order.has_key", values_, 1, 1, position_ );
+	verify_arg_count( "order.has_key", values_, 1, 1, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::ORDER );
 	bool hasKey( static_cast<HHuginn::HOrder*>( object_->raw() )->has_key( thread_, values_[0], position_ ) );
 	return ( thread_->object_factory().create_boolean( hasKey ) );
@@ -91,16 +91,16 @@ inline HHuginn::value_t has_key( huginn::HThread* thread_, HHuginn::value_t* obj
 
 inline HHuginn::value_t erase( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "order.erase", values_, 1, 1, position_ );
+	verify_arg_count( "order.erase", values_, 1, 1, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::ORDER );
 	static_cast<HHuginn::HOrder*>( object_->raw() )->erase( thread_, values_[0], position_ );
 	return ( *object_ );
 	M_EPILOG
 }
 
-inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t clear( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "order.clear", values_, 0, 0, position_ );
+	verify_arg_count( "order.clear", values_, 0, 0, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::ORDER );
 	static_cast<HHuginn::HOrder*>( object_->raw() )->value().clear();
 	return ( *object_ );
@@ -110,7 +110,7 @@ inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHug
 inline HHuginn::value_t update( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::ORDER );
-	verify_signature( "order.update", values_, { HHuginn::TYPE::ORDER }, position_ );
+	verify_signature( "order.update", values_, { HHuginn::TYPE::ORDER }, thread_, position_ );
 	HHuginn::HOrder& l( *static_cast<HHuginn::HOrder*>( object_->raw() ) );
 	HHuginn::HOrder const& r( *static_cast<HHuginn::HOrder const*>( values_[0].raw() ) );
 	if ( r.key_type()->type_id() != HHuginn::TYPE::NONE ) {
@@ -130,7 +130,7 @@ inline HHuginn::value_t update( huginn::HThread* thread_, HHuginn::value_t* obje
 inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::ORDER );
-	verify_signature( "order.equals", values_, { HHuginn::TYPE::ORDER }, position_ );
+	verify_signature( "order.equals", values_, { HHuginn::TYPE::ORDER }, thread_, position_ );
 	HHuginn::HOrder::values_t const& l( static_cast<HHuginn::HOrder*>( object_->raw() )->value() );
 	HHuginn::HOrder::values_t const& r( static_cast<HHuginn::HOrder const*>( values_[0].raw() )->value() );
 	bool equal( l.get_size() == r.get_size() );

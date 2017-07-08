@@ -70,29 +70,29 @@ private:
 
 namespace deque {
 
-inline HHuginn::value_t push( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t push( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "deque.push", values_, 1, 1, position_ );
+	verify_arg_count( "deque.push", values_, 1, 1, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
 	static_cast<HHuginn::HDeque*>( object_->raw() )->push_back( values_[0] );
 	return ( *object_ );
 	M_EPILOG
 }
 
-inline HHuginn::value_t pop( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t pop( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "deque.pop", values_, 0, 0, position_ );
+	verify_arg_count( "deque.pop", values_, 0, 0, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
 	static_cast<HHuginn::HDeque*>( object_->raw() )->pop_back();
 	return ( *object_ );
 	M_EPILOG
 }
 
-inline HHuginn::value_t append( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t append( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "deque.append";
-	verify_arg_count( name, values_, 1, 1, position_ );
-	HHuginn::type_id_t t( verify_arg_type( name, values_, 0, { HHuginn::TYPE::LIST, HHuginn::TYPE::DEQUE, HHuginn::TYPE::ORDER, HHuginn::TYPE::SET }, ARITY::UNARY, position_ ) );
+	verify_arg_count( name, values_, 1, 1, thread_, position_ );
+	HHuginn::type_id_t t( verify_arg_type( name, values_, 0, { HHuginn::TYPE::LIST, HHuginn::TYPE::DEQUE, HHuginn::TYPE::ORDER, HHuginn::TYPE::SET }, ARITY::UNARY, thread_, position_ ) );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
 	HHuginn::HDeque::values_t& dst( static_cast<HHuginn::HDeque*>( object_->raw() )->value() );
 	switch( t.get() ) {
@@ -117,11 +117,11 @@ inline HHuginn::value_t append( huginn::HThread*, HHuginn::value_t* object_, HHu
 	M_EPILOG
 }
 
-inline HHuginn::value_t prepend( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t prepend( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "deque.prepend";
-	verify_arg_count( name, values_, 1, 1, position_ );
-	HHuginn::type_id_t t( verify_arg_type( name, values_, 0, { HHuginn::TYPE::LIST, HHuginn::TYPE::DEQUE, HHuginn::TYPE::ORDER, HHuginn::TYPE::SET }, ARITY::UNARY, position_ ) );
+	verify_arg_count( name, values_, 1, 1, thread_, position_ );
+	HHuginn::type_id_t t( verify_arg_type( name, values_, 0, { HHuginn::TYPE::LIST, HHuginn::TYPE::DEQUE, HHuginn::TYPE::ORDER, HHuginn::TYPE::SET }, ARITY::UNARY, thread_, position_ ) );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
 	HHuginn::HDeque::values_t& dst( static_cast<HHuginn::HDeque*>( object_->raw() )->value() );
 	switch( t.get() ) {
@@ -146,41 +146,41 @@ inline HHuginn::value_t prepend( huginn::HThread*, HHuginn::value_t* object_, HH
 	M_EPILOG
 }
 
-inline HHuginn::value_t insert( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t insert( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_signature( "deque.insert", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::UNKNOWN }, position_ );
+	verify_signature( "deque.insert", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::UNKNOWN }, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
 	HHuginn::HDeque::values_t& dst( static_cast<HHuginn::HDeque*>( object_->raw() )->value() );
 	HHuginn::HInteger::value_type pos( get_integer( values_[0] ) );
 	if ( ( pos < 0 ) || ( pos > dst.get_size() ) ) {
-		throw HHuginn::HHuginnRuntimeException( "invalid insertion position: "_ys.append( pos ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "invalid insertion position: "_ys.append( pos ), thread_->current_frame()->file_id(), position_ );
 	}
 	dst.insert( dst.begin() + static_cast<int long>( pos ), values_[1] );
 	return ( *object_ );
 	M_EPILOG
 }
 
-inline HHuginn::value_t push_front( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t push_front( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "deque.push_front", values_, 1, 1, position_ );
+	verify_arg_count( "deque.push_front", values_, 1, 1, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
 	static_cast<HHuginn::HDeque*>( object_->raw() )->push_front( values_[0] );
 	return ( *object_ );
 	M_EPILOG
 }
 
-inline HHuginn::value_t pop_front( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t pop_front( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "deque.pop_front", values_, 0, 0, position_ );
+	verify_arg_count( "deque.pop_front", values_, 0, 0, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
 	static_cast<HHuginn::HDeque*>( object_->raw() )->pop_front();
 	return ( *object_ );
 	M_EPILOG
 }
 
-inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t clear( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "deque.clear", values_, 0, 0, position_ );
+	verify_arg_count( "deque.clear", values_, 0, 0, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
 	static_cast<HHuginn::HDeque*>( object_->raw() )->clear();
 	return ( *object_ );
@@ -190,7 +190,7 @@ inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHug
 inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
-	verify_signature( "deque.equals", values_, { HHuginn::TYPE::DEQUE }, position_ );
+	verify_signature( "deque.equals", values_, { HHuginn::TYPE::DEQUE }, thread_, position_ );
 	HHuginn::HDeque::values_t const& l( static_cast<HHuginn::HDeque*>( object_->raw() )->value() );
 	HHuginn::HDeque::values_t const& r( static_cast<HHuginn::HDeque const*>( values_[0].raw() )->value() );
 	bool equal( l.get_size() == r.get_size() );

@@ -102,7 +102,7 @@ HStream::HStream( HHuginn::HClass const* class_, HStreamInterface::ptr_t stream_
 
 HHuginn::value_t HStream::read( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_signature( "Stream.read", values_, { HHuginn::TYPE::INTEGER }, position_ );
+	verify_signature( "Stream.read", values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
 	int size( static_cast<int>( get_integer( values_[0] ) ) );
 	HStream* s( static_cast<HStream*>( object_->raw() ) );
 	return ( thread_->object_factory().create_string( s->read_impl( size ) ) );
@@ -111,7 +111,7 @@ HHuginn::value_t HStream::read( huginn::HThread* thread_, HHuginn::value_t* obje
 
 HHuginn::value_t HStream::read_line( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "Stream.read_line", values_, 0, 0, position_ );
+	verify_arg_count( "Stream.read_line", values_, 0, 0, thread_, position_ );
 	HStream* s( static_cast<HStream*>( object_->raw() ) );
 	HString const& line( s->read_line_impl() );
 	return ( ! line.is_empty() ? thread_->object_factory().create_string( line ) : thread_->runtime().none_value() );
@@ -120,7 +120,7 @@ HHuginn::value_t HStream::read_line( huginn::HThread* thread_, HHuginn::value_t*
 
 HHuginn::value_t HStream::write( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_signature( "Stream.write", values_, { HHuginn::TYPE::STRING }, position_ );
+	verify_signature( "Stream.write", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 	HString const& val( get_string( values_[0] ) );
 	HStream* s( static_cast<HStream*>( object_->raw() ) );
 	s->write_impl( val );

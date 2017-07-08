@@ -67,7 +67,7 @@ public:
 private:
 	HHuginn::value_t do_connect( tools::huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		verify_signature( "Database.connect", values_, { HHuginn::TYPE::STRING }, position_ );
+		verify_signature( "Database.connect", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		return ( _databaseConnectionClass->create_instance( thread_, nullptr, values_, position_ ) );
 		M_EPILOG
 	}

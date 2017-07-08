@@ -67,7 +67,7 @@ public:
 	}
 	static HHuginn::value_t env( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		verify_signature( "OperatingSystem.env", values_, { HHuginn::TYPE::STRING }, position_ );
+		verify_signature( "OperatingSystem.env", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		HUTF8String utf8(  get_string( values_[0] ) );
 		char const* val( ::getenv( utf8.c_str() ) );
 		HRuntime& rt( thread_->runtime() );
@@ -78,7 +78,7 @@ public:
 		M_PROLOG
 		static int const MAX_ARG_COUNT( 65535 );
 		char const name[] = "OperatingSystem.exec";
-		verify_arg_count( name, values_, 1, MAX_ARG_COUNT, position_ );
+		verify_arg_count( name, values_, 1, MAX_ARG_COUNT, thread_, position_ );
 		int argc( static_cast<int>( values_.get_size() ) );
 		HResource<char*[]> argvHolder( new char*[argc + 1] );
 		char** argv( argvHolder.get() );
@@ -87,7 +87,7 @@ public:
 		utf8_strings_t argvDataHolder;
 		argvDataHolder.reserve( argc );
 		for ( int i( 0 ); i < argc; ++ i ) {
-			verify_arg_type( name, values_, i, HHuginn::TYPE::STRING, argc == 1 ? ARITY::UNARY : ARITY::MULTIPLE, position_ );
+			verify_arg_type( name, values_, i, HHuginn::TYPE::STRING, argc == 1 ? ARITY::UNARY : ARITY::MULTIPLE, thread_, position_ );
 			argvDataHolder.emplace_back( get_string( values_[i] ) );
 			argv[i] = const_cast<char*>( argvDataHolder.back().c_str() );
 		}
@@ -98,7 +98,7 @@ public:
 	}
 	static HHuginn::value_t exit( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		verify_signature( "OperatingSystem.exit", values_, { HHuginn::TYPE::INTEGER }, position_ );
+		verify_signature( "OperatingSystem.exit", values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
 		HHuginn::HInteger::value_type val( get_integer( values_[0] ) );
 		::exit( static_cast<int>( val ) );
 		return ( thread_->runtime().none_value() );
@@ -107,10 +107,10 @@ public:
 	static HHuginn::value_t spawn( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "OperatingSystem.spawn";
-		verify_arg_count( name, values_, 1, meta::max_signed<int short>::value, position_ );
+		verify_arg_count( name, values_, 1, meta::max_signed<int short>::value, thread_, position_ );
  		int argc( static_cast<int>( values_.get_size() ) );
 		for ( int i( 0 ); i < argc; ++ i ) {
-			verify_arg_type( name, values_, i, HHuginn::TYPE::STRING, argc == 1 ? ARITY::UNARY : ARITY::MULTIPLE, position_ );
+			verify_arg_type( name, values_, i, HHuginn::TYPE::STRING, argc == 1 ? ARITY::UNARY : ARITY::MULTIPLE, thread_, position_ );
 		}
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		try {
@@ -124,7 +124,7 @@ public:
 	}
 	static HHuginn::value_t stream( char const* name_, yaal::hcore::HStreamInterface* stream_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		verify_arg_count( name_, values_, 0, 0, position_ );
+		verify_arg_count( name_, values_, 0, 0, thread_, position_ );
 		HOperatingSystem* o( static_cast<HOperatingSystem*>( object_->raw() ) );
 		return ( thread_->object_factory().create<HStream>( o->_streamClass.raw(), make_pointer<HSynchronizedStream>( *stream_ ) ) );
 		M_EPILOG

@@ -355,9 +355,9 @@ void HRuntime::execute( void ) {
 namespace {
 namespace package {
 
-HHuginn::value_t value( HHuginn::value_t value_, HString name_, HThread*, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t value( HHuginn::value_t value_, HString name_, HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( name_, values_, 0, 0, position_ );
+	verify_arg_count( name_, values_, 0, 0, thread_, position_ );
 	return ( value_ );
 	M_EPILOG
 }
@@ -459,49 +459,49 @@ namespace huginn_builtin {
 
 HHuginn::value_t string( HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "string", values_, 1, 1, position_ );
+	verify_arg_count( "string", values_, 1, 1, thread_, position_ );
 	return ( value_builtin::string( thread_, values_[0], position_ ) );
 	M_EPILOG
 }
 
 HHuginn::value_t integer( HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "integer", values_, 1, 1, position_ );
+	verify_arg_count( "integer", values_, 1, 1, thread_, position_ );
 	return ( value_builtin::integer( thread_, values_[0], position_ ) );
 	M_EPILOG
 }
 
 HHuginn::value_t real( HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "real", values_, 1, 1, position_ );
+	verify_arg_count( "real", values_, 1, 1, thread_, position_ );
 	return ( value_builtin::real( thread_, values_[0], position_ ) );
 	M_EPILOG
 }
 
 HHuginn::value_t boolean( HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "boolean", values_, 1, 1, position_ );
+	verify_arg_count( "boolean", values_, 1, 1, thread_, position_ );
 	return ( value_builtin::boolean( thread_, values_[0], position_ ) );
 	M_EPILOG
 }
 
 HHuginn::value_t character( HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "character", values_, 1, 1, position_ );
+	verify_arg_count( "character", values_, 1, 1, thread_, position_ );
 	return ( value_builtin::character( thread_, values_[0], position_ ) );
 	M_EPILOG
 }
 
 HHuginn::value_t number( HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "number", values_, 1, 1, position_ );
+	verify_arg_count( "number", values_, 1, 1, thread_, position_ );
 	return ( value_builtin::number( thread_, values_[0], position_ ) );
 	M_EPILOG
 }
 
 HHuginn::value_t size( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "size", values_, 1, 1, position_ );
+	verify_arg_count( "size", values_, 1, 1, thread_, position_ );
 	HHuginn::value_t const& val( values_.front() );
 	HHuginn::HValue const* v( val.raw() );
 	int long long s( 0 );
@@ -535,7 +535,7 @@ HHuginn::value_t size( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 
 HHuginn::value_t type( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "type", values_, 1, 1, position_ );
+	verify_arg_count( "type", values_, 1, 1, thread_, position_ );
 	HHuginn::HValue const* v( values_.front().raw() );
 	HHuginn::identifier_id_t id( v->get_class()->identifier_id() );
 	HHuginn::value_t* f( thread_->runtime().get_function( id, true ) );
@@ -545,7 +545,7 @@ HHuginn::value_t type( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 
 HHuginn::value_t copy( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "copy", values_, 1, 1, position_ );
+	verify_arg_count( "copy", values_, 1, 1, thread_, position_ );
 	HHuginn::HValue const* v( values_.front().raw() );
 	return ( v->clone( thread_, position_ ) );
 	M_EPILOG
@@ -553,7 +553,7 @@ HHuginn::value_t copy( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 
 HHuginn::value_t observe( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "observe", values_, 1, 1, position_ );
+	verify_arg_count( "observe", values_, 1, 1, thread_, position_ );
 	HHuginn::value_t const& v( values_.front() );
 	if ( v->type_id() == HHuginn::TYPE::OBSERVER ) {
 		throw HHuginn::HHuginnRuntimeException(
@@ -568,7 +568,7 @@ HHuginn::value_t observe( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::
 
 HHuginn::value_t use( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_signature( "use", values_, { HHuginn::TYPE::OBSERVER }, position_ );
+	verify_signature( "use", values_, { HHuginn::TYPE::OBSERVER }, thread_, position_ );
 	HHuginn::HObserver const* o( static_cast<HHuginn::HObserver const*>( values_.front().raw() ) );
 	HHuginn::value_t v( o->value() );
 	if ( !v ) {
@@ -602,7 +602,7 @@ HHuginn::value_t deque( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::va
 
 HHuginn::value_t dict( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "dict", values_, 0, 0, position_ );
+	verify_arg_count( "dict", values_, 0, 0, thread_, position_ );
 	return ( thread_->object_factory().create_dict() );
 	M_EPILOG
 }
@@ -620,7 +620,7 @@ HHuginn::value_t order( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::va
 
 HHuginn::value_t lookup( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "lookup", values_, 0, 0, position_ );
+	verify_arg_count( "lookup", values_, 0, 0, thread_, position_ );
 	return ( thread_->object_factory().create_lookup() );
 	M_EPILOG
 }
@@ -638,7 +638,7 @@ HHuginn::value_t set( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::valu
 
 HHuginn::value_t print( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "print", values_, 1, 1, position_ );
+	verify_arg_count( "print", values_, 1, 1, thread_, position_ );
 	HHuginn::HValue const* v( values_.front().raw() );
 	yaal::hcore::HStreamInterface& out( thread_->runtime().huginn()->output_stream() );
 	HHuginn::type_id_t typeId( v->type_id() );
@@ -668,7 +668,7 @@ HHuginn::value_t print( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::va
 
 HHuginn::value_t input( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "input", values_, 0, 0, position_ );
+	verify_arg_count( "input", values_, 0, 0, thread_, position_ );
 	yaal::hcore::HString l;
 	int len( static_cast<int>( thread_->runtime().huginn()->input_stream().read_until( l, HStreamInterface::eols, false ) ) );
 	return ( len > 0 ? thread_->object_factory().create_string( l ) : thread_->runtime().none_value() );
@@ -678,9 +678,9 @@ HHuginn::value_t input( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::va
 inline HHuginn::value_t assert( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "assert";
-	verify_arg_count( name, values_, 2, 3, position_ );
-	verify_arg_type( name, values_, 0, HHuginn::TYPE::BOOLEAN, ARITY::MULTIPLE, position_ );
-	verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, ARITY::MULTIPLE, position_ );
+	verify_arg_count( name, values_, 2, 3, thread_, position_ );
+	verify_arg_type( name, values_, 0, HHuginn::TYPE::BOOLEAN, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, ARITY::MULTIPLE, thread_, position_ );
 	if ( ! get_boolean( values_[0] ) ) {
 		int argc( static_cast<int>( values_.get_size() ) );
 		HString message( get_string( values_[argc - 1] ) );

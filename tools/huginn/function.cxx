@@ -63,6 +63,7 @@ HHuginn::value_t HFunction::execute( function_frame_creator_t functionFrameCreat
 		values_,
 		_parameterCount - static_cast<int>( _defaultValues.get_size() ),
 		_parameterCount,
+		thread_,
 		position_
 	);
 	int upCast( 0 );

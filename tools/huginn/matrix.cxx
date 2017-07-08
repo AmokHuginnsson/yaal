@@ -49,28 +49,40 @@ HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass const* class_, HHugi
 	: HValue( class_ )
 	, _data() {
 	char const name[] = "Matrix.constructor";
-	verify_arg_count( name, values_, 1, meta::max_signed<int>::value, position_ );
+	verify_arg_count( name, values_, 1, meta::max_signed<int>::value, thread_, position_ );
 	if ( values_[0]->type_id() != HHuginn::TYPE::LIST ) {
-		verify_signature( name, values_, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER }, position_ );
+		verify_signature( name, values_, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER }, thread_, position_ );
 		HHuginn::HFunctionReference const& fr( *static_cast<HHuginn::HFunctionReference const*>( values_[0].raw() ) );
 		try {
 			int myRows( safe_int::cast<int>( get_integer( values_[1] ) ) );
 			if ( myRows < 1 ) {
-				throw HHuginn::HHuginnRuntimeException( "Invalid number of rows in matrix specification: "_ys.append( myRows ).append( "." ), position_ );
+				throw HHuginn::HHuginnRuntimeException(
+					"Invalid number of rows in matrix specification: "_ys.append( myRows ).append( "." ),
+					thread_->current_frame()->file_id(),
+					position_
+				);
 			}
 			int cols( safe_int::cast<int>( get_integer( values_[2] ) ) );
 			if ( cols < 1 ) {
-				throw HHuginn::HHuginnRuntimeException( "Invalid number of columns in matrix specification: "_ys.append( cols ).append( "." ), position_ );
+				throw HHuginn::HHuginnRuntimeException(
+					"Invalid number of columns in matrix specification: "_ys.append( cols ).append( "." ),
+					thread_->current_frame()->file_id(),
+					position_
+				);
 			}
 			if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::number ) ) {
 				_data = data_t( make_resource<arbitrary_precision_matrix_t>( myRows, cols ) );
 			} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::real ) ) {
 				_data = data_t( make_resource<floating_point_matrix_t>( myRows, cols ) );
 			} else {
-				throw HHuginn::HHuginnRuntimeException( "Bad matrix type: `"_ys.append( thread_->runtime().function_name( fr.function().id() ) ).append( "'." ), position_ );
+				throw HHuginn::HHuginnRuntimeException(
+					"Bad matrix type: `"_ys.append( thread_->runtime().function_name( fr.function().id() ) ).append( "'." ),
+					thread_->current_frame()->file_id(),
+					position_
+				);
 			}
 		} catch ( HException const& e ) {
-			throw HHuginn::HHuginnRuntimeException( e.what(), position_ );
+			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
 		}
 	} else {
 		HHuginn::HList::values_t const* rowData( nullptr );
@@ -81,7 +93,7 @@ HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass const* class_, HHugi
 			myRows = safe_int::cast<int>( values_.get_size() );
 			cols = safe_int::cast<int>( ( rowData = &get_list( values_[0] ) )->get_size() );
 			if ( cols < 1 ) {
-				throw HHuginn::HHuginnRuntimeException( "Invalid number of columns in matrix specification: "_ys.append( cols ).append( "." ), position_ );
+				throw HHuginn::HHuginnRuntimeException( "Invalid number of columns in matrix specification: "_ys.append( cols ).append( "." ), thread_->current_frame()->file_id(), position_ );
 			}
 			t = (*rowData)[0]->type_id();
 			if ( t == HHuginn::TYPE::NUMBER ) {
@@ -89,17 +101,18 @@ HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass const* class_, HHugi
 			} else if ( t == HHuginn::TYPE::REAL ) {
 				_data = data_t( make_resource<floating_point_matrix_t>( myRows, cols ) );
 			} else {
-				throw HHuginn::HHuginnRuntimeException( "Matrix must have numeric data, either `number' or `real'.", position_ );
+				throw HHuginn::HHuginnRuntimeException( "Matrix must have numeric data, either `number' or `real'.", thread_->current_frame()->file_id(), position_ );
 			}
 		} catch ( HException const& e ) {
 			throw HHuginn::HHuginnRuntimeException( e.what(), position_ );
 		}
 		for ( int r( 0 ); r < myRows; ++ r ) {
-			verify_arg_type( name, values_, r, HHuginn::TYPE::LIST, ARITY::MULTIPLE, position_ );
+			verify_arg_type( name, values_, r, HHuginn::TYPE::LIST, ARITY::MULTIPLE, thread_, position_ );
 			int otherCols( 0 );
 			if ( ( otherCols = static_cast<int>( ( rowData = &get_list( values_[r] ) )->get_size() ) ) != cols ) {
 				throw HHuginn::HHuginnRuntimeException(
 					"Inconsistent number of columns across rows: "_ys.append( otherCols ).append( " vs " ).append( cols ).append( "." ),
+					thread_->current_frame()->file_id(),
 					position_
 				);
 			}
@@ -108,6 +121,7 @@ HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass const* class_, HHugi
 				if ( v->type_id() != t ) {
 					throw HHuginn::HHuginnRuntimeException(
 						"Non uniformly typed data in matrix definition, in row: "_ys.append( r ).append( ", column: " ).append( c ).append( "." ),
+						thread_->current_frame()->file_id(),
 						position_
 					);
 				}
@@ -135,7 +149,7 @@ HMatrix::HMatrix( HHuginn::HClass const* class_, floating_point_matrix_ptr_t&& d
 HHuginn::value_t HMatrix::columns( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.columns";
-	verify_arg_count( name, values_, 0, 0, position_ );
+	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HHuginn::value_t v;
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	if ( o->_data.type() == 0 ) {
@@ -152,7 +166,7 @@ HHuginn::value_t HMatrix::columns( huginn::HThread* thread_, HHuginn::value_t* o
 HHuginn::value_t HMatrix::rows( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.rows";
-	verify_arg_count( name, values_, 0, 0, position_ );
+	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HHuginn::value_t v;
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	if ( o->_data.type() == 0 ) {
@@ -168,7 +182,7 @@ HHuginn::value_t HMatrix::rows( huginn::HThread* thread_, HHuginn::value_t* obje
 
 HHuginn::value_t HMatrix::get( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_signature( "Matrix.get", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER }, position_ );
+	verify_signature( "Matrix.get", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER }, thread_, position_ );
 	int row( static_cast<int>( get_integer( values_[0] ) ) );
 	int col( static_cast<int>( get_integer( values_[1] ) ) );
 	HHuginn::value_t v;
@@ -176,19 +190,19 @@ HHuginn::value_t HMatrix::get( huginn::HThread* thread_, HHuginn::value_t* objec
 	if ( o->_data.type() == 0 ) {
 		arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
 		if ( ( row < 0 ) || ( row >= m.rows() ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), thread_->current_frame()->file_id(), position_ );
 		}
 		if ( ( col < 0 ) || ( col >= m.columns() ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), thread_->current_frame()->file_id(), position_ );
 		}
 		v = thread_->runtime().object_factory()->create_number( m[row][col] );
 	} else {
 		floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
 		if ( ( row < 0 ) || ( row >= m.rows() ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), thread_->current_frame()->file_id(), position_ );
 		}
 		if ( ( col < 0 ) || ( col >= m.columns() ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), thread_->current_frame()->file_id(), position_ );
 		}
 		v = thread_->runtime().object_factory()->create_real( m[row][col] );
 	}
@@ -196,31 +210,31 @@ HHuginn::value_t HMatrix::get( huginn::HThread* thread_, HHuginn::value_t* objec
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::set( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::set( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.set";
-	verify_signature( name, values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER, HHuginn::TYPE::UNKNOWN }, position_ );
+	verify_signature( name, values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER, HHuginn::TYPE::UNKNOWN }, thread_, position_ );
 	int row( static_cast<int>( get_integer( values_[0] ) ) );
 	int col( static_cast<int>( get_integer( values_[1] ) ) );
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	if ( o->_data.type() == 0 ) {
-		verify_arg_type( name, values_, 2, HHuginn::TYPE::NUMBER, ARITY::MULTIPLE, position_ );
+		verify_arg_type( name, values_, 2, HHuginn::TYPE::NUMBER, ARITY::MULTIPLE, thread_, position_ );
 		arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
 		if ( ( row < 0 ) || ( row >= m.rows() ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), thread_->current_frame()->file_id(), position_ );
 		}
 		if ( ( col < 0 ) || ( col >= m.columns() ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), thread_->current_frame()->file_id(), position_ );
 		}
 		m[row][col] = get_number( values_[2] );
 	} else {
-		verify_arg_type( name, values_, 2, HHuginn::TYPE::REAL, ARITY::MULTIPLE, position_ );
+		verify_arg_type( name, values_, 2, HHuginn::TYPE::REAL, ARITY::MULTIPLE, thread_, position_ );
 		floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
 		if ( ( row < 0 ) || ( row >= m.rows() ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), thread_->current_frame()->file_id(), position_ );
 		}
 		if ( ( col < 0 ) || ( col >= m.columns() ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), thread_->current_frame()->file_id(), position_ );
 		}
 		m[row][col] = get_real( values_[2] );
 	}
@@ -228,16 +242,16 @@ HHuginn::value_t HMatrix::set( huginn::HThread*, HHuginn::value_t* object_, HHug
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::add( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::add( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.add";
-	verify_arg_count( name, values_, 1, 1, position_ );
-	verify_arg_type( name, values_, 0, (*object_)->get_class(), ARITY::UNARY, position_ );
+	verify_arg_count( name, values_, 1, 1, thread_, position_ );
+	verify_arg_type( name, values_, 0, (*object_)->get_class(), ARITY::UNARY, thread_, position_ );
 	HHuginn::value_t v;
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	HMatrix const* arg( static_cast<HMatrix const*>( values_[0].raw() ) );
 	if ( o->_data.type() != arg->_data.type() ) {
-		throw HHuginn::HHuginnRuntimeException( "Non matching data types.", position_ );
+		throw HHuginn::HHuginnRuntimeException( "Non matching data types.", thread_->current_frame()->file_id(), position_ );
 	}
 	try {
 		if ( o->_data.type() == 0 ) {
@@ -250,22 +264,22 @@ HHuginn::value_t HMatrix::add( huginn::HThread*, HHuginn::value_t* object_, HHug
 			m += ma;
 		}
 	} catch ( HException const& e ) {
-		throw HHuginn::HHuginnRuntimeException( e.what(), position_ );
+		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
 	}
 	return ( *object_ );
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::subtract( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::subtract( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.subtract";
-	verify_arg_count( name, values_, 1, 1, position_ );
-	verify_arg_type( name, values_, 0, (*object_)->get_class(), ARITY::UNARY, position_ );
+	verify_arg_count( name, values_, 1, 1, thread_, position_ );
+	verify_arg_type( name, values_, 0, (*object_)->get_class(), ARITY::UNARY, thread_, position_ );
 	HHuginn::value_t v;
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	HMatrix const* arg( static_cast<HMatrix const*>( values_[0].raw() ) );
 	if ( o->_data.type() != arg->_data.type() ) {
-		throw HHuginn::HHuginnRuntimeException( "Non matching data types.", position_ );
+		throw HHuginn::HHuginnRuntimeException( "Non matching data types.", thread_->current_frame()->file_id(), position_ );
 	}
 	try {
 		if ( o->_data.type() == 0 ) {
@@ -278,22 +292,22 @@ HHuginn::value_t HMatrix::subtract( huginn::HThread*, HHuginn::value_t* object_,
 			m -= ma;
 		}
 	} catch ( HException const& e ) {
-		throw HHuginn::HHuginnRuntimeException( e.what(), position_ );
+		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
 	}
 	return ( *object_ );
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::multiply( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::multiply( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.multiply";
-	verify_arg_count( name, values_, 1, 1, position_ );
-	verify_arg_type( name, values_, 0, (*object_)->get_class(), ARITY::UNARY, position_ );
+	verify_arg_count( name, values_, 1, 1, thread_, position_ );
+	verify_arg_type( name, values_, 0, (*object_)->get_class(), ARITY::UNARY, thread_, position_ );
 	HHuginn::value_t v;
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	HMatrix const* arg( static_cast<HMatrix const*>( values_[0].raw() ) );
 	if ( o->_data.type() != arg->_data.type() ) {
-		throw HHuginn::HHuginnRuntimeException( "Non matching data types.", position_ );
+		throw HHuginn::HHuginnRuntimeException( "Non matching data types.", thread_->current_frame()->file_id(), position_ );
 	}
 	try {
 		if ( o->_data.type() == 0 ) {
@@ -306,7 +320,7 @@ HHuginn::value_t HMatrix::multiply( huginn::HThread*, HHuginn::value_t* object_,
 			m *= ma;
 		}
 	} catch ( HException const& e ) {
-		throw HHuginn::HHuginnRuntimeException( e.what(), position_ );
+		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
 	}
 	return ( *object_ );
 	M_EPILOG
@@ -315,7 +329,7 @@ HHuginn::value_t HMatrix::multiply( huginn::HThread*, HHuginn::value_t* object_,
 HHuginn::value_t HMatrix::det( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.det";
-	verify_arg_count( name, values_, 0, 0, position_ );
+	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HHuginn::value_t v;
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	try {
@@ -327,23 +341,23 @@ HHuginn::value_t HMatrix::det( huginn::HThread* thread_, HHuginn::value_t* objec
 			v = thread_->runtime().object_factory()->create_real( m.det() );
 		}
 	} catch ( HException const& e ) {
-		throw HHuginn::HHuginnRuntimeException( e.what(), position_ );
+		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
 	}
 	return ( v );
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::scale( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::scale( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.scale";
-	verify_arg_count( name, values_, 1, 1, position_ );
+	verify_arg_count( name, values_, 1, 1, thread_, position_ );
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	if ( o->_data.type() == 0 ) {
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::NUMBER, ARITY::UNARY, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::NUMBER, ARITY::UNARY, thread_, position_ );
 		arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
 		m *= get_number( values_[0] );
 	} else {
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::REAL, ARITY::UNARY, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::REAL, ARITY::UNARY, thread_, position_ );
 		floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
 		m *= get_real( values_[0] );
 	}
@@ -351,13 +365,13 @@ HHuginn::value_t HMatrix::scale( huginn::HThread*, HHuginn::value_t* object_, HH
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::scale_to( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::scale_to( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.scale_to";
-	verify_arg_count( name, values_, 1, 1, position_ );
+	verify_arg_count( name, values_, 1, 1, thread_, position_ );
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	if ( o->_data.type() == 0 ) {
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::NUMBER, ARITY::UNARY, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::NUMBER, ARITY::UNARY, thread_, position_ );
 		arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
 		HNumber extremum;
 		for ( int r( 0 ), rows( m.rows() ), cols( m.columns() ); r < rows; ++ r ) {
@@ -370,11 +384,11 @@ HHuginn::value_t HMatrix::scale_to( huginn::HThread*, HHuginn::value_t* object_,
 			}
 		}
 		if ( extremum == number::N0 ) {
-			throw HHuginn::HHuginnRuntimeException( "Zeroed matrix cannot be scaled.", position_ );
+			throw HHuginn::HHuginnRuntimeException( "Zeroed matrix cannot be scaled.", thread_->current_frame()->file_id(), position_ );
 		}
 		m *= get_number( values_[0] ) / extremum;
 	} else {
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::REAL, ARITY::UNARY, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::REAL, ARITY::UNARY, thread_, position_ );
 		floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
 		double long extremum( 0.L );
 		for ( int r( 0 ), rows( m.rows() ), cols( m.columns() ); r < rows; ++ r ) {
@@ -385,7 +399,7 @@ HHuginn::value_t HMatrix::scale_to( huginn::HThread*, HHuginn::value_t* object_,
 			}
 		}
 		if ( extremum == 0.L ) {
-			throw HHuginn::HHuginnRuntimeException( "Zeroed matrix cannot be scaled.", position_ );
+			throw HHuginn::HHuginnRuntimeException( "Zeroed matrix cannot be scaled.", thread_->current_frame()->file_id(), position_ );
 		}
 		m *= get_real( values_[0] ) / extremum;
 	}
@@ -396,7 +410,7 @@ HHuginn::value_t HMatrix::scale_to( huginn::HThread*, HHuginn::value_t* object_,
 HHuginn::value_t HMatrix::inverse( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.inverse";
-	verify_arg_count( name, values_, 0, 0, position_ );
+	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	HHuginn::value_t v;
 	try {
@@ -406,7 +420,7 @@ HHuginn::value_t HMatrix::inverse( huginn::HThread* thread_, HHuginn::value_t* o
 			v = thread_->object_factory().create<HMatrix>( o->HValue::get_class(), make_resource<floating_point_matrix_t>( o->_data.get<floating_point_matrix_ptr_t>()->inverse() ) );
 		}
 	} catch ( HException const& e ) {
-		throw HHuginn::HHuginnRuntimeException( e.what(), position_ );
+		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
 	}
 	return ( v );
 	M_EPILOG
@@ -415,7 +429,7 @@ HHuginn::value_t HMatrix::inverse( huginn::HThread* thread_, HHuginn::value_t* o
 HHuginn::value_t HMatrix::transpose( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.transpose";
-	verify_arg_count( name, values_, 0, 0, position_ );
+	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	HHuginn::value_t v;
 	if ( o->_data.type() == 0 ) {
@@ -462,6 +476,7 @@ void matrix_apply( HHuginn::value_t store_, huginn::HThread* thread_, matrix_t& 
 						.append( "', but result was a `" )
 						.append( res->get_class()->name() )
 						.append( "' instead." ),
+					thread_->current_frame()->file_id(),
 					position_
 				);
 			}
@@ -473,8 +488,8 @@ void matrix_apply( HHuginn::value_t store_, huginn::HThread* thread_, matrix_t& 
 HHuginn::value_t HMatrix::apply( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.apply";
-	verify_arg_count( name, values_, 1, 1, position_ );
-	HHuginn::type_id_t t( verify_arg_type( name, values_, 0, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::BOUND_METHOD }, ARITY::UNARY, position_ ) );
+	verify_arg_count( name, values_, 1, 1, thread_, position_ );
+	HHuginn::type_id_t t( verify_arg_type( name, values_, 0, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::BOUND_METHOD }, ARITY::UNARY, thread_, position_ ) );
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	HHuginn::value_t v;
 	if ( o->_data.type() == 0 ) {
@@ -499,7 +514,7 @@ HHuginn::value_t HMatrix::apply( huginn::HThread* thread_, HHuginn::value_t* obj
 HHuginn::value_t HMatrix::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.to_string";
-	verify_arg_count( name, values_, 0, 0, position_ );
+	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HString s( "Matrix(" );
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	if ( o->_data.type() == 0 ) {

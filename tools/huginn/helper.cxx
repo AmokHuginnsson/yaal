@@ -99,16 +99,17 @@ void operands_type_mismatch( char const* op_, HHuginn::type_id_t t1_, HHuginn::t
 	throw HHuginn::HHuginnRuntimeException( msg, pos_ );
 }
 
-void verify_arg_count( yaal::hcore::HString const& name_, HHuginn::values_t const& values_, int min_, int max_, int position_ ) {
+void verify_arg_count( yaal::hcore::HString const& name_, HHuginn::values_t const& values_, int min_, int max_, huginn::HThread* thread_, int position_ ) {
 	M_PROLOG
 	int argCount( static_cast<int>( values_.get_size() ) );
 	if ( min_ == max_ ) {
 		if ( argCount != min_ ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"Bad number of parameters in call to: `"_ys
-				.append( name_ ).append( "()', expected exactly: " )
-				.append( min_ ).append( ", got: " )
-				.append( argCount ).append( "." ),
+					.append( name_ ).append( "()', expected exactly: " )
+					.append( min_ ).append( ", got: " )
+					.append( argCount ).append( "." ),
+				thread_->current_frame()->file_id(),
 				position_
 			);
 		}
@@ -116,17 +117,19 @@ void verify_arg_count( yaal::hcore::HString const& name_, HHuginn::values_t cons
 		if ( argCount < min_ ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"Bad number of parameters in call to: `"_ys
-				.append( name_ ).append( "()', expected at least: " )
-				.append( min_ ).append( ", got: " )
-				.append( argCount ).append( "." ),
+					.append( name_ ).append( "()', expected at least: " )
+					.append( min_ ).append( ", got: " )
+					.append( argCount ).append( "." ),
+				thread_->current_frame()->file_id(),
 				position_
 			);
 		} else if ( argCount > max_ ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"Bad number of parameters in call to: `"_ys
-				.append( name_ ).append( "()', expected at most: " )
-				.append( max_ ).append( ", got: " )
-				.append( argCount ).append( "." ),
+					.append( name_ ).append( "()', expected at most: " )
+					.append( max_ ).append( ", got: " )
+					.append( argCount ).append( "." ),
+				thread_->current_frame()->file_id(),
 				position_
 			);
 		}
@@ -162,6 +165,7 @@ void verify_arg_type(
 	HHuginn::type_id_t type_,
 	yaal::hcore::HString const& reqName_,
 	ARITY argsArity_,
+	huginn::HThread* thread_,
 	int position_
 ) {
 	M_PROLOG
@@ -172,13 +176,14 @@ void verify_arg_type(
 		}
 		throw HHuginn::HHuginnRuntimeException(
 			""_ys.append( name_ )
-			.append( "() " )
-			.append( no )
-			.append( "argument must be " )
-			.append( reqName_ )
-			.append( ", not " )
-			.append( a_type_name( values_[no_]->get_class() ) )
-			.append( "." ),
+				.append( "() " )
+				.append( no )
+				.append( "argument must be " )
+				.append( reqName_ )
+				.append( ", not " )
+				.append( a_type_name( values_[no_]->get_class() ) )
+				.append( "." ),
+			thread_->current_frame()->file_id(),
 			position_
 		);
 	}
@@ -191,24 +196,24 @@ void verify_arg_type(
 void verify_arg_type(
 	yaal::hcore::HString const& name_,
 	HHuginn::values_t const& values_,
-	int no_, HHuginn::TYPE type_, ARITY argsArity_, int position_ ) {
-	verify_arg_type( name_, values_, no_, HHuginn::type_id_t( static_cast<HHuginn::type_id_t::value_type>( type_ ) ), a_type_name( type_ ), argsArity_, position_ );
+	int no_, HHuginn::TYPE type_, ARITY argsArity_, huginn::HThread* thread_, int position_ ) {
+	verify_arg_type( name_, values_, no_, HHuginn::type_id_t( static_cast<HHuginn::type_id_t::value_type>( type_ ) ), a_type_name( type_ ), argsArity_, thread_, position_ );
 }
 
 void verify_arg_type(
 	yaal::hcore::HString const& name_,
 	HHuginn::values_t const& values_,
-	int no_, HHuginn::HClass const* class_, ARITY argsArity_, int position_ ) {
-	verify_arg_type( name_, values_, no_, class_->type_id(), a_type_name( class_ ), argsArity_, position_ );
+	int no_, HHuginn::HClass const* class_, ARITY argsArity_, huginn::HThread* thread_, int position_ ) {
+	verify_arg_type( name_, values_, no_, class_->type_id(), a_type_name( class_ ), argsArity_, thread_, position_ );
 }
 
-void verify_signature( yaal::hcore::HString const& name_, HHuginn::values_t const& values_, types_t const& types_, int position_ ) {
+void verify_signature( yaal::hcore::HString const& name_, HHuginn::values_t const& values_, types_t const& types_, huginn::HThread* thread_, int position_ ) {
 	int const COUNT( static_cast<int>( types_.get_size() ) );
-	verify_arg_count( name_, values_, COUNT, COUNT, position_ );
+	verify_arg_count( name_, values_, COUNT, COUNT, thread_, position_ );
 	ARITY arity( COUNT == 1 ? ARITY::UNARY : ARITY::MULTIPLE );
 	for ( int i( 0 ); i < COUNT; ++ i ) {
 		if ( types_[i] != HHuginn::TYPE::UNKNOWN ) {
-			verify_arg_type( name_, values_, i, types_[i], arity, position_ );
+			verify_arg_type( name_, values_, i, types_[i], arity, thread_, position_ );
 		}
 	}
 }
@@ -219,6 +224,7 @@ HHuginn::type_id_t verify_arg_type(
 	int no_,
 	types_t const& types_,
 	ARITY argsArity_,
+	huginn::HThread* thread_,
 	int position_
 ) {
 	M_PROLOG
@@ -237,14 +243,15 @@ HHuginn::type_id_t verify_arg_type(
 		}
 		throw HHuginn::HHuginnRuntimeException(
 			""_ys.append( name_ )
-			.append( "() " )
-			.append( no )
-			.append( "argument must be one of" )
-			.append( " {" )
-			.append( reqName )
-			.append( "}, not " )
-			.append( a_type_name( values_[no_]->get_class() ) )
-			.append( "." ),
+				.append( "() " )
+				.append( no )
+				.append( "argument must be one of" )
+				.append( " {" )
+				.append( reqName )
+				.append( "}, not " )
+				.append( a_type_name( values_[no_]->get_class() ) )
+				.append( "." ),
+			thread_->current_frame()->file_id(),
 			position_
 		);
 	}
@@ -255,7 +262,7 @@ HHuginn::type_id_t verify_arg_type(
 HHuginn::type_id_t verify_arg_numeric(
 	yaal::hcore::HString const& name_,
 	HHuginn::values_t const& values_,
-	int no_, ARITY argsArity_, int position_ ) {
+	int no_, ARITY argsArity_, huginn::HThread* thread_, int position_ ) {
 	M_PROLOG
 	HHuginn::type_id_t t( values_[no_]->type_id() );
 	if ( ( t != HHuginn::TYPE::NUMBER ) && ( t != HHuginn::TYPE::REAL ) ) {
@@ -265,11 +272,12 @@ HHuginn::type_id_t verify_arg_numeric(
 		}
 		throw HHuginn::HHuginnRuntimeException(
 			""_ys.append( name_ )
-			.append( "() " )
-			.append( no )
-			.append( "argument must be a numeric type, either a `number' or a `real', not " )
-			.append( a_type_name( values_[no_]->get_class() ) )
-			.append( "." ),
+				.append( "() " )
+				.append( no )
+				.append( "argument must be a numeric type, either a `number' or a `real', not " )
+				.append( a_type_name( values_[no_]->get_class() ) )
+				.append( "." ),
+			thread_->current_frame()->file_id(),
 			position_
 		);
 	}
@@ -280,7 +288,7 @@ HHuginn::type_id_t verify_arg_numeric(
 HHuginn::type_id_t verify_arg_collection(
 	yaal::hcore::HString const& name_,
 	HHuginn::values_t const& values_,
-	int no_, ARITY argsArity_, ONTICALLY ontically_, int position_ ) {
+	int no_, ARITY argsArity_, ONTICALLY ontically_, huginn::HThread* thread_, int position_ ) {
 	M_PROLOG
 	static HHuginn::TYPE const material[] = {
 		HHuginn::TYPE::LIST,
@@ -300,13 +308,14 @@ HHuginn::type_id_t verify_arg_collection(
 		}
 		throw HHuginn::HHuginnRuntimeException(
 			""_ys.append( name_ )
-			.append( "() " )
-			.append( no )
-			.append( "argument must be a" )
-			.append( ( ontically_ == ONTICALLY::MATERIALIZED ) ? " materialized" : "" )
-			.append( " collection type, not " )
-			.append( a_type_name( values_[no_]->get_class() ) )
-			.append( "." ),
+				.append( "() " )
+				.append( no )
+				.append( "argument must be a" )
+				.append( ( ontically_ == ONTICALLY::MATERIALIZED ) ? " materialized" : "" )
+				.append( " collection type, not " )
+				.append( a_type_name( values_[no_]->get_class() ) )
+				.append( "." ),
+			thread_->current_frame()->file_id(),
 			position_
 		);
 	}
@@ -320,6 +329,7 @@ HHuginn::type_id_t verify_arg_collection_value_type_low(
 	collection_t const& collection_,
 	types_t const& requiredTypes_,
 	UNIFORMITY uniformity_,
+	huginn::HThread* thread_,
 	int position_
 ) {
 	HHuginn::type_id_t type( _unknownClass_.type_id() );
@@ -335,6 +345,7 @@ HHuginn::type_id_t verify_arg_collection_value_type_low(
 					.append( a_type_name( v->get_class() ) )
 					.append( ", at position: " )
 					.append( pos ),
+				thread_->current_frame()->file_id(),
 				position_
 			);
 		}
@@ -349,6 +360,7 @@ HHuginn::type_id_t verify_arg_collection_value_type_low(
 						.append( a_type_name( v->get_class() ) )
 						.append( ", at position: " )
 						.append( pos ),
+					thread_->current_frame()->file_id(),
 					position_
 				);
 			}
@@ -365,19 +377,20 @@ HHuginn::type_id_t verify_arg_collection_value_type(
 	ARITY argsArity_,
 	types_t const& requiredTypes_,
 	UNIFORMITY uniformity_,
+	huginn::HThread* thread_,
 	int position_
 ) {
-	verify_arg_collection( name_, values_, no_, argsArity_, ONTICALLY::MATERIALIZED, position_ );
+	verify_arg_collection( name_, values_, no_, argsArity_, ONTICALLY::MATERIALIZED, thread_, position_ );
 	HHuginn::type_id_t type( _unknownClass_.type_id() );
 	switch ( values_[no_]->type_id().get() ) {
 		case ( static_cast<int>( HHuginn::TYPE::LIST ) ): {
-			type = verify_arg_collection_value_type_low( name_, *static_cast<HHuginn::HList const*>( values_[no_].raw() ), requiredTypes_, uniformity_, position_ );
+			type = verify_arg_collection_value_type_low( name_, *static_cast<HHuginn::HList const*>( values_[no_].raw() ), requiredTypes_, uniformity_, thread_, position_ );
 		} break;
 		case ( static_cast<int>( HHuginn::TYPE::DEQUE ) ): {
-			type = verify_arg_collection_value_type_low( name_, *static_cast<HHuginn::HDeque const*>( values_[no_].raw() ), requiredTypes_, uniformity_, position_ );
+			type = verify_arg_collection_value_type_low( name_, *static_cast<HHuginn::HDeque const*>( values_[no_].raw() ), requiredTypes_, uniformity_, thread_, position_ );
 		} break;
 		case ( static_cast<int>( HHuginn::TYPE::SET ) ): {
-			type = verify_arg_collection_value_type_low( name_, *static_cast<HHuginn::HSet const*>( values_[no_].raw() ), requiredTypes_, uniformity_, position_ );
+			type = verify_arg_collection_value_type_low( name_, *static_cast<HHuginn::HSet const*>( values_[no_].raw() ), requiredTypes_, uniformity_, thread_, position_ );
 		} break;
 		case ( static_cast<int>( HHuginn::TYPE::ORDER ) ): {
 			HHuginn::HOrder::values_t const& o( static_cast<HHuginn::HOrder const*>( values_[no_].raw() )->value() );
@@ -389,6 +402,7 @@ HHuginn::type_id_t verify_arg_collection_value_type(
 							.append( "() a collection contains value of an unexpected type: " )
 							.append( a_type_name( c ) )
 							.append( "." ),
+						thread_->current_frame()->file_id(),
 						position_
 					);
 				}

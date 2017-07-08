@@ -97,7 +97,7 @@ HHuginn::value_t HSubprocess::is_alive(
 ) {
 	M_PROLOG
 	char const name[] = "Subprocess.is_alive";
-	verify_arg_count( name, values_, 0, 0, position_ );
+	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HSubprocess* o( static_cast<HSubprocess*>( object_->raw() ) );
 	return ( thread_->runtime().object_factory()->create_boolean( o->_pipedChild.is_running() ) );
 	M_EPILOG
@@ -111,7 +111,7 @@ HHuginn::value_t HSubprocess::kill(
 ) {
 	M_PROLOG
 	char const name[] = "Subprocess.kill";
-	verify_arg_count( name, values_, 0, 0, position_ );
+	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HSubprocess* o( static_cast<HSubprocess*>( object_->raw() ) );
 	HPipedChild::STATUS s( o->_pipedChild.finish() );
 	return ( thread_->runtime().object_factory()->create_integer( s.value ) );
@@ -126,7 +126,7 @@ HHuginn::value_t HSubprocess::get_pid(
 ) {
 	M_PROLOG
 	char const name[] = "Subprocess.get_pid";
-	verify_arg_count( name, values_, 0, 0, position_ );
+	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HSubprocess* o( static_cast<HSubprocess*>( object_->raw() ) );
 	return ( thread_->runtime().object_factory()->create_integer( o->_pipedChild.get_pid() ) );
 	M_EPILOG
@@ -139,11 +139,11 @@ HHuginn::value_t HSubprocess::wait(
 	int position_
 ) {
 	M_PROLOG
-	verify_signature( "Subprocess.wait", values_, { HHuginn::TYPE::INTEGER }, position_ );
+	verify_signature( "Subprocess.wait", values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
 	HSubprocess* o( static_cast<HSubprocess*>( object_->raw() ) );
 	int waitFor( static_cast<int>( get_integer( values_[0] ) ) );
 	if ( waitFor < 0 ) {
-		throw HHuginn::HHuginnRuntimeException( "invalid wait time: "_ys.append( waitFor ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "invalid wait time: "_ys.append( waitFor ), thread_->current_frame()->file_id(), position_ );
 	}
 	HPipedChild::STATUS s( o->_pipedChild.finish( waitFor ) );
 	return ( thread_->runtime().object_factory()->create_integer( s.value ) );
@@ -159,7 +159,7 @@ HHuginn::value_t HSubprocess::stream(
 	int position_
 ) {
 	M_PROLOG
-	verify_arg_count( name_, values_, 0, 0, position_ );
+	verify_arg_count( name_, values_, 0, 0, thread_, position_ );
 	HSubprocess* o( static_cast<HSubprocess*>( object_->raw() ) );
 	HSubprocessClass const* c( static_cast<HSubprocessClass const*>( o->HHuginn::HValue::get_class() ) );
 	HHuginn::HClass const* sc( c->stream_class() );

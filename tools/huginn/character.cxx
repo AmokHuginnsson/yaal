@@ -47,20 +47,20 @@ namespace huginn {
 
 namespace character {
 
-inline HHuginn::value_t to_lower( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t to_lower( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "character.to_lower";
-	verify_arg_count( name, values_, 0, 0, position_ );
+	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HHuginn::HCharacter* c( static_cast<HHuginn::HCharacter*>( object_->raw() ) );
 	c->set( HHuginn::HCharacter::value_type( static_cast<yaal::u32_t>( std::towlower( static_cast<wint_t>( c->value().get() ) ) ) ) );
 	return ( *object_ );
 	M_EPILOG
 }
 
-inline HHuginn::value_t to_upper( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t to_upper( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "character.to_upper";
-	verify_arg_count( name, values_, 0, 0, position_ );
+	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HHuginn::HCharacter* c( static_cast<HHuginn::HCharacter*>( object_->raw() ) );
 	c->set( HHuginn::HCharacter::value_type( static_cast<yaal::u32_t>( std::towupper( static_cast<wint_t>( c->value().get() ) ) ) ) );
 	return ( *object_ );
@@ -69,7 +69,7 @@ inline HHuginn::value_t to_upper( huginn::HThread*, HHuginn::value_t* object_, H
 
 inline HHuginn::value_t is_of_a_kind( char const* name, bool (*isofakind)( code_point_t ), huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( name, values_, 0, 0, position_ );
+	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HHuginn::HCharacter* c( static_cast<HHuginn::HCharacter*>( object_->raw() ) );
 	return ( thread_->object_factory().create_boolean( isofakind( c->value() ) != 0 ) );
 	M_EPILOG

@@ -116,8 +116,8 @@ private:
 	virtual HHuginn::value_t do_create_instance( huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) const {
 		M_PROLOG
 		char const n[] = "CompiledRegularExpression.constructor";
-		verify_arg_count( n, values_, 1, 1, position_ );
-		verify_arg_type( n, values_, 0, HHuginn::TYPE::STRING, ARITY::UNARY, position_ );
+		verify_arg_count( n, values_, 1, 1, thread_, position_ );
+		verify_arg_type( n, values_, 0, HHuginn::TYPE::STRING, ARITY::UNARY, thread_, position_ );
 		HCompiledRegularExpression::regex_t regex(
 			make_resource<HRegex>(
 				get_string( values_[0] ),
@@ -140,7 +140,7 @@ HHuginn::value_t HCompiledRegularExpression::do_match(
 	HHuginn::values_t const& values_,
 	int position_
 ) {
-	verify_signature( "CompiledRegularExpression.match", values_, { HHuginn::TYPE::STRING }, position_ );
+	verify_signature( "CompiledRegularExpression.match", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 	HCompiledRegularExpressionClass const* creClass( static_cast<HCompiledRegularExpressionClass const*>( HValue::get_class() ) );
 	return ( thread_->object_factory().create<HRegularExpressionMatch>( creClass->regular_expression_match_class(), make_resource<HRegex>( _regex->copy() ), values_[0] ) );
 }
@@ -150,7 +150,7 @@ HHuginn::value_t HCompiledRegularExpression::do_replace(
 	HHuginn::values_t const& values_,
 	int position_
 ) {
-	verify_signature( "CompiledRegularExpression.replace", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, position_ );
+	verify_signature( "CompiledRegularExpression.replace", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, thread_, position_ );
 	HHuginn::value_t v;
 	try {
 		v = thread_->object_factory().create_string( _regex->replace( get_string( values_[0] ), get_string( values_[1] ) ) );
@@ -166,7 +166,7 @@ HHuginn::value_t HCompiledRegularExpression::do_groups(
 	HHuginn::values_t const& values_,
 	int position_
 ) {
-	verify_signature( "CompiledRegularExpression.groups", values_, { HHuginn::TYPE::STRING }, position_ );
+	verify_signature( "CompiledRegularExpression.groups", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 	yaal::hcore::HString const& string( get_string( values_[0] ) );
 	HRegex::groups_t g( _regex->groups( string ) );
 	HRuntime& rt( thread_->runtime() );

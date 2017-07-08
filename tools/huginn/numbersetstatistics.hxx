@@ -52,7 +52,7 @@ public:
 private:
 	number_set_stats_t _stats;
 public:
-	HNumberSetStatistics( HHuginn::HClass const*, HHuginn::values_t const&, int );
+	HNumberSetStatistics( huginn::HThread*, HHuginn::HClass const*, HHuginn::values_t const&, int );
 	static HHuginn::value_t stat( char const*, xmath::aggregate_type_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t derivative_stat( char const*, DERIVATIVE_STAT, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::value_t count( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );

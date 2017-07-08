@@ -106,7 +106,7 @@ HHuginn::value_t HQueryResult::column_name(
 	int position_
 ) {
 	M_PROLOG
-	verify_signature( "QueryResult.column_name", values_, { HHuginn::TYPE::INTEGER }, position_ );
+	verify_signature( "QueryResult.column_name", values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
 	HQueryResult* qr( static_cast<HQueryResult*>( object_->raw() ) );
 	return ( thread_->object_factory().create_string( qr->_recordSet->get_column_name( static_cast<int>( get_integer( values_[0] ) ) ) ) );
 	M_EPILOG
@@ -115,7 +115,7 @@ HHuginn::value_t HQueryResult::column_name(
 HHuginn::value_t HQueryResult::field_count( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "QueryResult.field_count";
-	verify_arg_count( name, values_, 0, 0, position_ );
+	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HQueryResult* qr( static_cast<HQueryResult*>( object_->raw() ) );
 	return ( thread_->object_factory().create_integer( qr->_recordSet->get_field_count() ) );
 	M_EPILOG
@@ -124,7 +124,7 @@ HHuginn::value_t HQueryResult::field_count( tools::huginn::HThread* thread_, HHu
 HHuginn::value_t HQueryResult::insert_id( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "QueryResult.insert_id";
-	verify_arg_count( name, values_, 0, 0, position_ );
+	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HQueryResult* qr( static_cast<HQueryResult*>( object_->raw() ) );
 	return ( thread_->object_factory().create_integer( qr->_recordSet->get_insert_id() ) );
 	M_EPILOG
@@ -133,7 +133,7 @@ HHuginn::value_t HQueryResult::insert_id( tools::huginn::HThread* thread_, HHugi
 HHuginn::value_t HQueryResult::has_next( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "QueryResult.has_next";
-	verify_arg_count( name, values_, 0, 0, position_ );
+	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HQueryResult* qr( static_cast<HQueryResult*>( object_->raw() ) );
 	return ( thread_->object_factory().create_boolean( qr->_it != qr->_recordSet->end() ) );
 	M_EPILOG
@@ -182,7 +182,7 @@ public:
 HHuginn::value_t HQueryResult::fetch_row( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "QueryResult.fetch_row";
-	verify_arg_count( name, values_, 0, 0, position_ );
+	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HQueryResult* qr( static_cast<HQueryResult*>( object_->raw() ) );
 	HQueryResultClass const* qrc( static_cast<HQueryResultClass const*>( qr->HValue::get_class() ) );
 	HHuginn::value_t v( thread_->runtime().none_value() );

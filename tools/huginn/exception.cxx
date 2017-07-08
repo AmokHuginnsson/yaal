@@ -77,7 +77,7 @@ public:
 private:
 	virtual HHuginn::value_t do_create_instance( huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) const {
 		M_PROLOG
-		verify_signature( name() + ".constructor", values_, { HHuginn::TYPE::STRING }, position_ );
+		verify_signature( name() + ".constructor", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		return ( thread_->object_factory().create<HHuginn::HException>( this, get_string( values_[0] ) ) );
 		M_EPILOG
 	}
@@ -86,7 +86,7 @@ private:
 		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_->raw() ) );
 		verify_arg_count(
 			static_cast<HExceptionClass const*>( e->get_class() )->name() + ".what",
-			values_, 0, 0, position_
+			values_, 0, 0, thread_, position_
 		);
 		return ( thread_->object_factory().create_string( e->what() ) );
 		M_EPILOG
@@ -96,7 +96,7 @@ private:
 		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_->raw() ) );
 		verify_arg_count(
 			static_cast<HExceptionClass const*>( e->get_class() )->name() + ".where",
-			values_, 0, 0, position_
+			values_, 0, 0, thread_, position_
 		);
 		return ( thread_->object_factory().create_string( e->where() ) );
 		M_EPILOG
@@ -106,7 +106,7 @@ private:
 		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_->raw() ) );
 		verify_arg_count(
 			static_cast<HExceptionClass const*>( e->get_class() )->name() + ".message",
-			values_, 0, 0, position_
+			values_, 0, 0, thread_, position_
 		);
 		HString message( e->where() );
 		message.append( ": " ).append( e->what() );

@@ -45,17 +45,17 @@ namespace tools {
 
 namespace huginn {
 
-HNumberSetStatistics::HNumberSetStatistics( HHuginn::HClass const* class_, HHuginn::values_t const& values_, int position_ )
+HNumberSetStatistics::HNumberSetStatistics( huginn::HThread* thread_, HHuginn::HClass const* class_, HHuginn::values_t const& values_, int position_ )
 	: HValue( class_ )
 	, _stats() {
 	char const name[] = "NumberSetStatistics.constructor";
-	verify_signature( name, values_, { HHuginn::TYPE::LIST }, position_ );
+	verify_signature( name, values_, { HHuginn::TYPE::LIST }, thread_, position_ );
 	HHuginn::type_id_t t( values_[0]->type_id() );
-	HHuginn::type_id_t vt( verify_arg_collection_value_type( name, values_, 0, ARITY::UNARY, { HHuginn::TYPE::REAL, HHuginn::TYPE::NUMBER }, UNIFORMITY::REQUIRED, position_ ) );
+	HHuginn::type_id_t vt( verify_arg_collection_value_type( name, values_, 0, ARITY::UNARY, { HHuginn::TYPE::REAL, HHuginn::TYPE::NUMBER }, UNIFORMITY::REQUIRED, thread_, position_ ) );
 	if ( t == HHuginn::TYPE::LIST ) {
 		HHuginn::HList::values_t const& src( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
 		if ( src.is_empty() ) {
-			throw HHuginn::HHuginnRuntimeException( "Cannot aggregate statistics over empty set.", position_ );
+			throw HHuginn::HHuginnRuntimeException( "Cannot aggregate statistics over empty set.", thread_->current_frame()->file_id(), position_ );
 		}
 		if ( vt == HHuginn::TYPE::REAL ) {
 			_stats = number_set_stats_t( make_resource<number_set_stats_real_t>( value_unboxing_iterator<double long>( src.begin() ), value_unboxing_iterator<double long>( src.end() ), AGGREGATE_TYPE::BASIC | AGGREGATE_TYPE::MEDIAN | AGGREGATE_TYPE::INTERQUARTILE_RANGE | AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION ) );
@@ -109,7 +109,7 @@ typename stats_t::value_type derivative_stats_impl( stats_t const& stats_, HNumb
 
 HHuginn::value_t HNumberSetStatistics::stat( char const* name_, xmath::aggregate_type_t aggregateType_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "NumberSetStatistics."_ys.append( name_ ), values_, 0, 0, position_ );
+	verify_arg_count( "NumberSetStatistics."_ys.append( name_ ), values_, 0, 0, thread_, position_ );
 	HHuginn::value_t v;
 	HNumberSetStatistics* o( static_cast<HNumberSetStatistics*>( object_->raw() ) );
 	if ( o->_stats.type() == 0 ) {
@@ -125,7 +125,7 @@ HHuginn::value_t HNumberSetStatistics::stat( char const* name_, xmath::aggregate
 
 HHuginn::value_t HNumberSetStatistics::derivative_stat( char const* name_, DERIVATIVE_STAT derivativeStats_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "NumberSetStatistics."_ys.append( name_ ), values_, 0, 0, position_ );
+	verify_arg_count( "NumberSetStatistics."_ys.append( name_ ), values_, 0, 0, thread_, position_ );
 	HHuginn::value_t v;
 	HNumberSetStatistics* o( static_cast<HNumberSetStatistics*>( object_->raw() ) );
 	if ( o->_stats.type() == 0 ) {
@@ -141,7 +141,7 @@ HHuginn::value_t HNumberSetStatistics::derivative_stat( char const* name_, DERIV
 
 HHuginn::value_t HNumberSetStatistics::count( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "NumberSetStatistics.count", values_, 0, 0, position_ );
+	verify_arg_count( "NumberSetStatistics.count", values_, 0, 0, thread_, position_ );
 	HHuginn::value_t v;
 	HNumberSetStatistics* o( static_cast<HNumberSetStatistics*>( object_->raw() ) );
 	if ( o->_stats.type() == 0 ) {

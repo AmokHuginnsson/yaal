@@ -64,7 +64,7 @@ public:
 private:
 	HHuginn::value_t do_compile( huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		verify_signature( "RegularExpressions.compile", values_, { HHuginn::TYPE::STRING }, position_ );
+		verify_signature( "RegularExpressions.compile", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		return ( _compiledRegularExpressionClass->create_instance( thread_, nullptr, values_, position_ ) );
 		M_EPILOG
 	}

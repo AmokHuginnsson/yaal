@@ -64,7 +64,7 @@ public:
 	}
 	static HHuginn::value_t resolve( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		verify_signature( "Network.resolve", values_, { HHuginn::TYPE::STRING }, position_ );
+		verify_signature( "Network.resolve", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		return ( thread_->object_factory().create_string( resolver::ip_to_string( resolver::get_ip( get_string( values_[0] ) ) ) ) );
 		M_EPILOG
 	}
@@ -77,10 +77,10 @@ private:
 	HHuginn::value_t do_connect( huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Network.connect";
-		verify_arg_count( name, values_, 1, 2, position_ );
+		verify_arg_count( name, values_, 1, 2, thread_, position_ );
 		ARITY arity( values_.get_size() > 1 ? ARITY::MULTIPLE : ARITY::UNARY );
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, arity, position_ );
-		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, arity, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, arity, thread_, position_ );
+		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, arity, thread_, position_ );
 		int port( 0 );
 		if ( arity == ARITY::MULTIPLE ) {
 			port = static_cast<int>( get_integer( values_[1] ) );

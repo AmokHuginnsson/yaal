@@ -52,16 +52,16 @@ HClock::HClock( HHuginn::HClass* class_ )
 HHuginn::value_t HClock::milliseconds( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Clock.milliseconds";
-	verify_arg_count( name, values_, 0, 0, position_ );
+	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	huginn::HClock* c( static_cast<huginn::HClock*>( object_->raw() ) );
 	return ( thread_->object_factory().create_integer( c->_clock.get_time_elapsed( time::UNIT::MILLISECOND ) ) );
 	M_EPILOG
 }
 
-HHuginn::value_t HClock::reset( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HClock::reset( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Clock.reset";
-	verify_arg_count( name, values_, 0, 0, position_ );
+	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	huginn::HClock* c( static_cast<huginn::HClock*>( object_->raw() ) );
 	c->_clock.reset();
 	return ( *object_ );
@@ -71,7 +71,7 @@ HHuginn::value_t HClock::reset( huginn::HThread*, HHuginn::value_t* object_, HHu
 HHuginn::value_t HClock::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Clock.to_string";
-	verify_arg_count( name, values_, 0, 0, position_ );
+	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	huginn::HClock* c( static_cast<huginn::HClock*>( object_->raw() ) );
 	return ( thread_->object_factory().create_string( lexical_cast<HString>( time::duration( c->_clock.get_time_elapsed( time::UNIT::NANOSECOND ), time::UNIT::NANOSECOND ) ) ) );
 	M_EPILOG

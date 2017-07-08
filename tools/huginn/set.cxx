@@ -73,7 +73,7 @@ namespace set {
 
 inline HHuginn::value_t insert( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "set.insert", values_, 1, 1, position_ );
+	verify_arg_count( "set.insert", values_, 1, 1, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
 	static_cast<HHuginn::HSet*>( object_->raw() )->insert( thread_, values_[0], position_ );
 	return ( *object_ );
@@ -82,7 +82,7 @@ inline HHuginn::value_t insert( huginn::HThread* thread_, HHuginn::value_t* obje
 
 inline HHuginn::value_t has_key( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "set.has_key", values_, 1, 1, position_ );
+	verify_arg_count( "set.has_key", values_, 1, 1, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
 	bool hasKey( static_cast<HHuginn::HSet*>( object_->raw() )->has_key( thread_, values_[0], position_ ) );
 	return ( thread_->object_factory().create_boolean( hasKey ) );
@@ -91,16 +91,16 @@ inline HHuginn::value_t has_key( huginn::HThread* thread_, HHuginn::value_t* obj
 
 inline HHuginn::value_t erase( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "set.erase", values_, 1, 1, position_ );
+	verify_arg_count( "set.erase", values_, 1, 1, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
 	static_cast<HHuginn::HSet*>( object_->raw() )->erase( thread_, values_[0], position_ );
 	return ( *object_ );
 	M_EPILOG
 }
 
-inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t clear( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "set.clear", values_, 0, 0, position_ );
+	verify_arg_count( "set.clear", values_, 0, 0, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
 	static_cast<HHuginn::HSet*>( object_->raw() )->value().clear();
 	return ( *object_ );
@@ -110,7 +110,7 @@ inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHug
 inline HHuginn::value_t update( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
-	verify_signature( "set.update", values_, { HHuginn::TYPE::SET }, position_ );
+	verify_signature( "set.update", values_, { HHuginn::TYPE::SET }, thread_, position_ );
 	HHuginn::HSet* s( static_cast<HHuginn::HSet*>( object_->raw() ) );
 	HHuginn::HSet::values_t& l( s->value() );
 	HHuginn::HSet::values_t const& r( static_cast<HHuginn::HSet const*>( values_[0].raw() )->value() );
@@ -126,7 +126,7 @@ inline HHuginn::value_t update( huginn::HThread* thread_, HHuginn::value_t* obje
 inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
-	verify_signature( "set.equals", values_, { HHuginn::TYPE::SET }, position_ );
+	verify_signature( "set.equals", values_, { HHuginn::TYPE::SET }, thread_, position_ );
 	HHuginn::HSet::values_t const& l( static_cast<HHuginn::HSet*>( object_->raw() )->value() );
 	HHuginn::HSet::values_t const& r( static_cast<HHuginn::HSet const*>( values_[0].raw() )->value() );
 	bool equal( l.get_size() == r.get_size() );
