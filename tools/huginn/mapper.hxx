@@ -64,8 +64,8 @@ public:
 		M_EPILOG
 	}
 protected:
-	virtual int long do_size( void ) const override {
-		return ( static_cast<HHuginn::HIterable const*>( _source.raw() )->size() );
+	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
+		return ( static_cast<HHuginn::HIterable const*>( _source.raw() )->size( thread_, position_ ) );
 	}
 private:
 	virtual HIterator do_iterator( HThread*, int ) override;
@@ -84,8 +84,8 @@ public:
 		return;
 	}
 protected:
-	virtual bool do_is_valid( void ) override {
-		return ( _impl.is_valid() );
+	virtual bool do_is_valid( HThread* thread_, int position_ ) override {
+		return ( _impl.is_valid( thread_, position_ ) );
 	}
 	virtual void do_next( HThread* thread_, int position_ ) override {
 		_impl.next( thread_, position_ );

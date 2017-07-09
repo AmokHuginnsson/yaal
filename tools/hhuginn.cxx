@@ -126,13 +126,6 @@ HHuginn::HHuginnRuntimeException::HHuginnRuntimeException( yaal::hcore::HString 
 	return;
 }
 
-HHuginn::HHuginnRuntimeException::HHuginnRuntimeException( yaal::hcore::HString const& message_, int position_ )
-	: _message( message_ )
-	, _fileId( MAIN_FILE_ID )
-	, _position( position_ ) {
-	return;
-}
-
 yaal::hcore::HString const& HHuginn::HHuginnRuntimeException::message( void ) const {
 	return ( _message );
 }
@@ -341,13 +334,13 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 		M_ASSERT( cc->_classIdentifier == identifierId_ );
 		for ( OCompiler::submitted_imports_t::value_type const& i : _compiler->_submittedImports ) {
 			if ( identifierId_ == i._package ) {
-				throw HHuginnRuntimeException( "Package of the same name `"_ys.append( name ).append( "' is already imported." ), cc->_position.get() );
+				throw HHuginnRuntimeException( "Package of the same name `"_ys.append( name ).append( "' is already imported." ), MAIN_FILE_ID, cc->_position.get() );
 			} else if ( identifierId_ == i._alias ) {
-				throw HHuginnRuntimeException( "Package alias of the same name `"_ys.append( name ).append( "' is already defined." ), cc->_position.get() );
+				throw HHuginnRuntimeException( "Package alias of the same name `"_ys.append( name ).append( "' is already defined." ), MAIN_FILE_ID, cc->_position.get() );
 			}
 		}
 		if ( _runtime->get_function( identifierId_ ) && ! cls ) {
-			throw HHuginnRuntimeException( "Function of the same name `"_ys.append( name ).append( "' is already defined." ), cc->_position.get() );
+			throw HHuginnRuntimeException( "Function of the same name `"_ys.append( name ).append( "' is already defined." ), MAIN_FILE_ID, cc->_position.get() );
 		}
 		HClass const* super( nullptr );
 		if ( cc->_baseName != INVALID_IDENTIFIER ) {
@@ -761,8 +754,8 @@ HHuginn::HIterable::HIterator HHuginn::HIterable::iterator( huginn::HThread* thr
 	return ( do_iterator( thread_, position_ ) );
 }
 
-int long HHuginn::HIterable::size( void ) const {
-	return ( do_size() );
+int long HHuginn::HIterable::size( huginn::HThread* thread_, int position_ ) const {
+	return ( do_size( thread_, position_ ) );
 }
 
 HHuginn::HTernaryEvaluator::HTernaryEvaluator(

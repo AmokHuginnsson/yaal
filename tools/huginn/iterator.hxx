@@ -48,15 +48,15 @@ public:
 	HHuginn::value_t value( HThread* thread_, int position_ ) {
 		return ( do_value( thread_, position_ ) );
 	}
-	bool is_valid( void ) {
-		return ( do_is_valid() );
+	bool is_valid( HThread* thread_, int position_ ) {
+		return ( do_is_valid( thread_, position_ ) );
 	}
 	void next( HThread* thread_, int position_ ) {
 		do_next( thread_, position_ );
 	}
 protected:
 	virtual HHuginn::value_t do_value( HThread*, int ) = 0;
-	virtual bool do_is_valid( void ) = 0;
+	virtual bool do_is_valid( HThread*, int ) = 0;
 	virtual void do_next( HThread*, int ) = 0;
 };
 
@@ -75,8 +75,8 @@ public:
 	value_t value( huginn::HThread* thread_, int position_ ) {
 		return ( _impl->value( thread_, position_ ) );
 	}
-	bool is_valid( void ) {
-		return ( !! _impl && _impl->is_valid() );
+	bool is_valid( huginn::HThread* thread_, int position_ ) {
+		return ( !! _impl && _impl->is_valid( thread_, position_ ) );
 	}
 	void next( huginn::HThread* thread_, int position_ ) {
 		_impl->next( thread_, position_ );

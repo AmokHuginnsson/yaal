@@ -104,7 +104,7 @@ HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass const* class_, HHugi
 				throw HHuginn::HHuginnRuntimeException( "Matrix must have numeric data, either `number' or `real'.", thread_->current_frame()->file_id(), position_ );
 			}
 		} catch ( HException const& e ) {
-			throw HHuginn::HHuginnRuntimeException( e.what(), position_ );
+			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
 		}
 		for ( int r( 0 ); r < myRows; ++ r ) {
 			verify_arg_type( name, values_, r, HHuginn::TYPE::LIST, ARITY::MULTIPLE, thread_, position_ );

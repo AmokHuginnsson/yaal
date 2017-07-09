@@ -188,9 +188,9 @@ HHuginn::class_t HSubprocess::get_class( HRuntime* runtime_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HSubprocess::do_clone( huginn::HThread*, int ) const {
+HHuginn::value_t HSubprocess::do_clone( huginn::HThread* thread_, int position_ ) const {
 	M_PROLOG
-	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on Subprocess.", 0 );
+	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on Subprocess.", thread_->current_frame()->file_id(), position_ );
 	M_EPILOG
 }
 

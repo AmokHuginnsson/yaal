@@ -57,8 +57,8 @@ protected:
 	virtual HHuginn::value_t do_value( HThread*, int ) override {
 		return ( _list->get( _index ) );
 	}
-	virtual bool do_is_valid( void ) override {
-		return ( _index < _list->size() );
+	virtual bool do_is_valid( huginn::HThread* thread_, int position_ ) override {
+		return ( _index < _list->size( thread_, position_ ) );
 	}
 	virtual void do_next( HThread*, int ) override {
 		++ _index;
@@ -205,7 +205,7 @@ void HHuginn::HList::pop_back( void ) {
 	M_EPILOG
 }
 
-int long HHuginn::HList::do_size( void ) const {
+int long HHuginn::HList::do_size( huginn::HThread*, int ) const {
 	return ( _data.get_size() );
 }
 

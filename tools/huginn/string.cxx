@@ -60,7 +60,7 @@ protected:
 	virtual HHuginn::value_t do_value( HThread*, int ) override {
 		return ( _objectFactory->create_character( _string->value()[ _index ] ) );
 	}
-	virtual bool do_is_valid( void ) override {
+	virtual bool do_is_valid( huginn::HThread*, int ) override {
 		return ( _index < _string->value().get_size() );
 	}
 	virtual void do_next( HThread*, int ) override {
@@ -129,7 +129,7 @@ public:
 	}
 	void ensure( bool condResult_, char const* msg_ ) {
 		if ( ! condResult_ ) {
-			throw HHuginn::HHuginnRuntimeException( hcore::to_string( msg_ ).append( _it - _format.begin() ), _position );
+			throw HHuginn::HHuginnRuntimeException( hcore::to_string( msg_ ).append( _it - _format.begin() ), _thread->current_frame()->file_id(), _position );
 		}
 	}
 	void format( void ) {
@@ -165,7 +165,7 @@ public:
 						try {
 							idx = lexical_cast<int>( idxRaw );
 						} catch ( HException const& e ) {
-							throw HHuginn::HHuginnRuntimeException( e.what(), _position );
+							throw HHuginn::HHuginnRuntimeException( e.what(), _thread->current_frame()->file_id(), _position );
 						}
 					}
 					++ fmtSubstCount;
@@ -312,7 +312,7 @@ HHuginn::HIterable::HIterator HHuginn::HString::do_iterator( huginn::HThread*, i
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-int long HHuginn::HString::do_size( void ) const {
+int long HHuginn::HString::do_size( huginn::HThread*, int ) const {
 	return ( _value.get_length() );
 }
 

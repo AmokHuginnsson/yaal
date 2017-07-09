@@ -61,8 +61,8 @@ public:
 		M_EPILOG
 	}
 protected:
-	virtual int long do_size( void ) const override {
-		return ( safe_int::cast<int long>( static_cast<HHuginn::HDeque const*>( _deque.raw() )->size() ) );
+	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
+		return ( safe_int::cast<int long>( static_cast<HHuginn::HDeque const*>( _deque.raw() )->size( thread_, position_ ) ) );
 	}
 private:
 	virtual HIterator do_iterator( HThread*, int ) override;
@@ -76,16 +76,16 @@ class HDequeReverseIterator : public HIteratorInterface {
 	HHuginn::HDeque* _deque;
 	int long _index;
 public:
-	HDequeReverseIterator( HHuginn::HDeque* deque_ )
+	HDequeReverseIterator( HThread* thread_, HHuginn::HDeque* deque_, int position_ )
 		: _deque( deque_ )
-		, _index( deque_->size() - 1 ) {
+		, _index( deque_->size( thread_, position_ ) - 1 ) {
 		return;
 	}
 protected:
 	virtual HHuginn::value_t do_value( HThread*, int ) override {
 		return ( _deque->get( _index ) );
 	}
-	virtual bool do_is_valid( void ) override {
+	virtual bool do_is_valid( HThread*, int ) override {
 		return ( _index >= 0 );
 	}
 	virtual void do_next( HThread*, int ) override {
@@ -96,8 +96,8 @@ private:
 	HDequeReverseIterator& operator = ( HDequeReverseIterator const& ) = delete;
 };
 
-HReversedDeque::HIterator HReversedDeque::do_iterator( HThread*, int ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HDequeReverseIterator( static_cast<HHuginn::HDeque*>( _deque.raw() ) ) );
+HReversedDeque::HIterator HReversedDeque::do_iterator( HThread* thread_, int position_ ) {
+	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HDequeReverseIterator( thread_, static_cast<HHuginn::HDeque*>( _deque.raw() ), position_ ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }
 

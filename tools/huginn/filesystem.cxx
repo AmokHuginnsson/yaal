@@ -140,7 +140,7 @@ public:
 		try {
 			int long long mode( get_integer( values_[1] ) );
 			if ( ( mode < 0 ) || ( mode > 07777 ) ) {
-				throw HHuginn::HHuginnRuntimeException( "Bad mode: "_ys.append( mode ), position_ );
+				throw HHuginn::HHuginnRuntimeException( "Bad mode: "_ys.append( mode ), thread_->current_frame()->file_id(), position_ );
 			}
 			filesystem::chmod( get_string( values_[0] ), static_cast<u32_t>( mode ) );
 		} catch ( HFileSystemException const& e ) {
@@ -179,8 +179,8 @@ private:
 		int operation( static_cast<int>( get_integer( values_[1] ) ) );
 		if ( ( operation != OPERATIONS::READING ) && ( operation != OPERATIONS::WRITING ) ) {
 			throw HHuginn::HHuginnRuntimeException(
-				HString( name ).append( "(): second argument must be either FileSystem.reading() or FileSystem.writing()" )
-				, thread_->current_frame()->file_id(),
+				HString( name ).append( "(): second argument must be either FileSystem.reading() or FileSystem.writing()" ),
+				thread_->current_frame()->file_id(),
 				position_
 			);
 		}

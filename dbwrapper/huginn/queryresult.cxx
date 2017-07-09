@@ -78,7 +78,7 @@ protected:
 	virtual HHuginn::value_t do_value( tools::huginn::HThread*, int ) override {
 		return ( fetch_row( _recordSet, _it, *_runtime ) );
 	}
-	virtual bool do_is_valid( void ) override {
+	virtual bool do_is_valid( tools::huginn::HThread*, int ) override {
 		return ( _it != _recordSet->end() );
 	}
 	virtual void do_next( tools::huginn::HThread*, int ) override {
@@ -144,7 +144,7 @@ HHuginn::HIterable::HIterator HQueryResult::do_iterator( tools::huginn::HThread*
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-int long HQueryResult::do_size( void ) const {
+int long HQueryResult::do_size( tools::huginn::HThread*, int ) const {
 	return ( _recordSet->get_dml_size() );
 }
 
@@ -218,9 +218,9 @@ HHuginn::class_t HQueryResult::get_class( HRuntime* runtime_, HHuginn::class_t c
 	M_EPILOG
 }
 
-HHuginn::value_t HQueryResult::do_clone( tools::huginn::HThread*, int ) const {
+HHuginn::value_t HQueryResult::do_clone( tools::huginn::HThread* thread_, int position_ ) const {
 	M_PROLOG
-	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on QueryResult.", 0 );
+	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on QueryResult.", thread_->current_frame()->file_id(), position_ );
 	M_EPILOG
 }
 

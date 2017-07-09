@@ -64,8 +64,8 @@ public:
 		M_EPILOG
 	}
 protected:
-	virtual int long do_size( void ) const override {
-		throw HHuginn::HHuginnRuntimeException( "Getting size of `Filter' is an invalid operation.", 0 );
+	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
+		throw HHuginn::HHuginnRuntimeException( "Getting size of `Filter' is an invalid operation.", thread_->current_frame()->file_id(), position_ );
 	}
 private:
 	virtual HIterator do_iterator( HThread*, int ) override;
@@ -86,8 +86,8 @@ public:
 		return;
 	}
 protected:
-	virtual bool do_is_valid( void ) override {
-		return ( _impl.is_valid() );
+	virtual bool do_is_valid( HThread* thread_, int position_ ) override {
+		return ( _impl.is_valid( thread_, position_ ) );
 	}
 	virtual void do_next( HThread* thread_, int position_ ) override {
 		_impl.next( thread_, position_ );
@@ -97,7 +97,7 @@ protected:
 		return ( _value );
 	}
 	void scan( HThread* thread_, int position_ ) {
-		while ( _impl.is_valid() ) {
+		while ( _impl.is_valid( thread_, position_ ) ) {
 			_value = _impl.value( thread_, position_ );
 			if ( do_test( thread_, position_ ) ) {
 				break;
@@ -126,6 +126,7 @@ protected:
 		if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
 			throw HHuginn::HHuginnRuntimeException(
 				hcore::to_string( "Filter function returned wrong type, expected `boolean' got: `" ).append( v->get_class()->name() ).append( "'." ),
+				thread_->current_frame()->file_id(),
 				position_
 			);
 		}
@@ -148,6 +149,7 @@ protected:
 		if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
 			throw HHuginn::HHuginnRuntimeException(
 				hcore::to_string( "Filter functor returned wrong type, expected `boolean' got: `" ).append( v->get_class()->name() ).append( "'." ),
+				thread_->current_frame()->file_id(),
 				position_
 			);
 		}

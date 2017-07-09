@@ -201,8 +201,8 @@ HHuginn::class_t HFileStat::get_class( HRuntime* runtime_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HFileStat::do_clone( huginn::HThread*, int ) const {
-	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on FileStat.", 0 );
+HHuginn::value_t HFileStat::do_clone( huginn::HThread* thread_, int position_ ) const {
+	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on FileStat.", thread_->current_frame()->file_id(), position_ );
 }
 
 }

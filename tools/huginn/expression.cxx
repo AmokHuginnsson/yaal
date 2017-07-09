@@ -311,7 +311,7 @@ void HExpression::set_variable( HFrame* frame_, int ) {
 			ref = src;
 		} else {
 			if ( ref->type_id() != src->type_id() ) {
-				operands_type_mismatch( op_to_str( operation._operator ), ref->type_id(), src->type_id(), p );
+				operands_type_mismatch( op_to_str( operation._operator ), ref->type_id(), src->type_id(), file_id(), p );
 			}
 			switch ( operation._operator ) {
 				case ( OPERATOR::PLUS_ASSIGN ):     { value_builtin::add( frame_->thread(), ref, src, p ); } break;
@@ -442,7 +442,7 @@ void HExpression::plus( HFrame* frame_, int ) {
 	frame_->values().pop();
 	HHuginn::value_t& v1( frame_->values().top() );
 	if ( v1->type_id() != v2->type_id() ) {
-		operands_type_mismatch( op_to_str( OPERATOR::PLUS ), v1->type_id(), v2->type_id(), p );
+		operands_type_mismatch( op_to_str( OPERATOR::PLUS ), v1->type_id(), v2->type_id(), file_id(), p );
 	}
 	if ( ! v1.unique() ) {
 		v1 = v1->clone( frame_->thread(), p );
@@ -462,7 +462,7 @@ void HExpression::minus( HFrame* frame_, int ) {
 	frame_->values().pop();
 	HHuginn::value_t& v1( frame_->values().top() );
 	if ( v1->type_id() != v2->type_id() ) {
-		operands_type_mismatch( op_to_str( OPERATOR::MINUS ), v1->type_id(), v2->type_id(), p );
+		operands_type_mismatch( op_to_str( OPERATOR::MINUS ), v1->type_id(), v2->type_id(), file_id(), p );
 	}
 	if ( ! v1.unique() ) {
 		v1 = v1->clone( frame_->thread(), p );
@@ -482,7 +482,7 @@ void HExpression::mul( HFrame* frame_, int ) {
 	frame_->values().pop();
 	HHuginn::value_t& v1( frame_->values().top() );
 	if ( v1->type_id() != v2->type_id() ) {
-		operands_type_mismatch( op_to_str( OPERATOR::MULTIPLY ), v1->type_id(), v2->type_id(), p );
+		operands_type_mismatch( op_to_str( OPERATOR::MULTIPLY ), v1->type_id(), v2->type_id(), file_id(), p );
 	}
 	if ( ! v1.unique() ) {
 		v1 = v1->clone( frame_->thread(), p );
@@ -502,7 +502,7 @@ void HExpression::div( HFrame* frame_, int ) {
 	frame_->values().pop();
 	HHuginn::value_t& v1( frame_->values().top() );
 	if ( v1->type_id() != v2->type_id() ) {
-		operands_type_mismatch( op_to_str( OPERATOR::DIVIDE ), v1->type_id(), v2->type_id(), p );
+		operands_type_mismatch( op_to_str( OPERATOR::DIVIDE ), v1->type_id(), v2->type_id(), file_id(), p );
 	}
 	if ( ! v1.unique() ) {
 		v1 = v1->clone( frame_->thread(), p );
@@ -522,7 +522,7 @@ void HExpression::mod( HFrame* frame_, int ) {
 	frame_->values().pop();
 	HHuginn::value_t& v1( frame_->values().top() );
 	if ( v1->type_id() != v2->type_id() ) {
-		operands_type_mismatch( op_to_str( OPERATOR::MODULO ), v1->type_id(), v2->type_id(), p );
+		operands_type_mismatch( op_to_str( OPERATOR::MODULO ), v1->type_id(), v2->type_id(), file_id(), p );
 	}
 	if ( ! v1.unique() ) {
 		v1 = v1->clone( frame_->thread(), p );
@@ -566,7 +566,7 @@ void HExpression::power( HFrame* frame_, int ) {
 		frame_->values().pop();
 		HHuginn::value_t& v1( frame_->values().top() );
 		if ( v1->type_id() != v2->type_id() ) {
-			operands_type_mismatch( op_to_str( OPERATOR::POWER ), v1->type_id(), v2->type_id(), p );
+			operands_type_mismatch( op_to_str( OPERATOR::POWER ), v1->type_id(), v2->type_id(), file_id(), p );
 		}
 		if ( ! v1.unique() ) {
 			v1 = v1->clone( frame_->thread(), p );
@@ -662,7 +662,7 @@ void HExpression::equals( HFrame* frame_, int ) {
 	HHuginn::type_id_t t1( v1->type_id() );
 	HHuginn::type_id_t t2( v2->type_id() );
 	if ( ( t1 != t2 ) && ( t1 != HHuginn::TYPE::NONE ) && ( t2 != HHuginn::TYPE::NONE ) ) {
-		operands_type_mismatch( op_to_str( OPERATOR::EQUALS ), t1, t2, p );
+		operands_type_mismatch( op_to_str( OPERATOR::EQUALS ), t1, t2, file_id(), p );
 	}
 	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::equals( frame_->thread(), v1, v2, p ) ) );
 	return;
@@ -682,7 +682,7 @@ void HExpression::not_equals( HFrame* frame_, int ) {
 	HHuginn::type_id_t t1( v1->type_id() );
 	HHuginn::type_id_t t2( v2->type_id() );
 	if ( ( t1 != t2 ) && ( t1 != HHuginn::TYPE::NONE ) && ( t2 != HHuginn::TYPE::NONE ) ) {
-		operands_type_mismatch( op_to_str( OPERATOR::NOT_EQUALS ), t1, t2, p );
+		operands_type_mismatch( op_to_str( OPERATOR::NOT_EQUALS ), t1, t2, file_id(), p );
 	}
 	frame_->values().push( frame_->thread()->object_factory().create_boolean( ! value_builtin::equals( frame_->thread(), v1, v2, p ) ) );
 	return;
@@ -700,7 +700,7 @@ void HExpression::less( HFrame* frame_, int ) {
 	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	if ( v1->type_id() != v2->type_id() ) {
-		operands_type_mismatch( op_to_str( OPERATOR::LESS ), v1->type_id(), v2->type_id(), p );
+		operands_type_mismatch( op_to_str( OPERATOR::LESS ), v1->type_id(), v2->type_id(), file_id(), p );
 	}
 	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::less( frame_->thread(), v1, v2, p ) ) );
 	return;
@@ -718,7 +718,7 @@ void HExpression::greater( HFrame* frame_, int ) {
 	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	if ( v1->type_id() != v2->type_id() ) {
-		operands_type_mismatch( op_to_str( OPERATOR::GREATER ), v1->type_id(), v2->type_id(), p );
+		operands_type_mismatch( op_to_str( OPERATOR::GREATER ), v1->type_id(), v2->type_id(), file_id(), p );
 	}
 	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::greater( frame_->thread(), v1, v2, p ) ) );
 	return;
@@ -736,7 +736,7 @@ void HExpression::less_or_equal( HFrame* frame_, int ) {
 	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	if ( v1->type_id() != v2->type_id() ) {
-		operands_type_mismatch( op_to_str( OPERATOR::LESS_OR_EQUAL ), v1->type_id(), v2->type_id(), p );
+		operands_type_mismatch( op_to_str( OPERATOR::LESS_OR_EQUAL ), v1->type_id(), v2->type_id(), file_id(), p );
 	}
 	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::less_or_equal( frame_->thread(), v1, v2, p ) ) );
 	return;
@@ -754,7 +754,7 @@ void HExpression::greater_or_equal( HFrame* frame_, int ) {
 	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	if ( v1->type_id() != v2->type_id() ) {
-		operands_type_mismatch( op_to_str( OPERATOR::GREATER_OR_EQUAL ), v1->type_id(), v2->type_id(), p );
+		operands_type_mismatch( op_to_str( OPERATOR::GREATER_OR_EQUAL ), v1->type_id(), v2->type_id(), file_id(), p );
 	}
 	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::greater_or_equal( frame_->thread(), v1, v2, p ) ) );
 	return;

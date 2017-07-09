@@ -76,7 +76,7 @@ protected:
 	virtual HHuginn::value_t do_value( HThread*, int ) override {
 		return ( ! _lineCache.is_empty() ? _objectFactory->create_string( _lineCache ) : _objectFactory->runtime().none_value() );
 	}
-	virtual bool do_is_valid( void ) override {
+	virtual bool do_is_valid( huginn::HThread*, int ) override {
 		return ( _stream->is_valid() );
 	}
 	virtual void do_next( HThread* thread_, int position_ ) override {
@@ -167,8 +167,8 @@ HHuginn::HIterable::HIterator HStream::do_iterator( HThread* thread_, int positi
 	return ( HIterator::iterator_implementation_t( nullptr ) );
 }
 
-int long HStream::do_size( void ) const {
-	throw HHuginn::HHuginnRuntimeException( "Getting size of `Stream' is an invalid operation.", 0 );
+int long HStream::do_size( huginn::HThread* thread_, int position_ ) const {
+	throw HHuginn::HHuginnRuntimeException( "Getting size of `Stream' is an invalid operation.", thread_->current_frame()->file_id(), position_ );
 }
 
 HHuginn::class_t HStream::get_class( HRuntime* runtime_ ) {
@@ -192,9 +192,9 @@ HHuginn::class_t HStream::get_class( HRuntime* runtime_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HStream::do_clone( huginn::HThread*, int ) const {
+HHuginn::value_t HStream::do_clone( huginn::HThread* thread_, int position_ ) const {
 	M_PROLOG
-	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on Stream.", 0 );
+	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on Stream.", thread_->current_frame()->file_id(), position_ );
 	M_EPILOG
 }
 

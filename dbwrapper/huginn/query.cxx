@@ -142,9 +142,9 @@ HHuginn::class_t HQuery::get_class( HRuntime* runtime_, HHuginn::class_t const& 
 	M_EPILOG
 }
 
-HHuginn::value_t HQuery::do_clone( tools::huginn::HThread*, int ) const {
+HHuginn::value_t HQuery::do_clone( tools::huginn::HThread* thread_, int position_ ) const {
 	M_PROLOG
-	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on Query.", 0 );
+	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on Query.", thread_->current_frame()->file_id(), position_ );
 	M_EPILOG
 }
 

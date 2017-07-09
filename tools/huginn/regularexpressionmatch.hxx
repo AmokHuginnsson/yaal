@@ -50,7 +50,7 @@ public:
 	static HHuginn::class_t get_class( HRuntime* );
 protected:
 	virtual HIterator do_iterator( HThread*, int ) override;
-	virtual int long do_size( void ) const override;
+	virtual int long do_size( huginn::HThread*, int ) const override;
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread*, int ) const override;
 };

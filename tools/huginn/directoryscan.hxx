@@ -73,8 +73,8 @@ public:
 		M_EPILOG
 	}
 protected:
-	virtual int long do_size( void ) const override {
-		throw HHuginn::HHuginnRuntimeException( "Getting size of `DirectoryScan' is an invalid operation.", 0 );
+	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
+		throw HHuginn::HHuginnRuntimeException( "Getting size of `DirectoryScan' is an invalid operation.", thread_->current_frame()->file_id(), position_ );
 	}
 private:
 	virtual HIterator do_iterator( HThread*, int ) override;
@@ -99,7 +99,7 @@ protected:
 	virtual HHuginn::value_t do_value( HThread*, int ) override {
 		return ( _objectFactory->create_string( _it->get_name() ) );
 	}
-	virtual bool do_is_valid( void ) override {
+	virtual bool do_is_valid( huginn::HThread*, int ) override {
 		return ( _it != _end );
 	}
 	virtual void do_next( HThread*, int ) override {

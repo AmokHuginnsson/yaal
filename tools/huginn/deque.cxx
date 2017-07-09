@@ -49,16 +49,16 @@ class HDequeIterator : public HIteratorInterface {
 	int _index;
 public:
 	HDequeIterator( HHuginn::HDeque* deque_ )
-		: _deque( deque_ ),
-		_index( 0 ) {
+		: _deque( deque_ )
+		, _index( 0 ) {
 		return;
 	}
 protected:
 	virtual HHuginn::value_t do_value( HThread*, int ) override {
 		return ( _deque->get( _index ) );
 	}
-	virtual bool do_is_valid( void ) override {
-		return ( _index < _deque->size() );
+	virtual bool do_is_valid( HThread* thread_ , int position_ ) override {
+		return ( _index < _deque->size( thread_, position_ ) );
 	}
 	virtual void do_next( HThread*, int ) override {
 		++ _index;
@@ -269,7 +269,7 @@ void HHuginn::HDeque::pop_front( void ) {
 	M_EPILOG
 }
 
-int long HHuginn::HDeque::do_size( void ) const {
+int long HHuginn::HDeque::do_size( huginn::HThread*, int ) const {
 	return ( _data.get_size() );
 }
 

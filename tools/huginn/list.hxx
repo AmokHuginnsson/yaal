@@ -61,8 +61,8 @@ public:
 		M_EPILOG
 	}
 protected:
-	virtual int long do_size( void ) const override {
-		return ( safe_int::cast<int long>( static_cast<HHuginn::HList const*>( _list.raw() )->size() ) );
+	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
+		return ( safe_int::cast<int long>( static_cast<HHuginn::HList const*>( _list.raw() )->size( thread_, position_ ) ) );
 	}
 private:
 	virtual HIterator do_iterator( HThread*, int ) override;
@@ -76,16 +76,16 @@ class HListReverseIterator : public HIteratorInterface {
 	HHuginn::HList* _list;
 	int long _index;
 public:
-	HListReverseIterator( HHuginn::HList* list_ )
+	HListReverseIterator( HThread* thread_, HHuginn::HList* list_, int position_ )
 		: _list( list_ )
-		, _index( list_->size() - 1 ) {
+		, _index( list_->size( thread_, position_ ) - 1 ) {
 		return;
 	}
 protected:
 	virtual HHuginn::value_t do_value( HThread*, int ) override {
 		return ( _list->get( _index ) );
 	}
-	virtual bool do_is_valid( void ) override {
+	virtual bool do_is_valid( HThread*, int ) override {
 		return ( _index >= 0 );
 	}
 	virtual void do_next( HThread*, int ) override {
@@ -96,8 +96,8 @@ private:
 	HListReverseIterator& operator = ( HListReverseIterator const& ) = delete;
 };
 
-HReversedList::HIterator HReversedList::do_iterator( HThread*, int ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HListReverseIterator( static_cast<HHuginn::HList*>( _list.raw() ) ) );
+HReversedList::HIterator HReversedList::do_iterator( HThread* thread_, int position_ ) {
+	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HListReverseIterator( thread_, static_cast<HHuginn::HList*>( _list.raw() ), position_ ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }
 

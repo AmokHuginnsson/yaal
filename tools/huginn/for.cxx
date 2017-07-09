@@ -72,7 +72,7 @@ void HFor::do_execute( HThread* thread_ ) const {
 		HHuginn::HObject* obj( nullptr );
 		if ( coll ) {
 			HHuginn::HIterable::HIterator it( coll->iterator( thread_, sourcePosition ) );
-			while ( f->can_continue() && it.is_valid() ) {
+			while ( f->can_continue() && it.is_valid( thread_, sourcePosition ) ) {
 				_control->execute( thread_ );
 				f->commit_variable( it.value( thread_, sourcePosition ), controlPosition );
 				if ( f->can_continue() ) {

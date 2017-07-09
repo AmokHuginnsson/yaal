@@ -341,7 +341,7 @@ void HRuntime::execute( void ) {
 	M_PROLOG
 	util::HScopeExitCall sec( hcore::call( &threads_t::clear, &_threads ) );
 	values_t args;
-	if ( _argv->size() > 0 ) {
+	if ( _argv->size( nullptr, 0 ) > 0 ) {
 		args.push_back( _argv );
 	}
 	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
@@ -435,7 +435,7 @@ HHuginn::value_t HRuntime::call( identifier_id_t identifier_, values_t const& va
 		M_ASSERT( t != _threads.end() );
 		res = static_cast<HHuginn::HFunctionReference*>( _functionsStore.at( identifier_ ).raw() )->function()( t->second.raw(), nullptr, values_, position_ );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "Function `"_ys.append( identifier_name( identifier_ ) ).append( "(...)' is not defined." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Function `"_ys.append( identifier_name( identifier_ ) ).append( "(...)' is not defined." ), MAIN_FILE_ID, position_ );
 	}
 	return ( res );
 	M_EPILOG
@@ -507,7 +507,7 @@ HHuginn::value_t size( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 	int long long s( 0 );
 	HHuginn::HIterable const* iterable( dynamic_cast<HHuginn::HIterable const*>( v ) );
 	if ( iterable ) {
-		s = iterable->size();
+		s = iterable->size( thread_, position_ );
 	} else {
 		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v ) ) {
 			HHuginn::value_t res( o->call_method( thread_, val, INTERFACE::GET_SIZE, HHuginn::values_t(), position_ ) );

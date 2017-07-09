@@ -70,7 +70,7 @@ public:
 		M_EPILOG
 	}
 protected:
-	virtual int long do_size( void ) const override {
+	virtual int long do_size( huginn::HThread*, int ) const override {
 		return ( safe_int::cast<int long>( ( _stop + _step - ( _from + 1 ) ) / _step ) );
 	}
 private:
@@ -96,7 +96,7 @@ protected:
 	virtual HHuginn::value_t do_value( HThread*, int ) override {
 		return ( _objectFactory->create_integer( _i ) );
 	}
-	virtual bool do_is_valid( void ) override {
+	virtual bool do_is_valid( HThread*, int ) override {
 		return ( _range->step() > 0 ? _i < _range->stop() : _i > _range->stop() );
 	}
 	virtual void do_next( HThread*, int ) override {

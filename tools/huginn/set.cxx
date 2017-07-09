@@ -58,7 +58,7 @@ protected:
 	virtual HHuginn::value_t do_value( HThread*, int ) override {
 		return ( *_it );
 	}
-	virtual bool do_is_valid( void ) override {
+	virtual bool do_is_valid( huginn::HThread*, int ) override {
 		return ( _it != _set->end() );
 	}
 	virtual void do_next( HThread*, int ) override {
@@ -173,7 +173,7 @@ HHuginn::HSet::HSet( HHuginn::HClass const* class_, allocator_t const& allocator
 	return;
 }
 
-int long HHuginn::HSet::do_size( void ) const {
+int long HHuginn::HSet::do_size( huginn::HThread*, int ) const {
 	return ( _data.get_size() );
 }
 

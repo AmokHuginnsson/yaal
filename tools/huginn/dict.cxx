@@ -58,7 +58,7 @@ protected:
 	virtual HHuginn::value_t do_value( HThread*, int ) override {
 		return ( _it->first );
 	}
-	virtual bool do_is_valid( void ) override {
+	virtual bool do_is_valid( huginn::HThread*, int ) override {
 		return ( _it != _dict->end() );
 	}
 	virtual void do_next( HThread*, int ) override {
@@ -123,7 +123,7 @@ inline HHuginn::value_t update( huginn::HThread* thread_, HHuginn::value_t* obje
 	HHuginn::HDict& l( *static_cast<HHuginn::HDict*>( object_->raw() ) );
 	HHuginn::HDict const& r( *static_cast<HHuginn::HDict const*>( values_[0].raw() ) );
 	if ( r.key_type()->type_id() != HHuginn::TYPE::NONE ) {
-		l.verify_key_type( r.key_type(), position_ );
+		l.verify_key_type( thread_, r.key_type(), position_ );
 	}
 	HHuginn::HDict::values_t& lv( l.value() );
 	HHuginn::HDict::values_t const& rv( r.value() );
@@ -187,28 +187,28 @@ HHuginn::HDict::HDict( HHuginn::HClass const* class_, allocator_t const& allocat
 	return;
 }
 
-int long HHuginn::HDict::do_size( void ) const {
+int long HHuginn::HDict::do_size( huginn::HThread*, int ) const {
 	return ( _data.get_size() );
 }
 
-void HHuginn::HDict::verify_key_type( HHuginn::HClass const* keyType_, int position_ ) const {
+void HHuginn::HDict::verify_key_type( huginn::HThread* thread_, HHuginn::HClass const* keyType_, int position_ ) const {
 	if ( ( _keyType->type_id() != TYPE::NONE ) && ( keyType_ != _keyType ) ) {
-		throw HHuginnRuntimeException( "Non-uniform key types, got "_ys.append( a_type_name( keyType_ ) ).append( " instead of " ).append( a_type_name( _keyType ) ).append( "." ), position_ );
+		throw HHuginnRuntimeException( "Non-uniform key types, got "_ys.append( a_type_name( keyType_ ) ).append( " instead of " ).append( a_type_name( _keyType ) ).append( "." ), thread_->current_frame()->file_id(), position_ );
 	}
 	if ( ! OCompiler::is_comparable( keyType_->type_id() ) ) {
-		throw HHuginnRuntimeException( "Key type `"_ys.append( keyType_->name() ).append( "' is not a comparable." ), position_ );
+		throw HHuginnRuntimeException( "Key type `"_ys.append( keyType_->name() ).append( "' is not a comparable." ), thread_->current_frame()->file_id(), position_ );
 	}
 	return;
 }
 
 HHuginn::value_t HHuginn::HDict::get( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) {
 	M_PROLOG
-	verify_key_type( key_->get_class(), position_ );
+	verify_key_type( thread_, key_->get_class(), position_ );
 	_helper.anchor( thread_, position_ );
 	values_t::iterator it( _data.find( key_ ) );
 	_helper.detach();
 	if ( ! ( it != _data.end() ) ) {
-		throw HHuginnRuntimeException( "Key does not exist in `dict'.", position_ );
+		throw HHuginnRuntimeException( "Key does not exist in `dict'.", thread_->current_frame()->file_id(), position_ );
 	}
 	return ( it->second );
 	M_EPILOG
@@ -216,7 +216,7 @@ HHuginn::value_t HHuginn::HDict::get( huginn::HThread* thread_, HHuginn::value_t
 
 bool HHuginn::HDict::try_get( huginn::HThread* thread_, HHuginn::value_t const& key_, HHuginn::value_t& result_, int position_ ) {
 	M_PROLOG
-	verify_key_type( key_->get_class(), position_ );
+	verify_key_type( thread_, key_->get_class(), position_ );
 	_helper.anchor( thread_, position_ );
 	values_t::iterator it( _data.find( key_ ) );
 	_helper.detach();
@@ -231,7 +231,7 @@ bool HHuginn::HDict::try_get( huginn::HThread* thread_, HHuginn::value_t const& 
 
 bool HHuginn::HDict::has_key( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) const {
 	M_PROLOG
-	verify_key_type( key_->get_class(), position_ );
+	verify_key_type( thread_, key_->get_class(), position_ );
 	_helper.anchor( thread_, position_ );
 	bool has( _data.find( key_ ) != _data.end() );
 	_helper.detach();
@@ -241,7 +241,7 @@ bool HHuginn::HDict::has_key( huginn::HThread* thread_, HHuginn::value_t const& 
 
 void HHuginn::HDict::erase( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) {
 	M_PROLOG
-	verify_key_type( key_->get_class(), position_ );
+	verify_key_type( thread_, key_->get_class(), position_ );
 	_helper.anchor( thread_, position_ );
 	_data.erase( key_ );
 	_helper.detach();
@@ -251,7 +251,7 @@ void HHuginn::HDict::erase( huginn::HThread* thread_, HHuginn::value_t const& ke
 
 HHuginn::value_t& HHuginn::HDict::get_ref( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) {
 	M_PROLOG
-	verify_key_type( key_->get_class(), position_ );
+	verify_key_type( thread_, key_->get_class(), position_ );
 	_keyType = key_->get_class();
 	_helper.anchor( thread_, position_ );
 	HHuginn::value_t& ref( _data[key_] );
@@ -262,7 +262,7 @@ HHuginn::value_t& HHuginn::HDict::get_ref( huginn::HThread* thread_, HHuginn::va
 
 void HHuginn::HDict::insert( huginn::HThread* thread_, HHuginn::value_t const& key_, HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
-	verify_key_type( key_->get_class(), position_ );
+	verify_key_type( thread_, key_->get_class(), position_ );
 	_helper.anchor( thread_, position_ );
 	_data.insert( make_pair( key_, value_ ) );
 	_helper.detach();

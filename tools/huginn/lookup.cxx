@@ -58,7 +58,7 @@ protected:
 	virtual HHuginn::value_t do_value( HThread*, int ) override {
 		return ( _it->first );
 	}
-	virtual bool do_is_valid( void ) override {
+	virtual bool do_is_valid( huginn::HThread*, int ) override {
 		return ( _it != _lookup->end() );
 	}
 	virtual void do_next( HThread*, int ) override {
@@ -182,7 +182,7 @@ HHuginn::HLookup::HLookup( HHuginn::HClass const* class_, allocator_t const& all
 	return;
 }
 
-int long HHuginn::HLookup::do_size( void ) const {
+int long HHuginn::HLookup::do_size( huginn::HThread*, int ) const {
 	return ( _data.get_size() );
 }
 
@@ -192,7 +192,7 @@ HHuginn::value_t HHuginn::HLookup::get( huginn::HThread* thread_, HHuginn::value
 	values_t::iterator it( _data.find( key_ ) );
 	_helper.detach();
 	if ( ! ( it != _data.end() ) ) {
-		throw HHuginnRuntimeException( "Key does not exist in `lookup'.", position_ );
+		throw HHuginnRuntimeException( "Key does not exist in `lookup'.", thread_->current_frame()->file_id(), position_ );
 	}
 	return ( it->second );
 	M_EPILOG

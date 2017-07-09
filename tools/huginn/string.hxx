@@ -61,8 +61,8 @@ public:
 		M_EPILOG
 	}
 protected:
-	virtual int long do_size( void ) const override {
-		return ( safe_int::cast<int long>( static_cast<HHuginn::HString const*>( _string.raw() )->size() ) );
+	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
+		return ( safe_int::cast<int long>( static_cast<HHuginn::HString const*>( _string.raw() )->size( thread_, position_ ) ) );
 	}
 private:
 	virtual HIterator do_iterator( HThread*, int ) override;
@@ -87,7 +87,7 @@ protected:
 	virtual HHuginn::value_t do_value( HThread*, int ) override {
 		return ( _objectFactory->create_character( _string->value()[ _index ] ) );
 	}
-	virtual bool do_is_valid( void ) override {
+	virtual bool do_is_valid( HThread*, int ) override {
 		return ( _index >= 0 );
 	}
 	virtual void do_next( HThread*, int ) override {

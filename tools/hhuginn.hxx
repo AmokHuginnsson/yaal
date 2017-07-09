@@ -369,7 +369,6 @@ private:
 	int _position;
 public:
 	HHuginnRuntimeException( yaal::hcore::HString const&, int, int );
-	HHuginnRuntimeException( yaal::hcore::HString const&, int );
 	yaal::hcore::HString const& message( void ) const;
 	int position( void ) const;
 	int file_id( void ) const;
@@ -610,10 +609,10 @@ public:
 	class HIterator;
 	HIterable( HClass const* );
 	HIterator iterator( huginn::HThread*, int );
-	int long size( void ) const;
+	int long size( huginn::HThread*, int ) const;
 protected:
 	virtual HIterator do_iterator( huginn::HThread*, int ) = 0;
-	virtual int long do_size( void ) const = 0;
+	virtual int long do_size( huginn::HThread*, int ) const = 0;
 };
 
 class HHuginn::HBoolean : public HHuginn::HValue {
@@ -706,7 +705,7 @@ public:
 	void to_string( void ) const;
 protected:
 	virtual HIterator do_iterator( huginn::HThread*, int ) override;
-	virtual int long do_size( void ) const override;
+	virtual int long do_size( huginn::HThread*, int ) const override;
 private:
 	virtual value_t do_clone( huginn::HThread*, int ) const override;
 };
@@ -776,7 +775,7 @@ public:
 	}
 protected:
 	virtual HIterator do_iterator( huginn::HThread*, int ) override;
-	virtual int long do_size( void ) const override;
+	virtual int long do_size( huginn::HThread*, int ) const override;
 private:
 	virtual value_t do_clone( huginn::HThread*, int ) const override;
 };
@@ -805,7 +804,7 @@ public:
 	}
 protected:
 	virtual HIterator do_iterator( huginn::HThread*, int ) override;
-	virtual int long do_size( void ) const override;
+	virtual int long do_size( huginn::HThread*, int ) const override;
 private:
 	virtual value_t do_clone( huginn::HThread*, int ) const override;
 };
@@ -856,7 +855,7 @@ public:
 	values_t& value( void ) {
 		return ( _data );
 	}
-	void verify_key_type( HHuginn::HClass const*, int ) const;
+	void verify_key_type( huginn::HThread*, HHuginn::HClass const*, int ) const;
 	void anchor( huginn::HThread* thread_, int position_ ) {
 		_helper.anchor( thread_, position_ );
 	}
@@ -865,7 +864,7 @@ public:
 	}
 protected:
 	virtual HIterator do_iterator( huginn::HThread*, int ) override;
-	virtual int long do_size( void ) const override;
+	virtual int long do_size( huginn::HThread*, int ) const override;
 private:
 	HDict( HDict const& ) = delete;
 	HDict& operator = ( HDict const& ) = delete;
@@ -897,7 +896,7 @@ public:
 	values_t& value( void ) {
 		return ( _data );
 	}
-	void verify_key_type( HHuginn::HClass const*, int ) const;
+	void verify_key_type( huginn::HThread*, HHuginn::HClass const*, int ) const;
 	void anchor( huginn::HThread* thread_, int position_ ) {
 		_helper.anchor( thread_, position_ );
 	}
@@ -906,7 +905,7 @@ public:
 	}
 protected:
 	virtual HIterator do_iterator( huginn::HThread*, int ) override;
-	virtual int long do_size( void ) const override;
+	virtual int long do_size( huginn::HThread*, int ) const override;
 private:
 	HOrder( HOrder const& ) = delete;
 	HOrder& operator = ( HOrder const& ) = delete;
@@ -967,7 +966,7 @@ public:
 	}
 protected:
 	virtual HIterator do_iterator( huginn::HThread*, int ) override;
-	virtual int long do_size( void ) const override;
+	virtual int long do_size( huginn::HThread*, int ) const override;
 private:
 	HLookup( HLookup const& ) = delete;
 	HLookup& operator = ( HLookup const& ) = delete;
@@ -1005,7 +1004,7 @@ public:
 	}
 protected:
 	virtual HIterator do_iterator( huginn::HThread*, int ) override;
-	virtual int long do_size( void ) const override;
+	virtual int long do_size( huginn::HThread*, int ) const override;
 private:
 	HSet( HSet const& ) = delete;
 	HSet& operator = ( HSet const& ) = delete;

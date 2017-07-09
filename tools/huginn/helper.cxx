@@ -88,7 +88,7 @@ bool is_restricted( yaal::hcore::HString const& name_ ) {
 	M_EPILOG
 }
 
-void operands_type_mismatch( char const* op_, HHuginn::type_id_t t1_, HHuginn::type_id_t t2_, int pos_ ) {
+void operands_type_mismatch( char const* op_, HHuginn::type_id_t t1_, HHuginn::type_id_t t2_, int fileId_, int pos_ ) {
 	hcore::HString msg( "Operand types for `" );
 	msg.append( op_ )
 		.append( "' do not match: `" )
@@ -96,7 +96,7 @@ void operands_type_mismatch( char const* op_, HHuginn::type_id_t t1_, HHuginn::t
 		.append( "' vs `" )
 		.append( type_name( t2_ ) )
 		.append( "'." ),
-	throw HHuginn::HHuginnRuntimeException( msg, pos_ );
+	throw HHuginn::HHuginnRuntimeException( msg, fileId_, pos_ );
 }
 
 void verify_arg_count( yaal::hcore::HString const& name_, HHuginn::values_t const& values_, int min_, int max_, huginn::HThread* thread_, int position_ ) {

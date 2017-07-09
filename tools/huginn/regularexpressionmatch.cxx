@@ -61,7 +61,7 @@ protected:
 	virtual HHuginn::value_t do_value( HThread*, int ) override {
 		return ( _objectFactory->create_string( _regularExpressionMatch->get_string().substr( _it->start(), _it->size() ) ) );
 	}
-	virtual bool do_is_valid( void ) override {
+	virtual bool do_is_valid( huginn::HThread*, int ) override {
 		return ( _it != _regularExpressionMatch->end() );
 	}
 	virtual void do_next( HThread*, int ) override {
@@ -105,7 +105,7 @@ HHuginn::HIterable::HIterator HRegularExpressionMatch::do_iterator( huginn::HThr
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-int long HRegularExpressionMatch::do_size( void ) const {
+int long HRegularExpressionMatch::do_size( huginn::HThread*, int ) const {
 	return ( distance( _regex->find( _fast ), _regex->end() ) );
 }
 

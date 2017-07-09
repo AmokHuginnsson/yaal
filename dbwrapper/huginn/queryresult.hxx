@@ -52,7 +52,7 @@ public:
 	static tools::HHuginn::class_t get_class( tools::huginn::HRuntime*, tools::HHuginn::class_t const& );
 private:
 	virtual HIterator do_iterator( tools::huginn::HThread*, int ) override;
-	virtual int long do_size( void ) const override;
+	virtual int long do_size( yaal::tools::huginn::HThread*, int ) const override;
 	virtual tools::HHuginn::value_t do_clone( tools::huginn::HThread*, int ) const override __attribute__((noreturn));
 	HQueryResult( HQueryResult const& ) = delete;
 	HQueryResult& operator = ( HQueryResult const& ) = delete;

@@ -58,7 +58,7 @@ protected:
 	virtual HHuginn::value_t do_value( HThread*, int ) override {
 		return ( *_it );
 	}
-	virtual bool do_is_valid( void ) override {
+	virtual bool do_is_valid( huginn::HThread*, int ) override {
 		return ( _it != _order->end() );
 	}
 	virtual void do_next( HThread*, int ) override {
@@ -114,7 +114,7 @@ inline HHuginn::value_t update( huginn::HThread* thread_, HHuginn::value_t* obje
 	HHuginn::HOrder& l( *static_cast<HHuginn::HOrder*>( object_->raw() ) );
 	HHuginn::HOrder const& r( *static_cast<HHuginn::HOrder const*>( values_[0].raw() ) );
 	if ( r.key_type()->type_id() != HHuginn::TYPE::NONE ) {
-		l.verify_key_type( r.key_type(), position_ );
+		l.verify_key_type( thread_, r.key_type(), position_ );
 	}
 	HHuginn::HOrder::values_t& lv( l.value() );
 	HHuginn::HOrder::values_t const& rv( r.value() );
@@ -178,23 +178,31 @@ HHuginn::HOrder::HOrder( HHuginn::HClass const* class_, allocator_t const& alloc
 	return;
 }
 
-int long HHuginn::HOrder::do_size( void ) const {
+int long HHuginn::HOrder::do_size( huginn::HThread*, int ) const {
 	return ( _data.get_size() );
 }
 
-void HHuginn::HOrder::verify_key_type( HHuginn::HHuginn::HClass const* keyType_, int position_ ) const {
+void HHuginn::HOrder::verify_key_type( huginn::HThread* thread_, HHuginn::HHuginn::HClass const* keyType_, int position_ ) const {
 	if ( ( _keyType->type_id() != TYPE::NONE ) && ( keyType_ != _keyType ) ) {
-		throw HHuginnRuntimeException( "Non-uniform key types, got "_ys.append( a_type_name( keyType_ ) ).append( " instead of " ).append( a_type_name( _keyType ) ).append( "." ), position_ );
+		throw HHuginnRuntimeException(
+			"Non-uniform key types, got "_ys.append( a_type_name( keyType_ ) ).append( " instead of " ).append( a_type_name( _keyType ) ).append( "." ),
+			thread_->current_frame()->file_id(),
+			position_
+		);
 	}
 	if ( ! OCompiler::is_comparable( keyType_->type_id() ) ) {
-		throw HHuginnRuntimeException( "Key type `"_ys.append( keyType_->name() ).append( "' is not a comparable." ), position_ );
+		throw HHuginnRuntimeException(
+			"Key type `"_ys.append( keyType_->name() ).append( "' is not a comparable." ),
+			thread_->current_frame()->file_id(),
+			position_
+		);
 	}
 	return;
 }
 
 bool HHuginn::HOrder::has_key( huginn::HThread* thread_, HHuginn::value_t const& value_, int position_ ) const {
 	M_PROLOG
-	verify_key_type( value_->get_class(), position_ );
+	verify_key_type( thread_, value_->get_class(), position_ );
 	_helper.anchor( thread_, position_ );
 	bool has( _data.find( value_ ) != _data.end() );
 	_helper.detach();
@@ -204,7 +212,7 @@ bool HHuginn::HOrder::has_key( huginn::HThread* thread_, HHuginn::value_t const&
 
 void HHuginn::HOrder::erase( huginn::HThread* thread_, HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
-	verify_key_type( value_->get_class(), position_ );
+	verify_key_type( thread_, value_->get_class(), position_ );
 	_helper.anchor( thread_, position_ );
 	_data.erase( value_ );
 	_helper.detach();
@@ -214,7 +222,7 @@ void HHuginn::HOrder::erase( huginn::HThread* thread_, HHuginn::value_t const& v
 
 void HHuginn::HOrder::insert( huginn::HThread* thread_, HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
-	verify_key_type( value_->get_class(), position_ );
+	verify_key_type( thread_, value_->get_class(), position_ );
 	_helper.anchor( thread_, position_ );
 	_data.insert( value_ );
 	_helper.detach();

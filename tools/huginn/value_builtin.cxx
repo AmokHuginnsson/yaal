@@ -64,7 +64,7 @@ HHuginn::value_t subscript(
 		}
 		HHuginn::HInteger const* i( static_cast<HHuginn::HInteger const*>( index_.raw() ) );
 		int long long index( i->value() );
-		int long size( static_cast<HHuginn::HIterable*>( base_.raw() )->size() );
+		int long size( static_cast<HHuginn::HIterable*>( base_.raw() )->size( thread_, position_ ) );
 		if ( ( index < -size ) || ( index >= size ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Bad index.", thread_->current_frame()->file_id(), position_ );
 		}
@@ -117,7 +117,7 @@ HHuginn::value_t range(
 		if ( !! step_ && ( step_->type_id() != HHuginn::TYPE::INTEGER ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Range operand `step' is not an integer.", thread_->current_frame()->file_id(), position_ );
 		}
-		int long size( static_cast<HHuginn::HIterable*>( base_.raw() )->size() );
+		int long size( static_cast<HHuginn::HIterable*>( base_.raw() )->size( thread_, position_ ) );
 		if ( baseType == HHuginn::TYPE::LIST ) {
 			res = thread_->object_factory().create_list();
 		} else if ( baseType == HHuginn::TYPE::DEQUE ) {

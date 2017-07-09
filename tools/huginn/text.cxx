@@ -96,7 +96,7 @@ public:
 		HString const& sep( get_string( values_[1] ) );
 		HHuginn::HIterable::HIterator it( coll->iterator( thread_, position_ ) );
 		bool addSep( false );
-		while ( it.is_valid() ) {
+		while ( it.is_valid( thread_, position_ ) ) {
 			HHuginn::value_t v( it.value( thread_, position_ ) );
 			if ( v->type_id() != HHuginn::TYPE::STRING ) {
 				throw HHuginn::HHuginnRuntimeException(
