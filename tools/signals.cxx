@@ -373,7 +373,7 @@ int HBaseSignalHandlers::signal_TERM( int signum_ ) {
 	message = "Process was explicitly killed: ";
 	message += strsignal( signum_ );
 	message += '.';
-	log( LOG_LEVEL::INFO ) << message << endl;
+	log( LOG_LEVEL::NOTICE ) << message << endl;
 	cerr << "\n" << message << endl;
 	return ( -2 );
 	M_EPILOG
@@ -387,7 +387,7 @@ int HBaseSignalHandlers::signal_QUIT ( int signum_ ) {
 	message = "Abnormal program quit forced: ";
 	message += ::strsignal( signum_ );
 	message += '.';
-	log( LOG_LEVEL::INFO ) << message << endl;
+	log( LOG_LEVEL::ERROR ) << message << endl;
 	cerr << "\n" << message << endl;
 	abort();
 	return ( 0 );
@@ -429,7 +429,7 @@ int HBaseSignalHandlers::signal_fatal( int signum_ ) {
 	message = "Process caused FATAL ERROR: ";
 	message += ::strsignal( signum_ );
 	message += '.';
-	log( LOG_LEVEL::INFO ) << message << endl;
+	log( LOG_LEVEL::CRITICAL ) << message << endl;
 	cerr << "\n" << message << endl;
 	abort();
 #ifdef __MSVCXX__
@@ -450,7 +450,7 @@ int HBaseSignalHandlers::signal_USR1( int signum_ ) {
 	message = "\nDo you play with the mouse under FreeBSD ? ";
 	message += ::strsignal( signum_ );
 	message += '.';
-	log( LOG_LEVEL::INFO ) << message << endl;
+	log( LOG_LEVEL::WARNING ) << message << endl;
 	cerr << "\n" << message << endl;
 	return ( -3 );
 	M_EPILOG
