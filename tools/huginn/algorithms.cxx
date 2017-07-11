@@ -45,6 +45,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "lookup.hxx"
 #include "set.hxx"
 #include "string.hxx"
+#include "exception.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -67,6 +68,7 @@ class HAlgorithms : public HHuginn::HValue {
 	HHuginn::class_t _reversedOrderClass;
 	HHuginn::class_t _reversedSetClass;
 	HHuginn::class_t _reversedStringClass;
+	HHuginn::class_t _exceptionClass;
 public:
 	HAlgorithms( HHuginn::HClass* class_ )
 		: HValue( class_ )
@@ -79,7 +81,8 @@ public:
 		, _reversedLookupClass( HReversedLookup::get_class( class_->runtime() ) )
 		, _reversedOrderClass( HReversedOrder::get_class( class_->runtime() ) )
 		, _reversedSetClass( HReversedSet::get_class( class_->runtime() ) )
-		, _reversedStringClass( HReversedString::get_class( class_->runtime() ) ) {
+		, _reversedStringClass( HReversedString::get_class( class_->runtime() ) )
+		, _exceptionClass( exception::create_class( class_->runtime(), "AlgorithmsException", "The `AlgorithmsException` exception type for `Algorithms` package." ) ) {
 		return;
 	}
 	static HHuginn::value_t filter( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
