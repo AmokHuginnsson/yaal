@@ -83,6 +83,13 @@ HXml::generator_t const HXml::GENERATOR::INDENT = HXml::generator_t::new_flag();
 HXml::generator_t const HXml::GENERATOR::STRIP_ENTITIES = HXml::generator_t::new_flag();
 
 class HXmlParserG : public HSingleton<HXmlParserG> {
+private:
+	yaal::hcore::HString _msg;
+	yaal::hcore::HString _cache;
+	HXmlParserG( void )
+		: _msg()
+		, _cache() {
+	}
 	virtual ~HXmlParserG( void ) {
 		M_PROLOG
 		xmlCleanupParser();
@@ -90,21 +97,56 @@ class HXmlParserG : public HSingleton<HXmlParserG> {
 		return;
 		M_DESTRUCTOR_EPILOG
 	}
-	static void log_error( void*, char const* format_, ... ) __attribute__(( format( printf, 2, 3 ) )) {
+	static void log_error_impl( void* instance_, char const* format_, ... ) __attribute__(( format( printf, 2, 3 ) )) {
+		HXmlParserG* instance( static_cast<HXmlParserG*>( instance_ ) );
 		static int const MAX_ERROR_MESSAGE_LENGTH( 4096 );
+		static HString const trim( to_string( character_class( CHARACTER_CLASS::WHITESPACE ).data() ).append( "^" ) );
 		char msg[MAX_ERROR_MESSAGE_LENGTH];
 		va_list ap;
 		va_start( ap, format_ );
-		vsnprintf( msg, MAX_ERROR_MESSAGE_LENGTH, format_, ap );
+		int len( static_cast<int>( vsnprintf( msg, MAX_ERROR_MESSAGE_LENGTH, format_, ap ) ) );
 		va_end( ap );
-		log( LOG_LEVEL::WARNING ) << msg << endl;
+		instance->_cache.assign( msg, len );
+		instance->_cache.trim( trim );
+		if ( ! instance->_msg.is_empty() ) {
+			instance->_msg.append( " " );
+		}
+		instance->_msg.append( instance->_cache );
 	}
 public:
+	static void log_error( void* instance_, xmlErrorPtr error_ ) {
+		HXmlParserG* instance( static_cast<HXmlParserG*>( instance_ ) );
+		/*
+		 * libxml2 has quite shitty quality.
+		 * If xmlError::node is set then xmlError::ctxt is set to some random address
+		 * instead of nullptr.
+		 */
+		xmlParserCtxtPtr ctxt( ! error_->node ? static_cast<xmlParserCtxtPtr>( error_->ctxt ) : nullptr );
+		LOG_LEVEL::priority_t l( LOG_LEVEL::DEBUG );
+		switch ( error_->level ) {
+			case ( XML_ERR_NONE ):
+			case ( XML_ERR_WARNING ): {
+				l = error_->level == XML_ERR_NONE ? LOG_LEVEL::DEBUG : LOG_LEVEL::NOTICE;
+				xmlParserWarning( ctxt, "%s", error_->message );
+			} break;
+			case ( XML_ERR_ERROR ): {
+				l = LOG_LEVEL::WARNING;
+				xmlParserError( ctxt, "%s", error_->message );
+			} break;
+			case ( XML_ERR_FATAL ): {
+				l = LOG_LEVEL::ERROR;
+				xmlParserValidityError( ctxt, "%s", error_->message );
+			} break;
+		}
+		if ( ! instance->_msg.is_empty() ) {
+			log( l ) << "XML: " << instance->_msg << endl;
+			instance->_msg.clear();
+		}
+	}
 	static void init( void ) {
-		HXmlParserG::get_instance();
-		static xmlGenericErrorFunc f( &HXmlParserG::log_error );
+		static xmlGenericErrorFunc f( &HXmlParserG::log_error_impl );
 		initGenericErrorDefaultFunc( &f );
-		xmlSetGenericErrorFunc( nullptr, f );
+		xmlSetGenericErrorFunc( &HXmlParserG::get_instance(), f );
 	}
 private:
 	friend class HSingleton<HXmlParserG>;
@@ -271,6 +313,7 @@ HXml::HXml( void )
 	, _namespaces()
 	, _domTree() {
 	M_PROLOG
+	xmlSetStructuredErrorFunc( &HXmlParserG::get_instance(), &HXmlParserG::log_error );
 	return;
 	M_EPILOG
 }
@@ -286,6 +329,7 @@ HXml::HXml( HXml const& xml_ )
 	, _namespaces( xml_._namespaces )
 	, _domTree( xml_._domTree ) {
 	M_PROLOG
+	xmlSetStructuredErrorFunc( &HXmlParserG::get_instance(), &HXmlParserG::log_error );
 	HNodeProxy root( get_root() );
 	if ( !! root ) {
 		root.reset_owner( this );
@@ -305,6 +349,7 @@ HXml::HXml( HXml&& xml_ )
 	, _namespaces( yaal::move( xml_._namespaces ) )
 	, _domTree( yaal::move( xml_._domTree ) ) {
 	M_PROLOG
+	xmlSetStructuredErrorFunc( &HXmlParserG::get_instance(), &HXmlParserG::log_error );
 	HNodeProxy root( get_root() );
 	if ( !! root ) {
 		root.reset_owner( this );
@@ -317,10 +362,6 @@ HXml& HXml::operator = ( HXml const& xml_ ) {
 	if ( &xml_ != this ) {
 		HXml tmp( xml_ );
 		swap( tmp );
-		HNodeProxy root( get_root() );
-		if ( !! root ) {
-			root.reset_owner( this );
-		}
 	}
 	return ( *this );
 }
@@ -328,14 +369,6 @@ HXml& HXml::operator = ( HXml const& xml_ ) {
 HXml& HXml::operator = ( HXml&& xml_ ) {
 	if ( &xml_ != this ) {
 		swap( xml_ );
-		HNodeProxy root( get_root() );
-		if ( !! root ) {
-			root.reset_owner( this );
-		}
-		root = xml_.get_root();
-		if ( !! root ) {
-			root.reset_owner( &xml_ );
-		}
 		xml_.clear();
 	}
 	return ( *this );
@@ -353,6 +386,14 @@ void HXml::swap( HXml& xml_ ) {
 		swap( xml_._entities, _entities );
 		swap( xml_._namespaces, _namespaces );
 		swap( xml_._domTree, _domTree );
+		HNodeProxy root( get_root() );
+		if ( !! root ) {
+			root.reset_owner( this );
+		}
+		root = xml_.get_root();
+		if ( !! root ) {
+			root.reset_owner( &xml_ );
+		}
 	}
 	return;
 }
