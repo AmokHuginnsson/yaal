@@ -128,10 +128,37 @@ int preparse_integer( HString const& str_, char* alternate_ ) {
 		-- len;
 		-- skip;
 	}
-	int const maxDigits( base == 10 ? MAX_VALID_DECIMAL_INTEGER_LENGTH : ( base == 16 ? MAX_VALID_HEXADECIMAL_INTEGER_LENGTH : ( base == 8 ? MAX_VALID_OCTAL_INTEGER_LENGTH : MAX_VALID_BINARY_INTEGER_LENGTH ) ) );
-	for ( int i( 0 ); ( i < len ) && is_ascii( *it ); ++ i, ++ it, ++ alternate_ ) {
+	int maxDigits( 0 );
+	HCharacterClass const* cc( nullptr );
+	char const* name( nullptr );
+	switch ( base ) {
+		case ( 10 ): {
+			maxDigits = MAX_VALID_DECIMAL_INTEGER_LENGTH;
+			cc = &character_class( CHARACTER_CLASS::DIGIT );
+			name = "decimal";
+		} break;
+		case ( 16 ): {
+			maxDigits = MAX_VALID_HEXADECIMAL_INTEGER_LENGTH;
+			cc = &character_class( CHARACTER_CLASS::HEX_DIGIT );
+			name = "hexadecimal";
+		} break;
+		case ( 8 ): {
+			maxDigits = MAX_VALID_OCTAL_INTEGER_LENGTH;
+			cc = &character_class( CHARACTER_CLASS::OCT_DIGIT );
+			name = "octal";
+		} break;
+		case ( 2 ): {
+			maxDigits = MAX_VALID_BINARY_INTEGER_LENGTH;
+			cc = &character_class( CHARACTER_CLASS::BIN_DIGIT );
+			name = "binary";
+		} break;
+		default: {
+			M_ASSERT( !"invalid code path"[0] );
+		}
+	}
+	for ( int i( 0 ); ( i < len ) && cc->has( *it ); ++ i, ++ it, ++ alternate_ ) {
 		if ( i > maxDigits ) {
-			M_THROW( "too many "_ys.append( base == 10 ? "decimal" : ( base == 16 ) ? "hexadecimal" : ( base == 8 ? "octal" : "binary" ) ).append( " digits: " ).append( str_ ), len );
+			M_THROW( "too many "_ys.append( name ).append( " digits: " ).append( str_ ), len );
 		}
 		*alternate_ = static_cast<char>( (*it).get() );
 	}
