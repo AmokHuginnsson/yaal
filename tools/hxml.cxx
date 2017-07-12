@@ -123,6 +123,9 @@ public:
 		 */
 		xmlParserCtxtPtr ctxt( ! error_->node ? static_cast<xmlParserCtxtPtr>( error_->ctxt ) : nullptr );
 		LOG_LEVEL::priority_t l( LOG_LEVEL::DEBUG );
+		if ( ctxt && ctxt->myDoc && ( ctxt->myDoc->parseFlags == 0 ) && ( error_->domain == XML_FROM_PARSER ) && ( error_->code == XML_WAR_UNDECLARED_ENTITY ) ) {
+			error_->level = XML_ERR_NONE;
+		}
 		switch ( error_->level ) {
 			case ( XML_ERR_NONE ):
 			case ( XML_ERR_WARNING ): {
