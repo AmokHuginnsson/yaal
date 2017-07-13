@@ -424,7 +424,7 @@ HString HFormat::string( void ) const {
 				} else if ( !!( conv & HFormatImpl::CONVERSION::LONG_LONG ) ) {
 					snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, HFormatImpl::variant_shell<int long long>::get( *_impl->_args, it->_position ) );
 				} else {
-					M_ASSERT( conv == HFormatImpl::CONVERSION::INT );
+					M_ASSERT( ( conv & ~( HFormatImpl::CONVERSION::OCTAL | HFormatImpl::CONVERSION::HEXADECIMAL ) ) == HFormatImpl::CONVERSION::INT );
 					snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, HFormatImpl::variant_shell<int>::get( *_impl->_args, it->_position ) );
 				}
 			} else if ( !!( conv & HFormatImpl::CONVERSION::STRING ) ) {
@@ -617,7 +617,7 @@ int HFormat::HFormatImpl::next_token( HFormatImpl::conversion_t const& conv ) {
 	OToken* t( pos >= 0 ? &_tokens[pos] : nullptr );
 	M_ENSURE(
 		( t && (
-			( conv == t->_conversion )
+			( conv == ( t->_conversion & ~( HFormatImpl::CONVERSION::OCTAL | HFormatImpl::CONVERSION::HEXADECIMAL ) ) )
 			|| ( ( conv == HFormatImpl::CONVERSION::CHAR ) && ( t->_conversion & HFormatImpl::CONVERSION::INT ) && ( t->_conversion & HFormatImpl::CONVERSION::BYTE ) )
 		) )
 		|| ( ! t && ( conv == HFormatImpl::CONVERSION::INT ) )
