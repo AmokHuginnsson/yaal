@@ -282,8 +282,15 @@ struct OCompiler {
 		 */
 		bool _inline;
 
-		OFunctionContext( HHuginn::identifier_id_t, HStatement::statement_id_t, int, bool );
+		/*! \brief Compiler reference.
+		 */
+		OCompiler* _compiler;
+
+		OFunctionContext( OCompiler*, HHuginn::identifier_id_t, HStatement::statement_id_t, int, bool );
 		expressions_stack_t& expressions_stack( void );
+	private:
+		OFunctionContext( OFunctionContext const& ) = delete;
+		OFunctionContext& operator = ( OFunctionContext const& ) = delete;
 	};
 	typedef yaal::hcore::HResource<OFunctionContext> function_context_t;
 	typedef yaal::hcore::HStack<function_context_t> function_contexts_t;
@@ -402,6 +409,7 @@ struct OCompiler {
 	used_identifiers_t _usedIdentifiers;
 	captures_log_t _capturesLog;
 	HHuginn::compiler_setup_t _setup;
+	HIntrospectorInterface* _introspector;
 	HStatement::statement_id_t _statementIdGenerator;
 	scope_context_cache_t _scopeContextCache;
 	/*! \brief Tells if this compiler instance is used for sub-module.
@@ -422,7 +430,7 @@ struct OCompiler {
 	OCompiler( HRuntime* );
 	void reset( int );
 	OFunctionContext& f( void );
-	void set_setup( HHuginn::compiler_setup_t );
+	void set_setup( HHuginn::compiler_setup_t, HIntrospectorInterface* );
 	void detect_misuse( void ) const;
 	void resolve_symbols( void );
 	void set_function_name( yaal::hcore::HString const&, executing_parser::position_t );
@@ -531,6 +539,7 @@ struct OCompiler {
 	void defer_store_number( yaal::hcore::HString const&, executing_parser::position_t );
 	void defer_store_character( code_point_t, executing_parser::position_t );
 	void defer_call( yaal::hcore::HString const&, executing_parser::position_t );
+	HHuginn::expression_t new_expression( int, int = 0 );
 private:
 	OCompiler( OCompiler const& ) = delete;
 	OCompiler& operator = ( OCompiler const& ) = delete;

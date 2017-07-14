@@ -38,7 +38,7 @@ namespace tools {
 
 namespace huginn {
 
-class HRuntime {
+class HRuntime : public HIntrospecteeInterface {
 private:
 	typedef HHuginn::type_id_t type_id_t;
 	typedef HHuginn::identifier_id_t identifier_id_t;

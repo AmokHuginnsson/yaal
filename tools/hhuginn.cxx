@@ -138,6 +138,13 @@ int HHuginn::HHuginnRuntimeException::file_id( void ) const {
 	return ( _fileId );
 }
 
+void HIntrospectorInterface::introspect( yaal::tools::HIntrospecteeInterface& introspectee_ ) {
+	M_PROLOG
+	do_introspect( introspectee_ );
+	return;
+	M_EPILOG
+}
+
 HHuginn::HObjectReference::HObjectReference( value_t const& value_, int upCastLevel_, bool upCast_, int fileId_, int position_ )
 	: HValue( &_objectReferenceClass_ )
 	, _object( value_ )
@@ -422,7 +429,7 @@ void HHuginn::register_function( identifier_id_t id_ ) {
 	M_EPILOG
 }
 
-bool HHuginn::compile( paths_t const& paths_, compiler_setup_t compilerSetup_ ) {
+bool HHuginn::compile( paths_t const& paths_, compiler_setup_t compilerSetup_, HIntrospectorInterface* introspector_ ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::PARSED );
 	if ( ( compilerSetup_ & COMPILER::BE_STRICT ) && ( compilerSetup_ & COMPILER::BE_SLOPPY ) ) {
@@ -434,7 +441,7 @@ bool HHuginn::compile( paths_t const& paths_, compiler_setup_t compilerSetup_ ) 
 	bool ok( false );
 	int mainStatementCount( _compiler->_mainStatementCount );
 	try {
-		_compiler->set_setup( compilerSetup_ );
+		_compiler->set_setup( compilerSetup_, introspector_ );
 		_engine.execute( &( _compiler->_classNoter ) );
 		_compiler->_classNoter._passThrough = true;
 		_engine.execute();
@@ -451,9 +458,9 @@ bool HHuginn::compile( paths_t const& paths_, compiler_setup_t compilerSetup_ ) 
 	M_EPILOG
 }
 
-bool HHuginn::compile( compiler_setup_t compilerSetup_ ) {
+bool HHuginn::compile( compiler_setup_t compilerSetup_, HIntrospectorInterface* introspector_ ) {
 	M_PROLOG
-	return ( compile( paths_t(), compilerSetup_ ) );
+	return ( compile( paths_t(), compilerSetup_, introspector_ ) );
 	M_EPILOG
 }
 

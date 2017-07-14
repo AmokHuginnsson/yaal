@@ -90,6 +90,8 @@ extern M_YAAL_TOOLS_PUBLIC_API char const* _errMsgHHuginn_[];
 
 }
 
+class HIntrospectorInterface;
+
 /*! \brief Huginn programming language implementation.
  */
 class HHuginn {
@@ -248,17 +250,19 @@ public:
 	/*! \brief Compile parsed program.
 	 *
 	 * \param compilerSetup_ - decide how compiler should work.
+	 * \param introspector_ - program state introspector.
 	 * \return True iff compilation finished with no errors.
 	 */
-	bool compile( compiler_setup_t compilerSetup_ = COMPILER::DEFAULT );
+	bool compile( compiler_setup_t compilerSetup_ = COMPILER::DEFAULT, HIntrospectorInterface* introspector_ = nullptr );
 
 	/*! \brief Compile parsed program.
 	 *
 	 * \param paths_ - paths to Huginn modules directories.
 	 * \param compilerSetup_ - decide how compiler should work.
+	 * \param introspector_ - program state introspector.
 	 * \return True iff compilation finished with no errors.
 	 */
-	bool compile( paths_t const& paths_, compiler_setup_t compilerSetup_ = COMPILER::DEFAULT );
+	bool compile( paths_t const& paths_, compiler_setup_t compilerSetup_ = COMPILER::DEFAULT, HIntrospectorInterface* introspector_ = nullptr );
 
 	/*! \brief Execute compiled program.
 	 *
@@ -341,6 +345,19 @@ private:
 };
 
 typedef yaal::hcore::HExceptionT<HHuginn> HHuginnException;
+
+class HIntrospecteeInterface {
+public:
+	virtual ~HIntrospecteeInterface( void ) {}
+};
+
+class HIntrospectorInterface {
+public:
+	virtual ~HIntrospectorInterface( void ) {}
+	void introspect( HIntrospecteeInterface& );
+protected:
+	virtual void do_introspect( HIntrospecteeInterface& ) = 0;
+};
 
 class HHuginn::HErrorCoordinate {
 public:
