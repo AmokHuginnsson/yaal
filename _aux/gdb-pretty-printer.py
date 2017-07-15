@@ -167,8 +167,10 @@ class YaalHCoreHUTF8StringPrinter:
 		self._val = val_
 
 	def to_string( self ):
+		offset = self._val['_offset']
+		byteCount = self._val['_byteCount']
 		BuferMetaSize = gdb.lookup_type( 'yaal::hcore::HUTF8String::OBufferMeta' ).sizeof
-		return ( self._val['_ptr'] + BuferMetaSize ).string( "utf-8" )
+		return ( self._val['_ptr'] + BuferMetaSize + offset ).string( "utf-8", "strict", byteCount )
 
 	def display_hint( self ):
 		return 'string'
