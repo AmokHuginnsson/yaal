@@ -1063,10 +1063,14 @@ HString::HString( HUTF8String const& str_ )
 	: _len() {
 	M_PROLOG
 	int long newSize( str_.character_count() );
-	resize( newSize, str_.rank() );
-	switch ( str_.rank() ) {
-		case ( 1 ): {
+	int rank( str_.rank() );
+	resize( newSize, rank ? rank : 1 );
+	switch ( rank ) {
+		case ( 0 ): {
 			::memcpy( MEM, str_.raw(), static_cast<size_t>( newSize ) );
+		} break;
+		case ( 1 ): {
+			copy_n_unpack( str_.begin(), newSize, static_cast<yaal::u8_t*>( MEM ) );
 		} break;
 		case ( 2 ): {
 			copy_n_unpack( str_.begin(), newSize, static_cast<yaal::u16_t*>( MEM ) );
@@ -2463,7 +2467,9 @@ void HUTF8String::assign( HString::const_iterator it_, HString::const_iterator e
 	}
 	if ( _ptr ) {
 		_meta->_used = byteCount;
-		_meta->_rank = static_cast<i8_t>( unicode::rank( maxCodePoint ) );
+		int r( unicode::rank( maxCodePoint ) );
+		int utf8Length( unicode::utf8_length( maxCodePoint ) );
+		_meta->_rank = static_cast<i8_t>( utf8Length > 1 ? r : 0 );
 		char* p( _ptr + sizeof ( OBufferMeta ) );
 		p[byteCount] = 0;
 	}
