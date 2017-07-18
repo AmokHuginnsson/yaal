@@ -57,23 +57,20 @@ HFrame::HFrame(
 	, _number( 0 )
 	, _type( TYPE::SCOPE )
 	, _state( STATE::NORMAL )
-	, _fileId( INVALID_FILE_ID )
-	, _statementId( INVALID_STATEMENT_IDENTIFIER ) {
+	, _statement( nullptr ) {
 	_variables.reserve( _thread->runtime().max_local_variable_count() );
 	return;
 }
 
 void HFrame::init(
 	TYPE type_,
-	int fileId_,
-	HStatement::statement_id_t statementId_,
+	HStatement const* statement_,
 	HHuginn::value_t* object_,
 	int upCast_
 ) {
 	M_PROLOG
 	_type = type_;
-	_fileId = fileId_;
-	_statementId = statementId_;
+	_statement = statement_;
 	_object = object_;
 	_upCast = upCast_;
 	_result = _thread->runtime().none_value();
@@ -122,7 +119,7 @@ void HFrame::cleanup( void ) {
 
 void HFrame::reset( void ) {
 	M_PROLOG
-	_statementId = INVALID_STATEMENT_IDENTIFIER;
+	_statement = nullptr;
 	_result.reset();
 	_variables.clear();
 	_state = STATE::NORMAL;
@@ -141,7 +138,7 @@ void HFrame::commit_variable( HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
 	if ( _result->type_id() != HHuginn::TYPE::REFERENCE ) {
 		M_ASSERT( _result->type_id() == HHuginn::TYPE::CHARACTER );
-		throw HHuginn::HHuginnRuntimeException( "String does not support item assignment.", _fileId, position_ );
+		throw HHuginn::HHuginnRuntimeException( "String does not support item assignment.", file_id(), position_ );
 	}
 	static_cast<HHuginn::HReference*>( _result.raw() )->value() = value_;
 	return;
@@ -166,7 +163,7 @@ HHuginn::value_t HFrame::get_field( HExpression::ACCESS access_, int index_ ) {
 HHuginn::value_t HFrame::get_variable( HExpression::ACCESS access_, HStatement::statement_id_t statementId_, int index_ ) {
 	M_PROLOG
 	HFrame* f( this );
-	while ( statementId_ != f->_statementId ) {
+	while ( statementId_ != f->_statement->id() ) {
 		f = f->_parent;
 		M_ASSERT( f );
 	}
@@ -206,7 +203,7 @@ HHuginn::value_t HFrame::get_super( int position_ ) {
 	M_PROLOG
 	HHuginn::value_t* obj( object() );
 	M_ASSERT( obj && !! *obj );
-	return ( _thread->runtime().object_factory()->create<HHuginn::HObjectReference>( *obj, _upCast, true, _fileId, position_ ) );
+	return ( _thread->runtime().object_factory()->create<HHuginn::HObjectReference>( *obj, _upCast, true, file_id(), position_ ) );
 	M_EPILOG
 }
 

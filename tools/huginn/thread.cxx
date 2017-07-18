@@ -82,16 +82,16 @@ void HThread::add_frame( void ) {
 	++ _frameCount;
 }
 
-void HThread::create_function_frame( int fileId_, HStatement::statement_id_t statementId_, HHuginn::value_t* object_, int upCast_ ) {
+void HThread::create_function_frame( HStatement const* statement_, HHuginn::value_t* object_, int upCast_ ) {
 	M_PROLOG
 	add_frame();
 	++ _functionFrameCount;
-	_currentFrame->init( HFrame::TYPE::FUNCTION, fileId_, statementId_, object_, upCast_ );
+	_currentFrame->init( HFrame::TYPE::FUNCTION, statement_, object_, upCast_ );
 	return;
 	M_EPILOG
 }
 
-void HThread::create_incremental_function_frame( int fileId_, HStatement::statement_id_t statementId_, HHuginn::value_t* object_, int upCast_ ) {
+void HThread::create_incremental_function_frame( HStatement const* statement_, HHuginn::value_t* object_, int upCast_ ) {
 	M_PROLOG
 	frame_t incrementalFrame( _runtime->incremental_frame() );
 	M_ASSERT( _frameCount == 0 );
@@ -105,31 +105,31 @@ void HThread::create_incremental_function_frame( int fileId_, HStatement::statem
 	}
 	_runtime->set_incremental_frame( _frames.back() );
 	_currentFrame->reshape( this, _runtime->max_local_variable_count() );
-	_currentFrame->init( HFrame::TYPE::FUNCTION, fileId_, statementId_, object_, upCast_ );
+	_currentFrame->init( HFrame::TYPE::FUNCTION, statement_, object_, upCast_ );
 	return;
 	M_EPILOG
 }
 
-void HThread::create_loop_frame( int fileId_, HStatement::statement_id_t statementId_ ) {
+void HThread::create_loop_frame( HStatement const* statement_ ) {
 	M_PROLOG
 	add_frame();
-	_currentFrame->init( HFrame::TYPE::LOOP, fileId_, statementId_ );
+	_currentFrame->init( HFrame::TYPE::LOOP, statement_ );
 	return;
 	M_EPILOG
 }
 
-void HThread::create_scope_frame( int fileId_, HStatement::statement_id_t statementId_ ) {
+void HThread::create_scope_frame( HStatement const* statement_ ) {
 	M_PROLOG
 	add_frame();
-	_currentFrame->init( HFrame::TYPE::SCOPE, fileId_, statementId_ );
+	_currentFrame->init( HFrame::TYPE::SCOPE, statement_ );
 	return;
 	M_EPILOG
 }
 
-void HThread::create_try_catch_frame( int fileId_, HStatement::statement_id_t statementId_ ) {
+void HThread::create_try_catch_frame( HStatement const* statement_ ) {
 	M_PROLOG
 	add_frame();
-	_currentFrame->init( HFrame::TYPE::TRY_CATCH, fileId_, statementId_ );
+	_currentFrame->init( HFrame::TYPE::TRY_CATCH, statement_ );
 	return;
 	M_EPILOG
 }

@@ -56,11 +56,11 @@ private:
 public:
 	HThread( HRuntime*, yaal::hcore::HThread::id_t );
 	~HThread( void );
-	void create_function_frame( int, HStatement::statement_id_t, HHuginn::value_t*, int );
-	void create_incremental_function_frame( int, HStatement::statement_id_t, HHuginn::value_t*, int );
-	void create_loop_frame( int, HStatement::statement_id_t );
-	void create_scope_frame( int, HStatement::statement_id_t );
-	void create_try_catch_frame( int, HStatement::statement_id_t );
+	void create_function_frame( HStatement const*, HHuginn::value_t*, int );
+	void create_incremental_function_frame( HStatement const*, HHuginn::value_t*, int );
+	void create_loop_frame( HStatement const* );
+	void create_scope_frame( HStatement const* );
+	void create_try_catch_frame( HStatement const* );
 	void pop_frame( void );
 	void pop_incremental_frame( void );
 	HFrame* current_frame( void ) {

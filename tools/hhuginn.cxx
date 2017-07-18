@@ -138,6 +138,35 @@ int HHuginn::HHuginnRuntimeException::file_id( void ) const {
 	return ( _fileId );
 }
 
+HIntrospecteeInterface::HCallSite::HCallSite( yaal::hcore::HString const& file_, int line_, int column_, yaal::hcore::HString const& context_ )
+	: _file( file_ )
+	, _line( line_ )
+	, _column( column_ )
+	, _context( context_ ) {
+}
+
+yaal::hcore::HString const& HIntrospecteeInterface::HCallSite::file( void ) const {
+	return ( _file );
+}
+
+int HIntrospecteeInterface::HCallSite::line( void ) const {
+	return ( _line );
+}
+
+int HIntrospecteeInterface::HCallSite::column( void ) const {
+	return ( _column );
+}
+
+yaal::hcore::HString const& HIntrospecteeInterface::HCallSite::context( void ) const {
+	return ( _context );
+}
+
+HIntrospecteeInterface::call_stack_t HIntrospecteeInterface::get_call_stack( void ) {
+	M_PROLOG
+	return ( do_get_call_stack() );
+	M_EPILOG
+}
+
 void HIntrospectorInterface::introspect( yaal::tools::HIntrospecteeInterface& introspectee_ ) {
 	M_PROLOG
 	do_introspect( introspectee_ );
@@ -355,7 +384,7 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 		}
 		field_definitions_t fieldDefinitions;
 		huginn::HThread t( _runtime.raw(), hcore::HThread::get_current_thread_id() );
-		t.create_function_frame( INVALID_FILE_ID, INVALID_STATEMENT_IDENTIFIER, nullptr, 0 );
+		t.create_function_frame( nullptr, nullptr, 0 );
 		HFrame* frame( t.current_frame() );
 		for ( int i( 0 ), size( static_cast<int>( cc->_fieldNames.get_size() ) ); i < size; ++ i ) {
 			OCompiler::OClassContext::expressions_t::const_iterator f( cc->_fieldDefinitions.find( i ) );

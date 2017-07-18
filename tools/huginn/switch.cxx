@@ -55,7 +55,7 @@ HSwitch::HSwitch(
 
 void HSwitch::do_execute( HThread* thread_ ) const {
 	M_PROLOG
-	thread_->create_loop_frame( file_id(), id() );
+	thread_->create_loop_frame( this );
 	HFrame* f( thread_->current_frame() );
 	_expression->execute( thread_ );
 	if ( f->can_continue() ) {

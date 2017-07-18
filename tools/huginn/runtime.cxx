@@ -956,9 +956,28 @@ yaal::hcore::HString const& HRuntime::function_name( void const* id_ ) const {
 	M_EPILOG
 }
 
+HIntrospecteeInterface::call_stack_t HRuntime::do_get_call_stack( void ) {
+	call_stack_t callStack;
+	HThread* t( current_thread() );
+	HFrame* f( t->current_frame() );
+	int position( f->statement()->position() );
+	while ( f ) {
+		if ( f->type() == HFrame::TYPE::FUNCTION ) {
+			int fileId( f->file_id() );
+			HHuginn::HErrorCoordinate ec( _huginn->get_coordinate( fileId, position ) );
+			callStack.emplace_back( _huginn->source_name( fileId ), ec.line(), ec.column(), "" );
+			break;
+		}
+		f = f->parent();
+		if ( f ) {
+			position = f->statement()->position();
+		}
+	}
+	return ( callStack );
 }
 
 }
 
 }
 
+}

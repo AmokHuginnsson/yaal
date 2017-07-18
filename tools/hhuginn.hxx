@@ -61,6 +61,7 @@ namespace huginn {
 class HSource;
 class HFrame;
 class HThread;
+class HStatement;
 class HExpression;
 class HScope;
 class HFunction;
@@ -348,7 +349,25 @@ typedef yaal::hcore::HExceptionT<HHuginn> HHuginnException;
 
 class HIntrospecteeInterface {
 public:
+	class HCallSite {
+		yaal::hcore::HString _file;
+		int _line;
+		int _column;
+		yaal::hcore::HString _context;
+	public:
+		HCallSite( yaal::hcore::HString const&, int, int, yaal::hcore::HString const& );
+		yaal::hcore::HString const& file( void ) const;
+		int line( void ) const;
+		int column( void ) const;
+		yaal::hcore::HString const& context( void ) const;
+	};
+	typedef yaal::hcore::HArray<HCallSite> call_stack_t;
+public:
 	virtual ~HIntrospecteeInterface( void ) {}
+	call_stack_t get_call_stack( void );
+protected:
+	virtual call_stack_t do_get_call_stack( void ) = 0;
+
 };
 
 class HIntrospectorInterface {

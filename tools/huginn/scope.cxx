@@ -64,7 +64,7 @@ int HScope::statement_position_at( int index_ ) const {
 void HScope::do_execute( HThread* thread_ ) const {
 	M_PROLOG
 	if ( ! _inline ) {
-		thread_->create_scope_frame( file_id(), id() );
+		thread_->create_scope_frame( this );
 	}
 	HFrame* f( thread_->current_frame() );
 	for ( statement_t const& s : _statements ) {

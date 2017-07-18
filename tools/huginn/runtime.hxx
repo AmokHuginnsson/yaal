@@ -204,6 +204,8 @@ public:
 	HHuginn::class_t make_package( yaal::hcore::HString const&, HRuntime const& );
 	void set_incremental_frame( huginn::HThread::frame_t const& );
 	huginn::HThread::frame_t const& incremental_frame( void ) const;
+protected:
+	virtual call_stack_t do_get_call_stack( void ) override;
 private:
 	void register_builtin_function( yaal::hcore::HString const&, function_t&&, yaal::hcore::HString const& );
 private:

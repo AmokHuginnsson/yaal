@@ -82,7 +82,7 @@ HHuginn::value_t HFunction::execute( function_frame_creator_t functionFrameCreat
 			upCast = 0;
 		}
 	}
-	( thread_->*functionFrameCreator_ )( _scope->file_id(), _scope->id(), object_, upCast );
+	( thread_->*functionFrameCreator_ )( _scope.raw(), object_, upCast );
 	HFrame* f( thread_->current_frame() );
 	for (
 		int i( 0 ),

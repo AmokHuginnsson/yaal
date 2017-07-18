@@ -42,19 +42,16 @@ class HTryCatch : public HStatement {
 public:
 	typedef HTryCatch this_type;
 	typedef HStatement base_type;
-	class HCatch {
-		HStatement::statement_id_t _id;
+	class HCatch : public HStatement {
 		HHuginn::identifier_id_t _type;
 		HHuginn::expression_t _control;
 		HHuginn::scope_t _scope;
-		int _fileId;
 	public:
 		HCatch(
 			HStatement::statement_id_t,
 			HHuginn::identifier_id_t,
 			HHuginn::expression_t const&,
-			HHuginn::scope_t const&,
-			int
+			HHuginn::scope_t const&
 		);
 		void execute( HThread*, HHuginn::value_t ) const;
 		HHuginn::identifier_id_t type( void ) const {

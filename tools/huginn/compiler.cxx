@@ -982,7 +982,7 @@ void OCompiler::commit_catch( executing_parser::position_t ) {
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	HHuginn::scope_t scope( pop_scope_context() ); /* don't squash! pop_scope_context() changes fc._scopeStack */
 	OScopeContext& sc( *fc._scopeStack.top() );
-	HTryCatch::HCatch c( sc._statementId, sc._exceptionType, current_expression(), scope, _fileId );
+	HTryCatch::HCatch c( sc._statementId, sc._exceptionType, current_expression(), scope );
 	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	fc._scopeStack.top()->_catches.emplace_back( c );
