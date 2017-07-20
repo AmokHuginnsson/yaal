@@ -956,24 +956,32 @@ yaal::hcore::HString const& HRuntime::function_name( void const* id_ ) const {
 	M_EPILOG
 }
 
-HIntrospecteeInterface::call_stack_t HRuntime::do_get_call_stack( void ) {
+HIntrospecteeInterface::call_stack_t HRuntime::get_call_stack( huginn::HThread* thread_ ) {
+	M_PROLOG
 	call_stack_t callStack;
-	HThread* t( current_thread() );
-	HFrame* f( t->current_frame() );
-	int position( f->statement()->position() );
+	HFrame* f( thread_->current_frame() );
+	int position( f->position() );
 	while ( f ) {
 		if ( f->type() == HFrame::TYPE::FUNCTION ) {
 			int fileId( f->file_id() );
 			HHuginn::HErrorCoordinate ec( _huginn->get_coordinate( fileId, position ) );
-			callStack.emplace_back( _huginn->source_name( fileId ), ec.line(), ec.column(), "" );
-			break;
+			HFunction const* func( static_cast<HFunction const*>( f->statement() ) );
+			callStack.emplace_back( _huginn->source_name( fileId ), ec.line(), ec.column(), identifier_name( func->name() ) );
+			position = INVALID_POSITION;
 		}
 		f = f->parent();
-		if ( f ) {
-			position = f->statement()->position();
+		if ( f && ( position == INVALID_POSITION ) ) {
+			position = f->position();
 		}
 	}
 	return ( callStack );
+	M_EPILOG
+}
+
+HIntrospecteeInterface::call_stack_t HRuntime::do_get_call_stack( void ) {
+	M_PROLOG
+	return ( get_call_stack( current_thread() ) );
+	M_EPILOG
 }
 
 }

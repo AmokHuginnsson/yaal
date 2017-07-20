@@ -1170,7 +1170,7 @@ void OCompiler::add_return_statement( executing_parser::position_t position_ ) {
 void OCompiler::add_throw_statement( executing_parser::position_t position_ ) {
 	M_PROLOG
 	M_ASSERT( ! f()._scopeStack.is_empty() );
-	terminate_scope( make_pointer<HThrow>( _runtime->huginn(), current_expression(), _fileId, position_.get() ) );
+	terminate_scope( make_pointer<HThrow>( current_expression(), _fileId, position_.get() ) );
 	reset_expression();
 	return;
 	M_EPILOG

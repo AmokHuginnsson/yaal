@@ -218,9 +218,10 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t&& value_, 
 
 void HThread::raise( HHuginn::HClass const* class_, yaal::hcore::HString const& message_, int position_ ) {
 	M_PROLOG
-	HHuginn::value_t e( _runtime->object_factory()->create<HHuginn::HException>( class_, message_ ) );
-	int fileId( current_frame()->file_id() );
-	static_cast<HHuginn::HException*>( e.raw() )->set_where( _runtime->huginn()->where( fileId, position_ ) );
+	HFrame* f( current_frame() );
+	f->set_position( position_ );
+	HHuginn::value_t e( _runtime->object_factory()->create<HHuginn::HException>( this, class_, message_ ) );
+	int fileId( f->file_id() );
 	break_execution( HFrame::STATE::EXCEPTION, yaal::move( e ), 0, fileId, position_ );
 	return;
 	M_EPILOG

@@ -43,10 +43,9 @@ public:
 	typedef HThrow this_type;
 	typedef HStatement base_type;
 private:
-	HHuginn* _huginn;
 	HHuginn::expression_t _expression;
 public:
-	HThrow( HHuginn*, HHuginn::expression_t const&, int, int );
+	HThrow( HHuginn::expression_t const&, int, int );
 protected:
 	virtual void do_execute( HThread* ) const override;
 private:

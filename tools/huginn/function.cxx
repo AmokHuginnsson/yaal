@@ -48,10 +48,11 @@ HFunction::HFunction(
 	int parameterCount_,
 	HHuginn::scope_t const& scope_,
 	expressions_t const& defaultValues_
-) : _name( name_ ),
-	_parameterCount( parameterCount_ ),
-	_defaultValues( defaultValues_ ),
-	_scope( scope_ ) {
+) : HStatement( scope_->id(), scope_->file_id(), scope_->position() )
+	, _name( name_ )
+	, _parameterCount( parameterCount_ )
+	, _defaultValues( defaultValues_ )
+	, _scope( scope_ ) {
 	_scope->make_inline();
 	return;
 }
@@ -82,7 +83,7 @@ HHuginn::value_t HFunction::execute( function_frame_creator_t functionFrameCreat
 			upCast = 0;
 		}
 	}
-	( thread_->*functionFrameCreator_ )( _scope.raw(), object_, upCast );
+	( thread_->*functionFrameCreator_ )( this, object_, upCast );
 	HFrame* f( thread_->current_frame() );
 	for (
 		int i( 0 ),

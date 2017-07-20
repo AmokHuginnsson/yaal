@@ -57,7 +57,8 @@ HFrame::HFrame(
 	, _number( 0 )
 	, _type( TYPE::SCOPE )
 	, _state( STATE::NORMAL )
-	, _statement( nullptr ) {
+	, _statement( nullptr )
+	, _position( INVALID_POSITION ) {
 	_variables.reserve( _thread->runtime().max_local_variable_count() );
 	return;
 }
@@ -119,6 +120,7 @@ void HFrame::cleanup( void ) {
 
 void HFrame::reset( void ) {
 	M_PROLOG
+	_position = INVALID_POSITION;
 	_statement = nullptr;
 	_result.reset();
 	_variables.clear();

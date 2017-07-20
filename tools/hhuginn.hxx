@@ -1080,12 +1080,13 @@ public:
 	typedef HHuginn::HValue base_type;
 private:
 	yaal::hcore::HString _message;
-	yaal::hcore::HString _where;
+	HIntrospecteeInterface::call_stack_t _callStack;
 public:
-	HException( HHuginn::HClass const*, yaal::hcore::HString const& );
+	HException( huginn::HThread*, HHuginn::HClass const*, yaal::hcore::HString const& );
+	HException( HHuginn::HClass const*, yaal::hcore::HString const&, HIntrospecteeInterface::call_stack_t const& );
 	yaal::hcore::HString const& what( void ) const;
-	yaal::hcore::HString const& where( void ) const;
-	void set_where( yaal::hcore::HString const& );
+	yaal::hcore::HString where( void ) const;
+	HIntrospecteeInterface::call_stack_t const& trace( void ) const;
 private:
 	virtual value_t do_clone( huginn::HThread*, int ) const override;
 };

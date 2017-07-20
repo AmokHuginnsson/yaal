@@ -84,6 +84,7 @@ private:
 	TYPE _type;
 	STATE _state;
 	HStatement const* _statement;
+	int _position;
 public:
 	HFrame( HThread*, HFrame* );
 	void init( TYPE, HStatement const*, HHuginn::value_t* = nullptr, int = 0 );
@@ -148,6 +149,12 @@ public:
 	}
 	int file_id( void ) const {
 		return ( _statement->file_id() );
+	}
+	void set_position( int position_ ) {
+		_position = position_;
+	}
+	int position( void ) const {
+		return ( _position );
 	}
 private:
 	HFrame( HFrame const& ) = delete;

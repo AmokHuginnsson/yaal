@@ -38,7 +38,7 @@ namespace tools {
 
 namespace huginn {
 
-class HFunction {
+class HFunction : public HStatement {
 public:
 	typedef HFunction this_type;
 	typedef HHuginn::expressions_t expressions_t;
@@ -53,6 +53,9 @@ public:
 	HFunction( HHuginn::identifier_id_t, int, HHuginn::scope_t const&, expressions_t const& );
 	HFunction( HFunction&& ) = default;
 	HHuginn::value_t execute( function_frame_creator_t, function_frame_popper_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int ) const;
+	HHuginn::identifier_id_t name( void ) const {
+		return ( _name );
+	}
 };
 
 }

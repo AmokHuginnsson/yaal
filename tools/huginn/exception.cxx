@@ -78,7 +78,8 @@ private:
 	virtual HHuginn::value_t do_create_instance( huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) const {
 		M_PROLOG
 		verify_signature( name() + ".constructor", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
-		return ( thread_->object_factory().create<HHuginn::HException>( this, get_string( values_[0] ) ) );
+		thread_->current_frame()->set_position( position_ );
+		return ( thread_->object_factory().create<HHuginn::HException>( thread_, this, get_string( values_[0] ) ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t what( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
@@ -164,10 +165,17 @@ HHuginn::class_t create_class( HRuntime* runtime_, yaal::hcore::HString const& n
 
 }
 
-HHuginn::HException::HException( HHuginn::HClass const* class_, yaal::hcore::HString const& message_ )
+HHuginn::HException::HException( huginn::HThread* thread_, HHuginn::HClass const* class_, yaal::hcore::HString const& message_ )
 	: HValue( class_ )
 	, _message( message_ )
-	, _where() {
+	, _callStack( thread_->runtime().get_call_stack( thread_ ) ) {
+	return;
+}
+
+HHuginn::HException::HException( HHuginn::HClass const* class_, yaal::hcore::HString const& message_, HIntrospecteeInterface::call_stack_t const& callStack_ )
+	: HValue( class_ )
+	, _message( message_ )
+	, _callStack( callStack_ ) {
 	return;
 }
 
@@ -175,17 +183,17 @@ yaal::hcore::HString const& HHuginn::HException::what( void ) const {
 	return ( _message );
 }
 
-yaal::hcore::HString const& HHuginn::HException::where( void ) const {
-	return ( _where );
+yaal::hcore::HString HHuginn::HException::where( void ) const {
+	HIntrospecteeInterface::HCallSite const& cs( _callStack.front() );
+	return ( to_string( cs.file() ).append( ":" ).append( cs.line() ).append( ":" ).append( cs.column() ) );
 }
 
-void HHuginn::HException::set_where( yaal::hcore::HString const& where_ ) {
-	_where = where_;
+HIntrospecteeInterface::call_stack_t const& HHuginn::HException::trace( void ) const {
+	return ( _callStack );
 }
 
 HHuginn::value_t HHuginn::HException::do_clone( huginn::HThread* thread_, int ) const {
-	HHuginn::value_t e( thread_->object_factory().create<HException>( get_class(), _message ) );
-	static_cast<HException*>( e.raw() )->set_where( _where );
+	HHuginn::value_t e( thread_->object_factory().create<HException>( get_class(), _message, _callStack ) );
 	return ( e );
 }
 
