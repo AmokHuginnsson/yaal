@@ -68,6 +68,7 @@ public:
 				: HHuginn::field_definitions_t{
 						{ "what",    runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::what, _1, _2, _3, _4 ) ),    "get exception message" },
 						{ "where",   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::where, _1, _2, _3, _4 ) ),   "get originating exception position" },
+						{ "trace",   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::trace, _1, _2, _3, _4 ) ),   "get call stack for exception origin" },
 						{ "message", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::message, _1, _2, _3, _4 ) ), "get exception message" }
 				},
 			doc_
@@ -100,6 +101,23 @@ private:
 			values_, 0, 0, thread_, position_
 		);
 		return ( thread_->object_factory().create_string( e->where() ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t trace( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_->raw() ) );
+		verify_arg_count(
+			static_cast<HExceptionClass const*>( e->get_class() )->name() + ".trace",
+			values_, 0, 0, thread_, position_
+		);
+		HIntrospecteeInterface::call_stack_t const& traceData( e->trace() );
+		HObjectFactory& of( thread_->object_factory() );
+		HHuginn::value_t traceValue( of.create_list() );
+		HHuginn::HList::values_t& traceList( static_cast<HHuginn::HList*>( traceValue.raw() )->value() );
+		for ( HIntrospecteeInterface::HCallSite const& cs : traceData ) {
+			traceList.push_back( of.create<HStackFrameInfo>( of.stack_frame_info_class(), cs ) );
+		}
+		return ( traceValue );
 		M_EPILOG
 	}
 	static HHuginn::value_t message( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
@@ -157,6 +175,81 @@ HHuginn::class_t create_class( HRuntime* runtime_, yaal::hcore::HString const& n
 	if ( runtime_ ) {
 		runtime_->huginn()->register_class( c, HHuginn::ACCESS::PUBLIC );
 	}
+	return ( c );
+	M_EPILOG
+}
+
+HStackFrameInfo::HStackFrameInfo( HHuginn::HClass const* class_, HIntrospecteeInterface::HCallSite const& callSite_ )
+	: HValue( class_ )
+	, _callSite( callSite_ ) {
+}
+
+HHuginn::value_t HStackFrameInfo::file( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "file", values_, 0, 0, thread_, position_ );
+	HStackFrameInfo* sfi( static_cast<HStackFrameInfo*>( object_->raw() ) );
+	return ( thread_->object_factory().create_string( sfi->_callSite.file() ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HStackFrameInfo::line( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "line", values_, 0, 0, thread_, position_ );
+	HStackFrameInfo* sfi( static_cast<HStackFrameInfo*>( object_->raw() ) );
+	return ( thread_->object_factory().create_integer( sfi->_callSite.line() ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HStackFrameInfo::column( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "column", values_, 0, 0, thread_, position_ );
+	HStackFrameInfo* sfi( static_cast<HStackFrameInfo*>( object_->raw() ) );
+	return ( thread_->object_factory().create_integer( sfi->_callSite.column() ) );
+	M_EPILOG
+}
+
+HHuginn::	value_t HStackFrameInfo::context( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "context", values_, 0, 0, thread_, position_ );
+	HStackFrameInfo* sfi( static_cast<HStackFrameInfo*>( object_->raw() ) );
+	return ( thread_->object_factory().create_string( sfi->_callSite.context() ) );
+	M_EPILOG
+}
+
+HHuginn::	value_t HStackFrameInfo::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "to_string", values_, 0, 0, thread_, position_ );
+	HStackFrameInfo* sfi( static_cast<HStackFrameInfo*>( object_->raw() ) );
+	hcore::HString s;
+	s.assign( sfi->_callSite.file() )
+		.append( ":" ).append( sfi->_callSite.line() )
+		.append( ":" ).append( sfi->_callSite.column() )
+		.append( ":" ).append( sfi->_callSite.context() );
+	return ( thread_->object_factory().create_string( s ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HStackFrameInfo::do_clone( huginn::HThread* thread_, int position_ ) const {
+	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on StackFrameInfo.", thread_->current_frame()->file_id(), position_ );
+}
+
+HHuginn::class_t HStackFrameInfo::get_class( HRuntime* runtime_ ) {
+	M_PROLOG
+	HHuginn::class_t c(
+		runtime_->create_class(
+			"StackFrameInfo",
+			nullptr,
+			HHuginn::field_definitions_t{
+				{ "file",      runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HStackFrameInfo::file, _1, _2, _3, _4 ) ),      "a name of the file where exception went through" },
+				{ "line",      runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HStackFrameInfo::line, _1, _2, _3, _4 ) ),      "a line number in given file where an exception went through" },
+				{ "column",    runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HStackFrameInfo::column, _1, _2, _3, _4 ) ),    "a column number where an exception went through" },
+				{ "context",   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HStackFrameInfo::context, _1, _2, _3, _4 ) ),   "a calling context for given execution frame" },
+				{ "to_string", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HStackFrameInfo::to_string, _1, _2, _3, _4 ) ), "a string representation of a StackFrameInfo value" }
+			},
+			"The `StackFrameInfo` is a class representing information about single execution stack frame."
+		)
+	);
+	runtime_->huginn()->register_class( c );
 	return ( c );
 	M_EPILOG
 }

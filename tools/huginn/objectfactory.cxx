@@ -104,6 +104,7 @@ HObjectFactory::HObjectFactory( HRuntime* runtime_ )
 	, _lookup( lookup::get_class( runtime_, this ) )
 	, _set( set::get_class( runtime_, this ) )
 	, _exception()
+	, _stackFrameInfo()
 	, _conversionException()
 	, _arithmeticException()
 	, _stringPool( _memoryPools, _string.raw() )
@@ -128,6 +129,7 @@ HObjectFactory::HObjectFactory( HRuntime* runtime_ )
 void HObjectFactory::register_builtin_classes( void ) {
 	M_PROLOG
 	_exception = exception::get_class( _runtime );
+	_stackFrameInfo = exception::HStackFrameInfo::get_class( _runtime );
 
 	_runtime->huginn()->register_class( _boolean );
 	_runtime->huginn()->register_class( _integer );
