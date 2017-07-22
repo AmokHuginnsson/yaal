@@ -63,7 +63,7 @@ private:
 	HHuginn::scope_t _try;
 	catches_t _catches;
 public:
-	HTryCatch( HStatement::statement_id_t, HHuginn::scope_t const&, catches_t const&, int, int );
+	HTryCatch( HHuginn::scope_t const&, catches_t const&, int, int );
 protected:
 	virtual void do_execute( HThread* ) const override;
 };

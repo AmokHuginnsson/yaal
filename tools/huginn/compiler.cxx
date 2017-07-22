@@ -1245,6 +1245,8 @@ void OCompiler::save_control_variable( executing_parser::position_t position_ ) 
 void OCompiler::commit_catch_control_variable( executing_parser::position_t position_ ) {
 	M_PROLOG
 	commit_assignable( position_ );
+	OFunctionContext& fc( f() );
+	fc._inline = true;
 	return;
 	M_EPILOG
 }
@@ -1348,10 +1350,9 @@ void OCompiler::add_try_catch_statement( executing_parser::position_t position_ 
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	HTryCatch::catches_t catches( yaal::move( fc._scopeStack.top()->_catches ) );
-	HStatement::statement_id_t statementId( fc._scopeStack.top()->_statementId );
 	HHuginn::scope_t scope( pop_scope_context() );
 	HScope::statement_t tryCatchStatement(
-		make_pointer<HTryCatch>( statementId, scope, catches, _fileId, position_.get() )
+		make_pointer<HTryCatch>( scope, catches, _fileId, position_.get() )
 	);
 	current_scope()->add_statement( tryCatchStatement );
 	reset_expression();

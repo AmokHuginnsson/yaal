@@ -68,8 +68,8 @@ void HTryCatch::HCatch::execute( HThread* thread_, HHuginn::value_t value_ ) con
 	M_EPILOG
 }
 
-HTryCatch::HTryCatch( HStatement::statement_id_t id_, HHuginn::scope_t const& try_, catches_t const& catches_, int fileId_, int position_ )
-	: HStatement( id_, fileId_, position_ )
+HTryCatch::HTryCatch( HHuginn::scope_t const& try_, catches_t const& catches_, int fileId_, int position_ )
+	: HStatement( try_->id(), fileId_, position_ )
 	, _try( try_ )
 	, _catches( catches_ ) {
 	_try->make_inline();
