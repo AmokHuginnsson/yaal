@@ -104,7 +104,7 @@ HEditWidget::~HEditWidget( void ) {
 
 void HEditWidget::set_mask( yaal::hcore::HString const& mask_ ) {
 	M_PROLOG
-	if ( ! _mask.compile( mask_ ) ) {
+	if ( ! _mask.compile( mask_, HRegex::COMPILE::NO_EXCEPTION ) ) {
 		M_THROW( _mask.error(), _mask.error_code() );
 	}
 	if ( ! _mask.matches( _string ) ) {
