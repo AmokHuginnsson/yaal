@@ -59,14 +59,6 @@ HFunction::HFunction(
 
 HHuginn::value_t HFunction::execute( function_frame_creator_t functionFrameCreator_, function_frame_popper_t functionFramePopper_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) const {
 	M_PROLOG
-	verify_arg_count(
-		thread_->runtime().identifier_name( _name ),
-		values_,
-		_parameterCount - static_cast<int>( _defaultValues.get_size() ),
-		_parameterCount,
-		thread_,
-		position_
-	);
 	int upCast( 0 );
 	HHuginn::HObject* object( object_ ? static_cast<HHuginn::HObject*>( object_->raw() ) : nullptr );
 	if ( object_ && ( object->field_index( _name ) >= 0 ) ) {
@@ -84,6 +76,14 @@ HHuginn::value_t HFunction::execute( function_frame_creator_t functionFrameCreat
 		}
 	}
 	( thread_->*functionFrameCreator_ )( this, object_, upCast );
+	verify_arg_count(
+		thread_->runtime().identifier_name( _name ),
+		values_,
+		_parameterCount - static_cast<int>( _defaultValues.get_size() ),
+		_parameterCount,
+		thread_,
+		position_
+	);
 	HFrame* f( thread_->current_frame() );
 	for (
 		int i( 0 ),
