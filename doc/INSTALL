@@ -193,6 +193,8 @@ Restart server.
 
 *** Firebird.
 
+**** For Firebird version 2.5.
+
 Edit /etc/firebird/2.5/firebird.conf and setup database access:
 
   DatabaseAccess = Restrict /var/lib/firebird/2.5/data
@@ -213,6 +215,17 @@ in gsec tool add new user:
   GSEC> add root -pw <your_password> -fname Database -mname System -lname Administrator -admin yes
 
 and you are good to go.
+
+**** For Firebird 3.0 and newer.
+
+In Firebird 3.0 and newer the implementation of new security model is completely broken, so don't bother.
+For all administrative tasks you *MUST* use database connections as `sysdba` user with `RDB$ADMIN` role.
+To create `tables`, `generators`, `triggers` that is accessible by non-`sysdba` user you *MUST*:
+1. Create non-privileged {user}.
+2. Grant RDB$ADMIN for that {user}.
+3. Connect as this new {user} to given database.
+4. Create objects you require.
+5. Revoke RDB$ADMIN from that {user}.
 
 * Testing the installation.
 

@@ -765,9 +765,9 @@ void encode( code_point_t codePoint_, char*& dest_ ) {
 	char* p( dest_ - 1 );
 	u8_t head[] = { 0, 0, unicode::ENC_2_BYTES_MARK_VALUE, unicode::ENC_3_BYTES_MARK_VALUE, unicode::ENC_4_BYTES_MARK_VALUE };
 	switch( r ) {
-		case ( 4 ): { *p = static_cast<char>( unicode::TAIL_BYTES_MARK_VALUE | ( unicode::TAIL_BYTES_VALUE_MASK & codePoint_.get() ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
-		case ( 3 ): { *p = static_cast<char>( unicode::TAIL_BYTES_MARK_VALUE | ( unicode::TAIL_BYTES_VALUE_MASK & codePoint_.get() ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
-		case ( 2 ): { *p = static_cast<char>( unicode::TAIL_BYTES_MARK_VALUE | ( unicode::TAIL_BYTES_VALUE_MASK & codePoint_.get() ) ); --p; codePoint_ >>= 6; } /* no break - fall through */
+		case ( 4 ): { *p = static_cast<char>( unicode::TAIL_BYTES_MARK_VALUE | ( unicode::TAIL_BYTES_VALUE_MASK & codePoint_.get() ) ); --p; codePoint_ >>= 6; } /* fall through */
+		case ( 3 ): { *p = static_cast<char>( unicode::TAIL_BYTES_MARK_VALUE | ( unicode::TAIL_BYTES_VALUE_MASK & codePoint_.get() ) ); --p; codePoint_ >>= 6; } /* fall through */
+		case ( 2 ): { *p = static_cast<char>( unicode::TAIL_BYTES_MARK_VALUE | ( unicode::TAIL_BYTES_VALUE_MASK & codePoint_.get() ) ); --p; codePoint_ >>= 6; } /* fall through */
 		case ( 1 ): { *p = static_cast<char>( head[r] | codePoint_.get() ); } /* no break - fall through */
 	}
 }

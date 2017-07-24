@@ -181,22 +181,22 @@ int HTreeWidget::do_process_input( int code_ ) {
 	code_ = HWidget::do_process_input( code_ );
 	tree_view_t::node_t node = _selected;
 	switch ( code_ ) {
-		case ( KEY_CODE::HOME ):
+		case ( KEY_CODE::HOME ): {
 			node = _view.get_root();
 			if ( node->has_children() ) {
 				_selected = &*node->begin();
 			}
-		break;
-		case ( KEY_CODE::END ):
+		} break;
+		case ( KEY_CODE::END ): {
 			node = _view.get_root();
 			if ( node->has_children() ) {
 				_selected = &*prev( node->end() );
 			}
-		break;
-		case ( KEY_CODE::PAGE_UP ):
-			break;
-		case ( KEY_CODE::PAGE_DOWN ):
-			break;
+		} break;
+		case ( KEY_CODE::PAGE_UP ): {
+		} break;
+		case ( KEY_CODE::PAGE_DOWN ): {
+		} break;
 		case ( KEY_CODE::UP ): {
 			_selected = previous( node );
 			if ( _selected == node ) {
@@ -214,8 +214,7 @@ int HTreeWidget::do_process_input( int code_ ) {
 					}
 				}
 			}
-		}
-		break;
+		} break;
 		case ( KEY_CODE::RIGHT ): {
 			wasFolded = ! (**node)._unfolded;
 			if ( node->has_children() ) {
@@ -226,7 +225,7 @@ int HTreeWidget::do_process_input( int code_ ) {
 			}
 		}
 		/* when node is unfolded, right key works as down key */
-		/* no break */
+		/* fall through */
 		case ( KEY_CODE::DOWN ): {
 			if ( (**node)._unfolded ) {
 				if ( node->has_children() ) {
@@ -247,30 +246,29 @@ int HTreeWidget::do_process_input( int code_ ) {
 					_selected = node;
 				}
 			}
-		}
-		break;
-		case ( KEY_CODE::LEFT ):
+		} break;
+		case ( KEY_CODE::LEFT ): {
 			if ( (**node)._unfolded && node->get_level() ) {
 				(**node)._unfolded = false;
 			} else if ( node->get_level() > 1 ) {
 				_selected = node->get_parent();
 			}
-		break;
+		} break;
 		case ( ' ' ):
-		case ( '\r' ):
+		case ( '\r' ): {
 			if ( node->has_children() ) {
 				(**node)._unfolded = ! (**node)._unfolded;
 			} else {
 				errorCode = code_;
 			}
-		break; /* I have to think more about it. */
-		case ( '\t' ):
+		} break; /* I have to think more about it. */
+		case ( '\t' ): {
 			_focused = false;	/* very  */
 			schedule_repaint();	/* magic */
-		/* no break on purpose, see hlistwidget.c */
-		default :
+		} /* fall through */ /* no break on purpose, see hlistwidget.c */
+		default: {
 			errorCode = code_;
-		break;
+		} break;
 	}
 	code_ = errorCode;
 	if ( ! errorCode ) {

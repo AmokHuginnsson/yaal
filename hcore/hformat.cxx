@@ -812,7 +812,7 @@ HFormat::HFormatImpl::conversion_t HFormat::HFormatImpl::get_conversion( HString
 				conversion = CONVERSION::CONSTANT;
 				break;
 			}
-		}
+		} /* fallthrough */
 		/* % conversion can only occur immediately after %, eg: %% is ok but %*% is not */
 		/* no break */
 		default: {

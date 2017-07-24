@@ -139,12 +139,12 @@ inline void free( tType& pointer_ ) throw() {
 
 }
 
-void* operator new ( std::size_t, yaal::memory::YaalNew const& ) throw ( yaal::memory::HMemoryAllocationException );
+void* operator new ( std::size_t, yaal::memory::YaalNew const& );
 void operator delete ( void*, yaal::memory::YaalNew const& ) throw ();
 inline void operator delete ( void* ptr_, yaal::memory::YaalNew const& ) throw () {
 	::operator delete ( ptr_ );
 }
-void* operator new[] ( std::size_t, yaal::memory::YaalNew const& ) throw ( yaal::memory::HMemoryAllocationException );
+void* operator new[] ( std::size_t, yaal::memory::YaalNew const& );
 void operator delete[] ( void*, yaal::memory::YaalNew const& ) throw ();
 inline void operator delete[] ( void* ptr_, yaal::memory::YaalNew const& ) throw () {
 	::operator delete[] ( ptr_ );

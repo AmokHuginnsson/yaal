@@ -365,12 +365,23 @@ if test ["${ORACLE}"] != ["no"] ; then
 	CPPFLAGS=["${CPPFLAGS_ORIG}"]
 fi
 if test ["${FIREBIRD}"] != ["no"] ; then
-	AC_CHECK_HEADERS([ibase.h],
-	  [AC_SUBST([DO_FIREBIRD_DRIVER],["firebird"])
-			DEFAULT_DRIVER=["Firebird"]],
-				[if test ["${FIREBIRD}"] = ["yes"] ; then
-					AC_MSG_ERROR([[Cannot continue without Firebird devel(client)!]])
-				fi;FIREBIRD=["no"]])
+	AC_CHECK_HEADERS(
+		[ibase.h],
+	  [AC_SUBST(
+			[DO_FIREBIRD_DRIVER],
+			["firebird"]
+		) DEFAULT_DRIVER=["Firebird"]],
+		[AC_CHECK_HEADERS(
+			[firebird/ibase.h],
+			[AC_SUBST(
+				[DO_FIREBIRD_DRIVER],
+				["firebird"]
+			) DEFAULT_DRIVER=["Firebird"]],
+			[if test ["${FIREBIRD}"] = ["yes"] ; then
+				AC_MSG_ERROR([[Cannot continue without Firebird devel(client)!]])
+			fi; FIREBIRD=["no"]]
+		)]
+	)
 fi
 if test ["${MYSQL}"] != ["no"] ; then
 	AC_CHECK_HEADERS([mysql/mysql.h],
@@ -382,14 +393,21 @@ if test ["${MYSQL}"] != ["no"] ; then
 fi
 if test ["${POSTGRES}"] != ["no"] ; then
 	AC_CHECK_HEADERS([postgresql/libpq-fe.h],
-		[AC_SUBST([DO_POSTGRESQL_DRIVER],["postgresql"])
-			DEFAULT_DRIVER=["PostgreSQL"]],
-		[AC_CHECK_HEADERS([libpq-fe.h],
-			[AC_SUBST([DO_POSTGRESQL_DRIVER],["postgresql"])
-			DEFAULT_DRIVER=["PostgreSQL"]],
-				[if test ["${POSTGRES}"] = ["yes"] ; then
-					AC_MSG_ERROR([[Cannot continue without PostgreSQL devel(client)!]])
-				fi;POSTGRES=["no"]])])
+		[AC_SUBST(
+			[DO_POSTGRESQL_DRIVER],
+			["postgresql"]
+		) DEFAULT_DRIVER=["PostgreSQL"]],
+		[AC_CHECK_HEADERS(
+			[libpq-fe.h],
+			[AC_SUBST(
+				[DO_POSTGRESQL_DRIVER],
+				["postgresql"]
+			)	DEFAULT_DRIVER=["PostgreSQL"]],
+			[if test ["${POSTGRES}"] = ["yes"] ; then
+				AC_MSG_ERROR([[Cannot continue without PostgreSQL devel(client)!]])
+			fi;POSTGRES=["no"]]
+		)]
+	)
 fi
 if test ["${SQLITE3}"] != ["no"] ; then
 	AC_CHECK_HEADERS([sqlite3.h],

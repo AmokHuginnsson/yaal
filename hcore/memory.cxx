@@ -83,7 +83,7 @@ void free0( void* ptr_ ) throw() {
 
 }
 
-void* operator new ( std::size_t size_, yaal::memory::YaalNew const& ) throw ( yaal::memory::HMemoryAllocationException ) {
+void* operator new ( std::size_t size_, yaal::memory::YaalNew const& ) {
 	M_ASSERT( ( size_ > 0 ) && "yaal::memory::new: requested size lower than 0" );
 	void* newPtr( ::operator new ( size_, std::nothrow ) );
 	if ( newPtr == 0 ) {
@@ -97,7 +97,7 @@ void* operator new ( std::size_t size_, yaal::memory::YaalNew const& ) throw ( y
 	return ( newPtr );
 }
 
-void* operator new[] ( std::size_t size_, yaal::memory::YaalNew const& ) throw ( yaal::memory::HMemoryAllocationException ) {
+void* operator new[] ( std::size_t size_, yaal::memory::YaalNew const& ) {
 	M_ASSERT( ( size_ > 0 ) && "yaal::memory::new[]: requested size lower than 0" );
 	void* newPtr( ::operator new[] ( size_, std::nothrow ) );
 	if ( newPtr == 0 ) {

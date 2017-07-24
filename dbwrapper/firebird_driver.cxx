@@ -27,9 +27,14 @@ Copyright:
 #include "config.hxx"
 
 #ifdef HAVE_IBASE_H
+#	include <ibase.h>
+#elif defined( HAVE_FIREBIRD_IBASE_H )
+#	include <firebird/ibase.h>
+#else
+#	error Firebird database is not supported.
+#endif
 
 #include <cstring>
-#include <ibase.h>
 
 #include "hcore/hchunk.hxx"
 #include "hcore/harray.hxx"
@@ -619,6 +624,4 @@ int yaal_firebird_driver_main( int, char** ) {
 }
 
 }
-
-#endif /* #ifdef HAVE_IBASE_H */
 

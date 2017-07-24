@@ -61,10 +61,10 @@ namespace {
 char const* default_format( TYPE type_ ) {
 	char const* df = nullptr;
 	switch ( type_ ) {
-		case ( TYPE::HSTRING ):       df = "%s"; break;
-		case ( TYPE::INT_LONG_LONG ): df = "%lld"; break;
+		case ( TYPE::HSTRING ):       df = "%s";     break;
+		case ( TYPE::INT_LONG_LONG ): df = "%lld";   break;
 		case ( TYPE::DOUBLE_LONG ):   df = "%.12Lf"; break;
-		case ( TYPE::HTIME ):         df = "%s"; break;
+		case ( TYPE::HTIME ):         df = "%s";     break;
 		default: {
 			M_ASSERT( !"bad type"[0] );
 		}
@@ -791,7 +791,7 @@ int HListWidget::process_input_view( int code_ ) {
 				handle_key_edit();
 			}
 		} break;
-		case ( '\t' ):                handle_key_tab();
+		case ( '\t' ):                handle_key_tab(); /* fall through */
 /* there is no break in previous `case():', because this list must give up
  * its focus and be refreshed and parent window must give focus
  * to another widget */

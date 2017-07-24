@@ -114,7 +114,7 @@ struct pool final {
 	typedef T value_type;
 	typedef size_t size_type;
 	typedef ptrdiff_t difference_type;
-	typedef yaal::hcore::HPool<sizeof ( T )> pool_t;
+	typedef yaal::hcore::HPool<static_cast<int>( sizeof ( T ) )> pool_t;
 	pool_t _pool;
 	template<typename U>
 	struct rebind {
@@ -188,7 +188,7 @@ struct shared_pool final {
 	typedef T value_type;
 	typedef size_t size_type;
 	typedef ptrdiff_t difference_type;
-	typedef yaal::hcore::HPool<sizeof ( T )> pool_t;
+	typedef yaal::hcore::HPool<static_cast<int>( sizeof ( T ) )> pool_t;
 	pool_t* _pool;
 	template<typename U>
 	struct rebind {

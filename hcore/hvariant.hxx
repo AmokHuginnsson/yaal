@@ -65,27 +65,27 @@ public:
 		t16_t, t17_t, t18_t, t19_t, t20_t
 	> this_type;
 	static int const SIZE = yaal::meta::max<
-		sizeof ( t0_t ),
-		sizeof ( t1_t ),
-		sizeof ( t2_t ),
-		sizeof ( t3_t ),
-		sizeof ( t4_t ),
-		sizeof ( t5_t ),
-		sizeof ( t6_t ),
-		sizeof ( t7_t ),
-		sizeof ( t8_t ),
-		sizeof ( t9_t ),
-		sizeof ( t10_t ),
-		sizeof ( t11_t ),
-		sizeof ( t12_t ),
-		sizeof ( t13_t ),
-		sizeof ( t14_t ),
-		sizeof ( t15_t ),
-		sizeof ( t16_t ),
-		sizeof ( t17_t ),
-		sizeof ( t18_t ),
-		sizeof ( t19_t ),
-		sizeof ( t20_t )>::value;
+		static_cast<int>( sizeof ( t0_t ) ),
+		static_cast<int>( sizeof ( t1_t ) ),
+		static_cast<int>( sizeof ( t2_t ) ),
+		static_cast<int>( sizeof ( t3_t ) ),
+		static_cast<int>( sizeof ( t4_t ) ),
+		static_cast<int>( sizeof ( t5_t ) ),
+		static_cast<int>( sizeof ( t6_t ) ),
+		static_cast<int>( sizeof ( t7_t ) ),
+		static_cast<int>( sizeof ( t8_t ) ),
+		static_cast<int>( sizeof ( t9_t ) ),
+		static_cast<int>( sizeof ( t10_t ) ),
+		static_cast<int>( sizeof ( t11_t ) ),
+		static_cast<int>( sizeof ( t12_t ) ),
+		static_cast<int>( sizeof ( t13_t ) ),
+		static_cast<int>( sizeof ( t14_t ) ),
+		static_cast<int>( sizeof ( t15_t ) ),
+		static_cast<int>( sizeof ( t16_t ) ),
+		static_cast<int>( sizeof ( t17_t ) ),
+		static_cast<int>( sizeof ( t18_t ) ),
+		static_cast<int>( sizeof ( t19_t ) ),
+		static_cast<int>( sizeof ( t20_t ) )>::value;
 	static int const INVALID = -1;
 private:
 	typedef typename memory::aligned<SIZE>::type aligner_t;
