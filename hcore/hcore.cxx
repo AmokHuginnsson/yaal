@@ -29,6 +29,7 @@ char const COPYRIGHT [ ] =
 
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <libintl.h>
 #include <locale.h>
 #include <sys/stat.h>
@@ -210,13 +211,12 @@ void init_locale( char const* package_ ) {
 }
 
 namespace {
+
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 static i64_t const FWD_RLIM_INFINITY = static_cast<i64_t>( RLIM_INFINITY );
 #pragma GCC diagnostic error "-Wold-style-cast"
-}
 
-namespace {
-
+static char const YAAL_AUTO_SANITY_ENV[] = "YAAL_AUTO_SANITY";
 static char const SYSCALL_FAILURE[] = "syscall failure - bailing out";
 
 void ensure_limit( int resource_, char const* message_, bool autoSanity_ ) {
@@ -260,11 +260,17 @@ void ensure_limit( int resource_, char const* message_, bool autoSanity_ ) {
 					M_ASSERT( !"Invalid resource type!"[0] );
 				}
 			}
-			if ( ::setrlimit( resource_, &rl ) != 0 ) {
-				::perror( SYSCALL_FAILURE );
-				::exit( 1 );
+			if ( ::setrlimit( resource_, &rl ) == 0 ) {
+				log( LOG_LEVEL::NOTICE ) << message_ << " - setting limit automatically - " << rl.rlim_cur << endl;
+			} else {
+				int e( errno );
+				if ( ::getenv( YAAL_AUTO_SANITY_ENV ) == nullptr ) {
+					log( LOG_LEVEL::WARNING ) << message_ << " - failed to set limit automatically - " << rl.rlim_cur << ": " << strerror( e ) <<  endl;
+				} else {
+					::perror( SYSCALL_FAILURE );
+					::exit( 1 );
+				}
 			}
-			log( LOG_LEVEL::WARNING ) << message_ << " - setting limit automatically - " << rl.rlim_cur << endl;
 		} else {
 			HString message( message_ );
 			message.append( " - bailing out" );
@@ -324,7 +330,7 @@ HCoreInitDeinit::HCoreInitDeinit( void ) {
 			::exit( 1 );
 		}
 		bool autoSanity( false );
-		if ( ::getenv( "YAAL_AUTO_SANITY" ) ) {
+		if ( ::getenv( YAAL_AUTO_SANITY_ENV ) ) {
 			autoSanity = true;
 		}
 #ifdef YAAL_AUTO_SANITY
