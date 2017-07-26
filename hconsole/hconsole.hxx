@@ -34,7 +34,7 @@ namespace yaal {
 namespace hconsole {
 
 extern M_YAAL_HCONSOLE_PUBLIC_API int _latency_;
-extern M_YAAL_HCONSOLE_PUBLIC_API COLOR::color_t _screenBackground_;
+extern M_YAAL_HCONSOLE_PUBLIC_API tools::COLOR::color_t _screenBackground_;
 extern M_YAAL_HCONSOLE_PUBLIC_API HWidget::OAttribute _attributeDisabled_;
 extern M_YAAL_HCONSOLE_PUBLIC_API HWidget::OAttribute _attributeEnabled_;
 extern M_YAAL_HCONSOLE_PUBLIC_API HWidget::OAttribute _attributeFocused_;

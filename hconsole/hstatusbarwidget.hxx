@@ -89,14 +89,14 @@ public:
 	void init_progress( double, char const*, bool = true );
 	void update_progress( double = -1, char const * = nullptr );
 	template<typename... T>
-	void message( COLOR::color_t color_, T const&... a_ ) {
+	void message( tools::COLOR::color_t color_, T const&... a_ ) {
 		return ( do_message( color_, do_format( a_... ) ) );
 	}
 	template<typename... T>
 	void message( T const&... a_ ) {
 		return ( do_message( do_format( a_... ) ) );
 	}
-	void clear( COLOR::color_t );
+	void clear( tools::COLOR::color_t );
 	void bar( char const* = nullptr );
 	void ask( char const*, choices_t const&, int = -1 );
 	void confirm( char const*, HTUIProcess::call_t, HTUIProcess::call_t );
@@ -104,7 +104,7 @@ public:
 	virtual int process_input_normal( int );
 	virtual int process_input_menu( int );
 protected:
-	void do_message( COLOR::color_t, yaal::hcore::HString const& );
+	void do_message( tools::COLOR::color_t, yaal::hcore::HString const& );
 	void do_message( yaal::hcore::HString const& );
 	virtual void do_paint( void ) override;
 	virtual void do_draw_label( void ) override;

@@ -33,6 +33,7 @@ Copyright:
 #include "tools/hxml.hxx"
 #include "hconsole/hinfo.hxx"
 #include "hconsole/hevent.hxx"
+#include "tools/color.hxx"
 
 namespace yaal {
 
@@ -61,8 +62,8 @@ class HWidget : public yaal::hcore::HPointerFromThisInterface<HWidget> {
 public:
 	typedef HWidget this_type;
 	struct OAttribute {
-		COLOR::color_t _label;
-		COLOR::color_t _data;
+		tools::COLOR::color_t _label;
+		tools::COLOR::color_t _data;
 		bool operator == ( OAttribute const& attr_ ) const;
 	};
 /*! \brief Various configuration bits for HWidget hierarchy.
@@ -339,19 +340,19 @@ public:
  *
  * \return Attribute of widgets label.
  */
-	COLOR::color_t attr_label( void ) const;
+	tools::COLOR::color_t attr_label( void ) const;
 
 /*! \brief Retrieve attribute (widgets) of a widgets shortcut highlight.
  *
  * \return Attribute of widgets shortcut highlight.
  */
-	COLOR::color_t attr_shortcut( void ) const;
+	tools::COLOR::color_t attr_shortcut( void ) const;
 
 /*! \brief Retrieve attribute (widgets) of a widgets data.
  *
  * \return Attribute of widgets data.
  */
-	COLOR::color_t attr_data( void ) const;
+	tools::COLOR::color_t attr_data( void ) const;
 
 /*! \brief Schedule full paint on next refresh cycle.
  */

@@ -53,7 +53,7 @@ private:
 			TEXT_EOL
 		} type_t;
 		type_t _type;
-		COLOR::color_t _attribute;
+		tools::COLOR::color_t _attribute;
 		hcore::HString _text;
 	public:
 		HLogLine( void );
@@ -64,15 +64,15 @@ private:
 	int _lines;
 	int _offsetRow;
 	int _offsetColumn;
-	COLOR::color_t _attribute;
+	tools::COLOR::color_t _attribute;
 	contents_t _contents;
 public:
 	HLogPad( HWindow*, int, int, int, int, yaal::hcore::HString const&,
 			HWidgetAttributesInterface const& = HWidgetAttributesInterface() );
 	virtual ~HLogPad( void );
-	void add( COLOR::color_t, yaal::hcore::HString const& );
+	void add( tools::COLOR::color_t, yaal::hcore::HString const& );
 	void add( yaal::hcore::HString const& );
-	void add( COLOR::color_t );
+	void add( tools::COLOR::color_t );
 protected:
 	void add( HLogLine const& );
 	virtual int do_process_input( int ) override;

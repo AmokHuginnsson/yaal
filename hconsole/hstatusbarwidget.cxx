@@ -39,6 +39,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/hlog.hxx"
 
 using namespace yaal::hcore;
+using namespace yaal::tools;
 
 namespace yaal {
 

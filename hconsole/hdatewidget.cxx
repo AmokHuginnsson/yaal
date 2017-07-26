@@ -32,6 +32,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hdatewidget.hxx"
 
 using namespace yaal::hcore;
+using namespace yaal::tools;
 
 namespace yaal {
 

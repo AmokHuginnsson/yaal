@@ -38,6 +38,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #endif /* __DEBUGGER_BABUNI__ */
 
 using namespace yaal::hcore;
+using namespace yaal::tools;
 
 namespace yaal {
 

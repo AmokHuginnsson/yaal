@@ -30,7 +30,7 @@ Copyright:
 #include "hcore/hsingleton.hxx"
 #include "hcore/hpipe.hxx"
 #include "hcore/hformat.hxx"
-#include "tools/ansi.hxx"
+#include "tools/color.hxx"
 #include "tools/signals.hxx"
 #include "hconsole/mouse.hxx"
 
@@ -158,57 +158,6 @@ enum class CURSOR {
 	VERY_VISIBLE
 };
 
-/*! \brief TUI colors definitions.
- */
-struct COLOR {
-	typedef enum {
-		FG_BLACK         = 0,
-		FG_RED           = 1,
-		FG_GREEN         = 2,
-		FG_BROWN         = 3,
-		FG_BLUE          = 4,
-		FG_MAGENTA       = 5,
-		FG_CYAN          = 6,
-		FG_LIGHTGRAY     = 7,
-		FG_BOLD          = 8,
-		FG_GRAY          = FG_BLACK     | FG_BOLD,
-		FG_BRIGHTRED     = FG_RED       | FG_BOLD,
-		FG_BRIGHTGREEN   = FG_GREEN     | FG_BOLD,
-		FG_YELLOW        = FG_BROWN     | FG_BOLD,
-		FG_BRIGHTBLUE    = FG_BLUE      | FG_BOLD,
-		FG_BRIGHTMAGENTA = FG_MAGENTA   | FG_BOLD,
-		FG_BRIGHTCYAN    = FG_CYAN      | FG_BOLD,
-		FG_WHITE         = FG_LIGHTGRAY | FG_BOLD,
-		FG_MASK          = 0x07,
-
-		BG_BLACK         = 0,
-		BG_RED           = 16,
-		BG_GREEN         = 32,
-		BG_BROWN         = 48,
-		BG_BLUE          = 64,
-		BG_MAGENTA       = 80,
-		BG_CYAN          = 96,
-		BG_LIGHTGRAY     = 112,
-		BG_BLINK         = 128,
-		BG_GRAY          = BG_BLACK     | BG_BLINK,
-		BG_BRIGHTRED     = BG_RED       | BG_BLINK,
-		BG_BRIGHTGREEN   = BG_GREEN     | BG_BLINK,
-		BG_YELLOW        = BG_BROWN     | BG_BLINK,
-		BG_BRIGHTBLUE    = BG_BLUE      | BG_BLINK,
-		BG_BRIGHTMAGENTA = BG_MAGENTA   | BG_BLINK,
-		BG_BRIGHTCYAN    = BG_CYAN      | BG_BLINK,
-		BG_WHITE         = BG_LIGHTGRAY | BG_BLINK,
-		BG_MASK          = 0x70,
-		ATTR_NORMAL      = ( FG_LIGHTGRAY | BG_BLACK ),
-		ATTR_DEFAULT     = -1
-	} color_t;
-	static color_t complementary( color_t );
-	static color_t combine( color_t, color_t );
-	static color_t fg_to_bg( color_t );
-	static color_t from_string( yaal::hcore::HString const& );
-	static yaal::ansi::HSequence const& to_ansi( color_t );
-};
-
 /*! \brief Get special key code values.
  *
  * \tparam code - basic input code.
@@ -264,8 +213,8 @@ public:
 	int get_width( void ) const;
 	void enter_curses( void );
 	void leave_curses( void );
-	void set_attr( COLOR::color_t ) const;
-	void set_background( COLOR::color_t ) const;
+	void set_attr( tools::COLOR::color_t ) const;
+	void set_background( tools::COLOR::color_t ) const;
 	void move( int, int ) const;
 	CURSOR curs_set( CURSOR ) const;
 	void addch( int );
@@ -283,13 +232,13 @@ public:
 		return ( do_mvprintf( row_, col_, do_format( a_... ) ) );
 	}
 	template<typename... T>
-	void cmvprintf( int row_, int col_, COLOR::color_t attr_, T const&... a_ ) const {
+	void cmvprintf( int row_, int col_, tools::COLOR::color_t attr_, T const&... a_ ) const {
 		return ( do_cmvprintf( row_, col_, attr_, do_format( a_... ) ) );
 	}
 	void ungetch( int );
 	int get_key( void ) const;
 	int kbhit( void ) const;
-	COLOR::color_t get_attr( void ) const;
+	tools::COLOR::color_t get_attr( void ) const;
 	void clear_terminal( void );
 	void clear( void );
 	bool is_enabled( void ) const;
@@ -309,7 +258,7 @@ public:
 	static void set_escdelay( int );
 protected:
 	void do_mvprintf( int, int, yaal::hcore::HString const& ) const;
-	void do_cmvprintf( int, int, COLOR::color_t, yaal::hcore::HString const& ) const;
+	void do_cmvprintf( int, int, tools::COLOR::color_t, yaal::hcore::HString const& ) const;
 	void init( void );
 private:
 	HConsole( void );

@@ -33,6 +33,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hwindow.hxx"
 
 using namespace yaal::hcore;
+using namespace yaal::tools;
 using namespace yaal::hconsole::mouse;
 
 namespace yaal {
