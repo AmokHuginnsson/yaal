@@ -111,6 +111,16 @@ COLOR::color_t COLOR::from_string( yaal::hcore::HString const& name_ ) {
 		color = FG_BRIGHTMAGENTA;
 	} else if ( name == "yellow" ) {
 		color = FG_YELLOW;
+	} else if ( name == "reset" ) {
+		color = ATTR_RESET;
+	} else if ( name == "bold" ) {
+		color = ATTR_BOLD;
+	} else if ( name == "underline" ) {
+		color = ATTR_UNDERLINE;
+	} else if ( name == "blink" ) {
+		color = ATTR_BLINK;
+	} else if ( name == "reverse" ) {
+		color = ATTR_REVERSE;
 	} else {
 		throw HColorException( "Bad color name: `"_ys.append( name_ ).append( "'." ) );
 	}
@@ -121,7 +131,12 @@ yaal::ansi::HSequence const& COLOR::to_ansi( color_t color_ ) {
 	M_PROLOG
 	HSequence const* seq( nullptr );
 	switch ( color_ ) {
-		case ( ATTR_DEFAULT ):     seq = &ansi::reset;         break;
+		case ( ATTR_DEFAULT ):
+		case ( ATTR_RESET ):       seq = &ansi::reset;         break;
+		case ( ATTR_BOLD ):        seq = &ansi::bold;          break;
+		case ( ATTR_UNDERLINE ):   seq = &ansi::underline;     break;
+		case ( ATTR_BLINK ):       seq = &ansi::blink;         break;
+		case ( ATTR_REVERSE ):     seq = &ansi::reverse;       break;
 		case ( FG_BLACK ):         seq = &ansi::black;         break;
 		case ( FG_RED ):           seq = &ansi::red;           break;
 		case ( FG_GREEN ):         seq = &ansi::green;         break;

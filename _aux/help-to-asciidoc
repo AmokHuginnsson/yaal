@@ -3,21 +3,47 @@
 import sys
 import subprocess
 import argparse
+import re
 
 class Option:
-	def __init__( self_, short_, long_, value_, desc_ ):
+	def __init__( self_, short_, long_, value_, desc_, optional_ ):
 		self_._short = short_
 		self_._long = long_
 		self_._value = value_
 		self_._desc = desc_
+		self_._optional = optional_
+
+strongRe = re.compile( "(?<!\\\\)\\*\\*" )
+strongTag = "‼strongTag‼"
+emphasisRe = re.compile( "(?<!\\\\)\\*" )
+emphasisTag = "‼emphasisTag‼"
+codeRe = re.compile( "(?<!\\\\)[`$]" )
+codeTag = "‼codeTag‼"
+escapeRe = re.compile( "\\\\([*`$_])" )
+def markdown_to_asciidoc( str_ ):
+	s = str_.strip()
+	s = re.sub( strongRe, strongTag, s )
+	s = re.sub( emphasisRe, emphasisTag, s )
+	s = re.sub( codeRe, codeTag, s )
+	s = s.replace( "+", "\\+" )
+	s = s.replace( strongTag, "*" )
+	s = s.replace( emphasisTag, "_" )
+	s = s.replace( codeTag, "+" )
+	s = s.replace( "\\*\\*", "$$**$$" )
+	s = re.sub( escapeRe, "+++\\1+++", s )
+	return s
+
+testStr = "Some **text** with *markdown* and specials like: ^#!.\\*huginn.\\* - not so easy.\n"
 
 def main():
-	parser = argparse.ArgumentParser( description = "Generate asciidoc file based on output of `{prj} --help' call." )
+#	print( "{}{}".format( testStr, markdown_to_asciidoc( testStr ) ) )
+#	return ( 0 )
+	parser = argparse.ArgumentParser( description = "Generate asciidoc file based on output of `{prj} --help -v' call." )
 	parser.add_argument( "-p", "--project", metavar = "name", type = str, required = True, help = "Name of the project to generate asciidoc for." )
 	parser.add_argument( "-o", "--output", metavar = "path", type = str, required = True, help = "Destination path for result asciidoc file." )
 	args = parser.parse_args()
 	binary = "./build/release/" + args.project + "/1exec"
-	help = subprocess.Popen( [ binary, "--help" ], universal_newlines = True, stdout = subprocess.PIPE ).stdout.read()
+	help = subprocess.Popen( [ binary, "--help", "-v" ], universal_newlines = True, stdout = subprocess.PIPE ).stdout.read()
 	lines = help.split( "\n" )
 	preamble = []
 	options = []
@@ -48,6 +74,7 @@ def main():
 					else:
 						desc += ( " " + w )
 				value = None
+				optional = False
 				ss = short.split( "=" ) if short else None
 				ls = longFrom.split( "=" ) if longFrom else None
 				if ss and len( ss ) > 1:
@@ -56,8 +83,11 @@ def main():
 				elif ls and len( ls ) > 1:
 					longFrom = ls[0]
 					value = ls[1]
+				if value and value.endswith( "]" ):
+					value = value.strip( "]" )
+					optional = True
 				if len( desc.strip() ) > 0:
-					options.append( Option( short, longFrom, value, desc.strip() ) )
+					options.append( Option( short, longFrom, value, desc.strip(), optional ) )
 				else:
 					o = options[-1]
 					if short:
@@ -74,7 +104,7 @@ def main():
 				options[-1]._desc += ( " " + line )
 		else:
 			footer += ( l + "\n" )
-	usage = preamble[0].replace( binary, args.project )
+	usage = preamble[0].replace( binary, "**" + args.project + "**" )
 	del preamble[0]
 	name = preamble[0].replace( binary, args.project )
 	del preamble[0]
@@ -87,9 +117,9 @@ def main():
 	out.write( "NAME\n----\n" )
 	out.write( name + "\n\n" )
 	out.write( "SYNOPSIS\n--------\n" )
-	out.write( "$$" + usage + "$$\n\n" )
+	out.write( markdown_to_asciidoc( usage ) + "\n\n" )
 	out.write( "DESCRIPTION\n-----------\n" )
-	out.write( "$$" + "\n".join( preamble[:-1] ) + "$$\n\n" )
+	out.write( "\n".join( map( markdown_to_asciidoc, preamble[:-1] ) ) + "\n\n" )
 	if len( options ) > 0:
 		out.write( "OPTIONS\n-------\n" )
 	for o in options:
@@ -98,13 +128,13 @@ def main():
 				o._short if o._short else "",
 				", " if o._short and o._long else "",
 				o._long if o._long else "",
-				"='" + o._value + "'" if o._value else ""
+				"='" + o._value + "'" + ( "*]*" if o._optional else "" ) if o._value else ""
 			)
 		)
-		out.write( "\t$$" + o._desc.capitalize() + ( "." if not o._desc.endswith( "." ) else "" ) + "$$\n\n" )
+		out.write( "\t" + markdown_to_asciidoc( o._desc.capitalize() ) + ( "." if not o._desc.endswith( "." ) else "" ) + "\n\n" )
 
 	if len( footer ) > 1:
-		out.write( "$$" + footer + "$$\n" )
+		out.write( markdown_to_asciidoc( footer.replace( binary, args.project ) ) + "\n\n" )
 
 	out.write( "AUTHORS\n-------\n" )
 	authors = set( filter( lambda x : x, subprocess.check_output( [ "git", "log", "--format=%aN <%aE>" ], universal_newlines = True ).split( "\n" ) ) )

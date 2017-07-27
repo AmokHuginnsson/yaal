@@ -36,6 +36,7 @@ Copyright:
 #include "hcore/hboundcall.hxx"
 #include "hcore/hfile.hxx"
 #include "hcore/hhashmap.hxx"
+#include "tools/color.hxx"
 
 namespace yaal {
 
@@ -89,23 +90,87 @@ yaal::hcore::HString get_token( yaal::hcore::HString const&, yaal::hcore::HStrin
 yaal::hcore::HString cardinal( int );
 yaal::hcore::HString ordinal( int );
 
+
+class HTheme {
+	COLOR::color_t _strong;
+	COLOR::color_t _emphasis;
+	COLOR::color_t _code;
+	COLOR::color_t _special;
+public:
+	HTheme(
+		COLOR::color_t strong_ = COLOR::ATTR_BOLD,
+		COLOR::color_t emphasis_ = COLOR::ATTR_UNDERLINE,
+		COLOR::color_t code_ = COLOR::FG_GREEN,
+		COLOR::color_t special_ = COLOR::FG_YELLOW
+	) : _strong( strong_ )
+		, _emphasis( emphasis_ )
+		, _code( code_ )
+		, _special( special_ ) {
+	}
+	COLOR::color_t strong( void ) const {
+		return ( _strong );
+	}
+	COLOR::color_t emphasis( void ) const {
+		return ( _emphasis );
+	}
+	COLOR::color_t code( void ) const {
+		return ( _code );
+	}
+	COLOR::color_t special( void ) const {
+		return ( _special );
+	}
+};
+yaal::hcore::HString highlight( yaal::hcore::HString const&, HTheme const& = HTheme() );
+
 /*! \brief Helper structure for displaying program help and current configuration.
  */
-struct OOptionInfo {
+class HOptionInfo {
 	yaal::hcore::HProgramOptionsHandler const& _opt;
 	char const* _name;
 	char const* _intro;
-	char const* _note;
 	char const* _syntax;
-	OOptionInfo( yaal::hcore::HProgramOptionsHandler const& opt, char const* name, char const* intro, char const* note, char const* syntax = nullptr )
-		: _opt( opt ), _name( name ), _intro( intro ), _note( note ), _syntax( syntax ) {}
+	char const* _description;
+	char const* _note;
+	HTheme _theme;
+	bool _color;
+	bool _markdown;
+public:
+	HOptionInfo(
+		yaal::hcore::HProgramOptionsHandler const& opt_
+	) : _opt( opt_ )
+		, _name( nullptr )
+		, _intro( nullptr )
+		, _syntax( nullptr )
+		, _description( nullptr )
+		, _note( nullptr )
+		, _theme()
+		, _color( true )
+		, _markdown( false ) {
+	}
+	HOptionInfo& name( char const* );
+	char const* name( void ) const;
+	HOptionInfo& intro( char const* );
+	char const* intro( void ) const;
+	HOptionInfo& syntax( char const* );
+	char const* syntax( void ) const;
+	HOptionInfo& description( char const* );
+	char const* description( void ) const;
+	HOptionInfo& note( char const* );
+	char const* note( void ) const;
+	HOptionInfo& theme( HTheme const& );
+	HTheme const& theme( void ) const;
+	HOptionInfo& color( bool );
+	bool color( void ) const;
+	HOptionInfo& markdown( bool );
+	bool markdown( void ) const;
+	yaal::hcore::HProgramOptionsHandler const& opt( void ) const;
 private:
-	OOptionInfo( OOptionInfo const& );
-	OOptionInfo& operator = ( OOptionInfo const& );
+	HOptionInfo( HOptionInfo const& );
+	HOptionInfo& operator = ( HOptionInfo const& );
 };
 
-void show_help( OOptionInfo const&, yaal::hcore::HStreamInterface& = yaal::hcore::cout );
-void dump_configuration( OOptionInfo const&, yaal::hcore::HStreamInterface& = yaal::hcore::cout );
+void show_help( HOptionInfo const&, yaal::hcore::HStreamInterface& = yaal::hcore::cout );
+void dump_configuration( HOptionInfo const&, yaal::hcore::HStreamInterface& = yaal::hcore::cout );
 
 void failure( int, char const*, ... ) __attribute__(( __noreturn__, format( printf, 2, 3 ) ));
 

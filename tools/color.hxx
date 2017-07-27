@@ -79,7 +79,12 @@ struct COLOR {
 		BG_WHITE         = BG_LIGHTGRAY | BG_BLINK,
 		BG_MASK          = 0x70,
 		ATTR_NORMAL      = ( FG_LIGHTGRAY | BG_BLACK ),
-		ATTR_DEFAULT     = -1
+		ATTR_DEFAULT     = -1,
+		ATTR_RESET       = 256,
+		ATTR_BOLD        = 512,
+		ATTR_UNDERLINE   = 1024,
+		ATTR_BLINK       = 2048,
+		ATTR_REVERSE     = 4096
 	} color_t;
 	static color_t complementary( color_t );
 	static color_t combine( color_t, color_t );
