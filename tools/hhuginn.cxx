@@ -339,7 +339,7 @@ void HHuginn::load( yaal::hcore::HStreamInterface& stream_, int skippedLines_ ) 
 
 void HHuginn::preprocess( void ) {
 	M_PROLOG
-	M_ENSURE( _state == STATE::LOADED );
+	M_ENSURE( _state == STATE::LOADED, "Program source must be loaded before preprocessing." );
 	_sources.front()->preprocess();
 	_state = STATE::PREPROCESSED;
 	return;
@@ -348,7 +348,7 @@ void HHuginn::preprocess( void ) {
 
 bool HHuginn::parse( void ) {
 	M_PROLOG
-	M_ENSURE( _state == STATE::PREPROCESSED );
+	M_ENSURE( _state == STATE::PREPROCESSED, "Preprocessor step is required before parsing." );
 	bool ok( _engine.parse( _sources.front()->begin(), _sources.front()->end() ) );
 	if ( ! ok ) {
 		_errorMessage = _engine.error_messages()[0];
@@ -460,7 +460,7 @@ void HHuginn::register_function( identifier_id_t id_ ) {
 
 bool HHuginn::compile( paths_t const& paths_, compiler_setup_t compilerSetup_, HIntrospectorInterface* introspector_ ) {
 	M_PROLOG
-	M_ENSURE( _state == STATE::PARSED );
+	M_ENSURE( _state == STATE::PARSED, "Parsing step is required before compilation." );
 	if ( ( compilerSetup_ & COMPILER::BE_STRICT ) && ( compilerSetup_ & COMPILER::BE_SLOPPY ) ) {
 		throw HHuginnException( "BE_STRICT and BE_SLOPPY flags are mutually exclusive." );
 	}
@@ -495,7 +495,7 @@ bool HHuginn::compile( compiler_setup_t compilerSetup_, HIntrospectorInterface* 
 
 bool HHuginn::execute( void ) {
 	M_PROLOG
-	M_ENSURE( _state == STATE::COMPILED );
+	M_ENSURE( _state == STATE::COMPILED, "Program must be compiled before execution." );
 	bool ok( false );
 	try {
 		_runtime->execute();
