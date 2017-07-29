@@ -291,6 +291,9 @@ yaal::hcore::HString hl( yaal::hcore::HString const& str_, HTheme const& theme_,
 	}
 	return ( s );
 }
+yaal::hcore::HString plain( yaal::hcore::HString const& str_ ) {
+	return ( hl( str_, HTheme(), false, false ) );
+}
 }
 
 void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
@@ -491,7 +494,7 @@ void dump_configuration( HOptionInfo const& info, HStreamInterface& out_ ) {
 		out_ << "# this is configuration file for: `" << info.name() << "' program\n";
 	}
 	if ( info.intro() ) {
-		out_ << "# " << info.intro() << "\n";
+		out_ << "# " << plain( info.intro() ) << "\n";
 	}
 	if ( info.name() || info.intro() ) {
 		out_ << "\n";
@@ -556,7 +559,7 @@ void dump_configuration( HOptionInfo const& info, HStreamInterface& out_ ) {
 			} break;
 		}
 		if ( ! o.default_value().is_empty() ) {
-			out_ << ", default: " << o.default_value();
+			out_ << ", default: " << plain( o.default_value() );
 		}
 		out_ << "\n";
 		if ( description.is_empty() ) {
@@ -573,12 +576,12 @@ void dump_configuration( HOptionInfo const& info, HStreamInterface& out_ ) {
 				eol = static_cast<int>( desc.find_other_than( character_class( CHARACTER_CLASS::WHITESPACE ).data(), eol ) );
 			}
 			if ( eol >= MAXIMUM_LINE_LENGTH ) {
-				out_ << "# " << desc.left( eol ) << "\n";
+				out_ << "# " << plain( desc.left( eol ) ) << "\n";
 				desc.shift_left( eol );
 				desc.trim_left();
 				description = desc;
 			} else {
-				out_ << "# " << desc << "\n";
+				out_ << "# " << plain( desc ) << "\n";
 				description.clear();
 				loop = false;
 			}
@@ -607,7 +610,7 @@ void dump_configuration( HOptionInfo const& info, HStreamInterface& out_ ) {
 		out_ << "\n";
 	}
 	if ( info.note() ) {
-		out_ << "# " << info.note() << "\n\n";
+		out_ << "# " << plain( info.note() ) << "\n\n";
 	}
 	out_ << "# vim: set ft=conf:" << endl;
 	return;
