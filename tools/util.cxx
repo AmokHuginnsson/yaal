@@ -439,15 +439,20 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 				if ( ( ws < 0 ) && ( words < 2 ) ) {
 					eol = static_cast<int>( desc.get_length() );
 				}
-				if ( ( ws < 0 ) || ( ws > cols ) )
+				if ( ( ws < 0 ) || ( ws > cols ) ) {
+					if ( words < 2 ) {
+						eol = ws;
+					}
 					break;
+				}
 				eol = ws;
 				ws = static_cast<int>( desc.find_other_than( character_class( CHARACTER_CLASS::WHITESPACE ).data(), ws ) );
-				if ( ws > 0 )
+				if ( ws > 0 ) {
 					++ words;
+				}
 			}
 			if ( ( ws >= cols ) || ( desc.get_length() > cols ) ) {
-				out_ << desc.left( eol ) << "\n";
+				out_ << hl( desc.left( eol ).trim_right(), info.theme(), color, info.markdown() ) << "\n";
 				desc.shift_left( eol );
 				desc.trim_left();
 				desc.insert( 0, "  ", 2 );
