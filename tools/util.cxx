@@ -636,6 +636,7 @@ yaal::hcore::HString highlight( yaal::hcore::HString const& str_, HTheme const& 
 	bool strong( false );
 	bool emphasis( false );
 	bool code( false );
+	bool special( false );
 	typedef HStack<HString> colors_t;
 	colors_t colors;
 	colors.push( *reset );
@@ -662,8 +663,10 @@ yaal::hcore::HString highlight( yaal::hcore::HString const& str_, HTheme const& 
 			continue;
 		}
 		c = *it;
-		if ( ( *it == '`' ) || ( *it == '$' ) ) {
-			apply( code, *it == '`' ? theme_.code() : theme_.special() );
+		if ( *it == '`' ) {
+			apply( code, theme_.code() );
+		} else if ( *it == '$' ) {
+			apply( special, theme_.special() );
 		} else if ( ( *it == '*' ) || ( *it == '_' ) ) {
 			code_point_t prefix( *it );
 			++ it;
