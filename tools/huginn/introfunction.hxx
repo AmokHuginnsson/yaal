@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-  introexpression.hxx - this file is integral part of `yaal' project.
+  introfunction.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -26,11 +26,11 @@ Copyright:
 
 /* YAAL_PRIVATE_IMPLEMENTATION_DETAIL */
 
-#ifndef YAAL_TOOLS_HUGINN_INTROEXPRESSION_HXX_INCLUDED
-#define YAAL_TOOLS_HUGINN_INTROEXPRESSION_HXX_INCLUDED 1
+#ifndef YAAL_TOOLS_HUGINN_INTROFUNCTION_HXX_INCLUDED
+#define YAAL_TOOLS_HUGINN_INTROFUNCTION_HXX_INCLUDED 1
 
-#include "tools/huginn/expression.hxx"
-#include "runtime.hxx"
+#include "function.hxx"
+#include "compiler.hxx"
 
 namespace yaal {
 
@@ -38,20 +38,20 @@ namespace tools {
 
 namespace huginn {
 
-class HIntroExpression : public HExpression {
+class HIntroFunction : public HFunction {
 public:
-	typedef HIntroExpression this_type;
-	typedef HExpression base_type;
+	typedef HIntroFunction this_type;
+	typedef HHuginn::expressions_t expressions_t;
+	typedef void ( huginn::HThread::* function_frame_creator_t )( HStatement const*, HHuginn::value_t*, int );
+	typedef void ( huginn::HThread::* function_frame_popper_t )( void );
 private:
-	HIntrospectorInterface* _introspector;
+	OCompiler::OFunctionContext::parameter_names_t _parameterNames;
 public:
-	HIntroExpression( HIntrospectorInterface*, int = MAIN_FILE_ID, int = 0 );
-	void get_variable_direct_note( ACCESS, HStatement::statement_id_t, int, huginn::HFrame*, HHuginn::identifier_id_t, int );
-protected:
-	virtual void do_execute( huginn::HThread* ) const override;
+	HIntroFunction( HHuginn::identifier_id_t, OCompiler::OFunctionContext::parameter_names_t const&, HHuginn::scope_t const&, expressions_t const& );
+	HHuginn::value_t execute( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int ) const;
+	HHuginn::value_t execute_incremental_main( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int ) const;
 private:
-	HIntroExpression( HIntroExpression const& ) = delete;
-	HIntroExpression& operator = ( HIntroExpression const& ) = delete;
+	void note_parameters( huginn::HThread* ) const;
 };
 
 }
@@ -60,5 +60,5 @@ private:
 
 }
 
-#endif /* #ifndef YAAL_TOOLS_HUGINN_INTROEXPRESSION_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_HUGINN_INTROFUNCTION_HXX_INCLUDED */
 

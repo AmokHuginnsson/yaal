@@ -62,7 +62,6 @@ void HFor::do_execute( HThread* thread_ ) const {
 	M_PROLOG
 	thread_->create_loop_frame( this );
 	HFrame* f( thread_->current_frame() );
-	f->add_variable( HHuginn::value_t() );
 	_source->execute( thread_ );
 	int controlPosition( _control->position() );
 	int sourcePosition( _source->position() );

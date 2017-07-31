@@ -57,7 +57,7 @@ HFunction::HFunction(
 	return;
 }
 
-HHuginn::value_t HFunction::execute( function_frame_creator_t functionFrameCreator_, function_frame_popper_t functionFramePopper_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) const {
+int HFunction::upcast( HHuginn::value_t* object_ ) const {
 	M_PROLOG
 	int upCast( 0 );
 	HHuginn::HObject* object( object_ ? static_cast<HHuginn::HObject*>( object_->raw() ) : nullptr );
@@ -75,7 +75,44 @@ HHuginn::value_t HFunction::execute( function_frame_creator_t functionFrameCreat
 			upCast = 0;
 		}
 	}
-	( thread_->*functionFrameCreator_ )( this, object_, upCast );
+	return ( upCast );
+	M_EPILOG
+}
+
+HHuginn::value_t HFunction::execute(
+	huginn::HThread* thread_,
+	HHuginn::value_t* object_,
+	HHuginn::values_t const& values_,
+	int position_
+) const {
+	M_PROLOG
+	thread_->create_function_frame( this, object_, upcast( object_ ) );
+	HHuginn::value_t res( execute_impl( thread_, values_, position_ ) );
+	thread_->pop_frame();
+	return ( res );
+	M_EPILOG
+}
+
+HHuginn::value_t HFunction::execute_incremental_main(
+	huginn::HThread* thread_,
+	HHuginn::value_t* object_,
+	HHuginn::values_t const& values_,
+	int position_
+) const {
+	M_PROLOG
+	thread_->create_incremental_function_frame( this, object_, upcast( object_ ) );
+	HHuginn::value_t res( execute_impl( thread_, values_, position_ ) );
+	thread_->pop_incremental_frame();
+	return ( res );
+	M_EPILOG
+}
+
+HHuginn::value_t HFunction::execute_impl(
+	huginn::HThread* thread_,
+	HHuginn::values_t const& values_,
+	int position_
+) const {
+	M_PROLOG
 	verify_arg_count(
 		thread_->runtime().identifier_name( _name ),
 		values_,
@@ -106,9 +143,7 @@ HHuginn::value_t HFunction::execute( function_frame_creator_t functionFrameCreat
 	if ( f->can_continue() ) {
 		_scope->execute( thread_ );
 	}
-	HHuginn::value_t res( f->result() );
-	( thread_->*functionFramePopper_ )();
-	return ( res );
+	return ( f->result() );
 	M_EPILOG
 }
 

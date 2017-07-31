@@ -50,6 +50,7 @@ HFrame::HFrame(
 	, _object( nullptr )
 	, _upCast( 0 )
 	, _variables()
+	, _variableIdentifiers()
 	, _instructionPointers()
 	, _values()
 	, _valueCache()
@@ -123,6 +124,7 @@ void HFrame::reset( void ) {
 	_position = INVALID_POSITION;
 	_statement = nullptr;
 	_result.reset();
+	_variableIdentifiers.clear();
 	_variables.clear();
 	_state = STATE::NORMAL;
 	return;
@@ -132,6 +134,22 @@ void HFrame::reset( void ) {
 void HFrame::add_variable( HHuginn::value_t const& value_ ) {
 	M_PROLOG
 	_variables.push_back( value_ );
+	return;
+	M_EPILOG
+}
+
+void HFrame::note_variable( HHuginn::identifier_id_t identifier_ ) {
+	M_PROLOG
+	_variableIdentifiers.push_back( identifier_ );
+	return;
+	M_EPILOG
+}
+
+void HFrame::note_variable( HHuginn::identifier_id_t identifier_, HStatement::statement_id_t statementId_, int index_ ) {
+	M_PROLOG
+	if ( ( statementId_ == _statement->id() ) && ( static_cast<int>( _variableIdentifiers.get_size() ) == index_ ) ) {
+		_variableIdentifiers.push_back( identifier_ );
+	}
 	return;
 	M_EPILOG
 }
@@ -171,7 +189,7 @@ HHuginn::value_t HFrame::get_variable( HExpression::ACCESS access_, HStatement::
 	}
 	HHuginn::value_t v;
 	/*
-	 * It is very difficult to remove next following if() statement due to
+	 * It is very difficult to remove following if() statement due to
 	 * loop statements in Huginn language.
 	 * For `for' and `while' loop statement variables that are local to their scope ({...})
 	 * shall be created during first iteration and only updated during subsequent iterations.

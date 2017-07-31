@@ -53,6 +53,13 @@ struct hash<key_t*> {
 	}
 };
 
+template<typename first_t, typename second_t>
+struct hash<yaal::hcore::HPair<first_t, second_t>> {
+	int long operator () ( yaal::hcore::HPair<first_t, second_t> const& key_ ) const {
+		return ( hash<first_t>()( key_.first ) * 3 + hash<second_t>()( key_.second ) );
+	}
+};
+
 extern M_YAAL_HCORE_PUBLIC_API int long const* const _primes_;
 
 template<typename value_t, typename hasher_t, typename equal_key_t, typename get_key_t, typename allocator_t>

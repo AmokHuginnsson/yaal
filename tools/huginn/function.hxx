@@ -51,11 +51,17 @@ private:
 	HHuginn::scope_t _scope;
 public:
 	HFunction( HHuginn::identifier_id_t, int, HHuginn::scope_t const&, expressions_t const& );
-	HFunction( HFunction&& ) = default;
-	HHuginn::value_t execute( function_frame_creator_t, function_frame_popper_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int ) const;
+	HHuginn::value_t execute( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int ) const;
+	HHuginn::value_t execute_incremental_main( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int ) const;
 	HHuginn::identifier_id_t name( void ) const {
 		return ( _name );
 	}
+protected:
+	HHuginn::value_t execute_impl( huginn::HThread*, HHuginn::values_t const&, int ) const;
+	int upcast( HHuginn::value_t* ) const;
+private:
+	HFunction( HFunction const& ) = delete;
+	HFunction( HFunction&& ) = delete;
 };
 
 }

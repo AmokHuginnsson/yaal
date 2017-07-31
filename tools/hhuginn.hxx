@@ -362,12 +362,14 @@ public:
 		yaal::hcore::HString const& context( void ) const;
 	};
 	typedef yaal::hcore::HArray<HCallSite> call_stack_t;
+	typedef yaal::hcore::HArray<yaal::hcore::HString> identifier_names_t;
 public:
 	virtual ~HIntrospecteeInterface( void ) {}
 	call_stack_t get_call_stack( void );
+	identifier_names_t get_locals( int );
 protected:
 	virtual call_stack_t do_get_call_stack( void ) = 0;
-
+	virtual identifier_names_t do_get_locals( int ) = 0;
 };
 
 class HIntrospectorInterface {

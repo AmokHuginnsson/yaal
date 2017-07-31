@@ -984,6 +984,39 @@ HIntrospecteeInterface::call_stack_t HRuntime::do_get_call_stack( void ) {
 	M_EPILOG
 }
 
+HIntrospecteeInterface::identifier_names_t HRuntime::get_locals( HThread* thread_, int frameNo_ ) {
+	M_PROLOG
+	identifier_names_t identifierNames;
+	HFrame* f( thread_->current_frame() );
+	while ( frameNo_ > 0 ) {
+		while ( f ) {
+			HFrame::TYPE t( f->type() );
+			f = f->parent();
+			if ( t == HFrame::TYPE::FUNCTION ) {
+				break;
+			}
+		}
+		-- frameNo_;
+	}
+	while ( f ) {
+		for ( HHuginn::identifier_id_t identifier : f->variable_identifiers() ) {
+			identifierNames.push_back( identifier_name( identifier ) );
+		}
+		if ( f->type() == HFrame::TYPE::FUNCTION ) {
+			break;
+		}
+		f = f->parent();
+	}
+	return ( identifierNames );
+	M_EPILOG
+}
+
+HIntrospecteeInterface::identifier_names_t HRuntime::do_get_locals( int frameNo_ ) {
+	M_PROLOG
+	return ( get_locals( current_thread(), frameNo_ ) );
+	M_EPILOG
+}
+
 }
 
 }

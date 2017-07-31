@@ -30,6 +30,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "compiler.hxx"
 #include "expression.hxx"
 #include "introexpression.hxx"
+#include "introfunction.hxx"
 #include "if.hxx"
 #include "for.hxx"
 #include "while.hxx"
@@ -434,18 +435,39 @@ void OCompiler::resolve_symbols( void ) {
 					}
 				}
 				if ( !! es._expression ) {
-					es._expression->replace_execution_step(
-						es._index,
-						hcore::call(
-							&HExpression::get_variable_direct,
-							es._expression.raw(),
-							HExpression::ACCESS::REFERENCE,
-							sc->_statementId,
-							localVariable._index,
-							_1,
-							es._position
-						)
-					);
+					if ( _introspector ) {
+						es._expression->replace_execution_step(
+							es._index,
+							hcore::call(
+								&HIntroExpression::get_variable_direct_note,
+								static_cast<HIntroExpression*>( es._expression.raw() ),
+								HExpression::ACCESS::REFERENCE,
+								sc->_statementId,
+								localVariable._index,
+								_1,
+								es._identifier,
+								es._position
+							)
+						);
+					} else {
+						es._expression->replace_execution_step(
+							es._index,
+							hcore::call(
+								&HExpression::get_variable_direct,
+								es._expression.raw(),
+								HExpression::ACCESS::REFERENCE,
+								sc->_statementId,
+								localVariable._index,
+								_1,
+								es._position
+							)
+						);
+					}
+				} else {
+					/*
+					 * Function arguments would be handled here,
+					 * but they are added explicitly from HFunction::execute().
+					 */
 				}
 				break;
 			} else {
@@ -815,18 +837,31 @@ OCompiler::function_info_t OCompiler::create_function_low( executing_parser::pos
 		_mainStatementCount += scope->statement_count();
 	}
 	HHuginn::function_t fun(
-		hcore::call(
-			&HFunction::execute,
-			make_pointer<HFunction>(
-				fc._functionIdentifier,
-				static_cast<int>( fc._parameters.get_size() ),
-				scope,
-				fc._defaultValues
-			),
-			isIncrementalMain ? &huginn::HThread::create_incremental_function_frame : &huginn::HThread::create_function_frame,
-			isIncrementalMain ? &huginn::HThread::pop_incremental_frame : &huginn::HThread::pop_frame,
-			_1, _2, _3, _4
-		)
+		_introspector
+			? HHuginn::function_t(
+				hcore::call(
+					isIncrementalMain ? &HIntroFunction::execute_incremental_main : &HIntroFunction::execute,
+					make_pointer<HIntroFunction>(
+						fc._functionIdentifier,
+						fc._parameters,
+						scope,
+						fc._defaultValues
+					),
+					_1, _2, _3, _4
+				)
+			)
+			: HHuginn::function_t(
+				hcore::call(
+					isIncrementalMain ? &HFunction::execute_incremental_main : &HFunction::execute,
+					make_pointer<HFunction>(
+						fc._functionIdentifier,
+						static_cast<int>( fc._parameters.get_size() ),
+						scope,
+						fc._defaultValues
+					),
+					_1, _2, _3, _4
+				)
+			)
 	);
 	M_ASSERT( fc._scopeStack.get_size() == 1 );
 	function_info_t fi( fc._functionIdentifier, fun );

@@ -54,6 +54,18 @@ void HIntroExpression::do_execute( huginn::HThread* thread_ ) const {
 	M_EPILOG
 }
 
+void HIntroExpression::get_variable_direct_note(
+	ACCESS access_, HStatement::statement_id_t statementId_, int index_, huginn::HFrame* frame_, HHuginn::identifier_id_t identifier_, int
+) {
+	M_PROLOG
+	frame_->values().emplace( frame_->get_variable( access_, statementId_, index_ ) );
+	if ( access_ == HExpression::ACCESS::REFERENCE ) {
+		frame_->note_variable( identifier_, statementId_, index_ );
+	}
+	return;
+	M_EPILOG
+}
+
 }
 
 }

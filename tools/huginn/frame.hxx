@@ -48,6 +48,7 @@ public:
 	typedef HFrame this_type;
 	typedef yaal::hcore::HStack<HHuginn::value_t> values_t;
 	typedef yaal::hcore::HStack<int> instruction_pointers_t;
+	typedef yaal::hcore::HArray<HHuginn::identifier_id_t> identifiers_t;
 	enum class TYPE {
 		SCOPE,
 		LOOP,
@@ -63,11 +64,40 @@ public:
 		RUNTIME_EXCEPTION
 	};
 private:
+	/*!
+	 * A pointer to the thread on which behave this frame was initialized.
+	 */
 	HThread* _thread;
+
+	/*!
+	 * Pointer to parent frame of this frame.
+	 */
 	HFrame* const _parent;
+
+	/*!
+	 * If current frame is initialized for a call
+	 * to user defined method in user defined `class`, then
+	 * '_object' holds `this` reference, otherwise it is nullptr.
+	 */
 	HHuginn::value_t* _object;
+
+	/*!
+	 * Upcast level, a number of consecutive uses of `super`
+	 * that is in effect for '_object' at current frame.
+	 */
 	int _upCast;
+
+	/*!
+	 * A (linear) store for *local* variables values defined
+	 * and available in this scope (frame) so far.
+	 */
 	HHuginn::values_t _variables;
+
+	/*!
+	 * Identifiers for the variables defined in current scope (frame) so far.
+	 */
+	identifiers_t _variableIdentifiers; /*!< Used for introspection only. */
+
 	/*
 	 * Instruction pointers must be kept per frame (and not in HThread)
 	 * because new frame (new scope) can be created from within an expression
@@ -77,10 +107,29 @@ private:
 	 * e.g.: boolean short-circuits and ternary operators.
 	 */
 	instruction_pointers_t _instructionPointers;
+
+	/*!
+	 * Value stack used by expression evaluator.
+	 */
 	values_t _values;
+
+	/*!
+	 * Used exclusively to speed up function call parameter construction
+	 * in HExpression::grab_args().
+	 */
 	HHuginn::values_t _valueCache;
+
+	/*!
+	 * Temporary store for expression result value used to pass expression results
+	 * across frames and functions.
+	 */
 	HHuginn::value_t _result;
+
+	/*!
+	 * A frame number in the stack.
+	 */
 	int _number;
+
 	TYPE _type;
 	STATE _state;
 	HStatement const* _statement;
@@ -94,6 +143,8 @@ public:
 	HHuginn::value_t get_this( void );
 	HHuginn::value_t get_super( int );
 	void add_variable( HHuginn::value_t const& );
+	void note_variable( HHuginn::identifier_id_t );
+	void note_variable( HHuginn::identifier_id_t, HStatement::statement_id_t, int );
 	void commit_variable( HHuginn::value_t const&, int );
 	bool can_continue( void ) const {
 		return ( _state == STATE::NORMAL );
@@ -155,6 +206,9 @@ public:
 	}
 	int position( void ) const {
 		return ( _position );
+	}
+	identifiers_t const& variable_identifiers( void ) const {
+		return ( _variableIdentifiers );
 	}
 private:
 	HFrame( HFrame const& ) = delete;

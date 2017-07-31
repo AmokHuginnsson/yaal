@@ -167,6 +167,12 @@ HIntrospecteeInterface::call_stack_t HIntrospecteeInterface::get_call_stack( voi
 	M_EPILOG
 }
 
+HIntrospecteeInterface::identifier_names_t HIntrospecteeInterface::get_locals( int frameNo_ ) {
+	M_PROLOG
+	return ( do_get_locals( frameNo_ ) );
+	M_EPILOG
+}
+
 void HIntrospectorInterface::introspect( yaal::tools::HIntrospecteeInterface& introspectee_ ) {
 	M_PROLOG
 	do_introspect( introspectee_ );
