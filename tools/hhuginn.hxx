@@ -361,15 +361,23 @@ public:
 		int column( void ) const;
 		yaal::hcore::HString const& context( void ) const;
 	};
+	class HVariableView {
+		yaal::hcore::HString _name;
+		HHuginn::value_ref_t _view;
+	public:
+		HVariableView( yaal::hcore::HString const&, HHuginn::value_t const& );
+		yaal::hcore::HString const& name( void ) const;
+		HHuginn::value_t value( void ) const;
+	};
 	typedef yaal::hcore::HArray<HCallSite> call_stack_t;
-	typedef yaal::hcore::HArray<yaal::hcore::HString> identifier_names_t;
+	typedef yaal::hcore::HArray<HVariableView> variable_views_t;
 public:
 	virtual ~HIntrospecteeInterface( void ) {}
 	call_stack_t get_call_stack( void );
-	identifier_names_t get_locals( int );
+	variable_views_t get_locals( int );
 protected:
 	virtual call_stack_t do_get_call_stack( void ) = 0;
-	virtual identifier_names_t do_get_locals( int ) = 0;
+	virtual variable_views_t do_get_locals( int ) = 0;
 };
 
 class HIntrospectorInterface {

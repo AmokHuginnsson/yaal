@@ -161,13 +161,26 @@ yaal::hcore::HString const& HIntrospecteeInterface::HCallSite::context( void ) c
 	return ( _context );
 }
 
+HIntrospecteeInterface::HVariableView::HVariableView( yaal::hcore::HString const& name_, HHuginn::value_t const& view_ )
+	: _name( name_ )
+	, _view( view_ ) {
+}
+
+yaal::hcore::HString const& HIntrospecteeInterface::HVariableView::name( void ) const {
+	return ( _name );
+}
+
+HHuginn::value_t HIntrospecteeInterface::HVariableView::value( void ) const {
+	return ( _view );
+}
+
 HIntrospecteeInterface::call_stack_t HIntrospecteeInterface::get_call_stack( void ) {
 	M_PROLOG
 	return ( do_get_call_stack() );
 	M_EPILOG
 }
 
-HIntrospecteeInterface::identifier_names_t HIntrospecteeInterface::get_locals( int frameNo_ ) {
+HIntrospecteeInterface::variable_views_t HIntrospecteeInterface::get_locals( int frameNo_ ) {
 	M_PROLOG
 	return ( do_get_locals( frameNo_ ) );
 	M_EPILOG

@@ -984,9 +984,9 @@ HIntrospecteeInterface::call_stack_t HRuntime::do_get_call_stack( void ) {
 	M_EPILOG
 }
 
-HIntrospecteeInterface::identifier_names_t HRuntime::get_locals( HThread* thread_, int frameNo_ ) {
+HIntrospecteeInterface::variable_views_t HRuntime::get_locals( HThread* thread_, int frameNo_ ) {
 	M_PROLOG
-	identifier_names_t identifierNames;
+	variable_views_t variableViews;
 	HFrame* f( thread_->current_frame() );
 	while ( frameNo_ > 0 ) {
 		while ( f ) {
@@ -999,19 +999,22 @@ HIntrospecteeInterface::identifier_names_t HRuntime::get_locals( HThread* thread
 		-- frameNo_;
 	}
 	while ( f ) {
-		for ( HHuginn::identifier_id_t identifier : f->variable_identifiers() ) {
-			identifierNames.push_back( identifier_name( identifier ) );
+		HHuginn::values_t const& variableValues( f->variable_values() );
+		HFrame::identifiers_t const& variableIdentifiers( f->variable_identifiers() );
+		M_ASSERT( variableIdentifiers.get_size() == variableValues.get_size() );
+		for ( int i( 0 ), COUNT( static_cast<int>( variableValues.get_size() ) ); i < COUNT; ++ i ) {
+			variableViews.emplace_back( identifier_name( variableIdentifiers[ i ] ), variableValues[ i ] );
 		}
 		if ( f->type() == HFrame::TYPE::FUNCTION ) {
 			break;
 		}
 		f = f->parent();
 	}
-	return ( identifierNames );
+	return ( variableViews );
 	M_EPILOG
 }
 
-HIntrospecteeInterface::identifier_names_t HRuntime::do_get_locals( int frameNo_ ) {
+HIntrospecteeInterface::variable_views_t HRuntime::do_get_locals( int frameNo_ ) {
 	M_PROLOG
 	return ( get_locals( current_thread(), frameNo_ ) );
 	M_EPILOG

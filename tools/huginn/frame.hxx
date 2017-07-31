@@ -207,6 +207,9 @@ public:
 	int position( void ) const {
 		return ( _position );
 	}
+	HHuginn::values_t const& variable_values( void ) const {
+		return ( _variables );
+	}
 	identifiers_t const& variable_identifiers( void ) const {
 		return ( _variableIdentifiers );
 	}

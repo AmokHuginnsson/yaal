@@ -206,11 +206,11 @@ public:
 	huginn::HThread::frame_t const& incremental_frame( void ) const;
 	call_stack_t get_call_stack( HThread* );
 	using HIntrospecteeInterface::get_call_stack;
-	identifier_names_t get_locals( HThread*, int );
+	variable_views_t get_locals( HThread*, int );
 	using HIntrospecteeInterface::get_locals;
 protected:
 	virtual call_stack_t do_get_call_stack( void ) override;
-	virtual identifier_names_t do_get_locals( int ) override;
+	virtual variable_views_t do_get_locals( int ) override;
 private:
 	void register_builtin_function( yaal::hcore::HString const&, function_t&&, yaal::hcore::HString const& );
 private:
