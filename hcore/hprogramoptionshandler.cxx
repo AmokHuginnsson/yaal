@@ -583,7 +583,7 @@ void HProgramOptionsHandler::verify_new_option( HOption& option_ ) {
 		option_.short_form( sf );
 	}
 	if ( ! option_.default_value().is_empty() ) {
-		option_.set( option_.default_value() );
+		set_option( option_, option_.default_value() );
 	}
 	return;
 	M_EPILOG
