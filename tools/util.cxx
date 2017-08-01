@@ -278,6 +278,7 @@ yaal::hcore::HProgramOptionsHandler const& HOptionInfo::opt( void ) const {
 
 namespace {
 yaal::hcore::HString hl( yaal::hcore::HString const& str_, HTheme const& theme_, bool color_, bool markdown_ ) {
+	M_PROLOG
 	HString s;
 	if ( color_ ) {
 		s = highlight( str_, theme_ );
@@ -290,9 +291,23 @@ yaal::hcore::HString hl( yaal::hcore::HString const& str_, HTheme const& theme_,
 		s = re2.replace( s, "$1" );
 	}
 	return ( s );
+	M_EPILOG
 }
 yaal::hcore::HString plain( yaal::hcore::HString const& str_ ) {
+	M_PROLOG
 	return ( hl( str_, HTheme(), false, false ) );
+	M_EPILOG
+}
+yaal::hcore::HString escape_markdown( yaal::hcore::HString const& string_ ) {
+	M_PROLOG
+	HString s( string_ );
+	s.replace( "$", "\\$" );
+	s.replace( "*", "\\*" );
+	s.replace( "_", "\\_" );
+	s.replace( "`", "\\`" );
+	s.replace( "{", "\\{" );
+	return ( s );
+	M_EPILOG
 }
 }
 
@@ -429,7 +444,7 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 		/* + 2 for two prefixing spaces, + 2 for 2 spaces separating options from descriptions, + 2 for comma and space */
 		desc = description;
 		if ( ! o.default_value().is_empty() ) {
-			desc.append( " (default: *" ).append( o.default_value() ).append( "*)" );
+			desc.append( " (default: *" ).append( escape_markdown( o.default_value() ) ).append( "*)" );
 		}
 		bool loop( true );
 		do {
@@ -559,7 +574,7 @@ void dump_configuration( HOptionInfo const& info, HStreamInterface& out_ ) {
 			} break;
 		}
 		if ( ! o.default_value().is_empty() ) {
-			out_ << ", default: " << plain( o.default_value() );
+			out_ << ", default: " << o.default_value();
 		}
 		out_ << "\n";
 		if ( description.is_empty() ) {

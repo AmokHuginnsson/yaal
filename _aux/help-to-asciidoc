@@ -13,6 +13,9 @@ class Option:
 		self_._desc = desc_
 		self_._optional = optional_
 
+def capitalize( str_ ):
+	return str_[0].upper() + str_[1:]
+
 strongRe = re.compile( "(?<!\\\\)\\*\\*" )
 strongTag = "‼strongTag‼"
 emphasisRe = re.compile( "(?<!\\\\)\\*" )
@@ -131,7 +134,7 @@ def main():
 				"='" + o._value + "'" + ( "*]*" if o._optional else "" ) if o._value else ""
 			)
 		)
-		out.write( "\t" + markdown_to_asciidoc( o._desc.capitalize() ) + ( "." if not o._desc.endswith( "." ) else "" ) + "\n\n" )
+		out.write( "\t" + markdown_to_asciidoc( capitalize( o._desc ) ) + ( "." if not o._desc.endswith( "." ) else "" ) + "\n\n" )
 
 	if len( footer ) > 1:
 		out.write( markdown_to_asciidoc( footer.replace( binary, args.project ) ) + "\n\n" )
