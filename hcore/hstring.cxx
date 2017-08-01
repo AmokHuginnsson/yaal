@@ -3062,7 +3062,7 @@ int stricasecmp( HString const& left_, HString const& right_ ) {
 	for ( int long i( 0 ); ( diff == 0 ) && ( i < len ); ++ i ) {
 		diff = static_cast<int>( towlower( static_cast<wint_t>( left_[i].get() ) ) ) - static_cast<int>( towlower( static_cast<wint_t>( right_[i].get() ) ) );
 	}
-	return ( diff );
+	return ( diff ? diff : ( left_.get_size() == right_.get_size() ? 0 : ( left_.get_size() < right_.get_size() ? -1 : 1 ) ) );
 }
 
 }
