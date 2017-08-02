@@ -48,8 +48,10 @@ HIntroExpression::HIntroExpression( HIntrospectorInterface* introspector_, int f
 void HIntroExpression::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
 	HExpression::do_execute( thread_ );
-	thread_->current_frame()->set_position( position() );
-	_introspector->introspect( thread_->runtime() );
+	if ( thread_->runtime().current_thread() ) {
+		thread_->current_frame()->set_position( position() );
+		_introspector->introspect( thread_->runtime() );
+	}
 	return;
 	M_EPILOG
 }
