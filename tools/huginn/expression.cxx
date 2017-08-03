@@ -308,7 +308,7 @@ void HExpression::set_variable( HFrame* frame_, int ) {
 		}
 		HHuginn::value_t& ref( static_cast<HHuginn::HReference*>( dst.raw() )->value() );
 		if ( operation._operator == OPERATOR::ASSIGN ) {
-			ref = src;
+			ref.swap( src );
 		} else {
 			if ( ref->type_id() != src->type_id() ) {
 				operands_type_mismatch( op_to_str( operation._operator ), ref->type_id(), src->type_id(), file_id(), p );
@@ -905,7 +905,8 @@ void HExpression::do_execute( huginn::HThread* thread_ ) const {
 				break;
 			}
 		}
-		if ( f->state() != HFrame::STATE::EXCEPTION ) {
+		HFrame::STATE s( f->state() );
+		if ( ( s != HFrame::STATE::EXCEPTION ) && ( s != HFrame::STATE::RUNTIME_EXCEPTION ) ) {
 			f->set_result( yaal::move( f->values().top() ) );
 			M_ASSERT( f->ip() == static_cast<int>( _instructions.get_size() ) );
 			f->values().pop();

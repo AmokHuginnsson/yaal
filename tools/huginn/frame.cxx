@@ -91,6 +91,14 @@ void HFrame::reshape( HThread* thread_, int size_ ) {
 }
 
 void HFrame::break_execution( STATE state_ ) {
+	/*
+	 * Order of those two calls matters.
+	 * In case of uncaught exception from Huginn user defined destructor
+	 * we set the state of whole frame stack as STATE::RUNTIME_EXCEPTION.
+	 * Frame state is checked in ~HObject() with has_runtime_exception() call.
+	 * Setting state first here ensures that no more user defined desturctors
+	 * will be called.
+	 */
 	_state = state_;
 	_values.clear();
 	return;
@@ -123,7 +131,14 @@ void HFrame::reset( void ) {
 	M_PROLOG
 	_position = INVALID_POSITION;
 	_statement = nullptr;
-	_result.reset();
+	/*
+	 * Huginn exception thrown from Huginn user defined destructor
+	 * invoked on behave of `_result` could assign
+	 * to `_result` and mess up ref-counter.
+	 * Hence `move` to temporary.
+	 */
+	HHuginn::value_t r( yaal::move( _result ) );
+	r.reset();
 	_variableIdentifiers.clear();
 	_variables.clear();
 	_state = STATE::NORMAL;

@@ -88,7 +88,7 @@ private:
 	int _upCast;
 
 	/*!
-	 * A (linear) store for *local* variables values defined
+	 * A (linear) store for *local* variable values defined
 	 * and available in this scope (frame) so far.
 	 */
 	HHuginn::values_t _variables;

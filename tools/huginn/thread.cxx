@@ -29,6 +29,8 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "thread.hxx"
 #include "runtime.hxx"
+#include "function.hxx"
+#include "keyword.hxx"
 #include "objectfactory.hxx"
 
 using namespace yaal;
@@ -172,6 +174,7 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t&& value_, 
 	int level( 0 );
 	HFrame* target( current_frame() );
 	int no( target->number() );
+	char const* exMsg = "Uncaught exception: ";
 	while ( target ) {
 		if ( target->is_loop() ) {
 			++ level;
@@ -191,8 +194,20 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t&& value_, 
 			break;
 		} else if ( ( state_ == HFrame::STATE::CONTINUE ) && ( level > 0 ) ) {
 			break;
-		} else if ( ( state_ == HFrame::STATE::EXCEPTION ) && target->has_catch() ) {
-			break;
+		} else if ( state_ == HFrame::STATE::EXCEPTION ) {
+			if ( target->has_catch() ) {
+				break;
+			} else if (
+				( target->type() == HFrame::TYPE::FUNCTION )
+				&& ( static_cast<HFunction const*>( target->statement() )->name() == KEYWORD::DESTRUCTOR_IDENTIFIER )
+			) {
+				exMsg = "Uncaught exception from destructor: ";
+				while ( target ) {
+					target->break_execution( HFrame::STATE::RUNTIME_EXCEPTION ); /* ---> DTOR_FIX <--- */
+					target = target->parent();
+				}
+				break;
+			}
 		}
 		target = parent;
 	}
@@ -203,7 +218,7 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t&& value_, 
 		 * Uncaught STATE::EXCEPTION becomes STATE::RUNTIME_EXCEPTION!
 		 */
 		HHuginn::HException const* e( dynamic_cast<HHuginn::HException const*>( value_.raw() ) );
-		_exceptionMessage = "Uncaught exception: ";
+		_exceptionMessage = exMsg;
 		_exceptionFileId = fileId_;
 		_exceptionPosition = position_;
 		if ( e ) {
@@ -242,7 +257,11 @@ bool HThread::has_exception( void ) const {
 }
 
 bool HThread::has_runtime_exception( void ) const {
-	return ( ! _exceptionMessage.is_empty() || ( _exceptionPosition != 0 ) );
+	return (
+		( _currentFrame && _currentFrame->state() == HFrame::STATE::RUNTIME_EXCEPTION ) /* Needed by ~HObject() from DTOR_FIX. */
+		|| ! _exceptionMessage.is_empty()
+		|| ( _exceptionPosition != 0 )
+	);
 }
 
 void HThread::flush_runtime_exception( void ) {

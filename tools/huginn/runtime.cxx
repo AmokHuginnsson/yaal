@@ -972,6 +972,9 @@ HIntrospecteeInterface::call_stack_t HRuntime::get_call_stack( huginn::HThread* 
 		f = f->parent();
 		if ( f && ( position == INVALID_POSITION ) ) {
 			position = f->position();
+			if ( ( position == INVALID_POSITION ) && ( f->statement() ) ) {
+				position = f->statement()->position();
+			}
 		}
 	}
 	return ( callStack );

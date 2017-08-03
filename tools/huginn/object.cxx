@@ -85,10 +85,9 @@ HHuginn::HObject::HObject( HClass const* class_, fields_t const& fields_ )
 
 HHuginn::HObject::~HObject( void ) {
 	M_PROLOG
-	/* *FIXME* *TODO* Remove !is_builtin() test after HObject, HValue hierarchy fix. */
 	HHuginn::HClass const* clss( get_class() );
 	HRuntime* runtime( clss->runtime() );
-	huginn::HThread* t( runtime && ! is_builtin( clss->name() ) ? runtime->current_thread() : nullptr );
+	huginn::HThread* t( runtime ? runtime->current_thread() : nullptr );
 	if ( t && ! t->has_runtime_exception() ) {
 		hobject_destructor_helper::buffer_t buffer;
 		hobject_destructor_helper::allocator<hobject_destructor_helper::holder_t> allocator( buffer.mem() );
