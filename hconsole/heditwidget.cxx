@@ -149,14 +149,6 @@ HInfo const& HEditWidget::do_get_data( void ) const {
 	M_EPILOG
 }
 
-void HEditWidget::set_flags( bool replace_, bool password_ ) {
-	M_PROLOG
-	_replace = replace_;
-	_password = password_;
-	return;
-	M_EPILOG
-}
-
 void HEditWidget::set_bits( int const* maxlen,
 							yaal::hcore::HString const* val, yaal::hcore::HString const* mask,
 							bool const* replace, bool const* multiline,

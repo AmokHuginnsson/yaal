@@ -109,7 +109,6 @@ public:
 								yaal::hcore::HString const& label = "",
 								HWidgetAttributesInterface const& = HWidgetAttributesInterface() );
 	virtual ~HEditWidget( void );
-	void set_flags( bool = false, bool = false );
 	void set_text( yaal::hcore::HString const& );
 	yaal::hcore::HString const& get_text( void ) const;
 	void set_mask( yaal::hcore::HString const& );
