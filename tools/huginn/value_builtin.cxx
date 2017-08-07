@@ -495,6 +495,8 @@ int long hash( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 		rt = hcore::hash<code_point_t>()( static_cast<HHuginn::HCharacter const*>( v_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::BOOLEAN ) {
 		rt = hcore::hash<bool>()( static_cast<HHuginn::HBoolean const*>( v_.raw() )->value() );
+	} else if ( typeId == HHuginn::TYPE::FUNCTION_REFERENCE ) {
+		rt = hcore::hash<int long>()( static_cast<HHuginn::HFunctionReference const*>( v_.raw() )->identifier_id().get() );
 	} else if ( typeId != HHuginn::TYPE::NONE ) {
 		HHuginn::value_t res;
 		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v_.raw() ) ) {
@@ -611,6 +613,8 @@ bool less( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const
 		res = static_cast<HHuginn::HNumber const*>( v1_.raw() )->value() < static_cast<HHuginn::HNumber const*>( v2_.raw() )->value();
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
 		res = static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() < static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value();
+	} else if ( typeId == HHuginn::TYPE::FUNCTION_REFERENCE ) {
+		res = static_cast<HHuginn::HFunctionReference const*>( v1_.raw() )->identifier_id() < static_cast<HHuginn::HFunctionReference const*>( v2_.raw() )->identifier_id();
 	} else {
 		res = fallback_compare( thread_, INTERFACE::LESS, op_to_str( OPERATOR::LESS ), v1_, v2_, position_ );
 	}

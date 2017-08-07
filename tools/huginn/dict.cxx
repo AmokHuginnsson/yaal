@@ -136,6 +136,22 @@ inline HHuginn::value_t update( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_EPILOG
 }
 
+inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "dict.hash", values_, 0, 0, thread_, position_ );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DICT );
+	HHuginn::HDict::values_t const& values( static_cast<HHuginn::HDict*>( object_->raw() )->value() );
+	int long hashValue( static_cast<int long>( HHuginn::TYPE::DICT ) );
+	for ( HHuginn::HDict::values_t::value_type const& v : values ) {
+		hashValue *= 3;
+		hashValue += value_builtin::hash( thread_, v.first, position_ );
+		hashValue *= 3;
+		hashValue += value_builtin::hash( thread_, v.second, position_ );
+	}
+	return ( thread_->object_factory().create_integer( hashValue ) );
+	M_EPILOG
+}
+
 inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DICT );
@@ -166,6 +182,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 				{ "clear",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &dict::clear, _1, _2, _3, _4 ) ),   "erase `dict`'s content, `dict` becomes empty" },
 				{ "add",     objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &dict::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `dict` with key/value pairs from *other* `dict`" },
 				{ "update",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &dict::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `dict` with key/value pairs from *other* `dict`" },
+				{ "hash",    objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &dict::hash, _1, _2, _3, _4 ) ),    "calculate hash value for this `dict`" },
 				{ "equals",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &dict::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `dict` has the same content" }
 			},
 			"The `dict` is a collection providing a sorted key to value map. It supports operations of iteration, key-value insertion, key removal and key search. The keys stored in given `dict` instance must be of uniform type."

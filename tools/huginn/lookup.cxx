@@ -132,6 +132,22 @@ inline HHuginn::value_t update( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_EPILOG
 }
 
+inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "lookup.hash", values_, 0, 0, thread_, position_ );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LOOKUP );
+	HHuginn::HLookup::values_t const& values( static_cast<HHuginn::HLookup*>( object_->raw() )->value() );
+	int long hashValue( static_cast<int long>( HHuginn::TYPE::LOOKUP ) );
+	for ( HHuginn::HLookup::values_t::value_type const& v : values ) {
+		hashValue *= 3;
+		hashValue += value_builtin::hash( thread_, v.first, position_ );
+		hashValue *= 3;
+		hashValue += value_builtin::hash( thread_, v.second, position_ );
+	}
+	return ( thread_->object_factory().create_integer( hashValue ) );
+	M_EPILOG
+}
+
 inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LOOKUP );
@@ -162,6 +178,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 				{ "clear",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &lookup::clear, _1, _2, _3, _4 ) ),   "erase `lookup`'s content, `lookup` becomes empty" },
 				{ "add",     objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &lookup::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `lookup` with key/value pairs from *other* `lookup`" },
 				{ "update",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &lookup::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `lookup` with key/value pairs from *other* `lookup`" },
+				{ "hash",    objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &lookup::hash, _1, _2, _3, _4 ) ),    "calculate hash value for this `lookup`" },
 				{ "equals",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &lookup::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `lookup` has the same content" }
 			},
 			"The `lookup` is a collection providing a sorted key to value map. It supports operations of iteration, key-value insertion, key removal and key search."

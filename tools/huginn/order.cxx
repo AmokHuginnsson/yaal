@@ -127,6 +127,20 @@ inline HHuginn::value_t update( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_EPILOG
 }
 
+inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "order.hash", values_, 0, 0, thread_, position_ );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::ORDER );
+	HHuginn::HOrder::values_t const& values( static_cast<HHuginn::HOrder*>( object_->raw() )->value() );
+	int long hashValue( static_cast<int long>( HHuginn::TYPE::ORDER ) );
+	for ( HHuginn::value_t const& v : values ) {
+		hashValue *= 3;
+		hashValue += value_builtin::hash( thread_, v, position_ );
+	}
+	return ( thread_->object_factory().create_integer( hashValue ) );
+	M_EPILOG
+}
+
 inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::ORDER );
@@ -157,6 +171,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 				{ "clear",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &order::clear, _1, _2, _3, _4 ) ),   "erase `order`'s content, `order` becomes empty" },
 				{ "add",     objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &order::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `order` with values added from *other* `order`" },
 				{ "update",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &order::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `order` with values from *other* `order`" },
+				{ "hash",    objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &order::hash, _1, _2, _3, _4 ) ),    "calculate hash value for this `order`" },
 				{ "equals",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &order::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `order` has the same content" }
 			},
 			"The `order` is a collection of sorted values of uniform types. It supports operations of addition, search and element removal."

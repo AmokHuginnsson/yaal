@@ -123,6 +123,20 @@ inline HHuginn::value_t update( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_EPILOG
 }
 
+inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "set.hash", values_, 0, 0, thread_, position_ );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
+	HHuginn::HSet::values_t const& values( static_cast<HHuginn::HSet*>( object_->raw() )->value() );
+	int long hashValue( static_cast<int long>( HHuginn::TYPE::SET ) );
+	for ( HHuginn::value_t const& v : values ) {
+		hashValue *= 3;
+		hashValue += value_builtin::hash( thread_, v, position_ );
+	}
+	return ( thread_->object_factory().create_integer( hashValue ) );
+	M_EPILOG
+}
+
 inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
@@ -153,6 +167,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 				{ "clear",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &set::clear, _1, _2, _3, _4 ) ),   "erase `set`'s content, `set` becomes empty" },
 				{ "add",     objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &set::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `set` with values from *other* `set`" },
 				{ "update",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &set::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `set` with values from *other* `set`" },
+				{ "hash",    objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &set::hash, _1, _2, _3, _4 ) ),    "calculate hash value for this `set`" },
 				{ "equals",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &set::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `set` has the same content" }
 			},
 			"The `set` is a collection of unique elements of varying types. It supports operation of element insertion, removal and search."

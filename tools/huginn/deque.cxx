@@ -187,6 +187,20 @@ inline HHuginn::value_t clear( huginn::HThread* thread_, HHuginn::value_t* objec
 	M_EPILOG
 }
 
+inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "deque.hash", values_, 0, 0, thread_, position_ );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
+	HHuginn::HDeque::values_t const& values( static_cast<HHuginn::HDeque*>( object_->raw() )->value() );
+	int long hashValue( static_cast<int long>( HHuginn::TYPE::DEQUE ) );
+	for ( HHuginn::value_t const& v : values ) {
+		hashValue *= 3;
+		hashValue += value_builtin::hash( thread_, v, position_ );
+	}
+	return ( thread_->object_factory().create_integer( hashValue ) );
+	M_EPILOG
+}
+
 inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
@@ -220,9 +234,10 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 				{ "prepend",    objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &deque::prepend, _1, _2, _3, _4 ) ),    "( *other* ) - prepend all elements from *other* collection in front of this `deque`" },
 				{ "insert",     objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &deque::insert, _1, _2, _3, _4 ) ),     "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
 				{ "clear",      objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &deque::clear, _1, _2, _3, _4 ) ),      "erase `deque`'s content, `deque` becomes empty" },
+				{ "hash",       objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &deque::hash, _1, _2, _3, _4 ) ),       "calculate hash value for this `deque`" },
 				{ "equals",     objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &deque::equals, _1, _2, _3, _4 ) ),     "( *other* ) - test if *other* `deque` has the same content" }
 			},
-			"The `deque` is a collection type that is used to represent and operate on list of values. "
+			"The `deque` is a collection type that is used to represent and operate on deque of values. "
 			"It supports basic subscript and range operators. "
 			"It also supports efficient operations of addition and removal of its elements at its both ends."
 		)
