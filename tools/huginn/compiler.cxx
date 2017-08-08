@@ -1556,6 +1556,9 @@ bool OCompiler::is_comparable( HHuginn::type_id_t type_ ) {
 		is_numeric( type_ )
 		|| ( type_ == HHuginn::TYPE::STRING )
 		|| ( type_ == HHuginn::TYPE::CHARACTER )
+		|| ( type_ == HHuginn::TYPE::FUNCTION_REFERENCE )
+		|| ( type_ == HHuginn::TYPE::LIST )
+		|| ( type_ == HHuginn::TYPE::DEQUE )
 	);
 }
 

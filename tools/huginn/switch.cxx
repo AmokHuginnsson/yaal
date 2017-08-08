@@ -60,9 +60,6 @@ void HSwitch::do_execute( HThread* thread_ ) const {
 	_expression->execute( thread_ );
 	if ( f->can_continue() ) {
 		HHuginn::value_t v( f->result() );
-		if ( ! OCompiler::is_comparable( v->type_id() ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Expression does not evaluate to comparable type.", file_id(), _expression->position() );
-		}
 		bool matched( false );
 		for ( cases_t::const_iterator it( _cases.begin() ), end( _cases.end() );
 			( it != end ) && f->can_continue(); ++ it ) {

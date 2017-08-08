@@ -201,6 +201,19 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 	M_EPILOG
 }
 
+inline HHuginn::value_t less( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
+	verify_signature( "deque.less", values_, { HHuginn::TYPE::DEQUE }, thread_, position_ );
+	HHuginn::HDeque::values_t const& l( static_cast<HHuginn::HDeque*>( object_->raw() )->value() );
+	HHuginn::HDeque::values_t const& r( static_cast<HHuginn::HDeque const*>( values_[0].raw() )->value() );
+	HHuginn::HValueLessHelper lessHelper;
+	lessHelper.anchor( thread_, position_ );
+	bool res( lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), cref( lessHelper ) ) );
+	return ( thread_->object_factory().create_boolean( res ) );
+	M_EPILOG
+}
+
 inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
@@ -235,6 +248,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 				{ "insert",     objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &deque::insert, _1, _2, _3, _4 ) ),     "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
 				{ "clear",      objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &deque::clear, _1, _2, _3, _4 ) ),      "erase `deque`'s content, `deque` becomes empty" },
 				{ "hash",       objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &deque::hash, _1, _2, _3, _4 ) ),       "calculate hash value for this `deque`" },
+				{ "less",       objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &deque::less, _1, _2, _3, _4 ) ),       "( *other* ) - test if this `deque` comes lexicographically before *other* `deque`" },
 				{ "equals",     objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &deque::equals, _1, _2, _3, _4 ) ),     "( *other* ) - test if *other* `deque` has the same content" }
 			},
 			"The `deque` is a collection type that is used to represent and operate on deque of values. "

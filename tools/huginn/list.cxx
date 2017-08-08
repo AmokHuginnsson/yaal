@@ -154,6 +154,19 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 	M_EPILOG
 }
 
+inline HHuginn::value_t less( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
+	verify_signature( "list.less", values_, { HHuginn::TYPE::LIST }, thread_, position_ );
+	HHuginn::HList::values_t const& l( static_cast<HHuginn::HList*>( object_->raw() )->value() );
+	HHuginn::HList::values_t const& r( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
+	HHuginn::HValueLessHelper lessHelper;
+	lessHelper.anchor( thread_, position_ );
+	bool res( lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), cref( lessHelper ) ) );
+	return ( thread_->object_factory().create_boolean( res ) );
+	M_EPILOG
+}
+
 inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
@@ -185,6 +198,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 				{ "insert", objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &list::insert, _1, _2, _3, _4 ) ), "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
 				{ "clear",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &list::clear, _1, _2, _3, _4 ) ),  "erase `list`'s content, `list` becomes empty" },
 				{ "hash",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &list::hash, _1, _2, _3, _4 ) ),   "calculate hash value for this `list`" },
+				{ "less",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &list::less, _1, _2, _3, _4 ) ),   "( *other* ) - test if this `list` comes lexicographically before *other* `list`" },
 				{ "equals", objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &list::equals, _1, _2, _3, _4 ) ), "( *other* ) - test if *other* `list` has the same content" }
 			},
 			"The `list` is a collection type that is used to represent and operate on `list` of values. "
