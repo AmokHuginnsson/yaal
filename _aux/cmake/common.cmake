@@ -325,7 +325,7 @@ if ( CMAKE_HOST_WIN32 )
 	set( CPACK_GENERATOR "WIX" )
 	set( CPACK_ARCHIVE_COMPONENT_INSTALL ON )
 	set( CPACK_WIX_LIGHT_EXTRA_FLAGS "-sval" )
-	set( CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS "C:/Windows/System32/msvcp120.dll" ) # lib OpenSSL dependency
+	set( CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS "C:/Windows/System32/msvcr120.dll" ) # lib OpenSSL dependency
 	include( InstallRequiredSystemLibraries )
 	include( CPack )
 endif()
