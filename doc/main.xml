@@ -15,10 +15,13 @@
 		<td>Debian Stable</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>Ubuntu 16.10 (Yakkety Yak)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>Ubuntu 17.10 (Artful Aardvark)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>Centos 7 (Final)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>CentOS 7 (Final)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+	</tr>
+	<tr>
+		<td>Fedora 26</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
 		<td>FreeBSD 11.0 (compiled with clang)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
