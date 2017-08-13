@@ -240,7 +240,7 @@ void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifier
 				.append( "' does not have `" )
 				.append( rt.identifier_name( identifierId_ ) )
 				.append( "' member (did you mean `" )
-				.append( rt.suggestion( identifierId_ ) )
+				.append( rt.suggestion( v->get_class(), identifierId_ ) )
 				.append( "'?)." ),
 				file_id(),
 				p

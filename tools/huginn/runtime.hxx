@@ -198,6 +198,7 @@ public:
 	void register_builtins( void );
 
 	yaal::hcore::HString suggestion( HHuginn::identifier_id_t ) const;
+	yaal::hcore::HString suggestion( HHuginn::HClass const*, HHuginn::identifier_id_t ) const;
 
 	yaal::hcore::HString const& function_name( void const* ) const;
 	void copy_text( HRuntime& );

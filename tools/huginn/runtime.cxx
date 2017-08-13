@@ -942,6 +942,26 @@ yaal::hcore::HString HRuntime::suggestion( HHuginn::identifier_id_t identifier_ 
 	M_EPILOG
 }
 
+yaal::hcore::HString HRuntime::suggestion( HHuginn::HClass const* class_, HHuginn::identifier_id_t identifierId_ ) const {
+	M_PROLOG
+	HString identifierName( identifier_name( identifierId_ ) );
+	HString s;
+	int minDiff( meta::max_signed<int>::value );
+	while ( class_ ) {
+		for ( HHuginn::identifier_id_t identifierId : class_->field_identifiers() ) {
+			HString const& name( identifier_name( identifierId ) );
+			int diff( string::distance::levenshtein_damerau( name, identifierName ) );
+			if ( ( diff > 0 ) && ( diff < minDiff ) ) {
+				minDiff = diff;
+				s = name;
+			}
+		}
+		class_ = class_->super();
+	}
+	return ( s );
+	M_EPILOG
+}
+
 yaal::hcore::HString const& HRuntime::function_name( void const* id_ ) const {
 	M_PROLOG
 	static yaal::hcore::HString const unknown( "unknown" );
