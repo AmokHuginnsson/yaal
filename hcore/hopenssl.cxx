@@ -465,13 +465,19 @@ int long HOpenSSL::read( void* buffer_, int long size_ ) {
 int long HOpenSSL::write( void const* buffer_, int long size_ ) {
 	M_PROLOG
 	M_ASSERT( _ssl );
-	if ( _pendingOperation )
+	if ( _pendingOperation ) {
 		accept_or_connect();
+	}
 	int nWritten( -1 );
 	if ( ! _pendingOperation ) {
-		nWritten = SSL_write( static_cast<SSL*>( _ssl ), buffer_, static_cast<int>( size_ ) );
-		if ( nWritten <= 0 )
-			check_err( nWritten );
+		if ( size_ > 0 ) {
+			nWritten = SSL_write( static_cast<SSL*>( _ssl ), buffer_, static_cast<int>( size_ ) );
+			if ( nWritten <= 0 ) {
+				check_err( nWritten );
+			}
+		} else {
+			nWritten = 0;
+		}
 	}
 	return ( nWritten );
 	M_EPILOG
