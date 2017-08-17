@@ -327,196 +327,41 @@ void OCompiler::resolve_symbols( void ) {
 	HHuginn::class_t aClass;
 	int maxLocalVariableCount( 0 );
 	for ( OExecutionStep& es : _executionStepsBacklog ) {
-		if ( es._classId != lastClassId ) {
-			if ( es._classId != INVALID_IDENTIFIER ) {
-				aClass = _runtime->get_class( es._classId );
-				M_ASSERT( !! aClass );
-			} else {
-				aClass.reset();
-			}
-			lastClassId = es._classId;
-		}
-		if ( find_if( _submittedImports.begin(), _submittedImports.end(), [&es]( OImportInfo const& info_ ) { return ( info_._package == es._identifier ); } ) != _submittedImports.end() ) {
-			throw HHuginn::HHuginnRuntimeException( "Making a direct reference to a package is forbidden.", MAIN_FILE_ID, es._position );
-		}
-		do {
-			if ( !! aClass ) {
-				int index( aClass->field_index( es._identifier ) );
-				if ( index >= 0 ) {
-					if ( ! es._expression ) {
-						throw HHuginn::HHuginnRuntimeException(
-							"Method argument name `"_ys
-								.append( _runtime->identifier_name( es._identifier) )
-								.append( "' conflicts with class `" )
-								.append( _runtime->identifier_name( aClass->identifier_id() ) )
-								.append( "' field name." ),
-							MAIN_FILE_ID,
-							es._position
-						);
-					}
-					es._expression->replace_execution_step(
-						es._index,
-						hcore::call(
-							&HExpression::get_field_direct,
-							es._expression.raw(),
-							es._operation == OExecutionStep::OPERATION::USE ? HExpression::ACCESS::VALUE : HExpression::ACCESS::REFERENCE,
-							index,
-							_1,
-							es._position
-						)
-					);
-					break;
-				}
-			}
-			captures_log_t::const_iterator cli( _capturesLog.find( es._scope->_functionId ) );
-			if ( cli != _capturesLog.end() ) {
-				OFunctionContext::parameter_names_t::const_iterator ci( find( cli->second.begin(), cli->second.end(), es._identifier ) );
-				if ( ci != cli->second.end() ) {
-					es._expression->replace_execution_step(
-						es._index,
-						hcore::call(
-							&HExpression::get_field_direct,
-							es._expression.raw(),
-							es._operation == OExecutionStep::OPERATION::USE ? HExpression::ACCESS::VALUE : HExpression::ACCESS::REFERENCE,
-							static_cast<int>( distance( cli->second.begin(), ci ) ),
-							_1,
-							es._position
-						)
-					);
-					break;
-				}
-			}
-			OScopeContext* sc( es._scope.raw() );
-			HHuginn::identifier_id_t fi( sc->_functionId );
-			OScopeContext::OLocalVariable localVariable;
-			while ( sc ) {
-				OScopeContext::local_variables_t::const_iterator it( sc->_variables.find( es._identifier ) );
-				if ( it != sc->_variables.end() ) {
-					localVariable = it->second;
-					break;
-				}
-				if ( sc->_parent && ( sc->_parent->_functionId == fi ) ) {
-					sc = sc->_parent;
+		try {
+			if ( es._classId != lastClassId ) {
+				if ( es._classId != INVALID_IDENTIFIER ) {
+					aClass = _runtime->get_class( es._classId );
+					M_ASSERT( !! aClass );
 				} else {
-					sc = nullptr;
+					aClass.reset();
 				}
+				lastClassId = es._classId;
 			}
-			if ( es._operation == OExecutionStep::OPERATION::DEFINE ) {
-				if ( ! sc ) {
-					sc = es._scope.raw();
-					/*
-					 * There are two kinds of OScopeContexts:
-					 * 1. Real scope context that is equivalent of {...} in program code.
-					 * 2. Virtual scope context that is necessary for proper scoping of `for' and `while' and `if'
-					 *    control variables e.g.:
-					 *        for ( e : list ) { ... }
-					 *    in this case `e' is in virtual scope.
-					 * Finding indices of local variables must take into account both types of scopes
-					 * because real scopes `{}' can be inlined in virtual scopes in run-time,
-					 * like it happens in case of `if/else' statement.
-					 * Inlining `if/else' real scopes has a side effect of allowing different
-					 * variables from different scopes (different `else if' stanzas in the same `if/else' chain)
-					 * to have the same index, this is possible because `[else] if' stanzas are mutually exclusive
-					 * in given `if/else' chain.
-					 */
-					OScopeContext* parent( sc );
-					while ( parent->_parent && ( parent->_parent->_statementId == parent->_statementId ) ) {
-						parent = parent->_parent;
-					}
-					M_ASSERT( localVariable._index == -1 );
-					localVariable._index = static_cast<int>( sc->_variables.get_size() );
-					if ( parent != sc ) {
-						localVariable._index += static_cast<int>( parent->_variables.get_size() );
-					}
-					localVariable._definedBy = es._expression.raw();
-					sc->_variables[es._identifier] = localVariable;
-					if ( ( localVariable._index + 1 ) > maxLocalVariableCount ) {
-						maxLocalVariableCount = localVariable._index + 1;
-					}
-				}
-				if ( !! es._expression ) {
-					if ( _introspector ) {
-						es._expression->replace_execution_step(
-							es._index,
-							hcore::call(
-								&HIntroExpression::get_variable_direct_note,
-								static_cast<HIntroExpression*>( es._expression.raw() ),
-								HExpression::ACCESS::REFERENCE,
-								sc->_statementId,
-								localVariable._index,
-								_1,
-								es._identifier,
+			if ( find_if( _submittedImports.begin(), _submittedImports.end(), [&es]( OImportInfo const& info_ ) { return ( info_._package == es._identifier ); } ) != _submittedImports.end() ) {
+				throw HHuginn::HHuginnRuntimeException( "Making a direct reference to a package is forbidden.", MAIN_FILE_ID, es._position );
+			}
+			do {
+				if ( !! aClass ) {
+					int index( aClass->field_index( es._identifier ) );
+					if ( index >= 0 ) {
+						if ( ! es._expression ) {
+							throw HHuginn::HHuginnRuntimeException(
+								"Method argument name `"_ys
+									.append( _runtime->identifier_name( es._identifier) )
+									.append( "' conflicts with class `" )
+									.append( _runtime->identifier_name( aClass->identifier_id() ) )
+									.append( "' field name." ),
+								MAIN_FILE_ID,
 								es._position
-							)
-						);
-					} else {
+							);
+						}
 						es._expression->replace_execution_step(
 							es._index,
 							hcore::call(
-								&HExpression::get_variable_direct,
+								&HExpression::get_field_direct,
 								es._expression.raw(),
-								HExpression::ACCESS::REFERENCE,
-								sc->_statementId,
-								localVariable._index,
-								_1,
-								es._position
-							)
-						);
-					}
-				} else {
-					/*
-					 * Function arguments would be handled here,
-					 * but they are added explicitly from HFunction::execute().
-					 */
-				}
-				break;
-			} else {
-				if ( sc ) {
-					if ( es._expression.raw() == localVariable._definedBy ) {
-						throw HHuginn::HHuginnRuntimeException(
-							"Symbol `"_ys.append( _runtime->identifier_name( es._identifier ) ).append( "' is not yet defined in this expression." ),
-							MAIN_FILE_ID,
-							es._position
-						);
-					}
-					es._expression->replace_execution_step(
-						es._index,
-						hcore::call(
-							&HExpression::get_variable_direct,
-							es._expression.raw(),
-							es._operation == OExecutionStep::OPERATION::USE ? HExpression::ACCESS::VALUE : HExpression::ACCESS::REFERENCE,
-							sc->_statementId,
-							localVariable._index,
-							_1,
-							es._position
-						)
-					);
-					break;
-				}
-			}
-			if ( ( es._operation == OExecutionStep::OPERATION::USE ) && ! is_keyword( _runtime->identifier_name( es._identifier ) ) ) {
-				HHuginn::value_t* callable( _runtime->get_function( es._identifier ) );
-				if ( !! callable ) {
-					es._expression->replace_execution_step(
-						es._index,
-						hcore::call(
-							&HExpression::store_external_reference,
-							es._expression.raw(),
-							HHuginn::value_ref_t( *callable ),
-							_1,
-							es._position
-						)
-					);
-					break;
-				} else {
-					HHuginn::value_t* p( _runtime->get_package( es._identifier ) );
-					if ( !! p ) {
-						es._expression->replace_execution_step(
-							es._index,
-							hcore::call(
-								&HExpression::store_external_reference,
-								es._expression.raw(),
-								HHuginn::value_ref_t( *p ),
+								es._operation == OExecutionStep::OPERATION::USE ? HExpression::ACCESS::VALUE : HExpression::ACCESS::REFERENCE,
+								index,
 								_1,
 								es._position
 							)
@@ -524,17 +369,181 @@ void OCompiler::resolve_symbols( void ) {
 						break;
 					}
 				}
+				captures_log_t::const_iterator cli( _capturesLog.find( es._scope->_functionId ) );
+				if ( cli != _capturesLog.end() ) {
+					OFunctionContext::parameter_names_t::const_iterator ci( find( cli->second.begin(), cli->second.end(), es._identifier ) );
+					if ( ci != cli->second.end() ) {
+						es._expression->replace_execution_step(
+							es._index,
+							hcore::call(
+								&HExpression::get_field_direct,
+								es._expression.raw(),
+								es._operation == OExecutionStep::OPERATION::USE ? HExpression::ACCESS::VALUE : HExpression::ACCESS::REFERENCE,
+								static_cast<int>( distance( cli->second.begin(), ci ) ),
+								_1,
+								es._position
+							)
+						);
+						break;
+					}
+				}
+				OScopeContext* sc( es._scope.raw() );
+				HHuginn::identifier_id_t fi( sc->_functionId );
+				OScopeContext::OLocalVariable localVariable;
+				while ( sc ) {
+					OScopeContext::local_variables_t::const_iterator it( sc->_variables.find( es._identifier ) );
+					if ( it != sc->_variables.end() ) {
+						localVariable = it->second;
+						break;
+					}
+					if ( sc->_parent && ( sc->_parent->_functionId == fi ) ) {
+						sc = sc->_parent;
+					} else {
+						sc = nullptr;
+					}
+				}
+				if ( es._operation == OExecutionStep::OPERATION::DEFINE ) {
+					if ( ! sc ) {
+						sc = es._scope.raw();
+						/*
+						 * There are two kinds of OScopeContexts:
+						 * 1. Real scope context that is equivalent of {...} in program code.
+						 * 2. Virtual scope context that is necessary for proper scoping of `for' and `while' and `if'
+						 *    control variables e.g.:
+						 *        for ( e : list ) { ... }
+						 *    in this case `e' is in virtual scope.
+						 * Finding indices of local variables must take into account both types of scopes
+						 * because real scopes `{}' can be inlined in virtual scopes in run-time,
+						 * like it happens in case of `if/else' statement.
+						 * Inlining `if/else' real scopes has a side effect of allowing different
+						 * variables from different scopes (different `else if' stanzas in the same `if/else' chain)
+						 * to have the same index, this is possible because `[else] if' stanzas are mutually exclusive
+						 * in given `if/else' chain.
+						 */
+						OScopeContext* parent( sc );
+						while ( parent->_parent && ( parent->_parent->_statementId == parent->_statementId ) ) {
+							parent = parent->_parent;
+						}
+						M_ASSERT( localVariable._index == -1 );
+						localVariable._index = static_cast<int>( sc->_variables.get_size() );
+						if ( parent != sc ) {
+							localVariable._index += static_cast<int>( parent->_variables.get_size() );
+						}
+						localVariable._definedBy = es._expression.raw();
+						sc->_variables[es._identifier] = localVariable;
+						if ( ( localVariable._index + 1 ) > maxLocalVariableCount ) {
+							maxLocalVariableCount = localVariable._index + 1;
+						}
+					}
+					if ( !! es._expression ) {
+						if ( _introspector ) {
+							es._expression->replace_execution_step(
+								es._index,
+								hcore::call(
+									&HIntroExpression::get_variable_direct_note,
+									static_cast<HIntroExpression*>( es._expression.raw() ),
+									HExpression::ACCESS::REFERENCE,
+									sc->_statementId,
+									localVariable._index,
+									_1,
+									es._identifier,
+									es._position
+								)
+							);
+						} else {
+							es._expression->replace_execution_step(
+								es._index,
+								hcore::call(
+									&HExpression::get_variable_direct,
+									es._expression.raw(),
+									HExpression::ACCESS::REFERENCE,
+									sc->_statementId,
+									localVariable._index,
+									_1,
+									es._position
+								)
+							);
+						}
+					} else {
+						/*
+						 * Function arguments would be handled here,
+						 * but they are added explicitly from HFunction::execute().
+						 */
+					}
+					break;
+				} else {
+					if ( sc ) {
+						if ( es._expression.raw() == localVariable._definedBy ) {
+							throw HHuginn::HHuginnRuntimeException(
+								"Symbol `"_ys.append( _runtime->identifier_name( es._identifier ) ).append( "' is not yet defined in this expression." ),
+								MAIN_FILE_ID,
+								es._position
+							);
+						}
+						es._expression->replace_execution_step(
+							es._index,
+							hcore::call(
+								&HExpression::get_variable_direct,
+								es._expression.raw(),
+								es._operation == OExecutionStep::OPERATION::USE ? HExpression::ACCESS::VALUE : HExpression::ACCESS::REFERENCE,
+								sc->_statementId,
+								localVariable._index,
+								_1,
+								es._position
+							)
+						);
+						break;
+					}
+				}
+				if ( ( es._operation == OExecutionStep::OPERATION::USE ) && ! is_keyword( _runtime->identifier_name( es._identifier ) ) ) {
+					HHuginn::value_t* callable( _runtime->get_function( es._identifier ) );
+					if ( !! callable ) {
+						es._expression->replace_execution_step(
+							es._index,
+							hcore::call(
+								&HExpression::store_external_reference,
+								es._expression.raw(),
+								HHuginn::value_ref_t( *callable ),
+								_1,
+								es._position
+							)
+						);
+						break;
+					} else {
+						HHuginn::value_t* p( _runtime->get_package( es._identifier ) );
+						if ( !! p ) {
+							es._expression->replace_execution_step(
+								es._index,
+								hcore::call(
+									&HExpression::store_external_reference,
+									es._expression.raw(),
+									HHuginn::value_ref_t( *p ),
+									_1,
+									es._position
+								)
+							);
+							break;
+						}
+					}
+				}
+				throw HHuginn::HHuginnRuntimeException(
+					"Symbol `"_ys
+						.append( _runtime->identifier_name( es._identifier ) )
+						.append( "' is not defined in this context (did you mean `" )
+						.append( _runtime->suggestion( es._identifier ) )
+						.append( "'?)." ),
+					MAIN_FILE_ID,
+					es._position
+				);
+			} while ( false );
+		} catch ( ... ) {
+			if ( es._classId != INVALID_IDENTIFIER ) {
+				_runtime->drop_class( es._classId );
+			} else {
+				_runtime->drop_function( es._scope->_functionId );
 			}
-			throw HHuginn::HHuginnRuntimeException(
-				"Symbol `"_ys
-					.append( _runtime->identifier_name( es._identifier ) )
-					.append( "' is not defined in this context (did you mean `" )
-					.append( _runtime->suggestion( es._identifier ) )
-					.append( "'?)." ),
-				MAIN_FILE_ID,
-				es._position
-			);
-		} while ( false );
+			throw;
+		}
 	}
 	_runtime->set_max_local_variable_count( maxLocalVariableCount );
 	_scopeContextCache.clear();

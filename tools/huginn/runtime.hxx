@@ -144,7 +144,9 @@ public:
 	class_t get_class( identifier_id_t );
 	value_t* get_package( identifier_id_t );
 	void register_class_low( class_t, HHuginn::ACCESS );
+	void drop_class( identifier_id_t ); /* for failed symbol resolving */
 	void register_function( identifier_id_t, function_t, yaal::hcore::HString const& );
+	void drop_function( identifier_id_t ); /* for failed symbol resolving */
 	void register_package( identifier_id_t, identifier_id_t, HHuginn::paths_t const&, HHuginn::compiler_setup_t, int );
 	class_t create_class( identifier_id_t, HHuginn::HClass const*, field_definitions_t const&, yaal::hcore::HString const& );
 	class_t create_class( yaal::hcore::HString const&, HHuginn::HClass const*, field_definitions_t const&, yaal::hcore::HString const& );

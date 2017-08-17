@@ -257,10 +257,37 @@ void HRuntime::register_class_low( class_t class_, HHuginn::ACCESS classConstruc
 	M_EPILOG
 }
 
+void HRuntime::drop_class( identifier_id_t identifier_ ) {
+	M_PROLOG
+	_functionsAvailable.erase( identifier_ );
+	_functionsStore.erase( identifier_ );
+	_dependencies.erase(
+		yaal::remove_if(
+			_dependencies.begin(),
+			_dependencies.end(),
+			[&identifier_]( class_t const& class_ ) {
+				return ( class_->identifier_id() == identifier_ );
+			}
+		),
+		_dependencies.end()
+	);
+	_classes.erase( identifier_ );
+	return;
+	M_EPILOG
+}
+
 void HRuntime::register_function( identifier_id_t identifier_, function_t function_, yaal::hcore::HString const& doc_ ) {
 	M_PROLOG
 	_functionsStore[ identifier_ ] = _objectFactory->create_function_reference( identifier_, function_, doc_ );
 	_functionsAvailable.insert( identifier_ );
+	return;
+	M_EPILOG
+}
+
+void HRuntime::drop_function( identifier_id_t identifier_ ) {
+	M_PROLOG
+	_functionsAvailable.erase( identifier_ );
+	_functionsStore.erase( identifier_ );
 	return;
 	M_EPILOG
 }
