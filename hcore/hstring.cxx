@@ -2164,7 +2164,7 @@ HString& HString::erase( int long from_, int long length_ ) {
 		int rank( GET_RANK );
 		int long oldSize( GET_SIZE );
 		adaptive::move( MEM, from_, MEM, from_ + length_, rank, oldSize - ( from_ + length_ ) );
-		SET_SIZE( GET_SIZE - length_ );
+		SET_SIZE( oldSize - length_ );
 	}
 	return ( *this );
 	M_EPILOG
