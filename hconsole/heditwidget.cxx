@@ -309,12 +309,14 @@ int HEditWidget::kill_char( void ) {
 	M_PROLOG
 	int err = ( ! _readOnly && ( ( _widgetOffset + _cursorPosition ) > 0 ) ) ? 0 : 1;
 	if ( ! err ) {
-		if ( _widgetOffset > 0 )
+		if ( _widgetOffset > 0 ) {
 			_widgetOffset --;
-		else if ( _cursorPosition > 0 )
+		} else if ( _cursorPosition > 0 ) {
 			_cursorPosition --;
-		if ( ! _replace )
-			_varTmpBuffer.erase( _widgetOffset+ _cursorPosition, 1 );
+		}
+		if ( ! _replace ) {
+			_varTmpBuffer.erase( _widgetOffset + _cursorPosition, 1 );
+		}
 	}
 	return ( err );
 	M_EPILOG
@@ -325,10 +327,11 @@ int HEditWidget::find_bow( int length_ ) {
 	int index = static_cast<int>( _string.reverse_find_other_than( _wordSeparator_, length_ - ( _widgetOffset + _cursorPosition ) ) );
 	if ( index >= 0 ) {
 		index = static_cast<int>( _string.reverse_find_one_of( _wordSeparator_, index ) );
-		if ( index < 0 )
+		if ( index < 0 ) {
 			index = 0;
-		else
+		} else {
 			index = length_ - index;
+		}
 	}
 	return ( index );
 	M_EPILOG
@@ -402,7 +405,7 @@ int HEditWidget::kill_word( int length_ ) {
 int HEditWidget::insert_char( int code_, int length_ ) {
 	M_PROLOG
 	int err = 0;
-	if ( ( ! _readOnly && ( code_ > 31 ) && ( code_ < 256 ) )
+	if ( ( ! _readOnly && ( code_ > 31 ) && ( code_ < KEY_CODE::META_BASE ) )
 			&& ( ( ! _replace && ( length_ < _maxStringSize ) )
 				|| ( _replace && ( ( _widgetOffset + _cursorPosition ) < length_ ) )	) ) {
 		if ( ! _replace ) {
@@ -423,8 +426,9 @@ int HEditWidget::insert_char( int code_, int length_ ) {
 
 int HEditWidget::update_from_history( void ) {
 	M_PROLOG
-	if ( ! _history.is_empty() && ( _historyIt != _history.end() ) )
+	if ( ! _history.is_empty() && ( _historyIt != _history.end() ) ) {
 		_varTmpBuffer = *_historyIt;
+	}
 	int length = static_cast<int>( _varTmpBuffer.get_length() );
 	if ( length >= _widthRaw ) {
 		_cursorPosition = _widthRaw - 1;
@@ -448,23 +452,23 @@ int HEditWidget::do_process_input( int code_ ) {
 	int oldCursorPosition( _cursorPosition );
 	int length( static_cast<int>( _varTmpBuffer.get_length() ) );
 	switch ( code_ ) {
-		case ( KEY_CODE::PAGE_UP ):
+		case ( KEY_CODE::PAGE_UP ): {
 			_historyIt = hcore::cyclic_iterator( _history );
 			errorCode = HISTORY_OPERATION;
-		break;
-		case ( KEY_CODE::PAGE_DOWN ):
+		} break;
+		case ( KEY_CODE::PAGE_DOWN ): {
 			_historyIt = hcore::cyclic_iterator( _history );
 			-- _historyIt;
 			errorCode = HISTORY_OPERATION;
-		break;
-		case ( KEY_CODE::UP ):
+		} break;
+		case ( KEY_CODE::UP ): {
 			++ _historyIt;
 			errorCode = HISTORY_OPERATION;
-		break;
-		case ( KEY_CODE::DOWN ):
+		} break;
+		case ( KEY_CODE::DOWN ): {
 			-- _historyIt;
 			errorCode = HISTORY_OPERATION;
-		break;
+		} break;
 		case ( '\t' ):
 		/* enter works like tab without focus movement */
 		case ( '\r' ): {
@@ -483,53 +487,53 @@ int HEditWidget::do_process_input( int code_ ) {
 				}
 				_historyIt = hcore::cyclic_iterator( _history );
 				-- _historyIt;
-			} else
+			} else {
 				-- _historyIt;
+			}
 			errorCode = DATA_ENTER;
-		}
-		break;
-		case ( KEY_CODE::LEFT ):
+		} break;
+		case ( KEY_CODE::LEFT ): {
 			errorCode = move_left();
-		break;
+		} break;
 		case ( KEY<'a'>::ctrl ):
-		case ( KEY_CODE::HOME ):
+		case ( KEY_CODE::HOME ): {
 			_cursorPosition = 0;
 			_widgetOffset = 0;
-		break;
+		} break;
 		case ( KEY<'e'>::ctrl ):
-		case ( KEY_CODE::END ):
+		case ( KEY_CODE::END ): {
 			errorCode = go_to_end( length );
-		break;
-		case ( KEY_CODE::RIGHT ):
+		} break;
+		case ( KEY_CODE::RIGHT ): {
 			errorCode = move_right( length );
-		break;
-		case ( KEY<'u'>::ctrl ):
+		} break;
+		case ( KEY<'u'>::ctrl ): {
 			errorCode = kill_line();
-		break;
-		case ( KEY_CODE::DELETE ):
+		} break;
+		case ( KEY_CODE::DELETE ): {
 			errorCode = delete_char( length );
-		break;
-		case ( KEY_CODE::BACKSPACE ):
+		} break;
+		case ( KEY_CODE::BACKSPACE ): {
 			errorCode = kill_char();
-		break;
-		case ( KEY_CODE::INSERT ):
+		} break;
+		case ( KEY_CODE::INSERT ): {
 			_replace = ! _replace;
-		break;
-		case ( KEY<'f'>::meta ):
+		} break;
+		case ( KEY<'f'>::meta ): {
 			errorCode = go_to_eow( length );
-		break;
-		case ( KEY<'b'>::meta ):
+		} break;
+		case ( KEY<'b'>::meta ): {
 			errorCode = go_to_bow( length );
-		break;
-		case ( KEY<'d'>::meta ):
+		} break;
+		case ( KEY<'d'>::meta ): {
 			errorCode = delete_word( length );
-		break;
-		case ( KEY<'w'>::ctrl ):
+		} break;
+		case ( KEY<'w'>::ctrl ): {
 			errorCode = kill_word( length );
-		break;
-		default:
+		} break;
+		default: {
 			errorCode = insert_char( code_, length );
-		break;
+		} break;
 	}
 	if ( errorCode == HISTORY_OPERATION ) {
 		errorCode = update_from_history();

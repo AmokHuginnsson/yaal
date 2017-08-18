@@ -43,6 +43,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/hcore.hxx"
 #include "hcore/numeric.hxx"
 #include "hcore/system.hxx"
+#include "hcore/unicode.hxx"
 #include "tools/tools.hxx"
 #include "tools/hterminal.hxx"
 #include "hconsole.hxx"
@@ -667,6 +668,25 @@ void HConsole::ungetch( int code_ ) {
 	M_EPILOG
 }
 
+inline int complete_unicode( WINDOW* window_, int key_ ) {
+	M_PROLOG
+	int tailLength( key_ >= 0 && key_ < 256 ? unicode::utf8_declared_length( static_cast<char>( key_ ) ) - 1 : 0 );
+	yaal::u32_t character( static_cast<yaal::u32_t>( key_ ) );
+	if ( tailLength > 0 ) {
+		M_ENSURE( nodelay( window_, true ) != ERR );
+		static u8_t const mask[] = { 0xff, unicode::ENC_2_BYTES_VALUE_MASK, unicode::ENC_3_BYTES_VALUE_MASK, unicode::ENC_4_BYTES_VALUE_MASK };
+		character &= mask[tailLength];
+		for ( int i( 0 ); i < tailLength; ++ i ) {
+			character <<= 6;
+			int key( wgetch( window_ ) );
+			character |= ( static_cast<u8_t>( key ) & unicode::TAIL_BYTES_VALUE_MASK );
+		}
+		M_ENSURE( nodelay( window_, false ) != ERR );
+	}
+	return ( static_cast<int>( character ) );
+	M_EPILOG
+}
+
 int HConsole::get_key( void ) const {
 	M_PROLOG
 	CURSOR origCursState = CURSOR::INVISIBLE;
@@ -691,7 +711,7 @@ int HConsole::get_key( void ) const {
 		origCursState = curs_set( CURSOR::INVISIBLE );
 		cmvprintf( _height - 1, -1, COLOR::FG_WHITE, "ctrl-%c", _commandComposeCharacter_ );
 		wtimeout( static_cast<WINDOW*>( _window ), _commandComposeDelay_ * 100 );
-		key = wgetch( static_cast<WINDOW*>( _window ) );
+		key = complete_unicode( static_cast<WINDOW*>( _window ), wgetch( static_cast<WINDOW*>( _window ) ) );
 		wtimeout( static_cast<WINDOW*>( _window ), -1 );
 		if ( key == ERR ) {
 			key = KEY<>::ctrl_r( _commandComposeCharacter_ );
@@ -702,7 +722,7 @@ int HConsole::get_key( void ) const {
 				key = KEY<>::command_r( character = key + KEY_CODE::CONTROL_BASE );
 			} else if ( key == KEY_CODE::ESCAPE ) {
 				M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), true ) != ERR );
-				key = wgetch( static_cast<WINDOW*>( _window ) );
+				key = complete_unicode( static_cast<WINDOW*>( _window ), wgetch( static_cast<WINDOW*>( _window ) ) );
 				M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), false ) != ERR );
 				if ( key == ERR ) {
 					key = KEY<>::command_r( character = KEY_CODE::ESCAPE );
@@ -715,52 +735,53 @@ int HConsole::get_key( void ) const {
 			cmvprintf( _height - 1, 6, COLOR::FG_WHITE, " %c", static_cast<char>( character ) );
 		}
 		curs_set( origCursState );
+	} else {
+		switch ( key ) {
+			case ( KEY_NPAGE ):     key = KEY_CODE::PAGE_DOWN; break;
+			case ( KEY_PPAGE ):     key = KEY_CODE::PAGE_UP;   break;
+			case ( KEY_HOME ):      key = KEY_CODE::HOME;      break;
+			case ( 347 ):
+			case ( KEY_END ):       key = KEY_CODE::END;       break;
+			case ( 8 ):
+			case ( 127 ):
+			case ( KEY_BACKSPACE ): key = KEY_CODE::BACKSPACE; break;
+			case ( KEY_UP ):        key = KEY_CODE::UP;        break;
+			case ( KEY_DOWN ):      key = KEY_CODE::DOWN;      break;
+			case ( KEY_LEFT ):      key = KEY_CODE::LEFT;      break;
+			case ( KEY_RIGHT ):     key = KEY_CODE::RIGHT;     break;
+			case ( KEY_DC ):        key = KEY_CODE::DELETE;    break;
+			case ( KEY_IC ):        key = KEY_CODE::INSERT;    break;
+			case ( KEY_F(1) ):      key = KEY_CODE::F1;        break;
+			case ( KEY_F(2) ):      key = KEY_CODE::F2;        break;
+			case ( KEY_F(3) ):      key = KEY_CODE::F3;        break;
+			case ( KEY_F(4) ):      key = KEY_CODE::F4;        break;
+			case ( KEY_F(5) ):      key = KEY_CODE::F5;        break;
+			case ( KEY_F(6) ):      key = KEY_CODE::F6;        break;
+			case ( KEY_F(7) ):      key = KEY_CODE::F7;        break;
+			case ( KEY_F(8) ):      key = KEY_CODE::F8;        break;
+			case ( KEY_F(9) ):      key = KEY_CODE::F9;        break;
+			case ( KEY_F(10) ):     key = KEY_CODE::F10;       break;
+			case ( KEY_F(11) ):     key = KEY_CODE::F11;       break;
+			case ( KEY_F(12) ):     key = KEY_CODE::F12;       break;
+			case ( KEY_F(13) ):     key = KEY_CODE::F13;       break;
+			case ( KEY_F(14) ):     key = KEY_CODE::F14;       break;
+			case ( KEY_F(15) ):     key = KEY_CODE::F15;       break;
+			case ( KEY_F(16) ):     key = KEY_CODE::F16;       break;
+			case ( KEY_F(17) ):     key = KEY_CODE::F17;       break;
+			case ( KEY_F(18) ):     key = KEY_CODE::F18;       break;
+			case ( KEY_F(19) ):     key = KEY_CODE::F19;       break;
+			case ( KEY_F(20) ):     key = KEY_CODE::F20;       break;
+			case ( KEY_F(21) ):     key = KEY_CODE::F21;       break;
+			case ( KEY_F(22) ):     key = KEY_CODE::F22;       break;
+			case ( KEY_F(23) ):     key = KEY_CODE::F23;       break;
+			case ( KEY_F(24) ):     key = KEY_CODE::F24;       break;
+			case ( KEY_MOUSE ):     key = KEY_CODE::MOUSE;     break;
+			default: {
+				key = complete_unicode( static_cast<WINDOW*>( _window ), key );
+			} break;
+		}
 	}
 	M_ENSURE( echo() != ERR );
-	M_ASSERT( ( key < KEY_CODE::SPECIAL_KEY ) || ( key > KEY_CODE::META_BASE ) );
-	switch ( key ) {
-		case ( KEY_NPAGE ):     key = KEY_CODE::PAGE_DOWN; break;
-		case ( KEY_PPAGE ):     key = KEY_CODE::PAGE_UP;   break;
-		case ( KEY_HOME ):      key = KEY_CODE::HOME;      break;
-		case ( 347 ):
-		case ( KEY_END ):       key = KEY_CODE::END;       break;
-		case ( 8 ):
-		case ( 127 ):
-		case ( KEY_BACKSPACE ): key = KEY_CODE::BACKSPACE; break;
-		case ( KEY_UP ):        key = KEY_CODE::UP;        break;
-		case ( KEY_DOWN ):      key = KEY_CODE::DOWN;      break;
-		case ( KEY_LEFT ):      key = KEY_CODE::LEFT;      break;
-		case ( KEY_RIGHT ):     key = KEY_CODE::RIGHT;     break;
-		case ( KEY_DC ):        key = KEY_CODE::DELETE;    break;
-		case ( KEY_IC ):        key = KEY_CODE::INSERT;    break;
-		case ( KEY_F(1) ):      key = KEY_CODE::F1;        break;
-		case ( KEY_F(2) ):      key = KEY_CODE::F2;        break;
-		case ( KEY_F(3) ):      key = KEY_CODE::F3;        break;
-		case ( KEY_F(4) ):      key = KEY_CODE::F4;        break;
-		case ( KEY_F(5) ):      key = KEY_CODE::F5;        break;
-		case ( KEY_F(6) ):      key = KEY_CODE::F6;        break;
-		case ( KEY_F(7) ):      key = KEY_CODE::F7;        break;
-		case ( KEY_F(8) ):      key = KEY_CODE::F8;        break;
-		case ( KEY_F(9) ):      key = KEY_CODE::F9;        break;
-		case ( KEY_F(10) ):     key = KEY_CODE::F10;       break;
-		case ( KEY_F(11) ):     key = KEY_CODE::F11;       break;
-		case ( KEY_F(12) ):     key = KEY_CODE::F12;       break;
-		case ( KEY_F(13) ):     key = KEY_CODE::F13;       break;
-		case ( KEY_F(14) ):     key = KEY_CODE::F14;       break;
-		case ( KEY_F(15) ):     key = KEY_CODE::F15;       break;
-		case ( KEY_F(16) ):     key = KEY_CODE::F16;       break;
-		case ( KEY_F(17) ):     key = KEY_CODE::F17;       break;
-		case ( KEY_F(18) ):     key = KEY_CODE::F18;       break;
-		case ( KEY_F(19) ):     key = KEY_CODE::F19;       break;
-		case ( KEY_F(20) ):     key = KEY_CODE::F20;       break;
-		case ( KEY_F(21) ):     key = KEY_CODE::F21;       break;
-		case ( KEY_F(22) ):     key = KEY_CODE::F22;       break;
-		case ( KEY_F(23) ):     key = KEY_CODE::F23;       break;
-		case ( KEY_F(24) ):     key = KEY_CODE::F24;       break;
-		case ( KEY_MOUSE ):     key = KEY_CODE::MOUSE;     break;
-		default:
-		break;
-	}
 	return ( key );
 	M_EPILOG
 }
