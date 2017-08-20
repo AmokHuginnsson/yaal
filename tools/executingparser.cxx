@@ -3168,6 +3168,33 @@ bool is_known_character( code_point_t char_ ) {
 	return ( ( char_ >= ' ' ) || ( char_ == '\t' ) );
 }
 
+void semantic_unescape( yaal::hcore::HString& str_ ) {
+	M_PROLOG
+	for ( int i( 0 ); i < str_.get_length(); ++ i ) {
+		int k( i );
+		if ( ( str_[k] == '\\' ) && ( ( k + 1 ) < str_.get_length() ) ) {
+			++ k;
+			if ( str_[k] == '\\' ) {
+				++ i;
+				continue;
+			} else if (
+				( str_[k] == 'x' )
+				&& ( ( k + 2 ) < str_.get_length() )
+				&& is_hex_digit( str_[k + 1] )
+				&& is_hex_digit( str_[k + 2] )
+			) {
+				char num[] = { static_cast<char>( str_[k + 1].get() ), static_cast<char>( str_[k + 2].get() ), 0 };
+				code_point_t c( static_cast<u32_t>( stoi( num, nullptr, 16 ) ) );
+				if ( c != 0_ycp ) {
+					str_.replace( i, 4, 1, c );
+				}
+			}
+		}
+	}
+	return;
+	M_EPILOG
+}
+
 }
 
 yaal::hcore::HUTF8String::const_iterator HStringLiteral::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
@@ -3208,6 +3235,7 @@ yaal::hcore::HUTF8String::const_iterator HStringLiteral::do_parse( HExecutingPar
 	if ( valid ) {
 		_cache = HUTF8String( from, scan );
 		++ scan;
+		semantic_unescape( _cache );
 		unescape( _cache, _escapes_ );
 		position_t pos( position( executingParser_, start ) );
 		if ( !! _actionString ) {
