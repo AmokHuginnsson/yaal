@@ -861,27 +861,27 @@ HCharacterClass const& character_class( CHARACTER_CLASS::character_class_t chara
 static yaal::u8_t const ALLOC_BIT_MASK = meta::obinary<010000000>::value;
 static yaal::u8_t const RANK_BIT_MASK =  meta::obinary<001100000>::value;
 #undef IS_INPLACE
-#define IS_INPLACE ( ! ( _mem[ ALLOC_FLAG_INDEX ] & ALLOC_BIT_MASK ) )
+#define IS_INPLACE ( ! ( this->_mem[ ALLOC_FLAG_INDEX ] & ALLOC_BIT_MASK ) )
 #undef GET_RANK
-#define GET_RANK ( ( ( _mem[ ALLOC_FLAG_INDEX ] & RANK_BIT_MASK ) >> 5 ) + 1 )
+#define GET_RANK ( ( ( this->_mem[ ALLOC_FLAG_INDEX ] & RANK_BIT_MASK ) >> 5 ) + 1 )
 #undef EXT_IS_INPLACE
 #define EXT_IS_INPLACE( base ) ( ! ( base._mem[ ALLOC_FLAG_INDEX ] & ALLOC_BIT_MASK ) )
 #undef EXT_GET_RANK
 #define EXT_GET_RANK( base ) ( ( ( base._mem[ ALLOC_FLAG_INDEX ] & RANK_BIT_MASK ) >> 5 ) + 1 )
 #undef MEM
-#define MEM ( IS_INPLACE ? _mem : _ptr )
+#define MEM ( IS_INPLACE ? this->_mem : this->_ptr )
 #undef EXT_MEM
 #define EXT_MEM( base ) ( EXT_IS_INPLACE( base ) ? base._mem : base._ptr )
 #undef GET_SIZE
-#define GET_SIZE ( IS_INPLACE ? ( _mem[ ALLOC_FLAG_INDEX ] & ~RANK_BIT_MASK ) : static_cast<int long>( _len[ 1 ] ) )
+#define GET_SIZE ( IS_INPLACE ? ( this->_mem[ ALLOC_FLAG_INDEX ] & ~RANK_BIT_MASK ) : static_cast<int long>( this->_len[ 1 ] ) )
 #undef EXT_GET_SIZE
 #define EXT_GET_SIZE( base ) ( EXT_IS_INPLACE( base ) ? ( base._mem[ ALLOC_FLAG_INDEX ] & ~RANK_BIT_MASK ) : static_cast<int long>( base._len[ 1 ] ) )
 #undef SET_RANK
-#define SET_RANK( rank ) ( _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( ( _mem[ ALLOC_FLAG_INDEX ] & ~RANK_BIT_MASK ) | ( ( ( rank ) - 1 ) << 5 ) ) )
+#define SET_RANK( rank ) ( this->_mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( ( this->_mem[ ALLOC_FLAG_INDEX ] & ~RANK_BIT_MASK ) | ( ( ( rank ) - 1 ) << 5 ) ) )
 #undef SET_SIZE
 #define SET_SIZE( size ) \
 	do { \
-		( IS_INPLACE ? _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( ( _mem[ ALLOC_FLAG_INDEX ] & RANK_BIT_MASK ) | static_cast<char>( size ) ) : _len[ 1 ] = ( size ) ); \
+		( IS_INPLACE ? this->_mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( ( this->_mem[ ALLOC_FLAG_INDEX ] & RANK_BIT_MASK ) | static_cast<char>( size ) ) : this->_len[ 1 ] = ( size ) ); \
 		if ( ( size ) == 0 ) { \
 			SET_RANK( 1 ); \
 		} \
@@ -889,16 +889,16 @@ static yaal::u8_t const RANK_BIT_MASK =  meta::obinary<001100000>::value;
 #undef GET_ALLOC_BYTES
 #undef SET_ALLOC_BYTES
 #if TARGET_CPU_BITS >= 64
-#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY : _len[ 2 ] & static_cast<int long>( static_cast<int long unsigned>( -1 ) >> 3 ) )
+#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY : this->_len[ 2 ] & static_cast<int long>( static_cast<int long unsigned>( -1 ) >> 3 ) )
 #define SET_ALLOC_BYTES( capacity ) \
 	do { \
-		_len[ 2 ] = ( capacity ); _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( _mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK ); \
+		this->_len[ 2 ] = ( capacity ); this->_mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( this->_mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK ); \
 	} while ( 0 )
 #else /* #if TARGET_CPU_BITS >= 64 */
-#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY : ( _len[ 2 ] & static_cast<int long>( static_cast<int long unsigned>( -1 ) >> 3 ) ) << 3 )
+#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY : ( this->_len[ 2 ] & static_cast<int long>( static_cast<int long unsigned>( -1 ) >> 3 ) ) << 3 )
 #define SET_ALLOC_BYTES( capacity ) \
 	do { \
-		_len[ 2 ] = ( ( capacity ) >> 3 ); _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( _mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK ); \
+		this->_len[ 2 ] = ( ( capacity ) >> 3 ); this->_mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( this->_mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK ); \
 	} while ( 0 )
 #endif /* #else #if TARGET_CPU_BITS >= 64 */
 
@@ -1052,7 +1052,7 @@ void HString::reserve( int long preallocate_ ) {
 void HString::resize( int long const preallocate_, int const rank_ ) {
 	M_PROLOG
 	if ( preallocate_ > 0 ) {
-		reserve( preallocate_, rank_ );
+		reserve( max( preallocate_, GET_SIZE ), rank_ );
 	}
 	SET_SIZE( preallocate_ );
 	return;
@@ -1833,7 +1833,7 @@ HString& HString::replace( HString const& pattern_, HString const& with_ ) {
 	int long newSize( oldSize + subWP * patternOffsets.get_size() );
 	int withRank( EXT_GET_RANK( with_ ) );
 	int rank( max( GET_RANK, withRank ) );
-	reserve( max( oldSize, newSize ), rank );
+	resize( newSize, rank );
 	void* dst( MEM );
 	void const* src( EXT_MEM( with_ ) );
 	int long extraOffset( 0 );
@@ -1853,7 +1853,6 @@ HString& HString::replace( HString const& pattern_, HString const& with_ ) {
 		srcOffset += lenPattern;
 	}
 	adaptive::move( dst, dstOffset, dst, srcOffset + extraOffset, rank, oldSize - srcOffset );
-	SET_SIZE( newSize );
 	return ( *this );
 	M_EPILOG
 }
@@ -1909,24 +1908,24 @@ HString& HString::replace( int long thisOffset_, int long onto_, HString const& 
 	M_EPILOG
 }
 
-HString& HString::replace( int long pos_, int long size_, int long count_, code_point_t value_ ) {
+HString& HString::replace( int long pos_, int long onto_, int long count_, code_point_t value_ ) {
 	M_PROLOG
-	replace_check( pos_, size_, 0, 0, MAX_STRING_LENGTH );
+	replace_check( pos_, onto_, 0, 0, MAX_STRING_LENGTH );
 	int long oldSize( GET_SIZE );
 	int withRank( unicode::rank( value_ ) );
 	int rank( GET_RANK );
-	int long newSize( oldSize + ( count_ - size_ ) );
+	int long newSize( oldSize + ( count_ - onto_ ) );
 	resize( newSize, rank = max( rank, withRank ) );
-	adaptive::move( MEM, pos_ + count_, MEM, pos_ + size_, rank, oldSize - ( pos_ + size_ ) );
+	adaptive::move( MEM, pos_ + count_, MEM, pos_ + onto_, rank, oldSize - ( pos_ + onto_ ) );
 	adaptive::fill( MEM, rank, pos_, count_, value_ );
 	return ( *this );
 	M_EPILOG
 }
 
-HString& HString::replace( int long pos_, int long size_, char const* buffer_, int long len_ ) {
+HString& HString::replace( int long pos_, int long onto_, char const* buffer_, int long len_ ) {
 	M_PROLOG
-	replace_check( pos_, size_, 0, len_, len_ );
-	from_utf8( pos_, size_, buffer_, len_ );
+	replace_check( pos_, onto_, 0, len_, len_ );
+	from_utf8( pos_, onto_, buffer_, len_ );
 	return ( *this );
 	M_EPILOG
 }
