@@ -32,6 +32,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "executingparser.hxx"
 
+#include "hcore/unicode.hxx"
 #include "hcore/hstack.hxx"
 #include "hcore/hfile.hxx"
 #include "hcore/hmultimap.hxx"
@@ -3177,16 +3178,32 @@ void semantic_unescape( yaal::hcore::HString& str_ ) {
 			if ( str_[k] == '\\' ) {
 				++ i;
 				continue;
-			} else if (
-				( str_[k] == 'x' )
-				&& ( ( k + 2 ) < str_.get_length() )
-				&& is_hex_digit( str_[k + 1] )
-				&& is_hex_digit( str_[k + 2] )
-			) {
-				char num[] = { static_cast<char>( str_[k + 1].get() ), static_cast<char>( str_[k + 2].get() ), 0 };
-				code_point_t c( static_cast<u32_t>( stoi( num, nullptr, 16 ) ) );
-				if ( c != 0_ycp ) {
-					str_.replace( i, 4, 1, c );
+			}
+			code_point_t prefix( str_[k] );
+			int codeLen( 0 );
+			switch ( prefix.get() ) {
+				case ( 'x' ): { codeLen = 2; } break;
+				case ( 'u' ): { codeLen = 4; } break;
+				case ( 'U' ): { codeLen = 8; } break;
+			}
+			if ( ( codeLen > 0 ) && ( ( k + codeLen ) < str_.get_length() ) ) {
+				bool good( true );
+				char num[10];
+				++ k;
+				for ( int n( 0 ); n < codeLen; ++ n ) {
+					code_point_t d( str_[k + n] );
+					if ( ! is_hex_digit( d ) ) {
+						good = false;
+						break;
+					}
+					num[n] = static_cast<char>( d.get() );
+				}
+				num[codeLen] = 0;
+				if ( good ) {
+					code_point_t c( static_cast<u32_t>( stoul( num, nullptr, 16 ) ) );
+					if ( ( c != 0_ycp ) && ( c < unicode::UCS_MAX_4_BYTE_CODE_POINT ) ) {
+						str_.replace( i, 2 + codeLen, 1, c );
+					}
 				}
 			}
 		}
