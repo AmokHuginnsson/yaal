@@ -140,7 +140,7 @@ void HDataListWidget::do_load( int long id_ ) {
 				char const* format( _iso8601DateTimeFormat_ );
 				HTime t( HTime::TZ::UTC, static_cast<yaal::i64_t>( 0 ) );
 				if ( !! row[i] ) {
-					HString const& s( *row[i] );
+					HString s( *row[i] );
 					bool datePart( s.find_one_of( "/-" ) != HString::npos );
 					bool timePart( s.find( ':'_ycp ) != HString::npos );
 					if ( ! datePart && timePart ) {
