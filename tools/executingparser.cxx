@@ -3212,12 +3212,30 @@ void semantic_unescape( yaal::hcore::HString& str_ ) {
 	M_EPILOG
 }
 
-}
+class HParseResult {
+	yaal::hcore::HUTF8String::const_iterator _scan;
+	bool _valid;
+public:
+	HParseResult( yaal::hcore::HUTF8String::const_iterator scan_, bool valid_ )
+		: _scan( scan_ )
+		, _valid( valid_ ) {
+	}
+	yaal::hcore::HUTF8String::const_iterator scan( void ) const {
+		return ( _scan );
+	}
+	bool valid( void ) const {
+		return ( _valid );
+	}
+};
 
-yaal::hcore::HUTF8String::const_iterator HStringLiteral::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
-	M_PROLOG
-	yaal::hcore::HUTF8String::const_iterator start( skip_space( first_, last_ ) );
-	yaal::hcore::HUTF8String::const_iterator scan( start );
+HParseResult parse_quoted(
+	yaal::hcore::HString& onto_,
+	yaal::hcore::HUTF8String::const_iterator first_,
+	yaal::hcore::HUTF8String::const_iterator from_,
+	yaal::hcore::HUTF8String::const_iterator last_,
+	code_point_t quote_
+) {
+	yaal::hcore::HUTF8String::const_iterator scan( from_ );
 	bool valid( false );
 	yaal::hcore::HUTF8String::const_iterator from;
 	do {
@@ -3225,12 +3243,12 @@ yaal::hcore::HUTF8String::const_iterator HStringLiteral::do_parse( HExecutingPar
 			scan = first_;
 			break;
 		}
-		if( *scan != '"' ) {
+		if( *scan != quote_ ) {
 			break;
 		}
 		++ scan;
 		from = scan;
-		while ( ( scan != last_ ) && ( *scan != '"' ) ) {
+		while ( ( scan != last_ ) && ( *scan != quote_ ) ) {
 			if ( *scan == '\\' ) {
 				++ scan;
 				if ( ! ( scan != last_ ) ) {
@@ -3243,14 +3261,26 @@ yaal::hcore::HUTF8String::const_iterator HStringLiteral::do_parse( HExecutingPar
 			++ scan;
 		}
 		if ( scan != last_ ) {
-			if ( *scan != '"' ) {
+			if ( *scan != quote_ ) {
 				break;
 			}
 			valid = true;
 		}
 	} while ( false );
 	if ( valid ) {
-		_cache = HUTF8String( from, scan );
+		onto_ = HUTF8String( from, scan );
+	}
+	return ( HParseResult( scan, valid ) );
+}
+
+}
+
+yaal::hcore::HUTF8String::const_iterator HStringLiteral::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
+	M_PROLOG
+	yaal::hcore::HUTF8String::const_iterator start( skip_space( first_, last_ ) );
+	HParseResult parseResult( parse_quoted( _cache, first_, start, last_, '"'_ycp ) );
+	yaal::hcore::HUTF8String::const_iterator scan( parseResult.scan() );
+	if ( parseResult.valid() ) {
 		++ scan;
 		semantic_unescape( _cache );
 		unescape( _cache, _escapes_ );
@@ -3390,57 +3420,30 @@ bool HCharacterLiteral::do_has_action( void ) const {
 yaal::hcore::HUTF8String::const_iterator HCharacterLiteral::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
 	M_PROLOG
 	yaal::hcore::HUTF8String::const_iterator start( skip_space( first_, last_ ) );
-	yaal::hcore::HUTF8String::const_iterator scan( start );
-	bool valid( false );
-	yaal::hcore::HUTF8String::const_iterator from;
-	do {
-		if ( scan == last_ ) {
-			scan = first_;
-			break;
-		}
-		if ( *scan != '\'' ) {
-			break;
-		}
+	HParseResult parseResult( parse_quoted( _cache, first_, start, last_, '\''_ycp ) );
+	yaal::hcore::HUTF8String::const_iterator scan( parseResult.scan() );
+	static char const errMsg[] = "expected literal character";
+	if ( parseResult.valid() ) {
 		++ scan;
-		from = scan;
-		if ( scan != last_ ) {
-			if ( *scan == '\'' ) {
-				break;
-			}
-			if ( *scan == '\\' ) {
-				++ scan;
-				if ( ! ( scan != last_ ) ) {
-					break;
-				}
-			}
-			if ( ! is_known_character( *scan ) ) {
-				break;
-			}
-			++ scan;
-		}
-		if ( scan != last_ ) {
-			if ( *scan != '\'' ) {
-				break;
-			}
-			valid = true;
-		}
-	} while ( false );
-	if ( valid ) {
-		_cache = HUTF8String( from, scan );
-		++ scan;
+		semantic_unescape( _cache );
 		unescape( _cache, _escapes_ );
-		position_t pos( position( executingParser_, start ) );
-		if ( !! _actionCharacter ) {
-			add_execution_step( executingParser_, start, call( _actionCharacter, _cache[0] ) );
-		} else if ( !! _actionCharacterPosition ) {
-			add_execution_step( executingParser_, start, call( _actionCharacterPosition, _cache[0], pos ) );
-		} else if ( !! _action ) {
-			add_execution_step( executingParser_, start, _action );
-		} else if ( !! _actionPosition ) {
-			add_execution_step( executingParser_, start, call( _actionPosition, pos ) );
+		if ( _cache.get_length() == 1 ) {
+			position_t pos( position( executingParser_, start ) );
+			if ( !! _actionCharacter ) {
+				add_execution_step( executingParser_, start, call( _actionCharacter, _cache[0] ) );
+			} else if ( !! _actionCharacterPosition ) {
+				add_execution_step( executingParser_, start, call( _actionCharacterPosition, _cache[0], pos ) );
+			} else if ( !! _action ) {
+				add_execution_step( executingParser_, start, _action );
+			} else if ( !! _actionPosition ) {
+				add_execution_step( executingParser_, start, call( _actionPosition, pos ) );
+			}
+		} else {
+			report_error( executingParser_, scan, errMsg );
+			scan = first_;
 		}
 	} else {
-		report_error( executingParser_, scan, "expected literal string" );
+		report_error( executingParser_, scan, errMsg );
 		scan = first_;
 	}
 	return ( scan );
