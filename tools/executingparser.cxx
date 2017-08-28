@@ -3186,24 +3186,38 @@ void semantic_unescape( yaal::hcore::HString& str_ ) {
 				case ( 'u' ): { codeLen = 4; } break;
 				case ( 'U' ): { codeLen = 8; } break;
 			}
-			if ( ( codeLen > 0 ) && ( ( k + codeLen ) < str_.get_length() ) ) {
-				bool good( true );
-				char num[10];
-				++ k;
-				for ( int n( 0 ); n < codeLen; ++ n ) {
-					code_point_t d( str_[k + n] );
-					if ( ! is_hex_digit( d ) ) {
-						good = false;
+			int base( 16 );
+			bool good( false );
+			char num[10];
+			if ( codeLen > 0 ) {
+				if ( ( k + codeLen ) < str_.get_length() ) {
+					good = true;
+					++ k;
+					for ( int n( 0 ); n < codeLen; ++ n ) {
+						code_point_t d( str_[k + n] );
+						if ( ! is_hex_digit( d ) ) {
+							good = false;
+							break;
+						}
+						num[n] = static_cast<char>( d.get() );
+					}
+				}
+			} else {
+				base = 8;
+				for ( int len( min( 3, static_cast<int>( str_.get_length() ) - k ) ); codeLen < len; ++ codeLen ) {
+					code_point_t d( str_[k + codeLen] );
+					if ( ! is_oct_digit( d ) ) {
 						break;
 					}
-					num[n] = static_cast<char>( d.get() );
+					num[codeLen] = static_cast<char>( d.get() );
+					good = true;
 				}
+			}
+			if ( good ) {
 				num[codeLen] = 0;
-				if ( good ) {
-					code_point_t c( static_cast<u32_t>( stoul( num, nullptr, 16 ) ) );
-					if ( ( c != 0_ycp ) && ( c < unicode::UCS_MAX_4_BYTE_CODE_POINT ) ) {
-						str_.replace( i, 2 + codeLen, 1, c );
-					}
+				code_point_t c( static_cast<u32_t>( stoul( num, nullptr, base ) ) );
+				if ( ( c != 0_ycp ) && ( c < unicode::UCS_MAX_4_BYTE_CODE_POINT ) ) {
+					str_.replace( i, ( base == 16 ? 2 : 1 ) + codeLen, 1, c );
 				}
 			}
 		}
