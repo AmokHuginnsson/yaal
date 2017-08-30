@@ -36,7 +36,6 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/hstack.hxx"
 #include "hcore/hfile.hxx"
 #include "hcore/hmultimap.hxx"
-#include "tools/escape.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::tools::util;
@@ -51,10 +50,13 @@ namespace {
 
 static char const _raw_[] = "\n\r\t\b\a\f\033\v";
 static char const _safe_[] = "nrtbafev";
-static EscapeTable const _escapes_( _raw_,  static_cast<int>( sizeof ( _raw_ ) )  - 1,
-                                    _safe_, static_cast<int>( sizeof ( _safe_ ) ) - 1 );
 
 }
+
+EscapeTable const _escapes_(
+	_raw_,  static_cast<int>( sizeof ( _raw_ ) )  - 1,
+	_safe_, static_cast<int>( sizeof ( _safe_ ) ) - 1
+);
 
 class HRecursionDetector {
 	typedef yaal::hcore::HArray<HRuleBase const*> visited_t;

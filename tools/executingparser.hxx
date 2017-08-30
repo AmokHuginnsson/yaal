@@ -40,6 +40,7 @@ Copyright:
 #include "hcore/hqueue.hxx"
 #include "hcore/hboundcall.hxx"
 #include "hcore/htaggedpod.hxx"
+#include "tools/escape.hxx"
 
 namespace yaal {
 
@@ -1034,6 +1035,8 @@ HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const&, HRuleBase
 HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const&, HRuleBase::action_position_t const&, bool = true );
 HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const&, HRegex::action_string_t const&, bool = true );
 HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const&, HRegex::action_string_position_t const&, bool = true );
+
+extern util::EscapeTable const _escapes_;
 
 }
 
