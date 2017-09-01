@@ -63,19 +63,31 @@ void escape( yaal::hcore::HString& string_, EscapeTable const& et_, code_point_t
 		static cache_t _cache_;
 		HChunk& cache( *_cache_ );
 		static int const CODE_POINT_SIZE( static_cast<int>( sizeof ( code_point_t ) ) );
-		cache.realloc( chunk_size<code_point_t>( string_.get_length() ) );
-		int cacheSize( static_cast<int>( cache.get_size() ) / CODE_POINT_SIZE );
-		int pos( 0 );
-		code_point_t* ptr( cache.get<code_point_t>() );
-		for ( HString::const_iterator it( string_.begin() ), end( string_.end() ); it != end; ++ it, ++ pos ) {
-			code_point_t ch( unicode::rank( *it ) == 1 ? code_point_t( static_cast<yaal::u32_t>( et_._rawToSafe[static_cast<char unsigned>( (*it).get() )] ) ) : *it );
-			if ( ( pos + 1 ) >= cacheSize ) {
-				cache.realloc( chunk_size<code_point_t>( cacheSize * 2 ) );
+		int cacheSize( 0 );
+		code_point_t* ptr( nullptr );
+		auto cache_update = [&cache, &cacheSize, &ptr]( int size_ ) {
+			if ( size_ > cacheSize ) {
+				cache.realloc( chunk_size<code_point_t>( max( cacheSize * 2, size_ ) ) );
 				cacheSize = static_cast<int>( cache.get_size() ) / CODE_POINT_SIZE;
 				ptr = cache.get<code_point_t>();
 			}
+		};
+		cache_update( static_cast<int>( string_.get_length() ) );
+		int pos( 0 );
+		for ( HString::const_iterator it( string_.begin() ), end( string_.end() ); it != end; ++ it, ++ pos ) {
+			code_point_t ch(
+				unicode::rank( *it ) == 1
+				? code_point_t(
+						static_cast<char unsigned>(
+							et_._rawToSafe[static_cast<char unsigned>( (*it).get() )]
+						)
+					)
+				: *it
+			);
+			cache_update( pos + 1 );
 			if ( ch != *it ) {
 				ptr[pos ++] = escape_;
+				cache_update( pos + 1 );
 			}
 			ptr[ pos ] = ch;
 		}
@@ -103,7 +115,11 @@ void unescape( yaal::hcore::HString& string_, EscapeTable const& et_, code_point
 				if ( ! ( it != end ) ) {
 					break;
 				}
-				ptr[pos] = unicode::rank( *it ) == 1 ? code_point_t(static_cast<yaal::u32_t>( et_._safeToRaw[static_cast<char unsigned>( (*it).get() )] ) ) : *it;
+				ptr[pos] = unicode::rank( *it ) == 1
+					? code_point_t(
+							static_cast<char unsigned>( et_._safeToRaw[static_cast<char unsigned>( (*it).get() )] )
+						)
+					: *it;
 			} else {
 				ptr[pos] = *it;
 			}
