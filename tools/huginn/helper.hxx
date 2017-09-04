@@ -52,6 +52,13 @@ enum class ONTICALLY {
 	VIRTUAL
 };
 
+enum class BASE {
+	DEC,
+	HEX,
+	OCT,
+	BIN
+};
+
 class HThread;
 
 typedef yaal::hcore::HArray<HHuginn::TYPE> types_t;
@@ -97,6 +104,8 @@ data_t get_by_type( HHuginn::value_t const& );
 
 template<typename data_t>
 data_t get_by_type( HHuginn::value_t& );
+
+yaal::hcore::HString int_to_str( HHuginn::HInteger::value_type, BASE, bool );
 
 template<typename data_t, typename iterator_t>
 class HValueUnboxingIterator : public yaal::hcore::iterator_interface<data_t, yaal::hcore::iterator_category::forward> {

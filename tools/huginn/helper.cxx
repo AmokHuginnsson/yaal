@@ -32,6 +32,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "keyword.hxx"
 #include "value_builtin.hxx"
 #include "tools/util.hxx"
+#include "tools/hstringstream.hxx"
+#include "tools/streamtools.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -608,6 +610,28 @@ char const* op_to_str( OPERATOR o_ ) {
 		case ( OPERATOR::NONE ): break;
 	}
 	return ( str );
+}
+
+yaal::hcore::HString int_to_str( HHuginn::HInteger::value_type int_, BASE base_, bool prefix_ ) {
+	M_PROLOG
+	HStringStream ss;
+	switch ( base_ ) {
+		case ( BASE::DEC ): ss << int_; break;
+		case ( BASE::HEX ): ss << ( prefix_ ? "0x" : "" ) << hex << int_; break;
+		case ( BASE::OCT ): ss << ( prefix_ ? "0o"  : "" ) << oct << int_; break;
+		case ( BASE::BIN ): {
+			HStringStream bs;
+			bs << bin << int_;
+			HString s( bs.string() );
+			s.trim_left( "0" );
+			if ( s.is_empty() ) {
+				s.assign( "0" );
+			}
+			ss << ( prefix_ ? "0b" : "" ) << s;
+		} break;
+	}
+	return ( ss.string() );
+	M_EPILOG
 }
 
 }

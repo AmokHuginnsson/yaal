@@ -129,7 +129,10 @@ public:
 	}
 	void ensure( bool condResult_, char const* msg_ ) {
 		if ( ! condResult_ ) {
-			throw HHuginn::HHuginnRuntimeException( hcore::to_string( msg_ ).append( _it - _format.begin() ), _thread->current_frame()->file_id(), _position );
+			throw HHuginn::HHuginnRuntimeException(
+				hcore::to_string( msg_ ).append( " at: " ).append( _it - _format.begin() ), _thread->current_frame()->file_id(),
+				_position
+			);
 		}
 	}
 	void format( void ) {
@@ -137,27 +140,34 @@ public:
 		int fmtSubstCount( 0 );
 		bool autoIndex( false );
 		HString idxRaw;
-		char const* errMsg( "Invalid format specification at: " );
+		HString specRaw;
+		HString formatedValue;
+		char const* errMsg( "Invalid format specification" );
 		int maxUsedValue( -1 );
 		int valCount( static_cast<int>( _values.get_size() ) );
 		for ( HString::const_iterator end( _format.end() ); _it != end; ++ _it ) {
 			if ( *_it == FMT_OPEN ) {
 				++ _it;
-				ensure( _it != end, "Single '{' encountered in format string at: " );
+				ensure( _it != end, "Single '{' encountered in format string" );
 				if ( *_it != FMT_OPEN ) {
 					idxRaw.clear();
 					while ( ( _it != end ) && is_digit( *_it ) ) {
-						idxRaw.append( *_it );
+						idxRaw.push_back( *_it );
 						++ _it;
 					}
 					ensure( _it != end, errMsg );
 					if ( *_it == FMT_SPEC ) {
 						++ _it;
+						specRaw.clear();
+						while ( ( _it != end ) && ( *_it != FMT_CLOSE ) ) {
+							specRaw.push_back( *_it );
+							++ _it;
+						}
 						ensure( _it != end, errMsg );
 					}
 					ensure( *_it == FMT_CLOSE, errMsg );
 					if ( fmtSubstCount > 0 ) {
-						ensure( (  autoIndex && idxRaw.is_empty() ) || ( ! autoIndex && ! idxRaw.is_empty() ), "Cannot mix manual and automatic field numbering at: " );
+						ensure( (  autoIndex && idxRaw.is_empty() ) || ( ! autoIndex && ! idxRaw.is_empty() ), "Cannot mix manual and automatic field numbering" );
 					}
 					autoIndex = idxRaw.is_empty();
 					int idx( fmtSubstCount );
@@ -170,18 +180,71 @@ public:
 					}
 					++ fmtSubstCount;
 					maxUsedValue = max( idx, maxUsedValue );
-					ensure( idx < valCount, "Wrong value index at: " );
-					HHuginn::value_t v( value_builtin::string( _thread, _values[idx], _position ) );
-					_result.append( static_cast<HHuginn::HString*>( v.raw() )->value() );
+					ensure( idx < valCount, "Wrong value index" );
+					HHuginn::value_t const& v( _values[idx] );
+					HHuginn::type_id_t type( v->type_id() );
+					BASE base( BASE::DEC );
+					bool prefix( false );
+					int width( 0 );
+					code_point_t fill( ' '_ycp );
+					if ( ! specRaw.is_empty() ) {
+						prefix = specRaw.front() == '#'_ycp;
+						code_point_t typeSpec( specRaw.back() );
+						specRaw.pop_back();
+						if ( prefix ) {
+							specRaw.shift_left( 1 );
+						}
+						switch ( typeSpec.get() ) {
+							case ( 'x' ): base = BASE::HEX; /* fallthrough */
+							case ( 'o' ): if ( base == BASE::DEC ) { base = BASE::OCT; } /* fallthrough */
+							case ( 'b' ): if ( base == BASE::DEC ) { base = BASE::BIN; } /* fallthrough */
+							case ( 'd' ): {
+								ensure( type == HHuginn::TYPE::INTEGER, "Expected an `integer` type" );
+							} break;
+							case ( 'f' ): {
+								ensure( type == HHuginn::TYPE::REAL, "Expected a `real` type" );
+							} break;
+							case ( 's' ): {
+								ensure( type == HHuginn::TYPE::STRING, "Expected a `string` type" );
+							} break;
+							case ( 'c' ): {
+								ensure( type == HHuginn::TYPE::CHARACTER, "Expected a `character` type" );
+							} break;
+							default: {
+								ensure( false, "Invalid type specification at: " );
+							} break;
+						}
+						if ( ! specRaw.is_empty() ) {
+							if ( specRaw.front() == '0'_ycp ) {
+								fill = '0'_ycp;
+								specRaw.shift_left( 1 );
+							}
+							try {
+								width = lexical_cast<int>( specRaw );
+							} catch ( HLexicalCastException const& e ) {
+								ensure( false, e.what() );
+							}
+						}
+					}
+					if ( ( type == HHuginn::TYPE::INTEGER ) && ( base != BASE::DEC ) ) {
+						formatedValue.assign( int_to_str( static_cast<HHuginn::HInteger const*>( v.raw() )->value(), base, prefix ) );
+					} else {
+						HHuginn::value_t sv( value_builtin::string( _thread, _values[idx], _position ) );
+						formatedValue.assign( static_cast<HHuginn::HString*>( sv.raw() )->value() );
+					}
+					if ( width > formatedValue.get_length() ) {
+						formatedValue.shift_right( width - formatedValue.get_length(), fill );
+					}
+					_result.append( formatedValue );
 					continue;
 				}
 			} else if ( *_it == FMT_CLOSE ) {
 				++ _it;
-				ensure( ( _it != end ) && ( *_it == FMT_CLOSE ), "Single '}' encountered in format string at: " );
+				ensure( ( _it != end ) && ( *_it == FMT_CLOSE ), "Single '}' encountered in format string" );
 			}
 			_result.append( *_it );
 		}
-		ensure( maxUsedValue == ( valCount - 1 ), "Not all values used in format at: " );
+		ensure( maxUsedValue == ( valCount - 1 ), "Not all values used in format" );
 		return;
 		M_EPILOG
 	}
