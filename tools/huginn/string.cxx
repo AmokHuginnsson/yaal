@@ -211,7 +211,7 @@ public:
 								ensure( type == HHuginn::TYPE::CHARACTER, "Expected a `character` type" );
 							} break;
 							default: {
-								ensure( false, "Invalid type specification at: " );
+								ensure( false, "Invalid type specification" );
 							} break;
 						}
 						if ( ! specRaw.is_empty() ) {

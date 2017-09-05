@@ -117,8 +117,20 @@ M_EXPORT_SYMBOL void driver_init( void ) {
 M_EXPORT_SYMBOL void driver_cleanup( void );
 M_EXPORT_SYMBOL void driver_cleanup( void ) {
 	M_PROLOG
+#ifndef __HOST_OS_TYPE_FEDORA__
+	/*
+	 * mysql_library_end() causes crash on Fedora via:
+	 *
+	 * ERR_clear_error()
+	 * vio_end()
+	 * mysql_library_end()
+	 *
+	 * stack, it is probably an invalid free in OpenSSL library.
+	 *
+	 */
 	log << "Cleaning up after MySQL driver." << endl;
 	mysql_library_end();
+#endif /* #ifndef __HOST_OS_TYPE_FEDORA__ */
 	return;
 	M_EPILOG
 }

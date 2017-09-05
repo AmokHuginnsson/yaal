@@ -9,6 +9,7 @@
 #cmakedefine __HOST_OS_TYPE_DEBIAN__
 #cmakedefine __HOST_OS_TYPE_UBUNTU__
 #cmakedefine __HOST_OS_TYPE_CENTOS__
+#cmakedefine __HOST_OS_TYPE_FEDORA__
 #cmakedefine __HOST_OS_TYPE_PLD__
 #cmakedefine __HOST_OS_TYPE_SLACKWARE__
 #cmakedefine __HOST_OS_TYPE_FREEBSD__

@@ -126,6 +126,9 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 		elif test ["x${HOST_OS_TYPE}"] = ["xCentOS"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/yum.repos.d/CentOS-Base.repo] \) ; then
 			AC_DEFINE([__HOST_OS_TYPE_CENTOS__], [], [Your specific linux version is CentOS.])
 			HOST_OS_TYPE=[CentOS]
+		elif test ["x${HOST_OS_TYPE}"] = ["xFedora"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/yum.repos.d/CentOS-Base.repo] \) ; then
+			AC_DEFINE([__HOST_OS_TYPE_FEDORA__], [], [Your specific linux version is Fedora.])
+			HOST_OS_TYPE=[CentOS]
 		elif test ["x${HOST_OS_TYPE}"] = ["xPLD"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/poldek/poldek.conf] \) ; then
 			AC_DEFINE([__HOST_OS_TYPE_PLD__], [], [Your specific linux version is PLD.])
 			HOST_OS_TYPE=[PLD]
