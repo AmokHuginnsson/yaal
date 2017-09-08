@@ -9,12 +9,19 @@ endef
 define BUILD_TARGET
 
 REAL_TARGET := $$(DIR_BUILD)/$$($(1))/$$(EXEC_NAME)
+REAL_DIR_$(1) = $$(if $$(realpath $$(DIR_ROOT)/$$(SRC_$(1))),$$(SRC_$(1))/,$$(dir $$(SRC_$(1))))
 
 ifeq ($$(CURDIR),$$(DIR_BUILD))
 
-HDRS_$(1) = $$(strip $$(sort $$(shell cd $$(DIR_ROOT) && $$(FIND) -H ./$$(SRC_$(1)) -name '*.$$(HS)')))
-SRCS_$(1) = $$(strip $$(sort $$(shell cd $$(DIR_ROOT) && $$(FIND) -H ./$$(SRC_$(1)) -name '*.$$(SS)')))
-OBJS_$(1) = $$(subst ./$$(SRC_$(1))/,./$$($(1))/,$$(patsubst %.$$(SS),%.$$(OS),$$(SRCS_$(1))))
+HDRS_$(1) = $$(strip $$(sort \
+	$$(if $$(realpath $$(DIR_ROOT)/$$(SRC_$(1))),\
+	$$(shell cd $$(DIR_ROOT) && $$(FIND) -H ./$$(SRC_$(1)) -name '*.$$(HS)'),\
+	$$(subst $$(DIR_ROOT),.,$$(wildcard $$(DIR_ROOT)/$$(SRC_$(1))*.$$(HS))) )))
+SRCS_$(1) = $$(strip $$(sort \
+	$$(if $$(realpath $$(DIR_ROOT)/$$(SRC_$(1))),\
+	$$(shell cd $$(DIR_ROOT) && $$(FIND) -H ./$$(SRC_$(1)) -name '*.$$(SS)'),\
+	$$(subst $$(DIR_ROOT),.,$$(wildcard $$(DIR_ROOT)/$$(SRC_$(1))*.$$(SS))) )))
+OBJS_$(1) = $$(subst ./$$(REAL_DIR_$(1)),./$$($(1))/,$$(patsubst %.$$(SS),%.$$(OS),$$(SRCS_$(1))))
 OBJS := $$(OBJS) $$(OBJS_$(1))
 TOTAL := $$(words $$(OBJS))
 
@@ -22,13 +29,13 @@ endif
 
 # implict pattern rule
 
-$$($(1))/%.$$(DS): $$(SRC_$(1))/%.$$(SS)
+$$($(1))/%.$$(DS): $$(REAL_DIR_$(1))%.$$(SS)
 	@$$(call msg,printf "%b" "$$($$(CURR_DEP_PROGRESS_INDICATOR))$$(DEP_PROGRESS_INDICATOR_SUFFIX)$$(eval $$(call PROGRESS_INDICATOR))" && ) \
 	/bin/rm -f "$$(@)"; \
 	$$(DXX) $$(CXXFLAGS) $$(COMPILER_FLAGS_$(1)) -MM $$(<) -MT $$(@:.$$(DS)=.$$(OS)) -MT $$(@) -MF $$(@) \
 	$$(call msg,&& printf "%b" "$$(DEP_CL)")
 
-$$($(1))/%.$$(OS): $$(SRC_$(1))/%.$$(SS)
+$$($(1))/%.$$(OS): $$(REAL_DIR_$(1))%.$$(SS)
 	@$$(call msg_always,printf "[%3d%%] %b" "$$(shell expr $$(words $$(CUR_COUNT)) \* 100 / $$(TOTAL))" "$$($$(CURR_PROGRESS_INDICATOR))$$(eval $$(call PROGRESS_INDICATOR))Compiling \`$$(subst $$(DIR_ROOT)/,,$$(<))' ... " && ) \
 	/bin/rm -f "$$(@)" && \
 	$$(call invoke,$$(CXX) $$(CXXFLAGS) $$(COMPILER_FLAGS_$(1)) -D__ID__="\"$$(<) $$(shell $$(GITID) ./$$(subst . /,./,$$(foreach IT,$$(subst /, ,$$(subst $$(DIR_ROOT),,$$(DIR_BUILD))),/..))/$$(subst $$(DIR_ROOT)/,,$$(<)))\"" $$(<) -c -o $$(@) 2>&1 | tee -a make.log ) && \
