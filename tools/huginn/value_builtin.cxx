@@ -35,6 +35,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "helper.hxx"
 #include "exception.hxx"
 #include "keyword.hxx"
+#include "operator.hxx"
 #include "objectfactory.hxx"
 
 using namespace yaal;
@@ -50,7 +51,7 @@ namespace value_builtin {
 
 HHuginn::value_t subscript(
 	HThread* thread_,
-	HExpression::ACCESS subscript_,
+	HFrame::ACCESS subscript_,
 	HHuginn::value_t& base_,
 	HHuginn::value_t const& index_,
 	int position_
@@ -73,10 +74,10 @@ HHuginn::value_t subscript(
 		}
 		if ( baseType == HHuginn::TYPE::LIST ) {
 			HHuginn::HList* l( static_cast<HHuginn::HList*>( base_.raw() ) );
-			res = ( subscript_ == HExpression::ACCESS::VALUE ? l->get( index ) : of.create_reference( l->get_ref( index ) ) );
+			res = ( subscript_ == HFrame::ACCESS::VALUE ? l->get( index ) : of.create_reference( l->get_ref( index ) ) );
 		} else if ( baseType == HHuginn::TYPE::DEQUE ) {
 			HHuginn::HDeque* d( static_cast<HHuginn::HDeque*>( base_.raw() ) );
-			res = ( subscript_ == HExpression::ACCESS::VALUE ? d->get( index ) : of.create_reference( d->get_ref( index ) ) );
+			res = ( subscript_ == HFrame::ACCESS::VALUE ? d->get( index ) : of.create_reference( d->get_ref( index ) ) );
 		} else {
 			M_ASSERT( baseType == HHuginn::TYPE::STRING );
 			HHuginn::HString* s( static_cast<HHuginn::HString*>( base_.raw() ) );
@@ -84,10 +85,10 @@ HHuginn::value_t subscript(
 		}
 	} else if ( baseType == HHuginn::TYPE::DICT ) {
 		HHuginn::HDict* d( static_cast<HHuginn::HDict*>( base_.raw() ) );
-		res = ( subscript_ == HExpression::ACCESS::VALUE ? d->get( thread_, index_, position_ ) : of.create_reference( d->get_ref( thread_, index_, position_ ) ) );
+		res = ( subscript_ == HFrame::ACCESS::VALUE ? d->get( thread_, index_, position_ ) : of.create_reference( d->get_ref( thread_, index_, position_ ) ) );
 	} else if ( baseType == HHuginn::TYPE::LOOKUP ) {
 		HHuginn::HLookup* l( static_cast<HHuginn::HLookup*>( base_.raw() ) );
-		res = ( subscript_ == HExpression::ACCESS::VALUE ? l->get( thread_, index_, position_ ) : of.create_reference( l->get_ref( thread_, index_, position_ ) ) );
+		res = ( subscript_ == HFrame::ACCESS::VALUE ? l->get( thread_, index_, position_ ) : of.create_reference( l->get_ref( thread_, index_, position_ ) ) );
 	} else {
 		throw HHuginn::HHuginnRuntimeException( "Subscript is not supported on `"_ys.append( base_->get_class()->name() ).append( "'." ), thread_->current_frame()->file_id(), position_ );
 	}

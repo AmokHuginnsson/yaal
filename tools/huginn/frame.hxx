@@ -23,16 +23,15 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-
-/* YAAL_PRIVATE_IMPLEMENTATION_DETAIL */
+/*! \file tools/huginn/frame.hxx
+ * \brief Declaration of huginn::HFrame class.
+ */
 
 #ifndef YAAL_TOOLS_HUGINN_FRAME_HXX_INCLUDED
 #define YAAL_TOOLS_HUGINN_FRAME_HXX_INCLUDED 1
 
 #include "tools/hhuginn.hxx"
-#include "tools/huginn/operator.hxx"
-#include "tools/huginn/expression.hxx"
-#include "tools/huginn/scope.hxx"
+#include "tools/huginn/statement.hxx"
 
 namespace yaal {
 
@@ -62,6 +61,10 @@ public:
 		CONTINUE,
 		EXCEPTION,
 		RUNTIME_EXCEPTION
+	};
+	enum class ACCESS {
+		VALUE,
+		REFERENCE
 	};
 private:
 	/*!
@@ -138,8 +141,8 @@ public:
 	HFrame( HThread*, HFrame* );
 	void init( TYPE, HStatement const*, HHuginn::value_t* = nullptr, int = 0 );
 	void reshape( HThread*, int );
-	HHuginn::value_t get_field( HExpression::ACCESS, int );
-	HHuginn::value_t get_variable( HExpression::ACCESS, HStatement::statement_id_t, int );
+	HHuginn::value_t get_field( ACCESS, int );
+	HHuginn::value_t get_variable( ACCESS, HStatement::statement_id_t, int );
 	HHuginn::value_t get_this( void );
 	HHuginn::value_t get_super( int );
 	void add_variable( HHuginn::value_t const& );

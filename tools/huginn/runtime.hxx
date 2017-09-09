@@ -23,14 +23,15 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-
-/* YAAL_PRIVATE_IMPLEMENTATION_DETAIL */
+/*! \file tools/huginn/runtime.hxx
+ * \brief Declaration of huginn::HRuntime class.
+ */
 
 #ifndef YAAL_TOOLS_HUGINN_RUNTIME_HXX_INCLUDED
 #define YAAL_TOOLS_HUGINN_RUNTIME_HXX_INCLUDED 1
 
 #include "tools/hhuginn.hxx"
-#include "thread.hxx"
+#include "tools/huginn/thread.hxx"
 
 namespace yaal {
 

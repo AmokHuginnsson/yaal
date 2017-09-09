@@ -23,8 +23,9 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-
-/* YAAL_PRIVATE_IMPLEMENTATION_DETAIL */
+/*! \file tools/huginn/helper.hxx
+ * \brief Declarations of Huginn interpreter implementation helper functions.
+ */
 
 #ifndef YAAL_TOOLS_HUGINN_HELPER_HXX_INCLUDED
 #define YAAL_TOOLS_HUGINN_HELPER_HXX_INCLUDED 1

@@ -180,12 +180,12 @@ void HFrame::commit_variable( HHuginn::value_t const& value_, int position_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HFrame::get_field( HExpression::ACCESS access_, int index_ ) {
+HHuginn::value_t HFrame::get_field( ACCESS access_, int index_ ) {
 	M_PROLOG
 	HHuginn::value_t* obj( object() );
 	M_ASSERT( obj && !! *obj );
 	HHuginn::value_t v;
-	if ( access_ == HExpression::ACCESS::VALUE ) {
+	if ( access_ == ACCESS::VALUE ) {
 		v = static_cast<HHuginn::HObject*>( obj->raw() )->field( *obj, index_ );
 	} else {
 		HHuginn::value_t& ref( static_cast<HHuginn::HObject*>( obj->raw() )->field_ref( index_ ) );
@@ -195,7 +195,7 @@ HHuginn::value_t HFrame::get_field( HExpression::ACCESS access_, int index_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HFrame::get_variable( HExpression::ACCESS access_, HStatement::statement_id_t statementId_, int index_ ) {
+HHuginn::value_t HFrame::get_variable( ACCESS access_, HStatement::statement_id_t statementId_, int index_ ) {
 	M_PROLOG
 	HFrame* f( this );
 	while ( statementId_ != f->_statement->id() ) {
@@ -213,11 +213,11 @@ HHuginn::value_t HFrame::get_variable( HExpression::ACCESS access_, HStatement::
 	 * in all but last of iterations are destroyed in order of their definition
 	 * and not in reverse order of their definition as it would be expected.
 	 */
-	if ( ( access_ == HExpression::ACCESS::REFERENCE ) && ( static_cast<int>( f->_variables.get_size() ) == index_ ) ) {
+	if ( ( access_ == ACCESS::REFERENCE ) && ( static_cast<int>( f->_variables.get_size() ) == index_ ) ) {
 		M_ASSERT( f == this );
 		f->_variables.push_back( HHuginn::value_t() );
 	}
-	if ( access_ == HExpression::ACCESS::VALUE ) {
+	if ( access_ == ACCESS::VALUE ) {
 		v = f->_variables[index_];
 	} else {
 	  v = _thread->runtime().object_factory()->create_reference( f->_variables[index_] );

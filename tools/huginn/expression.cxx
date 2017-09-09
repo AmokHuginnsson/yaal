@@ -193,14 +193,14 @@ void HExpression::close_parenthesis( HFrame* frame_, int position_ ) {
 	M_EPILOG
 }
 
-void HExpression::get_field_direct( ACCESS access_, int index_, huginn::HFrame* frame_, int ) {
+void HExpression::get_field_direct( HFrame::ACCESS access_, int index_, huginn::HFrame* frame_, int ) {
 	M_PROLOG
 	frame_->values().emplace( frame_->get_field( access_, index_ ) );
 	return;
 	M_EPILOG
 }
 
-void HExpression::get_variable_direct( ACCESS access_, HStatement::statement_id_t statementId_, int index_, huginn::HFrame* frame_, int ) {
+void HExpression::get_variable_direct( HFrame::ACCESS access_, HStatement::statement_id_t statementId_, int index_, huginn::HFrame* frame_, int ) {
 	M_PROLOG
 	frame_->values().emplace( frame_->get_variable( access_, statementId_, index_ ) );
 	return;
@@ -221,7 +221,7 @@ void HExpression::get_super( huginn::HFrame* frame_, int position_ ) {
 	M_EPILOG
 }
 
-void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifierId_, huginn::HFrame* frame_, int ) {
+void HExpression::get_field( HFrame::ACCESS access_, HHuginn::identifier_id_t identifierId_, huginn::HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::MEMBER_ACCESS );
@@ -246,7 +246,7 @@ void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifier
 				p
 			);
 		}
-		if ( access_ == ACCESS::VALUE ) {
+		if ( access_ == HFrame::ACCESS::VALUE ) {
 			frame_->values().push( v->field( v, fi ) );
 		} else if ( ! v.unique() ) {
 			HHuginn::HObject* o( dynamic_cast<HHuginn::HObject*>( v.raw() ) );
@@ -275,7 +275,7 @@ void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifier
 					p
 				);
 			}
-			if ( access_ == ACCESS::VALUE ) {
+			if ( access_ == HFrame::ACCESS::VALUE ) {
 				frame_->values().push( oref->field( t, fi, p ) );
 			} else {
 				throw HHuginn::HHuginnRuntimeException( "Changing upcasted reference.", file_id(), p );
@@ -580,7 +580,7 @@ void HExpression::power( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::subscript( ACCESS access_, HFrame* frame_, int ) {
+void HExpression::subscript( HFrame::ACCESS access_, HFrame* frame_, int ) {
 	M_PROLOG
 	int& ip( frame_->ip() );
 	M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );

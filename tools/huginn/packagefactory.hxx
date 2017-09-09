@@ -23,8 +23,9 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-
-/* YAAL_PRIVATE_IMPLEMENTATION_DETAIL */
+/*! \file tools/huginn/packagefactory.hxx
+ * \brief Declaration of HPackageCreatorInterface and HPackageFactory classes.
+ */
 
 #ifndef YAAL_TOOLS_HUGINN_PACKAGEFACTORY_HXX_INCLUDED
 #define YAAL_TOOLS_HUGINN_PACKAGEFACTORY_HXX_INCLUDED

@@ -360,7 +360,7 @@ void OCompiler::resolve_symbols( void ) {
 							hcore::call(
 								&HExpression::get_field_direct,
 								es._expression.raw(),
-								es._operation == OExecutionStep::OPERATION::USE ? HExpression::ACCESS::VALUE : HExpression::ACCESS::REFERENCE,
+								es._operation == OExecutionStep::OPERATION::USE ? HFrame::ACCESS::VALUE : HFrame::ACCESS::REFERENCE,
 								index,
 								_1,
 								es._position
@@ -378,7 +378,7 @@ void OCompiler::resolve_symbols( void ) {
 							hcore::call(
 								&HExpression::get_field_direct,
 								es._expression.raw(),
-								es._operation == OExecutionStep::OPERATION::USE ? HExpression::ACCESS::VALUE : HExpression::ACCESS::REFERENCE,
+								es._operation == OExecutionStep::OPERATION::USE ? HFrame::ACCESS::VALUE : HFrame::ACCESS::REFERENCE,
 								static_cast<int>( distance( cli->second.begin(), ci ) ),
 								_1,
 								es._position
@@ -442,7 +442,7 @@ void OCompiler::resolve_symbols( void ) {
 								hcore::call(
 									&HIntroExpression::get_variable_direct_note,
 									static_cast<HIntroExpression*>( es._expression.raw() ),
-									HExpression::ACCESS::REFERENCE,
+									HFrame::ACCESS::REFERENCE,
 									sc->_statementId,
 									localVariable._index,
 									_1,
@@ -456,7 +456,7 @@ void OCompiler::resolve_symbols( void ) {
 								hcore::call(
 									&HExpression::get_variable_direct,
 									es._expression.raw(),
-									HExpression::ACCESS::REFERENCE,
+									HFrame::ACCESS::REFERENCE,
 									sc->_statementId,
 									localVariable._index,
 									_1,
@@ -485,7 +485,7 @@ void OCompiler::resolve_symbols( void ) {
 							hcore::call(
 								&HExpression::get_variable_direct,
 								es._expression.raw(),
-								es._operation == OExecutionStep::OPERATION::USE ? HExpression::ACCESS::VALUE : HExpression::ACCESS::REFERENCE,
+								es._operation == OExecutionStep::OPERATION::USE ? HFrame::ACCESS::VALUE : HFrame::ACCESS::REFERENCE,
 								sc->_statementId,
 								localVariable._index,
 								_1,
@@ -2019,7 +2019,7 @@ void OCompiler::dispatch_subscript( executing_parser::position_t position_ ) {
 		expression->add_execution_step( hcore::call( &HExpression::range, expression.raw(), _1, position_.get() ) );
 		expression->commit_oper( OPERATOR::RANGE );
 	} else {
-		expression->add_execution_step( hcore::call( &HExpression::subscript, expression.raw(), HExpression::ACCESS::VALUE, _1, position_.get() ) );
+		expression->add_execution_step( hcore::call( &HExpression::subscript, expression.raw(), HFrame::ACCESS::VALUE, _1, position_.get() ) );
 		expression->commit_oper( OPERATOR::SUBSCRIPT );
 	}
 	fc._operations.pop();
@@ -2210,13 +2210,13 @@ void OCompiler::make_reference( executing_parser::position_t position_ ) {
 	if ( fc._lastDereferenceOperator == OPERATOR::SUBSCRIPT ) {
 		current_expression()->pop_execution_step();
 		current_expression()->add_execution_step(
-			hcore::call( &HExpression::subscript, current_expression().raw(), HExpression::ACCESS::REFERENCE, _1, position_.get() )
+			hcore::call( &HExpression::subscript, current_expression().raw(), HFrame::ACCESS::REFERENCE, _1, position_.get() )
 		);
 	} else {
 		HExpression& expression( *current_expression() );
 		expression.pop_execution_step();
 		expression.add_execution_step(
-			hcore::call( &HExpression::get_field, current_expression().raw(), HExpression::ACCESS::REFERENCE, fc._lastMemberName, _1, _fileId )
+			hcore::call( &HExpression::get_field, current_expression().raw(), HFrame::ACCESS::REFERENCE, fc._lastMemberName, _1, _fileId )
 		);
 	}
 	fc._variables.emplace( INVALID_IDENTIFIER, -1 );
@@ -2304,7 +2304,7 @@ void OCompiler::defer_get_field_reference( yaal::hcore::HString const& value_, e
 	}
 	HExpression& expression( *current_expression() );
 	expression.add_execution_step(
-		hcore::call( &HExpression::get_field, current_expression().raw(), HExpression::ACCESS::VALUE, refIdentifier, _1, _fileId )
+		hcore::call( &HExpression::get_field, current_expression().raw(), HFrame::ACCESS::VALUE, refIdentifier, _1, _fileId )
 	);
 	expression.commit_oper( OPERATOR::MEMBER_ACCESS );
 	fc._lastMemberName = refIdentifier;

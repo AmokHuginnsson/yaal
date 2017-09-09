@@ -33,6 +33,7 @@ Copyright:
 #include "hcore/hboundcall.hxx"
 #include "tools/huginn/statement.hxx"
 #include "tools/huginn/operator.hxx"
+#include "tools/huginn/frame.hxx"
 #include "tools/hhuginn.hxx"
 
 namespace yaal {
@@ -42,16 +43,11 @@ namespace tools {
 namespace huginn {
 
 class HThread;
-class HFrame;
 
 class HExpression : public HStatement {
 public:
 	typedef HExpression this_type;
 	typedef HStatement base_type;
-	enum class ACCESS {
-		VALUE,
-		REFERENCE
-	};
 	typedef yaal::hcore::HBoundCall<void ( huginn::HFrame* )> execution_step_t;
 private:
 	typedef yaal::hcore::HArray<execution_step_t> execution_steps_t;
@@ -77,15 +73,15 @@ public:
 	void negate( huginn::HFrame*, int );
 	void function_call( huginn::HFrame*, int );
 	void make_dict( huginn::HFrame*, int );
-	void get_field_direct( ACCESS, int, huginn::HFrame*, int );
-	void get_variable_direct( ACCESS, HStatement::statement_id_t, int, huginn::HFrame*, int );
+	void get_field_direct( HFrame::ACCESS, int, huginn::HFrame*, int );
+	void get_variable_direct( HFrame::ACCESS, HStatement::statement_id_t, int, huginn::HFrame*, int );
 	void create_closure( huginn::HFrame*, int );
 	void get_this( huginn::HFrame*, int );
 	void get_super( huginn::HFrame*, int );
 	void set_variable( huginn::HFrame*, int );
-	void subscript( ACCESS, huginn::HFrame*, int );
+	void subscript( HFrame::ACCESS, huginn::HFrame*, int );
 	void range( huginn::HFrame*, int );
-	void get_field( ACCESS, HHuginn::identifier_id_t, huginn::HFrame*, int );
+	void get_field( HFrame::ACCESS, HHuginn::identifier_id_t, huginn::HFrame*, int );
 	void power( huginn::HFrame*, int );
 	void equals( huginn::HFrame*, int );
 	void not_equals( huginn::HFrame*, int );

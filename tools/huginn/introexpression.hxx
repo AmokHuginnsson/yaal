@@ -46,7 +46,7 @@ private:
 	HIntrospectorInterface* _introspector;
 public:
 	HIntroExpression( HIntrospectorInterface*, int = MAIN_FILE_ID, int = 0 );
-	void get_variable_direct_note( ACCESS, HStatement::statement_id_t, int, huginn::HFrame*, HHuginn::identifier_id_t, int );
+	void get_variable_direct_note( HFrame::ACCESS, HStatement::statement_id_t, int, huginn::HFrame*, HHuginn::identifier_id_t, int );
 protected:
 	virtual void do_execute( huginn::HThread* ) const override;
 private:

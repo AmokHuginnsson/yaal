@@ -23,8 +23,9 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-
-/* YAAL_PRIVATE_IMPLEMENTATION_DETAIL */
+/*! \file tools/huginn/objectfactory.hxx
+ * \brief Declaration of HObjectFactory class.
+ */
 
 #ifndef YAAL_TOOLS_HUGINN_OBJECTFACTORY_HXX_INCLUDED
 #define YAAL_TOOLS_HUGINN_OBJECTFACTORY_HXX_INCLUDED 1

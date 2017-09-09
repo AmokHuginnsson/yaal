@@ -30,6 +30,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "helper.hxx"
 #include "thread.hxx"
 #include "keyword.hxx"
+#include "operator.hxx"
 #include "value_builtin.hxx"
 #include "tools/util.hxx"
 #include "tools/hstringstream.hxx"

@@ -29,6 +29,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "trycatch.hxx"
 #include "thread.hxx"
+#include "expression.hxx"
 #include "scope.hxx"
 
 using namespace yaal;
