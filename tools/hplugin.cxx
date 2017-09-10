@@ -42,8 +42,9 @@ HPlugin::HPlugin( void ) : _handle( nullptr ) {
 
 HPlugin::~HPlugin( void ) {
 	M_PROLOG
-	if ( _handle )
+	if ( _handle ) {
 		unload();
+	}
 	M_DESTRUCTOR_EPILOG
 }
 
@@ -51,8 +52,9 @@ void HPlugin::load( HString const& path_ ) {
 	M_PROLOG
 	HUTF8String utf8( path_ );
 	_handle = dlopen( ! path_.is_empty() ? utf8.c_str() : nullptr, RTLD_NOW | RTLD_GLOBAL );
-	if ( _handle == reinterpret_cast<void const*>( -1 ) )
+	if ( _handle == reinterpret_cast<void const*>( -1 ) ) {
 		_handle = nullptr;
+	}
 	M_ENSURE( _handle != nullptr, path_ );
 	return;
 	M_EPILOG

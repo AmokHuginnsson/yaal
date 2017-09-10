@@ -34,6 +34,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 #include "source.hxx"
 #include "hcore/hfile.hxx"
 #include "tools/filesystem.hxx"
+#include "tools/hplugin.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -66,7 +67,8 @@ HHuginn::value_t HPackageCreatorInterface::new_instance( HRuntime* runtime_ ) {
 }
 
 HPackageFactory::HPackageFactory( void )
-	: _creators() {
+	: _creators()
+	, _binaries() {
 	return;
 }
 
@@ -77,8 +79,9 @@ HPackageFactory::~HPackageFactory( void ) {
 void HPackageFactory::register_package_creator( HString const& name_, HPackageCreatorInterface* instantiator_ ) {
 	M_PROLOG
 	creators_t::iterator it = _creators.find( name_ );
-	if ( it != _creators.end() )
+	if ( it != _creators.end() ) {
 		M_THROW( _( "Package already registered" ), errno );
+	}
 	OCreator creator;
 	creator._instantiator = instantiator_;
 	_creators[ name_ ] = creator;
@@ -92,32 +95,90 @@ HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, HHuginn::p
 	creators_t::iterator it = _creators.find( name_ );
 	if ( it != _creators.end() ) {
 		package = it->second._instantiator->new_instance( runtime_ );
-	} else {
-		HHuginn::paths_t paths( paths_ );
-		paths.insert( paths.end(), HHuginn::MODULE_PATHS.begin(), HHuginn::MODULE_PATHS.end() );
-		HString path;
+	}
+	HHuginn::paths_t paths( paths_ );
+	paths.insert( paths.end(), HHuginn::MODULE_PATHS.begin(), HHuginn::MODULE_PATHS.end() );
+	if ( ! package ) {
+		package = load_binary( runtime_, paths, name_, position_ );
+	}
+	if ( ! package ) {
+		package = load_module( runtime_, paths, compilerSetup_, name_, position_ );
+	}
+	if ( ! package ) {
+		throw HHuginn::HHuginnRuntimeException( "Package `"_ys.append( name_ ).append( "' does not exist." ), MAIN_FILE_ID, position_ );
+	}
+	return ( package );
+	M_EPILOG
+}
+
+HHuginn::value_t HPackageFactory::load_binary( HRuntime* runtime_, HHuginn::paths_t const& paths_, yaal::hcore::HString const& name_, int position_ ) {
+	M_PROLOG
+	plugin_t plugin( make_pointer<HPlugin>() );
+	HString pluginName;
+	pluginName
+		.assign( LIB_PREFIX )
+		.append( "huginn_" )
+		.append( name_ )
+		.append( LIB_INFIX )
+		.append( "." )
+		.append( LIB_EXT );
+	pluginName.lower();
+	HHuginn::value_t package;
+	try {
+		plugin->load( pluginName );
+	} catch ( HPluginException const& ) {
+	}
+	if ( ! plugin->is_loaded() ) {
 		HString test;
-		for ( HString const& p : paths ) {
-			test.assign( p ).append( "/" ).append( name_ ).append( ".hgn" );
+		for ( HString const& p : paths_ ) {
+			test.assign( p ).append( "/" ).append( pluginName );
 			try {
-				if ( ! p.is_empty() && filesystem::is_regular_file( test ) ) {
-					path = test;
-					break;
-				}
-			} catch ( filesystem::HFileSystemException const& ) {
+				plugin->load( test );
+				break;
+			} catch ( HPluginException const& ) {
 			}
 		}
-		if ( ! path.is_empty() ) {
-			package = load_module( runtime_, paths_, compilerSetup_, path, name_, position_ );
-		} else {
-			throw HHuginn::HHuginnRuntimeException( "Package `"_ys.append( name_ ).append( "' does not exist." ), MAIN_FILE_ID, position_ );
+	}
+	if ( plugin->is_loaded() ) {
+		try {
+			typedef HPackageCreatorInterface* (*instantiator_getter_t)( void );
+			instantiator_getter_t instantiator_getter( nullptr );
+			plugin->resolve( "get_package_creator", instantiator_getter );
+			HPackageCreatorInterface* instantiator( instantiator_getter() );
+			register_package_creator( name_, instantiator );
+			package = instantiator->new_instance( runtime_ );
+			_binaries.emplace_back( plugin );
+		} catch ( HPluginException const& e ) {
+			throw HHuginn::HHuginnRuntimeException( e.what(), MAIN_FILE_ID, position_ );
 		}
 	}
 	return ( package );
 	M_EPILOG
 }
 
-HHuginn::value_t HPackageFactory::load_module( HRuntime* runtime_, HHuginn::paths_t const& paths_, HHuginn::compiler_setup_t compilerSetup_, yaal::hcore::HString const& path_, yaal::hcore::HString const& name_, int position_ ) {
+HHuginn::value_t HPackageFactory::load_module( HRuntime* runtime_, HHuginn::paths_t const& paths_, HHuginn::compiler_setup_t compilerSetup_, yaal::hcore::HString const& name_, int position_ ) {
+	M_PROLOG
+	HString path;
+	HString test;
+	for ( HString const& p : paths_ ) {
+		test.assign( p ).append( "/" ).append( name_ ).append( ".hgn" );
+		try {
+			if ( ! p.is_empty() && filesystem::is_regular_file( test ) ) {
+				path = test;
+				break;
+			}
+		} catch ( filesystem::HFileSystemException const& ) {
+		}
+	}
+	return (
+		! path.is_empty()
+			? compile_module( runtime_, paths_, compilerSetup_, path, name_, position_ )
+			: HHuginn::value_t()
+	);
+	M_EPILOG
+}
+
+HHuginn::value_t HPackageFactory::compile_module( HRuntime* runtime_, HHuginn::paths_t const& paths_, HHuginn::compiler_setup_t compilerSetup_, yaal::hcore::HString const& path_, yaal::hcore::HString const& name_, int position_ ) {
 	M_PROLOG
 	HFile src( path_, HFile::OPEN::READING );
 	HHuginn loader( runtime_ );
