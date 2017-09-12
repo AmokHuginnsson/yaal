@@ -134,7 +134,7 @@ HHuginn::HErrorCoordinate HSource::error_coordinate( int position_ ) const {
 	int line( static_cast<int>( count( _orig.begin(), _orig.begin() + position_, NEWLINE ) ) + 1 );
 	int lastNewlinePosition( 0 );
 	if ( line > 1 ) {
-		int nlPos( static_cast<int>( _orig.find_last( NEWLINE, position_ ) ) );
+		int nlPos( static_cast<int>( _orig.find_last( NEWLINE, position_ - 1 ) ) );
 		++ nlPos;
 		lastNewlinePosition = nlPos;
 	}
