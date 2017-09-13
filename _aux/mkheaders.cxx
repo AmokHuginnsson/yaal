@@ -44,7 +44,6 @@ bool is_private( string const& );
 string dirname( string const& );
 string basename( string const& );
 string strip_prefix( string, string );
-string dirname_basename( string const& );
 void copy_file( string const&, string const& );
 void copy_modification_time( string const&, string const& );
 
@@ -79,7 +78,7 @@ int main( int argc_, char** argv_ ) {
 		string dirInclude( dirBuild + "/include" );
 		string dirLibHeaders( dirBuild + "/include/yaal" );
 		set<string> components;
-		transform( paths.begin(), paths.end(), inserter( components, components.begin() ), dirname_basename );
+		transform( paths.begin(), paths.end(), inserter( components, components.begin() ), dirname );
 		cout << "Making headers ... " << endl
 			<< "dir root: " << dirRoot << endl
 			<< "dir build: " << dirBuild << endl
@@ -318,9 +317,6 @@ void remove_all( string const& p ) {
 	} else
 		unlink( toRemove.c_str() );
 }
-
-string dirname_basename( string const& p )
-	{ return basename( dirname( p ) ); }
 
 string strip_prefix( string item_, string prefix_ ) {
 	return ( item_.find( prefix_ ) == 0 ? string( item_, prefix_.size() ) : item_ );
