@@ -528,6 +528,7 @@ yaal::hcore::HString const& type_name( HHuginn::TYPE type_ ) {
 	static HString const NAME_STRING = "string";
 	static HString const NAME_NUMBER = "number";
 	static HString const NAME_CHARACTER = "character";
+	static HString const NAME_TUPLE = "tuple";
 	static HString const NAME_LIST = "list";
 	static HString const NAME_DICT = "dict";
 	static HString const NAME_DEQUE = "deque";
@@ -550,6 +551,7 @@ yaal::hcore::HString const& type_name( HHuginn::TYPE type_ ) {
 		case ( HHuginn::TYPE::STRING ):             s = &NAME_STRING;             break;
 		case ( HHuginn::TYPE::NUMBER ):             s = &NAME_NUMBER;             break;
 		case ( HHuginn::TYPE::CHARACTER ):          s = &NAME_CHARACTER;          break;
+		case ( HHuginn::TYPE::TUPLE ):              s = &NAME_TUPLE;              break;
 		case ( HHuginn::TYPE::LIST ):               s = &NAME_LIST;               break;
 		case ( HHuginn::TYPE::DICT ):               s = &NAME_DICT;               break;
 		case ( HHuginn::TYPE::DEQUE ):              s = &NAME_DEQUE;              break;

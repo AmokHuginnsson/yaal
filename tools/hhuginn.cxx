@@ -83,14 +83,14 @@ int _huginnMaxCallStack_( DEFAULT_MAX_CALL_STACK );
 
 namespace huginn {
 
-HHuginn::identifier_id_t const TYPE_NONE_IDENTIFIER( 23 );
-HHuginn::identifier_id_t const TYPE_OBSERVER_IDENTIFIER( 24 );
-HHuginn::identifier_id_t const TYPE_REFERENCE_IDENTIFIER( 25 );
-HHuginn::identifier_id_t const TYPE_FUNCTION_REFERENCE_IDENTIFIER( 26 );
-HHuginn::identifier_id_t const TYPE_OBJECT_REFERENCE_IDENTIFIER( 27 );
-HHuginn::identifier_id_t const TYPE_METHOD_IDENTIFIER( 28 );
-HHuginn::identifier_id_t const TYPE_BOUND_METHOD_IDENTIFIER( 29 );
-HHuginn::identifier_id_t const TYPE_UNKNOWN_IDENTIFIER( 30 );
+HHuginn::identifier_id_t const TYPE_NONE_IDENTIFIER( 24 );
+HHuginn::identifier_id_t const TYPE_OBSERVER_IDENTIFIER( 25 );
+HHuginn::identifier_id_t const TYPE_REFERENCE_IDENTIFIER( 26 );
+HHuginn::identifier_id_t const TYPE_FUNCTION_REFERENCE_IDENTIFIER( 27 );
+HHuginn::identifier_id_t const TYPE_OBJECT_REFERENCE_IDENTIFIER( 28 );
+HHuginn::identifier_id_t const TYPE_METHOD_IDENTIFIER( 29 );
+HHuginn::identifier_id_t const TYPE_BOUND_METHOD_IDENTIFIER( 30 );
+HHuginn::identifier_id_t const TYPE_UNKNOWN_IDENTIFIER( 31 );
 HHuginn::HClass const _noneClass_( HHuginn::TYPE::NONE, TYPE_NONE_IDENTIFIER, "A type of `none` value." );
 HHuginn::HClass const _observerClass_( HHuginn::TYPE::OBSERVER, TYPE_OBSERVER_IDENTIFIER, "The `*observer*` is a type representing a reference cycle breaking, non-owning weak \"pointer\" to a value." );
 HHuginn::HClass const _referenceClass_( HHuginn::TYPE::REFERENCE, TYPE_REFERENCE_IDENTIFIER, "Write only reference. Allows assign operator to work." );
@@ -939,6 +939,19 @@ yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn const* h
 			} else {
 				str = type_name( HHuginn::TYPE::FUNCTION_REFERENCE );
 			}
+		} break;
+		case ( HHuginn::TYPE::TUPLE ): {
+			HHuginn::HTuple const* t( static_cast<HHuginn::HTuple const*>( value_.raw() ) );
+			str = "(";
+			bool next( false );
+			for ( HHuginn::value_t const& v : t->value() ) {
+				if ( next ) {
+					str.append( ", " );
+				}
+				next = true;
+				str.append( to_string( v, huginn_ ) );
+			}
+			str.append( ")" );
 		} break;
 		case ( HHuginn::TYPE::LIST ): {
 			HHuginn::HList const* l( static_cast<HHuginn::HList const*>( value_.raw() ) );

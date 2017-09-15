@@ -64,6 +64,10 @@ namespace character {
 HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
 }
 
+namespace tuple {
+HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
+}
+
 namespace list {
 HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
 }
@@ -97,6 +101,7 @@ HObjectFactory::HObjectFactory( HRuntime* runtime_ )
 	, _real( real::get_class( runtime_, this ) )
 	, _number( number::get_class( runtime_, this ) )
 	, _character( character::get_class( runtime_, this ) )
+	, _tuple( tuple::get_class( runtime_, this ) )
 	, _list( list::get_class( runtime_, this ) )
 	, _deque( deque::get_class( runtime_, this ) )
 	, _dict( dict::get_class( runtime_, this ) )
@@ -113,6 +118,7 @@ HObjectFactory::HObjectFactory( HRuntime* runtime_ )
 	, _realPool( _memoryPools, _real.raw() )
 	, _numberPool( _memoryPools, _number.raw() )
 	, _characterPool( _memoryPools, _character.raw() )
+	, _tuplePool( _memoryPools, _tuple.raw() )
 	, _listPool( _memoryPools, _list.raw() )
 	, _dequePool( _memoryPools, _deque.raw() )
 	, _dictPool( _memoryPools, _dict.raw() )
@@ -137,6 +143,7 @@ void HObjectFactory::register_builtin_classes( void ) {
 	_runtime->huginn()->register_class( _real );
 	_runtime->huginn()->register_class( _number );
 	_runtime->huginn()->register_class( _character );
+	_runtime->huginn()->register_class( _tuple );
 	_runtime->huginn()->register_class( _list );
 	_runtime->huginn()->register_class( _deque );
 	_runtime->huginn()->register_class( _dict );

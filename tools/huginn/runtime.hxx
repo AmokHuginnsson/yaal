@@ -235,6 +235,7 @@ HHuginn::value_t type( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t co
 HHuginn::value_t copy( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 HHuginn::value_t observe( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 HHuginn::value_t use( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+HHuginn::value_t tuple( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 HHuginn::value_t list( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 HHuginn::value_t deque( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 HHuginn::value_t dict( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );

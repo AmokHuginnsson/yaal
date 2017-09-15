@@ -1557,7 +1557,15 @@ bool OCompiler::is_numeric( HHuginn::type_id_t type_ ) {
 }
 
 bool OCompiler::is_collection( HHuginn::type_id_t type_ ) {
-	return ( ( type_ == HHuginn::TYPE::LIST ) || ( type_ == HHuginn::TYPE::DEQUE ) || ( type_ == HHuginn::TYPE::DICT ) || ( type_ == HHuginn::TYPE::LOOKUP ) || ( type_ == HHuginn::TYPE::ORDER ) || ( type_ == HHuginn::TYPE::SET ) );
+	return (
+		( type_ == HHuginn::TYPE::TUPLE )
+		|| ( type_ == HHuginn::TYPE::LIST )
+		|| ( type_ == HHuginn::TYPE::DEQUE )
+		|| ( type_ == HHuginn::TYPE::DICT )
+		|| ( type_ == HHuginn::TYPE::LOOKUP )
+		|| ( type_ == HHuginn::TYPE::ORDER )
+		|| ( type_ == HHuginn::TYPE::SET )
+	);
 }
 
 bool OCompiler::is_comparable( HHuginn::type_id_t type_ ) {
@@ -1566,6 +1574,7 @@ bool OCompiler::is_comparable( HHuginn::type_id_t type_ ) {
 		|| ( type_ == HHuginn::TYPE::STRING )
 		|| ( type_ == HHuginn::TYPE::CHARACTER )
 		|| ( type_ == HHuginn::TYPE::FUNCTION_REFERENCE )
+		|| ( type_ == HHuginn::TYPE::TUPLE )
 		|| ( type_ == HHuginn::TYPE::LIST )
 		|| ( type_ == HHuginn::TYPE::DEQUE )
 	);
@@ -2043,6 +2052,7 @@ HHuginn::type_id_t function_ref_to_type_id( HHuginn::identifier_id_t identifierI
 		{ BUILTIN::CHARACTER_IDENTIFIER, type_id( HHuginn::TYPE::CHARACTER ) },
 		{ BUILTIN::BOOLEAN_IDENTIFIER,   type_id( HHuginn::TYPE::BOOLEAN ) },
 		{ BUILTIN::SIZE_IDENTIFIER,      type_id( HHuginn::TYPE::INTEGER ) },
+		{ BUILTIN::TUPLE_IDENTIFIER,     type_id( HHuginn::TYPE::TUPLE ) },
 		{ BUILTIN::LIST_IDENTIFIER,      type_id( HHuginn::TYPE::LIST ) },
 		{ BUILTIN::DEQUE_IDENTIFIER,     type_id( HHuginn::TYPE::DEQUE ) },
 		{ BUILTIN::DICT_IDENTIFIER,      type_id( HHuginn::TYPE::DICT ) },

@@ -88,6 +88,7 @@ extern HHuginn::identifier_id_t const TYPE_IDENTIFIER;
 extern HHuginn::identifier_id_t const COPY_IDENTIFIER;
 extern HHuginn::identifier_id_t const OBSERVE_IDENTIFIER;
 extern HHuginn::identifier_id_t const USE_IDENTIFIER;
+extern HHuginn::identifier_id_t const TUPLE_IDENTIFIER;
 extern HHuginn::identifier_id_t const LIST_IDENTIFIER;
 extern HHuginn::identifier_id_t const DEQUE_IDENTIFIER;
 extern HHuginn::identifier_id_t const DICT_IDENTIFIER;

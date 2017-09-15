@@ -87,6 +87,14 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		"numberLiteral",
 		constant( '$' ) >> real[e_p::HReal::action_string_position_t( hcore::call( &OCompiler::defer_store_number, _compiler.get(), _1, _2 ) )]
 	);
+	HRule tupleLiteral(
+		"tupleLiteral",
+		constant(
+			'(',
+			HRuleBase::action_position_t( hcore::call( &OCompiler::defer_call, _compiler.get(), "tuple", _1 ) )
+		) >> -argList >> ')',
+		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
+	);
 	HRule listLiteral(
 		"listLiteral",
 		constant(
@@ -203,7 +211,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 				| character_literal[e_p::HCharacterLiteral::action_character_position_t( hcore::call( &OCompiler::defer_store_character, _compiler.get(), _1, _2 ) )] )
 			>> -( memberAccess >> functionCallOperator )
 		)
-		| ( ( listLiteral | dictLiteral | stringLiteral ) >> -( ( subscriptOperator | memberAccess ) >> dereference ) )
+		| ( ( tupleLiteral | listLiteral | dictLiteral | stringLiteral ) >> -( ( subscriptOperator | memberAccess ) >> dereference ) )
 		| ( setLiteral >> -( memberAccess >> dereference ) )
 		| literalNone | booleanLiteralTrue | booleanLiteralFalse
 		| ( reference >> dereference )

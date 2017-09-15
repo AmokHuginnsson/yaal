@@ -87,12 +87,13 @@ HHuginn::identifier_id_t const TYPE_IDENTIFIER( 12 );
 HHuginn::identifier_id_t const COPY_IDENTIFIER( 13 );
 HHuginn::identifier_id_t const OBSERVE_IDENTIFIER( 14 );
 HHuginn::identifier_id_t const USE_IDENTIFIER( 15 );
-HHuginn::identifier_id_t const LIST_IDENTIFIER( 16 );
-HHuginn::identifier_id_t const DEQUE_IDENTIFIER( 17 );
-HHuginn::identifier_id_t const DICT_IDENTIFIER( 18 );
-HHuginn::identifier_id_t const LOOKUP_IDENTIFIER( 19 );
-HHuginn::identifier_id_t const ORDER_IDENTIFIER( 20 );
-HHuginn::identifier_id_t const SET_IDENTIFIER( 21 );
+HHuginn::identifier_id_t const TUPLE_IDENTIFIER( 16 );
+HHuginn::identifier_id_t const LIST_IDENTIFIER( 17 );
+HHuginn::identifier_id_t const DEQUE_IDENTIFIER( 18 );
+HHuginn::identifier_id_t const DICT_IDENTIFIER( 19 );
+HHuginn::identifier_id_t const LOOKUP_IDENTIFIER( 20 );
+HHuginn::identifier_id_t const ORDER_IDENTIFIER( 21 );
+HHuginn::identifier_id_t const SET_IDENTIFIER( 22 );
 
 }
 
@@ -121,7 +122,7 @@ char const* POWER = "power";
 namespace STANDARD_FUNCTIONS {
 
 char const* MAIN = "main";
-HHuginn::identifier_id_t const MAIN_IDENTIFIER( 22 );
+HHuginn::identifier_id_t const MAIN_IDENTIFIER( 23 );
 
 }
 
@@ -161,6 +162,7 @@ words_t _builtin_ = {{
 	type_name( HHuginn::TYPE::DEQUE ),
 	type_name( HHuginn::TYPE::DICT ),
 	type_name( HHuginn::TYPE::INTEGER ),
+	type_name( HHuginn::TYPE::TUPLE ),
 	type_name( HHuginn::TYPE::LIST ),
 	type_name( HHuginn::TYPE::LOOKUP ),
 	type_name( HHuginn::TYPE::ORDER ),

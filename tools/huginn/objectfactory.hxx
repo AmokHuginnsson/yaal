@@ -156,6 +156,7 @@ class HObjectFactory final {
 	HHuginn::class_t _real;
 	HHuginn::class_t _number;
 	HHuginn::class_t _character;
+	HHuginn::class_t _tuple;
 	HHuginn::class_t _list;
 	HHuginn::class_t _deque;
 	HHuginn::class_t _dict;
@@ -173,6 +174,7 @@ class HObjectFactory final {
 	HObjectPool<HHuginn::HReal> _realPool;
 	HObjectPool<HHuginn::HNumber> _numberPool;
 	HObjectPool<HHuginn::HCharacter> _characterPool;
+	HObjectPool<HHuginn::HTuple> _tuplePool;
 	HObjectPool<HHuginn::HList> _listPool;
 	HObjectPool<HHuginn::HDeque> _dequePool;
 	HObjectPool<HHuginn::HDict, POOL_TYPE::COLLECTION> _dictPool;
@@ -206,6 +208,9 @@ public:
 	}
 	HHuginn::value_t create_character( HHuginn::HCharacter::value_type value_ ) const {
 		return ( _characterPool.create( value_ ) );
+	}
+	HHuginn::value_t create_tuple( HHuginn::values_t&& values_ = HHuginn::values_t() ) const {
+		return ( _tuplePool.create( yaal::move( values_ ) ) );
 	}
 	HHuginn::value_t create_list( HHuginn::values_t&& values_ = HHuginn::values_t() ) const {
 		return ( _listPool.create( yaal::move( values_ ) ) );

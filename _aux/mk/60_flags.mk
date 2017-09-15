@@ -5,7 +5,7 @@ CWARNING_FLAGS = \
 						-Wconversion \
 						-Wendif-labels \
 						-Werror \
-						-Wlarger-than-32768 \
+						-Wlarger-than-65536 \
 						-Wmissing-format-attribute \
 						-Wmissing-noreturn \
 						-Wpointer-arith \

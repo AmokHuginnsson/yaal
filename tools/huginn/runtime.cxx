@@ -71,6 +71,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			{ BUILTIN::COPY, BUILTIN::COPY_IDENTIFIER },
 			{ BUILTIN::OBSERVE, BUILTIN::OBSERVE_IDENTIFIER },
 			{ BUILTIN::USE, BUILTIN::USE_IDENTIFIER },
+			{ type_name( HHuginn::TYPE::TUPLE ), BUILTIN::TUPLE_IDENTIFIER },
 			{ type_name( HHuginn::TYPE::LIST ), BUILTIN::LIST_IDENTIFIER },
 			{ type_name( HHuginn::TYPE::DEQUE ), BUILTIN::DEQUE_IDENTIFIER },
 			{ type_name( HHuginn::TYPE::DICT ), BUILTIN::DICT_IDENTIFIER },
@@ -104,6 +105,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			BUILTIN::COPY,
 			BUILTIN::OBSERVE,
 			BUILTIN::USE,
+			type_name( HHuginn::TYPE::TUPLE ),
 			type_name( HHuginn::TYPE::LIST ),
 			type_name( HHuginn::TYPE::DEQUE ),
 			type_name( HHuginn::TYPE::DICT ),
@@ -605,6 +607,13 @@ HHuginn::value_t use( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::valu
 	M_EPILOG
 }
 
+HHuginn::value_t tuple( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int ) {
+	M_PROLOG
+	HHuginn::values_t v( values_ );
+	return ( thread_->object_factory().create_tuple( yaal::move( v ) ) );
+	M_EPILOG
+}
+
 HHuginn::value_t list( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int ) {
 	M_PROLOG
 	HHuginn::value_t v( thread_->object_factory().create_list() );
@@ -785,6 +794,7 @@ void HRuntime::register_builtins( void ) {
 	M_ENSURE( identifier_id( BUILTIN::COPY ) == BUILTIN::COPY_IDENTIFIER );
 	M_ENSURE( identifier_id( BUILTIN::OBSERVE ) == BUILTIN::OBSERVE_IDENTIFIER );
 	M_ENSURE( identifier_id( BUILTIN::USE ) == BUILTIN::USE_IDENTIFIER );
+	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::TUPLE ) ) == BUILTIN::TUPLE_IDENTIFIER );
 	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::LIST ) ) == BUILTIN::LIST_IDENTIFIER );
 	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::DEQUE ) ) == BUILTIN::DEQUE_IDENTIFIER );
 	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::DICT ) ) == BUILTIN::DICT_IDENTIFIER );
@@ -811,6 +821,7 @@ void HRuntime::register_builtins( void ) {
 	register_builtin_function( BUILTIN::COPY, hcore::call( &huginn_builtin::copy, _1, _2, _3, _4 ), "( *ref* ) - make a deep copy of a value given given by *ref*" );
 	register_builtin_function( BUILTIN::OBSERVE, hcore::call( &huginn_builtin::observe, _1, _2, _3, _4 ), "( *ref* ) - create an `*observer*` for a value given by *ref*" );
 	register_builtin_function( BUILTIN::USE, hcore::call( &huginn_builtin::use, _1, _2, _3, _4 ), "( *observer* ) - get a reference to a value from given *observer*" );
+	register_builtin_function( type_name( HHuginn::TYPE::TUPLE ), hcore::call( &huginn_builtin::tuple, _1, _2, _3, _4 ), "([ *items...* ]) - create `tuple` collection from *items...*" );
 	register_builtin_function( type_name( HHuginn::TYPE::LIST ), hcore::call( &huginn_builtin::list, _1, _2, _3, _4 ), "([ *items...* ]) - create `list` collection from *items...*" );
 	register_builtin_function( type_name( HHuginn::TYPE::DEQUE ), hcore::call( &huginn_builtin::deque, _1, _2, _3, _4 ), "([ *items...* ]) - create `deque` collection from *items...*" );
 	register_builtin_function( type_name( HHuginn::TYPE::DICT ), hcore::call( &huginn_builtin::dict, _1, _2, _3, _4 ), "create empty `dict` object" );

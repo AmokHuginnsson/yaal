@@ -120,6 +120,7 @@ public:
 	class HString;
 	class HCharacter;
 	class HNumber;
+	class HTuple;
 	class HList;
 	class HDeque;
 	typedef yaal::hcore::HPointer<HList> list_t;
@@ -152,6 +153,7 @@ public:
 		STRING,
 		NUMBER,
 		CHARACTER,
+		TUPLE,
 		LIST,
 		DEQUE,
 		DICT,
@@ -795,6 +797,26 @@ public:
 	void to_number( void ) const;
 	void to_real( void ) const;
 	void to_string( void ) const;
+private:
+	virtual value_t do_clone( huginn::HThread*, int ) const override;
+};
+
+class HHuginn::HTuple : public HHuginn::HIterable {
+public:
+	typedef HHuginn::HTuple this_type;
+	typedef HHuginn::HIterable base_type;
+	typedef yaal::hcore::HArray<HHuginn::value_t> values_t;
+private:
+	values_t _data;
+public:
+	HTuple( HHuginn::HClass const*, values_t&& );
+	value_t get( int long long );
+	values_t const& value( void ) const {
+		return ( _data );
+	}
+protected:
+	virtual HIterator do_iterator( huginn::HThread*, int ) override;
+	virtual int long do_size( huginn::HThread*, int ) const override;
 private:
 	virtual value_t do_clone( huginn::HThread*, int ) const override;
 };
