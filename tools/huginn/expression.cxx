@@ -302,10 +302,7 @@ void HExpression::set_variable( HFrame* frame_, int ) {
 		frame_->values().pop();
 		HHuginn::value_t dst( yaal::move( frame_->values().top() ) );
 		frame_->values().pop();
-		if ( dst->type_id() != HHuginn::TYPE::REFERENCE ) {
-			M_ASSERT( dst->type_id() == HHuginn::TYPE::CHARACTER );
-			throw HHuginn::HHuginnRuntimeException( "String does not support item assignment.", file_id(), p );
-		}
+		M_ASSERT( dst->type_id() == HHuginn::TYPE::REFERENCE );
 		HHuginn::value_t& ref( static_cast<HHuginn::HReference*>( dst.raw() )->value() );
 		if ( operation._operator == OPERATOR::ASSIGN ) {
 			ref.swap( src );
@@ -635,7 +632,7 @@ void HExpression::range( HFrame* frame_, int ) {
 	frame_->values().pop();
 	if ( ! select && ( rangeOpCount > 0 ) ) {
 		HHuginn::type_id_t t( base->type_id() );
-		if ( ( t != HHuginn::TYPE::LIST ) && ( t != HHuginn::TYPE::DEQUE ) && ( t != HHuginn::TYPE::STRING ) ) {
+		if ( ( t != HHuginn::TYPE::TUPLE ) && ( t != HHuginn::TYPE::LIST ) && ( t != HHuginn::TYPE::DEQUE ) && ( t != HHuginn::TYPE::STRING ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Range operator not supported on `"_ys.append( base->get_class()->name() ).append( "'." ), file_id(), p );
 		}
 		frame_->values().push( yaal::move( base ) );

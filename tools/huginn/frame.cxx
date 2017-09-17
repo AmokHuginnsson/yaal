@@ -169,12 +169,9 @@ void HFrame::note_variable( HHuginn::identifier_id_t identifier_, HStatement::st
 	M_EPILOG
 }
 
-void HFrame::commit_variable( HHuginn::value_t const& value_, int position_ ) {
+void HFrame::commit_variable( HHuginn::value_t const& value_, int ) {
 	M_PROLOG
-	if ( _result->type_id() != HHuginn::TYPE::REFERENCE ) {
-		M_ASSERT( _result->type_id() == HHuginn::TYPE::CHARACTER );
-		throw HHuginn::HHuginnRuntimeException( "String does not support item assignment.", file_id(), position_ );
-	}
+	M_ASSERT( _result->type_id() == HHuginn::TYPE::REFERENCE );
 	static_cast<HHuginn::HReference*>( _result.raw() )->value() = value_;
 	return;
 	M_EPILOG

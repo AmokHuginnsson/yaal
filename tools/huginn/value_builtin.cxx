@@ -59,7 +59,7 @@ HHuginn::value_t subscript(
 	HHuginn::type_id_t baseType( base_->type_id() );
 	HHuginn::value_t res;
 	HObjectFactory& of( *thread_->runtime().object_factory() );
-	if ( ( baseType == HHuginn::TYPE::LIST ) || ( baseType == HHuginn::TYPE::DEQUE ) || ( baseType == HHuginn::TYPE::STRING ) ) {
+	if ( ( baseType == HHuginn::TYPE::TUPLE ) || ( baseType == HHuginn::TYPE::LIST ) || ( baseType == HHuginn::TYPE::DEQUE ) || ( baseType == HHuginn::TYPE::STRING ) ) {
 		if ( index_->type_id() != HHuginn::TYPE::INTEGER ) {
 			throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::IDX_NOT_INT] ).append( index_->get_class()->name() ), thread_->current_frame()->file_id(), position_ );
 		}
@@ -72,7 +72,13 @@ HHuginn::value_t subscript(
 		if ( index < 0 ) {
 			index += size;
 		}
-		if ( baseType == HHuginn::TYPE::LIST ) {
+		if ( baseType == HHuginn::TYPE::TUPLE ) {
+			if ( subscript_ != HFrame::ACCESS::VALUE ) {
+				throw HHuginn::HHuginnRuntimeException( "`tuple` does not support item assignment.", thread_->current_frame()->file_id(), position_ );
+			}
+			HHuginn::HTuple* t( static_cast<HHuginn::HTuple*>( base_.raw() ) );
+			res = t->get( index );
+		} else if ( baseType == HHuginn::TYPE::LIST ) {
 			HHuginn::HList* l( static_cast<HHuginn::HList*>( base_.raw() ) );
 			res = ( subscript_ == HFrame::ACCESS::VALUE ? l->get( index ) : of.create_reference( l->get_ref( index ) ) );
 		} else if ( baseType == HHuginn::TYPE::DEQUE ) {
@@ -80,6 +86,9 @@ HHuginn::value_t subscript(
 			res = ( subscript_ == HFrame::ACCESS::VALUE ? d->get( index ) : of.create_reference( d->get_ref( index ) ) );
 		} else {
 			M_ASSERT( baseType == HHuginn::TYPE::STRING );
+			if ( subscript_ != HFrame::ACCESS::VALUE ) {
+				throw HHuginn::HHuginnRuntimeException( "`string` does not support item assignment.", thread_->current_frame()->file_id(), position_ );
+			}
 			HHuginn::HString* s( static_cast<HHuginn::HString*>( base_.raw() ) );
 			res = thread_->object_factory().create_character( s->value()[static_cast<int>( index )] );
 		}
@@ -108,7 +117,7 @@ HHuginn::value_t range(
 	 */
 	HHuginn::type_id_t baseType( base_->type_id() );
 	HHuginn::value_t res;
-	if ( ( baseType == HHuginn::TYPE::LIST ) || ( baseType == HHuginn::TYPE::DEQUE ) || ( baseType == HHuginn::TYPE::STRING ) ) {
+	if ( ( baseType == HHuginn::TYPE::TUPLE ) || ( baseType == HHuginn::TYPE::LIST ) || ( baseType == HHuginn::TYPE::DEQUE ) || ( baseType == HHuginn::TYPE::STRING ) ) {
 		if ( !! from_ && ( from_->type_id() != HHuginn::TYPE::INTEGER ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Range operand `from' is not an integer.", thread_->current_frame()->file_id(), position_ );
 		}
@@ -119,7 +128,9 @@ HHuginn::value_t range(
 			throw HHuginn::HHuginnRuntimeException( "Range operand `step' is not an integer.", thread_->current_frame()->file_id(), position_ );
 		}
 		int long size( static_cast<HHuginn::HIterable*>( base_.raw() )->size( thread_, position_ ) );
-		if ( baseType == HHuginn::TYPE::LIST ) {
+		if ( baseType == HHuginn::TYPE::TUPLE ) {
+			res = thread_->object_factory().create_tuple();
+		} else if ( baseType == HHuginn::TYPE::LIST ) {
 			res = thread_->object_factory().create_list();
 		} else if ( baseType == HHuginn::TYPE::DEQUE ) {
 			res = thread_->object_factory().create_deque();
@@ -172,7 +183,20 @@ HHuginn::value_t range(
 					break;
 				}
 			}
-			if ( baseType == HHuginn::TYPE::LIST ) {
+			if ( baseType == HHuginn::TYPE::TUPLE ) {
+				HHuginn::HTuple* t( static_cast<HHuginn::HTuple*>( base_.raw() ) );
+				HHuginn::values_t v;
+				if ( step > 0 ) {
+					for ( int long i( from ); i < to; i += step ) {
+						v.push_back( t->get( i ) );
+					}
+				} else {
+					for ( int long i( from ); i > to; i += step ) {
+						v.push_back( t->get( i ) );
+					}
+				}
+				res = thread_->object_factory().create_tuple( yaal::move( v ) );
+			} else if ( baseType == HHuginn::TYPE::LIST ) {
 				HHuginn::HList* l( static_cast<HHuginn::HList*>( base_.raw() ) );
 				HHuginn::HList* r( static_cast<HHuginn::HList*>( res.raw() ) );
 				if ( step > 0 ) {

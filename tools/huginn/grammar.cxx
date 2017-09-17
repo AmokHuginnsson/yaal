@@ -92,7 +92,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		constant(
 			'(',
 			HRuleBase::action_position_t( hcore::call( &OCompiler::defer_call, _compiler.get(), "tuple", _1 ) )
-		) >> -argList >> ')',
+		) >> -argList >> -constant( ',' ) >> ')',
 		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
 	);
 	HRule listLiteral(
