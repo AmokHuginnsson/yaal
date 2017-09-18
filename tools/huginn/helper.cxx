@@ -294,6 +294,7 @@ HHuginn::type_id_t verify_arg_collection(
 	int no_, ARITY argsArity_, ONTICALLY ontically_, huginn::HThread* thread_, int position_ ) {
 	M_PROLOG
 	static HHuginn::TYPE const material[] = {
+		HHuginn::TYPE::TUPLE,
 		HHuginn::TYPE::LIST,
 		HHuginn::TYPE::DEQUE,
 		HHuginn::TYPE::SET,

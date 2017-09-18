@@ -38,6 +38,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "range.hxx"
 #include "filter.hxx"
 #include "mapper.hxx"
+#include "tuple.hxx"
 #include "list.hxx"
 #include "deque.hxx"
 #include "dict.hxx"
@@ -61,6 +62,7 @@ class HAlgorithms : public HHuginn::HValue {
 	HHuginn::class_t _filterClass;
 	HHuginn::class_t _mapperClass;
 	HHuginn::class_t _rangeClass;
+	HHuginn::class_t _reversedTupleClass;
 	HHuginn::class_t _reversedListClass;
 	HHuginn::class_t _reversedDequeClass;
 	HHuginn::class_t _reversedDictClass;
@@ -75,6 +77,7 @@ public:
 		, _filterClass( HFilter::get_class( class_->runtime() ) )
 		, _mapperClass( HMapper::get_class( class_->runtime() ) )
 		, _rangeClass( HRange::get_class( class_->runtime() ) )
+		, _reversedTupleClass( HReversedTuple::get_class( class_->runtime() ) )
 		, _reversedListClass( HReversedList::get_class( class_->runtime() ) )
 		, _reversedDequeClass( HReversedDeque::get_class( class_->runtime() ) )
 		, _reversedDictClass( HReversedDict::get_class( class_->runtime() ) )
@@ -131,7 +134,14 @@ public:
 		HHuginn::value_t v;
 		HHuginn::HIterable const* src( static_cast<HHuginn::HIterable const*>( values_[0].raw() ) );
 		HHuginn::HIterable::HIterator it( const_cast<HHuginn::HIterable*>( src )->iterator( thread_, position_ ) );
-		if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::list ) ) {
+		if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::tuple ) ) {
+			HHuginn::HTuple::values_t dest;
+			while ( thread_->can_continue() && it.is_valid( thread_, position_ ) ) {
+				dest.push_back( it.value( thread_, position_ ) );
+				it.next( thread_, position_ );
+			}
+			v = thread_->object_factory().create_tuple( yaal::move( dest ) );
+		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::list ) ) {
 			v = thread_->object_factory().create_list();
 			HHuginn::HList::values_t& dest( static_cast<HHuginn::HList*>( v.raw() )->value() );
 			while ( thread_->can_continue() && it.is_valid( thread_, position_ ) ) {
@@ -188,7 +198,10 @@ public:
 		}
 		HHuginn::value_t v( thread_->object_factory().create_list() );
 		HHuginn::HList::values_t& dest( static_cast<HHuginn::HList*>( v.raw() )->value() );
-		if ( t == HHuginn::TYPE::LIST ) {
+		if ( t == HHuginn::TYPE::TUPLE ) {
+			HHuginn::HTuple::values_t const& k( static_cast<HHuginn::HTuple const*>( values_[0].raw() )->value() );
+			dest = k;
+		} else if ( t == HHuginn::TYPE::LIST ) {
 			HHuginn::HList::values_t const& l( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
 			dest = l;
 		} else if ( t == HHuginn::TYPE::DEQUE ) {
@@ -256,6 +269,9 @@ public:
 		HHuginn::value_t v;
 		HAlgorithms* a( static_cast<HAlgorithms*>( object_->raw() ) );
 		switch ( t.get() ) {
+			case ( static_cast<int>( HHuginn::TYPE::TUPLE ) ): {
+				v = thread_->object_factory().create<HReversedTuple>( a->_reversedTupleClass.raw(), values_[0] );
+			} break;
 			case ( static_cast<int>( HHuginn::TYPE::LIST ) ): {
 				v = thread_->object_factory().create<HReversedList>( a->_reversedListClass.raw(), values_[0] );
 			} break;
