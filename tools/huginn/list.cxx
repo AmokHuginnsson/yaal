@@ -83,10 +83,20 @@ inline HHuginn::value_t append( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_PROLOG
 	char const name[] = "list.append";
 	verify_arg_count( name, values_, 1, 1, thread_, position_ );
-	HHuginn::type_id_t t( verify_arg_type( name, values_, 0, { HHuginn::TYPE::LIST, HHuginn::TYPE::DEQUE, HHuginn::TYPE::ORDER, HHuginn::TYPE::SET }, ARITY::UNARY, thread_, position_ ) );
+	HHuginn::type_id_t t(
+		verify_arg_type(
+			name, values_, 0, {
+				HHuginn::TYPE::TUPLE, HHuginn::TYPE::LIST, HHuginn::TYPE::DEQUE, HHuginn::TYPE::ORDER, HHuginn::TYPE::SET
+			}, ARITY::UNARY, thread_, position_
+		)
+	);
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
 	HHuginn::HList::values_t& dst( static_cast<HHuginn::HList*>( object_->raw() )->value() );
 	switch( t.get() ) {
+		case ( static_cast<int>( HHuginn::TYPE::TUPLE ) ): {
+			HHuginn::HTuple::values_t const& src( static_cast<HHuginn::HTuple const*>( values_[0].raw() )->value() );
+			dst.insert( dst.end(), src.begin(), src.end() );
+		} break;
 		case ( static_cast<int>( HHuginn::TYPE::LIST ) ): {
 			HHuginn::HList::values_t const& src( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
 			dst.insert( dst.end(), src.begin(), src.end() );

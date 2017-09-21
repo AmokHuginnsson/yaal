@@ -814,6 +814,9 @@ public:
 	values_t const& value( void ) const {
 		return ( _data );
 	}
+	values_t& value( void ) {
+		return ( _data );
+	}
 protected:
 	virtual HIterator do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override;

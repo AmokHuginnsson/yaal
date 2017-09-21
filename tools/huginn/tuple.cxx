@@ -70,6 +70,17 @@ private:
 
 namespace tuple {
 
+inline HHuginn::value_t add( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_signature( "tuple.add", values_, { HHuginn::TYPE::TUPLE }, thread_, position_ );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::TUPLE );
+	HHuginn::HTuple::values_t& dst( static_cast<HHuginn::HTuple*>( object_->raw() )->value() );
+	HHuginn::HTuple::values_t const& src( static_cast<HHuginn::HTuple const*>( values_[0].raw() )->value() );
+	dst.insert( dst.end(), src.begin(), src.end() );
+	return ( *object_ );
+	M_EPILOG
+}
+
 inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "tuple.hash", values_, 0, 0, thread_, position_ );
@@ -121,6 +132,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			runtime_->identifier_id( type_name( HHuginn::TYPE::TUPLE ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
+				{ "add",    objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &tuple::add, _1, _2, _3, _4 ) ),    "( *other* ) - append all elements from *other* `tuple` at the end of this `tuple`" },
 				{ "hash",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &tuple::hash, _1, _2, _3, _4 ) ),   "calculate hash value for this `tuple`" },
 				{ "less",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &tuple::less, _1, _2, _3, _4 ) ),   "( *other* ) - test if this `tuple` comes lexicographically before *other* `tuple`" },
 				{ "equals", objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &tuple::equals, _1, _2, _3, _4 ) ), "( *other* ) - test if *other* `tuple` has the same content" }
