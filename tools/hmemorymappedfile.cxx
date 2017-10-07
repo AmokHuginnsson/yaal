@@ -27,6 +27,7 @@ Copyright:
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/mman.h>
+#include <sys/types.h>
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
