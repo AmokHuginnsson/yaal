@@ -146,7 +146,9 @@ public:
 	void free( void* p ) {
 		/* Find HPoolBlock that holds this object memory. */
 		int offset( *( static_cast<u8_t*>( p ) + OBJECT_SPACE - 1 ) );
+#pragma GCC diagnostic ignored "-Wcast-align"
 		HPoolBlock* pb( reinterpret_cast<HPoolBlock*>( static_cast<u8_t*>( p ) - offset * OBJECT_SPACE ) );
+#pragma GCC diagnostic error "-Wcast-align"
 		bool wasFull( pb->is_full() );
 		if ( pb->free( p ) ) {
 			/* HPoolBlock is no longer used so we can possibly remove it. */

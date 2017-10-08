@@ -98,7 +98,5 @@ private:
 
 }
 
-M_YAAL_TOOLS_EXTERN template class yaal::hcore::HSingleton<yaal::tools::huginn::HPackageFactory>;
-
 #endif /* not YAAL_TOOLS_HUGINN_PACKAGEFACTORY_HXX_INCLUDED */
 
