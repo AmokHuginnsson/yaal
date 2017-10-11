@@ -98,5 +98,12 @@ private:
 
 }
 
+#ifdef __HOST_OS_TYPE_CYGWIN__
+/*
+ * Required for proper auto-registration of packages from libraries other than yaal_tools.
+ */
+M_YAAL_TOOLS_EXTERN template class yaal::hcore::HSingleton<yaal::tools::huginn::HPackageFactory>;
+#endif /* #ifdef __HOST_OS_TYPE_CYGWIN__ */
+
 #endif /* not YAAL_TOOLS_HUGINN_PACKAGEFACTORY_HXX_INCLUDED */
 
