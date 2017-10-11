@@ -66,6 +66,7 @@ HStreamInterface& HBinaryFormatter::operator << ( HStreamInterface::manipulator_
 
 namespace {
 #pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wsign-conversion"
 template<typename T>
 inline T fwd_htons( T arg_ ) {
 	return ( static_cast<T>( htons( static_cast<uint16_t>( arg_ ) ) ) );
@@ -74,6 +75,7 @@ template<typename T>
 inline T fwd_htonl( T arg_ ) {
 	return ( static_cast<T>( htonl( static_cast<uint32_t> ( arg_ ) ) ) );
 }
+#pragma GCC diagnostic error "-Wsign-conversion"
 #pragma GCC diagnostic error "-Wold-style-cast"
 }
 

@@ -109,6 +109,7 @@ void HUDPSocket::init( MODE type_ ) {
 
 namespace {
 #pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wsign-conversion"
 template<typename T>
 inline T fwd_htons( T arg_ ) {
 	return ( htons( arg_ ) );
@@ -117,6 +118,7 @@ template<typename T>
 inline T fwd_ntohs( T arg_ ) {
 	return ( ntohs( arg_ ) );
 }
+#pragma GCC diagnostic error "-Wsign-conversion"
 #pragma GCC diagnostic error "-Wold-style-cast"
 }
 
