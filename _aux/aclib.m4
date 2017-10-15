@@ -118,22 +118,25 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 		AC_DEFINE([__HOST_OS_TYPE_LINUX__], [], [Your operating system is Linux.])
 		YAAL_LXXFLAGS=["-Wl,--entry=\"${PACKAGE_NAME}_\$(*)_main\""]
 		if test ["x${HOST_OS_TYPE}"] = ["xDebian"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/debconf.conf] \) ; then
-			AC_DEFINE([__HOST_OS_TYPE_DEBIAN__], [], [Your specific linux version is Debian.])
+			AC_DEFINE([__HOST_OS_TYPE_DEBIAN__], [], [Your specific Linux version is Debian.])
 			HOST_OS_TYPE=[Debian]
 		elif test ["x${HOST_OS_TYPE}"] = ["xUbuntu"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/00-header] \) ; then
-			AC_DEFINE([__HOST_OS_TYPE_UBUNTU__], [], [Your specific linux version is Ubuntu.])
+			AC_DEFINE([__HOST_OS_TYPE_UBUNTU__], [], [Your specific Linux version is Ubuntu.])
 			HOST_OS_TYPE=[Ubuntu]
 		elif test ["x${HOST_OS_TYPE}"] = ["xCentOS"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/yum.repos.d/CentOS-Base.repo] \) ; then
-			AC_DEFINE([__HOST_OS_TYPE_CENTOS__], [], [Your specific linux version is CentOS.])
+			AC_DEFINE([__HOST_OS_TYPE_CENTOS__], [], [Your specific Linux version is CentOS.])
 			HOST_OS_TYPE=[CentOS]
 		elif test ["x${HOST_OS_TYPE}"] = ["xFedora"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/yum.repos.d/CentOS-Base.repo] \) ; then
-			AC_DEFINE([__HOST_OS_TYPE_FEDORA__], [], [Your specific linux version is Fedora.])
+			AC_DEFINE([__HOST_OS_TYPE_FEDORA__], [], [Your specific Linux version is Fedora.])
 			HOST_OS_TYPE=[CentOS]
+		elif test ["x${HOST_OS_TYPE}"] = ["xRaspbian"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/rpi-issue] \) ; then
+			AC_DEFINE([__HOST_OS_TYPE_RASPBIAN__], [], [Your specific Linux version is Raspbian.])
+			HOST_OS_TYPE=[Raspbian]
 		elif test ["x${HOST_OS_TYPE}"] = ["xPLD"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/poldek/poldek.conf] \) ; then
-			AC_DEFINE([__HOST_OS_TYPE_PLD__], [], [Your specific linux version is PLD.])
+			AC_DEFINE([__HOST_OS_TYPE_PLD__], [], [Your specific Linux version is PLD.])
 			HOST_OS_TYPE=[PLD]
 		elif test ["x${HOST_OS_TYPE}"] = ["xSlackware"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/random-seed] \) ; then
-			AC_DEFINE([__HOST_OS_TYPE_SLACKWARE__], [], [Your specific linux version is Slackware.])
+			AC_DEFINE([__HOST_OS_TYPE_SLACKWARE__], [], [Your specific Linux version is Slackware.])
 			HOST_OS_TYPE=[Slackware]
 		else
 			HOST_OS_TYPE=[Linux]
