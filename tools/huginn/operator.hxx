@@ -80,6 +80,7 @@ enum class OPERATOR {
 	BOOLEAN_NOT,
 	TERNARY,
 	MAKE_DICT,
+	MAKE_LOOKUP,
 	NONE
 };
 

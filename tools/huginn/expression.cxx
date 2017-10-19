@@ -396,18 +396,32 @@ void HExpression::create_closure( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::make_dict( HFrame* frame_, int ) {
+namespace {
+
+struct ValuePosition {
+	HHuginn::value_t _value;
+	int _position;
+	ValuePosition( HHuginn::value_t const& val_, int pos_ )
+		: _value( val_ ), _position( pos_ ) {
+	}
+};
+typedef yaal::hcore::HArray<ValuePosition> positioned_values_t;
+
+template <typename assoc_t>
+inline HHuginn::value_t fill_assoc( HThread* thread_, HHuginn::value_t&& assoc_, positioned_values_t const& values_ ) {
+	assoc_t* dict( static_cast<assoc_t*>( assoc_.raw() ) );
+	for ( int i( 0 ), S( static_cast<int>( values_.get_size() ) ); i < S; i += 2 ) {
+		dict->insert( thread_, values_[i]._value, values_[i + 1]._value, values_[i]._position );
+	}
+	return ( assoc_ );
+}
+
+}
+
+void HExpression::make_assoc( OPERATOR op_, HFrame* frame_, int ) {
 	M_PROLOG
 	int& ip( frame_->ip() );
 	M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );
-	struct ValuePosition {
-		HHuginn::value_t _value;
-		int _position;
-		ValuePosition( HHuginn::value_t const& val_, int pos_ )
-			: _value( val_ ), _position( pos_ ) {
-		}
-	};
-	typedef yaal::hcore::HArray<ValuePosition> positioned_values_t;
 	positioned_values_t values;
 	while ( _instructions[ip]._operator == OPERATOR::FUNCTION_ARGUMENT ) {
 		values.emplace_back( yaal::move( frame_->values().top() ), _instructions[ip]._position );
@@ -420,11 +434,11 @@ void HExpression::make_dict( HFrame* frame_, int ) {
 	++ ip;
 	reverse( values.begin(), values.end() );
 	HThread* t( frame_->thread() );
-	HHuginn::value_t v( t->object_factory().create_dict() );
-	HHuginn::HDict* dict( static_cast<HHuginn::HDict*>( v.raw() ) );
-	for ( int i( 0 ), S( static_cast<int>( values.get_size() ) ); i < S; i += 2 ) {
-		dict->insert( t, values[i]._value, values[i + 1]._value, values[i]._position );
-	}
+	HHuginn::value_t v(
+		op_ == OPERATOR::MAKE_DICT
+		? fill_assoc<HHuginn::HDict>( t, t->object_factory().create_dict(), values )
+		: fill_assoc<HHuginn::HLookup>( t, t->object_factory().create_lookup(), values )
+	);
 	frame_->values().push( v );
 	return;
 	M_EPILOG

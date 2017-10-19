@@ -2143,7 +2143,8 @@ void OCompiler::dispatch_action( OPERATOR oper_, executing_parser::position_t po
 		case ( OPERATOR::ASSIGN ):        { dispatch_assign( position_ );        } break;
 		case ( OPERATOR::MEMBER_ACCESS ): { dispatch_member_access( position_ ); } break;
 		case ( OPERATOR::FUNCTION_CALL ): { dispatch_function_call( &HExpression::function_call, position_ ); } break;
-		case ( OPERATOR::MAKE_DICT ):     { dispatch_function_call( &HExpression::make_dict, position_ ); } break;
+		case ( OPERATOR::MAKE_DICT ):     { dispatch_function_call( &HExpression::make_dict, position_ ); }     break;
+		case ( OPERATOR::MAKE_LOOKUP ):   { dispatch_function_call( &HExpression::make_lookup, position_ ); }   break;
 		case ( OPERATOR::PARENTHESIS ):
 		case ( OPERATOR::ABSOLUTE ): {
 			M_ASSERT( ( o == OPERATOR::ABSOLUTE ) || ( o == OPERATOR::PARENTHESIS ) );

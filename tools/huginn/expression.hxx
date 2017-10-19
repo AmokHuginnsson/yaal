@@ -72,7 +72,13 @@ public:
 	void factorial( huginn::HFrame*, int );
 	void negate( huginn::HFrame*, int );
 	void function_call( huginn::HFrame*, int );
-	void make_dict( huginn::HFrame*, int );
+	void make_assoc( OPERATOR, huginn::HFrame*, int );
+	void make_dict( huginn::HFrame* frame_, int position_ ) {
+		make_assoc( OPERATOR::MAKE_DICT, frame_, position_ );
+	}
+	void make_lookup( huginn::HFrame* frame_, int position_ ) {
+		make_assoc( OPERATOR::MAKE_LOOKUP, frame_, position_ );
+	}
 	void get_field_direct( HFrame::ACCESS, int, huginn::HFrame*, int );
 	void get_variable_direct( HFrame::ACCESS, HStatement::statement_id_t, int, huginn::HFrame*, int );
 	void create_closure( huginn::HFrame*, int );

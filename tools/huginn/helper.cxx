@@ -611,6 +611,7 @@ char const* op_to_str( OPERATOR o_ ) {
 		case ( OPERATOR::BOOLEAN_NOT ):        str = "!x";     break;
 		case ( OPERATOR::TERNARY ):            str = "?:";     break;
 		case ( OPERATOR::MAKE_DICT ):          str = "{k:v}";  break;
+		case ( OPERATOR::MAKE_LOOKUP ):        str = "[k:v]";  break;
 		case ( OPERATOR::NONE ): break;
 	}
 	return ( str );

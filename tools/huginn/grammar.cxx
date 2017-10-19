@@ -115,6 +115,14 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		) >> -( dictLiteralElement >> *( ',' >> dictLiteralElement ) ) >> '}',
 		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MAKE_DICT, _1 ) )
 	);
+	HRule lookupLiteral(
+		"lookupLiteral",
+		constant(
+			'[',
+			HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
+		) >> -( dictLiteralElement >> *( ',' >> dictLiteralElement ) ) >> ']',
+		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MAKE_LOOKUP, _1 ) )
+	);
 	HRule setLiteral(
 		"setLiteral",
 		constant(
@@ -211,7 +219,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 				| character_literal[e_p::HCharacterLiteral::action_character_position_t( hcore::call( &OCompiler::defer_store_character, _compiler.get(), _1, _2 ) )] )
 			>> -( memberAccess >> functionCallOperator )
 		)
-		| ( ( tupleLiteral | listLiteral | dictLiteral | stringLiteral ) >> -( ( subscriptOperator | memberAccess ) >> dereference ) )
+		| ( ( tupleLiteral | listLiteral | dictLiteral | lookupLiteral | stringLiteral ) >> -( ( subscriptOperator | memberAccess ) >> dereference ) )
 		| ( setLiteral >> -( memberAccess >> dereference ) )
 		| literalNone | booleanLiteralTrue | booleanLiteralFalse
 		| ( reference >> dereference )
