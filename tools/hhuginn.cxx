@@ -992,6 +992,19 @@ yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn const* h
 			}
 			str.append( "}" );
 		} break;
+		case ( HHuginn::TYPE::LOOKUP ): {
+			HHuginn::HLookup const* lk( static_cast<HHuginn::HLookup const*>( value_.raw() ) );
+			str = "[";
+			bool next( false );
+			for ( HHuginn::HLookup::values_t::value_type const& v : lk->value() ) {
+				if ( next ) {
+					str.append( ", " );
+				}
+				next = true;
+				str.append( to_string( v.first, huginn_ ) ).append( ": " ).append( to_string( v.second, huginn_ ) );
+			}
+			str.append( "]" );
+		} break;
 		case ( HHuginn::TYPE::SET ): {
 			HHuginn::HSet const* s( static_cast<HHuginn::HSet const*>( value_.raw() ) );
 			str = "{";
