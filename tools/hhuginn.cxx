@@ -951,6 +951,9 @@ yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn const* h
 				next = true;
 				str.append( to_string( v, huginn_ ) );
 			}
+			if ( t->value().get_size() == 1 ) {
+				str.append( "," );
+			}
 			str.append( ")" );
 		} break;
 		case ( HHuginn::TYPE::LIST ): {
