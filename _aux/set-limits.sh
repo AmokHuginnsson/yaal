@@ -31,16 +31,15 @@ else
 fi
 ulimit -s 8192
 if [ ${PHYS_MEM} -ne 0 ] ; then
-	ulimit -v ${PHYS_MEM}
-	ulimit -d ${PHYS_MEM}
-	LIMITED=`ulimit -v`
 	if [ -z "${MAX_32BIT_PHYS_MEM}" ] ; then
 		MAX_32BIT_PHYS_MEM=`expr 4095 \* 1024`
 	fi
+	LIMITED=$(ulimit -v ${PHYS_MEM} ; ulimit -v)
 	if [ \( ${PHYS_MEM} -gt ${MAX_32BIT_PHYS_MEM} \) -a \( "x${LIMITED}" = "xunlimited" \) ] ; then
-		ulimit -v ${MAX_32BIT_PHYS_MEM}
-		ulimit -d ${MAX_32BIT_PHYS_MEM}
+		PHYS_MEM=${MAX_32BIT_PHYS_MEM}
 	fi
+	ulimit -v ${PHYS_MEM}
+	ulimit -d ${PHYS_MEM}
 fi
 
 # vim: ft=sh
