@@ -34,7 +34,9 @@ if [ ${PHYS_MEM} -ne 0 ] ; then
 	ulimit -v ${PHYS_MEM}
 	ulimit -d ${PHYS_MEM}
 	LIMITED=`ulimit -v`
-	MAX_32BIT_PHYS_MEM=`expr 4095 \* 1024`
+	if [ -z "${MAX_32BIT_PHYS_MEM}" ] ; then
+		MAX_32BIT_PHYS_MEM=`expr 4095 \* 1024`
+	fi
 	if [ \( ${PHYS_MEM} -gt ${MAX_32BIT_PHYS_MEM} \) -a \( "x${LIMITED}" = "xunlimited" \) ] ; then
 		ulimit -v ${MAX_32BIT_PHYS_MEM}
 		ulimit -d ${MAX_32BIT_PHYS_MEM}
