@@ -31,6 +31,7 @@ including but not limited to:
 	- Ubuntu
 	- CentOS
 	- Fedora
+	- Raspbian
 - FreeBSD
 - Oracle Solaris
 - Microsoft Windows
@@ -38,4 +39,8 @@ including but not limited to:
 
 ## How
 
-**yaal** can be installed from binary packages and build from sources.
+**yaal** can be installed from [binary packages][1] or build from [sources][2].
+
+[1]: https://codestation.org/?h-action=menu-page&page=download
+[2]: https://codestation.org/?h-action=menu-project&menu=submenu-project&page=&project=yaal
+
