@@ -156,6 +156,11 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		capture >> ( * ( ',' >> capture ) )
 	);
 	HRule statement( "statement" );
+	HRule callable(
+		"callable",
+		constant( '(' ) >> -nameList >> constant( ')', HRuleBase::action_position_t( hcore::call( &OCompiler::verify_default_argument, _compiler.get(), _1 ) ) )
+		>> '{' >> *statement >> '}'
+	);
 	/*
 	 * There are two kinds of lambdas in Huginn language:
 	 * 1. Pure lambda functions (called Lambda(s) for short)
@@ -173,8 +178,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		"lambda",
 		( '@' >> -( '[' >> captureList >> ']' ) )[
 			e_p::HRegex::action_position_t( hcore::call( &OCompiler::set_lambda_name, _compiler.get(), _1 ) )
-		] >> '(' >> -nameList >> constant( ')', HRuleBase::action_position_t( hcore::call( &OCompiler::verify_default_argument, _compiler.get(), _1 ) ) )
-		>> '{' >> *statement  >> '}',
+		] >> callable,
 		HRuleBase::action_position_t( hcore::call( &OCompiler::create_lambda, _compiler.get(), _1 ) )
 	);
 	HRule rangeOper(
@@ -470,9 +474,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 			"functionDefinitionIdentifier",
 			identifierPattern,
 			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_function_name, _compiler.get(), _1, _2 ) )
-		) >> '(' >> -nameList >>
-		constant( ')', HRuleBase::action_position_t( hcore::call( &OCompiler::verify_default_argument, _compiler.get(), _1 ) ) )
-		>> '{' >> *statement >> '}',
+		) >> callable,
 		HRuleBase::action_position_t( hcore::call( &OCompiler::create_function, _compiler.get(), _1 ) )
 	);
 	HRule field(
