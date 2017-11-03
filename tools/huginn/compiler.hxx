@@ -457,8 +457,7 @@ struct OCompiler {
 
 	/*! \brief Verify that there are no holes in default argument definitions in function parameters.
 	 *
-	 * This function is called both explicitly by OCompiler
-	 * and implicitly by executing_parser (from grammar).
+	 * This function is called implicitly by executing_parser (from grammar).
 	 */
 	void verify_default_argument( executing_parser::position_t );
 	void track_name_cycle( HHuginn::identifier_id_t );

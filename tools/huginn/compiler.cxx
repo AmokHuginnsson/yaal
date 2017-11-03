@@ -962,7 +962,6 @@ void OCompiler::add_parameter( yaal::hcore::HString const& name_, executing_pars
 	if ( find( fc._parameters.begin(), fc._parameters.end(), parameterIdentifier ) != fc._parameters.end() ) {
 		throw HHuginn::HHuginnRuntimeException( "Parameter `"_ys.append( name_ ).append( "' was already defined." ), MAIN_FILE_ID, position_.get() );
 	}
-	verify_default_argument( position_ );
 	_usedIdentifiers[parameterIdentifier].write( position_.get(), OIdentifierUse::TYPE::VARIABLE );
 	_executionStepsBacklog.emplace_back(
 		OExecutionStep::OPERATION::DEFINE,

@@ -131,13 +131,18 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		) >> arg >> *( ',' >> arg ) >> '}',
 		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
 	);
-	HRule parameter(
-		"parameter",
+	HRule parameterIdentifier(
+		"parameterIdentifier",
 		regex(
-			"parameterIdentifier",
 			identifierPattern,
 			HRegex::action_string_position_t( hcore::call( &OCompiler::add_parameter, _compiler.get(), _1, _2 ) )
-		) >> -( constant( '=' ) >> HRule( expression, HRuleBase::action_position_t( hcore::call( &OCompiler::add_default_value, _compiler.get(), _1 ) ) ) )
+		)
+	);
+	HRule parameter(
+		"parameter",
+		parameterIdentifier
+		>> -( constant( '=' ) >> HRule( expression, HRuleBase::action_position_t( hcore::call( &OCompiler::add_default_value, _compiler.get(), _1 ) ) ) ),
+		HRuleBase::action_position_t( hcore::call( &OCompiler::verify_default_argument, _compiler.get(), _1 ) )
 	);
 	HRule nameList(
 		"nameList",
@@ -158,7 +163,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	HRule statement( "statement" );
 	HRule callable(
 		"callable",
-		constant( '(' ) >> -nameList >> constant( ')', HRuleBase::action_position_t( hcore::call( &OCompiler::verify_default_argument, _compiler.get(), _1 ) ) )
+		constant( '(' ) >> -nameList >> ')'
 		>> '{' >> *statement >> '}'
 	);
 	/*
