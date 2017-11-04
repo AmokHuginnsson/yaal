@@ -19,7 +19,7 @@ for handling problems and providing solutions in multiple domains:
 - database access
 
 **yaal** also contains a fully fledged
-programming language named Huginn.
+programming language named [Huginn][1].
 
 ## Where
 
@@ -39,8 +39,9 @@ including but not limited to:
 
 ## How
 
-**yaal** can be installed from [binary packages][1] or build from [sources][2].
+**yaal** can be installed from [binary packages][2] or build from [sources][3].
 
-[1]: https://codestation.org/?h-action=menu-page&page=download
-[2]: https://codestation.org/?h-action=menu-project&menu=submenu-project&page=&project=yaal
+[1]: https://huginn.org/
+[2]: https://codestation.org/?h-action=menu-page&page=download
+[3]: https://codestation.org/?h-action=menu-project&menu=submenu-project&page=&project=yaal
 
