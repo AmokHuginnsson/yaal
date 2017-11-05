@@ -1901,10 +1901,6 @@ yaal::hcore::HUTF8String::const_iterator HAnd::do_parse( HExecutingParser* execu
 	M_EPILOG
 }
 
-bool HAnd::do_is_optional( void ) const {
-	return ( true );
-}
-
 void HAnd::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const {
 	M_PROLOG
 	rd_.desc( "( " );
@@ -2049,10 +2045,6 @@ yaal::hcore::HUTF8String::const_iterator HNot::do_parse( HExecutingParser* execu
 	}
 	return ( scan );
 	M_EPILOG
-}
-
-bool HNot::do_is_optional( void ) const {
-	return ( true );
 }
 
 void HNot::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const {

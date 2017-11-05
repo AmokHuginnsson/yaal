@@ -554,7 +554,6 @@ public:
 protected:
 	HAnd( HNamedRule const&, HNamedRule const&, action_t const& );
 	HAnd( HNamedRule const&, HNamedRule const&, action_position_t const& );
-	virtual bool do_is_optional( void ) const override;
 	virtual ptr_t do_clone( void ) const override;
 	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
@@ -588,7 +587,6 @@ public:
 protected:
 	HNot( HNamedRule const&, HNamedRule const&, action_t const& );
 	HNot( HNamedRule const&, HNamedRule const&, action_position_t const& );
-	virtual bool do_is_optional( void ) const override;
 	virtual ptr_t do_clone( void ) const override;
 	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
