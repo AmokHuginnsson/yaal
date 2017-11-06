@@ -278,6 +278,10 @@ struct OCompiler {
 		 */
 		bool _isLambda;
 
+		/*! \brief Tell if this function is of a variadic kind.
+		 */
+		bool _isVariadic;
+
 		/*! \brief Tell if next scope created with {...} should be inlined.
 		 */
 		bool _inline;
@@ -441,6 +445,7 @@ struct OCompiler {
 	void set_field_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void add_field_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void set_lambda_name( executing_parser::position_t );
+	void mark_variadic( void );
 	void create_function( executing_parser::position_t );
 	function_info_t create_function_low( executing_parser::position_t );
 	void commit_import( executing_parser::position_t );

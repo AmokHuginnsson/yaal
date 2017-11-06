@@ -32,6 +32,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "thread.hxx"
 #include "expression.hxx"
 #include "scope.hxx"
+#include "objectfactory.hxx"
 #include "helper.hxx"
 
 using namespace yaal;
@@ -47,12 +48,19 @@ HFunction::HFunction(
 	HHuginn::identifier_id_t name_,
 	int parameterCount_,
 	HHuginn::scope_t const& scope_,
-	expressions_t const& defaultValues_
+	expressions_t const& defaultValues_,
+	bool isVariadic_
 ) : HStatement( scope_->id(), scope_->file_id(), scope_->position() )
 	, _name( name_ )
 	, _parameterCount( parameterCount_ )
+	, _defaultParametersStart( _parameterCount - static_cast<int>( defaultValues_.get_size() ) )
 	, _defaultValues( defaultValues_ )
-	, _scope( scope_ ) {
+	, _scope( scope_ )
+	, _isVariadic( isVariadic_ ) {
+	if ( _isVariadic ) {
+		-- _defaultParametersStart;
+		-- _parameterCount;
+	}
 	_scope->make_inline();
 	return;
 }
@@ -116,29 +124,33 @@ HHuginn::value_t HFunction::execute_impl(
 	verify_arg_count(
 		thread_->runtime().identifier_name( _name ),
 		values_,
-		_parameterCount - static_cast<int>( _defaultValues.get_size() ),
-		_parameterCount,
+		_defaultParametersStart,
+		_isVariadic ? meta::max_signed<int>::value : _parameterCount,
 		thread_,
 		position_
 	);
 	HFrame* f( thread_->current_frame() );
-	for (
-		int i( 0 ),
-			VALUE_COUNT( static_cast<int>( values_.get_size() ) ),
-			DEFAULT_VALUE_COUNT( static_cast<int>( _defaultValues.get_size() ) );
-		i < _parameterCount;
-		++ i
-	) {
+	int const VALUE_COUNT( static_cast<int>( values_.get_size() ) );
+	for ( int i( 0 ); i < _parameterCount; ++ i ) {
 		if ( i < VALUE_COUNT ) {
 			f->add_variable( values_[i] );
 		} else {
-			int defaultValueIndex( i - ( _parameterCount - DEFAULT_VALUE_COUNT ) );
+			int defaultValueIndex( i - _defaultParametersStart );
 			_defaultValues[defaultValueIndex]->execute( thread_ );
 			if ( ! f->can_continue() ) {
 				break;
 			}
 			f->add_variable( f->result() );
 		}
+	}
+	if ( _isVariadic ) {
+		HHuginn::value_t v( thread_->object_factory().create_tuple() );
+		HHuginn::HTuple::values_t& variadic( static_cast<HHuginn::HTuple*>( v.raw() )->value() );
+		variadic.reserve( max( VALUE_COUNT - _parameterCount, 0 ) );
+		for ( int i( _parameterCount ); i < VALUE_COUNT; ++ i ) {
+			variadic.push_back( values_[i] );
+		}
+		f->add_variable( v );
 	}
 	if ( f->can_continue() ) {
 		_scope->execute( thread_ );

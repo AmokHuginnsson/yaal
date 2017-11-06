@@ -39,8 +39,15 @@ HIntroFunction::HIntroFunction(
 	HHuginn::identifier_id_t name_,
 	OCompiler::OFunctionContext::parameter_names_t const& parameterNames_,
 	HHuginn::scope_t const& scope_,
-	expressions_t const& defaults_
-) : HFunction( name_, static_cast<int>( parameterNames_.get_size() ), scope_, defaults_ )
+	expressions_t const& defaults_,
+	bool isVariadic_
+) : HFunction(
+		name_,
+		static_cast<int>( parameterNames_.get_size() ),
+		scope_,
+		defaults_,
+		isVariadic_
+	)
 	, _parameterNames( parameterNames_ ) {
 	return;
 }

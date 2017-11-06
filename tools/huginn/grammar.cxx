@@ -140,30 +140,23 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	);
 	HRule parameter(
 		"parameter",
-		parameterIdentifier
+		( parameterIdentifier ^ "..." )
 		>> -( constant( '=' ) >> HRule( expression, HRuleBase::action_position_t( hcore::call( &OCompiler::add_default_value, _compiler.get(), _1 ) ) ) ),
 		HRuleBase::action_position_t( hcore::call( &OCompiler::verify_default_argument, _compiler.get(), _1 ) )
+	);
+	HRule variadicParameter(
+		"variadicParameter",
+		parameterIdentifier >> "...",
+		HRuleBase::action_t( hcore::call( &OCompiler::mark_variadic, _compiler.get() ) )
 	);
 	HRule nameList(
 		"nameList",
 		parameter >> ( * ( ',' >> parameter ) )
 	);
-	HRule capture(
-		"capture",
-		regex(
-			"captureIdentifier",
-			identifierPattern,
-			HRegex::action_string_position_t( hcore::call( &OCompiler::add_capture, _compiler.get(), _1, _2 ) )
-		)
-	);
-	HRule captureList(
-		"captureList",
-		capture >> ( * ( ',' >> capture ) )
-	);
 	HRule statement( "statement" );
 	HRule callable(
 		"callable",
-		constant( '(' ) >> -nameList >> ')'
+		constant( '(' ) >> -( ( nameList >> -( ',' >> variadicParameter ) ) | variadicParameter ) >> ')'
 		>> '{' >> *statement >> '}'
 	);
 	/*
@@ -179,6 +172,18 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	 * Hence each Closure constitutes a separate class which instance is created
 	 * on Closure definition site.
 	 */
+	HRule capture(
+		"capture",
+		regex(
+			"captureIdentifier",
+			identifierPattern,
+			HRegex::action_string_position_t( hcore::call( &OCompiler::add_capture, _compiler.get(), _1, _2 ) )
+		)
+	);
+	HRule captureList(
+		"captureList",
+		capture >> ( * ( ',' >> capture ) )
+	);
 	HRule lambda(
 		"lambda",
 		( '@' >> -( '[' >> captureList >> ']' ) )[

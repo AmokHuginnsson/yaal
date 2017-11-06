@@ -47,10 +47,12 @@ public:
 private:
 	HHuginn::identifier_id_t _name;
 	int _parameterCount;
+	int _defaultParametersStart;
 	expressions_t _defaultValues;
 	HHuginn::scope_t _scope;
+	bool _isVariadic;
 public:
-	HFunction( HHuginn::identifier_id_t, int, HHuginn::scope_t const&, expressions_t const& );
+	HFunction( HHuginn::identifier_id_t, int, HHuginn::scope_t const&, expressions_t const&, bool );
 	HHuginn::value_t execute( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int ) const;
 	HHuginn::value_t execute_incremental_main( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int ) const;
 	HHuginn::identifier_id_t name( void ) const {

@@ -47,7 +47,7 @@ public:
 private:
 	OCompiler::OFunctionContext::parameter_names_t _parameterNames;
 public:
-	HIntroFunction( HHuginn::identifier_id_t, OCompiler::OFunctionContext::parameter_names_t const&, HHuginn::scope_t const&, expressions_t const& );
+	HIntroFunction( HHuginn::identifier_id_t, OCompiler::OFunctionContext::parameter_names_t const&, HHuginn::scope_t const&, expressions_t const&, bool );
 	HHuginn::value_t execute( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int ) const;
 	HHuginn::value_t execute_incremental_main( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int ) const;
 private:

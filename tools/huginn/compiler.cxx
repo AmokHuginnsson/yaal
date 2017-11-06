@@ -146,6 +146,7 @@ OCompiler::OFunctionContext::OFunctionContext(
 	, _isAssert( false )
 	, _lastMemberName()
 	, _isLambda( isLambda_ )
+	, _isVariadic( false )
 	, _inline( true )
 	, _compiler( compiler_ ) {
 	_scopeStack.emplace( make_pointer<OScopeContext>( this, statementId_, fileId_, 0 ) );
@@ -854,7 +855,8 @@ OCompiler::function_info_t OCompiler::create_function_low( executing_parser::pos
 						fc._functionIdentifier,
 						fc._parameters,
 						scope,
-						fc._defaultValues
+						fc._defaultValues,
+						fc._isVariadic
 					),
 					_1, _2, _3, _4
 				)
@@ -866,7 +868,8 @@ OCompiler::function_info_t OCompiler::create_function_low( executing_parser::pos
 						fc._functionIdentifier,
 						static_cast<int>( fc._parameters.get_size() ),
 						scope,
-						fc._defaultValues
+						fc._defaultValues,
+						fc._isVariadic
 					),
 					_1, _2, _3, _4
 				)
@@ -973,6 +976,14 @@ void OCompiler::add_parameter( yaal::hcore::HString const& name_, executing_pars
 		position_.get()
 	);
 	fc._parameters.push_back( parameterIdentifier );
+	return;
+	M_EPILOG
+}
+
+void OCompiler::mark_variadic( void ) {
+	M_PROLOG
+	OFunctionContext& fc( f() );
+	fc._isVariadic = true;
 	return;
 	M_EPILOG
 }
