@@ -105,7 +105,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	);
 	HRule dictLiteralElement(
 		"dictLiteralElement",
-		arg >> ':' >>	arg
+		arg >> ':' >> arg
 	);
 	HRule dictLiteral(
 		"dictLiteral",

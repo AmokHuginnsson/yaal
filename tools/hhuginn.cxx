@@ -996,10 +996,14 @@ yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn const* h
 			str.append( "}" );
 		} break;
 		case ( HHuginn::TYPE::LOOKUP ): {
-			HHuginn::HLookup const* lk( static_cast<HHuginn::HLookup const*>( value_.raw() ) );
+			HHuginn::HLookup::values_t const& lk( static_cast<HHuginn::HLookup const*>( value_.raw() )->value() );
+			if ( lk.is_empty() ) {
+				str = "lookup()";
+				break;
+			}
 			str = "[";
 			bool next( false );
-			for ( HHuginn::HLookup::values_t::value_type const& v : lk->value() ) {
+			for ( HHuginn::HLookup::values_t::value_type const& v : lk ) {
 				if ( next ) {
 					str.append( ", " );
 				}
