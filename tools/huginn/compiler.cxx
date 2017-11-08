@@ -372,7 +372,7 @@ void OCompiler::resolve_symbols( void ) {
 				}
 				captures_log_t::const_iterator cli( _capturesLog.find( es._scope->_functionId ) );
 				if ( cli != _capturesLog.end() ) {
-					OFunctionContext::parameter_names_t::const_iterator ci( find( cli->second.begin(), cli->second.end(), es._identifier ) );
+					HFunction::parameter_names_t::const_iterator ci( find( cli->second.begin(), cli->second.end(), es._identifier ) );
 					if ( ci != cli->second.end() ) {
 						es._expression->replace_execution_step(
 							es._index,
@@ -866,7 +866,7 @@ OCompiler::function_info_t OCompiler::create_function_low( executing_parser::pos
 					isIncrementalMain ? &HFunction::execute_incremental_main : &HFunction::execute,
 					make_pointer<HFunction>(
 						fc._functionIdentifier,
-						static_cast<int>( fc._parameters.get_size() ),
+						fc._parameters,
 						scope,
 						fc._defaultValues,
 						fc._isVariadic

@@ -37,29 +37,18 @@ namespace huginn {
 
 HIntroFunction::HIntroFunction(
 	HHuginn::identifier_id_t name_,
-	OCompiler::OFunctionContext::parameter_names_t const& parameterNames_,
+	parameter_names_t const& parameterNames_,
 	HHuginn::scope_t const& scope_,
 	expressions_t const& defaults_,
 	bool isVariadic_
 ) : HFunction(
-		name_,
-		static_cast<int>( parameterNames_.get_size() ),
-		scope_,
-		defaults_,
-		isVariadic_
-	)
-	, _parameterNames( parameterNames_ ) {
+	name_,
+	parameterNames_,
+	scope_,
+	defaults_,
+	isVariadic_
+) {
 	return;
-}
-
-void HIntroFunction::note_parameters( HThread* thread_ ) const {
-	M_PROLOG
-	HFrame* f( thread_->current_frame() );
-	for ( HHuginn::identifier_id_t identifier : _parameterNames ) {
-		f->note_variable( identifier );
-	}
-	return;
-	M_EPILOG
 }
 
 HHuginn::value_t HIntroFunction::execute(

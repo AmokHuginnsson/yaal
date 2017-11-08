@@ -29,8 +29,8 @@ Copyright:
 #ifndef YAAL_TOOLS_HUGINN_FUNCTION_HXX_INCLUDED
 #define YAAL_TOOLS_HUGINN_FUNCTION_HXX_INCLUDED 1
 
-#include "tools/hhuginn.hxx"
 #include "thread.hxx"
+#include "tools/hhuginn.hxx"
 
 namespace yaal {
 
@@ -41,18 +41,20 @@ namespace huginn {
 class HFunction : public HStatement {
 public:
 	typedef HFunction this_type;
+	typedef yaal::hcore::HArray<HHuginn::identifier_id_t> parameter_names_t;
 	typedef HHuginn::expressions_t expressions_t;
 	typedef void ( huginn::HThread::* function_frame_creator_t )( HStatement const*, HHuginn::value_t*, int );
 	typedef void ( huginn::HThread::* function_frame_popper_t )( void );
 private:
 	HHuginn::identifier_id_t _name;
-	int _parameterCount;
+	parameter_names_t _parameterNames;
 	int _defaultParametersStart;
 	expressions_t _defaultValues;
 	HHuginn::scope_t _scope;
+	int _parameterCount;
 	bool _isVariadic;
 public:
-	HFunction( HHuginn::identifier_id_t, int, HHuginn::scope_t const&, expressions_t const&, bool );
+	HFunction( HHuginn::identifier_id_t, parameter_names_t const&, HHuginn::scope_t const&, expressions_t const&, bool );
 	HHuginn::value_t execute( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int ) const;
 	HHuginn::value_t execute_incremental_main( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int ) const;
 	HHuginn::identifier_id_t name( void ) const {
@@ -60,6 +62,7 @@ public:
 	}
 protected:
 	HHuginn::value_t execute_impl( huginn::HThread*, HHuginn::values_t const&, int ) const;
+	void note_parameters( huginn::HThread* ) const;
 	int upcast( HHuginn::value_t* ) const;
 private:
 	HFunction( HFunction const& ) = delete;

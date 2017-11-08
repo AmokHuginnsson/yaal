@@ -177,7 +177,6 @@ struct OCompiler {
 			}
 		};
 		typedef yaal::hcore::HStack<OVariableRef> variable_stack_t;
-		typedef yaal::hcore::HArray<HHuginn::identifier_id_t> parameter_names_t;
 
 		/*! \brief Identifier of currently compiled function.
 		 */
@@ -185,11 +184,11 @@ struct OCompiler {
 
 		/*! \param Names of parameters for currently compiled function.
 		 */
-		parameter_names_t _parameters;
+		HFunction::parameter_names_t _parameters;
 
 		/*! \param Names of captures for currently compiled lambda function.
 		 */
-		parameter_names_t _captures;
+		HFunction::parameter_names_t _captures;
 
 		/*! \brief Default values for parameters of currently compiled function.
 		 */
@@ -387,7 +386,7 @@ struct OCompiler {
 	private:
 		OImportInfo& operator = ( OImportInfo&& ) = delete;
 	};
-	typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, OFunctionContext::parameter_names_t> captures_log_t;
+	typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, HFunction::parameter_names_t> captures_log_t;
 	typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, OIdentifierUse> used_identifiers_t;
 	typedef yaal::hcore::HArray<OExecutionStep> execution_steps_backlog_t;
 	typedef yaal::hcore::HArray<HHuginn::identifier_id_t> class_identifiers_t;

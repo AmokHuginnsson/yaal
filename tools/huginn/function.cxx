@@ -46,16 +46,17 @@ namespace huginn {
 
 HFunction::HFunction(
 	HHuginn::identifier_id_t name_,
-	int parameterCount_,
+	parameter_names_t const& parameterNames_,
 	HHuginn::scope_t const& scope_,
 	expressions_t const& defaultValues_,
 	bool isVariadic_
 ) : HStatement( scope_->id(), scope_->file_id(), scope_->position() )
 	, _name( name_ )
-	, _parameterCount( parameterCount_ )
-	, _defaultParametersStart( _parameterCount - static_cast<int>( defaultValues_.get_size() ) )
+	, _parameterNames( parameterNames_ )
+	, _defaultParametersStart( static_cast<int>( parameterNames_.get_size() - defaultValues_.get_size() ) )
 	, _defaultValues( defaultValues_ )
 	, _scope( scope_ )
+	, _parameterCount( static_cast<int>( _parameterNames.get_size() ) )
 	, _isVariadic( isVariadic_ ) {
 	if ( _isVariadic ) {
 		-- _defaultParametersStart;
@@ -121,20 +122,12 @@ HHuginn::value_t HFunction::execute_impl(
 	int position_
 ) const {
 	M_PROLOG
-	verify_arg_count(
-		thread_->runtime().identifier_name( _name ),
-		values_,
-		_defaultParametersStart,
-		_isVariadic ? meta::max_signed<int>::value : _parameterCount,
-		thread_,
-		position_
-	);
 	HFrame* f( thread_->current_frame() );
 	int const VALUE_COUNT( static_cast<int>( values_.get_size() ) );
 	for ( int i( 0 ); i < _parameterCount; ++ i ) {
 		if ( i < VALUE_COUNT ) {
 			f->add_variable( values_[i] );
-		} else {
+		} else if ( i >= _defaultParametersStart ) {
 			int defaultValueIndex( i - _defaultParametersStart );
 			_defaultValues[defaultValueIndex]->execute( thread_ );
 			if ( ! f->can_continue() ) {
@@ -152,10 +145,28 @@ HHuginn::value_t HFunction::execute_impl(
 		}
 		f->add_variable( v );
 	}
+	verify_arg_count(
+		thread_->runtime().identifier_name( _name ),
+		values_,
+		_defaultParametersStart,
+		_isVariadic ? meta::max_signed<int>::value : _parameterCount,
+		thread_,
+		position_
+	);
 	if ( f->can_continue() ) {
 		_scope->execute( thread_ );
 	}
 	return ( f->result() );
+	M_EPILOG
+}
+
+void HFunction::note_parameters( HThread* thread_ ) const {
+	M_PROLOG
+	HFrame* f( thread_->current_frame() );
+	for ( HHuginn::identifier_id_t identifier : _parameterNames ) {
+		f->note_variable( identifier );
+	}
+	return;
 	M_EPILOG
 }
 

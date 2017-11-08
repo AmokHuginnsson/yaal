@@ -30,7 +30,6 @@ Copyright:
 #define YAAL_TOOLS_HUGINN_INTROFUNCTION_HXX_INCLUDED 1
 
 #include "function.hxx"
-#include "compiler.hxx"
 
 namespace yaal {
 
@@ -44,14 +43,10 @@ public:
 	typedef HHuginn::expressions_t expressions_t;
 	typedef void ( huginn::HThread::* function_frame_creator_t )( HStatement const*, HHuginn::value_t*, int );
 	typedef void ( huginn::HThread::* function_frame_popper_t )( void );
-private:
-	OCompiler::OFunctionContext::parameter_names_t _parameterNames;
 public:
-	HIntroFunction( HHuginn::identifier_id_t, OCompiler::OFunctionContext::parameter_names_t const&, HHuginn::scope_t const&, expressions_t const&, bool );
+	HIntroFunction( HHuginn::identifier_id_t, parameter_names_t const&, HHuginn::scope_t const&, expressions_t const&, bool );
 	HHuginn::value_t execute( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int ) const;
 	HHuginn::value_t execute_incremental_main( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int ) const;
-private:
-	void note_parameters( huginn::HThread* ) const;
 };
 
 }
