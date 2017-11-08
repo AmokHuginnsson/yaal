@@ -1013,10 +1013,14 @@ yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn const* h
 			str.append( "]" );
 		} break;
 		case ( HHuginn::TYPE::SET ): {
-			HHuginn::HSet const* s( static_cast<HHuginn::HSet const*>( value_.raw() ) );
+			HHuginn::HSet::values_t const& s( static_cast<HHuginn::HSet const*>( value_.raw() )->value() );
+			if ( s.is_empty() ) {
+				str = "set()";
+				break;
+			}
 			str = "{";
 			bool next( false );
-			for ( HHuginn::value_t const& v : s->value() ) {
+			for ( HHuginn::value_t const& v : s ) {
 				if ( next ) {
 					str.append( ", " );
 				}
