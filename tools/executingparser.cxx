@@ -75,33 +75,7 @@ public:
 		M_PROLOG
 		visited_t& chk( _checkpoints.top() );
 		if ( find( chk.begin(), chk.end(), rule_ ) != chk.end() ) {
-			rule_use_t ru;
-			chk.front()->rule_use( ru );
-			HRuleDescription rd;
-			hcore::HString name;
-			for ( HRuleBase const* r : chk ) {
-				if ( dynamic_cast<HRuleRef const*>( r ) ) {
-					continue;
-				}
-				rd.clear();
-				r->describe( rd, ru );
-				for ( HNamedRule const* nr : rd.children() ) {
-					if ( nr->id() == rule_ ) {
-						name = rd.make_name( *nr );
-						break;
-					}
-				}
-				if ( ! name.is_empty() ) {
-					break;
-				}
-			}
-			rd.clear();
-			if ( ! name.is_empty() ) {
-				rd.desc( name );
-				rd.desc( " = " );
-			}
-			rule_->describe( rd, ru );
-			throw HRecursionDetectorException( "Infinite recursion detected: "_ys.append( rd.description() ) );
+			throw HRecursionDetectorException( "Infinite recursion detected: "_ys.append( rule_description( chk, rule_ ) ) );
 		}
 		chk.push_back( rule_ );
 		bool firstTime( false );
@@ -138,6 +112,38 @@ public:
 		_checkpoints.pop();
 		_visited.pop();
 		return;
+		M_EPILOG
+	}
+private:
+	yaal::hcore::HString rule_description( visited_t const& chk_, HRuleBase const* rule_ ) {
+		M_PROLOG
+		rule_use_t ru;
+		chk_.front()->rule_use( ru );
+		HRuleDescription rd;
+		hcore::HString name;
+		for ( HRuleBase const* r : chk_ ) {
+			if ( dynamic_cast<HRuleRef const*>( r ) ) {
+				continue;
+			}
+			rd.clear();
+			r->describe( rd, ru );
+			for ( HNamedRule const* nr : rd.children() ) {
+				if ( nr->id() == rule_ ) {
+					name = rd.make_name( *nr );
+					break;
+				}
+			}
+			if ( ! name.is_empty() ) {
+				break;
+			}
+		}
+		rd.clear();
+		if ( ! name.is_empty() ) {
+			rd.desc( name );
+			rd.desc( " = " );
+		}
+		rule_->describe( rd, ru );
+		return ( rd.description() );
 		M_EPILOG
 	}
 };
@@ -1252,12 +1258,15 @@ bool HFollows::do_detect_recursion( HRecursionDetector& recursionDetector_, bool
 	bool reset( false );
 	for (
 		rules_t::const_iterator it( _rules.begin() ), end( _rules.end() );
-		! ( reset && skipVisit_  ) && ( it != end );
+		! ( reset && skipVisit_ ) && ( it != end );
 		++ it
 	) {
 		HRuleBase::ptr_t r( it->rule() );
 		if ( !! r ) {
-			reset  = r->detect_recursion( recursionDetector_, skipVisit_ );
+			reset = r->detect_recursion( recursionDetector_, skipVisit_ );
+			if ( reset ) {
+				recursionDetector_.reset_visits();
+			}
 		}
 	}
 	return ( reset );
@@ -1683,7 +1692,7 @@ bool HAlternative::do_detect_recursion( HRecursionDetector& recursionDetector_, 
 			recursionDetector_.reset_visits();
 		}
 	}
-	return ( reset );
+	return ( reset || skipVisit_ );
 	M_EPILOG
 }
 
