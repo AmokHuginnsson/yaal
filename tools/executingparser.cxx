@@ -122,7 +122,7 @@ private:
 		HRuleDescription rd;
 		hcore::HString name;
 		for ( HRuleBase const* r : chk_ ) {
-			if ( dynamic_cast<HRuleRef const*>( r ) ) {
+			if ( dynamic_cast<HRuleRef const*>( r ) || dynamic_cast<HAction const*>( r ) ) {
 				continue;
 			}
 			rd.clear();
@@ -431,7 +431,7 @@ yaal::hcore::HUTF8String::const_iterator HRuleBase::parse( HExecutingParser* exe
 	M_PROLOG
 	M_ASSERT( ( first_ != HUTF8String::const_iterator() ) && ( last_ != HUTF8String::const_iterator() ) );
 	yaal::hcore::HUTF8String::const_iterator it( do_parse( executingParser_, first_, last_ ) );
-	if ( it == first_ ) {
+	if ( ! dynamic_cast<HAction const*>( this ) && ( it == first_ ) ) {
 		HExecutingParser::HProxy::drop_execution_steps( executingParser_, first_ );
 	}
 	M_ASSERT( it != HUTF8String::const_iterator() );
@@ -625,7 +625,7 @@ void HNamedRule::describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const 
 	HRule const* r( dynamic_cast<HRule const*>( &*_rule ) );
 	if ( r && ( ( ! _name.is_empty() && ( r->get_name() == _name ) ) || ( _name.is_empty() && r->has_action() ) ) ) {
 		r->get_named_rule()->describe( rd_, ru_ );
-	} else {
+	} else if ( ! dynamic_cast<HAction const*>( &*_rule ) ) {
 		rule_use_t::const_iterator it( ru_.find( _rule.get() ) );
 		HRuleRef const* rr( dynamic_cast<HRuleRef const*>( &*_rule ) );
 		if ( ( ( it != ru_.end() ) && ( it->second > 1 ) ) || ( ! _name.is_empty() ) || rr || ( r && r->has_action() ) ) {
@@ -4477,6 +4477,96 @@ HRule regex( yaal::hcore::HString const& name_, yaal::hcore::HString const& patt
 	M_ENSURE( ! pattern_.is_empty() );
 	return ( HRule( name_, HRegex( pattern_[0] == '^' ? pattern_  : "^" + pattern_, action_, skipWS_ ) ) );
 	M_EPILOG
+}
+
+HAction::HAction( HAction const& other_ )
+	: HRuleBase( other_._action, other_._actionPosition, other_._skipWS ) {
+	return;
+}
+
+HAction::HAction( action_t const& action_ )
+	: HRuleBase( action_, false ) {
+	return;
+}
+
+HAction::HAction( action_position_t const& action_ )
+	: HRuleBase( action_, false ) {
+	return;
+}
+
+HRuleBase::ptr_t HAction::do_clone( void ) const {
+	M_PROLOG
+	return ( make_pointer<HAction>( *this ) );
+	M_EPILOG
+}
+
+HAction HAction::operator[]( action_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ! has_action() );
+	return ( HAction( action_ ) );
+	M_EPILOG
+}
+
+HAction HAction::operator[]( action_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ! has_action() );
+	return ( HAction( action_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HUTF8String::const_iterator HAction::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator ) const {
+	M_PROLOG
+	if ( !! _action ) {
+		add_execution_step( executingParser_, first_, _action );
+	} else if ( !! _actionPosition ) {
+		add_execution_step( executingParser_, first_, call( _actionPosition, position( executingParser_, first_ ) ) );
+	}
+	return ( first_ );
+	M_EPILOG
+}
+
+bool HAction::do_is_optional( void ) const {
+	return ( true );
+}
+
+void HAction::do_describe( HRuleDescription&, rule_use_t const& ) const {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+void HAction::do_detach( HRuleBase const*, visited_t&, bool& ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+bool HAction::do_detect_recursion( HRecursionDetector&, bool ) const {
+	M_PROLOG
+	return ( false );
+	M_EPILOG
+}
+
+void HAction::do_find_recursions( HRuleAggregator& ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+HFollows operator >> ( HRuleBase::action_position_t const& actionPosition_, HRuleBase const& rule_ ) {
+	return ( HFollows( HAction( actionPosition_ ), rule_ ) );
+}
+
+HFollows operator >> ( HRuleBase::action_t const& action_, HRuleBase const& rule_ ) {
+	return ( HFollows( HAction( action_ ), rule_ ) );
+}
+
+HFollows operator >> ( HFollows const& predecessor_, HRuleBase::action_position_t const& actionPosition_ ) {
+	return ( HFollows( predecessor_, HAction( actionPosition_ ) ) );
+}
+
+HFollows operator >> ( HFollows const& predecessor_, HRuleBase::action_t const& action_ ) {
+	return ( HFollows( predecessor_, HAction( action_ ) ) );
 }
 
 HRuleDescription::HRuleDescription( void )

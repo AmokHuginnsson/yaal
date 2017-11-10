@@ -322,7 +322,12 @@ class HOptional;
 class HAnd;
 class HNot;
 class HString;
+class HAction;
 
+HFollows operator >> ( HRuleBase::action_position_t const&, HRuleBase const& );
+HFollows operator >> ( HRuleBase::action_t const&, HRuleBase const& );
+HFollows operator >> ( HFollows const&, HRuleBase::action_position_t const& );
+HFollows operator >> ( HFollows const&, HRuleBase::action_t const& );
 HFollows operator >> ( HRuleBase const&, HRuleBase const& );
 HFollows operator >> ( HFollows const&, HRuleBase const& );
 HFollows operator >> ( char const*, HRuleBase const& );
@@ -381,9 +386,13 @@ private:
 	HFollows( HRuleBase const&, HRuleBase const& );
 	HFollows( HFollows const&, HRuleBase const& );
 	HFollows& operator = ( HFollows const& ) = delete;
+	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( action_position_t const&, yaal::tools::executing_parser::HRuleBase const& );
+	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( action_t const&, yaal::tools::executing_parser::HRuleBase const& );
 	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::hcore::HString const&, yaal::tools::executing_parser::HRuleBase const& );
 	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HRuleBase const&, yaal::tools::executing_parser::HRuleBase const& );
 	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HFollows const&, yaal::tools::executing_parser::HRuleBase const& );
+	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HFollows const&, action_position_t const& );
+	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HFollows const&, action_t const& );
 	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( char, yaal::tools::executing_parser::HRuleBase const& );
 	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HRuleBase const&, char );
 	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HFollows const&, char );
@@ -1002,6 +1011,33 @@ private:
 };
 
 typedef yaal::hcore::HExceptionT<HRegex, HRuleBaseException> HRegexException;
+
+class HAction : public HRuleBase {
+public:
+	typedef HAction this_type;
+	typedef HRuleBase base_type;
+public:
+	HAction( HAction const& );
+	HAction operator[]( action_t const& ) const;
+	HAction operator[]( action_position_t const& ) const;
+protected:
+	HAction( action_t const& );
+	HAction( action_position_t const& );
+	virtual ptr_t do_clone( void ) const override;
+	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator ) const override;
+	virtual bool do_is_optional( void ) const override;
+	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
+	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
+	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
+	virtual void do_find_recursions( HRuleAggregator& ) override;
+private:
+	HAction( HRuleBase const& );
+	HAction& operator = ( HAction const& ) = delete;
+	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( action_position_t const&, yaal::tools::executing_parser::HRuleBase const& );
+	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( action_t const&, yaal::tools::executing_parser::HRuleBase const& );
+	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HFollows const&, action_position_t const& );
+	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HFollows const&, action_t const& );
+};
 
 HCharacter constant( char, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO );
 HCharacter constant( char, HRuleBase::action_t const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO );
