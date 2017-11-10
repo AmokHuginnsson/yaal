@@ -59,11 +59,34 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		expression,
 		HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_ARGUMENT, _1 ) )
 	);
-	HRule argList( "argList", arg >> ( * ( ',' >> arg ) ) );
+	HRule functionArgument(
+		"functionArgument",
+		arg ^ ':'
+	);
+	HRule argList( "argList", functionArgument >> *( ',' >> functionArgument ) );
+	HRule parameterName(
+		regex(
+			"parameterName",
+			identifierPattern,
+			e_p::HStringLiteral::action_string_position_t( hcore::call( &OCompiler::defer_store_string, _compiler.get(), _1, _2 ) )
+		),
+		HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_ARGUMENT, _1 ) )
+	);
+	HRule namedParameter(
+		"namedParameter",
+		parameterName >> ':' >> functionArgument
+	);
+	HRule namedParameters(
+		"namedParameters",
+		HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
+		>> namedParameter >> *( ',' >> namedParameter )
+		>> HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MAKE_LOOKUP, _1 ) ),
+		HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_ARGUMENT, _1 ) )
+	);
 	HRule functionCallOperator(
 		"functionCallOperator",
 		constant( '(', HRuleBase::action_position_t( hcore::call( &OCompiler::start_function_call, _compiler.get(), _1 ) ) )
-		>> -argList >>
+		>> -( ( argList >> -( ',' >> namedParameters ) ) | namedParameters ) >>
 		constant( ')', HRuleBase::action_position_t( hcore::call( &OCompiler::close_function_call, _compiler.get(), _1 ) ) ),
 		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
 	);
