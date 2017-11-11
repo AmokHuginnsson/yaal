@@ -625,7 +625,7 @@ void HNamedRule::describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const 
 	HRule const* r( dynamic_cast<HRule const*>( &*_rule ) );
 	if ( r && ( ( ! _name.is_empty() && ( r->get_name() == _name ) ) || ( _name.is_empty() && r->has_action() ) ) ) {
 		r->get_named_rule()->describe( rd_, ru_ );
-	} else if ( ! dynamic_cast<HAction const*>( &*_rule ) ) {
+	} else {
 		rule_use_t::const_iterator it( ru_.find( _rule.get() ) );
 		HRuleRef const* rr( dynamic_cast<HRuleRef const*>( &*_rule ) );
 		if ( ( ( it != ru_.end() ) && ( it->second > 1 ) ) || ( ! _name.is_empty() ) || rr || ( r && r->has_action() ) ) {
@@ -4529,8 +4529,9 @@ bool HAction::do_is_optional( void ) const {
 	return ( true );
 }
 
-void HAction::do_describe( HRuleDescription&, rule_use_t const& ) const {
+void HAction::do_describe( HRuleDescription& rd_, rule_use_t const& ) const {
 	M_PROLOG
+	rd_.desc( "()" );
 	return;
 	M_EPILOG
 }
