@@ -2110,8 +2110,10 @@ void OCompiler::dispatch_function_call( expression_action_t const& action_, exec
 		if ( vd._type == HHuginn::TYPE::FUNCTION_REFERENCE ) {
 			t = function_ref_to_type_id( vd._identifier );
 		}
-	} else {
+	} else if ( action_ == &HExpression::make_dict ) {
 		t = type_id( HHuginn::TYPE::DICT );
+	} else {
+		t = type_id( HHuginn::TYPE::LOOKUP );
 	}
 	fc._valueTypes.push( t );
 	M_ASSERT( fc._operations.top()._operator == OPERATOR::FUNCTION_CALL );
