@@ -182,6 +182,7 @@ class HObjectFactory final {
 	HObjectPool<HHuginn::HOrder, POOL_TYPE::COLLECTION> _orderPool;
 	HObjectPool<HHuginn::HSet, POOL_TYPE::COLLECTION> _setPool;
 	HObjectPool<HHuginn::HReference, POOL_TYPE::CLASSLESS> _referencePool;
+	HObjectPool<HHuginn::HTaggedValue, POOL_TYPE::CLASSLESS> _taggedValuePool;
 	HObjectPool<HHuginn::HFunctionReference, POOL_TYPE::CLASSLESS> _functionReferencePool;
 	HObjectPool<HHuginn::HClass::HBoundMethod, POOL_TYPE::CLASSLESS> _boundMethodPool;
 	HObjectPool<HHuginn::HObject, POOL_TYPE::CLASSLESS> _objectPool;
@@ -232,6 +233,9 @@ public:
 	}
 	HHuginn::value_t create_reference( HHuginn::value_t& value_ ) const {
 		return ( _referencePool.create( value_ ) );
+	}
+	HHuginn::value_t create_tagged_value( HHuginn::value_t const& value_, HHuginn::HClass const* tag_ ) const {
+		return ( _taggedValuePool.create( value_, tag_ ) );
 	}
 	HHuginn::value_t create_function_reference( HHuginn::identifier_id_t identifierId_, HHuginn::function_t const& function_, yaal::hcore::HString const& doc_ ) const {
 		return ( _functionReferencePool.create( identifierId_, function_, doc_ ) );

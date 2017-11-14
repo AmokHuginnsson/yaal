@@ -126,6 +126,7 @@ HObjectFactory::HObjectFactory( HRuntime* runtime_ )
 	, _orderPool( _memoryPools, _order.raw() )
 	, _setPool( _memoryPools, _set.raw() )
 	, _referencePool( _memoryPools )
+	, _taggedValuePool( _memoryPools )
 	, _functionReferencePool( _memoryPools )
 	, _boundMethodPool( _memoryPools )
 	, _objectPool( _memoryPools ) {

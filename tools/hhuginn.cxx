@@ -90,7 +90,9 @@ HHuginn::identifier_id_t const TYPE_FUNCTION_REFERENCE_IDENTIFIER( 27 );
 HHuginn::identifier_id_t const TYPE_OBJECT_REFERENCE_IDENTIFIER( 28 );
 HHuginn::identifier_id_t const TYPE_METHOD_IDENTIFIER( 29 );
 HHuginn::identifier_id_t const TYPE_BOUND_METHOD_IDENTIFIER( 30 );
-HHuginn::identifier_id_t const TYPE_UNKNOWN_IDENTIFIER( 31 );
+HHuginn::identifier_id_t const TYPE_VARIADIC_PARAMETERS_IDENTIFIER( 31 );
+HHuginn::identifier_id_t const TYPE_NAMED_PARAMETERS_IDENTIFIER( 32 );
+HHuginn::identifier_id_t const TYPE_UNKNOWN_IDENTIFIER( 33 );
 HHuginn::HClass const _noneClass_( HHuginn::TYPE::NONE, TYPE_NONE_IDENTIFIER, "A type of `none` value." );
 HHuginn::HClass const _observerClass_( HHuginn::TYPE::OBSERVER, TYPE_OBSERVER_IDENTIFIER, "The `*observer*` is a type representing a reference cycle breaking, non-owning weak \"pointer\" to a value." );
 HHuginn::HClass const _referenceClass_( HHuginn::TYPE::REFERENCE, TYPE_REFERENCE_IDENTIFIER, "Write only reference. Allows assign operator to work." );
@@ -98,6 +100,8 @@ HHuginn::HClass const _functionReferenceClass_( HHuginn::TYPE::FUNCTION_REFERENC
 HHuginn::HClass const _objectReferenceClass_( HHuginn::TYPE::OBJECT_REFERENCE, TYPE_OBJECT_REFERENCE_IDENTIFIER, "The `*object_reference*` is a up-casting reference allowing to access super class methods." );
 HHuginn::HClass const _methodClass_( HHuginn::TYPE::METHOD, TYPE_METHOD_IDENTIFIER, "Unbound method." );
 HHuginn::HClass const _boundMethodClass_( HHuginn::TYPE::BOUND_METHOD, TYPE_BOUND_METHOD_IDENTIFIER, "A reference to a callable method with a valid runtime value bound to it." );
+HHuginn::HClass const _variadicParametersClass_( HHuginn::TYPE::VARIADIC_PARAMETERS, TYPE_VARIADIC_PARAMETERS_IDENTIFIER, "Variadic parameters pack." );
+HHuginn::HClass const _namedParametersClass_( HHuginn::TYPE::NAMED_PARAMETERS, TYPE_NAMED_PARAMETERS_IDENTIFIER, "Named parameters pack." );
 HHuginn::HClass const _unknownClass_( HHuginn::TYPE::UNKNOWN, TYPE_UNKNOWN_IDENTIFIER, "An erroneous unknown type." );
 
 char const* _errMsgHHuginn_[ 10 ] = {
@@ -255,6 +259,29 @@ HHuginn::value_t HHuginn::HObjectReference::field( huginn::HThread* thread_, int
 HHuginn::value_t HHuginn::HObjectReference::do_clone( huginn::HThread* thread_, int position_ ) const {
 	M_PROLOG
 	return ( make_pointer<HObjectReference>( _object->clone( thread_, position_ ), _class ) );
+	M_EPILOG
+}
+
+HHuginn::HTaggedValue::HTaggedValue( value_t const& value_, HClass const* class_ )
+	: HValue( class_ )
+	, _value( value_ ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::HTaggedValue::value( void ) const {
+	M_PROLOG
+	return ( _value );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::HTaggedValue::do_clone( huginn::HThread*, int ) const {
+	M_PROLOG
+	M_ASSERT( 0 && "cloning tagged value"[0] );
+#if defined( NDEBUG ) || defined( __MSVCXX__ )
+	return ( HHuginn::value_t() );
+#endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
 	M_EPILOG
 }
 

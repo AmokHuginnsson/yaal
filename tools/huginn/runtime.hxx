@@ -255,6 +255,8 @@ extern HHuginn::identifier_id_t const TYPE_FUNCTION_REFERENCE_IDENTIFIER;
 extern HHuginn::identifier_id_t const TYPE_OBJECT_REFERENCE_IDENTIFIER;
 extern HHuginn::identifier_id_t const TYPE_METHOD_IDENTIFIER;
 extern HHuginn::identifier_id_t const TYPE_BOUND_METHOD_IDENTIFIER;
+extern HHuginn::identifier_id_t const TYPE_VARIADIC_PARAMETERS_IDENTIFIER;
+extern HHuginn::identifier_id_t const TYPE_NAMED_PARAMETERS_IDENTIFIER;
 extern HHuginn::identifier_id_t const TYPE_UNKNOWN_IDENTIFIER;
 
 }

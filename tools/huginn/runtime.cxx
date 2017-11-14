@@ -86,6 +86,8 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			{ _objectReferenceClass_.name(), TYPE_OBJECT_REFERENCE_IDENTIFIER },
 			{ _methodClass_.name(), TYPE_METHOD_IDENTIFIER },
 			{ _boundMethodClass_.name(), TYPE_BOUND_METHOD_IDENTIFIER },
+			{ _variadicParametersClass_.name(), TYPE_VARIADIC_PARAMETERS_IDENTIFIER },
+			{ _namedParametersClass_.name(), TYPE_NAMED_PARAMETERS_IDENTIFIER },
 			{ _unknownClass_.name(), TYPE_UNKNOWN_IDENTIFIER }
 		} )
 	, _identifierNames( {
@@ -120,6 +122,8 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			_objectReferenceClass_.name(),
 			_methodClass_.name(),
 			_boundMethodClass_.name(),
+			_variadicParametersClass_.name(),
+			_namedParametersClass_.name(),
 			_unknownClass_.name()
 		} )
 	, _objectFactory( new HObjectFactory( this ) )
@@ -757,7 +761,7 @@ void HRuntime::register_builtin_function( yaal::hcore::HString const& name_, fun
 }
 
 namespace {
-HHuginn::HClass const* _coreClasses_[8];
+HHuginn::HClass const* _coreClasses_[10];
 }
 
 void HRuntime::register_builtins( void ) {
@@ -773,6 +777,8 @@ void HRuntime::register_builtins( void ) {
 			&_objectReferenceClass_,
 			&_methodClass_,
 			&_boundMethodClass_,
+			&_variadicParametersClass_,
+			&_namedParametersClass_,
 			&_unknownClass_
 		};
 		static_assert( sizeof ( coreClassesInit ) == sizeof ( _coreClasses_ ), "invalid core classes initializer size" );
@@ -808,6 +814,8 @@ void HRuntime::register_builtins( void ) {
 	M_ENSURE( identifier_id( _objectReferenceClass_.name() ) == TYPE_OBJECT_REFERENCE_IDENTIFIER );
 	M_ENSURE( identifier_id( _methodClass_.name() ) == TYPE_METHOD_IDENTIFIER );
 	M_ENSURE( identifier_id( _boundMethodClass_.name() ) == TYPE_BOUND_METHOD_IDENTIFIER );
+	M_ENSURE( identifier_id( _variadicParametersClass_.name() ) == TYPE_VARIADIC_PARAMETERS_IDENTIFIER );
+	M_ENSURE( identifier_id( _namedParametersClass_.name() ) == TYPE_NAMED_PARAMETERS_IDENTIFIER );
 	M_ENSURE( identifier_id( _unknownClass_.name() ) == TYPE_UNKNOWN_IDENTIFIER );
 	M_ENSURE( identifier_id( STANDARD_FUNCTIONS::MAIN ) == STANDARD_FUNCTIONS::MAIN_IDENTIFIER );
 	register_builtin_function( type_name( HHuginn::TYPE::INTEGER ), hcore::call( &huginn_builtin::integer, _1, _2, _3, _4 ), "( *val* ) - convert *val* value to `integer` type" );

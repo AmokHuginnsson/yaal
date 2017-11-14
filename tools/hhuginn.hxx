@@ -112,6 +112,7 @@ public:
 	class HReference;
 	class HFunctionReference;
 	class HValue;
+	class HTaggedValue;
 	typedef yaal::hcore::HPointer<HValue> value_t;
 	typedef yaal::hcore::HPointerObserver<HValue> value_ref_t;
 	class HBoolean;
@@ -166,6 +167,8 @@ public:
 		OBJECT_REFERENCE,
 		METHOD,
 		BOUND_METHOD,
+		VARIADIC_PARAMETERS,
+		NAMED_PARAMETERS,
 		UNKNOWN,
 		NOT_BOOLEAN
 	};
@@ -606,6 +609,25 @@ private:
 	HObjectReference( HObjectReference const& ) = delete;
 	HObjectReference& operator = ( HObjectReference const& ) = delete;
 	virtual value_t do_clone( huginn::HThread*, int ) const override;
+};
+
+/*! \brief Huginn Value tagger.
+ *
+ * Sole purpose of this class is to help with support for named parameters and variadic functions.
+ */
+class HHuginn::HTaggedValue : public HHuginn::HValue {
+public:
+	typedef HHuginn::HTaggedValue this_type;
+	typedef HHuginn::HValue base_type;
+private:
+	value_t _value;
+public:
+	HTaggedValue( value_t const&, HClass const* );
+	value_t value( void ) const;
+private:
+	HTaggedValue( HTaggedValue const& ) = delete;
+	HTaggedValue& operator = ( HTaggedValue const& ) = delete;
+	virtual value_t do_clone( huginn::HThread*, int ) const override M_DEBUG_CODE( __attribute__((__noreturn__)) );
 };
 
 class HHuginn::HObserver : public HHuginn::HValue {
@@ -1135,6 +1157,8 @@ extern HHuginn::HClass const _functionReferenceClass_;
 extern HHuginn::HClass const _objectReferenceClass_;
 extern HHuginn::HClass const _methodClass_;
 extern HHuginn::HClass const _boundMethodClass_;
+extern HHuginn::HClass const _variadicParametersClass_;
+extern HHuginn::HClass const _namedParametersClass_;
 extern HHuginn::HClass const _unknownClass_;
 
 inline HHuginn::type_id_t type_id( HHuginn::TYPE type_ ) {

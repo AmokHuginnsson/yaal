@@ -542,6 +542,8 @@ yaal::hcore::HString const& type_name( HHuginn::TYPE type_ ) {
 	static HString const NAME_OBJECT_REFERENCE = "*object_reference*";
 	static HString const NAME_METHOD = "*method*";
 	static HString const NAME_BOUND_METHOD = "*bound_method*";
+	static HString const NAME_VARIADIC_PARAMETERS = "*variadic_parameters*";
+	static HString const NAME_NAMED_PARAMETERS = "*named_parameters*";
 	static HString const NAME_UNKNOWN = "*unknown*";
 	HString const* s( &NAME_UNKNOWN );
 	switch ( type_ ) {
@@ -565,6 +567,8 @@ yaal::hcore::HString const& type_name( HHuginn::TYPE type_ ) {
 		case ( HHuginn::TYPE::OBJECT_REFERENCE ):   s = &NAME_OBJECT_REFERENCE;   break;
 		case ( HHuginn::TYPE::METHOD ):             s = &NAME_METHOD;             break;
 		case ( HHuginn::TYPE::BOUND_METHOD ):       s = &NAME_BOUND_METHOD;       break;
+		case ( HHuginn::TYPE::VARIADIC_PARAMETERS ):s = &NAME_VARIADIC_PARAMETERS;break;
+		case ( HHuginn::TYPE::NAMED_PARAMETERS ):   s = &NAME_NAMED_PARAMETERS;   break;
 		case ( HHuginn::TYPE::UNKNOWN ):            s = &NAME_UNKNOWN;            break;
 		case ( HHuginn::TYPE::NOT_BOOLEAN ):        s = &NAME_UNKNOWN;            break;
 	}
