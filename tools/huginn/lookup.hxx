@@ -95,7 +95,6 @@ private:
 	HLookupReverseIterator& operator = ( HLookupReverseIterator const& ) = delete;
 };
 
-
 HReversedLookup::HIterator HReversedLookup::do_iterator( HThread*, int ) {
 	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HLookupReverseIterator( &static_cast<HHuginn::HLookup*>( _lookup.raw() )->value() ) );
 	return ( HIterator( yaal::move( impl ) ) );

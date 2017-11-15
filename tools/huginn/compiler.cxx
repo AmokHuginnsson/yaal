@@ -2083,15 +2083,16 @@ HHuginn::type_id_t function_ref_to_type_id( HHuginn::identifier_id_t identifierI
 void OCompiler::dispatch_function_call( expression_action_t const& action_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
+	HExpression* expr( current_expression().raw() );
 	if ( fc._isAssert && ( fc._nestedCalls == 0 ) ) {
 		int from( position_.get() + 1 );
 		OScopeContext& sc( *fc._scopeStack.top() );
 		int len( sc._assertExpressionEnd - from );
 		sc._assertExpressionEnd = 0;
-		current_expression()->oper( OPERATOR::FUNCTION_ARGUMENT, position_.get() );
-		current_expression()->add_execution_step(
+		expr->oper( OPERATOR::FUNCTION_ARGUMENT, position_.get() );
+		expr->add_execution_step(
 			hcore::call(
-				&HExpression::store_direct, current_expression().raw(),
+				&HExpression::store_direct, expr,
 				_runtime->object_factory()->create_string( _runtime->huginn()->get_snippet( from, len ).trim() ),
 				_1,
 				position_.get()
@@ -2118,8 +2119,16 @@ void OCompiler::dispatch_function_call( expression_action_t const& action_, exec
 	fc._valueTypes.push( t );
 	M_ASSERT( fc._operations.top()._operator == OPERATOR::FUNCTION_CALL );
 	defer_action( action_, position_ );
-	current_expression()->commit_oper( OPERATOR::FUNCTION_CALL );
+	expr->commit_oper( OPERATOR::FUNCTION_CALL );
 	fc._operations.pop();
+	return;
+	M_EPILOG
+}
+
+void OCompiler::pack_named_parameters( executing_parser::position_t position_ ) {
+	M_PROLOG
+	HExpression* expr( current_expression().raw() );
+	expr->add_execution_step( hcore::call( &HExpression::pack_named_parameters, expr, _1, position_.get() ) );
 	return;
 	M_EPILOG
 }
@@ -2211,7 +2220,8 @@ void OCompiler::dispatch_action( OPERATOR oper_, executing_parser::position_t po
 
 void OCompiler::defer_action( expression_action_t const& expressionAction_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	current_expression()->add_execution_step( hcore::call( expressionAction_, current_expression().raw(), _1, position_.get() ) );
+	HExpression* expr( current_expression().raw() );
+	expr->add_execution_step( hcore::call( expressionAction_, expr, _1, position_.get() ) );
 	return;
 	M_EPILOG
 }
@@ -2230,16 +2240,16 @@ void OCompiler::make_reference( executing_parser::position_t position_ ) {
 	if ( ( fc._lastDereferenceOperator != OPERATOR::SUBSCRIPT ) && ( fc._lastDereferenceOperator != OPERATOR::MEMBER_ACCESS ) ) {
 		throw HHuginn::HHuginnRuntimeException( "Assignment to function result.", MAIN_FILE_ID, position_.get() );
 	}
+	HExpression* expr( current_expression().raw() );
 	if ( fc._lastDereferenceOperator == OPERATOR::SUBSCRIPT ) {
-		current_expression()->pop_execution_step();
-		current_expression()->add_execution_step(
-			hcore::call( &HExpression::subscript, current_expression().raw(), HFrame::ACCESS::REFERENCE, _1, position_.get() )
+		expr->pop_execution_step();
+		expr->add_execution_step(
+			hcore::call( &HExpression::subscript, expr, HFrame::ACCESS::REFERENCE, _1, position_.get() )
 		);
 	} else {
-		HExpression& expression( *current_expression() );
-		expression.pop_execution_step();
-		expression.add_execution_step(
-			hcore::call( &HExpression::get_field, current_expression().raw(), HFrame::ACCESS::REFERENCE, fc._lastMemberName, _1, _fileId )
+		expr->pop_execution_step();
+		expr->add_execution_step(
+			hcore::call( &HExpression::get_field, expr, HFrame::ACCESS::REFERENCE, fc._lastMemberName, _1, _fileId )
 		);
 	}
 	fc._variables.emplace( INVALID_IDENTIFIER, -1 );
@@ -2255,11 +2265,13 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 	bool keyword( false );
 	bool isAssert( refIdentifier == KEYWORD::ASSERT_IDENTIFIER );
 	bool isFieldDefinition( !! _classContext && ( _functionContexts.get_size() == 1 ) );
+	HHuginn::expression_t& expression( current_expression() );
+	HExpression* expr( expression.raw() );
 	if ( ( keyword = huginn::is_keyword( value_ ) ) ) {
 		if ( isAssert ) {
 			fc._isAssert = isAssert;
 		}
-		if ( ( ( value_ != KEYWORD::THIS ) && ( value_ != KEYWORD::SUPER ) && ! isAssert ) || ( isAssert && ! current_expression()->is_empty() ) ) {
+		if ( ( ( value_ != KEYWORD::THIS ) && ( value_ != KEYWORD::SUPER ) && ! isAssert ) || ( isAssert && ! expr->is_empty() ) ) {
 			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted keyword." ), MAIN_FILE_ID, position_.get() );
 		} else if ( ! isAssert && ! _classContext ) {
 			throw HHuginn::HHuginnRuntimeException( "Keyword `"_ys.append( value_ ).append( "' can be used only in class context." ), MAIN_FILE_ID, position_.get() );
@@ -2268,17 +2280,16 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 	if ( _isIncremental && ( refIdentifier == STANDARD_FUNCTIONS::MAIN_IDENTIFIER ) ) {
 		throw HHuginn::HHuginnRuntimeException( "Referencing main() function in incremental mode is forbidden.", MAIN_FILE_ID, position_.get() );
 	}
-	HHuginn::expression_t& expression( current_expression() );
 	if ( ( ! keyword || isAssert ) && huginn::is_builtin( value_ ) ) {
 		/*
 		 * We can do it here (as opposed to *::resolve_symbols()) because built-ins must exist,
 		 * hence h->get_function() always succeeds, and built-ins cannot be overridden
 		 * so they meaning stays always the same.
 		 */
-		current_expression()->add_execution_step(
+		expr->add_execution_step(
 			hcore::call(
 				&HExpression::store_direct,
-				current_expression().raw(),
+				expr,
 				*_runtime->get_function( refIdentifier ),
 				_1,
 				position_.get()
@@ -2289,15 +2300,15 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 			throw HHuginn::HHuginnRuntimeException( "Dereferencing symbol `"_ys.append( value_ ).append( "' in field definition is forbidden." ), MAIN_FILE_ID, position_.get() );
 		}
 		if ( refIdentifier == KEYWORD::THIS_IDENTIFIER ) {
-			expression->add_execution_step(
-				hcore::call( &HExpression::get_this, expression.raw(), _1, position_.get() )
+			expr->add_execution_step(
+				hcore::call( &HExpression::get_this, expr, _1, position_.get() )
 			);
 		} else if ( refIdentifier == KEYWORD::SUPER_IDENTIFIER ) {
-			expression->add_execution_step(
-				hcore::call( &HExpression::get_super, expression.raw(), _1, position_.get() )
+			expr->add_execution_step(
+				hcore::call( &HExpression::get_super, expr, _1, position_.get() )
 			);
 		} else {
-			int index( expression->add_execution_step( HExpression::execution_step_t() ) );
+			int index( expr->add_execution_step( HExpression::execution_step_t() ) );
 			_executionStepsBacklog.emplace_back(
 				OExecutionStep::OPERATION::USE,
 				expression,
@@ -2325,11 +2336,11 @@ void OCompiler::defer_get_field_reference( yaal::hcore::HString const& value_, e
 			throw HHuginn::HHuginnRuntimeException( "Keyword `"_ys.append( value_ ).append( "' can be used only in class context." ), MAIN_FILE_ID, position_.get() );
 		}
 	}
-	HExpression& expression( *current_expression() );
-	expression.add_execution_step(
-		hcore::call( &HExpression::get_field, current_expression().raw(), HFrame::ACCESS::VALUE, refIdentifier, _1, _fileId )
+	HExpression* expr( current_expression().raw() );
+	expr->add_execution_step(
+		hcore::call( &HExpression::get_field, expr, HFrame::ACCESS::VALUE, refIdentifier, _1, _fileId )
 	);
-	expression.commit_oper( OPERATOR::MEMBER_ACCESS );
+	expr->commit_oper( OPERATOR::MEMBER_ACCESS );
 	fc._lastMemberName = refIdentifier;
 	fc._valueTypes.pop();
 	fc._valueTypes.push( type_id( HHuginn::TYPE::REFERENCE ) );
@@ -2365,7 +2376,8 @@ void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executi
 
 void OCompiler::defer_store_direct( HHuginn::value_t const& value_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	current_expression()->add_execution_step( hcore::call( &HExpression::store_direct, current_expression().raw(), value_, _1, position_.get() ) );
+	HExpression* expr( current_expression().raw() );
+	expr->add_execution_step( hcore::call( &HExpression::store_direct, expr, value_, _1, position_.get() ) );
 	f()._valueTypes.push( value_->type_id() );
 	return;
 	M_EPILOG
@@ -2381,10 +2393,11 @@ OPERATOR _copyConstContext_[] = {
 void OCompiler::defer_store_real( double long value_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
+	HExpression* expr( current_expression().raw() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		current_expression()->add_execution_step( hcore::call( &HExpression::store_direct, current_expression().raw(), _runtime->object_factory()->create_real( value_ ), _1, position_.get() ) );
+		expr->add_execution_step( hcore::call( &HExpression::store_direct, expr, _runtime->object_factory()->create_real( value_ ), _1, position_.get() ) );
 	} else {
-		current_expression()->add_execution_step( hcore::call( &HExpression::store_real, current_expression().raw(), value_, _1, position_.get() ) );
+		expr->add_execution_step( hcore::call( &HExpression::store_real, expr, value_, _1, position_.get() ) );
 	}
 	fc._valueTypes.push( type_id( HHuginn::TYPE::REAL ) );
 	return;
@@ -2394,10 +2407,11 @@ void OCompiler::defer_store_real( double long value_, executing_parser::position
 void OCompiler::defer_store_integer( int long long value_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
+	HExpression* expr( current_expression().raw() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		current_expression()->add_execution_step( hcore::call( &HExpression::store_direct, current_expression().raw(), _runtime->object_factory()->create_integer( value_ ), _1, position_.get() ) );
+		expr->add_execution_step( hcore::call( &HExpression::store_direct, expr, _runtime->object_factory()->create_integer( value_ ), _1, position_.get() ) );
 	} else {
-		current_expression()->add_execution_step( hcore::call( &HExpression::store_integer, current_expression().raw(), value_, _1, position_.get() ) );
+		expr->add_execution_step( hcore::call( &HExpression::store_integer, expr, value_, _1, position_.get() ) );
 	}
 	fc._valueTypes.push( type_id( HHuginn::TYPE::INTEGER ) );
 	return;
@@ -2407,10 +2421,11 @@ void OCompiler::defer_store_integer( int long long value_, executing_parser::pos
 void OCompiler::defer_store_string( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
+	HExpression* expr( current_expression().raw() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		current_expression()->add_execution_step( hcore::call( &HExpression::store_direct, current_expression().raw(), _runtime->object_factory()->create_string( value_ ), _1, position_.get() ) );
+		expr->add_execution_step( hcore::call( &HExpression::store_direct, expr, _runtime->object_factory()->create_string( value_ ), _1, position_.get() ) );
 	} else {
-		current_expression()->add_execution_step( hcore::call( &HExpression::store_string, current_expression().raw(), value_, _1, position_.get() ) );
+		expr->add_execution_step( hcore::call( &HExpression::store_string, expr, value_, _1, position_.get() ) );
 	}
 	fc._valueTypes.push( type_id( HHuginn::TYPE::STRING ) );
 	return;
@@ -2420,10 +2435,11 @@ void OCompiler::defer_store_string( yaal::hcore::HString const& value_, executin
 void OCompiler::defer_store_number( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
+	HExpression* expr( current_expression().raw() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		current_expression()->add_execution_step( hcore::call( &HExpression::store_direct, current_expression().raw(), _runtime->object_factory()->create_number( value_ ), _1, position_.get() ) );
+		expr->add_execution_step( hcore::call( &HExpression::store_direct, expr, _runtime->object_factory()->create_number( value_ ), _1, position_.get() ) );
 	} else {
-		current_expression()->add_execution_step( hcore::call( &HExpression::store_number, current_expression().raw(), value_, _1, position_.get() ) );
+		expr->add_execution_step( hcore::call( &HExpression::store_number, expr, value_, _1, position_.get() ) );
 	}
 	fc._valueTypes.push( type_id( HHuginn::TYPE::NUMBER ) );
 	return;
@@ -2433,10 +2449,11 @@ void OCompiler::defer_store_number( yaal::hcore::HString const& value_, executin
 void OCompiler::defer_store_character( code_point_t value_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
+	HExpression* expr( current_expression().raw() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		current_expression()->add_execution_step( hcore::call( &HExpression::store_direct, current_expression().raw(), _runtime->object_factory()->create_character( value_ ), _1, position_.get() ) );
+		expr->add_execution_step( hcore::call( &HExpression::store_direct, expr, _runtime->object_factory()->create_character( value_ ), _1, position_.get() ) );
 	} else {
-		current_expression()->add_execution_step( hcore::call( &HExpression::store_character, current_expression().raw(), value_, _1, position_.get() ) );
+		expr->add_execution_step( hcore::call( &HExpression::store_character, expr, value_, _1, position_.get() ) );
 	}
 	fc._valueTypes.push( type_id( HHuginn::TYPE::CHARACTER ) );
 	return;

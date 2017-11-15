@@ -623,7 +623,7 @@ private:
 	value_t _value;
 public:
 	HTaggedValue( value_t const&, HClass const* );
-	value_t value( void ) const;
+	value_t& value( void );
 private:
 	HTaggedValue( HTaggedValue const& ) = delete;
 	HTaggedValue& operator = ( HTaggedValue const& ) = delete;
@@ -1051,6 +1051,7 @@ public:
 	values_t& value( void ) {
 		return ( _data );
 	}
+	void update( huginn::HThread*, HHuginn::value_t const&, int );
 	void anchor( huginn::HThread* thread_, int position_ ) {
 		_helper.anchor( thread_, position_ );
 	}

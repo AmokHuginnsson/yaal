@@ -72,6 +72,7 @@ public:
 	void factorial( huginn::HFrame*, int );
 	void negate( huginn::HFrame*, int );
 	void function_call( huginn::HFrame*, int );
+	void pack_named_parameters( huginn::HFrame*, int );
 	void make_assoc( OPERATOR, huginn::HFrame*, int );
 	void make_dict( huginn::HFrame* frame_, int position_ ) {
 		make_assoc( OPERATOR::MAKE_DICT, frame_, position_ );

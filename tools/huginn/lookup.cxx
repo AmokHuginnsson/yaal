@@ -120,14 +120,7 @@ inline HHuginn::value_t update( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LOOKUP );
 	verify_signature( "lookup.update", values_, { HHuginn::TYPE::LOOKUP }, thread_, position_ );
-	HHuginn::HLookup* lookup( static_cast<HHuginn::HLookup*>( object_->raw() ) );
-	HHuginn::HLookup::values_t& l( lookup->value() );
-	HHuginn::HLookup::values_t const& r( static_cast<HHuginn::HLookup const*>( values_[0].raw() )->value() );
-	lookup->anchor( thread_, position_ );
-	for ( HHuginn::HLookup::values_t::const_iterator it( r.begin() ), end( r.end() ); it != end; ++ it ) {
-		l.insert( *it );
-	}
-	lookup->detach();
+	static_cast<HHuginn::HLookup*>( object_->raw() )->update( thread_, values_[0], position_ );
 	return ( *object_ );
 	M_EPILOG
 }
@@ -260,6 +253,18 @@ void HHuginn::HLookup::insert( huginn::HThread* thread_, HHuginn::value_t const&
 	M_PROLOG
 	_helper.anchor( thread_, position_ );
 	_data.insert( make_pair( key_, value_ ) );
+	_helper.detach();
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HLookup::update( huginn::HThread* thread_, HHuginn::value_t const& lookup_, int position_ ) {
+	M_PROLOG
+	_helper.anchor( thread_, position_ );
+	HHuginn::HLookup::values_t const& r( static_cast<HHuginn::HLookup const*>( lookup_.raw() )->value() );
+	for ( HHuginn::HLookup::values_t::const_iterator it( r.begin() ), end( r.end() ); it != end; ++ it ) {
+		_data.insert( *it );
+	}
 	_helper.detach();
 	return;
 	M_EPILOG

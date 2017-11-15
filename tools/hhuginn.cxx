@@ -270,7 +270,7 @@ HHuginn::HTaggedValue::HTaggedValue( value_t const& value_, HClass const* class_
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HTaggedValue::value( void ) const {
+HHuginn::value_t& HHuginn::HTaggedValue::value( void ) {
 	M_PROLOG
 	return ( _value );
 	M_EPILOG

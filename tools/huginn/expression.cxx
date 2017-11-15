@@ -349,6 +349,31 @@ HHuginn::values_t& HExpression::grab_args( HFrame* frame_ ) {
 	M_EPILOG
 }
 
+void HExpression::pack_named_parameters( huginn::HFrame* frame_, int position_ ) {
+	M_PROLOG
+	HFrame::values_t& values( frame_->values() );
+	HHuginn::value_t& vr( values.top() );
+	if ( vr->type_id() == HHuginn::TYPE::LOOKUP ) {
+		vr = frame_->thread()->object_factory().create_tagged_value( vr, &_namedParametersClass_ );
+	} else if ( vr->type_id() == HHuginn::TYPE::NAMED_PARAMETERS ) {
+		HHuginn::value_t v( yaal::move( vr ) );
+		values.pop();
+		HHuginn::value_t& vtr( values.top() );
+		if ( vtr->type_id() != HHuginn::TYPE::LOOKUP ) {
+			throw HHuginn::HHuginnRuntimeException( "Packed parameter is not a lookup.", file_id(), position_ );
+		}
+		vtr.swap( v );
+		HHuginn::HTaggedValue& tv( *static_cast<HHuginn::HTaggedValue*>( vtr.raw() ) );
+		HHuginn::HLookup& l( *static_cast<HHuginn::HLookup*>( v.raw() ) );
+		l.update( frame_->thread(), tv.value(), position_ );
+		tv.value().swap( v );
+	} else {
+		throw HHuginn::HHuginnRuntimeException( "Packed parameter is not a lookup.", file_id(), position_ );
+	}
+	return;
+	M_EPILOG
+}
+
 void HExpression::function_call( HFrame* frame_, int position_ ) {
 	M_PROLOG
 	HHuginn::values_t& args( grab_args( frame_ ) );
