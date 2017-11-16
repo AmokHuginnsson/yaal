@@ -701,7 +701,6 @@ public:
 		_value = ! _value;
 		return;
 	}
-	void to_string( void ) const;
 private:
 	virtual value_t do_clone( huginn::HThread*, int ) const override;
 };
@@ -721,11 +720,6 @@ public:
 	value_type& value( void ) {
 		return ( _value );
 	}
-	void to_character( void ) const;
-	void to_integer( void ) const;
-	void to_number( void ) const;
-	void to_real( void ) const;
-	void to_string( void ) const;
 private:
 	virtual value_t do_clone( huginn::HThread*, int ) const override;
 };
@@ -745,11 +739,6 @@ public:
 	value_type& value( void ) {
 		return ( _value );
 	}
-	void to_integer( void ) const;
-	void to_number( void ) const;
-	void to_real( void ) const;
-	void to_string( void ) const;
-	/* There is no direct conversion to character. */
 private:
 	virtual value_t do_clone( huginn::HThread*, int ) const override;
 };
@@ -769,10 +758,6 @@ public:
 	value_type& value( void ) {
 		return ( _value );
 	}
-	void to_integer( void ) const;
-	void to_number( void ) const;
-	void to_real( void ) const;
-	void to_string( void ) const;
 protected:
 	virtual HIterator do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override;
@@ -793,9 +778,6 @@ public:
 		return ( _value );
 	}
 	void set( value_type );
-	void to_character( void ) const;
-	void to_integer( void ) const;
-	void to_string( void ) const;
 private:
 	virtual value_t do_clone( huginn::HThread*, int ) const override;
 };
@@ -815,10 +797,6 @@ public:
 	value_type& value( void ) {
 		return ( _value );
 	}
-	void to_integer( void ) const;
-	void to_number( void ) const;
-	void to_real( void ) const;
-	void to_string( void ) const;
 private:
 	virtual value_t do_clone( huginn::HThread*, int ) const override;
 };
