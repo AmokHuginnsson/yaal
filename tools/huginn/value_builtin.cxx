@@ -759,6 +759,155 @@ HHuginn::value_t fallback_conversion( HHuginn::type_id_t type_, HThread* thread_
 	return ( res );
 }
 
+HHuginn::value_t fallback_string_conversion( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
+	return ( thread_->runtime().object_factory()->create_string( string_representation( thread_, v_, position_ ) ) );
+}
+
+}
+
+yaal::hcore::HString string_representation( HThread* thread_, HHuginn::value_t const& value_, int position_ ) {
+	yaal::hcore::HString str;
+	switch ( static_cast<HHuginn::TYPE>( value_->type_id().get() ) ) {
+		case ( HHuginn::TYPE::STRING ): {
+			str.assign( '"' ).append( static_cast<HHuginn::HString const*>( value_.raw() )->value() ).append( '"' );
+		} break;
+		case ( HHuginn::TYPE::INTEGER ): {
+			str = static_cast<HHuginn::HInteger const*>( value_.raw() )->value();
+		} break;
+		case ( HHuginn::TYPE::REAL ): {
+			str = static_cast<HHuginn::HReal const*>( value_.raw() )->value();
+		} break;
+		case ( HHuginn::TYPE::NUMBER ): {
+			str.assign( '$' ).append( static_cast<HHuginn::HNumber const*>( value_.raw() )->value().to_string() );
+		} break;
+		case ( HHuginn::TYPE::CHARACTER ): {
+			str.assign( "'" ).append( static_cast<HHuginn::HCharacter const*>( value_.raw() )->value() ).append( "'" );
+		} break;
+		case ( HHuginn::TYPE::BOOLEAN ): {
+			str = static_cast<HHuginn::HBoolean const*>( value_.raw() )->value() ? KEYWORD::TRUE : KEYWORD::FALSE;
+		} break;
+		case ( HHuginn::TYPE::NONE ): {
+			str = "none";
+		} break;
+		case ( HHuginn::TYPE::FUNCTION_REFERENCE ): {
+			if ( thread_ ) {
+				str = thread_->runtime().identifier_name( static_cast<HHuginn::HFunctionReference const*>( value_.raw() )->identifier_id() );
+			} else {
+				str = type_name( HHuginn::TYPE::FUNCTION_REFERENCE );
+			}
+		} break;
+		case ( HHuginn::TYPE::TUPLE ): {
+			HHuginn::HTuple const* t( static_cast<HHuginn::HTuple const*>( value_.raw() ) );
+			str = "(";
+			bool next( false );
+			for ( HHuginn::value_t const& v : t->value() ) {
+				if ( next ) {
+					str.append( ", " );
+				}
+				next = true;
+				str.append( string_representation( thread_, v, position_ ) );
+			}
+			if ( t->value().get_size() == 1 ) {
+				str.append( "," );
+			}
+			str.append( ")" );
+		} break;
+		case ( HHuginn::TYPE::LIST ): {
+			HHuginn::HList const* l( static_cast<HHuginn::HList const*>( value_.raw() ) );
+			str = "[";
+			bool next( false );
+			for ( HHuginn::value_t const& v : l->value() ) {
+				if ( next ) {
+					str.append( ", " );
+				}
+				next = true;
+				str.append( string_representation( thread_, v, position_ ) );
+			}
+			str.append( "]" );
+		} break;
+		case ( HHuginn::TYPE::DEQUE ): {
+			HHuginn::HDeque const* l( static_cast<HHuginn::HDeque const*>( value_.raw() ) );
+			str = "deque(";
+			bool next( false );
+			for ( HHuginn::value_t const& v : l->value() ) {
+				if ( next ) {
+					str.append( ", " );
+				}
+				next = true;
+				str.append( string_representation( thread_, v, position_ ) );
+			}
+			str.append( ")" );
+		} break;
+		case ( HHuginn::TYPE::DICT ): {
+			HHuginn::HDict const* d( static_cast<HHuginn::HDict const*>( value_.raw() ) );
+			str = "{";
+			bool next( false );
+			for ( HHuginn::HDict::values_t::value_type const& v : d->value() ) {
+				if ( next ) {
+					str.append( ", " );
+				}
+				next = true;
+				str.append( string_representation( thread_, v.first, position_ ) ).append( ": " ).append( string_representation( thread_, v.second, position_ ) );
+			}
+			str.append( "}" );
+		} break;
+		case ( HHuginn::TYPE::LOOKUP ): {
+			HHuginn::HLookup::values_t const& lk( static_cast<HHuginn::HLookup const*>( value_.raw() )->value() );
+			if ( lk.is_empty() ) {
+				str = "lookup()";
+				break;
+			}
+			str = "[";
+			bool next( false );
+			for ( HHuginn::HLookup::values_t::value_type const& v : lk ) {
+				if ( next ) {
+					str.append( ", " );
+				}
+				next = true;
+				str.append( string_representation( thread_, v.first, position_ ) ).append( ": " ).append( string_representation( thread_, v.second, position_ ) );
+			}
+			str.append( "]" );
+		} break;
+		case ( HHuginn::TYPE::SET ): {
+			HHuginn::HSet::values_t const& s( static_cast<HHuginn::HSet const*>( value_.raw() )->value() );
+			if ( s.is_empty() ) {
+				str = "set()";
+				break;
+			}
+			str = "{";
+			bool next( false );
+			for ( HHuginn::value_t const& v : s ) {
+				if ( next ) {
+					str.append( ", " );
+				}
+				next = true;
+				str.append( string_representation( thread_, v, position_ ) );
+			}
+			str.append( "}" );
+		} break;
+		case ( HHuginn::TYPE::ORDER ): {
+			HHuginn::HOrder const* l( static_cast<HHuginn::HOrder const*>( value_.raw() ) );
+			str = "order(";
+			bool next( false );
+			for ( HHuginn::value_t const& v : l->value() ) {
+				if ( next ) {
+					str.append( ", " );
+				}
+				next = true;
+				str.append( string_representation( thread_, v, position_ ) );
+			}
+			str.append( ")" );
+		} break;
+		default: {
+			if ( thread_ ) {
+				HHuginn::value_t v( fallback_conversion( type_id( HHuginn::TYPE::STRING ), thread_, value_, position_ ) );
+				str = get_string( v );
+			} else {
+				str = value_->get_class()->name();
+			}
+		}
+	}
+	return ( str );
 }
 
 HHuginn::value_t string( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
@@ -790,7 +939,7 @@ HHuginn::value_t string( HThread* thread_, HHuginn::value_t const& v_, int posit
 			res = thread_->object_factory().create_string( KEYWORD::NONE );
 		} break;
 		default: {
-			res = fallback_conversion( type_id( HHuginn::TYPE::STRING ), thread_, v_, position_ );
+			res = fallback_string_conversion( thread_, v_, position_ );
 		}
 	}
 	return ( res );

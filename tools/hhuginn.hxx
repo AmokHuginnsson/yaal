@@ -346,7 +346,7 @@ private:
 	char const* error_message( int ) const;
 	HHuginn( HHuginn const& ) = delete;
 	HHuginn& operator = ( HHuginn const& ) = delete;
-	friend yaal::hcore::HString to_string( HHuginn::value_t const&, HHuginn const* );
+	friend yaal::hcore::HString to_string( HHuginn::value_t const&, HHuginn* );
 	friend class huginn::HPackageFactory;
 };
 
@@ -1167,7 +1167,7 @@ inline bool operator != ( HHuginn::type_id_t t1_, HHuginn::TYPE t2_ ) {
 }
 
 yaal::hcore::HString to_string( HHuginn::value_t const& );
-yaal::hcore::HString to_string( HHuginn::value_t const&, HHuginn const* );
+yaal::hcore::HString to_string( HHuginn::value_t const&, HHuginn* );
 
 }
 

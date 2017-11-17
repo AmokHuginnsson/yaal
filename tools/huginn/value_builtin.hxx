@@ -65,6 +65,7 @@ HHuginn::value_t real( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t boolean( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t character( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t number( HThread*, HHuginn::value_t const&, int );
+yaal::hcore::HString string_representation( HThread*, HHuginn::value_t const&, int );
 
 }
 
