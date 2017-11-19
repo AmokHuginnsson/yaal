@@ -44,11 +44,11 @@ private:
 	HIntrospecteeInterface::HCallSite _callSite;
 public:
 	HStackFrameInfo( HHuginn::HClass const*, HIntrospecteeInterface::HCallSite const& );
-	static HHuginn::value_t file( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
-	static HHuginn::value_t line( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
-	static HHuginn::value_t column( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
-	static HHuginn::value_t context( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
-	static HHuginn::value_t to_string( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+	static HHuginn::value_t file( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+	static HHuginn::value_t line( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+	static HHuginn::value_t column( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+	static HHuginn::value_t context( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+	static HHuginn::value_t to_string( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::class_t get_class( HRuntime* );
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread*, int ) const override __attribute__((noreturn));

@@ -98,7 +98,7 @@ HHuginn::HObject::~HObject( void ) {
 			try {
 				static_cast<HClass::HMethod const*>(
 					_fields[destructorIdx].raw()
-				)->function()( t, &nonOwning, values_t{}, 0 );
+				)->function()( t, &nonOwning, HArguments( t ), 0 );
 			} catch ( HHuginnRuntimeException const& e ) {
 				t->break_execution( HFrame::STATE::RUNTIME_EXCEPTION );
 				t->set_exception( e.message(), e.file_id(), e.position() );
@@ -109,7 +109,7 @@ HHuginn::HObject::~HObject( void ) {
 			destructorIdx = c->field_index( KEYWORD::DESTRUCTOR_IDENTIFIER );
 			if ( destructorIdx >= 0 ) {
 				try {
-					c->function( destructorIdx )( t, &nonOwning, values_t{}, 0 );
+					c->function( destructorIdx )( t, &nonOwning, HArguments( t ), 0 );
 				} catch ( HHuginnRuntimeException const& e ) {
 					t->break_execution( HFrame::STATE::RUNTIME_EXCEPTION );
 					t->set_exception( e.message(), e.file_id(), e.position() );
@@ -187,7 +187,7 @@ HHuginn::value_t HHuginn::HObject::call_method(
 	huginn::HThread* thread_,
 	HHuginn::value_t const& object_,
 	yaal::hcore::HString const& methodName_,
-	HHuginn::values_t const& arguments_,
+	HHuginn::values_t& arguments_,
 	int position_
 ) const {
 	M_PROLOG

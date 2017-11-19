@@ -59,13 +59,13 @@ public:
 		, _databaseConnectionClass( HDatabaseConnection::get_class( class_->runtime(), _exceptionClass ) ) {
 		return;
 	}
-	static HHuginn::value_t connect( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t connect( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		return ( static_cast<HDatabase*>( object_->raw() )->do_connect( thread_, values_, position_ ) );
 		M_EPILOG
 	}
 private:
-	HHuginn::value_t do_connect( tools::huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
+	HHuginn::value_t do_connect( tools::huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "Database.connect", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		return ( _databaseConnectionClass->create_instance( thread_, nullptr, values_, position_ ) );

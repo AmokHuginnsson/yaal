@@ -251,7 +251,7 @@ void fallback_arithmetic( HThread* thread_, char const* methodName_, char const*
 	HHuginn::value_t v;
 	HHuginn::type_id_t t( v1_->type_id() );
 	if ( thread_ && ( o = dynamic_cast<HHuginn::HObject*>( v1_.raw() ) ) ) {
-		v = o->call_method( thread_, v1_, methodName_, { v2_ }, position_ );
+		v = o->call_method( thread_, v1_, methodName_, HArguments( thread_, v2_ ), position_ );
 		if ( v->type_id() != t ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"Arithmetic method `"_ys
@@ -270,7 +270,7 @@ void fallback_arithmetic( HThread* thread_, char const* methodName_, char const*
 		int idx( c->field_index( thread_->runtime().identifier_id( methodName_ ) ) );
 		if ( idx >= 0 ) {
 			HHuginn::HClass::HMethod const& m( *static_cast<HHuginn::HClass::HMethod const*>( c->field( idx ).raw() ) );
-			v = m.function()( thread_, &v1_, HHuginn::values_t{ v2_ }, position_ );
+			v = m.function()( thread_, &v1_, HArguments( thread_, v2_ ), position_ );
 			M_ASSERT( v->type_id() == t );
 		} else {
 			throw HHuginn::HHuginnRuntimeException( "There is no `"_ys.append( oper_ ).append( "' operator for " ).append( a_type_name( t ) ).append( "." ), thread_->current_frame()->file_id(), position_ );
@@ -497,7 +497,7 @@ HHuginn::value_t neg( HThread* thread_, HHuginn::value_t const& v_, int position
 		res = thread_->object_factory().create_number( -static_cast<HHuginn::HNumber const*>( v_.raw() )->value() );
 	} else {
 		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v_.raw() ) ) {
-			o->call_method( thread_, v_, "negate", {}, position_ );
+			o->call_method( thread_, v_, "negate", HArguments( thread_ ), position_ );
 		} else {
 			throw HHuginn::HHuginnRuntimeException( "There is no `negate` operator for `"_ys.append( v_->get_class()->name() ).append( "'." ), thread_->current_frame()->file_id(), position_ );
 		}
@@ -525,7 +525,7 @@ int long hash( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	} else if ( typeId != HHuginn::TYPE::NONE ) {
 		HHuginn::value_t res;
 		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v_.raw() ) ) {
-			res = o->call_method( thread_, v_, INTERFACE::HASH, HHuginn::values_t(), position_ );
+			res = o->call_method( thread_, v_, INTERFACE::HASH, HArguments( thread_ ), position_ );
 			if ( res->type_id() != HHuginn::TYPE::INTEGER ) {
 				throw HHuginn::HHuginnRuntimeException(
 					"User supplied `hash' function returned an invalid type "_ys
@@ -540,7 +540,7 @@ int long hash( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 			int idx( c->field_index( thread_->runtime().identifier_id( INTERFACE::HASH ) ) );
 			if ( idx >= 0 ) {
 				HHuginn::HClass::HMethod const& m( *static_cast<HHuginn::HClass::HMethod const*>( c->field( idx ).raw() ) );
-				res = m.function()( thread_, const_cast<HHuginn::value_t*>( &v_ ), HHuginn::values_t{}, position_ );
+				res = m.function()( thread_, const_cast<HHuginn::value_t*>( &v_ ), HArguments( thread_ ), position_ );
 				M_ASSERT( res->type_id() == HHuginn::TYPE::INTEGER );
 			} else {
 				throw HHuginn::HHuginnRuntimeException(
@@ -562,7 +562,7 @@ bool fallback_compare( HThread* thread_, char const* methodName_, char const* op
 	HHuginn::HObject const* o( nullptr );
 	HHuginn::value_t v;
 	if ( thread_ && ( o = dynamic_cast<HHuginn::HObject const*>( v1_.raw() ) ) ) {
-		v = o->call_method( thread_, v1_, methodName_, { v2_ }, position_ );
+		v = o->call_method( thread_, v1_, methodName_, HArguments( thread_, v2_ ), position_ );
 		if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"Comparison method `"_ys.append( methodName_ ).append( "' returned non-boolean result of " ).append( a_type_name( v->get_class() ) ).append( " type." ),
@@ -575,7 +575,7 @@ bool fallback_compare( HThread* thread_, char const* methodName_, char const* op
 		int idx( c->field_index( thread_->runtime().identifier_id( methodName_ ) ) );
 		if ( idx >= 0 ) {
 			HHuginn::HClass::HMethod const& m( *static_cast<HHuginn::HClass::HMethod const*>( c->field( idx ).raw() ) );
-			v = m.function()( thread_, const_cast<HHuginn::value_t*>( &v1_ ), HHuginn::values_t{ v2_ }, position_ );
+			v = m.function()( thread_, const_cast<HHuginn::value_t*>( &v1_ ), HArguments( thread_, v2_ ), position_ );
 			M_ASSERT( v->type_id() == HHuginn::TYPE::BOOLEAN );
 		} else {
 			throw HHuginn::HHuginnRuntimeException( "There is no `"_ys.append( oper_ ).append( "' operator for `" ).append( v1_->get_class()->name() ).append( "'." ), thread_->current_frame()->file_id(), position_ );
@@ -725,7 +725,7 @@ HHuginn::value_t fallback_conversion( HHuginn::type_id_t type_, HThread* thread_
 	HString methodName( "to_" );
 	methodName.append( type_name( type_ ) );
 	if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v_.raw() ) ) {
-		res = o->call_method( thread_, v_, methodName, HHuginn::values_t(), position_ );
+		res = o->call_method( thread_, v_, methodName, HArguments( thread_ ), position_ );
 		if ( res->type_id() != type_ ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"User conversion method returned invalid type "_ys
@@ -742,7 +742,7 @@ HHuginn::value_t fallback_conversion( HHuginn::type_id_t type_, HThread* thread_
 		int idx( c->field_index( thread_->runtime().identifier_id( methodName ) ) );
 		if ( idx >= 0 ) {
 			HHuginn::HClass::HMethod const& m( *static_cast<HHuginn::HClass::HMethod const*>( c->field( idx ).raw() ) );
-			res = m.function()( thread_, const_cast<HHuginn::value_t*>( &v_ ), HHuginn::values_t{}, position_ );
+			res = m.function()( thread_, const_cast<HHuginn::value_t*>( &v_ ), HArguments( thread_ ), position_ );
 			M_ASSERT( res->type_id() == type_ );
 		} else {
 			throw HHuginn::HHuginnRuntimeException(

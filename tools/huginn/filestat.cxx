@@ -54,7 +54,7 @@ HFileStat::HFileStat( HHuginn::HClass const* class_, HHuginn::HClass const* exce
 	return;
 }
 
-HHuginn::value_t HFileStat::id( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HFileStat::id( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "FileStat.id", values_, 0, 0, thread_, position_ );
 	HFileStat* o( static_cast<HFileStat*>( object_->raw() ) );
@@ -69,7 +69,7 @@ HHuginn::value_t HFileStat::id( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_EPILOG
 }
 
-HHuginn::value_t HFileStat::name( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HFileStat::name( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "FileStat.name", values_, 0, 0, thread_, position_ );
 	HFileStat* o( static_cast<HFileStat*>( object_->raw() ) );
@@ -85,7 +85,7 @@ HHuginn::value_t HFileStat::name( huginn::HThread* thread_, HHuginn::value_t* ob
 	M_EPILOG
 }
 
-HHuginn::value_t HFileStat::size( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HFileStat::size( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "FileStat.size", values_, 0, 0, thread_, position_ );
 	HFileStat* o( static_cast<HFileStat*>( object_->raw() ) );
@@ -100,7 +100,7 @@ HHuginn::value_t HFileStat::size( huginn::HThread* thread_, HHuginn::value_t* ob
 	M_EPILOG
 }
 
-HHuginn::value_t HFileStat::mode( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HFileStat::mode( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "FileStat.mode", values_, 0, 0, thread_, position_ );
 	HFileStat* o( static_cast<HFileStat*>( object_->raw() ) );
@@ -115,7 +115,7 @@ HHuginn::value_t HFileStat::mode( huginn::HThread* thread_, HHuginn::value_t* ob
 	M_EPILOG
 }
 
-HHuginn::value_t HFileStat::type( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HFileStat::type( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "FileStat.type", values_, 0, 0, thread_, position_ );
 	HFileStat* o( static_cast<HFileStat*>( object_->raw() ) );
@@ -129,7 +129,7 @@ HHuginn::value_t HFileStat::type( huginn::HThread* thread_, HHuginn::value_t* ob
 	M_EPILOG
 }
 
-HHuginn::value_t HFileStat::user( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HFileStat::user( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "FileStat.user", values_, 0, 0, thread_, position_ );
 	HFileStat* o( static_cast<HFileStat*>( object_->raw() ) );
@@ -144,7 +144,7 @@ HHuginn::value_t HFileStat::user( huginn::HThread* thread_, HHuginn::value_t* ob
 	M_EPILOG
 }
 
-HHuginn::value_t HFileStat::group( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HFileStat::group( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "FileStat.group", values_, 0, 0, thread_, position_ );
 	HFileStat* o( static_cast<HFileStat*>( object_->raw() ) );
@@ -159,7 +159,7 @@ HHuginn::value_t HFileStat::group( huginn::HThread* thread_, HHuginn::value_t* o
 	M_EPILOG
 }
 
-HHuginn::value_t HFileStat::get_times( char const* name_, time_getter_t timeGetter_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HFileStat::get_times( char const* name_, time_getter_t timeGetter_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "FileStat."_ys.append( name_ ), values_, 0, 0, thread_, position_ );
 	HFileStat* o( static_cast<HFileStat*>( object_->raw() ) );

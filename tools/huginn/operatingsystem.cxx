@@ -65,7 +65,7 @@ public:
 		, _subprocessClass( HSubprocess::get_class( class_->runtime() ) ) {
 		return;
 	}
-	static HHuginn::value_t env( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t env( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "OperatingSystem.env", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		HUTF8String utf8(  get_string( values_[0] ) );
@@ -74,7 +74,7 @@ public:
 		return ( val ? rt.object_factory()->create_string( val ) : rt.none_value() );
 		M_EPILOG
 	}
-	static HHuginn::value_t exec( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t exec( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		static int const MAX_ARG_COUNT( 65535 );
 		char const name[] = "OperatingSystem.exec";
@@ -96,7 +96,7 @@ public:
 		return ( thread_->runtime().none_value() );
 		M_EPILOG
 	}
-	static HHuginn::value_t exit( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t exit( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "OperatingSystem.exit", values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
 		HHuginn::HInteger::value_type val( get_integer( values_[0] ) );
@@ -104,7 +104,7 @@ public:
 		return ( thread_->runtime().none_value() );
 		M_EPILOG
 	}
-	static HHuginn::value_t spawn( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t spawn( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "OperatingSystem.spawn";
 		verify_arg_count( name, values_, 1, meta::max_signed<int short>::value, thread_, position_ );
@@ -122,7 +122,7 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t stream( char const* name_, yaal::hcore::HStreamInterface* stream_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t stream( char const* name_, yaal::hcore::HStreamInterface* stream_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( name_, values_, 0, 0, thread_, position_ );
 		HOperatingSystem* o( static_cast<HOperatingSystem*>( object_->raw() ) );

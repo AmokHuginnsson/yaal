@@ -76,14 +76,14 @@ public:
 		return;
 	}
 private:
-	virtual HHuginn::value_t do_create_instance( huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) const {
+	virtual HHuginn::value_t do_create_instance( huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) const {
 		M_PROLOG
 		verify_signature( name() + ".constructor", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		thread_->current_frame()->set_position( position_ );
 		return ( thread_->object_factory().create<HHuginn::HException>( thread_, this, get_string( values_[0] ) ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t what( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t what( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_->raw() ) );
 		verify_arg_count(
@@ -93,7 +93,7 @@ private:
 		return ( thread_->object_factory().create_string( e->what() ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t where( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t where( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_->raw() ) );
 		verify_arg_count(
@@ -103,7 +103,7 @@ private:
 		return ( thread_->object_factory().create_string( e->where() ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t trace( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t trace( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_->raw() ) );
 		verify_arg_count(
@@ -120,7 +120,7 @@ private:
 		return ( traceValue );
 		M_EPILOG
 	}
-	static HHuginn::value_t message( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t message( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_->raw() ) );
 		verify_arg_count(
@@ -184,7 +184,7 @@ HStackFrameInfo::HStackFrameInfo( HHuginn::HClass const* class_, HIntrospecteeIn
 	, _callSite( callSite_ ) {
 }
 
-HHuginn::value_t HStackFrameInfo::file( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HStackFrameInfo::file( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "file", values_, 0, 0, thread_, position_ );
 	HStackFrameInfo* sfi( static_cast<HStackFrameInfo*>( object_->raw() ) );
@@ -192,7 +192,7 @@ HHuginn::value_t HStackFrameInfo::file( huginn::HThread* thread_, HHuginn::value
 	M_EPILOG
 }
 
-HHuginn::value_t HStackFrameInfo::line( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HStackFrameInfo::line( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "line", values_, 0, 0, thread_, position_ );
 	HStackFrameInfo* sfi( static_cast<HStackFrameInfo*>( object_->raw() ) );
@@ -200,7 +200,7 @@ HHuginn::value_t HStackFrameInfo::line( huginn::HThread* thread_, HHuginn::value
 	M_EPILOG
 }
 
-HHuginn::value_t HStackFrameInfo::column( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HStackFrameInfo::column( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "column", values_, 0, 0, thread_, position_ );
 	HStackFrameInfo* sfi( static_cast<HStackFrameInfo*>( object_->raw() ) );
@@ -208,7 +208,7 @@ HHuginn::value_t HStackFrameInfo::column( huginn::HThread* thread_, HHuginn::val
 	M_EPILOG
 }
 
-HHuginn::	value_t HStackFrameInfo::context( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::	value_t HStackFrameInfo::context( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "context", values_, 0, 0, thread_, position_ );
 	HStackFrameInfo* sfi( static_cast<HStackFrameInfo*>( object_->raw() ) );
@@ -216,7 +216,7 @@ HHuginn::	value_t HStackFrameInfo::context( huginn::HThread* thread_, HHuginn::v
 	M_EPILOG
 }
 
-HHuginn::	value_t HStackFrameInfo::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::	value_t HStackFrameInfo::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "to_string", values_, 0, 0, thread_, position_ );
 	HStackFrameInfo* sfi( static_cast<HStackFrameInfo*>( object_->raw() ) );

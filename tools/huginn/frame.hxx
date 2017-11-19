@@ -48,6 +48,7 @@ public:
 	typedef yaal::hcore::HStack<HHuginn::value_t> values_t;
 	typedef yaal::hcore::HStack<int> instruction_pointers_t;
 	typedef yaal::hcore::HArray<HHuginn::identifier_id_t> identifiers_t;
+	typedef yaal::hcore::HArray<HHuginn::values_t> value_cache_t;
 	enum class TYPE {
 		SCOPE,
 		LOOP,
@@ -118,9 +119,13 @@ private:
 
 	/*!
 	 * Used exclusively to speed up function call parameter construction
-	 * in HExpression::grab_args().
+	 * through HThread::value_cache() and HFrame::value_cache().
 	 */
-	HHuginn::values_t _valueCache;
+	value_cache_t _valueCache;
+
+	/*! Number of argument sets in _valueCache.
+	 */
+	int _valueCacheSize;
 
 	/*!
 	 * Temporary store for expression result value used to pass expression results
@@ -195,9 +200,6 @@ public:
 	void end_expression( void ) {
 		_instructionPointers.pop();
 	}
-	HHuginn::values_t& value_cache( void ) {
-		return ( _valueCache );
-	}
 	HStatement const* statement( void ) const {
 		return ( _statement );
 	}
@@ -210,12 +212,27 @@ public:
 	int position( void ) const {
 		return ( _position );
 	}
-	HHuginn::values_t const& variable_values( void ) const {
+	HHuginn::values_t& variable_values( void ) {
 		return ( _variables );
 	}
 	identifiers_t const& variable_identifiers( void ) const {
 		return ( _variableIdentifiers );
 	}
+protected:
+	HHuginn::values_t& value_cache( void ) {
+		if (  _valueCacheSize == static_cast<int>( _valueCache.get_size() ) ) {
+			_valueCache.resize( _valueCacheSize + 1 );
+		}
+		HHuginn::values_t& values( _valueCache[_valueCacheSize] );
+		++ _valueCacheSize;
+		return ( values );
+	}
+	void invalidate_value_cache( void ) {
+		-- _valueCacheSize;
+		_valueCache[_valueCacheSize].clear();
+		return;
+	}
+	friend class HArguments;
 private:
 	HFrame( HFrame const& ) = delete;
 	HFrame& operator = ( HFrame const& ) = delete;

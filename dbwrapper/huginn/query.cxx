@@ -87,7 +87,7 @@ public:
 	}
 };
 
-HHuginn::value_t HQuery::bind( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HQuery::bind( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_signature( "Query.bind", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::STRING }, thread_, position_ );
 	HQuery* q( static_cast<HQuery*>( object_->raw() ) );
@@ -103,7 +103,7 @@ HHuginn::value_t HQuery::bind( tools::huginn::HThread* thread_, HHuginn::value_t
 	M_EPILOG
 }
 
-HHuginn::value_t HQuery::execute( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HQuery::execute( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Query.execute";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );

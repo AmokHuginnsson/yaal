@@ -924,7 +924,7 @@ HHuginn::HClass::HBoundMethod::HBoundMethod( HHuginn::function_t const& method_,
 	return;
 }
 
-HHuginn::value_t HHuginn::HClass::HBoundMethod::call( huginn::HThread* thread_, values_t const& arguments_, int position_ ) {
+HHuginn::value_t HHuginn::HClass::HBoundMethod::call( huginn::HThread* thread_, values_t& arguments_, int position_ ) {
 	return ( _function( thread_, &_objectHolder, arguments_, position_ ) );
 }
 

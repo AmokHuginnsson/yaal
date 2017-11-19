@@ -91,7 +91,7 @@ int HFunction::upcast( HHuginn::value_t* object_ ) const {
 HHuginn::value_t HFunction::execute(
 	huginn::HThread* thread_,
 	HHuginn::value_t* object_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int position_
 ) const {
 	M_PROLOG
@@ -105,7 +105,7 @@ HHuginn::value_t HFunction::execute(
 HHuginn::value_t HFunction::execute_incremental_main(
 	huginn::HThread* thread_,
 	HHuginn::value_t* object_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int position_
 ) const {
 	M_PROLOG
@@ -118,7 +118,7 @@ HHuginn::value_t HFunction::execute_incremental_main(
 
 HHuginn::value_t HFunction::execute_impl(
 	huginn::HThread* thread_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int position_
 ) const {
 	M_PROLOG

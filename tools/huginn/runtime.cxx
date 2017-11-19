@@ -388,14 +388,14 @@ void HRuntime::execute( void ) {
 namespace {
 namespace package {
 
-HHuginn::value_t value( HHuginn::value_t value_, HString name_, HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t value( HHuginn::value_t value_, HString name_, HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( name_, values_, 0, 0, thread_, position_ );
 	return ( value_ );
 	M_EPILOG
 }
 
-HHuginn::value_t instance( HHuginn::HClass const* class_, HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t instance( HHuginn::HClass const* class_, HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	return ( class_->create_instance( thread_, object_, values_, position_ ) );
 	M_EPILOG
@@ -459,7 +459,7 @@ huginn::HThread::frame_t const& HRuntime::incremental_frame( void ) const {
 	M_EPILOG
 }
 
-HHuginn::value_t HRuntime::call( identifier_id_t identifier_, values_t const& values_, int position_ ) {
+HHuginn::value_t HRuntime::call( identifier_id_t identifier_, values_t& values_, int position_ ) {
 	M_PROLOG
 	value_t res;
 	if ( _functionsAvailable.count( identifier_ ) > 0 ) {
@@ -490,49 +490,49 @@ void HRuntime::clear_arguments( void ) {
 
 namespace huginn_builtin {
 
-HHuginn::value_t string( HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t string( HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "string", values_, 1, 1, thread_, position_ );
 	return ( value_builtin::string( thread_, values_[0], position_ ) );
 	M_EPILOG
 }
 
-HHuginn::value_t integer( HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t integer( HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "integer", values_, 1, 1, thread_, position_ );
 	return ( value_builtin::integer( thread_, values_[0], position_ ) );
 	M_EPILOG
 }
 
-HHuginn::value_t real( HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t real( HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "real", values_, 1, 1, thread_, position_ );
 	return ( value_builtin::real( thread_, values_[0], position_ ) );
 	M_EPILOG
 }
 
-HHuginn::value_t boolean( HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t boolean( HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "boolean", values_, 1, 1, thread_, position_ );
 	return ( value_builtin::boolean( thread_, values_[0], position_ ) );
 	M_EPILOG
 }
 
-HHuginn::value_t character( HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t character( HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "character", values_, 1, 1, thread_, position_ );
 	return ( value_builtin::character( thread_, values_[0], position_ ) );
 	M_EPILOG
 }
 
-HHuginn::value_t number( HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t number( HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "number", values_, 1, 1, thread_, position_ );
 	return ( value_builtin::number( thread_, values_[0], position_ ) );
 	M_EPILOG
 }
 
-HHuginn::value_t size( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t size( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "size", values_, 1, 1, thread_, position_ );
 	HHuginn::value_t const& val( values_.front() );
@@ -543,7 +543,7 @@ HHuginn::value_t size( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 		s = iterable->size( thread_, position_ );
 	} else {
 		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v ) ) {
-			HHuginn::value_t res( o->call_method( thread_, val, INTERFACE::GET_SIZE, HHuginn::values_t(), position_ ) );
+			HHuginn::value_t res( o->call_method( thread_, val, INTERFACE::GET_SIZE, HArguments( thread_ ), position_ ) );
 			if ( res->type_id() != HHuginn::TYPE::INTEGER ) {
 				throw HHuginn::HHuginnRuntimeException(
 					"User supplied `get_size' method returned an invalid type "_ys
@@ -566,7 +566,7 @@ HHuginn::value_t size( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 	M_EPILOG
 }
 
-HHuginn::value_t type( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t type( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "type", values_, 1, 1, thread_, position_ );
 	HHuginn::HValue const* v( values_.front().raw() );
@@ -576,7 +576,7 @@ HHuginn::value_t type( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 	M_EPILOG
 }
 
-HHuginn::value_t copy( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t copy( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "copy", values_, 1, 1, thread_, position_ );
 	HHuginn::HValue const* v( values_.front().raw() );
@@ -584,7 +584,7 @@ HHuginn::value_t copy( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 	M_EPILOG
 }
 
-HHuginn::value_t observe( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t observe( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "observe", values_, 1, 1, thread_, position_ );
 	HHuginn::value_t const& v( values_.front() );
@@ -599,7 +599,7 @@ HHuginn::value_t observe( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::
 	M_EPILOG
 }
 
-HHuginn::value_t use( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t use( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_signature( "use", values_, { HHuginn::TYPE::OBSERVER }, thread_, position_ );
 	HHuginn::HObserver const* o( static_cast<HHuginn::HObserver const*>( values_.front().raw() ) );
@@ -611,14 +611,14 @@ HHuginn::value_t use( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::valu
 	M_EPILOG
 }
 
-HHuginn::value_t tuple( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int ) {
+HHuginn::value_t tuple( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int ) {
 	M_PROLOG
 	HHuginn::values_t v( values_ );
 	return ( thread_->object_factory().create_tuple( yaal::move( v ) ) );
 	M_EPILOG
 }
 
-HHuginn::value_t list( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int ) {
+HHuginn::value_t list( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int ) {
 	M_PROLOG
 	HHuginn::value_t v( thread_->object_factory().create_list() );
 	HHuginn::HList* l( static_cast<HHuginn::HList*>( v.raw() ) );
@@ -629,7 +629,7 @@ HHuginn::value_t list( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 	M_EPILOG
 }
 
-HHuginn::value_t deque( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int ) {
+HHuginn::value_t deque( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int ) {
 	M_PROLOG
 	HHuginn::value_t v( thread_->object_factory().create_deque() );
 	HHuginn::HDeque* d( static_cast<HHuginn::HDeque*>( v.raw() ) );
@@ -640,14 +640,14 @@ HHuginn::value_t deque( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::va
 	M_EPILOG
 }
 
-HHuginn::value_t dict( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t dict( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "dict", values_, 0, 0, thread_, position_ );
 	return ( thread_->object_factory().create_dict() );
 	M_EPILOG
 }
 
-HHuginn::value_t order( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t order( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	HHuginn::value_t v( thread_->object_factory().create_order() );
 	HHuginn::HOrder* o( static_cast<HHuginn::HOrder*>( v.raw() ) );
@@ -658,14 +658,14 @@ HHuginn::value_t order( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::va
 	M_EPILOG
 }
 
-HHuginn::value_t lookup( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t lookup( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "lookup", values_, 0, 0, thread_, position_ );
 	return ( thread_->object_factory().create_lookup() );
 	M_EPILOG
 }
 
-HHuginn::value_t set( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t set( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	HHuginn::value_t v( thread_->object_factory().create_set() );
 	HHuginn::HSet* s( static_cast<HHuginn::HSet*>( v.raw() ) );
@@ -676,7 +676,7 @@ HHuginn::value_t set( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::valu
 	M_EPILOG
 }
 
-HHuginn::value_t print( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t print( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "print", values_, 1, 1, thread_, position_ );
 	HHuginn::HValue const* v( values_.front().raw() );
@@ -706,7 +706,7 @@ HHuginn::value_t print( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::va
 	M_EPILOG
 }
 
-HHuginn::value_t input( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t input( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "input", values_, 0, 0, thread_, position_ );
 	yaal::hcore::HString l;
@@ -715,7 +715,7 @@ HHuginn::value_t input( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::va
 	M_EPILOG
 }
 
-inline HHuginn::value_t assert( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t assert( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "assert";
 	verify_arg_count( name, values_, 2, 3, thread_, position_ );
@@ -733,8 +733,8 @@ inline HHuginn::value_t assert( huginn::HThread* thread_, HHuginn::value_t*, HHu
 	M_EPILOG
 }
 
-HHuginn::value_t invalid_instance( yaal::hcore::HString const&, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
-HHuginn::value_t invalid_instance( yaal::hcore::HString const& name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const&, int position_ ) {
+HHuginn::value_t invalid_instance( yaal::hcore::HString const&, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+HHuginn::value_t invalid_instance( yaal::hcore::HString const& name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t&, int position_ ) {
 	M_PROLOG
 	/*
 	 * __attribute__(( noreturn )) causes problems with clang.
@@ -1068,7 +1068,7 @@ HIntrospecteeInterface::variable_views_t HRuntime::get_locals( HThread* thread_,
 		-- frameNo_;
 	}
 	while ( f ) {
-		HHuginn::values_t const& variableValues( f->variable_values() );
+		HHuginn::values_t& variableValues( f->variable_values() );
 		HFrame::identifiers_t const& variableIdentifiers( f->variable_identifiers() );
 		M_ASSERT( variableIdentifiers.get_size() == variableValues.get_size() );
 		for ( int i( 0 ), COUNT( static_cast<int>( variableValues.get_size() ) ); i < COUNT; ++ i ) {

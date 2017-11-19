@@ -55,13 +55,13 @@ public:
 		, _exceptionClass( exception::create_class( class_->runtime(), "CryptographyException", "The `CryptographyException` exception type for `Cryptography` package." ) ) {
 		return;
 	}
-	static HHuginn::value_t hash( char const* name_, tools::hash::hash_string_t hash_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t hash( char const* name_, tools::hash::hash_string_t hash_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( name_, values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		return ( thread_->object_factory().create_string( hash_( get_string( values_[0] ) ) ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t hmac( char const* name_, hash::FUNCTION hashType_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t hmac( char const* name_, hash::FUNCTION hashType_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( name_, values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, thread_, position_ );
 		return ( thread_->object_factory().create_string( hash::hmac( hashType_, get_string( values_[0] ), get_string( values_[1] ) ) ) );

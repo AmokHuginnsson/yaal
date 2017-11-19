@@ -52,10 +52,10 @@ public:
 private:
 	number_set_stats_t _stats;
 public:
-	HNumberSetStatistics( huginn::HThread*, HHuginn::HClass const*, HHuginn::values_t const&, int );
-	static HHuginn::value_t stat( char const*, xmath::aggregate_type_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
-	static HHuginn::value_t derivative_stat( char const*, DERIVATIVE_STAT, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
-	static HHuginn::value_t count( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+	HNumberSetStatistics( huginn::HThread*, HHuginn::HClass const*, HHuginn::values_t&, int );
+	static HHuginn::value_t stat( char const*, xmath::aggregate_type_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+	static HHuginn::value_t derivative_stat( char const*, DERIVATIVE_STAT, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+	static HHuginn::value_t count( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::class_t get_class( HRuntime* );
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread*, int ) const override __attribute__((noreturn));

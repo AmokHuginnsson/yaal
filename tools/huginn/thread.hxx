@@ -51,6 +51,7 @@ private:
 	int _functionFrameCount;
 	yaal::hcore::HThread::id_t _id;
 	HRuntime* _runtime;
+	HHuginn::values_t _valueCache;
 	HObjectFactory& _objectFactory;
 	yaal::hcore::HString _exceptionMessage;
 	int _exceptionFileId;
@@ -95,10 +96,51 @@ public:
 	int call_stack_size( void ) const {
 		return ( _functionFrameCount );
 	}
+	HHuginn::values_t& value_cache( void ) {
+		return ( _valueCache );
+	}
 private:
 	void add_frame( void );
 	HThread( HThread const& ) = delete;
 	HThread& operator = ( HThread const& ) = delete;
+};
+
+class HArguments {
+private:
+	HFrame* _frame;
+	HHuginn::values_t& _values;
+public:
+	template<typename... args_t>
+	HArguments( HThread* thread_, args_t&&... args_ )
+		: HArguments( thread_, yaal::forward<args_t>( args_ )... ) {
+	}
+	template<typename head_t, typename... args_t>
+	HArguments( HThread* thread_, head_t&& head_, args_t&&... args_ )
+		: HArguments( thread_, yaal::forward<args_t>( args_ )... ) {
+		_values.push_back( yaal::forward<head_t>( head_ ) );
+	}
+	HArguments( HThread* thread_ )
+		: _frame( thread_->current_frame() )
+		, _values( _frame ? _frame->value_cache() : thread_->value_cache() ) {
+	}
+	HArguments( HFrame* frame_ )
+		: _frame( frame_ )
+		, _values( _frame->value_cache() ) {
+	}
+	~HArguments( void ) {
+		if ( _frame ) {
+			_frame->invalidate_value_cache();
+		} else {
+			_values.clear();
+		}
+	}
+	operator HHuginn::values_t& ( void ) {
+		return ( _values );
+	}
+private:
+	HArguments( HArguments&& ) = delete;
+	HArguments( HArguments const& ) = delete;
+	HArguments& operator = ( HArguments const& ) = delete;
 };
 
 }

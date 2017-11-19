@@ -45,7 +45,7 @@ namespace tools {
 
 namespace huginn {
 
-HNumberSetStatistics::HNumberSetStatistics( huginn::HThread* thread_, HHuginn::HClass const* class_, HHuginn::values_t const& values_, int position_ )
+HNumberSetStatistics::HNumberSetStatistics( huginn::HThread* thread_, HHuginn::HClass const* class_, HHuginn::values_t& values_, int position_ )
 	: HValue( class_ )
 	, _stats() {
 	char const name[] = "NumberSetStatistics.constructor";
@@ -107,7 +107,7 @@ typename stats_t::value_type derivative_stats_impl( stats_t const& stats_, HNumb
 	return ( res );
 }
 
-HHuginn::value_t HNumberSetStatistics::stat( char const* name_, xmath::aggregate_type_t aggregateType_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HNumberSetStatistics::stat( char const* name_, xmath::aggregate_type_t aggregateType_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "NumberSetStatistics."_ys.append( name_ ), values_, 0, 0, thread_, position_ );
 	HHuginn::value_t v;
@@ -123,7 +123,7 @@ HHuginn::value_t HNumberSetStatistics::stat( char const* name_, xmath::aggregate
 	M_EPILOG
 }
 
-HHuginn::value_t HNumberSetStatistics::derivative_stat( char const* name_, DERIVATIVE_STAT derivativeStats_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HNumberSetStatistics::derivative_stat( char const* name_, DERIVATIVE_STAT derivativeStats_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "NumberSetStatistics."_ys.append( name_ ), values_, 0, 0, thread_, position_ );
 	HHuginn::value_t v;
@@ -139,7 +139,7 @@ HHuginn::value_t HNumberSetStatistics::derivative_stat( char const* name_, DERIV
 	M_EPILOG
 }
 
-HHuginn::value_t HNumberSetStatistics::count( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HNumberSetStatistics::count( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "NumberSetStatistics.count", values_, 0, 0, thread_, position_ );
 	HHuginn::value_t v;

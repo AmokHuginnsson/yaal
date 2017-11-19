@@ -45,7 +45,7 @@ namespace tools {
 
 namespace huginn {
 
-HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass const* class_, HHuginn::values_t const& values_, int position_ )
+HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass const* class_, HHuginn::values_t& values_, int position_ )
 	: HValue( class_ )
 	, _data() {
 	char const name[] = "Matrix.constructor";
@@ -146,7 +146,7 @@ HMatrix::HMatrix( HHuginn::HClass const* class_, floating_point_matrix_ptr_t&& d
 	, _data( yaal::move( data_ ) ) {
 }
 
-HHuginn::value_t HMatrix::columns( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::columns( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.columns";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
@@ -163,7 +163,7 @@ HHuginn::value_t HMatrix::columns( huginn::HThread* thread_, HHuginn::value_t* o
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::rows( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::rows( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.rows";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
@@ -180,7 +180,7 @@ HHuginn::value_t HMatrix::rows( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::get( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::get( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_signature( "Matrix.get", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER }, thread_, position_ );
 	int row( static_cast<int>( get_integer( values_[0] ) ) );
@@ -210,7 +210,7 @@ HHuginn::value_t HMatrix::get( huginn::HThread* thread_, HHuginn::value_t* objec
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::set( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::set( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.set";
 	verify_signature( name, values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER, HHuginn::TYPE::UNKNOWN }, thread_, position_ );
@@ -242,7 +242,7 @@ HHuginn::value_t HMatrix::set( huginn::HThread* thread_, HHuginn::value_t* objec
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::add( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::add( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.add";
 	verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -270,7 +270,7 @@ HHuginn::value_t HMatrix::add( huginn::HThread* thread_, HHuginn::value_t* objec
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::subtract( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::subtract( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.subtract";
 	verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -298,7 +298,7 @@ HHuginn::value_t HMatrix::subtract( huginn::HThread* thread_, HHuginn::value_t* 
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::multiply( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::multiply( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.multiply";
 	verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -326,7 +326,7 @@ HHuginn::value_t HMatrix::multiply( huginn::HThread* thread_, HHuginn::value_t* 
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::det( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::det( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.det";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
@@ -347,7 +347,7 @@ HHuginn::value_t HMatrix::det( huginn::HThread* thread_, HHuginn::value_t* objec
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::scale( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::scale( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.scale";
 	verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -365,7 +365,7 @@ HHuginn::value_t HMatrix::scale( huginn::HThread* thread_, HHuginn::value_t* obj
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::scale_to( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::scale_to( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.scale_to";
 	verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -407,7 +407,7 @@ HHuginn::value_t HMatrix::scale_to( huginn::HThread* thread_, HHuginn::value_t* 
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::inverse( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::inverse( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.inverse";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
@@ -426,7 +426,7 @@ HHuginn::value_t HMatrix::inverse( huginn::HThread* thread_, HHuginn::value_t* o
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::transpose( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::transpose( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.transpose";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
@@ -442,15 +442,15 @@ HHuginn::value_t HMatrix::transpose( huginn::HThread* thread_, HHuginn::value_t*
 }
 
 template<typename call_t>
-HHuginn::value_t do_matrix_apply( call_t call_, HThread* thread_, HHuginn::values_t const& values_, int position_ );
+HHuginn::value_t do_matrix_apply( call_t call_, HThread* thread_, HHuginn::values_t& values_, int position_ );
 
 template<>
-HHuginn::value_t do_matrix_apply( HHuginn::function_t call_, HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t do_matrix_apply( HHuginn::function_t call_, HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 	return ( call_( thread_, nullptr, values_, position_ ) );
 }
 
 template<>
-HHuginn::value_t do_matrix_apply( HHuginn::HClass::HBoundMethod const* call_, HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t do_matrix_apply( HHuginn::HClass::HBoundMethod const* call_, HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 	return ( const_cast<HHuginn::HClass::HBoundMethod*>( call_ )->call( thread_, values_, position_ ) );
 }
 
@@ -468,7 +468,7 @@ void matrix_apply( HHuginn::value_t store_, huginn::HThread* thread_, matrix_t& 
 			row.value() = r;
 			col.value() = c;
 			val.value() = matrix_[r][c];
-			res = do_matrix_apply( call_, thread_, HHuginn::values_t({ rowHolder, colHolder, store_ }), position_ );
+			res = do_matrix_apply( call_, thread_, HArguments( thread_, store_, colHolder, rowHolder ), position_ );
 			if ( res->type_id() != expectedType ) {
 				throw HHuginn::HHuginnRuntimeException(
 					"Applied transformation function shall return `"_ys
@@ -485,7 +485,7 @@ void matrix_apply( HHuginn::value_t store_, huginn::HThread* thread_, matrix_t& 
 	}
 }
 
-HHuginn::value_t HMatrix::apply( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::apply( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.apply";
 	verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -511,7 +511,7 @@ HHuginn::value_t HMatrix::apply( huginn::HThread* thread_, HHuginn::value_t* obj
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HMatrix::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Matrix.to_string";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );

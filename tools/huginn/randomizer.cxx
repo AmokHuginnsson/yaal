@@ -56,7 +56,7 @@ HRandomizer::HRandomizer( HHuginn::HClass const* class_, yaal::hcore::HRandomize
 	return;
 }
 
-HHuginn::value_t HRandomizer::next( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HRandomizer::next( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Randomizer.next";
 	verify_arg_count( name, values_, 0, 1, thread_, position_ );
@@ -70,7 +70,7 @@ HHuginn::value_t HRandomizer::next( huginn::HThread* thread_, HHuginn::value_t* 
 	M_EPILOG
 }
 
-HHuginn::value_t HRandomizer::next_real( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HRandomizer::next_real( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Randomizer.next_real";
 	verify_arg_count( name, values_, 0, 1, thread_, position_ );

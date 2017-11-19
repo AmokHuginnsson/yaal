@@ -132,19 +132,19 @@ HHuginn::function_t const& HHuginn::HClass::function( int index_ ) const {
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HClass::create_instance( huginn::HThread* thread_, value_t*, values_t const& values_, int position_ ) const {
+HHuginn::value_t HHuginn::HClass::create_instance( huginn::HThread* thread_, value_t*, values_t& values_, int position_ ) const {
 	M_PROLOG
 	return ( do_create_instance( thread_, values_, position_ ) );
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HClass::access_violation( huginn::HThread* thread_, value_t*, values_t const&, int position_ ) const {
+HHuginn::value_t HHuginn::HClass::access_violation( huginn::HThread* thread_, value_t*, values_t&, int position_ ) const {
 	M_PROLOG
 	throw HHuginn::HHuginnRuntimeException( "Explicit construction of class `"_ys.append( name() ).append( "' objects (instances) is forbidden." ), thread_->current_frame()->file_id(), position_ );
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HClass::do_create_instance( huginn::HThread* thread_, values_t const& values_, int position_ ) const {
+HHuginn::value_t HHuginn::HClass::do_create_instance( huginn::HThread* thread_, values_t& values_, int position_ ) const {
 	M_PROLOG
 	value_t v( thread_->runtime().object_factory()->create_object( this, get_defaults( thread_, position_ ) ) );
 	int constructorIdx( field_index( KEYWORD::CONSTRUCTOR_IDENTIFIER ) );

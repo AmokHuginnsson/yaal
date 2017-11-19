@@ -70,7 +70,7 @@ private:
 
 namespace tuple {
 
-inline HHuginn::value_t add( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t add( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_signature( "tuple.add", values_, { HHuginn::TYPE::TUPLE }, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::TUPLE );
@@ -81,7 +81,7 @@ inline HHuginn::value_t add( huginn::HThread* thread_, HHuginn::value_t* object_
 	M_EPILOG
 }
 
-inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "tuple.hash", values_, 0, 0, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::TUPLE );
@@ -95,7 +95,7 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 	M_EPILOG
 }
 
-inline HHuginn::value_t less( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t less( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::TUPLE );
 	verify_signature( "tuple.less", values_, { HHuginn::TYPE::TUPLE }, thread_, position_ );
@@ -108,7 +108,7 @@ inline HHuginn::value_t less( huginn::HThread* thread_, HHuginn::value_t* object
 	M_EPILOG
 }
 
-inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::TUPLE );
 	verify_signature( "tuple.equals", values_, { HHuginn::TYPE::TUPLE }, thread_, position_ );

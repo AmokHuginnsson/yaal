@@ -91,7 +91,7 @@ yaal::hcore::HRegex::HMatchIterator HRegularExpressionMatch::end( void ) const {
 	return ( _regex->end() );
 }
 
-HHuginn::value_t HRegularExpressionMatch::matched( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HRegularExpressionMatch::matched( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "RegularExpressionMatch.matched";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );

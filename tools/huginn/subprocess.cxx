@@ -77,7 +77,7 @@ public:
 	}
 };
 
-HSubprocess::HSubprocess( HHuginn::HClass const* class_, HHuginn::values_t const& argv_ )
+HSubprocess::HSubprocess( HHuginn::HClass const* class_, HHuginn::values_t& argv_ )
 	: HHuginn::HValue( class_ )
 	, _pipedChild() {
 	HPipedChild::argv_t argv;
@@ -92,7 +92,7 @@ HSubprocess::HSubprocess( HHuginn::HClass const* class_, HHuginn::values_t const
 HHuginn::value_t HSubprocess::is_alive(
 	huginn::HThread* thread_,
 	HHuginn::value_t* object_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int position_
 ) {
 	M_PROLOG
@@ -106,7 +106,7 @@ HHuginn::value_t HSubprocess::is_alive(
 HHuginn::value_t HSubprocess::kill(
 	huginn::HThread* thread_,
 	HHuginn::value_t* object_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int position_
 ) {
 	M_PROLOG
@@ -121,7 +121,7 @@ HHuginn::value_t HSubprocess::kill(
 HHuginn::value_t HSubprocess::get_pid(
 	huginn::HThread* thread_,
 	HHuginn::value_t* object_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int position_
 ) {
 	M_PROLOG
@@ -135,7 +135,7 @@ HHuginn::value_t HSubprocess::get_pid(
 HHuginn::value_t HSubprocess::wait(
 	huginn::HThread* thread_,
 	HHuginn::value_t* object_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int position_
 ) {
 	M_PROLOG
@@ -155,7 +155,7 @@ HHuginn::value_t HSubprocess::stream(
 	stream_getter_t streamGetter_,
 	huginn::HThread* thread_,
 	HHuginn::value_t* object_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int position_
 ) {
 	M_PROLOG

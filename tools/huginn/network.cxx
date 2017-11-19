@@ -62,19 +62,19 @@ public:
 		, _exceptionClass( exception::create_class( class_->runtime(), "NetworkException", "The `NetworkException` exception type for `Network` package." ) ) {
 		return;
 	}
-	static HHuginn::value_t resolve( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t resolve( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "Network.resolve", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		return ( thread_->object_factory().create_string( resolver::ip_to_string( resolver::get_ip( get_string( values_[0] ) ) ) ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t connect( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t connect( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		return ( static_cast<HNetwork*>( object_->raw() )->do_connect( thread_, values_, position_ ) );
 		M_EPILOG
 	}
 private:
-	HHuginn::value_t do_connect( huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
+	HHuginn::value_t do_connect( huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Network.connect";
 		verify_arg_count( name, values_, 1, 2, thread_, position_ );

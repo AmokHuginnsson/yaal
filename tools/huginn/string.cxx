@@ -76,7 +76,7 @@ namespace string {
 typedef int long ( yaal::hcore::HString::*finder_t )( yaal::hcore::HString const&, int long ) const;
 typedef int long ( yaal::hcore::HString::*finder_raw_t )( HString const&, int long ) const;
 
-inline HHuginn::value_t find( char const* name_, finder_t finder_, int long default_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t find( char const* name_, finder_t finder_, int long default_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( name_, values_, 1, 2, thread_, position_ );
 	verify_arg_type( name_, values_, 0, HHuginn::TYPE::STRING, ARITY::MULTIPLE, thread_, position_ );
@@ -91,7 +91,7 @@ inline HHuginn::value_t find( char const* name_, finder_t finder_, int long defa
 	M_EPILOG
 }
 
-inline HHuginn::value_t find_raw( char const* name_, finder_raw_t finder_, int long default_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t find_raw( char const* name_, finder_raw_t finder_, int long default_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( name_, values_, 1, 2, thread_, position_ );
 	verify_arg_type( name_, values_, 0, HHuginn::TYPE::STRING, ARITY::MULTIPLE, thread_, position_ );
@@ -115,10 +115,10 @@ private:
 	HString const& _format;
 	HString& _result;
 	HString::const_iterator _it;
-	HHuginn::values_t const& _values;
+	HHuginn::values_t& _values;
 	int _position;
 public:
-	HHuginnStringFormatter( HThread* thread_, HString const& format_, HString& result_, HHuginn::values_t const& values_, int position_ )
+	HHuginnStringFormatter( HThread* thread_, HString const& format_, HString& result_, HHuginn::values_t& values_, int position_ )
 		: _thread( thread_ )
 		, _format( format_ )
 		, _result( result_ )
@@ -253,7 +253,7 @@ private:
 	HHuginnStringFormatter& operator = ( HHuginnStringFormatter const& ) = delete;
 };
 
-inline HHuginn::value_t format( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t format( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	HString const& fmt( static_cast<HHuginn::HString*>( object_->raw() )->value() );
 	HHuginn::value_t v( thread_->object_factory().create_string() );
@@ -264,7 +264,7 @@ inline HHuginn::value_t format( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_EPILOG
 }
 
-inline HHuginn::value_t replace( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t replace( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_signature( "string.replace", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, thread_, position_ );
 	static_cast<HHuginn::HString*>( object_->raw() )->value().replace( get_string( values_[0] ), get_string( values_[1] ) );
@@ -272,7 +272,7 @@ inline HHuginn::value_t replace( huginn::HThread* thread_, HHuginn::value_t* obj
 	M_EPILOG
 }
 
-inline HHuginn::value_t strip( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t strip( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "string.strip";
 	verify_arg_count( name, values_, 0, 1, thread_, position_ );
@@ -298,7 +298,7 @@ inline HHuginn::value_t strip( huginn::HThread* thread_, HHuginn::value_t* objec
 	M_EPILOG
 }
 
-inline HHuginn::value_t to_lower( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t to_lower( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "string.to_lower";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
@@ -307,7 +307,7 @@ inline HHuginn::value_t to_lower( huginn::HThread* thread_, HHuginn::value_t* ob
 	M_EPILOG
 }
 
-inline HHuginn::value_t to_upper( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t to_upper( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "string.to_upper";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
@@ -316,7 +316,7 @@ inline HHuginn::value_t to_upper( huginn::HThread* thread_, HHuginn::value_t* ob
 	M_EPILOG
 }
 
-inline HHuginn::value_t clear( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t clear( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "string.clear";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );

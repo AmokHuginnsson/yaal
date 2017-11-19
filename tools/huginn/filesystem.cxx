@@ -74,30 +74,30 @@ public:
 		, _exceptionClass( exception::create_class( class_->runtime(), "FileSystemException", "The `FileSystemException` exception type for `FileSystem` package." ) ) {
 		return;
 	}
-	static HHuginn::value_t open( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t open( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		return ( static_cast<HFileSystem*>( object_->raw() )->do_open( thread_, values_, position_ ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t reading( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t reading( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "FileSystem.reading", values_, 0, 0, thread_, position_ );
 		return ( thread_->object_factory().create_integer( OPERATIONS::READING + 0 ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t writing( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t writing( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "FileSystem.writing", values_, 0, 0, thread_, position_ );
 		return ( thread_->object_factory().create_integer( OPERATIONS::WRITING + 0 ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t current_working_directory( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t current_working_directory( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "FileSystem.current_working_directory", values_, 0, 0, thread_, position_ );
 		return ( thread_->object_factory().create_string( filesystem::current_working_directory() ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t rename( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t rename( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "FileSystem.rename", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, thread_, position_ );
 		try {
@@ -109,7 +109,7 @@ public:
 		return ( *object_ );
 		M_EPILOG
 	}
-	static HHuginn::value_t remove( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t remove( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "FileSystem.remove", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		try {
@@ -121,7 +121,7 @@ public:
 		return ( *object_ );
 		M_EPILOG
 	}
-	static HHuginn::value_t path_transform( char const* name_, str_transform_func_t pathTransformFunc_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t path_transform( char const* name_, str_transform_func_t pathTransformFunc_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( name_, values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		HHuginn::value_t v( thread_->runtime().none_value() );
@@ -134,7 +134,7 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t chmod( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t chmod( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "FileSystem.chmod", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::INTEGER }, thread_, position_ );
 		try {
@@ -150,7 +150,7 @@ public:
 		return ( *object_ );
 		M_EPILOG
 	}
-	static HHuginn::value_t dir( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t dir( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "FileSystem.dir", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		HHuginn::value_t v( thread_->runtime().none_value() );
@@ -163,7 +163,7 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t stat( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t stat( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "FileSystem.stat", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		HHuginn::value_t v( thread_->runtime().none_value() );
@@ -172,7 +172,7 @@ public:
 		M_EPILOG
 	}
 private:
-	HHuginn::value_t do_open( huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
+	HHuginn::value_t do_open( huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "FileSystem.open";
 		verify_signature( name, values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::INTEGER }, thread_, position_ );

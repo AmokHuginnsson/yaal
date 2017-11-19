@@ -56,13 +56,13 @@ public:
 		, _compiledRegularExpressionClass( HCompiledRegularExpression::get_class( class_->runtime(), _exceptionClass ) ) {
 		return;
 	}
-	static HHuginn::value_t compile( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t compile( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		return ( static_cast<HRegularExpressions*>( object_->raw() )->do_compile( thread_, values_, position_ ) );
 		M_EPILOG
 	}
 private:
-	HHuginn::value_t do_compile( huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
+	HHuginn::value_t do_compile( huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "RegularExpressions.compile", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		return ( _compiledRegularExpressionClass->create_instance( thread_, nullptr, values_, position_ ) );

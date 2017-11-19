@@ -54,7 +54,7 @@ HIntroFunction::HIntroFunction(
 HHuginn::value_t HIntroFunction::execute(
 	huginn::HThread* thread_,
 	HHuginn::value_t* object_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int position_
 ) const {
 	M_PROLOG
@@ -69,7 +69,7 @@ HHuginn::value_t HIntroFunction::execute(
 HHuginn::value_t HIntroFunction::execute_incremental_main(
 	huginn::HThread* thread_,
 	HHuginn::value_t* object_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int position_
 ) const {
 	M_PROLOG

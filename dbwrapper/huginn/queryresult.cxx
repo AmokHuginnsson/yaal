@@ -102,7 +102,7 @@ HQueryResult::HQueryResult(
 HHuginn::value_t HQueryResult::column_name(
 	tools::huginn::HThread* thread_,
 	HHuginn::value_t* object_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int position_
 ) {
 	M_PROLOG
@@ -112,7 +112,7 @@ HHuginn::value_t HQueryResult::column_name(
 	M_EPILOG
 }
 
-HHuginn::value_t HQueryResult::field_count( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HQueryResult::field_count( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "QueryResult.field_count";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
@@ -121,7 +121,7 @@ HHuginn::value_t HQueryResult::field_count( tools::huginn::HThread* thread_, HHu
 	M_EPILOG
 }
 
-HHuginn::value_t HQueryResult::insert_id( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HQueryResult::insert_id( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "QueryResult.insert_id";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
@@ -130,7 +130,7 @@ HHuginn::value_t HQueryResult::insert_id( tools::huginn::HThread* thread_, HHugi
 	M_EPILOG
 }
 
-HHuginn::value_t HQueryResult::has_next( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HQueryResult::has_next( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "QueryResult.has_next";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
@@ -179,7 +179,7 @@ public:
 	}
 };
 
-HHuginn::value_t HQueryResult::fetch_row( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HQueryResult::fetch_row( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "QueryResult.fetch_row";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );

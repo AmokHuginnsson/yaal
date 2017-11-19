@@ -46,7 +46,7 @@ public:
 	HRegularExpressionMatch( HHuginn::HClass const*, HCompiledRegularExpression::regex_t, HHuginn::value_t const& );
 	yaal::hcore::HString const& get_string( void ) const;
 	yaal::hcore::HRegex::HMatchIterator end( void ) const;
-	static HHuginn::value_t matched( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+	static HHuginn::value_t matched( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::class_t get_class( HRuntime* );
 protected:
 	virtual HIterator do_iterator( HThread*, int ) override;

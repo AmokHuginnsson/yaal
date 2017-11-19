@@ -54,6 +54,7 @@ HFrame::HFrame(
 	, _instructionPointers()
 	, _values()
 	, _valueCache()
+	, _valueCacheSize( 0 )
 	, _result()
 	, _number( 0 )
 	, _type( TYPE::SCOPE )

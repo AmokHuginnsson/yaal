@@ -31,6 +31,7 @@ Copyright:
 
 #include "tools/hhuginn.hxx"
 #include "tools/huginn/iterator.hxx"
+#include "tools/huginn/thread.hxx"
 
 namespace yaal {
 
@@ -105,7 +106,7 @@ public:
 	}
 protected:
 	virtual HHuginn::value_t do_value( HThread* thread_, int position_ ) override {
-		return ( _function( thread_, nullptr, HHuginn::values_t( { _impl.value( thread_, position_ ) } ), position_ ) );
+		return ( _function( thread_, nullptr, HArguments( thread_, _impl.value( thread_, position_ ) ), position_ ) );
 	}
 };
 
@@ -119,7 +120,7 @@ public:
 	}
 protected:
 	virtual HHuginn::value_t do_value( HThread* thread_, int position_ ) override {
-		return ( _method.call( thread_, HHuginn::values_t( { _impl.value( thread_, position_ ) } ), position_ ) );
+		return ( _method.call( thread_, HArguments( thread_, _impl.value( thread_, position_ ) ), position_ ) );
 	}
 };
 

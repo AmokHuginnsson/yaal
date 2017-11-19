@@ -53,7 +53,7 @@ HCompiledRegularExpression::HCompiledRegularExpression( HHuginn::HClass const* c
 HHuginn::value_t HCompiledRegularExpression::groups(
 	huginn::HThread* thread_,
 	HHuginn::value_t* object_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int position_
 ) {
 	HCompiledRegularExpression* cre( static_cast<HCompiledRegularExpression*>( object_->raw() ) );
@@ -63,7 +63,7 @@ HHuginn::value_t HCompiledRegularExpression::groups(
 HHuginn::value_t HCompiledRegularExpression::match(
 	huginn::HThread* thread_,
 	HHuginn::value_t* object_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int position_
 ) {
 	HCompiledRegularExpression* cre( static_cast<HCompiledRegularExpression*>( object_->raw() ) );
@@ -73,7 +73,7 @@ HHuginn::value_t HCompiledRegularExpression::match(
 HHuginn::value_t HCompiledRegularExpression::replace(
 	huginn::HThread* thread_,
 	HHuginn::value_t* object_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int position_
 ) {
 	HCompiledRegularExpression* cre( static_cast<HCompiledRegularExpression*>( object_->raw() ) );
@@ -113,7 +113,7 @@ public:
 		return ( _exceptionClass.raw() );
 	}
 private:
-	virtual HHuginn::value_t do_create_instance( huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) const {
+	virtual HHuginn::value_t do_create_instance( huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) const {
 		M_PROLOG
 		char const n[] = "CompiledRegularExpression.constructor";
 		verify_arg_count( n, values_, 1, 1, thread_, position_ );
@@ -137,7 +137,7 @@ private:
 
 HHuginn::value_t HCompiledRegularExpression::do_match(
 	huginn::HThread* thread_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int position_
 ) {
 	verify_signature( "CompiledRegularExpression.match", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
@@ -147,7 +147,7 @@ HHuginn::value_t HCompiledRegularExpression::do_match(
 
 HHuginn::value_t HCompiledRegularExpression::do_replace(
 	huginn::HThread* thread_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int position_
 ) {
 	verify_signature( "CompiledRegularExpression.replace", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, thread_, position_ );
@@ -163,7 +163,7 @@ HHuginn::value_t HCompiledRegularExpression::do_replace(
 
 HHuginn::value_t HCompiledRegularExpression::do_groups(
 	huginn::HThread* thread_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int position_
 ) {
 	verify_signature( "CompiledRegularExpression.groups", values_, { HHuginn::TYPE::STRING }, thread_, position_ );

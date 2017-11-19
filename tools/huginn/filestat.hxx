@@ -48,14 +48,14 @@ private:
 	filesystem::path_t _path;
 public:
 	HFileStat( HHuginn::HClass const*, HHuginn::HClass const*, HHuginn::HClass const*, filesystem::path_t const& );
-	static HHuginn::value_t id( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
-	static HHuginn::value_t name( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
-	static HHuginn::value_t size( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
-	static HHuginn::value_t mode( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
-	static HHuginn::value_t type( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
-	static HHuginn::value_t user( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
-	static HHuginn::value_t group( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
-	static HHuginn::value_t get_times( char const*, time_getter_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+	static HHuginn::value_t id( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+	static HHuginn::value_t name( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+	static HHuginn::value_t size( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+	static HHuginn::value_t mode( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+	static HHuginn::value_t type( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+	static HHuginn::value_t user( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+	static HHuginn::value_t group( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+	static HHuginn::value_t get_times( char const*, time_getter_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::class_t get_class( HRuntime* );
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread*, int ) const override __attribute__((noreturn));

@@ -47,7 +47,7 @@ namespace huginn {
 
 namespace character {
 
-inline HHuginn::value_t to_lower( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t to_lower( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "character.to_lower";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
@@ -57,7 +57,7 @@ inline HHuginn::value_t to_lower( huginn::HThread* thread_, HHuginn::value_t* ob
 	M_EPILOG
 }
 
-inline HHuginn::value_t to_upper( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t to_upper( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "character.to_upper";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
@@ -67,7 +67,7 @@ inline HHuginn::value_t to_upper( huginn::HThread* thread_, HHuginn::value_t* ob
 	M_EPILOG
 }
 
-inline HHuginn::value_t is_of_a_kind( char const* name, bool (*isofakind)( code_point_t ), huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t is_of_a_kind( char const* name, bool (*isofakind)( code_point_t ), huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HHuginn::HCharacter* c( static_cast<HHuginn::HCharacter*>( object_->raw() ) );

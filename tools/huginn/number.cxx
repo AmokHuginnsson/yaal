@@ -45,7 +45,7 @@ namespace huginn {
 
 namespace number {
 
-inline HHuginn::value_t is_exact( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t is_exact( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "number.is_exact";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
@@ -53,7 +53,7 @@ inline HHuginn::value_t is_exact( huginn::HThread* thread_, HHuginn::value_t* ob
 	M_EPILOG
 }
 
-inline HHuginn::value_t is_integral( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t is_integral( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "number.is_integral";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
@@ -61,7 +61,7 @@ inline HHuginn::value_t is_integral( huginn::HThread* thread_, HHuginn::value_t*
 	M_EPILOG
 }
 
-inline HHuginn::value_t get_precision( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t get_precision( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "number.get_precision";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
@@ -69,7 +69,7 @@ inline HHuginn::value_t get_precision( huginn::HThread* thread_, HHuginn::value_
 	M_EPILOG
 }
 
-inline HHuginn::value_t set_precision( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t set_precision( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_signature( "number.set_precision", values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
 	int precision = static_cast<int>( get_integer( values_[0] ) );

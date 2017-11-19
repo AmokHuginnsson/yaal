@@ -144,7 +144,7 @@ public:
 	typedef yaal::hcore::HArray<yaal::hcore::HString> field_descriptions_t;
 	typedef yaal::hcore::HArray<value_t> values_t;
 	typedef yaal::hcore::HPointer<huginn::HFrame> frame_t;
-	typedef yaal::hcore::HBoundCall<value_t ( huginn::HThread*, value_t*, values_t const&, int )> function_t;
+	typedef yaal::hcore::HBoundCall<value_t ( huginn::HThread*, value_t*, values_t&, int )> function_t;
 	typedef yaal::hcore::HArray<yaal::hcore::HString> paths_t;
 	enum class TYPE {
 		NONE,
@@ -500,12 +500,12 @@ public:
 	huginn::HRuntime* runtime( void ) const {
 		return ( _runtime );
 	}
-	value_t create_instance( huginn::HThread*, value_t*, values_t const&, int ) const;
-	value_t access_violation( huginn::HThread*, value_t*, values_t const&, int ) const __attribute__((noreturn));
+	value_t create_instance( huginn::HThread*, value_t*, values_t&, int ) const;
+	value_t access_violation( huginn::HThread*, value_t*, values_t&, int ) const __attribute__((noreturn));
 	yaal::hcore::HString const& doc( void ) const;
 	yaal::hcore::HString const& doc( identifier_id_t ) const;
 private:
-	virtual value_t do_create_instance( huginn::HThread*, values_t const&, int ) const;
+	virtual value_t do_create_instance( huginn::HThread*, values_t&, int ) const;
 	HClass( HClass const& ) = delete;
 	HClass& operator = ( HClass const& ) = delete;
 };
@@ -561,7 +561,7 @@ private:
 	HHuginn::value_t _objectHolder;
 public:
 	HBoundMethod( HHuginn::function_t const&, HHuginn::value_t const& );
-	HHuginn::value_t call( huginn::HThread*, values_t const&, int );
+	HHuginn::value_t call( huginn::HThread*, values_t&, int );
 private:
 	HBoundMethod( HBoundMethod const& ) = delete;
 	HBoundMethod& operator = ( HBoundMethod const& ) = delete;
@@ -579,7 +579,7 @@ public:
 	HObject( HClass const*, fields_t const& );
 	virtual ~HObject( void );
 	value_t& field_ref( int );
-	HHuginn::value_t call_method( huginn::HThread*, HHuginn::value_t const&, yaal::hcore::HString const&, HHuginn::values_t const&, int ) const;
+	HHuginn::value_t call_method( huginn::HThread*, HHuginn::value_t const&, yaal::hcore::HString const&, HHuginn::values_t&, int ) const;
 	HHuginn::value_t get_method( huginn::HThread*, HHuginn::value_t const&, yaal::hcore::HString const&, int ) const;
 private:
 	HObject( HObject const& ) = delete;

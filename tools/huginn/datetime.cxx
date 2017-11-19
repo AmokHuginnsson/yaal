@@ -60,7 +60,7 @@ public:
 		, _exceptionClass( exception::create_class( class_->runtime(), "DateTimeException", "The `DateTimeException` exception type for `DateTime` package." ) ) {
 		return;
 	}
-	static HHuginn::value_t now( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t now( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "DateTime.now", values_, 0, 0, thread_, position_ );
 		HDateTime* dt( dynamic_cast<HDateTime*>( object_->raw() ) );
@@ -68,7 +68,7 @@ public:
 		return ( thread_->object_factory().create<huginn::HTime>( dt->_timeClass.raw(), now_local() ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t clock( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t clock( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "DateTime.clock", values_, 0, 0, thread_, position_ );
 		HDateTime* dt( dynamic_cast<HDateTime*>( object_->raw() ) );
@@ -76,7 +76,7 @@ public:
 		return ( thread_->object_factory().create<HClock>( dt->_clockClass.raw() ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t sleep( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t sleep( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "DateTime.sleep", values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
 		int long long nanoseconds( get_integer( values_[0] ) );

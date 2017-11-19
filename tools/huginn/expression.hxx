@@ -43,6 +43,7 @@ namespace tools {
 namespace huginn {
 
 class HThread;
+class HArguments;
 
 class HExpression : public HStatement {
 public:
@@ -110,7 +111,7 @@ public:
 	void store_character( code_point_t, huginn::HFrame*, int );
 	bool is_empty( void ) const;
 protected:
-	HHuginn::values_t& grab_args( HFrame* );
+	void grab_args( HFrame*, HArguments& );
 	virtual void do_execute( huginn::HThread* ) const override;
 private:
 	HExpression( HExpression const& ) = delete;

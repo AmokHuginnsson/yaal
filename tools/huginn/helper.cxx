@@ -102,7 +102,7 @@ void operands_type_mismatch( char const* op_, HHuginn::type_id_t t1_, HHuginn::t
 	throw HHuginn::HHuginnRuntimeException( msg, fileId_, pos_ );
 }
 
-void verify_arg_count( yaal::hcore::HString const& name_, HHuginn::values_t const& values_, int min_, int max_, huginn::HThread* thread_, int position_ ) {
+void verify_arg_count( yaal::hcore::HString const& name_, HHuginn::values_t& values_, int min_, int max_, huginn::HThread* thread_, int position_ ) {
 	M_PROLOG
 	int argCount( static_cast<int>( values_.get_size() ) );
 	if ( min_ == max_ ) {
@@ -163,7 +163,7 @@ namespace {
 
 void verify_arg_type(
 	yaal::hcore::HString const& name_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int no_,
 	HHuginn::type_id_t type_,
 	yaal::hcore::HString const& reqName_,
@@ -198,19 +198,19 @@ void verify_arg_type(
 
 void verify_arg_type(
 	yaal::hcore::HString const& name_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int no_, HHuginn::TYPE type_, ARITY argsArity_, huginn::HThread* thread_, int position_ ) {
 	verify_arg_type( name_, values_, no_, HHuginn::type_id_t( static_cast<HHuginn::type_id_t::value_type>( type_ ) ), a_type_name( type_ ), argsArity_, thread_, position_ );
 }
 
 void verify_arg_type(
 	yaal::hcore::HString const& name_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int no_, HHuginn::HClass const* class_, ARITY argsArity_, huginn::HThread* thread_, int position_ ) {
 	verify_arg_type( name_, values_, no_, class_->type_id(), a_type_name( class_ ), argsArity_, thread_, position_ );
 }
 
-void verify_signature( yaal::hcore::HString const& name_, HHuginn::values_t const& values_, types_t const& types_, huginn::HThread* thread_, int position_ ) {
+void verify_signature( yaal::hcore::HString const& name_, HHuginn::values_t& values_, types_t const& types_, huginn::HThread* thread_, int position_ ) {
 	int const COUNT( static_cast<int>( types_.get_size() ) );
 	verify_arg_count( name_, values_, COUNT, COUNT, thread_, position_ );
 	ARITY arity( COUNT == 1 ? ARITY::UNARY : ARITY::MULTIPLE );
@@ -223,7 +223,7 @@ void verify_signature( yaal::hcore::HString const& name_, HHuginn::values_t cons
 
 HHuginn::type_id_t verify_arg_type(
 	yaal::hcore::HString const& name_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int no_,
 	types_t const& types_,
 	ARITY argsArity_,
@@ -264,7 +264,7 @@ HHuginn::type_id_t verify_arg_type(
 
 HHuginn::type_id_t verify_arg_numeric(
 	yaal::hcore::HString const& name_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int no_, ARITY argsArity_, huginn::HThread* thread_, int position_ ) {
 	M_PROLOG
 	HHuginn::type_id_t t( values_[no_]->type_id() );
@@ -290,7 +290,7 @@ HHuginn::type_id_t verify_arg_numeric(
 
 HHuginn::type_id_t verify_arg_collection(
 	yaal::hcore::HString const& name_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int no_, ARITY argsArity_, ONTICALLY ontically_, huginn::HThread* thread_, int position_ ) {
 	M_PROLOG
 	static HHuginn::TYPE const material[] = {
@@ -376,7 +376,7 @@ HHuginn::type_id_t verify_arg_collection_value_type_low(
 
 HHuginn::type_id_t verify_arg_collection_value_type(
 	yaal::hcore::HString const& name_,
-	HHuginn::values_t const& values_,
+	HHuginn::values_t& values_,
 	int no_,
 	ARITY argsArity_,
 	types_t const& requiredTypes_,

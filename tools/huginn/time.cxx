@@ -49,7 +49,7 @@ HTime::HTime( HHuginn::HClass const* class_, yaal::hcore::HTime const& time_ )
 	return;
 }
 
-HHuginn::value_t HTime::mod( char const* name_, time_mod_t timeMod_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HTime::mod( char const* name_, time_mod_t timeMod_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_signature( hcore::to_string( "Time." ).append( name_ ), values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
 	( static_cast<HTime*>( object_->raw() )->_time.*timeMod_ )( static_cast<int>( get_integer( values_[0] ) ) );
@@ -57,7 +57,7 @@ HHuginn::value_t HTime::mod( char const* name_, time_mod_t timeMod_, huginn::HTh
 	M_EPILOG
 }
 
-HHuginn::value_t HTime::set( char const* name_, time_set_t timeSet_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HTime::set( char const* name_, time_set_t timeSet_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_signature( hcore::to_string( "Time." ).append( name_ ), values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER }, thread_, position_ );
 	try {
@@ -75,7 +75,7 @@ HHuginn::value_t HTime::set( char const* name_, time_set_t timeSet_, huginn::HTh
 	M_EPILOG
 }
 
-HHuginn::value_t HTime::set_datetime( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HTime::set_datetime( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_signature( "Time.set_datetime", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER }, thread_, position_ );
 	try {
@@ -96,7 +96,7 @@ HHuginn::value_t HTime::set_datetime( huginn::HThread* thread_, HHuginn::value_t
 	M_EPILOG
 }
 
-HHuginn::value_t HTime::from_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HTime::from_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_signature( "Time.from_string", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 	try {
@@ -110,21 +110,21 @@ HHuginn::value_t HTime::from_string( huginn::HThread* thread_, HHuginn::value_t*
 	M_EPILOG
 }
 
-HHuginn::value_t HTime::get( char const* name_, time_get_t timeGet_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HTime::get( char const* name_, time_get_t timeGet_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "Time."_ys.append( name_ ), values_, 0, 0, thread_, position_ );
 	return ( thread_->object_factory().create_integer( ( static_cast<HTime*>( object_->raw() )->_time.*timeGet_ )() ) );
 	M_EPILOG
 }
 
-HHuginn::value_t HTime::get_month( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HTime::get_month( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "Time.get_month", values_, 0, 0, thread_, position_ );
 	return ( thread_->object_factory().create_integer( static_cast<HTime*>( object_->raw() )->_time.get_month() ) );
 	M_EPILOG
 }
 
-HHuginn::value_t HTime::subtract( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HTime::subtract( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Time.subtract";
 	verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -137,7 +137,7 @@ HHuginn::value_t HTime::subtract( huginn::HThread* thread_, HHuginn::value_t* ob
 	M_EPILOG
 }
 
-HHuginn::value_t HTime::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HTime::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Time.to_string";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );

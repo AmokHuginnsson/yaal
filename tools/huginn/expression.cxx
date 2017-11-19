@@ -330,12 +330,12 @@ void HExpression::set_variable( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-HHuginn::values_t& HExpression::grab_args( HFrame* frame_ ) {
+void HExpression::grab_args( HFrame* frame_, HArguments& args_ ) {
 	M_PROLOG
 	int& ip( frame_->ip() );
 	M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( ! frame_->values().is_empty() );
-	HHuginn::values_t& values( frame_->value_cache() );
+	HHuginn::values_t& values( args_ );
 	while ( _instructions[ip]._operator == OPERATOR::FUNCTION_ARGUMENT ) {
 		++ ip;
 		M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );
@@ -345,7 +345,7 @@ HHuginn::values_t& HExpression::grab_args( HFrame* frame_ ) {
 	}
 	M_ASSERT( _instructions[ip]._operator == OPERATOR::FUNCTION_CALL );
 	reverse( values.begin(), values.end() );
-	return ( values );
+	return;
 	M_EPILOG
 }
 
@@ -376,7 +376,8 @@ void HExpression::pack_named_parameters( huginn::HFrame* frame_, int position_ )
 
 void HExpression::function_call( HFrame* frame_, int position_ ) {
 	M_PROLOG
-	HHuginn::values_t& args( grab_args( frame_ ) );
+	HArguments args( frame_ );
+	grab_args( frame_, args );
 	int& ip( frame_->ip() );
 	int p( _instructions[ip]._position );
 	++ ip;
@@ -400,7 +401,6 @@ void HExpression::function_call( HFrame* frame_, int position_ ) {
 		HHuginn::HClass::HBoundMethod* m( static_cast<HHuginn::HClass::HBoundMethod*>( f.raw() ) );
 		values.push( m->call( thread, args, p ) );
 	}
-	args.clear();
 	return;
 	M_EPILOG
 }
@@ -410,13 +410,13 @@ void HExpression::create_closure( HFrame* frame_, int ) {
 	HFrame::values_t& values( frame_->values() );
 	HHuginn::value_t f( yaal::move( values.top() ) );
 	values.pop();
-	HHuginn::values_t& args( grab_args( frame_ ) );
+	HArguments args( frame_ );
+	grab_args( frame_, args );
 	++ frame_->ip();
 	M_ASSERT( f->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE );
 	HObjectFactory& of( frame_->thread()->object_factory() );
 	HHuginn::value_t closure( of.create_object( &_noneClass_, args ) );
 	values.push( of.create_bound_method( static_cast<HHuginn::HFunctionReference*>( f.raw() )->function(), closure ) );
-	args.clear();
 	return;
 	M_EPILOG
 }

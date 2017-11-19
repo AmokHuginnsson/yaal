@@ -66,7 +66,7 @@ public:
 		, _exceptionClass( exception::create_class( class_->runtime(), "MathematicsException", "The `MathematicsException` exception type for `Mathematics` package." ) ) {
 		return;
 	}
-	static HHuginn::value_t get_constant( char const* name_, constant_getter_t constantGetter_, double long real_, huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t get_constant( char const* name_, constant_getter_t constantGetter_, double long real_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		HString name( "Mathematics." );
 		name.append( name_ );
@@ -96,17 +96,17 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t pi( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t pi( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		return ( get_constant( "pi", &number::PI, math::PI, thread_, values_, position_ ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t e( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t e( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		return ( get_constant( "e", &number::E, math::E, thread_, values_, position_ ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t square_root( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t square_root( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.square_root";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -129,7 +129,7 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t natural_exponential( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t natural_exponential( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.natural_exponential";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -145,7 +145,7 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t natural_logarithm( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t natural_logarithm( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.natural_logarithm";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -168,7 +168,7 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t sinus( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t sinus( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.sinus";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -184,7 +184,7 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t cosinus( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t cosinus( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.cosinus";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -200,7 +200,7 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t tangens( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t tangens( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.tangens";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -216,7 +216,7 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t cotangens( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t cotangens( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.tangens";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -232,7 +232,7 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t arcus_sinus( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t arcus_sinus( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.arcus_sinus";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -248,7 +248,7 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t arcus_cosinus( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t arcus_cosinus( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.arcus_cosinus";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -264,7 +264,7 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t arcus_tangens( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t arcus_tangens( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.arcus_tangens";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -280,7 +280,7 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t arcus_cotangens( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t arcus_cotangens( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.arcus_cotangens";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -296,7 +296,7 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t hyperbolic_sinus( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t hyperbolic_sinus( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.hyperbolic_sinus";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -312,7 +312,7 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t hyperbolic_cosinus( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t hyperbolic_cosinus( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.hyperbolic_cosinus";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -328,7 +328,7 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t hyperbolic_tangens( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t hyperbolic_tangens( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.hyperbolic_tangens";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -344,7 +344,7 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t hyperbolic_cotangens( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t hyperbolic_cotangens( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.hyperbolic_cotangens";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -360,7 +360,7 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t sigmoid( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t sigmoid( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.sigmoid";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -376,7 +376,7 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t error_function( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t error_function( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.error_function";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -392,7 +392,7 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t cumulative_distribution_function( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t cumulative_distribution_function( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.cumulative_distribution_function";
 		verify_arg_count( name, values_, 3, 3, thread_, position_ );
@@ -413,7 +413,7 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t round( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t round( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.round";
 		verify_arg_count( name, values_, 1, 2, thread_, position_ );
@@ -443,7 +443,7 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t floor( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t floor( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.floor";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -459,7 +459,7 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t ceil( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t ceil( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.ceil";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
@@ -475,26 +475,26 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t differs_at( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t differs_at( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "Mathematics.differs_at", values_, { HHuginn::TYPE::NUMBER, HHuginn::TYPE::NUMBER }, thread_, position_ );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		return ( thread_->object_factory().create_integer( number::differs_at( get_number( values_[0] ), get_number( values_[1] ) ) ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t matrix( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t matrix( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		HMathematics* m( static_cast<HMathematics*>( object_->raw() ) );
 		return ( thread_->object_factory().create<HMatrix>( thread_, m->_matrixClass.raw(), values_, position_ ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t statistics( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t statistics( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		HMathematics* m( static_cast<HMathematics*>( object_->raw() ) );
 		return ( thread_->object_factory().create<HNumberSetStatistics>( thread_, m->_numberSetStatisticsClass.raw(), values_, position_ ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t randomizer( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t randomizer( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.randomizer";
 		verify_arg_count( name, values_, 0, 1, thread_, position_ );

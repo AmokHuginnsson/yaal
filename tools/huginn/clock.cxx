@@ -49,7 +49,7 @@ HClock::HClock( HHuginn::HClass* class_ )
 	return;
 }
 
-HHuginn::value_t HClock::milliseconds( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HClock::milliseconds( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Clock.milliseconds";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
@@ -58,7 +58,7 @@ HHuginn::value_t HClock::milliseconds( huginn::HThread* thread_, HHuginn::value_
 	M_EPILOG
 }
 
-HHuginn::value_t HClock::reset( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HClock::reset( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Clock.reset";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
@@ -68,7 +68,7 @@ HHuginn::value_t HClock::reset( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_EPILOG
 }
 
-HHuginn::value_t HClock::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HClock::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Clock.to_string";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );

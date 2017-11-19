@@ -88,13 +88,13 @@ public:
 		, _exceptionClass( exception::create_class( class_->runtime(), "AlgorithmsException", "The `AlgorithmsException` exception type for `Algorithms` package." ) ) {
 		return;
 	}
-	static HHuginn::value_t filter( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t filter( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		return ( static_cast<HAlgorithms*>( object_->raw() )->do_filter( thread_, values_, position_ ) );
 	}
-	static HHuginn::value_t map( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t map( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		return ( static_cast<HAlgorithms*>( object_->raw() )->do_map( thread_, values_, position_ ) );
 	}
-	static HHuginn::value_t reduce( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t reduce( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		char const name[] = "Algorithms.reduce";
 		verify_arg_count( name, values_, 2, 3, thread_, position_ );
 		verify_arg_collection( name, values_, 0, ARITY::MULTIPLE, ONTICALLY::VIRTUAL, thread_, position_ );
@@ -113,19 +113,19 @@ public:
 		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
 			HHuginn::function_t function( static_cast<HHuginn::HFunctionReference const*>( values_[1].raw() )->function() );
 			while ( it.is_valid( thread_, position_ ) && thread_->can_continue() ) {
-				accumulator = function( thread_, nullptr, HHuginn::values_t( { accumulator, it.value( thread_, position_ ) } ), position_ );
+				accumulator = function( thread_, nullptr, HArguments( thread_, it.value( thread_, position_ ), accumulator ), position_ );
 				it.next( thread_, position_ );
 			}
 		} else {
 			HHuginn::HClass::HBoundMethod* boundMethod( const_cast<HHuginn::HClass::HBoundMethod*>( static_cast<HHuginn::HClass::HBoundMethod const*>( values_[1].raw() ) ) );
 			while ( it.is_valid( thread_, position_ ) && thread_->can_continue() ) {
-				accumulator = boundMethod->call( thread_, HHuginn::values_t( { accumulator, it.value( thread_, position_ ) } ), position_ );
+				accumulator = boundMethod->call( thread_, HArguments( thread_, it.value( thread_, position_ ), accumulator ), position_ );
 				it.next( thread_, position_ );
 			}
 		}
 		return ( accumulator );
 	}
-	static HHuginn::value_t materialize( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t materialize( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		char const name[] = "Algorithms.materialize";
 		verify_arg_count( name, values_, 2, 2, thread_, position_ );
 		verify_arg_collection( name, values_, 0, ARITY::MULTIPLE, ONTICALLY::VIRTUAL, thread_, position_ );
@@ -184,10 +184,10 @@ public:
 		}
 		return ( v );
 	}
-	static HHuginn::value_t range( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t range( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		return ( static_cast<HAlgorithms*>( object_->raw() )->do_range( thread_, values_, position_ ) );
 	}
-	static HHuginn::value_t sorted( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t sorted( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		char const name[] = "Algorithms.sorted";
 		verify_arg_count( name, values_, 1, 2, thread_, position_ );
 		HHuginn::type_id_t t( verify_arg_collection( name, values_, 0, ARITY::MULTIPLE, ONTICALLY::VIRTUAL, thread_, position_ ) );
@@ -262,7 +262,7 @@ public:
 		}
 		return ( v );
 	}
-	static HHuginn::value_t reversed( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t reversed( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		char const name[] = "Algorithms.reversed";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
 		HHuginn::type_id_t t( verify_arg_collection( name, values_, 0, ARITY::UNARY, ONTICALLY::MATERIALIZED, thread_, position_ ) );
@@ -300,7 +300,7 @@ public:
 		return ( v );
 	}
 private:
-	HHuginn::value_t do_filter( HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
+	HHuginn::value_t do_filter( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Algorithms.filter";
 		verify_arg_count( name, values_, 2, 2, thread_, position_ );
@@ -315,7 +315,7 @@ private:
 		return ( v );
 		M_EPILOG
 	}
-	HHuginn::value_t do_map( HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
+	HHuginn::value_t do_map( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Algorithms.map";
 		verify_arg_count( name, values_, 2, 2, thread_, position_ );
@@ -330,7 +330,7 @@ private:
 		return ( v );
 		M_EPILOG
 	}
-	HHuginn::value_t do_range( HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
+	HHuginn::value_t do_range( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Algorithms.range";
 		verify_arg_count( name, values_, 1, 3, thread_, position_ );

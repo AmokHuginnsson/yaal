@@ -31,6 +31,7 @@ Copyright:
 
 #include "tools/hhuginn.hxx"
 #include "tools/huginn/iterator.hxx"
+#include "tools/huginn/thread.hxx"
 
 namespace yaal {
 
@@ -122,7 +123,7 @@ public:
 	}
 protected:
 	virtual bool do_test( HThread* thread_, int position_ ) override {
-		HHuginn::value_t v( _function( thread_, nullptr, HHuginn::values_t( { _value } ), position_ ) );
+		HHuginn::value_t v( _function( thread_, nullptr, HArguments( thread_, _value ), position_ ) );
 		if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
 			throw HHuginn::HHuginnRuntimeException(
 				hcore::to_string( "Filter function returned wrong type, expected `boolean' got: `" ).append( v->get_class()->name() ).append( "'." ),
@@ -145,7 +146,7 @@ public:
 	}
 protected:
 	virtual bool do_test( HThread* thread_, int position_ ) override {
-		HHuginn::value_t v( _method.call( thread_, HHuginn::values_t( { _impl.value( thread_, position_ ) } ), position_ ) );
+		HHuginn::value_t v( _method.call( thread_, HArguments( thread_, _impl.value( thread_, position_ ) ), position_ ) );
 		if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
 			throw HHuginn::HHuginnRuntimeException(
 				hcore::to_string( "Filter functor returned wrong type, expected `boolean' got: `" ).append( v->get_class()->name() ).append( "'." ),

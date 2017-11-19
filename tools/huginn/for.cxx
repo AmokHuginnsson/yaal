@@ -81,7 +81,7 @@ void HFor::do_execute( HThread* thread_ ) const {
 				it.next( thread_, sourcePosition );
 			}
 		} else if ( ( obj = dynamic_cast<HHuginn::HObject*>( source.raw() ) ) ) {
-			HHuginn::value_t itVal( obj->call_method( thread_, source, INTERFACE::ITERATOR, {}, sourcePosition ) );
+			HHuginn::value_t itVal( obj->call_method( thread_, source, INTERFACE::ITERATOR, HArguments( thread_ ), sourcePosition ) );
 			HHuginn::HObject* it( dynamic_cast<HHuginn::HObject*>( itVal.raw() ) );
 			if ( ! it ) {
 				throw HHuginn::HHuginnRuntimeException( "`For' source returned invalid iterator object.", file_id(), sourcePosition );
@@ -93,14 +93,14 @@ void HFor::do_execute( HThread* thread_ ) const {
 			HHuginn::value_t nextField( it->get_method( thread_, itVal, INTERFACE::NEXT, sourcePosition ) );
 			HHuginn::HClass::HBoundMethod* nextMethod( static_cast<HHuginn::HClass::HBoundMethod*>( nextField.raw() ) );
 			while ( f->can_continue() ) {
-				HHuginn::value_t isValid( isValidMethod->call( thread_, {}, sourcePosition ) );
+				HHuginn::value_t isValid( isValidMethod->call( thread_, HArguments( thread_ ), sourcePosition ) );
 				if ( isValid->type_id() != HHuginn::TYPE::BOOLEAN ) {
 					throw HHuginn::HHuginnRuntimeException( "`For' source iterator is_valid returned non-boolean value.", file_id(), sourcePosition );
 				}
 				if ( ! ( f->can_continue() && static_cast<HHuginn::HBoolean*>( isValid.raw() )->value() ) ) {
 					break;
 				}
-				HHuginn::value_t value( valueMethod->call( thread_, {}, sourcePosition ) );
+				HHuginn::value_t value( valueMethod->call( thread_, HArguments( thread_ ), sourcePosition ) );
 				if ( ! f->can_continue() ) {
 					break;
 				}
@@ -110,7 +110,7 @@ void HFor::do_execute( HThread* thread_ ) const {
 					_loop->execute( thread_ );
 				}
 				f->continue_execution();
-				nextMethod->call( thread_, {}, sourcePosition );
+				nextMethod->call( thread_, HArguments( thread_ ), sourcePosition );
 			}
 		} else {
 			throw HHuginn::HHuginnRuntimeException( "`For' source is not an iterable.", file_id(), sourcePosition );
