@@ -87,6 +87,9 @@ void HFrame::reshape( HThread* thread_, int size_ ) {
 	M_PROLOG
 	_thread = thread_;
 	_variables.reserve( size_ );
+	for ( HHuginn::values_t& v : _valueCache ) {
+		v.reserve( size_ );
+	}
 	return;
 	M_EPILOG
 }

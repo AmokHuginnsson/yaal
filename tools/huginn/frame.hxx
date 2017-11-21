@@ -222,6 +222,7 @@ protected:
 	HHuginn::values_t& value_cache( void ) {
 		if (  _valueCacheSize == static_cast<int>( _valueCache.get_size() ) ) {
 			_valueCache.resize( _valueCacheSize + 1 );
+			_valueCache.back().reserve( _variables.get_capacity() );
 		}
 		HHuginn::values_t& values( _valueCache[_valueCacheSize] );
 		++ _valueCacheSize;

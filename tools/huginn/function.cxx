@@ -110,49 +110,42 @@ HHuginn::value_t HFunction::execute_incremental_main(
 ) const {
 	M_PROLOG
 	thread_->create_incremental_function_frame( this, object_, upcast( object_ ) );
-	HHuginn::value_t res( execute_impl( thread_, values_, position_ ) );
+	HHuginn::value_t res( execute_incremental_main_impl( thread_, values_, position_ ) );
 	thread_->pop_incremental_frame();
 	return ( res );
 	M_EPILOG
 }
 
-HHuginn::value_t HFunction::execute_impl(
+HHuginn::value_t HFunction::execute_impl_low(
 	huginn::HThread* thread_,
 	HHuginn::values_t& values_,
-	int position_
+	int
 ) const {
 	M_PROLOG
 	HFrame* f( thread_->current_frame() );
 	int const VALUE_COUNT( static_cast<int>( values_.get_size() ) );
-	for ( int i( 0 ); i < _parameterCount; ++ i ) {
-		if ( i < VALUE_COUNT ) {
-			f->add_variable( values_[i] );
-		} else if ( i >= _defaultParametersStart ) {
-			int defaultValueIndex( i - _defaultParametersStart );
-			_defaultValues[defaultValueIndex]->execute( thread_ );
-			if ( ! f->can_continue() ) {
-				break;
-			}
-			f->add_variable( f->result() );
+	HHuginn::values_t& variables( f->variable_values() );
+	variables.swap( values_ );
+	for ( int i( max( _defaultParametersStart, static_cast<int>( variables.get_size() ) ) ); i < _parameterCount; ++ i ) {
+		int defaultValueIndex( i - _defaultParametersStart );
+		_defaultValues[defaultValueIndex]->execute( thread_ );
+		if ( ! f->can_continue() ) {
+			break;
 		}
+		f->add_variable( f->result() );
 	}
 	if ( _isVariadic ) {
 		HHuginn::value_t v( thread_->object_factory().create_tuple() );
 		HHuginn::HTuple::values_t& variadic( static_cast<HHuginn::HTuple*>( v.raw() )->value() );
 		variadic.reserve( max( VALUE_COUNT - _parameterCount, 0 ) );
 		for ( int i( _parameterCount ); i < VALUE_COUNT; ++ i ) {
-			variadic.push_back( values_[i] );
+			variadic.push_back( variables[i] );
+		}
+		if ( VALUE_COUNT > _parameterCount ) {
+			variables.resize( _parameterCount );
 		}
 		f->add_variable( v );
 	}
-	verify_arg_count(
-		thread_->runtime().identifier_name( _name ),
-		values_,
-		_defaultParametersStart,
-		_isVariadic ? meta::max_signed<int>::value : _parameterCount,
-		thread_,
-		position_
-	);
 	if ( f->can_continue() ) {
 		_scope->execute( thread_ );
 	}

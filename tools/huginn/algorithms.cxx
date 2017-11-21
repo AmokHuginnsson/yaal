@@ -241,19 +241,15 @@ public:
 			less.anchor( thread_, position_ );
 			sort( dest.begin(), dest.end(), cref( less ) );
 		} else {
-			HHuginn::values_t l( 1 );
-			HHuginn::values_t r( 1 );
 			HHuginn::function_t k( static_cast<HHuginn::HFunctionReference*>( key.raw() )->function() );
 			sort(
 				dest.begin(), dest.end(),
-				[&l, &r, &k, &thread_, &position_]( HHuginn::value_t const& l_, HHuginn::value_t const& r_ ) {
-					l[0] = l_;
-					r[0] = r_;
+				[&k, &thread_, &position_]( HHuginn::value_t const& l_, HHuginn::value_t const& r_ ) {
 					return (
 						value_builtin::less(
 							thread_,
-							k( thread_, nullptr, l, position_ ),
-							k( thread_, nullptr, r, position_ ),
+							k( thread_, nullptr, HArguments( thread_, l_ ), position_ ),
+							k( thread_, nullptr, HArguments( thread_, r_ ), position_ ),
 							position_
 						)
 					);

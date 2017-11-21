@@ -54,6 +54,7 @@ HThread::HThread( HRuntime* runtime_, yaal::hcore::HThread::id_t id_ )
 	, _exceptionMessage()
 	, _exceptionFileId( INVALID_FILE_ID )
 	, _exceptionPosition( 0 ) {
+	_valueCache.reserve( _runtime->max_local_variable_count() );
 	return;
 }
 

@@ -374,6 +374,7 @@ void HRuntime::execute( void ) {
 	M_PROLOG
 	util::HScopeExitCall sec( hcore::call( &threads_t::clear, &_threads ) );
 	values_t args;
+	args.reserve( max_local_variable_count() );
 	if ( _argv->size( nullptr, 0 ) > 0 ) {
 		args.push_back( _argv );
 	}
