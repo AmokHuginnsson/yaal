@@ -44,7 +44,7 @@ public:
 	typedef void ( huginn::HThread::* function_frame_creator_t )( HStatement const*, HHuginn::value_t*, int );
 	typedef void ( huginn::HThread::* function_frame_popper_t )( void );
 public:
-	HIntroFunction( HHuginn::identifier_id_t, parameter_names_t const&, HHuginn::scope_t const&, expressions_t const&, bool );
+	HIntroFunction( HHuginn::identifier_id_t, parameter_names_t const&, HHuginn::scope_t const&, expressions_t const&, bool, bool );
 	HHuginn::value_t execute( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int ) const;
 	HHuginn::value_t execute_incremental_main( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int ) const;
 };

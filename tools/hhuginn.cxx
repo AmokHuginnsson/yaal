@@ -271,12 +271,6 @@ HHuginn::HTaggedValue::HTaggedValue( value_t const& value_, HClass const* class_
 	M_EPILOG
 }
 
-HHuginn::value_t& HHuginn::HTaggedValue::value( void ) {
-	M_PROLOG
-	return ( _value );
-	M_EPILOG
-}
-
 HHuginn::value_t HHuginn::HTaggedValue::do_clone( huginn::HThread*, int ) const {
 	M_PROLOG
 	M_ASSERT( 0 && "cloning tagged value"[0] );

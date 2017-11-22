@@ -164,7 +164,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	);
 	HRule parameter(
 		"parameter",
-		( parameterIdentifier ^ "..." )
+		( parameterIdentifier ^ ( constant( "..." ) | ":::" ) )
 		>> -( constant( '=' ) >> HRule( expression, HRuleBase::action_position_t( hcore::call( &OCompiler::add_default_value, _compiler.get(), _1 ) ) ) ),
 		HRuleBase::action_position_t( hcore::call( &OCompiler::verify_default_argument, _compiler.get(), _1 ) )
 	);
@@ -173,6 +173,11 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		parameterIdentifier >> "...",
 		HRuleBase::action_t( hcore::call( &OCompiler::mark_variadic, _compiler.get() ) )
 	);
+	HRule namedParameterCapture(
+		"namedParameterCapture",
+		parameterIdentifier >> ":::",
+		HRuleBase::action_t( hcore::call( &OCompiler::mark_named_parameter_capture, _compiler.get() ) )
+	);
 	HRule nameList(
 		"nameList",
 		parameter >> ( * ( ',' >> parameter ) )
@@ -180,7 +185,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	HRule statement( "statement" );
 	HRule callable(
 		"callable",
-		constant( '(' ) >> -( ( nameList >> -( ',' >> variadicParameter ) ) | variadicParameter ) >> ')'
+		constant( '(' ) >> -( ( nameList >> -( ',' >> variadicParameter ) >> -( ',' >> namedParameterCapture ) ) | ( variadicParameter >> -( ',' >> namedParameterCapture ) ) | namedParameterCapture ) >> ')'
 		>> '{' >> *statement >> '}'
 	);
 	/*

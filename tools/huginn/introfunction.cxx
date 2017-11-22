@@ -40,13 +40,15 @@ HIntroFunction::HIntroFunction(
 	parameter_names_t const& parameterNames_,
 	HHuginn::scope_t const& scope_,
 	expressions_t const& defaults_,
-	bool isVariadic_
+	bool isVariadic_,
+	bool capturesNamedParameters_
 ) : HFunction(
 	name_,
 	parameterNames_,
 	scope_,
 	defaults_,
-	isVariadic_
+	isVariadic_,
+	capturesNamedParameters_
 ) {
 	return;
 }

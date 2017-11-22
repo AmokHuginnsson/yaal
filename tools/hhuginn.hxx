@@ -623,7 +623,12 @@ private:
 	value_t _value;
 public:
 	HTaggedValue( value_t const&, HClass const* );
-	value_t& value( void );
+	value_t const& value( void ) const {
+		return ( _value );
+	}
+	value_t& value( void ) {
+		return ( _value );
+	}
 private:
 	HTaggedValue( HTaggedValue const& ) = delete;
 	HTaggedValue& operator = ( HTaggedValue const& ) = delete;

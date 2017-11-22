@@ -147,6 +147,7 @@ OCompiler::OFunctionContext::OFunctionContext(
 	, _lastMemberName()
 	, _isLambda( isLambda_ )
 	, _isVariadic( false )
+	, _capturesNamedParameters( false )
 	, _inline( true )
 	, _compiler( compiler_ ) {
 	_scopeStack.emplace( make_pointer<OScopeContext>( this, statementId_, fileId_, 0 ) );
@@ -856,7 +857,8 @@ OCompiler::function_info_t OCompiler::create_function_low( executing_parser::pos
 						fc._parameters,
 						scope,
 						fc._defaultValues,
-						fc._isVariadic
+						fc._isVariadic,
+						fc._capturesNamedParameters
 					),
 					_1, _2, _3, _4
 				)
@@ -869,7 +871,8 @@ OCompiler::function_info_t OCompiler::create_function_low( executing_parser::pos
 						fc._parameters,
 						scope,
 						fc._defaultValues,
-						fc._isVariadic
+						fc._isVariadic,
+						fc._capturesNamedParameters
 					),
 					_1, _2, _3, _4
 				)
@@ -984,6 +987,14 @@ void OCompiler::mark_variadic( void ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	fc._isVariadic = true;
+	return;
+	M_EPILOG
+}
+
+void OCompiler::mark_named_parameter_capture( void ) {
+	M_PROLOG
+	OFunctionContext& fc( f() );
+	fc._capturesNamedParameters = true;
 	return;
 	M_EPILOG
 }

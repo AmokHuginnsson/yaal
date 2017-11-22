@@ -49,7 +49,8 @@ HFunction::HFunction(
 	parameter_names_t const& parameterNames_,
 	HHuginn::scope_t const& scope_,
 	expressions_t const& defaultValues_,
-	bool isVariadic_
+	bool isVariadic_,
+	bool capturesNamedParameters_
 ) : HStatement( scope_->id(), scope_->file_id(), scope_->position() )
 	, _name( name_ )
 	, _parameterNames( parameterNames_ )
@@ -57,8 +58,13 @@ HFunction::HFunction(
 	, _defaultValues( defaultValues_ )
 	, _scope( scope_ )
 	, _parameterCount( static_cast<int>( _parameterNames.get_size() ) )
-	, _isVariadic( isVariadic_ ) {
+	, _isVariadic( isVariadic_ )
+	, _capturesNamedParameters( capturesNamedParameters_ ) {
 	if ( _isVariadic ) {
+		-- _defaultParametersStart;
+		-- _parameterCount;
+	}
+	if ( _capturesNamedParameters ) {
 		-- _defaultParametersStart;
 		-- _parameterCount;
 	}
@@ -145,6 +151,8 @@ HHuginn::value_t HFunction::execute_impl_low(
 			variables.resize( _parameterCount );
 		}
 		f->add_variable( v );
+	}
+	if ( _capturesNamedParameters ) {
 	}
 	if ( f->can_continue() ) {
 		_scope->execute( thread_ );
