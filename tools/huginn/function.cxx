@@ -111,48 +111,165 @@ HHuginn::value_t HFunction::execute(
 HHuginn::value_t HFunction::execute_incremental_main(
 	huginn::HThread* thread_,
 	HHuginn::value_t* object_,
-	HHuginn::values_t& values_,
-	int position_
+	HHuginn::values_t&,
+	int
 ) const {
 	M_PROLOG
 	thread_->create_incremental_function_frame( this, object_, upcast( object_ ) );
-	HHuginn::value_t res( execute_incremental_main_impl( thread_, values_, position_ ) );
+	HHuginn::value_t res( execute_incremental_main_impl( thread_ ) );
 	thread_->pop_incremental_frame();
 	return ( res );
 	M_EPILOG
 }
 
-HHuginn::value_t HFunction::execute_impl_low(
+HHuginn::value_t HFunction::execute_impl(
 	huginn::HThread* thread_,
 	HHuginn::values_t& values_,
-	int
+	int position_
 ) const {
 	M_PROLOG
 	HFrame* f( thread_->current_frame() );
-	int const VALUE_COUNT( static_cast<int>( values_.get_size() ) );
 	HHuginn::values_t& variables( f->variable_values() );
 	variables.swap( values_ );
-	for ( int i( max( _defaultParametersStart, static_cast<int>( variables.get_size() ) ) ); i < _parameterCount; ++ i ) {
-		int defaultValueIndex( i - _defaultParametersStart );
-		_defaultValues[defaultValueIndex]->execute( thread_ );
-		if ( ! f->can_continue() ) {
-			break;
+	HHuginn::value_t namedParameters;
+	int positionalArgumentsCount( static_cast<int>( variables.get_size() ) );
+	bool hasKeywordArguments( ! variables.is_empty() && ( variables.back()->type_id() == HHuginn::TYPE::NAMED_PARAMETERS ) );
+	if ( hasKeywordArguments ) {
+		namedParameters = yaal::move( static_cast<HHuginn::HTaggedValue*>( variables.back().raw() )->value() );
+		variables.pop_back();
+		-- positionalArgumentsCount;
+	}
+	if ( positionalArgumentsCount < _parameterCount ) {
+		variables.resize( _parameterCount );
+	}
+	if ( hasKeywordArguments ) {
+		HHuginn::HLookup::values_t& namedParametersData( static_cast<HHuginn::HLookup*>( namedParameters.raw() )->value() );
+		HRuntime& r( thread_->runtime() );
+		for ( HHuginn::HLookup::values_t::iterator it( namedParametersData.begin() ); it != namedParametersData.end(); ) {
+			HHuginn::HLookup::values_t::iterator del( it );
+			++ it;
+			if ( del->first->type_id() != HHuginn::TYPE::STRING ) {
+				throw HHuginn::HHuginnRuntimeException(
+					"In call to `"_ys
+						.append( thread_->runtime().identifier_name( _name ) )
+						.append( "()`, a non-string name in named parameter." ),
+					f->file_id(),
+					position_
+				);
+			}
+			hcore::HString const& keywordName( get_string( del->first ) );
+			HHuginn::identifier_id_t keywordIdentifier( r.identifier_id( keywordName ) );
+			parameter_names_t::const_iterator positionalPosition( find( _parameterNames.begin(), _parameterNames.end(), keywordIdentifier ) );
+			if ( positionalPosition != _parameterNames.end() ) {
+				int positionalIndex( static_cast<int>( positionalPosition - _parameterNames.begin() ) );
+				if ( positionalIndex < positionalArgumentsCount ) {
+					throw HHuginn::HHuginnRuntimeException(
+						"In call to `"_ys
+							.append( thread_->runtime().identifier_name( _name ) )
+							.append( "()`, positional argument `" )
+							.append( keywordName )
+							.append( "` was already set." ),
+						f->file_id(),
+						position_
+					);
+				}
+				variables[positionalIndex] = del->second;
+				++ positionalArgumentsCount;
+				namedParametersData.erase( del );
+			}
 		}
-		f->add_variable( f->result() );
+	}
+	for ( int i( max( _defaultParametersStart, positionalArgumentsCount ) ); i < _parameterCount; ++ i ) {
+		int defaultValueIndex( i - _defaultParametersStart );
+		if ( ! variables[i] ) {
+			_defaultValues[defaultValueIndex]->execute( thread_ );
+			if ( ! f->can_continue() ) {
+				break;
+			}
+			variables[i] = f->result();
+			++ positionalArgumentsCount;
+		}
 	}
 	if ( _isVariadic ) {
 		HHuginn::value_t v( thread_->object_factory().create_tuple() );
 		HHuginn::HTuple::values_t& variadic( static_cast<HHuginn::HTuple*>( v.raw() )->value() );
-		variadic.reserve( max( VALUE_COUNT - _parameterCount, 0 ) );
-		for ( int i( _parameterCount ); i < VALUE_COUNT; ++ i ) {
+		variadic.reserve( max( positionalArgumentsCount - _parameterCount, 0 ) );
+		for ( int i( _parameterCount ); i < positionalArgumentsCount; ++ i ) {
 			variadic.push_back( variables[i] );
 		}
-		if ( VALUE_COUNT > _parameterCount ) {
+		if ( positionalArgumentsCount > _parameterCount ) {
 			variables.resize( _parameterCount );
+			positionalArgumentsCount = _parameterCount;
 		}
-		f->add_variable( v );
+		variables.push_back( v );
 	}
 	if ( _capturesNamedParameters ) {
+		if ( ! namedParameters ) {
+			namedParameters = thread_->object_factory().create_lookup();
+		}
+		variables.push_back( namedParameters );
+	} else if ( !! namedParameters && ! static_cast<HHuginn::HLookup*>( namedParameters.raw() )->value().is_empty() ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"Call to `"_ys
+				.append( thread_->runtime().identifier_name( _name ) )
+				.append( "()` got unexpected keyword arguments." ),
+			f->file_id(),
+			position_
+		);
+	}
+	if ( positionalArgumentsCount < _parameterCount ) {
+		parameter_names_t missing;
+		for ( int i( 0 ); i < _defaultParametersStart; ++ i ) {
+			if ( ! variables[i] ) {
+				missing.push_back( _parameterNames[i] );
+			}
+		}
+		HString missingList;
+		bool first( true );
+		HRuntime& r( thread_->runtime() );
+		for ( HHuginn::identifier_id_t m : missing ) {
+			if ( ! first ) {
+				missingList.append( m == missing.back() ? " and " : ", " );
+			}
+			missingList.append( '`' ).append( r.identifier_name( m ) ).append( '`' );
+			first = false;
+		}
+		HString msg( "In call to `" );
+		msg.append( r.identifier_name( _name ) )
+			.append( "()`, missing required positional argument" )
+			.append( missing.get_size() > 1 ? "s: " : ": " )
+			.append( missingList ).append( "." );
+		throw HHuginn::HHuginnRuntimeException( msg, f->file_id(), position_ );
+	} else if ( positionalArgumentsCount > _parameterCount ) {
+		if ( _defaultParametersStart != _parameterCount ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"Function `"_ys
+					.append( thread_->runtime().identifier_name( _name ) )
+					.append( "` accepts from " )
+					.append( _defaultParametersStart )
+					.append( " to " )
+					.append( _parameterCount )
+					.append( " positional parameters, but " )
+					.append( positionalArgumentsCount )
+					.append( " were given." ),
+				f->file_id(),
+				position_
+			);
+		} else {
+			throw HHuginn::HHuginnRuntimeException(
+				"Function `"_ys
+					.append( thread_->runtime().identifier_name( _name ) )
+					.append( "` accepts from " )
+					.append( _parameterCount )
+					.append( " positional parameter" )
+					.append( _parameterCount == 1 ? "" : "s" )
+					.append(", but " )
+					.append( positionalArgumentsCount )
+					.append( " were given." ),
+				f->file_id(),
+				position_
+			);
+		}
 	}
 	if ( f->can_continue() ) {
 		_scope->execute( thread_ );

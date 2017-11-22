@@ -31,6 +31,7 @@ Copyright:
 
 #include "runtime.hxx"
 #include "helper.hxx"
+#include "scope.hxx"
 #include "tools/hhuginn.hxx"
 
 namespace yaal {
@@ -63,27 +64,15 @@ public:
 		return ( _name );
 	}
 protected:
-	HHuginn::value_t execute_impl( huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) const {
-		verify_arg_count(
-			thread_->runtime().identifier_name( _name ),
-			values_,
-			_defaultParametersStart,
-			_isVariadic ? meta::max_signed<int>::value : _parameterCount,
-			thread_,
-			position_
-		);
-		return ( execute_impl_low( thread_, values_, position_ ) );
-	}
-	HHuginn::value_t execute_incremental_main_impl( huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) const {
+	HHuginn::value_t execute_incremental_main_impl( huginn::HThread* thread_ ) const {
 		HFrame* f( thread_->current_frame() );
-		HHuginn::values_t& variables( f->variable_values() );
-		variables.swap( values_ );
-		return ( execute_impl_low( thread_, values_, position_ ) );
+		_scope->execute( thread_ );
+		return ( f->result() );
 	}
+	HHuginn::value_t execute_impl( huginn::HThread*, HHuginn::values_t&, int ) const;
 	void note_parameters( huginn::HThread* ) const;
 	int upcast( HHuginn::value_t* ) const;
 private:
-	HHuginn::value_t execute_impl_low( huginn::HThread*, HHuginn::values_t&, int ) const;
 	HFunction( HFunction const& ) = delete;
 	HFunction( HFunction&& ) = delete;
 };

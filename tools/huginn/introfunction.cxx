@@ -71,13 +71,13 @@ HHuginn::value_t HIntroFunction::execute(
 HHuginn::value_t HIntroFunction::execute_incremental_main(
 	huginn::HThread* thread_,
 	HHuginn::value_t* object_,
-	HHuginn::values_t& values_,
-	int position_
+	HHuginn::values_t&,
+	int
 ) const {
 	M_PROLOG
 	thread_->create_incremental_function_frame( this, object_, upcast( object_ ) );
 	note_parameters( thread_ );
-	HHuginn::value_t res( execute_incremental_main_impl( thread_, values_, position_ ) );
+	HHuginn::value_t res( execute_incremental_main_impl( thread_ ) );
 	thread_->pop_incremental_frame();
 	return ( res );
 	M_EPILOG

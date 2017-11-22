@@ -224,9 +224,9 @@ protected:
 			_valueCache.resize( _valueCacheSize + 1 );
 			_valueCache.back().reserve( _variables.get_capacity() );
 		}
-		HHuginn::values_t& values( _valueCache[_valueCacheSize] );
+		HHuginn::values_t& vals( _valueCache[_valueCacheSize] );
 		++ _valueCacheSize;
-		return ( values );
+		return ( vals );
 	}
 	void invalidate_value_cache( void ) {
 		-- _valueCacheSize;
