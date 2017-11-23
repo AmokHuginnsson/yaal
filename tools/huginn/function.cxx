@@ -162,7 +162,7 @@ HHuginn::value_t HFunction::execute_impl(
 			parameter_names_t::const_iterator positionalPosition( find( _parameterNames.begin(), _parameterNames.end(), keywordIdentifier ) );
 			if ( positionalPosition != _parameterNames.end() ) {
 				int positionalIndex( static_cast<int>( positionalPosition - _parameterNames.begin() ) );
-				if ( positionalIndex < positionalArgumentsCount ) {
+				if ( !! variables[positionalIndex] ) {
 					throw HHuginn::HHuginnRuntimeException(
 						"In call to `"_ys
 							.append( thread_->runtime().identifier_name( _name ) )
