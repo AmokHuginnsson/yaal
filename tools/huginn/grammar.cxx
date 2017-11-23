@@ -134,17 +134,17 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	HRule dictLiteral(
 		"dictLiteral",
 		constant(
-			'{',
+			'[',
 			HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
-		) >> -( dictLiteralElement >> *( ',' >> dictLiteralElement ) ) >> '}',
+		) >> -( dictLiteralElement >> *( ',' >> dictLiteralElement ) ) >> ']',
 		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MAKE_DICT, _1 ) )
 	);
 	HRule lookupLiteral(
 		"lookupLiteral",
 		constant(
-			'[',
+			'{',
 			HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
-		) >> -( dictLiteralElement >> *( ',' >> dictLiteralElement ) ) >> ']',
+		) >> -( dictLiteralElement >> *( ',' >> dictLiteralElement ) ) >> '}',
 		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MAKE_LOOKUP, _1 ) )
 	);
 	HRule setLiteral(

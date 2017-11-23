@@ -839,25 +839,25 @@ yaal::hcore::HString string_representation( HThread* thread_, HHuginn::value_t c
 			str.append( ")" );
 		} break;
 		case ( HHuginn::TYPE::DICT ): {
-			HHuginn::HDict const* d( static_cast<HHuginn::HDict const*>( value_.raw() ) );
-			str = "{";
+			HHuginn::HDict::values_t const& d( static_cast<HHuginn::HDict const*>( value_.raw() )->value() );
+			if ( d.is_empty() ) {
+				str = "dict()";
+				break;
+			}
+			str = "[";
 			bool next( false );
-			for ( HHuginn::HDict::values_t::value_type const& v : d->value() ) {
+			for ( HHuginn::HDict::values_t::value_type const& v : d ) {
 				if ( next ) {
 					str.append( ", " );
 				}
 				next = true;
 				str.append( string_representation( thread_, v.first, position_ ) ).append( ": " ).append( string_representation( thread_, v.second, position_ ) );
 			}
-			str.append( "}" );
+			str.append( "]" );
 		} break;
 		case ( HHuginn::TYPE::LOOKUP ): {
 			HHuginn::HLookup::values_t const& lk( static_cast<HHuginn::HLookup const*>( value_.raw() )->value() );
-			if ( lk.is_empty() ) {
-				str = "lookup()";
-				break;
-			}
-			str = "[";
+			str = "{";
 			bool next( false );
 			for ( HHuginn::HLookup::values_t::value_type const& v : lk ) {
 				if ( next ) {
@@ -866,7 +866,7 @@ yaal::hcore::HString string_representation( HThread* thread_, HHuginn::value_t c
 				next = true;
 				str.append( string_representation( thread_, v.first, position_ ) ).append( ": " ).append( string_representation( thread_, v.second, position_ ) );
 			}
-			str.append( "]" );
+			str.append( "}" );
 		} break;
 		case ( HHuginn::TYPE::SET ): {
 			HHuginn::HSet::values_t const& s( static_cast<HHuginn::HSet const*>( value_.raw() )->value() );
