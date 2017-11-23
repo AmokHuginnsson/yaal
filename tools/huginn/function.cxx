@@ -245,11 +245,11 @@ HHuginn::value_t HFunction::execute_impl(
 			throw HHuginn::HHuginnRuntimeException(
 				"Function `"_ys
 					.append( thread_->runtime().identifier_name( _name ) )
-					.append( "` accepts from " )
+					.append( "()` accepts from " )
 					.append( _defaultParametersStart )
 					.append( " to " )
 					.append( _parameterCount )
-					.append( " positional parameters, but " )
+					.append( " positional arguments, but " )
 					.append( positionalArgumentsCount )
 					.append( " were given." ),
 				f->file_id(),
@@ -259,9 +259,9 @@ HHuginn::value_t HFunction::execute_impl(
 			throw HHuginn::HHuginnRuntimeException(
 				"Function `"_ys
 					.append( thread_->runtime().identifier_name( _name ) )
-					.append( "` accepts from " )
+					.append( "()` accepts exactly " )
 					.append( _parameterCount )
-					.append( " positional parameter" )
+					.append( " positional argument" )
 					.append( _parameterCount == 1 ? "" : "s" )
 					.append(", but " )
 					.append( positionalArgumentsCount )
