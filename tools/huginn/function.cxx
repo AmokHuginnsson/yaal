@@ -179,7 +179,7 @@ HHuginn::value_t HFunction::execute_impl(
 			}
 		}
 	}
-	for ( int i( max( _defaultParametersStart, positionalArgumentsCount ) ); i < _parameterCount; ++ i ) {
+	for ( int i( _defaultParametersStart ); i < _parameterCount; ++ i ) {
 		int defaultValueIndex( i - _defaultParametersStart );
 		if ( ! variables[i] ) {
 			_defaultValues[defaultValueIndex]->execute( thread_ );
