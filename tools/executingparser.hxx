@@ -34,6 +34,7 @@ Copyright:
 #include "hcore/hnumber.hxx"
 #include "hcore/hregex.hxx"
 #include "hcore/harray.hxx"
+#include "hcore/hstack.hxx"
 #include "hcore/hlist.hxx"
 #include "hcore/hhashset.hxx"
 #include "hcore/hhashmap.hxx"
@@ -70,6 +71,21 @@ typedef yaal::hcore::HHashSet<HRuleBase const*> visited_t;
 typedef yaal::hcore::HHashMap<HRuleBase const*, int> rule_use_t;
 struct Position;
 typedef yaal::hcore::HTaggedPOD<int, Position> position_t;
+
+class HRecursionDetector {
+	typedef yaal::hcore::HArray<HRuleBase const*> visited_t;
+	typedef yaal::hcore::HStack<visited_t> checkpoints_t;
+	checkpoints_t _visited;
+	checkpoints_t _checkpoints;
+public:
+	HRecursionDetector( void );
+	bool visit( HRuleBase const* );
+	void reset_visits( void );
+	void checkpoints_push( void );
+	void checkpoints_pop( void );
+private:
+	yaal::hcore::HString rule_description( visited_t const&, HRuleBase const* );
+};
 
 class HRuleDescription {
 public:

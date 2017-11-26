@@ -58,95 +58,92 @@ EscapeTable const _escapes_(
 	_safe_, static_cast<int>( sizeof ( _safe_ ) ) - 1
 );
 
-class HRecursionDetector {
-	typedef yaal::hcore::HArray<HRuleBase const*> visited_t;
-	typedef yaal::hcore::HStack<visited_t> checkpoints_t;
-	checkpoints_t _visited;
-	checkpoints_t _checkpoints;
-public:
-	HRecursionDetector( void )
-		: _visited()
-		, _checkpoints() {
-		_visited.emplace();
-		_checkpoints.emplace();
-		return;
+HRecursionDetector::HRecursionDetector( void )
+	: _visited()
+	, _checkpoints() {
+	_visited.emplace();
+	_checkpoints.emplace();
+	return;
+}
+
+bool HRecursionDetector::visit( HRuleBase const* rule_ ) {
+	M_PROLOG
+	visited_t& chk( _checkpoints.top() );
+	if ( find( chk.begin(), chk.end(), rule_ ) != chk.end() ) {
+		throw HRecursionDetectorException( "Infinite recursion detected: "_ys.append( rule_description( chk, rule_ ) ) );
 	}
-	bool visit( HRuleBase const* rule_ ) {
-		M_PROLOG
-		visited_t& chk( _checkpoints.top() );
-		if ( find( chk.begin(), chk.end(), rule_ ) != chk.end() ) {
-			throw HRecursionDetectorException( "Infinite recursion detected: "_ys.append( rule_description( chk, rule_ ) ) );
+	chk.push_back( rule_ );
+	bool firstTime( false );
+	visited_t& vis( _visited.top() );
+	if ( find( vis.begin(), vis.end(), rule_ ) == vis.end() ) {
+		vis.push_back( rule_ );
+		firstTime = true;
+	}
+	return ( firstTime );
+	M_EPILOG
+}
+
+void HRecursionDetector::reset_visits( void ) {
+	M_PROLOG
+	_checkpoints.top().clear();
+	return;
+	M_EPILOG
+}
+
+/*! \brief Copy (backup) all visited nodes so far.
+ *
+ * Top of _checkpoints can be always messed with and throw away when no longer
+ * needed when going back to the `root' on grammar tree.
+ */
+void HRecursionDetector::checkpoints_push( void ) {
+	M_PROLOG
+	visited_t visited( _visited.top() );
+	_visited.emplace( yaal::move( visited ) );
+	visited_t checkpoints( _checkpoints.top() );
+	_checkpoints.emplace( yaal::move( checkpoints ) );
+	return;
+	M_EPILOG
+}
+
+void HRecursionDetector::checkpoints_pop( void ) {
+	M_PROLOG
+	_checkpoints.pop();
+	_visited.pop();
+	return;
+	M_EPILOG
+}
+
+yaal::hcore::HString HRecursionDetector::rule_description( visited_t const& chk_, HRuleBase const* rule_ ) {
+	M_PROLOG
+	rule_use_t ru;
+	chk_.front()->rule_use( ru );
+	HRuleDescription rd;
+	hcore::HString name;
+	for ( HRuleBase const* r : chk_ ) {
+		if ( dynamic_cast<HRuleRef const*>( r ) || dynamic_cast<HAction const*>( r ) ) {
+			continue;
 		}
-		chk.push_back( rule_ );
-		bool firstTime( false );
-		visited_t& vis( _visited.top() );
-		if ( find( vis.begin(), vis.end(), rule_ ) == vis.end() ) {
-			vis.push_back( rule_ );
-			firstTime = true;
-		}
-		return ( firstTime );
-		M_EPILOG
-	}
-	void reset_visits( void ) {
-		M_PROLOG
-		_checkpoints.top().clear();
-		return;
-		M_EPILOG
-	}
-	/*! \brief Copy (backup) all visited nodes so far.
-	 *
-	 * Top of _checkpoints can be always messed with and throw away when no longer
-	 * needed when going back to the `root' on grammar tree.
-	 */
-	void checkpoints_push( void ) {
-		M_PROLOG
-		visited_t visited( _visited.top() );
-		_visited.emplace( yaal::move( visited ) );
-		visited_t checkpoints( _checkpoints.top() );
-		_checkpoints.emplace( yaal::move( checkpoints ) );
-		return;
-		M_EPILOG
-	}
-	void checkpoints_pop( void ) {
-		M_PROLOG
-		_checkpoints.pop();
-		_visited.pop();
-		return;
-		M_EPILOG
-	}
-private:
-	yaal::hcore::HString rule_description( visited_t const& chk_, HRuleBase const* rule_ ) {
-		M_PROLOG
-		rule_use_t ru;
-		chk_.front()->rule_use( ru );
-		HRuleDescription rd;
-		hcore::HString name;
-		for ( HRuleBase const* r : chk_ ) {
-			if ( dynamic_cast<HRuleRef const*>( r ) || dynamic_cast<HAction const*>( r ) ) {
-				continue;
-			}
-			rd.clear();
-			r->describe( rd, ru );
-			for ( HNamedRule const* nr : rd.children() ) {
-				if ( nr->id() == rule_ ) {
-					name = rd.make_name( *nr );
-					break;
-				}
-			}
-			if ( ! name.is_empty() ) {
+		rd.clear();
+		r->describe( rd, ru );
+		for ( HNamedRule const* nr : rd.children() ) {
+			if ( nr->id() == rule_ ) {
+				name = rd.make_name( *nr );
 				break;
 			}
 		}
-		rd.clear();
 		if ( ! name.is_empty() ) {
-			rd.desc( name );
-			rd.desc( " = " );
+			break;
 		}
-		rule_->describe( rd, ru );
-		return ( rd.description() );
-		M_EPILOG
 	}
-};
+	rd.clear();
+	if ( ! name.is_empty() ) {
+		rd.desc( name );
+		rd.desc( " = " );
+	}
+	rule_->describe( rd, ru );
+	return ( rd.description() );
+	M_EPILOG
+}
 
 class HRuleAggregator {
 	typedef yaal::hcore::HArray<HNamedRule*> named_rules_t;

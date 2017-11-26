@@ -40,11 +40,121 @@ namespace yaal {
 
 namespace tools {
 
+class HIdentifierParser : public executing_parser::HRuleBase {
+public:
+	typedef HIdentifierParser this_type;
+	typedef HRuleBase base_type;
+	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const&, executing_parser::position_t )> action_string_position_t;
+private:
+	yaal::hcore::HString _name;
+	action_string_position_t _actionStringPosition;
+public:
+	HIdentifierParser( HIdentifierParser const& identifier_ )
+		: HRuleBase( identifier_._action, identifier_._actionPosition, identifier_._skipWS )
+		, _name( identifier_._name )
+		, _actionStringPosition( identifier_._actionStringPosition ) {
+		return;
+	}
+	virtual ~HIdentifierParser( void ) {
+		return;
+	}
+protected:
+	virtual ptr_t do_clone( void ) const override {
+		M_PROLOG
+		return ( make_pointer<HIdentifierParser>( *this ) );
+		M_EPILOG
+	}
+	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator ) const override;
+	virtual void do_describe( executing_parser::HRuleDescription& rd_, executing_parser::rule_use_t const& ) const override {
+		M_PROLOG
+		rd_.desc( _name );
+		return;
+		M_EPILOG
+	}
+	virtual void do_detach( HRuleBase const*, executing_parser::visited_t&, bool& ) override {
+		return;
+	}
+	virtual bool do_detect_recursion( executing_parser::HRecursionDetector& recursionDetector_, bool ) const override {
+		M_PROLOG
+		recursionDetector_.reset_visits();
+		return ( true );
+		M_EPILOG
+	}
+	virtual void do_find_recursions( executing_parser::HRuleAggregator& ) override {
+		return;
+	}
+	virtual bool do_has_action( void ) const override {
+		return ( HRuleBase::do_has_action() || ( !! _actionStringPosition ) );
+	}
+private:
+	HIdentifierParser( yaal::hcore::HString const& name_, action_string_position_t const& action_ )
+		: HRuleBase( true )
+		, _name( name_ )
+		, _actionStringPosition( action_ ) {
+		return;
+	}
+	HIdentifierParser& operator = ( HIdentifierParser const& ) = delete;
+	friend HIdentifierParser identifier( yaal::hcore::HString const&, HIdentifierParser::action_string_position_t const& );
+	friend HIdentifierParser identifier( HIdentifierParser::action_string_position_t const& );
+};
+
+inline bool is_identifer_head( code_point_t const& codePoint_ ) {
+	return (
+		( ( codePoint_ >= 'a' ) && ( codePoint_ <= 'z' ) )
+		|| ( ( codePoint_ >= 'A' ) && ( codePoint_ <= 'Z' ) )
+		|| ( ( codePoint_ >= 0x391 ) && ( codePoint_ <= 0x3c9 ) )
+		|| ( codePoint_ == '_' )
+	);
+}
+
+inline bool is_identifer_tail( code_point_t const& codePoint_ ) {
+	return (
+		( ( codePoint_ >= 'a' ) && ( codePoint_ <= 'z' ) )
+		|| ( ( codePoint_ >= 'A' ) && ( codePoint_ <= 'Z' ) )
+		|| ( ( codePoint_ >= '0' ) && ( codePoint_ <= '9' ) )
+		|| ( ( codePoint_ >= 0x391 ) && ( codePoint_ <= 0x3c9 ) )
+		|| ( codePoint_ == '_' )
+	);
+}
+
+hcore::HUTF8String::const_iterator HIdentifierParser::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
+	M_PROLOG
+	yaal::hcore::HUTF8String::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
+	yaal::hcore::HUTF8String::const_iterator scan( start );
+	bool matched( false );
+	if ( scan != last_ ) {
+		if ( is_identifer_head( *scan ) ) {
+			++ scan;
+			while ( is_identifer_tail( *scan ) ) {
+				++ scan;
+			}
+		}
+		if ( scan != start ) {
+			executing_parser::position_t pos( position( executingParser_, start ) );
+			if ( !! _actionStringPosition ) {
+				add_execution_step( executingParser_, start, call( _actionStringPosition, hcore::HUTF8String( start, scan ), pos ) );
+			}
+			matched = true;
+		}
+	} else {
+		scan = first_;
+	}
+	if ( ! matched ) {
+		report_error( executingParser_, scan, "expected an identifier" );
+		scan = first_;
+	}
+	return ( scan );
+	M_EPILOG
+}
+
+inline HIdentifierParser identifier( yaal::hcore::HString const& name_, HIdentifierParser::action_string_position_t const& action_ ) {
+	return ( HIdentifierParser( name_, action_ ) );
+}
+
 executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	M_PROLOG
 	using namespace executing_parser;
 	namespace e_p = executing_parser;
-	hcore::HString identifierPattern( "[a-zA-Z\\x{0391}-\\x{03c9}_][a-zA-Z\\x{0391}-\\x{03c9}0-9_]*" );
 	HRule expression( "expression", e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::mark_expression_position, _compiler.get(), _1 ) ) );
 	HRule absoluteValue( "absoluteValue",
 		constant( '|', e_p::HCharacter::action_character_position_t( hcore::call( &OCompiler::defer_oper, _compiler.get(), _1, _2 ) ) )
@@ -65,9 +175,8 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	);
 	HRule argList( "argList", functionArgument >> *( ',' >> functionArgument ) );
 	HRule parameterName(
-		regex(
+		identifier(
 			"parameterName",
-			identifierPattern,
 			e_p::HStringLiteral::action_string_position_t( hcore::call( &OCompiler::defer_store_string, _compiler.get(), _1, _2 ) )
 		),
 		HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_ARGUMENT, _1 ) )
@@ -155,10 +264,9 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		) >> arg >> *( ',' >> arg ) >> '}',
 		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
 	);
-	HRule parameterIdentifier(
-		"parameterIdentifier",
-		regex(
-			identifierPattern,
+	HIdentifierParser parameterIdentifier(
+		identifier(
+			"parameterIdentifier",
 			HRegex::action_string_position_t( hcore::call( &OCompiler::add_parameter, _compiler.get(), _1, _2 ) )
 		)
 	);
@@ -201,11 +309,9 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	 * Hence each Closure constitutes a separate class which instance is created
 	 * on Closure definition site.
 	 */
-	HRule capture(
-		"capture",
-		regex(
-			"captureIdentifier",
-			identifierPattern,
+	HIdentifierParser capture(
+		identifier(
+			"capture",
 			HRegex::action_string_position_t( hcore::call( &OCompiler::add_capture, _compiler.get(), _1, _2 ) )
 		)
 	);
@@ -235,18 +341,16 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		) >> ( ( ( rangeOper >> -arg ) | ( arg >> -( rangeOper >> -arg ) ) ) >> -( rangeOper >> -arg ) ) >> ']',
 		e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::SUBSCRIPT, _1 ) )
 	);
-	HRule reference(
-		regex(
+	HIdentifierParser reference(
+		identifier(
 			"reference",
-			identifierPattern,
 			e_p::HStringLiteral::action_string_position_t( hcore::call( &OCompiler::defer_get_reference, _compiler.get(), _1, _2 ) )
 		)
 	);
 	HRule memberAccess(
 		"memberAccess",
-		constant( '.', HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::MEMBER_ACCESS, _1 ) ) ) >> regex(
+		constant( '.', HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::MEMBER_ACCESS, _1 ) ) ) >> identifier(
 			"member",
-			identifierPattern,
 			e_p::HStringLiteral::action_string_position_t( hcore::call( &OCompiler::defer_get_field_reference, _compiler.get(), _1, _2 ) )
 		),
 		e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MEMBER_ACCESS, _1 ) )
@@ -388,9 +492,8 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	HRule assignable(
 		"assignable",
 		subscript[e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::make_reference, _compiler.get(), _1 ) )]
-		| regex(
+		| identifier(
 			"variableSetter",
-			identifierPattern,
 			e_p::HString::action_string_position_t( hcore::call( &OCompiler::defer_make_variable, _compiler.get(), _1, _2 ) )
 		)
 	);
@@ -414,9 +517,8 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	HRule catchStatement(
 		"catchStatement",
 		constant( KEYWORD::CATCH ) >> '(' >>
-		regex(
+		identifier(
 			"exceptionType",
-			identifierPattern,
 			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_type_name, _compiler.get(), _1, _2 ) )
 		) >> assignable[e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::commit_catch_control_variable, _compiler.get(), _1 ) )] >> ')' >>
 		scope[HRuleBase::action_position_t( hcore::call( &OCompiler::commit_catch, _compiler.get(), _1 ) )]
@@ -509,31 +611,27 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	);
 	HRule functionDefinition(
 		"functionDefinition",
-		regex(
+		identifier(
 			"functionDefinitionIdentifier",
-			identifierPattern,
 			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_function_name, _compiler.get(), _1, _2 ) )
 		) >> callable,
 		HRuleBase::action_position_t( hcore::call( &OCompiler::create_function, _compiler.get(), _1 ) )
 	);
 	HRule field(
 		"field",
-		regex(
+		identifier(
 			"fieldIdentifier",
-			identifierPattern,
 			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_field_name, _compiler.get(), _1, _2 ) )
 		) >> '=' >> HRule( expression, HRuleBase::action_position_t( hcore::call( &OCompiler::add_field_definition, _compiler.get(), _1 ) ) ) >> ';'
 	);
 	HRule classDefinition(
 		"classDefinition",
-		constant( KEYWORD::CLASS ) >> regex(
+		constant( KEYWORD::CLASS ) >> identifier(
 			"classIdentifier",
-			identifierPattern,
 			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::OClassNoter::note, &(_compiler->_classNoter), _1, _2 ) )
 		) >> -(
-			':' >> regex(
+			':' >> identifier(
 				"baseIdentifier",
-				identifierPattern,
 				e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_base_name, _compiler.get(), _1, _2 ) )
 			)
 		) >> '{' >> +( field | functionDefinition ) >> '}',
@@ -541,13 +639,11 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	);
 	HRule importStatement(
 		"importStatement",
-		constant( "import" ) >> regex(
+		constant( "import" ) >> identifier(
 			"packageName",
-			identifierPattern,
 			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_import_name, _compiler.get(), _1, _2 ) )
-		) >> "as" >> regex(
+		) >> "as" >> identifier(
 			"importName",
-			identifierPattern,
 			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_import_alias, _compiler.get(), _1, _2 ) )
 		) >> ';',
 		HRuleBase::action_position_t( hcore::call( &OCompiler::commit_import, _compiler.get(), _1 ) )
