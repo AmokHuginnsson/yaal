@@ -241,6 +241,14 @@ AC_DEFUN_ONCE([YAAL_DETECT_COMMON_FLAGS], [
 		YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-pthread], [C++])
 		YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-pthread], [C++])
 	fi
+	if test ["x${HOST_OS_TYPE}"] == ["xRaspbian"] ; then
+		YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-mcpu=cortex-a53], [C++])
+		YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-mfpu=neon-fp-armv8], [C++])
+		YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-mfloat-abi=hard], [C++])
+		YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-mlittle-endian], [C++])
+		YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-munaligned-access], [C++])
+		YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-funsafe-math-optimizations], [C++])
+	fi
 	YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-m64], [C++])
 	AC_ARG_ENABLE([native],[AC_HELP_STRING([--enable-native],[Use all available CPU features.])],[YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-march=native], [C++])])
 	YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-fPIC], [C++])
