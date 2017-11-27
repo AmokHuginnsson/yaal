@@ -64,7 +64,7 @@ protected:
 		return ( make_pointer<HIdentifierParser>( *this ) );
 		M_EPILOG
 	}
-	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator ) const override;
+	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator const&, yaal::hcore::HUTF8String::const_iterator const& ) const override;
 	virtual void do_describe( executing_parser::HRuleDescription& rd_, executing_parser::rule_use_t const& ) const override {
 		M_PROLOG
 		rd_.desc( _name );
@@ -117,7 +117,7 @@ inline bool is_identifer_tail( code_point_t const& codePoint_ ) {
 	);
 }
 
-hcore::HUTF8String::const_iterator HIdentifierParser::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
+hcore::HUTF8String::const_iterator HIdentifierParser::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const {
 	M_PROLOG
 	yaal::hcore::HUTF8String::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
 	yaal::hcore::HUTF8String::const_iterator scan( start );

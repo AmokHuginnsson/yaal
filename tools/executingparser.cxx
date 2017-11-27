@@ -302,20 +302,20 @@ bool HExecutingParser::do_parse( void ) {
 	M_EPILOG
 }
 
-void HExecutingParser::add_execution_step( yaal::hcore::HUTF8String::const_iterator position_, executor_t const& executor_ ) {
+void HExecutingParser::add_execution_step( yaal::hcore::HUTF8String::const_iterator const& position_, executor_t const& executor_ ) {
 	M_PROLOG
 	_executors.push_back( make_pair( position_, executor_ ) );
 	return;
 	M_EPILOG
 }
 
-void HExecutingParser::drop_execution_steps( yaal::hcore::HUTF8String::const_iterator it_ ) {
+void HExecutingParser::drop_execution_steps( yaal::hcore::HUTF8String::const_iterator const& it_ ) {
 	M_PROLOG
 	execution_steps_t::iterator e( end( _executors ) );
 	execution_steps_t::iterator it(
 		lower_bound(
 			begin( _executors ), e, it_,
-			[]( execution_step_t const& s_, yaal::hcore::HUTF8String::const_iterator i ) {
+			[]( execution_step_t const& s_, yaal::hcore::HUTF8String::const_iterator const& i ) {
 				return ( s_.first < i );
 			}
 		)
@@ -325,7 +325,7 @@ void HExecutingParser::drop_execution_steps( yaal::hcore::HUTF8String::const_ite
 	M_EPILOG
 }
 
-void HExecutingParser::report_error( yaal::hcore::HUTF8String::const_iterator position_, yaal::hcore::HString const& message_ ) {
+void HExecutingParser::report_error( yaal::hcore::HUTF8String::const_iterator const& position_, yaal::hcore::HString const& message_ ) {
 	M_PROLOG
 	int long pos( position( position_ ) );
 	if ( pos > _errorPosition ) {
@@ -339,7 +339,7 @@ void HExecutingParser::report_error( yaal::hcore::HUTF8String::const_iterator po
 	M_EPILOG
 }
 
-int HExecutingParser::position( yaal::hcore::HUTF8String::const_iterator position_ ) {
+int HExecutingParser::position( yaal::hcore::HUTF8String::const_iterator const& position_ ) {
 	return ( static_cast<int>( position_ - _inputStart ) );
 }
 
@@ -355,28 +355,28 @@ HExecutingParser::messages_t const& HExecutingParser::error_messages( void ) con
 	M_EPILOG
 }
 
-void HExecutingParser::HProxy::add_execution_step( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator position_, executor_t const& executor_ ) {
+void HExecutingParser::HProxy::add_execution_step( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator const& position_, executor_t const& executor_ ) {
 	M_PROLOG
 	executingParser_->add_execution_step( position_, executor_ );
 	return;
 	M_EPILOG
 }
 
-void HExecutingParser::HProxy::drop_execution_steps( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator position_ ) {
+void HExecutingParser::HProxy::drop_execution_steps( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator const& position_ ) {
 	M_PROLOG
 	executingParser_->drop_execution_steps( position_ );
 	return;
 	M_EPILOG
 }
 
-void HExecutingParser::HProxy::report_error( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator position_, yaal::hcore::HString const& message_ ) {
+void HExecutingParser::HProxy::report_error( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator const& position_, yaal::hcore::HString const& message_ ) {
 	M_PROLOG
 	executingParser_->report_error( position_, message_ );
 	return;
 	M_EPILOG
 }
 
-int HExecutingParser::HProxy::position( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator position_ ) {
+int HExecutingParser::HProxy::position( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator const& position_ ) {
 	M_PROLOG
 	return ( executingParser_->position( position_ ) );
 	M_EPILOG
@@ -424,7 +424,7 @@ bool HRuleBase::is_optional( void ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HUTF8String::const_iterator HRuleBase::parse( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator first_, yaal::hcore::HUTF8String::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HRuleBase::parse( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator const& first_, yaal::hcore::HUTF8String::const_iterator const& last_ ) const {
 	M_PROLOG
 	M_ASSERT( ( first_ != HUTF8String::const_iterator() ) && ( last_ != HUTF8String::const_iterator() ) );
 	yaal::hcore::HUTF8String::const_iterator it( do_parse( executingParser_, first_, last_ ) );
@@ -436,28 +436,28 @@ yaal::hcore::HUTF8String::const_iterator HRuleBase::parse( HExecutingParser* exe
 	M_EPILOG
 }
 
-void HRuleBase::add_execution_step( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator position_, action_t const& executor_ ) const {
+void HRuleBase::add_execution_step( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator const& position_, action_t const& executor_ ) const {
 	M_PROLOG
 	HExecutingParser::HProxy::add_execution_step( executingParser_, position_, executor_ );
 	return;
 	M_EPILOG
 }
 
-void HRuleBase::drop_execution_steps( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator position_ ) const {
+void HRuleBase::drop_execution_steps( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator const& position_ ) const {
 	M_PROLOG
 	HExecutingParser::HProxy::drop_execution_steps( executingParser_, position_ );
 	return;
 	M_EPILOG
 }
 
-void HRuleBase::report_error( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator position_, yaal::hcore::HString const& message_ ) const {
+void HRuleBase::report_error( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator const& position_, yaal::hcore::HString const& message_ ) const {
 	M_PROLOG
 	HExecutingParser::HProxy::report_error( executingParser_, position_, message_ );
 	return;
 	M_EPILOG
 }
 
-executing_parser::position_t HRuleBase::position( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator position_ ) const {
+executing_parser::position_t HRuleBase::position( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator const& position_ ) const {
 	M_PROLOG
 	return ( executing_parser::position_t( HExecutingParser::HProxy::position( executingParser_, position_ ) ) );
 	M_EPILOG
@@ -491,7 +491,7 @@ bool HRuleBase::do_is_optional( void ) const {
 	return ( false );
 }
 
-yaal::hcore::HUTF8String::const_iterator HRuleBase::skip_space( yaal::hcore::HUTF8String::const_iterator first_, yaal::hcore::HUTF8String::const_iterator last_ ) {
+yaal::hcore::HUTF8String::const_iterator HRuleBase::skip_space( yaal::hcore::HUTF8String::const_iterator first_, yaal::hcore::HUTF8String::const_iterator const& last_ ) {
 	M_PROLOG
 	M_ASSERT( ( first_ != HUTF8String::const_iterator() ) && ( last_ != HUTF8String::const_iterator() ) );
 	while ( ( first_ != last_ ) && is_whitespace( *first_ ) ) {
@@ -819,7 +819,7 @@ HRule::ptr_t HRule::do_clone( void ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HUTF8String::const_iterator HRule::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HRule::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const {
 	M_PROLOG
 	yaal::hcore::HUTF8String::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
 	yaal::hcore::HUTF8String::const_iterator scan( !! _rule ? _rule->parse( executingParser_, start, last_ ) : start );
@@ -919,7 +919,7 @@ void HRecursiveRule::set_rule( HRuleBase::ptr_t const& rule_ ) {
 	M_EPILOG
 }
 
-yaal::hcore::HUTF8String::const_iterator HRecursiveRule::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HRecursiveRule::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const {
 	M_PROLOG
 	M_ENSURE( !! _rule );
 	return ( _rule->parse( executingParser_, first_, last_ ) );
@@ -1002,7 +1002,7 @@ HRuleRef::HRuleRef( HRuleBase::ptr_t rule_ )
 	return;
 }
 
-yaal::hcore::HUTF8String::const_iterator HRuleRef::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HRuleRef::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const {
 	M_PROLOG
 	HRuleBase::ptr_t r( _rule );
 	M_ASSERT( !! r );
@@ -1203,7 +1203,7 @@ void HFollows::do_rule_use( rule_use_t& ruleUse_ ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HUTF8String::const_iterator HFollows::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HFollows::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const {
 	M_PROLOG
 	yaal::hcore::HUTF8String::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
 	yaal::hcore::HUTF8String::const_iterator scan( start );
@@ -1313,7 +1313,7 @@ HKleeneBase::HKleeneBase( HNamedRule const& rule_, action_t const& action_, acti
 	return;
 }
 
-yaal::hcore::HUTF8String::const_iterator HKleeneBase::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HKleeneBase::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const {
 	M_PROLOG
 	yaal::hcore::HUTF8String::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
 	yaal::hcore::HUTF8String::const_iterator scan( start );
@@ -1602,7 +1602,7 @@ HAlternative HAlternative::operator[]( action_position_t const& action_ ) const 
 	M_EPILOG
 }
 
-yaal::hcore::HUTF8String::const_iterator HAlternative::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HAlternative::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const {
 	yaal::hcore::HUTF8String::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
 	yaal::hcore::HUTF8String::const_iterator scan( start );
 	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
@@ -1756,7 +1756,7 @@ HOptional HOptional::operator[]( action_position_t const& action_ ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HUTF8String::const_iterator HOptional::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HOptional::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const {
 	M_PROLOG
 	yaal::hcore::HUTF8String::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
 	yaal::hcore::HUTF8String::const_iterator scan( !! _rule ? _rule->parse( executingParser_, start, last_ ) : start );
@@ -1888,7 +1888,7 @@ HAnd HAnd::operator[]( action_position_t const& action_ ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HUTF8String::const_iterator HAnd::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HAnd::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const {
 	M_PROLOG
 	yaal::hcore::HUTF8String::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
 	yaal::hcore::HUTF8String::const_iterator scan( !! _rule ? _rule->parse( executingParser_, start, last_ ) : start );
@@ -2032,7 +2032,7 @@ HNot HNot::operator[]( action_position_t const& action_ ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HUTF8String::const_iterator HNot::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HNot::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const {
 	M_PROLOG
 	yaal::hcore::HUTF8String::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
 	yaal::hcore::HUTF8String::const_iterator scan( !! _rule ? _rule->parse( executingParser_, start, last_ ) : start );
@@ -2504,7 +2504,7 @@ bool HReal::do_has_action( void ) const {
 	);
 }
 
-yaal::hcore::HUTF8String::const_iterator HReal::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HReal::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const {
 	M_PROLOG
 	yaal::hcore::HUTF8String::const_iterator start( skip_space( first_, last_ ) );
 	yaal::hcore::HUTF8String::const_iterator scan( start );
@@ -2956,7 +2956,7 @@ bool HInteger::do_has_action( void ) const {
 	);
 }
 
-yaal::hcore::HUTF8String::const_iterator HInteger::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HInteger::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const {
 	M_PROLOG
 	yaal::hcore::HUTF8String::const_iterator start( skip_space( first_, last_ ) );
 	yaal::hcore::HUTF8String::const_iterator scan( start );
@@ -3244,9 +3244,9 @@ public:
 
 HParseResult parse_quoted(
 	yaal::hcore::HString& onto_,
-	yaal::hcore::HUTF8String::const_iterator first_,
+	yaal::hcore::HUTF8String::const_iterator const& first_,
 	yaal::hcore::HUTF8String::const_iterator from_,
-	yaal::hcore::HUTF8String::const_iterator last_,
+	yaal::hcore::HUTF8String::const_iterator const& last_,
 	code_point_t quote_
 ) {
 	yaal::hcore::HUTF8String::const_iterator scan( from_ );
@@ -3289,7 +3289,7 @@ HParseResult parse_quoted(
 
 }
 
-yaal::hcore::HUTF8String::const_iterator HStringLiteral::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HStringLiteral::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const {
 	M_PROLOG
 	yaal::hcore::HUTF8String::const_iterator start( skip_space( first_, last_ ) );
 	HParseResult parseResult( parse_quoted( _cache, first_, start, last_, '"'_ycp ) );
@@ -3431,7 +3431,7 @@ bool HCharacterLiteral::do_has_action( void ) const {
 	return ( HRuleBase::do_has_action() || ( !! _actionCharacter ) || ( !! _actionCharacterPosition ) );
 }
 
-yaal::hcore::HUTF8String::const_iterator HCharacterLiteral::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HCharacterLiteral::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const {
 	M_PROLOG
 	yaal::hcore::HUTF8String::const_iterator start( skip_space( first_, last_ ) );
 	HParseResult parseResult( parse_quoted( _cache, first_, start, last_, '\''_ycp ) );
@@ -3617,7 +3617,7 @@ HCharacter HCharacter::operator() ( WHITE_SPACE whiteSpace_ ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HUTF8String::const_iterator HCharacter::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
+yaal::hcore::HUTF8String::const_iterator HCharacter::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const {
 	M_PROLOG
 	yaal::hcore::HUTF8String::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
 	yaal::hcore::HUTF8String::const_iterator scan( start );
@@ -3861,7 +3861,7 @@ bool HString::do_has_action( void ) const {
 	return ( HRuleBase::do_has_action() || ( !! _actionString ) || ( !! _actionStringPosition ) );
 }
 
-hcore::HUTF8String::const_iterator HString::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
+hcore::HUTF8String::const_iterator HString::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const {
 	M_PROLOG
 	M_ASSERT( ! _dictionary.is_empty() );
 	yaal::hcore::HUTF8String::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
@@ -4160,7 +4160,7 @@ bool HRegex::do_has_action( void ) const {
 	return ( HRuleBase::do_has_action() || ( !! _actionString ) || ( !! _actionStringPosition ) );
 }
 
-hcore::HUTF8String::const_iterator HRegex::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator last_ ) const {
+hcore::HUTF8String::const_iterator HRegex::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const {
 	M_PROLOG
 	yaal::hcore::HUTF8String::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
 	yaal::hcore::HUTF8String::const_iterator scan( start );
@@ -4511,7 +4511,7 @@ HAction HAction::operator[]( action_position_t const& action_ ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HUTF8String::const_iterator HAction::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator first_, hcore::HUTF8String::const_iterator ) const {
+yaal::hcore::HUTF8String::const_iterator HAction::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& ) const {
 	M_PROLOG
 	if ( !! _action ) {
 		add_execution_step( executingParser_, first_, _action );
