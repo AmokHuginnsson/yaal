@@ -428,7 +428,7 @@ yaal::hcore::HUTF8String::const_iterator HRuleBase::parse( HExecutingParser* exe
 	M_PROLOG
 	M_ASSERT( ( first_ != HUTF8String::const_iterator() ) && ( last_ != HUTF8String::const_iterator() ) );
 	yaal::hcore::HUTF8String::const_iterator it( do_parse( executingParser_, first_, last_ ) );
-	if ( ! dynamic_cast<HAction const*>( this ) && ( it == first_ ) ) {
+	if ( ! always_matches() && ( it == first_ ) ) {
 		HExecutingParser::HProxy::drop_execution_steps( executingParser_, first_ );
 	}
 	M_ASSERT( it != HUTF8String::const_iterator() );
@@ -539,6 +539,10 @@ bool HRuleBase::skips_ws( void ) const {
 
 bool HRuleBase::do_has_action( void ) const {
 	return ( ( !! _action ) || ( !! _actionPosition ) );
+}
+
+bool HRuleBase::do_always_matches( void ) const {
+	return ( false );
 }
 
 HRuleBase const* HRuleBase::find( yaal::hcore::HString const& name_ ) const {
@@ -4549,6 +4553,10 @@ void HAction::do_find_recursions( HRuleAggregator& ) {
 	M_PROLOG
 	return;
 	M_EPILOG
+}
+
+bool HAction::do_always_matches( void ) const {
+	return ( true );
 }
 
 HFollows operator >> ( HRuleBase::action_position_t const& actionPosition_, HRuleBase const& rule_ ) {

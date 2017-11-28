@@ -179,6 +179,9 @@ public:
 	bool detect_recursion( HRecursionDetector&, bool ) const;
 	void find_recursions( HRuleAggregator& );
 	bool has_action( void ) const;
+	bool always_matches( void ) const {
+		return ( do_always_matches() );
+	}
 	bool skips_ws( void ) const;
 	HRuleBase const* find( yaal::hcore::HString const& ) const;
 	static yaal::hcore::HUTF8String::const_iterator skip_space( yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator const& );
@@ -192,6 +195,7 @@ protected:
 	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const = 0;
 	virtual void do_find_recursions( HRuleAggregator& ) = 0;
 	virtual bool do_has_action( void ) const;
+	virtual bool do_always_matches( void ) const;
 	virtual HRuleBase const* do_find( yaal::hcore::HString const& ) const;
 	void add_execution_step( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator const&, action_t const& ) const;
 	void drop_execution_steps( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator const& ) const;
@@ -1046,6 +1050,7 @@ protected:
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
 	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
 	virtual void do_find_recursions( HRuleAggregator& ) override;
+	virtual bool do_always_matches( void ) const override;
 private:
 	HAction( HRuleBase const& );
 	HAction& operator = ( HAction const& ) = delete;
