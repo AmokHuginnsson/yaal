@@ -428,7 +428,7 @@ yaal::hcore::HUTF8String::const_iterator HRuleBase::parse( HExecutingParser* exe
 	M_PROLOG
 	M_ASSERT( ( first_ != HUTF8String::const_iterator() ) && ( last_ != HUTF8String::const_iterator() ) );
 	yaal::hcore::HUTF8String::const_iterator it( do_parse( executingParser_, first_, last_ ) );
-	if ( ! always_matches() && ( it == first_ ) ) {
+	if ( ( it == first_ ) && ! always_matches() && is_optional() ) {
 		HExecutingParser::HProxy::drop_execution_steps( executingParser_, first_ );
 	}
 	M_ASSERT( it != HUTF8String::const_iterator() );
@@ -1325,6 +1325,7 @@ yaal::hcore::HUTF8String::const_iterator HKleeneBase::do_parse( HExecutingParser
 	while ( scan != last_ ) {
 		scan = _rule->parse( executingParser_, scan, last_ );
 		if ( scan == oldScan ) {
+			drop_execution_steps( executingParser_, scan );
 			break;
 		}
 		oldScan = scan;
@@ -1612,6 +1613,8 @@ yaal::hcore::HUTF8String::const_iterator HAlternative::do_parse( HExecutingParse
 	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
 		if ( ( scan = (*it)->parse( executingParser_, start, last_ ) ) != start ) {
 			break;
+		} else {
+			drop_execution_steps( executingParser_, start );
 		}
 	}
 	if ( scan != start ) {
