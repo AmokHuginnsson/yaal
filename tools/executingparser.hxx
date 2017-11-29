@@ -874,6 +874,7 @@ private:
 	yaal::hcore::HString _characters;
 	action_character_t _actionCharacter;
 	action_character_position_t _actionCharacterPosition;
+	yaal::hcore::HString _errorMessage;
 public:
 	HCharacter( HCharacter const& character_ );
 	virtual ~HCharacter( void ) {
@@ -898,6 +899,7 @@ protected:
 	virtual void do_find_recursions( HRuleAggregator& ) override;
 	virtual bool do_has_action( void ) const override;
 private:
+	yaal::hcore::HString make_error_message( void ) const;
 	HCharacter( bool );
 	HCharacter& operator = ( HCharacter const& ) = delete;
 	friend HCharacter const& get_character_instance( void );
@@ -924,6 +926,7 @@ private:
 	action_string_t _actionString;
 	action_string_position_t _actionStringPosition;
 	WORD_BOUNDARY _wordBoundary;
+	yaal::hcore::HString _errorMessage;
 public:
 	HString( HString const& );
 	virtual ~HString( void ) {
@@ -950,6 +953,7 @@ protected:
 	virtual void do_find_recursions( HRuleAggregator& ) override;
 	virtual bool do_has_action( void ) const override;
 private:
+	yaal::hcore::HString make_error_message( void ) const;
 	yaal::hcore::HString desc( void ) const;
 	HString( yaal::hcore::HString const&, bool, WORD_BOUNDARY );
 	HString& operator = ( HString const& ) = delete;

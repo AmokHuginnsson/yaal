@@ -3516,7 +3516,8 @@ HCharacter::HCharacter( bool skipWS_ )
 	: HRuleBase( skipWS_ )
 	, _characters()
 	, _actionCharacter()
-	, _actionCharacterPosition() {
+	, _actionCharacterPosition()
+	, _errorMessage( make_error_message() ) {
 	return;
 }
 
@@ -3524,7 +3525,8 @@ HCharacter::HCharacter( hcore::HString const& characters_, action_t const& actio
 	: HRuleBase( action_, skipWS_ )
 	, _characters( characters_ )
 	, _actionCharacter()
-	, _actionCharacterPosition() {
+	, _actionCharacterPosition()
+	, _errorMessage( make_error_message() ) {
 	return;
 }
 
@@ -3532,7 +3534,8 @@ HCharacter::HCharacter( hcore::HString const& characters_, action_position_t con
 	: HRuleBase( action_, skipWS_ )
 	, _characters( characters_ )
 	, _actionCharacter()
-	, _actionCharacterPosition() {
+	, _actionCharacterPosition()
+	, _errorMessage( make_error_message() ) {
 	return;
 }
 
@@ -3540,7 +3543,8 @@ HCharacter::HCharacter( hcore::HString const& characters_, action_character_t co
 	: HRuleBase( skipWS_ )
 	, _characters( characters_ )
 	, _actionCharacter( action_ )
-	, _actionCharacterPosition() {
+	, _actionCharacterPosition()
+	, _errorMessage( make_error_message() ) {
 	return;
 }
 
@@ -3548,7 +3552,8 @@ HCharacter::HCharacter( hcore::HString const& characters_, action_character_posi
 	: HRuleBase( skipWS_ )
 	, _characters( characters_ )
 	, _actionCharacter()
-	, _actionCharacterPosition( action_ ) {
+	, _actionCharacterPosition( action_ )
+	, _errorMessage( make_error_message() ) {
 	return;
 }
 
@@ -3556,7 +3561,8 @@ HCharacter::HCharacter( HCharacter const& character_ )
 	: HRuleBase( character_._action, character_._actionPosition, character_._skipWS )
 	, _characters( character_._characters )
 	, _actionCharacter( character_._actionCharacter )
-	, _actionCharacterPosition( character_._actionCharacterPosition ) {
+	, _actionCharacterPosition( character_._actionCharacterPosition )
+	, _errorMessage( character_._errorMessage ) {
 	return;
 }
 
@@ -3649,11 +3655,15 @@ yaal::hcore::HUTF8String::const_iterator HCharacter::do_parse( HExecutingParser*
 		scan = first_;
 	}
 	if ( ! matched ) {
-		report_error( executingParser_, scan, "expected one of characters: " + _characters );
+		report_error( executingParser_, scan, _errorMessage );
 		scan = first_;
 	}
 	return ( scan );
 	M_EPILOG
+}
+
+yaal::hcore::HString HCharacter::make_error_message( void ) const {
+	return ( "expected one of characters: "_ys.append( _characters ) );
 }
 
 HRuleBase::ptr_t HCharacter::do_clone( void ) const {
@@ -3725,7 +3735,8 @@ HString::HString( hcore::HString const& string_, bool skipWS_, WORD_BOUNDARY wor
 	, _dictionary( 1, string_ )
 	, _actionString()
 	, _actionStringPosition()
-	, _wordBoundary( wordBoundary_ ) {
+	, _wordBoundary( wordBoundary_ )
+	, _errorMessage( make_error_message() ) {
 	M_ASSERT( ! string_.is_empty() );
 	return;
 }
@@ -3735,7 +3746,8 @@ HString::HString( HString const& string_, yaal::hcore::HString const& token_ )
 	, _dictionary( string_._dictionary )
 	, _actionString( string_._actionString )
 	, _actionStringPosition( string_._actionStringPosition )
-	, _wordBoundary( string_._wordBoundary ) {
+	, _wordBoundary( string_._wordBoundary )
+	, _errorMessage() {
 	M_ASSERT( ! token_.is_empty() );
 	for ( yaal::hcore::HString const& s : _dictionary ) {
 		if ( token_.find( s ) == 0 ) {
@@ -3743,6 +3755,7 @@ HString::HString( HString const& string_, yaal::hcore::HString const& token_ )
 		}
 	}
 	_dictionary.emplace_back( token_ );
+	_errorMessage = make_error_message();
 	return;
 }
 
@@ -3751,7 +3764,8 @@ HString::HString( hcore::HString const& string_, action_t const& action_, bool s
 	, _dictionary( 1, string_ )
 	, _actionString()
 	, _actionStringPosition()
-	, _wordBoundary( wordBoundary_ ) {
+	, _wordBoundary( wordBoundary_ )
+	, _errorMessage( make_error_message() ) {
 	M_ASSERT( ! string_.is_empty() );
 	return;
 }
@@ -3761,7 +3775,8 @@ HString::HString( hcore::HString const& string_, action_position_t const& action
 	, _dictionary( 1, string_ )
 	, _actionString()
 	, _actionStringPosition()
-	, _wordBoundary( wordBoundary_ ) {
+	, _wordBoundary( wordBoundary_ )
+	, _errorMessage( make_error_message() ) {
 	M_ASSERT( ! string_.is_empty() );
 	return;
 }
@@ -3771,7 +3786,8 @@ HString::HString( hcore::HString const& string_, action_string_t const& action_,
 	, _dictionary( 1, string_ )
 	, _actionString( action_ )
 	, _actionStringPosition()
-	, _wordBoundary( wordBoundary_ ) {
+	, _wordBoundary( wordBoundary_ )
+	, _errorMessage( make_error_message() ) {
 	M_ASSERT( ! string_.is_empty() );
 	return;
 }
@@ -3781,7 +3797,8 @@ HString::HString( hcore::HString const& string_, action_string_position_t const&
 	, _dictionary( 1, string_ )
 	, _actionString()
 	, _actionStringPosition( action_ )
-	, _wordBoundary( wordBoundary_ ) {
+	, _wordBoundary( wordBoundary_ )
+	, _errorMessage( make_error_message() ) {
 	M_ASSERT( ! string_.is_empty() );
 	return;
 }
@@ -3791,7 +3808,8 @@ HString::HString( dictionary_t const& dictionary_, action_t const& action_, bool
 	, _dictionary( dictionary_ )
 	, _actionString()
 	, _actionStringPosition()
-	, _wordBoundary( wordBoundary_ ) {
+	, _wordBoundary( wordBoundary_ )
+	, _errorMessage( make_error_message() ) {
 	M_ASSERT( ! _dictionary.is_empty() );
 	return;
 }
@@ -3801,7 +3819,8 @@ HString::HString( dictionary_t const& dictionary_, action_position_t const& acti
 	, _dictionary( dictionary_ )
 	, _actionString()
 	, _actionStringPosition()
-	, _wordBoundary( wordBoundary_ ) {
+	, _wordBoundary( wordBoundary_ )
+	, _errorMessage( make_error_message() ) {
 	M_ASSERT( ! _dictionary.is_empty() );
 	return;
 }
@@ -3811,7 +3830,8 @@ HString::HString( dictionary_t const& dictionary_, action_string_t const& action
 	, _dictionary( dictionary_ )
 	, _actionString( action_ )
 	, _actionStringPosition()
-	, _wordBoundary( wordBoundary_ ) {
+	, _wordBoundary( wordBoundary_ )
+	, _errorMessage( make_error_message() ) {
 	M_ASSERT( ! _dictionary.is_empty() );
 	return;
 }
@@ -3821,7 +3841,8 @@ HString::HString( dictionary_t const& dictionary_, action_string_position_t cons
 	, _dictionary( dictionary_ )
 	, _actionString()
 	, _actionStringPosition( action_ )
-	, _wordBoundary( wordBoundary_ ) {
+	, _wordBoundary( wordBoundary_ )
+	, _errorMessage( make_error_message() ) {
 	M_ASSERT( ! _dictionary.is_empty() );
 	return;
 }
@@ -3831,7 +3852,8 @@ HString::HString( HString const& string_ )
 	, _dictionary( string_._dictionary )
 	, _actionString( string_._actionString )
 	, _actionStringPosition( string_._actionStringPosition )
-	, _wordBoundary( string_._wordBoundary ) {
+	, _wordBoundary( string_._wordBoundary )
+	, _errorMessage( string_._errorMessage ) {
 	M_ASSERT( ! _dictionary.is_empty() );
 	return;
 }
@@ -3905,11 +3927,15 @@ hcore::HUTF8String::const_iterator HString::do_parse( HExecutingParser* executin
 		scan = first_;
 	}
 	if ( ! matched ) {
-		report_error( executingParser_, scan, "expected string: " + desc() );
+		report_error( executingParser_, scan, _errorMessage );
 		scan = first_;
 	}
 	return ( scan );
 	M_EPILOG
+}
+
+yaal::hcore::HString HString::make_error_message( void ) const {
+	return ( "expected string: "_ys.append( desc() ) );
 }
 
 yaal::hcore::HString HString::desc( void ) const {
