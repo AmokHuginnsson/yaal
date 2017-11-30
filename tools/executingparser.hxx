@@ -184,7 +184,7 @@ public:
 	}
 	bool skips_ws( void ) const;
 	HRuleBase const* find( yaal::hcore::HString const& ) const;
-	static yaal::hcore::HUTF8String::const_iterator skip_space( yaal::hcore::HUTF8String::const_iterator, yaal::hcore::HUTF8String::const_iterator const& );
+	static yaal::hcore::HUTF8String::const_iterator& skip_space( yaal::hcore::HUTF8String::const_iterator&, yaal::hcore::HUTF8String::const_iterator const& );
 protected:
 	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator const&, yaal::hcore::HUTF8String::const_iterator const& ) const = 0;
 	virtual ptr_t do_clone( void ) const = 0;

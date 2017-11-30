@@ -119,8 +119,7 @@ inline bool is_identifer_tail( code_point_t const& codePoint_ ) {
 
 hcore::HUTF8String::const_iterator HIdentifierParser::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const {
 	M_PROLOG
-	yaal::hcore::HUTF8String::const_iterator start( _skipWS ? skip_space( first_, last_ ) : first_ );
-	yaal::hcore::HUTF8String::const_iterator scan( start );
+	yaal::hcore::HUTF8String::const_iterator scan( first_ );
 	bool matched( false );
 	if ( scan != last_ ) {
 		if ( is_identifer_head( *scan ) ) {
@@ -129,10 +128,10 @@ hcore::HUTF8String::const_iterator HIdentifierParser::do_parse( HExecutingParser
 				++ scan;
 			}
 		}
-		if ( scan != start ) {
-			executing_parser::position_t pos( position( executingParser_, start ) );
+		if ( scan != first_ ) {
+			executing_parser::position_t pos( position( executingParser_, first_ ) );
 			if ( !! _actionStringPosition ) {
-				add_execution_step( executingParser_, start, call( _actionStringPosition, hcore::HUTF8String( start, scan ), pos ) );
+				add_execution_step( executingParser_, first_, call( _actionStringPosition, hcore::HUTF8String( first_, scan ), pos ) );
 			}
 			matched = true;
 		}
