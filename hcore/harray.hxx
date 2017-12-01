@@ -363,22 +363,43 @@ public:
 	}
 	/*! \brief Access element at given position in this array.
 	 *
+	 * Element is retrieved without bounds checking.
+	 *
 	 * \param index_ - index of requested element in this array.
 	 * \return Reference to element at requested index.
 	 */
 	type_t& operator[] ( int long index_ ) {
 		M_PROLOG
-		int long idx = ( index_ < 0 ) ? index_ + _size : index_;
-		if ( ( idx >= _size ) || ( idx < 0 ) )
-			M_THROW( _errMsgHArray_[ ERROR::BAD_INDEX ], idx );
-		return ( _buf[ idx ] );
+		return ( _buf[ index_ ] );
 		M_EPILOG
 	}
 	type_t const& operator[] ( int long index_ ) const {
 		M_PROLOG
+		return ( _buf[ index_ ] );
+		M_EPILOG
+	}
+	/*! \brief Access element at given position in this array.
+	 *
+	 * Element is retrieved with bounds checking.
+	 *
+	 * \param index_ - index of requested element in this array.
+	 * \return Reference to element at requested index.
+	 */
+	type_t& at( int long index_ ) {
+		M_PROLOG
+		int long idx = ( index_ < 0 ) ? index_ + _size : index_;
+		if ( ( idx >= _size ) || ( idx < 0 ) ) {
+			throw HOutOfRangeException( yaal::hcore::to_string( _errMsgHArray_[ ERROR::BAD_INDEX ] ).append( idx ) );
+		}
+		return ( _buf[ idx ] );
+		M_EPILOG
+	}
+	type_t const& at( int long index_ ) const {
+		M_PROLOG
 		int long idx( ( index_ < 0 ) ? index_ + _size : index_ );
-		if ( ( idx >= _size ) || ( idx < 0 ) )
-			M_THROW( _errMsgHArray_[ ERROR::BAD_INDEX ], idx );
+		if ( ( idx >= _size ) || ( idx < 0 ) ) {
+			throw HOutOfRangeException( yaal::hcore::to_string( _errMsgHArray_[ ERROR::BAD_INDEX ] ).append( idx ) );
+		}
 		return ( _buf[ idx ] );
 		M_EPILOG
 	}

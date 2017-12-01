@@ -278,20 +278,40 @@ public:
 
 	/*! \brief Access element at given position in this deque.
 	 *
+	 * Element is retrieved without bounds checking.
+	 *
 	 * \param index_ - index of requested element in this deque.
 	 * \return Reference to element at requested index.
 	 */
 	type_t const& operator[] ( int long index_ ) const {
-		int long idx = ( index_ < 0 ) ? index_ + _size : index_;
-		if ( ( idx >= _size ) || ( idx < 0 ) )
-			M_THROW( _errMsgHDeque_[ ERROR::BAD_INDEX ], idx );
-		int long itemIndex( _start + idx );
+		int long itemIndex( _start + index_ );
 		return ( _chunks.get<value_type const*>()[ itemIndex / VALUES_PER_CHUNK][ itemIndex % VALUES_PER_CHUNK ] );
 	}
 	type_t& operator[] ( int long index_ ) {
+		int long itemIndex( _start + index_ );
+		return ( _chunks.get<value_type*>()[ itemIndex / VALUES_PER_CHUNK][ itemIndex % VALUES_PER_CHUNK ] );
+	}
+
+	/*! \brief Access element at given position in this deque.
+	 *
+	 * Element is retrieved with bounds checking.
+	 *
+	 * \param index_ - index of requested element in this deque.
+	 * \return Reference to element at requested index.
+	 */
+	type_t const& at( int long index_ ) const {
 		int long idx = ( index_ < 0 ) ? index_ + _size : index_;
-		if ( ( idx >= _size ) || ( idx < 0 ) )
-			M_THROW( _errMsgHDeque_[ ERROR::BAD_INDEX ], idx );
+		if ( ( idx >= _size ) || ( idx < 0 ) ) {
+			throw HOutOfRangeException( yaal::hcore::to_string( _errMsgHDeque_[ ERROR::BAD_INDEX ] ).append( idx ) );
+		}
+		int long itemIndex( _start + idx );
+		return ( _chunks.get<value_type const*>()[ itemIndex / VALUES_PER_CHUNK][ itemIndex % VALUES_PER_CHUNK ] );
+	}
+	type_t& at( int long index_ ) {
+		int long idx = ( index_ < 0 ) ? index_ + _size : index_;
+		if ( ( idx >= _size ) || ( idx < 0 ) ) {
+			throw HOutOfRangeException( yaal::hcore::to_string( _errMsgHDeque_[ ERROR::BAD_INDEX ] ).append( idx ) );
+		}
 		int long itemIndex( _start + idx );
 		return ( _chunks.get<value_type*>()[ itemIndex / VALUES_PER_CHUNK][ itemIndex % VALUES_PER_CHUNK ] );
 	}
