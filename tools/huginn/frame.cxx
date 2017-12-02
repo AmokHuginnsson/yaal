@@ -150,13 +150,6 @@ void HFrame::reset( void ) {
 	M_EPILOG
 }
 
-void HFrame::add_variable( HHuginn::value_t const& value_ ) {
-	M_PROLOG
-	_variables.push_back( value_ );
-	return;
-	M_EPILOG
-}
-
 void HFrame::note_variable( HHuginn::identifier_id_t identifier_ ) {
 	M_PROLOG
 	_variableIdentifiers.push_back( identifier_ );
