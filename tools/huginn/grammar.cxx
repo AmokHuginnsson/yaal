@@ -31,14 +31,55 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "runtime.hxx"
 #include "keyword.hxx"
 #include "compiler.hxx"
+#include "tools/util.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
+using namespace yaal::tools::util;
 using namespace yaal::tools::huginn;
 
 namespace yaal {
 
 namespace tools {
+
+namespace {
+
+typedef yaal::hcore::HArray<bool> flags_t;
+static int const CODE_POINT_CUT_OFF( 0x10000 );
+
+flags_t make_heads( void ) {
+	flags_t heads;
+	heads.reserve( CODE_POINT_CUT_OFF );
+	for ( int i( 0 ); i < CODE_POINT_CUT_OFF; ++ i ) {
+		heads.push_back(
+			( ( i >= 'a' ) && ( i <= 'z' ) )
+			|| ( ( i >= 'A' ) && ( i <= 'Z' ) )
+			|| ( ( i >= 0x391 ) && ( i <= 0x3c9 ) )
+			|| ( i == '_' )
+		);
+	}
+	return ( heads );
+}
+
+flags_t make_tails( void ) {
+	flags_t tails;
+	tails.reserve( CODE_POINT_CUT_OFF );
+	for ( int i( 0 ); i < CODE_POINT_CUT_OFF; ++ i ) {
+		tails.push_back(
+			( ( i >= 'a' ) && ( i <= 'z' ) )
+			|| ( ( i >= 'A' ) && ( i <= 'Z' ) )
+			|| ( ( i >= '0' ) && ( i <= '9' ) )
+			|| ( ( i >= 0x391 ) && ( i <= 0x3c9 ) )
+			|| ( i == '_' )
+		);
+	}
+	return ( tails );
+}
+
+static flags_t const _heads_( make_heads() );
+static flags_t const _tails_( make_tails() );
+
+}
 
 class HIdentifierParser : public executing_parser::HRuleBase {
 public:
@@ -48,11 +89,13 @@ public:
 private:
 	yaal::hcore::HString _name;
 	action_string_position_t _actionStringPosition;
+	yaal::hcore::HString _errorMessage;
 public:
 	HIdentifierParser( HIdentifierParser const& identifier_ )
 		: HRuleBase( identifier_._action, identifier_._actionPosition, identifier_._skipWS )
 		, _name( identifier_._name )
-		, _actionStringPosition( identifier_._actionStringPosition ) {
+		, _actionStringPosition( identifier_._actionStringPosition )
+		, _errorMessage( identifier_._errorMessage ) {
 		return;
 	}
 	virtual ~HIdentifierParser( void ) {
@@ -90,7 +133,8 @@ private:
 	HIdentifierParser( yaal::hcore::HString const& name_, action_string_position_t const& action_ )
 		: HRuleBase( true )
 		, _name( name_ )
-		, _actionStringPosition( action_ ) {
+		, _actionStringPosition( action_ )
+		, _errorMessage( "expected "_ys.append( article( _name ) ).append( " " ).append( _name ) ) {
 		return;
 	}
 	HIdentifierParser& operator = ( HIdentifierParser const& ) = delete;
@@ -99,22 +143,11 @@ private:
 };
 
 inline bool is_identifer_head( code_point_t const& codePoint_ ) {
-	return (
-		( ( codePoint_ >= 'a' ) && ( codePoint_ <= 'z' ) )
-		|| ( ( codePoint_ >= 'A' ) && ( codePoint_ <= 'Z' ) )
-		|| ( ( codePoint_ >= 0x391 ) && ( codePoint_ <= 0x3c9 ) )
-		|| ( codePoint_ == '_' )
-	);
+	return ( ( codePoint_ < CODE_POINT_CUT_OFF ) && _heads_[codePoint_.get()] );
 }
 
 inline bool is_identifer_tail( code_point_t const& codePoint_ ) {
-	return (
-		( ( codePoint_ >= 'a' ) && ( codePoint_ <= 'z' ) )
-		|| ( ( codePoint_ >= 'A' ) && ( codePoint_ <= 'Z' ) )
-		|| ( ( codePoint_ >= '0' ) && ( codePoint_ <= '9' ) )
-		|| ( ( codePoint_ >= 0x391 ) && ( codePoint_ <= 0x3c9 ) )
-		|| ( codePoint_ == '_' )
-	);
+	return ( ( codePoint_ < CODE_POINT_CUT_OFF ) && _tails_[codePoint_.get()] );
 }
 
 hcore::HUTF8String::const_iterator HIdentifierParser::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const {
@@ -139,7 +172,7 @@ hcore::HUTF8String::const_iterator HIdentifierParser::do_parse( HExecutingParser
 		scan = first_;
 	}
 	if ( ! matched ) {
-		report_error( executingParser_, scan, "expected an identifier" );
+		report_error( executingParser_, scan, _errorMessage );
 		scan = first_;
 	}
 	return ( scan );
