@@ -1534,7 +1534,10 @@ void OCompiler::defer_str_oper( yaal::hcore::HString const& operator_, executing
 		{ op_to_str( OPERATOR::BOOLEAN_OR ),       OPERATOR::BOOLEAN_OR },
 		{ op_to_str( OPERATOR::BOOLEAN_XOR ),      OPERATOR::BOOLEAN_XOR },
 		{ op_to_str( OPERATOR::LESS ),             OPERATOR::LESS },
-		{ op_to_str( OPERATOR::GREATER ),          OPERATOR::GREATER }
+		{ op_to_str( OPERATOR::GREATER ),          OPERATOR::GREATER },
+		{ op_to_symbol_str( OPERATOR::BOOLEAN_AND ), OPERATOR::BOOLEAN_AND },
+		{ op_to_symbol_str( OPERATOR::BOOLEAN_OR ),  OPERATOR::BOOLEAN_OR },
+		{ op_to_symbol_str( OPERATOR::BOOLEAN_XOR ), OPERATOR::BOOLEAN_XOR }
 	} );
 	OPERATOR o( operatorLookup.at( operator_ ) );
 	current_expression()->oper( o, position_.get() );

@@ -448,8 +448,10 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	HRule booleanAnd(
 		"booleanAnd",
 		equality[e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::start_subexpression, _compiler.get(), _1 ) )] >> *(
-			/* compare action */ (
-				constant( "&&", e_p::HString::action_position_t( hcore::call( &OCompiler::add_subexpression, _compiler.get(), OPERATOR::BOOLEAN_AND, _1 ) ) )
+			/* boolean action */ (
+				/* boolean operator */ (
+					constant( "&&" ) | "⋀"
+				)[e_p::HString::action_position_t( hcore::call( &OCompiler::add_subexpression, _compiler.get(), OPERATOR::BOOLEAN_AND, _1 ) )]
 				>> equality
 			)[HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::BOOLEAN_AND, _1 ) )]
 		),
@@ -458,8 +460,10 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	HRule booleanOr(
 		"booleanOr",
 		HRule( booleanAnd, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::start_subexpression, _compiler.get(), _1 ) ) ) >> *(
-			/* compare action */ (
-				constant( "||", e_p::HString::action_position_t( hcore::call( &OCompiler::add_subexpression, _compiler.get(), OPERATOR::BOOLEAN_OR, _1 ) ) )
+			/* boolean action */ (
+				/* boolean operator */ (
+					constant( "||" ) | "⋁"
+				)[e_p::HString::action_position_t( hcore::call( &OCompiler::add_subexpression, _compiler.get(), OPERATOR::BOOLEAN_OR, _1 ) )]
 				>> booleanAnd
 			)[HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::BOOLEAN_OR, _1 ) )]
 		),
@@ -468,8 +472,10 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	HRule booleanXor(
 		"booleanXor",
 		booleanOr >> -(
-			/* compare action */ (
-				constant( "^^", e_p::HString::action_string_position_t( hcore::call( &OCompiler::defer_str_oper, _compiler.get(), _1, _2 ) ) )
+			/* boolean action */ (
+				/* boolean operator */ (
+					constant( "^^" ) | "⊕"
+				)[e_p::HString::action_string_position_t( hcore::call( &OCompiler::defer_str_oper, _compiler.get(), _1, _2 ) )]
 				>> booleanOr
 			)[HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::BOOLEAN_XOR, _1 ) )]
 		)

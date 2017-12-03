@@ -96,6 +96,7 @@ struct OPositionedOperator {
 typedef yaal::hcore::HStack<OPositionedOperator> operations_t;
 
 char const* op_to_str( OPERATOR );
+char const* op_to_symbol_str( OPERATOR );
 
 }
 
