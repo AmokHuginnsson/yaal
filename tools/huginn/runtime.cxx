@@ -146,7 +146,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 void HRuntime::reset( void ) {
 	M_PROLOG
 	_result.reset();
-	_argv->clear();
+	static_cast<HHuginn::HList*>( _argv.raw() )->clear();
 	_threads.clear();
 	_idGenerator = static_cast<type_id_t::value_type>( HHuginn::TYPE::NOT_BOOLEAN );
 	return;
@@ -375,7 +375,8 @@ void HRuntime::execute( void ) {
 	util::HScopeExitCall sec( hcore::call( &threads_t::clear, &_threads ) );
 	values_t args;
 	args.reserve( max_local_variable_count() );
-	if ( _argv->size( nullptr, 0 ) > 0 ) {
+	HHuginn::HList& argv( *static_cast<HHuginn::HList*>( _argv.raw() ) );
+	if ( argv.size( nullptr, 0 ) > 0 ) {
 		args.push_back( _argv );
 	}
 	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
@@ -477,14 +478,16 @@ HHuginn::value_t HRuntime::call( identifier_id_t identifier_, values_t& values_,
 
 void HRuntime::add_argument( yaal::hcore::HString const& arg_ ) {
 	M_PROLOG
-	_argv->push_back( _objectFactory->create_string( arg_ ) );
+	HHuginn::HList& argv( *static_cast<HHuginn::HList*>( _argv.raw() ) );
+	argv.push_back( _objectFactory->create_string( arg_ ) );
 	return;
 	M_EPILOG
 }
 
 void HRuntime::clear_arguments( void ) {
 	M_PROLOG
-	_argv->clear();
+	HHuginn::HList& argv( *static_cast<HHuginn::HList*>( _argv.raw() ) );
+	argv.clear();
 	return;
 	M_EPILOG
 }

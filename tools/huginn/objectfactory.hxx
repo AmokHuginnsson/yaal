@@ -97,7 +97,7 @@ public:
 	}
 	template<typename... arg_t>
 	HHuginn::value_t create( arg_t&&... arg_ ) const {
-		return ( yaal::hcore::allocate_pointer<allocator_t, T>( this->_allocator, _class, yaal::forward<arg_t>( arg_ )... ) );
+		return ( huginn::allocate_value<allocator_t, T>( this->_allocator, _class, yaal::forward<arg_t>( arg_ )... ) );
 	}
 private:
 	HObjectPool( HObjectPool const& ) = delete;
@@ -123,7 +123,7 @@ public:
 	}
 	template<typename... arg_t>
 	HHuginn::value_t create( arg_t&&... arg_ ) const {
-		return ( yaal::hcore::allocate_pointer<allocator_t, T>( this->_allocator, _class, _nodeAllocator, yaal::forward<arg_t>( arg_ )... ) );
+		return ( huginn::allocate_value<allocator_t, T>( this->_allocator, _class, _nodeAllocator, yaal::forward<arg_t>( arg_ )... ) );
 	}
 private:
 	HObjectPool( HObjectPool const& ) = delete;
@@ -143,7 +143,7 @@ public:
 	}
 	template<typename... arg_t>
 	HHuginn::value_t create( arg_t&&... arg_ ) const {
-		return ( yaal::hcore::allocate_pointer<allocator_t, T>( this->_allocator, yaal::forward<arg_t>( arg_ )... ) );
+		return ( huginn::allocate_value<allocator_t, T>( this->_allocator, yaal::forward<arg_t>( arg_ )... ) );
 	}
 };
 
@@ -273,7 +273,7 @@ public:
 		}
 		pool_holder_t& pool( it->second );
 		allocator_t allocator( static_cast<pool_t*>( pool.get() )->get() );
-		return ( yaal::hcore::allocate_pointer<allocator_t, T>( allocator, yaal::forward<args_t>( args_ )... ) );
+		return ( huginn::allocate_value<allocator_t, T>( allocator, yaal::forward<args_t>( args_ )... ) );
 	}
 private:
 	HObjectFactory( HObjectFactory const& ) = delete;

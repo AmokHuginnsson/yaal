@@ -259,7 +259,7 @@ HHuginn::value_t HHuginn::HObjectReference::field( huginn::HThread* thread_, int
 
 HHuginn::value_t HHuginn::HObjectReference::do_clone( huginn::HThread* thread_, int position_ ) const {
 	M_PROLOG
-	return ( make_pointer<HObjectReference>( _object->clone( thread_, position_ ), _class ) );
+	return ( thread_->object_factory().create<HObjectReference>( _object->clone( thread_, position_ ), _class ) );
 	M_EPILOG
 }
 
@@ -435,7 +435,7 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 			} else {
 				OCompiler::OClassContext::methods_t::const_iterator m( cc->_methods.find( i ) );
 				M_ASSERT( m != cc->_methods.end() );
-				fieldDefinitions.emplace_back( cc->_fieldNames[i], make_pointer<HClass::HMethod>( m->second ), cc->_docs.at( i ) );
+				fieldDefinitions.emplace_back( cc->_fieldNames[i], _runtime->object_factory()->create<HClass::HMethod>( m->second ), cc->_docs.at( i ) );
 			}
 		}
 		t.pop_frame();
@@ -802,8 +802,8 @@ HHuginn::value_t HHuginn::HObserver::value( void ) const {
 	return ( _value );
 }
 
-HHuginn::value_t HHuginn::HObserver::do_clone( huginn::HThread*, int ) const {
-	return ( make_pointer<HObserver>( _value ) );
+HHuginn::value_t HHuginn::HObserver::do_clone( huginn::HThread* thread_, int ) const {
+	return ( thread_->object_factory().create<HObserver>( _value ) );
 }
 
 HHuginn::HReference::HReference( HHuginn::value_t& value_ )
@@ -908,8 +908,8 @@ HHuginn::function_t const& HHuginn::HClass::HMethod::function( void ) const {
 	return ( _function );
 }
 
-HHuginn::value_t HHuginn::HClass::HMethod::do_clone( huginn::HThread*, int ) const {
-	return ( make_pointer<HMethod>( _function ) );
+HHuginn::value_t HHuginn::HClass::HMethod::do_clone( huginn::HThread* thread_, int ) const {
+	return ( thread_->object_factory().create<HMethod>( _function ) );
 }
 
 HHuginn::HClass::HBoundMethod::HBoundMethod( HHuginn::function_t const& method_, HHuginn::value_t const& object_ )

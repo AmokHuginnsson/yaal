@@ -143,11 +143,11 @@ private:
 };
 
 inline bool is_identifer_head( code_point_t const& codePoint_ ) {
-	return ( ( codePoint_ < CODE_POINT_CUT_OFF ) && _heads_[codePoint_.get()] );
+	return ( ( codePoint_ < CODE_POINT_CUT_OFF ) && _heads_[static_cast<int>( codePoint_.get() )] );
 }
 
 inline bool is_identifer_tail( code_point_t const& codePoint_ ) {
-	return ( ( codePoint_ < CODE_POINT_CUT_OFF ) && _tails_[codePoint_.get()] );
+	return ( ( codePoint_ < CODE_POINT_CUT_OFF ) && _tails_[static_cast<int>( codePoint_.get() )] );
 }
 
 hcore::HUTF8String::const_iterator HIdentifierParser::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const {

@@ -40,6 +40,7 @@ Copyright:
 #include "hcore/hthread.hxx"
 #include "hcore/htaggedpod.hxx"
 #include "tools/executingparser.hxx"
+#include "tools/huginn/valuereference.hxx"
 
 namespace yaal {
 
@@ -113,8 +114,8 @@ public:
 	class HFunctionReference;
 	class HValue;
 	class HTaggedValue;
-	typedef yaal::hcore::HPointer<HValue> value_t;
-	typedef yaal::hcore::HPointerObserver<HValue> value_ref_t;
+	typedef yaal::tools::huginn::HValueReference<HValue> value_t;
+	typedef yaal::tools::huginn::HValueReferenceObserver<HValue> value_ref_t;
 	class HBoolean;
 	class HInteger;
 	class HReal;
@@ -124,7 +125,6 @@ public:
 	class HTuple;
 	class HList;
 	class HDeque;
-	typedef yaal::hcore::HPointer<HList> list_t;
 	class HDict;
 	class HOrder;
 	class HLookup;
@@ -639,7 +639,7 @@ class HHuginn::HObserver : public HHuginn::HValue {
 public:
 	typedef HHuginn::HObserver this_type;
 	typedef HHuginn::HValue base_type;
-	typedef yaal::hcore::HPointerObserver<HHuginn::HValue> value_type;
+	typedef HHuginn::value_ref_t value_type;
 private:
 	value_type _value;
 public:

@@ -108,7 +108,7 @@ private:
 	dependencies_t _dependencies;
 	classes_t _classes;
 	packages_t _packages;
-	HHuginn::list_t _argv;
+	HHuginn::value_t _argv;
 	value_t _result;
 	huginn::HThread::frame_t _incrementalFrame;
 	int _maxLocalVariableCount;
