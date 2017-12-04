@@ -33,11 +33,18 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "ansi.hxx"
 #include "hterminal.hxx"
 
+using namespace yaal;
+using namespace yaal::hcore;
 using namespace yaal::tools;
 
 namespace yaal {
 
 namespace ansi {
+
+namespace {
+static char const* TERM( getenv( "TERM" ) );
+static bool const has256colors( TERM ? ( to_string( TERM ).find( "256" ) != HString::npos ) : false );
+}
 
 HSequence const reset( "\033[0m" );
 HSequence const bold( "\033[1m" );
@@ -54,14 +61,14 @@ HSequence const magenta( "\033[22;35m" );
 HSequence const cyan( "\033[22;36m" );
 HSequence const lightgray( "\033[22;37m" );
 
-HSequence const gray( "\033[1;30m" );
-HSequence const brightred( "\033[1;31m" );
-HSequence const brightgreen( "\033[1;32m" );
-HSequence const yellow( "\033[1;33m" );
-HSequence const brightblue( "\033[1;34m" );
-HSequence const brightmagenta( "\033[1;35m" );
-HSequence const brightcyan( "\033[1;36m" );
-HSequence const white( "\033[1;37m" );
+HSequence const gray( has256colors ? "\033[1;90m" : "\033[1;30m" );
+HSequence const brightred( has256colors ? "\033[1;91m" : "\033[1;31m" );
+HSequence const brightgreen( has256colors ? "\033[1;92m" : "\033[1;32m" );
+HSequence const yellow( has256colors ? "\033[1;93m" : "\033[1;33m" );
+HSequence const brightblue( has256colors ? "\033[1;94m" : "\033[1;34m" );
+HSequence const brightmagenta( has256colors ? "\033[1;95m" : "\033[1;35m" );
+HSequence const brightcyan( has256colors ? "\033[1;96m" : "\033[1;36m" );
+HSequence const white( has256colors ? "\033[1;97m" : "\033[1;37m" );
 
 HSequence const bgblack( "\033[40m" );
 HSequence const bgred( "\033[41m" );
