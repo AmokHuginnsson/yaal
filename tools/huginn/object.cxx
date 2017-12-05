@@ -91,7 +91,7 @@ HHuginn::HObject::~HObject( void ) {
 	if ( t && ! t->has_runtime_exception() ) {
 		hobject_destructor_helper::buffer_t buffer;
 		hobject_destructor_helper::allocator<hobject_destructor_helper::holder_t> allocator( buffer.mem() );
-		HHuginn::value_t nonOwning( this, &hobject_destructor_helper::deleter, allocator );
+		HHuginn::value_t nonOwning( static_cast<HHuginn::HValue*>( this ), &hobject_destructor_helper::deleter, allocator );
 		int destructorIdx( clss->field_index( KEYWORD::DESTRUCTOR_IDENTIFIER ) );
 		HClass const* c( clss->super() );
 		if ( destructorIdx >= 0 ) {
