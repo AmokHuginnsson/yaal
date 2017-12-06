@@ -231,6 +231,7 @@ void HExpression::get_field( HFrame::ACCESS access_, HHuginn::identifier_id_t id
 	frame_->values().pop();
 	HThread* t( frame_->thread() );
 	HRuntime& rt( t->runtime() );
+	HHuginn::HObjectReference* oref( nullptr );
 	if ( v->get_class()->is_complex() ) {
 		int fi( v->field_index( identifierId_ ) );
 		if ( fi < 0 ) {
@@ -258,31 +259,36 @@ void HExpression::get_field( HFrame::ACCESS access_, HHuginn::identifier_id_t id
 		} else {
 			throw HHuginn::HHuginnRuntimeException( "Assignment to temporary.", file_id(), p );
 		}
-	} else {
-		HHuginn::HObjectReference* oref( dynamic_cast<HHuginn::HObjectReference*>( v.raw() ) );
-		if ( oref != nullptr ) { /* Handle `super' keyword. */
-			int fi( oref->field_index( identifierId_ ) );
-			if ( fi < 0 ) {
-				throw HHuginn::HHuginnRuntimeException(
-					"`"_ys
-					.append( oref->get_class()->name() )
-					.append( "' does not have `" )
-					.append( rt.identifier_name( identifierId_ ) )
-					.append( "' member (did you mean `" )
-					.append( rt.suggestion( identifierId_ ) )
-					.append( "'?)." ),
-					file_id(),
-					p
-				);
-			}
-			if ( access_ == HFrame::ACCESS::VALUE ) {
-				frame_->values().push( oref->field( t, fi, p ) );
-			} else {
-				throw HHuginn::HHuginnRuntimeException( "Changing upcasted reference.", file_id(), p );
-			}
-		} else {
-			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( v->get_class()->name() ).append( "' is not a compound object." ), file_id(), p );
+	} else if ( ( oref = dynamic_cast<HHuginn::HObjectReference*>( v.raw() ) ) != nullptr ) { /* Handle `super' keyword. */
+		int fi( oref->field_index( identifierId_ ) );
+		if ( fi < 0 ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"`"_ys
+				.append( oref->get_class()->name() )
+				.append( "' does not have `" )
+				.append( rt.identifier_name( identifierId_ ) )
+				.append( "' member (did you mean `" )
+				.append( rt.suggestion( identifierId_ ) )
+				.append( "'?)." ),
+				file_id(),
+				p
+			);
 		}
+		if ( access_ == HFrame::ACCESS::VALUE ) {
+			frame_->values().push( oref->field( t, fi, p ) );
+		} else {
+			throw HHuginn::HHuginnRuntimeException( "Changing upcasted reference.", file_id(), p );
+		}
+	} else {
+		HString const* n( &v->get_class()->name() );
+		if ( v->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) {
+			HHuginn::HFunctionReference* fr( static_cast<HHuginn::HFunctionReference*>( v.raw() ) );
+			HHuginn::class_t c( rt.get_class( fr->identifier_id() ) );
+			if ( !!c ) {
+				n = &c->name();
+			}
+		}
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( *n ).append( "' is not a compound object." ), file_id(), p );
 	}
 	return;
 	M_EPILOG
