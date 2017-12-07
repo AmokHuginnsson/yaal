@@ -153,7 +153,7 @@ HHuginn::value_t HFunction::execute_impl(
 					"In call to `"_ys
 						.append( thread_->runtime().identifier_name( _name ) )
 						.append( "()`, a non-string name in named parameter." ),
-					f->file_id(),
+					f->parent() ? f->parent()->file_id() : f->file_id(),
 					position_
 				);
 			}
@@ -169,7 +169,7 @@ HHuginn::value_t HFunction::execute_impl(
 							.append( "()`, positional argument `" )
 							.append( keywordName )
 							.append( "` was already set." ),
-						f->file_id(),
+						f->parent() ? f->parent()->file_id() : f->file_id(),
 						position_
 					);
 				}
@@ -213,7 +213,7 @@ HHuginn::value_t HFunction::execute_impl(
 			"Call to `"_ys
 				.append( thread_->runtime().identifier_name( _name ) )
 				.append( "()` got unexpected keyword arguments." ),
-			f->file_id(),
+			f->parent() ? f->parent()->file_id() : f->file_id(),
 			position_
 		);
 	}
@@ -239,7 +239,7 @@ HHuginn::value_t HFunction::execute_impl(
 			.append( "()`, missing required positional argument" )
 			.append( missing.get_size() > 1 ? "s: " : ": " )
 			.append( missingList ).append( "." );
-		throw HHuginn::HHuginnRuntimeException( msg, f->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( msg, f->parent() ? f->parent()->file_id() : f->file_id(), position_ );
 	} else if ( positionalArgumentsCount > _parameterCount ) {
 		if ( _defaultParametersStart != _parameterCount ) {
 			throw HHuginn::HHuginnRuntimeException(
@@ -252,7 +252,7 @@ HHuginn::value_t HFunction::execute_impl(
 					.append( " positional arguments, but " )
 					.append( positionalArgumentsCount )
 					.append( " were given." ),
-				f->file_id(),
+				f->parent() ? f->parent()->file_id() : f->file_id(),
 				position_
 			);
 		} else {
@@ -266,7 +266,7 @@ HHuginn::value_t HFunction::execute_impl(
 					.append(", but " )
 					.append( positionalArgumentsCount )
 					.append( " were given." ),
-				f->file_id(),
+				f->parent() ? f->parent()->file_id() : f->file_id(),
 				position_
 			);
 		}
