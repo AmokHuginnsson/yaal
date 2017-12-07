@@ -50,6 +50,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hsocket.hxx"
 #include "pod.hxx"
 #include "system.hxx"
+#include "hregex.hxx"
 #include "commit_id.hxx"
 
 namespace yaal {
@@ -140,6 +141,33 @@ void decode_set_env( HString line ) {
 	HString val = line.mid( valPos );
 	line.set_at( eon, 0_ycp );
 	set_env( line, val );
+	return;
+	M_EPILOG
+}
+
+void substitute_environment( HString& string_, ENV_SUBST_MODE mode_ ) {
+	M_PROLOG
+	bool envVarRefFound( false );
+	do {
+		envVarRefFound = false;
+		if ( ! string_.is_empty() ) {
+			HRegex pattern( "[$][{][^{}]+[}]" );
+			HString substituted(
+				pattern.replace(
+					string_,
+					HRegex::replacer_t(
+						[]( yaal::hcore::HString const& match_ ) {
+							HUTF8String utf8( match_.substr( 2, match_.get_length() - 3 ) );
+							char const* envVal = ::getenv( utf8.c_str() );
+							return ( envVal ? envVal : "" );
+						}
+					)
+				)
+			);
+			envVarRefFound = ( substituted != string_ );
+			string_.assign( substituted	);
+		}
+	} while ( ( mode_ == ENV_SUBST_MODE::RECURSIVE ) && envVarRefFound );
 	return;
 	M_EPILOG
 }

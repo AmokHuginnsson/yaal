@@ -39,7 +39,6 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hstring.hxx"
 #include "hformat.hxx"
 #include "hchunk.hxx"
-#include "hregex.hxx"
 #include "hlog.hxx"
 #include "hcore.hxx"
 
@@ -147,25 +146,6 @@ int rc_open( HString const& rcPath_, HFile& file_ ) {
 	}
 	log << message;
 	return ( error );
-	M_EPILOG
-}
-
-bool substitute_environment( HString& string_ ) {
-	M_PROLOG
-	bool envVarRefFound = false;
-	if ( ! string_.is_empty() ) {
-		HRegex pattern( "[$][{][^{}]+[}]" );
-		HRegex::HMatchIterator it = pattern.find( string_ );
-		if ( it != pattern.end() ) {
-			HString var = string_.mid( it->start(), it->size() );
-			HString name = var.mid( 2, it->size() - 3 );
-			HUTF8String utf8( name );
-			char const* start = ::getenv( utf8.c_str() );
-			string_.replace( var, start ? start : "" );
-			envVarRefFound = true;
-		}
-	}
-	return ( envVarRefFound );
 	M_EPILOG
 }
 
@@ -709,9 +689,7 @@ int read_rc_line( HString& option_, HString& value_, HFile& file_,
 void HProgramOptionsHandler::set_option( HOption& option_, HString const& value_ ) {
 	M_PROLOG
 	HString value( value_ );
-	while ( substitute_environment( value ) ) {
-		/* empty loop */
-	}
+	substitute_environment( value, ENV_SUBST_MODE::RECURSIVE );
 	if ( _debugLevel_ >= DEBUG_LEVEL::DEBUG_MESSAGES ) {
 		HString name;
 		if ( ! option_.long_form().is_empty() ) {

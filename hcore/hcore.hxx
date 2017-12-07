@@ -47,6 +47,11 @@ bool eq( double long, double long );
 void set_env( HString const&, HString const&, bool = true );
 void unset_env( HString const& );
 void decode_set_env( HString );
+enum class ENV_SUBST_MODE {
+	RECURSIVE,
+	ONE_LAYER
+};
+void substitute_environment( HString&, ENV_SUBST_MODE );
 void init_locale( char const* = nullptr );
 void banner( char const* = nullptr, char const* = nullptr );
 double long strtold( HString const&, int* = nullptr );
