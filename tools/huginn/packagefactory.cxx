@@ -32,6 +32,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 #include "objectfactory.hxx"
 #include "compiler.hxx"
 #include "source.hxx"
+#include "hcore/hcore.hxx"
 #include "hcore/hfile.hxx"
 #include "tools/filesystem.hxx"
 #include "tools/hplugin.hxx"
@@ -132,6 +133,7 @@ HHuginn::value_t HPackageFactory::load_binary( HRuntime* runtime_, HHuginn::path
 		HString test;
 		for ( HString const& p : paths_ ) {
 			test.assign( p ).append( "/" ).append( pluginName );
+			substitute_environment( test, ENV_SUBST_MODE::RECURSIVE );
 			try {
 				plugin->load( test );
 				break;
@@ -162,6 +164,7 @@ HHuginn::value_t HPackageFactory::load_module( HRuntime* runtime_, HHuginn::path
 	HString test;
 	for ( HString const& p : paths_ ) {
 		test.assign( p ).append( "/" ).append( name_ ).append( ".hgn" );
+		substitute_environment( test, ENV_SUBST_MODE::RECURSIVE );
 		try {
 			if ( ! p.is_empty() && filesystem::is_regular_file( test ) ) {
 				path = test;
