@@ -34,7 +34,6 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "helper.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
-#include "objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -208,7 +207,7 @@ HHuginn::value_t HStackFrameInfo::column( huginn::HThread* thread_, HHuginn::val
 	M_EPILOG
 }
 
-HHuginn::	value_t HStackFrameInfo::context( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+HHuginn::value_t HStackFrameInfo::context( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "context", values_, 0, 0, thread_, position_ );
 	HStackFrameInfo* sfi( static_cast<HStackFrameInfo*>( object_->raw() ) );
@@ -216,7 +215,7 @@ HHuginn::	value_t HStackFrameInfo::context( huginn::HThread* thread_, HHuginn::v
 	M_EPILOG
 }
 
-HHuginn::	value_t HStackFrameInfo::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+HHuginn::value_t HStackFrameInfo::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "to_string", values_, 0, 0, thread_, position_ );
 	HStackFrameInfo* sfi( static_cast<HStackFrameInfo*>( object_->raw() ) );
