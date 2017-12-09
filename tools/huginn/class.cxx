@@ -91,18 +91,25 @@ void HHuginn::HClass::redefine( HClass const* super_, field_definitions_t const&
 	_fieldDefinitions = ( _super ? _super->_fieldDefinitions : values_t() );
 	_fieldDescriptions = ( _super ? _super->_fieldDescriptions : field_descriptions_t() );
 	for ( field_definitions_t::value_type const& fd : fieldDefinitions_ ) {
-		identifier_id_t identifierId( _runtime->identifier_id( fd.name() ) );
-		_fieldIdentifiers.emplace_back( identifierId );
-		field_indexes_t::const_iterator fi(
-			_fieldIndexes.insert( make_pair( identifierId, static_cast<int>( _fieldIndexes.get_size() ) ) ).first
-		);
-		if ( fi->second >= _fieldDefinitions.get_size() ) {
-			_fieldDefinitions.resize( fi->second + 1 );
-			_fieldDescriptions.resize( fi->second + 1 );
-		}
-		_fieldDefinitions[fi->second] = fd.value();
-		_fieldDescriptions[fi->second] = fd.doc();
+		add_member( fd );
 	}
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HClass::add_member( HHuginn::HFieldDefinition const& fd_ ) {
+	M_PROLOG
+	identifier_id_t identifierId( _runtime->identifier_id( fd_.name() ) );
+	_fieldIdentifiers.emplace_back( identifierId );
+	field_indexes_t::const_iterator fi(
+		_fieldIndexes.insert( make_pair( identifierId, static_cast<int>( _fieldIndexes.get_size() ) ) ).first
+	);
+	if ( fi->second >= _fieldDefinitions.get_size() ) {
+		_fieldDefinitions.resize( fi->second + 1 );
+		_fieldDescriptions.resize( fi->second + 1 );
+	}
+	_fieldDefinitions[fi->second] = fd_.value();
+	_fieldDescriptions[fi->second] = fd_.doc();
 	return;
 	M_EPILOG
 }
@@ -141,6 +148,28 @@ HHuginn::value_t HHuginn::HClass::create_instance( huginn::HThread* thread_, val
 HHuginn::value_t HHuginn::HClass::access_violation( huginn::HThread* thread_, value_t*, values_t&, int position_ ) const {
 	M_PROLOG
 	throw HHuginn::HHuginnRuntimeException( "Explicit construction of class `"_ys.append( name() ).append( "' objects (instances) is forbidden." ), thread_->current_frame()->file_id(), position_ );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::HClass::constructor( HHuginn::ACCESS access_ ) const {
+	M_PROLOG
+	HHuginn::identifier_id_t identifier( identifier_id() );
+	HHuginn::function_t function(
+		hcore::call(
+			access_ != HHuginn::ACCESS::PRIVATE
+				? &HHuginn::HClass::create_instance
+				: &HHuginn::HClass::access_violation,
+			this, _1, _2, _3, _4
+		)
+	);
+	HHuginn::value_t functionReference(
+		_runtime->object_factory()->create_function_reference(
+			identifier,
+			function,
+			"automatic constructor for class: `"_ys.append( _runtime->identifier_name( identifier ) ).append( "`" )
+		)
+	);
+	return ( functionReference );
 	M_EPILOG
 }
 

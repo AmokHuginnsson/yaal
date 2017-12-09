@@ -63,7 +63,14 @@ public:
 		, _matrixClass( HMatrix::get_class( class_->runtime() ) )
 		, _numberSetStatisticsClass( HNumberSetStatistics::get_class( class_->runtime() ) )
 		, _randomizerClass( HRandomizer::get_class( class_->runtime() ) )
-		, _exceptionClass( exception::create_class( class_->runtime(), "MathematicsException", "The `MathematicsException` exception type for `Mathematics` package." ) ) {
+		, _exceptionClass(
+			exception::create_class(
+				HHuginn::ACCESS::PACKAGE,
+				class_->runtime(),
+				"MathematicsException",
+				"The `MathematicsException` exception type for `Mathematics` package."
+			)
+		) {
 		return;
 	}
 	static HHuginn::value_t get_constant( char const* name_, constant_getter_t constantGetter_, double long real_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {

@@ -50,13 +50,20 @@ namespace dbwrapper {
 namespace huginn {
 
 class HDatabase : public HHuginn::HValue {
-	HHuginn::class_t _exceptionClass;
 	HHuginn::class_t _databaseConnectionClass;
+	HHuginn::class_t _exceptionClass;
 public:
 	HDatabase( HHuginn::HClass* class_ )
 		: HValue( class_ )
-		, _exceptionClass( exception::create_class( class_->runtime(), "DatabaseException", "The `DatabaseException` exception type for `Database` package." ) )
-		, _databaseConnectionClass( HDatabaseConnection::get_class( class_->runtime(), _exceptionClass ) ) {
+		, _databaseConnectionClass( HDatabaseConnection::get_class( class_->runtime(), _exceptionClass ) )
+		, _exceptionClass(
+			exception::create_class(
+				HHuginn::ACCESS::PACKAGE,
+				class_->runtime(),
+				"DatabaseException",
+				"The `DatabaseException` exception type for `Database` package."
+			)
+		) {
 		return;
 	}
 	static HHuginn::value_t connect( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {

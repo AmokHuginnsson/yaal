@@ -71,7 +71,14 @@ public:
 		, _directoryScanClass( HDirectoryScan::get_class( class_->runtime() ) )
 		, _timeClass( huginn::HTime::get_class( class_->runtime() ) )
 		, _fileStatClass( HFileStat::get_class( class_->runtime() ) )
-		, _exceptionClass( exception::create_class( class_->runtime(), "FileSystemException", "The `FileSystemException` exception type for `FileSystem` package." ) ) {
+		, _exceptionClass(
+			exception::create_class(
+				HHuginn::ACCESS::PACKAGE,
+				class_->runtime(),
+				"FileSystemException",
+				"The `FileSystemException` exception type for `FileSystem` package."
+			)
+		) {
 		return;
 	}
 	static HHuginn::value_t open( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {

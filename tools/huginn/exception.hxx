@@ -57,6 +57,7 @@ private:
 HHuginn::class_t get_class( HRuntime* );
 
 HHuginn::class_t create_class(
+	HHuginn::ACCESS,
 	HRuntime*,
 	yaal::hcore::HString const&,
 	yaal::hcore::HString const&,

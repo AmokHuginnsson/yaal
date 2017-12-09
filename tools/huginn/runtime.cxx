@@ -247,14 +247,12 @@ void HRuntime::set_max_call_stack_size( int maxCallStackSize_ ) {
 }
 
 
-void HRuntime::register_class_low( class_t class_, HHuginn::ACCESS classConstructorAccess_ ) {
+void HRuntime::register_class( class_t class_, HHuginn::ACCESS classConstructorAccess_ ) {
 	M_PROLOG
 	if ( _classes.insert( make_pair( class_->identifier_id(), class_ ) ).second ) {
 		_dependencies.push_back( class_ );
 		HHuginn::identifier_id_t identifier( class_->identifier_id() );
-		HHuginn::function_t function( hcore::call( classConstructorAccess_ != HHuginn::ACCESS::PRIVATE ? &HHuginn::HClass::create_instance : &HHuginn::HClass::access_violation, class_.raw(), _1, _2, _3, _4 ) );
-		HHuginn::value_t functionReference( _objectFactory->create_function_reference( identifier, function, "automatic constructor for class: `"_ys.append( identifier_name( identifier ) ).append( "`" ) ) );
-		_functionsStore.insert( make_pair( identifier, functionReference ) );
+		_functionsStore.insert( make_pair( identifier, class_->constructor( classConstructorAccess_ ) ) );
 	}
 	if ( classConstructorAccess_ == HHuginn::ACCESS::PUBLIC ) {
 		_functionsAvailable.insert( class_->identifier_id() );

@@ -470,6 +470,7 @@ public:
 	virtual ~HClass( void ) {
 	}
 	void redefine( HClass const*, field_definitions_t const& );
+	void add_member( HHuginn::HFieldDefinition const& );
 	HClass const* super( void ) const {
 		return ( _super );
 	}
@@ -487,6 +488,7 @@ public:
 	value_t const& field( int index_ ) const {
 		return ( _fieldDefinitions[index_] );
 	}
+	value_t constructor( HHuginn::ACCESS ) const;
 	values_t get_defaults( huginn::HThread*, int ) const;
 	value_t get_default( huginn::HThread*, int, int ) const;
 	function_t const& function( int ) const;

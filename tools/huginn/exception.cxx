@@ -140,7 +140,13 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 			HRuntime::class_constructor_t(
 				[&runtime_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
 					return (
-						make_pointer<HExceptionClass>( runtime_, typeId_, runtime_->identifier_id( "Exception" ), nullptr, "The `Exception` class is a base class for Huginn standard exceptions hierarchy." )
+						make_pointer<HExceptionClass>(
+							runtime_,
+							typeId_,
+							runtime_->identifier_id( "Exception" ),
+							nullptr,
+							"The `Exception` class is a base class for Huginn standard exceptions hierarchy."
+						)
 					);
 				}
 			)
@@ -150,7 +156,7 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 	M_EPILOG
 }
 
-HHuginn::class_t create_class( HRuntime* runtime_, yaal::hcore::HString const& name_, yaal::hcore::HString const& doc_, HHuginn::HClass const* base_ ) {
+HHuginn::class_t create_class( HHuginn::ACCESS access_, HRuntime* runtime_, yaal::hcore::HString const& name_, yaal::hcore::HString const& doc_, HHuginn::HClass const* base_ ) {
 	M_PROLOG
 	HHuginn::identifier_id_t classIdentifier( runtime_->identifier_id( name_ ) );
 	HHuginn::class_t c( runtime_ ? runtime_->get_class( classIdentifier ) : nullptr );
@@ -172,7 +178,7 @@ HHuginn::class_t create_class( HRuntime* runtime_, yaal::hcore::HString const& n
 		);
 	}
 	if ( runtime_ ) {
-		runtime_->huginn()->register_class( c, HHuginn::ACCESS::PUBLIC );
+		runtime_->huginn()->register_class( c, access_ );
 	}
 	return ( c );
 	M_EPILOG

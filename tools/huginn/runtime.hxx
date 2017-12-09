@@ -144,7 +144,7 @@ public:
 	value_t* get_function( identifier_id_t, bool = false );
 	class_t get_class( identifier_id_t );
 	value_t* get_package( identifier_id_t );
-	void register_class_low( class_t, HHuginn::ACCESS );
+	void register_class( class_t, HHuginn::ACCESS );
 	void drop_class( identifier_id_t ); /* for failed symbol resolving */
 	void register_function( identifier_id_t, function_t, yaal::hcore::HString const& );
 	void drop_function( identifier_id_t ); /* for failed symbol resolving */

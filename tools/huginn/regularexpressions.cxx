@@ -47,13 +47,20 @@ namespace tools {
 namespace huginn {
 
 class HRegularExpressions : public HHuginn::HValue {
-	HHuginn::class_t _exceptionClass;
 	HHuginn::class_t _compiledRegularExpressionClass;
+	HHuginn::class_t _exceptionClass;
 public:
 	HRegularExpressions( HHuginn::HClass* class_ )
 		: HValue( class_ )
-		, _exceptionClass( exception::create_class( class_->runtime(), "RegularExpressionException", "The `RegularExpressionException` exception type for `RegularExpression` package." ) )
-		, _compiledRegularExpressionClass( HCompiledRegularExpression::get_class( class_->runtime(), _exceptionClass ) ) {
+		, _compiledRegularExpressionClass( HCompiledRegularExpression::get_class( class_->runtime(), _exceptionClass ) )
+		, _exceptionClass(
+			exception::create_class(
+				HHuginn::ACCESS::PACKAGE,
+				class_->runtime(),
+				"RegularExpressionException",
+				"The `RegularExpressionException` exception type for `RegularExpression` package."
+			)
+		) {
 		return;
 	}
 	static HHuginn::value_t compile( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {

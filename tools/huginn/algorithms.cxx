@@ -85,7 +85,14 @@ public:
 		, _reversedOrderClass( HReversedOrder::get_class( class_->runtime() ) )
 		, _reversedSetClass( HReversedSet::get_class( class_->runtime() ) )
 		, _reversedStringClass( HReversedString::get_class( class_->runtime() ) )
-		, _exceptionClass( exception::create_class( class_->runtime(), "AlgorithmsException", "The `AlgorithmsException` exception type for `Algorithms` package." ) ) {
+		, _exceptionClass(
+			exception::create_class(
+				HHuginn::ACCESS::PACKAGE,
+				class_->runtime(),
+				"AlgorithmsException",
+				"The `AlgorithmsException` exception type for `Algorithms` package."
+			)
+		) {
 		return;
 	}
 	static HHuginn::value_t filter( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {

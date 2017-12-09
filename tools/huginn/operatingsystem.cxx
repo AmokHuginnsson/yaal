@@ -54,15 +54,22 @@ namespace tools {
 namespace huginn {
 
 class HOperatingSystem : public HHuginn::HValue {
-	HHuginn::class_t _exceptionClass;
 	HHuginn::class_t _streamClass;
 	HHuginn::class_t _subprocessClass;
+	HHuginn::class_t _exceptionClass;
 public:
 	HOperatingSystem( HHuginn::HClass* class_ )
 		: HValue( class_ )
-		, _exceptionClass( exception::create_class( class_->runtime(), "OperatingSystemException", "The `OperatingSystemException` exception type for `OperatingSystem` package." ) )
 		, _streamClass( HStream::get_class( class_->runtime() ) )
-		, _subprocessClass( HSubprocess::get_class( class_->runtime() ) ) {
+		, _subprocessClass( HSubprocess::get_class( class_->runtime() ) )
+		, _exceptionClass(
+			exception::create_class(
+				HHuginn::ACCESS::PACKAGE,
+				class_->runtime(),
+				"OperatingSystemException",
+				"The `OperatingSystemException` exception type for `OperatingSystem` package."
+			)
+		) {
 		return;
 	}
 	static HHuginn::value_t env( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
