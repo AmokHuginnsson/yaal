@@ -539,6 +539,7 @@ void OCompiler::resolve_symbols( void ) {
 				);
 			} while ( false );
 		} catch ( ... ) {
+			/* For incremental mode. */
 			if ( es._classId != INVALID_IDENTIFIER ) {
 				_runtime->drop_class( es._classId );
 			} else {

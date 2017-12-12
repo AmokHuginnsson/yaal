@@ -147,14 +147,18 @@ HHuginn::value_t HHuginn::HClass::create_instance( huginn::HThread* thread_, val
 
 HHuginn::value_t HHuginn::HClass::access_violation( huginn::HThread* thread_, value_t*, values_t&, int position_ ) const {
 	M_PROLOG
-	throw HHuginn::HHuginnRuntimeException( "Explicit construction of class `"_ys.append( name() ).append( "' objects (instances) is forbidden." ), thread_->current_frame()->file_id(), position_ );
+	throw HHuginn::HHuginnRuntimeException(
+		"Explicit construction of class `"_ys.append( name() ).append( "' objects (instances) is forbidden." ),
+		thread_->current_frame()->file_id(),
+		position_
+	);
 	M_EPILOG
 }
 
 HHuginn::value_t HHuginn::HClass::constructor( HHuginn::ACCESS access_ ) const {
 	M_PROLOG
 	HHuginn::identifier_id_t identifier( identifier_id() );
-	HHuginn::function_t function(
+	HHuginn::function_t func(
 		hcore::call(
 			access_ != HHuginn::ACCESS::PRIVATE
 				? &HHuginn::HClass::create_instance
@@ -165,7 +169,7 @@ HHuginn::value_t HHuginn::HClass::constructor( HHuginn::ACCESS access_ ) const {
 	HHuginn::value_t functionReference(
 		_runtime->object_factory()->create_function_reference(
 			identifier,
-			function,
+			func,
 			"automatic constructor for class: `"_ys.append( _runtime->identifier_name( identifier ) ).append( "`" )
 		)
 	);

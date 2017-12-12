@@ -246,7 +246,6 @@ void HRuntime::set_max_call_stack_size( int maxCallStackSize_ ) {
 	M_EPILOG
 }
 
-
 void HRuntime::register_class( class_t class_, HHuginn::ACCESS classConstructorAccess_ ) {
 	M_PROLOG
 	if ( _classes.insert( make_pair( class_->identifier_id(), class_ ) ).second ) {

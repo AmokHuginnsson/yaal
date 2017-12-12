@@ -96,17 +96,31 @@ private:
 	 * of given submodule.
 	 *
 	 * 3.
+	 * Once resolved, function reference accessed in submodule must stay resolved
+	 * in context of that submodule.
+	 *
+	 * 4.
 	 * Function definitions loaded from sub-module must not be available in current global namespace.
 	 *
-	 * Because of 1 and 2 we need to have single function definition store shared by all sub-modules.
-	 * Because of 3 we need to keep track which functions are defined in current module only.
+	 * Because of 1, 2 and 3 we need to have single function definition store shared by all sub-modules.
+	 * Because of 4 we need to keep track which functions are defined in current module only.
+	 *
+	 * It also means that submodule classes must be registered in runtime so its constructors are
+	 * still available in its submodule context.
 	 *
 	 * Hence use of _functionsStore and _functionsAvailable.
 	 */
-	functions_store_t _functionsStore; /*!< All function ever defined in all sub-modules. */
+	functions_store_t _functionsStore; /*!< All functions ever defined in all sub-modules. */
 	functions_available_t _functionsAvailable; /*!< Functions available in current module context. */
-	dependencies_t _dependencies;
-	classes_t _classes;
+	/*
+	 * All classes must be kept directly in runtime so it will be simpler
+	 * to reregister, i.e. update class runtime with update_runtime() for
+	 * classes defined in submodules.
+	 *
+	 * Order of _dependencies and _classes in HRuntime definition is vital!
+	 */
+	dependencies_t _dependencies; /*!< Extra pointers to classes available in runtime, used to enforce order of desturctors! */
+	classes_t _classes; /*!< All classes defined for this runtime, including classes from submodules. */
 	packages_t _packages;
 	HHuginn::value_t _argv;
 	value_t _result;
@@ -145,9 +159,35 @@ public:
 	class_t get_class( identifier_id_t );
 	value_t* get_package( identifier_id_t );
 	void register_class( class_t, HHuginn::ACCESS );
-	void drop_class( identifier_id_t ); /* for failed symbol resolving */
+	/*! \brief Remove compiled class from runtime.
+	 *
+	 * Code compilation works in such a way that class definitions
+	 * are added to runtime as they are compiled.
+	 * Symbol resolving is performed as last stage of compilation,
+	 * so it is possible that during compilation a class with invalid
+	 * symbol references are added to runtime.
+	 *
+	 * In case of scripts this does not pose any problem as runtime
+	 * gets to be destroyed anyway in case of compilation failure.
+	 *
+	 * In case of incremental mode it is a problem cause we would
+	 * end up with dangling class with invalid symbol references
+	 * that would trash next statement added.
+	 *
+	 * So we need a way to remove from runtime all compiled classes
+	 * that fail to resolve its symbols in resolve_symbols().
+	 *
+	 * \param identifier_ - identifier of the class to remove.
+	 */
+	void drop_class( identifier_id_t identifier_ );
 	void register_function( identifier_id_t, function_t, yaal::hcore::HString const& );
-	void drop_function( identifier_id_t ); /* for failed symbol resolving */
+	/*! \brief Remove compiled function from runtime.
+	 *
+	 * See comment for \e drop_class().
+	 *
+	 * \param identifier_ - identifier of function to remove.
+	 */
+	void drop_function( identifier_id_t identifier_ );
 	void register_package( identifier_id_t, identifier_id_t, HHuginn::paths_t const&, HHuginn::compiler_setup_t, int );
 	class_t create_class( identifier_id_t, HHuginn::HClass const*, field_definitions_t const&, yaal::hcore::HString const& );
 	class_t create_class( yaal::hcore::HString const&, HHuginn::HClass const*, field_definitions_t const&, yaal::hcore::HString const& );
