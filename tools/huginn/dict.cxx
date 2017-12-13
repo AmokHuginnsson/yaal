@@ -176,14 +176,14 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			runtime_->identifier_id( type_name( HHuginn::TYPE::DICT ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "has_key", objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &dict::has_key, _1, _2, _3, _4 ) ), "( *key* ) - tell if given *key* can be found in this `dict`" },
-				{ "get",     objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &dict::get, _1, _2, _3, _4 ) ),     "( *key*, *default* ) - get value for given *key* from this `dict`, or *default* if given *key* is not present in the `dict`" },
-				{ "erase",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &dict::erase, _1, _2, _3, _4 ) ),   "( *key* ) - remove given *key* from this `dict`" },
-				{ "clear",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &dict::clear, _1, _2, _3, _4 ) ),   "erase `dict`'s content, `dict` becomes empty" },
-				{ "add",     objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &dict::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `dict` with key/value pairs from *other* `dict`" },
-				{ "update",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &dict::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `dict` with key/value pairs from *other* `dict`" },
-				{ "hash",    objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &dict::hash, _1, _2, _3, _4 ) ),    "calculate hash value for this `dict`" },
-				{ "equals",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &dict::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `dict` has the same content" }
+				{ "has_key", objectFactory_->create_method( hcore::call( &dict::has_key, _1, _2, _3, _4 ) ), "( *key* ) - tell if given *key* can be found in this `dict`" },
+				{ "get",     objectFactory_->create_method( hcore::call( &dict::get, _1, _2, _3, _4 ) ),     "( *key*, *default* ) - get value for given *key* from this `dict`, or *default* if given *key* is not present in the `dict`" },
+				{ "erase",   objectFactory_->create_method( hcore::call( &dict::erase, _1, _2, _3, _4 ) ),   "( *key* ) - remove given *key* from this `dict`" },
+				{ "clear",   objectFactory_->create_method( hcore::call( &dict::clear, _1, _2, _3, _4 ) ),   "erase `dict`'s content, `dict` becomes empty" },
+				{ "add",     objectFactory_->create_method( hcore::call( &dict::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `dict` with key/value pairs from *other* `dict`" },
+				{ "update",  objectFactory_->create_method( hcore::call( &dict::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `dict` with key/value pairs from *other* `dict`" },
+				{ "hash",    objectFactory_->create_method( hcore::call( &dict::hash, _1, _2, _3, _4 ) ),    "calculate hash value for this `dict`" },
+				{ "equals",  objectFactory_->create_method( hcore::call( &dict::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `dict` has the same content" }
 			},
 			"The `dict` is a collection providing a sorted key to value map. It supports operations of iteration, key-value insertion, key removal and key search. The keys stored in given `dict` instance must be of uniform type."
 		)

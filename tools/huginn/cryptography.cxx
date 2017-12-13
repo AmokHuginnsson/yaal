@@ -90,12 +90,12 @@ HHuginn::value_t HCryptographyCreator::do_new_instance( HRuntime* runtime_ ) {
 			"Cryptography",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "md5",         runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::hash, "Cryptography.md5", static_cast<hash_string_t>( &md5 ), _1, _2, _3, _4 ) ),       "( *str* ) - calculate *MD5* sum of given `string`" },
-				{ "sha1",        runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::hash, "Cryptography.sha1", static_cast<hash_string_t>( &sha1 ), _1, _2, _3, _4 ) ),     "( *str* ) - calculate *SHA1* sum of given `string`" },
-				{ "sha512",      runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::hash, "Cryptography.sha512", static_cast<hash_string_t>( &sha512 ), _1, _2, _3, _4 ) ), "( *str* ) - calculate *SHA512* sum of given `string`" },
-				{ "hmac_md5",    runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::hmac, "Cryptography.hmac_md5", hash::FUNCTION::MD5, _1, _2, _3, _4 ) ),                 "( *key*, *str* ) - calculate *HMAC-MD5* verification code for given `string` *str* using given *key*" },
-				{ "hmac_sha1",   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::hmac, "Cryptography.hmac_sha1", hash::FUNCTION::SHA1, _1, _2, _3, _4 ) ),               "( *key*, *str* ) - calculate *HMAC-SHA1* verification code for given `string` *str* using given *key*" },
-				{ "hmac_sha512", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::hmac, "Cryptography.hmac_sha512", hash::FUNCTION::SHA512, _1, _2, _3, _4 ) ),           "( *key*, *str* ) - calculate *HMAC-SHA512* verification code for given `string` *str* using given *key*" }
+				{ "md5",         runtime_->object_factory()->create_method( hcore::call( &HCryptography::hash, "Cryptography.md5", static_cast<hash_string_t>( &md5 ), _1, _2, _3, _4 ) ),       "( *str* ) - calculate *MD5* sum of given `string`" },
+				{ "sha1",        runtime_->object_factory()->create_method( hcore::call( &HCryptography::hash, "Cryptography.sha1", static_cast<hash_string_t>( &sha1 ), _1, _2, _3, _4 ) ),     "( *str* ) - calculate *SHA1* sum of given `string`" },
+				{ "sha512",      runtime_->object_factory()->create_method( hcore::call( &HCryptography::hash, "Cryptography.sha512", static_cast<hash_string_t>( &sha512 ), _1, _2, _3, _4 ) ), "( *str* ) - calculate *SHA512* sum of given `string`" },
+				{ "hmac_md5",    runtime_->object_factory()->create_method( hcore::call( &HCryptography::hmac, "Cryptography.hmac_md5", hash::FUNCTION::MD5, _1, _2, _3, _4 ) ),                 "( *key*, *str* ) - calculate *HMAC-MD5* verification code for given `string` *str* using given *key*" },
+				{ "hmac_sha1",   runtime_->object_factory()->create_method( hcore::call( &HCryptography::hmac, "Cryptography.hmac_sha1", hash::FUNCTION::SHA1, _1, _2, _3, _4 ) ),               "( *key*, *str* ) - calculate *HMAC-SHA1* verification code for given `string` *str* using given *key*" },
+				{ "hmac_sha512", runtime_->object_factory()->create_method( hcore::call( &HCryptography::hmac, "Cryptography.hmac_sha512", hash::FUNCTION::SHA512, _1, _2, _3, _4 ) ),           "( *key*, *str* ) - calculate *HMAC-SHA512* verification code for given `string` *str* using given *key*" }
 			},
 			"The `Cryptography` package provides functionality of a cryptographic nature, like hashing functions."
 		)

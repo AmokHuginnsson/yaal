@@ -110,9 +110,9 @@ HHuginn::value_t HDateTimeCreator::do_new_instance( HRuntime* runtime_ ) {
 			"DateTime",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "now",   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HDateTime::now, _1, _2, _3, _4 ) ),   "get information about current point-in-time" },
-				{ "clock", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HDateTime::clock, _1, _2, _3, _4 ) ), "create a stopper-watch instance" },
-				{ "sleep", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HDateTime::sleep, _1, _2, _3, _4 ) ), "( *nanoseconds* ) - suspend program execution for specified amount of *nanoseconds*" }
+				{ "now",   runtime_->object_factory()->create_method( hcore::call( &HDateTime::now, _1, _2, _3, _4 ) ),   "get information about current point-in-time" },
+				{ "clock", runtime_->object_factory()->create_method( hcore::call( &HDateTime::clock, _1, _2, _3, _4 ) ), "create a stopper-watch instance" },
+				{ "sleep", runtime_->object_factory()->create_method( hcore::call( &HDateTime::sleep, _1, _2, _3, _4 ) ), "( *nanoseconds* ) - suspend program execution for specified amount of *nanoseconds*" }
 			},
 			"The `DateTime` package provides date and time handling functionalities."
 		)

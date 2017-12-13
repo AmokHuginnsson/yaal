@@ -88,10 +88,10 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			runtime_->identifier_id( type_name( HHuginn::TYPE::NUMBER ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "is_exact",      objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &number::is_exact, _1, _2, _3, _4 ) ),      "tell if this number is an exact representation" },
-				{ "is_integral",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &number::is_integral, _1, _2, _3, _4 ) ),   "tell if this number does not have any decimal digits" },
-				{ "get_precision", objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &number::get_precision, _1, _2, _3, _4 ) ), "get maximum precision of this number" },
-				{ "set_precision", objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &number::set_precision, _1, _2, _3, _4 ) ), "( *prec* ) set maximum precision of this number to *prec* (increasing precision works only on numbers that currently have exact representation)" }
+				{ "is_exact",      objectFactory_->create_method( hcore::call( &number::is_exact, _1, _2, _3, _4 ) ),      "tell if this number is an exact representation" },
+				{ "is_integral",   objectFactory_->create_method( hcore::call( &number::is_integral, _1, _2, _3, _4 ) ),   "tell if this number does not have any decimal digits" },
+				{ "get_precision", objectFactory_->create_method( hcore::call( &number::get_precision, _1, _2, _3, _4 ) ), "get maximum precision of this number" },
+				{ "set_precision", objectFactory_->create_method( hcore::call( &number::set_precision, _1, _2, _3, _4 ) ), "( *prec* ) set maximum precision of this number to *prec* (increasing precision works only on numbers that currently have exact representation)" }
 			},
 			"The `number` is a scalar type that is used to represent and operate on fixed point numbers of arbitrary size. "
 			"It supports basic operations of addition, subtraction, multiplication, division, modulo, power, factorial and comparisons, "

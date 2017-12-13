@@ -435,7 +435,7 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 			} else {
 				OCompiler::OClassContext::methods_t::const_iterator m( cc->_methods.find( i ) );
 				M_ASSERT( m != cc->_methods.end() );
-				fieldDefinitions.emplace_back( cc->_fieldNames[i], _runtime->object_factory()->create<HClass::HMethod>( m->second ), cc->_docs.at( i ) );
+				fieldDefinitions.emplace_back( cc->_fieldNames[i], _runtime->object_factory()->create_method( m->second ), cc->_docs.at( i ) );
 			}
 		}
 		t.pop_frame();
@@ -909,7 +909,7 @@ HHuginn::function_t const& HHuginn::HClass::HMethod::function( void ) const {
 }
 
 HHuginn::value_t HHuginn::HClass::HMethod::do_clone( huginn::HThread* thread_, int ) const {
-	return ( thread_->object_factory().create<HMethod>( _function ) );
+	return ( thread_->object_factory().create_method( _function ) );
 }
 
 HHuginn::HClass::HBoundMethod::HBoundMethod( HHuginn::function_t const& method_, HHuginn::value_t const& object_ )

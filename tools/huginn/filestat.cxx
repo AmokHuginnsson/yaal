@@ -181,17 +181,17 @@ HHuginn::class_t HFileStat::get_class( HRuntime* runtime_ ) {
 			"FileStat",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "id",       runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HFileStat::id, _1, _2, _3, _4 ) ),    "get file's identification number" },
-				{ "name",     runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HFileStat::name, _1, _2, _3, _4 ) ),  "get the name of the file" },
-				{ "size",     runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HFileStat::size, _1, _2, _3, _4 ) ),  "get file size in bytes" },
-				{ "mode",     runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HFileStat::mode, _1, _2, _3, _4 ) ),  "get file's access permissions" },
-				{ "type",     runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HFileStat::type, _1, _2, _3, _4 ) ),  "get the type of the file" },
-				{ "user",     runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HFileStat::user, _1, _2, _3, _4 ) ),  "get an user name of the file owner" },
-				{ "group",    runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HFileStat::group, _1, _2, _3, _4 ) ), "get a group name of the file owner" },
-				{ "created",  runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HFileStat::get_times, "created",  &HFSItem::created, _1, _2, _3, _4 ) ),  "get file's metadata modification `time`" },
-				{ "changed",  runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HFileStat::get_times, "changed",  &HFSItem::created, _1, _2, _3, _4 ) ),  "get file's metadata modification `time`" },
-				{ "modified", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HFileStat::get_times, "modified", &HFSItem::modified, _1, _2, _3, _4 ) ), "get file's data modification `time`" },
-				{ "accessed", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HFileStat::get_times, "accessed", &HFSItem::accessed, _1, _2, _3, _4 ) ), "get file's last access `time`" }
+				{ "id",       runtime_->object_factory()->create_method( hcore::call( &HFileStat::id, _1, _2, _3, _4 ) ),    "get file's identification number" },
+				{ "name",     runtime_->object_factory()->create_method( hcore::call( &HFileStat::name, _1, _2, _3, _4 ) ),  "get the name of the file" },
+				{ "size",     runtime_->object_factory()->create_method( hcore::call( &HFileStat::size, _1, _2, _3, _4 ) ),  "get file size in bytes" },
+				{ "mode",     runtime_->object_factory()->create_method( hcore::call( &HFileStat::mode, _1, _2, _3, _4 ) ),  "get file's access permissions" },
+				{ "type",     runtime_->object_factory()->create_method( hcore::call( &HFileStat::type, _1, _2, _3, _4 ) ),  "get the type of the file" },
+				{ "user",     runtime_->object_factory()->create_method( hcore::call( &HFileStat::user, _1, _2, _3, _4 ) ),  "get an user name of the file owner" },
+				{ "group",    runtime_->object_factory()->create_method( hcore::call( &HFileStat::group, _1, _2, _3, _4 ) ), "get a group name of the file owner" },
+				{ "created",  runtime_->object_factory()->create_method( hcore::call( &HFileStat::get_times, "created",  &HFSItem::created, _1, _2, _3, _4 ) ),  "get file's metadata modification `time`" },
+				{ "changed",  runtime_->object_factory()->create_method( hcore::call( &HFileStat::get_times, "changed",  &HFSItem::created, _1, _2, _3, _4 ) ),  "get file's metadata modification `time`" },
+				{ "modified", runtime_->object_factory()->create_method( hcore::call( &HFileStat::get_times, "modified", &HFSItem::modified, _1, _2, _3, _4 ) ), "get file's data modification `time`" },
+				{ "accessed", runtime_->object_factory()->create_method( hcore::call( &HFileStat::get_times, "accessed", &HFSItem::accessed, _1, _2, _3, _4 ) ), "get file's last access `time`" }
 			},
 			"The `FileStat` class allows obtaining metadata information about various file system objects."
 		)

@@ -76,7 +76,7 @@ public:
 				d.doc()
 			);
 		}
-		fd.emplace_back( "to_string", runtime_->object_factory()->create<HEnumeratorClass::HMethod>( hcore::call( &HEnumeratorClass::to_string, _1, _2, _3, _4 ) ), "Get enumerator name." );
+		fd.emplace_back( "to_string", runtime_->object_factory()->create_method( hcore::call( &HEnumeratorClass::to_string, _1, _2, _3, _4 ) ), "Get enumerator name." );
 		redefine( base_, fd );
 		return;
 	}

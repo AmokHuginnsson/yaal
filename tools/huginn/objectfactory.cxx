@@ -92,9 +92,20 @@ namespace set {
 HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
 }
 
-HObjectFactory::HObjectFactory( HRuntime* runtime_ )
+HObjectFactoryBase::HObjectFactoryBase( HRuntime* runtime_ )
 	: _runtime( runtime_ )
-	, _memoryPools()
+	, _memoryPoolsStore()
+	, _memoryPools() {
+}
+
+HObjectFactory::HObjectFactory( HRuntime* runtime_ )
+	: HObjectFactoryBase( runtime_ )
+	, _referencePool( this )
+	, _taggedValuePool( this )
+	, _functionReferencePool( this )
+	, _methodPool( this )
+	, _boundMethodPool( this )
+	, _objectPool( this )
 	, _boolean( boolean::get_class( runtime_, this ) )
 	, _integer( integer::get_class( runtime_, this ) )
 	, _string( string::get_class( runtime_, this ) )
@@ -112,24 +123,19 @@ HObjectFactory::HObjectFactory( HRuntime* runtime_ )
 	, _stackFrameInfo()
 	, _conversionException()
 	, _arithmeticException()
-	, _stringPool( _memoryPools, _string.raw() )
-	, _integerPool( _memoryPools, _integer.raw() )
-	, _booleanPool( _memoryPools, _boolean.raw() )
-	, _realPool( _memoryPools, _real.raw() )
-	, _numberPool( _memoryPools, _number.raw() )
-	, _characterPool( _memoryPools, _character.raw() )
-	, _tuplePool( _memoryPools, _tuple.raw() )
-	, _listPool( _memoryPools, _list.raw() )
-	, _dequePool( _memoryPools, _deque.raw() )
-	, _dictPool( _memoryPools, _dict.raw() )
-	, _lookupPool( _memoryPools, _lookup.raw() )
-	, _orderPool( _memoryPools, _order.raw() )
-	, _setPool( _memoryPools, _set.raw() )
-	, _referencePool( _memoryPools )
-	, _taggedValuePool( _memoryPools )
-	, _functionReferencePool( _memoryPools )
-	, _boundMethodPool( _memoryPools )
-	, _objectPool( _memoryPools ) {
+	, _stringPool( this, _string.raw() )
+	, _integerPool( this, _integer.raw() )
+	, _booleanPool( this, _boolean.raw() )
+	, _realPool( this, _real.raw() )
+	, _numberPool( this, _number.raw() )
+	, _characterPool( this, _character.raw() )
+	, _tuplePool( this, _tuple.raw() )
+	, _listPool( this, _list.raw() )
+	, _dequePool( this, _deque.raw() )
+	, _dictPool( this, _dict.raw() )
+	, _lookupPool( this, _lookup.raw() )
+	, _orderPool( this, _order.raw() )
+	, _setPool( this, _set.raw() ) {
 	return;
 }
 

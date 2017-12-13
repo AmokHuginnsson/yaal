@@ -116,7 +116,7 @@ HHuginn::class_t HRegularExpressionMatch::get_class( HRuntime* runtime_ ) {
 			"RegularExpressionMatch",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "matched", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HRegularExpressionMatch::matched, _1, _2, _3, _4 ) ), "tell if given regular expression pattern matched against given string" }
+				{ "matched", runtime_->object_factory()->create_method( hcore::call( &HRegularExpressionMatch::matched, _1, _2, _3, _4 ) ), "tell if given regular expression pattern matched against given string" }
 			},
 			"The `RegularExpressionMatch` class represents result of regular expression based text search."
 		)

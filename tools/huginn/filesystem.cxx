@@ -223,18 +223,18 @@ HHuginn::value_t HFileSystemCreator::do_new_instance( HRuntime* runtime_ ) {
 			"FileSystem",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "open",                      runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::open, _1, _2, _3, _4 ) ),    "( *path*, *mode* ) - open file under given *path* in the attached file system, using specified (i/o) *mode*" },
-				{ "reading",                   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::reading, _1, _2, _3, _4 ) ), "a mode for *.open()* method, used to open files for reading" },
-				{ "writing",                   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::writing, _1, _2, _3, _4 ) ), "a mode for *.open()* method, used to open files for writing" },
-				{ "rename",                    runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::rename, _1, _2, _3, _4 ) ),  "( *oldPath*, *newPath* ) - rename or move file from *oldPath* to *newPath* in attached file system", },
-				{ "remove",                    runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::remove, _1, _2, _3, _4 ) ),  "( *path* ) - remove file with given *path* from attached file system" },
-				{ "readlink",                  runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::path_transform, "FileSystem.readlink", &filesystem::readlink, _1, _2, _3, _4 ) ), "( *path* ) - get resolved symbolic links or canonical file name for given *path*" },
-				{ "basename",                  runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::path_transform, "FileSystem.basename", &filesystem::basename, _1, _2, _3, _4 ) ), "( *path* ) - strip directory from filename for given *path*" },
-				{ "dirname",                   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::path_transform, "FileSystem.dirname", &filesystem::dirname, _1, _2, _3, _4 ) ),   "( *path* ) - strip last component from file name for given *path*" },
-				{ "chmod",                     runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::chmod, _1, _2, _3, _4 ) ),   "( *path*, *mode* ) - change file mode bits for file *path* to new mode *mode*" },
-				{ "dir",                       runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::dir, _1, _2, _3, _4 ) ),     "( *path* ) - list content of the directory given by *path*" },
-				{ "stat",                      runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::stat, _1, _2, _3, _4 ) ),    "( *path* ) - get metadata information for file given by *path*" },
-				{ "current_working_directory", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::current_working_directory, _1, _2, _3, _4 ) ), "get current working directory path" }
+				{ "open",                      runtime_->object_factory()->create_method( hcore::call( &HFileSystem::open, _1, _2, _3, _4 ) ),    "( *path*, *mode* ) - open file under given *path* in the attached file system, using specified (i/o) *mode*" },
+				{ "reading",                   runtime_->object_factory()->create_method( hcore::call( &HFileSystem::reading, _1, _2, _3, _4 ) ), "a mode for *.open()* method, used to open files for reading" },
+				{ "writing",                   runtime_->object_factory()->create_method( hcore::call( &HFileSystem::writing, _1, _2, _3, _4 ) ), "a mode for *.open()* method, used to open files for writing" },
+				{ "rename",                    runtime_->object_factory()->create_method( hcore::call( &HFileSystem::rename, _1, _2, _3, _4 ) ),  "( *oldPath*, *newPath* ) - rename or move file from *oldPath* to *newPath* in attached file system", },
+				{ "remove",                    runtime_->object_factory()->create_method( hcore::call( &HFileSystem::remove, _1, _2, _3, _4 ) ),  "( *path* ) - remove file with given *path* from attached file system" },
+				{ "readlink",                  runtime_->object_factory()->create_method( hcore::call( &HFileSystem::path_transform, "FileSystem.readlink", &filesystem::readlink, _1, _2, _3, _4 ) ), "( *path* ) - get resolved symbolic links or canonical file name for given *path*" },
+				{ "basename",                  runtime_->object_factory()->create_method( hcore::call( &HFileSystem::path_transform, "FileSystem.basename", &filesystem::basename, _1, _2, _3, _4 ) ), "( *path* ) - strip directory from filename for given *path*" },
+				{ "dirname",                   runtime_->object_factory()->create_method( hcore::call( &HFileSystem::path_transform, "FileSystem.dirname", &filesystem::dirname, _1, _2, _3, _4 ) ),   "( *path* ) - strip last component from file name for given *path*" },
+				{ "chmod",                     runtime_->object_factory()->create_method( hcore::call( &HFileSystem::chmod, _1, _2, _3, _4 ) ),   "( *path*, *mode* ) - change file mode bits for file *path* to new mode *mode*" },
+				{ "dir",                       runtime_->object_factory()->create_method( hcore::call( &HFileSystem::dir, _1, _2, _3, _4 ) ),     "( *path* ) - list content of the directory given by *path*" },
+				{ "stat",                      runtime_->object_factory()->create_method( hcore::call( &HFileSystem::stat, _1, _2, _3, _4 ) ),    "( *path* ) - get metadata information for file given by *path*" },
+				{ "current_working_directory", runtime_->object_factory()->create_method( hcore::call( &HFileSystem::current_working_directory, _1, _2, _3, _4 ) ), "get current working directory path" }
 			},
 			"The `FileSystem` package provides interface to various file system queries and operations."
 		)

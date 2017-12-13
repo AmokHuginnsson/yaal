@@ -161,14 +161,14 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			runtime_->identifier_id( type_name( HHuginn::TYPE::SET ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "insert",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &set::insert, _1, _2, _3, _4 ) ),  "( *elem* ) - insert given element *elem* into a `set`" },
-				{ "has_key", objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &set::has_key, _1, _2, _3, _4 ) ), "( *elem* ) - tell if given element *elem* is present in the `set`" },
-				{ "erase",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &set::erase, _1, _2, _3, _4 ) ),   "( *elem* ) - remove given element *elem* from the `set`" },
-				{ "clear",   objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &set::clear, _1, _2, _3, _4 ) ),   "erase `set`'s content, `set` becomes empty" },
-				{ "add",     objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &set::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `set` with values from *other* `set`" },
-				{ "update",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &set::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `set` with values from *other* `set`" },
-				{ "hash",    objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &set::hash, _1, _2, _3, _4 ) ),    "calculate hash value for this `set`" },
-				{ "equals",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &set::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `set` has the same content" }
+				{ "insert",  objectFactory_->create_method( hcore::call( &set::insert, _1, _2, _3, _4 ) ),  "( *elem* ) - insert given element *elem* into a `set`" },
+				{ "has_key", objectFactory_->create_method( hcore::call( &set::has_key, _1, _2, _3, _4 ) ), "( *elem* ) - tell if given element *elem* is present in the `set`" },
+				{ "erase",   objectFactory_->create_method( hcore::call( &set::erase, _1, _2, _3, _4 ) ),   "( *elem* ) - remove given element *elem* from the `set`" },
+				{ "clear",   objectFactory_->create_method( hcore::call( &set::clear, _1, _2, _3, _4 ) ),   "erase `set`'s content, `set` becomes empty" },
+				{ "add",     objectFactory_->create_method( hcore::call( &set::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `set` with values from *other* `set`" },
+				{ "update",  objectFactory_->create_method( hcore::call( &set::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `set` with values from *other* `set`" },
+				{ "hash",    objectFactory_->create_method( hcore::call( &set::hash, _1, _2, _3, _4 ) ),    "calculate hash value for this `set`" },
+				{ "equals",  objectFactory_->create_method( hcore::call( &set::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `set` has the same content" }
 			},
 			"The `set` is a collection of unique elements of varying types. It supports operation of element insertion, removal and search."
 		)

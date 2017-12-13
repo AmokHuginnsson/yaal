@@ -96,8 +96,8 @@ HHuginn::class_t HRandomizer::get_class( HRuntime* runtime_ ) {
 			"Randomizer",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "next",      runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HRandomizer::next, _1, _2, _3, _4 ) ),      "([ *range* ]) - get next `integer` random number, possibly restricted to given range" },
-				{ "next_real", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HRandomizer::next_real, _1, _2, _3, _4 ) ), "([ *range* ]) - get next `real` random number, possibly restricted to given range" }
+				{ "next",      runtime_->object_factory()->create_method( hcore::call( &HRandomizer::next, _1, _2, _3, _4 ) ),      "([ *range* ]) - get next `integer` random number, possibly restricted to given range" },
+				{ "next_real", runtime_->object_factory()->create_method( hcore::call( &HRandomizer::next_real, _1, _2, _3, _4 ) ), "([ *range* ]) - get next `real` random number, possibly restricted to given range" }
 			},
 			"The `Randomizer` class represents a random number generator concept. `Randomizer` can generate uniform distribution of either `integer` or `real` values from given range."
 		)

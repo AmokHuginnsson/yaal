@@ -258,18 +258,18 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			runtime_->identifier_id( type_name( HHuginn::TYPE::DEQUE ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "push",       objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &deque::push, _1, _2, _3, _4 ) ),       "( *elem* ) - add new *elem* at the (right/back) end of the `deque`, `deque` grows in size by 1" },
-				{ "pop",        objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &deque::pop, _1, _2, _3, _4 ) ),        "remove last element from the deque, deque shrinks by 1" },
-				{ "push_front", objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &deque::push_front, _1, _2, _3, _4 ) ), "( *elem* ) - add new *elem* at the (left/front) beginning of the `deque`, `deque` grows in size by 1" },
-				{ "pop_front",  objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &deque::pop_front, _1, _2, _3, _4 ) ),  "remove first element from the `deque`, `deque` shrinks by 1" },
-				{ "add",        objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &deque::append, _1, _2, _3, _4 ) ),     "( *other* ) - append all elements from *other* collection at the end of this `deque`" },
-				{ "append",     objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &deque::append, _1, _2, _3, _4 ) ),     "( *other* ) - append all elements from *other* collection at the end of this `deque`" },
-				{ "prepend",    objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &deque::prepend, _1, _2, _3, _4 ) ),    "( *other* ) - prepend all elements from *other* collection in front of this `deque`" },
-				{ "insert",     objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &deque::insert, _1, _2, _3, _4 ) ),     "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
-				{ "clear",      objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &deque::clear, _1, _2, _3, _4 ) ),      "erase `deque`'s content, `deque` becomes empty" },
-				{ "hash",       objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &deque::hash, _1, _2, _3, _4 ) ),       "calculate hash value for this `deque`" },
-				{ "less",       objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &deque::less, _1, _2, _3, _4 ) ),       "( *other* ) - test if this `deque` comes lexicographically before *other* `deque`" },
-				{ "equals",     objectFactory_->create<HHuginn::HClass::HMethod>( hcore::call( &deque::equals, _1, _2, _3, _4 ) ),     "( *other* ) - test if *other* `deque` has the same content" }
+				{ "push",       objectFactory_->create_method( hcore::call( &deque::push, _1, _2, _3, _4 ) ),       "( *elem* ) - add new *elem* at the (right/back) end of the `deque`, `deque` grows in size by 1" },
+				{ "pop",        objectFactory_->create_method( hcore::call( &deque::pop, _1, _2, _3, _4 ) ),        "remove last element from the deque, deque shrinks by 1" },
+				{ "push_front", objectFactory_->create_method( hcore::call( &deque::push_front, _1, _2, _3, _4 ) ), "( *elem* ) - add new *elem* at the (left/front) beginning of the `deque`, `deque` grows in size by 1" },
+				{ "pop_front",  objectFactory_->create_method( hcore::call( &deque::pop_front, _1, _2, _3, _4 ) ),  "remove first element from the `deque`, `deque` shrinks by 1" },
+				{ "add",        objectFactory_->create_method( hcore::call( &deque::append, _1, _2, _3, _4 ) ),     "( *other* ) - append all elements from *other* collection at the end of this `deque`" },
+				{ "append",     objectFactory_->create_method( hcore::call( &deque::append, _1, _2, _3, _4 ) ),     "( *other* ) - append all elements from *other* collection at the end of this `deque`" },
+				{ "prepend",    objectFactory_->create_method( hcore::call( &deque::prepend, _1, _2, _3, _4 ) ),    "( *other* ) - prepend all elements from *other* collection in front of this `deque`" },
+				{ "insert",     objectFactory_->create_method( hcore::call( &deque::insert, _1, _2, _3, _4 ) ),     "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
+				{ "clear",      objectFactory_->create_method( hcore::call( &deque::clear, _1, _2, _3, _4 ) ),      "erase `deque`'s content, `deque` becomes empty" },
+				{ "hash",       objectFactory_->create_method( hcore::call( &deque::hash, _1, _2, _3, _4 ) ),       "calculate hash value for this `deque`" },
+				{ "less",       objectFactory_->create_method( hcore::call( &deque::less, _1, _2, _3, _4 ) ),       "( *other* ) - test if this `deque` comes lexicographically before *other* `deque`" },
+				{ "equals",     objectFactory_->create_method( hcore::call( &deque::equals, _1, _2, _3, _4 ) ),     "( *other* ) - test if *other* `deque` has the same content" }
 			},
 			"The `deque` is a collection type that is used to represent and operate on deque of values. "
 			"It supports basic subscript and range operators. "

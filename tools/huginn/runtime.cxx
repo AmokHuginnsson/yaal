@@ -411,7 +411,7 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 		if ( context_._packages.find( it->first ) == context_._packages.end() ) {
 			fds.emplace_back(
 				identifier_name( it->first ),
-				object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &package::value, it->second, identifier_name( it->first ), _1, _2, _3, _4 ) ),
+				object_factory()->create_method( hcore::call( &package::value, it->second, identifier_name( it->first ), _1, _2, _3, _4 ) ),
 				"access package "_ys.append( it->second->get_class()->name() ).append( " imported in submodule" )
 			);
 			it = _packages.erase( it );
@@ -423,7 +423,7 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 		if ( context_._classes.find( c.first ) == context_._classes.end() ) {
 			fds.emplace_back(
 				identifier_name( c.first ),
-				object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &package::instance, c.second.raw(), _1, _2, _3, _4 ) ),
+				object_factory()->create_method( hcore::call( &package::instance, c.second.raw(), _1, _2, _3, _4 ) ),
 				"access class "_ys.append( identifier_name( c.first ) ).append( " imported in submodule" )
 			);
 		}
@@ -433,7 +433,7 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 			HHuginn::HFunctionReference const* fr( static_cast<HHuginn::HFunctionReference const*>( _functionsStore.at( fi ).raw() ) );
 			fds.emplace_back(
 				identifier_name( fi ),
-				object_factory()->create<HHuginn::HClass::HMethod>( fr->function() ),
+				object_factory()->create_method( fr->function() ),
 				! fr->doc().is_empty() ? fr->doc() : "access function "_ys.append( identifier_name( fi ) ).append( " imported in submodule" )
 			);
 		}

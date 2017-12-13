@@ -70,8 +70,8 @@ public:
 			runtime_->identifier_id( "Query" ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "bind",    runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HQuery::bind, _1, _2, _3, _4 ) ),    "( *index*, *value* ) - bind given *value* for query variable at given *index*" },
-				{ "execute", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HQuery::execute, _1, _2, _3, _4 ) ), "execute query" }
+				{ "bind",    runtime_->object_factory()->create_method( hcore::call( &HQuery::bind, _1, _2, _3, _4 ) ),    "( *index*, *value* ) - bind given *value* for query variable at given *index*" },
+				{ "execute", runtime_->object_factory()->create_method( hcore::call( &HQuery::execute, _1, _2, _3, _4 ) ), "execute query" }
 			},
 			"The `Query` class represents compiled database query. It is used for actual query execution."
 		)

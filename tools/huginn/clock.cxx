@@ -84,9 +84,9 @@ HHuginn::class_t HClock::get_class( HRuntime* runtime_ ) {
 			"Clock",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "milliseconds", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HClock::milliseconds, _1, _2, _3, _4 ) ), "how many milliseconds elapsed since last `Clock` reset" },
-				{ "reset",        runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HClock::reset, _1, _2, _3, _4 ) ),        "() - reset `Clock`s elapsed time counter" },
-				{ "to_string",    runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HClock::to_string, _1, _2, _3, _4 ) ),    "get precise `string` representation of elapsed time measured by this `Clock`" }
+				{ "milliseconds", runtime_->object_factory()->create_method( hcore::call( &HClock::milliseconds, _1, _2, _3, _4 ) ), "how many milliseconds elapsed since last `Clock` reset" },
+				{ "reset",        runtime_->object_factory()->create_method( hcore::call( &HClock::reset, _1, _2, _3, _4 ) ),        "() - reset `Clock`s elapsed time counter" },
+				{ "to_string",    runtime_->object_factory()->create_method( hcore::call( &HClock::to_string, _1, _2, _3, _4 ) ),    "get precise `string` representation of elapsed time measured by this `Clock`" }
 			},
 			"The `Clock` provides a stopper watch concept machinery."
 		)

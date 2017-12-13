@@ -98,9 +98,9 @@ public:
 			runtime_->identifier_id( "DatabaseConnection" ),
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "query",        runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::query, _1, _2, _3, _4 ) ),        "( *sql* ) - create query object for given *sql* `string`" },
-				{ "table_names",  runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::table_names, _1, _2, _3, _4 ) ),  "get list of table names available in connected database" },
-				{ "column_names", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::column_names, _1, _2, _3, _4 ) ), "( *table* ) - get list of column names from given *table* in connected database" }
+				{ "query",        runtime_->object_factory()->create_method( hcore::call( &HDatabaseConnection::query, _1, _2, _3, _4 ) ),        "( *sql* ) - create query object for given *sql* `string`" },
+				{ "table_names",  runtime_->object_factory()->create_method( hcore::call( &HDatabaseConnection::table_names, _1, _2, _3, _4 ) ),  "get list of table names available in connected database" },
+				{ "column_names", runtime_->object_factory()->create_method( hcore::call( &HDatabaseConnection::column_names, _1, _2, _3, _4 ) ), "( *table* ) - get list of column names from given *table* in connected database" }
 			},
 			"The `DatabaseConnection` class allows performing various type of queries on connected database."
 		)

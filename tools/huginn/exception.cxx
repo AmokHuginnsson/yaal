@@ -65,10 +65,10 @@ public:
 			base_
 				? HHuginn::field_definitions_t{}
 				: HHuginn::field_definitions_t{
-						{ "what",    runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::what, _1, _2, _3, _4 ) ),    "get exception message" },
-						{ "where",   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::where, _1, _2, _3, _4 ) ),   "get originating exception position" },
-						{ "trace",   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::trace, _1, _2, _3, _4 ) ),   "get call stack for exception origin" },
-						{ "message", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::message, _1, _2, _3, _4 ) ), "get exception message" }
+						{ "what",    runtime_->object_factory()->create_method( hcore::call( &HExceptionClass::what, _1, _2, _3, _4 ) ),    "get exception message" },
+						{ "where",   runtime_->object_factory()->create_method( hcore::call( &HExceptionClass::where, _1, _2, _3, _4 ) ),   "get originating exception position" },
+						{ "trace",   runtime_->object_factory()->create_method( hcore::call( &HExceptionClass::trace, _1, _2, _3, _4 ) ),   "get call stack for exception origin" },
+						{ "message", runtime_->object_factory()->create_method( hcore::call( &HExceptionClass::message, _1, _2, _3, _4 ) ), "get exception message" }
 				},
 			doc_
 		) {
@@ -245,11 +245,11 @@ HHuginn::class_t HStackFrameInfo::get_class( HRuntime* runtime_ ) {
 			"StackFrameInfo",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "file",      runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HStackFrameInfo::file, _1, _2, _3, _4 ) ),      "a name of the file where exception went through" },
-				{ "line",      runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HStackFrameInfo::line, _1, _2, _3, _4 ) ),      "a line number in given file where an exception went through" },
-				{ "column",    runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HStackFrameInfo::column, _1, _2, _3, _4 ) ),    "a column number where an exception went through" },
-				{ "context",   runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HStackFrameInfo::context, _1, _2, _3, _4 ) ),   "a calling context for given execution frame" },
-				{ "to_string", runtime_->object_factory()->create<HHuginn::HClass::HMethod>( hcore::call( &HStackFrameInfo::to_string, _1, _2, _3, _4 ) ), "a string representation of a StackFrameInfo value" }
+				{ "file",      runtime_->object_factory()->create_method( hcore::call( &HStackFrameInfo::file, _1, _2, _3, _4 ) ),      "a name of the file where exception went through" },
+				{ "line",      runtime_->object_factory()->create_method( hcore::call( &HStackFrameInfo::line, _1, _2, _3, _4 ) ),      "a line number in given file where an exception went through" },
+				{ "column",    runtime_->object_factory()->create_method( hcore::call( &HStackFrameInfo::column, _1, _2, _3, _4 ) ),    "a column number where an exception went through" },
+				{ "context",   runtime_->object_factory()->create_method( hcore::call( &HStackFrameInfo::context, _1, _2, _3, _4 ) ),   "a calling context for given execution frame" },
+				{ "to_string", runtime_->object_factory()->create_method( hcore::call( &HStackFrameInfo::to_string, _1, _2, _3, _4 ) ), "a string representation of a StackFrameInfo value" }
 			},
 			"The `StackFrameInfo` is a class representing information about single execution stack frame."
 		)
