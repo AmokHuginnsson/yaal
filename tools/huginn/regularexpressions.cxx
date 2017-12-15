@@ -55,7 +55,6 @@ public:
 		, _compiledRegularExpressionClass( HCompiledRegularExpression::get_class( class_->runtime(), _exceptionClass ) )
 		, _exceptionClass(
 			exception::create_class(
-				HHuginn::ACCESS::PACKAGE,
 				class_->runtime(),
 				"RegularExpressionException",
 				"The `RegularExpressionException` exception type for `RegularExpression` package."

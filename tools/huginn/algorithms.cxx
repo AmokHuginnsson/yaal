@@ -87,7 +87,6 @@ public:
 		, _reversedStringClass( HReversedString::get_class( class_->runtime() ) )
 		, _exceptionClass(
 			exception::create_class(
-				HHuginn::ACCESS::PACKAGE,
 				class_->runtime(),
 				"AlgorithmsException",
 				"The `AlgorithmsException` exception type for `Algorithms` package."

@@ -158,19 +158,19 @@ void HObjectFactory::register_builtin_classes( void ) {
 	_runtime->huginn()->register_class( _lookup );
 	_runtime->huginn()->register_class( _set );
 
-	_runtime->huginn()->register_class( _exception, HHuginn::ACCESS::PUBLIC );
+	_runtime->huginn()->register_class( _exception, HHuginn::ACCESS::PUBLIC, HHuginn::VISIBILITY::GLOBAL );
 
 	_conversionException = exception::create_class(
-		HHuginn::ACCESS::PUBLIC,
 		_runtime,
 		"ConversionException",
-		"The `ConversionException` is an exception class used to signal invalid conversion attempts."
+		"The `ConversionException` is an exception class used to signal invalid conversion attempts.",
+		HHuginn::VISIBILITY::GLOBAL
 	);
 	_arithmeticException = exception::create_class(
-		HHuginn::ACCESS::PUBLIC,
 		_runtime,
 		"ArithmeticException",
-		"The `ArithmeticException` is an exception class used to signal erroneous arithmetic operation."
+		"The `ArithmeticException` is an exception class used to signal erroneous arithmetic operation.",
+		HHuginn::VISIBILITY::GLOBAL
 	);
 	return;
 	M_EPILOG

@@ -54,7 +54,6 @@ public:
 		: HValue( class_ )
 		, _exceptionClass(
 			exception::create_class(
-				HHuginn::ACCESS::PACKAGE,
 				class_->runtime(),
 				"CryptographyException",
 				"The `CryptographyException` exception type for `Cryptography` package."

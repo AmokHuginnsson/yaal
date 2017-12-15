@@ -64,6 +64,7 @@ public:
 	static HHuginn::value_t apply( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t to_string( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::class_t get_class( HRuntime* );
+	static HHuginn::value_t create_instance( HHuginn::HClass const*, huginn::HThread*, HHuginn::values_t&, int );
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread*, int ) const override;
 };

@@ -251,6 +251,20 @@ void cleanup_packages( void ) {
 	M_EPILOG
 }
 
+HHuginn::class_t add_to_package( HHuginn::HClass* package_, HHuginn::class_t const& class_, yaal::hcore::HString const& doc_ ) {
+	M_PROLOG
+	HHuginn::value_t member(
+		package_->runtime()->object_factory()->create_method( class_->constructor_function( HHuginn::ACCESS::PUBLIC ) )
+	);
+	package_->add_member(
+		HHuginn::HFieldDefinition(
+			class_->name(), member, doc_
+		)
+	);
+	return ( class_ );
+	M_EPILOG
+}
+
 }
 
 }

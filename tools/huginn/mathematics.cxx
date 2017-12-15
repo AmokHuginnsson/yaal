@@ -60,15 +60,24 @@ class HMathematics : public HHuginn::HValue {
 public:
 	HMathematics( HHuginn::HClass* class_ )
 		: HValue( class_ )
-		, _matrixClass( HMatrix::get_class( class_->runtime() ) )
+		, _matrixClass(
+			add_to_package(
+				class_,
+				HMatrix::get_class( class_->runtime() ),
+				"( *type*, *rows*, *cols* ) - create instance of Matrix class of values of type *type* and *rows* rows and *cols* columns"
+			)
+		)
 		, _numberSetStatisticsClass( HNumberSetStatistics::get_class( class_->runtime() ) )
 		, _randomizerClass( HRandomizer::get_class( class_->runtime() ) )
 		, _exceptionClass(
-			exception::create_class(
-				HHuginn::ACCESS::PACKAGE,
-				class_->runtime(),
-				"MathematicsException",
-				"The `MathematicsException` exception type for `Mathematics` package."
+			add_to_package(
+				class_,
+				exception::create_class(
+					class_->runtime(),
+					"MathematicsException",
+					"The `MathematicsException` exception type for `Mathematics` package."
+				),
+				"( *message* ) - create instance of MathematicsException with given *message*"
 			)
 		) {
 		return;
@@ -492,7 +501,7 @@ public:
 	static HHuginn::value_t matrix( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		HMathematics* m( static_cast<HMathematics*>( object_->raw() ) );
-		return ( thread_->object_factory().create<HMatrix>( thread_, m->_matrixClass.raw(), values_, position_ ) );
+		return ( HMatrix::create_instance( m->_matrixClass.raw(), thread_, values_, position_ ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t statistics( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {

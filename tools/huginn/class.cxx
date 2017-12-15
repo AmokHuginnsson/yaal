@@ -49,10 +49,12 @@ HHuginn::HClass::HClass(
 	identifier_id_t identifierId_,
 	HClass const* super_,
 	field_definitions_t const& fieldDefinitions_,
-	yaal::hcore::HString const& doc_
+	yaal::hcore::HString const& doc_,
+	create_instance_t createInstance_
 ) : _typeId( typeId_ )
 	, _identifierId( identifierId_ )
 	, _super( nullptr )
+	, _createInstance( createInstance_ ? createInstance_ : &HClass::create_instance_default )
 	, _fieldIdentifiers()
 	, _fieldIndexes()
 	, _fieldDefinitions()
@@ -72,6 +74,7 @@ HHuginn::HClass::HClass(
 ) : _typeId( huginn::type_id( typeTag_ ) )
 	, _identifierId( identifierId_ )
 	, _super( nullptr )
+	, _createInstance( &HClass::create_instance_default )
 	, _fieldIdentifiers()
 	, _fieldIndexes()
 	, _fieldDefinitions()
@@ -139,9 +142,13 @@ HHuginn::function_t const& HHuginn::HClass::function( int index_ ) const {
 	M_EPILOG
 }
 
+HHuginn::value_t HHuginn::HClass::create_instance_default( HClass const* class_, huginn::HThread* thread_, values_t& values_, int position_ ) {
+	return ( class_->do_create_instance( thread_, values_, position_ ) );
+}
+
 HHuginn::value_t HHuginn::HClass::create_instance( huginn::HThread* thread_, value_t*, values_t& values_, int position_ ) const {
 	M_PROLOG
-	return ( do_create_instance( thread_, values_, position_ ) );
+	return ( _createInstance( this, thread_, values_, position_ ) );
 	M_EPILOG
 }
 
@@ -155,25 +162,31 @@ HHuginn::value_t HHuginn::HClass::access_violation( huginn::HThread* thread_, va
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HClass::constructor( HHuginn::ACCESS access_ ) const {
+HHuginn::function_t HHuginn::HClass::constructor_function( HHuginn::ACCESS access_ ) const {
 	M_PROLOG
-	HHuginn::identifier_id_t identifier( identifier_id() );
-	HHuginn::function_t func(
+	return (
 		hcore::call(
-			access_ != HHuginn::ACCESS::PRIVATE
+			access_ == HHuginn::ACCESS::PUBLIC
 				? &HHuginn::HClass::create_instance
 				: &HHuginn::HClass::access_violation,
 			this, _1, _2, _3, _4
 		)
 	);
-	HHuginn::value_t functionReference(
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::HClass::constructor( HHuginn::ACCESS access_ ) const {
+	M_PROLOG
+	HHuginn::identifier_id_t identifier( identifier_id() );
+	HHuginn::function_t func( constructor_function( access_ ) );
+	HHuginn::value_t ctor(
 		_runtime->object_factory()->create_function_reference(
 			identifier,
 			func,
 			"automatic constructor for class: `"_ys.append( _runtime->identifier_name( identifier ) ).append( "`" )
 		)
 	);
-	return ( functionReference );
+	return ( ctor );
 	M_EPILOG
 }
 

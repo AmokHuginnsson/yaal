@@ -92,6 +92,8 @@ private:
 	friend class yaal::hcore::HDestructor<HPackageFactory>;
 };
 
+HHuginn::class_t add_to_package( HHuginn::HClass*, HHuginn::class_t const&, yaal::hcore::HString const& );
+
 }
 
 }

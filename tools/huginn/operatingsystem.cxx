@@ -64,7 +64,6 @@ public:
 		, _subprocessClass( HSubprocess::get_class( class_->runtime() ) )
 		, _exceptionClass(
 			exception::create_class(
-				HHuginn::ACCESS::PACKAGE,
 				class_->runtime(),
 				"OperatingSystemException",
 				"The `OperatingSystemException` exception type for `OperatingSystem` package."

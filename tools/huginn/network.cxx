@@ -61,7 +61,6 @@ public:
 		, _streamClass( HStream::get_class( class_->runtime() ) )
 		, _exceptionClass(
 			exception::create_class(
-				HHuginn::ACCESS::PACKAGE,
 				class_->runtime(),
 				"NetworkException",
 				"The `NetworkException` exception type for `Network` package."

@@ -73,7 +73,6 @@ public:
 		, _fileStatClass( HFileStat::get_class( class_->runtime() ) )
 		, _exceptionClass(
 			exception::create_class(
-				HHuginn::ACCESS::PACKAGE,
 				class_->runtime(),
 				"FileSystemException",
 				"The `FileSystemException` exception type for `FileSystem` package."

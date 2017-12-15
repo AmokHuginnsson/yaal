@@ -194,8 +194,11 @@ public:
 	 */
 	enum class ACCESS {
 		PRIVATE,
-		PACKAGE,
 		PUBLIC
+	};
+	enum class VISIBILITY {
+		GLOBAL,
+		PACKAGE
 	};
 private:
 	enum class STATE {
@@ -336,7 +339,7 @@ public:
 	yaal::hcore::HStreamInterface& log_stream( void );
 	yaal::hcore::HString get_snippet( int, int ) const;
 	yaal::hcore::HString const& get_comment( int ) const;
-	void register_class( class_t, ACCESS = ACCESS::PRIVATE );
+	void register_class( class_t, ACCESS = ACCESS::PRIVATE, VISIBILITY = VISIBILITY::PACKAGE );
 	void register_function( identifier_id_t );
 	static void disable_grammar_verification( void );
 private:
@@ -452,12 +455,14 @@ class HHuginn::HClass {
 public:
 	typedef HHuginn::HClass this_type;
 	typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, int> field_indexes_t;
+	typedef value_t ( *create_instance_t )( HClass const*, huginn::HThread*, values_t&, int );
 	class HMethod;
 	class HBoundMethod;
 private:
 	type_id_t _typeId;
 	identifier_id_t _identifierId;
 	HClass const* _super;
+	create_instance_t _createInstance;
 	field_identifiers_t _fieldIdentifiers;
 	field_indexes_t _fieldIndexes;
 	values_t _fieldDefinitions;
@@ -465,7 +470,7 @@ private:
 	yaal::hcore::HString _doc;
 	huginn::HRuntime* _runtime;
 public:
-	HClass( huginn::HRuntime*, type_id_t, identifier_id_t, HClass const*, field_definitions_t const&, yaal::hcore::HString const& );
+	HClass( huginn::HRuntime*, type_id_t, identifier_id_t, HClass const*, field_definitions_t const&, yaal::hcore::HString const&, create_instance_t = nullptr );
 	HClass( HHuginn::TYPE, HHuginn::identifier_id_t, yaal::hcore::HString const& );
 	virtual ~HClass( void ) {
 	}
@@ -488,6 +493,7 @@ public:
 	value_t const& field( int index_ ) const {
 		return ( _fieldDefinitions[index_] );
 	}
+	function_t constructor_function( HHuginn::ACCESS ) const;
 	value_t constructor( HHuginn::ACCESS ) const;
 	values_t get_defaults( huginn::HThread*, int ) const;
 	value_t get_default( huginn::HThread*, int, int ) const;
@@ -503,6 +509,7 @@ public:
 	huginn::HRuntime* runtime( void ) const {
 		return ( _runtime );
 	}
+	static value_t create_instance_default( HClass const*, huginn::HThread*, values_t&, int );
 	value_t create_instance( huginn::HThread*, value_t*, values_t&, int ) const;
 	value_t access_violation( huginn::HThread*, value_t*, values_t&, int ) const __attribute__((noreturn));
 	yaal::hcore::HString const& doc( void ) const;

@@ -246,14 +246,14 @@ void HRuntime::set_max_call_stack_size( int maxCallStackSize_ ) {
 	M_EPILOG
 }
 
-void HRuntime::register_class( class_t class_, HHuginn::ACCESS classConstructorAccess_ ) {
+void HRuntime::register_class( class_t class_, HHuginn::ACCESS classConstructorAccess_, HHuginn::VISIBILITY classConstructorVisibility_ ) {
 	M_PROLOG
 	if ( _classes.insert( make_pair( class_->identifier_id(), class_ ) ).second ) {
 		_dependencies.push_back( class_ );
 		HHuginn::identifier_id_t identifier( class_->identifier_id() );
 		_functionsStore.insert( make_pair( identifier, class_->constructor( classConstructorAccess_ ) ) );
 	}
-	if ( classConstructorAccess_ == HHuginn::ACCESS::PUBLIC ) {
+	if ( classConstructorVisibility_ == HHuginn::VISIBILITY::GLOBAL ) {
 		_functionsAvailable.insert( class_->identifier_id() );
 	}
 	return;
@@ -312,7 +312,13 @@ void HRuntime::register_package( identifier_id_t package_, identifier_id_t alias
 	M_EPILOG
 }
 
-HHuginn::class_t HRuntime::create_class( identifier_id_t identifier_, HHuginn::HClass const* base_, field_definitions_t const& fieldDefinitions_, yaal::hcore::HString const& doc_ ) {
+HHuginn::class_t HRuntime::create_class(
+	identifier_id_t identifier_,
+	HHuginn::HClass const* base_,
+	field_definitions_t const& fieldDefinitions_,
+	yaal::hcore::HString const& doc_,
+	HHuginn::HClass::create_instance_t createInstance_
+) {
 	M_PROLOG
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
@@ -321,7 +327,8 @@ HHuginn::class_t HRuntime::create_class( identifier_id_t identifier_, HHuginn::H
 			identifier_,
 			base_,
 			fieldDefinitions_,
-			doc_
+			doc_,
+			createInstance_
 		)
 	);
 	++ _idGenerator;
@@ -329,9 +336,17 @@ HHuginn::class_t HRuntime::create_class( identifier_id_t identifier_, HHuginn::H
 	M_EPILOG
 }
 
-HHuginn::class_t HRuntime::create_class( yaal::hcore::HString const& name_, HHuginn::HClass const* base_, field_definitions_t const& fieldDefinitions_, yaal::hcore::HString const& doc_ ) {
+HHuginn::class_t HRuntime::create_class(
+	yaal::hcore::HString const& name_,
+	HHuginn::HClass const* base_,
+	field_definitions_t const& fieldDefinitions_,
+	yaal::hcore::HString const& doc_,
+	HHuginn::HClass::create_instance_t createInstance_
+) {
 	M_PROLOG
-	return ( create_class( identifier_id( name_ ), base_, fieldDefinitions_, doc_ ) );
+	return (
+		create_class( identifier_id( name_ ), base_, fieldDefinitions_, doc_, createInstance_ )
+	);
 	M_EPILOG
 }
 

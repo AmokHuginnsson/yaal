@@ -58,7 +58,6 @@ public:
 		, _databaseConnectionClass( HDatabaseConnection::get_class( class_->runtime(), _exceptionClass ) )
 		, _exceptionClass(
 			exception::create_class(
-				HHuginn::ACCESS::PACKAGE,
 				class_->runtime(),
 				"DatabaseException",
 				"The `DatabaseException` exception type for `Database` package."

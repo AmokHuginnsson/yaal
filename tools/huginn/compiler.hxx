@@ -247,7 +247,7 @@ struct OCompiler {
 		 * By nested calls we mean:
 		 * \code
 		 * foo( foo( foo( foo( 0 ) ) ) )
-		 * \codeend
+		 * \endcode
 		 */
 		int _nestedCalls;
 

@@ -156,7 +156,7 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 	M_EPILOG
 }
 
-HHuginn::class_t create_class( HHuginn::ACCESS access_, HRuntime* runtime_, yaal::hcore::HString const& name_, yaal::hcore::HString const& doc_, HHuginn::HClass const* base_ ) {
+HHuginn::class_t create_class( HRuntime* runtime_, yaal::hcore::HString const& name_, yaal::hcore::HString const& doc_, HHuginn::VISIBILITY visibility_, HHuginn::HClass const* base_ ) {
 	M_PROLOG
 	HHuginn::identifier_id_t classIdentifier( runtime_->identifier_id( name_ ) );
 	HHuginn::class_t c( runtime_ ? runtime_->get_class( classIdentifier ) : nullptr );
@@ -178,7 +178,7 @@ HHuginn::class_t create_class( HHuginn::ACCESS access_, HRuntime* runtime_, yaal
 		);
 	}
 	if ( runtime_ ) {
-		runtime_->huginn()->register_class( c, access_ );
+		runtime_->huginn()->register_class( c, HHuginn::ACCESS::PUBLIC, visibility_ );
 	}
 	return ( c );
 	M_EPILOG

@@ -553,6 +553,10 @@ HHuginn::value_t HMatrix::to_string( huginn::HThread* thread_, HHuginn::value_t*
 	M_EPILOG
 }
 
+HHuginn::value_t HMatrix::create_instance( HHuginn::HClass const* class_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
+	return ( thread_->object_factory().create<HMatrix>( thread_, class_, values_, position_ ) );
+}
+
 HHuginn::class_t HMatrix::get_class( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
@@ -575,10 +579,11 @@ HHuginn::class_t HMatrix::get_class( HRuntime* runtime_ ) {
 				{ "apply",     runtime_->object_factory()->create_method( hcore::call( &HMatrix::apply, _1, _2, _3, _4 ) ),     "( *fun* ) - apply unary function *fun* over all values in this `Matrix`" },
 				{ "to_string", runtime_->object_factory()->create_method( hcore::call( &HMatrix::to_string, _1, _2, _3, _4 ) ), "get string representation of this `Matrix`" }
 			},
-			"The `Matrix` class provides mathematical concept of number matrices. It supports operations of addition, multiplication, subtraction, scaling, inversion and transposition."
+			"The `Matrix` class provides mathematical concept of number matrices. It supports operations of addition, multiplication, subtraction, scaling, inversion and transposition.",
+			&HMatrix::create_instance
 		)
 	);
-	runtime_->huginn()->register_class( c );
+	runtime_->huginn()->register_class( c, HHuginn::ACCESS::PUBLIC );
 	return ( c );
 	M_EPILOG
 }

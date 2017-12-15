@@ -59,7 +59,6 @@ public:
 		, _clockClass( HClock::get_class( class_->runtime() ) )
 		, _exceptionClass(
 			exception::create_class(
-				HHuginn::ACCESS::PACKAGE,
 				class_->runtime(),
 				"DateTimeException",
 				"The `DateTimeException` exception type for `DateTime` package."
