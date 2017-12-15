@@ -657,6 +657,38 @@ HHuginn::type_id_t OCompiler::guess_type( HHuginn::identifier_id_t identifierId_
 	return ( t );
 }
 
+HHuginn::HClass const* OCompiler::type_id_to_clasS( HHuginn::type_id_t typeId_ ) const {
+	HHuginn::HClass const* c( &_unknownClass_ );
+	HObjectFactory const& of( *_runtime->object_factory() );
+	switch ( static_cast<HHuginn::TYPE>( typeId_.get() ) ) {
+		case ( HHuginn::TYPE::INTEGER ):             c = of.integer_class();         break;
+		case ( HHuginn::TYPE::REAL ):                c = of.real_class();            break;
+		case ( HHuginn::TYPE::STRING ):              c = of.string_class();          break;
+		case ( HHuginn::TYPE::NUMBER ):              c = of.number_class();          break;
+		case ( HHuginn::TYPE::CHARACTER ):           c = of.character_class();       break;
+		case ( HHuginn::TYPE::BOOLEAN ):             c = of.boolean_class();         break;
+		case ( HHuginn::TYPE::TUPLE ):               c = of.tuple_class();           break;
+		case ( HHuginn::TYPE::LIST ):                c = of.list_class();            break;
+		case ( HHuginn::TYPE::DEQUE ):               c = of.deque_class();           break;
+		case ( HHuginn::TYPE::DICT ):                c = of.dict_class();            break;
+		case ( HHuginn::TYPE::LOOKUP ):              c = of.lookup_class();          break;
+		case ( HHuginn::TYPE::ORDER ):               c = of.order_class();           break;
+		case ( HHuginn::TYPE::SET ):                 c = of.set_class();             break;
+		case ( HHuginn::TYPE::NONE ):                c = &_noneClass_;               break;
+		case ( HHuginn::TYPE::OBSERVER ):            c = &_observerClass_;           break;
+		case ( HHuginn::TYPE::REFERENCE ):           c = &_referenceClass_;          break;
+		case ( HHuginn::TYPE::FUNCTION_REFERENCE ):  c = &_functionReferenceClass_;  break;
+		case ( HHuginn::TYPE::OBJECT_REFERENCE ):    c = &_objectReferenceClass_;    break;
+		case ( HHuginn::TYPE::METHOD ):              c = &_methodClass_;             break;
+		case ( HHuginn::TYPE::BOUND_METHOD ):        c = &_boundMethodClass_;        break;
+		case ( HHuginn::TYPE::VARIADIC_PARAMETERS ): c = &_variadicParametersClass_; break;
+		case ( HHuginn::TYPE::NAMED_PARAMETERS ):    c = &_namedParametersClass_;    break;
+		case ( HHuginn::TYPE::NOT_BOOLEAN ):
+		case ( HHuginn::TYPE::UNKNOWN ):             c = &_unknownClass_;            break;
+	}
+	return ( c );
+}
+
 void OCompiler::note_type( HHuginn::identifier_id_t identifierId_, HHuginn::type_id_t type_ ) {
 	f()._scopeStack.top()->note_type( identifierId_, type_ );
 }

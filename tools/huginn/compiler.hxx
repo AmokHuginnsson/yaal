@@ -486,6 +486,7 @@ struct OCompiler {
 	HHuginn::expression_t& current_expression( void );
 	OScopeContext& current_scope_context( void );
 	HHuginn::type_id_t guess_type( HHuginn::identifier_id_t );
+	HHuginn::HClass const* type_id_to_clasS( HHuginn::type_id_t ) const;
 	void note_type( HHuginn::identifier_id_t, HHuginn::type_id_t );
 	void reset_expression( void );
 	void pop_function_context( void );

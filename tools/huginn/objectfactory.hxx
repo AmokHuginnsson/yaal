@@ -293,8 +293,44 @@ public:
 	HHuginn::value_t create_object( HHuginn::HClass const* class_, HHuginn::HObject::fields_t const& fields_ ) const {
 		return ( _objectPool.create( class_, fields_ ) );
 	}
+	HHuginn::HClass const* integer_class( void ) const {
+		return ( _integer.raw() );
+	}
+	HHuginn::HClass const* real_class( void ) const {
+		return ( _real.raw() );
+	}
+	HHuginn::HClass const* string_class( void ) const {
+		return ( _string.raw() );
+	}
+	HHuginn::HClass const* number_class( void ) const {
+		return ( _number.raw() );
+	}
+	HHuginn::HClass const* character_class( void ) const {
+		return ( _character.raw() );
+	}
 	HHuginn::HClass const* boolean_class( void ) const {
 		return ( _boolean.raw() );
+	}
+	HHuginn::HClass const* tuple_class( void ) const {
+		return ( _tuple.raw() );
+	}
+	HHuginn::HClass const* list_class( void ) const {
+		return ( _list.raw() );
+	}
+	HHuginn::HClass const* deque_class( void ) const {
+		return ( _deque.raw() );
+	}
+	HHuginn::HClass const* dict_class( void ) const {
+		return ( _dict.raw() );
+	}
+	HHuginn::HClass const* lookup_class( void ) const {
+		return ( _lookup.raw() );
+	}
+	HHuginn::HClass const* order_class( void ) const {
+		return ( _order.raw() );
+	}
+	HHuginn::HClass const* set_class( void ) const {
+		return ( _set.raw() );
 	}
 	HHuginn::HClass const* exception_class( void ) const {
 		return ( _exception.raw() );
