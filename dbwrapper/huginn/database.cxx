@@ -56,13 +56,7 @@ public:
 	HDatabase( HHuginn::HClass* class_ )
 		: HValue( class_ )
 		, _databaseConnectionClass( HDatabaseConnection::get_class( class_->runtime(), _exceptionClass ) )
-		, _exceptionClass(
-			exception::create_class(
-				class_->runtime(),
-				"DatabaseException",
-				"The `DatabaseException` exception type for `Database` package."
-			)
-		) {
+		, _exceptionClass( package_exception( class_ ) ) {
 		return;
 	}
 	static HHuginn::value_t connect( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {

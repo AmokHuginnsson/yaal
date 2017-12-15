@@ -62,13 +62,7 @@ public:
 		: HValue( class_ )
 		, _streamClass( HStream::get_class( class_->runtime() ) )
 		, _subprocessClass( HSubprocess::get_class( class_->runtime() ) )
-		, _exceptionClass(
-			exception::create_class(
-				class_->runtime(),
-				"OperatingSystemException",
-				"The `OperatingSystemException` exception type for `OperatingSystem` package."
-			)
-		) {
+		, _exceptionClass( package_exception( class_ ) ) {
 		return;
 	}
 	static HHuginn::value_t env( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {

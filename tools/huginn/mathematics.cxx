@@ -69,17 +69,7 @@ public:
 		)
 		, _numberSetStatisticsClass( HNumberSetStatistics::get_class( class_->runtime() ) )
 		, _randomizerClass( HRandomizer::get_class( class_->runtime() ) )
-		, _exceptionClass(
-			add_to_package(
-				class_,
-				exception::create_class(
-					class_->runtime(),
-					"MathematicsException",
-					"The `MathematicsException` exception type for `Mathematics` package."
-				),
-				"( *message* ) - create instance of MathematicsException with given *message*"
-			)
-		) {
+		, _exceptionClass( package_exception( class_ ) ) {
 		return;
 	}
 	static HHuginn::value_t get_constant( char const* name_, constant_getter_t constantGetter_, double long real_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {

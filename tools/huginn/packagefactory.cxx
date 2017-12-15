@@ -32,6 +32,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 #include "objectfactory.hxx"
 #include "compiler.hxx"
 #include "source.hxx"
+#include "exception.hxx"
 #include "hcore/hcore.hxx"
 #include "hcore/hfile.hxx"
 #include "tools/filesystem.hxx"
@@ -263,6 +264,23 @@ HHuginn::class_t add_to_package( HHuginn::HClass* package_, HHuginn::class_t con
 	);
 	return ( class_ );
 	M_EPILOG
+}
+
+HHuginn::class_t package_exception( HHuginn::HClass* package_ ) {
+	HString name( package_->name() );
+	HString exName( name );
+	exName.append( "Exception" );
+	return (
+		add_to_package(
+			package_,
+			exception::create_class(
+				package_->runtime(),
+				exName,
+				"The `"_ys.append( exName ).append( "` exception type for `" ).append( name ).append( "` package." )
+			),
+			"( *message* ) - create instance of "_ys.append( exName ).append( " with given *message*" )
+		)
+	);
 }
 
 }
