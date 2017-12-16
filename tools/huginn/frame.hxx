@@ -48,7 +48,8 @@ public:
 	typedef yaal::hcore::HStack<HHuginn::value_t> values_t;
 	typedef yaal::hcore::HStack<int> instruction_pointers_t;
 	typedef yaal::hcore::HArray<HHuginn::identifier_id_t> identifiers_t;
-	typedef yaal::hcore::HArray<HHuginn::values_t> value_cache_t;
+	typedef yaal::hcore::HResource<HHuginn::values_t> values_holder_t;
+	typedef yaal::hcore::HArray<values_holder_t> value_cache_t;
 	enum class TYPE {
 		SCOPE,
 		LOOP,
@@ -220,16 +221,16 @@ public:
 protected:
 	HHuginn::values_t& value_cache( void ) {
 		if (  _valueCacheSize == static_cast<int>( _valueCache.get_size() ) ) {
-			_valueCache.resize( _valueCacheSize + 1 );
-			_valueCache.back().reserve( _variables.get_capacity() );
+			_valueCache.emplace_back( yaal::hcore::make_resource<HHuginn::values_t>() );
+			_valueCache.back()->reserve( _variables.get_capacity() );
 		}
-		HHuginn::values_t& vals( _valueCache[_valueCacheSize] );
+		HHuginn::values_t& vals( *_valueCache[_valueCacheSize] );
 		++ _valueCacheSize;
 		return ( vals );
 	}
 	void invalidate_value_cache( void ) {
 		-- _valueCacheSize;
-		_valueCache[_valueCacheSize].clear();
+		_valueCache[_valueCacheSize]->clear();
 		return;
 	}
 	friend class HArguments;
