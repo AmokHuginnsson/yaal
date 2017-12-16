@@ -36,7 +36,7 @@ Copyright:
 #include "tools/huginn/frame.hxx"
 #include "tools/huginn/trycatch.hxx"
 #include "tools/huginn/scope.hxx"
-#include "tools/huginn/runtime.hxx"
+#include "tools/huginn/expression.hxx"
 #include "tools/hhuginn.hxx"
 
 namespace yaal {
@@ -50,7 +50,6 @@ class HExpression;
 /*! \brief Huginn language compiler.
  */
 struct OCompiler {
-	typedef void ( HExpression::* expression_action_t ) ( HFrame*, int );
 	typedef yaal::hcore::HStack<HFunction::expressions_t> expressions_stack_t;
 	typedef yaal::hcore::HHashMap<HHuginn::identifier_id_t, HHuginn::type_id_t> variable_types_t;
 	/*! \brief Saves _compiled_ `if'/`case' expression-scope pairs.
@@ -535,13 +534,13 @@ struct OCompiler {
 	void dispatch_negate( executing_parser::position_t );
 	void dispatch_compare( executing_parser::position_t );
 	void dispatch_equals( executing_parser::position_t );
-	void dispatch_boolean( expression_action_t const&, executing_parser::position_t );
+	void dispatch_boolean( HExpression::OExecutionStep::action_t const&, executing_parser::position_t );
 	void dispatch_ternary( void );
 	void dispatch_assign( executing_parser::position_t );
 	void dispatch_subscript( executing_parser::position_t );
-	void dispatch_function_call( expression_action_t const&, executing_parser::position_t );
+	void dispatch_function_call( HExpression::OExecutionStep::action_t const&, executing_parser::position_t );
 	void dispatch_member_access( executing_parser::position_t );
-	void defer_action( expression_action_t const&, executing_parser::position_t );
+	void defer_action( HExpression::OExecutionStep::action_t const&, executing_parser::position_t );
 	void defer_store_direct( HHuginn::value_t const&, executing_parser::position_t );
 	void defer_store_real( double long, executing_parser::position_t );
 	void defer_store_integer( int long long, executing_parser::position_t );

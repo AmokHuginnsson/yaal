@@ -45,6 +45,214 @@ namespace tools {
 
 namespace huginn {
 
+HExpression::OExecutionStep::OExecutionStep( void )
+	: _expression( nullptr )
+	, _action( nullptr )
+	, _position( INVALID_POSITION )
+	, _access( HFrame::ACCESS::VALUE )
+	, _statementId( INVALID_STATEMENT_IDENTIFIER )
+	, _index( -1 )
+	, _identifierId( INVALID_IDENTIFIER )
+	, _value()
+	, _valueRef()
+	, _real( 0.0L )
+	, _integer( 0 )
+	, _string()
+	, _character( 0 ) {
+}
+
+HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_ )
+	: _expression( expression_ )
+	, _action( action_ )
+	, _position( position_ )
+	, _access( HFrame::ACCESS::VALUE )
+	, _statementId( INVALID_STATEMENT_IDENTIFIER )
+	, _index( -1 )
+	, _identifierId( INVALID_IDENTIFIER )
+	, _value()
+	, _valueRef()
+	, _real( 0.0L )
+	, _integer( 0 )
+	, _string()
+	, _character( 0 ) {
+}
+
+HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HFrame::ACCESS access_ )
+	: _expression( expression_ )
+	, _action( action_ )
+	, _position( position_ )
+	, _access( access_ )
+	, _statementId( INVALID_STATEMENT_IDENTIFIER )
+	, _index( -1 )
+	, _identifierId( INVALID_IDENTIFIER )
+	, _value()
+	, _valueRef()
+	, _real( 0.0L )
+	, _integer( 0 )
+	, _string()
+	, _character( 0 ) {
+}
+
+HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HFrame::ACCESS access_, int index_ )
+	: _expression( expression_ )
+	, _action( action_ )
+	, _position( position_ )
+	, _access( access_ )
+	, _statementId( INVALID_STATEMENT_IDENTIFIER )
+	, _index( index_ )
+	, _identifierId( INVALID_IDENTIFIER )
+	, _value()
+	, _valueRef()
+	, _real( 0.0L )
+	, _integer( 0 )
+	, _string()
+	, _character( 0 ) {
+}
+
+HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HFrame::ACCESS access_, HHuginn::identifier_id_t identifierId_ )
+	: _expression( expression_ )
+	, _action( action_ )
+	, _position( position_ )
+	, _access( access_ )
+	, _statementId( INVALID_STATEMENT_IDENTIFIER )
+	, _index( -1 )
+	, _identifierId( identifierId_ )
+	, _value()
+	, _valueRef()
+	, _real( 0.0L )
+	, _integer( 0 )
+	, _string()
+	, _character( 0 ) {
+}
+
+HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HFrame::ACCESS access_, HStatement::statement_id_t statementId_, int index_ )
+	: _expression( expression_ )
+	, _action( action_ )
+	, _position( position_ )
+	, _access( access_ )
+	, _statementId( statementId_ )
+	, _index( index_ )
+	, _identifierId( INVALID_IDENTIFIER )
+	, _value()
+	, _valueRef()
+	, _real( 0.0L )
+	, _integer( 0 )
+	, _string()
+	, _character( 0 ) {
+}
+
+HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HFrame::ACCESS access_, HStatement::statement_id_t statementId_, int index_, HHuginn::identifier_id_t identifierId_ )
+	: _expression( expression_ )
+	, _action( action_ )
+	, _position( position_ )
+	, _access( access_ )
+	, _statementId( statementId_ )
+	, _index( index_ )
+	, _identifierId( identifierId_ )
+	, _value()
+	, _valueRef()
+	, _real( 0.0L )
+	, _integer( 0 )
+	, _string()
+	, _character( 0 ) {
+}
+
+HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HHuginn::value_ref_t const& valueRef_ )
+	: _expression( expression_ )
+	, _action( action_ )
+	, _position( position_ )
+	, _access( HFrame::ACCESS::VALUE )
+	, _statementId( INVALID_STATEMENT_IDENTIFIER )
+	, _index( -1 )
+	, _identifierId( INVALID_IDENTIFIER )
+	, _value()
+	, _valueRef( valueRef_ )
+	, _real( 0.0L )
+	, _integer( 0 )
+	, _string()
+	, _character( 0 ) {
+}
+
+HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HHuginn::value_t const& value_ )
+	: _expression( expression_ )
+	, _action( action_ )
+	, _position( position_ )
+	, _access( HFrame::ACCESS::VALUE )
+	, _statementId( INVALID_STATEMENT_IDENTIFIER )
+	, _index( -1 )
+	, _identifierId( INVALID_IDENTIFIER )
+	, _value( value_ )
+	, _valueRef()
+	, _real( 0.0L )
+	, _integer( 0 )
+	, _string()
+	, _character( 0 ) {
+}
+
+HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, double long doubleLong_ )
+	: _expression( expression_ )
+	, _action( action_ )
+	, _position( position_ )
+	, _access( HFrame::ACCESS::VALUE )
+	, _statementId( INVALID_STATEMENT_IDENTIFIER )
+	, _index( -1 )
+	, _identifierId( INVALID_IDENTIFIER )
+	, _value()
+	, _valueRef()
+	, _real( doubleLong_ )
+	, _integer( 0 )
+	, _string()
+	, _character( 0 ) {
+}
+
+HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, int long long integer_ )
+	: _expression( expression_ )
+	, _action( action_ )
+	, _position( position_ )
+	, _access( HFrame::ACCESS::VALUE )
+	, _statementId( INVALID_STATEMENT_IDENTIFIER )
+	, _index( -1 )
+	, _identifierId( INVALID_IDENTIFIER )
+	, _value()
+	, _valueRef()
+	, _real( 0.0L )
+	, _integer( integer_ )
+	, _string()
+	, _character( 0 ) {
+}
+
+HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, yaal::hcore::HString const& string_ )
+	: _expression( expression_ )
+	, _action( action_ )
+	, _position( position_ )
+	, _access( HFrame::ACCESS::VALUE )
+	, _statementId( INVALID_STATEMENT_IDENTIFIER )
+	, _index( -1 )
+	, _identifierId( INVALID_IDENTIFIER )
+	, _value()
+	, _valueRef()
+	, _real( 0.0L )
+	, _integer( 0 )
+	, _string( string_ )
+	, _character( 0 ) {
+}
+
+HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, code_point_t character_ )
+	: _expression( expression_ )
+	, _action( action_ )
+	, _position( position_ )
+	, _access( HFrame::ACCESS::VALUE )
+	, _statementId( INVALID_STATEMENT_IDENTIFIER )
+	, _index( -1 )
+	, _identifierId( INVALID_IDENTIFIER )
+	, _value()
+	, _valueRef()
+	, _real( 0.0L )
+	, _integer( 0 )
+	, _string()
+	, _character( character_ ) {
+}
+
 HExpression::HExpression( int fileId_, int position_ )
 	: HStatement( INVALID_STATEMENT_IDENTIFIER, fileId_, position_ )
 	, _executionSteps()
@@ -53,14 +261,14 @@ HExpression::HExpression( int fileId_, int position_ )
 	return;
 }
 
-int HExpression::add_execution_step( execution_step_t const& executionStep_ ) {
+int HExpression::add_execution_step( OExecutionStep const& executionStep_ ) {
 	M_PROLOG
 	_executionSteps.push_back( executionStep_ );
 	return ( static_cast<int>( _executionSteps.get_size() - 1 ) );
 	M_EPILOG
 }
 
-void HExpression::replace_execution_step( int index_, execution_step_t const& executionStep_ ) {
+void HExpression::replace_execution_step( int index_, OExecutionStep const& executionStep_ ) {
 	M_PROLOG
 	_executionSteps[index_] = executionStep_;
 	return;
@@ -177,7 +385,7 @@ void HExpression::commit_oper( OPERATOR operator_ ) {
 	M_EPILOG
 }
 
-void HExpression::close_parenthesis( HFrame* frame_, int position_ ) {
+void HExpression::close_parenthesis( OExecutionStep const& executionStep_, HFrame* frame_ ) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( ! frame_->values().is_empty() );
@@ -187,41 +395,41 @@ void HExpression::close_parenthesis( HFrame* frame_, int position_ ) {
 	if ( o == OPERATOR::ABSOLUTE ) {
 		HHuginn::value_t v( yaal::move( frame_->values().top() ) );
 		frame_->values().pop();
-		frame_->values().push( value_builtin::abs( frame_->thread(), v, position_ ) );
+		frame_->values().push( value_builtin::abs( frame_->thread(), v, executionStep_._position ) );
 	}
 	return;
 	M_EPILOG
 }
 
-void HExpression::get_field_direct( HFrame::ACCESS access_, int index_, huginn::HFrame* frame_, int ) {
+void HExpression::get_field_direct( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
 	M_PROLOG
-	frame_->values().emplace( frame_->get_field( access_, index_ ) );
+	frame_->values().emplace( frame_->get_field( executionStep_._access, executionStep_._index ) );
 	return;
 	M_EPILOG
 }
 
-void HExpression::get_variable_direct( HFrame::ACCESS access_, HStatement::statement_id_t statementId_, int index_, huginn::HFrame* frame_, int ) {
+void HExpression::get_variable_direct( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
 	M_PROLOG
-	frame_->values().emplace( frame_->get_variable( access_, statementId_, index_ ) );
+	frame_->values().emplace( frame_->get_variable( executionStep_._access, executionStep_._statementId, executionStep_._index ) );
 	return;
 	M_EPILOG
 }
 
-void HExpression::get_this( huginn::HFrame* frame_, int ) {
+void HExpression::get_this( OExecutionStep const&, huginn::HFrame* frame_ ) {
 	M_PROLOG
 	frame_->values().emplace( frame_->get_this() );
 	return;
 	M_EPILOG
 }
 
-void HExpression::get_super( huginn::HFrame* frame_, int position_ ) {
+void HExpression::get_super( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
 	M_PROLOG
-	frame_->values().emplace( frame_->get_super( position_ ) );
+	frame_->values().emplace( frame_->get_super( executionStep_._position ) );
 	return;
 	M_EPILOG
 }
 
-void HExpression::get_field( HFrame::ACCESS access_, HHuginn::identifier_id_t identifierId_, huginn::HFrame* frame_, int ) {
+void HExpression::get_field(  OExecutionStep const& executionStep_,huginn::HFrame* frame_ ) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::MEMBER_ACCESS );
@@ -233,21 +441,21 @@ void HExpression::get_field( HFrame::ACCESS access_, HHuginn::identifier_id_t id
 	HRuntime& rt( t->runtime() );
 	HHuginn::HObjectReference* oref( nullptr );
 	if ( v->get_class()->is_complex() ) {
-		int fi( v->field_index( identifierId_ ) );
+		int fi( v->field_index( executionStep_._identifierId ) );
 		if ( fi < 0 ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"`"_ys
 				.append( v->get_class()->name() )
 				.append( "' does not have `" )
-				.append( rt.identifier_name( identifierId_ ) )
+				.append( rt.identifier_name( executionStep_._identifierId ) )
 				.append( "' member (did you mean `" )
-				.append( rt.suggestion( v->get_class(), identifierId_ ) )
+				.append( rt.suggestion( v->get_class(), executionStep_._identifierId ) )
 				.append( "'?)." ),
 				file_id(),
 				p
 			);
 		}
-		if ( access_ == HFrame::ACCESS::VALUE ) {
+		if ( executionStep_._access == HFrame::ACCESS::VALUE ) {
 			frame_->values().push( v->field( v, fi ) );
 		} else if ( ! v.unique() ) {
 			HHuginn::HObject* o( dynamic_cast<HHuginn::HObject*>( v.raw() ) );
@@ -260,21 +468,21 @@ void HExpression::get_field( HFrame::ACCESS access_, HHuginn::identifier_id_t id
 			throw HHuginn::HHuginnRuntimeException( "Assignment to temporary.", file_id(), p );
 		}
 	} else if ( ( oref = dynamic_cast<HHuginn::HObjectReference*>( v.raw() ) ) != nullptr ) { /* Handle `super' keyword. */
-		int fi( oref->field_index( identifierId_ ) );
+		int fi( oref->field_index( executionStep_._identifierId ) );
 		if ( fi < 0 ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"`"_ys
 				.append( oref->get_class()->name() )
 				.append( "' does not have `" )
-				.append( rt.identifier_name( identifierId_ ) )
+				.append( rt.identifier_name( executionStep_._identifierId ) )
 				.append( "' member (did you mean `" )
-				.append( rt.suggestion( identifierId_ ) )
+				.append( rt.suggestion( executionStep_._identifierId ) )
 				.append( "'?)." ),
 				file_id(),
 				p
 			);
 		}
-		if ( access_ == HFrame::ACCESS::VALUE ) {
+		if ( executionStep_._access == HFrame::ACCESS::VALUE ) {
 			frame_->values().push( oref->field( t, fi, p ) );
 		} else {
 			throw HHuginn::HHuginnRuntimeException( "Changing upcasted reference.", file_id(), p );
@@ -294,7 +502,7 @@ void HExpression::get_field( HFrame::ACCESS access_, HHuginn::identifier_id_t id
 	M_EPILOG
 }
 
-void HExpression::set_variable( HFrame* frame_, int ) {
+void HExpression::set_variable( OExecutionStep const&, HFrame* frame_ ) {
 	M_PROLOG
 	int& ip( frame_->ip() );
 	while ( ip < static_cast<int>( _instructions.get_size() ) ) {
@@ -355,7 +563,7 @@ void HExpression::grab_args( HFrame* frame_, HArguments& args_ ) {
 	M_EPILOG
 }
 
-void HExpression::pack_named_parameters( huginn::HFrame* frame_, int position_ ) {
+void HExpression::pack_named_parameters( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
 	M_PROLOG
 	HFrame::values_t& values( frame_->values() );
 	HHuginn::value_t& vr( values.top() );
@@ -366,21 +574,21 @@ void HExpression::pack_named_parameters( huginn::HFrame* frame_, int position_ )
 		values.pop();
 		HHuginn::value_t& vtr( values.top() );
 		if ( vtr->type_id() != HHuginn::TYPE::LOOKUP ) {
-			throw HHuginn::HHuginnRuntimeException( "Packed parameter is not a lookup.", file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Packed parameter is not a lookup.", file_id(), executionStep_._position );
 		}
 		vtr.swap( v );
 		HHuginn::HTaggedValue& tv( *static_cast<HHuginn::HTaggedValue*>( vtr.raw() ) );
 		HHuginn::HLookup& l( *static_cast<HHuginn::HLookup*>( v.raw() ) );
-		l.update( frame_->thread(), tv.value(), position_ );
+		l.update( frame_->thread(), tv.value(), executionStep_._position );
 		tv.value().swap( v );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "Packed parameter is not a lookup.", file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Packed parameter is not a lookup.", file_id(), executionStep_._position );
 	}
 	return;
 	M_EPILOG
 }
 
-void HExpression::function_call( HFrame* frame_, int position_ ) {
+void HExpression::function_call( OExecutionStep const& executionStep_, HFrame* frame_ ) {
 	M_PROLOG
 	HArguments args( frame_ );
 	grab_args( frame_, args );
@@ -391,13 +599,13 @@ void HExpression::function_call( HFrame* frame_, int position_ ) {
 	HHuginn::HClass const* c( values.top()->get_class() );
 	HHuginn::type_id_t t( c->type_id() );
 	if ( ( t != HHuginn::TYPE::FUNCTION_REFERENCE ) && ( t != HHuginn::TYPE::BOUND_METHOD ) ) {
-		throw HHuginn::HHuginnRuntimeException( "Reference `"_ys.append( c->name() ).append( "' is not a function." ), file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Reference `"_ys.append( c->name() ).append( "' is not a function." ), file_id(), executionStep_._position );
 	}
 	HHuginn::value_t f( yaal::move( values.top() ) );
 	values.pop();
 	HThread* thread( frame_->thread() );
 	if ( thread->call_stack_size() >= thread->runtime().max_call_stack_size() ) {
-		throw HHuginn::HHuginnRuntimeException( "Call stack size limit exceeded: "_ys.append( thread->call_stack_size() + 1 ), file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Call stack size limit exceeded: "_ys.append( thread->call_stack_size() + 1 ), file_id(), executionStep_._position );
 	}
 	frame_->set_position( p );
 	if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
@@ -411,7 +619,7 @@ void HExpression::function_call( HFrame* frame_, int position_ ) {
 	M_EPILOG
 }
 
-void HExpression::create_closure( HFrame* frame_, int ) {
+void HExpression::create_closure( OExecutionStep const&, HFrame* frame_ ) {
 	M_PROLOG
 	HFrame::values_t& values( frame_->values() );
 	HHuginn::value_t f( yaal::move( values.top() ) );
@@ -475,7 +683,7 @@ void HExpression::make_assoc( OPERATOR op_, HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::plus( HFrame* frame_, int ) {
+void HExpression::plus( OExecutionStep const&, HFrame* frame_ ) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::PLUS );
@@ -495,7 +703,7 @@ void HExpression::plus( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::minus( HFrame* frame_, int ) {
+void HExpression::minus( OExecutionStep const&, HFrame* frame_ ) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::MINUS );
@@ -515,7 +723,7 @@ void HExpression::minus( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::mul( HFrame* frame_, int ) {
+void HExpression::mul( OExecutionStep const&, HFrame* frame_ ) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::MULTIPLY );
@@ -535,7 +743,7 @@ void HExpression::mul( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::div( HFrame* frame_, int ) {
+void HExpression::div( OExecutionStep const&, HFrame* frame_ ) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::DIVIDE );
@@ -555,7 +763,7 @@ void HExpression::div( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::mod( HFrame* frame_, int ) {
+void HExpression::mod( OExecutionStep const&, HFrame* frame_ ) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::MODULO );
@@ -575,17 +783,17 @@ void HExpression::mod( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::factorial( huginn::HFrame* frame_, int position_ ) {
+void HExpression::factorial( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->values().is_empty() );
 	HHuginn::value_t v( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	frame_->values().push( value_builtin::factorial( frame_->thread(), v, position_ ) );
+	frame_->values().push( value_builtin::factorial( frame_->thread(), v, executionStep_._position ) );
 	return;
 	M_EPILOG
 }
 
-void HExpression::negate( HFrame* frame_, int ) {
+void HExpression::negate( OExecutionStep const&, HFrame* frame_ ) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::NEGATE );
@@ -599,7 +807,7 @@ void HExpression::negate( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::power( HFrame* frame_, int ) {
+void HExpression::power( OExecutionStep const&, HFrame* frame_ ) {
 	M_PROLOG
 	int& ip( frame_->ip() );
 	while ( ( ip < static_cast<int>( _instructions.get_size() ) ) && ( _instructions[ip]._operator == OPERATOR::POWER ) ) {
@@ -622,7 +830,7 @@ void HExpression::power( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::subscript( HFrame::ACCESS access_, HFrame* frame_, int ) {
+void HExpression::subscript( OExecutionStep const& executionStep_, HFrame* frame_ ) {
 	M_PROLOG
 	int& ip( frame_->ip() );
 	M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );
@@ -636,12 +844,12 @@ void HExpression::subscript( HFrame::ACCESS access_, HFrame* frame_, int ) {
 	++ ip;
 	HHuginn::value_t base( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	frame_->values().push( value_builtin::subscript( frame_->thread(), access_, base, index, p ) );
+	frame_->values().push( value_builtin::subscript( frame_->thread(), executionStep_._access, base, index, p ) );
 	return;
 	M_EPILOG
 }
 
-void HExpression::range( HFrame* frame_, int ) {
+void HExpression::range( OExecutionStep const&, HFrame* frame_ ) {
 	M_PROLOG
 	int& ip( frame_->ip() );
 	M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );
@@ -692,7 +900,7 @@ void HExpression::range( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::equals( HFrame* frame_, int ) {
+void HExpression::equals( OExecutionStep const&, HFrame* frame_ ) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::EQUALS );
@@ -712,7 +920,7 @@ void HExpression::equals( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::not_equals( HFrame* frame_, int ) {
+void HExpression::not_equals( OExecutionStep const&, HFrame* frame_ ) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::NOT_EQUALS );
@@ -732,7 +940,7 @@ void HExpression::not_equals( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::less( HFrame* frame_, int ) {
+void HExpression::less( OExecutionStep const&, HFrame* frame_ ) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::LESS );
@@ -750,7 +958,7 @@ void HExpression::less( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::greater( HFrame* frame_, int ) {
+void HExpression::greater( OExecutionStep const&, HFrame* frame_ ) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::GREATER );
@@ -768,7 +976,7 @@ void HExpression::greater( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::less_or_equal( HFrame* frame_, int ) {
+void HExpression::less_or_equal( OExecutionStep const&, HFrame* frame_ ) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::LESS_OR_EQUAL );
@@ -786,7 +994,7 @@ void HExpression::less_or_equal( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::greater_or_equal( HFrame* frame_, int ) {
+void HExpression::greater_or_equal( OExecutionStep const&, HFrame* frame_ ) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::GREATER_OR_EQUAL );
@@ -804,7 +1012,7 @@ void HExpression::greater_or_equal( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::boolean_and( HFrame* frame_, int ) {
+void HExpression::boolean_and( OExecutionStep const&, HFrame* frame_ ) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::BOOLEAN_AND );
@@ -817,7 +1025,7 @@ void HExpression::boolean_and( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::boolean_or( HFrame* frame_, int ) {
+void HExpression::boolean_or( OExecutionStep const&, HFrame* frame_ ) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::BOOLEAN_OR );
@@ -830,7 +1038,7 @@ void HExpression::boolean_or( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::boolean_xor( HFrame* frame_, int ) {
+void HExpression::boolean_xor( OExecutionStep const&, HFrame* frame_ ) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::BOOLEAN_XOR );
@@ -855,7 +1063,7 @@ void HExpression::boolean_xor( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::boolean_not( HFrame* frame_, int ) {
+void HExpression::boolean_not( OExecutionStep const&, HFrame* frame_ ) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::BOOLEAN_NOT );
@@ -874,7 +1082,7 @@ void HExpression::boolean_not( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::ternary( HFrame* frame_, int ) {
+void HExpression::ternary( OExecutionStep const&, HFrame* frame_ ) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::TERNARY );
@@ -887,51 +1095,51 @@ void HExpression::ternary( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::store_direct( HHuginn::value_t const& value_, HFrame* frame_, int ) {
+void HExpression::store_direct( OExecutionStep const& executionStep_, HFrame* frame_ ) {
 	M_PROLOG
-	frame_->values().push( value_ );
+	frame_->values().push( executionStep_._value );
 	return;
 	M_EPILOG
 }
 
-void HExpression::store_external_reference( HHuginn::value_ref_t const& value_, huginn::HFrame* frame_, int ) {
+void HExpression::store_external_reference( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
 	M_PROLOG
-	frame_->values().push( value_ );
+	frame_->values().push( executionStep_._valueRef );
 	return;
 	M_EPILOG
 }
 
-void HExpression::store_real( double long value_, HFrame* frame_, int ) {
+void HExpression::store_real( OExecutionStep const& executionStep_, HFrame* frame_ ) {
 	M_PROLOG
-	frame_->values().push( frame_->thread()->object_factory().create_real( value_ ) );
+	frame_->values().push( frame_->thread()->object_factory().create_real( executionStep_._real ) );
 	return;
 	M_EPILOG
 }
 
-void HExpression::store_integer( int long long value_, HFrame* frame_, int ) {
+void HExpression::store_integer( OExecutionStep const& executionStep_, HFrame* frame_ ) {
 	M_PROLOG
-	frame_->values().push( frame_->thread()->object_factory().create_integer( value_ ) );
+	frame_->values().push( frame_->thread()->object_factory().create_integer( executionStep_._integer ) );
 	return;
 	M_EPILOG
 }
 
-void HExpression::store_string( yaal::hcore::HString const& value_, HFrame* frame_, int ) {
+void HExpression::store_string( OExecutionStep const& executionStep_, HFrame* frame_ ) {
 	M_PROLOG
-	frame_->values().push( frame_->thread()->runtime().object_factory()->create_string( value_ ) );
+	frame_->values().push( frame_->thread()->runtime().object_factory()->create_string( executionStep_._string ) );
 	return;
 	M_EPILOG
 }
 
-void HExpression::store_number( yaal::hcore::HString const& value_, HFrame* frame_, int ) {
+void HExpression::store_number( OExecutionStep const& executionStep_, HFrame* frame_ ) {
 	M_PROLOG
-	frame_->values().push( frame_->thread()->object_factory().create_number( value_ ) );
+	frame_->values().push( frame_->thread()->object_factory().create_number( executionStep_._string ) );
 	return;
 	M_EPILOG
 }
 
-void HExpression::store_character( code_point_t value_, HFrame* frame_, int ) {
+void HExpression::store_character( OExecutionStep const& executionStep_, HFrame* frame_ ) {
 	M_PROLOG
-	frame_->values().push( frame_->thread()->object_factory().create_character( value_ ) );
+	frame_->values().push( frame_->thread()->object_factory().create_character( executionStep_._character ) );
 	return;
 	M_EPILOG
 }
@@ -941,8 +1149,8 @@ void HExpression::do_execute( huginn::HThread* thread_ ) const {
 		M_ASSERT( _operations.is_empty() );
 		HFrame* f( thread_->current_frame() );
 		f->start_expression();
-		for ( execution_step_t const& e : _executionSteps ) {
-			e( f );
+		for ( OExecutionStep const& e : _executionSteps ) {
+			( e._expression->*e._action )( e, f );
 			if ( ! thread_->can_continue() ) {
 				break;
 			}

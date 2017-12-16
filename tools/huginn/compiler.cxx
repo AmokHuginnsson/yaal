@@ -359,13 +359,12 @@ void OCompiler::resolve_symbols( void ) {
 						}
 						es._expression->replace_execution_step(
 							es._index,
-							hcore::call(
-								&HExpression::get_field_direct,
+							HExpression::OExecutionStep(
 								es._expression.raw(),
+								&HExpression::get_field_direct,
+								es._position,
 								es._operation == OExecutionStep::OPERATION::USE ? HFrame::ACCESS::VALUE : HFrame::ACCESS::REFERENCE,
-								index,
-								_1,
-								es._position
+								index
 							)
 						);
 						break;
@@ -377,13 +376,12 @@ void OCompiler::resolve_symbols( void ) {
 					if ( ci != cli->second.end() ) {
 						es._expression->replace_execution_step(
 							es._index,
-							hcore::call(
-								&HExpression::get_field_direct,
+							HExpression::OExecutionStep(
 								es._expression.raw(),
+								&HExpression::get_field_direct,
+								es._position,
 								es._operation == OExecutionStep::OPERATION::USE ? HFrame::ACCESS::VALUE : HFrame::ACCESS::REFERENCE,
-								static_cast<int>( distance( cli->second.begin(), ci ) ),
-								_1,
-								es._position
+								static_cast<int>( distance( cli->second.begin(), ci ) )
 							)
 						);
 						break;
@@ -441,28 +439,26 @@ void OCompiler::resolve_symbols( void ) {
 						if ( _introspector ) {
 							es._expression->replace_execution_step(
 								es._index,
-								hcore::call(
-									&HIntroExpression::get_variable_direct_note,
+								HExpression::OExecutionStep(
 									static_cast<HIntroExpression*>( es._expression.raw() ),
+									static_cast<HExpression::OExecutionStep::action_t>( &HIntroExpression::get_variable_direct_note ),
+									es._position,
 									HFrame::ACCESS::REFERENCE,
 									sc->_statementId,
 									localVariable._index,
-									_1,
-									es._identifier,
-									es._position
+									es._identifier
 								)
 							);
 						} else {
 							es._expression->replace_execution_step(
 								es._index,
-								hcore::call(
-									&HExpression::get_variable_direct,
+								HExpression::OExecutionStep(
 									es._expression.raw(),
+									&HExpression::get_variable_direct,
+									es._position,
 									HFrame::ACCESS::REFERENCE,
 									sc->_statementId,
-									localVariable._index,
-									_1,
-									es._position
+									localVariable._index
 								)
 							);
 						}
@@ -484,14 +480,13 @@ void OCompiler::resolve_symbols( void ) {
 						}
 						es._expression->replace_execution_step(
 							es._index,
-							hcore::call(
-								&HExpression::get_variable_direct,
+							HExpression::OExecutionStep(
 								es._expression.raw(),
+								&HExpression::get_variable_direct,
+								es._position,
 								es._operation == OExecutionStep::OPERATION::USE ? HFrame::ACCESS::VALUE : HFrame::ACCESS::REFERENCE,
 								sc->_statementId,
-								localVariable._index,
-								_1,
-								es._position
+								localVariable._index
 							)
 						);
 						break;
@@ -502,12 +497,11 @@ void OCompiler::resolve_symbols( void ) {
 					if ( !! callable ) {
 						es._expression->replace_execution_step(
 							es._index,
-							hcore::call(
-								&HExpression::store_external_reference,
+							HExpression::OExecutionStep(
 								es._expression.raw(),
-								HHuginn::value_ref_t( *callable ),
-								_1,
-								es._position
+								&HExpression::store_external_reference,
+								es._position,
+								HHuginn::value_ref_t( *callable )
 							)
 						);
 						break;
@@ -516,12 +510,11 @@ void OCompiler::resolve_symbols( void ) {
 						if ( !! p ) {
 							es._expression->replace_execution_step(
 								es._index,
-								hcore::call(
-									&HExpression::store_external_reference,
+								HExpression::OExecutionStep(
 									es._expression.raw(),
-									HHuginn::value_ref_t( *p ),
-									_1,
-									es._position
+									&HExpression::store_external_reference,
+									es._position,
+									HHuginn::value_ref_t( *p )
 								)
 							);
 							break;
@@ -1257,7 +1250,7 @@ void OCompiler::add_return_statement( executing_parser::position_t position_ ) {
 	M_ASSERT( ! f()._scopeStack.is_empty() );
 	HHuginn::expression_t& e( current_expression() );
 	if ( e->is_empty() ) {
-		e->add_execution_step( hcore::call( &HExpression::store_direct, e.raw(), _runtime->none_value(), _1, position_.get() ) );
+		e->add_execution_step( HExpression::OExecutionStep( e.raw(), &HExpression::store_direct, position_.get(), _runtime->none_value() ) );
 	}
 	terminate_scope( make_pointer<HReturn>( e, _fileId, position_.get() ) );
 	reset_expression();
@@ -1882,7 +1875,7 @@ void OCompiler::dispatch_compare( executing_parser::position_t position_ ) {
 	M_EPILOG
 }
 
-void OCompiler::dispatch_boolean( expression_action_t const& action_, executing_parser::position_t position_ ) {
+void OCompiler::dispatch_boolean( HExpression::OExecutionStep::action_t const& action_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	OPositionedOperator po( fc._operations.top() );
@@ -2082,10 +2075,10 @@ void OCompiler::dispatch_subscript( executing_parser::position_t position_ ) {
 		if ( nonInteger ) {
 			throw HHuginn::HHuginnRuntimeException( "Range specifier is not an integer.", MAIN_FILE_ID, p );
 		}
-		expression->add_execution_step( hcore::call( &HExpression::range, expression.raw(), _1, position_.get() ) );
+		expression->add_execution_step( HExpression::OExecutionStep( expression.raw(), &HExpression::range, position_.get() ) );
 		expression->commit_oper( OPERATOR::RANGE );
 	} else {
-		expression->add_execution_step( hcore::call( &HExpression::subscript, expression.raw(), HFrame::ACCESS::VALUE, _1, position_.get() ) );
+		expression->add_execution_step( HExpression::OExecutionStep( expression.raw(), &HExpression::subscript, position_.get(), HFrame::ACCESS::VALUE ) );
 		expression->commit_oper( OPERATOR::SUBSCRIPT );
 	}
 	fc._operations.pop();
@@ -2127,7 +2120,7 @@ HHuginn::type_id_t function_ref_to_type_id( HHuginn::identifier_id_t identifierI
 }
 }
 
-void OCompiler::dispatch_function_call( expression_action_t const& action_, executing_parser::position_t position_ ) {
+void OCompiler::dispatch_function_call( HExpression::OExecutionStep::action_t const& action_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	HExpression* expr( current_expression().raw() );
@@ -2138,11 +2131,11 @@ void OCompiler::dispatch_function_call( expression_action_t const& action_, exec
 		sc._assertExpressionEnd = 0;
 		expr->oper( OPERATOR::FUNCTION_ARGUMENT, position_.get() );
 		expr->add_execution_step(
-			hcore::call(
-				&HExpression::store_direct, expr,
-				_runtime->object_factory()->create_string( _runtime->huginn()->get_snippet( from, len ).trim() ),
-				_1,
-				position_.get()
+			HExpression::OExecutionStep(
+				expr,
+				&HExpression::store_direct,
+				position_.get(),
+				_runtime->object_factory()->create_string( _runtime->huginn()->get_snippet( from, len ).trim() )
 			)
 		);
 		fc._isAssert = false;
@@ -2175,7 +2168,7 @@ void OCompiler::dispatch_function_call( expression_action_t const& action_, exec
 void OCompiler::pack_named_parameters( executing_parser::position_t position_ ) {
 	M_PROLOG
 	HExpression* expr( current_expression().raw() );
-	expr->add_execution_step( hcore::call( &HExpression::pack_named_parameters, expr, _1, position_.get() ) );
+	expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::pack_named_parameters, position_.get() ) );
 	return;
 	M_EPILOG
 }
@@ -2265,10 +2258,10 @@ void OCompiler::dispatch_action( OPERATOR oper_, executing_parser::position_t po
 	M_EPILOG
 }
 
-void OCompiler::defer_action( expression_action_t const& expressionAction_, executing_parser::position_t position_ ) {
+void OCompiler::defer_action( HExpression::OExecutionStep::action_t const& expressionAction_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	HExpression* expr( current_expression().raw() );
-	expr->add_execution_step( hcore::call( expressionAction_, expr, _1, position_.get() ) );
+	expr->add_execution_step( HExpression::OExecutionStep( expr, expressionAction_, position_.get() ) );
 	return;
 	M_EPILOG
 }
@@ -2291,12 +2284,12 @@ void OCompiler::make_reference( executing_parser::position_t position_ ) {
 	if ( fc._lastDereferenceOperator == OPERATOR::SUBSCRIPT ) {
 		expr->pop_execution_step();
 		expr->add_execution_step(
-			hcore::call( &HExpression::subscript, expr, HFrame::ACCESS::REFERENCE, _1, position_.get() )
+			HExpression::OExecutionStep( expr, &HExpression::subscript, position_.get(), HFrame::ACCESS::REFERENCE )
 		);
 	} else {
 		expr->pop_execution_step();
 		expr->add_execution_step(
-			hcore::call( &HExpression::get_field, expr, HFrame::ACCESS::REFERENCE, fc._lastMemberName, _1, _fileId )
+			HExpression::OExecutionStep( expr, &HExpression::get_field, position_.get(), HFrame::ACCESS::REFERENCE, fc._lastMemberName )
 		);
 	}
 	fc._variables.emplace( INVALID_IDENTIFIER, -1 );
@@ -2334,12 +2327,11 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 		 * so they meaning stays always the same.
 		 */
 		expr->add_execution_step(
-			hcore::call(
-				&HExpression::store_direct,
+			HExpression::OExecutionStep(
 				expr,
-				*_runtime->get_function( refIdentifier ),
-				_1,
-				position_.get()
+				&HExpression::store_direct,
+				position_.get(),
+				*_runtime->get_function( refIdentifier )
 			)
 		);
 	} else {
@@ -2348,14 +2340,14 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 		}
 		if ( refIdentifier == KEYWORD::THIS_IDENTIFIER ) {
 			expr->add_execution_step(
-				hcore::call( &HExpression::get_this, expr, _1, position_.get() )
+				HExpression::OExecutionStep( expr, &HExpression::get_this, position_.get() )
 			);
 		} else if ( refIdentifier == KEYWORD::SUPER_IDENTIFIER ) {
 			expr->add_execution_step(
-				hcore::call( &HExpression::get_super, expr, _1, position_.get() )
+				HExpression::OExecutionStep( expr, &HExpression::get_super, position_.get() )
 			);
 		} else {
-			int index( expr->add_execution_step( HExpression::execution_step_t() ) );
+			int index( expr->add_execution_step( HExpression::OExecutionStep() ) );
 			_executionStepsBacklog.emplace_back(
 				OExecutionStep::OPERATION::USE,
 				expression,
@@ -2385,7 +2377,7 @@ void OCompiler::defer_get_field_reference( yaal::hcore::HString const& value_, e
 	}
 	HExpression* expr( current_expression().raw() );
 	expr->add_execution_step(
-		hcore::call( &HExpression::get_field, expr, HFrame::ACCESS::VALUE, refIdentifier, _1, _fileId )
+		HExpression::OExecutionStep( expr, &HExpression::get_field, position_.get(), HFrame::ACCESS::VALUE, refIdentifier )
 	);
 	expr->commit_oper( OPERATOR::MEMBER_ACCESS );
 	fc._lastMemberName = refIdentifier;
@@ -2405,7 +2397,7 @@ void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executi
 	}
 	HHuginn::identifier_id_t varIdentifier( _runtime->identifier_id( value_ ) );
 	HHuginn::expression_t& expression( current_expression() );
-	int index( expression->add_execution_step( HExpression::execution_step_t() ) );
+	int index( expression->add_execution_step( HExpression::OExecutionStep() ) );
 	_executionStepsBacklog.emplace_back(
 		OExecutionStep::OPERATION::DEFINE,
 		expression,
@@ -2424,7 +2416,7 @@ void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executi
 void OCompiler::defer_store_direct( HHuginn::value_t const& value_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	HExpression* expr( current_expression().raw() );
-	expr->add_execution_step( hcore::call( &HExpression::store_direct, expr, value_, _1, position_.get() ) );
+	expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, position_.get(), value_ ) );
 	f()._valueTypes.push( value_->type_id() );
 	return;
 	M_EPILOG
@@ -2442,9 +2434,9 @@ void OCompiler::defer_store_real( double long value_, executing_parser::position
 	OFunctionContext& fc( f() );
 	HExpression* expr( current_expression().raw() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		expr->add_execution_step( hcore::call( &HExpression::store_direct, expr, _runtime->object_factory()->create_real( value_ ), _1, position_.get() ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, position_.get(), _runtime->object_factory()->create_real( value_ ) ) );
 	} else {
-		expr->add_execution_step( hcore::call( &HExpression::store_real, expr, value_, _1, position_.get() ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_real, position_.get(), value_ ) );
 	}
 	fc._valueTypes.push( type_id( HHuginn::TYPE::REAL ) );
 	return;
@@ -2456,9 +2448,9 @@ void OCompiler::defer_store_integer( int long long value_, executing_parser::pos
 	OFunctionContext& fc( f() );
 	HExpression* expr( current_expression().raw() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		expr->add_execution_step( hcore::call( &HExpression::store_direct, expr, _runtime->object_factory()->create_integer( value_ ), _1, position_.get() ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, position_.get(), _runtime->object_factory()->create_integer( value_ ) ) );
 	} else {
-		expr->add_execution_step( hcore::call( &HExpression::store_integer, expr, value_, _1, position_.get() ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_integer, position_.get(), value_ ) );
 	}
 	fc._valueTypes.push( type_id( HHuginn::TYPE::INTEGER ) );
 	return;
@@ -2470,9 +2462,9 @@ void OCompiler::defer_store_string( yaal::hcore::HString const& value_, executin
 	OFunctionContext& fc( f() );
 	HExpression* expr( current_expression().raw() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		expr->add_execution_step( hcore::call( &HExpression::store_direct, expr, _runtime->object_factory()->create_string( value_ ), _1, position_.get() ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, position_.get(), _runtime->object_factory()->create_string( value_ ) ) );
 	} else {
-		expr->add_execution_step( hcore::call( &HExpression::store_string, expr, value_, _1, position_.get() ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_string, position_.get(), value_ ) );
 	}
 	fc._valueTypes.push( type_id( HHuginn::TYPE::STRING ) );
 	return;
@@ -2484,9 +2476,9 @@ void OCompiler::defer_store_number( yaal::hcore::HString const& value_, executin
 	OFunctionContext& fc( f() );
 	HExpression* expr( current_expression().raw() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		expr->add_execution_step( hcore::call( &HExpression::store_direct, expr, _runtime->object_factory()->create_number( value_ ), _1, position_.get() ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, position_.get(), _runtime->object_factory()->create_number( value_ ) ) );
 	} else {
-		expr->add_execution_step( hcore::call( &HExpression::store_number, expr, value_, _1, position_.get() ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_number, position_.get(), value_ ) );
 	}
 	fc._valueTypes.push( type_id( HHuginn::TYPE::NUMBER ) );
 	return;
@@ -2498,9 +2490,9 @@ void OCompiler::defer_store_character( code_point_t value_, executing_parser::po
 	OFunctionContext& fc( f() );
 	HExpression* expr( current_expression().raw() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		expr->add_execution_step( hcore::call( &HExpression::store_direct, expr, _runtime->object_factory()->create_character( value_ ), _1, position_.get() ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, position_.get(), _runtime->object_factory()->create_character( value_ ) ) );
 	} else {
-		expr->add_execution_step( hcore::call( &HExpression::store_character, expr, value_, _1, position_.get() ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_character, position_.get(), value_ ) );
 	}
 	fc._valueTypes.push( type_id( HHuginn::TYPE::CHARACTER ) );
 	return;
