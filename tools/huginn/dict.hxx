@@ -38,67 +38,11 @@ namespace tools {
 
 namespace huginn {
 
-class HReversedDict : public HHuginn::HIterable {
-	HHuginn::value_t _dict;
-public:
-	HReversedDict( HHuginn::HClass const* class_, HHuginn::value_t const& dict_ )
-		: HIterable( class_ )
-		, _dict( dict_ ) {
-		M_ASSERT( _dict->type_id() == HHuginn::TYPE::DICT );
-	}
-	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
-		M_PROLOG
-		HHuginn::class_t c(
-			runtime_->create_class(
-				"ReversedDictView",
-				nullptr,
-				HHuginn::field_definitions_t{},
-				"The `ReversedDictView` class represents *lazy* *iterable* reversed view of a `dict`."
-			)
-		);
-		runtime_->huginn()->register_class( c );
-		return ( c );
-		M_EPILOG
-	}
-protected:
-	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
-		return ( safe_int::cast<int long>( static_cast<HHuginn::HDict const*>( _dict.raw() )->size( thread_, position_ ) ) );
-	}
-private:
-	virtual HIterator do_iterator( HThread*, int ) override;
-private:
-	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, int ) const override {
-		return ( thread_->object_factory().create<HReversedDict>( HIterable::get_class(), _dict ) );
-	}
-};
+namespace dict {
 
-class HDictReverseIterator : public HIteratorInterface {
-	HHuginn::HDict::values_t* _dict;
-	HHuginn::HDict::values_t::reverse_iterator _it;
-public:
-	HDictReverseIterator( HHuginn::HDict::values_t* dict_ )
-		: _dict( dict_ ), _it( dict_->rbegin() ) {
-		return;
-	}
-protected:
-	virtual HHuginn::value_t do_value( HThread*, int ) override {
-		return ( _it->first );
-	}
-	virtual bool do_is_valid( HThread*, int ) override {
-		return ( _it != _dict->rend() );
-	}
-	virtual void do_next( HThread*, int ) override {
-		++ _it;
-	}
-private:
-	HDictReverseIterator( HDictReverseIterator const& ) = delete;
-	HDictReverseIterator& operator = ( HDictReverseIterator const& ) = delete;
-};
+HHuginn::value_t key_values_view( huginn::HThread*, HHuginn::value_t const& );
+HHuginn::value_t reversed_view( huginn::HThread*, HHuginn::value_t const& );
 
-
-HReversedDict::HIterator HReversedDict::do_iterator( HThread*, int ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HDictReverseIterator( &static_cast<HHuginn::HDict*>( _dict.raw() )->value() ) );
-	return ( HIterator( yaal::move( impl ) ) );
 }
 
 }

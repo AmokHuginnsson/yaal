@@ -256,6 +256,7 @@ void HRuntime::register_class( class_t class_, HHuginn::ACCESS classConstructorA
 	if ( classConstructorVisibility_ == HHuginn::VISIBILITY::GLOBAL ) {
 		_functionsAvailable.insert( class_->identifier_id() );
 	}
+	class_->finalize_registration( this );
 	return;
 	M_EPILOG
 }

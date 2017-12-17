@@ -142,6 +142,16 @@ HHuginn::function_t const& HHuginn::HClass::function( int index_ ) const {
 	M_EPILOG
 }
 
+void HHuginn::HClass::finalize_registration( huginn::HRuntime* runtime_ ) {
+	M_PROLOG
+	do_finalize_registration( runtime_ );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HClass::do_finalize_registration( huginn::HRuntime* ) {
+}
+
 HHuginn::value_t HHuginn::HClass::create_instance_default( HClass const* class_, huginn::HThread* thread_, values_t& values_, int position_ ) {
 	return ( class_->do_create_instance( thread_, values_, position_ ) );
 }

@@ -514,7 +514,9 @@ public:
 	value_t access_violation( huginn::HThread*, value_t*, values_t&, int ) const __attribute__((noreturn));
 	yaal::hcore::HString const& doc( void ) const;
 	yaal::hcore::HString const& doc( identifier_id_t ) const;
+	void finalize_registration( huginn::HRuntime* );
 private:
+	virtual void do_finalize_registration( huginn::HRuntime* );
 	virtual value_t do_create_instance( huginn::HThread*, values_t&, int ) const;
 	HClass( HClass const& ) = delete;
 	HClass& operator = ( HClass const& ) = delete;

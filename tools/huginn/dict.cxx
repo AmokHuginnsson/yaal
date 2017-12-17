@@ -27,7 +27,7 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
-#include "tools/hhuginn.hxx"
+#include "dict.hxx"
 #include "runtime.hxx"
 #include "iterator.hxx"
 #include "compiler.hxx"
@@ -46,17 +46,37 @@ namespace tools {
 
 namespace huginn {
 
+namespace dict {
+
 class HDictIterator : public HIteratorInterface {
+public:
+	enum class TYPE {
+		KEYS,
+		KEY_VALUES
+	};
+	typedef HHuginn::value_t (HDictIterator::*value_getter_t)( void );
+private:
 	HHuginn::HDict::values_t* _dict;
 	HHuginn::HDict::values_t::iterator _it;
+	value_getter_t _valueGetter;
+	HObjectFactory& _objectFactory;
 public:
-	HDictIterator( HHuginn::HDict::values_t* dict_ )
-		: _dict( dict_ ), _it( dict_->begin() ) {
+	HDictIterator( HHuginn::HDict::values_t* dict_, HObjectFactory& objectFactory_, TYPE type_ )
+		: _dict( dict_ )
+		, _it( dict_->begin() )
+		, _valueGetter( type_ == TYPE::KEYS ? &HDictIterator::get_key : &HDictIterator::get_key_value )
+		, _objectFactory( objectFactory_ ) {
 		return;
 	}
 protected:
-	virtual HHuginn::value_t do_value( HThread*, int ) override {
+	HHuginn::value_t get_key( void ) {
 		return ( _it->first );
+	}
+	HHuginn::value_t get_key_value( void ) {
+		return ( _objectFactory.create_tuple( { _it->first, _it->second } ) );
+	}
+	virtual HHuginn::value_t do_value( HThread*, int ) override {
+		return ( (this->*_valueGetter)() );
 	}
 	virtual bool do_is_valid( huginn::HThread*, int ) override {
 		return ( _it != _dict->end() );
@@ -69,7 +89,106 @@ private:
 	HDictIterator& operator = ( HDictIterator const& ) = delete;
 };
 
-namespace dict {
+class HKeyValuesDictView : public HHuginn::HIterable {
+	HHuginn::value_t _dict;
+public:
+	HKeyValuesDictView( HHuginn::HClass const* class_, HHuginn::value_t const& dict_ )
+		: HIterable( class_ )
+		, _dict( dict_ ) {
+		M_ASSERT( _dict->type_id() == HHuginn::TYPE::DICT );
+	}
+	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
+		M_PROLOG
+		HHuginn::class_t c(
+			runtime_->create_class(
+				"KeyValuesDictView",
+				nullptr,
+				HHuginn::field_definitions_t{},
+				"The `KeyValuesDictView` class represents *lazy* *iterable* view of a `dict` consisted of key-value pairs."
+			)
+		);
+		return ( c );
+		M_EPILOG
+	}
+protected:
+	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
+		return ( safe_int::cast<int long>( static_cast<HHuginn::HDict const*>( _dict.raw() )->size( thread_, position_ ) ) );
+	}
+private:
+	virtual HIterator do_iterator( HThread*, int ) override {
+		HIterator::iterator_implementation_t impl(
+			new ( memory::yaal ) HDictIterator(
+				&static_cast<HHuginn::HDict*>( _dict.raw() )->value(),
+				*_dict->get_class()->runtime()->object_factory(),
+				HDictIterator::TYPE::KEY_VALUES
+			)
+		);
+		return ( HIterator( yaal::move( impl ) ) );
+	}
+private:
+	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, int ) const override {
+		return ( thread_->object_factory().create<HKeyValuesDictView>( HIterable::get_class(), _dict ) );
+	}
+};
+
+class HDictReverseIterator : public HIteratorInterface {
+	HHuginn::HDict::values_t* _dict;
+	HHuginn::HDict::values_t::reverse_iterator _it;
+public:
+	HDictReverseIterator( HHuginn::HDict::values_t* dict_ )
+		: _dict( dict_ ), _it( dict_->rbegin() ) {
+		return;
+	}
+protected:
+	virtual HHuginn::value_t do_value( HThread*, int ) override {
+		return ( _it->first );
+	}
+	virtual bool do_is_valid( HThread*, int ) override {
+		return ( _it != _dict->rend() );
+	}
+	virtual void do_next( HThread*, int ) override {
+		++ _it;
+	}
+private:
+	HDictReverseIterator( HDictReverseIterator const& ) = delete;
+	HDictReverseIterator& operator = ( HDictReverseIterator const& ) = delete;
+};
+
+class HReversedDict : public HHuginn::HIterable {
+	HHuginn::value_t _dict;
+public:
+	HReversedDict( HHuginn::HClass const* class_, HHuginn::value_t const& dict_ )
+		: HIterable( class_ )
+		, _dict( dict_ ) {
+		M_ASSERT( _dict->type_id() == HHuginn::TYPE::DICT );
+	}
+	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
+		M_PROLOG
+		HHuginn::class_t c(
+			runtime_->create_class(
+				"ReversedDictView",
+				nullptr,
+				HHuginn::field_definitions_t{},
+				"The `ReversedDictView` class represents *lazy* *iterable* reversed view of a `dict`."
+			)
+		);
+		return ( c );
+		M_EPILOG
+	}
+protected:
+	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
+		return ( safe_int::cast<int long>( static_cast<HHuginn::HDict const*>( _dict.raw() )->size( thread_, position_ ) ) );
+	}
+private:
+	virtual HIterator do_iterator( HThread*, int ) override {
+		HIterator::iterator_implementation_t impl( new ( memory::yaal ) HDictReverseIterator( &static_cast<HHuginn::HDict*>( _dict.raw() )->value() ) );
+		return ( HIterator( yaal::move( impl ) ) );
+	}
+private:
+	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, int ) const override {
+		return ( thread_->object_factory().create<HReversedDict>( HIterable::get_class(), _dict ) );
+	}
+};
 
 inline HHuginn::value_t has_key( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
@@ -166,15 +285,61 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_EPILOG
 }
 
+inline HHuginn::value_t values( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DICT );
+	verify_signature( "dict.values", values_, {}, thread_, position_ );
+	return ( dict::key_values_view( thread_, *object_ ) );
+	M_EPILOG
+}
+
+class HDictClass : public HHuginn::HClass {
+public:
+	typedef HDictClass this_type;
+	typedef HHuginn::HClass base_type;
+private:
+	HHuginn::class_t _keyValuesDictViewClass;
+	HHuginn::class_t _reversedDictClass;
+public:
+	HDictClass(
+		HRuntime* runtime_,
+		HHuginn::type_id_t typeId_,
+		HHuginn::identifier_id_t identifierId_,
+		HHuginn::field_definitions_t const& fieldDefinitions_,
+		yaal::hcore::HString const& doc_
+	) : HHuginn::HClass(
+			runtime_,
+			typeId_,
+			identifierId_,
+			nullptr,
+			fieldDefinitions_,
+			doc_
+		)
+		, _keyValuesDictViewClass( HKeyValuesDictView::get_class( runtime_ ) )
+		, _reversedDictClass( HReversedDict::get_class( runtime_ ) ) {
+		return;
+	}
+	HHuginn::HClass const* key_values_dict_view_class( void ) const {
+		return ( _keyValuesDictViewClass.raw() );
+	}
+	HHuginn::HClass const* reversed_dict_class( void ) const {
+		return ( _reversedDictClass.raw() );
+	}
+protected:
+	void do_finalize_registration( huginn::HRuntime* runtime_ ) {
+		runtime_->huginn()->register_class( _keyValuesDictViewClass );
+		runtime_->huginn()->register_class( _reversedDictClass );
+	}
+};
+
 HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
 HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		make_pointer<HHuginn::HClass>(
+		make_pointer<HDictClass>(
 			runtime_,
 			type_id( HHuginn::TYPE::DICT ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::DICT ) ),
-			nullptr,
 			HHuginn::field_definitions_t{
 				{ "has_key", objectFactory_->create_method( hcore::call( &dict::has_key, _1, _2, _3, _4 ) ), "( *key* ) - tell if given *key* can be found in this `dict`" },
 				{ "get",     objectFactory_->create_method( hcore::call( &dict::get, _1, _2, _3, _4 ) ),     "( *key*, *default* ) - get value for given *key* from this `dict`, or *default* if given *key* is not present in the `dict`" },
@@ -183,12 +348,29 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 				{ "add",     objectFactory_->create_method( hcore::call( &dict::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `dict` with key/value pairs from *other* `dict`" },
 				{ "update",  objectFactory_->create_method( hcore::call( &dict::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `dict` with key/value pairs from *other* `dict`" },
 				{ "hash",    objectFactory_->create_method( hcore::call( &dict::hash, _1, _2, _3, _4 ) ),    "calculate hash value for this `dict`" },
-				{ "equals",  objectFactory_->create_method( hcore::call( &dict::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `dict` has the same content" }
+				{ "equals",  objectFactory_->create_method( hcore::call( &dict::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `dict` has the same content" },
+				{ "values",  objectFactory_->create_method( hcore::call( &dict::values, _1, _2, _3, _4 ) ),  "get key-value pairs view of this `dict`" }
 			},
 			"The `dict` is a collection providing a sorted key to value map. It supports operations of iteration, key-value insertion, key removal and key search. The keys stored in given `dict` instance must be of uniform type."
 		)
 	);
 	return ( c );
+	M_EPILOG
+}
+
+HHuginn::value_t key_values_view( huginn::HThread* thread_, HHuginn::value_t const& value_ ) {
+	M_PROLOG
+	M_ASSERT( value_->type_id() == HHuginn::TYPE::DICT );
+	HDictClass const* dc( static_cast<HDictClass const*>( value_->get_class() ) );
+	return ( thread_->object_factory().create<HKeyValuesDictView>( dc->key_values_dict_view_class(), value_ ) );
+	M_EPILOG
+}
+
+HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const& value_ ) {
+	M_PROLOG
+	M_ASSERT( value_->type_id() == HHuginn::TYPE::DICT );
+	HDictClass const* dc( static_cast<HDictClass const*>( value_->get_class() ) );
+	return ( thread_->object_factory().create<HReversedDict>( dc->reversed_dict_class(), value_ ) );
 	M_EPILOG
 }
 
@@ -293,7 +475,13 @@ HHuginn::HClass const* HHuginn::HDict::key_type( void ) const {
 }
 
 HHuginn::HIterable::HIterator HHuginn::HDict::do_iterator( huginn::HThread*, int ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::HDictIterator( &_data ) );
+	HIterator::iterator_implementation_t impl(
+		new ( memory::yaal ) huginn::dict::HDictIterator(
+			&_data,
+			*get_class()->runtime()->object_factory(),
+			huginn::dict::HDictIterator::TYPE::KEYS
+		)
+	);
 	return ( HIterator( yaal::move( impl ) ) );
 }
 

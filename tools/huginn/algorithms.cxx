@@ -65,7 +65,6 @@ class HAlgorithms : public HHuginn::HValue {
 	HHuginn::class_t _reversedTupleClass;
 	HHuginn::class_t _reversedListClass;
 	HHuginn::class_t _reversedDequeClass;
-	HHuginn::class_t _reversedDictClass;
 	HHuginn::class_t _reversedLookupClass;
 	HHuginn::class_t _reversedOrderClass;
 	HHuginn::class_t _reversedSetClass;
@@ -80,7 +79,6 @@ public:
 		, _reversedTupleClass( HReversedTuple::get_class( class_->runtime() ) )
 		, _reversedListClass( HReversedList::get_class( class_->runtime() ) )
 		, _reversedDequeClass( HReversedDeque::get_class( class_->runtime() ) )
-		, _reversedDictClass( HReversedDict::get_class( class_->runtime() ) )
 		, _reversedLookupClass( HReversedLookup::get_class( class_->runtime() ) )
 		, _reversedOrderClass( HReversedOrder::get_class( class_->runtime() ) )
 		, _reversedSetClass( HReversedSet::get_class( class_->runtime() ) )
@@ -275,7 +273,7 @@ public:
 				v = thread_->object_factory().create<HReversedDeque>( a->_reversedDequeClass.raw(), values_[0] );
 			} break;
 			case ( static_cast<int>( HHuginn::TYPE::DICT ) ): {
-				v = thread_->object_factory().create<HReversedDict>( a->_reversedDictClass.raw(), values_[0] );
+				v = dict::reversed_view( thread_, values_[0] );
 			} break;
 			case ( static_cast<int>( HHuginn::TYPE::LOOKUP ) ): {
 				v = thread_->object_factory().create<HReversedLookup>( a->_reversedLookupClass.raw(), values_[0] );
