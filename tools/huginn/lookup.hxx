@@ -38,66 +38,11 @@ namespace tools {
 
 namespace huginn {
 
-class HReversedLookup : public HHuginn::HIterable {
-	HHuginn::value_t _lookup;
-public:
-	HReversedLookup( HHuginn::HClass const* class_, HHuginn::value_t const& lookup_ )
-		: HIterable( class_ )
-		, _lookup( lookup_ ) {
-		M_ASSERT( _lookup->type_id() == HHuginn::TYPE::LOOKUP );
-	}
-	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
-		M_PROLOG
-		HHuginn::class_t c(
-			runtime_->create_class(
-				"ReversedLookupView",
-				nullptr,
-				HHuginn::field_definitions_t{},
-				"The `ReversedLookupView` class represents *lazy* *iterable* reversed view of a `lookup`."
-			)
-		);
-		runtime_->huginn()->register_class( c );
-		return ( c );
-		M_EPILOG
-	}
-protected:
-	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
-		return ( safe_int::cast<int long>( static_cast<HHuginn::HLookup const*>( _lookup.raw() )->size( thread_, position_ ) ) );
-	}
-private:
-	virtual HIterator do_iterator( HThread*, int ) override;
-private:
-	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, int ) const override {
-		return ( thread_->object_factory().create<HReversedLookup>( HIterable::get_class(), _lookup ) );
-	}
-};
+namespace lookup {
 
-class HLookupReverseIterator : public HIteratorInterface {
-	HHuginn::HLookup::values_t* _lookup;
-	HHuginn::HLookup::values_t::reverse_iterator _it;
-public:
-	HLookupReverseIterator( HHuginn::HLookup::values_t* lookup_ )
-		: _lookup( lookup_ ), _it( lookup_->rbegin() ) {
-		return;
-	}
-protected:
-	virtual HHuginn::value_t do_value( HThread*, int ) override {
-		return ( _it->first );
-	}
-	virtual bool do_is_valid( HThread*, int ) override {
-		return ( _it != _lookup->rend() );
-	}
-	virtual void do_next( HThread*, int ) override {
-		++ _it;
-	}
-private:
-	HLookupReverseIterator( HLookupReverseIterator const& ) = delete;
-	HLookupReverseIterator& operator = ( HLookupReverseIterator const& ) = delete;
-};
+HHuginn::value_t key_values_view( huginn::HThread*, HHuginn::value_t const& );
+HHuginn::value_t reversed_view( huginn::HThread*, HHuginn::value_t const& );
 
-HReversedLookup::HIterator HReversedLookup::do_iterator( HThread*, int ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HLookupReverseIterator( &static_cast<HHuginn::HLookup*>( _lookup.raw() )->value() ) );
-	return ( HIterator( yaal::move( impl ) ) );
 }
 
 }
