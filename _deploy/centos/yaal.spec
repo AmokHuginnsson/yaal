@@ -12,7 +12,7 @@ BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildRequires: make, autoconf, libtool, pcre-devel, libxml2-devel, libxslt-devel, zlib-devel, openssl-devel, ncurses-devel, doxygen
 Requires: pcre, libxml2, libxslt, openssl, zlib, ncurses
 
-%global __requires_exclude_from %{?__requires_exclude:%__requires_exclude|}^.*libyaal_(sqlite3|postgresql|mysql|firebird|oracle)_driver.*$
+%global __requires_exclude_from %{?__requires_exclude:%__requires_exclude|}^.*(libyaal_(sqlite3|postgresql|mysql|firebird|oracle)_driver|pkgconfig).*$
 %global _enable_debug_package 0
 %global debug_package %{nil}
 %global __os_install_post /usr/lib/rpm/brp-compress %{nil}
