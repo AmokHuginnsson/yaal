@@ -411,7 +411,12 @@ void pow( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 	HHuginn::type_id_t typeId( v1_->type_id() );
 	if ( typeId == HHuginn::TYPE::REAL ) {
 		HHuginn::HReal::value_type& val( static_cast<HHuginn::HReal*>( v1_.raw() )->value() );
-		val = ::powl( val, static_cast<HHuginn::HReal const*>( v2_.raw() )->value() );
+		HHuginn::HReal::value_type exp( static_cast<HHuginn::HReal const*>( v2_.raw() )->value() );
+		if ( ( val != 0.L ) || ( exp != 0.L ) ) {
+			val = ::powl( val, exp );
+		} else {
+			thread_->raise( thread_->runtime().object_factory()->arithmetic_exception_class(), "indeterminate form 0^0", position_ );
+		}
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		do {
 			HNumber const& exp( static_cast<HHuginn::HNumber const*>( v2_.raw() )->value() );
@@ -422,7 +427,11 @@ void pow( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 				thread_->raise( thread_->runtime().object_factory()->arithmetic_exception_class(), "Exponent too big: "_ys.append( exp.to_string() ), position_ );
 				break;
 			}
-			static_cast<HHuginn::HNumber*>( v1_.raw() )->value() ^= expV;
+			try {
+				static_cast<HHuginn::HNumber*>( v1_.raw() )->value() ^= expV;
+			} catch ( HNumberException const& ex ) {
+				thread_->raise( thread_->runtime().object_factory()->arithmetic_exception_class(), ex.what(), position_ );
+			}
 		} while ( false );
 	} else {
 		fallback_arithmetic( thread_, INTERFACE::POWER, op_to_str( OPERATOR::POWER ), v1_, v2_, position_ );
