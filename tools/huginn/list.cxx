@@ -132,6 +132,24 @@ inline HHuginn::value_t insert( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_EPILOG
 }
 
+inline HHuginn::value_t resize( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_signature( "list.resize", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::UNKNOWN }, thread_, position_ );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
+	HHuginn::HList::values_t& dst( static_cast<HHuginn::HList*>( object_->raw() )->value() );
+	HHuginn::HInteger::value_type size( get_integer( values_[0] ) );
+	if ( size < 0 ) {
+		throw HHuginn::HHuginnRuntimeException( "invalid new size: "_ys.append( size ), thread_->current_frame()->file_id(), position_ );
+	}
+	int long oldSize( dst.get_size() );
+	dst.resize( static_cast<int long>( size ) );
+	for ( int long i( oldSize ); i < size; ++ i ) {
+		dst[i] = values_[1]->clone( thread_, position_ );
+	}
+	return ( *object_ );
+	M_EPILOG
+}
+
 inline HHuginn::value_t pop( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "list.pop", values_, 0, 0, thread_, position_ );
@@ -206,6 +224,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 				{ "add",    objectFactory_->create_method( hcore::call( &list::append, _1, _2, _3, _4 ) ), "( *other* ) - append all elements from *other* collection at the end of this `list`" },
 				{ "append", objectFactory_->create_method( hcore::call( &list::append, _1, _2, _3, _4 ) ), "( *other* ) - append all elements from *other* collection at the end of this `list`" },
 				{ "insert", objectFactory_->create_method( hcore::call( &list::insert, _1, _2, _3, _4 ) ), "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
+				{ "resize", objectFactory_->create_method( hcore::call( &list::resize, _1, _2, _3, _4 ) ), "( *size*, *elem* ) - resize `list` to given *size* optionally filling new elements with **copies** of value *elem*" },
 				{ "clear",  objectFactory_->create_method( hcore::call( &list::clear, _1, _2, _3, _4 ) ),  "erase `list`'s content, `list` becomes empty" },
 				{ "hash",   objectFactory_->create_method( hcore::call( &list::hash, _1, _2, _3, _4 ) ),   "calculate hash value for this `list`" },
 				{ "less",   objectFactory_->create_method( hcore::call( &list::less, _1, _2, _3, _4 ) ),   "( *other* ) - test if this `list` comes lexicographically before *other* `list`" },
