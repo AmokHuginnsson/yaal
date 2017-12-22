@@ -116,6 +116,7 @@ char const* MULTIPLY = "multiply";
 char const* DIVIDE = "divide";
 char const* MODULO = "modulo";
 char const* POWER = "power";
+char const* CLONE = "clone";
 
 }
 

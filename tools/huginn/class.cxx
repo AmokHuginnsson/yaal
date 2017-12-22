@@ -215,7 +215,7 @@ HHuginn::values_t HHuginn::HClass::get_defaults( huginn::HThread* thread_, int p
 	M_PROLOG
 	values_t defaults;
 	for ( value_t const& v : _fieldDefinitions ) {
-		defaults.push_back( v->clone( thread_, position_ ) );
+		defaults.push_back( v->clone( thread_, const_cast<HHuginn::value_t*>( &v ), position_ ) );
 	}
 	return ( defaults );
 	M_EPILOG
@@ -223,7 +223,8 @@ HHuginn::values_t HHuginn::HClass::get_defaults( huginn::HThread* thread_, int p
 
 HHuginn::value_t HHuginn::HClass::get_default( huginn::HThread* thread_, int index_, int position_ ) const {
 	M_PROLOG
-	return ( _fieldDefinitions[index_]->clone( thread_, position_ ) );
+	HHuginn::value_t const& v( _fieldDefinitions[index_] );
+	return ( v->clone( thread_, const_cast<HHuginn::value_t*>( &v ), position_ ) );
 	M_EPILOG
 }
 

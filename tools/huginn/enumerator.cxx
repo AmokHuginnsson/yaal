@@ -144,7 +144,7 @@ HHuginn::HEnumerator::HEnumerator( HHuginn::HClass const* class_, value_type val
 	return;
 }
 
-HHuginn::value_t HHuginn::HEnumerator::do_clone( huginn::HThread* thread_, int position_ ) const {
+HHuginn::value_t HHuginn::HEnumerator::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
 	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on enumerators.", thread_->current_frame()->file_id(), position_ );
 }
 

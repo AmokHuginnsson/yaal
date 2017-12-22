@@ -107,7 +107,7 @@ HHuginn::class_t HRandomizer::get_class( HRuntime* runtime_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HRandomizer::do_clone( huginn::HThread* thread_, int ) const {
+HHuginn::value_t HRandomizer::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	return ( thread_->object_factory().create<HRandomizer>( HValue::get_class(), _generator ) );
 }
 

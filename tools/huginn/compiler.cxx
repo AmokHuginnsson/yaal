@@ -582,6 +582,7 @@ void OCompiler::detect_misuse( void ) const {
 		_runtime->identifier_id( INTERFACE::DIVIDE ),
 		_runtime->identifier_id( INTERFACE::MODULO ),
 		_runtime->identifier_id( INTERFACE::POWER ),
+		_runtime->identifier_id( INTERFACE::CLONE ),
 		_runtime->identifier_id( "to_string" ),
 		_runtime->identifier_id( "to_integer" ),
 		_runtime->identifier_id( "to_real" ),
@@ -650,7 +651,7 @@ HHuginn::type_id_t OCompiler::guess_type( HHuginn::identifier_id_t identifierId_
 	return ( t );
 }
 
-HHuginn::HClass const* OCompiler::type_id_to_clasS( HHuginn::type_id_t typeId_ ) const {
+HHuginn::HClass const* OCompiler::type_id_to_class( HHuginn::type_id_t typeId_ ) const {
 	HHuginn::HClass const* c( &_unknownClass_ );
 	HObjectFactory const& of( *_runtime->object_factory() );
 	switch ( static_cast<HHuginn::TYPE>( typeId_.get() ) ) {

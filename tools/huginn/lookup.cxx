@@ -126,7 +126,7 @@ private:
 		return ( HIterator( yaal::move( impl ) ) );
 	}
 private:
-	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, int ) const override {
+	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
 		return ( thread_->object_factory().create<HKeyValuesLookupView>( HIterable::get_class(), _lookup ) );
 	}
 };
@@ -187,7 +187,7 @@ private:
 		return ( HIterator( yaal::move( impl ) ) );
 	}
 private:
-	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, int ) const override {
+	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
 		return ( thread_->object_factory().create<HReversedLookup>( HIterable::get_class(), _lookup ) );
 	}
 };
@@ -461,14 +461,19 @@ HHuginn::HIterable::HIterator HHuginn::HLookup::do_iterator( huginn::HThread*, i
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HLookup::do_clone( huginn::HThread* thread_, int position_ ) const {
+HHuginn::value_t HHuginn::HLookup::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
 	M_PROLOG
 	HHuginn::value_t res( thread_->runtime().object_factory()->create_lookup() );
 	HLookup* lookup( static_cast<HLookup*>( res.raw() ) );
 	values_t& data( lookup->value() );
 	lookup->anchor( thread_, position_ );
 	for ( values_t::value_type const& v : _data ) {
-		data.insert( make_pair( v.first->clone( thread_, position_ ), v.second->clone( thread_, position_ ) ) );
+		data.insert(
+			make_pair(
+				v.first->clone( thread_, const_cast<HHuginn::value_t*>( &v.first ), position_ ),
+				v.second->clone( thread_, const_cast<HHuginn::value_t*>( &v.second ), position_ )
+			)
+		);
 	}
 	lookup->detach();
 	return ( res );

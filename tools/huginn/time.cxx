@@ -180,7 +180,7 @@ HHuginn::class_t HTime::get_class( HRuntime* runtime_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HTime::do_clone( huginn::HThread* thread_, int ) const {
+HHuginn::value_t HTime::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	M_PROLOG
 	return ( thread_->object_factory().create<HTime>( HValue::get_class(), _time ) );
 	M_EPILOG

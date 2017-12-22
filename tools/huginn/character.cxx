@@ -119,7 +119,7 @@ void HHuginn::HCharacter::set( value_type value_ ) {
 	return;
 }
 
-HHuginn::value_t HHuginn::HCharacter::do_clone( huginn::HThread* thread_, int ) const {
+HHuginn::value_t HHuginn::HCharacter::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	return ( thread_->runtime().object_factory()->create_character( _value ) );
 }
 

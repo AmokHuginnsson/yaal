@@ -52,7 +52,7 @@ protected:
 	virtual HIterator do_iterator( HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override;
 private:
-	virtual HHuginn::value_t do_clone( huginn::HThread*, int ) const override;
+	virtual HHuginn::value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 }

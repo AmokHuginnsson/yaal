@@ -126,7 +126,7 @@ HHuginn::class_t HRegularExpressionMatch::get_class( HRuntime* runtime_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HRegularExpressionMatch::do_clone( huginn::HThread* thread_, int ) const {
+HHuginn::value_t HRegularExpressionMatch::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	M_PROLOG
 	return ( thread_->object_factory().create<HRegularExpressionMatch>( HIterable::get_class(), make_resource<HRegex>( _regex->copy() ), _string ) );
 	M_EPILOG

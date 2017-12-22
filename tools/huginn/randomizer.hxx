@@ -48,7 +48,7 @@ public:
 	static HHuginn::value_t next_real( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::class_t get_class( HRuntime* );
 private:
-	virtual HHuginn::value_t do_clone( huginn::HThread*, int ) const override;
+	virtual HHuginn::value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 }

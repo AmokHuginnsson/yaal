@@ -596,8 +596,8 @@ HHuginn::value_t type( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 HHuginn::value_t copy( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "copy", values_, 1, 1, thread_, position_ );
-	HHuginn::HValue const* v( values_.front().raw() );
-	return ( v->clone( thread_, position_ ) );
+	HHuginn::value_t& v( values_.front() );
+	return ( v->clone( thread_, &v, position_ ) );
 	M_EPILOG
 }
 

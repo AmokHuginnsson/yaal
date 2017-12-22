@@ -366,7 +366,7 @@ HHuginn::HString::HString( HHuginn::HClass const* class_, yaal::hcore::HString c
 	return;
 }
 
-HHuginn::value_t HHuginn::HString::do_clone( huginn::HThread* thread_, int ) const {
+HHuginn::value_t HHuginn::HString::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	return ( thread_->runtime().object_factory()->create_string( _value ) );
 }
 

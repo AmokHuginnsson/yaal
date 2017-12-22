@@ -117,6 +117,7 @@ extern char const* MULTIPLY;
 extern char const* DIVIDE;
 extern char const* MODULO;
 extern char const* POWER;
+extern char const* CLONE;
 
 }
 

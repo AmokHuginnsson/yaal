@@ -696,7 +696,7 @@ void HExpression::plus( OExecutionStep const&, HFrame* frame_ ) {
 		operands_type_mismatch( op_to_str( OPERATOR::PLUS ), v1->type_id(), v2->type_id(), file_id(), p );
 	}
 	if ( ! v1.unique() ) {
-		v1 = v1->clone( frame_->thread(), p );
+		v1 = v1->clone( frame_->thread(), &v1, p );
 	}
 	value_builtin::add( frame_->thread(), v1, v2, p );
 	return;
@@ -716,7 +716,7 @@ void HExpression::minus( OExecutionStep const&, HFrame* frame_ ) {
 		operands_type_mismatch( op_to_str( OPERATOR::MINUS ), v1->type_id(), v2->type_id(), file_id(), p );
 	}
 	if ( ! v1.unique() ) {
-		v1 = v1->clone( frame_->thread(), p );
+		v1 = v1->clone( frame_->thread(), &v1, p );
 	}
 	value_builtin::sub( frame_->thread(), v1, v2, p );
 	return;
@@ -736,7 +736,7 @@ void HExpression::mul( OExecutionStep const&, HFrame* frame_ ) {
 		operands_type_mismatch( op_to_str( OPERATOR::MULTIPLY ), v1->type_id(), v2->type_id(), file_id(), p );
 	}
 	if ( ! v1.unique() ) {
-		v1 = v1->clone( frame_->thread(), p );
+		v1 = v1->clone( frame_->thread(), &v1, p );
 	}
 	value_builtin::mul( frame_->thread(), v1, v2, p );
 	return;
@@ -756,7 +756,7 @@ void HExpression::div( OExecutionStep const&, HFrame* frame_ ) {
 		operands_type_mismatch( op_to_str( OPERATOR::DIVIDE ), v1->type_id(), v2->type_id(), file_id(), p );
 	}
 	if ( ! v1.unique() ) {
-		v1 = v1->clone( frame_->thread(), p );
+		v1 = v1->clone( frame_->thread(), &v1, p );
 	}
 	value_builtin::div( frame_->thread(), v1, v2, p );
 	return;
@@ -776,7 +776,7 @@ void HExpression::mod( OExecutionStep const&, HFrame* frame_ ) {
 		operands_type_mismatch( op_to_str( OPERATOR::MODULO ), v1->type_id(), v2->type_id(), file_id(), p );
 	}
 	if ( ! v1.unique() ) {
-		v1 = v1->clone( frame_->thread(), p );
+		v1 = v1->clone( frame_->thread(), &v1, p );
 	}
 	value_builtin::mod( frame_->thread(), v1, v2, p );
 	return;
@@ -820,7 +820,7 @@ void HExpression::power( OExecutionStep const&, HFrame* frame_ ) {
 			operands_type_mismatch( op_to_str( OPERATOR::POWER ), v1->type_id(), v2->type_id(), file_id(), p );
 		}
 		if ( ! v1.unique() ) {
-			v1 = v1->clone( frame_->thread(), p );
+			v1 = v1->clone( frame_->thread(), &v1, p );
 		}
 		value_builtin::pow( frame_->thread(), v1, v2, p );
 	}

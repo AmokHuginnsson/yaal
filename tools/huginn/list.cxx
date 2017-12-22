@@ -143,8 +143,9 @@ inline HHuginn::value_t resize( huginn::HThread* thread_, HHuginn::value_t* obje
 	}
 	int long oldSize( dst.get_size() );
 	dst.resize( static_cast<int long>( size ) );
+	HHuginn::value_t& templ( values_[1] );
 	for ( int long i( oldSize ); i < size; ++ i ) {
-		dst[i] = values_[1]->clone( thread_, position_ );
+		dst[i] = templ->clone( thread_, &templ, position_ );
 	}
 	return ( *object_ );
 	M_EPILOG
@@ -325,11 +326,11 @@ HHuginn::HIterable::HIterator HHuginn::HList::do_iterator( huginn::HThread*, int
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HList::do_clone( huginn::HThread* thread_, int position_ ) const {
+HHuginn::value_t HHuginn::HList::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
 	values_t data;
 	data.reserve( _data.get_size() );
 	for ( values_t::value_type const& v : _data ) {
-		data.push_back( v->clone( thread_, position_ ) );
+		data.push_back( v->clone( thread_, const_cast<HHuginn::value_t*>( &v ), position_ ) );
 	}
 	return ( thread_->runtime().object_factory()->create_list( yaal::move( data ) ) );
 }

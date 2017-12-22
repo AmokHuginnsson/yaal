@@ -75,7 +75,7 @@ HHuginn::HReal::HReal( HHuginn::HClass const* class_, HHuginn::HReal::value_type
 	return;
 }
 
-HHuginn::value_t HHuginn::HReal::do_clone( huginn::HThread* thread_, int ) const {
+HHuginn::value_t HHuginn::HReal::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	return ( thread_->runtime().object_factory()->create_real( _value ) );
 }
 

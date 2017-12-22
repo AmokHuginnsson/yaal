@@ -54,7 +54,7 @@ private:
 	tools::HHuginn::value_t do_table_names( tools::huginn::HThread*, tools::HHuginn::values_t&, int );
 	tools::HHuginn::value_t do_column_names( tools::huginn::HThread*, tools::HHuginn::values_t&, int );
 private:
-	virtual tools::HHuginn::value_t do_clone( tools::huginn::HThread*, int ) const override __attribute__((noreturn));
+	virtual tools::HHuginn::value_t do_clone( tools::huginn::HThread*, tools::HHuginn::value_t*, int ) const override __attribute__((noreturn));
 };
 
 }

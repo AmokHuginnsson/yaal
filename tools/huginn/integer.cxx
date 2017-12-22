@@ -74,7 +74,7 @@ HHuginn::HInteger::HInteger( HHuginn::HClass const* class_, HHuginn::HInteger::v
 	return;
 }
 
-HHuginn::value_t HHuginn::HInteger::do_clone( huginn::HThread* thread_, int ) const {
+HHuginn::value_t HHuginn::HInteger::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	return ( thread_->runtime().object_factory()->create_integer( _value ) );
 }
 

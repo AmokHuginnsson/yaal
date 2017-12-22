@@ -588,7 +588,7 @@ HHuginn::class_t HMatrix::get_class( HRuntime* runtime_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::do_clone( huginn::HThread* thread_, int ) const {
+HHuginn::value_t HMatrix::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	M_PROLOG
 	HHuginn::value_t v;
 	if ( _data.type() == 0 ) {

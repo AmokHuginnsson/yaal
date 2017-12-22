@@ -538,7 +538,7 @@ public:
 	HClass const* get_class( void ) const {
 		return ( _class );
 	}
-	value_t clone( huginn::HThread*, int ) const;
+	value_t clone( huginn::HThread*, HHuginn::value_t*, int ) const;
 	int field_index( identifier_id_t ) const;
 	bool is_kind_of( HHuginn::identifier_id_t ) const;
 	value_t field( HHuginn::value_t const& subject_, int index_ ) const {
@@ -546,7 +546,7 @@ public:
 	}
 private:
 	virtual value_t do_field( HHuginn::value_t const&, int ) const;
-	virtual value_t do_clone( huginn::HThread*, int ) const;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const;
 	HValue( HValue const& ) = delete;
 	HValue& operator = ( HValue const& ) = delete;
 };
@@ -563,7 +563,7 @@ public:
 private:
 	HMethod( HMethod const& ) = delete;
 	HMethod& operator = ( HMethod const& ) = delete;
-	virtual value_t do_clone( huginn::HThread*, int ) const override;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 class HHuginn::HClass::HBoundMethod : public HHuginn::HClass::HMethod {
@@ -577,7 +577,7 @@ public:
 private:
 	HBoundMethod( HBoundMethod const& ) = delete;
 	HBoundMethod& operator = ( HBoundMethod const& ) = delete;
-	virtual value_t do_clone( huginn::HThread*, int ) const override;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 class HHuginn::HObject : public HHuginn::HValue {
@@ -597,7 +597,7 @@ private:
 	HObject( HObject const& ) = delete;
 	HObject& operator = ( HObject const& ) = delete;
 private:
-	virtual value_t do_clone( huginn::HThread*, int ) const override;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 	virtual value_t do_field( HHuginn::value_t const&, int ) const override;
 };
 
@@ -620,7 +620,7 @@ public:
 private:
 	HObjectReference( HObjectReference const& ) = delete;
 	HObjectReference& operator = ( HObjectReference const& ) = delete;
-	virtual value_t do_clone( huginn::HThread*, int ) const override;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 /*! \brief Huginn Value tagger.
@@ -644,7 +644,7 @@ public:
 private:
 	HTaggedValue( HTaggedValue const& ) = delete;
 	HTaggedValue& operator = ( HTaggedValue const& ) = delete;
-	virtual value_t do_clone( huginn::HThread*, int ) const override M_DEBUG_CODE( __attribute__((__noreturn__)) );
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override M_DEBUG_CODE( __attribute__((__noreturn__)) );
 };
 
 class HHuginn::HObserver : public HHuginn::HValue {
@@ -658,7 +658,7 @@ public:
 	HObserver( HHuginn::value_t const& );
 	HHuginn::value_t value( void ) const;
 private:
-	virtual value_t do_clone( huginn::HThread*, int ) const override;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 class HHuginn::HReference : public HHuginn::HValue {
@@ -671,7 +671,7 @@ public:
 	HReference( HHuginn::value_t& );
 	HHuginn::value_t& value( void ) const;
 private:
-	virtual value_t do_clone( huginn::HThread*, int ) const override M_DEBUG_CODE( __attribute__((__noreturn__)) );
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override M_DEBUG_CODE( __attribute__((__noreturn__)) );
 };
 
 class HHuginn::HTernaryEvaluator : public HHuginn::HValue {
@@ -686,7 +686,7 @@ public:
 	HTernaryEvaluator( expression_t const&, expression_t const&, expression_t const& );
 	value_t execute( huginn::HThread* );
 private:
-	virtual value_t do_clone( huginn::HThread*, int ) const override M_DEBUG_CODE( __attribute__((__noreturn__)) );
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override M_DEBUG_CODE( __attribute__((__noreturn__)) );
 };
 
 class HHuginn::HIterable : public HHuginn::HValue {
@@ -719,7 +719,7 @@ public:
 		return;
 	}
 private:
-	virtual value_t do_clone( huginn::HThread*, int ) const override;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 class HHuginn::HInteger : public HHuginn::HValue {
@@ -738,7 +738,7 @@ public:
 		return ( _value );
 	}
 private:
-	virtual value_t do_clone( huginn::HThread*, int ) const override;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 class HHuginn::HReal : public HHuginn::HValue {
@@ -757,7 +757,7 @@ public:
 		return ( _value );
 	}
 private:
-	virtual value_t do_clone( huginn::HThread*, int ) const override;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 class HHuginn::HString : public HHuginn::HIterable {
@@ -779,7 +779,7 @@ protected:
 	virtual HIterator do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override;
 private:
-	virtual value_t do_clone( huginn::HThread*, int ) const override;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 class HHuginn::HCharacter : public HHuginn::HValue {
@@ -796,7 +796,7 @@ public:
 	}
 	void set( value_type );
 private:
-	virtual value_t do_clone( huginn::HThread*, int ) const override;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 class HHuginn::HNumber : public HHuginn::HValue {
@@ -815,7 +815,7 @@ public:
 		return ( _value );
 	}
 private:
-	virtual value_t do_clone( huginn::HThread*, int ) const override;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 class HHuginn::HTuple : public HHuginn::HIterable {
@@ -838,7 +838,7 @@ protected:
 	virtual HIterator do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override;
 private:
-	virtual value_t do_clone( huginn::HThread*, int ) const override;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 class HHuginn::HList : public HHuginn::HIterable {
@@ -865,7 +865,7 @@ protected:
 	virtual HIterator do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override;
 private:
-	virtual value_t do_clone( huginn::HThread*, int ) const override;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 class HHuginn::HDeque : public HHuginn::HIterable {
@@ -894,7 +894,7 @@ protected:
 	virtual HIterator do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override;
 private:
-	virtual value_t do_clone( huginn::HThread*, int ) const override;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 class HHuginn::HValueLessHelper final {
@@ -957,7 +957,7 @@ private:
 	HDict( HDict const& ) = delete;
 	HDict& operator = ( HDict const& ) = delete;
 private:
-	virtual value_t do_clone( huginn::HThread*, int ) const override;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 class HHuginn::HOrder : public HHuginn::HIterable {
@@ -998,7 +998,7 @@ private:
 	HOrder( HOrder const& ) = delete;
 	HOrder& operator = ( HOrder const& ) = delete;
 private:
-	virtual value_t do_clone( huginn::HThread*, int ) const override;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 class HHuginn::HValueHashHelper final {
@@ -1060,7 +1060,7 @@ private:
 	HLookup( HLookup const& ) = delete;
 	HLookup& operator = ( HLookup const& ) = delete;
 private:
-	virtual value_t do_clone( huginn::HThread*, int ) const override;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 class HHuginn::HSet : public HHuginn::HIterable {
@@ -1098,7 +1098,7 @@ private:
 	HSet( HSet const& ) = delete;
 	HSet& operator = ( HSet const& ) = delete;
 private:
-	virtual value_t do_clone( huginn::HThread*, int ) const override;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 class HHuginn::HFunctionReference : public HHuginn::HValue {
@@ -1124,7 +1124,7 @@ public:
 	}
 	yaal::hcore::HString const& doc( void ) const;
 private:
-	virtual value_t do_clone( huginn::HThread*, int ) const override;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 class HHuginn::HException : public HHuginn::HValue {
@@ -1141,7 +1141,7 @@ public:
 	yaal::hcore::HString where( void ) const;
 	HIntrospecteeInterface::call_stack_t const& trace( void ) const;
 private:
-	virtual value_t do_clone( huginn::HThread*, int ) const override;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 class HHuginn::HEnumerator : public HHuginn::HValue {
@@ -1160,7 +1160,7 @@ public:
 		return ( _value );
 	}
 private:
-	virtual value_t do_clone( huginn::HThread*, int ) const override __attribute__((noreturn));
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override __attribute__((noreturn));
 };
 
 namespace huginn {

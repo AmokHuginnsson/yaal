@@ -234,7 +234,7 @@ HHuginn::value_t HStackFrameInfo::to_string( huginn::HThread* thread_, HHuginn::
 	M_EPILOG
 }
 
-HHuginn::value_t HStackFrameInfo::do_clone( huginn::HThread* thread_, int position_ ) const {
+HHuginn::value_t HStackFrameInfo::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
 	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on StackFrameInfo.", thread_->current_frame()->file_id(), position_ );
 }
 
@@ -290,7 +290,7 @@ HIntrospecteeInterface::call_stack_t const& HHuginn::HException::trace( void ) c
 	return ( _callStack );
 }
 
-HHuginn::value_t HHuginn::HException::do_clone( huginn::HThread* thread_, int ) const {
+HHuginn::value_t HHuginn::HException::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	HHuginn::value_t e( thread_->object_factory().create<HException>( get_class(), _message, _callStack ) );
 	return ( e );
 }

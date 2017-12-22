@@ -55,7 +55,7 @@ private:
 	HHuginn::value_t do_groups( huginn::HThread*, HHuginn::values_t&, int );
 	HHuginn::value_t do_replace( huginn::HThread*, HHuginn::values_t&, int );
 private:
-	virtual HHuginn::value_t do_clone( huginn::HThread*, int ) const override;
+	virtual HHuginn::value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 }

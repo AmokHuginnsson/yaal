@@ -56,7 +56,7 @@ private:
 	void write_impl( yaal::hcore::HString const& );
 	virtual HIterator do_iterator( HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override __attribute__((noreturn));
-	virtual HHuginn::value_t do_clone( huginn::HThread*, int ) const override __attribute__((noreturn));
+	virtual HHuginn::value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override __attribute__((noreturn));
 };
 
 }

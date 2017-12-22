@@ -71,7 +71,7 @@ protected:
 private:
 	virtual HIterator do_iterator( HThread*, int ) override;
 private:
-	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, int ) const override {
+	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
 		return ( thread_->object_factory().create<HMapper>( HIterable::get_class(), _source, _function, _method ) );
 	}
 };

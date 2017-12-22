@@ -224,14 +224,14 @@ HHuginn::HIterable::HIterator HHuginn::HSet::do_iterator( huginn::HThread*, int 
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HSet::do_clone( huginn::HThread* thread_, int position_ ) const {
+HHuginn::value_t HHuginn::HSet::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
 	M_PROLOG
 	HHuginn::value_t res( thread_->runtime().object_factory()->create_set() );
 	HSet* set( static_cast<HSet*>( res.raw() ) );
 	values_t& data( set->value() );
 	set->anchor( thread_, position_ );
 	for ( values_t::value_type const& v : _data ) {
-		data.insert( v->clone( thread_, position_ ) );
+		data.insert( v->clone( thread_, const_cast<HHuginn::value_t*>( &v ), position_ ) );
 	}
 	set->detach();
 	return ( res );

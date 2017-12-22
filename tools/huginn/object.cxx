@@ -197,13 +197,31 @@ HHuginn::value_t HHuginn::HObject::call_method(
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HObject::do_clone( huginn::HThread* thread_, int position_ ) const {
+HHuginn::value_t HHuginn::HObject::do_clone( huginn::HThread* thread_, HHuginn::value_t* object_, int position_ ) const {
 	M_PROLOG
-	values_t fields;
-	for ( value_t const& v : _fields ) {
-		fields.push_back( v->clone( thread_, position_ ) );
+	int idx( field_index( thread_->runtime().identifier_id( INTERFACE::CLONE ) ) );
+	HHuginn::value_t copy;
+	if ( idx >= 0 ) {
+		HHuginn::value_t cloneMember( field( *object_, idx ) );
+		if ( cloneMember->type_id() != HHuginn::TYPE::BOUND_METHOD ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"`clone' in class `"_ys
+					.append( get_class()->name() )
+					.append( "' is not a method." ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+		HHuginn::HClass::HMethod const* m( static_cast<HHuginn::HClass::HMethod const*>( cloneMember.raw() ) );
+		copy = m->function()( thread_, object_, HArguments( thread_ ), position_ );
+	} else {
+		values_t fields;
+		for ( value_t const& v : _fields ) {
+			fields.push_back( v->clone( thread_, const_cast<HHuginn::value_t*>( &v ), position_ ) );
+		}
+		copy = thread_->runtime().object_factory()->create_object( get_class(), fields );
 	}
-	return ( thread_->runtime().object_factory()->create_object( get_class(), fields ) );
+	return ( copy );
 	M_EPILOG
 }
 

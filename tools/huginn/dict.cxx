@@ -126,7 +126,7 @@ private:
 		return ( HIterator( yaal::move( impl ) ) );
 	}
 private:
-	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, int ) const override {
+	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
 		return ( thread_->object_factory().create<HKeyValuesDictView>( HIterable::get_class(), _dict ) );
 	}
 };
@@ -185,7 +185,7 @@ private:
 		return ( HIterator( yaal::move( impl ) ) );
 	}
 private:
-	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, int ) const override {
+	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
 		return ( thread_->object_factory().create<HReversedDict>( HIterable::get_class(), _dict ) );
 	}
 };
@@ -485,14 +485,20 @@ HHuginn::HIterable::HIterator HHuginn::HDict::do_iterator( huginn::HThread*, int
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HDict::do_clone( huginn::HThread* thread_, int position_ ) const {
+HHuginn::value_t HHuginn::HDict::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
 	HHuginn::value_t res( thread_->runtime().object_factory()->create_dict() );
 	HDict* dict( static_cast<HDict*>( res.raw() ) );
 	dict->_keyType = _keyType;
 	values_t& data( dict->value() );
 	dict->anchor( thread_, position_ );
 	for ( values_t::value_type const& v : _data ) {
-		data.insert( data.end(), make_pair( v.first->clone( thread_, position_ ), v.second->clone( thread_, position_ ) ) );
+		data.insert(
+			data.end(),
+			make_pair(
+				v.first->clone( thread_, const_cast<HHuginn::value_t*>( &v.first ), position_ ),
+				v.second->clone( thread_, const_cast<HHuginn::value_t*>( &v.second ), position_ )
+			)
+		);
 	}
 	dict->detach();
 	return ( res );

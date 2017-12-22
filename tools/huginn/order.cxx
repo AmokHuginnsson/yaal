@@ -255,14 +255,14 @@ HHuginn::HIterable::HIterator HHuginn::HOrder::do_iterator( huginn::HThread*, in
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HOrder::do_clone( huginn::HThread* thread_, int position_ ) const {
+HHuginn::value_t HHuginn::HOrder::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
 	HHuginn::value_t res( thread_->runtime().object_factory()->create_order() );
 	HHuginn::HOrder* order( static_cast<HHuginn::HOrder*>( res.raw() ) );
 	values_t&  data( order->value() );
 	order->_keyType = _keyType;
 	order->anchor( thread_, position_ );
 	for ( values_t::value_type const& v : _data ) {
-		data.insert( data.end(), v->clone( thread_, position_ ) );
+		data.insert( data.end(), v->clone( thread_, const_cast<HHuginn::value_t*>( &v ), position_ ) );
 	}
 	order->detach();
 	return ( res );

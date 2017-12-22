@@ -114,7 +114,7 @@ HHuginn::HNumber::HNumber( HHuginn::HClass const* class_, HHuginn::HNumber::valu
 	return;
 }
 
-HHuginn::value_t HHuginn::HNumber::do_clone( huginn::HThread* thread_, int ) const {
+HHuginn::value_t HHuginn::HNumber::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	return ( thread_->runtime().object_factory()->create_number( _value ) );
 }
 

@@ -203,7 +203,7 @@ HHuginn::class_t HCompiledRegularExpression::get_class( HRuntime* runtime_, HHug
 	M_EPILOG
 }
 
-HHuginn::value_t HCompiledRegularExpression::do_clone( huginn::HThread* thread_, int ) const {
+HHuginn::value_t HCompiledRegularExpression::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	M_PROLOG
 	return ( thread_->object_factory().create<HCompiledRegularExpression>( HValue::get_class(), make_resource<HRegex>( _regex->copy() ) ) );
 	M_EPILOG

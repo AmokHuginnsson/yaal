@@ -171,11 +171,11 @@ HHuginn::HIterable::HIterator HHuginn::HTuple::do_iterator( huginn::HThread*, in
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HTuple::do_clone( huginn::HThread* thread_, int position_ ) const {
+HHuginn::value_t HHuginn::HTuple::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
 	values_t data;
 	data.reserve( _data.get_size() );
 	for ( values_t::value_type const& v : _data ) {
-		data.push_back( v->clone( thread_, position_ ) );
+		data.push_back( v->clone( thread_, const_cast<HHuginn::value_t*>( &v ), position_ ) );
 	}
 	return ( thread_->runtime().object_factory()->create_tuple( yaal::move( data ) ) );
 }
