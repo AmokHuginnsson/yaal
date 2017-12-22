@@ -27,7 +27,7 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
-#include "tools/hhuginn.hxx"
+#include "list.hxx"
 #include "runtime.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
@@ -159,6 +159,40 @@ inline HHuginn::value_t pop( huginn::HThread* thread_, HHuginn::value_t* object_
 	M_EPILOG
 }
 
+HHuginn::value_t sort( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "list.sort";
+	verify_arg_count( name, values_, 0, 1, thread_, position_ );
+	HHuginn::value_t key;
+	if ( values_.get_size() > 0 ) {
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::FUNCTION_REFERENCE, ARITY::MULTIPLE, thread_, position_ );
+		key = values_[0];
+	}
+	HHuginn::HList::values_t& data( static_cast<HHuginn::HList*>( object_->raw() )->value() );
+	if ( ! key ) {
+		HHuginn::HValueLessHelper less;
+		less.anchor( thread_, position_ );
+		sort( data.begin(), data.end(), cref( less ) );
+	} else {
+		HHuginn::function_t k( static_cast<HHuginn::HFunctionReference*>( key.raw() )->function() );
+		yaal::sort(
+			data.begin(), data.end(),
+			[&k, &thread_, &position_]( HHuginn::value_t const& l_, HHuginn::value_t const& r_ ) {
+				return (
+					value_builtin::less(
+						thread_,
+						k( thread_, nullptr, HArguments( thread_, l_ ), position_ ),
+						k( thread_, nullptr, HArguments( thread_, r_ ), position_ ),
+						position_
+					)
+				);
+			}
+		);
+	}
+	return ( *object_ );
+	M_EPILOG
+}
+
 inline HHuginn::value_t clear( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "list.clear", values_, 0, 0, thread_, position_ );
@@ -226,6 +260,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 				{ "insert", objectFactory_->create_method( hcore::call( &list::insert, _1, _2, _3, _4 ) ), "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
 				{ "resize", objectFactory_->create_method( hcore::call( &list::resize, _1, _2, _3, _4 ) ), "( *size*, *elem* ) - resize `list` to given *size* optionally filling new elements with **copies** of value *elem*" },
 				{ "clear",  objectFactory_->create_method( hcore::call( &list::clear, _1, _2, _3, _4 ) ),  "erase `list`'s content, `list` becomes empty" },
+				{ "sort",   objectFactory_->create_method( hcore::call( &list::sort, _1, _2, _3, _4 ) ),   "( [*callable*] ) - in-place sort this `list`, using *callable* to retrieve keys for element comparison" },
 				{ "hash",   objectFactory_->create_method( hcore::call( &list::hash, _1, _2, _3, _4 ) ),   "calculate hash value for this `list`" },
 				{ "less",   objectFactory_->create_method( hcore::call( &list::less, _1, _2, _3, _4 ) ),   "( *other* ) - test if this `list` comes lexicographically before *other* `list`" },
 				{ "equals", objectFactory_->create_method( hcore::call( &list::equals, _1, _2, _3, _4 ) ), "( *other* ) - test if *other* `list` has the same content" }

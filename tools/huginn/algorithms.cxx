@@ -187,11 +187,6 @@ public:
 		char const name[] = "Algorithms.sorted";
 		verify_arg_count( name, values_, 1, 2, thread_, position_ );
 		HHuginn::type_id_t t( verify_arg_collection( name, values_, 0, ARITY::MULTIPLE, ONTICALLY::VIRTUAL, thread_, position_ ) );
-		HHuginn::value_t key;
-		if ( values_.get_size() > 1 ) {
-			verify_arg_type( name, values_, 1, HHuginn::TYPE::FUNCTION_REFERENCE, ARITY::MULTIPLE, thread_, position_ );
-			key = values_[1];
-		}
 		HHuginn::value_t v( thread_->object_factory().create_list() );
 		HHuginn::HList::values_t& dest( static_cast<HHuginn::HList*>( v.raw() )->value() );
 		if ( t == HHuginn::TYPE::TUPLE ) {
@@ -232,25 +227,10 @@ public:
 				it.next( thread_, position_ );
 			}
 		}
-		if ( ! key ) {
-			HHuginn::HValueLessHelper less;
-			less.anchor( thread_, position_ );
-			sort( dest.begin(), dest.end(), cref( less ) );
+		if ( values_.get_size() > 1 ) {
+			list::sort( thread_, &v, HArguments( thread_, values_[1] ), position_ );
 		} else {
-			HHuginn::function_t k( static_cast<HHuginn::HFunctionReference*>( key.raw() )->function() );
-			sort(
-				dest.begin(), dest.end(),
-				[&k, &thread_, &position_]( HHuginn::value_t const& l_, HHuginn::value_t const& r_ ) {
-					return (
-						value_builtin::less(
-							thread_,
-							k( thread_, nullptr, HArguments( thread_, l_ ), position_ ),
-							k( thread_, nullptr, HArguments( thread_, r_ ), position_ ),
-							position_
-						)
-					);
-				}
-			);
+			list::sort( thread_, &v, HArguments( thread_ ), position_ );
 		}
 		return ( v );
 	}
