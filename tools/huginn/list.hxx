@@ -43,69 +43,9 @@ namespace huginn {
 namespace list {
 
 HHuginn::value_t sort( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+HHuginn::value_t reversed_view( huginn::HThread*, HHuginn::value_t const& );
 
 }
-
-class HListReverseIterator : public HIteratorInterface {
-	HHuginn::HList* _list;
-	int long _index;
-public:
-	HListReverseIterator( HThread* thread_, HHuginn::HList* list_, int position_ )
-		: _list( list_ )
-		, _index( list_->size( thread_, position_ ) - 1 ) {
-		return;
-	}
-protected:
-	virtual HHuginn::value_t do_value( HThread*, int ) override {
-		return ( _list->get( _index ) );
-	}
-	virtual bool do_is_valid( HThread*, int ) override {
-		return ( _index >= 0 );
-	}
-	virtual void do_next( HThread*, int ) override {
-		-- _index;
-	}
-private:
-	HListReverseIterator( HListReverseIterator const& ) = delete;
-	HListReverseIterator& operator = ( HListReverseIterator const& ) = delete;
-};
-
-class HReversedList : public HHuginn::HIterable {
-	HHuginn::value_t _list;
-public:
-	HReversedList( HHuginn::HClass const* class_, HHuginn::value_t const& list_ )
-		: HIterable( class_ )
-		, _list( list_ ) {
-		M_ASSERT( _list->type_id() == HHuginn::TYPE::LIST );
-	}
-	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
-		M_PROLOG
-		HHuginn::class_t c(
-			runtime_->create_class(
-				"ReversedListView",
-				nullptr,
-				HHuginn::field_definitions_t{},
-				"The `ReversedListView` class represents *lazy* *iterable* reversed view of a `list`."
-			)
-		);
-		runtime_->huginn()->register_class( c );
-		return ( c );
-		M_EPILOG
-	}
-protected:
-	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
-		return ( safe_int::cast<int long>( static_cast<HHuginn::HList const*>( _list.raw() )->size( thread_, position_ ) ) );
-	}
-private:
-	virtual HIterator do_iterator( HThread* thread_, int position_ ) override {
-		HIterator::iterator_implementation_t impl( new ( memory::yaal ) HListReverseIterator( thread_, static_cast<HHuginn::HList*>( _list.raw() ), position_ ) );
-		return ( HIterator( yaal::move( impl ) ) );
-	}
-private:
-	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
-		return ( thread_->object_factory().create<HReversedList>( HIterable::get_class(), _list ) );
-	}
-};
 
 }
 

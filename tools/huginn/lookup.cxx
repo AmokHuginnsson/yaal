@@ -348,16 +348,16 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 HHuginn::value_t key_values_view( huginn::HThread* thread_, HHuginn::value_t const& value_ ) {
 	M_PROLOG
 	M_ASSERT( value_->type_id() == HHuginn::TYPE::LOOKUP );
-	HLookupClass const* dc( static_cast<HLookupClass const*>( value_->get_class() ) );
-	return ( thread_->object_factory().create<HKeyValuesLookupView>( dc->key_values_lookup_view_class(), value_ ) );
+	HLookupClass const* lc( static_cast<HLookupClass const*>( value_->get_class() ) );
+	return ( thread_->object_factory().create<HKeyValuesLookupView>( lc->key_values_lookup_view_class(), value_ ) );
 	M_EPILOG
 }
 
 HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const& value_ ) {
 	M_PROLOG
 	M_ASSERT( value_->type_id() == HHuginn::TYPE::LOOKUP );
-	HLookupClass const* dc( static_cast<HLookupClass const*>( value_->get_class() ) );
-	return ( thread_->object_factory().create<HReversedLookup>( dc->reversed_lookup_class(), value_ ) );
+	HLookupClass const* lc( static_cast<HLookupClass const*>( value_->get_class() ) );
+	return ( thread_->object_factory().create<HReversedLookup>( lc->reversed_lookup_class(), value_ ) );
 	M_EPILOG
 }
 
