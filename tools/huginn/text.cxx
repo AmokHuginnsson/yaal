@@ -38,6 +38,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 
 using namespace yaal;
 using namespace yaal::hcore;
+using namespace yaal::tools;
 using namespace yaal::tools::huginn;
 
 namespace yaal {
@@ -116,7 +117,7 @@ public:
 	static HHuginn::value_t distance( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "Text.distance", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, thread_, position_ );
-		return ( thread_->runtime().object_factory()->create_integer( string::distance::levenshtein_damerau( get_string( values_[0] ), get_string( values_[1] ) ) ) );
+		return ( thread_->runtime().object_factory()->create_integer( string::distance( get_string( values_[0] ), get_string( values_[1] ) ) ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t repeat( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {

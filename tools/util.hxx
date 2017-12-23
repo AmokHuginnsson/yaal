@@ -89,7 +89,7 @@ double long atof_ex( yaal::hcore::HString const&, bool = false );
 yaal::hcore::HString get_token( yaal::hcore::HString const&, yaal::hcore::HString const&, int long );
 yaal::hcore::HString cardinal( int );
 yaal::hcore::HString ordinal( int );
-
+char const* near_keys( char );
 
 class HTheme {
 	COLOR::color_t _strong;

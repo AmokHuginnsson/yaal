@@ -995,7 +995,7 @@ yaal::hcore::HString HRuntime::suggestion( HHuginn::identifier_id_t identifier_ 
 	HString s;
 	int minDiff( meta::max_signed<int>::value );
 	for ( yaal::hcore::HString const& i : _identifierNames ) {
-		int diff( string::distance::levenshtein_damerau( i, identifier ) );
+		int diff( string::distance( i, identifier, string::DISTANCE_METRIC::QWERTY ) );
 		if ( ( diff > 0 ) && ( diff < minDiff ) ) {
 			minDiff = diff;
 			s = i;
@@ -1013,7 +1013,7 @@ yaal::hcore::HString HRuntime::suggestion( HHuginn::HClass const* class_, HHugin
 	while ( class_ ) {
 		for ( HHuginn::identifier_id_t identifierId : class_->field_identifiers() ) {
 			HString const& name( identifier_name( identifierId ) );
-			int diff( string::distance::levenshtein_damerau( name, identifierName ) );
+			int diff( string::distance( name, identifierName, string::DISTANCE_METRIC::QWERTY ) );
 			if ( ( diff > 0 ) && ( diff < minDiff ) ) {
 				minDiff = diff;
 				s = name;

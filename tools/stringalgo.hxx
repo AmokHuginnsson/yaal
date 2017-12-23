@@ -67,18 +67,22 @@ yaal::hcore::HString join( collection const& container_, yaal::hcore::HString co
 	return ( value );
 }
 
-/*! \brief The Levenshtein and Damerau-Levenshtein string distance functions.
+/*! \brief The string distance metrics.
  */
-namespace distance {
+enum class DISTANCE_METRIC {
+	LEVENSHTEIN,
+	DAMERAU_LEVENSHTEIN,
+	QWERTY
+};
 
 /*! \brief Calculate distance between two strings.
  *
  * \param first - first string of a pair of strings to calculate distance.
  * \param second - second string of given pair.
- * \param damerau - use Damerau-Levenshtein definition of string distance if set to true, use Levenshtein definition otherwise.
+ * \param distanceMetric_ - distance metric type to use for calculating string distance.
  * \return calculated (Damerau-)Levenshtein distance between strings.
  */
-int levenshtein_damerau( yaal::hcore::HString const& first, yaal::hcore::HString const& second, bool damerau = true );
+int distance( yaal::hcore::HString const& first, yaal::hcore::HString const& second, DISTANCE_METRIC distanceMetric_ = DISTANCE_METRIC::DAMERAU_LEVENSHTEIN );
 
 /*! \brief Predicate for find_local algorithm.
  *
@@ -92,28 +96,28 @@ class HAlike {
 	item_t const& _item;
 	iter_t _iter;
 	int long _best;
-	bool _damerau;
+	DISTANCE_METRIC _distanceMetric;
 public:
-	HAlike( iter_t it, item_t const& item, bool damerau = true )
-		: _item( item ), _iter( it ),
-		_best( meta::max_signed<int long>::value ),
-		_damerau( damerau ) {}
+	HAlike( iter_t it, item_t const& item, DISTANCE_METRIC distanceMetric_ = DISTANCE_METRIC::DAMERAU_LEVENSHTEIN )
+		: _item( item )
+		, _iter( it )
+		, _best( meta::max_signed<int long>::value )
+		, _distanceMetric( distanceMetric_ ) {}
 	void operator()( iter_t it ) {
-		int long dist = levenshtein_damerau( _item, *it, _damerau );
+		int long dist = distance( _item, *it, _distanceMetric );
 		if ( dist < _best ) {
 			_best = dist;
 			_iter = it;
 		}
 	}
-	iter_t operator()( void ) const
-		{ return ( _iter ); }
+	iter_t operator()( void ) const {
+		return ( _iter );
+	}
 };
 
 template<typename iter_t, typename item_t>
-HAlike<iter_t, item_t> alike( iter_t iter, item_t const& item, bool damerau = true ) {
-	return ( HAlike<iter_t, item_t>( iter, item, damerau ) );
-}
-
+HAlike<iter_t, item_t> alike( iter_t iter, item_t const& item, DISTANCE_METRIC distanceMetric_ = DISTANCE_METRIC::DAMERAU_LEVENSHTEIN ) {
+	return ( HAlike<iter_t, item_t>( iter, item, distanceMetric_ ) );
 }
 
 }

@@ -24,11 +24,14 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <cstring>
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "stringalgo.hxx"
 #include "hcore/hresource.hxx"
+#include "tools/util.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -39,68 +42,69 @@ namespace tools {
 
 namespace string {
 
-namespace {
-int min3 ( int a, int b, int c ) {
-	int ret = c;
-	if ( a < ret )
-		ret = a;
-	if ( b < ret )
-		ret = b;
-	return ( ret );
-}
-int min ( int a, int b ) {
-	return ( a < b ? a : b );
-}
-}
-
-namespace distance {
-
-int levenshtein_damerau( yaal::hcore::HString const& one_, yaal::hcore::HString const& two_, bool damerau_ ) {
+int distance( yaal::hcore::HString const& one_, yaal::hcore::HString const& two_, DISTANCE_METRIC distanceMetric_ ) {
 	M_PROLOG
-	int cost = 0;
-	int indexOne = 0, indexTwo = 0;
 	int lengthOne = static_cast<int>( one_.length() );
 	int lengthTwo = static_cast<int>( two_.length() );
-	int** distanceMatrix = nullptr;
-	if ( ! lengthTwo )
+	if ( ! lengthTwo ) {
 		return ( lengthOne );
-	if ( ! lengthOne )
+	}
+	if ( ! lengthOne ) {
 		return ( lengthTwo );
-	lengthOne ++;
-	lengthTwo ++;
+	}
+	++ lengthOne;
+	++ lengthTwo;
+	int** distanceMatrix = nullptr;
 	HResource<int*[]> distanceMatrixHolder( new ( memory::yaal ) int*[ lengthOne ] );
 	HResource<int[]> distanceMatrixBuffer( new ( memory::yaal ) int[ lengthOne * lengthTwo ] );
 	distanceMatrix = distanceMatrixHolder.raw();
-	for ( indexOne = 0; indexOne < lengthOne; ++ indexOne )
+	for ( int indexOne( 0 ); indexOne < lengthOne; ++ indexOne ) {
 		distanceMatrix[ indexOne ] = distanceMatrixBuffer.raw() + indexOne * lengthTwo;
-	for ( indexOne = 0; indexOne < lengthOne; ++ indexOne )
+	}
+	for ( int indexOne( 0 ); indexOne < lengthOne; ++ indexOne ) {
 		distanceMatrix[ indexOne ][ 0 ] = indexOne;
-	for ( indexTwo = 0; indexTwo < lengthTwo; ++ indexTwo )
+	}
+	for ( int indexTwo( 0 ); indexTwo < lengthTwo; ++ indexTwo ) {
 		distanceMatrix[ 0 ][ indexTwo ] = indexTwo;
-	lengthTwo --;
-	lengthOne --;
+	}
+	-- lengthTwo;
+	-- lengthOne;
 	/* real magic starts here */
-	for ( indexOne = 0; indexOne < lengthOne; ++ indexOne ) {
-		for ( indexTwo = 0; indexTwo < lengthTwo; ++ indexTwo ) {
-			cost = 0;
-			if ( one_ [ indexOne ] != two_ [ indexTwo ] )
-				cost = 1;
-			distanceMatrix[ indexOne + 1 ][ indexTwo + 1 ] = min3(
-					distanceMatrix[ indexOne ][ indexTwo + 1 ] + 1,
-					distanceMatrix[ indexOne + 1 ][ indexTwo ] + 1,
-					distanceMatrix[ indexOne ][ indexTwo ] + cost );
-			if ( damerau_ && ( indexOne > 0 ) && ( indexTwo > 0 )
-					&& ( one_[ indexOne - 1 ] == two_[ indexTwo ] )
-					&& ( one_[ indexOne ] == two_[ indexTwo - 1 ] ) )
+	for ( int indexOne( 0 ); indexOne < lengthOne; ++ indexOne ) {
+		code_point_t one( one_[ indexOne ] );
+		for ( int indexTwo( 0 ); indexTwo < lengthTwo; ++ indexTwo ) {
+			int cost( 0 );
+			int swapCost( 0 );
+			code_point_t two( two_[ indexTwo ] );
+			if ( one != two ) {
+				cost = (
+					( distanceMetric_ == DISTANCE_METRIC::QWERTY )
+					&& is_ascii( one )
+					&& is_ascii( two )
+					&& ( strchr( util::near_keys( static_cast<char>( one.get() ) ), static_cast<char>( two.get() ) ) == nullptr )
+				) ? 2 : 1;
+				swapCost = 1;
+			}
+			distanceMatrix[ indexOne + 1 ][ indexTwo + 1 ] = min(
+				distanceMatrix[ indexOne ][ indexTwo + 1 ] + 1,
+				distanceMatrix[ indexOne + 1 ][ indexTwo ] + 1,
+				distanceMatrix[ indexOne ][ indexTwo ] + cost
+			);
+			if (
+				( distanceMetric_ != DISTANCE_METRIC::LEVENSHTEIN )
+				&& ( indexOne > 0 ) && ( indexTwo > 0 )
+				&& ( one_[ indexOne - 1 ] == two )
+				&& ( one == two_[ indexTwo - 1 ] )
+			) {
 				distanceMatrix[ indexOne + 1 ][ indexTwo + 1 ] = min(
-						distanceMatrix[ indexOne + 1 ][ indexTwo + 1 ],
-						distanceMatrix[ indexOne - 1 ][ indexTwo - 1 ] + cost );
+					distanceMatrix[ indexOne + 1 ][ indexTwo + 1 ],
+					distanceMatrix[ indexOne - 1 ][ indexTwo - 1 ] + swapCost
+				);
+			}
 		}
 	}
 	return ( distanceMatrix[ lengthOne ][ lengthTwo ] );
 	M_EPILOG
-}
-
 }
 
 }
