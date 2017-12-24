@@ -2176,6 +2176,14 @@ void OCompiler::pack_named_parameters( executing_parser::position_t position_ ) 
 	M_EPILOG
 }
 
+void OCompiler::unpack_variadic_parameters( executing_parser::position_t position_ ) {
+	M_PROLOG
+	HExpression* expr( current_expression().raw() );
+	expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::unpack_variadic_parameters, position_.get() ) );
+	return;
+	M_EPILOG
+}
+
 void OCompiler::dispatch_member_access( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );

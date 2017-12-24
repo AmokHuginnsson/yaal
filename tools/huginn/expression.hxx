@@ -107,6 +107,7 @@ public:
 	void negate( OExecutionStep const&, huginn::HFrame* );
 	void function_call( OExecutionStep const&, huginn::HFrame* );
 	void pack_named_parameters( OExecutionStep const&, huginn::HFrame* );
+	void unpack_variadic_parameters( OExecutionStep const&, huginn::HFrame* );
 	void make_assoc( OPERATOR, huginn::HFrame*, int );
 	void make_dict( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
 		make_assoc( OPERATOR::MAKE_DICT, frame_, executionStep_._position );

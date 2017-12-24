@@ -520,6 +520,7 @@ struct OCompiler {
 	void mark_expression_position( executing_parser::position_t );
 	void make_reference( executing_parser::position_t );
 	void pack_named_parameters( executing_parser::position_t );
+	void unpack_variadic_parameters( executing_parser::position_t );
 	void defer_get_reference( yaal::hcore::HString const&, executing_parser::position_t );
 	void defer_get_field_reference( yaal::hcore::HString const&, executing_parser::position_t );
 	void defer_make_variable( yaal::hcore::HString const&, executing_parser::position_t );

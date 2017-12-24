@@ -203,7 +203,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	);
 	HRule functionArgument(
 		"functionArgument",
-		arg ^ ':'
+		( arg ^ ':' ) >> -( constant( "..." )[HRuleBase::action_position_t( hcore::call( &OCompiler::unpack_variadic_parameters, _compiler.get(), _1 ) )] )
 	);
 	HRule argList( "argList", functionArgument >> *( ',' >> functionArgument ) );
 	HRule parameterName(

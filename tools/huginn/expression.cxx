@@ -553,7 +553,14 @@ void HExpression::grab_args( HFrame* frame_, HArguments& args_ ) {
 	while ( _instructions[ip]._operator == OPERATOR::FUNCTION_ARGUMENT ) {
 		++ ip;
 		M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );
-		values.push_back( yaal::move( frame_->values().top() ) );
+		HHuginn::value_t& v( frame_->values().top() );
+		if ( v->type_id() != HHuginn::TYPE::VARIADIC_PARAMETERS ) {
+			values.push_back( yaal::move( v ) );
+		} else {
+			HHuginn::value_t& vp( static_cast<HHuginn::HTaggedValue*>( v.raw() )->value() );
+			HHuginn::values_t& p( static_cast<HHuginn::HTuple*>( vp.raw() )->value() );
+			values.insert( values.end(), p.rbegin(), p.rend() );
+		}
 		frame_->values().pop();
 		M_ASSERT( ! frame_->values().is_empty() );
 	}
@@ -583,6 +590,19 @@ void HExpression::pack_named_parameters( OExecutionStep const& executionStep_, h
 		tv.value().swap( v );
 	} else {
 		throw HHuginn::HHuginnRuntimeException( "Packed parameter is not a lookup.", file_id(), executionStep_._position );
+	}
+	return;
+	M_EPILOG
+}
+
+void HExpression::unpack_variadic_parameters( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
+	M_PROLOG
+	HFrame::values_t& values( frame_->values() );
+	HHuginn::value_t& vr( values.top() );
+	if ( vr->type_id() == HHuginn::TYPE::TUPLE ) {
+		vr = frame_->thread()->object_factory().create_tagged_value( vr, &_variadicParametersClass_ );
+	} else {
+		throw HHuginn::HHuginnRuntimeException( "Parameter is not a tuple.", file_id(), executionStep_._position );
 	}
 	return;
 	M_EPILOG
