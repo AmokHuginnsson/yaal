@@ -38,6 +38,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "objectfactory.hxx"
 #include "packagefactory.hxx"
 #include "matrix.hxx"
+#include "complex.hxx"
 #include "numbersetstatistics.hxx"
 #include "randomizer.hxx"
 
@@ -53,6 +54,7 @@ namespace huginn {
 
 class HMathematics : public HHuginn::HValue {
 	typedef yaal::hcore::HNumber const& ( *constant_getter_t )( yaal::hcore::HNumber::integer_t );
+	HHuginn::class_t _complexClass;
 	HHuginn::class_t _matrixClass;
 	HHuginn::class_t _numberSetStatisticsClass;
 	HHuginn::class_t _randomizerClass;
@@ -60,11 +62,18 @@ class HMathematics : public HHuginn::HValue {
 public:
 	HMathematics( HHuginn::HClass* class_ )
 		: HValue( class_ )
+		, _complexClass(
+			add_to_package(
+				class_,
+				HComplex::get_class( class_->runtime() ),
+				"( *real*, *imaginary* ) - create instance of Complex with *real* real part and *imaginary* imaginary part."
+			)
+		)
 		, _matrixClass(
 			add_to_package(
 				class_,
 				HMatrix::get_class( class_->runtime() ),
-				"( *type*, *rows*, *cols* ) - create instance of Matrix class of values of type *type* and *rows* rows and *cols* columns"
+				"( *type*, *rows*, *cols* ) - create instance of Matrix class of values of type *type* and *rows* rows and *cols* columns."
 			)
 		)
 		, _numberSetStatisticsClass( HNumberSetStatistics::get_class( class_->runtime() ) )
@@ -488,12 +497,6 @@ public:
 		return ( thread_->object_factory().create_integer( number::differs_at( get_number( values_[0] ), get_number( values_[1] ) ) ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t matrix( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-		M_PROLOG
-		HMathematics* m( static_cast<HMathematics*>( object_->raw() ) );
-		return ( HMatrix::create_instance( m->_matrixClass.raw(), thread_, values_, position_ ) );
-		M_EPILOG
-	}
 	static HHuginn::value_t statistics( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		HMathematics* m( static_cast<HMathematics*>( object_->raw() ) );
@@ -556,7 +559,6 @@ HHuginn::value_t HMathematicsCreator::do_new_instance( HRuntime* runtime_ ) {
 				{ "floor",                runtime_->object_factory()->create_method( hcore::call( &HMathematics::floor, _1, _2, _3, _4 ) ),                "( *value* ) - get largest integral value not greater than *value*" },
 				{ "ceil",                 runtime_->object_factory()->create_method( hcore::call( &HMathematics::ceil, _1, _2, _3, _4 ) ),                 "( *value* ) - get smallest integral value not less than *value*" },
 				{ "differs_at",           runtime_->object_factory()->create_method( hcore::call( &HMathematics::differs_at, _1, _2, _3, _4 ) ),           "( *first*, *second* ) - tell at which decimal position *first* and *second* values have first occurrence of different digit" },
-				{ "matrix",               runtime_->object_factory()->create_method( hcore::call( &HMathematics::matrix, _1, _2, _3, _4 ) ),               "( *type*, *rows*, *cols* ) - create instance of Matrix class of values of type *type* and *rows* rows and *cols* columns" },
 				{ "statistics",           runtime_->object_factory()->create_method( hcore::call( &HMathematics::statistics, _1, _2, _3, _4 ) ),           "( *iterable* ) - calculate numerical statistics over given iterable *iterable* of uniformly types values" },
 				{ "randomizer",           runtime_->object_factory()->create_method( hcore::call( &HMathematics::randomizer, _1, _2, _3, _4 ) ),           "([ *cap* ]) - create random number generator which output values are capped at *cap*" }
 			},
