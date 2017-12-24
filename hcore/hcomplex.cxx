@@ -48,7 +48,7 @@ HComplex::HComplex( void )
 	M_EPILOG
 }
 
-HComplex::HComplex( double long real_,  double long imaginary_ )
+HComplex::HComplex( value_type real_,  value_type imaginary_ )
 	: _real( real_ ), _imaginary( imaginary_ ) {
 	M_PROLOG
 	return;
@@ -68,33 +68,33 @@ HComplex::~HComplex( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
-double long HComplex::re( void ) const {
+HComplex::value_type HComplex::re( void ) const {
 	M_PROLOG
 	return ( _real );
 	M_EPILOG
 }
 
-double long HComplex::im( void ) const {
+HComplex::value_type HComplex::im( void ) const {
 	M_PROLOG
 	return ( _imaginary );
 	M_EPILOG
 }
 
-HComplex& HComplex::set_real( double long real_ ) {
+HComplex& HComplex::set_real( value_type real_ ) {
 	M_PROLOG
 	_real = real_;
 	return ( *this );
 	M_EPILOG
 }
 
-HComplex& HComplex::set_imaginary( double long imaginary_ ) {
+HComplex& HComplex::set_imaginary( value_type imaginary_ ) {
 	M_PROLOG
 	_imaginary = imaginary_;
 	return ( *this );
 	M_EPILOG
 }
 
-HComplex& HComplex::set( double long real_, double long imaginary_ ) {
+HComplex& HComplex::set( value_type real_, value_type imaginary_ ) {
 	M_PROLOG
 	_real = real_;
 	_imaginary = imaginary_;
@@ -102,9 +102,9 @@ HComplex& HComplex::set( double long real_, double long imaginary_ ) {
 	M_EPILOG
 }
 
-double long HComplex::modulus( void ) const {
+HComplex::value_type HComplex::modulus( void ) const {
 	M_PROLOG
-	double long mod( 0 );
+	value_type mod( 0 );
 	if ( _imaginary == 0.0l )
 		mod = _real;
 	else if ( _real == 0.0l )
@@ -114,25 +114,25 @@ double long HComplex::modulus( void ) const {
 	M_EPILOG
 }
 
-double long HComplex::argument( void ) const {
+HComplex::value_type HComplex::argument( void ) const {
 	M_PROLOG
-	bool reZero( yaal::abs( _real ) < ( 2.L * std::numeric_limits<double long>::epsilon() ) );
-	bool imZero( yaal::abs( _imaginary ) < ( 2.L * std::numeric_limits<double long>::epsilon() ) );
+	bool reZero( yaal::abs( _real ) < ( 2.L * std::numeric_limits<value_type>::epsilon() ) );
+	bool imZero( yaal::abs( _imaginary ) < ( 2.L * std::numeric_limits<value_type>::epsilon() ) );
 	if ( reZero && imZero  )
 		M_THROW( "Argument for 0 + 0i is undefined.", errno );
 
-	double long arg( 0.L );
-	if ( _real > 0.L )
+	value_type arg( 0.L );
+	if ( _real > 0.L ) {
 		arg = ::std::atan( _imaginary  / _real );
-	else if ( ( _real < 0.L ) && ( _imaginary >= 0.L ) )
+	} else if ( ( _real < 0.L ) && ( _imaginary >= 0.L ) ) {
 		arg = ::std::atan( _imaginary  / _real ) + PI;
-	else if ( ( _real < 0.L ) && ( _imaginary < 0.L ) )
+	} else if ( ( _real < 0.L ) && ( _imaginary < 0.L ) ) {
 		arg = ::std::atan( _imaginary  / _real ) - PI;
-	else if ( reZero && ( _imaginary > 0 ) )
+	} else if ( reZero && ( _imaginary > 0 ) ) {
 		arg = PI / 2.L;
-	else if ( reZero && ( _imaginary < 0 ) )
+	} else if ( reZero && ( _imaginary < 0 ) ) {
 		arg = -PI / 2.L;
-	else {
+	} else {
 		M_ASSERT( 0 && "bad code path" );
 	}
 	return ( arg );
@@ -179,14 +179,14 @@ HComplex& HComplex::operator -= ( HComplex const& complex_ ) {
 
 HComplex& HComplex::operator *= ( HComplex const& complex_ ) {
 	M_PROLOG
-	double long real( _real * complex_._real - _imaginary * complex_._imaginary );
-	double long imaginary( _imaginary * complex_._real + _real * complex_._imaginary );
+	value_type real( _real * complex_._real - _imaginary * complex_._imaginary );
+	value_type imaginary( _imaginary * complex_._real + _real * complex_._imaginary );
 	set( real, imaginary );
 	return ( *this );
 	M_EPILOG
 }
 
-HComplex& HComplex::operator *= ( double long value_ ) {
+HComplex& HComplex::operator *= ( value_type value_ ) {
 	M_PROLOG
 	_real *= value_;
 	_imaginary *= value_;
@@ -196,17 +196,17 @@ HComplex& HComplex::operator *= ( double long value_ ) {
 
 HComplex& HComplex::operator /= ( HComplex const& complex_ ) {
 	M_PROLOG
-	double long denominator( complex_._real * complex_._real + complex_._imaginary * complex_._imaginary );
+	value_type denominator( complex_._real * complex_._real + complex_._imaginary * complex_._imaginary );
 	if ( denominator == 0.0L )
 		M_THROW( "denominator equals 0", errno );
-	double long real( ( _real * complex_._real + _imaginary * complex_._imaginary ) / denominator );
-	double long imaginary( ( complex_._real * _imaginary - _real * complex_._imaginary ) / denominator );
+	value_type real( ( _real * complex_._real + _imaginary * complex_._imaginary ) / denominator );
+	value_type imaginary( ( complex_._real * _imaginary - _real * complex_._imaginary ) / denominator );
 	set( real, imaginary );
 	return ( *this );
 	M_EPILOG
 }
 
-HComplex& HComplex::operator /= ( double long value_ ) {
+HComplex& HComplex::operator /= ( value_type value_ ) {
 	M_PROLOG
 	if ( value_ == 0.0L )
 		M_THROW( "denominator equals 0", errno );
@@ -247,7 +247,7 @@ HComplex HComplex::operator * ( HComplex const& complex_ ) const {
 	M_EPILOG
 }
 
-HComplex HComplex::operator * ( double long value_ ) const {
+HComplex HComplex::operator * ( value_type value_ ) const {
 	M_PROLOG
 	HComplex c( *this );
 	c *= value_;
@@ -263,7 +263,7 @@ HComplex HComplex::operator / ( HComplex const& complex_ ) const {
 	M_EPILOG
 }
 
-HComplex HComplex::operator / ( double long value_ ) const {
+HComplex HComplex::operator / ( value_type value_ ) const {
 	M_PROLOG
 	HComplex c( *this );
 	c /= value_;
@@ -271,26 +271,26 @@ HComplex HComplex::operator / ( double long value_ ) const {
 	M_EPILOG
 }
 
-HComplex operator + ( double long value_, HComplex const& complex_ ) {
+HComplex operator + ( HComplex::value_type value_, HComplex const& complex_ ) {
 	M_PROLOG
 	return ( complex_ + value_ );
 	M_EPILOG
 }
 
-HComplex operator - ( double long value_, HComplex const& complex_ ) {
+HComplex operator - ( HComplex::value_type value_, HComplex const& complex_ ) {
 	M_PROLOG
 	HComplex c( value_ );
 	return ( c - complex_ );
 	M_EPILOG
 }
 
-HComplex operator * ( double long value_, HComplex const& complex_ ) {
+HComplex operator * ( HComplex::value_type value_, HComplex const& complex_ ) {
 	M_PROLOG
 	return ( complex_ * value_ );
 	M_EPILOG
 }
 
-HComplex operator / ( double long value_, HComplex const& complex_ ) {
+HComplex operator / ( HComplex::value_type value_, HComplex const& complex_ ) {
 	M_PROLOG
 	HComplex c( value_ );
 	return ( c / complex_ );
@@ -302,7 +302,7 @@ HComplex operator "" _yi ( double long val_ ) {
 }
 
 HComplex operator "" _yi ( int long long unsigned val_ ) {
-	return ( HComplex( 0.L, static_cast<double long>( val_ ) ) );
+	return ( HComplex( 0.L, static_cast<HComplex::value_type>( val_ ) ) );
 }
 
 }
