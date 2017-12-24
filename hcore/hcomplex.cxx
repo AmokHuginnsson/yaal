@@ -42,21 +42,21 @@ namespace yaal {
 namespace hcore {
 
 HComplex::HComplex( void )
-	: _real( 0 ), _imaginary( 0 ) {
+	: _real( 0.L ), _imaginary( 0.L ) {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
 HComplex::HComplex( value_type real_,  value_type imaginary_ )
-	: _real( real_ ), _imaginary( imaginary_ ) {
+	: _real( real_ + 0.L ), _imaginary( imaginary_ + 0.L ) {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
 HComplex::HComplex( HComplex const& complex_ )
-	: _real( complex_._real ), _imaginary( complex_._imaginary ) {
+	: _real( complex_._real + 0.L ), _imaginary( complex_._imaginary + 0.L ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -82,34 +82,36 @@ HComplex::value_type HComplex::im( void ) const {
 
 HComplex& HComplex::set_real( value_type real_ ) {
 	M_PROLOG
-	_real = real_;
+	_real = real_ + 0.L;
 	return ( *this );
 	M_EPILOG
 }
 
 HComplex& HComplex::set_imaginary( value_type imaginary_ ) {
 	M_PROLOG
-	_imaginary = imaginary_;
+	_imaginary = imaginary_ + 0.L;
 	return ( *this );
 	M_EPILOG
 }
 
 HComplex& HComplex::set( value_type real_, value_type imaginary_ ) {
 	M_PROLOG
-	_real = real_;
-	_imaginary = imaginary_;
+	_real = real_ + 0.L;
+	_imaginary = imaginary_ + 0.L;
 	return ( *this );
 	M_EPILOG
 }
 
 HComplex::value_type HComplex::modulus( void ) const {
 	M_PROLOG
-	value_type mod( 0 );
-	if ( _imaginary == 0.0l )
-		mod = _real;
-	else if ( _real == 0.0l )
-		mod = _imaginary;
-	else mod = square_root( _real * _real + _imaginary * _imaginary );
+	value_type mod( 0.L );
+	if ( ( _imaginary + 0.L ) == 0.L ) {
+		mod = yaal::abs( _real );
+	} else if ( ( _real + 0.L ) == 0.L ) {
+		mod = yaal::abs( _imaginary );
+	}	else {
+		mod = square_root( _real * _real + _imaginary * _imaginary );
+	}
 	return ( mod );
 	M_EPILOG
 }
@@ -124,7 +126,7 @@ HComplex::value_type HComplex::argument( void ) const {
 	value_type arg( 0.L );
 	if ( _real > 0.L ) {
 		arg = ::std::atan( _imaginary  / _real );
-	} else if ( ( _real < 0.L ) && ( _imaginary >= 0.L ) ) {
+	} else if ( ( _real < 0.L ) && ( ( _imaginary + 0.L ) >= 0.L ) ) {
 		arg = ::std::atan( _imaginary  / _real ) + PI;
 	} else if ( ( _real < 0.L ) && ( _imaginary < 0.L ) ) {
 		arg = ::std::atan( _imaginary  / _real ) - PI;

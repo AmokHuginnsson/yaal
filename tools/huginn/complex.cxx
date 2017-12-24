@@ -178,6 +178,14 @@ HHuginn::value_t HComplex::modulus( huginn::HThread* thread_, HHuginn::value_t* 
 	M_EPILOG
 }
 
+HHuginn::value_t HComplex::negate( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "Complex.negate", values_, 0, 0, thread_, position_ );
+	HComplex* o( static_cast<HComplex*>( object_->raw() ) );
+	return ( thread_->object_factory().create<HComplex>( (*object_)->get_class(), - o->_data ) );
+	M_EPILOG
+}
+
 HHuginn::value_t HComplex::argument( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "Complex.argument", values_, 0, 0, thread_, position_ );
@@ -224,6 +232,7 @@ HHuginn::class_t HComplex::get_class( HRuntime* runtime_ ) {
 				{ "divide",    runtime_->object_factory()->create_method( hcore::call( &HComplex::divide, _1, _2, _3, _4 ) ),    "( *other* ) - divide this `Complex` by *other* `Complex` number" },
 				{ "modulus",   runtime_->object_factory()->create_method( hcore::call( &HComplex::modulus, _1, _2, _3, _4 ) ),   "get modulus value of this `Complex` number" },
 				{ "argument",  runtime_->object_factory()->create_method( hcore::call( &HComplex::argument, _1, _2, _3, _4 ) ),  "get argument value of this `Complex` number" },
+				{ "negate",    runtime_->object_factory()->create_method( hcore::call( &HComplex::negate, _1, _2, _3, _4 ) ),    "get negation of this `Complex` number" },
 				{ "to_string", runtime_->object_factory()->create_method( hcore::call( &HComplex::to_string, _1, _2, _3, _4 ) ), "get string representation of this `Complex` number" }
 			},
 			"The `Complex` class provides mathematical concept of complex numbers. It supports operations of addition, multiplication, subtraction, division, modulus and argument.",
