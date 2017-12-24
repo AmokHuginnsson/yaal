@@ -586,7 +586,7 @@ char const* op_to_symbol_str( OPERATOR o_ ) {
 		case ( OPERATOR::POWER ):              str = "^";      break;
 		case ( OPERATOR::POWER_TERM ):         str = "^;";     break;
 		case ( OPERATOR::FACTORIAL ):          str = "x!";     break;
-		case ( OPERATOR::ABSOLUTE ):           str = "|...|";  break;
+		case ( OPERATOR::MODULUS ):            str = "|...|";  break;
 		case ( OPERATOR::PARENTHESIS ):        str = "(...)";  break;
 		case ( OPERATOR::ASSIGN ):             str = "=";      break;
 		case ( OPERATOR::ASSIGN_TERM ):        str = "=;";     break;

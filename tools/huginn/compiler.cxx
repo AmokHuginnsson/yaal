@@ -582,6 +582,8 @@ void OCompiler::detect_misuse( void ) const {
 		_runtime->identifier_id( INTERFACE::DIVIDE ),
 		_runtime->identifier_id( INTERFACE::MODULO ),
 		_runtime->identifier_id( INTERFACE::POWER ),
+		_runtime->identifier_id( INTERFACE::MODULUS ),
+		_runtime->identifier_id( INTERFACE::NEGATE ),
 		_runtime->identifier_id( INTERFACE::CLONE ),
 		_runtime->identifier_id( "to_string" ),
 		_runtime->identifier_id( "to_integer" ),
@@ -1530,7 +1532,7 @@ void OCompiler::defer_oper( code_point_t operator_, executing_parser::position_t
 		case ( '%' ): o = OPERATOR::MODULO;      break;
 		case ( '^' ): o = OPERATOR::POWER;       break;
 		case ( '(' ): o = OPERATOR::PARENTHESIS; break;
-		case ( '|' ): o = OPERATOR::ABSOLUTE;    break;
+		case ( '|' ): o = OPERATOR::MODULUS;    break;
 		case ( '!' ): o = OPERATOR::BOOLEAN_NOT; break;
 		default: {
 			M_ASSERT( ! "bad code path"[0] );
@@ -2208,12 +2210,12 @@ void OCompiler::dispatch_action( OPERATOR oper_, executing_parser::position_t po
 		case ( OPERATOR::MAKE_DICT ):     { dispatch_function_call( &HExpression::make_dict, position_ ); }     break;
 		case ( OPERATOR::MAKE_LOOKUP ):   { dispatch_function_call( &HExpression::make_lookup, position_ ); }   break;
 		case ( OPERATOR::PARENTHESIS ):
-		case ( OPERATOR::ABSOLUTE ): {
-			M_ASSERT( ( o == OPERATOR::ABSOLUTE ) || ( o == OPERATOR::PARENTHESIS ) );
+		case ( OPERATOR::MODULUS ): {
+			M_ASSERT( ( o == OPERATOR::MODULUS ) || ( o == OPERATOR::PARENTHESIS ) );
 			defer_action( &HExpression::close_parenthesis, position_ );
 			current_expression()->commit_oper( o );
 			fc._operations.pop();
-			if ( o == OPERATOR::ABSOLUTE ) {
+			if ( o == OPERATOR::MODULUS ) {
 				M_ASSERT( ! fc._valueTypes.is_empty() );
 				if ( ! is_numeric_congruent( fc._valueTypes.top()._type ) ) {
 					throw HHuginn::HHuginnRuntimeException(

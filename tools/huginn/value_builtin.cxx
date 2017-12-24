@@ -246,6 +246,11 @@ HHuginn::value_t range(
 }
 
 namespace {
+enum class OPERATION {
+	OPEN,
+	CLOSED
+};
+
 void fallback_arithmetic( HThread* thread_, char const* methodName_, char const* oper_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	HHuginn::HObject* o( nullptr );
 	HHuginn::value_t v;
@@ -273,10 +278,52 @@ void fallback_arithmetic( HThread* thread_, char const* methodName_, char const*
 			v = m.function()( thread_, &v1_, HArguments( thread_, v2_ ), position_ );
 			M_ASSERT( v->type_id() == t );
 		} else {
-			throw HHuginn::HHuginnRuntimeException( "There is no `"_ys.append( oper_ ).append( "' operator for " ).append( a_type_name( t ) ).append( "." ), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException(
+				"There is no `"_ys.append( oper_ ).append( "' operator for " ).append( a_type_name( t ) ).append( "." ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
 		}
 	}
 	return;
+}
+
+HHuginn::value_t fallback_unary_arithmetic( HThread* thread_, char const* methodName_, char const* oper_, HHuginn::value_t const& v_, OPERATION operation_, int position_ ) {
+	HHuginn::HObject* o( nullptr );
+	HHuginn::value_t v;
+	HHuginn::type_id_t t( v_->type_id() );
+	HHuginn::value_t& obj( const_cast<HHuginn::value_t&>( v_ ) );
+	if ( thread_ && ( o = dynamic_cast<HHuginn::HObject*>( obj.raw() ) ) ) {
+		v = o->call_method( thread_, obj, methodName_, HArguments( thread_ ), position_ );
+		if ( ( operation_ == OPERATION::CLOSED ) && ( v->type_id() != t ) ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"Arithmetic method `"_ys
+					.append( methodName_ )
+					.append( "' on " )
+					.append( a_type_name( v_->get_class() ) )
+					.append( " returned result of incompatible type " )
+					.append( a_type_name( v->get_class() ) )
+					.append( "." ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+	} else {
+		HHuginn::HClass const* c( v_->get_class() );
+		int idx( c->field_index( thread_->runtime().identifier_id( methodName_ ) ) );
+		if ( idx >= 0 ) {
+			HHuginn::HClass::HMethod const& m( *static_cast<HHuginn::HClass::HMethod const*>( c->field( idx ).raw() ) );
+			v = m.function()( thread_, &obj, HArguments( thread_ ), position_ );
+			M_ASSERT( ( operation_ == OPERATION::OPEN ) || ( v->type_id() == t ) );
+		} else {
+			throw HHuginn::HHuginnRuntimeException(
+				"There is no `"_ys.append( oper_ ).append( "' operator for " ).append( a_type_name( v_->get_class() ) ).append( "." ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+	}
+	return ( v );
 }
 }
 
@@ -485,7 +532,7 @@ HHuginn::value_t abs( HThread* thread_, HHuginn::value_t const& v_, int position
 			res = thread_->object_factory().create_number( -v );
 		}
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "There is no |.| operator for `"_ys.append( v_->get_class()->name() ).append( "'." ), thread_->current_frame()->file_id(), position_ );
+		res = fallback_unary_arithmetic( thread_, INTERFACE::MODULUS, op_to_str( OPERATOR::MODULUS ), v_, OPERATION::OPEN, position_ );
 	}
 	return ( res );
 }
@@ -505,11 +552,7 @@ HHuginn::value_t neg( HThread* thread_, HHuginn::value_t const& v_, int position
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		res = thread_->object_factory().create_number( -static_cast<HHuginn::HNumber const*>( v_.raw() )->value() );
 	} else {
-		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v_.raw() ) ) {
-			o->call_method( thread_, v_, "negate", HArguments( thread_ ), position_ );
-		} else {
-			throw HHuginn::HHuginnRuntimeException( "There is no `negate` operator for `"_ys.append( v_->get_class()->name() ).append( "'." ), thread_->current_frame()->file_id(), position_ );
-		}
+		res = fallback_unary_arithmetic( thread_, INTERFACE::NEGATE, op_to_str( OPERATOR::NEGATE ), v_, OPERATION::CLOSED, position_ );
 	}
 	return ( res );
 }

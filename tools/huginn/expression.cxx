@@ -325,7 +325,7 @@ void HExpression::commit_oper( OPERATOR operator_ ) {
 		case ( OPERATOR::BOOLEAN_NOT ):
 		case ( OPERATOR::TERNARY ):
 		case ( OPERATOR::MEMBER_ACCESS ):
-		case ( OPERATOR::ABSOLUTE ):
+		case ( OPERATOR::MODULUS ):
 		case ( OPERATOR::PARENTHESIS ): {
 			M_ASSERT( _operations.top()._operator == operator_ );
 			_instructions.push_back( _operations.top() );
@@ -390,9 +390,9 @@ void HExpression::close_parenthesis( OExecutionStep const& executionStep_, HFram
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( ! frame_->values().is_empty() );
 	OPERATOR o( _instructions[frame_->ip()]._operator );
-	M_ASSERT( ( o == OPERATOR::ABSOLUTE ) || ( o == OPERATOR::PARENTHESIS ) );
+	M_ASSERT( ( o == OPERATOR::MODULUS ) || ( o == OPERATOR::PARENTHESIS ) );
 	++ frame_->ip();
-	if ( o == OPERATOR::ABSOLUTE ) {
+	if ( o == OPERATOR::MODULUS ) {
 		HHuginn::value_t v( yaal::move( frame_->values().top() ) );
 		frame_->values().pop();
 		frame_->values().push( value_builtin::abs( frame_->thread(), v, executionStep_._position ) );

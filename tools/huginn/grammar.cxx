@@ -188,10 +188,10 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	using namespace executing_parser;
 	namespace e_p = executing_parser;
 	HRule expression( "expression", e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::mark_expression_position, _compiler.get(), _1 ) ) );
-	HRule absoluteValue( "absoluteValue",
+	HRule modulus( "modulus",
 		constant( '|', e_p::HCharacter::action_character_position_t( hcore::call( &OCompiler::defer_oper, _compiler.get(), _1, _2 ) ) )
 		>> expression
-		>> constant( '|', e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::ABSOLUTE, _1 ) ) ) );
+		>> constant( '|', e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MODULUS, _1 ) ) ) );
 	HRule parenthesis( "parenthesis",
 		constant( '(', e_p::HCharacter::action_character_position_t( hcore::call( &OCompiler::defer_oper, _compiler.get(), _1, _2 ) ) )
 		>> expression
@@ -389,7 +389,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	);
 	HRule dereference( "dereference", *( subscriptOperator | functionCallOperator | memberAccess ) );
 	HRule atom( "atom",
-		absoluteValue
+		modulus
 		| parenthesis >> -( memberAccess >> dereference )
 		| real( e_p::HReal::PARSE::STRICT )[e_p::HReal::action_double_long_position_t( hcore::call( &OCompiler::defer_store_real, _compiler.get(), _1, _2 ) )]
 		| integer[e_p::HInteger::action_int_long_long_position_t( hcore::call( &OCompiler::defer_store_integer, _compiler.get(), _1, _2 ) )]
