@@ -843,7 +843,13 @@ yaal::hcore::HString string_representation( HThread* thread_, HHuginn::value_t c
 		} break;
 		case ( HHuginn::TYPE::FUNCTION_REFERENCE ): {
 			if ( thread_ ) {
-				str = thread_->runtime().identifier_name( static_cast<HHuginn::HFunctionReference const*>( value_.raw() )->identifier_id() );
+				HHuginn::identifier_id_t identifier( static_cast<HHuginn::HFunctionReference const*>( value_.raw() )->identifier_id() );
+				HRuntime& r( thread_->runtime() );
+				HHuginn::class_t c( r.get_class( identifier ) );
+				if ( !! c && c->origin() ) {
+					str.assign( r.package_name( c->origin() ) ).append( "." );
+				}
+				str.append( r.identifier_name( identifier ) );
 			} else {
 				str = type_name( HHuginn::TYPE::FUNCTION_REFERENCE );
 			}
@@ -983,9 +989,6 @@ HHuginn::value_t string( HThread* thread_, HHuginn::value_t const& v_, int posit
 		} break;
 		case ( static_cast<int>( HHuginn::TYPE::BOOLEAN ) ): {
 			res = thread_->object_factory().create_string( static_cast<HHuginn::HBoolean const*>( v_.raw() )->value() ? KEYWORD::TRUE : KEYWORD::FALSE );
-		} break;
-		case ( static_cast<int>( HHuginn::TYPE::FUNCTION_REFERENCE ) ): {
-			res = thread_->object_factory().create_string( thread_->runtime().identifier_name( static_cast<HHuginn::HFunctionReference const*>( v_.raw() )->identifier_id() ) );
 		} break;
 		case ( static_cast<int>( HHuginn::TYPE::NONE ) ): {
 			res = thread_->object_factory().create_string( KEYWORD::NONE );

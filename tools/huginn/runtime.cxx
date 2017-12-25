@@ -318,6 +318,7 @@ HHuginn::class_t HRuntime::create_class(
 	HHuginn::HClass const* base_,
 	field_definitions_t const& fieldDefinitions_,
 	yaal::hcore::HString const& doc_,
+	HHuginn::HClass const* origin_,
 	HHuginn::HClass::create_instance_t createInstance_
 ) {
 	M_PROLOG
@@ -329,6 +330,7 @@ HHuginn::class_t HRuntime::create_class(
 			base_,
 			fieldDefinitions_,
 			doc_,
+			origin_,
 			createInstance_
 		)
 	);
@@ -342,11 +344,12 @@ HHuginn::class_t HRuntime::create_class(
 	HHuginn::HClass const* base_,
 	field_definitions_t const& fieldDefinitions_,
 	yaal::hcore::HString const& doc_,
+	HHuginn::HClass const* origin_,
 	HHuginn::HClass::create_instance_t createInstance_
 ) {
 	M_PROLOG
 	return (
-		create_class( identifier_id( name_ ), base_, fieldDefinitions_, doc_, createInstance_ )
+		create_class( identifier_id( name_ ), base_, fieldDefinitions_, doc_, origin_, createInstance_ )
 	);
 	M_EPILOG
 }
@@ -456,6 +459,11 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 	}
 	HString doc( _huginn->get_comment( 1 ) );
 	HHuginn::class_t c( create_class( name_, nullptr, fds, ! doc.is_empty() ? doc : "The `"_ys.append( name_ ).append( "` is an user defined submodule." ) ) );
+	for ( classes_t::value_type& m : _classes ) {
+		if ( ! m.second->origin() && ( context_._classes.find( m.first ) == context_._classes.end() )) {
+			m.second->set_origin( c.raw() );
+		}
+	}
 	_huginn->register_class( c );
 	return ( c );
 	M_EPILOG
@@ -1032,6 +1040,20 @@ yaal::hcore::HString const& HRuntime::function_name( void const* id_ ) const {
 	for ( functions_store_t::value_type const& f : _functionsStore ) {
 		if ( static_cast<HHuginn::HFunctionReference const*>( f.second.raw() )->function().id() == id_ ) {
 			name = &identifier_name( f.first );
+			break;
+		}
+	}
+	return ( *name );
+	M_EPILOG
+}
+
+yaal::hcore::HString const& HRuntime::package_name( HHuginn::HClass const* class_ ) const {
+	M_PROLOG
+	static yaal::hcore::HString const unknown( "unknown" );
+	yaal::hcore::HString const* name( &unknown );
+	for ( packages_t::value_type const& p : _packages ) {
+		if ( p.second->get_class() == class_ ) {
+			name = &identifier_name( p.first );
 			break;
 		}
 	}

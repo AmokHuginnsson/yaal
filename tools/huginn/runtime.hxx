@@ -189,8 +189,22 @@ public:
 	 */
 	void drop_function( identifier_id_t identifier_ );
 	void register_package( identifier_id_t, identifier_id_t, HHuginn::paths_t const&, HHuginn::compiler_setup_t, int );
-	class_t create_class( identifier_id_t, HHuginn::HClass const*, field_definitions_t const&, yaal::hcore::HString const&, HHuginn::HClass::create_instance_t = nullptr );
-	class_t create_class( yaal::hcore::HString const&, HHuginn::HClass const*, field_definitions_t const&, yaal::hcore::HString const&, HHuginn::HClass::create_instance_t = nullptr );
+	class_t create_class(
+		identifier_id_t,
+		HHuginn::HClass const*,
+		field_definitions_t const&,
+		yaal::hcore::HString const&,
+		HHuginn::HClass const* = nullptr,
+		HHuginn::HClass::create_instance_t = nullptr
+	);
+	class_t create_class(
+		yaal::hcore::HString const&,
+		HHuginn::HClass const*,
+		field_definitions_t const&,
+		yaal::hcore::HString const&,
+		HHuginn::HClass const* = nullptr,
+		HHuginn::HClass::create_instance_t = nullptr
+	);
 	class_t create_class( class_constructor_t const& );
 	void execute( void );
 
@@ -244,6 +258,7 @@ public:
 	yaal::hcore::HString suggestion( HHuginn::HClass const*, HHuginn::identifier_id_t ) const;
 
 	yaal::hcore::HString const& function_name( void const* ) const;
+	yaal::hcore::HString const& package_name( HHuginn::HClass const* ) const;
 	void copy_text( HRuntime& );
 	HHuginn::class_t make_package( yaal::hcore::HString const&, HRuntime const& );
 	void set_incremental_frame( huginn::HThread::frame_t const& );

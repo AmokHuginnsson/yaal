@@ -65,14 +65,14 @@ public:
 		, _complexClass(
 			add_to_package(
 				class_,
-				HComplex::get_class( class_->runtime() ),
+				HComplex::get_class( class_->runtime(), class_ ),
 				"( *real*, *imaginary* ) - create instance of Complex with *real* real part and *imaginary* imaginary part."
 			)
 		)
 		, _matrixClass(
 			add_to_package(
 				class_,
-				HMatrix::get_class( class_->runtime() ),
+				HMatrix::get_class( class_->runtime(), class_ ),
 				"( *type*, *rows*, *cols* ) - create instance of Matrix class of values of type *type* and *rows* rows and *cols* columns."
 			)
 		)

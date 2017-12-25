@@ -468,9 +468,10 @@ private:
 	values_t _fieldDefinitions;
 	field_descriptions_t _fieldDescriptions;
 	yaal::hcore::HString _doc;
+	HClass const* _origin;
 	huginn::HRuntime* _runtime;
 public:
-	HClass( huginn::HRuntime*, type_id_t, identifier_id_t, HClass const*, field_definitions_t const&, yaal::hcore::HString const&, create_instance_t = nullptr );
+	HClass( huginn::HRuntime*, type_id_t, identifier_id_t, HClass const*, field_definitions_t const&, yaal::hcore::HString const&, HClass const* = nullptr, create_instance_t = nullptr );
 	HClass( HHuginn::TYPE, HHuginn::identifier_id_t, yaal::hcore::HString const& );
 	virtual ~HClass( void ) {
 	}
@@ -478,6 +479,9 @@ public:
 	void add_member( HHuginn::HFieldDefinition const& );
 	HClass const* super( void ) const {
 		return ( _super );
+	}
+	HClass const* origin( void ) const {
+		return ( _origin );
 	}
 	identifier_id_t identifier_id( void ) const {
 		return ( _identifierId );
@@ -506,6 +510,7 @@ public:
 		return ( _fieldDefinitions[index_] != super_->_fieldDefinitions[index_] );
 	}
 	void update_runtime( huginn::HRuntime* );
+	void set_origin( HClass const* );
 	huginn::HRuntime* runtime( void ) const {
 		return ( _runtime );
 	}

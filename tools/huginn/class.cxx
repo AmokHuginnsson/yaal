@@ -50,6 +50,7 @@ HHuginn::HClass::HClass(
 	HClass const* super_,
 	field_definitions_t const& fieldDefinitions_,
 	yaal::hcore::HString const& doc_,
+	HClass const* origin_,
 	create_instance_t createInstance_
 ) : _typeId( typeId_ )
 	, _identifierId( identifierId_ )
@@ -60,6 +61,7 @@ HHuginn::HClass::HClass(
 	, _fieldDefinitions()
 	, _fieldDescriptions()
 	, _doc( doc_ )
+	, _origin( origin_ )
 	, _runtime( runtime_ ) {
 	M_PROLOG
 	redefine( super_, fieldDefinitions_ );
@@ -80,6 +82,7 @@ HHuginn::HClass::HClass(
 	, _fieldDefinitions()
 	, _fieldDescriptions()
 	, _doc( doc_ )
+	, _origin( nullptr )
 	, _runtime( nullptr ) {
 	M_PROLOG
 	return;
@@ -119,6 +122,12 @@ void HHuginn::HClass::add_member( HHuginn::HFieldDefinition const& fd_ ) {
 
 void HHuginn::HClass::update_runtime( huginn::HRuntime* runtime_ ) {
 	_runtime = runtime_;
+	return;
+}
+
+void HHuginn::HClass::set_origin( HClass const* origin_ ) {
+	M_ASSERT( ! _origin && origin_ );
+	_origin = origin_;
 	return;
 }
 
