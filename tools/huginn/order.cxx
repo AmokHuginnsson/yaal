@@ -27,7 +27,7 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
-#include "tools/hhuginn.hxx"
+#include "order.hxx"
 #include "runtime.hxx"
 #include "iterator.hxx"
 #include "compiler.hxx"
@@ -45,6 +45,8 @@ namespace yaal {
 namespace tools {
 
 namespace huginn {
+
+namespace order {
 
 class HOrderIterator : public HIteratorInterface {
 	HHuginn::HOrder::values_t* _order;
@@ -69,7 +71,64 @@ private:
 	HOrderIterator& operator = ( HOrderIterator const& ) = delete;
 };
 
-namespace order {
+class HOrderReverseIterator : public HIteratorInterface {
+	HHuginn::HOrder::values_t* _order;
+	HHuginn::HOrder::values_t::reverse_iterator _it;
+public:
+	HOrderReverseIterator( HHuginn::HOrder::values_t* order_ )
+		: _order( order_ ), _it( order_->rbegin() ) {
+		return;
+	}
+protected:
+	virtual HHuginn::value_t do_value( HThread*, int ) override {
+		return ( *_it );
+	}
+	virtual bool do_is_valid( HThread*, int ) override {
+		return ( _it != _order->rend() );
+	}
+	virtual void do_next( HThread*, int ) override {
+		++ _it;
+	}
+private:
+	HOrderReverseIterator( HOrderReverseIterator const& ) = delete;
+	HOrderReverseIterator& operator = ( HOrderReverseIterator const& ) = delete;
+};
+
+class HReversedOrder : public HHuginn::HIterable {
+	HHuginn::value_t _order;
+public:
+	HReversedOrder( HHuginn::HClass const* class_, HHuginn::value_t const& order_ )
+		: HIterable( class_ )
+		, _order( order_ ) {
+		M_ASSERT( _order->type_id() == HHuginn::TYPE::ORDER );
+	}
+	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
+		M_PROLOG
+		HHuginn::class_t c(
+			runtime_->create_class(
+				"ReversedOrderView",
+				nullptr,
+				HHuginn::field_definitions_t{},
+				"The `ReversedOrderView` class represents *lazy* *iterable* reversed view of a `order`."
+			)
+		);
+		return ( c );
+		M_EPILOG
+	}
+protected:
+	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
+		return ( safe_int::cast<int long>( static_cast<HHuginn::HOrder const*>( _order.raw() )->size( thread_, position_ ) ) );
+	}
+private:
+	virtual HIterator do_iterator( HThread*, int ) override {
+		HIterator::iterator_implementation_t impl( new ( memory::yaal ) HOrderReverseIterator( &static_cast<HHuginn::HOrder*>( _order.raw() )->value() ) );
+		return ( HIterator( yaal::move( impl ) ) );
+	}
+private:
+	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
+		return ( thread_->object_factory().create<HReversedOrder>( HIterable::get_class(), _order ) );
+	}
+};
 
 inline HHuginn::value_t insert( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
@@ -155,13 +214,19 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_EPILOG
 }
 
-HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
-HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
-	M_PROLOG
-	HHuginn::class_t c(
-		make_pointer<HHuginn::HClass>(
+class HOrderClass : public HHuginn::HClass {
+public:
+	typedef HOrderClass this_type;
+	typedef HHuginn::HClass base_type;
+private:
+	HHuginn::class_t _reversedOrderClass;
+public:
+	HOrderClass(
+		HRuntime* runtime_,
+		HObjectFactory* objectFactory_
+	) : HHuginn::HClass(
 			runtime_,
-			type_id( HHuginn::TYPE::ORDER ),
+			huginn::type_id( HHuginn::TYPE::ORDER ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::ORDER ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
@@ -176,8 +241,30 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			},
 			"The `order` is a collection of sorted values of uniform types. It supports operations of addition, search and element removal."
 		)
-	);
-	return ( c );
+		, _reversedOrderClass( HReversedOrder::get_class( runtime_ ) ) {
+		return;
+	}
+	HHuginn::HClass const* reversed_order_class( void ) const {
+		return ( _reversedOrderClass.raw() );
+	}
+protected:
+	void do_finalize_registration( huginn::HRuntime* runtime_ ) {
+		runtime_->huginn()->register_class( _reversedOrderClass );
+	}
+};
+
+HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
+HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
+	M_PROLOG
+	return ( make_pointer<HOrderClass>( runtime_, objectFactory_ ) );
+	M_EPILOG
+}
+
+HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const& value_ ) {
+	M_PROLOG
+	M_ASSERT( value_->type_id() == HHuginn::TYPE::ORDER );
+	HOrderClass const* lc( static_cast<HOrderClass const*>( value_->get_class() ) );
+	return ( thread_->object_factory().create<HReversedOrder>( lc->reversed_order_class(), value_ ) );
 	M_EPILOG
 }
 
@@ -251,7 +338,7 @@ HHuginn::HClass const* HHuginn::HOrder::key_type( void ) const {
 }
 
 HHuginn::HIterable::HIterator HHuginn::HOrder::do_iterator( huginn::HThread*, int ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::HOrderIterator( &_data ) );
+	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::order::HOrderIterator( &_data ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }
 

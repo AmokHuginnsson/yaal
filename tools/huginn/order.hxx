@@ -30,7 +30,6 @@ Copyright:
 #define YAAL_TOOLS_HUGINN_ORDER_HXX_INCLUDED 1
 
 #include "tools/hhuginn.hxx"
-#include "tools/huginn/iterator.hxx"
 
 namespace yaal {
 
@@ -38,67 +37,11 @@ namespace tools {
 
 namespace huginn {
 
-class HReversedOrder : public HHuginn::HIterable {
-	HHuginn::value_t _order;
-public:
-	HReversedOrder( HHuginn::HClass const* class_, HHuginn::value_t const& order_ )
-		: HIterable( class_ )
-		, _order( order_ ) {
-		M_ASSERT( _order->type_id() == HHuginn::TYPE::ORDER );
-	}
-	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
-		M_PROLOG
-		HHuginn::class_t c(
-			runtime_->create_class(
-				"ReversedOrderView",
-				nullptr,
-				HHuginn::field_definitions_t{},
-				"The `ReversedOrderView` class represents *lazy* *iterable* reversed view of a `order`."
-			)
-		);
-		runtime_->huginn()->register_class( c );
-		return ( c );
-		M_EPILOG
-	}
-protected:
-	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
-		return ( safe_int::cast<int long>( static_cast<HHuginn::HOrder const*>( _order.raw() )->size( thread_, position_ ) ) );
-	}
-private:
-	virtual HIterator do_iterator( HThread*, int ) override;
-private:
-	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
-		return ( thread_->object_factory().create<HReversedOrder>( HIterable::get_class(), _order ) );
-	}
-};
+namespace order {
 
-class HOrderReverseIterator : public HIteratorInterface {
-	HHuginn::HOrder::values_t* _order;
-	HHuginn::HOrder::values_t::reverse_iterator _it;
-public:
-	HOrderReverseIterator( HHuginn::HOrder::values_t* order_ )
-		: _order( order_ ), _it( order_->rbegin() ) {
-		return;
-	}
-protected:
-	virtual HHuginn::value_t do_value( HThread*, int ) override {
-		return ( *_it );
-	}
-	virtual bool do_is_valid( HThread*, int ) override {
-		return ( _it != _order->rend() );
-	}
-	virtual void do_next( HThread*, int ) override {
-		++ _it;
-	}
-private:
-	HOrderReverseIterator( HOrderReverseIterator const& ) = delete;
-	HOrderReverseIterator& operator = ( HOrderReverseIterator const& ) = delete;
-};
+HHuginn::value_t sort( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+HHuginn::value_t reversed_view( huginn::HThread*, HHuginn::value_t const& );
 
-
-HReversedOrder::HIterator HReversedOrder::do_iterator( HThread*, int ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HOrderReverseIterator( &static_cast<HHuginn::HOrder*>( _order.raw() )->value() ) );
-	return ( HIterator( yaal::move( impl ) ) );
 }
 
 }
