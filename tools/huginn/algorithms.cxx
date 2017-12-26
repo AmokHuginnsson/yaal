@@ -62,7 +62,6 @@ class HAlgorithms : public HHuginn::HValue {
 	HHuginn::class_t _filterClass;
 	HHuginn::class_t _mapperClass;
 	HHuginn::class_t _rangeClass;
-	HHuginn::class_t _reversedSetClass;
 	HHuginn::class_t _reversedStringClass;
 	HHuginn::class_t _exceptionClass;
 public:
@@ -71,7 +70,6 @@ public:
 		, _filterClass( HFilter::get_class( class_->runtime() ) )
 		, _mapperClass( HMapper::get_class( class_->runtime() ) )
 		, _rangeClass( HRange::get_class( class_->runtime() ) )
-		, _reversedSetClass( HReversedSet::get_class( class_->runtime() ) )
 		, _reversedStringClass( HReversedString::get_class( class_->runtime() ) )
 		, _exceptionClass( package_exception( class_ ) ) {
 		return;
@@ -252,7 +250,7 @@ public:
 				v = order::reversed_view( thread_, values_[0] );
 			} break;
 			case ( static_cast<int>( HHuginn::TYPE::SET ) ): {
-				v = thread_->object_factory().create<HReversedSet>( a->_reversedSetClass.raw(), values_[0] );
+				v = set::reversed_view( thread_, values_[0] );
 			} break;
 			case ( static_cast<int>( HHuginn::TYPE::STRING ) ): {
 				v = thread_->object_factory().create<HReversedString>( a->_reversedStringClass.raw(), values_[0] );

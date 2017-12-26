@@ -27,7 +27,7 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
-#include "tools/hhuginn.hxx"
+#include "set.hxx"
 #include "runtime.hxx"
 #include "iterator.hxx"
 #include "compiler.hxx"
@@ -45,6 +45,8 @@ namespace yaal {
 namespace tools {
 
 namespace huginn {
+
+namespace set {
 
 class HSetIterator : public HIteratorInterface {
 	HHuginn::HSet::values_t* _set;
@@ -69,7 +71,64 @@ private:
 	HSetIterator& operator = ( HSetIterator const& ) = delete;
 };
 
-namespace set {
+class HSetReverseIterator : public HIteratorInterface {
+	HHuginn::HSet::values_t* _set;
+	HHuginn::HSet::values_t::reverse_iterator _it;
+public:
+	HSetReverseIterator( HHuginn::HSet::values_t* set_ )
+		: _set( set_ ), _it( set_->rbegin() ) {
+		return;
+	}
+protected:
+	virtual HHuginn::value_t do_value( HThread*, int ) override {
+		return ( *_it );
+	}
+	virtual bool do_is_valid( HThread*, int ) override {
+		return ( _it != _set->rend() );
+	}
+	virtual void do_next( HThread*, int ) override {
+		++ _it;
+	}
+private:
+	HSetReverseIterator( HSetReverseIterator const& ) = delete;
+	HSetReverseIterator& operator = ( HSetReverseIterator const& ) = delete;
+};
+
+class HReversedSet : public HHuginn::HIterable {
+	HHuginn::value_t _set;
+public:
+	HReversedSet( HHuginn::HClass const* class_, HHuginn::value_t const& set_ )
+		: HIterable( class_ )
+		, _set( set_ ) {
+		M_ASSERT( _set->type_id() == HHuginn::TYPE::SET );
+	}
+	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
+		M_PROLOG
+		HHuginn::class_t c(
+			runtime_->create_class(
+				"ReversedSetView",
+				nullptr,
+				HHuginn::field_definitions_t{},
+				"The `ReversedSetView` class represents *lazy* *iterable* reversed view of a `set`."
+			)
+		);
+		return ( c );
+		M_EPILOG
+	}
+protected:
+	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
+		return ( safe_int::cast<int long>( static_cast<HHuginn::HSet const*>( _set.raw() )->size( thread_, position_ ) ) );
+	}
+private:
+	virtual HIterator do_iterator( HThread*, int ) override {
+		HIterator::iterator_implementation_t impl( new ( memory::yaal ) HSetReverseIterator( &static_cast<HHuginn::HSet*>( _set.raw() )->value() ) );
+		return ( HIterator( yaal::move( impl ) ) );
+	}
+private:
+	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
+		return ( thread_->object_factory().create<HReversedSet>( HIterable::get_class(), _set ) );
+	}
+};
 
 inline HHuginn::value_t insert( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
@@ -151,13 +210,19 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_EPILOG
 }
 
-HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
-HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
-	M_PROLOG
-	HHuginn::class_t c(
-		make_pointer<HHuginn::HClass>(
+class HSetClass : public HHuginn::HClass {
+public:
+	typedef HSetClass this_type;
+	typedef HHuginn::HClass base_type;
+private:
+	HHuginn::class_t _reversedSetClass;
+public:
+	HSetClass(
+		HRuntime* runtime_,
+		HObjectFactory* objectFactory_
+	) : HHuginn::HClass(
 			runtime_,
-			type_id( HHuginn::TYPE::SET ),
+			huginn::type_id( HHuginn::TYPE::SET ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::SET ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
@@ -172,8 +237,30 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			},
 			"The `set` is a collection of unique elements of varying types. It supports operation of element insertion, removal and search."
 		)
-	);
-	return ( c );
+		, _reversedSetClass( HReversedSet::get_class( runtime_ ) ) {
+		return;
+	}
+	HHuginn::HClass const* reversed_set_class( void ) const {
+		return ( _reversedSetClass.raw() );
+	}
+protected:
+	void do_finalize_registration( huginn::HRuntime* runtime_ ) {
+		runtime_->huginn()->register_class( _reversedSetClass );
+	}
+};
+
+HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
+HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
+	M_PROLOG
+	return ( make_pointer<HSetClass>( runtime_, objectFactory_ ) );
+	M_EPILOG
+}
+
+HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const& value_ ) {
+	M_PROLOG
+	M_ASSERT( value_->type_id() == HHuginn::TYPE::SET );
+	HSetClass const* sc( static_cast<HSetClass const*>( value_->get_class() ) );
+	return ( thread_->object_factory().create<HReversedSet>( sc->reversed_set_class(), value_ ) );
 	M_EPILOG
 }
 
@@ -220,7 +307,7 @@ void HHuginn::HSet::insert( huginn::HThread* thread_, HHuginn::value_t const& va
 }
 
 HHuginn::HIterable::HIterator HHuginn::HSet::do_iterator( huginn::HThread*, int ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::HSetIterator( &_data ) );
+	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::set::HSetIterator( &_data ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
