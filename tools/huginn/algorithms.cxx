@@ -63,7 +63,6 @@ class HAlgorithms : public HHuginn::HValue {
 	HHuginn::class_t _mapperClass;
 	HHuginn::class_t _rangeClass;
 	HHuginn::class_t _reversedTupleClass;
-	HHuginn::class_t _reversedDequeClass;
 	HHuginn::class_t _reversedOrderClass;
 	HHuginn::class_t _reversedSetClass;
 	HHuginn::class_t _reversedStringClass;
@@ -75,7 +74,6 @@ public:
 		, _mapperClass( HMapper::get_class( class_->runtime() ) )
 		, _rangeClass( HRange::get_class( class_->runtime() ) )
 		, _reversedTupleClass( HReversedTuple::get_class( class_->runtime() ) )
-		, _reversedDequeClass( HReversedDeque::get_class( class_->runtime() ) )
 		, _reversedOrderClass( HReversedOrder::get_class( class_->runtime() ) )
 		, _reversedSetClass( HReversedSet::get_class( class_->runtime() ) )
 		, _reversedStringClass( HReversedString::get_class( class_->runtime() ) )
@@ -246,7 +244,7 @@ public:
 				v = list::reversed_view( thread_, values_[0] );
 			} break;
 			case ( static_cast<int>( HHuginn::TYPE::DEQUE ) ): {
-				v = thread_->object_factory().create<HReversedDeque>( a->_reversedDequeClass.raw(), values_[0] );
+				v = deque::reversed_view( thread_, values_[0] );
 			} break;
 			case ( static_cast<int>( HHuginn::TYPE::DICT ) ): {
 				v = dict::reversed_view( thread_, values_[0] );

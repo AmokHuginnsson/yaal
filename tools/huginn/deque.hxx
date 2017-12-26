@@ -30,7 +30,6 @@ Copyright:
 #define YAAL_TOOLS_HUGINN_DEQUE_HXX_INCLUDED 1
 
 #include "tools/hhuginn.hxx"
-#include "tools/huginn/iterator.hxx"
 
 namespace yaal {
 
@@ -38,67 +37,11 @@ namespace tools {
 
 namespace huginn {
 
-class HReversedDeque : public HHuginn::HIterable {
-	HHuginn::value_t _deque;
-public:
-	HReversedDeque( HHuginn::HClass const* class_, HHuginn::value_t const& deque_ )
-		: HIterable( class_ )
-		, _deque( deque_ ) {
-		M_ASSERT( _deque->type_id() == HHuginn::TYPE::DEQUE );
-	}
-	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
-		M_PROLOG
-		HHuginn::class_t c(
-			runtime_->create_class(
-				"ReversedDequeView",
-				nullptr,
-				HHuginn::field_definitions_t{},
-				"The `ReversedDequeView` class represents *lazy* *iterable* reversed view of a `deque`."
-			)
-		);
-		runtime_->huginn()->register_class( c );
-		return ( c );
-		M_EPILOG
-	}
-protected:
-	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
-		return ( safe_int::cast<int long>( static_cast<HHuginn::HDeque const*>( _deque.raw() )->size( thread_, position_ ) ) );
-	}
-private:
-	virtual HIterator do_iterator( HThread*, int ) override;
-private:
-	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
-		return ( thread_->object_factory().create<HReversedDeque>( HIterable::get_class(), _deque ) );
-	}
-};
+namespace deque {
 
-class HDequeReverseIterator : public HIteratorInterface {
-	HHuginn::HDeque* _deque;
-	int long _index;
-public:
-	HDequeReverseIterator( HThread* thread_, HHuginn::HDeque* deque_, int position_ )
-		: _deque( deque_ )
-		, _index( deque_->size( thread_, position_ ) - 1 ) {
-		return;
-	}
-protected:
-	virtual HHuginn::value_t do_value( HThread*, int ) override {
-		return ( _deque->get( _index ) );
-	}
-	virtual bool do_is_valid( HThread*, int ) override {
-		return ( _index >= 0 );
-	}
-	virtual void do_next( HThread*, int ) override {
-		-- _index;
-	}
-private:
-	HDequeReverseIterator( HDequeReverseIterator const& ) = delete;
-	HDequeReverseIterator& operator = ( HDequeReverseIterator const& ) = delete;
-};
+HHuginn::value_t sort( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+HHuginn::value_t reversed_view( huginn::HThread*, HHuginn::value_t const& );
 
-HReversedDeque::HIterator HReversedDeque::do_iterator( HThread* thread_, int position_ ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HDequeReverseIterator( thread_, static_cast<HHuginn::HDeque*>( _deque.raw() ), position_ ) );
-	return ( HIterator( yaal::move( impl ) ) );
 }
 
 }

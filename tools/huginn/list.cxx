@@ -28,10 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "list.hxx"
-#include "runtime.hxx"
-#include "iterator.hxx"
 #include "helper.hxx"
-#include "objectfactory.hxx"
 #include "value_builtin.hxx"
 
 using namespace yaal;
