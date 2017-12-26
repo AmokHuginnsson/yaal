@@ -62,7 +62,6 @@ class HAlgorithms : public HHuginn::HValue {
 	HHuginn::class_t _filterClass;
 	HHuginn::class_t _mapperClass;
 	HHuginn::class_t _rangeClass;
-	HHuginn::class_t _reversedStringClass;
 	HHuginn::class_t _exceptionClass;
 public:
 	HAlgorithms( HHuginn::HClass* class_ )
@@ -70,7 +69,6 @@ public:
 		, _filterClass( HFilter::get_class( class_->runtime() ) )
 		, _mapperClass( HMapper::get_class( class_->runtime() ) )
 		, _rangeClass( HRange::get_class( class_->runtime() ) )
-		, _reversedStringClass( HReversedString::get_class( class_->runtime() ) )
 		, _exceptionClass( package_exception( class_ ) ) {
 		return;
 	}
@@ -224,12 +222,11 @@ public:
 		}
 		return ( v );
 	}
-	static HHuginn::value_t reversed( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	static HHuginn::value_t reversed( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		char const name[] = "Algorithms.reversed";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
 		HHuginn::type_id_t t( verify_arg_collection( name, values_, 0, ARITY::UNARY, ONTICALLY::MATERIALIZED, thread_, position_ ) );
 		HHuginn::value_t v;
-		HAlgorithms* a( static_cast<HAlgorithms*>( object_->raw() ) );
 		switch ( t.get() ) {
 			case ( static_cast<int>( HHuginn::TYPE::TUPLE ) ): {
 				v = tuple::reversed_view( thread_, values_[0] );
@@ -253,7 +250,7 @@ public:
 				v = set::reversed_view( thread_, values_[0] );
 			} break;
 			case ( static_cast<int>( HHuginn::TYPE::STRING ) ): {
-				v = thread_->object_factory().create<HReversedString>( a->_reversedStringClass.raw(), values_[0] );
+				v = string::reversed_view( thread_, values_[0] );
 			} break;
 			default: {
 				M_ASSERT( !"Invalid code path!"[0] );

@@ -30,7 +30,6 @@ Copyright:
 #define YAAL_TOOLS_HUGINN_STRING_HXX_INCLUDED 1
 
 #include "tools/hhuginn.hxx"
-#include "tools/huginn/iterator.hxx"
 
 namespace yaal {
 
@@ -38,69 +37,11 @@ namespace tools {
 
 namespace huginn {
 
-class HReversedString : public HHuginn::HIterable {
-	HHuginn::value_t _string;
-public:
-	HReversedString( HHuginn::HClass const* class_, HHuginn::value_t const& string_ )
-		: HIterable( class_ )
-		, _string( string_ ) {
-		M_ASSERT( _string->type_id() == HHuginn::TYPE::STRING );
-	}
-	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
-		M_PROLOG
-		HHuginn::class_t c(
-			runtime_->create_class(
-				"ReversedStringView",
-				nullptr,
-				HHuginn::field_definitions_t{},
-				"The `ReversedStringView` class represents *lazy* *iterable* reversed view of a `string`."
-			)
-		);
-		runtime_->huginn()->register_class( c );
-		return ( c );
-		M_EPILOG
-	}
-protected:
-	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
-		return ( safe_int::cast<int long>( static_cast<HHuginn::HString const*>( _string.raw() )->size( thread_, position_ ) ) );
-	}
-private:
-	virtual HIterator do_iterator( HThread*, int ) override;
-private:
-	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
-		return ( thread_->object_factory().create<HReversedString>( HIterable::get_class(), _string ) );
-	}
-};
+namespace string {
 
-class HStringReverseIterator : public HIteratorInterface {
-	HHuginn::HString* _string;
-	HObjectFactory* _objectFactory;
-	int long _index;
-public:
-	HStringReverseIterator( HHuginn::HString* string_ )
-		: _string( string_ )
-		, _objectFactory( string_->get_class()->runtime()->object_factory() )
-		, _index( string_->value().get_length() - 1 ) {
-		return;
-	}
-protected:
-	virtual HHuginn::value_t do_value( HThread*, int ) override {
-		return ( _objectFactory->create_character( _string->value()[ _index ] ) );
-	}
-	virtual bool do_is_valid( HThread*, int ) override {
-		return ( _index >= 0 );
-	}
-	virtual void do_next( HThread*, int ) override {
-		-- _index;
-	}
-private:
-	HStringReverseIterator( HStringReverseIterator const& ) = delete;
-	HStringReverseIterator& operator = ( HStringReverseIterator const& ) = delete;
-};
+HHuginn::value_t sort( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+HHuginn::value_t reversed_view( huginn::HThread*, HHuginn::value_t const& );
 
-HReversedString::HIterator HReversedString::do_iterator( HThread*, int ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HStringReverseIterator( static_cast<HHuginn::HString*>( _string.raw() ) ) );
-	return ( HIterator( yaal::move( impl ) ) );
 }
 
 }

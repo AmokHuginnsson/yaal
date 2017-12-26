@@ -27,7 +27,7 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
-#include "tools/hhuginn.hxx"
+#include "string.hxx"
 #include "runtime.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
@@ -44,6 +44,8 @@ namespace yaal {
 namespace tools {
 
 namespace huginn {
+
+namespace string {
 
 class HStringIterator : public HIteratorInterface {
 	HHuginn::HString* _string;
@@ -71,7 +73,67 @@ private:
 	HStringIterator& operator = ( HStringIterator const& ) = delete;
 };
 
-namespace string {
+class HStringReverseIterator : public HIteratorInterface {
+	HHuginn::HString* _string;
+	HObjectFactory* _objectFactory;
+	int long _index;
+public:
+	HStringReverseIterator( HHuginn::HString* string_ )
+		: _string( string_ )
+		, _objectFactory( string_->get_class()->runtime()->object_factory() )
+		, _index( string_->value().get_length() - 1 ) {
+		return;
+	}
+protected:
+	virtual HHuginn::value_t do_value( HThread*, int ) override {
+		return ( _objectFactory->create_character( _string->value()[ _index ] ) );
+	}
+	virtual bool do_is_valid( HThread*, int ) override {
+		return ( _index >= 0 );
+	}
+	virtual void do_next( HThread*, int ) override {
+		-- _index;
+	}
+private:
+	HStringReverseIterator( HStringReverseIterator const& ) = delete;
+	HStringReverseIterator& operator = ( HStringReverseIterator const& ) = delete;
+};
+
+class HReversedString : public HHuginn::HIterable {
+	HHuginn::value_t _string;
+public:
+	HReversedString( HHuginn::HClass const* class_, HHuginn::value_t const& string_ )
+		: HIterable( class_ )
+		, _string( string_ ) {
+		M_ASSERT( _string->type_id() == HHuginn::TYPE::STRING );
+	}
+	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
+		M_PROLOG
+		HHuginn::class_t c(
+			runtime_->create_class(
+				"ReversedStringView",
+				nullptr,
+				HHuginn::field_definitions_t{},
+				"The `ReversedStringView` class represents *lazy* *iterable* reversed view of a `string`."
+			)
+		);
+		return ( c );
+		M_EPILOG
+	}
+protected:
+	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
+		return ( safe_int::cast<int long>( static_cast<HHuginn::HString const*>( _string.raw() )->size( thread_, position_ ) ) );
+	}
+private:
+	virtual HIterator do_iterator( HThread*, int ) override {
+		HIterator::iterator_implementation_t impl( new ( memory::yaal ) HStringReverseIterator( static_cast<HHuginn::HString*>( _string.raw() ) ) );
+		return ( HIterator( yaal::move( impl ) ) );
+	}
+private:
+	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
+		return ( thread_->object_factory().create<HReversedString>( HIterable::get_class(), _string ) );
+	}
+};
 
 typedef int long ( yaal::hcore::HString::*finder_t )( yaal::hcore::HString const&, int long ) const;
 typedef int long ( yaal::hcore::HString::*finder_raw_t )( HString const&, int long ) const;
@@ -325,13 +387,19 @@ inline HHuginn::value_t clear( huginn::HThread* thread_, HHuginn::value_t* objec
 	M_EPILOG
 }
 
-HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
-HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
-	M_PROLOG
-	HHuginn::class_t c(
-		make_pointer<HHuginn::HClass>(
+class HStringClass : public HHuginn::HClass {
+public:
+	typedef HStringClass this_type;
+	typedef HHuginn::HClass base_type;
+private:
+	HHuginn::class_t _reversedStringClass;
+public:
+	HStringClass(
+		HRuntime* runtime_,
+		HObjectFactory* objectFactory_
+	) : HHuginn::HClass(
 			runtime_,
-			type_id( HHuginn::TYPE::STRING ),
+			huginn::type_id( HHuginn::TYPE::STRING ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::STRING ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
@@ -351,8 +419,30 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			"The `string` is a scalar type that is used to represent and operate on character strings. "
 			"It supports basic operations of addition and comparisons, it also supports subscript and range operators."
 		)
-	);
-	return ( c );
+		, _reversedStringClass( HReversedString::get_class( runtime_ ) ) {
+		return;
+	}
+	HHuginn::HClass const* reversed_string_class( void ) const {
+		return ( _reversedStringClass.raw() );
+	}
+protected:
+	void do_finalize_registration( huginn::HRuntime* runtime_ ) {
+		runtime_->huginn()->register_class( _reversedStringClass );
+	}
+};
+
+HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
+HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
+	M_PROLOG
+	return ( make_pointer<HStringClass>( runtime_, objectFactory_ ) );
+	M_EPILOG
+}
+
+HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const& value_ ) {
+	M_PROLOG
+	M_ASSERT( value_->type_id() == HHuginn::TYPE::STRING );
+	HStringClass const* sc( static_cast<HStringClass const*>( value_->get_class() ) );
+	return ( thread_->object_factory().create<HReversedString>( sc->reversed_string_class(), value_ ) );
 	M_EPILOG
 }
 
@@ -371,7 +461,7 @@ HHuginn::value_t HHuginn::HString::do_clone( huginn::HThread* thread_, HHuginn::
 }
 
 HHuginn::HIterable::HIterator HHuginn::HString::do_iterator( huginn::HThread*, int ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HStringIterator( this ) );
+	HIterator::iterator_implementation_t impl( new ( memory::yaal ) string::HStringIterator( this ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
