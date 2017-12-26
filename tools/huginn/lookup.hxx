@@ -30,7 +30,6 @@ Copyright:
 #define YAAL_TOOLS_HUGINN_LOOKUP_HXX_INCLUDED 1
 
 #include "tools/hhuginn.hxx"
-#include "tools/huginn/iterator.hxx"
 
 namespace yaal {
 

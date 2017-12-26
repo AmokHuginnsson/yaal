@@ -30,9 +30,6 @@ Copyright:
 #define YAAL_TOOLS_HUGINN_LIST_HXX_INCLUDED 1
 
 #include "tools/hhuginn.hxx"
-#include "tools/huginn/runtime.hxx"
-#include "tools/huginn/objectfactory.hxx"
-#include "tools/huginn/iterator.hxx"
 
 namespace yaal {
 

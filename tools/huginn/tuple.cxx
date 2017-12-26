@@ -27,7 +27,7 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
-#include "tools/hhuginn.hxx"
+#include "tuple.hxx"
 #include "runtime.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
@@ -43,6 +43,8 @@ namespace yaal {
 namespace tools {
 
 namespace huginn {
+
+namespace tuple {
 
 class HTupleIterator : public HIteratorInterface {
 	HHuginn::HTuple* _tuple;
@@ -68,7 +70,65 @@ private:
 	HTupleIterator& operator = ( HTupleIterator const& ) = delete;
 };
 
-namespace tuple {
+class HTupleReverseIterator : public HIteratorInterface {
+	HHuginn::HTuple* _tuple;
+	int long _index;
+public:
+	HTupleReverseIterator( HThread* thread_, HHuginn::HTuple* tuple_, int position_ )
+		: _tuple( tuple_ )
+		, _index( tuple_->size( thread_, position_ ) - 1 ) {
+		return;
+	}
+protected:
+	virtual HHuginn::value_t do_value( HThread*, int ) override {
+		return ( _tuple->get( _index ) );
+	}
+	virtual bool do_is_valid( HThread*, int ) override {
+		return ( _index >= 0 );
+	}
+	virtual void do_next( HThread*, int ) override {
+		-- _index;
+	}
+private:
+	HTupleReverseIterator( HTupleReverseIterator const& ) = delete;
+	HTupleReverseIterator& operator = ( HTupleReverseIterator const& ) = delete;
+};
+
+class HReversedTuple : public HHuginn::HIterable {
+	HHuginn::value_t _tuple;
+public:
+	HReversedTuple( HHuginn::HClass const* class_, HHuginn::value_t const& tuple_ )
+		: HIterable( class_ )
+		, _tuple( tuple_ ) {
+		M_ASSERT( _tuple->type_id() == HHuginn::TYPE::TUPLE );
+	}
+	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
+		M_PROLOG
+		HHuginn::class_t c(
+			runtime_->create_class(
+				"ReversedTupleView",
+				nullptr,
+				HHuginn::field_definitions_t{},
+				"The `ReversedTupleView` class represents *lazy* *iterable* reversed view of a `tuple`."
+			)
+		);
+		return ( c );
+		M_EPILOG
+	}
+protected:
+	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
+		return ( safe_int::cast<int long>( static_cast<HHuginn::HTuple const*>( _tuple.raw() )->size( thread_, position_ ) ) );
+	}
+private:
+	virtual HIterator do_iterator( HThread* thread_, int position_ ) override {
+		HIterator::iterator_implementation_t impl( new ( memory::yaal ) HTupleReverseIterator( thread_, static_cast<HHuginn::HTuple*>( _tuple.raw() ), position_ ) );
+		return ( HIterator( yaal::move( impl ) ) );
+	}
+private:
+	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
+		return ( thread_->object_factory().create<HReversedTuple>( HIterable::get_class(), _tuple ) );
+	}
+};
 
 inline HHuginn::value_t add( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
@@ -122,13 +182,19 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_EPILOG
 }
 
-HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
-HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
-	M_PROLOG
-	HHuginn::class_t c(
-		make_pointer<HHuginn::HClass>(
+class HTupleClass : public HHuginn::HClass {
+public:
+	typedef HTupleClass this_type;
+	typedef HHuginn::HClass base_type;
+private:
+	HHuginn::class_t _reversedTupleClass;
+public:
+	HTupleClass(
+		HRuntime* runtime_,
+		HObjectFactory* objectFactory_
+	) : HHuginn::HClass(
 			runtime_,
-			type_id( HHuginn::TYPE::TUPLE ),
+			huginn::type_id( HHuginn::TYPE::TUPLE ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::TUPLE ) ),
 			nullptr,
 			HHuginn::field_definitions_t{
@@ -140,10 +206,33 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			"The `tuple` is a collection type that is used to represent and operate on `tuple` of values. "
 			"It supports basic subscript and range operators."
 		)
-	);
-	return ( c );
+		, _reversedTupleClass( HReversedTuple::get_class( runtime_ ) ) {
+		return;
+	}
+	HHuginn::HClass const* reversed_tuple_class( void ) const {
+		return ( _reversedTupleClass.raw() );
+	}
+protected:
+	void do_finalize_registration( huginn::HRuntime* runtime_ ) {
+		runtime_->huginn()->register_class( _reversedTupleClass );
+	}
+};
+
+HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
+HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
+	M_PROLOG
+	return ( make_pointer<HTupleClass>( runtime_, objectFactory_ ) );
 	M_EPILOG
 }
+
+HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const& value_ ) {
+	M_PROLOG
+	M_ASSERT( value_->type_id() == HHuginn::TYPE::TUPLE );
+	HTupleClass const* lc( static_cast<HTupleClass const*>( value_->get_class() ) );
+	return ( thread_->object_factory().create<HReversedTuple>( lc->reversed_tuple_class(), value_ ) );
+	M_EPILOG
+}
+
 
 }
 
@@ -167,7 +256,7 @@ HHuginn::value_t HHuginn::HTuple::get( int long long index_ ) {
 }
 
 HHuginn::HIterable::HIterator HHuginn::HTuple::do_iterator( huginn::HThread*, int ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::HTupleIterator( this ) );
+	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::tuple::HTupleIterator( this ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }
 

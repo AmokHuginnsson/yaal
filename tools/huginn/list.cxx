@@ -29,7 +29,10 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "list.hxx"
 #include "helper.hxx"
+#include "iterator.hxx"
 #include "value_builtin.hxx"
+#include "runtime.hxx"
+#include "objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;

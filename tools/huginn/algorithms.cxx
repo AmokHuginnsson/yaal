@@ -62,7 +62,6 @@ class HAlgorithms : public HHuginn::HValue {
 	HHuginn::class_t _filterClass;
 	HHuginn::class_t _mapperClass;
 	HHuginn::class_t _rangeClass;
-	HHuginn::class_t _reversedTupleClass;
 	HHuginn::class_t _reversedOrderClass;
 	HHuginn::class_t _reversedSetClass;
 	HHuginn::class_t _reversedStringClass;
@@ -73,7 +72,6 @@ public:
 		, _filterClass( HFilter::get_class( class_->runtime() ) )
 		, _mapperClass( HMapper::get_class( class_->runtime() ) )
 		, _rangeClass( HRange::get_class( class_->runtime() ) )
-		, _reversedTupleClass( HReversedTuple::get_class( class_->runtime() ) )
 		, _reversedOrderClass( HReversedOrder::get_class( class_->runtime() ) )
 		, _reversedSetClass( HReversedSet::get_class( class_->runtime() ) )
 		, _reversedStringClass( HReversedString::get_class( class_->runtime() ) )
@@ -238,7 +236,7 @@ public:
 		HAlgorithms* a( static_cast<HAlgorithms*>( object_->raw() ) );
 		switch ( t.get() ) {
 			case ( static_cast<int>( HHuginn::TYPE::TUPLE ) ): {
-				v = thread_->object_factory().create<HReversedTuple>( a->_reversedTupleClass.raw(), values_[0] );
+				v = tuple::reversed_view( thread_, values_[0] );
 			} break;
 			case ( static_cast<int>( HHuginn::TYPE::LIST ) ): {
 				v = list::reversed_view( thread_, values_[0] );

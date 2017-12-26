@@ -30,7 +30,6 @@ Copyright:
 #define YAAL_TOOLS_HUGINN_TUPLE_HXX_INCLUDED 1
 
 #include "tools/hhuginn.hxx"
-#include "tools/huginn/iterator.hxx"
 
 namespace yaal {
 
@@ -38,67 +37,11 @@ namespace tools {
 
 namespace huginn {
 
-class HReversedTuple : public HHuginn::HIterable {
-	HHuginn::value_t _tuple;
-public:
-	HReversedTuple( HHuginn::HClass const* class_, HHuginn::value_t const& tuple_ )
-		: HIterable( class_ )
-		, _tuple( tuple_ ) {
-		M_ASSERT( _tuple->type_id() == HHuginn::TYPE::TUPLE );
-	}
-	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
-		M_PROLOG
-		HHuginn::class_t c(
-			runtime_->create_class(
-				"ReversedTupleView",
-				nullptr,
-				HHuginn::field_definitions_t{},
-				"The `ReversedTupleView` class represents *lazy* *iterable* reversed view of a `tuple`."
-			)
-		);
-		runtime_->huginn()->register_class( c );
-		return ( c );
-		M_EPILOG
-	}
-protected:
-	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
-		return ( safe_int::cast<int long>( static_cast<HHuginn::HTuple const*>( _tuple.raw() )->size( thread_, position_ ) ) );
-	}
-private:
-	virtual HIterator do_iterator( HThread*, int ) override;
-private:
-	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
-		return ( thread_->object_factory().create<HReversedTuple>( HIterable::get_class(), _tuple ) );
-	}
-};
+namespace tuple {
 
-class HTupleReverseIterator : public HIteratorInterface {
-	HHuginn::HTuple* _tuple;
-	int long _index;
-public:
-	HTupleReverseIterator( HThread* thread_, HHuginn::HTuple* tuple_, int position_ )
-		: _tuple( tuple_ )
-		, _index( tuple_->size( thread_, position_ ) - 1 ) {
-		return;
-	}
-protected:
-	virtual HHuginn::value_t do_value( HThread*, int ) override {
-		return ( _tuple->get( _index ) );
-	}
-	virtual bool do_is_valid( HThread*, int ) override {
-		return ( _index >= 0 );
-	}
-	virtual void do_next( HThread*, int ) override {
-		-- _index;
-	}
-private:
-	HTupleReverseIterator( HTupleReverseIterator const& ) = delete;
-	HTupleReverseIterator& operator = ( HTupleReverseIterator const& ) = delete;
-};
+HHuginn::value_t sort( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+HHuginn::value_t reversed_view( huginn::HThread*, HHuginn::value_t const& );
 
-HReversedTuple::HIterator HReversedTuple::do_iterator( HThread* thread_, int position_ ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HTupleReverseIterator( thread_, static_cast<HHuginn::HTuple*>( _tuple.raw() ), position_ ) );
-	return ( HIterator( yaal::move( impl ) ) );
 }
 
 }
