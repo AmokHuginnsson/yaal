@@ -91,14 +91,14 @@ bool is_restricted( yaal::hcore::HString const& name_ ) {
 	M_EPILOG
 }
 
-void operands_type_mismatch( char const* op_, HHuginn::type_id_t t1_, HHuginn::type_id_t t2_, int fileId_, int pos_ ) {
+void operands_type_mismatch( char const* op_, HHuginn::HClass const* c1_, HHuginn::HClass const* c2_, int fileId_, int pos_ ) {
 	hcore::HString msg( "Operand types for `" );
 	msg.append( op_ )
-		.append( "' do not match: `" )
-		.append( type_name( t1_ ) )
-		.append( "' vs `" )
-		.append( type_name( t2_ ) )
-		.append( "'." ),
+		.append( "' do not match: " )
+		.append( a_type_name( c1_ ) )
+		.append( " vs " )
+		.append( a_type_name( c2_ ) )
+		.append( "." ),
 	throw HHuginn::HHuginnRuntimeException( msg, fileId_, pos_ );
 }
 

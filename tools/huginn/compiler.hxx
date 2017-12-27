@@ -51,7 +51,7 @@ class HExpression;
  */
 struct OCompiler {
 	typedef yaal::hcore::HStack<HFunction::expressions_t> expressions_stack_t;
-	typedef yaal::hcore::HHashMap<HHuginn::identifier_id_t, HHuginn::type_id_t> variable_types_t;
+	typedef yaal::hcore::HHashMap<HHuginn::identifier_id_t, HHuginn::HClass const*> variable_types_t;
 	/*! \brief Saves _compiled_ `if'/`case' expression-scope pairs.
 	 *
 	 * Once created by compiler OActiveScope instance is never modified
@@ -140,8 +140,8 @@ struct OCompiler {
 
 		OScopeContext( OFunctionContext*, HStatement::statement_id_t, int, int );
 		HHuginn::expression_t& expression( void );
-		HHuginn::type_id_t guess_type( HHuginn::identifier_id_t ) const;
-		void note_type( HHuginn::identifier_id_t, HHuginn::type_id_t );
+		HHuginn::HClass const* guess_type( OCompiler const*, HHuginn::identifier_id_t ) const;
+		void note_type( HHuginn::identifier_id_t, HHuginn::HClass const* );
 	private:
 		OScopeContext( OScopeContext const& ) = delete;
 		OScopeContext& operator = ( OScopeContext const& ) = delete;
@@ -152,18 +152,20 @@ struct OCompiler {
 		typedef yaal::hcore::HPointer<OScopeContext> scope_context_t;
 		typedef yaal::hcore::HStack<scope_context_t> scope_stack_t;
 		struct OValueDesc {
-			HHuginn::type_id_t _type;
+			HHuginn::HClass const* _class;
 			HHuginn::identifier_id_t _identifier;
-			OValueDesc( HHuginn::type_id_t type_ )
-				: _type( type_ )
+			OValueDesc( HHuginn::HClass const* class_ )
+				: _class( class_ )
 				, _identifier( INVALID_IDENTIFIER ) {
 				return;
 			}
-			OValueDesc( HHuginn::type_id_t type_, HHuginn::identifier_id_t identifierId_ )
-				: _type( type_ )
+			OValueDesc( HHuginn::HClass const* class_, HHuginn::identifier_id_t identifierId_ )
+				: _class( class_ )
 				, _identifier( identifierId_ ) {
 				return;
 			}
+			OValueDesc( OValueDesc const& ) = default;
+			OValueDesc& operator = ( OValueDesc const& ) = default;
 		};
 		typedef yaal::hcore::HStack<OValueDesc> type_stack_t;
 		struct OVariableRef {
@@ -436,6 +438,7 @@ struct OCompiler {
 	OCompiler( HRuntime* );
 	void reset( int );
 	OFunctionContext& f( void );
+	OFunctionContext const& f( void ) const;
 	void set_setup( HHuginn::compiler_setup_t, HIntrospectorInterface* );
 	void detect_misuse( void ) const;
 	void resolve_symbols( void );
@@ -469,24 +472,25 @@ struct OCompiler {
 	 */
 	void verify_default_argument( executing_parser::position_t );
 	void track_name_cycle( HHuginn::identifier_id_t );
-	static bool is_numeric( HHuginn::type_id_t );
-	static bool is_collection( HHuginn::type_id_t );
-	static bool is_numeric_congruent( HHuginn::type_id_t );
-	static bool is_summable( HHuginn::type_id_t );
-	static bool is_comparable( HHuginn::type_id_t );
-	static bool is_comparable_congruent( HHuginn::type_id_t );
-	static bool is_boolean_congruent( HHuginn::type_id_t );
-	static bool is_unknown( HHuginn::type_id_t );
-	static bool is_reference_congruent( HHuginn::type_id_t );
-	static bool is_integer_congruent( HHuginn::type_id_t );
-	static bool are_congruous( HHuginn::type_id_t, HHuginn::type_id_t );
-	static HHuginn::type_id_t congruent( HHuginn::type_id_t, HHuginn::type_id_t );
+	static bool is_numeric( HHuginn::HClass const* );
+	static bool is_collection( HHuginn::HClass const* );
+	static bool is_numeric_congruent( HHuginn::HClass const* );
+	static bool is_summable( HHuginn::HClass const* );
+	static bool is_comparable( HHuginn::HClass const* );
+	static bool is_comparable_congruent( HHuginn::HClass const* );
+	static bool is_boolean_congruent( HHuginn::HClass const* );
+	static bool is_unknown( HHuginn::HClass const* );
+	static bool is_reference_congruent( HHuginn::HClass const* );
+	static bool is_integer_congruent( HHuginn::HClass const* );
+	static bool are_congruous( HHuginn::HClass const*, HHuginn::HClass const* );
+	HHuginn::HClass const* congruent( HHuginn::HClass const*, HHuginn::HClass const* ) const;
 	HHuginn::scope_t& current_scope( void );
 	HHuginn::expression_t& current_expression( void );
 	OScopeContext& current_scope_context( void );
-	HHuginn::type_id_t guess_type( HHuginn::identifier_id_t );
+	HHuginn::HClass const* guess_type( HHuginn::identifier_id_t ) const;
 	HHuginn::HClass const* type_id_to_class( HHuginn::type_id_t ) const;
-	void note_type( HHuginn::identifier_id_t, HHuginn::type_id_t );
+	HHuginn::HClass const* type_to_class( HHuginn::TYPE ) const;
+	void note_type( HHuginn::identifier_id_t, HHuginn::HClass const* );
 	void reset_expression( void );
 	void pop_function_context( void );
 	HHuginn::scope_t pop_scope_context( void );
@@ -551,6 +555,7 @@ struct OCompiler {
 	void defer_call( yaal::hcore::HString const&, executing_parser::position_t );
 	HHuginn::expression_t new_expression( int, int = 0 );
 private:
+	HHuginn::HClass const* function_ref_to_class( HHuginn::identifier_id_t );
 	OCompiler( OCompiler const& ) = delete;
 	OCompiler& operator = ( OCompiler const& ) = delete;
 };
