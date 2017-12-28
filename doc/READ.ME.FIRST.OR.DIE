@@ -5,17 +5,17 @@
 ** Hardware:
   - amd64 aka x64.
   - x86 aka i386 (soon to be deprecated).
-	- armhf (32 bit arm architecture).
+  - armhf (32 bit arm architecture).
 
 ** Software:
   - Debian (latest development branch, currently `unstable' aka `Sid', and always latest stable release)
   - Ubuntu (latest development branch and latest stable release, currently 16.04 and 18.04 respectively)
   - CentOS (latest stable release, currently 7)
-  - Fedora (latest stable release, currently 26)
+  - Fedora (latest stable release, currently 27)
   - FreeBSD (latest stable release, currently 11.1-RELEASE)
   - Oracle Solaris (latest stable release, currently 11.3)
   - Darwin (latest stable release, 14.5.0)
-  - Windows 7 SP1 with Cygwin (latest available cygwin release, currently 2.5.2)
+  - Windows 7 SP1 with Cygwin (latest available cygwin release, currently 2.9.0)
   - Windows 7 SP1 with Visual Studio (latest available Visual Studio release, currently 2015)
   - Raspbian (latest stable release, currently 9.x (aka Stretch))
 

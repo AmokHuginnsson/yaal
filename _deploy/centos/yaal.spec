@@ -4,7 +4,7 @@ Release: %{?BUILD_ID}%{!?BUILD_ID:1}%{?dist}
 Summary: Yet Another Abstraction Layer - general purpose C++ library.
 
 Group:   System Environment/Libraries
-License: Commercialh
+License: Commercial (CC BY-ND-NC 4.0, AFPL)
 URL:     http://codestation.org/
 Source:  https://codestation.org/repo/yaal.git
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
@@ -47,7 +47,7 @@ make purge
 %build
 umask 0077
 %{clearflags}
-make %{?_smp_mflags} debug release doc PREFIX=%{_prefix} SYSCONFDIR=%{_sysconfdir} LIBDIR=%{_libdir} DOCDIR=%{_docdir} MANDIR=%{_mandir} LOCALSTATEDIR=%{_localstatedir} CONFIGURE="--enable-auto-sanity"
+make %{?_smp_mflags} debug release doc PREFIX=%{_prefix} SYSCONFDIR=%{_sysconfdir} LIBDIR=%{_libdir} DOCDIR=%{_pkgdocdir} MANDIR=%{_mandir} LOCALSTATEDIR=%{_localstatedir} CONFIGURE="--enable-auto-sanity"
 
 %install
 rm -rf ${RPM_BUILD_ROOT}
@@ -70,6 +70,8 @@ make purge
 %{_libdir}/lib*[a-z]?.so*
 %{_sysconfdir}/*
 %{_localstatedir}/*
+%exclude %{_pkgdocdir}/html
+%doc doc/INSTALL doc/PROGRAMMER.READ.ME doc/READ.ME.FIRST.OR.DIE LICENSE.md
 
 %files -n yaal-devel
 %defattr(-,root,root,-)
@@ -78,11 +80,12 @@ make purge
 %{_includedir}/*
 %{_datadir}/pkgconfig/*
 %{_datadir}/yaal
+%exclude %{_pkgdocdir}/html
+%doc doc/INSTALL doc/PROGRAMMER.READ.ME doc/READ.ME.FIRST.OR.DIE LICENSE.md
 
 %files -n yaal-doc
 %defattr(-,root,root,-)
-%{_datadir}/doc/*
-%doc
+%doc build/doc/html doc/INSTALL doc/PROGRAMMER.READ.ME doc/READ.ME.FIRST.OR.DIE LICENSE.md
 
 %changelog
 

@@ -21,10 +21,13 @@
 		<td>CentOS 7 (Final)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>Fedora 26</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>Fedora 27</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
 		<td>FreeBSD 11.1 (compiled with clang)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+	</tr>
+	<tr>
+		<td>Raspbian</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
 		<td>Oracle Solaris 11.3</td><td class="good">100%</td><td class="good">100%</td><td class="fine">Fail<a class="note" href="#solaris">3)</a></td>

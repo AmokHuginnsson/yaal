@@ -7,32 +7,32 @@ pushdef([AC_VERSION],esyscmd(awk '/^VERSION[[[:space:]]]+=[[[:space:]]]+/{printf
 pushdef([AC_SUBVERSION],esyscmd(awk '/^SUBVERSION[[[:space:]]]+=[[[:space:]]]+/{printf $3}' Makefile.mk.in))
 pushdef([AC_EXTRAVERSION],esyscmd(awk '/^EXTRAVERSION[[[:space:]]]+=[[[:space:]]]+/{printf $3}' Makefile.mk.in))
 pushdef([YAAL_PACKAGE_VERSION],[AC_VERSION.AC_SUBVERSION.AC_EXTRAVERSION-esyscmd(date +%Y%m%d|tr -d '\n')])
-AC_INIT([[yaal]],[YAAL_PACKAGE_VERSION],[[amok@codestation.org]],[],[https://codestation.org/repo/yaal.git])
+AC_INIT([yaal],[YAAL_PACKAGE_VERSION],[[amok@codestation.org]],[],[https://codestation.org/repo/yaal.git])
 m4_include([_aux/aclib.m4])
 PRIVILEGES_SANITY
 
 AC_MSG_RESULT([--- Welcome to yaal configurator ---                     [[0%]]])
 
-AC_ARG_WITH([console-mouse],[AC_HELP_STRING([--with-console-mouse],[Compile with console mouse support, default is `yes' if appropriate library can be found.])],[CONSOLE_MOUSE=$withval],[CONSOLE_MOUSE="auto"])
+AC_ARG_WITH([console-mouse],[AS_HELP_STRING([--with-console-mouse],[Compile with console mouse support, default is `yes' if appropriate library can be found.])],[CONSOLE_MOUSE=$withval],[CONSOLE_MOUSE="auto"])
 dnl ` <- this one fixes syntax highlighting in vim.
-AC_ARG_WITH([sqlite3],[AC_HELP_STRING([--with-sqlite3],[Compile with SQLite3 driver, default is `yes' if SQLite3 can be found.])],[SQLITE3=$withval],[SQLITE3="auto"])
+AC_ARG_WITH([sqlite3],[AS_HELP_STRING([--with-sqlite3],[Compile with SQLite3 driver, default is `yes' if SQLite3 can be found.])],[SQLITE3=$withval],[SQLITE3="auto"])
 dnl `
-AC_ARG_WITH([postgres],[AC_HELP_STRING([--with-postgres],[Compile with PostgreSQL driver, default is `yes' if PostgreSQL can be found.])],[POSTGRES=$withval],[POSTGRES="auto"])
+AC_ARG_WITH([postgres],[AS_HELP_STRING([--with-postgres],[Compile with PostgreSQL driver, default is `yes' if PostgreSQL can be found.])],[POSTGRES=$withval],[POSTGRES="auto"])
 dnl `
-AC_ARG_WITH([mysql],[AC_HELP_STRING([--with-mysql],[Compile with MySQL driver, default is `yes' if MySQL can be found.])],[MYSQL=$withval],[MYSQL="auto"])
+AC_ARG_WITH([mysql],[AS_HELP_STRING([--with-mysql],[Compile with MySQL driver, default is `yes' if MySQL can be found.])],[MYSQL=$withval],[MYSQL="auto"])
 dnl `
-AC_ARG_WITH([firebird],[AC_HELP_STRING([--with-firebird],[Compile with Firebird driver, default is `yes' if Firebird can be found.])],[FIREBIRD=$withval],[FIREBIRD="auto"])
+AC_ARG_WITH([firebird],[AS_HELP_STRING([--with-firebird],[Compile with Firebird driver, default is `yes' if Firebird can be found.])],[FIREBIRD=$withval],[FIREBIRD="auto"])
 dnl `
-AC_ARG_WITH([oracle],[AC_HELP_STRING([--with-oracle],[Compile with Oracle driver, default is `yes' if Oracle can be found.])],[ORACLE=$withval],[ORACLE="auto"])
+AC_ARG_WITH([oracle],[AS_HELP_STRING([--with-oracle],[Compile with Oracle driver, default is `yes' if Oracle can be found.])],[ORACLE=$withval],[ORACLE="auto"])
 dnl `
 DO_TARGET="RELEASE"
-AC_ARG_ENABLE([debug],[AC_HELP_STRING([--enable-debug],[Compile with debugging symbols.])],[DO_TARGET="DEBUG" LIB_INFIX="-d"])
-AC_ARG_ENABLE([release],[AC_HELP_STRING([--enable-release],[Compile with full optimizations on (this is the default).])],[DO_TARGET="RELEASE" LIB_INFIX=""])
-AC_ARG_ENABLE([reldeb],[AC_HELP_STRING([--enable-reldeb],[Compile with full optimizations but include debugging information.])],[DO_TARGET="RELDEB" LIB_INFIX="-rd"])
-AC_ARG_ENABLE([relassert],[AC_HELP_STRING([--enable-relassert],[Compile with full optimizations but keep assertion checks.])],[DO_TARGET="RELASSERT" LIB_INFIX="-ra"])
-AC_ARG_ENABLE([profiling],[AC_HELP_STRING([--enable-profiling],[Provide support for profiling tools.])],[DO_TARGET="PROFILING" LIB_INFIX="-p"])
-AC_ARG_ENABLE([coverage],[AC_HELP_STRING([--enable-coverage],[Get ready to gather coverage data.])],[DO_TARGET="COVERAGE" LIB_INFIX="-c"])
-AC_ARG_ENABLE([auto-sanity],[AC_HELP_STRING([--enable-auto-sanity],[Try to automatically sanitize user environment.])],[AC_DEFINE_UNQUOTED(YAAL_AUTO_SANITY,1,[Enable automatic environment sanitization.])])
+AC_ARG_ENABLE([debug],[AS_HELP_STRING([--enable-debug],[Compile with debugging symbols.])],[DO_TARGET="DEBUG" LIB_INFIX="-d"])
+AC_ARG_ENABLE([release],[AS_HELP_STRING([--enable-release],[Compile with full optimizations on (this is the default).])],[DO_TARGET="RELEASE" LIB_INFIX=""])
+AC_ARG_ENABLE([reldeb],[AS_HELP_STRING([--enable-reldeb],[Compile with full optimizations but include debugging information.])],[DO_TARGET="RELDEB" LIB_INFIX="-rd"])
+AC_ARG_ENABLE([relassert],[AS_HELP_STRING([--enable-relassert],[Compile with full optimizations but keep assertion checks.])],[DO_TARGET="RELASSERT" LIB_INFIX="-ra"])
+AC_ARG_ENABLE([profiling],[AS_HELP_STRING([--enable-profiling],[Provide support for profiling tools.])],[DO_TARGET="PROFILING" LIB_INFIX="-p"])
+AC_ARG_ENABLE([coverage],[AS_HELP_STRING([--enable-coverage],[Get ready to gather coverage data.])],[DO_TARGET="COVERAGE" LIB_INFIX="-c"])
+AC_ARG_ENABLE([auto-sanity],[AS_HELP_STRING([--enable-auto-sanity],[Try to automatically sanitize user environment.])],[AC_DEFINE_UNQUOTED(YAAL_AUTO_SANITY,1,[Enable automatic environment sanitization.])])
 
 AC_MSG_RESULT([--- Initialization ... ---                               [[6%]]])
 
@@ -42,7 +42,7 @@ AC_CONFIG_SRCDIR([[yaalrc.in]])
 AC_CONFIG_AUX_DIR([_aux])
 
 dnl yaal is not Free Software.
-AC_COPYRIGHT([[yaal (c) 2015 All rights reserved.]])
+AC_COPYRIGHT([[yaal (c) 2018 All rights reserved.]])
 
 dnl yaal is still in alpha stage.
 AC_REVISION(${THIS_ID})
@@ -527,5 +527,5 @@ AC_CONFIG_HEADERS(config.hxx)
 AC_CONFIG_FILES([Makefile.mk yaalrc yaal.pc])
 AC_OUTPUT
 AC_MSG_RESULT([--- All ok, good luck! ---                     	       [[100%]]])
-AC_MSG_RESULT([[Now you can type \`make'.]])
+AC_MSG_RESULT([[Now you can type `make'.]])
 

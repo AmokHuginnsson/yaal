@@ -20,7 +20,7 @@ dnl Unique file in project: projectnamerc is sample configuration file.
 AC_CONFIG_SRCDIR([[$1rc]])
 
 dnl yaal client is not Free Software.
-AC_COPYRIGHT([[$1 (c) 2015 All rights reserved.]])
+AC_COPYRIGHT([[$1 (c) 2018 All rights reserved.]])
 
 AC_REVISION([$2])
 

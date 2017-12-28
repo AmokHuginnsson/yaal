@@ -250,7 +250,7 @@ AC_DEFUN_ONCE([YAAL_DETECT_COMMON_FLAGS], [
 		YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-funsafe-math-optimizations], [C++])
 	fi
 	YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-m64], [C++])
-	AC_ARG_ENABLE([native],[AC_HELP_STRING([--enable-native],[Use all available CPU features.])],[YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-march=native], [C++])])
+	AC_ARG_ENABLE([native],[AS_HELP_STRING([--enable-native],[Use all available CPU features.])],[YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-march=native], [C++])])
 	YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-fPIC], [C++])
 	YAAL_DETECT_FLAGS(EXTRA_COMPILER_OPTIMIZATION_FLAGS, [-fexpensive-optimizations], [C++])
 	YAAL_DETECT_FLAGS(RDYNAMIC, [-rdynamic], [C++])
