@@ -1,0 +1,17 @@
+language:  C++
+sudo: false
+script:
+  - umask 0077
+  - export EXTRA_CXXFLAGS="-DPCRE_STUDY_EXTRA_NEEDED=0x0008"
+  - exec make purge debug
+addons:
+  apt:
+    packages:
+      - libpcre3-dev
+      - libssl-dev
+      - libsqlite3-dev
+      - sqlite3
+      - libxml2-dev
+      - libxslt1-dev
+      - zlib1g-dev
+      - libncursesw5-dev
