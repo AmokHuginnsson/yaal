@@ -161,7 +161,7 @@ HHuginn::value_t HFileStat::group( huginn::HThread* thread_, HHuginn::value_t* o
 
 HHuginn::value_t HFileStat::get_times( char const* name_, time_getter_t timeGetter_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "FileStat."_ys.append( name_ ), values_, 0, 0, thread_, position_ );
+	verify_arg_count( name_, values_, 0, 0, thread_, position_ );
 	HFileStat* o( static_cast<HFileStat*>( object_->raw() ) );
 	HFSItem fi( o->_path );
 	HHuginn::value_t v( thread_->runtime().none_value() );
@@ -188,10 +188,10 @@ HHuginn::class_t HFileStat::get_class( HRuntime* runtime_ ) {
 				{ "type",     runtime_->object_factory()->create_method( hcore::call( &HFileStat::type, _1, _2, _3, _4 ) ),  "get the type of the file" },
 				{ "user",     runtime_->object_factory()->create_method( hcore::call( &HFileStat::user, _1, _2, _3, _4 ) ),  "get an user name of the file owner" },
 				{ "group",    runtime_->object_factory()->create_method( hcore::call( &HFileStat::group, _1, _2, _3, _4 ) ), "get a group name of the file owner" },
-				{ "created",  runtime_->object_factory()->create_method( hcore::call( &HFileStat::get_times, "created",  &HFSItem::created, _1, _2, _3, _4 ) ),  "get file's metadata modification `time`" },
-				{ "changed",  runtime_->object_factory()->create_method( hcore::call( &HFileStat::get_times, "changed",  &HFSItem::created, _1, _2, _3, _4 ) ),  "get file's metadata modification `time`" },
-				{ "modified", runtime_->object_factory()->create_method( hcore::call( &HFileStat::get_times, "modified", &HFSItem::modified, _1, _2, _3, _4 ) ), "get file's data modification `time`" },
-				{ "accessed", runtime_->object_factory()->create_method( hcore::call( &HFileStat::get_times, "accessed", &HFSItem::accessed, _1, _2, _3, _4 ) ), "get file's last access `time`" }
+				{ "created",  runtime_->object_factory()->create_method( hcore::call( &HFileStat::get_times, "FileStat.created",  &HFSItem::created, _1, _2, _3, _4 ) ),  "get file's metadata modification `time`" },
+				{ "changed",  runtime_->object_factory()->create_method( hcore::call( &HFileStat::get_times, "FileStat.changed",  &HFSItem::created, _1, _2, _3, _4 ) ),  "get file's metadata modification `time`" },
+				{ "modified", runtime_->object_factory()->create_method( hcore::call( &HFileStat::get_times, "FileStat.modified", &HFSItem::modified, _1, _2, _3, _4 ) ), "get file's data modification `time`" },
+				{ "accessed", runtime_->object_factory()->create_method( hcore::call( &HFileStat::get_times, "FileStat.accessed", &HFSItem::accessed, _1, _2, _3, _4 ) ), "get file's last access `time`" }
 			},
 			"The `FileStat` class allows obtaining metadata information about various file system objects."
 		)

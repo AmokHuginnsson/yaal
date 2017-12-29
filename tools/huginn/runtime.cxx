@@ -406,9 +406,9 @@ void HRuntime::execute( void ) {
 namespace {
 namespace package {
 
-HHuginn::value_t value( HHuginn::value_t value_, HString name_, HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+HHuginn::value_t value( HHuginn::value_t value_, HUTF8String name_, HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( name_, values_, 0, 0, thread_, position_ );
+	verify_arg_count( name_.c_str(), values_, 0, 0, thread_, position_ );
 	return ( value_ );
 	M_EPILOG
 }

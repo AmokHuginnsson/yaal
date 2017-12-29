@@ -83,14 +83,12 @@ public:
 	}
 	static HHuginn::value_t get_constant( char const* name_, constant_getter_t constantGetter_, double long real_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
-		HString name( "Mathematics." );
-		name.append( name_ );
-		verify_arg_count( name, values_, 1, 2, thread_, position_ );
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::FUNCTION_REFERENCE, ARITY::MULTIPLE, thread_, position_ );
+		verify_arg_count( name_, values_, 1, 2, thread_, position_ );
+		verify_arg_type( name_, values_, 0, HHuginn::TYPE::FUNCTION_REFERENCE, ARITY::MULTIPLE, thread_, position_ );
 		HHuginn::HFunctionReference const& fr( *static_cast<HHuginn::HFunctionReference const*>( values_[0].raw() ) );
 		int precision( 0 );
 		if ( values_.get_size() > 1 ) {
-			verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
+			verify_arg_type( name_, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
 			precision = static_cast<int>( get_integer( values_[1] ) );
 		}
 		if ( precision < 0 ) {
@@ -103,7 +101,10 @@ public:
 			v = thread_->object_factory().create_real( real_ );
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
-				name.append( " can be either `number' or `real' type, not a `" ).append( thread_->runtime().identifier_name( fr.identifier_id() ) ).append( "'." ),
+				hcore::to_string( name_ )
+					.append( " can be either `number' or `real' type, not a `" )
+					.append( thread_->runtime().identifier_name( fr.identifier_id() ) )
+					.append( "'." ),
 				thread_->current_frame()->file_id(),
 				position_
 			);
@@ -113,12 +114,12 @@ public:
 	}
 	static HHuginn::value_t pi( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
-		return ( get_constant( "pi", &number::PI, math::PI, thread_, values_, position_ ) );
+		return ( get_constant( "Mathematics.pi", &number::PI, math::PI, thread_, values_, position_ ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t e( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
-		return ( get_constant( "e", &number::E, math::E, thread_, values_, position_ ) );
+		return ( get_constant( "Mathematics.e", &number::E, math::E, thread_, values_, position_ ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t square_root( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {

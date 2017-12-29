@@ -51,6 +51,13 @@ class HExceptionClass : public HHuginn::HClass {
 public:
 	typedef HExceptionClass this_type;
 	typedef HHuginn::HClass base_type;
+private:
+	HUTF8String _constructorName;
+	HUTF8String _whatName;
+	HUTF8String _whereName;
+	HUTF8String _traceName;
+	HUTF8String _messageName;
+public:
 	HExceptionClass(
 		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_,
@@ -71,13 +78,18 @@ public:
 						{ "message", runtime_->object_factory()->create_method( hcore::call( &HExceptionClass::message, _1, _2, _3, _4 ) ), "get exception message" }
 				},
 			doc_
-		) {
+		)
+		, _constructorName( name() + ".constructor" )
+		, _whatName( name() + ".what" )
+		, _whereName( name() + ".where" )
+		, _traceName( name() + ".trace" )
+		, _messageName( name() + ".message" ) {
 		return;
 	}
 private:
 	virtual HHuginn::value_t do_create_instance( huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) const {
 		M_PROLOG
-		verify_signature( name() + ".constructor", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
+		verify_signature( _constructorName.c_str(), values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		thread_->current_frame()->set_position( position_ );
 		return ( thread_->object_factory().create<HHuginn::HException>( thread_, this, get_string( values_[0] ) ) );
 		M_EPILOG
@@ -86,7 +98,7 @@ private:
 		M_PROLOG
 		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_->raw() ) );
 		verify_arg_count(
-			static_cast<HExceptionClass const*>( e->get_class() )->name() + ".what",
+			static_cast<HExceptionClass const*>( e->get_class() )->_whatName.c_str(),
 			values_, 0, 0, thread_, position_
 		);
 		return ( thread_->object_factory().create_string( e->what() ) );
@@ -96,7 +108,7 @@ private:
 		M_PROLOG
 		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_->raw() ) );
 		verify_arg_count(
-			static_cast<HExceptionClass const*>( e->get_class() )->name() + ".where",
+			static_cast<HExceptionClass const*>( e->get_class() )->_whereName.c_str(),
 			values_, 0, 0, thread_, position_
 		);
 		return ( thread_->object_factory().create_string( e->where() ) );
@@ -106,7 +118,7 @@ private:
 		M_PROLOG
 		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_->raw() ) );
 		verify_arg_count(
-			static_cast<HExceptionClass const*>( e->get_class() )->name() + ".trace",
+			static_cast<HExceptionClass const*>( e->get_class() )->_traceName.c_str(),
 			values_, 0, 0, thread_, position_
 		);
 		HIntrospecteeInterface::call_stack_t const& traceData( e->trace() );
@@ -123,7 +135,7 @@ private:
 		M_PROLOG
 		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_->raw() ) );
 		verify_arg_count(
-			static_cast<HExceptionClass const*>( e->get_class() )->name() + ".message",
+			static_cast<HExceptionClass const*>( e->get_class() )->_messageName.c_str(),
 			values_, 0, 0, thread_, position_
 		);
 		HString message( e->where() );

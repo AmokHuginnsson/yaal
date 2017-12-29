@@ -138,9 +138,7 @@ public:
 	}
 	static HHuginn::value_t int_base_to_str( char const* name_, BASE base_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
-		HString name( "Text." );
-		name.append( name_ );
-		verify_signature( name, values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
+		verify_signature( name_, values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
 		return (
 			thread_->runtime().object_factory()->create_string(
 				int_to_str( get_integer( values_[0] ), base_, true )
@@ -164,13 +162,13 @@ HHuginn::value_t HTextCreator::do_new_instance( HRuntime* runtime_ ) {
 			"Text",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "split",    runtime_->object_factory()->create_method( hcore::call( &HText::split, _1, _2, _3, _4 ) ), "( *str*, *sep* ) - split `string` *str* by separator *sep* into a `list` of `string`s" },
-				{ "join",     runtime_->object_factory()->create_method( hcore::call( &HText::join, _1, _2, _3, _4 ) ), "( *coll*, *sep* ) - join all string from *coll* into one `string` using *sep* as separator" },
+				{ "split",    runtime_->object_factory()->create_method( hcore::call( &HText::split, _1, _2, _3, _4 ) ),    "( *str*, *sep* ) - split `string` *str* by separator *sep* into a `list` of `string`s" },
+				{ "join",     runtime_->object_factory()->create_method( hcore::call( &HText::join, _1, _2, _3, _4 ) ),     "( *coll*, *sep* ) - join all string from *coll* into one `string` using *sep* as separator" },
 				{ "distance", runtime_->object_factory()->create_method( hcore::call( &HText::distance, _1, _2, _3, _4 ) ), "( *first*, *second* ) - calculate Damerau-Levenshtein distance between *first* and *second* `string`s" },
-				{ "repeat",   runtime_->object_factory()->create_method( hcore::call( &HText::repeat, _1, _2, _3, _4 ) ), "( *seed*, *count* ) - construct new `string` by repeating *seed* `string` *count* times" },
-				{ "hex",      runtime_->object_factory()->create_method( hcore::call( &HText::int_base_to_str, "hex", BASE::HEX, _1, _2, _3, _4 ) ), "( *int* ) - convert *int* value to a `string` using hexadecimal representation" },
-				{ "oct",      runtime_->object_factory()->create_method( hcore::call( &HText::int_base_to_str, "oct", BASE::OCT, _1, _2, _3, _4 ) ), "( *int* ) - convert *int* value to a `string` using octal representation" },
-				{ "bin",      runtime_->object_factory()->create_method( hcore::call( &HText::int_base_to_str, "bin", BASE::BIN, _1, _2, _3, _4 ) ), "( *int* ) - convert *int* value to a `string` using binary representation" }
+				{ "repeat",   runtime_->object_factory()->create_method( hcore::call( &HText::repeat, _1, _2, _3, _4 ) ),   "( *seed*, *count* ) - construct new `string` by repeating *seed* `string` *count* times" },
+				{ "hex",      runtime_->object_factory()->create_method( hcore::call( &HText::int_base_to_str, "Text.hex", BASE::HEX, _1, _2, _3, _4 ) ), "( *int* ) - convert *int* value to a `string` using hexadecimal representation" },
+				{ "oct",      runtime_->object_factory()->create_method( hcore::call( &HText::int_base_to_str, "Text.oct", BASE::OCT, _1, _2, _3, _4 ) ), "( *int* ) - convert *int* value to a `string` using octal representation" },
+				{ "bin",      runtime_->object_factory()->create_method( hcore::call( &HText::int_base_to_str, "Text.bin", BASE::BIN, _1, _2, _3, _4 ) ), "( *int* ) - convert *int* value to a `string` using binary representation" }
 			},
 			"The `Text` package provides various text manipulation algorithms."
 		)

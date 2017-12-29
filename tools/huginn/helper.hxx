@@ -76,14 +76,14 @@ inline yaal::hcore::HString a_type_name( HHuginn::type_id_t type_ ) {
 }
 
 void operands_type_mismatch( char const*, HHuginn::HClass const*, HHuginn::HClass const*, int, int ) __attribute__(( noreturn ));
-void verify_arg_count( yaal::hcore::HString const&, HHuginn::values_t&, int, int, huginn::HThread*, int );
-void verify_arg_type( yaal::hcore::HString const&, HHuginn::values_t&, int, HHuginn::TYPE, ARITY, huginn::HThread*, int );
-HHuginn::type_id_t verify_arg_type( yaal::hcore::HString const&, HHuginn::values_t&, int, types_t const&, ARITY, huginn::HThread*, int );
-void verify_arg_type( yaal::hcore::HString const&, HHuginn::values_t&, int, HHuginn::HClass const*, ARITY, huginn::HThread*, int );
-void verify_signature( yaal::hcore::HString const&, HHuginn::values_t&, types_t const&, huginn::HThread*, int );
-HHuginn::type_id_t verify_arg_numeric( yaal::hcore::HString const&, HHuginn::values_t&, int, ARITY, huginn::HThread*, int );
-HHuginn::type_id_t verify_arg_collection( yaal::hcore::HString const&, HHuginn::values_t&, int, ARITY, ONTICALLY, huginn::HThread*, int );
-HHuginn::type_id_t verify_arg_collection_value_type( yaal::hcore::HString const&, HHuginn::values_t&, int, ARITY, types_t const&, UNIFORMITY, huginn::HThread*, int );
+void verify_arg_count( char const*, HHuginn::values_t&, int, int, huginn::HThread*, int );
+void verify_arg_type( char const*, HHuginn::values_t&, int, HHuginn::TYPE, ARITY, huginn::HThread*, int );
+HHuginn::type_id_t verify_arg_type( char const*, HHuginn::values_t&, int, types_t const&, ARITY, huginn::HThread*, int );
+void verify_arg_type( char const*, HHuginn::values_t&, int, HHuginn::HClass const*, ARITY, huginn::HThread*, int );
+void verify_signature( char const*, HHuginn::values_t&, types_t const&, huginn::HThread*, int );
+HHuginn::type_id_t verify_arg_numeric( char const*, HHuginn::values_t&, int, ARITY, huginn::HThread*, int );
+HHuginn::type_id_t verify_arg_collection( char const*, HHuginn::values_t&, int, ARITY, ONTICALLY, huginn::HThread*, int );
+HHuginn::type_id_t verify_arg_collection_value_type( char const*, HHuginn::values_t&, int, ARITY, types_t const&, UNIFORMITY, huginn::HThread*, int );
 
 HHuginn::HString::value_type const& get_string( HHuginn::value_t const& );
 HHuginn::HInteger::value_type get_integer( HHuginn::value_t const& );
