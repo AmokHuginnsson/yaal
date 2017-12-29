@@ -71,11 +71,24 @@ HHuginn::identifier_id_t const ASSERT_IDENTIFIER( 4 );
 
 namespace BUILTIN {
 
-char const* SIZE = "size";
-char const* TYPE = "type";
-char const* COPY = "copy";
-char const* OBSERVE = "observe";
-char const* USE = "use";
+char const* INTEGER   = "integer";
+char const* REAL      = "real";
+char const* NUMBER    = "number";
+char const* STRING    = "string";
+char const* CHARACTER = "character";
+char const* BOOLEAN   = "boolean";
+char const* SIZE      = "size";
+char const* TYPE      = "type";
+char const* COPY      = "copy";
+char const* OBSERVE   = "observe";
+char const* USE       = "use";
+char const* TUPLE     = "tuple";
+char const* LIST      = "list";
+char const* DEQUE     = "deque";
+char const* DICT      = "dict";
+char const* LOOKUP    = "lookup";
+char const* ORDER     = "order";
+char const* SET       = "set";
 HHuginn::identifier_id_t const INTEGER_IDENTIFIER( 5 );
 HHuginn::identifier_id_t const REAL_IDENTIFIER( 6 );
 HHuginn::identifier_id_t const NUMBER_IDENTIFIER( 7 );
@@ -99,33 +112,65 @@ HHuginn::identifier_id_t const SET_IDENTIFIER( 22 );
 
 namespace INTERFACE {
 
-char const* GET_SIZE = "get_size";
-char const* ITERATOR = "iterator";
-char const* IS_VALID = "is_valid";
-char const* NEXT = "next";
-char const* VALUE = "value";
-char const* HASH = "hash";
-char const* EQUALS = "equals";
-char const* LESS = "less";
-char const* GREATER = "greater";
-char const* LESS_OR_EQUAL = "less_or_equal";
+char const* CLONE            = "clone";
+char const* GET_SIZE         = "get_size";
+char const* ITERATOR         = "iterator";
+char const* IS_VALID         = "is_valid";
+char const* NEXT             = "next";
+char const* VALUE            = "value";
+char const* HASH             = "hash";
+char const* EQUALS           = "equals";
+char const* LESS             = "less";
+char const* GREATER          = "greater";
+char const* LESS_OR_EQUAL    = "less_or_equal";
 char const* GREATER_OR_EQUAL = "greater_or_equal";
-char const* ADD = "add";
-char const* SUBTRACT = "subtract";
-char const* MULTIPLY = "multiply";
-char const* DIVIDE = "divide";
-char const* MODULO = "modulo";
-char const* POWER = "power";
-char const* MODULUS = "modulus";
-char const* NEGATE = "negate";
-char const* CLONE = "clone";
+char const* ADD              = "add";
+char const* SUBTRACT         = "subtract";
+char const* MULTIPLY         = "multiply";
+char const* DIVIDE           = "divide";
+char const* MODULO           = "modulo";
+char const* POWER            = "power";
+char const* MODULUS          = "modulus";
+char const* NEGATE           = "negate";
+char const* TO_STRING        = "to_string";
+char const* TO_INTEGER       = "to_integer";
+char const* TO_REAL          = "to_real";
+char const* TO_NUMBER        = "to_number";
+char const* TO_CHARACTER     = "to_character";
+char const* TO_BOOLEAN       = "to_boolean";
+HHuginn::identifier_id_t const CLONE_IDENTIFIER( 23 );
+HHuginn::identifier_id_t const GET_SIZE_IDENTIFIER( 24 );
+HHuginn::identifier_id_t const ITERATOR_IDENTIFIER( 25 );
+HHuginn::identifier_id_t const IS_VALID_IDENTIFIER( 26 );
+HHuginn::identifier_id_t const NEXT_IDENTIFIER( 27 );
+HHuginn::identifier_id_t const VALUE_IDENTIFIER( 28 );
+HHuginn::identifier_id_t const HASH_IDENTIFIER( 29 );
+HHuginn::identifier_id_t const EQUALS_IDENTIFIER( 30 );
+HHuginn::identifier_id_t const LESS_IDENTIFIER( 31 );
+HHuginn::identifier_id_t const GREATER_IDENTIFIER( 32 );
+HHuginn::identifier_id_t const LESS_OR_EQUAL_IDENTIFIER( 33 );
+HHuginn::identifier_id_t const GREATER_OR_EQUAL_IDENTIFIER( 34 );
+HHuginn::identifier_id_t const ADD_IDENTIFIER( 35 );
+HHuginn::identifier_id_t const SUBTRACT_IDENTIFIER( 36 );
+HHuginn::identifier_id_t const MULTIPLY_IDENTIFIER( 37 );
+HHuginn::identifier_id_t const DIVIDE_IDENTIFIER( 38 );
+HHuginn::identifier_id_t const MODULO_IDENTIFIER( 39 );
+HHuginn::identifier_id_t const POWER_IDENTIFIER( 40 );
+HHuginn::identifier_id_t const MODULUS_IDENTIFIER( 41 );
+HHuginn::identifier_id_t const NEGATE_IDENTIFIER( 42 );
+HHuginn::identifier_id_t const TO_STRING_IDENTIFIER( 43 );
+HHuginn::identifier_id_t const TO_INTEGER_IDENTIFIER( 44 );
+HHuginn::identifier_id_t const TO_REAL_IDENTIFIER( 45 );
+HHuginn::identifier_id_t const TO_NUMBER_IDENTIFIER( 46 );
+HHuginn::identifier_id_t const TO_CHARACTER_IDENTIFIER( 47 );
+HHuginn::identifier_id_t const TO_BOOLEAN_IDENTIFIER( 48 );
 
 }
 
 namespace STANDARD_FUNCTIONS {
 
 char const* MAIN = "main";
-HHuginn::identifier_id_t const MAIN_IDENTIFIER( 23 );
+HHuginn::identifier_id_t const MAIN_IDENTIFIER( 49 );
 
 }
 

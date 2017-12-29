@@ -72,11 +72,24 @@ extern HHuginn::identifier_id_t const ASSERT_IDENTIFIER;
 
 namespace BUILTIN {
 
+extern char const* INTEGER;
+extern char const* REAL;
+extern char const* NUMBER;
+extern char const* STRING;
+extern char const* CHARACTER;
+extern char const* BOOLEAN;
 extern char const* SIZE;
 extern char const* TYPE;
 extern char const* COPY;
 extern char const* OBSERVE;
 extern char const* USE;
+extern char const* TUPLE;
+extern char const* LIST;
+extern char const* DEQUE;
+extern char const* DICT;
+extern char const* LOOKUP;
+extern char const* ORDER;
+extern char const* SET;
 extern HHuginn::identifier_id_t const INTEGER_IDENTIFIER;
 extern HHuginn::identifier_id_t const REAL_IDENTIFIER;
 extern HHuginn::identifier_id_t const NUMBER_IDENTIFIER;
@@ -100,6 +113,7 @@ extern HHuginn::identifier_id_t const SET_IDENTIFIER;
 
 namespace INTERFACE {
 
+extern char const* CLONE;
 extern char const* GET_SIZE;
 extern char const* ITERATOR;
 extern char const* VALUE;
@@ -119,7 +133,38 @@ extern char const* MODULO;
 extern char const* POWER;
 extern char const* MODULUS;
 extern char const* NEGATE;
-extern char const* CLONE;
+extern char const* TO_STRING;
+extern char const* TO_INTEGER;
+extern char const* TO_REAL;
+extern char const* TO_NUMBER;
+extern char const* TO_CHARACTER;
+extern char const* TO_BOOLEAN;
+extern HHuginn::identifier_id_t const CLONE_IDENTIFIER;
+extern HHuginn::identifier_id_t const GET_SIZE_IDENTIFIER;
+extern HHuginn::identifier_id_t const ITERATOR_IDENTIFIER;
+extern HHuginn::identifier_id_t const VALUE_IDENTIFIER;
+extern HHuginn::identifier_id_t const NEXT_IDENTIFIER;
+extern HHuginn::identifier_id_t const IS_VALID_IDENTIFIER;
+extern HHuginn::identifier_id_t const HASH_IDENTIFIER;
+extern HHuginn::identifier_id_t const EQUALS_IDENTIFIER;
+extern HHuginn::identifier_id_t const LESS_IDENTIFIER;
+extern HHuginn::identifier_id_t const GREATER_IDENTIFIER;
+extern HHuginn::identifier_id_t const LESS_OR_EQUAL_IDENTIFIER;
+extern HHuginn::identifier_id_t const GREATER_OR_EQUAL_IDENTIFIER;
+extern HHuginn::identifier_id_t const ADD_IDENTIFIER;
+extern HHuginn::identifier_id_t const SUBTRACT_IDENTIFIER;
+extern HHuginn::identifier_id_t const MULTIPLY_IDENTIFIER;
+extern HHuginn::identifier_id_t const DIVIDE_IDENTIFIER;
+extern HHuginn::identifier_id_t const MODULO_IDENTIFIER;
+extern HHuginn::identifier_id_t const POWER_IDENTIFIER;
+extern HHuginn::identifier_id_t const MODULUS_IDENTIFIER;
+extern HHuginn::identifier_id_t const NEGATE_IDENTIFIER;
+extern HHuginn::identifier_id_t const TO_STRING_IDENTIFIER;
+extern HHuginn::identifier_id_t const TO_INTEGER_IDENTIFIER;
+extern HHuginn::identifier_id_t const TO_REAL_IDENTIFIER;
+extern HHuginn::identifier_id_t const TO_NUMBER_IDENTIFIER;
+extern HHuginn::identifier_id_t const TO_CHARACTER_IDENTIFIER;
+extern HHuginn::identifier_id_t const TO_BOOLEAN_IDENTIFIER;
 
 }
 

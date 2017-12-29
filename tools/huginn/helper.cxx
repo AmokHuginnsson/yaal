@@ -161,6 +161,7 @@ yaal::hcore::HString a_type_name( HHuginn::HClass const* class_ ) {
 
 namespace {
 
+void fail_arg_type( char const*, HHuginn::values_t&, int, yaal::hcore::HString const&, ARITY, huginn::HThread*, int ) __attribute__((noreturn));
 void fail_arg_type(
 	char const* name_,
 	HHuginn::values_t& values_,
@@ -187,7 +188,6 @@ void fail_arg_type(
 		thread_->current_frame()->file_id(),
 		position_
 	);
-	return;
 	M_EPILOG
 }
 
@@ -523,29 +523,29 @@ yaal::hcore::HNumber& get_by_type<yaal::hcore::HNumber&>( HHuginn::value_t& valu
 }
 
 yaal::hcore::HString const& type_name( HHuginn::TYPE type_ ) {
-	static HString const NAME_NONE = "*none*";
-	static HString const NAME_BOOLEAN = "boolean";
-	static HString const NAME_INTEGER = "integer";
-	static HString const NAME_REAL = "real";
-	static HString const NAME_STRING = "string";
-	static HString const NAME_NUMBER = "number";
-	static HString const NAME_CHARACTER = "character";
-	static HString const NAME_TUPLE = "tuple";
-	static HString const NAME_LIST = "list";
-	static HString const NAME_DICT = "dict";
-	static HString const NAME_DEQUE = "deque";
-	static HString const NAME_ORDER = "order";
-	static HString const NAME_LOOKUP = "lookup";
-	static HString const NAME_SET = "set";
-	static HString const NAME_OBSERVER = "*observer*";
-	static HString const NAME_REFERENCE = "*reference*";
-	static HString const NAME_FUNCTION_REFERENCE = "*function_reference*";
-	static HString const NAME_OBJECT_REFERENCE = "*object_reference*";
-	static HString const NAME_METHOD = "*method*";
-	static HString const NAME_BOUND_METHOD = "*bound_method*";
+	static HString const NAME_BOOLEAN   = BUILTIN::BOOLEAN;
+	static HString const NAME_INTEGER   = BUILTIN::INTEGER;
+	static HString const NAME_REAL      = BUILTIN::REAL;
+	static HString const NAME_STRING    = BUILTIN::STRING;
+	static HString const NAME_NUMBER    = BUILTIN::NUMBER;
+	static HString const NAME_CHARACTER = BUILTIN::CHARACTER;
+	static HString const NAME_TUPLE     = BUILTIN::TUPLE;
+	static HString const NAME_LIST      = BUILTIN::LIST;
+	static HString const NAME_DEQUE     = BUILTIN::DEQUE;
+	static HString const NAME_DICT      = BUILTIN::DICT;
+	static HString const NAME_LOOKUP    = BUILTIN::LOOKUP;
+	static HString const NAME_ORDER     = BUILTIN::ORDER;
+	static HString const NAME_SET       = BUILTIN::SET;
+	static HString const NAME_NONE                = "*none*";
+	static HString const NAME_OBSERVER            = "*observer*";
+	static HString const NAME_REFERENCE           = "*reference*";
+	static HString const NAME_FUNCTION_REFERENCE  = "*function_reference*";
+	static HString const NAME_OBJECT_REFERENCE    = "*object_reference*";
+	static HString const NAME_METHOD              = "*method*";
+	static HString const NAME_BOUND_METHOD        = "*bound_method*";
 	static HString const NAME_VARIADIC_PARAMETERS = "*variadic_parameters*";
-	static HString const NAME_NAMED_PARAMETERS = "*named_parameters*";
-	static HString const NAME_UNKNOWN = "*unknown*";
+	static HString const NAME_NAMED_PARAMETERS    = "*named_parameters*";
+	static HString const NAME_UNKNOWN             = "*unknown*";
 	HString const* s( &NAME_UNKNOWN );
 	switch ( type_ ) {
 		case ( HHuginn::TYPE::NONE ):               s = &NAME_NONE;               break;

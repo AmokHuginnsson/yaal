@@ -148,19 +148,19 @@ HHuginn::value_t HHuginn::HObject::do_field( HHuginn::value_t const& object_, in
 HHuginn::value_t HHuginn::HObject::get_method(
 	huginn::HThread* thread_,
 	HHuginn::value_t const& object_,
-	yaal::hcore::HString const& methodName_,
+	HHuginn::identifier_id_t methodIdentifier_,
 	int position_
 ) const {
 	M_PROLOG
 	M_ASSERT( object_.raw() == this );
 	HHuginn::value_t res;
-	int idx( field_index( thread_->runtime().identifier_id( methodName_ ) ) );
+	int idx( field_index( methodIdentifier_ ) );
 	if ( idx >= 0 ) {
 		res = field( object_, idx );
 		if ( res->type_id() != HHuginn::TYPE::BOUND_METHOD ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"`"_ys
-					.append( methodName_ )
+					.append( thread_->runtime().identifier_name( methodIdentifier_ ) )
 					.append( "' in class `" )
 					.append( get_class()->name() )
 					.append( "' is not a method." ),
@@ -173,13 +173,36 @@ HHuginn::value_t HHuginn::HObject::get_method(
 			"Class `"_ys
 				.append( get_class()->name() )
 				.append( "' does not have `" )
-				.append( methodName_ )
+				.append( thread_->runtime().identifier_name( methodIdentifier_ ) )
 				.append( "' method." ),
 			thread_->current_frame()->file_id(),
 			position_
 		);
 	}
 	return ( res );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::HObject::get_method(
+	huginn::HThread* thread_,
+	HHuginn::value_t const& object_,
+	yaal::hcore::HString const& methodName_,
+	int position_
+) const {
+	return ( get_method( thread_, object_, thread_->runtime().identifier_id( methodName_ ), position_ ) );
+}
+
+HHuginn::value_t HHuginn::HObject::call_method(
+	huginn::HThread* thread_,
+	HHuginn::value_t const& object_,
+	HHuginn::identifier_id_t methodIdentifier_,
+	HHuginn::values_t& arguments_,
+	int position_
+) const {
+	M_PROLOG
+	HHuginn::value_t f( get_method( thread_, object_, methodIdentifier_, position_ ) );
+	HHuginn::HClass::HMethod const* m( static_cast<HHuginn::HClass::HMethod const*>( f.raw() ) );
+	return ( m->function()( thread_, const_cast<HHuginn::value_t*>( &object_ ), arguments_, position_ ) );
 	M_EPILOG
 }
 
@@ -191,7 +214,7 @@ HHuginn::value_t HHuginn::HObject::call_method(
 	int position_
 ) const {
 	M_PROLOG
-	HHuginn::value_t f( get_method( thread_, object_, methodName_, position_ ) );
+	HHuginn::value_t f( get_method( thread_, object_, thread_->runtime().identifier_id( methodName_ ), position_ ) );
 	HHuginn::HClass::HMethod const* m( static_cast<HHuginn::HClass::HMethod const*>( f.raw() ) );
 	return ( m->function()( thread_, const_cast<HHuginn::value_t*>( &object_ ), arguments_, position_ ) );
 	M_EPILOG
@@ -199,7 +222,7 @@ HHuginn::value_t HHuginn::HObject::call_method(
 
 HHuginn::value_t HHuginn::HObject::do_clone( huginn::HThread* thread_, HHuginn::value_t* object_, int position_ ) const {
 	M_PROLOG
-	int idx( field_index( thread_->runtime().identifier_id( INTERFACE::CLONE ) ) );
+	int idx( field_index( INTERFACE::CLONE_IDENTIFIER ) );
 	HHuginn::value_t copy;
 	if ( idx >= 0 ) {
 		HHuginn::value_t cloneMember( field( *object_, idx ) );

@@ -60,24 +60,50 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			{ KEYWORD::THIS, KEYWORD::THIS_IDENTIFIER },
 			{ KEYWORD::SUPER, KEYWORD::SUPER_IDENTIFIER },
 			{ KEYWORD::ASSERT, KEYWORD::ASSERT_IDENTIFIER },
-			{ type_name( HHuginn::TYPE::INTEGER ), BUILTIN::INTEGER_IDENTIFIER },
-			{ type_name( HHuginn::TYPE::REAL ), BUILTIN::REAL_IDENTIFIER },
-			{ type_name( HHuginn::TYPE::NUMBER ), BUILTIN::NUMBER_IDENTIFIER },
-			{ type_name( HHuginn::TYPE::STRING ), BUILTIN::STRING_IDENTIFIER },
-			{ type_name( HHuginn::TYPE::CHARACTER ), BUILTIN::CHARACTER_IDENTIFIER },
-			{ type_name( HHuginn::TYPE::BOOLEAN ), BUILTIN::BOOLEAN_IDENTIFIER },
+			{ BUILTIN::INTEGER, BUILTIN::INTEGER_IDENTIFIER },
+			{ BUILTIN::REAL, BUILTIN::REAL_IDENTIFIER },
+			{ BUILTIN::NUMBER, BUILTIN::NUMBER_IDENTIFIER },
+			{ BUILTIN::STRING, BUILTIN::STRING_IDENTIFIER },
+			{ BUILTIN::CHARACTER, BUILTIN::CHARACTER_IDENTIFIER },
+			{ BUILTIN::BOOLEAN, BUILTIN::BOOLEAN_IDENTIFIER },
 			{ BUILTIN::SIZE, BUILTIN::SIZE_IDENTIFIER },
 			{ BUILTIN::TYPE, BUILTIN::TYPE_IDENTIFIER },
 			{ BUILTIN::COPY, BUILTIN::COPY_IDENTIFIER },
 			{ BUILTIN::OBSERVE, BUILTIN::OBSERVE_IDENTIFIER },
 			{ BUILTIN::USE, BUILTIN::USE_IDENTIFIER },
-			{ type_name( HHuginn::TYPE::TUPLE ), BUILTIN::TUPLE_IDENTIFIER },
-			{ type_name( HHuginn::TYPE::LIST ), BUILTIN::LIST_IDENTIFIER },
-			{ type_name( HHuginn::TYPE::DEQUE ), BUILTIN::DEQUE_IDENTIFIER },
-			{ type_name( HHuginn::TYPE::DICT ), BUILTIN::DICT_IDENTIFIER },
-			{ type_name( HHuginn::TYPE::LOOKUP ), BUILTIN::LOOKUP_IDENTIFIER },
-			{ type_name( HHuginn::TYPE::ORDER ), BUILTIN::ORDER_IDENTIFIER },
-			{ type_name( HHuginn::TYPE::SET ), BUILTIN::SET_IDENTIFIER },
+			{ BUILTIN::TUPLE, BUILTIN::TUPLE_IDENTIFIER },
+			{ BUILTIN::LIST, BUILTIN::LIST_IDENTIFIER },
+			{ BUILTIN::DEQUE, BUILTIN::DEQUE_IDENTIFIER },
+			{ BUILTIN::DICT, BUILTIN::DICT_IDENTIFIER },
+			{ BUILTIN::LOOKUP, BUILTIN::LOOKUP_IDENTIFIER },
+			{ BUILTIN::ORDER, BUILTIN::ORDER_IDENTIFIER },
+			{ BUILTIN::SET, BUILTIN::SET_IDENTIFIER },
+			{ INTERFACE::CLONE,            INTERFACE::CLONE_IDENTIFIER },
+			{ INTERFACE::GET_SIZE,         INTERFACE::GET_SIZE_IDENTIFIER },
+			{ INTERFACE::ITERATOR,         INTERFACE::ITERATOR_IDENTIFIER },
+			{ INTERFACE::IS_VALID,         INTERFACE::IS_VALID_IDENTIFIER },
+			{ INTERFACE::NEXT,             INTERFACE::NEXT_IDENTIFIER },
+			{ INTERFACE::VALUE,            INTERFACE::VALUE_IDENTIFIER },
+			{ INTERFACE::HASH,             INTERFACE::HASH_IDENTIFIER },
+			{ INTERFACE::EQUALS,           INTERFACE::EQUALS_IDENTIFIER },
+			{ INTERFACE::LESS,             INTERFACE::LESS_IDENTIFIER },
+			{ INTERFACE::GREATER,          INTERFACE::GREATER_IDENTIFIER },
+			{ INTERFACE::LESS_OR_EQUAL,    INTERFACE::LESS_OR_EQUAL_IDENTIFIER },
+			{ INTERFACE::GREATER_OR_EQUAL, INTERFACE::GREATER_OR_EQUAL_IDENTIFIER },
+			{ INTERFACE::ADD,              INTERFACE::ADD_IDENTIFIER },
+			{ INTERFACE::SUBTRACT,         INTERFACE::SUBTRACT_IDENTIFIER },
+			{ INTERFACE::MULTIPLY,         INTERFACE::MULTIPLY_IDENTIFIER },
+			{ INTERFACE::DIVIDE,           INTERFACE::DIVIDE_IDENTIFIER },
+			{ INTERFACE::MODULO,           INTERFACE::MODULO_IDENTIFIER },
+			{ INTERFACE::POWER,            INTERFACE::POWER_IDENTIFIER },
+			{ INTERFACE::MODULUS,          INTERFACE::MODULUS_IDENTIFIER },
+			{ INTERFACE::NEGATE,           INTERFACE::NEGATE_IDENTIFIER },
+			{ INTERFACE::TO_STRING,        INTERFACE::TO_STRING_IDENTIFIER },
+			{ INTERFACE::TO_INTEGER,       INTERFACE::TO_INTEGER_IDENTIFIER },
+			{ INTERFACE::TO_REAL,          INTERFACE::TO_REAL_IDENTIFIER },
+			{ INTERFACE::TO_NUMBER,        INTERFACE::TO_NUMBER_IDENTIFIER },
+			{ INTERFACE::TO_CHARACTER,     INTERFACE::TO_CHARACTER_IDENTIFIER },
+			{ INTERFACE::TO_BOOLEAN,       INTERFACE::TO_BOOLEAN_IDENTIFIER },
 			{ STANDARD_FUNCTIONS::MAIN, STANDARD_FUNCTIONS::MAIN_IDENTIFIER },
 			{ _noneClass_.name(), TYPE_NONE_IDENTIFIER },
 			{ _observerClass_.name(), TYPE_OBSERVER_IDENTIFIER },
@@ -96,24 +122,50 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			KEYWORD::THIS,
 			KEYWORD::SUPER,
 			KEYWORD::ASSERT,
-			type_name( HHuginn::TYPE::INTEGER ),
-			type_name( HHuginn::TYPE::REAL ),
-			type_name( HHuginn::TYPE::NUMBER ),
-			type_name( HHuginn::TYPE::STRING ),
-			type_name( HHuginn::TYPE::CHARACTER ),
-			type_name( HHuginn::TYPE::BOOLEAN ),
+			BUILTIN::INTEGER,
+			BUILTIN::REAL,
+			BUILTIN::NUMBER,
+			BUILTIN::STRING,
+			BUILTIN::CHARACTER,
+			BUILTIN::BOOLEAN,
 			BUILTIN::SIZE,
 			BUILTIN::TYPE,
 			BUILTIN::COPY,
 			BUILTIN::OBSERVE,
 			BUILTIN::USE,
-			type_name( HHuginn::TYPE::TUPLE ),
-			type_name( HHuginn::TYPE::LIST ),
-			type_name( HHuginn::TYPE::DEQUE ),
-			type_name( HHuginn::TYPE::DICT ),
-			type_name( HHuginn::TYPE::LOOKUP ),
-			type_name( HHuginn::TYPE::ORDER ),
-			type_name( HHuginn::TYPE::SET ),
+			BUILTIN::TUPLE,
+			BUILTIN::LIST,
+			BUILTIN::DEQUE,
+			BUILTIN::DICT,
+			BUILTIN::LOOKUP,
+			BUILTIN::ORDER,
+			BUILTIN::SET,
+			INTERFACE::CLONE,
+			INTERFACE::GET_SIZE,
+			INTERFACE::ITERATOR,
+			INTERFACE::IS_VALID,
+			INTERFACE::NEXT,
+			INTERFACE::VALUE,
+			INTERFACE::HASH,
+			INTERFACE::EQUALS,
+			INTERFACE::LESS,
+			INTERFACE::GREATER,
+			INTERFACE::LESS_OR_EQUAL,
+			INTERFACE::GREATER_OR_EQUAL,
+			INTERFACE::ADD,
+			INTERFACE::SUBTRACT,
+			INTERFACE::MULTIPLY,
+			INTERFACE::DIVIDE,
+			INTERFACE::MODULO,
+			INTERFACE::POWER,
+			INTERFACE::MODULUS,
+			INTERFACE::NEGATE,
+			INTERFACE::TO_STRING,
+			INTERFACE::TO_INTEGER,
+			INTERFACE::TO_REAL,
+			INTERFACE::TO_NUMBER,
+			INTERFACE::TO_CHARACTER,
+			INTERFACE::TO_BOOLEAN,
 			STANDARD_FUNCTIONS::MAIN,
 			_noneClass_.name(),
 			_observerClass_.name(),
@@ -568,7 +620,7 @@ HHuginn::value_t size( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 		s = iterable->size( thread_, position_ );
 	} else {
 		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v ) ) {
-			HHuginn::value_t res( o->call_method( thread_, val, INTERFACE::GET_SIZE, HArguments( thread_ ), position_ ) );
+			HHuginn::value_t res( o->call_method( thread_, val, INTERFACE::GET_SIZE_IDENTIFIER, HArguments( thread_ ), position_ ) );
 			if ( res->type_id() != HHuginn::TYPE::INTEGER ) {
 				throw HHuginn::HHuginnRuntimeException(
 					"User supplied `get_size' method returned an invalid type "_ys
@@ -809,40 +861,66 @@ void HRuntime::register_builtins( void ) {
 		static_assert( sizeof ( coreClassesInit ) == sizeof ( _coreClasses_ ), "invalid core classes initializer size" );
 		copy( begin( coreClassesInit ), end( coreClassesInit ), begin( _coreClasses_ ) );
 	}
-	M_ENSURE( identifier_id( KEYWORD::CONSTRUCTOR ) == KEYWORD::CONSTRUCTOR_IDENTIFIER );
-	M_ENSURE( identifier_id( KEYWORD::DESTRUCTOR ) == KEYWORD::DESTRUCTOR_IDENTIFIER );
-	M_ENSURE( identifier_id( KEYWORD::THIS ) == KEYWORD::THIS_IDENTIFIER );
-	M_ENSURE( identifier_id( KEYWORD::SUPER ) == KEYWORD::SUPER_IDENTIFIER );
-	M_ENSURE( identifier_id( KEYWORD::ASSERT ) == KEYWORD::ASSERT_IDENTIFIER );
-	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::INTEGER ) ) == BUILTIN::INTEGER_IDENTIFIER );
-	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::REAL ) ) == BUILTIN::REAL_IDENTIFIER );
-	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::NUMBER ) ) == BUILTIN::NUMBER_IDENTIFIER );
-	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::STRING ) ) == BUILTIN::STRING_IDENTIFIER );
-	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::CHARACTER ) ) == BUILTIN::CHARACTER_IDENTIFIER );
-	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::BOOLEAN ) ) == BUILTIN::BOOLEAN_IDENTIFIER );
-	M_ENSURE( identifier_id( BUILTIN::SIZE ) == BUILTIN::SIZE_IDENTIFIER );
-	M_ENSURE( identifier_id( BUILTIN::TYPE ) == BUILTIN::TYPE_IDENTIFIER );
-	M_ENSURE( identifier_id( BUILTIN::COPY ) == BUILTIN::COPY_IDENTIFIER );
-	M_ENSURE( identifier_id( BUILTIN::OBSERVE ) == BUILTIN::OBSERVE_IDENTIFIER );
-	M_ENSURE( identifier_id( BUILTIN::USE ) == BUILTIN::USE_IDENTIFIER );
-	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::TUPLE ) ) == BUILTIN::TUPLE_IDENTIFIER );
-	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::LIST ) ) == BUILTIN::LIST_IDENTIFIER );
-	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::DEQUE ) ) == BUILTIN::DEQUE_IDENTIFIER );
-	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::DICT ) ) == BUILTIN::DICT_IDENTIFIER );
-	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::LOOKUP ) ) == BUILTIN::LOOKUP_IDENTIFIER );
-	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::ORDER ) ) == BUILTIN::ORDER_IDENTIFIER );
-	M_ENSURE( identifier_id( type_name( HHuginn::TYPE::SET ) ) == BUILTIN::SET_IDENTIFIER );
-	M_ENSURE( identifier_id( _noneClass_.name() ) == TYPE_NONE_IDENTIFIER );
-	M_ENSURE( identifier_id( _observerClass_.name() ) == TYPE_OBSERVER_IDENTIFIER );
-	M_ENSURE( identifier_id( _referenceClass_.name() ) == TYPE_REFERENCE_IDENTIFIER );
-	M_ENSURE( identifier_id( _functionReferenceClass_.name() ) == TYPE_FUNCTION_REFERENCE_IDENTIFIER );
-	M_ENSURE( identifier_id( _objectReferenceClass_.name() ) == TYPE_OBJECT_REFERENCE_IDENTIFIER );
-	M_ENSURE( identifier_id( _methodClass_.name() ) == TYPE_METHOD_IDENTIFIER );
-	M_ENSURE( identifier_id( _boundMethodClass_.name() ) == TYPE_BOUND_METHOD_IDENTIFIER );
-	M_ENSURE( identifier_id( _variadicParametersClass_.name() ) == TYPE_VARIADIC_PARAMETERS_IDENTIFIER );
-	M_ENSURE( identifier_id( _namedParametersClass_.name() ) == TYPE_NAMED_PARAMETERS_IDENTIFIER );
-	M_ENSURE( identifier_id( _unknownClass_.name() ) == TYPE_UNKNOWN_IDENTIFIER );
-	M_ENSURE( identifier_id( STANDARD_FUNCTIONS::MAIN ) == STANDARD_FUNCTIONS::MAIN_IDENTIFIER );
+	M_ENSURE( ( identifier_id( KEYWORD::CONSTRUCTOR ) == KEYWORD::CONSTRUCTOR_IDENTIFIER ) && ( identifier_name( KEYWORD::CONSTRUCTOR_IDENTIFIER ) == KEYWORD::CONSTRUCTOR ) );
+	M_ENSURE( ( identifier_id( KEYWORD::DESTRUCTOR ) == KEYWORD::DESTRUCTOR_IDENTIFIER ) && ( identifier_name( KEYWORD::DESTRUCTOR_IDENTIFIER ) == KEYWORD::DESTRUCTOR ) );
+	M_ENSURE( ( identifier_id( KEYWORD::THIS ) == KEYWORD::THIS_IDENTIFIER ) && ( identifier_name( KEYWORD::THIS_IDENTIFIER ) == KEYWORD::THIS ) );
+	M_ENSURE( ( identifier_id( KEYWORD::SUPER ) == KEYWORD::SUPER_IDENTIFIER ) && ( identifier_name( KEYWORD::SUPER_IDENTIFIER ) == KEYWORD::SUPER ) );
+	M_ENSURE( ( identifier_id( KEYWORD::ASSERT ) == KEYWORD::ASSERT_IDENTIFIER ) && ( identifier_name( KEYWORD::ASSERT_IDENTIFIER ) == KEYWORD::ASSERT ) );
+	M_ENSURE( ( identifier_id( BUILTIN::INTEGER ) == BUILTIN::INTEGER_IDENTIFIER ) && ( identifier_name( BUILTIN::INTEGER_IDENTIFIER ) == BUILTIN::INTEGER ) );
+	M_ENSURE( ( identifier_id( BUILTIN::REAL ) == BUILTIN::REAL_IDENTIFIER ) && ( identifier_name( BUILTIN::REAL_IDENTIFIER ) == BUILTIN::REAL ) );
+	M_ENSURE( ( identifier_id( BUILTIN::NUMBER ) == BUILTIN::NUMBER_IDENTIFIER ) && ( identifier_name( BUILTIN::NUMBER_IDENTIFIER ) == BUILTIN::NUMBER ) );
+	M_ENSURE( ( identifier_id( BUILTIN::STRING ) == BUILTIN::STRING_IDENTIFIER ) && ( identifier_name( BUILTIN::STRING_IDENTIFIER ) == BUILTIN::STRING ) );
+	M_ENSURE( ( identifier_id( BUILTIN::CHARACTER ) == BUILTIN::CHARACTER_IDENTIFIER ) && ( identifier_name( BUILTIN::CHARACTER_IDENTIFIER ) == BUILTIN::CHARACTER ) );
+	M_ENSURE( ( identifier_id( BUILTIN::BOOLEAN ) == BUILTIN::BOOLEAN_IDENTIFIER ) && ( identifier_name( BUILTIN::BOOLEAN_IDENTIFIER ) == BUILTIN::BOOLEAN ) );
+	M_ENSURE( ( identifier_id( BUILTIN::SIZE ) == BUILTIN::SIZE_IDENTIFIER ) && ( identifier_name( BUILTIN::SIZE_IDENTIFIER ) == BUILTIN::SIZE ) );
+	M_ENSURE( ( identifier_id( BUILTIN::TYPE ) == BUILTIN::TYPE_IDENTIFIER ) && ( identifier_name( BUILTIN::TYPE_IDENTIFIER ) == BUILTIN::TYPE ) );
+	M_ENSURE( ( identifier_id( BUILTIN::COPY ) == BUILTIN::COPY_IDENTIFIER ) && ( identifier_name( BUILTIN::COPY_IDENTIFIER ) == BUILTIN::COPY ) );
+	M_ENSURE( ( identifier_id( BUILTIN::OBSERVE ) == BUILTIN::OBSERVE_IDENTIFIER ) && ( identifier_name( BUILTIN::OBSERVE_IDENTIFIER ) == BUILTIN::OBSERVE ) );
+	M_ENSURE( ( identifier_id( BUILTIN::USE ) == BUILTIN::USE_IDENTIFIER ) && ( identifier_name( BUILTIN::USE_IDENTIFIER ) == BUILTIN::USE ) );
+	M_ENSURE( ( identifier_id( BUILTIN::TUPLE ) == BUILTIN::TUPLE_IDENTIFIER ) && ( identifier_name( BUILTIN::TUPLE_IDENTIFIER ) == BUILTIN::TUPLE ) );
+	M_ENSURE( ( identifier_id( BUILTIN::LIST ) == BUILTIN::LIST_IDENTIFIER ) && ( identifier_name( BUILTIN::LIST_IDENTIFIER ) == BUILTIN::LIST ) );
+	M_ENSURE( ( identifier_id( BUILTIN::DEQUE ) == BUILTIN::DEQUE_IDENTIFIER ) && ( identifier_name( BUILTIN::DEQUE_IDENTIFIER ) == BUILTIN::DEQUE ) );
+	M_ENSURE( ( identifier_id( BUILTIN::DICT ) == BUILTIN::DICT_IDENTIFIER ) && ( identifier_name( BUILTIN::DICT_IDENTIFIER ) == BUILTIN::DICT ) );
+	M_ENSURE( ( identifier_id( BUILTIN::LOOKUP ) == BUILTIN::LOOKUP_IDENTIFIER ) && ( identifier_name( BUILTIN::LOOKUP_IDENTIFIER ) == BUILTIN::LOOKUP ) );
+	M_ENSURE( ( identifier_id( BUILTIN::ORDER ) == BUILTIN::ORDER_IDENTIFIER ) && ( identifier_name( BUILTIN::ORDER_IDENTIFIER ) == BUILTIN::ORDER ) );
+	M_ENSURE( ( identifier_id( BUILTIN::SET ) == BUILTIN::SET_IDENTIFIER ) && ( identifier_name( BUILTIN::SET_IDENTIFIER ) == BUILTIN::SET ) );
+	M_ENSURE( ( identifier_id( INTERFACE::CLONE ) == INTERFACE::CLONE_IDENTIFIER ) && ( identifier_name( INTERFACE::CLONE_IDENTIFIER ) == INTERFACE::CLONE ) );
+	M_ENSURE( ( identifier_id( INTERFACE::GET_SIZE ) == INTERFACE::GET_SIZE_IDENTIFIER ) && ( identifier_name( INTERFACE::GET_SIZE_IDENTIFIER ) == INTERFACE::GET_SIZE ) );
+	M_ENSURE( ( identifier_id( INTERFACE::ITERATOR ) == INTERFACE::ITERATOR_IDENTIFIER ) && ( identifier_name( INTERFACE::ITERATOR_IDENTIFIER ) == INTERFACE::ITERATOR ) );
+	M_ENSURE( ( identifier_id( INTERFACE::IS_VALID ) == INTERFACE::IS_VALID_IDENTIFIER ) && ( identifier_name( INTERFACE::IS_VALID_IDENTIFIER ) == INTERFACE::IS_VALID ) );
+	M_ENSURE( ( identifier_id( INTERFACE::NEXT ) == INTERFACE::NEXT_IDENTIFIER ) && ( identifier_name( INTERFACE::NEXT_IDENTIFIER ) == INTERFACE::NEXT ) );
+	M_ENSURE( ( identifier_id( INTERFACE::VALUE ) == INTERFACE::VALUE_IDENTIFIER ) && ( identifier_name( INTERFACE::VALUE_IDENTIFIER ) == INTERFACE::VALUE ) );
+	M_ENSURE( ( identifier_id( INTERFACE::HASH ) == INTERFACE::HASH_IDENTIFIER ) && ( identifier_name( INTERFACE::HASH_IDENTIFIER ) == INTERFACE::HASH ) );
+	M_ENSURE( ( identifier_id( INTERFACE::EQUALS ) == INTERFACE::EQUALS_IDENTIFIER ) && ( identifier_name( INTERFACE::EQUALS_IDENTIFIER ) == INTERFACE::EQUALS ) );
+	M_ENSURE( ( identifier_id( INTERFACE::LESS ) == INTERFACE::LESS_IDENTIFIER ) && ( identifier_name( INTERFACE::LESS_IDENTIFIER ) == INTERFACE::LESS ) );
+	M_ENSURE( ( identifier_id( INTERFACE::GREATER ) == INTERFACE::GREATER_IDENTIFIER ) && ( identifier_name( INTERFACE::GREATER_IDENTIFIER ) == INTERFACE::GREATER ) );
+	M_ENSURE( ( identifier_id( INTERFACE::LESS_OR_EQUAL ) == INTERFACE::LESS_OR_EQUAL_IDENTIFIER ) && ( identifier_name( INTERFACE::LESS_OR_EQUAL_IDENTIFIER ) == INTERFACE::LESS_OR_EQUAL ) );
+	M_ENSURE( ( identifier_id( INTERFACE::GREATER_OR_EQUAL ) == INTERFACE::GREATER_OR_EQUAL_IDENTIFIER ) && ( identifier_name( INTERFACE::GREATER_OR_EQUAL_IDENTIFIER ) == INTERFACE::GREATER_OR_EQUAL ) );
+	M_ENSURE( ( identifier_id( INTERFACE::ADD ) == INTERFACE::ADD_IDENTIFIER ) && ( identifier_name( INTERFACE::ADD_IDENTIFIER ) == INTERFACE::ADD ) );
+	M_ENSURE( ( identifier_id( INTERFACE::SUBTRACT ) == INTERFACE::SUBTRACT_IDENTIFIER ) && ( identifier_name( INTERFACE::SUBTRACT_IDENTIFIER ) == INTERFACE::SUBTRACT ) );
+	M_ENSURE( ( identifier_id( INTERFACE::MULTIPLY ) == INTERFACE::MULTIPLY_IDENTIFIER ) && ( identifier_name( INTERFACE::MULTIPLY_IDENTIFIER ) == INTERFACE::MULTIPLY ) );
+	M_ENSURE( ( identifier_id( INTERFACE::DIVIDE ) == INTERFACE::DIVIDE_IDENTIFIER ) && ( identifier_name( INTERFACE::DIVIDE_IDENTIFIER ) == INTERFACE::DIVIDE ) );
+	M_ENSURE( ( identifier_id( INTERFACE::MODULO ) == INTERFACE::MODULO_IDENTIFIER ) && ( identifier_name( INTERFACE::MODULO_IDENTIFIER ) == INTERFACE::MODULO ) );
+	M_ENSURE( ( identifier_id( INTERFACE::POWER ) == INTERFACE::POWER_IDENTIFIER ) && ( identifier_name( INTERFACE::POWER_IDENTIFIER ) == INTERFACE::POWER ) );
+	M_ENSURE( ( identifier_id( INTERFACE::MODULUS ) == INTERFACE::MODULUS_IDENTIFIER ) && ( identifier_name( INTERFACE::MODULUS_IDENTIFIER ) == INTERFACE::MODULUS ) );
+	M_ENSURE( ( identifier_id( INTERFACE::NEGATE ) == INTERFACE::NEGATE_IDENTIFIER ) && ( identifier_name( INTERFACE::NEGATE_IDENTIFIER ) == INTERFACE::NEGATE ) );
+	M_ENSURE( ( identifier_id( INTERFACE::TO_STRING ) == INTERFACE::TO_STRING_IDENTIFIER ) && ( identifier_name( INTERFACE::TO_STRING_IDENTIFIER ) == INTERFACE::TO_STRING ) );
+	M_ENSURE( ( identifier_id( INTERFACE::TO_INTEGER ) == INTERFACE::TO_INTEGER_IDENTIFIER ) && ( identifier_name( INTERFACE::TO_INTEGER_IDENTIFIER ) == INTERFACE::TO_INTEGER ) );
+	M_ENSURE( ( identifier_id( INTERFACE::TO_REAL ) == INTERFACE::TO_REAL_IDENTIFIER ) && ( identifier_name( INTERFACE::TO_REAL_IDENTIFIER ) == INTERFACE::TO_REAL ) );
+	M_ENSURE( ( identifier_id( INTERFACE::TO_NUMBER ) == INTERFACE::TO_NUMBER_IDENTIFIER ) && ( identifier_name( INTERFACE::TO_NUMBER_IDENTIFIER ) == INTERFACE::TO_NUMBER ) );
+	M_ENSURE( ( identifier_id( INTERFACE::TO_CHARACTER ) == INTERFACE::TO_CHARACTER_IDENTIFIER ) && ( identifier_name( INTERFACE::TO_CHARACTER_IDENTIFIER ) == INTERFACE::TO_CHARACTER ) );
+	M_ENSURE( ( identifier_id( INTERFACE::TO_BOOLEAN ) == INTERFACE::TO_BOOLEAN_IDENTIFIER ) && ( identifier_name( INTERFACE::TO_BOOLEAN_IDENTIFIER ) == INTERFACE::TO_BOOLEAN ) );
+	M_ENSURE( ( identifier_id( _noneClass_.name() ) == TYPE_NONE_IDENTIFIER ) && ( identifier_name( TYPE_NONE_IDENTIFIER ) == _noneClass_.name() ) );
+	M_ENSURE( ( identifier_id( _observerClass_.name() ) == TYPE_OBSERVER_IDENTIFIER ) && ( identifier_name( TYPE_OBSERVER_IDENTIFIER ) == _observerClass_.name() ) );
+	M_ENSURE( ( identifier_id( _referenceClass_.name() ) == TYPE_REFERENCE_IDENTIFIER ) && ( identifier_name( TYPE_REFERENCE_IDENTIFIER ) == _referenceClass_.name() ) );
+	M_ENSURE( ( identifier_id( _functionReferenceClass_.name() ) == TYPE_FUNCTION_REFERENCE_IDENTIFIER ) && ( identifier_name( TYPE_FUNCTION_REFERENCE_IDENTIFIER ) == _functionReferenceClass_.name() ) );
+	M_ENSURE( ( identifier_id( _objectReferenceClass_.name() ) == TYPE_OBJECT_REFERENCE_IDENTIFIER ) && ( identifier_name( TYPE_OBJECT_REFERENCE_IDENTIFIER ) == _objectReferenceClass_.name() ) );
+	M_ENSURE( ( identifier_id( _methodClass_.name() ) == TYPE_METHOD_IDENTIFIER ) && ( identifier_name( TYPE_METHOD_IDENTIFIER ) == _methodClass_.name() ) );
+	M_ENSURE( ( identifier_id( _boundMethodClass_.name() ) == TYPE_BOUND_METHOD_IDENTIFIER ) && ( identifier_name( TYPE_BOUND_METHOD_IDENTIFIER ) == _boundMethodClass_.name() ) );
+	M_ENSURE( ( identifier_id( _variadicParametersClass_.name() ) == TYPE_VARIADIC_PARAMETERS_IDENTIFIER ) && ( identifier_name( TYPE_VARIADIC_PARAMETERS_IDENTIFIER ) == _variadicParametersClass_.name() ) );
+	M_ENSURE( ( identifier_id( _namedParametersClass_.name() ) == TYPE_NAMED_PARAMETERS_IDENTIFIER ) && ( identifier_name( TYPE_NAMED_PARAMETERS_IDENTIFIER ) == _namedParametersClass_.name() ) );
+	M_ENSURE( ( identifier_id( _unknownClass_.name() ) == TYPE_UNKNOWN_IDENTIFIER ) && ( identifier_name( TYPE_UNKNOWN_IDENTIFIER ) == _unknownClass_.name() ) );
+	M_ENSURE( ( identifier_id( STANDARD_FUNCTIONS::MAIN ) == STANDARD_FUNCTIONS::MAIN_IDENTIFIER ) && ( identifier_name( STANDARD_FUNCTIONS::MAIN_IDENTIFIER ) == STANDARD_FUNCTIONS::MAIN ) );
 	register_builtin_function( type_name( HHuginn::TYPE::INTEGER ), hcore::call( &huginn_builtin::integer, _1, _2, _3, _4 ), "( *val* ) - convert *val* value to `integer` type" );
 	register_builtin_function( type_name( HHuginn::TYPE::REAL ), hcore::call( &huginn_builtin::real, _1, _2, _3, _4 ), "( *val* ) - convert *val* value to `real`" );
 	register_builtin_function( type_name( HHuginn::TYPE::STRING ), hcore::call( &huginn_builtin::string, _1, _2, _3, _4 ), "( *val* ) - convert *val* value to `string`" );
