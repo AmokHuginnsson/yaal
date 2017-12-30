@@ -287,7 +287,8 @@ OCompiler::OCompiler( HRuntime* runtime_ )
 	, _isModule( false )
 	, _fileId( INVALID_FILE_ID )
 	, _isIncremental( false )
-	, _mainStatementCount( 0 )
+	, _mainExecutedStatementCount( 0 )
+	, _mainCompiledStatementCount( 0 )
 	, _runtime( runtime_ ) {
 	return;
 }
@@ -296,7 +297,8 @@ void OCompiler::reset( int undoSteps_ ) {
 	M_PROLOG
 	_fileId = INVALID_FILE_ID;
 	_isModule = false;
-	_mainStatementCount -= undoSteps_;
+	_mainCompiledStatementCount -= undoSteps_;
+	_mainExecutedStatementCount = _mainCompiledStatementCount;
 	_isIncremental = true;
 	_scopeContextCache.clear();
 	_statementIdGenerator = INVALID_STATEMENT_IDENTIFIER;
@@ -879,10 +881,10 @@ OCompiler::function_info_t OCompiler::create_function_low( executing_parser::pos
 	HHuginn::scope_t scope( pop_scope_context() );
 	bool isIncrementalMain( _isIncremental && ( fc._functionIdentifier == STANDARD_FUNCTIONS::MAIN_IDENTIFIER ) && ! _classContext );
 	if ( isIncrementalMain ) {
-		for ( int i( _mainStatementCount ); i > 0; -- i ) {
+		for ( int i( _mainExecutedStatementCount ); i > 0; -- i ) {
 			scope->remove_statement( i - 1 );
 		}
-		_mainStatementCount += scope->statement_count();
+		_mainCompiledStatementCount += scope->statement_count();
 	}
 	HHuginn::function_t fun(
 		_introspector

@@ -509,7 +509,7 @@ bool HHuginn::compile( paths_t const& paths_, compiler_setup_t compilerSetup_, H
 		compilerSetup_ |= COMPILER::BE_STRICT;
 	}
 	bool ok( false );
-	int mainStatementCount( _compiler->_mainStatementCount );
+	int mainStatementCount( _compiler->_mainCompiledStatementCount );
 	try {
 		_compiler->set_setup( compilerSetup_, introspector_ );
 		_engine.execute( &( _compiler->_classNoter ) );
@@ -519,7 +519,7 @@ bool HHuginn::compile( paths_t const& paths_, compiler_setup_t compilerSetup_, H
 		_state = STATE::COMPILED;
 		ok = true;
 	} catch ( HHuginnRuntimeException const& e ) {
-		_compiler->_mainStatementCount = mainStatementCount;
+		_compiler->_mainCompiledStatementCount = mainStatementCount;
 		_errorMessage = e.message();
 		_errorPosition = e.position();
 		_errorFileId = e.file_id();
@@ -540,8 +540,10 @@ bool HHuginn::execute( void ) {
 	bool ok( false );
 	try {
 		_runtime->execute();
+		_compiler->_mainExecutedStatementCount = _compiler->_mainCompiledStatementCount;
 		ok = true;
 	} catch ( HHuginnRuntimeException const& e ) {
+		_compiler->_mainCompiledStatementCount = _compiler->_mainExecutedStatementCount;
 		_errorMessage = e.message();
 		_errorPosition = e.position();
 		_errorFileId = e.file_id();

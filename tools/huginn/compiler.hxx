@@ -431,9 +431,12 @@ struct OCompiler {
 	 * In incremental mode redefinitions override original definitions.
 	 */
 	bool _isIncremental;
-	/*! \brief Statement count in previous invarnation of `main()' loop.
+	/*! \brief Statement count in successfully executed previous incarnation of `main()' loop.
 	 */
-	int _mainStatementCount;
+	int _mainExecutedStatementCount;
+	/*! \brief Statement count in successfully compiled previous incarnation of `main()' loop.
+	 */
+	int _mainCompiledStatementCount;
 	HRuntime* _runtime;
 	OCompiler( HRuntime* );
 	void reset( int );
