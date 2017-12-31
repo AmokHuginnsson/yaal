@@ -445,12 +445,12 @@ void HExpression::get_field(  OExecutionStep const& executionStep_,huginn::HFram
 		if ( fi < 0 ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"`"_ys
-				.append( v->get_class()->name() )
-				.append( "' does not have `" )
-				.append( rt.identifier_name( executionStep_._identifierId ) )
-				.append( "' member (did you mean `" )
-				.append( rt.suggestion( v->get_class(), executionStep_._identifierId ) )
-				.append( "'?)." ),
+					.append( v->get_class()->name() )
+					.append( "' does not have `" )
+					.append( rt.identifier_name( executionStep_._identifierId ) )
+					.append( "' member (did you mean `" )
+					.append( rt.suggestion( v->get_class(), executionStep_._identifierId ) )
+					.append( "'?)." ),
 				file_id(),
 				p
 			);
@@ -468,24 +468,24 @@ void HExpression::get_field(  OExecutionStep const& executionStep_,huginn::HFram
 			throw HHuginn::HHuginnRuntimeException( "Assignment to temporary.", file_id(), p );
 		}
 	} else if ( ( oref = dynamic_cast<HHuginn::HObjectReference*>( v.raw() ) ) != nullptr ) { /* Handle `super' keyword. */
+		if ( executionStep_._access == HFrame::ACCESS::REFERENCE ) {
+			throw HHuginn::HHuginnRuntimeException( "Changing upcasted reference.", file_id(), p );
+		}
 		int fi( oref->field_index( executionStep_._identifierId ) );
-		if ( fi < 0 ) {
+		if ( fi >= 0 ) {
+			frame_->values().push( oref->field( t, fi, p ) );
+		} else {
 			throw HHuginn::HHuginnRuntimeException(
 				"`"_ys
-				.append( oref->get_class()->name() )
-				.append( "' does not have `" )
-				.append( rt.identifier_name( executionStep_._identifierId ) )
-				.append( "' member (did you mean `" )
-				.append( rt.suggestion( executionStep_._identifierId ) )
-				.append( "'?)." ),
+					.append( oref->reference_class()->name() )
+					.append( "' does not have `" )
+					.append( rt.identifier_name( executionStep_._identifierId ) )
+					.append( "' member (did you mean `" )
+					.append( rt.suggestion( executionStep_._identifierId ) )
+					.append( "'?)." ),
 				file_id(),
 				p
 			);
-		}
-		if ( executionStep_._access == HFrame::ACCESS::VALUE ) {
-			frame_->values().push( oref->field( t, fi, p ) );
-		} else {
-			throw HHuginn::HHuginnRuntimeException( "Changing upcasted reference.", file_id(), p );
 		}
 	} else {
 		HString const* n( &v->get_class()->name() );

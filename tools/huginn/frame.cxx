@@ -232,7 +232,7 @@ HHuginn::value_t HFrame::get_super( int position_ ) {
 	M_PROLOG
 	HHuginn::value_t* obj( object() );
 	M_ASSERT( obj && !! *obj );
-	return ( _thread->runtime().object_factory()->create<HHuginn::HObjectReference>( *obj, _upCast, true, file_id(), position_ ) );
+	return ( _thread->runtime().object_factory()->create<HHuginn::HObjectReference>( *obj, _upCast, file_id(), position_ ) );
 	M_EPILOG
 }
 

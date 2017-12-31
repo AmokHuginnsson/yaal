@@ -50,17 +50,27 @@ HHuginn::HClass::HClass(
 	HClass const* super_,
 	field_definitions_t const& fieldDefinitions_,
 	yaal::hcore::HString const& doc_,
+	TYPE type_,
 	HClass const* origin_,
 	create_instance_t createInstance_
 ) : _typeId( typeId_ )
 	, _identifierId( identifierId_ )
 	, _super( nullptr )
-	, _createInstance( createInstance_ ? createInstance_ : &HClass::create_instance_default )
+	, _createInstance(
+		createInstance_
+			? createInstance_
+			: (
+				super_ && ( super_->_type == TYPE::BUILTIN ) && ( type_ == TYPE::USER )
+					? &HClass::create_instance_default
+					: &HClass::create_instance_default
+			)
+	)
 	, _fieldIdentifiers()
 	, _fieldIndexes()
 	, _fieldDefinitions()
 	, _fieldDescriptions()
 	, _doc( doc_ )
+	, _type( type_ )
 	, _origin( origin_ )
 	, _runtime( runtime_ ) {
 	M_PROLOG
@@ -82,11 +92,27 @@ HHuginn::HClass::HClass(
 	, _fieldDefinitions()
 	, _fieldDescriptions()
 	, _doc( doc_ )
+	, _type( TYPE::BUILTIN )
 	, _origin( nullptr )
 	, _runtime( nullptr ) {
 	M_PROLOG
 	return;
 	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::HClass::base_class_not_initialized( huginn::HThread* thread_, value_t*, values_t&, int position_ ) const {
+	throw HHuginn::HHuginnRuntimeException(
+		"Base class `"_ys
+			.append( _super->name() )
+			.append( "' is not initialized." )
+		,
+		thread_->current_frame()->file_id(),
+		position_
+	);
+}
+
+bool HHuginn::HClass::has_builtin_base( void ) const {
+	return ( _super && ( _super->_type == TYPE::BUILTIN ) && ( _type == TYPE::USER ) );
 }
 
 void HHuginn::HClass::redefine( HClass const* super_, field_definitions_t const& fieldDefinitions_ ) {
@@ -96,6 +122,16 @@ void HHuginn::HClass::redefine( HClass const* super_, field_definitions_t const&
 	_fieldIndexes = ( _super ? _super->_fieldIndexes : field_indexes_t() );
 	_fieldDefinitions = ( _super ? _super->_fieldDefinitions : values_t() );
 	_fieldDescriptions = ( _super ? _super->_fieldDescriptions : field_descriptions_t() );
+	if ( has_builtin_base() ) {
+		for ( HHuginn::value_t& v : _fieldDefinitions ) {
+			v = _runtime->object_factory()->create_method(
+				hcore::call(
+					&HHuginn::HClass::base_class_not_initialized,
+					this, _1, _2, _3, _4
+				)
+			);
+		}
+	}
 	for ( field_definitions_t::value_type const& fd : fieldDefinitions_ ) {
 		add_member( fd );
 	}

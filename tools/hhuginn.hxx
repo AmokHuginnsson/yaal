@@ -453,6 +453,10 @@ public:
 
 class HHuginn::HClass {
 public:
+	enum class TYPE {
+		BUILTIN,
+		USER
+	};
 	typedef HHuginn::HClass this_type;
 	typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, int> field_indexes_t;
 	typedef value_t ( *create_instance_t )( HClass const*, huginn::HThread*, values_t&, int );
@@ -468,10 +472,11 @@ private:
 	values_t _fieldDefinitions;
 	field_descriptions_t _fieldDescriptions;
 	yaal::hcore::HString _doc;
+	TYPE _type;
 	HClass const* _origin;
 	huginn::HRuntime* _runtime;
 public:
-	HClass( huginn::HRuntime*, type_id_t, identifier_id_t, HClass const*, field_definitions_t const&, yaal::hcore::HString const&, HClass const* = nullptr, create_instance_t = nullptr );
+	HClass( huginn::HRuntime*, type_id_t, identifier_id_t, HClass const*, field_definitions_t const&, yaal::hcore::HString const&, TYPE = TYPE::BUILTIN, HClass const* = nullptr, create_instance_t = nullptr );
 	HClass( HHuginn::TYPE, HHuginn::identifier_id_t, yaal::hcore::HString const& );
 	virtual ~HClass( void ) {
 	}
@@ -509,6 +514,7 @@ public:
 	bool is_overridden( HClass const* super_, int index_ ) const {
 		return ( _fieldDefinitions[index_] != super_->_fieldDefinitions[index_] );
 	}
+	bool has_builtin_base( void ) const;
 	void update_runtime( huginn::HRuntime* );
 	void set_origin( HClass const* );
 	huginn::HRuntime* runtime( void ) const {
@@ -516,11 +522,12 @@ public:
 	}
 	static value_t create_instance_default( HClass const*, huginn::HThread*, values_t&, int );
 	value_t create_instance( huginn::HThread*, value_t*, values_t&, int ) const;
-	value_t access_violation( huginn::HThread*, value_t*, values_t&, int ) const __attribute__((noreturn));
 	yaal::hcore::HString const& doc( void ) const;
 	yaal::hcore::HString const& doc( identifier_id_t ) const;
 	void finalize_registration( huginn::HRuntime* );
 private:
+	value_t access_violation( huginn::HThread*, value_t*, values_t&, int ) const __attribute__((noreturn));
+	value_t base_class_not_initialized( huginn::HThread*, value_t*, values_t&, int ) const __attribute__((noreturn));
 	virtual void do_finalize_registration( huginn::HRuntime* );
 	virtual value_t do_create_instance( huginn::HThread*, values_t&, int ) const;
 	HClass( HClass const& ) = delete;
@@ -617,13 +624,16 @@ public:
 	typedef HHuginn::HObjectReference this_type;
 	typedef HHuginn::HValue base_type;
 private:
-	value_t _object;
-	HClass const* _class;
+	value_t _value;
+	HClass const* _referenceClass;
 public:
-	HObjectReference( value_t const&, int, bool, int, int );
+	HObjectReference( value_t const&, int, int, int );
 	HObjectReference( value_t const&, HClass const* );
 	int field_index( identifier_id_t ) const;
 	value_t field( huginn::HThread*, int, int );
+	HHuginn::HClass const* reference_class( void ) const {
+		return ( _referenceClass );
+	}
 private:
 	HObjectReference( HObjectReference const& ) = delete;
 	HObjectReference& operator = ( HObjectReference const& ) = delete;

@@ -946,11 +946,15 @@ void OCompiler::track_name_cycle( HHuginn::identifier_id_t identifierId_ ) {
 	while ( cc->_baseName != INVALID_IDENTIFIER ) {
 		submitted_classes_t::const_iterator it( _submittedClasses.find( cc->_baseName ) );
 		if ( it == _submittedClasses.end() ) {
-			throw HHuginn::HHuginnRuntimeException(
-				"Base class `"_ys.append( _runtime->identifier_name( cc->_baseName ) ).append( "' was not defined." ),
-				MAIN_FILE_ID,
-				cc->_basePosition.get()
-			);
+			if ( ! _runtime->get_class( cc->_baseName ) ) {
+				throw HHuginn::HHuginnRuntimeException(
+					"Base class `"_ys.append( _runtime->identifier_name( cc->_baseName ) ).append( "' was not defined." ),
+					MAIN_FILE_ID,
+					cc->_basePosition.get()
+				);
+			} else {
+				break;
+			}
 		}
 		hierarchy.push_back( cc->_baseName );
 		if ( ! names.insert( cc->_baseName ).second ) {

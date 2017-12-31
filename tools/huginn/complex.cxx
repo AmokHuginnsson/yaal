@@ -240,6 +240,7 @@ HHuginn::class_t HComplex::get_class( HRuntime* runtime_, HHuginn::HClass const*
 				{ "to_string", runtime_->object_factory()->create_method( hcore::call( &HComplex::to_string, _1, _2, _3, _4 ) ), "get string representation of this `Complex` number" }
 			},
 			"The `Complex` class provides mathematical concept of complex numbers. It supports operations of addition, multiplication, subtraction, division, modulus and argument.",
+			HHuginn::HClass::TYPE::BUILTIN,
 			origin_,
 			&HComplex::create_instance
 		)

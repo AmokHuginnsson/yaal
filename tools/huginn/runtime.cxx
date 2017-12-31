@@ -370,6 +370,7 @@ HHuginn::class_t HRuntime::create_class(
 	HHuginn::HClass const* base_,
 	field_definitions_t const& fieldDefinitions_,
 	yaal::hcore::HString const& doc_,
+	HHuginn::HClass::TYPE type_,
 	HHuginn::HClass const* origin_,
 	HHuginn::HClass::create_instance_t createInstance_
 ) {
@@ -382,6 +383,7 @@ HHuginn::class_t HRuntime::create_class(
 			base_,
 			fieldDefinitions_,
 			doc_,
+			type_,
 			origin_,
 			createInstance_
 		)
@@ -396,12 +398,13 @@ HHuginn::class_t HRuntime::create_class(
 	HHuginn::HClass const* base_,
 	field_definitions_t const& fieldDefinitions_,
 	yaal::hcore::HString const& doc_,
+	HHuginn::HClass::TYPE type_,
 	HHuginn::HClass const* origin_,
 	HHuginn::HClass::create_instance_t createInstance_
 ) {
 	M_PROLOG
 	return (
-		create_class( identifier_id( name_ ), base_, fieldDefinitions_, doc_, origin_, createInstance_ )
+		create_class( identifier_id( name_ ), base_, fieldDefinitions_, doc_, type_, origin_, createInstance_ )
 	);
 	M_EPILOG
 }

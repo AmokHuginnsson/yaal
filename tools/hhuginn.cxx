@@ -198,15 +198,15 @@ void HIntrospectorInterface::introspect( yaal::tools::HIntrospecteeInterface& in
 	M_EPILOG
 }
 
-HHuginn::HObjectReference::HObjectReference( value_t const& value_, int upCastLevel_, bool upCast_, int fileId_, int position_ )
+HHuginn::HObjectReference::HObjectReference( value_t const& value_, int upCastLevel_, int fileId_, int position_ )
 	: HValue( &_objectReferenceClass_ )
-	, _object( value_ )
-	, _class( nullptr ) {
+	, _value( value_ )
+	, _referenceClass( nullptr ) {
 	M_PROLOG
-	HObject const* o( dynamic_cast<HObject const*>( _object.raw() ) );
+	HObject const* o( dynamic_cast<HObject const*>( _value.raw() ) );
 	M_ASSERT( o );
 	HClass const* c( o->get_class() );
-	for ( int i( 0 ); i < ( upCastLevel_ + ( upCast_ ? 1 : 0 ) ); ++ i ) {
+	for ( int i( 0 ); i < ( upCastLevel_ + 1 ); ++ i ) {
 		HClass const* s( c->super() );
 		if ( ! s ) {
 			throw HHuginnRuntimeException(
@@ -217,15 +217,15 @@ HHuginn::HObjectReference::HObjectReference( value_t const& value_, int upCastLe
 		}
 		c = s;
 	}
-	_class = c;
+	_referenceClass = c;
 	return;
 	M_EPILOG
 }
 
 HHuginn::HObjectReference::HObjectReference( value_t const& value_, HClass const* class_ )
 	: HValue( &_objectReferenceClass_ )
-	, _object( value_ )
-	, _class( class_ ) {
+	, _value( value_ )
+	, _referenceClass( class_ ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -233,24 +233,24 @@ HHuginn::HObjectReference::HObjectReference( value_t const& value_, HClass const
 
 int HHuginn::HObjectReference::field_index( identifier_id_t identifierId_ ) const {
 	M_PROLOG
-	HObject const* o( static_cast<HObject const*>( _object.raw() ) );
-	return ( _class != o->get_class() ? _class->field_index( identifierId_ ) : o->field_index( identifierId_ ) );
+	HValue const* v( _value.raw() );
+	return ( _referenceClass != v->get_class() ? _referenceClass->field_index( identifierId_ ) : v->field_index( identifierId_ ) );
 	M_EPILOG
 }
 
 HHuginn::value_t HHuginn::HObjectReference::field( huginn::HThread* thread_, int index_, int position_ ) {
 	M_PROLOG
-	HObject* o( static_cast<HObject*>( _object.raw() ) );
+	HObject* o( static_cast<HObject*>( _value.raw() ) );
 	value_t v;
-	if ( o->get_class()->is_overridden( _class, index_ ) ) {
-		v = _class->get_default( thread_, index_, position_ );
+	if ( o->get_class()->is_overridden( _referenceClass, index_ ) ) {
+		v = _referenceClass->get_default( thread_, index_, position_ );
 	} else {
 		v = o->field_ref( index_ );
 	}
 	if ( v->type_id() == TYPE::METHOD ) {
-		v = _class->runtime()->object_factory()->create_bound_method(
+		v = _referenceClass->runtime()->object_factory()->create_bound_method(
 			static_cast<HClass::HMethod*>( v.raw() )->function(),
-			_object
+			_value
 		);
 	}
 	return ( v );
@@ -259,7 +259,7 @@ HHuginn::value_t HHuginn::HObjectReference::field( huginn::HThread* thread_, int
 
 HHuginn::value_t HHuginn::HObjectReference::do_clone( huginn::HThread* thread_, HHuginn::value_t* object_, int position_ ) const {
 	M_PROLOG
-	return ( thread_->object_factory().create<HObjectReference>( _object->clone( thread_, object_, position_ ), _class ) );
+	return ( thread_->object_factory().create<HObjectReference>( _value->clone( thread_, object_, position_ ), _referenceClass ) );
 	M_EPILOG
 }
 
@@ -421,7 +421,8 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 		}
 		HClass const* super( nullptr );
 		if ( cc->_baseName != INVALID_IDENTIFIER ) {
-			super = commit_class( cc->_baseName );
+			HHuginn::class_t c( _runtime->get_class( cc->_baseName ) );
+			super = ! c ? commit_class( cc->_baseName ) : c.raw();
 		}
 		field_definitions_t fieldDefinitions;
 		huginn::HThread t( _runtime.raw(), hcore::HThread::get_current_thread_id() );
@@ -440,7 +441,7 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 		}
 		t.pop_frame();
 		if ( ! cls ) {
-			cls = _runtime->create_class( identifierId_, super, fieldDefinitions, cc->_doc ? *cc->_doc : "" );
+			cls = _runtime->create_class( identifierId_, super, fieldDefinitions, cc->_doc ? *cc->_doc : "", HClass::TYPE::USER );
 			_runtime->register_class( cls, ACCESS::PUBLIC, VISIBILITY::GLOBAL );
 		} else {
 			cls->redefine( super, fieldDefinitions );

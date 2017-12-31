@@ -194,6 +194,7 @@ public:
 		HHuginn::HClass const*,
 		field_definitions_t const&,
 		yaal::hcore::HString const&,
+		HHuginn::HClass::TYPE = HHuginn::HClass::TYPE::BUILTIN,
 		HHuginn::HClass const* = nullptr,
 		HHuginn::HClass::create_instance_t = nullptr
 	);
@@ -202,6 +203,7 @@ public:
 		HHuginn::HClass const*,
 		field_definitions_t const&,
 		yaal::hcore::HString const&,
+		HHuginn::HClass::TYPE = HHuginn::HClass::TYPE::BUILTIN,
 		HHuginn::HClass const* = nullptr,
 		HHuginn::HClass::create_instance_t = nullptr
 	);
