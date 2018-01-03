@@ -43,9 +43,10 @@ namespace yaal {
 namespace tools {
 
 namespace {
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 static void const* const FWD_MAP_FAILED = MAP_FAILED;
-#pragma GCC diagnostic error "-Wold-style-cast"
+#pragma GCC diagnostic pop
 }
 
 HMemoryMappedFile::HMemoryMappedFile( yaal::hcore::HString const& path_, int long size_ )

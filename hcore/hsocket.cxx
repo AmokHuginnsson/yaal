@@ -315,6 +315,7 @@ void HSocket::connect( yaal::hcore::HString const& address_, int port_ ) {
 }
 
 namespace {
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 #pragma GCC diagnostic ignored "-Wsign-conversion"
 template<typename T>
@@ -329,8 +330,7 @@ template<typename T>
 inline T fwd_ntohs( T arg_ ) {
 	return ( ntohs( arg_ ) );
 }
-#pragma GCC diagnostic error "-Wsign-conversion"
-#pragma GCC diagnostic error "-Wold-style-cast"
+#pragma GCC diagnostic pop
 }
 
 void HSocket::make_address( yaal::hcore::HString const& address_, int port_ ) {

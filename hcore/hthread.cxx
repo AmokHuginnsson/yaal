@@ -202,6 +202,7 @@ void HThread::CLEANUP( void* ) {
  * and this macro uses old-style-casts.
  */
 #ifdef __HOST_OS_TYPE_SOLARIS__
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 #endif /* #ifdef __HOST_OS_TYPE_SOLARIS__ */
 void HThread::control( void ) {
@@ -226,7 +227,7 @@ void HThread::control( void ) {
 	M_EPILOG
 }
 #ifdef __HOST_OS_TYPE_SOLARIS__
-#pragma GCC diagnostic error "-Wold-style-cast"
+#pragma GCC diagnostic pop
 #endif /* #ifdef __HOST_OS_TYPE_SOLARIS__ */
 
 bool HThread::is_alive( void ) const {
@@ -462,9 +463,10 @@ HCondition::~HCondition( void ) {
 }
 
 namespace {
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 static int const FWD_CLOCK_REALTIME = CLOCK_REALTIME;
-#pragma GCC diagnostic error "-Wold-style-cast"
+#pragma GCC diagnostic pop
 }
 
 /*

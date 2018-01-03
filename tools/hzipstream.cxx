@@ -113,6 +113,7 @@ void HZipStream::cleanup( void ) {
 }
 
 namespace {
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 template<typename T>
 inline int fwd_inflateInit( T arg_ ) {
@@ -122,7 +123,7 @@ template<typename T1, typename T2>
 inline int fwd_deflateInit( T1 arg1_, T2 arg2_ ) {
 	return ( deflateInit( arg1_, arg2_ ) );
 }
-#pragma GCC diagnostic error "-Wold-style-cast"
+#pragma GCC diagnostic pop
 }
 
 void HZipStream::init( void ) {

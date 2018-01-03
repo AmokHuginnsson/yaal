@@ -123,10 +123,11 @@ public:
 template<typename T, POOL_TYPE const = POOL_TYPE::SCALAR>
 class HObjectPool;
 
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Weffc++"
 template<typename T>
 class HObjectPool<T, POOL_TYPE::SCALAR> : public HObjectPoolBase<T> {
-#pragma GCC diagnostic error "-Weffc++"
+#pragma GCC diagnostic pop
 	HHuginn::HClass const* _class;
 public:
 	typedef HObjectPoolBase<T> base_type;
@@ -145,10 +146,11 @@ private:
 	HObjectPool& operator = ( HObjectPool const& ) = delete;
 };
 
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Weffc++"
 template<typename T>
 class HObjectPool<T, POOL_TYPE::COLLECTION> : public HObjectPoolBase<T> {
-#pragma GCC diagnostic error "-Weffc++"
+#pragma GCC diagnostic pop
 	HHuginn::HClass const* _class;
 	typename T::pool_t _nodePool;
 	typename T::allocator_t _nodeAllocator;
@@ -171,10 +173,11 @@ private:
 	HObjectPool& operator = ( HObjectPool const& ) = delete;
 };
 
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Weffc++"
 template<typename T>
 class HObjectPool<T, POOL_TYPE::CLASSLESS> : public HObjectPoolBase<T> {
-#pragma GCC diagnostic error "-Weffc++"
+#pragma GCC diagnostic pop
 public:
 	typedef HObjectPoolBase<T> base_type;
 	typedef typename base_type::allocator_t allocator_t;

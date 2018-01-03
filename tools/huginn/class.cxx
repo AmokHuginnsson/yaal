@@ -100,6 +100,11 @@ HHuginn::HClass::HClass(
 	M_EPILOG
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wsuggest-attribute=noreturn"
 HHuginn::value_t HHuginn::HClass::base_class_not_initialized( huginn::HThread* thread_, value_t*, values_t&, int position_ ) const {
 	throw HHuginn::HHuginnRuntimeException(
 		"Base class `"_ys
@@ -110,6 +115,7 @@ HHuginn::value_t HHuginn::HClass::base_class_not_initialized( huginn::HThread* t
 		position_
 	);
 }
+#pragma GCC diagnostic pop
 
 bool HHuginn::HClass::has_builtin_base( void ) const {
 	return ( _super && ( _super->_type == TYPE::BUILTIN ) && ( _type == TYPE::USER ) );

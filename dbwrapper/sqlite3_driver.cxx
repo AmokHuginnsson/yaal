@@ -264,9 +264,10 @@ M_EXPORT_SYMBOL void* db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 	return ( yaal_db_query( dbLink_, query_ ) );
 }
 
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 sqlite3_destructor_type SQLITE_STATIC_FWD{ SQLITE_STATIC };
-#pragma GCC diagnostic error "-Wold-style-cast"
+#pragma GCC diagnostic pop
 
 M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HUTF8String const& );
 M_EXPORT_SYMBOL void query_bind( ODBLink&, void* data_, int argNo_, yaal::hcore::HUTF8String const& value_ ) {

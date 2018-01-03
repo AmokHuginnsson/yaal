@@ -40,12 +40,13 @@ namespace tls {
 STATIC_ASSERT( sizeof ( key_t ) >= sizeof ( pthread_key_t ) );
 
 namespace {
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 template<typename to_t, typename from_t>
 inline to_t old_style_cast( from_t val_ ) {
 	return ( (to_t)val_ );
 }
-#pragma GCC diagnostic error "-Wold-style-cast"
+#pragma GCC diagnostic pop
 }
 
 key_t create( destruct_t destruct_ ) {

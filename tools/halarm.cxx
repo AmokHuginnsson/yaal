@@ -45,14 +45,16 @@ namespace tools {
 static_assert( sizeof ( timer_t ) <= sizeof ( HAlarm::timer_handle_t ), "timer handle too big" );
 
 namespace {
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 static int const FWD_CLOCK_REALTIME = CLOCK_REALTIME;
-#pragma GCC diagnostic error "-Wold-style-cast"
+#pragma GCC diagnostic pop
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-conversion"
 int sigaddset_fwd( sigset_t* set, int signo ) {
 	return ( sigaddset( set, signo ) );
 }
-#pragma GCC diagnostic error "-Wsign-conversion"
+#pragma GCC diagnostic pop
 
 static void dummy_signal_handler( int )
 	{ }

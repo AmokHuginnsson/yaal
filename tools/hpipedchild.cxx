@@ -93,6 +93,7 @@ HPipedChild::~HPipedChild( void ) {
 }
 
 namespace {
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 template<typename T>
 inline bool FWD_WIFEXITED( T val_ ) {
@@ -110,7 +111,7 @@ template<typename T>
 inline int FWD_WTERMSIG( T val_ ) {
 	return ( WTERMSIG( val_ ) );
 }
-#pragma GCC diagnostic error "-Wold-style-cast"
+#pragma GCC diagnostic pop
 }
 
 HPipedChild::STATUS HPipedChild::finish( int finishIn_ ) {

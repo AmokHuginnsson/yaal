@@ -105,9 +105,10 @@ int hunt_tty( int offset_ ) {
 int _mouse_ = 0;
 
 namespace {
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 static int long unsigned const FWD_CONS_MOUSECTL = CONS_MOUSECTL;
-#pragma GCC diagnostic error "-Wold-style-cast"
+#pragma GCC diagnostic pop
 }
 
 int console_mouse_open( void ) {

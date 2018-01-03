@@ -240,9 +240,10 @@ void init_locale( char const* package_ ) {
 
 namespace {
 
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 static i64_t const FWD_RLIM_INFINITY = static_cast<i64_t>( RLIM_INFINITY );
-#pragma GCC diagnostic error "-Wold-style-cast"
+#pragma GCC diagnostic pop
 
 static char const YAAL_AUTO_SANITY_ENV[] = "YAAL_AUTO_SANITY";
 static char const SYSCALL_FAILURE[] = "syscall failure - bailing out";

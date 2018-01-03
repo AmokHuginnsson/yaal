@@ -148,9 +148,10 @@ int bio_read( BIO* bio_, char* buf_, int size_ ) {
 int bio_write( BIO* bio_, char const* buf_, int size_ ) {
 	M_PROLOG
 #ifdef HAVE_VALGRIND_MEMCHECK_H
+#pragma GCC diagnostic push
 #	pragma GCC diagnostic ignored "-Wold-style-cast"
 	VALGRIND_MAKE_MEM_DEFINED( buf_, size_ );
-#	pragma GCC diagnostic error "-Wold-style-cast"
+#pragma GCC diagnostic pop
 #endif /* #ifdef HAVE_VALGRIND_MEMCHECK_H */
 	int nWritten( static_cast<int>( ::write( static_cast<int>( reinterpret_cast<int long>( BIO_get_data( bio_ ) ) ), buf_, static_cast<size_t>( size_ ) ) ) );
 	if ( ( nWritten < 0 ) && ( errno == EAGAIN ) ) {
@@ -449,9 +450,10 @@ int long HOpenSSL::read( void* buffer_, int long size_ ) {
 		nRead = SSL_read( static_cast<SSL*>( _ssl ), buffer_, static_cast<int>( size_ ) );
 #ifdef HAVE_VALGRIND_MEMCHECK_H
 		if ( nRead > 0 ) {
+#pragma GCC diagnostic push
 #	pragma GCC diagnostic ignored "-Wold-style-cast"
 			VALGRIND_MAKE_MEM_DEFINED( buffer_, nRead );
-#	pragma GCC diagnostic error "-Wold-style-cast"
+#pragma GCC diagnostic pop
 		}
 #endif /* #ifdef HAVE_VALGRIND_MEMCHECK_H */
 		if ( nRead <= 0 ) {

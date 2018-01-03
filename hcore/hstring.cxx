@@ -924,6 +924,7 @@ char const* err_msg( int no_ ) {
 }
 
 #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002
+#pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Weffc++"
 #endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002 */
 
@@ -1313,7 +1314,7 @@ HString::HString( void const* ptrVoid_ )
 }
 
 #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002
-# pragma GCC diagnostic error "-Weffc++"
+#pragma GCC diagnostic pop
 #endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002 */
 
 HString& HString::operator = ( HString const& string_ ) {

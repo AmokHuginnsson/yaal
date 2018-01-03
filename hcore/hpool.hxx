@@ -69,7 +69,9 @@ private:
 		int _index; /*!< This block index in HPool<>. */
 	public:
 #pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wlarger-than="
 		HPoolBlock( int index_ )
 			: _mem()
@@ -146,9 +148,10 @@ public:
 	void free( void* p ) {
 		/* Find HPoolBlock that holds this object memory. */
 		int offset( *( static_cast<u8_t*>( p ) + OBJECT_SPACE - 1 ) );
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wcast-align"
 		HPoolBlock* pb( reinterpret_cast<HPoolBlock*>( static_cast<u8_t*>( p ) - offset * OBJECT_SPACE ) );
-#pragma GCC diagnostic error "-Wcast-align"
+#pragma GCC diagnostic pop
 		bool wasFull( pb->is_full() );
 		if ( pb->free( p ) ) {
 			/* HPoolBlock is no longer used so we can possibly remove it. */

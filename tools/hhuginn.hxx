@@ -495,6 +495,9 @@ public:
 	type_id_t type_id( void ) const {
 		return ( _typeId );
 	}
+	TYPE type( void ) const {
+		return ( _type );
+	}
 	field_identifiers_t const& field_identifiers( void ) const {
 		return ( _fieldIdentifiers );
 	}
@@ -527,7 +530,7 @@ public:
 	void finalize_registration( huginn::HRuntime* );
 private:
 	value_t access_violation( huginn::HThread*, value_t*, values_t&, int ) const __attribute__((noreturn));
-	value_t base_class_not_initialized( huginn::HThread*, value_t*, values_t&, int ) const __attribute__((noreturn));
+	value_t base_class_not_initialized( huginn::HThread*, value_t*, values_t&, int ) const;
 	virtual void do_finalize_registration( huginn::HRuntime* );
 	virtual value_t do_create_instance( huginn::HThread*, values_t&, int ) const;
 	HClass( HClass const& ) = delete;
@@ -607,6 +610,8 @@ public:
 	HHuginn::value_t get_method( huginn::HThread*, HHuginn::value_t const&, HHuginn::identifier_id_t, int ) const;
 	HHuginn::value_t call_method( huginn::HThread*, HHuginn::value_t const&, yaal::hcore::HString const&, HHuginn::values_t&, int ) const;
 	HHuginn::value_t get_method( huginn::HThread*, HHuginn::value_t const&, yaal::hcore::HString const&, int ) const;
+	static HHuginn::value_t init_base( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+	static HHuginn::value_t forward_call( HHuginn::function_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 private:
 	HObject( HObject const& ) = delete;
 	HObject& operator = ( HObject const& ) = delete;
@@ -633,6 +638,9 @@ public:
 	value_t field( huginn::HThread*, int, int );
 	HHuginn::HClass const* reference_class( void ) const {
 		return ( _referenceClass );
+	}
+	HHuginn::value_t const& value( void ) {
+		return ( _value );
 	}
 private:
 	HObjectReference( HObjectReference const& ) = delete;

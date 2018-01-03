@@ -442,12 +442,13 @@ void HConsole::leave_curses( void ) {
 }
 
 namespace {
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-conversion"
 template <typename T>
 inline void fwd_wattrset( WINDOW* win_, T val_ ) {
 	static_cast<void>( wattrset( win_, val_ ) );
 }
-#pragma GCC diagnostic error "-Wsign-conversion"
+#pragma GCC diagnostic pop
 }
 
 void HConsole::set_attr( COLOR::color_t attr_ ) const {
@@ -799,12 +800,13 @@ int HConsole::kbhit( void ) const {
 }
 
 namespace {
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 template <typename T1, typename T2>
 inline void fwd_attr_get( WINDOW* win_, T1& val1_, T2& val2_, void* ) {
 	static_cast<void>( wattr_get( win_, val1_, val2_, nullptr ) ); /* Ugly macro */
 }
-#pragma GCC diagnostic error "-Wold-style-cast"
+#pragma GCC diagnostic pop
 }
 
 COLOR::color_t HConsole::get_attr( void ) const {

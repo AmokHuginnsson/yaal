@@ -89,11 +89,13 @@ int kill( int pid_, int signal_ ) {
 }
 
 namespace {
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 template<typename T1>
 inline void FWD_FD_ZERO( T1 val1_ ) {
 	FD_ZERO( val1_ );
 }
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-conversion"
 template<typename T1, typename T2>
 inline void FWD_FD_SET( T1 val1_, T2 val2_ ) {
@@ -103,11 +105,11 @@ template<typename T1, typename T2>
 inline bool FWD_FD_ISSET( T1 val1_, T2 val2_ ) {
 	return ( FD_ISSET( val1_, val2_ ) );
 }
-#pragma GCC diagnostic error "-Wsign-conversion"
+#pragma GCC diagnostic pop
 #ifdef __HOST_OS_TYPE_DARWIN__
 mach_msg_type_number_t HOST_VM_INFO_COUNT_FWD{ HOST_VM_INFO_COUNT };
 #endif /* #ifdef __HOST_OS_TYPE_DARWIN__ */
-#pragma GCC diagnostic error "-Wold-style-cast"
+#pragma GCC diagnostic pop
 }
 
 int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, int long* timeOut_, bool restartable_ ) {
@@ -192,9 +194,10 @@ yaal::hcore::HString get_host_name( void ) {
 }
 
 namespace {
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 static i64_t const FWD_RLIM_INFINITY = static_cast<i64_t>( RLIM_INFINITY );
-#pragma GCC diagnostic error "-Wold-style-cast"
+#pragma GCC diagnostic pop
 }
 
 HResourceInfo get_memory_size_info( void ) {

@@ -128,9 +128,10 @@ private:
 #endif /* #else #ifndef __sun__ */
 	/*! \brief True HSBBSTree contents.
 	 */
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Weffc++"
 	class HNode : public HSBBSTreeBase::HAbstractNode {
-#pragma GCC diagnostic error "-Weffc++"
+#pragma GCC diagnostic pop
 		key_value_type _key;
 		HNode( key_value_type const& key_ )
 			: HAbstractNode()

@@ -324,12 +324,13 @@ private:
  * makes no sense.
  */
 #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008005
+# pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Weffc++"
 #endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008005 */
 template<typename tType>
 class HPointerObserver final : public HPointerBase<tType> {
 #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008005
-# pragma GCC diagnostic error "-Weffc++"
+# pragma GCC diagnostic pop
 #endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008005 */
 public:
 	typedef HSharedBase<tType> shared_t;
@@ -405,12 +406,13 @@ public:
  * \tparam access_type_t - defines pointer kind, one of HPointerStrict or HPointerWeak.
  */
 #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008005
+# pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Weffc++"
 #endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008005 */
 template<typename tType>
 class HPointer final : public HPointerBase<tType> {
 #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008005
-# pragma GCC diagnostic error "-Weffc++"
+# pragma GCC diagnostic pop
 #endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008005 */
 public:
 	typedef typename HPointerBase<tType>::value_type value_type;

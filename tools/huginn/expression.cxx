@@ -34,6 +34,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "value_builtin.hxx"
 #include "booleanevaluator.hxx"
 #include "helper.hxx"
+#include "keyword.hxx"
 #include "objectfactory.hxx"
 
 using namespace yaal;
@@ -474,6 +475,15 @@ void HExpression::get_field(  OExecutionStep const& executionStep_,huginn::HFram
 		int fi( oref->field_index( executionStep_._identifierId ) );
 		if ( fi >= 0 ) {
 			frame_->values().push( oref->field( t, fi, p ) );
+		} else if ( ( executionStep_._identifierId == KEYWORD::CONSTRUCTOR_IDENTIFIER ) && ( oref->reference_class()->type() == HHuginn::HClass::TYPE::BUILTIN ) ) {
+			frame_->values().push(
+				rt.object_factory()->create_bound_method(
+					hcore::call(
+						&HHuginn::HObject::init_base, _1, _2, _3, _4
+					),
+					oref->value()
+				)
+			);
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
 				"`"_ys

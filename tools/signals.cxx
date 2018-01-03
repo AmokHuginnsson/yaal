@@ -86,10 +86,12 @@ typedef void (*sighandler_t)( int );
 #endif /* #ifndef HAVE_SIGHANDLER_T */
 
 namespace {
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 static sighandler_t const FWD_SIG_DFL = SIG_DFL;
 static sighandler_t const FWD_SIG_ERR = SIG_ERR;
-#pragma GCC diagnostic error "-Wold-style-cast"
+#pragma GCC diagnostic pop
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-conversion"
 int sigaddset_fwd( sigset_t* set, int signo ) {
 	return ( sigaddset( set, signo ) );
@@ -97,7 +99,7 @@ int sigaddset_fwd( sigset_t* set, int signo ) {
 int sigdelset_fwd( sigset_t* set, int signo ) {
 	return ( sigdelset( set, signo ) );
 }
-#pragma GCC diagnostic error "-Wsign-conversion"
+#pragma GCC diagnostic pop
 }
 
 void reset_signal_low( int sigNo_ ) {

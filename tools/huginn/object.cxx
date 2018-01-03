@@ -123,6 +123,39 @@ HHuginn::HObject::~HObject( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
+HHuginn::value_t HHuginn::HObject::init_base( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	HObject* o( static_cast<HObject*>( object_->raw() ) );
+	HHuginn::HClass const* super( o->get_class() );
+	while ( super->type() != HHuginn::HClass::TYPE::BUILTIN ) {
+		super = super->super();
+	}
+	o->_fields.push_back(
+		super->create_instance( thread_, object_, values_, position_ )
+	);
+	for ( int i( 0 ), COUNT( static_cast<int>( super->field_identifiers().get_size() ) ); i < COUNT; ++ i ) {
+		HHuginn::HValue const& v( *super->field( i ) );
+		o->_fields[i] = ( v.type_id() == HHuginn::TYPE::METHOD )
+			? thread_->runtime().object_factory()->create_method(
+				hcore::call(
+					&HHuginn::HObject::forward_call,
+					static_cast<HHuginn::HClass::HMethod const&>( v ).function(),
+					_1, _2, _3, _4
+				)
+			)
+			: super->get_default( thread_, i, position_ );
+	}
+	return ( *object_ );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::HObject::forward_call( HHuginn::function_t func_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	HObject* o( static_cast<HObject*>( object_->raw() ) );
+	return ( func_( thread_, &o->_fields.back(), values_, position_ ) );
+	M_EPILOG
+}
+
 HHuginn::value_t& HHuginn::HObject::field_ref( int index_ ) {
 	M_PROLOG
 	return ( _fields[index_] );

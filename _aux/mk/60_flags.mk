@@ -5,7 +5,6 @@ CWARNING_FLAGS = \
 						-Wconversion \
 						-Wendif-labels \
 						-Werror \
-						-Wlarger-than-65536 \
 						-Wmissing-format-attribute \
 						-Wmissing-noreturn \
 						-Wpointer-arith \
@@ -77,7 +76,6 @@ ifdef DO_PROFILING
 endif
 ifdef DO_COVERAGE
 	TARGET=cov
-	CWARNING_FLAGS += -Wlarger-than-65536
 	COMPILER_COVERAGE_FLAGS = --coverage
 	COMPILER_DEBUG_FLAGS = -D__DEBUG__ -fno-inline -fno-inline-small-functions -fno-default-inline
 	LINKER_COVERAGE_FLAGS   = --coverage

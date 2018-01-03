@@ -121,9 +121,10 @@ int find_term_fd( void ) {
 	return ( fd );
 }
 
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 static int const FWD_TIOCGWINSZ = TIOCGWINSZ;
-#pragma GCC diagnostic error "-Wold-style-cast"
+#pragma GCC diagnostic pop
 
 }
 
