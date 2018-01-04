@@ -233,7 +233,7 @@ include $(DIR_ROOT)/_aux/mk/e0_target-tools.mk
 doc: $(DIR_ROOT)/build/doc/html/doxygen.css
 
 $(DIR_ROOT)/build/doc/html/doxygen.css: $(SRCS) $(HDRS)
-	@cd $(DIR_ROOT) && doxygen _aux/doxygenrc 2>&1 | grep 'is not documented'; \
+	@cd $(DIR_ROOT) && doxygen _aux/doxygenrc $(if $(VERBOSE), 2>&1 | grep 'is not documented', > /dev/null 2>&1); \
 	cat $(DIR_ROOT)/doc/doxygen.css >> $(DIR_ROOT)/build/doc/html/doxygen.css; \
 	chmod -R a+rX $(DIR_ROOT)/build/doc
 

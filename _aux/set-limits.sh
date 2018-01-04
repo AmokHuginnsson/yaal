@@ -22,12 +22,16 @@ PHYS_MEM=`expr "${PHYS_MEM}" \* 1024`
 
 ulimit -c unlimited
 
+if [ -z "${PROC_LIMIT}" ] ; then
+	PROC_LIMIT=400
+fi
+
 # bash proc limit is set with -u, dash proc limit is set with -p
 IS_BASH=`ulimit -a | grep 'max user processes'`
 if [ "x${IS_BASH}" != "x" ] ; then
-	ulimit -u 400
+	ulimit -u ${PROC_LIMIT}
 else
-	ulimit -p 400
+	ulimit -p ${PROC_LIMIT}
 fi
 ulimit -s 8192
 if [ ${PHYS_MEM} -ne 0 ] ; then

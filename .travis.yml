@@ -1,9 +1,20 @@
 language:  C++
+cache:
+  ccache: true
+  directories:
+    - ../tress
 sudo: false
+install:
+  - mkdir -p ../tress
+  - git -C ../tress init
+  - git -C ../tress fetch https://codestation.org/repo/tress.git HEAD
+  - git -C ../tress reset --hard FETCH_HEAD --
 script:
   - umask 0077
+  - export TIMESTAMP=`date +%Y%m%d%H%M%S`
   - export EXTRA_CXXFLAGS="-DPCRE_STUDY_EXTRA_NEEDED=0x0008"
-  - exec make purge debug
+  - export PROC_LIMIT=4096
+  - exec make -C _deploy/debian clean package bundle BUILD_ID="-0codestation${TIMESTAMP}"
 addons:
   apt:
     packages:
@@ -15,3 +26,12 @@ addons:
       - libxslt1-dev
       - zlib1g-dev
       - libncursesw5-dev
+      - devscripts
+      - libdistro-info-perl
+      - dpkg-dev
+      - fakeroot
+      - debhelper
+      - doxygen
+      - asciidoc
+      - graphviz
+      - libboost-all-dev

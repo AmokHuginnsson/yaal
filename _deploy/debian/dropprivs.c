@@ -25,8 +25,15 @@ int main( int argc, char** argv ) {
 		}
 
 		char const* username = getenv( "USERNAME" );
-		if ( username == NULL )
+		if ( username == NULL ) {
 			username = getenv( "LOGNAME" );
+		}
+		if ( username == NULL ) {
+			username = getenv( "USER" );
+		}
+		if ( username == NULL ) {
+			username = getenv( "LOGIN" );
+		}
 		if ( username == NULL ) {
 			error = errno;
 			errmsg = "unable to guess unprivileged user name";
