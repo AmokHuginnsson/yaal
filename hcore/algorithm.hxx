@@ -671,7 +671,7 @@ inline bool equal( iter1_t it1, iter1_t end1, iter2_t it2 ) {
  */
 template<typename iter1_t, typename iter2_t, typename predicate_t>
 inline bool equal( iter1_t it1, iter1_t end1, iter2_t it2, predicate_t predicate_ ) {
-	for ( ; ( it1 != end1 ) && predicate_( *it1 == *it2 ); ++ it1, ++ it2 )
+	for ( ; ( it1 != end1 ) && predicate_( *it1, *it2 ); ++ it1, ++ it2 )
 		;
 	return ( it1 == end1 );
 }

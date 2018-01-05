@@ -12,9 +12,9 @@ install:
 script:
   - umask 0077
   - export TIMESTAMP=`date +%Y%m%d%H%M%S`
-  - export EXTRA_CXXFLAGS="-DPCRE_STUDY_EXTRA_NEEDED=0x0008"
+  - export EXTRA_CXXFLAGS="-DPCRE_STUDY_EXTRA_NEEDED=0"
   - export PROC_LIMIT=4096
-  - exec make -C _deploy/debian clean package bundle BUILD_ID="-0codestation${TIMESTAMP}"
+  - make -C _deploy/debian clean package bundle BUILD_ID="-0codestation${TIMESTAMP}"
 addons:
   apt:
     packages:
