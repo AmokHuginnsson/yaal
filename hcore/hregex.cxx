@@ -198,15 +198,17 @@ bool HRegex::compile( HString const& pattern_, compile_t flags_ ) {
 	_utf8ConversionCache = pattern_;
 	_impl = ::pcre_compile2( _utf8ConversionCache.c_str(), options, &_lastError, &errMsg, &offset, nullptr );
 	if ( ! _lastError ) {
-		_extra = ::pcre_study( static_cast<pcre*>( _impl ), PCRE_STUDY_EXTRA_NEEDED | PCRE_STUDY_JIT_COMPILE, &errMsg );
+		_extra = ::pcre_study( static_cast<pcre*>( _impl ), PCRE_STUDY_JIT_COMPILE, &errMsg );
 		if ( errMsg ) {
+			reset();
 			_lastError = 10; /* according to manual "this code is not in use" */
 		}
 	}
 	if ( ! ( _lastError || errMsg ) ) {
 		_pattern = pattern_;
 	} else {
-		_errorMessage.assign( pattern_ ).append( ":" ).append( offset ).append( ": " ).append( errMsg ? errMsg : "" ).append( errMsg ? ", " : "" ).append( _lastError );
+		_errorMessage.assign( pattern_ ).append( ":" ).append( offset ).append( ": " )
+			.append( errMsg ? errMsg : "" ).append( errMsg ? ", " : "" ).append( _lastError );
 		if ( ! ( flags_ & COMPILE::NO_EXCEPTION ) ) {
 			HString msg( yaal::move( _errorMessage ) );
 			clear();
@@ -223,7 +225,7 @@ HString const& HRegex::pattern( void ) const {
 }
 
 bool HRegex::is_valid( void ) const {
-	return ( _extra != nullptr );
+	return ( _impl != nullptr );
 }
 
 HString const& HRegex::error( void ) const {
@@ -236,7 +238,7 @@ int HRegex::error_code( void ) const {
 
 HUTF8String HRegex::matches_impl( HUTF8String const& str_, int& start_, int& matchLength_, match_t match_ ) const {
 	M_PROLOG
-	if ( _extra == nullptr ) {
+	if ( _impl == nullptr ) {
 		throw HRegexException( _errMsgHRegex_[ ERROR::UNINITIALIZED ] );
 	}
 	start_ = NO_MATCH;
@@ -262,6 +264,9 @@ HUTF8String HRegex::matches_impl( HUTF8String const& str_, int& start_, int& mat
 
 HRegex::groups_t HRegex::groups_impl( HUTF8String const& string_, match_t match_ ) const {
 	M_PROLOG
+	if ( _impl == nullptr ) {
+		throw HRegexException( _errMsgHRegex_[ ERROR::UNINITIALIZED ] );
+	}
 	groups_t g;
 	typedef yaal::hcore::HArray<int> matches_t;
 	int expectedGroupCount( static_cast<int>( count( _pattern.begin(), _pattern.end(), '('_ycp ) + 1 ) );

@@ -9,12 +9,17 @@ install:
   - git -C ../tress init
   - git -C ../tress fetch https://codestation.org/repo/tress.git HEAD
   - git -C ../tress reset --hard FETCH_HEAD --
+  - sed -e '/DROP .* IF EXISTS/d' ../tress/data/mysql.sql > ../tress/mysql.sql
+  - mysql -u root < ../tress/mysql.sql
+  - psql -U postgres < ../tress/data/postgresql.sql
 script:
   - umask 0077
   - export TIMESTAMP=`date +%Y%m%d%H%M%S`
-  - export EXTRA_CXXFLAGS="-DPCRE_STUDY_EXTRA_NEEDED=0"
   - export PROC_LIMIT=4096
   - make -C _deploy/debian clean package bundle BUILD_ID="-0codestation${TIMESTAMP}"
+services:
+  - mysql
+  - postgresql
 addons:
   apt:
     packages:
