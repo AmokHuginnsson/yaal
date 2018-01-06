@@ -1,9 +1,4 @@
-language:  C++
-cache:
-  ccache: true
-  directories:
-    - ../tress
-sudo: false
+language: C++
 install:
   - mkdir -p ../tress
   - git -C ../tress init
@@ -14,8 +9,9 @@ install:
   - psql -U postgres < ../tress/data/postgresql.sql
 script:
   - umask 0077
-  - export TIMESTAMP=`date +%Y%m%d%H%M%S`
-  - export PROC_LIMIT=4096
+  - export CONTINUOUS_INTEGRATION_SYSTEM="travis" TIMESTAMP=`date +%Y%m%d%H%M%S`
+  - export PREFIX="${HOME}/usr" SYSCONFDIR="${HOME}/etc/conf" LOCALSTATEDIR="${HOME}/var"
+  - make && make install
   - make -C _deploy/debian clean package bundle BUILD_ID="-0codestation${TIMESTAMP}"
 services:
   - mysql
@@ -40,3 +36,10 @@ addons:
       - asciidoc
       - graphviz
       - libboost-all-dev
+sudo: false
+cache:
+  ccache: true
+  directories:
+    - ../tress
+before_cache:
+  - rm -f ../tress/*tress.log

@@ -29,9 +29,9 @@ fi
 # bash proc limit is set with -u, dash proc limit is set with -p
 IS_BASH=`ulimit -a | grep 'max user processes'`
 if [ "x${IS_BASH}" != "x" ] ; then
-	ulimit -u ${PROC_LIMIT}
+	ulimit -u ${PROC_LIMIT} > /dev/null 2>&1 || true
 else
-	ulimit -p ${PROC_LIMIT}
+	ulimit -p ${PROC_LIMIT} > /dev/null 2>&1 || true
 fi
 ulimit -s 8192
 if [ ${PHYS_MEM} -ne 0 ] ; then
