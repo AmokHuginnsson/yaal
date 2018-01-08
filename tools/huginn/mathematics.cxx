@@ -77,7 +77,13 @@ public:
 			)
 		)
 		, _numberSetStatisticsClass( HNumberSetStatistics::get_class( class_->runtime() ) )
-		, _randomizerClass( HRandomizer::get_class( class_->runtime() ) )
+		, _randomizerClass(
+			add_to_package(
+				class_,
+				HRandomizer::get_class( class_->runtime(), class_ ),
+				"([ *cap* ]) - create random number generator which output values are capped at *cap*"
+			)
+		)
 		, _exceptionClass( package_exception( class_ ) ) {
 		return;
 	}
@@ -504,19 +510,6 @@ public:
 		return ( thread_->object_factory().create<HNumberSetStatistics>( thread_, m->_numberSetStatisticsClass.raw(), values_, position_ ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t randomizer( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-		M_PROLOG
-		char const name[] = "Mathematics.randomizer";
-		verify_arg_count( name, values_, 0, 1, thread_, position_ );
-		yaal::u64_t cap( meta::max_unsigned<yaal::u64_t>::value );
-		if ( ! values_.is_empty() ) {
-			verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, ARITY::UNARY, thread_, position_ );
-			cap = static_cast<yaal::u64_t>( get_integer( values_[0] ) );
-		}
-		HMathematics* m( static_cast<HMathematics*>( object_->raw() ) );
-		return ( thread_->object_factory().create<huginn::HRandomizer>( m->_randomizerClass.raw(), cap ) );
-		M_EPILOG
-	}
 };
 
 namespace package_factory {
@@ -561,7 +554,6 @@ HHuginn::value_t HMathematicsCreator::do_new_instance( HRuntime* runtime_ ) {
 				{ "ceil",                 runtime_->object_factory()->create_method( hcore::call( &HMathematics::ceil, _1, _2, _3, _4 ) ),                 "( *value* ) - get smallest integral value not less than *value*" },
 				{ "differs_at",           runtime_->object_factory()->create_method( hcore::call( &HMathematics::differs_at, _1, _2, _3, _4 ) ),           "( *first*, *second* ) - tell at which decimal position *first* and *second* values have first occurrence of different digit" },
 				{ "statistics",           runtime_->object_factory()->create_method( hcore::call( &HMathematics::statistics, _1, _2, _3, _4 ) ),           "( *iterable* ) - calculate numerical statistics over given iterable *iterable* of uniformly types values" },
-				{ "randomizer",           runtime_->object_factory()->create_method( hcore::call( &HMathematics::randomizer, _1, _2, _3, _4 ) ),           "([ *cap* ]) - create random number generator which output values are capped at *cap*" }
 			},
 			"The `Mathematics` package provides essential mathematical functions and classes. All of those functions and classes work with values of both `real` and `number` types."
 		)

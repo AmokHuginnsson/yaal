@@ -56,6 +56,19 @@ HRandomizer::HRandomizer( HHuginn::HClass const* class_, yaal::hcore::HRandomize
 	return;
 }
 
+HHuginn::value_t HRandomizer::create_instance( HHuginn::HClass const* class_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "Randomizer.constructor";
+	verify_arg_count( name, values_, 0, 1, thread_, position_ );
+	yaal::u64_t cap( meta::max_unsigned<yaal::u64_t>::value );
+	if ( ! values_.is_empty() ) {
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, ARITY::UNARY, thread_, position_ );
+		cap = static_cast<yaal::u64_t>( get_integer( values_[0] ) );
+	}
+	return ( thread_->object_factory().create<huginn::HRandomizer>( class_, cap ) );
+	M_EPILOG
+}
+
 HHuginn::value_t HRandomizer::next( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Randomizer.next";
@@ -89,7 +102,27 @@ HHuginn::value_t HRandomizer::next_real( huginn::HThread* thread_, HHuginn::valu
 	M_EPILOG
 }
 
-HHuginn::class_t HRandomizer::get_class( HRuntime* runtime_ ) {
+HHuginn::value_t HRandomizer::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "Randomizer.to_string";
+	verify_arg_count( name, values_, 0, 0, thread_, position_ );
+	HRandomizer* o( static_cast<HRandomizer*>( object_->raw() ) );
+	HHuginn::HClass const* origin( o->HValue::get_class()->origin() );
+	HString s;
+	if ( origin ) {
+		s.append( thread_->runtime().package_name( origin ) ).append( "." );
+	}
+	s.append( "Randomizer(" );
+	yaal::u64_t cap( o->_generator.range() );
+	if ( cap != meta::max_unsigned<yaal::u64_t>::value ) {
+		s.append( cap );
+	}
+	s.append( ")" );
+	return ( thread_->runtime().object_factory()->create_string( s ) );
+	M_EPILOG
+}
+
+HHuginn::class_t HRandomizer::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
@@ -97,12 +130,16 @@ HHuginn::class_t HRandomizer::get_class( HRuntime* runtime_ ) {
 			nullptr,
 			HHuginn::field_definitions_t{
 				{ "next",      runtime_->object_factory()->create_method( hcore::call( &HRandomizer::next, _1, _2, _3, _4 ) ),      "([ *range* ]) - get next `integer` random number, possibly restricted to given range" },
-				{ "next_real", runtime_->object_factory()->create_method( hcore::call( &HRandomizer::next_real, _1, _2, _3, _4 ) ), "([ *range* ]) - get next `real` random number, possibly restricted to given range" }
+				{ "next_real", runtime_->object_factory()->create_method( hcore::call( &HRandomizer::next_real, _1, _2, _3, _4 ) ), "([ *range* ]) - get next `real` random number, possibly restricted to given range" },
+				{ "to_string", runtime_->object_factory()->create_method( hcore::call( &HRandomizer::to_string, _1, _2, _3, _4 ) ), "get string representation of this `Randomizer`" }
 			},
-			"The `Randomizer` class represents a random number generator concept. `Randomizer` can generate uniform distribution of either `integer` or `real` values from given range."
+			"The `Randomizer` class represents a random number generator concept. `Randomizer` can generate uniform distribution of either `integer` or `real` values from given range.",
+			HHuginn::HClass::TYPE::BUILTIN,
+			origin_,
+			&HRandomizer::create_instance
 		)
 	);
-	runtime_->huginn()->register_class( c );
+	runtime_->huginn()->register_class( c, HHuginn::ACCESS::PUBLIC );
 	return ( c );
 	M_EPILOG
 }
