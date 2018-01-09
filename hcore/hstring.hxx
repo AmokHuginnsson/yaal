@@ -759,20 +759,56 @@ public:
 	bool operator == ( HCharRef const& other_ ) const {
 		return ( get() == other_.get() );
 	}
+	bool operator == ( code_point_t other_ ) const {
+		return ( get() == other_ );
+	}
+	friend bool operator == ( code_point_t left_, HCharRef const& right_ ) {
+		return ( left_ == right_.get() );
+	}
 	bool operator != ( HCharRef const& other_ ) const {
 		return ( get() != other_.get() );
+	}
+	bool operator != ( code_point_t other_ ) const {
+		return ( get() != other_ );
+	}
+	friend bool operator != ( code_point_t left_, HCharRef const& right_ ) {
+		return ( left_ != right_.get() );
 	}
 	bool operator < ( HCharRef const& other_ ) const {
 		return ( get() < other_.get() );
 	}
+	bool operator < ( code_point_t other_ ) const {
+		return ( get() < other_ );
+	}
+	friend bool operator < ( code_point_t left_, HCharRef const& right_ ) {
+		return ( left_ < right_.get() );
+	}
 	bool operator <= ( HCharRef const& other_ ) const {
 		return ( get() <= other_.get() );
+	}
+	bool operator <= ( code_point_t other_ ) const {
+		return ( get() <= other_ );
+	}
+	friend bool operator <= ( code_point_t left_, HCharRef const& right_ ) {
+		return ( left_ <= right_.get() );
 	}
 	bool operator > ( HCharRef const& other_ ) const {
 		return ( get() > other_.get() );
 	}
+	bool operator > ( code_point_t other_ ) const {
+		return ( get() > other_ );
+	}
+	friend bool operator > ( code_point_t left_, HCharRef const& right_ ) {
+		return ( left_ > right_.get() );
+	}
 	bool operator >= ( HCharRef const& other_ ) const {
 		return ( get() >= other_.get() );
+	}
+	bool operator >= ( code_point_t other_ ) const {
+		return ( get() >= other_ );
+	}
+	friend bool operator >= ( code_point_t left_, HCharRef const& right_ ) {
+		return ( left_ >= right_.get() );
 	}
 	void swap( HCharRef& );
 private:
