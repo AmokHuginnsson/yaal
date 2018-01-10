@@ -76,7 +76,13 @@ public:
 				"( *type*, *rows*, *cols* ) - create instance of Matrix class of values of type *type* and *rows* rows and *cols* columns."
 			)
 		)
-		, _numberSetStatisticsClass( HNumberSetStatistics::get_class( class_->runtime() ) )
+		, _numberSetStatisticsClass(
+			add_to_package(
+				class_,
+				HNumberSetStatistics::get_class( class_->runtime(), class_ ),
+				"( *iterable* ) - calculate numerical statistics over given iterable *iterable* of uniformly types values"
+			)
+		)
 		, _randomizerClass(
 			add_to_package(
 				class_,
@@ -507,7 +513,7 @@ public:
 	static HHuginn::value_t statistics( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		HMathematics* m( static_cast<HMathematics*>( object_->raw() ) );
-		return ( thread_->object_factory().create<HNumberSetStatistics>( thread_, m->_numberSetStatisticsClass.raw(), values_, position_ ) );
+		return ( m->_numberSetStatisticsClass->create_instance( thread_, object_, values_, position_ ) );
 		M_EPILOG
 	}
 };
@@ -553,7 +559,7 @@ HHuginn::value_t HMathematicsCreator::do_new_instance( HRuntime* runtime_ ) {
 				{ "floor",                runtime_->object_factory()->create_method( hcore::call( &HMathematics::floor, _1, _2, _3, _4 ) ),                "( *value* ) - get largest integral value not greater than *value*" },
 				{ "ceil",                 runtime_->object_factory()->create_method( hcore::call( &HMathematics::ceil, _1, _2, _3, _4 ) ),                 "( *value* ) - get smallest integral value not less than *value*" },
 				{ "differs_at",           runtime_->object_factory()->create_method( hcore::call( &HMathematics::differs_at, _1, _2, _3, _4 ) ),           "( *first*, *second* ) - tell at which decimal position *first* and *second* values have first occurrence of different digit" },
-				{ "statistics",           runtime_->object_factory()->create_method( hcore::call( &HMathematics::statistics, _1, _2, _3, _4 ) ),           "( *iterable* ) - calculate numerical statistics over given iterable *iterable* of uniformly types values" },
+				{ "statistics",           runtime_->object_factory()->create_method( hcore::call( &HMathematics::statistics, _1, _2, _3, _4 ) ),           "( *iterable* ) - create NumberSetStatistics over *iterable* of uniformly types values" }
 			},
 			"The `Mathematics` package provides essential mathematical functions and classes. All of those functions and classes work with values of both `real` and `number` types."
 		)

@@ -251,7 +251,7 @@ private:
 				middle_t fm( select( first_, last_, halfCount / 2, false ) );
 				middle_t lm( select( first_, last_, halfCount + ( hasMiddle ? 1 : 0 ) + halfCount / 2, false ) );
 				_interquartileRange = lm.first - fm.first;
-			} else {
+			} else if ( _count > 1 ) {
 				middle_t fm( select( first_, last_, halfCount / 2 - 1, true ) );
 				middle_t lm( select( first_, last_, halfCount + ( hasMiddle ? 1 : 0 ) + halfCount / 2 - 1, true ) );
 				_interquartileRange = ( lm.first + lm.second ) / 2 - ( fm.first + fm.second ) / 2;

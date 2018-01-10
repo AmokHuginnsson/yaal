@@ -108,10 +108,8 @@ void HAuxiliaryBuffer<type_t>::init( iter_t first_, iter_t last_ ) {
 			canCopy = newCanCopy;
 	}
 	i64_t auxSize( min( _requestedSize, canCopy ) );
-	/* Only 1 element in auxiliary buffer is equivalent
-	 * to pure inplace implementation, so it does not make sense to go with aux. */
 	clear();
-	if ( auxSize > 1 ) {
+	if ( auxSize > 0 ) {
 		if ( auxSize > _allocated ) {
 			if ( _allocated > 0 ) {
 				::operator delete ( _data, memory::yaal );

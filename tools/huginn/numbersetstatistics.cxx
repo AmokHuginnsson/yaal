@@ -155,7 +155,13 @@ HHuginn::value_t HNumberSetStatistics::count( huginn::HThread* thread_, HHuginn:
 	M_EPILOG
 }
 
-HHuginn::class_t HNumberSetStatistics::get_class( HRuntime* runtime_ ) {
+HHuginn::value_t HNumberSetStatistics::create_instance( HHuginn::HClass const* class_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	return ( thread_->object_factory().create<HNumberSetStatistics>( thread_, class_, values_, position_ ) );
+	M_EPILOG
+}
+
+HHuginn::class_t HNumberSetStatistics::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
@@ -177,10 +183,13 @@ HHuginn::class_t HNumberSetStatistics::get_class( HRuntime* runtime_ ) {
 				{ "range",     runtime_->object_factory()->create_method( hcore::call( &HNumberSetStatistics::derivative_stat, "NumberSetStatistics.range",     DERIVATIVE_STAT::RANGE,     _1, _2, _3, _4 ) ), "a range of values in the numeric set" },
 				{ "mid_range", runtime_->object_factory()->create_method( hcore::call( &HNumberSetStatistics::derivative_stat, "NumberSetStatistics.mid_range", DERIVATIVE_STAT::MID_RANGE, _1, _2, _3, _4 ) ), "a mid range value of the numbers in the given set" }
 			},
-			"The `NumberSetStatistics` is a class representing results of gathering numerical statistics over some uniformly typed number set."
+			"The `NumberSetStatistics` is a class representing results of gathering numerical statistics over some uniformly typed number set.",
+			HHuginn::HClass::TYPE::BUILTIN,
+			origin_,
+			&HNumberSetStatistics::create_instance
 		)
 	);
-	runtime_->huginn()->register_class( c );
+	runtime_->huginn()->register_class( c, HHuginn::ACCESS::PUBLIC );
 	return ( c );
 	M_EPILOG
 }
