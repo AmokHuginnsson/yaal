@@ -274,6 +274,10 @@ AC_DEFUN_ONCE([YAAL_DETECT_COMMON_FLAGS], [
 	if test ["x${HOST_OS_TYPE}"] = ["xSolaris"] ; then
 		YAAL_DETECT_FLAGS(EXTRA_COMPILER_DEBUG_FLAGS, [-gstabs+], [C++])
 	fi
+	YAAL_DETECT_FLAGS(EXTRA_COMPILER_DEBUG_FLAGS, [-femit-class-debug-always], [C++])
+	if test ["x${HOST_OS_TYPE}"] = ["xRaspbian"] ; then
+		YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,--no-keep-memory], [C++])
+	fi
 	if test ["x${START_GROUP}"] != ["x"] ; then
 		END_GROUP=["-Wl,--end-group"]
 	fi

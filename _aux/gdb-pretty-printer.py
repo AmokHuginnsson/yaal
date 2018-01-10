@@ -12,6 +12,9 @@ def yaal_lookup_function( val_ ):
 	regex = re.compile( "^yaal::hcore::HPointer<.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHPointerPrinter( val_ )
+	regex = re.compile( "^yaal::tools::huginn::HValueReference<.*>$" )
+	if regex.match( lookup_tag ):
+		return YaalToolsHuginnHValueReferencePrinter( val_ )
 	regex = re.compile( "^yaal::hcore::HResource<.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHResourcePrinter( val_ )
@@ -91,6 +94,105 @@ class YaalHCoreHPointerPrinter:
 						def children( self ):
 							return self._innerPrinter.children()
 						setattr( self.__class__, 'children', children )
+
+	def to_string( self ):
+		s = "NULL"
+		if self._ptr != 0:
+			if self._innerPrinter != None:
+				s = self._innerPrinter.to_string()
+			else:
+				s = self._ptr.dereference()
+		return s
+
+	def display_hint( self ):
+		s = "string";
+		if ( self._ptr != 0 ) and ( self._innerPrinter != None ):
+			s = self._innerPrinter.display_hint()
+		return s
+
+class YaalToolsHuginnHValueReferencePrinter:
+	"Print a yaal::tools::huginn::HValueReverence"
+	Scalars = None
+	Collections = None
+	try:
+		RealType      = gdb.lookup_type( "yaal::tools::HHuginn::HReal" ).pointer()
+		IntegerType   = gdb.lookup_type( "yaal::tools::HHuginn::HInteger" ).pointer()
+		StringType    = gdb.lookup_type( "yaal::tools::HHuginn::HString" ).pointer()
+		NumberType    = gdb.lookup_type( "yaal::tools::HHuginn::HNumber" ).pointer()
+		CharacterType = gdb.lookup_type( "yaal::tools::HHuginn::HCharacter" ).pointer()
+		BooleanType   = gdb.lookup_type( "yaal::tools::HHuginn::HBoolean" ).pointer()
+		TupleType     = gdb.lookup_type( "yaal::tools::HHuginn::HTuple" ).pointer()
+		ListType      = gdb.lookup_type( "yaal::tools::HHuginn::HList" ).pointer()
+		DequeType     = gdb.lookup_type( "yaal::tools::HHuginn::HDeque" ).pointer()
+		DictType      = gdb.lookup_type( "yaal::tools::HHuginn::HDict" ).pointer()
+		LookupType    = gdb.lookup_type( "yaal::tools::HHuginn::HLookup" ).pointer()
+		OrderType     = gdb.lookup_type( "yaal::tools::HHuginn::HOrder" ).pointer()
+		SetType       = gdb.lookup_type( "yaal::tools::HHuginn::HSet" ).pointer()
+
+		INTEGER   = int( gdb.lookup_symbol( "yaal::tools::HHuginn::TYPE::INTEGER" )[0].value() )
+		REAL      = int( gdb.lookup_symbol( "yaal::tools::HHuginn::TYPE::REAL" )[0].value() )
+		STRING    = int( gdb.lookup_symbol( "yaal::tools::HHuginn::TYPE::STRING" )[0].value() )
+		NUMBER    = int( gdb.lookup_symbol( "yaal::tools::HHuginn::TYPE::NUMBER" )[0].value() )
+		CHARACTER = int( gdb.lookup_symbol( "yaal::tools::HHuginn::TYPE::CHARACTER" )[0].value() )
+		BOOLEAN   = int( gdb.lookup_symbol( "yaal::tools::HHuginn::TYPE::BOOLEAN" )[0].value() )
+		TUPLE     = int( gdb.lookup_symbol( "yaal::tools::HHuginn::TYPE::TUPLE" )[0].value() )
+		LIST      = int( gdb.lookup_symbol( "yaal::tools::HHuginn::TYPE::LIST" )[0].value() )
+		DEQUE     = int( gdb.lookup_symbol( "yaal::tools::HHuginn::TYPE::DEQUE" )[0].value() )
+		DICT      = int( gdb.lookup_symbol( "yaal::tools::HHuginn::TYPE::DICT" )[0].value() )
+		LOOKUP    = int( gdb.lookup_symbol( "yaal::tools::HHuginn::TYPE::LOOKUP" )[0].value() )
+		ORDER     = int( gdb.lookup_symbol( "yaal::tools::HHuginn::TYPE::ORDER" )[0].value() )
+		SET       = int( gdb.lookup_symbol( "yaal::tools::HHuginn::TYPE::SET" )[0].value() )
+		Scalars = {
+			INTEGER:   IntegerType,
+			REAL:      RealType,
+			STRING:    StringType,
+			NUMBER:    NumberType,
+			CHARACTER: CharacterType,
+			BOOLEAN:   BooleanType,
+		}
+		Collections = {
+			TUPLE:  TupleType,
+			LIST:   ListType,
+			DEQUE:  DequeType,
+			DICT:   DictType,
+			LOOKUP: LookupType,
+			ORDER:  OrderType,
+			SET:    SetType
+		}
+		print( "Huginn debug utility loaded." )
+	except Exception as e:
+		pass
+	class ValuePrinter:
+		def __init__( self_, ptr_, typeId_ ):
+			self_._ptr = ptr_
+			self_._class = YaalToolsHuginnHValueReferencePrinter.Scalars.get( typeId_ )
+		def to_string( self_ ):
+			return self_._ptr.cast( self_._class )['_value']
+		def display_hint( self_ ):
+			return "string"
+	def __init__( self, val_ ):
+		self._val = val_
+		self._ptr = 0
+		shared = self._val['_shared']
+		if shared != 0:
+			self._ptr = self._val['_shared']['_object']
+			refType = self._val.type.template_argument( 0 ).unqualified().name
+			valueType = gdb.lookup_type( "yaal::tools::HHuginn::HValue" ).unqualified().name
+			if self._ptr != 0 and refType == valueType:
+				typeId = int( self._ptr['_class']['_typeId']['_value'] )
+				if YaalToolsHuginnHValueReferencePrinter.Scalars and ( typeId in YaalToolsHuginnHValueReferencePrinter.Scalars ):
+					self._innerPrinter = YaalToolsHuginnHValueReferencePrinter.ValuePrinter( self._ptr, typeId )
+				elif YaalToolsHuginnHValueReferencePrinter.Collections and ( typeId in YaalToolsHuginnHValueReferencePrinter.Collections ):
+					self._innerPrinter = yaal_lookup_function( self._ptr.cast( YaalToolsHuginnHValueReferencePrinter.Collections.get( typeId ) )['_data'] )
+				else:
+					self._innerPrinter = yaal_lookup_function( self._ptr.dereference() )
+				if self._innerPrinter != None:
+					if hasattr( self._innerPrinter, 'children' ):
+						def children():
+							return self._innerPrinter.children()
+						setattr( self, 'children', children )
+			else:
+				self._innerPrinter = yaal_lookup_function( self._ptr.dereference() )
 
 	def to_string( self ):
 		s = "NULL"
