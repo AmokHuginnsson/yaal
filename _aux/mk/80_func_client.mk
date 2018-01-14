@@ -54,5 +54,8 @@ endif
 
 endef
 
-$(foreach IT,$(TARGETS),$(eval $(call PREPARE_TARGET,$(IT))))
+define MAKE_DIR
+$(1):
+	@umask 022;$$(MKDIR_P) $(1)
+endef
 

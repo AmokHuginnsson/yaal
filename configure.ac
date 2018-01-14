@@ -525,7 +525,14 @@ AH_BOTTOM([
 dnl We have to set up proper compiler/linker flags.
 AC_CONFIG_HEADERS(config.hxx)
 AC_CONFIG_FILES([Makefile.mk yaalrc yaal.pc])
+AC_CHECK_FILE(
+	[${srcdir}/LICENSE.md],
+	AC_CONFIG_FILES(
+		[license.hxx:LICENSE.md],
+		[${srcdir}/_aux/mklicense license.hxx ${srcdir}/LICENSE.md]
+	)
+)
 AC_OUTPUT
-AC_MSG_RESULT([--- All ok, good luck! ---                     	       [[100%]]])
+AC_MSG_RESULT([--- All ok, good luck! ---                              [[100%]]])
 AC_MSG_RESULT([[Now you can type `make'.]])
 

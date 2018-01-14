@@ -318,13 +318,33 @@ else()
 	)
 endif()
 
+if ( EXISTS "${CMAKE_HOME_DIRECTORY}/LICENSE.md" )
+	if ( NOT CMAKE_HOST_WIN32 )
+		add_custom_command(
+			OUTPUT ${TARGET_PATH}/license.hxx
+			COMMAND ${CMAKE_HOME_DIRECTORY}/_aux/mklicense "${TARGET_PATH}/license.hxx" "${CMAKE_HOME_DIRECTORY}/LICENSE.md"
+			DEPENDS "${CMAKE_HOME_DIRECTORY}/LICENSE.md"
+			COMMENT "Generating license.hxx."
+		)
+	else()
+		add_custom_command(
+			OUTPUT ${TARGET_PATH}/license.hxx
+			COMMAND mklicense "${TARGET_PATH}/license.hxx" "${CMAKE_HOME_DIRECTORY}/LICENSE.md"
+			DEPENDS "${CMAKE_HOME_DIRECTORY}/LICENSE.md" mklicense
+			COMMENT "Generating license.hxx."
+		)
+	endif()
+	add_custom_target( license ALL DEPENDS "${TARGET_PATH}/license.hxx" )
+	add_dependencies( commit_id license )
+endif()
+
 if ( CMAKE_HOST_WIN32 )
 	if ( IS_DIRECTORY "${CMAKE_HOME_DIRECTORY}/_deploy/freebsd" )
 		set( CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_HOME_DIRECTORY}/_deploy/freebsd/pkg-descr")
 	endif()
 	if ( EXISTS "${CMAKE_HOME_DIRECTORY}/LICENSE.md" )
-		configure_file( "${CMAKE_HOME_DIRECTORY}/LICENSE.md" "${CMAKE_HOME_DIRECTORY}/build/COPYRIGHT.txt" COPYONLY )
-		set( CPACK_RESOURCE_FILE_LICENSE "${CMAKE_HOME_DIRECTORY}/build/COPYRIGHT.txt" )
+		configure_file( "${CMAKE_HOME_DIRECTORY}/LICENSE.md" "${CMAKE_HOME_DIRECTORY}/build/LICENSE.txt" COPYONLY )
+		set( CPACK_RESOURCE_FILE_LICENSE "${CMAKE_HOME_DIRECTORY}/build/LICENSE.txt" )
 	endif()
 	set( CPACK_PACKAGE_VENDOR "CodeStation.org" )
 	set( CPACK_PACKAGE_INSTALL_DIRECTORY ${PROJECT_NAME} )

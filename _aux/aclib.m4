@@ -108,6 +108,7 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 	LIB_PREFIX=["lib"]
 	LIB_EXT=["so"]
 	EXE_SUFFIX=[""]
+	HOME_ENV_VAR=['"HOME"']
 	SYMBOL_PREFIX=['""']
 	if test ["x${UNAME_OS_NAME}"] = ["xLinux"] ; then
 		AC_SUBST([SERIAL_DEVICE],['ttyS0'])
@@ -174,6 +175,7 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 	AC_DEFINE_UNQUOTED([LIB_INFIX],"${LIB_INFIX}",[Target dependent library name infix.])
 	AC_DEFINE_UNQUOTED([LIB_EXT],"${LIB_EXT}",[Dynamic library file name extension used on this platform.])
 	AC_DEFINE_UNQUOTED([EXE_SUFFIX],${EXE_SUFFIX},[Suffix used for binary program executable on this platform.])
+	AC_DEFINE_UNQUOTED([HOME_ENV_VAR],${HOME_ENV_VAR},[Name of environment variable used to point to user home directory.])
 	AC_SUBST([LIB_EXT],[${LIB_EXT}])
 	AC_SUBST([UNAME_OS_NAME],[${UNAME_OS_NAME}])
 	AC_SUBST([HOST_OS_TYPE],[${HOST_OS_TYPE}])

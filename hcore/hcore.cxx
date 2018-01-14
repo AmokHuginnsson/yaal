@@ -1,32 +1,6 @@
-#include <unistd.h>
-#include "config.hxx"
-char const COPYRIGHT [ ] =
-"/*\n"
-"---           `%s' %s (c) 1978 by Marcin 'Amok' Konarski            ---\n"
-"\n"
-/* hcore.cxx - this file is integral part of `yaal' project.
- */
-"  i.  You may not make any changes in Copyright information.\n"
-"  ii. You must attach Copyright information to any part of every copy\n"
-"      of this software.\n"
-"\n"
-"Copyright:\n"
-"\n"
-" You can use this software free of charge and you can redistribute its binary\n"
-" package freely but:\n"
-"  1. You are not allowed to use any part of sources of this software.\n"
-"  2. You are not allowed to redistribute any part of sources of this software.\n"
-"  3. You are not allowed to reverse engineer this software.\n"
-"  4. If you want to distribute a binary package of this software you cannot\n"
-"     demand any fees for it. You cannot even demand\n"
-"     a return of cost of the media or distribution (CD for example).\n"
-"  5. You cannot involve this software in any commercial activity (for example\n"
-"     as a free add-on to paid software or newspaper).\n"
-" This program is distributed in the hope that it will be useful, but WITHOUT\n"
-" ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or\n"
-" FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.\n"
-"*/\n";
+/* Read yaal/LICENSE.md file for copyright and licensing information. */
 
+#include <unistd.h>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -51,6 +25,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "pod.hxx"
 #include "system.hxx"
 #include "hregex.hxx"
+#include "config.hxx"
+#include "license.hxx"
 #include "commit_id.hxx"
 
 namespace yaal {
@@ -473,8 +449,8 @@ HCoreInitDeinit::HCoreInitDeinit( void ) {
 
 void banner( char const* packageName_, char const* packageVersion_ ) {
 	HLog::disable_auto_rehash();
-	::printf( COPYRIGHT, packageName_ ? packageName_ : PACKAGE_NAME, packageVersion_ ? packageVersion_ : PACKAGE_VERSION );
-	::printf( "\nVCS id: %s\n\n", COMMIT_ID );
+	::printf( LICENSE, packageName_ ? packageName_ : PACKAGE_NAME, packageVersion_ ? packageVersion_ : PACKAGE_VERSION );
+	::printf( "VCS id: %s\n\n", COMMIT_ID );
 	::printf(
 		"Available libraries:\n"
 		"\thcore\n" );

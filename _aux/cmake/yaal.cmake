@@ -201,6 +201,11 @@ check_cxx_source_compiles( "#include <cmath>
 	int main( int, char** ) { ::ceill( 0. ); return ( 0 ); }" HAVE_DECL_CEILL )
 check_cxx_source_compiles( "#include <cmath>
 	int main( int, char** ) { ::roundl( 0. ); return ( 0 ); }" HAVE_DECL_ROUNDL )
+if ( NOT CMAKE_HOST_WIN32 )
+	set( HOME_ENV_VAR "HOME" )
+else()
+	set( HOME_ENV_VAR "HOMEPATH" )
+endif()
 
 include( env )
 
@@ -330,6 +335,7 @@ if ( CMAKE_HOST_WIN32 )
 	add_executable( makedef ${CMAKE_HOME_DIRECTORY}/_aux/makedef.cxx )
 	add_executable( mkheaders ${CMAKE_HOME_DIRECTORY}/_aux/mkheaders.cxx )
 	add_executable( update-commit-id ${CMAKE_HOME_DIRECTORY}/_aux/update-commit-id.cxx )
+	add_executable( mklicense "${CMAKE_HOME_DIRECTORY}/_aux/mklicense.cxx" )
 	add_dependencies( msvcxx makedef )
 	set_target_properties( hcore PROPERTIES LINK_INTERFACE_LIBRARIES "" )
 	set_target_properties( makedef PROPERTIES COMPILE_DEFINITIONS "YAAL_MSVCXX_FIX_HXX_INCLUDED=1" )
@@ -415,6 +421,7 @@ endif()
 
 if ( CMAKE_HOST_WIN32 )
 	install( TARGETS update-commit-id COMPONENT private RUNTIME DESTINATION ${RUNTIME_DESTINATION} )
+	install( TARGETS mklicense COMPONENT private RUNTIME DESTINATION ${RUNTIME_DESTINATION} )
 	install( TARGETS ${COMPONENTS} ${DRIVERS} RUNTIME DESTINATION ${RUNTIME_DESTINATION} COMPONENT runtime LIBRARY DESTINATION bin COMPONENT runtime )
 	install( TARGETS ${COMPONENTS} ARCHIVE DESTINATION lib COMPONENT devel )
 	if ( DEFINED BUILD_PACKAGE )

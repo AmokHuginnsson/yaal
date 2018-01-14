@@ -1,3 +1,4 @@
+
 ??_7?$HField@VHFile@hcore@yaal@@$0A@@hcore@yaal@@6B@
 ??_7?$HSingleton@VHAsyncCaller@tools@yaal@@@hcore@yaal@@6B@
 ??_7?$HSingleton@VHConsole@hconsole@yaal@@@hcore@yaal@@6B@
@@ -12,7 +13,9 @@
 ??_7?$HSingleton@VOSSLContextClient@HOpenSSL@hcore@yaal@@@hcore@yaal@@6B@
 ??_7?$HSingleton@VOSSLContextServer@HOpenSSL@hcore@yaal@@@hcore@yaal@@6B@
 ??_7HAsyncCaller@tools@yaal@@6B@
+??_7HConsole@hconsole@yaal@@6B?$HSingleton@VHConsole@hconsole@yaal@@@hcore@2@@
 ??_7HConsole@hconsole@yaal@@6B@
+??_7HConsole@hconsole@yaal@@6BHFormatter@hcore@2@@
 ??_7HLog@hcore@yaal@@6B?$HField@VHFile@hcore@yaal@@$0A@@12@@
 ??_7HLog@hcore@yaal@@6B?$HSingleton@VHLog@hcore@yaal@@@12@@
 ??_7HLog@hcore@yaal@@6BHSynchronizedStream@12@@
@@ -30,6 +33,7 @@
 ??_7OSSLContextServer@HOpenSSL@hcore@yaal@@6BOSSLContext@123@@
 ?ALL@FLAG@HListWidget@hconsole@yaal@@2V?$HBitFlag@UFLAG@HListWidget@hconsole@yaal@@@hcore@4@B
 ?APPEND@OPEN@HFile@hcore@yaal@@2V?$HBitFlag@UOPEN@HFile@hcore@yaal@@@34@B
+?ARITHMETIC_MEAN@AGGREGATE_TYPE@xmath@tools@yaal@@2V?$HBitFlag@UAGGREGATE_TYPE@xmath@tools@yaal@@@hcore@4@B
 ?AUTO_XINCLUDE@PARSER@HXml@tools@yaal@@2V?$HBitFlag@UPARSER@HXml@tools@yaal@@@hcore@4@B
 ?AVERAGE@AGGREGATE_TYPE@xmath@tools@yaal@@2V?$HBitFlag@UAGGREGATE_TYPE@xmath@tools@yaal@@@hcore@4@B
 ?BASIC@AGGREGATE_TYPE@xmath@tools@yaal@@2V?$HBitFlag@UAGGREGATE_TYPE@xmath@tools@yaal@@@hcore@4@B
@@ -70,9 +74,11 @@
 ?IGNORE_CONVERSION_ERRORS@PARSER@HXml@tools@yaal@@2V?$HBitFlag@UPARSER@HXml@tools@yaal@@@hcore@4@B
 ?INCLUDE_EMPTY@HTokenizer@hcore@yaal@@2V?$HBitFlag@VHTokenizer@hcore@yaal@@@23@B
 ?INDENT@GENERATOR@HXml@tools@yaal@@2V?$HBitFlag@UGENERATOR@HXml@tools@yaal@@@hcore@4@B
+?INTERQUARTILE_RANGE@AGGREGATE_TYPE@xmath@tools@yaal@@2V?$HBitFlag@UAGGREGATE_TYPE@xmath@tools@yaal@@@hcore@4@B
 ?KEEP_EMPTY@PARSER@HXml@tools@yaal@@2V?$HBitFlag@UPARSER@HXml@tools@yaal@@@hcore@4@B
 ?MANAGED_IO@SystemIO@msvcxx@@2HB
 ?MAXIMUM@AGGREGATE_TYPE@xmath@tools@yaal@@2V?$HBitFlag@UAGGREGATE_TYPE@xmath@tools@yaal@@@hcore@4@B
+?MEAN_ABSOLUTE_DEVIATION@AGGREGATE_TYPE@xmath@tools@yaal@@2V?$HBitFlag@UAGGREGATE_TYPE@xmath@tools@yaal@@@hcore@4@B
 ?MEDIAN@AGGREGATE_TYPE@xmath@tools@yaal@@2V?$HBitFlag@UAGGREGATE_TYPE@xmath@tools@yaal@@@hcore@4@B
 ?MINIMUM@AGGREGATE_TYPE@xmath@tools@yaal@@2V?$HBitFlag@UAGGREGATE_TYPE@xmath@tools@yaal@@@hcore@4@B
 ?N0@number@hcore@yaal@@3VHNumber@23@B
@@ -118,7 +124,9 @@
 ?_attributeEnabled_@hconsole@yaal@@3UOAttribute@HWidget@12@A
 ?_attributeFocused_@hconsole@yaal@@3UOAttribute@HWidget@12@A
 ?_attributeSearchHighlight_@hconsole@yaal@@3HA
+?_attributeSearchHighlight_@hconsole@yaal@@3UOAttribute@HWidget@12@A
 ?_attributeStatusBar_@hconsole@yaal@@3HA
+?_attributeStatusBar_@hconsole@yaal@@3UOAttribute@HWidget@12@A
 ?_autoRehash@HLog@hcore@yaal@@0_NA
 ?_baudRate_@tools@yaal@@3W4SPEED@HSerial@12@A
 ?_commandComposeCharacter_@hconsole@yaal@@3DA
@@ -183,6 +191,7 @@
 ?_resolveHostnames@HSocket@hcore@yaal@@2_NA
 ?_rfc2822DateTimeFormat_@hcore@yaal@@3QBDB
 ?_screenBackground_@hconsole@yaal@@3HA
+?_screenBackground_@hconsole@yaal@@3W4color_t@COLOR@tools@2@A
 ?_serialDevice_@tools@yaal@@3VHString@hcore@2@A
 ?_serialFlags_@tools@yaal@@3V?$HBitFlag@UFLAG@HSerial@tools@yaal@@@hcore@2@A
 ?_threadStackSize@HThread@hcore@yaal@@2HA
@@ -206,6 +215,7 @@
 ?bgwhite@ansi@yaal@@3VHSequence@12@B
 ?bgyellow@ansi@yaal@@3VHSequence@12@B
 ?black@ansi@yaal@@3VHSequence@12@B
+?blink@ansi@yaal@@3VHSequence@12@B
 ?blue@ansi@yaal@@3VHSequence@12@B
 ?bold@ansi@yaal@@3VHSequence@12@B
 ?brightblue@ansi@yaal@@3VHSequence@12@B
@@ -236,6 +246,7 @@
 ?red@ansi@yaal@@3VHSequence@12@B
 ?reset@ansi@yaal@@3VHSequence@12@B
 ?restore@ansi@yaal@@3VHSequence@12@B
+?reverse@ansi@yaal@@3VHSequence@12@B
 ?right@ansi@yaal@@3VHSequence@12@B
 ?save@ansi@yaal@@3VHSequence@12@B
 ?string_literal@executing_parser@tools@yaal@@3ABVHStringLiteral@123@B

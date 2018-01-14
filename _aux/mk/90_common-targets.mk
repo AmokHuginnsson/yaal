@@ -1,6 +1,10 @@
 #phony targets
 .PHONY: all bin check clean clean-dep cov debug dep distclean doc install install-environment mrproper relassert reldeb release prof purge spell static stats uninstall
 
+$(foreach IT,$(TARGETS),$(eval $(call PREPARE_TARGET,$(IT))))
+$(foreach IT,$(TARGETS),$(eval $(call BUILD_TARGET,$(IT))))
+$(foreach IT,$(DIRS),$(eval $(call MAKE_DIR,$(IT))))
+
 all: $(TARGET)
 
 debug relassert reldeb release prof cov: environment $(REAL_TARGETS)
