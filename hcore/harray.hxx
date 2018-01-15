@@ -808,7 +808,7 @@ public:
 		, _index( it_._index ) {
 		static_assert(
 			( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ),
-			"creating non-const instance discards qualifiers"
+			"creating non-const iterator instance discards qualifiers"
 		);
 		return;
 	}

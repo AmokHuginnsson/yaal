@@ -592,7 +592,10 @@ public:
 		: base_type()
 		, _owner( it_._owner )
 		, _index( it_._index ) {
-		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
+		static_assert(
+			trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value,
+			"creating non-const iterator instance discards qualifiers"
+		);
 	}
 	HIterator& operator = ( HIterator const& it_ ) {
 		if ( &it_ != this ) {

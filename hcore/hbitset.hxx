@@ -6,7 +6,6 @@
 #ifndef YAAL_HCORE_HBITSET_HXX_INCLUDED
 #define YAAL_HCORE_HBITSET_HXX_INCLUDED 1
 
-#include "hcore/static_assert.hxx"
 #include "hcore/algorithm.hxx"
 #include "hcore/iterator.hxx"
 #include "hcore/hstring.hxx"
@@ -178,7 +177,7 @@ YAAL_DEFINE_OPER( ^ )
 		return ( bs );
 	}
 	word_t to_integer( void ) const {
-		STATIC_ASSERT( SIZE <= BITS_IN_WORD );
+		static_assert( SIZE <= BITS_IN_WORD, "integer overflow" );
 		return ( bit::reverse( _buf[ 0 ] ) );
 	}
 	word_t const* raw( void ) const {

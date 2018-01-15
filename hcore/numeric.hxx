@@ -7,8 +7,6 @@
 #ifndef YAAL_HCORE_NUMERIC_HXX_INCLUDED
 #define YAAL_HCORE_NUMERIC_HXX_INCLUDED 1
 
-#include "hcore/static_assert.hxx"
-
 namespace yaal {
 
 /*! \brief Compile time numerical calculus functions belong here.
@@ -331,7 +329,7 @@ struct out_of_range<T, val, false> {
  */
 template<typename T, int long val>
 struct integer_cast {
-	STATIC_ASSERT( meta::is_signed<T>::value );
+	static_assert( meta::is_signed<T>::value, "Signed to unsigned cast mismatch." );
 	static T const value = out_of_range<T, static_cast<T>( val ), static_cast<T>( val ) == val>::value;
 };
 template<typename T, int long val>
@@ -341,7 +339,7 @@ T const integer_cast<T, val>::value;
  */
 template<typename T, int long unsigned val>
 struct unsigned_integer_cast {
-	STATIC_ASSERT( meta::logical_not<meta::is_signed< T >::value>::value );
+	static_assert( meta::logical_not<meta::is_signed<T>::value>::value, "Unsigned to signed cast mismatch." );
 	static T const value = out_of_range<T, static_cast<T>( val ), static_cast<T>( val ) == val>::value;
 };
 template<typename T, int long unsigned val>

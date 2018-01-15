@@ -28,21 +28,28 @@ private:
 	char _data[ sizeof ( value_type ) ];
 	bool _initialized;
 public:
-	HOptional( void ) : _data(), _initialized( false ) {}
+	HOptional( void )
+		: _data()
+		, _initialized( false ) {
+	}
 	HOptional( value_type const& value_ )
-		: _data(), _initialized( true ) {
+		: _data()
+		, _initialized( true ) {
 		new ( _data ) value_type( value_ );
 	}
 	~HOptional( void ) {
 		M_PROLOG
-		if ( _initialized )
+		if ( _initialized ) {
 			M_SAFE( operator->()->~value_type() );
+		}
 		M_DESTRUCTOR_EPILOG
 	}
 	HOptional( HOptional const& other_ )
-		: _data(), _initialized( other_._initialized ) {
-		if ( _initialized )
+		: _data()
+		, _initialized( other_._initialized ) {
+		if ( _initialized ) {
 			new ( _data ) value_type( *other_ );
+		}
 	}
 	HOptional& operator = ( HOptional const& other_ ) {
 		if ( &other_ != this ) {
@@ -96,26 +103,36 @@ private:
 	value_type* _value;
 	bool _initialized;
 public:
-	HOptional( void ) : _value(), _initialized( false ) {}
+	HOptional( void )
+		: _value()
+		, _initialized( false ) {
+	}
 	HOptional( value_type& value_ )
-		: _value( &value_ ), _initialized( true ) {
+		: _value( &value_ )
+		, _initialized( true ) {
 	}
 	HOptional( HOptional const& other_ )
-		: _value(), _initialized( other_._initialized ) {
+		: _value()
+		, _initialized( other_._initialized ) {
 		if ( _initialized ) {
 			_value = other_._value;
 		}
 	}
 	template<typename other_t>
 	explicit HOptional( HOptional<other_t&> const& other_ )
-		: _value(), _initialized( other_ ) {
-		STATIC_ASSERT(( trait::same_type<type_t, other_t>::value || trait::same_type<type_t, other_t const>::value ));
+		: _value()
+		, _initialized( other_ ) {
+		static_assert(
+			trait::same_type<type_t, other_t>::value || trait::same_type<type_t, other_t const>::value,
+			"creating non-const optional instance discards qualifiers"
+		);
 		if ( _initialized ) {
 			_value = reinterpret_cast<HOptional const&>( other_ )._value;
 		}
 	}
 	HOptional( HOptional<type_t>& other_ )
-		: _value(), _initialized( other_ ) {
+		: _value()
+		, _initialized( other_ ) {
 		if ( _initialized ) {
 			_value = &*other_;
 		}

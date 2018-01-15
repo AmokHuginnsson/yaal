@@ -47,7 +47,7 @@ namespace yaal {
 
 namespace hconsole {
 
-STATIC_ASSERT( KEY_CODE::SPECIAL_KEY > KEY_MAX );
+static_assert( KEY_CODE::SPECIAL_KEY > KEY_MAX, "ncurses key codes overlap with KEY_CODE codes" );
 
 #ifdef HAVE_ASCII_GRAPHICS
 int GLYPH::ARROW::DOWN;

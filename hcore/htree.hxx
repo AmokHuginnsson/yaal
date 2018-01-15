@@ -669,7 +669,10 @@ public:
 		: base_type()
 		, _owner( it._owner )
 		, _iterator( it._iterator ) {
-		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
+		static_assert(
+			trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value,
+			"creating non-const iterator instance discards qualifiers"
+		);
 		return;
 	}
 	HIterator& operator = ( HIterator const& it ) {
@@ -787,7 +790,10 @@ public:
 		: base_type()
 		, _owner( it._owner )
 		, _track( it._track.begin(), it._track.end() ) {
-		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
+		static_assert(
+			trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value,
+			"creating non-const iterator instance discards qualifiers"
+		);
 		return;
 	}
 	HIterator& operator = ( HIterator const& it ) {

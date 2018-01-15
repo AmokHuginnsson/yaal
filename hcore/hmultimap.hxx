@@ -384,7 +384,10 @@ public:
 	HIterator( HIterator const& it_ ) : base_type(), _owner( it_._owner ), _major( it_._major ), _minor( it_._minor ) {}
 	template<typename other_const_qual_t>
 	HIterator( HIterator<other_const_qual_t> const& it_ ) : base_type(), _owner( it_._owner ), _major( it_._major ), _minor( it_._minor ) {
-		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
+		static_assert(
+			trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value,
+			"creating non-const iterator instance discards qualifiers"
+		);
 	}
 	HIterator& operator = ( HIterator const& it_ ) {
 		if ( &it_ != this ) {

@@ -130,7 +130,10 @@ public:
 	HIterator( HIterator const& it ) : base_type(), _owner( it._owner ), _index( it._index ) {}
 	template<typename other_const_qual_t>
 	HIterator( HIterator<other_const_qual_t> const& it ) : base_type(), _owner( it._owner ), _index( it._index ) {
-		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, bool>::value ));
+		static_assert(
+			trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, bool>::value,
+			"creating non-const iterator instance discards qualifiers"
+		);
 	}
 	HIterator& operator ++ ( void ) {
 		++ _index;

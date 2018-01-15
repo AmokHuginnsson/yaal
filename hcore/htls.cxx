@@ -13,7 +13,7 @@ namespace hcore {
 
 namespace tls {
 
-STATIC_ASSERT( sizeof ( key_t ) >= sizeof ( pthread_key_t ) );
+static_assert( sizeof ( key_t ) >= sizeof ( pthread_key_t ), "native key size exceeds yaal's implementation key size" );
 
 namespace {
 #pragma GCC diagnostic push

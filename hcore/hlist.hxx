@@ -1068,8 +1068,10 @@ public:
 		, _owner( iterator_._owner )
 		, _current( iterator_._current ) {
 		M_PROLOG
-		static_assert( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value,
-				"assigning const_iterator to non-const iterator" );
+		static_assert(
+			trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value,
+			"creating non-const iterator instance discards qualifiers"
+		);
 		return;
 		M_EPILOG
 	}

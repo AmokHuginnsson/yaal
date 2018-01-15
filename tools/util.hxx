@@ -48,7 +48,7 @@ public:
 
 template<typename T>
 inline T hton( T v_ ) {
-	STATIC_ASSERT( is_numeric<T>::value );
+	static_assert( is_numeric<T>::value, "switching endianness on non integer type" );
 	reverse( static_cast<char*>( static_cast<void*>( &v_ ) ), static_cast<char*>( static_cast<void*>( &v_ ) ) + sizeof ( v_ ) );
 	return ( v_ );
 }
