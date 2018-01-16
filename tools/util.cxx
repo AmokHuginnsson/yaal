@@ -285,6 +285,42 @@ yaal::hcore::HString escape_markdown( yaal::hcore::HString const& string_ ) {
 	return ( s );
 	M_EPILOG
 }
+char const _nonBreakingSpace_[] = "\xc2\xa0";
+void insert_non_breaking_spaces( yaal::hcore::HString& str_ ) {
+	M_PROLOG
+	static char const articles[][5] = { "A", " a", "An", " an", "The", " the", "To", " to" };
+	for ( char const* a : articles ) {
+		str_.replace( to_string( a ).append( ' ' ), to_string( a ).append( _nonBreakingSpace_ ) );
+	}
+	return;
+	M_EPILOG
+}
+void insert_line_breaks( yaal::hcore::HString& str_, int atColumn_, char const* prefix_ = nullptr ) {
+	M_PROLOG
+	int long pos( 0 );
+	insert_non_breaking_spaces( str_ );
+	while ( pos < ( str_.get_length() - atColumn_ ) ) {
+		int long spacePos( str_.find_last_one_of( character_class( CHARACTER_CLASS::WHITESPACE ).data(), pos + atColumn_ ) );
+		if ( spacePos != HString::npos ) {
+			str_.set_at( spacePos, '\n'_ycp );
+			pos = spacePos + 1;
+		} else {
+			spacePos = str_.find_one_of( character_class( CHARACTER_CLASS::WHITESPACE ).data(), pos + atColumn_ );
+			if ( spacePos != HString::npos ) {
+				str_.set_at( spacePos, '\n'_ycp );
+				pos = spacePos + 1;
+			} else {
+				break;
+			}
+		}
+	}
+	str_.replace( _nonBreakingSpace_, " " );
+	if ( prefix_ ) {
+		str_.replace( "\n", to_string( "\n" ).append( prefix_ ) );
+	}
+	return;
+	M_EPILOG
+}
 }
 
 void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
@@ -292,6 +328,18 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 	errno = 0;
 	HString name;
 	bool color( is_a_tty( out_ ) && info.color() );
+	int columns( 0 );
+	if ( color && _terminal_.exists() ) {
+		HTerminal::coord_t c( _terminal_.size() );
+		columns = c.second;
+	}
+	if ( columns <= 0 ) {
+		char const* envColumns( ::getenv( "COLUMNS" ) );
+		if ( envColumns ) {
+			columns = lexical_cast<int>( envColumns );
+		}
+	}
+	columns = xmath::clip( 80, columns, 128 );
 	if ( color ) {
 		name.append( *COLOR::to_ansi( info.theme().strong() ) );
 	}
@@ -303,9 +351,14 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 	if ( syntax.is_empty() ) {
 		syntax.assign( "[*OPTION*]... [*FILE*]..." );
 	}
+	HString desc;
+	if ( info.description() ) {
+		desc.assign( info.description() );
+		insert_line_breaks( desc, columns );
+	}
 	out_ << "Usage: " << name << " " << hl( syntax, info.theme(), color, info.markdown() ) << "\n"
 		<< name << " - " << hl( info.intro(), info.theme(), color, info.markdown() ) << "\n\n"
-		<< ( info.description() ? hl( info.description(), info.theme(), color, info.markdown() ) : "" ) << ( info.description() ? "\n\n" : "" )
+		<< ( info.description() ? hl( desc, info.theme(), color, info.markdown() ) : "" ) << ( info.description() ? "\n\n" : "" )
 		<< "Mandatory arguments to long options are mandatory for short options too.\n"
 		"Options:\n";
 	int longestLongLength( 0 );
@@ -325,19 +378,6 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 			longestShortLength = 2;
 		}
 	}
-	HString desc;
-	int columns( 0 );
-	if ( color && _terminal_.exists() ) {
-		HTerminal::coord_t c( _terminal_.size() );
-		columns = c.second;
-	}
-	if ( columns <= 0 ) {
-		char const* envColumns( ::getenv( "COLUMNS" ) );
-		if ( envColumns ) {
-			columns = lexical_cast<int>( envColumns );
-		}
-	}
-	columns = xmath::clip( 80, columns, 128 );
 	int cols( columns - ( longestLongLength + longestShortLength + 2 + 2 + 2 ) );
 	/* display each option description */
 	int const COUNT( static_cast<int>( opts.size() ) );
@@ -364,6 +404,7 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 		char const* comma( is_byte( o.short_form() ) && ! o.long_form().is_empty() ? "," : " " );
 		if ( ! description ) {
 			description = o.description();
+			insert_non_breaking_spaces( description );
 		}
 		/* if long form word exist, build full form of long form */
 		HString lf;
@@ -446,7 +487,7 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 				}
 			}
 			if ( ( ws >= cols ) || ( desc.get_length() > cols ) ) {
-				out_ << hl( desc.left( eol ).trim_right(), info.theme(), color, info.markdown() ) << "\n";
+				out_ << hl( desc.left( eol ).trim_right().replace( _nonBreakingSpace_, " " ), info.theme(), color, info.markdown() ) << "\n";
 				desc.shift_left( eol );
 				desc.trim_left();
 				desc.insert( 0, "  ", 2 );
@@ -460,7 +501,7 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 				}
 				out_ << setw( static_cast<int>( longestLongLength + longestShortLength + 2 + 2 + 2 ) ) << "";
 			} else {
-				out_ << hl( desc, info.theme(), color, info.markdown() ) << "\n";
+				out_ << hl( desc.replace( _nonBreakingSpace_, " " ), info.theme(), color, info.markdown() ) << "\n";
 				description.clear();
 				loop = false;
 			}
@@ -481,6 +522,7 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 
 void dump_configuration( HOptionInfo const& info, HStreamInterface& out_ ) {
 	M_PROLOG
+	static int const MAXIMUM_LINE_LENGTH = 72;
 	if ( info.name() ) {
 		out_ << "# this is configuration file for: `" << info.name() << "' program\n";
 	}
@@ -489,6 +531,12 @@ void dump_configuration( HOptionInfo const& info, HStreamInterface& out_ ) {
 	}
 	if ( info.name() || info.intro() ) {
 		out_ << "\n";
+	}
+	HString desc;
+	if ( info.description() ) {
+		desc.assign( plain( info.description() ) );
+		insert_line_breaks( desc, MAXIMUM_LINE_LENGTH, "# " );
+		out_ << "# " << desc << "\n\n";
 	}
 	out_ <<
 "# comments begin with `#' char and continues until end of line\n"
@@ -506,7 +554,6 @@ void dump_configuration( HOptionInfo const& info, HStreamInterface& out_ ) {
 "#\n"
 "# example:\n"
 "# log_path ${HOME}/var/log/program.log\n\n";
-	HString desc;
 	HString description;
 	HProgramOptionsHandler::options_t const& opts = info.opt().get_options();
 	int const COUNT = static_cast<int>( opts.size() );
@@ -526,7 +573,6 @@ void dump_configuration( HOptionInfo const& info, HStreamInterface& out_ ) {
 					&& ( o.description() == description ) )
 				description = "";
 		}
-		static int const MAXIMUM_LINE_LENGTH = 72;
 		out_ << "### " << o.long_form() << " ###\n# type: ";
 		switch ( o.recipient_type() ) {
 			case ( TYPE::BOOL ): {
