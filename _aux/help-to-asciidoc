@@ -13,8 +13,13 @@ class Option:
 		self_._desc = desc_
 		self_._optional = optional_
 
-def capitalize( str_ ):
-	return str_[0].upper() + str_[1:]
+def prepare_description( str_ ):
+	capitalized = str_[0].upper() + str_[1:]
+	parts = capitalized.split( "`" )
+	for i in range( len( parts ) ):
+		if i % 2 == 1:
+			parts[i] = parts[i].replace( "_", "**" ).replace( "\\**", "\\_" )
+	return "_".join( parts )
 
 strongRe = re.compile( "(?<!\\\\)\\*\\*" )
 strongTag = "‼strongTag‼"
@@ -108,9 +113,9 @@ def main():
 		else:
 			footer += ( l + "\n" )
 	usage = preamble[0].replace( binary, "**" + args.project + "**" )
-	del preamble[0]
+	del preamble[0:2]
 	name = preamble[0].replace( binary, args.project )
-	del preamble[0]
+	del preamble[0:2]
 	if usage.startswith( "Usage: " ):
 		usage = usage[7:]
 
@@ -134,7 +139,7 @@ def main():
 				"='" + o._value + "'" + ( "*]*" if o._optional else "" ) if o._value else ""
 			)
 		)
-		out.write( "\t" + markdown_to_asciidoc( capitalize( o._desc ) ) + ( "." if not o._desc.endswith( "." ) else "" ) + "\n\n" )
+		out.write( "\t" + markdown_to_asciidoc( prepare_description( o._desc ) ) + ( "." if not o._desc.endswith( "." ) else "" ) + "\n\n" )
 
 	if len( footer ) > 1:
 		out.write( markdown_to_asciidoc( footer.replace( binary, args.project ) ) + "\n\n" )

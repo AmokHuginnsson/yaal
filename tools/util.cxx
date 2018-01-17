@@ -252,12 +252,81 @@ yaal::hcore::HProgramOptionsHandler const& HOptionInfo::opt( void ) const {
 	return ( _opt );
 }
 
+class HHighlighter {
+public:
+	typedef HStack<HString> colors_t;
+private:
+	HTheme _theme;
+	colors_t _colors;
+	bool _strong;
+	bool _emphasis;
+	bool _code;
+	bool _special;
+public:
+	HHighlighter( HTheme const& theme_ = HTheme() )
+		: _theme( theme_ )
+		, _colors()
+		, _strong( false )
+		, _emphasis( false )
+		, _code( false )
+		, _special( false ) {
+		M_PROLOG
+		_colors.push( *reset );
+		return;
+		M_EPILOG
+	}
+	yaal::hcore::HString highlight( yaal::hcore::HString const& str_ ) {
+		M_PROLOG
+		HString s;
+		HString c;
+		auto apply = [this, &c]( bool& state_, COLOR::color_t color_ ) {
+			if ( state_ ) {
+				c.assign( *COLOR::to_ansi( COLOR::ATTR_RESET ) );
+				_colors.pop();
+			} else {
+				c.clear();
+				_colors.push( *COLOR::to_ansi( color_ ) );
+			}
+			c.append( _colors.top() );
+			state_ = !state_;
+		};
+		for ( HString::const_iterator it( str_.begin() ), end( str_.end() ); it != end; ++ it ) {
+			if ( *it == '\\' ) {
+				++ it;
+				if ( ! ( it != end ) ) {
+					break;
+				}
+				s.append( *it );
+				continue;
+			}
+			c = *it;
+			if ( *it == '`' ) {
+				apply( _code, _theme.code() );
+			} else if ( *it == '$' ) {
+				apply( _special, _theme.special() );
+			} else if ( ( *it == '*' ) || ( *it == '_' ) ) {
+				code_point_t prefix( *it );
+				++ it;
+				if ( ( it != end ) && ( *it == prefix ) ) {
+					apply( _strong, _theme.strong() );
+				} else {
+					-- it;
+					apply( _emphasis, _theme.emphasis() );
+				}
+			}
+			s.append( c );
+		}
+		return ( s );
+		M_EPILOG
+	}
+};
+
 namespace {
-yaal::hcore::HString hl( yaal::hcore::HString const& str_, HTheme const& theme_, bool color_, bool markdown_ ) {
+yaal::hcore::HString hl( HHighlighter& highlighter_, yaal::hcore::HString const& str_, bool color_, bool markdown_ ) {
 	M_PROLOG
 	HString s;
 	if ( color_ ) {
-		s = highlight( str_, theme_ );
+		s = highlighter_.highlight( str_ );
 	} else if ( markdown_ ) {
 		s = str_;
 	} else {
@@ -269,9 +338,16 @@ yaal::hcore::HString hl( yaal::hcore::HString const& str_, HTheme const& theme_,
 	return ( s );
 	M_EPILOG
 }
+yaal::hcore::HString hl( yaal::hcore::HString const& str_, HTheme const& theme_, bool color_, bool markdown_ ) {
+	M_PROLOG
+	HHighlighter highlighter( theme_ );
+	return ( hl( highlighter, str_, color_, markdown_ ) );
+	M_EPILOG
+}
 yaal::hcore::HString plain( yaal::hcore::HString const& str_ ) {
 	M_PROLOG
-	return ( hl( str_, HTheme(), false, false ) );
+	HHighlighter highlighter;
+	return ( hl( highlighter, str_, false, false ) );
 	M_EPILOG
 }
 yaal::hcore::HString escape_markdown( yaal::hcore::HString const& string_ ) {
@@ -357,10 +433,11 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 		insert_line_breaks( desc, columns );
 	}
 	out_ << "Usage: " << name << " " << hl( syntax, info.theme(), color, info.markdown() ) << "\n"
+		<< ( info.markdown() ? "\n" : "" )
 		<< name << " - " << hl( info.intro(), info.theme(), color, info.markdown() ) << "\n\n"
 		<< ( info.description() ? hl( desc, info.theme(), color, info.markdown() ) : "" ) << ( info.description() ? "\n\n" : "" )
-		<< "Mandatory arguments to long options are mandatory for short options too.\n"
-		"Options:\n";
+		<< "Mandatory arguments to long options are mandatory for short options too." << ( info.markdown() ? "  \n" : "\n" )
+		<< "Options:\n" << ( info.markdown() ? "\n" : "" );
 	int longestLongLength( 0 );
 	int longestShortLength( 0 );
 	HProgramOptionsHandler::options_t const& opts( info.opt().get_options() );
@@ -378,7 +455,9 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 			longestShortLength = 2;
 		}
 	}
-	int cols( columns - ( longestLongLength + longestShortLength + 2 + 2 + 2 ) );
+	static int const INDENT( info.markdown() ? 4 : 2 );
+	/* + INDENT for two prefixing spaces, + 2 for 2 spaces separating options from descriptions, + 2 for comma and space */
+	int cols( columns - ( longestLongLength + longestShortLength + INDENT + 2 + 2 ) );
 	/* display each option description */
 	int const COUNT( static_cast<int>( opts.size() ) );
 	HString description;
@@ -456,13 +535,14 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 				}
 			}
 		}
-		out_ << "  " << setw( static_cast<int>( longestShortLength + extraSFL ) ) << sf << comma << " "
+		out_ << ( info.markdown() ? "    " : "  " )
+			<< setw( static_cast<int>( longestShortLength + extraSFL ) ) << sf << comma << " "
 			<< setw( static_cast<int>( longestLongLength + extraLFL ) ) << hcore::left << lf << hcore::right << "  ";
-		/* + 2 for two prefixing spaces, + 2 for 2 spaces separating options from descriptions, + 2 for comma and space */
 		desc = description;
 		if ( ! o.default_value().is_empty() ) {
 			desc.append( " (default: *" ).append( escape_markdown( o.default_value() ) ).append( "*)" );
 		}
+		HHighlighter highlighter( info.theme() );
 		bool loop( true );
 		do {
 			int eol( 0 );
@@ -487,10 +567,10 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 				}
 			}
 			if ( ( ws >= cols ) || ( desc.get_length() > cols ) ) {
-				out_ << hl( desc.left( eol ).trim_right().replace( _nonBreakingSpace_, " " ), info.theme(), color, info.markdown() ) << "\n";
+				out_ << hl( highlighter, desc.left( eol ).trim_right().replace( _nonBreakingSpace_, " " ), color, info.markdown() ) << "\n";
 				desc.shift_left( eol );
 				desc.trim_left();
-				desc.insert( 0, "  ", 2 );
+				desc.insert( 0, "    ", info.markdown() ? 4 : 2 );
 				if ( i < ( COUNT - 1 ) ) {
 					HProgramOptionsHandler::HOption const& n = opts[ i + 1 ];
 					if ( ( ! o.long_form().is_empty() && ! n.long_form().is_empty() && ( o.long_form() == n.long_form() ) )
@@ -501,7 +581,7 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 				}
 				out_ << setw( static_cast<int>( longestLongLength + longestShortLength + 2 + 2 + 2 ) ) << "";
 			} else {
-				out_ << hl( desc.replace( _nonBreakingSpace_, " " ), info.theme(), color, info.markdown() ) << "\n";
+				out_ << hl( highlighter, desc.replace( _nonBreakingSpace_, " " ), color, info.markdown() ) << "\n";
 				description.clear();
 				loop = false;
 			}
@@ -657,66 +737,26 @@ void dump_configuration( HOptionInfo const& info, HStreamInterface& out_ ) {
 void failure( int exitStatus_, char const* format_, ... ) {
 	M_PROLOG
 	static int const MAX_FAILURE_MESSAGE_LENGTH( 4096 );
+	bool color( is_a_tty( stderr ) );
 	char msg[MAX_FAILURE_MESSAGE_LENGTH];
 	va_list ap;
 	va_start( ap, format_ );
-	int size( vsnprintf( msg, MAX_FAILURE_MESSAGE_LENGTH, format_, ap ) );
+	vsnprintf( msg, MAX_FAILURE_MESSAGE_LENGTH, format_, ap );
 	va_end( ap );
-	fwrite( msg, 1, static_cast<size_t>( size ), stderr );
-	log << "failure: " << msg;
+	HHighlighter highlighter;
+	HString formated( color ? highlighter.highlight( msg ) : msg );
+	HUTF8String utf8( formated );
+	fwrite( utf8.c_str(), 1, static_cast<size_t>( utf8.byte_count() ), stderr );
+	log << "failure: " << plain( msg );
 	throw ( exitStatus_ );
 	M_EPILOG
 }
 
 yaal::hcore::HString highlight( yaal::hcore::HString const& str_, HTheme const& theme_ ) {
-	HString s( str_ );
-	bool strong( false );
-	bool emphasis( false );
-	bool code( false );
-	bool special( false );
-	typedef HStack<HString> colors_t;
-	colors_t colors;
-	colors.push( *reset );
-	s.clear();
-	HString c;
-	auto apply = [&colors, &c]( bool& state_, COLOR::color_t color_ ) {
-		if ( state_ ) {
-			c.assign( *COLOR::to_ansi( COLOR::ATTR_RESET ) );
-			colors.pop();
-		} else {
-			c.clear();
-			colors.push( *COLOR::to_ansi( color_ ) );
-		}
-		c.append( colors.top() );
-		state_ = !state_;
-	};
-	for ( HString::const_iterator it( str_.begin() ), end( str_.end() ); it != end; ++ it ) {
-		if ( *it == '\\' ) {
-			++ it;
-			if ( ! ( it != end ) ) {
-				break;
-			}
-			s.append( *it );
-			continue;
-		}
-		c = *it;
-		if ( *it == '`' ) {
-			apply( code, theme_.code() );
-		} else if ( *it == '$' ) {
-			apply( special, theme_.special() );
-		} else if ( ( *it == '*' ) || ( *it == '_' ) ) {
-			code_point_t prefix( *it );
-			++ it;
-			if ( ( it != end ) && ( *it == prefix ) ) {
-				apply( strong, theme_.strong() );
-			} else {
-				-- it;
-				apply( emphasis, theme_.emphasis() );
-			}
-		}
-		s.append( c );
-	}
-	return ( s );
+	M_PROLOG
+	HHighlighter highlighter( theme_ );
+	return ( highlighter.highlight( str_ ) );
+	M_EPILOG
 }
 
 char const* near_keys( char key_ ) {
