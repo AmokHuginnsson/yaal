@@ -690,9 +690,7 @@ void HProgramOptionsHandler::set_option( HOption& option_, HString const& value_
 	M_EPILOG
 }
 
-int HProgramOptionsHandler::process_command_line( int argc_,
-		char** argv_,
-		int* invalid_ ) {
+int HProgramOptionsHandler::process_command_line( int argc_, char** argv_, int* invalid_ ) {
 	M_PROLOG
 	hcore::log( LOG_LEVEL::INFO ) << "Decoding switches ... ";
 	HString optName;
@@ -730,9 +728,9 @@ int HProgramOptionsHandler::process_command_line( int argc_,
 		} else if ( arg[0] == '-' ) {
 			++ arg;
 			while ( *arg ) {
-				HOption* opt( ( it = find_if( _options.begin(), _options.end(), [&arg]( HOption& opt_ ) { return ( opt_.short_form() == *arg ); } ) ) != _options.end() ? &*it : nullptr );
+				char on( *arg );
+				HOption* opt( ( it = find_if( _options.begin(), _options.end(), [&on]( HOption& opt_ ) { return ( opt_.short_form() == on ); } ) ) != _options.end() ? &*it : nullptr );
 				if ( opt ) {
-					char on( *arg );
 					if ( ( opt->switch_type() == HOption::ARGUMENT::REQUIRED ) || ( opt->switch_type() == HOption::ARGUMENT::OPTIONAL ) ) {
 						optValue.assign( arg + 1 );
 						arg += optValue.get_length();
@@ -751,7 +749,7 @@ int HProgramOptionsHandler::process_command_line( int argc_,
 					set_option( *opt, optValue );
 				} else {
 					++ invalid;
-					cerr << argv_[0] << ": invalid option -- '" << *arg << "'" << endl;
+					cerr << argv_[0] << ": invalid option -- '" << on << "'" << endl;
 				}
 				++ arg;
 			}

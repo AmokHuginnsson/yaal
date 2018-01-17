@@ -310,7 +310,7 @@ inline HHuginn::value_t replace( huginn::HThread* thread_, HHuginn::value_t* obj
 	M_EPILOG
 }
 
-inline HHuginn::value_t strip( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+inline HHuginn::value_t strip( HString&( HString::* trim_ )( HString const& ), huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "string.strip";
 	verify_arg_count( name, values_, 0, 1, thread_, position_ );
@@ -322,9 +322,9 @@ inline HHuginn::value_t strip( huginn::HThread* thread_, HHuginn::value_t* objec
 	HString dest( get_string( object_->raw() ) );
 	int long len( dest.get_length() );
 	if ( trimChars ) {
-		dest.trim( *trimChars );
+		(dest.*trim_)( *trimChars );
 	} else {
-		dest.trim();
+		(dest.*trim_)( character_class( CHARACTER_CLASS::WHITESPACE ).data() );
 	}
 	HHuginn::value_t v;
 	if ( dest.get_length() != len ) {
@@ -387,7 +387,9 @@ public:
 				{ "find_last_other_than", objectFactory_->create_method( hcore::call( &string::find_raw, "string.find_last_other_than", static_cast<finder_raw_t>( &HString::find_last_other_than ), hcore::HString::npos + 0, _1, _2, _3, _4 ) ), "( *set* ) - find position of any characters that in not present in given *set* that appears last just before *before* position in the string" },
 				{ "format",               objectFactory_->create_method( hcore::call( &string::format, _1, _2, _3, _4 ) ),   "( *item...* ) - construct string based on *format template* using *item*s as format substitutions" },
 				{ "replace",              objectFactory_->create_method( hcore::call( &string::replace, _1, _2, _3, _4 ) ),  "( *what*, *with* ) - replace all occurrences of *what* substring with *with* substring" },
-				{ "strip",                objectFactory_->create_method( hcore::call( &string::strip, _1, _2, _3, _4 ) ),    "strip( *set* ) - strip all occurrences of characters in *set* from both ends of the string" },
+				{ "strip",                objectFactory_->create_method( hcore::call( &string::strip, &hcore::HString::trim, _1, _2, _3, _4 ) ),       "( *set* ) - strip all occurrences of characters in *set* from both ends of the string" },
+				{ "strip_left",           objectFactory_->create_method( hcore::call( &string::strip, &hcore::HString::trim_left, _1, _2, _3, _4 ) ),  "( *set* ) - strip all occurrences of characters in *set* from the left side of the string" },
+				{ "strip_right",          objectFactory_->create_method( hcore::call( &string::strip, &hcore::HString::trim_right, _1, _2, _3, _4 ) ), "( *set* ) - strip all occurrences of characters in *set* from the right side of the string" },
 				{ "to_lower",             objectFactory_->create_method( hcore::call( &string::to_lower, _1, _2, _3, _4 ) ), "turn all string's characters to lower case" },
 				{ "to_upper",             objectFactory_->create_method( hcore::call( &string::to_upper, _1, _2, _3, _4 ) ), "turn all string's characters to upper case" },
 				{ "clear",                objectFactory_->create_method( hcore::call( &string::clear, _1, _2, _3, _4 ) ),    "erase string content" }
