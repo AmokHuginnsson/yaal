@@ -60,7 +60,7 @@ def main():
 	isOptions = False
 	for l in lines:
 		line = l.strip()
-		optionStart = line.startswith( "-" )
+		optionStart = line.startswith( "-" ) and not line.startswith( "- " )
 		if optionStart:
 			isPreamble = False
 			isOptions = True

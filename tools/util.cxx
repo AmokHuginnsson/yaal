@@ -376,6 +376,11 @@ void insert_line_breaks( yaal::hcore::HString& str_, int atColumn_, char const* 
 	int long pos( 0 );
 	insert_non_breaking_spaces( str_ );
 	while ( pos < ( str_.get_length() - atColumn_ ) ) {
+		int long lineBreakPos( str_.find( '\n'_ycp, pos ) );
+		if ( ( lineBreakPos != HString::npos ) && ( lineBreakPos - pos < atColumn_ ) ) {
+			pos = lineBreakPos + 1;
+			continue;
+		}
 		int long spacePos( str_.find_last_one_of( character_class( CHARACTER_CLASS::WHITESPACE ).data(), pos + atColumn_ ) );
 		if ( spacePos != HString::npos ) {
 			str_.set_at( spacePos, '\n'_ycp );
