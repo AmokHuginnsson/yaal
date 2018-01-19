@@ -545,34 +545,14 @@ void HProgramOptionsHandler::verify_new_option( HOption& option_ ) {
 	M_EPILOG
 }
 
-namespace program_options_helper {
-
 namespace {
 
-void process_loader( ORCLoader& loader ) {
+void process_loader( program_options_helper::ORCLoader& loader ) {
 	M_PROLOG
 	loader._optionHandler.process_rc_file( loader._section, loader.rc_callback );
 	return;
 	M_EPILOG
 }
-
-}
-
-int reload_configuration( void ) {
-	M_PROLOG
-	HSetup& setup( HSetup::get_instance() );
-	HLocker lock( setup );
-	log << "Reloading configuration." << endl;
-	for ( HSetup::iterator it( setup.begin() ), end( setup.end() ); it != end; ++ it ) {
-		process_loader( it->second );
-	}
-	return ( 0 );
-	M_EPILOG
-}
-
-}
-
-namespace {
 
 /* Reads one line from file_, stores beginning of line in option_,
  * stores rest of line in value_, returns 1 if there are more lines
@@ -782,6 +762,23 @@ void HProgramOptionsHandler::set_from_env( void ) {
 		}
 	}
 	return;
+	M_EPILOG
+}
+
+}
+
+namespace program_options_helper {
+
+int reload_configuration( void ) {
+	M_PROLOG
+	using namespace hcore::program_options_helper;
+	HSetup& setup( HSetup::get_instance() );
+	HLocker lock( setup );
+	hcore::log << "Reloading configuration." << endl;
+	for ( HSetup::iterator it( setup.begin() ), end( setup.end() ); it != end; ++ it ) {
+		process_loader( it->second );
+	}
+	return ( 0 );
 	M_EPILOG
 }
 

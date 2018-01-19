@@ -12,9 +12,32 @@
 #include "hcore/hboundcall.hxx"
 #include "hcore/hfile.hxx"
 #include "hcore/hhashmap.hxx"
+#include "hcore/programoptionshelper.hxx"
+#include "tools/hoptional.hxx"
 #include "tools/color.hxx"
 
 namespace yaal {
+
+namespace program_options_helper {
+
+template<typename tType>
+void set_option_value_from_string( yaal::tools::HOptional<tType>& object, yaal::hcore::HString const& value ) {
+	M_PROLOG
+	tType tmp;
+	set_option_value_from_string( tmp, value );
+	object = tmp;
+	return;
+	M_EPILOG
+}
+
+template<typename tType>
+yaal::hcore::HString get_string_from_option_value( yaal::tools::HOptional<tType> const& value_ ) {
+	M_PROLOG
+	return ( value_ ? get_string_from_option_value( *value_ ) : "" );
+	M_EPILOG
+}
+
+}
 
 namespace hcore {
 

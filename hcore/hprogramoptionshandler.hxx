@@ -7,46 +7,20 @@
  * Declaration of command line handling routines.
  */
 
-#ifndef YAAL_HCORE_PROGRAMOPTIONSHANDLER_HXX_INCLUDED
-#define YAAL_HCORE_PROGRAMOPTIONSHANDLER_HXX_INCLUDED 1
+#ifndef YAAL_HCORE_HPROGRAMOPTIONSHANDLER_HXX_INCLUDED
+#define YAAL_HCORE_HPROGRAMOPTIONSHANDLER_HXX_INCLUDED 1
 
 #include "hcore/hpointer.hxx"
-#include "hcore/harray.hxx"
-#include "hcore/hdeque.hxx"
-#include "hcore/hlist.hxx"
-#include "hcore/hset.hxx"
-#include "hcore/hhashset.hxx"
 #include "hcore/hfile.hxx"
 #include "hcore/hpair.hxx"
 #include "hcore/reflection.hxx"
 #include "hcore/memory.hxx"
 #include "hcore/hboundcall.hxx"
+#include "hcore/programoptionshelper.hxx"
 
 namespace yaal {
 
 namespace hcore {
-
-namespace program_options_helper {
-
-template<typename tType>
-void set_option_value_from_string( tType& object, yaal::hcore::HString const& value );
-
-template<typename tType>
-void set_option_value_from_string( yaal::hcore::HArray<tType>& object, yaal::hcore::HString const& value );
-
-template<typename tType>
-void set_option_value_from_string( yaal::hcore::HDeque<tType>& object, yaal::hcore::HString const& value );
-
-template<typename tType>
-void set_option_value_from_string( yaal::hcore::HList<tType>& object, yaal::hcore::HString const& value );
-
-template<typename tType>
-void set_option_value_from_string( yaal::hcore::HSet<tType>& object, yaal::hcore::HString const& value );
-
-template<typename tType>
-void set_option_value_from_string( yaal::hcore::HHashSet<tType>& object, yaal::hcore::HString const& value );
-
-}
 
 /*! \brief Handle program options from command-line and configuration (resource) file.
  */
@@ -127,7 +101,7 @@ public:
 		}
 		template<typename T>
 		static yaal::hcore::HString get( T const& value_ ) {
-			return ( lexical_cast<yaal::hcore::HString>( value_ ) );
+			return ( program_options_helper::get_string_from_option_value( value_ ) );
 		}
 	};
 	template<typename tType>
@@ -175,67 +149,6 @@ private:
 
 typedef HExceptionT<HProgramOptionsHandler> HProgramOptionsHandlerException;
 
-/*! \brief Helper functions for program options handling infrastructure.
- */
-namespace program_options_helper {
-
-template<typename tType>
-void set_option_value_from_string( HArray<tType>& object, HString const& value ) {
-	M_PROLOG
-	object.push_back( lexical_cast<tType>( value ) );
-	return;
-	M_EPILOG
-}
-
-template<typename tType>
-void set_option_value_from_string( HDeque<tType>& object, HString const& value ) {
-	M_PROLOG
-	object.push_back( lexical_cast<tType>( value ) );
-	return;
-	M_EPILOG
-}
-
-template<typename tType>
-void set_option_value_from_string( HList<tType>& object, HString const& value ) {
-	M_PROLOG
-	object.push_back( lexical_cast<tType>( value ) );
-	return;
-	M_EPILOG
-}
-
-template<typename tType>
-void set_option_value_from_string( HSet<tType>& object, HString const& value ) {
-	M_PROLOG
-	object.insert( lexical_cast<tType>( value ) );
-	return;
-	M_EPILOG
-}
-
-template<typename tType>
-void set_option_value_from_string( HHashSet<tType>& object, HString const& value ) {
-	M_PROLOG
-	object.insert( lexical_cast<tType>( value ) );
-	return;
-	M_EPILOG
-}
-
-/*! \brief Set variable value based on string.
- */
-template<typename tType>
-void set_option_value_from_string( tType& object, HString const& value ) {
-	M_PROLOG
-	object = lexical_cast<tType>( value );
-	return;
-	M_EPILOG
-}
-
-}
-
-namespace program_options_helper {
-
-int reload_configuration( void );
-
-}
 
 inline void swap( yaal::hcore::HProgramOptionsHandler::HOption& a, yaal::hcore::HProgramOptionsHandler::HOption& b )
 	{ a.swap( b ); }
@@ -244,5 +157,5 @@ inline void swap( yaal::hcore::HProgramOptionsHandler::HOption& a, yaal::hcore::
 
 }
 
-#endif /* #ifndef YAAL_HCORE_PROGRAMOPTIONSHANDLER_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HPROGRAMOPTIONSHANDLER_HXX_INCLUDED */
 
