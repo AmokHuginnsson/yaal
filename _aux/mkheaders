@@ -31,6 +31,14 @@ if [ -z "${LIB_NAME}" -o -z "${LIB_VERSION}" -o -z "${DIR_ROOT}" -o -z "${DIR_BU
 	exit 1
 fi
 
+if [ "x${VERBOSE}" != "x" ] ; then
+	echo "LIB_NAME    = ${LIB_NAME}"
+	echo "LIB_VERSION = ${LIB_VERSION}"
+	echo "DIR_ROOT    = ${DIR_ROOT}"
+	echo "DIR_BUILD   = ${DIR_BUILD}"
+	echo "HDRS        = [${HDRS}]"
+fi
+
 umask 022
 
 LIB_NAME_UC=`echo ${LIB_NAME} | tr [a-z] [A-Z]`
