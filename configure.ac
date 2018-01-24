@@ -228,8 +228,11 @@ AC_MSG_RESULT([--- All needed libraries found. ---                     [[70%]]])
 
 AC_MSG_RESULT([--- Additional checks ... ---                           [[71%]]])
 AC_SUBST([SERIAL_DEVICE],['null'])
-AC_CHECK_FILE([/dev/cuaa0],[AC_SUBST([SERIAL_DEVICE],['cuaa0'])],
-	[AC_CHECK_FILE([/dev/ttyS0],[AC_SUBST([SERIAL_DEVICE],['ttyS0'])])])
+
+if test ["x${build_os}"] = ["x${host_os}"] ; then
+	AC_CHECK_FILE([/dev/cuaa0],[AC_SUBST([SERIAL_DEVICE],['cuaa0'])],
+		[AC_CHECK_FILE([/dev/ttyS0],[AC_SUBST([SERIAL_DEVICE],['ttyS0'])])])
+fi
 
 CXXFLAGS=["${CXXFLAGS_ORIG}"]
 
@@ -243,24 +246,26 @@ AC_COMPILE_IFELSE([AC_LANG_SOURCE([[void f( void ) { static char const dynamicLi
 dnl `
 AC_MSG_RESULT([$RESULT])
 
-AC_MSG_CHECKING([whether strftime() returns required buffer size])
-RESULT=["no"]
-AC_RUN_IFELSE([AC_LANG_SOURCE([[#include <ctime>
-#include <unistd.h>
-#include <sys/wait.h>
-int main( int, char const** ) {
-	time_t t( time( NULL ) );
-	struct tm broken;
-	localtime_r( &t, &broken );
-	pid_t pid( fork() );
-	if ( ! pid ) {
-		return ( strftime( NULL, 1024, "%Y-%m-%d %T", &broken ) );
-	}
-	int status( 0 );
-	waitpid( pid, &status, 0 );
-	return ( WIFEXITED( status ) ? WEXITSTATUS( status ) - 19 : 1 );
-}]])], [AC_DEFINE([HAVE_SMART_STRFTIME],[],[Can your strftime calculate output length?])] [RESULT=["yes"]])
-AC_MSG_RESULT([$RESULT])
+if test ["x${build_os}"] = ["x${host_os}"] ; then
+	AC_MSG_CHECKING([whether strftime() returns required buffer size])
+	RESULT=["no"]
+	AC_RUN_IFELSE([AC_LANG_SOURCE([[#include <ctime>
+	#include <unistd.h>
+	#include <sys/wait.h>
+	int main( int, char const** ) {
+		time_t t( time( NULL ) );
+		struct tm broken;
+		localtime_r( &t, &broken );
+		pid_t pid( fork() );
+		if ( ! pid ) {
+			return ( strftime( NULL, 1024, "%Y-%m-%d %T", &broken ) );
+		}
+		int status( 0 );
+		waitpid( pid, &status, 0 );
+		return ( WIFEXITED( status ) ? WEXITSTATUS( status ) - 19 : 1 );
+	}]])], [AC_DEFINE([HAVE_SMART_STRFTIME],[],[Can your strftime calculate output length?])] [RESULT=["yes"]])
+	AC_MSG_RESULT([$RESULT])
+fi
 
 AC_MSG_CHECKING([whether contents of input buffer for iconv() is const])
 RESULT=["no"]
@@ -525,13 +530,12 @@ AH_BOTTOM([
 dnl We have to set up proper compiler/linker flags.
 AC_CONFIG_HEADERS(config.hxx)
 AC_CONFIG_FILES([Makefile.mk yaalrc yaal.pc])
-AC_CHECK_FILE(
-	[${srcdir}/LICENSE.md],
+if test -f ["${srcdir}/LICENSE.md"] ; then
 	AC_CONFIG_FILES(
 		[license.hxx:LICENSE.md],
 		[${srcdir}/_aux/mklicense license.hxx ${srcdir}/LICENSE.md]
 	)
-)
+fi
 AC_OUTPUT
 AC_MSG_RESULT([--- All ok, good luck! ---                              [[100%]]])
 AC_MSG_RESULT([[Now you can type `make'.]])

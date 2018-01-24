@@ -251,14 +251,14 @@ struct obinary<0> {
  * \tparam exponent - exponent of power function.
  * \retval value - base**exponent.
  */
-template<int long long unsigned const base, int long unsigned const exponent, int long unsigned const helper = 1>
+template<int long long unsigned const base, int long long unsigned const exponent, int long long unsigned const helper = 1>
 struct power {
 	static int long long unsigned const value = power<base, exponent - 1, helper * base>::value;
 };
 
 /*! \cond */
-template<int long long unsigned const base, int long unsigned const helper>
-struct power<base,0,helper> {
+template<int long long unsigned const base, int long long unsigned const helper>
+struct power<base, 0, helper> {
 	static int long long unsigned const value = helper;
 };
 /*! \endcond */
