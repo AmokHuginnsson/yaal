@@ -526,6 +526,20 @@ void OCompiler::resolve_symbols( void ) {
 	M_EPILOG
 }
 
+void OCompiler::merge( HHuginn::expression_t& to_, HHuginn::expression_t& from_ ) {
+	M_PROLOG
+	int stepOffset( to_->execution_step_count() );
+	to_->merge( *from_ );
+	for ( OExecutionStep& es : _executionStepsBacklog ) {
+		if ( es._expression == from_ ) {
+			es._expression = to_;
+			es._index += stepOffset;
+		}
+	}
+	return;
+	M_EPILOG
+}
+
 namespace {
 HString use_name( OCompiler::OIdentifierUse::TYPE type_ ) {
 	HString name;
@@ -1025,14 +1039,32 @@ void OCompiler::add_capture( yaal::hcore::HString const& name_, executing_parser
 	if ( find( fc._captures.begin(), fc._captures.end(), captureIdentifier ) != fc._captures.end() ) {
 		throw HHuginn::HHuginnRuntimeException( "Capture `"_ys.append( name_ ).append( "' was already defined." ), MAIN_FILE_ID, position_.get() );
 	}
-	HHuginn::expression_t& expression( current_expression() );
 	if ( fc._captures.is_empty() ) {
-		expression->oper( OPERATOR::FUNCTION_CALL, position_.get() );
+		current_expression()->oper( OPERATOR::FUNCTION_CALL, position_.get() );
 	}
-	defer_get_reference( name_, position_ );
+	fc._operations.emplace( OPERATOR::FUNCTION_CALL, position_.get() );
+	fc._captures.push_back( captureIdentifier );
+	start_subexpression( position_ );
+	return;
+	M_EPILOG
+}
+
+void OCompiler::commit_capture( executing_parser::position_t position_ ) {
+	M_PROLOG
+	OFunctionContext& fc( f() );
+	OCompiler::expressions_stack_t& exprStack( fc.expressions_stack() );
+	HHuginn::expression_t captureExpression( exprStack.top().back() );
+	exprStack.pop();
+	HHuginn::expression_t& expression( exprStack.top().back() );
+	M_ASSERT( ! fc._operations.is_empty() && ( fc._operations.top()._operator == OPERATOR::FUNCTION_CALL ) );
+	fc._operations.pop();
+	if ( captureExpression->is_empty() ) {
+		defer_get_reference( _runtime->identifier_name( fc._captures.back() ), position_ );
+	} else {
+		merge( expression, captureExpression );
+	}
 	fc._valueTypes.pop();
 	expression->oper( OPERATOR::FUNCTION_ARGUMENT, position_.get() );
-	fc._captures.push_back( captureIdentifier );
 	return;
 	M_EPILOG
 }
@@ -1211,7 +1243,7 @@ void OCompiler::commit_boolean( OPERATOR operator_, executing_parser::position_t
 	} else {
 		HHuginn::expression_t e( fc._scopeStack.top()->expression() );
 		fc.expressions_stack().pop();
-		fc._scopeStack.top()->expression()->merge( *e );
+		merge( fc._scopeStack.top()->expression(), e );
 	}
 	return;
 	M_EPILOG
@@ -1234,7 +1266,7 @@ void OCompiler::commit_ternary( executing_parser::position_t position_ ) {
 	} else {
 		HHuginn::expression_t e( fc._scopeStack.top()->expression() );
 		fc.expressions_stack().pop();
-		fc._scopeStack.top()->expression()->merge( *e );
+		merge( fc._scopeStack.top()->expression(), e );
 	}
 }
 

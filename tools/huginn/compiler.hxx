@@ -444,6 +444,7 @@ struct OCompiler {
 	void set_type_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void add_parameter( yaal::hcore::HString const&, executing_parser::position_t );
 	void add_capture( yaal::hcore::HString const&, executing_parser::position_t );
+	void commit_capture( executing_parser::position_t );
 
 	/*! \brief Verify that there are no holes in default argument definitions in function parameters.
 	 *
@@ -533,6 +534,7 @@ struct OCompiler {
 	void defer_store_character( code_point_t, executing_parser::position_t );
 	void defer_call( yaal::hcore::HString const&, executing_parser::position_t );
 	HHuginn::expression_t new_expression( int, int = 0 );
+	void merge( HHuginn::expression_t&, HHuginn::expression_t& );
 private:
 	HHuginn::HClass const* function_ref_to_class( HHuginn::identifier_id_t );
 	OCompiler( OCompiler const& ) = delete;

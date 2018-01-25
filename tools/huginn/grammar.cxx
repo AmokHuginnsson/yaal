@@ -317,11 +317,13 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	 * Hence each Closure constitutes a separate class which instance is created
 	 * on Closure definition site.
 	 */
-	HIdentifierParser capture(
+	HRule capture(
+		"capture",
 		identifier(
-			"capture",
+			"captureIdentifier",
 			HRegex::action_string_position_t( hcore::call( &OCompiler::add_capture, _compiler.get(), _1, _2 ) )
-		)
+		) >> -( ':' >> expression ),
+		HRuleBase::action_position_t( hcore::call( &OCompiler::commit_capture, _compiler.get(), _1 ) )
 	);
 	HRule captureList(
 		"captureList",

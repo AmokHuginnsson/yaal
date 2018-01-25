@@ -320,6 +320,8 @@ class HNot;
 class HString;
 class HAction;
 
+HFollows operator >> ( HRuleBase const&, HRuleBase::action_position_t const& );
+HFollows operator >> ( HRuleBase const&, HRuleBase::action_t const& );
 HFollows operator >> ( HRuleBase::action_position_t const&, HRuleBase const& );
 HFollows operator >> ( HRuleBase::action_t const&, HRuleBase const& );
 HFollows operator >> ( HFollows const&, HRuleBase::action_position_t const& );
@@ -382,6 +384,8 @@ private:
 	HFollows( HRuleBase const&, HRuleBase const& );
 	HFollows( HFollows const&, HRuleBase const& );
 	HFollows& operator = ( HFollows const& ) = delete;
+	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HRuleBase const&, action_position_t const& );
+	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HRuleBase const&, action_t const& );
 	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( action_position_t const&, yaal::tools::executing_parser::HRuleBase const& );
 	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( action_t const&, yaal::tools::executing_parser::HRuleBase const& );
 	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::hcore::HString const&, yaal::tools::executing_parser::HRuleBase const& );
@@ -1034,6 +1038,8 @@ protected:
 private:
 	HAction( HRuleBase const& );
 	HAction& operator = ( HAction const& ) = delete;
+	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HRuleBase const&, action_position_t const& );
+	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HRuleBase const&, action_t const& );
 	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( action_position_t const&, yaal::tools::executing_parser::HRuleBase const& );
 	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( action_t const&, yaal::tools::executing_parser::HRuleBase const& );
 	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HFollows const&, action_position_t const& );

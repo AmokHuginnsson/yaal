@@ -67,6 +67,7 @@ private:
 	operations_t _operations;
 public:
 	HExpression( int = MAIN_FILE_ID, int = 0 );
+	int execution_step_count( void ) const;
 	int add_execution_step( OExecutionStep const& );
 	void replace_execution_step( int, OExecutionStep const& );
 	void pop_execution_step( void );

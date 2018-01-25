@@ -238,6 +238,12 @@ HExpression::HExpression( int fileId_, int position_ )
 	return;
 }
 
+int HExpression::execution_step_count( void ) const {
+	M_PROLOG
+	return ( static_cast<int>( _executionSteps.get_size() ) );
+	M_EPILOG
+}
+
 int HExpression::add_execution_step( OExecutionStep const& executionStep_ ) {
 	M_PROLOG
 	_executionSteps.push_back( executionStep_ );
@@ -261,8 +267,22 @@ void HExpression::pop_execution_step( void ) {
 
 void HExpression::merge( HExpression& expression_ ) {
 	M_PROLOG
+	for ( OExecutionStep& es : expression_._executionSteps ) {
+		es._expression = this;
+	}
 	move( expression_._executionSteps.begin(), expression_._executionSteps.end(), back_insert_iterator( _executionSteps ) );
+	move( expression_._instructions.begin(), expression_._instructions.end(), back_insert_iterator( _instructions ) );
 	expression_._executionSteps.clear();
+	expression_._instructions.clear();
+	operations_t operationsStore;
+	while ( ! expression_._operations.is_empty() ) {
+		operationsStore.push( expression_._operations.top() );
+		expression_._operations.pop();
+	}
+	while ( ! operationsStore.is_empty() ) {
+		_operations.push( operationsStore.top() );
+		operationsStore.pop();
+	}
 	return;
 	M_EPILOG
 }

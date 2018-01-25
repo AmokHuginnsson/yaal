@@ -4556,6 +4556,14 @@ bool HAction::do_always_matches( void ) const {
 	return ( true );
 }
 
+HFollows operator >> ( HRuleBase const& rule_, HRuleBase::action_position_t const& actionPosition_  ) {
+	return ( HFollows( rule_, HAction( actionPosition_ ) ) );
+}
+
+HFollows operator >> ( HRuleBase const& rule_, HRuleBase::action_t const& action_ ) {
+	return ( HFollows( rule_, HAction( action_ ) ) );
+}
+
 HFollows operator >> ( HRuleBase::action_position_t const& actionPosition_, HRuleBase const& rule_ ) {
 	return ( HFollows( HAction( actionPosition_ ), rule_ ) );
 }
