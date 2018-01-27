@@ -193,6 +193,19 @@ inline HHuginn::value_t get( huginn::HThread* thread_, HHuginn::value_t* object_
 	M_EPILOG
 }
 
+inline HHuginn::value_t ensure( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "dict.ensure", values_, 2, 2, thread_, position_ );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DICT );
+	HHuginn::HDict* l( static_cast<HHuginn::HDict*>( object_->raw() ) );
+	HHuginn::value_t& v( l->get_ref( thread_, values_[0], position_ ) );
+	if ( ! v ) {
+		v = values_[1];
+	}
+	return ( v );
+	M_EPILOG
+}
+
 inline HHuginn::value_t erase( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "dict.erase", values_, 1, 1, thread_, position_ );
@@ -320,6 +333,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 				{ "has_key", objectFactory_->create_method( hcore::call( &dict::has_key, _1, _2, _3, _4 ) ), "( *key* ) - tell if given *key* can be found in this `dict`" },
 				{ "get",     objectFactory_->create_method( hcore::call( &dict::get, _1, _2, _3, _4 ) ),     "( *key*, *default* ) - get value for given *key* from this `dict`, or *default* if given *key* is not present in the `dict`" },
 				{ "erase",   objectFactory_->create_method( hcore::call( &dict::erase, _1, _2, _3, _4 ) ),   "( *key* ) - remove given *key* from this `dict`" },
+				{ "ensure",  objectFactory_->create_method( hcore::call( &dict::ensure, _1, _2, _3, _4 ) ),  "( *key*, *default* ) - get value for given *key* from this `dict`, if given *key* is not present in the `dict` insert *default* into this `dict` before returning it" },
 				{ "clear",   objectFactory_->create_method( hcore::call( &dict::clear, _1, _2, _3, _4 ) ),   "erase `dict`'s content, `dict` becomes empty" },
 				{ "add",     objectFactory_->create_method( hcore::call( &dict::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `dict` with key/value pairs from *other* `dict`" },
 				{ "update",  objectFactory_->create_method( hcore::call( &dict::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `dict` with key/value pairs from *other* `dict`" },

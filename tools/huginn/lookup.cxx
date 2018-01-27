@@ -194,6 +194,19 @@ inline HHuginn::value_t get( huginn::HThread* thread_, HHuginn::value_t* object_
 	M_EPILOG
 }
 
+inline HHuginn::value_t ensure( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "lookup.ensure", values_, 2, 2, thread_, position_ );
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LOOKUP );
+	HHuginn::HLookup* l( static_cast<HHuginn::HLookup*>( object_->raw() ) );
+	HHuginn::value_t& v( l->get_ref( thread_, values_[0], position_ ) );
+	if ( ! v ) {
+		v = values_[1];
+	}
+	return ( v );
+	M_EPILOG
+}
+
 inline HHuginn::value_t erase( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "lookup.erase", values_, 1, 1, thread_, position_ );
@@ -305,6 +318,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			HHuginn::field_definitions_t{
 				{ "has_key", objectFactory_->create_method( hcore::call( &lookup::has_key, _1, _2, _3, _4 ) ), "( *key* ) - tell if given *key* can be found in this `lookup`" },
 				{ "get",     objectFactory_->create_method( hcore::call( &lookup::get, _1, _2, _3, _4 ) ),     "( *key*, *default* ) - get value for given *key* from this `lookup`, or *default* if given *key* is not present in the `lookup`" },
+				{ "ensure",  objectFactory_->create_method( hcore::call( &lookup::ensure, _1, _2, _3, _4 ) ),  "( *key*, *default* ) - get value for given *key* from this `lookup`, if given *key* is not present in the `lookup` insert *default* into this `lookup` before returning it" },
 				{ "erase",   objectFactory_->create_method( hcore::call( &lookup::erase, _1, _2, _3, _4 ) ),   "( *key* ) - remove given *key* from this `lookup`" },
 				{ "clear",   objectFactory_->create_method( hcore::call( &lookup::clear, _1, _2, _3, _4 ) ),   "erase `lookup`'s content, `lookup` becomes empty" },
 				{ "add",     objectFactory_->create_method( hcore::call( &lookup::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `lookup` with key/value pairs from *other* `lookup`" },

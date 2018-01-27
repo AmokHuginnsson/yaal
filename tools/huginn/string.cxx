@@ -194,9 +194,9 @@ public:
 						++ _it;
 					}
 					ensure( _it != end, errMsg );
+					specRaw.clear();
 					if ( *_it == FMT_SPEC ) {
 						++ _it;
-						specRaw.clear();
 						while ( ( _it != end ) && ( *_it != FMT_CLOSE ) ) {
 							specRaw.push_back( *_it );
 							++ _it;
