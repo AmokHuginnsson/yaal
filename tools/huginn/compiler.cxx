@@ -2125,15 +2125,16 @@ void OCompiler::dispatch_subscript( executing_parser::position_t position_ ) {
 		}
 		expression->add_execution_step( HExpression::OExecutionStep( expression.raw(), &HExpression::range, position_.get() ) );
 		expression->commit_oper( OPERATOR::RANGE );
+		fc._lastDereferenceOperator = OPERATOR::RANGE;
 	} else {
 		expression->add_execution_step( HExpression::OExecutionStep( expression.raw(), &HExpression::subscript, position_.get(), HFrame::ACCESS::VALUE ) );
 		expression->commit_oper( OPERATOR::SUBSCRIPT );
+		fc._lastDereferenceOperator = OPERATOR::SUBSCRIPT;
 	}
 	fc._operations.pop();
 	M_ASSERT( fc._valueTypes.get_size() >= 1 );
 	fc._valueTypes.pop();
 	fc._valueTypes.push( type_to_class( HHuginn::TYPE::REFERENCE ) );
-	fc._lastDereferenceOperator = OPERATOR::SUBSCRIPT;
 	return;
 	M_EPILOG
 }
@@ -2336,7 +2337,11 @@ void OCompiler::make_reference( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	if ( ( fc._lastDereferenceOperator != OPERATOR::SUBSCRIPT ) && ( fc._lastDereferenceOperator != OPERATOR::MEMBER_ACCESS ) ) {
-		throw HHuginn::HHuginnRuntimeException( "Assignment to function result.", MAIN_FILE_ID, position_.get() );
+		throw HHuginn::HHuginnRuntimeException(
+			fc._lastDereferenceOperator == OPERATOR::RANGE ? "Assignment to slice view." : "Assignment to function result.",
+			MAIN_FILE_ID,
+			position_.get()
+		);
 	}
 	HExpression* expr( current_expression().raw() );
 	if ( fc._lastDereferenceOperator == OPERATOR::SUBSCRIPT ) {
