@@ -3,7 +3,7 @@
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
-#include "enumerator.hxx"
+#include "enumeration.hxx"
 #include "tools/hhuginn.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
@@ -20,14 +20,14 @@ namespace tools {
 
 namespace huginn {
 
-namespace enumerator {
+namespace enumeration {
 
-class HEnumeratorClass : public HHuginn::HClass {
+class HEnumerationClass : public HHuginn::HClass {
 public:
-	typedef HEnumeratorClass this_type;
+	typedef HEnumerationClass this_type;
 	typedef HHuginn::HClass base_type;
 public:
-	HEnumeratorClass(
+	HEnumerationClass(
 		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_,
 		HHuginn::identifier_id_t identifierId_,
@@ -45,33 +45,33 @@ public:
 		HHuginn::field_definitions_t fd;
 		fd.reserve( descriptions_.get_size() + 1 );
 		int id( 0 );
-		for ( enumerator::HDesctiption const& d : descriptions_ ) {
+		for ( enumeration::HDesctiption const& d : descriptions_ ) {
 			fd.emplace_back(
 				d.name(),
-				runtime_->object_factory()->create<HHuginn::HEnumerator>( this, id ++ ),
+				runtime_->object_factory()->create<HHuginn::HEnumeration>( this, id ++ ),
 				d.doc()
 			);
 		}
-		fd.emplace_back( "to_string", runtime_->object_factory()->create_method( hcore::call( &HEnumeratorClass::to_string, _1, _2, _3, _4 ) ), "Get enumerator name." );
+		fd.emplace_back( "to_string", runtime_->object_factory()->create_method( hcore::call( &HEnumerationClass::to_string, _1, _2, _3, _4 ) ), "Get enumeration name." );
 		redefine( base_, fd );
 		return;
 	}
-	yaal::hcore::HString const& enumerator_name( int id_ ) const {
+	yaal::hcore::HString const& enumeration_name( int id_ ) const {
 		return ( runtime()->identifier_name( field_identifiers()[id_] ) );
 	}
 	static HHuginn::value_t to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "to_string", values_, 0, 0, thread_, position_ );
-		HHuginn::HEnumerator* e( static_cast<HHuginn::HEnumerator*>( object_->raw() ) );
-		HEnumeratorClass const* ec( static_cast<HEnumeratorClass const*>( e->get_class() ) );
+		HHuginn::HEnumeration* e( static_cast<HHuginn::HEnumeration*>( object_->raw() ) );
+		HEnumerationClass const* ec( static_cast<HEnumerationClass const*>( e->get_class() ) );
 		HString s( ec->name() );
-		return ( thread_->object_factory().create_string( s.append( "." ).append( ec->enumerator_name( e->value() ) ) ) );
+		return ( thread_->object_factory().create_string( s.append( "." ).append( ec->enumeration_name( e->value() ) ) ) );
 		M_EPILOG
 	}
 private:
 	virtual HHuginn::value_t do_create_instance( huginn::HThread* thread_, HHuginn::values_t&, int position_ ) const {
 		M_PROLOG
-		throw HHuginn::HHuginnRuntimeException( "Explicit construction of enumerator `"_ys.append( name() ).append( "' instances is forbidden." ), thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Explicit construction of enumeration `"_ys.append( name() ).append( "' instances is forbidden." ), thread_->current_frame()->file_id(), position_ );
 		M_EPILOG
 	}
 };
@@ -90,7 +90,7 @@ HHuginn::class_t create_class(
 			HRuntime::class_constructor_t(
 				[&runtime_, &classIdentifier, &descriptions_, &doc_, &base_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
 					return (
-						make_pointer<HEnumeratorClass>(
+						make_pointer<HEnumerationClass>(
 							runtime_,
 							typeId_,
 							classIdentifier,
@@ -114,14 +114,14 @@ HHuginn::class_t create_class(
 
 }
 
-HHuginn::HEnumerator::HEnumerator( HHuginn::HClass const* class_, value_type value_ )
+HHuginn::HEnumeration::HEnumeration( HHuginn::HClass const* class_, value_type value_ )
 	: HValue( class_ )
 	, _value( value_ ) {
 	return;
 }
 
-HHuginn::value_t HHuginn::HEnumerator::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
-	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on enumerators.", thread_->current_frame()->file_id(), position_ );
+HHuginn::value_t HHuginn::HEnumeration::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
+	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on enumerations.", thread_->current_frame()->file_id(), position_ );
 }
 
 }

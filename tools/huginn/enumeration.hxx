@@ -14,7 +14,7 @@ namespace tools {
 
 namespace huginn {
 
-namespace enumerator {
+namespace enumeration {
 
 class HDesctiption {
 private:

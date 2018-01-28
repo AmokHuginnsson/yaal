@@ -107,7 +107,7 @@ public:
 	class HSet;
 	class HObject;
 	class HException;
-	class HEnumerator;
+	class HEnumeration;
 	class HObjectReference;
 	class HTernaryEvaluator;
 	class HValueHashHelper;
@@ -1145,15 +1145,15 @@ private:
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
-class HHuginn::HEnumerator : public HHuginn::HValue {
+class HHuginn::HEnumeration : public HHuginn::HValue {
 public:
-	typedef HHuginn::HEnumerator this_type;
+	typedef HHuginn::HEnumeration this_type;
 	typedef HHuginn::HValue base_type;
 	typedef int value_type;
 private:
 	value_type _value;
 public:
-	HEnumerator( HHuginn::HClass const*, value_type );
+	HEnumeration( HHuginn::HClass const*, value_type );
 	value_type value( void ) const {
 		return ( _value );
 	}
