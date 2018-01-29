@@ -14,6 +14,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "range.hxx"
 #include "filter.hxx"
 #include "mapper.hxx"
+#include "enumerator.hxx"
 #include "tuple.hxx"
 #include "list.hxx"
 #include "deque.hxx"
@@ -38,6 +39,7 @@ class HAlgorithms : public HHuginn::HValue {
 	HHuginn::class_t _filterClass;
 	HHuginn::class_t _mapperClass;
 	HHuginn::class_t _rangeClass;
+	HHuginn::class_t _enumeratorClass;
 	HHuginn::class_t _exceptionClass;
 public:
 	HAlgorithms( HHuginn::HClass* class_ )
@@ -45,6 +47,7 @@ public:
 		, _filterClass( HFilter::get_class( class_->runtime() ) )
 		, _mapperClass( HMapper::get_class( class_->runtime() ) )
 		, _rangeClass( HRange::get_class( class_->runtime() ) )
+		, _enumeratorClass( HEnumerator::get_class( class_->runtime() ) )
 		, _exceptionClass( package_exception( class_ ) ) {
 		return;
 	}
@@ -53,6 +56,9 @@ public:
 	}
 	static HHuginn::value_t map( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		return ( static_cast<HAlgorithms*>( object_->raw() )->do_map( thread_, values_, position_ ) );
+	}
+	static HHuginn::value_t enumerate( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		return ( static_cast<HAlgorithms*>( object_->raw() )->do_enumerate( thread_, values_, position_ ) );
 	}
 	static HHuginn::value_t reduce( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		char const name[] = "Algorithms.reduce";
@@ -265,6 +271,19 @@ private:
 		return ( v );
 		M_EPILOG
 	}
+	HHuginn::value_t do_enumerate( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "Algorithms.enumerate";
+		verify_arg_count( name, values_, 1, 2, thread_, position_ );
+		verify_arg_collection( name, values_, 0, ARITY::MULTIPLE, ONTICALLY::VIRTUAL, thread_, position_ );
+		HHuginn::HInteger::value_type start( 0 );
+		if ( values_.get_size() > 1 ) {
+			verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
+			start = get_integer( values_[1] );
+		}
+		return ( thread_->object_factory().create<HEnumerator>( _enumeratorClass.raw(), values_[0], start ) );
+		M_EPILOG
+	}
 	HHuginn::value_t do_range( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Algorithms.range";
@@ -312,6 +331,7 @@ HHuginn::value_t HAlgorithmsCreator::do_new_instance( HRuntime* runtime_ ) {
 			HHuginn::field_definitions_t{
 				{ "filter",      runtime_->object_factory()->create_method( hcore::call( &HAlgorithms::filter, _1, _2, _3, _4 ) ),      "( *iterable*, *callable* ) - create `Filter` object that iterates over *iterable* and returns only elements for which *callable* returns `boolean` equal `true`" },
 				{ "map",         runtime_->object_factory()->create_method( hcore::call( &HAlgorithms::map, _1, _2, _3, _4 ) ),         "( *iterable*, *callable* ) - create `Mapper` object that maps elements from *iterable* transforming each of them with *callable* when iterated over" },
+				{ "enumerate",   runtime_->object_factory()->create_method( hcore::call( &HAlgorithms::enumerate, _1, _2, _3, _4 ) ),   "( *iterable*[, *start*] ) - create `Enumerator` object that counts elements from *iterable* when iterated over" },
 				{ "materialize", runtime_->object_factory()->create_method( hcore::call( &HAlgorithms::materialize, _1, _2, _3, _4 ) ), "( *iterable*, *colType* ) - copy elements from *iterable* to newly created instance of *colType*" },
 				{ "reduce",      runtime_->object_factory()->create_method( hcore::call( &HAlgorithms::reduce, _1, _2, _3, _4 ) ),      "( *iterable*, *callable* [, *init*] ) - iteratively combine all elements from *iterable* using *callable(x,y)* and starting value of *init*" },
 				{ "range",       runtime_->object_factory()->create_method( hcore::call( &HAlgorithms::range, _1, _2, _3, _4 ) ),       "( [*from*,] *until* [, *step*] ) - produce iterable sequence of `integer` values ranging from *from* up until *until* using *step* increments" },
