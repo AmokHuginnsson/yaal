@@ -33,10 +33,12 @@ public:
 	 */
 	class HOption {
 	public:
+		/*! \brief Option argument ontological policy.
+		 */
 		enum class ARGUMENT {
-			NONE,
-			OPTIONAL,
-			REQUIRED
+			NONE,     /*!< No argument is expected. */
+			OPTIONAL, /*!< Argument is optional but is present it must immediately follow an option (without separating whitespace). */
+			REQUIRED  /*!< Argument is required, missing argument is an error unless there are more options following, then next option is interpreted as an argument. */
 		};
 		typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const& )> setter_t;
 		typedef yaal::hcore::HBoundCall<yaal::hcore::HString ( void )> getter_t;

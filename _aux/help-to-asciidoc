@@ -55,6 +55,7 @@ def main():
 	lines = help.split( "\n" )
 	preamble = []
 	options = []
+	aliases = []
 	footer = ""
 	isPreamble = True
 	isOptions = False
@@ -73,15 +74,17 @@ def main():
 				words = line.split( " " )
 				short = None
 				longFrom = None
+				value = None
 				desc = ""
 				for w in words:
 					if len( desc ) == 0 and w.startswith( "--" ):
 						longFrom = w.strip( "," )
 					elif len( desc ) == 0 and w.startswith( "-" ):
 						short = w.strip( "," )
-					else:
+					elif longFrom or value:
 						desc += ( " " + w )
-				value = None
+					else:
+						value = w
 				optional = False
 				ss = short.split( "=" ) if short else None
 				ls = longFrom.split( "=" ) if longFrom else None
@@ -94,7 +97,11 @@ def main():
 				if value and value.endswith( "]" ):
 					value = value.strip( "]" )
 					optional = True
-				if len( desc.strip() ) > 0:
+				desc = desc.strip()
+				if desc.lower().find( "an alias for **" ) >= 0:
+					desc = map( lambda x: x.strip( "*" ), desc[15:].split( ", " ) )
+					aliases.append( ( short, longFrom, *desc ) )
+				elif len( desc ) > 0:
 					options.append( Option( short, longFrom, value, desc.strip(), optional ) )
 				else:
 					o = options[-1]
@@ -112,6 +119,13 @@ def main():
 				options[-1]._desc += ( " " + line )
 		else:
 			footer += ( l + "\n" )
+	for a in aliases:
+		for o in options:
+			if a[2] == o._short or ( ( len( a ) > 3 ) and ( a[3] == o._long ) ):
+				if a[0]:
+					o._short += ( ", " + a[0] )
+				if a[1]:
+					o._long += ( ", " + a[1] )
 	usage = preamble[0].replace( binary, "**" + args.project + "**" )
 	del preamble[0:2]
 	name = preamble[0].replace( binary, args.project )
@@ -132,11 +146,12 @@ def main():
 		out.write( "OPTIONS\n-------\n" )
 	for o in options:
 		out.write(
-			"*{}{}{}*{}::\n".format(
+			"*{}{}{}*{}{}::\n".format(
 				o._short if o._short else "",
 				", " if o._short and o._long else "",
 				o._long if o._long else "",
-				"='" + o._value + "'" + ( "*]*" if o._optional else "" ) if o._value else ""
+				"=" if o._long and o._value else " ",
+				"'" + o._value + "'" + ( "*]*" if o._optional else "" ) if o._value else ""
 			)
 		)
 		out.write( "\t" + markdown_to_asciidoc( prepare_description( o._desc ) ) + ( "." if not o._desc.endswith( "." ) else "" ) + "\n\n" )

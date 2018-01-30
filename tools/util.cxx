@@ -402,6 +402,22 @@ void insert_line_breaks( yaal::hcore::HString& str_, int atColumn_, char const* 
 	return;
 	M_EPILOG
 }
+yaal::hcore::HString alias_desc( HProgramOptionsHandler::HOption const& opt_ ) {
+	M_PROLOG
+	HString aliasDesc( "an alias for " );
+	bool hasShortFrom( is_byte( opt_.short_form() ) && ( opt_.short_form() > 0 ) );
+	if ( hasShortFrom ) {
+		aliasDesc.append( "**-" ).append( static_cast<char>( opt_.short_form() ) ).append( "**" );
+	}
+	if ( ! opt_.long_form().is_empty() ) {
+		if ( hasShortFrom ) {
+			aliasDesc.append( ", " );
+		}
+		aliasDesc.append( "**--" ).append( opt_.long_form() ).append( "**" );
+	}
+	return ( aliasDesc );
+	M_EPILOG
+}
 }
 
 void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
@@ -508,7 +524,9 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 			if ( o.switch_type() == HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL ) {
 				lf.append( "[" );
 			}
-			lf.append( "=" );
+			if ( ! o.long_form().is_empty() ) {
+				lf.append( "=" );
+			}
 			if ( color ) {
 				lf.append( *COLOR::to_ansi( info.theme().emphasis() ) );
 			}
@@ -528,7 +546,7 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 				extraLFL = 0;
 				comma = " ";
 				if ( description == o.description() ) {
-					description = "";
+					description = alias_desc( p );
 				}
 			}
 			if ( is_byte( o.short_form() ) && is_byte( p.short_form() ) && (  o.short_form() == p.short_form() ) ) {
@@ -536,13 +554,15 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 				extraSFL = 0;
 				comma = " ";
 				if ( description == o.description() ) {
-					description = "";
+					description = alias_desc( p );
 				}
 			}
 		}
+		bool specialSpace( ! ( o.long_form().is_empty() && ! o.argument_name().is_empty() ) );
 		out_ << ( info.markdown() ? "    " : "  " )
-			<< setw( static_cast<int>( longestShortLength + extraSFL ) ) << sf << comma << " "
-			<< setw( static_cast<int>( longestLongLength + extraLFL ) ) << hcore::left << lf << hcore::right << "  ";
+			<< setw( static_cast<int>( longestShortLength + extraSFL ) ) << sf << comma << ( specialSpace ? " " : "" )
+			<< setw( static_cast<int>( longestLongLength + extraLFL ) ) << hcore::left << lf << hcore::right << "  "
+			<< ( specialSpace ? "" : " " );
 		desc = description;
 		if ( ! o.default_value().is_empty() ) {
 			desc.append( " (default: *" ).append( escape_markdown( o.default_value() ) ).append( "*)" );

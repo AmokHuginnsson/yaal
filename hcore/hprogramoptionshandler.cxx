@@ -711,6 +711,14 @@ int HProgramOptionsHandler::process_command_line( int argc_, char** argv_, int* 
 				char on( *arg );
 				HOption* opt( ( it = find_if( _options.begin(), _options.end(), [&on]( HOption& opt_ ) { return ( opt_.short_form() == on ); } ) ) != _options.end() ? &*it : nullptr );
 				if ( opt ) {
+					/*
+					 * According to `man 1 getopt` an optional argument must immediately follow and option,
+					 * e.g., if `-s` is an option expecting an optional argument then:
+					 * -s/bin/sh
+					 * is interpreted as setting `s` value to `/bin/sh`, but
+					 * -s /bin/sh
+					 * is interpreted as setting `s` to empty value and passing `/bin/sh` as non-option argument.
+					 */
 					if ( ( opt->switch_type() == HOption::ARGUMENT::REQUIRED ) || ( opt->switch_type() == HOption::ARGUMENT::OPTIONAL ) ) {
 						optValue.assign( arg + 1 );
 						arg += optValue.get_length();
