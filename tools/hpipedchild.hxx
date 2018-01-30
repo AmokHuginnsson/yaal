@@ -52,6 +52,9 @@ public:
 	yaal::hcore::HStreamInterface::ptr_t stream_in( void );
 	yaal::hcore::HStreamInterface::ptr_t stream_out( void );
 	yaal::hcore::HStreamInterface::ptr_t stream_err( void );
+	void close_in( void );
+	void close_out( void );
+	void close_err( void );
 private:
 	HPipedChild( HPipedChild const& ) = delete;
 	HPipedChild& operator = ( HPipedChild const& ) = delete;

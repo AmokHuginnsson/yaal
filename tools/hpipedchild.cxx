@@ -258,6 +258,27 @@ yaal::hcore::HStreamInterface::ptr_t HPipedChild::stream_err( void ) {
 	M_EPILOG
 }
 
+void HPipedChild::close_in( void ) {
+	M_PROLOG
+	close_and_invalidate( _in );
+	return;
+	M_EPILOG
+}
+
+void HPipedChild::close_out( void ) {
+	M_PROLOG
+	close_and_invalidate( _out );
+	return;
+	M_EPILOG
+}
+
+void HPipedChild::close_err( void ) {
+	M_PROLOG
+	close_and_invalidate( _err );
+	return;
+	M_EPILOG
+}
+
 }
 
 }
