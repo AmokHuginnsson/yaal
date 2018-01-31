@@ -42,7 +42,13 @@ public:
 	M_YAAL_TOOLS_PUBLIC_API static int _killGracePeriod;
 	HPipedChild( void );
 	~HPipedChild( void );
-	void spawn( yaal::hcore::HString const&, argv_t const& = argv_t() );
+	void spawn(
+		yaal::hcore::HString const&,
+		argv_t const& = argv_t(),
+		yaal::hcore::HStreamInterface const* = nullptr,
+		yaal::hcore::HStreamInterface const* = nullptr,
+		yaal::hcore::HStreamInterface const* = nullptr
+	);
 	STATUS finish( int = 0 );
 	bool is_running( void ) const;
 	int get_pid( void ) const;

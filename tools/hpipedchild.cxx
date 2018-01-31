@@ -29,6 +29,10 @@ namespace yaal {
 
 namespace tools {
 
+inline int stream_to_fd( yaal::hcore::HStreamInterface const* stream_ ) {
+	return ( static_cast<int>( reinterpret_cast<int_native_t>( stream_->data() ) ) );
+}
+
 static void close_and_invalidate( HStreamInterface::ptr_t& stream_ ) {
 	M_PROLOG
 	if ( !! stream_ ) {
@@ -148,7 +152,13 @@ struct OPipeResGuard {
 	}
 };
 
-void HPipedChild::spawn( HString const& image_, argv_t const& argv_ ) {
+void HPipedChild::spawn(
+	HString const& image_,
+	argv_t const& argv_,
+	yaal::hcore::HStreamInterface const* in_,
+	yaal::hcore::HStreamInterface const* out_,
+	yaal::hcore::HStreamInterface const* err_
+) {
 	M_PROLOG
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	OPipeResGuard pipeIn, pipeOut, pipeErr;
@@ -169,6 +179,18 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ ) {
 	cout << hcore::flush;
 	::fflush( stdout );
 	cerr << hcore::flush;
+	if ( in_ ) {
+		close_and_invalidate( fileDesIn[ 0 ] );
+		fileDesIn[0] = ::dup( stream_to_fd( in_ ) );
+	}
+	if ( out_ ) {
+		close_and_invalidate( fileDesOut[ 1 ] );
+		fileDesOut[1] = ::dup( stream_to_fd( out_ ) );
+	}
+	if ( err_ ) {
+		close_and_invalidate( fileDesErr[ 1 ] );
+		fileDesErr[1] = ::dup( stream_to_fd( err_ ) );
+	}
 	_pid = ::fork();
 	M_ENSURE( _pid >= 0, "fork()" );
 	if ( ! _pid ) {
@@ -193,16 +215,21 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ ) {
 		::execv( argv.get<char const*>()[ 0 ], const_cast<char* const*>( argv.get<char const*>() ) );
 		M_ENSURE( !"execv"[0] );
 	} else {
-		close_and_invalidate( fileDesIn[ 0 ] );
-		close_and_invalidate( fileDesOut[ 1 ] );
-		close_and_invalidate( fileDesErr[ 1 ] );
-		using yaal::swap;
-		_in = make_pointer<HRawFile>( fileDesIn[ 1 ], HRawFile::OWNERSHIP::ACQUIRED );
-		fileDesIn[1] = -1;
-		_out = make_pointer<HRawFile>( fileDesOut[ 0 ], HRawFile::OWNERSHIP::ACQUIRED );
-		fileDesOut[0] = -1;
-		_err = make_pointer<HRawFile>( fileDesErr[ 0 ], HRawFile::OWNERSHIP::ACQUIRED );
-		fileDesErr[0] = -1;
+		if ( ! in_ ) {
+			close_and_invalidate( fileDesIn[ 0 ] );
+			_in = make_pointer<HRawFile>( fileDesIn[ 1 ], HRawFile::OWNERSHIP::ACQUIRED );
+			fileDesIn[1] = -1;
+		}
+		if ( ! out_ ) {
+			close_and_invalidate( fileDesOut[ 1 ] );
+			_out = make_pointer<HRawFile>( fileDesOut[ 0 ], HRawFile::OWNERSHIP::ACQUIRED );
+			fileDesOut[0] = -1;
+		}
+		if ( ! err_ ) {
+			close_and_invalidate( fileDesErr[ 1 ] );
+			_err = make_pointer<HRawFile>( fileDesErr[ 0 ], HRawFile::OWNERSHIP::ACQUIRED );
+			fileDesErr[0] = -1;
+		}
 	}
 	return;
 	M_EPILOG

@@ -10,19 +10,25 @@ namespace yaal {
 namespace hcore {
 
 HSynchronizedStream::HSynchronizedStream( void )
-	: _mutex( HMutex::TYPE::RECURSIVE ), _streamOwned(), _streamRef( nullptr ) {
+	: _mutex( HMutex::TYPE::RECURSIVE )
+	, _streamOwned()
+	, _streamRef( nullptr ) {
 	return;
 }
 
 HSynchronizedStream::HSynchronizedStream( owned_stream_t stream_ )
-	: _mutex( HMutex::TYPE::RECURSIVE ), _streamOwned( stream_ ), _streamRef( _streamOwned.raw() ) {
+	: _mutex( HMutex::TYPE::RECURSIVE )
+	, _streamOwned( stream_ )
+	, _streamRef( _streamOwned.raw() ) {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
 HSynchronizedStream::HSynchronizedStream( ref_stream_t stream_ )
-	: _mutex( HMutex::TYPE::RECURSIVE ), _streamOwned(), _streamRef( &stream_ ) {
+	: _mutex( HMutex::TYPE::RECURSIVE )
+	, _streamOwned()
+	, _streamRef( &stream_ ) {
 	M_PROLOG
 	return;
 	M_EPILOG

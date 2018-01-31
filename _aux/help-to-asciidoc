@@ -100,7 +100,7 @@ def main():
 				desc = desc.strip()
 				if desc.lower().find( "an alias for **" ) >= 0:
 					desc = map( lambda x: x.strip( "*" ), desc[15:].split( ", " ) )
-					aliases.append( ( short, longFrom, *desc ) )
+					aliases.append( ( short, longFrom ) + tuple( desc ) )
 				elif len( desc ) > 0:
 					options.append( Option( short, longFrom, value, desc.strip(), optional ) )
 				else:
