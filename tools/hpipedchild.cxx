@@ -166,7 +166,10 @@ void HPipedChild::spawn(
 	int* fileDesOut = pipeOut._res;
 	int* fileDesErr = pipeErr._res;
 	HFSItem image( image_ );
-	M_ENSURE( !! image && image.is_executable(), image_ );
+	M_ENSURE( !! image, image_ );
+	if ( ! ( image.is_executable() && image.is_file() ) ) {
+		throw HPipedChildException( "Not an executable: "_ys.append( image_ ) );
+	}
 	M_ENSURE( ( ! ::pipe( fileDesIn ) ) && ( ! ::pipe( fileDesOut ) ) && ( ! ::pipe( fileDesErr ) ) );
 	HChunk argv( chunk_size<char const*>( argv_.size() + 2 ) );
 	HLock stdinLock( cin.acquire() );
