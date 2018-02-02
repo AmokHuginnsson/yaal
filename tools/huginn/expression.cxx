@@ -570,7 +570,6 @@ void HExpression::grab_args( HFrame* frame_, HArguments& args_ ) {
 			values.insert( values.end(), p.rbegin(), p.rend() );
 		}
 		frame_->values().pop();
-		M_ASSERT( ! frame_->values().is_empty() );
 	}
 	M_ASSERT( _instructions[ip]._operator == OPERATOR::FUNCTION_CALL );
 	reverse( values.begin(), values.end() );
@@ -620,6 +619,7 @@ void HExpression::function_call( OExecutionStep const& executionStep_, HFrame* f
 	M_PROLOG
 	HArguments args( frame_ );
 	grab_args( frame_, args );
+	M_ASSERT( ! frame_->values().is_empty() );
 	int& ip( frame_->ip() );
 	int p( _instructions[ip]._position );
 	++ ip;
