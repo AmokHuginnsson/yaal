@@ -207,7 +207,7 @@ HHuginn::value_t sort( huginn::HThread* thread_, HHuginn::value_t* object_, HHug
 	}
 	HHuginn::HList::values_t& data( static_cast<HHuginn::HList*>( object_->raw() )->value() );
 	if ( ! key ) {
-		HHuginn::HValueLessHelper less;
+		HHuginn::HValueCompareHelper less( &value_builtin::less );
 		less.anchor( thread_, position_ );
 		sort( data.begin(), data.end(), cref( less ) );
 	} else {
@@ -259,7 +259,7 @@ inline HHuginn::value_t less( huginn::HThread* thread_, HHuginn::value_t* object
 	verify_signature( "list.less", values_, { HHuginn::TYPE::LIST }, thread_, position_ );
 	HHuginn::HList::values_t const& l( static_cast<HHuginn::HList*>( object_->raw() )->value() );
 	HHuginn::HList::values_t const& r( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
-	HHuginn::HValueLessHelper lessHelper;
+	HHuginn::HValueCompareHelper lessHelper( &value_builtin::less );
 	lessHelper.anchor( thread_, position_ );
 	bool res( lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), cref( lessHelper ) ) );
 	return ( thread_->object_factory().create_boolean( res ) );

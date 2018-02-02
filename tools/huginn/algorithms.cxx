@@ -154,6 +154,7 @@ public:
 		return ( static_cast<HAlgorithms*>( object_->raw() )->do_range( thread_, values_, position_ ) );
 	}
 	static HHuginn::value_t sorted( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
 		char const name[] = "Algorithms.sorted";
 		verify_arg_count( name, values_, 1, 2, thread_, position_ );
 		HHuginn::type_id_t t( verify_arg_collection( name, values_, 0, ARITY::MULTIPLE, ONTICALLY::VIRTUAL, thread_, position_ ) );
@@ -203,8 +204,28 @@ public:
 			list::sort( thread_, &v, HArguments( thread_ ), position_ );
 		}
 		return ( v );
+		M_EPILOG
+	}
+	static HHuginn::value_t min( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "Algorithms.min";
+		verify_arg_count( name, values_, 1, meta::max_signed<int>::value, thread_, position_ );
+		HHuginn::HValueCompareHelper less( &value_builtin::less );
+		less.anchor( thread_, position_ );
+		return ( *min_element( values_.begin(), values_.end(), cref( less ) ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t max( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "Algorithms.max";
+		verify_arg_count( name, values_, 1, meta::max_signed<int>::value, thread_, position_ );
+		HHuginn::HValueCompareHelper less( &value_builtin::less );
+		less.anchor( thread_, position_ );
+		return ( *max_element( values_.begin(), values_.end(), cref( less ) ) );
+		M_EPILOG
 	}
 	static HHuginn::value_t reversed( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
 		char const name[] = "Algorithms.reversed";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
 		HHuginn::type_id_t t( verify_arg_collection( name, values_, 0, ARITY::UNARY, ONTICALLY::MATERIALIZED, thread_, position_ ) );
@@ -239,6 +260,7 @@ public:
 			}
 		}
 		return ( v );
+		M_EPILOG
 	}
 private:
 	HHuginn::value_t do_filter( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
@@ -335,6 +357,8 @@ HHuginn::value_t HAlgorithmsCreator::do_new_instance( HRuntime* runtime_ ) {
 				{ "materialize", runtime_->object_factory()->create_method( hcore::call( &HAlgorithms::materialize, _1, _2, _3, _4 ) ), "( *iterable*, *colType* ) - copy elements from *iterable* to newly created instance of *colType*" },
 				{ "reduce",      runtime_->object_factory()->create_method( hcore::call( &HAlgorithms::reduce, _1, _2, _3, _4 ) ),      "( *iterable*, *callable* [, *init*] ) - iteratively combine all elements from *iterable* using *callable(x,y)* and starting value of *init*" },
 				{ "range",       runtime_->object_factory()->create_method( hcore::call( &HAlgorithms::range, _1, _2, _3, _4 ) ),       "( [*from*,] *until* [, *step*] ) - produce iterable sequence of `integer` values ranging from *from* up until *until* using *step* increments" },
+				{ "min",         runtime_->object_factory()->create_method( hcore::call( &HAlgorithms::min, _1, _2, _3, _4 ) ),         "( *arg1*, *arg2*[, argN...] ) - find minimum element from given set" },
+				{ "max",         runtime_->object_factory()->create_method( hcore::call( &HAlgorithms::max, _1, _2, _3, _4 ) ),         "( *arg1*, *arg2*[, argN...] ) - find maximum element from given set" },
 				{ "sorted",      runtime_->object_factory()->create_method( hcore::call( &HAlgorithms::sorted, _1, _2, _3, _4 ) ),      "( *iterable* [, *callable*] ) - return content of *iterable* as sorted `list`, using *callable* to retrieve keys for element comparison" },
 				{ "reversed",    runtime_->object_factory()->create_method( hcore::call( &HAlgorithms::reversed, _1, _2, _3, _4 ) ),    "( *coll* ) - create reversed iterable view of a *coll* materialized collection" }
 			},

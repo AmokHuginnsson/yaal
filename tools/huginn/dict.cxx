@@ -370,7 +370,7 @@ HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const
 
 HHuginn::HDict::HDict( HHuginn::HClass const* class_, allocator_t const& allocator_ )
 	: HIterable( class_ )
-	, _helper()
+	, _helper( &value_builtin::less )
 	, _data( _helper, allocator_ )
 	, _keyType( &huginn::_noneClass_ ) {
 	return;

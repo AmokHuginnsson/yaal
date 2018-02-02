@@ -1485,7 +1485,14 @@ inline iterator_t max_element( iterator_t it, iterator_t end ) {
  */
 template<typename iterator_t, typename predicate_t>
 inline iterator_t max_element( iterator_t it, iterator_t end, predicate_t predicate_ ) {
-	return ( min_element( it, end, predicate_ ) );
+	iterator_t max( it );
+	++ it;
+	for ( ; ( it != end ); ++ it ) {
+		if ( predicate_( *max, *it ) ) {
+			max = it;
+		}
+	}
+	return ( max );
 }
 
 template<typename tType, typename predicate_t>

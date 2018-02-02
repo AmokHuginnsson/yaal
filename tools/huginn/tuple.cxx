@@ -137,7 +137,7 @@ inline HHuginn::value_t less( huginn::HThread* thread_, HHuginn::value_t* object
 	verify_signature( "tuple.less", values_, { HHuginn::TYPE::TUPLE }, thread_, position_ );
 	HHuginn::HTuple::values_t const& l( static_cast<HHuginn::HTuple*>( object_->raw() )->value() );
 	HHuginn::HTuple::values_t const& r( static_cast<HHuginn::HTuple const*>( values_[0].raw() )->value() );
-	HHuginn::HValueLessHelper lessHelper;
+	HHuginn::HValueCompareHelper lessHelper( &value_builtin::less );
 	lessHelper.anchor( thread_, position_ );
 	bool res( lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), cref( lessHelper ) ) );
 	return ( thread_->object_factory().create_boolean( res ) );

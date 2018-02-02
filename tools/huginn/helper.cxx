@@ -36,15 +36,16 @@ bool HHuginn::HValueHashHelper::operator()( HHuginn::value_t const& v1_, HHuginn
 	return ( ( v1_->type_id() == v2_->type_id() ) && huginn::value_builtin::equals( _thread, v1_, v2_, _position ) );
 }
 
-HHuginn::HValueLessHelper::HValueLessHelper( void )
+HHuginn::HValueCompareHelper::HValueCompareHelper( compare_t compare_ )
 	: _thread( nullptr )
-	, _position( 0 ) {
+	, _position( 0 )
+	, _compare( compare_ ) {
 }
 
-bool HHuginn::HValueLessHelper::operator()( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) const {
+bool HHuginn::HValueCompareHelper::operator()( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) const {
 	M_ASSERT( _thread != nullptr );
 	M_ASSERT( v1_->type_id() == v2_->type_id() );
-	return ( huginn::value_builtin::less( _thread, v1_, v2_, _position ) );
+	return ( _compare( _thread, v1_, v2_, _position ) );
 }
 
 namespace huginn {

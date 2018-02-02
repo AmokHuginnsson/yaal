@@ -111,7 +111,7 @@ public:
 	class HObjectReference;
 	class HTernaryEvaluator;
 	class HValueHashHelper;
-	class HValueLessHelper;
+	class HValueCompareHelper;
 	typedef yaal::hcore::HPointer<huginn::HExpression> expression_t;
 	typedef yaal::hcore::HArray<HHuginn::expression_t> expressions_t;
 	class HErrorCoordinate;
@@ -898,11 +898,13 @@ private:
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
-class HHuginn::HValueLessHelper final {
+class HHuginn::HValueCompareHelper final {
+	typedef bool (*compare_t)( huginn::HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 	huginn::HThread* _thread;
 	int _position;
+	compare_t _compare;
 public:
-	HValueLessHelper( void );
+	HValueCompareHelper( compare_t );
 	void anchor( huginn::HThread* thread_, int position_ ) {
 		_thread = thread_;
 		_position = position_;
@@ -913,20 +915,20 @@ public:
 		_position = 0;
 	}
 private:
-	HValueLessHelper( HValueLessHelper const& ) = delete;
-	HValueLessHelper& operator = ( HValueLessHelper const& ) = delete;
+	HValueCompareHelper( HValueCompareHelper const& ) = delete;
+	HValueCompareHelper& operator = ( HValueCompareHelper const& ) = delete;
 };
 
 class HHuginn::HDict : public HHuginn::HIterable {
 public:
 	typedef HHuginn::HDict this_type;
 	typedef HHuginn::HIterable base_type;
-	typedef yaal::hcore::HMap<HHuginn::value_t, HHuginn::value_t, HValueLessHelper&> values_prototype_t;
+	typedef yaal::hcore::HMap<HHuginn::value_t, HHuginn::value_t, HValueCompareHelper&> values_prototype_t;
 	typedef yaal::hcore::HPool<values_prototype_t::node_size::value> pool_t;
 	typedef allocator::shared_pool<values_prototype_t::node_type> allocator_t;
-	typedef yaal::hcore::HMap<HHuginn::value_t, HHuginn::value_t, HValueLessHelper&, allocator_t> values_t;
+	typedef yaal::hcore::HMap<HHuginn::value_t, HHuginn::value_t, HValueCompareHelper&, allocator_t> values_t;
 private:
-	mutable HValueLessHelper _helper;
+	mutable HValueCompareHelper _helper;
 	values_t _data;
 	HHuginn::HClass const* _keyType;
 public:
@@ -965,12 +967,12 @@ class HHuginn::HOrder : public HHuginn::HIterable {
 public:
 	typedef HHuginn::HOrder this_type;
 	typedef HHuginn::HIterable base_type;
-	typedef yaal::hcore::HSet<HHuginn::value_t, HValueLessHelper&> values_prototype_t;
+	typedef yaal::hcore::HSet<HHuginn::value_t, HValueCompareHelper&> values_prototype_t;
 	typedef yaal::hcore::HPool<values_prototype_t::node_size::value> pool_t;
 	typedef allocator::shared_pool<values_prototype_t::node_type> allocator_t;
-	typedef yaal::hcore::HSet<HHuginn::value_t, HValueLessHelper&, allocator_t> values_t;
+	typedef yaal::hcore::HSet<HHuginn::value_t, HValueCompareHelper&, allocator_t> values_t;
 private:
-	mutable HValueLessHelper _helper;
+	mutable HValueCompareHelper _helper;
 	values_t _data;
 	HHuginn::HClass const* _keyType;
 public:
