@@ -77,7 +77,7 @@ private:
 void* yaal_sqlite3_db_fetch_query_result( ODBLink&, char const* );
 void yaal_sqlite3_rs_free_query_result( void* );
 void* yaal_db_query( ODBLink&, char const* );
-void yaal_rs_free_cursor( void* );
+void yaal_rs_free_cursor( void*, bool );
 void yaal_sqlite3_db_disconnect( ODBLink& );
 
 /* sqlite driver uses convention that database file name should have
@@ -266,17 +266,18 @@ M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* data_ ) {
 
 M_EXPORT_SYMBOL void query_free( ODBLink&, void* );
 M_EXPORT_SYMBOL void query_free( ODBLink&, void* data_ ) {
-	yaal_rs_free_cursor( data_ );
+	yaal_rs_free_cursor( data_, false );
 	return;
 }
 
-void yaal_rs_free_cursor( void* data_ ) {
+void yaal_rs_free_cursor( void* data_, bool reset_ ) {
 	OSQLiteResult* result( static_cast<OSQLiteResult*>( data_ ) );
 	M_ASSERT( result->_useCount > 0 );
 	-- result->_useCount;
-	if ( result->_useCount > 0 ) {
+	if ( reset_ && ( result->_useCount > 0 ) ) {
 		sqlite3_reset( static_cast<sqlite3_stmt*>( result->_data ) );
-	} else {
+	}
+	if ( ! result->_useCount ) {
 		sqlite3_finalize( static_cast<sqlite3_stmt*>( result->_data ) );
 		M_SAFE( delete result );
 	}
@@ -284,7 +285,7 @@ void yaal_rs_free_cursor( void* data_ ) {
 }
 M_EXPORT_SYMBOL void rs_free_cursor( void* );
 M_EXPORT_SYMBOL void rs_free_cursor( void* data_ ) {
-	yaal_rs_free_cursor( data_ );
+	yaal_rs_free_cursor( data_, true );
 	return;
 }
 

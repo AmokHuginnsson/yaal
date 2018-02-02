@@ -80,7 +80,7 @@ private:
 
 void* mysql_db_prepare_query( ODBLink&, char const* );
 void* mysql_query_execute( ODBLink&, void* );
-void mysql_query_free( void* );
+void mysql_query_free( void*, bool );
 
 M_EXPORT_SYMBOL void driver_init( void );
 M_EXPORT_SYMBOL void driver_init( void ) {
@@ -242,9 +242,7 @@ M_EXPORT_SYMBOL void query_bind( ODBLink&, void* data_, int argNo_, yaal::hcore:
 
 void* mysql_query_execute( ODBLink&, void* data_ ) {
 	OMySQLResult* pq( static_cast<OMySQLResult*>( data_ ) );
-	if ( pq->_result ) {
-		::mysql_free_result( pq->_result );
-		pq->_result = nullptr;
+	if ( ! pq->_result ) {
 		mysql_stmt_reset( pq->_statement );
 		pq->_result = mysql_stmt_result_metadata( pq->_statement );
 	}
@@ -264,13 +262,15 @@ M_EXPORT_SYMBOL void* query_execute( ODBLink& dbLink_, void* data_ ) {
 	return ( mysql_query_execute( dbLink_, data_ ) );
 }
 
-void mysql_query_free( void* data_ ) {
+void mysql_query_free( void* data_, bool reset_ ) {
 	OMySQLResult* pq( static_cast<OMySQLResult*>( data_ ) );
-	M_ASSERT( pq->_useCount >= 0 );
+	M_ASSERT( pq->_useCount > 0 );
+	-- pq->_useCount;
+	if ( reset_ && pq->_result ) {
+		::mysql_free_result( pq->_result );
+		pq->_result = nullptr;
+	}
 	if ( ! pq->_useCount ) {
-		if ( pq->_result ) {
-			::mysql_free_result( pq->_result );
-		}
 		if ( pq->_statement ) {
 			::mysql_stmt_close( pq->_statement );
 		}
@@ -281,23 +281,13 @@ void mysql_query_free( void* data_ ) {
 
 M_EXPORT_SYMBOL void query_free( ODBLink&, void* );
 M_EXPORT_SYMBOL void query_free( ODBLink&, void* data_ ) {
-	OMySQLResult* pq( static_cast<OMySQLResult*>( data_ ) );
-	M_ASSERT( pq->_useCount > 0 );
-	-- pq->_useCount;
-	mysql_query_free( data_ );
+	mysql_query_free( data_, false );
 	return;
 }
 
 M_EXPORT_SYMBOL void rs_free_cursor( void* );
 M_EXPORT_SYMBOL void rs_free_cursor( void* data_ ) {
-	OMySQLResult* pq( static_cast<OMySQLResult*>( data_ ) );
-	M_ASSERT( pq->_useCount > 0 );
-	-- pq->_useCount;
-	if ( pq->_result ) {
-		::mysql_free_result( pq->_result );
-		pq->_result = nullptr;
-	}
-	mysql_query_free( data_ );
+	mysql_query_free( data_, true );
 	return;
 }
 

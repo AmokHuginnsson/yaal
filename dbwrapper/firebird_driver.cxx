@@ -413,21 +413,21 @@ M_EXPORT_SYMBOL void* query_execute( ODBLink& dbLink_, void* data_ ) {
 	return ( firebird_query_execute( dbLink_, data_ ) );
 }
 
-void firebird_rs_free_cursor( void* );
+void firebird_rs_free_cursor( void*, bool );
 
 M_EXPORT_SYMBOL void query_free( ODBLink&, void* );
 M_EXPORT_SYMBOL void query_free( ODBLink&, void* data_ ) {
-	firebird_rs_free_cursor( data_ );
+	firebird_rs_free_cursor( data_, false );
 	return;
 }
 
-void firebird_rs_free_cursor( void* data_ ) {
+void firebird_rs_free_cursor( void* data_, bool reset_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
 	OFirebird* db( static_cast<OFirebird*>( res->_dbLink._conn ) );
 	M_ASSERT( res );
 	M_ASSERT( res->_useCount > 0 );
 	-- res->_useCount;
-	if ( res->_stmt ) {
+	if ( reset_ && res->_stmt ) {
 		isc_dsql_free_statement( db->_status, &res->_stmt, res->_useCount == 0 ? DSQL_drop : DSQL_close );
 	}
 	if ( ! res->_useCount ) {
@@ -446,7 +446,7 @@ void firebird_rs_free_cursor( void* data_ ) {
 }
 M_EXPORT_SYMBOL void rs_free_cursor( void* );
 M_EXPORT_SYMBOL void rs_free_cursor( void* data_ ) {
-	firebird_rs_free_cursor( data_ );
+	firebird_rs_free_cursor( data_, true );
 	return;
 }
 

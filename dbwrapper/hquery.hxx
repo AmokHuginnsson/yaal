@@ -23,12 +23,14 @@ public:
 	typedef HQuery this_type;
 	typedef yaal::hcore::HPointer<HQuery> ptr_t;
 	typedef yaal::hcore::HHashMap<int, yaal::hcore::HUTF8String> bind_buffer_t;
+	typedef yaal::hcore::HPointerObserver<HRecordSet> result_observer_t;
 private:
 	mutable database_ptr_t _dataBase; /*!< data-base that this record-set belongs to */
 	mutable ODBConnector const* _connector; /*!< low level database engine connector */
 	void* _query; /*!< low level query data */
 	yaal::hcore::HString _sql;
 	bind_buffer_t _bindBuffer;
+	result_observer_t _resultObserver;
 public:
 	virtual ~HQuery( void );
 	void bind( int, yaal::hcore::HString const& );

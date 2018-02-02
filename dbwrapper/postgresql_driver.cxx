@@ -208,7 +208,12 @@ M_EXPORT_SYMBOL void* query_execute( ODBLink& dbLink_, void* data_ ) {
 			::PQclear( pr->_result );
 		}
 		pr->_result = ::PQdescribePrepared( conn, pr->_id.c_str() );
-		::PQsendQueryPrepared( conn, pr->_id.c_str(), static_cast<int>( pr->_params.get_size() ), pr->_params.data(), nullptr, nullptr, 0 );
+		::PQsendQueryPrepared(
+			conn, pr->_id.c_str(),
+			static_cast<int>( pr->_params.get_size() ),
+			! pr->_params.is_empty() ? pr->_params.data() : nullptr,
+			nullptr, nullptr, 0
+		);
 		++ pr->_useCount;
 		pr->_requireSync = true;
 	}

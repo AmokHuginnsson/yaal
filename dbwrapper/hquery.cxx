@@ -25,7 +25,8 @@ HQuery::HQuery(
 	, _connector( connector_ )
 	, _query( query_ )
 	, _sql( sql_ )
-	, _bindBuffer() {
+	, _bindBuffer()
+	, _resultObserver() {
 	return;
 }
 
@@ -52,11 +53,17 @@ HRecordSet::ptr_t HQuery::execute( void ) {
 	if ( _logSQL_ ) {
 		log << "SQL: " << _sql << endl;
 	}
+	HRecordSet::ptr_t rs( _resultObserver );
+	if ( !! rs ) {
+		throw HQueryException( "Previous execution on this query is still pending." );
+	}
 	void* result( (_connector->query_execute)( _dataBase->_dbLink, _query ) );
 	if ( (_connector->dbrs_errno)( _dataBase->_dbLink, result ) ) {
 		throw HSQLException( HString( "SQL error: " ) + (_connector->dbrs_error)( _dataBase->_dbLink, result ) );
 	}
-	return ( make_pointer<HRecordSet>( _dataBase, _connector, result, HRecordSet::CURSOR::FORWARD ) );
+	rs = make_pointer<HRecordSet>( _dataBase, _connector, result, HRecordSet::CURSOR::FORWARD );
+	_resultObserver = rs;
+	return ( rs );
 	M_EPILOG
 }
 
