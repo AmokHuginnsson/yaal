@@ -1072,10 +1072,14 @@ void OCompiler::commit_capture( executing_parser::position_t position_ ) {
 void OCompiler::create_scope( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
+	HStatement::statement_id_t sid( INVALID_STATEMENT_IDENTIFIER );
 	if ( ! fc._inline ) {
 		++ _statementIdGenerator;
+		sid = _statementIdGenerator;
+	} else {
+		sid = fc._scopeStack.top()->_statementId;
 	}
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, _statementIdGenerator, _fileId, position_.get() ) );
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, sid, _fileId, position_.get() ) );
 	fc._inline = false;
 	return;
 	M_EPILOG
