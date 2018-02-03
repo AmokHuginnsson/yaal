@@ -310,7 +310,12 @@ void HRuntime::drop_class( identifier_id_t identifier_ ) {
 
 void HRuntime::register_function( identifier_id_t identifier_, function_t function_, yaal::hcore::HString const& doc_ ) {
 	M_PROLOG
-	_functionsStore[ identifier_ ] = _objectFactory->create_function_reference( identifier_, function_, doc_ );
+	HHuginn::value_t& f( _functionsStore[ identifier_ ] );
+	if ( ! f ) {
+		f = _objectFactory->create_function_reference( identifier_, function_, doc_ );
+	} else {
+		static_cast<HHuginn::HFunctionReference*>( f.raw() )->reset( function_ );
+	}
 	_functionsAvailable.insert( identifier_ );
 	return;
 	M_EPILOG

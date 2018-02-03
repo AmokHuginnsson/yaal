@@ -860,6 +860,13 @@ HHuginn::HFunctionReference::HFunctionReference(
 	return;
 }
 
+void HHuginn::HFunctionReference::reset( function_t const& function_ ) {
+	M_PROLOG
+	_function = function_;
+	return;
+	M_EPILOG
+}
+
 HHuginn::value_t HHuginn::HFunctionReference::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	return ( thread_->runtime().object_factory()->create_function_reference( _identifierId, _function, _doc ) );
 }

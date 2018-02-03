@@ -1125,6 +1125,7 @@ public:
 	HHuginn::function_t const& function( void ) const {
 		return ( _function );
 	}
+	void reset( function_t const& );
 	yaal::hcore::HString const& doc( void ) const;
 private:
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
