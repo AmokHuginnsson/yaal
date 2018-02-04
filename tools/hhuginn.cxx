@@ -467,6 +467,18 @@ void HHuginn::register_class( class_t class_, ACCESS classConstructorAccess_, VI
 	M_EPILOG
 }
 
+void HHuginn::register_function( yaal::hcore::HString const& name_, function_t&& func_, yaal::hcore::HString const& doc_ ) {
+	M_PROLOG
+	if ( is_restricted( name_ ) ) {
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), MAIN_FILE_ID, 0 );
+	}
+	identifier_id_t id( _runtime->identifier_id( name_ ) );
+	_runtime->register_function( id, func_, doc_ );
+	register_function( id );
+	return;
+	M_EPILOG
+}
+
 void HHuginn::register_function( identifier_id_t id_ ) {
 	M_PROLOG
 	OCompiler::OIdentifierUse& iu( _compiler->_usedIdentifiers[id_] );

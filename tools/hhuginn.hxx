@@ -317,6 +317,7 @@ public:
 	yaal::hcore::HString const& get_comment( int ) const;
 	void register_class( class_t, ACCESS = ACCESS::PRIVATE, VISIBILITY = VISIBILITY::PACKAGE );
 	void register_function( identifier_id_t );
+	void register_function( yaal::hcore::HString const&, function_t&&, yaal::hcore::HString const& );
 	static void disable_grammar_verification( void );
 private:
 	HHuginn( huginn::HRuntime* );
