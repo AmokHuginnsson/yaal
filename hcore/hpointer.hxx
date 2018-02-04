@@ -48,6 +48,7 @@ public:
 	typedef typename trait::ternary<trait::is_array<tType>::value, typename trait::strip_pointer<decayed_type>::type, decayed_type>::type value_type;
 	typedef typename trait::make_reference<value_type>::type reference;
 	typedef typename trait::make_reference<value_type const>::type const_reference;
+	typedef value_type* pointer;
 protected:
 	int _referenceCounter[ 2 ];
 	value_type* _object;
@@ -193,6 +194,7 @@ public:
 	typedef typename shared_t::value_type value_type;
 	typedef typename shared_t::reference reference;
 	typedef typename shared_t::const_reference const_reference;
+	typedef typename shared_t::pointer pointer;
 	/*
 	 * WARNING!
 	 *
@@ -248,18 +250,19 @@ protected:
 	}
 	template<typename type, typename alien_t>
 	void acquire( HPointerBase<alien_t> const& from ) {
+		typedef typename HPointerBase<alien_t>::pointer alien_pointer;
 		HPointerBase const& alien = reinterpret_cast<HPointerBase const&>( from );
 		if ( ( &alien != this ) && ( _shared != alien._shared ) ) {
 			M_ASSERT( ( ! ( _shared && alien._shared ) )
 					|| ( ( _shared && alien._shared )
-						&& ( _object != static_cast<alien_t*>( static_cast<void*>( alien._object ) ) ) ) );
+						&& ( _object != static_cast<alien_pointer>( static_cast<void*>( alien._object ) ) ) ) );
 			if ( _shared ) {
 				release<type>();
 			}
 			if ( alien._shared && ( alien._shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] > 0 ) ) {
 				alien._shared->inc_reference_counter( static_cast<type*>( nullptr ) );
 				_shared = alien._shared;
-				assign( _object, static_cast<alien_t*>( static_cast<void*>( alien._object ) ) );
+				assign( _object, static_cast<alien_pointer>( static_cast<void*>( alien._object ) ) );
 			} else {
 				_shared = nullptr;
 				_object = nullptr;
@@ -281,13 +284,13 @@ protected:
 		return ( ! ( _shared && _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] ) );
 	}
 private:
-	void assign( tType*& to, tType* from ) {
+	void assign( pointer& to, pointer from ) {
 		to = from;
 		return;
 	}
 	template<typename alien_t>
-	void assign( tType*& to, alien_t* from ) {
-		to = dynamic_cast<tType*>( from );
+	void assign( pointer& to, alien_t* from ) {
+		to = dynamic_cast<pointer>( from );
 		return;
 	}
 	friend struct pointer_helper;
