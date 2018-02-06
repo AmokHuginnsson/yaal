@@ -55,11 +55,14 @@ static void close_and_invalidate( int& fd_ ) {
 
 int HPipedChild::_killGracePeriod = static_cast<int>( time::in_units<time::UNIT::MILLISECOND>( time::duration( 1, time::UNIT::SECOND ) ) );
 
-HPipedChild::HPipedChild( void )
-	: _pid( -1 )
-	, _in()
-	, _out()
-	, _err() {
+HPipedChild::HPipedChild(
+	yaal::hcore::HStreamInterface::ptr_t in_,
+	yaal::hcore::HStreamInterface::ptr_t out_,
+	yaal::hcore::HStreamInterface::ptr_t err_
+) : _pid( -1 )
+	, _in( in_ )
+	, _out( out_ )
+	, _err( err_ ) {
 	return;
 }
 
@@ -160,6 +163,27 @@ void HPipedChild::spawn(
 	yaal::hcore::HStreamInterface const* err_
 ) {
 	M_PROLOG
+	if ( !! _in ) {
+		if ( in_ ) {
+			throw HPipedChildException( "Input stream already defined." );
+		} else {
+			in_ = _in.raw();
+		}
+	}
+	if ( !! _out ) {
+		if ( out_ ) {
+			throw HPipedChildException( "Output stream already defined." );
+		} else {
+			out_ = _out.raw();
+		}
+	}
+	if ( !! _err ) {
+		if ( err_ ) {
+			throw HPipedChildException( "Error stream already defined." );
+		} else {
+			err_ = _err.raw();
+		}
+	}
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	OPipeResGuard pipeIn, pipeOut, pipeErr;
 	int* fileDesIn = pipeIn._res;

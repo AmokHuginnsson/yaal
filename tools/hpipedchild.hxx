@@ -40,7 +40,11 @@ private:
 	yaal::hcore::HStreamInterface::ptr_t _err;
 public:
 	M_YAAL_TOOLS_PUBLIC_API static int _killGracePeriod;
-	HPipedChild( void );
+	HPipedChild(
+		yaal::hcore::HStreamInterface::ptr_t = {},
+		yaal::hcore::HStreamInterface::ptr_t = {},
+		yaal::hcore::HStreamInterface::ptr_t = {}
+	);
 	~HPipedChild( void );
 	void spawn(
 		yaal::hcore::HString const&,
