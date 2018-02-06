@@ -87,6 +87,7 @@ public:
 	io_t& create_io( IO::TYPE::type_t, HANDLE, HANDLE = nullptr, std::string const& = std::string() );
 	io_t& get_io( int );
 	int close_io( int );
+	int dup_io( int );
 	int dup2_io( int, int );
 	static SystemIO& get_instance( void );
 private:

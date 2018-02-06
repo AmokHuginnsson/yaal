@@ -75,6 +75,7 @@ inline int unsigned alarm( int unsigned seconds_ ) {
 void pthread_setname_np( pthread_t, char const* );
 #endif /* #if ! defined( HAVE_PTHREAD_SETNAME_NP ) */
 
+#define dup msvcxx::dup
 #define dup2 msvcxx::dup2
 #define isatty msvcxx::isatty
 

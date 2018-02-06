@@ -12,6 +12,7 @@ M_YAAL_HCORE_PUBLIC_API int long sendto( int, void const*, int long, int, sockad
 M_YAAL_HCORE_PUBLIC_API int long recvfrom( int, void*, int long, int, sockaddr*, int* );
 M_YAAL_HCORE_PUBLIC_API int pipe( int* );
 M_YAAL_HCORE_PUBLIC_API int isatty( int );
+M_YAAL_HCORE_PUBLIC_API int dup( int );
 M_YAAL_HCORE_PUBLIC_API int dup2( int, int );
 M_YAAL_HCORE_PUBLIC_API void log_windows_error( char const* );
 M_YAAL_HCORE_PUBLIC_API int lockf( int, int, int long long );

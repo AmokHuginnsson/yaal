@@ -12,7 +12,6 @@
 #define execvp execvp_off
 #define access access_off
 #define lseek lseek_off
-#define dup dup_off
 
 #define fill fill_off
 #include "csignal"

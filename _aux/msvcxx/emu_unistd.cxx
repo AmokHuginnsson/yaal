@@ -10,7 +10,6 @@
 
 #define access access_off
 #define lseek lseek_off
-#define dup dup_off
 
 #include <csignal>
 
@@ -217,6 +216,18 @@ int fcntl( int fd_, int cmd_, int arg_ ) {
 		SystemIO& sysIo( SystemIO::get_instance() );
 		IO& io( *( sysIo.get_io( fd_ ).second ) );
 		ret = io.fcntl( cmd_, arg_ );
+	}
+	return ( ret );
+}
+
+M_EXPORT_SYMBOL
+int dup( int fd_ ) {
+	int ret( -1 );
+	if ( ( fd_ < SystemIO::MANAGED_IO ) && ( fd_ < SystemIO::MANAGED_IO ) ) {
+		ret = _dup( fd_ );
+	} else {
+		SystemIO& sysIo( SystemIO::get_instance() );
+		ret = sysIo.dup_io( fd_ );
 	}
 	return ( ret );
 }
