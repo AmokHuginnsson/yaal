@@ -65,7 +65,7 @@ enum class DIRECTORY_MODIFICATION {
 void create_directory( path_t const&, u32_t, DIRECTORY_MODIFICATION = DIRECTORY_MODIFICATION::EXACT );
 void remove_directory( path_t const&, DIRECTORY_MODIFICATION = DIRECTORY_MODIFICATION::EXACT );
 
-typedef yaal::hcore::HArray<path_t> find_result;
+typedef yaal::hcore::HArray<path_t> paths_t;
 
 struct FIND_TYPE {
 	typedef enum {
@@ -75,10 +75,11 @@ struct FIND_TYPE {
 	} enum_t;
 };
 
-find_result find( yaal::hcore::HString const&, yaal::hcore::HString const&,
+paths_t find( path_t const&, yaal::hcore::HString const&,
 		int = 0, int = meta::max_signed<int>::value, FIND_TYPE::enum_t = FIND_TYPE::ALL );
-find_result find( yaal::hcore::HString const&, yaal::hcore::HRegex const&,
+paths_t find( path_t const&, yaal::hcore::HRegex const&,
 		int = 0, int = meta::max_signed<int>::value, FIND_TYPE::enum_t = FIND_TYPE::ALL );
+paths_t glob( path_t const& );
 
 }
 

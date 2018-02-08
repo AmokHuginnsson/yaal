@@ -14,12 +14,15 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "filesystem.hxx"
 #include "stringalgo.hxx"
 #include "hfsitem.hxx"
+#include "hcore/hqueue.hxx"
 #include "hcore/hcall.hxx"
 
 #undef YAAL_USES_STAT
 
 using namespace yaal;
 using namespace yaal::hcore;
+using namespace yaal::tools;
+using namespace yaal::tools::string;
 
 namespace yaal {
 
@@ -358,8 +361,8 @@ void remove_directory( path_t const& path_, DIRECTORY_MODIFICATION directoryModi
 			throw HFileSystemException( to_string( "Failed to remove directory `" ).append( path ).append( "'" ) );
 		}
 	} else {
-		find_result fr( find( path, ".*" ) );
-		find_result::iterator lim(
+		paths_t fr( find( path, ".*" ) );
+		paths_t::iterator lim(
 			yaal::stable_partition( fr.begin(), fr.end(),
 				[]( path_t const& p ) {
 					return ( ! is_directory( p ) );
@@ -367,20 +370,20 @@ void remove_directory( path_t const& path_, DIRECTORY_MODIFICATION directoryModi
 			)
 		);
 		for_each( fr.begin(), lim, ptr_fun( &remove ) );
-		for_each( fr.rbegin(), HReverseIterator<find_result::iterator>( lim ), call( &remove_directory, _1, DIRECTORY_MODIFICATION::EXACT ) );
+		for_each( fr.rbegin(), HReverseIterator<paths_t::iterator>( lim ), call( &remove_directory, _1, DIRECTORY_MODIFICATION::EXACT ) );
 		remove_directory( path_, DIRECTORY_MODIFICATION::EXACT );
 	}
 }
 
-find_result find( yaal::hcore::HString const& in, yaal::hcore::HString const& pattern_,
+paths_t find( path_t const& in, yaal::hcore::HString const& pattern_,
 		int minDepth_, int maxDepth_, FIND_TYPE::enum_t fileType_ ) {
 	HRegex regex( pattern_ );
 	return ( find( in, regex, minDepth_, maxDepth_, fileType_ ) );
 }
 
-find_result find( yaal::hcore::HString const& in, yaal::hcore::HRegex const& pattern_,
+paths_t find( path_t const& in, yaal::hcore::HRegex const& pattern_,
 		int minDepth_, int maxDepth_, FIND_TYPE::enum_t fileType_ ) {
-	find_result result;
+	paths_t result;
 	HFSItem p( in );
 	if ( !! p ) {
 		if ( is_directory( p.get_path() ) ) {
@@ -390,7 +393,7 @@ find_result find( yaal::hcore::HString const& in, yaal::hcore::HRegex const& pat
 						result.emplace_back( it->get_path() );
 					}
 					if ( maxDepth_ > 0 ) {
-						find_result sub( find( it->get_path(), pattern_, minDepth_ > 0 ? minDepth_ - 1 : 0, maxDepth_ - 1, fileType_ ) );
+						paths_t sub( find( it->get_path(), pattern_, minDepth_ > 0 ? minDepth_ - 1 : 0, maxDepth_ - 1, fileType_ ) );
 						result.insert( result.end(), sub.begin(), sub.end() );
 					}
 				} else {
@@ -406,6 +409,102 @@ find_result find( yaal::hcore::HString const& in, yaal::hcore::HRegex const& pat
 		}
 	}
 	return ( result );
+}
+
+namespace {
+
+HString glob_to_re( yaal::hcore::HString const& globStr_ ) {
+	HString globRE( "^" );
+	bool escaped( false );
+	for ( code_point_t c : globStr_ ) {
+		if ( escaped || ( ( c != '\\' ) && ( c != '*' ) && ( c != '?' ) ) ) {
+			globRE.push_back( '['_ycp );
+			globRE.push_back( c );
+			globRE.push_back( ']'_ycp );
+			escaped = false;
+		} else if ( c == '\\' ) {
+			escaped = true;
+		} else if ( c == '*' ) {
+			globRE.append( ".*" );
+		} else {
+			globRE.push_back( '.'_ycp );
+		}
+	}
+	globRE.push_back( '$'_ycp );
+	return ( globRE );
+}
+
+struct OScan {
+	filesystem::path_t _path;
+	int _part;
+	OScan( filesystem::path_t const& path_, int part_ )
+		: _path( path_ )
+		, _part( part_ ) {
+	}
+	OScan( OScan const& ) = default;
+	OScan( OScan&& ) = default;
+};
+
+}
+
+yaal::tools::filesystem::paths_t glob( path_t const& path_ ) {
+	paths_t gr;
+	HString globChars( "*?" );
+	if ( path_.find_one_of( globChars ) != HString::npos ) {
+		tokens_t pathParts( split<>( filesystem::normalize_path( path_ ), filesystem::path::SEPARATOR ) );
+		typedef HQueue<OScan> scan_t;
+		HString base( "/" );
+		if ( pathParts.front().is_empty() ) {
+			pathParts.erase( pathParts.begin() );
+		} else {
+			base.assign( "./" );
+		}
+		scan_t scan;
+		scan.emplace( "", 0 );
+		HString trialPath;
+		while ( ! scan.is_empty() ) {
+			OScan trial( scan.front() );
+			scan.pop();
+			HString const& p( pathParts[trial._part] );
+			trialPath.assign( base ).append( trial._path );
+			if ( p.find_one_of( globChars ) != HString::npos ) {
+				HRegex globRE( glob_to_re( p ) );
+				if ( ! trial._path.is_empty() ) {
+					trial._path.append( filesystem::path::SEPARATOR );
+				}
+				HFSItem dir( trialPath );
+				if ( !! dir ) {
+					++ trial._part;
+					HString name;
+					HString newMatch;
+					for ( HFSItem const& f : dir ) {
+						name.assign( f.get_name() );
+						newMatch.assign( trial._path );
+						if ( globRE.matches( f.get_name() ) && ( ( trial._part == pathParts.get_size() ) || ( f.is_directory() ) ) ) {
+							newMatch.append( name );
+							if ( trial._part < pathParts.get_size() ) {
+								scan.emplace( newMatch, trial._part );
+							} else {
+								gr.push_back( newMatch );
+							}
+						}
+					}
+				}
+			} else {
+				trial._path.append( filesystem::path::SEPARATOR ).append( p );
+				++ trial._part;
+				if ( trial._part < pathParts.get_size() ) {
+					scan.emplace( trial );
+				} else {
+					gr.push_back( trial._path );
+				}
+			}
+		}
+	} else {
+		gr.push_back( path_ );
+	}
+	sort( gr.begin(), gr.end() );
+	return ( gr );
 }
 
 }
