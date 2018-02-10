@@ -491,7 +491,10 @@ yaal::tools::filesystem::paths_t glob( path_t const& path_ ) {
 					}
 				}
 			} else {
-				trial._path.append( filesystem::path::SEPARATOR ).append( p );
+				if ( ! trial._path.is_empty() ) {
+					trial._path.append( filesystem::path::SEPARATOR );
+				}
+				trial._path.append( p );
 				++ trial._part;
 				if ( trial._part < pathParts.get_size() ) {
 					scan.emplace( trial );
