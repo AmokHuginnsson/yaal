@@ -140,7 +140,7 @@ hcore::HUTF8String::const_iterator HIdentifierParser::do_parse( HExecutingParser
 		if ( scan != first_ ) {
 			executing_parser::position_t pos( position( executingParser_, first_ ) );
 			if ( !! _actionStringPosition ) {
-				add_execution_step( executingParser_, first_, call( _actionStringPosition, hcore::HUTF8String( first_, scan ), pos ) );
+				add_execution_step( executingParser_, call( _actionStringPosition, hcore::HUTF8String( first_, scan ), pos ) );
 			}
 			matched = true;
 		}

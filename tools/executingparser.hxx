@@ -173,9 +173,10 @@ protected:
 	virtual bool do_has_action( void ) const;
 	virtual bool do_always_matches( void ) const;
 	virtual HRuleBase const* do_find( yaal::hcore::HString const& ) const;
-	void add_execution_step( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator const&, action_t const& ) const;
-	void drop_execution_steps( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator const& ) const;
+	void add_execution_step( HExecutingParser*, action_t const& ) const;
+	void drop_execution_steps( HExecutingParser*, int ) const;
 	void report_error( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator const&, yaal::hcore::HString const& ) const;
+	int execution_step_count( HExecutingParser const* ) const;
 	executing_parser::position_t position( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator const& ) const;
 	friend class yaal::tools::HExecutingParser;
 private:
@@ -1091,16 +1092,16 @@ public:
 		TRUST_GRAMMAR
 	};
 	class HProxy {
-		static void add_execution_step( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator const&, executor_t const& );
-		static void drop_execution_steps( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator const& );
+		static void add_execution_step( HExecutingParser*, executor_t const& );
+		static void drop_execution_steps( HExecutingParser*, int );
 		static void report_error( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator const&, yaal::hcore::HString const& );
+		static int execution_step_count( HExecutingParser const* );
 		static int position( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator const& );
 		friend class executing_parser::HRuleBase;
 	};
 private:
 	typedef executing_parser::HRuleBase::ptr_t grammar_t;
-	typedef yaal::hcore::HPair<yaal::hcore::HUTF8String::const_iterator, executor_t> execution_step_t;
-	typedef yaal::hcore::HArray<execution_step_t> execution_steps_t;
+	typedef yaal::hcore::HArray<executor_t> execution_steps_t;
 	grammar_t _grammar;
 	execution_steps_t _executors;
 	bool _matched;
@@ -1120,9 +1121,10 @@ public:
 	messages_t const& error_messages( void ) const;
 private:
 	bool do_parse( void );
-	void add_execution_step( yaal::hcore::HUTF8String::const_iterator const&, executor_t const& );
-	void drop_execution_steps( yaal::hcore::HUTF8String::const_iterator const& );
+	void add_execution_step( executor_t const& );
+	void drop_execution_steps( int );
 	void report_error( yaal::hcore::HUTF8String::const_iterator const&, yaal::hcore::HString const& );
+	int execution_step_count( void ) const;
 	int position( yaal::hcore::HUTF8String::const_iterator const& );
 	void sanitize( void );
 	HExecutingParser( HExecutingParser const& );

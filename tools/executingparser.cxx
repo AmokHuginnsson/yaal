@@ -242,8 +242,8 @@ void HExecutingParser::execute( void* id_ ) {
 	M_PROLOG
 	M_ENSURE( _matched );
 	for ( execution_steps_t::iterator it( _executors.begin() ), end( _executors.end() ); it != end; ++ it ) {
-		if ( ! id_ || ( it->second.id() == id_ ) ) {
-			it->second();
+		if ( ! id_ || ( it->id() == id_ ) ) {
+			(*it)();
 		}
 	}
 	return;
@@ -277,25 +277,16 @@ bool HExecutingParser::do_parse( void ) {
 	M_EPILOG
 }
 
-void HExecutingParser::add_execution_step( yaal::hcore::HUTF8String::const_iterator const& position_, executor_t const& executor_ ) {
+void HExecutingParser::add_execution_step( executor_t const& executor_ ) {
 	M_PROLOG
-	_executors.push_back( make_pair( position_, executor_ ) );
+	_executors.push_back( executor_ );
 	return;
 	M_EPILOG
 }
 
-void HExecutingParser::drop_execution_steps( yaal::hcore::HUTF8String::const_iterator const& it_ ) {
+void HExecutingParser::drop_execution_steps( int from_ ) {
 	M_PROLOG
-	execution_steps_t::iterator e( end( _executors ) );
-	execution_steps_t::iterator it(
-		lower_bound(
-			begin( _executors ), e, it_,
-			[]( execution_step_t const& s_, yaal::hcore::HUTF8String::const_iterator const& i ) {
-				return ( s_.first < i );
-			}
-		)
-	);
-	_executors.erase( it, e );
+	_executors.erase( _executors.begin() + from_, _executors.end() );
 	return;
 	M_EPILOG
 }
@@ -314,6 +305,10 @@ void HExecutingParser::report_error( yaal::hcore::HUTF8String::const_iterator co
 	M_EPILOG
 }
 
+int HExecutingParser::execution_step_count( void ) const {
+	return ( static_cast<int>( _executors.get_size() ) );
+}
+
 int HExecutingParser::position( yaal::hcore::HUTF8String::const_iterator const& position_ ) {
 	return ( static_cast<int>( position_ - _inputStart ) );
 }
@@ -330,16 +325,16 @@ HExecutingParser::messages_t const& HExecutingParser::error_messages( void ) con
 	M_EPILOG
 }
 
-void HExecutingParser::HProxy::add_execution_step( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator const& position_, executor_t const& executor_ ) {
+void HExecutingParser::HProxy::add_execution_step( HExecutingParser* executingParser_, executor_t const& executor_ ) {
 	M_PROLOG
-	executingParser_->add_execution_step( position_, executor_ );
+	executingParser_->add_execution_step( executor_ );
 	return;
 	M_EPILOG
 }
 
-void HExecutingParser::HProxy::drop_execution_steps( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator const& position_ ) {
+void HExecutingParser::HProxy::drop_execution_steps( HExecutingParser* executingParser_, int from_ ) {
 	M_PROLOG
-	executingParser_->drop_execution_steps( position_ );
+	executingParser_->drop_execution_steps( from_ );
 	return;
 	M_EPILOG
 }
@@ -348,6 +343,12 @@ void HExecutingParser::HProxy::report_error( HExecutingParser* executingParser_,
 	M_PROLOG
 	executingParser_->report_error( position_, message_ );
 	return;
+	M_EPILOG
+}
+
+int HExecutingParser::HProxy::execution_step_count( HExecutingParser const* executingParser_ ) {
+	M_PROLOG
+	return ( executingParser_->execution_step_count() );
 	M_EPILOG
 }
 
@@ -402,6 +403,7 @@ bool HRuleBase::is_optional( void ) const {
 yaal::hcore::HUTF8String::const_iterator HRuleBase::parse( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator const& first_, yaal::hcore::HUTF8String::const_iterator const& last_ ) const {
 	M_PROLOG
 	M_ASSERT( ( first_ != HUTF8String::const_iterator() ) && ( last_ != HUTF8String::const_iterator() ) );
+	int stepCount( HExecutingParser::HProxy::execution_step_count( executingParser_ ) );
 	yaal::hcore::HUTF8String::const_iterator start( first_ );
 	if ( _skipWS ) {
 		skip_space( start, last_ );
@@ -410,7 +412,7 @@ yaal::hcore::HUTF8String::const_iterator HRuleBase::parse( HExecutingParser* exe
 	M_ASSERT( it != HUTF8String::const_iterator() );
 	if ( it == start ) {
 		if ( ! always_matches() && is_optional() ) {
-			HExecutingParser::HProxy::drop_execution_steps( executingParser_, first_ );
+			HExecutingParser::HProxy::drop_execution_steps( executingParser_, stepCount );
 		}
 		return ( first_ );
 	}
@@ -418,16 +420,16 @@ yaal::hcore::HUTF8String::const_iterator HRuleBase::parse( HExecutingParser* exe
 	M_EPILOG
 }
 
-void HRuleBase::add_execution_step( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator const& position_, action_t const& executor_ ) const {
+void HRuleBase::add_execution_step( HExecutingParser* executingParser_, action_t const& executor_ ) const {
 	M_PROLOG
-	HExecutingParser::HProxy::add_execution_step( executingParser_, position_, executor_ );
+	HExecutingParser::HProxy::add_execution_step( executingParser_, executor_ );
 	return;
 	M_EPILOG
 }
 
-void HRuleBase::drop_execution_steps( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator const& position_ ) const {
+void HRuleBase::drop_execution_steps( HExecutingParser* executingParser_, int from_ ) const {
 	M_PROLOG
-	HExecutingParser::HProxy::drop_execution_steps( executingParser_, position_ );
+	HExecutingParser::HProxy::drop_execution_steps( executingParser_, from_ );
 	return;
 	M_EPILOG
 }
@@ -436,6 +438,12 @@ void HRuleBase::report_error( HExecutingParser* executingParser_, yaal::hcore::H
 	M_PROLOG
 	HExecutingParser::HProxy::report_error( executingParser_, position_, message_ );
 	return;
+	M_EPILOG
+}
+
+int HRuleBase::execution_step_count( HExecutingParser const* executingParser_ ) const {
+	M_PROLOG
+	return ( HExecutingParser::HProxy::execution_step_count( executingParser_ ) );
 	M_EPILOG
 }
 
@@ -810,9 +818,9 @@ yaal::hcore::HUTF8String::const_iterator HRule::do_parse( HExecutingParser* exec
 	yaal::hcore::HUTF8String::const_iterator scan( !! _rule ? _rule->parse( executingParser_, first_, last_ ) : first_ );
 	if ( scan != first_ ) {
 		if ( !! _action ) {
-			add_execution_step( executingParser_, first_, _action );
+			add_execution_step( executingParser_, _action );
 		} else if ( !! _actionPosition ) {
-			add_execution_step( executingParser_, first_, call( _actionPosition, position( executingParser_, first_ ) ) );
+			add_execution_step( executingParser_, call( _actionPosition, position( executingParser_, first_ ) ) );
 		}
 	} else {
 		scan = first_;
@@ -1203,9 +1211,9 @@ yaal::hcore::HUTF8String::const_iterator HFollows::do_parse( HExecutingParser* e
 	}
 	if ( matched ) {
 		if ( !! _action ) {
-			add_execution_step( executingParser_, first_, _action );
+			add_execution_step( executingParser_, _action );
 		} else if ( !! _actionPosition ) {
-			add_execution_step( executingParser_, first_, call( _actionPosition, position( executingParser_, first_ ) ) );
+			add_execution_step( executingParser_, call( _actionPosition, position( executingParser_, first_ ) ) );
 		}
 	} else {
 		scan = first_;
@@ -1302,18 +1310,19 @@ yaal::hcore::HUTF8String::const_iterator HKleeneBase::do_parse( HExecutingParser
 	yaal::hcore::HUTF8String::const_iterator scan( first_ );
 	yaal::hcore::HUTF8String::const_iterator oldScan( scan );
 	while ( scan != last_ ) {
+		int stepCount( execution_step_count( executingParser_ ) );
 		scan = _rule->parse( executingParser_, scan, last_ );
 		if ( scan == oldScan ) {
-			drop_execution_steps( executingParser_, scan );
+			drop_execution_steps( executingParser_, stepCount );
 			break;
 		}
 		oldScan = scan;
 	}
 	if ( scan != first_ ) {
 		if ( !! _action ) {
-			add_execution_step( executingParser_, first_, _action );
+			add_execution_step( executingParser_, _action );
 		} else if ( !! _actionPosition ) {
-			add_execution_step( executingParser_, first_, call( _actionPosition, position( executingParser_, first_ ) ) );
+			add_execution_step( executingParser_, call( _actionPosition, position( executingParser_, first_ ) ) );
 		}
 	} else {
 		scan = first_;
@@ -1588,18 +1597,19 @@ HAlternative HAlternative::operator[]( action_position_t const& action_ ) const 
 
 yaal::hcore::HUTF8String::const_iterator HAlternative::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const {
 	yaal::hcore::HUTF8String::const_iterator scan( first_ );
+	int stepCount( execution_step_count( executingParser_ ) );
 	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
 		if ( ( scan = (*it)->parse( executingParser_, first_, last_ ) ) != first_ ) {
 			break;
 		} else {
-			drop_execution_steps( executingParser_, first_ );
+			drop_execution_steps( executingParser_, stepCount );
 		}
 	}
 	if ( scan != first_ ) {
 		if ( !! _action ) {
-			add_execution_step( executingParser_, first_, _action );
+			add_execution_step( executingParser_, _action );
 		} else if ( !! _actionPosition ) {
-			add_execution_step( executingParser_, first_, call( _actionPosition, position( executingParser_, first_ ) ) );
+			add_execution_step( executingParser_, call( _actionPosition, position( executingParser_, first_ ) ) );
 		}
 	} else {
 		scan = first_;
@@ -1746,9 +1756,9 @@ yaal::hcore::HUTF8String::const_iterator HOptional::do_parse( HExecutingParser* 
 	yaal::hcore::HUTF8String::const_iterator scan( !! _rule ? _rule->parse( executingParser_, first_, last_ ) : first_ );
 	if ( scan != first_ ) {
 		if ( !! _action ) {
-			add_execution_step( executingParser_, first_, _action );
+			add_execution_step( executingParser_, _action );
 		} else if ( !! _actionPosition ) {
-			add_execution_step( executingParser_, first_, call( _actionPosition, position( executingParser_, first_ ) ) );
+			add_execution_step( executingParser_, call( _actionPosition, position( executingParser_, first_ ) ) );
 		}
 	} else {
 		scan = first_;
@@ -1875,13 +1885,14 @@ HAnd HAnd::operator[]( action_position_t const& action_ ) const {
 yaal::hcore::HUTF8String::const_iterator HAnd::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const {
 	M_PROLOG
 	yaal::hcore::HUTF8String::const_iterator scan( !! _rule ? _rule->parse( executingParser_, first_, last_ ) : first_ );
+	int stepCount( execution_step_count( executingParser_ ) );
 	yaal::hcore::HUTF8String::const_iterator andScan( !! _and ? _and->parse( executingParser_, scan, last_ ) : scan );
 	if ( ( scan != first_ ) && ( andScan != scan ) ) {
-		drop_execution_steps( executingParser_, scan );
+		drop_execution_steps( executingParser_, stepCount );
 		if ( !! _action ) {
-			add_execution_step( executingParser_, first_, _action );
+			add_execution_step( executingParser_, _action );
 		} else if ( !! _actionPosition ) {
-			add_execution_step( executingParser_, first_, call( _actionPosition, position( executingParser_, first_ ) ) );
+			add_execution_step( executingParser_, call( _actionPosition, position( executingParser_, first_ ) ) );
 		}
 	} else {
 		scan = first_;
@@ -2021,9 +2032,9 @@ yaal::hcore::HUTF8String::const_iterator HNot::do_parse( HExecutingParser* execu
 	yaal::hcore::HUTF8String::const_iterator notScan( !! _not ? _not->parse( executingParser_, scan, last_ ) : scan );
 	if ( ( scan != first_ ) && ( notScan == scan ) ) {
 		if ( !! _action ) {
-			add_execution_step( executingParser_, first_, _action );
+			add_execution_step( executingParser_, _action );
 		} else if ( !! _actionPosition ) {
-			add_execution_step( executingParser_, first_, call( _actionPosition, position( executingParser_, first_ ) ) );
+			add_execution_step( executingParser_, call( _actionPosition, position( executingParser_, first_ ) ) );
 		}
 	} else {
 		if ( scan != first_ ) {
@@ -2547,28 +2558,28 @@ yaal::hcore::HUTF8String::const_iterator HReal::do_parse( HExecutingParser* exec
 		}
 		if ( !! _actionDouble ) {
 			double d( ::strtod( _cache.get<char>(), nullptr ) );
-			add_execution_step( executingParser_, first_, call( _actionDouble, d ) );
+			add_execution_step( executingParser_, call( _actionDouble, d ) );
 		} else if ( !! _actionDoublePosition ) {
 			double d( ::strtod( _cache.get<char>(), nullptr ) );
-			add_execution_step( executingParser_, first_, call( _actionDoublePosition, d, pos ) );
+			add_execution_step( executingParser_, call( _actionDoublePosition, d, pos ) );
 		} else if ( !! _actionDoubleLong ) {
 			double long dl( ::strtold( _cache.get<char>(), nullptr ) );
-			add_execution_step( executingParser_, first_, call( _actionDoubleLong, dl ) );
+			add_execution_step( executingParser_, call( _actionDoubleLong, dl ) );
 		} else if ( !! _actionDoubleLongPosition ) {
 			double long dl( ::strtold( _cache.get<char>(), nullptr ) );
-			add_execution_step( executingParser_, first_, call( _actionDoubleLongPosition, dl, pos ) );
+			add_execution_step( executingParser_, call( _actionDoubleLongPosition, dl, pos ) );
 		} else if ( !! _actionNumber ) {
-			add_execution_step( executingParser_, first_, call( _actionNumber, yaal::move( _stringCache ) ) );
+			add_execution_step( executingParser_, call( _actionNumber, yaal::move( _stringCache ) ) );
 		} else if ( !! _actionNumberPosition ) {
-			add_execution_step( executingParser_, first_, call( _actionNumberPosition, yaal::move( _stringCache ), pos ) );
+			add_execution_step( executingParser_, call( _actionNumberPosition, yaal::move( _stringCache ), pos ) );
 		} else if ( !! _actionString ) {
-			add_execution_step( executingParser_, first_, call( _actionString, yaal::move( _stringCache ) ) );
+			add_execution_step( executingParser_, call( _actionString, yaal::move( _stringCache ) ) );
 		} else if ( !! _actionStringPosition ) {
-			add_execution_step( executingParser_, first_, call( _actionStringPosition, yaal::move( _stringCache ), pos ) );
+			add_execution_step( executingParser_, call( _actionStringPosition, yaal::move( _stringCache ), pos ) );
 		} else if ( !! _action ) {
-			add_execution_step( executingParser_, first_, call( _action ) );
+			add_execution_step( executingParser_, call( _action ) );
 		} else if ( !! _actionPosition ) {
-			add_execution_step( executingParser_, first_, call( _actionPosition, pos ) );
+			add_execution_step( executingParser_, call( _actionPosition, pos ) );
 		}
 	} else {
 		report_error( executingParser_, scan, "expected real number" );
@@ -2984,34 +2995,34 @@ yaal::hcore::HUTF8String::const_iterator HInteger::do_parse( HExecutingParser* e
 			position_t pos( position( executingParser_, first_ ) );
 			if ( !! _actionIntLongLong ) {
 				int long long ill( lexical_cast<int long long>( _cache ) );
-				add_execution_step( executingParser_, first_, call( _actionIntLongLong, ill ) );
+				add_execution_step( executingParser_, call( _actionIntLongLong, ill ) );
 			} else if ( !! _actionIntLongLongPosition ) {
 				int long long ill( lexical_cast<int long long>( _cache ) );
-				add_execution_step( executingParser_, first_, call( _actionIntLongLongPosition, ill, pos ) );
+				add_execution_step( executingParser_, call( _actionIntLongLongPosition, ill, pos ) );
 			} else if ( !! _actionIntLong ) {
 				int long il( lexical_cast<int long>( _cache ) );
-				add_execution_step( executingParser_, first_, call( _actionIntLong, il ) );
+				add_execution_step( executingParser_, call( _actionIntLong, il ) );
 			} else if ( !! _actionIntLongPosition ) {
 				int long il( lexical_cast<int long>( _cache ) );
-				add_execution_step( executingParser_, first_, call( _actionIntLongPosition, il, pos ) );
+				add_execution_step( executingParser_, call( _actionIntLongPosition, il, pos ) );
 			} else if ( !! _actionInt ) {
 				int i( lexical_cast<int>( _cache ) );
-				add_execution_step( executingParser_, first_, call( _actionInt, i ) );
+				add_execution_step( executingParser_, call( _actionInt, i ) );
 			} else if ( !! _actionIntPosition ) {
 				int i( lexical_cast<int>( _cache ) );
-				add_execution_step( executingParser_, first_, call( _actionIntPosition, i, pos ) );
+				add_execution_step( executingParser_, call( _actionIntPosition, i, pos ) );
 			} else if ( !! _actionNumber ) {
-				add_execution_step( executingParser_, first_, call( _actionNumber, yaal::move( _cache ) ) );
+				add_execution_step( executingParser_, call( _actionNumber, yaal::move( _cache ) ) );
 			} else if ( !! _actionNumberPosition ) {
-				add_execution_step( executingParser_, first_, call( _actionNumberPosition, yaal::move( _cache ), pos ) );
+				add_execution_step( executingParser_, call( _actionNumberPosition, yaal::move( _cache ), pos ) );
 			} else if ( !! _actionString ) {
-				add_execution_step( executingParser_, first_, call( _actionString, yaal::move( _cache ) ) );
+				add_execution_step( executingParser_, call( _actionString, yaal::move( _cache ) ) );
 			} else if ( !! _actionStringPosition ) {
-				add_execution_step( executingParser_, first_, call( _actionStringPosition, yaal::move( _cache ), pos ) );
+				add_execution_step( executingParser_, call( _actionStringPosition, yaal::move( _cache ), pos ) );
 			} else if ( !! _action ) {
-				add_execution_step( executingParser_, first_, call( _action ) );
+				add_execution_step( executingParser_, call( _action ) );
 			} else if ( !! _actionPosition ) {
-				add_execution_step( executingParser_, first_, call( _actionPosition, pos ) );
+				add_execution_step( executingParser_, call( _actionPosition, pos ) );
 			}
 		} catch ( HException const& e ) {
 			report_error( executingParser_, scan, e.what() );
@@ -3279,13 +3290,13 @@ yaal::hcore::HUTF8String::const_iterator HStringLiteral::do_parse( HExecutingPar
 		unescape( _cache, _escapes_ );
 		position_t pos( position( executingParser_, first_ ) );
 		if ( !! _actionString ) {
-			add_execution_step( executingParser_, first_, call( _actionString, yaal::move( _cache ) ) );
+			add_execution_step( executingParser_, call( _actionString, yaal::move( _cache ) ) );
 		} else if ( !! _actionStringPosition ) {
-			add_execution_step( executingParser_, first_, call( _actionStringPosition, yaal::move( _cache ), pos ) );
+			add_execution_step( executingParser_, call( _actionStringPosition, yaal::move( _cache ), pos ) );
 		} else if ( !! _action ) {
-			add_execution_step( executingParser_, first_, _action );
+			add_execution_step( executingParser_, _action );
 		} else if ( !! _actionPosition ) {
-			add_execution_step( executingParser_, first_, call( _actionPosition, pos ) );
+			add_execution_step( executingParser_, call( _actionPosition, pos ) );
 		}
 	} else {
 		report_error( executingParser_, scan, "expected literal string" );
@@ -3422,13 +3433,13 @@ yaal::hcore::HUTF8String::const_iterator HCharacterLiteral::do_parse( HExecuting
 		if ( _cache.get_length() == 1 ) {
 			position_t pos( position( executingParser_, first_ ) );
 			if ( !! _actionCharacter ) {
-				add_execution_step( executingParser_, first_, call( _actionCharacter, _cache[0] ) );
+				add_execution_step( executingParser_, call( _actionCharacter, _cache[0] ) );
 			} else if ( !! _actionCharacterPosition ) {
-				add_execution_step( executingParser_, first_, call( _actionCharacterPosition, _cache[0], pos ) );
+				add_execution_step( executingParser_, call( _actionCharacterPosition, _cache[0], pos ) );
 			} else if ( !! _action ) {
-				add_execution_step( executingParser_, first_, _action );
+				add_execution_step( executingParser_, _action );
 			} else if ( !! _actionPosition ) {
-				add_execution_step( executingParser_, first_, call( _actionPosition, pos ) );
+				add_execution_step( executingParser_, call( _actionPosition, pos ) );
 			}
 		} else {
 			report_error( executingParser_, scan, errMsg );
@@ -3610,13 +3621,13 @@ yaal::hcore::HUTF8String::const_iterator HCharacter::do_parse( HExecutingParser*
 		if ( _characters.is_empty() || ( _characters.find( *scan ) != hcore::HString::npos ) ) {
 			position_t pos( position( executingParser_, first_ ) );
 			if ( !! _actionCharacter ) {
-				add_execution_step( executingParser_, first_, call( _actionCharacter, c ) );
+				add_execution_step( executingParser_, call( _actionCharacter, c ) );
 			} else if ( !! _actionCharacterPosition ) {
-				add_execution_step( executingParser_, first_, call( _actionCharacterPosition, c, pos ) );
+				add_execution_step( executingParser_, call( _actionCharacterPosition, c, pos ) );
 			} else if ( !! _action ) {
-				add_execution_step( executingParser_, first_, call( _action ) );
+				add_execution_step( executingParser_, call( _action ) );
 			} else if ( !! _actionPosition ) {
-				add_execution_step( executingParser_, first_, call( _actionPosition, pos ) );
+				add_execution_step( executingParser_, call( _actionPosition, pos ) );
 			}
 			++ scan;
 			matched = true;
@@ -3881,13 +3892,13 @@ hcore::HUTF8String::const_iterator HString::do_parse( HExecutingParser* executin
 			if ( matched ) {
 				position_t pos( position( executingParser_, first_ ) );
 				if ( !! _actionString ) {
-					add_execution_step( executingParser_, first_, call( _actionString, s ) );
+					add_execution_step( executingParser_, call( _actionString, s ) );
 				} else if ( !! _actionStringPosition ) {
-					add_execution_step( executingParser_, first_, call( _actionStringPosition, s, pos ) );
+					add_execution_step( executingParser_, call( _actionStringPosition, s, pos ) );
 				} else if ( !! _action ) {
-					add_execution_step( executingParser_, first_, call( _action ) );
+					add_execution_step( executingParser_, call( _action ) );
 				} else if ( !! _actionPosition ) {
-					add_execution_step( executingParser_, first_, call( _actionPosition, pos ) );
+					add_execution_step( executingParser_, call( _actionPosition, pos ) );
 				}
 				break;
 			}
@@ -4173,15 +4184,15 @@ hcore::HUTF8String::const_iterator HRegex::do_parse( HExecutingParser* executing
 			if ( !! _actionString ) {
 				HUTF8String::const_iterator from( scan + it->start() );
 				HUTF8String::const_iterator to( from + it->size() );
-				add_execution_step( executingParser_, first_, call( _actionString, hcore::HUTF8String( from, to ) ) );
+				add_execution_step( executingParser_, call( _actionString, hcore::HUTF8String( from, to ) ) );
 			} else if ( !! _actionStringPosition ) {
 				HUTF8String::const_iterator from( scan + it->start() );
 				HUTF8String::const_iterator to( from + it->size() );
-				add_execution_step( executingParser_, first_, call( _actionStringPosition, hcore::HUTF8String( from, to ), pos ) );
+				add_execution_step( executingParser_, call( _actionStringPosition, hcore::HUTF8String( from, to ), pos ) );
 			} else if ( !! _action ) {
-				add_execution_step( executingParser_, first_, call( _action ) );
+				add_execution_step( executingParser_, call( _action ) );
 			} else if ( !! _actionPosition ) {
-				add_execution_step( executingParser_, first_, call( _actionPosition, pos ) );
+				add_execution_step( executingParser_, call( _actionPosition, pos ) );
 			}
 			scan += ( it->start() + it->size() );
 			matched = true;
@@ -4515,9 +4526,9 @@ HAction HAction::operator[]( action_position_t const& action_ ) const {
 yaal::hcore::HUTF8String::const_iterator HAction::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& ) const {
 	M_PROLOG
 	if ( !! _action ) {
-		add_execution_step( executingParser_, first_, _action );
+		add_execution_step( executingParser_, _action );
 	} else if ( !! _actionPosition ) {
-		add_execution_step( executingParser_, first_, call( _actionPosition, position( executingParser_, first_ ) ) );
+		add_execution_step( executingParser_, call( _actionPosition, position( executingParser_, first_ ) ) );
 	}
 	return ( first_ );
 	M_EPILOG
