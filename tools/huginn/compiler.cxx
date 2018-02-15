@@ -115,6 +115,7 @@ OCompiler::OFunctionContext::OFunctionContext(
 	, _operations()
 	, _valueTypes()
 	, _variables()
+	, _variableCount()
 	, _loopCount( 0 )
 	, _loopSwitchCount( 0 )
 	, _nestedCalls( 0 )
@@ -1594,9 +1595,13 @@ void OCompiler::defer_str_oper( yaal::hcore::HString const& operator_, executing
 		{ op_to_symbol_str( OPERATOR::BOOLEAN_OR ),  OPERATOR::BOOLEAN_OR },
 		{ op_to_symbol_str( OPERATOR::BOOLEAN_XOR ), OPERATOR::BOOLEAN_XOR }
 	} );
+	OFunctionContext& fc( f() );
 	OPERATOR o( operatorLookup.at( operator_ ) );
+	if ( ( o == OPERATOR::ASSIGN ) && ( fc._variableCount.top() > 1 ) ) {
+		o = OPERATOR::ASSIGN_PACK;
+	}
 	current_expression()->oper( o, position_.get() );
-	f()._operations.emplace( o, position_.get() );
+	fc._operations.emplace( o, position_.get() );
 	return;
 	M_EPILOG
 }
@@ -2010,89 +2015,134 @@ void OCompiler::dispatch_assign( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	bool hasAssign( false );
+	bool assignPack( false );
+	int varCount( 0 );
 	while ( ! fc._operations.is_empty() ) {
 		OPERATOR o( fc._operations.top()._operator );
 		if ( ( o < OPERATOR::ASSIGN ) || ( o > OPERATOR::POWER_ASSIGN ) ) {
 			break;
 		}
-		M_ASSERT( fc._valueTypes.get_size() >= 2 );
-		M_ASSERT( ! fc._variables.is_empty() );
 		int p( fc._operations.top()._position );
 		fc._operations.pop();
-		HHuginn::HClass const* c1( fc._valueTypes.top()._class );
-		fc._valueTypes.pop();
-		HHuginn::HClass const* c2( fc._valueTypes.top()._class );
-		fc._valueTypes.pop();
-		OFunctionContext::OVariableRef varRef( fc._variables.top() );
-		HHuginn::HClass const* realDestType( c2 );
-		if ( realDestType->type_id() == HHuginn::TYPE::UNKNOWN ) {
-			realDestType = guess_type( varRef._identifier );
+		if ( assignPack ) {
+			throw HHuginn::HHuginnRuntimeException( "Assignee pack must be final assignment.", MAIN_FILE_ID, p );
 		}
-		if ( varRef._identifier != INVALID_IDENTIFIER ) {
-			note_type( varRef._identifier, c1 );
-		}
-		if ( varRef._identifier != INVALID_IDENTIFIER ) {
-			if ( o == OPERATOR::ASSIGN ) {
-				_usedIdentifiers[varRef._identifier].write( position_.get(), OIdentifierUse::TYPE::VARIABLE );
-			} else if ( are_congruous( c1, realDestType ) ) {
-				_usedIdentifiers[varRef._identifier].read( position_.get(), OIdentifierUse::TYPE::VARIABLE );
-				M_ASSERT( varRef._executionStepIndex >= 0 );
-				_executionStepsBacklog[varRef._executionStepIndex]._operation = OExecutionStep::OPERATION::UPDATE;
-			} else {
-				operands_type_mismatch( op_to_str( o ), realDestType, c1, MAIN_FILE_ID, p );
+		varCount = fc._variableCount.top();
+		if ( varCount == 1 ) {
+			M_ASSERT( fc._valueTypes.get_size() >= 2 );
+			M_ASSERT( ! fc._variables.is_empty() );
+			M_ASSERT( o != OPERATOR::ASSIGN_PACK );
+			HHuginn::HClass const* srcType( fc._valueTypes.top()._class );
+			fc._valueTypes.pop();
+			HHuginn::HClass const* destType( fc._valueTypes.top()._class );
+			fc._valueTypes.pop();
+			OFunctionContext::OVariableRef varRef( fc._variables.top() );
+			HHuginn::HClass const* realDestType( destType );
+			if ( realDestType->type_id() == HHuginn::TYPE::UNKNOWN ) {
+				realDestType = guess_type( varRef._identifier );
 			}
-		}
-		switch ( o ) {
-			case ( OPERATOR::PLUS_ASSIGN ):
-			case ( OPERATOR::MINUS_ASSIGN ): {
-				if ( ! ( is_summable( c1 ) && is_summable( realDestType ) ) ) {
-					throw HHuginn::HHuginnRuntimeException(
-						HString( o == OPERATOR::PLUS_ASSIGN ? _errMsgHHuginn_[ERR_CODE::OP_NOT_SUM] : _errMsgHHuginn_[ERR_CODE::OP_NOT_SUB] )
-							.append( a_type_name( realDestType ) )
-							.append( ", " )
-							.append( a_type_name( c1 ) ),
-						MAIN_FILE_ID,
-						p
-					);
+			if ( varRef._identifier != INVALID_IDENTIFIER ) {
+				note_type( varRef._identifier, srcType );
+			}
+			if ( varRef._identifier != INVALID_IDENTIFIER ) {
+				if ( o == OPERATOR::ASSIGN ) {
+					_usedIdentifiers[varRef._identifier].write( position_.get(), OIdentifierUse::TYPE::VARIABLE );
+				} else if ( are_congruous( srcType, realDestType ) ) {
+					_usedIdentifiers[varRef._identifier].read( position_.get(), OIdentifierUse::TYPE::VARIABLE );
+					M_ASSERT( varRef._executionStepIndex >= 0 );
+					_executionStepsBacklog[varRef._executionStepIndex]._operation = OExecutionStep::OPERATION::UPDATE;
+				} else {
+					operands_type_mismatch( op_to_str( o ), realDestType, srcType, MAIN_FILE_ID, p );
 				}
-			} break;
-			case ( OPERATOR::MULTIPLY_ASSIGN ):
-			case ( OPERATOR::DIVIDE_ASSIGN ):
-			case ( OPERATOR::MODULO_ASSIGN ):
-			case ( OPERATOR::POWER_ASSIGN ): {
-				if ( ! ( is_numeric_congruent( c1 ) && is_numeric_congruent( realDestType ) ) ) {
-					throw HHuginn::HHuginnRuntimeException(
-						HString(
-							o == OPERATOR::MULTIPLY_ASSIGN
-								? _errMsgHHuginn_[ERR_CODE::OP_NOT_MUL]
-								: (
-									o == OPERATOR::POWER_ASSIGN ? _errMsgHHuginn_[ERR_CODE::OP_NOT_EXP] : _errMsgHHuginn_[ERR_CODE::OP_NOT_DIV]
-								)
-						)
-							.append( a_type_name( realDestType ) )
-							.append( ", " )
-							.append( a_type_name( c1 ) ),
-						MAIN_FILE_ID,
-						p
-					);
+			}
+			switch ( o ) {
+				case ( OPERATOR::PLUS_ASSIGN ):
+				case ( OPERATOR::MINUS_ASSIGN ): {
+					if ( ! ( is_summable( srcType ) && is_summable( realDestType ) ) ) {
+						throw HHuginn::HHuginnRuntimeException(
+							HString( o == OPERATOR::PLUS_ASSIGN ? _errMsgHHuginn_[ERR_CODE::OP_NOT_SUM] : _errMsgHHuginn_[ERR_CODE::OP_NOT_SUB] )
+								.append( a_type_name( realDestType ) )
+								.append( ", " )
+								.append( a_type_name( srcType ) ),
+							MAIN_FILE_ID,
+							p
+						);
+					}
+				} break;
+				case ( OPERATOR::MULTIPLY_ASSIGN ):
+				case ( OPERATOR::DIVIDE_ASSIGN ):
+				case ( OPERATOR::MODULO_ASSIGN ):
+				case ( OPERATOR::POWER_ASSIGN ): {
+					if ( ! ( is_numeric_congruent( srcType ) && is_numeric_congruent( realDestType ) ) ) {
+						throw HHuginn::HHuginnRuntimeException(
+							HString(
+								o == OPERATOR::MULTIPLY_ASSIGN
+									? _errMsgHHuginn_[ERR_CODE::OP_NOT_MUL]
+									: (
+										o == OPERATOR::POWER_ASSIGN ? _errMsgHHuginn_[ERR_CODE::OP_NOT_EXP] : _errMsgHHuginn_[ERR_CODE::OP_NOT_DIV]
+									)
+							)
+								.append( a_type_name( realDestType ) )
+								.append( ", " )
+								.append( a_type_name( srcType ) ),
+							MAIN_FILE_ID,
+							p
+						);
+					}
+				} break;
+				case ( OPERATOR::ASSIGN ): break;
+				default: {
+					M_ASSERT( ! "bad code path"[0] );
+				} break;
+			}
+			if ( ! is_reference_congruent( destType ) ) {
+				throw HHuginn::HHuginnRuntimeException( "Setting a non reference location.", MAIN_FILE_ID, p );
+			}
+			fc._variables.pop();
+			fc._valueTypes.push( congruent( srcType, destType ) );
+		} else if ( o != OPERATOR::ASSIGN_PACK ) {
+			M_ASSERT( o != OPERATOR::ASSIGN );
+			throw HHuginn::HHuginnRuntimeException( "Mutating variable pack is not supported.", MAIN_FILE_ID, p );
+		} else {
+			M_ASSERT( fc._valueTypes.get_size() >= ( varCount + 1 ) );
+			M_ASSERT( fc._variables.get_size() >= varCount );
+			fc._valueTypes.pop(); /* src value */
+			for ( int i( 0 ); i < varCount; ++ i ) {
+				fc._valueTypes.pop();
+				OFunctionContext::OVariableRef varRef( fc._variables.top() );
+				if ( varRef._identifier != INVALID_IDENTIFIER ) {
+					_usedIdentifiers[varRef._identifier].write( position_.get(), OIdentifierUse::TYPE::VARIABLE );
 				}
-			} break;
-			case ( OPERATOR::ASSIGN ): break;
-			default: {
-				M_ASSERT( ! "bad code path"[0] );
-			} break;
+				fc._variables.pop();
+			}
+			fc._valueTypes.push( type_to_class( HHuginn::TYPE::TUPLE ) );
+			assignPack = true;
 		}
-		fc._variables.pop();
-		if ( ! is_reference_congruent( c2 ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Setting a non reference location.", MAIN_FILE_ID, p );
-		}
-		fc._valueTypes.push( congruent( c1, c2 ) );
+		fc._variableCount.pop();
 		hasAssign = true;
 	}
 	if ( hasAssign ) {
-		defer_action( &HExpression::set_variable, position_ );
-		current_expression()->commit_oper( OPERATOR::ASSIGN_TERM );
+		HExpression* expr( current_expression().raw() );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::set_variable, position_.get(), HFrame::ACCESS::REFERENCE, varCount ) );
+		expr->commit_oper( OPERATOR::ASSIGN_TERM );
 	}
+	return;
+	M_EPILOG
+}
+
+void OCompiler::start_assignable( executing_parser::position_t ) {
+	M_PROLOG
+	OFunctionContext& fc( f() );
+	fc._variableCount.push( static_cast<int>( fc._variables.get_size() ) );
+	return;
+	M_EPILOG
+}
+
+void OCompiler::finish_assignable( executing_parser::position_t ) {
+	M_PROLOG
+	OFunctionContext& fc( f() );
+	int& varCount( fc._variableCount.top() );
+	varCount = static_cast<int>( fc._variables.get_size() ) - varCount;
 	return;
 	M_EPILOG
 }
@@ -2391,7 +2441,7 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 		/*
 		 * We can do it here (as opposed to *::resolve_symbols()) because built-ins must exist,
 		 * hence h->get_function() always succeeds, and built-ins cannot be overridden
-		 * so they meaning stays always the same.
+		 * so their meaning stays always the same.
 		 */
 		expr->add_execution_step(
 			HExpression::OExecutionStep(
@@ -2432,6 +2482,7 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 }
 
 void OCompiler::defer_get_field_reference( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
+	M_PROLOG
 	OFunctionContext& fc( f() );
 	HHuginn::identifier_id_t refIdentifier( _runtime->identifier_id( value_ ) );
 	_usedIdentifiers[refIdentifier].read( position_.get(), OIdentifierUse::TYPE::FIELD );
@@ -2450,6 +2501,8 @@ void OCompiler::defer_get_field_reference( yaal::hcore::HString const& value_, e
 	fc._lastMemberName = refIdentifier;
 	fc._valueTypes.pop();
 	fc._valueTypes.push( type_to_class( HHuginn::TYPE::REFERENCE ) );
+	return;
+	M_EPILOG
 }
 
 void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {

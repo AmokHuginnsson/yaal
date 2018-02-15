@@ -567,6 +567,7 @@ char const* op_to_symbol_str( OPERATOR o_ ) {
 		case ( OPERATOR::MODULUS ):            str = "|...|";  break;
 		case ( OPERATOR::PARENTHESIS ):        str = "(...)";  break;
 		case ( OPERATOR::ASSIGN ):             str = "=";      break;
+		case ( OPERATOR::ASSIGN_PACK ):        str = ",=";     break;
 		case ( OPERATOR::ASSIGN_TERM ):        str = "=;";     break;
 		case ( OPERATOR::PLUS_ASSIGN ):        str = "+=";     break;
 		case ( OPERATOR::MINUS_ASSIGN ):       str = "-=";     break;

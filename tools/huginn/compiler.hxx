@@ -154,6 +154,7 @@ struct OCompiler {
 			}
 		};
 		typedef yaal::hcore::HStack<OVariableRef> variable_stack_t;
+		typedef yaal::hcore::HStack<int> variable_count_t;
 
 		/*! \brief Identifier of currently compiled function.
 		 */
@@ -204,6 +205,12 @@ struct OCompiler {
 		 * to link types to variables in current compilation context.
 		 */
 		variable_stack_t _variables;
+
+		/*! \brief Number of variables on left side of the assignment (`=` sign).
+		 *
+		 * Used to support tuple unpacking.
+		 */
+		variable_count_t _variableCount;
 
 		/*! \brief Keep track how deep we are in nested for/while statements.
 		 *
@@ -481,6 +488,8 @@ struct OCompiler {
 	void start_loop_statement( executing_parser::position_t );
 	void start_switch_statement( executing_parser::position_t );
 	void start_subexpression( executing_parser::position_t );
+	void start_assignable( executing_parser::position_t );
+	void finish_assignable( executing_parser::position_t );
 	void add_subexpression( OPERATOR, executing_parser::position_t );
 	void add_field_definition( executing_parser::position_t );
 	void commit_boolean( OPERATOR, executing_parser::position_t );

@@ -513,13 +513,19 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 			e_p::HString::action_string_position_t( hcore::call( &OCompiler::defer_make_variable, _compiler.get(), _1, _2 ) )
 		)
 	);
+	HRule assignablePack(
+		"assignablePack",
+		HRuleBase::action_position_t( hcore::call( &OCompiler::start_assignable, _compiler.get(), _1 ) )
+		>> assignable >> * ( ',' >> assignable ) >>
+		HRuleBase::action_position_t( hcore::call( &OCompiler::finish_assignable, _compiler.get(), _1 ) )
+	);
 	/*
 	 * Assignment shall work only as aliasing.
 	 * In other words you cannot modify value of referenced object
 	 * with assignment. You can only change where a reference points to.
 	 */
 	expression %= HRule(
-		* ( assignable >> ( constant( "=" ) | "+=" | "-=" | "*=" | "/=" | "%=" | "^=" )[
+		* ( assignablePack >> ( constant( "=" ) | "+=" | "-=" | "*=" | "/=" | "%=" | "^=" )[
 				e_p::HString::action_string_position_t( hcore::call( &OCompiler::defer_str_oper, _compiler.get(), _1, _2 ) )
 			] ^ '='
 		) >> value,

@@ -508,9 +508,11 @@ void HExpression::get_field(  OExecutionStep const& executionStep_,huginn::HFram
 	M_EPILOG
 }
 
-void HExpression::set_variable( OExecutionStep const&, HFrame* frame_ ) {
+void HExpression::set_variable( OExecutionStep const& es_, HFrame* frame_ ) {
 	M_PROLOG
 	int& ip( frame_->ip() );
+	HFrame::values_t& values( frame_->values() );
+	HThread* t( frame_->thread() );
 	while ( ip < static_cast<int>( _instructions.get_size() ) ) {
 		instructions_t::value_type& operation( _instructions[ip] );
 		if ( ( operation._operator < OPERATOR::ASSIGN ) || ( operation._operator > OPERATOR::POWER_ASSIGN ) ) {
@@ -518,33 +520,59 @@ void HExpression::set_variable( OExecutionStep const&, HFrame* frame_ ) {
 		}
 		int p( operation._position );
 		++ ip;
-		HHuginn::value_t src( yaal::move( frame_->values().top() ) );
-		frame_->values().pop();
-		HHuginn::value_t dst( yaal::move( frame_->values().top() ) );
-		frame_->values().pop();
-		M_ASSERT( dst->type_id() == HHuginn::TYPE::REFERENCE );
-		HHuginn::value_t& ref( static_cast<HHuginn::HReference*>( dst.raw() )->value() );
-		if ( operation._operator == OPERATOR::ASSIGN ) {
-			ref.swap( src );
+		HHuginn::value_t src( yaal::move( values.top() ) );
+		values.pop();
+		if ( operation._operator == OPERATOR::ASSIGN_PACK ) {
+			if ( src->type_id() != HHuginn::TYPE::TUPLE ) {
+				throw HHuginn::HHuginnRuntimeException( "Assigner is not a `tuple` object.", file_id(), p );
+			}
+			HHuginn::HTuple::values_t const& srcData( static_cast<HHuginn::HTuple*>( src.raw() )->value() );
+			int ds( static_cast<int>( srcData.get_size() ) );
+			if ( ds != es_._index ) {
+				throw HHuginn::HHuginnRuntimeException(
+					hcore::to_string( ds > es_._index ? "Too many" : "Not enough" )
+						.append( " values to unpack, expected: " ).append( es_._index )
+						.append( ", got: " ).append( ds ).append( "." ),
+					file_id(),
+					p
+				);
+			}
+			HHuginn::HTuple::values_t data( es_._index );
+			for ( int i( ds - 1 ); i >= 0; -- i ) {
+				HHuginn::value_t dst( yaal::move( values.top() ) );
+				values.pop();
+				M_ASSERT( dst->type_id() == HHuginn::TYPE::REFERENCE );
+				HHuginn::value_t& ref( static_cast<HHuginn::HReference*>( dst.raw() )->value() );
+				data[i] = ref = srcData[i];
+			}
+			values.push( t->object_factory().create_tuple( yaal::move( data ) ) );
 		} else {
-			HHuginn::HClass const* refClass( ref->get_class() );
-			HHuginn::HClass const* srcClass( src->get_class() );
-			if ( refClass != srcClass ) {
-				operands_type_mismatch( op_to_str( operation._operator ), refClass, srcClass, file_id(), p );
+			HHuginn::value_t dst( yaal::move( values.top() ) );
+			values.pop();
+			M_ASSERT( dst->type_id() == HHuginn::TYPE::REFERENCE );
+			HHuginn::value_t& ref( static_cast<HHuginn::HReference*>( dst.raw() )->value() );
+			if ( operation._operator == OPERATOR::ASSIGN ) {
+				ref.swap( src );
+			} else {
+				HHuginn::HClass const* refClass( ref->get_class() );
+				HHuginn::HClass const* srcClass( src->get_class() );
+				if ( refClass != srcClass ) {
+					operands_type_mismatch( op_to_str( operation._operator ), refClass, srcClass, file_id(), p );
+				}
+				switch ( operation._operator ) {
+					case ( OPERATOR::PLUS_ASSIGN ):     { value_builtin::add( t, ref, src, p ); } break;
+					case ( OPERATOR::MINUS_ASSIGN ):    { value_builtin::sub( t, ref, src, p ); } break;
+					case ( OPERATOR::MULTIPLY_ASSIGN ): { value_builtin::mul( t, ref, src, p ); } break;
+					case ( OPERATOR::DIVIDE_ASSIGN ):   { value_builtin::div( t, ref, src, p ); } break;
+					case ( OPERATOR::MODULO_ASSIGN ):   { value_builtin::mod( t, ref, src, p ); } break;
+					case ( OPERATOR::POWER_ASSIGN ):    { value_builtin::pow( t, ref, src, p ); } break;
+					default: {
+						M_ASSERT( ! "bad code path"[0] );
+					} break;
+				}
 			}
-			switch ( operation._operator ) {
-				case ( OPERATOR::PLUS_ASSIGN ):     { value_builtin::add( frame_->thread(), ref, src, p ); } break;
-				case ( OPERATOR::MINUS_ASSIGN ):    { value_builtin::sub( frame_->thread(), ref, src, p ); } break;
-				case ( OPERATOR::MULTIPLY_ASSIGN ): { value_builtin::mul( frame_->thread(), ref, src, p ); } break;
-				case ( OPERATOR::DIVIDE_ASSIGN ):   { value_builtin::div( frame_->thread(), ref, src, p ); } break;
-				case ( OPERATOR::MODULO_ASSIGN ):   { value_builtin::mod( frame_->thread(), ref, src, p ); } break;
-				case ( OPERATOR::POWER_ASSIGN ):    { value_builtin::pow( frame_->thread(), ref, src, p ); } break;
-				default: {
-					M_ASSERT( ! "bad code path"[0] );
-				} break;
-			}
+			values.push( ref );
 		}
-		frame_->values().push( ref );
 	}
 	M_ASSERT( ( ip < static_cast<int>( _instructions.get_size() ) ) && (  _instructions[ip]._operator == OPERATOR::ASSIGN_TERM ) );
 	++ ip;
