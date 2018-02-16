@@ -19,13 +19,15 @@ public:
 	typedef HFor this_type;
 	typedef HStatement base_type;
 private:
-	HHuginn::expression_t _control;
+	HHuginn::expressions_t _control;
 	HHuginn::expression_t _source;
 	HHuginn::scope_t _loop;
 public:
-	HFor( HStatement::statement_id_t, HHuginn::expression_t const&, HHuginn::expression_t const&, HHuginn::scope_t const&, int, int );
+	HFor( HStatement::statement_id_t, HHuginn::expressions_t&&, HHuginn::expression_t const&, HHuginn::scope_t const&, int, int );
 protected:
 	virtual void do_execute( HThread* ) const override;
+private:
+	void run_loop( HThread*, HFrame*, HHuginn::value_t const& ) const;
 };
 
 }

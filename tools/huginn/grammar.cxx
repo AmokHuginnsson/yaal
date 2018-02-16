@@ -592,14 +592,16 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 			bound_call<e_p::HRuleBase::action_position_t>( &OCompiler::start_loop_statement, _compiler.get(), _1 )
 		) >> '(' >> expression >> ')' >> scope
 	);
+	HRule forCtrlVar(
+		"forCtrlVar",
+		assignable[e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::save_control_variable, _compiler.get(), _1 ) )]
+	);
 	HRule forStatement(
 		"forStatement",
 		constant(
 			KEYWORD::FOR,
 			bound_call<e_p::HRuleBase::action_position_t>( &OCompiler::start_loop_statement, _compiler.get(), _1 )
-		) >> '(' >>
-		assignable[e_p::HRegex::action_position_t( hcore::call( &OCompiler::save_control_variable, _compiler.get(), _1 ) )]
-		>> ':' >> expression >> ')' >> scope
+		) >> '(' >> forCtrlVar >> * ( ',' >> forCtrlVar ) >> ':' >> expression >> ')' >> scope
 	);
 	HRule caseStatement(
 		"caseStatement",

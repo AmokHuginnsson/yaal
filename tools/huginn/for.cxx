@@ -21,13 +21,13 @@ namespace huginn {
 
 HFor::HFor(
 	HStatement::statement_id_t id_,
-	HHuginn::expression_t const& control_,
+	HHuginn::expressions_t&& control_,
 	HHuginn::expression_t const& source_,
 	HHuginn::scope_t const& loop_,
 	int fileId_,
 	int statementPosition_
 ) : HStatement( id_, fileId_, statementPosition_ )
-	, _control( control_ )
+	, _control( yaal::move( control_ ) )
 	, _source( source_ )
 	, _loop( loop_ ) {
 	_loop->make_inline();
@@ -39,7 +39,6 @@ void HFor::do_execute( HThread* thread_ ) const {
 	thread_->create_loop_frame( this );
 	HFrame* f( thread_->current_frame() );
 	_source->execute( thread_ );
-	int controlPosition( _control->position() );
 	int sourcePosition( _source->position() );
 	if ( f->can_continue() ) {
 		HHuginn::value_t source( f->result() );
@@ -48,12 +47,7 @@ void HFor::do_execute( HThread* thread_ ) const {
 		if ( coll ) {
 			HHuginn::HIterable::HIterator it( coll->iterator( thread_, sourcePosition ) );
 			while ( f->can_continue() && it.is_valid( thread_, sourcePosition ) ) {
-				_control->execute( thread_ );
-				f->commit_variable( it.value( thread_, sourcePosition ), controlPosition );
-				if ( f->can_continue() ) {
-					_loop->execute( thread_ );
-				}
-				f->continue_execution();
+				run_loop( thread_, f, it.value( thread_, sourcePosition ) );
 				it.next( thread_, sourcePosition );
 			}
 		} else if ( ( obj = dynamic_cast<HHuginn::HObject*>( source.raw() ) ) ) {
@@ -80,12 +74,7 @@ void HFor::do_execute( HThread* thread_ ) const {
 				if ( ! f->can_continue() ) {
 					break;
 				}
-				_control->execute( thread_ );
-				f->commit_variable( value, controlPosition );
-				if ( f->can_continue() ) {
-					_loop->execute( thread_ );
-				}
-				f->continue_execution();
+				run_loop( thread_, f, value );
 				nextMethod->call( thread_, HArguments( thread_ ), sourcePosition );
 			}
 		} else {
@@ -93,6 +82,41 @@ void HFor::do_execute( HThread* thread_ ) const {
 		}
 	}
 	thread_->pop_frame();
+	return;
+	M_EPILOG
+}
+
+void HFor::run_loop( HThread* thread_, HFrame* frame_, HHuginn::value_t const& value_ ) const {
+	M_PROLOG
+	int cs( static_cast<int>( _control.get_size() ) );
+	if ( cs == 1 ) {
+		_control.front()->execute( thread_ );
+		frame_->commit_variable( value_, _control.front()->position() );
+	} else {
+		if ( value_->type_id() != HHuginn::TYPE::TUPLE ) {
+			throw HHuginn::HHuginnRuntimeException( "`For` source did not return a `tuple` object.", file_id(), _source->position() );
+		}
+		HHuginn::HTuple::values_t const& srcData( static_cast<HHuginn::HTuple const*>( value_.raw() )->value() );
+		int ds( static_cast<int>( srcData.get_size() ) );
+		if ( ds != cs ) {
+			throw HHuginn::HHuginnRuntimeException(
+				hcore::to_string( ds > cs ? "Too many" : "Not enough" )
+					.append( " values to unpack, expected: " ).append( cs )
+					.append( ", got: " ).append( ds ).append( "." ),
+				file_id(),
+				_source->position()
+			);
+		}
+		int i( 0 );
+		for ( HHuginn::expression_t const& control : _control ) {
+			control->execute( thread_ );
+			frame_->commit_variable( srcData[i ++], control->position() );
+		}
+	}
+	if ( frame_->can_continue() ) {
+		_loop->execute( thread_ );
+	}
+	frame_->continue_execution();
 	return;
 	M_EPILOG
 }

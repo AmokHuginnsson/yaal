@@ -1413,10 +1413,11 @@ void OCompiler::add_for_statement( executing_parser::position_t position_ ) {
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	HHuginn::scope_t scope( pop_scope_context() ); /* don't squash! pop_scope_context() changes fc._scopeStack */
 	OScopeContext& sc( *fc._scopeStack.top() );
-	HHuginn::expression_t source( fc.expressions_stack().top().back() );
-	fc.expressions_stack().top().pop_back();
+	HHuginn::expressions_t& exprs( fc.expressions_stack().top() );
+	HHuginn::expression_t source( exprs.back() );
+	exprs.pop_back();
 	HScope::statement_t forStatement(
-		make_pointer<HFor>( sc._statementId, current_expression(), source, scope, _fileId, position_.get() )
+		make_pointer<HFor>( sc._statementId, yaal::move( exprs ), source, scope, _fileId, position_.get() )
 	);
 	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );
