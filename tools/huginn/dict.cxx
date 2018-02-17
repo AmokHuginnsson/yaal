@@ -24,7 +24,7 @@ namespace huginn {
 
 namespace dict {
 
-class HDictIterator : public HIteratorInterface {
+class HDictIterator : public HNotifableIterator {
 public:
 	enum class TYPE {
 		KEYS,
@@ -37,9 +37,10 @@ private:
 	value_getter_t _valueGetter;
 	HObjectFactory& _objectFactory;
 public:
-	HDictIterator( HHuginn::HDict::values_t* dict_, HObjectFactory& objectFactory_, TYPE type_ )
-		: _dict( dict_ )
-		, _it( dict_->begin() )
+	HDictIterator( HHuginn::HDict* owner_, HObjectFactory& objectFactory_, TYPE type_ )
+		: HNotifableIterator( owner_ )
+		, _dict( &owner_->value() )
+		, _it( _dict->begin() )
 		, _valueGetter( type_ == TYPE::KEYS ? &HDictIterator::get_key : &HDictIterator::get_key_value )
 		, _objectFactory( objectFactory_ ) {
 		return;
@@ -58,7 +59,21 @@ protected:
 		return ( _it != _dict->end() );
 	}
 	virtual void do_next( HThread*, int ) override {
+		if ( _skip == 0 ) {
+			++ _it;
+		} else {
+			-- _skip;
+		}
+	}
+	virtual void do_invalidate( void ) override {
+		_it = _dict->end();
+	}
+	virtual void do_skip( void ) override {
 		++ _it;
+		++ _skip;
+	}
+	virtual void const* do_node_id( void ) const override {
+		return ( _it.node_id() );
 	}
 private:
 	HDictIterator( HDictIterator const& ) = delete;
@@ -94,7 +109,7 @@ private:
 	virtual HIterator do_iterator( HThread*, int ) override {
 		HIterator::iterator_implementation_t impl(
 			new ( memory::yaal ) HDictIterator(
-				&static_cast<HHuginn::HDict*>( _dict.raw() )->value(),
+				static_cast<HHuginn::HDict*>( _dict.raw() ),
 				*_dict->get_class()->runtime()->object_factory(),
 				HDictIterator::TYPE::KEY_VALUES
 			)
@@ -107,12 +122,14 @@ private:
 	}
 };
 
-class HDictReverseIterator : public HIteratorInterface {
+class HDictReverseIterator : public HNotifableIterator {
 	HHuginn::HDict::values_t* _dict;
 	HHuginn::HDict::values_t::reverse_iterator _it;
 public:
-	HDictReverseIterator( HHuginn::HDict::values_t* dict_ )
-		: _dict( dict_ ), _it( dict_->rbegin() ) {
+	HDictReverseIterator( HHuginn::HDict* owner_ )
+		: HNotifableIterator( owner_ )
+		, _dict( &owner_->value() )
+		, _it( _dict->rbegin() ) {
 		return;
 	}
 protected:
@@ -123,7 +140,21 @@ protected:
 		return ( _it != _dict->rend() );
 	}
 	virtual void do_next( HThread*, int ) override {
+		if ( _skip == 0 ) {
+			++ _it;
+		} else {
+			-- _skip;
+		}
+	}
+	virtual void do_invalidate( void ) override {
+		_it = _dict->rend();
+	}
+	virtual void do_skip( void ) override {
 		++ _it;
+		++ _skip;
+	}
+	virtual void const* do_node_id( void ) const override {
+		return ( _it.base().node_id() );
 	}
 private:
 	HDictReverseIterator( HDictReverseIterator const& ) = delete;
@@ -157,7 +188,7 @@ protected:
 	}
 private:
 	virtual HIterator do_iterator( HThread*, int ) override {
-		HIterator::iterator_implementation_t impl( new ( memory::yaal ) HDictReverseIterator( &static_cast<HHuginn::HDict*>( _dict.raw() )->value() ) );
+		HIterator::iterator_implementation_t impl( new ( memory::yaal ) HDictReverseIterator( static_cast<HHuginn::HDict*>( _dict.raw() ) ) );
 		return ( HIterator( yaal::move( impl ) ) );
 	}
 private:
@@ -219,7 +250,7 @@ inline HHuginn::value_t clear( huginn::HThread* thread_, HHuginn::value_t* objec
 	M_PROLOG
 	verify_arg_count( "dict.clear", values_, 0, 0, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DICT );
-	static_cast<HHuginn::HDict*>( object_->raw() )->value().clear();
+	static_cast<HHuginn::HDict*>( object_->raw() )->clear();
 	return ( *object_ );
 	M_EPILOG
 }
@@ -369,7 +400,7 @@ HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const
 }
 
 HHuginn::HDict::HDict( HHuginn::HClass const* class_, allocator_t const& allocator_ )
-	: HIterable( class_ )
+	: HInvalidatingIterable( class_ )
 	, _helper( &value_builtin::less )
 	, _data( _helper, allocator_ )
 	, _keyType( &huginn::_noneClass_ ) {
@@ -436,7 +467,11 @@ void HHuginn::HDict::erase( huginn::HThread* thread_, HHuginn::value_t const& ke
 	M_PROLOG
 	verify_key_type( thread_, key_->get_class(), position_ );
 	_helper.anchor( thread_, position_ );
-	_data.erase( key_ );
+	values_t::iterator it( _data.find( key_ ) );
+	if ( it != _data.end() ) {
+		invalidate( it.node_id() );
+		_data.erase( it );
+	}
 	_helper.detach();
 	return;
 	M_EPILOG
@@ -468,10 +503,18 @@ HHuginn::HClass const* HHuginn::HDict::key_type( void ) const {
 	return ( _keyType );
 }
 
+void HHuginn::HDict::clear( void ) {
+	M_PROLOG
+	invalidate();
+	_data.clear();
+	return;
+	M_EPILOG
+}
+
 HHuginn::HIterable::HIterator HHuginn::HDict::do_iterator( huginn::HThread*, int ) {
 	HIterator::iterator_implementation_t impl(
 		new ( memory::yaal ) huginn::dict::HDictIterator(
-			&_data,
+			this,
 			*get_class()->runtime()->object_factory(),
 			huginn::dict::HDictIterator::TYPE::KEYS
 		)

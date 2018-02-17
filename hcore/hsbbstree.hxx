@@ -421,6 +421,9 @@ public:
 		return ( &static_cast<typename owner_t::HNode*>( _current )->_key );
 		M_EPILOG
 	}
+	void const* node_id( void ) const {
+		return ( _current );
+	}
 private:
 	friend class HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>;
 	explicit HIterator( owner_t const* owner_, HSBBSTreeBase::HAbstractNode* node_ )

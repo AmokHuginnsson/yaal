@@ -24,12 +24,14 @@ namespace huginn {
 
 namespace order {
 
-class HOrderIterator : public HIteratorInterface {
+class HOrderIterator : public HNotifableIterator {
 	HHuginn::HOrder::values_t* _order;
 	HHuginn::HOrder::values_t::iterator _it;
 public:
-	HOrderIterator( HHuginn::HOrder::values_t* order_ )
-		: _order( order_ ), _it( order_->begin() ) {
+	HOrderIterator( HHuginn::HOrder* owner_ )
+		: HNotifableIterator( owner_ )
+		, _order( &owner_->value() )
+		, _it( _order->begin() ) {
 		return;
 	}
 protected:
@@ -40,19 +42,35 @@ protected:
 		return ( _it != _order->end() );
 	}
 	virtual void do_next( HThread*, int ) override {
+		if ( _skip == 0 ) {
+			++ _it;
+		} else {
+			-- _skip;
+		}
+	}
+	virtual void do_invalidate( void ) override {
+		_it = _order->end();
+	}
+	virtual void do_skip( void ) override {
 		++ _it;
+		++ _skip;
+	}
+	virtual void const* do_node_id( void ) const override {
+		return ( _it.node_id() );
 	}
 private:
 	HOrderIterator( HOrderIterator const& ) = delete;
 	HOrderIterator& operator = ( HOrderIterator const& ) = delete;
 };
 
-class HOrderReverseIterator : public HIteratorInterface {
+class HOrderReverseIterator : public HNotifableIterator {
 	HHuginn::HOrder::values_t* _order;
 	HHuginn::HOrder::values_t::reverse_iterator _it;
 public:
-	HOrderReverseIterator( HHuginn::HOrder::values_t* order_ )
-		: _order( order_ ), _it( order_->rbegin() ) {
+	HOrderReverseIterator( HHuginn::HOrder* owner_ )
+		: HNotifableIterator( owner_ )
+		, _order( &owner_->value() )
+		, _it( _order->rbegin() ) {
 		return;
 	}
 protected:
@@ -63,7 +81,21 @@ protected:
 		return ( _it != _order->rend() );
 	}
 	virtual void do_next( HThread*, int ) override {
+		if ( _skip == 0 ) {
+			++ _it;
+		} else {
+			-- _skip;
+		}
+	}
+	virtual void do_invalidate( void ) override {
+		_it = _order->rend();
+	}
+	virtual void do_skip( void ) override {
 		++ _it;
+		++ _skip;
+	}
+	virtual void const* do_node_id( void ) const override {
+		return ( _it.base().node_id() );
 	}
 private:
 	HOrderReverseIterator( HOrderReverseIterator const& ) = delete;
@@ -97,7 +129,7 @@ protected:
 	}
 private:
 	virtual HIterator do_iterator( HThread*, int ) override {
-		HIterator::iterator_implementation_t impl( new ( memory::yaal ) HOrderReverseIterator( &static_cast<HHuginn::HOrder*>( _order.raw() )->value() ) );
+		HIterator::iterator_implementation_t impl( new ( memory::yaal ) HOrderReverseIterator( static_cast<HHuginn::HOrder*>( _order.raw() ) ) );
 		return ( HIterator( yaal::move( impl ) ) );
 	}
 private:
@@ -137,7 +169,7 @@ inline HHuginn::value_t clear( huginn::HThread* thread_, HHuginn::value_t* objec
 	M_PROLOG
 	verify_arg_count( "order.clear", values_, 0, 0, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::ORDER );
-	static_cast<HHuginn::HOrder*>( object_->raw() )->value().clear();
+	static_cast<HHuginn::HOrder*>( object_->raw() )->clear();
 	return ( *object_ );
 	M_EPILOG
 }
@@ -249,7 +281,7 @@ HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const
 }
 
 HHuginn::HOrder::HOrder( HHuginn::HClass const* class_, allocator_t const& allocator_ )
-	: HIterable( class_ )
+	: HInvalidatingIterable( class_ )
 	, _helper( &value_builtin::less )
 	, _data( _helper, allocator_ )
 	, _keyType( &huginn::_noneClass_ ) {
@@ -292,7 +324,11 @@ void HHuginn::HOrder::erase( huginn::HThread* thread_, HHuginn::value_t const& v
 	M_PROLOG
 	verify_key_type( thread_, value_->get_class(), position_ );
 	_helper.anchor( thread_, position_ );
-	_data.erase( value_ );
+	values_t::iterator it( _data.find( value_ ) );
+	if ( it != _data.end() ) {
+		invalidate( it.node_id() );
+		_data.erase( it );
+	}
 	_helper.detach();
 	return;
 	M_EPILOG
@@ -309,12 +345,20 @@ void HHuginn::HOrder::insert( huginn::HThread* thread_, HHuginn::value_t const& 
 	M_EPILOG
 }
 
+void HHuginn::HOrder::clear( void ) {
+	M_PROLOG
+	invalidate();
+	_data.clear();
+	return;
+	M_EPILOG
+}
+
 HHuginn::HClass const* HHuginn::HOrder::key_type( void ) const {
 	return ( _keyType );
 }
 
 HHuginn::HIterable::HIterator HHuginn::HOrder::do_iterator( huginn::HThread*, int ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::order::HOrderIterator( &_data ) );
+	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::order::HOrderIterator( this ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }
 

@@ -184,6 +184,9 @@ public:
 			M_ASSERT( _owner == it._owner );
 			return ( ( _atom != it._atom ) || ( _index != it._index ) );
 		}
+		void const* node_id( void ) const {
+			return ( _atom );
+		}
 	private:
 		friend class HHashContainer<value_type, hasher_type, equal_key_type, get_key_type, allocator_t>;
 		explicit HIterator( owner_t const* owner_, int long index_, typename owner_t::HAtom* atom_ )

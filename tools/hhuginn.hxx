@@ -48,6 +48,7 @@ class HObjectFactory;
 struct OCompiler;
 class HRuntime;
 class HPackageFactory;
+class HNotifableIterator;
 
 namespace ERR_CODE {
 enum {
@@ -81,6 +82,7 @@ public:
 	typedef yaal::hcore::HTaggedPOD<int, identifier_tag> identifier_id_t;
 	typedef yaal::hcore::HPointer<HHuginn> ptr_t;
 	class HIterable;
+	class HInvalidatingIterable;
 	typedef yaal::hcore::HPointer<HIterable> iterable_t;
 	typedef yaal::hcore::HPointer<huginn::HScope> scope_t;
 	class HClass;
@@ -704,6 +706,19 @@ protected:
 	virtual int long do_size( huginn::HThread*, int ) const = 0;
 };
 
+class HHuginn::HInvalidatingIterable : public HHuginn::HIterable {
+public:
+	typedef yaal::hcore::HArray<huginn::HNotifableIterator*> observers_t;
+private:
+	observers_t _observers;
+public:
+	HInvalidatingIterable( HClass const* );
+	void notify( huginn::HNotifableIterator* );
+	void forget( huginn::HNotifableIterator* );
+	void invalidate( void );
+	void invalidate( void const* );
+};
+
 class HHuginn::HBoolean : public HHuginn::HValue {
 public:
 	typedef HHuginn::HBoolean this_type;
@@ -920,7 +935,7 @@ private:
 	HValueCompareHelper& operator = ( HValueCompareHelper const& ) = delete;
 };
 
-class HHuginn::HDict : public HHuginn::HIterable {
+class HHuginn::HDict : public HHuginn::HInvalidatingIterable {
 public:
 	typedef HHuginn::HDict this_type;
 	typedef HHuginn::HIterable base_type;
@@ -948,6 +963,7 @@ public:
 		return ( _data );
 	}
 	void verify_key_type( huginn::HThread*, HHuginn::HClass const*, int ) const;
+	void clear( void );
 	void anchor( huginn::HThread* thread_, int position_ ) {
 		_helper.anchor( thread_, position_ );
 	}
@@ -964,7 +980,7 @@ private:
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
-class HHuginn::HOrder : public HHuginn::HIterable {
+class HHuginn::HOrder : public HHuginn::HInvalidatingIterable {
 public:
 	typedef HHuginn::HOrder this_type;
 	typedef HHuginn::HIterable base_type;
@@ -989,6 +1005,7 @@ public:
 		return ( _data );
 	}
 	void verify_key_type( huginn::HThread*, HHuginn::HClass const*, int ) const;
+	void clear( void );
 	void anchor( huginn::HThread* thread_, int position_ ) {
 		_helper.anchor( thread_, position_ );
 	}
@@ -1025,7 +1042,7 @@ private:
 	HValueHashHelper& operator = ( HValueHashHelper const& ) = delete;
 };
 
-class HHuginn::HLookup : public HHuginn::HIterable {
+class HHuginn::HLookup : public HHuginn::HInvalidatingIterable {
 public:
 	typedef HHuginn::HLookup this_type;
 	typedef HHuginn::HIterable base_type;
@@ -1051,6 +1068,7 @@ public:
 		return ( _data );
 	}
 	void update( huginn::HThread*, HHuginn::value_t const&, int );
+	void clear( void );
 	void anchor( huginn::HThread* thread_, int position_ ) {
 		_helper.anchor( thread_, position_ );
 	}
@@ -1067,7 +1085,7 @@ private:
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
-class HHuginn::HSet : public HHuginn::HIterable {
+class HHuginn::HSet : public HHuginn::HInvalidatingIterable {
 public:
 	typedef HHuginn::HSet this_type;
 	typedef HHuginn::HIterable base_type;
@@ -1089,6 +1107,7 @@ public:
 	values_t& value( void ) {
 		return ( _data );
 	}
+	void clear( void );
 	void anchor( huginn::HThread* thread_, int position_ ) {
 		_helper.anchor( thread_, position_ );
 	}

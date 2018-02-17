@@ -24,12 +24,14 @@ namespace huginn {
 
 namespace set {
 
-class HSetIterator : public HIteratorInterface {
+class HSetIterator : public HNotifableIterator {
 	HHuginn::HSet::values_t* _set;
 	HHuginn::HSet::values_t::iterator _it;
 public:
-	HSetIterator( HHuginn::HSet::values_t* set_ )
-		: _set( set_ ), _it( set_->begin() ) {
+	HSetIterator( HHuginn::HSet* owner_ )
+		: HNotifableIterator( owner_ )
+		, _set( &owner_->value() )
+		, _it( _set->begin() ) {
 		return;
 	}
 protected:
@@ -40,19 +42,35 @@ protected:
 		return ( _it != _set->end() );
 	}
 	virtual void do_next( HThread*, int ) override {
+		if ( _skip == 0 ) {
+			++ _it;
+		} else {
+			-- _skip;
+		}
+	}
+	virtual void do_invalidate( void ) override {
+		_it = _set->end();
+	}
+	virtual void do_skip( void ) override {
 		++ _it;
+		++ _skip;
+	}
+	virtual void const* do_node_id( void ) const override {
+		return ( _it.node_id() );
 	}
 private:
 	HSetIterator( HSetIterator const& ) = delete;
 	HSetIterator& operator = ( HSetIterator const& ) = delete;
 };
 
-class HSetReverseIterator : public HIteratorInterface {
+class HSetReverseIterator : public HNotifableIterator {
 	HHuginn::HSet::values_t* _set;
 	HHuginn::HSet::values_t::reverse_iterator _it;
 public:
-	HSetReverseIterator( HHuginn::HSet::values_t* set_ )
-		: _set( set_ ), _it( set_->rbegin() ) {
+	HSetReverseIterator( HHuginn::HSet* owner_ )
+		: HNotifableIterator( owner_ )
+		, _set( &owner_->value() )
+		, _it( _set->rbegin() ) {
 		return;
 	}
 protected:
@@ -63,7 +81,21 @@ protected:
 		return ( _it != _set->rend() );
 	}
 	virtual void do_next( HThread*, int ) override {
+		if ( _skip == 0 ) {
+			++ _it;
+		} else {
+			-- _skip;
+		}
+	}
+	virtual void do_invalidate( void ) override {
+		_it = _set->rend();
+	}
+	virtual void do_skip( void ) override {
 		++ _it;
+		++ _skip;
+	}
+	virtual void const* do_node_id( void ) const override {
+		return ( _it.base().node_id() );
 	}
 private:
 	HSetReverseIterator( HSetReverseIterator const& ) = delete;
@@ -97,7 +129,7 @@ protected:
 	}
 private:
 	virtual HIterator do_iterator( HThread*, int ) override {
-		HIterator::iterator_implementation_t impl( new ( memory::yaal ) HSetReverseIterator( &static_cast<HHuginn::HSet*>( _set.raw() )->value() ) );
+		HIterator::iterator_implementation_t impl( new ( memory::yaal ) HSetReverseIterator( static_cast<HHuginn::HSet*>( _set.raw() ) ) );
 		return ( HIterator( yaal::move( impl ) ) );
 	}
 private:
@@ -137,7 +169,7 @@ inline HHuginn::value_t clear( huginn::HThread* thread_, HHuginn::value_t* objec
 	M_PROLOG
 	verify_arg_count( "set.clear", values_, 0, 0, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
-	static_cast<HHuginn::HSet*>( object_->raw() )->value().clear();
+	static_cast<HHuginn::HSet*>( object_->raw() )->clear();
 	return ( *object_ );
 	M_EPILOG
 }
@@ -245,7 +277,7 @@ HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const
 }
 
 HHuginn::HSet::HSet( HHuginn::HClass const* class_, allocator_t const& allocator_ )
-	: HIterable( class_ )
+	: HInvalidatingIterable( class_ )
 	, _helper()
 	, _data( _helper, _helper, allocator_ ) {
 	return;
@@ -267,7 +299,11 @@ bool HHuginn::HSet::has_key( huginn::HThread* thread_, HHuginn::value_t const& k
 void HHuginn::HSet::erase( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) {
 	M_PROLOG
 	_helper.anchor( thread_, position_ );
-	_data.erase( key_ );
+	values_t::iterator it( _data.find( key_ ) );
+	if ( it != _data.end() ) {
+		invalidate( it.node_id() );
+		_data.erase( it );
+	}
 	_helper.detach();
 	return;
 	M_EPILOG
@@ -282,8 +318,16 @@ void HHuginn::HSet::insert( huginn::HThread* thread_, HHuginn::value_t const& va
 	M_EPILOG
 }
 
+void HHuginn::HSet::clear( void ) {
+	M_PROLOG
+	invalidate();
+	_data.clear();
+	return;
+	M_EPILOG
+}
+
 HHuginn::HIterable::HIterator HHuginn::HSet::do_iterator( huginn::HThread*, int ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::set::HSetIterator( &_data ) );
+	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::set::HSetIterator( this ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }
 

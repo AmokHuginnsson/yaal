@@ -813,19 +813,6 @@ HHuginn::value_t HHuginn::HReference::do_clone( huginn::HThread*, HHuginn::value
 #endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
 }
 
-HHuginn::HIterable::HIterable( HClass const* class_ )
-	: HValue( class_ ) {
-	return;
-}
-
-HHuginn::HIterable::HIterator HHuginn::HIterable::iterator( huginn::HThread* thread_, int position_ ) {
-	return ( do_iterator( thread_, position_ ) );
-}
-
-int long HHuginn::HIterable::size( huginn::HThread* thread_, int position_ ) const {
-	return ( do_size( thread_, position_ ) );
-}
-
 HHuginn::HTernaryEvaluator::HTernaryEvaluator(
 	expression_t const& condition_,
 	expression_t const& ifTrue_,

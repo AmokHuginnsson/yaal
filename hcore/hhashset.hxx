@@ -88,6 +88,9 @@ public:
 		bool operator != ( HIterator const& it ) const {
 			return ( _engine != it._engine );
 		}
+		void const* node_id( void ) const {
+			return ( _engine.node_id() );
+		}
 	private:
 		friend class HHashSet<key_type, hasher_type, equal_key_type, allocator_t>;
 		explicit HIterator( typename engine_t::HIterator const& it ) : base_type(), _engine( it ) {};

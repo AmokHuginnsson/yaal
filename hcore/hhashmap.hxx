@@ -429,12 +429,16 @@ public:
 	bool operator != ( HIterator<other_const_qual_t> const& it ) const {
 		return ( _engine != it._engine );
 	}
+	void const* node_id( void ) const {
+		return ( _engine.node_id() );
+	}
 private:
 	friend class HHashMap<key_type, data_type, hasher_t, equal_key_t, allocator_t>;
 	template<typename other_const_qual_t>
 	friend class HIterator;
 	explicit HIterator( typename hashmap_t::engine_t::HIterator const& it )
-		: base_type(), _engine( it ) {
+		: base_type()
+		, _engine( it ) {
 		return;
 	}
 };

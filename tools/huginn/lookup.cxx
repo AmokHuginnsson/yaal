@@ -23,7 +23,7 @@ namespace huginn {
 
 namespace lookup {
 
-class HLookupIterator : public HIteratorInterface {
+class HLookupIterator : public HNotifableIterator {
 public:
 	enum class TYPE {
 		KEYS,
@@ -36,9 +36,10 @@ private:
 	value_getter_t _valueGetter;
 	HObjectFactory& _objectFactory;
 public:
-	HLookupIterator( HHuginn::HLookup::values_t* lookup_, HObjectFactory& objectFactory_, TYPE type_ )
-		: _lookup( lookup_ )
-		, _it( lookup_->begin() )
+	HLookupIterator( HHuginn::HLookup* owner_, HObjectFactory& objectFactory_, TYPE type_ )
+		: HNotifableIterator( owner_ )
+		, _lookup( &owner_->value() )
+		, _it( _lookup->begin() )
 		, _valueGetter( type_ == TYPE::KEYS ? &HLookupIterator::get_key : &HLookupIterator::get_key_value )
 		, _objectFactory( objectFactory_ ) {
 		return;
@@ -57,7 +58,21 @@ protected:
 		return ( _it != _lookup->end() );
 	}
 	virtual void do_next( HThread*, int ) override {
+		if ( _skip == 0 ) {
+			++ _it;
+		} else {
+			-- _skip;
+		}
+	}
+	virtual void do_invalidate( void ) override {
+		_it = _lookup->end();
+	}
+	virtual void do_skip( void ) override {
 		++ _it;
+		++ _skip;
+	}
+	virtual void const* do_node_id( void ) const override {
+		return ( _it.node_id() );
 	}
 private:
 	HLookupIterator( HLookupIterator const& ) = delete;
@@ -93,7 +108,7 @@ private:
 	virtual HIterator do_iterator( HThread*, int ) override {
 		HIterator::iterator_implementation_t impl(
 			new ( memory::yaal ) HLookupIterator(
-				&static_cast<HHuginn::HLookup*>( _lookup.raw() )->value(),
+				static_cast<HHuginn::HLookup*>( _lookup.raw() ),
 				*_lookup->get_class()->runtime()->object_factory(),
 				HLookupIterator::TYPE::KEY_VALUES
 			)
@@ -106,12 +121,14 @@ private:
 	}
 };
 
-class HLookupReverseIterator : public HIteratorInterface {
+class HLookupReverseIterator : public HNotifableIterator {
 	HHuginn::HLookup::values_t* _lookup;
 	HHuginn::HLookup::values_t::reverse_iterator _it;
 public:
-	HLookupReverseIterator( HHuginn::HLookup::values_t* lookup_ )
-		: _lookup( lookup_ ), _it( lookup_->rbegin() ) {
+	HLookupReverseIterator( HHuginn::HLookup* owner_ )
+		: HNotifableIterator( owner_ )
+		, _lookup( &owner_->value() )
+		, _it( _lookup->rbegin() ) {
 		return;
 	}
 protected:
@@ -122,7 +139,21 @@ protected:
 		return ( _it != _lookup->rend() );
 	}
 	virtual void do_next( HThread*, int ) override {
+		if ( _skip == 0 ) {
+			++ _it;
+		} else {
+			-- _skip;
+		}
+	}
+	virtual void do_invalidate( void ) override {
+		_it = _lookup->rend();
+	}
+	virtual void do_skip( void ) override {
 		++ _it;
+		++ _skip;
+	}
+	virtual void const* do_node_id( void ) const override {
+		return ( _it.base().node_id() );
 	}
 private:
 	HLookupReverseIterator( HLookupReverseIterator const& ) = delete;
@@ -157,7 +188,7 @@ protected:
 private:
 	virtual HIterator do_iterator( HThread*, int ) override {
 		HIterator::iterator_implementation_t impl(
-			new ( memory::yaal ) HLookupReverseIterator( &static_cast<HHuginn::HLookup*>( _lookup.raw() )->value() )
+			new ( memory::yaal ) HLookupReverseIterator( static_cast<HHuginn::HLookup*>( _lookup.raw() ) )
 		);
 		return ( HIterator( yaal::move( impl ) ) );
 	}
@@ -220,7 +251,7 @@ inline HHuginn::value_t clear( huginn::HThread* thread_, HHuginn::value_t* objec
 	M_PROLOG
 	verify_arg_count( "lookup.clear", values_, 0, 0, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LOOKUP );
-	static_cast<HHuginn::HLookup*>( object_->raw() )->value().clear();
+	static_cast<HHuginn::HLookup*>( object_->raw() )->clear();
 	return ( *object_ );
 	M_EPILOG
 }
@@ -355,7 +386,7 @@ HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const
 }
 
 HHuginn::HLookup::HLookup( HHuginn::HClass const* class_, allocator_t const& allocator_ )
-	: HIterable( class_ )
+	: HInvalidatingIterable( class_ )
 	, _helper()
 	, _data( _helper, _helper, allocator_ ) {
 	return;
@@ -403,7 +434,11 @@ bool HHuginn::HLookup::has_key( huginn::HThread* thread_, HHuginn::value_t const
 void HHuginn::HLookup::erase( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) {
 	M_PROLOG
 	_helper.anchor( thread_, position_ );
-	_data.erase( key_ );
+	values_t::iterator it( _data.find( key_ ) );
+	if ( it != _data.end() ) {
+		invalidate( it.node_id() );
+		_data.erase( it );
+	}
 	_helper.detach();
 	return;
 	M_EPILOG
@@ -439,10 +474,18 @@ void HHuginn::HLookup::update( huginn::HThread* thread_, HHuginn::value_t const&
 	M_EPILOG
 }
 
+void HHuginn::HLookup::clear( void ) {
+	M_PROLOG
+	invalidate();
+	_data.clear();
+	return;
+	M_EPILOG
+}
+
 HHuginn::HIterable::HIterator HHuginn::HLookup::do_iterator( huginn::HThread*, int ) {
 	HIterator::iterator_implementation_t impl(
 		new ( memory::yaal ) huginn::lookup::HLookupIterator(
-			&_data,
+			this,
 			*get_class()->runtime()->object_factory(),
 			huginn::lookup::HLookupIterator::TYPE::KEYS
 		)

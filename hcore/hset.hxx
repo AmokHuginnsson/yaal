@@ -92,6 +92,9 @@ public:
 		bool operator != ( HIterator const& it ) const {
 			return ( _engine != it._engine );
 		}
+		void const* node_id( void ) const {
+			return ( _engine.node_id() );
+		}
 	private:
 		friend class HSet<type_t, compare_type, allocator_t>;
 		explicit HIterator( typename engine_type::iterator_type const& it )

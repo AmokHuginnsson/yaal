@@ -307,22 +307,31 @@ public:
 		-- _engine;
 		return ( it );
 	}
-	const_qual_t& operator* ( void ) const
-		{ return ( *_engine ); }
-	const_qual_t* operator-> ( void ) const
-		{ return ( &*_engine ); }
+	const_qual_t& operator* ( void ) const {
+		return ( *_engine );
+	}
+	const_qual_t* operator-> ( void ) const {
+		return ( &*_engine );
+	}
 	template<typename other_const_qual_t>
-	bool operator == ( HIterator<other_const_qual_t> const& it ) const
-		{ return ( _engine == it._engine ); }
+	bool operator == ( HIterator<other_const_qual_t> const& it ) const {
+		return ( _engine == it._engine );
+	}
 	template<typename other_const_qual_t>
-	bool operator != ( HIterator<other_const_qual_t> const& it ) const
-		{ return ( _engine != it._engine ); }
+	bool operator != ( HIterator<other_const_qual_t> const& it ) const {
+		return ( _engine != it._engine );
+	}
+	void const* node_id( void ) const {
+		return ( _engine.node_id() );
+	}
 private:
 	friend class HMap<key_type, data_type, compare_t, allocator_t, engine_t>;
 	template<typename other_const_qual_t>
 	friend class HIterator;
 	explicit HIterator( typename engine_type::iterator_type const& it )
-		: base_type(), _engine( it ) {};
+		: base_type()
+		, _engine( it ) {
+	}
 };
 
 template<typename key_type, typename data_type, typename compare_t, typename allocator_t, typename engine_t>
