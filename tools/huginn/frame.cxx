@@ -165,14 +165,20 @@ HHuginn::value_t HFrame::get_field( ACCESS access_, int index_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HFrame::get_variable( ACCESS access_, HStatement::statement_id_t statementId_, int index_ ) {
+HHuginn::value_t const& HFrame::get_variable_value( HStatement::statement_id_t statementId_, int index_ ) {
 	M_PROLOG
 	HFrame* f( this );
 	while ( statementId_ != f->_statement->id() ) {
 		f = f->_parent;
 		M_ASSERT( f );
 	}
-	HHuginn::value_t v;
+	return ( f->_variables[index_] );
+	M_EPILOG
+}
+
+HHuginn::value_t HFrame::make_variable( HStatement::statement_id_t M_DEBUG_CODE( statementId_ ), int index_ ) {
+	M_PROLOG
+	M_ASSERT( statementId_ == _statement->id() );
 	/*
 	 * It is very difficult to remove following if() statement due to
 	 * loop statements in Huginn language.
@@ -183,16 +189,21 @@ HHuginn::value_t HFrame::get_variable( ACCESS access_, HStatement::statement_id_
 	 * in all but last of iterations are destroyed in order of their definition
 	 * and not in reverse order of their definition as it would be expected.
 	 */
-	if ( ( access_ == ACCESS::REFERENCE ) && ( static_cast<int>( f->_variables.get_size() ) == index_ ) ) {
-		M_ASSERT( f == this );
-		f->_variables.push_back( HHuginn::value_t() );
+	if ( static_cast<int>( _variables.get_size() ) == index_ ) {
+		_variables.push_back( HHuginn::value_t() );
 	}
-	if ( access_ == ACCESS::VALUE ) {
-		v = f->_variables[index_];
-	} else {
-	  v = _thread->runtime().object_factory()->create_reference( f->_variables[index_] );
+	return ( _thread->runtime().object_factory()->create_reference( _variables[index_] ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HFrame::get_variable_reference( HStatement::statement_id_t statementId_, int index_ ) {
+	M_PROLOG
+	HFrame* f( this );
+	while ( statementId_ != f->_statement->id() ) {
+		f = f->_parent;
+		M_ASSERT( f );
 	}
-	return ( v );
+	return ( _thread->runtime().object_factory()->create_reference( f->_variables[index_] ) );
 	M_EPILOG
 }
 

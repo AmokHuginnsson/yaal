@@ -93,7 +93,9 @@ public:
 		make_assoc( OPERATOR::MAKE_LOOKUP, frame_, executionStep_._position );
 	}
 	void get_field_direct( OExecutionStep const&, huginn::HFrame* );
-	void get_variable_direct( OExecutionStep const&, huginn::HFrame* );
+	void get_variable_value( OExecutionStep const&, huginn::HFrame* );
+	void get_variable_reference( OExecutionStep const&, huginn::HFrame* );
+	void make_variable( OExecutionStep const&, huginn::HFrame* );
 	void create_closure( OExecutionStep const&, huginn::HFrame* );
 	void get_this( OExecutionStep const&, huginn::HFrame* );
 	void get_super( OExecutionStep const&, huginn::HFrame* );

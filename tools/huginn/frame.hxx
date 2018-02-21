@@ -124,7 +124,9 @@ public:
 	void init( TYPE, HStatement const*, HHuginn::value_t* = nullptr, int = 0 );
 	void reshape( HThread*, int );
 	HHuginn::value_t get_field( ACCESS, int );
-	HHuginn::value_t get_variable( ACCESS, HStatement::statement_id_t, int );
+	HHuginn::value_t const& get_variable_value( HStatement::statement_id_t, int );
+	HHuginn::value_t get_variable_reference( HStatement::statement_id_t, int );
+	HHuginn::value_t make_variable( HStatement::statement_id_t, int );
 	HHuginn::value_t get_this( void );
 	HHuginn::value_t get_super( int );
 	void note_variable( HHuginn::identifier_id_t );

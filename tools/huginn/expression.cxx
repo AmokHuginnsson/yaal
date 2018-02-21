@@ -405,9 +405,23 @@ void HExpression::get_field_direct( OExecutionStep const& executionStep_, huginn
 	M_EPILOG
 }
 
-void HExpression::get_variable_direct( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
+void HExpression::get_variable_value( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
 	M_PROLOG
-	frame_->values().emplace( frame_->get_variable( executionStep_._access, executionStep_._statementId, executionStep_._index ) );
+	frame_->values().emplace( frame_->get_variable_value( executionStep_._statementId, executionStep_._index ) );
+	return;
+	M_EPILOG
+}
+
+void HExpression::get_variable_reference( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
+	M_PROLOG
+	frame_->values().emplace( frame_->get_variable_reference( executionStep_._statementId, executionStep_._index ) );
+	return;
+	M_EPILOG
+}
+
+void HExpression::make_variable( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
+	M_PROLOG
+	frame_->values().emplace( frame_->make_variable( executionStep_._statementId, executionStep_._index ) );
 	return;
 	M_EPILOG
 }

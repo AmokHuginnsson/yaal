@@ -32,15 +32,24 @@ void HIntroExpression::do_execute( huginn::HThread* thread_ ) const {
 	M_EPILOG
 }
 
-void HIntroExpression::get_variable_direct_note(
+void HIntroExpression::get_variable_reference(
 	OExecutionStep const& execionStep_,
 	huginn::HFrame* frame_
 ) {
 	M_PROLOG
-	frame_->values().emplace( frame_->get_variable( execionStep_._access, execionStep_._statementId, execionStep_._index ) );
-	if ( execionStep_._access == HFrame::ACCESS::REFERENCE ) {
-		frame_->note_variable( execionStep_._identifierId, execionStep_._statementId, execionStep_._index );
-	}
+	frame_->values().emplace( frame_->get_variable_reference( execionStep_._statementId, execionStep_._index ) );
+	frame_->note_variable( execionStep_._identifierId, execionStep_._statementId, execionStep_._index );
+	return;
+	M_EPILOG
+}
+
+void HIntroExpression::make_variable(
+	OExecutionStep const& execionStep_,
+	huginn::HFrame* frame_
+) {
+	M_PROLOG
+	frame_->values().emplace( frame_->make_variable( execionStep_._statementId, execionStep_._index ) );
+	frame_->note_variable( execionStep_._identifierId, execionStep_._statementId, execionStep_._index );
 	return;
 	M_EPILOG
 }

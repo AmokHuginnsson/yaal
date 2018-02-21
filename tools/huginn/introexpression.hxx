@@ -22,7 +22,8 @@ private:
 	HIntrospectorInterface* _introspector;
 public:
 	HIntroExpression( HIntrospectorInterface*, int = MAIN_FILE_ID, int = 0 );
-	void get_variable_direct_note( OExecutionStep const&, huginn::HFrame* );
+	void get_variable_reference( OExecutionStep const&, huginn::HFrame* );
+	void make_variable( OExecutionStep const&, huginn::HFrame* );
 protected:
 	virtual void do_execute( huginn::HThread* ) const override;
 private:

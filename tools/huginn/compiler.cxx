@@ -382,7 +382,8 @@ void OCompiler::resolve_symbols( void ) {
 					}
 				}
 				if ( es._operation == OExecutionStep::OPERATION::DEFINE ) {
-					if ( ! sc ) {
+					bool make( ! sc );
+					if ( make ) {
 						sc = es._scope.raw();
 						/*
 						 * There are two kinds of OScopeContexts:
@@ -420,7 +421,7 @@ void OCompiler::resolve_symbols( void ) {
 								es._index,
 								HExpression::OExecutionStep(
 									static_cast<HIntroExpression*>( es._expression.raw() ),
-									static_cast<HExpression::OExecutionStep::action_t>( &HIntroExpression::get_variable_direct_note ),
+									static_cast<HExpression::OExecutionStep::action_t>( make ? &HIntroExpression::make_variable : &HIntroExpression::get_variable_reference ),
 									es._position,
 									HFrame::ACCESS::REFERENCE,
 									sc->_statementId,
@@ -433,7 +434,7 @@ void OCompiler::resolve_symbols( void ) {
 								es._index,
 								HExpression::OExecutionStep(
 									es._expression.raw(),
-									&HExpression::get_variable_direct,
+									make ? &HExpression::make_variable : &HExpression::get_variable_reference,
 									es._position,
 									HFrame::ACCESS::REFERENCE,
 									sc->_statementId,
@@ -461,7 +462,7 @@ void OCompiler::resolve_symbols( void ) {
 							es._index,
 							HExpression::OExecutionStep(
 								es._expression.raw(),
-								&HExpression::get_variable_direct,
+								es._operation == OExecutionStep::OPERATION::USE ? &HExpression::get_variable_value : &HExpression::get_variable_reference,
 								es._position,
 								es._operation == OExecutionStep::OPERATION::USE ? HFrame::ACCESS::VALUE : HFrame::ACCESS::REFERENCE,
 								sc->_statementId,
