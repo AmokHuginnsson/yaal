@@ -283,12 +283,14 @@ int isatty( int fd_ ) {
 
 int close( int fd_ ) {
 	int ret( 0 );
-	if ( fd_ < SystemIO::MANAGED_IO )
+	if ( fd_ < SystemIO::MANAGED_IO ) {
 		ret = ::close( fd_ );
-	else
+	} else {
 		ret = SystemIO::get_instance().close_io( fd_ );
-	if ( ret < 0 )
+	}
+	if ( ret < 0 ) {
 		log_windows_error( "close" );
+	}
 	return ( ret );
 }
 

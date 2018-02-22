@@ -35,8 +35,13 @@ inline int stream_to_fd( yaal::hcore::HStreamInterface const* stream_ ) {
 
 static void close_and_invalidate( HStreamInterface::ptr_t& stream_ ) {
 	M_PROLOG
-	if ( !! stream_ ) {
-		static_cast<HRawFile*>( stream_.raw() )->close();
+	try {
+		if ( dynamic_cast<HRawFile*>( stream_.raw() ) ) {
+			static_cast<HRawFile*>( stream_.raw() )->close();
+		} else if ( dynamic_cast<HFile*>( stream_.raw() ) ) {
+			static_cast<HFile*>( stream_.raw() )->close();
+		}
+	} catch ( ... ) {
 	}
 	stream_.reset();
 	return;
@@ -49,6 +54,26 @@ static void close_and_invalidate( int& fd_ ) {
 		M_ENSURE( M_TEMP_FAILURE_RETRY( hcore::system::close( fd_ ) ) == 0 );
 	}
 	fd_ = -1;
+	return;
+	M_EPILOG
+}
+
+static void fixupFds( int& fd_, HStreamInterface::ptr_t const& owner_, HStreamInterface const*& ref_, char const* name_ ) {
+	M_PROLOG
+	if ( !! owner_ ) {
+		if ( ref_ ) {
+			throw HPipedChildException( to_string( name_ ).append( " stream is already defined." ) );
+		} else {
+			ref_ = owner_.raw();
+		}
+	}
+	if ( ref_ ) {
+		close_and_invalidate( fd_ );
+		fd_ = stream_to_fd( ref_ );
+		if ( ! owner_ ) {
+			fd_ = ::dup( fd_ );
+		}
+	}
 	return;
 	M_EPILOG
 }
@@ -139,6 +164,13 @@ HPipedChild::STATUS HPipedChild::finish( int finishIn_ ) {
 	M_EPILOG
 }
 
+#undef IN
+#undef OUT
+enum class PIPE_END {
+	IN = 0,
+	OUT = 1
+};
+
 struct OPipeResGuard {
 	int _res[2];
 	OPipeResGuard( void )
@@ -153,6 +185,9 @@ struct OPipeResGuard {
 			M_ENSURE( M_TEMP_FAILURE_RETRY( hcore::system::close( _res[ 1 ] ) ) == 0 );
 		}
 	}
+	int& operator[]( PIPE_END pipeEnd_ ) {
+		return ( _res[static_cast<int>( pipeEnd_ )] );
+	}
 };
 
 void HPipedChild::spawn(
@@ -163,38 +198,14 @@ void HPipedChild::spawn(
 	yaal::hcore::HStreamInterface const* err_
 ) {
 	M_PROLOG
-	if ( !! _in ) {
-		if ( in_ ) {
-			throw HPipedChildException( "Input stream already defined." );
-		} else {
-			in_ = _in.raw();
-		}
-	}
-	if ( !! _out ) {
-		if ( out_ ) {
-			throw HPipedChildException( "Output stream already defined." );
-		} else {
-			out_ = _out.raw();
-		}
-	}
-	if ( !! _err ) {
-		if ( err_ ) {
-			throw HPipedChildException( "Error stream already defined." );
-		} else {
-			err_ = _err.raw();
-		}
-	}
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	OPipeResGuard pipeIn, pipeOut, pipeErr;
-	int* fileDesIn = pipeIn._res;
-	int* fileDesOut = pipeOut._res;
-	int* fileDesErr = pipeErr._res;
 	HFSItem image( image_ );
 	M_ENSURE( !! image, image_ );
 	if ( ! ( image.is_executable() && image.is_file() ) ) {
 		throw HPipedChildException( "Not an executable: "_ys.append( image_ ) );
 	}
-	M_ENSURE( ( ! ::pipe( fileDesIn ) ) && ( ! ::pipe( fileDesOut ) ) && ( ! ::pipe( fileDesErr ) ) );
+	M_ENSURE( ( ! ::pipe( pipeIn._res ) ) && ( ! ::pipe( pipeOut._res ) ) && ( ! ::pipe( pipeErr._res ) ) );
 	HChunk argv( chunk_size<char const*>( argv_.size() + 2 ) );
 	HLock stdinLock( cin.acquire() );
 	HLock stdoutLock( cout.acquire() );
@@ -206,27 +217,18 @@ void HPipedChild::spawn(
 	cout << hcore::flush;
 	::fflush( stdout );
 	cerr << hcore::flush;
-	if ( in_ ) {
-		close_and_invalidate( fileDesIn[ 0 ] );
-		fileDesIn[0] = ::dup( stream_to_fd( in_ ) );
-	}
-	if ( out_ ) {
-		close_and_invalidate( fileDesOut[ 1 ] );
-		fileDesOut[1] = ::dup( stream_to_fd( out_ ) );
-	}
-	if ( err_ ) {
-		close_and_invalidate( fileDesErr[ 1 ] );
-		fileDesErr[1] = ::dup( stream_to_fd( err_ ) );
-	}
+	fixupFds( pipeIn[ PIPE_END::IN ], _in, in_, "Input" );
+	fixupFds( pipeOut[ PIPE_END::OUT ], _out, out_, "Output" );
+	fixupFds( pipeErr[ PIPE_END::OUT ], _err, err_, "Error" );
 	_pid = ::fork();
 	M_ENSURE( _pid >= 0, "fork()" );
 	if ( ! _pid ) {
-		close_and_invalidate( fileDesIn[ 1 ] );
-		close_and_invalidate( fileDesOut[ 0 ] );
-		close_and_invalidate( fileDesErr[ 0 ] );
-		if ( ( ::dup2( fileDesIn[ 0 ], stdinFd ) < 0 )
-				|| ( ::dup2( fileDesOut[ 1 ], stdoutFd ) < 0 )
-				|| ( ::dup2( fileDesErr[ 1 ], stderrFd ) < 0 ) ) {
+		close_and_invalidate( pipeIn[ PIPE_END::OUT ] );
+		close_and_invalidate( pipeOut[ PIPE_END::IN ] );
+		close_and_invalidate( pipeErr[ PIPE_END::IN ] );
+		if ( ( ::dup2( pipeIn[ PIPE_END::IN ], stdinFd ) < 0 )
+				|| ( ::dup2( pipeOut[ PIPE_END::OUT ], stdoutFd ) < 0 )
+				|| ( ::dup2( pipeErr[ PIPE_END::OUT ], stderrFd ) < 0 ) ) {
 			M_THROW( "dup2", errno );
 		}
 		HUTF8String utf8Image( image_ );
@@ -243,19 +245,19 @@ void HPipedChild::spawn(
 		M_ENSURE( !"execv"[0] );
 	} else {
 		if ( ! in_ ) {
-			close_and_invalidate( fileDesIn[ 0 ] );
-			_in = make_pointer<HRawFile>( fileDesIn[ 1 ], HRawFile::OWNERSHIP::ACQUIRED );
-			fileDesIn[1] = -1;
+			close_and_invalidate( pipeIn[ PIPE_END::IN ] );
+			_in = make_pointer<HRawFile>( pipeIn[ PIPE_END::OUT ], HRawFile::OWNERSHIP::ACQUIRED );
+			pipeIn[PIPE_END::OUT] = -1;
 		}
 		if ( ! out_ ) {
-			close_and_invalidate( fileDesOut[ 1 ] );
-			_out = make_pointer<HRawFile>( fileDesOut[ 0 ], HRawFile::OWNERSHIP::ACQUIRED );
-			fileDesOut[0] = -1;
+			close_and_invalidate( pipeOut[ PIPE_END::OUT ] );
+			_out = make_pointer<HRawFile>( pipeOut[ PIPE_END::IN ], HRawFile::OWNERSHIP::ACQUIRED );
+			pipeOut[PIPE_END::IN] = -1;
 		}
 		if ( ! err_ ) {
-			close_and_invalidate( fileDesErr[ 1 ] );
-			_err = make_pointer<HRawFile>( fileDesErr[ 0 ], HRawFile::OWNERSHIP::ACQUIRED );
-			fileDesErr[0] = -1;
+			close_and_invalidate( pipeErr[ PIPE_END::OUT ] );
+			_err = make_pointer<HRawFile>( pipeErr[ PIPE_END::IN ], HRawFile::OWNERSHIP::ACQUIRED );
+			pipeErr[PIPE_END::IN] = -1;
 		}
 	}
 	return;

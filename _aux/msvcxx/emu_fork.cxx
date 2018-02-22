@@ -60,19 +60,12 @@ char* xstrdup( char const* str_ ) {
 M_EXPORT_SYMBOL
 int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void ) {
 	/* Make a backup of original descriptors. */
-	HLock stdinLock( hcore::cin.acquire() );
-	HLock stdoutLock( hcore::cout.acquire() );
-	HLock stderrLock( hcore::cerr.acquire() );
 	int stdinFd( _fileno( stdin ) );
 	int stdoutFd( _fileno( stdout ) );
 	int stderrFd( _fileno( stderr ) );
 	int hStdIn = _dup( stdinFd );
-	::fflush( stdout );
-	hcore::cout << hcore::flush;
 	std::cout << std::flush;
 	int hStdOut = _dup( stdoutFd );
-	::fflush( stderr );
-	hcore::cerr << hcore::flush;
 	std::cerr << std::flush;
 	int hStdErr = _dup( stderrFd );
 
@@ -95,11 +88,13 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void ) {
 
 	utf8 = _path;
 	intptr_t processHandle( ::spawnvp( P_NOWAIT, utf8.c_str(), argv ) );
-	if ( processHandle == -1 )
+	if ( processHandle == -1 ) {
 		log_windows_error( "spawnvp" );
+	}
 	int pid( ::GetProcessId( reinterpret_cast<HANDLE>( processHandle ) ) );
-	if ( pid <= 0 )
+	if ( pid <= 0 ) {
 		log_windows_error( "GetProcessId" );
+	}
 
 	/* Restore backed up standard descriptors. */
 	M_ENSURE( ::dup2( hStdIn, stdinFd ) == 0 );
@@ -109,11 +104,13 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void ) {
 	/* Close backups. */
 	if ( TEMP_FAILURE_RETRY( ::close( hStdIn ) )
 		|| TEMP_FAILURE_RETRY( ::close( hStdOut ) )
-		|| TEMP_FAILURE_RETRY( ::close( hStdErr ) ) )
+		|| TEMP_FAILURE_RETRY( ::close( hStdErr ) ) ) {
 		M_THROW( "close", errno );
+	}
 
-	for ( int  k = 0, size = _argv.size(); k < size; ++ k )
+	for ( int  k = 0, size = _argv.size(); k < size; ++ k ) {
 		memory::free( argv[ k ] );
+	}
 	memory::free( argv );
 
 	_children_.insert( pid );

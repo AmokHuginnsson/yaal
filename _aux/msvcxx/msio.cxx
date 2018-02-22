@@ -332,7 +332,8 @@ int SystemIO::close_io( int id_ ) {
 		ret = i->second->close();
 		_ioTable.erase( i );
 	} else {
-		M_ASSERT( id_ < MANAGED_IO );
+		ret = -1;
+		errno = EBADF;
 	}
 	return ( ret );
 }

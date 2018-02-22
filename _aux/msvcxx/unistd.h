@@ -110,7 +110,7 @@ inline int lockf( int fd_, int cmd_, size_t off_ )
 
 #include "tools/hpipedchild.hxx"
 
-#define ms_fork HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( image_, argv_, fileDesIn, fileDesOut, fileDesErr )
+#define ms_fork HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( image_, argv_, pipeIn._res, pipeOut._res, pipeErr._res )
 class M_YAAL_HCORE_PUBLIC_API HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn {
 	int* _in;
 	int* _out;
