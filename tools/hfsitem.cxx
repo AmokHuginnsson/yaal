@@ -136,19 +136,19 @@ HString HFSItem::get_name( void ) const {
 	M_EPILOG
 }
 
-int HFSItem::get_uid( void ) const {
+yaal::hcore::system::user_id_t HFSItem::get_uid( void ) const {
 	M_PROLOG
 	struct stat s;
 	do_stat( &s );
-	return ( static_cast<int>( s.st_uid ) );
+	return ( static_cast<yaal::hcore::system::user_id_t>( s.st_uid ) );
 	M_EPILOG
 }
 
-int HFSItem::get_gid( void ) const {
+yaal::hcore::system::user_id_t HFSItem::get_gid( void ) const {
 	M_PROLOG
 	struct stat s;
 	do_stat( &s );
-	return ( static_cast<int>( s.st_gid ) );
+	return ( static_cast<yaal::hcore::system::user_id_t>( s.st_gid ) );
 	M_EPILOG
 }
 

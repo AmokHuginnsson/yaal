@@ -107,7 +107,7 @@ void HLog::do_rehash( void* src_, char const* processName_ ) {
 	FILE* src( static_cast<FILE*>( src_ ) );
 	if ( src ) {
 		_tag.assign( " " )
-			.append( system::get_user_name( static_cast<int>( getuid() ) ) )
+			.append( system::get_user_name( system::get_user_id() ) )
 			.append( "@" )
 			.append( system::get_host_name() )
 			.append( "->" )

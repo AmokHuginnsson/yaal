@@ -6,6 +6,7 @@
 #include "hcore/hstring.hxx"
 #include "hcore/hchunk.hxx"
 #include "hcore/hpointer.hxx"
+#include "hcore/system.hxx"
 #include "hcore/htime.hxx"
 
 namespace yaal {
@@ -37,8 +38,8 @@ public:
 	yaal::hcore::HString get_group( void ) const;
 	u64_t id( void ) const;
 	int get_permissions( void ) const;
-	int get_uid( void ) const;
-	int get_gid( void ) const;
+	yaal::hcore::system::user_id_t get_uid( void ) const;
+	yaal::hcore::system::user_id_t get_gid( void ) const;
 	HIterator begin( void );
 	HIterator end( void );
 	bool operator ! ( void ) const;

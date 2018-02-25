@@ -136,12 +136,17 @@ static int const GETGR_R_SIZE   = 1024;
 
 }
 
-HString get_user_name( int uid_ ) {
+user_id_t get_user_id( void ) {
+	return ( getuid() );
+}
+
+HString get_user_name( user_id_t uid_ ) {
 	M_PROLOG
 	passwd accountInfo;
 	int bufferSize( static_cast<int>( ::sysconf( _SC_GETPW_R_SIZE_MAX ) ) );
-	if ( bufferSize <= 0 )
+	if ( bufferSize <= 0 ) {
 		bufferSize = GETPW_R_SIZE;
+	}
 	HChunk buffer( bufferSize );
 	passwd* any( nullptr );
 	M_ENSURE( ! getpwuid_r( static_cast<uid_t>( uid_ ), &accountInfo, buffer.get<char>(), static_cast<size_t>( bufferSize ), &any ) );
@@ -149,12 +154,13 @@ HString get_user_name( int uid_ ) {
 	M_EPILOG
 }
 
-HString get_group_name( int gid_ ) {
+HString get_group_name( user_id_t gid_ ) {
 	M_PROLOG
 	group groupInfo;
 	int bufferSize( static_cast<int>( ::sysconf( _SC_GETGR_R_SIZE_MAX ) ) );
-	if ( bufferSize <= 0 )
+	if ( bufferSize <= 0 ) {
 		bufferSize = GETGR_R_SIZE;
+	}
 	HChunk buffer( bufferSize );
 	group* any( nullptr );
 	M_ENSURE( ! getgrgid_r( static_cast<gid_t>( gid_ ), &groupInfo, buffer.get<char>(), static_cast<size_t>( bufferSize ), &any ) );
