@@ -513,6 +513,7 @@ yaal::hcore::HString const& type_name( HHuginn::TYPE type_ ) {
 	static HString const NAME_LOOKUP    = BUILTIN::LOOKUP;
 	static HString const NAME_ORDER     = BUILTIN::ORDER;
 	static HString const NAME_SET       = BUILTIN::SET;
+	static HString const NAME_BLOB      = BUILTIN::BLOB;
 	static HString const NAME_NONE                = "*none*";
 	static HString const NAME_OBSERVER            = "*observer*";
 	static HString const NAME_REFERENCE           = "*reference*";
@@ -539,6 +540,7 @@ yaal::hcore::HString const& type_name( HHuginn::TYPE type_ ) {
 		case ( HHuginn::TYPE::ORDER ):              s = &NAME_ORDER;              break;
 		case ( HHuginn::TYPE::LOOKUP ):             s = &NAME_LOOKUP;             break;
 		case ( HHuginn::TYPE::SET ):                s = &NAME_SET;                break;
+		case ( HHuginn::TYPE::BLOB ):               s = &NAME_BLOB;               break;
 		case ( HHuginn::TYPE::OBSERVER ):           s = &NAME_OBSERVER;           break;
 		case ( HHuginn::TYPE::REFERENCE ):          s = &NAME_REFERENCE;          break;
 		case ( HHuginn::TYPE::FUNCTION_REFERENCE ): s = &NAME_FUNCTION_REFERENCE; break;
@@ -588,9 +590,9 @@ char const* op_to_symbol_str( OPERATOR o_ ) {
 		case ( OPERATOR::GREATER ):            str = ">";      break;
 		case ( OPERATOR::LESS_OR_EQUAL ):      str = "<=";     break;
 		case ( OPERATOR::GREATER_OR_EQUAL ):   str = ">=";     break;
-		case ( OPERATOR::BOOLEAN_AND ):        str = "⋀";     break;
-		case ( OPERATOR::BOOLEAN_OR ):         str = "⋁";     break;
-		case ( OPERATOR::BOOLEAN_XOR ):        str = "⊕";     break;
+		case ( OPERATOR::BOOLEAN_AND ):        str = "⋀";      break;
+		case ( OPERATOR::BOOLEAN_OR ):         str = "⋁";      break;
+		case ( OPERATOR::BOOLEAN_XOR ):        str = "⊕";      break;
 		case ( OPERATOR::BOOLEAN_NOT ):        str = "!x";     break;
 		case ( OPERATOR::TERNARY ):            str = "?:";     break;
 		case ( OPERATOR::MAKE_DICT ):          str = "{k:v}";  break;

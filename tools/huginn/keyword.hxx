@@ -66,6 +66,7 @@ extern char const* DICT;
 extern char const* LOOKUP;
 extern char const* ORDER;
 extern char const* SET;
+extern char const* BLOB;
 extern HHuginn::identifier_id_t const INTEGER_IDENTIFIER;
 extern HHuginn::identifier_id_t const REAL_IDENTIFIER;
 extern HHuginn::identifier_id_t const NUMBER_IDENTIFIER;
@@ -84,6 +85,7 @@ extern HHuginn::identifier_id_t const DICT_IDENTIFIER;
 extern HHuginn::identifier_id_t const LOOKUP_IDENTIFIER;
 extern HHuginn::identifier_id_t const ORDER_IDENTIFIER;
 extern HHuginn::identifier_id_t const SET_IDENTIFIER;
+extern HHuginn::identifier_id_t const BLOB_IDENTIFIER;
 
 }
 

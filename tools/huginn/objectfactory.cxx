@@ -68,6 +68,10 @@ namespace set {
 HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
 }
 
+namespace blob {
+HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
+}
+
 HObjectFactoryBase::HObjectFactoryBase( HRuntime* runtime_ )
 	: _runtime( runtime_ )
 	, _memoryPoolsStore()
@@ -95,6 +99,7 @@ HObjectFactory::HObjectFactory( HRuntime* runtime_ )
 	, _order( order::get_class( runtime_, this ) )
 	, _lookup( lookup::get_class( runtime_, this ) )
 	, _set( set::get_class( runtime_, this ) )
+	, _blob( blob::get_class( runtime_, this ) )
 	, _exception()
 	, _stackFrameInfo()
 	, _conversionException()
@@ -111,7 +116,8 @@ HObjectFactory::HObjectFactory( HRuntime* runtime_ )
 	, _dictPool( this, _dict.raw() )
 	, _lookupPool( this, _lookup.raw() )
 	, _orderPool( this, _order.raw() )
-	, _setPool( this, _set.raw() ) {
+	, _setPool( this, _set.raw() )
+	, _blobPool( this, _blob.raw() ) {
 	return;
 }
 
@@ -133,6 +139,7 @@ void HObjectFactory::register_builtin_classes( void ) {
 	_runtime->huginn()->register_class( _order );
 	_runtime->huginn()->register_class( _lookup );
 	_runtime->huginn()->register_class( _set );
+	_runtime->huginn()->register_class( _blob );
 
 	_runtime->huginn()->register_class( _exception, HHuginn::ACCESS::PUBLIC, HHuginn::VISIBILITY::GLOBAL );
 

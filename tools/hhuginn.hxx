@@ -107,6 +107,7 @@ public:
 	class HOrder;
 	class HLookup;
 	class HSet;
+	class HBlob;
 	class HObject;
 	class HException;
 	class HEnumeration;
@@ -140,6 +141,7 @@ public:
 		ORDER,
 		LOOKUP,
 		SET,
+		BLOB,
 		OBSERVER,
 		REFERENCE,
 		FUNCTION_REFERENCE,
@@ -1120,6 +1122,19 @@ protected:
 private:
 	HSet( HSet const& ) = delete;
 	HSet& operator = ( HSet const& ) = delete;
+private:
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
+};
+
+class HHuginn::HBlob : public HHuginn::HValue {
+public:
+	typedef HHuginn::HBlob this_type;
+	typedef HHuginn::HValue base_type;
+private:
+	yaal::hcore::HChunk _data;
+public:
+	HBlob( HHuginn::HClass const*, yaal::hcore::HChunk&& );
+	int long get_size( void ) const;
 private:
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };

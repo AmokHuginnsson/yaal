@@ -54,6 +54,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			{ BUILTIN::LOOKUP, BUILTIN::LOOKUP_IDENTIFIER },
 			{ BUILTIN::ORDER, BUILTIN::ORDER_IDENTIFIER },
 			{ BUILTIN::SET, BUILTIN::SET_IDENTIFIER },
+			{ BUILTIN::BLOB, BUILTIN::BLOB_IDENTIFIER },
 			{ INTERFACE::CLONE,            INTERFACE::CLONE_IDENTIFIER },
 			{ INTERFACE::GET_SIZE,         INTERFACE::GET_SIZE_IDENTIFIER },
 			{ INTERFACE::ITERATOR,         INTERFACE::ITERATOR_IDENTIFIER },
@@ -116,6 +117,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			BUILTIN::LOOKUP,
 			BUILTIN::ORDER,
 			BUILTIN::SET,
+			BUILTIN::BLOB,
 			INTERFACE::CLONE,
 			INTERFACE::GET_SIZE,
 			INTERFACE::ITERATOR,
@@ -602,26 +604,26 @@ HHuginn::value_t size( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 	HHuginn::HIterable const* iterable( dynamic_cast<HHuginn::HIterable const*>( v ) );
 	if ( iterable ) {
 		s = iterable->size( thread_, position_ );
-	} else {
-		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v ) ) {
-			HHuginn::value_t res( o->call_method( thread_, val, INTERFACE::GET_SIZE_IDENTIFIER, HArguments( thread_ ), position_ ) );
-			if ( res->type_id() != HHuginn::TYPE::INTEGER ) {
-				throw HHuginn::HHuginnRuntimeException(
-					"User supplied `get_size' method returned an invalid type "_ys
-						.append( a_type_name( res->get_class() ) )
-						.append( " instead of an `integer'." ),
-					thread_->current_frame()->file_id(),
-					position_
-				);
-			}
-			s = get_integer( res );
-		} else {
+	} else if ( v->type_id() == HHuginn::TYPE::BLOB ) {
+		s = static_cast<HHuginn::HBlob const*>( v )->get_size();
+	} else if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v ) ) {
+		HHuginn::value_t res( o->call_method( thread_, val, INTERFACE::GET_SIZE_IDENTIFIER, HArguments( thread_ ), position_ ) );
+		if ( res->type_id() != HHuginn::TYPE::INTEGER ) {
 			throw HHuginn::HHuginnRuntimeException(
-				"Getting size of "_ys.append( a_type_name( v->get_class() ) ).append( "s is not supported." ),
+				"User supplied `get_size' method returned an invalid type "_ys
+					.append( a_type_name( res->get_class() ) )
+					.append( " instead of an `integer'." ),
 				thread_->current_frame()->file_id(),
 				position_
 			);
 		}
+		s = get_integer( res );
+	} else {
+		throw HHuginn::HHuginnRuntimeException(
+			"Getting size of "_ys.append( a_type_name( v->get_class() ) ).append( "s is not supported." ),
+			thread_->current_frame()->file_id(),
+			position_
+		);
 	}
 	return ( thread_->object_factory().create_integer( s ) );
 	M_EPILOG
@@ -734,6 +736,41 @@ HHuginn::value_t set( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::valu
 		s->insert( thread_, e, position_ );
 	}
 	return ( v );
+	M_EPILOG
+}
+
+HHuginn::value_t blob( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_signature( "blob", values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
+	HHuginn::HInteger::value_type s( get_integer( values_[0] ) );
+	if ( s <= 0 ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"Invalid `blob` size requested: "_ys.append( s ),
+			thread_->current_frame()->file_id(),
+			position_
+		);
+	}
+	int long rs( 0 );
+	try {
+		rs = safe_int::cast<int long>( s );
+	} catch ( ... ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"Requested `blob` size is too big: "_ys.append( s ),
+			thread_->current_frame()->file_id(),
+			position_
+		);
+	}
+	HChunk c;
+	try {
+		c.realloc( rs, HChunk::STRATEGY::EXACT );
+	} catch ( HException const& e ) {
+		throw HHuginn::HHuginnRuntimeException(
+			e.what(),
+			thread_->current_frame()->file_id(),
+			position_
+		);
+	}
+	return ( thread_->object_factory().create_blob( yaal::move( c ) ) );
 	M_EPILOG
 }
 
@@ -868,6 +905,7 @@ void HRuntime::register_builtins( void ) {
 	M_ENSURE( ( identifier_id( BUILTIN::LOOKUP ) == BUILTIN::LOOKUP_IDENTIFIER ) && ( identifier_name( BUILTIN::LOOKUP_IDENTIFIER ) == BUILTIN::LOOKUP ) );
 	M_ENSURE( ( identifier_id( BUILTIN::ORDER ) == BUILTIN::ORDER_IDENTIFIER ) && ( identifier_name( BUILTIN::ORDER_IDENTIFIER ) == BUILTIN::ORDER ) );
 	M_ENSURE( ( identifier_id( BUILTIN::SET ) == BUILTIN::SET_IDENTIFIER ) && ( identifier_name( BUILTIN::SET_IDENTIFIER ) == BUILTIN::SET ) );
+	M_ENSURE( ( identifier_id( BUILTIN::BLOB ) == BUILTIN::BLOB_IDENTIFIER ) && ( identifier_name( BUILTIN::BLOB_IDENTIFIER ) == BUILTIN::BLOB ) );
 	M_ENSURE( ( identifier_id( INTERFACE::CLONE ) == INTERFACE::CLONE_IDENTIFIER ) && ( identifier_name( INTERFACE::CLONE_IDENTIFIER ) == INTERFACE::CLONE ) );
 	M_ENSURE( ( identifier_id( INTERFACE::GET_SIZE ) == INTERFACE::GET_SIZE_IDENTIFIER ) && ( identifier_name( INTERFACE::GET_SIZE_IDENTIFIER ) == INTERFACE::GET_SIZE ) );
 	M_ENSURE( ( identifier_id( INTERFACE::ITERATOR ) == INTERFACE::ITERATOR_IDENTIFIER ) && ( identifier_name( INTERFACE::ITERATOR_IDENTIFIER ) == INTERFACE::ITERATOR ) );
@@ -911,18 +949,19 @@ void HRuntime::register_builtins( void ) {
 	register_builtin_function( type_name( HHuginn::TYPE::NUMBER ), hcore::call( &huginn_builtin::number, _1, _2, _3, _4 ), "( *val* ) - convert *val* value to `number`" );
 	register_builtin_function( type_name( HHuginn::TYPE::BOOLEAN ), hcore::call( &huginn_builtin::boolean, _1, _2, _3, _4 ), "( *val* ) - convert *val* value to `boolean`" );
 	register_builtin_function( type_name( HHuginn::TYPE::CHARACTER ), hcore::call( &huginn_builtin::character, _1, _2, _3, _4 ), "( *val* ) - convert *val* value to `character`" );
-	register_builtin_function( BUILTIN::SIZE, hcore::call( &huginn_builtin::size, _1, _2, _3, _4 ), "( *expr* ) - get size of given expression *expr*, e.g: a number of elements in a collection" );
-	register_builtin_function( BUILTIN::TYPE, hcore::call( &huginn_builtin::type, _1, _2, _3, _4 ), "( *expr* ) - get type of given expression *expr*" );
+	register_builtin_function( BUILTIN::SIZE, hcore::call( &huginn_builtin::size, _1, _2, _3, _4 ), "( *expr* ) - get a size of given expression *expr*, e.g: a number of elements in a collection" );
+	register_builtin_function( BUILTIN::TYPE, hcore::call( &huginn_builtin::type, _1, _2, _3, _4 ), "( *expr* ) - get a type of given expression *expr*" );
 	register_builtin_function( BUILTIN::COPY, hcore::call( &huginn_builtin::copy, _1, _2, _3, _4 ), "( *ref* ) - make a deep copy of a value given given by *ref*" );
 	register_builtin_function( BUILTIN::OBSERVE, hcore::call( &huginn_builtin::observe, _1, _2, _3, _4 ), "( *ref* ) - create an `*observer*` for a value given by *ref*" );
 	register_builtin_function( BUILTIN::USE, hcore::call( &huginn_builtin::use, _1, _2, _3, _4 ), "( *observer* ) - get a reference to a value from given *observer*" );
-	register_builtin_function( type_name( HHuginn::TYPE::TUPLE ), hcore::call( &huginn_builtin::tuple, _1, _2, _3, _4 ), "([ *items...* ]) - create `tuple` collection from *items...*" );
-	register_builtin_function( type_name( HHuginn::TYPE::LIST ), hcore::call( &huginn_builtin::list, _1, _2, _3, _4 ), "([ *items...* ]) - create `list` collection from *items...*" );
-	register_builtin_function( type_name( HHuginn::TYPE::DEQUE ), hcore::call( &huginn_builtin::deque, _1, _2, _3, _4 ), "([ *items...* ]) - create `deque` collection from *items...*" );
-	register_builtin_function( type_name( HHuginn::TYPE::DICT ), hcore::call( &huginn_builtin::dict, _1, _2, _3, _4 ), "create empty `dict` object" );
-	register_builtin_function( type_name( HHuginn::TYPE::ORDER ), hcore::call( &huginn_builtin::order, _1, _2, _3, _4 ), "([ *items...* ]) - create `order` collection from *items...*" );
-	register_builtin_function( type_name( HHuginn::TYPE::LOOKUP ), hcore::call( &huginn_builtin::lookup, _1, _2, _3, _4 ), "create empty `lookup` object" );
-	register_builtin_function( type_name( HHuginn::TYPE::SET ), hcore::call( &huginn_builtin::set, _1, _2, _3, _4 ), "([ *items...* ]) - create `set` collection from *items...*" );
+	register_builtin_function( type_name( HHuginn::TYPE::TUPLE ), hcore::call( &huginn_builtin::tuple, _1, _2, _3, _4 ), "([ *items...* ]) - create a `tuple` collection from *items...*" );
+	register_builtin_function( type_name( HHuginn::TYPE::LIST ), hcore::call( &huginn_builtin::list, _1, _2, _3, _4 ), "([ *items...* ]) - create a `list` collection from *items...*" );
+	register_builtin_function( type_name( HHuginn::TYPE::DEQUE ), hcore::call( &huginn_builtin::deque, _1, _2, _3, _4 ), "([ *items...* ]) - create a `deque` collection from *items...*" );
+	register_builtin_function( type_name( HHuginn::TYPE::DICT ), hcore::call( &huginn_builtin::dict, _1, _2, _3, _4 ), "create empty a `dict` object" );
+	register_builtin_function( type_name( HHuginn::TYPE::ORDER ), hcore::call( &huginn_builtin::order, _1, _2, _3, _4 ), "([ *items...* ]) - create an `order` collection from *items...*" );
+	register_builtin_function( type_name( HHuginn::TYPE::LOOKUP ), hcore::call( &huginn_builtin::lookup, _1, _2, _3, _4 ), "create empty a `lookup` object" );
+	register_builtin_function( type_name( HHuginn::TYPE::SET ), hcore::call( &huginn_builtin::set, _1, _2, _3, _4 ), "([ *items...* ]) - create a `set` collection from *items...*" );
+	register_builtin_function( type_name( HHuginn::TYPE::BLOB ), hcore::call( &huginn_builtin::blob, _1, _2, _3, _4 ), "( *size* ) - create a `blob` of *size* bytes size" );
 	register_builtin_function( "print", hcore::call( &huginn_builtin::print, _1, _2, _3, _4 ), "( *str* ) - print a message given by *str* to interpreter's standard output" );
 	register_builtin_function( "input", hcore::call( &huginn_builtin::input, _1, _2, _3, _4 ), "read a line of text from interpreter's standard input" );
 	register_builtin_function( KEYWORD::ASSERT, hcore::call( &huginn_builtin::assert, _1, _2, _3, _4 ), "( *condition*[, *message*] ) - ensure *condition* is met or bailout with *message*" );

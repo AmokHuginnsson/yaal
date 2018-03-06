@@ -188,6 +188,7 @@ class HObjectFactory final : public HObjectFactoryBase {
 	HHuginn::class_t _order;
 	HHuginn::class_t _lookup;
 	HHuginn::class_t _set;
+	HHuginn::class_t _blob;
 	HHuginn::class_t _exception;
 	HHuginn::class_t _stackFrameInfo;
 	HHuginn::class_t _conversionException;
@@ -206,6 +207,7 @@ class HObjectFactory final : public HObjectFactoryBase {
 	HObjectPool<HHuginn::HLookup, POOL_TYPE::COLLECTION> _lookupPool;
 	HObjectPool<HHuginn::HOrder, POOL_TYPE::COLLECTION> _orderPool;
 	HObjectPool<HHuginn::HSet, POOL_TYPE::COLLECTION> _setPool;
+	HObjectPool<HHuginn::HBlob> _blobPool;
 public:
 	HObjectFactory( HRuntime* );
 	void register_builtin_classes( void );
@@ -250,6 +252,9 @@ public:
 	}
 	HHuginn::value_t create_set( void ) const {
 		return ( _setPool.create() );
+	}
+	HHuginn::value_t create_blob( yaal::hcore::HChunk&& chunk_ ) const {
+		return ( _blobPool.create( yaal::move( chunk_ ) ) );
 	}
 	HHuginn::value_t create_reference( HHuginn::value_t& value_ ) const {
 		return ( _referencePool.create( value_ ) );
@@ -310,6 +315,9 @@ public:
 	}
 	HHuginn::HClass const* set_class( void ) const {
 		return ( _set.raw() );
+	}
+	HHuginn::HClass const* blob_class( void ) const {
+		return ( _blob.raw() );
 	}
 	HHuginn::HClass const* exception_class( void ) const {
 		return ( _exception.raw() );
