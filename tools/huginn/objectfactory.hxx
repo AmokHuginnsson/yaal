@@ -191,6 +191,7 @@ class HObjectFactory final : public HObjectFactoryBase {
 	HHuginn::class_t _blob;
 	HHuginn::class_t _exception;
 	HHuginn::class_t _stackFrameInfo;
+	HHuginn::class_t _runtimeException;
 	HHuginn::class_t _conversionException;
 	HHuginn::class_t _arithmeticException;
 	/* Explicit pools. */
@@ -324,6 +325,9 @@ public:
 	}
 	HHuginn::HClass const* stack_frame_info_class( void ) const {
 		return ( _stackFrameInfo.raw() );
+	}
+	HHuginn::HClass const* runtime_exception_class( void ) const {
+		return ( _runtimeException.raw() );
 	}
 	HHuginn::HClass const* conversion_exception_class( void ) const {
 		return ( _conversionException.raw() );

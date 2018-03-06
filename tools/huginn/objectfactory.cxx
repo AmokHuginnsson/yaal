@@ -102,6 +102,7 @@ HObjectFactory::HObjectFactory( HRuntime* runtime_ )
 	, _blob( blob::get_class( runtime_, this ) )
 	, _exception()
 	, _stackFrameInfo()
+	, _runtimeException()
 	, _conversionException()
 	, _arithmeticException()
 	, _stringPool( this, _string.raw() )
@@ -143,6 +144,12 @@ void HObjectFactory::register_builtin_classes( void ) {
 
 	_runtime->huginn()->register_class( _exception, HHuginn::ACCESS::PUBLIC, HHuginn::VISIBILITY::GLOBAL );
 
+	_runtimeException = exception::create_class(
+		_runtime,
+		"RuntimeException",
+		"The `RuntimeException` is an exception class used to signal errors from Huginn's runtime engine.",
+		HHuginn::VISIBILITY::GLOBAL
+	);
 	_conversionException = exception::create_class(
 		_runtime,
 		"ConversionException",

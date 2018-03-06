@@ -183,6 +183,7 @@ words_t _keywords_ = {{
 
 words_t _builtin_ = {{
 	"assert", /* for VM dump */
+	type_name( HHuginn::TYPE::BLOB ),
 	type_name( HHuginn::TYPE::BOOLEAN ),
 	type_name( HHuginn::TYPE::CHARACTER ),
 	type_name( HHuginn::TYPE::DEQUE ),

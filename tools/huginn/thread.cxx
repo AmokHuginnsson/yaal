@@ -152,7 +152,7 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t&& value_, 
 	int level( 0 );
 	HFrame* target( current_frame() );
 	int no( target->number() );
-	char const* exMsg = "Uncaught exception: ";
+	char const* exMsg = "";
 	while ( target ) {
 		if ( target->is_loop() ) {
 			++ level;
@@ -179,7 +179,7 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t&& value_, 
 				( target->type() == HFrame::TYPE::FUNCTION )
 				&& ( static_cast<HFunction const*>( target->statement() )->name() == KEYWORD::DESTRUCTOR_IDENTIFIER )
 			) {
-				exMsg = "Uncaught exception from destructor: ";
+				exMsg = " from destructor";
 				while ( target ) {
 					target->break_execution( HFrame::STATE::RUNTIME_EXCEPTION ); /* ---> DTOR_FIX <--- */
 					target = target->parent();
@@ -196,13 +196,22 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t&& value_, 
 		 * Uncaught STATE::EXCEPTION becomes STATE::RUNTIME_EXCEPTION!
 		 */
 		HHuginn::HException const* e( dynamic_cast<HHuginn::HException const*>( value_.raw() ) );
-		_exceptionMessage = exMsg;
 		_exceptionFileId = fileId_;
 		_exceptionPosition = position_;
+		_exceptionMessage.assign( "Uncaught " );
 		if ( e ) {
-			_exceptionMessage.append( e->what() );
+			_exceptionMessage
+				.append( e->get_class()->name() )
+				.append( exMsg )
+				.append( ": " )
+				.append( e->what() );
 		} else {
-			_exceptionMessage.append( "of type " ).append( value_->get_class()->name() );
+			_exceptionMessage
+				.append( "exception" )
+				.append( exMsg )
+				.append( " of type " )
+				.append( value_->get_class()->name() )
+				.append( "." );
 		}
 	}
 	return;

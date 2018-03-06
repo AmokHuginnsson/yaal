@@ -58,14 +58,10 @@ HHuginn::value_t HHuginn::HBlob::do_clone( huginn::HThread* thread_, HHuginn::va
 	HChunk c;
 	try {
 		c.realloc( _data.get_size(), HChunk::STRATEGY::EXACT );
+		memcpy( c.raw(), _data.raw(), static_cast<size_t>( _data.get_size() ) );
 	} catch ( HException const& e ) {
-		throw HHuginn::HHuginnRuntimeException(
-			e.what(),
-			thread_->current_frame()->file_id(),
-			position_
-		);
+		thread_->raise( thread_->object_factory().runtime_exception_class(), e.what(), position_ );
 	}
-	memcpy( c.raw(), _data.raw(), static_cast<size_t>( _data.get_size() ) );
 	return ( thread_->runtime().object_factory()->create_blob( yaal::move( c ) ) );
 }
 

@@ -764,11 +764,7 @@ HHuginn::value_t blob( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 	try {
 		c.realloc( rs, HChunk::STRATEGY::EXACT );
 	} catch ( HException const& e ) {
-		throw HHuginn::HHuginnRuntimeException(
-			e.what(),
-			thread_->current_frame()->file_id(),
-			position_
-		);
+		thread_->raise( thread_->object_factory().runtime_exception_class(), e.what(), position_ );
 	}
 	return ( thread_->object_factory().create_blob( yaal::move( c ) ) );
 	M_EPILOG
