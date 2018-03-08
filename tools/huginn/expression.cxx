@@ -440,14 +440,15 @@ void HExpression::get_super( OExecutionStep const& executionStep_, huginn::HFram
 	M_EPILOG
 }
 
-void HExpression::get_field(  OExecutionStep const& executionStep_,huginn::HFrame* frame_ ) {
+void HExpression::get_field( OExecutionStep const& executionStep_,huginn::HFrame* frame_ ) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::MEMBER_ACCESS );
 	int p( _instructions[frame_->ip()]._position );
 	++ frame_->ip();
-	HHuginn::value_t v( yaal::move( frame_->values().top() ) );
-	frame_->values().pop();
+	HFrame::values_t& values( frame_->values() );
+	HHuginn::value_t v( yaal::move( values.top() ) );
+	values.pop();
 	HThread* t( frame_->thread() );
 	HRuntime& rt( t->runtime() );
 	HHuginn::HObjectReference* oref( nullptr );
@@ -467,11 +468,11 @@ void HExpression::get_field(  OExecutionStep const& executionStep_,huginn::HFram
 			);
 		}
 		if ( executionStep_._access == HFrame::ACCESS::VALUE ) {
-			frame_->values().push( v->field( v, fi ) );
+			values.push( v->field( v, fi ) );
 		} else if ( ! v.unique() ) {
 			HHuginn::HObject* o( dynamic_cast<HHuginn::HObject*>( v.raw() ) );
 			if ( o != nullptr ) {
-				frame_->values().push( rt.object_factory()->create_reference( o->field_ref( fi ) ) );
+				values.push( rt.object_factory()->create_reference( o->field_ref( fi ) ) );
 			} else {
 				throw HHuginn::HHuginnRuntimeException( "Assignment to read-only location.", file_id(), p );
 			}
@@ -484,9 +485,9 @@ void HExpression::get_field(  OExecutionStep const& executionStep_,huginn::HFram
 		}
 		int fi( oref->field_index( executionStep_._identifierId ) );
 		if ( fi >= 0 ) {
-			frame_->values().push( oref->field( t, fi, p ) );
+			values.push( oref->field( t, fi, p ) );
 		} else if ( ( executionStep_._identifierId == KEYWORD::CONSTRUCTOR_IDENTIFIER ) && ( oref->reference_class()->type() == HHuginn::HClass::TYPE::BUILTIN ) ) {
-			frame_->values().push(
+			values.push(
 				rt.object_factory()->create_bound_method(
 					hcore::call(
 						&HHuginn::HObject::init_base, _1, _2, _3, _4
@@ -511,12 +512,34 @@ void HExpression::get_field(  OExecutionStep const& executionStep_,huginn::HFram
 		HString const* n( &v->get_class()->name() );
 		if ( v->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) {
 			HHuginn::HFunctionReference* fr( static_cast<HHuginn::HFunctionReference*>( v.raw() ) );
+			n = &rt.identifier_name( fr->identifier_id() );
 			HHuginn::class_t c( rt.get_class( fr->identifier_id() ) );
 			if ( !!c ) {
+				int fi( c->field_index( executionStep_._identifierId ) );
 				n = &c->name();
+				if ( fi < 0 ) {
+					throw HHuginn::HHuginnRuntimeException(
+						"`"_ys
+							.append( *n )
+							.append( "' does not have `" )
+							.append( rt.identifier_name( executionStep_._identifierId ) )
+							.append( "' member (did you mean `" )
+							.append( rt.suggestion( executionStep_._identifierId ) )
+							.append( "'?)." ),
+						file_id(),
+						p
+					);
+				}
+				if ( executionStep_._access == HFrame::ACCESS::REFERENCE ) {
+					throw HHuginn::HHuginnRuntimeException( "Assignment to read-only location.", file_id(), p );
+				}
+				values.push( c->field( fi ) );
+			} else {
+				throw HHuginn::HHuginnRuntimeException( "`"_ys.append( *n ).append( "' is not a compound object." ), file_id(), p );
 			}
+		} else {
+			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( *n ).append( "' is not a compound object." ), file_id(), p );
 		}
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( *n ).append( "' is not a compound object." ), file_id(), p );
 	}
 	return;
 	M_EPILOG
@@ -668,9 +691,6 @@ void HExpression::function_call( OExecutionStep const& executionStep_, HFrame* f
 	HFrame::values_t& values( frame_->values() );
 	HHuginn::HClass const* c( values.top()->get_class() );
 	HHuginn::type_id_t t( c->type_id() );
-	if ( ( t != HHuginn::TYPE::FUNCTION_REFERENCE ) && ( t != HHuginn::TYPE::BOUND_METHOD ) ) {
-		throw HHuginn::HHuginnRuntimeException( "Reference `"_ys.append( c->name() ).append( "' is not a function." ), file_id(), executionStep_._position );
-	}
 	HHuginn::value_t f( yaal::move( values.top() ) );
 	values.pop();
 	HThread* thread( frame_->thread() );
@@ -680,10 +700,14 @@ void HExpression::function_call( OExecutionStep const& executionStep_, HFrame* f
 	frame_->set_position( p );
 	if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
 		values.push( static_cast<HHuginn::HFunctionReference*>( f.raw() )->function()( thread, nullptr, args, p ) );
-	} else {
-		M_ASSERT( t == HHuginn::TYPE::BOUND_METHOD );
+	} else if ( t == HHuginn::TYPE::BOUND_METHOD ) {
 		HHuginn::HClass::HBoundMethod* m( static_cast<HHuginn::HClass::HBoundMethod*>( f.raw() ) );
 		values.push( m->call( thread, args, p ) );
+	} else if ( t == HHuginn::TYPE::METHOD ) {
+		HHuginn::HClass::HMethod* m( static_cast<HHuginn::HClass::HMethod*>( f.raw() ) );
+		values.push( m->call( thread, args, file_id(), p ) );
+	} else {
+		throw HHuginn::HHuginnRuntimeException( "Reference `"_ys.append( c->name() ).append( "' is not a function." ), file_id(), executionStep_._position );
 	}
 	return;
 	M_EPILOG

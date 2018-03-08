@@ -882,8 +882,22 @@ HHuginn::HClass::HMethod::HMethod(
 	return;
 }
 
-HHuginn::function_t const& HHuginn::HClass::HMethod::function( void ) const {
-	return ( _function );
+HHuginn::value_t HHuginn::HClass::HMethod::call( huginn::HThread* thread_, values_t& arguments_, int fileId_, int position_ ) {
+	if ( arguments_.is_empty() ) {
+		throw HHuginn::HHuginnRuntimeException( "Calling method without an object.", fileId_, position_ );
+	}
+	HHuginn::value_t o( yaal::move( arguments_.front() ) );
+	if ( o->get_class() != _juncture ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"Method of class "_ys
+				.append( a_type_name( _juncture ) )
+				.append( " called on an object of type " )
+				.append( a_type_name( o->get_class() ) )
+				.append( "." ), fileId_, position_
+		);
+	}
+	arguments_.erase( arguments_.begin() );
+	return ( _function( thread_, &o, arguments_, position_ ) );
 }
 
 HHuginn::value_t HHuginn::HClass::HMethod::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {

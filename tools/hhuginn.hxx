@@ -555,7 +555,10 @@ protected:
 	HHuginn::function_t _function;
 public:
 	HMethod( HHuginn::HClass const*, HHuginn::function_t const& );
-	HHuginn::function_t const& function( void ) const;
+	HHuginn::value_t call( huginn::HThread*, values_t&, int, int );
+	HHuginn::function_t const& function( void ) const {
+		return ( _function );
+	}
 private:
 	HMethod( HMethod const& ) = delete;
 	HMethod& operator = ( HMethod const& ) = delete;

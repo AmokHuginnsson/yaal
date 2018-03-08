@@ -3,7 +3,6 @@
  * \brief Declaration of huginn::HThread class.
  */
 
-
 #ifndef YAAL_TOOLS_HUGINN_THREAD_HXX_INCLUDED
 #define YAAL_TOOLS_HUGINN_THREAD_HXX_INCLUDED 1
 
