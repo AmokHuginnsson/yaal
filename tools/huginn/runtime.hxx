@@ -8,6 +8,7 @@
 
 #include "tools/hhuginn.hxx"
 #include "tools/huginn/thread.hxx"
+#include "tools/huginn/objectfactory.hxx"
 
 namespace yaal {
 
@@ -168,7 +169,6 @@ public:
 	class_t create_class(
 		identifier_id_t,
 		HHuginn::HClass const*,
-		field_definitions_t const&,
 		yaal::hcore::HString const&,
 		HHuginn::HClass::TYPE = HHuginn::HClass::TYPE::BUILTIN,
 		HHuginn::HClass const* = nullptr,
@@ -177,7 +177,6 @@ public:
 	class_t create_class(
 		yaal::hcore::HString const&,
 		HHuginn::HClass const*,
-		field_definitions_t const&,
 		yaal::hcore::HString const&,
 		HHuginn::HClass::TYPE = HHuginn::HClass::TYPE::BUILTIN,
 		HHuginn::HClass const* = nullptr,
@@ -239,6 +238,12 @@ public:
 	yaal::hcore::HString const& package_name( HHuginn::HClass const* ) const;
 	void copy_text( HRuntime& );
 	HHuginn::class_t make_package( yaal::hcore::HString const&, HRuntime const& );
+	template<typename... T>
+	HHuginn::value_t create_method( HHuginn::HClass const* juncture_, T&&... args_ ) {
+		return (
+			_objectFactory->create_method( juncture_, yaal::hcore::call( yaal::forward<T>( args_ )..., yaal::hcore::_1, yaal::hcore::_2, yaal::hcore::_3, yaal::hcore::_4 ) )
+		);
+	}
 	void set_incremental_frame( huginn::HThread::frame_t const& );
 	huginn::HThread::frame_t const& incremental_frame( void ) const;
 	call_stack_t get_call_stack( HThread* );

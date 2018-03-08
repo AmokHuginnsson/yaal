@@ -558,30 +558,31 @@ HHuginn::class_t HMatrix::get_class( HRuntime* runtime_, HHuginn::HClass const* 
 		runtime_->create_class(
 			"Matrix",
 			nullptr,
-			HHuginn::field_definitions_t{
-				{ "columns",   runtime_->object_factory()->create_method( hcore::call( &HMatrix::columns, _1, _2, _3, _4 ) ),   "get column dimension of this `Matrix`" },
-				{ "rows",      runtime_->object_factory()->create_method( hcore::call( &HMatrix::rows, _1, _2, _3, _4 ) ),      "get row dimension of this `Matrix`" },
-				{ "get",       runtime_->object_factory()->create_method( hcore::call( &HMatrix::get, _1, _2, _3, _4 ) ),       "( *row*, *column* ) - get numeric value present at given *row* and *column* in this `Matrix`" },
-				{ "set",       runtime_->object_factory()->create_method( hcore::call( &HMatrix::set, _1, _2, _3, _4 ) ),       "( *row*, *column*, *value* ) - set given numeric *value* at given *row* and *column* in this `Matrix`" },
-				{ "add",       runtime_->object_factory()->create_method( hcore::call( &HMatrix::add, _1, _2, _3, _4 ) ),       "( *other* ) - add *other* `Matrix` to this `Matrix`" },
-				{ "subtract",  runtime_->object_factory()->create_method( hcore::call( &HMatrix::subtract, _1, _2, _3, _4 ) ),  "( *other* ) - subtract *other* `Matrix` from this `Matrix`" },
-				{ "multiply",  runtime_->object_factory()->create_method( hcore::call( &HMatrix::multiply, _1, _2, _3, _4 ) ),  "( *other* ) - multiply this `Matrix` by *other* `Matrix`" },
-				{ "det",       runtime_->object_factory()->create_method( hcore::call( &HMatrix::det, _1, _2, _3, _4 ) ),       "find value of determinant of this `Matrix`" },
-				{ "modulus",   runtime_->object_factory()->create_method( hcore::call( &HMatrix::det, _1, _2, _3, _4 ) ),       "find value of determinant of this `Matrix`" },
-				{ "scale",     runtime_->object_factory()->create_method( hcore::call( &HMatrix::scale, _1, _2, _3, _4 ) ),     "( *factor* ) - scale all values in this `Matrix` by given *factor*" },
-				{ "scale_to",  runtime_->object_factory()->create_method( hcore::call( &HMatrix::scale_to, _1, _2, _3, _4 ) ),  "( *cap* ) - rescale values in this `Matrix` so maximum of its values is equal to *cap*" },
-				{ "inverse",   runtime_->object_factory()->create_method( hcore::call( &HMatrix::inverse, _1, _2, _3, _4 ) ),   "find *inverse* of this `Matrix`" },
-				{ "transpose", runtime_->object_factory()->create_method( hcore::call( &HMatrix::transpose, _1, _2, _3, _4 ) ), "create transposed version of this `Matrix`" },
-				{ "apply",     runtime_->object_factory()->create_method( hcore::call( &HMatrix::apply, _1, _2, _3, _4 ) ),     "( *fun* ) - apply unary function *fun* over all values in this `Matrix`" },
-				{ "negate",    runtime_->object_factory()->create_method( hcore::call( &HMatrix::negate, _1, _2, _3, _4 ) ),    "get negation of this `Matrix`" },
-				{ "to_string", runtime_->object_factory()->create_method( hcore::call( &HMatrix::to_string, _1, _2, _3, _4 ) ), "get string representation of this `Matrix`" }
-			},
 			"The `Matrix` class provides mathematical concept of number matrices. It supports operations of addition, multiplication, subtraction, scaling, inversion and transposition.",
 			HHuginn::HClass::TYPE::BUILTIN,
 			origin_,
 			&HMatrix::create_instance
 		)
 	);
+	HHuginn::field_definitions_t fd{
+		{ "columns",   runtime_->create_method( c.raw(), &HMatrix::columns ),   "get column dimension of this `Matrix`" },
+		{ "rows",      runtime_->create_method( c.raw(), &HMatrix::rows ),      "get row dimension of this `Matrix`" },
+		{ "get",       runtime_->create_method( c.raw(), &HMatrix::get ),       "( *row*, *column* ) - get numeric value present at given *row* and *column* in this `Matrix`" },
+		{ "set",       runtime_->create_method( c.raw(), &HMatrix::set ),       "( *row*, *column*, *value* ) - set given numeric *value* at given *row* and *column* in this `Matrix`" },
+		{ "add",       runtime_->create_method( c.raw(), &HMatrix::add ),       "( *other* ) - add *other* `Matrix` to this `Matrix`" },
+		{ "subtract",  runtime_->create_method( c.raw(), &HMatrix::subtract ),  "( *other* ) - subtract *other* `Matrix` from this `Matrix`" },
+		{ "multiply",  runtime_->create_method( c.raw(), &HMatrix::multiply ),  "( *other* ) - multiply this `Matrix` by *other* `Matrix`" },
+		{ "det",       runtime_->create_method( c.raw(), &HMatrix::det ),       "find value of determinant of this `Matrix`" },
+		{ "modulus",   runtime_->create_method( c.raw(), &HMatrix::det ),       "find value of determinant of this `Matrix`" },
+		{ "scale",     runtime_->create_method( c.raw(), &HMatrix::scale ),     "( *factor* ) - scale all values in this `Matrix` by given *factor*" },
+		{ "scale_to",  runtime_->create_method( c.raw(), &HMatrix::scale_to ),  "( *cap* ) - rescale values in this `Matrix` so maximum of its values is equal to *cap*" },
+		{ "inverse",   runtime_->create_method( c.raw(), &HMatrix::inverse ),   "find *inverse* of this `Matrix`" },
+		{ "transpose", runtime_->create_method( c.raw(), &HMatrix::transpose ), "create transposed version of this `Matrix`" },
+		{ "apply",     runtime_->create_method( c.raw(), &HMatrix::apply ),     "( *fun* ) - apply unary function *fun* over all values in this `Matrix`" },
+		{ "negate",    runtime_->create_method( c.raw(), &HMatrix::negate ),    "get negation of this `Matrix`" },
+		{ "to_string", runtime_->create_method( c.raw(), &HMatrix::to_string ), "get string representation of this `Matrix`" }
+	};
+	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c, HHuginn::ACCESS::PUBLIC );
 	return ( c );
 	M_EPILOG

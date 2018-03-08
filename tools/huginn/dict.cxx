@@ -94,7 +94,6 @@ public:
 			runtime_->create_class(
 				"KeyValuesDictView",
 				nullptr,
-				HHuginn::field_definitions_t{},
 				"The `KeyValuesDictView` class represents *lazy* *iterable* view of a `dict` consisted of key-value pairs."
 			)
 		);
@@ -175,7 +174,6 @@ public:
 			runtime_->create_class(
 				"ReversedDictView",
 				nullptr,
-				HHuginn::field_definitions_t{},
 				"The `ReversedDictView` class represents *lazy* *iterable* reversed view of a `dict`."
 			)
 		);
@@ -325,14 +323,12 @@ public:
 		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_,
 		HHuginn::identifier_id_t identifierId_,
-		HHuginn::field_definitions_t const& fieldDefinitions_,
 		yaal::hcore::HString const& doc_
 	) : HHuginn::HClass(
 			runtime_,
 			typeId_,
 			identifierId_,
 			nullptr,
-			fieldDefinitions_,
 			doc_
 		)
 		, _keyValuesDictViewClass( HKeyValuesDictView::get_class( runtime_ ) )
@@ -360,21 +356,22 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			runtime_,
 			type_id( HHuginn::TYPE::DICT ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::DICT ) ),
-			HHuginn::field_definitions_t{
-				{ "has_key", objectFactory_->create_method( hcore::call( &dict::has_key, _1, _2, _3, _4 ) ), "( *key* ) - tell if given *key* can be found in this `dict`" },
-				{ "get",     objectFactory_->create_method( hcore::call( &dict::get, _1, _2, _3, _4 ) ),     "( *key*, *default* ) - get value for given *key* from this `dict`, or *default* if given *key* is not present in the `dict`" },
-				{ "erase",   objectFactory_->create_method( hcore::call( &dict::erase, _1, _2, _3, _4 ) ),   "( *key* ) - remove given *key* from this `dict`" },
-				{ "ensure",  objectFactory_->create_method( hcore::call( &dict::ensure, _1, _2, _3, _4 ) ),  "( *key*, *default* ) - get value for given *key* from this `dict`, if given *key* is not present in the `dict` insert *default* into this `dict` before returning it" },
-				{ "clear",   objectFactory_->create_method( hcore::call( &dict::clear, _1, _2, _3, _4 ) ),   "erase `dict`'s content, `dict` becomes empty" },
-				{ "add",     objectFactory_->create_method( hcore::call( &dict::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `dict` with key/value pairs from *other* `dict`" },
-				{ "update",  objectFactory_->create_method( hcore::call( &dict::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `dict` with key/value pairs from *other* `dict`" },
-				{ "hash",    objectFactory_->create_method( hcore::call( &dict::hash, _1, _2, _3, _4 ) ),    "calculate hash value for this `dict`" },
-				{ "equals",  objectFactory_->create_method( hcore::call( &dict::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `dict` has the same content" },
-				{ "values",  objectFactory_->create_method( hcore::call( &dict::values, _1, _2, _3, _4 ) ),  "get key-value pairs view of this `dict`" }
-			},
 			"The `dict` is a collection providing a sorted key to value map. It supports operations of iteration, key-value insertion, key removal and key search. The keys stored in given `dict` instance must be of uniform type."
 		)
 	);
+	HHuginn::field_definitions_t fd{
+		{ "has_key", objectFactory_->create_method( c.raw(), &dict::has_key ), "( *key* ) - tell if given *key* can be found in this `dict`" },
+		{ "get",     objectFactory_->create_method( c.raw(), &dict::get ),     "( *key*, *default* ) - get value for given *key* from this `dict`, or *default* if given *key* is not present in the `dict`" },
+		{ "erase",   objectFactory_->create_method( c.raw(), &dict::erase ),   "( *key* ) - remove given *key* from this `dict`" },
+		{ "ensure",  objectFactory_->create_method( c.raw(), &dict::ensure ),  "( *key*, *default* ) - get value for given *key* from this `dict`, if given *key* is not present in the `dict` insert *default* into this `dict` before returning it" },
+		{ "clear",   objectFactory_->create_method( c.raw(), &dict::clear ),   "erase `dict`'s content, `dict` becomes empty" },
+		{ "add",     objectFactory_->create_method( c.raw(), &dict::update ),  "( *other* ) - update content of this `dict` with key/value pairs from *other* `dict`" },
+		{ "update",  objectFactory_->create_method( c.raw(), &dict::update ),  "( *other* ) - update content of this `dict` with key/value pairs from *other* `dict`" },
+		{ "hash",    objectFactory_->create_method( c.raw(), &dict::hash ),    "calculate hash value for this `dict`" },
+		{ "equals",  objectFactory_->create_method( c.raw(), &dict::equals ),  "( *other* ) - test if *other* `dict` has the same content" },
+		{ "values",  objectFactory_->create_method( c.raw(), &dict::values ),  "get key-value pairs view of this `dict`" }
+	};
+	c->redefine( nullptr, fd );
 	return ( c );
 	M_EPILOG
 }

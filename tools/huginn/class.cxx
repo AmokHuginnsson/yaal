@@ -24,7 +24,6 @@ HHuginn::HClass::HClass(
 	type_id_t typeId_,
 	identifier_id_t identifierId_,
 	HClass const* super_,
-	field_definitions_t const& fieldDefinitions_,
 	yaal::hcore::HString const& doc_,
 	TYPE type_,
 	HClass const* origin_,
@@ -50,7 +49,6 @@ HHuginn::HClass::HClass(
 	, _origin( origin_ )
 	, _runtime( runtime_ ) {
 	M_PROLOG
-	redefine( super_, fieldDefinitions_ );
 	return;
 	M_EPILOG
 }
@@ -107,6 +105,7 @@ void HHuginn::HClass::redefine( HClass const* super_, field_definitions_t const&
 	if ( has_builtin_base() ) {
 		for ( HHuginn::value_t& v : _fieldDefinitions ) {
 			v = _runtime->object_factory()->create_method(
+				this,
 				hcore::call(
 					&HHuginn::HClass::base_class_not_initialized,
 					this, _1, _2, _3, _4

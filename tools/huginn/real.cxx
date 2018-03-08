@@ -30,7 +30,6 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* ) {
 			type_id( HHuginn::TYPE::REAL ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::REAL ) ),
 			nullptr,
-			HHuginn::field_definitions_t{},
 			"The `real` is a scalar type that is used to represent and operate on floating point numbers. "
 			"It supports basic operations of addition, subtraction, multiplication, division, modulo, power and comparisons, "
 			"it can also be used as an argument in functions and algorithms from Mathematics package. "

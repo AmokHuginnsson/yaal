@@ -120,19 +120,20 @@ HHuginn::value_t HOperatingSystemCreator::do_new_instance( HRuntime* runtime_ ) 
 		runtime_->create_class(
 			"OperatingSystem",
 			nullptr,
-			HHuginn::field_definitions_t{
-				{ "env",    runtime_->object_factory()->create_method( hcore::call( &HOperatingSystem::env, _1, _2, _3, _4 ) ),   "( *name* ) - get value of an environment variable named *name*" },
-				{ "exec",   runtime_->object_factory()->create_method( hcore::call( &HOperatingSystem::exec, _1, _2, _3, _4 ) ),  "( *prog*, *args*... ) - replace current process space with running image of *prog* providing it with *args* arguments" },
-				{ "exit",   runtime_->object_factory()->create_method( hcore::call( &HOperatingSystem::exit, _1, _2, _3, _4 ) ),  "( *status* ) - exit the interpreter with the *status*" },
-				{ "spawn",  runtime_->object_factory()->create_method( hcore::call( &HOperatingSystem::spawn, _1, _2, _3, _4 ) ), "( *prog*, *args*... ) - start a subprocess *prog* providing it with *args* arguments" },
-				{ "stdin",  runtime_->object_factory()->create_method( hcore::call( &HOperatingSystem::stream, "OperatingSystem.stdin", &runtime_->huginn()->input_stream(), _1, _2, _3, _4 ) ),   "get access to interpreter's standard input stream" },
-				{ "stdout", runtime_->object_factory()->create_method( hcore::call( &HOperatingSystem::stream, "OperatingSystem.stdout", &runtime_->huginn()->output_stream(), _1, _2, _3, _4 ) ), "get access to interpreter's standard output stream" },
-				{ "stderr", runtime_->object_factory()->create_method( hcore::call( &HOperatingSystem::stream, "OperatingSystem.stderr", &runtime_->huginn()->error_stream(), _1, _2, _3, _4 ) ),  "get access to interpreter's standard error stream" },
-				{ "stdlog", runtime_->object_factory()->create_method( hcore::call( &HOperatingSystem::stream, "OperatingSystem.stdlog", &runtime_->huginn()->log_stream(), _1, _2, _3, _4 ) ),    "get access to interpreter's standard log stream" }
-			},
 			"The `OperatingSystem` package provides an interface to various operating system functionalities."
 		)
 	);
+	HHuginn::field_definitions_t fd{
+		{ "env",    runtime_->create_method( c.raw(), &HOperatingSystem::env ),   "( *name* ) - get value of an environment variable named *name*" },
+		{ "exec",   runtime_->create_method( c.raw(), &HOperatingSystem::exec ),  "( *prog*, *args*... ) - replace current process space with running image of *prog* providing it with *args* arguments" },
+		{ "exit",   runtime_->create_method( c.raw(), &HOperatingSystem::exit ),  "( *status* ) - exit the interpreter with the *status*" },
+		{ "spawn",  runtime_->create_method( c.raw(), &HOperatingSystem::spawn ), "( *prog*, *args*... ) - start a subprocess *prog* providing it with *args* arguments" },
+		{ "stdin",  runtime_->create_method( c.raw(), &HOperatingSystem::stream, "OperatingSystem.stdin", &runtime_->huginn()->input_stream() ),   "get access to interpreter's standard input stream" },
+		{ "stdout", runtime_->create_method( c.raw(), &HOperatingSystem::stream, "OperatingSystem.stdout", &runtime_->huginn()->output_stream() ), "get access to interpreter's standard output stream" },
+		{ "stderr", runtime_->create_method( c.raw(), &HOperatingSystem::stream, "OperatingSystem.stderr", &runtime_->huginn()->error_stream() ),  "get access to interpreter's standard error stream" },
+		{ "stdlog", runtime_->create_method( c.raw(), &HOperatingSystem::stream, "OperatingSystem.stdlog", &runtime_->huginn()->log_stream() ),    "get access to interpreter's standard log stream" }
+	};
+	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );
 	return ( runtime_->object_factory()->create<HOperatingSystem>( c.raw() ) );
 	M_EPILOG

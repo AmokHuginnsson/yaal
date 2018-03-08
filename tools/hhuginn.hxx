@@ -457,7 +457,7 @@ private:
 	HClass const* _origin;
 	huginn::HRuntime* _runtime;
 public:
-	HClass( huginn::HRuntime*, type_id_t, identifier_id_t, HClass const*, field_definitions_t const&, yaal::hcore::HString const&, TYPE = TYPE::BUILTIN, HClass const* = nullptr, create_instance_t = nullptr );
+	HClass( huginn::HRuntime*, type_id_t, identifier_id_t, HClass const*, yaal::hcore::HString const&, TYPE = TYPE::BUILTIN, HClass const* = nullptr, create_instance_t = nullptr );
 	HClass( HHuginn::TYPE, HHuginn::identifier_id_t, yaal::hcore::HString const& );
 	virtual ~HClass( void ) {
 	}
@@ -551,10 +551,11 @@ class HHuginn::HClass::HMethod : public HHuginn::HValue {
 	typedef HHuginn::HClass::HMethod this_type;
 	typedef HHuginn::HValue base_type;
 protected:
+	HHuginn::HClass const* _juncture;
 	HHuginn::function_t _function;
 public:
+	HMethod( HHuginn::HClass const* /* used by HBoundMethod */, HHuginn::HClass const*, HHuginn::function_t const& );
 	HMethod( HHuginn::HClass const*, HHuginn::function_t const& );
-	HMethod( HHuginn::function_t const& );
 	HHuginn::function_t const& function( void ) const;
 private:
 	HMethod( HMethod const& ) = delete;

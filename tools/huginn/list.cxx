@@ -84,7 +84,6 @@ public:
 			runtime_->create_class(
 				"ReversedListView",
 				nullptr,
-				HHuginn::field_definitions_t{},
 				"The `ReversedListView` class represents *lazy* *iterable* reversed view of a `list`."
 			)
 		);
@@ -295,24 +294,25 @@ public:
 			huginn::type_id( HHuginn::TYPE::LIST ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::LIST ) ),
 			nullptr,
-			HHuginn::field_definitions_t{
-				{ "push",   objectFactory_->create_method( hcore::call( &list::push, _1, _2, _3, _4 ) ),   "( *elem* ) - add new *elem* at the end of the `list`, `list` grows in size by 1" },
-				{ "pop",    objectFactory_->create_method( hcore::call( &list::pop, _1, _2, _3, _4 ) ),    "remove last element from the `list`, `list` shrinks by 1" },
-				{ "add",    objectFactory_->create_method( hcore::call( &list::append, _1, _2, _3, _4 ) ), "( *other* ) - append all elements from *other* collection at the end of this `list`" },
-				{ "append", objectFactory_->create_method( hcore::call( &list::append, _1, _2, _3, _4 ) ), "( *other* ) - append all elements from *other* collection at the end of this `list`" },
-				{ "insert", objectFactory_->create_method( hcore::call( &list::insert, _1, _2, _3, _4 ) ), "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
-				{ "resize", objectFactory_->create_method( hcore::call( &list::resize, _1, _2, _3, _4 ) ), "( *size*, *elem* ) - resize `list` to given *size* optionally filling new elements with **copies** of value *elem*" },
-				{ "clear",  objectFactory_->create_method( hcore::call( &list::clear, _1, _2, _3, _4 ) ),  "erase `list`'s content, `list` becomes empty" },
-				{ "sort",   objectFactory_->create_method( hcore::call( &list::sort, _1, _2, _3, _4 ) ),   "( [*callable*] ) - in-place sort this `list`, using *callable* to retrieve keys for element comparison" },
-				{ "hash",   objectFactory_->create_method( hcore::call( &list::hash, _1, _2, _3, _4 ) ),   "calculate hash value for this `list`" },
-				{ "less",   objectFactory_->create_method( hcore::call( &list::less, _1, _2, _3, _4 ) ),   "( *other* ) - test if this `list` comes lexicographically before *other* `list`" },
-				{ "equals", objectFactory_->create_method( hcore::call( &list::equals, _1, _2, _3, _4 ) ), "( *other* ) - test if *other* `list` has the same content" }
-			},
 			"The `list` is a collection type that is used to represent and operate on `list` of values. "
 			"It supports basic subscript and range operators. "
 			"It also supports efficient operations of addition and removal of its elements from its (right) end."
 		)
 		, _reversedListClass( HReversedList::get_class( runtime_ ) ) {
+		HHuginn::field_definitions_t fd{
+			{ "push",   objectFactory_->create_method( this, &list::push ),   "( *elem* ) - add new *elem* at the end of the `list`, `list` grows in size by 1" },
+			{ "pop",    objectFactory_->create_method( this, &list::pop ),    "remove last element from the `list`, `list` shrinks by 1" },
+			{ "add",    objectFactory_->create_method( this, &list::append ), "( *other* ) - append all elements from *other* collection at the end of this `list`" },
+			{ "append", objectFactory_->create_method( this, &list::append ), "( *other* ) - append all elements from *other* collection at the end of this `list`" },
+			{ "insert", objectFactory_->create_method( this, &list::insert ), "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
+			{ "resize", objectFactory_->create_method( this, &list::resize ), "( *size*, *elem* ) - resize `list` to given *size* optionally filling new elements with **copies** of value *elem*" },
+			{ "clear",  objectFactory_->create_method( this, &list::clear ),  "erase `list`'s content, `list` becomes empty" },
+			{ "sort",   objectFactory_->create_method( this, &list::sort ),   "( [*callable*] ) - in-place sort this `list`, using *callable* to retrieve keys for element comparison" },
+			{ "hash",   objectFactory_->create_method( this, &list::hash ),   "calculate hash value for this `list`" },
+			{ "less",   objectFactory_->create_method( this, &list::less ),   "( *other* ) - test if this `list` comes lexicographically before *other* `list`" },
+			{ "equals", objectFactory_->create_method( this, &list::equals ), "( *other* ) - test if *other* `list` has the same content" }
+		};
+		redefine( nullptr, fd );
 		return;
 	}
 	HHuginn::HClass const* reversed_list_class( void ) const {

@@ -96,13 +96,14 @@ HHuginn::value_t HNetworkCreator::do_new_instance( HRuntime* runtime_ ) {
 		runtime_->create_class(
 			"Network",
 			nullptr,
-			HHuginn::field_definitions_t{
-				{ "connect", runtime_->object_factory()->create_method( hcore::call( &HNetwork::connect, _1, _2, _3, _4 ) ), "( *host*, *port* ) - create a TCP connection to given *host* at given *port*" },
-				{ "resolve", runtime_->object_factory()->create_method( hcore::call( &HNetwork::resolve, _1, _2, _3, _4 ) ), "( *hostName* ) - resolve IP address of given *hostName*" }
-			},
 			"The `Network` package provides access to various networking related functionalities."
 		)
 	);
+	HHuginn::field_definitions_t fd{
+		{ "connect", runtime_->create_method( c.raw(), &HNetwork::connect ), "( *host*, *port* ) - create a TCP connection to given *host* at given *port*" },
+		{ "resolve", runtime_->create_method( c.raw(), &HNetwork::resolve ), "( *hostName* ) - resolve IP address of given *hostName*" }
+	};
+	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );
 	return ( runtime_->object_factory()->create<HNetwork>( c.raw() ) );
 	M_EPILOG

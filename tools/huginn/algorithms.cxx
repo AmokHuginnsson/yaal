@@ -350,21 +350,22 @@ HHuginn::value_t HAlgorithmsCreator::do_new_instance( HRuntime* runtime_ ) {
 		runtime_->create_class(
 			"Algorithms",
 			nullptr,
-			HHuginn::field_definitions_t{
-				{ "filter",      runtime_->object_factory()->create_method( hcore::call( &HAlgorithms::filter, _1, _2, _3, _4 ) ),      "( *iterable*, *callable* ) - create `Filter` object that iterates over *iterable* and returns only elements for which *callable* returns `boolean` equal `true`" },
-				{ "map",         runtime_->object_factory()->create_method( hcore::call( &HAlgorithms::map, _1, _2, _3, _4 ) ),         "( *iterable*, *callable* ) - create `Mapper` object that maps elements from *iterable* transforming each of them with *callable* when iterated over" },
-				{ "enumerate",   runtime_->object_factory()->create_method( hcore::call( &HAlgorithms::enumerate, _1, _2, _3, _4 ) ),   "( *iterable*[, *start*] ) - create `Enumerator` object that counts elements from *iterable* when iterated over" },
-				{ "materialize", runtime_->object_factory()->create_method( hcore::call( &HAlgorithms::materialize, _1, _2, _3, _4 ) ), "( *iterable*, *colType* ) - copy elements from *iterable* to newly created instance of *colType*" },
-				{ "reduce",      runtime_->object_factory()->create_method( hcore::call( &HAlgorithms::reduce, _1, _2, _3, _4 ) ),      "( *iterable*, *callable* [, *init*] ) - iteratively combine all elements from *iterable* using *callable(x,y)* and starting value of *init*" },
-				{ "range",       runtime_->object_factory()->create_method( hcore::call( &HAlgorithms::range, _1, _2, _3, _4 ) ),       "( [*from*,] *until* [, *step*] ) - produce iterable sequence of `integer` values ranging from *from* up until *until* using *step* increments" },
-				{ "min",         runtime_->object_factory()->create_method( hcore::call( &HAlgorithms::min, _1, _2, _3, _4 ) ),         "( *arg1*, *arg2*[, argN...] ) - find minimum element from given set" },
-				{ "max",         runtime_->object_factory()->create_method( hcore::call( &HAlgorithms::max, _1, _2, _3, _4 ) ),         "( *arg1*, *arg2*[, argN...] ) - find maximum element from given set" },
-				{ "sorted",      runtime_->object_factory()->create_method( hcore::call( &HAlgorithms::sorted, _1, _2, _3, _4 ) ),      "( *iterable* [, *callable*] ) - return content of *iterable* as sorted `list`, using *callable* to retrieve keys for element comparison" },
-				{ "reversed",    runtime_->object_factory()->create_method( hcore::call( &HAlgorithms::reversed, _1, _2, _3, _4 ) ),    "( *coll* ) - create reversed iterable view of a *coll* materialized collection" }
-			},
 			"The `Algorithms` package contains basic low-level algorithms."
 		)
 	);
+	HHuginn::field_definitions_t fd{
+		{ "filter",      runtime_->create_method( c.raw(), &HAlgorithms::filter ),      "( *iterable*, *callable* ) - create `Filter` object that iterates over *iterable* and returns only elements for which *callable* returns `boolean` equal `true`" },
+		{ "map",         runtime_->create_method( c.raw(), &HAlgorithms::map ),         "( *iterable*, *callable* ) - create `Mapper` object that maps elements from *iterable* transforming each of them with *callable* when iterated over" },
+		{ "enumerate",   runtime_->create_method( c.raw(), &HAlgorithms::enumerate ),   "( *iterable*[, *start*] ) - create `Enumerator` object that counts elements from *iterable* when iterated over" },
+		{ "materialize", runtime_->create_method( c.raw(), &HAlgorithms::materialize ), "( *iterable*, *colType* ) - copy elements from *iterable* to newly created instance of *colType*" },
+		{ "reduce",      runtime_->create_method( c.raw(), &HAlgorithms::reduce ),      "( *iterable*, *callable* [, *init*] ) - iteratively combine all elements from *iterable* using *callable(x,y)* and starting value of *init*" },
+		{ "range",       runtime_->create_method( c.raw(), &HAlgorithms::range ),       "( [*from*,] *until* [, *step*] ) - produce iterable sequence of `integer` values ranging from *from* up until *until* using *step* increments" },
+		{ "min",         runtime_->create_method( c.raw(), &HAlgorithms::min ),         "( *arg1*, *arg2*[, argN...] ) - find minimum element from given set" },
+		{ "max",         runtime_->create_method( c.raw(), &HAlgorithms::max ),         "( *arg1*, *arg2*[, argN...] ) - find maximum element from given set" },
+		{ "sorted",      runtime_->create_method( c.raw(), &HAlgorithms::sorted ),      "( *iterable* [, *callable*] ) - return content of *iterable* as sorted `list`, using *callable* to retrieve keys for element comparison" },
+		{ "reversed",    runtime_->create_method( c.raw(), &HAlgorithms::reversed ),    "( *coll* ) - create reversed iterable view of a *coll* materialized collection" }
+	};
+	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );
 	return ( runtime_->object_factory()->create<HAlgorithms>( c.raw() ) );
 	M_EPILOG

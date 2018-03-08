@@ -201,26 +201,27 @@ HHuginn::class_t HComplex::get_class( HRuntime* runtime_, HHuginn::HClass const*
 		runtime_->create_class(
 			"Complex",
 			nullptr,
-			HHuginn::field_definitions_t{
-				{ "real",      runtime_->object_factory()->create_method( hcore::call( &HComplex::real, _1, _2, _3, _4 ) ),      "get real part of this `Complex` number" },
-				{ "imaginary", runtime_->object_factory()->create_method( hcore::call( &HComplex::imaginary, _1, _2, _3, _4 ) ), "get imaginary part of this `Complex` number" },
-				{ "get",       runtime_->object_factory()->create_method( hcore::call( &HComplex::get, _1, _2, _3, _4 ) ),       "get both real and imaginary part of this `Complex`" },
-				{ "set",       runtime_->object_factory()->create_method( hcore::call( &HComplex::set, _1, _2, _3, _4 ) ),       "( *real*, *imaginary* ) - set both real and imaginary part of this `Complex` number" },
-				{ "add",       runtime_->object_factory()->create_method( hcore::call( &HComplex::add, _1, _2, _3, _4 ) ),       "( *other* ) - add *other* `Complex` to this `Complex` number" },
-				{ "subtract",  runtime_->object_factory()->create_method( hcore::call( &HComplex::subtract, _1, _2, _3, _4 ) ),  "( *other* ) - subtract *other* `Complex` from this `Complex` number" },
-				{ "multiply",  runtime_->object_factory()->create_method( hcore::call( &HComplex::multiply, _1, _2, _3, _4 ) ),  "( *other* ) - multiply this `Complex` by *other* `Complex` number" },
-				{ "divide",    runtime_->object_factory()->create_method( hcore::call( &HComplex::divide, _1, _2, _3, _4 ) ),    "( *other* ) - divide this `Complex` by *other* `Complex` number" },
-				{ "modulus",   runtime_->object_factory()->create_method( hcore::call( &HComplex::modulus, _1, _2, _3, _4 ) ),   "get modulus value of this `Complex` number" },
-				{ "argument",  runtime_->object_factory()->create_method( hcore::call( &HComplex::argument, _1, _2, _3, _4 ) ),  "get argument value of this `Complex` number" },
-				{ "negate",    runtime_->object_factory()->create_method( hcore::call( &HComplex::negate, _1, _2, _3, _4 ) ),    "get negation of this `Complex` number" },
-				{ "to_string", runtime_->object_factory()->create_method( hcore::call( &HComplex::to_string, _1, _2, _3, _4 ) ), "get string representation of this `Complex` number" }
-			},
 			"The `Complex` class provides mathematical concept of complex numbers. It supports operations of addition, multiplication, subtraction, division, modulus and argument.",
 			HHuginn::HClass::TYPE::BUILTIN,
 			origin_,
 			&HComplex::create_instance
 		)
 	);
+	HHuginn::field_definitions_t fd{
+		{ "real",      runtime_->create_method( c.raw(), &HComplex::real ),      "get real part of this `Complex` number" },
+		{ "imaginary", runtime_->create_method( c.raw(), &HComplex::imaginary ), "get imaginary part of this `Complex` number" },
+		{ "get",       runtime_->create_method( c.raw(), &HComplex::get ),       "get both real and imaginary part of this `Complex`" },
+		{ "set",       runtime_->create_method( c.raw(), &HComplex::set ),       "( *real*, *imaginary* ) - set both real and imaginary part of this `Complex` number" },
+		{ "add",       runtime_->create_method( c.raw(), &HComplex::add ),       "( *other* ) - add *other* `Complex` to this `Complex` number" },
+		{ "subtract",  runtime_->create_method( c.raw(), &HComplex::subtract ),  "( *other* ) - subtract *other* `Complex` from this `Complex` number" },
+		{ "multiply",  runtime_->create_method( c.raw(), &HComplex::multiply ),  "( *other* ) - multiply this `Complex` by *other* `Complex` number" },
+		{ "divide",    runtime_->create_method( c.raw(), &HComplex::divide ),    "( *other* ) - divide this `Complex` by *other* `Complex` number" },
+		{ "modulus",   runtime_->create_method( c.raw(), &HComplex::modulus ),   "get modulus value of this `Complex` number" },
+		{ "argument",  runtime_->create_method( c.raw(), &HComplex::argument ),  "get argument value of this `Complex` number" },
+		{ "negate",    runtime_->create_method( c.raw(), &HComplex::negate ),    "get negation of this `Complex` number" },
+		{ "to_string", runtime_->create_method( c.raw(), &HComplex::to_string ), "get string representation of this `Complex` number" }
+	};
+	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c, HHuginn::ACCESS::PUBLIC );
 	return ( c );
 	M_EPILOG

@@ -128,29 +128,30 @@ HHuginn::class_t HTime::get_class( HRuntime* runtime_ ) {
 		runtime_->create_class(
 			"Time",
 			nullptr,
-			HHuginn::field_definitions_t{
-				{ "mod_year",     runtime_->object_factory()->create_method( hcore::call( &HTime::mod, "Time.mod_year",   &hcore::HTime::mod_year, _1, _2, _3, _4 ) ),   "( *num* ) - modify time value by *num* of years" },
-				{ "mod_month",    runtime_->object_factory()->create_method( hcore::call( &HTime::mod, "Time.mod_month",  &hcore::HTime::mod_month, _1, _2, _3, _4 ) ),  "( *num* ) - modify time value by *num* of months" },
-				{ "mod_day",      runtime_->object_factory()->create_method( hcore::call( &HTime::mod, "Time.mod_day",    &hcore::HTime::mod_day, _1, _2, _3, _4 ) ),    "( *num* ) - modify time value by *num* of days" },
-				{ "mod_hour",     runtime_->object_factory()->create_method( hcore::call( &HTime::mod, "Time.mod_hour",   &hcore::HTime::mod_hour, _1, _2, _3, _4 ) ),   "( *num* ) - modify time value by *num* of hours" },
-				{ "mod_minute",   runtime_->object_factory()->create_method( hcore::call( &HTime::mod, "Time.mod_minute", &hcore::HTime::mod_minute, _1, _2, _3, _4 ) ), "( *num* ) - modify time value by *num* of minutes" },
-				{ "mod_second",   runtime_->object_factory()->create_method( hcore::call( &HTime::mod, "Time.mod_second", &hcore::HTime::mod_second, _1, _2, _3, _4 ) ), "( *num* ) - modify time value by *num* of seconds" },
-				{ "set_time",     runtime_->object_factory()->create_method( hcore::call( &HTime::set, "Time.set_time",   &hcore::HTime::set_time, _1, _2, _3, _4 ) ),   "( *hh*, *mm*, *ss* ) - set time value to *hh*:*mm*:*ss*" },
-				{ "set_date",     runtime_->object_factory()->create_method( hcore::call( &HTime::set, "Time.set_date",   &hcore::HTime::set_date, _1, _2, _3, _4 ) ),   "( *YYYY*, *MM*, *DD* ) - set date value to *YYYY*-*MM*-*DD*" },
-				{ "get_year",     runtime_->object_factory()->create_method( hcore::call( &HTime::get, "Time.get_year",   &hcore::HTime::get_year, _1, _2, _3, _4 ) ),   "get number of years from time" },
-				{ "get_day",      runtime_->object_factory()->create_method( hcore::call( &HTime::get, "Time.get_day",    &hcore::HTime::get_day, _1, _2, _3, _4 ) ),    "get number of days from time" },
-				{ "get_hour",     runtime_->object_factory()->create_method( hcore::call( &HTime::get, "Time.get_hour",   &hcore::HTime::get_hour, _1, _2, _3, _4 ) ),   "get number of hours from time" },
-				{ "get_minute",   runtime_->object_factory()->create_method( hcore::call( &HTime::get, "Time.get_minute", &hcore::HTime::get_minute, _1, _2, _3, _4 ) ), "get number of minutes from time" },
-				{ "get_second",   runtime_->object_factory()->create_method( hcore::call( &HTime::get, "Time.get_second", &hcore::HTime::get_second, _1, _2, _3, _4 ) ), "get number of seconds from time" },
-				{ "set_datetime", runtime_->object_factory()->create_method( hcore::call( &HTime::set_datetime, _1, _2, _3, _4 ) ), "( *YYYY*, *MM*, *DD*, *hh*, *mm*, *ss* ) - set date value to *YYYY*-*MM*-*DD* *hh*:*mm*:*ss*" },
-				{ "get_month",    runtime_->object_factory()->create_method( hcore::call( &HTime::get_month, _1, _2, _3, _4 ) ),    "get number of months from time" },
-				{ "subtract",     runtime_->object_factory()->create_method( hcore::call( &HTime::subtract, _1, _2, _3, _4 ) ),     "( *time* ) - calculate time difference between this and *time* time points" },
-				{ "from_string",  runtime_->object_factory()->create_method( hcore::call( &HTime::from_string, _1, _2, _3, _4 ) ),  "( *str* ) - set time from parsed `string` *str*" },
-				{ "to_string",    runtime_->object_factory()->create_method( hcore::call( &HTime::to_string, _1, _2, _3, _4 ) ),    "get `string` representation of this point-in-time" }
-			},
 			"The `Time` class represent information about point-in-time."
 		)
 	);
+	HHuginn::field_definitions_t fd{
+		{ "mod_year",     runtime_->create_method( c.raw(), &HTime::mod, "Time.mod_year",   &hcore::HTime::mod_year ),   "( *num* ) - modify time value by *num* of years" },
+		{ "mod_month",    runtime_->create_method( c.raw(), &HTime::mod, "Time.mod_month",  &hcore::HTime::mod_month ),  "( *num* ) - modify time value by *num* of months" },
+		{ "mod_day",      runtime_->create_method( c.raw(), &HTime::mod, "Time.mod_day",    &hcore::HTime::mod_day ),    "( *num* ) - modify time value by *num* of days" },
+		{ "mod_hour",     runtime_->create_method( c.raw(), &HTime::mod, "Time.mod_hour",   &hcore::HTime::mod_hour ),   "( *num* ) - modify time value by *num* of hours" },
+		{ "mod_minute",   runtime_->create_method( c.raw(), &HTime::mod, "Time.mod_minute", &hcore::HTime::mod_minute ), "( *num* ) - modify time value by *num* of minutes" },
+		{ "mod_second",   runtime_->create_method( c.raw(), &HTime::mod, "Time.mod_second", &hcore::HTime::mod_second ), "( *num* ) - modify time value by *num* of seconds" },
+		{ "set_time",     runtime_->create_method( c.raw(), &HTime::set, "Time.set_time",   &hcore::HTime::set_time ),   "( *hh*, *mm*, *ss* ) - set time value to *hh*:*mm*:*ss*" },
+		{ "set_date",     runtime_->create_method( c.raw(), &HTime::set, "Time.set_date",   &hcore::HTime::set_date ),   "( *YYYY*, *MM*, *DD* ) - set date value to *YYYY*-*MM*-*DD*" },
+		{ "get_year",     runtime_->create_method( c.raw(), &HTime::get, "Time.get_year",   &hcore::HTime::get_year ),   "get number of years from time" },
+		{ "get_day",      runtime_->create_method( c.raw(), &HTime::get, "Time.get_day",    &hcore::HTime::get_day ),    "get number of days from time" },
+		{ "get_hour",     runtime_->create_method( c.raw(), &HTime::get, "Time.get_hour",   &hcore::HTime::get_hour ),   "get number of hours from time" },
+		{ "get_minute",   runtime_->create_method( c.raw(), &HTime::get, "Time.get_minute", &hcore::HTime::get_minute ), "get number of minutes from time" },
+		{ "get_second",   runtime_->create_method( c.raw(), &HTime::get, "Time.get_second", &hcore::HTime::get_second ), "get number of seconds from time" },
+		{ "set_datetime", runtime_->create_method( c.raw(), &HTime::set_datetime ), "( *YYYY*, *MM*, *DD*, *hh*, *mm*, *ss* ) - set date value to *YYYY*-*MM*-*DD* *hh*:*mm*:*ss*" },
+		{ "get_month",    runtime_->create_method( c.raw(), &HTime::get_month ),    "get number of months from time" },
+		{ "subtract",     runtime_->create_method( c.raw(), &HTime::subtract ),     "( *time* ) - calculate time difference between this and *time* time points" },
+		{ "from_string",  runtime_->create_method( c.raw(), &HTime::from_string ),  "( *str* ) - set time from parsed `string` *str*" },
+		{ "to_string",    runtime_->create_method( c.raw(), &HTime::to_string ),    "get `string` representation of this point-in-time" }
+	};
+	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );
 	return ( c );
 	M_EPILOG

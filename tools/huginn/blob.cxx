@@ -32,7 +32,6 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* ) {
 			type_id( HHuginn::TYPE::BLOB ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::BLOB ) ),
 			nullptr,
-			HHuginn::field_definitions_t{},
 			"The `blob` represents raw memory buffer."
 		)
 	);

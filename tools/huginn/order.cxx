@@ -116,7 +116,6 @@ public:
 			runtime_->create_class(
 				"ReversedOrderView",
 				nullptr,
-				HHuginn::field_definitions_t{},
 				"The `ReversedOrderView` class represents *lazy* *iterable* reversed view of a `order`."
 			)
 		);
@@ -237,19 +236,20 @@ public:
 			huginn::type_id( HHuginn::TYPE::ORDER ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::ORDER ) ),
 			nullptr,
-			HHuginn::field_definitions_t{
-				{ "insert",  objectFactory_->create_method( hcore::call( &order::insert, _1, _2, _3, _4 ) ),  "( *elem* ) - insert given element *elem* into an `order`" },
-				{ "has_key", objectFactory_->create_method( hcore::call( &order::has_key, _1, _2, _3, _4 ) ), "( *elem* ) - tell if given element *elem* is in the `order`" },
-				{ "erase",   objectFactory_->create_method( hcore::call( &order::erase, _1, _2, _3, _4 ) ),   "( *elem* ) - remove given element *elem* from the `order`" },
-				{ "clear",   objectFactory_->create_method( hcore::call( &order::clear, _1, _2, _3, _4 ) ),   "erase `order`'s content, `order` becomes empty" },
-				{ "add",     objectFactory_->create_method( hcore::call( &order::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `order` with values added from *other* `order`" },
-				{ "update",  objectFactory_->create_method( hcore::call( &order::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `order` with values from *other* `order`" },
-				{ "hash",    objectFactory_->create_method( hcore::call( &order::hash, _1, _2, _3, _4 ) ),    "calculate hash value for this `order`" },
-				{ "equals",  objectFactory_->create_method( hcore::call( &order::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `order` has the same content" }
-			},
 			"The `order` is a collection of sorted values of uniform types. It supports operations of addition, search and element removal."
 		)
 		, _reversedOrderClass( HReversedOrder::get_class( runtime_ ) ) {
+		HHuginn::field_definitions_t fd{
+			{ "insert",  objectFactory_->create_method( this, &order::insert ),  "( *elem* ) - insert given element *elem* into an `order`" },
+			{ "has_key", objectFactory_->create_method( this, &order::has_key ), "( *elem* ) - tell if given element *elem* is in the `order`" },
+			{ "erase",   objectFactory_->create_method( this, &order::erase ),   "( *elem* ) - remove given element *elem* from the `order`" },
+			{ "clear",   objectFactory_->create_method( this, &order::clear ),   "erase `order`'s content, `order` becomes empty" },
+			{ "add",     objectFactory_->create_method( this, &order::update ),  "( *other* ) - update content of this `order` with values added from *other* `order`" },
+			{ "update",  objectFactory_->create_method( this, &order::update ),  "( *other* ) - update content of this `order` with values from *other* `order`" },
+			{ "hash",    objectFactory_->create_method( this, &order::hash ),    "calculate hash value for this `order`" },
+			{ "equals",  objectFactory_->create_method( this, &order::equals ),  "( *other* ) - test if *other* `order` has the same content" }
+		};
+		redefine( nullptr, fd );
 		return;
 	}
 	HHuginn::HClass const* reversed_order_class( void ) const {

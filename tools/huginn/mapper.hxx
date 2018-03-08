@@ -32,7 +32,6 @@ public:
 			runtime_->create_class(
 				"Mapper",
 				nullptr,
-				HHuginn::field_definitions_t{},
 				"The `Mapper` class represent *lazy* transformation of one *iterable* into another. Resulting *iterable* produces values from original *iterable* transformed by user supplied unary function."
 			)
 		);

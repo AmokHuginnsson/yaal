@@ -62,9 +62,6 @@ HHuginn::value_t HDatabaseCreator::do_new_instance( HRuntime* runtime_ ) {
 		runtime_->create_class(
 			"Database",
 			nullptr,
-			HHuginn::field_definitions_t{
-				{ "connect", runtime_->object_factory()->create_method( hcore::call( &HDatabase::connect, _1, _2, _3, _4 ) ), "( *DSN* ) - create connection to the database specified by given *DSN*" }
-			},
 			"The `Database` package provides access to various database engines through database agnostic interface. Following drivers are supported:"
 #ifdef HAVE_LIBSQLITE3
 			" SQLite3"
@@ -84,6 +81,10 @@ HHuginn::value_t HDatabaseCreator::do_new_instance( HRuntime* runtime_ ) {
 			"."
 		)
 	);
+	HHuginn::field_definitions_t fd{
+		{ "connect", runtime_->create_method( c.raw(), &HDatabase::connect ), "( *DSN* ) - create connection to the database specified by given *DSN*" }
+	};
+	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );
 	return ( runtime_->object_factory()->create<HDatabase>( c.raw() ) );
 	M_EPILOG

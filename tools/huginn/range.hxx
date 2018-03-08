@@ -37,7 +37,6 @@ public:
 			runtime_->create_class(
 				"Range",
 				nullptr,
-				HHuginn::field_definitions_t{},
 				"The `Range` class represents *lazy* *iterable* range of integer values."
 			)
 		);

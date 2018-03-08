@@ -91,12 +91,13 @@ HHuginn::class_t HRegularExpressionMatch::get_class( HRuntime* runtime_ ) {
 		runtime_->create_class(
 			"RegularExpressionMatch",
 			nullptr,
-			HHuginn::field_definitions_t{
-				{ "matched", runtime_->object_factory()->create_method( hcore::call( &HRegularExpressionMatch::matched, _1, _2, _3, _4 ) ), "tell if given regular expression pattern matched against given string" }
-			},
 			"The `RegularExpressionMatch` class represents result of regular expression based text search."
 		)
 	);
+	HHuginn::field_definitions_t fd{
+		{ "matched", runtime_->create_method( c.raw(), &HRegularExpressionMatch::matched ), "tell if given regular expression pattern matched against given string" }
+	};
+	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );
 	return ( c );
 	M_EPILOG

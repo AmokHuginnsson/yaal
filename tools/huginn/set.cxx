@@ -116,7 +116,6 @@ public:
 			runtime_->create_class(
 				"ReversedSetView",
 				nullptr,
-				HHuginn::field_definitions_t{},
 				"The `ReversedSetView` class represents *lazy* *iterable* reversed view of a `set`."
 			)
 		);
@@ -233,19 +232,20 @@ public:
 			huginn::type_id( HHuginn::TYPE::SET ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::SET ) ),
 			nullptr,
-			HHuginn::field_definitions_t{
-				{ "insert",  objectFactory_->create_method( hcore::call( &set::insert, _1, _2, _3, _4 ) ),  "( *elem* ) - insert given element *elem* into a `set`" },
-				{ "has_key", objectFactory_->create_method( hcore::call( &set::has_key, _1, _2, _3, _4 ) ), "( *elem* ) - tell if given element *elem* is present in the `set`" },
-				{ "erase",   objectFactory_->create_method( hcore::call( &set::erase, _1, _2, _3, _4 ) ),   "( *elem* ) - remove given element *elem* from the `set`" },
-				{ "clear",   objectFactory_->create_method( hcore::call( &set::clear, _1, _2, _3, _4 ) ),   "erase `set`'s content, `set` becomes empty" },
-				{ "add",     objectFactory_->create_method( hcore::call( &set::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `set` with values from *other* `set`" },
-				{ "update",  objectFactory_->create_method( hcore::call( &set::update, _1, _2, _3, _4 ) ),  "( *other* ) - update content of this `set` with values from *other* `set`" },
-				{ "hash",    objectFactory_->create_method( hcore::call( &set::hash, _1, _2, _3, _4 ) ),    "calculate hash value for this `set`" },
-				{ "equals",  objectFactory_->create_method( hcore::call( &set::equals, _1, _2, _3, _4 ) ),  "( *other* ) - test if *other* `set` has the same content" }
-			},
 			"The `set` is a collection of unique elements of varying types. It supports operation of element insertion, removal and search."
 		)
 		, _reversedSetClass( HReversedSet::get_class( runtime_ ) ) {
+		HHuginn::field_definitions_t fd{
+			{ "insert",  objectFactory_->create_method( this, &set::insert ),  "( *elem* ) - insert given element *elem* into a `set`" },
+			{ "has_key", objectFactory_->create_method( this, &set::has_key ), "( *elem* ) - tell if given element *elem* is present in the `set`" },
+			{ "erase",   objectFactory_->create_method( this, &set::erase ),   "( *elem* ) - remove given element *elem* from the `set`" },
+			{ "clear",   objectFactory_->create_method( this, &set::clear ),   "erase `set`'s content, `set` becomes empty" },
+			{ "add",     objectFactory_->create_method( this, &set::update ),  "( *other* ) - update content of this `set` with values from *other* `set`" },
+			{ "update",  objectFactory_->create_method( this, &set::update ),  "( *other* ) - update content of this `set` with values from *other* `set`" },
+			{ "hash",    objectFactory_->create_method( this, &set::hash ),    "calculate hash value for this `set`" },
+			{ "equals",  objectFactory_->create_method( this, &set::equals ),  "( *other* ) - test if *other* `set` has the same content" }
+		};
+		redefine( nullptr, fd );
 		return;
 	}
 	HHuginn::HClass const* reversed_set_class( void ) const {

@@ -45,14 +45,15 @@ public:
 			typeId_,
 			runtime_->identifier_id( "Query" ),
 			nullptr,
-			HHuginn::field_definitions_t{
-				{ "bind",    runtime_->object_factory()->create_method( hcore::call( &HQuery::bind, _1, _2, _3, _4 ) ),    "( *index*, *value* ) - bind given *value* for query variable at given *index*" },
-				{ "execute", runtime_->object_factory()->create_method( hcore::call( &HQuery::execute, _1, _2, _3, _4 ) ), "execute query" }
-			},
 			"The `Query` class represents compiled database query. It is used for actual query execution."
 		)
 		, _exceptionClass( exceptionClass_ )
 		, _queryResultClass( huginn::HQueryResult::get_class( runtime_, exceptionClass_ ) ) {
+		HHuginn::field_definitions_t fd{
+			{ "bind",    runtime_->create_method( this, &HQuery::bind ),    "( *index*, *value* ) - bind given *value* for query variable at given *index*" },
+			{ "execute", runtime_->create_method( this, &HQuery::execute ), "execute query" }
+		};
+		redefine( nullptr, fd );
 		return;
 	}
 	HHuginn::HClass const* query_result_class( void ) const {

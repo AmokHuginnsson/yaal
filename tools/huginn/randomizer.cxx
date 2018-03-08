@@ -104,17 +104,18 @@ HHuginn::class_t HRandomizer::get_class( HRuntime* runtime_, HHuginn::HClass con
 		runtime_->create_class(
 			"Randomizer",
 			nullptr,
-			HHuginn::field_definitions_t{
-				{ "next",      runtime_->object_factory()->create_method( hcore::call( &HRandomizer::next, _1, _2, _3, _4 ) ),      "([ *range* ]) - get next `integer` random number, possibly restricted to given range" },
-				{ "next_real", runtime_->object_factory()->create_method( hcore::call( &HRandomizer::next_real, _1, _2, _3, _4 ) ), "([ *range* ]) - get next `real` random number, possibly restricted to given range" },
-				{ "to_string", runtime_->object_factory()->create_method( hcore::call( &HRandomizer::to_string, _1, _2, _3, _4 ) ), "get string representation of this `Randomizer`" }
-			},
 			"The `Randomizer` class represents a random number generator concept. `Randomizer` can generate uniform distribution of either `integer` or `real` values from given range.",
 			HHuginn::HClass::TYPE::BUILTIN,
 			origin_,
 			&HRandomizer::create_instance
 		)
 	);
+	HHuginn::field_definitions_t fd{
+		{ "next",      runtime_->create_method( c.raw(), &HRandomizer::next ),      "([ *range* ]) - get next `integer` random number, possibly restricted to given range" },
+		{ "next_real", runtime_->create_method( c.raw(), &HRandomizer::next_real ), "([ *range* ]) - get next `real` random number, possibly restricted to given range" },
+		{ "to_string", runtime_->create_method( c.raw(), &HRandomizer::to_string ), "get string representation of this `Randomizer`" }
+	};
+	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c, HHuginn::ACCESS::PUBLIC );
 	return ( c );
 	M_EPILOG

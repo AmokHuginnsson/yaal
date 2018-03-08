@@ -137,18 +137,19 @@ HHuginn::value_t HTextCreator::do_new_instance( HRuntime* runtime_ ) {
 		runtime_->create_class(
 			"Text",
 			nullptr,
-			HHuginn::field_definitions_t{
-				{ "split",    runtime_->object_factory()->create_method( hcore::call( &HText::split, _1, _2, _3, _4 ) ),    "( *str*, *sep* ) - split `string` *str* by separator *sep* into a `list` of `string`s" },
-				{ "join",     runtime_->object_factory()->create_method( hcore::call( &HText::join, _1, _2, _3, _4 ) ),     "( *coll*, *sep* ) - join all string from *coll* into one `string` using *sep* as separator" },
-				{ "distance", runtime_->object_factory()->create_method( hcore::call( &HText::distance, _1, _2, _3, _4 ) ), "( *first*, *second* ) - calculate Damerau-Levenshtein distance between *first* and *second* `string`s" },
-				{ "repeat",   runtime_->object_factory()->create_method( hcore::call( &HText::repeat, _1, _2, _3, _4 ) ),   "( *seed*, *count* ) - construct new `string` by repeating *seed* `string` *count* times" },
-				{ "hex",      runtime_->object_factory()->create_method( hcore::call( &HText::int_base_to_str, "Text.hex", BASE::HEX, _1, _2, _3, _4 ) ), "( *int* ) - convert *int* value to a `string` using hexadecimal representation" },
-				{ "oct",      runtime_->object_factory()->create_method( hcore::call( &HText::int_base_to_str, "Text.oct", BASE::OCT, _1, _2, _3, _4 ) ), "( *int* ) - convert *int* value to a `string` using octal representation" },
-				{ "bin",      runtime_->object_factory()->create_method( hcore::call( &HText::int_base_to_str, "Text.bin", BASE::BIN, _1, _2, _3, _4 ) ), "( *int* ) - convert *int* value to a `string` using binary representation" }
-			},
 			"The `Text` package provides various text manipulation algorithms."
 		)
 	);
+	HHuginn::field_definitions_t fd{
+		{ "split",    runtime_->create_method( c.raw(), &HText::split ),    "( *str*, *sep* ) - split `string` *str* by separator *sep* into a `list` of `string`s" },
+		{ "join",     runtime_->create_method( c.raw(), &HText::join ),     "( *coll*, *sep* ) - join all string from *coll* into one `string` using *sep* as separator" },
+		{ "distance", runtime_->create_method( c.raw(), &HText::distance ), "( *first*, *second* ) - calculate Damerau-Levenshtein distance between *first* and *second* `string`s" },
+		{ "repeat",   runtime_->create_method( c.raw(), &HText::repeat ),   "( *seed*, *count* ) - construct new `string` by repeating *seed* `string` *count* times" },
+		{ "hex",      runtime_->create_method( c.raw(), &HText::int_base_to_str, "Text.hex", BASE::HEX ), "( *int* ) - convert *int* value to a `string` using hexadecimal representation" },
+		{ "oct",      runtime_->create_method( c.raw(), &HText::int_base_to_str, "Text.oct", BASE::OCT ), "( *int* ) - convert *int* value to a `string` using octal representation" },
+		{ "bin",      runtime_->create_method( c.raw(), &HText::int_base_to_str, "Text.bin", BASE::BIN ), "( *int* ) - convert *int* value to a `string` using binary representation" }
+	};
+	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );
 	return ( runtime_->object_factory()->create<HText>( c.raw() ) );
 	M_EPILOG

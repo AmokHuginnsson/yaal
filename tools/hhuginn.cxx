@@ -400,6 +400,10 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 			HHuginn::class_t c( _runtime->get_class( cc->_baseName ) );
 			super = ! c ? commit_class( cc->_baseName ) : c.raw();
 		}
+		if ( ! cls ) {
+			cls = _runtime->create_class( identifierId_, super, cc->_doc ? *cc->_doc : "", HClass::TYPE::USER );
+			_runtime->register_class( cls, ACCESS::PUBLIC, VISIBILITY::GLOBAL );
+		}
 		field_definitions_t fieldDefinitions;
 		huginn::HThread t( _runtime.raw(), hcore::HThread::get_current_thread_id() );
 		t.create_function_frame( nullptr, nullptr, 0 );
@@ -412,16 +416,11 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 			} else {
 				OCompiler::OClassContext::methods_t::const_iterator m( cc->_methods.find( i ) );
 				M_ASSERT( m != cc->_methods.end() );
-				fieldDefinitions.emplace_back( cc->_fieldNames[i], _runtime->object_factory()->create_method( m->second ), cc->_docs.at( i ) );
+				fieldDefinitions.emplace_back( cc->_fieldNames[i], _runtime->object_factory()->create_method( cls.raw(), m->second ), cc->_docs.at( i ) );
 			}
 		}
 		t.pop_frame();
-		if ( ! cls ) {
-			cls = _runtime->create_class( identifierId_, super, fieldDefinitions, cc->_doc ? *cc->_doc : "", HClass::TYPE::USER );
-			_runtime->register_class( cls, ACCESS::PUBLIC, VISIBILITY::GLOBAL );
-		} else {
-			cls->redefine( super, fieldDefinitions );
-		}
+		cls->redefine( super, fieldDefinitions );
 		_compiler->_submittedClasses.erase( identifierId_ );
 	}
 	return ( cls.raw() );
@@ -875,16 +874,20 @@ yaal::hcore::HString const& HHuginn::HFunctionReference::doc( void ) const {
 }
 
 HHuginn::HClass::HMethod::HMethod(
+	HHuginn::HClass const* juncture_,
 	function_t const& function_
 ) : HValue( &_methodClass_ )
+	, _juncture( juncture_ )
 	, _function( function_ ) {
 	return;
 }
 
 HHuginn::HClass::HMethod::HMethod(
 	HHuginn::HClass const* class_,
+	HHuginn::HClass const* juncture_,
 	function_t const& function_
 ) : HValue( class_ )
+	, _juncture( juncture_ )
 	, _function( function_ ) {
 	return;
 }
@@ -894,11 +897,11 @@ HHuginn::function_t const& HHuginn::HClass::HMethod::function( void ) const {
 }
 
 HHuginn::value_t HHuginn::HClass::HMethod::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
-	return ( thread_->object_factory().create_method( _function ) );
+	return ( thread_->object_factory().create_method( _juncture, _function ) );
 }
 
 HHuginn::HClass::HBoundMethod::HBoundMethod( HHuginn::function_t const& method_, HHuginn::value_t const& object_ )
-	: HMethod( &_boundMethodClass_, method_ )
+	: HMethod( &_boundMethodClass_, object_->get_class(), method_ )
 	, _objectHolder( object_ ) {
 	return;
 }

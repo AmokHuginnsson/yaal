@@ -351,7 +351,6 @@ void HRuntime::register_package( identifier_id_t package_, identifier_id_t alias
 HHuginn::class_t HRuntime::create_class(
 	identifier_id_t identifier_,
 	HHuginn::HClass const* base_,
-	field_definitions_t const& fieldDefinitions_,
 	yaal::hcore::HString const& doc_,
 	HHuginn::HClass::TYPE type_,
 	HHuginn::HClass const* origin_,
@@ -364,7 +363,6 @@ HHuginn::class_t HRuntime::create_class(
 			type_id_t( _idGenerator ),
 			identifier_,
 			base_,
-			fieldDefinitions_,
 			doc_,
 			type_,
 			origin_,
@@ -379,7 +377,6 @@ HHuginn::class_t HRuntime::create_class(
 HHuginn::class_t HRuntime::create_class(
 	yaal::hcore::HString const& name_,
 	HHuginn::HClass const* base_,
-	field_definitions_t const& fieldDefinitions_,
 	yaal::hcore::HString const& doc_,
 	HHuginn::HClass::TYPE type_,
 	HHuginn::HClass const* origin_,
@@ -387,7 +384,7 @@ HHuginn::class_t HRuntime::create_class(
 ) {
 	M_PROLOG
 	return (
-		create_class( identifier_id( name_ ), base_, fieldDefinitions_, doc_, type_, origin_, createInstance_ )
+		create_class( identifier_id( name_ ), base_, doc_, type_, origin_, createInstance_ )
 	);
 	M_EPILOG
 }
@@ -462,13 +459,15 @@ HHuginn::value_t instance( HHuginn::HClass const* class_, HThread* thread_, HHug
 
 HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRuntime const& context_ ) {
 	M_PROLOG
+	HString doc( _huginn->get_comment( 1 ) );
+	HHuginn::class_t cls( create_class( name_, nullptr, ! doc.is_empty() ? doc : "The `"_ys.append( name_ ).append( "` is an user defined submodule." ) ) );
 	HHuginn::field_definitions_t fds;
 	/* Erasing from lookup invalidated .end() */
 	for ( packages_t::iterator it( _packages.begin() ); it != _packages.end(); ) {
 		if ( context_._packages.find( it->first ) == context_._packages.end() ) {
 			fds.emplace_back(
 				identifier_name( it->first ),
-				object_factory()->create_method( hcore::call( &package::value, it->second, identifier_name( it->first ), _1, _2, _3, _4 ) ),
+				create_method( cls.raw(), &package::value, it->second, identifier_name( it->first ) ),
 				"access package "_ys.append( it->second->get_class()->name() ).append( " imported in submodule" )
 			);
 			it = _packages.erase( it );
@@ -480,7 +479,7 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 		if ( context_._classes.find( c.first ) == context_._classes.end() ) {
 			fds.emplace_back(
 				identifier_name( c.first ),
-				object_factory()->create_method( hcore::call( &package::instance, c.second.raw(), _1, _2, _3, _4 ) ),
+				create_method( cls.raw(), &package::instance, c.second.raw() ),
 				"access class "_ys.append( identifier_name( c.first ) ).append( " imported in submodule" )
 			);
 		}
@@ -490,20 +489,19 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 			HHuginn::HFunctionReference const* fr( static_cast<HHuginn::HFunctionReference const*>( _functionsStore.at( fi ).raw() ) );
 			fds.emplace_back(
 				identifier_name( fi ),
-				object_factory()->create_method( fr->function() ),
+				_objectFactory->create_method( cls.raw(), fr->function() ),
 				! fr->doc().is_empty() ? fr->doc() : "access function "_ys.append( identifier_name( fi ) ).append( " imported in submodule" )
 			);
 		}
 	}
-	HString doc( _huginn->get_comment( 1 ) );
-	HHuginn::class_t c( create_class( name_, nullptr, fds, ! doc.is_empty() ? doc : "The `"_ys.append( name_ ).append( "` is an user defined submodule." ) ) );
 	for ( classes_t::value_type& m : _classes ) {
 		if ( ! m.second->origin() && ( context_._classes.find( m.first ) == context_._classes.end() )) {
-			m.second->set_origin( c.raw() );
+			m.second->set_origin( cls.raw() );
 		}
 	}
-	_huginn->register_class( c );
-	return ( c );
+	cls->redefine( nullptr, fds );
+	_huginn->register_class( cls );
+	return ( cls );
 	M_EPILOG
 }
 

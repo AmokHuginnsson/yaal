@@ -84,7 +84,6 @@ public:
 			runtime_->create_class(
 				"ReversedDequeView",
 				nullptr,
-				HHuginn::field_definitions_t{},
 				"The `ReversedDequeView` class represents *lazy* *iterable* reversed view of a `deque`."
 			)
 		);
@@ -299,25 +298,26 @@ public:
 			huginn::type_id( HHuginn::TYPE::DEQUE ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::DEQUE ) ),
 			nullptr,
-			HHuginn::field_definitions_t{
-				{ "push",       objectFactory_->create_method( hcore::call( &deque::push, _1, _2, _3, _4 ) ),       "( *elem* ) - add new *elem* at the (right/back) end of the `deque`, `deque` grows in size by 1" },
-				{ "pop",        objectFactory_->create_method( hcore::call( &deque::pop, _1, _2, _3, _4 ) ),        "remove last element from the deque, deque shrinks by 1" },
-				{ "push_front", objectFactory_->create_method( hcore::call( &deque::push_front, _1, _2, _3, _4 ) ), "( *elem* ) - add new *elem* at the (left/front) beginning of the `deque`, `deque` grows in size by 1" },
-				{ "pop_front",  objectFactory_->create_method( hcore::call( &deque::pop_front, _1, _2, _3, _4 ) ),  "remove first element from the `deque`, `deque` shrinks by 1" },
-				{ "add",        objectFactory_->create_method( hcore::call( &deque::append, _1, _2, _3, _4 ) ),     "( *other* ) - append all elements from *other* collection at the end of this `deque`" },
-				{ "append",     objectFactory_->create_method( hcore::call( &deque::append, _1, _2, _3, _4 ) ),     "( *other* ) - append all elements from *other* collection at the end of this `deque`" },
-				{ "prepend",    objectFactory_->create_method( hcore::call( &deque::prepend, _1, _2, _3, _4 ) ),    "( *other* ) - prepend all elements from *other* collection in front of this `deque`" },
-				{ "insert",     objectFactory_->create_method( hcore::call( &deque::insert, _1, _2, _3, _4 ) ),     "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
-				{ "clear",      objectFactory_->create_method( hcore::call( &deque::clear, _1, _2, _3, _4 ) ),      "erase `deque`'s content, `deque` becomes empty" },
-				{ "hash",       objectFactory_->create_method( hcore::call( &deque::hash, _1, _2, _3, _4 ) ),       "calculate hash value for this `deque`" },
-				{ "less",       objectFactory_->create_method( hcore::call( &deque::less, _1, _2, _3, _4 ) ),       "( *other* ) - test if this `deque` comes lexicographically before *other* `deque`" },
-				{ "equals",     objectFactory_->create_method( hcore::call( &deque::equals, _1, _2, _3, _4 ) ),     "( *other* ) - test if *other* `deque` has the same content" }
-			},
 			"The `deque` is a collection type that is used to represent and operate on deque of values. "
 			"It supports basic subscript and range operators. "
 			"It also supports efficient operations of addition and removal of its elements at its both ends."
 		)
 		, _reversedDequeClass( HReversedDeque::get_class( runtime_ ) ) {
+		HHuginn::field_definitions_t fd{
+			{ "push",       objectFactory_->create_method( this, &deque::push ),       "( *elem* ) - add new *elem* at the (right/back) end of the `deque`, `deque` grows in size by 1" },
+			{ "pop",        objectFactory_->create_method( this, &deque::pop ),        "remove last element from the deque, deque shrinks by 1" },
+			{ "push_front", objectFactory_->create_method( this, &deque::push_front ), "( *elem* ) - add new *elem* at the (left/front) beginning of the `deque`, `deque` grows in size by 1" },
+			{ "pop_front",  objectFactory_->create_method( this, &deque::pop_front ),  "remove first element from the `deque`, `deque` shrinks by 1" },
+			{ "add",        objectFactory_->create_method( this, &deque::append ),     "( *other* ) - append all elements from *other* collection at the end of  `deque`" },
+			{ "append",     objectFactory_->create_method( this, &deque::append ),     "( *other* ) - append all elements from *other* collection at the end of  `deque`" },
+			{ "prepend",    objectFactory_->create_method( this, &deque::prepend ),    "( *other* ) - prepend all elements from *other* collection in front of  `deque`" },
+			{ "insert",     objectFactory_->create_method( this, &deque::insert ),     "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
+			{ "clear",      objectFactory_->create_method( this, &deque::clear ),      "erase `deque`'s content, `deque` becomes empty" },
+			{ "hash",       objectFactory_->create_method( this, &deque::hash ),       "calculate hash value for  `deque`" },
+			{ "less",       objectFactory_->create_method( this, &deque::less ),       "( *other* ) - test if  `deque` comes lexicographically before *other* `deque`" },
+			{ "equals",     objectFactory_->create_method( this, &deque::equals ),     "( *other* ) - test if *other* `deque` has the same content" }
+		};
+		redefine( nullptr, fd );
 		return;
 	}
 	HHuginn::HClass const* reversed_deque_class( void ) const {

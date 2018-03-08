@@ -143,28 +143,29 @@ HHuginn::class_t HNumberSetStatistics::get_class( HRuntime* runtime_, HHuginn::H
 		runtime_->create_class(
 			"NumberSetStatistics",
 			nullptr,
-			HHuginn::field_definitions_t{
-				{ "count",                         runtime_->object_factory()->create_method( hcore::call( &HNumberSetStatistics::count, _1, _2, _3, _4 ) ), "a number of elements in given numeric set" },
-				{ "minimum",                       runtime_->object_factory()->create_method( hcore::call( &HNumberSetStatistics::stat, "NumberSetStatistics.minimum",                       AGGREGATE_TYPE::MINIMUM, _1, _2, _3, _4 ) ),                       "a minimum numeric value in set" },
-				{ "maximum",                       runtime_->object_factory()->create_method( hcore::call( &HNumberSetStatistics::stat, "NumberSetStatistics.maximum",                       AGGREGATE_TYPE::MAXIMUM, _1, _2, _3, _4 ) ),                       "a maximum numeric value in set" },
-				{ "sum",                           runtime_->object_factory()->create_method( hcore::call( &HNumberSetStatistics::stat, "NumberSetStatistics.sum",                           AGGREGATE_TYPE::SUM, _1, _2, _3, _4 ) ),                           "a sum of all values in set" },
-				{ "arithmetic_mean",               runtime_->object_factory()->create_method( hcore::call( &HNumberSetStatistics::stat, "NumberSetStatistics.arithmetic_mean",               AGGREGATE_TYPE::ARITHMETIC_MEAN, _1, _2, _3, _4 ) ),               "an arithmetic mean of all numbers in set" },
-				{ "median",                        runtime_->object_factory()->create_method( hcore::call( &HNumberSetStatistics::stat, "NumberSetStatistics.median",                        AGGREGATE_TYPE::MEDIAN, _1, _2, _3, _4 ) ),                        "a median value in set" },
-				{ "interquartile_range",           runtime_->object_factory()->create_method( hcore::call( &HNumberSetStatistics::stat, "NumberSetStatistics.interquartile_range",           AGGREGATE_TYPE::INTERQUARTILE_RANGE, _1, _2, _3, _4 ) ),           "an interquartile range of given set of values" },
-				{ "sample_variance",               runtime_->object_factory()->create_method( hcore::call( &HNumberSetStatistics::stat, "NumberSetStatistics.sample_variance",               AGGREGATE_TYPE::SAMPLE_VARIANCE, _1, _2, _3, _4 ) ),               "a sample_variance of the set" },
-				{ "population_variance",           runtime_->object_factory()->create_method( hcore::call( &HNumberSetStatistics::stat, "NumberSetStatistics.population_variance",           AGGREGATE_TYPE::POPULATION_VARIANCE, _1, _2, _3, _4 ) ),           "a population sample_variance of the numeric set" },
-				{ "sample_standard_deviation",     runtime_->object_factory()->create_method( hcore::call( &HNumberSetStatistics::stat, "NumberSetStatistics.sample_standard_deviation",     AGGREGATE_TYPE::SAMPLE_STANDARD_DEVIATION, _1, _2, _3, _4 ) ),     "a standard deviation of the numeric set" },
-				{ "population_standard_deviation", runtime_->object_factory()->create_method( hcore::call( &HNumberSetStatistics::stat, "NumberSetStatistics.population_standard_deviation", AGGREGATE_TYPE::POPULATION_STANDARD_DEVIATION, _1, _2, _3, _4 ) ), "a population standard deviation of the numeric set" },
-				{ "mean_absolute_deviation",       runtime_->object_factory()->create_method( hcore::call( &HNumberSetStatistics::stat, "NumberSetStatistics.mean_absolute_deviation",       AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION, _1, _2, _3, _4 ) ),       "a mean absolute deviation of the numeric set" },
-				{ "range",     runtime_->object_factory()->create_method( hcore::call( &HNumberSetStatistics::derivative_stat, "NumberSetStatistics.range",     DERIVATIVE_STAT::RANGE,     _1, _2, _3, _4 ) ), "a range of values in the numeric set" },
-				{ "mid_range", runtime_->object_factory()->create_method( hcore::call( &HNumberSetStatistics::derivative_stat, "NumberSetStatistics.mid_range", DERIVATIVE_STAT::MID_RANGE, _1, _2, _3, _4 ) ), "a mid range value of the numbers in the given set" }
-			},
 			"The `NumberSetStatistics` is a class representing results of gathering numerical statistics over some uniformly typed number set.",
 			HHuginn::HClass::TYPE::BUILTIN,
 			origin_,
 			&HNumberSetStatistics::create_instance
 		)
 	);
+	HHuginn::field_definitions_t fd{
+		{ "count",                         runtime_->create_method( c.raw(), &HNumberSetStatistics::count ), "a number of elements in given numeric set" },
+		{ "minimum",                       runtime_->create_method( c.raw(), &HNumberSetStatistics::stat, "NumberSetStatistics.minimum",                       AGGREGATE_TYPE::MINIMUM ),                       "a minimum numeric value in set" },
+		{ "maximum",                       runtime_->create_method( c.raw(), &HNumberSetStatistics::stat, "NumberSetStatistics.maximum",                       AGGREGATE_TYPE::MAXIMUM ),                       "a maximum numeric value in set" },
+		{ "sum",                           runtime_->create_method( c.raw(), &HNumberSetStatistics::stat, "NumberSetStatistics.sum",                           AGGREGATE_TYPE::SUM ),                           "a sum of all values in set" },
+		{ "arithmetic_mean",               runtime_->create_method( c.raw(), &HNumberSetStatistics::stat, "NumberSetStatistics.arithmetic_mean",               AGGREGATE_TYPE::ARITHMETIC_MEAN ),               "an arithmetic mean of all numbers in set" },
+		{ "median",                        runtime_->create_method( c.raw(), &HNumberSetStatistics::stat, "NumberSetStatistics.median",                        AGGREGATE_TYPE::MEDIAN ),                        "a median value in set" },
+		{ "interquartile_range",           runtime_->create_method( c.raw(), &HNumberSetStatistics::stat, "NumberSetStatistics.interquartile_range",           AGGREGATE_TYPE::INTERQUARTILE_RANGE ),           "an interquartile range of given set of values" },
+		{ "sample_variance",               runtime_->create_method( c.raw(), &HNumberSetStatistics::stat, "NumberSetStatistics.sample_variance",               AGGREGATE_TYPE::SAMPLE_VARIANCE ),               "a sample_variance of the set" },
+		{ "population_variance",           runtime_->create_method( c.raw(), &HNumberSetStatistics::stat, "NumberSetStatistics.population_variance",           AGGREGATE_TYPE::POPULATION_VARIANCE ),           "a population sample_variance of the numeric set" },
+		{ "sample_standard_deviation",     runtime_->create_method( c.raw(), &HNumberSetStatistics::stat, "NumberSetStatistics.sample_standard_deviation",     AGGREGATE_TYPE::SAMPLE_STANDARD_DEVIATION ),     "a standard deviation of the numeric set" },
+		{ "population_standard_deviation", runtime_->create_method( c.raw(), &HNumberSetStatistics::stat, "NumberSetStatistics.population_standard_deviation", AGGREGATE_TYPE::POPULATION_STANDARD_DEVIATION ), "a population standard deviation of the numeric set" },
+		{ "mean_absolute_deviation",       runtime_->create_method( c.raw(), &HNumberSetStatistics::stat, "NumberSetStatistics.mean_absolute_deviation",       AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION ),       "a mean absolute deviation of the numeric set" },
+		{ "range",                         runtime_->create_method( c.raw(), &HNumberSetStatistics::derivative_stat, "NumberSetStatistics.range",              DERIVATIVE_STAT::RANGE ),                        "a range of values in the numeric set" },
+		{ "mid_range",                     runtime_->create_method( c.raw(), &HNumberSetStatistics::derivative_stat, "NumberSetStatistics.mid_range",          DERIVATIVE_STAT::MID_RANGE ),                    "a mid range value of the numbers in the given set" }
+	};
+	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c, HHuginn::ACCESS::PUBLIC );
 	return ( c );
 	M_EPILOG

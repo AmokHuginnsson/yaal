@@ -84,7 +84,6 @@ public:
 			runtime_->create_class(
 				"ReversedTupleView",
 				nullptr,
-				HHuginn::field_definitions_t{},
 				"The `ReversedTupleView` class represents *lazy* *iterable* reversed view of a `tuple`."
 			)
 		);
@@ -173,16 +172,17 @@ public:
 			huginn::type_id( HHuginn::TYPE::TUPLE ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::TUPLE ) ),
 			nullptr,
-			HHuginn::field_definitions_t{
-				{ "add",    objectFactory_->create_method( hcore::call( &tuple::add, _1, _2, _3, _4 ) ),    "( *other* ) - append all elements from *other* `tuple` at the end of this `tuple`" },
-				{ "hash",   objectFactory_->create_method( hcore::call( &tuple::hash, _1, _2, _3, _4 ) ),   "calculate hash value for this `tuple`" },
-				{ "less",   objectFactory_->create_method( hcore::call( &tuple::less, _1, _2, _3, _4 ) ),   "( *other* ) - test if this `tuple` comes lexicographically before *other* `tuple`" },
-				{ "equals", objectFactory_->create_method( hcore::call( &tuple::equals, _1, _2, _3, _4 ) ), "( *other* ) - test if *other* `tuple` has the same content" }
-			},
 			"The `tuple` is a collection type that is used to represent and operate on `tuple` of values. "
 			"It supports basic subscript and range operators."
 		)
 		, _reversedTupleClass( HReversedTuple::get_class( runtime_ ) ) {
+		HHuginn::field_definitions_t fd{
+			{ "add",    objectFactory_->create_method( this, &tuple::add ),    "( *other* ) - append all elements from *other* `tuple` at the end of this `tuple`" },
+			{ "hash",   objectFactory_->create_method( this, &tuple::hash ),   "calculate hash value for this `tuple`" },
+			{ "less",   objectFactory_->create_method( this, &tuple::less ),   "( *other* ) - test if this `tuple` comes lexicographically before *other* `tuple`" },
+			{ "equals", objectFactory_->create_method( this, &tuple::equals ), "( *other* ) - test if *other* `tuple` has the same content" }
+		};
+		redefine( nullptr, fd );
 		return;
 	}
 	HHuginn::HClass const* reversed_tuple_class( void ) const {

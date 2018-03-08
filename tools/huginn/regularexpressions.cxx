@@ -59,12 +59,13 @@ HHuginn::value_t HRegularExpressionsCreator::do_new_instance( HRuntime* runtime_
 		runtime_->create_class(
 			"RegularExpressions",
 			nullptr,
-			HHuginn::field_definitions_t{
-				{ "compile", runtime_->object_factory()->create_method( hcore::call( &HRegularExpressions::compile, _1, _2, _3, _4 ) ), "( *pattern* ) - compile given regular expression pattern to be used for text searches" }
-			},
 			"The `RegularExpressions` package provides support for regular expressions based text searches."
 		)
 	);
+	HHuginn::field_definitions_t fd{
+		{ "compile", runtime_->create_method( c.raw(), &HRegularExpressions::compile ), "( *pattern* ) - compile given regular expression pattern to be used for text searches" }
+	};
+	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );
 	return ( runtime_->object_factory()->create<HRegularExpressions>( c.raw() ) );
 	M_EPILOG

@@ -40,7 +40,6 @@ public:
 			runtime_->create_class(
 				"DirectoryScan",
 				nullptr,
-				HHuginn::field_definitions_t{},
 				"The `DirectoryScan` class represents ongoing directory scan operation."
 			)
 		);

@@ -30,7 +30,6 @@ public:
 			runtime_->create_class(
 				"Enumerator",
 				nullptr,
-				HHuginn::field_definitions_t{},
 				"The `Enumerator` class allows counting elements of *iterable* that are iterated over."
 			)
 		);

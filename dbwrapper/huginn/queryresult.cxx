@@ -138,16 +138,17 @@ public:
 			typeId_,
 			runtime_->identifier_id( "QueryResult" ),
 			nullptr,
-			HHuginn::field_definitions_t{
-				{ "column_name", runtime_->object_factory()->create_method( hcore::call( &HQueryResult::column_name, _1, _2, _3, _4 ) ), "( *index* ) - get name of SELECT's column at given *index*" },
-				{ "field_count", runtime_->object_factory()->create_method( hcore::call( &HQueryResult::field_count, _1, _2, _3, _4 ) ), "get number of SELECTed attributes" },
-				{ "insert_id",   runtime_->object_factory()->create_method( hcore::call( &HQueryResult::insert_id, _1, _2, _3, _4 ) ),   "get value of row ID from last INSERT statement" },
-				{ "has_next",    runtime_->object_factory()->create_method( hcore::call( &HQueryResult::has_next, _1, _2, _3, _4 ) ),    "tell if this result set has more rows to be fetched" },
-				{ "fetch_row",   runtime_->object_factory()->create_method( hcore::call( &HQueryResult::fetch_row, _1, _2, _3, _4 ) ),   "fetch next row of data from this result set" }
-			},
 			"The `QueryResult` class represent result of database query execution. It allows getting both material query results and query result meta data."
 		)
 		, _exceptionClass( exceptionClass_ ) {
+		HHuginn::field_definitions_t fd{
+			{ "column_name", runtime_->create_method( this, &HQueryResult::column_name ), "( *index* ) - get name of SELECT's column at given *index*" },
+			{ "field_count", runtime_->create_method( this, &HQueryResult::field_count ), "get number of SELECTed attributes" },
+			{ "insert_id",   runtime_->create_method( this, &HQueryResult::insert_id ),   "get value of row ID from last INSERT statement" },
+			{ "has_next",    runtime_->create_method( this, &HQueryResult::has_next ),    "tell if this result set has more rows to be fetched" },
+			{ "fetch_row",   runtime_->create_method( this, &HQueryResult::fetch_row ),   "fetch next row of data from this result set" }
+		};
+		redefine( nullptr, fd );
 		return;
 	}
 	HHuginn::HClass const* exception_class( void ) const {

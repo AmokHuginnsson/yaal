@@ -71,15 +71,16 @@ public:
 			typeId_,
 			runtime_->identifier_id( "CompiledRegularExpression" ),
 			nullptr,
-			HHuginn::field_definitions_t{
-				{ "match",   runtime_->object_factory()->create_method( hcore::call( &HCompiledRegularExpression::match, _1, _2, _3, _4 ) ),   "( *text* ) - find a match of this compiled regular expression in given *text*" },
-				{ "groups",  runtime_->object_factory()->create_method( hcore::call( &HCompiledRegularExpression::groups, _1, _2, _3, _4 ) ),  "( *text* ) - get all matching regular expression groups from this regular expression in given *text*" },
-				{ "replace", runtime_->object_factory()->create_method( hcore::call( &HCompiledRegularExpression::replace, _1, _2, _3, _4 ) ), "( *text*, *replacement* ) - replace each occurrence of matched groups in *text* with *replacement* pattern" }
-			},
 			"The `CompiledRegularExpression` class gives access to result of regular expression based text searches."
 		)
 		, _exceptionClass( exceptionClass_ )
 		, _regularExpressionMatchClass( HRegularExpressionMatch::get_class( runtime_ ) ) {
+		HHuginn::field_definitions_t fd{
+			{ "match",   runtime_->create_method( this, &HCompiledRegularExpression::match ),   "( *text* ) - find a match of this compiled regular expression in given *text*" },
+			{ "groups",  runtime_->create_method( this, &HCompiledRegularExpression::groups ),  "( *text* ) - get all matching regular expression groups from this regular expression in given *text*" },
+			{ "replace", runtime_->create_method( this, &HCompiledRegularExpression::replace ), "( *text*, *replacement* ) - replace each occurrence of matched groups in *text* with *replacement* pattern" }
+		};
+		redefine( nullptr, fd );
 		return;
 	}
 	HHuginn::HClass const* regular_expression_match_class( void ) const {

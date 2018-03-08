@@ -39,7 +39,6 @@ public:
 			typeId_,
 			identifierId_,
 			base_,
-			HHuginn::field_definitions_t{},
 			doc_
 		) {
 		HHuginn::field_definitions_t fd;
@@ -52,7 +51,7 @@ public:
 				d.doc()
 			);
 		}
-		fd.emplace_back( "to_string", runtime_->object_factory()->create_method( hcore::call( &HEnumerationClass::to_string, _1, _2, _3, _4 ) ), "Get enumeration name." );
+		fd.emplace_back( "to_string", runtime_->object_factory()->create_method( this, hcore::call( &HEnumerationClass::to_string, _1, _2, _3, _4 ) ), "Get enumeration name." );
 		redefine( base_, fd );
 		return;
 	}
