@@ -882,16 +882,6 @@ HHuginn::HClass::HMethod::HMethod(
 	return;
 }
 
-HHuginn::HClass::HMethod::HMethod(
-	HHuginn::HClass const* class_,
-	HHuginn::HClass const* juncture_,
-	function_t const& function_
-) : HValue( class_ )
-	, _juncture( juncture_ )
-	, _function( function_ ) {
-	return;
-}
-
 HHuginn::function_t const& HHuginn::HClass::HMethod::function( void ) const {
 	return ( _function );
 }
@@ -901,7 +891,8 @@ HHuginn::value_t HHuginn::HClass::HMethod::do_clone( huginn::HThread* thread_, H
 }
 
 HHuginn::HClass::HBoundMethod::HBoundMethod( HHuginn::function_t const& method_, HHuginn::value_t const& object_ )
-	: HMethod( &_boundMethodClass_, object_->get_class(), method_ )
+	: HValue( &_boundMethodClass_ )
+	, _function( method_ )
 	, _objectHolder( object_ ) {
 	return;
 }
@@ -910,10 +901,14 @@ HHuginn::value_t HHuginn::HClass::HBoundMethod::call( huginn::HThread* thread_, 
 	return ( _function( thread_, &_objectHolder, arguments_, position_ ) );
 }
 
+HHuginn::function_t const& HHuginn::HClass::HBoundMethod::function( void ) const {
+	return ( _function );
+}
+
 HHuginn::value_t HHuginn::HClass::HBoundMethod::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
 	return (
 		thread_->runtime().object_factory()->create_bound_method(
-			static_cast<HMethod const*>( this )->function(),
+			_function,
 			_objectHolder->clone( thread_, const_cast<HHuginn::value_t*>( &_objectHolder ), position_ )
 		)
 	);

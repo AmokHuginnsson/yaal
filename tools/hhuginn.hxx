@@ -554,7 +554,6 @@ protected:
 	HHuginn::HClass const* _juncture;
 	HHuginn::function_t _function;
 public:
-	HMethod( HHuginn::HClass const* /* used by HBoundMethod */, HHuginn::HClass const*, HHuginn::function_t const& );
 	HMethod( HHuginn::HClass const*, HHuginn::function_t const& );
 	HHuginn::function_t const& function( void ) const;
 private:
@@ -563,14 +562,16 @@ private:
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
-class HHuginn::HClass::HBoundMethod : public HHuginn::HClass::HMethod {
+class HHuginn::HClass::HBoundMethod : public HHuginn::HValue {
 	typedef HHuginn::HClass::HBoundMethod this_type;
-	typedef HHuginn::HClass::HMethod base_type;
+	typedef HHuginn::HValue base_type;
 private:
+	HHuginn::function_t _function;
 	HHuginn::value_t _objectHolder;
 public:
 	HBoundMethod( HHuginn::function_t const&, HHuginn::value_t const& );
 	HHuginn::value_t call( huginn::HThread*, values_t&, int );
+	HHuginn::function_t const& function( void ) const;
 private:
 	HBoundMethod( HBoundMethod const& ) = delete;
 	HBoundMethod& operator = ( HBoundMethod const& ) = delete;

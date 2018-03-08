@@ -72,6 +72,7 @@ HHuginn::HObject::~HObject( void ) {
 		HClass const* c( clss->super() );
 		if ( destructorIdx >= 0 ) {
 			try {
+				M_ASSERT( _fields[destructorIdx]->type_id() == HHuginn::TYPE::METHOD );
 				static_cast<HClass::HMethod const*>(
 					_fields[destructorIdx].raw()
 				)->function()( t, &nonOwning, HArguments( t ), 0 );
@@ -211,7 +212,7 @@ HHuginn::value_t HHuginn::HObject::call_method(
 ) const {
 	M_PROLOG
 	HHuginn::value_t f( get_method( thread_, object_, methodIdentifier_, position_ ) );
-	HHuginn::HClass::HMethod const* m( static_cast<HHuginn::HClass::HMethod const*>( f.raw() ) );
+	HHuginn::HClass::HBoundMethod const* m( static_cast<HHuginn::HClass::HBoundMethod const*>( f.raw() ) );
 	return ( m->function()( thread_, const_cast<HHuginn::value_t*>( &object_ ), arguments_, position_ ) );
 	M_EPILOG
 }
@@ -225,7 +226,7 @@ HHuginn::value_t HHuginn::HObject::call_method(
 ) const {
 	M_PROLOG
 	HHuginn::value_t f( get_method( thread_, object_, thread_->runtime().identifier_id( methodName_ ), position_ ) );
-	HHuginn::HClass::HMethod const* m( static_cast<HHuginn::HClass::HMethod const*>( f.raw() ) );
+	HHuginn::HClass::HBoundMethod const* m( static_cast<HHuginn::HClass::HBoundMethod const*>( f.raw() ) );
 	return ( m->function()( thread_, const_cast<HHuginn::value_t*>( &object_ ), arguments_, position_ ) );
 	M_EPILOG
 }
@@ -245,7 +246,7 @@ HHuginn::value_t HHuginn::HObject::do_clone( huginn::HThread* thread_, HHuginn::
 				position_
 			);
 		}
-		HHuginn::HClass::HMethod const* m( static_cast<HHuginn::HClass::HMethod const*>( cloneMember.raw() ) );
+		HHuginn::HClass::HBoundMethod const* m( static_cast<HHuginn::HClass::HBoundMethod const*>( cloneMember.raw() ) );
 		copy = m->function()( thread_, object_, HArguments( thread_ ), position_ );
 	} else {
 		values_t fields;
