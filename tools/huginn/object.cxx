@@ -164,22 +164,23 @@ HHuginn::value_t HHuginn::HObject::get_method(
 ) const {
 	M_PROLOG
 	M_ASSERT( object_.raw() == this );
-	HHuginn::value_t res;
+	return (
+		get_class()->runtime()->object_factory()->create_bound_method(
+			get_method( thread_, methodIdentifier_, position_ ),
+			object_
+		)
+	);
+	M_EPILOG
+}
+
+HHuginn::function_t const& HHuginn::HObject::get_method(
+	huginn::HThread* thread_,
+	HHuginn::identifier_id_t methodIdentifier_,
+	int position_
+) const {
+	M_PROLOG
 	int idx( field_index( methodIdentifier_ ) );
-	if ( idx >= 0 ) {
-		res = field( object_, idx );
-		if ( res->type_id() != HHuginn::TYPE::BOUND_METHOD ) {
-			throw HHuginn::HHuginnRuntimeException(
-				"`"_ys
-					.append( thread_->runtime().identifier_name( methodIdentifier_ ) )
-					.append( "' in class `" )
-					.append( get_class()->name() )
-					.append( "' is not a method." ),
-				thread_->current_frame()->file_id(),
-				position_
-			);
-		}
-	} else {
+	if ( idx < 0 ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Class `"_ys
 				.append( get_class()->name() )
@@ -190,17 +191,20 @@ HHuginn::value_t HHuginn::HObject::get_method(
 			position_
 		);
 	}
-	return ( res );
+	HHuginn::value_t const& f( _fields[ idx ] );
+	if ( f->type_id() != HHuginn::TYPE::METHOD ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"`"_ys
+				.append( thread_->runtime().identifier_name( methodIdentifier_ ) )
+				.append( "' in class `" )
+				.append( get_class()->name() )
+				.append( "' is not a method." ),
+			thread_->current_frame()->file_id(),
+			position_
+		);
+	}
+	return ( static_cast<HHuginn::HClass::HMethod const*>( f.raw() )->function() );
 	M_EPILOG
-}
-
-HHuginn::value_t HHuginn::HObject::get_method(
-	huginn::HThread* thread_,
-	HHuginn::value_t const& object_,
-	yaal::hcore::HString const& methodName_,
-	int position_
-) const {
-	return ( get_method( thread_, object_, thread_->runtime().identifier_id( methodName_ ), position_ ) );
 }
 
 HHuginn::value_t HHuginn::HObject::call_method(
@@ -211,23 +215,8 @@ HHuginn::value_t HHuginn::HObject::call_method(
 	int position_
 ) const {
 	M_PROLOG
-	HHuginn::value_t f( get_method( thread_, object_, methodIdentifier_, position_ ) );
-	HHuginn::HClass::HBoundMethod const* m( static_cast<HHuginn::HClass::HBoundMethod const*>( f.raw() ) );
-	return ( m->function()( thread_, const_cast<HHuginn::value_t*>( &object_ ), arguments_, position_ ) );
-	M_EPILOG
-}
-
-HHuginn::value_t HHuginn::HObject::call_method(
-	huginn::HThread* thread_,
-	HHuginn::value_t const& object_,
-	yaal::hcore::HString const& methodName_,
-	HHuginn::values_t& arguments_,
-	int position_
-) const {
-	M_PROLOG
-	HHuginn::value_t f( get_method( thread_, object_, thread_->runtime().identifier_id( methodName_ ), position_ ) );
-	HHuginn::HClass::HBoundMethod const* m( static_cast<HHuginn::HClass::HBoundMethod const*>( f.raw() ) );
-	return ( m->function()( thread_, const_cast<HHuginn::value_t*>( &object_ ), arguments_, position_ ) );
+	HHuginn::function_t const& f( get_method( thread_, methodIdentifier_, position_ ) );
+	return ( f( thread_, const_cast<HHuginn::value_t*>( &object_ ), arguments_, position_ ) );
 	M_EPILOG
 }
 
@@ -236,8 +225,8 @@ HHuginn::value_t HHuginn::HObject::do_clone( huginn::HThread* thread_, HHuginn::
 	int idx( field_index( INTERFACE::CLONE_IDENTIFIER ) );
 	HHuginn::value_t copy;
 	if ( idx >= 0 ) {
-		HHuginn::value_t cloneMember( field( *object_, idx ) );
-		if ( cloneMember->type_id() != HHuginn::TYPE::BOUND_METHOD ) {
+		HHuginn::value_t const& cloneMember( _fields[ idx ] );
+		if ( cloneMember->type_id() != HHuginn::TYPE::METHOD ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"`clone' in class `"_ys
 					.append( get_class()->name() )
@@ -246,7 +235,7 @@ HHuginn::value_t HHuginn::HObject::do_clone( huginn::HThread* thread_, HHuginn::
 				position_
 			);
 		}
-		HHuginn::HClass::HBoundMethod const* m( static_cast<HHuginn::HClass::HBoundMethod const*>( cloneMember.raw() ) );
+		HHuginn::HClass::HMethod const* m( static_cast<HHuginn::HClass::HMethod const*>( cloneMember.raw() ) );
 		copy = m->function()( thread_, object_, HArguments( thread_ ), position_ );
 	} else {
 		values_t fields;

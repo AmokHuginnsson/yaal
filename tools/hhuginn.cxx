@@ -921,10 +921,6 @@ HHuginn::value_t HHuginn::HClass::HBoundMethod::call( huginn::HThread* thread_, 
 	return ( _function( thread_, &_objectHolder, arguments_, position_ ) );
 }
 
-HHuginn::function_t const& HHuginn::HClass::HBoundMethod::function( void ) const {
-	return ( _function );
-}
-
 HHuginn::value_t HHuginn::HClass::HBoundMethod::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
 	return (
 		thread_->runtime().object_factory()->create_bound_method(

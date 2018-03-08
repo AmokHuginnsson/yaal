@@ -574,7 +574,6 @@ private:
 public:
 	HBoundMethod( HHuginn::function_t const&, HHuginn::value_t const& );
 	HHuginn::value_t call( huginn::HThread*, values_t&, int );
-	HHuginn::function_t const& function( void ) const;
 private:
 	HBoundMethod( HBoundMethod const& ) = delete;
 	HBoundMethod& operator = ( HBoundMethod const& ) = delete;
@@ -594,14 +593,13 @@ public:
 	value_t& field_ref( int );
 	HHuginn::value_t call_method( huginn::HThread*, HHuginn::value_t const&, HHuginn::identifier_id_t, HHuginn::values_t&, int ) const;
 	HHuginn::value_t get_method( huginn::HThread*, HHuginn::value_t const&, HHuginn::identifier_id_t, int ) const;
-	HHuginn::value_t call_method( huginn::HThread*, HHuginn::value_t const&, yaal::hcore::HString const&, HHuginn::values_t&, int ) const;
-	HHuginn::value_t get_method( huginn::HThread*, HHuginn::value_t const&, yaal::hcore::HString const&, int ) const;
 	static HHuginn::value_t init_base( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t forward_call( HHuginn::function_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 private:
 	HObject( HObject const& ) = delete;
 	HObject& operator = ( HObject const& ) = delete;
 private:
+	HHuginn::function_t const& get_method( huginn::HThread*, HHuginn::identifier_id_t, int ) const;
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 	virtual value_t do_field( HHuginn::value_t const&, int ) const override;
 };
