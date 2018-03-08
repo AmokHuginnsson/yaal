@@ -882,9 +882,13 @@ HHuginn::HClass::HMethod::HMethod(
 	return;
 }
 
-HHuginn::value_t HHuginn::HClass::HMethod::call( huginn::HThread* thread_, values_t& arguments_, int fileId_, int position_ ) {
+HHuginn::value_t HHuginn::HClass::HMethod::call( huginn::HThread* thread_, values_t& arguments_, int position_ ) {
 	if ( arguments_.is_empty() ) {
-		throw HHuginn::HHuginnRuntimeException( "Calling method without an object.", fileId_, position_ );
+		throw HHuginn::HHuginnRuntimeException(
+			"Calling method without an object.",
+			thread_->current_frame()->file_id(),
+			position_
+		);
 	}
 	HHuginn::value_t o( yaal::move( arguments_.front() ) );
 	if ( o->get_class() != _juncture ) {
@@ -893,7 +897,9 @@ HHuginn::value_t HHuginn::HClass::HMethod::call( huginn::HThread* thread_, value
 				.append( a_type_name( _juncture ) )
 				.append( " called on an object of type " )
 				.append( a_type_name( o->get_class() ) )
-				.append( "." ), fileId_, position_
+				.append( "." ),
+			thread_->current_frame()->file_id(),
+			position_
 		);
 	}
 	arguments_.erase( arguments_.begin() );

@@ -111,9 +111,32 @@ protected:
 };
 
 class HMethodFilterIterator : public HFilterIterator {
+	HHuginn::HClass::HMethod& _method;
+public:
+	HMethodFilterIterator( HHuginn::HIterable::HIterator&& iterator_, HHuginn::HClass::HMethod& method_, HThread* thread_, int position_ )
+		: HFilterIterator( yaal::move( iterator_ ) )
+		, _method( method_ ) {
+		scan( thread_, position_ );
+		return;
+	}
+protected:
+	virtual bool do_test( HThread* thread_, int position_ ) override {
+		HHuginn::value_t v( _method.call( thread_, HArguments( thread_, _impl.value( thread_, position_ ) ), position_ ) );
+		if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
+			throw HHuginn::HHuginnRuntimeException(
+				hcore::to_string( "Filter functor returned wrong type, expected `boolean' got: `" ).append( v->get_class()->name() ).append( "'." ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+		return ( static_cast<HHuginn::HBoolean*>( v.raw() )->value() );
+	}
+};
+
+class HBoundMethodFilterIterator : public HFilterIterator {
 	HHuginn::HClass::HBoundMethod& _method;
 public:
-	HMethodFilterIterator( HHuginn::HIterable::HIterator&& iterator_, HHuginn::HClass::HBoundMethod& method_, HThread* thread_, int position_ )
+	HBoundMethodFilterIterator( HHuginn::HIterable::HIterator&& iterator_, HHuginn::HClass::HBoundMethod& method_, HThread* thread_, int position_ )
 		: HFilterIterator( yaal::move( iterator_ ) )
 		, _method( method_ ) {
 		scan( thread_, position_ );
@@ -137,8 +160,10 @@ HFilter::HIterator HFilter::do_iterator( HThread* thread_, int position_ ) {
 	HIterator::iterator_implementation_t impl;
 	if ( !! _function ) {
 		impl.reset( new ( memory::yaal ) HFunctionFilterIterator( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), _function, thread_, position_ ) );
+	} else if ( _method->type_id() == HHuginn::TYPE::METHOD ) {
+		impl.reset( new ( memory::yaal ) HMethodFilterIterator( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), *static_cast<HHuginn::HClass::HMethod*>( _method.raw() ), thread_, position_ ) );
 	} else {
-		impl.reset( new ( memory::yaal ) HMethodFilterIterator( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), *static_cast<HHuginn::HClass::HBoundMethod*>( _method.raw() ), thread_, position_ ) );
+		impl.reset( new ( memory::yaal ) HBoundMethodFilterIterator( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), *static_cast<HHuginn::HClass::HBoundMethod*>( _method.raw() ), thread_, position_ ) );
 	}
 	return ( HIterator( yaal::move( impl ) ) );
 }

@@ -705,7 +705,7 @@ void HExpression::function_call( OExecutionStep const& executionStep_, HFrame* f
 		values.push( m->call( thread, args, p ) );
 	} else if ( t == HHuginn::TYPE::METHOD ) {
 		HHuginn::HClass::HMethod* m( static_cast<HHuginn::HClass::HMethod*>( f.raw() ) );
-		values.push( m->call( thread, args, file_id(), p ) );
+		values.push( m->call( thread, args, p ) );
 	} else {
 		throw HHuginn::HHuginnRuntimeException( "Reference `"_ys.append( c->name() ).append( "' is not a function." ), file_id(), executionStep_._position );
 	}
