@@ -78,9 +78,9 @@ public:
 		, _exceptionClass( exceptionClass_ )
 		, _queryClass( huginn::HQuery::get_class( runtime_, exceptionClass_ ) ) {
 		HHuginn::field_definitions_t fd{
-			{ "query",        runtime_->create_method( this, &HDatabaseConnection::query ),        "( *sql* ) - create query object for given *sql* `string`" },
-			{ "table_names",  runtime_->create_method( this, &HDatabaseConnection::table_names ),  "get list of table names available in connected database" },
-			{ "column_names", runtime_->create_method( this, &HDatabaseConnection::column_names ), "( *table* ) - get list of column names from given *table* in connected database" }
+			{ "query",        runtime_->create_method( &HDatabaseConnection::query ),        "( *sql* ) - create query object for given *sql* `string`" },
+			{ "table_names",  runtime_->create_method( &HDatabaseConnection::table_names ),  "get list of table names available in connected database" },
+			{ "column_names", runtime_->create_method( &HDatabaseConnection::column_names ), "( *table* ) - get list of column names from given *table* in connected database" }
 		};
 		redefine( nullptr, fd );
 		return;

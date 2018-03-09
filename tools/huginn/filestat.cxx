@@ -160,17 +160,17 @@ HHuginn::class_t HFileStat::get_class( HRuntime* runtime_ ) {
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "id",       runtime_->create_method( c.raw(), &HFileStat::id ),    "get file's identification number" },
-		{ "name",     runtime_->create_method( c.raw(), &HFileStat::name ),  "get the name of the file" },
-		{ "size",     runtime_->create_method( c.raw(), &HFileStat::size ),  "get file size in bytes" },
-		{ "mode",     runtime_->create_method( c.raw(), &HFileStat::mode ),  "get file's access permissions" },
-		{ "type",     runtime_->create_method( c.raw(), &HFileStat::type ),  "get the type of the file" },
-		{ "user",     runtime_->create_method( c.raw(), &HFileStat::user ),  "get an user name of the file owner" },
-		{ "group",    runtime_->create_method( c.raw(), &HFileStat::group ), "get a group name of the file owner" },
-		{ "created",  runtime_->create_method( c.raw(), &HFileStat::get_times, "FileStat.created",  &HFSItem::created ),  "get file's metadata modification `time`" },
-		{ "changed",  runtime_->create_method( c.raw(), &HFileStat::get_times, "FileStat.changed",  &HFSItem::created ),  "get file's metadata modification `time`" },
-		{ "modified", runtime_->create_method( c.raw(), &HFileStat::get_times, "FileStat.modified", &HFSItem::modified ), "get file's data modification `time`" },
-		{ "accessed", runtime_->create_method( c.raw(), &HFileStat::get_times, "FileStat.accessed", &HFSItem::accessed ), "get file's last access `time`" }
+		{ "id",       runtime_->create_method( &HFileStat::id ),    "get file's identification number" },
+		{ "name",     runtime_->create_method( &HFileStat::name ),  "get the name of the file" },
+		{ "size",     runtime_->create_method( &HFileStat::size ),  "get file size in bytes" },
+		{ "mode",     runtime_->create_method( &HFileStat::mode ),  "get file's access permissions" },
+		{ "type",     runtime_->create_method( &HFileStat::type ),  "get the type of the file" },
+		{ "user",     runtime_->create_method( &HFileStat::user ),  "get an user name of the file owner" },
+		{ "group",    runtime_->create_method( &HFileStat::group ), "get a group name of the file owner" },
+		{ "created",  runtime_->create_method( &HFileStat::get_times, "FileStat.created",  &HFSItem::created ),  "get file's metadata modification `time`" },
+		{ "changed",  runtime_->create_method( &HFileStat::get_times, "FileStat.changed",  &HFSItem::created ),  "get file's metadata modification `time`" },
+		{ "modified", runtime_->create_method( &HFileStat::get_times, "FileStat.modified", &HFSItem::modified ), "get file's data modification `time`" },
+		{ "accessed", runtime_->create_method( &HFileStat::get_times, "FileStat.accessed", &HFSItem::accessed ), "get file's last access `time`" }
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );

@@ -76,9 +76,9 @@ public:
 		, _exceptionClass( exceptionClass_ )
 		, _regularExpressionMatchClass( HRegularExpressionMatch::get_class( runtime_ ) ) {
 		HHuginn::field_definitions_t fd{
-			{ "match",   runtime_->create_method( this, &HCompiledRegularExpression::match ),   "( *text* ) - find a match of this compiled regular expression in given *text*" },
-			{ "groups",  runtime_->create_method( this, &HCompiledRegularExpression::groups ),  "( *text* ) - get all matching regular expression groups from this regular expression in given *text*" },
-			{ "replace", runtime_->create_method( this, &HCompiledRegularExpression::replace ), "( *text*, *replacement* ) - replace each occurrence of matched groups in *text* with *replacement* pattern" }
+			{ "match",   runtime_->create_method( &HCompiledRegularExpression::match ),   "( *text* ) - find a match of this compiled regular expression in given *text*" },
+			{ "groups",  runtime_->create_method( &HCompiledRegularExpression::groups ),  "( *text* ) - get all matching regular expression groups from this regular expression in given *text*" },
+			{ "replace", runtime_->create_method( &HCompiledRegularExpression::replace ), "( *text*, *replacement* ) - replace each occurrence of matched groups in *text* with *replacement* pattern" }
 		};
 		redefine( nullptr, fd );
 		return;

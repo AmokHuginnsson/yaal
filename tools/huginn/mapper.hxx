@@ -85,10 +85,10 @@ protected:
 	}
 };
 
-class HMethodMapperIterator : public HMapperIterator {
-	HHuginn::HClass::HMethod& _method;
+class HUnboundMethodMapperIterator : public HMapperIterator {
+	HHuginn::HClass::HUnboundMethod& _method;
 public:
-	HMethodMapperIterator( HHuginn::HIterable::HIterator&& iterator_, HHuginn::HClass::HMethod& method_ )
+	HUnboundMethodMapperIterator( HHuginn::HIterable::HIterator&& iterator_, HHuginn::HClass::HUnboundMethod& method_ )
 		: HMapperIterator( yaal::move( iterator_ ) )
 		, _method( method_ ) {
 		return;
@@ -117,8 +117,8 @@ HMapper::HIterator HMapper::do_iterator( HThread* thread_, int position_ ) {
 	HIterator::iterator_implementation_t impl;
 	if ( !! _function ) {
 		impl.reset( new ( memory::yaal ) HFunctionMapperIterator( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), _function ) );
-	} else if ( _method->type_id() == HHuginn::TYPE::METHOD ) {
-		impl.reset( new ( memory::yaal ) HMethodMapperIterator( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), *static_cast<HHuginn::HClass::HMethod*>( _method.raw() ) ) );
+	} else if ( _method->type_id() == HHuginn::TYPE::UNBOUND_METHOD ) {
+		impl.reset( new ( memory::yaal ) HUnboundMethodMapperIterator( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), *static_cast<HHuginn::HClass::HUnboundMethod*>( _method.raw() ) ) );
 	} else {
 		impl.reset( new ( memory::yaal ) HBoundMethodMapperIterator( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), *static_cast<HHuginn::HClass::HBoundMethod*>( _method.raw() ) ) );
 	}

@@ -346,16 +346,16 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "has_key", objectFactory_->create_method( c.raw(), &lookup::has_key ), "( *key* ) - tell if given *key* can be found in this `lookup`" },
-		{ "get",     objectFactory_->create_method( c.raw(), &lookup::get ),     "( *key*, *default* ) - get value for given *key* from this `lookup`, or *default* if given *key* is not present in the `lookup`" },
-		{ "ensure",  objectFactory_->create_method( c.raw(), &lookup::ensure ),  "( *key*, *default* ) - get value for given *key* from this `lookup`, if given *key* is not present in the `lookup` insert *default* into this `lookup` before returning it" },
-		{ "erase",   objectFactory_->create_method( c.raw(), &lookup::erase ),   "( *key* ) - remove given *key* from this `lookup`" },
-		{ "clear",   objectFactory_->create_method( c.raw(), &lookup::clear ),   "erase `lookup`'s content, `lookup` becomes empty" },
-		{ "add",     objectFactory_->create_method( c.raw(), &lookup::update ),  "( *other* ) - update content of this `lookup` with key/value pairs from *other* `lookup`" },
-		{ "update",  objectFactory_->create_method( c.raw(), &lookup::update ),  "( *other* ) - update content of this `lookup` with key/value pairs from *other* `lookup`" },
-		{ "hash",    objectFactory_->create_method( c.raw(), &lookup::hash ),    "calculate hash value for this `lookup`" },
-		{ "equals",  objectFactory_->create_method( c.raw(), &lookup::equals ),  "( *other* ) - test if *other* `lookup` has the same content" },
-		{ "values",  objectFactory_->create_method( c.raw(), &lookup::values ),  "get key-value pairs view of this `lookup`" }
+		{ "has_key", objectFactory_->create_method( &lookup::has_key ), "( *key* ) - tell if given *key* can be found in this `lookup`" },
+		{ "get",     objectFactory_->create_method( &lookup::get ),     "( *key*, *default* ) - get value for given *key* from this `lookup`, or *default* if given *key* is not present in the `lookup`" },
+		{ "ensure",  objectFactory_->create_method( &lookup::ensure ),  "( *key*, *default* ) - get value for given *key* from this `lookup`, if given *key* is not present in the `lookup` insert *default* into this `lookup` before returning it" },
+		{ "erase",   objectFactory_->create_method( &lookup::erase ),   "( *key* ) - remove given *key* from this `lookup`" },
+		{ "clear",   objectFactory_->create_method( &lookup::clear ),   "erase `lookup`'s content, `lookup` becomes empty" },
+		{ "add",     objectFactory_->create_method( &lookup::update ),  "( *other* ) - update content of this `lookup` with key/value pairs from *other* `lookup`" },
+		{ "update",  objectFactory_->create_method( &lookup::update ),  "( *other* ) - update content of this `lookup` with key/value pairs from *other* `lookup`" },
+		{ "hash",    objectFactory_->create_method( &lookup::hash ),    "calculate hash value for this `lookup`" },
+		{ "equals",  objectFactory_->create_method( &lookup::equals ),  "( *other* ) - test if *other* `lookup` has the same content" },
+		{ "values",  objectFactory_->create_method( &lookup::values ),  "get key-value pairs view of this `lookup`" }
 	};
 	c->redefine( nullptr, fd );
 	return ( c );

@@ -70,10 +70,10 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "is_exact",      objectFactory_->create_method( c.raw(), &number::is_exact ),      "tell if this number is an exact representation" },
-		{ "is_integral",   objectFactory_->create_method( c.raw(), &number::is_integral ),   "tell if this number does not have any decimal digits" },
-		{ "get_precision", objectFactory_->create_method( c.raw(), &number::get_precision ), "get maximum precision of this number" },
-		{ "set_precision", objectFactory_->create_method( c.raw(), &number::set_precision ), "( *prec* ) set maximum precision of this number to *prec* (increasing precision works only on numbers that currently have exact representation)" }
+		{ "is_exact",      objectFactory_->create_method( &number::is_exact ),      "tell if this number is an exact representation" },
+		{ "is_integral",   objectFactory_->create_method( &number::is_integral ),   "tell if this number does not have any decimal digits" },
+		{ "get_precision", objectFactory_->create_method( &number::get_precision ), "get maximum precision of this number" },
+		{ "set_precision", objectFactory_->create_method( &number::set_precision ), "( *prec* ) set maximum precision of this number to *prec* (increasing precision works only on numbers that currently have exact representation)" }
 	};
 	c->redefine( nullptr, fd );
 	return ( c );

@@ -63,7 +63,7 @@ HHuginn::value_t HRegularExpressionsCreator::do_new_instance( HRuntime* runtime_
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "compile", runtime_->create_method( c.raw(), &HRegularExpressions::compile ), "( *pattern* ) - compile given regular expression pattern to be used for text searches" }
+		{ "compile", runtime_->create_method( &HRegularExpressions::compile ), "( *pattern* ) - compile given regular expression pattern to be used for text searches" }
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );

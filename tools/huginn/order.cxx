@@ -240,14 +240,14 @@ public:
 		)
 		, _reversedOrderClass( HReversedOrder::get_class( runtime_ ) ) {
 		HHuginn::field_definitions_t fd{
-			{ "insert",  objectFactory_->create_method( this, &order::insert ),  "( *elem* ) - insert given element *elem* into an `order`" },
-			{ "has_key", objectFactory_->create_method( this, &order::has_key ), "( *elem* ) - tell if given element *elem* is in the `order`" },
-			{ "erase",   objectFactory_->create_method( this, &order::erase ),   "( *elem* ) - remove given element *elem* from the `order`" },
-			{ "clear",   objectFactory_->create_method( this, &order::clear ),   "erase `order`'s content, `order` becomes empty" },
-			{ "add",     objectFactory_->create_method( this, &order::update ),  "( *other* ) - update content of this `order` with values added from *other* `order`" },
-			{ "update",  objectFactory_->create_method( this, &order::update ),  "( *other* ) - update content of this `order` with values from *other* `order`" },
-			{ "hash",    objectFactory_->create_method( this, &order::hash ),    "calculate hash value for this `order`" },
-			{ "equals",  objectFactory_->create_method( this, &order::equals ),  "( *other* ) - test if *other* `order` has the same content" }
+			{ "insert",  objectFactory_->create_method( &order::insert ),  "( *elem* ) - insert given element *elem* into an `order`" },
+			{ "has_key", objectFactory_->create_method( &order::has_key ), "( *elem* ) - tell if given element *elem* is in the `order`" },
+			{ "erase",   objectFactory_->create_method( &order::erase ),   "( *elem* ) - remove given element *elem* from the `order`" },
+			{ "clear",   objectFactory_->create_method( &order::clear ),   "erase `order`'s content, `order` becomes empty" },
+			{ "add",     objectFactory_->create_method( &order::update ),  "( *other* ) - update content of this `order` with values added from *other* `order`" },
+			{ "update",  objectFactory_->create_method( &order::update ),  "( *other* ) - update content of this `order` with values from *other* `order`" },
+			{ "hash",    objectFactory_->create_method( &order::hash ),    "calculate hash value for this `order`" },
+			{ "equals",  objectFactory_->create_method( &order::equals ),  "( *other* ) - test if *other* `order` has the same content" }
 		};
 		redefine( nullptr, fd );
 		return;

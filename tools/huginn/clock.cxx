@@ -63,9 +63,9 @@ HHuginn::class_t HClock::get_class( HRuntime* runtime_ ) {
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "milliseconds", runtime_->create_method( c.raw(), &HClock::milliseconds ), "how many milliseconds elapsed since last `Clock` reset" },
-		{ "reset",        runtime_->create_method( c.raw(), &HClock::reset ),        "() - reset `Clock`s elapsed time counter" },
-		{ "to_string",    runtime_->create_method( c.raw(), &HClock::to_string ),    "get precise `string` representation of elapsed time measured by this `Clock`" }
+		{ "milliseconds", runtime_->create_method( &HClock::milliseconds ), "how many milliseconds elapsed since last `Clock` reset" },
+		{ "reset",        runtime_->create_method( &HClock::reset ),        "() - reset `Clock`s elapsed time counter" },
+		{ "to_string",    runtime_->create_method( &HClock::to_string ),    "get precise `string` representation of elapsed time measured by this `Clock`" }
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );

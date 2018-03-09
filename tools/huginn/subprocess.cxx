@@ -36,13 +36,13 @@ public:
 		)
 		, _streamClass( HStream::get_class( runtime_ ) ) {
 		HHuginn::field_definitions_t fd{
-			{ "is_alive", runtime_->create_method( this, &HSubprocess::is_alive ), "tell if given subprocess is alive and running" },
-			{ "kill",     runtime_->create_method( this, &HSubprocess::kill ),     "kill this sub-process" },
-			{ "get_pid",  runtime_->create_method( this, &HSubprocess::get_pid ),  "get operating system Process IDentification-number of this subprocess" },
-			{ "wait",     runtime_->create_method( this, &HSubprocess::wait ),     "wait for this subprocess to finish is execution and return its exit status" },
-			{ "in",       runtime_->create_method( this, &HSubprocess::stream, "Subprocess.in", &HPipedChild::stream_in ),   "standard input stream of a subprocess" },
-			{ "out",      runtime_->create_method( this, &HSubprocess::stream, "Subprocess.out", &HPipedChild::stream_out ), "standard output stream of a subprocess" },
-			{ "err",      runtime_->create_method( this, &HSubprocess::stream, "Subprocess.err", &HPipedChild::stream_err ), "standard error stream of a subprocess" }
+			{ "is_alive", runtime_->create_method( &HSubprocess::is_alive ), "tell if given subprocess is alive and running" },
+			{ "kill",     runtime_->create_method( &HSubprocess::kill ),     "kill this sub-process" },
+			{ "get_pid",  runtime_->create_method( &HSubprocess::get_pid ),  "get operating system Process IDentification-number of this subprocess" },
+			{ "wait",     runtime_->create_method( &HSubprocess::wait ),     "wait for this subprocess to finish is execution and return its exit status" },
+			{ "in",       runtime_->create_method( &HSubprocess::stream, "Subprocess.in", &HPipedChild::stream_in ),   "standard input stream of a subprocess" },
+			{ "out",      runtime_->create_method( &HSubprocess::stream, "Subprocess.out", &HPipedChild::stream_out ), "standard output stream of a subprocess" },
+			{ "err",      runtime_->create_method( &HSubprocess::stream, "Subprocess.err", &HPipedChild::stream_err ), "standard error stream of a subprocess" }
 		};
 		redefine( nullptr, fd );
 		return;

@@ -142,11 +142,11 @@ public:
 		)
 		, _exceptionClass( exceptionClass_ ) {
 		HHuginn::field_definitions_t fd{
-			{ "column_name", runtime_->create_method( this, &HQueryResult::column_name ), "( *index* ) - get name of SELECT's column at given *index*" },
-			{ "field_count", runtime_->create_method( this, &HQueryResult::field_count ), "get number of SELECTed attributes" },
-			{ "insert_id",   runtime_->create_method( this, &HQueryResult::insert_id ),   "get value of row ID from last INSERT statement" },
-			{ "has_next",    runtime_->create_method( this, &HQueryResult::has_next ),    "tell if this result set has more rows to be fetched" },
-			{ "fetch_row",   runtime_->create_method( this, &HQueryResult::fetch_row ),   "fetch next row of data from this result set" }
+			{ "column_name", runtime_->create_method( &HQueryResult::column_name ), "( *index* ) - get name of SELECT's column at given *index*" },
+			{ "field_count", runtime_->create_method( &HQueryResult::field_count ), "get number of SELECTed attributes" },
+			{ "insert_id",   runtime_->create_method( &HQueryResult::insert_id ),   "get value of row ID from last INSERT statement" },
+			{ "has_next",    runtime_->create_method( &HQueryResult::has_next ),    "tell if this result set has more rows to be fetched" },
+			{ "fetch_row",   runtime_->create_method( &HQueryResult::fetch_row ),   "fetch next row of data from this result set" }
 		};
 		redefine( nullptr, fd );
 		return;

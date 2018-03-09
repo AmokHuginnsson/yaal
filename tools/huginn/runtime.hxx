@@ -239,9 +239,9 @@ public:
 	void copy_text( HRuntime& );
 	HHuginn::class_t make_package( yaal::hcore::HString const&, HRuntime const& );
 	template<typename... T>
-	HHuginn::value_t create_method( HHuginn::HClass const* juncture_, T&&... args_ ) {
+	HHuginn::value_t create_method( T&&... args_ ) {
 		return (
-			_objectFactory->create_method( juncture_, yaal::hcore::call( yaal::forward<T>( args_ )..., yaal::hcore::_1, yaal::hcore::_2, yaal::hcore::_3, yaal::hcore::_4 ) )
+			_objectFactory->create_method( yaal::forward<T>( args_ )... )
 		);
 	}
 	void set_incremental_frame( huginn::HThread::frame_t const& );
@@ -293,6 +293,7 @@ extern HHuginn::identifier_id_t const TYPE_REFERENCE_IDENTIFIER;
 extern HHuginn::identifier_id_t const TYPE_FUNCTION_REFERENCE_IDENTIFIER;
 extern HHuginn::identifier_id_t const TYPE_OBJECT_REFERENCE_IDENTIFIER;
 extern HHuginn::identifier_id_t const TYPE_METHOD_IDENTIFIER;
+extern HHuginn::identifier_id_t const TYPE_UNBOUND_METHOD_IDENTIFIER;
 extern HHuginn::identifier_id_t const TYPE_BOUND_METHOD_IDENTIFIER;
 extern HHuginn::identifier_id_t const TYPE_VARIADIC_PARAMETERS_IDENTIFIER;
 extern HHuginn::identifier_id_t const TYPE_NAMED_PARAMETERS_IDENTIFIER;

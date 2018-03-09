@@ -66,16 +66,18 @@ HHuginn::identifier_id_t const TYPE_REFERENCE_IDENTIFIER( 53 );
 HHuginn::identifier_id_t const TYPE_FUNCTION_REFERENCE_IDENTIFIER( 54 );
 HHuginn::identifier_id_t const TYPE_OBJECT_REFERENCE_IDENTIFIER( 55 );
 HHuginn::identifier_id_t const TYPE_METHOD_IDENTIFIER( 56 );
-HHuginn::identifier_id_t const TYPE_BOUND_METHOD_IDENTIFIER( 57 );
-HHuginn::identifier_id_t const TYPE_VARIADIC_PARAMETERS_IDENTIFIER( 58 );
-HHuginn::identifier_id_t const TYPE_NAMED_PARAMETERS_IDENTIFIER( 59 );
-HHuginn::identifier_id_t const TYPE_UNKNOWN_IDENTIFIER( 60 );
+HHuginn::identifier_id_t const TYPE_UNBOUND_METHOD_IDENTIFIER( 57 );
+HHuginn::identifier_id_t const TYPE_BOUND_METHOD_IDENTIFIER( 58 );
+HHuginn::identifier_id_t const TYPE_VARIADIC_PARAMETERS_IDENTIFIER( 59 );
+HHuginn::identifier_id_t const TYPE_NAMED_PARAMETERS_IDENTIFIER( 60 );
+HHuginn::identifier_id_t const TYPE_UNKNOWN_IDENTIFIER( 61 );
 HHuginn::HClass const _noneClass_( HHuginn::TYPE::NONE, TYPE_NONE_IDENTIFIER, "A type of `none` value." );
 HHuginn::HClass const _observerClass_( HHuginn::TYPE::OBSERVER, TYPE_OBSERVER_IDENTIFIER, "The `*observer*` is a type representing a reference cycle breaking, non-owning weak \"pointer\" to a value." );
 HHuginn::HClass const _referenceClass_( HHuginn::TYPE::REFERENCE, TYPE_REFERENCE_IDENTIFIER, "Write only reference. Allows assign operator to work." );
 HHuginn::HClass const _functionReferenceClass_( HHuginn::TYPE::FUNCTION_REFERENCE, TYPE_FUNCTION_REFERENCE_IDENTIFIER, "The `*function_reference*` is a Huginn's way of providing information about a value's *runtime* type." );
 HHuginn::HClass const _objectReferenceClass_( HHuginn::TYPE::OBJECT_REFERENCE, TYPE_OBJECT_REFERENCE_IDENTIFIER, "The `*object_reference*` is a up-casting reference allowing to access super class methods." );
-HHuginn::HClass const _methodClass_( HHuginn::TYPE::METHOD, TYPE_METHOD_IDENTIFIER, "Unbound method." );
+HHuginn::HClass const _methodClass_( HHuginn::TYPE::METHOD, TYPE_METHOD_IDENTIFIER, "Raw *uncallable* method." );
+HHuginn::HClass const _unboundMethodClass_( HHuginn::TYPE::UNBOUND_METHOD, TYPE_UNBOUND_METHOD_IDENTIFIER, "A reference to a callable but unbound method." );
 HHuginn::HClass const _boundMethodClass_( HHuginn::TYPE::BOUND_METHOD, TYPE_BOUND_METHOD_IDENTIFIER, "A reference to a callable method with a valid runtime value bound to it." );
 HHuginn::HClass const _variadicParametersClass_( HHuginn::TYPE::VARIADIC_PARAMETERS, TYPE_VARIADIC_PARAMETERS_IDENTIFIER, "Variadic parameters pack." );
 HHuginn::HClass const _namedParametersClass_( HHuginn::TYPE::NAMED_PARAMETERS, TYPE_NAMED_PARAMETERS_IDENTIFIER, "Named parameters pack." );
@@ -416,7 +418,7 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 			} else {
 				OCompiler::OClassContext::methods_t::const_iterator m( cc->_methods.find( i ) );
 				M_ASSERT( m != cc->_methods.end() );
-				fieldDefinitions.emplace_back( cc->_fieldNames[i], _runtime->object_factory()->create_method( cls.raw(), m->second ), cc->_docs.at( i ) );
+				fieldDefinitions.emplace_back( cc->_fieldNames[i], _runtime->object_factory()->create_method_raw( m->second ), cc->_docs.at( i ) );
 			}
 		}
 		t.pop_frame();
@@ -874,15 +876,26 @@ yaal::hcore::HString const& HHuginn::HFunctionReference::doc( void ) const {
 }
 
 HHuginn::HClass::HMethod::HMethod(
-	HHuginn::HClass const* juncture_,
 	function_t const& function_
 ) : HValue( &_methodClass_ )
+	, _function( function_ ) {
+	return;
+}
+
+HHuginn::value_t HHuginn::HClass::HMethod::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
+	return ( thread_->object_factory().create_method_raw( _function ) );
+}
+
+HHuginn::HClass::HUnboundMethod::HUnboundMethod(
+	HHuginn::HClass const* juncture_,
+	function_t const& function_
+) : HValue( &_unboundMethodClass_ )
 	, _juncture( juncture_ )
 	, _function( function_ ) {
 	return;
 }
 
-HHuginn::value_t HHuginn::HClass::HMethod::call( huginn::HThread* thread_, values_t& arguments_, int position_ ) {
+HHuginn::value_t HHuginn::HClass::HUnboundMethod::call( huginn::HThread* thread_, values_t& arguments_, int position_ ) {
 	if ( arguments_.is_empty() ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Calling method without an object.",
@@ -906,8 +919,8 @@ HHuginn::value_t HHuginn::HClass::HMethod::call( huginn::HThread* thread_, value
 	return ( _function( thread_, &o, arguments_, position_ ) );
 }
 
-HHuginn::value_t HHuginn::HClass::HMethod::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
-	return ( thread_->object_factory().create_method( _juncture, _function ) );
+HHuginn::value_t HHuginn::HClass::HUnboundMethod::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
+	return ( thread_->object_factory().create_unbound_method( _juncture, _function ) );
 }
 
 HHuginn::HClass::HBoundMethod::HBoundMethod( HHuginn::function_t const& method_, HHuginn::value_t const& object_ )

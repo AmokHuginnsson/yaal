@@ -533,7 +533,12 @@ void HExpression::get_field( OExecutionStep const& executionStep_,huginn::HFrame
 				if ( executionStep_._access == HFrame::ACCESS::REFERENCE ) {
 					throw HHuginn::HHuginnRuntimeException( "Assignment to read-only location.", file_id(), p );
 				}
-				values.push( c->field( fi ) );
+				HHuginn::value_t const& f( c->field( fi ) );
+				values.push(
+					f->type_id() == HHuginn::TYPE::METHOD
+						? rt.object_factory()->create_unbound_method( c.raw(), static_cast<HHuginn::HClass::HMethod const*>( f.raw() )->function() )
+						: f
+				);
 			} else {
 				throw HHuginn::HHuginnRuntimeException( "`"_ys.append( *n ).append( "' is not a compound object." ), file_id(), p );
 			}
@@ -703,11 +708,11 @@ void HExpression::function_call( OExecutionStep const& executionStep_, HFrame* f
 	} else if ( t == HHuginn::TYPE::BOUND_METHOD ) {
 		HHuginn::HClass::HBoundMethod* m( static_cast<HHuginn::HClass::HBoundMethod*>( f.raw() ) );
 		values.push( m->call( thread, args, p ) );
-	} else if ( t == HHuginn::TYPE::METHOD ) {
-		HHuginn::HClass::HMethod* m( static_cast<HHuginn::HClass::HMethod*>( f.raw() ) );
+	} else if ( t == HHuginn::TYPE::UNBOUND_METHOD ) {
+		HHuginn::HClass::HUnboundMethod* m( static_cast<HHuginn::HClass::HUnboundMethod*>( f.raw() ) );
 		values.push( m->call( thread, args, p ) );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "Reference `"_ys.append( c->name() ).append( "' is not a function." ), file_id(), executionStep_._position );
+		throw HHuginn::HHuginnRuntimeException( "Reference `"_ys.append( c->name() ).append( "' is not a callable." ), file_id(), executionStep_._position );
 	}
 	return;
 	M_EPILOG

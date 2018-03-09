@@ -172,6 +172,7 @@ class HObjectFactory final : public HObjectFactoryBase {
 	HObjectPool<HHuginn::HTaggedValue, POOL_TYPE::CLASSLESS> _taggedValuePool;
 	HObjectPool<HHuginn::HFunctionReference, POOL_TYPE::CLASSLESS> _functionReferencePool;
 	HObjectPool<HHuginn::HClass::HMethod, POOL_TYPE::CLASSLESS> _methodPool;
+	HObjectPool<HHuginn::HClass::HUnboundMethod, POOL_TYPE::CLASSLESS> _unboundMethodPool;
 	HObjectPool<HHuginn::HClass::HBoundMethod, POOL_TYPE::CLASSLESS> _boundMethodPool;
 	HObjectPool<HHuginn::HObject, POOL_TYPE::CLASSLESS> _objectPool;
 	/* Built-in classes. */
@@ -266,8 +267,17 @@ public:
 	HHuginn::value_t create_function_reference( HHuginn::identifier_id_t identifierId_, HHuginn::function_t const& function_, yaal::hcore::HString const& doc_ ) const {
 		return ( _functionReferencePool.create( identifierId_, function_, doc_ ) );
 	}
-	HHuginn::value_t create_method( HHuginn::HClass const* juncture_, HHuginn::function_t const& method_ ) const {
-		return ( _methodPool.create( juncture_, method_ ) );
+	template<typename... T>
+	HHuginn::value_t create_method( T&&... args_ ) {
+		return (
+			_methodPool.create( yaal::hcore::call( yaal::forward<T>( args_ )..., yaal::hcore::_1, yaal::hcore::_2, yaal::hcore::_3, yaal::hcore::_4 ) )
+		);
+	}
+	HHuginn::value_t create_method_raw( HHuginn::function_t const& method_ ) const {
+		return ( _methodPool.create( method_ ) );
+	}
+	HHuginn::value_t create_unbound_method( HHuginn::HClass const* juncture_, HHuginn::function_t const& method_ ) const {
+		return ( _unboundMethodPool.create( juncture_, method_ ) );
 	}
 	HHuginn::value_t create_bound_method( HHuginn::function_t const& method_, HHuginn::value_t const& object_ ) const {
 		return ( _boundMethodPool.create( method_, object_ ) );
@@ -336,12 +346,6 @@ public:
 	HHuginn::value_t create( args_t&&... args_ )  {
 		typedef typename pool_type_info<T>::allocator_t allocator_t;
 		return ( huginn::allocate_value<allocator_t, T>( get_allocator<T>(), yaal::forward<args_t>( args_ )... ) );
-	}
-	template<typename... T>
-	HHuginn::value_t create_method( HHuginn::HClass const* juncture_, T&&... args_ ) {
-		return (
-			_methodPool.create( juncture_, yaal::hcore::call( yaal::forward<T>( args_ )..., yaal::hcore::_1, yaal::hcore::_2, yaal::hcore::_3, yaal::hcore::_4 ) )
-		);
 	}
 private:
 	HObjectFactory( HObjectFactory const& ) = delete;

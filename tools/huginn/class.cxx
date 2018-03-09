@@ -104,12 +104,9 @@ void HHuginn::HClass::redefine( HClass const* super_, field_definitions_t const&
 	_fieldDescriptions = ( _super ? _super->_fieldDescriptions : field_descriptions_t() );
 	if ( has_builtin_base() ) {
 		for ( HHuginn::value_t& v : _fieldDefinitions ) {
-			v = _runtime->object_factory()->create_method(
-				this,
-				hcore::call(
-					&HHuginn::HClass::base_class_not_initialized,
-					this, _1, _2, _3, _4
-				)
+			v = _runtime->create_method(
+				&HHuginn::HClass::base_class_not_initialized,
+				this
 			);
 		}
 	}

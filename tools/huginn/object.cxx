@@ -114,12 +114,8 @@ HHuginn::value_t HHuginn::HObject::init_base( huginn::HThread* thread_, HHuginn:
 		HHuginn::HValue const& v( *super->field( i ) );
 		o->_fields[i] = ( v.type_id() == HHuginn::TYPE::METHOD )
 			? thread_->runtime().object_factory()->create_method(
-				o->get_class(),
-				hcore::call(
-					&HHuginn::HObject::forward_call,
-					static_cast<HHuginn::HClass::HMethod const&>( v ).function(),
-					_1, _2, _3, _4
-				)
+				&HHuginn::HObject::forward_call,
+				static_cast<HHuginn::HClass::HMethod const&>( v ).function()
 			)
 			: super->get_default( thread_, i, position_ );
 	}

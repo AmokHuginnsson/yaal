@@ -111,9 +111,9 @@ HHuginn::class_t HRandomizer::get_class( HRuntime* runtime_, HHuginn::HClass con
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "next",      runtime_->create_method( c.raw(), &HRandomizer::next ),      "([ *range* ]) - get next `integer` random number, possibly restricted to given range" },
-		{ "next_real", runtime_->create_method( c.raw(), &HRandomizer::next_real ), "([ *range* ]) - get next `real` random number, possibly restricted to given range" },
-		{ "to_string", runtime_->create_method( c.raw(), &HRandomizer::to_string ), "get string representation of this `Randomizer`" }
+		{ "next",      runtime_->create_method( &HRandomizer::next ),      "([ *range* ]) - get next `integer` random number, possibly restricted to given range" },
+		{ "next_real", runtime_->create_method( &HRandomizer::next_real ), "([ *range* ]) - get next `real` random number, possibly restricted to given range" },
+		{ "to_string", runtime_->create_method( &HRandomizer::to_string ), "get string representation of this `Randomizer`" }
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c, HHuginn::ACCESS::PUBLIC );

@@ -110,10 +110,10 @@ protected:
 	}
 };
 
-class HMethodFilterIterator : public HFilterIterator {
-	HHuginn::HClass::HMethod& _method;
+class HUnboundMethodFilterIterator : public HFilterIterator {
+	HHuginn::HClass::HUnboundMethod& _method;
 public:
-	HMethodFilterIterator( HHuginn::HIterable::HIterator&& iterator_, HHuginn::HClass::HMethod& method_, HThread* thread_, int position_ )
+	HUnboundMethodFilterIterator( HHuginn::HIterable::HIterator&& iterator_, HHuginn::HClass::HUnboundMethod& method_, HThread* thread_, int position_ )
 		: HFilterIterator( yaal::move( iterator_ ) )
 		, _method( method_ ) {
 		scan( thread_, position_ );
@@ -160,8 +160,8 @@ HFilter::HIterator HFilter::do_iterator( HThread* thread_, int position_ ) {
 	HIterator::iterator_implementation_t impl;
 	if ( !! _function ) {
 		impl.reset( new ( memory::yaal ) HFunctionFilterIterator( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), _function, thread_, position_ ) );
-	} else if ( _method->type_id() == HHuginn::TYPE::METHOD ) {
-		impl.reset( new ( memory::yaal ) HMethodFilterIterator( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), *static_cast<HHuginn::HClass::HMethod*>( _method.raw() ), thread_, position_ ) );
+	} else if ( _method->type_id() == HHuginn::TYPE::UNBOUND_METHOD ) {
+		impl.reset( new ( memory::yaal ) HUnboundMethodFilterIterator( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), *static_cast<HHuginn::HClass::HUnboundMethod*>( _method.raw() ), thread_, position_ ) );
 	} else {
 		impl.reset( new ( memory::yaal ) HBoundMethodFilterIterator( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), *static_cast<HHuginn::HClass::HBoundMethod*>( _method.raw() ), thread_, position_ ) );
 	}

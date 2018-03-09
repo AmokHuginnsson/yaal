@@ -679,6 +679,7 @@ HHuginn::HClass const* OCompiler::type_id_to_class( HHuginn::type_id_t typeId_ )
 		case ( HHuginn::TYPE::FUNCTION_REFERENCE ):  c = &_functionReferenceClass_;  break;
 		case ( HHuginn::TYPE::OBJECT_REFERENCE ):    c = &_objectReferenceClass_;    break;
 		case ( HHuginn::TYPE::METHOD ):              c = &_methodClass_;             break;
+		case ( HHuginn::TYPE::UNBOUND_METHOD ):      c = &_unboundMethodClass_;        break;
 		case ( HHuginn::TYPE::BOUND_METHOD ):        c = &_boundMethodClass_;        break;
 		case ( HHuginn::TYPE::VARIADIC_PARAMETERS ): c = &_variadicParametersClass_; break;
 		case ( HHuginn::TYPE::NAMED_PARAMETERS ):    c = &_namedParametersClass_;    break;

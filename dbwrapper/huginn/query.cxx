@@ -50,8 +50,8 @@ public:
 		, _exceptionClass( exceptionClass_ )
 		, _queryResultClass( huginn::HQueryResult::get_class( runtime_, exceptionClass_ ) ) {
 		HHuginn::field_definitions_t fd{
-			{ "bind",    runtime_->create_method( this, &HQuery::bind ),    "( *index*, *value* ) - bind given *value* for query variable at given *index*" },
-			{ "execute", runtime_->create_method( this, &HQuery::execute ), "execute query" }
+			{ "bind",    runtime_->create_method( &HQuery::bind ),    "( *index*, *value* ) - bind given *value* for query variable at given *index*" },
+			{ "execute", runtime_->create_method( &HQuery::execute ), "execute query" }
 		};
 		redefine( nullptr, fd );
 		return;

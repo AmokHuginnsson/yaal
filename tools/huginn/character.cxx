@@ -66,15 +66,15 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "to_lower",  objectFactory_->create_method( c.raw(), &character::to_lower ), "make this character lower case" },
-		{ "to_upper",  objectFactory_->create_method( c.raw(), &character::to_upper ), "make this character upper case" },
-		{ "is_upper",  objectFactory_->create_method( c.raw(), &character::is_of_a_kind, "character.is_upper",  hcore::is_upper ),      "tell if this character is an upper case character" },
-		{ "is_lower",  objectFactory_->create_method( c.raw(), &character::is_of_a_kind, "character.is_lower",  hcore::is_lower ),      "tell if this character is a lower case character" },
-		{ "is_digit",  objectFactory_->create_method( c.raw(), &character::is_of_a_kind, "character.is_digit",  hcore::is_digit ),      "tell if this character represents decimal digit" },
-		{ "is_xdigit", objectFactory_->create_method( c.raw(), &character::is_of_a_kind, "character.is_xdigit", hcore::is_hex_digit ),  "tell if this character represents a hexadecimal digit" },
-		{ "is_space",  objectFactory_->create_method( c.raw(), &character::is_of_a_kind, "character.is_space",  hcore::is_whitespace ), "tell if this character represents a white space character" },
-		{ "is_alpha",  objectFactory_->create_method( c.raw(), &character::is_of_a_kind, "character.is_alpha",  hcore::is_alpha ),      "tell if this character represents an alphabet character" },
-		{ "is_alnum",  objectFactory_->create_method( c.raw(), &character::is_of_a_kind, "character.is_alnum",  hcore::is_alnum ),      "tell if this character represents any alphanumeric character" }
+		{ "to_lower",  objectFactory_->create_method( &character::to_lower ), "make this character lower case" },
+		{ "to_upper",  objectFactory_->create_method( &character::to_upper ), "make this character upper case" },
+		{ "is_upper",  objectFactory_->create_method( &character::is_of_a_kind, "character.is_upper",  hcore::is_upper ),      "tell if this character is an upper case character" },
+		{ "is_lower",  objectFactory_->create_method( &character::is_of_a_kind, "character.is_lower",  hcore::is_lower ),      "tell if this character is a lower case character" },
+		{ "is_digit",  objectFactory_->create_method( &character::is_of_a_kind, "character.is_digit",  hcore::is_digit ),      "tell if this character represents decimal digit" },
+		{ "is_xdigit", objectFactory_->create_method( &character::is_of_a_kind, "character.is_xdigit", hcore::is_hex_digit ),  "tell if this character represents a hexadecimal digit" },
+		{ "is_space",  objectFactory_->create_method( &character::is_of_a_kind, "character.is_space",  hcore::is_whitespace ), "tell if this character represents a white space character" },
+		{ "is_alpha",  objectFactory_->create_method( &character::is_of_a_kind, "character.is_alpha",  hcore::is_alpha ),      "tell if this character represents an alphabet character" },
+		{ "is_alnum",  objectFactory_->create_method( &character::is_of_a_kind, "character.is_alnum",  hcore::is_alnum ),      "tell if this character represents any alphanumeric character" }
 	};
 	c->redefine( nullptr, fd );
 	return ( c );

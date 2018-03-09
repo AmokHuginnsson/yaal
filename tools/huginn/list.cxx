@@ -300,17 +300,17 @@ public:
 		)
 		, _reversedListClass( HReversedList::get_class( runtime_ ) ) {
 		HHuginn::field_definitions_t fd{
-			{ "push",   objectFactory_->create_method( this, &list::push ),   "( *elem* ) - add new *elem* at the end of the `list`, `list` grows in size by 1" },
-			{ "pop",    objectFactory_->create_method( this, &list::pop ),    "remove last element from the `list`, `list` shrinks by 1" },
-			{ "add",    objectFactory_->create_method( this, &list::append ), "( *other* ) - append all elements from *other* collection at the end of this `list`" },
-			{ "append", objectFactory_->create_method( this, &list::append ), "( *other* ) - append all elements from *other* collection at the end of this `list`" },
-			{ "insert", objectFactory_->create_method( this, &list::insert ), "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
-			{ "resize", objectFactory_->create_method( this, &list::resize ), "( *size*, *elem* ) - resize `list` to given *size* optionally filling new elements with **copies** of value *elem*" },
-			{ "clear",  objectFactory_->create_method( this, &list::clear ),  "erase `list`'s content, `list` becomes empty" },
-			{ "sort",   objectFactory_->create_method( this, &list::sort ),   "( [*callable*] ) - in-place sort this `list`, using *callable* to retrieve keys for element comparison" },
-			{ "hash",   objectFactory_->create_method( this, &list::hash ),   "calculate hash value for this `list`" },
-			{ "less",   objectFactory_->create_method( this, &list::less ),   "( *other* ) - test if this `list` comes lexicographically before *other* `list`" },
-			{ "equals", objectFactory_->create_method( this, &list::equals ), "( *other* ) - test if *other* `list` has the same content" }
+			{ "push",   objectFactory_->create_method( &list::push ),   "( *elem* ) - add new *elem* at the end of the `list`, `list` grows in size by 1" },
+			{ "pop",    objectFactory_->create_method( &list::pop ),    "remove last element from the `list`, `list` shrinks by 1" },
+			{ "add",    objectFactory_->create_method( &list::append ), "( *other* ) - append all elements from *other* collection at the end of this `list`" },
+			{ "append", objectFactory_->create_method( &list::append ), "( *other* ) - append all elements from *other* collection at the end of this `list`" },
+			{ "insert", objectFactory_->create_method( &list::insert ), "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
+			{ "resize", objectFactory_->create_method( &list::resize ), "( *size*, *elem* ) - resize `list` to given *size* optionally filling new elements with **copies** of value *elem*" },
+			{ "clear",  objectFactory_->create_method( &list::clear ),  "erase `list`'s content, `list` becomes empty" },
+			{ "sort",   objectFactory_->create_method( &list::sort ),   "( [*callable*] ) - in-place sort this `list`, using *callable* to retrieve keys for element comparison" },
+			{ "hash",   objectFactory_->create_method( &list::hash ),   "calculate hash value for this `list`" },
+			{ "less",   objectFactory_->create_method( &list::less ),   "( *other* ) - test if this `list` comes lexicographically before *other* `list`" },
+			{ "equals", objectFactory_->create_method( &list::equals ), "( *other* ) - test if *other* `list` has the same content" }
 		};
 		redefine( nullptr, fd );
 		return;

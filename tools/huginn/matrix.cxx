@@ -565,22 +565,22 @@ HHuginn::class_t HMatrix::get_class( HRuntime* runtime_, HHuginn::HClass const* 
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "columns",   runtime_->create_method( c.raw(), &HMatrix::columns ),   "get column dimension of this `Matrix`" },
-		{ "rows",      runtime_->create_method( c.raw(), &HMatrix::rows ),      "get row dimension of this `Matrix`" },
-		{ "get",       runtime_->create_method( c.raw(), &HMatrix::get ),       "( *row*, *column* ) - get numeric value present at given *row* and *column* in this `Matrix`" },
-		{ "set",       runtime_->create_method( c.raw(), &HMatrix::set ),       "( *row*, *column*, *value* ) - set given numeric *value* at given *row* and *column* in this `Matrix`" },
-		{ "add",       runtime_->create_method( c.raw(), &HMatrix::add ),       "( *other* ) - add *other* `Matrix` to this `Matrix`" },
-		{ "subtract",  runtime_->create_method( c.raw(), &HMatrix::subtract ),  "( *other* ) - subtract *other* `Matrix` from this `Matrix`" },
-		{ "multiply",  runtime_->create_method( c.raw(), &HMatrix::multiply ),  "( *other* ) - multiply this `Matrix` by *other* `Matrix`" },
-		{ "det",       runtime_->create_method( c.raw(), &HMatrix::det ),       "find value of determinant of this `Matrix`" },
-		{ "modulus",   runtime_->create_method( c.raw(), &HMatrix::det ),       "find value of determinant of this `Matrix`" },
-		{ "scale",     runtime_->create_method( c.raw(), &HMatrix::scale ),     "( *factor* ) - scale all values in this `Matrix` by given *factor*" },
-		{ "scale_to",  runtime_->create_method( c.raw(), &HMatrix::scale_to ),  "( *cap* ) - rescale values in this `Matrix` so maximum of its values is equal to *cap*" },
-		{ "inverse",   runtime_->create_method( c.raw(), &HMatrix::inverse ),   "find *inverse* of this `Matrix`" },
-		{ "transpose", runtime_->create_method( c.raw(), &HMatrix::transpose ), "create transposed version of this `Matrix`" },
-		{ "apply",     runtime_->create_method( c.raw(), &HMatrix::apply ),     "( *fun* ) - apply unary function *fun* over all values in this `Matrix`" },
-		{ "negate",    runtime_->create_method( c.raw(), &HMatrix::negate ),    "get negation of this `Matrix`" },
-		{ "to_string", runtime_->create_method( c.raw(), &HMatrix::to_string ), "get string representation of this `Matrix`" }
+		{ "columns",   runtime_->create_method( &HMatrix::columns ),   "get column dimension of this `Matrix`" },
+		{ "rows",      runtime_->create_method( &HMatrix::rows ),      "get row dimension of this `Matrix`" },
+		{ "get",       runtime_->create_method( &HMatrix::get ),       "( *row*, *column* ) - get numeric value present at given *row* and *column* in this `Matrix`" },
+		{ "set",       runtime_->create_method( &HMatrix::set ),       "( *row*, *column*, *value* ) - set given numeric *value* at given *row* and *column* in this `Matrix`" },
+		{ "add",       runtime_->create_method( &HMatrix::add ),       "( *other* ) - add *other* `Matrix` to this `Matrix`" },
+		{ "subtract",  runtime_->create_method( &HMatrix::subtract ),  "( *other* ) - subtract *other* `Matrix` from this `Matrix`" },
+		{ "multiply",  runtime_->create_method( &HMatrix::multiply ),  "( *other* ) - multiply this `Matrix` by *other* `Matrix`" },
+		{ "det",       runtime_->create_method( &HMatrix::det ),       "find value of determinant of this `Matrix`" },
+		{ "modulus",   runtime_->create_method( &HMatrix::det ),       "find value of determinant of this `Matrix`" },
+		{ "scale",     runtime_->create_method( &HMatrix::scale ),     "( *factor* ) - scale all values in this `Matrix` by given *factor*" },
+		{ "scale_to",  runtime_->create_method( &HMatrix::scale_to ),  "( *cap* ) - rescale values in this `Matrix` so maximum of its values is equal to *cap*" },
+		{ "inverse",   runtime_->create_method( &HMatrix::inverse ),   "find *inverse* of this `Matrix`" },
+		{ "transpose", runtime_->create_method( &HMatrix::transpose ), "create transposed version of this `Matrix`" },
+		{ "apply",     runtime_->create_method( &HMatrix::apply ),     "( *fun* ) - apply unary function *fun* over all values in this `Matrix`" },
+		{ "negate",    runtime_->create_method( &HMatrix::negate ),    "get negation of this `Matrix`" },
+		{ "to_string", runtime_->create_method( &HMatrix::to_string ), "get string representation of this `Matrix`" }
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c, HHuginn::ACCESS::PUBLIC );

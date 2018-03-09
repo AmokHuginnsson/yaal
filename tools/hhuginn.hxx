@@ -147,6 +147,7 @@ public:
 		FUNCTION_REFERENCE,
 		OBJECT_REFERENCE,
 		METHOD,
+		UNBOUND_METHOD,
 		BOUND_METHOD,
 		VARIADIC_PARAMETERS,
 		NAMED_PARAMETERS,
@@ -442,6 +443,7 @@ public:
 	typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, int> field_indexes_t;
 	typedef value_t ( *create_instance_t )( HClass const*, huginn::HThread*, values_t&, int );
 	class HMethod;
+	class HUnboundMethod;
 	class HBoundMethod;
 private:
 	type_id_t _typeId;
@@ -551,17 +553,30 @@ class HHuginn::HClass::HMethod : public HHuginn::HValue {
 	typedef HHuginn::HClass::HMethod this_type;
 	typedef HHuginn::HValue base_type;
 protected:
-	HHuginn::HClass const* _juncture;
 	HHuginn::function_t _function;
 public:
-	HMethod( HHuginn::HClass const*, HHuginn::function_t const& );
-	HHuginn::value_t call( huginn::HThread*, values_t&, int );
+	HMethod( HHuginn::function_t const& );
 	HHuginn::function_t const& function( void ) const {
 		return ( _function );
 	}
 private:
 	HMethod( HMethod const& ) = delete;
 	HMethod& operator = ( HMethod const& ) = delete;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
+};
+
+class HHuginn::HClass::HUnboundMethod : public HHuginn::HValue {
+	typedef HHuginn::HClass::HUnboundMethod this_type;
+	typedef HHuginn::HValue base_type;
+protected:
+	HHuginn::HClass const* _juncture;
+	HHuginn::function_t _function;
+public:
+	HUnboundMethod( HHuginn::HClass const*, HHuginn::function_t const& );
+	HHuginn::value_t call( huginn::HThread*, values_t&, int );
+private:
+	HUnboundMethod( HUnboundMethod const& ) = delete;
+	HUnboundMethod& operator = ( HUnboundMethod const& ) = delete;
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
@@ -1213,6 +1228,7 @@ extern HHuginn::HClass const _referenceClass_;
 extern HHuginn::HClass const _functionReferenceClass_;
 extern HHuginn::HClass const _objectReferenceClass_;
 extern HHuginn::HClass const _methodClass_;
+extern HHuginn::HClass const _unboundMethodClass_;
 extern HHuginn::HClass const _boundMethodClass_;
 extern HHuginn::HClass const _variadicParametersClass_;
 extern HHuginn::HClass const _namedParametersClass_;

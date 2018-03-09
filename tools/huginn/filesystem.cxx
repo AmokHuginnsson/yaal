@@ -195,18 +195,18 @@ HHuginn::value_t HFileSystemCreator::do_new_instance( HRuntime* runtime_ ) {
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "open",                      runtime_->create_method( c.raw(), &HFileSystem::open ),    "( *path*, *mode* ) - open file under given *path* in the attached file system, using specified (i/o) *mode*" },
-		{ "reading",                   runtime_->create_method( c.raw(), &HFileSystem::reading ), "a mode for *.open()* method, used to open files for reading" },
-		{ "writing",                   runtime_->create_method( c.raw(), &HFileSystem::writing ), "a mode for *.open()* method, used to open files for writing" },
-		{ "rename",                    runtime_->create_method( c.raw(), &HFileSystem::rename ),  "( *oldPath*, *newPath* ) - rename or move file from *oldPath* to *newPath* in attached file system", },
-		{ "remove",                    runtime_->create_method( c.raw(), &HFileSystem::remove ),  "( *path* ) - remove file with given *path* from attached file system" },
-		{ "readlink",                  runtime_->create_method( c.raw(), &HFileSystem::path_transform, "FileSystem.readlink", &filesystem::readlink ), "( *path* ) - get resolved symbolic links or canonical file name for given *path*" },
-		{ "basename",                  runtime_->create_method( c.raw(), &HFileSystem::path_transform, "FileSystem.basename", &filesystem::basename ), "( *path* ) - strip directory from filename for given *path*" },
-		{ "dirname",                   runtime_->create_method( c.raw(), &HFileSystem::path_transform, "FileSystem.dirname", &filesystem::dirname ),   "( *path* ) - strip last component from file name for given *path*" },
-		{ "chmod",                     runtime_->create_method( c.raw(), &HFileSystem::chmod ),   "( *path*, *mode* ) - change file mode bits for file *path* to new mode *mode*" },
-		{ "dir",                       runtime_->create_method( c.raw(), &HFileSystem::dir ),     "( *path* ) - list content of the directory given by *path*" },
-		{ "stat",                      runtime_->create_method( c.raw(), &HFileSystem::stat ),    "( *path* ) - get metadata information for file given by *path*" },
-		{ "current_working_directory", runtime_->create_method( c.raw(), &HFileSystem::current_working_directory ), "get current working directory path" }
+		{ "open",                      runtime_->create_method( &HFileSystem::open ),    "( *path*, *mode* ) - open file under given *path* in the attached file system, using specified (i/o) *mode*" },
+		{ "reading",                   runtime_->create_method( &HFileSystem::reading ), "a mode for *.open()* method, used to open files for reading" },
+		{ "writing",                   runtime_->create_method( &HFileSystem::writing ), "a mode for *.open()* method, used to open files for writing" },
+		{ "rename",                    runtime_->create_method( &HFileSystem::rename ),  "( *oldPath*, *newPath* ) - rename or move file from *oldPath* to *newPath* in attached file system", },
+		{ "remove",                    runtime_->create_method( &HFileSystem::remove ),  "( *path* ) - remove file with given *path* from attached file system" },
+		{ "readlink",                  runtime_->create_method( &HFileSystem::path_transform, "FileSystem.readlink", &filesystem::readlink ), "( *path* ) - get resolved symbolic links or canonical file name for given *path*" },
+		{ "basename",                  runtime_->create_method( &HFileSystem::path_transform, "FileSystem.basename", &filesystem::basename ), "( *path* ) - strip directory from filename for given *path*" },
+		{ "dirname",                   runtime_->create_method( &HFileSystem::path_transform, "FileSystem.dirname", &filesystem::dirname ),   "( *path* ) - strip last component from file name for given *path*" },
+		{ "chmod",                     runtime_->create_method( &HFileSystem::chmod ),   "( *path*, *mode* ) - change file mode bits for file *path* to new mode *mode*" },
+		{ "dir",                       runtime_->create_method( &HFileSystem::dir ),     "( *path* ) - list content of the directory given by *path*" },
+		{ "stat",                      runtime_->create_method( &HFileSystem::stat ),    "( *path* ) - get metadata information for file given by *path*" },
+		{ "current_working_directory", runtime_->create_method( &HFileSystem::current_working_directory ), "get current working directory path" }
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );

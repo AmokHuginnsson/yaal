@@ -177,10 +177,10 @@ public:
 		)
 		, _reversedTupleClass( HReversedTuple::get_class( runtime_ ) ) {
 		HHuginn::field_definitions_t fd{
-			{ "add",    objectFactory_->create_method( this, &tuple::add ),    "( *other* ) - append all elements from *other* `tuple` at the end of this `tuple`" },
-			{ "hash",   objectFactory_->create_method( this, &tuple::hash ),   "calculate hash value for this `tuple`" },
-			{ "less",   objectFactory_->create_method( this, &tuple::less ),   "( *other* ) - test if this `tuple` comes lexicographically before *other* `tuple`" },
-			{ "equals", objectFactory_->create_method( this, &tuple::equals ), "( *other* ) - test if *other* `tuple` has the same content" }
+			{ "add",    objectFactory_->create_method( &tuple::add ),    "( *other* ) - append all elements from *other* `tuple` at the end of this `tuple`" },
+			{ "hash",   objectFactory_->create_method( &tuple::hash ),   "calculate hash value for this `tuple`" },
+			{ "less",   objectFactory_->create_method( &tuple::less ),   "( *other* ) - test if this `tuple` comes lexicographically before *other* `tuple`" },
+			{ "equals", objectFactory_->create_method( &tuple::equals ), "( *other* ) - test if *other* `tuple` has the same content" }
 		};
 		redefine( nullptr, fd );
 		return;

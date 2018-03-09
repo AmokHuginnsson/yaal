@@ -141,13 +141,13 @@ HHuginn::value_t HTextCreator::do_new_instance( HRuntime* runtime_ ) {
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "split",    runtime_->create_method( c.raw(), &HText::split ),    "( *str*, *sep* ) - split `string` *str* by separator *sep* into a `list` of `string`s" },
-		{ "join",     runtime_->create_method( c.raw(), &HText::join ),     "( *coll*, *sep* ) - join all string from *coll* into one `string` using *sep* as separator" },
-		{ "distance", runtime_->create_method( c.raw(), &HText::distance ), "( *first*, *second* ) - calculate Damerau-Levenshtein distance between *first* and *second* `string`s" },
-		{ "repeat",   runtime_->create_method( c.raw(), &HText::repeat ),   "( *seed*, *count* ) - construct new `string` by repeating *seed* `string` *count* times" },
-		{ "hex",      runtime_->create_method( c.raw(), &HText::int_base_to_str, "Text.hex", BASE::HEX ), "( *int* ) - convert *int* value to a `string` using hexadecimal representation" },
-		{ "oct",      runtime_->create_method( c.raw(), &HText::int_base_to_str, "Text.oct", BASE::OCT ), "( *int* ) - convert *int* value to a `string` using octal representation" },
-		{ "bin",      runtime_->create_method( c.raw(), &HText::int_base_to_str, "Text.bin", BASE::BIN ), "( *int* ) - convert *int* value to a `string` using binary representation" }
+		{ "split",    runtime_->create_method( &HText::split ),    "( *str*, *sep* ) - split `string` *str* by separator *sep* into a `list` of `string`s" },
+		{ "join",     runtime_->create_method( &HText::join ),     "( *coll*, *sep* ) - join all string from *coll* into one `string` using *sep* as separator" },
+		{ "distance", runtime_->create_method( &HText::distance ), "( *first*, *second* ) - calculate Damerau-Levenshtein distance between *first* and *second* `string`s" },
+		{ "repeat",   runtime_->create_method( &HText::repeat ),   "( *seed*, *count* ) - construct new `string` by repeating *seed* `string` *count* times" },
+		{ "hex",      runtime_->create_method( &HText::int_base_to_str, "Text.hex", BASE::HEX ), "( *int* ) - convert *int* value to a `string` using hexadecimal representation" },
+		{ "oct",      runtime_->create_method( &HText::int_base_to_str, "Text.oct", BASE::OCT ), "( *int* ) - convert *int* value to a `string` using octal representation" },
+		{ "bin",      runtime_->create_method( &HText::int_base_to_str, "Text.bin", BASE::BIN ), "( *int* ) - convert *int* value to a `string` using binary representation" }
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );

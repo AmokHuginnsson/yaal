@@ -304,18 +304,18 @@ public:
 		)
 		, _reversedDequeClass( HReversedDeque::get_class( runtime_ ) ) {
 		HHuginn::field_definitions_t fd{
-			{ "push",       objectFactory_->create_method( this, &deque::push ),       "( *elem* ) - add new *elem* at the (right/back) end of the `deque`, `deque` grows in size by 1" },
-			{ "pop",        objectFactory_->create_method( this, &deque::pop ),        "remove last element from the deque, deque shrinks by 1" },
-			{ "push_front", objectFactory_->create_method( this, &deque::push_front ), "( *elem* ) - add new *elem* at the (left/front) beginning of the `deque`, `deque` grows in size by 1" },
-			{ "pop_front",  objectFactory_->create_method( this, &deque::pop_front ),  "remove first element from the `deque`, `deque` shrinks by 1" },
-			{ "add",        objectFactory_->create_method( this, &deque::append ),     "( *other* ) - append all elements from *other* collection at the end of  `deque`" },
-			{ "append",     objectFactory_->create_method( this, &deque::append ),     "( *other* ) - append all elements from *other* collection at the end of  `deque`" },
-			{ "prepend",    objectFactory_->create_method( this, &deque::prepend ),    "( *other* ) - prepend all elements from *other* collection in front of  `deque`" },
-			{ "insert",     objectFactory_->create_method( this, &deque::insert ),     "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
-			{ "clear",      objectFactory_->create_method( this, &deque::clear ),      "erase `deque`'s content, `deque` becomes empty" },
-			{ "hash",       objectFactory_->create_method( this, &deque::hash ),       "calculate hash value for  `deque`" },
-			{ "less",       objectFactory_->create_method( this, &deque::less ),       "( *other* ) - test if  `deque` comes lexicographically before *other* `deque`" },
-			{ "equals",     objectFactory_->create_method( this, &deque::equals ),     "( *other* ) - test if *other* `deque` has the same content" }
+			{ "push",       objectFactory_->create_method( &deque::push ),       "( *elem* ) - add new *elem* at the (right/back) end of the `deque`, `deque` grows in size by 1" },
+			{ "pop",        objectFactory_->create_method( &deque::pop ),        "remove last element from the deque, deque shrinks by 1" },
+			{ "push_front", objectFactory_->create_method( &deque::push_front ), "( *elem* ) - add new *elem* at the (left/front) beginning of the `deque`, `deque` grows in size by 1" },
+			{ "pop_front",  objectFactory_->create_method( &deque::pop_front ),  "remove first element from the `deque`, `deque` shrinks by 1" },
+			{ "add",        objectFactory_->create_method( &deque::append ),     "( *other* ) - append all elements from *other* collection at the end of  `deque`" },
+			{ "append",     objectFactory_->create_method( &deque::append ),     "( *other* ) - append all elements from *other* collection at the end of  `deque`" },
+			{ "prepend",    objectFactory_->create_method( &deque::prepend ),    "( *other* ) - prepend all elements from *other* collection in front of  `deque`" },
+			{ "insert",     objectFactory_->create_method( &deque::insert ),     "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
+			{ "clear",      objectFactory_->create_method( &deque::clear ),      "erase `deque`'s content, `deque` becomes empty" },
+			{ "hash",       objectFactory_->create_method( &deque::hash ),       "calculate hash value for  `deque`" },
+			{ "less",       objectFactory_->create_method( &deque::less ),       "( *other* ) - test if  `deque` comes lexicographically before *other* `deque`" },
+			{ "equals",     objectFactory_->create_method( &deque::equals ),     "( *other* ) - test if *other* `deque` has the same content" }
 		};
 		redefine( nullptr, fd );
 		return;

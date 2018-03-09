@@ -62,12 +62,12 @@ HHuginn::value_t HCryptographyCreator::do_new_instance( HRuntime* runtime_ ) {
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "md5",         runtime_->create_method( c.raw(), &HCryptography::hash, "Cryptography.md5", static_cast<hash_string_t>( &md5 ) ),       "( *str* ) - calculate *MD5* sum of given `string`" },
-		{ "sha1",        runtime_->create_method( c.raw(), &HCryptography::hash, "Cryptography.sha1", static_cast<hash_string_t>( &sha1 ) ),     "( *str* ) - calculate *SHA1* sum of given `string`" },
-		{ "sha512",      runtime_->create_method( c.raw(), &HCryptography::hash, "Cryptography.sha512", static_cast<hash_string_t>( &sha512 ) ), "( *str* ) - calculate *SHA512* sum of given `string`" },
-		{ "hmac_md5",    runtime_->create_method( c.raw(), &HCryptography::hmac, "Cryptography.hmac_md5", hash::FUNCTION::MD5 ),                 "( *key*, *str* ) - calculate *HMAC-MD5* verification code for given `string` *str* using given *key*" },
-		{ "hmac_sha1",   runtime_->create_method( c.raw(), &HCryptography::hmac, "Cryptography.hmac_sha1", hash::FUNCTION::SHA1 ),               "( *key*, *str* ) - calculate *HMAC-SHA1* verification code for given `string` *str* using given *key*" },
-		{ "hmac_sha512", runtime_->create_method( c.raw(), &HCryptography::hmac, "Cryptography.hmac_sha512", hash::FUNCTION::SHA512 ),           "( *key*, *str* ) - calculate *HMAC-SHA512* verification code for given `string` *str* using given *key*" }
+		{ "md5",         runtime_->create_method( &HCryptography::hash, "Cryptography.md5", static_cast<hash_string_t>( &md5 ) ),       "( *str* ) - calculate *MD5* sum of given `string`" },
+		{ "sha1",        runtime_->create_method( &HCryptography::hash, "Cryptography.sha1", static_cast<hash_string_t>( &sha1 ) ),     "( *str* ) - calculate *SHA1* sum of given `string`" },
+		{ "sha512",      runtime_->create_method( &HCryptography::hash, "Cryptography.sha512", static_cast<hash_string_t>( &sha512 ) ), "( *str* ) - calculate *SHA512* sum of given `string`" },
+		{ "hmac_md5",    runtime_->create_method( &HCryptography::hmac, "Cryptography.hmac_md5", hash::FUNCTION::MD5 ),                 "( *key*, *str* ) - calculate *HMAC-MD5* verification code for given `string` *str* using given *key*" },
+		{ "hmac_sha1",   runtime_->create_method( &HCryptography::hmac, "Cryptography.hmac_sha1", hash::FUNCTION::SHA1 ),               "( *key*, *str* ) - calculate *HMAC-SHA1* verification code for given `string` *str* using given *key*" },
+		{ "hmac_sha512", runtime_->create_method( &HCryptography::hmac, "Cryptography.hmac_sha512", hash::FUNCTION::SHA512 ),           "( *key*, *str* ) - calculate *HMAC-SHA512* verification code for given `string` *str* using given *key*" }
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );

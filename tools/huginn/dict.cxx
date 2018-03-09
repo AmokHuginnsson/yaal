@@ -360,16 +360,16 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "has_key", objectFactory_->create_method( c.raw(), &dict::has_key ), "( *key* ) - tell if given *key* can be found in this `dict`" },
-		{ "get",     objectFactory_->create_method( c.raw(), &dict::get ),     "( *key*, *default* ) - get value for given *key* from this `dict`, or *default* if given *key* is not present in the `dict`" },
-		{ "erase",   objectFactory_->create_method( c.raw(), &dict::erase ),   "( *key* ) - remove given *key* from this `dict`" },
-		{ "ensure",  objectFactory_->create_method( c.raw(), &dict::ensure ),  "( *key*, *default* ) - get value for given *key* from this `dict`, if given *key* is not present in the `dict` insert *default* into this `dict` before returning it" },
-		{ "clear",   objectFactory_->create_method( c.raw(), &dict::clear ),   "erase `dict`'s content, `dict` becomes empty" },
-		{ "add",     objectFactory_->create_method( c.raw(), &dict::update ),  "( *other* ) - update content of this `dict` with key/value pairs from *other* `dict`" },
-		{ "update",  objectFactory_->create_method( c.raw(), &dict::update ),  "( *other* ) - update content of this `dict` with key/value pairs from *other* `dict`" },
-		{ "hash",    objectFactory_->create_method( c.raw(), &dict::hash ),    "calculate hash value for this `dict`" },
-		{ "equals",  objectFactory_->create_method( c.raw(), &dict::equals ),  "( *other* ) - test if *other* `dict` has the same content" },
-		{ "values",  objectFactory_->create_method( c.raw(), &dict::values ),  "get key-value pairs view of this `dict`" }
+		{ "has_key", objectFactory_->create_method( &dict::has_key ), "( *key* ) - tell if given *key* can be found in this `dict`" },
+		{ "get",     objectFactory_->create_method( &dict::get ),     "( *key*, *default* ) - get value for given *key* from this `dict`, or *default* if given *key* is not present in the `dict`" },
+		{ "erase",   objectFactory_->create_method( &dict::erase ),   "( *key* ) - remove given *key* from this `dict`" },
+		{ "ensure",  objectFactory_->create_method( &dict::ensure ),  "( *key*, *default* ) - get value for given *key* from this `dict`, if given *key* is not present in the `dict` insert *default* into this `dict` before returning it" },
+		{ "clear",   objectFactory_->create_method( &dict::clear ),   "erase `dict`'s content, `dict` becomes empty" },
+		{ "add",     objectFactory_->create_method( &dict::update ),  "( *other* ) - update content of this `dict` with key/value pairs from *other* `dict`" },
+		{ "update",  objectFactory_->create_method( &dict::update ),  "( *other* ) - update content of this `dict` with key/value pairs from *other* `dict`" },
+		{ "hash",    objectFactory_->create_method( &dict::hash ),    "calculate hash value for this `dict`" },
+		{ "equals",  objectFactory_->create_method( &dict::equals ),  "( *other* ) - test if *other* `dict` has the same content" },
+		{ "values",  objectFactory_->create_method( &dict::values ),  "get key-value pairs view of this `dict`" }
 	};
 	c->redefine( nullptr, fd );
 	return ( c );

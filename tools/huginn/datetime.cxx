@@ -82,9 +82,9 @@ HHuginn::value_t HDateTimeCreator::do_new_instance( HRuntime* runtime_ ) {
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "now",   runtime_->create_method( c.raw(), &HDateTime::now ),   "get information about current point-in-time" },
-		{ "clock", runtime_->create_method( c.raw(), &HDateTime::clock ), "create a stopper-watch instance" },
-		{ "sleep", runtime_->create_method( c.raw(), &HDateTime::sleep ), "( *nanoseconds* ) - suspend program execution for specified amount of *nanoseconds*" }
+		{ "now",   runtime_->create_method( &HDateTime::now ),   "get information about current point-in-time" },
+		{ "clock", runtime_->create_method( &HDateTime::clock ), "create a stopper-watch instance" },
+		{ "sleep", runtime_->create_method( &HDateTime::sleep ), "( *nanoseconds* ) - suspend program execution for specified amount of *nanoseconds*" }
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );

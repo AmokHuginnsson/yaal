@@ -88,6 +88,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			{ _functionReferenceClass_.name(), TYPE_FUNCTION_REFERENCE_IDENTIFIER },
 			{ _objectReferenceClass_.name(), TYPE_OBJECT_REFERENCE_IDENTIFIER },
 			{ _methodClass_.name(), TYPE_METHOD_IDENTIFIER },
+			{ _unboundMethodClass_.name(), TYPE_UNBOUND_METHOD_IDENTIFIER },
 			{ _boundMethodClass_.name(), TYPE_BOUND_METHOD_IDENTIFIER },
 			{ _variadicParametersClass_.name(), TYPE_VARIADIC_PARAMETERS_IDENTIFIER },
 			{ _namedParametersClass_.name(), TYPE_NAMED_PARAMETERS_IDENTIFIER },
@@ -151,6 +152,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			_functionReferenceClass_.name(),
 			_objectReferenceClass_.name(),
 			_methodClass_.name(),
+			_unboundMethodClass_.name(),
 			_boundMethodClass_.name(),
 			_variadicParametersClass_.name(),
 			_namedParametersClass_.name(),
@@ -467,7 +469,7 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 		if ( context_._packages.find( it->first ) == context_._packages.end() ) {
 			fds.emplace_back(
 				identifier_name( it->first ),
-				create_method( cls.raw(), &package::value, it->second, identifier_name( it->first ) ),
+				create_method( &package::value, it->second, identifier_name( it->first ) ),
 				"access package "_ys.append( it->second->get_class()->name() ).append( " imported in submodule" )
 			);
 			it = _packages.erase( it );
@@ -479,7 +481,7 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 		if ( context_._classes.find( c.first ) == context_._classes.end() ) {
 			fds.emplace_back(
 				identifier_name( c.first ),
-				create_method( cls.raw(), &package::instance, c.second.raw() ),
+				create_method( &package::instance, c.second.raw() ),
 				"access class "_ys.append( identifier_name( c.first ) ).append( " imported in submodule" )
 			);
 		}
@@ -489,7 +491,7 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 			HHuginn::HFunctionReference const* fr( static_cast<HHuginn::HFunctionReference const*>( _functionsStore.at( fi ).raw() ) );
 			fds.emplace_back(
 				identifier_name( fi ),
-				_objectFactory->create_method( cls.raw(), fr->function() ),
+				_objectFactory->create_method_raw( fr->function() ),
 				! fr->doc().is_empty() ? fr->doc() : "access function "_ys.append( identifier_name( fi ) ).append( " imported in submodule" )
 			);
 		}
@@ -853,7 +855,7 @@ void HRuntime::register_builtin_function( yaal::hcore::HString const& name_, fun
 }
 
 namespace {
-HHuginn::HClass const* _coreClasses_[10];
+HHuginn::HClass const* _coreClasses_[11];
 }
 
 void HRuntime::register_builtins( void ) {
@@ -868,6 +870,7 @@ void HRuntime::register_builtins( void ) {
 			&_functionReferenceClass_,
 			&_objectReferenceClass_,
 			&_methodClass_,
+			&_unboundMethodClass_,
 			&_boundMethodClass_,
 			&_variadicParametersClass_,
 			&_namedParametersClass_,
@@ -932,6 +935,7 @@ void HRuntime::register_builtins( void ) {
 	M_ENSURE( ( identifier_id( _functionReferenceClass_.name() ) == TYPE_FUNCTION_REFERENCE_IDENTIFIER ) && ( identifier_name( TYPE_FUNCTION_REFERENCE_IDENTIFIER ) == _functionReferenceClass_.name() ) );
 	M_ENSURE( ( identifier_id( _objectReferenceClass_.name() ) == TYPE_OBJECT_REFERENCE_IDENTIFIER ) && ( identifier_name( TYPE_OBJECT_REFERENCE_IDENTIFIER ) == _objectReferenceClass_.name() ) );
 	M_ENSURE( ( identifier_id( _methodClass_.name() ) == TYPE_METHOD_IDENTIFIER ) && ( identifier_name( TYPE_METHOD_IDENTIFIER ) == _methodClass_.name() ) );
+	M_ENSURE( ( identifier_id( _unboundMethodClass_.name() ) == TYPE_UNBOUND_METHOD_IDENTIFIER ) && ( identifier_name( TYPE_UNBOUND_METHOD_IDENTIFIER ) == _unboundMethodClass_.name() ) );
 	M_ENSURE( ( identifier_id( _boundMethodClass_.name() ) == TYPE_BOUND_METHOD_IDENTIFIER ) && ( identifier_name( TYPE_BOUND_METHOD_IDENTIFIER ) == _boundMethodClass_.name() ) );
 	M_ENSURE( ( identifier_id( _variadicParametersClass_.name() ) == TYPE_VARIADIC_PARAMETERS_IDENTIFIER ) && ( identifier_name( TYPE_VARIADIC_PARAMETERS_IDENTIFIER ) == _variadicParametersClass_.name() ) );
 	M_ENSURE( ( identifier_id( _namedParametersClass_.name() ) == TYPE_NAMED_PARAMETERS_IDENTIFIER ) && ( identifier_name( TYPE_NAMED_PARAMETERS_IDENTIFIER ) == _namedParametersClass_.name() ) );

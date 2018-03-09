@@ -57,10 +57,10 @@ public:
 			base_
 				? HHuginn::field_definitions_t{}
 				: HHuginn::field_definitions_t{
-					{ "what",    runtime_->create_method( this, &HExceptionClass::what ),    "get exception message" },
-					{ "where",   runtime_->create_method( this, &HExceptionClass::where ),   "get originating exception position" },
-					{ "trace",   runtime_->create_method( this, &HExceptionClass::trace ),   "get call stack for exception origin" },
-					{ "message", runtime_->create_method( this, &HExceptionClass::message ), "get exception message" }
+					{ "what",    runtime_->create_method( &HExceptionClass::what ),    "get exception message" },
+					{ "where",   runtime_->create_method( &HExceptionClass::where ),   "get originating exception position" },
+					{ "trace",   runtime_->create_method( &HExceptionClass::trace ),   "get call stack for exception origin" },
+					{ "message", runtime_->create_method( &HExceptionClass::message ), "get exception message" }
 				}
 		);
 		return;
@@ -239,11 +239,11 @@ HHuginn::class_t HStackFrameInfo::get_class( HRuntime* runtime_ ) {
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "file",      runtime_->create_method( c.raw(), &HStackFrameInfo::file ),      "a name of the file where exception went through" },
-		{ "line",      runtime_->create_method( c.raw(), &HStackFrameInfo::line ),      "a line number in given file where an exception went through" },
-		{ "column",    runtime_->create_method( c.raw(), &HStackFrameInfo::column ),    "a column number where an exception went through" },
-		{ "context",   runtime_->create_method( c.raw(), &HStackFrameInfo::context ),   "a calling context for given execution frame" },
-		{ "to_string", runtime_->create_method( c.raw(), &HStackFrameInfo::to_string ), "a string representation of a StackFrameInfo value" }
+		{ "file",      runtime_->create_method( &HStackFrameInfo::file ),      "a name of the file where exception went through" },
+		{ "line",      runtime_->create_method( &HStackFrameInfo::line ),      "a line number in given file where an exception went through" },
+		{ "column",    runtime_->create_method( &HStackFrameInfo::column ),    "a column number where an exception went through" },
+		{ "context",   runtime_->create_method( &HStackFrameInfo::context ),   "a calling context for given execution frame" },
+		{ "to_string", runtime_->create_method( &HStackFrameInfo::to_string ), "a string representation of a StackFrameInfo value" }
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );

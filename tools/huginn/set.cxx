@@ -236,14 +236,14 @@ public:
 		)
 		, _reversedSetClass( HReversedSet::get_class( runtime_ ) ) {
 		HHuginn::field_definitions_t fd{
-			{ "insert",  objectFactory_->create_method( this, &set::insert ),  "( *elem* ) - insert given element *elem* into a `set`" },
-			{ "has_key", objectFactory_->create_method( this, &set::has_key ), "( *elem* ) - tell if given element *elem* is present in the `set`" },
-			{ "erase",   objectFactory_->create_method( this, &set::erase ),   "( *elem* ) - remove given element *elem* from the `set`" },
-			{ "clear",   objectFactory_->create_method( this, &set::clear ),   "erase `set`'s content, `set` becomes empty" },
-			{ "add",     objectFactory_->create_method( this, &set::update ),  "( *other* ) - update content of this `set` with values from *other* `set`" },
-			{ "update",  objectFactory_->create_method( this, &set::update ),  "( *other* ) - update content of this `set` with values from *other* `set`" },
-			{ "hash",    objectFactory_->create_method( this, &set::hash ),    "calculate hash value for this `set`" },
-			{ "equals",  objectFactory_->create_method( this, &set::equals ),  "( *other* ) - test if *other* `set` has the same content" }
+			{ "insert",  objectFactory_->create_method( &set::insert ),  "( *elem* ) - insert given element *elem* into a `set`" },
+			{ "has_key", objectFactory_->create_method( &set::has_key ), "( *elem* ) - tell if given element *elem* is present in the `set`" },
+			{ "erase",   objectFactory_->create_method( &set::erase ),   "( *elem* ) - remove given element *elem* from the `set`" },
+			{ "clear",   objectFactory_->create_method( &set::clear ),   "erase `set`'s content, `set` becomes empty" },
+			{ "add",     objectFactory_->create_method( &set::update ),  "( *other* ) - update content of this `set` with values from *other* `set`" },
+			{ "update",  objectFactory_->create_method( &set::update ),  "( *other* ) - update content of this `set` with values from *other* `set`" },
+			{ "hash",    objectFactory_->create_method( &set::hash ),    "calculate hash value for this `set`" },
+			{ "equals",  objectFactory_->create_method( &set::equals ),  "( *other* ) - test if *other* `set` has the same content" }
 		};
 		redefine( nullptr, fd );
 		return;

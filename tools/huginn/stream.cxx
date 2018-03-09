@@ -160,9 +160,9 @@ HHuginn::class_t HStream::get_class( HRuntime* runtime_ ) {
 		runtime_->huginn()->register_class( c );
 	}
 	HHuginn::field_definitions_t fd{
-		{ "read",      runtime_->create_method( c.raw(), &HStream::read ),      "read all data from given stream" },
-		{ "read_line", runtime_->create_method( c.raw(), &HStream::read_line ), "read single line of text from given stream" },
-		{ "write",     runtime_->create_method( c.raw(), &HStream::write ),     "( *value* ) - write given value info this stream" }
+		{ "read",      runtime_->create_method( &HStream::read ),      "read all data from given stream" },
+		{ "read_line", runtime_->create_method( &HStream::read_line ), "read single line of text from given stream" },
+		{ "write",     runtime_->create_method( &HStream::write ),     "( *value* ) - write given value info this stream" }
 	};
 	c->redefine( nullptr, fd );
 	return ( c );

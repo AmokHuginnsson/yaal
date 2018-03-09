@@ -82,7 +82,7 @@ HHuginn::value_t HDatabaseCreator::do_new_instance( HRuntime* runtime_ ) {
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "connect", runtime_->create_method( c.raw(), &HDatabase::connect ), "( *DSN* ) - create connection to the database specified by given *DSN*" }
+		{ "connect", runtime_->create_method( &HDatabase::connect ), "( *DSN* ) - create connection to the database specified by given *DSN*" }
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );

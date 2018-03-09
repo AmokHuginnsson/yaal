@@ -100,8 +100,8 @@ HHuginn::value_t HNetworkCreator::do_new_instance( HRuntime* runtime_ ) {
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "connect", runtime_->create_method( c.raw(), &HNetwork::connect ), "( *host*, *port* ) - create a TCP connection to given *host* at given *port*" },
-		{ "resolve", runtime_->create_method( c.raw(), &HNetwork::resolve ), "( *hostName* ) - resolve IP address of given *hostName*" }
+		{ "connect", runtime_->create_method( &HNetwork::connect ), "( *host*, *port* ) - create a TCP connection to given *host* at given *port*" },
+		{ "resolve", runtime_->create_method( &HNetwork::resolve ), "( *hostName* ) - resolve IP address of given *hostName*" }
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );

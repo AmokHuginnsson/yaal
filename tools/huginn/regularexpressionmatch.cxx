@@ -95,7 +95,7 @@ HHuginn::class_t HRegularExpressionMatch::get_class( HRuntime* runtime_ ) {
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "matched", runtime_->create_method( c.raw(), &HRegularExpressionMatch::matched ), "tell if given regular expression pattern matched against given string" }
+		{ "matched", runtime_->create_method( &HRegularExpressionMatch::matched ), "tell if given regular expression pattern matched against given string" }
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );
