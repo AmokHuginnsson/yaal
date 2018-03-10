@@ -133,7 +133,7 @@ endef
 include $(DIR_ROOT)/_aux/mk/a0_target-default.mk
 
 #phony targets
-.PHONY: all bin clean clean-dep cov coverage-stats debug dep distclean doc install install-environment mrproper relassert reldeb release prepare-coverage-baseline prof purge purge-local static stats test uninstall
+.PHONY: all bin clean clean-dep cov coverage-stats debug dep distclean doc install install-environment mrproper relassert reldeb release prepare-coverage-baseline prof purge purge-local stats test uninstall
 
 $(TARGET): $(DIRS) $(TARGETS) $(firstword $(SSL_KEYS)) $(MAIN_LIB_HEADER)
 

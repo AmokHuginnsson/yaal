@@ -83,7 +83,7 @@ CONF_cov=--enable-coverage
 DS=d
 FIND=find
 
-.PHONY: all bin check clean clean-all clean-cov clean-debug clean-prof clean-relassert clean-reldeb clean-release clean-dep cov coverage-stats debug dep distclean doc help install install-all install-cov install-debug install-prof install-relassert install-reldeb install-release mrproper mrproper-all mrproper-cov mrproper-debug mrproper-prof mrproper-relassert mrproper-reldeb mrproper-release relassert reldeb release prepare-coverage-baseline prof purge purge-local spell static stats tags uninstall
+.PHONY: all bin check clean clean-all clean-cov clean-debug clean-prof clean-relassert clean-reldeb clean-release clean-dep cov coverage-stats debug dep distclean doc help install install-all install-cov install-debug install-prof install-relassert install-reldeb install-release mrproper mrproper-all mrproper-cov mrproper-debug mrproper-prof mrproper-relassert mrproper-reldeb mrproper-release relassert reldeb release prepare-coverage-baseline prof purge purge-local spell stats tags uninstall
 
 default: $(.DEFAULT_GOAL)
 
@@ -92,7 +92,7 @@ all: $(MAIN_TARGETS)
 install-all: $(foreach T, $(MAIN_TARGETS), install-$(T))
 uninstall-all: $(foreach T, $(MAIN_TARGETS), uninstall-$(T))
 
-bin check clean coverage-stats dep doc environment install mrproper prepare-coverage-baseline spell static stats tags uninstall .DEFAULT: .my_make  build/$(.DEFAULT_GOAL)/Makefile.mk
+bin check clean coverage-stats dep doc environment install mrproper prepare-coverage-baseline spell stats tags uninstall .DEFAULT: .my_make  build/$(.DEFAULT_GOAL)/Makefile.mk
 	@test -t 1 && TERMINAL="TERM" && export TERMINAL ; \
 	$(call invoke,$(MAKE) -C $(dir $(firstword $(foreach T,$(MAIN_TARGETS),$(wildcard ./build/$(T)/Makefile.mk)) ./)) -f $(firstword $(notdir $(foreach T,$(MAIN_TARGETS),$(wildcard ./build/$(T)/Makefile.mk))) ./_aux/empty) $(@))
 
@@ -148,7 +148,7 @@ help:
 		"clean-debug       - clean build artifatcs for debug target\n" \
 		"clean-prof        - clean build artifatcs for profiling target\n" \
 		""
-# all bin check clean clean-all clean-cov clean-debug clean-prof clean-relassert clean-reldeb clean-release clean-dep cov coverage-stats debug dep distclean doc help install install-all install-cov install-debug install-prof install-relassert install-reldeb install-release mrproper mrproper-all mrproper-cov mrproper-debug mrproper-prof mrproper-relassert mrproper-reldeb mrproper-release relassert reldeb release prepare-coverage-baseline prof purge static stats tags uninstall
+# all bin check clean clean-all clean-cov clean-debug clean-prof clean-relassert clean-reldeb clean-release clean-dep cov coverage-stats debug dep distclean doc help install install-all install-cov install-debug install-prof install-relassert install-reldeb install-release mrproper mrproper-all mrproper-cov mrproper-debug mrproper-prof mrproper-relassert mrproper-reldeb mrproper-release relassert reldeb release prepare-coverage-baseline prof purge stats tags uninstall
 
 .my_make:
 	@./_aux/guess-make

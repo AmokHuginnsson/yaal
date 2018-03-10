@@ -3,12 +3,12 @@ print-%:
 
 define PREPARE_TARGET
 DIRS := $$(DIRS) $$(DIR_BUILD)/$$($(1))
-REAL_TARGETS := $$(REAL_TARGETS) $$(DIR_BUILD)/$$($(1))/$$(EXEC_NAME)
+REAL_TARGETS := $$(REAL_TARGETS) $$(DIR_BUILD)/$$($(1))/$$(EXEC_NAME)$$(STATIC_SUFFIX)
 endef
 
 define BUILD_TARGET
 
-REAL_TARGET := $$(DIR_BUILD)/$$($(1))/$$(EXEC_NAME)
+REAL_TARGET := $$(DIR_BUILD)/$$($(1))/$$(EXEC_NAME)$$(STATIC_SUFFIX)
 REAL_DIR_$(1) = $$(if $$(realpath $$(DIR_ROOT)/$$(SRC_$(1))),$$(SRC_$(1))/,$$(dir $$(SRC_$(1))))
 
 ifeq ($$(CURDIR),$$(DIR_BUILD))
@@ -45,7 +45,7 @@ $$($(1))/%.$$(OS): $$(REAL_DIR_$(1))%.$$(SS)
 $$(REAL_TARGET): $$(OBJS_$(1)) $$(EXTRA_DEPS_$(1))
 	@$$(call msg,printf "%b" "Linking \`$$(@)' ... " && ) \
 	/bin/rm -f "$$(@)"; \
-	$$(call invoke,$$(LXX) $$(LXXFLAGS) $$(LXXFLAGS_$(1)) -o $$(@) $$(START_GROUP) $$(OBJS_$(1)) $$(END_GROUP) $$(EXTRA_LIBS) $$(LIBS) $$(LIBS_$(1)) 2>&1 | tee -a make.log )
+	$$(call invoke,$$(LXX) $$(LXXFLAGS) $$(LXXFLAGS_$(1)) -o $$(@) $$(START_GROUP) $$(OBJS_$(1)) $$(END_GROUP) $$(if $$(STATIC),$$(STATICLIBS),$$(EXTRA_LIBS)) $$(LIBS) $$(LIBS_$(1)) 2>&1 | tee -a make.log )
 ifdef DO_RELEASE
 	$$(call invoke,strip $$(REAL_TARGET))
 endif

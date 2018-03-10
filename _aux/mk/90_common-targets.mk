@@ -1,5 +1,5 @@
 #phony targets
-.PHONY: all bin check clean clean-dep cov debug dep distclean doc install install-environment mrproper relassert reldeb release prof purge spell static stats uninstall
+.PHONY: all bin check clean clean-dep cov debug dep distclean doc install install-environment mrproper relassert reldeb release prof purge spell stats uninstall
 
 $(foreach IT,$(TARGETS),$(eval $(call PREPARE_TARGET,$(IT))))
 $(foreach IT,$(TARGETS),$(eval $(call BUILD_TARGET,$(IT))))
@@ -16,9 +16,6 @@ $(DIR_BUILD):
 
 $(PRJNAME).info : src/$(PRJNAME).texinfo
 	@makeinfo src/$(PRJNAME).texinfo
-
-static:
-	@$(MAKE) LIBS="$(STATICLIBS)"
 
 clean-dep:
 	@$(FIND) . -name '*.$(DS)' | xargs /bin/rm -f
