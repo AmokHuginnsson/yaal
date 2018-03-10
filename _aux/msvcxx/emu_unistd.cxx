@@ -262,22 +262,57 @@ int pipe( int* fds_ ) {
 #undef isatty /* original isatty comes from VS */
 M_EXPORT_SYMBOL
 int isatty( int fd_ ) {
-	int val( ::isatty( fd_ ) );
-	if ( ( fd_ == STDIN_FILENO ) || ( fd_ == STDOUT_FILENO ) || ( fd_ == STDERR_FILENO ) ) {
-		static CMutex m;
-		static bool once( true );
-		static bool ansiSysLoaded( false );
-		if ( once ) {
-			CLock l( m );
-			if ( once ) {
-				ansiSysLoaded = get_drivers().count( "ansi.sys" ) > 0;
-				once = false;
-			}
+	static bool initialized( false );
+	static char const* ANSICON( nullptr );
+	static bool ansiSysLoaded( false );
+	static CMutex m;
+	if ( ! initialized ) {
+		CLock l( m );
+		if ( ! initialized ) {
+			ansiSysLoaded = get_drivers().count( "ansi.sys" ) > 0;
+			ANSICON = ::getenv( "ANSICON" );
 		}
-		char const* TERM( ::getenv( "TERM" ) );
-		char const* ANSICON( ::getenv( "ANSICON" ) );
-		val = ( TERM || ( val && ( ANSICON || ansiSysLoaded ) ) ) ? 1 : 0;
+		initialized = true;
 	}
+	int val( ::isatty( fd_ ) );
+	do {
+		if ( ( fd_ != STDIN_FILENO ) && ( fd_ != STDOUT_FILENO ) && ( fd_ != STDERR_FILENO ) ) {
+			break;
+		}
+		if ( val && ( ANSICON || ansiSysLoaded ) ) {
+			break;
+		}
+		HANDLE h( reinterpret_cast<HANDLE>( _get_osfhandle( fd_ ) ) );
+		val = 0;
+		if ( h == INVALID_HANDLE_VALUE ) {
+			break;
+		}
+		DWORD st( 0 );
+		if ( GetConsoleMode( h, &st ) ) {
+			val = 1;
+			break;
+		}
+		if ( GetFileType( h ) != FILE_TYPE_PIPE ) {
+			break;
+		}
+		int const bufSize( MAX_PATH + static_cast<int>( sizeof ( FILE_NAME_INFO ) ) );
+		HChunk c( bufSize );
+		if ( ! GetFileInformationByHandleEx( h, FileNameInfo, c.raw(), bufSize ) ) {
+			break;
+		}
+		FILE_NAME_INFO* fni( c.get<FILE_NAME_INFO>() );
+		HString n;
+		for ( int i( 0 ); i < static_cast<int>( fni->FileNameLength ); ++ i ) {
+			n.push_back( code_point_t( fni->FileName[i] ) );
+		}
+		if ( ( n.find( "\\cygwin-" ) != 0 ) && ( n.find( "\\msys-" ) != 0 ) ) {
+			break;
+		}
+		if ( n.find( "-pty" ) == HString::npos ) {
+			break;
+		}
+		val = 1;
+	} while ( false );
 	return ( val );
 }
 
