@@ -12,6 +12,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "objectfactory.hxx"
 #include "directoryscan.hxx"
 #include "helper.hxx"
+#include "enumeration.hxx"
 #include "exception.hxx"
 #include "hcore/hfile.hxx"
 #include "packagefactory.hxx"
@@ -39,6 +40,7 @@ class HFileSystem : public HHuginn::HValue {
 	HHuginn::class_t _directoryScanClass;
 	HHuginn::class_t _timeClass;
 	HHuginn::class_t _fileStatClass;
+	HHuginn::class_t _openModeClass;
 	HHuginn::class_t _exceptionClass;
 public:
 	HFileSystem( HHuginn::HClass* class_ )
@@ -47,6 +49,22 @@ public:
 		, _directoryScanClass( HDirectoryScan::get_class( class_->runtime() ) )
 		, _timeClass( huginn::HTime::get_class( class_->runtime() ) )
 		, _fileStatClass( HFileStat::get_class( class_->runtime() ) )
+		, _openModeClass(
+			add_enumeration_to_package(
+				class_,
+				enumeration::create_class(
+					class_->runtime(),
+					"OPEN_MODE",
+					enumeration::descriptions_t{
+						{ "READ", "Open file for reading." },
+						{ "WRITE", "Open file for writing." }
+					},
+					"The `OPEN_MODE` is set of possible modes used for opening the files.",
+					HHuginn::VISIBILITY::PACKAGE
+				),
+				"set of possible modes used for opening the files."
+			)
+		)
 		, _exceptionClass( package_exception( class_ ) ) {
 		return;
 	}

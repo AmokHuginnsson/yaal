@@ -393,8 +393,9 @@ HHuginn::class_t HRuntime::create_class(
 
 HHuginn::class_t HRuntime::create_class( class_constructor_t const& classConstructor_ ) {
 	M_PROLOG
-	class_t c( classConstructor_( type_id_t( _idGenerator ) ) );
+	type_id_t id( _idGenerator );
 	++ _idGenerator;
+	class_t c( classConstructor_( id ) );
 	return ( c );
 	M_EPILOG
 }

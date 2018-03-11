@@ -40,6 +40,7 @@ HHuginn::class_t create_class(
 	yaal::hcore::HString const&,
 	descriptions_t const&,
 	yaal::hcore::HString const&,
+	HHuginn::VISIBILITY,
 	HHuginn::HClass const* = nullptr
 );
 

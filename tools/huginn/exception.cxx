@@ -169,6 +169,7 @@ HHuginn::class_t create_class( HRuntime* runtime_, yaal::hcore::HString const& n
 		);
 	}
 	if ( runtime_ ) {
+		/* *TODO* *FIXME* Move to the end of if(!c) above. */
 		runtime_->huginn()->register_class( c, HHuginn::ACCESS::PUBLIC, visibility_ );
 	}
 	return ( c );

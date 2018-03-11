@@ -647,7 +647,12 @@ bool equals( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t con
 				res = static_cast<HHuginn::HFunctionReference const*>( v1_.raw() )->identifier_id() == static_cast<HHuginn::HFunctionReference const*>( v2_.raw() )->identifier_id();
 			} break;
 			default: {
-				res = fallback_compare( thread_, INTERFACE::EQUALS_IDENTIFIER, op_to_str( OPERATOR::EQUALS ), v1_, v2_, position_ );
+				HHuginn::HEnumeral const* enumeral1( dynamic_cast<HHuginn::HEnumeral const*>( v1_.raw() ) );
+				if ( enumeral1 ) {
+					res = enumeral1->value() == static_cast<HHuginn::HEnumeral const*>( v2_.raw() )->value();
+				} else {
+					res = fallback_compare( thread_, INTERFACE::EQUALS_IDENTIFIER, op_to_str( OPERATOR::EQUALS ), v1_, v2_, position_ );
+				}
 			}
 		}
 	} else {

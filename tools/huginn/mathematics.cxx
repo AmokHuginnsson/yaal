@@ -39,28 +39,28 @@ public:
 	HMathematics( HHuginn::HClass* class_ )
 		: HValue( class_ )
 		, _complexClass(
-			add_to_package(
+			add_class_to_package(
 				class_,
 				HComplex::get_class( class_->runtime(), class_ ),
 				"( *real*, *imaginary* ) - create instance of Complex with *real* real part and *imaginary* imaginary part."
 			)
 		)
 		, _matrixClass(
-			add_to_package(
+			add_class_to_package(
 				class_,
 				HMatrix::get_class( class_->runtime(), class_ ),
 				"( *type*, *rows*, *cols* ) - create instance of Matrix class of values of type *type* and *rows* rows and *cols* columns."
 			)
 		)
 		, _numberSetStatisticsClass(
-			add_to_package(
+			add_class_to_package(
 				class_,
 				HNumberSetStatistics::get_class( class_->runtime(), class_ ),
 				"( *iterable* ) - calculate numerical statistics over given iterable *iterable* of uniformly types values"
 			)
 		)
 		, _randomizerClass(
-			add_to_package(
+			add_class_to_package(
 				class_,
 				HRandomizer::get_class( class_->runtime(), class_ ),
 				"([ *cap* ]) - create random number generator which output values are capped at *cap*"

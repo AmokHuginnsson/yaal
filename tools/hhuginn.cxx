@@ -765,12 +765,13 @@ bool HHuginn::HValue::is_kind_of( HHuginn::identifier_id_t typeName_ ) const {
 HHuginn::value_t HHuginn::HValue::do_field( HHuginn::value_t const& object_, int index_ ) const {
 	M_PROLOG
 	value_t const& f( _class->field( index_ ) );
-	M_ASSERT( f->type_id() == TYPE::METHOD );
 	return (
-		_class->runtime()->object_factory()->create_bound_method(
-			static_cast<HClass::HMethod const*>( f.raw() )->function(),
-			object_
-		)
+		( f->type_id() == TYPE::METHOD )
+			?_class->runtime()->object_factory()->create_bound_method(
+				static_cast<HClass::HMethod const*>( f.raw() )->function(),
+				object_
+			)
+			: f
 	);
 	M_EPILOG
 }
