@@ -455,6 +455,18 @@ void HExpression::get_field( OExecutionStep const& executionStep_,huginn::HFrame
 	if ( v->get_class()->is_complex() ) {
 		int fi( v->field_index( executionStep_._identifierId ) );
 		if ( fi < 0 ) {
+			fi = v->get_class()->field_index( executionStep_._identifierId, HHuginn::HClass::MEMBER_TYPE::STATIC );
+			if ( fi >= 0 ) {
+				throw HHuginn::HHuginnRuntimeException(
+					"`"_ys
+						.append( rt.identifier_name( executionStep_._identifierId ) )
+						.append( "' member of `" )
+						.append( v->get_class()->name() )
+						.append( "' must be accessed from static context." ),
+					file_id(),
+					p
+				);
+			}
 			throw HHuginn::HHuginnRuntimeException(
 				"`"_ys
 					.append( v->get_class()->name() )
@@ -515,7 +527,7 @@ void HExpression::get_field( OExecutionStep const& executionStep_,huginn::HFrame
 			n = &rt.identifier_name( fr->identifier_id() );
 			HHuginn::class_t c( rt.get_class( fr->identifier_id() ) );
 			if ( !!c ) {
-				int fi( c->field_index( executionStep_._identifierId ) );
+				int fi( c->field_index( executionStep_._identifierId, HHuginn::HClass::MEMBER_TYPE::STATIC ) );
 				n = &c->name();
 				if ( fi < 0 ) {
 					throw HHuginn::HHuginnRuntimeException(

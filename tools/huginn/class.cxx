@@ -41,6 +41,7 @@ HHuginn::HClass::HClass(
 			)
 	)
 	, _fieldIdentifiers()
+	, _staticFieldIndexes()
 	, _fieldIndexes()
 	, _fieldDefinitions()
 	, _fieldDescriptions()
@@ -62,6 +63,7 @@ HHuginn::HClass::HClass(
 	, _super( nullptr )
 	, _createInstance( &HClass::create_instance_default )
 	, _fieldIdentifiers()
+	, _staticFieldIndexes()
 	, _fieldIndexes()
 	, _fieldDefinitions()
 	, _fieldDescriptions()
@@ -117,12 +119,21 @@ void HHuginn::HClass::redefine( HClass const* super_, field_definitions_t const&
 	M_EPILOG
 }
 
-void HHuginn::HClass::add_member( HHuginn::HFieldDefinition const& fd_ ) {
+void HHuginn::HClass::add_member( HHuginn::HFieldDefinition const& fd_, MEMBER_TYPE memberType_ ) {
 	M_PROLOG
 	identifier_id_t identifierId( _runtime->identifier_id( fd_.name() ) );
 	_fieldIdentifiers.emplace_back( identifierId );
+	int fieldCount( static_cast<int>( _fieldIndexes.get_size() + _staticFieldIndexes.get_size() ) );
+	if (
+		( ( memberType_ == MEMBER_TYPE::INSTANCE ) && _staticFieldIndexes.count( identifierId ) )
+		|| ( ( memberType_ == MEMBER_TYPE::STATIC ) && _fieldIndexes.count( identifierId ) )
+	) {
+		throw HHuginnException( "Static and Instance members conflict." );
+	}
 	field_indexes_t::const_iterator fi(
-		_fieldIndexes.insert( make_pair( identifierId, static_cast<int>( _fieldIndexes.get_size() ) ) ).first
+		memberType_ == MEMBER_TYPE::INSTANCE
+			? _fieldIndexes.insert( make_pair( identifierId, fieldCount ) ).first
+			: _staticFieldIndexes.insert( make_pair( identifierId, fieldCount ) ).first
 	);
 	if ( fi->second >= _fieldDefinitions.get_size() ) {
 		_fieldDefinitions.resize( fi->second + 1 );
@@ -145,10 +156,19 @@ void HHuginn::HClass::set_origin( HClass const* origin_ ) {
 	return;
 }
 
-int HHuginn::HClass::field_index( identifier_id_t identifierId_ ) const {
+int HHuginn::HClass::field_index( identifier_id_t identifierId_, MEMBER_TYPE memberType_ ) const {
 	M_PROLOG
+	int fieldIndex( -1 );
 	field_indexes_t::const_iterator it( _fieldIndexes.find( identifierId_ ) );
-	return ( it != _fieldIndexes.end() ? it->second : -1 );
+	if ( it != _fieldIndexes.end() ) {
+		fieldIndex = it->second;
+	} else if (
+		( memberType_ == MEMBER_TYPE::STATIC )
+		&& ( (	it = _staticFieldIndexes.find( identifierId_ ) ) != _staticFieldIndexes.end() )
+	) {
+		fieldIndex = it->second;
+	}
+	return ( fieldIndex );
 	M_EPILOG
 }
 
@@ -271,7 +291,7 @@ yaal::hcore::HString const& HHuginn::HClass::doc( void ) const {
 
 yaal::hcore::HString const& HHuginn::HClass::doc( identifier_id_t method_ ) const {
 	M_PROLOG
-	int fieldIndex( field_index( method_ ) );
+	int fieldIndex( field_index( method_, MEMBER_TYPE::STATIC ) );
 	if ( fieldIndex < 0 ) {
 		throw HHuginnException( "Invalid method identifier id." );
 	}

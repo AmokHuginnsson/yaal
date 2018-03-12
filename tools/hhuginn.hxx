@@ -439,6 +439,11 @@ public:
 		BUILTIN,
 		USER
 	};
+	enum class MEMBER_TYPE {
+		INSTANCE,
+#undef STATIC
+		STATIC
+	};
 	typedef HHuginn::HClass this_type;
 	typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, int> field_indexes_t;
 	typedef value_t ( *create_instance_t )( HClass const*, huginn::HThread*, values_t&, int );
@@ -451,6 +456,7 @@ private:
 	HClass const* _super;
 	create_instance_t _createInstance;
 	field_identifiers_t _fieldIdentifiers;
+	field_indexes_t _staticFieldIndexes;
 	field_indexes_t _fieldIndexes;
 	values_t _fieldDefinitions;
 	field_descriptions_t _fieldDescriptions;
@@ -464,7 +470,7 @@ public:
 	virtual ~HClass( void ) {
 	}
 	void redefine( HClass const*, field_definitions_t const& );
-	void add_member( HHuginn::HFieldDefinition const& );
+	void add_member( HHuginn::HFieldDefinition const&, MEMBER_TYPE = MEMBER_TYPE::INSTANCE );
 	HClass const* super( void ) const {
 		return ( _super );
 	}
@@ -484,7 +490,7 @@ public:
 	field_identifiers_t const& field_identifiers( void ) const {
 		return ( _fieldIdentifiers );
 	}
-	int field_index( identifier_id_t ) const;
+	int field_index( identifier_id_t, MEMBER_TYPE = MEMBER_TYPE::INSTANCE ) const;
 	value_t const& field( int index_ ) const {
 		return ( _fieldDefinitions[index_] );
 	}

@@ -74,7 +74,8 @@ public:
 				"The `SEEK` is set of possible anchors used for seeking in seekable streams.",
 				HHuginn::VISIBILITY::PACKAGE
 			),
-			"set of possible modes used for seeking in streams."
+			"set of possible modes used for seeking in streams.",
+			HHuginn::HClass::MEMBER_TYPE::STATIC
 		);
 	}
 	HHuginn::HClass const* seek_class( void ) const {

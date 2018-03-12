@@ -80,7 +80,12 @@ void operands_type_mismatch( char const* op_, HHuginn::HClass const* c1_, HHugin
 	throw HHuginn::HHuginnRuntimeException( msg, fileId_, pos_ );
 }
 
-HHuginn::class_t add_class_as_member( HHuginn::HClass* juncture_, HHuginn::class_t const& class_, yaal::hcore::HString const& doc_ ) {
+HHuginn::class_t add_class_as_member(
+	HHuginn::HClass* juncture_,
+	HHuginn::class_t const& class_,
+	yaal::hcore::HString const& doc_,
+	HHuginn::HClass::MEMBER_TYPE memberType_
+) {
 	M_PROLOG
 	HHuginn::value_t member(
 		juncture_->runtime()->object_factory()->create_method_raw( class_->constructor_function( HHuginn::ACCESS::PUBLIC ) )
@@ -88,13 +93,19 @@ HHuginn::class_t add_class_as_member( HHuginn::HClass* juncture_, HHuginn::class
 	juncture_->add_member(
 		HHuginn::HFieldDefinition(
 			class_->name(), member, doc_
-		)
+		),
+		memberType_
 	);
 	return ( class_ );
 	M_EPILOG
 }
 
-enumeration::HEnumerationClass::ptr_t add_enumeration_as_member( HHuginn::HClass* juncture_, enumeration::HEnumerationClass::ptr_t const& class_, yaal::hcore::HString const& doc_ ) {
+enumeration::HEnumerationClass::ptr_t add_enumeration_as_member(
+	HHuginn::HClass* juncture_,
+	enumeration::HEnumerationClass::ptr_t const& class_,
+	yaal::hcore::HString const& doc_,
+	HHuginn::HClass::MEMBER_TYPE memberType_
+) {
 	M_PROLOG
 	HHuginn::value_t member(
 		juncture_->runtime()->object_factory()->create<HHuginn::HValue>( class_.raw() )
@@ -102,7 +113,8 @@ enumeration::HEnumerationClass::ptr_t add_enumeration_as_member( HHuginn::HClass
 	juncture_->add_member(
 		HHuginn::HFieldDefinition(
 			class_->name(), member, doc_
-		)
+		),
+		memberType_
 	);
 	return ( class_ );
 	M_EPILOG
