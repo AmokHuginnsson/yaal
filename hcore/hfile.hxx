@@ -44,13 +44,6 @@ public:
 		BUFFERED_READS,
 		UNBUFFERED_READS
 	};
-	/*! \brief Kinds of seek operation.
-	 */
-	enum class SEEK {
-		SET,
-		CUR,
-		END
-	};
 private:
 	void* _handle;
 	HString _path;
@@ -84,7 +77,6 @@ public:
 	void* release( void );
 	int long read_line( HString&, READ = READ::DEFAULTS, int const = 0 );
 	int long tell( void ) const;
-	void seek( int long, SEEK = SEEK::SET );
 	HString const& get_path( void ) const;
 	HString const& get_error( void ) const;
 	bool is_opened( void ) const;
@@ -97,6 +89,7 @@ private:
 	virtual int long do_write( void const*, int long ) override;
 	virtual void do_flush( void ) override;
 	virtual int long do_read( void*, int long ) override;
+	virtual void do_seek( int long, SEEK ) override;
 	virtual bool do_is_valid( void ) const override;
 	virtual POLL_TYPE do_poll_type( void ) const override;
 	virtual void const* do_data( void ) const override;

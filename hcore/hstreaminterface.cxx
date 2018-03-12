@@ -864,6 +864,20 @@ int long HStreamInterface::read( void* buffer_, int long size_ ) {
 	M_EPILOG
 }
 
+void HStreamInterface::seek( int long offset_, SEEK anchor_ ) {
+	M_PROLOG
+	_offset = 0;
+	clear();
+	do_seek( offset_, anchor_ );
+	M_EPILOG
+}
+
+void HStreamInterface::do_seek( int long, SEEK ) {
+	M_PROLOG
+	throw HStreamInterfaceException( "Seeking on this stream is not supported." );
+	M_EPILOG
+}
+
 int long HStreamInterface::write( void const* buffer_, int long size_ ) {
 	M_PROLOG
 	return ( do_write( buffer_, size_ ) );

@@ -483,11 +483,21 @@ int long HSynchronizedStream::do_read( void* buf_, int long size_ ) {
 	M_EPILOG
 }
 
+void HSynchronizedStream::do_seek( int long offset_, SEEK anchor_ ) {
+	M_PROLOG
+	HLock l( _mutex );
+	if ( _streamRef ) {
+		_streamRef->seek( offset_, anchor_ );
+	}
+	M_EPILOG
+}
+
 void HSynchronizedStream::do_flush( void ) {
 	M_PROLOG
 	HLock l( _mutex );
-	if ( _streamRef )
+	if ( _streamRef ) {
 		_streamRef->flush();
+	}
 	return;
 	M_EPILOG
 }

@@ -175,15 +175,15 @@ int long HFile::tell( void ) const {
 	M_EPILOG
 }
 
-void HFile::seek( int long pos, SEEK seek_ ) {
+void HFile::do_seek( int long pos, SEEK seek_ ) {
 	M_PROLOG
 	M_ASSERT( _handle );
 	int s( 0 );
 	switch ( seek_ ) {
-		case ( SEEK::SET ): {
+		case ( SEEK::BEGIN ): {
 			s = SEEK_SET;
 		} break;
-		case ( SEEK::CUR ): {
+		case ( SEEK::CURRENT ): {
 			s = SEEK_CUR;
 		} break;
 		case ( SEEK::END ): {
@@ -194,7 +194,6 @@ void HFile::seek( int long pos, SEEK seek_ ) {
 		} break;
 	}
 	M_ENSURE( ::std::fseek( static_cast<FILE*>( _handle ), pos, s ) == 0 );
-	clear();
 	return;
 	M_EPILOG
 }
