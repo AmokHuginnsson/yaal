@@ -29,8 +29,12 @@ HPipe::~HPipe( void ) {
 	M_PROLOG
 	HRawFile* inStream( static_cast<HRawFile*>( _in.raw() ) );
 	HRawFile* outStream( static_cast<HRawFile*>( _out.raw() ) );
-	M_ENSURE( ! inStream->is_valid() || ( inStream->close() == 0 ) );
-	M_ENSURE( ! outStream->is_valid() || ( outStream->close() == 0 ) );
+	if ( inStream->is_valid() ) {
+		inStream->close();
+	}
+	if ( outStream->is_valid() ) {
+		outStream->close();
+	}
 	return;
 	M_DESTRUCTOR_EPILOG
 }

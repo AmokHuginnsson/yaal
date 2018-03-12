@@ -242,7 +242,7 @@ HHuginn::class_t add_class_to_package( HHuginn::HClass* package_, HHuginn::class
 	M_EPILOG
 }
 
-HHuginn::class_t add_enumeration_to_package( HHuginn::HClass* package_, HHuginn::class_t const& class_, yaal::hcore::HString const& doc_ ) {
+enumeration::HEnumerationClass::ptr_t add_enumeration_to_package( HHuginn::HClass* package_, enumeration::HEnumerationClass::ptr_t const& class_, yaal::hcore::HString const& doc_ ) {
 	M_PROLOG
 	HHuginn::value_t member(
 		package_->runtime()->object_factory()->create<HHuginn::HValue>( class_.raw() )

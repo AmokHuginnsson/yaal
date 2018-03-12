@@ -22,122 +22,120 @@ namespace huginn {
 
 namespace enumeration {
 
-class HEnumerationClass : public HHuginn::HClass {
+class HEnumerationClass::HEnumeralClass : public HHuginn::HClass {
 public:
-	typedef HEnumerationClass this_type;
+	typedef HEnumeralClass this_type;
 	typedef HHuginn::HClass base_type;
 private:
-	class HEnumeralClass : public HHuginn::HClass {
-	public:
-		typedef HEnumeralClass this_type;
-		typedef HHuginn::HClass base_type;
-	private:
-		HEnumerationClass const* _enumerationClass;
-	public:
-		HEnumeralClass(
-			HEnumerationClass const* enumerationClass_,
-			HRuntime* runtime_,
-			HHuginn::type_id_t typeId_,
-			HHuginn::identifier_id_t identifierId_,
-			yaal::hcore::HString const& doc_
-		) : HHuginn::HClass(
-			runtime_,
-			typeId_,
-			identifierId_,
-			nullptr,
-			doc_
-		)
-		, _enumerationClass( enumerationClass_ ) {
-		}
-		HEnumerationClass const* enumeration_class( void ) const {
-			return ( _enumerationClass );
-		}
-	protected:
-		virtual HHuginn::value_t do_create_instance( huginn::HThread* thread_, HHuginn::values_t&, int position_ ) const {
-			M_PROLOG
-			throw HHuginn::HHuginnRuntimeException( "Explicit construction of enumeral `"_ys.append( name() ).append( "' instances is forbidden." ), thread_->current_frame()->file_id(), position_ );
-			M_EPILOG
-		}
-	private:
-		HEnumeralClass( HEnumeralClass const& ) = delete;
-		HEnumeralClass& operator = ( HEnumeralClass const& ) = delete;
-	};
-	HHuginn::class_t _valueClass;
+	HEnumerationClass const* _enumerationClass;
 public:
-	HEnumerationClass(
+	HEnumeralClass(
+		HEnumerationClass const* enumerationClass_,
 		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_,
 		HHuginn::identifier_id_t identifierId_,
-		descriptions_t const& descriptions_,
-		HHuginn::HClass const* base_,
-		yaal::hcore::HString const& doc_,
-		HHuginn::VISIBILITY visibility_
+		yaal::hcore::HString const& doc_
 	) : HHuginn::HClass(
-			runtime_,
-			typeId_,
-			identifierId_,
-			base_,
-			doc_
-		)
-		, _valueClass() {
-		HString const& name( runtime_->identifier_name( identifierId_ ) );
-		HString valueName( name );
-		HObjectFactory& of( *runtime_->object_factory() );
-		valueName.append( name.find_one_of( character_class( CHARACTER_CLASS::LOWER_CASE_LETTER ).data() ) != HString::npos ? "Enumeral" : "_ENUMERAL" );
-		_valueClass = runtime_->create_class(
-			HRuntime::class_constructor_t(
-				[this, &runtime_, &name, &valueName] ( HHuginn::type_id_t tid_ ) -> HHuginn::class_t {
-					return (
-						make_pointer<HEnumeralClass>(
-							this,
-							runtime_,
-							tid_,
-							runtime_->identifier_id( valueName ),
-							"The `"_ys.append( valueName ).append( "` class represents value of `" ).append( name ).append( "` enumeration." )
-						)
-					);
-				}
-			)
-		);
-		_valueClass->redefine(
-			nullptr,
-			HHuginn::field_definitions_t{
-				{ "to_string", runtime_->create_method( &HEnumerationClass::to_string ), "Get enumeration name." }
-			}
-		);
-		runtime_->huginn()->register_class( _valueClass, HHuginn::ACCESS::PRIVATE, visibility_ );
-		HHuginn::field_definitions_t fd;
-		fd.reserve( descriptions_.get_size() + 1 );
-		int id( 0 );
-		for ( enumeration::HDesctiption const& d : descriptions_ ) {
-			fd.emplace_back(
-				d.name(),
-				of.create<HHuginn::HEnumeral>( _valueClass.raw(), id ++ ),
-				d.doc()
-			);
-		}
-		redefine( base_, fd );
-		return;
+		runtime_,
+		typeId_,
+		identifierId_,
+		nullptr,
+		doc_
+	)
+	, _enumerationClass( enumerationClass_ ) {
 	}
-	yaal::hcore::HString const& enumeration_name( int id_ ) const {
-		return ( runtime()->identifier_name( field_identifiers()[id_] ) );
+	HEnumerationClass const* enumeration_class( void ) const {
+		return ( _enumerationClass );
 	}
-	static HHuginn::value_t to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+protected:
+	virtual HHuginn::value_t do_create_instance( huginn::HThread* thread_, HHuginn::values_t&, int position_ ) const {
 		M_PROLOG
-		verify_arg_count( "to_string", values_, 0, 0, thread_, position_ );
-		HHuginn::HEnumeral* e( static_cast<HHuginn::HEnumeral*>( object_->raw() ) );
-		HEnumerationClass const* ec( static_cast<HEnumeralClass const*>( e->get_class() )->enumeration_class() );
-		HString s( ec->name() );
-		return ( thread_->object_factory().create_string( s.append( "." ).append( ec->enumeration_name( e->value() ) ) ) );
+		throw HHuginn::HHuginnRuntimeException( "Explicit construction of enumeral `"_ys.append( name() ).append( "' instances is forbidden." ), thread_->current_frame()->file_id(), position_ );
 		M_EPILOG
 	}
 private:
-	virtual HHuginn::value_t do_create_instance( huginn::HThread* thread_, HHuginn::values_t&, int position_ ) const {
-		M_PROLOG
-		throw HHuginn::HHuginnRuntimeException( "Explicit construction of enumeration `"_ys.append( name() ).append( "' instances is forbidden." ), thread_->current_frame()->file_id(), position_ );
-		M_EPILOG
-	}
+	HEnumeralClass( HEnumeralClass const& ) = delete;
+	HEnumeralClass& operator = ( HEnumeralClass const& ) = delete;
 };
+
+HEnumerationClass::HEnumerationClass(
+	HRuntime* runtime_,
+	HHuginn::type_id_t typeId_,
+	HHuginn::identifier_id_t identifierId_,
+	descriptions_t const& descriptions_,
+	HHuginn::HClass const* base_,
+	yaal::hcore::HString const& doc_,
+	HHuginn::VISIBILITY visibility_
+) : HHuginn::HClass(
+		runtime_,
+		typeId_,
+		identifierId_,
+		base_,
+		doc_
+	)
+	, _valueClass() {
+	HString valueName( name() );
+	HObjectFactory& of( *runtime_->object_factory() );
+	valueName.append( name().find_one_of( character_class( CHARACTER_CLASS::LOWER_CASE_LETTER ).data() ) != HString::npos ? "Enumeral" : "_ENUMERAL" );
+	_valueClass = runtime_->create_class(
+		HRuntime::class_constructor_t(
+			[this, &runtime_, &valueName] ( HHuginn::type_id_t tid_ ) -> HHuginn::class_t {
+				return (
+					make_pointer<HEnumeralClass>(
+						this,
+						runtime_,
+						tid_,
+						runtime_->identifier_id( valueName ),
+						"The `"_ys.append( valueName ).append( "` class represents value of `" ).append( name() ).append( "` enumeration." )
+					)
+				);
+			}
+		)
+	);
+	_valueClass->redefine(
+		nullptr,
+		HHuginn::field_definitions_t{
+			{ "to_string", runtime_->create_method( &HEnumerationClass::to_string ), "Get enumeration name." }
+		}
+	);
+	runtime_->huginn()->register_class( _valueClass, HHuginn::ACCESS::PRIVATE, visibility_ );
+	HHuginn::field_definitions_t fd;
+	fd.reserve( descriptions_.get_size() + 1 );
+	int id( 0 );
+	for ( enumeration::HDesctiption const& d : descriptions_ ) {
+		if ( d.value() != HDesctiption::UNDEFINED ) {
+			id = d.value();
+		}
+		fd.emplace_back(
+			d.name(),
+			of.create<HHuginn::HEnumeral>( _valueClass.raw(), id ),
+			d.doc()
+		);
+		++ id;
+	}
+	redefine( base_, fd );
+	return;
+}
+
+yaal::hcore::HString const& HEnumerationClass::enumeration_name( int id_ ) const {
+	return ( runtime()->identifier_name( field_identifiers()[id_] ) );
+}
+
+HHuginn::value_t HEnumerationClass::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "to_string", values_, 0, 0, thread_, position_ );
+	HHuginn::HEnumeral* e( static_cast<HHuginn::HEnumeral*>( object_->raw() ) );
+	HEnumerationClass const* ec( static_cast<HEnumeralClass const*>( e->get_class() )->enumeration_class() );
+	HString s( ec->name() );
+	return ( thread_->object_factory().create_string( s.append( "." ).append( ec->enumeration_name( e->value() ) ) ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HEnumerationClass::do_create_instance( huginn::HThread* thread_, HHuginn::values_t&, int position_ ) const {
+	M_PROLOG
+	throw HHuginn::HHuginnRuntimeException( "Explicit construction of enumeration `"_ys.append( name() ).append( "' instances is forbidden." ), thread_->current_frame()->file_id(), position_ );
+	M_EPILOG
+}
 
 HHuginn::class_t create_class(
 	HRuntime* runtime_,

@@ -199,6 +199,17 @@ void verify_signature( char const* name_, HHuginn::values_t& values_, types_t co
 	}
 }
 
+void verify_signature_by_class( char const* name_, HHuginn::values_t& values_, classes_t const& classes_, huginn::HThread* thread_, int position_ ) {
+	int const COUNT( static_cast<int>( classes_.get_size() ) );
+	verify_arg_count( name_, values_, COUNT, COUNT, thread_, position_ );
+	ARITY arity( COUNT == 1 ? ARITY::UNARY : ARITY::MULTIPLE );
+	for ( int i( 0 ); i < COUNT; ++ i ) {
+		if ( classes_[i]->type_id() != HHuginn::TYPE::UNKNOWN ) {
+			verify_arg_type( name_, values_, i, classes_[i], arity, thread_, position_ );
+		}
+	}
+}
+
 HHuginn::type_id_t verify_arg_type(
 	char const* name_,
 	HHuginn::values_t& values_,

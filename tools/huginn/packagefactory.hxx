@@ -11,6 +11,7 @@
 #include "hcore/hsingleton.hxx"
 
 #include "tools/hhuginn.hxx"
+#include "tools/huginn/enumeration.hxx"
 
 namespace yaal {
 
@@ -69,7 +70,7 @@ private:
 };
 
 HHuginn::class_t add_class_to_package( HHuginn::HClass*, HHuginn::class_t const&, yaal::hcore::HString const& );
-HHuginn::class_t add_enumeration_to_package( HHuginn::HClass*, HHuginn::class_t const&, yaal::hcore::HString const& );
+enumeration::HEnumerationClass::ptr_t add_enumeration_to_package( HHuginn::HClass*, enumeration::HEnumerationClass::ptr_t const&, yaal::hcore::HString const& );
 HHuginn::class_t package_exception( HHuginn::HClass* );
 
 }

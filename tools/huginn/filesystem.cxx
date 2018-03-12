@@ -15,6 +15,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "enumeration.hxx"
 #include "exception.hxx"
 #include "hcore/hfile.hxx"
+#include "hcore/safe_int.hxx"
 #include "packagefactory.hxx"
 #include "tools/filesystem.hxx"
 
@@ -32,15 +33,11 @@ namespace huginn {
 typedef yaal::hcore::HString (*str_transform_func_t)( yaal::hcore::HString const& );
 
 class HFileSystem : public HHuginn::HValue {
-	struct OPERATIONS {
-		static int const READING = 1;
-		static int const WRITING = 2;
-	};
 	HHuginn::class_t _streamClass;
 	HHuginn::class_t _directoryScanClass;
 	HHuginn::class_t _timeClass;
 	HHuginn::class_t _fileStatClass;
-	HHuginn::class_t _openModeClass;
+	enumeration::HEnumerationClass::ptr_t _openModeClass;
 	HHuginn::class_t _exceptionClass;
 public:
 	HFileSystem( HHuginn::HClass* class_ )
@@ -56,8 +53,8 @@ public:
 					class_->runtime(),
 					"OPEN_MODE",
 					enumeration::descriptions_t{
-						{ "READ", "Open file for reading." },
-						{ "WRITE", "Open file for writing." }
+						{ "READ", "Open file for reading.", safe_int::cast<int>( HFile::OPEN::READING.value() ) },
+						{ "WRITE", "Open file for writing.", safe_int::cast<int>( HFile::OPEN::WRITING.value() ) }
 					},
 					"The `OPEN_MODE` is set of possible modes used for opening the files.",
 					HHuginn::VISIBILITY::PACKAGE
@@ -71,18 +68,6 @@ public:
 	static HHuginn::value_t open( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		return ( static_cast<HFileSystem*>( object_->raw() )->do_open( thread_, values_, position_ ) );
-		M_EPILOG
-	}
-	static HHuginn::value_t reading( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
-		M_PROLOG
-		verify_arg_count( "FileSystem.reading", values_, 0, 0, thread_, position_ );
-		return ( thread_->object_factory().create_integer( OPERATIONS::READING + 0 ) );
-		M_EPILOG
-	}
-	static HHuginn::value_t writing( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
-		M_PROLOG
-		verify_arg_count( "FileSystem.writing", values_, 0, 0, thread_, position_ );
-		return ( thread_->object_factory().create_integer( OPERATIONS::WRITING + 0 ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t current_working_directory( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -169,19 +154,12 @@ private:
 	HHuginn::value_t do_open( huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "FileSystem.open";
-		verify_signature( name, values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::INTEGER }, thread_, position_ );
-		int operation( static_cast<int>( get_integer( values_[1] ) ) );
-		if ( ( operation != OPERATIONS::READING ) && ( operation != OPERATIONS::WRITING ) ) {
-			throw HHuginn::HHuginnRuntimeException(
-				HString( name ).append( "(): second argument must be either FileSystem.reading() or FileSystem.writing()" ),
-				thread_->current_frame()->file_id(),
-				position_
-			);
-		}
+		verify_signature_by_class( name, values_, { thread_->object_factory().string_class(), _openModeClass->enumeral_class() }, thread_, position_ );
+		int operation( static_cast<HHuginn::HEnumeral*>( values_[1].raw() )->value() );
 		HStreamInterface::ptr_t stream(
 			make_pointer<HFile>(
 				get_string( values_[0] ),
-				operation == OPERATIONS::READING ? HFile::OPEN::READING : HFile::OPEN::WRITING
+				operation == safe_int::cast<int>( HFile::OPEN::READING.value() ) ? HFile::OPEN::READING : HFile::OPEN::WRITING
 			)
 		);
 		HFile* f( static_cast<HFile*>( stream.raw() ) );
@@ -214,8 +192,6 @@ HHuginn::value_t HFileSystemCreator::do_new_instance( HRuntime* runtime_ ) {
 	);
 	HHuginn::field_definitions_t fd{
 		{ "open",                      runtime_->create_method( &HFileSystem::open ),    "( *path*, *mode* ) - open file under given *path* in the attached file system, using specified (i/o) *mode*" },
-		{ "reading",                   runtime_->create_method( &HFileSystem::reading ), "a mode for *.open()* method, used to open files for reading" },
-		{ "writing",                   runtime_->create_method( &HFileSystem::writing ), "a mode for *.open()* method, used to open files for writing" },
 		{ "rename",                    runtime_->create_method( &HFileSystem::rename ),  "( *oldPath*, *newPath* ) - rename or move file from *oldPath* to *newPath* in attached file system", },
 		{ "remove",                    runtime_->create_method( &HFileSystem::remove ),  "( *path* ) - remove file with given *path* from attached file system" },
 		{ "readlink",                  runtime_->create_method( &HFileSystem::path_transform, "FileSystem.readlink", &filesystem::readlink ), "( *path* ) - get resolved symbolic links or canonical file name for given *path*" },
