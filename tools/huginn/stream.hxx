@@ -24,12 +24,14 @@ public:
 	static HHuginn::value_t read( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t read_line( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t write( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+	static HHuginn::value_t seek( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	yaal::hcore::HString const& read_line_impl( void );
 	bool is_valid( void ) const;
 	static HHuginn::class_t get_class( HRuntime* );
 private:
 	yaal::hcore::HString read_impl( int long );
 	void write_impl( yaal::hcore::HString const& );
+	void seek_impl( int long, yaal::hcore::HStreamInterface::SEEK );
 	virtual HIterator do_iterator( HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override __attribute__((noreturn));
 	virtual HHuginn::value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override __attribute__((noreturn));

@@ -872,11 +872,17 @@ void HStreamInterface::seek( int long offset_, SEEK anchor_ ) {
 	M_EPILOG
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wsuggest-attribute=noreturn"
 void HStreamInterface::do_seek( int long, SEEK ) {
 	M_PROLOG
 	throw HStreamInterfaceException( "Seeking on this stream is not supported." );
 	M_EPILOG
 }
+#pragma GCC diagnostic pop
 
 int long HStreamInterface::write( void const* buffer_, int long size_ ) {
 	M_PROLOG

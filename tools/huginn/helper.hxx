@@ -7,6 +7,7 @@
 #define YAAL_TOOLS_HUGINN_HELPER_HXX_INCLUDED 1
 
 #include "tools/hhuginn.hxx"
+#include "tools/huginn/enumeration.hxx"
 
 namespace yaal {
 
@@ -52,6 +53,9 @@ inline yaal::hcore::HString a_type_name( HHuginn::type_id_t type_ ) {
 }
 
 void operands_type_mismatch( char const*, HHuginn::HClass const*, HHuginn::HClass const*, int, int ) __attribute__(( noreturn ));
+HHuginn::class_t add_class_as_member( HHuginn::HClass*, HHuginn::class_t const&, yaal::hcore::HString const& );
+enumeration::HEnumerationClass::ptr_t add_enumeration_as_member( HHuginn::HClass*, enumeration::HEnumerationClass::ptr_t const&, yaal::hcore::HString const& );
+HHuginn::class_t class_exception( HHuginn::HClass* );
 void verify_arg_count( char const*, HHuginn::values_t&, int, int, huginn::HThread*, int );
 void verify_arg_type( char const*, HHuginn::values_t&, int, HHuginn::TYPE, ARITY, huginn::HThread*, int );
 HHuginn::type_id_t verify_arg_type( char const*, HHuginn::values_t&, int, types_t const&, ARITY, huginn::HThread*, int );
@@ -69,6 +73,7 @@ HHuginn::HNumber::value_type const& get_number( HHuginn::value_t const& );
 HHuginn::HBoolean::value_type get_boolean( HHuginn::value_t const& );
 HHuginn::HCharacter::value_type get_character( HHuginn::value_t const& );
 HHuginn::HList::values_t const& get_list( HHuginn::value_t const& );
+HHuginn::HEnumeral::value_type get_enumeral( HHuginn::value_t const& );
 
 HHuginn::HString::value_type const& get_string( HHuginn::HValue const* );
 HHuginn::HInteger::value_type get_integer( HHuginn::HValue const* );
@@ -76,6 +81,7 @@ HHuginn::HReal::value_type get_real( HHuginn::HValue const* );
 HHuginn::HNumber::value_type const& get_number( HHuginn::HValue const* );
 HHuginn::HBoolean::value_type get_boolean( HHuginn::HValue const* );
 HHuginn::HCharacter::value_type get_character( HHuginn::HValue const* );
+HHuginn::HEnumeral::value_type get_enumeral( HHuginn::HValue const* );
 
 template<typename data_t>
 data_t get_by_type( HHuginn::value_t const& );

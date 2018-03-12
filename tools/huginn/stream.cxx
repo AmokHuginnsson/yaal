@@ -9,6 +9,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "helper.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
+#include "hcore/safe_int.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -36,6 +37,50 @@ void raise( hcore::HException const& exception_, huginn::HThread* thread_, int p
 	M_EPILOG
 }
 }
+
+class HStreamClass : public HHuginn::HClass {
+public:
+	typedef HStreamClass this_type;
+	typedef HHuginn::HClass base_type;
+private:
+	enumeration::HEnumerationClass::ptr_t _seekEnumerationClass;
+public:
+	HStreamClass( HRuntime* runtime_, HHuginn::type_id_t typeId_, HHuginn::identifier_id_t identifierId_ )
+		: HClass(
+			runtime_,
+			typeId_,
+			identifierId_,
+			nullptr,
+			"The `Stream` class gives an interface for stream based I/O operations."
+		)
+		, _seekEnumerationClass() {
+		HHuginn::field_definitions_t fd{
+			{ "read",      runtime_->create_method( &HStream::read ),      "read all data from given stream" },
+			{ "read_line", runtime_->create_method( &HStream::read_line ), "read single line of text from given stream" },
+			{ "write",     runtime_->create_method( &HStream::write ),     "( *value* ) - write given value info this stream" },
+			{ "seek",      runtime_->create_method( &HStream::seek ),     "( *offset*, *anchor* ) - move reading/writing position to the *offset* counted from an *anchor*" }
+		};
+		redefine( nullptr, fd );
+		_seekEnumerationClass = add_enumeration_as_member(
+			this,
+			enumeration::create_class(
+				runtime_,
+				"SEEK",
+				enumeration::descriptions_t{
+					{ "BEGIN", "Count offset position form the beginning of the stream.", static_cast<int>( HStreamInterface::SEEK::BEGIN ) },
+					{ "CURRENT", "Count offset position form the current position in the stream.", static_cast<int>( HStreamInterface::SEEK::CURRENT ) },
+					{ "END", "Count offset position form the end of the stream.", static_cast<int>( HStreamInterface::SEEK::END ) }
+				},
+				"The `SEEK` is set of possible anchors used for seeking in seekable streams.",
+				HHuginn::VISIBILITY::PACKAGE
+			),
+			"set of possible modes used for seeking in streams."
+		);
+	}
+	HHuginn::HClass const* seek_class( void ) const {
+		return ( _seekEnumerationClass->enumeral_class() );
+	}
+};
 
 class HStreamIterator : public HIteratorInterface {
 	HStream* _stream;
@@ -104,6 +149,20 @@ HHuginn::value_t HStream::write( huginn::HThread* thread_, HHuginn::value_t* obj
 	M_EPILOG
 }
 
+HHuginn::value_t HStream::seek( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	HStream* s( static_cast<HStream*>( object_->raw() ) );
+	HStreamClass const* sc( static_cast<HStreamClass const*>( s->HValue::get_class() ) );
+	verify_signature_by_class( "Stream.seek", values_, { thread_->object_factory().integer_class(), sc->seek_class() }, thread_, position_ );
+	try {
+		s->seek_impl( safe_int::cast<int long>( get_integer( values_[0] ) ), static_cast<HStreamInterface::SEEK>( get_enumeral( values_[1] ) ) );
+	} catch ( HException const& e ) {
+		raise( e, thread_, position_ );
+	}
+	return ( thread_->runtime().none_value() );
+	M_EPILOG
+}
+
 HString HStream::read_impl( int long size_ ) {
 	M_PROLOG
 	_buffer.realloc( size_ );
@@ -124,6 +183,13 @@ yaal::hcore::HString const& HStream::read_line_impl( void ) {
 	M_PROLOG
 	_stream->read_until( _lineBuffer, HStreamInterface::eols, false );
 	return ( _lineBuffer );
+	M_EPILOG
+}
+
+void HStream::seek_impl( int long offset_, yaal::hcore::HStreamInterface::SEEK anchor_ ) {
+	M_PROLOG
+	_stream->seek( offset_, anchor_ );
+	return;
 	M_EPILOG
 }
 
@@ -149,21 +215,23 @@ int long HStream::do_size( huginn::HThread* thread_, int position_ ) const {
 
 HHuginn::class_t HStream::get_class( HRuntime* runtime_ ) {
 	M_PROLOG
-	char const name[] = "Stream";
-	HHuginn::class_t c( runtime_->get_class( runtime_->identifier_id( name ) ) );
+	HHuginn::identifier_id_t classIdentifier( runtime_->identifier_id( "Stream" ) );
+	HHuginn::class_t c( runtime_->get_class( classIdentifier ) );
 	if ( ! c ) {
-		c = runtime_->create_class(
-			name,
-			nullptr,
-			"The `Stream` class gives an interface for stream based I/O operations."
+		c =	runtime_->create_class(
+			HRuntime::class_constructor_t(
+				[&runtime_, &classIdentifier] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
+					return (
+						make_pointer<HStreamClass>(
+							runtime_,
+							typeId_,
+							classIdentifier
+						)
+					);
+				}
+			)
 		);
-		HHuginn::field_definitions_t fd{
-			{ "read",      runtime_->create_method( &HStream::read ),      "read all data from given stream" },
-			{ "read_line", runtime_->create_method( &HStream::read_line ), "read single line of text from given stream" },
-			{ "write",     runtime_->create_method( &HStream::write ),     "( *value* ) - write given value info this stream" }
-		};
-		c->redefine( nullptr, fd );
-		runtime_->huginn()->register_class( c );
+		runtime_->huginn()->register_class( c, HHuginn::ACCESS::PRIVATE, HHuginn::VISIBILITY::GLOBAL );
 	}
 	return ( c );
 	M_EPILOG

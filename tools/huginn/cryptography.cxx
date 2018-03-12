@@ -28,7 +28,7 @@ class HCryptography : public HHuginn::HValue {
 public:
 	HCryptography( HHuginn::HClass* class_ )
 		: HValue( class_ )
-		, _exceptionClass( package_exception( class_ ) ) {
+		, _exceptionClass( class_exception( class_ ) ) {
 		return;
 	}
 	static HHuginn::value_t hash( char const* name_, tools::hash::hash_string_t hash_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {

@@ -8,6 +8,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "keyword.hxx"
 #include "operator.hxx"
 #include "value_builtin.hxx"
+#include "exception.hxx"
 #include "tools/util.hxx"
 #include "tools/hstringstream.hxx"
 #include "tools/streamtools.hxx"
@@ -77,6 +78,51 @@ void operands_type_mismatch( char const* op_, HHuginn::HClass const* c1_, HHugin
 		.append( a_type_name( c2_ ) )
 		.append( "." ),
 	throw HHuginn::HHuginnRuntimeException( msg, fileId_, pos_ );
+}
+
+HHuginn::class_t add_class_as_member( HHuginn::HClass* juncture_, HHuginn::class_t const& class_, yaal::hcore::HString const& doc_ ) {
+	M_PROLOG
+	HHuginn::value_t member(
+		juncture_->runtime()->object_factory()->create_method_raw( class_->constructor_function( HHuginn::ACCESS::PUBLIC ) )
+	);
+	juncture_->add_member(
+		HHuginn::HFieldDefinition(
+			class_->name(), member, doc_
+		)
+	);
+	return ( class_ );
+	M_EPILOG
+}
+
+enumeration::HEnumerationClass::ptr_t add_enumeration_as_member( HHuginn::HClass* juncture_, enumeration::HEnumerationClass::ptr_t const& class_, yaal::hcore::HString const& doc_ ) {
+	M_PROLOG
+	HHuginn::value_t member(
+		juncture_->runtime()->object_factory()->create<HHuginn::HValue>( class_.raw() )
+	);
+	juncture_->add_member(
+		HHuginn::HFieldDefinition(
+			class_->name(), member, doc_
+		)
+	);
+	return ( class_ );
+	M_EPILOG
+}
+
+HHuginn::class_t class_exception( HHuginn::HClass* package_ ) {
+	HString name( package_->name() );
+	HString exName( name );
+	exName.append( "Exception" );
+	return (
+		add_class_as_member(
+			package_,
+			exception::create_class(
+				package_->runtime(),
+				exName,
+				"The `"_ys.append( exName ).append( "` exception type for `" ).append( name ).append( "` package." )
+			),
+			"( *message* ) - create instance of "_ys.append( exName ).append( " with given *message*" )
+		)
+	);
 }
 
 void verify_arg_count( char const* name_, HHuginn::values_t& values_, int min_, int max_, huginn::HThread* thread_, int position_ ) {
@@ -450,6 +496,12 @@ HHuginn::HList::values_t const& get_list( HHuginn::value_t const& value_ ) {
 	return ( static_cast<HHuginn::HList const*>( value_.raw() )->value() );
 }
 
+HHuginn::HEnumeral::value_type get_enumeral( HHuginn::value_t const& value_ ) {
+	M_ASSERT( !! value_ );
+	M_ASSERT( dynamic_cast<HHuginn::HEnumeral const*>( value_.raw() ) );
+	return ( static_cast<HHuginn::HEnumeral const*>( value_.raw() )->value() );
+}
+
 HHuginn::HString::value_type const& get_string( HHuginn::HValue const* value_ ) {
 	M_ASSERT( !! value_ );
 	M_ASSERT( dynamic_cast<HHuginn::HString const*>( value_ ) );
@@ -484,6 +536,12 @@ HHuginn::HCharacter::value_type get_character( HHuginn::HValue const* value_ ) {
 	M_ASSERT( !! value_ );
 	M_ASSERT( dynamic_cast<HHuginn::HCharacter const*>( value_ ) );
 	return ( static_cast<HHuginn::HCharacter const*>( value_ )->value() );
+}
+
+HHuginn::HEnumeral::value_type get_enumeral( HHuginn::HValue const* value_ ) {
+	M_ASSERT( !! value_ );
+	M_ASSERT( dynamic_cast<HHuginn::HEnumeral const*>( value_ ) );
+	return ( static_cast<HHuginn::HEnumeral const*>( value_ )->value() );
 }
 
 template<>

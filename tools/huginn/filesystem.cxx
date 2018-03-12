@@ -47,7 +47,7 @@ public:
 		, _timeClass( huginn::HTime::get_class( class_->runtime() ) )
 		, _fileStatClass( HFileStat::get_class( class_->runtime() ) )
 		, _openModeClass(
-			add_enumeration_to_package(
+			add_enumeration_as_member(
 				class_,
 				enumeration::create_class(
 					class_->runtime(),
@@ -62,7 +62,7 @@ public:
 				"set of possible modes used for opening the files."
 			)
 		)
-		, _exceptionClass( package_exception( class_ ) ) {
+		, _exceptionClass( class_exception( class_ ) ) {
 		return;
 	}
 	static HHuginn::value_t open( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -155,11 +155,11 @@ private:
 		M_PROLOG
 		char const name[] = "FileSystem.open";
 		verify_signature_by_class( name, values_, { thread_->object_factory().string_class(), _openModeClass->enumeral_class() }, thread_, position_ );
-		int operation( static_cast<HHuginn::HEnumeral*>( values_[1].raw() )->value() );
+		bool reading( get_enumeral( values_[1] ) == safe_int::cast<int>( HFile::OPEN::READING.value() ) );
 		HStreamInterface::ptr_t stream(
 			make_pointer<HFile>(
 				get_string( values_[0] ),
-				operation == safe_int::cast<int>( HFile::OPEN::READING.value() ) ? HFile::OPEN::READING : HFile::OPEN::WRITING
+				reading ? HFile::OPEN::READING : HFile::OPEN::WRITING
 			)
 		);
 		HFile* f( static_cast<HFile*>( stream.raw() ) );

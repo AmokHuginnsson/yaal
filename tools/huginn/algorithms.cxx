@@ -48,7 +48,7 @@ public:
 		, _mapperClass( HMapper::get_class( class_->runtime() ) )
 		, _rangeClass( HRange::get_class( class_->runtime() ) )
 		, _enumeratorClass( HEnumerator::get_class( class_->runtime() ) )
-		, _exceptionClass( package_exception( class_ ) ) {
+		, _exceptionClass( class_exception( class_ ) ) {
 		return;
 	}
 	static HHuginn::value_t filter( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {

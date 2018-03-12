@@ -252,9 +252,9 @@ public:
 	}
 	int long read( void*, int long );
 	int long write( void const*, int long );
-	/*! \brief Move reading/writting position on seekable stream.
+	/*! \brief Move reading/writing position on seekable stream.
 	 *
-	 * \param offset - new reading/writting position.
+	 * \param offset - new reading/writing position.
 	 * \param anchor - count offset relative to given anchor.
 	 */
 	void seek( int long offset, SEEK anchor = SEEK::BEGIN );
@@ -424,7 +424,7 @@ private:
 	void apply_precision( void );
 	virtual int long do_write( void const*, int long ) = 0;
 	virtual int long do_read( void*, int long ) = 0;
-	virtual void do_seek( int long, SEEK ) __attribute__((noreturn));
+	virtual void do_seek( int long, SEEK );
 	virtual void do_flush( void ) = 0;
 	virtual bool do_is_valid( void ) const = 0;
 	virtual POLL_TYPE do_poll_type( void ) const = 0;
