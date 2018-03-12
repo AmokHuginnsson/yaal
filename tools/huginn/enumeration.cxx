@@ -165,9 +165,8 @@ HHuginn::class_t create_class(
 				}
 			)
 		);
+		runtime_->huginn()->register_class( c, HHuginn::ACCESS::PRIVATE, visibility_ );
 	}
-	/* *TODO* *FIXME* Move to the end of if(!c) above. */
-	runtime_->huginn()->register_class( c, HHuginn::ACCESS::PRIVATE, visibility_ );
 	return ( c );
 }
 

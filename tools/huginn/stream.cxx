@@ -157,14 +157,14 @@ HHuginn::class_t HStream::get_class( HRuntime* runtime_ ) {
 			nullptr,
 			"The `Stream` class gives an interface for stream based I/O operations."
 		);
+		HHuginn::field_definitions_t fd{
+			{ "read",      runtime_->create_method( &HStream::read ),      "read all data from given stream" },
+			{ "read_line", runtime_->create_method( &HStream::read_line ), "read single line of text from given stream" },
+			{ "write",     runtime_->create_method( &HStream::write ),     "( *value* ) - write given value info this stream" }
+		};
+		c->redefine( nullptr, fd );
 		runtime_->huginn()->register_class( c );
 	}
-	HHuginn::field_definitions_t fd{
-		{ "read",      runtime_->create_method( &HStream::read ),      "read all data from given stream" },
-		{ "read_line", runtime_->create_method( &HStream::read_line ), "read single line of text from given stream" },
-		{ "write",     runtime_->create_method( &HStream::write ),     "( *value* ) - write given value info this stream" }
-	};
-	c->redefine( nullptr, fd );
 	return ( c );
 	M_EPILOG
 }
