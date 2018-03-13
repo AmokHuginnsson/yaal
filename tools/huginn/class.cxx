@@ -289,11 +289,11 @@ yaal::hcore::HString const& HHuginn::HClass::doc( void ) const {
 	return ( _doc );
 }
 
-yaal::hcore::HString const& HHuginn::HClass::doc( identifier_id_t method_ ) const {
+yaal::hcore::HString const& HHuginn::HClass::doc( identifier_id_t member_ ) const {
 	M_PROLOG
-	int fieldIndex( field_index( method_, MEMBER_TYPE::STATIC ) );
+	int fieldIndex( field_index( member_, MEMBER_TYPE::STATIC ) );
 	if ( fieldIndex < 0 ) {
-		throw HHuginnException( "Invalid method identifier id." );
+		throw HHuginnException( "Invalid member identifier id." );
 	}
 	return ( _fieldDescriptions[ fieldIndex ] );
 	M_EPILOG

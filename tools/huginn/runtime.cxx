@@ -1082,8 +1082,15 @@ void HRuntime::dump_docs( yaal::hcore::HStreamInterface& stream_ ) const {
 			stream_ << cls.name() << ":" << cls.doc() << endl;
 		}
 		for ( HHuginn::field_identifiers_t::value_type const& f : cls.field_identifiers() ) {
-			if ( ! cls.doc( f ).is_empty() ) {
-				stream_ << cls.name() << "." << identifier_name( f ) << ":" << cls.doc( f ) << endl;
+			HString const& doc( cls.doc( f ) );
+			if ( ! doc.is_empty() ) {
+				stream_ << cls.name() << "." << identifier_name( f ) << ":";
+				int fi( cls.field_index( f, HHuginn::HClass::MEMBER_TYPE::STATIC ) );
+				HHuginn::type_id_t tid( cls.field( fi )->type_id() );
+				if ( ( doc.front() != '(' ) && ( tid == HHuginn::TYPE::METHOD ) ) {
+					stream_ << "() - ";
+				}
+				stream_ << doc << endl;
 			}
 		}
 	}
