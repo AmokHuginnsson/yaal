@@ -1154,11 +1154,13 @@ class HHuginn::HBlob : public HHuginn::HValue {
 public:
 	typedef HHuginn::HBlob this_type;
 	typedef HHuginn::HValue base_type;
+	typedef yaal::hcore::HChunk value_type;
 private:
-	yaal::hcore::HChunk _data;
+	value_type _data;
 public:
 	HBlob( HHuginn::HClass const*, yaal::hcore::HChunk&& );
 	int long get_size( void ) const;
+	value_type const& value( void ) const;
 private:
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };

@@ -53,6 +53,10 @@ int long HHuginn::HBlob::get_size( void ) const {
 	return ( _data.get_size() );
 }
 
+HHuginn::HBlob::value_type const& HHuginn::HBlob::value( void ) const {
+	return ( _data );
+}
+
 HHuginn::value_t HHuginn::HBlob::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
 	HChunk c;
 	try {

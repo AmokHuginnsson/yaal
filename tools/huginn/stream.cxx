@@ -1,5 +1,7 @@
 /* Read yaal/LICENSE.md file for copyright and licensing information. */
 
+#include <cstring>
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
@@ -44,6 +46,7 @@ public:
 	typedef HHuginn::HClass base_type;
 private:
 	enumeration::HEnumerationClass::ptr_t _seekEnumerationClass;
+	HHuginn::class_t _exceptionClass;
 public:
 	HStreamClass( HRuntime* runtime_, HHuginn::type_id_t typeId_, HHuginn::identifier_id_t identifierId_ )
 		: HClass(
@@ -53,12 +56,22 @@ public:
 			nullptr,
 			"The `Stream` class gives an interface for stream based I/O operations."
 		)
-		, _seekEnumerationClass() {
+		, _seekEnumerationClass()
+		, _exceptionClass() {
 		HHuginn::field_definitions_t fd{
-			{ "read",      runtime_->create_method( &HStream::read ),      "read all data from given stream" },
-			{ "read_line", runtime_->create_method( &HStream::read_line ), "read single line of text from given stream" },
-			{ "write",     runtime_->create_method( &HStream::write ),     "( *value* ) - write given value info this stream" },
-			{ "seek",      runtime_->create_method( &HStream::seek ),     "( *offset*, *anchor* ) - move reading/writing position to the *offset* counted from an *anchor*" }
+			{ "read_blob",       runtime_->create_method( &HStream::read_fwd,  "Stream.read_blob",       &HStream::read_blob ),       "( *count* ) read *count* bytes of data from this stream" },
+			{ "read_string",     runtime_->create_method( &HStream::read_fwd,  "Stream.read_string",     &HStream::read_string ),     "( *count* ) read *count* bytes of UTF-8 encoded characters as a `string` from this stream" },
+			{ "read_integer",    runtime_->create_method( &HStream::read_fwd,  "Stream.read_integer",    &HStream::read_integer ),    "( *count* ) read *count=1|2|4|8* bytes of data as an `integer` from this stream" },
+			{ "read_real",       runtime_->create_method( &HStream::read_fwd,  "Stream.read_real",       &HStream::read_real ),       "( *count* ) read *count=4|8|16* bytes of data as a `real` from this stream" },
+			{ "read_character",  runtime_->create_method( &HStream::read_fwd,  "Stream.read_character",  &HStream::read_character ),  "( *count* ) read *count=1|2|4* bytes of data as a `character` from this stream" },
+			{ "write_blob",      runtime_->create_method( &HStream::write_fwd, "Stream.write_blob",      HHuginn::TYPE::BLOB,      &HStream::write_blob ),      "( *blobVal*, *count* ) - write *count* number of bytes from given *blobVal* info this stream" },
+			{ "write_string",    runtime_->create_method( &HStream::write_fwd, "Stream.write_string",    HHuginn::TYPE::STRING,    &HStream::write_string ),    "( *strVal*, *count* ) - write *count* number of bytes from given *strVal* info this stream" },
+			{ "write_integer",   runtime_->create_method( &HStream::write_fwd, "Stream.write_integer",   HHuginn::TYPE::INTEGER,   &HStream::write_integer ) ,  "( *intVal*, *count=1|2|4|8* ) - write *count* number of bytes from given *intVal* info this stream" },
+			{ "write_real",      runtime_->create_method( &HStream::write_fwd, "Stream.write_real",      HHuginn::TYPE::REAL,      &HStream::write_real ),      "( *realVal*, *count=4|8|16* ) - write *count* number of bytes from given *realVal* info this stream" },
+			{ "write_character", runtime_->create_method( &HStream::write_fwd, "Stream.write_character", HHuginn::TYPE::CHARACTER, &HStream::write_character ), "( *charVal*, *count=1|2|4* ) - write *count* number of bytes from given *charVal* info this stream" },
+			{ "seek",            runtime_->create_method( &HStream::seek ),                                                           "( *offset*, *anchor* ) - move reading/writing position to the *offset* counted from an *anchor*" },
+			{ "read_line",       runtime_->create_method( &HStream::read_line ),                                                      "read single line of text from this stream" },
+			{ "write_line",      runtime_->create_method( &HStream::write_line ),                                                     "( *strVal* ) - write entriety of given *strVal* info this stream" }
 		};
 		redefine( nullptr, fd );
 		_seekEnumerationClass = add_enumeration_as_member(
@@ -77,9 +90,13 @@ public:
 			"set of possible modes used for seeking in streams.",
 			HHuginn::HClass::MEMBER_TYPE::STATIC
 		);
+		_exceptionClass = class_exception( this );
 	}
 	HHuginn::HClass const* seek_class( void ) const {
 		return ( _seekEnumerationClass->enumeral_class() );
+	}
+	HHuginn::HClass const* exception_class( void ) const {
+		return ( _exceptionClass.raw() );
 	}
 };
 
@@ -88,9 +105,9 @@ class HStreamIterator : public HIteratorInterface {
 	HString _lineCache;
 	HObjectFactory* _objectFactory;
 public:
-	HStreamIterator( HStream* stream_ )
+	HStreamIterator( HThread* thread_, HStream* stream_, int position_ )
 		: _stream( stream_ )
-		, _lineCache( _stream->read_line_impl() )
+		, _lineCache( _stream->read_line_raw( thread_, position_ ) )
 		, _objectFactory( _stream->HValue::get_class()->runtime()->object_factory() ) {
 		return;
 	}
@@ -102,11 +119,7 @@ protected:
 		return ( _stream->is_valid() );
 	}
 	virtual void do_next( HThread* thread_, int position_ ) override {
-		try {
-			_lineCache = _stream->read_line_impl();
-		} catch ( HException const& e ) {
-			raise( e, thread_, position_ );
-		}
+		_lineCache = _stream->read_line_raw( thread_, position_ );
 	}
 private:
 	HStreamIterator( HStreamIterator const& ) = delete;
@@ -122,12 +135,32 @@ HStream::HStream( HHuginn::HClass const* class_, HStreamInterface::ptr_t stream_
 	return;
 }
 
-HHuginn::value_t HStream::read( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+HHuginn::HClass const* HStream::exception_class( void ) const {
+	return ( static_cast<HStreamClass const*>( HValue::get_class() )->exception_class() );
+}
+
+HHuginn::value_t HStream::read_fwd( char const* name_, reader_t reader_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
-	verify_signature( "Stream.read", values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
-	int size( static_cast<int>( get_integer( values_[0] ) ) );
-	HStream* s( static_cast<HStream*>( object_->raw() ) );
-	return ( thread_->object_factory().create_string( s->read_impl( size ) ) );
+	verify_signature( name_, values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
+	HHuginn::value_t v( thread_->runtime().none_value() );
+	try {
+		v = ( static_cast<HStream*>( object_->raw() )->*reader_ )( thread_, get_integer( values_[0] ), position_ );
+	} catch ( HException const& e ) {
+		raise( e, thread_, position_ );
+	}
+	return ( v );
+	M_EPILOG
+}
+
+HHuginn::value_t HStream::write_fwd( char const* name_, HHuginn::TYPE type_, writer_t writer_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_signature( name_, values_, { type_, HHuginn::TYPE::INTEGER }, thread_, position_ );
+	try {
+		( static_cast<HStream*>( object_->raw() )->*writer_ )( thread_, values_[0], get_integer( values_[1] ), position_ );
+	} catch ( HException const& e ) {
+		raise( e, thread_, position_ );
+	}
+	return ( *object_ );
 	M_EPILOG
 }
 
@@ -135,18 +168,16 @@ HHuginn::value_t HStream::read_line( huginn::HThread* thread_, HHuginn::value_t*
 	M_PROLOG
 	verify_arg_count( "Stream.read_line", values_, 0, 0, thread_, position_ );
 	HStream* s( static_cast<HStream*>( object_->raw() ) );
-	HString const& line( s->read_line_impl() );
-	return ( ! line.is_empty() ? thread_->object_factory().create_string( line ) : thread_->runtime().none_value() );
+	return ( s->read_line_impl( thread_, position_ ) );
 	M_EPILOG
 }
 
-HHuginn::value_t HStream::write( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+HHuginn::value_t HStream::write_line( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_signature( "Stream.write", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
-	HString const& val( get_string( values_[0] ) );
 	HStream* s( static_cast<HStream*>( object_->raw() ) );
-	s->write_impl( val );
-	return ( thread_->runtime().none_value() );
+	s->write_line_impl( thread_, get_string( values_[0] ), position_ );
+	return ( *object_ );
 	M_EPILOG
 }
 
@@ -164,26 +195,303 @@ HHuginn::value_t HStream::seek( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_EPILOG
 }
 
-HString HStream::read_impl( int long size_ ) {
+HHuginn::value_t HStream::read_blob( HThread* thread_, HHuginn::HInteger::value_type count_, int position_ ) {
 	M_PROLOG
-	_buffer.realloc( size_ );
-	int long nRead( _stream->read( _buffer.raw(), size_ ) );
-	HString s( _buffer.get<char>(), nRead );
-	return ( s );
+	HChunk c;
+	int long count( safe_int::cast<int long>( count_ ) );
+	_buffer.realloc( count );
+	int long nRead( _stream->read( _buffer.raw(), count ) );
+	if ( nRead > 0 ) {
+		c.realloc( nRead, HChunk::STRATEGY::EXACT );
+		memcpy( c.raw(), _buffer.raw(), static_cast<size_t>( nRead ) );
+	} else if ( nRead < 0 ) {
+		thread_->raise( exception_class(), "Invalid read", position_ );
+	}
+	return ( thread_->runtime().object_factory()->create_blob( yaal::move( c ) ) );
 	M_EPILOG
 }
 
-void HStream::write_impl( HString const& val_ ) {
+HHuginn::value_t HStream::read_string( HThread* thread_, HHuginn::HInteger::value_type count_, int position_ ) {
 	M_PROLOG
-	_converter = val_;
-	_stream->write( _converter.c_str(), _converter.byte_count() );
+	HString s;
+	int long count( safe_int::cast<int long>( count_ ) );
+	_buffer.realloc( count );
+	int long nRead( _stream->read( _buffer.raw(), count ) );
+	if ( nRead > 0 ) {
+		s.assign( _buffer.get<char>(), nRead );
+	} else if ( nRead < 0 ) {
+		thread_->raise( exception_class(), "Read failed.", position_ );
+	}
+	return ( thread_->object_factory().create_string( s ) );
 	M_EPILOG
 }
 
-yaal::hcore::HString const& HStream::read_line_impl( void ) {
+HHuginn::value_t HStream::read_integer( HThread* thread_, HHuginn::HInteger::value_type count_, int position_ ) {
 	M_PROLOG
-	_stream->read_until( _lineBuffer, HStreamInterface::eols, false );
+	HHuginn::HInteger::value_type val( 0 );
+	int count( safe_int::cast<int>( count_ ) );
+	int nRead( 0 );
+	switch ( count ) {
+		case ( sizeof ( yaal::i8_t ) ): {
+			yaal::i8_t i8( 0 );
+			nRead = static_cast<int>( _stream->read( &i8, count ) );
+			val = i8;
+		} break;
+		case ( sizeof ( yaal::i16_t ) ): {
+			yaal::i16_t i16( 0 );
+			nRead = static_cast<int>( _stream->read( &i16, count ) );
+			val = i16;
+		} break;
+		case ( sizeof ( yaal::i32_t ) ): {
+			yaal::i32_t i32( 0 );
+			nRead = static_cast<int>( _stream->read( &i32, count ) );
+			val = i32;
+		} break;
+		case ( sizeof ( HHuginn::HInteger::value_type ) ): {
+			nRead = static_cast<int>( _stream->read( &val, count ) );
+		} break;
+		default: {
+			throw HHuginn::HHuginnRuntimeException(
+				"Invalid read size.",
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+	}
+	if ( nRead != count ) {
+		thread_->raise( exception_class(), "Not enough data in the stream.", position_ );
+	}
+	return ( thread_->object_factory().create_integer( val ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HStream::read_real( HThread* thread_, HHuginn::HInteger::value_type count_, int position_ ) {
+	M_PROLOG
+	HHuginn::HReal::value_type val( 0 );
+	int count( safe_int::cast<int>( count_ ) );
+	int nRead( 0 );
+	switch ( count ) {
+		case ( sizeof ( float ) ): {
+			float f( 0 );
+			nRead = static_cast<int>( _stream->read( &f, count ) );
+			val = f;
+		} break;
+		case ( sizeof ( double ) ): {
+			double d( 0 );
+			nRead = static_cast<int>( _stream->read( &d, count ) );
+			val = d;
+		} break;
+		case ( sizeof ( HHuginn::HReal::value_type ) ): {
+			nRead = static_cast<int>( _stream->read( &val, count ) );
+		} break;
+		default: {
+			throw HHuginn::HHuginnRuntimeException(
+				"Invalid read size.",
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+	}
+	if ( nRead != count ) {
+		thread_->raise( exception_class(), "Not enough data in the stream.", position_ );
+	}
+	return ( thread_->object_factory().create_real( val ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HStream::read_character( HThread* thread_, HHuginn::HInteger::value_type count_, int position_ ) {
+	M_PROLOG
+	HHuginn::HCharacter::value_type::value_type val( 0 );
+	int count( safe_int::cast<int>( count_ ) );
+	int nRead( 0 );
+	switch ( count ) {
+		case ( sizeof ( yaal::u8_t ) ): {
+			yaal::u8_t u8( 0 );
+			nRead = static_cast<int>( _stream->read( &u8, count ) );
+			val = u8;
+		} break;
+		case ( sizeof ( yaal::u16_t ) ): {
+			yaal::u16_t u16( 0 );
+			nRead = static_cast<int>( _stream->read( &u16, count ) );
+			val = u16;
+		} break;
+		case ( sizeof ( HHuginn::HCharacter::value_type::value_type ) ): {
+			nRead = static_cast<int>( _stream->read( &val, count ) );
+		} break;
+		default: {
+			throw HHuginn::HHuginnRuntimeException(
+				"Invalid read size.",
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+	}
+	if ( nRead != count ) {
+		thread_->raise( exception_class(), "Not enough data in the stream.", position_ );
+	}
+	return ( thread_->object_factory().create_character( code_point_t( val ) ) );
+	M_EPILOG
+}
+
+void HStream::write_blob( HThread* thread_, HHuginn::value_t const& value_, HHuginn::HInteger::value_type count_, int position_ ) {
+	M_PROLOG
+	int long count( safe_int::cast<int long>( count_ ) );
+	HHuginn::HBlob const& blob( *static_cast<HHuginn::HBlob const*>( value_.raw() ) );
+	if ( count <= blob.get_size() ) {
+		int long nWrite( _stream->write( blob.value().raw(), count ) );
+		if ( nWrite != count ) {
+			thread_->raise( exception_class(), "Write failed.", position_ );
+		}
+	} else {
+		thread_->raise( exception_class(), "Write bigger than source blob.", position_ );
+	}
+	return;
+	M_EPILOG
+}
+
+void HStream::write_string( HThread* thread_, HHuginn::value_t const& value_, HHuginn::HInteger::value_type count_, int position_ ) {
+	M_PROLOG
+	int long count( safe_int::cast<int long>( count_ ) );
+	HHuginn::HString::value_type const& s( static_cast<HHuginn::HString const*>( value_.raw() )->value() );
+	if ( count <= s.get_length() ) {
+		_converter.assign( s.begin(), s.begin() + count );
+		int long nWrite( _stream->write( _converter.c_str(), _converter.byte_count() ) );
+		if ( nWrite != _converter.byte_count() ) {
+			thread_->raise( exception_class(), "Write failed.", position_ );
+		}
+	} else {
+		thread_->raise( exception_class(), "Write bigger than source string.", position_ );
+	}
+	return;
+	M_EPILOG
+}
+
+void HStream::write_integer( HThread* thread_, HHuginn::value_t const& value_, HHuginn::HInteger::value_type count_, int position_ ) {
+	M_PROLOG
+	int long count( safe_int::cast<int long>( count_ ) );
+	HHuginn::HInteger::value_type val( static_cast<HHuginn::HInteger const*>( value_.raw() )->value() );
+	int nWrite( 0 );
+	switch ( count ) {
+		case ( sizeof ( yaal::i8_t ) ): {
+			yaal::i8_t i8( static_cast<yaal::i8_t>( val ) );
+			nWrite = static_cast<int>( _stream->write( &i8, count ) );
+		} break;
+		case ( sizeof ( yaal::i16_t ) ): {
+			yaal::i16_t i16( static_cast<yaal::i16_t>( val ) );
+			nWrite = static_cast<int>( _stream->write( &i16, count ) );
+		} break;
+		case ( sizeof ( yaal::i32_t ) ): {
+			yaal::i32_t i32( static_cast<yaal::i32_t>( val ) );
+			nWrite = static_cast<int>( _stream->write( &i32, count ) );
+		} break;
+		case ( sizeof ( HHuginn::HInteger::value_type ) ): {
+			nWrite = static_cast<int>( _stream->write( &val, count ) );
+		} break;
+		default: {
+			throw HHuginn::HHuginnRuntimeException(
+				"Invalid write size.",
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+	}
+	if ( nWrite != count ) {
+		thread_->raise( exception_class(), "Write failed.", position_ );
+	}
+	return;
+	M_EPILOG
+}
+
+void HStream::write_real( HThread* thread_, HHuginn::value_t const& value_, HHuginn::HInteger::value_type count_, int position_ ) {
+	M_PROLOG
+	int long count( safe_int::cast<int long>( count_ ) );
+	HHuginn::HReal::value_type val( static_cast<HHuginn::HReal const*>( value_.raw() )->value() );
+	int nWrite( 0 );
+	switch ( count ) {
+		case ( sizeof ( float ) ): {
+			float f( static_cast<float>( val ) );
+			nWrite = static_cast<int>( _stream->write( &f, count ) );
+		} break;
+		case ( sizeof ( double ) ): {
+			double d( static_cast<double>( val ) );
+			nWrite = static_cast<int>( _stream->write( &d, count ) );
+		} break;
+		case ( sizeof ( HHuginn::HReal::value_type ) ): {
+			nWrite = static_cast<int>( _stream->write( &val, count ) );
+		} break;
+		default: {
+			throw HHuginn::HHuginnRuntimeException(
+				"Invalid write size.",
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+	}
+	if ( nWrite != count ) {
+		thread_->raise( exception_class(), "Write failed.", position_ );
+	}
+	return;
+	M_EPILOG
+}
+
+void HStream::write_character( HThread* thread_, HHuginn::value_t const& value_, HHuginn::HInteger::value_type count_, int position_ ) {
+	M_PROLOG
+	int long count( safe_int::cast<int long>( count_ ) );
+	HHuginn::HCharacter::value_type::value_type val( static_cast<HHuginn::HCharacter const*>( value_.raw() )->value().get() );
+	int nWrite( 0 );
+	switch ( count ) {
+		case ( sizeof ( yaal::u8_t ) ): {
+			yaal::u8_t u8( static_cast<yaal::u8_t>( val ) );
+			nWrite = static_cast<int>( _stream->write( &u8, count ) );
+		} break;
+		case ( sizeof ( yaal::u16_t ) ): {
+			yaal::u16_t u16( static_cast<yaal::u16_t>( val ) );
+			nWrite = static_cast<int>( _stream->write( &u16, count ) );
+		} break;
+		case ( sizeof ( HHuginn::HInteger::value_type ) ): {
+			nWrite = static_cast<int>( _stream->write( &val, count ) );
+		} break;
+		default: {
+			throw HHuginn::HHuginnRuntimeException(
+				"Invalid write size.",
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+	}
+	if ( nWrite != count ) {
+		thread_->raise( exception_class(), "Write failed.", position_ );
+	}
+	return;
+	M_EPILOG
+}
+
+yaal::hcore::HString const& HStream::read_line_raw( HThread* thread_, int position_ ) {
+	M_PROLOG
+	try {
+		_stream->read_until( _lineBuffer, HStreamInterface::eols, false );
+	} catch ( HException const& e ) {
+		raise( e, thread_, position_ );
+	}
 	return ( _lineBuffer );
+	M_EPILOG
+}
+
+HHuginn::value_t HStream::read_line_impl( HThread* thread_, int position_ ) {
+	M_PROLOG
+	return ( thread_->object_factory().create_string( read_line_raw( thread_, position_ ) ) );
+	M_EPILOG
+}
+
+void HStream::write_line_impl( HThread* thread_, HString const& val_, int position_ ) {
+	M_PROLOG
+	try {
+		_converter = val_;
+		_stream->write( _converter.c_str(), _converter.byte_count() );
+	} catch ( HException const& e ) {
+		raise( e, thread_, position_ );
+	}
+	return;
 	M_EPILOG
 }
 
@@ -201,13 +509,8 @@ bool HStream::is_valid( void ) const {
 }
 
 HHuginn::HIterable::HIterator HStream::do_iterator( HThread* thread_, int position_ ) {
-	try {
-		HIterator::iterator_implementation_t impl( new ( memory::yaal ) HStreamIterator( this ) );
-		return ( HIterator( yaal::move( impl ) ) );
-	} catch ( HException const& e ) {
-		raise( e, thread_, position_ );
-	}
-	return ( HIterator::iterator_implementation_t( nullptr ) );
+	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HStreamIterator( thread_, this, position_ ) );
+	return ( HIterator( yaal::move( impl ) ) );
 }
 
 int long HStream::do_size( huginn::HThread* thread_, int position_ ) const {
