@@ -12,6 +12,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "thread.hxx"
 #include "objectfactory.hxx"
 #include "hcore/safe_int.hxx"
+#include "hcore/unicode.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -61,14 +62,25 @@ public:
 		HHuginn::field_definitions_t fd{
 			{ "read_blob",       runtime_->create_method( &HStream::read_fwd,  "Stream.read_blob",       &HStream::read_blob ),       "( *count* ) read *count* bytes of data from this stream" },
 			{ "read_string",     runtime_->create_method( &HStream::read_fwd,  "Stream.read_string",     &HStream::read_string ),     "( *count* ) read *count* bytes of UTF-8 encoded characters as a `string` from this stream" },
-			{ "read_integer",    runtime_->create_method( &HStream::read_fwd,  "Stream.read_integer",    &HStream::read_integer ),    "( *count* ) read *count=1|2|4|8* bytes of data as an `integer` from this stream" },
-			{ "read_real",       runtime_->create_method( &HStream::read_fwd,  "Stream.read_real",       &HStream::read_real ),       "( *count* ) read *count=4|8|16* bytes of data as a `real` from this stream" },
-			{ "read_character",  runtime_->create_method( &HStream::read_fwd,  "Stream.read_character",  &HStream::read_character ),  "( *count* ) read *count=1|2|4* bytes of data as a `character` from this stream" },
+			{ "read_integer",    runtime_->create_method( &HStream::read_fwd,  "Stream.read_integer",    &HStream::read_integer ),    "( *count* ) read *count==(1|2|4|8)* bytes of data as an `integer` from this stream" },
+			{ "read_real",       runtime_->create_method( &HStream::read_fwd,  "Stream.read_real",       &HStream::read_real ),
+				"( *count* ) read *count==(" M_STRINGIFY( SIZEOF_FLOAT )
+#if SIZEOF_DOUBLE != SIZEOF_DOUBLE_LONG
+					"|" M_STRINGIFY( SIZEOF_DOUBLE )
+#endif /* #if SIZEOF_DOUBLE != SIZEOF_DOUBLE_LONG */
+					"|" M_STRINGIFY( SIZEOF_DOUBLE_LONG ) ")* bytes of data as a `real` from this stream"
+			},
+			{ "read_character",  runtime_->create_method( &HStream::read_fwd,  "Stream.read_character",  &HStream::read_character ),  "( *count* ) read *count==(1|2|4)* bytes of data as a `character` from this stream" },
 			{ "write_blob",      runtime_->create_method( &HStream::write_fwd, "Stream.write_blob",      HHuginn::TYPE::BLOB,      &HStream::write_blob ),      "( *blobVal*, *count* ) - write *count* number of bytes from given *blobVal* info this stream" },
-			{ "write_string",    runtime_->create_method( &HStream::write_fwd, "Stream.write_string",    HHuginn::TYPE::STRING,    &HStream::write_string ),    "( *strVal*, *count* ) - write *count* number of bytes from given *strVal* info this stream" },
-			{ "write_integer",   runtime_->create_method( &HStream::write_fwd, "Stream.write_integer",   HHuginn::TYPE::INTEGER,   &HStream::write_integer ) ,  "( *intVal*, *count=1|2|4|8* ) - write *count* number of bytes from given *intVal* info this stream" },
-			{ "write_real",      runtime_->create_method( &HStream::write_fwd, "Stream.write_real",      HHuginn::TYPE::REAL,      &HStream::write_real ),      "( *realVal*, *count=4|8|16* ) - write *count* number of bytes from given *realVal* info this stream" },
-			{ "write_character", runtime_->create_method( &HStream::write_fwd, "Stream.write_character", HHuginn::TYPE::CHARACTER, &HStream::write_character ), "( *charVal*, *count=1|2|4* ) - write *count* number of bytes from given *charVal* info this stream" },
+			{ "write_string",    runtime_->create_method( &HStream::write_fwd, "Stream.write_string",    HHuginn::TYPE::STRING,    &HStream::write_string ),    "( *strVal*, *count* ) - write *count* number of code points from given *strVal* info this stream" },
+			{ "write_integer",   runtime_->create_method( &HStream::write_fwd, "Stream.write_integer",   HHuginn::TYPE::INTEGER,   &HStream::write_integer ) ,  "( *intVal*, *count* ) - write *count==(1|2|4|8)* number of bytes from given *intVal* info this stream" },
+			{ "write_real",      runtime_->create_method( &HStream::write_fwd, "Stream.write_real",      HHuginn::TYPE::REAL,      &HStream::write_real ),
+				"( *realVal*, *count* ) - write *count==(" M_STRINGIFY( SIZEOF_FLOAT )
+#if SIZEOF_DOUBLE != SIZEOF_DOUBLE_LONG
+					"|" M_STRINGIFY( SIZEOF_DOUBLE )
+#endif /* #if SIZEOF_DOUBLE != SIZEOF_DOUBLE_LONG */
+					"|" M_STRINGIFY( SIZEOF_DOUBLE_LONG ) ")* number of bytes from given *realVal* info this stream" },
+			{ "write_character", runtime_->create_method( &HStream::write_fwd, "Stream.write_character", HHuginn::TYPE::CHARACTER, &HStream::write_character ), "( *charVal*, *count* ) - write *count==(1|2|4)* number of bytes from given *charVal* info this stream" },
 			{ "seek",            runtime_->create_method( &HStream::seek ),                                                           "( *offset*, *anchor* ) - move reading/writing position to the *offset* counted from an *anchor*" },
 			{ "read_line",       runtime_->create_method( &HStream::read_line ),                                                      "read single line of text from this stream" },
 			{ "write_line",      runtime_->create_method( &HStream::write_line ),                                                     "( *strVal* ) - write entriety of given *strVal* info this stream" }
@@ -276,11 +288,13 @@ HHuginn::value_t HStream::read_real( HThread* thread_, HHuginn::HInteger::value_
 			nRead = static_cast<int>( _stream->read( &f, count ) );
 			val = f;
 		} break;
+#if SIZEOF_DOUBLE != SIZEOF_DOUBLE_LONG
 		case ( sizeof ( double ) ): {
 			double d( 0 );
 			nRead = static_cast<int>( _stream->read( &d, count ) );
 			val = d;
 		} break;
+#endif /* #if SIZEOF_DOUBLE != SIZEOF_DOUBLE_LONG */
 		case ( sizeof ( HHuginn::HReal::value_type ) ): {
 			nRead = static_cast<int>( _stream->read( &val, count ) );
 		} break;
@@ -326,10 +340,12 @@ HHuginn::value_t HStream::read_character( HThread* thread_, HHuginn::HInteger::v
 			);
 		}
 	}
+	code_point_t cp( val );
+	unicode::rank( cp );
 	if ( nRead != count ) {
 		thread_->raise( exception_class(), "Not enough data in the stream.", position_ );
 	}
-	return ( thread_->object_factory().create_character( code_point_t( val ) ) );
+	return ( thread_->object_factory().create_character( code_point_t( cp ) ) );
 	M_EPILOG
 }
 
@@ -412,10 +428,12 @@ void HStream::write_real( HThread* thread_, HHuginn::value_t const& value_, HHug
 			float f( static_cast<float>( val ) );
 			nWrite = static_cast<int>( _stream->write( &f, count ) );
 		} break;
+#if SIZEOF_DOUBLE != SIZEOF_DOUBLE_LONG
 		case ( sizeof ( double ) ): {
 			double d( static_cast<double>( val ) );
 			nWrite = static_cast<int>( _stream->write( &d, count ) );
 		} break;
+#endif /* #if SIZEOF_DOUBLE != SIZEOF_DOUBLE_LONG */
 		case ( sizeof ( HHuginn::HReal::value_type ) ): {
 			nWrite = static_cast<int>( _stream->write( &val, count ) );
 		} break;
