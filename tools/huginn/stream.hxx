@@ -36,6 +36,7 @@ private:
 	HHuginn::value_t read_blob( HThread*, HHuginn::HInteger::value_type, int );
 	HHuginn::value_t read_string( HThread*, HHuginn::HInteger::value_type, int );
 	HHuginn::value_t read_integer( HThread*, HHuginn::HInteger::value_type, int );
+	HHuginn::value_t read_integer_unsigned( HThread*, HHuginn::HInteger::value_type, int );
 	HHuginn::value_t read_real( HThread*, HHuginn::HInteger::value_type, int );
 	HHuginn::value_t read_character( HThread*, HHuginn::HInteger::value_type, int );
 	HHuginn::value_t read_line_impl( HThread*, int );
@@ -43,6 +44,7 @@ private:
 	void write_blob( HThread*, HHuginn::value_t const&, HHuginn::HInteger::value_type, int );
 	void write_string( HThread*, HHuginn::value_t const&, HHuginn::HInteger::value_type, int );
 	void write_integer( HThread*, HHuginn::value_t const&, HHuginn::HInteger::value_type, int );
+	void write_integer_unsigned( HThread*, HHuginn::value_t const&, HHuginn::HInteger::value_type, int );
 	void write_real( HThread*, HHuginn::value_t const&, HHuginn::HInteger::value_type, int );
 	void write_character( HThread*, HHuginn::value_t const&, HHuginn::HInteger::value_type, int );
 	void write_line_impl( HThread*, yaal::hcore::HString const&, int );

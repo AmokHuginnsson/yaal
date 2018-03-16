@@ -63,6 +63,7 @@ public:
 			{ "read_blob",       runtime_->create_method( &HStream::read_fwd,  "Stream.read_blob",       &HStream::read_blob ),       "( *count* ) read *count* bytes of data from this stream" },
 			{ "read_string",     runtime_->create_method( &HStream::read_fwd,  "Stream.read_string",     &HStream::read_string ),     "( *count* ) read *count* bytes of UTF-8 encoded characters as a `string` from this stream" },
 			{ "read_integer",    runtime_->create_method( &HStream::read_fwd,  "Stream.read_integer",    &HStream::read_integer ),    "( *count* ) read *count==(1|2|4|8)* bytes of data as an `integer` from this stream" },
+			{ "read_integer_unsigned", runtime_->create_method( &HStream::read_fwd,  "Stream.read_integer_unsigned",    &HStream::read_integer_unsigned ), "( *count* ) read *count==(1|2|4|8)* bytes of data as an `integer` from this stream's unsigned raw storage" },
 			{ "read_real",       runtime_->create_method( &HStream::read_fwd,  "Stream.read_real",       &HStream::read_real ),
 				"( *count* ) read *count==(" M_STRINGIFY( SIZEOF_FLOAT )
 #if SIZEOF_DOUBLE != SIZEOF_DOUBLE_LONG
@@ -74,6 +75,7 @@ public:
 			{ "write_blob",      runtime_->create_method( &HStream::write_fwd, "Stream.write_blob",      HHuginn::TYPE::BLOB,      &HStream::write_blob ),      "( *blobVal*, *count* ) - write *count* number of bytes from given *blobVal* info this stream" },
 			{ "write_string",    runtime_->create_method( &HStream::write_fwd, "Stream.write_string",    HHuginn::TYPE::STRING,    &HStream::write_string ),    "( *strVal*, *count* ) - write *count* number of code points from given *strVal* info this stream" },
 			{ "write_integer",   runtime_->create_method( &HStream::write_fwd, "Stream.write_integer",   HHuginn::TYPE::INTEGER,   &HStream::write_integer ) ,  "( *intVal*, *count* ) - write *count==(1|2|4|8)* number of bytes from given *intVal* info this stream" },
+			{ "write_integer_unsigned",   runtime_->create_method( &HStream::write_fwd, "Stream.write_integer_unsigned",   HHuginn::TYPE::INTEGER,   &HStream::write_integer_unsigned ) ,  "( *intVal*, *count* ) - write *count==(1|2|4|8)* number of bytes from given *intVal* info this stream's unsigned raw storage" },
 			{ "write_real",      runtime_->create_method( &HStream::write_fwd, "Stream.write_real",      HHuginn::TYPE::REAL,      &HStream::write_real ),
 				"( *realVal*, *count* ) - write *count==(" M_STRINGIFY( SIZEOF_FLOAT )
 #if SIZEOF_DOUBLE != SIZEOF_DOUBLE_LONG
@@ -203,7 +205,7 @@ HHuginn::value_t HStream::seek( huginn::HThread* thread_, HHuginn::value_t* obje
 	} catch ( HException const& e ) {
 		raise( e, thread_, position_ );
 	}
-	return ( thread_->runtime().none_value() );
+	return ( *object_ );
 	M_EPILOG
 }
 
@@ -258,6 +260,45 @@ HHuginn::value_t HStream::read_integer( HThread* thread_, HHuginn::HInteger::val
 			yaal::i32_t i32( 0 );
 			nRead = static_cast<int>( _stream->read( &i32, count ) );
 			val = i32;
+		} break;
+		case ( sizeof ( HHuginn::HInteger::value_type ) ): {
+			nRead = static_cast<int>( _stream->read( &val, count ) );
+		} break;
+		default: {
+			throw HHuginn::HHuginnRuntimeException(
+				"Invalid read size.",
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+	}
+	if ( nRead != count ) {
+		thread_->raise( exception_class(), "Not enough data in the stream.", position_ );
+	}
+	return ( thread_->object_factory().create_integer( val ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HStream::read_integer_unsigned( HThread* thread_, HHuginn::HInteger::value_type count_, int position_ ) {
+	M_PROLOG
+	HHuginn::HInteger::value_type val( 0 );
+	int count( safe_int::cast<int>( count_ ) );
+	int nRead( 0 );
+	switch ( count ) {
+		case ( sizeof ( yaal::u8_t ) ): {
+			yaal::u8_t u8( 0 );
+			nRead = static_cast<int>( _stream->read( &u8, count ) );
+			val = static_cast<HHuginn::HInteger::value_type>( u8 );
+		} break;
+		case ( sizeof ( yaal::u16_t ) ): {
+			yaal::u16_t u16( 0 );
+			nRead = static_cast<int>( _stream->read( &u16, count ) );
+			val = static_cast<HHuginn::HInteger::value_type>( u16 );
+		} break;
+		case ( sizeof ( yaal::u32_t ) ): {
+			yaal::u32_t u32( 0 );
+			nRead = static_cast<int>( _stream->read( &u32, count ) );
+			val = static_cast<HHuginn::HInteger::value_type>( u32 );
 		} break;
 		case ( sizeof ( HHuginn::HInteger::value_type ) ): {
 			nRead = static_cast<int>( _stream->read( &val, count ) );
@@ -399,6 +440,49 @@ void HStream::write_integer( HThread* thread_, HHuginn::value_t const& value_, H
 		case ( sizeof ( yaal::i32_t ) ): {
 			yaal::i32_t i32( static_cast<yaal::i32_t>( val ) );
 			nWrite = static_cast<int>( _stream->write( &i32, count ) );
+		} break;
+		case ( sizeof ( HHuginn::HInteger::value_type ) ): {
+			nWrite = static_cast<int>( _stream->write( &val, count ) );
+		} break;
+		default: {
+			throw HHuginn::HHuginnRuntimeException(
+				"Invalid write size.",
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+	}
+	if ( nWrite != count ) {
+		thread_->raise( exception_class(), "Write failed.", position_ );
+	}
+	return;
+	M_EPILOG
+}
+
+void HStream::write_integer_unsigned( HThread* thread_, HHuginn::value_t const& value_, HHuginn::HInteger::value_type count_, int position_ ) {
+	M_PROLOG
+	int long count( safe_int::cast<int long>( count_ ) );
+	HHuginn::HInteger::value_type val( static_cast<HHuginn::HInteger const*>( value_.raw() )->value() );
+	if ( ( val < 0 ) && ( count != static_cast<int>( sizeof ( HHuginn::HInteger::value_type ) ) ) ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"Missuse of _unsigned_ integer writer.",
+			thread_->current_frame()->file_id(),
+			position_
+		);
+	}
+	int nWrite( 0 );
+	switch ( count ) {
+		case ( sizeof ( yaal::u8_t ) ): {
+			yaal::u8_t u8( static_cast<yaal::u8_t>( val ) );
+			nWrite = static_cast<int>( _stream->write( &u8, count ) );
+		} break;
+		case ( sizeof ( yaal::u16_t ) ): {
+			yaal::u16_t u16( static_cast<yaal::u16_t>( val ) );
+			nWrite = static_cast<int>( _stream->write( &u16, count ) );
+		} break;
+		case ( sizeof ( yaal::u32_t ) ): {
+			yaal::u32_t u32( static_cast<yaal::u32_t>( val ) );
+			nWrite = static_cast<int>( _stream->write( &u32, count ) );
 		} break;
 		case ( sizeof ( HHuginn::HInteger::value_type ) ): {
 			nWrite = static_cast<int>( _stream->write( &val, count ) );
