@@ -1,7 +1,5 @@
 /* Read yaal/LICENSE.md file for copyright and licensing information. */
 
-#include <cstring>
-
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
@@ -11,6 +9,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "helper.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
+#include "semanticbuffer.hxx"
 #include "hcore/safe_int.hxx"
 #include "hcore/unicode.hxx"
 
@@ -82,41 +81,6 @@ struct HNumber::ElementaryFunctions {
 		} while ( false );
 		post_io( thread_, toRead, nRead, exClass_, IO::READ, position_ );
 		return ( v );
-		M_EPILOG
-	}
-	static void serialize( huginn::HThread* thread_, HStreamInterface::ptr_t& stream_, HNumber const& number_, HHuginn::HClass const* exClass_, int position_ ) {
-		M_PROLOG
-		do {
-			int long toWrite( static_cast<int>( sizeof ( number_._precision ) ) );
-			int long nWritten( stream_->write( &number_._precision, toWrite ) );
-			if ( ! post_io( thread_, toWrite, nWritten, exClass_, IO::WRITE, position_ ) ) {
-				break;
-			}
-
-			toWrite = static_cast<int>( sizeof ( number_._leafCount ) );
-			nWritten = stream_->write( &number_._leafCount, toWrite );
-			if ( ! post_io( thread_, toWrite, nWritten, exClass_, IO::WRITE, position_ ) ) {
-				break;
-			}
-
-			toWrite = static_cast<int>( sizeof ( number_._integralPartSize ) );
-			nWritten = stream_->write( &number_._integralPartSize, toWrite );
-			if ( ! post_io( thread_, toWrite, nWritten, exClass_, IO::WRITE, position_ ) ) {
-				break;
-			}
-
-			i8_t i8( number_._negative ? 1 : 0 );
-			toWrite = static_cast<int>( sizeof ( i8 ) );
-			nWritten = stream_->write( &i8, toWrite );
-			if ( ! post_io( thread_, toWrite, nWritten, exClass_, IO::WRITE, position_ ) ) {
-				break;
-			}
-
-			toWrite = number_._leafCount * static_cast<int>( sizeof ( HNumber::integer_t ) );
-			nWritten = stream_->write( number_._canonical.raw(), toWrite );
-			post_io( thread_, toWrite, nWritten, exClass_, IO::WRITE, position_ );
-		} while ( false );
-		return;
 		M_EPILOG
 	}
 };
@@ -695,6 +659,7 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 	}
 	HHuginn::TYPE t( static_cast<HHuginn::TYPE>( tRaw ) );
 	switch ( t ) {
+		case ( HHuginn::TYPE::NONE ): break;
 		case ( HHuginn::TYPE::BOOLEAN ): {
 			i8_t i8( 0 );
 			toRead = 1;
@@ -723,6 +688,133 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 		case ( HHuginn::TYPE::NUMBER ): {
 			v = HNumber::ElementaryFunctions::deserialize( thread_, _stream, exception_class(), position_ );
 		} break;
+		case ( HHuginn::TYPE::TUPLE ): {
+			int long len( 0 );
+			toRead = static_cast<int>( sizeof ( len ) );
+			nRead = _stream->read( &len, toRead );
+			if ( nRead != toRead ) {
+				break;
+			}
+			HHuginn::HTuple::values_t data;
+			data.reserve( len );
+			for ( int long i( 0 ); i < len; ++ i ) {
+				data.push_back( deserialize_impl( thread_, position_ ) );
+			}
+			v = thread_->object_factory().create_tuple( yaal::move( data ) );
+		} break;
+		case ( HHuginn::TYPE::LIST ): {
+			int long len( 0 );
+			toRead = static_cast<int>( sizeof ( len ) );
+			nRead = _stream->read( &len, toRead );
+			if ( nRead != toRead ) {
+				break;
+			}
+			HHuginn::HList::values_t data;
+			data.reserve( len );
+			for ( int long i( 0 ); i < len; ++ i ) {
+				data.push_back( deserialize_impl( thread_, position_ ) );
+			}
+			v = thread_->object_factory().create_list( yaal::move( data ) );
+		} break;
+		case ( HHuginn::TYPE::DEQUE ): {
+			int long len( 0 );
+			toRead = static_cast<int>( sizeof ( len ) );
+			nRead = _stream->read( &len, toRead );
+			if ( nRead != toRead ) {
+				break;
+			}
+			HHuginn::HDeque::values_t data;
+			for ( int long i( 0 ); i < len; ++ i ) {
+				data.push_back( deserialize_impl( thread_, position_ ) );
+			}
+			v = thread_->object_factory().create_deque( yaal::move( data ) );
+		} break;
+		case ( HHuginn::TYPE::DICT ): {
+			int long len( 0 );
+			toRead = static_cast<int>( sizeof ( len ) );
+			nRead = _stream->read( &len, toRead );
+			if ( nRead != toRead ) {
+				break;
+			}
+			v = thread_->object_factory().create_dict();
+			HHuginn::HDict& val( *static_cast<HHuginn::HDict*>( v.raw() ) );
+			HHuginn::HDict::values_t& data( val.value() );
+			val.anchor( thread_, position_ );
+			for ( int long i( 0 ); i < len; ++ i ) {
+				HHuginn::value_t key( deserialize_impl( thread_, position_ ) );
+				HHuginn::value_t value( deserialize_impl( thread_, position_ ) );
+				data.insert( make_pair( key, value ) );
+			}
+			val.detach();
+		} break;
+		case ( HHuginn::TYPE::LOOKUP ): {
+			int long len( 0 );
+			toRead = static_cast<int>( sizeof ( len ) );
+			nRead = _stream->read( &len, toRead );
+			if ( nRead != toRead ) {
+				break;
+			}
+			v = thread_->object_factory().create_lookup();
+			HHuginn::HLookup& val( *static_cast<HHuginn::HLookup*>( v.raw() ) );
+			HHuginn::HLookup::values_t& data( val.value() );
+			val.anchor( thread_, position_ );
+			for ( int long i( 0 ); i < len; ++ i ) {
+				HHuginn::value_t key( deserialize_impl( thread_, position_ ) );
+				HHuginn::value_t value( deserialize_impl( thread_, position_ ) );
+				data.insert( make_pair( key, value ) );
+			}
+			val.detach();
+		} break;
+		case ( HHuginn::TYPE::ORDER ): {
+			int long len( 0 );
+			toRead = static_cast<int>( sizeof ( len ) );
+			nRead = _stream->read( &len, toRead );
+			if ( nRead != toRead ) {
+				break;
+			}
+			v = thread_->object_factory().create_order();
+			HHuginn::HOrder& val( *static_cast<HHuginn::HOrder*>( v.raw() ) );
+			HHuginn::HOrder::values_t& data( val.value() );
+			val.anchor( thread_, position_ );
+			for ( int long i( 0 ); i < len; ++ i ) {
+				data.insert( deserialize_impl( thread_, position_ ) );
+			}
+			val.detach();
+		} break;
+		case ( HHuginn::TYPE::SET ): {
+			int long len( 0 );
+			toRead = static_cast<int>( sizeof ( len ) );
+			nRead = _stream->read( &len, toRead );
+			if ( nRead != toRead ) {
+				break;
+			}
+			v = thread_->object_factory().create_set();
+			HHuginn::HSet& val( *static_cast<HHuginn::HSet*>( v.raw() ) );
+			HHuginn::HSet::values_t& data( val.value() );
+			val.anchor( thread_, position_ );
+			for ( int long i( 0 ); i < len; ++ i ) {
+				data.insert( deserialize_impl( thread_, position_ ) );
+			}
+			val.detach();
+		} break;
+		case ( HHuginn::TYPE::FUNCTION_REFERENCE ): {
+			int_native_t len( 0 );
+			toRead = static_cast<int>( sizeof ( len ) );
+			nRead = _stream->read( &len, toRead );
+			if ( nRead != toRead ) {
+				break;
+			}
+			_buffer.realloc( len );
+			_stream->read( _buffer.raw(), len );
+			HString n( _buffer.get<char>(), len );
+			HHuginn::identifier_id_t id( thread_->runtime().identifier_id( n ) );
+			HHuginn::value_t* f( thread_->runtime().get_function( id ) );
+			if ( f ) {
+				v = *f;
+			} else {
+				thread_->raise( exception_class(), "Function `"_ys.append( n ).append( "' is not defined." ), position_ );
+			}
+		} break;
 		default: {
 			thread_->raise( exception_class(), "Unknown value type: "_ys.append( static_cast<int>( t ) ), position_ );
 		}
@@ -746,73 +838,13 @@ void HStream::write_line_impl( HThread* thread_, HString const& val_, int positi
 	M_EPILOG
 }
 
-template<typename T>
-bool serialize( HThread* thread_, HStreamInterface::ptr_t& stream_, T val_, HHuginn::HClass const* exClass_, int position_ ) {
-	M_PROLOG
-	int long toWrite( static_cast<int>( sizeof ( val_ ) ) );
-	int long nWritten( stream_->write( &val_, toWrite ) );
-	post_io( thread_, toWrite, nWritten, exClass_, IO::WRITE, position_ );
-	return ( nWritten == toWrite );
-	M_EPILOG
-}
-
 void HStream::serialize_impl( HThread* thread_, HHuginn::value_t const& val_, int position_ ) {
 	M_PROLOG
 	try {
-		yaal::u8_t t( static_cast<u8_t>( val_->type_id().get() ) );
-		switch ( static_cast<HHuginn::TYPE>( t ) ) {
-			case ( HHuginn::TYPE::BOOLEAN ): {
-				if ( ! huginn::serialize( thread_, _stream, t, exception_class(), position_ ) ) {
-					break;
-				}
-				i8_t i8( static_cast<HHuginn::HBoolean const*>( val_.raw() )->value() ? 1 : 0 );
-				huginn::serialize( thread_, _stream, i8, exception_class(), position_ );
-			} break;
-			case ( HHuginn::TYPE::INTEGER ): {
-				if ( ! huginn::serialize( thread_, _stream, t, exception_class(), position_ ) ) {
-					break;
-				}
-				write_integer( thread_, val_, static_cast<int>( sizeof ( HHuginn::HInteger::value_type ) ), position_ );
-			} break;
-			case ( HHuginn::TYPE::REAL ): {
-				if ( ! huginn::serialize( thread_, _stream, t, exception_class(), position_ ) ) {
-					break;
-				}
-				write_real( thread_, val_, static_cast<int>( sizeof ( HHuginn::HReal::value_type ) ), position_ );
-			} break;
-			case ( HHuginn::TYPE::CHARACTER ): {
-				if ( ! huginn::serialize( thread_, _stream, t, exception_class(), position_ ) ) {
-					break;
-				}
-				write_character( thread_, val_, static_cast<int>( sizeof ( HHuginn::HCharacter::value_type::value_type ) ), position_ );
-			} break;
-			case ( HHuginn::TYPE::STRING ): {
-				if ( ! huginn::serialize( thread_, _stream, t, exception_class(), position_ ) ) {
-					break;
-				}
-				_converter.assign( static_cast<HHuginn::HString const*>( val_.raw() )->value() );
-				int_native_t len( _converter.byte_count() );
-				if ( ! huginn::serialize( thread_, _stream, len, exception_class(), position_ ) ) {
-					break;
-				}
-				post_io( thread_, len, _stream->write( _converter.c_str(), len ), exception_class(), IO::WRITE, position_ );
-			} break;
-			case ( HHuginn::TYPE::NUMBER ): {
-				if ( ! huginn::serialize( thread_, _stream, t, exception_class(), position_ ) ) {
-					break;
-				}
-				HNumber::ElementaryFunctions::serialize( thread_, _stream, static_cast<HHuginn::HNumber const*>( val_.raw() )->value(), exception_class(), position_ );
-			} break;
-			default: {
-				throw HHuginn::HHuginnRuntimeException(
-					"`"_ys
-						.append( val_->get_class()->name() )
-						.append( "` is not a serializable type." ),
-					thread_->current_frame()->file_id(),
-					position_
-				);
-			}
-		}
+		HSemanticBuffer sb( _buffer, _converter, thread_, position_ );
+		sb.serialize( val_ );
+		int long nWritten( _stream->write( sb.data(), sb.size() ) );
+		post_io( thread_, sb.size(), nWritten, exception_class(), IO::WRITE, position_ );
 	} catch ( HException const& e ) {
 		raise( e, thread_, position_ );
 	}
