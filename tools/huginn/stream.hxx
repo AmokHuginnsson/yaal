@@ -27,8 +27,10 @@ public:
 	HStream( HHuginn::HClass const*, yaal::hcore::HStreamInterface::ptr_t );
 	static HHuginn::value_t read_fwd( char const*, reader_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t read_line( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+	static HHuginn::value_t deserialize( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t write_fwd( char const*, HHuginn::TYPE, writer_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t write_line( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+	static HHuginn::value_t serialize( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t seek( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	bool is_valid( void ) const;
 	static HHuginn::class_t get_class( HRuntime* );
@@ -40,6 +42,7 @@ private:
 	HHuginn::value_t read_real( HThread*, HHuginn::HInteger::value_type, int );
 	HHuginn::value_t read_character( HThread*, HHuginn::HInteger::value_type, int );
 	HHuginn::value_t read_line_impl( HThread*, int );
+	HHuginn::value_t deserialize_impl( HThread*, int );
 	yaal::hcore::HString const& read_line_raw( HThread*, int );
 	void write_blob( HThread*, HHuginn::value_t const&, HHuginn::HInteger::value_type, int );
 	void write_string( HThread*, HHuginn::value_t const&, HHuginn::HInteger::value_type, int );
@@ -48,6 +51,7 @@ private:
 	void write_real( HThread*, HHuginn::value_t const&, HHuginn::HInteger::value_type, int );
 	void write_character( HThread*, HHuginn::value_t const&, HHuginn::HInteger::value_type, int );
 	void write_line_impl( HThread*, yaal::hcore::HString const&, int );
+	void serialize_impl( HThread*, HHuginn::value_t const&, int );
 	void seek_impl( int long, yaal::hcore::HStreamInterface::SEEK );
 	virtual HIterator do_iterator( HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override __attribute__((noreturn));
