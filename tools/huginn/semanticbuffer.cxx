@@ -44,13 +44,11 @@ HSemanticBuffer::HSemanticBuffer( yaal::hcore::HChunk& buffer_, yaal::hcore::HUT
 
 void HSemanticBuffer::serialize( HHuginn::value_t const& val_ ) {
 	M_PROLOG
-	if ( ! _cycleTracker.insert( val_.raw() ).second ) {
-			throw HHuginn::HHuginnRuntimeException(
-				"Cycle detected.",
-				_context._thread->current_frame()->file_id(),
-				_context._position
-			);
-	}
+	_cycleTracker.check(
+		val_,
+		_context._thread->current_frame()->file_id(),
+		_context._position
+	);
 	yaal::u8_t t( static_cast<u8_t>( val_->type_id().get() ) );
 	write( t );
 	switch ( static_cast<HHuginn::TYPE>( t ) ) {
@@ -138,6 +136,7 @@ void HSemanticBuffer::serialize( HHuginn::value_t const& val_ ) {
 			);
 		}
 	}
+	_cycleTracker.done( val_ );
 	return;
 	M_EPILOG
 }

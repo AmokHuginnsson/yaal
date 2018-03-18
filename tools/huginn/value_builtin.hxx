@@ -7,6 +7,7 @@
 
 #include "tools/hhuginn.hxx"
 #include "tools/huginn/frame.hxx"
+#include "tools/huginn/helper.hxx"
 
 namespace yaal {
 
@@ -41,7 +42,7 @@ HHuginn::value_t real( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t boolean( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t character( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t number( HThread*, HHuginn::value_t const&, int );
-yaal::hcore::HString string_representation( HThread*, HHuginn::value_t const&, int );
+yaal::hcore::HString string_representation( HThread*, HHuginn::value_t const&, HCycleTracker&, int );
 
 }
 

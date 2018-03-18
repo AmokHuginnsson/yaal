@@ -8,6 +8,7 @@
 #include <cstring>
 
 #include "tools/hhuginn.hxx"
+#include "tools/huginn/helper.hxx"
 
 namespace yaal {
 
@@ -16,13 +17,11 @@ namespace tools {
 namespace huginn {
 
 class HSemanticBuffer {
-public:
-	typedef yaal::hcore::HSet<HHuginn::HValue const*> cycle_tracker_t;
 private:
 	yaal::hcore::HChunk& _buffer;
 	yaal::hcore::HUTF8String& _converter;
 	int long _size;
-	cycle_tracker_t _cycleTracker;
+	HCycleTracker _cycleTracker;
 	struct OContext {
 		huginn::HThread* _thread;
 		int _position;

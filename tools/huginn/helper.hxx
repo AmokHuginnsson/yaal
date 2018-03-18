@@ -38,6 +38,17 @@ enum class BASE {
 };
 
 class HThread;
+class HCycleTracker {
+public:
+	typedef yaal::hcore::HSet<HHuginn::HValue const*> value_noter_t;
+private:
+	value_noter_t _valueNoter;
+public:
+	HCycleTracker( void );
+	bool track( HHuginn::value_t const& );
+	void check( HHuginn::value_t const&, int, int );
+	void done( HHuginn::value_t const& );
+};
 
 typedef yaal::hcore::HArray<HHuginn::TYPE> types_t;
 typedef yaal::hcore::HArray<HHuginn::HClass const*> classes_t;

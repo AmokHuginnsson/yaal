@@ -795,13 +795,28 @@ HHuginn::value_t fallback_conversion( HHuginn::type_id_t type_, HThread* thread_
 }
 
 HHuginn::value_t fallback_string_conversion( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
-	return ( thread_->runtime().object_factory()->create_string( string_representation( thread_, v_, position_ ) ) );
+	HCycleTracker cycleTracker;
+	return ( thread_->runtime().object_factory()->create_string( string_representation( thread_, v_, cycleTracker, position_ ) ) );
+}
+
+char const* type_to_cycle_str( HHuginn::TYPE type_ ) {
+	char const* sym( "/*cycle*/" );
+	switch ( type_ ) {
+		case ( HHuginn::TYPE::TUPLE ): { sym = "/*(cycle)*/"; } break;
+		case ( HHuginn::TYPE::LIST ):  { sym = "/*[cycle]*/"; } break;
+		case ( HHuginn::TYPE::DICT ):  { sym = "/*{cycle}*/"; } break;
+		default:;
+	}
+	return ( sym );
 }
 
 }
 
-yaal::hcore::HString string_representation( HThread* thread_, HHuginn::value_t const& value_, int position_ ) {
+yaal::hcore::HString string_representation( HThread* thread_, HHuginn::value_t const& value_, HCycleTracker& cycleTracker_, int position_ ) {
 	yaal::hcore::HString str;
+	if ( ! cycleTracker_.track( value_ ) ) {
+		return ( "none"_ys.append( type_to_cycle_str( static_cast<HHuginn::TYPE>( value_->type_id().get() ) ) ) );
+	}
 	switch ( static_cast<HHuginn::TYPE>( value_->type_id().get() ) ) {
 		case ( HHuginn::TYPE::STRING ): {
 			str.assign( '"' ).append( static_cast<HHuginn::HString const*>( value_.raw() )->value() ).append( '"' );
@@ -846,7 +861,7 @@ yaal::hcore::HString string_representation( HThread* thread_, HHuginn::value_t c
 					str.append( ", " );
 				}
 				next = true;
-				str.append( string_representation( thread_, v, position_ ) );
+				str.append( string_representation( thread_, v, cycleTracker_, position_ ) );
 			}
 			if ( t->value().get_size() == 1 ) {
 				str.append( "," );
@@ -862,7 +877,7 @@ yaal::hcore::HString string_representation( HThread* thread_, HHuginn::value_t c
 					str.append( ", " );
 				}
 				next = true;
-				str.append( string_representation( thread_, v, position_ ) );
+				str.append( string_representation( thread_, v, cycleTracker_, position_ ) );
 			}
 			str.append( "]" );
 		} break;
@@ -875,7 +890,7 @@ yaal::hcore::HString string_representation( HThread* thread_, HHuginn::value_t c
 					str.append( ", " );
 				}
 				next = true;
-				str.append( string_representation( thread_, v, position_ ) );
+				str.append( string_representation( thread_, v, cycleTracker_, position_ ) );
 			}
 			str.append( ")" );
 		} break;
@@ -892,7 +907,7 @@ yaal::hcore::HString string_representation( HThread* thread_, HHuginn::value_t c
 					str.append( ", " );
 				}
 				next = true;
-				str.append( string_representation( thread_, v.first, position_ ) ).append( ": " ).append( string_representation( thread_, v.second, position_ ) );
+				str.append( string_representation( thread_, v.first, cycleTracker_, position_ ) ).append( ": " ).append( string_representation( thread_, v.second, cycleTracker_, position_ ) );
 			}
 			str.append( "]" );
 		} break;
@@ -905,7 +920,7 @@ yaal::hcore::HString string_representation( HThread* thread_, HHuginn::value_t c
 					str.append( ", " );
 				}
 				next = true;
-				str.append( string_representation( thread_, v.first, position_ ) ).append( ": " ).append( string_representation( thread_, v.second, position_ ) );
+				str.append( string_representation( thread_, v.first, cycleTracker_, position_ ) ).append( ": " ).append( string_representation( thread_, v.second, cycleTracker_, position_ ) );
 			}
 			str.append( "}" );
 		} break;
@@ -922,7 +937,7 @@ yaal::hcore::HString string_representation( HThread* thread_, HHuginn::value_t c
 					str.append( ", " );
 				}
 				next = true;
-				str.append( string_representation( thread_, v, position_ ) );
+				str.append( string_representation( thread_, v, cycleTracker_, position_ ) );
 			}
 			str.append( "}" );
 		} break;
@@ -935,7 +950,7 @@ yaal::hcore::HString string_representation( HThread* thread_, HHuginn::value_t c
 					str.append( ", " );
 				}
 				next = true;
-				str.append( string_representation( thread_, v, position_ ) );
+				str.append( string_representation( thread_, v, cycleTracker_, position_ ) );
 			}
 			str.append( ")" );
 		} break;
@@ -948,6 +963,7 @@ yaal::hcore::HString string_representation( HThread* thread_, HHuginn::value_t c
 			}
 		}
 	}
+	cycleTracker_.done( value_ );
 	return ( str );
 }
 

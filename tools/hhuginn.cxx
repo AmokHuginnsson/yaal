@@ -953,7 +953,8 @@ yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn* huginn_
 	}
 	HString s;
 	try {
-		s = value_builtin::string_representation( threadHolder.raw(), value_, 0 );
+		HCycleTracker cycleTracker;
+		s = value_builtin::string_representation( threadHolder.raw(), value_, cycleTracker, 0 );
 	} catch ( HHuginn::HHuginnRuntimeException const& e ) {
 		s = e.message();
 	} catch ( HException const& e ) {
