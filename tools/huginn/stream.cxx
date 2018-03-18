@@ -714,6 +714,7 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 		return ( thread_->runtime().none_value() );
 	}
 	HHuginn::TYPE t( static_cast<HHuginn::TYPE>( tRaw ) );
+	HFrame* f( thread_->current_frame() );
 	switch ( t ) {
 		case ( HHuginn::TYPE::NONE ): break;
 		case ( HHuginn::TYPE::BOOLEAN ): {
@@ -753,7 +754,7 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 			}
 			HHuginn::HTuple::values_t data;
 			data.reserve( len );
-			for ( int long i( 0 ); i < len; ++ i ) {
+			for ( int long i( 0 ); f->can_continue() && ( i < len ); ++ i ) {
 				data.push_back( deserialize_impl( thread_, position_ ) );
 			}
 			v = thread_->object_factory().create_tuple( yaal::move( data ) );
@@ -764,7 +765,7 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 			}
 			HHuginn::HList::values_t data;
 			data.reserve( len );
-			for ( int long i( 0 ); i < len; ++ i ) {
+			for ( int long i( 0 ); f->can_continue() && ( i < len ); ++ i ) {
 				data.push_back( deserialize_impl( thread_, position_ ) );
 			}
 			v = thread_->object_factory().create_list( yaal::move( data ) );
@@ -774,7 +775,7 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 				break;
 			}
 			HHuginn::HDeque::values_t data;
-			for ( int long i( 0 ); i < len; ++ i ) {
+			for ( int long i( 0 ); f->can_continue() && ( i < len ); ++ i ) {
 				data.push_back( deserialize_impl( thread_, position_ ) );
 			}
 			v = thread_->object_factory().create_deque( yaal::move( data ) );
@@ -788,7 +789,7 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 			HHuginn::HDict::values_t& data( val.value() );
 			HHuginn::HClass const* keyType( &huginn::_noneClass_ );
 			val.anchor( thread_, position_ );
-			for ( int long i( 0 ); i < len; ++ i ) {
+			for ( int long i( 0 ); f->can_continue() && ( i < len ); ++ i ) {
 				HHuginn::value_t key( deserialize_impl( thread_, position_ ) );
 				if ( ! is_comparable( key->get_class() ) || ( ( i > 0 ) && ( key->get_class() != keyType ) ) ) {
 					raise( thread_, "Malformed Huginn data stream.", position_, exception_class() );
@@ -807,7 +808,7 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 			HHuginn::HLookup& val( *static_cast<HHuginn::HLookup*>( v.raw() ) );
 			HHuginn::HLookup::values_t& data( val.value() );
 			val.anchor( thread_, position_ );
-			for ( int long i( 0 ); i < len; ++ i ) {
+			for ( int long i( 0 ); f->can_continue() && ( i < len ); ++ i ) {
 				HHuginn::value_t key( deserialize_impl( thread_, position_ ) );
 				HHuginn::value_t value( deserialize_impl( thread_, position_ ) );
 				data.insert( make_pair( key, value ) );
@@ -823,7 +824,7 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 			HHuginn::HOrder::values_t& data( val.value() );
 			HHuginn::HClass const* keyType( &huginn::_noneClass_ );
 			val.anchor( thread_, position_ );
-			for ( int long i( 0 ); i < len; ++ i ) {
+			for ( int long i( 0 ); f->can_continue() && ( i < len ); ++ i ) {
 				HHuginn::value_t key( deserialize_impl( thread_, position_ ) );
 				if ( ! is_comparable( key->get_class() ) || ( ( i > 0 ) && ( key->get_class() != keyType ) ) ) {
 					raise( thread_, "Malformed Huginn data stream.", position_, exception_class() );
@@ -841,7 +842,7 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 			HHuginn::HSet& val( *static_cast<HHuginn::HSet*>( v.raw() ) );
 			HHuginn::HSet::values_t& data( val.value() );
 			val.anchor( thread_, position_ );
-			for ( int long i( 0 ); i < len; ++ i ) {
+			for ( int long i( 0 ); f->can_continue() && ( i < len ); ++ i ) {
 				data.insert( deserialize_impl( thread_, position_ ) );
 			}
 			val.detach();
@@ -855,9 +856,9 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 			try {
 				HString n( _buffer.get<char>(), len );
 				HHuginn::identifier_id_t id( thread_->runtime().identifier_id( n ) );
-				HHuginn::value_t* f( thread_->runtime().get_function( id ) );
-				if ( f ) {
-					v = *f;
+				HHuginn::value_t* fun( thread_->runtime().get_function( id ) );
+				if ( fun ) {
+					v = *fun;
 				} else {
 					raise( thread_, "Function `"_ys.append( n ).append( "' is not defined." ), position_, exception_class() );
 				}
