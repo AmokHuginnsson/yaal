@@ -543,7 +543,7 @@ int long hash( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	} else if ( typeId == HHuginn::TYPE::STRING ) {
 		rt = hcore::hash<hcore::HString>()( static_cast<HHuginn::HString const*>( v_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
-		rt = hcore::hash<double long>()( static_cast<HHuginn::HNumber const*>( v_.raw() )->value().to_floating_point() );
+		rt = hcore::hash<HNumber>()( static_cast<HHuginn::HNumber const*>( v_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
 		rt = hcore::hash<code_point_t>()( static_cast<HHuginn::HCharacter const*>( v_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::BOOLEAN ) {

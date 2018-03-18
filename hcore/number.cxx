@@ -12,6 +12,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "math.hxx"
 #include "hlist.hxx"
 #include "hthread.hxx"
+#include "hhashcontainer.hxx"
 #include "hsingleton.hxx"
 
 using namespace yaal::hcore;
@@ -472,7 +473,28 @@ struct HNumber::ElementaryFunctions {
 		return ( math::error_function( value_.to_floating_point() ) );
 		M_EPILOG
 	}
+	static int long hash( HNumber const& value_ ) {
+		int long h( 0 );
+		i32_t const* src( value_._canonical.get<i32_t>() );
+		for ( int i( 0 ); i < value_._leafCount; ++ i ) {
+#if SIZEOF_INT_LONG == 8
+			h = h ^ ( src[i] << ( ( i % 2 ) ? 32 : 0 ) );
+#else
+			h = h ^ src[i];
+#endif
+		}
+		h = h ^ value_._precision;
+		h = h ^ value_._leafCount;
+		h = h ^ value_._integralPartSize;
+		h += ( value_._negative ? 1 : 0 );
+		return ( h );
+	}
 };
+
+template<>
+int long hash<HNumber>::operator () ( HNumber const& number_ ) const {
+	return ( HNumber::ElementaryFunctions::hash( number_ ) );
+}
 
 namespace number {
 
