@@ -70,8 +70,11 @@ void* HChunk::realloc( int long size_, STRATEGY strategy_ ) {
 		int long newSize( 0 );
 		if ( strategy_ == STRATEGY::GEOMETRIC ) {
 			newSize = 1;
-			while ( newSize < size_ ) {
+			while ( ( newSize < size_ ) && newSize ) {
 				newSize <<= 1;
+			}
+			if ( ! newSize ) {
+				M_THROW( "requested allocation size is too big", size_ );
 			}
 		} else {
 			M_ASSERT( strategy_ == STRATEGY::EXACT );

@@ -18,6 +18,10 @@ class HStream : public HHuginn::HIterable {
 public:
 	typedef HHuginn::value_t ( HStream::*reader_t )( HThread*, HHuginn::HInteger::value_type, int );
 	typedef void ( HStream::*writer_t )( HThread*, HHuginn::value_t const&, HHuginn::HInteger::value_type, int );
+	enum class IO {
+		READ,
+		WRITE
+	};
 private:
 	yaal::hcore::HStreamInterface::ptr_t _stream;
 	yaal::hcore::HChunk _buffer;
@@ -34,6 +38,9 @@ public:
 	static HHuginn::value_t seek( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	bool is_valid( void ) const;
 	static HHuginn::class_t get_class( HRuntime* );
+	void raise( HThread*, yaal::hcore::HString const&, int, HHuginn::HClass const* = nullptr ) const;
+	bool post_io( huginn::HThread*, int long, int long, IO, int, HHuginn::HClass const* = nullptr ) const;
+	HHuginn::HClass const* exception_class( void ) const;
 private:
 	HHuginn::value_t read_blob( HThread*, HHuginn::HInteger::value_type, int );
 	HHuginn::value_t read_string( HThread*, HHuginn::HInteger::value_type, int );
@@ -56,7 +63,7 @@ private:
 	virtual HIterator do_iterator( HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override __attribute__((noreturn));
 	virtual HHuginn::value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override __attribute__((noreturn));
-	HHuginn::HClass const* exception_class( void ) const;
+	int long read_len( HThread*, int );
 private:
 	friend class HStreamClass;
 	friend class HStreamIterator;

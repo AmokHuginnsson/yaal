@@ -466,6 +466,97 @@ HHuginn::type_id_t verify_arg_collection_value_type(
 	return ( type );
 }
 
+bool is_numeric( HHuginn::HClass const* class_ ) {
+	HHuginn::type_id_t t( class_->type_id() );
+	return (
+		( t == HHuginn::TYPE::INTEGER )
+		|| ( t == HHuginn::TYPE::REAL )
+		|| ( t == HHuginn::TYPE::NUMBER )
+	);
+}
+
+bool is_collection( HHuginn::HClass const* class_ ) {
+	HHuginn::type_id_t t( class_->type_id() );
+	return (
+		( t == HHuginn::TYPE::TUPLE )
+		|| ( t == HHuginn::TYPE::LIST )
+		|| ( t == HHuginn::TYPE::DEQUE )
+		|| ( t == HHuginn::TYPE::DICT )
+		|| ( t == HHuginn::TYPE::LOOKUP )
+		|| ( t == HHuginn::TYPE::ORDER )
+		|| ( t == HHuginn::TYPE::SET )
+	);
+}
+
+bool is_comparable( HHuginn::HClass const* class_ ) {
+	HHuginn::type_id_t t( class_->type_id() );
+	return (
+		is_numeric( class_ )
+		|| ( t == HHuginn::TYPE::STRING )
+		|| ( t == HHuginn::TYPE::CHARACTER )
+		|| ( t == HHuginn::TYPE::FUNCTION_REFERENCE )
+		|| ( t == HHuginn::TYPE::TUPLE )
+		|| ( t == HHuginn::TYPE::LIST )
+		|| ( t == HHuginn::TYPE::DEQUE )
+	);
+}
+
+bool is_boolean_congruent( HHuginn::HClass const* class_ ) {
+	HHuginn::type_id_t t( class_->type_id() );
+	return (
+		( t == HHuginn::TYPE::BOOLEAN )
+		|| ( t == HHuginn::TYPE::UNKNOWN )
+		|| ( t == HHuginn::TYPE::REFERENCE )
+	);
+}
+
+bool is_unknown( HHuginn::HClass const* class_ ) {
+	HHuginn::type_id_t t( class_->type_id() );
+	return ( ( t == HHuginn::TYPE::NOT_BOOLEAN ) || ( t == HHuginn::TYPE::UNKNOWN ) || ( t == HHuginn::TYPE::REFERENCE ) );
+}
+
+bool is_numeric_congruent( HHuginn::HClass const* class_ ) {
+	return ( is_numeric( class_ ) || is_unknown( class_ ) );
+}
+
+bool is_comparable_congruent( HHuginn::HClass const* class_ ) {
+	return ( is_comparable( class_ ) || is_unknown( class_ ) );
+}
+
+bool is_reference_congruent( HHuginn::HClass const* class_ ) {
+	HHuginn::type_id_t t( class_->type_id() );
+	return ( ( t == HHuginn::TYPE::REFERENCE ) || ( t == HHuginn::TYPE::UNKNOWN ) );
+}
+
+bool is_integer_congruent( HHuginn::HClass const* class_ ) {
+	return ( ( class_->type_id() == HHuginn::TYPE::INTEGER ) || is_unknown( class_ ) );
+}
+
+bool is_summable( HHuginn::HClass const* class_ ) {
+	return (
+		is_numeric_congruent( class_ )
+		|| ( class_->type_id() == HHuginn::TYPE::STRING )
+		|| is_collection( class_ )
+	);
+}
+
+bool are_congruous( HHuginn::HClass const* c1_, HHuginn::HClass const* c2_ ) {
+	HHuginn::type_id_t t1( c1_->type_id() );
+	HHuginn::type_id_t t2( c2_->type_id() );
+	bool congruous(
+		( t1 == t2 )
+		|| ( t1 == HHuginn::TYPE::UNKNOWN )
+		|| ( t2 == HHuginn::TYPE::UNKNOWN )
+		|| ( t1 == HHuginn::TYPE::REFERENCE )
+		|| ( t2 == HHuginn::TYPE::REFERENCE )
+	);
+	if ( ! congruous ) {
+		congruous = ( ( t1 != HHuginn::TYPE::BOOLEAN ) && ( t2 == HHuginn::TYPE::NOT_BOOLEAN ) )
+			|| ( ( t2 != HHuginn::TYPE::BOOLEAN ) && ( t1 == HHuginn::TYPE::NOT_BOOLEAN ) );
+	}
+	return ( congruous );
+}
+
 HHuginn::HString::value_type const& get_string( HHuginn::value_t const& value_ ) {
 	M_ASSERT( !! value_ );
 	M_ASSERT( dynamic_cast<HHuginn::HString const*>( value_.raw() ) );

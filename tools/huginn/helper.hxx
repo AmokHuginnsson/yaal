@@ -66,6 +66,18 @@ HHuginn::type_id_t verify_arg_numeric( char const*, HHuginn::values_t&, int, ARI
 HHuginn::type_id_t verify_arg_collection( char const*, HHuginn::values_t&, int, ARITY, ONTICALLY, huginn::HThread*, int );
 HHuginn::type_id_t verify_arg_collection_value_type( char const*, HHuginn::values_t&, int, ARITY, types_t const&, UNIFORMITY, huginn::HThread*, int );
 
+bool is_numeric( HHuginn::HClass const* );
+bool is_collection( HHuginn::HClass const* );
+bool is_numeric_congruent( HHuginn::HClass const* );
+bool is_summable( HHuginn::HClass const* );
+bool is_comparable( HHuginn::HClass const* );
+bool is_comparable_congruent( HHuginn::HClass const* );
+bool is_boolean_congruent( HHuginn::HClass const* );
+bool is_unknown( HHuginn::HClass const* );
+bool is_reference_congruent( HHuginn::HClass const* );
+bool is_integer_congruent( HHuginn::HClass const* );
+bool are_congruous( HHuginn::HClass const*, HHuginn::HClass const* );
+
 HHuginn::HString::value_type const& get_string( HHuginn::value_t const& );
 HHuginn::HInteger::value_type get_integer( HHuginn::value_t const& );
 HHuginn::HReal::value_type get_real( HHuginn::value_t const& );

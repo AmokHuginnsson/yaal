@@ -412,7 +412,7 @@ void HHuginn::HDict::verify_key_type( huginn::HThread* thread_, HHuginn::HClass 
 	if ( ( _keyType->type_id() != TYPE::NONE ) && ( keyType_ != _keyType ) ) {
 		throw HHuginnRuntimeException( "Non-uniform key types, got "_ys.append( a_type_name( keyType_ ) ).append( " instead of " ).append( a_type_name( _keyType ) ).append( "." ), thread_->current_frame()->file_id(), position_ );
 	}
-	if ( ! OCompiler::is_comparable( keyType_ ) ) {
+	if ( ! is_comparable( keyType_ ) ) {
 		throw HHuginnRuntimeException(
 			"Key type `"_ys.append( keyType_->name() ).append( "' is not a comparable." ),
 			thread_->current_frame()->file_id(),

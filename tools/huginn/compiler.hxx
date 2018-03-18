@@ -459,17 +459,6 @@ struct OCompiler {
 	 */
 	void verify_default_argument( executing_parser::position_t );
 	void track_name_cycle( HHuginn::identifier_id_t );
-	static bool is_numeric( HHuginn::HClass const* );
-	static bool is_collection( HHuginn::HClass const* );
-	static bool is_numeric_congruent( HHuginn::HClass const* );
-	static bool is_summable( HHuginn::HClass const* );
-	static bool is_comparable( HHuginn::HClass const* );
-	static bool is_comparable_congruent( HHuginn::HClass const* );
-	static bool is_boolean_congruent( HHuginn::HClass const* );
-	static bool is_unknown( HHuginn::HClass const* );
-	static bool is_reference_congruent( HHuginn::HClass const* );
-	static bool is_integer_congruent( HHuginn::HClass const* );
-	static bool are_congruous( HHuginn::HClass const*, HHuginn::HClass const* );
 	HHuginn::HClass const* congruent( HHuginn::HClass const*, HHuginn::HClass const* ) const;
 	HHuginn::scope_t& current_scope( void );
 	HHuginn::expression_t& current_expression( void );
