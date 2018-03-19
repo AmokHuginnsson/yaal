@@ -184,11 +184,10 @@ inline HHuginn::value_t update( huginn::HThread* thread_, HHuginn::value_t* obje
 	}
 	HHuginn::HOrder::values_t& lv( l.value() );
 	HHuginn::HOrder::values_t const& rv( r.value() );
-	l.anchor( thread_, position_ );
+	HAnchorGuard<HHuginn::HOrder> ag( l, thread_, position_ );
 	for ( HHuginn::HOrder::values_t::const_iterator it( rv.begin() ), end( rv.end() ); it != end; ++ it ) {
 		lv.insert( *it );
 	}
-	l.detach();
 	return ( *object_ );
 	M_EPILOG
 }
@@ -313,23 +312,20 @@ void HHuginn::HOrder::verify_key_type( huginn::HThread* thread_, HHuginn::HHugin
 bool HHuginn::HOrder::has_key( huginn::HThread* thread_, HHuginn::value_t const& value_, int position_ ) const {
 	M_PROLOG
 	verify_key_type( thread_, value_->get_class(), position_ );
-	_helper.anchor( thread_, position_ );
-	bool has( _data.find( value_ ) != _data.end() );
-	_helper.detach();
-	return ( has );
+	HAnchorGuard<HHuginn::HOrder> ag( *this, thread_, position_ );
+	return ( _data.find( value_ ) != _data.end() );
 	M_EPILOG
 }
 
 void HHuginn::HOrder::erase( huginn::HThread* thread_, HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
 	verify_key_type( thread_, value_->get_class(), position_ );
-	_helper.anchor( thread_, position_ );
+	HAnchorGuard<HHuginn::HOrder> ag( *this, thread_, position_ );
 	values_t::iterator it( _data.find( value_ ) );
 	if ( it != _data.end() ) {
 		invalidate( it.node_id() );
 		_data.erase( it );
 	}
-	_helper.detach();
 	return;
 	M_EPILOG
 }
@@ -337,9 +333,8 @@ void HHuginn::HOrder::erase( huginn::HThread* thread_, HHuginn::value_t const& v
 void HHuginn::HOrder::insert( huginn::HThread* thread_, HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
 	verify_key_type( thread_, value_->get_class(), position_ );
-	_helper.anchor( thread_, position_ );
+	HAnchorGuard<HHuginn::HOrder> ag( *this, thread_, position_ );
 	_data.insert( value_ );
-	_helper.detach();
 	_keyType = value_->get_class();
 	return;
 	M_EPILOG
@@ -367,11 +362,10 @@ HHuginn::value_t HHuginn::HOrder::do_clone( huginn::HThread* thread_, HHuginn::v
 	HHuginn::HOrder* order( static_cast<HHuginn::HOrder*>( res.raw() ) );
 	values_t&  data( order->value() );
 	order->_keyType = _keyType;
-	order->anchor( thread_, position_ );
+	HAnchorGuard<HHuginn::HOrder> ag( *order, thread_, position_ );
 	for ( values_t::value_type const& v : _data ) {
 		data.insert( data.end(), v->clone( thread_, const_cast<HHuginn::value_t*>( &v ), position_ ) );
 	}
-	order->detach();
 	return ( res );
 }
 

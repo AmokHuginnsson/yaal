@@ -114,6 +114,19 @@ data_t get_by_type( HHuginn::value_t& );
 
 yaal::hcore::HString int_to_str( HHuginn::HInteger::value_type, BASE, bool );
 
+template<typename T>
+class HAnchorGuard {
+	T const& _obj;
+public:
+	HAnchorGuard( T const& obj_, HThread* thread_, int position_ )
+		: _obj( obj_ ) {
+		_obj.anchor( thread_, position_ );
+	}
+	~HAnchorGuard( void ) {
+		_obj.detach();
+	}
+};
+
 template<typename data_t, typename iterator_t>
 class HValueUnboxingIterator : public yaal::hcore::iterator_interface<data_t, yaal::hcore::iterator_category::forward> {
 public:

@@ -788,7 +788,7 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 			HHuginn::HDict& val( *static_cast<HHuginn::HDict*>( v.raw() ) );
 			HHuginn::HDict::values_t& data( val.value() );
 			HHuginn::HClass const* keyType( &huginn::_noneClass_ );
-			val.anchor( thread_, position_ );
+			HAnchorGuard<HHuginn::HDict> ag( val, thread_, position_ );
 			for ( int long i( 0 ); f->can_continue() && ( i < len ); ++ i ) {
 				HHuginn::value_t key( deserialize_impl( thread_, position_ ) );
 				if ( ! is_comparable( key->get_class() ) || ( ( i > 0 ) && ( key->get_class() != keyType ) ) ) {
@@ -798,7 +798,6 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 				HHuginn::value_t value( deserialize_impl( thread_, position_ ) );
 				data.insert( make_pair( key, value ) );
 			}
-			val.detach();
 		} break;
 		case ( HHuginn::TYPE::LOOKUP ): {
 			if ( ( len = read_len( thread_, position_ ) ) < 0 ) {
@@ -807,13 +806,12 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 			v = thread_->object_factory().create_lookup();
 			HHuginn::HLookup& val( *static_cast<HHuginn::HLookup*>( v.raw() ) );
 			HHuginn::HLookup::values_t& data( val.value() );
-			val.anchor( thread_, position_ );
+			HAnchorGuard<HHuginn::HLookup> ag( val, thread_, position_ );
 			for ( int long i( 0 ); f->can_continue() && ( i < len ); ++ i ) {
 				HHuginn::value_t key( deserialize_impl( thread_, position_ ) );
 				HHuginn::value_t value( deserialize_impl( thread_, position_ ) );
 				data.insert( make_pair( key, value ) );
 			}
-			val.detach();
 		} break;
 		case ( HHuginn::TYPE::ORDER ): {
 			if ( ( len = read_len( thread_, position_ ) ) < 0 ) {
@@ -823,7 +821,7 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 			HHuginn::HOrder& val( *static_cast<HHuginn::HOrder*>( v.raw() ) );
 			HHuginn::HOrder::values_t& data( val.value() );
 			HHuginn::HClass const* keyType( &huginn::_noneClass_ );
-			val.anchor( thread_, position_ );
+			HAnchorGuard<HHuginn::HOrder> ag( val, thread_, position_ );
 			for ( int long i( 0 ); f->can_continue() && ( i < len ); ++ i ) {
 				HHuginn::value_t key( deserialize_impl( thread_, position_ ) );
 				if ( ! is_comparable( key->get_class() ) || ( ( i > 0 ) && ( key->get_class() != keyType ) ) ) {
@@ -832,7 +830,6 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 				}
 				data.insert( key );
 			}
-			val.detach();
 		} break;
 		case ( HHuginn::TYPE::SET ): {
 			if ( ( len = read_len( thread_, position_ ) ) < 0 ) {
@@ -841,11 +838,10 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 			v = thread_->object_factory().create_set();
 			HHuginn::HSet& val( *static_cast<HHuginn::HSet*>( v.raw() ) );
 			HHuginn::HSet::values_t& data( val.value() );
-			val.anchor( thread_, position_ );
+			HAnchorGuard<HHuginn::HSet> ag( val, thread_, position_ );
 			for ( int long i( 0 ); f->can_continue() && ( i < len ); ++ i ) {
 				data.insert( deserialize_impl( thread_, position_ ) );
 			}
-			val.detach();
 		} break;
 		case ( HHuginn::TYPE::FUNCTION_REFERENCE ): {
 			if ( ( len = read_len( thread_, position_ ) ) < 0 ) {

@@ -990,10 +990,10 @@ public:
 	}
 	void verify_key_type( huginn::HThread*, HHuginn::HClass const*, int ) const;
 	void clear( void );
-	void anchor( huginn::HThread* thread_, int position_ ) {
+	void anchor( huginn::HThread* thread_, int position_ ) const {
 		_helper.anchor( thread_, position_ );
 	}
-	void detach( void ) {
+	void detach( void ) const {
 		_helper.detach();
 	}
 protected:
@@ -1032,10 +1032,10 @@ public:
 	}
 	void verify_key_type( huginn::HThread*, HHuginn::HClass const*, int ) const;
 	void clear( void );
-	void anchor( huginn::HThread* thread_, int position_ ) {
+	void anchor( huginn::HThread* thread_, int position_ ) const {
 		_helper.anchor( thread_, position_ );
 	}
-	void detach( void ) {
+	void detach( void ) const {
 		_helper.detach();
 	}
 protected:
@@ -1095,10 +1095,10 @@ public:
 	}
 	void update( huginn::HThread*, HHuginn::value_t const&, int );
 	void clear( void );
-	void anchor( huginn::HThread* thread_, int position_ ) {
+	void anchor( huginn::HThread* thread_, int position_ ) const {
 		_helper.anchor( thread_, position_ );
 	}
-	void detach( void ) {
+	void detach( void ) const {
 		_helper.detach();
 	}
 protected:
@@ -1134,10 +1134,10 @@ public:
 		return ( _data );
 	}
 	void clear( void );
-	void anchor( huginn::HThread* thread_, int position_ ) {
+	void anchor( huginn::HThread* thread_, int position_ ) const {
 		_helper.anchor( thread_, position_ );
 	}
-	void detach( void ) {
+	void detach( void ) const {
 		_helper.detach();
 	}
 protected:

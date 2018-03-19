@@ -180,11 +180,10 @@ inline HHuginn::value_t update( huginn::HThread* thread_, HHuginn::value_t* obje
 	HHuginn::HSet* s( static_cast<HHuginn::HSet*>( object_->raw() ) );
 	HHuginn::HSet::values_t& l( s->value() );
 	HHuginn::HSet::values_t const& r( static_cast<HHuginn::HSet const*>( values_[0].raw() )->value() );
-	s->anchor( thread_, position_ );
+	HAnchorGuard<HHuginn::HSet> ag( *s, thread_, position_ );
 	for ( HHuginn::HSet::values_t::const_iterator it( r.begin() ), end( r.end() ); it != end; ++ it ) {
 		l.insert( *it );
 	}
-	s->detach();
 	return ( *object_ );
 	M_EPILOG
 }
@@ -289,31 +288,27 @@ int long HHuginn::HSet::do_size( huginn::HThread*, int ) const {
 
 bool HHuginn::HSet::has_key( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) const {
 	M_PROLOG
-	_helper.anchor( thread_, position_ );
-	bool has( _data.find( key_ ) != _data.end() );
-	_helper.detach();
-	return ( has );
+	HAnchorGuard<HHuginn::HSet> ag( *this, thread_, position_ );
+	return ( _data.find( key_ ) != _data.end() );
 	M_EPILOG
 }
 
 void HHuginn::HSet::erase( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) {
 	M_PROLOG
-	_helper.anchor( thread_, position_ );
+	HAnchorGuard<HHuginn::HSet> ag( *this, thread_, position_ );
 	values_t::iterator it( _data.find( key_ ) );
 	if ( it != _data.end() ) {
 		invalidate( it.node_id() );
 		_data.erase( it );
 	}
-	_helper.detach();
 	return;
 	M_EPILOG
 }
 
 void HHuginn::HSet::insert( huginn::HThread* thread_, HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
-	_helper.anchor( thread_, position_ );
+	HAnchorGuard<HHuginn::HSet> ag( *this, thread_, position_ );
 	_data.insert( value_ );
-	_helper.detach();
 	return;
 	M_EPILOG
 }
@@ -336,11 +331,10 @@ HHuginn::value_t HHuginn::HSet::do_clone( huginn::HThread* thread_, HHuginn::val
 	HHuginn::value_t res( thread_->runtime().object_factory()->create_set() );
 	HSet* set( static_cast<HSet*>( res.raw() ) );
 	values_t& data( set->value() );
-	set->anchor( thread_, position_ );
+	HAnchorGuard<HHuginn::HSet> ag( *set, thread_, position_ );
 	for ( values_t::value_type const& v : _data ) {
 		data.insert( v->clone( thread_, const_cast<HHuginn::value_t*>( &v ), position_ ) );
 	}
-	set->detach();
 	return ( res );
 	M_EPILOG
 }
