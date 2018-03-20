@@ -732,9 +732,20 @@ void OCompiler::set_import_name( yaal::hcore::HString const& name_, executing_pa
 	if ( _submittedClasses.count( importIdentifier ) > 0 ) {
 		throw HHuginn::HHuginnRuntimeException( "Class `"_ys.append( name_ ).append( "' named is already defined." ), MAIN_FILE_ID, position_.get() );
 	}
-	if ( find_if( _submittedImports.begin(), _submittedImports.end(), [&importIdentifier]( OImportInfo const& info_ ) { return ( info_._package == importIdentifier ); } ) != _submittedImports.end() ) {
+	submitted_imports_t::const_iterator it;
+	if (
+		( it = find_if(
+			_submittedImports.begin(),
+			_submittedImports.end(),
+			[&importIdentifier]( OImportInfo const& info_ ) {
+				return ( ( importIdentifier == info_._package ) || ( importIdentifier == info_._alias ) );
+			}
+		) ) != _submittedImports.end()
+	) {
 		throw HHuginn::HHuginnRuntimeException(
-			"Package `"_ys.append( _runtime->identifier_name( importIdentifier ) ).append( "' was already imported." ),
+			"Package `"_ys
+				.append( _runtime->identifier_name( importIdentifier ) )
+				.append( importIdentifier == it->_package ? "' was already imported." : "' name was used as an alias." ),
 			MAIN_FILE_ID,
 			position_.get()
 		);
