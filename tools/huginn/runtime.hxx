@@ -21,7 +21,6 @@ private:
 	typedef HHuginn::type_id_t type_id_t;
 	typedef HHuginn::identifier_id_t identifier_id_t;
 	typedef HHuginn::value_t value_t;
-	typedef HHuginn::values_t values_t;
 	typedef HHuginn::function_t function_t;
 	typedef HHuginn::field_definitions_t field_definitions_t;
 	typedef HHuginn::class_t class_t;
@@ -30,7 +29,7 @@ private:
 	typedef yaal::hcore::HLookupMap<yaal::hcore::HString, identifier_id_t> identifier_ids_t;
 	typedef yaal::hcore::HPointer<huginn::HObjectFactory> object_factory_t;
 	typedef yaal::hcore::HLookupMap<identifier_id_t, class_t> classes_t;
-	typedef yaal::hcore::HLookupMap<identifier_id_t, value_t> packages_t;
+	typedef yaal::hcore::HLookupMap<identifier_id_t, value_t> values_t;
 	/*! \brief A type for storing functions.
 	 *
 	 * Symbol resolving stores pointers to map values (value_t*),
@@ -98,7 +97,7 @@ private:
 	 */
 	dependencies_t _dependencies; /*!< Extra pointers to classes available in runtime, used to enforce order of desturctors! */
 	classes_t _classes; /*!< All classes defined for this runtime, including classes from submodules. */
-	packages_t _packages;
+	values_t _values;
 	HHuginn::value_t _argv;
 	value_t _result;
 	huginn::HThread::frame_t _incrementalFrame;
@@ -134,7 +133,7 @@ public:
 	yaal::hcore::HString const& identifier_name( identifier_id_t ) const;
 	value_t* get_function( identifier_id_t, bool = false );
 	class_t get_class( identifier_id_t );
-	value_t* get_package( identifier_id_t );
+	value_t* get_value( identifier_id_t );
 	void register_class( class_t, HHuginn::ACCESS, HHuginn::VISIBILITY );
 	/*! \brief Remove compiled class from runtime.
 	 *
@@ -192,7 +191,7 @@ public:
 	 * \param position_ - call context information for error reporting.
 	 * \return Result returned by called Huginn function.
 	 */
-	value_t call( yaal::hcore::HString const& name_, values_t& argv_, int position_ );
+	value_t call( yaal::hcore::HString const& name_, HHuginn::values_t& argv_, int position_ );
 
 	/*! \brief Call (execute) Huginn function.
 	 *
@@ -201,7 +200,7 @@ public:
 	 * \param position_ - call context information for error reporting.
 	 * \return Result returned by called Huginn function.
 	 */
-	value_t call( identifier_id_t identifier_, values_t& argv_, int position_ );
+	value_t call( identifier_id_t identifier_, HHuginn::values_t& argv_, int position_ );
 
 	/*! \brief Get value returned by program's main().
 	 *

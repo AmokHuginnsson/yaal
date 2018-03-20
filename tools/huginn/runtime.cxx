@@ -167,7 +167,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 	, _functionsAvailable()
 	, _dependencies()
 	, _classes()
-	, _packages()
+	, _values()
 	, _argv( _objectFactory->create_list() )
 	, _result()
 	, _incrementalFrame()
@@ -199,7 +199,7 @@ void HRuntime::copy_text( HRuntime& source_ ) {
 	_result = source_._result;
 	_incrementalFrame = source_._incrementalFrame;
 	_argv = source_._argv;
-	_packages = source_._packages;
+	_values = source_._values;
 	_classes = source_._classes;
 	_dependencies = source_._dependencies;
 	using yaal::swap;
@@ -248,11 +248,11 @@ HHuginn::class_t HRuntime::get_class( identifier_id_t identifierId_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t* HRuntime::get_package( identifier_id_t identifierId_ ) {
+HHuginn::value_t* HRuntime::get_value( identifier_id_t identifierId_ ) {
 	M_PROLOG
 	HHuginn::value_t* v( nullptr );
-	packages_t::iterator it( _packages.find( identifierId_ ) );
-	if ( it != _packages.end() ) {
+	values_t::iterator it( _values.find( identifierId_ ) );
+	if ( it != _values.end() ) {
 		v = &( it->second );
 	}
 	return ( v );
@@ -336,7 +336,7 @@ void HRuntime::drop_function( identifier_id_t identifier_ ) {
 void HRuntime::register_package( identifier_id_t package_, identifier_id_t alias_, HHuginn::paths_t const& paths_, HHuginn::compiler_setup_t compilerSetup_, int position_ ) {
 	M_PROLOG
 	HHuginn::value_t package;
-	for ( packages_t::value_type const& p : _packages ) {
+	for ( values_t::value_type const& p : _values ) {
 		if ( p.second->get_class()->identifier_id() == package_ ) {
 			package = p.second;
 			break;
@@ -345,7 +345,7 @@ void HRuntime::register_package( identifier_id_t package_, identifier_id_t alias
 	if ( ! package ) {
 		package = HPackageFactory::get_instance().create_package( this, paths_, compilerSetup_, identifier_name( package_ ), position_ );
 	}
-	_packages.insert( make_pair( alias_, package ) );
+	_values.insert( make_pair( alias_, package ) );
 	return;
 	M_EPILOG
 }
@@ -427,7 +427,7 @@ yaal::hcore::HString const& HRuntime::identifier_name( identifier_id_t id_ ) con
 void HRuntime::execute( void ) {
 	M_PROLOG
 	util::HScopeExitCall sec( hcore::call( &threads_t::clear, &_threads ) );
-	values_t args;
+	HHuginn::values_t args;
 	args.reserve( max_local_variable_count() );
 	HHuginn::HList& argv( *static_cast<HHuginn::HList*>( _argv.raw() ) );
 	if ( argv.size( nullptr, 0 ) > 0 ) {
@@ -466,14 +466,14 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 	HHuginn::class_t cls( create_class( name_, nullptr, ! doc.is_empty() ? doc : "The `"_ys.append( name_ ).append( "` is an user defined submodule." ) ) );
 	HHuginn::field_definitions_t fds;
 	/* Erasing from lookup invalidated .end() */
-	for ( packages_t::iterator it( _packages.begin() ); it != _packages.end(); ) {
-		if ( context_._packages.find( it->first ) == context_._packages.end() ) {
+	for ( values_t::iterator it( _values.begin() ); it != _values.end(); ) {
+		if ( context_._values.find( it->first ) == context_._values.end() ) {
 			fds.emplace_back(
 				identifier_name( it->first ),
 				create_method( &package::value, it->second, identifier_name( it->first ) ),
 				"access package "_ys.append( it->second->get_class()->name() ).append( " imported in submodule" )
 			);
-			it = _packages.erase( it );
+			it = _values.erase( it );
 		} else {
 			++ it;
 		}
@@ -521,7 +521,7 @@ huginn::HThread::frame_t const& HRuntime::incremental_frame( void ) const {
 	M_EPILOG
 }
 
-HHuginn::value_t HRuntime::call( identifier_id_t identifier_, values_t& values_, int position_ ) {
+HHuginn::value_t HRuntime::call( identifier_id_t identifier_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	value_t res;
 	if ( _functionsAvailable.count( identifier_ ) > 0 ) {
@@ -1043,8 +1043,8 @@ inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterfac
 void HRuntime::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) const {
 	M_PROLOG
 	stream_ << "Huginn VM state for `" << _huginn->source_name( MAIN_FILE_ID ) << "'" << endl;
-	for ( packages_t::value_type const& p : _packages ) {
-		stream_ << "package: " << identifier_name( p.first ) << " = " << p.second->get_class()->name() << endl;
+	for ( values_t::value_type const& v : _values ) {
+		stream_ << "package: " << identifier_name( v.first ) << " = " << v.second->get_class()->name() << endl;
 	}
 	for ( HHuginn::HClass const* c : _coreClasses_ ) {
 		stream_ << "class: " << c->name() << " {}" << endl;
@@ -1158,9 +1158,9 @@ yaal::hcore::HString const& HRuntime::package_name( HHuginn::HClass const* class
 	M_PROLOG
 	static yaal::hcore::HString const unknown( "unknown" );
 	yaal::hcore::HString const* name( &unknown );
-	for ( packages_t::value_type const& p : _packages ) {
-		if ( p.second->get_class() == class_ ) {
-			name = &identifier_name( p.first );
+	for ( values_t::value_type const& v : _values ) {
+		if ( v.second->get_class() == class_ ) {
+			name = &identifier_name( v.first );
 			break;
 		}
 	}

@@ -486,15 +486,15 @@ void OCompiler::resolve_symbols( void ) {
 						);
 						break;
 					} else {
-						HHuginn::value_t* p( _runtime->get_package( es._identifier ) );
-						if ( !! p ) {
+						HHuginn::value_t* v( _runtime->get_value( es._identifier ) );
+						if ( !! v ) {
 							es._expression->replace_execution_step(
 								es._index,
 								HExpression::OExecutionStep(
 									es._expression.raw(),
 									&HExpression::store_external_reference,
 									es._position,
-									HHuginn::value_ref_t( *p )
+									HHuginn::value_ref_t( *v )
 								)
 							);
 							break;
