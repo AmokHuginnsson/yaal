@@ -384,19 +384,8 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 	M_PROLOG
 	class_t cls( _runtime->get_class( identifierId_ ) );
 	if ( _compiler->_submittedClasses.count( identifierId_ ) > 0 ) {
-		yaal::hcore::HString const& name( _runtime->identifier_name( identifierId_ ) );
 		OCompiler::OClassContext* cc( _compiler->_submittedClasses.at( identifierId_ ).get() );
 		M_ASSERT( cc->_classIdentifier == identifierId_ );
-		for ( OCompiler::submitted_imports_t::value_type const& i : _compiler->_submittedImports ) {
-			if ( identifierId_ == i._package ) {
-				throw HHuginnRuntimeException( "Package of the same name `"_ys.append( name ).append( "' is already imported." ), MAIN_FILE_ID, cc->_position.get() );
-			} else if ( identifierId_ == i._alias ) {
-				throw HHuginnRuntimeException( "Package alias of the same name `"_ys.append( name ).append( "' is already defined." ), MAIN_FILE_ID, cc->_position.get() );
-			}
-		}
-		if ( _runtime->get_function( identifierId_ ) && ! cls ) {
-			throw HHuginnRuntimeException( "Function of the same name `"_ys.append( name ).append( "' is already defined." ), MAIN_FILE_ID, cc->_position.get() );
-		}
 		HClass const* super( nullptr );
 		if ( cc->_baseName != INVALID_IDENTIFIER ) {
 			HHuginn::class_t c( _runtime->get_class( cc->_baseName ) );
@@ -559,13 +548,13 @@ yaal::hcore::HString HHuginn::where( int fileId_, int position_ ) const {
 
 int HHuginn::error_position( void ) const {
 	M_PROLOG
-	return ( _sources[_errorFileId]->error_position( _errorPosition ) );
+	return ( _errorFileId >= 0 ? _sources[_errorFileId]->error_position( _errorPosition ) : 0 );
 	M_EPILOG
 }
 
 HHuginn::HErrorCoordinate HHuginn::error_coordinate( void ) const {
 	M_PROLOG
-	return ( _sources[_errorFileId]->error_coordinate( error_position() ) );
+	return ( _errorFileId >= 0 ? _sources[_errorFileId]->error_coordinate( error_position() ) : HErrorCoordinate( 0, 0 ) );
 	M_EPILOG
 }
 
@@ -577,7 +566,7 @@ HHuginn::HErrorCoordinate HHuginn::get_coordinate( int fileId_, int position_ ) 
 
 yaal::hcore::HString HHuginn::error_message( void ) const {
 	M_PROLOG
-	hcore::HString message( _sources[_errorFileId]->name() );
+	hcore::HString message( _errorFileId >= 0 ? _sources[_errorFileId]->name() : "" );
 	HErrorCoordinate coord( error_coordinate() );
 	if ( ! _errorMessage.is_empty() ) {
 		message

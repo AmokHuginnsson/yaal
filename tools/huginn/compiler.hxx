@@ -432,6 +432,9 @@ struct OCompiler {
 	void set_import_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void set_import_alias( yaal::hcore::HString const&, executing_parser::position_t );
 	void set_class_name( HHuginn::identifier_id_t, executing_parser::position_t );
+	void check_name_import( HHuginn::identifier_id_t, executing_parser::position_t );
+	void check_name_class( HHuginn::identifier_id_t, executing_parser::position_t );
+	void check_name_function( HHuginn::identifier_id_t, executing_parser::position_t );
 	void set_base_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void set_field_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void add_field_name( yaal::hcore::HString const&, executing_parser::position_t );

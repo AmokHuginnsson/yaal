@@ -693,6 +693,62 @@ void OCompiler::note_type( HHuginn::identifier_id_t identifierId_, HHuginn::HCla
 	f()._scopeStack.top()->note_type( identifierId_, class_ );
 }
 
+void OCompiler::check_name_import( HHuginn::identifier_id_t identifier_, executing_parser::position_t position_ ) {
+	M_PROLOG
+	submitted_imports_t::const_iterator it;
+	if (
+		( it = find_if(
+			_submittedImports.begin(),
+			_submittedImports.end(),
+			[&identifier_]( OImportInfo const& info_ ) {
+				return ( ( identifier_ == info_._package ) || ( identifier_ == info_._alias ) );
+			}
+		) ) != _submittedImports.end()
+	) {
+		HString const& name( _runtime->identifier_name( identifier_ ) );
+		throw HHuginn::HHuginnRuntimeException(
+			identifier_ == it->_package
+				? "Package of the same name `"_ys.append( name ).append( "' is already imported." )
+				: "Package alias of the same name `"_ys.append( name ).append( "' is already defined." ),
+			MAIN_FILE_ID,
+			position_.get()
+		);
+	}
+	return;
+	M_EPILOG
+}
+
+void OCompiler::check_name_class( HHuginn::identifier_id_t identifier_, executing_parser::position_t position_ ) {
+	M_PROLOG
+	if ( _submittedClasses.count( identifier_ ) > 0 ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"Class of the same name `"_ys
+				.append( _runtime->identifier_name( identifier_ ) )
+				.append( "' is already defined." ),
+			MAIN_FILE_ID,
+			position_.get()
+		);
+	}
+	return;
+	M_EPILOG
+}
+
+void OCompiler::check_name_function( HHuginn::identifier_id_t identifier_, executing_parser::position_t position_ ) {
+	M_PROLOG
+	HHuginn::value_t* fun( _runtime->get_function( identifier_ ) );
+	if ( fun ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"Function `"_ys
+				.append( _runtime->identifier_name( identifier_ ) )
+				.append( "' was already defined." ),
+			MAIN_FILE_ID,
+			position_.get()
+		);
+	}
+	return;
+	M_EPILOG
+}
+
 void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	HHuginn::identifier_id_t functionIdentifier( _runtime->identifier_id( name_ ) );
@@ -703,10 +759,11 @@ void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_
 		}
 	}
 	if ( ! _classContext ) {
-		HHuginn::value_t* fun( _runtime->get_function( functionIdentifier ) );
-		if ( fun && ! _isIncremental ) {
-			throw HHuginn::HHuginnRuntimeException( "Function `"_ys.append( name_ ).append( "' was already defined." ), MAIN_FILE_ID, position_.get() );
+		if ( ! _isIncremental ) {
+			check_name_function( functionIdentifier, position_ );
 		}
+		check_name_class( functionIdentifier, position_ );
+		check_name_import( functionIdentifier, position_ );
 	}
 	if ( ! isCtorDtor ) {
 		_usedIdentifiers[functionIdentifier].write(
@@ -729,27 +786,9 @@ void OCompiler::set_import_name( yaal::hcore::HString const& name_, executing_pa
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), MAIN_FILE_ID, position_.get() );
 	}
 	HHuginn::identifier_id_t importIdentifier( _runtime->identifier_id( name_ ) );
-	if ( _submittedClasses.count( importIdentifier ) > 0 ) {
-		throw HHuginn::HHuginnRuntimeException( "Class `"_ys.append( name_ ).append( "' named is already defined." ), MAIN_FILE_ID, position_.get() );
-	}
-	submitted_imports_t::const_iterator it;
-	if (
-		( it = find_if(
-			_submittedImports.begin(),
-			_submittedImports.end(),
-			[&importIdentifier]( OImportInfo const& info_ ) {
-				return ( ( importIdentifier == info_._package ) || ( importIdentifier == info_._alias ) );
-			}
-		) ) != _submittedImports.end()
-	) {
-		throw HHuginn::HHuginnRuntimeException(
-			"Package `"_ys
-				.append( _runtime->identifier_name( importIdentifier ) )
-				.append( importIdentifier == it->_package ? "' was already imported." : "' name was used as an alias." ),
-			MAIN_FILE_ID,
-			position_.get()
-		);
-	}
+	check_name_import( importIdentifier, position_ );
+	check_name_class( importIdentifier, position_ );
+	check_name_function( importIdentifier, position_ );
 	_importInfo._package = importIdentifier;
 	_importInfo._position = position_.get();
 	return;
@@ -762,20 +801,9 @@ void OCompiler::set_import_alias( yaal::hcore::HString const& name_, executing_p
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), MAIN_FILE_ID, position_.get() );
 	}
 	HHuginn::identifier_id_t importAliasIdentifier( _runtime->identifier_id( name_ ) );
-	if ( _submittedClasses.count( importAliasIdentifier ) > 0 ) {
-		throw HHuginn::HHuginnRuntimeException(
-			"Class `"_ys.append( name_ ).append( "' named is already defined." ),
-			MAIN_FILE_ID,
-			position_.get()
-		);
-	}
-	if ( find_if( _submittedImports.begin(), _submittedImports.end(), [&importAliasIdentifier]( OImportInfo const& info_ ) { return ( info_._alias == importAliasIdentifier ); } ) != _submittedImports.end() ) {
-		throw HHuginn::HHuginnRuntimeException(
-			"Import alias `"_ys.append( _runtime->identifier_name( importAliasIdentifier ) ).append( "' is already defined." ),
-			MAIN_FILE_ID,
-			position_.get()
-		);
-	}
+	check_name_import( importAliasIdentifier, position_ );
+	check_name_class( importAliasIdentifier, position_ );
+	check_name_function( importAliasIdentifier, position_ );
 	_importInfo._alias = importAliasIdentifier;
 	_usedIdentifiers[importAliasIdentifier].write( position_.get(), OIdentifierUse::TYPE::PACKAGE );
 	return;
@@ -791,13 +819,11 @@ void OCompiler::commit_import( executing_parser::position_t ) {
 
 void OCompiler::set_class_name( HHuginn::identifier_id_t identifier_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	if ( ( _submittedClasses.count( identifier_ ) > 0 ) || ( !! _runtime->get_class( identifier_ ) && ! _isIncremental ) ) {
-		throw HHuginn::HHuginnRuntimeException(
-			"Class `"_ys.append( _runtime->identifier_name( identifier_ ) ).append( "' is already defined." ),
-			MAIN_FILE_ID,
-			position_.get()
-		);
+	check_name_class( identifier_, position_ );
+	if ( ! _runtime->get_class( identifier_ ) ) {
+		check_name_function( identifier_, position_ );
 	}
+	check_name_import( identifier_, position_ );
 	_classContext = make_resource<OClassContext>();
 	_usedIdentifiers[identifier_].write( position_.get(), OIdentifierUse::TYPE::CLASS );
 	_functionContexts.emplace( make_resource<OFunctionContext>( this, identifier_, ++ _statementIdGenerator, _fileId, false ) );
