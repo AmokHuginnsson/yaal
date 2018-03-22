@@ -332,7 +332,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	HRule lambda(
 		"lambda",
 		( '@' >> -( '[' >> captureList >> ']' ) )[
-			e_p::HRegex::action_position_t( hcore::call( &OCompiler::set_lambda_name, _compiler.get(), _1 ) )
+			HIdentifierParser::action_position_t( hcore::call( &OCompiler::set_lambda_name, _compiler.get(), _1 ) )
 		] >> callable,
 		HRuleBase::action_position_t( hcore::call( &OCompiler::create_lambda, _compiler.get(), _1 ) )
 	);
@@ -541,7 +541,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		constant( KEYWORD::CATCH ) >> '(' >>
 		identifier(
 			"exceptionType",
-			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_type_name, _compiler.get(), _1, _2 ) )
+			HIdentifierParser::action_string_position_t( hcore::call( &OCompiler::set_type_name, _compiler.get(), _1, _2 ) )
 		) >> assignable[e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::commit_catch_control_variable, _compiler.get(), _1 ) )] >> ')' >>
 		scope[HRuleBase::action_position_t( hcore::call( &OCompiler::commit_catch, _compiler.get(), _1 ) )]
 	);
@@ -637,7 +637,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		"functionDefinition",
 		identifier(
 			"functionDefinitionIdentifier",
-			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_function_name, _compiler.get(), _1, _2 ) )
+			HIdentifierParser::action_string_position_t( hcore::call( &OCompiler::set_function_name, _compiler.get(), _1, _2 ) )
 		) >> callable,
 		HRuleBase::action_position_t( hcore::call( &OCompiler::create_function, _compiler.get(), _1 ) )
 	);
@@ -645,34 +645,49 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		"field",
 		identifier(
 			"fieldIdentifier",
-			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_field_name, _compiler.get(), _1, _2 ) )
+			HIdentifierParser::action_string_position_t( hcore::call( &OCompiler::set_field_name, _compiler.get(), _1, _2 ) )
 		) >> '=' >> HRule( expression, HRuleBase::action_position_t( hcore::call( &OCompiler::add_field_definition, _compiler.get(), _1 ) ) ) >> ';'
 	);
 	HRule classDefinition(
 		"classDefinition",
 		constant( KEYWORD::CLASS ) >> identifier(
 			"classIdentifier",
-			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::OClassNoter::note, &(_compiler->_classNoter), _1, _2 ) )
+			HIdentifierParser::action_string_position_t( hcore::call( &OCompiler::OClassNoter::note, &(_compiler->_classNoter), _1, _2 ) )
 		) >> -(
 			':' >> identifier(
 				"baseIdentifier",
-				e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_base_name, _compiler.get(), _1, _2 ) )
+				HIdentifierParser::action_string_position_t( hcore::call( &OCompiler::set_base_name, _compiler.get(), _1, _2 ) )
 			)
 		) >> '{' >> +( field | functionDefinition ) >> '}',
 		HRuleBase::action_position_t( hcore::call( &OCompiler::submit_class, _compiler.get(), _1 ) )
+	);
+	HRule enumeral(
+		"enumeral",
+		identifier(
+			"fieldIdentifier",
+			HIdentifierParser::action_string_position_t( hcore::call( &OCompiler::set_field_name, _compiler.get(), _1, _2 ) )
+		)
+	);
+	HRule enumDefinition(
+		"enumDefinition",
+		constant( KEYWORD::ENUM ) >> identifier(
+			"enumIdentifier",
+			HIdentifierParser::action_string_position_t( hcore::call( &OCompiler::set_enum_name, _compiler.get(), _1, _2 ) )
+		) >> '{' >> enumeral >> *( ',' >> enumeral ) >> '}',
+		HRuleBase::action_position_t( hcore::call( &OCompiler::commit_enum, _compiler.get(), _1 ) )
 	);
 	HRule importStatement(
 		"importStatement",
 		constant( "import" ) >> identifier(
 			"packageName",
-			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_import_name, _compiler.get(), _1, _2 ) )
+			HIdentifierParser::action_string_position_t( hcore::call( &OCompiler::set_import_name, _compiler.get(), _1, _2 ) )
 		) >> "as" >> identifier(
 			"importName",
-			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_import_alias, _compiler.get(), _1, _2 ) )
+			HIdentifierParser::action_string_position_t( hcore::call( &OCompiler::set_import_alias, _compiler.get(), _1, _2 ) )
 		) >> ';',
 		HRuleBase::action_position_t( hcore::call( &OCompiler::commit_import, _compiler.get(), _1 ) )
 	);
-	HRule huginnGrammar( "huginnGrammar", + ( classDefinition | functionDefinition | importStatement ) );
+	HRule huginnGrammar( "huginnGrammar", + ( classDefinition | functionDefinition | enumDefinition | importStatement ) );
 	return ( huginnGrammar );
 	M_EPILOG
 }

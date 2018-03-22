@@ -164,6 +164,7 @@ public:
 	 * \param identifier_ - identifier of function to remove.
 	 */
 	void drop_function( identifier_id_t identifier_ );
+	void register_value( identifier_id_t, HHuginn::value_t const& );
 	void register_package( identifier_id_t, identifier_id_t, HHuginn::paths_t const&, HHuginn::compiler_setup_t, int );
 	class_t create_class(
 		identifier_id_t,

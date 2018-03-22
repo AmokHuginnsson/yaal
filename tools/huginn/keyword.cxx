@@ -25,6 +25,7 @@ char const* CLASS = "class";
 char const* CONTINUE = "continue";
 char const* DEFAULT = "default";
 char const* ELSE = "else";
+char const* ENUM = "enum";
 char const* FALSE = "false";
 char const* FOR = "for";
 char const* IF = "if";
@@ -167,6 +168,7 @@ words_t _keywords_ = {{
 	KEYWORD::DEFAULT,
 	KEYWORD::DESTRUCTOR,
 	KEYWORD::ELSE,
+	KEYWORD::ENUM,
 	KEYWORD::FALSE,
 	KEYWORD::FOR,
 	KEYWORD::IF,

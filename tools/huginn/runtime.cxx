@@ -333,7 +333,20 @@ void HRuntime::drop_function( identifier_id_t identifier_ ) {
 	M_EPILOG
 }
 
-void HRuntime::register_package( identifier_id_t package_, identifier_id_t alias_, HHuginn::paths_t const& paths_, HHuginn::compiler_setup_t compilerSetup_, int position_ ) {
+void HRuntime::register_value( identifier_id_t identifier_, HHuginn::value_t const& value_ ) {
+	M_PROLOG
+	_values.insert( make_pair( identifier_, value_ ) );
+	return;
+	M_EPILOG
+}
+
+void HRuntime::register_package(
+	identifier_id_t package_,
+	identifier_id_t alias_,
+	HHuginn::paths_t const& paths_,
+	HHuginn::compiler_setup_t compilerSetup_,
+	int position_
+) {
 	M_PROLOG
 	HHuginn::value_t package;
 	for ( values_t::value_type const& p : _values ) {

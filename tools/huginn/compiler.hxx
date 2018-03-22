@@ -330,8 +330,9 @@ struct OCompiler {
 			CLASS,
 			FIELD,
 			METHOD,
-			VARIABLE,
 			FUNCTION,
+			ENUM,
+			VARIABLE,
 			PACKAGE
 		};
 		TYPE _type;
@@ -381,6 +382,7 @@ struct OCompiler {
 	typedef yaal::hcore::HResource<OClassContext> class_context_t;
 	typedef yaal::hcore::HHashMap<HHuginn::identifier_id_t, class_context_t> submitted_classes_t;
 	typedef yaal::hcore::HArray<OImportInfo> submitted_imports_t;
+	typedef HHuginn::values_t submitted_enums_t;
 	typedef yaal::hcore::HArray<OFunctionContext::scope_context_t> scope_context_cache_t;
 	typedef yaal::hcore::HPair<HHuginn::identifier_id_t, HHuginn::function_t> function_info_t;
 	function_contexts_t _functionContexts;
@@ -394,6 +396,7 @@ struct OCompiler {
 	 */
 	OClassNoter _classNoter;
 	submitted_classes_t _submittedClasses;
+	submitted_enums_t _submittedEnums;
 	submitted_imports_t _submittedImports;
 	OImportInfo _importInfo;
 	execution_steps_backlog_t _executionStepsBacklog;
@@ -433,8 +436,10 @@ struct OCompiler {
 	void set_import_alias( yaal::hcore::HString const&, executing_parser::position_t );
 	void set_class_name( HHuginn::identifier_id_t, executing_parser::position_t );
 	void check_name_import( HHuginn::identifier_id_t, executing_parser::position_t );
-	void check_name_class( HHuginn::identifier_id_t, executing_parser::position_t );
+	void check_name_class( HHuginn::identifier_id_t, bool, executing_parser::position_t );
 	void check_name_function( HHuginn::identifier_id_t, executing_parser::position_t );
+	void check_name_enum( HHuginn::identifier_id_t, bool, executing_parser::position_t );
+	void set_enum_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void set_base_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void set_field_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void add_field_name( yaal::hcore::HString const&, executing_parser::position_t );
@@ -445,6 +450,7 @@ struct OCompiler {
 	function_info_t create_function_low( executing_parser::position_t );
 	void commit_import( executing_parser::position_t );
 	void submit_class( executing_parser::position_t );
+	void commit_enum( executing_parser::position_t );
 	void create_lambda( executing_parser::position_t );
 	void commit_assignable( executing_parser::position_t );
 	void save_control_variable( executing_parser::position_t );

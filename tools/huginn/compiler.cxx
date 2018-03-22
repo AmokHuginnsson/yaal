@@ -252,6 +252,7 @@ OCompiler::OCompiler( HRuntime* runtime_ )
 	, _classIdentifiers()
 	, _classNoter( this )
 	, _submittedClasses()
+	, _submittedEnums()
 	, _submittedImports()
 	, _importInfo()
 	, _executionStepsBacklog()
@@ -285,6 +286,7 @@ void OCompiler::reset( int undoSteps_ ) {
 	_executionStepsBacklog.clear();
 	_importInfo.reset();
 	_submittedImports.clear();
+	_submittedEnums.clear();
 	_submittedClasses.clear();
 	_classNoter._passThrough = false;
 	_classIdentifiers.clear();
@@ -318,7 +320,13 @@ void OCompiler::resolve_symbols( void ) {
 				}
 				lastClassId = es._classId;
 			}
-			if ( find_if( _submittedImports.begin(), _submittedImports.end(), [&es]( OImportInfo const& info_ ) { return ( info_._package == es._identifier ); } ) != _submittedImports.end() ) {
+			if (
+				find_if(
+					_submittedImports.begin(),
+					_submittedImports.end(),
+					[&es]( OImportInfo const& info_ ) { return ( info_._package == es._identifier ); }
+				) != _submittedImports.end()
+			) {
 				throw HHuginn::HHuginnRuntimeException( "Making a direct reference to a package is forbidden.", MAIN_FILE_ID, es._position );
 			}
 			do {
@@ -473,28 +481,28 @@ void OCompiler::resolve_symbols( void ) {
 					}
 				}
 				if ( ( es._operation == OExecutionStep::OPERATION::USE ) && ! is_keyword( _runtime->identifier_name( es._identifier ) ) ) {
-					HHuginn::value_t* callable( _runtime->get_function( es._identifier ) );
-					if ( !! callable ) {
+					HHuginn::value_t* v( _runtime->get_value( es._identifier ) );
+					if ( !! v ) {
 						es._expression->replace_execution_step(
 							es._index,
 							HExpression::OExecutionStep(
 								es._expression.raw(),
 								&HExpression::store_external_reference,
 								es._position,
-								HHuginn::value_ref_t( *callable )
+								HHuginn::value_ref_t( *v )
 							)
 						);
 						break;
 					} else {
-						HHuginn::value_t* v( _runtime->get_value( es._identifier ) );
-						if ( !! v ) {
+						HHuginn::value_t* callable( _runtime->get_function( es._identifier ) );
+						if ( !! callable ) {
 							es._expression->replace_execution_step(
 								es._index,
 								HExpression::OExecutionStep(
 									es._expression.raw(),
 									&HExpression::store_external_reference,
 									es._position,
-									HHuginn::value_ref_t( *v )
+									HHuginn::value_ref_t( *callable )
 								)
 							);
 							break;
@@ -551,6 +559,7 @@ HString use_name( OCompiler::OIdentifierUse::TYPE type_ ) {
 		case ( OCompiler::OIdentifierUse::TYPE::FIELD ):    name = "Field";    break;
 		case ( OCompiler::OIdentifierUse::TYPE::METHOD ):   name = "Method";   break;
 		case ( OCompiler::OIdentifierUse::TYPE::FUNCTION ): name = "Function"; break;
+		case ( OCompiler::OIdentifierUse::TYPE::ENUM ):     name = "Enum";     break;
 		case ( OCompiler::OIdentifierUse::TYPE::VARIABLE ): name = "Variable"; break;
 		case ( OCompiler::OIdentifierUse::TYPE::PACKAGE ):  name = "Package";  break;
 	}
@@ -679,7 +688,7 @@ HHuginn::HClass const* OCompiler::type_id_to_class( HHuginn::type_id_t typeId_ )
 		case ( HHuginn::TYPE::FUNCTION_REFERENCE ):  c = &_functionReferenceClass_;  break;
 		case ( HHuginn::TYPE::OBJECT_REFERENCE ):    c = &_objectReferenceClass_;    break;
 		case ( HHuginn::TYPE::METHOD ):              c = &_methodClass_;             break;
-		case ( HHuginn::TYPE::UNBOUND_METHOD ):      c = &_unboundMethodClass_;        break;
+		case ( HHuginn::TYPE::UNBOUND_METHOD ):      c = &_unboundMethodClass_;      break;
 		case ( HHuginn::TYPE::BOUND_METHOD ):        c = &_boundMethodClass_;        break;
 		case ( HHuginn::TYPE::VARIADIC_PARAMETERS ): c = &_variadicParametersClass_; break;
 		case ( HHuginn::TYPE::NAMED_PARAMETERS ):    c = &_namedParametersClass_;    break;
@@ -718,11 +727,40 @@ void OCompiler::check_name_import( HHuginn::identifier_id_t identifier_, executi
 	M_EPILOG
 }
 
-void OCompiler::check_name_class( HHuginn::identifier_id_t identifier_, executing_parser::position_t position_ ) {
+void OCompiler::check_name_class( HHuginn::identifier_id_t identifier_, bool testRuntime_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	if ( _submittedClasses.count( identifier_ ) > 0 ) {
+	HHuginn::class_t c( testRuntime_ ? _runtime->get_class( identifier_ ) : HHuginn::class_t() );
+	if ( ( _submittedClasses.count( identifier_ ) > 0 ) || ( !! c && ! _isIncremental ) ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Class of the same name `"_ys
+				.append( _runtime->identifier_name( identifier_ ) )
+				.append( "' is already defined." ),
+			MAIN_FILE_ID,
+			position_.get()
+		);
+	}
+	return;
+	M_EPILOG
+}
+
+void OCompiler::check_name_enum( HHuginn::identifier_id_t identifier_, bool testRuntime_, executing_parser::position_t position_ ) {
+	M_PROLOG
+	submitted_enums_t::const_iterator it;
+	HHuginn::value_t* v( _runtime->get_value( identifier_ ) );
+	if (
+		( testRuntime_ && v && dynamic_cast<enumeration::HEnumerationClass const*>( (*v)->get_class() ) )
+		|| (
+			( it = find_if(
+				_submittedEnums.begin(),
+				_submittedEnums.end(),
+				[&identifier_]( HHuginn::value_t const& enum_ ) {
+					return ( identifier_ == enum_->get_class()->identifier_id() );
+				}
+			) ) != _submittedEnums.end()
+		)
+	) {
+		throw HHuginn::HHuginnRuntimeException(
+			"Enumeration of the same name `"_ys
 				.append( _runtime->identifier_name( identifier_ ) )
 				.append( "' is already defined." ),
 			MAIN_FILE_ID,
@@ -762,7 +800,8 @@ void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_
 		if ( ! _isIncremental ) {
 			check_name_function( functionIdentifier, position_ );
 		}
-		check_name_class( functionIdentifier, position_ );
+		check_name_enum( functionIdentifier, true, position_ );
+		check_name_class( functionIdentifier, true, position_ );
 		check_name_import( functionIdentifier, position_ );
 	}
 	if ( ! isCtorDtor ) {
@@ -787,7 +826,8 @@ void OCompiler::set_import_name( yaal::hcore::HString const& name_, executing_pa
 	}
 	HHuginn::identifier_id_t importIdentifier( _runtime->identifier_id( name_ ) );
 	check_name_import( importIdentifier, position_ );
-	check_name_class( importIdentifier, position_ );
+	check_name_enum( importIdentifier, true, position_ );
+	check_name_class( importIdentifier, false, position_ );
 	check_name_function( importIdentifier, position_ );
 	_importInfo._package = importIdentifier;
 	_importInfo._position = position_.get();
@@ -802,7 +842,8 @@ void OCompiler::set_import_alias( yaal::hcore::HString const& name_, executing_p
 	}
 	HHuginn::identifier_id_t importAliasIdentifier( _runtime->identifier_id( name_ ) );
 	check_name_import( importAliasIdentifier, position_ );
-	check_name_class( importAliasIdentifier, position_ );
+	check_name_enum( importAliasIdentifier, true, position_ );
+	check_name_class( importAliasIdentifier, true, position_ );
 	check_name_function( importAliasIdentifier, position_ );
 	_importInfo._alias = importAliasIdentifier;
 	_usedIdentifiers[importAliasIdentifier].write( position_.get(), OIdentifierUse::TYPE::PACKAGE );
@@ -817,9 +858,55 @@ void OCompiler::commit_import( executing_parser::position_t ) {
 	M_EPILOG
 }
 
+void OCompiler::commit_enum( executing_parser::position_t position_ ) {
+	M_PROLOG
+	_classContext->_doc = &_runtime->huginn()->get_comment( position_.get() );
+	enumeration::descriptions_t ed;
+	for ( int i( 0 ); i < static_cast<int>( _classContext->_fieldNames.get_size() ); ++ i ) {
+		ed.emplace_back( _classContext->_fieldNames[i], _classContext->_docs.at( i ) );
+	}
+	HHuginn::class_t enumDefinition(
+		enumeration::create_class(
+			_runtime,
+			_runtime->identifier_name( _classContext->_classIdentifier ),
+			ed,
+			_classContext->_doc ? *_classContext->_doc : "",
+			HHuginn::VISIBILITY::GLOBAL
+		)
+	);
+	_submittedEnums.emplace_back(
+		_runtime->object_factory()->create<HHuginn::HValue>( enumDefinition.raw() )
+	);
+	_classContext.reset();
+	return;
+	M_EPILOG
+}
+
+void OCompiler::set_enum_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+	M_PROLOG
+	if ( is_restricted( name_ ) ) {
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), MAIN_FILE_ID, position_.get() );
+	}
+	HHuginn::identifier_id_t enumIdentifier( _runtime->identifier_id( name_ ) );
+	check_name_enum( enumIdentifier, false, position_ );
+	check_name_class( enumIdentifier, true, position_ );
+	HHuginn::value_t* v( _runtime->get_value( enumIdentifier ) );
+	if ( ! ( v && dynamic_cast<enumeration::HEnumerationClass const*>( (*v)->get_class() ) ) ) {
+		check_name_function( enumIdentifier, position_ );
+	}
+	check_name_import( enumIdentifier, position_ );
+	_classContext = make_resource<OClassContext>();
+	_usedIdentifiers[enumIdentifier].write( position_.get(), OIdentifierUse::TYPE::ENUM );
+	_classContext->_classIdentifier = enumIdentifier;
+	_classContext->_position = position_;
+	return;
+	M_EPILOG
+}
+
 void OCompiler::set_class_name( HHuginn::identifier_id_t identifier_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	check_name_class( identifier_, position_ );
+	check_name_class( identifier_, true, position_ );
+	check_name_enum( identifier_, true, position_ );
 	if ( ! _runtime->get_class( identifier_ ) ) {
 		check_name_function( identifier_, position_ );
 	}
@@ -856,6 +943,9 @@ void OCompiler::add_field_name( yaal::hcore::HString const& name_, executing_par
 		);
 	}
 	_classContext->_fieldNames.push_back( name_ );
+	HString const& doc( _runtime->huginn()->get_comment( position_.get() ) );
+	int idx( static_cast<int>( _classContext->_fieldNames.get_size() - 1 ) );
+	_classContext->_docs.insert( make_pair( idx, doc ) );
 	return;
 	M_EPILOG
 }
@@ -1569,13 +1659,11 @@ void OCompiler::add_default_value( executing_parser::position_t ) {
 	M_EPILOG
 }
 
-void OCompiler::add_field_definition( executing_parser::position_t position_ ) {
+void OCompiler::add_field_definition( executing_parser::position_t ) {
 	M_PROLOG
 	M_ASSERT( !! _classContext );
-	HString const& doc( _runtime->huginn()->get_comment( position_.get() ) );
 	int idx( static_cast<int>( _classContext->_fieldNames.get_size() - 1 ) );
 	_classContext->_fieldDefinitions.insert( make_pair( idx, current_expression() ) );
-	_classContext->_docs.insert( make_pair( idx, doc ) );
 	reset_expression();
 	return;
 	M_EPILOG

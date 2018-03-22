@@ -26,6 +26,7 @@ extern char const* CLASS;
 extern char const* CONTINUE;
 extern char const* DEFAULT;
 extern char const* ELSE;
+extern char const* ENUM;
 extern char const* FALSE;
 extern char const* FOR;
 extern char const* IF;

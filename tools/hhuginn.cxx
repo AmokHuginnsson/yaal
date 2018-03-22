@@ -423,6 +423,9 @@ void HHuginn::finalize_compilation( paths_t const& paths_, compiler_setup_t comp
 	for ( OCompiler::submitted_imports_t::value_type const& i : _compiler->_submittedImports ) {
 		_runtime->register_package( i._package, i._alias, paths_, compilerSetup_, i._position );
 	}
+	for ( OCompiler::submitted_enums_t::value_type const& e : _compiler->_submittedEnums ) {
+		_runtime->register_value( e->get_class()->identifier_id(), e );
+	}
 	typedef HArray<identifier_id_t> identifiers_t;
 	identifiers_t classIdentifiers;
 	for ( OCompiler::submitted_classes_t::value_type const& sc : _compiler->_submittedClasses ) {
