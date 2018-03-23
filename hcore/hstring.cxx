@@ -13,7 +13,6 @@
 #include "base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
-#include "algorithm.hxx"
 #include "hstring.hxx"
 #include "memory.hxx"
 #include "hchunk.hxx"
@@ -293,109 +292,73 @@ inline void move( void* dest_, int long destOffset_, void const* src_, int long 
 	return;
 }
 
-inline bool equal( void const* left_, int leftRank_, void const* right_, int rightRank_, int long size_ ) {
-	bool res( false );
-	switch ( 4 * leftRank_ + rightRank_ ) {
-		case ( 4 * 1 + 1 ): /* UCS-1 and UCS-1 */
-		case ( 4 * 2 + 2 ): /* UCS-2 and UCS-2 */
-		case ( 4 * 4 + 4 ): /* UCS-4 and UCS-4 */ {
-			res = !::memcmp( left_, right_, static_cast<size_t>( size_ * leftRank_ ) );
-		} break;
-		case ( 4 * 2 + 1 ): /* UCS-2 and UCS-1 */ {
-			res = yaal::equal(
-				static_cast<yaal::u16_t const*>( left_ ), static_cast<yaal::u16_t const*>( left_ ) + size_,
-				static_cast<yaal::u8_t const*>( right_ )
-			);
-		} break;
-		case ( 4 * 4 + 1 ): /* UCS-4 and UCS-1 */ {
-			res = yaal::equal(
-				static_cast<yaal::u32_t const*>( left_ ), static_cast<yaal::u32_t const*>( left_ ) + size_,
-				static_cast<yaal::u8_t const*>( right_ )
-			);
-		} break;
-		case ( 4 * 1 + 2 ): /* UCS-1 and UCS-2 */ {
-			res = yaal::equal(
-				static_cast<yaal::u8_t const*>( left_ ), static_cast<yaal::u8_t const*>( left_ ) + size_,
-				static_cast<yaal::u16_t const*>( right_ )
-			);
-		} break;
-		case ( 4 * 4 + 2 ): /* UCS-4 and UCS-2 */ {
-			res = yaal::equal(
-				static_cast<yaal::u32_t const*>( left_ ), static_cast<yaal::u32_t const*>( left_ ) + size_,
-				static_cast<yaal::u16_t const*>( right_ )
-			);
-		} break;
-		case ( 4 * 1 + 4 ): /* UCS-1 and UCS-4 */ {
-			res = yaal::equal(
-				static_cast<yaal::u8_t const*>( left_ ), static_cast<yaal::u8_t const*>( left_ ) + size_,
-				static_cast<yaal::u32_t const*>( right_ )
-			);
-		} break;
-		case ( 4 * 2 + 4 ): /* UCS-2 and UCS-4 */ {
-			res = yaal::equal(
-				static_cast<yaal::u16_t const*>( left_ ), static_cast<yaal::u16_t const*>( left_ ) + size_,
-				static_cast<yaal::u32_t const*>( right_ )
-			);
-		} break;
+template<typename left_ucs_t, typename right_ucs_t>
+int compare_impl( left_ucs_t const* left_, int long leftOffset_, int long leftSize_, right_ucs_t const* right_, int long rightOffset_, int long rightSize_ ) {
+	int res( 0 );
+	left_ucs_t const* left( left_ + leftOffset_ );
+	right_ucs_t const* right( right_ + rightOffset_ );
+	int long len( min( leftSize_, rightSize_ ) );
+	for ( int long i( 0 ); ( res == 0 ) && ( i < len ); ++ i ) {
+		res = static_cast<int>( left[i] ) - static_cast<int>( right[i] );
 	}
-	return ( res );
+	return ( res != 0 ? res : ( ( leftSize_ < rightSize_ ) ? -1 : ( ( leftSize_ > rightSize_ ) ? 1 : 0 ) ) );
 }
 
-inline bool less( void const* left_, int leftRank_, int long leftSize_, void const* right_, int rightRank_, int long rightSize_ ) {
-	bool res( false );
+inline int compare( void const* left_, int leftRank_, int long leftOffset_, int long leftSize_, void const* right_, int rightRank_, int long rightOffset_, int long rightSize_ ) {
+	int res( 0 );
 	switch ( 4 * leftRank_ + rightRank_ ) {
 		case ( 4 * 1 + 1 ): /* UCS-1 and UCS-1 */ {
-			res = yaal::lexicographical_compare(
-				static_cast<yaal::u8_t const*>( left_ ), static_cast<yaal::u8_t const*>( left_ ) + leftSize_,
-				static_cast<yaal::u8_t const*>( right_ ), static_cast<yaal::u8_t const*>( right_ ) + rightSize_
+			res = compare_impl(
+				static_cast<yaal::u8_t const*>( left_ ), leftOffset_, leftSize_,
+				static_cast<yaal::u8_t const*>( right_ ), rightOffset_, rightSize_
 			);
 		} break;
 		case ( 4 * 2 + 1 ): /* UCS-2 and UCS-1 */ {
-			res = yaal::lexicographical_compare(
-				static_cast<yaal::u16_t const*>( left_ ), static_cast<yaal::u16_t const*>( left_ ) + leftSize_,
-				static_cast<yaal::u8_t const*>( right_ ), static_cast<yaal::u8_t const*>( right_ ) + rightSize_
+			res = compare_impl(
+				static_cast<yaal::u16_t const*>( left_ ), leftOffset_, leftSize_,
+				static_cast<yaal::u8_t const*>( right_ ), rightOffset_, rightSize_
 			);
 		} break;
 		case ( 4 * 4 + 1 ): /* UCS-4 and UCS-1 */ {
-			res = yaal::lexicographical_compare(
-				static_cast<yaal::u32_t const*>( left_ ), static_cast<yaal::u32_t const*>( left_ ) + leftSize_,
-				static_cast<yaal::u8_t const*>( right_ ), static_cast<yaal::u8_t const*>( right_ ) + rightSize_
+			res = compare_impl(
+				static_cast<yaal::u32_t const*>( left_ ), leftOffset_, leftSize_,
+				static_cast<yaal::u8_t const*>( right_ ), rightOffset_, rightSize_
 			);
 		} break;
 		case ( 4 * 1 + 2 ): /* UCS-1 and UCS-2 */ {
-			res = yaal::lexicographical_compare(
-				static_cast<yaal::u8_t const*>( left_ ), static_cast<yaal::u8_t const*>( left_ ) + leftSize_,
-				static_cast<yaal::u16_t const*>( right_ ), static_cast<yaal::u16_t const*>( right_ ) + rightSize_
+			res = compare_impl(
+				static_cast<yaal::u8_t const*>( left_ ), leftOffset_, leftSize_,
+				static_cast<yaal::u16_t const*>( right_ ), rightOffset_, rightSize_
 			);
 		} break;
 		case ( 4 * 2 + 2 ): /* UCS-2 and UCS-2 */ {
-			res = yaal::lexicographical_compare(
-				static_cast<yaal::u16_t const*>( left_ ), static_cast<yaal::u16_t const*>( left_ ) + leftSize_,
-				static_cast<yaal::u16_t const*>( right_ ), static_cast<yaal::u16_t const*>( right_ ) + rightSize_
+			res = compare_impl(
+				static_cast<yaal::u16_t const*>( left_ ), leftOffset_, leftSize_,
+				static_cast<yaal::u16_t const*>( right_ ), rightOffset_, rightSize_
 			);
 		} break;
 		case ( 4 * 4 + 2 ): /* UCS-4 and UCS-2 */ {
-			res = yaal::lexicographical_compare(
-				static_cast<yaal::u32_t const*>( left_ ), static_cast<yaal::u32_t const*>( left_ ) + leftSize_,
-				static_cast<yaal::u16_t const*>( right_ ), static_cast<yaal::u16_t const*>( right_ ) + rightSize_
+			res = compare_impl(
+				static_cast<yaal::u32_t const*>( left_ ), leftOffset_, leftSize_,
+				static_cast<yaal::u16_t const*>( right_ ), rightOffset_, rightSize_
 			);
 		} break;
 		case ( 4 * 1 + 4 ): /* UCS-1 and UCS-4 */ {
-			res = yaal::lexicographical_compare(
-				static_cast<yaal::u8_t const*>( left_ ), static_cast<yaal::u8_t const*>( left_ ) + leftSize_,
-				static_cast<yaal::u32_t const*>( right_ ), static_cast<yaal::u32_t const*>( right_ ) + rightSize_
+			res = compare_impl(
+				static_cast<yaal::u8_t const*>( left_ ), leftOffset_, leftSize_,
+				static_cast<yaal::u32_t const*>( right_ ), rightOffset_, rightSize_
 			);
 		} break;
 		case ( 4 * 2 + 4 ): /* UCS-2 and UCS-4 */ {
-			res = yaal::lexicographical_compare(
-				static_cast<yaal::u16_t const*>( left_ ), static_cast<yaal::u16_t const*>( left_ ) + leftSize_,
-				static_cast<yaal::u32_t const*>( right_ ), static_cast<yaal::u32_t const*>( right_ ) + rightSize_
+			res = compare_impl(
+				static_cast<yaal::u16_t const*>( left_ ), leftOffset_, leftSize_,
+				static_cast<yaal::u32_t const*>( right_ ), rightOffset_, rightSize_
 			);
 		} break;
 		case ( 4 * 4 + 4 ): /* UCS-4 and UCS-4 */ {
-			res = yaal::lexicographical_compare(
-				static_cast<yaal::u32_t const*>( left_ ), static_cast<yaal::u32_t const*>( left_ ) + leftSize_,
-				static_cast<yaal::u32_t const*>( right_ ), static_cast<yaal::u32_t const*>( right_ ) + rightSize_
+			res = compare_impl(
+				static_cast<yaal::u32_t const*>( left_ ), leftOffset_, leftSize_,
+				static_cast<yaal::u32_t const*>( right_ ), rightOffset_, rightSize_
 			);
 		} break;
 	}
@@ -1366,7 +1329,7 @@ bool HString::operator == ( HString const& other_ ) const {
 		( this == &other_ )
 		|| (
 			( thisSize == otherSize )
-			&& adaptive::equal( MEM, GET_RANK, EXT_MEM( other_ ), EXT_GET_RANK( other_ ), thisSize )
+			&& ( adaptive::compare( MEM, GET_RANK, 0, thisSize, EXT_MEM( other_ ), EXT_GET_RANK( other_ ), 0, otherSize ) == 0 )
 		)
 	);
 	M_EPILOG
@@ -1381,7 +1344,7 @@ bool HString::operator != (  HString const& other_ ) const {
 bool HString::operator > ( HString const& other_ ) const {
 	M_PROLOG
 	return (
-		adaptive::less( EXT_MEM( other_ ), EXT_GET_RANK( other_ ), EXT_GET_SIZE( other_ ), MEM, GET_RANK, GET_SIZE )
+		adaptive::compare( MEM, GET_RANK, 0, GET_SIZE, EXT_MEM( other_ ), EXT_GET_RANK( other_ ), 0, EXT_GET_SIZE( other_ ) ) > 0
 	);
 	M_EPILOG
 }
@@ -1389,7 +1352,7 @@ bool HString::operator > ( HString const& other_ ) const {
 bool HString::operator < ( HString const& other_ ) const {
 	M_PROLOG
 	return (
-		adaptive::less( MEM, GET_RANK, GET_SIZE, EXT_MEM( other_ ), EXT_GET_RANK( other_ ), EXT_GET_SIZE( other_ ) )
+		adaptive::compare( MEM, GET_RANK, 0, GET_SIZE, EXT_MEM( other_ ), EXT_GET_RANK( other_ ), 0, EXT_GET_SIZE( other_ ) ) < 0
 	);
 	M_EPILOG
 }
@@ -1397,7 +1360,7 @@ bool HString::operator < ( HString const& other_ ) const {
 bool HString::operator >= ( HString const& other_ ) const {
 	M_PROLOG
 	return (
-		! adaptive::less( MEM, GET_RANK, GET_SIZE, EXT_MEM( other_ ), EXT_GET_RANK( other_ ), EXT_GET_SIZE( other_ ) )
+		adaptive::compare( MEM, GET_RANK, 0, GET_SIZE, EXT_MEM( other_ ), EXT_GET_RANK( other_ ), 0, EXT_GET_SIZE( other_ ) ) >= 0
 	);
 	M_EPILOG
 }
@@ -1405,7 +1368,7 @@ bool HString::operator >= ( HString const& other_ ) const {
 bool HString::operator <= ( HString const& other_ ) const {
 	M_PROLOG
 	return (
-		! adaptive::less( EXT_MEM( other_ ), EXT_GET_RANK( other_ ), EXT_GET_SIZE( other_ ), MEM, GET_RANK, GET_SIZE )
+		adaptive::compare( MEM, GET_RANK, 0, GET_SIZE, EXT_MEM( other_ ), EXT_GET_RANK( other_ ), 0, EXT_GET_SIZE( other_ ) ) <= 0
 	);
 	M_EPILOG
 }
@@ -1451,6 +1414,35 @@ bool operator >= ( char const* left_, HString const& right_ ) {
 bool operator <= ( char const* left_, HString const& right_ ) {
 	M_PROLOG
 	return ( right_.operator >= ( left_ ) );
+	M_EPILOG
+}
+
+int HString::compare( HString const& other_, int long from_, int long len_ ) const {
+	M_PROLOG
+	return ( compare( 0, GET_SIZE, other_, from_, len_ ) );
+	M_EPILOG
+}
+
+int HString::compare( int long thisFrom_, int long thisLen_, HString const& other_, int long from_, int long len_ ) const {
+	M_PROLOG
+	int long s( GET_SIZE );
+	int long os( EXT_GET_SIZE( other_ ) );
+	if ( ( thisFrom_ < 0 ) || ( thisFrom_ > s ) ) {
+		M_THROW( err_msg( ERROR::BAD_OFFSET ), thisFrom_ );
+	}
+	if ( ( thisLen_ < 0 ) || ( ( thisFrom_ + thisLen_ ) > s ) ) {
+		M_THROW( err_msg( ERROR::BAD_LENGTH ), thisLen_ );
+	}
+	if ( len_ == npos ) {
+		len_ = os - from_;
+	}
+	if ( ( from_ < 0 ) || ( from_ > os ) ) {
+		M_THROW( err_msg( ERROR::BAD_OFFSET ), from_ );
+	}
+	if ( ( len_ < 0 ) || ( ( from_ + len_ ) > os ) ) {
+		M_THROW( err_msg( ERROR::BAD_LENGTH ), len_ );
+	}
+	return ( adaptive::compare( MEM, GET_RANK, thisFrom_, thisLen_, EXT_MEM( other_ ), EXT_GET_RANK( other_ ), from_, len_ ) );
 	M_EPILOG
 }
 

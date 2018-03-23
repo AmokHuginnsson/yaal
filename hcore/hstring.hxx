@@ -539,6 +539,24 @@ public:
 	 * \return Self.
 	 */
 	HString& replace( iterator first_, iterator last_, HString const& replacement );
+	/*! \brief Perform lexicographical comparison of the (sub-)strings.
+	 *
+	 * \param other - the string that shall be compared with this string.
+	 * \param from - compare portion of \e other string starting at this position.
+	 * \param len - use at most \e len characters for comparison.
+	 * \return 0 iff compared (sub)strings are equal, -1 if this string comes lexicographically before \e other, 1 otherwise.
+	 */
+	int compare( HString const& other, int long from = 0, int long len = npos ) const;
+	/*! \brief Perform lexicographical comparison of the (sub-)strings.
+	 *
+	 * \param thisFrom - compare portion of \e this string starting at \e thisFrom position.
+	 * \param thisLen - use at most \e thisLen characters from this string for comparison.
+	 * \param other - the string that shall be compared with this string.
+	 * \param from - compare portion of \e other string starting at this position.
+	 * \param len - use at most \e len characters from \e other string for comparison.
+	 * \return 0 iff compared (sub)strings are equal, -1 if this string comes lexicographically before \e other, 1 otherwise.
+	 */
+	int compare( int long thisFrom, int long thisLen, HString const& other, int long from = 0, int long len = npos ) const;
 	/*! \brief Convert all characters of this string to upper case.
 	 *
 	 * \return Self.
