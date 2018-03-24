@@ -795,6 +795,7 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 					raise( thread_, "Malformed Huginn data stream.", position_, exception_class() );
 					break;
 				}
+				keyType = key->get_class();
 				HHuginn::value_t value( deserialize_impl( thread_, position_ ) );
 				data.insert( make_pair( key, value ) );
 			}
