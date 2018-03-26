@@ -13,6 +13,7 @@ script:
   - export PREFIX="${HOME}/usr" SYSCONFDIR="${HOME}/etc/conf" LOCALSTATEDIR="${HOME}/var"
   - make && make install
   - make -C _deploy/debian clean package bundle BUILD_ID="-0codestation${TIMESTAMP}"
+  - lftp -e 'put debian/tmp/yaal-bundle.tar;quit' -u "travis,${TRAVIS_FTP_PASS}" codestation.org
 services:
   - mysql
   - postgresql
@@ -36,6 +37,7 @@ addons:
       - asciidoc
       - graphviz
       - libboost-all-dev
+      - lftp
 sudo: false
 cache:
   ccache: true
