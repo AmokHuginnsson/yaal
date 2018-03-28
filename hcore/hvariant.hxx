@@ -102,7 +102,7 @@ public:
 		}
 		_type = v_._type;
 	}
-	HVariant( HVariant&& v_ )
+	HVariant( HVariant&& v_ ) noexcept
 		: _mem()
 		, _type( INVALID ) {
 		swap( v_ );
@@ -151,7 +151,7 @@ public:
 		}
 		return ( *this );
 	}
-	HVariant& operator = ( HVariant&& v_ ) {
+	HVariant& operator = ( HVariant&& v_ ) noexcept {
 		if ( &v_ != this ) {
 			swap( v_ );
 			destroy( v_._type, v_._mem.mem() );
@@ -159,7 +159,7 @@ public:
 		}
 		return ( *this );
 	}
-	void swap( HVariant& v_ ) {
+	void swap( HVariant& v_ ) noexcept {
 		if ( &v_ != this ) {
 			if ( _type == v_._type ) {
 				swap( _type, _mem.mem(), v_._mem.mem() );

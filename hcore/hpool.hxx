@@ -95,8 +95,8 @@ public:
 		, _free( -1 ) {
 		return;
 	}
-	HPool( HPool&& ) = default;
-	HPool& operator = ( HPool&& ) = default;
+	HPool( HPool&& ) noexcept = default;
+	HPool& operator = ( HPool&& ) noexcept = default;
 	~HPool( void ) {
 		M_ASSERT( ( _poolBlockCount == 0 ) || ( _poolBlockCount == 1 ) );
 		if ( _poolBlockCount == 1 ) {

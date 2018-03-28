@@ -124,7 +124,7 @@ public:
 		return;
 	}
 	HResource( HResource const& ) = delete;
-	HResource( HResource&& src_ )
+	HResource( HResource&& src_ ) noexcept
 		: _holder() {
 		pass( yaal::move( src_ ) );
 		return;
@@ -145,7 +145,7 @@ public:
 		return;
 	}
 	HResource& operator = ( HResource const& ) = delete;
-	HResource& operator = ( HResource&& src_ ) {
+	HResource& operator = ( HResource&& src_ ) noexcept {
 		if ( &src_ != this ) {
 			pass( yaal::move( src_ ) );
 		}

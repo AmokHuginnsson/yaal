@@ -37,24 +37,13 @@ public:
 		: _value( pod_ ) {
 		return;
 	}
-	HTaggedPOD( HTaggedPOD const& tp_ )
-		: _value( tp_._value ) {
-		return;
-	}
-	~HTaggedPOD( void ) {
-		return;
-	}
-	HTaggedPOD& operator = ( HTaggedPOD const& tp_ ) {
-		if ( &tp_ != this ) {
-			_value = tp_._value;
-		}
-		return ( *this );
-	}
+	HTaggedPOD( HTaggedPOD const& ) = default;
+	HTaggedPOD( HTaggedPOD&& ) noexcept = default;
+	HTaggedPOD& operator = ( HTaggedPOD const& ) = default;
+	HTaggedPOD& operator = ( HTaggedPOD&& ) noexcept = default;
 	void swap( HTaggedPOD& tp_ ) {
-		if ( &tp_ != this ) {
-			using yaal::swap;
-			swap( _value, tp_._value );
-		}
+		using yaal::swap;
+		swap( _value, tp_._value );
 		return;
 	}
 	pod_t const& raw( void ) const {

@@ -141,7 +141,7 @@ public:
 	 *
 	 * \param str - construct new string based on \e str.
 	 */
-	HString( HString&& str );
+	HString( HString&& str ) noexcept;
 	/*! \brief Size based constructor.
 	 *
 	 * initialize immediately with size
@@ -1009,7 +1009,7 @@ public:
 	HUTF8String( const_iterator, const_iterator );
 	HUTF8String( HString::const_iterator, HString::const_iterator );
 	HUTF8String( HUTF8String const& );
-	HUTF8String( HUTF8String&& );
+	HUTF8String( HUTF8String&& ) noexcept;
 	HUTF8String& operator = ( HString const& );
 	HUTF8String& operator = ( HUTF8String const& );
 	HUTF8String& operator = ( HUTF8String&& );
@@ -1061,7 +1061,7 @@ private:
 public:
 	HIterator( void );
 	HIterator( HIterator const& );
-	HIterator( HIterator&& );
+	HIterator( HIterator&& ) noexcept;
 	~HIterator( void );
 	HIterator& operator = ( HIterator const& );
 	HIterator& operator = ( HIterator&& );

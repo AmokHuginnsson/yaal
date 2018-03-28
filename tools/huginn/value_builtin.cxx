@@ -231,7 +231,7 @@ void fallback_arithmetic( HThread* thread_, HHuginn::identifier_id_t methodIdent
 	HHuginn::HObject* o( nullptr );
 	HHuginn::value_t v;
 	HHuginn::type_id_t t( v1_->type_id() );
-	if ( thread_ && ( o = dynamic_cast<HHuginn::HObject*>( v1_.raw() ) ) ) {
+	if ( ( o = dynamic_cast<HHuginn::HObject*>( v1_.raw() ) ) ) {
 		v = o->call_method( thread_, v1_, methodIdentifier_, HArguments( thread_, v2_ ), position_ );
 		if ( v->type_id() != t ) {
 			throw HHuginn::HHuginnRuntimeException(
@@ -269,7 +269,7 @@ HHuginn::value_t fallback_unary_arithmetic( HThread* thread_, HHuginn::identifie
 	HHuginn::value_t v;
 	HHuginn::type_id_t t( v_->type_id() );
 	HHuginn::value_t& obj( const_cast<HHuginn::value_t&>( v_ ) );
-	if ( thread_ && ( o = dynamic_cast<HHuginn::HObject*>( obj.raw() ) ) ) {
+	if ( ( o = dynamic_cast<HHuginn::HObject*>( obj.raw() ) ) ) {
 		v = o->call_method( thread_, obj, methodIdentifier_, HArguments( thread_ ), position_ );
 		if ( ( operation_ == OPERATION::CLOSED ) && ( v->type_id() != t ) ) {
 			throw HHuginn::HHuginnRuntimeException(
@@ -589,7 +589,7 @@ namespace {
 bool fallback_compare( HThread* thread_, HHuginn::identifier_id_t methodIdentifier_, char const* oper_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	HHuginn::HObject const* o( nullptr );
 	HHuginn::value_t v;
-	if ( thread_ && ( o = dynamic_cast<HHuginn::HObject const*>( v1_.raw() ) ) ) {
+	if ( ( o = dynamic_cast<HHuginn::HObject const*>( v1_.raw() ) ) ) {
 		v = o->call_method( thread_, v1_, methodIdentifier_, HArguments( thread_, v2_ ), position_ );
 		if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
 			throw HHuginn::HHuginnRuntimeException(

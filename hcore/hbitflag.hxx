@@ -30,6 +30,9 @@ public:
 	HBitFlag( HBitFlag const& bf_ )
 		: _flag( bf_._flag ) {
 	}
+	HBitFlag( HBitFlag&& ) noexcept = default;
+	HBitFlag& operator = ( HBitFlag const& ) = default;
+	HBitFlag& operator = ( HBitFlag&& ) noexcept = default;
 #define YAAL_DEFINE_OPER( OP ) \
 	HBitFlag& operator OP ( HBitFlag const& bf_ ) { \
 		_flag OP bf_._flag; \

@@ -126,6 +126,10 @@ class reference {
 	basic_t* _ref;
 public:
 	explicit reference( basic_t& obj ) : _ref( &obj ) {}
+	reference( reference const& ) = default;
+	reference( reference&& ) noexcept = default;
+	reference& operator = ( reference const& ) = default;
+	reference& operator = ( reference&& ) noexcept = default;
 	operator basic_t& ( void ) const
 		{ return ( *_ref ); }
 	basic_t& operator->( void )

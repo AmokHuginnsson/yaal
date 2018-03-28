@@ -1066,7 +1066,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( void ) {
 		return ( (base_type::_call)() );
@@ -1090,7 +1090,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( void ) {
 		return ( (base_type::_call)( _a0 ) );
@@ -1115,7 +1115,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( void ) {
 		return ( (base_type::_call)( _a0, _a1 ) );
@@ -1143,7 +1143,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( void ) {
 		return ( (base_type::_call)( _a0, _a1, _a2 ) );
@@ -1172,7 +1172,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( void ) {
 		return ( (base_type::_call)( _a0, _a1, _a2, _a3 ) );
@@ -1204,7 +1204,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( void ) {
 		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4 ) );
@@ -1237,7 +1237,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( void ) {
 		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5 ) );
@@ -1273,7 +1273,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( void ) {
 		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ) );
@@ -1310,7 +1310,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( void ) {
 		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ) );
@@ -1349,7 +1349,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( void ) {
 		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ) );
@@ -1389,7 +1389,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( void ) {
 		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ) );
@@ -1414,7 +1414,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)( free_standing_call_args::resolve_arg_get( _a0, a0 ) ) );
@@ -1440,7 +1440,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
@@ -1470,7 +1470,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
@@ -1503,7 +1503,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
@@ -1541,7 +1541,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
@@ -1582,7 +1582,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
@@ -1628,7 +1628,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
@@ -1677,7 +1677,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
@@ -1730,7 +1730,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
@@ -1786,7 +1786,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
@@ -1846,7 +1846,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
@@ -1892,7 +1892,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
@@ -1923,7 +1923,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
@@ -1957,7 +1957,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
@@ -1996,7 +1996,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
@@ -2038,7 +2038,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
@@ -2085,7 +2085,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
@@ -2135,7 +2135,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
@@ -2189,7 +2189,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
@@ -2246,7 +2246,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
@@ -2307,7 +2307,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
@@ -2357,7 +2357,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
@@ -2392,7 +2392,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
@@ -2432,7 +2432,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
@@ -2475,7 +2475,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
@@ -2523,7 +2523,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
@@ -2574,7 +2574,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
@@ -2629,7 +2629,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
@@ -2687,7 +2687,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
@@ -2749,7 +2749,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
@@ -2801,7 +2801,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
@@ -2842,7 +2842,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
@@ -2886,7 +2886,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
@@ -2935,7 +2935,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
@@ -2987,7 +2987,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
@@ -3043,7 +3043,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
@@ -3102,7 +3102,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
@@ -3165,7 +3165,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
@@ -3221,7 +3221,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
 		return ( (base_type::_call)(
@@ -3266,7 +3266,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
 		return ( (base_type::_call)(
@@ -3316,7 +3316,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
 		return ( (base_type::_call)(
@@ -3369,7 +3369,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
 		return ( (base_type::_call)(
@@ -3426,7 +3426,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
 		return ( (base_type::_call)(
@@ -3486,7 +3486,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
 		return ( (base_type::_call)(
@@ -3550,7 +3550,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
 		return ( (base_type::_call)(
@@ -3608,7 +3608,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
 		return ( (base_type::_call)(
@@ -3659,7 +3659,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
 		return ( (base_type::_call)(
@@ -3713,7 +3713,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
 		return ( (base_type::_call)(
@@ -3771,7 +3771,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
 		return ( (base_type::_call)(
@@ -3832,7 +3832,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
 		return ( (base_type::_call)(
@@ -3897,7 +3897,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
 		return ( (base_type::_call)(
@@ -3959,7 +3959,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) {
 		return ( (base_type::_call)(
@@ -4014,7 +4014,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) {
 		return ( (base_type::_call)(
@@ -4073,7 +4073,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) {
 		return ( (base_type::_call)(
@@ -4135,7 +4135,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) {
 		return ( (base_type::_call)(
@@ -4201,7 +4201,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) {
 		return ( (base_type::_call)(
@@ -4265,7 +4265,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) {
 		return ( (base_type::_call)(
@@ -4325,7 +4325,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) {
 		return ( (base_type::_call)(
@@ -4388,7 +4388,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) {
 		return ( (base_type::_call)(
@@ -4455,7 +4455,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) {
 		return ( (base_type::_call)(
@@ -4522,7 +4522,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) {
 		return ( (base_type::_call)(
@@ -4586,7 +4586,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) {
 		return ( (base_type::_call)(
@@ -4654,7 +4654,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) {
 		return ( (base_type::_call)(
@@ -4723,7 +4723,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9 ) {
 		return ( (base_type::_call)(
@@ -4792,7 +4792,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9 ) {
 		return ( (base_type::_call)(
@@ -4864,7 +4864,7 @@ public:
 		return;
 	}
 	HCall( HCall const& ) = default;
-	HCall( HCall&& ) = default;
+	HCall( HCall&& ) noexcept = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9, fa10_t a10 ) {
 		return ( (base_type::_call)(

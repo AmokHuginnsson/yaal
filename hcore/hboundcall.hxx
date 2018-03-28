@@ -111,10 +111,14 @@ public:
 		: _call( make_pointer<function_t>( foreignCall_ ) ) {
 		return;
 	}
-	HBoundCall( function_t&& foreignCall_ )
+	HBoundCall( function_t&& foreignCall_ ) noexcept
 		: _call( make_pointer<function_t>( yaal::move( foreignCall_ ) ) ) {
 		return;
 	}
+	HBoundCall( HBoundCall const& ) = default;
+	HBoundCall& operator = ( HBoundCall const& ) = default;
+	HBoundCall( HBoundCall&& ) noexcept = default;
+	HBoundCall& operator = ( HBoundCall&& ) noexcept = default;
 	template<typename... arg_t>
 	result_type operator()( arg_t&&... arg_ ) const {
 		int const t( _call.type() );

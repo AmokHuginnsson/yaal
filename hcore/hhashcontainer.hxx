@@ -62,7 +62,7 @@ private:
 			, _value( value_ ) {
 			return;
 		}
-		HAtom( value_type&& value_ )
+		HAtom( value_type&& value_ ) noexcept
 			: _next( nullptr )
 			, _value( yaal::move( value_ ) ) {
 			return;
@@ -117,6 +117,7 @@ public:
 			, _index( it_._index )
 			, _atom( it_._atom ) {
 		}
+		HIterator( HIterator&& ) noexcept = default;
 		HIterator& operator = ( HIterator const& it_ ) {
 			if ( &it_ != this ) {
 				_owner = it_._owner;
@@ -125,6 +126,7 @@ public:
 			}
 			return ( *this );
 		}
+		HIterator& operator = ( HIterator&& ) noexcept = default;
 		HIterator& operator ++ ( void ) {
 			M_ASSERT( _owner );
 			int long oldIndex( _index );

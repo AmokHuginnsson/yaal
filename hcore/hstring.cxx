@@ -891,7 +891,7 @@ HString::HString( HString const& string_ )
 	M_EPILOG
 }
 
-HString::HString( HString&& string_ )
+HString::HString( HString&& string_ ) noexcept
 	: _len() {
 	::memcpy( _mem, string_._mem, INPLACE_BUFFER_SIZE );
 	::memset( string_._mem, 0, INPLACE_BUFFER_SIZE );
@@ -2293,7 +2293,7 @@ HUTF8String::HUTF8String( HUTF8String const& str_ )
 	return;
 }
 
-HUTF8String::HUTF8String( HUTF8String&& str_ )
+HUTF8String::HUTF8String( HUTF8String&& str_ ) noexcept
 	: _characterCount( yaal::move( str_._characterCount ) )
 	, _offset( yaal::move( str_._offset ) )
 	, _byteCount( yaal::move( str_._byteCount ) )
@@ -2571,7 +2571,7 @@ HUTF8String::HIterator::HIterator( HIterator const& other_ )
 	return;
 }
 
-HUTF8String::HIterator::HIterator( HIterator&& other_ )
+HUTF8String::HIterator::HIterator( HIterator&& other_ ) noexcept
 	: _ptr( yaal::move( other_._ptr ) )
 	, _characterIndex( yaal::move( other_._characterIndex ) )
 	, _byteIndex( yaal::move( other_._byteIndex ) ) {

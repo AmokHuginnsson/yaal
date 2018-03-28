@@ -126,7 +126,7 @@ public:
 		return ( ( first < pair_.first )
 				|| ( ! ( pair_.first < first ) && ( second < pair_.second ) ) );
 	}
-	void swap( HPair& pair_ ) {
+	void swap( HPair& pair_ ) noexcept {
 		if ( &pair_ != this ) {
 			using yaal::swap;
 			swap( first, pair_.first );
