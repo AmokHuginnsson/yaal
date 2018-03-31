@@ -97,6 +97,7 @@ char const* ITERATOR         = "iterator";
 char const* IS_VALID         = "is_valid";
 char const* NEXT             = "next";
 char const* VALUE            = "value";
+char const* CALL             = "call";
 char const* HASH             = "hash";
 char const* EQUALS           = "equals";
 char const* LESS             = "less";
@@ -123,33 +124,34 @@ HHuginn::identifier_id_t const ITERATOR_IDENTIFIER( 26 );
 HHuginn::identifier_id_t const IS_VALID_IDENTIFIER( 27 );
 HHuginn::identifier_id_t const NEXT_IDENTIFIER( 28 );
 HHuginn::identifier_id_t const VALUE_IDENTIFIER( 29 );
-HHuginn::identifier_id_t const HASH_IDENTIFIER( 30 );
-HHuginn::identifier_id_t const EQUALS_IDENTIFIER( 31 );
-HHuginn::identifier_id_t const LESS_IDENTIFIER( 32 );
-HHuginn::identifier_id_t const GREATER_IDENTIFIER( 33 );
-HHuginn::identifier_id_t const LESS_OR_EQUAL_IDENTIFIER( 34 );
-HHuginn::identifier_id_t const GREATER_OR_EQUAL_IDENTIFIER( 35 );
-HHuginn::identifier_id_t const ADD_IDENTIFIER( 36 );
-HHuginn::identifier_id_t const SUBTRACT_IDENTIFIER( 37 );
-HHuginn::identifier_id_t const MULTIPLY_IDENTIFIER( 38 );
-HHuginn::identifier_id_t const DIVIDE_IDENTIFIER( 39 );
-HHuginn::identifier_id_t const MODULO_IDENTIFIER( 40 );
-HHuginn::identifier_id_t const POWER_IDENTIFIER( 41 );
-HHuginn::identifier_id_t const MODULUS_IDENTIFIER( 42 );
-HHuginn::identifier_id_t const NEGATE_IDENTIFIER( 43 );
-HHuginn::identifier_id_t const TO_STRING_IDENTIFIER( 44 );
-HHuginn::identifier_id_t const TO_INTEGER_IDENTIFIER( 45 );
-HHuginn::identifier_id_t const TO_REAL_IDENTIFIER( 46 );
-HHuginn::identifier_id_t const TO_NUMBER_IDENTIFIER( 47 );
-HHuginn::identifier_id_t const TO_CHARACTER_IDENTIFIER( 48 );
-HHuginn::identifier_id_t const TO_BOOLEAN_IDENTIFIER( 49 );
+HHuginn::identifier_id_t const CALL_IDENTIFIER( 30 );
+HHuginn::identifier_id_t const HASH_IDENTIFIER( 31 );
+HHuginn::identifier_id_t const EQUALS_IDENTIFIER( 32 );
+HHuginn::identifier_id_t const LESS_IDENTIFIER( 33 );
+HHuginn::identifier_id_t const GREATER_IDENTIFIER( 34 );
+HHuginn::identifier_id_t const LESS_OR_EQUAL_IDENTIFIER( 35 );
+HHuginn::identifier_id_t const GREATER_OR_EQUAL_IDENTIFIER( 36 );
+HHuginn::identifier_id_t const ADD_IDENTIFIER( 37 );
+HHuginn::identifier_id_t const SUBTRACT_IDENTIFIER( 38 );
+HHuginn::identifier_id_t const MULTIPLY_IDENTIFIER( 39 );
+HHuginn::identifier_id_t const DIVIDE_IDENTIFIER( 40 );
+HHuginn::identifier_id_t const MODULO_IDENTIFIER( 41 );
+HHuginn::identifier_id_t const POWER_IDENTIFIER( 42 );
+HHuginn::identifier_id_t const MODULUS_IDENTIFIER( 43 );
+HHuginn::identifier_id_t const NEGATE_IDENTIFIER( 44 );
+HHuginn::identifier_id_t const TO_STRING_IDENTIFIER( 45 );
+HHuginn::identifier_id_t const TO_INTEGER_IDENTIFIER( 46 );
+HHuginn::identifier_id_t const TO_REAL_IDENTIFIER( 47 );
+HHuginn::identifier_id_t const TO_NUMBER_IDENTIFIER( 48 );
+HHuginn::identifier_id_t const TO_CHARACTER_IDENTIFIER( 49 );
+HHuginn::identifier_id_t const TO_BOOLEAN_IDENTIFIER( 50 );
 
 }
 
 namespace STANDARD_FUNCTIONS {
 
 char const* MAIN = "main";
-HHuginn::identifier_id_t const MAIN_IDENTIFIER( 50 );
+HHuginn::identifier_id_t const MAIN_IDENTIFIER( 51 );
 
 }
 

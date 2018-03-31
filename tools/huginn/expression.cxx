@@ -724,7 +724,22 @@ void HExpression::function_call( OExecutionStep const& executionStep_, HFrame* f
 		HHuginn::HClass::HUnboundMethod* m( static_cast<HHuginn::HClass::HUnboundMethod*>( f.raw() ) );
 		values.push( m->call( thread, args, p ) );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "Reference `"_ys.append( c->name() ).append( "' is not a callable." ), file_id(), executionStep_._position );
+		HHuginn::HObject* o( nullptr );
+		if ( ( o = dynamic_cast<HHuginn::HObject*>( f.raw() ) ) ) {
+			values.push( o->call_method( thread, f, INTERFACE::CALL_IDENTIFIER, args, executionStep_._position ) );
+		} else {
+			int idx( c->field_index( INTERFACE::CALL_IDENTIFIER ) );
+			if ( idx >= 0 ) {
+				HHuginn::HClass::HMethod const& m( *static_cast<HHuginn::HClass::HMethod const*>( c->field( idx ).raw() ) );
+				values.push( m.function()( thread, &f, args, executionStep_._position ) );
+			} else {
+				throw HHuginn::HHuginnRuntimeException(
+					"Reference `"_ys.append( c->name() ).append( "' is not a callable." ),
+					file_id(),
+					executionStep_._position
+				);
+			}
+		}
 	}
 	return;
 	M_EPILOG
