@@ -325,8 +325,11 @@ HHuginn::value_t HStream::read_blob( HThread* thread_, HHuginn::HInteger::value_
 	}
 	HChunk c;
 	int long toRead( safe_int::cast<int long>( toRead_ ) );
-	_buffer.realloc( toRead );
-	int long nRead( _stream->read( _buffer.raw(), toRead ) );
+	int long nRead( 0 );
+	if ( toRead > 0 ) {
+		_buffer.realloc( toRead );
+		nRead = _stream->read( _buffer.raw(), toRead );
+	}
 	if ( nRead > 0 ) {
 		c.realloc( nRead, HChunk::STRATEGY::EXACT );
 		memcpy( c.raw(), _buffer.raw(), static_cast<size_t>( nRead ) );
@@ -347,8 +350,11 @@ HHuginn::value_t HStream::read_string( HThread* thread_, HHuginn::HInteger::valu
 	}
 	HString s;
 	int long toRead( safe_int::cast<int long>( toRead_ ) );
-	_buffer.realloc( toRead );
-	int long nRead( _stream->read( _buffer.raw(), toRead ) );
+	int long nRead( 0 );
+	if ( toRead > 0 ) {
+		_buffer.realloc( toRead );
+		nRead = _stream->read( _buffer.raw(), toRead );
+	}
 	if ( nRead > 0 ) {
 		try {
 			s.assign( _buffer.get<char>(), nRead );
