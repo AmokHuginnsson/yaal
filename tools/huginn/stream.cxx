@@ -689,9 +689,11 @@ yaal::hcore::HString const& HStream::read_line_raw( HThread* thread_, int positi
 
 HHuginn::value_t HStream::read_line_impl( HThread* thread_, int position_ ) {
 	M_PROLOG
-	return ( thread_->object_factory().create_string( read_line_raw( thread_, position_ ) ) );
+	HString const& line( read_line_raw( thread_, position_ ) );
+	return ( ! line.is_empty() ? thread_->object_factory().create_string( line ) : thread_->runtime().none_value() );
 	M_EPILOG
 }
+
 int long	HStream::read_len( HThread* thread_, int position_ ) {
 	int long len( 0 );
 	int long toRead = static_cast<int>( sizeof ( len ) );
@@ -829,6 +831,7 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 					raise( thread_, "Malformed Huginn data stream.", position_, exception_class() );
 					break;
 				}
+				keyType = key->get_class();
 				data.insert( key );
 			}
 		} break;
