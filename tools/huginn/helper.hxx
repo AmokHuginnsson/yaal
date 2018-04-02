@@ -163,6 +163,767 @@ HValueUnboxingIterator<data_t, iterator_t> value_unboxing_iterator( iterator_t i
 	return ( HValueUnboxingIterator<data_t, iterator_t>( it_ ) );
 }
 
+typedef yaal::hcore::HArray<yaal::hcore::HUTF8String> utf8_converters_t;
+
+template<int const ARG_COUNT, bool const RETURN_VOID, typename F>
+struct function_wrapper;
+
+template<typename T>
+struct huginn_type_from_integer {
+	static HHuginn::TYPE const value = HHuginn::TYPE::INTEGER;
+	static T get( utf8_converters_t&, huginn::HThread* thread_, HHuginn::value_t const& value_, int position_ ) {
+		int val( 0 );
+		try {
+			val = safe_int::cast<T>( get_integer( value_ ) );
+		} catch ( yaal::hcore::HOutOfRangeException const& e ) {
+			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+		}
+		return ( val );
+	}
+	static HHuginn::value_t make( HRuntime& runtime_, T value_ ) {
+		return ( runtime_.object_factory()->create_integer( value_ ) );
+	}
+};
+
+template<typename T>
+struct huginn_type_from_character {
+	static HHuginn::TYPE const value = HHuginn::TYPE::CHARACTER;
+	static T get( utf8_converters_t&, huginn::HThread* thread_, HHuginn::value_t const& value_, int position_ ) {
+		int val( 0 );
+		try {
+			val = safe_int::cast<T>( get_character( value_ ).get() );
+		} catch ( yaal::hcore::HOutOfRangeException const& e ) {
+			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+		}
+		return ( val );
+	}
+	static HHuginn::value_t make( HRuntime& runtime_, T value_ ) {
+		return ( runtime_.object_factory()->create_character( code_point_t( value_ ) ) );
+	}
+};
+
+template<typename T>
+struct huginn_type_from_real {
+	static HHuginn::TYPE const value = HHuginn::TYPE::REAL;
+	static T get( utf8_converters_t&, huginn::HThread*, HHuginn::value_t const& value_, int ) {
+		return ( static_cast<T>( get_real( value_ ) ) );
+	}
+	static HHuginn::value_t make( HRuntime& runtime_, T value_ ) {
+		return ( runtime_.object_factory()->create_real( value_ ) );
+	}
+};
+
+template<typename T>
+struct huginn_type_from_pod;
+
+template<>
+struct huginn_type_from_pod<bool> {
+	static HHuginn::TYPE const value = HHuginn::TYPE::BOOLEAN;
+	static bool get( utf8_converters_t&, huginn::HThread*, HHuginn::value_t const& value_, int ) {
+		return ( get_boolean( value_ ) );
+	}
+	static HHuginn::value_t make( HRuntime& runtime_, bool value_ ) {
+		return ( value_ ? runtime_.true_value() : runtime_.false_value() );
+	}
+};
+
+/*
+ * Work-around for bug in GCC 4.8.4,
+ * Superfluous warning about non-virtual destructor in base class.
+ * In our case non of the classes in question have any fields
+ * so the warning makes no sense.
+ */
+#if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008005
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Weffc++"
+#endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008005 */
+
+template<>
+struct huginn_type_from_pod<int long long> : public huginn_type_from_integer<int long long> {
+};
+template<>
+struct huginn_type_from_pod<int long long unsigned> : public huginn_type_from_integer<int long long unsigned> {
+};
+
+template<>
+struct huginn_type_from_pod<int long> : public huginn_type_from_integer<int long> {
+};
+
+template<>
+struct huginn_type_from_pod<int long unsigned> : public huginn_type_from_integer<int long unsigned> {
+};
+
+template<>
+struct huginn_type_from_pod<int> : public huginn_type_from_integer<int> {
+};
+
+template<>
+struct huginn_type_from_pod<int unsigned> : public huginn_type_from_integer<int unsigned> {
+};
+
+template<>
+struct huginn_type_from_pod<int short> : public huginn_type_from_integer<int short> {
+};
+
+template<>
+struct huginn_type_from_pod<int short unsigned> : public huginn_type_from_integer<int short unsigned> {
+};
+
+template<>
+struct huginn_type_from_pod<char> : public huginn_type_from_character<char> {
+};
+
+template<>
+struct huginn_type_from_pod<char unsigned> : public huginn_type_from_character<char unsigned> {
+};
+
+template<>
+struct huginn_type_from_pod<char signed> : public huginn_type_from_character<char signed> {
+};
+
+template<>
+struct huginn_type_from_pod<double long> : public huginn_type_from_real<double long> {
+};
+
+template<>
+struct huginn_type_from_pod<double> : public huginn_type_from_real<double> {
+};
+
+template<>
+struct huginn_type_from_pod<float> : public huginn_type_from_real<float> {
+};
+
+#if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008005
+# pragma GCC diagnostic pop
+#endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008005 */
+
+template<>
+struct huginn_type_from_pod<code_point_t> {
+	static HHuginn::TYPE const value = HHuginn::TYPE::CHARACTER;
+	static code_point_t get( utf8_converters_t&, huginn::HThread*, HHuginn::value_t const& value_, int ) {
+		return ( get_character( value_ ) );
+	}
+	static HHuginn::value_t make( HRuntime& runtime_, code_point_t value_ ) {
+		return ( runtime_.object_factory()->create_character( value_ ) );
+	}
+};
+
+template<>
+struct huginn_type_from_pod<yaal::hcore::HNumber> {
+	static HHuginn::TYPE const value = HHuginn::TYPE::NUMBER;
+	static yaal::hcore::HNumber const& get( utf8_converters_t&, huginn::HThread*, HHuginn::value_t const& value_, int ) {
+		return ( get_number( value_ ) );
+	}
+	static HHuginn::value_t make( HRuntime& runtime_, yaal::hcore::HNumber const& value_ ) {
+		return ( runtime_.object_factory()->create_number( value_ ) );
+	}
+};
+
+template<>
+struct huginn_type_from_pod<yaal::hcore::HString> {
+	static HHuginn::TYPE const value = HHuginn::TYPE::STRING;
+	static yaal::hcore::HString const& get( utf8_converters_t&, huginn::HThread*, HHuginn::value_t const& value_, int ) {
+		return ( get_string( value_ ) );
+	}
+	static HHuginn::value_t make( HRuntime& runtime_, yaal::hcore::HString const& value_ ) {
+		return ( runtime_.object_factory()->create_string( value_ ) );
+	}
+};
+
+template<>
+struct huginn_type_from_pod<char const*> {
+	static HHuginn::TYPE const value = HHuginn::TYPE::STRING;
+	static char const* get( utf8_converters_t& utf8_, huginn::HThread*, HHuginn::value_t const& value_, int ) {
+		yaal::hcore::HString const& s( get_string( value_ ) );
+		utf8_.emplace_back( s );
+		return ( utf8_.back().c_str() );
+	}
+	static HHuginn::value_t make( HRuntime& runtime_, char const* value_ ) {
+		return ( value_ ? runtime_.object_factory()->create_string( value_ ) : runtime_.none_value() );
+	}
+};
+
+template<typename T, int const N>
+struct decayed_argument_type {
+	typedef typename trait::decay<typename trait::argument_type<T, N>::type>::type type;
+};
+
+template<typename T>
+struct decayed_return_type {
+	typedef typename trait::decay<typename trait::return_type<T>::type>::type type;
+};
+
+template<typename F>
+struct function_wrapper<0, false, F> {
+static HHuginn::value_t impl( F fun_, char const* name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 0, 0, thread_, position_ );
+	return (
+		huginn_type_from_pod<typename decayed_return_type<F>::type>::make(
+			thread_->runtime(),
+			fun_()
+		)
+	);
+	M_EPILOG
+}
+};
+
+template<typename F>
+struct function_wrapper<0, true, F> {
+static HHuginn::value_t impl( F fun_, char const* name_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 0, 0, thread_, position_ );
+	fun_();
+	return ( object_ ? *object_ : thread_->runtime().none_value() );
+	M_EPILOG
+}
+};
+
+template<typename F>
+struct function_wrapper<1, false, F> {
+static HHuginn::value_t impl( F fun_, char const* name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 1, 1, thread_, position_ );
+	verify_arg_type( name_, values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::UNARY, thread_, position_ );
+	utf8_converters_t utf8;
+	return (
+		huginn_type_from_pod<typename decayed_return_type<F>::type>::make(
+			thread_->runtime(),
+			fun_(
+				huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::get( utf8, thread_, values_[0], position_ )
+			)
+		)
+	);
+	M_EPILOG
+}
+};
+
+template<typename F>
+struct function_wrapper<1, true, F> {
+static HHuginn::value_t impl( F fun_, char const* name_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 1, 1, thread_, position_ );
+	verify_arg_type( name_, values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::UNARY, thread_, position_ );
+	utf8_converters_t utf8;
+	fun_(
+		huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::get( utf8, thread_, values_[0], position_ )
+	);
+	return ( object_ ? *object_ : thread_->runtime().none_value() );
+	M_EPILOG
+}
+};
+
+template<typename F>
+struct function_wrapper<2, false, F> {
+static HHuginn::value_t impl( F fun_, char const* name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 2, 2, thread_, position_ );
+	verify_arg_type( name_, values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 1, huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	utf8_converters_t utf8;
+	return (
+		huginn_type_from_pod<typename decayed_return_type<F>::type>::make(
+			thread_->runtime(),
+			fun_(
+				huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::get( utf8, thread_, values_[0], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::get( utf8, thread_, values_[1], position_ )
+			)
+		)
+	);
+	M_EPILOG
+}
+};
+
+template<typename F>
+struct function_wrapper<2, true, F> {
+static HHuginn::value_t impl( F fun_, char const* name_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 2, 2, thread_, position_ );
+	verify_arg_type( name_, values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 1, huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	utf8_converters_t utf8;
+	fun_(
+		huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::get( utf8, thread_, values_[0], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::get( utf8, thread_, values_[1], position_ )
+	);
+	return ( object_ ? *object_ : thread_->runtime().none_value() );
+	M_EPILOG
+}
+};
+
+template<typename F>
+struct function_wrapper<3, false, F> {
+static HHuginn::value_t impl( F fun_, char const* name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 3, 3, thread_, position_ );
+	verify_arg_type( name_, values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 1, huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 2, huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	utf8_converters_t utf8;
+	return (
+		huginn_type_from_pod<typename decayed_return_type<F>::type>::make(
+			thread_->runtime(),
+			fun_(
+				huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::get( utf8, thread_, values_[0], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::get( utf8, thread_, values_[1], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::get( utf8, thread_, values_[2], position_ )
+			)
+		)
+	);
+	M_EPILOG
+}
+};
+
+template<typename F>
+struct function_wrapper<3, true, F> {
+static HHuginn::value_t impl( F fun_, char const* name_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 3, 3, thread_, position_ );
+	verify_arg_type( name_, values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 1, huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 2, huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	utf8_converters_t utf8;
+	fun_(
+		huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::get( utf8, thread_, values_[0], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::get( utf8, thread_, values_[1], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::get( utf8, thread_, values_[2], position_ )
+	);
+	return ( object_ ? *object_ : thread_->runtime().none_value() );
+	M_EPILOG
+}
+};
+
+template<typename F>
+struct function_wrapper<4, false, F> {
+static HHuginn::value_t impl( F fun_, char const* name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 4, 4, thread_, position_ );
+	verify_arg_type( name_, values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 1, huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 2, huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 3, huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	utf8_converters_t utf8;
+	return (
+		huginn_type_from_pod<typename decayed_return_type<F>::type>::make(
+			thread_->runtime(),
+			fun_(
+				huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::get( utf8, thread_, values_[0], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::get( utf8, thread_, values_[1], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::get( utf8, thread_, values_[2], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::get( utf8, thread_, values_[3], position_ )
+			)
+		)
+	);
+	M_EPILOG
+}
+};
+
+template<typename F>
+struct function_wrapper<4, true, F> {
+static HHuginn::value_t impl( F fun_, char const* name_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 4, 4, thread_, position_ );
+	verify_arg_type( name_, values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 1, huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 2, huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 3, huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	utf8_converters_t utf8;
+	fun_(
+		huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::get( utf8, thread_, values_[0], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::get( utf8, thread_, values_[1], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::get( utf8, thread_, values_[2], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::get( utf8, thread_, values_[3], position_ )
+	);
+	return ( object_ ? *object_ : thread_->runtime().none_value() );
+	M_EPILOG
+}
+};
+
+template<typename F>
+struct function_wrapper<5, false, F> {
+static HHuginn::value_t impl( F fun_, char const* name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 5, 5, thread_, position_ );
+	verify_arg_type( name_, values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 1, huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 2, huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 3, huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 4, huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	utf8_converters_t utf8;
+	return (
+		huginn_type_from_pod<typename decayed_return_type<F>::type>::make(
+			thread_->runtime(),
+			fun_(
+				huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::get( utf8, thread_, values_[0], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::get( utf8, thread_, values_[1], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::get( utf8, thread_, values_[2], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::get( utf8, thread_, values_[3], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::get( utf8, thread_, values_[4], position_ )
+			)
+		)
+	);
+	M_EPILOG
+}
+};
+
+template<typename F>
+struct function_wrapper<5, true, F> {
+static HHuginn::value_t impl( F fun_, char const* name_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 5, 5, thread_, position_ );
+	verify_arg_type( name_, values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 1, huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 2, huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 3, huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 4, huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	utf8_converters_t utf8;
+	fun_(
+		huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::get( utf8, thread_, values_[0], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::get( utf8, thread_, values_[1], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::get( utf8, thread_, values_[2], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::get( utf8, thread_, values_[3], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::get( utf8, thread_, values_[4], position_ )
+	);
+	return ( object_ ? *object_ : thread_->runtime().none_value() );
+	M_EPILOG
+}
+};
+
+template<typename F>
+struct function_wrapper<6, false, F> {
+static HHuginn::value_t impl( F fun_, char const* name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 6, 6, thread_, position_ );
+	verify_arg_type( name_, values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 1, huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 2, huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 3, huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 4, huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 5, huginn_type_from_pod<typename decayed_argument_type<F, 5>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	utf8_converters_t utf8;
+	return (
+		huginn_type_from_pod<typename decayed_return_type<F>::type>::make(
+			thread_->runtime(),
+			fun_(
+				huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::get( utf8, thread_, values_[0], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::get( utf8, thread_, values_[1], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::get( utf8, thread_, values_[2], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::get( utf8, thread_, values_[3], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::get( utf8, thread_, values_[4], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 5>::type>::get( utf8, thread_, values_[5], position_ )
+			)
+		)
+	);
+	M_EPILOG
+}
+};
+
+template<typename F>
+struct function_wrapper<6, true, F> {
+static HHuginn::value_t impl( F fun_, char const* name_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 6, 6, thread_, position_ );
+	verify_arg_type( name_, values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 1, huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 2, huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 3, huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 4, huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 5, huginn_type_from_pod<typename decayed_argument_type<F, 5>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	utf8_converters_t utf8;
+	fun_(
+		huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::get( utf8, thread_, values_[0], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::get( utf8, thread_, values_[1], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::get( utf8, thread_, values_[2], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::get( utf8, thread_, values_[3], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::get( utf8, thread_, values_[4], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 5>::type>::get( utf8, thread_, values_[5], position_ )
+	);
+	return ( object_ ? *object_ : thread_->runtime().none_value() );
+	M_EPILOG
+}
+};
+
+template<typename F>
+struct function_wrapper<7, false, F> {
+static HHuginn::value_t impl( F fun_, char const* name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 7, 7, thread_, position_ );
+	verify_arg_type( name_, values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 1, huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 2, huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 3, huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 4, huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 5, huginn_type_from_pod<typename decayed_argument_type<F, 5>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 6, huginn_type_from_pod<typename decayed_argument_type<F, 6>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	utf8_converters_t utf8;
+	return (
+		huginn_type_from_pod<typename decayed_return_type<F>::type>::make(
+			thread_->runtime(),
+			fun_(
+				huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::get( utf8, thread_, values_[0], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::get( utf8, thread_, values_[1], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::get( utf8, thread_, values_[2], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::get( utf8, thread_, values_[3], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::get( utf8, thread_, values_[4], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 5>::type>::get( utf8, thread_, values_[5], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 6>::type>::get( utf8, thread_, values_[6], position_ )
+			)
+		)
+	);
+	M_EPILOG
+}
+};
+
+template<typename F>
+struct function_wrapper<7, true, F> {
+static HHuginn::value_t impl( F fun_, char const* name_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 7, 7, thread_, position_ );
+	verify_arg_type( name_, values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 1, huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 2, huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 3, huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 4, huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 5, huginn_type_from_pod<typename decayed_argument_type<F, 5>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 6, huginn_type_from_pod<typename decayed_argument_type<F, 6>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	utf8_converters_t utf8;
+	fun_(
+		huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::get( utf8, thread_, values_[0], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::get( utf8, thread_, values_[1], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::get( utf8, thread_, values_[2], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::get( utf8, thread_, values_[3], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::get( utf8, thread_, values_[4], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 5>::type>::get( utf8, thread_, values_[5], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 6>::type>::get( utf8, thread_, values_[6], position_ )
+	);
+	return ( object_ ? *object_ : thread_->runtime().none_value() );
+	M_EPILOG
+}
+};
+
+template<typename F>
+struct function_wrapper<8, false, F> {
+static HHuginn::value_t impl( F fun_, char const* name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 8, 8, thread_, position_ );
+	verify_arg_type( name_, values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 1, huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 2, huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 3, huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 4, huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 5, huginn_type_from_pod<typename decayed_argument_type<F, 5>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 6, huginn_type_from_pod<typename decayed_argument_type<F, 6>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 7, huginn_type_from_pod<typename decayed_argument_type<F, 7>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	utf8_converters_t utf8;
+	return (
+		huginn_type_from_pod<typename decayed_return_type<F>::type>::make(
+			thread_->runtime(),
+			fun_(
+				huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::get( utf8, thread_, values_[0], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::get( utf8, thread_, values_[1], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::get( utf8, thread_, values_[2], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::get( utf8, thread_, values_[3], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::get( utf8, thread_, values_[4], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 5>::type>::get( utf8, thread_, values_[5], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 6>::type>::get( utf8, thread_, values_[6], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 7>::type>::get( utf8, thread_, values_[7], position_ )
+			)
+		)
+	);
+	M_EPILOG
+}
+};
+
+template<typename F>
+struct function_wrapper<8, true, F> {
+static HHuginn::value_t impl( F fun_, char const* name_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 8, 8, thread_, position_ );
+	verify_arg_type( name_, values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 1, huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 2, huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 3, huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 4, huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 5, huginn_type_from_pod<typename decayed_argument_type<F, 5>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 6, huginn_type_from_pod<typename decayed_argument_type<F, 6>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 7, huginn_type_from_pod<typename decayed_argument_type<F, 7>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	utf8_converters_t utf8;
+	fun_(
+		huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::get( utf8, thread_, values_[0], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::get( utf8, thread_, values_[1], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::get( utf8, thread_, values_[2], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::get( utf8, thread_, values_[3], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::get( utf8, thread_, values_[4], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 5>::type>::get( utf8, thread_, values_[5], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 6>::type>::get( utf8, thread_, values_[6], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 7>::type>::get( utf8, thread_, values_[7], position_ )
+	);
+	return ( object_ ? *object_ : thread_->runtime().none_value() );
+	M_EPILOG
+}
+};
+
+template<typename F>
+struct function_wrapper<9, false, F> {
+static HHuginn::value_t impl( F fun_, char const* name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 9, 9, thread_, position_ );
+	verify_arg_type( name_, values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 1, huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 2, huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 3, huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 4, huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 5, huginn_type_from_pod<typename decayed_argument_type<F, 5>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 6, huginn_type_from_pod<typename decayed_argument_type<F, 6>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 7, huginn_type_from_pod<typename decayed_argument_type<F, 7>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 8, huginn_type_from_pod<typename decayed_argument_type<F, 8>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	utf8_converters_t utf8;
+	return (
+		huginn_type_from_pod<typename decayed_return_type<F>::type>::make(
+			thread_->runtime(),
+			fun_(
+				huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::get( utf8, thread_, values_[0], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::get( utf8, thread_, values_[1], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::get( utf8, thread_, values_[2], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::get( utf8, thread_, values_[3], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::get( utf8, thread_, values_[4], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 5>::type>::get( utf8, thread_, values_[5], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 6>::type>::get( utf8, thread_, values_[6], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 7>::type>::get( utf8, thread_, values_[7], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 8>::type>::get( utf8, thread_, values_[8], position_ )
+			)
+		)
+	);
+	M_EPILOG
+}
+};
+
+template<typename F>
+struct function_wrapper<9, true, F> {
+static HHuginn::value_t impl( F fun_, char const* name_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 9, 9, thread_, position_ );
+	verify_arg_type( name_, values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 1, huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 2, huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 3, huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 4, huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 5, huginn_type_from_pod<typename decayed_argument_type<F, 5>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 6, huginn_type_from_pod<typename decayed_argument_type<F, 6>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 7, huginn_type_from_pod<typename decayed_argument_type<F, 7>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 8, huginn_type_from_pod<typename decayed_argument_type<F, 8>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	utf8_converters_t utf8;
+	fun_(
+		huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::get( utf8, thread_, values_[0], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::get( utf8, thread_, values_[1], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::get( utf8, thread_, values_[2], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::get( utf8, thread_, values_[3], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::get( utf8, thread_, values_[4], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 5>::type>::get( utf8, thread_, values_[5], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 6>::type>::get( utf8, thread_, values_[6], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 7>::type>::get( utf8, thread_, values_[7], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 8>::type>::get( utf8, thread_, values_[8], position_ )
+	);
+	return ( object_ ? *object_ : thread_->runtime().none_value() );
+	M_EPILOG
+}
+};
+
+template<typename F>
+struct function_wrapper<10, false, F> {
+static HHuginn::value_t impl( F fun_, char const* name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 10, 10, thread_, position_ );
+	verify_arg_type( name_, values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 1, huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 2, huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 3, huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 4, huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 5, huginn_type_from_pod<typename decayed_argument_type<F, 5>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 6, huginn_type_from_pod<typename decayed_argument_type<F, 6>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 7, huginn_type_from_pod<typename decayed_argument_type<F, 7>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 8, huginn_type_from_pod<typename decayed_argument_type<F, 8>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 9, huginn_type_from_pod<typename decayed_argument_type<F, 9>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	utf8_converters_t utf8;
+	return (
+		huginn_type_from_pod<typename decayed_return_type<F>::type>::make(
+			thread_->runtime(),
+			fun_(
+				huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::get( utf8, thread_, values_[0], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::get( utf8, thread_, values_[1], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::get( utf8, thread_, values_[2], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::get( utf8, thread_, values_[3], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::get( utf8, thread_, values_[4], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 5>::type>::get( utf8, thread_, values_[5], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 6>::type>::get( utf8, thread_, values_[6], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 7>::type>::get( utf8, thread_, values_[7], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 8>::type>::get( utf8, thread_, values_[8], position_ ),
+				huginn_type_from_pod<typename decayed_argument_type<F, 9>::type>::get( utf8, thread_, values_[9], position_ )
+			)
+		)
+	);
+	M_EPILOG
+}
+};
+
+template<typename F>
+struct function_wrapper<10, true, F> {
+static HHuginn::value_t impl( F fun_, char const* name_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_, values_, 10, 10, thread_, position_ );
+	verify_arg_type( name_, values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 1, huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 2, huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 3, huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 4, huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 5, huginn_type_from_pod<typename decayed_argument_type<F, 5>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 6, huginn_type_from_pod<typename decayed_argument_type<F, 6>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 7, huginn_type_from_pod<typename decayed_argument_type<F, 7>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 8, huginn_type_from_pod<typename decayed_argument_type<F, 8>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_type( name_, values_, 9, huginn_type_from_pod<typename decayed_argument_type<F, 9>::type>::value, ARITY::MULTIPLE, thread_, position_ );
+	utf8_converters_t utf8;
+	fun_(
+		huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::get( utf8, thread_, values_[0], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::get( utf8, thread_, values_[1], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::get( utf8, thread_, values_[2], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::get( utf8, thread_, values_[3], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::get( utf8, thread_, values_[4], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 5>::type>::get( utf8, thread_, values_[5], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 6>::type>::get( utf8, thread_, values_[6], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 7>::type>::get( utf8, thread_, values_[7], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 8>::type>::get( utf8, thread_, values_[8], position_ ),
+		huginn_type_from_pod<typename decayed_argument_type<F, 9>::type>::get( utf8, thread_, values_[9], position_ )
+	);
+	return ( object_ ? *object_ : thread_->runtime().none_value() );
+	M_EPILOG
+}
+};
+
+template<typename F>
+HHuginn::function_t function( char const* name_,  F fun_ ) {
+	typedef typename trait::return_type<F>::type return_type;
+	bool const returns_void( trait::same_type<return_type, void>::value || trait::same_type<return_type, trait::no_type>::value );
+	return (
+		yaal::hcore::call(
+			&function_wrapper<trait::argument_count<F>::value, returns_void, F>::impl,
+			fun_,
+			name_,
+			yaal::hcore::_1,
+			yaal::hcore::_2,
+			yaal::hcore::_3,
+			yaal::hcore::_4
+		)
+	);
+}
+
+template<typename F>
+void register_function( HHuginn& h_, yaal::hcore::HString const& name_, F fun_, yaal::hcore::HString const& doc_ ) {
+	M_PROLOG
+	yaal::hcore::HUTF8String utf8( name_ );
+	h_.register_function( name_, huginn::function( utf8.c_str(), fun_ ), doc_ );
+	M_EPILOG
+}
+
 }
 
 }
