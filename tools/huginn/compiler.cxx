@@ -336,7 +336,7 @@ void OCompiler::resolve_symbols( void ) {
 						if ( ! es._expression ) {
 							throw HHuginn::HHuginnRuntimeException(
 								"Method argument name `"_ys
-									.append( _runtime->identifier_name( es._identifier) )
+									.append( _runtime->identifier_name( es._identifier ) )
 									.append( "' conflicts with class `" )
 									.append( _runtime->identifier_name( aClass->identifier_id() ) )
 									.append( "' field name." ),

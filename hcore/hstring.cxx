@@ -100,7 +100,7 @@ inline void copy_n_cast_backward( iterator_t src_, int long size_, U* dst_ ) {
 	int long matchStart( 0 ); /* index in string_ */ \
 	int long consideredCharacterIndex( 0 ); /* index in needle_ */ \
 	while ( ( matchStart + consideredCharacterIndex ) < haystackLength_ ) { \
-		if ( transform( needle_[ direction_needle consideredCharacterIndex ] ) == transform( haystack_[ direction_haystack ( matchStart + consideredCharacterIndex ) ] ) ) { \
+		if ( transform( needle_[ direction_needle consideredCharacterIndex ] ) == transform( haystack_[ direction_haystack( matchStart + consideredCharacterIndex ) ] ) ) { \
 			++ consideredCharacterIndex; \
 			if ( consideredCharacterIndex == needleLength_ ) { \
 				return ( direction_result matchStart ); \
@@ -660,7 +660,7 @@ OUTF8StringStats get_string_stats( char const* str_, int long size_ ) {
 	int charBytesLeft( 0 );
 	int rank( 1 );
 	char const* p( str_ );
-	while( ( byteCount < size_ ) && *p ) {
+	while ( ( byteCount < size_ ) && *p ) {
 		if ( charBytesLeft == 0 ) {
 			if ( ! ( *p & unicode::ENC_1_BYTES_MARK_MASK ) ) {
 				++ characterCount;
@@ -703,10 +703,10 @@ void encode( code_point_t codePoint_, char*& dest_ ) {
 	dest_ += r;
 	char* p( dest_ - 1 );
 	u8_t head[] = { 0, 0, unicode::ENC_2_BYTES_MARK_VALUE, unicode::ENC_3_BYTES_MARK_VALUE, unicode::ENC_4_BYTES_MARK_VALUE };
-	switch( r ) {
-		case ( 4 ): { *p = static_cast<char>( unicode::TAIL_BYTES_MARK_VALUE | ( unicode::TAIL_BYTES_VALUE_MASK & codePoint_.get() ) ); --p; codePoint_ >>= 6; } /* fall through */
-		case ( 3 ): { *p = static_cast<char>( unicode::TAIL_BYTES_MARK_VALUE | ( unicode::TAIL_BYTES_VALUE_MASK & codePoint_.get() ) ); --p; codePoint_ >>= 6; } /* fall through */
-		case ( 2 ): { *p = static_cast<char>( unicode::TAIL_BYTES_MARK_VALUE | ( unicode::TAIL_BYTES_VALUE_MASK & codePoint_.get() ) ); --p; codePoint_ >>= 6; } /* fall through */
+	switch ( r ) {
+		case ( 4 ): { *p = static_cast<char>( unicode::TAIL_BYTES_MARK_VALUE | ( unicode::TAIL_BYTES_VALUE_MASK & codePoint_.get() ) ); -- p; codePoint_ >>= 6; } /* fall through */
+		case ( 3 ): { *p = static_cast<char>( unicode::TAIL_BYTES_MARK_VALUE | ( unicode::TAIL_BYTES_VALUE_MASK & codePoint_.get() ) ); -- p; codePoint_ >>= 6; } /* fall through */
+		case ( 2 ): { *p = static_cast<char>( unicode::TAIL_BYTES_MARK_VALUE | ( unicode::TAIL_BYTES_VALUE_MASK & codePoint_.get() ) ); -- p; codePoint_ >>= 6; } /* fall through */
 		case ( 1 ): { *p = static_cast<char>( head[r] | codePoint_.get() ); } /* no break - fall through */
 	}
 }
@@ -828,14 +828,14 @@ static yaal::u8_t const RANK_BIT_MASK =  meta::obinary<001100000>::value;
 #undef GET_ALLOC_BYTES
 #undef SET_ALLOC_BYTES
 #if TARGET_CPU_BITS >= 64
-#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY : this->_len[ 2 ] & static_cast<int long>( static_cast<int long unsigned>( -1 ) >> 3 ) )
-#define SET_ALLOC_BYTES( capacity ) \
+# define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY : this->_len[ 2 ] & static_cast<int long>( static_cast<int long unsigned>( -1 ) >> 3 ) )
+# define SET_ALLOC_BYTES( capacity ) \
 	do { \
 		this->_len[ 2 ] = ( capacity ); this->_mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( this->_mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK ); \
 	} while ( 0 )
 #else /* #if TARGET_CPU_BITS >= 64 */
-#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY : ( this->_len[ 2 ] & static_cast<int long>( static_cast<int long unsigned>( -1 ) >> 3 ) ) << 3 )
-#define SET_ALLOC_BYTES( capacity ) \
+# define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY : ( this->_len[ 2 ] & static_cast<int long>( static_cast<int long unsigned>( -1 ) >> 3 ) ) << 3 )
+# define SET_ALLOC_BYTES( capacity ) \
 	do { \
 		this->_len[ 2 ] = ( ( capacity ) >> 3 ); this->_mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( this->_mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK ); \
 	} while ( 0 )
@@ -863,7 +863,7 @@ char const* err_msg( int no_ ) {
 }
 
 #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002
-#pragma GCC diagnostic push
+# pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Weffc++"
 #endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002 */
 
@@ -1253,7 +1253,7 @@ HString::HString( void const* ptrVoid_ )
 }
 
 #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002
-#pragma GCC diagnostic pop
+# pragma GCC diagnostic pop
 #endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002 */
 
 HString& HString::operator = ( HString const& string_ ) {
@@ -2848,7 +2848,6 @@ void copy_all_to_ascii( HString::const_iterator it_, HString::const_iterator end
 	return;
 	M_EPILOG
 }
-
 
 int stoi( HString const& str_, int* endIdx_, int base_ ) {
 	M_PROLOG

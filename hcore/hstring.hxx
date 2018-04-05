@@ -46,7 +46,8 @@ class HCharacterClass {
 	int _size;
 public:
 	HCharacterClass( char const* data_, int size_ )
-		: _data( data_ ), _size( size_ ) {}
+		: _data( data_ )
+		, _size( size_ ) {}
 	/*! \brief Get characters in Character Class.
 	 *
 	 * \return Data in Character Class.
@@ -911,7 +912,8 @@ public:
 private:
 	friend class HString;
 	HConstIterator( HString const* owner_, int long index_ )
-		: _owner( owner_ ), _index( index_ ) {
+		: _owner( owner_ )
+		, _index( index_ ) {
 		return;
 	}
 };

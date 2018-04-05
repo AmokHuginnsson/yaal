@@ -35,10 +35,12 @@ class HPointer;
 template<typename T, typename U>
 struct has_initialize_observer {
 private:
-	template<typename X, typename Y> static auto test( int ) -> decltype( static_cast<X*>( nullptr )->initialize_observer( Y() ), static_cast<trait::true_type*>( nullptr ) );
-	template<typename, typename> static trait::false_type* test( ... );
+	template<typename X, typename Y>
+	static auto test( int )->decltype ( static_cast<X*>( nullptr )->initialize_observer( Y() ), static_cast<trait::true_type*>( nullptr ) );
+	template<typename, typename>
+	static trait::false_type* test( ... );
 public:
-	static bool const value = trait::same_type<decltype( test<T, U>( 0 ) ), trait::true_type*>::value;
+	static bool const value = trait::same_type<decltype ( test<T, U>( 0 ) ), trait::true_type*>::value;
 };
 
 template<typename tType>
@@ -156,13 +158,13 @@ struct pointer_helper {
 
 	template<typename tType>
 	static tType* do_make_pointer_pre( HPointer<tType>& ptr_ ) {
-		ptr_._shared = new ( memory::yaal ) HSharedDeleter<tType, HSpaceHolderDeleter<tType> >( HSpaceHolderDeleter<tType>(), static_cast<tType*>( nullptr ) );
-		return ( static_cast<HSharedDeleter<tType, HSpaceHolderDeleter<tType> >*>( ptr_._shared )->DELETER.mem() );
+		ptr_._shared = new ( memory::yaal ) HSharedDeleter<tType, HSpaceHolderDeleter<tType>>( HSpaceHolderDeleter<tType>(), static_cast<tType*>( nullptr ) );
+		return ( static_cast<HSharedDeleter<tType, HSpaceHolderDeleter<tType>>*>( ptr_._shared )->DELETER.mem() );
 	}
 
 	template<typename tType>
 	static void do_make_pointer_post( HPointer<tType>& ptr_ ) {
-		ptr_._object = static_cast<HSharedDeleter<tType, HSpaceHolderDeleter<tType> >*>( ptr_._shared )->DELETER.mem();
+		ptr_._object = static_cast<HSharedDeleter<tType, HSpaceHolderDeleter<tType>>*>( ptr_._shared )->DELETER.mem();
 		ptr_._shared->_object = ptr_._object;
 		HPointer<tType>::initialize_from_this( ptr_._object, ptr_, 0 );
 		return;
@@ -254,8 +256,8 @@ protected:
 		HPointerBase const& alien = reinterpret_cast<HPointerBase const&>( from );
 		if ( ( &alien != this ) && ( _shared != alien._shared ) ) {
 			M_ASSERT( ( ! ( _shared && alien._shared ) )
-					|| ( ( _shared && alien._shared )
-						&& ( _object != static_cast<alien_pointer>( static_cast<void*>( alien._object ) ) ) ) );
+				|| ( ( _shared && alien._shared )
+					&& ( _object != static_cast<alien_pointer>( static_cast<void*>( alien._object ) ) ) ) );
 			if ( _shared ) {
 				release<type>();
 			}
@@ -350,7 +352,7 @@ public:
 		return ( *this );
 	}
 	HPointerObserver& operator = ( HPointerObserver&& other_ ) noexcept {
-		if ( & other_ != this ) {
+		if ( &other_ != this ) {
 			swap( other_ );
 			other_.reset();
 		}
@@ -525,7 +527,7 @@ public:
 
 	template<typename alien_t>
 	bool operator == ( HPointer<alien_t> const& pointer_ ) const {
-		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
+		HPointer const* alien = reinterpret_cast<HPointer const*>( &pointer_ );
 		return ( this->_object == static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) );
 	}
 	template<typename alien_t>
@@ -534,7 +536,7 @@ public:
 	}
 	template<typename alien_t>
 	bool operator != ( HPointer<alien_t> const& pointer_ ) const {
-		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
+		HPointer const* alien = reinterpret_cast<HPointer const*>( &pointer_ );
 		return ( this->_object != static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) );
 	}
 	template<typename alien_t>
@@ -544,7 +546,7 @@ public:
 
 	template<typename alien_t>
 	bool operator < ( HPointer<alien_t> const& pointer_ ) const {
-		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
+		HPointer const* alien = reinterpret_cast<HPointer const*>( &pointer_ );
 		return ( this->_object < static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) );
 	}
 	template<typename alien_t>
@@ -553,7 +555,7 @@ public:
 	}
 	template<typename alien_t>
 	bool operator > ( HPointer<alien_t> const& pointer_ ) const {
-		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
+		HPointer const* alien = reinterpret_cast<HPointer const*>( &pointer_ );
 		return ( this->_object > static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) );
 	}
 	template<typename alien_t>
@@ -563,7 +565,7 @@ public:
 
 	template<typename alien_t>
 	bool operator <= ( HPointer<alien_t> const& pointer_ ) const {
-		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
+		HPointer const* alien = reinterpret_cast<HPointer const*>( &pointer_ );
 		return ( this->_object <= static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) );
 	}
 	template<typename alien_t>
@@ -572,7 +574,7 @@ public:
 	}
 	template<typename alien_t>
 	bool operator >= ( HPointer<alien_t> const& pointer_ ) const {
-		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
+		HPointer const* alien = reinterpret_cast<HPointer const*>( &pointer_ );
 		return ( this->_object >= static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) );
 	}
 	template<typename alien_t>
@@ -581,12 +583,12 @@ public:
 	}
 
 	tType const* operator->( void ) const {
-    static_assert( !trait::is_array<tType>::value, "structure dereference operator is called for an array" );
+		static_assert( !trait::is_array<tType>::value, "structure dereference operator is called for an array" );
 		M_ASSERT( this->_shared && ( this->_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] > 0 ) );
 		return ( this->_object );
 	}
 	value_type* operator->( void ) {
-    static_assert( !trait::is_array<tType>::value, "structure dereference operator is called for an array" );
+		static_assert( !trait::is_array<tType>::value, "structure dereference operator is called for an array" );
 		M_ASSERT( this->_shared && ( this->_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] > 0 ) );
 		return ( this->_object );
 	}
@@ -683,7 +685,7 @@ class HSharedDeleterAllocatorImpl : protected HSharedDeleterAllocator<tType, del
 		: base_type( deleter_, allocator_, object_ ) {
 	}
 	virtual void destroy( void ) override {
-		typedef typename allocator_t:: template rebind<HSharedDeleterAllocatorImpl>::other allocator_type;
+		typedef typename allocator_t::template rebind<HSharedDeleterAllocatorImpl>::other allocator_type;
 		allocator_type( this->_allocator ).deallocate( this, 1 );
 	}
 	friend struct pointer_helper;
@@ -704,7 +706,7 @@ public:
 		: _selfObserver() {
 		return;
 	}
-	virtual ~HPointerFromThisInterface( void ){}
+	virtual ~HPointerFromThisInterface( void ) {}
 	ptr_t get_pointer( void ) {
 		return ( _selfObserver );
 	}

@@ -770,7 +770,7 @@ inline iterator_t rotate( iterator_t first_, iterator_t mid_, iterator_t last_ )
 template<typename iterator_t, typename out_it_t>
 inline out_it_t rotate_copy( iterator_t first_, iterator_t mid_, iterator_t last_, out_it_t out_ ) {
 	out_it_t it( copy( mid_, last_, out_ ) );
-  it = copy( first_, mid_, it );
+	it = copy( first_, mid_, it );
 	return ( it );
 }
 
@@ -1277,7 +1277,7 @@ inline bool next_permutation( iterator_t it, iterator_t end ) {
 			-- i;
 			-- count;
 			iterator_t ie = itLast;
-			while ( *i >= * ie ) {
+			while ( *i >= *ie ) {
 				-- count;
 				if ( ! count )
 					break;
@@ -1318,7 +1318,7 @@ inline bool prev_permutation( iterator_t it, iterator_t end ) {
 			-- i;
 			-- count;
 			iterator_t ie = itLast;
-			while ( *i <= * ie ) {
+			while ( *i <= *ie ) {
 				-- count;
 				if ( ! count )
 					break;
@@ -1567,7 +1567,7 @@ inline void make_heap( iterator_t first_, iterator_t last_ ) {
 template<typename iterator_t, typename compare_t>
 inline void push_heap( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 	int long pos( ( last_ - first_ ) - 1 ); /* zero based position of inserted element */
-	while ( ( pos > 0 ) && comp_( *( first_ + ( ( pos -1 ) / 2 ) ), *( first_ + pos ) ) ) {
+	while ( ( pos > 0 ) && comp_( *( first_ + ( ( pos - 1 ) / 2 ) ), *( first_ + pos ) ) ) {
 		swap( *( first_ + ( ( pos - 1 ) / 2 ) ), *( first_ + pos ) );
 		pos = ( pos - 1 ) / 2;
 	}

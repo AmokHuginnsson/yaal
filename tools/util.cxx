@@ -59,14 +59,14 @@ HString& usun_ogonki( HString& string_ ) {
 
 yaal::hcore::HString article( yaal::hcore::HString const& word_ ) {
 	int long pos( word_.find_one_of( character_class( CHARACTER_CLASS::LETTER ).data() ) );
-	return( pos != HString::npos ? ( character_class( CHARACTER_CLASS::VOWEL ).has( word_[pos] ) ? "an" : "a" ) : "" );
+	return ( pos != HString::npos ? ( character_class( CHARACTER_CLASS::VOWEL ).has( word_[pos] ) ? "an" : "a" ) : "" );
 }
 
 double long atof_ex( HString const& string_, bool parse_ ) {
 	M_PROLOG
 	double long value( 0 );
 	HString str = string_;
-	str.replace ( ",", "." ).replace ( " ", "" ).replace ( "\t", "" );
+	str.replace( ",", "." ).replace( " ", "" ).replace( "\t", "" );
 	if ( parse_ ) {
 		HExpression analyzer;
 		try {
@@ -539,7 +539,7 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 				lf.append( "]" );
 			}
 		}
-		if ( i > 0 ) /* subsequent options */ {
+		if ( i > 0 ) { /* subsequent options */
 			HProgramOptionsHandler::HOption const& p = opts[ i - 1 ];
 			if ( ! o.long_form().is_empty() && ! p.long_form().is_empty() && ( o.long_form() == p.long_form() ) ) {
 				lf.clear();
@@ -644,21 +644,21 @@ void dump_configuration( HOptionInfo const& info, HStreamInterface& out_ ) {
 		out_ << "# " << desc << "\n\n";
 	}
 	out_ <<
-"# comments begin with `#' char and continues until end of line\n"
-"# option names are case insensitive\n"
-"# in most cases option values are case insensitive also\n"
-"# syntax for settings is:\n"
-"# ^{option}{white}(['\"]){value1 value2 ... valuen}\\1{white}# comment$\n"
-"# value may be surrounded by apostrophes or quotation marks\n"
-"# one level of this surrounding is stripped\n"
-"# we currently distinguish between four kind of value types:\n"
-"# bool   - (true|yes|on|false|no|off)\n"
-"# char   - [a-z]\n"
-"# int    - [0-9]+\n"
-"# string - [^ ].*\n"
-"#\n"
-"# example:\n"
-"# log_path ${HOME}/var/log/program.log\n\n";
+		"# comments begin with `#' char and continues until end of line\n"
+		"# option names are case insensitive\n"
+		"# in most cases option values are case insensitive also\n"
+		"# syntax for settings is:\n"
+		"# ^{option}{white}(['\"]){value1 value2 ... valuen}\\1{white}# comment$\n"
+		"# value may be surrounded by apostrophes or quotation marks\n"
+		"# one level of this surrounding is stripped\n"
+		"# we currently distinguish between four kind of value types:\n"
+		"# bool   - (true|yes|on|false|no|off)\n"
+		"# char   - [a-z]\n"
+		"# int    - [0-9]+\n"
+		"# string - [^ ].*\n"
+		"#\n"
+		"# example:\n"
+		"# log_path ${HOME}/var/log/program.log\n\n";
 	HString description;
 	HProgramOptionsHandler::options_t const& opts = info.opt().get_options();
 	int const COUNT = static_cast<int>( opts.size() );
@@ -667,16 +667,18 @@ void dump_configuration( HOptionInfo const& info, HStreamInterface& out_ ) {
 		if ( o.long_form().is_empty() ) {
 			continue;
 		}
-		if ( i > 0 ) /* subsequent options */ {
+		if ( i > 0 ) { /* subsequent options */
 			HProgramOptionsHandler::HOption const& p = opts[ i - 1 ];
 			if ( !o.long_form().is_empty() && !p.long_form().is_empty()
 					&& ( o.long_form() == p.long_form() )
-					&& ( o.description() == description ) )
+					&& ( o.description() == description ) ) {
 				description = "";
+			}
 			if ( is_byte( o.short_form() ) && is_byte( p.short_form() )
 					&& ( o.short_form() == p.short_form() )
-					&& ( o.description() == description ) )
+					&& ( o.description() == description ) ) {
 				description = "";
+			}
 		}
 		out_ << "### " << o.long_form() << " ###\n# type: ";
 		switch ( o.recipient_type() ) {
