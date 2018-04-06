@@ -390,6 +390,13 @@ void OCompiler::resolve_symbols( void ) {
 					}
 				}
 				if ( es._operation == OExecutionStep::OPERATION::DEFINE ) {
+					if ( !! _runtime->get_class( es._identifier ) ) {
+						throw HHuginn::HHuginnRuntimeException(
+							"`"_ys.append( _runtime->identifier_name( es._identifier ) ).append( "' is a class name." ),
+							MAIN_FILE_ID,
+							es._position
+						);
+					}
 					bool make( ! sc );
 					if ( make ) {
 						sc = es._scope.raw();
