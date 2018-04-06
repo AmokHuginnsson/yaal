@@ -45,6 +45,22 @@ HHuginn::value_t HRandomizer::create_instance( HHuginn::HClass const* class_, hu
 	M_EPILOG
 }
 
+HHuginn::value_t HRandomizer::seed( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "Randomizer.seed";
+	verify_arg_count( name, values_, 0, 1, thread_, position_ );
+	HRandomizer* o( static_cast<HRandomizer*>( object_->raw() ) );
+	if ( ! values_.is_empty() ) {
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, ARITY::UNARY, thread_, position_ );
+		yaal::u64_t data( static_cast<yaal::u64_t>( get_integer( values_[0] ) ) );
+		o->_generator = hcore::HRandomizer( data, o->_generator.range() );
+	} else {
+		o->_generator = randomizer_helper::make_randomizer( o->_generator.range() );
+	}
+	return ( *object_ );
+	M_EPILOG
+}
+
 HHuginn::value_t HRandomizer::next( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Randomizer.next";
@@ -113,6 +129,7 @@ HHuginn::class_t HRandomizer::get_class( HRuntime* runtime_, HHuginn::HClass con
 	HHuginn::field_definitions_t fd{
 		{ "next",      runtime_->create_method( &HRandomizer::next ),      "([ *range* ]) - get next `integer` random number, possibly restricted to given range" },
 		{ "next_real", runtime_->create_method( &HRandomizer::next_real ), "([ *range* ]) - get next `real` random number, possibly restricted to given range" },
+		{ "seed",      runtime_->create_method( &HRandomizer::seed ),      "([ *data* ]) - initialize random generator internal state based on supplied *data*, or using system entropy if no data is given" },
 		{ "to_string", runtime_->create_method( &HRandomizer::to_string ), "get string representation of this `Randomizer`" }
 	};
 	c->redefine( nullptr, fd );
