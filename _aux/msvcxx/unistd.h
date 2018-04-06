@@ -30,6 +30,7 @@ char* basename( char* );
 #include "tools/hscheduledasynccaller.hxx"
 
 typedef int uid_t;
+typedef int gid_t;
 #ifndef MODE_T_DEFINED
 typedef int unsigned mode_t;
 #define MODE_T_DEFINED 1
@@ -57,6 +58,7 @@ static int const _XOPEN_NAME_MAX = 2048;
 #define gai_strerror msvcxx::windows_strerror
 
 uid_t getuid( void );
+gid_t getgid( void );
 int readlink( char const*, char*, size_t );
 int setenv( char const*, char const*, int );
 int unsetenv( char const* );

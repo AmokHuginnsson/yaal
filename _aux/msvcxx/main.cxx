@@ -231,7 +231,7 @@ struct dirent* readdir( DIR* dir_ ) {
 	return ( found ? &dir_->_payload : nullptr );
 }
 
-PSID get_base_sid( char* buffer_, int size_ ) {
+PSID get_base_sid( char* buffer_, int size_, TOKEN_INFORMATION_CLASS tic_ ) {
 	/* Open the access token associated with the calling process. */
 	HANDLE hToken( nullptr );
 	if ( ! ::OpenProcessToken( ::GetCurrentProcess(), TOKEN_QUERY, &hToken ) ) {
@@ -242,7 +242,7 @@ PSID get_base_sid( char* buffer_, int size_ ) {
 	::memset( buffer_, 0, size_ );
 	/* Retrieve the token information in a TOKEN_USER structure. */
 	DWORD dummy( 0 );
-	if ( ! ::GetTokenInformation( hToken, TokenUser, buffer_, size_, &dummy ) ) {
+	if ( ! ::GetTokenInformation( hToken, tic_, buffer_, size_, &dummy ) ) {
 		log_windows_error( "GetTokenInformation" );
 		return ( nullptr );
 	}
@@ -260,7 +260,17 @@ uid_t getuid( void ) {
 	static int const SID_SIZE( 128 );
 	static int const TOKEN_USER_SIZE( sizeof ( TOKEN_USER ) + SID_SIZE );
 	char tokenUserBuffer[ TOKEN_USER_SIZE ];
-	PSID sid( get_base_sid( tokenUserBuffer, TOKEN_USER_SIZE ) );
+	PSID sid( get_base_sid( tokenUserBuffer, TOKEN_USER_SIZE, TokenUser ) );
+	int uid( sid ? *::GetSidSubAuthority( sid, *::GetSidSubAuthorityCount( sid ) - 1 ) : -1 );
+	return ( uid );
+}
+
+
+uid_t getgid( void ) {
+	static int const SID_SIZE( 128 );
+	static int const TOKEN_USER_SIZE( sizeof ( TOKEN_USER ) + SID_SIZE );
+	char tokenUserBuffer[ TOKEN_USER_SIZE ];
+	PSID sid( get_base_sid( tokenUserBuffer, TOKEN_USER_SIZE, TokenPrimaryGroup ) );
 	int uid( sid ? *::GetSidSubAuthority( sid, *::GetSidSubAuthorityCount( sid ) - 1 ) : -1 );
 	return ( uid );
 }
@@ -304,7 +314,7 @@ bool get_system_account_name( int id_, char* buf_, int size_ ) {
 	static int const SID_SIZE( 128 );
 	static int const TOKEN_USER_SIZE( sizeof ( TOKEN_USER ) + SID_SIZE );
 	char tokenUserBuffer[ TOKEN_USER_SIZE ];
-	PSID sid( get_base_sid( tokenUserBuffer, TOKEN_USER_SIZE ) );
+	PSID sid( get_base_sid( tokenUserBuffer, TOKEN_USER_SIZE, TokenUser ) );
 	bool fail( true );
 	if ( sid ) {
 		LPTSTR sidStrBuffer( nullptr );

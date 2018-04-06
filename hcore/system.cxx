@@ -154,6 +154,10 @@ HString get_user_name( user_id_t uid_ ) {
 	M_EPILOG
 }
 
+user_id_t get_group_id( void ) {
+	return ( getgid() );
+}
+
 HString get_group_name( user_id_t gid_ ) {
 	M_PROLOG
 	group groupInfo;

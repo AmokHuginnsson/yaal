@@ -50,6 +50,24 @@ public:
 		return ( val ? rt.object_factory()->create_string( val ) : rt.none_value() );
 		M_EPILOG
 	}
+	static HHuginn::value_t getpid( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( "OperatingSystem.getpid", values_, 0, 0, thread_, position_ );
+		return ( thread_->object_factory().create_integer( system::getpid() ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t getuid( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( "OperatingSystem.getuid", values_, 0, 0, thread_, position_ );
+		return ( thread_->object_factory().create_integer( system::get_user_id() ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t getgid( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( "OperatingSystem.getgid", values_, 0, 0, thread_, position_ );
+		return ( thread_->object_factory().create_integer( system::get_group_id() ) );
+		M_EPILOG
+	}
 	static HHuginn::value_t exec( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		static int const MAX_ARG_COUNT( 65535 );
@@ -124,10 +142,13 @@ HHuginn::value_t HOperatingSystemCreator::do_new_instance( HRuntime* runtime_ ) 
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "env",    runtime_->create_method( &HOperatingSystem::env ),   "( *name* ) - get value of an environment variable named *name*" },
-		{ "exec",   runtime_->create_method( &HOperatingSystem::exec ),  "( *prog*, *args*... ) - replace current process space with running image of *prog* providing it with *args* arguments" },
-		{ "exit",   runtime_->create_method( &HOperatingSystem::exit ),  "( *status* ) - exit the interpreter with the *status*" },
-		{ "spawn",  runtime_->create_method( &HOperatingSystem::spawn ), "( *prog*, *args*... ) - start a subprocess *prog* providing it with *args* arguments" },
+		{ "env",    runtime_->create_method( &HOperatingSystem::env ),    "( *name* ) - get value of an environment variable named *name*" },
+		{ "getpid", runtime_->create_method( &HOperatingSystem::getpid ), "get Huginn's interpreter process id" },
+		{ "getuid", runtime_->create_method( &HOperatingSystem::getuid ), "get Huginn's interpreter process effective user id" },
+		{ "getgid", runtime_->create_method( &HOperatingSystem::getgid ), "get Huginn's interpreter process effective group id" },
+		{ "exec",   runtime_->create_method( &HOperatingSystem::exec ),   "( *prog*, *args*... ) - replace current process space with running image of *prog* providing it with *args* arguments" },
+		{ "exit",   runtime_->create_method( &HOperatingSystem::exit ),   "( *status* ) - exit the interpreter with the *status*" },
+		{ "spawn",  runtime_->create_method( &HOperatingSystem::spawn ),  "( *prog*, *args*... ) - start a subprocess *prog* providing it with *args* arguments" },
 		{ "stdin",  runtime_->create_method( &HOperatingSystem::stream, "OperatingSystem.stdin", &runtime_->huginn()->input_stream() ),   "get access to interpreter's standard input stream" },
 		{ "stdout", runtime_->create_method( &HOperatingSystem::stream, "OperatingSystem.stdout", &runtime_->huginn()->output_stream() ), "get access to interpreter's standard output stream" },
 		{ "stderr", runtime_->create_method( &HOperatingSystem::stream, "OperatingSystem.stderr", &runtime_->huginn()->error_stream() ),  "get access to interpreter's standard error stream" },

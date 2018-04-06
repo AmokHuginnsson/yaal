@@ -37,9 +37,9 @@ int kill( int, int );
  */
 int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, int long* timeOut_, bool restartable_ = true );
 
-/*! \brief Get current user system id.
+/*! \brief Get current process'es effecive user id.
  *
- * \return Current user system id.
+ * \return Current process'es effecive user id.
  */
 user_id_t get_user_id( void );
 
@@ -49,6 +49,12 @@ user_id_t get_user_id( void );
  * \return human readable user name.
  */
 yaal::hcore::HString get_user_name( user_id_t uid_ );
+
+/*! \brief Get current process'es effecive group id.
+ *
+ * \return Current process'es effecive group id.
+ */
+user_id_t get_group_id( void );
 
 /*! \brief Get human readable group name from system group id.
  *
