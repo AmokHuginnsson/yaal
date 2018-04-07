@@ -1215,9 +1215,13 @@ public:
 	typedef HHuginn::HValue base_type;
 	typedef int value_type;
 private:
+	HHuginn::identifier_id_t _identifier;
 	value_type _value;
 public:
-	HEnumeral( HHuginn::HClass const*, value_type );
+	HEnumeral( HHuginn::HClass const*, identifier_id_t, value_type );
+	HHuginn::identifier_id_t identifier( void ) const {
+		return ( _identifier );
+	}
 	value_type value( void ) const {
 		return ( _value );
 	}

@@ -61,7 +61,6 @@ public:
 		yaal::hcore::HString const& doc_,
 		HHuginn::VISIBILITY visibility_
 	);
-	yaal::hcore::HString const& enumeration_name( int id_ ) const;
 	static HHuginn::value_t to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ );
 	HHuginn::HClass const* enumeral_class( void ) const {
 		return ( _valueClass.raw() );

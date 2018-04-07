@@ -108,7 +108,7 @@ HEnumerationClass::HEnumerationClass(
 		}
 		fd.emplace_back(
 			d.name(),
-			of.create<HHuginn::HEnumeral>( _valueClass.raw(), id ),
+			of.create<HHuginn::HEnumeral>( _valueClass.raw(), runtime_->identifier_id( d.name() ), id ),
 			d.doc()
 		);
 		++ id;
@@ -117,17 +117,13 @@ HEnumerationClass::HEnumerationClass(
 	return;
 }
 
-yaal::hcore::HString const& HEnumerationClass::enumeration_name( int id_ ) const {
-	return ( runtime()->identifier_name( field_identifiers()[id_] ) );
-}
-
 HHuginn::value_t HEnumerationClass::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "to_string", values_, 0, 0, thread_, position_ );
 	HHuginn::HEnumeral* e( static_cast<HHuginn::HEnumeral*>( object_->raw() ) );
 	HEnumerationClass const* ec( static_cast<HEnumeralClass const*>( e->get_class() )->enumeration_class() );
 	HString s( ec->name() );
-	return ( thread_->object_factory().create_string( s.append( "." ).append( ec->enumeration_name( e->value() ) ) ) );
+	return ( thread_->object_factory().create_string( s.append( "." ).append( thread_->runtime().identifier_name( e->identifier() ) ) ) );
 	M_EPILOG
 }
 
@@ -174,8 +170,9 @@ HHuginn::class_t create_class(
 
 }
 
-HHuginn::HEnumeral::HEnumeral( HHuginn::HClass const* class_, value_type value_ )
+HHuginn::HEnumeral::HEnumeral( HHuginn::HClass const* class_, HHuginn::identifier_id_t identifier_, value_type value_ )
 	: HValue( class_ )
+	, _identifier( identifier_ )
 	, _value( value_ ) {
 	return;
 }
