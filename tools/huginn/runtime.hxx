@@ -129,6 +129,7 @@ public:
 	int max_call_stack_size( void ) const {
 		return ( _maxCallStackSize );
 	}
+	identifier_id_t try_identifier_id( yaal::hcore::HString const& ) const;
 	identifier_id_t identifier_id( yaal::hcore::HString const& );
 	yaal::hcore::HString const& identifier_name( identifier_id_t ) const;
 	value_t* get_function( identifier_id_t, bool = false );

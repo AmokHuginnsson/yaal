@@ -415,14 +415,19 @@ HHuginn::class_t HRuntime::create_class( class_constructor_t const& classConstru
 	M_EPILOG
 }
 
+HHuginn::identifier_id_t HRuntime::try_identifier_id( yaal::hcore::HString const& name_ ) const {
+	M_PROLOG
+	M_ASSERT( _identifierIds.get_size() == _identifierNames.get_size() );
+	identifier_ids_t::const_iterator it( _identifierIds.find( name_ ) );
+	return ( it != _identifierIds.end() ? it->second : INVALID_IDENTIFIER );
+	M_EPILOG
+}
+
 HHuginn::identifier_id_t HRuntime::identifier_id( yaal::hcore::HString const& name_ ) {
 	M_PROLOG
 	M_ASSERT( _identifierIds.get_size() == _identifierNames.get_size() );
-	identifier_id_t id;
-	identifier_ids_t::const_iterator it( _identifierIds.find( name_ ) );
-	if ( it != _identifierIds.end() ) {
-		id = it->second;
-	} else {
+	identifier_id_t id( try_identifier_id( name_ ) );
+	if ( id == INVALID_IDENTIFIER ) {
 		id = identifier_id_t( static_cast<identifier_id_t::value_type>( _identifierIds.get_size() ) );
 		_identifierIds.insert( make_pair( name_, id ) );
 		_identifierNames.emplace_back( name_ );
