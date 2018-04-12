@@ -25,9 +25,12 @@ namespace tools {
 namespace huginn {
 
 class HIntrospection : public HHuginn::HValue {
+private:
+	HHuginn::class_t _exceptionClass;
 public:
 	HIntrospection( HHuginn::HClass* class_ )
-		: HValue( class_ ) {
+		: HValue( class_ )
+		, _exceptionClass( class_exception( class_ ) ) {
 		return;
 	}
 	static HHuginn::value_t version( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -110,6 +113,41 @@ public:
 		return ( of.create_tuple( yaal::move( attrs ) ) );
 		M_EPILOG
 	}
+	static HHuginn::value_t import( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "Introspection.import", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
+		HRuntime& r( thread_->runtime() );
+		HString const& package( get_string( values_[0] ) );
+		HHuginn::identifier_id_t id( r.try_identifier_id( package ) );
+		bool classExists( !! r.get_class( id ) );
+		bool functionExists( !! r.get_function( id ) );
+		HHuginn::value_t* rtv( r.get_value( id ) );
+		bool enumerationExists( rtv && dynamic_cast<enumeration::HEnumerationClass const*>( (*rtv)->get_class() ) );
+		if ( is_restricted( package ) ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"`"_ys.append( package ).append( "' is restricted keyword." ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+		if ( classExists || functionExists || rtv ) {
+			throw HHuginn::HHuginnRuntimeException(
+				hcore::to_string(
+					enumerationExists ? "Enumeration" : ( classExists ? "Class" : ( functionExists ? "Function" : "Package alias" ) )
+				).append( " of the same name already exists." ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+		HHuginn::value_t v( r.none_value() );
+		try {
+			v = HPackageFactory::get_instance().create_package( &r, package, position_ );
+		} catch ( HException const& e ) {
+			thread_->raise( static_cast<HIntrospection*>( object_->raw() )->_exceptionClass.raw(), e.what(), position_ );
+		}
+		return ( v );
+		M_EPILOG
+	}
 };
 
 namespace package_factory {
@@ -132,7 +170,8 @@ HHuginn::value_t HTntrospectionCreator::do_new_instance( HRuntime* runtime_ ) {
 		{ "version",         runtime_->create_method( &HIntrospection::version ),         "return runtime version information." },
 		{ "symbol",          runtime_->create_method( &HIntrospection::symbol ),          "( *name* ) - get global symbol by *name*." },
 		{ "attribute",       runtime_->create_method( &HIntrospection::attribute ),       "( *object*, *name* ) - get *object*'s attribute (a field or method) by *name*." },
-		{ "list_attributes", runtime_->create_method( &HIntrospection::list_attributes ), "( *object* ) - list attributes of given *object*." }
+		{ "list_attributes", runtime_->create_method( &HIntrospection::list_attributes ), "( *object* ) - list attributes of given *object*." },
+		{ "import",          runtime_->create_method( &HIntrospection::import ),          "( *package* ) - import given *package*." }
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );

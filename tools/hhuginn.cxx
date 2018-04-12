@@ -418,10 +418,10 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 	M_EPILOG
 }
 
-void HHuginn::finalize_compilation( paths_t const& paths_, compiler_setup_t compilerSetup_ ) {
+void HHuginn::finalize_compilation( void ) {
 	M_PROLOG
 	for ( OCompiler::submitted_imports_t::value_type const& i : _compiler->_submittedImports ) {
-		_runtime->register_package( i._package, i._alias, paths_, compilerSetup_, i._position );
+		_runtime->register_package( i._package, i._alias, i._position );
 	}
 	for ( OCompiler::submitted_enums_t::value_type const& e : _compiler->_submittedEnums ) {
 		_runtime->register_value( e->get_class()->identifier_id(), e );
@@ -436,7 +436,7 @@ void HHuginn::finalize_compilation( paths_t const& paths_, compiler_setup_t comp
 		commit_class( id );
 	}
 	M_ASSERT( _compiler->_submittedClasses.is_empty() );
-	if ( compilerSetup_ & COMPILER::BE_STRICT ) {
+	if ( _runtime->compiler_setup() & COMPILER::BE_STRICT ) {
 		_compiler->detect_misuse();
 	}
 	_compiler->resolve_symbols();
@@ -493,11 +493,12 @@ bool HHuginn::compile( paths_t const& paths_, compiler_setup_t compilerSetup_, H
 	bool ok( false );
 	int mainStatementCount( _compiler->_mainCompiledStatementCount );
 	try {
-		_compiler->set_setup( compilerSetup_, introspector_ );
+		_compiler->set_setup( introspector_ );
+		_runtime->set_setup( paths_, compilerSetup_ );
 		_engine.execute( &( _compiler->_classNoter ) );
 		_compiler->_classNoter._passThrough = true;
 		_engine.execute();
-		finalize_compilation( paths_, compilerSetup_ );
+		finalize_compilation();
 		_state = STATE::COMPILED;
 		ok = true;
 	} catch ( HHuginnRuntimeException const& e ) {
@@ -519,6 +520,7 @@ bool HHuginn::compile( compiler_setup_t compilerSetup_, HIntrospectorInterface* 
 bool HHuginn::execute( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::COMPILED, "Program must be compiled before execution." );
+	HScopedValueReplacement<STATE> state(	_state, STATE::RUNNING );
 	bool ok( false );
 	try {
 		_runtime->execute();

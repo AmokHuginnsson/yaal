@@ -66,20 +66,20 @@ void HPackageFactory::register_package_creator( HString const& name_, HPackageCr
 	M_EPILOG
 }
 
-HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, HHuginn::paths_t const& paths_, HHuginn::compiler_setup_t compilerSetup_, yaal::hcore::HString const& name_, int position_ ) {
+HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, yaal::hcore::HString const& name_, int position_ ) {
 	M_PROLOG
 	HHuginn::value_t package;
 	creators_t::iterator it = _creators.find( name_ );
 	if ( it != _creators.end() ) {
 		package = it->second._instantiator->new_instance( runtime_ );
 	}
-	HHuginn::paths_t paths( paths_ );
+	HHuginn::paths_t paths( runtime_->module_paths() );
 	paths.insert( paths.end(), HHuginn::MODULE_PATHS.begin(), HHuginn::MODULE_PATHS.end() );
 	if ( ! package ) {
 		package = load_binary( runtime_, paths, name_, position_ );
 	}
 	if ( ! package ) {
-		package = load_module( runtime_, paths, compilerSetup_, name_, position_ );
+		package = load_module( runtime_, paths, name_, position_ );
 	}
 	if ( ! package ) {
 		throw HHuginn::HHuginnRuntimeException( "Package `"_ys.append( name_ ).append( "' does not exist." ), MAIN_FILE_ID, position_ );
@@ -134,7 +134,7 @@ HHuginn::value_t HPackageFactory::load_binary( HRuntime* runtime_, HHuginn::path
 	M_EPILOG
 }
 
-HHuginn::value_t HPackageFactory::load_module( HRuntime* runtime_, HHuginn::paths_t const& paths_, HHuginn::compiler_setup_t compilerSetup_, yaal::hcore::HString const& name_, int position_ ) {
+HHuginn::value_t HPackageFactory::load_module( HRuntime* runtime_, HHuginn::paths_t const& paths_, yaal::hcore::HString const& name_, int position_ ) {
 	M_PROLOG
 	HString path;
 	HString test;
@@ -151,13 +151,13 @@ HHuginn::value_t HPackageFactory::load_module( HRuntime* runtime_, HHuginn::path
 	}
 	return (
 		! path.is_empty()
-			? compile_module( runtime_, paths_, compilerSetup_, path, name_, position_ )
+			? compile_module( runtime_, paths_, path, name_, position_ )
 			: HHuginn::value_t()
 	);
 	M_EPILOG
 }
 
-HHuginn::value_t HPackageFactory::compile_module( HRuntime* runtime_, HHuginn::paths_t const& paths_, HHuginn::compiler_setup_t compilerSetup_, yaal::hcore::HString const& path_, yaal::hcore::HString const& name_, int position_ ) {
+HHuginn::value_t HPackageFactory::compile_module( HRuntime* runtime_, HHuginn::paths_t const& paths_, yaal::hcore::HString const& path_, yaal::hcore::HString const& name_, int position_ ) {
 	M_PROLOG
 	HFile src( path_, HFile::OPEN::READING );
 	HHuginn loader( runtime_ );
@@ -169,7 +169,7 @@ HHuginn::value_t HPackageFactory::compile_module( HRuntime* runtime_, HHuginn::p
 	HHuginn& h( *runtime_->huginn() );
 	int fileId( h._compiler->_fileId == MAIN_FILE_ID ? static_cast<int>( h._sources.get_size() - 1 ) : h._compiler->_fileId );
 	loader._compiler->_fileId = fileId;
-	if ( ! ( loader.parse() && loader.compile( paths_, compilerSetup_ ) ) ) {
+	if ( ! ( loader.parse() && loader.compile( paths_, runtime_->compiler_setup() ) ) ) {
 		throw HHuginn::HHuginnRuntimeException( loader.error_message(), fileId, position_ );
 	}
 	h._compiler->_fileId = loader._compiler->_fileId;

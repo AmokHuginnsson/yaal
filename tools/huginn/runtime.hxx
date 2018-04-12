@@ -103,6 +103,8 @@ private:
 	huginn::HThread::frame_t _incrementalFrame;
 	int _maxLocalVariableCount;
 	int _maxCallStackSize;
+	HHuginn::paths_t _modulePaths;
+	HHuginn::compiler_setup_t _compilerSetup;
 public:
 	HRuntime( HHuginn* );
 	huginn::HThread* current_thread( void );
@@ -166,7 +168,8 @@ public:
 	 */
 	void drop_function( identifier_id_t identifier_ );
 	void register_value( identifier_id_t, HHuginn::value_t const& );
-	void register_package( identifier_id_t, identifier_id_t, HHuginn::paths_t const&, HHuginn::compiler_setup_t, int );
+	void set_setup( HHuginn::paths_t const&, HHuginn::compiler_setup_t );
+	void register_package( identifier_id_t, identifier_id_t, int );
 	class_t create_class(
 		identifier_id_t,
 		HHuginn::HClass const*,
@@ -247,6 +250,8 @@ public:
 	}
 	void set_incremental_frame( huginn::HThread::frame_t const& );
 	huginn::HThread::frame_t const& incremental_frame( void ) const;
+	HHuginn::paths_t const& module_paths( void ) const;
+	HHuginn::compiler_setup_t compiler_setup( void ) const;
 	call_stack_t get_call_stack( HThread* );
 	using HIntrospecteeInterface::get_call_stack;
 	variable_views_t get_locals( HThread*, int );

@@ -174,7 +174,9 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 	, _result()
 	, _incrementalFrame()
 	, _maxLocalVariableCount( 0 )
-	, _maxCallStackSize( _huginnMaxCallStack_ ) {
+	, _maxCallStackSize( _huginnMaxCallStack_ )
+	, _modulePaths()
+	, _compilerSetup( HHuginn::COMPILER::DEFAULT ) {
 }
 
 void HRuntime::reset( void ) {
@@ -213,6 +215,8 @@ void HRuntime::copy_text( HRuntime& source_ ) {
 	_objectFactory = source_._objectFactory;
 	_maxLocalVariableCount = source_._maxLocalVariableCount;
 	_maxCallStackSize = source_._maxCallStackSize;
+	_modulePaths = source_._modulePaths;
+	_compilerSetup = source_._compilerSetup;
 	for ( dependencies_t::value_type& c : _dependencies ) {
 		_huginn->register_class( c );
 		c->update_runtime( this );
@@ -345,8 +349,6 @@ void HRuntime::register_value( identifier_id_t identifier_, HHuginn::value_t con
 void HRuntime::register_package(
 	identifier_id_t package_,
 	identifier_id_t alias_,
-	HHuginn::paths_t const& paths_,
-	HHuginn::compiler_setup_t compilerSetup_,
 	int position_
 ) {
 	M_PROLOG
@@ -358,7 +360,7 @@ void HRuntime::register_package(
 		}
 	}
 	if ( ! package ) {
-		package = HPackageFactory::get_instance().create_package( this, paths_, compilerSetup_, identifier_name( package_ ), position_ );
+		package = HPackageFactory::get_instance().create_package( this, identifier_name( package_ ), position_ );
 	}
 	_values.insert( make_pair( alias_, package ) );
 	return;
@@ -1254,6 +1256,22 @@ HIntrospecteeInterface::variable_views_t HRuntime::do_get_locals( int frameNo_ )
 	M_PROLOG
 	return ( get_locals( current_thread(), frameNo_ ) );
 	M_EPILOG
+}
+
+void HRuntime::set_setup( HHuginn::paths_t const& paths_, HHuginn::compiler_setup_t setup_ ) {
+	M_PROLOG
+	_modulePaths = paths_;
+	_compilerSetup = setup_;
+	return;
+	M_EPILOG
+}
+
+HHuginn::paths_t const& HRuntime::module_paths( void ) const {
+	return ( _modulePaths );
+}
+
+HHuginn::compiler_setup_t HRuntime::compiler_setup( void ) const {
+	return ( _compilerSetup );
 }
 
 }

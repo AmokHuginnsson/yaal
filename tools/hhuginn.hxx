@@ -187,7 +187,8 @@ private:
 		LOADED,
 		PREPROCESSED,
 		PARSED,
-		COMPILED
+		COMPILED,
+		RUNNING
 	};
 	STATE _state;
 	runtime_t _runtime;
@@ -327,7 +328,7 @@ public:
 private:
 	HHuginn( huginn::HRuntime* );
 	huginn::HRuntime const& runtime( void ) const;
-	void finalize_compilation( paths_t const&, compiler_setup_t );
+	void finalize_compilation( void );
 	HClass const* commit_class( identifier_id_t );
 	char const* error_message( int ) const;
 	HHuginn( HHuginn const& ) = delete;

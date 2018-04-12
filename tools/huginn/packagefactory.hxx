@@ -52,15 +52,15 @@ private:
 	plugins_t _binaries;
 public:
 	void register_package_creator( yaal::hcore::HString const&, HPackageCreatorInterface* );
-	HHuginn::value_t create_package( HRuntime*, HHuginn::paths_t const&, HHuginn::compiler_setup_t, yaal::hcore::HString const&, int );
+	HHuginn::value_t create_package( HRuntime*, yaal::hcore::HString const&, int );
 	creators_t::iterator begin( void );
 	creators_t::iterator end( void );
 	void initialize_globals( void );
 	void cleanup_globals( void );
 private:
 	HHuginn::value_t load_binary( HRuntime*, HHuginn::paths_t const&, yaal::hcore::HString const&, int );
-	HHuginn::value_t load_module( HRuntime*, HHuginn::paths_t const&, HHuginn::compiler_setup_t, yaal::hcore::HString const&, int );
-	HHuginn::value_t compile_module( HRuntime*, HHuginn::paths_t const&, HHuginn::compiler_setup_t, yaal::hcore::HString const&, yaal::hcore::HString const&, int );
+	HHuginn::value_t load_module( HRuntime*, HHuginn::paths_t const&, yaal::hcore::HString const&, int );
+	HHuginn::value_t compile_module( HRuntime*, HHuginn::paths_t const&, yaal::hcore::HString const&, yaal::hcore::HString const&, int );
 	HPackageFactory( void );
 	~HPackageFactory( void );
 	static int life_time( int );

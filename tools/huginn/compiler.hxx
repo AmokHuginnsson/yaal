@@ -402,7 +402,6 @@ struct OCompiler {
 	execution_steps_backlog_t _executionStepsBacklog;
 	used_identifiers_t _usedIdentifiers;
 	captures_log_t _capturesLog;
-	HHuginn::compiler_setup_t _setup;
 	HIntrospectorInterface* _introspector;
 	HStatement::statement_id_t _statementIdGenerator;
 	scope_context_cache_t _scopeContextCache;
@@ -428,7 +427,7 @@ struct OCompiler {
 	void reset( int );
 	OFunctionContext& f( void );
 	OFunctionContext const& f( void ) const;
-	void set_setup( HHuginn::compiler_setup_t, HIntrospectorInterface* );
+	void set_setup( HIntrospectorInterface* );
 	void detect_misuse( void ) const;
 	void resolve_symbols( void );
 	void set_function_name( yaal::hcore::HString const&, executing_parser::position_t );

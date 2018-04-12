@@ -258,7 +258,6 @@ OCompiler::OCompiler( HRuntime* runtime_ )
 	, _executionStepsBacklog()
 	, _usedIdentifiers()
 	, _capturesLog()
-	, _setup( HHuginn::COMPILER::BE_STRICT )
 	, _introspector( nullptr )
 	, _statementIdGenerator( INVALID_STATEMENT_IDENTIFIER )
 	, _scopeContextCache()
@@ -296,8 +295,7 @@ void OCompiler::reset( int undoSteps_ ) {
 	M_EPILOG
 }
 
-void OCompiler::set_setup( HHuginn::compiler_setup_t setup_, HIntrospectorInterface* introspector_ ) {
-	_setup = setup_;
+void OCompiler::set_setup( HIntrospectorInterface* introspector_ ) {
 	_introspector = introspector_;
 	++ _fileId;
 	return;
@@ -1279,7 +1277,7 @@ HHuginn::scope_t OCompiler::pop_scope_context( void ) {
 	OScopeContext& sc( *fc._scopeStack.top() );
 	HHuginn::scope_t scope( yaal::move( sc._scope ) );
 	if (
-		( _setup & HHuginn::COMPILER::BE_STRICT )
+		( _runtime->compiler_setup() & HHuginn::COMPILER::BE_STRICT )
 		&& ( sc._terminatedAt != NOT_TERMINATED )
 		&& ( scope->statement_count() > ( sc._terminatedAt + 1 ) )
 	) {
