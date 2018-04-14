@@ -604,10 +604,12 @@ void OCompiler::detect_misuse( void ) const {
 		HHuginn::identifier_id_t id( iu.first );
 		OIdentifierUse const& use( iu.second );
 		if ( use._readCount == 0 ) {
-			if ( ( find( begin( implicitUse ), end( implicitUse ), id ) == end( implicitUse ) )
-				&& ( ! _isModule
-					|| ( ( use._type == OIdentifierUse::TYPE::VARIABLE )
-					|| ( use._type == OIdentifierUse::TYPE::UNKNOWN ) )
+			if (
+				( find( begin( implicitUse ), end( implicitUse ), id ) == end( implicitUse ) )
+				&& (
+					! _isModule
+					|| ( use._type == OIdentifierUse::TYPE::VARIABLE )
+					|| ( use._type == OIdentifierUse::TYPE::UNKNOWN )
 				)
 			) {
 				throw HHuginn::HHuginnRuntimeException(
