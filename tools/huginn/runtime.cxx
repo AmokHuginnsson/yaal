@@ -160,12 +160,12 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			_namedParametersClass_.name(),
 			_unknownClass_.name()
 		} )
-	, _objectFactory( new HObjectFactory( this ) )
+	, _objectFactory( make_pointer<HObjectFactory>( this ) )
 	, _none( _objectFactory->create<HHuginn::HValue>( &_noneClass_ ) )
 	, _true( _objectFactory->create_boolean( true ) )
 	, _false( _objectFactory->create_boolean( false ) )
 	, _threads()
-	, _functionsStore()
+	, _functionsStore( make_pointer<functions_store_t>() )
 	, _functionsAvailable()
 	, _dependencies()
 	, _classes()
@@ -206,8 +206,7 @@ void HRuntime::copy_text( HRuntime& source_ ) {
 	_values = source_._values;
 	_classes = source_._classes;
 	_dependencies = source_._dependencies;
-	using yaal::swap;
-	_functionsStore = yaal::move( source_._functionsStore );
+	_functionsStore = source_._functionsStore;
 	_threads = source_._threads;
 	_false = source_._false;
 	_true = source_._true;
@@ -217,6 +216,13 @@ void HRuntime::copy_text( HRuntime& source_ ) {
 	_maxCallStackSize = source_._maxCallStackSize;
 	_modulePaths = source_._modulePaths;
 	_compilerSetup = source_._compilerSetup;
+	fix_references();
+	return;
+	M_EPILOG
+}
+
+void HRuntime::fix_references( void ) {
+	M_PROLOG
 	for ( dependencies_t::value_type& c : _dependencies ) {
 		_huginn->register_class( c );
 		c->update_runtime( this );
@@ -241,7 +247,7 @@ HHuginn::value_t* HRuntime::get_function( identifier_id_t identifierId_, bool fr
 	M_PROLOG
 	HHuginn::value_t* f( nullptr );
 	if ( fromAll_ || ( _functionsAvailable.count( identifierId_ ) > 0 ) ) {
-		f = &_functionsStore.at( identifierId_ );
+		f = &_functionsStore->at( identifierId_ );
 	}
 	return ( f );
 	M_EPILOG
@@ -289,7 +295,7 @@ void HRuntime::register_class( class_t class_, HHuginn::ACCESS classConstructorA
 	if ( _classes.insert( make_pair( class_->identifier_id(), class_ ) ).second ) {
 		_dependencies.push_back( class_ );
 		HHuginn::identifier_id_t identifier( class_->identifier_id() );
-		_functionsStore.insert( make_pair( identifier, class_->constructor( classConstructorAccess_ ) ) );
+		_functionsStore->insert( make_pair( identifier, class_->constructor( classConstructorAccess_ ) ) );
 	}
 	if ( classConstructorVisibility_ == HHuginn::VISIBILITY::GLOBAL ) {
 		_functionsAvailable.insert( class_->identifier_id() );
@@ -302,7 +308,7 @@ void HRuntime::register_class( class_t class_, HHuginn::ACCESS classConstructorA
 void HRuntime::drop_class( identifier_id_t identifier_ ) {
 	M_PROLOG
 	_functionsAvailable.erase( identifier_ );
-	_functionsStore.erase( identifier_ );
+	_functionsStore->erase( identifier_ );
 	_dependencies.erase(
 		yaal::remove_if(
 			_dependencies.begin(),
@@ -320,7 +326,7 @@ void HRuntime::drop_class( identifier_id_t identifier_ ) {
 
 void HRuntime::register_function( identifier_id_t identifier_, function_t function_, yaal::hcore::HString const& doc_ ) {
 	M_PROLOG
-	HHuginn::value_t& f( _functionsStore[ identifier_ ] );
+	HHuginn::value_t& f( _functionsStore->operator[]( identifier_ ) );
 	if ( ! f ) {
 		f = _objectFactory->create_function_reference( identifier_, function_, doc_ );
 	} else {
@@ -334,7 +340,7 @@ void HRuntime::register_function( identifier_id_t identifier_, function_t functi
 void HRuntime::drop_function( identifier_id_t identifier_ ) {
 	M_PROLOG
 	_functionsAvailable.erase( identifier_ );
-	_functionsStore.erase( identifier_ );
+	_functionsStore->erase( identifier_ );
 	return;
 	M_EPILOG
 }
@@ -511,7 +517,7 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 	}
 	for ( functions_available_t::value_type const& fi : _functionsAvailable ) {
 		if ( context_._functionsAvailable.find( fi ) == context_._functionsAvailable.end() ) {
-			HHuginn::HFunctionReference const* fr( static_cast<HHuginn::HFunctionReference const*>( _functionsStore.at( fi ).raw() ) );
+			HHuginn::HFunctionReference const* fr( static_cast<HHuginn::HFunctionReference const*>( _functionsStore->at( fi ).raw() ) );
 			fds.emplace_back(
 				identifier_name( fi ),
 				_objectFactory->create_method_raw( fr->function() ),
@@ -550,7 +556,7 @@ HHuginn::value_t HRuntime::call( identifier_id_t identifier_, HHuginn::values_t&
 		yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
 		threads_t::iterator t( _threads.find( threadId ) );
 		M_ASSERT( t != _threads.end() );
-		res = static_cast<HHuginn::HFunctionReference*>( _functionsStore.at( identifier_ ).raw() )->function()( t->second.raw(), nullptr, values_, position_ );
+		res = static_cast<HHuginn::HFunctionReference*>( _functionsStore->at( identifier_ ).raw() )->function()( t->second.raw(), nullptr, values_, position_ );
 	} else {
 		throw HHuginn::HHuginnRuntimeException( "Function `"_ys.append( identifier_name( identifier_ ) ).append( "(...)' is not defined." ), MAIN_FILE_ID, position_ );
 	}
@@ -871,7 +877,7 @@ void HRuntime::register_builtin_function( yaal::hcore::HString const& name_, fun
 	M_PROLOG
 	identifier_id_t id( identifier_id( name_ ) );
 	_huginn->register_function( id );
-	_functionsStore.insert( make_pair( id, _objectFactory->create_function_reference( id, yaal::move( function_ ), doc_ ) ) );
+	_functionsStore->insert( make_pair( id, _objectFactory->create_function_reference( id, yaal::move( function_ ), doc_ ) ) );
 	_functionsAvailable.insert( id );
 	return;
 	M_EPILOG
@@ -1118,7 +1124,7 @@ void HRuntime::dump_docs( yaal::hcore::HStreamInterface& stream_ ) const {
 		}
 	}
 	for ( functions_available_t::value_type const& fa : _functionsAvailable ) {
-		HHuginn::HFunctionReference const& f( *static_cast<HHuginn::HFunctionReference const*>( _functionsStore.at( fa ).raw() ) );
+		HHuginn::HFunctionReference const& f( *static_cast<HHuginn::HFunctionReference const*>( _functionsStore->at( fa ).raw() ) );
 		if ( ! f.doc().is_empty() && ( ( _classes.count( fa ) == 0 ) || _classes.at( fa )->doc().is_empty() ) ) {
 			stream_ << identifier_name( fa ) << ":" << f.doc() << endl;
 		}
@@ -1167,7 +1173,7 @@ yaal::hcore::HString const& HRuntime::function_name( void const* id_ ) const {
 	M_PROLOG
 	static yaal::hcore::HString const unknown( "unknown" );
 	yaal::hcore::HString const* name( &unknown );
-	for ( functions_store_t::value_type const& f : _functionsStore ) {
+	for ( functions_store_t::value_type const& f : *_functionsStore ) {
 		if ( static_cast<HHuginn::HFunctionReference const*>( f.second.raw() )->function().id() == id_ ) {
 			name = &identifier_name( f.first );
 			break;

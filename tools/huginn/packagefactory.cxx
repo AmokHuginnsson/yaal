@@ -170,6 +170,7 @@ HHuginn::value_t HPackageFactory::compile_module( HRuntime* runtime_, HHuginn::p
 	int fileId( h._compiler->_fileId == MAIN_FILE_ID ? static_cast<int>( h._sources.get_size() - 1 ) : h._compiler->_fileId );
 	loader._compiler->_fileId = fileId;
 	if ( ! ( loader.parse() && loader.compile( paths_, runtime_->compiler_setup() ) ) ) {
+		runtime_->fix_references();
 		throw HHuginn::HHuginnRuntimeException( loader.error_message(), fileId, position_ );
 	}
 	h._compiler->_fileId = loader._compiler->_fileId;

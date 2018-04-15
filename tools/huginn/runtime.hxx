@@ -37,6 +37,7 @@ private:
 	 * to HLookupMap invalidates old pointers.
 	 */
 	typedef yaal::hcore::HHashMap<identifier_id_t, value_t> functions_store_t;
+	typedef yaal::hcore::HPointer<functions_store_t> shared_functions_store_t;
 	typedef yaal::hcore::HHashSet<identifier_id_t> functions_available_t;
 	typedef yaal::hcore::HArray<HHuginn::class_t> dependencies_t;
 public:
@@ -86,7 +87,7 @@ private:
 	 *
 	 * Hence use of _functionsStore and _functionsAvailable.
 	 */
-	functions_store_t _functionsStore; /*!< All functions ever defined in all sub-modules. */
+	shared_functions_store_t _functionsStore; /*!< All functions ever defined in all sub-modules. */
 	functions_available_t _functionsAvailable; /*!< Functions available in current module context. */
 	/*
 	 * All classes must be kept directly in runtime so it will be simpler
@@ -241,6 +242,7 @@ public:
 	yaal::hcore::HString const& function_name( void const* ) const;
 	yaal::hcore::HString const& package_name( HHuginn::HClass const* ) const;
 	void copy_text( HRuntime& );
+	void fix_references( void );
 	HHuginn::class_t make_package( yaal::hcore::HString const&, HRuntime const& );
 	template<typename... T>
 	HHuginn::value_t create_method( T&&... args_ ) {
