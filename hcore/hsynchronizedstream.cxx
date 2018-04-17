@@ -378,6 +378,13 @@ HStreamInterface& HSynchronizedStream::do_set_precision( int val_ ) {
 	M_EPILOG
 }
 
+HStreamInterface& HSynchronizedStream::do_set_mode( MODE val_ ) {
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_set_mode( val_ ) );
+	M_EPILOG
+}
+
 HStreamInterface& HSynchronizedStream::do_set_base( BASE val_ ) {
 	M_PROLOG
 	HLock l( _mutex );
@@ -445,6 +452,13 @@ int HSynchronizedStream::do_get_precision( void ) const {
 	M_PROLOG
 	HLock l( _mutex );
 	return ( HStreamInterface::do_get_precision() );
+	M_EPILOG
+}
+
+HStreamInterface::MODE HSynchronizedStream::do_get_mode( void ) const {
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_get_mode() );
 	M_EPILOG
 }
 

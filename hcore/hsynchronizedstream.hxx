@@ -87,6 +87,7 @@ protected:
 	virtual HStreamInterface& do_set_fill( code_point_t ) override;
 	virtual HStreamInterface& do_set_width( int ) override;
 	virtual HStreamInterface& do_set_precision( int ) override;
+	virtual HStreamInterface& do_set_mode( MODE ) override;
 	virtual HStreamInterface& do_set_base( BASE ) override;
 	virtual HStreamInterface& do_set_float_format( FLOAT_FORMAT ) override;
 	virtual HStreamInterface& do_set_adjust( ADJUST ) override;
@@ -97,6 +98,7 @@ protected:
 	virtual code_point_t do_get_fill( void ) const override;
 	virtual int do_get_width( void ) const override;
 	virtual int do_get_precision( void ) const override;
+	virtual MODE do_get_mode( void ) const override;
 	virtual BASE do_get_base( void ) const override;
 	virtual FLOAT_FORMAT do_get_float_format( void ) const override;
 	virtual ADJUST do_get_adjust( void ) const override;

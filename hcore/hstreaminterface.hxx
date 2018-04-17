@@ -19,6 +19,8 @@ namespace hcore {
 class HStreamInterface;
 HStreamInterface& endl( HStreamInterface& );
 HStreamInterface& flush( HStreamInterface& );
+HStreamInterface& text( HStreamInterface& );
+HStreamInterface& binary( HStreamInterface& );
 HStreamInterface& dec( HStreamInterface& );
 HStreamInterface& hex( HStreamInterface& );
 HStreamInterface& oct( HStreamInterface& );
@@ -50,6 +52,10 @@ public:
 		void set_precision( HStreamInterface& ) const;
 	};
 	typedef HPointer<HStreamInterface> ptr_t;
+	enum class MODE {
+		TEXT,
+		BINARY
+	};
 	enum class POLL_TYPE {
 		NATIVE,
 		EMULATED,
@@ -86,6 +92,7 @@ protected:
 	code_point_t _fill;  /*!< Fill character for output operations. */
 	int _width;     /*!< Next output operation width. */
 	int _precision; /*!< Set number of significant digits to display for all subsequent outputs of floating point type values. */
+	MODE _mode;
 	BASE _base;
 	FLOAT_FORMAT _floatFormat;
 	ADJUST _adjust;
@@ -316,6 +323,9 @@ public:
 	HStreamInterface& set_precision( int precision_ ) {
 		return ( do_set_precision( precision_ ) );
 	}
+	HStreamInterface& set_mode( MODE val_ ) {
+		return ( do_set_mode( val_ ) );
+	}
 	HStreamInterface& set_base( BASE val_ ) {
 		return ( do_set_base( val_ ) );
 	}
@@ -339,6 +349,9 @@ public:
 	}
 	int get_precision( void ) const {
 		return ( do_get_precision() );
+	}
+	MODE get_mode( void ) const {
+		return ( do_get_mode() );
 	}
 	BASE get_base( void ) const {
 		return ( do_get_base() );
@@ -396,6 +409,7 @@ protected:
 	virtual HStreamInterface& do_set_fill( code_point_t );
 	virtual HStreamInterface& do_set_width( int );
 	virtual HStreamInterface& do_set_precision( int );
+	virtual HStreamInterface& do_set_mode( MODE );
 	virtual HStreamInterface& do_set_base( BASE );
 	virtual HStreamInterface& do_set_float_format( FLOAT_FORMAT );
 	virtual HStreamInterface& do_set_adjust( ADJUST );
@@ -406,6 +420,7 @@ protected:
 	virtual code_point_t do_get_fill( void ) const;
 	virtual int do_get_width( void ) const;
 	virtual int do_get_precision( void ) const;
+	virtual MODE do_get_mode( void ) const;
 	virtual BASE do_get_base( void ) const;
 	virtual FLOAT_FORMAT do_get_float_format( void ) const;
 	virtual ADJUST do_get_adjust( void ) const;

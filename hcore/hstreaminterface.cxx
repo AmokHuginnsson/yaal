@@ -29,6 +29,7 @@ HStreamInterface::HStreamInterface( void )
 	, _fill( ' ' )
 	, _width( 0 )
 	, _precision( 6 )
+	, _mode( MODE::TEXT )
 	, _base( BASE::DEC )
 	, _floatFormat( FLOAT_FORMAT::NATURAL )
 	, _adjust( ADJUST::RIGHT )
@@ -45,9 +46,14 @@ HStreamInterface::~HStreamInterface( void ) {
 
 HStreamInterface& HStreamInterface::do_output( HString const& string_ ) {
 	M_PROLOG
-	_wordCache = string_;
-	reformat();
-	_conversionCache = _wordCache;
+	if ( _mode == MODE::TEXT ) {
+		_wordCache = string_;
+		reformat();
+		_conversionCache = _wordCache;
+	} else {
+		_conversionCache = string_;
+		do_output( static_cast<i32_t>( _conversionCache.byte_count() ) );
+	}
 	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
 	return ( *this );
 	M_EPILOG
@@ -55,102 +61,153 @@ HStreamInterface& HStreamInterface::do_output( HString const& string_ ) {
 
 HStreamInterface& HStreamInterface::do_output( char const* string_ ) {
 	M_PROLOG
-	_wordCache = string_;
-	reformat();
-	_conversionCache = _wordCache;
-	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	if ( _mode == MODE::TEXT ) {
+		_wordCache = string_;
+		reformat();
+		_conversionCache = _wordCache;
+		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	} else {
+		i32_t len( static_cast<i32_t>( strlen( string_ ) ) );
+		do_output( len );
+		do_write( string_, len );
+	}
 	return ( *this );
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_output( bool bool_ ) {
 	M_PROLOG
-	_wordCache = _boolAlpha ? ( bool_ ? "true" : "false" ) : ( bool_ ? "1" : "0" );
-	reformat();
-	_conversionCache = _wordCache;
-	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	if ( _mode == MODE::TEXT ) {
+		_wordCache = _boolAlpha ? ( bool_ ? "true" : "false" ) : ( bool_ ? "1" : "0" );
+		reformat();
+		_conversionCache = _wordCache;
+		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	} else {
+		i8_t buffer( bool_ ? 1 : 0 );
+		do_write( &buffer, static_cast<int>( sizeof ( buffer ) ) );
+	}
 	return ( *this );
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_output( code_point_t char_ ) {
 	M_PROLOG
-	_wordCache = char_;
-	reformat();
-	_conversionCache = _wordCache;
-	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	if ( _mode == MODE::TEXT ) {
+		_wordCache = char_;
+		reformat();
+		_conversionCache = _wordCache;
+		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	} else {
+		do_write( &char_.get(), static_cast<int>( sizeof ( char_.get() ) ) );
+	}
 	return ( *this );
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_output( char char_ ) {
 	M_PROLOG
-	_wordCache = char_;
-	reformat();
-	_conversionCache = _wordCache;
-	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	if ( _mode == MODE::TEXT ) {
+		_wordCache = char_;
+		reformat();
+		_conversionCache = _wordCache;
+		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	} else {
+		do_write( &char_, static_cast<int>( sizeof ( char_ ) ) );
+	}
 	return ( *this );
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_output( char unsigned charUnsigned_ ) {
 	M_PROLOG
-	_wordCache = charUnsigned_;
-	reformat();
-	_conversionCache = _wordCache;
-	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	if ( _mode == MODE::TEXT ) {
+		_wordCache = charUnsigned_;
+		reformat();
+		_conversionCache = _wordCache;
+		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	} else {
+		do_write( &charUnsigned_, static_cast<int>( sizeof ( charUnsigned_ ) ) );
+	}
 	return ( *this );
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_output( int short shortInteger_ ) {
 	M_PROLOG
-	int long tmp( shortInteger_ );
-	return ( do_output( tmp ) );
+	if ( _mode == MODE::TEXT ) {
+		int long tmp( shortInteger_ );
+		do_output( tmp );
+	} else {
+		do_write( &shortInteger_, static_cast<int>( sizeof ( shortInteger_ ) ) );
+	}
+	return ( *this );
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_output( int short unsigned unsignedShortInteger_ ) {
 	M_PROLOG
-	int long unsigned tmp( unsignedShortInteger_ );
-	return ( do_output( tmp ) );
+	if ( _mode == MODE::TEXT ) {
+		int long unsigned tmp( unsignedShortInteger_ );
+		do_output( tmp );
+	} else {
+		do_write( &unsignedShortInteger_, static_cast<int>( sizeof ( unsignedShortInteger_ ) ) );
+	}
+	return ( *this );
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_output( int integer_ ) {
 	M_PROLOG
-	int long tmp( integer_ );
-	return ( do_output( tmp ) );
+	if ( _mode == MODE::TEXT ) {
+		int long tmp( integer_ );
+		do_output( tmp );
+	} else {
+		do_write( &integer_, static_cast<int>( sizeof ( integer_ ) ) );
+	}
+	return ( *this );
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_output( int unsigned unsignedInteger_ ) {
 	M_PROLOG
-	int long unsigned tmp( unsignedInteger_ );
-	return ( do_output( tmp ) );
+	if ( _mode == MODE::TEXT ) {
+		int long unsigned tmp( unsignedInteger_ );
+		do_output( tmp );
+	} else {
+		do_write( &unsignedInteger_, static_cast<int>( sizeof ( unsignedInteger_ ) ) );
+	}
+	return ( *this );
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_output( int long longInteger_ ) {
 	M_PROLOG
-	char buffer[MAX_INTEGER_DIGIT_COUNT];
-	snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, _base == BASE::DEC ? "%ld" : ( _base == BASE::HEX ) ? "%lx" : "%lo", longInteger_ );
-	_wordCache = buffer;
-	reformat();
-	_conversionCache = _wordCache;
-	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	if ( _mode == MODE::TEXT ) {
+		char buffer[MAX_INTEGER_DIGIT_COUNT];
+		snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, _base == BASE::DEC ? "%ld" : ( _base == BASE::HEX ) ? "%lx" : "%lo", longInteger_ );
+		_wordCache = buffer;
+		reformat();
+		_conversionCache = _wordCache;
+		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	} else {
+		do_write( &longInteger_, static_cast<int>( sizeof ( longInteger_ ) ) );
+	}
 	return ( *this );
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_output( int long long longLongInteger_ ) {
 	M_PROLOG
-	char buffer[MAX_INTEGER_DIGIT_COUNT];
-	snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, _base == BASE::DEC ? "%lld" : ( _base == BASE::HEX ) ? "%llx" : "%llo", longLongInteger_ );
-	_wordCache = buffer;
-	reformat();
-	_conversionCache = _wordCache;
-	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	if ( _mode == MODE::TEXT ) {
+		char buffer[MAX_INTEGER_DIGIT_COUNT];
+		snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, _base == BASE::DEC ? "%lld" : ( _base == BASE::HEX ) ? "%llx" : "%llo", longLongInteger_ );
+		_wordCache = buffer;
+		reformat();
+		_conversionCache = _wordCache;
+		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	} else {
+		do_write( &longLongInteger_, static_cast<int>( sizeof ( longLongInteger_ ) ) );
+	}
 	return ( *this );
 	M_EPILOG
 }
@@ -184,24 +241,32 @@ void HStreamInterface::reformat( void ) {
 
 HStreamInterface& HStreamInterface::do_output( int long unsigned unsignedLongInteger_ ) {
 	M_PROLOG
-	char buffer[MAX_INTEGER_DIGIT_COUNT];
-	snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, _base == BASE::DEC ? "%lu" : ( _base == BASE::HEX ) ? "%lx" : "%lo", unsignedLongInteger_ );
-	_wordCache = buffer;
-	reformat();
-	_conversionCache = _wordCache;
-	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	if ( _mode == MODE::TEXT ) {
+		char buffer[MAX_INTEGER_DIGIT_COUNT];
+		snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, _base == BASE::DEC ? "%lu" : ( _base == BASE::HEX ) ? "%lx" : "%lo", unsignedLongInteger_ );
+		_wordCache = buffer;
+		reformat();
+		_conversionCache = _wordCache;
+		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	} else {
+		do_write( &unsignedLongInteger_, static_cast<int>( sizeof ( unsignedLongInteger_ ) ) );
+	}
 	return ( *this );
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_output( int long long unsigned unsignedLongLongInteger_ ) {
 	M_PROLOG
-	char buffer[MAX_INTEGER_DIGIT_COUNT];
-	snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, _base == BASE::DEC ? "%llu" : ( _base == BASE::HEX ) ? "%llx" : "%llo", unsignedLongLongInteger_ );
-	_wordCache = buffer;
-	reformat();
-	_conversionCache = _wordCache;
-	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	if ( _mode == MODE::TEXT ) {
+		char buffer[MAX_INTEGER_DIGIT_COUNT];
+		snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, _base == BASE::DEC ? "%llu" : ( _base == BASE::HEX ) ? "%llx" : "%llo", unsignedLongLongInteger_ );
+		_wordCache = buffer;
+		reformat();
+		_conversionCache = _wordCache;
+		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	} else {
+		do_write( &unsignedLongLongInteger_, static_cast<int>( sizeof ( unsignedLongLongInteger_ ) ) );
+	}
 	return ( *this );
 	M_EPILOG
 }
@@ -225,63 +290,79 @@ void HStreamInterface::apply_precision( void ) {
 
 HStreamInterface& HStreamInterface::do_output( double double_ ) {
 	M_PROLOG
-	char buffer[MAX_FLOAT_DIGIT_COUNT];
-	char fmt[MAX_FLOAT_FORMAT_SIZE] = "%f";
-	if ( _floatFormat != FLOAT_FORMAT::NATURAL ) {
-		snprintf( fmt, MAX_FLOAT_FORMAT_SIZE, "%%.%d%c", _precision, _floatFormat == FLOAT_FORMAT::FIXED ? 'f' : 'e' );
+	if ( _mode == MODE::TEXT ) {
+		char buffer[MAX_FLOAT_DIGIT_COUNT];
+		char fmt[MAX_FLOAT_FORMAT_SIZE] = "%f";
+		if ( _floatFormat != FLOAT_FORMAT::NATURAL ) {
+			snprintf( fmt, MAX_FLOAT_FORMAT_SIZE, "%%.%d%c", _precision, _floatFormat == FLOAT_FORMAT::FIXED ? 'f' : 'e' );
+		}
+		snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, double_ );
+		_wordCache = buffer;
+		apply_precision();
+		reformat();
+		_conversionCache = _wordCache;
+		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	} else {
+		do_write( &double_, static_cast<int>( sizeof ( double_ ) ) );
 	}
-	snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, double_ );
-	_wordCache = buffer;
-	apply_precision();
-	reformat();
-	_conversionCache = _wordCache;
-	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
 	return ( *this );
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_output( double long longDouble_ ) {
 	M_PROLOG
-	char buffer[MAX_FLOAT_DIGIT_COUNT];
-	char fmt[MAX_FLOAT_FORMAT_SIZE] = "%.12Lf";
-	if ( _floatFormat != FLOAT_FORMAT::NATURAL ) {
-		snprintf( fmt, MAX_FLOAT_FORMAT_SIZE, "%%.%dL%c", _precision, _floatFormat == FLOAT_FORMAT::FIXED ? 'f' : 'e' );
+	if ( _mode == MODE::TEXT ) {
+		char buffer[MAX_FLOAT_DIGIT_COUNT];
+		char fmt[MAX_FLOAT_FORMAT_SIZE] = "%.12Lf";
+		if ( _floatFormat != FLOAT_FORMAT::NATURAL ) {
+			snprintf( fmt, MAX_FLOAT_FORMAT_SIZE, "%%.%dL%c", _precision, _floatFormat == FLOAT_FORMAT::FIXED ? 'f' : 'e' );
+		}
+		snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, longDouble_ );
+		_wordCache = buffer;
+		apply_precision();
+		reformat();
+		_conversionCache = _wordCache;
+		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	} else {
+		do_write( &longDouble_, static_cast<int>( sizeof ( longDouble_ ) ) );
 	}
-	snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, longDouble_ );
-	_wordCache = buffer;
-	apply_precision();
-	reformat();
-	_conversionCache = _wordCache;
-	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
 	return ( *this );
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_output( float float_ ) {
 	M_PROLOG
-	char buffer[MAX_FLOAT_DIGIT_COUNT];
-	char fmt[MAX_FLOAT_FORMAT_SIZE] = "%f";
-	if ( _floatFormat != FLOAT_FORMAT::NATURAL ) {
-		snprintf( fmt, MAX_FLOAT_FORMAT_SIZE, "%%.%d%c", _precision, _floatFormat == FLOAT_FORMAT::FIXED ? 'f' : 'e' );
+	if ( _mode == MODE::TEXT ) {
+		char buffer[MAX_FLOAT_DIGIT_COUNT];
+		char fmt[MAX_FLOAT_FORMAT_SIZE] = "%f";
+		if ( _floatFormat != FLOAT_FORMAT::NATURAL ) {
+			snprintf( fmt, MAX_FLOAT_FORMAT_SIZE, "%%.%d%c", _precision, _floatFormat == FLOAT_FORMAT::FIXED ? 'f' : 'e' );
+		}
+		snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, float_ );
+		_wordCache = buffer;
+		apply_precision();
+		reformat();
+		_conversionCache = _wordCache;
+		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	} else {
+		do_write( &float_, static_cast<int>( sizeof ( float_ ) ) );
 	}
-	snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, float_ );
-	_wordCache = buffer;
-	apply_precision();
-	reformat();
-	_conversionCache = _wordCache;
-	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
 	return ( *this );
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_output( void const* ptr_ ) {
 	M_PROLOG
-	char buffer[MAX_INTEGER_DIGIT_COUNT];
-	snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, "0x%lx", reinterpret_cast<int long unsigned>( ptr_ ) );
-	_wordCache = buffer;
-	reformat();
-	_conversionCache = _wordCache;
-	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	if ( _mode == MODE::TEXT ) {
+		char buffer[MAX_INTEGER_DIGIT_COUNT];
+		snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, "0x%lx", reinterpret_cast<int long unsigned>( ptr_ ) );
+		_wordCache = buffer;
+		reformat();
+		_conversionCache = _wordCache;
+		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	} else {
+		do_write( &ptr_, static_cast<int>( sizeof ( ptr_ ) ) );
+	}
 	return ( *this );
 	M_EPILOG
 }
@@ -301,6 +382,9 @@ HStreamInterface& HStreamInterface::do_output( HManipulator const& manipulator_ 
 
 HStreamInterface& endl( HStreamInterface& file_ ) {
 	M_PROLOG
+	if ( file_.get_mode() != HStreamInterface::MODE::TEXT ) {
+		throw HStreamInterfaceException( "Invalid output conversion for binary mode." );
+	}
 	file_.do_write( "\n", 1 );
 	file_.do_flush();
 	return ( file_ );
@@ -311,6 +395,18 @@ HStreamInterface& flush( HStreamInterface& file_ ) {
 	M_PROLOG
 	file_.do_flush();
 	return ( file_ );
+	M_EPILOG
+}
+
+HStreamInterface& text( HStreamInterface& iface_ ) {
+	M_PROLOG
+	return ( iface_.set_mode( HStreamInterface::MODE::TEXT ) );
+	M_EPILOG
+}
+
+HStreamInterface& binary( HStreamInterface& iface_ ) {
+	M_PROLOG
+	return ( iface_.set_mode( HStreamInterface::MODE::BINARY ) );
 	M_EPILOG
 }
 
@@ -554,15 +650,6 @@ int HStreamInterface::do_peek( void ) {
 	return ( _offset > 0 ? _cache.get<char>()[ _offset - 1 ] : INVALID_CHARACTER );
 }
 
-HStreamInterface& HStreamInterface::do_input( HString& word ) {
-	M_PROLOG
-	if ( read_word() ) {
-		word = _wordCache;
-	}
-	return ( *this );
-	M_EPILOG
-}
-
 bool HStreamInterface::read_word( void ) {
 	M_PROLOG
 	/* Regarding _whiteSpace_.size() + 1, about "+ 1" see comment in semantic_read in analogous context */
@@ -669,10 +756,46 @@ bool HStreamInterface::read_floatint_point( void ) {
 	M_EPILOG
 }
 
+HStreamInterface& HStreamInterface::do_input( HString& word ) {
+	M_PROLOG
+	if ( _mode == MODE::TEXT ) {
+		if ( read_word() ) {
+			word = _wordCache;
+		}
+	} else {
+		i32_t len( 0 );
+		do_input( len );
+		if ( _offset < len ) {
+			_cache.realloc( len );
+			int long toRead( len - _offset );
+			_fail = do_read( _cache.get<char>() + _offset, toRead ) != toRead;
+			if ( ! _fail ) {
+				_offset = static_cast<int>( len );
+			}
+		}
+		if ( good() ) {
+			word.assign( _cache.get<char>(), len );
+			::memmove( _cache.raw(), _cache.get<char>() + len, static_cast<size_t>( _offset - len ) );
+			_offset -= static_cast<int>( len );
+		}
+	}
+	return ( *this );
+	M_EPILOG
+}
+
 HStreamInterface& HStreamInterface::do_input( bool& b ) {
 	M_PROLOG
-	if ( read_word() ) {
-		b = lexical_cast<bool>( _wordCache );
+	if ( _mode == MODE::TEXT ) {
+		if ( read_word() ) {
+			b = lexical_cast<bool>( _wordCache );
+		}
+	} else {
+		i8_t buffer( 0 );
+		int long toRead( static_cast<int>( sizeof ( buffer ) ) );
+		_fail = read( &buffer, toRead ) != toRead;
+		if ( good() ) {
+			b = buffer ? true : false;
+		}
 	}
 	return ( *this );
 	M_EPILOG
@@ -680,33 +803,49 @@ HStreamInterface& HStreamInterface::do_input( bool& b ) {
 
 HStreamInterface& HStreamInterface::do_input( code_point_t& char_ ) {
 	M_PROLOG
-	/* Regarding _whiteSpace_.size() + 1, about "+ 1" see comment in semantic_read in analogous context */
-	char c( 0 );
-	do {
-		read( &c, 1 );
-	} while ( good() && _skipWS && character_class( CHARACTER_CLASS::WHITESPACE ).hasz( code_point_t( static_cast<yaal::u32_t>( c ) ) ) );
-	yaal::u32_t character( static_cast<u8_t>( c ) );
-	static u8_t const mask[] = { 0xff, unicode::ENC_2_BYTES_VALUE_MASK, unicode::ENC_3_BYTES_VALUE_MASK, unicode::ENC_4_BYTES_VALUE_MASK };
-	int tailLength( unicode::utf8_declared_length( c ) - 1 );
-	character &= mask[tailLength];
-	for ( int i( 0 ); i < tailLength; ++ i ) {
-		character <<= 6;
-		read( &c, 1 );
-		character |= ( static_cast<u8_t>( c ) & unicode::TAIL_BYTES_VALUE_MASK );
+	if ( _mode == MODE::TEXT ) {
+		/* Regarding _whiteSpace_.size() + 1, about "+ 1" see comment in semantic_read in analogous context */
+		char c( 0 );
+		do {
+			read( &c, 1 );
+		} while ( good() && _skipWS && character_class( CHARACTER_CLASS::WHITESPACE ).hasz( code_point_t( static_cast<yaal::u32_t>( c ) ) ) );
+		yaal::u32_t character( static_cast<u8_t>( c ) );
+		static u8_t const mask[] = { 0xff, unicode::ENC_2_BYTES_VALUE_MASK, unicode::ENC_3_BYTES_VALUE_MASK, unicode::ENC_4_BYTES_VALUE_MASK };
+		int tailLength( unicode::utf8_declared_length( c ) - 1 );
+		character &= mask[tailLength];
+		for ( int i( 0 ); i < tailLength; ++ i ) {
+			character <<= 6;
+			read( &c, 1 );
+			character |= ( static_cast<u8_t>( c ) & unicode::TAIL_BYTES_VALUE_MASK );
+		}
+		char_ = code_point_t( character );
+	} else {
+		u32_t buffer( 0 );
+		int long toRead( static_cast<int>( sizeof ( buffer ) ) );
+		_fail = read( &buffer, toRead ) != toRead;
+		if ( good() ) {
+			char_ = code_point_t( buffer );
+		}
 	}
-	char_ = code_point_t( character );
 	return ( *this );
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_input( char& char_ ) {
 	M_PROLOG
-	/* Regarding _whiteSpace_.size() + 1, about "+ 1" see comment in semantic_read in analogous context */
 	char c( 0 );
-	do {
-		read( &c, 1 );
-	} while ( good() && _skipWS && character_class( CHARACTER_CLASS::WHITESPACE ).hasz( code_point_t( static_cast<yaal::u32_t>( c ) ) ) );
-	char_ = c;
+	int long toRead( static_cast<int>( sizeof ( c ) ) );
+	if ( _mode == MODE::TEXT ) {
+		/* Regarding _whiteSpace_.size() + 1, about "+ 1" see comment in semantic_read in analogous context */
+		do {
+			read( &c, toRead );
+		} while ( good() && _skipWS && character_class( CHARACTER_CLASS::WHITESPACE ).hasz( code_point_t( static_cast<yaal::u32_t>( c ) ) ) );
+	} else {
+		_fail = read( &c, toRead ) != toRead;
+	}
+	if ( good() ) {
+		char_ = c;
+	}
 	return ( *this );
 	M_EPILOG
 }
@@ -722,8 +861,17 @@ HStreamInterface& HStreamInterface::do_input( char unsigned& cu ) {
 
 HStreamInterface& HStreamInterface::do_input( int short& is ) {
 	M_PROLOG
-	if ( read_integer() ) {
-		is = lexical_cast<int short>( _wordCache );
+	if ( _mode == MODE::TEXT ) {
+		if ( read_integer() ) {
+			is = lexical_cast<int short>( _wordCache );
+		}
+	} else {
+		int short buffer( 0 );
+		int long toRead( static_cast<int>( sizeof ( buffer ) ) );
+		_fail = ( read( &buffer, toRead ) ) != toRead;
+		if ( good() ) {
+			is = buffer;
+		}
 	}
 	return ( *this );
 	M_EPILOG
@@ -731,8 +879,17 @@ HStreamInterface& HStreamInterface::do_input( int short& is ) {
 
 HStreamInterface& HStreamInterface::do_input( int short unsigned& isu ) {
 	M_PROLOG
-	if ( read_integer() ) {
-		isu = lexical_cast<int short unsigned>( _wordCache );
+	if ( _mode == MODE::TEXT ) {
+		if ( read_integer() ) {
+			isu = lexical_cast<int short unsigned>( _wordCache );
+		}
+	} else {
+		int short unsigned buffer( 0 );
+		int long toRead( static_cast<int>( sizeof ( buffer ) ) );
+		_fail = ( read( &buffer, toRead ) ) != toRead;
+		if ( good() ) {
+			isu = buffer;
+		}
 	}
 	return ( *this );
 	M_EPILOG
@@ -740,8 +897,17 @@ HStreamInterface& HStreamInterface::do_input( int short unsigned& isu ) {
 
 HStreamInterface& HStreamInterface::do_input( int& i ) {
 	M_PROLOG
-	if ( read_integer() ) {
-		i = lexical_cast<int>( _wordCache );
+	if ( _mode == MODE::TEXT ) {
+		if ( read_integer() ) {
+			i = lexical_cast<int>( _wordCache );
+		}
+	} else {
+		int buffer( 0 );
+		int long toRead( static_cast<int>( sizeof ( buffer ) ) );
+		_fail = ( read( &buffer, toRead ) ) != toRead;
+		if ( good() ) {
+			i = buffer;
+		}
 	}
 	return ( *this );
 	M_EPILOG
@@ -749,8 +915,17 @@ HStreamInterface& HStreamInterface::do_input( int& i ) {
 
 HStreamInterface& HStreamInterface::do_input( int unsigned& iu ) {
 	M_PROLOG
-	if ( read_integer() ) {
-		iu = lexical_cast<int unsigned>( _wordCache );
+	if ( _mode == MODE::TEXT ) {
+		if ( read_integer() ) {
+			iu = lexical_cast<int unsigned>( _wordCache );
+		}
+	} else {
+		int unsigned buffer( 0 );
+		int long toRead( static_cast<int>( sizeof ( buffer ) ) );
+		_fail = ( read( &buffer, toRead ) ) != toRead;
+		if ( good() ) {
+			iu = buffer;
+		}
 	}
 	return ( *this );
 	M_EPILOG
@@ -758,8 +933,17 @@ HStreamInterface& HStreamInterface::do_input( int unsigned& iu ) {
 
 HStreamInterface& HStreamInterface::do_input( int long& il ) {
 	M_PROLOG
-	if ( read_integer() ) {
-		il = lexical_cast<int long>( _wordCache );
+	if ( _mode == MODE::TEXT ) {
+		if ( read_integer() ) {
+			il = lexical_cast<int long>( _wordCache );
+		}
+	} else {
+		int long buffer( 0 );
+		int long toRead( static_cast<int>( sizeof ( buffer ) ) );
+		_fail = ( read( &buffer, toRead ) ) != toRead;
+		if ( good() ) {
+			il = buffer;
+		}
 	}
 	return ( *this );
 	M_EPILOG
@@ -767,8 +951,17 @@ HStreamInterface& HStreamInterface::do_input( int long& il ) {
 
 HStreamInterface& HStreamInterface::do_input( int long unsigned& ilu ) {
 	M_PROLOG
-	if ( read_integer() ) {
-		ilu = lexical_cast<int long unsigned>( _wordCache );
+	if ( _mode == MODE::TEXT ) {
+		if ( read_integer() ) {
+			ilu = lexical_cast<int long unsigned>( _wordCache );
+		}
+	} else {
+		int long unsigned buffer( 0 );
+		int long toRead( static_cast<int>( sizeof ( buffer ) ) );
+		_fail = ( read( &buffer, toRead ) ) != toRead;
+		if ( good() ) {
+			ilu = buffer;
+		}
 	}
 	return ( *this );
 	M_EPILOG
@@ -776,8 +969,17 @@ HStreamInterface& HStreamInterface::do_input( int long unsigned& ilu ) {
 
 HStreamInterface& HStreamInterface::do_input( int long long& ill ) {
 	M_PROLOG
-	if ( read_integer() ) {
-		ill = lexical_cast<int long long>( _wordCache );
+	if ( _mode == MODE::TEXT ) {
+		if ( read_integer() ) {
+			ill = lexical_cast<int long long>( _wordCache );
+		}
+	} else {
+		int long long buffer( 0 );
+		int long toRead( static_cast<int>( sizeof ( buffer ) ) );
+		_fail = ( read( &buffer, toRead ) ) != toRead;
+		if ( good() ) {
+			ill = buffer;
+		}
 	}
 	return ( *this );
 	M_EPILOG
@@ -785,8 +987,17 @@ HStreamInterface& HStreamInterface::do_input( int long long& ill ) {
 
 HStreamInterface& HStreamInterface::do_input( int long long unsigned& illu ) {
 	M_PROLOG
-	if ( read_integer() ) {
-		illu = lexical_cast<int long long unsigned>( _wordCache );
+	if ( _mode == MODE::TEXT ) {
+		if ( read_integer() ) {
+			illu = lexical_cast<int long long unsigned>( _wordCache );
+		}
+	} else {
+		int long long unsigned buffer( 0 );
+		int long toRead( static_cast<int>( sizeof ( buffer ) ) );
+		_fail = ( read( &buffer, toRead ) ) != toRead;
+		if ( good() ) {
+			illu = buffer;
+		}
 	}
 	return ( *this );
 	M_EPILOG
@@ -794,8 +1005,17 @@ HStreamInterface& HStreamInterface::do_input( int long long unsigned& illu ) {
 
 HStreamInterface& HStreamInterface::do_input( double& d ) {
 	M_PROLOG
-	if ( read_floatint_point() ) {
-		d = lexical_cast<double>( _wordCache );
+	if ( _mode == MODE::TEXT ) {
+		if ( read_floatint_point() ) {
+			d = lexical_cast<double>( _wordCache );
+		}
+	} else {
+		double buffer( 0 );
+		int long toRead( static_cast<int>( sizeof ( buffer ) ) );
+		_fail = ( read( &buffer, toRead ) ) != toRead;
+		if ( good() ) {
+			d = buffer;
+		}
 	}
 	return ( *this );
 	M_EPILOG
@@ -803,8 +1023,17 @@ HStreamInterface& HStreamInterface::do_input( double& d ) {
 
 HStreamInterface& HStreamInterface::do_input( double long& dl ) {
 	M_PROLOG
-	if ( read_floatint_point() ) {
-		dl = lexical_cast<double long>( _wordCache );
+	if ( _mode == MODE::TEXT ) {
+		if ( read_floatint_point() ) {
+			dl = lexical_cast<double long>( _wordCache );
+		}
+	} else {
+		double long buffer( 0 );
+		int long toRead( static_cast<int>( sizeof ( buffer ) ) );
+		_fail = ( read( &buffer, toRead ) ) != toRead;
+		if ( good() ) {
+			dl = buffer;
+		}
 	}
 	return ( *this );
 	M_EPILOG
@@ -812,8 +1041,17 @@ HStreamInterface& HStreamInterface::do_input( double long& dl ) {
 
 HStreamInterface& HStreamInterface::do_input( float& f ) {
 	M_PROLOG
-	if ( read_floatint_point() ) {
-		f = lexical_cast<float>( _wordCache );
+	if ( _mode == MODE::TEXT ) {
+		if ( read_floatint_point() ) {
+			f = lexical_cast<float>( _wordCache );
+		}
+	} else {
+		float buffer( 0 );
+		int long toRead( static_cast<int>( sizeof ( buffer ) ) );
+		_fail = ( read( &buffer, toRead ) ) != toRead;
+		if ( good() ) {
+			f = buffer;
+		}
 	}
 	return ( *this );
 	M_EPILOG
@@ -821,9 +1059,18 @@ HStreamInterface& HStreamInterface::do_input( float& f ) {
 
 HStreamInterface& HStreamInterface::do_input( void const*& pointer_ ) {
 	M_PROLOG
-	size_t val( 0 );
-	do_input( val );
-	pointer_ = reinterpret_cast<void const*>( val );
+	if ( _mode == MODE::TEXT ) {
+		size_t val( 0 );
+		do_input( val );
+		pointer_ = reinterpret_cast<void const*>( val );
+	} else {
+		void const* buffer( nullptr );
+		int long toRead( static_cast<int>( sizeof ( buffer ) ) );
+		_fail = ( read( &buffer, toRead ) ) != toRead;
+		if ( good() ) {
+			pointer_ = buffer;
+		}
+	}
 	return ( *this );
 	M_EPILOG
 }
@@ -942,6 +1189,13 @@ HStreamInterface& HStreamInterface::do_set_precision( int precision_ ) {
 	M_EPILOG
 }
 
+HStreamInterface& HStreamInterface::do_set_mode( MODE mode_ ) {
+	M_PROLOG
+	_mode = mode_;
+	return ( *this );
+	M_EPILOG
+}
+
 HStreamInterface& HStreamInterface::do_set_base( BASE base_ ) {
 	M_PROLOG
 	_base = base_;
@@ -995,6 +1249,10 @@ int HStreamInterface::do_get_width( void ) const {
 
 int HStreamInterface::do_get_precision( void ) const {
 	return ( _precision );
+}
+
+HStreamInterface::MODE HStreamInterface::do_get_mode( void ) const {
+	return ( _mode );
 }
 
 HStreamInterface::BASE HStreamInterface::do_get_base( void ) const {

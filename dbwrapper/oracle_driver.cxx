@@ -326,7 +326,7 @@ void* oracle_query_execute( ODBLink& dbLink_, void* data_ ) {
 						break;
 					}
 					int nameLength( 0 );
-					text* name( nullptr );
+					::text* name( nullptr );
 					if ( ( ( *query->_status ) = OCIAttrGet( params[i],
 									OCI_DTYPE_PARAM, &name,
 									reinterpret_cast<ub4*>( &nameLength ),
