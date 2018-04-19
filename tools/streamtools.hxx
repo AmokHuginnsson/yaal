@@ -355,12 +355,15 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 
 class HNumber;
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface&, yaal::hcore::HNumber const& );
+yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface&, yaal::hcore::HNumber& );
 
 class HTime;
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface&, yaal::hcore::HTime const& );
+yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface&, yaal::hcore::HTime& );
 
 class HComplex;
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface&, yaal::hcore::HComplex const& );
+yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface&, yaal::hcore::HComplex& );
 
 }
 

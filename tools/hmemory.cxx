@@ -14,9 +14,15 @@ namespace yaal {
 
 namespace tools {
 
+namespace {
+
+static int const UNINITIALIZED = -1;
+
+}
+
 HMemory::HMemory( HMemoryHandlingStrategyInterface& memory_, INITIAL_STATE initialState_ )
 	: _memory( memory_ )
-	, _valid( initialState_ == INITIAL_STATE::AUTO ? -1 : ( initialState_ == INITIAL_STATE::VALID ? memory_.get_size() : 0 ) )
+	, _valid( initialState_ == INITIAL_STATE::AUTO ? UNINITIALIZED : ( initialState_ == INITIAL_STATE::VALID ? memory_.get_size() : 0 ) )
 	, _cursorRead( 0 )
 	, _cursorWrite( 0 ) {
 	return;
@@ -30,14 +36,14 @@ bool HMemory::operator == ( HMemory const& other ) const {
 	M_PROLOG
 	return (
 		( other._memory.get_size() == _memory.get_size() )
-			&& ( ! ::memcmp( other._memory.get_memory(), _memory.get_memory(), static_cast<size_t>( _memory.get_size() ) ) )
+		&& ( ! ::memcmp( other._memory.get_memory(), _memory.get_memory(), static_cast<size_t>( _memory.get_size() ) ) )
 	);
 	M_EPILOG
 }
 
 int long HMemory::do_write( void const* src_, int long size_ ) {
 	M_PROLOG
-	if ( _valid == -1 ) { /* First data access. */
+	if ( _valid == UNINITIALIZED ) { /* First data access. */
 		_valid = 0;
 	}
 	_memory.commit( _valid, _cursorRead, _cursorWrite, size_ );
@@ -68,7 +74,7 @@ void HMemory::do_flush( void ) {
 
 int long HMemory::do_read( void* dest_, int long size_ ) {
 	M_PROLOG
-	if ( _valid == -1 ) { /* First data access. */
+	if ( _valid == UNINITIALIZED ) { /* First data access. */
 		_valid = _memory.get_size();
 	}
 	int long size( min( size_, _valid ) );
@@ -83,13 +89,17 @@ int long HMemory::do_read( void* dest_, int long size_ ) {
 		_cursorRead += size;
 	}
 	_valid -= size;
+	if ( ( _valid == 0 ) && ( size == 0 ) && ( size_ > 0 ) ) {
+		_valid = UNINITIALIZED;
+		size = -1;
+	}
 	return ( size );
 	M_EPILOG
 }
 
 bool HMemory::do_is_valid( void ) const {
 	M_PROLOG
-	return ( ( _cursorRead < _memory.get_size() ) && ( _cursorWrite < _memory.get_size() ) );
+	return ( _valid != UNINITIALIZED );
 	M_EPILOG
 }
 

@@ -21,6 +21,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/hnumber.hxx"
 #include "hcore/hcomplex.hxx"
 #include "hcore/htime.hxx"
+#include "hcore/number.hxx"
 #include "util.hxx"
 
 using namespace yaal::hcore;
@@ -307,26 +308,158 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& stre
 
 namespace hcore {
 
+struct HNumber::ElementaryFunctions {
+	static void serialize( HStreamInterface& stream_, HNumber const& number_ ) {
+		M_PROLOG
+		stream_ << number_._precision << number_._leafCount << number_._integralPartSize << static_cast<u8_t>( number_._negative ? 1 : 0 );
+		stream_.write( number_._canonical.raw(), number_._leafCount * static_cast<int>( sizeof ( HNumber::integer_t ) ) );
+		return;
+		M_EPILOG
+	}
+	static void deserialize( HStreamInterface& stream_, HNumber& number_ ) {
+		M_PROLOG
+		u8_t neg( 0 );
+		HNumber n;
+		do {
+			stream_ >> n._precision;
+			if ( ! stream_.good() ) {
+				break;
+			}
+			stream_ >> n._leafCount;
+			if ( ! stream_.good() ) {
+				break;
+			}
+			stream_ >> n._integralPartSize;
+			if ( ! stream_.good() ) {
+				break;
+			}
+			stream_ >> neg;
+			if ( ! stream_.good() ) {
+				break;
+			}
+			number_._negative = neg != 0;
+
+			if (
+				( ( neg != 0 ) && ( neg != 1 ) )
+				|| ( n._precision < number::HARDCODED_MINIMUM_PRECISION )
+				|| ( n._leafCount < 0 )
+				|| ( n._integralPartSize < 0 )
+				|| ( n._integralPartSize > n._leafCount )
+			) {
+				break;
+			}
+			if ( n._leafCount > 0 ) {
+				n._canonical.realloc( chunk_size<HNumber::integer_t>( n._leafCount ) );
+				int toRead( n._leafCount * static_cast<int>( sizeof ( HNumber::integer_t ) ) );
+				if ( stream_.read( n._canonical.raw(), toRead ) != toRead ) {
+					break;
+				}
+			}
+			number_ = yaal::move( n );
+		} while ( false );
+		return;
+		M_EPILOG
+	}
+};
+
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HNumber const& number_ ) {
 	M_PROLOG
-	HNumber n( number_ );
-	n.round( out.get_precision() );
-	out << n.to_string();
+	if ( out.get_mode() == HStreamInterface::MODE::TEXT ) {
+		HNumber n( number_ );
+		n.round( out.get_precision() );
+		out << n.to_string();
+	} else {
+		HNumber::ElementaryFunctions::serialize( out, number_ );
+	}
 	return ( out );
+	M_EPILOG
+}
+
+yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface& in, yaal::hcore::HNumber& number_ ) {
+	M_PROLOG
+	if ( in.get_mode() == HStreamInterface::MODE::TEXT ) {
+		HString strNo;
+		in >> strNo;
+		number_ = strNo;
+	} else {
+		HNumber::ElementaryFunctions::deserialize( in, number_ );
+	}
+	return ( in );
 	M_EPILOG
 }
 
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTime const& t_ ) {
 	M_PROLOG
-	out << t_.string();
+	if ( out.get_mode() == HStreamInterface::MODE::TEXT ) {
+		out << t_.string();
+	} else {
+		out << t_.raw();
+	}
 	return ( out );
+	M_EPILOG
+}
+
+yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface& in, yaal::hcore::HTime& t_ ) {
+	M_PROLOG
+	if ( in.get_mode() == HStreamInterface::MODE::TEXT ) {
+		HString strTime;
+		in >> strTime;
+		t_.from_string( strTime );
+	} else {
+		i64_t v( 0 );
+		in >> v;
+		if ( in.good() ) {
+			t_.set( v );
+		}
+	}
+	return ( in );
 	M_EPILOG
 }
 
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HComplex const& c_ ) {
 	M_PROLOG
-	out << "(" << c_.re() << "+" << c_.im() << "i)";
+	if ( out.get_mode() == HStreamInterface::MODE::TEXT ) {
+		out << "(" << c_.re() << "+" << c_.im() << "i)";
+	} else {
+		out << c_.re() << c_.im();
+	}
 	return ( out );
+	M_EPILOG
+}
+
+yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface& in, yaal::hcore::HComplex& c_ ) {
+	M_PROLOG
+	HComplex::value_type re( 0 );
+	HComplex::value_type im( 0 );
+	if ( in.get_mode() == HStreamInterface::MODE::TEXT ) {
+		do {
+			HString s;
+			in >> s;
+			if ( s.is_empty() || ( s.front() != '(' ) ) {
+				break;
+			}
+			int long plusIdx( s.find( '+'_ycp ) );
+			if ( ( plusIdx == HString::npos ) || ( plusIdx > ( s.get_length() - 4 ) ) ) {
+				break;
+			}
+			re = lexical_cast<HComplex::value_type>( s.substr( 1, plusIdx - 1 ) );
+			im = lexical_cast<HComplex::value_type>( s.substr( plusIdx + 1, s.get_length() - ( plusIdx + 3 ) ) );
+			c_.set( re, im );
+		} while ( false );
+	} else {
+		do {
+			in >> re;
+			if ( ! in.good() ) {
+				break;
+			}
+			in >> im;
+			if ( ! in.good() ) {
+				break;
+			}
+			c_.set( re, im );
+		} while ( false );
+	}
+	return ( in );
 	M_EPILOG
 }
 
