@@ -22,6 +22,9 @@ namespace yaal {
 
 namespace hcore {
 
+class HProgramOptionsHandler;
+typedef HExceptionT<HProgramOptionsHandler> HProgramOptionsHandlerException;
+
 /*! \brief Handle program options from command-line and configuration (resource) file.
  */
 class HProgramOptionsHandler {
@@ -79,8 +82,8 @@ public:
 		template<typename T>
 		HOption& recipient( T& recipient_ ) {
 			M_PROLOG
-			_setter = yaal::hcore::call( static_cast<void (*)( T&, yaal::hcore::HString const& )>( &HOption::set ), yaal::ref( recipient_ ), _1 );
-			_getter = yaal::hcore::call( static_cast<yaal::hcore::HString (*)( T const& )>( &HOption::get ), yaal::cref( recipient_ ) );
+			_setter = yaal::hcore::call( static_cast<void (HOption::*)( T&, yaal::hcore::HString const& )>( &HOption::set ), this, yaal::ref( recipient_ ), _1 );
+			_getter = yaal::hcore::call( static_cast<yaal::hcore::HString (HOption::*)( T const& )>( &HOption::get ), this, yaal::cref( recipient_ ) );
 			_recipientType = yaal::symbolic_type<T>::value;
 			_valueId = reinterpret_cast<u64_t>( &recipient_ );
 			return ( *this );
@@ -95,15 +98,37 @@ public:
 		void swap( HOption& );
 	private:
 		template<typename T>
-		static void set( T& recipient_, yaal::hcore::HString const& value_ ) {
+		void set( T& recipient_, yaal::hcore::HString const& value_ ) {
 			M_PROLOG
-			program_options_helper::set_option_value_from_string( recipient_, value_ );
+			try {
+				program_options_helper::set_option_value_from_string( recipient_, value_ );
+			} catch ( HException const& e ) {
+				throw HProgramOptionsHandlerException(
+					"Option `"_ys
+						.append( !_longForm.is_empty() ? "--" : "-" )
+						.append( !_longForm.is_empty() ? _longForm : to_string( code_point_t( static_cast<code_point_t::value_type>( _shortForm ) ) ) )
+						.append( "' got an invalid value: " )
+						.append( e.what() )
+				);
+			}
 			return;
 			M_EPILOG
 		}
 		template<typename T>
-		static yaal::hcore::HString get( T const& value_ ) {
-			return ( program_options_helper::get_string_from_option_value( value_ ) );
+		yaal::hcore::HString get( T const& value_ ) {
+			HString s;
+			try {
+				s = program_options_helper::get_string_from_option_value( value_ );
+			} catch ( HException const& e ) {
+				throw HProgramOptionsHandlerException(
+					"Option's `"_ys
+						.append( !_longForm.is_empty() ? "--" : "-" )
+						.append( !_longForm.is_empty() ? _longForm : to_string( code_point_t( static_cast<code_point_t::value_type>( _shortForm ) ) ) )
+						.append( "' value is not printable: " )
+						.append( e.what() )
+				);
+			}
+			return ( s );
 		}
 	};
 	template<typename tType>
@@ -148,9 +173,6 @@ private:
 	void set_option( HOption&, HString const& );
 	void set_from_env( void );
 };
-
-typedef HExceptionT<HProgramOptionsHandler> HProgramOptionsHandlerException;
-
 
 inline void swap( yaal::hcore::HProgramOptionsHandler::HOption& a, yaal::hcore::HProgramOptionsHandler::HOption& b )
 	{ a.swap( b ); }
