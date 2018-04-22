@@ -86,7 +86,9 @@ template<typename tType>
 void HDestructor<tType>::destruct( void ) {
 	M_PROLOG
 	if ( _object ) {
+#ifndef __HOST_OS_TYPE_CYGWIN__
 		M_SAFE( delete _object );
+#endif /* #ifndef __HOST_OS_TYPE_CYGWIN__ */
 	}
 	_object = nullptr;
 	M_EPILOG

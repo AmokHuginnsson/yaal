@@ -6,14 +6,16 @@
 #include "hcore/hchunk.hxx"
 #include "hcore/hpair.hxx"
 #include "hcore/hstreaminterface.hxx"
+#include "hcore/hsingleton.hxx"
 
 namespace yaal {
 
 namespace tools {
 
-class HTerminal {
+class M_YAAL_TOOLS_PUBLIC_API HTerminal : public yaal::hcore::HSingleton<HTerminal> {
 public:
 	typedef HTerminal this_type;
+	typedef yaal::hcore::HSingleton<HTerminal> base_type;
 	typedef yaal::hcore::HPair<int, int> coord_t;
 private:
 	yaal::hcore::HChunk _termios;
@@ -23,9 +25,15 @@ public:
 	void init( void );
 	void flush( void );
 	coord_t size( void ) const;
+	static int life_time( int ) {
+		return ( 50 );
+	}
+private:
+	friend class yaal::hcore::HSingleton<HTerminal>;
+	friend class yaal::hcore::HDestructor<HTerminal>;
 };
 
-extern HTerminal _terminal_;
+typedef yaal::hcore::HExceptionT<HTerminal, yaal::hcore::HExceptionT<yaal::hcore::HSingleton<HTerminal>>> HTerminalException;
 
 template<typename T>
 bool is_a_tty( T const& );

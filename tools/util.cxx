@@ -426,8 +426,8 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 	HString name;
 	bool color( is_a_tty( out_ ) && info.color() );
 	int columns( 0 );
-	if ( color && _terminal_.exists() ) {
-		HTerminal::coord_t c( _terminal_.size() );
+	if ( color && HTerminal::get_instance().exists() ) {
+		HTerminal::coord_t c( HTerminal::get_instance().size() );
 		columns = c.second;
 	}
 	if ( columns <= 0 ) {

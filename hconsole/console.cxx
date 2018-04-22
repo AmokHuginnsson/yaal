@@ -298,7 +298,7 @@ void HConsole::init( void ) {
 
 void HConsole::enter_curses( void ) {
 	M_PROLOG
-	if ( ! _terminal_.exists() ) {
+	if ( ! HTerminal::get_instance().exists() ) {
 		throw HConsoleException( "Not connected to a terminal." );
 	}
 	static short const colors[] = {
@@ -310,7 +310,7 @@ void HConsole::enter_curses( void ) {
 	if ( ! _initialized ) {
 		init();
 	}
-	_terminal_.init();
+	HTerminal::get_instance().init();
 	use_env( true );
 	if ( ! _window ) {
 		_window = initscr();
@@ -411,7 +411,7 @@ void HConsole::leave_curses( void ) {
 	static_cast<WINDOW*>( _window ) = nullptr;
 */
 	M_ENSURE( endwin() == OK );
-	_terminal_.flush();
+	HTerminal::get_instance().flush();
 	_enabled = false;
 	return;
 	M_EPILOG

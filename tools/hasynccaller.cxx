@@ -81,7 +81,7 @@ bool HAsyncCaller::want_restart( void ) const {
 }
 
 int HAsyncCaller::life_time( int ) {
-	return ( HThreadPool::life_time( 0 ) + 10 );
+	return ( HThreadPool::life_time( 0 ) - 20 );
 }
 
 }

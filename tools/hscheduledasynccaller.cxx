@@ -114,7 +114,7 @@ void HScheduledAsyncCaller::run( void ) {
 }
 
 int HScheduledAsyncCaller::life_time( int ) {
-	return ( HAsyncCaller::life_time( 0 ) + 10 );
+	return ( HAsyncCaller::life_time( 0 ) - 10 );
 }
 
 }

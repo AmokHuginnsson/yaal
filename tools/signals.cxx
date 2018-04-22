@@ -289,7 +289,7 @@ void HSignalService::exit( int ) {
 }
 
 int HSignalService::life_time( int ) {
-	return ( HThreadPool::life_time( 0 ) + 50 );
+	return ( HThreadPool::life_time( 0 ) - 10 );
 }
 
 void HSignalService::call_handler( int sigNo_ ) {

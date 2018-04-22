@@ -34,7 +34,7 @@ void HLifeTimeTracker::do_destruct( void ) {
 	M_PROLOG
 	HLock lock( _mutex );
 	_isKilled_ = true;
-	map_stack_t::iterator it = _destructors.begin();
+	map_stack_t::iterator it( _destructors.begin() );
 	M_ASSERT( it != _destructors.end() );
 	destructor_ptr_t destructor = (*it).second;
 	M_ASSERT( !! destructor );

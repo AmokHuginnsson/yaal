@@ -116,8 +116,6 @@ HTerminal::coord_t HTerminal::size( void ) const {
 	M_EPILOG
 }
 
-HTerminal _terminal_;
-
 template<>
 bool is_a_tty( int const& fd_ ) {
 	return ( ::isatty( fd_ ) ? true : false );
