@@ -30,6 +30,10 @@ typedef yaal::hcore::HExceptionT<FileSystem> HFileSystemException;
 typedef yaal::hcore::HString path_t;
 
 path_t normalize_path( path_t const& );
+bool is_absolute( path_t const& );
+inline bool is_relative( path_t const& path_ ) {
+	return ( ! is_absolute( path_ ) );
+}
 
 path_t current_working_directory( void );
 bool exists( path_t const& );

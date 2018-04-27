@@ -68,6 +68,12 @@ path_t current_working_directory( void ) {
 	return ( p );
 }
 
+bool is_absolute( path_t const& path_ ) {
+	M_PROLOG
+	return ( ! path_.is_empty() && ( path_.front() == path::ROOT.front() ) );
+	M_EPILOG
+}
+
 path_t normalize_path( path_t const& path_ ) {
 	M_PROLOG
 	HString path( path_ );
