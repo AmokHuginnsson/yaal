@@ -92,10 +92,12 @@ HHuginn::value_t HPackageFactory::load_binary( HRuntime* runtime_, HHuginn::path
 	M_PROLOG
 	plugin_t plugin( make_pointer<HPlugin>() );
 	HString pluginName;
+	HString name( name_ );
+	name.replace( ".", "/" );
 	pluginName
 		.assign( LIB_PREFIX )
 		.append( "huginn_" )
-		.append( name_ )
+		.append( name )
 		.append( LIB_INFIX )
 		.append( "." )
 		.append( LIB_EXT );
@@ -138,8 +140,10 @@ HHuginn::value_t HPackageFactory::load_module( HRuntime* runtime_, HHuginn::path
 	M_PROLOG
 	HString path;
 	HString test;
+	HString name( name_ );
+	name.replace( ".", "/" );
 	for ( HString const& p : paths_ ) {
-		test.assign( p ).append( "/" ).append( name_ ).append( ".hgn" );
+		test.assign( p ).append( "/" ).append( name ).append( ".hgn" );
 		substitute_environment( test, ENV_SUBST_MODE::RECURSIVE );
 		try {
 			if ( ! p.is_empty() && filesystem::is_regular_file( test ) ) {

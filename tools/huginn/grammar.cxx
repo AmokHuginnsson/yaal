@@ -676,12 +676,20 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		) >> '{' >> enumeral >> *( ',' >> enumeral ) >> '}',
 		HRuleBase::action_position_t( hcore::call( &OCompiler::commit_enum, _compiler.get(), _1 ) )
 	);
+	HIdentifierParser moduleName(
+		identifier(
+			"moduleName",
+			HIdentifierParser::action_string_position_t( hcore::call( &OCompiler::build_import_name, _compiler.get(), _1, _2 ) )
+		)
+	);
+	HRule packageName(
+		"packageName",
+		moduleName >> *( '.' >> moduleName ),
+		HRule::action_position_t( hcore::call( &OCompiler::set_import_name, _compiler.get(), _1 ) )
+	);
 	HRule importStatement(
 		"importStatement",
-		constant( "import" ) >> identifier(
-			"packageName",
-			HIdentifierParser::action_string_position_t( hcore::call( &OCompiler::set_import_name, _compiler.get(), _1, _2 ) )
-		) >> "as" >> identifier(
+		constant( "import" ) >> packageName >> "as" >> identifier(
 			"importName",
 			HIdentifierParser::action_string_position_t( hcore::call( &OCompiler::set_import_alias, _compiler.get(), _1, _2 ) )
 		) >> ';',

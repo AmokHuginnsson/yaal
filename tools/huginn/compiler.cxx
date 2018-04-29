@@ -254,6 +254,7 @@ OCompiler::OCompiler( HRuntime* runtime_ )
 	, _submittedClasses()
 	, _submittedEnums()
 	, _submittedImports()
+	, _moduleName()
 	, _importInfo()
 	, _executionStepsBacklog()
 	, _usedIdentifiers()
@@ -284,6 +285,7 @@ void OCompiler::reset( int undoSteps_ ) {
 	_usedIdentifiers.clear();
 	_executionStepsBacklog.clear();
 	_importInfo.reset();
+	_moduleName.clear();
 	_submittedImports.clear();
 	_submittedEnums.clear();
 	_submittedClasses.clear();
@@ -826,12 +828,23 @@ void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_
 	M_EPILOG
 }
 
-void OCompiler::set_import_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+void OCompiler::build_import_name( yaal::hcore::HString const& name_, executing_parser::position_t ) {
 	M_PROLOG
-	if ( is_restricted( name_ ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), MAIN_FILE_ID, position_.get() );
+	if ( ! _moduleName.is_empty() ) {
+		_moduleName.append( "." );
 	}
-	HHuginn::identifier_id_t importIdentifier( _runtime->identifier_id( name_ ) );
+	_moduleName.append( name_ );
+	return;
+	M_EPILOG
+}
+
+void OCompiler::set_import_name( executing_parser::position_t position_ ) {
+	M_PROLOG
+	if ( is_restricted( _moduleName ) ) {
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( _moduleName ).append( "' is a restricted name." ), MAIN_FILE_ID, position_.get() );
+	}
+	HHuginn::identifier_id_t importIdentifier( _runtime->identifier_id( _moduleName ) );
+	_moduleName.clear();
 	check_name_import( importIdentifier, position_ );
 	check_name_enum( importIdentifier, true, position_ );
 	check_name_class( importIdentifier, false, position_ );

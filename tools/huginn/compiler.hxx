@@ -398,6 +398,7 @@ struct OCompiler {
 	submitted_classes_t _submittedClasses;
 	submitted_enums_t _submittedEnums;
 	submitted_imports_t _submittedImports;
+	yaal::hcore::HString _moduleName;
 	OImportInfo _importInfo;
 	execution_steps_backlog_t _executionStepsBacklog;
 	used_identifiers_t _usedIdentifiers;
@@ -431,7 +432,8 @@ struct OCompiler {
 	void detect_misuse( void ) const;
 	void resolve_symbols( void );
 	void set_function_name( yaal::hcore::HString const&, executing_parser::position_t );
-	void set_import_name( yaal::hcore::HString const&, executing_parser::position_t );
+	void build_import_name( yaal::hcore::HString const&, executing_parser::position_t );
+	void set_import_name( executing_parser::position_t );
 	void set_import_alias( yaal::hcore::HString const&, executing_parser::position_t );
 	void set_class_name( HHuginn::identifier_id_t, executing_parser::position_t );
 	void check_name_import( HHuginn::identifier_id_t, executing_parser::position_t );
