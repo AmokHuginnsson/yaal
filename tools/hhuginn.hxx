@@ -321,7 +321,7 @@ public:
 	yaal::hcore::HStreamInterface& log_stream( void );
 	yaal::hcore::HString get_snippet( int, int ) const;
 	yaal::hcore::HString const& get_comment( int ) const;
-	void register_class( class_t, ACCESS = ACCESS::PRIVATE, VISIBILITY = VISIBILITY::PACKAGE );
+	void register_class( class_t, VISIBILITY = VISIBILITY::PACKAGE );
 	void register_function( identifier_id_t );
 	void register_function( yaal::hcore::HString const&, function_t&&, yaal::hcore::HString const& );
 	static void disable_grammar_verification( void );
@@ -448,10 +448,12 @@ public:
 	typedef HHuginn::HClass this_type;
 	typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, int> field_indexes_t;
 	typedef value_t ( *create_instance_t )( HClass const*, huginn::HThread*, values_t&, int );
+	typedef HHuginn::value_t ( *constructor_t )( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	class HMethod;
 	class HUnboundMethod;
 	class HBoundMethod;
 private:
+	huginn::HRuntime* _runtime;
 	type_id_t _typeId;
 	identifier_id_t _identifierId;
 	HClass const* _super;
@@ -460,13 +462,16 @@ private:
 	field_indexes_t _staticFieldIndexes;
 	field_indexes_t _fieldIndexes;
 	values_t _fieldDefinitions;
+	value_t _constructor;
 	field_descriptions_t _fieldDescriptions;
 	yaal::hcore::HString _doc;
 	TYPE _type;
 	HClass const* _origin;
-	huginn::HRuntime* _runtime;
 public:
-	HClass( huginn::HRuntime*, type_id_t, identifier_id_t, HClass const*, yaal::hcore::HString const&, TYPE = TYPE::BUILTIN, HClass const* = nullptr, create_instance_t = nullptr );
+	HClass( huginn::HRuntime*, type_id_t, identifier_id_t, yaal::hcore::HString const&, ACCESS, TYPE = TYPE::BUILTIN, HClass const* = nullptr, create_instance_t = nullptr );
+	HClass( huginn::HRuntime*, type_id_t, identifier_id_t, yaal::hcore::HString const&, constructor_t );
+	HClass( huginn::HRuntime*, huginn::HObjectFactory*, type_id_t, identifier_id_t, yaal::hcore::HString const&, constructor_t );
+	HClass( huginn::HRuntime*, huginn::HObjectFactory*, char const*, char const* );
 	HClass( HHuginn::TYPE, HHuginn::identifier_id_t, yaal::hcore::HString const& );
 	virtual ~HClass( void ) {
 	}
@@ -495,8 +500,7 @@ public:
 	value_t const& field( int index_ ) const {
 		return ( _fieldDefinitions[index_] );
 	}
-	function_t constructor_function( HHuginn::ACCESS ) const;
-	value_t constructor( HHuginn::ACCESS ) const;
+	function_t constructor_function( void ) const;
 	values_t get_defaults( huginn::HThread*, int ) const;
 	value_t get_default( huginn::HThread*, int, int ) const;
 	function_t const& function( int ) const;
@@ -513,12 +517,17 @@ public:
 	huginn::HRuntime* runtime( void ) const {
 		return ( _runtime );
 	}
+	HHuginn::value_t const& constructor( void ) const {
+		return ( _constructor );
+	}
 	static value_t create_instance_default( HClass const*, huginn::HThread*, values_t&, int );
 	value_t create_instance( huginn::HThread*, value_t*, values_t&, int ) const;
 	yaal::hcore::HString const& doc( void ) const;
 	yaal::hcore::HString const& doc( identifier_id_t ) const;
 	void finalize_registration( huginn::HRuntime* );
 private:
+	value_t make_constructor( huginn::HObjectFactory*, HHuginn::ACCESS ) const;
+	value_t make_constructor( huginn::HObjectFactory*, constructor_t ) const;
 	value_t access_violation( huginn::HThread*, value_t*, values_t&, int ) const __attribute__((noreturn));
 	value_t base_class_not_initialized( huginn::HThread*, value_t*, values_t&, int ) const;
 	virtual void do_finalize_registration( huginn::HRuntime* );

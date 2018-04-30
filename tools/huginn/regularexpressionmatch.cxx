@@ -90,8 +90,8 @@ HHuginn::class_t HRegularExpressionMatch::get_class( HRuntime* runtime_ ) {
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"RegularExpressionMatch",
-			nullptr,
-			"The `RegularExpressionMatch` class represents result of regular expression based text search."
+			"The `RegularExpressionMatch` class represents result of regular expression based text search.",
+			HHuginn::ACCESS::PRIVATE
 		)
 	);
 	HHuginn::field_definitions_t fd{

@@ -557,8 +557,8 @@ HHuginn::class_t HMatrix::get_class( HRuntime* runtime_, HHuginn::HClass const* 
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"Matrix",
-			nullptr,
 			"The `Matrix` class provides mathematical concept of number matrices. It supports operations of addition, multiplication, subtraction, scaling, inversion and transposition.",
+			HHuginn::ACCESS::PUBLIC,
 			HHuginn::HClass::TYPE::BUILTIN,
 			origin_,
 			&HMatrix::create_instance
@@ -583,7 +583,7 @@ HHuginn::class_t HMatrix::get_class( HRuntime* runtime_, HHuginn::HClass const* 
 		{ "to_string", runtime_->create_method( &HMatrix::to_string ), "get string representation of this `Matrix`" }
 	};
 	c->redefine( nullptr, fd );
-	runtime_->huginn()->register_class( c, HHuginn::ACCESS::PUBLIC );
+	runtime_->huginn()->register_class( c );
 	return ( c );
 	M_EPILOG
 }

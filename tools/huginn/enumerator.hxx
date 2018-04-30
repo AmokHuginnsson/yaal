@@ -29,8 +29,8 @@ public:
 		HHuginn::class_t c(
 			runtime_->create_class(
 				"Enumerator",
-				nullptr,
-				"The `Enumerator` class allows counting elements of *iterable* that are iterated over."
+				"The `Enumerator` class allows counting elements of *iterable* that are iterated over.",
+				HHuginn::ACCESS::PRIVATE
 			)
 		);
 		runtime_->huginn()->register_class( c );

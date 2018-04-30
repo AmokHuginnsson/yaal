@@ -98,8 +98,8 @@ public:
 			runtime_,
 			typeId_,
 			identifierId_,
-			nullptr,
-			"The `Stream` class gives an interface for stream based I/O operations."
+			"The `Stream` class gives an interface for stream based I/O operations.",
+			HHuginn::ACCESS::PRIVATE
 		)
 		, _seekEnumerationClass()
 		, _exceptionClass() {
@@ -862,7 +862,7 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 			try {
 				HString n( _buffer.get<char>(), len );
 				HHuginn::identifier_id_t id( thread_->runtime().identifier_id( n ) );
-				HHuginn::value_t* fun( thread_->runtime().get_function( id ) );
+				HHuginn::value_t const* fun( thread_->runtime().get_function( id ) );
 				if ( fun ) {
 					v = *fun;
 				} else {
@@ -949,7 +949,7 @@ HHuginn::class_t HStream::get_class( HRuntime* runtime_ ) {
 				}
 			)
 		);
-		runtime_->huginn()->register_class( c, HHuginn::ACCESS::PRIVATE, HHuginn::VISIBILITY::GLOBAL );
+		runtime_->huginn()->register_class( c, HHuginn::VISIBILITY::GLOBAL );
 	}
 	return ( c );
 	M_EPILOG

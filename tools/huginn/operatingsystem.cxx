@@ -137,8 +137,8 @@ HHuginn::value_t HOperatingSystemCreator::do_new_instance( HRuntime* runtime_ ) 
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"OperatingSystem",
-			nullptr,
-			"The `OperatingSystem` package provides an interface to various operating system functionalities."
+			"The `OperatingSystem` package provides an interface to various operating system functionalities.",
+			HHuginn::ACCESS::PRIVATE
 		)
 	);
 	HHuginn::field_definitions_t fd{

@@ -39,8 +39,8 @@ public:
 		runtime_,
 		typeId_,
 		identifierId_,
-		nullptr,
-		doc_
+		doc_,
+		HHuginn::ACCESS::PRIVATE
 	)
 	, _enumerationClass( enumerationClass_ ) {
 	}
@@ -70,8 +70,8 @@ HEnumerationClass::HEnumerationClass(
 		runtime_,
 		typeId_,
 		identifierId_,
-		base_,
-		doc_
+		doc_,
+		HHuginn::ACCESS::PRIVATE
 	)
 	, _valueClass() {
 	HString valueName( name() );
@@ -98,7 +98,7 @@ HEnumerationClass::HEnumerationClass(
 			{ "to_string", runtime_->create_method( &HEnumerationClass::to_string ), "Get enumeration name." }
 		}
 	);
-	runtime_->huginn()->register_class( _valueClass, HHuginn::ACCESS::PRIVATE, visibility_ );
+	runtime_->huginn()->register_class( _valueClass, visibility_ );
 	HHuginn::field_definitions_t fd;
 	fd.reserve( descriptions_.get_size() + 1 );
 	int id( 0 );
@@ -161,7 +161,7 @@ HHuginn::class_t create_class(
 				}
 			)
 		);
-		runtime_->huginn()->register_class( c, HHuginn::ACCESS::PRIVATE, visibility_ );
+		runtime_->huginn()->register_class( c, visibility_ );
 	}
 	return ( c );
 }

@@ -137,8 +137,8 @@ public:
 			runtime_,
 			typeId_,
 			runtime_->identifier_id( "QueryResult" ),
-			nullptr,
-			"The `QueryResult` class represent result of database query execution. It allows getting both material query results and query result meta data."
+			"The `QueryResult` class represent result of database query execution. It allows getting both material query results and query result meta data.",
+			HHuginn::ACCESS::PRIVATE
 		)
 		, _exceptionClass( exceptionClass_ ) {
 		HHuginn::field_definitions_t fd{

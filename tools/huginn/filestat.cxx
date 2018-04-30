@@ -155,8 +155,8 @@ HHuginn::class_t HFileStat::get_class( HRuntime* runtime_ ) {
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"FileStat",
-			nullptr,
-			"The `FileStat` class allows obtaining metadata information about various file system objects."
+			"The `FileStat` class allows obtaining metadata information about various file system objects.",
+			HHuginn::ACCESS::PRIVATE
 		)
 	);
 	HHuginn::field_definitions_t fd{

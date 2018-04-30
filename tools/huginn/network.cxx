@@ -95,8 +95,8 @@ HHuginn::value_t HNetworkCreator::do_new_instance( HRuntime* runtime_ ) {
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"Network",
-			nullptr,
-			"The `Network` package provides access to various networking related functionalities."
+			"The `Network` package provides access to various networking related functionalities.",
+			HHuginn::ACCESS::PRIVATE
 		)
 	);
 	HHuginn::field_definitions_t fd{

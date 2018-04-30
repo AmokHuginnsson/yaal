@@ -78,12 +78,13 @@ public:
 		, _list( list_ ) {
 		M_ASSERT( _list->type_id() == HHuginn::TYPE::LIST );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
-			runtime_->create_class(
+			make_pointer<HHuginn::HClass>(
+				runtime_,
+				objectFactory_,
 				"ReversedListView",
-				nullptr,
 				"The `ReversedListView` class represents *lazy* *iterable* reversed view of a `list`."
 			)
 		);
@@ -291,14 +292,15 @@ public:
 		HObjectFactory* objectFactory_
 	) : HHuginn::HClass(
 			runtime_,
+			objectFactory_,
 			huginn::type_id( HHuginn::TYPE::LIST ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::LIST ) ),
-			nullptr,
 			"The `list` is a collection type that is used to represent and operate on `list` of values. "
 			"It supports basic subscript and range operators. "
-			"It also supports efficient operations of addition and removal of its elements from its (right) end."
+			"It also supports efficient operations of addition and removal of its elements from its (right) end.",
+			&huginn_builtin::list
 		)
-		, _reversedListClass( HReversedList::get_class( runtime_ ) ) {
+		, _reversedListClass( HReversedList::get_class( runtime_, objectFactory_ ) ) {
 		HHuginn::field_definitions_t fd{
 			{ "push",   objectFactory_->create_method( &list::push ),   "( *elem* ) - add new *elem* at the end of the `list`, `list` grows in size by 1" },
 			{ "pop",    objectFactory_->create_method( &list::pop ),    "remove last element from the `list`, `list` shrinks by 1" },

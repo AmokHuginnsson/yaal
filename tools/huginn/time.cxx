@@ -127,8 +127,8 @@ HHuginn::class_t HTime::get_class( HRuntime* runtime_ ) {
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"Time",
-			nullptr,
-			"The `Time` class represent information about point-in-time."
+			"The `Time` class represent information about point-in-time.",
+			HHuginn::ACCESS::PRIVATE
 		)
 	);
 	HHuginn::field_definitions_t fd{

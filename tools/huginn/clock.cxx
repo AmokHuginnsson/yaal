@@ -58,8 +58,8 @@ HHuginn::class_t HClock::get_class( HRuntime* runtime_ ) {
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"Clock",
-			nullptr,
-			"The `Clock` provides a stopper watch concept machinery."
+			"The `Clock` provides a stopper watch concept machinery.",
+			HHuginn::ACCESS::PRIVATE
 		)
 	);
 	HHuginn::field_definitions_t fd{

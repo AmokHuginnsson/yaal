@@ -119,8 +119,8 @@ HHuginn::class_t HRandomizer::get_class( HRuntime* runtime_, HHuginn::HClass con
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"Randomizer",
-			nullptr,
 			"The `Randomizer` class represents a random number generator concept. `Randomizer` can generate uniform distribution of either `integer` or `real` values from given range.",
+			HHuginn::ACCESS::PUBLIC,
 			HHuginn::HClass::TYPE::BUILTIN,
 			origin_,
 			&HRandomizer::create_instance
@@ -133,7 +133,7 @@ HHuginn::class_t HRandomizer::get_class( HRuntime* runtime_, HHuginn::HClass con
 		{ "to_string", runtime_->create_method( &HRandomizer::to_string ), "get string representation of this `Randomizer`" }
 	};
 	c->redefine( nullptr, fd );
-	runtime_->huginn()->register_class( c, HHuginn::ACCESS::PUBLIC );
+	runtime_->huginn()->register_class( c );
 	return ( c );
 	M_EPILOG
 }

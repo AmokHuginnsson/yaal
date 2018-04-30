@@ -142,8 +142,8 @@ HHuginn::class_t HNumberSetStatistics::get_class( HRuntime* runtime_, HHuginn::H
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"NumberSetStatistics",
-			nullptr,
 			"The `NumberSetStatistics` is a class representing results of gathering numerical statistics over some uniformly typed number set.",
+			HHuginn::ACCESS::PUBLIC,
 			HHuginn::HClass::TYPE::BUILTIN,
 			origin_,
 			&HNumberSetStatistics::create_instance
@@ -166,7 +166,7 @@ HHuginn::class_t HNumberSetStatistics::get_class( HRuntime* runtime_, HHuginn::H
 		{ "mid_range",                     runtime_->create_method( &HNumberSetStatistics::derivative_stat, "NumberSetStatistics.mid_range",          DERIVATIVE_STAT::MID_RANGE ),                    "a mid range value of the numbers in the given set" }
 	};
 	c->redefine( nullptr, fd );
-	runtime_->huginn()->register_class( c, HHuginn::ACCESS::PUBLIC );
+	runtime_->huginn()->register_class( c );
 	return ( c );
 	M_EPILOG
 }

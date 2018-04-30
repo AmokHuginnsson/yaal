@@ -38,7 +38,7 @@ private:
 	 */
 	typedef yaal::hcore::HHashMap<identifier_id_t, value_t> functions_store_t;
 	typedef yaal::hcore::HPointer<functions_store_t> shared_functions_store_t;
-	typedef yaal::hcore::HHashSet<identifier_id_t> functions_available_t;
+	typedef yaal::hcore::HHashSet<identifier_id_t> identifiers_t;
 	typedef yaal::hcore::HArray<HHuginn::class_t> dependencies_t;
 public:
 	typedef yaal::hcore::HArray<yaal::hcore::HString> identifier_names_t;
@@ -85,10 +85,10 @@ private:
 	 * It also means that submodule classes must be registered in runtime so its constructors are
 	 * still available in its submodule context.
 	 *
-	 * Hence use of _functionsStore and _functionsAvailable.
+	 * Hence use of _functionsStore and _globalDefinitions.
 	 */
 	shared_functions_store_t _functionsStore; /*!< All functions ever defined in all sub-modules. */
-	functions_available_t _functionsAvailable; /*!< Functions available in current module context. */
+	identifiers_t _globalDefinitions; /*!< Functions available in current module context. */
 	/*
 	 * All classes must be kept directly in runtime so it will be simpler
 	 * to reregister, i.e. update class runtime with update_runtime() for
@@ -132,13 +132,14 @@ public:
 	int max_call_stack_size( void ) const {
 		return ( _maxCallStackSize );
 	}
+	type_id_t new_type_id( void );
 	identifier_id_t try_identifier_id( yaal::hcore::HString const& ) const;
 	identifier_id_t identifier_id( yaal::hcore::HString const& );
 	yaal::hcore::HString const& identifier_name( identifier_id_t ) const;
-	value_t* get_function( identifier_id_t, bool = false );
-	class_t get_class( identifier_id_t );
-	value_t* get_value( identifier_id_t );
-	void register_class( class_t, HHuginn::ACCESS, HHuginn::VISIBILITY );
+	value_t const* get_function( identifier_id_t, bool = false ) const;
+	class_t get_class( identifier_id_t ) const;
+	value_t const* get_value( identifier_id_t ) const;
+	void register_class( class_t, HHuginn::VISIBILITY );
 	/*! \brief Remove compiled class from runtime.
 	 *
 	 * Code compilation works in such a way that class definitions
@@ -173,16 +174,16 @@ public:
 	void register_package( identifier_id_t, identifier_id_t, int );
 	class_t create_class(
 		identifier_id_t,
-		HHuginn::HClass const*,
 		yaal::hcore::HString const&,
+		HHuginn::ACCESS,
 		HHuginn::HClass::TYPE = HHuginn::HClass::TYPE::BUILTIN,
 		HHuginn::HClass const* = nullptr,
 		HHuginn::HClass::create_instance_t = nullptr
 	);
 	class_t create_class(
 		yaal::hcore::HString const&,
-		HHuginn::HClass const*,
 		yaal::hcore::HString const&,
+		HHuginn::ACCESS,
 		HHuginn::HClass::TYPE = HHuginn::HClass::TYPE::BUILTIN,
 		HHuginn::HClass const* = nullptr,
 		HHuginn::HClass::create_instance_t = nullptr

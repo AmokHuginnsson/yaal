@@ -44,8 +44,8 @@ public:
 			runtime_,
 			typeId_,
 			identifierId_,
-			base_,
-			doc_
+			doc_,
+			HHuginn::ACCESS::PUBLIC
 		)
 		, _constructorName( name() + ".constructor" )
 		, _whatName( name() + ".what" )
@@ -167,7 +167,7 @@ HHuginn::class_t create_class( HRuntime* runtime_, yaal::hcore::HString const& n
 				}
 			)
 		);
-		runtime_->huginn()->register_class( c, HHuginn::ACCESS::PUBLIC, visibility_ );
+		runtime_->huginn()->register_class( c, visibility_ );
 	}
 	return ( c );
 	M_EPILOG
@@ -232,8 +232,8 @@ HHuginn::class_t HStackFrameInfo::get_class( HRuntime* runtime_ ) {
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"StackFrameInfo",
-			nullptr,
-			"The `StackFrameInfo` is a class representing information about single execution stack frame."
+			"The `StackFrameInfo` is a class representing information about single execution stack frame.",
+			HHuginn::ACCESS::PRIVATE
 		)
 	);
 	HHuginn::field_definitions_t fd{

@@ -22,17 +22,18 @@ namespace huginn {
 namespace integer {
 
 HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
-HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* ) {
+HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
 			runtime_,
+			objectFactory_,
 			type_id( HHuginn::TYPE::INTEGER ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::INTEGER ) ),
-			nullptr,
 			"The `integer` is a scalar type that is used to represent and operate on integers. "
 			"It supports basic operations of addition, subtraction, multiplication, division, modulo and comparisons. "
-			"The range of possible values it can hold is [-2^32, 2^32)."
+			"The range of possible values it can hold is [-2^32, 2^32).",
+			&huginn_builtin::integer
 		)
 	);
 	return ( c );

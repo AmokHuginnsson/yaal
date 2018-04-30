@@ -23,32 +23,75 @@ HHuginn::HClass::HClass(
 	HRuntime* runtime_,
 	type_id_t typeId_,
 	identifier_id_t identifierId_,
-	HClass const* super_,
 	yaal::hcore::HString const& doc_,
+	HHuginn::ACCESS access_,
 	TYPE type_,
 	HClass const* origin_,
 	create_instance_t createInstance_
-) : _typeId( typeId_ )
+)	: _runtime( runtime_ )
+	, _typeId( typeId_ )
 	, _identifierId( identifierId_ )
 	, _super( nullptr )
-	, _createInstance(
-		createInstance_
-			? createInstance_
-			: (
-				super_ && ( super_->_type == TYPE::BUILTIN ) && ( type_ == TYPE::USER )
-					? &HClass::create_instance_default
-					: &HClass::create_instance_default
-			)
-	)
+	, _createInstance( createInstance_ ? createInstance_ : &HClass::create_instance_default )
 	, _fieldIdentifiers()
 	, _staticFieldIndexes()
 	, _fieldIndexes()
 	, _fieldDefinitions()
+	, _constructor( make_constructor( runtime_->object_factory(), access_ ) )
 	, _fieldDescriptions()
 	, _doc( doc_ )
 	, _type( type_ )
-	, _origin( origin_ )
-	, _runtime( runtime_ ) {
+	, _origin( origin_ ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+HHuginn::HClass::HClass(
+	HRuntime* runtime_,
+	HObjectFactory* objectFactory_,
+	char const* name_,
+	char const* doc_
+) : _runtime( runtime_ )
+	, _typeId( runtime_->new_type_id() )
+	, _identifierId( runtime_->identifier_id( name_ ) )
+	, _super( nullptr )
+	, _createInstance( &HClass::create_instance_default )
+	, _fieldIdentifiers()
+	, _staticFieldIndexes()
+	, _fieldIndexes()
+	, _fieldDefinitions()
+	, _constructor( make_constructor( objectFactory_, ACCESS::PRIVATE ) )
+	, _fieldDescriptions()
+	, _doc( doc_ )
+	, _type( TYPE::BUILTIN )
+	, _origin( nullptr ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+HHuginn::HClass::HClass(
+	HRuntime* runtime_,
+	HObjectFactory* objectFactory_,
+	type_id_t typeId_,
+	identifier_id_t identifierId_,
+	yaal::hcore::HString const& doc_,
+	constructor_t constructor_
+) : _runtime( runtime_ )
+	, _typeId( typeId_ )
+	, _identifierId( identifierId_ )
+	, _super( nullptr )
+	, _createInstance( &HClass::create_instance_default )
+	, _fieldIdentifiers()
+	, _staticFieldIndexes()
+	, _fieldIndexes()
+	, _fieldDefinitions()
+	, _constructor( make_constructor( objectFactory_, constructor_ ) )
+	, _fieldDescriptions()
+	, _doc( doc_ )
+	, _type( TYPE::BUILTIN )
+	, _origin( nullptr ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -58,7 +101,8 @@ HHuginn::HClass::HClass(
 	HHuginn::TYPE typeTag_,
 	HHuginn::identifier_id_t identifierId_,
 	yaal::hcore::HString const& doc_
-) : _typeId( huginn::type_id( typeTag_ ) )
+) : _runtime( nullptr )
+	, _typeId( huginn::type_id( typeTag_ ) )
 	, _identifierId( identifierId_ )
 	, _super( nullptr )
 	, _createInstance( &HClass::create_instance_default )
@@ -66,11 +110,11 @@ HHuginn::HClass::HClass(
 	, _staticFieldIndexes()
 	, _fieldIndexes()
 	, _fieldDefinitions()
+	, _constructor()
 	, _fieldDescriptions()
 	, _doc( doc_ )
 	, _type( TYPE::BUILTIN )
-	, _origin( nullptr )
-	, _runtime( nullptr ) {
+	, _origin( nullptr ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -215,9 +259,9 @@ HHuginn::value_t HHuginn::HClass::access_violation( huginn::HThread* thread_, va
 	M_EPILOG
 }
 
-HHuginn::function_t HHuginn::HClass::constructor_function( HHuginn::ACCESS access_ ) const {
+HHuginn::value_t HHuginn::HClass::make_constructor( HObjectFactory* objectFactory_, HHuginn::ACCESS access_ ) const {
 	M_PROLOG
-	return (
+	HHuginn::function_t func(
 		hcore::call(
 			access_ == HHuginn::ACCESS::PUBLIC
 				? &HHuginn::HClass::create_instance
@@ -225,21 +269,36 @@ HHuginn::function_t HHuginn::HClass::constructor_function( HHuginn::ACCESS acces
 			this, _1, _2, _3, _4
 		)
 	);
-	M_EPILOG
-}
-
-HHuginn::value_t HHuginn::HClass::constructor( HHuginn::ACCESS access_ ) const {
-	M_PROLOG
 	HHuginn::identifier_id_t identifier( identifier_id() );
-	HHuginn::function_t func( constructor_function( access_ ) );
 	HHuginn::value_t ctor(
-		_runtime->object_factory()->create_function_reference(
+		objectFactory_->create_function_reference(
 			identifier,
 			func,
 			"automatic constructor for class: `"_ys.append( _runtime->identifier_name( identifier ) ).append( "`" )
 		)
 	);
 	return ( ctor );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::HClass::make_constructor( HObjectFactory* objectFactory_, constructor_t constructor_ ) const {
+	M_PROLOG
+	HHuginn::function_t func( hcore::call( constructor_, _1, _2, _3, _4 ) );
+	HHuginn::identifier_id_t identifier( identifier_id() );
+	HHuginn::value_t ctor(
+		objectFactory_->create_function_reference(
+			identifier,
+			func,
+			"construct an instance of "_ys.append( a_type_name( this ) ).append( " type" )
+		)
+	);
+	return ( ctor );
+	M_EPILOG
+}
+
+HHuginn::function_t HHuginn::HClass::constructor_function( void ) const {
+	M_PROLOG
+	return ( static_cast<HFunctionReference const*>( _constructor.raw() )->function() );
 	M_EPILOG
 }
 

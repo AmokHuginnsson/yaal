@@ -72,8 +72,8 @@ public:
 			runtime_,
 			typeId_,
 			runtime_->identifier_id( "DatabaseConnection" ),
-			nullptr,
-			"The `DatabaseConnection` class allows performing various type of queries on connected database."
+			"The `DatabaseConnection` class allows performing various type of queries on connected database.",
+			HHuginn::ACCESS::PRIVATE
 		)
 		, _exceptionClass( exceptionClass_ )
 		, _queryClass( huginn::HQuery::get_class( runtime_, exceptionClass_ ) ) {

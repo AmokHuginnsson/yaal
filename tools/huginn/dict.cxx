@@ -88,12 +88,13 @@ public:
 		, _dict( dict_ ) {
 		M_ASSERT( _dict->type_id() == HHuginn::TYPE::DICT );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
-			runtime_->create_class(
+			make_pointer<HHuginn::HClass>(
+				runtime_,
+				objectFactory_,
 				"KeyValuesDictView",
-				nullptr,
 				"The `KeyValuesDictView` class represents *lazy* *iterable* view of a `dict` consisted of key-value pairs."
 			)
 		);
@@ -168,12 +169,13 @@ public:
 		, _dict( dict_ ) {
 		M_ASSERT( _dict->type_id() == HHuginn::TYPE::DICT );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
-			runtime_->create_class(
+			make_pointer<HHuginn::HClass>(
+				runtime_,
+				objectFactory_,
 				"ReversedDictView",
-				nullptr,
 				"The `ReversedDictView` class represents *lazy* *iterable* reversed view of a `dict`."
 			)
 		);
@@ -320,18 +322,20 @@ private:
 public:
 	HDictClass(
 		HRuntime* runtime_,
+		HObjectFactory* objectFactory_,
 		HHuginn::type_id_t typeId_,
 		HHuginn::identifier_id_t identifierId_,
 		yaal::hcore::HString const& doc_
 	) : HHuginn::HClass(
 			runtime_,
+			objectFactory_,
 			typeId_,
 			identifierId_,
-			nullptr,
-			doc_
+			doc_,
+			&huginn_builtin::dict
 		)
-		, _keyValuesDictViewClass( HKeyValuesDictView::get_class( runtime_ ) )
-		, _reversedDictClass( HReversedDict::get_class( runtime_ ) ) {
+		, _keyValuesDictViewClass( HKeyValuesDictView::get_class( runtime_, objectFactory_ ) )
+		, _reversedDictClass( HReversedDict::get_class( runtime_, objectFactory_ ) ) {
 		return;
 	}
 	HHuginn::HClass const* key_values_dict_view_class( void ) const {
@@ -353,6 +357,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 	HHuginn::class_t c(
 		make_pointer<HDictClass>(
 			runtime_,
+			objectFactory_,
 			type_id( HHuginn::TYPE::DICT ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::DICT ) ),
 			"The `dict` is a collection providing a sorted key to value map. It supports operations of iteration, key-value insertion, key removal and key search. The keys stored in given `dict` instance must be of uniform type."

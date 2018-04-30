@@ -186,8 +186,8 @@ HHuginn::value_t HFileSystemCreator::do_new_instance( HRuntime* runtime_ ) {
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"FileSystem",
-			nullptr,
-			"The `FileSystem` package provides interface to various file system queries and operations."
+			"The `FileSystem` package provides interface to various file system queries and operations.",
+			HHuginn::ACCESS::PRIVATE
 		)
 	);
 	HHuginn::field_definitions_t fd{

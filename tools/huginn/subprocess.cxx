@@ -31,8 +31,8 @@ public:
 			runtime_,
 			typeId_,
 			runtime_->identifier_id( "Subprocess" ),
-			nullptr,
-			"The `Subprocess` class represents a system process spawned from this interpreter instance. It allows for a basic process life management."
+			"The `Subprocess` class represents a system process spawned from this interpreter instance. It allows for a basic process life management.",
+			HHuginn::ACCESS::PRIVATE
 		)
 		, _streamClass( HStream::get_class( runtime_ ) ) {
 		HHuginn::field_definitions_t fd{

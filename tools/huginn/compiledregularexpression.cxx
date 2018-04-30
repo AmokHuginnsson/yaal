@@ -70,8 +70,8 @@ public:
 			runtime_,
 			typeId_,
 			runtime_->identifier_id( "CompiledRegularExpression" ),
-			nullptr,
-			"The `CompiledRegularExpression` class gives access to result of regular expression based text searches."
+			"The `CompiledRegularExpression` class gives access to result of regular expression based text searches.",
+			HHuginn::ACCESS::PRIVATE
 		)
 		, _exceptionClass( exceptionClass_ )
 		, _regularExpressionMatchClass( HRegularExpressionMatch::get_class( runtime_ ) ) {

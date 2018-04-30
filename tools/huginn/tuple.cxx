@@ -78,12 +78,13 @@ public:
 		, _tuple( tuple_ ) {
 		M_ASSERT( _tuple->type_id() == HHuginn::TYPE::TUPLE );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
-			runtime_->create_class(
+			make_pointer<HHuginn::HClass>(
+				runtime_,
+				objectFactory_,
 				"ReversedTupleView",
-				nullptr,
 				"The `ReversedTupleView` class represents *lazy* *iterable* reversed view of a `tuple`."
 			)
 		);
@@ -169,13 +170,14 @@ public:
 		HObjectFactory* objectFactory_
 	) : HHuginn::HClass(
 			runtime_,
+			objectFactory_,
 			huginn::type_id( HHuginn::TYPE::TUPLE ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::TUPLE ) ),
-			nullptr,
 			"The `tuple` is a collection type that is used to represent and operate on `tuple` of values. "
-			"It supports basic subscript and range operators."
+			"It supports basic subscript and range operators.",
+			&huginn_builtin::tuple
 		)
-		, _reversedTupleClass( HReversedTuple::get_class( runtime_ ) ) {
+		, _reversedTupleClass( HReversedTuple::get_class( runtime_, objectFactory_ ) ) {
 		HHuginn::field_definitions_t fd{
 			{ "add",    objectFactory_->create_method( &tuple::add ),    "( *other* ) - append all elements from *other* `tuple` at the end of this `tuple`" },
 			{ "hash",   objectFactory_->create_method( &tuple::hash ),   "calculate hash value for this `tuple`" },

@@ -44,8 +44,8 @@ public:
 			runtime_,
 			typeId_,
 			runtime_->identifier_id( "Query" ),
-			nullptr,
-			"The `Query` class represents compiled database query. It is used for actual query execution."
+			"The `Query` class represents compiled database query. It is used for actual query execution.",
+			HHuginn::ACCESS::PRIVATE
 		)
 		, _exceptionClass( exceptionClass_ )
 		, _queryResultClass( huginn::HQueryResult::get_class( runtime_, exceptionClass_ ) ) {

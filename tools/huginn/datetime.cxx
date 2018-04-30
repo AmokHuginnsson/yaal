@@ -77,8 +77,8 @@ HHuginn::value_t HDateTimeCreator::do_new_instance( HRuntime* runtime_ ) {
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"DateTime",
-			nullptr,
-			"The `DateTime` package provides date and time handling functionalities."
+			"The `DateTime` package provides date and time handling functionalities.",
+			HHuginn::ACCESS::PRIVATE
 		)
 	);
 	HHuginn::field_definitions_t fd{

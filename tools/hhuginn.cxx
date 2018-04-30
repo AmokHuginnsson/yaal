@@ -392,8 +392,8 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 			super = ! c ? commit_class( cc->_baseName ) : c.raw();
 		}
 		if ( ! cls ) {
-			cls = _runtime->create_class( identifierId_, super, cc->_doc ? *cc->_doc : "", HClass::TYPE::USER );
-			_runtime->register_class( cls, ACCESS::PUBLIC, VISIBILITY::GLOBAL );
+			cls = _runtime->create_class( identifierId_, cc->_doc ? *cc->_doc : "", ACCESS::PUBLIC, HClass::TYPE::USER );
+			_runtime->register_class( cls, VISIBILITY::GLOBAL );
 		}
 		field_definitions_t fieldDefinitions;
 		huginn::HThread t( _runtime.raw(), hcore::HThread::get_current_thread_id() );
@@ -444,10 +444,10 @@ void HHuginn::finalize_compilation( void ) {
 	M_EPILOG
 }
 
-void HHuginn::register_class( class_t class_, ACCESS classConstructorAccess_, VISIBILITY classConstructorVisibility_ ) {
+void HHuginn::register_class( class_t class_, VISIBILITY classConstructorVisibility_ ) {
 	M_PROLOG
 	M_ENSURE( _state != STATE::COMPILED );
-	_runtime->register_class( class_, classConstructorAccess_, classConstructorVisibility_ );
+	_runtime->register_class( class_, classConstructorVisibility_ );
 	OCompiler::OIdentifierUse& ciu( _compiler->_usedIdentifiers[class_->identifier_id()] );
 	ciu.write( 0, OCompiler::OIdentifierUse::TYPE::CLASS );
 	ciu.read( 0 );

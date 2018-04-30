@@ -31,8 +31,8 @@ public:
 		HHuginn::class_t c(
 			runtime_->create_class(
 				"Filter",
-				nullptr,
-				"The `Filter` class represents a *lazy* filtering transformation of one *iterable* into another. Resulting *iterable* produces only values matching supplied predicate."
+				"The `Filter` class represents a *lazy* filtering transformation of one *iterable* into another. Resulting *iterable* produces only values matching supplied predicate.",
+				HHuginn::ACCESS::PRIVATE
 			)
 		);
 		runtime_->huginn()->register_class( c );

@@ -87,12 +87,13 @@ public:
 		, _lookup( lookup_ ) {
 		M_ASSERT( _lookup->type_id() == HHuginn::TYPE::LOOKUP );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
-			runtime_->create_class(
+			make_pointer<HHuginn::HClass>(
+				runtime_,
+				objectFactory_,
 				"KeyValuesLookupView",
-				nullptr,
 				"The `KeyValuesLookupView` class represents *lazy* *iterable* view of a `lookup` consisted of key-value pairs."
 			)
 		);
@@ -167,12 +168,13 @@ public:
 		, _lookup( lookup_ ) {
 		M_ASSERT( _lookup->type_id() == HHuginn::TYPE::LOOKUP );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
-			runtime_->create_class(
+			make_pointer<HHuginn::HClass>(
+				runtime_,
+				objectFactory_,
 				"ReversedLookupView",
-				nullptr,
 				"The `ReversedLookupView` class represents *lazy* *iterable* reversed view of a `lookup`."
 			)
 		);
@@ -311,16 +313,18 @@ private:
 public:
 	HLookupClass(
 		HRuntime* runtime_,
+		HObjectFactory* objectFactory_,
 		yaal::hcore::HString const& doc_
 	) : HHuginn::HClass(
 			runtime_,
+			objectFactory_,
 			huginn::type_id( HHuginn::TYPE::LOOKUP ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::LOOKUP ) ),
-			nullptr,
-			doc_
+			doc_,
+			&huginn_builtin::lookup
 		)
-		, _keyValuesLookupViewClass( HKeyValuesLookupView::get_class( runtime_ ) )
-		, _reversedLookupClass( HReversedLookup::get_class( runtime_ ) ) {
+		, _keyValuesLookupViewClass( HKeyValuesLookupView::get_class( runtime_, objectFactory_ ) )
+		, _reversedLookupClass( HReversedLookup::get_class( runtime_, objectFactory_ ) ) {
 		return;
 	}
 	HHuginn::HClass const* key_values_lookup_view_class( void ) const {
@@ -342,6 +346,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 	HHuginn::class_t c(
 		make_pointer<HLookupClass>(
 			runtime_,
+			objectFactory_,
 			"The `lookup` is a collection providing a sorted key to value map. It supports operations of iteration, key-value insertion, key removal and key search."
 		)
 	);

@@ -200,8 +200,8 @@ HHuginn::class_t HComplex::get_class( HRuntime* runtime_, HHuginn::HClass const*
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"Complex",
-			nullptr,
 			"The `Complex` class provides mathematical concept of complex numbers. It supports operations of addition, multiplication, subtraction, division, modulus and argument.",
+			HHuginn::ACCESS::PUBLIC,
 			HHuginn::HClass::TYPE::BUILTIN,
 			origin_,
 			&HComplex::create_instance
@@ -222,7 +222,7 @@ HHuginn::class_t HComplex::get_class( HRuntime* runtime_, HHuginn::HClass const*
 		{ "to_string", runtime_->create_method( &HComplex::to_string ), "get string representation of this `Complex` number" }
 	};
 	c->redefine( nullptr, fd );
-	runtime_->huginn()->register_class( c, HHuginn::ACCESS::PUBLIC );
+	runtime_->huginn()->register_class( c );
 	return ( c );
 	M_EPILOG
 }

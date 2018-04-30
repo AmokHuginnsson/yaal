@@ -488,7 +488,7 @@ void OCompiler::resolve_symbols( void ) {
 					}
 				}
 				if ( ( es._operation == OExecutionStep::OPERATION::USE ) && ! is_keyword( _runtime->identifier_name( es._identifier ) ) ) {
-					HHuginn::value_t* v( _runtime->get_value( es._identifier ) );
+					HHuginn::value_t const* v( _runtime->get_value( es._identifier ) );
 					if ( !! v ) {
 						es._expression->replace_execution_step(
 							es._index,
@@ -501,7 +501,7 @@ void OCompiler::resolve_symbols( void ) {
 						);
 						break;
 					} else {
-						HHuginn::value_t* callable( _runtime->get_function( es._identifier ) );
+						HHuginn::value_t const* callable( _runtime->get_function( es._identifier ) );
 						if ( !! callable ) {
 							es._expression->replace_execution_step(
 								es._index,
@@ -755,7 +755,7 @@ void OCompiler::check_name_class( HHuginn::identifier_id_t identifier_, bool tes
 void OCompiler::check_name_enum( HHuginn::identifier_id_t identifier_, bool testRuntime_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	submitted_enums_t::const_iterator it;
-	HHuginn::value_t* v( _runtime->get_value( identifier_ ) );
+	HHuginn::value_t const* v( _runtime->get_value( identifier_ ) );
 	if (
 		( testRuntime_ && v && dynamic_cast<enumeration::HEnumerationClass const*>( (*v)->get_class() ) )
 		|| (
@@ -782,7 +782,7 @@ void OCompiler::check_name_enum( HHuginn::identifier_id_t identifier_, bool test
 
 void OCompiler::check_name_function( HHuginn::identifier_id_t identifier_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	HHuginn::value_t* fun( _runtime->get_function( identifier_ ) );
+	HHuginn::value_t const* fun( _runtime->get_function( identifier_ ) );
 	if ( fun ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Function `"_ys
@@ -910,7 +910,7 @@ void OCompiler::set_enum_name( yaal::hcore::HString const& name_, executing_pars
 	HHuginn::identifier_id_t enumIdentifier( _runtime->identifier_id( name_ ) );
 	check_name_enum( enumIdentifier, false, position_ );
 	check_name_class( enumIdentifier, true, position_ );
-	HHuginn::value_t* v( _runtime->get_value( enumIdentifier ) );
+	HHuginn::value_t const* v( _runtime->get_value( enumIdentifier ) );
 	if ( ! ( v && dynamic_cast<enumeration::HEnumerationClass const*>( (*v)->get_class() ) ) ) {
 		check_name_function( enumIdentifier, position_ );
 	}

@@ -31,8 +31,8 @@ public:
 		HHuginn::class_t c(
 			runtime_->create_class(
 				"Mapper",
-				nullptr,
-				"The `Mapper` class represent *lazy* transformation of one *iterable* into another. Resulting *iterable* produces values from original *iterable* transformed by user supplied unary function."
+				"The `Mapper` class represent *lazy* transformation of one *iterable* into another. Resulting *iterable* produces values from original *iterable* transformed by user supplied unary function.",
+				HHuginn::ACCESS::PRIVATE
 			)
 		);
 		runtime_->huginn()->register_class( c );

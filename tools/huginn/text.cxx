@@ -136,8 +136,8 @@ HHuginn::value_t HTextCreator::do_new_instance( HRuntime* runtime_ ) {
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"Text",
-			nullptr,
-			"The `Text` package provides various text manipulation algorithms."
+			"The `Text` package provides various text manipulation algorithms.",
+			HHuginn::ACCESS::PRIVATE
 		)
 	);
 	HHuginn::field_definitions_t fd{

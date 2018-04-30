@@ -131,7 +131,7 @@ HHuginn::class_t add_class_as_member(
 ) {
 	M_PROLOG
 	HHuginn::value_t member(
-		juncture_->runtime()->object_factory()->create_method_raw( class_->constructor_function( HHuginn::ACCESS::PUBLIC ) )
+		juncture_->runtime()->object_factory()->create_method_raw( class_->constructor_function() )
 	);
 	juncture_->add_member(
 		HHuginn::HFieldDefinition(

@@ -22,16 +22,17 @@ namespace huginn {
 namespace boolean {
 
 HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
-HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* ) {
+HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
 			runtime_,
+			objectFactory_,
 			type_id( HHuginn::TYPE::BOOLEAN ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::BOOLEAN ) ),
-			nullptr,
 			"The `boolean` is a scalar type that is used to represent and operate on boolean values. "
-			"It supports basic operations of negation, logical \"and\", \"or\", and \"xor\" and comparisons."
+			"It supports basic operations of negation, logical \"and\", \"or\", and \"xor\" and comparisons.",
+			&huginn_builtin::boolean
 		)
 	);
 	return ( c );

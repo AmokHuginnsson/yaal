@@ -39,8 +39,8 @@ public:
 		HHuginn::class_t c(
 			runtime_->create_class(
 				"DirectoryScan",
-				nullptr,
-				"The `DirectoryScan` class represents ongoing directory scan operation."
+				"The `DirectoryScan` class represents ongoing directory scan operation.",
+				HHuginn::ACCESS::PRIVATE
 			)
 		);
 		runtime_->huginn()->register_class( c );

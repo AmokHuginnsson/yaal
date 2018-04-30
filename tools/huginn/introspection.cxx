@@ -49,7 +49,7 @@ public:
 		HHuginn::value_t v( r.none_value() );
 		HString const& name( get_string( values_[0] ) );
 		HHuginn::identifier_id_t id( r.try_identifier_id( name ) );
-		HHuginn::value_t* pv( nullptr );
+		HHuginn::value_t const* pv( nullptr );
 		if ( id != INVALID_IDENTIFIER ) {
 			pv = r.get_function( id );
 			if ( ! pv ) {
@@ -121,7 +121,7 @@ public:
 		HHuginn::identifier_id_t id( r.try_identifier_id( package ) );
 		bool classExists( !! r.get_class( id ) );
 		bool functionExists( !! r.get_function( id ) );
-		HHuginn::value_t* rtv( r.get_value( id ) );
+		HHuginn::value_t const* rtv( r.get_value( id ) );
 		bool enumerationExists( rtv && dynamic_cast<enumeration::HEnumerationClass const*>( (*rtv)->get_class() ) );
 		if ( is_restricted( package ) ) {
 			throw HHuginn::HHuginnRuntimeException(
@@ -162,8 +162,8 @@ HHuginn::value_t HTntrospectionCreator::do_new_instance( HRuntime* runtime_ ) {
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"Introspection",
-			nullptr,
-			"The `Introspection` package provides run time introspection facility."
+			"The `Introspection` package provides run time introspection facility.",
+			HHuginn::ACCESS::PRIVATE
 		)
 	);
 	HHuginn::field_definitions_t fd{

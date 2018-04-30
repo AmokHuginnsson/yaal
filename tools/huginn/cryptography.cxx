@@ -57,8 +57,8 @@ HHuginn::value_t HCryptographyCreator::do_new_instance( HRuntime* runtime_ ) {
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"Cryptography",
-			nullptr,
-			"The `Cryptography` package provides functionality of a cryptographic nature, like hashing functions."
+			"The `Cryptography` package provides functionality of a cryptographic nature, like hashing functions.",
+			HHuginn::ACCESS::PRIVATE
 		)
 	);
 	HHuginn::field_definitions_t fd{

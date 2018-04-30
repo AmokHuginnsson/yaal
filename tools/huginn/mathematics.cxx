@@ -506,8 +506,8 @@ HHuginn::value_t HMathematicsCreator::do_new_instance( HRuntime* runtime_ ) {
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"Mathematics",
-			nullptr,
-			"The `Mathematics` package provides essential mathematical functions and classes. All of those functions and classes work with values of both `real` and `number` types."
+			"The `Mathematics` package provides essential mathematical functions and classes. All of those functions and classes work with values of both `real` and `number` types.",
+			HHuginn::ACCESS::PRIVATE
 		)
 	);
 	HHuginn::field_definitions_t fd{

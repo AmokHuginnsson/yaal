@@ -36,8 +36,8 @@ public:
 		HHuginn::class_t c(
 			runtime_->create_class(
 				"Range",
-				nullptr,
-				"The `Range` class represents *lazy* *iterable* range of integer values."
+				"The `Range` class represents *lazy* *iterable* range of integer values.",
+				HHuginn::ACCESS::PRIVATE
 			)
 		);
 		runtime_->huginn()->register_class( c );

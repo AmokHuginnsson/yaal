@@ -61,7 +61,6 @@ HHuginn::value_t HDatabaseCreator::do_new_instance( HRuntime* runtime_ ) {
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"Database",
-			nullptr,
 			"The `Database` package provides access to various database engines through database agnostic interface. Following drivers are supported:"
 #ifdef HAVE_LIBSQLITE3
 			" SQLite3"
@@ -78,7 +77,8 @@ HHuginn::value_t HDatabaseCreator::do_new_instance( HRuntime* runtime_ ) {
 #ifdef HAVE_LIBCLNTSH
 			" Oracle"
 #endif
-			"."
+			".",
+			HHuginn::ACCESS::PRIVATE
 		)
 	);
 	HHuginn::field_definitions_t fd{

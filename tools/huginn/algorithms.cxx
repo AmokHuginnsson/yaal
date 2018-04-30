@@ -353,8 +353,8 @@ HHuginn::value_t HAlgorithmsCreator::do_new_instance( HRuntime* runtime_ ) {
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"Algorithms",
-			nullptr,
-			"The `Algorithms` package contains basic low-level algorithms."
+			"The `Algorithms` package contains basic low-level algorithms.",
+			HHuginn::ACCESS::PRIVATE
 		)
 	);
 	HHuginn::field_definitions_t fd{

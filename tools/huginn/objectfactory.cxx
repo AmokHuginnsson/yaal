@@ -128,22 +128,22 @@ void HObjectFactory::register_builtin_classes( void ) {
 	_exception = exception::get_class( _runtime );
 	_stackFrameInfo = exception::HStackFrameInfo::get_class( _runtime );
 
-	_runtime->huginn()->register_class( _boolean );
-	_runtime->huginn()->register_class( _integer );
-	_runtime->huginn()->register_class( _string );
-	_runtime->huginn()->register_class( _real );
-	_runtime->huginn()->register_class( _number );
-	_runtime->huginn()->register_class( _character );
-	_runtime->huginn()->register_class( _tuple );
-	_runtime->huginn()->register_class( _list );
-	_runtime->huginn()->register_class( _deque );
-	_runtime->huginn()->register_class( _dict );
-	_runtime->huginn()->register_class( _order );
-	_runtime->huginn()->register_class( _lookup );
-	_runtime->huginn()->register_class( _set );
-	_runtime->huginn()->register_class( _blob );
+	_runtime->huginn()->register_class( _boolean, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _integer, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _string, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _real, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _number, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _character, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _tuple, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _list, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _deque, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _dict, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _order, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _lookup, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _set, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _blob, HHuginn::VISIBILITY::GLOBAL );
 
-	_runtime->huginn()->register_class( _exception, HHuginn::ACCESS::PUBLIC, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _exception, HHuginn::VISIBILITY::GLOBAL );
 
 	_runtimeException = exception::create_class(
 		_runtime,

@@ -58,8 +58,8 @@ HHuginn::value_t HRegularExpressionsCreator::do_new_instance( HRuntime* runtime_
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"RegularExpressions",
-			nullptr,
-			"The `RegularExpressions` package provides support for regular expressions based text searches."
+			"The `RegularExpressions` package provides support for regular expressions based text searches.",
+			HHuginn::ACCESS::PRIVATE
 		)
 	);
 	HHuginn::field_definitions_t fd{

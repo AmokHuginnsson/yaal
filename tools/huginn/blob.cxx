@@ -24,15 +24,16 @@ namespace huginn {
 namespace blob {
 
 HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
-HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* ) {
+HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
 			runtime_,
+			objectFactory_,
 			type_id( HHuginn::TYPE::BLOB ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::BLOB ) ),
-			nullptr,
-			"The `blob` represents raw memory buffer."
+			"The `blob` represents raw memory buffer.",
+			&huginn_builtin::blob
 		)
 	);
 	return ( c );

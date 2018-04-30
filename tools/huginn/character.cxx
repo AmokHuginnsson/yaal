@@ -58,11 +58,12 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
 			runtime_,
+			objectFactory_,
 			type_id( HHuginn::TYPE::CHARACTER ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::CHARACTER ) ),
-			nullptr,
 			"The `character` is a scalar type that is used to represent and operate on single characters. "
-			"It supports basic operations of comparisons, case modification and classification."
+			"It supports basic operations of comparisons, case modification and classification.",
+			&huginn_builtin::character
 		)
 	);
 	HHuginn::field_definitions_t fd{
