@@ -110,12 +110,11 @@ public:
 		, _order( order_ ) {
 		M_ASSERT( _order->type_id() == HHuginn::TYPE::ORDER );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			make_pointer<HHuginn::HClass>(
 				runtime_,
-				objectFactory_,
 				"ReversedOrderView",
 				"The `ReversedOrderView` class represents *lazy* *iterable* reversed view of a `order`."
 			)
@@ -239,7 +238,7 @@ public:
 			"The `order` is a collection of sorted values of uniform types. It supports operations of addition, search and element removal.",
 			&huginn_builtin::order
 		)
-		, _reversedOrderClass( HReversedOrder::get_class( runtime_, objectFactory_ ) ) {
+		, _reversedOrderClass( HReversedOrder::get_class( runtime_ ) ) {
 		HHuginn::field_definitions_t fd{
 			{ "insert",  objectFactory_->create_method( &order::insert ),  "( *elem* ) - insert given element *elem* into an `order`" },
 			{ "has_key", objectFactory_->create_method( &order::has_key ), "( *elem* ) - tell if given element *elem* is in the `order`" },
@@ -285,7 +284,7 @@ HHuginn::HOrder::HOrder( HHuginn::HClass const* class_, allocator_t const& alloc
 	: HInvalidatingIterable( class_ )
 	, _helper( &value_builtin::less )
 	, _data( _helper, allocator_ )
-	, _keyType( &huginn::_noneClass_ ) {
+	, _keyType( nullptr ) {
 	return;
 }
 
@@ -294,7 +293,7 @@ int long HHuginn::HOrder::do_size( huginn::HThread*, int ) const {
 }
 
 void HHuginn::HOrder::verify_key_type( huginn::HThread* thread_, HHuginn::HHuginn::HClass const* keyType_, int position_ ) const {
-	if ( ( _keyType->type_id() != TYPE::NONE ) && ( keyType_ != _keyType ) ) {
+	if ( _keyType && ( keyType_ != _keyType ) ) {
 		throw HHuginnRuntimeException(
 			"Non-uniform key types, got "_ys.append( a_type_name( keyType_ ) ).append( " instead of " ).append( a_type_name( _keyType ) ).append( "." ),
 			thread_->current_frame()->file_id(),

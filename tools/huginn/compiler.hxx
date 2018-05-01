@@ -13,6 +13,7 @@
 #include "tools/huginn/trycatch.hxx"
 #include "tools/huginn/scope.hxx"
 #include "tools/huginn/expression.hxx"
+#include "tools/huginn/keyword.hxx"
 #include "tools/hhuginn.hxx"
 
 namespace yaal {

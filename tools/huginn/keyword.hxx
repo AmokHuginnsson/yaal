@@ -14,6 +14,8 @@ namespace tools {
 
 namespace huginn {
 
+extern HHuginn::identifier_id_t const INVALID_IDENTIFIER;
+
 namespace KEYWORD {
 
 extern char const* ASSERT;
@@ -39,6 +41,7 @@ extern char const* THROW;
 extern char const* TRUE;
 extern char const* TRY;
 extern char const* WHILE;
+
 extern HHuginn::identifier_id_t const CONSTRUCTOR_IDENTIFIER;
 extern HHuginn::identifier_id_t const DESTRUCTOR_IDENTIFIER;
 extern HHuginn::identifier_id_t const THIS_IDENTIFIER;
@@ -68,6 +71,17 @@ extern char const* LOOKUP;
 extern char const* ORDER;
 extern char const* SET;
 extern char const* BLOB;
+extern char const* TYPE_NONE;
+extern char const* TYPE_OBSERVER;
+extern char const* TYPE_REFERENCE;
+extern char const* TYPE_FUNCTION_REFERENCE;
+extern char const* TYPE_OBJECT_REFERENCE;
+extern char const* TYPE_METHOD;
+extern char const* TYPE_UNBOUND_METHOD;
+extern char const* TYPE_BOUND_METHOD;
+extern char const* TYPE_VARIADIC_PARAMETERS;
+extern char const* TYPE_NAMED_PARAMETERS;
+extern char const* TYPE_UNKNOWN;
 extern HHuginn::identifier_id_t const INTEGER_IDENTIFIER;
 extern HHuginn::identifier_id_t const REAL_IDENTIFIER;
 extern HHuginn::identifier_id_t const NUMBER_IDENTIFIER;
@@ -87,6 +101,17 @@ extern HHuginn::identifier_id_t const LOOKUP_IDENTIFIER;
 extern HHuginn::identifier_id_t const ORDER_IDENTIFIER;
 extern HHuginn::identifier_id_t const SET_IDENTIFIER;
 extern HHuginn::identifier_id_t const BLOB_IDENTIFIER;
+extern HHuginn::identifier_id_t const TYPE_NONE_IDENTIFIER;
+extern HHuginn::identifier_id_t const TYPE_OBSERVER_IDENTIFIER;
+extern HHuginn::identifier_id_t const TYPE_REFERENCE_IDENTIFIER;
+extern HHuginn::identifier_id_t const TYPE_FUNCTION_REFERENCE_IDENTIFIER;
+extern HHuginn::identifier_id_t const TYPE_OBJECT_REFERENCE_IDENTIFIER;
+extern HHuginn::identifier_id_t const TYPE_METHOD_IDENTIFIER;
+extern HHuginn::identifier_id_t const TYPE_UNBOUND_METHOD_IDENTIFIER;
+extern HHuginn::identifier_id_t const TYPE_BOUND_METHOD_IDENTIFIER;
+extern HHuginn::identifier_id_t const TYPE_VARIADIC_PARAMETERS_IDENTIFIER;
+extern HHuginn::identifier_id_t const TYPE_NAMED_PARAMETERS_IDENTIFIER;
+extern HHuginn::identifier_id_t const TYPE_UNKNOWN_IDENTIFIER;
 
 }
 

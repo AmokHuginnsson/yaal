@@ -295,19 +295,6 @@ HHuginn::value_t input( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&,
 
 }
 
-extern HHuginn::identifier_id_t const INVALID_IDENTIFIER;
-extern HHuginn::identifier_id_t const TYPE_NONE_IDENTIFIER;
-extern HHuginn::identifier_id_t const TYPE_OBSERVER_IDENTIFIER;
-extern HHuginn::identifier_id_t const TYPE_REFERENCE_IDENTIFIER;
-extern HHuginn::identifier_id_t const TYPE_FUNCTION_REFERENCE_IDENTIFIER;
-extern HHuginn::identifier_id_t const TYPE_OBJECT_REFERENCE_IDENTIFIER;
-extern HHuginn::identifier_id_t const TYPE_METHOD_IDENTIFIER;
-extern HHuginn::identifier_id_t const TYPE_UNBOUND_METHOD_IDENTIFIER;
-extern HHuginn::identifier_id_t const TYPE_BOUND_METHOD_IDENTIFIER;
-extern HHuginn::identifier_id_t const TYPE_VARIADIC_PARAMETERS_IDENTIFIER;
-extern HHuginn::identifier_id_t const TYPE_NAMED_PARAMETERS_IDENTIFIER;
-extern HHuginn::identifier_id_t const TYPE_UNKNOWN_IDENTIFIER;
-
 }
 
 }

@@ -664,7 +664,7 @@ void HExpression::pack_named_parameters( OExecutionStep const& executionStep_, h
 	HFrame::values_t& values( frame_->values() );
 	HHuginn::value_t& vr( values.top() );
 	if ( vr->type_id() == HHuginn::TYPE::LOOKUP ) {
-		vr = frame_->thread()->object_factory().create_tagged_value( vr, &_namedParametersClass_ );
+		vr = frame_->thread()->object_factory().create_tagged_value( vr, frame_->thread()->object_factory().named_parameters_class() );
 	} else if ( vr->type_id() == HHuginn::TYPE::NAMED_PARAMETERS ) {
 		HHuginn::value_t v( yaal::move( vr ) );
 		values.pop();
@@ -689,7 +689,7 @@ void HExpression::unpack_variadic_parameters( OExecutionStep const& executionSte
 	HFrame::values_t& values( frame_->values() );
 	HHuginn::value_t& vr( values.top() );
 	if ( vr->type_id() == HHuginn::TYPE::TUPLE ) {
-		vr = frame_->thread()->object_factory().create_tagged_value( vr, &_variadicParametersClass_ );
+		vr = frame_->thread()->object_factory().create_tagged_value( vr, frame_->thread()->object_factory().variadic_parameters_class() );
 	} else {
 		throw HHuginn::HHuginnRuntimeException( "Parameter is not a tuple.", file_id(), executionStep_._position );
 	}
@@ -755,7 +755,7 @@ void HExpression::create_closure( OExecutionStep const&, HFrame* frame_ ) {
 	++ frame_->ip();
 	M_ASSERT( f->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE );
 	HObjectFactory& of( frame_->thread()->object_factory() );
-	HHuginn::value_t closure( of.create_object( &_noneClass_, args ) );
+	HHuginn::value_t closure( of.create_object( of.none_class(), args ) );
 	values.push( of.create_bound_method( static_cast<HHuginn::HFunctionReference*>( f.raw() )->function(), closure ) );
 	return;
 	M_EPILOG

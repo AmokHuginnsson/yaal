@@ -471,7 +471,8 @@ public:
 	HClass( huginn::HRuntime*, type_id_t, identifier_id_t, yaal::hcore::HString const&, ACCESS, TYPE = TYPE::BUILTIN, HClass const* = nullptr, create_instance_t = nullptr );
 	HClass( huginn::HRuntime*, type_id_t, identifier_id_t, yaal::hcore::HString const&, constructor_t );
 	HClass( huginn::HRuntime*, huginn::HObjectFactory*, type_id_t, identifier_id_t, yaal::hcore::HString const&, constructor_t );
-	HClass( huginn::HRuntime*, huginn::HObjectFactory*, char const*, char const* );
+	HClass( huginn::HRuntime*, char const*, char const* );
+	HClass( huginn::HRuntime*, HHuginn::TYPE, identifier_id_t, char const* );
 	HClass( HHuginn::TYPE, HHuginn::identifier_id_t, yaal::hcore::HString const& );
 	virtual ~HClass( void ) {
 	}
@@ -571,7 +572,7 @@ class HHuginn::HClass::HMethod : public HHuginn::HValue {
 protected:
 	HHuginn::function_t _function;
 public:
-	HMethod( HHuginn::function_t const& );
+	HMethod( HHuginn::HClass const*, HHuginn::function_t const& );
 	HHuginn::function_t const& function( void ) const {
 		return ( _function );
 	}
@@ -588,7 +589,7 @@ protected:
 	HHuginn::HClass const* _juncture;
 	HHuginn::function_t _function;
 public:
-	HUnboundMethod( HHuginn::HClass const*, HHuginn::function_t const& );
+	HUnboundMethod( HHuginn::HClass const*, HHuginn::HClass const*, HHuginn::function_t const& );
 	HHuginn::value_t call( huginn::HThread*, values_t&, int );
 private:
 	HUnboundMethod( HUnboundMethod const& ) = delete;
@@ -603,7 +604,7 @@ private:
 	HHuginn::function_t _function;
 	HHuginn::value_t _objectHolder;
 public:
-	HBoundMethod( HHuginn::function_t const&, HHuginn::value_t const& );
+	HBoundMethod( HHuginn::HClass const*, HHuginn::function_t const&, HHuginn::value_t const& );
 	HHuginn::value_t call( huginn::HThread*, values_t&, int );
 private:
 	HBoundMethod( HBoundMethod const& ) = delete;
@@ -647,8 +648,8 @@ private:
 	value_t _value;
 	HClass const* _referenceClass;
 public:
-	HObjectReference( value_t const&, int, int, int );
-	HObjectReference( value_t const&, HClass const* );
+	HObjectReference( HHuginn::HClass const*, value_t const&, int, int, int );
+	HObjectReference( HHuginn::HClass const*, value_t const&, HClass const* );
 	int field_index( identifier_id_t ) const;
 	value_t field( huginn::HThread*, int, int );
 	HHuginn::HClass const* reference_class( void ) const {
@@ -695,7 +696,7 @@ public:
 private:
 	value_type _value;
 public:
-	HObserver( HHuginn::value_t const& );
+	HObserver( HHuginn::HClass const*, HHuginn::value_t const& );
 	HHuginn::value_t value( void ) const;
 private:
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
@@ -708,7 +709,7 @@ public:
 private:
 	HHuginn::value_t& _value;
 public:
-	HReference( HHuginn::value_t& );
+	HReference( HHuginn::HClass const*, HHuginn::value_t& );
 	HHuginn::value_t& value( void ) const;
 private:
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override M_DEBUG_CODE( __attribute__((__noreturn__)) );
@@ -1189,7 +1190,7 @@ private:
 	HHuginn::function_t _function;
 	yaal::hcore::HString _doc;
 public:
-	HFunctionReference( identifier_id_t, HHuginn::function_t const&, yaal::hcore::HString const& );
+	HFunctionReference( HHuginn::HClass const*, identifier_id_t, HHuginn::function_t const&, yaal::hcore::HString const& );
 	identifier_id_t identifier_id( void ) const {
 		return ( _identifierId );
 	}
@@ -1241,16 +1242,6 @@ private:
 
 namespace huginn {
 
-extern HHuginn::HClass const _noneClass_;
-extern HHuginn::HClass const _observerClass_;
-extern HHuginn::HClass const _referenceClass_;
-extern HHuginn::HClass const _functionReferenceClass_;
-extern HHuginn::HClass const _objectReferenceClass_;
-extern HHuginn::HClass const _methodClass_;
-extern HHuginn::HClass const _unboundMethodClass_;
-extern HHuginn::HClass const _boundMethodClass_;
-extern HHuginn::HClass const _variadicParametersClass_;
-extern HHuginn::HClass const _namedParametersClass_;
 extern HHuginn::HClass const _unknownClass_;
 
 inline HHuginn::type_id_t type_id( HHuginn::TYPE type_ ) {

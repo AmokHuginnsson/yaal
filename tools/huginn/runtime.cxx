@@ -25,8 +25,6 @@ namespace tools {
 
 namespace huginn {
 
-HHuginn::identifier_id_t const INVALID_IDENTIFIER( -1 );
-
 HRuntime::HRuntime( HHuginn* huginn_ )
 	: _huginn( huginn_ )
 	, _idGenerator( static_cast<type_id_t::value_type>( HHuginn::TYPE::NOT_BOOLEAN ) )
@@ -55,6 +53,16 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			{ BUILTIN::ORDER, BUILTIN::ORDER_IDENTIFIER },
 			{ BUILTIN::SET, BUILTIN::SET_IDENTIFIER },
 			{ BUILTIN::BLOB, BUILTIN::BLOB_IDENTIFIER },
+			{ BUILTIN::TYPE_NONE, BUILTIN::TYPE_NONE_IDENTIFIER },
+			{ BUILTIN::TYPE_OBSERVER, BUILTIN::TYPE_OBSERVER_IDENTIFIER },
+			{ BUILTIN::TYPE_REFERENCE, BUILTIN::TYPE_REFERENCE_IDENTIFIER },
+			{ BUILTIN::TYPE_FUNCTION_REFERENCE, BUILTIN::TYPE_FUNCTION_REFERENCE_IDENTIFIER },
+			{ BUILTIN::TYPE_OBJECT_REFERENCE, BUILTIN::TYPE_OBJECT_REFERENCE_IDENTIFIER },
+			{ BUILTIN::TYPE_METHOD, BUILTIN::TYPE_METHOD_IDENTIFIER },
+			{ BUILTIN::TYPE_UNBOUND_METHOD, BUILTIN::TYPE_UNBOUND_METHOD_IDENTIFIER },
+			{ BUILTIN::TYPE_BOUND_METHOD, BUILTIN::TYPE_BOUND_METHOD_IDENTIFIER },
+			{ BUILTIN::TYPE_VARIADIC_PARAMETERS, BUILTIN::TYPE_VARIADIC_PARAMETERS_IDENTIFIER },
+			{ BUILTIN::TYPE_NAMED_PARAMETERS, BUILTIN::TYPE_NAMED_PARAMETERS_IDENTIFIER },
 			{ INTERFACE::CLONE,            INTERFACE::CLONE_IDENTIFIER },
 			{ INTERFACE::GET_SIZE,         INTERFACE::GET_SIZE_IDENTIFIER },
 			{ INTERFACE::ITERATOR,         INTERFACE::ITERATOR_IDENTIFIER },
@@ -83,17 +91,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			{ INTERFACE::TO_CHARACTER,     INTERFACE::TO_CHARACTER_IDENTIFIER },
 			{ INTERFACE::TO_BOOLEAN,       INTERFACE::TO_BOOLEAN_IDENTIFIER },
 			{ STANDARD_FUNCTIONS::MAIN, STANDARD_FUNCTIONS::MAIN_IDENTIFIER },
-			{ _noneClass_.name(), TYPE_NONE_IDENTIFIER },
-			{ _observerClass_.name(), TYPE_OBSERVER_IDENTIFIER },
-			{ _referenceClass_.name(), TYPE_REFERENCE_IDENTIFIER },
-			{ _functionReferenceClass_.name(), TYPE_FUNCTION_REFERENCE_IDENTIFIER },
-			{ _objectReferenceClass_.name(), TYPE_OBJECT_REFERENCE_IDENTIFIER },
-			{ _methodClass_.name(), TYPE_METHOD_IDENTIFIER },
-			{ _unboundMethodClass_.name(), TYPE_UNBOUND_METHOD_IDENTIFIER },
-			{ _boundMethodClass_.name(), TYPE_BOUND_METHOD_IDENTIFIER },
-			{ _variadicParametersClass_.name(), TYPE_VARIADIC_PARAMETERS_IDENTIFIER },
-			{ _namedParametersClass_.name(), TYPE_NAMED_PARAMETERS_IDENTIFIER },
-			{ _unknownClass_.name(), TYPE_UNKNOWN_IDENTIFIER }
+			{ _unknownClass_.name(), BUILTIN::TYPE_UNKNOWN_IDENTIFIER }
 		} )
 	, _identifierNames( {
 			KEYWORD::CONSTRUCTOR,
@@ -120,6 +118,16 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			BUILTIN::ORDER,
 			BUILTIN::SET,
 			BUILTIN::BLOB,
+			BUILTIN::TYPE_NONE,
+			BUILTIN::TYPE_OBSERVER,
+			BUILTIN::TYPE_REFERENCE,
+			BUILTIN::TYPE_FUNCTION_REFERENCE,
+			BUILTIN::TYPE_OBJECT_REFERENCE,
+			BUILTIN::TYPE_METHOD,
+			BUILTIN::TYPE_UNBOUND_METHOD,
+			BUILTIN::TYPE_BOUND_METHOD,
+			BUILTIN::TYPE_VARIADIC_PARAMETERS,
+			BUILTIN::TYPE_NAMED_PARAMETERS,
 			INTERFACE::CLONE,
 			INTERFACE::GET_SIZE,
 			INTERFACE::ITERATOR,
@@ -148,20 +156,10 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			INTERFACE::TO_CHARACTER,
 			INTERFACE::TO_BOOLEAN,
 			STANDARD_FUNCTIONS::MAIN,
-			_noneClass_.name(),
-			_observerClass_.name(),
-			_referenceClass_.name(),
-			_functionReferenceClass_.name(),
-			_objectReferenceClass_.name(),
-			_methodClass_.name(),
-			_unboundMethodClass_.name(),
-			_boundMethodClass_.name(),
-			_variadicParametersClass_.name(),
-			_namedParametersClass_.name(),
 			_unknownClass_.name()
 		} )
 	, _objectFactory( make_pointer<HObjectFactory>( this ) )
-	, _none( _objectFactory->create<HHuginn::HValue>( &_noneClass_ ) )
+	, _none( _objectFactory->create<HHuginn::HValue>( _objectFactory->none_class() ) )
 	, _true( _objectFactory->create_boolean( true ) )
 	, _false( _objectFactory->create_boolean( false ) )
 	, _threads()
@@ -701,7 +699,8 @@ HHuginn::value_t observe( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::
 			position_
 		);
 	}
-	return ( thread_->object_factory().create<HHuginn::HObserver>( v ) );
+	HObjectFactory& of( thread_->object_factory() );
+	return ( of.create<HHuginn::HObserver>( of.observer_class(), v ) );
 	M_EPILOG
 }
 
@@ -898,7 +897,7 @@ void HRuntime::register_builtin_function( yaal::hcore::HString const& name_, fun
 }
 
 namespace {
-HHuginn::HClass const* _coreClasses_[11];
+HHuginn::HClass const* _coreClasses_[1];
 }
 
 void HRuntime::register_builtins( void ) {
@@ -907,16 +906,6 @@ void HRuntime::register_builtins( void ) {
 	if ( ! once ) {
 		once = true;
 		HHuginn::HClass const* coreClassesInit[] = {
-			&_noneClass_,
-			&_observerClass_,
-			&_referenceClass_,
-			&_functionReferenceClass_,
-			&_objectReferenceClass_,
-			&_methodClass_,
-			&_unboundMethodClass_,
-			&_boundMethodClass_,
-			&_variadicParametersClass_,
-			&_namedParametersClass_,
 			&_unknownClass_
 		};
 		static_assert( sizeof ( coreClassesInit ) == sizeof ( _coreClasses_ ), "invalid core classes initializer size" );
@@ -946,6 +935,16 @@ void HRuntime::register_builtins( void ) {
 	M_ENSURE( ( identifier_id( BUILTIN::ORDER ) == BUILTIN::ORDER_IDENTIFIER ) && ( identifier_name( BUILTIN::ORDER_IDENTIFIER ) == BUILTIN::ORDER ) );
 	M_ENSURE( ( identifier_id( BUILTIN::SET ) == BUILTIN::SET_IDENTIFIER ) && ( identifier_name( BUILTIN::SET_IDENTIFIER ) == BUILTIN::SET ) );
 	M_ENSURE( ( identifier_id( BUILTIN::BLOB ) == BUILTIN::BLOB_IDENTIFIER ) && ( identifier_name( BUILTIN::BLOB_IDENTIFIER ) == BUILTIN::BLOB ) );
+	M_ENSURE( ( identifier_id( BUILTIN::TYPE_NONE ) == BUILTIN::TYPE_NONE_IDENTIFIER ) && ( identifier_name( BUILTIN::TYPE_NONE_IDENTIFIER ) == BUILTIN::TYPE_NONE ) );
+	M_ENSURE( ( identifier_id( BUILTIN::TYPE_OBSERVER ) == BUILTIN::TYPE_OBSERVER_IDENTIFIER ) && ( identifier_name( BUILTIN::TYPE_OBSERVER_IDENTIFIER ) == BUILTIN::TYPE_OBSERVER ) );
+	M_ENSURE( ( identifier_id( BUILTIN::TYPE_REFERENCE ) == BUILTIN::TYPE_REFERENCE_IDENTIFIER ) && ( identifier_name( BUILTIN::TYPE_REFERENCE_IDENTIFIER ) == BUILTIN::TYPE_REFERENCE ) );
+	M_ENSURE( ( identifier_id( BUILTIN::TYPE_FUNCTION_REFERENCE ) == BUILTIN::TYPE_FUNCTION_REFERENCE_IDENTIFIER ) && ( identifier_name( BUILTIN::TYPE_FUNCTION_REFERENCE_IDENTIFIER ) == BUILTIN::TYPE_FUNCTION_REFERENCE ) );
+	M_ENSURE( ( identifier_id( BUILTIN::TYPE_OBJECT_REFERENCE ) == BUILTIN::TYPE_OBJECT_REFERENCE_IDENTIFIER ) && ( identifier_name( BUILTIN::TYPE_OBJECT_REFERENCE_IDENTIFIER ) == BUILTIN::TYPE_OBJECT_REFERENCE ) );
+	M_ENSURE( ( identifier_id( BUILTIN::TYPE_METHOD ) == BUILTIN::TYPE_METHOD_IDENTIFIER ) && ( identifier_name( BUILTIN::TYPE_METHOD_IDENTIFIER ) == BUILTIN::TYPE_METHOD ) );
+	M_ENSURE( ( identifier_id( BUILTIN::TYPE_UNBOUND_METHOD ) == BUILTIN::TYPE_UNBOUND_METHOD_IDENTIFIER ) && ( identifier_name( BUILTIN::TYPE_UNBOUND_METHOD_IDENTIFIER ) == BUILTIN::TYPE_UNBOUND_METHOD ) );
+	M_ENSURE( ( identifier_id( BUILTIN::TYPE_BOUND_METHOD ) == BUILTIN::TYPE_BOUND_METHOD_IDENTIFIER ) && ( identifier_name( BUILTIN::TYPE_BOUND_METHOD_IDENTIFIER ) == BUILTIN::TYPE_BOUND_METHOD ) );
+	M_ENSURE( ( identifier_id( BUILTIN::TYPE_VARIADIC_PARAMETERS ) == BUILTIN::TYPE_VARIADIC_PARAMETERS_IDENTIFIER ) && ( identifier_name( BUILTIN::TYPE_VARIADIC_PARAMETERS_IDENTIFIER ) == BUILTIN::TYPE_VARIADIC_PARAMETERS ) );
+	M_ENSURE( ( identifier_id( BUILTIN::TYPE_NAMED_PARAMETERS ) == BUILTIN::TYPE_NAMED_PARAMETERS_IDENTIFIER ) && ( identifier_name( BUILTIN::TYPE_NAMED_PARAMETERS_IDENTIFIER ) == BUILTIN::TYPE_NAMED_PARAMETERS ) );
 	M_ENSURE( ( identifier_id( INTERFACE::CLONE ) == INTERFACE::CLONE_IDENTIFIER ) && ( identifier_name( INTERFACE::CLONE_IDENTIFIER ) == INTERFACE::CLONE ) );
 	M_ENSURE( ( identifier_id( INTERFACE::GET_SIZE ) == INTERFACE::GET_SIZE_IDENTIFIER ) && ( identifier_name( INTERFACE::GET_SIZE_IDENTIFIER ) == INTERFACE::GET_SIZE ) );
 	M_ENSURE( ( identifier_id( INTERFACE::ITERATOR ) == INTERFACE::ITERATOR_IDENTIFIER ) && ( identifier_name( INTERFACE::ITERATOR_IDENTIFIER ) == INTERFACE::ITERATOR ) );
@@ -973,17 +972,6 @@ void HRuntime::register_builtins( void ) {
 	M_ENSURE( ( identifier_id( INTERFACE::TO_NUMBER ) == INTERFACE::TO_NUMBER_IDENTIFIER ) && ( identifier_name( INTERFACE::TO_NUMBER_IDENTIFIER ) == INTERFACE::TO_NUMBER ) );
 	M_ENSURE( ( identifier_id( INTERFACE::TO_CHARACTER ) == INTERFACE::TO_CHARACTER_IDENTIFIER ) && ( identifier_name( INTERFACE::TO_CHARACTER_IDENTIFIER ) == INTERFACE::TO_CHARACTER ) );
 	M_ENSURE( ( identifier_id( INTERFACE::TO_BOOLEAN ) == INTERFACE::TO_BOOLEAN_IDENTIFIER ) && ( identifier_name( INTERFACE::TO_BOOLEAN_IDENTIFIER ) == INTERFACE::TO_BOOLEAN ) );
-	M_ENSURE( ( identifier_id( _noneClass_.name() ) == TYPE_NONE_IDENTIFIER ) && ( identifier_name( TYPE_NONE_IDENTIFIER ) == _noneClass_.name() ) );
-	M_ENSURE( ( identifier_id( _observerClass_.name() ) == TYPE_OBSERVER_IDENTIFIER ) && ( identifier_name( TYPE_OBSERVER_IDENTIFIER ) == _observerClass_.name() ) );
-	M_ENSURE( ( identifier_id( _referenceClass_.name() ) == TYPE_REFERENCE_IDENTIFIER ) && ( identifier_name( TYPE_REFERENCE_IDENTIFIER ) == _referenceClass_.name() ) );
-	M_ENSURE( ( identifier_id( _functionReferenceClass_.name() ) == TYPE_FUNCTION_REFERENCE_IDENTIFIER ) && ( identifier_name( TYPE_FUNCTION_REFERENCE_IDENTIFIER ) == _functionReferenceClass_.name() ) );
-	M_ENSURE( ( identifier_id( _objectReferenceClass_.name() ) == TYPE_OBJECT_REFERENCE_IDENTIFIER ) && ( identifier_name( TYPE_OBJECT_REFERENCE_IDENTIFIER ) == _objectReferenceClass_.name() ) );
-	M_ENSURE( ( identifier_id( _methodClass_.name() ) == TYPE_METHOD_IDENTIFIER ) && ( identifier_name( TYPE_METHOD_IDENTIFIER ) == _methodClass_.name() ) );
-	M_ENSURE( ( identifier_id( _unboundMethodClass_.name() ) == TYPE_UNBOUND_METHOD_IDENTIFIER ) && ( identifier_name( TYPE_UNBOUND_METHOD_IDENTIFIER ) == _unboundMethodClass_.name() ) );
-	M_ENSURE( ( identifier_id( _boundMethodClass_.name() ) == TYPE_BOUND_METHOD_IDENTIFIER ) && ( identifier_name( TYPE_BOUND_METHOD_IDENTIFIER ) == _boundMethodClass_.name() ) );
-	M_ENSURE( ( identifier_id( _variadicParametersClass_.name() ) == TYPE_VARIADIC_PARAMETERS_IDENTIFIER ) && ( identifier_name( TYPE_VARIADIC_PARAMETERS_IDENTIFIER ) == _variadicParametersClass_.name() ) );
-	M_ENSURE( ( identifier_id( _namedParametersClass_.name() ) == TYPE_NAMED_PARAMETERS_IDENTIFIER ) && ( identifier_name( TYPE_NAMED_PARAMETERS_IDENTIFIER ) == _namedParametersClass_.name() ) );
-	M_ENSURE( ( identifier_id( _unknownClass_.name() ) == TYPE_UNKNOWN_IDENTIFIER ) && ( identifier_name( TYPE_UNKNOWN_IDENTIFIER ) == _unknownClass_.name() ) );
 	M_ENSURE( ( identifier_id( STANDARD_FUNCTIONS::MAIN ) == STANDARD_FUNCTIONS::MAIN_IDENTIFIER ) && ( identifier_name( STANDARD_FUNCTIONS::MAIN_IDENTIFIER ) == STANDARD_FUNCTIONS::MAIN ) );
 	register_builtin_function( BUILTIN::SIZE, hcore::call( &huginn_builtin::size, _1, _2, _3, _4 ), "( *expr* ) - get a size of given expression *expr*, e.g: a number of elements in a collection" );
 	register_builtin_function( BUILTIN::TYPE, hcore::call( &huginn_builtin::type, _1, _2, _3, _4 ), "( *expr* ) - get a type of given expression *expr*" );
@@ -993,6 +981,7 @@ void HRuntime::register_builtins( void ) {
 	register_builtin_function( "print", hcore::call( &huginn_builtin::print, _1, _2, _3, _4 ), "( *str* ) - print a message given by *str* to interpreter's standard output" );
 	register_builtin_function( "input", hcore::call( &huginn_builtin::input, _1, _2, _3, _4 ), "read a line of text from interpreter's standard input" );
 	register_builtin_function( KEYWORD::ASSERT, hcore::call( &huginn_builtin::assert, _1, _2, _3, _4 ), "( *condition*[, *message*] ) - ensure *condition* is met or bailout with *message*" );
+	M_ENSURE( ( identifier_id( _unknownClass_.name() ) == BUILTIN::TYPE_UNKNOWN_IDENTIFIER ) && ( identifier_name( BUILTIN::TYPE_UNKNOWN_IDENTIFIER ) == _unknownClass_.name() ) );
 	for ( HHuginn::HClass const* c : _coreClasses_ ) {
 		register_builtin_function( c->name(), hcore::call( &huginn_builtin::invalid_instance, c->name(), _1, _2, _3, _4 ), "" );
 	}

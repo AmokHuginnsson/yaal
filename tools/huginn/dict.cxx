@@ -88,12 +88,11 @@ public:
 		, _dict( dict_ ) {
 		M_ASSERT( _dict->type_id() == HHuginn::TYPE::DICT );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			make_pointer<HHuginn::HClass>(
 				runtime_,
-				objectFactory_,
 				"KeyValuesDictView",
 				"The `KeyValuesDictView` class represents *lazy* *iterable* view of a `dict` consisted of key-value pairs."
 			)
@@ -169,12 +168,11 @@ public:
 		, _dict( dict_ ) {
 		M_ASSERT( _dict->type_id() == HHuginn::TYPE::DICT );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			make_pointer<HHuginn::HClass>(
 				runtime_,
-				objectFactory_,
 				"ReversedDictView",
 				"The `ReversedDictView` class represents *lazy* *iterable* reversed view of a `dict`."
 			)
@@ -334,8 +332,8 @@ public:
 			doc_,
 			&huginn_builtin::dict
 		)
-		, _keyValuesDictViewClass( HKeyValuesDictView::get_class( runtime_, objectFactory_ ) )
-		, _reversedDictClass( HReversedDict::get_class( runtime_, objectFactory_ ) ) {
+		, _keyValuesDictViewClass( HKeyValuesDictView::get_class( runtime_ ) )
+		, _reversedDictClass( HReversedDict::get_class( runtime_ ) ) {
 		return;
 	}
 	HHuginn::HClass const* key_values_dict_view_class( void ) const {
@@ -404,7 +402,7 @@ HHuginn::HDict::HDict( HHuginn::HClass const* class_, allocator_t const& allocat
 	: HInvalidatingIterable( class_ )
 	, _helper( &value_builtin::less )
 	, _data( _helper, allocator_ )
-	, _keyType( &huginn::_noneClass_ ) {
+	, _keyType( nullptr ) {
 	return;
 }
 
@@ -413,7 +411,7 @@ int long HHuginn::HDict::do_size( huginn::HThread*, int ) const {
 }
 
 void HHuginn::HDict::verify_key_type( huginn::HThread* thread_, HHuginn::HClass const* keyType_, int position_ ) const {
-	if ( ( _keyType->type_id() != TYPE::NONE ) && ( keyType_ != _keyType ) ) {
+	if ( _keyType && ( keyType_ != _keyType ) ) {
 		throw HHuginnRuntimeException( "Non-uniform key types, got "_ys.append( a_type_name( keyType_ ) ).append( " instead of " ).append( a_type_name( _keyType ) ).append( "." ), thread_->current_frame()->file_id(), position_ );
 	}
 	if ( ! is_comparable( keyType_ ) ) {

@@ -795,7 +795,7 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 			v = thread_->object_factory().create_dict();
 			HHuginn::HDict& val( *static_cast<HHuginn::HDict*>( v.raw() ) );
 			HHuginn::HDict::values_t& data( val.value() );
-			HHuginn::HClass const* keyType( &huginn::_noneClass_ );
+			HHuginn::HClass const* keyType( nullptr );
 			HAnchorGuard<HHuginn::HDict> ag( val, thread_, position_ );
 			for ( int long i( 0 ); f->can_continue() && ( i < len ); ++ i ) {
 				HHuginn::value_t key( deserialize_impl( thread_, position_ ) );
@@ -829,7 +829,7 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 			v = thread_->object_factory().create_order();
 			HHuginn::HOrder& val( *static_cast<HHuginn::HOrder*>( v.raw() ) );
 			HHuginn::HOrder::values_t& data( val.value() );
-			HHuginn::HClass const* keyType( &huginn::_noneClass_ );
+			HHuginn::HClass const* keyType( nullptr );
 			HAnchorGuard<HHuginn::HOrder> ag( val, thread_, position_ );
 			for ( int long i( 0 ); f->can_continue() && ( i < len ); ++ i ) {
 				HHuginn::value_t key( deserialize_impl( thread_, position_ ) );

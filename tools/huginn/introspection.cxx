@@ -8,6 +8,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/stringalgo.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
+#include "keyword.hxx"
 #include "thread.hxx"
 #include "packagefactory.hxx"
 #include "objectfactory.hxx"

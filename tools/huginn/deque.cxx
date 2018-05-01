@@ -78,12 +78,11 @@ public:
 		, _deque( deque_ ) {
 		M_ASSERT( _deque->type_id() == HHuginn::TYPE::DEQUE );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			make_pointer<HHuginn::HClass>(
 				runtime_,
-				objectFactory_,
 				"ReversedDequeView",
 				"The `ReversedDequeView` class represents *lazy* *iterable* reversed view of a `deque`."
 			)
@@ -304,7 +303,7 @@ public:
 			"It also supports efficient operations of addition and removal of its elements at its both ends.",
 			&huginn_builtin::deque
 		)
-		, _reversedDequeClass( HReversedDeque::get_class( runtime_, objectFactory_ ) ) {
+		, _reversedDequeClass( HReversedDeque::get_class( runtime_ ) ) {
 		HHuginn::field_definitions_t fd{
 			{ "push",       objectFactory_->create_method( &deque::push ),       "( *elem* ) - add new *elem* at the (right/back) end of the `deque`, `deque` grows in size by 1" },
 			{ "pop",        objectFactory_->create_method( &deque::pop ),        "remove last element from the deque, deque shrinks by 1" },

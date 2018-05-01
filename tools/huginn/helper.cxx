@@ -729,16 +729,16 @@ yaal::hcore::HString const& type_name( HHuginn::TYPE type_ ) {
 	static HString const NAME_ORDER     = BUILTIN::ORDER;
 	static HString const NAME_SET       = BUILTIN::SET;
 	static HString const NAME_BLOB      = BUILTIN::BLOB;
-	static HString const NAME_NONE                = "*none*";
-	static HString const NAME_OBSERVER            = "*observer*";
-	static HString const NAME_REFERENCE           = "*reference*";
-	static HString const NAME_FUNCTION_REFERENCE  = "*function_reference*";
-	static HString const NAME_OBJECT_REFERENCE    = "*object_reference*";
-	static HString const NAME_METHOD              = "*method*";
-	static HString const NAME_UNBOUND_METHOD      = "*unbound_method*";
-	static HString const NAME_BOUND_METHOD        = "*bound_method*";
-	static HString const NAME_VARIADIC_PARAMETERS = "*variadic_parameters*";
-	static HString const NAME_NAMED_PARAMETERS    = "*named_parameters*";
+	static HString const NAME_NONE                = BUILTIN::TYPE_NONE;
+	static HString const NAME_OBSERVER            = BUILTIN::TYPE_OBSERVER;
+	static HString const NAME_REFERENCE           = BUILTIN::TYPE_REFERENCE;
+	static HString const NAME_FUNCTION_REFERENCE  = BUILTIN::TYPE_FUNCTION_REFERENCE;
+	static HString const NAME_OBJECT_REFERENCE    = BUILTIN::TYPE_OBJECT_REFERENCE;
+	static HString const NAME_METHOD              = BUILTIN::TYPE_METHOD;
+	static HString const NAME_UNBOUND_METHOD      = BUILTIN::TYPE_UNBOUND_METHOD;
+	static HString const NAME_BOUND_METHOD        = BUILTIN::TYPE_BOUND_METHOD;
+	static HString const NAME_VARIADIC_PARAMETERS = BUILTIN::TYPE_VARIADIC_PARAMETERS;
+	static HString const NAME_NAMED_PARAMETERS    = BUILTIN::TYPE_NAMED_PARAMETERS;
 	static HString const NAME_UNKNOWN             = "*unknown*";
 	HString const* s( &NAME_UNKNOWN );
 	switch ( type_ ) {

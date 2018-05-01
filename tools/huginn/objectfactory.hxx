@@ -168,13 +168,25 @@ public:
 };
 
 class HObjectFactory final : public HObjectFactoryBase {
-	HObjectPool<HHuginn::HReference, POOL_TYPE::CLASSLESS> _referencePool;
 	HObjectPool<HHuginn::HTaggedValue, POOL_TYPE::CLASSLESS> _taggedValuePool;
-	HObjectPool<HHuginn::HFunctionReference, POOL_TYPE::CLASSLESS> _functionReferencePool;
-	HObjectPool<HHuginn::HClass::HMethod, POOL_TYPE::CLASSLESS> _methodPool;
-	HObjectPool<HHuginn::HClass::HUnboundMethod, POOL_TYPE::CLASSLESS> _unboundMethodPool;
-	HObjectPool<HHuginn::HClass::HBoundMethod, POOL_TYPE::CLASSLESS> _boundMethodPool;
 	HObjectPool<HHuginn::HObject, POOL_TYPE::CLASSLESS> _objectPool;
+	/* Language semantics classes. */
+	HHuginn::class_t _none;
+	HHuginn::class_t _observer;
+	HHuginn::class_t _reference;
+	HHuginn::class_t _functionReference;
+	HHuginn::class_t _objectReference;
+	HHuginn::class_t _method;
+	HHuginn::class_t _unboundMethod;
+	HHuginn::class_t _boundMethod;
+	HHuginn::class_t _variadicParameters;
+	HHuginn::class_t _namedParameters;
+	/* Language semantics pools. */
+	HObjectPool<HHuginn::HReference> _referencePool;
+	HObjectPool<HHuginn::HFunctionReference> _functionReferencePool;
+	HObjectPool<HHuginn::HClass::HMethod> _methodPool;
+	HObjectPool<HHuginn::HClass::HUnboundMethod> _unboundMethodPool;
+	HObjectPool<HHuginn::HClass::HBoundMethod> _boundMethodPool;
 	/* Built-in classes. */
 	HHuginn::class_t _boolean;
 	HHuginn::class_t _integer;
@@ -284,6 +296,36 @@ public:
 	}
 	HHuginn::value_t create_object( HHuginn::HClass const* class_, HHuginn::HObject::fields_t const& fields_ ) const {
 		return ( _objectPool.create( class_, fields_ ) );
+	}
+	HHuginn::HClass const* none_class( void ) const {
+		return ( _none.raw() );
+	}
+	HHuginn::HClass const* observer_class( void ) const {
+		return ( _observer.raw() );
+	}
+	HHuginn::HClass const* reference_class( void ) const {
+		return ( _reference.raw() );
+	}
+	HHuginn::HClass const* function_reference_class( void ) const {
+		return ( _functionReference.raw() );
+	}
+	HHuginn::HClass const* object_reference_class( void ) const {
+		return ( _objectReference.raw() );
+	}
+	HHuginn::HClass const* method_class( void ) const {
+		return ( _method.raw() );
+	}
+	HHuginn::HClass const* unbound_method_class( void ) const {
+		return ( _unboundMethod.raw() );
+	}
+	HHuginn::HClass const* bound_method_class( void ) const {
+		return ( _boundMethod.raw() );
+	}
+	HHuginn::HClass const* variadic_parameters_class( void ) const {
+		return ( _variadicParameters.raw() );
+	}
+	HHuginn::HClass const* named_parameters_class( void ) const {
+		return ( _namedParameters.raw() );
 	}
 	HHuginn::HClass const* integer_class( void ) const {
 		return ( _integer.raw() );

@@ -5,6 +5,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "objectfactory.hxx"
 #include "runtime.hxx"
+#include "keyword.hxx"
 #include "exception.hxx"
 
 using namespace yaal;
@@ -80,13 +81,23 @@ HObjectFactoryBase::HObjectFactoryBase( HRuntime* runtime_ )
 
 HObjectFactory::HObjectFactory( HRuntime* runtime_ )
 	: HObjectFactoryBase( runtime_ )
-	, _referencePool( this )
 	, _taggedValuePool( this )
-	, _functionReferencePool( this )
-	, _methodPool( this )
-	, _unboundMethodPool( this )
-	, _boundMethodPool( this )
 	, _objectPool( this )
+	, _none( make_pointer<HHuginn::HClass>( runtime_, HHuginn::TYPE::NONE, BUILTIN::TYPE_NONE_IDENTIFIER, "A type of `none` value." ) )
+	, _observer( make_pointer<HHuginn::HClass>( runtime_, HHuginn::TYPE::OBSERVER, BUILTIN::TYPE_OBSERVER_IDENTIFIER, "The `*observer*` is a type representing a reference cycle breaking, non-owning weak \"pointer\" to a value." ) )
+	, _reference( make_pointer<HHuginn::HClass>( runtime_, HHuginn::TYPE::REFERENCE, BUILTIN::TYPE_REFERENCE_IDENTIFIER, "Write only reference. Allows assign operator to work." ) )
+	, _functionReference( make_pointer<HHuginn::HClass>( runtime_, HHuginn::TYPE::FUNCTION_REFERENCE, BUILTIN::TYPE_FUNCTION_REFERENCE_IDENTIFIER, "The `*function_reference*` is a Huginn's way of providing information about a value's *runtime* type." ) )
+	, _objectReference( make_pointer<HHuginn::HClass>( runtime_, HHuginn::TYPE::OBJECT_REFERENCE, BUILTIN::TYPE_OBJECT_REFERENCE_IDENTIFIER, "The `*object_reference*` is a up-casting reference allowing to access super class methods." ) )
+	, _method( make_pointer<HHuginn::HClass>( runtime_, HHuginn::TYPE::METHOD, BUILTIN::TYPE_METHOD_IDENTIFIER, "Raw *uncallable* method." ) )
+	, _unboundMethod( make_pointer<HHuginn::HClass>( runtime_, HHuginn::TYPE::UNBOUND_METHOD, BUILTIN::TYPE_UNBOUND_METHOD_IDENTIFIER, "A reference to a callable but unbound method." ) )
+	, _boundMethod( make_pointer<HHuginn::HClass>( runtime_, HHuginn::TYPE::BOUND_METHOD, BUILTIN::TYPE_BOUND_METHOD_IDENTIFIER, "A reference to a callable method with a valid runtime value bound to it." ) )
+	, _variadicParameters( make_pointer<HHuginn::HClass>( runtime_, HHuginn::TYPE::VARIADIC_PARAMETERS, BUILTIN::TYPE_VARIADIC_PARAMETERS_IDENTIFIER, "Variadic parameters pack." ) )
+	, _namedParameters( make_pointer<HHuginn::HClass>( runtime_, HHuginn::TYPE::NAMED_PARAMETERS, BUILTIN::TYPE_NAMED_PARAMETERS_IDENTIFIER, "Named parameters pack." ) )
+	, _referencePool( this, _reference.raw() )
+	, _functionReferencePool( this, _functionReference.raw() )
+	, _methodPool( this, _method.raw() )
+	, _unboundMethodPool( this, _unboundMethod.raw() )
+	, _boundMethodPool( this, _boundMethod.raw() )
 	, _boolean( boolean::get_class( runtime_, this ) )
 	, _integer( integer::get_class( runtime_, this ) )
 	, _string( string::get_class( runtime_, this ) )
@@ -128,6 +139,16 @@ void HObjectFactory::register_builtin_classes( void ) {
 	_exception = exception::get_class( _runtime );
 	_stackFrameInfo = exception::HStackFrameInfo::get_class( _runtime );
 
+	_runtime->huginn()->register_class( _none, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _observer, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _reference, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _functionReference, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _objectReference, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _method, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _unboundMethod, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _boundMethod, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _variadicParameters, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _namedParameters, HHuginn::VISIBILITY::GLOBAL );
 	_runtime->huginn()->register_class( _boolean, HHuginn::VISIBILITY::GLOBAL );
 	_runtime->huginn()->register_class( _integer, HHuginn::VISIBILITY::GLOBAL );
 	_runtime->huginn()->register_class( _string, HHuginn::VISIBILITY::GLOBAL );

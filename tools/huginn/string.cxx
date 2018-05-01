@@ -83,12 +83,11 @@ public:
 		, _string( string_ ) {
 		M_ASSERT( _string->type_id() == HHuginn::TYPE::STRING );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			make_pointer<HHuginn::HClass>(
 				runtime_,
-				objectFactory_,
 				"ReversedStringView",
 				"The `ReversedStringView` class represents *lazy* *iterable* reversed view of a `string`."
 			)
@@ -382,7 +381,7 @@ public:
 			"It supports basic operations of addition and comparisons, it also supports subscript and range operators.",
 			&huginn_builtin::string
 		)
-		, _reversedStringClass( HReversedString::get_class( runtime_, objectFactory_ ) ) {
+		, _reversedStringClass( HReversedString::get_class( runtime_ ) ) {
 		HHuginn::field_definitions_t fd{
 			{ "find",                 objectFactory_->create_method( &string::find,     "string.find",                 static_cast<finder_t>( &HString::find ),      0 ), "( *needle*, *from* ) - find position of substring *needle* that start not sooner than *from* position in the string" },
 			{ "find_last",            objectFactory_->create_method( &string::find,     "string.find_last",            static_cast<finder_t>( &HString::find_last ), hcore::HString::npos + 0 ), "( *needle*, *before* ) - find position of substring *needle* that ends just before *before* in the string" },

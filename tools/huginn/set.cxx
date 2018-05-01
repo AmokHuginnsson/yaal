@@ -110,12 +110,11 @@ public:
 		, _set( set_ ) {
 		M_ASSERT( _set->type_id() == HHuginn::TYPE::SET );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			make_pointer<HHuginn::HClass>(
 				runtime_,
-				objectFactory_,
 				"ReversedSetView",
 				"The `ReversedSetView` class represents *lazy* *iterable* reversed view of a `set`."
 			)
@@ -235,7 +234,7 @@ public:
 			"The `set` is a collection of unique elements of varying types. It supports operation of element insertion, removal and search.",
 			&huginn_builtin::set
 		)
-		, _reversedSetClass( HReversedSet::get_class( runtime_, objectFactory_ ) ) {
+		, _reversedSetClass( HReversedSet::get_class( runtime_ ) ) {
 		HHuginn::field_definitions_t fd{
 			{ "insert",  objectFactory_->create_method( &set::insert ),  "( *elem* ) - insert given element *elem* into a `set`" },
 			{ "has_key", objectFactory_->create_method( &set::has_key ), "( *elem* ) - tell if given element *elem* is present in the `set`" },

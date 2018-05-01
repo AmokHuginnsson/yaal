@@ -87,12 +87,11 @@ public:
 		, _lookup( lookup_ ) {
 		M_ASSERT( _lookup->type_id() == HHuginn::TYPE::LOOKUP );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			make_pointer<HHuginn::HClass>(
 				runtime_,
-				objectFactory_,
 				"KeyValuesLookupView",
 				"The `KeyValuesLookupView` class represents *lazy* *iterable* view of a `lookup` consisted of key-value pairs."
 			)
@@ -168,12 +167,11 @@ public:
 		, _lookup( lookup_ ) {
 		M_ASSERT( _lookup->type_id() == HHuginn::TYPE::LOOKUP );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			make_pointer<HHuginn::HClass>(
 				runtime_,
-				objectFactory_,
 				"ReversedLookupView",
 				"The `ReversedLookupView` class represents *lazy* *iterable* reversed view of a `lookup`."
 			)
@@ -323,8 +321,8 @@ public:
 			doc_,
 			&huginn_builtin::lookup
 		)
-		, _keyValuesLookupViewClass( HKeyValuesLookupView::get_class( runtime_, objectFactory_ ) )
-		, _reversedLookupClass( HReversedLookup::get_class( runtime_, objectFactory_ ) ) {
+		, _keyValuesLookupViewClass( HKeyValuesLookupView::get_class( runtime_ ) )
+		, _reversedLookupClass( HReversedLookup::get_class( runtime_ ) ) {
 		return;
 	}
 	HHuginn::HClass const* key_values_lookup_view_class( void ) const {

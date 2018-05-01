@@ -49,7 +49,6 @@ HHuginn::HClass::HClass(
 
 HHuginn::HClass::HClass(
 	HRuntime* runtime_,
-	HObjectFactory* objectFactory_,
 	char const* name_,
 	char const* doc_
 ) : _runtime( runtime_ )
@@ -61,7 +60,7 @@ HHuginn::HClass::HClass(
 	, _staticFieldIndexes()
 	, _fieldIndexes()
 	, _fieldDefinitions()
-	, _constructor( make_constructor( objectFactory_, ACCESS::PRIVATE ) )
+	, _constructor()
 	, _fieldDescriptions()
 	, _doc( doc_ )
 	, _type( TYPE::BUILTIN )
@@ -70,6 +69,31 @@ HHuginn::HClass::HClass(
 	return;
 	M_EPILOG
 }
+
+HHuginn::HClass::HClass(
+	HRuntime* runtime_,
+	HHuginn::TYPE typeTag_,
+	HHuginn::identifier_id_t identifierId_,
+	char const* doc_
+) : _runtime( runtime_ )
+	, _typeId( huginn::type_id( typeTag_ ) )
+	, _identifierId( identifierId_ )
+	, _super( nullptr )
+	, _createInstance( &HClass::create_instance_default )
+	, _fieldIdentifiers()
+	, _staticFieldIndexes()
+	, _fieldIndexes()
+	, _fieldDefinitions()
+	, _constructor()
+	, _fieldDescriptions()
+	, _doc( doc_ )
+	, _type( TYPE::BUILTIN )
+	, _origin( nullptr ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
 
 HHuginn::HClass::HClass(
 	HRuntime* runtime_,
@@ -231,6 +255,9 @@ HHuginn::function_t const& HHuginn::HClass::function( int index_ ) const {
 
 void HHuginn::HClass::finalize_registration( huginn::HRuntime* runtime_ ) {
 	M_PROLOG
+	if ( ! _constructor ) {
+	 _constructor = make_constructor( runtime_->object_factory(), ACCESS::PRIVATE );
+	}
 	do_finalize_registration( runtime_ );
 	return;
 	M_EPILOG
