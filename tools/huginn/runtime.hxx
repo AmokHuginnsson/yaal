@@ -36,9 +36,9 @@ private:
 	 * so we cannot use HLookupMap here as adding and removing entries
 	 * to HLookupMap invalidates old pointers.
 	 */
-	typedef yaal::hcore::HHashMap<identifier_id_t, value_t> functions_store_t;
+	typedef yaal::hcore::HList<value_t> functions_store_t;
 	typedef yaal::hcore::HPointer<functions_store_t> shared_functions_store_t;
-	typedef yaal::hcore::HHashSet<identifier_id_t> identifiers_t;
+	typedef yaal::hcore::HHashMap<identifier_id_t, value_t const*> global_callables_t;
 	typedef yaal::hcore::HArray<HHuginn::class_t> dependencies_t;
 public:
 	typedef yaal::hcore::HArray<yaal::hcore::HString> identifier_names_t;
@@ -88,7 +88,7 @@ private:
 	 * Hence use of _functionsStore and _globalDefinitions.
 	 */
 	shared_functions_store_t _functionsStore; /*!< All functions ever defined in all sub-modules. */
-	identifiers_t _globalDefinitions; /*!< Functions available in current module context. */
+	global_callables_t _globalDefinitions; /*!< Functions available in current module context. */
 	/*
 	 * All classes must be kept directly in runtime so it will be simpler
 	 * to reregister, i.e. update class runtime with update_runtime() for
@@ -136,7 +136,7 @@ public:
 	identifier_id_t try_identifier_id( yaal::hcore::HString const& ) const;
 	identifier_id_t identifier_id( yaal::hcore::HString const& );
 	yaal::hcore::HString const& identifier_name( identifier_id_t ) const;
-	value_t const* get_function( identifier_id_t, bool = false ) const;
+	value_t const* get_function( identifier_id_t ) const;
 	class_t get_class( identifier_id_t ) const;
 	value_t const* get_value( identifier_id_t ) const;
 	void register_class( class_t, HHuginn::VISIBILITY );
