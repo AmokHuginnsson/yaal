@@ -60,11 +60,6 @@ int _huginnMaxCallStack_( DEFAULT_MAX_CALL_STACK );
 
 namespace huginn {
 
-namespace BUILTIN {
-HHuginn::identifier_id_t const TYPE_UNKNOWN_IDENTIFIER( 62 );
-}
-HHuginn::HClass const _unknownClass_( HHuginn::TYPE::UNKNOWN, BUILTIN::TYPE_UNKNOWN_IDENTIFIER, "An erroneous unknown type." );
-
 char const* _errMsgHHuginn_[ 10 ] = {
 	_( "Operands are not summable: " ),
 	_( "Operands are not subtractable: " ),
@@ -796,7 +791,7 @@ HHuginn::HTernaryEvaluator::HTernaryEvaluator(
 	expression_t const& condition_,
 	expression_t const& ifTrue_,
 	expression_t const& ifFalse_
-) : HValue( &_unknownClass_ ),
+) : HValue( nullptr ),
 	_condition( condition_ ),
 	_ifTrue( ifTrue_ ),
 	_ifFalse( ifFalse_ ) {

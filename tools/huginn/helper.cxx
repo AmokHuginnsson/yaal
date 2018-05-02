@@ -426,8 +426,8 @@ HHuginn::type_id_t verify_arg_collection_value_type_low(
 	huginn::HThread* thread_,
 	int position_
 ) {
-	HHuginn::type_id_t type( _unknownClass_.type_id() );
-	HHuginn::type_id_t curType( _unknownClass_.type_id() );
+	HHuginn::type_id_t type( type_id( HHuginn::TYPE::UNKNOWN ) );
+	HHuginn::type_id_t curType( type_id( HHuginn::TYPE::UNKNOWN ) );
 	bool first( true );
 	int long long pos( 0 );
 	for ( HHuginn::value_t const& v : collection_.value() ) {
@@ -475,7 +475,7 @@ HHuginn::type_id_t verify_arg_collection_value_type(
 	int position_
 ) {
 	verify_arg_collection( name_, values_, no_, argsArity_, ONTICALLY::MATERIALIZED, thread_, position_ );
-	HHuginn::type_id_t type( _unknownClass_.type_id() );
+	HHuginn::type_id_t type( type_id( HHuginn::TYPE::UNKNOWN ) );
 	switch ( values_[no_]->type_id().get() ) {
 		case ( static_cast<int>( HHuginn::TYPE::LIST ) ): {
 			type = verify_arg_collection_value_type_low( name_, *static_cast<HHuginn::HList const*>( values_[no_].raw() ), requiredTypes_, uniformity_, thread_, position_ );
@@ -510,7 +510,7 @@ HHuginn::type_id_t verify_arg_collection_value_type(
 }
 
 bool is_numeric( HHuginn::HClass const* class_ ) {
-	HHuginn::type_id_t t( class_->type_id() );
+	HHuginn::type_id_t t( class_ ? class_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
 	return (
 		( t == HHuginn::TYPE::INTEGER )
 		|| ( t == HHuginn::TYPE::REAL )
@@ -519,7 +519,7 @@ bool is_numeric( HHuginn::HClass const* class_ ) {
 }
 
 bool is_collection( HHuginn::HClass const* class_ ) {
-	HHuginn::type_id_t t( class_->type_id() );
+	HHuginn::type_id_t t( class_ ? class_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
 	return (
 		( t == HHuginn::TYPE::TUPLE )
 		|| ( t == HHuginn::TYPE::LIST )
@@ -532,7 +532,7 @@ bool is_collection( HHuginn::HClass const* class_ ) {
 }
 
 bool is_comparable( HHuginn::HClass const* class_ ) {
-	HHuginn::type_id_t t( class_->type_id() );
+	HHuginn::type_id_t t( class_ ? class_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
 	return (
 		is_numeric( class_ )
 		|| ( t == HHuginn::TYPE::STRING )
@@ -545,7 +545,7 @@ bool is_comparable( HHuginn::HClass const* class_ ) {
 }
 
 bool is_boolean_congruent( HHuginn::HClass const* class_ ) {
-	HHuginn::type_id_t t( class_->type_id() );
+	HHuginn::type_id_t t( class_ ? class_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
 	return (
 		( t == HHuginn::TYPE::BOOLEAN )
 		|| ( t == HHuginn::TYPE::UNKNOWN )
@@ -554,7 +554,7 @@ bool is_boolean_congruent( HHuginn::HClass const* class_ ) {
 }
 
 bool is_unknown( HHuginn::HClass const* class_ ) {
-	HHuginn::type_id_t t( class_->type_id() );
+	HHuginn::type_id_t t( class_ ? class_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
 	return ( ( t == HHuginn::TYPE::NOT_BOOLEAN ) || ( t == HHuginn::TYPE::UNKNOWN ) || ( t == HHuginn::TYPE::REFERENCE ) );
 }
 
@@ -567,25 +567,25 @@ bool is_comparable_congruent( HHuginn::HClass const* class_ ) {
 }
 
 bool is_reference_congruent( HHuginn::HClass const* class_ ) {
-	HHuginn::type_id_t t( class_->type_id() );
+	HHuginn::type_id_t t( class_ ? class_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
 	return ( ( t == HHuginn::TYPE::REFERENCE ) || ( t == HHuginn::TYPE::UNKNOWN ) );
 }
 
 bool is_integer_congruent( HHuginn::HClass const* class_ ) {
-	return ( ( class_->type_id() == HHuginn::TYPE::INTEGER ) || is_unknown( class_ ) );
+	return ( ( class_ && ( class_->type_id() == HHuginn::TYPE::INTEGER ) ) || is_unknown( class_ ) );
 }
 
 bool is_summable( HHuginn::HClass const* class_ ) {
 	return (
 		is_numeric_congruent( class_ )
-		|| ( class_->type_id() == HHuginn::TYPE::STRING )
+		|| ( class_ && ( class_->type_id() == HHuginn::TYPE::STRING ) )
 		|| is_collection( class_ )
 	);
 }
 
 bool are_congruous( HHuginn::HClass const* c1_, HHuginn::HClass const* c2_ ) {
-	HHuginn::type_id_t t1( c1_->type_id() );
-	HHuginn::type_id_t t2( c2_->type_id() );
+	HHuginn::type_id_t t1( c1_ ? c1_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
+	HHuginn::type_id_t t2( c2_ ? c2_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
 	bool congruous(
 		( t1 == t2 )
 		|| ( t1 == HHuginn::TYPE::UNKNOWN )
@@ -739,7 +739,7 @@ yaal::hcore::HString const& type_name( HHuginn::TYPE type_ ) {
 	static HString const NAME_BOUND_METHOD        = BUILTIN::TYPE_BOUND_METHOD;
 	static HString const NAME_VARIADIC_PARAMETERS = BUILTIN::TYPE_VARIADIC_PARAMETERS;
 	static HString const NAME_NAMED_PARAMETERS    = BUILTIN::TYPE_NAMED_PARAMETERS;
-	static HString const NAME_UNKNOWN             = "*unknown*";
+	static HString const NAME_UNKNOWN             = BUILTIN::TYPE_UNKNOWN;
 	HString const* s( &NAME_UNKNOWN );
 	switch ( type_ ) {
 		case ( HHuginn::TYPE::NONE ):               s = &NAME_NONE;               break;

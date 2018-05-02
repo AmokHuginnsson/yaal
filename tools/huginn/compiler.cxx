@@ -31,6 +31,9 @@ namespace huginn {
 
 HStatement::statement_id_t const INVALID_STATEMENT_IDENTIFIER( -1 );
 static int const NOT_TERMINATED( -1 );
+inline HHuginn::TYPE compiled_type_id( HHuginn::HClass const* class_ ) {
+	return ( class_ ? type_tag( class_->type_id() ) : HHuginn::TYPE::UNKNOWN );
+}
 
 OCompiler::OActiveScope::OActiveScope( HHuginn::scope_t& scope_, HHuginn::expression_t& expression_ )
 	: _scope( yaal::move( scope_ ) )
@@ -674,7 +677,7 @@ HHuginn::HClass const* OCompiler::type_to_class( HHuginn::TYPE type_ ) const {
 }
 
 HHuginn::HClass const* OCompiler::type_id_to_class( HHuginn::type_id_t typeId_ ) const {
-	HHuginn::HClass const* c( &_unknownClass_ );
+	HHuginn::HClass const* c( nullptr );
 	HObjectFactory const& of( *_runtime->object_factory() );
 	switch ( static_cast<HHuginn::TYPE>( typeId_.get() ) ) {
 		case ( HHuginn::TYPE::INTEGER ):             c = of.integer_class();             break;
@@ -702,7 +705,7 @@ HHuginn::HClass const* OCompiler::type_id_to_class( HHuginn::type_id_t typeId_ )
 		case ( HHuginn::TYPE::VARIADIC_PARAMETERS ): c = of.variadic_parameters_class(); break;
 		case ( HHuginn::TYPE::NAMED_PARAMETERS ):    c = of.named_parameters_class();    break;
 		case ( HHuginn::TYPE::NOT_BOOLEAN ):
-		case ( HHuginn::TYPE::UNKNOWN ):             c = &_unknownClass_;            break;
+		case ( HHuginn::TYPE::UNKNOWN ):             c = nullptr;            break;
 	}
 	return ( c );
 }
@@ -1388,7 +1391,7 @@ void OCompiler::commit_boolean( OPERATOR operator_, executing_parser::position_t
 	if ( fc.expressions_stack().top().get_size() > 1 ) {
 		HHuginn::value_t And( _runtime->object_factory()->create<HBooleanEvaluator>( _runtime, fc.expressions_stack().top(), operator_ ) );
 		fc.expressions_stack().pop();
-		M_ASSERT( ! fc._valueTypes.is_empty() && ( fc._valueTypes.top()._class->type_id() == HHuginn::TYPE::BOOLEAN ) );
+		M_ASSERT( ! fc._valueTypes.is_empty() && ( compiled_type_id( fc._valueTypes.top()._class ) == HHuginn::TYPE::BOOLEAN ) );
 		fc._valueTypes.pop();
 		defer_store_direct( And, position_ );
 		HExpression& expression( *current_expression() );
@@ -1788,7 +1791,7 @@ void OCompiler::defer_oper_direct( OPERATOR operator_, executing_parser::positio
 HHuginn::HHuginn::HClass const* OCompiler::congruent( HHuginn::HClass const* c1_, HHuginn::HClass const* c2_ ) const {
 	HHuginn::HClass const* c( type_to_class( HHuginn::TYPE::NOT_BOOLEAN ) );
 	if ( c1_ == c2_ ) {
-		HHuginn::type_id_t t1( c1_->type_id() );
+		HHuginn::type_id_t t1( c1_ ? c1_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
 		if ( ( t1 != HHuginn::TYPE::UNKNOWN ) && ( t1 != HHuginn::TYPE::REFERENCE ) ) {
 			c = c1_;
 		}
@@ -2096,7 +2099,7 @@ void OCompiler::dispatch_assign( executing_parser::position_t position_ ) {
 			fc._valueTypes.pop();
 			OFunctionContext::OVariableRef varRef( fc._variables.top() );
 			HHuginn::HClass const* realDestType( destType );
-			if ( realDestType->type_id() == HHuginn::TYPE::UNKNOWN ) {
+			if ( compiled_type_id( realDestType ) == HHuginn::TYPE::UNKNOWN ) {
 				realDestType = guess_type( varRef._identifier );
 			}
 			if ( varRef._identifier != INVALID_IDENTIFIER ) {
@@ -2221,7 +2224,7 @@ void OCompiler::dispatch_subscript( executing_parser::position_t position_ ) {
 		if ( op == OPERATOR::SUBSCRIPT_ARGUMENT ) {
 			++ range;
 		} else {
-			if ( ! ( nonInteger || is_integer_congruent( fc._valueTypes.top()._class ) || ( fc._valueTypes.top()._class->type_id() == HHuginn::TYPE::NONE ) ) ) {
+			if ( ! ( nonInteger || is_integer_congruent( fc._valueTypes.top()._class ) || ( compiled_type_id( fc._valueTypes.top()._class ) == HHuginn::TYPE::NONE ) ) ) {
 				nonInteger = true;
 				p = fc._operations.top()._position;
 			}
@@ -2308,7 +2311,7 @@ void OCompiler::dispatch_function_call( HExpression::OExecutionStep::action_t co
 	if ( action_ == &HExpression::function_call ) {
 		OFunctionContext::OValueDesc vd( fc._valueTypes.top() );
 		fc._valueTypes.pop();
-		if ( vd._class->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) {
+		if ( compiled_type_id( vd._class ) == HHuginn::TYPE::FUNCTION_REFERENCE ) {
 			c = function_ref_to_class( vd._identifier );
 		}
 	} else if ( action_ == &HExpression::make_dict ) {

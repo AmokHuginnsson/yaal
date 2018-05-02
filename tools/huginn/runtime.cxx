@@ -27,7 +27,7 @@ namespace huginn {
 
 HRuntime::HRuntime( HHuginn* huginn_ )
 	: _huginn( huginn_ )
-	, _idGenerator( static_cast<type_id_t::value_type>( HHuginn::TYPE::NOT_BOOLEAN ) )
+	, _idGenerator( type_id( HHuginn::TYPE::NOT_BOOLEAN ).get() )
 	, _identifierIds( {
 			{ KEYWORD::CONSTRUCTOR, KEYWORD::CONSTRUCTOR_IDENTIFIER },
 			{ KEYWORD::DESTRUCTOR, KEYWORD::DESTRUCTOR_IDENTIFIER },
@@ -90,8 +90,8 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			{ INTERFACE::TO_NUMBER,        INTERFACE::TO_NUMBER_IDENTIFIER },
 			{ INTERFACE::TO_CHARACTER,     INTERFACE::TO_CHARACTER_IDENTIFIER },
 			{ INTERFACE::TO_BOOLEAN,       INTERFACE::TO_BOOLEAN_IDENTIFIER },
-			{ STANDARD_FUNCTIONS::MAIN, STANDARD_FUNCTIONS::MAIN_IDENTIFIER },
-			{ _unknownClass_.name(), BUILTIN::TYPE_UNKNOWN_IDENTIFIER }
+			{ STANDARD_FUNCTIONS::MAIN,    STANDARD_FUNCTIONS::MAIN_IDENTIFIER },
+			{ BUILTIN::TYPE_UNKNOWN,       BUILTIN::TYPE_UNKNOWN_IDENTIFIER }
 		} )
 	, _identifierNames( {
 			KEYWORD::CONSTRUCTOR,
@@ -156,7 +156,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			INTERFACE::TO_CHARACTER,
 			INTERFACE::TO_BOOLEAN,
 			STANDARD_FUNCTIONS::MAIN,
-			_unknownClass_.name()
+			BUILTIN::TYPE_UNKNOWN
 		} )
 	, _objectFactory( make_pointer<HObjectFactory>( this ) )
 	, _none( _objectFactory->create<HHuginn::HValue>( _objectFactory->none_class() ) )
@@ -182,7 +182,7 @@ void HRuntime::reset( void ) {
 	_result.reset();
 	static_cast<HHuginn::HList*>( _argv.raw() )->clear();
 	_threads.clear();
-	_idGenerator = static_cast<type_id_t::value_type>( HHuginn::TYPE::NOT_BOOLEAN );
+	_idGenerator = type_id( HHuginn::TYPE::NOT_BOOLEAN ).get();
 	return;
 	M_EPILOG
 }
@@ -896,21 +896,8 @@ void HRuntime::register_builtin_function( yaal::hcore::HString const& name_, fun
 	M_EPILOG
 }
 
-namespace {
-HHuginn::HClass const* _coreClasses_[1];
-}
-
 void HRuntime::register_builtins( void ) {
 	M_PROLOG
-	static volatile bool once( false );
-	if ( ! once ) {
-		once = true;
-		HHuginn::HClass const* coreClassesInit[] = {
-			&_unknownClass_
-		};
-		static_assert( sizeof ( coreClassesInit ) == sizeof ( _coreClasses_ ), "invalid core classes initializer size" );
-		copy( begin( coreClassesInit ), end( coreClassesInit ), begin( _coreClasses_ ) );
-	}
 	M_ENSURE( ( identifier_id( KEYWORD::CONSTRUCTOR ) == KEYWORD::CONSTRUCTOR_IDENTIFIER ) && ( identifier_name( KEYWORD::CONSTRUCTOR_IDENTIFIER ) == KEYWORD::CONSTRUCTOR ) );
 	M_ENSURE( ( identifier_id( KEYWORD::DESTRUCTOR ) == KEYWORD::DESTRUCTOR_IDENTIFIER ) && ( identifier_name( KEYWORD::DESTRUCTOR_IDENTIFIER ) == KEYWORD::DESTRUCTOR ) );
 	M_ENSURE( ( identifier_id( KEYWORD::THIS ) == KEYWORD::THIS_IDENTIFIER ) && ( identifier_name( KEYWORD::THIS_IDENTIFIER ) == KEYWORD::THIS ) );
@@ -973,6 +960,7 @@ void HRuntime::register_builtins( void ) {
 	M_ENSURE( ( identifier_id( INTERFACE::TO_CHARACTER ) == INTERFACE::TO_CHARACTER_IDENTIFIER ) && ( identifier_name( INTERFACE::TO_CHARACTER_IDENTIFIER ) == INTERFACE::TO_CHARACTER ) );
 	M_ENSURE( ( identifier_id( INTERFACE::TO_BOOLEAN ) == INTERFACE::TO_BOOLEAN_IDENTIFIER ) && ( identifier_name( INTERFACE::TO_BOOLEAN_IDENTIFIER ) == INTERFACE::TO_BOOLEAN ) );
 	M_ENSURE( ( identifier_id( STANDARD_FUNCTIONS::MAIN ) == STANDARD_FUNCTIONS::MAIN_IDENTIFIER ) && ( identifier_name( STANDARD_FUNCTIONS::MAIN_IDENTIFIER ) == STANDARD_FUNCTIONS::MAIN ) );
+	M_ENSURE( ( identifier_id( BUILTIN::TYPE_UNKNOWN ) == BUILTIN::TYPE_UNKNOWN_IDENTIFIER ) && ( identifier_name( BUILTIN::TYPE_UNKNOWN_IDENTIFIER ) == BUILTIN::TYPE_UNKNOWN ) );
 	register_builtin_function( BUILTIN::SIZE, hcore::call( &huginn_builtin::size, _1, _2, _3, _4 ), "( *expr* ) - get a size of given expression *expr*, e.g: a number of elements in a collection" );
 	register_builtin_function( BUILTIN::TYPE, hcore::call( &huginn_builtin::type, _1, _2, _3, _4 ), "( *expr* ) - get a type of given expression *expr*" );
 	register_builtin_function( BUILTIN::COPY, hcore::call( &huginn_builtin::copy, _1, _2, _3, _4 ), "( *ref* ) - make a deep copy of a value given given by *ref*" );
@@ -981,10 +969,6 @@ void HRuntime::register_builtins( void ) {
 	register_builtin_function( "print", hcore::call( &huginn_builtin::print, _1, _2, _3, _4 ), "( *str* ) - print a message given by *str* to interpreter's standard output" );
 	register_builtin_function( "input", hcore::call( &huginn_builtin::input, _1, _2, _3, _4 ), "read a line of text from interpreter's standard input" );
 	register_builtin_function( KEYWORD::ASSERT, hcore::call( &huginn_builtin::assert, _1, _2, _3, _4 ), "( *condition*[, *message*] ) - ensure *condition* is met or bailout with *message*" );
-	M_ENSURE( ( identifier_id( _unknownClass_.name() ) == BUILTIN::TYPE_UNKNOWN_IDENTIFIER ) && ( identifier_name( BUILTIN::TYPE_UNKNOWN_IDENTIFIER ) == _unknownClass_.name() ) );
-	for ( HHuginn::HClass const* c : _coreClasses_ ) {
-		register_builtin_function( c->name(), hcore::call( &huginn_builtin::invalid_instance, c->name(), _1, _2, _3, _4 ), "" );
-	}
 	_objectFactory->register_builtin_classes();
 	return;
 	M_EPILOG
@@ -1064,9 +1048,6 @@ void HRuntime::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) const {
 	for ( values_t::value_type const& v : _values ) {
 		stream_ << "package: " << identifier_name( v.first ) << " = " << v.second->get_class()->name() << endl;
 	}
-	for ( HHuginn::HClass const* c : _coreClasses_ ) {
-		stream_ << "class: " << c->name() << " {}" << endl;
-	}
 	for ( classes_t::value_type const& c : _classes ) {
 		stream_ << *c.second << endl;
 	}
@@ -1089,11 +1070,6 @@ void HRuntime::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) const {
 
 void HRuntime::dump_docs( yaal::hcore::HStreamInterface& stream_ ) const {
 	M_PROLOG
-	for ( HHuginn::HClass const* c : _coreClasses_ ) {
-		if ( ! c->doc().is_empty() ) {
-			stream_ << c->name() << ":" << c->doc() << endl;
-		}
-	}
 	for ( classes_t::value_type const& c : _classes ) {
 		HHuginn::HClass const& cls( *c.second );
 		if ( ! cls.doc().is_empty() ) {

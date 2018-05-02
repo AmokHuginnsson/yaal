@@ -473,7 +473,6 @@ public:
 	HClass( huginn::HRuntime*, huginn::HObjectFactory*, type_id_t, identifier_id_t, yaal::hcore::HString const&, constructor_t );
 	HClass( huginn::HRuntime*, char const*, char const* );
 	HClass( huginn::HRuntime*, HHuginn::TYPE, identifier_id_t, char const* );
-	HClass( HHuginn::TYPE, HHuginn::identifier_id_t, yaal::hcore::HString const& );
 	virtual ~HClass( void ) {
 	}
 	void redefine( HClass const*, field_definitions_t const& );
@@ -1242,14 +1241,15 @@ private:
 
 namespace huginn {
 
-extern HHuginn::HClass const _unknownClass_;
-
-inline HHuginn::type_id_t type_id( HHuginn::TYPE type_ ) {
-	return ( HHuginn::type_id_t( static_cast<HHuginn::type_id_t::value_type>( type_ ) ) );
+inline HHuginn::type_id_t type_id( HHuginn::TYPE typeTag_ ) {
+	return ( HHuginn::type_id_t( static_cast<HHuginn::type_id_t::value_type>( typeTag_ ) ) );
+}
+inline HHuginn::TYPE type_tag( HHuginn::type_id_t typeId_ ) {
+	return ( static_cast<HHuginn::TYPE>( typeId_.get() ) );
 }
 yaal::hcore::HString const& type_name( HHuginn::TYPE );
 inline yaal::hcore::HString const& type_name( HHuginn::type_id_t type_ ) {
-	return ( type_name( static_cast<HHuginn::TYPE>( type_.get() ) ) );
+	return ( type_name( type_tag( type_ ) ) );
 }
 
 void initialize_packages( void );

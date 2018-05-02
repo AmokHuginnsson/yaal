@@ -79,6 +79,7 @@ char const* TYPE_UNBOUND_METHOD      = "*unbound_method*";
 char const* TYPE_BOUND_METHOD        = "*bound_method*";
 char const* TYPE_VARIADIC_PARAMETERS = "*variadic_parameters*";
 char const* TYPE_NAMED_PARAMETERS    = "*named_parameters*";
+char const* TYPE_UNKNOWN             = "*unknown*";
 HHuginn::identifier_id_t const INTEGER_IDENTIFIER( 5 );
 HHuginn::identifier_id_t const REAL_IDENTIFIER( 6 );
 HHuginn::identifier_id_t const NUMBER_IDENTIFIER( 7 );
@@ -108,6 +109,8 @@ HHuginn::identifier_id_t const TYPE_UNBOUND_METHOD_IDENTIFIER( 30 );
 HHuginn::identifier_id_t const TYPE_BOUND_METHOD_IDENTIFIER( 31 );
 HHuginn::identifier_id_t const TYPE_VARIADIC_PARAMETERS_IDENTIFIER( 32 );
 HHuginn::identifier_id_t const TYPE_NAMED_PARAMETERS_IDENTIFIER( 33 );
+
+HHuginn::identifier_id_t const TYPE_UNKNOWN_IDENTIFIER( 62 );
 
 }
 

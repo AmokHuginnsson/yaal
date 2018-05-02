@@ -121,29 +121,6 @@ HHuginn::HClass::HClass(
 	M_EPILOG
 }
 
-HHuginn::HClass::HClass(
-	HHuginn::TYPE typeTag_,
-	HHuginn::identifier_id_t identifierId_,
-	yaal::hcore::HString const& doc_
-) : _runtime( nullptr )
-	, _typeId( huginn::type_id( typeTag_ ) )
-	, _identifierId( identifierId_ )
-	, _super( nullptr )
-	, _createInstance( &HClass::create_instance_default )
-	, _fieldIdentifiers()
-	, _staticFieldIndexes()
-	, _fieldIndexes()
-	, _fieldDefinitions()
-	, _constructor()
-	, _fieldDescriptions()
-	, _doc( doc_ )
-	, _type( TYPE::BUILTIN )
-	, _origin( nullptr ) {
-	M_PROLOG
-	return;
-	M_EPILOG
-}
-
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
