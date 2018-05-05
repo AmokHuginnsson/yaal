@@ -26,7 +26,7 @@ namespace hash {
 void change_endianness( u32_t*, int long );
 void update_md5_state( u32_t*, HStreamBlockIterator::HBlock const& );
 
-yaal::hcore::HString md5( HStreamInterface& stream ) {
+md5_hash_t md5( HStreamInterface& stream ) {
 	M_PROLOG
 	static u32_t const BLOCK_SIZE = 512;
 	static u32_t const MESSAGE_LENGTH_SIZE( BLOCK_SIZE >> 3 );
@@ -66,21 +66,19 @@ yaal::hcore::HString md5( HStreamInterface& stream ) {
 			update_md5_state( state, block );
 		}
 	} while ( last == BLOCK_SIZE );
-	change_endianness( state, STATE_SIZE );
-	static int const RESULT_SIZE( 4 * 8 + 1 );
-	char result[RESULT_SIZE];
-	snprintf( result, RESULT_SIZE, "%08x%08x%08x%08x", state[ 0 ], state[ 1 ], state[ 2 ], state[ 3 ] );
+	md5_hash_t result;
+	memcpy( result.data(), state, static_cast<size_t>( result.size() ) );
 	return ( result );
 	M_EPILOG
 }
 
-yaal::hcore::HString md5( HStreamInterface::ptr_t stream ) {
+md5_hash_t md5( HStreamInterface::ptr_t stream ) {
 	M_PROLOG
 	return ( md5( *stream ) );
 	M_EPILOG
 }
 
-yaal::hcore::HString md5( HString const& string ) {
+md5_hash_t md5( HString const& string ) {
 	M_PROLOG
 	HStringStream ss( string );
 	return ( md5( ss ) );
@@ -89,7 +87,7 @@ yaal::hcore::HString md5( HString const& string ) {
 
 void update_sha1_state( u32_t*, HStreamBlockIterator::HBlock const& );
 
-yaal::hcore::HString sha1( HStreamInterface& stream ) {
+sha1_hash_t sha1( HStreamInterface& stream ) {
 	M_PROLOG
 	static u32_t const BLOCK_SIZE = 512;
 	static u32_t const MESSAGE_LENGTH_SIZE( BLOCK_SIZE >> 3 );
@@ -131,20 +129,20 @@ yaal::hcore::HString sha1( HStreamInterface& stream ) {
 			update_sha1_state( state, block );
 		}
 	} while ( last == BLOCK_SIZE );
-	static int const RESULT_SIZE( 5 * 8 + 1 );
-	char result[RESULT_SIZE];
-	snprintf( result, RESULT_SIZE, "%08x%08x%08x%08x%08x", state[ 0 ], state[ 1 ], state[ 2 ], state[ 3 ], state[ 4 ] );
+	change_endianness( state, STATE_SIZE );
+	sha1_hash_t result;
+	memcpy( result.data(), state, static_cast<size_t>( result.size() ) );
 	return ( result );
 	M_EPILOG
 }
 
-yaal::hcore::HString sha1( HStreamInterface::ptr_t stream ) {
+sha1_hash_t sha1( HStreamInterface::ptr_t stream ) {
 	M_PROLOG
 	return ( sha1( *stream ) );
 	M_EPILOG
 }
 
-yaal::hcore::HString sha1( HString const& string ) {
+sha1_hash_t sha1( HString const& string ) {
 	M_PROLOG
 	HStringStream ss( string );
 	return ( sha1( ss ) );
@@ -349,7 +347,7 @@ void change_endianness( u64_t*, int long );
 
 void update_sha512_state( u64_t*, HStreamBlockIterator::HBlock const& );
 
-yaal::hcore::HString sha512( HStreamInterface& stream ) {
+sha512_hash_t sha512( HStreamInterface& stream ) {
 	M_PROLOG
 	static u32_t const BLOCK_SIZE = 1024;
 	static u32_t const MESSAGE_LENGTH_SIZE( BLOCK_SIZE >> 3 );
@@ -390,25 +388,20 @@ yaal::hcore::HString sha512( HStreamInterface& stream ) {
 			update_sha512_state( state, block );
 		}
 	} while ( last == BLOCK_SIZE );
-#if SIZEOF_INT_LONG == 8
-	char const format[] = "%016lx%016lx%016lx%016lx%016lx%016lx%016lx%016lx";
-#else
-	char const format[] = "%016llx%016llx%016llx%016llx%016llx%016llx%016llx%016llx";
-#endif
-	static int const RESULT_SIZE( 8 * 16 + 1 );
-	char result[RESULT_SIZE];
-	snprintf( result, RESULT_SIZE, format, state[ 0 ], state[ 1 ], state[ 2 ], state[ 3 ], state[ 4 ], state[ 5 ], state[ 6 ], state[ 7 ] );
+	change_endianness( state, STATE_SIZE );
+	sha512_hash_t result;
+	memcpy( result.data(), state, static_cast<size_t>( result.size() ) );
 	return ( result );
 	M_EPILOG
 }
 
-yaal::hcore::HString sha512( HStreamInterface::ptr_t stream ) {
+sha512_hash_t sha512( HStreamInterface::ptr_t stream ) {
 	M_PROLOG
 	return ( sha512( *stream ) );
 	M_EPILOG
 }
 
-yaal::hcore::HString sha512( HString const& string ) {
+sha512_hash_t sha512( HString const& string ) {
 	M_PROLOG
 	HStringStream ss( string );
 	return ( sha512( ss ) );
@@ -483,6 +476,31 @@ void update_sha512_state( u64_t* state, HStreamBlockIterator::HBlock const& bloc
 #undef M_ROTATE_RIGHT64
 }
 
+template<typename hash_t>
+inline yaal::hcore::HString hash_to_string( hash_t const& hash_ ) {
+	HString s;
+	s.reserve( 2 * hash_.size() );
+	static int const BUF_SIZE( 3 );
+	char buf[BUF_SIZE];
+	for ( u8_t o : hash_ ) {
+		snprintf( buf, BUF_SIZE, "%02x", o );
+		s.append( buf );
+	}
+	return ( s );
+}
+
+yaal::hcore::HString to_string( md5_hash_t const& hash_ ) {
+	return ( hash_to_string( hash_ ) );
+}
+
+yaal::hcore::HString to_string( sha1_hash_t const& hash_ ) {
+	return ( hash_to_string( hash_ ) );
+}
+
+yaal::hcore::HString to_string( sha512_hash_t const& hash_ ) {
+	return ( hash_to_string( hash_ ) );
+}
+
 void change_endianness( u64_t* mem, int long size ) {
 	while ( size -- )
 		mem[ size ] =
@@ -497,61 +515,6 @@ void change_endianness( u64_t* mem, int long size ) {
 }
 
 namespace {
-constexpr int hashLenBits( FUNCTION function_ ) {
-	return ( function_ == FUNCTION::MD5 ? 128 : ( function_ == FUNCTION::SHA1 ? 160 : 512 ) );
-}
-constexpr int hashLenBytes( FUNCTION function_ ) {
-	return ( hashLenBits( function_ ) >> 3 );
-}
-constexpr int hashLenText( FUNCTION function_ ) {
-	return ( hashLenBytes( function_ ) * 2 );
-}
-HChunk parseHash( FUNCTION function_, yaal::hcore::HString const& hash_ ) {
-	M_PROLOG
-	HString hash( hash_ );
-	hash.lower();
-	M_ENSURE( hash.find_other_than( character_class( CHARACTER_CLASS::HEX_DIGIT ).data() ) == HString::npos );
-	int const expHashLenText( hashLenText( function_ ) );
-	M_ENSURE( hash.get_length() == expHashLenText );
-#if SIZEOF_INT_LONG == 8
-	char const formatSha512[] = "%016lx%016lx%016lx%016lx%016lx%016lx%016lx%016lx";
-#else
-	char const formatSha512[] = "%016llx%016llx%016llx%016llx%016llx%016llx%016llx%016llx";
-#endif
-	char const* format( function_ == FUNCTION::MD5 ? "%08x%08x%08x%08x" : ( function_ == FUNCTION::SHA1 ? "%08x%08x%08x%08x%08x" : formatSha512 ) );
-	HChunk binHash( expHashLenText / 2 );
-	switch ( function_ ) {
-		case ( FUNCTION::MD5 ): {
-			static int const bufSize( hashLenText( FUNCTION::MD5 ) + 1 );
-			char hashText[bufSize];
-			copy_ascii( hash_, hashText, bufSize );
-			u32_t* bin( binHash.get<u32_t>() );
-			sscanf( hashText, format, &bin[0], &bin[1], &bin[2], &bin[3] );
-			change_endianness( bin, binHash.count_of<u32_t>() );
-		} break;
-		case ( FUNCTION::SHA1 ): {
-			static int const bufSize( hashLenText( FUNCTION::SHA1 ) + 1 );
-			char hashText[bufSize];
-			copy_ascii( hash_, hashText, bufSize );
-			u32_t* bin( binHash.get<u32_t>() );
-			sscanf( hashText, format, &bin[0], &bin[1], &bin[2], &bin[3], &bin[4] );
-			change_endianness( bin, binHash.count_of<u32_t>() );
-		} break;
-		case ( FUNCTION::SHA512 ): {
-			static int const bufSize( hashLenText( FUNCTION::SHA512 ) + 1 );
-			char hashText[bufSize];
-			copy_ascii( hash_, hashText, bufSize );
-			u64_t* bin( binHash.get<u64_t>() );
-			sscanf( hashText, format, &bin[0], &bin[1], &bin[2], &bin[3], &bin[4], &bin[5], &bin[6], &bin[7] );
-			change_endianness( bin, binHash.count_of<u64_t>() );
-		} break;
-		default: {
-			M_ASSERT( !"Invalid code path!"[0] );
-		}
-	}
-	return ( binHash );
-	M_EPILOG
-}
 void memxor( void* dest_, void const* src_, int long size_ ) {
 	char* dst( static_cast<char*>( dest_ ) );
 	char const* src( static_cast<char const*>( src_ ) );
@@ -560,30 +523,51 @@ void memxor( void* dest_, void const* src_, int long size_ ) {
 	}
 	return;
 }
+template<typename hash_t>
+struct hash_function;
+
+template<>
+struct hash_function<md5_hash_t> {
+	static int const BLOCK_SIZE = 512;
+	md5_hash_t operator()( yaal::hcore::HString const& str_ ) {
+		return ( md5( str_ ) );
+	}
+	md5_hash_t operator()( HMemory& mem_ ) {
+		return ( md5( mem_ ) );
+	}
+};
+template<>
+struct hash_function<sha1_hash_t> {
+	static int const BLOCK_SIZE = 512;
+	sha1_hash_t operator()( yaal::hcore::HString const& str_ ) {
+		return ( sha1( str_ ) );
+	}
+	sha1_hash_t operator()( HMemory& mem_ ) {
+		return ( sha1( mem_ ) );
+	}
+};
+template<>
+struct hash_function<sha512_hash_t> {
+	static int const BLOCK_SIZE = 1024;
+	sha512_hash_t operator()( yaal::hcore::HString const& str_ ) {
+		return ( sha512( str_ ) );
+	}
+	sha512_hash_t operator()( HMemory& mem_ ) {
+		return ( sha512( mem_ ) );
+	}
+};
 }
 
-yaal::hcore::HString hmac( FUNCTION function_, yaal::hcore::HString const& key_, yaal::hcore::HString const& message_ ) {
+template<typename hash_t>
+hash_t hmac( yaal::hcore::HString const& key_, yaal::hcore::HString const& message_ ) {
 	M_PROLOG
-	hash_string_t hashString(
-		function_ == FUNCTION::MD5
-			? static_cast<hash_string_t>( &hash::md5 )
-			: ( function_ == FUNCTION::SHA1
-				? static_cast<hash_string_t>( &hash::sha1 )
-				: static_cast<hash_string_t>( &hash::sha512 ) )
-	);
-	hash_stream_t hashStream(
-		function_ == FUNCTION::MD5
-			? static_cast<hash_stream_t>( &hash::md5 )
-			: ( function_ == FUNCTION::SHA1
-				? static_cast<hash_stream_t>( &hash::sha1 )
-				: static_cast<hash_stream_t>( &hash::sha512 ) )
-	);
-	int blockSize( function_ == FUNCTION::SHA512 ? 1024 : 512 );
+	hash_function<hash_t> f;
+	int const hashLen( sizeof ( hash_t ) );
+	int blockSize( hash_function<hash_t>::BLOCK_SIZE );
 	int blockBytes( blockSize >> 3 );
 	HUTF8String key( key_ );
 	HUTF8String message( message_ );
 	HChunk ipad( blockBytes + message.byte_count() );
-	int hashLen( hashLenBytes( function_ ) );
 	HChunk opad( blockBytes + hashLen );
 	::memset( ipad.raw(), 0x36, static_cast<size_t>( blockBytes ) );
 	::memset( opad.raw(), 0x5c, static_cast<size_t>( blockBytes ) );
@@ -591,18 +575,72 @@ yaal::hcore::HString hmac( FUNCTION function_, yaal::hcore::HString const& key_,
 		memxor( ipad.raw(), key.c_str(), key.byte_count() );
 		memxor( opad.raw(), key.c_str(), key.byte_count() );
 	} else {
-		HChunk keyBinHashed( parseHash( function_, hashString( key_ ) ) );
-		memxor( ipad.raw(), keyBinHashed.raw(), keyBinHashed.get_size() );
-		memxor( opad.raw(), keyBinHashed.raw(), keyBinHashed.get_size() );
+		hash_t keyBinHashed( f( key_ ) );
+		memxor( ipad.raw(), keyBinHashed.data(), keyBinHashed.size() );
+		memxor( opad.raw(), keyBinHashed.data(), keyBinHashed.size() );
 	}
 	::memcpy( ipad.get<char>() + blockBytes, message.c_str(), static_cast<size_t>( message.byte_count() ) );
 	HMemoryObserver mo( ipad.raw(), blockBytes + message.byte_count() );
 	HMemory m( mo );
-	HChunk ipadHashed( parseHash( function_, hashStream( m ) ) );
-	::memcpy( opad.get<char>() + blockBytes, ipadHashed.raw(), static_cast<size_t>( hashLen ) );
+	hash_t ipadHashed( f( m ) );
+	::memcpy( opad.get<char>() + blockBytes, ipadHashed.data(), static_cast<size_t>( hashLen ) );
 	HMemoryObserver out( opad.raw(), blockBytes + hashLen );
 	HMemory mout( out );
-	return ( hashStream( mout ) );
+	return ( f( mout ) );
+	M_EPILOG
+}
+
+md5_hash_t hmac_md5( yaal::hcore::HString const& key_, yaal::hcore::HString const& message_ ) {
+	M_PROLOG
+	return ( hmac<md5_hash_t>( key_, message_ ) );
+	M_EPILOG
+}
+
+sha1_hash_t hmac_sha1( yaal::hcore::HString const& key_, yaal::hcore::HString const& message_ ) {
+	M_PROLOG
+	return ( hmac<sha1_hash_t>( key_, message_ ) );
+	M_EPILOG
+}
+
+sha512_hash_t hmac_sha512( yaal::hcore::HString const& key_, yaal::hcore::HString const& message_ ) {
+	M_PROLOG
+	return ( hmac<sha512_hash_t>( key_, message_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HString hmac( FUNCTION function_, yaal::hcore::HString const& key_, yaal::hcore::HString const& message_ ) {
+	M_PROLOG
+	HString s;
+	switch ( function_ ) {
+		case ( FUNCTION::MD5 ): s = to_string( hmac_md5( key_, message_ ) ); break;
+		case ( FUNCTION::SHA1 ): s = to_string( hmac_sha1( key_, message_ ) ); break;
+		case ( FUNCTION::SHA512 ): s = to_string( hmac_sha512( key_, message_ ) ); break;
+	}
+	return ( s );
+	M_EPILOG
+}
+
+yaal::hcore::HString string( FUNCTION function_, yaal::hcore::HString const& message_ ) {
+	M_PROLOG
+	HString s;
+	switch ( function_ ) {
+		case ( FUNCTION::MD5 ): s = to_string( md5( message_ ) ); break;
+		case ( FUNCTION::SHA1 ): s = to_string( sha1( message_ ) ); break;
+		case ( FUNCTION::SHA512 ): s = to_string( sha512( message_ ) ); break;
+	}
+	return ( s );
+	M_EPILOG
+}
+
+yaal::hcore::HString string( FUNCTION function_, yaal::hcore::HStreamInterface& stream_ ) {
+	M_PROLOG
+	HString s;
+	switch ( function_ ) {
+		case ( FUNCTION::MD5 ): s = to_string( md5( stream_ ) ); break;
+		case ( FUNCTION::SHA1 ): s = to_string( sha1( stream_ ) ); break;
+		case ( FUNCTION::SHA512 ): s = to_string( sha512( stream_ ) ); break;
+	}
+	return ( s );
 	M_EPILOG
 }
 
