@@ -95,37 +95,48 @@ int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, i
 	HClock clock;
 	fd_set readers;
 	fd_set writers;
-	if ( inputCount_ )
+	if ( inputCount_ ) {
 		FWD_FD_ZERO( &readers );
-	if ( outputCount_ )
+	}
+	if ( outputCount_ ) {
 		FWD_FD_ZERO( &writers );
-	for ( int i( 0 ); i < inputCount_; ++ i )
+	}
+	for ( int i( 0 ); i < inputCount_; ++ i ) {
 		FWD_FD_SET( input_[ i ], &readers );
-	for ( int i( 0 ); i < outputCount_; ++ i )
+	}
+	for ( int i( 0 ); i < outputCount_; ++ i ) {
 		FWD_FD_SET( output_[ i ], &writers );
-	timeval timeOut, * timeOutP = timeOut_ ? &timeOut : nullptr;
+	}
+	timeval timeOut;
+	timeval* timeOutP( timeOut_ ? &timeOut : nullptr );
 	if ( timeOut_ ) {
 		timeOut.tv_usec = static_cast<suseconds_t>( ( *timeOut_ % 1000 ) * 1000 );
 		timeOut.tv_sec = *timeOut_ / 1000;
 	}
 	int ret( 0 );
-	HScopedValueReplacement<int> saveErrno( errno, 0 );
+	i64_t elapsed( 0 );
 	do {
 		ret = ::select( FD_SETSIZE, inputCount_ ? &readers : nullptr, outputCount_ ? &writers : nullptr, nullptr, timeOutP );
-	} while ( restartable_
-			&& ( ret == -1 )
-			&& ( errno == EINTR )
-			&& ( ! timeOut_ || ( clock.get_time_elapsed( time::UNIT::MILLISECOND ) < *timeOut_ ) ) );
+		elapsed = clock.get_time_elapsed( time::UNIT::MILLISECOND );
+	} while (
+		restartable_
+		&& ( ret == -1 )
+		&& ( errno == EINTR )
+		&& ( ! timeOut_ || ( elapsed < *timeOut_ ) )
+	);
 	for ( int i( 0 ); i < inputCount_; ++ i ) {
-		if ( ! FWD_FD_ISSET( input_[ i ], &readers ) )
+		if ( ! FWD_FD_ISSET( input_[ i ], &readers ) ) {
 			input_[ i ] = -1;
+		}
 	}
 	for ( int i( 0 ); i < outputCount_; ++ i ) {
-		if ( ! FWD_FD_ISSET( output_[ i ], &writers ) )
+		if ( ! FWD_FD_ISSET( output_[ i ], &writers ) ) {
 			output_[ i ] = -1;
+		}
 	}
-	if ( timeOut_ )
+	if ( timeOut_ ) {
 		*timeOut_ -= min( *timeOut_, static_cast<int long>( clock.get_time_elapsed( time::UNIT::MILLISECOND ) ) );
+	}
 	return ( ret );
 }
 

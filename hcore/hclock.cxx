@@ -53,6 +53,7 @@ i64_t HClock::get_time_elapsed( yaal::hcore::time::UNIT unit_ ) const {
 	timespec time;
 	timespec now;
 	clockid_t cid( _type == TYPE::REAL ? FWD_CLOCK_REALTIME : FWD_CLOCK_THREAD_CPUTIME_ID );
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	M_ENSURE( clock_gettime( cid, &now ) == 0 );
 	time.tv_sec = static_cast<time_t>( now.tv_sec - _moment[ IDX_SECONDS ] );
 	if ( now.tv_nsec < _moment[ IDX_NANOSECONDS ] ) {
@@ -77,6 +78,7 @@ void HClock::reset( void ) {
 	M_PROLOG
 	timespec time;
 	clockid_t cid( _type == TYPE::REAL ? FWD_CLOCK_REALTIME : FWD_CLOCK_THREAD_CPUTIME_ID );
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	M_ENSURE( clock_gettime( cid, &time ) == 0 );
 	_moment[ IDX_SECONDS ] = time.tv_sec;
 	_moment[ IDX_NANOSECONDS ] = time.tv_nsec;
