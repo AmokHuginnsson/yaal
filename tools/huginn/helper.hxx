@@ -87,6 +87,18 @@ bool is_boolean_congruent( HHuginn::HClass const* );
 bool is_unknown( HHuginn::HClass const* );
 bool is_reference_congruent( HHuginn::HClass const* );
 bool is_integer_congruent( HHuginn::HClass const* );
+inline bool is_enum_class( HHuginn::HClass const* class_ ) {
+	return ( dynamic_cast<enumeration::HEnumerationClass const*>( class_ ) != nullptr );
+}
+inline bool is_enum_class( HHuginn::HValue const* val_ ) {
+	return ( is_enum_class( val_->get_class() ) );
+}
+inline bool is_enum_class( HHuginn::value_t const* val_ ) {
+	return ( is_enum_class( val_->raw() ) );
+}
+inline bool is_enum_class( HHuginn::value_t const& val_ ) {
+	return ( is_enum_class( val_.raw() ) );
+}
 bool are_congruous( HHuginn::HClass const*, HHuginn::HClass const* );
 
 HHuginn::HString::value_type const& get_string( HHuginn::value_t const& );

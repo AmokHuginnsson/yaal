@@ -760,7 +760,7 @@ void OCompiler::check_name_enum( HHuginn::identifier_id_t identifier_, bool test
 	submitted_enums_t::const_iterator it;
 	HHuginn::value_t const* v( _runtime->get_value( identifier_ ) );
 	if (
-		( testRuntime_ && v && dynamic_cast<enumeration::HEnumerationClass const*>( (*v)->get_class() ) )
+		( testRuntime_ && v && is_enum_class( v ) )
 		|| (
 			( it = find_if(
 				_submittedEnums.begin(),
@@ -914,7 +914,7 @@ void OCompiler::set_enum_name( yaal::hcore::HString const& name_, executing_pars
 	check_name_enum( enumIdentifier, false, position_ );
 	check_name_class( enumIdentifier, true, position_ );
 	HHuginn::value_t const* v( _runtime->get_value( enumIdentifier ) );
-	if ( ! ( v && dynamic_cast<enumeration::HEnumerationClass const*>( (*v)->get_class() ) ) ) {
+	if ( ! ( v && is_enum_class( v ) ) ) {
 		check_name_function( enumIdentifier, position_ );
 	}
 	check_name_import( enumIdentifier, position_ );

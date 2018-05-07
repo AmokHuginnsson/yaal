@@ -123,7 +123,7 @@ public:
 		bool classExists( !! r.get_class( id ) );
 		bool functionExists( !! r.get_function( id ) );
 		HHuginn::value_t const* rtv( r.get_value( id ) );
-		bool enumerationExists( rtv && dynamic_cast<enumeration::HEnumerationClass const*>( (*rtv)->get_class() ) );
+		bool enumerationExists( rtv && is_enum_class( rtv ) );
 		if ( is_restricted( package ) ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"`"_ys.append( package ).append( "' is restricted keyword." ),
