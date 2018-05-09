@@ -36,9 +36,9 @@ private:
 	 * so we cannot use HLookupMap here as adding and removing entries
 	 * to HLookupMap invalidates old pointers.
 	 */
-	typedef yaal::hcore::HList<value_t> functions_store_t;
-	typedef yaal::hcore::HPointer<functions_store_t> shared_functions_store_t;
-	typedef yaal::hcore::HHashMap<identifier_id_t, value_t const*> global_callables_t;
+	typedef yaal::hcore::HList<value_t> values_store_t;
+	typedef yaal::hcore::HPointer<values_store_t> shared_values_store_t;
+	typedef yaal::hcore::HHashMap<identifier_id_t, value_t const*> global_definitions_t;
 	typedef yaal::hcore::HArray<HHuginn::class_t> dependencies_t;
 public:
 	typedef yaal::hcore::HArray<yaal::hcore::HString> identifier_names_t;
@@ -63,6 +63,15 @@ private:
 	value_t _false;
 	threads_t _threads;
 	/*
+	 * All classes must be kept directly in runtime so it will be simpler
+	 * to reregister, i.e. update class runtime with update_runtime() for
+	 * classes defined in submodules.
+	 *
+	 * Order of _dependencies and _classes in HRuntime definition is vital!
+	 */
+	dependencies_t _dependencies; /*!< Extra pointers to classes available in runtime, used to enforce order of desturctors! */
+	classes_t _classes; /*!< All classes defined for this runtime, including classes from submodules. */
+	/*
 	 * 1.
 	 * Resolved function references are kept by naked/weak/dumb pointer (value_t*) in runtime.
 	 * They must be kept by weak reference to avoid self-referencing cycle of smart pointers
@@ -85,20 +94,10 @@ private:
 	 * It also means that submodule classes must be registered in runtime so its constructors are
 	 * still available in its submodule context.
 	 *
-	 * Hence use of _functionsStore and _globalDefinitions.
+	 * Hence use of _valuesStore and _globalDefinitions.
 	 */
-	shared_functions_store_t _functionsStore; /*!< All functions ever defined in all sub-modules. */
-	global_callables_t _globalDefinitions; /*!< Functions available in current module context. */
-	/*
-	 * All classes must be kept directly in runtime so it will be simpler
-	 * to reregister, i.e. update class runtime with update_runtime() for
-	 * classes defined in submodules.
-	 *
-	 * Order of _dependencies and _classes in HRuntime definition is vital!
-	 */
-	dependencies_t _dependencies; /*!< Extra pointers to classes available in runtime, used to enforce order of desturctors! */
-	classes_t _classes; /*!< All classes defined for this runtime, including classes from submodules. */
-	values_t _values;
+	shared_values_store_t _valuesStore; /*!< All functions ever defined in all sub-modules. */
+	global_definitions_t _globalDefinitions; /*!< Functions available in current module context. */
 	HHuginn::value_t _argv;
 	value_t _result;
 	huginn::HThread::frame_t _incrementalFrame;
@@ -136,9 +135,8 @@ public:
 	identifier_id_t try_identifier_id( yaal::hcore::HString const& ) const;
 	identifier_id_t identifier_id( yaal::hcore::HString const& );
 	yaal::hcore::HString const& identifier_name( identifier_id_t ) const;
-	value_t const* get_function( identifier_id_t ) const;
+	value_t const* get_global( identifier_id_t ) const;
 	class_t get_class( identifier_id_t ) const;
-	value_t const* get_value( identifier_id_t ) const;
 	void register_class( class_t, HHuginn::VISIBILITY );
 	/*! \brief Remove compiled class from runtime.
 	 *
@@ -168,8 +166,8 @@ public:
 	 *
 	 * \param identifier_ - identifier of function to remove.
 	 */
-	void drop_function( identifier_id_t identifier_ );
-	void register_value( identifier_id_t, HHuginn::value_t const& );
+	void drop_global( identifier_id_t identifier_ );
+	void register_global( identifier_id_t, HHuginn::value_t const& );
 	void set_setup( HHuginn::paths_t const&, HHuginn::compiler_setup_t );
 	void register_package( identifier_id_t, identifier_id_t, int );
 	class_t create_class(
@@ -263,6 +261,7 @@ protected:
 	virtual call_stack_t do_get_call_stack( void ) override;
 	virtual variable_views_t do_get_locals( int ) override;
 private:
+	HHuginn::value_t find_package( identifier_id_t ) const;
 	void register_builtin_function( yaal::hcore::HString const&, function_t&&, yaal::hcore::HString const& );
 private:
 	HRuntime( HRuntime const& ) = delete;

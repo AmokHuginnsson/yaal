@@ -401,7 +401,8 @@ void HHuginn::finalize_compilation( void ) {
 		_runtime->register_package( i._package, i._alias, i._position );
 	}
 	for ( OCompiler::submitted_enums_t::value_type const& e : _compiler->_submittedEnums ) {
-		_runtime->register_value( e->get_class()->identifier_id(), e );
+		M_ASSERT( is_enum_class( e ) );
+		_runtime->register_global( e->get_class()->identifier_id(), e );
 	}
 	typedef HArray<identifier_id_t> identifiers_t;
 	identifiers_t classIdentifiers;

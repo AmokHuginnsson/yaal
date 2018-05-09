@@ -862,11 +862,13 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 			try {
 				HString n( _buffer.get<char>(), len );
 				HHuginn::identifier_id_t id( thread_->runtime().identifier_id( n ) );
-				HHuginn::value_t const* fun( thread_->runtime().get_function( id ) );
-				if ( fun ) {
-					v = *fun;
-				} else {
+				HHuginn::value_t const* fun( thread_->runtime().get_global( id ) );
+				if ( ! fun ) {
 					raise( thread_, "Function `"_ys.append( n ).append( "' is not defined." ), position_, exception_class() );
+				} else if ( (*fun)->type_id() != HHuginn::TYPE::FUNCTION_REFERENCE ) {
+					raise( thread_, "Symbol `"_ys.append( n ).append( "' is not a function." ), position_, exception_class() );
+				} else {
+					v = *fun;
 				}
 			} catch ( HStringException const& ) {
 				raise( thread_, "Malformed Huginn data stream.", position_, exception_class() );

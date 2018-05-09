@@ -322,7 +322,7 @@ HHuginn::values_t HHuginn::HClass::get_defaults( huginn::HThread* thread_, int p
 	values_t defaults;
 	for ( value_t const& v : _fieldDefinitions ) {
 		defaults.push_back(
-			v->type_id() != HHuginn::TYPE::METHOD
+			( v->type_id() != HHuginn::TYPE::METHOD ) && ( ! is_enum_class( v ) )
 				? v->clone( thread_, const_cast<HHuginn::value_t*>( &v ), position_ )
 				: v
 		);
@@ -335,7 +335,7 @@ HHuginn::value_t HHuginn::HClass::get_default( huginn::HThread* thread_, int ind
 	M_PROLOG
 	HHuginn::value_t const& v( _fieldDefinitions[index_] );
 	return (
-		v->type_id() != HHuginn::TYPE::METHOD
+		( v->type_id() != HHuginn::TYPE::METHOD ) && ( ! is_enum_class( v ) )
 			? v->clone( thread_, const_cast<HHuginn::value_t*>( &v ), position_ )
 			: v
 	);

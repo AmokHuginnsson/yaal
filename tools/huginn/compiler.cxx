@@ -491,7 +491,7 @@ void OCompiler::resolve_symbols( void ) {
 					}
 				}
 				if ( ( es._operation == OExecutionStep::OPERATION::USE ) && ! is_keyword( _runtime->identifier_name( es._identifier ) ) ) {
-					HHuginn::value_t const* v( _runtime->get_value( es._identifier ) );
+					HHuginn::value_t const* v( _runtime->get_global( es._identifier ) );
 					if ( !! v ) {
 						es._expression->replace_execution_step(
 							es._index,
@@ -499,24 +499,10 @@ void OCompiler::resolve_symbols( void ) {
 								es._expression.raw(),
 								&HExpression::store_external_reference,
 								es._position,
-								HHuginn::value_ref_t( *v )
+								v
 							)
 						);
 						break;
-					} else {
-						HHuginn::value_t const* callable( _runtime->get_function( es._identifier ) );
-						if ( !! callable ) {
-							es._expression->replace_execution_step(
-								es._index,
-								HExpression::OExecutionStep(
-									es._expression.raw(),
-									&HExpression::store_external_reference,
-									es._position,
-									HHuginn::value_ref_t( *callable )
-								)
-							);
-							break;
-						}
 					}
 				}
 				throw HHuginn::HHuginnRuntimeException(
@@ -534,7 +520,7 @@ void OCompiler::resolve_symbols( void ) {
 			if ( es._classId != INVALID_IDENTIFIER ) {
 				_runtime->drop_class( es._classId );
 			} else {
-				_runtime->drop_function( es._scope->_functionId );
+				_runtime->drop_global( es._scope->_functionId );
 			}
 			throw;
 		}
@@ -665,7 +651,9 @@ HHuginn::expression_t OCompiler::new_expression( int fileId_, int position_ ) {
 HHuginn::HClass const* OCompiler::guess_type( HHuginn::identifier_id_t identifierId_ ) const {
 	HHuginn::HClass const* c( f()._scopeStack.top()->guess_type( this, identifierId_ ) );
 	if ( c == type_to_class( HHuginn::TYPE::UNKNOWN ) ) {
-		if ( _runtime->get_function( identifierId_ ) || ( find( _classIdentifiers.begin(), _classIdentifiers.end(), identifierId_ ) != _classIdentifiers.end() ) ) {
+		HHuginn::value_t const* v( _runtime->get_global( identifierId_ ) );
+		if ( ( v && ( (*v)->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) )
+			|| ( find( _classIdentifiers.begin(), _classIdentifiers.end(), identifierId_ ) != _classIdentifiers.end() ) ) {
 			c = type_to_class( HHuginn::TYPE::FUNCTION_REFERENCE );
 		}
 	}
@@ -758,7 +746,7 @@ void OCompiler::check_name_class( HHuginn::identifier_id_t identifier_, bool tes
 void OCompiler::check_name_enum( HHuginn::identifier_id_t identifier_, bool testRuntime_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	submitted_enums_t::const_iterator it;
-	HHuginn::value_t const* v( _runtime->get_value( identifier_ ) );
+	HHuginn::value_t const* v( _runtime->get_global( identifier_ ) );
 	if (
 		( testRuntime_ && v && is_enum_class( v ) )
 		|| (
@@ -785,8 +773,8 @@ void OCompiler::check_name_enum( HHuginn::identifier_id_t identifier_, bool test
 
 void OCompiler::check_name_function( HHuginn::identifier_id_t identifier_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	HHuginn::value_t const* fun( _runtime->get_function( identifier_ ) );
-	if ( fun ) {
+	HHuginn::value_t const* fun( _runtime->get_global( identifier_ ) );
+	if ( fun && ( (*fun)->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Function `"_ys
 				.append( _runtime->identifier_name( identifier_ ) )
@@ -913,7 +901,7 @@ void OCompiler::set_enum_name( yaal::hcore::HString const& name_, executing_pars
 	HHuginn::identifier_id_t enumIdentifier( _runtime->identifier_id( name_ ) );
 	check_name_enum( enumIdentifier, false, position_ );
 	check_name_class( enumIdentifier, true, position_ );
-	HHuginn::value_t const* v( _runtime->get_value( enumIdentifier ) );
+	HHuginn::value_t const* v( _runtime->get_global( enumIdentifier ) );
 	if ( ! ( v && is_enum_class( v ) ) ) {
 		check_name_function( enumIdentifier, position_ );
 	}
@@ -2510,7 +2498,7 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 				expr,
 				&HExpression::store_direct,
 				position_.get(),
-				*_runtime->get_function( refIdentifier )
+				*_runtime->get_global( refIdentifier )
 			)
 		);
 	} else {

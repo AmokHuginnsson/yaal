@@ -163,11 +163,10 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 	, _true( _objectFactory->create_boolean( true ) )
 	, _false( _objectFactory->create_boolean( false ) )
 	, _threads()
-	, _functionsStore( make_pointer<functions_store_t>() )
-	, _globalDefinitions()
 	, _dependencies()
 	, _classes()
-	, _values()
+	, _valuesStore( make_pointer<values_store_t>() )
+	, _globalDefinitions()
 	, _argv( _objectFactory->create_list() )
 	, _result()
 	, _incrementalFrame()
@@ -201,10 +200,9 @@ void HRuntime::copy_text( HRuntime& source_ ) {
 	_result = source_._result;
 	_incrementalFrame = source_._incrementalFrame;
 	_argv = source_._argv;
-	_values = source_._values;
+	_valuesStore = source_._valuesStore;
 	_classes = source_._classes;
 	_dependencies = source_._dependencies;
-	_functionsStore = source_._functionsStore;
 	_threads = source_._threads;
 	_false = source_._false;
 	_true = source_._true;
@@ -214,12 +212,13 @@ void HRuntime::copy_text( HRuntime& source_ ) {
 	_maxCallStackSize = source_._maxCallStackSize;
 	_modulePaths = source_._modulePaths;
 	_compilerSetup = source_._compilerSetup;
+	fix_references();
+	/* Update global references in sub-module. */
 	if ( _globalDefinitions.at( KEYWORD::ASSERT_IDENTIFIER ) != source_._globalDefinitions.at( KEYWORD::ASSERT_IDENTIFIER ) ) {
-		for ( global_callables_t::value_type& gc : _globalDefinitions ) {
+		for ( global_definitions_t::value_type& gc : _globalDefinitions ) {
 			gc.second = source_._globalDefinitions.at( gc.first );
 		}
 	}
-	fix_references();
 	return;
 	M_EPILOG
 }
@@ -246,9 +245,9 @@ HHuginn::value_t HRuntime::result( void ) const {
 	return ( _result );
 }
 
-HHuginn::value_t const* HRuntime::get_function( identifier_id_t identifierId_ ) const {
+HHuginn::value_t const* HRuntime::get_global( identifier_id_t identifierId_ ) const {
 	M_PROLOG
-	global_callables_t::const_iterator it( _globalDefinitions.find( identifierId_ ) );
+	global_definitions_t::const_iterator it( _globalDefinitions.find( identifierId_ ) );
 	return ( ( it != _globalDefinitions.end() ) ? it->second : nullptr );
 	M_EPILOG
 }
@@ -257,17 +256,6 @@ HHuginn::class_t HRuntime::get_class( identifier_id_t identifierId_ ) const {
 	M_PROLOG
 	classes_t::const_iterator ci( _classes.find( identifierId_ ) );
 	return ( ci != _classes.end() ? ci->second : class_t() );
-	M_EPILOG
-}
-
-HHuginn::value_t const* HRuntime::get_value( identifier_id_t identifierId_ ) const {
-	M_PROLOG
-	HHuginn::value_t const* v( nullptr );
-	values_t::const_iterator it( _values.find( identifierId_ ) );
-	if ( it != _values.end() ) {
-		v = &( it->second );
-	}
-	return ( v );
 	M_EPILOG
 }
 
@@ -295,7 +283,7 @@ void HRuntime::register_class( class_t class_, HHuginn::VISIBILITY classConstruc
 	if ( _classes.insert( make_pair( class_->identifier_id(), class_ ) ).second ) {
 		_dependencies.push_back( class_ );
 	}
-	if ( classConstructorVisibility_ == HHuginn::VISIBILITY::GLOBAL ) {
+	if ( ( classConstructorVisibility_ == HHuginn::VISIBILITY::GLOBAL ) && ! is_enum_class( class_.raw() ) ) {
 		_globalDefinitions.insert( make_pair( class_->identifier_id(), &class_->constructor() ) );
 	}
 	class_->finalize_registration( this );
@@ -323,25 +311,18 @@ void HRuntime::drop_class( identifier_id_t identifier_ ) {
 
 void HRuntime::register_function( identifier_id_t identifier_, function_t function_, yaal::hcore::HString const& doc_ ) {
 	M_PROLOG
-	global_callables_t::iterator gcIt( _globalDefinitions.find( identifier_ ) );
-	if ( gcIt != _globalDefinitions.end() ) {
-		static_cast<HHuginn::HFunctionReference*>( const_cast<HHuginn::HValue*>( gcIt->second->raw() ) )->reset( function_ );
-	} else {
-		HHuginn::value_t f( _objectFactory->create_function_reference( identifier_, function_, doc_ ) );
-		_functionsStore->push_back( f );
-		_globalDefinitions.insert( make_pair( identifier_, &_functionsStore->back() ) );
-	}
+	register_global( identifier_, _objectFactory->create_function_reference( identifier_, function_, doc_ ) );
 	return;
 	M_EPILOG
 }
 
-void HRuntime::drop_function( identifier_id_t identifier_ ) {
+void HRuntime::drop_global( identifier_id_t identifier_ ) {
 	M_PROLOG
-	global_callables_t::iterator gcIt( _globalDefinitions.find( identifier_ ) );
+	global_definitions_t::iterator gcIt( _globalDefinitions.find( identifier_ ) );
 	if ( gcIt != _globalDefinitions.end() ) {
-		for ( functions_store_t::iterator it( _functionsStore->begin() ), end( _functionsStore->end() ); it != end; ++ it ) {
+		for ( values_store_t::iterator it( _valuesStore->begin() ), end( _valuesStore->end() ); it != end; ++ it ) {
 			if ( it->raw() == gcIt->second->raw() ) {
-				_functionsStore->erase( it );
+				_valuesStore->erase( it );
 				break;
 			}
 		}
@@ -351,10 +332,34 @@ void HRuntime::drop_function( identifier_id_t identifier_ ) {
 	M_EPILOG
 }
 
-void HRuntime::register_value( identifier_id_t identifier_, HHuginn::value_t const& value_ ) {
+void HRuntime::register_global( identifier_id_t identifier_, HHuginn::value_t const& value_ ) {
 	M_PROLOG
-	_values.insert( make_pair( identifier_, value_ ) );
+	global_definitions_t::iterator gcIt( _globalDefinitions.find( identifier_ ) );
+	if ( gcIt != _globalDefinitions.end() ) {
+		for ( values_store_t::iterator it( _valuesStore->begin() ), end( _valuesStore->end() ); it != end; ++ it ) {
+			if ( it->raw() == gcIt->second->raw() ) {
+				*it = value_;
+				break;
+			}
+		}
+	} else {
+		_valuesStore->push_back( value_ );
+		_globalDefinitions.insert( make_pair( identifier_, &_valuesStore->back() ) );
+	}
 	return;
+	M_EPILOG
+}
+
+HHuginn::value_t HRuntime::find_package( identifier_id_t identifier_ ) const {
+	M_PROLOG
+	HHuginn::value_t package;
+	for ( values_store_t::value_type const& v : *_valuesStore ) {
+		if ( v->get_class()->identifier_id() == identifier_ ) {
+			package = v;
+			break;
+		}
+	}
+	return ( package );
 	M_EPILOG
 }
 
@@ -364,17 +369,11 @@ void HRuntime::register_package(
 	int position_
 ) {
 	M_PROLOG
-	HHuginn::value_t package;
-	for ( values_t::value_type const& p : _values ) {
-		if ( p.second->get_class()->identifier_id() == package_ ) {
-			package = p.second;
-			break;
-		}
-	}
+	HHuginn::value_t package( find_package( package_ ) );
 	if ( ! package ) {
 		package = HPackageFactory::get_instance().create_package( this, identifier_name( package_ ), position_ );
 	}
-	_values.insert( make_pair( alias_, package ) );
+	register_global( alias_, package );
 	return;
 	M_EPILOG
 }
@@ -507,21 +506,8 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 	HString doc( _huginn->get_comment( 1 ) );
 	HHuginn::class_t cls( create_class( name_, ! doc.is_empty() ? doc : "The `"_ys.append( name_ ).append( "` is an user defined submodule." ), HHuginn::ACCESS::PRIVATE ) );
 	HHuginn::field_definitions_t fds;
-	/* Erasing from lookup invalidated .end() */
-	for ( values_t::iterator it( _values.begin() ); it != _values.end(); ) {
-		if ( context_._values.find( it->first ) == context_._values.end() ) {
-			fds.emplace_back(
-				identifier_name( it->first ),
-				create_method( &package::value, it->second, identifier_name( it->first ) ),
-				"access package "_ys.append( it->second->get_class()->name() ).append( " imported in submodule" )
-			);
-			it = _values.erase( it );
-		} else {
-			++ it;
-		}
-	}
 	for ( classes_t::value_type const& c : _classes ) {
-		if ( context_._classes.find( c.first ) == context_._classes.end() ) {
+		if ( ! is_enum_class( c.second.raw() ) && ( context_._classes.count( c.first ) == 0 ) ) {
 			fds.emplace_back(
 				identifier_name( c.first ),
 				create_method( &package::instance, c.second.raw() ),
@@ -529,13 +515,29 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 			);
 		}
 	}
-	for ( global_callables_t::value_type const& gd : _globalDefinitions ) {
-		if ( ( gd.first >= STANDARD_FUNCTIONS::MAIN_IDENTIFIER ) && ( _classes.count( gd.first ) == 0 ) ) {
+	for ( global_definitions_t::value_type const& gd : _globalDefinitions ) {
+		bool isEnum( is_enum_class( gd.second ) );
+		if ( ( gd.first < STANDARD_FUNCTIONS::MAIN_IDENTIFIER ) || ( ! isEnum && ( _classes.count( gd.first ) > 0 ) ) ) {
+			continue;
+		}
+		if ( (*gd.second)->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) {
 			HHuginn::HFunctionReference const* fr( static_cast<HHuginn::HFunctionReference const*>( gd.second->raw() ) );
 			fds.emplace_back(
 				identifier_name( gd.first ),
 				_objectFactory->create_method_raw( fr->function() ),
 				! fr->doc().is_empty() ? fr->doc() : "access function "_ys.append( identifier_name( gd.first ) ).append( " imported in submodule" )
+			);
+		} else if ( isEnum ) {
+			fds.emplace_back(
+				identifier_name( gd.first ),
+				*gd.second,
+				"access enum "_ys.append( identifier_name( gd.first ) ).append( " imported in submodule" )
+			);
+		} else if ( ! context_.find_package( (*gd.second)->get_class()->identifier_id() ) ) {
+			fds.emplace_back(
+				identifier_name( gd.first ),
+				create_method( &package::value, *gd.second, identifier_name( gd.first ) ),
+				"access package "_ys.append( (*gd.second)->get_class()->name() ).append( " imported in submodule" )
 			);
 		}
 	}
@@ -566,12 +568,16 @@ huginn::HThread::frame_t const& HRuntime::incremental_frame( void ) const {
 HHuginn::value_t HRuntime::call( identifier_id_t identifier_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	value_t res;
-	global_callables_t::iterator gcIt( _globalDefinitions.find( identifier_ ) );
+	global_definitions_t::iterator gcIt( _globalDefinitions.find( identifier_ ) );
 	if ( gcIt != _globalDefinitions.end() ) {
 		yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
 		threads_t::iterator t( _threads.find( threadId ) );
 		M_ASSERT( t != _threads.end() );
-		res = static_cast<HHuginn::HFunctionReference const*>( gcIt->second->raw() )->function()( t->second.raw(), nullptr, values_, position_ );
+		if ( (*gcIt->second)->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) {
+			res = static_cast<HHuginn::HFunctionReference const*>( gcIt->second->raw() )->function()( t->second.raw(), nullptr, values_, position_ );
+		} else {
+			throw HHuginn::HHuginnRuntimeException( "Symbol `"_ys.append( identifier_name( identifier_ ) ).append( "` is not callable." ), MAIN_FILE_ID, position_ );
+		}
 	} else {
 		throw HHuginn::HHuginnRuntimeException( "Function `"_ys.append( identifier_name( identifier_ ) ).append( "(...)' is not defined." ), MAIN_FILE_ID, position_ );
 	}
@@ -892,8 +898,8 @@ void HRuntime::register_builtin_function( yaal::hcore::HString const& name_, fun
 	identifier_id_t id( identifier_id( name_ ) );
 	_huginn->register_function( id );
 	HHuginn::value_t f( _objectFactory->create_function_reference( id, yaal::move( function_ ), doc_ ) );
-	_functionsStore->push_back( f );
-	_globalDefinitions.insert( make_pair( id, &_functionsStore->back() ) );
+	_valuesStore->push_back( f );
+	_globalDefinitions.insert( make_pair( id, &_valuesStore->back() ) );
 	return;
 	M_EPILOG
 }
@@ -1047,13 +1053,20 @@ inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterfac
 void HRuntime::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) const {
 	M_PROLOG
 	stream_ << "Huginn VM state for `" << _huginn->source_name( MAIN_FILE_ID ) << "'" << endl;
-	for ( values_t::value_type const& v : _values ) {
-		stream_ << "package: " << identifier_name( v.first ) << " = " << v.second->get_class()->name() << endl;
+	for ( global_definitions_t::value_type const& gd : _globalDefinitions ) {
+		HHuginn::value_t const& v( *gd.second );
+		if ( ( v->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) || is_enum_class( v ) ) {
+			continue;
+		}
+		stream_ << "package: " << identifier_name( gd.first ) << " = " << v->get_class()->name() << endl;
 	}
 	for ( classes_t::value_type const& c : _classes ) {
 		stream_ << *c.second << endl;
 	}
-	for ( global_callables_t::value_type const& f : _globalDefinitions ) {
+	for ( global_definitions_t::value_type const& f : _globalDefinitions ) {
+		if ( (*f.second)->type_id() != HHuginn::TYPE::FUNCTION_REFERENCE ) {
+			continue;
+		}
 		yaal::hcore::HString const& name( identifier_name( f.first ) );
 		stream_ << "function: " << name;
 		if ( _debugLevel_ >= DEBUG_LEVEL::VERBOSE_MESSAGES ) {
@@ -1090,12 +1103,13 @@ void HRuntime::dump_docs( yaal::hcore::HStreamInterface& stream_ ) const {
 			}
 		}
 	}
-	for ( global_callables_t::value_type const& gd : _globalDefinitions ) {
-		if ( _classes.count( gd.first ) == 0 ) {
-			HHuginn::HFunctionReference const& f( *static_cast<HHuginn::HFunctionReference const*>( gd.second->raw() ) );
-			if ( ! f.doc().is_empty() ) {
-				stream_ << identifier_name( gd.first ) << ":" << f.doc() << endl;
-			}
+	for ( global_definitions_t::value_type const& gd : _globalDefinitions ) {
+		if ( ( (*gd.second)->type_id() != HHuginn::TYPE::FUNCTION_REFERENCE ) || ( _classes.count( gd.first ) > 0 ) ) {
+			continue;
+		}
+		HHuginn::HFunctionReference const& f( *static_cast<HHuginn::HFunctionReference const*>( gd.second->raw() ) );
+		if ( ! f.doc().is_empty() ) {
+			stream_ << identifier_name( gd.first ) << ":" << f.doc() << endl;
 		}
 	}
 	return;
@@ -1143,12 +1157,14 @@ yaal::hcore::HString const& HRuntime::function_name( void const* id_ ) const {
 	static yaal::hcore::HString const unknown( "unknown" );
 	yaal::hcore::HString const* name( &unknown );
 	bool found( false );
-	for ( functions_store_t::value_type const& f : *_functionsStore ) {
-		HHuginn::HFunctionReference const* fr( static_cast<HHuginn::HFunctionReference const*>( f.raw() ) );
-		if ( fr->function().id() == id_ ) {
-			name = &identifier_name( fr->identifier_id() );
-			found = true;
-			break;
+	for ( values_store_t::value_type const& f : *_valuesStore ) {
+		if ( f->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) {
+			HHuginn::HFunctionReference const* fr( static_cast<HHuginn::HFunctionReference const*>( f.raw() ) );
+			if ( fr->function().id() == id_ ) {
+				name = &identifier_name( fr->identifier_id() );
+				found = true;
+				break;
+			}
 		}
 	}
 	if ( ! found ) {
@@ -1166,9 +1182,9 @@ yaal::hcore::HString const& HRuntime::package_name( HHuginn::HClass const* class
 	M_PROLOG
 	static yaal::hcore::HString const unknown( "unknown" );
 	yaal::hcore::HString const* name( &unknown );
-	for ( values_t::value_type const& v : _values ) {
-		if ( v.second->get_class() == class_ ) {
-			name = &identifier_name( v.first );
+	for ( global_definitions_t::value_type const& gd : _globalDefinitions ) {
+		if ( (*gd.second)->get_class() == class_ ) {
+			name = &identifier_name( gd.first );
 			break;
 		}
 	}

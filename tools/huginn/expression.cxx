@@ -134,7 +134,7 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _character( 0 ) {
 }
 
-HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HHuginn::value_ref_t const& valueRef_ )
+HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HHuginn::value_t const* valueRef_ )
 	: _expression( expression_ )
 	, _action( action_ )
 	, _position( position_ )
@@ -1250,7 +1250,7 @@ void HExpression::store_direct( OExecutionStep const& executionStep_, HFrame* fr
 
 void HExpression::store_external_reference( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
 	M_PROLOG
-	frame_->values().push( executionStep_._valueRef );
+	frame_->values().push( *executionStep_._valueRef );
 	return;
 	M_EPILOG
 }

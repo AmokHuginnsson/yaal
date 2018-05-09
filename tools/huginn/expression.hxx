@@ -36,7 +36,7 @@ public:
 		int _index;
 		HHuginn::identifier_id_t _identifierId;
 		HHuginn::value_t _value;
-		HHuginn::value_ref_t _valueRef;
+		HHuginn::value_t const* _valueRef;
 		double long _real;
 		int long long _integer;
 		yaal::hcore::HString _string;
@@ -48,7 +48,7 @@ public:
 		OExecutionStep( HExpression*, action_t, int, HFrame::ACCESS, HHuginn::identifier_id_t );
 		OExecutionStep( HExpression*, action_t, int, HFrame::ACCESS, HStatement::statement_id_t, int );
 		OExecutionStep( HExpression*, action_t, int, HFrame::ACCESS, HStatement::statement_id_t, int, HHuginn::identifier_id_t );
-		OExecutionStep( HExpression*, action_t, int, HHuginn::value_ref_t const& );
+		OExecutionStep( HExpression*, action_t, int, HHuginn::value_t const* );
 		OExecutionStep( HExpression*, action_t, int, HHuginn::value_t const& );
 		OExecutionStep( HExpression*, action_t, int, double long );
 		OExecutionStep( HExpression*, action_t, int, int long long );

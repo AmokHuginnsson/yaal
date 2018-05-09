@@ -52,10 +52,7 @@ public:
 		HHuginn::identifier_id_t id( r.try_identifier_id( name ) );
 		HHuginn::value_t const* pv( nullptr );
 		if ( id != INVALID_IDENTIFIER ) {
-			pv = r.get_function( id );
-			if ( ! pv ) {
-				pv = r.get_value( id );
-			}
+			pv = r.get_global( id );
 		}
 		if ( pv ) {
 			v = *pv;
@@ -121,9 +118,9 @@ public:
 		HString const& package( get_string( values_[0] ) );
 		HHuginn::identifier_id_t id( r.try_identifier_id( package ) );
 		bool classExists( !! r.get_class( id ) );
-		bool functionExists( !! r.get_function( id ) );
-		HHuginn::value_t const* rtv( r.get_value( id ) );
-		bool enumerationExists( rtv && is_enum_class( rtv ) );
+		HHuginn::value_t const* g( r.get_global( id ) );
+		bool enumerationExists( g && is_enum_class( g ) );
+		bool functionExists( g && ( (*g)->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) );
 		if ( is_restricted( package ) ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"`"_ys.append( package ).append( "' is restricted keyword." ),
@@ -131,7 +128,7 @@ public:
 				position_
 			);
 		}
-		if ( classExists || functionExists || rtv ) {
+		if ( classExists || functionExists || g ) {
 			throw HHuginn::HHuginnRuntimeException(
 				hcore::to_string(
 					enumerationExists ? "Enumeration" : ( classExists ? "Class" : ( functionExists ? "Function" : "Package alias" ) )
