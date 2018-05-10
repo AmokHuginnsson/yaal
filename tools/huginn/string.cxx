@@ -337,8 +337,7 @@ inline HHuginn::value_t strip( HString&( HString::* trim_ )( HString const& ), h
 
 inline HHuginn::value_t to_lower( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
-	char const name[] = "string.to_lower";
-	verify_arg_count( name, values_, 0, 0, thread_, position_ );
+	verify_arg_count( "string.to_lower", values_, 0, 0, thread_, position_ );
 	static_cast<HHuginn::HString*>( object_->raw() )->value().lower();
 	return ( *object_ );
 	M_EPILOG
@@ -346,8 +345,7 @@ inline HHuginn::value_t to_lower( huginn::HThread* thread_, HHuginn::value_t* ob
 
 inline HHuginn::value_t to_upper( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
-	char const name[] = "string.to_upper";
-	verify_arg_count( name, values_, 0, 0, thread_, position_ );
+	verify_arg_count( "string.to_upper", values_, 0, 0, thread_, position_ );
 	static_cast<HHuginn::HString*>( object_->raw() )->value().upper();
 	return ( *object_ );
 	M_EPILOG
@@ -355,10 +353,33 @@ inline HHuginn::value_t to_upper( huginn::HThread* thread_, HHuginn::value_t* ob
 
 inline HHuginn::value_t clear( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
-	char const name[] = "string.clear";
-	verify_arg_count( name, values_, 0, 0, thread_, position_ );
+	verify_arg_count( "string.clear", values_, 0, 0, thread_, position_ );
 	static_cast<HHuginn::HString*>( object_->raw() )->value().clear();
 	return ( *object_ );
+	M_EPILOG
+}
+
+inline HHuginn::value_t starts_with( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_signature( "string.starts_with", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
+	hcore::HString const& subject( static_cast<HHuginn::HString*>( object_->raw() )->value() );
+	hcore::HString const& object( get_string( values_[0] ) );
+	return ( thread_->object_factory().create_boolean( object.is_empty() || ( subject.find( object ) == 0 ) ) );
+	M_EPILOG
+}
+
+inline HHuginn::value_t ends_with( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_signature( "string.ends_with", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
+	hcore::HString const& subject( static_cast<HHuginn::HString*>( object_->raw() )->value() );
+	hcore::HString const& object( get_string( values_[0] ) );
+	int long pos( subject.find_last( object ) );
+	return (
+		thread_->object_factory().create_boolean(
+			object.is_empty()
+			|| ( ( pos != HString::npos ) && ( pos == ( subject.get_length() - object.get_length() ) ) )
+		)
+	);
 	M_EPILOG
 }
 
@@ -383,20 +404,22 @@ public:
 		)
 		, _reversedStringClass( HReversedString::get_class( runtime_ ) ) {
 		HHuginn::field_definitions_t fd{
-			{ "find",                 objectFactory_->create_method( &string::find,     "string.find",                 static_cast<finder_t>( &HString::find ),      0 ), "( *needle*, *from* ) - find position of substring *needle* that start not sooner than *from* position in the string" },
-			{ "find_last",            objectFactory_->create_method( &string::find,     "string.find_last",            static_cast<finder_t>( &HString::find_last ), hcore::HString::npos + 0 ), "( *needle*, *before* ) - find position of substring *needle* that ends just before *before* in the string" },
-			{ "find_one_of",          objectFactory_->create_method( &string::find_raw, "string.find_one_of",          static_cast<finder_raw_t>( &HString::find_one_of ), 0 ), "( *set* ) - find position of any of characters in given *set* that appears first in the string but not sooner than *from*" },
-			{ "find_last_one_of",     objectFactory_->create_method( &string::find_raw, "string.find_last_one_of",     static_cast<finder_raw_t>( &HString::find_last_one_of ), hcore::HString::npos + 0 ), "( *set* ) - find position of any characters from given *set* that appears last just before *before* position in the string" },
-			{ "find_other_than",      objectFactory_->create_method( &string::find_raw, "string.find_other_than",      static_cast<finder_raw_t>( &HString::find_other_than ), 0 ), "( *set* ) - find position of any of characters that is not present in given *set* that appears first in the string but not sooner than *from*"  },
-			{ "find_last_other_than", objectFactory_->create_method( &string::find_raw, "string.find_last_other_than", static_cast<finder_raw_t>( &HString::find_last_other_than ), hcore::HString::npos + 0 ), "( *set* ) - find position of any characters that in not present in given *set* that appears last just before *before* position in the string" },
-			{ "format",               objectFactory_->create_method( &string::format ),   "( *item...* ) - construct string based on *format template* using *item*s as format substitutions" },
-			{ "replace",              objectFactory_->create_method( &string::replace ),  "( *what*, *with* ) - replace all occurrences of *what* substring with *with* substring" },
-			{ "strip",                objectFactory_->create_method( &string::strip, &hcore::HString::trim ),       "( *set* ) - strip all occurrences of characters in *set* from both ends of the string" },
-			{ "strip_left",           objectFactory_->create_method( &string::strip, &hcore::HString::trim_left ),  "( *set* ) - strip all occurrences of characters in *set* from the left side of the string" },
-			{ "strip_right",          objectFactory_->create_method( &string::strip, &hcore::HString::trim_right ), "( *set* ) - strip all occurrences of characters in *set* from the right side of the string" },
-			{ "to_lower",             objectFactory_->create_method( &string::to_lower ), "turn all string's characters to lower case" },
-			{ "to_upper",             objectFactory_->create_method( &string::to_upper ), "turn all string's characters to upper case" },
-			{ "clear",                objectFactory_->create_method( &string::clear ),    "erase string content" }
+			{ "find",                 objectFactory_->create_method( &string::find,     "string.find",                 static_cast<finder_t>( &HString::find ),      0 ), "( *needle*, *from* ) - find position of substring *needle* that start not sooner than *from* position in the `string`" },
+			{ "find_last",            objectFactory_->create_method( &string::find,     "string.find_last",            static_cast<finder_t>( &HString::find_last ), hcore::HString::npos + 0 ), "( *needle*, *before* ) - find position of substring *needle* that ends just before *before* in the `string`" },
+			{ "find_one_of",          objectFactory_->create_method( &string::find_raw, "string.find_one_of",          static_cast<finder_raw_t>( &HString::find_one_of ), 0 ), "( *set* ) - find position of any of characters in given *set* that appears first in the `string` but not sooner than *from*" },
+			{ "find_last_one_of",     objectFactory_->create_method( &string::find_raw, "string.find_last_one_of",     static_cast<finder_raw_t>( &HString::find_last_one_of ), hcore::HString::npos + 0 ), "( *set* ) - find position of any characters from given *set* that appears last just before *before* position in the `string`" },
+			{ "find_other_than",      objectFactory_->create_method( &string::find_raw, "string.find_other_than",      static_cast<finder_raw_t>( &HString::find_other_than ), 0 ), "( *set* ) - find position of any of characters that is not present in given *set* that appears first in the `string` but not sooner than *from*"  },
+			{ "find_last_other_than", objectFactory_->create_method( &string::find_raw, "string.find_last_other_than", static_cast<finder_raw_t>( &HString::find_last_other_than ), hcore::HString::npos + 0 ), "( *set* ) - find position of any characters that in not present in given *set* that appears last just before *before* position in the `string`" },
+			{ "format",               objectFactory_->create_method( &string::format ),      "( *item...* ) - construct `string` based on *format template* using *item*s as format substitutions" },
+			{ "replace",              objectFactory_->create_method( &string::replace ),     "( *what*, *with* ) - replace all occurrences of *what* `string` with *with* `string`" },
+			{ "strip",                objectFactory_->create_method( &string::strip, &hcore::HString::trim ),       "( *set* ) - strip all occurrences of characters in *set* from both ends of the `string`" },
+			{ "strip_left",           objectFactory_->create_method( &string::strip, &hcore::HString::trim_left ),  "( *set* ) - strip all occurrences of characters in *set* from the left side of the `string`" },
+			{ "strip_right",          objectFactory_->create_method( &string::strip, &hcore::HString::trim_right ), "( *set* ) - strip all occurrences of characters in *set* from the right side of the `string`" },
+			{ "to_lower",             objectFactory_->create_method( &string::to_lower ),    "turn all `string`'s characters to lower case" },
+			{ "to_upper",             objectFactory_->create_method( &string::to_upper ),    "turn all `string`'s characters to upper case" },
+			{ "starts_with",          objectFactory_->create_method( &string::starts_with ), "( *prefix* ) - check if this `string` starts with given *prefix*" },
+			{ "ends_with",            objectFactory_->create_method( &string::ends_with ),   "( *suffix* ) - check if this `string` ends with given *suffix*" },
+			{ "clear",                objectFactory_->create_method( &string::clear ),       "erase `string` content" }
 		};
 		redefine( nullptr, fd );
 		return;
