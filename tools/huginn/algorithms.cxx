@@ -15,6 +15,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "filter.hxx"
 #include "mapper.hxx"
 #include "enumerator.hxx"
+#include "zip.hxx"
 #include "tuple.hxx"
 #include "list.hxx"
 #include "deque.hxx"
@@ -40,6 +41,7 @@ class HAlgorithms : public HHuginn::HValue {
 	HHuginn::class_t _mapperClass;
 	HHuginn::class_t _rangeClass;
 	HHuginn::class_t _enumeratorClass;
+	HHuginn::class_t _zipClass;
 	HHuginn::class_t _exceptionClass;
 public:
 	HAlgorithms( HHuginn::HClass* class_ )
@@ -48,6 +50,7 @@ public:
 		, _mapperClass( HMapper::get_class( class_->runtime() ) )
 		, _rangeClass( HRange::get_class( class_->runtime() ) )
 		, _enumeratorClass( HEnumerator::get_class( class_->runtime() ) )
+		, _zipClass( HZip::get_class( class_->runtime() ) )
 		, _exceptionClass( class_exception( class_ ) ) {
 		return;
 	}
@@ -59,6 +62,9 @@ public:
 	}
 	static HHuginn::value_t enumerate( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		return ( static_cast<HAlgorithms*>( object_->raw() )->do_enumerate( thread_, values_, position_ ) );
+	}
+	static HHuginn::value_t zip( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		return ( static_cast<HAlgorithms*>( object_->raw() )->do_zip( thread_, values_, position_ ) );
 	}
 	static HHuginn::value_t reduce( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		char const name[] = "Algorithms.reduce";
@@ -310,6 +316,17 @@ private:
 		return ( thread_->object_factory().create<HEnumerator>( _enumeratorClass.raw(), values_[0], start ) );
 		M_EPILOG
 	}
+	HHuginn::value_t do_zip( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "Algorithms.zip";
+		verify_arg_count( name, values_, 1, meta::max_signed<int>::value, thread_, position_ );
+		int cols( static_cast<int>( values_.get_size() ) );
+		for ( int i( 0 ); i < cols; ++ i ) {
+			verify_arg_collection( name, values_, i, ARITY::MULTIPLE, ONTICALLY::VIRTUAL, thread_, position_ );
+		}
+		return ( thread_->object_factory().create<HZip>( _zipClass.raw(), values_ ) );
+		M_EPILOG
+	}
 	HHuginn::value_t do_range( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Algorithms.range";
@@ -367,6 +384,7 @@ HHuginn::value_t HAlgorithmsCreator::do_new_instance( HRuntime* runtime_ ) {
 		{ "min",         runtime_->create_method( &HAlgorithms::min ),         "( *arg1*, *arg2*[, argN...] ) - find minimum element from given set" },
 		{ "max",         runtime_->create_method( &HAlgorithms::max ),         "( *arg1*, *arg2*[, argN...] ) - find maximum element from given set" },
 		{ "sorted",      runtime_->create_method( &HAlgorithms::sorted ),      "( *iterable* [, *callable*] ) - return content of *iterable* as sorted `list`, using *callable* to retrieve keys for element comparison" },
+		{ "zip",         runtime_->create_method( &HAlgorithms::zip ),         "( *iterable1*, *iterable2*, ... ) - create zipped iterable view of a set of iterables" },
 		{ "reversed",    runtime_->create_method( &HAlgorithms::reversed ),    "( *coll* ) - create reversed iterable view of a *coll* materialized collection" }
 	};
 	c->redefine( nullptr, fd );
