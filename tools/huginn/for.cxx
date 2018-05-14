@@ -45,10 +45,10 @@ void HFor::do_execute( HThread* thread_ ) const {
 		HHuginn::HIterable* coll( dynamic_cast<HHuginn::HIterable*>( source.raw() ) );
 		HHuginn::HObject* obj( nullptr );
 		if ( coll ) {
-			HHuginn::HIterable::HIterator it( coll->iterator( thread_, sourcePosition ) );
-			while ( f->can_continue() && it.is_valid( thread_, sourcePosition ) ) {
-				run_loop( thread_, f, it.value( thread_, sourcePosition ) );
-				it.next( thread_, sourcePosition );
+			HHuginn::HIterable::iterator_t it( coll->iterator( thread_, sourcePosition ) );
+			while ( f->can_continue() && it->is_valid( thread_, sourcePosition ) ) {
+				run_loop( thread_, f, it->value( thread_, sourcePosition ) );
+				it->next( thread_, sourcePosition );
 			}
 		} else if ( ( obj = dynamic_cast<HHuginn::HObject*>( source.raw() ) ) ) {
 			HHuginn::value_t itVal( obj->call_method( thread_, source, INTERFACE::ITERATOR_IDENTIFIER, HArguments( thread_ ), sourcePosition ) );

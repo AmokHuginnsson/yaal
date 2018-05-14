@@ -52,7 +52,7 @@ protected:
 		throw HHuginn::HHuginnRuntimeException( "Getting size of `DirectoryScan' is an invalid operation.", thread_->current_frame()->file_id(), position_ );
 	}
 private:
-	virtual HIterator do_iterator( HThread*, int ) override;
+	virtual iterator_t do_iterator( HThread*, int ) override;
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
 		return ( thread_->object_factory().create<HDirectoryScan>( HIterable::get_class(), _path ) );
@@ -85,9 +85,8 @@ private:
 	HDirectoryScanIterator& operator = ( HDirectoryScanIterator const& ) = delete;
 };
 
-HDirectoryScan::HIterator HDirectoryScan::do_iterator( HThread*, int ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HDirectoryScanIterator( *_it, *_end, this ) );
-	return ( HIterator( yaal::move( impl ) ) );
+HDirectoryScan::iterator_t HDirectoryScan::do_iterator( HThread*, int ) {
+	return ( hcore::make_pointer<HDirectoryScanIterator>( *_it, *_end, this ) );
 }
 
 }

@@ -127,9 +127,8 @@ protected:
 		return ( safe_int::cast<int long>( static_cast<HHuginn::HOrder const*>( _order.raw() )->size( thread_, position_ ) ) );
 	}
 private:
-	virtual HIterator do_iterator( HThread*, int ) override {
-		HIterator::iterator_implementation_t impl( new ( memory::yaal ) HOrderReverseIterator( static_cast<HHuginn::HOrder*>( _order.raw() ) ) );
-		return ( HIterator( yaal::move( impl ) ) );
+	virtual iterator_t do_iterator( HThread*, int ) override {
+		return ( make_pointer<HOrderReverseIterator>( static_cast<HHuginn::HOrder*>( _order.raw() ) ) );
 	}
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
@@ -353,9 +352,8 @@ HHuginn::HClass const* HHuginn::HOrder::key_type( void ) const {
 	return ( _keyType );
 }
 
-HHuginn::HIterable::HIterator HHuginn::HOrder::do_iterator( huginn::HThread*, int ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::order::HOrderIterator( this ) );
-	return ( HIterator( yaal::move( impl ) ) );
+HHuginn::HIterable::iterator_t HHuginn::HOrder::do_iterator( huginn::HThread*, int ) {
+	return ( make_pointer<huginn::order::HOrderIterator>( this ) );
 }
 
 HHuginn::value_t HHuginn::HOrder::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {

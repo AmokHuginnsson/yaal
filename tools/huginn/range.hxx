@@ -49,7 +49,7 @@ protected:
 		return ( safe_int::cast<int long>( ( _stop + _step - ( _from + 1 ) ) / _step ) );
 	}
 private:
-	virtual HIterator do_iterator( HThread*, int ) override;
+	virtual iterator_t do_iterator( HThread*, int ) override;
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
 		return ( thread_->object_factory().create<HRange>( HIterable::get_class(), _from, _stop, _step ) );
@@ -82,9 +82,8 @@ private:
 	HRangeIterator& operator = ( HRangeIterator const& ) = delete;
 };
 
-HRange::HIterator HRange::do_iterator( HThread*, int ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HRangeIterator( _from, this ) );
-	return ( HIterator( yaal::move( impl ) ) );
+HRange::iterator_t HRange::do_iterator( HThread*, int ) {
+	return ( hcore::make_pointer<HRangeIterator>( _from, this ) );
 }
 
 }

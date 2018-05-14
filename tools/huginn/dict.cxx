@@ -105,15 +105,14 @@ protected:
 		return ( safe_int::cast<int long>( static_cast<HHuginn::HDict const*>( _dict.raw() )->size( thread_, position_ ) ) );
 	}
 private:
-	virtual HIterator do_iterator( HThread*, int ) override {
-		HIterator::iterator_implementation_t impl(
-			new ( memory::yaal ) HDictIterator(
+	virtual iterator_t do_iterator( HThread*, int ) override {
+		return (
+			make_pointer<HDictIterator>(
 				static_cast<HHuginn::HDict*>( _dict.raw() ),
 				*_dict->get_class()->runtime()->object_factory(),
 				HDictIterator::TYPE::KEY_VALUES
 			)
 		);
-		return ( HIterator( yaal::move( impl ) ) );
 	}
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
@@ -185,9 +184,8 @@ protected:
 		return ( safe_int::cast<int long>( static_cast<HHuginn::HDict const*>( _dict.raw() )->size( thread_, position_ ) ) );
 	}
 private:
-	virtual HIterator do_iterator( HThread*, int ) override {
-		HIterator::iterator_implementation_t impl( new ( memory::yaal ) HDictReverseIterator( static_cast<HHuginn::HDict*>( _dict.raw() ) ) );
-		return ( HIterator( yaal::move( impl ) ) );
+	virtual iterator_t do_iterator( HThread*, int ) override {
+		return ( make_pointer<HDictReverseIterator>( static_cast<HHuginn::HDict*>( _dict.raw() ) ) );
 	}
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
@@ -502,15 +500,14 @@ void HHuginn::HDict::clear( void ) {
 	M_EPILOG
 }
 
-HHuginn::HIterable::HIterator HHuginn::HDict::do_iterator( huginn::HThread*, int ) {
-	HIterator::iterator_implementation_t impl(
-		new ( memory::yaal ) huginn::dict::HDictIterator(
+HHuginn::HIterable::iterator_t HHuginn::HDict::do_iterator( huginn::HThread*, int ) {
+	return (
+		make_pointer<huginn::dict::HDictIterator>(
 			this,
 			*get_class()->runtime()->object_factory(),
 			huginn::dict::HDictIterator::TYPE::KEYS
 		)
 	);
-	return ( HIterator( yaal::move( impl ) ) );
 }
 
 HHuginn::value_t HHuginn::HDict::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {

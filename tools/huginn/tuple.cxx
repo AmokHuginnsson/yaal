@@ -95,9 +95,8 @@ protected:
 		return ( safe_int::cast<int long>( static_cast<HHuginn::HTuple const*>( _tuple.raw() )->size( thread_, position_ ) ) );
 	}
 private:
-	virtual HIterator do_iterator( HThread* thread_, int position_ ) override {
-		HIterator::iterator_implementation_t impl( new ( memory::yaal ) HTupleReverseIterator( thread_, static_cast<HHuginn::HTuple*>( _tuple.raw() ), position_ ) );
-		return ( HIterator( yaal::move( impl ) ) );
+	virtual iterator_t do_iterator( HThread* thread_, int position_ ) override {
+		return ( make_pointer<HTupleReverseIterator>( thread_, static_cast<HHuginn::HTuple*>( _tuple.raw() ), position_ ) );
 	}
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
@@ -232,9 +231,8 @@ HHuginn::value_t HHuginn::HTuple::get( int long long index_ ) {
 	M_EPILOG
 }
 
-HHuginn::HIterable::HIterator HHuginn::HTuple::do_iterator( huginn::HThread*, int ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::tuple::HTupleIterator( this ) );
-	return ( HIterator( yaal::move( impl ) ) );
+HHuginn::HIterable::iterator_t HHuginn::HTuple::do_iterator( huginn::HThread*, int ) {
+	return ( make_pointer<huginn::tuple::HTupleIterator>( this ) );
 }
 
 HHuginn::value_t HHuginn::HTuple::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {

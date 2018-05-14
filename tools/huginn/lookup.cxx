@@ -104,15 +104,14 @@ protected:
 		return ( safe_int::cast<int long>( static_cast<HHuginn::HLookup const*>( _lookup.raw() )->size( thread_, position_ ) ) );
 	}
 private:
-	virtual HIterator do_iterator( HThread*, int ) override {
-		HIterator::iterator_implementation_t impl(
-			new ( memory::yaal ) HLookupIterator(
+	virtual iterator_t do_iterator( HThread*, int ) override {
+		return (
+			make_pointer<HLookupIterator>(
 				static_cast<HHuginn::HLookup*>( _lookup.raw() ),
 				*_lookup->get_class()->runtime()->object_factory(),
 				HLookupIterator::TYPE::KEY_VALUES
 			)
 		);
-		return ( HIterator( yaal::move( impl ) ) );
 	}
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
@@ -184,11 +183,8 @@ protected:
 		return ( safe_int::cast<int long>( static_cast<HHuginn::HLookup const*>( _lookup.raw() )->size( thread_, position_ ) ) );
 	}
 private:
-	virtual HIterator do_iterator( HThread*, int ) override {
-		HIterator::iterator_implementation_t impl(
-			new ( memory::yaal ) HLookupReverseIterator( static_cast<HHuginn::HLookup*>( _lookup.raw() ) )
-		);
-		return ( HIterator( yaal::move( impl ) ) );
+	virtual iterator_t do_iterator( HThread*, int ) override {
+		return ( make_pointer<HLookupReverseIterator>( static_cast<HHuginn::HLookup*>( _lookup.raw() ) ) );
 	}
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
@@ -473,15 +469,14 @@ void HHuginn::HLookup::clear( void ) {
 	M_EPILOG
 }
 
-HHuginn::HIterable::HIterator HHuginn::HLookup::do_iterator( huginn::HThread*, int ) {
-	HIterator::iterator_implementation_t impl(
-		new ( memory::yaal ) huginn::lookup::HLookupIterator(
+HHuginn::HIterable::iterator_t HHuginn::HLookup::do_iterator( huginn::HThread*, int ) {
+	return (
+		make_pointer<huginn::lookup::HLookupIterator>(
 			this,
 			*get_class()->runtime()->object_factory(),
 			huginn::lookup::HLookupIterator::TYPE::KEYS
 		)
 	);
-	return ( HIterator( yaal::move( impl ) ) );
 }
 
 HHuginn::value_t HHuginn::HLookup::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {

@@ -95,9 +95,8 @@ protected:
 		return ( safe_int::cast<int long>( static_cast<HHuginn::HDeque const*>( _deque.raw() )->size( thread_, position_ ) ) );
 	}
 private:
-	virtual HIterator do_iterator( HThread* thread_, int position_ ) override {
-		HIterator::iterator_implementation_t impl( new ( memory::yaal ) HDequeReverseIterator( thread_, static_cast<HHuginn::HDeque*>( _deque.raw() ), position_ ) );
-		return ( HIterator( yaal::move( impl ) ) );
+	virtual iterator_t do_iterator( HThread* thread_, int position_ ) override {
+		return ( make_pointer<HDequeReverseIterator>( thread_, static_cast<HHuginn::HDeque*>( _deque.raw() ), position_ ) );
 	}
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
@@ -405,9 +404,8 @@ HHuginn::value_t& HHuginn::HDeque::get_ref( int long long index_ ) {
 	M_EPILOG
 }
 
-HHuginn::HIterable::HIterator HHuginn::HDeque::do_iterator( huginn::HThread*, int ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::deque::HDequeIterator( this ) );
-	return ( HIterator( yaal::move( impl ) ) );
+HHuginn::HIterable::iterator_t HHuginn::HDeque::do_iterator( huginn::HThread*, int ) {
+	return ( hcore::make_pointer<deque::HDequeIterator>( this ) );
 }
 
 HHuginn::value_t HHuginn::HDeque::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {

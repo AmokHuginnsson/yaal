@@ -115,9 +115,8 @@ HHuginn::value_t HQueryResult::has_next( tools::huginn::HThread* thread_, HHugin
 	M_EPILOG
 }
 
-HHuginn::HIterable::HIterator HQueryResult::do_iterator( tools::huginn::HThread*, int ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HQueryResultIterator( _recordSet, yaal::move( _it ), _runtime ) );
-	return ( HIterator( yaal::move( impl ) ) );
+HHuginn::HIterable::iterator_t HQueryResult::do_iterator( tools::huginn::HThread*, int ) {
+	return ( make_pointer<HQueryResultIterator>( _recordSet, yaal::move( _it ), _runtime ) );
 }
 
 int long HQueryResult::do_size( tools::huginn::HThread*, int ) const {

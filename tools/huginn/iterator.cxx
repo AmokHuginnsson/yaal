@@ -14,7 +14,7 @@ HHuginn::HIterable::HIterable( HClass const* class_ )
 	return;
 }
 
-HHuginn::HIterable::HIterator HHuginn::HIterable::iterator( huginn::HThread* thread_, int position_ ) {
+HHuginn::HIterable::iterator_t HHuginn::HIterable::iterator( huginn::HThread* thread_, int position_ ) {
 	return ( do_iterator( thread_, position_ ) );
 }
 

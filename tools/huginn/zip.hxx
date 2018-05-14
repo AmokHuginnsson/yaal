@@ -47,7 +47,7 @@ protected:
 		return ( s );
 	}
 private:
-	virtual HIterator do_iterator( HThread*, int ) override;
+	virtual iterator_t do_iterator( HThread*, int ) override;
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
 		return ( thread_->object_factory().create<HZip>( HIterable::get_class(), _source ) );
@@ -56,7 +56,7 @@ private:
 
 class HZipIterator : public HIteratorInterface {
 public:
-	typedef yaal::hcore::HArray<HHuginn::HIterable::HIterator> iterators_t;
+	typedef yaal::hcore::HArray<HHuginn::HIterable::iterator_t> iterators_t;
 protected:
 	iterators_t _impl;
 public:
@@ -68,7 +68,7 @@ protected:
 	virtual bool do_is_valid( HThread* thread_, int position_ ) override {
 		bool valid( true );
 		for ( iterators_t::value_type& it : _impl ) {
-			if ( ! it.is_valid( thread_, position_ ) ) {
+			if ( ! it->is_valid( thread_, position_ ) ) {
 				valid = false;
 				break;
 			}
@@ -77,14 +77,14 @@ protected:
 	}
 	virtual void do_next( HThread* thread_, int position_ ) override {
 		for ( iterators_t::value_type& it : _impl ) {
-			it.next( thread_, position_ );
+			it->next( thread_, position_ );
 		}
 	}
 	virtual HHuginn::value_t do_value( HThread* thread_, int position_ ) override {
 		HHuginn::HTuple::values_t data;
 		data.reserve( _impl.get_size() );
 		for ( iterators_t::value_type& it : _impl ) {
-			data.emplace_back( it.value( thread_, position_ ) );
+			data.emplace_back( it->value( thread_, position_ ) );
 		}
 		HObjectFactory& of( thread_->object_factory() );
 		return ( of.create_tuple( yaal::move( data ) ) );
@@ -94,16 +94,13 @@ private:
 	HZipIterator& operator = ( HZipIterator const& ) = delete;
 };
 
-HZip::HIterator HZip::do_iterator( HThread* thread_, int position_ ) {
+HZip::iterator_t HZip::do_iterator( HThread* thread_, int position_ ) {
 	HZipIterator::iterators_t data;
 	data.reserve( _source.get_size() );
 	for ( HHuginn::value_t& v : _source ) {
 		data.emplace_back( static_cast<HHuginn::HIterable*>( v.raw() )->iterator( thread_, position_ ) );
 	}
-	HIterator::iterator_implementation_t impl(
-		yaal::hcore::make_resource<HZipIterator>( yaal::move( data ) )
-	);
-	return ( HIterator( yaal::move( impl ) ) );
+	return ( yaal::hcore::make_pointer<HZipIterator>( yaal::move( data ) ) );
 }
 
 }

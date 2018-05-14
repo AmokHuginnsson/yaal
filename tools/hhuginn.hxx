@@ -49,6 +49,7 @@ struct OCompiler;
 class HRuntime;
 class HPackageFactory;
 class HNotifableIterator;
+class HIteratorInterface;
 
 namespace ERR_CODE {
 enum {
@@ -733,12 +734,12 @@ class HHuginn::HIterable : public HHuginn::HValue {
 public:
 	typedef HHuginn::HIterable this_type;
 	typedef HHuginn::HValue base_type;
-	class HIterator;
+	typedef yaal::hcore::HPointer<huginn::HIteratorInterface> iterator_t;
 	HIterable( HClass const* );
-	HIterator iterator( huginn::HThread*, int );
+	iterator_t iterator( huginn::HThread*, int );
 	int long size( huginn::HThread*, int ) const;
 protected:
-	virtual HIterator do_iterator( huginn::HThread*, int ) = 0;
+	virtual iterator_t do_iterator( huginn::HThread*, int ) = 0;
 	virtual int long do_size( huginn::HThread*, int ) const = 0;
 };
 
@@ -829,7 +830,7 @@ public:
 		return ( _value );
 	}
 protected:
-	virtual HIterator do_iterator( huginn::HThread*, int ) override;
+	virtual iterator_t do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override;
 private:
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
@@ -888,7 +889,7 @@ public:
 		return ( _data );
 	}
 protected:
-	virtual HIterator do_iterator( huginn::HThread*, int ) override;
+	virtual iterator_t do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override;
 private:
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
@@ -915,7 +916,7 @@ public:
 		return ( _data );
 	}
 protected:
-	virtual HIterator do_iterator( huginn::HThread*, int ) override;
+	virtual iterator_t do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override;
 private:
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
@@ -944,7 +945,7 @@ public:
 		return ( _data );
 	}
 protected:
-	virtual HIterator do_iterator( huginn::HThread*, int ) override;
+	virtual iterator_t do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override;
 private:
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
@@ -1007,7 +1008,7 @@ public:
 		_helper.detach();
 	}
 protected:
-	virtual HIterator do_iterator( huginn::HThread*, int ) override;
+	virtual iterator_t do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override;
 private:
 	HDict( HDict const& ) = delete;
@@ -1049,7 +1050,7 @@ public:
 		_helper.detach();
 	}
 protected:
-	virtual HIterator do_iterator( huginn::HThread*, int ) override;
+	virtual iterator_t do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override;
 private:
 	HOrder( HOrder const& ) = delete;
@@ -1112,7 +1113,7 @@ public:
 		_helper.detach();
 	}
 protected:
-	virtual HIterator do_iterator( huginn::HThread*, int ) override;
+	virtual iterator_t do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override;
 private:
 	HLookup( HLookup const& ) = delete;
@@ -1151,7 +1152,7 @@ public:
 		_helper.detach();
 	}
 protected:
-	virtual HIterator do_iterator( huginn::HThread*, int ) override;
+	virtual iterator_t do_iterator( huginn::HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override;
 private:
 	HSet( HSet const& ) = delete;

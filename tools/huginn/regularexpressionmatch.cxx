@@ -76,9 +76,8 @@ HHuginn::value_t HRegularExpressionMatch::matched( huginn::HThread* thread_, HHu
 	M_EPILOG
 }
 
-HHuginn::HIterable::HIterator HRegularExpressionMatch::do_iterator( huginn::HThread*, int ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HRegularExpressionMatchIterator( this, _regex->find( _fast ) ) );
-	return ( HIterator( yaal::move( impl ) ) );
+HHuginn::HIterable::iterator_t HRegularExpressionMatch::do_iterator( huginn::HThread*, int ) {
+	return ( make_pointer<HRegularExpressionMatchIterator>( this, _regex->find( _fast ) ) );
 }
 
 int long HRegularExpressionMatch::do_size( huginn::HThread*, int ) const {

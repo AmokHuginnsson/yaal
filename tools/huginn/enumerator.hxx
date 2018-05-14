@@ -42,7 +42,7 @@ protected:
 		return ( static_cast<HHuginn::HIterable const*>( _source.raw() )->size( thread_, position_ ) );
 	}
 private:
-	virtual HIterator do_iterator( HThread*, int ) override;
+	virtual iterator_t do_iterator( HThread*, int ) override;
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
 		return ( thread_->object_factory().create<HEnumerator>( HIterable::get_class(), _source, _start ) );
@@ -51,20 +51,20 @@ private:
 
 class HEnumeratorIterator : public HIteratorInterface {
 protected:
-	HHuginn::HIterable::HIterator _impl;
+	HHuginn::HIterable::iterator_t _impl;
 	HHuginn::HInteger::value_type _counter;
 public:
-	HEnumeratorIterator( HHuginn::HIterable::HIterator&& iterator_, HHuginn::HInteger::value_type start_ )
+	HEnumeratorIterator( HHuginn::HIterable::iterator_t&& iterator_, HHuginn::HInteger::value_type start_ )
 		: _impl( yaal::move( iterator_ ) )
 		, _counter( start_ ) {
 		return;
 	}
 protected:
 	virtual bool do_is_valid( HThread* thread_, int position_ ) override {
-		return ( _impl.is_valid( thread_, position_ ) );
+		return ( _impl->is_valid( thread_, position_ ) );
 	}
 	virtual void do_next( HThread* thread_, int position_ ) override {
-		_impl.next( thread_, position_ );
+		_impl->next( thread_, position_ );
 		++ _counter;
 	}
 	virtual HHuginn::value_t do_value( HThread* thread_, int position_ ) override {
@@ -73,7 +73,7 @@ protected:
 			of.create_tuple(
 				HHuginn::values_t( {
 					of.create_integer( _counter ),
-					_impl.value( thread_, position_ )
+					_impl->value( thread_, position_ )
 				} )
 			)
 		);
@@ -83,10 +83,8 @@ private:
 	HEnumeratorIterator& operator = ( HEnumeratorIterator const& ) = delete;
 };
 
-HEnumerator::HIterator HEnumerator::do_iterator( HThread* thread_, int position_ ) {
-	HIterator::iterator_implementation_t impl;
-	impl.reset( new ( memory::yaal ) HEnumeratorIterator( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), _start ) );
-	return ( HIterator( yaal::move( impl ) ) );
+HEnumerator::iterator_t HEnumerator::do_iterator( HThread* thread_, int position_ ) {
+	return ( hcore::make_pointer<HEnumeratorIterator>( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), _start ) );
 }
 
 }

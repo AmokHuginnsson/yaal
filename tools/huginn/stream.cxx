@@ -924,9 +924,8 @@ bool HStream::is_valid( void ) const {
 	M_EPILOG
 }
 
-HHuginn::HIterable::HIterator HStream::do_iterator( HThread* thread_, int position_ ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HStreamIterator( thread_, this, position_ ) );
-	return ( HIterator( yaal::move( impl ) ) );
+HHuginn::HIterable::iterator_t HStream::do_iterator( HThread* thread_, int position_ ) {
+	return ( make_pointer<HStreamIterator>( thread_, this, position_ ) );
 }
 
 int long HStream::do_size( huginn::HThread* thread_, int position_ ) const {

@@ -60,7 +60,7 @@ private:
 	void write_line_impl( HThread*, yaal::hcore::HString const&, int );
 	void serialize_impl( HThread*, HHuginn::value_t const&, int );
 	void seek_impl( int long, yaal::hcore::HStreamInterface::SEEK );
-	virtual HIterator do_iterator( HThread*, int ) override;
+	virtual iterator_t do_iterator( HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override __attribute__((noreturn));
 	virtual HHuginn::value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override __attribute__((noreturn));
 	int long read_len( HThread*, int );

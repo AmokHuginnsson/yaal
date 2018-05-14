@@ -100,9 +100,8 @@ protected:
 		return ( safe_int::cast<int long>( static_cast<HHuginn::HString const*>( _string.raw() )->size( thread_, position_ ) ) );
 	}
 private:
-	virtual HIterator do_iterator( HThread*, int ) override {
-		HIterator::iterator_implementation_t impl( new ( memory::yaal ) HStringReverseIterator( static_cast<HHuginn::HString*>( _string.raw() ) ) );
-		return ( HIterator( yaal::move( impl ) ) );
+	virtual iterator_t do_iterator( HThread*, int ) override {
+		return ( make_pointer<HStringReverseIterator>( static_cast<HHuginn::HString*>( _string.raw() ) ) );
 	}
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
@@ -462,9 +461,8 @@ HHuginn::value_t HHuginn::HString::do_clone( huginn::HThread* thread_, HHuginn::
 	return ( thread_->runtime().object_factory()->create_string( _value ) );
 }
 
-HHuginn::HIterable::HIterator HHuginn::HString::do_iterator( huginn::HThread*, int ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) string::HStringIterator( this ) );
-	return ( HIterator( yaal::move( impl ) ) );
+HHuginn::HIterable::iterator_t HHuginn::HString::do_iterator( huginn::HThread*, int ) {
+	return ( make_pointer<string::HStringIterator>( this ) );
 }
 
 int long HHuginn::HString::do_size( huginn::HThread*, int ) const {

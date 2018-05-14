@@ -66,10 +66,10 @@ public:
 		HString s;
 		HHuginn::HIterable* coll( static_cast<HHuginn::HIterable*>( const_cast<HHuginn::HValue*>( values_[0].raw() ) ) );
 		HString const& sep( get_string( values_[1] ) );
-		HHuginn::HIterable::HIterator it( coll->iterator( thread_, position_ ) );
+		HHuginn::HIterable::iterator_t it( coll->iterator( thread_, position_ ) );
 		bool addSep( false );
-		while ( it.is_valid( thread_, position_ ) ) {
-			HHuginn::value_t v( it.value( thread_, position_ ) );
+		while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
+			HHuginn::value_t v( it->value( thread_, position_ ) );
 			if ( v->type_id() != HHuginn::TYPE::STRING ) {
 				throw HHuginn::HHuginnRuntimeException(
 					""_ys.append( name )
@@ -85,7 +85,7 @@ public:
 			}
 			s.append( get_string( v.raw() ) );
 			addSep = true;
-			it.next( thread_, position_ );
+			it->next( thread_, position_ );
 		}
 		return ( thread_->runtime().object_factory()->create_string( s ) );
 		M_EPILOG
