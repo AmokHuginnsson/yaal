@@ -59,9 +59,12 @@ public:
 	typedef yaal::hcore::HArray<HHuginn::HIterable::iterator_t> iterators_t;
 protected:
 	iterators_t _impl;
+	HHuginn::values_t _cache;
 public:
 	HZipIterator( iterators_t&& iterators_ )
-		: _impl( yaal::move( iterators_ ) ) {
+		: _impl( yaal::move( iterators_ ) )
+		, _cache() {
+		_cache.reserve( _impl.get_size() );
 		return;
 	}
 protected:
@@ -72,20 +75,17 @@ protected:
 				valid = false;
 				break;
 			}
+			_cache.emplace_back( it->value( thread_, position_ ) );
+			it->next( thread_, position_ );
 		}
 		return ( valid );
 	}
-	virtual void do_next( HThread* thread_, int position_ ) override {
-		for ( iterators_t::value_type& it : _impl ) {
-			it->next( thread_, position_ );
-		}
+	virtual void do_next( HThread*, int ) override {
+		_cache.clear();
+		return;
 	}
-	virtual HHuginn::value_t do_value( HThread* thread_, int position_ ) override {
-		HHuginn::HTuple::values_t data;
-		data.reserve( _impl.get_size() );
-		for ( iterators_t::value_type& it : _impl ) {
-			data.emplace_back( it->value( thread_, position_ ) );
-		}
+	virtual HHuginn::value_t do_value( HThread* thread_, int ) override {
+		HHuginn::HTuple::values_t data( _cache );
 		HObjectFactory& of( thread_->object_factory() );
 		return ( of.create_tuple( yaal::move( data ) ) );
 	}

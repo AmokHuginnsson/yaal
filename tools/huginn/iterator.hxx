@@ -68,6 +68,33 @@ private:
 	HNotifableIterator& operator = ( HNotifableIterator const& ) = delete;
 };
 
+class HIterator : public HHuginn::HIterable, public HIteratorInterface {
+	HHuginn::value_t _source;
+	HHuginn::HIterable::iterator_t _impl;
+public:
+	HIterator( HHuginn::HClass const*, HHuginn::value_t const&, HHuginn::HIterable::iterator_t const& );
+	static HHuginn::class_t get_class( HRuntime* );
+protected:
+	/* Value interface. */
+	static HHuginn::value_t is_valid( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+	static HHuginn::value_t value( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+	static HHuginn::value_t next( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+protected:
+	/* Iterator interface. */
+	virtual bool do_is_valid( HThread* thread_, int position_ ) override {
+		return ( _impl->is_valid( thread_, position_ ) );
+	}
+	virtual void do_next( HThread* thread_, int position_ ) override {
+		_impl->next( thread_, position_ );
+	}
+	virtual HHuginn::value_t do_value( HThread* thread_, int position_ ) override {
+		return ( _impl->value( thread_, position_ ) );
+	}
+	/* Iterable interface. */
+	virtual iterator_t do_iterator( HThread*, int ) override;
+	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override;
+};
+
 }
 
 }

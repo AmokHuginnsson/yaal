@@ -37,6 +37,7 @@ namespace tools {
 namespace huginn {
 
 class HAlgorithms : public HHuginn::HValue {
+	HHuginn::class_t _iteratorClass;
 	HHuginn::class_t _filterClass;
 	HHuginn::class_t _mapperClass;
 	HHuginn::class_t _rangeClass;
@@ -46,6 +47,7 @@ class HAlgorithms : public HHuginn::HValue {
 public:
 	HAlgorithms( HHuginn::HClass* class_ )
 		: HValue( class_ )
+		, _iteratorClass( HIterator::get_class( class_->runtime() ) )
 		, _filterClass( HFilter::get_class( class_->runtime() ) )
 		, _mapperClass( HMapper::get_class( class_->runtime() ) )
 		, _rangeClass( HRange::get_class( class_->runtime() ) )
@@ -53,6 +55,9 @@ public:
 		, _zipClass( HZip::get_class( class_->runtime() ) )
 		, _exceptionClass( class_exception( class_ ) ) {
 		return;
+	}
+	static HHuginn::value_t iterator( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		return ( static_cast<HAlgorithms*>( object_->raw() )->do_iterator( thread_, values_, position_ ) );
 	}
 	static HHuginn::value_t filter( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		return ( static_cast<HAlgorithms*>( object_->raw() )->do_filter( thread_, values_, position_ ) );
@@ -327,6 +332,20 @@ private:
 		return ( thread_->object_factory().create<HZip>( _zipClass.raw(), values_ ) );
 		M_EPILOG
 	}
+	HHuginn::value_t do_iterator( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "Algorithms.iterator";
+		verify_arg_count( name, values_, 1, 1, thread_, position_ );
+		verify_arg_collection( name, values_, 0, ARITY::MULTIPLE, ONTICALLY::VIRTUAL, thread_, position_ );
+		return (
+			thread_->object_factory().create<HIterator>(
+				_iteratorClass.raw(),
+				values_.front(),
+				static_cast<HHuginn::HIterable*>( values_.front().raw() )->iterator( thread_, position_ )
+			)
+		);
+		M_EPILOG
+	}
 	HHuginn::value_t do_range( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Algorithms.range";
@@ -385,6 +404,7 @@ HHuginn::value_t HAlgorithmsCreator::do_new_instance( HRuntime* runtime_ ) {
 		{ "max",         runtime_->create_method( &HAlgorithms::max ),         "( *arg1*, *arg2*[, argN...] ) - find maximum element from given set" },
 		{ "sorted",      runtime_->create_method( &HAlgorithms::sorted ),      "( *iterable* [, *callable*] ) - return content of *iterable* as sorted `list`, using *callable* to retrieve keys for element comparison" },
 		{ "zip",         runtime_->create_method( &HAlgorithms::zip ),         "( *iterable1*, *iterable2*, ... ) - create zipped iterable view of a set of iterables" },
+		{ "iterator",    runtime_->create_method( &HAlgorithms::iterator ),    "( *iterable* ) - create manual iterator object for given iterable" },
 		{ "reversed",    runtime_->create_method( &HAlgorithms::reversed ),    "( *coll* ) - create reversed iterable view of a *coll* materialized collection" }
 	};
 	c->redefine( nullptr, fd );
