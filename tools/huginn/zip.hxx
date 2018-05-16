@@ -84,7 +84,17 @@ protected:
 		_cache.clear();
 		return;
 	}
-	virtual HHuginn::value_t do_value( HThread* thread_, int ) override {
+	virtual HHuginn::value_t do_value( HThread* thread_, int position_ ) override {
+		if ( _cache.is_empty() ) {
+			do_is_valid( thread_, position_ );
+		}
+		if ( _cache.get_size() < _impl.get_size() ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"Getting value from an invalid iterator.",
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
 		HHuginn::HTuple::values_t data( _cache );
 		HObjectFactory& of( thread_->object_factory() );
 		return ( of.create_tuple( yaal::move( data ) ) );
