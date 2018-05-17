@@ -69,16 +69,16 @@ public:
 	}
 protected:
 	virtual bool do_is_valid( HThread* thread_, int position_ ) override {
-		bool valid( true );
-		for ( iterators_t::value_type& it : _impl ) {
-			if ( ! it->is_valid( thread_, position_ ) ) {
-				valid = false;
-				break;
+		if ( _cache.is_empty() ) {
+			for ( iterators_t::value_type& it : _impl ) {
+				if ( ! it->is_valid( thread_, position_ ) ) {
+					break;
+				}
+				_cache.emplace_back( it->value( thread_, position_ ) );
+				it->next( thread_, position_ );
 			}
-			_cache.emplace_back( it->value( thread_, position_ ) );
-			it->next( thread_, position_ );
 		}
-		return ( valid );
+		return ( _cache.get_size() == _impl.get_size() );
 	}
 	virtual void do_next( HThread*, int ) override {
 		_cache.clear();
