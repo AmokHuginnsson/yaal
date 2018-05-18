@@ -54,6 +54,7 @@ install: all
 	@$(call msg_always,printf "%b\n" "i: you need to become root to do this" && ) \
 	$(if $(CLOU_BIN), $(call invoke,$(INSTALL) -d -m755 $(DIR_BIN) $(foreach clou,$(CLOU_BIN),&& $(INSTALL) -m755 $(clou) $(DIR_BIN)/$(patsubst %$(EXEC_NAME),$(PRJNAME),$(clou)) ) ) && ) \
 	$(if $(CLOU_LIB), $(call invoke,$(INSTALL) -d -m755 $(DIR_LIB) && $(INSTALL) -m755 $(CLOU_LIB) $(DIR_LIB)/ ) && ) \
+	$(if $(CLOU_MODULES), $(call invoke,$(INSTALL) -d -m755 $(DIR_LIB)/$(PRJNAME) && $(INSTALL) -m644 $(CLOU_MODULES) $(DIR_LIB)/$(PRJNAME)/ ) && ) \
 	$(if $(CLOU_CONF), $(call invoke,$(INSTALL) -d -m755 $(DIR_SYSCONF) && $(INSTALL) -m644 $(CLOU_CONF) $(DIR_SYSCONF)/ ) && ) \
 	$(if $(CLOU_SHARE), $(call invoke,$(INSTALL) -d -m755 $(DIR_SHARE)/$(PRJNAME) && $(INSTALL) -m644 $(CLOU_SHARE) $(DIR_SHARE)/$(PRJNAME)/ ) && ) \
 	$(if $(CLOU_LOCALSTATE), $(call invoke,$(INSTALL) -d -m755 $(DIR_LOCALSTATE)/$(PRJNAME) && $(INSTALL) -m644 $(CLOU_LOCALSTATE) $(DIR_LOCALSTATE)/$(PRJNAME)/ ) && ) \
@@ -67,6 +68,7 @@ uninstall:
 	@$(call msg_always,printf "%b\n" "i: you need to become root to do this" && ) \
 	$(if $(CLOU_BIN), $(call invoke,/bin/rm -f $(foreach clou,$(CLOU_BIN),$(DIR_BIN)/$(patsubst %$(EXEC_NAME),$(PRJNAME),$(clou)) ) ) && ) \
 	$(if $(CLOU_LIB), $(call invoke,/bin/rm -f $(addprefix $(DIR_LIB)/,$(notdir $(CLOU_LIB))) ) && ) \
+	$(if $(CLOU_MODULES), $(call invoke,/bin/rm -rf $(DIR_LIB)/$(PRJNAME) ) && ) \
 	$(if $(CLOU_CONF), $(call invoke,/bin/rm -f $(addprefix $(DIR_SYSCONF)/,$(notdir $(CLOU_CONF))) ) && ) \
 	$(if $(CLOU_SHARE), $(call invoke,/bin/rm -rf $(DIR_SHARE)/$(PRJNAME) ) && ) \
 	$(if $(CLOU_LOCALSTATE), $(call invoke,/bin/rm -rf $(DIR_LOCALSTATE)/$(PRJNAME) ) && ) \

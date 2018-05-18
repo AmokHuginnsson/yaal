@@ -72,6 +72,8 @@ fi
 sed -e "s/define[ \t]*PACKAGE_/define ${LIB_NAME_UC}_PACKAGE_/g" \
 	-e "s/define[ \t]*SYSCONFDIR/define ${LIB_NAME_UC}_SYSCONFDIR/g" \
 	-e "s/define[ \t]*LOCALSTATEDIR/define ${LIB_NAME_UC}_LOCALSTATEDIR/g" \
+	-e "s/define[ \t]*LIBDIR/define ${LIB_NAME_UC}_LIBDIR/g" \
+	-e "s/define[ \t]*LIBEXECDIR/define ${LIB_NAME_UC}_LIBEXECDIR/g" \
 	-e "s/define[ \t]*DATADIR/define ${LIB_NAME_UC}_DATADIR/g" \
 	-e 's/#define[ \t]*LIB_INFIX.*/#undef LIB_INFIX/g' "${CONFIG_SRC_PATH}" > ${DIR_HEADERS}/config.hxx
 

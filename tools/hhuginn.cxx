@@ -48,7 +48,7 @@ main( args ) {
 #endif
 
 namespace {
-char const DEFAULT_PATHS[] = ".:" DATADIR "/huginn";
+char const DEFAULT_PATHS[] = ".:" LIBDIR "/huginn:" DATADIR "/huginn";
 char const* const MODULE_PATHS_RAW( ::getenv( "HUGINNPATH" ) );
 HString MODULE_PATHS_S( MODULE_PATHS_RAW ? hcore::to_string( MODULE_PATHS_RAW ).append( ":" ).append( DEFAULT_PATHS ) : DEFAULT_PATHS );
 

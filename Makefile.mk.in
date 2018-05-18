@@ -16,6 +16,7 @@ PACKAGE_TARNAME= $(PRJNAME)
 DIR_SYSCONF    = $(DESTDIR)@sysconfdir@
 DIR_BIN        = $(DESTDIR)@bindir@
 DIR_LIB        = $(DESTDIR)@libdir@
+DIR_LIBEXEC    = $(DESTDIR)@libexecdir@
 DIR_LOCALSTATE = $(DESTDIR)@localstatedir@
 DIR_HEADERS    = $(DESTDIR)@includedir@
 DIR_SHARE      = $(DESTDIR)@datarootdir@

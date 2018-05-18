@@ -189,6 +189,7 @@ try {
 	var SYSCONFDIR = "";
 	var LOCALSTATEDIR = "";
 	var DATADIR = "";
+	var LIBDIR = "";
 	var BUILD_TYPE = "debug";
 	var BUILD_PACKAGE = 0;
 	var YAAL_AUTO_SANITY = 0;
@@ -253,6 +254,9 @@ try {
 			case "DATADIR":
 				DATADIR = parts[1];
 			break;
+			case "LIBDIR":
+				LIBDIR = parts[1];
+			break;
 			case "BUILD_TYPE":
 				BUILD_TYPE = parts[1];
 			break;
@@ -284,6 +288,9 @@ try {
 
 	if ( DATADIR.length == 0 ) {
 		DATADIR = PREFIX + "/share";
+	}
+	if ( LIBDIR.length == 0 ) {
+		LIBDIR = PREFIX + "/lib";
 	}
 
 	if ( FAST == -1 ) {
@@ -360,6 +367,7 @@ try {
 	envProc( "SYSCONFDIR" ) = SYSCONFDIR;
 	envProc( "LOCALSTATEDIR" ) = LOCALSTATEDIR;
 	envProc( "DATADIR" ) = DATADIR;
+	envProc( "LIBDIR" ) = LIBDIR;
 	envProc( "CXX" ) = "";
 	envProc( "CC" ) = "";
 	envProc.remove( "CXX" );

@@ -333,6 +333,14 @@ AC_DEFUN_ONCE([YAAL_DETECT_COMMON_FLAGS], [
 	AC_SUBST(LXXFLAGS_NO_UNDEFINED, [${LXXFLAGS_NO_UNDEFINED}])
 ])
 
+dnl Work around an autoconf bug.
+if test "$prefix" = "NONE"; then
+	prefix="${ac_default_prefix}"
+fi
+if test "$exec_prefix" = "NONE"; then
+	exec_prefix="${prefix}"
+fi
+
 SYSCONFDIR=`eval echo ${sysconfdir}`
 AC_DEFINE_UNQUOTED([SYSCONFDIR], "${SYSCONFDIR}", [Path to global system configuration directory.])
 LOCALSTATEDIR=`eval echo ${localstatedir}`
@@ -340,4 +348,8 @@ AC_DEFINE_UNQUOTED([LOCALSTATEDIR], "${LOCALSTATEDIR}", [Path to data files whic
 datadir_int=`eval echo ${datadir}`
 DATADIR=`eval echo ${datadir_int}`
 AC_DEFINE_UNQUOTED([DATADIR], "${DATADIR}", [Path to read only application speciffic data files.])
+LIBEXECDIR=`eval echo ${libexecdir}`
+AC_DEFINE_UNQUOTED([LIBEXECDIR], "${LIBEXECDIR}", [The directory for installing executable programs to be run by other programs rather than by users.])
+LIBDIR=`eval echo ${libdir}`
+AC_DEFINE_UNQUOTED([LIBDIR], "${LIBDIR}", [The directory for object files and libraries of object code.])
 
