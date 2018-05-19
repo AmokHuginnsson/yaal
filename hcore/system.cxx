@@ -1,5 +1,6 @@
 /* Read yaal/LICENSE.md file for copyright and licensing information. */
 
+#include <cstdlib>
 #include <csignal>
 #include <cstring>
 #include <unistd.h>
@@ -24,6 +25,7 @@
 #include <sys/vmmeter.h>
 #include <mach/mach_init.h>
 #include <mach/mach_host.h>
+#include <libproc.h>
 #endif /* #ifdef __HOST_OS_TYPE_DARWIN__ */
 
 #include "hcore/base.hxx"
@@ -346,6 +348,39 @@ int get_core_count_info( void ) {
 int get_page_size( void ) {
 	M_PROLOG
 	return ( static_cast<int>( ::sysconf( _SC_PAGESIZE ) ) );
+	M_EPILOG
+}
+
+yaal::hcore::HString get_self_exec_path( void ) {
+	M_PROLOG
+	HString path;
+#if defined ( __HOST_OS_TYPE_LINUX__ ) || defined ( __HOST_OS_TYPE_CYGWIN__ )
+	static int const MAX_PATH_LEN( 4096 );
+	char buf[MAX_PATH_LEN + 1] = { 0 };
+	static_cast<void>( readlink( "/proc/self/exe", buf, sizeof ( buf ) ) == 0 );
+	path = buf;
+#endif
+#ifdef __HOST_OS_TYPE_FREEBSD__
+	static int const MAX_PATH_LEN( 4096 );
+	int mib[] = { CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1 };
+	char buf[MAX_PATH_LEN];
+	size_t cb = sizeof ( buf );
+	sysctl( mib, 4, buf, &cb, NULL, 0 );
+	path = buf;
+#endif
+#ifdef __HOST_OS_TYPE_DARWIN__
+	char buf[PROC_PIDPATHINFO_MAXSIZE];
+	if ( proc_pidpath( getpid(), buf, sizeof ( buf ) ) == 0 ) {
+		path = buf;
+	}
+#endif
+#ifdef __HOST_OS_TYPE_SOLARIS__
+	path = getexecname();
+#endif
+#ifdef __HOST_OS_TYPE_WINDOWS__
+	ms_get_module_file_name( path );
+#endif
+	return ( path );
 	M_EPILOG
 }
 

@@ -3,6 +3,12 @@
 
 #include "hcore/pod.hxx"
 
+namespace yaal {
+namespace hcore {
+class HString;
+}
+}
+
 namespace msvcxx {
 
 int close( int );
@@ -17,9 +23,11 @@ M_YAAL_HCORE_PUBLIC_API int dup2( int, int );
 M_YAAL_HCORE_PUBLIC_API void log_windows_error( char const* );
 M_YAAL_HCORE_PUBLIC_API int lockf( int, int, int long long );
 void get_memory_size_info( yaal::i64_t&, yaal::i64_t& );
+void get_module_file_name( yaal::hcore::HString& );
 
 } /* namespace msvcxx */
 
 #define ms_get_memory_size_info msvcxx::get_memory_size_info
+#define ms_get_module_file_name msvcxx::get_module_file_name
 
 #endif /* #ifndef YAAL_MSVCXX_EMU_UNISTD_HXX_INCLUDED */

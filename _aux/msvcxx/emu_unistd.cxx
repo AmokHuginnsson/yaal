@@ -470,5 +470,13 @@ void get_memory_size_info( i64_t& free_, i64_t& total_ ) {
 	return;
 }
 
+void get_module_file_name( yaal::hcore::HString& path_ ) {
+	int const bufSize( MAX_PATH + static_cast<int>( sizeof ( FILE_NAME_INFO ) ) );
+	char buf[bufSize] = { 0 };
+	GetModuleFileName( nullptr, buf, bufSize );
+	path_ = buf;
+	return;
+}
+
 }
 

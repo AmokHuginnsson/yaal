@@ -1,4 +1,3 @@
-
 ??_7?$HField@VHFile@hcore@yaal@@$0A@@hcore@yaal@@6B@
 ??_7?$HSingleton@VHAsyncCaller@tools@yaal@@@hcore@yaal@@6B@
 ??_7?$HSingleton@VHConsole@hconsole@yaal@@@hcore@yaal@@6B@
@@ -7,6 +6,7 @@
 ??_7?$HSingleton@VHPackageFactory@huginn@tools@yaal@@@hcore@yaal@@6B@
 ??_7?$HSingleton@VHScheduledAsyncCaller@tools@yaal@@@hcore@yaal@@6B@
 ??_7?$HSingleton@VHSignalService@tools@yaal@@@hcore@yaal@@6B@
+??_7?$HSingleton@VHTerminal@tools@yaal@@@hcore@yaal@@6B@
 ??_7?$HSingleton@VHThreadPool@tools@yaal@@@hcore@yaal@@6B@
 ??_7?$HSingleton@VHWidgetFactory@hconsole@yaal@@@hcore@yaal@@6B@
 ??_7?$HSingleton@VHWindowFactory@hconsole@yaal@@@hcore@yaal@@6B@
@@ -23,6 +23,7 @@
 ??_7HPackageFactory@huginn@tools@yaal@@6B@
 ??_7HScheduledAsyncCaller@tools@yaal@@6B@
 ??_7HSignalService@tools@yaal@@6B@
+??_7HTerminal@tools@yaal@@6B@
 ??_7HThreadPool@tools@yaal@@6B?$HSingleton@VHThreadPool@tools@yaal@@@hcore@2@@
 ??_7HThreadPool@tools@yaal@@6BHWorkFlow@12@@
 ??_7HWidgetFactory@hconsole@yaal@@6B@
@@ -162,6 +163,7 @@
 ?_instance@?$HSingleton@VHPackageFactory@huginn@tools@yaal@@@hcore@yaal@@0PAVHPackageFactory@huginn@tools@3@A
 ?_instance@?$HSingleton@VHScheduledAsyncCaller@tools@yaal@@@hcore@yaal@@0PAVHScheduledAsyncCaller@tools@3@A
 ?_instance@?$HSingleton@VHSignalService@tools@yaal@@@hcore@yaal@@0PAVHSignalService@tools@3@A
+?_instance@?$HSingleton@VHTerminal@tools@yaal@@@hcore@yaal@@0PAVHTerminal@tools@3@A
 ?_instance@?$HSingleton@VHThreadPool@tools@yaal@@@hcore@yaal@@0PAVHThreadPool@tools@3@A
 ?_instance@?$HSingleton@VHWidgetFactory@hconsole@yaal@@@hcore@yaal@@0PAVHWidgetFactory@hconsole@3@A
 ?_instance@?$HSingleton@VHWindowFactory@hconsole@yaal@@@hcore@yaal@@0PAVHWindowFactory@hconsole@3@A

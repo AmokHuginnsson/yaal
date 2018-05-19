@@ -129,6 +129,12 @@ int get_core_count_info( void );
  */
 int get_page_size( void );
 
+/*! \brief Get path of this process executable.
+ *
+ * \return Path to this process executable.
+ */
+yaal::hcore::HString get_self_exec_path( void );
+
 }
 
 }
