@@ -33,9 +33,8 @@ public:
 		: _value() {
 		return;
 	}
-	explicit HTaggedPOD( pod_t const& pod_ )
+	explicit constexpr HTaggedPOD( pod_t const& pod_ )
 		: _value( pod_ ) {
-		return;
 	}
 	HTaggedPOD( HTaggedPOD const& ) = default;
 	HTaggedPOD( HTaggedPOD&& ) noexcept = default;

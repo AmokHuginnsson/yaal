@@ -25,13 +25,13 @@ namespace yaal {
 /*! \brief Unicode code point representation type.
  */
 typedef yaal::hcore::HTaggedPOD<yaal::u32_t, struct code_point_tag> code_point_t;
-inline code_point_t operator "" _ycp ( char char_ ) {
+inline constexpr code_point_t operator "" _ycp ( char char_ ) {
 	return ( code_point_t( static_cast<yaal::u32_t>( char_ ) ) );
 }
-inline code_point_t operator "" _ycp ( int long long unsigned char_ ) {
+inline constexpr code_point_t operator "" _ycp ( int long long unsigned char_ ) {
 	return ( code_point_t( static_cast<yaal::u32_t>( char_ ) ) );
 }
-inline code_point_t operator "" _ycp ( char32_t codePoint_ ) {
+inline constexpr code_point_t operator "" _ycp ( char32_t codePoint_ ) {
 	return ( code_point_t( codePoint_ ) );
 }
 
