@@ -184,7 +184,7 @@ template<typename T>
 struct huginn_type_from_integer {
 	static HHuginn::TYPE const value = HHuginn::TYPE::INTEGER;
 	static T get( utf8_converters_t&, huginn::HThread* thread_, HHuginn::value_t const& value_, int position_ ) {
-		int val( 0 );
+		T val( 0 );
 		try {
 			val = safe_int::cast<T>( get_integer( value_ ) );
 		} catch ( yaal::hcore::HOutOfRangeException const& e ) {
@@ -201,7 +201,7 @@ template<typename T>
 struct huginn_type_from_character {
 	static HHuginn::TYPE const value = HHuginn::TYPE::CHARACTER;
 	static T get( utf8_converters_t&, huginn::HThread* thread_, HHuginn::value_t const& value_, int position_ ) {
-		int val( 0 );
+		T val( 0 );
 		try {
 			val = safe_int::cast<T>( get_character( value_ ).get() );
 		} catch ( yaal::hcore::HOutOfRangeException const& e ) {
