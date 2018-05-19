@@ -228,15 +228,12 @@ path_t dirname( path_t const& path_ ) {
 		degenerated = true;
 	}	else if ( dname != path::ROOT ) {
 		dname.trim_right( path::SEPARATOR_STR );
-		if ( ! dname.is_empty() ) {
-			int long delimPos( dname.find_last( path::SEPARATOR ) );
-			if ( delimPos != HString::npos ) {
-				dname.erase( delimPos > 0 ? delimPos : 1 );
-			} else {
-				degenerated = true;
-			}
+		M_ASSERT( ! dname.is_empty() );
+		int long delimPos( dname.find_last( path::SEPARATOR ) );
+		if ( delimPos != HString::npos ) {
+			dname.erase( delimPos > 0 ? delimPos : 1 );
 		} else {
-			M_ASSERT( !"bad code path"[0] );
+			degenerated = true;
 		}
 	}
 	if ( degenerated ) {

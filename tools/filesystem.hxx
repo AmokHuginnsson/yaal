@@ -57,7 +57,7 @@ namespace path {
 extern path_t const ROOT;
 extern path_t const CURRENT;
 extern path_t const PARENT;
-static code_point_t const SEPARATOR = '/'_ycp;
+static code_point_t constexpr SEPARATOR = '/'_ycp;
 
 }
 
