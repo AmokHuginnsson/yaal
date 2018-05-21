@@ -312,6 +312,26 @@ HHuginn::value_t HHuginn::HClass::do_create_instance( huginn::HThread* thread_, 
 	int constructorIdx( field_index( KEYWORD::CONSTRUCTOR_IDENTIFIER ) );
 	if ( constructorIdx >= 0 ) {
 		function( constructorIdx )( thread_, &v, values_, position_ );
+	} else {
+		HHuginn::HObject& o( *static_cast<HHuginn::HObject*>( v.raw() ) );
+		int vi( 0 );
+		int const valueCount( static_cast<int>( values_.get_size() ) );
+		int const fieldCount( static_cast<int>( _fieldDefinitions.get_size() ) );
+		for ( int fi( 0 ); ( fi < fieldCount ) && ( vi < valueCount ); ++ fi ) {
+			HHuginn::value_t& f( o.field_ref( fi ) );
+			HHuginn::type_id_t t( f->type_id() );
+			if ( t != HHuginn::TYPE::METHOD ) {
+				f = values_[vi];
+				++ vi;
+			}
+		}
+		if ( vi < valueCount ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"Too many arguments for class initializer, expected at most: "_ys.append( vi ).append( "." ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
 	}
 	return ( v );
 	M_EPILOG
