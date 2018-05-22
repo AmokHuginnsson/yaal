@@ -143,6 +143,12 @@ inline HHuginn::value_t find_raw( char const* name_, finder_raw_t finder_, int l
 }
 
 class HHuginnStringFormatter {
+public:
+	enum class ALIGN {
+		LEFT,
+		CENTER,
+		RIGHT
+	};
 	static char const FMT_OPEN = '{';
 	static char const FMT_CLOSE = '}';
 	static char const FMT_SPEC = ':';
@@ -173,6 +179,7 @@ public:
 	}
 	void format( void ) {
 		M_PROLOG
+		HCharacterClass const ALIGN_CLASS( "<^>", 3 );
 		int fmtSubstCount( 0 );
 		bool autoIndex( false );
 		HString idxRaw;
@@ -220,16 +227,13 @@ public:
 					HHuginn::value_t const& v( _values[idx] );
 					HHuginn::type_id_t type( v->type_id() );
 					BASE base( BASE::DEC );
+					ALIGN align( ( type == HHuginn::TYPE::STRING ) || ( type == HHuginn::TYPE::CHARACTER ) ? ALIGN::LEFT : ALIGN::RIGHT );
 					bool prefix( false );
 					int width( 0 );
 					code_point_t fill( ' '_ycp );
 					if ( ! specRaw.is_empty() ) {
-						prefix = specRaw.front() == '#'_ycp;
 						code_point_t typeSpec( specRaw.back() );
 						specRaw.pop_back();
-						if ( prefix ) {
-							specRaw.shift_left( 1 );
-						}
 						switch ( typeSpec.get() ) {
 							case ( 'x' ): base = BASE::HEX; /* fallthrough */
 							case ( 'o' ): if ( base == BASE::DEC ) { base = BASE::OCT; } /* fallthrough */
@@ -239,6 +243,9 @@ public:
 							} break;
 							case ( 'f' ): {
 								ensure( type == HHuginn::TYPE::REAL, "Expected a `real` type" );
+							} break;
+							case ( 'n' ): {
+								ensure( type == HHuginn::TYPE::NUMBER, "Expected a `number` type" );
 							} break;
 							case ( 's' ): {
 								ensure( type == HHuginn::TYPE::STRING, "Expected a `string` type" );
@@ -250,11 +257,24 @@ public:
 								ensure( false, "Invalid type specification" );
 							} break;
 						}
+						if ( ! specRaw.is_empty() && ( specRaw.front() == '#'_ycp ) ) {
+							prefix = true;
+							specRaw.shift_left( 1 );
+						}
+						if ( ( specRaw.get_size() >= 2 ) && ALIGN_CLASS.has( specRaw[1] ) ) {
+							fill = specRaw.front();
+							specRaw.shift_left( 1 );
+						}
+						if ( ! specRaw.is_empty() && ALIGN_CLASS.has( specRaw.front() ) ) {
+							char alignSpec( static_cast<char>( specRaw.front().get() ) );
+							align = alignSpec == '<' ? ALIGN::LEFT : ( alignSpec == '^' ? ALIGN::CENTER : ALIGN::RIGHT );
+							specRaw.shift_left( 1 );
+						}
+						if ( ! specRaw.is_empty() && ( specRaw.front() == '0'_ycp ) ) {
+							fill = '0'_ycp;
+							specRaw.shift_left( 1 );
+						}
 						if ( ! specRaw.is_empty() ) {
-							if ( specRaw.front() == '0'_ycp ) {
-								fill = '0'_ycp;
-								specRaw.shift_left( 1 );
-							}
 							try {
 								width = lexical_cast<int>( specRaw );
 							} catch ( HLexicalCastException const& e ) {
@@ -269,7 +289,19 @@ public:
 						formatedValue.assign( static_cast<HHuginn::HString*>( sv.raw() )->value() );
 					}
 					if ( width > formatedValue.get_length() ) {
-						formatedValue.shift_right( width - formatedValue.get_length(), fill );
+						int space( static_cast<int>( width - formatedValue.get_length() ) );
+						switch ( align ) {
+							case ( ALIGN::LEFT ): {
+								formatedValue.append( space, fill );
+							} break;
+							case ( ALIGN::CENTER ): {
+								formatedValue.shift_right( space / 2, fill );
+								formatedValue.append( space - space / 2, fill );
+							} break;
+							case ( ALIGN::RIGHT ): {
+								formatedValue.shift_right( space, fill );
+							} break;
+						}
 					}
 					_result.append( formatedValue );
 					continue;
