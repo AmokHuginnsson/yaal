@@ -347,7 +347,7 @@ class YaalHCoreHArrayPrinter:
 		return self.Iterator( self._val['_buf'], self._val['_size'] )
 
 	def to_string( self ):
-		return ( "yaal::hcore::HArray of `%s' of length %d, capacity %d" % ( self._val.type.template_argument( 0 ), self._val['_size'], self._val['_capacity'] ) )
+		return ( "yaal::hcore::HArray of `%s` of length %d, capacity %d" % ( self._val.type.template_argument( 0 ), self._val['_size'], self._val['_capacity'] ) )
 
 	def display_hint( self ):
 		return 'array'
@@ -409,7 +409,7 @@ class YaalHCoreHDequePrinter:
 		return self.Iterator( self._val['_chunks']['_data'].cast( self._val.type.template_argument( 0 ).pointer().pointer() ), self._VPC, self._val['_start'], self._val['_size'] )
 
 	def to_string( self ):
-		return ( "yaal::hcore::HDeque of `%s' of length %d of VPC %d" % ( self._val.type.template_argument( 0 ), self._val['_size'], self._VPC ) )
+		return ( "yaal::hcore::HDeque of `%s` of length %d of VPC %d" % ( self._val.type.template_argument( 0 ), self._val['_size'], self._VPC ) )
 
 	def display_hint( self ):
 		return 'array'
@@ -464,7 +464,7 @@ class YaalHCoreHListPrinter:
 		return self.Iterator(self._val['_hook'], self._val['_size'])
 
 	def to_string( self ):
-		return ( "yaal::hcore::HList of `%s' of length %d" % ( self._val.type.template_argument( 0 ), self._val['_size'] ) )
+		return ( "yaal::hcore::HList of `%s` of length %d" % ( self._val.type.template_argument( 0 ), self._val['_size'] ) )
 
 	def display_hint( self ):
 		return 'array'
@@ -532,7 +532,7 @@ class YaalHCoreHMapPrinter:
 		return self.Iterator( self._val, self.begin(), self._val['_engine']['_size'] )
 
 	def to_string( self ):
-		return ( "yaal::hcore::HMap of `%s' to `%s' of length %d" % ( self._val.type.template_argument( 0 ), self._val.type.template_argument( 1 ), self._val['_engine']['_size'] ) )
+		return ( "yaal::hcore::HMap of `%s` to `%s` of length %d" % ( self._val.type.template_argument( 0 ), self._val.type.template_argument( 1 ), self._val['_engine']['_size'] ) )
 
 	def display_hint( self ):
 		return 'map'
@@ -571,7 +571,7 @@ class YaalHCoreHLookupMapPrinter:
 		return self.Iterator( self._val['_engine']['_data']['_buf'], self._val['_engine']['_data']['_size'] )
 
 	def to_string( self ):
-		return ( "yaal::hcore::HLookupMap of `%s' to `%s' of length %d" % ( self._val.type.template_argument( 0 ), self._val.type.template_argument( 1 ), self._val['_engine']['_data']['_size'] ) )
+		return ( "yaal::hcore::HLookupMap of `%s` to `%s` of length %d" % ( self._val.type.template_argument( 0 ), self._val.type.template_argument( 1 ), self._val['_engine']['_data']['_size'] ) )
 
 	def display_hint( self ):
 		return 'map'
@@ -614,7 +614,7 @@ class YaalHCoreHSetPrinter:
 		return self.Iterator( self._val, self.begin(), self._val['_engine']['_size'] )
 
 	def to_string( self ):
-		return ( "yaal::hcore::HSet of `%s' of length %d" % ( self._val.type.template_argument( 0 ), self._val['_engine']['_size'] ) )
+		return ( "yaal::hcore::HSet of `%s` of length %d" % ( self._val.type.template_argument( 0 ), self._val['_engine']['_size'] ) )
 
 	def display_hint( self ):
 		return 'array'
@@ -688,7 +688,7 @@ class YaalHCoreHHashMapPrinter:
 		return it
 
 	def to_string( self ):
-		return ( "yaal::hcore::HHashMap of `%s' to `%s' of length %d" % ( self._val.type.template_argument( 0 ), self._val.type.template_argument( 1 ), self._val['_engine']['_size'] ) )
+		return ( "yaal::hcore::HHashMap of `%s` to `%s` of length %d" % ( self._val.type.template_argument( 0 ), self._val.type.template_argument( 1 ), self._val['_engine']['_size'] ) )
 
 	def display_hint( self ):
 		return 'map'
@@ -734,7 +734,7 @@ class YaalHCoreHHashSetPrinter:
 		return it
 
 	def to_string( self ):
-		return ( "yaal::hcore::HHashSet of `%s' of length %d" % ( self._val.type.template_argument( 0 ), self._val['_engine']['_size'] ) )
+		return ( "yaal::hcore::HHashSet of `%s` of length %d" % ( self._val.type.template_argument( 0 ), self._val['_engine']['_size'] ) )
 
 	def display_hint( self ):
 		return 'array'
@@ -798,7 +798,7 @@ class YaalToolsHTwoWayMapPrinter:
 		return YaalHCoreHListPrinter( self._val['_data'] ).children()
 
 	def to_string( self ):
-		return ( "yaal::tools::HTwoWayMap of `%s<->%s' of length %d" % ( self._val.type.template_argument( 0 ), self._val.type.template_argument( 1 ), self._val['_data']['_size'] ) )
+		return ( "yaal::tools::HTwoWayMap of `%s<->%s` of length %d" % ( self._val.type.template_argument( 0 ), self._val.type.template_argument( 1 ), self._val['_data']['_size'] ) )
 
 	def display_hint( self ):
 		return 'array'
@@ -842,7 +842,7 @@ class YaalToolsHRingPrinter:
 		return self.Iterator( self._val['_buf']['_data'].cast( self._val.type.template_argument( 0 ).pointer() ), self._val['_start'], self._val['_size'], self.capacity() )
 
 	def to_string( self ):
-		return ( "yaal::tools::HRing of `%s' of length %d, capacity %d" % ( self._val.type.template_argument( 0 ), self._val['_size'], self.capacity() ) )
+		return ( "yaal::tools::HRing of `%s` of length %d, capacity %d" % ( self._val.type.template_argument( 0 ), self._val['_size'], self.capacity() ) )
 
 	def display_hint( self ):
 		return 'array'
