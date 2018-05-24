@@ -26,6 +26,10 @@ namespace {
 
 static char const _raw_[] = "\n\r\t\b\a\f\033\v";
 static char const _safe_[] = "nrtbafev";
+HNamedRule named_clone( HRuleBase const& rule_ ) {
+	HRule const* r( dynamic_cast<HRule const*>( &rule_ ) );
+	return ( HNamedRule( r ? r->get_name() : "", rule_.clone() ) );
+}
 
 }
 
@@ -681,21 +685,21 @@ HRule::HRule( HRule const& rule_ )
 
 HRule::HRule( HRuleBase const& rule_ )
 	: HRuleBase( rule_.skips_ws() )
-	, _rule( rule_.clone() )
+	, _rule( named_clone( rule_ ) )
 	, _completelyDefined( true ) {
 	return;
 }
 
 HRule::HRule( HRuleBase const& rule_, action_t const& action_ )
 	: HRuleBase( action_, rule_.skips_ws() )
-	, _rule( rule_.clone() )
+	, _rule( named_clone( rule_ ) )
 	, _completelyDefined( true ) {
 	return;
 }
 
 HRule::HRule( HRuleBase const& rule_, action_position_t const& action_ )
 	: HRuleBase( action_, rule_.skips_ws() )
-	, _rule( rule_.clone() )
+	, _rule( named_clone( rule_ ) )
 	, _completelyDefined( true ) {
 	return;
 }
@@ -760,7 +764,7 @@ HRule& HRule::operator %= ( HRuleBase const& rule_ ) {
 	M_ENSURE( ! _completelyDefined );
 	HRecursiveRule* rr( dynamic_cast<HRecursiveRule*>( _rule.rule().raw() ) );
 	M_ENSURE( rr );
-	rr->set_rule( rule_.clone() );
+	rr->set_rule( named_clone( rule_ ) );
 	HRuleAggregator rra( this );
 	_completelyDefined = true;
 	return ( *this );
@@ -899,7 +903,7 @@ HRecursiveRule::HRecursiveRule( void )
 	, _rule() {
 }
 
-void HRecursiveRule::set_rule( HRuleBase::ptr_t const& rule_ ) {
+void HRecursiveRule::set_rule( HNamedRule const& rule_ ) {
 	M_PROLOG
 	/*
 	 * HRecursiveRule can be set to other HRecursiveRule! :(

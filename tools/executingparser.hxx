@@ -280,7 +280,7 @@ protected:
 	virtual HRuleBase const* do_find( yaal::hcore::HString const& ) const override;
 private:
 	HRecursiveRule( void );
-	void set_rule( HRuleBase::ptr_t const& );
+	void set_rule( HNamedRule const& );
 	HRecursiveRule( HRecursiveRule const& ) = delete;
 	HRecursiveRule& operator = ( HRecursiveRule const& ) = delete;
 	friend class HRule;
