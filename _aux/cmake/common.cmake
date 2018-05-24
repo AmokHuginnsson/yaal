@@ -186,7 +186,9 @@ set( CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} -D_GNU_SOURCE -D_R
 
 if ( "x${HOST_OS_TYPE}" STREQUAL "xRaspbian" )
 	use_cxx_compiler_flag( -mcpu=cortex-a53 )
+	use_cxx_compiler_flag( -mtune=cortex-a53 )
 	use_cxx_compiler_flag( -mfpu=neon-fp-armv8 )
+	use_cxx_compiler_flag( -mneon-for-64bits )
 	use_cxx_compiler_flag( -mfloat-abi=hard )
 	use_cxx_compiler_flag( -mlittle-endian )
 	use_cxx_compiler_flag( -munaligned-access )
