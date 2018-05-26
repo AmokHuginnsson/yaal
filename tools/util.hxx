@@ -56,8 +56,8 @@ typedef yaal::hcore::HHashMap<yaal::code_point_t, yaal::code_point_t> code_point
 class HScopeExitCall {
 public:
 	typedef HScopeExitCall this_type;
-private:
 	typedef yaal::hcore::HBoundCall<> call_t;
+private:
 	call_t _call;
 public:
 	HScopeExitCall( call_t&& call_ )

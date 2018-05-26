@@ -367,15 +367,13 @@ public:
 		this->template do_reset<trait::false_type>();
 	}
 	void swap( HPointerObserver& p ) {
-		if ( &p != this ) {
-			/*
-			 * Both fields are POD types (pointers: tType*, HSharedBase*)
-			 * so they do not have a specialized implementation
-			 * and we can explicitly request yaal generic implementation.
-			 */
-			yaal::swap( this->_shared, p._shared );
-			yaal::swap( this->_object, p._object );
-		}
+		/*
+		 * Both fields are POD types (pointers: tType*, HSharedBase*)
+		 * so they do not have a specialized implementation
+		 * and we can explicitly request yaal generic implementation.
+		 */
+		yaal::swap( this->_shared, p._shared );
+		yaal::swap( this->_object, p._object );
 		return;
 	}
 };

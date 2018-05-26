@@ -12,10 +12,12 @@ M_VCSID( "$Id: " __ID__ " $" )
 #include "hcore/hfile.hxx"
 #include "tools/filesystem.hxx"
 #include "tools/hplugin.hxx"
+#include "tools/util.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::tools;
+using namespace yaal::tools::util;
 
 namespace yaal {
 
@@ -45,7 +47,8 @@ HHuginn::value_t HPackageCreatorInterface::new_instance( HRuntime* runtime_ ) {
 
 HPackageFactory::HPackageFactory( void )
 	: _creators()
-	, _binaries() {
+	, _binaries()
+	, _visitedImports() {
 	return;
 }
 
@@ -66,6 +69,12 @@ void HPackageFactory::register_package_creator( HString const& name_, HPackageCr
 	M_EPILOG
 }
 
+namespace {
+inline void remove_visited( HPackageFactory::visited_imports_t* vi_, HPackageFactory::visited_imports_t::iterator const* it_ ) {
+	vi_->erase( *it_ );
+}
+}
+
 HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, yaal::hcore::HString const& name_, int position_ ) {
 	M_PROLOG
 	HHuginn::value_t package;
@@ -73,6 +82,12 @@ HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, yaal::hcor
 	if ( it != _creators.end() ) {
 		package = it->second._instantiator->new_instance( runtime_ );
 	}
+	visited_imports_t::insert_result ir( _visitedImports.insert( name_ ) );
+	if ( ! ir.second ) {
+		throw HHuginn::HHuginnRuntimeException( "Package `"_ys.append( name_ ).append( "' is already being imported." ), MAIN_FILE_ID, position_ );
+	}
+	HScopeExitCall::call_t bc( call( &remove_visited, &_visitedImports, &ir.first ) );
+	HScopeExitCall sec( yaal::move( bc ) );
 	HHuginn::paths_t paths( runtime_->module_paths() );
 	paths.insert( paths.end(), HHuginn::MODULE_PATHS.begin(), HHuginn::MODULE_PATHS.end() );
 	if ( ! package ) {

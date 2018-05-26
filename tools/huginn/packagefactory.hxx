@@ -38,6 +38,7 @@ public:
 	typedef HSingleton<HPackageFactory> base_type;
 	typedef yaal::hcore::HPointer<HPlugin> plugin_t;
 	typedef yaal::hcore::HArray<plugin_t> plugins_t;
+	typedef yaal::hcore::HSet<yaal::hcore::HString> visited_imports_t;
 	struct OCreator {
 		OCreator( void )
 			: _instantiator( nullptr ) {
@@ -50,6 +51,7 @@ public:
 private:
 	creators_t _creators;
 	plugins_t _binaries;
+	visited_imports_t _visitedImports;
 public:
 	void register_package_creator( yaal::hcore::HString const&, HPackageCreatorInterface* );
 	HHuginn::value_t create_package( HRuntime*, yaal::hcore::HString const&, int );
