@@ -48,7 +48,8 @@ HHuginn::value_t HPackageCreatorInterface::new_instance( HRuntime* runtime_ ) {
 HPackageFactory::HPackageFactory( void )
 	: _creators()
 	, _binaries()
-	, _visitedImports() {
+	, _visitedImports()
+	, _mutex( HMutex::TYPE::RECURSIVE ) {
 	return;
 }
 
@@ -77,6 +78,7 @@ inline void remove_visited( HPackageFactory::visited_imports_t* vi_, HPackageFac
 
 HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, yaal::hcore::HString const& name_, int position_ ) {
 	M_PROLOG
+	HLock l( _mutex );
 	HHuginn::value_t package;
 	creators_t::iterator it = _creators.find( name_ );
 	if ( it != _creators.end() ) {

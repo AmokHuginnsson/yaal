@@ -52,6 +52,7 @@ private:
 	creators_t _creators;
 	plugins_t _binaries;
 	visited_imports_t _visitedImports;
+	mutable yaal::hcore::HMutex _mutex;
 public:
 	void register_package_creator( yaal::hcore::HString const&, HPackageCreatorInterface* );
 	HHuginn::value_t create_package( HRuntime*, yaal::hcore::HString const&, int );
