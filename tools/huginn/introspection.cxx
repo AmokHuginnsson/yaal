@@ -10,6 +10,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "helper.hxx"
 #include "keyword.hxx"
 #include "thread.hxx"
+#include "exception.hxx"
 #include "packagefactory.hxx"
 #include "objectfactory.hxx"
 #include "commit_id.hxx"
@@ -146,6 +147,18 @@ public:
 		return ( v );
 		M_EPILOG
 	}
+	static HHuginn::value_t call_stack( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( "Introspection.call_stack", values_, 0, 0, thread_, position_ );
+		HIntrospecteeInterface::call_stack_t callStack( thread_->runtime().get_call_stack( thread_ ) );
+		HObjectFactory& of( thread_->object_factory() );
+		HHuginn::HList::values_t data;
+		for ( HIntrospecteeInterface::HCallSite const& cs : callStack ) {
+			data.push_back( of.create<exception::HStackFrameInfo>( of.stack_frame_info_class(), cs ) );
+		}
+		return ( of.create_list( yaal::move( data ) ) );
+		M_EPILOG
+	}
 };
 
 namespace package_factory {
@@ -169,7 +182,8 @@ HHuginn::value_t HTntrospectionCreator::do_new_instance( HRuntime* runtime_ ) {
 		{ "symbol",          runtime_->create_method( &HIntrospection::symbol ),          "( *name* ) - get global symbol by *name*." },
 		{ "attribute",       runtime_->create_method( &HIntrospection::attribute ),       "( *object*, *name* ) - get *object*'s attribute (a field or method) by *name*." },
 		{ "list_attributes", runtime_->create_method( &HIntrospection::list_attributes ), "( *object* ) - list attributes of given *object*." },
-		{ "import",          runtime_->create_method( &HIntrospection::import ),          "( *package* ) - import given *package*." }
+		{ "import",          runtime_->create_method( &HIntrospection::import ),          "( *package* ) - import given *package*." },
+		{ "call_stack",      runtime_->create_method( &HIntrospection::call_stack ),      "get current call stack." }
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );
