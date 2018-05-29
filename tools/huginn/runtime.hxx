@@ -253,6 +253,7 @@ public:
 	huginn::HThread::frame_t const& incremental_frame( void ) const;
 	HHuginn::paths_t const& module_paths( void ) const;
 	HHuginn::compiler_setup_t compiler_setup( void ) const;
+	int file_id( void );
 	call_stack_t get_call_stack( HThread* );
 	using HIntrospecteeInterface::get_call_stack;
 	variable_views_t get_locals( HThread*, int );

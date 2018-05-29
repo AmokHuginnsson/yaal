@@ -241,6 +241,13 @@ huginn::HThread* HRuntime::current_thread( void ) {
 	M_EPILOG
 }
 
+int HRuntime::file_id( void ) {
+	M_PROLOG
+	huginn::HThread* t( current_thread() );
+	return ( t ? t->current_frame()->file_id() : _huginn->file_id() );
+	M_EPILOG
+}
+
 HHuginn::value_t HRuntime::result( void ) const {
 	return ( _result );
 }

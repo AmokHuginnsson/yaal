@@ -86,7 +86,11 @@ HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, yaal::hcor
 	}
 	visited_imports_t::insert_result ir( _visitedImports.insert( name_ ) );
 	if ( ! ir.second ) {
-		throw HHuginn::HHuginnRuntimeException( "Package `"_ys.append( name_ ).append( "' is already being imported." ), MAIN_FILE_ID, position_ );
+		throw HHuginn::HHuginnRuntimeException(
+			"Package `"_ys.append( name_ ).append( "' is already being imported." ),
+			runtime_->file_id(),
+			position_
+		);
 	}
 	HScopeExitCall::call_t bc( call( &remove_visited, &_visitedImports, &ir.first ) );
 	HScopeExitCall sec( yaal::move( bc ) );
@@ -99,7 +103,11 @@ HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, yaal::hcor
 		package = load_module( runtime_, paths, name_, position_ );
 	}
 	if ( ! package ) {
-		throw HHuginn::HHuginnRuntimeException( "Package `"_ys.append( name_ ).append( "' does not exist." ), MAIN_FILE_ID, position_ );
+		throw HHuginn::HHuginnRuntimeException(
+			"Package `"_ys.append( name_ ).append( "' does not exist." ),
+			runtime_->file_id(),
+			position_
+		);
 	}
 	return ( package );
 	M_EPILOG
@@ -146,7 +154,7 @@ HHuginn::value_t HPackageFactory::load_binary( HRuntime* runtime_, HHuginn::path
 			package = instantiator->new_instance( runtime_ );
 			_binaries.emplace_back( plugin );
 		} catch ( HPluginException const& e ) {
-			throw HHuginn::HHuginnRuntimeException( e.what(), MAIN_FILE_ID, position_ );
+			throw HHuginn::HHuginnRuntimeException( e.what(), runtime_->file_id(), position_ );
 		}
 	}
 	return ( package );
@@ -190,6 +198,7 @@ HHuginn::value_t HPackageFactory::compile_module( HRuntime* runtime_, HHuginn::p
 	HHuginn& h( *runtime_->huginn() );
 	int fileId( h._compiler->_fileId == MAIN_FILE_ID ? static_cast<int>( h._sources.get_size() - 1 ) : h._compiler->_fileId );
 	loader._compiler->_fileId = fileId;
+	loader._sources.insert( loader._sources.begin(), h._sources.begin(), h._sources.end() );
 	if ( ! ( loader.parse() && loader.compile( paths_, runtime_->compiler_setup() ) ) ) {
 		runtime_->fix_references();
 		throw HHuginn::HHuginnRuntimeException( loader.error_message(), fileId, position_ );
@@ -199,7 +208,7 @@ HHuginn::value_t HPackageFactory::compile_module( HRuntime* runtime_, HHuginn::p
 	HHuginn::class_t c( rt.make_package( name_, *runtime_ ) );
 	runtime_->copy_text( rt );
 	h.register_class( c );
-	h._sources.insert( h._sources.end(), make_move_iterator( loader._sources.begin() ), make_move_iterator( loader._sources.end() ) );
+	h._sources = yaal::move( loader._sources );
 	huginn::HThread t( runtime_, hcore::HThread::get_current_thread_id() );
 	return ( runtime_->object_factory()->create_object( c.raw(), c->get_defaults( &t, position_ ) ) );
 	M_EPILOG

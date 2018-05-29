@@ -267,7 +267,7 @@ HHuginn::HHuginn( void )
 	, _logStream()
 	, _logStreamRaw( &hcore::log ) {
 	M_PROLOG
-	_sources.emplace_back( make_resource<HSource>() );
+	_sources.emplace_back( make_pointer<HSource>() );
 	_grammarVerified.store( true );
 	_runtime->register_builtins();
 	return;
@@ -292,7 +292,7 @@ HHuginn::HHuginn( huginn::HRuntime* runtime_ )
 	, _logStream()
 	, _logStreamRaw( &hcore::log ) {
 	M_PROLOG
-	_sources.emplace_back( make_resource<HSource>() );
+	_sources.emplace_back( make_pointer<HSource>() );
 	_grammarVerified.store( true );
 	_runtime->register_builtins();
 	return;
@@ -305,8 +305,8 @@ void HHuginn::reset( int undoSteps_ ) {
 	_errorFileId = INVALID_FILE_ID;
 	_errorMessage.clear();
 	_compiler->reset( undoSteps_ );
-	_compiler->_fileId = INVALID_FILE_ID;
-	_sources[0] = make_resource<HSource>();
+	_sources.clear();
+	_sources.emplace_back( make_pointer<HSource>() );
 	_runtime->reset();
 	_state = STATE::EMPTY;
 	return;
@@ -326,7 +326,7 @@ void HHuginn::set_max_call_stack_size( int maxCallStackSize_ ) {
 void HHuginn::load( yaal::hcore::HStreamInterface& stream_, yaal::hcore::HString const& name_, int skippedLines_ ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::EMPTY );
-	_sources.front()->load( stream_, name_, skippedLines_ );
+	_sources.back()->load( stream_, name_, skippedLines_ );
 	_state = STATE::LOADED;
 	return;
 	M_EPILOG
@@ -335,7 +335,7 @@ void HHuginn::load( yaal::hcore::HStreamInterface& stream_, yaal::hcore::HString
 void HHuginn::load( yaal::hcore::HStreamInterface& stream_, int skippedLines_ ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::EMPTY );
-	_sources.front()->load( stream_, hcore::HString(), skippedLines_ );
+	_sources.back()->load( stream_, hcore::HString(), skippedLines_ );
 	_state = STATE::LOADED;
 	return;
 	M_EPILOG
@@ -344,7 +344,7 @@ void HHuginn::load( yaal::hcore::HStreamInterface& stream_, int skippedLines_ ) 
 void HHuginn::preprocess( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::LOADED, "Program source must be loaded before preprocessing." );
-	_sources.front()->preprocess();
+	_sources.back()->preprocess();
 	_state = STATE::PREPROCESSED;
 	return;
 	M_EPILOG
@@ -353,11 +353,11 @@ void HHuginn::preprocess( void ) {
 bool HHuginn::parse( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::PREPROCESSED, "Preprocessor step is required before parsing." );
-	bool ok( _engine.parse( _sources.front()->begin(), _sources.front()->end() ) );
+	bool ok( _engine.parse( _sources.back()->begin(), _sources.back()->end() ) );
 	if ( ! ok ) {
 		_errorMessage = _engine.error_messages()[0];
 		_errorPosition = _engine.error_position();
-		_errorFileId = MAIN_FILE_ID;
+		_errorFileId = static_cast<int>( _sources.get_size() ) - 1;
 	} else {
 		_state = STATE::PARSED;
 	}
@@ -543,6 +543,12 @@ int HHuginn::error_position( void ) const {
 	M_EPILOG
 }
 
+int HHuginn::file_id( void ) const {
+	M_PROLOG
+	return ( static_cast<int>( _sources.get_size() ) - 1 );
+	M_EPILOG
+}
+
 HHuginn::HErrorCoordinate HHuginn::error_coordinate( void ) const {
 	M_PROLOG
 	return ( _errorFileId >= 0 ? _sources[_errorFileId]->error_coordinate( error_position() ) : HErrorCoordinate( 0, 0 ) );
@@ -580,13 +586,13 @@ char const* HHuginn::error_message( int code_ ) const {
 
 yaal::hcore::HString HHuginn::get_snippet( int from_, int len_ ) const {
 	M_PROLOG
-	return ( _sources.front()->get_snippet( from_, len_ ) );
+	return ( _sources.back()->get_snippet( from_, len_ ) );
 	M_EPILOG
 }
 
 yaal::hcore::HString const& HHuginn::get_comment( int pos_ ) const {
 	M_PROLOG
-	return ( _sources.front()->get_comment( pos_ ) );
+	return ( _sources.back()->get_comment( pos_ ) );
 	M_EPILOG
 }
 
@@ -702,7 +708,7 @@ HHuginn::value_t HHuginn::result( void ) const {
 
 void HHuginn::dump_preprocessed_source( yaal::hcore::HStreamInterface& stream_ ) const {
 	M_PROLOG
-	_sources.front()->dump_preprocessed( stream_ );
+	_sources.back()->dump_preprocessed( stream_ );
 	return;
 	M_EPILOG
 }

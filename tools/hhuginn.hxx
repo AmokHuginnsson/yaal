@@ -165,7 +165,7 @@ public:
 		static M_YAAL_TOOLS_PUBLIC_API compiler_setup_t const BE_SLOPPY;
 	};
 	class HHuginnRuntimeException;
-	typedef yaal::hcore::HResource<huginn::HSource> source_t;
+	typedef yaal::hcore::HPointer<huginn::HSource> source_t;
 	typedef yaal::hcore::HArray<source_t> sources_t;
 	typedef yaal::hcore::HResource<huginn::OCompiler> compiler_t;
 	typedef yaal::hcore::HResource<huginn::HRuntime> runtime_t;
@@ -302,6 +302,7 @@ public:
 	void set_max_call_stack_size( int );
 	void dump_preprocessed_source( yaal::hcore::HStreamInterface& ) const;
 	int error_position( void ) const;
+	int file_id( void ) const;
 	HErrorCoordinate error_coordinate( void ) const;
 	HErrorCoordinate get_coordinate( int, int ) const;
 	yaal::hcore::HString source_name( int ) const;

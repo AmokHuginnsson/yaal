@@ -141,6 +141,8 @@ public:
 		HHuginn::value_t v( r.none_value() );
 		try {
 			v = HPackageFactory::get_instance().create_package( &r, package, position_ );
+		} catch ( HHuginn::HHuginnRuntimeException const& e ) {
+			thread_->raise( static_cast<HIntrospection*>( object_->raw() )->_exceptionClass.raw(), e.message(), position_ );
 		} catch ( HException const& e ) {
 			thread_->raise( static_cast<HIntrospection*>( object_->raw() )->_exceptionClass.raw(), e.what(), position_ );
 		}
