@@ -38,6 +38,7 @@ class HFileSystem : public HHuginn::HValue {
 	HHuginn::class_t _timeClass;
 	HHuginn::class_t _fileStatClass;
 	enumeration::HEnumerationClass::ptr_t _openModeClass;
+	enumeration::HEnumerationClass::ptr_t _fileTypeClass;
 	HHuginn::class_t _exceptionClass;
 public:
 	HFileSystem( HHuginn::HClass* class_ )
@@ -60,6 +61,27 @@ public:
 					HHuginn::VISIBILITY::PACKAGE
 				),
 				"set of possible modes used for opening the files."
+			)
+		)
+		, _fileTypeClass(
+			add_enumeration_as_member(
+				class_,
+				enumeration::create_class(
+					class_->runtime(),
+					"FILE_TYPE",
+					enumeration::descriptions_t{
+						{ "REGULAR",          "A regular file.", static_cast<int>( FILE_TYPE::REGULAR ) },
+						{ "DIRECTORY",        "A directory.", static_cast<int>( FILE_TYPE::DIRECTORY ) },
+						{ "SYMBOLIC_LINK",    "A symbolic link", static_cast<int>( FILE_TYPE::SYMBOLIC_LINK ) },
+						{ "SOCKET",           "A UNIX socket file.", static_cast<int>( FILE_TYPE::SOCKET ) },
+						{ "FIFO",             "A FIFO.", static_cast<int>( FILE_TYPE::FIFO ) },
+						{ "CHARACTER_DEVICE", "A character device.", static_cast<int>( FILE_TYPE::CHARACTER_DEVICE ) },
+						{ "BLOCK_DEVICE",     "A block device.", static_cast<int>( FILE_TYPE::BLOCK_DEVICE ) }
+					},
+					"The `FILE_TYPE` is set of possible file types.",
+					HHuginn::VISIBILITY::PACKAGE
+				),
+				"set of all possible file types."
 			)
 		)
 		, _exceptionClass( class_exception( class_ ) ) {
@@ -147,7 +169,7 @@ public:
 		verify_signature( "FileSystem.stat", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
-		return ( thread_->object_factory().create<HFileStat>( fsc->_fileStatClass.raw(), fsc->_exceptionClass.raw(), fsc->_timeClass.raw(), get_string( values_[0] ) ) );
+		return ( thread_->object_factory().create<HFileStat>( fsc->_fileStatClass.raw(), fsc->_fileTypeClass.raw(), fsc->_exceptionClass.raw(), fsc->_timeClass.raw(), get_string( values_[0] ) ) );
 		M_EPILOG
 	}
 private:

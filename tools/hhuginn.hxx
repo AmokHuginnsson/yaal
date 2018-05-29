@@ -497,6 +497,9 @@ public:
 	field_identifiers_t const& field_identifiers( void ) const {
 		return ( _fieldIdentifiers );
 	}
+	values_t const& field_definitions( void ) const {
+		return ( _fieldDefinitions );
+	}
 	int field_index( identifier_id_t, MEMBER_TYPE = MEMBER_TYPE::INSTANCE ) const;
 	value_t const& field( int index_ ) const {
 		return ( _fieldDefinitions[index_] );

@@ -8,6 +8,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "helper.hxx"
 #include "thread.hxx"
 #include "time.hxx"
+#include "enumeration.hxx"
 #include "objectfactory.hxx"
 #include "value_builtin.hxx"
 
@@ -22,8 +23,9 @@ namespace tools {
 
 namespace huginn {
 
-HFileStat::HFileStat( HHuginn::HClass const* class_, HHuginn::HClass const* exceptionClass_, HHuginn::HClass const* timeClass_, filesystem::path_t const& path_ )
+HFileStat::HFileStat( HHuginn::HClass const* class_, HHuginn::HClass const* fileTypeClass_, HHuginn::HClass const* exceptionClass_, HHuginn::HClass const* timeClass_, filesystem::path_t const& path_ )
 	: HValue( class_ )
+	, _fileTypeClass( fileTypeClass_ )
 	, _exceptionClass( exceptionClass_ )
 	, _timeClass( timeClass_ )
 	, _path( path_ ) {
@@ -97,7 +99,8 @@ HHuginn::value_t HFileStat::type( huginn::HThread* thread_, HHuginn::value_t* ob
 	HFileStat* o( static_cast<HFileStat*>( object_->raw() ) );
 	HHuginn::value_t v( thread_->runtime().none_value() );
 	try {
-		v = thread_->object_factory().create_string( filesystem::file_type_name( filesystem::file_type( o->_path ) ) );
+		FILE_TYPE ft( filesystem::file_type( o->_path ) );
+		v = static_cast<enumeration::HEnumerationClass const*>( o->_fileTypeClass )->enumeral( static_cast<int>( ft ) );
 	} catch ( HFileSystemException const& e ) {
 		thread_->raise( o->_exceptionClass, e.what(), position_ );
 	}

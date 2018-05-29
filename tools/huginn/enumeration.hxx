@@ -65,6 +65,7 @@ public:
 	HHuginn::HClass const* enumeral_class( void ) const {
 		return ( _valueClass.raw() );
 	}
+	HHuginn::value_t enumeral( HHuginn::HEnumeral::value_type ) const;
 private:
 	virtual HHuginn::value_t do_create_instance( huginn::HThread* thread_, HHuginn::values_t&, int position_ ) const __attribute__((noreturn));
 };

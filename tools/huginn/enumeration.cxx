@@ -74,6 +74,7 @@ HEnumerationClass::HEnumerationClass(
 		HHuginn::ACCESS::PRIVATE
 	)
 	, _valueClass() {
+	M_PROLOG
 	HString valueName( name() );
 	HObjectFactory& of( *runtime_->object_factory() );
 	valueName.append( name().find_one_of( character_class( CHARACTER_CLASS::LOWER_CASE_LETTER ).data() ) != HString::npos ? "Enumeral" : "_ENUMERAL" );
@@ -115,6 +116,20 @@ HEnumerationClass::HEnumerationClass(
 	}
 	redefine( base_, fd );
 	return;
+	M_EPILOG
+}
+
+HHuginn::value_t HEnumerationClass::enumeral( HHuginn::HEnumeral::value_type id_ ) const {
+	M_PROLOG
+	HHuginn::value_t v;
+	for ( HHuginn::value_t const& e : field_definitions() ) {
+		if ( static_cast<HHuginn::HEnumeral const*>( e.raw() )->value() == id_ ) {
+			v = e;
+			break;
+		}
+	}
+	return ( v );
+	M_EPILOG
 }
 
 HHuginn::value_t HEnumerationClass::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
