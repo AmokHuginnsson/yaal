@@ -266,6 +266,7 @@ OCompiler::OCompiler( HRuntime* runtime_ )
 	, _statementIdGenerator( INVALID_STATEMENT_IDENTIFIER )
 	, _scopeContextCache()
 	, _isModule( false )
+	, _preloaded( false )
 	, _fileId( INVALID_FILE_ID )
 	, _isIncremental( false )
 	, _mainExecutedStatementCount( 0 )
@@ -277,6 +278,7 @@ OCompiler::OCompiler( HRuntime* runtime_ )
 void OCompiler::reset( int undoSteps_ ) {
 	M_PROLOG
 	_fileId = INVALID_FILE_ID;
+	_preloaded = false;
 	_isModule = false;
 	_mainCompiledStatementCount -= undoSteps_;
 	_mainExecutedStatementCount = _mainCompiledStatementCount;
@@ -300,8 +302,9 @@ void OCompiler::reset( int undoSteps_ ) {
 	M_EPILOG
 }
 
-void OCompiler::set_setup( HIntrospectorInterface* introspector_ ) {
+void OCompiler::set_setup( HIntrospectorInterface* introspector_, bool preloaded_ ) {
 	_introspector = introspector_;
+	_preloaded = preloaded_;
 	++ _fileId;
 	return;
 }
@@ -730,7 +733,7 @@ void OCompiler::check_name_import( HHuginn::identifier_id_t identifier_, executi
 void OCompiler::check_name_class( HHuginn::identifier_id_t identifier_, bool testRuntime_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	HHuginn::class_t c( testRuntime_ ? _runtime->get_class( identifier_ ) : HHuginn::class_t() );
-	if ( ( _submittedClasses.count( identifier_ ) > 0 ) || ( !! c && ! _isIncremental ) ) {
+	if ( ( _submittedClasses.count( identifier_ ) > 0 ) || ( !! c && ! ( _isIncremental || _preloaded ) ) ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Class of the same name `"_ys
 				.append( _runtime->identifier_name( identifier_ ) )

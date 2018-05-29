@@ -410,6 +410,9 @@ struct OCompiler {
 	/*! \brief Tells if this compiler instance is used for sub-module.
 	 */
 	bool _isModule;
+	/*! \brief Tells if currently loaded module was already loaded by different import path.
+	 */
+	bool _preloaded;
 	/*! \brief Number of currently compiled source file, used for sub-modules.
 	 */
 	int _fileId;
@@ -429,7 +432,7 @@ struct OCompiler {
 	void reset( int );
 	OFunctionContext& f( void );
 	OFunctionContext const& f( void ) const;
-	void set_setup( HIntrospectorInterface* );
+	void set_setup( HIntrospectorInterface*, bool );
 	void detect_misuse( void ) const;
 	void resolve_symbols( void );
 	void set_function_name( yaal::hcore::HString const&, executing_parser::position_t );

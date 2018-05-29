@@ -378,8 +378,8 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 		}
 		if ( ! cls ) {
 			cls = _runtime->create_class( identifierId_, cc->_doc ? *cc->_doc : "", ACCESS::PUBLIC, HClass::TYPE::USER );
-			_runtime->register_class( cls, VISIBILITY::GLOBAL );
 		}
+		_runtime->register_class( cls, VISIBILITY::GLOBAL );
 		field_definitions_t fieldDefinitions;
 		huginn::HThread t( _runtime.raw(), hcore::HThread::get_current_thread_id() );
 		t.create_function_frame( nullptr, nullptr, 0 );
@@ -479,7 +479,16 @@ bool HHuginn::compile( paths_t const& paths_, compiler_setup_t compilerSetup_, H
 	bool ok( false );
 	int mainStatementCount( _compiler->_mainCompiledStatementCount );
 	try {
-		_compiler->set_setup( introspector_ );
+		_compiler->set_setup(
+			introspector_,
+			count_if(
+				_sources.begin(),
+				_sources.end(),
+				[this]( source_t const& src_ ) {
+					return ( src_->name() == _sources.back()->name() );
+				}
+			) > 1
+		);
 		_runtime->set_setup( paths_, compilerSetup_ );
 		_engine.execute( &( _compiler->_classNoter ) );
 		_compiler->_classNoter._passThrough = true;
