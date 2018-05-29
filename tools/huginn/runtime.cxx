@@ -517,7 +517,7 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 	}
 	for ( global_definitions_t::value_type const& gd : _globalDefinitions ) {
 		bool isEnum( is_enum_class( gd.second ) );
-		if ( ( gd.first < STANDARD_FUNCTIONS::MAIN_IDENTIFIER ) || ( ! isEnum && ( _classes.count( gd.first ) > 0 ) ) ) {
+		if ( ( gd.first < STANDARD_FUNCTIONS::MAIN_IDENTIFIER ) || ( ! isEnum && ( _classes.count( gd.first ) > 0 ) ) || is_restricted( identifier_name( gd.first ) ) ) {
 			continue;
 		}
 		if ( (*gd.second)->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) {
