@@ -194,7 +194,7 @@ HHuginn::HObjectReference::HObjectReference( HHuginn::HClass const* class_, valu
 	M_EPILOG
 }
 
-int HHuginn::HObjectReference::field_index( identifier_id_t identifierId_ ) const {
+int HHuginn::HObjectReference::field_index( identifier_id_t const& identifierId_ ) const {
 	M_PROLOG
 	HValue const* v( _value.raw() );
 	return ( _referenceClass != v->get_class() ? _referenceClass->field_index( identifierId_ ) : v->field_index( identifierId_ ) );
@@ -745,13 +745,13 @@ HHuginn::HValue::HValue( HClass const* class_ )
 	return;
 }
 
-int HHuginn::HValue::field_index( identifier_id_t identifierId_ ) const {
+int HHuginn::HValue::field_index( identifier_id_t const& identifierId_ ) const {
 	M_PROLOG
 	return ( _class->field_index( identifierId_ ) );
 	M_EPILOG
 }
 
-bool HHuginn::HValue::is_kind_of( HHuginn::identifier_id_t typeName_ ) const {
+bool HHuginn::HValue::is_kind_of( HHuginn::identifier_id_t const& typeName_ ) const {
 	M_PROLOG
 	return ( _class->is_kind_of( typeName_ ) );
 	M_EPILOG

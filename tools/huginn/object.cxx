@@ -155,7 +155,7 @@ HHuginn::value_t HHuginn::HObject::do_field( HHuginn::value_t const& object_, in
 HHuginn::value_t HHuginn::HObject::get_method(
 	huginn::HThread* thread_,
 	HHuginn::value_t const& object_,
-	HHuginn::identifier_id_t methodIdentifier_,
+	HHuginn::identifier_id_t const& methodIdentifier_,
 	int position_
 ) const {
 	M_PROLOG
@@ -171,7 +171,7 @@ HHuginn::value_t HHuginn::HObject::get_method(
 
 HHuginn::function_t const& HHuginn::HObject::get_method(
 	huginn::HThread* thread_,
-	HHuginn::identifier_id_t methodIdentifier_,
+	HHuginn::identifier_id_t const& methodIdentifier_,
 	int position_
 ) const {
 	M_PROLOG
@@ -206,7 +206,7 @@ HHuginn::function_t const& HHuginn::HObject::get_method(
 HHuginn::value_t HHuginn::HObject::call_method(
 	huginn::HThread* thread_,
 	HHuginn::value_t const& object_,
-	HHuginn::identifier_id_t methodIdentifier_,
+	HHuginn::identifier_id_t const& methodIdentifier_,
 	HHuginn::values_t& arguments_,
 	int position_
 ) const {

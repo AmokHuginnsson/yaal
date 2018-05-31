@@ -485,11 +485,11 @@ public:
 	HClass const* origin( void ) const {
 		return ( _origin );
 	}
-	identifier_id_t identifier_id( void ) const {
+	identifier_id_t const& identifier_id( void ) const {
 		return ( _identifierId );
 	}
 	yaal::hcore::HString const& name( void ) const;
-	type_id_t type_id( void ) const {
+	type_id_t const& type_id( void ) const {
 		return ( _typeId );
 	}
 	TYPE type( void ) const {
@@ -501,7 +501,7 @@ public:
 	values_t const& field_definitions( void ) const {
 		return ( _fieldDefinitions );
 	}
-	int field_index( identifier_id_t, MEMBER_TYPE = MEMBER_TYPE::INSTANCE ) const;
+	int field_index( identifier_id_t const&, MEMBER_TYPE = MEMBER_TYPE::INSTANCE ) const;
 	value_t const& field( int index_ ) const {
 		return ( _fieldDefinitions[index_] );
 	}
@@ -509,7 +509,7 @@ public:
 	values_t get_defaults( huginn::HThread*, int ) const;
 	value_t get_default( huginn::HThread*, int, int ) const;
 	function_t const& function( int ) const;
-	bool is_kind_of( identifier_id_t ) const;
+	bool is_kind_of( identifier_id_t const& ) const;
 	bool is_complex( void ) const {
 		return ( ! _fieldDefinitions.is_empty() );
 	}
@@ -551,15 +551,15 @@ public:
 	virtual ~HValue( void ) {
 		return;
 	}
-	type_id_t type_id( void ) const {
+	type_id_t const& type_id( void ) const {
 		return ( _class->type_id() );
 	}
 	HClass const* get_class( void ) const {
 		return ( _class );
 	}
 	value_t clone( huginn::HThread*, HHuginn::value_t*, int ) const;
-	int field_index( identifier_id_t ) const;
-	bool is_kind_of( HHuginn::identifier_id_t ) const;
+	int field_index( identifier_id_t const& ) const;
+	bool is_kind_of( identifier_id_t const& ) const;
 	value_t field( HHuginn::value_t const& subject_, int index_ ) const {
 		return ( do_field( subject_, index_ ) );
 	}
@@ -627,15 +627,15 @@ public:
 	HObject( HClass const*, fields_t const& );
 	virtual ~HObject( void );
 	value_t& field_ref( int );
-	HHuginn::value_t call_method( huginn::HThread*, HHuginn::value_t const&, HHuginn::identifier_id_t, HHuginn::values_t&, int ) const;
-	HHuginn::value_t get_method( huginn::HThread*, HHuginn::value_t const&, HHuginn::identifier_id_t, int ) const;
+	HHuginn::value_t call_method( huginn::HThread*, HHuginn::value_t const&, HHuginn::identifier_id_t const&, HHuginn::values_t&, int ) const;
+	HHuginn::value_t get_method( huginn::HThread*, HHuginn::value_t const&, HHuginn::identifier_id_t const&, int ) const;
 	static HHuginn::value_t init_base( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t forward_call( HHuginn::function_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 private:
 	HObject( HObject const& ) = delete;
 	HObject& operator = ( HObject const& ) = delete;
 private:
-	HHuginn::function_t const& get_method( huginn::HThread*, HHuginn::identifier_id_t, int ) const;
+	HHuginn::function_t const& get_method( huginn::HThread*, HHuginn::identifier_id_t const&, int ) const;
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 	virtual value_t do_field( HHuginn::value_t const&, int ) const override;
 };
@@ -654,7 +654,7 @@ private:
 public:
 	HObjectReference( HHuginn::HClass const*, value_t const&, int, int, int );
 	HObjectReference( HHuginn::HClass const*, value_t const&, HClass const* );
-	int field_index( identifier_id_t ) const;
+	int field_index( identifier_id_t const& ) const;
 	value_t field( huginn::HThread*, int, int );
 	HHuginn::HClass const* reference_class( void ) const {
 		return ( _referenceClass );
@@ -1195,7 +1195,7 @@ private:
 	yaal::hcore::HString _doc;
 public:
 	HFunctionReference( HHuginn::HClass const*, identifier_id_t, HHuginn::function_t const&, yaal::hcore::HString const& );
-	identifier_id_t identifier_id( void ) const {
+	identifier_id_t const& identifier_id( void ) const {
 		return ( _identifierId );
 	}
 	HHuginn::function_t const& function( void ) const {
@@ -1234,7 +1234,7 @@ private:
 	value_type _value;
 public:
 	HEnumeral( HHuginn::HClass const*, identifier_id_t, value_type );
-	HHuginn::identifier_id_t identifier( void ) const {
+	HHuginn::identifier_id_t const& identifier( void ) const {
 		return ( _identifier );
 	}
 	value_type value( void ) const {
@@ -1249,11 +1249,11 @@ namespace huginn {
 inline HHuginn::type_id_t type_id( HHuginn::TYPE typeTag_ ) {
 	return ( HHuginn::type_id_t( static_cast<HHuginn::type_id_t::value_type>( typeTag_ ) ) );
 }
-inline HHuginn::TYPE type_tag( HHuginn::type_id_t typeId_ ) {
+inline HHuginn::TYPE type_tag( HHuginn::type_id_t const& typeId_ ) {
 	return ( static_cast<HHuginn::TYPE>( typeId_.get() ) );
 }
 yaal::hcore::HString const& type_name( HHuginn::TYPE );
-inline yaal::hcore::HString const& type_name( HHuginn::type_id_t type_ ) {
+inline yaal::hcore::HString const& type_name( HHuginn::type_id_t const& type_ ) {
 	return ( type_name( type_tag( type_ ) ) );
 }
 
@@ -1262,16 +1262,16 @@ void cleanup_packages( void );
 
 }
 
-inline bool operator == ( HHuginn::TYPE t1_, HHuginn::type_id_t t2_ ) {
+inline bool operator == ( HHuginn::TYPE t1_, HHuginn::type_id_t const& t2_ ) {
 	return ( static_cast<HHuginn::type_id_t::value_type>( t1_ ) == t2_.get() );
 }
-inline bool operator == ( HHuginn::type_id_t t1_, HHuginn::TYPE t2_ ) {
+inline bool operator == ( HHuginn::type_id_t const& t1_, HHuginn::TYPE t2_ ) {
 	return ( static_cast<HHuginn::type_id_t::value_type>( t2_ ) == t1_.get() );
 }
-inline bool operator != ( HHuginn::TYPE t1_, HHuginn::type_id_t t2_ ) {
+inline bool operator != ( HHuginn::TYPE t1_, HHuginn::type_id_t const& t2_ ) {
 	return ( static_cast<HHuginn::type_id_t::value_type>( t1_ ) != t2_.get() );
 }
-inline bool operator != ( HHuginn::type_id_t t1_, HHuginn::TYPE t2_ ) {
+inline bool operator != ( HHuginn::type_id_t const& t1_, HHuginn::TYPE t2_ ) {
 	return ( static_cast<HHuginn::type_id_t::value_type>( t2_ ) != t1_.get() );
 }
 

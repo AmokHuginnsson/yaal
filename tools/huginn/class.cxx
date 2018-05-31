@@ -201,7 +201,7 @@ void HHuginn::HClass::set_origin( HClass const* origin_ ) {
 	return;
 }
 
-int HHuginn::HClass::field_index( identifier_id_t identifierId_, MEMBER_TYPE memberType_ ) const {
+int HHuginn::HClass::field_index( identifier_id_t const& identifierId_, MEMBER_TYPE memberType_ ) const {
 	M_PROLOG
 	int fieldIndex( -1 );
 	field_indexes_t::const_iterator it( _fieldIndexes.find( identifierId_ ) );
@@ -362,7 +362,7 @@ HHuginn::value_t HHuginn::HClass::get_default( huginn::HThread* thread_, int ind
 	M_EPILOG
 }
 
-bool HHuginn::HClass::is_kind_of( identifier_id_t identifierId_ ) const {
+bool HHuginn::HClass::is_kind_of( identifier_id_t const& identifierId_ ) const {
 	M_PROLOG
 	return ( ( identifierId_ == _identifierId ) || ( _super ? _super->is_kind_of( identifierId_ ) : false ) );
 	M_EPILOG

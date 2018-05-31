@@ -36,8 +36,10 @@ public:
 	explicit constexpr HTaggedPOD( pod_t const& pod_ )
 		: _value( pod_ ) {
 	}
-	HTaggedPOD( HTaggedPOD const& ) = default;
-	HTaggedPOD( HTaggedPOD&& ) noexcept = default;
+	constexpr HTaggedPOD( HTaggedPOD const& ) = default;
+	constexpr HTaggedPOD( HTaggedPOD&& other_ ) noexcept
+		: _value( yaal::move( other_._value ) ) {
+	}
 	HTaggedPOD& operator = ( HTaggedPOD const& ) = default;
 	HTaggedPOD& operator = ( HTaggedPOD&& ) noexcept = default;
 	void swap( HTaggedPOD& tp_ ) {
