@@ -563,8 +563,12 @@ public:
 	value_t field( HHuginn::value_t const& subject_, int index_ ) const {
 		return ( do_field( subject_, index_ ) );
 	}
+	value_t const& field( int index_ ) const {
+		return ( do_field( index_ ) );
+	}
 private:
 	virtual value_t do_field( HHuginn::value_t const&, int ) const;
+	virtual value_t const& do_field( int ) const;
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const;
 	HValue( HValue const& ) = delete;
 	HValue& operator = ( HValue const& ) = delete;
@@ -638,6 +642,7 @@ private:
 	HHuginn::function_t const& get_method( huginn::HThread*, HHuginn::identifier_id_t const&, int ) const;
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 	virtual value_t do_field( HHuginn::value_t const&, int ) const override;
+	value_t const& do_field( int ) const override;
 };
 
 /*! \brief Type hierarchy aware object reference.

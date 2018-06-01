@@ -69,6 +69,7 @@ public:
 	HExpression( int = MAIN_FILE_ID, int = 0 );
 	int execution_step_count( void ) const;
 	int add_execution_step( OExecutionStep const& );
+	OExecutionStep& execution_step( int );
 	void replace_execution_step( int, OExecutionStep const& );
 	void pop_execution_step( void );
 	void merge( HExpression& );

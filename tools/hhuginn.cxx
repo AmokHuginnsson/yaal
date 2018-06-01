@@ -771,6 +771,12 @@ HHuginn::value_t HHuginn::HValue::do_field( HHuginn::value_t const& object_, int
 	M_EPILOG
 }
 
+HHuginn::value_t const& HHuginn::HValue::do_field( int index_ ) const {
+	M_PROLOG
+	return ( _class->field( index_ ) );
+	M_EPILOG
+}
+
 HHuginn::value_t HHuginn::HValue::clone( huginn::HThread* thread_, HHuginn::value_t* object_, int position_ ) const {
 	return ( do_clone( thread_, object_, position_ ) );
 }

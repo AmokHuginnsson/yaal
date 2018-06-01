@@ -265,6 +265,12 @@ void HExpression::pop_execution_step( void ) {
 	M_EPILOG
 }
 
+HExpression::OExecutionStep& HExpression::execution_step( int idx_ ) {
+	M_PROLOG
+	return ( _executionSteps[idx_] );
+	M_EPILOG
+}
+
 void HExpression::merge( HExpression& expression_ ) {
 	M_PROLOG
 	for ( OExecutionStep& es : expression_._executionSteps ) {
@@ -479,7 +485,13 @@ void HExpression::get_field( OExecutionStep const& executionStep_,huginn::HFrame
 				p
 			);
 		}
-		if ( executionStep_._access == HFrame::ACCESS::VALUE ) {
+		if ( executionStep_._access == HFrame::ACCESS::BOUND_CALL ) {
+			HHuginn::value_t const& f( v->field( fi ) );
+			if ( f->type_id() == HHuginn::TYPE::METHOD ) {
+				values.push( v );
+			}
+			values.push( f );
+		} else if ( executionStep_._access == HFrame::ACCESS::VALUE ) {
 			values.push( v->field( v, fi ) );
 		} else if ( ! v.unique() ) {
 			HHuginn::HObject* o( dynamic_cast<HHuginn::HObject*>( v.raw() ) );
@@ -723,6 +735,11 @@ void HExpression::function_call( OExecutionStep const& executionStep_, HFrame* f
 	} else if ( t == HHuginn::TYPE::UNBOUND_METHOD ) {
 		HHuginn::HClass::HUnboundMethod* m( static_cast<HHuginn::HClass::HUnboundMethod*>( f.raw() ) );
 		values.push( m->call( thread, args, p ) );
+	} else if ( t == HHuginn::TYPE::METHOD ) {
+		HHuginn::HClass::HMethod* m( static_cast<HHuginn::HClass::HMethod*>( f.raw() ) );
+		HHuginn::value_t v( yaal::move( values.top() ) );
+		values.pop();
+		values.push( m->function()( thread, &v, args, p ) );
 	} else {
 		HHuginn::HObject* o( nullptr );
 		if ( ( o = dynamic_cast<HHuginn::HObject*>( f.raw() ) ) ) {

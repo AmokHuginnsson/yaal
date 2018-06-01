@@ -249,15 +249,6 @@ struct OCompiler {
 		 */
 		bool _isAssert;
 
-		/*! \brief Keeps information of last used member access name in currently compiled expression.
-		 *
-		 * Allows support for assignment to referenced object members:
-		 * \code
-		 * x._field = 0;
-		 * \endcode
-		 */
-		HHuginn::identifier_id_t _lastMemberName;
-
 		/*! \brief Tell if this function context refers to lambda.
 		 */
 		bool _isLambda;

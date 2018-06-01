@@ -124,7 +124,6 @@ OCompiler::OFunctionContext::OFunctionContext(
 	, _nestedCalls( 0 )
 	, _lastDereferenceOperator( OPERATOR::NONE )
 	, _isAssert( false )
-	, _lastMemberName()
 	, _isLambda( isLambda_ )
 	, _isVariadic( false )
 	, _capturesNamedParameters( false )
@@ -1518,8 +1517,13 @@ void OCompiler::commit_catch_control_variable( executing_parser::position_t posi
 
 void OCompiler::start_function_call( executing_parser::position_t position_ ) {
 	M_PROLOG
-	defer_oper_direct( OPERATOR::FUNCTION_CALL, position_ );
 	OFunctionContext& fc( f() );
+	if ( fc._lastDereferenceOperator == OPERATOR::MEMBER_ACCESS ) {
+		fc._lastDereferenceOperator = OPERATOR::NONE;
+		HExpression* expr( current_expression().raw() );
+		expr->execution_step( expr->execution_step_count() - 1 )._access = HFrame::ACCESS::BOUND_CALL;
+	}
+	defer_oper_direct( OPERATOR::FUNCTION_CALL, position_ );
 	if ( fc._isAssert ) {
 		++ fc._nestedCalls;
 	}
@@ -2457,10 +2461,7 @@ void OCompiler::make_reference( executing_parser::position_t position_ ) {
 			HExpression::OExecutionStep( expr, &HExpression::subscript, position_.get(), HFrame::ACCESS::REFERENCE )
 		);
 	} else {
-		expr->pop_execution_step();
-		expr->add_execution_step(
-			HExpression::OExecutionStep( expr, &HExpression::get_field, position_.get(), HFrame::ACCESS::REFERENCE, fc._lastMemberName )
-		);
+		expr->execution_step( expr->execution_step_count() - 1 )._access = HFrame::ACCESS::REFERENCE;
 	}
 	fc._variables.emplace( INVALID_IDENTIFIER, -1 );
 	return;
@@ -2551,7 +2552,6 @@ void OCompiler::defer_get_field_reference( yaal::hcore::HString const& value_, e
 		HExpression::OExecutionStep( expr, &HExpression::get_field, position_.get(), HFrame::ACCESS::VALUE, refIdentifier )
 	);
 	expr->commit_oper( OPERATOR::MEMBER_ACCESS );
-	fc._lastMemberName = refIdentifier;
 	fc._valueTypes.pop();
 	fc._valueTypes.push( type_to_class( HHuginn::TYPE::REFERENCE ) );
 	return;

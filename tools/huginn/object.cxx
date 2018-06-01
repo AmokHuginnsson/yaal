@@ -130,6 +130,12 @@ HHuginn::value_t HHuginn::HObject::forward_call( HHuginn::function_t func_, hugi
 	M_EPILOG
 }
 
+HHuginn::value_t const& HHuginn::HObject::do_field( int index_ ) const {
+	M_PROLOG
+	return ( _fields[index_] );
+	M_EPILOG
+}
+
 HHuginn::value_t& HHuginn::HObject::field_ref( int index_ ) {
 	M_PROLOG
 	return ( _fields[index_] );

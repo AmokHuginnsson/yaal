@@ -42,7 +42,8 @@ public:
 	};
 	enum class ACCESS {
 		VALUE,
-		REFERENCE
+		REFERENCE,
+		BOUND_CALL
 	};
 private:
 	/*!
