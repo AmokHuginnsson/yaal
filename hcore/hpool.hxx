@@ -23,18 +23,10 @@ public:
 	typedef int long long aligner_t;
 	static int const OBJECTS_PER_BLOCK = 256;
 	static int const OBJECT_SIZE = size;
-#if TARGET_CPU_BITS == 64
 	static int const OBJECT_SPACE = meta::ternary<(OBJECT_SIZE < 2), 2,
 	                                meta::ternary<(OBJECT_SIZE < 4), 4,
 	                                meta::ternary<(OBJECT_SIZE < 8), 8,
 	                                (OBJECT_SIZE + 8) & ~7u>::value>::value>::value;
-#elif TARGET_CPU_BITS == 32 /* #if TARGET_CPU_BITS == 64 */
-	static int const OBJECT_SPACE = meta::ternary<(OBJECT_SIZE < 2), 2,
-	                                meta::ternary<(OBJECT_SIZE < 4), 4,
-	                                (OBJECT_SIZE + 4) & ~3u>::value>::value;
-#else /* #elif TARGET_CPU_BITS == 32 #if TARGET_CPU_BITS == 64 */
-#error Unsupported CPU bitness.
-#endif /* #else #elif TARGET_CPU_BITS == 32 #if TARGET_CPU_BITS == 64 */
 	static int const ALIGNER_ELEMENTS_PER_BLOCK = OBJECT_SPACE * ( OBJECTS_PER_BLOCK / static_cast<int>( sizeof ( aligner_t ) ) );
 private:
 	class HPoolBlock final {
