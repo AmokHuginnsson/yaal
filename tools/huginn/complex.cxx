@@ -83,11 +83,7 @@ HHuginn::value_t HComplex::add( huginn::HThread* thread_, HHuginn::value_t* obje
 	verify_arg_type( name, values_, 0, (*object_)->get_class(), ARITY::UNARY, thread_, position_ );
 	HComplex* o( static_cast<HComplex*>( object_->raw() ) );
 	HComplex const* arg( static_cast<HComplex const*>( values_[0].raw() ) );
-	try {
-		o->_data += arg->_data;
-	} catch ( HException const& e ) {
-		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
-	}
+	o->_data += arg->_data;
 	return ( *object_ );
 	M_EPILOG
 }
@@ -99,11 +95,7 @@ HHuginn::value_t HComplex::subtract( huginn::HThread* thread_, HHuginn::value_t*
 	verify_arg_type( name, values_, 0, (*object_)->get_class(), ARITY::UNARY, thread_, position_ );
 	HComplex* o( static_cast<HComplex*>( object_->raw() ) );
 	HComplex const* arg( static_cast<HComplex const*>( values_[0].raw() ) );
-	try {
-		o->_data -= arg->_data;
-	} catch ( HException const& e ) {
-		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
-	}
+	o->_data -= arg->_data;
 	return ( *object_ );
 	M_EPILOG
 }
@@ -115,11 +107,7 @@ HHuginn::value_t HComplex::multiply( huginn::HThread* thread_, HHuginn::value_t*
 	verify_arg_type( name, values_, 0, (*object_)->get_class(), ARITY::UNARY, thread_, position_ );
 	HComplex* o( static_cast<HComplex*>( object_->raw() ) );
 	HComplex const* arg( static_cast<HComplex const*>( values_[0].raw() ) );
-	try {
-		o->_data *= arg->_data;
-	} catch ( HException const& e ) {
-		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
-	}
+	o->_data *= arg->_data;
 	return ( *object_ );
 	M_EPILOG
 }
@@ -134,7 +122,8 @@ HHuginn::value_t HComplex::divide( huginn::HThread* thread_, HHuginn::value_t* o
 	try {
 		o->_data /= arg->_data;
 	} catch ( HException const& e ) {
-		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+		thread_->raise( thread_->object_factory().arithmetic_exception_class(), e.what(), position_ );
+		object_ = &thread_->runtime().none_value();
 	}
 	return ( *object_ );
 	M_EPILOG
@@ -145,11 +134,7 @@ HHuginn::value_t HComplex::modulus( huginn::HThread* thread_, HHuginn::value_t* 
 	verify_arg_count( "Complex.modulus", values_, 0, 0, thread_, position_ );
 	HComplex* o( static_cast<HComplex*>( object_->raw() ) );
 	data_t::value_type mod( 0.L );
-	try {
-		mod = o->_data.modulus();
-	} catch ( HException const& e ) {
-		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
-	}
+	mod = o->_data.modulus();
 	return ( thread_->object_factory().create_real( mod ) );
 	M_EPILOG
 }
@@ -170,7 +155,7 @@ HHuginn::value_t HComplex::argument( huginn::HThread* thread_, HHuginn::value_t*
 	try {
 		arg = o->_data.argument();
 	} catch ( HException const& e ) {
-		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+		thread_->raise( thread_->object_factory().arithmetic_exception_class(), e.what(), position_ );
 	}
 	return ( thread_->object_factory().create_real( arg ) );
 	M_EPILOG

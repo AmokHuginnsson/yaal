@@ -252,7 +252,7 @@ void fallback_arithmetic( HThread* thread_, HHuginn::identifier_id_t methodIdent
 		if ( idx >= 0 ) {
 			HHuginn::HClass::HMethod const& m( *static_cast<HHuginn::HClass::HMethod const*>( c->field( idx ).raw() ) );
 			v = m.function()( thread_, &v1_, HArguments( thread_, v2_ ), position_ );
-			M_ASSERT( v->type_id() == t );
+			M_ASSERT( ( v->type_id() == t ) || ! thread_->can_continue() );
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
 				"There is no `"_ys.append( oper_ ).append( "' operator for " ).append( a_type_name( t ) ).append( "." ),
@@ -290,7 +290,7 @@ HHuginn::value_t fallback_unary_arithmetic( HThread* thread_, HHuginn::identifie
 		if ( idx >= 0 ) {
 			HHuginn::HClass::HMethod const& m( *static_cast<HHuginn::HClass::HMethod const*>( c->field( idx ).raw() ) );
 			v = m.function()( thread_, &obj, HArguments( thread_ ), position_ );
-			M_ASSERT( ( operation_ == OPERATION::OPEN ) || ( v->type_id() == t ) );
+			M_ASSERT( ( operation_ == OPERATION::OPEN ) || ( v->type_id() == t ) || ! thread_->can_continue() );
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
 				"There is no `"_ys.append( oper_ ).append( "' operator for " ).append( a_type_name( v_->get_class() ) ).append( "." ),
@@ -608,7 +608,7 @@ bool fallback_compare( HThread* thread_, HHuginn::identifier_id_t methodIdentifi
 		if ( idx >= 0 ) {
 			HHuginn::HClass::HMethod const& m( *static_cast<HHuginn::HClass::HMethod const*>( c->field( idx ).raw() ) );
 			v = m.function()( thread_, const_cast<HHuginn::value_t*>( &v1_ ), HArguments( thread_, v2_ ), position_ );
-			M_ASSERT( v->type_id() == HHuginn::TYPE::BOOLEAN );
+			M_ASSERT( ( v->type_id() == HHuginn::TYPE::BOOLEAN ) || ! thread_->can_continue() );
 		} else {
 			throw HHuginn::HHuginnRuntimeException( "There is no `"_ys.append( oper_ ).append( "' operator for `" ).append( v1_->get_class()->name() ).append( "'." ), thread_->current_frame()->file_id(), position_ );
 		}
@@ -778,7 +778,7 @@ HHuginn::value_t fallback_conversion( HHuginn::type_id_t type_, HThread* thread_
 		if ( idx >= 0 ) {
 			HHuginn::HClass::HMethod const& m( *static_cast<HHuginn::HClass::HMethod const*>( c->field( idx ).raw() ) );
 			res = m.function()( thread_, const_cast<HHuginn::value_t*>( &v_ ), HArguments( thread_ ), position_ );
-			M_ASSERT( res->type_id() == type_ );
+			M_ASSERT( ( res->type_id() == type_ ) || ! thread_->can_continue() );
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
 				"Conversion from `"_ys

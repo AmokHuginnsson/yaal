@@ -96,9 +96,9 @@ HComplex::value_type HComplex::argument( void ) const {
 	M_PROLOG
 	bool reZero( yaal::abs( _real ) < ( 2.L * std::numeric_limits<value_type>::epsilon() ) );
 	bool imZero( yaal::abs( _imaginary ) < ( 2.L * std::numeric_limits<value_type>::epsilon() ) );
-	if ( reZero && imZero  )
+	if ( reZero && imZero  ) {
 		M_THROW( "Argument for 0 + 0i is undefined.", errno );
-
+	}
 	value_type arg( 0.L );
 	if ( _real > 0.L ) {
 		arg = ::std::atan( _imaginary  / _real );
@@ -119,23 +119,25 @@ HComplex::value_type HComplex::argument( void ) const {
 
 HComplex& HComplex::operator = ( HComplex const& complex_ ) {
 	M_PROLOG
-	if ( &complex_ != this )
+	if ( &complex_ != this ) {
 		set( complex_._real, complex_._imaginary );
+	}
 	return ( *this );
 	M_EPILOG
 }
 
 bool HComplex::operator == ( HComplex const& complex_ ) const {
 	M_PROLOG
-	return ( eq( _real, complex_._real )
-			&& eq( _imaginary, complex_._imaginary ) );
+	return (
+		eq( _real, complex_._real )
+		&& eq( _imaginary, complex_._imaginary )
+	);
 	M_EPILOG
 }
 
 bool HComplex::operator != ( HComplex const& complex_ ) const {
 	M_PROLOG
-	return ( ! ( eq( _real, complex_._real )
-				&& eq( _imaginary, complex_._imaginary ) ) );
+	return ( ! operator == ( complex_ ) );
 	M_EPILOG
 }
 
@@ -175,8 +177,9 @@ HComplex& HComplex::operator *= ( value_type value_ ) {
 HComplex& HComplex::operator /= ( HComplex const& complex_ ) {
 	M_PROLOG
 	value_type denominator( complex_._real * complex_._real + complex_._imaginary * complex_._imaginary );
-	if ( denominator == 0.0L )
+	if ( denominator == 0.0L ) {
 		M_THROW( "denominator equals 0", errno );
+	}
 	value_type real( ( _real * complex_._real + _imaginary * complex_._imaginary ) / denominator );
 	value_type imaginary( ( complex_._real * _imaginary - _real * complex_._imaginary ) / denominator );
 	set( real, imaginary );
@@ -186,8 +189,9 @@ HComplex& HComplex::operator /= ( HComplex const& complex_ ) {
 
 HComplex& HComplex::operator /= ( value_type value_ ) {
 	M_PROLOG
-	if ( value_ == 0.0L )
+	if ( value_ == 0.0L ) {
 		M_THROW( "denominator equals 0", errno );
+	}
 	_real /= value_;
 	_imaginary /= value_;
 	return ( *this );
