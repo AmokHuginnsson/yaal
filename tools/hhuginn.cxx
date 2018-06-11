@@ -161,6 +161,13 @@ void HIntrospectorInterface::introspect( yaal::tools::HIntrospecteeInterface& in
 	M_EPILOG
 }
 
+void HIntrospectorInterface::symbol( symbols_t const& symbol_, HHuginn::SYMBOL_KIND symbolKind_, int fileId_, int position_ ) {
+	M_PROLOG
+	do_symbol( symbol_, symbolKind_, fileId_, position_ );
+	return;
+	M_EPILOG
+}
+
 HHuginn::HObjectReference::HObjectReference( HHuginn::HClass const* class_, value_t const& value_, int upCastLevel_, int fileId_, int position_ )
 	: HValue( class_ )
 	, _value( value_ )
@@ -435,11 +442,11 @@ void HHuginn::register_class( class_t class_, VISIBILITY classConstructorVisibil
 	M_ENSURE( _state != STATE::COMPILED );
 	_runtime->register_class( class_, classConstructorVisibility_ );
 	OCompiler::OIdentifierUse& ciu( _compiler->_usedIdentifiers[class_->identifier_id()] );
-	ciu.write( 0, OCompiler::OIdentifierUse::TYPE::CLASS );
+	ciu.write( 0, SYMBOL_KIND::CLASS );
 	ciu.read( 0 );
 	for ( identifier_id_t id : class_->field_identifiers() ) {
 		OCompiler::OIdentifierUse& iu( _compiler->_usedIdentifiers[id] );
-		iu.write( 0, OCompiler::OIdentifierUse::TYPE::FIELD );
+		iu.write( 0, SYMBOL_KIND::FIELD );
 		iu.read( 0 );
 	}
 	return;
@@ -461,7 +468,7 @@ void HHuginn::register_function( yaal::hcore::HString const& name_, function_t&&
 void HHuginn::register_function( identifier_id_t id_ ) {
 	M_PROLOG
 	OCompiler::OIdentifierUse& iu( _compiler->_usedIdentifiers[id_] );
-	iu.write( 0, OCompiler::OIdentifierUse::TYPE::FUNCTION );
+	iu.write( 0, SYMBOL_KIND::FUNCTION );
 	iu.read( 0 );
 	return;
 	M_EPILOG
@@ -540,7 +547,7 @@ yaal::hcore::HString HHuginn::source_name( int fileId_ ) const {
 yaal::hcore::HString HHuginn::where( int fileId_, int position_ ) const {
 	M_PROLOG
 	hcore::HString w( source_name( fileId_ ) );
-	HHuginn::HErrorCoordinate ec( get_coordinate( fileId_, position_ ) );
+	HHuginn::HCoordinate ec( get_coordinate( fileId_, position_ ) );
 	w.append( ":" ).append( ec.line() ).append( ":" ).append( ec.column() );
 	return ( w );
 	M_EPILOG
@@ -548,7 +555,7 @@ yaal::hcore::HString HHuginn::where( int fileId_, int position_ ) const {
 
 int HHuginn::error_position( void ) const {
 	M_PROLOG
-	return ( _errorFileId >= 0 ? _sources[_errorFileId]->error_position( _errorPosition ) : 0 );
+	return ( _errorFileId >= 0 ? _sources[_errorFileId]->real_position( _errorPosition ) : 0 );
 	M_EPILOG
 }
 
@@ -558,22 +565,28 @@ int HHuginn::file_id( void ) const {
 	M_EPILOG
 }
 
-HHuginn::HErrorCoordinate HHuginn::error_coordinate( void ) const {
+HHuginn::HCoordinate HHuginn::error_coordinate( void ) const {
 	M_PROLOG
-	return ( _errorFileId >= 0 ? _sources[_errorFileId]->error_coordinate( error_position() ) : HErrorCoordinate( 0, 0 ) );
+	return ( _errorFileId >= 0 ? _sources[_errorFileId]->get_coordinate( error_position() ) : HCoordinate( 0, 0 ) );
 	M_EPILOG
 }
 
-HHuginn::HErrorCoordinate HHuginn::get_coordinate( int fileId_, int position_ ) const {
+int HHuginn::real_position( int fileId_, int position_ ) const {
 	M_PROLOG
-	return ( _sources[fileId_]->error_coordinate( _sources[fileId_]->error_position( position_ ) ) );
+	return ( _sources[fileId_]->real_position( position_ ) );
+	M_EPILOG
+}
+
+HHuginn::HCoordinate HHuginn::get_coordinate( int fileId_, int position_ ) const {
+	M_PROLOG
+	return ( _sources[fileId_]->get_coordinate( real_position( fileId_, position_ ) ) );
 	M_EPILOG
 }
 
 yaal::hcore::HString HHuginn::error_message( void ) const {
 	M_PROLOG
 	hcore::HString message( _errorFileId >= 0 ? _sources[_errorFileId]->name() : "" );
-	HErrorCoordinate coord( error_coordinate() );
+	HCoordinate coord( error_coordinate() );
 	if ( ! _errorMessage.is_empty() ) {
 		message
 			.append( ':' )

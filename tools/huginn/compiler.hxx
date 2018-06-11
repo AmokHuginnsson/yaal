@@ -317,24 +317,14 @@ struct OCompiler {
 		);
 	};
 	struct OIdentifierUse {
-		enum class TYPE {
-			UNKNOWN,
-			CLASS,
-			FIELD,
-			METHOD,
-			FUNCTION,
-			ENUM,
-			VARIABLE,
-			PACKAGE
-		};
-		TYPE _type;
+		HHuginn::SYMBOL_KIND _type;
 		int _readCount;
 		int _readPosition;
 		int _writeCount;
 		int _writePosition;
 		OIdentifierUse( void );
-		void read( int, TYPE = TYPE::UNKNOWN );
-		void write( int, TYPE );
+		void read( int, HHuginn::SYMBOL_KIND = HHuginn::SYMBOL_KIND::UNKNOWN );
+		void write( int, HHuginn::SYMBOL_KIND );
 	};
 	/*! \brief Class used to gather information about all user defined classes prior to real compilation.
 	 */

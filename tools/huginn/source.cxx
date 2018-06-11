@@ -80,7 +80,7 @@ void HSource::preprocess( void ) {
 				}
 				comment = string::join( lines, " " );
 				if ( ! comment.is_empty() ) {
-					_comments.insert( make_pair( error_coordinate( newPos ).line() - 1, comment ) );
+					_comments.insert( make_pair( get_coordinate( newPos ).line() - 1, comment ) );
 				}
 			}
 			pos = newPos;
@@ -91,7 +91,7 @@ void HSource::preprocess( void ) {
 	M_EPILOG
 }
 
-int HSource::error_position( int position_ ) const {
+int HSource::real_position( int position_ ) const {
 	M_PROLOG
 	int errorPosition( 0 );
 	if ( ! _orig.is_empty() ) {
@@ -104,7 +104,7 @@ int HSource::error_position( int position_ ) const {
 	M_EPILOG
 }
 
-HHuginn::HErrorCoordinate HSource::error_coordinate( int position_ ) const {
+HHuginn::HCoordinate HSource::get_coordinate( int position_ ) const {
 	M_PROLOG
 	/* +1 because we count lines starting from 1 (not starting from 0) */
 	int line( static_cast<int>( count( _orig.begin(), _orig.begin() + position_, NEWLINE ) ) + 1 );
@@ -115,7 +115,7 @@ HHuginn::HErrorCoordinate HSource::error_coordinate( int position_ ) const {
 		lastNewlinePosition = nlPos;
 	}
 	int column( ( position_ - lastNewlinePosition ) + 1 );
-	return ( HHuginn::HErrorCoordinate( line + _skippedLines, column ) );
+	return ( HHuginn::HCoordinate( line + _skippedLines, column ) );
 	M_EPILOG
 }
 
@@ -131,9 +131,9 @@ yaal::hcore::HString HSource::get_snippet( int from_, int len_ ) const {
 
 yaal::hcore::HString const& HSource::get_comment( int position_ ) const {
 	M_PROLOG
-	int origPos( error_position( position_ ) );
-	HHuginn::HErrorCoordinate ec( error_coordinate( origPos ) );
-	comments_t::const_iterator it( _comments.find( ec.line() - 2 ) );
+	int origPos( real_position( position_ ) );
+	HHuginn::HCoordinate coord( get_coordinate( origPos ) );
+	comments_t::const_iterator it( _comments.find( coord.line() - 2 ) );
 	static HString const noComment;
 	return ( it != _comments.end() ? it->second : noComment );
 	M_EPILOG

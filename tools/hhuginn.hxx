@@ -118,7 +118,7 @@ public:
 	class HValueCompareHelper;
 	typedef yaal::hcore::HPointer<huginn::HExpression> expression_t;
 	typedef yaal::hcore::HArray<HHuginn::expression_t> expressions_t;
-	class HErrorCoordinate;
+	class HCoordinate;
 	class HFieldDefinition;
 	typedef yaal::hcore::HArray<HFieldDefinition> field_definitions_t;
 	typedef yaal::hcore::HArray<identifier_id_t> field_identifiers_t;
@@ -180,6 +180,16 @@ public:
 	};
 	enum class VISIBILITY {
 		GLOBAL,
+		PACKAGE
+	};
+	enum class SYMBOL_KIND {
+		UNKNOWN,
+		CLASS,
+		FIELD,
+		METHOD,
+		FUNCTION,
+		ENUM,
+		VARIABLE,
 		PACKAGE
 	};
 private:
@@ -303,8 +313,9 @@ public:
 	void dump_preprocessed_source( yaal::hcore::HStreamInterface& ) const;
 	int error_position( void ) const;
 	int file_id( void ) const;
-	HErrorCoordinate error_coordinate( void ) const;
-	HErrorCoordinate get_coordinate( int, int ) const;
+	HCoordinate error_coordinate( void ) const;
+	HCoordinate get_coordinate( int, int ) const;
+	int real_position( int, int ) const;
 	yaal::hcore::HString source_name( int ) const;
 	yaal::hcore::HString where( int, int ) const;
 	yaal::hcore::HString error_message( void ) const;
@@ -376,20 +387,24 @@ protected:
 
 class HIntrospectorInterface {
 public:
+	typedef yaal::hcore::HArray<yaal::hcore::HString> symbols_t;
+public:
 	virtual ~HIntrospectorInterface( void ) {}
 	void introspect( HIntrospecteeInterface& );
+	void symbol( symbols_t const&, HHuginn::SYMBOL_KIND, int, int );
 protected:
 	virtual void do_introspect( HIntrospecteeInterface& ) = 0;
+	virtual void do_symbol( symbols_t const&, HHuginn::SYMBOL_KIND, int, int ) {}
 };
 
-class HHuginn::HErrorCoordinate {
+class HHuginn::HCoordinate {
 public:
-	typedef HErrorCoordinate this_type;
+	typedef HCoordinate this_type;
 private:
 	int _line;
 	int _column;
 public:
-	HErrorCoordinate( int line_, int column_ )
+	HCoordinate( int line_, int column_ )
 		: _line( line_ ), _column( column_ ) {
 	}
 	int line( void ) const {

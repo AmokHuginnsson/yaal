@@ -171,7 +171,7 @@ OCompiler::OExecutionStep::OExecutionStep(
 }
 
 OCompiler::OIdentifierUse::OIdentifierUse( void )
-	: _type( TYPE::UNKNOWN )
+	: _type( HHuginn::SYMBOL_KIND::UNKNOWN )
 	, _readCount( 0 )
 	, _readPosition( 0 )
 	, _writeCount( 0 )
@@ -179,18 +179,18 @@ OCompiler::OIdentifierUse::OIdentifierUse( void )
 	return;
 }
 
-void OCompiler::OIdentifierUse::read( int position_, TYPE type_ ) {
+void OCompiler::OIdentifierUse::read( int position_, HHuginn::SYMBOL_KIND symbolKind_ ) {
 	if ( _readCount == 0 ) {
-		_type = type_;
+		_type = symbolKind_;
 		_readPosition = position_;
 	}
 	++ _readCount;
 	return;
 }
 
-void OCompiler::OIdentifierUse::write( int position_, TYPE type_ ) {
+void OCompiler::OIdentifierUse::write( int position_, HHuginn::SYMBOL_KIND symbolKind_ ) {
 	if ( _writeCount == 0 ) {
-		_type = type_;
+		_type = symbolKind_;
 		_writePosition = position_;
 	}
 	++ _writeCount;
@@ -549,17 +549,17 @@ void OCompiler::merge( HHuginn::expression_t& to_, HHuginn::expression_t& from_ 
 }
 
 namespace {
-HString use_name( OCompiler::OIdentifierUse::TYPE type_ ) {
+HString use_name( HHuginn::SYMBOL_KIND symbolKind_ ) {
 	HString name;
-	switch ( type_ ) {
-		case ( OCompiler::OIdentifierUse::TYPE::UNKNOWN ):  name = "Symbol";   break;
-		case ( OCompiler::OIdentifierUse::TYPE::CLASS ):    name = "Class";    break;
-		case ( OCompiler::OIdentifierUse::TYPE::FIELD ):    name = "Field";    break;
-		case ( OCompiler::OIdentifierUse::TYPE::METHOD ):   name = "Method";   break;
-		case ( OCompiler::OIdentifierUse::TYPE::FUNCTION ): name = "Function"; break;
-		case ( OCompiler::OIdentifierUse::TYPE::ENUM ):     name = "Enum";     break;
-		case ( OCompiler::OIdentifierUse::TYPE::VARIABLE ): name = "Variable"; break;
-		case ( OCompiler::OIdentifierUse::TYPE::PACKAGE ):  name = "Package";  break;
+	switch ( symbolKind_ ) {
+		case ( HHuginn::SYMBOL_KIND::UNKNOWN ):  name = "Symbol";   break;
+		case ( HHuginn::SYMBOL_KIND::CLASS ):    name = "Class";    break;
+		case ( HHuginn::SYMBOL_KIND::FIELD ):    name = "Field";    break;
+		case ( HHuginn::SYMBOL_KIND::METHOD ):   name = "Method";   break;
+		case ( HHuginn::SYMBOL_KIND::FUNCTION ): name = "Function"; break;
+		case ( HHuginn::SYMBOL_KIND::ENUM ):     name = "Enum";     break;
+		case ( HHuginn::SYMBOL_KIND::VARIABLE ): name = "Variable"; break;
+		case ( HHuginn::SYMBOL_KIND::PACKAGE ):  name = "Package";  break;
 	}
 	return ( name );
 }
@@ -601,8 +601,8 @@ void OCompiler::detect_misuse( void ) const {
 				( find( begin( implicitUse ), end( implicitUse ), id ) == end( implicitUse ) )
 				&& (
 					! _isModule
-					|| ( use._type == OIdentifierUse::TYPE::VARIABLE )
-					|| ( use._type == OIdentifierUse::TYPE::UNKNOWN )
+					|| ( use._type == HHuginn::SYMBOL_KIND::VARIABLE )
+					|| ( use._type == HHuginn::SYMBOL_KIND::UNKNOWN )
 				)
 			) {
 				throw HHuginn::HHuginnRuntimeException(
@@ -809,7 +809,7 @@ void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_
 	if ( ! isCtorDtor ) {
 		_usedIdentifiers[functionIdentifier].write(
 			position_.get(),
-			! _classContext ? OIdentifierUse::TYPE::FUNCTION : OIdentifierUse::TYPE::METHOD
+			! _classContext ? HHuginn::SYMBOL_KIND::FUNCTION : HHuginn::SYMBOL_KIND::METHOD
 		);
 	}
 	_functionContexts.emplace( make_resource<OFunctionContext>( this, functionIdentifier, ++ _statementIdGenerator, _fileId, false ) );
@@ -817,6 +817,16 @@ void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_
 		add_field_name( name_, position_ );
 	}
 	create_scope( position_ );
+	if ( _introspector ) {
+		_introspector->symbol(
+			!! _classContext
+				? HIntrospectorInterface::symbols_t{ _runtime->identifier_name( _classContext->_classIdentifier ), name_ }
+				: HIntrospectorInterface::symbols_t{ name_ },
+			!! _classContext ? HHuginn::SYMBOL_KIND::METHOD : HHuginn::SYMBOL_KIND::FUNCTION,
+			_fileId,
+			position_.get()
+		);
+	}
 	return;
 	M_EPILOG
 }
@@ -859,7 +869,10 @@ void OCompiler::set_import_alias( yaal::hcore::HString const& name_, executing_p
 	check_name_class( importAliasIdentifier, true, position_ );
 	check_name_function( importAliasIdentifier, position_ );
 	_importInfo._alias = importAliasIdentifier;
-	_usedIdentifiers[importAliasIdentifier].write( position_.get(), OIdentifierUse::TYPE::PACKAGE );
+	_usedIdentifiers[importAliasIdentifier].write( position_.get(), HHuginn::SYMBOL_KIND::PACKAGE );
+	if ( _introspector ) {
+		_introspector->symbol( { _runtime->identifier_name( _importInfo._package ), name_ }, HHuginn::SYMBOL_KIND::PACKAGE, _fileId, position_.get() );
+	}
 	return;
 	M_EPILOG
 }
@@ -909,9 +922,12 @@ void OCompiler::set_enum_name( yaal::hcore::HString const& name_, executing_pars
 	}
 	check_name_import( enumIdentifier, position_ );
 	_classContext = make_resource<OClassContext>();
-	_usedIdentifiers[enumIdentifier].write( position_.get(), OIdentifierUse::TYPE::ENUM );
+	_usedIdentifiers[enumIdentifier].write( position_.get(), HHuginn::SYMBOL_KIND::ENUM );
 	_classContext->_classIdentifier = enumIdentifier;
 	_classContext->_position = position_;
+	if ( _introspector ) {
+		_introspector->symbol( { name_ }, HHuginn::SYMBOL_KIND::ENUM, _fileId, position_.get() );
+	}
 	return;
 	M_EPILOG
 }
@@ -925,10 +941,13 @@ void OCompiler::set_class_name( HHuginn::identifier_id_t identifier_, executing_
 	}
 	check_name_import( identifier_, position_ );
 	_classContext = make_resource<OClassContext>();
-	_usedIdentifiers[identifier_].write( position_.get(), OIdentifierUse::TYPE::CLASS );
+	_usedIdentifiers[identifier_].write( position_.get(), HHuginn::SYMBOL_KIND::CLASS );
 	_functionContexts.emplace( make_resource<OFunctionContext>( this, identifier_, ++ _statementIdGenerator, _fileId, false ) );
 	_classContext->_classIdentifier = identifier_;
 	_classContext->_position = position_;
+	if ( _introspector ) {
+		_introspector->symbol( { _runtime->identifier_name( identifier_ ) }, HHuginn::SYMBOL_KIND::CLASS, _fileId, position_.get() );
+	}
 	return;
 	M_EPILOG
 }
@@ -969,8 +988,11 @@ void OCompiler::set_field_name( yaal::hcore::HString const& name_, executing_par
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), _fileId, position_.get() );
 	}
 	HHuginn::identifier_id_t fieldIdentifier( _runtime->identifier_id( name_ ) );
-	_usedIdentifiers[fieldIdentifier].write( position_.get(), OIdentifierUse::TYPE::FIELD );
+	_usedIdentifiers[fieldIdentifier].write( position_.get(), HHuginn::SYMBOL_KIND::FIELD );
 	add_field_name( name_, position_ );
+	if ( _introspector ) {
+		_introspector->symbol( { _runtime->identifier_name( _classContext->_classIdentifier), name_ }, HHuginn::SYMBOL_KIND::FIELD, _fileId, position_.get() );
+	}
 	return;
 	M_EPILOG
 }
@@ -978,9 +1000,9 @@ void OCompiler::set_field_name( yaal::hcore::HString const& name_, executing_par
 void OCompiler::set_lambda_name( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OCompiler::OFunctionContext& fc( f() );
-	HHuginn::HErrorCoordinate ec( _runtime->huginn()->get_coordinate( _fileId, position_.get() ) );
+	HHuginn::HCoordinate coord( _runtime->huginn()->get_coordinate( _fileId, position_.get() ) );
 	using yaal::hcore::to_string;
-	HHuginn::identifier_id_t id( _runtime->identifier_id( to_string( "@" ).append( ec.line() ).append( ":" ).append( ec.column() ) ) );
+	HHuginn::identifier_id_t id( _runtime->identifier_id( to_string( "@" ).append( coord.line() ).append( ":" ).append( coord.column() ) ) );
 	_functionContexts.emplace( make_resource<OFunctionContext>( this, id, ++ _statementIdGenerator, _fileId, true ) );
 	if ( ! fc._captures.is_empty() ) {
 		_capturesLog.insert( make_pair( f()._functionIdentifier, yaal::move( fc._captures ) ) );
@@ -1145,7 +1167,7 @@ void OCompiler::add_parameter( yaal::hcore::HString const& name_, executing_pars
 	if ( find( fc._parameters.begin(), fc._parameters.end(), parameterIdentifier ) != fc._parameters.end() ) {
 		throw HHuginn::HHuginnRuntimeException( "Parameter `"_ys.append( name_ ).append( "' was already defined." ), _fileId, position_.get() );
 	}
-	_usedIdentifiers[parameterIdentifier].write( position_.get(), OIdentifierUse::TYPE::VARIABLE );
+	_usedIdentifiers[parameterIdentifier].write( position_.get(), HHuginn::SYMBOL_KIND::VARIABLE );
 	_executionStepsBacklog.emplace_back(
 		OExecutionStep::OPERATION::DEFINE,
 		HHuginn::expression_t(),
@@ -2102,9 +2124,9 @@ void OCompiler::dispatch_assign( executing_parser::position_t position_ ) {
 			}
 			if ( varRef._identifier != INVALID_IDENTIFIER ) {
 				if ( o == OPERATOR::ASSIGN ) {
-					_usedIdentifiers[varRef._identifier].write( position_.get(), OIdentifierUse::TYPE::VARIABLE );
+					_usedIdentifiers[varRef._identifier].write( position_.get(), HHuginn::SYMBOL_KIND::VARIABLE );
 				} else if ( are_congruous( srcType, realDestType ) ) {
-					_usedIdentifiers[varRef._identifier].read( position_.get(), OIdentifierUse::TYPE::VARIABLE );
+					_usedIdentifiers[varRef._identifier].read( position_.get(), HHuginn::SYMBOL_KIND::VARIABLE );
 					M_ASSERT( varRef._executionStepIndex >= 0 );
 					_executionStepsBacklog[varRef._executionStepIndex]._operation = OExecutionStep::OPERATION::UPDATE;
 				} else {
@@ -2167,7 +2189,7 @@ void OCompiler::dispatch_assign( executing_parser::position_t position_ ) {
 				fc._valueTypes.pop();
 				OFunctionContext::OVariableRef varRef( fc._variables.top() );
 				if ( varRef._identifier != INVALID_IDENTIFIER ) {
-					_usedIdentifiers[varRef._identifier].write( position_.get(), OIdentifierUse::TYPE::VARIABLE );
+					_usedIdentifiers[varRef._identifier].write( position_.get(), HHuginn::SYMBOL_KIND::VARIABLE );
 				}
 				fc._variables.pop();
 			}
@@ -2539,7 +2561,7 @@ void OCompiler::defer_get_field_reference( yaal::hcore::HString const& value_, e
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	HHuginn::identifier_id_t refIdentifier( _runtime->identifier_id( value_ ) );
-	_usedIdentifiers[refIdentifier].read( position_.get(), OIdentifierUse::TYPE::FIELD );
+	_usedIdentifiers[refIdentifier].read( position_.get(), HHuginn::SYMBOL_KIND::FIELD );
 	if ( huginn::is_keyword( value_ ) ) {
 		if ( refIdentifier != KEYWORD::CONSTRUCTOR_IDENTIFIER ) {
 			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted keyword." ), _fileId, position_.get() );

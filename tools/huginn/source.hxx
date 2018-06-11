@@ -32,8 +32,8 @@ public:
 	void load( yaal::hcore::HStreamInterface&, yaal::hcore::HString const&, int );
 	void preprocess( void );
 	char const* error_message( int ) const;
-	int error_position( int ) const;
-	HHuginn::HErrorCoordinate error_coordinate( int ) const;
+	int real_position( int ) const;
+	HHuginn::HCoordinate get_coordinate( int ) const;
 	yaal::hcore::HString get_snippet( int, int ) const;
 	yaal::hcore::HString const& get_comment( int ) const;
 	yaal::hcore::HString const& name( void ) const;

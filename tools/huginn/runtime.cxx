@@ -1207,9 +1207,9 @@ HIntrospecteeInterface::call_stack_t HRuntime::get_call_stack( huginn::HThread* 
 	while ( f ) {
 		if ( f->type() == HFrame::TYPE::FUNCTION ) {
 			int fileId( f->file_id() );
-			HHuginn::HErrorCoordinate ec( _huginn->get_coordinate( fileId, position ) );
+			HHuginn::HCoordinate coord( _huginn->get_coordinate( fileId, position ) );
 			HFunction const* func( static_cast<HFunction const*>( f->statement() ) );
-			callStack.emplace_back( _huginn->source_name( fileId ), ec.line(), ec.column(), identifier_name( func->name() ) );
+			callStack.emplace_back( _huginn->source_name( fileId ), coord.line(), coord.column(), identifier_name( func->name() ) );
 			position = INVALID_POSITION;
 		}
 		f = f->parent();
