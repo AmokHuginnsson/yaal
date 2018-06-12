@@ -18,9 +18,13 @@ namespace huginn {
 class HZip : public HHuginn::HIterable {
 	HHuginn::values_t _source;
 public:
-	HZip( HHuginn::HClass const* class_, HHuginn::values_t source_ )
+	HZip( HHuginn::HClass const* class_, HHuginn::values_t const& source_ )
 		: HIterable( class_ )
 		, _source( source_ ) {
+	}
+	HZip( HHuginn::HClass const* class_, HHuginn::values_t&& source_ )
+		: HIterable( class_ )
+		, _source( yaal::move( source_ ) ) {
 	}
 	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
 		M_PROLOG
@@ -49,8 +53,17 @@ protected:
 private:
 	virtual iterator_t do_iterator( HThread*, int ) override;
 private:
-	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
-		return ( thread_->object_factory().create<HZip>( HIterable::get_class(), _source ) );
+	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const override {
+		HHuginn::values_t vals;
+		for ( HHuginn::value_t const& v : _source ) {
+			vals.push_back( v->clone( thread_, const_cast<HHuginn::value_t*>( &v ), position_ ) );
+		}
+		return (
+			thread_->object_factory().create<HZip>(
+				HIterable::get_class(),
+				yaal::move( vals )
+			)
+		);
 	}
 };
 

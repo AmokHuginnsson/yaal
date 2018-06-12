@@ -31,6 +31,17 @@ int long HIterator::do_size( huginn::HThread* thread_, int position_ ) const {
 	M_EPILOG
 }
 
+HHuginn::value_t HIterator::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
+	HHuginn::value_t s( _source->clone( thread_, const_cast<HHuginn::value_t*>( &_source ), position_ ) );
+	return (
+		thread_->object_factory().create<HIterator>(
+			HIterable::get_class(),
+			s,
+			static_cast<HHuginn::HIterable*>( s.raw() )->iterator( thread_, position_ )
+		)
+	);
+}
+
 HHuginn::value_t HIterator::is_valid( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "Iterator.is_valid", values_, 0, 0, thread_, position_ );

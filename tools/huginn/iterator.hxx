@@ -93,6 +93,7 @@ protected:
 	/* Iterable interface. */
 	virtual iterator_t do_iterator( HThread*, int ) override;
 	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override;
+	virtual HHuginn::value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 }

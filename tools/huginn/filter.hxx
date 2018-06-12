@@ -46,8 +46,8 @@ protected:
 private:
 	virtual iterator_t do_iterator( HThread*, int ) override;
 private:
-	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
-		return ( thread_->object_factory().create<HFilter>( HIterable::get_class(), _source, _function, _method ) );
+	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const override {
+		return ( thread_->object_factory().create<HFilter>( HIterable::get_class(), _source->clone( thread_, const_cast<HHuginn::value_t*>( &_source ), position_ ), _function, _method ) );
 	}
 };
 
