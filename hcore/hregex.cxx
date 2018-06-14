@@ -279,7 +279,7 @@ HRegex::groups_t HRegex::groups_impl( HUTF8String const& string_, match_t match_
 	M_EPILOG
 }
 
-yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, yaal::hcore::HString const& replacement_, match_t match_ ) {
+yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, yaal::hcore::HString const& replacement_, match_t match_ ) const {
 	M_PROLOG
 	static char const errMsg[] = "Malformed back-reference in replacement string.";
 	static char const BACK_REF( '$' );
@@ -331,7 +331,7 @@ yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, yaal::h
 	M_EPILOG
 }
 
-yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, replacer_t const& replacer_, match_t match_ ) {
+yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, replacer_t const& replacer_, match_t match_ ) const {
 	M_PROLOG
 	HString res;
 	int endPos( 0 );

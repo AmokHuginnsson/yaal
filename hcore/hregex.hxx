@@ -116,8 +116,8 @@ public:
 	 */
 	HMatchResult matches( HUTF8String const& string_, match_t = MATCH::DEFAULT ) const;
 	groups_t groups( HUTF8String const& string_, match_t = MATCH::DEFAULT ) const;
-	yaal::hcore::HString replace( yaal::hcore::HString const&, yaal::hcore::HString const&, match_t = MATCH::DEFAULT );
-	yaal::hcore::HString replace( yaal::hcore::HString const&, replacer_t const&, match_t = MATCH::DEFAULT );
+	yaal::hcore::HString replace( yaal::hcore::HString const&, yaal::hcore::HString const&, match_t = MATCH::DEFAULT ) const;
+	yaal::hcore::HString replace( yaal::hcore::HString const&, replacer_t const&, match_t = MATCH::DEFAULT ) const;
 	void swap( HRegex& );
 	void clear( void );
 	HRegex copy( void ) const;

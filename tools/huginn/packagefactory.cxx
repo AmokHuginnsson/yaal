@@ -115,35 +115,37 @@ HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, yaal::hcor
 
 HHuginn::value_t HPackageFactory::load_binary( HRuntime* runtime_, HHuginn::paths_t const& paths_, yaal::hcore::HString const& name_, int position_ ) {
 	M_PROLOG
+	static HRegex const re( "([^.])[.]([^.])" );
+	HString name( re.replace( re.replace( name_, "$1/$2" ), "$1/$2" ) );
 	plugin_t plugin( make_pointer<HPlugin>() );
-	HString pluginName;
-	HString name( name_ );
-	name.replace( ".", "/" );
+	bool isSubDir( name.find( filesystem::path::SEPARATOR ) != HString::npos );
+	HString pluginName( isSubDir ? filesystem::dirname( name ).append( filesystem::path::SEPARATOR ) : "" );
 	pluginName
-		.assign( LIB_PREFIX )
+		.append( LIB_PREFIX )
 		.append( "huginn_" )
-		.append( name )
+		.append( isSubDir ? filesystem::basename( name ) : name )
 		.append( LIB_INFIX )
 		.append( "." )
 		.append( LIB_EXT );
 	pluginName.lower();
-	HHuginn::value_t package;
-	try {
-		plugin->load( pluginName );
-	} catch ( HPluginException const& ) {
-	}
-	if ( ! plugin->is_loaded() ) {
+	auto load = [&plugin]( yaal::hcore::HString path ) {
+		try {
+			substitute_environment( path, ENV_SUBST_MODE::RECURSIVE );
+			plugin->load( path );
+		} catch ( HPluginException const& ) {
+		}
+		return ( plugin->is_loaded() );
+	};
+	if ( ! load( pluginName ) && filesystem::is_relative( name ) ) {
 		HString test;
 		for ( HString const& p : paths_ ) {
-			test.assign( p ).append( "/" ).append( pluginName );
-			substitute_environment( test, ENV_SUBST_MODE::RECURSIVE );
-			try {
-				plugin->load( test );
+			test.assign( p ).append( filesystem::path::SEPARATOR ).append( pluginName );
+			if ( load( test ) ) {
 				break;
-			} catch ( HPluginException const& ) {
 			}
 		}
 	}
+	HHuginn::value_t package;
 	if ( plugin->is_loaded() ) {
 		try {
 			typedef HPackageCreatorInterface* (*instantiator_getter_t)( void );
@@ -163,20 +165,33 @@ HHuginn::value_t HPackageFactory::load_binary( HRuntime* runtime_, HHuginn::path
 
 HHuginn::value_t HPackageFactory::load_module( HRuntime* runtime_, HHuginn::paths_t const& paths_, yaal::hcore::HString const& name_, int position_ ) {
 	M_PROLOG
+	static HRegex const re( "([^.])[.]([^.])" );
+	HString name( re.replace( re.replace( name_, "$1/$2" ), "$1/$2" ) );
+	name.append( ".hgn" );
 	HString path;
-	HString test;
-	HString name( name_ );
-	name.replace( ".", "/" );
-	for ( HString const& p : paths_ ) {
-		test.assign( p ).append( "/" ).append( name ).append( ".hgn" );
-		substitute_environment( test, ENV_SUBST_MODE::RECURSIVE );
+	auto acquire_path = []( yaal::hcore::HString module ) {
+		substitute_environment( module, ENV_SUBST_MODE::RECURSIVE );
 		try {
-			if ( ! p.is_empty() && filesystem::is_regular_file( test ) ) {
-				path = test;
-				break;
+			if ( filesystem::is_regular_file( module ) ) {
+				return ( module );
 			}
 		} catch ( filesystem::HFileSystemException const& ) {
 		}
+		return ( hcore::HString() );
+	};
+	if ( filesystem::is_relative( name ) ) {
+		HString test;
+		for ( HString const& p : paths_ ) {
+			if ( p.is_empty() ) {
+				continue;
+			}
+			test.assign( p ).append( filesystem::path::SEPARATOR ).append( name );
+			if ( ! ( path = acquire_path( test ) ).is_empty() ) {
+				break;
+			}
+		}
+	} else {
+		path = acquire_path( name );
 	}
 	return (
 		! path.is_empty()
