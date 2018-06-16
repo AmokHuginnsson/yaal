@@ -84,7 +84,7 @@ public:
 	void factorial( OExecutionStep const&, huginn::HFrame* );
 	void negate( OExecutionStep const&, huginn::HFrame* );
 	void function_call( OExecutionStep const&, huginn::HFrame* );
-	void pack_named_parameters( OExecutionStep const&, huginn::HFrame* );
+	void repack_named_parameters( OExecutionStep const&, huginn::HFrame* );
 	void unpack_variadic_parameters( OExecutionStep const&, huginn::HFrame* );
 	void make_assoc( OPERATOR, huginn::HFrame*, int );
 	void make_dict( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {

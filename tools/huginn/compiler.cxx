@@ -2346,10 +2346,10 @@ void OCompiler::dispatch_function_call( HExpression::OExecutionStep::action_t co
 	M_EPILOG
 }
 
-void OCompiler::pack_named_parameters( executing_parser::position_t position_ ) {
+void OCompiler::repack_named_parameters( executing_parser::position_t position_ ) {
 	M_PROLOG
 	HExpression* expr( current_expression().raw() );
-	expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::pack_named_parameters, position_.get() ) );
+	expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::repack_named_parameters, position_.get() ) );
 	return;
 	M_EPILOG
 }

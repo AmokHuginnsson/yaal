@@ -671,26 +671,29 @@ void HExpression::grab_args( HFrame* frame_, HArguments& args_ ) {
 	M_EPILOG
 }
 
-void HExpression::pack_named_parameters( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
+void HExpression::repack_named_parameters( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
 	M_PROLOG
 	HFrame::values_t& values( frame_->values() );
-	HHuginn::value_t& vr( values.top() );
-	if ( vr->type_id() == HHuginn::TYPE::LOOKUP ) {
-		vr = frame_->thread()->object_factory().create_tagged_value( vr, frame_->thread()->object_factory().named_parameters_class() );
-	} else if ( vr->type_id() == HHuginn::TYPE::NAMED_PARAMETERS ) {
-		HHuginn::value_t v( yaal::move( vr ) );
-		values.pop();
-		HHuginn::value_t& vtr( values.top() );
-		if ( vtr->type_id() != HHuginn::TYPE::LOOKUP ) {
-			throw HHuginn::HHuginnRuntimeException( "Packed parameter is not a lookup.", file_id(), executionStep_._position );
-		}
-		vtr.swap( v );
-		HHuginn::HTaggedValue& tv( *static_cast<HHuginn::HTaggedValue*>( vtr.raw() ) );
-		HHuginn::HLookup& l( *static_cast<HHuginn::HLookup*>( v.raw() ) );
-		l.update( frame_->thread(), tv.value(), executionStep_._position );
-		tv.value().swap( v );
+	HHuginn::value_t v( yaal::move( values.top() ) );
+	values.pop();
+	if ( v->type_id() != HHuginn::TYPE::LOOKUP ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"Packed parameter is "_ys.append( a_type_name( v->get_class() ) ).append( " instead of a `lookup`." ),
+			file_id(),
+			executionStep_._position
+		);
+	}
+	HHuginn::value_t* pv( ! values.is_empty() ? &values.top() : nullptr );
+	if ( pv && ( (*pv)->type_id() == HHuginn::TYPE::NAMED_PARAMETERS ) ) {
+		HHuginn::HTaggedValue& tv( *static_cast<HHuginn::HTaggedValue*>( pv->raw() ) );
+		HHuginn::HLookup& l( *static_cast<HHuginn::HLookup*>( tv.value().raw() ) );
+		l.update( frame_->thread(), v, executionStep_._position );
+		int& ip( frame_->ip() );
+		M_ASSERT( _instructions[ip]._operator == OPERATOR::FUNCTION_ARGUMENT );
+		++ ip;
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "Packed parameter is not a lookup.", file_id(), executionStep_._position );
+		v = frame_->thread()->object_factory().create_tagged_value( v, frame_->thread()->object_factory().named_parameters_class() );
+		values.push( yaal::move( v ) );
 	}
 	return;
 	M_EPILOG
@@ -703,7 +706,11 @@ void HExpression::unpack_variadic_parameters( OExecutionStep const& executionSte
 	if ( vr->type_id() == HHuginn::TYPE::TUPLE ) {
 		vr = frame_->thread()->object_factory().create_tagged_value( vr, frame_->thread()->object_factory().variadic_parameters_class() );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "Parameter is not a tuple.", file_id(), executionStep_._position );
+		throw HHuginn::HHuginnRuntimeException(
+			"Unpacked parameter is "_ys.append( a_type_name( vr->get_class() ) ).append( " instead of a `tuple`." ),
+			file_id(),
+			executionStep_._position
+		);
 	}
 	return;
 	M_EPILOG

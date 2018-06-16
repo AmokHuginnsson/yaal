@@ -179,7 +179,11 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	);
 	HRule functionArgument(
 		"functionArgument",
-		( arg ^ ':' ) >> -( constant( "..." )[HRuleBase::action_position_t( hcore::call( &OCompiler::unpack_variadic_parameters, _compiler.get(), _1 ) )] )
+		( arg ^ ':' ) >> -constant( "..." )[HRuleBase::action_position_t( hcore::call( &OCompiler::unpack_variadic_parameters, _compiler.get(), _1 ) )]
+	);
+	HRule unpackedNamedParameters(
+		"unpackedNamedParameters",
+		arg >> constant( ":::" )[HRuleBase::action_position_t( hcore::call( &OCompiler::repack_named_parameters, _compiler.get(), _1 ) )]
 	);
 	HRule argList( "argList", functionArgument >> *( ',' >> functionArgument ) );
 	HRule parameterName(
@@ -198,13 +202,21 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
 		>> namedParameter >> *( ',' >> namedParameter )
 		>> HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MAKE_LOOKUP, _1 ) )
-		>> HRuleBase::action_position_t( hcore::call( &OCompiler::pack_named_parameters, _compiler.get(), _1 ) ),
+		>> HRuleBase::action_position_t( hcore::call( &OCompiler::repack_named_parameters, _compiler.get(), _1 ) ),
 		HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_ARGUMENT, _1 ) )
+	);
+	HRule repackedNamedParameter(
+		"repackedNamedParameter",
+		namedParameters | unpackedNamedParameters
+	);
+	HRule repackedNamedParameters(
+		"repackedNamedParameters",
+		repackedNamedParameter >> *( ',' >> repackedNamedParameter )
 	);
 	HRule functionCallOperator(
 		"functionCallOperator",
 		constant( '(', HRuleBase::action_position_t( hcore::call( &OCompiler::start_function_call, _compiler.get(), _1 ) ) )
-		>> -( ( argList >> -( ',' >> namedParameters ) ) | namedParameters ) >>
+		>> -( ( argList >> -( ',' >> repackedNamedParameters ) ) | repackedNamedParameters ) >>
 		constant( ')', HRuleBase::action_position_t( hcore::call( &OCompiler::close_function_call, _compiler.get(), _1 ) ) ),
 		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
 	);
