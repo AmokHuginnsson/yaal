@@ -574,6 +574,7 @@ void OCompiler::detect_misuse( void ) const {
 		_runtime->identifier_id( INTERFACE::IS_VALID ),
 		_runtime->identifier_id( INTERFACE::NEXT ),
 		_runtime->identifier_id( INTERFACE::VALUE ),
+		_runtime->identifier_id( INTERFACE::CALL ),
 		_runtime->identifier_id( INTERFACE::HASH ),
 		_runtime->identifier_id( INTERFACE::EQUALS ),
 		_runtime->identifier_id( INTERFACE::LESS ),
@@ -991,7 +992,7 @@ void OCompiler::set_field_name( yaal::hcore::HString const& name_, executing_par
 	_usedIdentifiers[fieldIdentifier].write( position_.get(), HHuginn::SYMBOL_KIND::FIELD );
 	add_field_name( name_, position_ );
 	if ( _introspector ) {
-		_introspector->symbol( { _runtime->identifier_name( _classContext->_classIdentifier), name_ }, HHuginn::SYMBOL_KIND::FIELD, _fileId, position_.get() );
+		_introspector->symbol( { _runtime->identifier_name( _classContext->_classIdentifier ), name_ }, HHuginn::SYMBOL_KIND::FIELD, _fileId, position_.get() );
 	}
 	return;
 	M_EPILOG

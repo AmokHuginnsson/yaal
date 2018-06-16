@@ -54,8 +54,9 @@ public:
 					class_->runtime(),
 					"OPEN_MODE",
 					enumeration::descriptions_t{
-						{ "READ", "Open file for reading.", safe_int::cast<int>( HFile::OPEN::READING.value() ) },
-						{ "WRITE", "Open file for writing.", safe_int::cast<int>( HFile::OPEN::WRITING.value() ) }
+						{ "READ", "Open file for reading only.", safe_int::cast<int>( HFile::OPEN::READING.value() ) },
+						{ "WRITE", "Open file for writing while truncating existing content.", safe_int::cast<int>( HFile::OPEN::WRITING.value() ) },
+						{ "APPEND", "Open file for appending, writing begins at end of file.", safe_int::cast<int>( HFile::OPEN::APPEND.value() ) },
 					},
 					"The `OPEN_MODE` is set of possible modes used for opening the files.",
 					HHuginn::VISIBILITY::PACKAGE
@@ -169,7 +170,15 @@ public:
 		verify_signature( "FileSystem.stat", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
-		return ( thread_->object_factory().create<HFileStat>( fsc->_fileStatClass.raw(), fsc->_fileTypeClass.raw(), fsc->_exceptionClass.raw(), fsc->_timeClass.raw(), get_string( values_[0] ) ) );
+		return (
+			thread_->object_factory().create<HFileStat>(
+				fsc->_fileStatClass.raw(),
+				fsc->_fileTypeClass.raw(),
+				fsc->_exceptionClass.raw(),
+				fsc->_timeClass.raw(),
+				get_string( values_[0] )
+			)
+		);
 		M_EPILOG
 	}
 private:
@@ -177,13 +186,14 @@ private:
 		M_PROLOG
 		char const name[] = "FileSystem.open";
 		verify_signature_by_class( name, values_, { thread_->object_factory().string_class(), _openModeClass->enumeral_class() }, thread_, position_ );
-		bool reading( get_enumeral( values_[1] ) == safe_int::cast<int>( HFile::OPEN::READING.value() ) );
-		HStreamInterface::ptr_t stream(
-			make_pointer<HFile>(
-				get_string( values_[0] ),
-				reading ? HFile::OPEN::READING : HFile::OPEN::WRITING
-			)
-		);
+		HHuginn::HEnumeral::value_type val( get_enumeral( values_[1] ) );
+		HFile::open_t openMode( HFile::OPEN::READING );
+		if ( val == safe_int::cast<int>( HFile::OPEN::WRITING.value() ) ) {
+			openMode = HFile::OPEN::WRITING;
+		} else if ( val == safe_int::cast<int>( HFile::OPEN::APPEND.value() ) ) {
+			openMode = HFile::OPEN::APPEND | HFile::OPEN::WRITING;
+		}
+		HStreamInterface::ptr_t stream( make_pointer<HFile>( get_string( values_[0] ), openMode ) );
 		HFile* f( static_cast<HFile*>( stream.raw() ) );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( f->is_opened() ) {
