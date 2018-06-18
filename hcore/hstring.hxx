@@ -283,7 +283,6 @@ public:
 	 * \return character at given position in this string.
 	 */
 	HString operator + ( HString const& ) const;
-	code_point_t const operator[] ( int position ) const;
 	/*! \brief Get character at given position.
 	 *
 	 * \param position - index of a position to get character for.
