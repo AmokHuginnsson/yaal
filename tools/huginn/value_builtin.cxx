@@ -802,9 +802,9 @@ HHuginn::value_t fallback_string_conversion( HThread* thread_, HHuginn::value_t 
 char const* type_to_cycle_str( HHuginn::TYPE type_ ) {
 	char const* sym( "/*cycle*/" );
 	switch ( type_ ) {
-		case ( HHuginn::TYPE::TUPLE ): { sym = "/*(cycle)*/"; } break;
-		case ( HHuginn::TYPE::LIST ):  { sym = "/*[cycle]*/"; } break;
-		case ( HHuginn::TYPE::DICT ):  { sym = "/*{cycle}*/"; } break;
+		case ( HHuginn::TYPE::TUPLE ):  { sym = "/*(cycle)*/"; } break;
+		case ( HHuginn::TYPE::LIST ):   { sym = "/*[cycle]*/"; } break;
+		case ( HHuginn::TYPE::LOOKUP ): { sym = "/*{cycle}*/"; } break;
 		default:;
 	}
 	return ( sym );

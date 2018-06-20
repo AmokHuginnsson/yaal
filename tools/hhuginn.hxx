@@ -296,6 +296,7 @@ public:
 	 * \param value_ - value of argument being added.
 	 */
 	void add_argument( yaal::hcore::HString const& value_ );
+	void add_argument( value_t const& value_ );
 
 	/*! \brief Remove all argument currently held for main() function.
 	 */
@@ -338,6 +339,73 @@ public:
 	void register_function( identifier_id_t );
 	void register_function( yaal::hcore::HString const&, function_t&&, yaal::hcore::HString const& );
 	static void disable_grammar_verification( void );
+	value_t value( int long long );
+	value_t value( code_point_t );
+	value_t value( double long );
+	value_t value( yaal::hcore::HNumber const& );
+	value_t value( yaal::hcore::HString const& );
+	value_t value( bool );
+	value_t value( void const* );
+	value_t const& value( value_t const& val_ ) const {
+		return ( val_ );
+	}
+	value_t value( values_t&& val_ );
+	value_t value( yaal::hcore::HDeque<value_t>&& val_ );
+	template<typename T>
+	value_t value( yaal::hcore::HArray<T> const& val_ ) {
+		M_PROLOG
+		values_t data;
+		data.reserve( val_.get_size() );
+		for ( T const& e : val_ ) {
+			data.emplace_back( value( e ) );
+		}
+		return ( value( yaal::move( data ) ) );
+		M_EPILOG
+	}
+	template<typename T>
+	value_t value( yaal::hcore::HDeque<T> const& val_ ) {
+		M_PROLOG
+		yaal::hcore::HDeque<value_t> data;
+		for ( T const& e : val_ ) {
+			data.emplace_back( value( e ) );
+		}
+		return ( value( yaal::move( data ) ) );
+		M_EPILOG
+	}
+	/* type forwarders */
+	value_t value( int long val_ ) {
+		return ( value( static_cast<int long long>( val_ ) ) );
+	}
+	value_t value( int val_ ) {
+		return ( value( static_cast<int long long>( val_ ) ) );
+	}
+	value_t value( int short val_ ) {
+		return ( value( static_cast<int long long>( val_ ) ) );
+	}
+	value_t value( int long long unsigned val_ ) {
+		return ( value( static_cast<int long long>( val_ ) ) );
+	}
+	value_t value( int long unsigned val_ ) {
+		return ( value( static_cast<int long long>( val_ ) ) );
+	}
+	value_t value( int unsigned val_ ) {
+		return ( value( static_cast<int long long>( val_ ) ) );
+	}
+	value_t value( int short unsigned val_ ) {
+		return ( value( static_cast<int long long>( val_ ) ) );
+	}
+	value_t value( double val_ ) {
+		return ( value( static_cast<double long>( val_ ) ) );
+	}
+	value_t value( float val_ ) {
+		return ( value( static_cast<double long>( val_ ) ) );
+	}
+	value_t value( char const* val_ ) {
+		return ( value( yaal::hcore::HString( val_ ) ) );
+	}
+	value_t value( std::nullptr_t ) {
+		return ( value( static_cast<void const*>( 0 ) ) );
+	}
 private:
 	HHuginn( huginn::HRuntime* );
 	huginn::HRuntime const& runtime( void ) const;

@@ -710,7 +710,69 @@ yaal::hcore::HStreamInterface& HHuginn::log_stream( void ) {
 	M_EPILOG
 }
 
+HHuginn::value_t HHuginn::value( int long long val_ ) {
+	M_PROLOG
+	return ( _runtime->object_factory()->create_integer( val_ ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::value( code_point_t val_ ) {
+	M_PROLOG
+	return ( _runtime->object_factory()->create_character( val_ ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::value( double long val_ ) {
+	M_PROLOG
+	return ( _runtime->object_factory()->create_real( val_ ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::value( yaal::hcore::HNumber const& val_ ) {
+	M_PROLOG
+	return ( _runtime->object_factory()->create_number( val_ ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::value( yaal::hcore::HString const& val_ ) {
+	M_PROLOG
+	return ( _runtime->object_factory()->create_string( val_ ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::value( bool val_ ) {
+	M_PROLOG
+	return ( val_ ? _runtime->true_value() : _runtime->false_value() );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::value( void const* val_ ) {
+	M_PROLOG
+	M_ENSURE( ! val_ );
+	return ( _runtime->none_value() );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::value( values_t&& val_ ) {
+	M_PROLOG
+	return ( _runtime->object_factory()->create_list( yaal::move( val_ ) ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::value( yaal::hcore::HDeque<value_t>&& val_ ) {
+	M_PROLOG
+	return ( _runtime->object_factory()->create_deque( yaal::move( val_ ) ) );
+	M_EPILOG
+}
+
 void HHuginn::add_argument( yaal::hcore::HString const& arg_ ) {
+	M_PROLOG
+	_runtime->add_argument( arg_ );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::add_argument( value_t const& arg_ ) {
 	M_PROLOG
 	_runtime->add_argument( arg_ );
 	return;

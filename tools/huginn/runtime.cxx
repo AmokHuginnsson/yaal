@@ -600,6 +600,14 @@ void HRuntime::add_argument( yaal::hcore::HString const& arg_ ) {
 	M_EPILOG
 }
 
+void HRuntime::add_argument( HHuginn::value_t const& arg_ ) {
+	M_PROLOG
+	HHuginn::HList& argv( *static_cast<HHuginn::HList*>( _argv.raw() ) );
+	argv.push_back( arg_ );
+	return;
+	M_EPILOG
+}
+
 void HRuntime::clear_arguments( void ) {
 	M_PROLOG
 	HHuginn::HList& argv( *static_cast<HHuginn::HList*>( _argv.raw() ) );

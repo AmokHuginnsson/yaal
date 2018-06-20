@@ -290,11 +290,11 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 			HRegex::action_string_position_t( hcore::call( &OCompiler::add_parameter, _compiler.get(), _1, _2 ) )
 		)
 	);
-	HRule value( "value" );
+	HRule val( "value" );
 	HRule parameter(
 		"parameter",
 		( parameterIdentifier ^ ( constant( "..." ) | ":::" ) )
-		>> -( constant( '=' ) >> HRule( value, HRuleBase::action_position_t( hcore::call( &OCompiler::add_default_value, _compiler.get(), _1 ) ) ) ),
+		>> -( constant( '=' ) >> HRule( val, HRuleBase::action_position_t( hcore::call( &OCompiler::add_default_value, _compiler.get(), _1 ) ) ) ),
 		HRuleBase::action_position_t( hcore::call( &OCompiler::verify_default_argument, _compiler.get(), _1 ) )
 	);
 	HRule variadicParameter(
@@ -516,7 +516,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		),
 		e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::commit_ternary, _compiler.get(), _1 ) )
 	);
-	value %= ternary;
+	val %= ternary;
 	HRule subscript( "subscript", ( reference >> +( subscriptOperator | functionCallOperator | memberAccess ) ) );
 	HRule assignable(
 		"assignable",
@@ -541,7 +541,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		* ( assignablePack >> ( constant( "=" ) | "+=" | "-=" | "*=" | "/=" | "%=" | "^=" )[
 				e_p::HString::action_string_position_t( hcore::call( &OCompiler::defer_str_oper, _compiler.get(), _1, _2 ) )
 			] ^ '='
-		) >> value,
+		) >> val,
 		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::ASSIGN, _1 ) )
 	);
 	HRule expressionStatement(

@@ -218,6 +218,7 @@ public:
 	 * \param value_ - value of argument being added.
 	 */
 	void add_argument( yaal::hcore::HString const& value_ );
+	void add_argument( HHuginn::value_t const& value_ );
 
 	/*! \brief Remove all argument currently held for main() function.
 	 */
