@@ -131,6 +131,7 @@ public:
 	HQueryResultClass(
 		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_,
+		HHuginn::HClass const* origin_,
 		HHuginn::class_t const& exceptionClass_
 	) : HHuginn::HClass(
 			runtime_,
@@ -148,6 +149,7 @@ public:
 			{ "fetch_row",   runtime_->create_method( &HQueryResult::fetch_row ),   "fetch next row of data from this result set" }
 		};
 		redefine( nullptr, fd );
+		set_origin( origin_ );
 		return;
 	}
 	HHuginn::HClass const* exception_class( void ) const {
@@ -172,16 +174,17 @@ HHuginn::value_t HQueryResult::fetch_row( tools::huginn::HThread* thread_, HHugi
 	M_EPILOG
 }
 
-HHuginn::class_t HQueryResult::get_class( HRuntime* runtime_, HHuginn::class_t const& exceptionClass_ ) {
+HHuginn::class_t HQueryResult::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_, HHuginn::class_t const& exceptionClass_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
 			HRuntime::class_constructor_t(
-				[&runtime_, &exceptionClass_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
+				[&runtime_, &origin_, &exceptionClass_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
 					return (
 						make_pointer<HQueryResultClass>(
 							runtime_,
 							typeId_,
+							origin_,
 							exceptionClass_
 						)
 					);

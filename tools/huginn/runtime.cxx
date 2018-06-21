@@ -514,7 +514,12 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 	HHuginn::class_t cls( create_class( name_, ! doc.is_empty() ? doc : "The `"_ys.append( name_ ).append( "` is an user defined submodule." ), HHuginn::ACCESS::PRIVATE ) );
 	HHuginn::field_definitions_t fds;
 	for ( classes_t::value_type const& c : _classes ) {
-		if ( ! is_enum_class( c.second.raw() ) && ( context_._classes.count( c.first ) == 0 ) ) {
+		if (
+			! is_enum_class( c.second.raw() )
+			&& ( context_._classes.count( c.first ) == 0 )
+			&& ! c.second->origin()
+			&& ! context_.find_package( c.first )
+		) {
 			fds.emplace_back(
 				identifier_name( c.first ),
 				create_method( &package::instance, c.second.raw() ),
@@ -540,7 +545,7 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 				*gd.second,
 				"access enum "_ys.append( identifier_name( gd.first ) ).append( " imported in submodule" )
 			);
-		} else if ( ! context_.find_package( (*gd.second)->get_class()->identifier_id() ) ) {
+		} else if ( !! context_.find_package( (*gd.second)->get_class()->identifier_id() ) ) {
 			fds.emplace_back(
 				identifier_name( gd.first ),
 				create_method( &package::value, *gd.second, identifier_name( gd.first ) ),
@@ -888,21 +893,6 @@ inline HHuginn::value_t assert( huginn::HThread* thread_, HHuginn::value_t*, HHu
 		throw HHuginn::HHuginnRuntimeException( message, thread_->current_frame()->file_id(), position_ );
 	}
 	return ( thread_->runtime().none_value() );
-	M_EPILOG
-}
-
-HHuginn::value_t invalid_instance( yaal::hcore::HString const&, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
-HHuginn::value_t invalid_instance( yaal::hcore::HString const& name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t&, int position_ ) {
-	M_PROLOG
-	/*
-	 * __attribute__(( noreturn )) causes problems with clang.
-	 * Hence this workaround.
-	 * Condition in following if shall always evaluate to `true'.
-	 */
-	if ( position_ >= 0 ) {
-		throw HHuginn::HHuginnRuntimeException( "Direct creation of instances of `"_ys.append( name_ ).append( "' is not allowed." ), thread_->current_frame()->file_id(), position_ );
-	}
-	return ( HHuginn::value_t() );
 	M_EPILOG
 }
 

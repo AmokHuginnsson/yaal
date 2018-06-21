@@ -73,7 +73,7 @@ class HIterator : public HHuginn::HIterable, public HIteratorInterface {
 	HHuginn::HIterable::iterator_t _impl;
 public:
 	HIterator( HHuginn::HClass const*, HHuginn::value_t const&, HHuginn::HIterable::iterator_t const& );
-	static HHuginn::class_t get_class( HRuntime* );
+	static HHuginn::class_t get_class( HRuntime*, HHuginn::HClass const* );
 protected:
 	/* Value interface. */
 	static HHuginn::value_t is_valid( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );

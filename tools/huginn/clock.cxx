@@ -53,7 +53,7 @@ HHuginn::value_t HClock::to_string( huginn::HThread* thread_, HHuginn::value_t* 
 	M_EPILOG
 }
 
-HHuginn::class_t HClock::get_class( HRuntime* runtime_ ) {
+HHuginn::class_t HClock::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
@@ -68,6 +68,7 @@ HHuginn::class_t HClock::get_class( HRuntime* runtime_ ) {
 		{ "to_string",    runtime_->create_method( &HClock::to_string ),    "get precise `string` representation of elapsed time measured by this `Clock`" }
 	};
 	c->redefine( nullptr, fd );
+	c->set_origin( origin_ );
 	runtime_->huginn()->register_class( c );
 	return ( c );
 	M_EPILOG

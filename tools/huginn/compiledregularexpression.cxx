@@ -65,6 +65,7 @@ public:
 	HCompiledRegularExpressionClass(
 		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_,
+		HHuginn::HClass const* origin_,
 		HHuginn::class_t const& exceptionClass_
 	) : HHuginn::HClass(
 			runtime_,
@@ -74,12 +75,13 @@ public:
 			HHuginn::ACCESS::PRIVATE
 		)
 		, _exceptionClass( exceptionClass_ )
-		, _regularExpressionMatchClass( HRegularExpressionMatch::get_class( runtime_ ) ) {
+		, _regularExpressionMatchClass( HRegularExpressionMatch::get_class( runtime_, origin_ ) ) {
 		HHuginn::field_definitions_t fd{
 			{ "match",   runtime_->create_method( &HCompiledRegularExpression::match ),   "( *text* ) - find a match of this compiled regular expression in given *text*" },
 			{ "groups",  runtime_->create_method( &HCompiledRegularExpression::groups ),  "( *text* ) - get all matching regular expression groups from this regular expression in given *text*" },
 			{ "replace", runtime_->create_method( &HCompiledRegularExpression::replace ), "( *text*, *replacement* ) - replace each occurrence of matched groups in *text* with *replacement* pattern" }
 		};
+		set_origin( origin_ );
 		redefine( nullptr, fd );
 		return;
 	}
@@ -158,16 +160,17 @@ HHuginn::value_t HCompiledRegularExpression::do_groups(
 	return ( v );
 }
 
-HHuginn::class_t HCompiledRegularExpression::get_class( HRuntime* runtime_, HHuginn::class_t const& exceptionClass_ ) {
+HHuginn::class_t HCompiledRegularExpression::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_, HHuginn::class_t const& exceptionClass_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
 			HRuntime::class_constructor_t(
-				[&runtime_, &exceptionClass_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
+				[&runtime_, &origin_, &exceptionClass_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
 					return (
 						make_pointer<HCompiledRegularExpressionClass>(
 							runtime_,
 							typeId_,
+							origin_,
 							exceptionClass_
 						)
 					);

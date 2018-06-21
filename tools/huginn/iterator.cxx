@@ -67,7 +67,7 @@ HHuginn::value_t HIterator::next( huginn::HThread* thread_, HHuginn::value_t* ob
 	M_EPILOG
 }
 
-HHuginn::class_t HIterator::get_class( HRuntime* runtime_ ) {
+HHuginn::class_t HIterator::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"Iterator",
@@ -82,6 +82,7 @@ HHuginn::class_t HIterator::get_class( HRuntime* runtime_ ) {
 		{ "next",     runtime_->create_method( &HIterator::next ),     "move this `Iterator` to next position" }
 	};
 	c->redefine( nullptr, fd );
+	c->set_origin( origin_ );
 	runtime_->huginn()->register_class( c );
 	return ( c );
 }

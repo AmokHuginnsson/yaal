@@ -31,7 +31,7 @@ class HDatabase : public HHuginn::HValue {
 public:
 	HDatabase( HHuginn::HClass* class_ )
 		: HValue( class_ )
-		, _databaseConnectionClass( HDatabaseConnection::get_class( class_->runtime(), _exceptionClass ) )
+		, _databaseConnectionClass( HDatabaseConnection::get_class( class_->runtime(), class_, _exceptionClass ) )
 		, _exceptionClass( class_exception( class_ ) ) {
 		return;
 	}

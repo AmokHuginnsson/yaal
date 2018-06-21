@@ -25,7 +25,7 @@ public:
 	static HHuginn::value_t match( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t groups( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t replace( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
-	static HHuginn::class_t get_class( HRuntime*, HHuginn::class_t const& );
+	static HHuginn::class_t get_class( HRuntime*, HHuginn::HClass const*, HHuginn::class_t const& );
 private:
 	HHuginn::value_t do_match( huginn::HThread*, HHuginn::values_t&, int );
 	HHuginn::value_t do_groups( huginn::HThread*, HHuginn::values_t&, int );

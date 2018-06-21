@@ -47,12 +47,12 @@ class HAlgorithms : public HHuginn::HValue {
 public:
 	HAlgorithms( HHuginn::HClass* class_ )
 		: HValue( class_ )
-		, _iteratorClass( HIterator::get_class( class_->runtime() ) )
-		, _filterClass( HFilter::get_class( class_->runtime() ) )
-		, _mapperClass( HMapper::get_class( class_->runtime() ) )
-		, _rangeClass( HRange::get_class( class_->runtime() ) )
-		, _enumeratorClass( HEnumerator::get_class( class_->runtime() ) )
-		, _zipClass( HZip::get_class( class_->runtime() ) )
+		, _iteratorClass( HIterator::get_class( class_->runtime(), class_ ) )
+		, _filterClass( HFilter::get_class( class_->runtime(), class_ ) )
+		, _mapperClass( HMapper::get_class( class_->runtime(), class_ ) )
+		, _rangeClass( HRange::get_class( class_->runtime(), class_ ) )
+		, _enumeratorClass( HEnumerator::get_class( class_->runtime(), class_ ) )
+		, _zipClass( HZip::get_class( class_->runtime(), class_ ) )
 		, _exceptionClass( class_exception( class_ ) ) {
 		return;
 	}

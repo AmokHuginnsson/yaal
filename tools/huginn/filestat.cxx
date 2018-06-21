@@ -153,7 +153,7 @@ HHuginn::value_t HFileStat::get_times( char const* name_, time_getter_t timeGett
 	M_EPILOG
 }
 
-HHuginn::class_t HFileStat::get_class( HRuntime* runtime_ ) {
+HHuginn::class_t HFileStat::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
@@ -176,6 +176,7 @@ HHuginn::class_t HFileStat::get_class( HRuntime* runtime_ ) {
 		{ "accessed", runtime_->create_method( &HFileStat::get_times, "FileStat.accessed", &HFSItem::accessed ), "get file's last access `time`" }
 	};
 	c->redefine( nullptr, fd );
+	c->set_origin( origin_ );
 	runtime_->huginn()->register_class( c );
 	return ( c );
 	M_EPILOG

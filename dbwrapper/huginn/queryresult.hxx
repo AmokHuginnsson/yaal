@@ -25,7 +25,7 @@ public:
 	static tools::HHuginn::value_t insert_id( tools::huginn::HThread*, tools::HHuginn::value_t*, tools::HHuginn::values_t&, int );
 	static tools::HHuginn::value_t has_next( tools::huginn::HThread*, tools::HHuginn::value_t*, tools::HHuginn::values_t&, int );
 	static tools::HHuginn::value_t fetch_row( tools::huginn::HThread*, tools::HHuginn::value_t*, tools::HHuginn::values_t&, int );
-	static tools::HHuginn::class_t get_class( tools::huginn::HRuntime*, tools::HHuginn::class_t const& );
+	static tools::HHuginn::class_t get_class( tools::huginn::HRuntime*, tools::HHuginn::HClass const*, tools::HHuginn::class_t const& );
 private:
 	virtual iterator_t do_iterator( tools::huginn::HThread*, int ) override;
 	virtual int long do_size( yaal::tools::huginn::HThread*, int ) const override;

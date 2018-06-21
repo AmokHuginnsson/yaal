@@ -84,7 +84,7 @@ int long HRegularExpressionMatch::do_size( huginn::HThread*, int ) const {
 	return ( distance( _regex->find( _fast ), _regex->end() ) );
 }
 
-HHuginn::class_t HRegularExpressionMatch::get_class( HRuntime* runtime_ ) {
+HHuginn::class_t HRegularExpressionMatch::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
@@ -97,6 +97,7 @@ HHuginn::class_t HRegularExpressionMatch::get_class( HRuntime* runtime_ ) {
 		{ "matched", runtime_->create_method( &HRegularExpressionMatch::matched ), "tell if given regular expression pattern matched against given string" }
 	};
 	c->redefine( nullptr, fd );
+	c->set_origin( origin_ );
 	runtime_->huginn()->register_class( c );
 	return ( c );
 	M_EPILOG

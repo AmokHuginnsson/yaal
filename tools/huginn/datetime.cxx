@@ -32,7 +32,7 @@ public:
 	HDateTime( HHuginn::HClass* class_ )
 		: HValue( class_ )
 		, _timeClass( HTime::get_class( class_->runtime() ) )
-		, _clockClass( HClock::get_class( class_->runtime() ) )
+		, _clockClass( HClock::get_class( class_->runtime(), class_ ) )
 		, _exceptionClass( class_exception( class_ ) ) {
 		return;
 	}

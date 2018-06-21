@@ -23,7 +23,7 @@ public:
 	yaal::hcore::HString const& get_string( void ) const;
 	yaal::hcore::HRegex::HMatchIterator end( void ) const;
 	static HHuginn::value_t matched( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
-	static HHuginn::class_t get_class( HRuntime* );
+	static HHuginn::class_t get_class( HRuntime*, HHuginn::HClass const* );
 protected:
 	virtual iterator_t do_iterator( HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override;

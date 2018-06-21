@@ -28,7 +28,7 @@ class HRegularExpressions : public HHuginn::HValue {
 public:
 	HRegularExpressions( HHuginn::HClass* class_ )
 		: HValue( class_ )
-		, _compiledRegularExpressionClass( HCompiledRegularExpression::get_class( class_->runtime(), _exceptionClass ) )
+		, _compiledRegularExpressionClass( HCompiledRegularExpression::get_class( class_->runtime(), class_, _exceptionClass ) )
 		, _exceptionClass( class_exception( class_ ) ) {
 		return;
 	}

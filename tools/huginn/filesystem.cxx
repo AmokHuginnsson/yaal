@@ -44,9 +44,9 @@ public:
 	HFileSystem( HHuginn::HClass* class_ )
 		: HValue( class_ )
 		, _streamClass( HStream::get_class( class_->runtime() ) )
-		, _directoryScanClass( HDirectoryScan::get_class( class_->runtime() ) )
+		, _directoryScanClass( HDirectoryScan::get_class( class_->runtime(), class_ ) )
 		, _timeClass( huginn::HTime::get_class( class_->runtime() ) )
-		, _fileStatClass( HFileStat::get_class( class_->runtime() ) )
+		, _fileStatClass( HFileStat::get_class( class_->runtime(), class_ ) )
 		, _openModeClass(
 			add_enumeration_as_member(
 				class_,

@@ -26,7 +26,7 @@ public:
 		, _function( function_ )
 		, _method( method_ ) {
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			runtime_->create_class(
@@ -35,6 +35,7 @@ public:
 				HHuginn::ACCESS::PRIVATE
 			)
 		);
+		c->set_origin( origin_ );
 		runtime_->huginn()->register_class( c );
 		return ( c );
 		M_EPILOG
