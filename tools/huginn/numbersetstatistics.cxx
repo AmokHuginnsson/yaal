@@ -21,24 +21,53 @@ namespace tools {
 
 namespace huginn {
 
+template<typename coll_t>
+HNumberSetStatistics::number_set_stats_t make_data( HThread* thread_, HHuginn::type_id_t const& vt_, HHuginn::value_t const& col_, int position_ ) {
+	M_PROLOG
+	typename coll_t::values_t const& src( static_cast<coll_t const*>( col_.raw() )->value() );
+	HNumberSetStatistics::number_set_stats_t nss;
+	if ( src.is_empty() ) {
+		throw HHuginn::HHuginnRuntimeException( "Cannot aggregate statistics over empty set.", thread_->current_frame()->file_id(), position_ );
+	}
+	if ( vt_ == HHuginn::TYPE::REAL ) {
+		nss = HNumberSetStatistics::number_set_stats_t(
+			make_resource<HNumberSetStatistics::number_set_stats_real_t>(
+				value_unboxing_iterator<double long>( src.begin() ),
+				value_unboxing_iterator<double long>( src.end() ),
+				AGGREGATE_TYPE::BASIC | AGGREGATE_TYPE::MEDIAN | AGGREGATE_TYPE::INTERQUARTILE_RANGE | AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION
+			)
+		);
+	} else {
+		M_ASSERT( vt_ == HHuginn::TYPE::NUMBER );
+		nss = HNumberSetStatistics::number_set_stats_t(
+			make_resource<HNumberSetStatistics::number_set_stats_number_t>(
+				value_unboxing_iterator<yaal::hcore::HNumber>( src.begin() ),
+				value_unboxing_iterator<yaal::hcore::HNumber>( src.end() ),
+				AGGREGATE_TYPE::BASIC | AGGREGATE_TYPE::MEDIAN | AGGREGATE_TYPE::INTERQUARTILE_RANGE | AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION
+			)
+		);
+	}
+	return ( nss );
+	M_EPILOG
+}
+
 HNumberSetStatistics::HNumberSetStatistics( huginn::HThread* thread_, HHuginn::HClass const* class_, HHuginn::values_t& values_, int position_ )
 	: HValue( class_ )
 	, _stats() {
 	char const name[] = "NumberSetStatistics.constructor";
-	verify_signature( name, values_, { HHuginn::TYPE::LIST }, thread_, position_ );
-	HHuginn::type_id_t t( values_[0]->type_id() );
+	verify_arg_count( name, values_, 1, 1, thread_, position_ );
+	HHuginn::type_id_t t( verify_arg_type( name, values_, 0, { HHuginn::TYPE::TUPLE, HHuginn::TYPE::LIST, HHuginn::TYPE::DEQUE, HHuginn::TYPE::SET, HHuginn::TYPE::ORDER }, ARITY::UNARY, thread_, position_ ) );
 	HHuginn::type_id_t vt( verify_arg_collection_value_type( name, values_, 0, ARITY::UNARY, { HHuginn::TYPE::REAL, HHuginn::TYPE::NUMBER }, UNIFORMITY::REQUIRED, thread_, position_ ) );
-	if ( t == HHuginn::TYPE::LIST ) {
-		HHuginn::HList::values_t const& src( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
-		if ( src.is_empty() ) {
-			throw HHuginn::HHuginnRuntimeException( "Cannot aggregate statistics over empty set.", thread_->current_frame()->file_id(), position_ );
-		}
-		if ( vt == HHuginn::TYPE::REAL ) {
-			_stats = number_set_stats_t( make_resource<number_set_stats_real_t>( value_unboxing_iterator<double long>( src.begin() ), value_unboxing_iterator<double long>( src.end() ), AGGREGATE_TYPE::BASIC | AGGREGATE_TYPE::MEDIAN | AGGREGATE_TYPE::INTERQUARTILE_RANGE | AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION ) );
-		} else {
-			M_ASSERT( vt == HHuginn::TYPE::NUMBER );
-			_stats = number_set_stats_t( make_resource<number_set_stats_number_t>( value_unboxing_iterator<yaal::hcore::HNumber>( src.begin() ), value_unboxing_iterator<yaal::hcore::HNumber>( src.end() ), AGGREGATE_TYPE::BASIC | AGGREGATE_TYPE::MEDIAN | AGGREGATE_TYPE::INTERQUARTILE_RANGE | AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION ) );
-		}
+	if ( t == HHuginn::TYPE::TUPLE ) {
+		_stats = make_data<HHuginn::HTuple>( thread_, vt, values_[0], position_ );
+	} else if ( t == HHuginn::TYPE::LIST ) {
+		_stats = make_data<HHuginn::HList>( thread_, vt, values_[0], position_ );
+	} else if ( t == HHuginn::TYPE::DEQUE ) {
+		_stats = make_data<HHuginn::HDeque>( thread_, vt, values_[0], position_ );
+	} else if ( t == HHuginn::TYPE::SET ) {
+		_stats = make_data<HHuginn::HSet>( thread_, vt, values_[0], position_ );
+	} else if ( t == HHuginn::TYPE::ORDER ) {
+		_stats = make_data<HHuginn::HOrder>( thread_, vt, values_[0], position_ );
 	}
 	return;
 }

@@ -477,6 +477,9 @@ HHuginn::type_id_t verify_arg_collection_value_type(
 	verify_arg_collection( name_, values_, no_, argsArity_, ONTICALLY::MATERIALIZED, thread_, position_ );
 	HHuginn::type_id_t type( type_id( HHuginn::TYPE::UNKNOWN ) );
 	switch ( values_[no_]->type_id().get() ) {
+		case ( static_cast<int>( HHuginn::TYPE::TUPLE ) ): {
+			type = verify_arg_collection_value_type_low( name_, *static_cast<HHuginn::HTuple const*>( values_[no_].raw() ), requiredTypes_, uniformity_, thread_, position_ );
+		} break;
 		case ( static_cast<int>( HHuginn::TYPE::LIST ) ): {
 			type = verify_arg_collection_value_type_low( name_, *static_cast<HHuginn::HList const*>( values_[no_].raw() ), requiredTypes_, uniformity_, thread_, position_ );
 		} break;
@@ -490,7 +493,8 @@ HHuginn::type_id_t verify_arg_collection_value_type(
 			HHuginn::HOrder::values_t const& o( static_cast<HHuginn::HOrder const*>( values_[no_].raw() )->value() );
 			if ( ! o.is_empty() ) {
 				HHuginn::HClass const* c( (*o.begin())->get_class() );
-				if ( find( requiredTypes_.begin(), requiredTypes_.end(), c->type_id() ) == requiredTypes_.end() ) {
+				type = c->type_id();
+				if ( find( requiredTypes_.begin(), requiredTypes_.end(), type ) == requiredTypes_.end() ) {
 					throw HHuginn::HHuginnRuntimeException(
 						hcore::to_string( name_ )
 							.append( "() a collection contains value of an unexpected type: " )
