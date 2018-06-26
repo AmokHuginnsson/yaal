@@ -206,6 +206,40 @@ public:
 	int type( void ) const {
 		return ( _type );
 	}
+	bool operator == ( HVariant const& other_ ) const {
+		bool eq( _type == other_._type );
+		if ( eq ) {
+			switch ( _type ) {
+				case ( INVALID ): break;
+				case ( 0 ): eq = equals( *reinterpret_cast<t0_t const*>( _mem.mem() ), *reinterpret_cast<t0_t const*>( other_._mem.mem() ) ); break;
+				case ( 1 ): eq = equals( *reinterpret_cast<t1_t const*>( _mem.mem() ), *reinterpret_cast<t1_t const*>( other_._mem.mem() ) ); break;
+				case ( 2 ): eq = equals( *reinterpret_cast<t2_t const*>( _mem.mem() ), *reinterpret_cast<t2_t const*>( other_._mem.mem() ) ); break;
+				case ( 3 ): eq = equals( *reinterpret_cast<t3_t const*>( _mem.mem() ), *reinterpret_cast<t3_t const*>( other_._mem.mem() ) ); break;
+				case ( 4 ): eq = equals( *reinterpret_cast<t4_t const*>( _mem.mem() ), *reinterpret_cast<t4_t const*>( other_._mem.mem() ) ); break;
+				case ( 5 ): eq = equals( *reinterpret_cast<t5_t const*>( _mem.mem() ), *reinterpret_cast<t5_t const*>( other_._mem.mem() ) ); break;
+				case ( 6 ): eq = equals( *reinterpret_cast<t6_t const*>( _mem.mem() ), *reinterpret_cast<t6_t const*>( other_._mem.mem() ) ); break;
+				case ( 7 ): eq = equals( *reinterpret_cast<t7_t const*>( _mem.mem() ), *reinterpret_cast<t7_t const*>( other_._mem.mem() ) ); break;
+				case ( 8 ): eq = equals( *reinterpret_cast<t8_t const*>( _mem.mem() ), *reinterpret_cast<t8_t const*>( other_._mem.mem() ) ); break;
+				case ( 9 ): eq = equals( *reinterpret_cast<t9_t const*>( _mem.mem() ), *reinterpret_cast<t9_t const*>( other_._mem.mem() ) ); break;
+				case ( 10 ): eq = equals( *reinterpret_cast<t10_t const*>( _mem.mem() ), *reinterpret_cast<t10_t const*>( other_._mem.mem() ) ); break;
+				case ( 11 ): eq = equals( *reinterpret_cast<t11_t const*>( _mem.mem() ), *reinterpret_cast<t11_t const*>( other_._mem.mem() ) ); break;
+				case ( 12 ): eq = equals( *reinterpret_cast<t12_t const*>( _mem.mem() ), *reinterpret_cast<t12_t const*>( other_._mem.mem() ) ); break;
+				case ( 13 ): eq = equals( *reinterpret_cast<t13_t const*>( _mem.mem() ), *reinterpret_cast<t13_t const*>( other_._mem.mem() ) ); break;
+				case ( 14 ): eq = equals( *reinterpret_cast<t14_t const*>( _mem.mem() ), *reinterpret_cast<t14_t const*>( other_._mem.mem() ) ); break;
+				case ( 15 ): eq = equals( *reinterpret_cast<t15_t const*>( _mem.mem() ), *reinterpret_cast<t15_t const*>( other_._mem.mem() ) ); break;
+				case ( 16 ): eq = equals( *reinterpret_cast<t16_t const*>( _mem.mem() ), *reinterpret_cast<t16_t const*>( other_._mem.mem() ) ); break;
+				case ( 17 ): eq = equals( *reinterpret_cast<t17_t const*>( _mem.mem() ), *reinterpret_cast<t17_t const*>( other_._mem.mem() ) ); break;
+				case ( 18 ): eq = equals( *reinterpret_cast<t18_t const*>( _mem.mem() ), *reinterpret_cast<t18_t const*>( other_._mem.mem() ) ); break;
+				case ( 19 ): eq = equals( *reinterpret_cast<t19_t const*>( _mem.mem() ), *reinterpret_cast<t19_t const*>( other_._mem.mem() ) ); break;
+				case ( 20 ): eq = equals( *reinterpret_cast<t20_t const*>( _mem.mem() ), *reinterpret_cast<t20_t const*>( other_._mem.mem() ) ); break;
+				default: M_ASSERT( 0 && "Absurd type number." ); break;
+			}
+		}
+		return ( eq );
+	}
+	bool operator != ( HVariant const& other_ ) const {
+		return ( ! operator == ( other_ ) );
+	}
 private:
 	static void swap( int type_, void* a_, void* b_ ) {
 		using yaal::swap;
@@ -314,6 +348,13 @@ private:
 					.append("'." )
 			);
 		}
+	}
+	template<typename T>
+	static bool equals( T const& a_, T const& b_ ) {
+		return ( a_ == b_ );
+	}
+	static bool equals( trait::no_type const&, trait::no_type const& ) {
+		return ( false );
 	}
 };
 
