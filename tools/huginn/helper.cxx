@@ -856,6 +856,23 @@ yaal::hcore::HString int_to_str( HHuginn::HInteger::value_type int_, BASE base_,
 	M_EPILOG
 }
 
+namespace package {
+
+HHuginn::value_t value( HHuginn::value_t value_, HUTF8String name_, HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( name_.c_str(), values_, 0, 0, thread_, position_ );
+	return ( value_ );
+	M_EPILOG
+}
+
+HHuginn::value_t instance( HHuginn::HClass const* class_, HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	return ( class_->create_instance( thread_, object_, values_, position_ ) );
+	M_EPILOG
+}
+
+}
+
 }
 
 }

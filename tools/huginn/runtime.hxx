@@ -137,6 +137,7 @@ public:
 	yaal::hcore::HString const& identifier_name( identifier_id_t ) const;
 	value_t const* get_global( identifier_id_t ) const;
 	class_t get_class( identifier_id_t ) const;
+	HHuginn::value_t find_package( identifier_id_t ) const;
 	void register_class( class_t, HHuginn::VISIBILITY );
 	/*! \brief Remove compiled class from runtime.
 	 *
@@ -263,7 +264,6 @@ protected:
 	virtual call_stack_t do_get_call_stack( void ) override;
 	virtual variable_views_t do_get_locals( int ) override;
 private:
-	HHuginn::value_t find_package( identifier_id_t ) const;
 	void register_builtin_function( yaal::hcore::HString const&, function_t&&, yaal::hcore::HString const& );
 private:
 	HRuntime( HRuntime const& ) = delete;

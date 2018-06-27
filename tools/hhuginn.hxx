@@ -697,6 +697,12 @@ private:
 public:
 	HBoundMethod( HHuginn::HClass const*, HHuginn::function_t const&, HHuginn::value_t const& );
 	HHuginn::value_t call( huginn::HThread*, values_t&, int );
+	HHuginn::value_t const& subject( void ) const {
+		return ( _objectHolder );
+	}
+	HHuginn::function_t const& function( void ) const {
+		return ( _function );
+	}
 private:
 	HBoundMethod( HBoundMethod const& ) = delete;
 	HBoundMethod& operator = ( HBoundMethod const& ) = delete;

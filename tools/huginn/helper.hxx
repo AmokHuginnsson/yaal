@@ -936,6 +936,13 @@ void register_function( HHuginn& h_, yaal::hcore::HString const& name_, F fun_, 
 	M_EPILOG
 }
 
+namespace package {
+
+HHuginn::value_t value( HHuginn::value_t, yaal::hcore::HUTF8String, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+HHuginn::value_t instance( HHuginn::HClass const*, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+
+}
+
 }
 
 }

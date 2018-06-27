@@ -489,25 +489,6 @@ void HRuntime::execute( void ) {
 	M_EPILOG
 }
 
-namespace {
-namespace package {
-
-HHuginn::value_t value( HHuginn::value_t value_, HUTF8String name_, HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	verify_arg_count( name_.c_str(), values_, 0, 0, thread_, position_ );
-	return ( value_ );
-	M_EPILOG
-}
-
-HHuginn::value_t instance( HHuginn::HClass const* class_, HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	return ( class_->create_instance( thread_, object_, values_, position_ ) );
-	M_EPILOG
-}
-
-}
-}
-
 HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRuntime const& context_ ) {
 	M_PROLOG
 	HString doc( _huginn->get_comment( 1 ) );
@@ -527,9 +508,18 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 			);
 		}
 	}
+	typedef HHashSet<HHuginn::type_id_t> type_set_t;
+	type_set_t previouslyImportedPackages;
+	for ( global_definitions_t::value_type const& gd : context_._globalDefinitions ) {
+		previouslyImportedPackages.insert( (*gd.second)->type_id() );
+	}
 	for ( global_definitions_t::value_type const& gd : _globalDefinitions ) {
 		bool isEnum( is_enum_class( gd.second ) );
-		if ( ( gd.first < STANDARD_FUNCTIONS::MAIN_IDENTIFIER ) || ( ! isEnum && ( _classes.count( gd.first ) > 0 ) ) || is_restricted( identifier_name( gd.first ) ) ) {
+		if (
+			( gd.first < STANDARD_FUNCTIONS::MAIN_IDENTIFIER )
+			|| ( ! isEnum && ( _classes.count( gd.first ) > 0 ) )
+			|| is_restricted( identifier_name( gd.first ) )
+		) {
 			continue;
 		}
 		if ( (*gd.second)->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) {
@@ -545,7 +535,7 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 				*gd.second,
 				"access enum "_ys.append( identifier_name( gd.first ) ).append( " imported in submodule" )
 			);
-		} else if ( !! context_.find_package( (*gd.second)->get_class()->identifier_id() ) ) {
+		} else if ( !! find_package( (*gd.second)->get_class()->identifier_id() ) && ( previouslyImportedPackages.count( (*gd.second)->type_id() ) == 0 ) ) {
 			fds.emplace_back(
 				identifier_name( gd.first ),
 				create_method( &package::value, *gd.second, identifier_name( gd.first ) ),
