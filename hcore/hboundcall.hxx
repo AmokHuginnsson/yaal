@@ -164,6 +164,12 @@ public:
 		}
 		return ( true );
 	}
+	bool operator == ( HBoundCall const& other_ ) const {
+		return ( _call == other_._call );
+	}
+	bool operator != ( HBoundCall const& other_ ) const {
+		return ( _call != other_._call );
+	}
 	void swap( HBoundCall& boundCall_ ) {
 		if ( &boundCall_ != this ) {
 			yaal::swap( boundCall_._call, _call );
