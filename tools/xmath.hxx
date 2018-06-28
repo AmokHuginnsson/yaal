@@ -35,6 +35,7 @@ struct AGGREGATE_TYPE {
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const MEDIAN;
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const MEAN_ABSOLUTE_DEVIATION;
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const INTERQUARTILE_RANGE;
+	static int long long required_data_points( aggregate_type_t const& );
 };
 
 /*! \brief Provide statistics for set of numbers.

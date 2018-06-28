@@ -115,14 +115,18 @@ typename stats_t::value_type derivative_stats_impl( stats_t const& stats_, HNumb
 HHuginn::value_t HNumberSetStatistics::stat( char const* name_, xmath::aggregate_type_t aggregateType_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( name_, values_, 0, 0, thread_, position_ );
-	HHuginn::value_t v;
+	HHuginn::value_t v( thread_->runtime().none_value() );
 	HNumberSetStatistics* o( static_cast<HNumberSetStatistics*>( object_->raw() ) );
 	if ( o->_stats.type() == 0 ) {
 		number_set_stats_real_t& nss( *( o->_stats.get<number_set_stats_real_ptr_t>().raw() ) );
-		v = thread_->runtime().object_factory()->create_real( stats_impl( nss, aggregateType_ ) );
+		if ( nss.count() > AGGREGATE_TYPE::required_data_points( aggregateType_ ) ) {
+			v = thread_->runtime().object_factory()->create_real( stats_impl( nss, aggregateType_ ) );
+		}
 	} else {
 		number_set_stats_number_t& nss( *( o->_stats.get<number_set_stats_number_ptr_t>().raw() ) );
-		v = thread_->runtime().object_factory()->create_number( stats_impl( nss, aggregateType_ ) );
+		if ( nss.count() > AGGREGATE_TYPE::required_data_points( aggregateType_ ) ) {
+			v = thread_->runtime().object_factory()->create_number( stats_impl( nss, aggregateType_ ) );
+		}
 	}
 	return ( v );
 	M_EPILOG
