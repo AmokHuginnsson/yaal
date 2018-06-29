@@ -29,6 +29,18 @@ HSource::HSource( void )
 	return;
 }
 
+void HSource::reset( void ) {
+	M_PROLOG
+	_skippedLines = 0;
+	_comments.clear();
+	_skips.clear();
+	_preprocessed.clear();
+	_orig.clear();
+	_name.clear();
+	return;
+	M_EPILOG
+}
+
 void HSource::load( yaal::hcore::HStreamInterface& stream_, yaal::hcore::HString const& name_, int skippedLines_ ) {
 	M_PROLOG
 	static int const PAGE_SIZE( static_cast<int>( system::get_page_size() ) );

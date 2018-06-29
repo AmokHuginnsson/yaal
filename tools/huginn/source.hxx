@@ -30,6 +30,7 @@ private:
 public:
 	HSource( void );
 	void load( yaal::hcore::HStreamInterface&, yaal::hcore::HString const&, int );
+	void reset( void );
 	void preprocess( void );
 	char const* error_message( int ) const;
 	int real_position( int ) const;

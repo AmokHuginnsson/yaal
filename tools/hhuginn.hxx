@@ -411,6 +411,8 @@ private:
 	huginn::HRuntime const& runtime( void ) const;
 	void finalize_compilation( void );
 	HClass const* commit_class( identifier_id_t );
+	huginn::HSource& current_source( void );
+	huginn::HSource const& current_source( void ) const;
 	char const* error_message( int ) const;
 	HHuginn( HHuginn const& ) = delete;
 	HHuginn& operator = ( HHuginn const& ) = delete;

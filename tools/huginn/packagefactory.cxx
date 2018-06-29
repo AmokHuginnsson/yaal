@@ -201,31 +201,37 @@ HHuginn::value_t HPackageFactory::load_module( HRuntime* runtime_, HHuginn::path
 	M_EPILOG
 }
 
-HHuginn::value_t HPackageFactory::compile_module( HRuntime* runtime_, HHuginn::paths_t const& paths_, yaal::hcore::HString const& path_, yaal::hcore::HString const& name_, int position_ ) {
+HHuginn::value_t HPackageFactory::compile_module(
+	HRuntime* contextRuntime_,
+	HHuginn::paths_t const& paths_,
+	yaal::hcore::HString const& path_,
+	yaal::hcore::HString const& name_,
+	int position_
+) {
 	M_PROLOG
+	HHuginn& contextHuginn( *contextRuntime_->huginn() );
+	HHuginn loader( contextRuntime_ );
+	HRuntime& loaderRuntime( const_cast<HRuntime&>( loader.runtime() ) );
 	HFile src( path_, HFile::OPEN::READING );
-	HHuginn loader( runtime_ );
-	HRuntime& rt( const_cast<HRuntime&>( loader.runtime() ) );
-	rt.copy_text( *runtime_ );
+	loaderRuntime.copy_text( *contextRuntime_ );
+	loader._compiler->_isModule = true;
 	loader.load( src );
 	loader.preprocess();
-	loader._compiler->_isModule = true;
-	HHuginn& h( *runtime_->huginn() );
-	int fileId( h._compiler->_fileId == MAIN_FILE_ID ? static_cast<int>( h._sources.get_size() - 1 ) : h._compiler->_fileId );
-	loader._compiler->_fileId = fileId;
-	loader._sources.insert( loader._sources.begin(), h._sources.begin(), h._sources.end() );
-	if ( ! ( loader.parse() && loader.compile( paths_, runtime_->compiler_setup() ) ) ) {
-		runtime_->fix_references();
-		throw HHuginn::HHuginnRuntimeException( loader.error_message(), fileId, position_ );
+	M_ASSERT( static_cast<int>( contextHuginn._sources.get_size() - 1 ) == contextHuginn._compiler->_fileId );
+	loader._compiler->_fileId = contextHuginn._compiler->_fileId;
+	loader._sources.insert( loader._sources.begin(), contextHuginn._sources.begin(), contextHuginn._sources.end() );
+	if ( ! ( loader.parse() && loader.compile( paths_, contextRuntime_->compiler_setup() ) ) ) {
+		contextRuntime_->fix_references();
+		throw HHuginn::HHuginnRuntimeException( loader.error_message(), contextHuginn._compiler->_fileId, position_ );
 	}
-	h._compiler->_fileId = loader._compiler->_fileId;
+	contextHuginn._compiler->_fileId = loader._compiler->_fileId;
 	loader._state = HHuginn::STATE::PARSED;
-	HHuginn::class_t c( rt.make_package( name_, *runtime_ ) );
-	runtime_->copy_text( rt );
-	h.register_class( c );
-	h._sources = yaal::move( loader._sources );
-	huginn::HThread t( runtime_, hcore::HThread::get_current_thread_id() );
-	return ( runtime_->object_factory()->create_object( c.raw(), c->get_defaults( &t, position_ ) ) );
+	HHuginn::class_t c( loaderRuntime.make_package( name_, *contextRuntime_ ) );
+	contextRuntime_->copy_text( loaderRuntime );
+	contextHuginn.register_class( c );
+	contextHuginn._sources = yaal::move( loader._sources );
+	huginn::HThread t( contextRuntime_, hcore::HThread::get_current_thread_id() );
+	return ( contextRuntime_->object_factory()->create_object( c.raw(), c->get_defaults( &t, position_ ) ) );
 	M_EPILOG
 }
 

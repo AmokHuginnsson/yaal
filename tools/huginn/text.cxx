@@ -48,7 +48,8 @@ public:
 		verify_arg_count( name, values_, 2, 2, thread_, position_ );
 		HHuginn::type_id_t t( values_[0]->type_id() );
 		if (
-			( t != HHuginn::TYPE::LIST )
+			( t != HHuginn::TYPE::TUPLE )
+			&& ( t != HHuginn::TYPE::LIST )
 			&& ( t != HHuginn::TYPE::DEQUE )
 			&& ( t != HHuginn::TYPE::ORDER )
 			&& ( t != HHuginn::TYPE::SET )

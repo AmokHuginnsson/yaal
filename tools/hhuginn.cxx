@@ -50,6 +50,7 @@ main( args ) {
 #endif
 
 namespace {
+
 char const DEFAULT_PATHS[] = ".:" LIBDIR "/huginn:" DATADIR "/huginn";
 char const* const MODULE_PATHS_RAW( ::getenv( "HUGINNPATH" ) );
 HString MODULE_PATHS_S(
@@ -61,6 +62,7 @@ HString MODULE_PATHS_S(
 );
 
 }
+
 HHuginn::paths_t const HHuginn::MODULE_PATHS( string::split<HHuginn::paths_t>( MODULE_PATHS_S, ":", HTokenizer::SKIP_EMPTY ) );
 
 static int const DEFAULT_MAX_CALL_STACK( 1024 );
@@ -312,8 +314,7 @@ void HHuginn::reset( int undoSteps_ ) {
 	_errorFileId = INVALID_FILE_ID;
 	_errorMessage.clear();
 	_compiler->reset( undoSteps_ );
-	_sources.clear();
-	_sources.emplace_back( make_pointer<HSource>() );
+	_sources.front()->reset();
 	_runtime->reset();
 	_state = STATE::EMPTY;
 	return;
@@ -330,10 +331,31 @@ void HHuginn::set_max_call_stack_size( int maxCallStackSize_ ) {
 	_runtime->set_max_call_stack_size( maxCallStackSize_ );
 }
 
+huginn::HSource& HHuginn::current_source( void ) {
+	M_PROLOG
+	int fileId( _compiler->_fileId );
+	return (
+		( fileId == INVALID_FILE_ID )
+		|| (
+			( fileId == MAIN_FILE_ID )
+			&& ( ( _state == STATE::PARSED ) || ( _state == STATE::COMPILED ) || ( _state == STATE::RUNNING ) )
+		)
+			? *_sources.front()
+			: *_sources.back()
+	);
+	M_EPILOG
+}
+
+huginn::HSource const & HHuginn::current_source( void ) const {
+	M_PROLOG
+	return ( const_cast<HHuginn*>( this )->current_source() );
+	M_EPILOG
+}
+
 void HHuginn::load( yaal::hcore::HStreamInterface& stream_, yaal::hcore::HString const& name_, int skippedLines_ ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::EMPTY );
-	_sources.back()->load( stream_, name_, skippedLines_ );
+	current_source().load( stream_, name_, skippedLines_ );
 	_state = STATE::LOADED;
 	return;
 	M_EPILOG
@@ -342,7 +364,7 @@ void HHuginn::load( yaal::hcore::HStreamInterface& stream_, yaal::hcore::HString
 void HHuginn::load( yaal::hcore::HStreamInterface& stream_, int skippedLines_ ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::EMPTY );
-	_sources.back()->load( stream_, hcore::HString(), skippedLines_ );
+	current_source().load( stream_, hcore::HString(), skippedLines_ );
 	_state = STATE::LOADED;
 	return;
 	M_EPILOG
@@ -351,7 +373,7 @@ void HHuginn::load( yaal::hcore::HStreamInterface& stream_, int skippedLines_ ) 
 void HHuginn::preprocess( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::LOADED, "Program source must be loaded before preprocessing." );
-	_sources.back()->preprocess();
+	current_source().preprocess();
 	_state = STATE::PREPROCESSED;
 	return;
 	M_EPILOG
@@ -360,7 +382,7 @@ void HHuginn::preprocess( void ) {
 bool HHuginn::parse( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::PREPROCESSED, "Preprocessor step is required before parsing." );
-	bool ok( _engine.parse( _sources.back()->begin(), _sources.back()->end() ) );
+	bool ok( _engine.parse( current_source().begin(), current_source().end() ) );
 	if ( ! ok ) {
 		_errorMessage = _engine.error_messages()[0];
 		_errorPosition = _engine.error_position();
@@ -492,7 +514,7 @@ bool HHuginn::compile( paths_t const& paths_, compiler_setup_t compilerSetup_, H
 				_sources.begin(),
 				_sources.end(),
 				[this]( source_t const& src_ ) {
-					return ( src_->name() == _sources.back()->name() );
+					return ( src_->name() == current_source().name() );
 				}
 			) > 1
 		);
@@ -608,13 +630,13 @@ char const* HHuginn::error_message( int code_ ) const {
 
 yaal::hcore::HString HHuginn::get_snippet( int from_, int len_ ) const {
 	M_PROLOG
-	return ( _sources.back()->get_snippet( from_, len_ ) );
+	return ( current_source().get_snippet( from_, len_ ) );
 	M_EPILOG
 }
 
 yaal::hcore::HString const& HHuginn::get_comment( int pos_ ) const {
 	M_PROLOG
-	return ( _sources.back()->get_comment( pos_ ) );
+	return ( current_source().get_comment( pos_ ) );
 	M_EPILOG
 }
 
@@ -792,7 +814,7 @@ HHuginn::value_t HHuginn::result( void ) const {
 
 void HHuginn::dump_preprocessed_source( yaal::hcore::HStreamInterface& stream_ ) const {
 	M_PROLOG
-	_sources.back()->dump_preprocessed( stream_ );
+	current_source().dump_preprocessed( stream_ );
 	return;
 	M_EPILOG
 }
