@@ -61,10 +61,10 @@ class HIdentifierParser : public executing_parser::HRuleBase {
 public:
 	typedef HIdentifierParser this_type;
 	typedef HRuleBase base_type;
-	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const&, executing_parser::position_t )> action_string_position_t;
+	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const&, executing_parser::range_t )> action_string_range_t;
 private:
 	yaal::hcore::HString _name;
-	action_string_position_t _actionStringPosition;
+	action_string_range_t _actionStringPosition;
 	yaal::hcore::HString _errorMessage;
 public:
 	HIdentifierParser( HIdentifierParser const& identifier_ )
@@ -106,7 +106,7 @@ protected:
 		return ( HRuleBase::do_has_action() || ( !! _actionStringPosition ) );
 	}
 private:
-	HIdentifierParser( yaal::hcore::HString const& name_, action_string_position_t const& action_ )
+	HIdentifierParser( yaal::hcore::HString const& name_, action_string_range_t const& action_ )
 		: HRuleBase( true )
 		, _name( name_ )
 		, _actionStringPosition( action_ )
@@ -114,8 +114,8 @@ private:
 		return;
 	}
 	HIdentifierParser& operator = ( HIdentifierParser const& ) = delete;
-	friend HIdentifierParser identifier( yaal::hcore::HString const&, HIdentifierParser::action_string_position_t const& );
-	friend HIdentifierParser identifier( HIdentifierParser::action_string_position_t const& );
+	friend HIdentifierParser identifier( yaal::hcore::HString const&, HIdentifierParser::action_string_range_t const& );
+	friend HIdentifierParser identifier( HIdentifierParser::action_string_range_t const& );
 };
 
 inline bool is_identifer_head( code_point_t const& codePoint_ ) {
@@ -138,9 +138,9 @@ hcore::HUTF8String::const_iterator HIdentifierParser::do_parse( HExecutingParser
 			}
 		}
 		if ( scan != first_ ) {
-			executing_parser::position_t pos( position( executingParser_, first_ ) );
+			executing_parser::range_t rng( range( executingParser_, first_, scan ) );
 			if ( !! _actionStringPosition ) {
-				add_execution_step( executingParser_, call( _actionStringPosition, hcore::HUTF8String( first_, scan ), pos ) );
+				add_execution_step( executingParser_, call( _actionStringPosition, hcore::HUTF8String( first_, scan ), rng ) );
 			}
 			matched = true;
 		}
@@ -155,7 +155,7 @@ hcore::HUTF8String::const_iterator HIdentifierParser::do_parse( HExecutingParser
 	M_EPILOG
 }
 
-inline HIdentifierParser identifier( yaal::hcore::HString const& name_, HIdentifierParser::action_string_position_t const& action_ ) {
+inline HIdentifierParser identifier( yaal::hcore::HString const& name_, HIdentifierParser::action_string_range_t const& action_ ) {
 	return ( HIdentifierParser( name_, action_ ) );
 }
 
@@ -163,35 +163,35 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	M_PROLOG
 	using namespace executing_parser;
 	namespace e_p = executing_parser;
-	HRule expression( "expression", e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::mark_expression_position, _compiler.get(), _1 ) ) );
+	HRule expression( "expression", e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::mark_expression_position, _compiler.get(), _1 ) ) );
 	HRule modulus( "modulus",
-		constant( '|', e_p::HCharacter::action_character_position_t( hcore::call( &OCompiler::defer_oper, _compiler.get(), _1, _2 ) ) )
+		constant( '|', e_p::HCharacter::action_character_range_t( hcore::call( &OCompiler::defer_oper, _compiler.get(), _1, _2 ) ) )
 		>> expression
-		>> constant( '|', e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MODULUS, _1 ) ) ) );
+		>> constant( '|', e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MODULUS, _1 ) ) ) );
 	HRule parenthesis( "parenthesis",
-		constant( '(', e_p::HCharacter::action_character_position_t( hcore::call( &OCompiler::defer_oper, _compiler.get(), _1, _2 ) ) )
+		constant( '(', e_p::HCharacter::action_character_range_t( hcore::call( &OCompiler::defer_oper, _compiler.get(), _1, _2 ) ) )
 		>> expression
-		>> constant( ')', e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::PARENTHESIS, _1 ) ) ) );
+		>> constant( ')', e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::PARENTHESIS, _1 ) ) ) );
 	HRule arg(
 		"argument",
 		expression,
-		HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_ARGUMENT, _1 ) )
+		HRuleBase::action_range_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_ARGUMENT, _1 ) )
 	);
 	HRule functionArgument(
 		"functionArgument",
-		( arg ^ ':' ) >> -constant( "..." )[HRuleBase::action_position_t( hcore::call( &OCompiler::unpack_variadic_parameters, _compiler.get(), _1 ) )]
+		( arg ^ ':' ) >> -constant( "..." )[HRuleBase::action_range_t( hcore::call( &OCompiler::unpack_variadic_parameters, _compiler.get(), _1 ) )]
 	);
 	HRule unpackedNamedParameters(
 		"unpackedNamedParameters",
-		arg >> constant( ":::" )[HRuleBase::action_position_t( hcore::call( &OCompiler::repack_named_parameters, _compiler.get(), _1 ) )]
+		arg >> constant( ":::" )[HRuleBase::action_range_t( hcore::call( &OCompiler::repack_named_parameters, _compiler.get(), _1 ) )]
 	);
 	HRule argList( "argList", functionArgument >> *( ',' >> functionArgument ) );
 	HRule parameterName(
 		identifier(
 			"parameterName",
-			e_p::HStringLiteral::action_string_position_t( hcore::call( &OCompiler::defer_store_string, _compiler.get(), _1, _2 ) )
+			e_p::HStringLiteral::action_string_range_t( hcore::call( &OCompiler::defer_store_string, _compiler.get(), _1, _2 ) )
 		),
-		HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_ARGUMENT, _1 ) )
+		HRuleBase::action_range_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_ARGUMENT, _1 ) )
 	);
 	HRule namedParameter(
 		"namedParameter",
@@ -199,11 +199,11 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	);
 	HRule namedParameters(
 		"namedParameters",
-		HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
+		HRuleBase::action_range_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
 		>> namedParameter >> *( ',' >> namedParameter )
-		>> HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MAKE_LOOKUP, _1 ) )
-		>> HRuleBase::action_position_t( hcore::call( &OCompiler::repack_named_parameters, _compiler.get(), _1 ) ),
-		HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_ARGUMENT, _1 ) )
+		>> HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MAKE_LOOKUP, _1 ) )
+		>> HRuleBase::action_range_t( hcore::call( &OCompiler::repack_named_parameters, _compiler.get(), _1 ) ),
+		HRuleBase::action_range_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_ARGUMENT, _1 ) )
 	);
 	HRule repackedNamedParameter(
 		"repackedNamedParameter",
@@ -215,46 +215,46 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	);
 	HRule functionCallOperator(
 		"functionCallOperator",
-		constant( '(', HRuleBase::action_position_t( hcore::call( &OCompiler::start_function_call, _compiler.get(), _1 ) ) )
+		constant( '(', HRuleBase::action_range_t( hcore::call( &OCompiler::start_function_call, _compiler.get(), _1 ) ) )
 		>> -( ( argList >> -( ',' >> repackedNamedParameters ) ) | repackedNamedParameters ) >>
-		constant( ')', HRuleBase::action_position_t( hcore::call( &OCompiler::close_function_call, _compiler.get(), _1 ) ) ),
-		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
+		constant( ')', HRuleBase::action_range_t( hcore::call( &OCompiler::close_function_call, _compiler.get(), _1 ) ) ),
+		HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
 	);
 	HRule stringLiteral(
 		"stringLiteral",
-		string_literal[e_p::HStringLiteral::action_string_position_t( hcore::call( &OCompiler::defer_store_string, _compiler.get(), _1, _2 ) )]
+		string_literal[e_p::HStringLiteral::action_string_range_t( hcore::call( &OCompiler::defer_store_string, _compiler.get(), _1, _2 ) )]
 	);
 	HRule literalNone(
 		"none",
-		constant( KEYWORD::NONE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_direct, _compiler.get(), runtime_ ? runtime_->none_value() : value_t(), _1 ) ) )
+		constant( KEYWORD::NONE, e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::defer_store_direct, _compiler.get(), runtime_ ? runtime_->none_value() : value_t(), _1 ) ) )
 	);
 	HRule booleanLiteralTrue(
 		"true",
-		constant( KEYWORD::TRUE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_direct, _compiler.get(), runtime_ ? runtime_->true_value() : value_t(), _1 ) ) )
+		constant( KEYWORD::TRUE, e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::defer_store_direct, _compiler.get(), runtime_ ? runtime_->true_value() : value_t(), _1 ) ) )
 	);
 	HRule booleanLiteralFalse(
 		"false",
-		constant( KEYWORD::FALSE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_direct, _compiler.get(), runtime_ ? runtime_->false_value() : value_t(), _1 ) ) )
+		constant( KEYWORD::FALSE, e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::defer_store_direct, _compiler.get(), runtime_ ? runtime_->false_value() : value_t(), _1 ) ) )
 	);
 	HRule numberLiteral(
 		"numberLiteral",
-		constant( '$' ) >> real[e_p::HReal::action_string_position_t( hcore::call( &OCompiler::defer_store_number, _compiler.get(), _1, _2 ) )]
+		constant( '$' ) >> real[e_p::HReal::action_string_range_t( hcore::call( &OCompiler::defer_store_number, _compiler.get(), _1, _2 ) )]
 	);
 	HRule tupleLiteral(
 		"tupleLiteral",
 		constant(
 			'(',
-			HRuleBase::action_position_t( hcore::call( &OCompiler::defer_call, _compiler.get(), "tuple", _1 ) )
+			HRuleBase::action_range_t( hcore::call( &OCompiler::defer_call, _compiler.get(), "tuple", _1 ) )
 		) >> -argList >> -constant( ',' ) >> ')',
-		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
+		HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
 	);
 	HRule listLiteral(
 		"listLiteral",
 		constant(
 			'[',
-			HRuleBase::action_position_t( hcore::call( &OCompiler::defer_call, _compiler.get(), "list", _1 ) )
+			HRuleBase::action_range_t( hcore::call( &OCompiler::defer_call, _compiler.get(), "list", _1 ) )
 		) >> -argList >> ']',
-		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
+		HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
 	);
 	HRule dictLiteralElement(
 		"dictLiteralElement",
@@ -264,38 +264,38 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		"dictLiteral",
 		constant(
 			'[',
-			HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
+			HRuleBase::action_range_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
 		) >> -( dictLiteralElement >> *( ',' >> dictLiteralElement ) ) >> ']',
-		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MAKE_DICT, _1 ) )
+		HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MAKE_DICT, _1 ) )
 	);
 	HRule lookupLiteral(
 		"lookupLiteral",
 		constant(
 			'{',
-			HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
+			HRuleBase::action_range_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
 		) >> -( dictLiteralElement >> *( ',' >> dictLiteralElement ) ) >> '}',
-		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MAKE_LOOKUP, _1 ) )
+		HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MAKE_LOOKUP, _1 ) )
 	);
 	HRule setLiteral(
 		"setLiteral",
 		constant(
 			'{',
-			HRuleBase::action_position_t( hcore::call( &OCompiler::defer_call, _compiler.get(), "set", _1 ) )
+			HRuleBase::action_range_t( hcore::call( &OCompiler::defer_call, _compiler.get(), "set", _1 ) )
 		) >> arg >> *( ',' >> arg ) >> '}',
-		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
+		HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
 	);
 	HIdentifierParser parameterIdentifier(
 		identifier(
 			"parameterIdentifier",
-			HRegex::action_string_position_t( hcore::call( &OCompiler::add_parameter, _compiler.get(), _1, _2 ) )
+			HRegex::action_string_range_t( hcore::call( &OCompiler::add_parameter, _compiler.get(), _1, _2 ) )
 		)
 	);
 	HRule val( "value" );
 	HRule parameter(
 		"parameter",
 		( parameterIdentifier ^ ( constant( "..." ) | ":::" ) )
-		>> -( constant( '=' ) >> HRule( val, HRuleBase::action_position_t( hcore::call( &OCompiler::add_default_value, _compiler.get(), _1 ) ) ) ),
-		HRuleBase::action_position_t( hcore::call( &OCompiler::verify_default_argument, _compiler.get(), _1 ) )
+		>> -( constant( '=' ) >> HRule( val, HRuleBase::action_range_t( hcore::call( &OCompiler::add_default_value, _compiler.get(), _1 ) ) ) ),
+		HRuleBase::action_range_t( hcore::call( &OCompiler::verify_default_argument, _compiler.get(), _1 ) )
 	);
 	HRule variadicParameter(
 		"variadicParameter",
@@ -334,9 +334,9 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		"capture",
 		identifier(
 			"captureIdentifier",
-			HRegex::action_string_position_t( hcore::call( &OCompiler::add_capture, _compiler.get(), _1, _2 ) )
+			HRegex::action_string_range_t( hcore::call( &OCompiler::add_capture, _compiler.get(), _1, _2 ) )
 		) >> -( ':' >> expression ),
-		HRuleBase::action_position_t( hcore::call( &OCompiler::commit_capture, _compiler.get(), _1 ) )
+		HRuleBase::action_range_t( hcore::call( &OCompiler::commit_capture, _compiler.get(), _1 ) )
 	);
 	HRule captureList(
 		"captureList",
@@ -345,48 +345,48 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	HRule lambda(
 		"lambda",
 		( '@' >> -( '[' >> captureList >> ']' ) )[
-			HIdentifierParser::action_position_t( hcore::call( &OCompiler::set_lambda_name, _compiler.get(), _1 ) )
+			HIdentifierParser::action_range_t( hcore::call( &OCompiler::set_lambda_name, _compiler.get(), _1 ) )
 		] >> callable,
-		HRuleBase::action_position_t( hcore::call( &OCompiler::create_lambda, _compiler.get(), _1 ) )
+		HRuleBase::action_range_t( hcore::call( &OCompiler::create_lambda, _compiler.get(), _1 ) )
 	);
 	HRule rangeOper(
 		"rangeOper",
 		constant(
 			':',
-			e_p::HCharacter::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::SUBSCRIPT_ARGUMENT, _1 ) )
+			e_p::HCharacter::action_range_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::SUBSCRIPT_ARGUMENT, _1 ) )
 		)
 	);
 	HRule subscriptOperator(
 		"subscriptOperator",
 		constant(
 			'[',
-			e_p::HCharacter::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::SUBSCRIPT, _1 ) )
+			e_p::HCharacter::action_range_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::SUBSCRIPT, _1 ) )
 		) >> ( ( ( rangeOper >> -arg ) | ( arg >> -( rangeOper >> -arg ) ) ) >> -( rangeOper >> -arg ) ) >> ']',
-		e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::SUBSCRIPT, _1 ) )
+		e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::SUBSCRIPT, _1 ) )
 	);
 	HIdentifierParser reference(
 		identifier(
 			"reference",
-			e_p::HStringLiteral::action_string_position_t( hcore::call( &OCompiler::defer_get_reference, _compiler.get(), _1, _2 ) )
+			e_p::HStringLiteral::action_string_range_t( hcore::call( &OCompiler::defer_get_reference, _compiler.get(), _1, _2 ) )
 		)
 	);
 	HRule memberAccess(
 		"memberAccess",
-		constant( '.', HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::MEMBER_ACCESS, _1 ) ) ) >> identifier(
+		constant( '.', HRuleBase::action_range_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::MEMBER_ACCESS, _1 ) ) ) >> identifier(
 			"member",
-			e_p::HStringLiteral::action_string_position_t( hcore::call( &OCompiler::defer_get_field_reference, _compiler.get(), _1, _2 ) )
+			e_p::HStringLiteral::action_string_range_t( hcore::call( &OCompiler::defer_get_field_reference, _compiler.get(), _1, _2 ) )
 		),
-		e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MEMBER_ACCESS, _1 ) )
+		e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MEMBER_ACCESS, _1 ) )
 	);
 	HRule dereference( "dereference", *( subscriptOperator | functionCallOperator | memberAccess ) );
 	HRule atom( "atom",
 		modulus
 		| parenthesis >> -( memberAccess >> dereference )
-		| real( e_p::HReal::PARSE::STRICT )[e_p::HReal::action_double_long_position_t( hcore::call( &OCompiler::defer_store_real, _compiler.get(), _1, _2 ) )]
-		| integer[e_p::HInteger::action_int_long_long_position_t( hcore::call( &OCompiler::defer_store_integer, _compiler.get(), _1, _2 ) )]
+		| real( e_p::HReal::PARSE::STRICT )[e_p::HReal::action_double_long_range_t( hcore::call( &OCompiler::defer_store_real, _compiler.get(), _1, _2 ) )]
+		| integer[e_p::HInteger::action_int_long_long_range_t( hcore::call( &OCompiler::defer_store_integer, _compiler.get(), _1, _2 ) )]
 		| (
 			( numberLiteral
-				| character_literal[e_p::HCharacterLiteral::action_character_position_t( hcore::call( &OCompiler::defer_store_character, _compiler.get(), _1, _2 ) )] )
+				| character_literal[e_p::HCharacterLiteral::action_character_range_t( hcore::call( &OCompiler::defer_store_character, _compiler.get(), _1, _2 ) )] )
 			>> -( memberAccess >> functionCallOperator )
 		)
 		| ( ( tupleLiteral | listLiteral | dictLiteral | lookupLiteral | stringLiteral ) >> -( ( subscriptOperator | memberAccess ) >> dereference ) )
@@ -397,27 +397,27 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	);
 	HRule factorial(
 		"factorial",
-		atom >> -( ( ( constant( '!' ) & "==" ) | ( constant( '!' ) ^ '=' ) )[HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FACTORIAL, _1 ) )] )
+		atom >> -( ( ( constant( '!' ) & "==" ) | ( constant( '!' ) ^ '=' ) )[HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FACTORIAL, _1 ) )] )
 	);
 	HRule booleanNot(
 		"booleanNot", (
-			constant( '!', HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::BOOLEAN_NOT, _1 ) ) )
+			constant( '!', HRuleBase::action_range_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::BOOLEAN_NOT, _1 ) ) )
 			>> factorial
 		)[
-			e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::BOOLEAN_NOT, _1 ) )
+			e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::BOOLEAN_NOT, _1 ) )
 		] | factorial
 	);
 	HRule negation( "negation" );
 	HRule power(
 		"power",
 		booleanNot >> (
-			* ( constant( '^', e_p::HCharacter::action_character_position_t( hcore::call( &OCompiler::defer_oper, _compiler.get(), _1, _2 ) ) ) >> negation )
+			* ( constant( '^', e_p::HCharacter::action_character_range_t( hcore::call( &OCompiler::defer_oper, _compiler.get(), _1, _2 ) ) ) >> negation )
 		),
-		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::POWER, _1 ) )
+		HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::POWER, _1 ) )
 	);
 	negation %= (
-		( constant( '-', HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::NEGATE, _1 ) ) ) >> negation )[
-			e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::NEGATE, _1 ) )
+		( constant( '-', HRuleBase::action_range_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::NEGATE, _1 ) ) ) >> negation )[
+			e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::NEGATE, _1 ) )
 		] | power
 	);
 	HRule multiplication(
@@ -426,9 +426,9 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 			* (
 					(
 					characters(
-						"*/%", e_p::HCharacter::action_character_position_t( hcore::call( &OCompiler::defer_oper, _compiler.get(), _1, _2 ) )
+						"*/%", e_p::HCharacter::action_character_range_t( hcore::call( &OCompiler::defer_oper, _compiler.get(), _1, _2 ) )
 					) >> negation
-				)[e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MULTIPLY, _1 ) )]
+				)[e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MULTIPLY, _1 ) )]
 			)
 		)
 	);
@@ -438,9 +438,9 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 			* (
 					(
 					characters(
-						"+-", e_p::HCharacter::action_character_position_t( hcore::call( &OCompiler::defer_oper, _compiler.get(), _1, _2 ) )
+						"+-", e_p::HCharacter::action_character_range_t( hcore::call( &OCompiler::defer_oper, _compiler.get(), _1, _2 ) )
 					) >> multiplication
-				)[e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::PLUS, _1 ) )]
+				)[e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::PLUS, _1 ) )]
 			)
 		)
 	);
@@ -450,9 +450,9 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 			/* compare action */ (
 				/* comparator operator */ (
 					constant( "<=" ) | ">=" | "<" | ">"
-				)[e_p::HString::action_string_position_t( hcore::call( &OCompiler::defer_str_oper, _compiler.get(), _1, _2 ) )]
+				)[e_p::HString::action_string_range_t( hcore::call( &OCompiler::defer_str_oper, _compiler.get(), _1, _2 ) )]
 				>> sum
-			)[HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::LESS, _1 ) )]
+			)[HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::LESS, _1 ) )]
 		)
 	);
 	HRule equality(
@@ -461,9 +461,9 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 			/* compare action */ (
 				/* comparator operator */ (
 					constant( "==" ) | "!="
-				)[e_p::HString::action_string_position_t( hcore::call( &OCompiler::defer_str_oper, _compiler.get(), _1, _2 ) )]
+				)[e_p::HString::action_string_range_t( hcore::call( &OCompiler::defer_str_oper, _compiler.get(), _1, _2 ) )]
 				>> compare
-			)[HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::EQUALS, _1 ) )]
+			)[HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::EQUALS, _1 ) )]
 		)
 	);
 	/*
@@ -471,27 +471,27 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	 */
 	HRule booleanAnd(
 		"booleanAnd",
-		equality[e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::start_subexpression, _compiler.get(), _1 ) )] >> *(
+		equality[e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::start_subexpression, _compiler.get(), _1 ) )] >> *(
 			/* boolean action */ (
 				/* boolean operator */ (
 					constant( "&&" ) | "⋀"
-				)[e_p::HString::action_position_t( hcore::call( &OCompiler::add_subexpression, _compiler.get(), OPERATOR::BOOLEAN_AND, _1 ) )]
+				)[e_p::HString::action_range_t( hcore::call( &OCompiler::add_subexpression, _compiler.get(), OPERATOR::BOOLEAN_AND, _1 ) )]
 				>> equality
-			)[HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::BOOLEAN_AND, _1 ) )]
+			)[HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::BOOLEAN_AND, _1 ) )]
 		),
-		e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::commit_boolean, _compiler.get(), OPERATOR::BOOLEAN_AND, _1 ) )
+		e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::commit_boolean, _compiler.get(), OPERATOR::BOOLEAN_AND, _1 ) )
 	);
 	HRule booleanOr(
 		"booleanOr",
-		HRule( booleanAnd, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::start_subexpression, _compiler.get(), _1 ) ) ) >> *(
+		HRule( booleanAnd, e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::start_subexpression, _compiler.get(), _1 ) ) ) >> *(
 			/* boolean action */ (
 				/* boolean operator */ (
 					constant( "||" ) | "⋁"
-				)[e_p::HString::action_position_t( hcore::call( &OCompiler::add_subexpression, _compiler.get(), OPERATOR::BOOLEAN_OR, _1 ) )]
+				)[e_p::HString::action_range_t( hcore::call( &OCompiler::add_subexpression, _compiler.get(), OPERATOR::BOOLEAN_OR, _1 ) )]
 				>> booleanAnd
-			)[HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::BOOLEAN_OR, _1 ) )]
+			)[HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::BOOLEAN_OR, _1 ) )]
 		),
-		e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::commit_boolean, _compiler.get(), OPERATOR::BOOLEAN_OR, _1 ) )
+		e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::commit_boolean, _compiler.get(), OPERATOR::BOOLEAN_OR, _1 ) )
 	);
 	HRule booleanXor(
 		"booleanXor",
@@ -499,38 +499,38 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 			/* boolean action */ (
 				/* boolean operator */ (
 					constant( "^^" ) | "⊕"
-				)[e_p::HString::action_string_position_t( hcore::call( &OCompiler::defer_str_oper, _compiler.get(), _1, _2 ) )]
+				)[e_p::HString::action_string_range_t( hcore::call( &OCompiler::defer_str_oper, _compiler.get(), _1, _2 ) )]
 				>> booleanOr
-			)[HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::BOOLEAN_XOR, _1 ) )]
+			)[HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::BOOLEAN_XOR, _1 ) )]
 		)
 	);
 	HRule ternary(
 		"ternary",
-		HRule( booleanXor, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::start_subexpression, _compiler.get(), _1 ) ) ) >> -(
+		HRule( booleanXor, e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::start_subexpression, _compiler.get(), _1 ) ) ) >> -(
 			/* ternary action */ (
-				constant( '?', e_p::HString::action_position_t( hcore::call( &OCompiler::add_subexpression, _compiler.get(), OPERATOR::TERNARY, _1 ) ) )
+				constant( '?', e_p::HString::action_range_t( hcore::call( &OCompiler::add_subexpression, _compiler.get(), OPERATOR::TERNARY, _1 ) ) )
 				>> expression
-				>> constant( ':', e_p::HString::action_position_t( hcore::call( &OCompiler::add_subexpression, _compiler.get(), OPERATOR::TERNARY, _1 ) ) )
+				>> constant( ':', e_p::HString::action_range_t( hcore::call( &OCompiler::add_subexpression, _compiler.get(), OPERATOR::TERNARY, _1 ) ) )
 				>> expression
-			)[HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::TERNARY, _1 ) )]
+			)[HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::TERNARY, _1 ) )]
 		),
-		e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::commit_ternary, _compiler.get(), _1 ) )
+		e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::commit_ternary, _compiler.get(), _1 ) )
 	);
 	val %= ternary;
 	HRule subscript( "subscript", ( reference >> +( subscriptOperator | functionCallOperator | memberAccess ) ) );
 	HRule assignable(
 		"assignable",
-		subscript[e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::make_reference, _compiler.get(), _1 ) )]
+		subscript[e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::make_reference, _compiler.get(), _1 ) )]
 		| identifier(
 			"variableSetter",
-			e_p::HString::action_string_position_t( hcore::call( &OCompiler::defer_make_variable, _compiler.get(), _1, _2 ) )
+			e_p::HString::action_string_range_t( hcore::call( &OCompiler::defer_make_variable, _compiler.get(), _1, _2 ) )
 		)
 	);
 	HRule assignablePack(
 		"assignablePack",
-		HRuleBase::action_position_t( hcore::call( &OCompiler::start_assignable, _compiler.get(), _1 ) )
+		HRuleBase::action_range_t( hcore::call( &OCompiler::start_assignable, _compiler.get(), _1 ) )
 		>> assignable >> * ( ',' >> assignable ) >>
-		HRuleBase::action_position_t( hcore::call( &OCompiler::finish_assignable, _compiler.get(), _1 ) )
+		HRuleBase::action_range_t( hcore::call( &OCompiler::finish_assignable, _compiler.get(), _1 ) )
 	);
 	/*
 	 * Assignment shall work only as aliasing.
@@ -539,24 +539,24 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	 */
 	expression %= HRule(
 		* ( assignablePack >> ( constant( "=" ) | "+=" | "-=" | "*=" | "/=" | "%=" | "^=" )[
-				e_p::HString::action_string_position_t( hcore::call( &OCompiler::defer_str_oper, _compiler.get(), _1, _2 ) )
+				e_p::HString::action_string_range_t( hcore::call( &OCompiler::defer_str_oper, _compiler.get(), _1, _2 ) )
 			] ^ '='
 		) >> val,
-		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::ASSIGN, _1 ) )
+		HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::ASSIGN, _1 ) )
 	);
 	HRule expressionStatement(
 		"expressionStatement",
-		HRule( expression, HRuleBase::action_position_t( hcore::call( &OCompiler::commit_expression, _compiler.get(), _1 ) ) ) >> ';'
+		HRule( expression, HRuleBase::action_range_t( hcore::call( &OCompiler::commit_expression, _compiler.get(), _1 ) ) ) >> ';'
 	);
-	HRule scope( "scope", constant( '{', HRuleBase::action_position_t( hcore::call( &OCompiler::create_scope, _compiler.get(), _1 ) ) ) >> *statement >> '}' );
+	HRule scope( "scope", constant( '{', HRuleBase::action_range_t( hcore::call( &OCompiler::create_scope, _compiler.get(), _1 ) ) ) >> *statement >> '}' );
 	HRule catchStatement(
 		"catchStatement",
 		constant( KEYWORD::CATCH ) >> '(' >>
 		identifier(
 			"exceptionType",
-			HIdentifierParser::action_string_position_t( hcore::call( &OCompiler::set_type_name, _compiler.get(), _1, _2 ) )
-		) >> assignable[e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::commit_catch_control_variable, _compiler.get(), _1 ) )] >> ')' >>
-		scope[HRuleBase::action_position_t( hcore::call( &OCompiler::commit_catch, _compiler.get(), _1 ) )]
+			HIdentifierParser::action_string_range_t( hcore::call( &OCompiler::set_type_name, _compiler.get(), _1, _2 ) )
+		) >> assignable[e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::commit_catch_control_variable, _compiler.get(), _1 ) )] >> ')' >>
+		scope[HRuleBase::action_range_t( hcore::call( &OCompiler::commit_catch, _compiler.get(), _1 ) )]
 	);
 	HRule tryCatchStatement(
 		"tryCatchStatement",
@@ -566,9 +566,9 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		"ifClause",
 		e_p::constant(
 			KEYWORD::IF,
-			bound_call<e_p::HRuleBase::action_position_t>( &OCompiler::start_if_statement, _compiler.get(), _1 )
+			bound_call<e_p::HRuleBase::action_range_t>( &OCompiler::start_if_statement, _compiler.get(), _1 )
 		) >> '(' >> expression >> ')' >> scope,
-		HRuleBase::action_position_t( hcore::call( &OCompiler::commit_if_clause, _compiler.get(), _1 ) )
+		HRuleBase::action_range_t( hcore::call( &OCompiler::commit_if_clause, _compiler.get(), _1 ) )
 	);
 	HRule ifStatement(
 		"ifStatement",
@@ -578,10 +578,10 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 			/* `else' clause */(
 				constant(
 					KEYWORD::ELSE,
-					bound_call<e_p::HRuleBase::action_position_t>( &OCompiler::start_else_clause, _compiler.get(), _1 )
+					bound_call<e_p::HRuleBase::action_range_t>( &OCompiler::start_else_clause, _compiler.get(), _1 )
 				) >> scope
 			)[
-				HRuleBase::action_position_t( hcore::call( &OCompiler::commit_else_clause, _compiler.get(), _1 ) )
+				HRuleBase::action_range_t( hcore::call( &OCompiler::commit_else_clause, _compiler.get(), _1 ) )
 			]
 		)
 	);
@@ -602,111 +602,111 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		"whileStatement",
 		constant(
 			KEYWORD::WHILE,
-			bound_call<e_p::HRuleBase::action_position_t>( &OCompiler::start_loop_statement, _compiler.get(), _1 )
+			bound_call<e_p::HRuleBase::action_range_t>( &OCompiler::start_loop_statement, _compiler.get(), _1 )
 		) >> '(' >> expression >> ')' >> scope
 	);
 	HRule forCtrlVar(
 		"forCtrlVar",
-		assignable[e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::save_control_variable, _compiler.get(), _1 ) )]
+		assignable[e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::save_control_variable, _compiler.get(), _1 ) )]
 	);
 	HRule forStatement(
 		"forStatement",
 		constant(
 			KEYWORD::FOR,
-			bound_call<e_p::HRuleBase::action_position_t>( &OCompiler::start_loop_statement, _compiler.get(), _1 )
+			bound_call<e_p::HRuleBase::action_range_t>( &OCompiler::start_loop_statement, _compiler.get(), _1 )
 		) >> '(' >> forCtrlVar >> * ( ',' >> forCtrlVar ) >> ':' >> expression >> ')' >> scope
 	);
 	HRule caseStatement(
 		"caseStatement",
 		constant( KEYWORD::CASE ) >> '(' >> expression >> ')' >> ':'
-		>> scope >> -( breakStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_break_statement, _compiler.get(), _1 ) )] ),
-		HRuleBase::action_position_t( hcore::call( &OCompiler::commit_if_clause, _compiler.get(), _1 ) )
+		>> scope >> -( breakStatement[HRuleBase::action_range_t( hcore::call( &OCompiler::add_break_statement, _compiler.get(), _1 ) )] ),
+		HRuleBase::action_range_t( hcore::call( &OCompiler::commit_if_clause, _compiler.get(), _1 ) )
 	);
 	HRule defaultStatement( "defaultStatement", constant( KEYWORD::DEFAULT ) >> ':' >> scope );
 	HRule switchStatement(
 		"switchStatement",
 		constant(
 			KEYWORD::SWITCH,
-			bound_call<e_p::HRuleBase::action_position_t>( &OCompiler::start_switch_statement, _compiler.get(), _1 )
+			bound_call<e_p::HRuleBase::action_range_t>( &OCompiler::start_switch_statement, _compiler.get(), _1 )
 		) >> '(' >> expression >> ')' >>
-		constant( '{', HRuleBase::action_position_t( hcore::call( &OCompiler::create_scope, _compiler.get(), _1 ) ) ) >> +caseStatement >>
-		-( defaultStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::commit_else_clause, _compiler.get(), _1 ) )] ) >> '}'
+		constant( '{', HRuleBase::action_range_t( hcore::call( &OCompiler::create_scope, _compiler.get(), _1 ) ) ) >> +caseStatement >>
+		-( defaultStatement[HRuleBase::action_range_t( hcore::call( &OCompiler::commit_else_clause, _compiler.get(), _1 ) )] ) >> '}'
 	);
 	HRule returnStatement( "returnStatement", constant( KEYWORD::RETURN ) >> -( '(' >> expression >> ')' ) >> ';' );
 	statement %= (
-		ifStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_if_statement, _compiler.get(), _1 ) )]
-		| whileStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_while_statement, _compiler.get(), _1 ) )]
-		| forStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_for_statement, _compiler.get(), _1 ) )]
-		| switchStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_switch_statement, _compiler.get(), _1 ) )]
-		| tryCatchStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_try_catch_statement, _compiler.get(), _1 ) )]
-		| throwStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_throw_statement, _compiler.get(), _1 ) )]
-		| breakStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_break_statement, _compiler.get(), _1 ) )]
-		| continueStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_continue_statement, _compiler.get(), _1 ) )]
-		| returnStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_return_statement, _compiler.get(), _1 ) )]
+		ifStatement[HRuleBase::action_range_t( hcore::call( &OCompiler::add_if_statement, _compiler.get(), _1 ) )]
+		| whileStatement[HRuleBase::action_range_t( hcore::call( &OCompiler::add_while_statement, _compiler.get(), _1 ) )]
+		| forStatement[HRuleBase::action_range_t( hcore::call( &OCompiler::add_for_statement, _compiler.get(), _1 ) )]
+		| switchStatement[HRuleBase::action_range_t( hcore::call( &OCompiler::add_switch_statement, _compiler.get(), _1 ) )]
+		| tryCatchStatement[HRuleBase::action_range_t( hcore::call( &OCompiler::add_try_catch_statement, _compiler.get(), _1 ) )]
+		| throwStatement[HRuleBase::action_range_t( hcore::call( &OCompiler::add_throw_statement, _compiler.get(), _1 ) )]
+		| breakStatement[HRuleBase::action_range_t( hcore::call( &OCompiler::add_break_statement, _compiler.get(), _1 ) )]
+		| continueStatement[HRuleBase::action_range_t( hcore::call( &OCompiler::add_continue_statement, _compiler.get(), _1 ) )]
+		| returnStatement[HRuleBase::action_range_t( hcore::call( &OCompiler::add_return_statement, _compiler.get(), _1 ) )]
 		| expressionStatement
-		| scope[HRuleBase::action_position_t( hcore::call( &OCompiler::commit_scope, _compiler.get(), _1 ) )]
+		| scope[HRuleBase::action_range_t( hcore::call( &OCompiler::commit_scope, _compiler.get(), _1 ) )]
 	);
 	HRule functionDefinition(
 		"functionDefinition",
 		identifier(
 			"functionDefinitionIdentifier",
-			HIdentifierParser::action_string_position_t( hcore::call( &OCompiler::set_function_name, _compiler.get(), _1, _2 ) )
+			HIdentifierParser::action_string_range_t( hcore::call( &OCompiler::set_function_name, _compiler.get(), _1, _2 ) )
 		) >> callable,
-		HRuleBase::action_position_t( hcore::call( &OCompiler::create_function, _compiler.get(), _1 ) )
+		HRuleBase::action_range_t( hcore::call( &OCompiler::create_function, _compiler.get(), _1 ) )
 	);
 	HRule field(
 		"field",
 		identifier(
 			"fieldIdentifier",
-			HIdentifierParser::action_string_position_t( hcore::call( &OCompiler::set_field_name, _compiler.get(), _1, _2 ) )
-		) >> '=' >> HRule( expression, HRuleBase::action_position_t( hcore::call( &OCompiler::add_field_definition, _compiler.get(), _1 ) ) ) >> ';'
+			HIdentifierParser::action_string_range_t( hcore::call( &OCompiler::set_field_name, _compiler.get(), _1, _2 ) )
+		) >> '=' >> HRule( expression, HRuleBase::action_range_t( hcore::call( &OCompiler::add_field_definition, _compiler.get(), _1 ) ) ) >> ';'
 	);
 	HRule classDefinition(
 		"classDefinition",
 		constant( KEYWORD::CLASS ) >> identifier(
 			"classIdentifier",
-			HIdentifierParser::action_string_position_t( hcore::call( &OCompiler::OClassNoter::note, &(_compiler->_classNoter), _1, _2 ) )
+			HIdentifierParser::action_string_range_t( hcore::call( &OCompiler::OClassNoter::note, &(_compiler->_classNoter), _1, _2 ) )
 		) >> -(
 			':' >> identifier(
 				"baseIdentifier",
-				HIdentifierParser::action_string_position_t( hcore::call( &OCompiler::set_base_name, _compiler.get(), _1, _2 ) )
+				HIdentifierParser::action_string_range_t( hcore::call( &OCompiler::set_base_name, _compiler.get(), _1, _2 ) )
 			)
 		) >> '{' >> +( field | functionDefinition ) >> '}',
-		HRuleBase::action_position_t( hcore::call( &OCompiler::submit_class, _compiler.get(), _1 ) )
+		HRuleBase::action_range_t( hcore::call( &OCompiler::submit_class, _compiler.get(), _1 ) )
 	);
 	HRule enumeral(
 		"enumeral",
 		identifier(
 			"fieldIdentifier",
-			HIdentifierParser::action_string_position_t( hcore::call( &OCompiler::set_field_name, _compiler.get(), _1, _2 ) )
+			HIdentifierParser::action_string_range_t( hcore::call( &OCompiler::set_field_name, _compiler.get(), _1, _2 ) )
 		)
 	);
 	HRule enumDefinition(
 		"enumDefinition",
 		constant( KEYWORD::ENUM ) >> identifier(
 			"enumIdentifier",
-			HIdentifierParser::action_string_position_t( hcore::call( &OCompiler::set_enum_name, _compiler.get(), _1, _2 ) )
+			HIdentifierParser::action_string_range_t( hcore::call( &OCompiler::set_enum_name, _compiler.get(), _1, _2 ) )
 		) >> '{' >> enumeral >> *( ',' >> enumeral ) >> '}',
-		HRuleBase::action_position_t( hcore::call( &OCompiler::commit_enum, _compiler.get(), _1 ) )
+		HRuleBase::action_range_t( hcore::call( &OCompiler::commit_enum, _compiler.get(), _1 ) )
 	);
 	HIdentifierParser moduleName(
 		identifier(
 			"moduleName",
-			HIdentifierParser::action_string_position_t( hcore::call( &OCompiler::build_import_name, _compiler.get(), _1, _2 ) )
+			HIdentifierParser::action_string_range_t( hcore::call( &OCompiler::build_import_name, _compiler.get(), _1, _2 ) )
 		)
 	);
 	HRule packageName(
 		"packageName",
 		moduleName >> *( '.' >> moduleName ),
-		HRule::action_position_t( hcore::call( &OCompiler::set_import_name, _compiler.get(), _1 ) )
+		HRule::action_range_t( hcore::call( &OCompiler::set_import_name, _compiler.get(), _1 ) )
 	);
 	HRule importStatement(
 		"importStatement",
 		constant( "import" ) >> packageName >> "as" >> identifier(
 			"importName",
-			HIdentifierParser::action_string_position_t( hcore::call( &OCompiler::set_import_alias, _compiler.get(), _1, _2 ) )
+			HIdentifierParser::action_string_range_t( hcore::call( &OCompiler::set_import_alias, _compiler.get(), _1, _2 ) )
 		) >> ';',
-		HRuleBase::action_position_t( hcore::call( &OCompiler::commit_import, _compiler.get(), _1 ) )
+		HRuleBase::action_range_t( hcore::call( &OCompiler::commit_import, _compiler.get(), _1 ) )
 	);
 	HRule huginnGrammar( "huginnGrammar", + ( classDefinition | functionDefinition | enumDefinition | importStatement ) );
 	return ( huginnGrammar );

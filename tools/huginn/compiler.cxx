@@ -45,9 +45,9 @@ OCompiler::OScopeContext::OScopeContext(
 	OFunctionContext* functionContext_,
 	HStatement::statement_id_t statementId_,
 	int fileId_,
-	int position_
+	int range_
 ) : _parent( ! functionContext_->_scopeStack.is_empty() ? functionContext_->_scopeStack.top().raw() : nullptr )
-	, _scope( make_pointer<HScope>( statementId_, fileId_, position_ ) )
+	, _scope( make_pointer<HScope>( statementId_, fileId_, range_ ) )
 	, _expressionsStack()
 	, _variableTypes()
 	, _exceptionType( INVALID_IDENTIFIER )
@@ -159,14 +159,14 @@ OCompiler::OExecutionStep::OExecutionStep(
 	HHuginn::identifier_id_t classId_,
 	int index_,
 	HHuginn::identifier_id_t identifier_,
-	int position_
+	int range_
 ) : _operation( operation_ )
 	, _expression( expression_ )
 	, _scope( scope_ )
 	, _classId( classId_ )
 	, _index( index_ )
 	, _identifier( identifier_ )
-	, _position( position_ ) {
+	, _position( range_ ) {
 	return;
 }
 
@@ -179,19 +179,19 @@ OCompiler::OIdentifierUse::OIdentifierUse( void )
 	return;
 }
 
-void OCompiler::OIdentifierUse::read( int position_, HHuginn::SYMBOL_KIND symbolKind_ ) {
+void OCompiler::OIdentifierUse::read( int range_, HHuginn::SYMBOL_KIND symbolKind_ ) {
 	if ( _readCount == 0 ) {
 		_type = symbolKind_;
-		_readPosition = position_;
+		_readPosition = range_;
 	}
 	++ _readCount;
 	return;
 }
 
-void OCompiler::OIdentifierUse::write( int position_, HHuginn::SYMBOL_KIND symbolKind_ ) {
+void OCompiler::OIdentifierUse::write( int range_, HHuginn::SYMBOL_KIND symbolKind_ ) {
 	if ( _writeCount == 0 ) {
 		_type = symbolKind_;
-		_writePosition = position_;
+		_writePosition = range_;
 	}
 	++ _writeCount;
 	return;
@@ -203,14 +203,14 @@ OCompiler::OClassNoter::OClassNoter( OCompiler* compiler_ )
 	return;
 }
 
-void OCompiler::OClassNoter::note( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+void OCompiler::OClassNoter::note( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	if ( is_restricted( name_ ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), MAIN_FILE_ID, position_.get() );
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), MAIN_FILE_ID, range_.start() );
 	}
 	HHuginn::identifier_id_t identifier( _compiler->_runtime->identifier_id( name_ ) );
 	if ( _passThrough ) {
-		_compiler->set_class_name( identifier, position_ );
+		_compiler->set_class_name( identifier, range_ );
 	} else {
 		_compiler->_classIdentifiers.push_back( identifier );
 	}
@@ -643,11 +643,11 @@ OCompiler::OScopeContext& OCompiler::current_scope_context( void ) {
 	return ( *f()._scopeStack.top() );
 }
 
-HHuginn::expression_t OCompiler::new_expression( int fileId_, int position_ ) {
+HHuginn::expression_t OCompiler::new_expression( int fileId_, int range_ ) {
 	return (
 		_introspector
-			? pointer_static_cast<HExpression>( make_pointer<HIntroExpression>( _introspector, fileId_, position_ ) )
-			: make_pointer<HExpression>( fileId_, position_ )
+			? pointer_static_cast<HExpression>( make_pointer<HIntroExpression>( _introspector, fileId_, range_ ) )
+			: make_pointer<HExpression>( fileId_, range_ )
 	);
 }
 
@@ -705,7 +705,7 @@ void OCompiler::note_type( HHuginn::identifier_id_t identifierId_, HHuginn::HCla
 	f()._scopeStack.top()->note_type( identifierId_, class_ );
 }
 
-void OCompiler::check_name_import( HHuginn::identifier_id_t identifier_, executing_parser::position_t position_ ) {
+void OCompiler::check_name_import( HHuginn::identifier_id_t identifier_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	submitted_imports_t::const_iterator it;
 	if (
@@ -723,14 +723,14 @@ void OCompiler::check_name_import( HHuginn::identifier_id_t identifier_, executi
 				? "Package of the same name `"_ys.append( name ).append( "' is already imported." )
 				: "Package alias of the same name `"_ys.append( name ).append( "' is already defined." ),
 			_fileId,
-			position_.get()
+			range_.start()
 		);
 	}
 	return;
 	M_EPILOG
 }
 
-void OCompiler::check_name_class( HHuginn::identifier_id_t identifier_, bool testRuntime_, executing_parser::position_t position_ ) {
+void OCompiler::check_name_class( HHuginn::identifier_id_t identifier_, bool testRuntime_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	HHuginn::class_t c( testRuntime_ ? _runtime->get_class( identifier_ ) : HHuginn::class_t() );
 	if ( ( _submittedClasses.count( identifier_ ) > 0 ) || ( !! c && ! ( _isIncremental || _preloaded ) ) ) {
@@ -739,14 +739,14 @@ void OCompiler::check_name_class( HHuginn::identifier_id_t identifier_, bool tes
 				.append( _runtime->identifier_name( identifier_ ) )
 				.append( "' is already defined." ),
 			_fileId,
-			position_.get()
+			range_.start()
 		);
 	}
 	return;
 	M_EPILOG
 }
 
-void OCompiler::check_name_enum( HHuginn::identifier_id_t identifier_, bool testRuntime_, executing_parser::position_t position_ ) {
+void OCompiler::check_name_enum( HHuginn::identifier_id_t identifier_, bool testRuntime_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	submitted_enums_t::const_iterator it;
 	HHuginn::value_t const* v( _runtime->get_global( identifier_ ) );
@@ -767,14 +767,14 @@ void OCompiler::check_name_enum( HHuginn::identifier_id_t identifier_, bool test
 				.append( _runtime->identifier_name( identifier_ ) )
 				.append( "' is already defined." ),
 			_fileId,
-			position_.get()
+			range_.start()
 		);
 	}
 	return;
 	M_EPILOG
 }
 
-void OCompiler::check_name_function( HHuginn::identifier_id_t identifier_, executing_parser::position_t position_ ) {
+void OCompiler::check_name_function( HHuginn::identifier_id_t identifier_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	HHuginn::value_t const* fun( _runtime->get_global( identifier_ ) );
 	if ( fun && ( (*fun)->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) ) {
@@ -783,41 +783,41 @@ void OCompiler::check_name_function( HHuginn::identifier_id_t identifier_, execu
 				.append( _runtime->identifier_name( identifier_ ) )
 				.append( "' was already defined." ),
 			_fileId,
-			position_.get()
+			range_.start()
 		);
 	}
 	return;
 	M_EPILOG
 }
 
-void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	HHuginn::identifier_id_t functionIdentifier( _runtime->identifier_id( name_ ) );
 	bool isCtorDtor( ( functionIdentifier == KEYWORD::CONSTRUCTOR_IDENTIFIER ) || ( functionIdentifier == KEYWORD::DESTRUCTOR_IDENTIFIER ) );
 	if ( is_restricted( name_ ) ) {
 		if ( ! _classContext || ! isCtorDtor ) {
-			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), _fileId, position_.get() );
+			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), _fileId, range_.start() );
 		}
 	}
 	if ( ! _classContext ) {
 		if ( ! _isIncremental ) {
-			check_name_function( functionIdentifier, position_ );
+			check_name_function( functionIdentifier, range_ );
 		}
-		check_name_enum( functionIdentifier, true, position_ );
-		check_name_class( functionIdentifier, true, position_ );
-		check_name_import( functionIdentifier, position_ );
+		check_name_enum( functionIdentifier, true, range_ );
+		check_name_class( functionIdentifier, true, range_ );
+		check_name_import( functionIdentifier, range_ );
 	}
 	if ( ! isCtorDtor ) {
 		_usedIdentifiers[functionIdentifier].write(
-			position_.get(),
+			range_.start(),
 			! _classContext ? HHuginn::SYMBOL_KIND::FUNCTION : HHuginn::SYMBOL_KIND::METHOD
 		);
 	}
 	_functionContexts.emplace( make_resource<OFunctionContext>( this, functionIdentifier, ++ _statementIdGenerator, _fileId, false ) );
 	if ( !! _classContext ) {
-		add_field_name( name_, position_ );
+		add_field_name( name_, range_ );
 	}
-	create_scope( position_ );
+	create_scope( range_ );
 	if ( _introspector ) {
 		_introspector->symbol(
 			!! _classContext
@@ -825,14 +825,14 @@ void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_
 				: HIntrospectorInterface::symbols_t{ name_ },
 			!! _classContext ? HHuginn::SYMBOL_KIND::METHOD : HHuginn::SYMBOL_KIND::FUNCTION,
 			_fileId,
-			position_.get()
+			range_.start()
 		);
 	}
 	return;
 	M_EPILOG
 }
 
-void OCompiler::build_import_name( yaal::hcore::HString const& name_, executing_parser::position_t ) {
+void OCompiler::build_import_name( yaal::hcore::HString const& name_, executing_parser::range_t ) {
 	M_PROLOG
 	if ( ! _moduleName.is_empty() ) {
 		_moduleName.append( "." );
@@ -842,52 +842,52 @@ void OCompiler::build_import_name( yaal::hcore::HString const& name_, executing_
 	M_EPILOG
 }
 
-void OCompiler::set_import_name( executing_parser::position_t position_ ) {
+void OCompiler::set_import_name( executing_parser::range_t range_ ) {
 	M_PROLOG
 	if ( is_restricted( _moduleName ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( _moduleName ).append( "' is a restricted name." ), _fileId, position_.get() );
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( _moduleName ).append( "' is a restricted name." ), _fileId, range_.start() );
 	}
 	HHuginn::identifier_id_t importIdentifier( _runtime->identifier_id( _moduleName ) );
 	_moduleName.clear();
-	check_name_import( importIdentifier, position_ );
-	check_name_enum( importIdentifier, true, position_ );
-	check_name_class( importIdentifier, false, position_ );
-	check_name_function( importIdentifier, position_ );
+	check_name_import( importIdentifier, range_ );
+	check_name_enum( importIdentifier, true, range_ );
+	check_name_class( importIdentifier, false, range_ );
+	check_name_function( importIdentifier, range_ );
 	_importInfo._package = importIdentifier;
-	_importInfo._position = position_.get();
+	_importInfo._position = range_.start();
 	return;
 	M_EPILOG
 }
 
-void OCompiler::set_import_alias( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+void OCompiler::set_import_alias( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	if ( is_restricted( name_ ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), _fileId, position_.get() );
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), _fileId, range_.start() );
 	}
 	HHuginn::identifier_id_t importAliasIdentifier( _runtime->identifier_id( name_ ) );
-	check_name_import( importAliasIdentifier, position_ );
-	check_name_enum( importAliasIdentifier, true, position_ );
-	check_name_class( importAliasIdentifier, true, position_ );
-	check_name_function( importAliasIdentifier, position_ );
+	check_name_import( importAliasIdentifier, range_ );
+	check_name_enum( importAliasIdentifier, true, range_ );
+	check_name_class( importAliasIdentifier, true, range_ );
+	check_name_function( importAliasIdentifier, range_ );
 	_importInfo._alias = importAliasIdentifier;
-	_usedIdentifiers[importAliasIdentifier].write( position_.get(), HHuginn::SYMBOL_KIND::PACKAGE );
+	_usedIdentifiers[importAliasIdentifier].write( range_.start(), HHuginn::SYMBOL_KIND::PACKAGE );
 	if ( _introspector ) {
-		_introspector->symbol( { _runtime->identifier_name( _importInfo._package ), name_ }, HHuginn::SYMBOL_KIND::PACKAGE, _fileId, position_.get() );
+		_introspector->symbol( { _runtime->identifier_name( _importInfo._package ), name_ }, HHuginn::SYMBOL_KIND::PACKAGE, _fileId, range_.start() );
 	}
 	return;
 	M_EPILOG
 }
 
-void OCompiler::commit_import( executing_parser::position_t ) {
+void OCompiler::commit_import( executing_parser::range_t ) {
 	M_PROLOG
 	_submittedImports.emplace_back( yaal::move( _importInfo ) );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::commit_enum( executing_parser::position_t position_ ) {
+void OCompiler::commit_enum( executing_parser::range_t range_ ) {
 	M_PROLOG
-	_classContext->_doc = &_runtime->huginn()->get_comment( position_.get() );
+	_classContext->_doc = &_runtime->huginn()->get_comment( range_.start() );
 	enumeration::descriptions_t ed;
 	for ( int i( 0 ); i < static_cast<int>( _classContext->_fieldNames.get_size() ); ++ i ) {
 		ed.emplace_back( _classContext->_fieldNames[i], _classContext->_docs.at( i ) );
@@ -909,128 +909,128 @@ void OCompiler::commit_enum( executing_parser::position_t position_ ) {
 	M_EPILOG
 }
 
-void OCompiler::set_enum_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+void OCompiler::set_enum_name( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	if ( is_restricted( name_ ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), _fileId, position_.get() );
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), _fileId, range_.start() );
 	}
 	HHuginn::identifier_id_t enumIdentifier( _runtime->identifier_id( name_ ) );
-	check_name_enum( enumIdentifier, false, position_ );
-	check_name_class( enumIdentifier, true, position_ );
+	check_name_enum( enumIdentifier, false, range_ );
+	check_name_class( enumIdentifier, true, range_ );
 	HHuginn::value_t const* v( _runtime->get_global( enumIdentifier ) );
 	if ( ! ( v && is_enum_class( v ) ) ) {
-		check_name_function( enumIdentifier, position_ );
+		check_name_function( enumIdentifier, range_ );
 	}
-	check_name_import( enumIdentifier, position_ );
+	check_name_import( enumIdentifier, range_ );
 	_classContext = make_resource<OClassContext>();
-	_usedIdentifiers[enumIdentifier].write( position_.get(), HHuginn::SYMBOL_KIND::ENUM );
+	_usedIdentifiers[enumIdentifier].write( range_.start(), HHuginn::SYMBOL_KIND::ENUM );
 	_classContext->_classIdentifier = enumIdentifier;
-	_classContext->_position = position_;
+	_classContext->_position = range_.start();
 	if ( _introspector ) {
-		_introspector->symbol( { name_ }, HHuginn::SYMBOL_KIND::ENUM, _fileId, position_.get() );
+		_introspector->symbol( { name_ }, HHuginn::SYMBOL_KIND::ENUM, _fileId, range_.start() );
 	}
 	return;
 	M_EPILOG
 }
 
-void OCompiler::set_class_name( HHuginn::identifier_id_t identifier_, executing_parser::position_t position_ ) {
+void OCompiler::set_class_name( HHuginn::identifier_id_t identifier_, executing_parser::range_t range_ ) {
 	M_PROLOG
-	check_name_class( identifier_, true, position_ );
-	check_name_enum( identifier_, true, position_ );
+	check_name_class( identifier_, true, range_ );
+	check_name_enum( identifier_, true, range_ );
 	if ( ! _runtime->get_class( identifier_ ) ) {
-		check_name_function( identifier_, position_ );
+		check_name_function( identifier_, range_ );
 	}
-	check_name_import( identifier_, position_ );
+	check_name_import( identifier_, range_ );
 	_classContext = make_resource<OClassContext>();
-	_usedIdentifiers[identifier_].write( position_.get(), HHuginn::SYMBOL_KIND::CLASS );
+	_usedIdentifiers[identifier_].write( range_.start(), HHuginn::SYMBOL_KIND::CLASS );
 	_functionContexts.emplace( make_resource<OFunctionContext>( this, identifier_, ++ _statementIdGenerator, _fileId, false ) );
 	_classContext->_classIdentifier = identifier_;
-	_classContext->_position = position_;
+	_classContext->_position = range_.start();
 	if ( _introspector ) {
-		_introspector->symbol( { _runtime->identifier_name( identifier_ ) }, HHuginn::SYMBOL_KIND::CLASS, _fileId, position_.get() );
+		_introspector->symbol( { _runtime->identifier_name( identifier_ ) }, HHuginn::SYMBOL_KIND::CLASS, _fileId, range_.start() );
 	}
 	return;
 	M_EPILOG
 }
 
-void OCompiler::set_base_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+void OCompiler::set_base_name( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	if ( is_builtin( name_ ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), _fileId, position_.get() );
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), _fileId, range_.start() );
 	}
 	HHuginn::identifier_id_t baseClassIdentifier( _runtime->identifier_id( name_ ) );
-	_usedIdentifiers[baseClassIdentifier].read( position_.get() );
+	_usedIdentifiers[baseClassIdentifier].read( range_.start() );
 	_classContext->_baseName = baseClassIdentifier;
-	_classContext->_basePosition = position_;
+	_classContext->_basePosition = range_.start();
 	return;
 	M_EPILOG
 }
 
-void OCompiler::add_field_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+void OCompiler::add_field_name( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	if ( find( _classContext->_fieldNames.begin(), _classContext->_fieldNames.end(), name_ ) != _classContext->_fieldNames.end() ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Field `"_ys.append( name_ ).append( "' is already defined in `" ).append( _runtime->identifier_name( _classContext->_classIdentifier ) ).append( "'." ),
 			_fileId,
-			position_.get()
+			range_.start()
 		);
 	}
 	_classContext->_fieldNames.push_back( name_ );
-	HString const& doc( _runtime->huginn()->get_comment( position_.get() ) );
+	HString const& doc( _runtime->huginn()->get_comment( range_.start() ) );
 	int idx( static_cast<int>( _classContext->_fieldNames.get_size() - 1 ) );
 	_classContext->_docs.insert( make_pair( idx, doc ) );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::set_field_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+void OCompiler::set_field_name( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	if ( is_restricted( name_ ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), _fileId, position_.get() );
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), _fileId, range_.start() );
 	}
 	HHuginn::identifier_id_t fieldIdentifier( _runtime->identifier_id( name_ ) );
-	_usedIdentifiers[fieldIdentifier].write( position_.get(), HHuginn::SYMBOL_KIND::FIELD );
-	add_field_name( name_, position_ );
+	_usedIdentifiers[fieldIdentifier].write( range_.start(), HHuginn::SYMBOL_KIND::FIELD );
+	add_field_name( name_, range_ );
 	if ( _introspector ) {
-		_introspector->symbol( { _runtime->identifier_name( _classContext->_classIdentifier ), name_ }, HHuginn::SYMBOL_KIND::FIELD, _fileId, position_.get() );
+		_introspector->symbol( { _runtime->identifier_name( _classContext->_classIdentifier ), name_ }, HHuginn::SYMBOL_KIND::FIELD, _fileId, range_.start() );
 	}
 	return;
 	M_EPILOG
 }
 
-void OCompiler::set_lambda_name( executing_parser::position_t position_ ) {
+void OCompiler::set_lambda_name( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OCompiler::OFunctionContext& fc( f() );
-	HHuginn::HCoordinate coord( _runtime->huginn()->get_coordinate( _fileId, position_.get() ) );
+	HHuginn::HCoordinate coord( _runtime->huginn()->get_coordinate( _fileId, range_.start() ) );
 	using yaal::hcore::to_string;
 	HHuginn::identifier_id_t id( _runtime->identifier_id( to_string( "@" ).append( coord.line() ).append( ":" ).append( coord.column() ) ) );
 	_functionContexts.emplace( make_resource<OFunctionContext>( this, id, ++ _statementIdGenerator, _fileId, true ) );
 	if ( ! fc._captures.is_empty() ) {
 		_capturesLog.insert( make_pair( f()._functionIdentifier, yaal::move( fc._captures ) ) );
 	}
-	create_scope( position_ );
+	create_scope( range_ );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::create_function( executing_parser::position_t position_ ) {
+void OCompiler::create_function( executing_parser::range_t range_ ) {
 	M_PROLOG
-	HString const& doc( _runtime->huginn()->get_comment( position_.get() ) );
-	function_info_t fi( create_function_low( position_ ) );
+	HString const& doc( _runtime->huginn()->get_comment( range_.start() ) );
+	function_info_t fi( create_function_low( range_ ) );
 	if ( !! _classContext ) {
 		int idx( static_cast<int>( _classContext->_fieldNames.get_size() - 1 ) );
 		_classContext->_methods.insert( make_pair( idx, fi.second ) );
 		_classContext->_docs.insert( make_pair( idx, doc ) );
 	} else {
 		if ( !! _runtime->get_class( fi.first ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Class of the same name `"_ys.append( _runtime->identifier_name( fi.first ) ).append( "' is already defined." ), _fileId, position_.get() );
+			throw HHuginn::HHuginnRuntimeException( "Class of the same name `"_ys.append( _runtime->identifier_name( fi.first ) ).append( "' is already defined." ), _fileId, range_.start() );
 		}
 		_runtime->register_function( fi.first, fi.second, doc );
 	}
 	M_EPILOG
 }
 
-OCompiler::function_info_t OCompiler::create_function_low( executing_parser::position_t ) {
+OCompiler::function_info_t OCompiler::create_function_low( executing_parser::range_t ) {
 	M_PROLOG
 	OCompiler::OFunctionContext& fc( f() );
 	M_ASSERT( fc._functionIdentifier != INVALID_IDENTIFIER );
@@ -1081,10 +1081,10 @@ OCompiler::function_info_t OCompiler::create_function_low( executing_parser::pos
 	M_EPILOG
 }
 
-void OCompiler::submit_class( executing_parser::position_t position_ ) {
+void OCompiler::submit_class( executing_parser::range_t range_ ) {
 	M_PROLOG
 	pop_function_context();
-	_classContext->_doc = &_runtime->huginn()->get_comment( position_.get() );
+	_classContext->_doc = &_runtime->huginn()->get_comment( range_.start() );
 	bool inserted( _submittedClasses.insert( make_pair( _classContext->_classIdentifier, yaal::move( _classContext ) ) ).second );
 	M_ASSERT( inserted );
 	static_cast<void>( inserted );
@@ -1107,7 +1107,7 @@ void OCompiler::track_name_cycle( HHuginn::identifier_id_t identifierId_ ) {
 				throw HHuginn::HHuginnRuntimeException(
 					"Base class `"_ys.append( _runtime->identifier_name( cc->_baseName ) ).append( "' was not defined." ),
 					_fileId,
-					cc->_basePosition.get()
+					cc->_basePosition
 				);
 			} else {
 				break;
@@ -1123,7 +1123,7 @@ void OCompiler::track_name_cycle( HHuginn::identifier_id_t identifierId_ ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"Class derivation cycle detected `"_ys.append( hier ).append( "'." ),
 				_fileId,
-				cc->_basePosition.get()
+				cc->_basePosition
 			);
 		}
 		cc = it->second.get();
@@ -1132,13 +1132,13 @@ void OCompiler::track_name_cycle( HHuginn::identifier_id_t identifierId_ ) {
 	M_EPILOG
 }
 
-void OCompiler::create_lambda( executing_parser::position_t position_ ) {
+void OCompiler::create_lambda( executing_parser::range_t range_ ) {
 	M_PROLOG
-	function_info_t fi( create_function_low( position_ ) );
+	function_info_t fi( create_function_low( range_ ) );
 	HHuginn::value_t fRef( _runtime->object_factory()->create_function_reference( fi.first, fi.second, "Lambda: "_ys.append( _runtime->identifier_name( fi.first ) ) ) );
-	defer_store_direct( fRef, position_ );
+	defer_store_direct( fRef, range_ );
 	if ( _capturesLog.find( fi.first ) != _capturesLog.end() ) {
-		defer_action( &HExpression::create_closure, position_ );
+		defer_action( &HExpression::create_closure, range_ );
 		current_expression()->commit_oper( OPERATOR::FUNCTION_CALL );
 		f()._valueTypes.top()._class = type_to_class( HHuginn::TYPE::BOUND_METHOD );
 	}
@@ -1146,29 +1146,29 @@ void OCompiler::create_lambda( executing_parser::position_t position_ ) {
 	M_EPILOG
 }
 
-void OCompiler::verify_default_argument( executing_parser::position_t position_ ) {
+void OCompiler::verify_default_argument( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	int lastDefaultValuePosition( fc._lastDefaultValuePosition );
 	if ( ( lastDefaultValuePosition >= 0 ) && ( lastDefaultValuePosition < static_cast<int>( fc._parameters.get_size() - 1 ) ) ) {
-		throw HHuginn::HHuginnRuntimeException( "Missing default argument.", _fileId, position_.get() );
+		throw HHuginn::HHuginnRuntimeException( "Missing default argument.", _fileId, range_.start() );
 	}
 	return;
 	M_EPILOG
 }
 
-void OCompiler::add_parameter( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+void OCompiler::add_parameter( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	HHuginn::identifier_id_t parameterIdentifier( _runtime->identifier_id( name_ ) );
 	captures_log_t::const_iterator cli( _capturesLog.find( fc._functionIdentifier ) );
 	if ( ( cli != _capturesLog.end() ) && ( find( cli->second.begin(), cli->second.end(), parameterIdentifier ) != cli->second.end() ) ) {
-		throw HHuginn::HHuginnRuntimeException( "Symbol `"_ys.append( name_ ).append( "' is a already used as a capture." ), _fileId, position_.get() );
+		throw HHuginn::HHuginnRuntimeException( "Symbol `"_ys.append( name_ ).append( "' is a already used as a capture." ), _fileId, range_.start() );
 	}
 	if ( find( fc._parameters.begin(), fc._parameters.end(), parameterIdentifier ) != fc._parameters.end() ) {
-		throw HHuginn::HHuginnRuntimeException( "Parameter `"_ys.append( name_ ).append( "' was already defined." ), _fileId, position_.get() );
+		throw HHuginn::HHuginnRuntimeException( "Parameter `"_ys.append( name_ ).append( "' was already defined." ), _fileId, range_.start() );
 	}
-	_usedIdentifiers[parameterIdentifier].write( position_.get(), HHuginn::SYMBOL_KIND::VARIABLE );
+	_usedIdentifiers[parameterIdentifier].write( range_.start(), HHuginn::SYMBOL_KIND::VARIABLE );
 	_executionStepsBacklog.emplace_back(
 		OExecutionStep::OPERATION::DEFINE,
 		HHuginn::expression_t(),
@@ -1176,7 +1176,7 @@ void OCompiler::add_parameter( yaal::hcore::HString const& name_, executing_pars
 		!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
 		-1,
 		parameterIdentifier,
-		position_.get()
+		range_.start()
 	);
 	fc._parameters.push_back( parameterIdentifier );
 	return;
@@ -1199,24 +1199,24 @@ void OCompiler::mark_named_parameter_capture( void ) {
 	M_EPILOG
 }
 
-void OCompiler::add_capture( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+void OCompiler::add_capture( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	HHuginn::identifier_id_t captureIdentifier( _runtime->identifier_id( name_ ) );
 	if ( find( fc._captures.begin(), fc._captures.end(), captureIdentifier ) != fc._captures.end() ) {
-		throw HHuginn::HHuginnRuntimeException( "Capture `"_ys.append( name_ ).append( "' was already defined." ), _fileId, position_.get() );
+		throw HHuginn::HHuginnRuntimeException( "Capture `"_ys.append( name_ ).append( "' was already defined." ), _fileId, range_.start() );
 	}
 	if ( fc._captures.is_empty() ) {
-		current_expression()->oper( OPERATOR::FUNCTION_CALL, position_.get() );
+		current_expression()->oper( OPERATOR::FUNCTION_CALL, range_.start() );
 	}
-	fc._operations.emplace( OPERATOR::FUNCTION_CALL, position_.get() );
+	fc._operations.emplace( OPERATOR::FUNCTION_CALL, range_.start() );
 	fc._captures.push_back( captureIdentifier );
-	start_subexpression( position_ );
+	start_subexpression( range_ );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::commit_capture( executing_parser::position_t position_ ) {
+void OCompiler::commit_capture( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	OCompiler::expressions_stack_t& exprStack( fc.expressions_stack() );
@@ -1226,17 +1226,17 @@ void OCompiler::commit_capture( executing_parser::position_t position_ ) {
 	M_ASSERT( ! fc._operations.is_empty() && ( fc._operations.top()._operator == OPERATOR::FUNCTION_CALL ) );
 	fc._operations.pop();
 	if ( captureExpression->is_empty() ) {
-		defer_get_reference( _runtime->identifier_name( fc._captures.back() ), position_ );
+		defer_get_reference( _runtime->identifier_name( fc._captures.back() ), range_ );
 	} else {
 		merge( expression, captureExpression );
 	}
 	fc._valueTypes.pop();
-	expression->oper( OPERATOR::FUNCTION_ARGUMENT, position_.get() );
+	expression->oper( OPERATOR::FUNCTION_ARGUMENT, range_.start() );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::create_scope( executing_parser::position_t position_ ) {
+void OCompiler::create_scope( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	HStatement::statement_id_t sid( INVALID_STATEMENT_IDENTIFIER );
@@ -1246,13 +1246,13 @@ void OCompiler::create_scope( executing_parser::position_t position_ ) {
 	} else {
 		sid = fc._scopeStack.top()->_statementId;
 	}
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, sid, _fileId, position_.get() ) );
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, sid, _fileId, range_.start() ) );
 	fc._inline = false;
 	return;
 	M_EPILOG
 }
 
-void OCompiler::commit_scope( executing_parser::position_t ) {
+void OCompiler::commit_scope( executing_parser::range_t ) {
 	M_PROLOG
 	M_DEBUG_CODE( OFunctionContext& fc( f() ); );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
@@ -1263,7 +1263,7 @@ void OCompiler::commit_scope( executing_parser::position_t ) {
 	M_EPILOG
 }
 
-void OCompiler::commit_catch( executing_parser::position_t ) {
+void OCompiler::commit_catch( executing_parser::range_t ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
@@ -1343,18 +1343,18 @@ void OCompiler::terminate_scope( HScope::statement_t&& statement_ ) {
 	M_EPILOG
 }
 
-void OCompiler::start_if_statement( executing_parser::position_t position_ ) {
+void OCompiler::start_if_statement( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	if ( fc._scopeStack.top()->_scopeChain.is_empty() ) {
-		fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, position_.get() ) );
+		fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, range_.start() ) );
 	}
 	fc._inline = true;
 	return;
 	M_EPILOG
 }
 
-void OCompiler::start_else_clause( executing_parser::position_t ) {
+void OCompiler::start_else_clause( executing_parser::range_t ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	fc._inline = true;
@@ -1362,43 +1362,43 @@ void OCompiler::start_else_clause( executing_parser::position_t ) {
 	M_EPILOG
 }
 
-void OCompiler::start_loop_statement( executing_parser::position_t position_ ) {
+void OCompiler::start_loop_statement( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	fc._inline = true;
 	++ fc._loopCount;
 	++ fc._loopSwitchCount;
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, position_.get() ) );
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, range_.start() ) );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::start_switch_statement( executing_parser::position_t position_ ) {
+void OCompiler::start_switch_statement( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	++ fc._loopSwitchCount;
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, position_.get() ) );
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, range_.start() ) );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::start_subexpression( executing_parser::position_t position_ ) {
+void OCompiler::start_subexpression( executing_parser::range_t range_ ) {
 	M_PROLOG
-	f().expressions_stack().emplace( 1, new_expression( _fileId, position_.get() ) );
+	f().expressions_stack().emplace( 1, new_expression( _fileId, range_.start() ) );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::add_subexpression( OPERATOR op_, executing_parser::position_t position_ ) {
+void OCompiler::add_subexpression( OPERATOR op_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	fc.expressions_stack().top().emplace_back( new_expression( _fileId, position_.get() ) );
-	fc._operations.emplace( op_, position_.get() );
+	fc.expressions_stack().top().emplace_back( new_expression( _fileId, range_.start() ) );
+	fc._operations.emplace( op_, range_.start() );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::commit_boolean( OPERATOR operator_, executing_parser::position_t position_ ) {
+void OCompiler::commit_boolean( OPERATOR operator_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	if ( fc.expressions_stack().top().get_size() > 1 ) {
@@ -1406,10 +1406,10 @@ void OCompiler::commit_boolean( OPERATOR operator_, executing_parser::position_t
 		fc.expressions_stack().pop();
 		M_ASSERT( ! fc._valueTypes.is_empty() && ( compiled_type_id( fc._valueTypes.top()._class ) == HHuginn::TYPE::BOOLEAN ) );
 		fc._valueTypes.pop();
-		defer_store_direct( And, position_ );
+		defer_store_direct( And, range_ );
 		HExpression& expression( *current_expression() );
-		expression.oper( operator_, position_.get() );
-		defer_action( operator_ == OPERATOR::BOOLEAN_AND ? &HExpression::boolean_and : &HExpression::boolean_or, position_ );
+		expression.oper( operator_, range_.start() );
+		defer_action( operator_ == OPERATOR::BOOLEAN_AND ? &HExpression::boolean_and : &HExpression::boolean_or, range_ );
 		expression.commit_oper( operator_ );
 	} else {
 		HHuginn::expression_t e( fc._scopeStack.top()->expression() );
@@ -1420,7 +1420,7 @@ void OCompiler::commit_boolean( OPERATOR operator_, executing_parser::position_t
 	M_EPILOG
 }
 
-void OCompiler::commit_ternary( executing_parser::position_t position_ ) {
+void OCompiler::commit_ternary( executing_parser::range_t range_ ) {
 	OFunctionContext& fc( f() );
 	HFunction::expressions_t const& exprs( fc.expressions_stack().top() );
 	if ( exprs.get_size() > 1 ) {
@@ -1429,10 +1429,10 @@ void OCompiler::commit_ternary( executing_parser::position_t position_ ) {
 		fc.expressions_stack().pop();
 		M_ASSERT( ! fc._valueTypes.is_empty() );
 		fc._valueTypes.pop();
-		defer_store_direct( ternary, position_ );
+		defer_store_direct( ternary, range_ );
 		HExpression& expression( *current_expression() );
-		expression.oper( OPERATOR::TERNARY, position_.get() );
-		defer_action( &HExpression::ternary, position_ );
+		expression.oper( OPERATOR::TERNARY, range_.start() );
+		defer_action( &HExpression::ternary, range_ );
 		expression.commit_oper( OPERATOR::TERNARY );
 	} else {
 		HHuginn::expression_t e( fc._scopeStack.top()->expression() );
@@ -1441,62 +1441,62 @@ void OCompiler::commit_ternary( executing_parser::position_t position_ ) {
 	}
 }
 
-void OCompiler::add_return_statement( executing_parser::position_t position_ ) {
+void OCompiler::add_return_statement( executing_parser::range_t range_ ) {
 	M_PROLOG
 	M_ASSERT( ! f()._scopeStack.is_empty() );
 	HHuginn::expression_t& e( current_expression() );
 	if ( e->is_empty() ) {
-		e->add_execution_step( HExpression::OExecutionStep( e.raw(), &HExpression::store_direct, position_.get(), _runtime->none_value() ) );
+		e->add_execution_step( HExpression::OExecutionStep( e.raw(), &HExpression::store_direct, range_.start(), _runtime->none_value() ) );
 	}
-	terminate_scope( make_pointer<HReturn>( e, _fileId, position_.get() ) );
+	terminate_scope( make_pointer<HReturn>( e, _fileId, range_.start() ) );
 	reset_expression();
 	return;
 	M_EPILOG
 }
 
-void OCompiler::add_throw_statement( executing_parser::position_t position_ ) {
+void OCompiler::add_throw_statement( executing_parser::range_t range_ ) {
 	M_PROLOG
 	M_ASSERT( ! f()._scopeStack.is_empty() );
-	terminate_scope( make_pointer<HThrow>( current_expression(), _fileId, position_.get() ) );
+	terminate_scope( make_pointer<HThrow>( current_expression(), _fileId, range_.start() ) );
 	reset_expression();
 	return;
 	M_EPILOG
 }
 
-void OCompiler::add_break_statement( executing_parser::position_t position_ ) {
+void OCompiler::add_break_statement( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	if ( fc._loopSwitchCount == 0 ) {
-		throw HHuginn::HHuginnRuntimeException( "Invalid context for `break' statement.", _fileId, position_.get() );
+		throw HHuginn::HHuginnRuntimeException( "Invalid context for `break' statement.", _fileId, range_.start() );
 	}
-	terminate_scope( make_pointer<HBreak>( HFrame::STATE::BREAK, _fileId, position_.get() ) );
+	terminate_scope( make_pointer<HBreak>( HFrame::STATE::BREAK, _fileId, range_.start() ) );
 	reset_expression();
 	return;
 	M_EPILOG
 }
 
-void OCompiler::add_continue_statement( executing_parser::position_t position_ ) {
+void OCompiler::add_continue_statement( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	if ( fc._loopCount == 0 ) {
-		throw HHuginn::HHuginnRuntimeException( "Invalid context for `continue' statement.", _fileId, position_.get() );
+		throw HHuginn::HHuginnRuntimeException( "Invalid context for `continue' statement.", _fileId, range_.start() );
 	}
-	terminate_scope( make_pointer<HBreak>( HFrame::STATE::CONTINUE, _fileId, position_.get() ) );
+	terminate_scope( make_pointer<HBreak>( HFrame::STATE::CONTINUE, _fileId, range_.start() ) );
 	reset_expression();
 	return;
 	M_EPILOG
 }
 
-void OCompiler::add_while_statement( executing_parser::position_t position_ ) {
+void OCompiler::add_while_statement( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	HHuginn::scope_t scope( pop_scope_context() );
 	OScopeContext& sc( current_scope_context() );
 	HScope::statement_t whileStatement(
-		make_pointer<HWhile>( sc._statementId, current_expression(), scope, _fileId, position_.get() )
+		make_pointer<HWhile>( sc._statementId, current_expression(), scope, _fileId, range_.start() )
 	);
 	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );
@@ -1508,10 +1508,10 @@ void OCompiler::add_while_statement( executing_parser::position_t position_ ) {
 	M_EPILOG
 }
 
-void OCompiler::commit_assignable( executing_parser::position_t position_ ) {
+void OCompiler::commit_assignable( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	mark_expression_position( position_ );
+	mark_expression_position( range_ );
 	M_ASSERT( ! fc._variables.is_empty() );
 	if ( fc._variables.top()._identifier != INVALID_IDENTIFIER ) {
 		note_type( fc._variables.top()._identifier, type_to_class( HHuginn::TYPE::UNKNOWN ) );
@@ -1521,24 +1521,24 @@ void OCompiler::commit_assignable( executing_parser::position_t position_ ) {
 	M_EPILOG
 }
 
-void OCompiler::save_control_variable( executing_parser::position_t position_ ) {
+void OCompiler::save_control_variable( executing_parser::range_t range_ ) {
 	M_PROLOG
-	commit_assignable( position_ );
+	commit_assignable( range_ );
 	OFunctionContext& fc( f() );
 	fc.expressions_stack().top().emplace_back( new_expression( _fileId ) );
 	M_EPILOG
 }
 
-void OCompiler::commit_catch_control_variable( executing_parser::position_t position_ ) {
+void OCompiler::commit_catch_control_variable( executing_parser::range_t range_ ) {
 	M_PROLOG
-	commit_assignable( position_ );
+	commit_assignable( range_ );
 	OFunctionContext& fc( f() );
 	fc._inline = true;
 	return;
 	M_EPILOG
 }
 
-void OCompiler::start_function_call( executing_parser::position_t position_ ) {
+void OCompiler::start_function_call( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	if ( fc._lastDereferenceOperator == OPERATOR::MEMBER_ACCESS ) {
@@ -1546,7 +1546,7 @@ void OCompiler::start_function_call( executing_parser::position_t position_ ) {
 		HExpression* expr( current_expression().raw() );
 		expr->execution_step( expr->execution_step_count() - 1 )._access = HFrame::ACCESS::BOUND_CALL;
 	}
-	defer_oper_direct( OPERATOR::FUNCTION_CALL, position_ );
+	defer_oper_direct( OPERATOR::FUNCTION_CALL, range_ );
 	if ( fc._isAssert ) {
 		++ fc._nestedCalls;
 	}
@@ -1554,31 +1554,31 @@ void OCompiler::start_function_call( executing_parser::position_t position_ ) {
 	M_EPILOG
 }
 
-void OCompiler::close_function_call( executing_parser::position_t position_ ) {
+void OCompiler::close_function_call( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	if ( fc._isAssert ) {
 		-- fc._nestedCalls;
 		OScopeContext& sc( *fc._scopeStack.top() );
 		if ( ( fc._nestedCalls == 0 ) && ( sc._assertExpressionEnd == 0 ) ) {
-			sc._assertExpressionEnd = position_.get();
+			sc._assertExpressionEnd = range_.start();
 		}
 	}
 	return;
 	M_EPILOG
 }
 
-void OCompiler::set_type_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+void OCompiler::set_type_name( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, position_.get() ) );
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, range_.start() ) );
 	OScopeContext& sc( current_scope_context() );
 	sc._exceptionType = _runtime->identifier_id( name_ );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::add_for_statement( executing_parser::position_t position_ ) {
+void OCompiler::add_for_statement( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
@@ -1588,7 +1588,7 @@ void OCompiler::add_for_statement( executing_parser::position_t position_ ) {
 	HHuginn::expression_t source( exprs.back() );
 	exprs.pop_back();
 	HScope::statement_t forStatement(
-		make_pointer<HFor>( sc._statementId, yaal::move( exprs ), source, scope, _fileId, position_.get() )
+		make_pointer<HFor>( sc._statementId, yaal::move( exprs ), source, scope, _fileId, range_.start() )
 	);
 	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );
@@ -1600,7 +1600,7 @@ void OCompiler::add_for_statement( executing_parser::position_t position_ ) {
 	M_EPILOG
 }
 
-void OCompiler::commit_if_clause( executing_parser::position_t ) {
+void OCompiler::commit_if_clause( executing_parser::range_t ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
@@ -1611,7 +1611,7 @@ void OCompiler::commit_if_clause( executing_parser::position_t ) {
 	M_EPILOG
 }
 
-void OCompiler::commit_else_clause( executing_parser::position_t ) {
+void OCompiler::commit_else_clause( executing_parser::range_t ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
@@ -1622,12 +1622,12 @@ void OCompiler::commit_else_clause( executing_parser::position_t ) {
 	M_EPILOG
 }
 
-void OCompiler::add_if_statement( executing_parser::position_t position_ ) {
+void OCompiler::add_if_statement( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	OScopeContext& sc( *fc._scopeStack.top() );
-	HScope::statement_t ifStatement( make_pointer<HIf>( sc._statementId, sc._scopeChain, sc._else, _fileId, position_.get() ) );
+	HScope::statement_t ifStatement( make_pointer<HIf>( sc._statementId, sc._scopeChain, sc._else, _fileId, range_.start() ) );
 	sc._scopeChain.clear();
 	sc._else.reset();
 	pop_scope_context_low();
@@ -1638,14 +1638,14 @@ void OCompiler::add_if_statement( executing_parser::position_t position_ ) {
 	M_EPILOG
 }
 
-void OCompiler::add_try_catch_statement( executing_parser::position_t position_ ) {
+void OCompiler::add_try_catch_statement( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	HTryCatch::catches_t catches( yaal::move( fc._scopeStack.top()->_catches ) );
 	HHuginn::scope_t scope( pop_scope_context() );
 	HScope::statement_t tryCatchStatement(
-		make_pointer<HTryCatch>( scope, catches, _fileId, position_.get() )
+		make_pointer<HTryCatch>( scope, catches, _fileId, range_.start() )
 	);
 	current_scope()->add_statement( tryCatchStatement );
 	reset_expression();
@@ -1653,7 +1653,7 @@ void OCompiler::add_try_catch_statement( executing_parser::position_t position_ 
 	M_EPILOG
 }
 
-void OCompiler::add_switch_statement( executing_parser::position_t position_ ) {
+void OCompiler::add_switch_statement( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
@@ -1668,7 +1668,7 @@ void OCompiler::add_switch_statement( executing_parser::position_t position_ ) {
 			contexts,
 			Default,
 			_fileId,
-			position_.get()
+			range_.start()
 		)
 	);
 	-- fc._loopSwitchCount;
@@ -1680,7 +1680,7 @@ void OCompiler::add_switch_statement( executing_parser::position_t position_ ) {
 	M_EPILOG
 }
 
-void OCompiler::commit_expression( executing_parser::position_t ) {
+void OCompiler::commit_expression( executing_parser::range_t ) {
 	M_PROLOG
 	M_ASSERT( ! f()._scopeStack.is_empty() );
 	current_scope()->add_statement( current_expression() );
@@ -1689,7 +1689,7 @@ void OCompiler::commit_expression( executing_parser::position_t ) {
 	M_EPILOG
 }
 
-void OCompiler::add_default_value( executing_parser::position_t ) {
+void OCompiler::add_default_value( executing_parser::range_t ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
@@ -1700,7 +1700,7 @@ void OCompiler::add_default_value( executing_parser::position_t ) {
 	M_EPILOG
 }
 
-void OCompiler::add_field_definition( executing_parser::position_t ) {
+void OCompiler::add_field_definition( executing_parser::range_t ) {
 	M_PROLOG
 	M_ASSERT( !! _classContext );
 	int idx( static_cast<int>( _classContext->_fieldNames.get_size() - 1 ) );
@@ -1710,15 +1710,15 @@ void OCompiler::add_field_definition( executing_parser::position_t ) {
 	M_EPILOG
 }
 
-void OCompiler::mark_expression_position( executing_parser::position_t position_ ) {
+void OCompiler::mark_expression_position( executing_parser::range_t range_ ) {
 	M_PROLOG
 	M_ASSERT( ! f()._scopeStack.is_empty() );
-	current_expression()->set_position( _fileId, position_.get() );
+	current_expression()->set_position( _fileId, range_.start() );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::defer_oper( code_point_t operator_, executing_parser::position_t position_ ) {
+void OCompiler::defer_oper( code_point_t operator_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OPERATOR o( OPERATOR::NONE );
 	switch ( operator_.get() ) {
@@ -1735,13 +1735,13 @@ void OCompiler::defer_oper( code_point_t operator_, executing_parser::position_t
 			M_ASSERT( ! "bad code path"[0] );
 		}
 	}
-	current_expression()->oper( o, position_.get() );
-	f()._operations.emplace( o, position_.get() );
+	current_expression()->oper( o, range_.start() );
+	f()._operations.emplace( o, range_.start() );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::defer_str_oper( yaal::hcore::HString const& operator_, executing_parser::position_t position_ ) {
+void OCompiler::defer_str_oper( yaal::hcore::HString const& operator_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	typedef yaal::hcore::HHashMap<yaal::hcore::HString, OPERATOR> operator_lookup_t;
 	static operator_lookup_t const operatorLookup( {
@@ -1770,18 +1770,18 @@ void OCompiler::defer_str_oper( yaal::hcore::HString const& operator_, executing
 	if ( ( o == OPERATOR::ASSIGN ) && ( fc._variableCount.top() > 1 ) ) {
 		o = OPERATOR::ASSIGN_PACK;
 	}
-	current_expression()->oper( o, position_.get() );
-	fc._operations.emplace( o, position_.get() );
+	current_expression()->oper( o, range_.start() );
+	fc._operations.emplace( o, range_.start() );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::defer_oper_direct( OPERATOR operator_, executing_parser::position_t position_ ) {
+void OCompiler::defer_oper_direct( OPERATOR operator_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	HHuginn::expression_t& expression( current_expression() );
-	expression->oper( operator_, position_.get() );
-	fc._operations.emplace( operator_, position_.get() );
+	expression->oper( operator_, range_.start() );
+	fc._operations.emplace( operator_, range_.start() );
 	/*
 	 * We want to support assert() statement.
 	 * We need to know where assert's condition expression ends.
@@ -1800,7 +1800,7 @@ void OCompiler::defer_oper_direct( OPERATOR operator_, executing_parser::positio
 		&& ( fc._operations.size() == ASSERT_SECOND_ARGUMENT_OPERATION_COUNT )
 	) {
 		OScopeContext& sc( *fc._scopeStack.top() );
-		sc._assertExpressionEnd = position_.get();
+		sc._assertExpressionEnd = range_.start();
 	}
 	return;
 	M_EPILOG
@@ -1823,7 +1823,7 @@ HHuginn::HHuginn::HClass const* OCompiler::congruent( HHuginn::HClass const* c1_
 	return ( c );
 }
 
-void OCompiler::dispatch_plus( executing_parser::position_t position_ ) {
+void OCompiler::dispatch_plus( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._operations.is_empty() );
@@ -1832,7 +1832,7 @@ void OCompiler::dispatch_plus( executing_parser::position_t position_ ) {
 	OPERATOR o( po._operator );
 	int p( po._position );
 	M_ASSERT( ( o == OPERATOR::PLUS ) || ( o == OPERATOR::MINUS ) );
-	defer_action( o == OPERATOR::PLUS ? &HExpression::plus : &HExpression::minus, position_ );
+	defer_action( o == OPERATOR::PLUS ? &HExpression::plus : &HExpression::minus, range_ );
 	current_expression()->commit_oper( o );
 	fc._operations.pop();
 	HHuginn::HClass const* c1( fc._valueTypes.top()._class );
@@ -1840,7 +1840,7 @@ void OCompiler::dispatch_plus( executing_parser::position_t position_ ) {
 	HHuginn::HClass const* c2( fc._valueTypes.top()._class );
 	fc._valueTypes.pop();
 	if ( ! are_congruous( c1, c2 ) ) {
-		operands_type_mismatch( op_to_str( o ), c2, c1, _fileId, position_.get() );
+		operands_type_mismatch( op_to_str( o ), c2, c1, _fileId, range_.start() );
 	}
 	if ( ! ( is_summable( c1 ) && is_summable( c2 ) ) ) {
 		throw HHuginn::HHuginnRuntimeException(
@@ -1857,7 +1857,7 @@ void OCompiler::dispatch_plus( executing_parser::position_t position_ ) {
 	M_EPILOG
 }
 
-void OCompiler::dispatch_mul( executing_parser::position_t position_ ) {
+void OCompiler::dispatch_mul( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._operations.is_empty() );
@@ -1866,7 +1866,7 @@ void OCompiler::dispatch_mul( executing_parser::position_t position_ ) {
 	OPERATOR o( po._operator );
 	int p( po._position );
 	M_ASSERT( ( o == OPERATOR::MULTIPLY ) || ( o == OPERATOR::DIVIDE ) || ( o == OPERATOR::MODULO ) );
-	defer_action( o == OPERATOR::MULTIPLY ? &HExpression::mul : ( o == OPERATOR::DIVIDE ? &HExpression::div : &HExpression::mod ), position_ );
+	defer_action( o == OPERATOR::MULTIPLY ? &HExpression::mul : ( o == OPERATOR::DIVIDE ? &HExpression::div : &HExpression::mod ), range_ );
 	current_expression()->commit_oper( o );
 	fc._operations.pop();
 	HHuginn::HClass const* c1( fc._valueTypes.top()._class );
@@ -1874,7 +1874,7 @@ void OCompiler::dispatch_mul( executing_parser::position_t position_ ) {
 	HHuginn::HClass const* c2( fc._valueTypes.top()._class );
 	fc._valueTypes.pop();
 	if ( ! are_congruous( c1, c2 ) ) {
-		operands_type_mismatch( op_to_str( o ), c2, c1, _fileId, position_.get() );
+		operands_type_mismatch( op_to_str( o ), c2, c1, _fileId, range_.start() );
 	}
 	if ( ! ( is_numeric_congruent( c1 ) && is_numeric_congruent( c2 ) ) ) {
 		throw HHuginn::HHuginnRuntimeException(
@@ -1891,7 +1891,7 @@ void OCompiler::dispatch_mul( executing_parser::position_t position_ ) {
 	M_EPILOG
 }
 
-void OCompiler::dispatch_power( executing_parser::position_t position_ ) {
+void OCompiler::dispatch_power( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	bool hasPower( false );
@@ -1920,31 +1920,31 @@ void OCompiler::dispatch_power( executing_parser::position_t position_ ) {
 		hasPower = true;
 	}
 	if ( hasPower ) {
-		defer_action( &HExpression::power, position_ );
+		defer_action( &HExpression::power, range_ );
 		current_expression()->commit_oper( OPERATOR::POWER_TERM );
 	}
 	return;
 	M_EPILOG
 }
 
-void OCompiler::dispatch_factorial( executing_parser::position_t position_ ) {
+void OCompiler::dispatch_factorial( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._valueTypes.is_empty() );
-	defer_action( &HExpression::factorial, position_ );
+	defer_action( &HExpression::factorial, range_ );
 	if ( ! is_numeric_congruent( fc._valueTypes.top()._class ) ) {
 		throw HHuginn::HHuginnRuntimeException(
 			hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_NUM] )
 				.append( a_type_name( fc._valueTypes.top()._class ) ),
 			_fileId,
-			position_.get()
+			range_.start()
 		);
 	}
 	return;
 	M_EPILOG
 }
 
-void OCompiler::dispatch_negate( executing_parser::position_t position_ ) {
+void OCompiler::dispatch_negate( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._operations.is_empty() );
@@ -1952,7 +1952,7 @@ void OCompiler::dispatch_negate( executing_parser::position_t position_ ) {
 	int p( po._position  );
 	M_ASSERT( po._operator == OPERATOR::NEGATE );
 	M_ASSERT( ! fc._valueTypes.is_empty() );
-	defer_action( &HExpression::negate, position_ );
+	defer_action( &HExpression::negate, range_ );
 	current_expression()->commit_oper( OPERATOR::NEGATE );
 	fc._operations.pop();
 	if ( ! is_numeric_congruent( fc._valueTypes.top()._class ) ) {
@@ -1967,7 +1967,7 @@ void OCompiler::dispatch_negate( executing_parser::position_t position_ ) {
 	M_EPILOG
 }
 
-void OCompiler::dispatch_compare( executing_parser::position_t position_ ) {
+void OCompiler::dispatch_compare( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	OPositionedOperator po( fc._operations.top() );
@@ -1976,10 +1976,10 @@ void OCompiler::dispatch_compare( executing_parser::position_t position_ ) {
 	M_ASSERT( ( o == OPERATOR::LESS ) || ( o == OPERATOR::GREATER ) || ( o == OPERATOR::LESS_OR_EQUAL ) || ( o == OPERATOR::GREATER_OR_EQUAL ) );
 	char const* os( op_to_str( o ) );
 	switch ( o ) {
-		case ( OPERATOR::LESS ):             { defer_action( &HExpression::less, position_ );             } break;
-		case ( OPERATOR::GREATER ):          { defer_action( &HExpression::greater, position_ );          } break;
-		case ( OPERATOR::LESS_OR_EQUAL ):    { defer_action( &HExpression::less_or_equal, position_ );    } break;
-		case ( OPERATOR::GREATER_OR_EQUAL ): { defer_action( &HExpression::greater_or_equal, position_ ); } break;
+		case ( OPERATOR::LESS ):             { defer_action( &HExpression::less, range_ );             } break;
+		case ( OPERATOR::GREATER ):          { defer_action( &HExpression::greater, range_ );          } break;
+		case ( OPERATOR::LESS_OR_EQUAL ):    { defer_action( &HExpression::less_or_equal, range_ );    } break;
+		case ( OPERATOR::GREATER_OR_EQUAL ): { defer_action( &HExpression::greater_or_equal, range_ ); } break;
 		default: {
 			M_ASSERT( ! "bad code path"[0] );
 		}
@@ -2009,14 +2009,14 @@ void OCompiler::dispatch_compare( executing_parser::position_t position_ ) {
 	M_EPILOG
 }
 
-void OCompiler::dispatch_boolean( HExpression::OExecutionStep::action_t const& action_, executing_parser::position_t position_ ) {
+void OCompiler::dispatch_boolean( HExpression::OExecutionStep::action_t const& action_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	OPositionedOperator po( fc._operations.top() );
 	int p( po._position );
 	if ( !! action_ ) {
 		M_ASSERT( action_ == &HExpression::boolean_xor );
-		defer_action( action_, position_ );
+		defer_action( action_, range_ );
 		current_expression()->commit_oper( po._operator );
 	}
 	fc._operations.pop();
@@ -2067,14 +2067,14 @@ void OCompiler::dispatch_ternary( void ) {
 	M_EPILOG
 }
 
-void OCompiler::dispatch_equals( executing_parser::position_t position_ ) {
+void OCompiler::dispatch_equals( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	OPositionedOperator po( fc._operations.top() );
 	OPERATOR o( po._operator );
 	int p( po._position );
 	M_ASSERT( ( o == OPERATOR::EQUALS ) || ( o == OPERATOR::NOT_EQUALS ) );
-	defer_action( o == OPERATOR::EQUALS ? &HExpression::equals : &HExpression::not_equals, position_ );
+	defer_action( o == OPERATOR::EQUALS ? &HExpression::equals : &HExpression::not_equals, range_ );
 	current_expression()->commit_oper( o );
 	fc._operations.pop();
 	M_ASSERT( fc._valueTypes.get_size() >= 2 );
@@ -2090,7 +2090,7 @@ void OCompiler::dispatch_equals( executing_parser::position_t position_ ) {
 	M_EPILOG
 }
 
-void OCompiler::dispatch_assign( executing_parser::position_t position_ ) {
+void OCompiler::dispatch_assign( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	bool hasAssign( false );
@@ -2125,9 +2125,9 @@ void OCompiler::dispatch_assign( executing_parser::position_t position_ ) {
 			}
 			if ( varRef._identifier != INVALID_IDENTIFIER ) {
 				if ( o == OPERATOR::ASSIGN ) {
-					_usedIdentifiers[varRef._identifier].write( position_.get(), HHuginn::SYMBOL_KIND::VARIABLE );
+					_usedIdentifiers[varRef._identifier].write( range_.start(), HHuginn::SYMBOL_KIND::VARIABLE );
 				} else if ( are_congruous( srcType, realDestType ) ) {
-					_usedIdentifiers[varRef._identifier].read( position_.get(), HHuginn::SYMBOL_KIND::VARIABLE );
+					_usedIdentifiers[varRef._identifier].read( range_.start(), HHuginn::SYMBOL_KIND::VARIABLE );
 					M_ASSERT( varRef._executionStepIndex >= 0 );
 					_executionStepsBacklog[varRef._executionStepIndex]._operation = OExecutionStep::OPERATION::UPDATE;
 				} else {
@@ -2190,7 +2190,7 @@ void OCompiler::dispatch_assign( executing_parser::position_t position_ ) {
 				fc._valueTypes.pop();
 				OFunctionContext::OVariableRef varRef( fc._variables.top() );
 				if ( varRef._identifier != INVALID_IDENTIFIER ) {
-					_usedIdentifiers[varRef._identifier].write( position_.get(), HHuginn::SYMBOL_KIND::VARIABLE );
+					_usedIdentifiers[varRef._identifier].write( range_.start(), HHuginn::SYMBOL_KIND::VARIABLE );
 				}
 				fc._variables.pop();
 			}
@@ -2202,14 +2202,14 @@ void OCompiler::dispatch_assign( executing_parser::position_t position_ ) {
 	}
 	if ( hasAssign ) {
 		HExpression* expr( current_expression().raw() );
-		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::set_variable, position_.get(), HFrame::ACCESS::REFERENCE, varCount ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::set_variable, range_.start(), HFrame::ACCESS::REFERENCE, varCount ) );
 		expr->commit_oper( OPERATOR::ASSIGN_TERM );
 	}
 	return;
 	M_EPILOG
 }
 
-void OCompiler::start_assignable( executing_parser::position_t ) {
+void OCompiler::start_assignable( executing_parser::range_t ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	fc._variableCount.push( static_cast<int>( fc._variables.get_size() ) );
@@ -2217,7 +2217,7 @@ void OCompiler::start_assignable( executing_parser::position_t ) {
 	M_EPILOG
 }
 
-void OCompiler::finish_assignable( executing_parser::position_t ) {
+void OCompiler::finish_assignable( executing_parser::range_t ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	int& varCount( fc._variableCount.top() );
@@ -2226,10 +2226,10 @@ void OCompiler::finish_assignable( executing_parser::position_t ) {
 	M_EPILOG
 }
 
-void OCompiler::dispatch_subscript( executing_parser::position_t position_ ) {
+void OCompiler::dispatch_subscript( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	int p( position_.get() );
+	int p( range_.start() );
 	if ( fc._isAssert && ( fc._nestedCalls == 0 ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`assert' is a restricted keyword.", _fileId, p );
 	}
@@ -2256,11 +2256,11 @@ void OCompiler::dispatch_subscript( executing_parser::position_t position_ ) {
 		if ( nonInteger ) {
 			throw HHuginn::HHuginnRuntimeException( "Range specifier is not an integer.", _fileId, p );
 		}
-		expression->add_execution_step( HExpression::OExecutionStep( expression.raw(), &HExpression::range, position_.get() ) );
+		expression->add_execution_step( HExpression::OExecutionStep( expression.raw(), &HExpression::range, range_.start() ) );
 		expression->commit_oper( OPERATOR::RANGE );
 		fc._lastDereferenceOperator = OPERATOR::RANGE;
 	} else {
-		expression->add_execution_step( HExpression::OExecutionStep( expression.raw(), &HExpression::subscript, position_.get(), HFrame::ACCESS::VALUE ) );
+		expression->add_execution_step( HExpression::OExecutionStep( expression.raw(), &HExpression::subscript, range_.start(), HFrame::ACCESS::VALUE ) );
 		expression->commit_oper( OPERATOR::SUBSCRIPT );
 		fc._lastDereferenceOperator = OPERATOR::SUBSCRIPT;
 	}
@@ -2301,21 +2301,21 @@ HHuginn::HClass const* OCompiler::function_ref_to_class( HHuginn::identifier_id_
 	return ( type_id_to_class( t ) );
 }
 
-void OCompiler::dispatch_function_call( HExpression::OExecutionStep::action_t const& action_, executing_parser::position_t position_ ) {
+void OCompiler::dispatch_function_call( HExpression::OExecutionStep::action_t const& action_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	HExpression* expr( current_expression().raw() );
 	if ( fc._isAssert && ( fc._nestedCalls == 0 ) ) {
-		int from( position_.get() + 1 );
+		int from( range_.start() + 1 );
 		OScopeContext& sc( *fc._scopeStack.top() );
 		int len( sc._assertExpressionEnd - from );
 		sc._assertExpressionEnd = 0;
-		expr->oper( OPERATOR::FUNCTION_ARGUMENT, position_.get() );
+		expr->oper( OPERATOR::FUNCTION_ARGUMENT, range_.start() );
 		expr->add_execution_step(
 			HExpression::OExecutionStep(
 				expr,
 				&HExpression::store_direct,
-				position_.get(),
+				range_.start(),
 				_runtime->object_factory()->create_string( _runtime->huginn()->get_snippet( from, len ).trim() )
 			)
 		);
@@ -2339,34 +2339,34 @@ void OCompiler::dispatch_function_call( HExpression::OExecutionStep::action_t co
 	}
 	fc._valueTypes.push( c );
 	M_ASSERT( fc._operations.top()._operator == OPERATOR::FUNCTION_CALL );
-	defer_action( action_, position_ );
+	defer_action( action_, range_ );
 	expr->commit_oper( OPERATOR::FUNCTION_CALL );
 	fc._operations.pop();
 	return;
 	M_EPILOG
 }
 
-void OCompiler::repack_named_parameters( executing_parser::position_t position_ ) {
+void OCompiler::repack_named_parameters( executing_parser::range_t range_ ) {
 	M_PROLOG
 	HExpression* expr( current_expression().raw() );
-	expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::repack_named_parameters, position_.get() ) );
+	expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::repack_named_parameters, range_.start() ) );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::unpack_variadic_parameters( executing_parser::position_t position_ ) {
+void OCompiler::unpack_variadic_parameters( executing_parser::range_t range_ ) {
 	M_PROLOG
 	HExpression* expr( current_expression().raw() );
-	expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::unpack_variadic_parameters, position_.get() ) );
+	expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::unpack_variadic_parameters, range_.start() ) );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::dispatch_member_access( executing_parser::position_t position_ ) {
+void OCompiler::dispatch_member_access( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	if ( fc._isAssert && ( fc._nestedCalls == 0 ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`assert' is a restricted keyword.", _fileId, position_.get() );
+		throw HHuginn::HHuginnRuntimeException( "`assert' is a restricted keyword.", _fileId, range_.start() );
 	}
 	fc._valueTypes.pop();
 	fc._valueTypes.push( type_to_class( HHuginn::TYPE::REFERENCE ) );
@@ -2376,7 +2376,7 @@ void OCompiler::dispatch_member_access( executing_parser::position_t position_ )
 	M_EPILOG
 }
 
-void OCompiler::dispatch_action( OPERATOR oper_, executing_parser::position_t position_ ) {
+void OCompiler::dispatch_action( OPERATOR oper_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	fc._lastDereferenceOperator = OPERATOR::NONE;
@@ -2384,21 +2384,21 @@ void OCompiler::dispatch_action( OPERATOR oper_, executing_parser::position_t po
 	OPERATOR o( po._operator );
 	int p( po._position );
 	switch ( oper_ ) {
-		case ( OPERATOR::PLUS ):          { dispatch_plus( position_ );          } break;
-		case ( OPERATOR::MULTIPLY ):      { dispatch_mul( position_ );           } break;
-		case ( OPERATOR::POWER ):         { dispatch_power( position_ );         } break;
-		case ( OPERATOR::FACTORIAL ):     { dispatch_factorial( position_ );     } break;
-		case ( OPERATOR::NEGATE ):        { dispatch_negate( position_ );        } break;
-		case ( OPERATOR::SUBSCRIPT ):     { dispatch_subscript( position_ );     } break;
-		case ( OPERATOR::ASSIGN ):        { dispatch_assign( position_ );        } break;
-		case ( OPERATOR::MEMBER_ACCESS ): { dispatch_member_access( position_ ); } break;
-		case ( OPERATOR::FUNCTION_CALL ): { dispatch_function_call( &HExpression::function_call, position_ ); } break;
-		case ( OPERATOR::MAKE_DICT ):     { dispatch_function_call( &HExpression::make_dict, position_ ); }     break;
-		case ( OPERATOR::MAKE_LOOKUP ):   { dispatch_function_call( &HExpression::make_lookup, position_ ); }   break;
+		case ( OPERATOR::PLUS ):          { dispatch_plus( range_ );          } break;
+		case ( OPERATOR::MULTIPLY ):      { dispatch_mul( range_ );           } break;
+		case ( OPERATOR::POWER ):         { dispatch_power( range_ );         } break;
+		case ( OPERATOR::FACTORIAL ):     { dispatch_factorial( range_ );     } break;
+		case ( OPERATOR::NEGATE ):        { dispatch_negate( range_ );        } break;
+		case ( OPERATOR::SUBSCRIPT ):     { dispatch_subscript( range_ );     } break;
+		case ( OPERATOR::ASSIGN ):        { dispatch_assign( range_ );        } break;
+		case ( OPERATOR::MEMBER_ACCESS ): { dispatch_member_access( range_ ); } break;
+		case ( OPERATOR::FUNCTION_CALL ): { dispatch_function_call( &HExpression::function_call, range_ ); } break;
+		case ( OPERATOR::MAKE_DICT ):     { dispatch_function_call( &HExpression::make_dict, range_ ); }     break;
+		case ( OPERATOR::MAKE_LOOKUP ):   { dispatch_function_call( &HExpression::make_lookup, range_ ); }   break;
 		case ( OPERATOR::PARENTHESIS ):
 		case ( OPERATOR::MODULUS ): {
 			M_ASSERT( ( o == OPERATOR::MODULUS ) || ( o == OPERATOR::PARENTHESIS ) );
-			defer_action( &HExpression::close_parenthesis, position_ );
+			defer_action( &HExpression::close_parenthesis, range_ );
 			current_expression()->commit_oper( o );
 			fc._operations.pop();
 			if ( o == OPERATOR::MODULUS ) {
@@ -2413,24 +2413,24 @@ void OCompiler::dispatch_action( OPERATOR oper_, executing_parser::position_t po
 				}
 			}
 		} break;
-		case ( OPERATOR::EQUALS ): { dispatch_equals( position_ );  } break;
-		case ( OPERATOR::LESS ):   { dispatch_compare( position_ ); } break;
+		case ( OPERATOR::EQUALS ): { dispatch_equals( range_ );  } break;
+		case ( OPERATOR::LESS ):   { dispatch_compare( range_ ); } break;
 		case ( OPERATOR::BOOLEAN_AND ): {
 			M_ASSERT( o == OPERATOR::BOOLEAN_AND );
-			dispatch_boolean( nullptr, position_ );
+			dispatch_boolean( nullptr, range_ );
 		} break;
 		case ( OPERATOR::BOOLEAN_OR ): {
 			M_ASSERT( o == OPERATOR::BOOLEAN_OR );
-			dispatch_boolean( nullptr, position_ );
+			dispatch_boolean( nullptr, range_ );
 		} break;
 		case ( OPERATOR::BOOLEAN_XOR ): {
 			M_ASSERT( o == OPERATOR::BOOLEAN_XOR );
-			dispatch_boolean( &HExpression::boolean_xor, position_ );
+			dispatch_boolean( &HExpression::boolean_xor, range_ );
 		} break;
 		case ( OPERATOR::BOOLEAN_NOT ): {
 			M_ASSERT( o == OPERATOR::BOOLEAN_NOT );
 			M_ASSERT( ! fc._valueTypes.is_empty() );
-			defer_action( &HExpression::boolean_not, position_ );
+			defer_action( &HExpression::boolean_not, range_ );
 			current_expression()->commit_oper( o );
 			fc._operations.pop();
 			HHuginn::HClass const* c( fc._valueTypes.top()._class );
@@ -2451,37 +2451,37 @@ void OCompiler::dispatch_action( OPERATOR oper_, executing_parser::position_t po
 	M_EPILOG
 }
 
-void OCompiler::defer_action( HExpression::OExecutionStep::action_t const& expressionAction_, executing_parser::position_t position_ ) {
+void OCompiler::defer_action( HExpression::OExecutionStep::action_t const& expressionAction_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	HExpression* expr( current_expression().raw() );
-	expr->add_execution_step( HExpression::OExecutionStep( expr, expressionAction_, position_.get() ) );
+	expr->add_execution_step( HExpression::OExecutionStep( expr, expressionAction_, range_.start() ) );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::defer_call( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+void OCompiler::defer_call( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
-	defer_get_reference( name_, position_ );
-	defer_oper_direct( OPERATOR::FUNCTION_CALL, position_ );
+	defer_get_reference( name_, range_ );
+	defer_oper_direct( OPERATOR::FUNCTION_CALL, range_ );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::make_reference( executing_parser::position_t position_ ) {
+void OCompiler::make_reference( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	if ( ( fc._lastDereferenceOperator != OPERATOR::SUBSCRIPT ) && ( fc._lastDereferenceOperator != OPERATOR::MEMBER_ACCESS ) ) {
 		throw HHuginn::HHuginnRuntimeException(
 			fc._lastDereferenceOperator == OPERATOR::RANGE ? "Assignment to slice view." : "Assignment to function result.",
 			_fileId,
-			position_.get()
+			range_.start()
 		);
 	}
 	HExpression* expr( current_expression().raw() );
 	if ( fc._lastDereferenceOperator == OPERATOR::SUBSCRIPT ) {
 		expr->pop_execution_step();
 		expr->add_execution_step(
-			HExpression::OExecutionStep( expr, &HExpression::subscript, position_.get(), HFrame::ACCESS::REFERENCE )
+			HExpression::OExecutionStep( expr, &HExpression::subscript, range_.start(), HFrame::ACCESS::REFERENCE )
 		);
 	} else {
 		expr->execution_step( expr->execution_step_count() - 1 )._access = HFrame::ACCESS::REFERENCE;
@@ -2491,11 +2491,11 @@ void OCompiler::make_reference( executing_parser::position_t position_ ) {
 	M_EPILOG
 }
 
-void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
+void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	HHuginn::identifier_id_t refIdentifier( _runtime->identifier_id( value_ ) );
-	_usedIdentifiers[refIdentifier].read( position_.get() );
+	_usedIdentifiers[refIdentifier].read( range_.start() );
 	bool keyword( false );
 	bool isAssert( refIdentifier == KEYWORD::ASSERT_IDENTIFIER );
 	bool isFieldDefinition( !! _classContext && ( _functionContexts.get_size() == 1 ) );
@@ -2506,13 +2506,13 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 			fc._isAssert = isAssert;
 		}
 		if ( ( ( value_ != KEYWORD::THIS ) && ( value_ != KEYWORD::SUPER ) && ! isAssert ) || ( isAssert && ! expr->is_empty() ) ) {
-			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted keyword." ), _fileId, position_.get() );
+			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted keyword." ), _fileId, range_.start() );
 		} else if ( ! isAssert && ! _classContext ) {
-			throw HHuginn::HHuginnRuntimeException( "Keyword `"_ys.append( value_ ).append( "' can be used only in class context." ), _fileId, position_.get() );
+			throw HHuginn::HHuginnRuntimeException( "Keyword `"_ys.append( value_ ).append( "' can be used only in class context." ), _fileId, range_.start() );
 		}
 	}
 	if ( _isIncremental && ( refIdentifier == STANDARD_FUNCTIONS::MAIN_IDENTIFIER ) ) {
-		throw HHuginn::HHuginnRuntimeException( "Referencing main() function in incremental mode is forbidden.", _fileId, position_.get() );
+		throw HHuginn::HHuginnRuntimeException( "Referencing main() function in incremental mode is forbidden.", _fileId, range_.start() );
 	}
 	if ( ( ! keyword || isAssert ) && huginn::is_builtin( value_ ) ) {
 		/*
@@ -2524,21 +2524,21 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 			HExpression::OExecutionStep(
 				expr,
 				&HExpression::store_direct,
-				position_.get(),
+				range_.start(),
 				*_runtime->get_global( refIdentifier )
 			)
 		);
 	} else {
 		if ( isFieldDefinition ) {
-			throw HHuginn::HHuginnRuntimeException( "Dereferencing symbol `"_ys.append( value_ ).append( "' in field definition is forbidden." ), _fileId, position_.get() );
+			throw HHuginn::HHuginnRuntimeException( "Dereferencing symbol `"_ys.append( value_ ).append( "' in field definition is forbidden." ), _fileId, range_.start() );
 		}
 		if ( refIdentifier == KEYWORD::THIS_IDENTIFIER ) {
 			expr->add_execution_step(
-				HExpression::OExecutionStep( expr, &HExpression::get_this, position_.get() )
+				HExpression::OExecutionStep( expr, &HExpression::get_this, range_.start() )
 			);
 		} else if ( refIdentifier == KEYWORD::SUPER_IDENTIFIER ) {
 			expr->add_execution_step(
-				HExpression::OExecutionStep( expr, &HExpression::get_super, position_.get() )
+				HExpression::OExecutionStep( expr, &HExpression::get_super, range_.start() )
 			);
 		} else {
 			int index( expr->add_execution_step( HExpression::OExecutionStep() ) );
@@ -2549,7 +2549,7 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 				!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
 				index,
 				refIdentifier,
-				position_.get()
+				range_.start()
 			);
 		}
 	}
@@ -2558,21 +2558,21 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 	M_EPILOG
 }
 
-void OCompiler::defer_get_field_reference( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
+void OCompiler::defer_get_field_reference( yaal::hcore::HString const& value_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	HHuginn::identifier_id_t refIdentifier( _runtime->identifier_id( value_ ) );
-	_usedIdentifiers[refIdentifier].read( position_.get(), HHuginn::SYMBOL_KIND::FIELD );
+	_usedIdentifiers[refIdentifier].read( range_.start(), HHuginn::SYMBOL_KIND::FIELD );
 	if ( huginn::is_keyword( value_ ) ) {
 		if ( refIdentifier != KEYWORD::CONSTRUCTOR_IDENTIFIER ) {
-			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted keyword." ), _fileId, position_.get() );
+			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted keyword." ), _fileId, range_.start() );
 		} else if ( ! _classContext ) {
-			throw HHuginn::HHuginnRuntimeException( "Keyword `"_ys.append( value_ ).append( "' can be used only in class context." ), _fileId, position_.get() );
+			throw HHuginn::HHuginnRuntimeException( "Keyword `"_ys.append( value_ ).append( "' can be used only in class context." ), _fileId, range_.start() );
 		}
 	}
 	HExpression* expr( current_expression().raw() );
 	expr->add_execution_step(
-		HExpression::OExecutionStep( expr, &HExpression::get_field, position_.get(), HFrame::ACCESS::VALUE, refIdentifier )
+		HExpression::OExecutionStep( expr, &HExpression::get_field, range_.start(), HFrame::ACCESS::VALUE, refIdentifier )
 	);
 	expr->commit_oper( OPERATOR::MEMBER_ACCESS );
 	fc._valueTypes.pop();
@@ -2581,15 +2581,15 @@ void OCompiler::defer_get_field_reference( yaal::hcore::HString const& value_, e
 	M_EPILOG
 }
 
-void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
+void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	if ( huginn::is_restricted( value_ ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted name." ), _fileId, position_.get() );
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted name." ), _fileId, range_.start() );
 	}
 	bool isFieldDefinition( !! _classContext && ( _functionContexts.get_size() == 1 ) );
 	if ( isFieldDefinition ) {
-		throw HHuginn::HHuginnRuntimeException( "Defining symbol `"_ys.append( value_ ).append( "' in field definition is forbidden." ), _fileId, position_.get() );
+		throw HHuginn::HHuginnRuntimeException( "Defining symbol `"_ys.append( value_ ).append( "' in field definition is forbidden." ), _fileId, range_.start() );
 	}
 	HHuginn::identifier_id_t varIdentifier( _runtime->identifier_id( value_ ) );
 	HHuginn::expression_t& expression( current_expression() );
@@ -2601,7 +2601,7 @@ void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executi
 		!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
 		index,
 		varIdentifier,
-		position_.get()
+		range_.start()
 	);
 	fc._valueTypes.push( type_to_class( HHuginn::TYPE::UNKNOWN ) );
 	fc._variables.emplace( varIdentifier, static_cast<int>( _executionStepsBacklog.get_size() - 1 ) );
@@ -2609,10 +2609,10 @@ void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executi
 	M_EPILOG
 }
 
-void OCompiler::defer_store_direct( HHuginn::value_t const& value_, executing_parser::position_t position_ ) {
+void OCompiler::defer_store_direct( HHuginn::value_t const& value_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	HExpression* expr( current_expression().raw() );
-	expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, position_.get(), value_ ) );
+	expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, range_.start(), value_ ) );
 	f()._valueTypes.push( value_->get_class() );
 	return;
 	M_EPILOG
@@ -2625,70 +2625,70 @@ OPERATOR _copyConstContext_[] = {
 	OPERATOR::SUBSCRIPT
 };
 
-void OCompiler::defer_store_real( double long value_, executing_parser::position_t position_ ) {
+void OCompiler::defer_store_real( double long value_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	HExpression* expr( current_expression().raw() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, position_.get(), _runtime->object_factory()->create_real( value_ ) ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, range_.start(), _runtime->object_factory()->create_real( value_ ) ) );
 	} else {
-		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_real, position_.get(), value_ ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_real, range_.start(), value_ ) );
 	}
 	fc._valueTypes.push( type_to_class( HHuginn::TYPE::REAL ) );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::defer_store_integer( int long long value_, executing_parser::position_t position_ ) {
+void OCompiler::defer_store_integer( int long long value_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	HExpression* expr( current_expression().raw() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, position_.get(), _runtime->object_factory()->create_integer( value_ ) ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, range_.start(), _runtime->object_factory()->create_integer( value_ ) ) );
 	} else {
-		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_integer, position_.get(), value_ ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_integer, range_.start(), value_ ) );
 	}
 	fc._valueTypes.push( type_to_class( HHuginn::TYPE::INTEGER ) );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::defer_store_string( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
+void OCompiler::defer_store_string( yaal::hcore::HString const& value_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	HExpression* expr( current_expression().raw() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, position_.get(), _runtime->object_factory()->create_string( value_ ) ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, range_.start(), _runtime->object_factory()->create_string( value_ ) ) );
 	} else {
-		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_string, position_.get(), value_ ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_string, range_.start(), value_ ) );
 	}
 	fc._valueTypes.push( type_to_class( HHuginn::TYPE::STRING ) );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::defer_store_number( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
+void OCompiler::defer_store_number( yaal::hcore::HString const& value_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	HExpression* expr( current_expression().raw() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, position_.get(), _runtime->object_factory()->create_number( value_ ) ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, range_.start(), _runtime->object_factory()->create_number( value_ ) ) );
 	} else {
-		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_number, position_.get(), value_ ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_number, range_.start(), value_ ) );
 	}
 	fc._valueTypes.push( type_to_class( HHuginn::TYPE::NUMBER ) );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::defer_store_character( code_point_t value_, executing_parser::position_t position_ ) {
+void OCompiler::defer_store_character( code_point_t value_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	HExpression* expr( current_expression().raw() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, position_.get(), _runtime->object_factory()->create_character( value_ ) ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, range_.start(), _runtime->object_factory()->create_character( value_ ) ) );
 	} else {
-		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_character, position_.get(), value_ ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_character, range_.start(), value_ ) );
 	}
 	fc._valueTypes.push( type_to_class( HHuginn::TYPE::CHARACTER ) );
 	return;
