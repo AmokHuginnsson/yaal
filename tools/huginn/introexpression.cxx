@@ -15,8 +15,8 @@ namespace tools {
 
 namespace huginn {
 
-HIntroExpression::HIntroExpression( HIntrospectorInterface* introspector_, int fileId_, int position_ )
-	: HExpression( fileId_, position_ )
+HIntroExpression::HIntroExpression( HIntrospectorInterface* introspector_, int fileId_, executing_parser::range_t range_ )
+	: HExpression( fileId_, range_ )
 	, _introspector( introspector_ ) {
 	return;
 }

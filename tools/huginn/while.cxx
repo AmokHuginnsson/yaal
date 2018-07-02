@@ -20,8 +20,8 @@ HWhile::HWhile(
 	HHuginn::expression_t const& condition_,
 	HHuginn::scope_t const& loop_,
 	int fileId_,
-	int position_
-) : HStatement( id_, fileId_, position_ )
+	executing_parser::range_t range_
+) : HStatement( id_, fileId_, range_ )
 	, _condition( condition_ )
 	, _loop( loop_ ) {
 	_loop->make_inline();

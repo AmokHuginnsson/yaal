@@ -230,8 +230,8 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _character( character_ ) {
 }
 
-HExpression::HExpression( int fileId_, int position_ )
-	: HStatement( INVALID_STATEMENT_IDENTIFIER, fileId_, position_ )
+HExpression::HExpression( int fileId_, executing_parser::range_t range_ )
+	: HStatement( INVALID_STATEMENT_IDENTIFIER, fileId_, range_ )
 	, _executionSteps()
 	, _instructions()
 	, _operations() {

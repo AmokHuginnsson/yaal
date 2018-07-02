@@ -23,7 +23,7 @@ public:
 private:
 	HFrame::STATE _state;
 public:
-	HBreak( HFrame::STATE, int, int );
+	HBreak( HFrame::STATE, int, executing_parser::range_t );
 protected:
 	virtual void do_execute( HThread* ) const override;
 private:

@@ -39,7 +39,7 @@ private:
 	HHuginn::scope_t _try;
 	catches_t _catches;
 public:
-	HTryCatch( HHuginn::scope_t const&, catches_t const&, int, int );
+	HTryCatch( HHuginn::scope_t const&, catches_t const&, int, executing_parser::range_t );
 protected:
 	virtual void do_execute( HThread* ) const override;
 };

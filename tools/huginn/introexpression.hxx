@@ -21,7 +21,7 @@ public:
 private:
 	HIntrospectorInterface* _introspector;
 public:
-	HIntroExpression( HIntrospectorInterface*, int = MAIN_FILE_ID, int = 0 );
+	HIntroExpression( HIntrospectorInterface*, int = MAIN_FILE_ID, executing_parser::range_t = { 0, 0 } );
 	void get_variable_reference( OExecutionStep const&, huginn::HFrame* );
 	void make_variable( OExecutionStep const&, huginn::HFrame* );
 protected:

@@ -20,8 +20,8 @@ HIf::HIf(
 	OCompiler::OScopeContext::active_scopes_t const& ifClause_,
 	HHuginn::scope_t const& elseClause_,
 	int fileId_,
-	int position_
-) : HStatement( id_, fileId_, position_ ),
+	executing_parser::range_t range_
+) : HStatement( id_, fileId_, range_ ),
 	_ifClauses( ifClause_ ),
 	_elseClause( elseClause_ ) {
 	for ( OCompiler::OActiveScope& as : _ifClauses ) {

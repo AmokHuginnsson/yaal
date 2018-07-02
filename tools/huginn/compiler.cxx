@@ -45,7 +45,7 @@ OCompiler::OScopeContext::OScopeContext(
 	OFunctionContext* functionContext_,
 	HStatement::statement_id_t statementId_,
 	int fileId_,
-	int range_
+	executing_parser::range_t range_
 ) : _parent( ! functionContext_->_scopeStack.is_empty() ? functionContext_->_scopeStack.top().raw() : nullptr )
 	, _scope( make_pointer<HScope>( statementId_, fileId_, range_ ) )
 	, _expressionsStack()
@@ -129,7 +129,7 @@ OCompiler::OFunctionContext::OFunctionContext(
 	, _capturesNamedParameters( false )
 	, _inline( true )
 	, _compiler( compiler_ ) {
-	_scopeStack.emplace( make_pointer<OScopeContext>( this, statementId_, fileId_, 0 ) );
+	_scopeStack.emplace( make_pointer<OScopeContext>( this, statementId_, fileId_, executing_parser::HRange( 0, 0 ) ) );
 	return;
 }
 
@@ -643,7 +643,7 @@ OCompiler::OScopeContext& OCompiler::current_scope_context( void ) {
 	return ( *f()._scopeStack.top() );
 }
 
-HHuginn::expression_t OCompiler::new_expression( int fileId_, int range_ ) {
+HHuginn::expression_t OCompiler::new_expression( int fileId_, executing_parser::range_t const& range_ ) {
 	return (
 		_introspector
 			? pointer_static_cast<HExpression>( make_pointer<HIntroExpression>( _introspector, fileId_, range_ ) )
@@ -1246,7 +1246,7 @@ void OCompiler::create_scope( executing_parser::range_t range_ ) {
 	} else {
 		sid = fc._scopeStack.top()->_statementId;
 	}
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, sid, _fileId, range_.start() ) );
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, sid, _fileId, range_ ) );
 	fc._inline = false;
 	return;
 	M_EPILOG
@@ -1347,7 +1347,7 @@ void OCompiler::start_if_statement( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	if ( fc._scopeStack.top()->_scopeChain.is_empty() ) {
-		fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, range_.start() ) );
+		fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, range_ ) );
 	}
 	fc._inline = true;
 	return;
@@ -1368,7 +1368,7 @@ void OCompiler::start_loop_statement( executing_parser::range_t range_ ) {
 	fc._inline = true;
 	++ fc._loopCount;
 	++ fc._loopSwitchCount;
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, range_.start() ) );
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, range_ ) );
 	return;
 	M_EPILOG
 }
@@ -1377,14 +1377,14 @@ void OCompiler::start_switch_statement( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	++ fc._loopSwitchCount;
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, range_.start() ) );
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, range_ ) );
 	return;
 	M_EPILOG
 }
 
 void OCompiler::start_subexpression( executing_parser::range_t range_ ) {
 	M_PROLOG
-	f().expressions_stack().emplace( 1, new_expression( _fileId, range_.start() ) );
+	f().expressions_stack().emplace( 1, new_expression( _fileId, range_ ) );
 	return;
 	M_EPILOG
 }
@@ -1392,7 +1392,7 @@ void OCompiler::start_subexpression( executing_parser::range_t range_ ) {
 void OCompiler::add_subexpression( OPERATOR op_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	fc.expressions_stack().top().emplace_back( new_expression( _fileId, range_.start() ) );
+	fc.expressions_stack().top().emplace_back( new_expression( _fileId, range_ ) );
 	fc._operations.emplace( op_, range_.start() );
 	return;
 	M_EPILOG
@@ -1448,7 +1448,7 @@ void OCompiler::add_return_statement( executing_parser::range_t range_ ) {
 	if ( e->is_empty() ) {
 		e->add_execution_step( HExpression::OExecutionStep( e.raw(), &HExpression::store_direct, range_.start(), _runtime->none_value() ) );
 	}
-	terminate_scope( make_pointer<HReturn>( e, _fileId, range_.start() ) );
+	terminate_scope( make_pointer<HReturn>( e, _fileId, range_ ) );
 	reset_expression();
 	return;
 	M_EPILOG
@@ -1457,7 +1457,7 @@ void OCompiler::add_return_statement( executing_parser::range_t range_ ) {
 void OCompiler::add_throw_statement( executing_parser::range_t range_ ) {
 	M_PROLOG
 	M_ASSERT( ! f()._scopeStack.is_empty() );
-	terminate_scope( make_pointer<HThrow>( current_expression(), _fileId, range_.start() ) );
+	terminate_scope( make_pointer<HThrow>( current_expression(), _fileId, range_ ) );
 	reset_expression();
 	return;
 	M_EPILOG
@@ -1470,7 +1470,7 @@ void OCompiler::add_break_statement( executing_parser::range_t range_ ) {
 	if ( fc._loopSwitchCount == 0 ) {
 		throw HHuginn::HHuginnRuntimeException( "Invalid context for `break' statement.", _fileId, range_.start() );
 	}
-	terminate_scope( make_pointer<HBreak>( HFrame::STATE::BREAK, _fileId, range_.start() ) );
+	terminate_scope( make_pointer<HBreak>( HFrame::STATE::BREAK, _fileId, range_ ) );
 	reset_expression();
 	return;
 	M_EPILOG
@@ -1483,7 +1483,7 @@ void OCompiler::add_continue_statement( executing_parser::range_t range_ ) {
 	if ( fc._loopCount == 0 ) {
 		throw HHuginn::HHuginnRuntimeException( "Invalid context for `continue' statement.", _fileId, range_.start() );
 	}
-	terminate_scope( make_pointer<HBreak>( HFrame::STATE::CONTINUE, _fileId, range_.start() ) );
+	terminate_scope( make_pointer<HBreak>( HFrame::STATE::CONTINUE, _fileId, range_ ) );
 	reset_expression();
 	return;
 	M_EPILOG
@@ -1496,7 +1496,7 @@ void OCompiler::add_while_statement( executing_parser::range_t range_ ) {
 	HHuginn::scope_t scope( pop_scope_context() );
 	OScopeContext& sc( current_scope_context() );
 	HScope::statement_t whileStatement(
-		make_pointer<HWhile>( sc._statementId, current_expression(), scope, _fileId, range_.start() )
+		make_pointer<HWhile>( sc._statementId, current_expression(), scope, _fileId, range_ )
 	);
 	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );
@@ -1571,7 +1571,7 @@ void OCompiler::close_function_call( executing_parser::range_t range_ ) {
 void OCompiler::set_type_name( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, range_.start() ) );
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, range_ ) );
 	OScopeContext& sc( current_scope_context() );
 	sc._exceptionType = _runtime->identifier_id( name_ );
 	return;
@@ -1588,7 +1588,7 @@ void OCompiler::add_for_statement( executing_parser::range_t range_ ) {
 	HHuginn::expression_t source( exprs.back() );
 	exprs.pop_back();
 	HScope::statement_t forStatement(
-		make_pointer<HFor>( sc._statementId, yaal::move( exprs ), source, scope, _fileId, range_.start() )
+		make_pointer<HFor>( sc._statementId, yaal::move( exprs ), source, scope, _fileId, range_ )
 	);
 	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );
@@ -1627,7 +1627,7 @@ void OCompiler::add_if_statement( executing_parser::range_t range_ ) {
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	OScopeContext& sc( *fc._scopeStack.top() );
-	HScope::statement_t ifStatement( make_pointer<HIf>( sc._statementId, sc._scopeChain, sc._else, _fileId, range_.start() ) );
+	HScope::statement_t ifStatement( make_pointer<HIf>( sc._statementId, sc._scopeChain, sc._else, _fileId, range_ ) );
 	sc._scopeChain.clear();
 	sc._else.reset();
 	pop_scope_context_low();
@@ -1645,7 +1645,7 @@ void OCompiler::add_try_catch_statement( executing_parser::range_t range_ ) {
 	HTryCatch::catches_t catches( yaal::move( fc._scopeStack.top()->_catches ) );
 	HHuginn::scope_t scope( pop_scope_context() );
 	HScope::statement_t tryCatchStatement(
-		make_pointer<HTryCatch>( scope, catches, _fileId, range_.start() )
+		make_pointer<HTryCatch>( scope, catches, _fileId, range_ )
 	);
 	current_scope()->add_statement( tryCatchStatement );
 	reset_expression();
@@ -1668,7 +1668,7 @@ void OCompiler::add_switch_statement( executing_parser::range_t range_ ) {
 			contexts,
 			Default,
 			_fileId,
-			range_.start()
+			range_
 		)
 	);
 	-- fc._loopSwitchCount;
@@ -1713,7 +1713,7 @@ void OCompiler::add_field_definition( executing_parser::range_t ) {
 void OCompiler::mark_expression_position( executing_parser::range_t range_ ) {
 	M_PROLOG
 	M_ASSERT( ! f()._scopeStack.is_empty() );
-	current_expression()->set_position( _fileId, range_.start() );
+	current_expression()->set_range( _fileId, range_ );
 	return;
 	M_EPILOG
 }

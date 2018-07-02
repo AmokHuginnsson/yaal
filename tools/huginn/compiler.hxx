@@ -115,7 +115,7 @@ struct OCompiler {
 		 */
 		local_variables_t _variables;
 
-		OScopeContext( OFunctionContext*, HStatement::statement_id_t, int, int );
+		OScopeContext( OFunctionContext*, HStatement::statement_id_t, int, executing_parser::range_t );
 		HHuginn::expression_t& expression( void );
 		HHuginn::HClass const* guess_type( OCompiler const*, HHuginn::identifier_id_t ) const;
 		void note_type( HHuginn::identifier_id_t, HHuginn::HClass const* );
@@ -526,7 +526,7 @@ struct OCompiler {
 	void defer_store_number( yaal::hcore::HString const&, executing_parser::range_t );
 	void defer_store_character( code_point_t, executing_parser::range_t );
 	void defer_call( yaal::hcore::HString const&, executing_parser::range_t );
-	HHuginn::expression_t new_expression( int, int = 0 );
+	HHuginn::expression_t new_expression( int, executing_parser::range_t const& = { 0, 0 } );
 	void merge( HHuginn::expression_t&, HHuginn::expression_t& );
 private:
 	HHuginn::HClass const* function_ref_to_class( HHuginn::identifier_id_t );

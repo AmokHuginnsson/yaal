@@ -26,12 +26,12 @@ public:
 private:
 	statement_id_t _id;
 	int _fileId;
-	int _position;
+	executing_parser::HRange _range;
 public:
-	HStatement( statement_id_t id_, int fileId_, int position_ )
+	HStatement( statement_id_t id_, int fileId_, executing_parser::range_t range_ )
 		: _id( id_ )
 		, _fileId( fileId_ )
-		, _position( position_ ) {
+		, _range( range_ ) {
 		return;
 	}
 	virtual ~HStatement( void ) {
@@ -39,7 +39,7 @@ public:
 	}
 	void execute( HThread* thread_ ) const {
 		if ( _isKilled_ ) {
-			throw HHuginn::HHuginnRuntimeException( "Killed interior.", _fileId, _position );
+			throw HHuginn::HHuginnRuntimeException( "Killed interior.", _fileId, _range.start() );
 		}
 		do_execute( thread_ );
 		return;
@@ -47,15 +47,18 @@ public:
 	statement_id_t id( void ) const {
 		return ( _id );
 	}
+	executing_parser::range_t const& range( void ) const {
+		return ( _range );
+	}
 	int position( void ) const {
-		return ( _position );
+		return ( _range.start() );
 	}
 	int file_id( void ) const {
 		return ( _fileId );
 	}
-	void set_position( int fileId_, int position_ ) {
+	void set_range( int fileId_, executing_parser::range_t range_ ) {
 		_fileId = fileId_;
-		_position = position_;
+		_range = range_;
 		return;
 	}
 protected:

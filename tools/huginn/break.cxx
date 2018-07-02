@@ -12,8 +12,8 @@ namespace tools {
 
 namespace huginn {
 
-HBreak::HBreak( HFrame::STATE state_, int fileId_, int position_ )
-	: HStatement( INVALID_STATEMENT_IDENTIFIER, fileId_, position_ )
+HBreak::HBreak( HFrame::STATE state_, int fileId_, executing_parser::range_t range_ )
+	: HStatement( INVALID_STATEMENT_IDENTIFIER, fileId_, range_ )
 	, _state( state_ ) {
 	return;
 }

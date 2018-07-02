@@ -21,8 +21,8 @@ HSwitch::HSwitch(
 	cases_t const& cases_,
 	HHuginn::scope_t const& default_,
 	int fileId_,
-	int position_
-) : HStatement( id_, fileId_, position_ ),
+	executing_parser::range_t range_
+) : HStatement( id_, fileId_, range_ ),
 	_expression( expression_ ),
 	_cases( cases_ ),
 	_default( default_ ) {

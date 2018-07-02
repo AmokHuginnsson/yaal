@@ -12,8 +12,8 @@ namespace tools {
 
 namespace huginn {
 
-HScope::HScope( statement_id_t id_, int fileId_, int position_ )
-	: HStatement( id_, fileId_, position_ )
+HScope::HScope( statement_id_t id_, int fileId_, executing_parser::range_t range_ )
+	: HStatement( id_, fileId_, range_ )
 	, _statements()
 	, _inline( false ) {
 	return;

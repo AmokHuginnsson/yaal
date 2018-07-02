@@ -25,8 +25,8 @@ HFor::HFor(
 	HHuginn::expression_t const& source_,
 	HHuginn::scope_t const& loop_,
 	int fileId_,
-	int statementPosition_
-) : HStatement( id_, fileId_, statementPosition_ )
+	executing_parser::range_t range_
+) : HStatement( id_, fileId_, range_ )
 	, _control( yaal::move( control_ ) )
 	, _source( source_ )
 	, _loop( loop_ ) {

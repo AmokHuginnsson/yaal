@@ -66,7 +66,7 @@ private:
 	instructions_t _instructions;
 	operations_t _operations;
 public:
-	HExpression( int = MAIN_FILE_ID, int = 0 );
+	HExpression( int = MAIN_FILE_ID, executing_parser::range_t = { 0, 0 } );
 	int execution_step_count( void ) const;
 	int add_execution_step( OExecutionStep const& );
 	OExecutionStep& execution_step( int );

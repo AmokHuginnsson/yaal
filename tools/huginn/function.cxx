@@ -27,7 +27,7 @@ HFunction::HFunction(
 	expressions_t const& defaultValues_,
 	bool isVariadic_,
 	bool capturesNamedParameters_
-) : HStatement( scope_->id(), scope_->file_id(), scope_->position() )
+) : HStatement( scope_->id(), scope_->file_id(), scope_->range() )
 	, _name( name_ )
 	, _parameterNames( parameterNames_ )
 	, _defaultParametersStart( static_cast<int>( parameterNames_.get_size() - defaultValues_.get_size() ) )

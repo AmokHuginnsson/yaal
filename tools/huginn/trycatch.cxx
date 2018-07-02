@@ -23,7 +23,7 @@ HTryCatch::HCatch::HCatch(
 	HHuginn::identifier_id_t type_,
 	HHuginn::expression_t const& control_,
 	HHuginn::scope_t const& scope_
-) : HStatement( id_, scope_->file_id(), scope_->position() )
+) : HStatement( id_, scope_->file_id(), scope_->range() )
 	, _type( type_ )
 	, _control( control_ )
 	, _scope( scope_ ) {
@@ -45,8 +45,8 @@ void HTryCatch::HCatch::execute( HThread* thread_, HHuginn::value_t value_ ) con
 	M_EPILOG
 }
 
-HTryCatch::HTryCatch( HHuginn::scope_t const& try_, catches_t const& catches_, int fileId_, int position_ )
-	: HStatement( try_->id(), fileId_, position_ )
+HTryCatch::HTryCatch( HHuginn::scope_t const& try_, catches_t const& catches_, int fileId_, executing_parser::range_t range_ )
+	: HStatement( try_->id(), fileId_, range_ )
 	, _try( try_ )
 	, _catches( catches_ ) {
 	_try->make_inline();

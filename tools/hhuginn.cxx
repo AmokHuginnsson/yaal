@@ -1048,7 +1048,7 @@ HHuginn::value_t HHuginn::HClass::HBoundMethod::do_clone( huginn::HThread* threa
 
 yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn* huginn_ ) {
 	HResource<huginn::HThread> threadHolder;
-	HStatement stmt( HStatement::statement_id_t( 0 ), 0, 0 );
+	HStatement stmt( HStatement::statement_id_t( 0 ), 0, { 0, 0 } );
 	if ( huginn_ ) {
 		threadHolder.reset( new huginn::HThread( const_cast<HRuntime*>( &huginn_->runtime() ), hcore::HThread::get_current_thread_id() ) );
 		threadHolder->create_function_frame( &stmt, nullptr, 0 );

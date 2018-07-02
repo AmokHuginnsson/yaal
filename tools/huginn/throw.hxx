@@ -21,7 +21,7 @@ public:
 private:
 	HHuginn::expression_t _expression;
 public:
-	HThrow( HHuginn::expression_t const&, int, int );
+	HThrow( HHuginn::expression_t const&, int, executing_parser::range_t );
 protected:
 	virtual void do_execute( HThread* ) const override;
 private:
