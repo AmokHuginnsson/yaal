@@ -69,15 +69,28 @@ public:
 struct CHARACTER_CLASS {
 	typedef enum {
 		WHITESPACE = 0,
-		BIN_DIGIT = 1,
-		OCT_DIGIT = 2,
-		DIGIT = 3,
-		HEX_DIGIT = 4,
-		LETTER = 5,
+		BIN_DIGIT  = 1,
+		OCT_DIGIT  = 2,
+		DIGIT      = 3,
+		HEX_DIGIT  = 4,
+		LETTER     = 5,
 		LOWER_CASE_LETTER = 6,
 		UPPER_CASE_LETTER = 7,
 		WORD = 8,
-		VOWEL = 9
+		VOWEL = 9,
+		GREEK = 10,
+		LOWER_CASE_GREEK = 11,
+		UPPER_CASE_GREEK = 12,
+		SUBSCRIPT = 13,
+		SUBSCRIPT_DIGIT = 14,
+		SUBSCRIPT_LETTER = 15,
+		SUBSCRIPT_LOWER_CASE_LETTER = 16,
+		SUBSCRIPT_UPPER_CASE_LETTER = 17,
+		SUPERSCRIPT = 18,
+		SUPERSCRIPT_DIGIT = 19,
+		SUPERSCRIPT_LETTER = 20,
+		SUPERSCRIPT_LOWER_CASE_LETTER = 21,
+		SUPERSCRIPT_UPPER_CASE_LETTER = 22
 	} character_class_t;
 };
 HCharacterClass const& character_class( CHARACTER_CLASS::character_class_t );
@@ -1179,6 +1192,11 @@ bool is_lower( code_point_t );
 bool is_alpha( code_point_t );
 bool is_alnum( code_point_t );
 bool is_ascii( code_point_t );
+bool is_greek( code_point_t );
+bool is_upper_greek( code_point_t );
+bool is_lower_greek( code_point_t );
+bool is_subscript( code_point_t );
+bool is_superscript( code_point_t );
 
 inline void swap( yaal::hcore::HString& a, yaal::hcore::HString& b ) {
 	a.swap( b );
