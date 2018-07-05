@@ -56,7 +56,8 @@ public:
 						{ "LOCAL",    "A local.",        static_cast<int>( KIND::LOCAL ) }
 					},
 					"The `KIND` is set of possible value conext kinds.",
-					HHuginn::VISIBILITY::PACKAGE
+					HHuginn::VISIBILITY::PACKAGE,
+					class_
 				),
 				"set of all possible context kinds."
 			)

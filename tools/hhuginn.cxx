@@ -441,7 +441,6 @@ void HHuginn::finalize_compilation( void ) {
 		M_ASSERT( is_enum_class( e ) );
 		_runtime->register_global( e->get_class()->identifier_id(), e );
 	}
-	typedef HArray<identifier_id_t> identifiers_t;
 	identifiers_t classIdentifiers;
 	for ( OCompiler::submitted_classes_t::value_type const& sc : _compiler->_submittedClasses ) {
 		_compiler->track_name_cycle( sc.first );

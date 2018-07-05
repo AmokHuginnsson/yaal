@@ -977,10 +977,29 @@ void HRuntime::register_builtins( void ) {
 	M_EPILOG
 }
 
+namespace {
+
+void sort_identifiers( identifiers_t& identifiers_, HRuntime const* runtime_ ) {
+	sort(
+		identifiers_.begin(),
+		identifiers_.end(),
+		[runtime_]( HHuginn::identifier_id_t const& l, HHuginn::identifier_id_t const& r ) {
+			return ( runtime_->identifier_name( l ) < runtime_->identifier_name( r ) );
+		}
+	);
+}
+
+}
+
 inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& stream_, HHuginn::HClass const& huginnClass_ ) {
 	M_PROLOG
 	HRuntime const* runtime( huginnClass_.runtime() );
-	stream_ << "class: " << huginnClass_.name();
+	stream_ << ( is_enum_class( &huginnClass_ ) ? "enum: " : "class: " );
+	stream_ << ( ( huginnClass_.access() == HHuginn::ACCESS::PUBLIC ) ? "" : "-" );
+	if ( huginnClass_.origin() ) {
+		stream_ << huginnClass_.origin()->name() << ".";
+	}
+	stream_ << huginnClass_.name();
 	if ( huginnClass_.super() ) {
 		stream_ << " : " << huginnClass_.super()->name();
 	}
@@ -1019,6 +1038,7 @@ inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterfac
 	stream_ << " {";
 	bool next( false );
 	bool verbose( _debugLevel_ >= DEBUG_LEVEL::VERBOSE_MESSAGES );
+	sort_identifiers( derivedFields, runtime );
 	for ( HHuginn::identifier_id_t f : derivedFields ) {
 		if ( next ) {
 			stream_ << ",";
@@ -1026,6 +1046,7 @@ inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterfac
 		next = true;
 		stream_ << " " << runtime->identifier_name( f ) << ( verbose ? "(derived)" : "" );
 	}
+	sort_identifiers( overriddenFields, runtime );
 	for ( HHuginn::identifier_id_t f : overriddenFields ) {
 		if ( next ) {
 			stream_ << ",";
@@ -1033,6 +1054,7 @@ inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterfac
 		next = true;
 		stream_ << " " << runtime->identifier_name( f ) << ( verbose ? "(overridden)" : "" );
 	}
+	sort_identifiers( newFields, runtime );
 	for ( HHuginn::identifier_id_t f : newFields ) {
 		if ( next ) {
 			stream_ << ",";
@@ -1055,14 +1077,37 @@ void HRuntime::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) const {
 		}
 		stream_ << "package: " << identifier_name( gd.first ) << " = " << v->get_class()->name() << endl;
 	}
+	huginn::classes_t classes;
 	for ( classes_t::value_type const& c : _classes ) {
-		stream_ << *c.second << endl;
+		classes.push_back( c.second.raw() );
 	}
+	sort(
+		classes.begin(),
+		classes.end(),
+		[]( HHuginn::HClass const* l, HHuginn::HClass const* r ) {
+			return ( l->name() < r->name() );
+		}
+	);
+	for ( HHuginn::HClass const* c : classes ) {
+		if ( ! is_enum_class( c ) ) {
+			stream_ << *c << endl;
+		}
+	}
+	for ( HHuginn::HClass const* c : classes ) {
+		if ( is_enum_class( c ) ) {
+			stream_ << *c << endl;
+		}
+	}
+	identifiers_t identifiers;
 	for ( global_definitions_t::value_type const& f : _globalDefinitions ) {
-		if ( (*f.second)->type_id() != HHuginn::TYPE::FUNCTION_REFERENCE ) {
+		if ( ( (*f.second)->type_id() != HHuginn::TYPE::FUNCTION_REFERENCE ) || !! get_class( f.first ) ) {
 			continue;
 		}
-		yaal::hcore::HString const& name( identifier_name( f.first ) );
+		identifiers.push_back( f.first );
+	}
+	sort_identifiers( identifiers, this );
+	for ( HHuginn::identifier_id_t const& id : identifiers ) {
+		yaal::hcore::HString const& name( identifier_name( id ) );
 		stream_ << "function: " << name;
 		if ( _debugLevel_ >= DEBUG_LEVEL::VERBOSE_MESSAGES ) {
 			if ( _builtin_.count( name ) > 0 ) {

@@ -53,21 +53,21 @@ private:
 	HHuginn::class_t _valueClass;
 public:
 	HEnumerationClass(
-		HRuntime* runtime_,
-		HHuginn::type_id_t typeId_,
-		HHuginn::identifier_id_t identifierId_,
-		descriptions_t const& descriptions_,
-		HHuginn::HClass const* base_,
-		yaal::hcore::HString const& doc_,
+		HRuntime*,
+		HHuginn::type_id_t,
+		HHuginn::identifier_id_t,
+		descriptions_t const&,
+		yaal::hcore::HString const&,
+		HHuginn::HClass const*,
 		HHuginn::VISIBILITY visibility_
 	);
-	static HHuginn::value_t to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ );
+	static HHuginn::value_t to_string( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	HHuginn::HClass const* enumeral_class( void ) const {
 		return ( _valueClass.raw() );
 	}
 	HHuginn::value_t enumeral( HHuginn::HEnumeral::value_type ) const;
 private:
-	virtual HHuginn::value_t do_create_instance( huginn::HThread* thread_, HHuginn::values_t&, int position_ ) const __attribute__((noreturn));
+	virtual HHuginn::value_t do_create_instance( huginn::HThread*, HHuginn::values_t&, int ) const __attribute__((noreturn));
 };
 
 HHuginn::class_t create_class(

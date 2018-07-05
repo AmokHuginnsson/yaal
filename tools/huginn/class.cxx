@@ -47,10 +47,12 @@ HHuginn::HClass::HClass(
 	M_EPILOG
 }
 
+/* ReverseTupleView, ReverseListView, ReverseDequeView and so on */
 HHuginn::HClass::HClass(
 	HRuntime* runtime_,
 	char const* name_,
-	char const* doc_
+	char const* doc_,
+	HClass const* origin_
 ) : _runtime( runtime_ )
 	, _typeId( runtime_->new_type_id() )
 	, _identifierId( runtime_->identifier_id( name_ ) )
@@ -64,12 +66,13 @@ HHuginn::HClass::HClass(
 	, _fieldDescriptions()
 	, _doc( doc_ )
 	, _type( TYPE::BUILTIN )
-	, _origin( nullptr ) {
+	, _origin( origin_ ) {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
+/* *none_type*, *function_reference*, *observer* and so on */
 HHuginn::HClass::HClass(
 	HRuntime* runtime_,
 	HHuginn::TYPE typeTag_,
@@ -94,7 +97,7 @@ HHuginn::HClass::HClass(
 	M_EPILOG
 }
 
-
+/* from HObjectFactory constructor */
 HHuginn::HClass::HClass(
 	HRuntime* runtime_,
 	HObjectFactory* objectFactory_,
@@ -201,6 +204,16 @@ void HHuginn::HClass::set_origin( HClass const* origin_ ) {
 	return;
 }
 
+HHuginn::ACCESS HHuginn::HClass::access( void ) const {
+	M_PROLOG
+	return (
+		( ! _origin && ! is_meta_class( this ) )
+			? HHuginn::ACCESS::PUBLIC
+			: HHuginn::ACCESS::PRIVATE
+	);
+	M_EPILOG
+}
+
 int HHuginn::HClass::field_index( identifier_id_t const& identifierId_, MEMBER_TYPE memberType_ ) const {
 	M_PROLOG
 	int fieldIndex( -1 );
@@ -233,7 +246,7 @@ HHuginn::function_t const& HHuginn::HClass::function( int index_ ) const {
 void HHuginn::HClass::finalize_registration( huginn::HRuntime* runtime_ ) {
 	M_PROLOG
 	if ( ! _constructor ) {
-	 _constructor = make_constructor( runtime_->object_factory(), ACCESS::PRIVATE );
+		_constructor = make_constructor( runtime_->object_factory(), HHuginn::ACCESS::PRIVATE );
 	}
 	do_finalize_registration( runtime_ );
 	return;

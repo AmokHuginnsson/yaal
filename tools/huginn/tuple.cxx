@@ -78,13 +78,14 @@ public:
 		, _tuple( tuple_ ) {
 		M_ASSERT( _tuple->type_id() == HHuginn::TYPE::TUPLE );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			make_pointer<HHuginn::HClass>(
 				runtime_,
 				"ReversedTupleView",
-				"The `ReversedTupleView` class represents *lazy* *iterable* reversed view of a `tuple`."
+				"The `ReversedTupleView` class represents *lazy* *iterable* reversed view of a `tuple`.",
+				origin_
 			)
 		);
 		return ( c );
@@ -175,7 +176,7 @@ public:
 			"It supports basic subscript and range operators.",
 			&huginn_builtin::tuple
 		)
-		, _reversedTupleClass( HReversedTuple::get_class( runtime_ ) ) {
+		, _reversedTupleClass( HReversedTuple::get_class( runtime_, this ) ) {
 		HHuginn::field_definitions_t fd{
 			{ "add",    objectFactory_->create_method( &tuple::add ),    "( *other* ) - append all elements from *other* `tuple` at the end of this `tuple`" },
 			{ "hash",   objectFactory_->create_method( &tuple::hash ),   "calculate hash value for this `tuple`" },

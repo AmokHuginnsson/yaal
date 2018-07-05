@@ -50,6 +50,7 @@ public:
 	void done( HHuginn::value_t const& );
 };
 
+typedef yaal::hcore::HArray<HHuginn::identifier_id_t> identifiers_t;
 typedef yaal::hcore::HArray<HHuginn::TYPE> types_t;
 typedef yaal::hcore::HArray<HHuginn::HClass const*> classes_t;
 
@@ -87,6 +88,7 @@ bool is_boolean_congruent( HHuginn::HClass const* );
 bool is_unknown( HHuginn::HClass const* );
 bool is_reference_congruent( HHuginn::HClass const* );
 bool is_integer_congruent( HHuginn::HClass const* );
+bool is_meta_class( HHuginn::HClass const* );
 inline bool is_enum_class( HHuginn::HClass const* class_ ) {
 	return ( dynamic_cast<enumeration::HEnumerationClass const*>( class_ ) != nullptr );
 }

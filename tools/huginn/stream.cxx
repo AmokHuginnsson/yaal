@@ -145,7 +145,8 @@ public:
 					{ "END", "Count offset position form the end of the stream.", static_cast<int>( HStreamInterface::SEEK::END ) }
 				},
 				"The `SEEK` is set of possible anchors used for seeking in seekable streams.",
-				HHuginn::VISIBILITY::PACKAGE
+				HHuginn::VISIBILITY::PACKAGE,
+				this
 			),
 			"set of possible modes used for seeking in streams.",
 			HHuginn::HClass::MEMBER_TYPE::STATIC

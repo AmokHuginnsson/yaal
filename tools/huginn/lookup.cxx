@@ -87,13 +87,14 @@ public:
 		, _lookup( lookup_ ) {
 		M_ASSERT( _lookup->type_id() == HHuginn::TYPE::LOOKUP );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			make_pointer<HHuginn::HClass>(
 				runtime_,
 				"KeyValuesLookupView",
-				"The `KeyValuesLookupView` class represents *lazy* *iterable* view of a `lookup` consisted of key-value pairs."
+				"The `KeyValuesLookupView` class represents *lazy* *iterable* view of a `lookup` consisted of key-value pairs.",
+				origin_
 			)
 		);
 		return ( c );
@@ -166,13 +167,14 @@ public:
 		, _lookup( lookup_ ) {
 		M_ASSERT( _lookup->type_id() == HHuginn::TYPE::LOOKUP );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			make_pointer<HHuginn::HClass>(
 				runtime_,
 				"ReversedLookupView",
-				"The `ReversedLookupView` class represents *lazy* *iterable* reversed view of a `lookup`."
+				"The `ReversedLookupView` class represents *lazy* *iterable* reversed view of a `lookup`.",
+				origin_
 			)
 		);
 		return ( c );
@@ -317,8 +319,8 @@ public:
 			doc_,
 			&huginn_builtin::lookup
 		)
-		, _keyValuesLookupViewClass( HKeyValuesLookupView::get_class( runtime_ ) )
-		, _reversedLookupClass( HReversedLookup::get_class( runtime_ ) ) {
+		, _keyValuesLookupViewClass( HKeyValuesLookupView::get_class( runtime_, this ) )
+		, _reversedLookupClass( HReversedLookup::get_class( runtime_, this ) ) {
 		return;
 	}
 	HHuginn::HClass const* key_values_lookup_view_class( void ) const {

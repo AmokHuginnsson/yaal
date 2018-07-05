@@ -556,10 +556,9 @@ private:
 	HClass const* _origin;
 public:
 	HClass( huginn::HRuntime*, type_id_t, identifier_id_t, yaal::hcore::HString const&, ACCESS, TYPE = TYPE::BUILTIN, HClass const* = nullptr, create_instance_t = nullptr );
-	HClass( huginn::HRuntime*, type_id_t, identifier_id_t, yaal::hcore::HString const&, constructor_t );
-	HClass( huginn::HRuntime*, huginn::HObjectFactory*, type_id_t, identifier_id_t, yaal::hcore::HString const&, constructor_t );
-	HClass( huginn::HRuntime*, char const*, char const* );
-	HClass( huginn::HRuntime*, HHuginn::TYPE, identifier_id_t, char const* );
+	HClass( huginn::HRuntime*, huginn::HObjectFactory*, type_id_t, identifier_id_t, yaal::hcore::HString const&, constructor_t ); /* from HObjectFactory constructor */
+	HClass( huginn::HRuntime*, char const*, char const*, HClass const* ); /* ReversedTupleView, ReversedListView, ... */
+	HClass( huginn::HRuntime*, HHuginn::TYPE, identifier_id_t, char const* ); /* *none*, *function_reference*, *observer*, ... */
 	virtual ~HClass( void ) {
 	}
 	void redefine( HClass const*, field_definitions_t const& );
@@ -580,6 +579,7 @@ public:
 	TYPE type( void ) const {
 		return ( _type );
 	}
+	ACCESS access( void ) const;
 	field_identifiers_t const& field_identifiers( void ) const {
 		return ( _fieldIdentifiers );
 	}

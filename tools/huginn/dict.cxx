@@ -88,13 +88,14 @@ public:
 		, _dict( dict_ ) {
 		M_ASSERT( _dict->type_id() == HHuginn::TYPE::DICT );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			make_pointer<HHuginn::HClass>(
 				runtime_,
 				"KeyValuesDictView",
-				"The `KeyValuesDictView` class represents *lazy* *iterable* view of a `dict` consisted of key-value pairs."
+				"The `KeyValuesDictView` class represents *lazy* *iterable* view of a `dict` consisted of key-value pairs.",
+				origin_
 			)
 		);
 		return ( c );
@@ -167,13 +168,14 @@ public:
 		, _dict( dict_ ) {
 		M_ASSERT( _dict->type_id() == HHuginn::TYPE::DICT );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			make_pointer<HHuginn::HClass>(
 				runtime_,
 				"ReversedDictView",
-				"The `ReversedDictView` class represents *lazy* *iterable* reversed view of a `dict`."
+				"The `ReversedDictView` class represents *lazy* *iterable* reversed view of a `dict`.",
+				origin_
 			)
 		);
 		return ( c );
@@ -330,8 +332,8 @@ public:
 			doc_,
 			&huginn_builtin::dict
 		)
-		, _keyValuesDictViewClass( HKeyValuesDictView::get_class( runtime_ ) )
-		, _reversedDictClass( HReversedDict::get_class( runtime_ ) ) {
+		, _keyValuesDictViewClass( HKeyValuesDictView::get_class( runtime_, this ) )
+		, _reversedDictClass( HReversedDict::get_class( runtime_, this ) ) {
 		return;
 	}
 	HHuginn::HClass const* key_values_dict_view_class( void ) const {

@@ -110,13 +110,14 @@ public:
 		, _order( order_ ) {
 		M_ASSERT( _order->type_id() == HHuginn::TYPE::ORDER );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			make_pointer<HHuginn::HClass>(
 				runtime_,
 				"ReversedOrderView",
-				"The `ReversedOrderView` class represents *lazy* *iterable* reversed view of a `order`."
+				"The `ReversedOrderView` class represents *lazy* *iterable* reversed view of a `order`.",
+				origin_
 			)
 		);
 		return ( c );
@@ -237,7 +238,7 @@ public:
 			"The `order` is a collection of sorted values of uniform types. It supports operations of addition, search and element removal.",
 			&huginn_builtin::order
 		)
-		, _reversedOrderClass( HReversedOrder::get_class( runtime_ ) ) {
+		, _reversedOrderClass( HReversedOrder::get_class( runtime_, this ) ) {
 		HHuginn::field_definitions_t fd{
 			{ "insert",  objectFactory_->create_method( &order::insert ),  "( *elem* ) - insert given element *elem* into an `order`" },
 			{ "has_key", objectFactory_->create_method( &order::has_key ), "( *elem* ) - tell if given element *elem* is in the `order`" },

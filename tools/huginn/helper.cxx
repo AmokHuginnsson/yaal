@@ -587,6 +587,11 @@ bool is_summable( HHuginn::HClass const* class_ ) {
 	);
 }
 
+bool is_meta_class( HHuginn::HClass const* class_ ) {
+	HHuginn::identifier_id_t id( class_->identifier_id() );
+	return ( ( id >= BUILTIN::TYPE_NONE_IDENTIFIER ) && ( id <= BUILTIN::TYPE_NAMED_PARAMETERS_IDENTIFIER ) );
+}
+
 bool are_congruous( HHuginn::HClass const* c1_, HHuginn::HClass const* c2_ ) {
 	HHuginn::type_id_t t1( c1_ ? c1_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
 	HHuginn::type_id_t t2( c2_ ? c2_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );

@@ -26,8 +26,6 @@ class HEnumerationClass::HEnumeralClass : public HHuginn::HClass {
 public:
 	typedef HEnumeralClass this_type;
 	typedef HHuginn::HClass base_type;
-private:
-	HEnumerationClass const* _enumerationClass;
 public:
 	HEnumeralClass(
 		HEnumerationClass const* enumerationClass_,
@@ -41,11 +39,11 @@ public:
 		identifierId_,
 		doc_,
 		HHuginn::ACCESS::PRIVATE
-	)
-	, _enumerationClass( enumerationClass_ ) {
+	) {
+		set_origin( enumerationClass_ );
 	}
 	HEnumerationClass const* enumeration_class( void ) const {
-		return ( _enumerationClass );
+		return ( static_cast<HEnumerationClass const*>( origin() ) );
 	}
 protected:
 	virtual HHuginn::value_t do_create_instance( huginn::HThread* thread_, HHuginn::values_t&, int position_ ) const {
@@ -63,8 +61,8 @@ HEnumerationClass::HEnumerationClass(
 	HHuginn::type_id_t typeId_,
 	HHuginn::identifier_id_t identifierId_,
 	descriptions_t const& descriptions_,
-	HHuginn::HClass const* base_,
 	yaal::hcore::HString const& doc_,
+	HHuginn::HClass const* origin_,
 	HHuginn::VISIBILITY visibility_
 ) : HHuginn::HClass(
 		runtime_,
@@ -114,7 +112,10 @@ HEnumerationClass::HEnumerationClass(
 		);
 		++ id;
 	}
-	redefine( base_, fd );
+	redefine( nullptr, fd );
+	if ( origin_ ) {
+		set_origin( origin_ );
+	}
 	return;
 	M_EPILOG
 }
@@ -154,22 +155,22 @@ HHuginn::class_t create_class(
 	descriptions_t const& descriptions_,
 	yaal::hcore::HString const& doc_,
 	HHuginn::VISIBILITY visibility_,
-	HHuginn::HClass const* base_
+	HHuginn::HClass const* origin_
 ) {
 	HHuginn::identifier_id_t classIdentifier( runtime_->identifier_id( name_ ) );
 	HHuginn::class_t c( runtime_ ? runtime_->get_class( classIdentifier ) : nullptr );
 	if ( ! c ) {
 		c =	runtime_->create_class(
 			HRuntime::class_constructor_t(
-				[&runtime_, &classIdentifier, &descriptions_, &doc_, &base_, &visibility_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
+				[&runtime_, &classIdentifier, &descriptions_, &doc_, &origin_, &visibility_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
 					return (
 						make_pointer<HEnumerationClass>(
 							runtime_,
 							typeId_,
 							classIdentifier,
 							descriptions_,
-							base_,
 							doc_,
+							origin_,
 							visibility_
 						)
 					);

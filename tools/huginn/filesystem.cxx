@@ -59,7 +59,8 @@ public:
 						{ "APPEND", "Open file for appending, writing begins at end of file.", safe_int::cast<int>( HFile::OPEN::APPEND.value() ) },
 					},
 					"The `OPEN_MODE` is set of possible modes used for opening the files.",
-					HHuginn::VISIBILITY::PACKAGE
+					HHuginn::VISIBILITY::PACKAGE,
+					class_
 				),
 				"set of possible modes used for opening the files."
 			)
@@ -80,7 +81,8 @@ public:
 						{ "BLOCK_DEVICE",     "A block device.", static_cast<int>( FILE_TYPE::BLOCK_DEVICE ) }
 					},
 					"The `FILE_TYPE` is set of possible file types.",
-					HHuginn::VISIBILITY::PACKAGE
+					HHuginn::VISIBILITY::PACKAGE,
+					class_
 				),
 				"set of all possible file types."
 			)
