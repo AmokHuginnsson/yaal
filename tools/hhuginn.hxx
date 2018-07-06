@@ -835,6 +835,7 @@ public:
 	typedef HHuginn::HIterable this_type;
 	typedef HHuginn::HValue base_type;
 	typedef yaal::hcore::HPointer<huginn::HIteratorInterface> iterator_t;
+	static int long const npos = -1;
 	HIterable( HClass const* );
 	iterator_t iterator( huginn::HThread*, int );
 	int long size( huginn::HThread*, int ) const;
@@ -981,6 +982,7 @@ private:
 	values_t _data;
 public:
 	HTuple( HHuginn::HClass const*, values_t&& );
+	int long find( huginn::HThread*, int, HHuginn::value_t const&, int long = 0, int long = -1 );
 	value_t get( int long long );
 	values_t const& value( void ) const {
 		return ( _data );
@@ -1007,6 +1009,7 @@ public:
 	void push_back( value_t const& );
 	void pop_back( void );
 	void clear( void );
+	int long find( huginn::HThread*, int, HHuginn::value_t const&, int long = 0, int long = -1 );
 	value_t get( int long long );
 	value_t& get_ref( int long long );
 	values_t const& value( void ) const {
@@ -1036,6 +1039,7 @@ public:
 	void push_front( value_t const& );
 	void pop_front( void );
 	void clear( void );
+	int long find( huginn::HThread*, int, HHuginn::value_t const&, int long = 0, int long = -1 );
 	value_t get( int long long );
 	value_t& get_ref( int long long );
 	values_t const& value( void ) const {

@@ -9,6 +9,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "value_builtin.hxx"
 #include "runtime.hxx"
 #include "objectfactory.hxx"
+#include "tools/xmath.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -238,6 +239,28 @@ inline HHuginn::value_t clear( huginn::HThread* thread_, HHuginn::value_t* objec
 	M_EPILOG
 }
 
+inline HHuginn::value_t find( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
+	char const name[] = "list.find";
+	verify_arg_count( name, values_, 1, 3, thread_, position_ );
+	int noArg( static_cast<int>( values_.get_size() ) );
+	int long start( 0 );
+	int long stop( -1 );
+	HHuginn::HList& l( *static_cast<HHuginn::HList*>( object_->raw() ) );
+	int long size( l.value().get_size() );
+	if ( noArg > 1 ) {
+		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
+		start = xmath::clip( start, safe_int::cast<int long>( get_integer( values_[1] ) ), size );
+	}
+	if ( noArg > 2 ) {
+		verify_arg_type( name, values_, 2, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
+		stop = xmath::clip( start, safe_int::cast<int long>( get_integer( values_[2] ) ), size );
+	}
+	return ( thread_->object_factory().create_integer( l.find( thread_, position_, values_[0], start, stop ) ) );
+	M_EPILOG
+}
+
 inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "list.hash", values_, 0, 0, thread_, position_ );
@@ -308,6 +331,7 @@ public:
 			{ "insert", objectFactory_->create_method( &list::insert ), "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
 			{ "resize", objectFactory_->create_method( &list::resize ), "( *size*, *elem* ) - resize `list` to given *size* optionally filling new elements with **copies** of value *elem*" },
 			{ "clear",  objectFactory_->create_method( &list::clear ),  "erase `list`'s content, `list` becomes empty" },
+			{ "find",   objectFactory_->create_method( &list::find ),   "( *elem*[, *start*[, *stop*]] ) - get index of first *elem*ent of the `list` not before *start* and before *stop*, return -1 if not found" },
 			{ "sort",   objectFactory_->create_method( &list::sort ),   "( [*callable*] ) - in-place sort this `list`, using *callable* to retrieve keys for element comparison" },
 			{ "hash",   objectFactory_->create_method( &list::hash ),   "calculate hash value for this `list`" },
 			{ "less",   objectFactory_->create_method( &list::less ),   "( *other* ) - test if this `list` comes lexicographically before *other* `list`" },
@@ -369,7 +393,29 @@ int long HHuginn::HList::do_size( huginn::HThread*, int ) const {
 }
 
 void HHuginn::HList::clear( void ) {
+	M_PROLOG
 	_data.clear();
+	return;
+	M_EPILOG
+}
+
+int long HHuginn::HList::find( huginn::HThread* thread_, int position_, HHuginn::value_t const& val_, int long start_, int long stop_ ) {
+	M_PROLOG
+	if ( stop_ < 0 ) {
+		stop_ = _data.get_size();
+	}
+	values_t::const_iterator it(
+		yaal::find_if(
+			_data.cbegin() + start_,
+			_data.cbegin() + stop_,
+			[thread_, &val_, position_]( HHuginn::value_t const& elem_ ) {
+				return ( value_builtin::equals( thread_, val_, elem_, position_ ) );
+			}
+		)
+	);
+	int long pos( distance( _data.cbegin(), it ) );
+	return ( pos != stop_ ? pos : npos );
+	M_EPILOG
 }
 
 HHuginn::value_t HHuginn::HList::get( int long long index_ ) {

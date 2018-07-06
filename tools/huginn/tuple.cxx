@@ -9,6 +9,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "helper.hxx"
 #include "objectfactory.hxx"
 #include "value_builtin.hxx"
+#include "tools/xmath.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -105,6 +106,28 @@ private:
 	}
 };
 
+inline HHuginn::value_t find( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::TUPLE );
+	char const name[] = "tuple.find";
+	verify_arg_count( name, values_, 1, 3, thread_, position_ );
+	int noArg( static_cast<int>( values_.get_size() ) );
+	int long start( 0 );
+	int long stop( -1 );
+	HHuginn::HTuple& l( *static_cast<HHuginn::HTuple*>( object_->raw() ) );
+	int long size( l.value().get_size() );
+	if ( noArg > 1 ) {
+		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
+		start = xmath::clip( start, safe_int::cast<int long>( get_integer( values_[1] ) ), size );
+	}
+	if ( noArg > 2 ) {
+		verify_arg_type( name, values_, 2, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
+		stop = xmath::clip( start, safe_int::cast<int long>( get_integer( values_[2] ) ), size );
+	}
+	return ( thread_->object_factory().create_integer( l.find( thread_, position_, values_[0], start, stop ) ) );
+	M_EPILOG
+}
+
 inline HHuginn::value_t add( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_signature( "tuple.add", values_, { HHuginn::TYPE::TUPLE }, thread_, position_ );
@@ -178,6 +201,7 @@ public:
 		)
 		, _reversedTupleClass( HReversedTuple::get_class( runtime_, this ) ) {
 		HHuginn::field_definitions_t fd{
+			{ "find",   objectFactory_->create_method( &tuple::find ),   "( *elem*[, *start*[, *stop*]] ) - get index of first *elem*ent of the `tuple` not before *start* and before *stop*, return -1 if not found" },
 			{ "add",    objectFactory_->create_method( &tuple::add ),    "( *other* ) - append all elements from *other* `tuple` at the end of this `tuple`" },
 			{ "hash",   objectFactory_->create_method( &tuple::hash ),   "calculate hash value for this `tuple`" },
 			{ "less",   objectFactory_->create_method( &tuple::less ),   "( *other* ) - test if this `tuple` comes lexicographically before *other* `tuple`" },
@@ -223,6 +247,25 @@ HHuginn::HTuple::HTuple( HHuginn::HClass const* class_, values_t&& data_ )
 
 int long HHuginn::HTuple::do_size( huginn::HThread*, int ) const {
 	return ( _data.get_size() );
+}
+
+int long HHuginn::HTuple::find( huginn::HThread* thread_, int position_, HHuginn::value_t const& val_, int long start_, int long stop_ ) {
+	M_PROLOG
+	if ( stop_ < 0 ) {
+		stop_ = _data.get_size();
+	}
+	values_t::const_iterator it(
+		yaal::find_if(
+			_data.cbegin() + start_,
+			_data.cbegin() + stop_,
+			[thread_, &val_, position_]( HHuginn::value_t const& elem_ ) {
+				return ( value_builtin::equals( thread_, val_, elem_, position_ ) );
+			}
+		)
+	);
+	int long pos( distance( _data.cbegin(), it ) );
+	return ( pos != stop_ ? pos : npos );
+	M_EPILOG
 }
 
 HHuginn::value_t HHuginn::HTuple::get( int long long index_ ) {

@@ -9,6 +9,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "helper.hxx"
 #include "objectfactory.hxx"
 #include "value_builtin.hxx"
+#include "tools/xmath.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -242,6 +243,28 @@ inline HHuginn::value_t clear( huginn::HThread* thread_, HHuginn::value_t* objec
 	M_EPILOG
 }
 
+inline HHuginn::value_t find( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
+	char const name[] = "deque.find";
+	verify_arg_count( name, values_, 1, 3, thread_, position_ );
+	int noArg( static_cast<int>( values_.get_size() ) );
+	int long start( 0 );
+	int long stop( -1 );
+	HHuginn::HDeque& l( *static_cast<HHuginn::HDeque*>( object_->raw() ) );
+	int long size( l.value().get_size() );
+	if ( noArg > 1 ) {
+		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
+		start = xmath::clip( start, safe_int::cast<int long>( get_integer( values_[1] ) ), size );
+	}
+	if ( noArg > 2 ) {
+		verify_arg_type( name, values_, 2, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
+		stop = xmath::clip( start, safe_int::cast<int long>( get_integer( values_[2] ) ), size );
+	}
+	return ( thread_->object_factory().create_integer( l.find( thread_, position_, values_[0], start, stop ) ) );
+	M_EPILOG
+}
+
 inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "deque.hash", values_, 0, 0, thread_, position_ );
@@ -314,6 +337,7 @@ public:
 			{ "prepend",    objectFactory_->create_method( &deque::prepend ),    "( *other* ) - prepend all elements from *other* collection in front of  `deque`" },
 			{ "insert",     objectFactory_->create_method( &deque::insert ),     "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
 			{ "clear",      objectFactory_->create_method( &deque::clear ),      "erase `deque`'s content, `deque` becomes empty" },
+			{ "find",       objectFactory_->create_method( &deque::find ),       "( *elem*[, *start*[, *stop*]] ) - get index of first *elem*ent of the `deque` not before *start* and before *stop*, return -1 if not found" },
 			{ "hash",       objectFactory_->create_method( &deque::hash ),       "calculate hash value for  `deque`" },
 			{ "less",       objectFactory_->create_method( &deque::less ),       "( *other* ) - test if  `deque` comes lexicographically before *other* `deque`" },
 			{ "equals",     objectFactory_->create_method( &deque::equals ),     "( *other* ) - test if *other* `deque` has the same content" }
@@ -388,7 +412,29 @@ int long HHuginn::HDeque::do_size( huginn::HThread*, int ) const {
 }
 
 void HHuginn::HDeque::clear( void ) {
+	M_PROLOG
 	_data.clear();
+	return;
+	M_EPILOG
+}
+
+int long HHuginn::HDeque::find( huginn::HThread* thread_, int position_, HHuginn::value_t const& val_, int long start_, int long stop_ ) {
+	M_PROLOG
+	if ( stop_ < 0 ) {
+		stop_ = _data.get_size();
+	}
+	values_t::const_iterator it(
+		yaal::find_if(
+			_data.cbegin() + start_,
+			_data.cbegin() + stop_,
+			[thread_, &val_, position_]( HHuginn::value_t const& elem_ ) {
+				return ( value_builtin::equals( thread_, val_, elem_, position_ ) );
+			}
+		)
+	);
+	int long pos( distance( _data.cbegin(), it ) );
+	return ( pos != stop_ ? pos : npos );
+	M_EPILOG
 }
 
 HHuginn::value_t HHuginn::HDeque::get( int long long index_ ) {
