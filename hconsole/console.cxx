@@ -331,7 +331,7 @@ void HConsole::enter_curses( void ) {
 	/* init color pairs */
 	M_ENSURE( use_default_colors() == OK );
 	M_ENSURE( assume_default_colors( COLOR_BLACK, COLOR_BLACK ) == OK );
-	static int const COLOR_MAX( countof ( colors ) );
+	static int const COLOR_MAX( yaal::size( colors ) );
 	for ( int bg( 0 ); bg < COLOR_MAX; ++ bg ) {
 		for ( int fg( 0 ); fg < COLOR_MAX; ++ fg ) {
 			init_pair( static_cast<short>( bg * COLOR_MAX + fg ),

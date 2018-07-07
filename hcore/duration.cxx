@@ -184,20 +184,20 @@ hcore::time::duration_t lexical_cast( hcore::HString const& val_ ) {
 	int long pos( 0 );
 	HString unitStr;
 	while ( pos < val_.get_length() ) {
-		pos = val_.find_other_than( character_class( CHARACTER_CLASS::WHITESPACE ).data(), pos );
-		int long numEnd( val_.find_other_than( character_class( CHARACTER_CLASS::DIGIT ).data(), pos ) );
+		pos = val_.find_other_than( character_class<CHARACTER_CLASS::WHITESPACE>().data(), pos );
+		int long numEnd( val_.find_other_than( character_class<CHARACTER_CLASS::DIGIT>().data(), pos ) );
 		if ( numEnd == HString::npos ) {
 			throw HLexicalCastException( "Malformed duration specification at: "_ys.append( pos ) );
 		}
 		i64_t v( lexical_cast<i64_t>( val_.substr( pos, numEnd - pos ) ) );
 		pos = numEnd;
-		pos = val_.find_other_than( character_class( CHARACTER_CLASS::WHITESPACE ).data(), pos );
-		int long unitStart( val_.find_one_of( character_class( CHARACTER_CLASS::LETTER ).data(), pos ) );
+		pos = val_.find_other_than( character_class<CHARACTER_CLASS::WHITESPACE>().data(), pos );
+		int long unitStart( val_.find_one_of( character_class<CHARACTER_CLASS::LETTER>().data(), pos ) );
 		if ( unitStart == HString::npos ) {
 			throw HLexicalCastException( "Malformed duration specification at: "_ys.append( pos ) );
 		}
 		pos = unitStart;
-		int long unitEnd( val_.find_other_than( character_class( CHARACTER_CLASS::LETTER ).data(), pos ) );
+		int long unitEnd( val_.find_other_than( character_class<CHARACTER_CLASS::LETTER>().data(), pos ) );
 		if ( unitEnd == HString::npos ) {
 			unitEnd = val_.get_length();
 		}

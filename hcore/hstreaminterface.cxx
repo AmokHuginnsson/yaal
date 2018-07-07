@@ -656,18 +656,18 @@ bool HStreamInterface::read_word( void ) {
 	if ( ! _skipWS ) {
 		int peeked( HStreamInterface::do_peek() );
 		if ( ( peeked == INVALID_CHARACTER )
-				|| character_class( CHARACTER_CLASS::WHITESPACE ).hasz( code_point_t( static_cast<yaal::u32_t>( peeked ) ) ) ) {
+				|| character_class<CHARACTER_CLASS::WHITESPACE>().hasz( code_point_t( static_cast<yaal::u32_t>( peeked ) ) ) ) {
 			_fail = true;
 		}
 	}
 	if ( good() ) {
-		read_while_retry( _wordCache, character_class( CHARACTER_CLASS::WHITESPACE ).data() );
+		read_while_retry( _wordCache, character_class<CHARACTER_CLASS::WHITESPACE>().data() );
 		if ( _skipWS ) {
 			_wordCache.clear();
 		}
 		if ( good() ) {
-			read_until_retry( _wordCache, character_class( CHARACTER_CLASS::WHITESPACE ).data(), false );
-			_wordCache.trim_right( character_class( CHARACTER_CLASS::WHITESPACE ).data() );
+			read_until_retry( _wordCache, character_class<CHARACTER_CLASS::WHITESPACE>().data(), false );
+			_wordCache.trim_right( character_class<CHARACTER_CLASS::WHITESPACE>().data() );
 		}
 	}
 	return ( _wordCache.get_length() > 0 );
@@ -676,7 +676,7 @@ bool HStreamInterface::read_word( void ) {
 
 bool HStreamInterface::read_integer( void ) {
 	M_PROLOG
-	read_while_retry( _wordCache, character_class( CHARACTER_CLASS::WHITESPACE ).data() );
+	read_while_retry( _wordCache, character_class<CHARACTER_CLASS::WHITESPACE>().data() );
 	_wordCache.clear();
 	do {
 		if ( ! good() ) {
@@ -704,7 +704,7 @@ bool HStreamInterface::read_integer( void ) {
 				break;
 			}
 		}
-		read_while_retry( _wordCache, character_class( CHARACTER_CLASS::DIGIT ).data() );
+		read_while_retry( _wordCache, character_class<CHARACTER_CLASS::DIGIT>().data() );
 		if ( _base != BASE::DEC ) {
 			_wordCache.insert( 0, _base == BASE::HEX ? "0x" : "0o" );
 		}
@@ -719,7 +719,7 @@ bool HStreamInterface::read_integer( void ) {
 bool HStreamInterface::read_floatint_point( void ) {
 	M_PROLOG
 	do {
-		read_while_retry( _wordCache, character_class( CHARACTER_CLASS::WHITESPACE ).data() );
+		read_while_retry( _wordCache, character_class<CHARACTER_CLASS::WHITESPACE>().data() );
 		_wordCache.clear();
 		if ( ! good() ) {
 			break;
@@ -732,7 +732,7 @@ bool HStreamInterface::read_floatint_point( void ) {
 		if ( neg ) {
 			read( &sink, 1 );
 		}
-		read_while_retry( _wordCache, character_class( CHARACTER_CLASS::DIGIT ).data() );
+		read_while_retry( _wordCache, character_class<CHARACTER_CLASS::DIGIT>().data() );
 		if ( ! good() ) {
 			break;
 		}
@@ -745,7 +745,7 @@ bool HStreamInterface::read_floatint_point( void ) {
 		}
 		if ( dot ) {
 			HString decimal;
-			read_while_retry( decimal, character_class( CHARACTER_CLASS::DIGIT ).data() );
+			read_while_retry( decimal, character_class<CHARACTER_CLASS::DIGIT>().data() );
 			if ( ! decimal.is_empty() ) {
 				_wordCache += sink;
 				_wordCache += decimal;
@@ -808,7 +808,7 @@ HStreamInterface& HStreamInterface::do_input( code_point_t& char_ ) {
 		char c( 0 );
 		do {
 			read( &c, 1 );
-		} while ( good() && _skipWS && character_class( CHARACTER_CLASS::WHITESPACE ).hasz( code_point_t( static_cast<yaal::u32_t>( c ) ) ) );
+		} while ( good() && _skipWS && character_class<CHARACTER_CLASS::WHITESPACE>().hasz( code_point_t( static_cast<yaal::u32_t>( c ) ) ) );
 		yaal::u32_t character( static_cast<u8_t>( c ) );
 		static u8_t const mask[] = { 0xff, unicode::ENC_2_BYTES_VALUE_MASK, unicode::ENC_3_BYTES_VALUE_MASK, unicode::ENC_4_BYTES_VALUE_MASK };
 		int tailLength( unicode::utf8_declared_length( c ) - 1 );
@@ -839,7 +839,7 @@ HStreamInterface& HStreamInterface::do_input( char& char_ ) {
 		/* Regarding _whiteSpace_.size() + 1, about "+ 1" see comment in semantic_read in analogous context */
 		do {
 			read( &c, toRead );
-		} while ( good() && _skipWS && character_class( CHARACTER_CLASS::WHITESPACE ).hasz( code_point_t( static_cast<yaal::u32_t>( c ) ) ) );
+		} while ( good() && _skipWS && character_class<CHARACTER_CLASS::WHITESPACE>().hasz( code_point_t( static_cast<yaal::u32_t>( c ) ) ) );
 	} else {
 		_fail = read( &c, toRead ) != toRead;
 	}

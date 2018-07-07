@@ -207,7 +207,7 @@ void HSignalService::register_handler( int sigNo_, handler_t handler_, void cons
 	_handlers.push_front( make_pair( sigNo_, make_pair( handler_, owner_ ) ) );
 	if ( _handlers.count( sigNo_ ) == 1 ) {
 		int SYNCHRONOUS_SIGNALS[] = { SIGSEGV, SIGBUS, SIGFPE, SIGILL };
-		if ( find( SYNCHRONOUS_SIGNALS, SYNCHRONOUS_SIGNALS + countof ( SYNCHRONOUS_SIGNALS ), sigNo_ ) == ( SYNCHRONOUS_SIGNALS + countof ( SYNCHRONOUS_SIGNALS ) ) ) {
+		if ( find( SYNCHRONOUS_SIGNALS, SYNCHRONOUS_SIGNALS + yaal::size( SYNCHRONOUS_SIGNALS ), sigNo_ ) == ( SYNCHRONOUS_SIGNALS + yaal::size( SYNCHRONOUS_SIGNALS ) ) ) {
 			catch_signal( sigNo_ );
 			M_ENSURE( hcore::system::kill( hcore::system::getpid(), SIGURG ) == 0 );
 		} else {

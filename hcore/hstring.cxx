@@ -737,18 +737,49 @@ void decode( T* dst_, char const* str_, int long size_ ) {
 
 }
 
-bool HCharacterClass::has( code_point_t char_ ) const {
-	return ( ( char_.get() < 256 ) && ( ::memchr( _data, static_cast<u8_t>( char_.get() ), static_cast<size_t>( _size ) ) != nullptr ) );
+template<>
+bool HCharacterClass<char>::has( code_point_t char_ ) const {
+	return (
+		( char_.get() <= unicode::UCS_MAX_1_BYTE_CODE_POINT )
+		&& ( ::memchr( _data, static_cast<u8_t>( char_.get() ), static_cast<size_t>( _size ) ) != nullptr )
+	);
 }
 
-bool HCharacterClass::hasz( code_point_t char_ ) const {
-	return ( ( char_.get() < 256 ) && ( ::memchr( _data, static_cast<u8_t>( char_.get() ), static_cast<size_t>( _size ) + 1 ) != nullptr ) );
+template<>
+bool HCharacterClass<char>::hasz( code_point_t char_ ) const {
+	return (
+		( char_.get() <= unicode::UCS_MAX_1_BYTE_CODE_POINT )
+		&& (
+			( ::memchr( _data, static_cast<u8_t>( char_.get() ), static_cast<size_t>( _size ) ) != nullptr )
+			|| ( char_.get() == 0 )
+		)
+	);
 }
 
-HCharacterClass const& character_class( CHARACTER_CLASS::character_class_t characterClass_ ) {
+template<>
+bool HCharacterClass<char16_t>::has( code_point_t char_ ) const {
+	return (
+		( char_.get() <= unicode::UCS_MAX_2_BYTE_CODE_POINT )
+		&& ( find( _data, _data + _size, static_cast<u16_t>( char_.get() ) ) != ( _data + _size ) )
+	);
+}
+
+template<>
+bool HCharacterClass<char16_t>::hasz( code_point_t char_ ) const {
+	return (
+		( char_.get() <= unicode::UCS_MAX_2_BYTE_CODE_POINT )
+		&& (
+			( find( _data, _data + _size, static_cast<u16_t>( char_.get() ) ) != ( _data + _size ) )
+			|| ( char_.get() == 0 )
+		)
+	);
+}
+
+template<>
+HCharacterClass<char> const& character_class( CHARACTER_CLASS characterClass_ ) {
 #undef D_WHITE_SPACE
 #define D_WHITE_SPACE "\a\b \t\v\f\r\n"
-	static HCharacterClass const whiteSpace = HCharacterClass( D_WHITE_SPACE, static_cast<int>( sizeof ( D_WHITE_SPACE ) - 1 ) );
+	static character_class_t const whiteSpace = character_class_t( D_WHITE_SPACE, static_cast<int>( sizeof ( D_WHITE_SPACE ) - 1 ) );
 #undef D_WHITE_SPACE
 #undef D_LOWER_CASE_LETTER
 #undef D_UPPER_CASE_LETTER
@@ -765,67 +796,15 @@ HCharacterClass const& character_class( CHARACTER_CLASS::character_class_t chara
 #define D_DEC_DIGIT D_OCT_DIGIT "89"
 #undef D_HEX_DIGIT
 #define D_HEX_DIGIT D_DEC_DIGIT "aAbBcCdDeEfF"
-#undef D_LOWER_CASE_GREEK
-#undef D_UPPER_CASE_GREEK
-#undef D_GREEK
-#define D_LOWER_CASE_GREEK "αβγδεζηθικλμνξοπρστυφχψω"
-#define D_UPPER_CASE_GREEK "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ"
-#define D_GREEK D_LOWER_CASE_GREEK D_UPPER_CASE_GREEK
-#undef D_SUBSCRIPT_DIGIT
-#undef D_SUBSCRIPT_LOWER_CASE_LETTER
-#undef D_SUBSCRIPT_UPPER_CASE_LETTER
-#undef D_SUBSCRIPT_LETTER
-#undef D_SUBSCRIPT
-#define D_SUBSCRIPT_DIGIT "₀₁₂₃₄₅₆₇₈₉"
-#define D_SUBSCRIPT_LOWER_CASE_LETTER "ₐₑₕᵢⱼₖₗₘₙₒₚᵣₛₜᵤᵥₓ"
-#define D_SUBSCRIPT_UPPER_CASE_LETTER ""
-#define D_SUBSCRIPT_LETTER D_SUBSCRIPT_LOWER_CASE_LETTER D_SUBSCRIPT_UPPER_CASE_LETTER
-#define D_SUBSCRIPT D_SUBSCRIPT_DIGIT D_SUBSCRIPT_LETTER
-#undef D_SUPERSCRIPT_DIGIT
-#undef D_SUPERSCRIPT_LOWER_CASE_LETTER
-#undef D_SUPERSCRIPT_UPPER_CASE_LETTER
-#undef D_SUPERSCRIPT_LETTER
-#undef D_SUPERSCRIPT
-#define D_SUPERSCRIPT_DIGIT "⁰¹²³⁴⁵⁶⁷⁸⁹"
-#define D_SUPERSCRIPT_LOWER_CASE_LETTER "ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖʳˢᵗᵘᵛʷˣʸᶻ"
-#define D_SUPERSCRIPT_UPPER_CASE_LETTER "ᴬᴮᴰᴱᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾᴿᵀᵁⱽᵂ"
-#define D_SUPERSCRIPT_LETTER D_SUPERSCRIPT_LOWER_CASE_LETTER D_SUPERSCRIPT_UPPER_CASE_LETTER
-#define D_SUPERSCRIPT D_SUPERSCRIPT_DIGIT D_SUPERSCRIPT_LETTER
-	static HCharacterClass const binDigit = HCharacterClass( D_BIN_DIGIT, static_cast<int>( sizeof ( D_BIN_DIGIT ) - 1 ) );
-	static HCharacterClass const octDigit = HCharacterClass( D_OCT_DIGIT, static_cast<int>( sizeof ( D_OCT_DIGIT ) - 1 ) );
-	static HCharacterClass const digit = HCharacterClass( D_DEC_DIGIT, static_cast<int>( sizeof ( D_DEC_DIGIT ) - 1 ) );
-	static HCharacterClass const hexDigit = HCharacterClass( D_HEX_DIGIT, static_cast<int>( sizeof ( D_HEX_DIGIT ) - 1 ) );
-	static HCharacterClass const letter = HCharacterClass( D_LETTER, static_cast<int>( sizeof ( D_LETTER ) - 1 ) );
-	static HCharacterClass const lowerCaseLetter = HCharacterClass( D_LOWER_CASE_LETTER, static_cast<int>( sizeof ( D_LOWER_CASE_LETTER ) - 1 ) );
-	static HCharacterClass const upperCaseLetter = HCharacterClass( D_UPPER_CASE_LETTER, static_cast<int>( sizeof ( D_UPPER_CASE_LETTER ) - 1 ) );
-	static HCharacterClass const word = HCharacterClass( D_LETTER D_DEC_DIGIT "_", static_cast<int>( sizeof ( D_LETTER D_DEC_DIGIT "_" ) - 1 ) );
-	static HCharacterClass const vowel = HCharacterClass( D_VOWEL, static_cast<int>( sizeof ( D_VOWEL ) - 1 ) );
-	static HCharacterClass const greek = HCharacterClass( D_GREEK, static_cast<int>( sizeof ( D_GREEK ) - 1 ) );
-	static HCharacterClass const lowerCaseGreek = HCharacterClass( D_LOWER_CASE_GREEK, static_cast<int>( sizeof ( D_LOWER_CASE_GREEK ) - 1 ) );
-	static HCharacterClass const upperCaseGreek = HCharacterClass( D_UPPER_CASE_GREEK, static_cast<int>( sizeof ( D_UPPER_CASE_GREEK ) - 1 ) );
-	static HCharacterClass const subscript = HCharacterClass( D_SUPERSCRIPT, static_cast<int>( sizeof ( D_SUPERSCRIPT ) - 1 ) );
-	static HCharacterClass const subscriptDigit = HCharacterClass( D_SUPERSCRIPT_DIGIT, static_cast<int>( sizeof ( D_SUPERSCRIPT_DIGIT ) - 1 ) );
-	static HCharacterClass const subscriptLetter = HCharacterClass( D_SUPERSCRIPT_LETTER, static_cast<int>( sizeof ( D_SUPERSCRIPT_LETTER ) - 1 ) );
-	static HCharacterClass const subscriptLowerCaseLetter = HCharacterClass( D_SUPERSCRIPT_LOWER_CASE_LETTER, static_cast<int>( sizeof ( D_SUPERSCRIPT_LOWER_CASE_LETTER ) - 1 ) );
-	static HCharacterClass const subscriptUpperCaseLetter = HCharacterClass( D_SUPERSCRIPT_UPPER_CASE_LETTER, static_cast<int>( sizeof ( D_SUPERSCRIPT_UPPER_CASE_LETTER ) - 1 ) );
-	static HCharacterClass const superscript = HCharacterClass( D_SUPERSCRIPT, static_cast<int>( sizeof ( D_SUPERSCRIPT ) - 1 ) );
-	static HCharacterClass const superscriptDigit = HCharacterClass( D_SUPERSCRIPT_DIGIT, static_cast<int>( sizeof ( D_SUPERSCRIPT_DIGIT ) - 1 ) );
-	static HCharacterClass const superscriptLetter = HCharacterClass( D_SUPERSCRIPT_LETTER, static_cast<int>( sizeof ( D_SUPERSCRIPT_LETTER ) - 1 ) );
-	static HCharacterClass const superscriptLowerCaseLetter = HCharacterClass( D_SUPERSCRIPT_LOWER_CASE_LETTER, static_cast<int>( sizeof ( D_SUPERSCRIPT_LOWER_CASE_LETTER ) - 1 ) );
-	static HCharacterClass const superscriptUpperCaseLetter = HCharacterClass( D_SUPERSCRIPT_UPPER_CASE_LETTER, static_cast<int>( sizeof ( D_SUPERSCRIPT_UPPER_CASE_LETTER ) - 1 ) );
-#undef D_SUPERSCRIPT_DIGIT
-#undef D_SUPERSCRIPT_LOWER_CASE_LETTER
-#undef D_SUPERSCRIPT_UPPER_CASE_LETTER
-#undef D_SUPERSCRIPT_LETTER
-#undef D_SUPERSCRIPT
-#undef D_SUBSCRIPT_DIGIT
-#undef D_SUBSCRIPT_LOWER_CASE_LETTER
-#undef D_SUBSCRIPT_UPPER_CASE_LETTER
-#undef D_SUBSCRIPT_LETTER
-#undef D_SUBSCRIPT
-#undef D_GREEK
-#undef D_UPPER_CASE_GREEK
-#undef D_LOWER_CASE_GREEK
+	static character_class_t const binDigit = character_class_t( D_BIN_DIGIT, static_cast<int>( sizeof ( D_BIN_DIGIT ) - 1 ) );
+	static character_class_t const octDigit = character_class_t( D_OCT_DIGIT, static_cast<int>( sizeof ( D_OCT_DIGIT ) - 1 ) );
+	static character_class_t const digit = character_class_t( D_DEC_DIGIT, static_cast<int>( sizeof ( D_DEC_DIGIT ) - 1 ) );
+	static character_class_t const hexDigit = character_class_t( D_HEX_DIGIT, static_cast<int>( sizeof ( D_HEX_DIGIT ) - 1 ) );
+	static character_class_t const letter = character_class_t( D_LETTER, static_cast<int>( sizeof ( D_LETTER ) - 1 ) );
+	static character_class_t const lowerCaseLetter = character_class_t( D_LOWER_CASE_LETTER, static_cast<int>( sizeof ( D_LOWER_CASE_LETTER ) - 1 ) );
+	static character_class_t const upperCaseLetter = character_class_t( D_UPPER_CASE_LETTER, static_cast<int>( sizeof ( D_UPPER_CASE_LETTER ) - 1 ) );
+	static character_class_t const word = character_class_t( D_LETTER D_DEC_DIGIT "_", static_cast<int>( sizeof ( D_LETTER D_DEC_DIGIT "_" ) - 1 ) );
+	static character_class_t const vowel = character_class_t( D_VOWEL, static_cast<int>( sizeof ( D_VOWEL ) - 1 ) );
 #undef D_HEX_DIGIT
 #undef D_DEC_DIGIT
 #undef D_OCT_DIGIT
@@ -834,7 +813,7 @@ HCharacterClass const& character_class( CHARACTER_CLASS::character_class_t chara
 #undef D_VOWEL
 #undef D_LOWER_CASE_LETTER
 #undef D_UPPER_CASE_LETTER
-	static HCharacterClass const* characterClass[] = {
+	static character_class_t const* characterClass[] = {
 		&whiteSpace,
 		&binDigit,
 		&octDigit,
@@ -844,7 +823,67 @@ HCharacterClass const& character_class( CHARACTER_CLASS::character_class_t chara
 		&lowerCaseLetter,
 		&upperCaseLetter,
 		&word,
-		&vowel,
+		&vowel
+	};
+	return ( *characterClass[static_cast<int>( characterClass_ )] );
+}
+
+template<>
+HCharacterClass<char16_t> const& character_class( CHARACTER_CLASS characterClass_ ) {
+#undef D_LOWER_CASE_GREEK
+#undef D_UPPER_CASE_GREEK
+#undef D_GREEK
+#define D_LOWER_CASE_GREEK u"αβγδεζηθικλμνξοπρστυφχψω"
+#define D_UPPER_CASE_GREEK u"ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ"
+#define D_GREEK D_LOWER_CASE_GREEK D_UPPER_CASE_GREEK
+#undef D_SUBSCRIPT_DIGIT
+#undef D_SUBSCRIPT_LOWER_CASE_LETTER
+#undef D_SUBSCRIPT_UPPER_CASE_LETTER
+#undef D_SUBSCRIPT_LETTER
+#undef D_SUBSCRIPT
+#define D_SUBSCRIPT_DIGIT u"₀₁₂₃₄₅₆₇₈₉"
+#define D_SUBSCRIPT_LOWER_CASE_LETTER u"ₐₑₕᵢⱼₖₗₘₙₒₚᵣₛₜᵤᵥₓ"
+#define D_SUBSCRIPT_UPPER_CASE_LETTER u""
+#define D_SUBSCRIPT_LETTER D_SUBSCRIPT_LOWER_CASE_LETTER D_SUBSCRIPT_UPPER_CASE_LETTER
+#define D_SUBSCRIPT D_SUBSCRIPT_DIGIT D_SUBSCRIPT_LETTER
+#undef D_SUPERSCRIPT_DIGIT
+#undef D_SUPERSCRIPT_LOWER_CASE_LETTER
+#undef D_SUPERSCRIPT_UPPER_CASE_LETTER
+#undef D_SUPERSCRIPT_LETTER
+#undef D_SUPERSCRIPT
+#define D_SUPERSCRIPT_DIGIT u"⁰¹²³⁴⁵⁶⁷⁸⁹"
+#define D_SUPERSCRIPT_LOWER_CASE_LETTER u"ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖʳˢᵗᵘᵛʷˣʸᶻ"
+#define D_SUPERSCRIPT_UPPER_CASE_LETTER u"ᴬᴮᴰᴱᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾᴿᵀᵁⱽᵂ"
+#define D_SUPERSCRIPT_LETTER D_SUPERSCRIPT_LOWER_CASE_LETTER D_SUPERSCRIPT_UPPER_CASE_LETTER
+#define D_SUPERSCRIPT D_SUPERSCRIPT_DIGIT D_SUPERSCRIPT_LETTER
+	typedef HCharacterClass<char16_t> cc_t;
+	static cc_t const greek = cc_t( D_GREEK, size( D_GREEK ) - 1 );
+	static cc_t const lowerCaseGreek = cc_t( D_LOWER_CASE_GREEK, size( D_LOWER_CASE_GREEK ) - 1 );
+	static cc_t const upperCaseGreek = cc_t( D_UPPER_CASE_GREEK, size( D_UPPER_CASE_GREEK ) - 1 );
+	static cc_t const subscript = cc_t( D_SUBSCRIPT, size( D_SUBSCRIPT ) - 1 );
+	static cc_t const subscriptDigit = cc_t( D_SUBSCRIPT_DIGIT, size( D_SUBSCRIPT_DIGIT ) - 1 );
+	static cc_t const subscriptLetter = cc_t( D_SUBSCRIPT_LETTER, size( D_SUBSCRIPT_LETTER ) - 1 );
+	static cc_t const subscriptLowerCaseLetter = cc_t( D_SUBSCRIPT_LOWER_CASE_LETTER, size( D_SUBSCRIPT_LOWER_CASE_LETTER ) - 1 );
+	static cc_t const subscriptUpperCaseLetter = cc_t( D_SUBSCRIPT_UPPER_CASE_LETTER, size( D_SUBSCRIPT_UPPER_CASE_LETTER ) - 1 );
+	static cc_t const superscript = cc_t( D_SUPERSCRIPT, size( D_SUPERSCRIPT ) - 1 );
+	static cc_t const superscriptDigit = cc_t( D_SUPERSCRIPT_DIGIT, size( D_SUPERSCRIPT_DIGIT ) - 1 );
+	static cc_t const superscriptLetter = cc_t( D_SUPERSCRIPT_LETTER, size( D_SUPERSCRIPT_LETTER ) - 1 );
+	static cc_t const superscriptLowerCaseLetter = cc_t( D_SUPERSCRIPT_LOWER_CASE_LETTER, size( D_SUPERSCRIPT_LOWER_CASE_LETTER ) - 1 );
+	static cc_t const superscriptUpperCaseLetter = cc_t( D_SUPERSCRIPT_UPPER_CASE_LETTER, size( D_SUPERSCRIPT_UPPER_CASE_LETTER ) - 1 );
+#undef D_SUPERSCRIPT_DIGIT
+#undef D_SUPERSCRIPT_LOWER_CASE_LETTER
+#undef D_SUPERSCRIPT_UPPER_CASE_LETTER
+#undef D_SUPERSCRIPT_LETTER
+#undef D_SUPERSCRIPT
+#undef D_SUBSCRIPT_DIGIT
+#undef D_SUBSCRIPT_LOWER_CASE_LETTER
+#undef D_SUBSCRIPT_UPPER_CASE_LETTER
+#undef D_SUBSCRIPT_LETTER
+#undef D_SUBSCRIPT
+#undef D_GREEK
+#undef D_UPPER_CASE_GREEK
+#undef D_LOWER_CASE_GREEK
+	static cc_t const* characterClass[] = {
 		&greek,
 		&lowerCaseGreek,
 		&upperCaseGreek,
@@ -859,7 +898,7 @@ HCharacterClass const& character_class( CHARACTER_CLASS::character_class_t chara
 		&superscriptLowerCaseLetter,
 		&superscriptUpperCaseLetter
 	};
-	return ( *characterClass[characterClass_] );
+	return ( *characterClass[static_cast<int>( characterClass_ ) - static_cast<int>( CHARACTER_CLASS::GREEK )] );
 }
 
 static yaal::u8_t const ALLOC_BIT_MASK = meta::obinary<010000000>::value;
@@ -1071,10 +1110,10 @@ HString::HString( HUTF8String const& str_ )
 	int rank( str_.rank() );
 	resize( newSize, rank ? rank : 1 );
 	switch ( rank ) {
-		case ( 0 ): {
+		case ( 0 ): { /* ASCII */
 			::memcpy( MEM, str_.raw(), static_cast<size_t>( newSize ) );
 		} break;
-		case ( 1 ): {
+		case ( 1 ): { /* code point value: 128 - 256 */
 			copy_n_unpack( str_.begin(), newSize, static_cast<yaal::u8_t*>( MEM ) );
 		} break;
 		case ( 2 ): {
@@ -1140,6 +1179,26 @@ HString::HString( char const* array_, int long size_ )
 	: _len() {
 	M_PROLOG
 	assign( array_, size_ );
+	return;
+	M_EPILOG
+}
+
+HString::HString( char16_t const* array_, int long size_ )
+	: _len() {
+	M_PROLOG
+	int rank( 2 );
+	resize( size_, rank );
+	adaptive::copy( MEM, rank, 0, array_, rank, 0, size_ );
+	return;
+	M_EPILOG
+}
+
+HString::HString( char32_t const* array_, int long size_ )
+	: _len() {
+	M_PROLOG
+	int rank( 4 );
+	resize( size_, rank );
+	adaptive::copy( MEM, rank, 0, array_, rank, 0, size_ );
 	return;
 	M_EPILOG
 }
@@ -3027,31 +3086,32 @@ double long stold( HString const& str_, int* endIdx_ ) {
 }
 
 bool is_whitespace( code_point_t char_ ) {
-	return ( character_class( CHARACTER_CLASS::WHITESPACE ).has( char_ ) );
+	return ( ( char_.get() <= ' ' ) && character_class<CHARACTER_CLASS::WHITESPACE>().has( char_ ) );
 }
 
 bool is_digit( code_point_t char_ ) {
-	return ( character_class( CHARACTER_CLASS::DIGIT ).has( char_ ) );
+	return ( ( char_.get() >= '0' ) && ( char_.get() <= '9' )  );
 }
 
 bool is_dec_digit( code_point_t char_ ) {
-	return ( character_class( CHARACTER_CLASS::DIGIT ).has( char_ ) );
+	return ( ( char_.get() >= '0' ) && ( char_.get() <= '9' )  );
 }
 
 bool is_hex_digit( code_point_t char_ ) {
-	return ( character_class( CHARACTER_CLASS::HEX_DIGIT ).has( char_ ) );
+	return ( character_class<CHARACTER_CLASS::HEX_DIGIT>().has( char_ ) );
 }
 
 bool is_oct_digit( code_point_t char_ ) {
-	return ( character_class( CHARACTER_CLASS::OCT_DIGIT ).has( char_ ) );
+	return ( ( char_.get() >= '0' ) && ( char_.get() <= '7' )  );
 }
 
 bool is_bin_digit( code_point_t char_ ) {
-	return ( character_class( CHARACTER_CLASS::BIN_DIGIT ).has( char_ ) );
+	return ( ( char_.get() >= '0' ) && ( char_.get() <= '1' )  );
 }
 
 bool is_letter( code_point_t char_ ) {
-	return ( character_class( CHARACTER_CLASS::LETTER ).has( char_ ) );
+	code_point_t::value_type ch( char_.get() );
+	return ( ( ( ch >= 'a' ) && ( ch <= 'z' ) ) || ( ( ch >= 'A' ) && ( ch <= 'Z' ) ) );
 }
 
 bool is_upper( code_point_t char_ ) {
@@ -3075,23 +3135,37 @@ bool is_ascii( code_point_t char_ ) {
 }
 
 bool is_greek( code_point_t char_ ) {
-	return ( character_class( CHARACTER_CLASS::GREEK ).has( char_ ) );
+	code_point_t::value_type cp( char_.get() );
+	return (
+		( cp >= unicode::CODE_POINT::GREEK_CAPITAL_LETTER_ALPHA )
+		&& ( cp <= unicode::CODE_POINT::GREEK_SMALL_LETTER_OMEGA )
+		&& ( cp != 0x03a2u )
+	);
 }
 
 bool is_upper_greek( code_point_t char_ ) {
-	return ( character_class( CHARACTER_CLASS::UPPER_CASE_GREEK ).has( char_ ) );
+	code_point_t::value_type cp( char_.get() );
+	return (
+		( cp >= unicode::CODE_POINT::GREEK_CAPITAL_LETTER_ALPHA )
+		&& ( cp <= unicode::CODE_POINT::GREEK_CAPITAL_LETTER_OMEGA )
+		&& ( cp != 0x03a2u )
+	);
 }
 
 bool is_lower_greek( code_point_t char_ ) {
-	return ( character_class( CHARACTER_CLASS::LOWER_CASE_GREEK ).has( char_ ) );
+	code_point_t::value_type cp( char_.get() );
+	return (
+		( cp >= unicode::CODE_POINT::GREEK_SMALL_LETTER_ALPHA )
+		&& ( cp <= unicode::CODE_POINT::GREEK_SMALL_LETTER_OMEGA )
+	);
 }
 
 bool is_subscript( code_point_t char_ ) {
-	return ( character_class( CHARACTER_CLASS::SUBSCRIPT ).has( char_ ) );
+	return ( character_class<CHARACTER_CLASS::SUBSCRIPT>().has( char_ ) );
 }
 
 bool is_superscript( code_point_t char_ ) {
-	return ( character_class( CHARACTER_CLASS::SUPERSCRIPT ).has( char_ ) );
+	return ( character_class<CHARACTER_CLASS::SUPERSCRIPT>().has( char_ ) );
 }
 
 inline wint_t to_lower( code_point_t codePoint_ ) {

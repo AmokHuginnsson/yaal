@@ -306,7 +306,7 @@ yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, yaal::h
 					++ r;
 				} else {
 					HString idS;
-					while ( ( r != e ) && character_class( CHARACTER_CLASS::DIGIT ).has( *r ) ) {
+					while ( ( r != e ) && character_class<CHARACTER_CLASS::DIGIT>().has( *r ) ) {
 						idS.push_back( *r );
 						++ r;
 					}

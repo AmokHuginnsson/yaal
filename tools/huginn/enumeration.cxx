@@ -75,7 +75,7 @@ HEnumerationClass::HEnumerationClass(
 	M_PROLOG
 	HString valueName( name() );
 	HObjectFactory& of( *runtime_->object_factory() );
-	valueName.append( name().find_one_of( character_class( CHARACTER_CLASS::LOWER_CASE_LETTER ).data() ) != HString::npos ? "Enumeral" : "_ENUMERAL" );
+	valueName.append( name().find_one_of( character_class<CHARACTER_CLASS::LOWER_CASE_LETTER>().data() ) != HString::npos ? "Enumeral" : "_ENUMERAL" );
 	_valueClass = runtime_->create_class(
 		HRuntime::class_constructor_t(
 			[this, &runtime_, &valueName] ( HHuginn::type_id_t tid_ ) -> HHuginn::class_t {

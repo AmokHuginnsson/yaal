@@ -151,7 +151,7 @@ void substitute_environment( HString& string_, ENV_SUBST_MODE mode_ ) {
 namespace hidden {
 
 inline HString::const_iterator skip_whitespace( HString const& str_ ) {
-	int long nonWhiteSpace( str_.find_other_than( character_class( CHARACTER_CLASS::WHITESPACE ).data() ) );
+	int long nonWhiteSpace( str_.find_other_than( character_class<CHARACTER_CLASS::WHITESPACE>().data() ) );
 	return ( str_.begin() + ( nonWhiteSpace != HString::npos ? nonWhiteSpace : 0 ) );
 }
 

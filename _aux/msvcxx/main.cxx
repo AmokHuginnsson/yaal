@@ -526,9 +526,9 @@ driver_names_t get_drivers( void ) {
 		TCHAR szDriver[ARRAY_SIZE];
 		int cDrivers( cbNeeded / sizeof ( drivers[0] ) );
 		for ( int i( 0 ); i < cDrivers; ++ i ) {
-			if ( ::GetDeviceDriverBaseName( drivers[i], szDriver, countof ( szDriver ) ) ) {
+			if ( ::GetDeviceDriverBaseName( drivers[i], szDriver, yaal::size( szDriver ) ) ) {
 				int c( 0 );
-				while ( ( c < countof ( szDriver ) ) && szDriver[c] ) {
+				while ( ( c < yaal::size( szDriver ) ) && szDriver[c] ) {
 					szDriver[c] = tolower( szDriver[c] );
 					++ c;
 				}

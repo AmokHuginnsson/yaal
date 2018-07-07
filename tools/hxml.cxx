@@ -76,7 +76,7 @@ private:
 	static void log_error_impl( void* instance_, char const* format_, ... ) __attribute__(( format( printf, 2, 3 ) )) {
 		HXmlParserG* instance( static_cast<HXmlParserG*>( instance_ ) );
 		static int const MAX_ERROR_MESSAGE_LENGTH( 4096 );
-		static HString const trim( to_string( character_class( CHARACTER_CLASS::WHITESPACE ).data() ).append( "^" ) );
+		static HString const trim( to_string( character_class<CHARACTER_CLASS::WHITESPACE>().data() ).append( "^" ) );
 		char msg[MAX_ERROR_MESSAGE_LENGTH];
 		va_list ap;
 		va_start( ap, format_ );
@@ -609,7 +609,7 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 			break;
 			case ( XML_TEXT_NODE ): if ( node->content ) {
 				_varTmpBuffer = convert( reinterpret_cast<char*>( node->content ), parser_ & PARSER::IGNORE_CONVERSION_ERRORS );
-				if ( ( parser_ & PARSER::KEEP_EMPTY ) || ( _varTmpBuffer.find_other_than( character_class( CHARACTER_CLASS::WHITESPACE ).data() ) >= 0 ) ) {
+				if ( ( parser_ & PARSER::KEEP_EMPTY ) || ( _varTmpBuffer.find_other_than( character_class<CHARACTER_CLASS::WHITESPACE>().data() ) >= 0 ) ) {
 					node_->add_node( HNode( this, HNode::TYPE::CONTENT, _varTmpBuffer, node->line ) );
 				}
 			}

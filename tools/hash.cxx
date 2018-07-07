@@ -427,7 +427,7 @@ void update_sha512_state( u64_t* state, HStreamBlockIterator::HBlock const& bloc
 		0x113f9804bef90daeULL, 0x1b710b35131c471bULL, 0x28db77f523047d84ULL, 0x32caab7b40c72493ULL, 0x3c9ebe0a15c9bebcULL,
 		0x431d67c49c100d4cULL, 0x4cc5d4becb3e42b6ULL, 0x597f299cfc657e2aULL, 0x5fcb6fab3ad6faecULL, 0x6c44198c4a475817ULL
 	};
-	static int const ROUND_COUNT( countof ( roundConst ) );
+	static int const ROUND_COUNT( yaal::size( roundConst ) );
 #define M_ROTATE_RIGHT64( x, s ) ( ( ( x ) >> ( s ) ) | ( ( x ) << ( 64 - ( s ) ) ) )
 	static int const INPUT_CHUNK_SIZE( 16 );
 	u64_t a( state[ 0 ] );

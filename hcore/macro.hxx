@@ -85,9 +85,6 @@
 #ifdef M_TEMP_FAILURE_RETRY
 #	error Yaal redefines M_TEMP_FAILURE_RETRY macro.
 #endif /* #ifdef M_TEMP_FAILURE_RETRY */
-#ifdef countof
-#	error Yaal redefines countof macro.
-#endif /* #ifdef countof */
 #ifdef M_ATTRIBUTE_SPEC
 #	error Yaal redefines M_ATTRIBUTE_SPEC macro.
 #endif /* #ifdef M_ATTRIBUTE_SPEC */
@@ -252,9 +249,6 @@
 #else /* #if defined( HAVE_DECL_TEMP_FAILURE_RETRY ) && ( HAVE_DECL_TEMP_FAILURE_RETRY == 1 ) */
 #	define M_TEMP_FAILURE_RETRY( expr ) ( expr )
 #endif /* #else #if defined( HAVE_DECL_TEMP_FAILURE_RETRY ) && ( HAVE_DECL_TEMP_FAILURE_RETRY == 1 ) */
-/*! \brief Convenience macro to obtain number of elements of declared array.
- */
-#define countof( array ) ( yaal::meta::integer_cast<int, sizeof ( yaal::YaalArrayElementCountHelper( ( array ) ) )>::value )
 
 #ifdef __MSVCXX__
 #define M_ATTRIBUTE_SPEC( ... ) __declspec( __VA_ARGS__ )

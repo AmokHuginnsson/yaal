@@ -58,8 +58,8 @@ HString& usun_ogonki( HString& string_ ) {
 }
 
 yaal::hcore::HString article( yaal::hcore::HString const& word_ ) {
-	int long pos( word_.find_one_of( character_class( CHARACTER_CLASS::LETTER ).data() ) );
-	return ( pos != HString::npos ? ( character_class( CHARACTER_CLASS::VOWEL ).has( word_[pos] ) ? "an" : "a" ) : "" );
+	int long pos( word_.find_one_of( character_class<CHARACTER_CLASS::LETTER>().data() ) );
+	return ( pos != HString::npos ? ( character_class<CHARACTER_CLASS::VOWEL>().has( word_[pos] ) ? "an" : "a" ) : "" );
 }
 
 double long atof_ex( HString const& string_, bool parse_ ) {
@@ -381,12 +381,12 @@ void insert_line_breaks( yaal::hcore::HString& str_, int atColumn_, char const* 
 			pos = lineBreakPos + 1;
 			continue;
 		}
-		int long spacePos( str_.find_last_one_of( character_class( CHARACTER_CLASS::WHITESPACE ).data(), pos + atColumn_ ) );
+		int long spacePos( str_.find_last_one_of( character_class<CHARACTER_CLASS::WHITESPACE>().data(), pos + atColumn_ ) );
 		if ( spacePos != HString::npos ) {
 			str_.set_at( spacePos, '\n'_ycp );
 			pos = spacePos + 1;
 		} else {
-			spacePos = str_.find_one_of( character_class( CHARACTER_CLASS::WHITESPACE ).data(), pos + atColumn_ );
+			spacePos = str_.find_one_of( character_class<CHARACTER_CLASS::WHITESPACE>().data(), pos + atColumn_ );
 			if ( spacePos != HString::npos ) {
 				str_.set_at( spacePos, '\n'_ycp );
 				pos = spacePos + 1;
@@ -575,7 +575,7 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 			int words( 0 );
 			while ( ( ws < cols ) && ( ws >= 0 ) ) {
 				eol = ws;
-				ws = static_cast<int>( desc.find_one_of( character_class( CHARACTER_CLASS::WHITESPACE ).data(), ws ) );
+				ws = static_cast<int>( desc.find_one_of( character_class<CHARACTER_CLASS::WHITESPACE>().data(), ws ) );
 				if ( ( ws < 0 ) && ( words < 2 ) ) {
 					eol = static_cast<int>( desc.get_length() );
 				}
@@ -586,7 +586,7 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 					break;
 				}
 				eol = ws;
-				ws = static_cast<int>( desc.find_other_than( character_class( CHARACTER_CLASS::WHITESPACE ).data(), ws ) );
+				ws = static_cast<int>( desc.find_other_than( character_class<CHARACTER_CLASS::WHITESPACE>().data(), ws ) );
 				if ( ws > 0 ) {
 					++ words;
 				}
@@ -714,10 +714,10 @@ void dump_configuration( HOptionInfo const& info, HStreamInterface& out_ ) {
 		do {
 			int eol = 0;
 			while ( ( eol < MAXIMUM_LINE_LENGTH ) && ( eol >= 0 ) ) {
-				eol = static_cast<int>( desc.find_one_of( character_class( CHARACTER_CLASS::WHITESPACE ).data(), eol ) );
+				eol = static_cast<int>( desc.find_one_of( character_class<CHARACTER_CLASS::WHITESPACE>().data(), eol ) );
 				if ( ( eol < 0 ) || ( eol > MAXIMUM_LINE_LENGTH ) )
 					break;
-				eol = static_cast<int>( desc.find_other_than( character_class( CHARACTER_CLASS::WHITESPACE ).data(), eol ) );
+				eol = static_cast<int>( desc.find_other_than( character_class<CHARACTER_CLASS::WHITESPACE>().data(), eol ) );
 			}
 			if ( eol >= MAXIMUM_LINE_LENGTH ) {
 				out_ << "# " << plain( desc.left( eol ) ) << "\n";

@@ -180,7 +180,7 @@ public:
 	}
 	void format( void ) {
 		M_PROLOG
-		HCharacterClass const ALIGN_CLASS( "<^>", 3 );
+		character_class_t const ALIGN_CLASS( "<^>", 3 );
 		int fmtSubstCount( 0 );
 		bool autoIndex( false );
 		HString idxRaw;
@@ -355,7 +355,7 @@ inline HHuginn::value_t strip( HString&( HString::* trim_ )( HString const& ), h
 	if ( trimChars ) {
 		(dest.*trim_)( *trimChars );
 	} else {
-		(dest.*trim_)( character_class( CHARACTER_CLASS::WHITESPACE ).data() );
+		(dest.*trim_)( character_class<CHARACTER_CLASS::WHITESPACE>().data() );
 	}
 	HHuginn::value_t v;
 	if ( dest.get_length() != len ) {

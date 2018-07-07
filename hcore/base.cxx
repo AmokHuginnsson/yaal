@@ -65,7 +65,7 @@ int preparse_integer( HString const& str_, char* alternate_ ) {
 	 */
 	HString::const_iterator it( str_.begin() );
 	int len( safe_int::cast<int>( str_.get_length() ) );
-	while ( ( len > 0 ) && character_class( CHARACTER_CLASS::WHITESPACE ).has( *it ) ) {
+	while ( ( len > 0 ) && character_class<CHARACTER_CLASS::WHITESPACE>().has( *it ) ) {
 		++ it;
 		-- len;
 	}
@@ -105,27 +105,27 @@ int preparse_integer( HString const& str_, char* alternate_ ) {
 		-- skip;
 	}
 	int maxDigits( 0 );
-	HCharacterClass const* cc( nullptr );
+	character_class_t const* cc( nullptr );
 	char const* name( nullptr );
 	switch ( base ) {
 		case ( 10 ): {
 			maxDigits = MAX_VALID_DECIMAL_INTEGER_LENGTH;
-			cc = &character_class( CHARACTER_CLASS::DIGIT );
+			cc = &character_class<CHARACTER_CLASS::DIGIT>();
 			name = "decimal";
 		} break;
 		case ( 16 ): {
 			maxDigits = MAX_VALID_HEXADECIMAL_INTEGER_LENGTH;
-			cc = &character_class( CHARACTER_CLASS::HEX_DIGIT );
+			cc = &character_class<CHARACTER_CLASS::HEX_DIGIT>();
 			name = "hexadecimal";
 		} break;
 		case ( 8 ): {
 			maxDigits = MAX_VALID_OCTAL_INTEGER_LENGTH;
-			cc = &character_class( CHARACTER_CLASS::OCT_DIGIT );
+			cc = &character_class<CHARACTER_CLASS::OCT_DIGIT>();
 			name = "octal";
 		} break;
 		case ( 2 ): {
 			maxDigits = MAX_VALID_BINARY_INTEGER_LENGTH;
-			cc = &character_class( CHARACTER_CLASS::BIN_DIGIT );
+			cc = &character_class<CHARACTER_CLASS::BIN_DIGIT>();
 			name = "binary";
 		} break;
 		default: {

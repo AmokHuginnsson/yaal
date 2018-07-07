@@ -28,6 +28,9 @@ typedef yaal::hcore::HTaggedPOD<yaal::u32_t, struct code_point_tag> code_point_t
 inline constexpr code_point_t operator "" _ycp ( char char_ ) {
 	return ( code_point_t( static_cast<yaal::u32_t>( char_ ) ) );
 }
+inline constexpr code_point_t operator "" _ycp ( wchar_t char_ ) {
+	return ( code_point_t( static_cast<yaal::u32_t>( char_ ) ) );
+}
 inline constexpr code_point_t operator "" _ycp ( int long long unsigned char_ ) {
 	return ( code_point_t( static_cast<yaal::u32_t>( char_ ) ) );
 }
@@ -41,18 +44,19 @@ namespace hcore {
  *
  * Define set of characters with O(1) size() on set.
  */
+template<typename char_type>
 class HCharacterClass {
-	char const* _data;
+	char_type const* _data;
 	int _size;
 public:
-	HCharacterClass( char const* data_, int size_ )
+	HCharacterClass( char_type const* data_, int size_ )
 		: _data( data_ )
 		, _size( size_ ) {}
 	/*! \brief Get characters in Character Class.
 	 *
 	 * \return Data in Character Class.
 	 */
-	char const* data( void ) const {
+	char_type const* data( void ) const {
 		return ( _data );
 	}
 	/*! \brief Get size of Character Class.
@@ -65,35 +69,41 @@ public:
 	bool has( code_point_t ) const;
 	bool hasz( code_point_t ) const;
 };
+typedef HCharacterClass<char> character_class_t;
 
-struct CHARACTER_CLASS {
-	typedef enum {
-		WHITESPACE = 0,
-		BIN_DIGIT  = 1,
-		OCT_DIGIT  = 2,
-		DIGIT      = 3,
-		HEX_DIGIT  = 4,
-		LETTER     = 5,
-		LOWER_CASE_LETTER = 6,
-		UPPER_CASE_LETTER = 7,
-		WORD = 8,
-		VOWEL = 9,
-		GREEK = 10,
-		LOWER_CASE_GREEK = 11,
-		UPPER_CASE_GREEK = 12,
-		SUBSCRIPT = 13,
-		SUBSCRIPT_DIGIT = 14,
-		SUBSCRIPT_LETTER = 15,
-		SUBSCRIPT_LOWER_CASE_LETTER = 16,
-		SUBSCRIPT_UPPER_CASE_LETTER = 17,
-		SUPERSCRIPT = 18,
-		SUPERSCRIPT_DIGIT = 19,
-		SUPERSCRIPT_LETTER = 20,
-		SUPERSCRIPT_LOWER_CASE_LETTER = 21,
-		SUPERSCRIPT_UPPER_CASE_LETTER = 22
-	} character_class_t;
+enum class CHARACTER_CLASS {
+	WHITESPACE = 0,
+	BIN_DIGIT  = 1,
+	OCT_DIGIT  = 2,
+	DIGIT      = 3,
+	HEX_DIGIT  = 4,
+	LETTER     = 5,
+	LOWER_CASE_LETTER = 6,
+	UPPER_CASE_LETTER = 7,
+	WORD = 8,
+	VOWEL = 9,
+	GREEK = 10,
+	LOWER_CASE_GREEK = 11,
+	UPPER_CASE_GREEK = 12,
+	SUBSCRIPT = 13,
+	SUBSCRIPT_DIGIT = 14,
+	SUBSCRIPT_LETTER = 15,
+	SUBSCRIPT_LOWER_CASE_LETTER = 16,
+	SUBSCRIPT_UPPER_CASE_LETTER = 17,
+	SUPERSCRIPT = 18,
+	SUPERSCRIPT_DIGIT = 19,
+	SUPERSCRIPT_LETTER = 20,
+	SUPERSCRIPT_LOWER_CASE_LETTER = 21,
+	SUPERSCRIPT_UPPER_CASE_LETTER = 22
 };
-HCharacterClass const& character_class( CHARACTER_CLASS::character_class_t );
+template<typename char_type>
+HCharacterClass<char_type> const& character_class( CHARACTER_CLASS );
+template<CHARACTER_CLASS const characterClass>
+HCharacterClass<typename trait::ternary<( characterClass >= CHARACTER_CLASS::GREEK ), char16_t, char>::type> const& character_class( void ) {
+	typedef typename trait::ternary<( characterClass >= CHARACTER_CLASS::GREEK ), char16_t, char>::type char_type;
+	return ( character_class<char_type>( characterClass ) );
+}
+
 
 class HUTF8String;
 
@@ -208,6 +218,8 @@ public:
 	 * size - at most that many characters from array are used.
 	 */
 	HString( char const* array, int long size );
+	HString( char16_t const* array, int long size );
+	HString( char32_t const* array, int long size );
 	/*! \brief Construct new HString from single code point.
 	 *
 	 * ch - a code point to initialize new string with.
@@ -618,19 +630,19 @@ public:
 	 * \param set - set of characters that shall be removed.
 	 * \return Self.
 	 */
-	HString& trim_left( HString const& set = character_class( CHARACTER_CLASS::WHITESPACE ).data() );
+	HString& trim_left( HString const& set = character_class<CHARACTER_CLASS::WHITESPACE>().data() );
 	/*! \brief Trim all consecutive occurrences of given characters from end of the string.
 	 *
 	 * \param set - set of characters that shall be removed.
 	 * \return Self.
 	 */
-	HString& trim_right( HString const& set = character_class( CHARACTER_CLASS::WHITESPACE ).data() );
+	HString& trim_right( HString const& set = character_class<CHARACTER_CLASS::WHITESPACE>().data() );
 	/*! \brief Trim all consecutive occurrences of given characters from both beginning and end of the string.
 	 *
 	 * \param set - set of characters that shall be removed.
 	 * \return Self.
 	 */
-	HString& trim( HString const& set = character_class( CHARACTER_CLASS::WHITESPACE ).data() );
+	HString& trim( HString const& set = character_class<CHARACTER_CLASS::WHITESPACE>().data() );
 	/*! \brief Remove first N characters from this string.
 	 * \param len - remove that many characters from beginning of this string.
 	 * \return Self.

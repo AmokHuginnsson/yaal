@@ -415,7 +415,7 @@ bool HExpression::translate( HString const& formula_ ) {
 		_terminalIndexes[ realIndex ] = index;
 		if ( ( formula_[ index ] >= 'a' ) && ( formula_[ index ] <= 'z' ) ) {
 			bool isFunc( false );
-			for ( int funcIdx( 0 ); funcIdx < countof( _functionsMnemonics_ ); ++ funcIdx ) {
+			for ( int funcIdx( 0 ); funcIdx < yaal::size( _functionsMnemonics_ ); ++ funcIdx ) {
 				if (
 					formula_.substr( index, _functionMnemonicsLength_[ funcIdx ] ) == _functionsMnemonics_[ funcIdx ]
 				) {

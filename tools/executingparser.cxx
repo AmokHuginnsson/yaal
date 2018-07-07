@@ -3004,7 +3004,7 @@ yaal::hcore::HUTF8String::const_iterator HInteger::do_parse( HExecutingParser* e
 			valid = false;
 			break;
 		}
-		if ( ( scan != last_ ) && ( character_class( CHARACTER_CLASS::WORD ).has( *scan ) ) ) {
+		if ( ( scan != last_ ) && ( character_class<CHARACTER_CLASS::WORD>().has( *scan ) ) ) {
 			valid = false;
 			break;
 		}
@@ -3608,7 +3608,7 @@ bool character_skip_ws( yaal::hcore::HString const& characters_, HRuleBase::WHIT
 	if ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) {
 		skipWS = true;
 		for ( code_point_t c : characters_ ) {
-			if ( character_class( CHARACTER_CLASS::WHITESPACE ).has( c ) ) {
+			if ( is_whitespace( c ) ) {
 				skipWS = false;
 				break;
 			}
@@ -3907,7 +3907,7 @@ hcore::HUTF8String::const_iterator HString::do_parse( HExecutingParser* executin
 				}
 			}
 			if ( matched && ( _wordBoundary == WORD_BOUNDARY::REQUIRED ) && ( scan != last_ ) ) {
-				matched = exor( character_class( CHARACTER_CLASS::WORD ).has( *( scan - 1 ) ), character_class( CHARACTER_CLASS::WORD ).has( *scan ) );
+				matched = exor( character_class<CHARACTER_CLASS::WORD>().has( *( scan - 1 ) ), character_class<CHARACTER_CLASS::WORD>().has( *scan ) );
 			}
 			if ( matched ) {
 				range_t rng( range( executingParser_, first_, scan ) );
@@ -3994,8 +3994,8 @@ void HString::do_find_recursions( HRuleAggregator& ) {
 HString string( yaal::hcore::HString const& string_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! character_class( CHARACTER_CLASS::WHITESPACE ).has( string_.front() ) ) );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class( CHARACTER_CLASS::WORD ).has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
+	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! is_whitespace( string_.front() ) ) );
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class<CHARACTER_CLASS::WORD>().has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
 	return ( HString( string_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -4003,8 +4003,8 @@ HString string( yaal::hcore::HString const& string_, HRuleBase::WHITE_SPACE whit
 HString string( yaal::hcore::HString const& string_, HString::action_string_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! character_class( CHARACTER_CLASS::WHITESPACE ).has( string_.front() ) ) );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class( CHARACTER_CLASS::WORD ).has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
+	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! is_whitespace( string_.front() ) ) );
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class<CHARACTER_CLASS::WORD>().has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -4012,8 +4012,8 @@ HString string( yaal::hcore::HString const& string_, HString::action_string_t co
 HString string( yaal::hcore::HString const& string_, HString::action_string_range_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! character_class( CHARACTER_CLASS::WHITESPACE ).has( string_.front() ) ) );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class( CHARACTER_CLASS::WORD ).has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
+	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! is_whitespace( string_.front() ) ) );
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class<CHARACTER_CLASS::WORD>().has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -4021,8 +4021,8 @@ HString string( yaal::hcore::HString const& string_, HString::action_string_rang
 HString string( yaal::hcore::HString const& string_, HString::action_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! character_class( CHARACTER_CLASS::WHITESPACE ).has( string_.front() ) ) );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class( CHARACTER_CLASS::WORD ).has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
+	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! is_whitespace( string_.front() ) ) );
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class<CHARACTER_CLASS::WORD>().has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -4030,8 +4030,8 @@ HString string( yaal::hcore::HString const& string_, HString::action_t const& ac
 HString string( yaal::hcore::HString const& string_, HString::action_range_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! character_class( CHARACTER_CLASS::WHITESPACE ).has( string_.front() ) ) );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class( CHARACTER_CLASS::WORD ).has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
+	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! is_whitespace( string_.front() ) ) );
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class<CHARACTER_CLASS::WORD>().has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -4039,8 +4039,8 @@ HString string( yaal::hcore::HString const& string_, HString::action_range_t con
 HString string( yaal::hcore::HString const& string_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class( CHARACTER_CLASS::WORD ).has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
-	bool skipWS( ! character_class( CHARACTER_CLASS::WHITESPACE ).has( string_.front() ) );
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class<CHARACTER_CLASS::WORD>().has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
+	bool skipWS( ! is_whitespace( string_.front() ) );
 	return ( HString( string_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -4048,8 +4048,8 @@ HString string( yaal::hcore::HString const& string_, HString::WORD_BOUNDARY word
 HString string( yaal::hcore::HString const& string_, HString::action_string_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class( CHARACTER_CLASS::WORD ).has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
-	bool skipWS( ! character_class( CHARACTER_CLASS::WHITESPACE ).has( string_.front() ) );
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class<CHARACTER_CLASS::WORD>().has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
+	bool skipWS( ! is_whitespace( string_.front() ) );
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -4057,8 +4057,8 @@ HString string( yaal::hcore::HString const& string_, HString::action_string_t co
 HString string( yaal::hcore::HString const& string_, HString::action_string_range_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class( CHARACTER_CLASS::WORD ).has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
-	bool skipWS( ! character_class( CHARACTER_CLASS::WHITESPACE ).has( string_.front() ) );
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( is_whitespace( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
+	bool skipWS( ! is_whitespace( string_.front() ) );
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -4066,8 +4066,8 @@ HString string( yaal::hcore::HString const& string_, HString::action_string_rang
 HString string( yaal::hcore::HString const& string_, HString::action_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class( CHARACTER_CLASS::WORD ).has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
-	bool skipWS( ! character_class( CHARACTER_CLASS::WHITESPACE ).has( string_.front() ) );
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class<CHARACTER_CLASS::WORD>().has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
+	bool skipWS( ! is_whitespace( string_.front() ) );
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }
@@ -4075,8 +4075,8 @@ HString string( yaal::hcore::HString const& string_, HString::action_t const& ac
 HString string( yaal::hcore::HString const& string_, HString::action_range_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class( CHARACTER_CLASS::WORD ).has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
-	bool skipWS( ! character_class( CHARACTER_CLASS::WHITESPACE ).has( string_.front() ) );
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class<CHARACTER_CLASS::WORD>().has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
+	bool skipWS( ! is_whitespace( string_.front() ) );
 	return ( HString( string_, action_, skipWS, wordBoundary ) );
 	M_EPILOG
 }

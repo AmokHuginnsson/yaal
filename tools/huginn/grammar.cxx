@@ -21,17 +21,16 @@ namespace tools {
 namespace {
 
 typedef yaal::hcore::HArray<bool> flags_t;
-static int const CODE_POINT_CUT_OFF( 0x10000 );
+static code_point_t const CODE_POINT_CUT_OFF( 0x10000u );
 
 flags_t make_heads( void ) {
 	flags_t heads;
-	heads.reserve( CODE_POINT_CUT_OFF );
-	for ( int i( 0 ); i < CODE_POINT_CUT_OFF; ++ i ) {
+	heads.reserve( static_cast<int>( CODE_POINT_CUT_OFF.get() ) );
+	for ( code_point_t cp( 0 ); cp < CODE_POINT_CUT_OFF; ++ cp ) {
 		heads.push_back(
-			( ( i >= 'a' ) && ( i <= 'z' ) )
-			|| ( ( i >= 'A' ) && ( i <= 'Z' ) )
-			|| ( ( i >= 0x391 ) && ( i <= 0x3c9 ) )
-			|| ( i == '_' )
+			is_letter( cp )
+			|| is_greek( cp )
+			|| ( cp == '_'_ycp )
 		);
 	}
 	return ( heads );
@@ -39,14 +38,14 @@ flags_t make_heads( void ) {
 
 flags_t make_tails( void ) {
 	flags_t tails;
-	tails.reserve( CODE_POINT_CUT_OFF );
-	for ( int i( 0 ); i < CODE_POINT_CUT_OFF; ++ i ) {
+	tails.reserve( static_cast<int>( CODE_POINT_CUT_OFF.get() ) );
+	for ( code_point_t cp( 0 ); cp < CODE_POINT_CUT_OFF; ++ cp ) {
 		tails.push_back(
-			( ( i >= 'a' ) && ( i <= 'z' ) )
-			|| ( ( i >= 'A' ) && ( i <= 'Z' ) )
-			|| ( ( i >= '0' ) && ( i <= '9' ) )
-			|| ( ( i >= 0x391 ) && ( i <= 0x3c9 ) )
-			|| ( i == '_' )
+			is_letter( cp )
+			|| is_digit( cp )
+			|| is_greek( cp )
+			|| is_subscript( cp )
+			|| ( cp == '_'_ycp )
 		);
 	}
 	return ( tails );

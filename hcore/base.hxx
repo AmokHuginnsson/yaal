@@ -109,10 +109,12 @@ struct Int2Type {
 	enum { value = N };
 };
 
-/*! \brief Helper to find number of elements in C array.
+/*! \brief Get number of elements of C array.
  */
 template <typename T, int long unsigned N>
-char ( &YaalArrayElementCountHelper( T ( &YaalArrayElementCountHelperArray )[N] ) )[N];
+inline constexpr int size( T const (&) [N] ) noexcept {
+	return ( static_cast<int>( N ) );
+}
 
 template<typename iter_t>
 bool is_hexadecimal( iter_t it_, iter_t end_ ) {

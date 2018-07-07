@@ -95,7 +95,7 @@ void HRandomizer::swap( HRandomizer& randomizer_ ) {
 		using yaal::swap;
 		swap( _index, randomizer_._index );
 		swap( _range, randomizer_._range );
-		swap_ranges( _state, _state + countof ( _state ), randomizer_._state );
+		swap_ranges( _state, _state + yaal::size( _state ), randomizer_._state );
 	}
 	return;
 	M_EPILOG
