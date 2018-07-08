@@ -659,6 +659,8 @@ OUTF8StringStats get_string_stats( char const* str_, int long size_ ) {
 	int characterCount( 0 );
 	int charBytesLeft( 0 );
 	int rank( 1 );
+	int tryRank( 0 );
+	u32_t cp( 0 );
 	char const* p( str_ );
 	while ( ( byteCount < size_ ) && *p ) {
 		if ( charBytesLeft == 0 ) {
@@ -666,21 +668,33 @@ OUTF8StringStats get_string_stats( char const* str_, int long size_ ) {
 				++ characterCount;
 			} else if ( ( *p & unicode::ENC_2_BYTES_MARK_MASK ) == unicode::ENC_2_BYTES_MARK_VALUE ) {
 				charBytesLeft = 1;
-				rank = max( rank, 2 );
+				tryRank = 0; /* 3 byte UTF-8 sequence can have either rank == 2 or rank == 1 */
+				cp = ( *p & unicode::ENC_2_BYTES_VALUE_MASK );
 			} else if ( ( *p & unicode::ENC_3_BYTES_MARK_MASK ) == unicode::ENC_3_BYTES_MARK_VALUE ) {
 				charBytesLeft = 2;
-				rank = max( rank, 4 ); /* not a bug, 3 byte UTF-8 sequence has a rank == 4 */
+				tryRank = 1; /* 3 byte UTF-8 sequence can have either rank == 4 or rank == 2 */
+				cp = ( *p & unicode::ENC_3_BYTES_VALUE_MASK );
 			} else if ( ( *p & unicode::ENC_4_BYTES_MARK_MASK ) == unicode::ENC_4_BYTES_MARK_VALUE ) {
 				charBytesLeft = 3;
-				rank = max( rank, 4 );
+				tryRank = 2;
 			} else {
 				throw HUTF8StringException( "Invalid UTF-8 head sequence at: "_ys.append( byteCount ) );
 			}
 		} else {
 			if ( ( *p & unicode::TAIL_BYTES_MARK_MASK ) == unicode::TAIL_BYTES_MARK_VALUE ) {
 				-- charBytesLeft;
+				cp <<= 6;
+				cp |= ( *p & unicode::TAIL_BYTES_VALUE_MASK );
 				if ( ! charBytesLeft ) {
+					static u32_t const UCS_RANK_CUTOFF[] = {
+						unicode::UCS_MAX_1_BYTE_CODE_POINT,
+						unicode::UCS_MAX_2_BYTE_CODE_POINT,
+						0
+					};
+					static int const RANKS[][3] = { { 1, 2, 4 }, { 2, 4, 4 } };
+
 					++ characterCount;
+					rank = max( RANKS[ cp > UCS_RANK_CUTOFF[tryRank] ][tryRank], rank );
 				}
 			} else {
 				throw HUTF8StringException( "Invalid UTF-8 tail sequence at: "_ys.append( byteCount ) );

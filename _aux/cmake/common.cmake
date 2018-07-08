@@ -31,6 +31,7 @@ if( CMAKE_HOST_WIN32 )
 	set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO" )
 	set( CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /SAFESEH:NO" )
 	set( CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /SAFESEH:NO" )
+	add_definitions( /utf-8 )
 	if ( NOT ( "${PROJECT_NAME}" STREQUAL "yaal" ) ) # For clients only.
 		add_definitions( -D__MSVCXX__ /FIyaal/fix.hxx )
 	endif()
