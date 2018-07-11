@@ -2167,6 +2167,12 @@ HAlternative operator | ( HAlternative const& alternative_, HRuleBase const& cho
 	M_EPILOG
 }
 
+HCharacter operator | ( HCharacter const& character_, code_point_t const& token_ ) {
+	M_PROLOG
+	return ( HCharacter( character_, token_ ) );
+	M_EPILOG
+}
+
 HString operator | ( HString const& string_, yaal::hcore::HString const& token_ ) {
 	M_PROLOG
 	return ( HString( string_, token_ ) );
@@ -3568,6 +3574,20 @@ HCharacter::HCharacter( HCharacter const& character_ )
 	return;
 }
 
+HCharacter::HCharacter( HCharacter const& character_, code_point_t const& token_ )
+	: HRuleBase( character_._action, character_._actionPosition, character_._skipWS )
+	, _characters( character_._characters )
+	, _actionCharacter( character_._actionCharacter )
+	, _actionCharacterPosition( character_._actionCharacterPosition )
+	, _errorMessage( character_._errorMessage ) {
+	if ( _characters.find( token_ ) != hcore::HString::npos ) {
+		throw HCharacterException( "token `"_ys.append( token_ ).append( "' is already observed" ) );
+	}
+	_characters.push_back( token_ );
+	_errorMessage = make_error_message();
+	return;
+}
+
 HCharacter HCharacter::operator[]( action_t const& action_ ) const {
 	M_PROLOG
 	M_ENSURE( ! has_action() );
@@ -3804,6 +3824,17 @@ HString::HString( hcore::HString const& string_, action_string_range_t const& ac
 	return;
 }
 
+HString::HString( dictionary_t const& dictionary_, bool skipWS_, WORD_BOUNDARY wordBoundary_ )
+	: HRuleBase( skipWS_ )
+	, _dictionary( dictionary_ )
+	, _actionString()
+	, _actionStringPosition()
+	, _wordBoundary( wordBoundary_ )
+	, _errorMessage( make_error_message() ) {
+	M_ASSERT( ! _dictionary.is_empty() );
+	return;
+}
+
 HString::HString( dictionary_t const& dictionary_, action_t const& action_, bool skipWS_, WORD_BOUNDARY wordBoundary_ )
 	: HRuleBase( action_, skipWS_ )
 	, _dictionary( dictionary_ )
@@ -3991,93 +4022,211 @@ void HString::do_find_recursions( HRuleAggregator& ) {
 	M_EPILOG
 }
 
+namespace {
+
+inline bool skip_ws( hcore::HString const& string_, HRuleBase::WHITE_SPACE whiteSpace_ ) {
+	return ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! is_whitespace( string_.front() ) ) );
+}
+
+inline HString::WORD_BOUNDARY word_boundary( yaal::hcore::HString const& string_, HString::WORD_BOUNDARY wordBoundary_ ) {
+	return (
+		wordBoundary_ == HString::WORD_BOUNDARY::AUTO
+			? (
+				character_class<CHARACTER_CLASS::WORD>().has( string_.back() )
+					? HString::WORD_BOUNDARY::REQUIRED
+					: HString::WORD_BOUNDARY::OPTIONAL
+			) : wordBoundary_
+	);
+}
+
+}
+
 HString string( yaal::hcore::HString const& string_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! is_whitespace( string_.front() ) ) );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class<CHARACTER_CLASS::WORD>().has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
-	return ( HString( string_, skipWS, wordBoundary ) );
+	return ( HString( string_, skip_ws( string_, whiteSpace_ ), word_boundary( string_, wordBoundary_ ) ) );
 	M_EPILOG
 }
 
 HString string( yaal::hcore::HString const& string_, HString::action_string_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! is_whitespace( string_.front() ) ) );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class<CHARACTER_CLASS::WORD>().has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
-	return ( HString( string_, action_, skipWS, wordBoundary ) );
+	return ( HString( string_, action_, skip_ws( string_, whiteSpace_ ), word_boundary( string_, wordBoundary_ ) ) );
 	M_EPILOG
 }
 
 HString string( yaal::hcore::HString const& string_, HString::action_string_range_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! is_whitespace( string_.front() ) ) );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class<CHARACTER_CLASS::WORD>().has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
-	return ( HString( string_, action_, skipWS, wordBoundary ) );
+	return ( HString( string_, action_, skip_ws( string_, whiteSpace_ ), word_boundary( string_, wordBoundary_ ) ) );
 	M_EPILOG
 }
 
 HString string( yaal::hcore::HString const& string_, HString::action_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! is_whitespace( string_.front() ) ) );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class<CHARACTER_CLASS::WORD>().has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
-	return ( HString( string_, action_, skipWS, wordBoundary ) );
+	return ( HString( string_, action_, skip_ws( string_, whiteSpace_ ), word_boundary( string_, wordBoundary_ ) ) );
 	M_EPILOG
 }
 
 HString string( yaal::hcore::HString const& string_, HString::action_range_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	bool skipWS( ( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP ) || ( ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) && ! is_whitespace( string_.front() ) ) );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class<CHARACTER_CLASS::WORD>().has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
-	return ( HString( string_, action_, skipWS, wordBoundary ) );
+	return ( HString( string_, action_, skip_ws( string_, whiteSpace_ ), word_boundary( string_, wordBoundary_ ) ) );
 	M_EPILOG
 }
 
 HString string( yaal::hcore::HString const& string_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class<CHARACTER_CLASS::WORD>().has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
-	bool skipWS( ! is_whitespace( string_.front() ) );
-	return ( HString( string_, skipWS, wordBoundary ) );
+	return ( HString( string_, ! is_whitespace( string_.front() ), word_boundary( string_, wordBoundary_ ) ) );
 	M_EPILOG
 }
 
 HString string( yaal::hcore::HString const& string_, HString::action_string_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class<CHARACTER_CLASS::WORD>().has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
-	bool skipWS( ! is_whitespace( string_.front() ) );
-	return ( HString( string_, action_, skipWS, wordBoundary ) );
+	return ( HString( string_, action_, ! is_whitespace( string_.front() ), word_boundary( string_, wordBoundary_ ) ) );
 	M_EPILOG
 }
 
 HString string( yaal::hcore::HString const& string_, HString::action_string_range_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( is_whitespace( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
-	bool skipWS( ! is_whitespace( string_.front() ) );
-	return ( HString( string_, action_, skipWS, wordBoundary ) );
+	return ( HString( string_, action_, ! is_whitespace( string_.front() ), word_boundary( string_, wordBoundary_ ) ) );
 	M_EPILOG
 }
 
 HString string( yaal::hcore::HString const& string_, HString::action_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class<CHARACTER_CLASS::WORD>().has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
-	bool skipWS( ! is_whitespace( string_.front() ) );
-	return ( HString( string_, action_, skipWS, wordBoundary ) );
+	return ( HString( string_, action_, ! is_whitespace( string_.front() ), word_boundary( string_, wordBoundary_ ) ) );
 	M_EPILOG
 }
 
 HString string( yaal::hcore::HString const& string_, HString::action_range_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
-	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ? ( character_class<CHARACTER_CLASS::WORD>().has( string_.back() ) ? HString::WORD_BOUNDARY::REQUIRED : HString::WORD_BOUNDARY::OPTIONAL ) : wordBoundary_ );
-	bool skipWS( ! is_whitespace( string_.front() ) );
-	return ( HString( string_, action_, skipWS, wordBoundary ) );
+	return ( HString( string_, action_, ! is_whitespace( string_.front() ), word_boundary( string_, wordBoundary_ ) ) );
+	M_EPILOG
+}
+
+namespace {
+
+void sanity_check( HString::dictionary_t const& strings_ ) {
+	M_PROLOG
+	typedef executing_parser::HString this_type;
+	M_ENSURE( ! strings_.is_empty() );
+	for ( int outer( 0 ), C( static_cast<int>( strings_.get_size() ) ); outer < C; ++ outer ) {
+		hcore::HString const& s( strings_[outer] );
+		M_ENSURE( ! s.is_empty() );
+		for ( int inner( 0 ); inner < outer; ++ inner ) {
+			if ( s.find( strings_[inner] ) == 0 ) {
+				throw HStringException( "token `"_ys.append( s ).append( "' would be hidden" ) );
+			}
+		}
+	}
+	return;
+	M_EPILOG
+}
+
+inline bool skip_ws( HString::dictionary_t const& strings_, HRuleBase::WHITE_SPACE whiteSpace_ ) {
+	bool skipWS( whiteSpace_ == HRuleBase::WHITE_SPACE::SKIP );
+	if ( ! skipWS && ( whiteSpace_ == HRuleBase::WHITE_SPACE::AUTO ) ) {
+		skipWS = true;
+		for ( hcore::HString const& s : strings_ ) {
+			if ( is_whitespace( s.front() ) ) {
+				skipWS = false;
+				break;
+			}
+		}
+	}
+	return ( skipWS );
+}
+
+inline HString::WORD_BOUNDARY word_boundary( HString::dictionary_t const& strings_, HString::WORD_BOUNDARY wordBoundary_ ) {
+	HString::WORD_BOUNDARY wordBoundary( wordBoundary_ );
+	if ( wordBoundary_ == HString::WORD_BOUNDARY::AUTO ) {
+		wordBoundary = HString::WORD_BOUNDARY::OPTIONAL;
+		for ( hcore::HString const& s : strings_ ) {
+			if ( character_class<CHARACTER_CLASS::WORD>().has( s.back() ) ) {
+				wordBoundary = HString::WORD_BOUNDARY::REQUIRED;
+				break;
+			}
+		}
+	}
+	return ( wordBoundary );
+}
+
+}
+
+HString string( HString::dictionary_t const& strings_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
+	M_PROLOG
+	sanity_check( strings_ );
+	return ( HString( strings_, skip_ws( strings_, whiteSpace_ ), word_boundary( strings_, wordBoundary_ ) ) );
+	M_EPILOG
+}
+
+HString string( HString::dictionary_t const& strings_, HString::action_string_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
+	M_PROLOG
+	sanity_check( strings_ );
+	return ( HString( strings_, action_, skip_ws( strings_, whiteSpace_ ), word_boundary( strings_, wordBoundary_ ) ) );
+	M_EPILOG
+}
+
+HString string( HString::dictionary_t const& strings_, HString::action_string_range_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
+	M_PROLOG
+	sanity_check( strings_ );
+	return ( HString( strings_, action_, skip_ws( strings_, whiteSpace_ ), word_boundary( strings_, wordBoundary_ ) ) );
+	M_EPILOG
+}
+
+HString string( HString::dictionary_t const& strings_, HString::action_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
+	M_PROLOG
+	sanity_check( strings_ );
+	return ( HString( strings_, action_, skip_ws( strings_, whiteSpace_ ), word_boundary( strings_, wordBoundary_ ) ) );
+	M_EPILOG
+}
+
+HString string( HString::dictionary_t const& strings_, HString::action_range_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
+	M_PROLOG
+	sanity_check( strings_ );
+	return ( HString( strings_, action_, skip_ws( strings_, whiteSpace_ ), word_boundary( strings_, wordBoundary_ ) ) );
+	M_EPILOG
+}
+
+HString string( HString::dictionary_t const& strings_, HString::WORD_BOUNDARY wordBoundary_ ) {
+	M_PROLOG
+	sanity_check( strings_ );
+	return ( HString( strings_, skip_ws( strings_, HRuleBase::WHITE_SPACE::AUTO ), word_boundary( strings_, wordBoundary_ ) ) );
+	M_EPILOG
+}
+
+HString string( HString::dictionary_t const& strings_, HString::action_string_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
+	M_PROLOG
+	sanity_check( strings_ );
+	return ( HString( strings_, action_, skip_ws( strings_, HRuleBase::WHITE_SPACE::AUTO ), word_boundary( strings_, wordBoundary_ ) ) );
+	M_EPILOG
+}
+
+HString string( HString::dictionary_t const& strings_, HString::action_string_range_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
+	M_PROLOG
+	sanity_check( strings_ );
+	return ( HString( strings_, action_, skip_ws( strings_, HRuleBase::WHITE_SPACE::AUTO ), word_boundary( strings_, wordBoundary_ ) ) );
+	M_EPILOG
+}
+
+HString string( HString::dictionary_t const& strings_, HString::action_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
+	M_PROLOG
+	sanity_check( strings_ );
+	return ( HString( strings_, action_, skip_ws( strings_, HRuleBase::WHITE_SPACE::AUTO ), word_boundary( strings_, wordBoundary_ ) ) );
+	M_EPILOG
+}
+
+HString string( HString::dictionary_t const& strings_, HString::action_range_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
+	M_PROLOG
+	sanity_check( strings_ );
+	return ( HString( strings_, action_, skip_ws( strings_, HRuleBase::WHITE_SPACE::AUTO ), word_boundary( strings_, wordBoundary_ ) ) );
 	M_EPILOG
 }
 
@@ -4431,6 +4580,76 @@ HString constant( yaal::hcore::HString const& string_, HString::action_string_ra
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
 	return ( string( string_, wordBoundary_ )[ action_ ] );
+	M_EPILOG
+}
+
+HString constant( HString::dictionary_t const& strings_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
+	M_PROLOG
+	M_ENSURE( ! strings_.is_empty() );
+	return ( string( strings_, whiteSpace_, wordBoundary_ ) );
+	M_EPILOG
+}
+
+HString constant( HString::dictionary_t const& strings_, HRuleBase::action_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
+	M_PROLOG
+	M_ENSURE( ! strings_.is_empty() );
+	return ( string( strings_, whiteSpace_, wordBoundary_ )[ action_ ] );
+	M_EPILOG
+}
+
+HString constant( HString::dictionary_t const& strings_, HRuleBase::action_range_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
+	M_PROLOG
+	M_ENSURE( ! strings_.is_empty() );
+	return ( string( strings_, whiteSpace_, wordBoundary_ )[ action_ ] );
+	M_EPILOG
+}
+
+HString constant( HString::dictionary_t const& strings_, HString::action_string_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
+	M_PROLOG
+	M_ENSURE( ! strings_.is_empty() );
+	return ( string( strings_, whiteSpace_, wordBoundary_ )[ action_ ] );
+	M_EPILOG
+}
+
+HString constant( HString::dictionary_t const& strings_, HString::action_string_range_t const& action_, HRuleBase::WHITE_SPACE whiteSpace_, HString::WORD_BOUNDARY wordBoundary_ ) {
+	M_PROLOG
+	M_ENSURE( ! strings_.is_empty() );
+	return ( string( strings_, whiteSpace_, wordBoundary_ )[ action_ ] );
+	M_EPILOG
+}
+
+HString constant( HString::dictionary_t const& strings_, HString::WORD_BOUNDARY wordBoundary_ ) {
+	M_PROLOG
+	M_ENSURE( ! strings_.is_empty() );
+	return ( string( strings_, wordBoundary_ ) );
+	M_EPILOG
+}
+
+HString constant( HString::dictionary_t const& strings_, HRuleBase::action_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
+	M_PROLOG
+	M_ENSURE( ! strings_.is_empty() );
+	return ( string( strings_, wordBoundary_ )[ action_ ] );
+	M_EPILOG
+}
+
+HString constant( HString::dictionary_t const& strings_, HRuleBase::action_range_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
+	M_PROLOG
+	M_ENSURE( ! strings_.is_empty() );
+	return ( string( strings_, wordBoundary_ )[ action_ ] );
+	M_EPILOG
+}
+
+HString constant( HString::dictionary_t const& strings_, HString::action_string_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
+	M_PROLOG
+	M_ENSURE( ! strings_.is_empty() );
+	return ( string( strings_, wordBoundary_ )[ action_ ] );
+	M_EPILOG
+}
+
+HString constant( HString::dictionary_t const& strings_, HString::action_string_range_t const& action_, HString::WORD_BOUNDARY wordBoundary_ ) {
+	M_PROLOG
+	M_ENSURE( ! strings_.is_empty() );
+	return ( string( strings_, wordBoundary_ )[ action_ ] );
 	M_EPILOG
 }
 

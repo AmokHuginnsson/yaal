@@ -292,7 +292,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	HRule val( "value" );
 	HRule parameter(
 		"parameter",
-		( parameterIdentifier ^ ( constant( "..." ) | ":::" ) )
+		( parameterIdentifier ^ ( constant( { "...", ":::" } ) ) )
 		>> -( constant( '=' ) >> HRule( val, HRuleBase::action_range_t( hcore::call( &OCompiler::add_default_value, _compiler.get(), _1 ) ) ) ),
 		HRuleBase::action_range_t( hcore::call( &OCompiler::verify_default_argument, _compiler.get(), _1 ) )
 	);
@@ -400,7 +400,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	);
 	HRule booleanNot(
 		"booleanNot", (
-			constant( '!', HRuleBase::action_range_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::BOOLEAN_NOT, _1 ) ) )
+			characters( "!¬", HRuleBase::action_range_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::BOOLEAN_NOT, _1 ) ) )
 			>> factorial
 		)[
 			e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::BOOLEAN_NOT, _1 ) )
@@ -448,7 +448,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		sum >> -(
 			/* compare action */ (
 				/* comparator operator */ (
-					constant( "<=" ) | ">=" | "<" | ">"
+					constant( { "<=", ">=", "<", ">" } )
 				)[e_p::HString::action_string_range_t( hcore::call( &OCompiler::defer_str_oper, _compiler.get(), _1, _2 ) )]
 				>> sum
 			)[HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::LESS, _1 ) )]
@@ -459,7 +459,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		compare >> -(
 			/* compare action */ (
 				/* comparator operator */ (
-					constant( "==" ) | "!="
+					constant( { "==", "!=" } )
 				)[e_p::HString::action_string_range_t( hcore::call( &OCompiler::defer_str_oper, _compiler.get(), _1, _2 ) )]
 				>> compare
 			)[HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::EQUALS, _1 ) )]
@@ -473,7 +473,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		equality[e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::start_subexpression, _compiler.get(), _1 ) )] >> *(
 			/* boolean action */ (
 				/* boolean operator */ (
-					constant( "&&" ) | "⋀"
+					constant( { "&&", "⋀" } )
 				)[e_p::HString::action_range_t( hcore::call( &OCompiler::add_subexpression, _compiler.get(), OPERATOR::BOOLEAN_AND, _1 ) )]
 				>> equality
 			)[HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::BOOLEAN_AND, _1 ) )]
@@ -485,7 +485,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		HRule( booleanAnd, e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::start_subexpression, _compiler.get(), _1 ) ) ) >> *(
 			/* boolean action */ (
 				/* boolean operator */ (
-					constant( "||" ) | "⋁"
+					constant( { "||", "⋁" } )
 				)[e_p::HString::action_range_t( hcore::call( &OCompiler::add_subexpression, _compiler.get(), OPERATOR::BOOLEAN_OR, _1 ) )]
 				>> booleanAnd
 			)[HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::BOOLEAN_OR, _1 ) )]
@@ -497,7 +497,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		booleanOr >> -(
 			/* boolean action */ (
 				/* boolean operator */ (
-					constant( "^^" ) | "⊕"
+					constant( { "^^", "⊕" } )
 				)[e_p::HString::action_string_range_t( hcore::call( &OCompiler::defer_str_oper, _compiler.get(), _1, _2 ) )]
 				>> booleanOr
 			)[HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::BOOLEAN_XOR, _1 ) )]
@@ -537,7 +537,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 	 * with assignment. You can only change where a reference points to.
 	 */
 	expression %= HRule(
-		* ( assignablePack >> ( constant( "=" ) | "+=" | "-=" | "*=" | "/=" | "%=" | "^=" )[
+		* ( assignablePack >> constant( { "=", "+=", "-=", "*=", "/=", "%=", "^=" } )[
 				e_p::HString::action_string_range_t( hcore::call( &OCompiler::defer_str_oper, _compiler.get(), _1, _2 ) )
 			] ^ '='
 		) >> val,

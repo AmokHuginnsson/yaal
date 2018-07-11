@@ -3104,11 +3104,11 @@ bool is_whitespace( code_point_t char_ ) {
 }
 
 bool is_digit( code_point_t char_ ) {
-	return ( ( char_.get() >= '0' ) && ( char_.get() <= '9' )  );
+	return ( ( char_.get() >= '0' ) && ( char_.get() <= '9' ) );
 }
 
 bool is_dec_digit( code_point_t char_ ) {
-	return ( ( char_.get() >= '0' ) && ( char_.get() <= '9' )  );
+	return ( ( char_.get() >= '0' ) && ( char_.get() <= '9' ) );
 }
 
 bool is_hex_digit( code_point_t char_ ) {
@@ -3116,11 +3116,11 @@ bool is_hex_digit( code_point_t char_ ) {
 }
 
 bool is_oct_digit( code_point_t char_ ) {
-	return ( ( char_.get() >= '0' ) && ( char_.get() <= '7' )  );
+	return ( ( char_.get() >= '0' ) && ( char_.get() <= '7' ) );
 }
 
 bool is_bin_digit( code_point_t char_ ) {
-	return ( ( char_.get() >= '0' ) && ( char_.get() <= '1' )  );
+	return ( ( char_.get() >= '0' ) && ( char_.get() <= '1' ) );
 }
 
 bool is_letter( code_point_t char_ ) {
