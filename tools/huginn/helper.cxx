@@ -535,6 +535,11 @@ bool is_collection( HHuginn::HClass const* class_ ) {
 	);
 }
 
+bool is_collection_like( HHuginn::HClass const* class_ ) {
+	HHuginn::type_id_t t( class_ ? class_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
+	return ( is_collection( class_ ) || ( t == HHuginn::TYPE::STRING ) || ( t == HHuginn::TYPE::UNKNOWN ) );
+}
+
 bool is_comparable( HHuginn::HClass const* class_ ) {
 	HHuginn::type_id_t t( class_ ? class_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
 	return (
@@ -816,6 +821,7 @@ char const* op_to_symbol_str( OPERATOR o_ ) {
 		case ( OPERATOR::GREATER ):            str = ">";      break;
 		case ( OPERATOR::LESS_OR_EQUAL ):      str = "≤";      break;
 		case ( OPERATOR::GREATER_OR_EQUAL ):   str = "≥";      break;
+		case ( OPERATOR::IS_ELEMENT_OF ):      str = "∈";      break;
 		case ( OPERATOR::BOOLEAN_AND ):        str = "⋀";      break;
 		case ( OPERATOR::BOOLEAN_OR ):         str = "⋁";      break;
 		case ( OPERATOR::BOOLEAN_XOR ):        str = "⊕";      break;

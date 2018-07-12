@@ -80,6 +80,7 @@ HHuginn::type_id_t verify_arg_collection_value_type( char const*, HHuginn::value
 
 bool is_numeric( HHuginn::HClass const* );
 bool is_collection( HHuginn::HClass const* );
+bool is_collection_like( HHuginn::HClass const* );
 bool is_numeric_congruent( HHuginn::HClass const* );
 bool is_summable( HHuginn::HClass const* );
 bool is_comparable( HHuginn::HClass const* );

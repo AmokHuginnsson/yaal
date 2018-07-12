@@ -399,7 +399,7 @@ void HHuginn::HList::clear( void ) {
 	M_EPILOG
 }
 
-int long HHuginn::HList::find( huginn::HThread* thread_, int position_, HHuginn::value_t const& val_, int long start_, int long stop_ ) {
+int long HHuginn::HList::find( huginn::HThread* thread_, int position_, HHuginn::value_t const& val_, int long start_, int long stop_ ) const {
 	M_PROLOG
 	if ( stop_ < 0 ) {
 		stop_ = _data.get_size();

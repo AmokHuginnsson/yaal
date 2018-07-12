@@ -1756,6 +1756,7 @@ void OCompiler::defer_str_oper( yaal::hcore::HString const& operator_, executing
 		{ op_to_str( OPERATOR::NOT_EQUALS ),       OPERATOR::NOT_EQUALS },
 		{ op_to_str( OPERATOR::LESS_OR_EQUAL ),    OPERATOR::LESS_OR_EQUAL },
 		{ op_to_str( OPERATOR::GREATER_OR_EQUAL ), OPERATOR::GREATER_OR_EQUAL },
+		{ op_to_str( OPERATOR::IS_ELEMENT_OF ),    OPERATOR::IS_ELEMENT_OF },
 		{ op_to_str( OPERATOR::BOOLEAN_AND ),      OPERATOR::BOOLEAN_AND },
 		{ op_to_str( OPERATOR::BOOLEAN_OR ),       OPERATOR::BOOLEAN_OR },
 		{ op_to_str( OPERATOR::BOOLEAN_XOR ),      OPERATOR::BOOLEAN_XOR },
@@ -1976,13 +1977,14 @@ void OCompiler::dispatch_compare( executing_parser::range_t range_ ) {
 	OPositionedOperator po( fc._operations.top() );
 	OPERATOR o( po._operator );
 	int p( po._position );
-	M_ASSERT( ( o == OPERATOR::LESS ) || ( o == OPERATOR::GREATER ) || ( o == OPERATOR::LESS_OR_EQUAL ) || ( o == OPERATOR::GREATER_OR_EQUAL ) );
+	M_ASSERT( ( o == OPERATOR::LESS ) || ( o == OPERATOR::GREATER ) || ( o == OPERATOR::LESS_OR_EQUAL ) || ( o == OPERATOR::GREATER_OR_EQUAL ) || ( o == OPERATOR::IS_ELEMENT_OF ) );
 	char const* os( op_to_str( o ) );
 	switch ( o ) {
 		case ( OPERATOR::LESS ):             { defer_action( &HExpression::less, range_ );             } break;
 		case ( OPERATOR::GREATER ):          { defer_action( &HExpression::greater, range_ );          } break;
 		case ( OPERATOR::LESS_OR_EQUAL ):    { defer_action( &HExpression::less_or_equal, range_ );    } break;
 		case ( OPERATOR::GREATER_OR_EQUAL ): { defer_action( &HExpression::greater_or_equal, range_ ); } break;
+		case ( OPERATOR::IS_ELEMENT_OF ):    { defer_action( &HExpression::is_element_of, range_ );    } break;
 		default: {
 			M_ASSERT( ! "bad code path"[0] );
 		}
@@ -1994,14 +1996,23 @@ void OCompiler::dispatch_compare( executing_parser::range_t range_ ) {
 	fc._valueTypes.pop();
 	HHuginn::HClass const* c2( fc._valueTypes.top()._class );
 	fc._valueTypes.pop();
-	if ( ! are_congruous( c1, c2 ) ) {
-		operands_type_mismatch( os, c2, c1, _fileId, p );
-	}
-	if ( ! ( is_comparable_congruent( c1 ) && is_comparable_congruent( c2 ) ) ) {
+	if ( o != OPERATOR::IS_ELEMENT_OF ) {
+		if ( ! are_congruous( c1, c2 ) ) {
+			operands_type_mismatch( os, c2, c1, _fileId, p );
+		}
+		if ( ! ( is_comparable_congruent( c1 ) && is_comparable_congruent( c2 ) ) ) {
+			throw HHuginn::HHuginnRuntimeException(
+				hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_CMP] )
+					.append( a_type_name( c2 ) )
+					.append( ", " )
+					.append( a_type_name( c1 ) ),
+				_fileId,
+				p
+			);
+		}
+	} else if ( ! is_collection_like( c1 ) ) {
 		throw HHuginn::HHuginnRuntimeException(
-			hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_CMP] )
-				.append( a_type_name( c2 ) )
-				.append( ", " )
+			hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_COLL] )
 				.append( a_type_name( c1 ) ),
 			_fileId,
 			p

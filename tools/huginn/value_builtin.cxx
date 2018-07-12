@@ -37,7 +37,11 @@ HHuginn::value_t subscript(
 	HObjectFactory& of( *thread_->runtime().object_factory() );
 	if ( ( baseType == HHuginn::TYPE::TUPLE ) || ( baseType == HHuginn::TYPE::LIST ) || ( baseType == HHuginn::TYPE::DEQUE ) || ( baseType == HHuginn::TYPE::STRING ) ) {
 		if ( index_->type_id() != HHuginn::TYPE::INTEGER ) {
-			throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::IDX_NOT_INT] ).append( index_->get_class()->name() ), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException(
+				hcore::to_string( _errMsgHHuginn_[ERR_CODE::IDX_NOT_INT] ).append( a_type_name( index_->get_class() ) ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
 		}
 		HHuginn::HInteger const* i( static_cast<HHuginn::HInteger const*>( index_.raw() ) );
 		int long long index( i->value() );
@@ -75,7 +79,11 @@ HHuginn::value_t subscript(
 		HHuginn::HLookup* l( static_cast<HHuginn::HLookup*>( base_.raw() ) );
 		res = ( subscript_ == HFrame::ACCESS::VALUE ? l->get( thread_, index_, position_ ) : of.create_reference( l->get_ref( thread_, index_, position_ ) ) );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "Subscript is not supported on `"_ys.append( base_->get_class()->name() ).append( "'." ), thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException(
+			"Subscript is not supported on "_ys.append( a_type_name( base_->get_class() ) ).append( "." ),
+			thread_->current_frame()->file_id(),
+			position_
+		);
 	}
 	return ( res );
 }
@@ -216,7 +224,11 @@ HHuginn::value_t range(
 			}
 		} while ( false );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "Range operator is not supported on `"_ys.append( base_->get_class()->name() ).append( "'." ), thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException(
+			"Range operator is not supported on "_ys.append( a_type_name( base_->get_class() ) ).append( "." ),
+			thread_->current_frame()->file_id(),
+			position_
+		);
 	}
 	return ( res );
 }
@@ -476,7 +488,10 @@ HHuginn::value_t factorial( HThread* thread_, HHuginn::value_t const& v_, int po
 			res = thread_->object_factory().create_number( number::factorial( n.to_integer() ) );
 		}
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "There is no `!` operator for `"_ys.append( v_->get_class()->name() ).append( "'." ), thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException(
+			"There is no `!` operator for "_ys.append( a_type_name( v_->get_class() ) ).append( "." ),
+			thread_->current_frame()->file_id(), position_
+		);
 	}
 	return ( res );
 }
@@ -610,7 +625,11 @@ bool fallback_compare( HThread* thread_, HHuginn::identifier_id_t methodIdentifi
 			v = m.function()( thread_, const_cast<HHuginn::value_t*>( &v1_ ), HArguments( thread_, v2_ ), position_ );
 			M_ASSERT( ( v->type_id() == HHuginn::TYPE::BOOLEAN ) || ! thread_->can_continue() );
 		} else {
-			throw HHuginn::HHuginnRuntimeException( "There is no `"_ys.append( oper_ ).append( "' operator for `" ).append( v1_->get_class()->name() ).append( "'." ), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException(
+				"There is no `"_ys.append( oper_ ).append( "' operator for " ).append( a_type_name( v1_->get_class() ) ).append( "." ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
 		}
 	}
 	HHuginn::HBoolean* b( static_cast<HHuginn::HBoolean*>( v.raw() ) );
@@ -743,6 +762,51 @@ bool greater_or_equal( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::v
 	return ( res );
 }
 
+bool is_element_of( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
+	M_ASSERT( is_collection_like( v2_->get_class() ) || ( v2_->type_id() > type_id( HHuginn::TYPE::UNKNOWN ) ) );
+	bool res( false );
+	HHuginn::type_id_t typeId( v2_->type_id() );
+	if ( typeId == HHuginn::TYPE::TUPLE ) {
+		HHuginn::HTuple const& tuple( *static_cast<HHuginn::HTuple const*>( v2_.raw() ) );
+		res = tuple.find( thread_, position_, v1_ ) != HHuginn::HTuple::npos;
+	} else if ( typeId == HHuginn::TYPE::LIST ) {
+		HHuginn::HList const& list( *static_cast<HHuginn::HList const*>( v2_.raw() ) );
+		res = list.find( thread_, position_, v1_ ) != HHuginn::HList::npos;
+	} else if ( typeId == HHuginn::TYPE::DEQUE ) {
+		HHuginn::HDeque const& deque( *static_cast<HHuginn::HDeque const*>( v2_.raw() ) );
+		res = deque.find( thread_, position_, v1_ ) != HHuginn::HDeque::npos;
+	} else if ( typeId == HHuginn::TYPE::DICT ) {
+		HHuginn::HDict const& dict( *static_cast<HHuginn::HDict const*>( v2_.raw() ) );
+		res = dict.has_key( thread_, v1_, position_ );
+	} else if ( typeId == HHuginn::TYPE::LOOKUP ) {
+		HHuginn::HLookup const& lookup( *static_cast<HHuginn::HLookup const*>( v2_.raw() ) );
+		res = lookup.has_key( thread_, v1_, position_ );
+	} else if ( typeId == HHuginn::TYPE::ORDER ) {
+		HHuginn::HOrder const& order( *static_cast<HHuginn::HOrder const*>( v2_.raw() ) );
+		res = order.has_key( thread_, v1_, position_ );
+	} else if ( typeId == HHuginn::TYPE::SET ) {
+		HHuginn::HSet const& set( *static_cast<HHuginn::HSet const*>( v2_.raw() ) );
+		res = set.has_key( thread_, v1_, position_ );
+	} else if ( typeId == HHuginn::TYPE::STRING ) {
+		HString const& string( static_cast<HHuginn::HString const*>( v2_.raw() )->value() );
+		if ( v1_->type_id() != HHuginn::TYPE::CHARACTER ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"Only `character`s can be elements of `string`s.",
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+		res = string.find( static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() ) != HString::npos;
+	} else {
+		throw HHuginn::HHuginnRuntimeException(
+			"There is no `"_ys.append( op_to_str( OPERATOR::IS_ELEMENT_OF ) ).append( "' operator for " ).append( a_type_name( v2_->get_class() ) ).append( "." ),
+			thread_->current_frame()->file_id(),
+			position_
+		);
+	}
+	return ( res );
+}
+
 HHuginn::value_t boolean_xor( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int ) {
 	M_ASSERT( ( v1_->type_id() == HHuginn::TYPE::BOOLEAN ) && ( v2_->type_id() == HHuginn::TYPE::BOOLEAN ) );
 	bool v1( static_cast<HHuginn::HBoolean const*>( v1_.raw() )->value() );
@@ -781,11 +845,11 @@ HHuginn::value_t fallback_conversion( HHuginn::type_id_t type_, HThread* thread_
 			M_ASSERT( ( res->type_id() == type_ ) || ! thread_->can_continue() );
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
-				"Conversion from `"_ys
-					.append( v_->get_class()->name() )
-					.append( "' to `" )
-					.append( type_name( type_ ) )
-					.append( "' is not supported." ),
+				"Conversion from "_ys
+					.append( a_type_name( v_->get_class() ) )
+					.append( " to " )
+					.append( a_type_name( type_ ) )
+					.append( " is not supported." ),
 				thread_->current_frame()->file_id(),
 				position_
 			);

@@ -70,7 +70,7 @@ int _huginnMaxCallStack_( DEFAULT_MAX_CALL_STACK );
 
 namespace huginn {
 
-char const* _errMsgHHuginn_[ 10 ] = {
+char const* _errMsgHHuginn_[ 11 ] = {
 	_( "Operands are not summable: " ),
 	_( "Operands are not subtractable: " ),
 	_( "Operands are not multipliable: " ),
@@ -80,7 +80,8 @@ char const* _errMsgHHuginn_[ 10 ] = {
 	_( "Operand is not a numeric value: " ),
 	_( "Operands are not boolean values: " ),
 	_( "Operand is not a boolean value: " ),
-	_( "Subscript is not an integer: " )
+	_( "Subscript is not an integer: " ),
+	_( "Operand is not a collection type: " )
 };
 
 }

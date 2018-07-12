@@ -62,7 +62,8 @@ enum {
 	OP_NOT_NUM,
 	OPS_NOT_BOOL,
 	OP_NOT_BOOL,
-	IDX_NOT_INT
+	IDX_NOT_INT,
+	OP_NOT_COLL
 };
 }
 
@@ -982,7 +983,7 @@ private:
 	values_t _data;
 public:
 	HTuple( HHuginn::HClass const*, values_t&& );
-	int long find( huginn::HThread*, int, HHuginn::value_t const&, int long = 0, int long = -1 );
+	int long find( huginn::HThread*, int, HHuginn::value_t const&, int long = 0, int long = -1 ) const;
 	value_t get( int long long );
 	values_t const& value( void ) const {
 		return ( _data );
@@ -1009,7 +1010,7 @@ public:
 	void push_back( value_t const& );
 	void pop_back( void );
 	void clear( void );
-	int long find( huginn::HThread*, int, HHuginn::value_t const&, int long = 0, int long = -1 );
+	int long find( huginn::HThread*, int, HHuginn::value_t const&, int long = 0, int long = -1 ) const;
 	value_t get( int long long );
 	value_t& get_ref( int long long );
 	values_t const& value( void ) const {
@@ -1039,7 +1040,7 @@ public:
 	void push_front( value_t const& );
 	void pop_front( void );
 	void clear( void );
-	int long find( huginn::HThread*, int, HHuginn::value_t const&, int long = 0, int long = -1 );
+	int long find( huginn::HThread*, int, HHuginn::value_t const&, int long = 0, int long = -1 ) const;
 	value_t get( int long long );
 	value_t& get_ref( int long long );
 	values_t const& value( void ) const {
