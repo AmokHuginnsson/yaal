@@ -398,18 +398,10 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		"factorial",
 		atom >> -( ( ( constant( '!' ) & "==" ) | ( constant( '!' ) ^ '=' ) )[HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FACTORIAL, _1 ) )] )
 	);
-	HRule booleanNot(
-		"booleanNot", (
-			characters( "!¬", HRuleBase::action_range_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::BOOLEAN_NOT, _1 ) ) )
-			>> factorial
-		)[
-			e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::BOOLEAN_NOT, _1 ) )
-		] | factorial
-	);
 	HRule negation( "negation" );
 	HRule power(
 		"power",
-		booleanNot >> (
+		factorial >> (
 			* ( constant( '^', e_p::HCharacter::action_character_range_t( hcore::call( &OCompiler::defer_oper, _compiler.get(), _1, _2 ) ) ) >> negation )
 		),
 		HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::POWER, _1 ) )
@@ -465,17 +457,25 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 			)[HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::EQUALS, _1 ) )]
 		)
 	);
+	HRule booleanNot(
+		"booleanNot", (
+			characters( "!¬", HRuleBase::action_range_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::BOOLEAN_NOT, _1 ) ) )
+			>> equality
+		)[
+			e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::BOOLEAN_NOT, _1 ) )
+		] | equality
+	);
 	/*
 	 * ( a == b ) && ( c == d ) || ( e == f ) && ( g == h )
 	 */
 	HRule booleanAnd(
 		"booleanAnd",
-		equality[e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::start_subexpression, _compiler.get(), _1 ) )] >> *(
+		booleanNot[e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::start_subexpression, _compiler.get(), _1 ) )] >> *(
 			/* boolean action */ (
 				/* boolean operator */ (
 					constant( { "&&", "⋀" } )
 				)[e_p::HString::action_range_t( hcore::call( &OCompiler::add_subexpression, _compiler.get(), OPERATOR::BOOLEAN_AND, _1 ) )]
-				>> equality
+				>> booleanNot
 			)[HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::BOOLEAN_AND, _1 ) )]
 		),
 		e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::commit_boolean, _compiler.get(), OPERATOR::BOOLEAN_AND, _1 ) )
