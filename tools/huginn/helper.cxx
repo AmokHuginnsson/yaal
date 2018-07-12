@@ -811,15 +811,15 @@ char const* op_to_symbol_str( OPERATOR o_ ) {
 		case ( OPERATOR::FUNCTION_ARGUMENT ):  str = "f(arg)"; break;
 		case ( OPERATOR::MEMBER_ACCESS ):      str = "o.memb"; break;
 		case ( OPERATOR::EQUALS ):             str = "==";     break;
-		case ( OPERATOR::NOT_EQUALS ):         str = "!=";     break;
+		case ( OPERATOR::NOT_EQUALS ):         str = "≠";      break;
 		case ( OPERATOR::LESS ):               str = "<";      break;
 		case ( OPERATOR::GREATER ):            str = ">";      break;
-		case ( OPERATOR::LESS_OR_EQUAL ):      str = "<=";     break;
-		case ( OPERATOR::GREATER_OR_EQUAL ):   str = ">=";     break;
+		case ( OPERATOR::LESS_OR_EQUAL ):      str = "≤";      break;
+		case ( OPERATOR::GREATER_OR_EQUAL ):   str = "≥";      break;
 		case ( OPERATOR::BOOLEAN_AND ):        str = "⋀";      break;
 		case ( OPERATOR::BOOLEAN_OR ):         str = "⋁";      break;
 		case ( OPERATOR::BOOLEAN_XOR ):        str = "⊕";      break;
-		case ( OPERATOR::BOOLEAN_NOT ):        str = "!x";     break;
+		case ( OPERATOR::BOOLEAN_NOT ):        str = "¬x";     break;
 		case ( OPERATOR::TERNARY ):            str = "?:";     break;
 		case ( OPERATOR::MAKE_DICT ):          str = "{k:v}";  break;
 		case ( OPERATOR::MAKE_LOOKUP ):        str = "[k:v]";  break;
@@ -831,9 +831,13 @@ char const* op_to_symbol_str( OPERATOR o_ ) {
 char const* op_to_str( OPERATOR o_ ) {
 	char const* str( "" );
 	switch ( o_ ) {
+		case ( OPERATOR::NOT_EQUALS ):         str = "!=";     break;
+		case ( OPERATOR::LESS_OR_EQUAL ):      str = "<=";     break;
+		case ( OPERATOR::GREATER_OR_EQUAL ):   str = ">=";     break;
 		case ( OPERATOR::BOOLEAN_AND ):        str = "&&";     break;
 		case ( OPERATOR::BOOLEAN_OR ):         str = "||";     break;
 		case ( OPERATOR::BOOLEAN_XOR ):        str = "^^";     break;
+		case ( OPERATOR::BOOLEAN_NOT ):        str = "!x";     break;
 		default: str = op_to_symbol_str( o_ );
 	}
 	return ( str );

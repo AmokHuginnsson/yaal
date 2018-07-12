@@ -440,7 +440,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		sum >> -(
 			/* compare action */ (
 				/* comparator operator */ (
-					constant( { "<=", ">=", "<", ">" } )
+					constant( { "<=", ">=", "<", ">", "≤", "≥" } )
 				)[e_p::HString::action_string_range_t( hcore::call( &OCompiler::defer_str_oper, _compiler.get(), _1, _2 ) )]
 				>> sum
 			)[HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::LESS, _1 ) )]
@@ -451,7 +451,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		compare >> -(
 			/* compare action */ (
 				/* comparator operator */ (
-					constant( { "==", "!=" } )
+					constant( { "==", "!=", "≠" } )
 				)[e_p::HString::action_string_range_t( hcore::call( &OCompiler::defer_str_oper, _compiler.get(), _1, _2 ) )]
 				>> compare
 			)[HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::EQUALS, _1 ) )]
