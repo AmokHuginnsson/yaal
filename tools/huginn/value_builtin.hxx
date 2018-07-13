@@ -8,6 +8,7 @@
 #include "tools/hhuginn.hxx"
 #include "tools/huginn/frame.hxx"
 #include "tools/huginn/helper.hxx"
+#include "tools/huginn/operator.hxx"
 
 namespace yaal {
 
@@ -33,7 +34,7 @@ bool less( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 bool greater( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 bool less_or_equal( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 bool greater_or_equal( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
-bool is_element_of( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
+bool is_element_of( HThread*, OPERATOR, HHuginn::value_t const&, HHuginn::value_t const&, int );
 int long hash( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t boolean_xor( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 HHuginn::value_t boolean_not( HThread*, HHuginn::value_t const&, int );

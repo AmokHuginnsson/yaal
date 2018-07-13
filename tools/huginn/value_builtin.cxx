@@ -762,7 +762,7 @@ bool greater_or_equal( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::v
 	return ( res );
 }
 
-bool is_element_of( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
+bool is_element_of( HThread* thread_, OPERATOR operator_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	M_ASSERT( is_collection_like( v2_->get_class() ) || ( v2_->type_id() > type_id( HHuginn::TYPE::UNKNOWN ) ) );
 	bool res( false );
 	HHuginn::type_id_t typeId( v2_->type_id() );
@@ -799,7 +799,7 @@ bool is_element_of( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::valu
 		res = string.find( static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() ) != HString::npos;
 	} else {
 		throw HHuginn::HHuginnRuntimeException(
-			"There is no `"_ys.append( op_to_str( OPERATOR::IS_ELEMENT_OF ) ).append( "' operator for " ).append( a_type_name( v2_->get_class() ) ).append( "." ),
+			"There is no `"_ys.append( op_to_str( operator_ ) ).append( "' operator for " ).append( a_type_name( v2_->get_class() ) ).append( "." ),
 			thread_->current_frame()->file_id(),
 			position_
 		);

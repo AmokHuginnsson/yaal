@@ -822,6 +822,7 @@ char const* op_to_symbol_str( OPERATOR o_ ) {
 		case ( OPERATOR::LESS_OR_EQUAL ):      str = "≤";      break;
 		case ( OPERATOR::GREATER_OR_EQUAL ):   str = "≥";      break;
 		case ( OPERATOR::IS_ELEMENT_OF ):      str = "∈";      break;
+		case ( OPERATOR::IS_NOT_ELEMENT_OF ):  str = "∉";      break;
 		case ( OPERATOR::BOOLEAN_AND ):        str = "⋀";      break;
 		case ( OPERATOR::BOOLEAN_OR ):         str = "⋁";      break;
 		case ( OPERATOR::BOOLEAN_XOR ):        str = "⊕";      break;

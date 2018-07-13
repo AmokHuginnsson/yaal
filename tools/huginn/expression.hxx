@@ -112,6 +112,7 @@ public:
 	void less_or_equal( OExecutionStep const&, huginn::HFrame* );
 	void greater_or_equal( OExecutionStep const&, huginn::HFrame* );
 	void is_element_of( OExecutionStep const&, huginn::HFrame* );
+	void is_not_element_of( OExecutionStep const&, huginn::HFrame* );
 	void boolean_and( OExecutionStep const&, huginn::HFrame* );
 	void boolean_or( OExecutionStep const&, huginn::HFrame* );
 	void boolean_xor( OExecutionStep const&, huginn::HFrame* );

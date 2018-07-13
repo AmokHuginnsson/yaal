@@ -317,6 +317,7 @@ void HExpression::commit_oper( OPERATOR operator_ ) {
 		case ( OPERATOR::LESS_OR_EQUAL ):
 		case ( OPERATOR::GREATER_OR_EQUAL ):
 		case ( OPERATOR::IS_ELEMENT_OF ):
+		case ( OPERATOR::IS_NOT_ELEMENT_OF ):
 		case ( OPERATOR::PLUS ):
 		case ( OPERATOR::MINUS ):
 		case ( OPERATOR::MULTIPLY ):
@@ -1197,7 +1198,26 @@ void HExpression::is_element_of( OExecutionStep const&, HFrame* frame_ ) {
 	if ( ( c2->type_id() <= type_id( HHuginn::TYPE::UNKNOWN ) ) && ! is_collection_like( c2 ) ) {
 		throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_COLL] ).append( a_type_name( c2 ) ), file_id(), p );
 	}
-	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::is_element_of( frame_->thread(), v1, v2, p ) ) );
+	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::is_element_of( frame_->thread(), OPERATOR::IS_ELEMENT_OF, v1, v2, p ) ) );
+	return;
+	M_EPILOG
+}
+
+void HExpression::is_not_element_of( OExecutionStep const&, HFrame* frame_ ) {
+	M_PROLOG
+	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::IS_NOT_ELEMENT_OF );
+	int p( _instructions[frame_->ip()]._position );
+	++ frame_->ip();
+	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
+	frame_->values().pop();
+	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
+	frame_->values().pop();
+	HHuginn::HClass const* c2( v2->get_class() );
+	if ( ( c2->type_id() <= type_id( HHuginn::TYPE::UNKNOWN ) ) && ! is_collection_like( c2 ) ) {
+		throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_COLL] ).append( a_type_name( c2 ) ), file_id(), p );
+	}
+	frame_->values().push( frame_->thread()->object_factory().create_boolean( ! value_builtin::is_element_of( frame_->thread(), OPERATOR::IS_NOT_ELEMENT_OF, v1, v2, p ) ) );
 	return;
 	M_EPILOG
 }
