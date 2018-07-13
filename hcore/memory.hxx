@@ -47,21 +47,25 @@ struct aligned_storage<T, aligner_type, size, 0> {
 	}
 };
 
-template<int const SIZE, typename T = void>
+template<int const SIZE, typename T = void, bool const DOUBLE_LONG_ALIGNMENT = false>
 struct aligned {
 	typedef typename yaal::trait::ternary<
-		( SIZE > ALIGNOF_INT_LONG ),
-		int long long,
+		DOUBLE_LONG_ALIGNMENT && ( SIZE > ALIGNOF_INT_LONG_LONG ),
+		double long,
 		typename yaal::trait::ternary<
-			( SIZE > ALIGNOF_INT ),
-			int long,
+			( SIZE > ALIGNOF_INT_LONG ),
+			int long long,
 			typename yaal::trait::ternary<
-				( SIZE > ALIGNOF_INT_SHORT ),
-				int,
+				( SIZE > ALIGNOF_INT ),
+				int long,
 				typename yaal::trait::ternary<
-					( SIZE > static_cast<int>( sizeof ( char ) ) ),
-					int short,
-					char
+					( SIZE > ALIGNOF_INT_SHORT ),
+					int,
+					typename yaal::trait::ternary<
+						( SIZE > static_cast<int>( sizeof ( char ) ) ),
+						int short,
+						char
+					>::type
 				>::type
 			>::type
 		>::type

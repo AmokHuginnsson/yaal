@@ -144,7 +144,7 @@ struct pointer_helper {
 
 	template<typename tType>
 	class HSpaceHolderDeleter {
-		typedef typename memory::aligned<static_cast<int>( sizeof ( tType ) ), tType>::type aligner_t;
+		typedef typename memory::aligned<static_cast<int>( sizeof ( tType ) ), tType, true>::type aligner_t;
 		aligner_t _mem;
 	public:
 		HSpaceHolderDeleter( void ) : _mem() {}
