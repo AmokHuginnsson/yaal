@@ -24,6 +24,9 @@ def yaal_lookup_function( val_ ):
 	regex = re.compile( "^yaal::hcore::HUTF8String$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHUTF8StringPrinter( val_ )
+	regex = re.compile( "^yaal::hcore::HTaggedPOD<unsigned int, yaal::code_point_tag>$" )
+	if regex.match( lookup_tag ):
+		return YaalHCoreCodePointPrinter( val_ )
 	regex = re.compile( "^yaal::hcore::HTime$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHTimePrinter( val_ )
@@ -273,6 +276,18 @@ class YaalHCoreHUTF8StringPrinter:
 		byteCount = self._val['_byteCount']
 		BuferMetaSize = gdb.lookup_type( 'yaal::hcore::HUTF8String::OBufferMeta' ).sizeof
 		return ( self._val['_ptr'] + BuferMetaSize + offset ).string( "utf-8", "strict", byteCount )
+
+	def display_hint( self ):
+		return 'string'
+
+class YaalHCoreCodePointPrinter:
+	"Print a yaal::hcore::code_point_t"
+
+	def __init__( self, val_ ):
+		self._val = val_
+
+	def to_string( self ):
+		return ( chr( self._val['_value'] ) )
 
 	def display_hint( self ):
 		return 'string'
@@ -663,7 +678,7 @@ class YaalHCoreHHashMapPrinter:
 				elt = self._atom.cast( nodeType )['_value']['second']
 				self.do_next()
 			self._count = self._count + 1
-			return ( '[%d]' % count, elt )
+			return ( '[%d]' % count, elt.dereference() )
 
 	def __init__( self, val_ ):
 		self._val = val_
