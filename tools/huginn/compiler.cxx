@@ -902,7 +902,7 @@ void OCompiler::commit_enum( executing_parser::range_t range_ ) {
 		)
 	);
 	_submittedEnums.emplace_back(
-		_runtime->object_factory()->create<HHuginn::HValue>( enumDefinition.raw() )
+		_runtime->object_factory()->create<enumeration::HEnumeration>( enumDefinition.raw() )
 	);
 	_classContext.reset();
 	return;

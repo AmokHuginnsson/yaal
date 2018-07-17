@@ -151,7 +151,7 @@ enumeration::HEnumerationClass::ptr_t add_enumeration_as_member(
 ) {
 	M_PROLOG
 	HHuginn::value_t member(
-		juncture_->runtime()->object_factory()->create<HHuginn::HValue>( class_.raw() )
+		juncture_->runtime()->object_factory()->create<enumeration::HEnumeration>( class_.raw() )
 	);
 	juncture_->add_member(
 		HHuginn::HFieldDefinition(

@@ -182,6 +182,14 @@ HHuginn::class_t create_class(
 	return ( c );
 }
 
+HEnumeration::HEnumeration( HHuginn::HClass const* class_ )
+	: HValue( class_ ) {
+}
+
+HHuginn::value_t HEnumeration::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
+	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on enumerations.", thread_->current_frame()->file_id(), position_ );
+}
+
 }
 
 }
@@ -194,7 +202,7 @@ HHuginn::HEnumeral::HEnumeral( HHuginn::HClass const* class_, HHuginn::identifie
 }
 
 HHuginn::value_t HHuginn::HEnumeral::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
-	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on enumerations.", thread_->current_frame()->file_id(), position_ );
+	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on enumerals.", thread_->current_frame()->file_id(), position_ );
 }
 
 }

@@ -70,6 +70,13 @@ private:
 	virtual HHuginn::value_t do_create_instance( huginn::HThread*, HHuginn::values_t&, int ) const __attribute__((noreturn));
 };
 
+class HEnumeration : HHuginn::HValue {
+public:
+	HEnumeration( HHuginn::HClass const* );
+private:
+	virtual HHuginn::value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const __attribute__((noreturn));
+};
+
 HHuginn::class_t create_class(
 	HRuntime*,
 	yaal::hcore::HString const&,
