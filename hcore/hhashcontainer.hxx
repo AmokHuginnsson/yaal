@@ -36,6 +36,13 @@ struct hash<yaal::hcore::HPair<first_t, second_t>> {
 	}
 };
 
+template<typename key_t, typename TAG>
+struct hash<yaal::hcore::HTaggedPOD<key_t, TAG>> {
+	int long operator () ( HTaggedPOD<key_t, TAG> const& key_ ) const {
+		return ( hash<key_t>()( key_.get() ) );
+	}
+};
+
 extern M_YAAL_HCORE_PUBLIC_API int long const* const _primes_;
 
 template<typename value_t, typename hasher_t, typename equal_key_t, typename get_key_t, typename allocator_t>

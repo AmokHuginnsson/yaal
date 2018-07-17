@@ -20,17 +20,6 @@
 
 namespace yaal {
 
-namespace hcore {
-
-template<typename key_t, typename TAG>
-struct hash<hcore::HTaggedPOD<key_t, TAG>> {
-	int long operator () ( HTaggedPOD<key_t, TAG> const& key_ ) const {
-		return ( hash<key_t>()( key_.get() ) );
-	}
-};
-
-}
-
 namespace tools {
 
 namespace huginn {
