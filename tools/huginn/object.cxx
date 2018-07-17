@@ -230,15 +230,26 @@ HHuginn::value_t HHuginn::HObject::do_clone( huginn::HThread* thread_, HHuginn::
 		HHuginn::value_t const& cloneMember( _fields[ idx ] );
 		if ( cloneMember->type_id() != HHuginn::TYPE::METHOD ) {
 			throw HHuginn::HHuginnRuntimeException(
-				"`clone' in class `"_ys
-					.append( get_class()->name() )
-					.append( "' is not a method." ),
+				"`clone' in class "_ys
+					.append( a_type_name( get_class() ) )
+					.append( " is not a method." ),
 				thread_->current_frame()->file_id(),
 				position_
 			);
 		}
 		HHuginn::HClass::HMethod const* m( static_cast<HHuginn::HClass::HMethod const*>( cloneMember.raw() ) );
 		copy = m->function()( thread_, object_, HArguments( thread_ ), position_ );
+		if ( copy->get_class() != get_class() ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"`clone' in class "_ys
+					.append( a_type_name( get_class() ) )
+					.append( " returned object of an invalid type: " )
+					.append( a_type_name( copy->get_class() ) )
+					.append( "." ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
 	} else {
 		values_t fields;
 		for ( value_t const& v : _fields ) {
