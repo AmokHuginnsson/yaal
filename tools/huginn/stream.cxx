@@ -551,15 +551,15 @@ void HStream::write_integer( HThread* thread_, HHuginn::value_t const& value_, H
 	int nWritten( 0 );
 	switch ( toWrite ) {
 		case ( sizeof ( yaal::i8_t ) ): {
-			yaal::i8_t i8( static_cast<yaal::i8_t>( val ) );
+			yaal::i8_t i8( safe_int::cast<yaal::i8_t>( val ) );
 			nWritten = static_cast<int>( _stream->write( &i8, toWrite ) );
 		} break;
 		case ( sizeof ( yaal::i16_t ) ): {
-			yaal::i16_t i16( static_cast<yaal::i16_t>( val ) );
+			yaal::i16_t i16( safe_int::cast<yaal::i16_t>( val ) );
 			nWritten = static_cast<int>( _stream->write( &i16, toWrite ) );
 		} break;
 		case ( sizeof ( yaal::i32_t ) ): {
-			yaal::i32_t i32( static_cast<yaal::i32_t>( val ) );
+			yaal::i32_t i32( safe_int::cast<yaal::i32_t>( val ) );
 			nWritten = static_cast<int>( _stream->write( &i32, toWrite ) );
 		} break;
 		case ( sizeof ( HHuginn::HInteger::value_type ) ): {
@@ -592,15 +592,15 @@ void HStream::write_integer_unsigned( HThread* thread_, HHuginn::value_t const& 
 	int nWritten( 0 );
 	switch ( toWrite ) {
 		case ( sizeof ( yaal::u8_t ) ): {
-			yaal::u8_t u8( static_cast<yaal::u8_t>( val ) );
+			yaal::u8_t u8( safe_int::cast<yaal::u8_t>( val ) );
 			nWritten = static_cast<int>( _stream->write( &u8, toWrite ) );
 		} break;
 		case ( sizeof ( yaal::u16_t ) ): {
-			yaal::u16_t u16( static_cast<yaal::u16_t>( val ) );
+			yaal::u16_t u16( safe_int::cast<yaal::u16_t>( val ) );
 			nWritten = static_cast<int>( _stream->write( &u16, toWrite ) );
 		} break;
 		case ( sizeof ( yaal::u32_t ) ): {
-			yaal::u32_t u32( static_cast<yaal::u32_t>( val ) );
+			yaal::u32_t u32( safe_int::cast<yaal::u32_t>( val ) );
 			nWritten = static_cast<int>( _stream->write( &u32, toWrite ) );
 		} break;
 		case ( sizeof ( HHuginn::HInteger::value_type ) ): {
