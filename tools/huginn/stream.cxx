@@ -658,11 +658,11 @@ void HStream::write_character( HThread* thread_, HHuginn::value_t const& value_,
 	int nWritten( 0 );
 	switch ( toWrite ) {
 		case ( sizeof ( yaal::u8_t ) ): {
-			yaal::u8_t u8( static_cast<yaal::u8_t>( val ) );
+			yaal::u8_t u8( safe_int::cast<yaal::u8_t>( val ) );
 			nWritten = static_cast<int>( _stream->write( &u8, toWrite ) );
 		} break;
 		case ( sizeof ( yaal::u16_t ) ): {
-			yaal::u16_t u16( static_cast<yaal::u16_t>( val ) );
+			yaal::u16_t u16( safe_int::cast<yaal::u16_t>( val ) );
 			nWritten = static_cast<int>( _stream->write( &u16, toWrite ) );
 		} break;
 		case ( sizeof ( HHuginn::HCharacter::value_type ) ): {
