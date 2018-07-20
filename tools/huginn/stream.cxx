@@ -701,7 +701,7 @@ HHuginn::value_t HStream::read_line_impl( HThread* thread_, int position_ ) {
 	M_EPILOG
 }
 
-int long	HStream::read_len( HThread* thread_, int position_ ) {
+int long HStream::read_len( HThread* thread_, int position_ ) {
 	int long len( 0 );
 	int long toRead = static_cast<int>( sizeof ( len ) );
 	int long nRead = _stream->read( &len, toRead );
@@ -938,7 +938,7 @@ HHuginn::class_t HStream::get_class( HRuntime* runtime_ ) {
 	HHuginn::identifier_id_t classIdentifier( runtime_->identifier_id( "Stream" ) );
 	HHuginn::class_t c( runtime_->get_class( classIdentifier ) );
 	if ( ! c ) {
-		c =	runtime_->create_class(
+		c = runtime_->create_class(
 			HRuntime::class_constructor_t(
 				[&runtime_, &classIdentifier] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
 					return (

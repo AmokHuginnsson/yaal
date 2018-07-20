@@ -300,7 +300,11 @@ public:
 								formatedValue.append( space - space / 2, fill );
 							} break;
 							case ( ALIGN::RIGHT ): {
-								formatedValue.shift_right( space, fill );
+								if ( ( type == HHuginn::TYPE::INTEGER ) && ( base != BASE::DEC ) && ( fill == '0'_ycp ) ) {
+									formatedValue.insert( 2, space, fill );
+								} else {
+									formatedValue.shift_right( space, fill );
+								}
 							} break;
 						}
 					}
