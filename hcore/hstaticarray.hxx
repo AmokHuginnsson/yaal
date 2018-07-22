@@ -6,6 +6,8 @@
 #ifndef YAAL_HCORE_HSTATICARRAY_HXX_INCLUDED
 #define YAAL_HCORE_HSTATICARRAY_HXX_INCLUDED 1
 
+#include <initializer_list>
+
 #include "hcore/hexception.hxx"
 #include "hcore/iterator.hxx"
 #include "hcore/algorithm_low.hxx"
@@ -42,12 +44,21 @@ private:
 	type_t _data[trait::to_unsigned<int, N>::value];
 public:
 	HStaticArray( void )
-		: _data()
-		{	}
+		: _data() {
+		return;
+	}
+	HStaticArray( std::initializer_list<value_type> constants_ )
+		: _data() {
+		M_PROLOG
+		assign( constants_.begin(), constants_.end() );
+		return;
+		M_EPILOG
+	}
 	HStaticArray( value_type const& filler_ )
 		: _data() {
 		M_PROLOG
 		fill( filler_ );
+		return;
 		M_EPILOG
 	}
 	template<typename iterator_t>
@@ -164,8 +175,9 @@ public:
 		M_PROLOG
 		using yaal::distance;
 		int long count( distance( first_, last_ ) );
-		if ( count != N )
+		if ( count != N ) {
 			M_THROW( _errMsgHStaticArray_[ ERROR::BAD_SEQUENCE_SIZE ], count );
+		}
 		for ( int i( 0 ); first_ != last_; ++ first_, ++ i ) {
 			_data[i] = *first_;
 		}
@@ -175,8 +187,9 @@ public:
 	template<typename iterator_t>
 	void assign( iterator_t first_, int count_ ) {
 		M_PROLOG
-		if ( count_ != N )
+		if ( count_ != N ) {
 			M_THROW( _errMsgHStaticArray_[ ERROR::COUNT_NOT_MATCH ], count_ );
+		}
 		for ( int i( 0 ); i < count_; ++ first_, ++ i ) {
 			_data[i] = *first_;
 		}
