@@ -39,7 +39,7 @@ public:
 	typedef HReverseIterator<iterator> reverse_iterator;
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 private:
-	type_t _data[N];
+	type_t _data[trait::to_unsigned<int, N>::value];
 public:
 	HStaticArray( void )
 		: _data()

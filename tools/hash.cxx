@@ -481,7 +481,7 @@ inline yaal::hcore::HString hash_to_string( hash_t const& hash_ ) {
 	HString s;
 	s.reserve( 2 * hash_.size() );
 	static int const BUF_SIZE( 3 );
-	char buf[BUF_SIZE];
+	char buf[trait::to_unsigned<int, BUF_SIZE>::value];
 	for ( u8_t o : hash_ ) {
 		snprintf( buf, BUF_SIZE, "%02x", o );
 		s.append( buf );

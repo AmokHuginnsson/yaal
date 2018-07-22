@@ -31,7 +31,7 @@ public:
 private:
 	class HPoolBlock final {
 	private:
-		aligner_t _mem[ HPool<size>::ALIGNER_ELEMENTS_PER_BLOCK ];
+		aligner_t _mem[ trait::to_unsigned<int, HPool<size>::ALIGNER_ELEMENTS_PER_BLOCK>::value ];
 		int _free; /*!< index of first free object */
 		int _used; /*!< number of allocated object in this block pool*/
 		int _index; /*!< This block index in HPool<>. */

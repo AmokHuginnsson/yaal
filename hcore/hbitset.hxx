@@ -21,13 +21,13 @@ template<int const SIZE>
 class HBitset final {
 	typedef u64_t word_t;
 	static int const BITS_IN_WORD = static_cast<int>( sizeof ( word_t ) ) * 8;
-	static word_t const BIT = 0x1LL << ( BITS_IN_WORD - 1 );
+	static word_t const BIT = 0x1ULL << ( BITS_IN_WORD - 1 );
 	static int const WORD_COUNT = SIZE / BITS_IN_WORD + ( SIZE % BITS_IN_WORD ? 1 : 0 );
 public:
-	typedef HBitset<SIZE> this_type;
+	typedef HBitset<trait::to_unsigned<int, SIZE>::value> this_type;
 	class HBitReference;
 private:
-	word_t _buf[WORD_COUNT];
+	word_t _buf[trait::to_unsigned<int, WORD_COUNT>::value];
 public:
 	HBitset()
 		: _buf() {

@@ -175,35 +175,83 @@ typename T::iterator end( T& cont_ ) {
 	return ( cont_.end() );
 }
 
+#if ! defined( __GNUC__ ) || defined( __clang__ )
 template<typename T, int const N>
+T const* begin( T const (&tab_)[N] ) {
+	static_assert( N >= 0, "Invalid array size." );
+	return ( tab_ );
+}
+#else
+template<typename T, int /* fuck */ unsigned const N>
 T const* begin( T const (&tab_)[N] ) {
 	return ( tab_ );
 }
+#endif
 
+#if ! defined( __GNUC__ ) || defined( __clang__ )
 template<typename T, int const N>
+T const* end( T const (&tab_)[N] ) {
+	static_assert( N >= 0, "Invalid array size." );
+	return ( tab_ + N );
+}
+#else
+template<typename T, int /* fuck */ unsigned const N>
 T const* end( T const (&tab_)[N] ) {
 	return ( tab_ + N );
 }
+#endif
 
+#if ! defined( __GNUC__ ) || defined( __clang__ )
 template<typename T, int const N>
+T* begin( T (&tab_)[N] ) {
+	static_assert( N >= 0, "Invalid array size." );
+	return ( tab_ );
+}
+#else
+template<typename T, int /* fuck */ unsigned const N>
 T* begin( T (&tab_)[N] ) {
 	return ( tab_ );
 }
+#endif
 
+#if ! defined( __GNUC__ ) || defined( __clang__ )
 template<typename T, int const N>
+T* end( T (&tab_)[N] ) {
+	static_assert( N >= 0, "Invalid array size." );
+	return ( tab_ + N );
+}
+#else
+template<typename T, int /* fuck */ unsigned const N>
 T* end( T (&tab_)[N] ) {
 	return ( tab_ + N );
 }
+#endif
 
+#if ! defined( __GNUC__ ) || defined( __clang__ )
 template<typename T, int const N>
+T const* cbegin( T (&tab_)[N] ) {
+	static_assert( N >= 0, "Invalid array size." );
+	return ( tab_ );
+}
+#else
+template<typename T, int /* fuck */ unsigned const N>
 T const* cbegin( T (&tab_)[N] ) {
 	return ( tab_ );
 }
+#endif
 
+#if ! defined( __GNUC__ ) || defined( __clang__ )
 template<typename T, int const N>
+T const* cend( T (&tab_)[N] ) {
+	static_assert( N >= 0, "Invalid array size." );
+	return ( tab_ + N );
+}
+#else
+template<typename T, int /* fuck */ unsigned const N>
 T const* cend( T (&tab_)[N] ) {
 	return ( tab_ + N );
 }
+#endif
 
 namespace hcore {
 

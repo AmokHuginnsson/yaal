@@ -401,6 +401,41 @@ struct is_reference<T const&> {
 };
 /*! \endcond */
 
+template<typename T>
+struct make_unsigned {
+	static_assert(
+		find_type<T, int short unsigned, int unsigned, int long unsigned, int long long unsigned>::value >= 0,
+		"Only integral types can be made unsigned."
+	);
+	typedef T type;
+};
+
+template<>
+struct make_unsigned<int short> {
+	typedef int short unsigned type;
+};
+
+template<>
+struct make_unsigned<int> {
+	typedef int unsigned type;
+};
+
+template<>
+struct make_unsigned<int long> {
+	typedef int long unsigned type;
+};
+
+template<>
+struct make_unsigned<int long long> {
+	typedef int long long unsigned type;
+};
+
+template<typename T, T const val>
+struct to_unsigned {
+	static_assert( val >= 0, "Invalid integer constant cast to unsigned." );
+	static typename make_unsigned<T>::type const value = static_cast<typename make_unsigned<T>::type>( val );
+};
+
 /*! \brief Test if given type is a C-array type.
  *
  * \tparam T - type to test for being C style array.
@@ -414,11 +449,20 @@ struct is_array {
 };
 
 /*! \cond */
+#if ! defined( __GNUC__ ) || defined( __clang__ )
 template<typename T, int const SIZE>
+struct is_array<T[SIZE]> {
+	static_assert( SIZE >= 0, "Invalid array size." );
+	static bool const value = true;
+	typedef trait::true_type type;
+};
+#else
+template<typename T, int /* f*ck */ unsigned const SIZE>
 struct is_array<T[SIZE]> {
 	static bool const value = true;
 	typedef trait::true_type type;
 };
+#endif
 
 template<typename T>
 struct is_array<T[]> {
@@ -631,10 +675,18 @@ struct remove_extent {
 };
 
 /*! \cond */
+#if ! defined( __GNUC__ ) || defined( __clang__ )
 template<typename T, int const SIZE>
+struct remove_extent<T[SIZE]> {
+	static_assert( SIZE >= 0, "Invalid array size." );
+	typedef T type;
+};
+#else
+template<typename T, int /* f*ck */ unsigned const SIZE>
 struct remove_extent<T[SIZE]> {
 	typedef T type;
 };
+#endif
 
 template<typename T>
 struct remove_extent<T[]> {

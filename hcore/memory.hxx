@@ -20,7 +20,7 @@ namespace memory {
 template<typename T, typename aligner_type, int const size, int const tail>
 struct aligned_storage {
 	aligner_type _aligner;
-	char _mem[tail];
+	char _mem[trait::to_unsigned<int, tail>::value];
 	aligned_storage( void )
 		: _aligner()
 		, _mem() {
