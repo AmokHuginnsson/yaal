@@ -55,7 +55,7 @@ private:
 	mutable yaal::hcore::HMutex _mutex;
 public:
 	void register_package_creator( yaal::hcore::HString const&, HPackageCreatorInterface* );
-	HHuginn::value_t create_package( HRuntime*, yaal::hcore::HString const&, int );
+	HHuginn::value_t create_package( HRuntime*, yaal::hcore::HString, int );
 	creators_t::iterator begin( void );
 	creators_t::iterator end( void );
 	void initialize_globals( void );

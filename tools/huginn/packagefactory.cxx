@@ -76,7 +76,7 @@ inline void remove_visited( HPackageFactory::visited_imports_t* vi_, HPackageFac
 }
 }
 
-HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, yaal::hcore::HString const& name_, int position_ ) {
+HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, yaal::hcore::HString name_, int position_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	HHuginn::value_t package;
