@@ -196,6 +196,10 @@ HStream::HStream( HHuginn::HClass const* class_, HStreamInterface::ptr_t stream_
 	return;
 }
 
+yaal::hcore::HStreamInterface::ptr_t HStream::raw( void ) const {
+	return ( _stream );
+}
+
 HHuginn::HClass const* HStream::exception_class( void ) const {
 	return ( static_cast<HStreamClass const*>( HValue::get_class() )->exception_class() );
 }

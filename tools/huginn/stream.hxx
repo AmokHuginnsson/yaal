@@ -41,6 +41,7 @@ public:
 	void raise( HThread*, yaal::hcore::HString const&, int, HHuginn::HClass const* = nullptr ) const;
 	bool post_io( huginn::HThread*, int long, int long, IO, int, HHuginn::HClass const* = nullptr ) const;
 	HHuginn::HClass const* exception_class( void ) const;
+	yaal::hcore::HStreamInterface::ptr_t raw( void ) const;
 private:
 	HHuginn::value_t read_blob( HThread*, HHuginn::HInteger::value_type, int );
 	HHuginn::value_t read_string( HThread*, HHuginn::HInteger::value_type, int );
