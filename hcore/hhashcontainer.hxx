@@ -139,20 +139,25 @@ public:
 			int long oldIndex( _index );
 			if ( _atom ) {
 				_atom = _atom->_next;
-				if ( ! _atom )
+				if ( ! _atom ) {
 					++ _index;
+				}
 			}
 			if ( ! _atom ) {
 				typename owner_t::HAtom* const* buckets = _owner->_buckets.template get<typename owner_t::HAtom*>();
-				if ( oldIndex == _owner->_prime )
+				if ( oldIndex == _owner->_prime ) {
 					_index = 0;
-				while ( ( _index < _owner->_prime ) && ! buckets[ _index ] )
+				}
+				while ( ( _index < _owner->_prime ) && ! buckets[ _index ] ) {
 					++ _index;
-				if ( _index < _owner->_prime )
+				}
+				if ( _index < _owner->_prime ) {
 					_atom = buckets[ _index ];
+				}
 			}
-			if ( ! _atom )
+			if ( ! _atom ) {
 				_index = _owner->_prime;
+			}
 			return ( *this );
 		}
 		HIterator& operator -- ( void ) {
@@ -160,24 +165,31 @@ public:
 			typename owner_t::HAtom* const* buckets = _owner->_buckets.template get<typename owner_t::HAtom*>();
 			if ( _atom ) {
 				typename owner_t::HAtom* atom( buckets[ _index ] );
-				while ( ( atom != _atom ) && ( atom->_next != _atom ) )
+				while ( ( atom != _atom ) && ( atom->_next != _atom ) ) {
 					atom = atom->_next;
-				if ( atom == _atom )
+				}
+				if ( atom == _atom ) {
 					_atom = nullptr;
-				else
+				} else {
 					_atom = atom;
+				}
 			}
 			if ( ! _atom ) {
 				if ( _index > 0 ) {
 					-- _index;
-					while ( ( _index > 0 ) && ! buckets[ _index ] )
+					while ( ( _index > 0 ) && ! buckets[ _index ] ) {
 						-- _index;
+					}
 					_atom = buckets[ _index ];
-					while ( _atom && _atom->_next )
+					while ( _atom && _atom->_next ) {
 						_atom = _atom->_next;
-				}
-				else
+					}
+					if ( ! _atom ) {
+						_index = _owner->_prime;
+					}
+				} else {
 					_index = _owner->_prime;
+				}
 			}
 			return ( *this );
 		}
@@ -199,7 +211,10 @@ public:
 	private:
 		friend class HHashContainer<value_type, hasher_type, equal_key_type, get_key_type, allocator_t>;
 		explicit HIterator( owner_t const* owner_, int long index_, typename owner_t::HAtom* atom_ )
-			: _owner( owner_ ), _index( index_ ), _atom( atom_ ) {};
+			: _owner( owner_ )
+			, _index( index_ )
+			, _atom( atom_ ) {
+		}
 	};
 private:
 	int long _prime;
