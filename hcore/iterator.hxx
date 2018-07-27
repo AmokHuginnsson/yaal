@@ -331,6 +331,9 @@ public:
 		++ it;
 		return ( it );
 	}
+	iterator_t const& raw( void ) const {
+		return ( _iterator );
+	}
 	reference operator*( void ) const {
 		return ( *_iterator );
 	}

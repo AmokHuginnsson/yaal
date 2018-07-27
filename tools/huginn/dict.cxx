@@ -153,7 +153,7 @@ protected:
 		++ _skip;
 	}
 	virtual void const* do_node_id( void ) const override {
-		return ( _it.base().node_id() );
+		return ( _it.raw().node_id() );
 	}
 private:
 	HDictReverseIterator( HDictReverseIterator const& ) = delete;
