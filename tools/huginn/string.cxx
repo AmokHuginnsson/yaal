@@ -65,7 +65,7 @@ protected:
 		return ( _objectFactory->create_character( _string->value()[ _index ] ) );
 	}
 	virtual bool do_is_valid( HThread*, int ) override {
-		return ( _index >= 0 );
+		return ( ( _index >= 0 ) && ( _index < _string->value().get_length() ) );
 	}
 	virtual void do_next( HThread*, int ) override {
 		-- _index;

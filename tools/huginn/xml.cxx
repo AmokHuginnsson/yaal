@@ -26,7 +26,9 @@ namespace huginn {
 
 namespace xml {
 
-class HElement : public HHuginn::HValue {
+typedef yaal::hcore::HPointer<yaal::tools::HXml> xml_t;
+
+class HElement : public HHuginn::HIterable {
 public:
 	typedef yaal::hcore::HPointer<yaal::tools::HXml> xml_t;
 private:
@@ -34,13 +36,18 @@ private:
 	yaal::tools::HXml::HNodeProxy _node;
 public:
 	HElement( HHuginn::HClass const* class_, xml_t xml_, yaal::tools::HXml::HNodeProxy const& node_ )
-		: HValue( class_ )
+		: HIterable( class_ )
 		, _xml( xml_ )
 		, _node( node_ ) {
 		return;
 	}
 	HHuginn::value_t name( HThread* thread_ ) const {
 		return ( thread_->object_factory().create_string( _node.get_name() ) );
+	}
+protected:
+	virtual iterator_t do_iterator( HThread*, int ) override;
+	virtual int long do_size( huginn::HThread*, int ) const override {
+		return ( distance( _node.begin(), _node.end() ) );
 	}
 };
 
@@ -103,14 +110,44 @@ public:
 		return ( c );
 		M_EPILOG
 	}
-	private:
-		HElementClass( HElementClass const& ) = delete;
-		HElementClass& operator = ( HElementClass const& ) = delete;
-	};
+private:
+	HElementClass( HElementClass const& ) = delete;
+	HElementClass& operator = ( HElementClass const& ) = delete;
+};
 
-	class HDocument : public HHuginn::HValue {
-	public:
-	typedef yaal::hcore::HPointer<yaal::tools::HXml> xml_t;
+class HElementIterator : public HIteratorInterface {
+	HHuginn::HClass const* _class;
+	xml_t _xml;
+	yaal::tools::HXml::HNodeProxy _node;
+	yaal::tools::HXml::HIterator _it;
+public:
+	HElementIterator( HHuginn::HClass const* class_, xml_t xml_, yaal::tools::HXml::HNodeProxy const& node_ )
+		: _class( class_ )
+		, _xml( xml_ )
+		, _node( node_ )
+		, _it( _node.begin() ) {
+		return;
+	}
+protected:
+	virtual HHuginn::value_t do_value( HThread* thread_, int ) override {
+		return ( thread_->object_factory().create<HElement>( _class, _xml, *_it ) );
+	}
+	virtual bool do_is_valid( huginn::HThread*, int ) override {
+		return ( _it != _node.end() );
+	}
+	virtual void do_next( HThread*, int ) override {
+		++ _it;
+	}
+private:
+	HElementIterator( HElementIterator const& ) = delete;
+	HElementIterator& operator = ( HElementIterator const& ) = delete;
+};
+
+HHuginn::HIterable::iterator_t HElement::do_iterator( HThread*, int ) {
+	return ( make_pointer<HElementIterator>( get_class(), _xml, _node ) );
+}
+
+class HDocument : public HHuginn::HValue {
 private:
 	xml_t _xml;
 public:
@@ -221,7 +258,7 @@ public:
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		HXml& XML( *static_cast<HXml*>( object_->raw() ) );
 		try {
-			xml::HDocument::xml_t doc( make_pointer<yaal::tools::HXml>() );
+			xml::xml_t doc( make_pointer<yaal::tools::HXml>() );
 			HStream& stream( *static_cast<HStream*>( values_[0].raw() ) );
 			doc->load( stream.raw() );
 			v = thread_->object_factory().create<xml::HDocument>( XML._documentClass.raw(), doc );
