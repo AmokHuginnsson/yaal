@@ -859,8 +859,14 @@ HHuginn::value_t fallback_conversion( HHuginn::type_id_t type_, HThread* thread_
 }
 
 HHuginn::value_t fallback_string_conversion( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
-	HCycleTracker cycleTracker;
-	return ( thread_->runtime().object_factory()->create_string( string_representation( thread_, v_, cycleTracker, position_ ) ) );
+	HHuginn::value_t v;
+	if ( v_->get_class()->is_kind_of( BUILTIN::STRING_IDENTIFIER ) ) {
+		v = v_;
+	} else {
+		HCycleTracker cycleTracker;
+		v = thread_->runtime().object_factory()->create_string( string_representation( thread_, v_, cycleTracker, position_ ) );
+	}
+	return ( v );
 }
 
 char const* type_to_cycle_str( HHuginn::TYPE type_ ) {

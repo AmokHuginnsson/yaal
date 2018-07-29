@@ -28,6 +28,20 @@ namespace xml {
 
 typedef yaal::hcore::HPointer<yaal::tools::HXml> xml_t;
 
+namespace {
+
+HHuginn::class_t make_node_class( HRuntime* runtime_, HHuginn::HClass const* origin_, char const* name_, char const* doc_ ) {
+	M_PROLOG
+	HHuginn::class_t c( runtime_->create_class( name_, doc_, HHuginn::ACCESS::PRIVATE ) );
+	c->redefine( runtime_->object_factory()->string_class(), {} );
+	c->set_origin( origin_ );
+	runtime_->huginn()->register_class( c, HHuginn::VISIBILITY::PACKAGE );
+	return ( c );
+	M_EPILOG
+}
+
+}
+
 class HElement : public HHuginn::HIterable {
 public:
 	typedef yaal::hcore::HPointer<yaal::tools::HXml> xml_t;
@@ -51,25 +65,30 @@ protected:
 	}
 };
 
+class HDocumentClass;
+
 class HElementClass : public HHuginn::HClass {
 public:
 	typedef HElementClass this_type;
 	typedef HHuginn::HClass base_type;
 private:
+	HHuginn::HClass const* _documentClass;
 	HHuginn::class_t const& _exceptionClass;
 public:
 	HElementClass(
 		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_,
+		HHuginn::HClass const* documentClass_,
 		HHuginn::class_t const& exceptionClass_,
 		HHuginn::HClass const* origin_
 	) : HHuginn::HClass(
 			runtime_,
 			typeId_,
 			runtime_->identifier_id( "Element" ),
-			"The `Element` class represent a single `XML` `Document` `Element` reference.",
+			"The `Element` class represents a single `XML` `Document` `Element` reference.",
 			HHuginn::ACCESS::PRIVATE
 		)
+		, _documentClass( documentClass_ )
 		, _exceptionClass( exceptionClass_ ) {
 		HHuginn::field_definitions_t fd{
 			{ "name", runtime_->create_method( &HElementClass::element_name ), "get the name of this `Element`" }
@@ -85,19 +104,21 @@ public:
 		return ( element.name( thread_ ) );
 		M_EPILOG
 	}
+	HDocumentClass const* document_class( void ) const;
 	HHuginn::HClass const* exception_class( void ) const {
 		return ( _exceptionClass.raw() );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::class_t const& exceptionClass_ , HHuginn::HClass const* origin_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::HClass const* documentClass_, HHuginn::class_t const& exceptionClass_ , HHuginn::HClass const* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			runtime_->create_class(
 				HRuntime::class_constructor_t(
-					[&runtime_, &exceptionClass_, &origin_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
+					[&runtime_, &documentClass_, &exceptionClass_, &origin_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
 						return (
 							make_pointer<HElementClass>(
 								runtime_,
 								typeId_,
+								documentClass_,
 								exceptionClass_,
 								origin_
 							)
@@ -129,9 +150,7 @@ public:
 		return;
 	}
 protected:
-	virtual HHuginn::value_t do_value( HThread* thread_, int ) override {
-		return ( thread_->object_factory().create<HElement>( _class, _xml, *_it ) );
-	}
+	virtual HHuginn::value_t do_value( HThread* thread_, int ) override;
 	virtual bool do_is_valid( huginn::HThread*, int ) override {
 		return ( _it != _node.end() );
 	}
@@ -173,21 +192,51 @@ public:
 	typedef HHuginn::HClass base_type;
 private:
 	HHuginn::class_t _elementClass;
+	HHuginn::class_t _textClass;
+	HHuginn::class_t _commentClass;
+	HHuginn::class_t _entityClass;
 	HHuginn::class_t const& _exceptionClass;
 public:
 	HDocumentClass(
 		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_,
 		HHuginn::class_t const& exceptionClass_,
-		HHuginn::HClass const* origin_
+		HHuginn::HClass* origin_
 	) : HHuginn::HClass(
 			runtime_,
 			typeId_,
 			runtime_->identifier_id( "Document" ),
-			"The `Document` class represent a single `XML` `Document` instance.",
+			"The `Document` class represents a single `XML` `Document` instance.",
 			HHuginn::ACCESS::PRIVATE
 		)
-		, _elementClass( HElementClass::get_class( runtime_, exceptionClass_, origin_ ) )
+		, _elementClass(
+			add_class_as_member(
+				origin_,
+				HElementClass::get_class( runtime_, this, exceptionClass_, origin_ ),
+				"An `XML` `Element` node type."
+			)
+		)
+		, _textClass(
+			add_class_as_member(
+				origin_,
+				make_node_class( runtime_, origin_, "Text", "The `Text` class represents TEXT node in an `XML` `Document`." ),
+				"An `XML` `TEXT` node type."
+			)
+		)
+		, _commentClass(
+			add_class_as_member(
+				origin_,
+				make_node_class( runtime_, origin_, "Comment", "The `Comment` class represents a comment string in an `XML` `Document`." ),
+				"An `XML` `Comment` node type."
+			)
+		)
+		, _entityClass(
+			add_class_as_member(
+				origin_,
+				make_node_class( runtime_, origin_, "Entity", "The `Entity` class represents an `Entity` reference in an `XML` `Document`." ),
+				"An `XML` `Entity` node type."
+			)
+		)
 		, _exceptionClass( exceptionClass_ ) {
 		HHuginn::field_definitions_t fd{
 			{ "root", runtime_->create_method( &HDocumentClass::root ), "get root element of an `XML` `Document`" }
@@ -207,10 +256,19 @@ public:
 	HHuginn::HClass const* element_class( void ) const {
 		return ( _elementClass.raw() );
 	}
+	HHuginn::HClass const* text_class( void ) const {
+		return ( _textClass.raw() );
+	}
+	HHuginn::HClass const* comment_class( void ) const {
+		return ( _commentClass.raw() );
+	}
+	HHuginn::HClass const* entity_class( void ) const {
+		return ( _entityClass.raw() );
+	}
 	HHuginn::HClass const* exception_class( void ) const {
 		return ( _exceptionClass.raw() );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::class_t const& exceptionClass_, HHuginn::HClass const* origin_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::class_t const& exceptionClass_, HHuginn::HClass* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			runtime_->create_class(
@@ -236,6 +294,38 @@ private:
 	HDocumentClass( HDocumentClass const& ) = delete;
 	HDocumentClass& operator = ( HDocumentClass const& ) = delete;
 };
+
+HDocumentClass const* HElementClass::document_class( void ) const {
+	return ( static_cast<HDocumentClass const *>( _documentClass ) );
+}
+
+HHuginn::value_t HElementIterator::do_value( HThread* thread_, int ) {
+	HHuginn::value_t v;
+	switch ( (*_it).get_type() ) {
+		case ( yaal::tools::HXml::HNode::TYPE::NODE ): {
+			v = thread_->object_factory().create<HElement>( _class, _xml, *_it );
+		} break;
+		case ( yaal::tools::HXml::HNode::TYPE::CONTENT ): {
+			v = thread_->object_factory().create<HHuginn::HString>(
+				static_cast<HElementClass const*>( _class )->document_class()->text_class(),
+				(*_it).get_value()
+			);
+		} break;
+		case ( yaal::tools::HXml::HNode::TYPE::COMMENT ): {
+			v = thread_->object_factory().create<HHuginn::HString>(
+				static_cast<HElementClass const*>( _class )->document_class()->comment_class(),
+				(*_it).get_value()
+			);
+		} break;
+		case ( yaal::tools::HXml::HNode::TYPE::ENTITY ): {
+			v = thread_->object_factory().create<HHuginn::HString>(
+				static_cast<HElementClass const*>( _class )->document_class()->entity_class(),
+				(*_it).get_value()
+			);
+		} break;
+	}
+	return ( v );
+}
 
 }
 

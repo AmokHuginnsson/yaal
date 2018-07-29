@@ -131,7 +131,11 @@ HHuginn::class_t add_class_as_member(
 ) {
 	M_PROLOG
 	HHuginn::value_t member(
-		juncture_->runtime()->object_factory()->create_method_raw( class_->constructor_function() )
+		juncture_->runtime()->object_factory()->create_function_reference(
+			class_->identifier_id(),
+			class_->constructor_function(),
+			"A constructor for "_ys.append( a_type_name( class_.raw() ) ).append( " class." )
+		)
 	);
 	juncture_->add_member(
 		HHuginn::HFieldDefinition(
