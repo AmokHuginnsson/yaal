@@ -182,8 +182,8 @@ public:
 		} else if ( is_enum_class( values_[0].raw() ) ) {
 			k = KIND::ENUM;
 		} else if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-			typeNameId = static_cast<HHuginn::HFunctionReference const*>( values_[0].raw() )->identifier_id();
-			HHuginn::class_t cls( r.get_class( typeNameId ) );
+			HHuginn::HFunctionReference const& fr( *static_cast<HHuginn::HFunctionReference const*>( values_[0].raw() ) );
+			HHuginn::HClass const* cls( r.get_class( fr.function().id() ) );
 			k = !! cls ? KIND::CLASS : KIND::FUNCTION;
 		} else if ( !! r.find_package( typeNameId ) ) {
 			k = KIND::PACKAGE;
@@ -197,6 +197,7 @@ public:
 		HRuntime& r( thread_->runtime() );
 		HString const& package( get_string( values_[0] ) );
 		HHuginn::identifier_id_t id( r.try_identifier_id( package ) );
+		bool packageExists( !! r.find_package( id ) );
 		bool classExists( !! r.get_class( id ) );
 		HHuginn::value_t const* g( r.get_global( id ) );
 		bool enumerationExists( g && is_enum_class( g ) );
@@ -208,10 +209,10 @@ public:
 				position_
 			);
 		}
-		if ( classExists || functionExists || g ) {
+		if ( classExists || functionExists || g || packageExists ) {
 			throw HHuginn::HHuginnRuntimeException(
 				hcore::to_string(
-					enumerationExists ? "Enumeration" : ( classExists ? "Class" : ( functionExists ? "Function" : "Package alias" ) )
+					enumerationExists ? "Enumeration" : ( classExists ? "Class" : ( functionExists ? "Function" : ( packageExists ? "Package" : "Package alias" ) ) )
 				).append( " of the same name already exists." ),
 				thread_->current_frame()->file_id(),
 				position_

@@ -32,17 +32,16 @@ namespace huginn {
 
 typedef yaal::hcore::HString (*str_transform_func_t)( yaal::hcore::HString const& );
 
-class HFileSystem : public HHuginn::HValue {
+class HFileSystem : public HPackage {
 	HHuginn::class_t _streamClass;
 	HHuginn::class_t _directoryScanClass;
 	HHuginn::class_t _timeClass;
 	HHuginn::class_t _fileStatClass;
 	enumeration::HEnumerationClass::ptr_t _openModeClass;
 	enumeration::HEnumerationClass::ptr_t _fileTypeClass;
-	HHuginn::class_t _exceptionClass;
 public:
 	HFileSystem( HHuginn::HClass* class_ )
-		: HValue( class_ )
+		: HPackage( class_ )
 		, _streamClass( HStream::get_class( class_->runtime() ) )
 		, _directoryScanClass( HDirectoryScan::get_class( class_->runtime(), class_ ) )
 		, _timeClass( huginn::HTime::get_class( class_->runtime() ) )
@@ -86,8 +85,7 @@ public:
 				),
 				"set of all possible file types."
 			)
-		)
-		, _exceptionClass( class_exception( class_ ) ) {
+		) {
 		return;
 	}
 	static HHuginn::value_t open( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -108,7 +106,7 @@ public:
 			filesystem::rename( get_string( values_[0] ), get_string( values_[1] ) );
 		} catch ( HFileSystemException const& e ) {
 			HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
-			thread_->raise( fsc->_exceptionClass.raw(), e.what(), position_ );
+			thread_->raise( fsc->exception_class(), e.what(), position_ );
 		}
 		return ( *object_ );
 		M_EPILOG
@@ -120,7 +118,7 @@ public:
 			filesystem::remove( get_string( values_[0] ) );
 		} catch ( HFileSystemException const& e ) {
 			HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
-			thread_->raise( fsc->_exceptionClass.raw(), e.what(), position_ );
+			thread_->raise( fsc->exception_class(), e.what(), position_ );
 		}
 		return ( *object_ );
 		M_EPILOG
@@ -133,7 +131,7 @@ public:
 			v = thread_->object_factory().create_string( pathTransformFunc_( get_string( values_[0] ) ) );
 		} catch ( HFileSystemException const& e ) {
 			HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
-			thread_->raise( fsc->_exceptionClass.raw(), e.what(), position_ );
+			thread_->raise( fsc->exception_class(), e.what(), position_ );
 		}
 		return ( v );
 		M_EPILOG
@@ -149,7 +147,7 @@ public:
 			filesystem::chmod( get_string( values_[0] ), static_cast<u32_t>( mode ) );
 		} catch ( HFileSystemException const& e ) {
 			HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
-			thread_->raise( fsc->_exceptionClass.raw(), e.what(), position_ );
+			thread_->raise( fsc->exception_class(), e.what(), position_ );
 		}
 		return ( *object_ );
 		M_EPILOG
@@ -162,7 +160,7 @@ public:
 		try {
 			v = thread_->object_factory().create<HDirectoryScan>( fsc->_directoryScanClass.raw(), get_string( values_[0] ) );
 		} catch ( HFSItemException const& e ) {
-			thread_->raise( fsc->_exceptionClass.raw(), e.what(), position_ );
+			thread_->raise( fsc->exception_class(), e.what(), position_ );
 		}
 		return ( v );
 		M_EPILOG
@@ -176,7 +174,7 @@ public:
 			thread_->object_factory().create<HFileStat>(
 				fsc->_fileStatClass.raw(),
 				fsc->_fileTypeClass.raw(),
-				fsc->_exceptionClass.raw(),
+				fsc->exception_class(),
 				fsc->_timeClass.raw(),
 				get_string( values_[0] )
 			)
@@ -201,7 +199,7 @@ private:
 		if ( f->is_opened() ) {
 			v = thread_->object_factory().create<HStream>( _streamClass.raw(), stream );
 		} else {
-			thread_->raise( _exceptionClass.raw(), f->get_error(), position_ );
+			thread_->raise( exception_class(), f->get_error(), position_ );
 		}
 		return ( v );
 		M_EPILOG

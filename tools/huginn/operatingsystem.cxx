@@ -29,16 +29,14 @@ namespace tools {
 
 namespace huginn {
 
-class HOperatingSystem : public HHuginn::HValue {
+class HOperatingSystem : public HPackage {
 	HHuginn::class_t _streamClass;
 	HHuginn::class_t _subprocessClass;
-	HHuginn::class_t _exceptionClass;
 public:
 	HOperatingSystem( HHuginn::HClass* class_ )
-		: HValue( class_ )
+		: HPackage( class_ )
 		, _streamClass( HStream::get_class( class_->runtime() ) )
-		, _subprocessClass( HSubprocess::get_class( class_->runtime(), class_ ) )
-		, _exceptionClass( class_exception( class_ ) ) {
+		, _subprocessClass( HSubprocess::get_class( class_->runtime(), class_ ) ) {
 		return;
 	}
 	static HHuginn::value_t env( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -86,7 +84,7 @@ public:
 			argv[i] = const_cast<char*>( argvDataHolder.back().c_str() );
 		}
 		::execvp( argv[0], argv );
-		thread_->raise( static_cast<HOperatingSystem*>( object_->raw() )->_exceptionClass.raw(), strerror( errno ), position_ );
+		thread_->raise( static_cast<HOperatingSystem*>( object_->raw() )->exception_class(), strerror( errno ), position_ );
 		return ( thread_->runtime().none_value() );
 		M_EPILOG
 	}
@@ -111,7 +109,7 @@ public:
 			HOperatingSystem* o( static_cast<HOperatingSystem*>( object_->raw() ) );
 			v = thread_->object_factory().create<HSubprocess>( o->_subprocessClass.raw(), values_ );
 		} catch ( HException const& e ) {
-			thread_->raise( static_cast<HOperatingSystem*>( object_->raw() )->_exceptionClass.raw(), e.what(), position_ );
+			thread_->raise( static_cast<HOperatingSystem*>( object_->raw() )->exception_class(), e.what(), position_ );
 		}
 		return ( v );
 		M_EPILOG

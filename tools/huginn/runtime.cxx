@@ -164,6 +164,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 	, _false( _objectFactory->create_boolean( false ) )
 	, _threads()
 	, _dependencies()
+	, _functionIds()
 	, _classes()
 	, _valuesStore( make_pointer<values_store_t>() )
 	, _globalDefinitions()
@@ -189,6 +190,7 @@ void HRuntime::reset( void ) {
 void HRuntime::copy_text( HRuntime& source_ ) {
 	M_PROLOG
 	M_ASSERT( &source_ != this );
+	bool submoduleContext( _globalDefinitions.at( KEYWORD::ASSERT_IDENTIFIER ) != source_._globalDefinitions.at( KEYWORD::ASSERT_IDENTIFIER ) );
 	_idGenerator = source_._idGenerator;
 	_identifierIds = source_._identifierIds;
 	_identifierNames = source_._identifierNames;
@@ -201,7 +203,10 @@ void HRuntime::copy_text( HRuntime& source_ ) {
 	_incrementalFrame = source_._incrementalFrame;
 	_argv = source_._argv;
 	_valuesStore = source_._valuesStore;
-	_classes = source_._classes;
+	if ( submoduleContext ) {
+		_classes.clear();
+	}
+	_functionIds = source_._functionIds;
 	_dependencies = source_._dependencies;
 	_threads = source_._threads;
 	_false = source_._false;
@@ -214,7 +219,7 @@ void HRuntime::copy_text( HRuntime& source_ ) {
 	_compilerSetup = source_._compilerSetup;
 	fix_references();
 	/* Update global references in sub-module. */
-	if ( _globalDefinitions.at( KEYWORD::ASSERT_IDENTIFIER ) != source_._globalDefinitions.at( KEYWORD::ASSERT_IDENTIFIER ) ) {
+	if ( submoduleContext ) {
 		for ( global_definitions_t::value_type& gc : _globalDefinitions ) {
 			gc.second = source_._globalDefinitions.at( gc.first );
 		}
@@ -266,6 +271,13 @@ HHuginn::class_t HRuntime::get_class( identifier_id_t identifierId_ ) const {
 	M_EPILOG
 }
 
+HHuginn::HClass const* HRuntime::get_class( void const* id_ ) const {
+	M_PROLOG
+	function_ids_t::const_iterator it( _functionIds.find( id_ ) );
+	return ( it != _functionIds.end() ? static_cast<HHuginn::HClass const*>( id_ ) : nullptr );
+	M_EPILOG
+}
+
 void HRuntime::set_max_local_variable_count( int maxLocalVariableCount_ ) {
 	M_PROLOG
 	M_ASSERT( maxLocalVariableCount_ >= 0 );
@@ -287,11 +299,14 @@ void HRuntime::set_max_call_stack_size( int maxCallStackSize_ ) {
 
 void HRuntime::register_class( class_t class_, HHuginn::VISIBILITY classConstructorVisibility_ ) {
 	M_PROLOG
-	if ( _classes.insert( make_pair( class_->identifier_id(), class_ ) ).second ) {
+	if ( _functionIds.insert( class_.raw() ).second ) {
 		_dependencies.push_back( class_ );
 	}
-	if ( ( classConstructorVisibility_ == HHuginn::VISIBILITY::GLOBAL ) && ! is_enum_class( class_.raw() ) ) {
-		_globalDefinitions.insert( make_pair( class_->identifier_id(), &class_->constructor() ) );
+	if ( classConstructorVisibility_ == HHuginn::VISIBILITY::GLOBAL ) {
+		_classes.insert( make_pair( class_->identifier_id(), class_ ) );
+		if ( ! is_enum_class( class_.raw() ) ) {
+			_globalDefinitions.insert( make_pair( class_->identifier_id(), &class_->constructor() ) );
+		}
 	}
 	class_->finalize_registration( this );
 	return;
@@ -300,18 +315,23 @@ void HRuntime::register_class( class_t class_, HHuginn::VISIBILITY classConstruc
 
 void HRuntime::drop_class( identifier_id_t identifier_ ) {
 	M_PROLOG
-	_globalDefinitions.erase( identifier_ );
-	_dependencies.erase(
-		yaal::remove_if(
-			_dependencies.begin(),
-			_dependencies.end(),
-			[&identifier_]( class_t const& class_ ) {
-				return ( class_->identifier_id() == identifier_ );
-			}
-		),
-		_dependencies.end()
-	);
-	_classes.erase( identifier_ );
+	classes_t::iterator it( _classes.find( identifier_ ) );
+	if ( it != _classes.end() ) {
+		HHuginn::type_id_t t( it->second->type_id() );
+		_functionIds.erase( it->second.raw() );
+		_globalDefinitions.erase( identifier_ );
+		_dependencies.erase(
+			yaal::remove_if(
+				_dependencies.begin(),
+				_dependencies.end(),
+				[&t]( class_t const& class_ ) {
+					return ( class_->type_id() == t );
+				}
+			),
+			_dependencies.end()
+		);
+		_classes.erase( it );
+	}
 	return;
 	M_EPILOG
 }
@@ -1067,6 +1087,37 @@ inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterfac
 	M_EPILOG
 }
 
+namespace {
+
+huginn::classes_t class_list( HRuntime::dependencies_t const& dependencies_ ) {
+	M_PROLOG
+	huginn::classes_t classes;
+	for ( HRuntime::dependencies_t::value_type const& c : dependencies_ ) {
+		classes.push_back( c.raw() );
+	}
+	sort(
+		classes.begin(),
+		classes.end(),
+		[]( HHuginn::HClass const* l, HHuginn::HClass const* r ) {
+			return ( l->name() < r->name() );
+		}
+	);
+	classes.erase(
+		unique(
+			classes.begin(),
+			classes.end(),
+			[]( HHuginn::HClass const* l, HHuginn::HClass const* r ) {
+				return ( l->type_id() == r->type_id() );
+			}
+		),
+		classes.end()
+	);
+	return ( classes );
+	M_EPILOG
+}
+
+}
+
 void HRuntime::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) const {
 	M_PROLOG
 	stream_ << "Huginn VM state for `" << _huginn->source_name( MAIN_FILE_ID ) << "'" << endl;
@@ -1077,17 +1128,7 @@ void HRuntime::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) const {
 		}
 		stream_ << "package: " << identifier_name( gd.first ) << " = " << v->get_class()->name() << endl;
 	}
-	huginn::classes_t classes;
-	for ( classes_t::value_type const& c : _classes ) {
-		classes.push_back( c.second.raw() );
-	}
-	sort(
-		classes.begin(),
-		classes.end(),
-		[]( HHuginn::HClass const* l, HHuginn::HClass const* r ) {
-			return ( l->name() < r->name() );
-		}
-	);
+	huginn::classes_t classes( class_list( _dependencies ) );
 	for ( HHuginn::HClass const* c : classes ) {
 		if ( ! is_enum_class( c ) ) {
 			stream_ << *c << endl;
@@ -1125,8 +1166,9 @@ void HRuntime::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) const {
 
 void HRuntime::dump_docs( yaal::hcore::HStreamInterface& stream_ ) const {
 	M_PROLOG
-	for ( classes_t::value_type const& c : _classes ) {
-		HHuginn::HClass const& cls( *c.second );
+	huginn::classes_t classes( class_list( _dependencies ) );
+	for ( huginn::classes_t::value_type const& c : classes ) {
+		HHuginn::HClass const& cls( *c );
 		if ( ! cls.doc().is_empty() ) {
 			stream_ << cls.name() << ":" << cls.doc() << endl;
 		}

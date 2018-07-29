@@ -279,6 +279,16 @@ void cleanup_packages( void ) {
 	M_EPILOG
 }
 
+HPackage::HPackage( HHuginn::HClass* class_ )
+	: HHuginn::HValue( class_ )
+	, _exceptionClass( class_exception( class_ ) ) {
+	return;
+}
+
+HHuginn::HClass const* HPackage::exception_class( void ) const {
+	return ( _exceptionClass.raw() );
+}
+
 }
 
 }

@@ -71,6 +71,17 @@ private:
 	friend class yaal::hcore::HDestructor<HPackageFactory>;
 };
 
+class HPackage : public HHuginn::HValue {
+public:
+	typedef HPackage this_type;
+	typedef HHuginn::HValue base_type;
+private:
+	HHuginn::class_t _exceptionClass;
+public:
+	HPackage( HHuginn::HClass* );
+	HHuginn::HClass const* exception_class( void ) const;
+};
+
 }
 
 }

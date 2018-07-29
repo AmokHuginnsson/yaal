@@ -24,16 +24,14 @@ namespace tools {
 
 namespace huginn {
 
-class HDateTime : public HHuginn::HValue {
+class HDateTime : public HPackage {
 	HHuginn::class_t _timeClass;
 	HHuginn::class_t _clockClass;
-	HHuginn::class_t _exceptionClass;
 public:
 	HDateTime( HHuginn::HClass* class_ )
-		: HValue( class_ )
+		: HPackage( class_ )
 		, _timeClass( HTime::get_class( class_->runtime() ) )
-		, _clockClass( HClock::get_class( class_->runtime(), class_ ) )
-		, _exceptionClass( class_exception( class_ ) ) {
+		, _clockClass( HClock::get_class( class_->runtime(), class_ ) ) {
 		return;
 	}
 	static HHuginn::value_t now( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {

@@ -33,8 +33,8 @@ namespace {
 HHuginn::class_t make_node_class( HRuntime* runtime_, HHuginn::HClass const* origin_, char const* name_, char const* doc_ ) {
 	M_PROLOG
 	HHuginn::class_t c( runtime_->create_class( name_, doc_, HHuginn::ACCESS::PRIVATE ) );
-	c->redefine( runtime_->object_factory()->string_class(), {} );
 	c->set_origin( origin_ );
+	c->redefine( runtime_->object_factory()->string_class(), {} );
 	runtime_->huginn()->register_class( c, HHuginn::VISIBILITY::PACKAGE );
 	return ( c );
 	M_EPILOG

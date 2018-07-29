@@ -24,18 +24,16 @@ namespace tools {
 
 namespace huginn {
 
-class HNetwork : public HHuginn::HValue {
+class HNetwork : public HPackage {
 	struct OPERATIONS {
 		static int const READING = 1;
 		static int const WRITING = 2;
 	};
 	HHuginn::class_t _streamClass;
-	HHuginn::class_t _exceptionClass;
 public:
 	HNetwork( HHuginn::HClass* class_ )
-		: HValue( class_ )
-		, _streamClass( HStream::get_class( class_->runtime() ) )
-		, _exceptionClass( class_exception( class_ ) ) {
+		: HPackage( class_ )
+		, _streamClass( HStream::get_class( class_->runtime() ) ) {
 		return;
 	}
 	static HHuginn::value_t resolve( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -61,7 +59,7 @@ private:
 		if ( arity == ARITY::MULTIPLE ) {
 			port = static_cast<int>( get_integer( values_[1] ) );
 			if ( ( port <= 0 ) || ( port > 65535 ) ) {
-				thread_->raise( _exceptionClass.raw(), "Bad port: "_ys.append( port ), position_ );
+				thread_->raise( exception_class(), "Bad port: "_ys.append( port ), position_ );
 				port = -1;
 			}
 		}
@@ -73,9 +71,9 @@ private:
 				s->connect( get_string( values_[0] ), port );
 				v = thread_->object_factory().create<HStream>( _streamClass.raw(), stream );
 			} catch ( HResolverException const& e ) {
-				thread_->raise( _exceptionClass.raw(), e.what(), position_ );
+				thread_->raise( exception_class(), e.what(), position_ );
 			} catch ( HSocketException const& e ) {
-				thread_->raise( _exceptionClass.raw(), e.what(), position_ );
+				thread_->raise( exception_class(), e.what(), position_ );
 			}
 		}
 		return ( v );

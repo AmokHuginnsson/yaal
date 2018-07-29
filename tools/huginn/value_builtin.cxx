@@ -861,7 +861,7 @@ HHuginn::value_t fallback_conversion( HHuginn::type_id_t type_, HThread* thread_
 HHuginn::value_t fallback_string_conversion( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t v;
 	if ( v_->get_class()->is_kind_of( BUILTIN::STRING_IDENTIFIER ) ) {
-		v = v_;
+		v = thread_->object_factory().create_string( get_string( v_ ) );
 	} else {
 		HCycleTracker cycleTracker;
 		v = thread_->runtime().object_factory()->create_string( string_representation( thread_, v_, cycleTracker, position_ ) );
@@ -911,13 +911,13 @@ yaal::hcore::HString string_representation( HThread* thread_, HHuginn::value_t c
 		} break;
 		case ( HHuginn::TYPE::FUNCTION_REFERENCE ): {
 			if ( thread_ ) {
-				HHuginn::identifier_id_t identifier( static_cast<HHuginn::HFunctionReference const*>( value_.raw() )->identifier_id() );
+				HHuginn::HFunctionReference const& fr( *static_cast<HHuginn::HFunctionReference const*>( value_.raw() ) );
 				HRuntime& r( thread_->runtime() );
-				HHuginn::class_t c( r.get_class( identifier ) );
+				HHuginn::HClass const* c( r.get_class( fr.function().id() ) );
 				if ( !! c && c->origin() ) {
 					str.assign( r.package_name( c->origin() ) ).append( "." );
 				}
-				str.append( r.identifier_name( identifier ) );
+				str.append( r.identifier_name( fr.identifier_id() ) );
 			} else {
 				str = type_name( HHuginn::TYPE::FUNCTION_REFERENCE );
 			}

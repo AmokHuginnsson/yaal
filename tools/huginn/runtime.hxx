@@ -29,6 +29,7 @@ private:
 	typedef yaal::hcore::HLookupMap<yaal::hcore::HString, identifier_id_t> identifier_ids_t;
 	typedef yaal::hcore::HPointer<huginn::HObjectFactory> object_factory_t;
 	typedef yaal::hcore::HLookupMap<identifier_id_t, class_t> classes_t;
+	typedef yaal::hcore::HHashSet<void const*> function_ids_t;
 	typedef yaal::hcore::HLookupMap<identifier_id_t, value_t> values_t;
 	/*! \brief A type for storing functions.
 	 *
@@ -39,8 +40,8 @@ private:
 	typedef yaal::hcore::HList<value_t> values_store_t;
 	typedef yaal::hcore::HPointer<values_store_t> shared_values_store_t;
 	typedef yaal::hcore::HHashMap<identifier_id_t, value_t const*> global_definitions_t;
-	typedef yaal::hcore::HArray<HHuginn::class_t> dependencies_t;
 public:
+	typedef yaal::hcore::HArray<HHuginn::class_t> dependencies_t;
 	typedef yaal::hcore::HArray<yaal::hcore::HString> identifier_names_t;
 	typedef yaal::hcore::HBoundCall<HHuginn::class_t ( type_id_t )> class_constructor_t;
 private:
@@ -70,6 +71,7 @@ private:
 	 * Order of _dependencies and _classes in HRuntime definition is vital!
 	 */
 	dependencies_t _dependencies; /*!< Extra pointers to classes available in runtime, used to enforce order of desturctors! */
+	function_ids_t _functionIds; /*!< Needed by `*function_reference*` to `string` conversion. */
 	classes_t _classes; /*!< All classes defined for this runtime, including classes from submodules. */
 	/*
 	 * 1.
@@ -137,6 +139,7 @@ public:
 	yaal::hcore::HString const& identifier_name( identifier_id_t ) const;
 	value_t const* get_global( identifier_id_t ) const;
 	class_t get_class( identifier_id_t ) const;
+	HHuginn::HClass const* get_class( void const* ) const;
 	HHuginn::value_t find_package( identifier_id_t ) const;
 	void register_class( class_t, HHuginn::VISIBILITY );
 	/*! \brief Remove compiled class from runtime.

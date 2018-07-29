@@ -10,6 +10,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "thread.hxx"
 #include "objectfactory.hxx"
 #include "semanticbuffer.hxx"
+#include "packagefactory.hxx"
 #include "hcore/safe_int.hxx"
 #include "hcore/number.hxx"
 #include "hcore/hfile.hxx"
@@ -207,20 +208,21 @@ HHuginn::HClass const* HStream::exception_class( void ) const {
 void HStream::raise( huginn::HThread* thread_, hcore::HString const& message_, int position_, HHuginn::HClass const* excClass_ ) const {
 	M_PROLOG
 	HRuntime& r( thread_->runtime() );
-	char const* excType( nullptr );
+	char const* packageName( nullptr );
 	HStreamInterface const* s( _stream.raw() );
 	HHuginn::HClass const* c( excClass_ );
 	if ( c ) {
 		/* Exception class was explicitly requested. */
 	} else if ( dynamic_cast<HFile const*>( s ) ) {
-		excType = "FileSystemException";
+		packageName = "FileSystem";
 	} else if ( dynamic_cast<HSocket const*>( s ) || dynamic_cast<HOpenSSL const*>( s ) ) {
-		excType = "NetworkException";
+		packageName = "Network";
 	} else if ( dynamic_cast<HSynchronizedStream const*>( s ) || dynamic_cast<HRawFile const*>( s ) ) {
-		excType = "OperatingSystemException";
+		packageName = "OperatingSystem";
 	}
 	if ( ! c ) {
-		c = excType ? r.get_class( r.identifier_id( excType ) ).raw() : exception_class();
+		HHuginn::value_t package( r.find_package( r.try_identifier_id( packageName ) ) );
+		c = !! package ? static_cast<HPackage*>( package.raw() )->exception_class() : exception_class();
 	}
 	thread_->raise( c, message_, position_ );
 	return;
