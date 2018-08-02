@@ -6,9 +6,11 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
 #include "runtime.hxx"
 #include "tools/stringalgo.hxx"
+#include "tools/hstringstream.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
+#include "stream.hxx"
 #include "packagefactory.hxx"
 #include "objectfactory.hxx"
 
@@ -23,11 +25,26 @@ namespace tools {
 
 namespace huginn {
 
-class HText : public HHuginn::HValue {
+class HText : public HPackage {
+	HHuginn::class_t _streamClass;
 public:
 	HText( HHuginn::HClass* class_ )
-		: HValue( class_ ) {
+		: HPackage( class_ )
+		, _streamClass( HStream::get_class( class_->runtime() ) ) {
 		return;
+	}
+	static HHuginn::value_t stream( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "Text.stream";
+		verify_arg_count( name, values_, 0, 1, thread_, position_ );
+		HText& t( *static_cast<HText*>( object_->raw() ) );
+		HStreamInterface::ptr_t stream( make_pointer<HStringStream>() );
+		HStringStream& ss( *static_cast<HStringStream*>( stream.raw() ) );
+		if ( values_.get_size() > 0 ) {
+			ss << get_string( values_[0] );
+		}
+		return ( thread_->object_factory().create<HStream>( t._streamClass.raw(), stream ) );
+		M_EPILOG
 	}
 	static HHuginn::value_t split( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
@@ -142,6 +159,7 @@ HHuginn::value_t HTextCreator::do_new_instance( HRuntime* runtime_ ) {
 		)
 	);
 	HHuginn::field_definitions_t fd{
+		{ "stream",   runtime_->create_method( &HText::stream ),   "( [*str*] ) - create read/write text `Stream` object" },
 		{ "split",    runtime_->create_method( &HText::split ),    "( *str*, *sep* ) - split `string` *str* by separator *sep* into a `list` of `string`s" },
 		{ "join",     runtime_->create_method( &HText::join ),     "( *coll*, *sep* ) - join all string from *coll* into one `string` using *sep* as separator" },
 		{ "distance", runtime_->create_method( &HText::distance ), "( *first*, *second* ) - calculate Damerau-Levenshtein distance between *first* and *second* `string`s" },

@@ -16,6 +16,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/hfile.hxx"
 #include "hcore/hsocket.hxx"
 #include "hcore/unicode.hxx"
+#include "tools/hstringstream.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -217,11 +218,13 @@ void HStream::raise( huginn::HThread* thread_, hcore::HString const& message_, i
 		packageName = "FileSystem";
 	} else if ( dynamic_cast<HSocket const*>( s ) || dynamic_cast<HOpenSSL const*>( s ) ) {
 		packageName = "Network";
+	} else if ( dynamic_cast<HStringStream const*>( s ) ) {
+		packageName = "Text";
 	} else if ( dynamic_cast<HSynchronizedStream const*>( s ) || dynamic_cast<HRawFile const*>( s ) ) {
 		packageName = "OperatingSystem";
 	}
 	if ( ! c ) {
-		HHuginn::value_t package( r.find_package( r.try_identifier_id( packageName ) ) );
+		HHuginn::value_t package( r.find_package( r.try_identifier_id( packageName ? packageName : "" ) ) );
 		c = !! package ? static_cast<HPackage*>( package.raw() )->exception_class() : exception_class();
 	}
 	thread_->raise( c, message_, position_ );
