@@ -222,6 +222,10 @@ void HRuntime::copy_text( HRuntime& source_ ) {
 	if ( submoduleContext ) {
 		for ( global_definitions_t::value_type& gc : _globalDefinitions ) {
 			gc.second = source_._globalDefinitions.at( gc.first );
+			class_t c( source_.get_class( gc.first ) );
+			if ( !! c ) {
+				_classes.insert( make_pair( gc.first, c ) );
+			}
 		}
 	}
 	return;
