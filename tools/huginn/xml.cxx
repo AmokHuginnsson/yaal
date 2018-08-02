@@ -56,12 +56,22 @@ public:
 		return;
 	}
 	HHuginn::value_t name( HThread* thread_ ) const {
-		return ( thread_->object_factory().create_string( _node.get_name() ) );
+		return ( !! _node ? thread_->object_factory().create_string( _node.get_name() ) : thread_->runtime().none_value() );
 	}
+	HHuginn::value_t append( HThread*, HHuginn::values_t&, int );
 protected:
 	virtual iterator_t do_iterator( HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override {
 		return ( distance( _node.begin(), _node.end() ) );
+	}
+	HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const override {
+		M_PROLOG
+		throw HHuginn::HHuginnRuntimeException(
+			"Copy semantics is not supported on `XML.Element`s.",
+			thread_->current_frame()->file_id(),
+			position_
+		);
+		M_EPILOG
 	}
 };
 
@@ -91,7 +101,8 @@ public:
 		, _documentClass( documentClass_ )
 		, _exceptionClass( exceptionClass_ ) {
 		HHuginn::field_definitions_t fd{
-			{ "name", runtime_->create_method( &HElementClass::element_name ), "get the name of this `Element`" }
+			{ "name",   runtime_->create_method( &HElementClass::element_name ), "get the name of this `Element`" },
+			{ "append", runtime_->create_method( &HElementClass::append ), "( *type*, *value* ) - append new node of type *type* and value *value* at the end of this `Element`" }
 		};
 		set_origin( origin_ );
 		redefine( nullptr, fd );
@@ -102,6 +113,13 @@ public:
 		verify_arg_count( "Element.name", values_, 0, 0, thread_, position_ );
 		HElement& element( *static_cast<HElement*>( object_->raw() ) );
 		return ( element.name( thread_ ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t append( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "Element.append", values_, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::STRING }, thread_, position_ );
+		HElement& element( *static_cast<HElement*>( object_->raw() ) );
+		return ( element.append( thread_, values_, position_ ) );
 		M_EPILOG
 	}
 	HDocumentClass const* document_class( void ) const;
@@ -183,6 +201,11 @@ public:
 	}
 	HHuginn::value_t root( HThread* thread_, HHuginn::HClass const* class_ ) {
 		return ( thread_->object_factory().create<HElement>( class_, _xml, _xml->get_root() ) );
+	}
+	HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
+		M_PROLOG
+		return ( thread_->object_factory().create<HDocument>( get_class(), make_pointer<yaal::tools::HXml>( *_xml ) ) );
+		M_EPILOG
 	}
 };
 
@@ -299,32 +322,68 @@ HDocumentClass const* HElementClass::document_class( void ) const {
 	return ( static_cast<HDocumentClass const *>( _documentClass ) );
 }
 
-HHuginn::value_t HElementIterator::do_value( HThread* thread_, int ) {
+namespace {
+
+HHuginn::value_t make_node_ref( HObjectFactory& of_, HDocumentClass const* dc_, xml_t const& xml_, yaal::tools::HXml::HNodeProxy const& n_ ) {
+	M_PROLOG
 	HHuginn::value_t v;
-	switch ( (*_it).get_type() ) {
+	switch ( n_.get_type() ) {
 		case ( yaal::tools::HXml::HNode::TYPE::NODE ): {
-			v = thread_->object_factory().create<HElement>( _class, _xml, *_it );
+			v = of_.create<HElement>( dc_->element_class(), xml_, n_ );
 		} break;
 		case ( yaal::tools::HXml::HNode::TYPE::CONTENT ): {
-			v = thread_->object_factory().create<HHuginn::HString>(
-				static_cast<HElementClass const*>( _class )->document_class()->text_class(),
-				(*_it).get_value()
-			);
+			v = of_.create<HHuginn::HString>( dc_->text_class(), n_.get_value() );
 		} break;
 		case ( yaal::tools::HXml::HNode::TYPE::COMMENT ): {
-			v = thread_->object_factory().create<HHuginn::HString>(
-				static_cast<HElementClass const*>( _class )->document_class()->comment_class(),
-				(*_it).get_value()
-			);
+			v = of_.create<HHuginn::HString>( dc_->comment_class(), n_.get_value() );
 		} break;
 		case ( yaal::tools::HXml::HNode::TYPE::ENTITY ): {
-			v = thread_->object_factory().create<HHuginn::HString>(
-				static_cast<HElementClass const*>( _class )->document_class()->entity_class(),
-				(*_it).get_value()
-			);
+			v = of_.create<HHuginn::HString>( dc_->entity_class(), n_.get_value() );
 		} break;
 	}
 	return ( v );
+	M_EPILOG
+}
+
+}
+
+HHuginn::value_t HElement::append( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	if ( ! _node ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"Referenced `XML.Element` was removed.",
+			thread_->current_frame()->file_id(),
+			position_
+		);
+	}
+	HElementClass const* ec( static_cast<HElementClass const*>( get_class() ) );
+	HDocumentClass const* dc( ec->document_class() );
+	HHuginn::HFunctionReference& fr( *static_cast<HHuginn::HFunctionReference*>( values_[0].raw() ) );
+	void const* id( fr.function().id() );
+	HRuntime& r( thread_->runtime() );
+	HString const& s( get_string( values_[1] ) );
+	yaal::tools::HXml::HNode::TYPE t( yaal::tools::HXml::HNode::TYPE::NODE );
+	if ( id == dc->element_class() ) {
+		/* node type already set */
+	} else if ( id == dc->text_class() ) {
+		t = yaal::tools::HXml::HNode::TYPE::CONTENT;
+	} else if ( id == dc->comment_class() ) {
+		t = yaal::tools::HXml::HNode::TYPE::COMMENT;
+	} else if ( id == dc->entity_class() ) {
+		t = yaal::tools::HXml::HNode::TYPE::ENTITY;
+	} else {
+		throw HHuginn::HHuginnRuntimeException(
+			"Node type must be one of: `XML.Element`, `XML.Text`, `XML.Comment` or `XML.Entity`, not `"_ys.append( r.identifier_name( fr.identifier_id() ) ).append( "`." ),
+			thread_->current_frame()->file_id(),
+			position_
+		);
+	}
+	return ( make_node_ref( *r.object_factory(), dc, _xml, *_node.add_node( t, s ) ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HElementIterator::do_value( HThread* thread_, int ) {
+	return ( make_node_ref( thread_->object_factory(), static_cast<HElementClass const*>( _class )->document_class(), _xml, *_it ) );
 }
 
 }
