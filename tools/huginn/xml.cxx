@@ -202,6 +202,12 @@ public:
 	HHuginn::value_t root( HThread* thread_, HHuginn::HClass const* class_ ) {
 		return ( thread_->object_factory().create<HElement>( class_, _xml, _xml->get_root() ) );
 	}
+	void save( HStream& stream_ ) {
+		M_PROLOG
+		_xml->save( stream_.raw(), yaal::tools::HXml::GENERATOR::INDENT );
+		return;
+		M_EPILOG
+	}
 	HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
 		M_PROLOG
 		return ( thread_->object_factory().create<HDocument>( get_class(), make_pointer<yaal::tools::HXml>( *_xml ) ) );
@@ -218,11 +224,13 @@ private:
 	HHuginn::class_t _textClass;
 	HHuginn::class_t _commentClass;
 	HHuginn::class_t _entityClass;
+	HHuginn::class_t const& _streamClass;
 	HHuginn::class_t const& _exceptionClass;
 public:
 	HDocumentClass(
 		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_,
+		HHuginn::class_t const& streamClass_,
 		HHuginn::class_t const& exceptionClass_,
 		HHuginn::HClass* origin_
 	) : HHuginn::HClass(
@@ -260,9 +268,11 @@ public:
 				"An `XML` `Entity` node type."
 			)
 		)
+		, _streamClass( streamClass_ )
 		, _exceptionClass( exceptionClass_ ) {
 		HHuginn::field_definitions_t fd{
-			{ "root", runtime_->create_method( &HDocumentClass::root ), "get root element of an `XML` `Document`" }
+			{ "root", runtime_->create_method( &HDocumentClass::root ), "get root element of an `XML` `Document`" },
+			{ "save", runtime_->create_method( &HDocumentClass::save ), "( *stream* ) - save this `Document` to given *stream*" }
 		};
 		set_origin( origin_ );
 		redefine( nullptr, fd );
@@ -274,6 +284,15 @@ public:
 		HDocument& document( *static_cast<HDocument*>( object_->raw() ) );
 		HDocumentClass const& documentClass( *static_cast<HDocumentClass const*>( document.get_class() ) );
 		return ( document.root( thread_, documentClass.element_class() ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t save( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		HDocument& document( *static_cast<HDocument*>( object_->raw() ) );
+		HDocumentClass const& documentClass( *static_cast<HDocumentClass const*>( document.get_class() ) );
+		verify_signature_by_class( "XML.save", values_, { documentClass._streamClass.raw() }, thread_, position_ );
+		document.save( *static_cast<HStream*>( values_[0].raw() ) );
+		return ( *object_ );
 		M_EPILOG
 	}
 	HHuginn::HClass const* element_class( void ) const {
@@ -291,16 +310,17 @@ public:
 	HHuginn::HClass const* exception_class( void ) const {
 		return ( _exceptionClass.raw() );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::class_t const& exceptionClass_, HHuginn::HClass* origin_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::class_t const& streamClass_, HHuginn::class_t const& exceptionClass_, HHuginn::HClass* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			runtime_->create_class(
 				HRuntime::class_constructor_t(
-					[&runtime_, &exceptionClass_, &origin_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
+					[&runtime_, &streamClass_, &exceptionClass_, &origin_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
 						return (
 							make_pointer<HDocumentClass>(
 								runtime_,
 								typeId_,
+								streamClass_,
 								exceptionClass_,
 								origin_
 							)
@@ -395,7 +415,7 @@ class HXml : public HHuginn::HValue {
 public:
 	HXml( HHuginn::HClass* class_ )
 		: HValue( class_ )
-		, _documentClass( xml::HDocumentClass::get_class( class_->runtime(), _exceptionClass, class_ ) )
+		, _documentClass( xml::HDocumentClass::get_class( class_->runtime(), _streamClass, _exceptionClass, class_ ) )
 		, _streamClass( HStream::get_class( class_->runtime() ) )
 		, _exceptionClass( class_exception( class_ ) ) {
 		return;
