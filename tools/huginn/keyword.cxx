@@ -40,11 +40,11 @@ char const* THROW = "throw";
 char const* TRUE = "true";
 char const* TRY = "try";
 char const* WHILE = "while";
-HHuginn::identifier_id_t const CONSTRUCTOR_IDENTIFIER( 0 );
-HHuginn::identifier_id_t const DESTRUCTOR_IDENTIFIER( 1 );
-HHuginn::identifier_id_t const THIS_IDENTIFIER( 2 );
-HHuginn::identifier_id_t const SUPER_IDENTIFIER( 3 );
-HHuginn::identifier_id_t const ASSERT_IDENTIFIER( 4 );
+HHuginn::identifier_id_t const CONSTRUCTOR_IDENTIFIER( INVALID_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const DESTRUCTOR_IDENTIFIER( CONSTRUCTOR_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const THIS_IDENTIFIER( DESTRUCTOR_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const SUPER_IDENTIFIER( THIS_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const ASSERT_IDENTIFIER( SUPER_IDENTIFIER + 1 );
 
 }
 
@@ -80,37 +80,35 @@ char const* TYPE_BOUND_METHOD        = "*bound_method*";
 char const* TYPE_VARIADIC_PARAMETERS = "*variadic_parameters*";
 char const* TYPE_NAMED_PARAMETERS    = "*named_parameters*";
 char const* TYPE_UNKNOWN             = "*unknown*";
-HHuginn::identifier_id_t const INTEGER_IDENTIFIER( 5 );
-HHuginn::identifier_id_t const REAL_IDENTIFIER( 6 );
-HHuginn::identifier_id_t const NUMBER_IDENTIFIER( 7 );
-HHuginn::identifier_id_t const STRING_IDENTIFIER( 8 );
-HHuginn::identifier_id_t const CHARACTER_IDENTIFIER( 9 );
-HHuginn::identifier_id_t const BOOLEAN_IDENTIFIER( 10 );
-HHuginn::identifier_id_t const SIZE_IDENTIFIER( 11 );
-HHuginn::identifier_id_t const TYPE_IDENTIFIER( 12 );
-HHuginn::identifier_id_t const COPY_IDENTIFIER( 13 );
-HHuginn::identifier_id_t const OBSERVE_IDENTIFIER( 14 );
-HHuginn::identifier_id_t const USE_IDENTIFIER( 15 );
-HHuginn::identifier_id_t const TUPLE_IDENTIFIER( 16 );
-HHuginn::identifier_id_t const LIST_IDENTIFIER( 17 );
-HHuginn::identifier_id_t const DEQUE_IDENTIFIER( 18 );
-HHuginn::identifier_id_t const DICT_IDENTIFIER( 19 );
-HHuginn::identifier_id_t const LOOKUP_IDENTIFIER( 20 );
-HHuginn::identifier_id_t const ORDER_IDENTIFIER( 21 );
-HHuginn::identifier_id_t const SET_IDENTIFIER( 22 );
-HHuginn::identifier_id_t const BLOB_IDENTIFIER( 23 );
-HHuginn::identifier_id_t const TYPE_NONE_IDENTIFIER( 24 );
-HHuginn::identifier_id_t const TYPE_OBSERVER_IDENTIFIER( 25 );
-HHuginn::identifier_id_t const TYPE_REFERENCE_IDENTIFIER( 26 );
-HHuginn::identifier_id_t const TYPE_FUNCTION_REFERENCE_IDENTIFIER( 27 );
-HHuginn::identifier_id_t const TYPE_OBJECT_REFERENCE_IDENTIFIER( 28 );
-HHuginn::identifier_id_t const TYPE_METHOD_IDENTIFIER( 29 );
-HHuginn::identifier_id_t const TYPE_UNBOUND_METHOD_IDENTIFIER( 30 );
-HHuginn::identifier_id_t const TYPE_BOUND_METHOD_IDENTIFIER( 31 );
-HHuginn::identifier_id_t const TYPE_VARIADIC_PARAMETERS_IDENTIFIER( 32 );
-HHuginn::identifier_id_t const TYPE_NAMED_PARAMETERS_IDENTIFIER( 33 );
-
-HHuginn::identifier_id_t const TYPE_UNKNOWN_IDENTIFIER( 62 );
+HHuginn::identifier_id_t const INTEGER_IDENTIFIER( KEYWORD::ASSERT_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const REAL_IDENTIFIER( INTEGER_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const NUMBER_IDENTIFIER( REAL_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const STRING_IDENTIFIER( NUMBER_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const CHARACTER_IDENTIFIER( STRING_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const BOOLEAN_IDENTIFIER( CHARACTER_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const SIZE_IDENTIFIER( BOOLEAN_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const TYPE_IDENTIFIER( SIZE_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const COPY_IDENTIFIER( TYPE_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const OBSERVE_IDENTIFIER( COPY_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const USE_IDENTIFIER( OBSERVE_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const TUPLE_IDENTIFIER( USE_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const LIST_IDENTIFIER( TUPLE_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const DEQUE_IDENTIFIER( LIST_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const DICT_IDENTIFIER( DEQUE_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const LOOKUP_IDENTIFIER( DICT_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const ORDER_IDENTIFIER( LOOKUP_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const SET_IDENTIFIER( ORDER_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const BLOB_IDENTIFIER( SET_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const TYPE_NONE_IDENTIFIER( BLOB_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const TYPE_OBSERVER_IDENTIFIER( TYPE_NONE_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const TYPE_REFERENCE_IDENTIFIER( TYPE_OBSERVER_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const TYPE_FUNCTION_REFERENCE_IDENTIFIER( TYPE_REFERENCE_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const TYPE_OBJECT_REFERENCE_IDENTIFIER( TYPE_FUNCTION_REFERENCE_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const TYPE_METHOD_IDENTIFIER( TYPE_OBJECT_REFERENCE_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const TYPE_UNBOUND_METHOD_IDENTIFIER( TYPE_METHOD_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const TYPE_BOUND_METHOD_IDENTIFIER( TYPE_UNBOUND_METHOD_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const TYPE_VARIADIC_PARAMETERS_IDENTIFIER( TYPE_BOUND_METHOD_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const TYPE_NAMED_PARAMETERS_IDENTIFIER( TYPE_VARIADIC_PARAMETERS_IDENTIFIER + 1 );
 
 }
 
@@ -143,42 +141,49 @@ char const* TO_REAL          = "to_real";
 char const* TO_NUMBER        = "to_number";
 char const* TO_CHARACTER     = "to_character";
 char const* TO_BOOLEAN       = "to_boolean";
-HHuginn::identifier_id_t const CLONE_IDENTIFIER( 34 );
-HHuginn::identifier_id_t const GET_SIZE_IDENTIFIER( 35 );
-HHuginn::identifier_id_t const ITERATOR_IDENTIFIER( 36 );
-HHuginn::identifier_id_t const IS_VALID_IDENTIFIER( 37 );
-HHuginn::identifier_id_t const NEXT_IDENTIFIER( 38 );
-HHuginn::identifier_id_t const VALUE_IDENTIFIER( 39 );
-HHuginn::identifier_id_t const CALL_IDENTIFIER( 40 );
-HHuginn::identifier_id_t const HASH_IDENTIFIER( 41 );
-HHuginn::identifier_id_t const EQUALS_IDENTIFIER( 42 );
-HHuginn::identifier_id_t const LESS_IDENTIFIER( 43 );
-HHuginn::identifier_id_t const GREATER_IDENTIFIER( 44 );
-HHuginn::identifier_id_t const LESS_OR_EQUAL_IDENTIFIER( 45 );
-HHuginn::identifier_id_t const GREATER_OR_EQUAL_IDENTIFIER( 46 );
-HHuginn::identifier_id_t const ADD_IDENTIFIER( 47 );
-HHuginn::identifier_id_t const SUBTRACT_IDENTIFIER( 48 );
-HHuginn::identifier_id_t const MULTIPLY_IDENTIFIER( 49 );
-HHuginn::identifier_id_t const DIVIDE_IDENTIFIER( 50 );
-HHuginn::identifier_id_t const MODULO_IDENTIFIER( 51 );
-HHuginn::identifier_id_t const POWER_IDENTIFIER( 52 );
-HHuginn::identifier_id_t const MODULUS_IDENTIFIER( 53 );
-HHuginn::identifier_id_t const NEGATE_IDENTIFIER( 54 );
-HHuginn::identifier_id_t const TO_STRING_IDENTIFIER( 55 );
-HHuginn::identifier_id_t const TO_INTEGER_IDENTIFIER( 56 );
-HHuginn::identifier_id_t const TO_REAL_IDENTIFIER( 57 );
-HHuginn::identifier_id_t const TO_NUMBER_IDENTIFIER( 58 );
-HHuginn::identifier_id_t const TO_CHARACTER_IDENTIFIER( 59 );
-HHuginn::identifier_id_t const TO_BOOLEAN_IDENTIFIER( 60 );
+HHuginn::identifier_id_t const CLONE_IDENTIFIER( BUILTIN::TYPE_NAMED_PARAMETERS_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const GET_SIZE_IDENTIFIER( CLONE_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const ITERATOR_IDENTIFIER( GET_SIZE_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const IS_VALID_IDENTIFIER( ITERATOR_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const NEXT_IDENTIFIER( IS_VALID_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const VALUE_IDENTIFIER( NEXT_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const CALL_IDENTIFIER( VALUE_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const HASH_IDENTIFIER( CALL_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const EQUALS_IDENTIFIER( HASH_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const LESS_IDENTIFIER( EQUALS_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const GREATER_IDENTIFIER( LESS_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const LESS_OR_EQUAL_IDENTIFIER( GREATER_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const GREATER_OR_EQUAL_IDENTIFIER( LESS_OR_EQUAL_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const ADD_IDENTIFIER( GREATER_OR_EQUAL_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const SUBTRACT_IDENTIFIER( ADD_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const MULTIPLY_IDENTIFIER( SUBTRACT_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const DIVIDE_IDENTIFIER( MULTIPLY_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const MODULO_IDENTIFIER( DIVIDE_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const POWER_IDENTIFIER( MODULO_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const MODULUS_IDENTIFIER( POWER_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const NEGATE_IDENTIFIER( MODULUS_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const TO_STRING_IDENTIFIER( NEGATE_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const TO_INTEGER_IDENTIFIER( TO_STRING_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const TO_REAL_IDENTIFIER( TO_INTEGER_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const TO_NUMBER_IDENTIFIER( TO_REAL_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const TO_CHARACTER_IDENTIFIER( TO_NUMBER_IDENTIFIER + 1 );
+HHuginn::identifier_id_t const TO_BOOLEAN_IDENTIFIER( TO_CHARACTER_IDENTIFIER + 1 );
 
 }
 
 namespace STANDARD_FUNCTIONS {
 
 char const* MAIN = "main";
-HHuginn::identifier_id_t const MAIN_IDENTIFIER( 61 );
+HHuginn::identifier_id_t const MAIN_IDENTIFIER( INTERFACE::TO_BOOLEAN_IDENTIFIER + 1 );
 
 }
+
+namespace BUILTIN {
+
+HHuginn::identifier_id_t const TYPE_UNKNOWN_IDENTIFIER( STANDARD_FUNCTIONS::MAIN_IDENTIFIER + 1 );
+
+}
+
 
 words_t _directives_ = {{
 	"import"
