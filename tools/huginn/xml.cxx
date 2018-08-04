@@ -59,6 +59,8 @@ public:
 		return ( !! _node ? thread_->object_factory().create_string( _node.get_name() ) : thread_->runtime().none_value() );
 	}
 	HHuginn::value_t append( HThread*, HHuginn::values_t&, int );
+	HHuginn::value_t parent( HThread* );
+	HHuginn::value_t document( HThread* );
 protected:
 	virtual iterator_t do_iterator( HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override {
@@ -101,8 +103,10 @@ public:
 		, _documentClass( documentClass_ )
 		, _exceptionClass( exceptionClass_ ) {
 		HHuginn::field_definitions_t fd{
-			{ "name",   runtime_->create_method( &HElementClass::element_name ), "get the name of this `Element`" },
-			{ "append", runtime_->create_method( &HElementClass::append ), "( *type*, *value* ) - append new node of type *type* and value *value* at the end of this `Element`" }
+			{ "name",     runtime_->create_method( &HElementClass::element_name ), "get the name of this `Element`" },
+			{ "parent",   runtime_->create_method( &HElementClass::parent ),       "get parent node of this `Element`" },
+			{ "document", runtime_->create_method( &HElementClass::document ),     "get an `XML` `Document` to which this `Element` belongs to" },
+			{ "append",   runtime_->create_method( &HElementClass::append ),       "( *type*, *value* ) - append new node of type *type* and value *value* at the end of this `Element`" }
 		};
 		set_origin( origin_ );
 		redefine( nullptr, fd );
@@ -113,6 +117,20 @@ public:
 		verify_arg_count( "Element.name", values_, 0, 0, thread_, position_ );
 		HElement& element( *static_cast<HElement*>( object_->raw() ) );
 		return ( element.name( thread_ ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t parent( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( "Element.parent", values_, 0, 0, thread_, position_ );
+		HElement& element( *static_cast<HElement*>( object_->raw() ) );
+		return ( element.parent( thread_ ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t document( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( "Element.document", values_, 0, 0, thread_, position_ );
+		HElement& element( *static_cast<HElement*>( object_->raw() ) );
+		return ( element.document( thread_ ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t append( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -399,6 +417,27 @@ HHuginn::value_t HElement::append( HThread* thread_, HHuginn::values_t& values_,
 		);
 	}
 	return ( make_node_ref( *r.object_factory(), dc, _xml, *_node.add_node( t, s ) ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HElement::parent( HThread* thread_ ) {
+	M_PROLOG
+	HElementClass const* ec( static_cast<HElementClass const*>( get_class() ) );
+	HDocumentClass const* dc( ec->document_class() );
+	yaal::tools::HXml::HNodeProxy n( _node.get_parent() );
+	return (
+		!! n
+			? thread_->object_factory().create<HElement>( dc->element_class(), _xml, n )
+			: thread_->runtime().none_value()
+	);
+	M_EPILOG
+}
+
+HHuginn::value_t HElement::document( HThread* thread_ ) {
+	M_PROLOG
+	HElementClass const* ec( static_cast<HElementClass const*>( get_class() ) );
+	HDocumentClass const* dc( ec->document_class() );
+	return ( thread_->object_factory().create<xml::HDocument>( dc, _xml ) );
 	M_EPILOG
 }
 
