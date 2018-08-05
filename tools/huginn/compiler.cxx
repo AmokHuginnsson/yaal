@@ -50,7 +50,7 @@ OCompiler::OScopeContext::OScopeContext(
 	, _scope( make_pointer<HScope>( statementId_, fileId_, range_ ) )
 	, _expressionsStack()
 	, _variableTypes()
-	, _exceptionType( INVALID_IDENTIFIER )
+	, _exceptionType( IDENTIFIER::INVALID )
 	, _assertExpressionEnd( 0 )
 	, _scopeChain()
 	, _else()
@@ -140,8 +140,8 @@ OCompiler::expressions_stack_t& OCompiler::OFunctionContext::expressions_stack( 
 }
 
 OCompiler::OClassContext::OClassContext( void )
-	: _classIdentifier( INVALID_IDENTIFIER )
-	, _baseName( INVALID_IDENTIFIER )
+	: _classIdentifier( IDENTIFIER::INVALID )
+	, _baseName( IDENTIFIER::INVALID )
 	, _fieldNames()
 	, _fieldDefinitions()
 	, _methods()
@@ -219,15 +219,15 @@ void OCompiler::OClassNoter::note( yaal::hcore::HString const& name_, executing_
 }
 
 OCompiler::OImportInfo::OImportInfo( void )
-	: _package( INVALID_IDENTIFIER )
-	, _alias( INVALID_IDENTIFIER )
+	: _package( IDENTIFIER::INVALID )
+	, _alias( IDENTIFIER::INVALID )
 	, _position( 0 ) {
 	return;
 }
 
 OCompiler::OImportInfo::OImportInfo( OImportInfo&& other_ )
-	: _package( INVALID_IDENTIFIER )
-	, _alias( INVALID_IDENTIFIER )
+	: _package( IDENTIFIER::INVALID )
+	, _alias( IDENTIFIER::INVALID )
 	, _position( 0 ) {
 	swap( other_ );
 	return;
@@ -242,8 +242,8 @@ void OCompiler::OImportInfo::swap( OImportInfo& other_ ) {
 }
 
 void OCompiler::OImportInfo::reset( void ) {
-	_package = INVALID_IDENTIFIER;
-	_alias = INVALID_IDENTIFIER;
+	_package = IDENTIFIER::INVALID;
+	_alias = IDENTIFIER::INVALID;
 	_position = 0;
 	return;
 }
@@ -311,13 +311,13 @@ void OCompiler::set_setup( HIntrospectorInterface* introspector_, bool preloaded
 void OCompiler::resolve_symbols( void ) {
 	M_PROLOG
 	M_ASSERT( _submittedClasses.is_empty() );
-	HHuginn::identifier_id_t lastClassId( INVALID_IDENTIFIER );
+	HHuginn::identifier_id_t lastClassId( IDENTIFIER::INVALID );
 	HHuginn::class_t aClass;
 	int maxLocalVariableCount( 0 );
 	for ( OExecutionStep& es : _executionStepsBacklog ) {
 		try {
 			if ( es._classId != lastClassId ) {
-				if ( es._classId != INVALID_IDENTIFIER ) {
+				if ( es._classId != IDENTIFIER::INVALID ) {
 					aClass = _runtime->get_class( es._classId );
 					M_ASSERT( !! aClass );
 				} else {
@@ -519,7 +519,7 @@ void OCompiler::resolve_symbols( void ) {
 			} while ( false );
 		} catch ( ... ) {
 			/* For incremental mode. */
-			if ( es._classId != INVALID_IDENTIFIER ) {
+			if ( es._classId != IDENTIFIER::INVALID ) {
 				_runtime->drop_class( es._classId );
 			} else {
 				_runtime->drop_global( es._scope->_functionId );
@@ -568,7 +568,7 @@ HString use_name( HHuginn::SYMBOL_KIND symbolKind_ ) {
 void OCompiler::detect_misuse( void ) const {
 	M_PROLOG
 	HHuginn::identifier_id_t implicitUse[] = {
-		STANDARD_FUNCTIONS::MAIN_IDENTIFIER,
+		IDENTIFIER::STANDARD_FUNCTIONS::MAIN,
 		_runtime->identifier_id( INTERFACE::GET_SIZE ),
 		_runtime->identifier_id( INTERFACE::ITERATOR ),
 		_runtime->identifier_id( INTERFACE::IS_VALID ),
@@ -793,7 +793,7 @@ void OCompiler::check_name_function( HHuginn::identifier_id_t identifier_, execu
 void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	HHuginn::identifier_id_t functionIdentifier( _runtime->identifier_id( name_ ) );
-	bool isCtorDtor( ( functionIdentifier == KEYWORD::CONSTRUCTOR_IDENTIFIER ) || ( functionIdentifier == KEYWORD::DESTRUCTOR_IDENTIFIER ) );
+	bool isCtorDtor( ( functionIdentifier == IDENTIFIER::KEYWORD::CONSTRUCTOR ) || ( functionIdentifier == IDENTIFIER::KEYWORD::DESTRUCTOR ) );
 	if ( is_restricted( name_ ) ) {
 		if ( ! _classContext || ! isCtorDtor ) {
 			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), _fileId, range_.start() );
@@ -1033,10 +1033,10 @@ void OCompiler::create_function( executing_parser::range_t range_ ) {
 OCompiler::function_info_t OCompiler::create_function_low( executing_parser::range_t ) {
 	M_PROLOG
 	OCompiler::OFunctionContext& fc( f() );
-	M_ASSERT( fc._functionIdentifier != INVALID_IDENTIFIER );
+	M_ASSERT( fc._functionIdentifier != IDENTIFIER::INVALID );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	HHuginn::scope_t scope( pop_scope_context() );
-	bool isIncrementalMain( _isIncremental && ( fc._functionIdentifier == STANDARD_FUNCTIONS::MAIN_IDENTIFIER ) && ! _classContext );
+	bool isIncrementalMain( _isIncremental && ( fc._functionIdentifier == IDENTIFIER::STANDARD_FUNCTIONS::MAIN ) && ! _classContext );
 	if ( isIncrementalMain ) {
 		for ( int i( _mainExecutedStatementCount ); i > 0; -- i ) {
 			scope->remove_statement( i - 1 );
@@ -1100,7 +1100,7 @@ void OCompiler::track_name_cycle( HHuginn::identifier_id_t identifierId_ ) {
 	hierarchy_t hierarchy;
 	OClassContext const* cc( _submittedClasses.at( identifierId_ ).get() );
 	names.insert( identifierId_ );
-	while ( cc->_baseName != INVALID_IDENTIFIER ) {
+	while ( cc->_baseName != IDENTIFIER::INVALID ) {
 		submitted_classes_t::const_iterator it( _submittedClasses.find( cc->_baseName ) );
 		if ( it == _submittedClasses.end() ) {
 			if ( ! _runtime->get_class( cc->_baseName ) ) {
@@ -1173,7 +1173,7 @@ void OCompiler::add_parameter( yaal::hcore::HString const& name_, executing_pars
 		OExecutionStep::OPERATION::DEFINE,
 		HHuginn::expression_t(),
 		fc._scopeStack.top(),
-		!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
+		!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : IDENTIFIER::INVALID,
 		-1,
 		parameterIdentifier,
 		range_.start()
@@ -1513,7 +1513,7 @@ void OCompiler::commit_assignable( executing_parser::range_t range_ ) {
 	OFunctionContext& fc( f() );
 	mark_expression_position( range_ );
 	M_ASSERT( ! fc._variables.is_empty() );
-	if ( fc._variables.top()._identifier != INVALID_IDENTIFIER ) {
+	if ( fc._variables.top()._identifier != IDENTIFIER::INVALID ) {
 		note_type( fc._variables.top()._identifier, type_to_class( HHuginn::TYPE::UNKNOWN ) );
 	}
 	fc._variables.clear();
@@ -2143,10 +2143,10 @@ void OCompiler::dispatch_assign( executing_parser::range_t range_ ) {
 			if ( compiled_type_id( realDestType ) == HHuginn::TYPE::UNKNOWN ) {
 				realDestType = guess_type( varRef._identifier );
 			}
-			if ( varRef._identifier != INVALID_IDENTIFIER ) {
+			if ( varRef._identifier != IDENTIFIER::INVALID ) {
 				note_type( varRef._identifier, srcType );
 			}
-			if ( varRef._identifier != INVALID_IDENTIFIER ) {
+			if ( varRef._identifier != IDENTIFIER::INVALID ) {
 				if ( o == OPERATOR::ASSIGN ) {
 					_usedIdentifiers[varRef._identifier].write( range_.start(), HHuginn::SYMBOL_KIND::VARIABLE );
 				} else if ( are_congruous( srcType, realDestType ) ) {
@@ -2212,7 +2212,7 @@ void OCompiler::dispatch_assign( executing_parser::range_t range_ ) {
 			for ( int i( 0 ); i < varCount; ++ i ) {
 				fc._valueTypes.pop();
 				OFunctionContext::OVariableRef varRef( fc._variables.top() );
-				if ( varRef._identifier != INVALID_IDENTIFIER ) {
+				if ( varRef._identifier != IDENTIFIER::INVALID ) {
 					_usedIdentifiers[varRef._identifier].write( range_.start(), HHuginn::SYMBOL_KIND::VARIABLE );
 				}
 				fc._variables.pop();
@@ -2299,23 +2299,23 @@ HHuginn::HClass const* OCompiler::function_ref_to_class( HHuginn::identifier_id_
 	HHuginn::type_id_t t( type_id( HHuginn::TYPE::UNKNOWN ) );
 	typedef HHashMap<HHuginn::identifier_id_t, HHuginn::type_id_t> fun_to_type_t;
 	static fun_to_type_t const funToType = {
-		{ BUILTIN::INTEGER_IDENTIFIER,   type_id( HHuginn::TYPE::INTEGER ) },
-		{ BUILTIN::REAL_IDENTIFIER,      type_id( HHuginn::TYPE::REAL ) },
-		{ BUILTIN::NUMBER_IDENTIFIER,    type_id( HHuginn::TYPE::NUMBER ) },
-		{ BUILTIN::STRING_IDENTIFIER,    type_id( HHuginn::TYPE::STRING ) },
-		{ BUILTIN::CHARACTER_IDENTIFIER, type_id( HHuginn::TYPE::CHARACTER ) },
-		{ BUILTIN::BOOLEAN_IDENTIFIER,   type_id( HHuginn::TYPE::BOOLEAN ) },
-		{ BUILTIN::SIZE_IDENTIFIER,      type_id( HHuginn::TYPE::INTEGER ) },
-		{ BUILTIN::TUPLE_IDENTIFIER,     type_id( HHuginn::TYPE::TUPLE ) },
-		{ BUILTIN::LIST_IDENTIFIER,      type_id( HHuginn::TYPE::LIST ) },
-		{ BUILTIN::DEQUE_IDENTIFIER,     type_id( HHuginn::TYPE::DEQUE ) },
-		{ BUILTIN::DICT_IDENTIFIER,      type_id( HHuginn::TYPE::DICT ) },
-		{ BUILTIN::LOOKUP_IDENTIFIER,    type_id( HHuginn::TYPE::LOOKUP ) },
-		{ BUILTIN::ORDER_IDENTIFIER,     type_id( HHuginn::TYPE::ORDER ) },
-		{ BUILTIN::SET_IDENTIFIER,       type_id( HHuginn::TYPE::SET ) },
-		{ BUILTIN::BLOB_IDENTIFIER,      type_id( HHuginn::TYPE::BLOB ) },
-		{ BUILTIN::OBSERVE_IDENTIFIER,   type_id( HHuginn::TYPE::OBSERVER ) },
-		{ BUILTIN::TYPE_IDENTIFIER,      type_id( HHuginn::TYPE::FUNCTION_REFERENCE ) }
+		{ IDENTIFIER::BUILTIN::INTEGER,   type_id( HHuginn::TYPE::INTEGER ) },
+		{ IDENTIFIER::BUILTIN::REAL,      type_id( HHuginn::TYPE::REAL ) },
+		{ IDENTIFIER::BUILTIN::NUMBER,    type_id( HHuginn::TYPE::NUMBER ) },
+		{ IDENTIFIER::BUILTIN::STRING,    type_id( HHuginn::TYPE::STRING ) },
+		{ IDENTIFIER::BUILTIN::CHARACTER, type_id( HHuginn::TYPE::CHARACTER ) },
+		{ IDENTIFIER::BUILTIN::BOOLEAN,   type_id( HHuginn::TYPE::BOOLEAN ) },
+		{ IDENTIFIER::BUILTIN::SIZE,      type_id( HHuginn::TYPE::INTEGER ) },
+		{ IDENTIFIER::BUILTIN::TUPLE,     type_id( HHuginn::TYPE::TUPLE ) },
+		{ IDENTIFIER::BUILTIN::LIST,      type_id( HHuginn::TYPE::LIST ) },
+		{ IDENTIFIER::BUILTIN::DEQUE,     type_id( HHuginn::TYPE::DEQUE ) },
+		{ IDENTIFIER::BUILTIN::DICT,      type_id( HHuginn::TYPE::DICT ) },
+		{ IDENTIFIER::BUILTIN::LOOKUP,    type_id( HHuginn::TYPE::LOOKUP ) },
+		{ IDENTIFIER::BUILTIN::ORDER,     type_id( HHuginn::TYPE::ORDER ) },
+		{ IDENTIFIER::BUILTIN::SET,       type_id( HHuginn::TYPE::SET ) },
+		{ IDENTIFIER::BUILTIN::BLOB,      type_id( HHuginn::TYPE::BLOB ) },
+		{ IDENTIFIER::BUILTIN::OBSERVE,   type_id( HHuginn::TYPE::OBSERVER ) },
+		{ IDENTIFIER::BUILTIN::TYPE,      type_id( HHuginn::TYPE::FUNCTION_REFERENCE ) }
 	};
 	fun_to_type_t::const_iterator it( funToType.find( identifierId_ ) );
 	if ( it != funToType.end() ) {
@@ -2509,7 +2509,7 @@ void OCompiler::make_reference( executing_parser::range_t range_ ) {
 	} else {
 		expr->execution_step( expr->execution_step_count() - 1 )._access = HFrame::ACCESS::REFERENCE;
 	}
-	fc._variables.emplace( INVALID_IDENTIFIER, -1 );
+	fc._variables.emplace( IDENTIFIER::INVALID, -1 );
 	return;
 	M_EPILOG
 }
@@ -2520,7 +2520,7 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 	HHuginn::identifier_id_t refIdentifier( _runtime->identifier_id( value_ ) );
 	_usedIdentifiers[refIdentifier].read( range_.start() );
 	bool keyword( false );
-	bool isAssert( refIdentifier == KEYWORD::ASSERT_IDENTIFIER );
+	bool isAssert( refIdentifier == IDENTIFIER::KEYWORD::ASSERT );
 	bool isFieldDefinition( !! _classContext && ( _functionContexts.get_size() == 1 ) );
 	HHuginn::expression_t& expression( current_expression() );
 	HExpression* expr( expression.raw() );
@@ -2534,7 +2534,7 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 			throw HHuginn::HHuginnRuntimeException( "Keyword `"_ys.append( value_ ).append( "' can be used only in class context." ), _fileId, range_.start() );
 		}
 	}
-	if ( _isIncremental && ( refIdentifier == STANDARD_FUNCTIONS::MAIN_IDENTIFIER ) ) {
+	if ( _isIncremental && ( refIdentifier == IDENTIFIER::STANDARD_FUNCTIONS::MAIN ) ) {
 		throw HHuginn::HHuginnRuntimeException( "Referencing main() function in incremental mode is forbidden.", _fileId, range_.start() );
 	}
 	if ( ( ! keyword || isAssert ) && huginn::is_builtin( value_ ) ) {
@@ -2555,11 +2555,11 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 		if ( isFieldDefinition ) {
 			throw HHuginn::HHuginnRuntimeException( "Dereferencing symbol `"_ys.append( value_ ).append( "' in field definition is forbidden." ), _fileId, range_.start() );
 		}
-		if ( refIdentifier == KEYWORD::THIS_IDENTIFIER ) {
+		if ( refIdentifier == IDENTIFIER::KEYWORD::THIS ) {
 			expr->add_execution_step(
 				HExpression::OExecutionStep( expr, &HExpression::get_this, range_.start() )
 			);
-		} else if ( refIdentifier == KEYWORD::SUPER_IDENTIFIER ) {
+		} else if ( refIdentifier == IDENTIFIER::KEYWORD::SUPER ) {
 			expr->add_execution_step(
 				HExpression::OExecutionStep( expr, &HExpression::get_super, range_.start() )
 			);
@@ -2569,7 +2569,7 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 				OExecutionStep::OPERATION::USE,
 				expression,
 				fc._scopeStack.top(),
-				!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
+				!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : IDENTIFIER::INVALID,
 				index,
 				refIdentifier,
 				range_.start()
@@ -2587,7 +2587,7 @@ void OCompiler::defer_get_field_reference( yaal::hcore::HString const& value_, e
 	HHuginn::identifier_id_t refIdentifier( _runtime->identifier_id( value_ ) );
 	_usedIdentifiers[refIdentifier].read( range_.start(), HHuginn::SYMBOL_KIND::FIELD );
 	if ( huginn::is_keyword( value_ ) ) {
-		if ( refIdentifier != KEYWORD::CONSTRUCTOR_IDENTIFIER ) {
+		if ( refIdentifier != IDENTIFIER::KEYWORD::CONSTRUCTOR ) {
 			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted keyword." ), _fileId, range_.start() );
 		} else if ( ! _classContext ) {
 			throw HHuginn::HHuginnRuntimeException( "Keyword `"_ys.append( value_ ).append( "' can be used only in class context." ), _fileId, range_.start() );
@@ -2621,7 +2621,7 @@ void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executi
 		OExecutionStep::OPERATION::DEFINE,
 		expression,
 		fc._scopeStack.top(),
-		!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : INVALID_IDENTIFIER,
+		!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : IDENTIFIER::INVALID,
 		index,
 		varIdentifier,
 		range_.start()

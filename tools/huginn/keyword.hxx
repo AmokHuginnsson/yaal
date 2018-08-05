@@ -14,7 +14,94 @@ namespace tools {
 
 namespace huginn {
 
-extern HHuginn::identifier_id_t const INVALID_IDENTIFIER;
+namespace IDENTIFIER {
+
+extern HHuginn::identifier_id_t const INVALID;
+
+namespace KEYWORD {
+
+extern HHuginn::identifier_id_t const CONSTRUCTOR;
+extern HHuginn::identifier_id_t const DESTRUCTOR;
+extern HHuginn::identifier_id_t const THIS;
+extern HHuginn::identifier_id_t const SUPER;
+extern HHuginn::identifier_id_t const ASSERT;
+
+}
+
+namespace BUILTIN {
+
+extern HHuginn::identifier_id_t const INTEGER;
+extern HHuginn::identifier_id_t const REAL;
+extern HHuginn::identifier_id_t const NUMBER;
+extern HHuginn::identifier_id_t const STRING;
+extern HHuginn::identifier_id_t const CHARACTER;
+extern HHuginn::identifier_id_t const BOOLEAN;
+extern HHuginn::identifier_id_t const SIZE;
+extern HHuginn::identifier_id_t const TYPE;
+extern HHuginn::identifier_id_t const COPY;
+extern HHuginn::identifier_id_t const OBSERVE;
+extern HHuginn::identifier_id_t const USE;
+extern HHuginn::identifier_id_t const TUPLE;
+extern HHuginn::identifier_id_t const LIST;
+extern HHuginn::identifier_id_t const DEQUE;
+extern HHuginn::identifier_id_t const DICT;
+extern HHuginn::identifier_id_t const LOOKUP;
+extern HHuginn::identifier_id_t const ORDER;
+extern HHuginn::identifier_id_t const SET;
+extern HHuginn::identifier_id_t const BLOB;
+extern HHuginn::identifier_id_t const TYPE_NONE;
+extern HHuginn::identifier_id_t const TYPE_OBSERVER;
+extern HHuginn::identifier_id_t const TYPE_REFERENCE;
+extern HHuginn::identifier_id_t const TYPE_FUNCTION_REFERENCE;
+extern HHuginn::identifier_id_t const TYPE_OBJECT_REFERENCE;
+extern HHuginn::identifier_id_t const TYPE_METHOD;
+extern HHuginn::identifier_id_t const TYPE_UNBOUND_METHOD;
+extern HHuginn::identifier_id_t const TYPE_BOUND_METHOD;
+extern HHuginn::identifier_id_t const TYPE_VARIADIC_PARAMETERS;
+extern HHuginn::identifier_id_t const TYPE_NAMED_PARAMETERS;
+extern HHuginn::identifier_id_t const TYPE_UNKNOWN;
+
+}
+
+namespace INTERFACE {
+
+extern HHuginn::identifier_id_t const CLONE;
+extern HHuginn::identifier_id_t const GET_SIZE;
+extern HHuginn::identifier_id_t const ITERATOR;
+extern HHuginn::identifier_id_t const VALUE;
+extern HHuginn::identifier_id_t const NEXT;
+extern HHuginn::identifier_id_t const IS_VALID;
+extern HHuginn::identifier_id_t const CALL;
+extern HHuginn::identifier_id_t const HASH;
+extern HHuginn::identifier_id_t const EQUALS;
+extern HHuginn::identifier_id_t const LESS;
+extern HHuginn::identifier_id_t const GREATER;
+extern HHuginn::identifier_id_t const LESS_OR_EQUAL;
+extern HHuginn::identifier_id_t const GREATER_OR_EQUAL;
+extern HHuginn::identifier_id_t const ADD;
+extern HHuginn::identifier_id_t const SUBTRACT;
+extern HHuginn::identifier_id_t const MULTIPLY;
+extern HHuginn::identifier_id_t const DIVIDE;
+extern HHuginn::identifier_id_t const MODULO;
+extern HHuginn::identifier_id_t const POWER;
+extern HHuginn::identifier_id_t const MODULUS;
+extern HHuginn::identifier_id_t const NEGATE;
+extern HHuginn::identifier_id_t const TO_STRING;
+extern HHuginn::identifier_id_t const TO_INTEGER;
+extern HHuginn::identifier_id_t const TO_REAL;
+extern HHuginn::identifier_id_t const TO_NUMBER;
+extern HHuginn::identifier_id_t const TO_CHARACTER;
+extern HHuginn::identifier_id_t const TO_BOOLEAN;
+
+}
+
+namespace STANDARD_FUNCTIONS {
+
+extern HHuginn::identifier_id_t const MAIN;
+
+}
+
+}
 
 namespace KEYWORD {
 
@@ -41,12 +128,6 @@ extern char const* THROW;
 extern char const* TRUE;
 extern char const* TRY;
 extern char const* WHILE;
-
-extern HHuginn::identifier_id_t const CONSTRUCTOR_IDENTIFIER;
-extern HHuginn::identifier_id_t const DESTRUCTOR_IDENTIFIER;
-extern HHuginn::identifier_id_t const THIS_IDENTIFIER;
-extern HHuginn::identifier_id_t const SUPER_IDENTIFIER;
-extern HHuginn::identifier_id_t const ASSERT_IDENTIFIER;
 
 }
 
@@ -82,36 +163,6 @@ extern char const* TYPE_BOUND_METHOD;
 extern char const* TYPE_VARIADIC_PARAMETERS;
 extern char const* TYPE_NAMED_PARAMETERS;
 extern char const* TYPE_UNKNOWN;
-extern HHuginn::identifier_id_t const INTEGER_IDENTIFIER;
-extern HHuginn::identifier_id_t const REAL_IDENTIFIER;
-extern HHuginn::identifier_id_t const NUMBER_IDENTIFIER;
-extern HHuginn::identifier_id_t const STRING_IDENTIFIER;
-extern HHuginn::identifier_id_t const CHARACTER_IDENTIFIER;
-extern HHuginn::identifier_id_t const BOOLEAN_IDENTIFIER;
-extern HHuginn::identifier_id_t const SIZE_IDENTIFIER;
-extern HHuginn::identifier_id_t const TYPE_IDENTIFIER;
-extern HHuginn::identifier_id_t const COPY_IDENTIFIER;
-extern HHuginn::identifier_id_t const OBSERVE_IDENTIFIER;
-extern HHuginn::identifier_id_t const USE_IDENTIFIER;
-extern HHuginn::identifier_id_t const TUPLE_IDENTIFIER;
-extern HHuginn::identifier_id_t const LIST_IDENTIFIER;
-extern HHuginn::identifier_id_t const DEQUE_IDENTIFIER;
-extern HHuginn::identifier_id_t const DICT_IDENTIFIER;
-extern HHuginn::identifier_id_t const LOOKUP_IDENTIFIER;
-extern HHuginn::identifier_id_t const ORDER_IDENTIFIER;
-extern HHuginn::identifier_id_t const SET_IDENTIFIER;
-extern HHuginn::identifier_id_t const BLOB_IDENTIFIER;
-extern HHuginn::identifier_id_t const TYPE_NONE_IDENTIFIER;
-extern HHuginn::identifier_id_t const TYPE_OBSERVER_IDENTIFIER;
-extern HHuginn::identifier_id_t const TYPE_REFERENCE_IDENTIFIER;
-extern HHuginn::identifier_id_t const TYPE_FUNCTION_REFERENCE_IDENTIFIER;
-extern HHuginn::identifier_id_t const TYPE_OBJECT_REFERENCE_IDENTIFIER;
-extern HHuginn::identifier_id_t const TYPE_METHOD_IDENTIFIER;
-extern HHuginn::identifier_id_t const TYPE_UNBOUND_METHOD_IDENTIFIER;
-extern HHuginn::identifier_id_t const TYPE_BOUND_METHOD_IDENTIFIER;
-extern HHuginn::identifier_id_t const TYPE_VARIADIC_PARAMETERS_IDENTIFIER;
-extern HHuginn::identifier_id_t const TYPE_NAMED_PARAMETERS_IDENTIFIER;
-extern HHuginn::identifier_id_t const TYPE_UNKNOWN_IDENTIFIER;
 
 }
 
@@ -144,39 +195,13 @@ extern char const* TO_REAL;
 extern char const* TO_NUMBER;
 extern char const* TO_CHARACTER;
 extern char const* TO_BOOLEAN;
-extern HHuginn::identifier_id_t const CLONE_IDENTIFIER;
-extern HHuginn::identifier_id_t const GET_SIZE_IDENTIFIER;
-extern HHuginn::identifier_id_t const ITERATOR_IDENTIFIER;
-extern HHuginn::identifier_id_t const VALUE_IDENTIFIER;
-extern HHuginn::identifier_id_t const NEXT_IDENTIFIER;
-extern HHuginn::identifier_id_t const IS_VALID_IDENTIFIER;
-extern HHuginn::identifier_id_t const CALL_IDENTIFIER;
-extern HHuginn::identifier_id_t const HASH_IDENTIFIER;
-extern HHuginn::identifier_id_t const EQUALS_IDENTIFIER;
-extern HHuginn::identifier_id_t const LESS_IDENTIFIER;
-extern HHuginn::identifier_id_t const GREATER_IDENTIFIER;
-extern HHuginn::identifier_id_t const LESS_OR_EQUAL_IDENTIFIER;
-extern HHuginn::identifier_id_t const GREATER_OR_EQUAL_IDENTIFIER;
-extern HHuginn::identifier_id_t const ADD_IDENTIFIER;
-extern HHuginn::identifier_id_t const SUBTRACT_IDENTIFIER;
-extern HHuginn::identifier_id_t const MULTIPLY_IDENTIFIER;
-extern HHuginn::identifier_id_t const DIVIDE_IDENTIFIER;
-extern HHuginn::identifier_id_t const MODULO_IDENTIFIER;
-extern HHuginn::identifier_id_t const POWER_IDENTIFIER;
-extern HHuginn::identifier_id_t const MODULUS_IDENTIFIER;
-extern HHuginn::identifier_id_t const NEGATE_IDENTIFIER;
-extern HHuginn::identifier_id_t const TO_STRING_IDENTIFIER;
-extern HHuginn::identifier_id_t const TO_INTEGER_IDENTIFIER;
-extern HHuginn::identifier_id_t const TO_REAL_IDENTIFIER;
-extern HHuginn::identifier_id_t const TO_NUMBER_IDENTIFIER;
-extern HHuginn::identifier_id_t const TO_CHARACTER_IDENTIFIER;
-extern HHuginn::identifier_id_t const TO_BOOLEAN_IDENTIFIER;
 
 }
 
 namespace STANDARD_FUNCTIONS {
+
 extern char const* MAIN;
-extern HHuginn::identifier_id_t const MAIN_IDENTIFIER;
+
 }
 
 typedef yaal::hcore::HHashSet<yaal::hcore::HString>  words_t;

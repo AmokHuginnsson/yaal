@@ -402,7 +402,7 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 		OCompiler::OClassContext* cc( _compiler->_submittedClasses.at( identifierId_ ).get() );
 		M_ASSERT( cc->_classIdentifier == identifierId_ );
 		HClass const* super( nullptr );
-		if ( cc->_baseName != INVALID_IDENTIFIER ) {
+		if ( cc->_baseName != IDENTIFIER::INVALID ) {
 			HHuginn::class_t c( _runtime->get_class( cc->_baseName ) );
 			super = ! c ? commit_class( cc->_baseName ) : c.raw();
 		}

@@ -29,7 +29,7 @@ HExpression::OExecutionStep::OExecutionStep( void )
 	, _access( HFrame::ACCESS::VALUE )
 	, _statementId( INVALID_STATEMENT_IDENTIFIER )
 	, _index( -1 )
-	, _identifierId( INVALID_IDENTIFIER )
+	, _identifierId( IDENTIFIER::INVALID )
 	, _value()
 	, _valueRef()
 	, _real( 0.0L )
@@ -45,7 +45,7 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _access( HFrame::ACCESS::VALUE )
 	, _statementId( INVALID_STATEMENT_IDENTIFIER )
 	, _index( -1 )
-	, _identifierId( INVALID_IDENTIFIER )
+	, _identifierId( IDENTIFIER::INVALID )
 	, _value()
 	, _valueRef()
 	, _real( 0.0L )
@@ -61,7 +61,7 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _access( access_ )
 	, _statementId( INVALID_STATEMENT_IDENTIFIER )
 	, _index( -1 )
-	, _identifierId( INVALID_IDENTIFIER )
+	, _identifierId( IDENTIFIER::INVALID )
 	, _value()
 	, _valueRef()
 	, _real( 0.0L )
@@ -77,7 +77,7 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _access( access_ )
 	, _statementId( INVALID_STATEMENT_IDENTIFIER )
 	, _index( index_ )
-	, _identifierId( INVALID_IDENTIFIER )
+	, _identifierId( IDENTIFIER::INVALID )
 	, _value()
 	, _valueRef()
 	, _real( 0.0L )
@@ -109,7 +109,7 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _access( access_ )
 	, _statementId( statementId_ )
 	, _index( index_ )
-	, _identifierId( INVALID_IDENTIFIER )
+	, _identifierId( IDENTIFIER::INVALID )
 	, _value()
 	, _valueRef()
 	, _real( 0.0L )
@@ -141,7 +141,7 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _access( HFrame::ACCESS::VALUE )
 	, _statementId( INVALID_STATEMENT_IDENTIFIER )
 	, _index( -1 )
-	, _identifierId( INVALID_IDENTIFIER )
+	, _identifierId( IDENTIFIER::INVALID )
 	, _value()
 	, _valueRef( valueRef_ )
 	, _real( 0.0L )
@@ -157,7 +157,7 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _access( HFrame::ACCESS::VALUE )
 	, _statementId( INVALID_STATEMENT_IDENTIFIER )
 	, _index( -1 )
-	, _identifierId( INVALID_IDENTIFIER )
+	, _identifierId( IDENTIFIER::INVALID )
 	, _value( value_ )
 	, _valueRef()
 	, _real( 0.0L )
@@ -173,7 +173,7 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _access( HFrame::ACCESS::VALUE )
 	, _statementId( INVALID_STATEMENT_IDENTIFIER )
 	, _index( -1 )
-	, _identifierId( INVALID_IDENTIFIER )
+	, _identifierId( IDENTIFIER::INVALID )
 	, _value()
 	, _valueRef()
 	, _real( doubleLong_ )
@@ -189,7 +189,7 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _access( HFrame::ACCESS::VALUE )
 	, _statementId( INVALID_STATEMENT_IDENTIFIER )
 	, _index( -1 )
-	, _identifierId( INVALID_IDENTIFIER )
+	, _identifierId( IDENTIFIER::INVALID )
 	, _value()
 	, _valueRef()
 	, _real( 0.0L )
@@ -205,7 +205,7 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _access( HFrame::ACCESS::VALUE )
 	, _statementId( INVALID_STATEMENT_IDENTIFIER )
 	, _index( -1 )
-	, _identifierId( INVALID_IDENTIFIER )
+	, _identifierId( IDENTIFIER::INVALID )
 	, _value()
 	, _valueRef()
 	, _real( 0.0L )
@@ -221,7 +221,7 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _access( HFrame::ACCESS::VALUE )
 	, _statementId( INVALID_STATEMENT_IDENTIFIER )
 	, _index( -1 )
-	, _identifierId( INVALID_IDENTIFIER )
+	, _identifierId( IDENTIFIER::INVALID )
 	, _value()
 	, _valueRef()
 	, _real( 0.0L )
@@ -512,7 +512,7 @@ void HExpression::get_field( OExecutionStep const& executionStep_,huginn::HFrame
 		int fi( oref->field_index( executionStep_._identifierId ) );
 		if ( fi >= 0 ) {
 			values.push( oref->field( t, fi, p ) );
-		} else if ( ( executionStep_._identifierId == KEYWORD::CONSTRUCTOR_IDENTIFIER ) && ( oref->reference_class()->type() == HHuginn::HClass::TYPE::BUILTIN ) ) {
+		} else if ( ( executionStep_._identifierId == IDENTIFIER::KEYWORD::CONSTRUCTOR ) && ( oref->reference_class()->type() == HHuginn::HClass::TYPE::BUILTIN ) ) {
 			values.push(
 				rt.object_factory()->create_bound_method(
 					hcore::call(
@@ -752,9 +752,9 @@ void HExpression::function_call( OExecutionStep const& executionStep_, HFrame* f
 	} else {
 		HHuginn::HObject* o( nullptr );
 		if ( ( o = dynamic_cast<HHuginn::HObject*>( f.raw() ) ) ) {
-			values.push( o->call_method( thread, f, INTERFACE::CALL_IDENTIFIER, args, executionStep_._position ) );
+			values.push( o->call_method( thread, f, IDENTIFIER::INTERFACE::CALL, args, executionStep_._position ) );
 		} else {
-			int idx( c->field_index( INTERFACE::CALL_IDENTIFIER ) );
+			int idx( c->field_index( IDENTIFIER::INTERFACE::CALL ) );
 			if ( idx >= 0 ) {
 				HHuginn::HClass::HMethod const& m( *static_cast<HHuginn::HClass::HMethod const*>( c->field( idx ).raw() ) );
 				values.push( m.function()( thread, &f, args, executionStep_._position ) );

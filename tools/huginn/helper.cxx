@@ -598,7 +598,7 @@ bool is_summable( HHuginn::HClass const* class_ ) {
 
 bool is_meta_class( HHuginn::HClass const* class_ ) {
 	HHuginn::identifier_id_t id( class_->identifier_id() );
-	return ( ( id >= BUILTIN::TYPE_NONE_IDENTIFIER ) && ( id <= BUILTIN::TYPE_NAMED_PARAMETERS_IDENTIFIER ) );
+	return ( ( id >= IDENTIFIER::BUILTIN::TYPE_NONE ) && ( id <= IDENTIFIER::BUILTIN::TYPE_NAMED_PARAMETERS ) );
 }
 
 bool are_congruous( HHuginn::HClass const* c1_, HHuginn::HClass const* c2_ ) {

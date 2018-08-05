@@ -68,7 +68,7 @@ HHuginn::HObject::~HObject( void ) {
 		hobject_destructor_helper::buffer_t buffer;
 		hobject_destructor_helper::allocator<hobject_destructor_helper::holder_t> allocator( buffer.mem() );
 		HHuginn::value_t nonOwning( static_cast<HHuginn::HValue*>( this ), &hobject_destructor_helper::deleter, allocator );
-		int destructorIdx( clss->field_index( KEYWORD::DESTRUCTOR_IDENTIFIER ) );
+		int destructorIdx( clss->field_index( IDENTIFIER::KEYWORD::DESTRUCTOR ) );
 		HClass const* c( clss->super() );
 		if ( destructorIdx >= 0 ) {
 			try {
@@ -83,7 +83,7 @@ HHuginn::HObject::~HObject( void ) {
 			}
 		}
 		while ( c ) {
-			destructorIdx = c->field_index( KEYWORD::DESTRUCTOR_IDENTIFIER );
+			destructorIdx = c->field_index( IDENTIFIER::KEYWORD::DESTRUCTOR );
 			if ( destructorIdx >= 0 ) {
 				try {
 					c->function( destructorIdx )( t, &nonOwning, HArguments( t ), 0 );
@@ -224,7 +224,7 @@ HHuginn::value_t HHuginn::HObject::call_method(
 
 HHuginn::value_t HHuginn::HObject::do_clone( huginn::HThread* thread_, HHuginn::value_t* object_, int position_ ) const {
 	M_PROLOG
-	int idx( field_index( INTERFACE::CLONE_IDENTIFIER ) );
+	int idx( field_index( IDENTIFIER::INTERFACE::CLONE ) );
 	HHuginn::value_t copy;
 	if ( idx >= 0 ) {
 		HHuginn::value_t const& cloneMember( _fields[ idx ] );

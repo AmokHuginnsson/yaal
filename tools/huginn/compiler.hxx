@@ -133,7 +133,7 @@ struct OCompiler {
 			HHuginn::identifier_id_t _identifier;
 			OValueDesc( HHuginn::HClass const* class_ )
 				: _class( class_ )
-				, _identifier( INVALID_IDENTIFIER ) {
+				, _identifier( IDENTIFIER::INVALID ) {
 				return;
 			}
 			OValueDesc( HHuginn::HClass const* class_, HHuginn::identifier_id_t identifierId_ )

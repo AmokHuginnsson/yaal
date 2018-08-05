@@ -327,7 +327,7 @@ void add( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		static_cast<HHuginn::HNumber*>( v1_.raw() )->value() += static_cast<HHuginn::HNumber const*>( v2_.raw() )->value();
 	} else {
-		fallback_arithmetic( thread_, INTERFACE::ADD_IDENTIFIER, op_to_str( OPERATOR::PLUS ), v1_, v2_, position_ );
+		fallback_arithmetic( thread_, IDENTIFIER::INTERFACE::ADD, op_to_str( OPERATOR::PLUS ), v1_, v2_, position_ );
 	}
 	return;
 }
@@ -342,7 +342,7 @@ void sub( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		static_cast<HHuginn::HNumber*>( v1_.raw() )->value() -= static_cast<HHuginn::HNumber const*>( v2_.raw() )->value();
 	} else {
-		fallback_arithmetic( thread_, INTERFACE::SUBTRACT_IDENTIFIER, op_to_str( OPERATOR::MINUS ), v1_, v2_, position_ );
+		fallback_arithmetic( thread_, IDENTIFIER::INTERFACE::SUBTRACT, op_to_str( OPERATOR::MINUS ), v1_, v2_, position_ );
 	}
 	return;
 }
@@ -357,7 +357,7 @@ void mul( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		static_cast<HHuginn::HNumber*>( v1_.raw() )->value() *= static_cast<HHuginn::HNumber const*>( v2_.raw() )->value();
 	} else {
-		fallback_arithmetic( thread_, INTERFACE::MULTIPLY_IDENTIFIER, op_to_str( OPERATOR::MULTIPLY ), v1_, v2_, position_ );
+		fallback_arithmetic( thread_, IDENTIFIER::INTERFACE::MULTIPLY, op_to_str( OPERATOR::MULTIPLY ), v1_, v2_, position_ );
 	}
 	return;
 }
@@ -392,7 +392,7 @@ void div( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 			v1_ = thread_->runtime().none_value();
 		}
 	} else {
-		fallback_arithmetic( thread_, INTERFACE::DIVIDE_IDENTIFIER, op_to_str( OPERATOR::DIVIDE ), v1_, v2_, position_ );
+		fallback_arithmetic( thread_, IDENTIFIER::INTERFACE::DIVIDE, op_to_str( OPERATOR::DIVIDE ), v1_, v2_, position_ );
 	}
 	HRuntime& rt( thread_->runtime() );
 	if ( v1_ == rt.none_value() ) {
@@ -431,7 +431,7 @@ void mod( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 			v1_ = thread_->runtime().none_value();
 		}
 	} else {
-		fallback_arithmetic( thread_, INTERFACE::MODULO_IDENTIFIER, op_to_str( OPERATOR::MODULO ), v1_, v2_, position_ );
+		fallback_arithmetic( thread_, IDENTIFIER::INTERFACE::MODULO, op_to_str( OPERATOR::MODULO ), v1_, v2_, position_ );
 	}
 	HRuntime& rt( thread_->runtime() );
 	if ( v1_ == rt.none_value() ) {
@@ -469,7 +469,7 @@ void pow( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 			}
 		} while ( false );
 	} else {
-		fallback_arithmetic( thread_, INTERFACE::POWER_IDENTIFIER, op_to_str( OPERATOR::POWER ), v1_, v2_, position_ );
+		fallback_arithmetic( thread_, IDENTIFIER::INTERFACE::POWER, op_to_str( OPERATOR::POWER ), v1_, v2_, position_ );
 	}
 	return;
 }
@@ -523,7 +523,7 @@ HHuginn::value_t abs( HThread* thread_, HHuginn::value_t const& v_, int position
 			res = thread_->object_factory().create_number( -v );
 		}
 	} else {
-		res = fallback_unary_arithmetic( thread_, INTERFACE::MODULUS_IDENTIFIER, op_to_str( OPERATOR::MODULUS ), v_, OPERATION::OPEN, position_ );
+		res = fallback_unary_arithmetic( thread_, IDENTIFIER::INTERFACE::MODULUS, op_to_str( OPERATOR::MODULUS ), v_, OPERATION::OPEN, position_ );
 	}
 	return ( res );
 }
@@ -543,7 +543,7 @@ HHuginn::value_t neg( HThread* thread_, HHuginn::value_t const& v_, int position
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		res = thread_->object_factory().create_number( -static_cast<HHuginn::HNumber const*>( v_.raw() )->value() );
 	} else {
-		res = fallback_unary_arithmetic( thread_, INTERFACE::NEGATE_IDENTIFIER, op_to_str( OPERATOR::NEGATE ), v_, OPERATION::CLOSED, position_ );
+		res = fallback_unary_arithmetic( thread_, IDENTIFIER::INTERFACE::NEGATE, op_to_str( OPERATOR::NEGATE ), v_, OPERATION::CLOSED, position_ );
 	}
 	return ( res );
 }
@@ -568,7 +568,7 @@ int long hash( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	} else if ( typeId != HHuginn::TYPE::NONE ) {
 		HHuginn::value_t res;
 		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v_.raw() ) ) {
-			res = o->call_method( thread_, v_, INTERFACE::HASH_IDENTIFIER, HArguments( thread_ ), position_ );
+			res = o->call_method( thread_, v_, IDENTIFIER::INTERFACE::HASH, HArguments( thread_ ), position_ );
 			if ( res->type_id() != HHuginn::TYPE::INTEGER ) {
 				throw HHuginn::HHuginnRuntimeException(
 					"User supplied `hash' function returned an invalid type "_ys
@@ -580,7 +580,7 @@ int long hash( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 			}
 		} else {
 			HHuginn::HClass const* c( v_->get_class() );
-			int idx( c->field_index( INTERFACE::HASH_IDENTIFIER ) );
+			int idx( c->field_index( IDENTIFIER::INTERFACE::HASH ) );
 			if ( idx >= 0 ) {
 				HHuginn::HClass::HMethod const& m( *static_cast<HHuginn::HClass::HMethod const*>( c->field( idx ).raw() ) );
 				res = m.function()( thread_, const_cast<HHuginn::value_t*>( &v_ ), HArguments( thread_ ), position_ );
@@ -670,7 +670,7 @@ bool equals( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t con
 				if ( enumeral1 ) {
 					res = enumeral1->value() == static_cast<HHuginn::HEnumeral const*>( v2_.raw() )->value();
 				} else {
-					res = fallback_compare( thread_, INTERFACE::EQUALS_IDENTIFIER, op_to_str( OPERATOR::EQUALS ), v1_, v2_, position_ );
+					res = fallback_compare( thread_, IDENTIFIER::INTERFACE::EQUALS, op_to_str( OPERATOR::EQUALS ), v1_, v2_, position_ );
 				}
 			}
 		}
@@ -697,7 +697,7 @@ bool less( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const
 	} else if ( typeId == HHuginn::TYPE::FUNCTION_REFERENCE ) {
 		res = static_cast<HHuginn::HFunctionReference const*>( v1_.raw() )->identifier_id() < static_cast<HHuginn::HFunctionReference const*>( v2_.raw() )->identifier_id();
 	} else {
-		res = fallback_compare( thread_, INTERFACE::LESS_IDENTIFIER, op_to_str( OPERATOR::LESS ), v1_, v2_, position_ );
+		res = fallback_compare( thread_, IDENTIFIER::INTERFACE::LESS, op_to_str( OPERATOR::LESS ), v1_, v2_, position_ );
 	}
 	return ( res );
 }
@@ -717,7 +717,7 @@ bool greater( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t co
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
 		res = static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() > static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value();
 	} else {
-		res = fallback_compare( thread_, INTERFACE::GREATER_IDENTIFIER, op_to_str( OPERATOR::GREATER ), v1_, v2_, position_ );
+		res = fallback_compare( thread_, IDENTIFIER::INTERFACE::GREATER, op_to_str( OPERATOR::GREATER ), v1_, v2_, position_ );
 	}
 	return ( res );
 }
@@ -737,7 +737,7 @@ bool less_or_equal( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::valu
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
 		res = static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() <= static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value();
 	} else {
-		res = fallback_compare( thread_, INTERFACE::LESS_OR_EQUAL_IDENTIFIER, op_to_str( OPERATOR::LESS_OR_EQUAL ), v1_, v2_, position_ );
+		res = fallback_compare( thread_, IDENTIFIER::INTERFACE::LESS_OR_EQUAL, op_to_str( OPERATOR::LESS_OR_EQUAL ), v1_, v2_, position_ );
 	}
 	return ( res );
 }
@@ -757,7 +757,7 @@ bool greater_or_equal( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::v
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
 		res = static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() >= static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value();
 	} else {
-		res = fallback_compare( thread_, INTERFACE::GREATER_OR_EQUAL_IDENTIFIER, op_to_str( OPERATOR::GREATER_OR_EQUAL ), v1_, v2_, position_ );
+		res = fallback_compare( thread_, IDENTIFIER::INTERFACE::GREATER_OR_EQUAL, op_to_str( OPERATOR::GREATER_OR_EQUAL ), v1_, v2_, position_ );
 	}
 	return ( res );
 }
@@ -860,7 +860,7 @@ HHuginn::value_t fallback_conversion( HHuginn::type_id_t type_, HThread* thread_
 
 HHuginn::value_t fallback_string_conversion( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t v;
-	if ( v_->get_class()->is_kind_of( BUILTIN::STRING_IDENTIFIER ) ) {
+	if ( v_->get_class()->is_kind_of( IDENTIFIER::BUILTIN::STRING ) ) {
 		v = thread_->object_factory().create_string( get_string( v_ ) );
 	} else {
 		HCycleTracker cycleTracker;
@@ -1026,7 +1026,7 @@ yaal::hcore::HString string_representation( HThread* thread_, HHuginn::value_t c
 		} break;
 		default: {
 			if ( thread_ ) {
-				HHuginn::value_t v( fallback_conversion( type_id( HHuginn::TYPE::STRING ), thread_, INTERFACE::TO_STRING_IDENTIFIER, value_, position_ ) );
+				HHuginn::value_t v( fallback_conversion( type_id( HHuginn::TYPE::STRING ), thread_, IDENTIFIER::INTERFACE::TO_STRING, value_, position_ ) );
 				str = get_string( v );
 			} else {
 				str = value_->get_class()->name();
@@ -1074,7 +1074,7 @@ HHuginn::value_t boolean( HThread* thread_, HHuginn::value_t const& v_, int posi
 	if ( v_->type_id() == HHuginn::TYPE::BOOLEAN ) {
 		res = v_;
 	} else {
-		res = fallback_conversion( type_id( HHuginn::TYPE::BOOLEAN ), thread_, INTERFACE::TO_BOOLEAN_IDENTIFIER, v_, position_ );
+		res = fallback_conversion( type_id( HHuginn::TYPE::BOOLEAN ), thread_, IDENTIFIER::INTERFACE::TO_BOOLEAN, v_, position_ );
 	}
 	return ( res );
 }
@@ -1105,7 +1105,7 @@ HHuginn::value_t integer( HThread* thread_, HHuginn::value_t const& v_, int posi
 	} else if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = v_;
 	} else {
-		res = fallback_conversion( type_id( HHuginn::TYPE::INTEGER ), thread_, INTERFACE::TO_INTEGER_IDENTIFIER, v_, position_ );
+		res = fallback_conversion( type_id( HHuginn::TYPE::INTEGER ), thread_, IDENTIFIER::INTERFACE::TO_INTEGER, v_, position_ );
 	}
 	return ( res );
 }
@@ -1128,7 +1128,7 @@ HHuginn::value_t real( HThread* thread_, HHuginn::value_t const& v_, int positio
 	} else if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = thread_->object_factory().create_real( static_cast<double long>( static_cast<HHuginn::HInteger const*>( v_.raw() )->value() ) );
 	} else {
-		res = fallback_conversion( type_id( HHuginn::TYPE::REAL ), thread_, INTERFACE::TO_REAL_IDENTIFIER, v_, position_ );
+		res = fallback_conversion( type_id( HHuginn::TYPE::REAL ), thread_, IDENTIFIER::INTERFACE::TO_REAL, v_, position_ );
 	}
 	return ( res );
 }
@@ -1141,7 +1141,7 @@ HHuginn::value_t character( HThread* thread_, HHuginn::value_t const& v_, int po
 	} else if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = thread_->object_factory().create_character( static_cast<HHuginn::HCharacter const*>( v_.raw() )->value() );
 	} else {
-		res = fallback_conversion( type_id( HHuginn::TYPE::CHARACTER ), thread_, INTERFACE::TO_CHARACTER_IDENTIFIER, v_, position_ );
+		res = fallback_conversion( type_id( HHuginn::TYPE::CHARACTER ), thread_, IDENTIFIER::INTERFACE::TO_CHARACTER, v_, position_ );
 	}
 	return ( res );
 }
@@ -1166,7 +1166,7 @@ HHuginn::value_t number( HThread* thread_, HHuginn::value_t const& v_, int posit
 	} else if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = thread_->object_factory().create_number( static_cast<HHuginn::HInteger const*>( v_.raw() )->value() );
 	} else {
-		res = fallback_conversion( type_id( HHuginn::TYPE::NUMBER ), thread_, INTERFACE::TO_NUMBER_IDENTIFIER, v_, position_ );
+		res = fallback_conversion( type_id( HHuginn::TYPE::NUMBER ), thread_, IDENTIFIER::INTERFACE::TO_NUMBER, v_, position_ );
 	}
 	return ( res );
 }

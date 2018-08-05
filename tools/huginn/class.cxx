@@ -322,7 +322,7 @@ HHuginn::function_t HHuginn::HClass::constructor_function( void ) const {
 HHuginn::value_t HHuginn::HClass::do_create_instance( huginn::HThread* thread_, values_t& values_, int position_ ) const {
 	M_PROLOG
 	value_t v( thread_->runtime().object_factory()->create_object( this, get_defaults( thread_, position_ ) ) );
-	int constructorIdx( field_index( KEYWORD::CONSTRUCTOR_IDENTIFIER ) );
+	int constructorIdx( field_index( IDENTIFIER::KEYWORD::CONSTRUCTOR ) );
 	if ( constructorIdx >= 0 ) {
 		function( constructorIdx )( thread_, &v, values_, position_ );
 	} else {

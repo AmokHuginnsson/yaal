@@ -51,16 +51,16 @@ void HFor::do_execute( HThread* thread_ ) const {
 				it->next( thread_, sourcePosition );
 			}
 		} else if ( ( obj = dynamic_cast<HHuginn::HObject*>( source.raw() ) ) ) {
-			HHuginn::value_t itVal( obj->call_method( thread_, source, INTERFACE::ITERATOR_IDENTIFIER, HArguments( thread_ ), sourcePosition ) );
+			HHuginn::value_t itVal( obj->call_method( thread_, source, IDENTIFIER::INTERFACE::ITERATOR, HArguments( thread_ ), sourcePosition ) );
 			HHuginn::HObject* it( dynamic_cast<HHuginn::HObject*>( itVal.raw() ) );
 			if ( ! it ) {
 				throw HHuginn::HHuginnRuntimeException( "`For' source returned invalid iterator object.", file_id(), sourcePosition );
 			}
-			HHuginn::value_t isValidField( it->get_method( thread_, itVal, INTERFACE::IS_VALID_IDENTIFIER, sourcePosition ) );
+			HHuginn::value_t isValidField( it->get_method( thread_, itVal, IDENTIFIER::INTERFACE::IS_VALID, sourcePosition ) );
 			HHuginn::HClass::HBoundMethod* isValidMethod( static_cast<HHuginn::HClass::HBoundMethod*>( isValidField.raw() ) );
-			HHuginn::value_t valueField( it->get_method( thread_, itVal, INTERFACE::VALUE_IDENTIFIER, sourcePosition ) );
+			HHuginn::value_t valueField( it->get_method( thread_, itVal, IDENTIFIER::INTERFACE::VALUE, sourcePosition ) );
 			HHuginn::HClass::HBoundMethod* valueMethod( static_cast<HHuginn::HClass::HBoundMethod*>( valueField.raw() ) );
-			HHuginn::value_t nextField( it->get_method( thread_, itVal, INTERFACE::NEXT_IDENTIFIER, sourcePosition ) );
+			HHuginn::value_t nextField( it->get_method( thread_, itVal, IDENTIFIER::INTERFACE::NEXT, sourcePosition ) );
 			HHuginn::HClass::HBoundMethod* nextMethod( static_cast<HHuginn::HClass::HBoundMethod*>( nextField.raw() ) );
 			while ( f->can_continue() ) {
 				HHuginn::value_t isValid( isValidMethod->call( thread_, HArguments( thread_ ), sourcePosition ) );

@@ -82,7 +82,7 @@ public:
 		HString const& name( get_string( values_[0] ) );
 		HHuginn::identifier_id_t id( r.try_identifier_id( name ) );
 		HHuginn::value_t const* pv( nullptr );
-		if ( id != INVALID_IDENTIFIER ) {
+		if ( id != IDENTIFIER::INVALID ) {
 			pv = r.get_global( id );
 		}
 		if ( pv ) {
@@ -98,7 +98,7 @@ public:
 		HHuginn::value_t v( r.none_value() );
 		HString const& name( get_string( values_[1] ) );
 		HHuginn::identifier_id_t id( r.try_identifier_id( name ) );
-		if ( id != INVALID_IDENTIFIER ) {
+		if ( id != IDENTIFIER::INVALID ) {
 			HHuginn::value_t& s( values_[0] );
 			HHuginn::type_id_t t( s->type_id() );
 			if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {

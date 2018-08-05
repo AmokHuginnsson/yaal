@@ -177,7 +177,7 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t&& value_, 
 				break;
 			} else if (
 				( target->type() == HFrame::TYPE::FUNCTION )
-				&& ( static_cast<HFunction const*>( target->statement() )->name() == KEYWORD::DESTRUCTOR_IDENTIFIER )
+				&& ( static_cast<HFunction const*>( target->statement() )->name() == IDENTIFIER::KEYWORD::DESTRUCTOR )
 			) {
 				exMsg = " from destructor";
 				while ( target ) {
