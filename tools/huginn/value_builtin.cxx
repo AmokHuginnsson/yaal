@@ -79,11 +79,25 @@ HHuginn::value_t subscript(
 		HHuginn::HLookup* l( static_cast<HHuginn::HLookup*>( base_.raw() ) );
 		res = ( subscript_ == HFrame::ACCESS::VALUE ? l->get( thread_, index_, position_ ) : of.create_reference( l->get_ref( thread_, index_, position_ ) ) );
 	} else {
-		throw HHuginn::HHuginnRuntimeException(
-			"Subscript is not supported on "_ys.append( a_type_name( base_->get_class() ) ).append( "." ),
-			thread_->current_frame()->file_id(),
-			position_
-		);
+		if ( subscript_ == HFrame::ACCESS::VALUE ) {
+			if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( base_.raw() ) ) {
+				res = o->call_method( thread_, base_, IDENTIFIER::INTERFACE::SUBSCRIPT, HArguments( thread_, index_ ), position_ );
+			} else {
+				HHuginn::HClass const* c( base_->get_class() );
+				int idx( c->field_index( IDENTIFIER::INTERFACE::SUBSCRIPT ) );
+				if ( idx >= 0 ) {
+					HHuginn::HClass::HMethod const& m( *static_cast<HHuginn::HClass::HMethod const*>( c->field( idx ).raw() ) );
+					res = m.function()( thread_, const_cast<HHuginn::value_t*>( &base_ ), HArguments( thread_, index_ ), position_ );
+				}
+			}
+		}
+		if ( ! res ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"Subscript is not supported on "_ys.append( a_type_name( base_->get_class() ) ).append( "." ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
 	}
 	return ( res );
 }

@@ -67,6 +67,7 @@ namespace INTERFACE {
 
 extern HHuginn::identifier_id_t const CLONE;
 extern HHuginn::identifier_id_t const GET_SIZE;
+extern HHuginn::identifier_id_t const SUBSCRIPT;
 extern HHuginn::identifier_id_t const ITERATOR;
 extern HHuginn::identifier_id_t const VALUE;
 extern HHuginn::identifier_id_t const NEXT;
@@ -170,6 +171,7 @@ namespace INTERFACE {
 
 extern char const* CLONE;
 extern char const* GET_SIZE;
+extern char const* SUBSCRIPT;
 extern char const* ITERATOR;
 extern char const* VALUE;
 extern char const* NEXT;
