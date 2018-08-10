@@ -1,0 +1,76 @@
+#! /bin/sh
+
+err() {
+	echo "req-keys: ${1}\nusage:\nreq-keys /path/to/issuer.key subject"
+	exit 1
+}
+
+if [ ${#} -ne 2 ] ; then
+	err "Wrong number of arguments."
+fi
+
+key="${1}"
+subject="${2}"
+
+if [ ! -f "${key}" ] ; then
+	err "Given the kay at given path (${key}) does not exist."
+	exit 1
+fi
+
+if [ ! -r "${key}" ] ; then
+	err "Cannot read given key file: ${key}."
+fi
+
+notBefore=""
+notAfter=""
+
+certData=$(
+openssl x509 \
+	-in "${key}" \
+	-noout \
+	-text \
+	-certopt ca_default,no_sigdump,no_serial,no_extensions,no_signame,no_validity \
+	-nameopt multiline \
+	-dates | sed -e 's/^[[:space:]]*//g' -e 's/[=][[:space:]]*/=/' -e 's/[[:space:]]*[=]/=/' | awk '/=/'
+)
+
+# echo "${certData}"
+
+commonName=`echo "${certData}" | awk -F '=' '/commonName/{print $2}'`
+emailAddress=`echo "${certData}" | awk -F '=' '/emailAddress/{print $2}'`
+organizationName=`echo "${certData}" | awk -F '=' '/organizationName/{print $2}'`
+organizationalUnitName=`echo "${certData}" | awk -F '=' '/organizationalUnitName/{print $2}'`
+countryName=`echo "${certData}" | awk -F '=' '/countryName/{print $2}'`
+stateOrProvinceName=`echo "${certData}" | awk -F '=' '/stateOrProvinceName/{print $2}'`
+localityName=`echo "${certData}" | awk -F '=' '/localityName/{print $2}'`
+notAfter=`echo "${certData}" | awk -F '=' '/notAfter/{print $2}'`
+
+notAfter=`date -d "${notAfter}" +%s`
+notBefore=`date +%s`
+
+days=`expr \( ${notAfter} - ${notBefore} \) / \( 3600 '*' 24 \) - 1`
+
+
+host=`echo "${commonName}" | awk -F '.' '{print $(NF-1)"."$NF}'`
+commonName="${subject}.${host}"
+user=`echo "${emailAddress}" | awk -F '@' '{print $1}'`
+emailAddress="${user}@${commonName}"
+
+echo "commonName = ${commonName}"
+echo "emailAddress = ${emailAddress}"
+echo "days = ${days}"
+
+subject=""
+subject="${subject}/C=${countryName}"
+subject="${subject}/ST=${stateOrProvinceName}"
+subject="${subject}/L=${localityName}"
+subject="${subject}/O=${organizationName}"
+subject="${subject}/OU=${organizationalUnitName}"
+subject="${subject}/CN=${commonName}"
+subject="${subject}/emailAddress=${emailAddress}/"
+
+echo "subject = ${subject}"
+
+openssl genpkey -algorithm rsa -pkeyopt rsa_keygen_bits:2048 -out key 2> /dev/null
+openssl req -x509 -new -key key -out pem -days ${days} -subj "${subject}"
+
