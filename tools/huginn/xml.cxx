@@ -60,6 +60,8 @@ public:
 	}
 	HHuginn::value_t nth_child( HThread*, int, int );
 	HHuginn::value_t append( HThread*, HHuginn::values_t&, int );
+	void remove( HThread*, HElement*, int );
+	void remove_nth( HThread*, int, int );
 	HHuginn::value_t parent( HThread* );
 	HHuginn::value_t document( HThread* );
 protected:
@@ -104,11 +106,13 @@ public:
 		, _documentClass( documentClass_ )
 		, _exceptionClass( exceptionClass_ ) {
 		HHuginn::field_definitions_t fd{
-			{ "name",      runtime_->create_method( &HElementClass::element_name ), "get the name of this `Element`" },
-			{ "parent",    runtime_->create_method( &HElementClass::parent ),       "get parent node of this `Element`" },
-			{ "subscript", runtime_->create_method( &HElementClass::subscript ),    "( *index* ) get *index*'th child node of this `Element`" },
-			{ "document",  runtime_->create_method( &HElementClass::document ),     "get an `XML` `Document` to which this `Element` belongs to" },
-			{ "append",    runtime_->create_method( &HElementClass::append ),       "( *type*, *value* ) - append new node of type *type* and value *value* at the end of this `Element`" }
+			{ "name",       runtime_->create_method( &HElementClass::element_name ), "get the name of this `Element`" },
+			{ "parent",     runtime_->create_method( &HElementClass::parent ),       "get parent node of this `Element`" },
+			{ "subscript",  runtime_->create_method( &HElementClass::subscript ),    "( *index* ) get *index*'th child node of this `Element`" },
+			{ "document",   runtime_->create_method( &HElementClass::document ),     "get an `XML` `Document` to which this `Element` belongs to" },
+			{ "append",     runtime_->create_method( &HElementClass::append ),       "( *type*, *value* ) - append new node of type *type* and value *value* at the end of this `Element`" },
+			{ "remove",     runtime_->create_method( &HElementClass::remove ),       "( *node* ) - remove given `Element` child node of this `Element`" },
+			{ "remove_nth", runtime_->create_method( &HElementClass::remove_nth ),   "( *nth* ) - remove *nth* child node of this `Element`" }
 		};
 		set_origin( origin_ );
 		redefine( nullptr, fd );
@@ -147,6 +151,22 @@ public:
 		verify_signature( "Element.append", values_, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::STRING }, thread_, position_ );
 		HElement& element( *static_cast<HElement*>( object_->raw() ) );
 		return ( element.append( thread_, values_, position_ ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t remove( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		HElement& element( *static_cast<HElement*>( object_->raw() ) );
+		verify_signature_by_class( "Element.remove", values_, { element.get_class() }, thread_, position_ );
+		element.remove( thread_, static_cast<HElement*>( values_[0].raw() ), position_ );
+		return ( *object_ );
+		M_EPILOG
+	}
+	static HHuginn::value_t remove_nth( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "Element.remove_nth", values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
+		HElement& element( *static_cast<HElement*>( object_->raw() ) );
+		element.remove_nth( thread_, safe_int::cast<int>( get_integer( values_[0] ) ), position_ );
+		return ( *object_ );
 		M_EPILOG
 	}
 	HDocumentClass const* document_class( void ) const;
@@ -456,6 +476,45 @@ HHuginn::value_t HElement::nth_child( HThread* thread_, int index_, int position
 	yaal::tools::HXml::HIterator it( _node.begin() );
 	advance( it, index_ );
 	return ( make_node_ref( thread_->object_factory(), dc, _xml, *it ) );
+	M_EPILOG
+}
+
+void HElement::remove( HThread* thread_, HElement* element_, int position_ ) {
+	M_PROLOG
+	yaal::tools::HXml::HIterator it(
+		yaal::find_if(
+			_node.begin(),
+			_node.end(),
+			[&element_]( yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+				return ( node_ == element_->_node );
+			}
+		)
+	);
+	if ( it == _node.end() ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"Given `XML.Element` in not a child node of this `Element`. ",
+			thread_->current_frame()->file_id(),
+			position_
+		);
+	}
+	_node.remove_node( it );
+	return;
+	M_EPILOG
+}
+
+void HElement::remove_nth( HThread* thread_, int nth_, int position_ ) {
+	M_PROLOG
+	if ( ( nth_ < 0 ) || ( nth_ >= _node.child_count() ) ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"Invalid `XML.Element` child index: "_ys.append( nth_ ),
+			thread_->current_frame()->file_id(),
+			position_
+		);
+	}
+	yaal::tools::HXml::HIterator it( _node.begin() );
+	advance( it, nth_ );
+	_node.remove_node( it );
+	return;
 	M_EPILOG
 }
 
