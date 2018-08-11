@@ -1170,19 +1170,51 @@ inline iter_out_t set_union( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, it
  * \param it2 - beginning of second range.
  * \param end2 - one past the end of second range.
  * \param out - destination container extender functor.
+ * \return One past end iterator for the output range.
  */
 template<typename iter_in1_t, typename iter_in2_t, typename iter_out_t>
 inline iter_out_t set_intersection( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t end2, iter_out_t out ) {
-	for ( ; ( it1 != end1 ) && ( it2 != end2 ); ++ it1 ) {
-		for ( ; ( it2 != end2 ) && ( *it2 < *it1 ); ++ it2 ) {
+	while ( ( it1 != end1 ) && ( it2 != end2 ) ) {
+		if ( *it1 < *it2 ) {
+			++ it1;
+			continue;
 		}
-		if ( ( it2 != end2 ) && ! ( *it1 < *it2 ) ) {
-			*out = *it1;
-			++ out;
+		if ( *it2 < *it1 ) {
 			++ it2;
+			continue;
 		}
+		*out = *it1;
+		++ out;
+		++ it1;
+		++ it2;
 	}
 	return ( out );
+}
+
+/*! \brief Check if given two sorted ranges intersect.
+ *
+ * \param it1 - beginning of first range.
+ * \param end1 - one past the end of first range.
+ * \param it2 - beginning of second range.
+ * \param end2 - one past the end of second range.
+ * \return True iff two ranges do intersect.
+ */
+template<typename iter_in1_t, typename iter_in2_t>
+inline bool does_intersect( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t end2 ) {
+	bool intersect( false );
+	while ( ( it1 != end1 ) && ( it2 != end2 ) ) {
+		if ( *it1 < *it2 ) {
+			++ it1;
+			continue;
+		}
+		if ( *it2 < *it1 ) {
+			++ it2;
+			continue;
+		}
+		intersect = true;
+		break;
+	}
+	return ( intersect );
 }
 
 /*! \brief Fill range of elements with given value.

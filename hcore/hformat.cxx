@@ -162,25 +162,6 @@ HFormat::HFormatImpl::HFormatImpl( HFormatImpl const& fi )
 	return;
 }
 
-namespace {
-
-class common {
-	int long _count;
-public:
-	common( int long count = 0 ) : _count( count ) {}
-	common& operator = ( int ) { return ( *this ); }
-	common& operator* ( void ) { return ( *this ); }
-	common& operator ++ ( void ) { ++ _count; return ( *this ); }
-	int long operator() ( void ) const { return ( _count ); }
-};
-
-template<typename iter1_t, typename iter2_t>
-bool does_intersect( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 ) {
-	return ( set_intersection( it1, end1, it2, end2, common() )() > 0 );
-}
-
-}
-
 HFormat::HFormat( HString const& aFmt_ )
 	: _impl( make_pointer<HFormatImpl>( aFmt_ ) ) {
 	M_PROLOG
