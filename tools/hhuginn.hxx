@@ -37,7 +37,6 @@ class HObjectFactory;
 struct OCompiler;
 class HRuntime;
 class HPackageFactory;
-class HNotifableIterator;
 class HIteratorInterface;
 
 namespace ERR_CODE {
@@ -72,6 +71,8 @@ public:
 	typedef yaal::hcore::HTaggedPOD<int, type_tag> type_id_t;
 	typedef yaal::hcore::HTaggedPOD<int, identifier_tag> identifier_id_t;
 	typedef yaal::hcore::HPointer<HHuginn> ptr_t;
+	class HNotifableReference;
+	class HReferenceTracker;
 	class HIterable;
 	class HInvalidatingIterable;
 	typedef yaal::hcore::HPointer<HIterable> iterable_t;
@@ -834,16 +835,48 @@ protected:
 	virtual int long do_size( huginn::HThread*, int ) const = 0;
 };
 
-class HHuginn::HInvalidatingIterable : public HHuginn::HIterable {
+class HHuginn::HReferenceTracker {
 public:
-	typedef yaal::hcore::HArray<huginn::HNotifableIterator*> observers_t;
-private:
+	typedef yaal::hcore::HArray<HHuginn::HNotifableReference*> observers_t;
+protected:
 	observers_t _observers;
 public:
-	HInvalidatingIterable( HClass const* );
-	void notify( huginn::HNotifableIterator* );
-	void forget( huginn::HNotifableIterator* );
+	HReferenceTracker( void );
+	virtual ~HReferenceTracker() {}
+	void notify( HHuginn::HNotifableReference* );
+	void forget( HHuginn::HNotifableReference* );
 	void invalidate( void );
+};
+
+class HHuginn::HNotifableReference {
+private:
+	HHuginn::HReferenceTracker* _owner;
+public:
+	HNotifableReference( HHuginn::HReferenceTracker* owner_ )
+		: _owner( owner_ ) {
+		_owner->notify( this );
+	}
+	virtual ~HNotifableReference( void ) {
+		_owner->forget( this );
+	}
+	void invalidate( void ) {
+		do_invalidate();
+	}
+	void const* id( void ) const {
+		return ( do_id() );
+	}
+protected:
+	virtual void do_invalidate( void ) = 0;
+	virtual void const* do_id( void ) const = 0;
+private:
+	HNotifableReference( HNotifableReference const& ) = delete;
+	HNotifableReference& operator = ( HNotifableReference const& ) = delete;
+};
+
+class HHuginn::HInvalidatingIterable : public HHuginn::HIterable, public HHuginn::HReferenceTracker {
+public:
+	HInvalidatingIterable( HClass const* );
+	using HReferenceTracker::invalidate;
 	void invalidate( void const* );
 };
 

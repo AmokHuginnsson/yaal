@@ -171,6 +171,51 @@ void HIntrospectorInterface::symbol( symbols_t const& symbol_, HHuginn::SYMBOL_K
 	M_EPILOG
 }
 
+HHuginn::HReferenceTracker::HReferenceTracker( void )
+	: _observers() {
+	return;
+}
+
+void HHuginn::HReferenceTracker::notify( HHuginn::HNotifableReference* ref_ ) {
+	M_PROLOG
+	_observers.push_back( ref_ );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HReferenceTracker::forget( HHuginn::HNotifableReference* ref_ ) {
+	M_PROLOG
+	_observers.erase( find( _observers.begin(), _observers.end(), ref_ ) );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HReferenceTracker::invalidate( void ) {
+	M_PROLOG
+	for ( HHuginn::HNotifableReference* nr : _observers ) {
+		nr->invalidate();
+	}
+	return;
+	M_EPILOG
+}
+
+HHuginn::HInvalidatingIterable::HInvalidatingIterable( HHuginn::HClass const* class_ )
+	: HIterable( class_ )
+	, HReferenceTracker() {
+	return;
+}
+
+void HHuginn::HInvalidatingIterable::invalidate( void const* id_ ) {
+	M_PROLOG
+	for ( HHuginn::HNotifableReference* nr : _observers ) {
+		if ( nr->id() == id_ ) {
+			static_cast<huginn::HNotifableIterator*>( nr )->skip();
+		}
+	}
+	return;
+	M_EPILOG
+}
+
 HHuginn::HObjectReference::HObjectReference( HHuginn::HClass const* class_, value_t const& value_, int upCastLevel_, int fileId_, int position_ )
 	: HValue( class_ )
 	, _value( value_ )

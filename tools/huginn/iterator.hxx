@@ -35,36 +35,21 @@ protected:
 	virtual void do_next( HThread*, int ) = 0;
 };
 
-class HNotifableIterator : public HIteratorInterface {
-private:
-	HHuginn::HInvalidatingIterable* _owner;
+class HNotifableIterator : public HIteratorInterface, public HHuginn::HNotifableReference {
 protected:
 	int _skip;
 public:
 	HNotifableIterator( HHuginn::HInvalidatingIterable* owner_ )
-		: _owner( owner_ )
+		: HIteratorInterface()
+		, HNotifableReference( owner_ )
 		, _skip( 0 ) {
-		_owner->notify( this );
-	}
-	virtual ~HNotifableIterator( void ) {
-		_owner->forget( this );
-	}
-	void invalidate( void ) {
-		do_invalidate();
+		return;
 	}
 	void skip( void ) {
 		do_skip();
 	}
-	void const* node_id( void ) const {
-		return ( do_node_id() );
-	}
 protected:
-	virtual void do_invalidate( void ) = 0;
 	virtual void do_skip( void ) = 0;
-	virtual void const* do_node_id( void ) const = 0;
-private:
-	HNotifableIterator( HNotifableIterator const& ) = delete;
-	HNotifableIterator& operator = ( HNotifableIterator const& ) = delete;
 };
 
 class HIterator : public HHuginn::HIterable, public HIteratorInterface {

@@ -237,7 +237,7 @@ protected:
 		++ _it;
 		++ _skip;
 	}
-	virtual void const* do_node_id( void ) const override {
+	virtual void const* do_id( void ) const override {
 		return ( _it.node_id() );
 	}
 private:
