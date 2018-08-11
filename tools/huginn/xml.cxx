@@ -458,7 +458,7 @@ HHuginn::value_t make_node_ref( HObjectFactory& of_, HDocumentClass const* dc_, 
 	M_PROLOG
 	HHuginn::value_t v;
 	switch ( n_.get_type() ) {
-		case ( yaal::tools::HXml::HNode::TYPE::NODE ): {
+		case ( yaal::tools::HXml::HNode::TYPE::ELEMENT ): {
 			v = static_cast<HDocument*>( doc_.raw() )->create_element( of_, doc_, n_ );
 		} break;
 		case ( yaal::tools::HXml::HNode::TYPE::CONTENT ): {
@@ -479,7 +479,7 @@ void get_all_child_nodes( HHuginn::HReferenceTracker::ids_t& ids_, yaal::tools::
 	M_PROLOG
 	for ( yaal::tools::HXml::HConstNodeProxy const& n : node_ ) {
 		ids_.push_back( n.node_id() );
-		if ( n.get_type() == yaal::tools::HXml::HNode::TYPE::NODE ) {
+		if ( n.get_type() == yaal::tools::HXml::HNode::TYPE::ELEMENT ) {
 			get_all_child_nodes( ids_, n );
 		}
 	}
@@ -546,7 +546,7 @@ HHuginn::value_t HElement::append( HThread* thread_, HHuginn::values_t& values_,
 	void const* id( fr.function().id() );
 	HRuntime& r( thread_->runtime() );
 	HString const& s( get_string( values_[1] ) );
-	yaal::tools::HXml::HNode::TYPE t( yaal::tools::HXml::HNode::TYPE::NODE );
+	yaal::tools::HXml::HNode::TYPE t( yaal::tools::HXml::HNode::TYPE::ELEMENT );
 	if ( id == dc->element_class() ) {
 		/* node type already set */
 	} else if ( id == dc->text_class() ) {

@@ -132,8 +132,8 @@ public:
 	/*! \brief XML node types.
 	 */
 	enum class TYPE {
-		NODE,    /*!< XML node. */
-		CONTENT, /*!< XML node content. */
+		ELEMENT, /*!< XML Element node. */
+		CONTENT, /*!< XML Text content. */
 		ENTITY,  /*!< XML entity. */
 		COMMENT  /*!< XML comment. */
 	};
@@ -148,7 +148,7 @@ private:
 	int _line;
 public:
 	HNode( HXml const* owner_, int line_ = 0 )
-		: _owner( owner_ ), _type( TYPE::NODE ),
+		: _owner( owner_ ), _type( TYPE::ELEMENT ),
 		_text(), _properties(),
 		_namespaceDefinitions(), _line( line_ ) {
 		return;
