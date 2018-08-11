@@ -236,6 +236,9 @@ public:
 	bool operator == ( HConstNodeProxy const& ) const;
 	bool operator != ( HConstNodeProxy const& ) const;
 	bool operator ! ( void ) const;
+	void const* node_id( void ) const {
+		return ( _node );
+	}
 private:
 	void get_elements_by_path( HConstNodeSet&, const_xml_element_t, yaal::hcore::HTokenizer const&, yaal::hcore::HTokenizer::iterator ) const;
 	void get_elements_by_name( HConstNodeSet&, const_xml_element_t, yaal::hcore::HString const& ) const;

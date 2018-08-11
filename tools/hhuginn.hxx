@@ -838,6 +838,7 @@ protected:
 class HHuginn::HReferenceTracker {
 public:
 	typedef yaal::hcore::HArray<HHuginn::HNotifableReference*> observers_t;
+	typedef yaal::hcore::HArray<void const*> ids_t;
 protected:
 	observers_t _observers;
 public:
@@ -845,6 +846,8 @@ public:
 	virtual ~HReferenceTracker() {}
 	void notify( HHuginn::HNotifableReference* );
 	void forget( HHuginn::HNotifableReference* );
+	void invalidate( void const* );
+	void invalidate( ids_t& );
 	void invalidate( void );
 };
 
@@ -876,8 +879,7 @@ private:
 class HHuginn::HInvalidatingIterable : public HHuginn::HIterable, public HHuginn::HReferenceTracker {
 public:
 	HInvalidatingIterable( HClass const* );
-	using HReferenceTracker::invalidate;
-	void invalidate( void const* );
+	void skip( void const* );
 };
 
 class HHuginn::HBoolean : public HHuginn::HValue {

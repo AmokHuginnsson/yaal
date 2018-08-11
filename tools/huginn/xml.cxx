@@ -45,33 +45,63 @@ HHuginn::class_t make_node_class( HRuntime* runtime_, HHuginn::HClass const* ori
 class HElement : public HHuginn::HInvalidatingIterable {
 public:
 	typedef yaal::hcore::HPointer<yaal::tools::HXml> xml_t;
+	class HTrackerProxy : public HHuginn::HNotifableReference {
+		HElement& _element;
+	public:
+		HTrackerProxy( HHuginn::HReferenceTracker* owner_, HElement& element_ )
+			: HHuginn::HNotifableReference( owner_ )
+			, _element( element_ ) {
+		}
+	protected:
+		virtual void do_invalidate( void ) override {
+			_element.do_invalidate();
+		}
+		virtual void const* do_id( void ) const override {
+			return ( _element.do_id() );
+		}
+	};
 private:
-	xml_t _xml;
+	HHuginn::value_t _doc;
 	yaal::tools::HXml::HNodeProxy _node;
+	HTrackerProxy _tracker;
 public:
-	HElement( HHuginn::HClass const* class_, xml_t xml_, yaal::tools::HXml::HNodeProxy const& node_ )
-		: HInvalidatingIterable( class_ )
-		, _xml( xml_ )
-		, _node( node_ ) {
-		return;
-	}
-	HHuginn::value_t name( HThread* thread_ ) const {
+	HElement( HHuginn::HClass const*, HHuginn::value_t&, yaal::tools::HXml::HNodeProxy const& );
+	virtual ~HElement( void );
+	HHuginn::value_t name( HThread* thread_, int position_ ) const {
+		ensure_valid( thread_, position_ );
 		return ( !! _node ? thread_->object_factory().create_string( _node.get_name() ) : thread_->runtime().none_value() );
 	}
 	HHuginn::value_t nth_child( HThread*, int, int );
 	HHuginn::value_t append( HThread*, HHuginn::values_t&, int );
 	void remove( HThread*, HElement*, int );
 	void remove_nth( HThread*, int, int );
-	HHuginn::value_t parent( HThread* );
-	HHuginn::value_t document( HThread* );
+	HHuginn::value_t parent( HThread*, int );
+	HHuginn::value_t document( HThread*, int );
 	yaal::tools::HXml::HNodeProxy const& node( void ) const {
 		return ( _node );
 	}
 protected:
 	virtual iterator_t do_iterator( HThread*, int ) override;
-	virtual int long do_size( huginn::HThread*, int ) const override {
+	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
+		ensure_valid( thread_, position_ );
 		return ( distance( _node.begin(), _node.end() ) );
 	}
+	void do_invalidate( void );
+	void const* do_id( void ) const {
+		return ( _node.node_id() );
+	}
+private:
+	void ensure_valid( HThread* thread_, int position_ ) const {
+		if ( ! _node ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"This `XML.Element` reference is no longer a valid node.",
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+		return;
+	}
+	void do_remove( yaal::tools::HXml::HIterator& );
 	HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const override {
 		M_PROLOG
 		throw HHuginn::HHuginnRuntimeException(
@@ -81,6 +111,8 @@ protected:
 		);
 		M_EPILOG
 	}
+private:
+	friend class HTrackerProxy;
 };
 
 class HDocumentClass;
@@ -125,14 +157,14 @@ public:
 		M_PROLOG
 		verify_arg_count( "Element.name", values_, 0, 0, thread_, position_ );
 		HElement& element( *static_cast<HElement*>( object_->raw() ) );
-		return ( element.name( thread_ ) );
+		return ( element.name( thread_, position_ ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t parent( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "Element.parent", values_, 0, 0, thread_, position_ );
 		HElement& element( *static_cast<HElement*>( object_->raw() ) );
-		return ( element.parent( thread_ ) );
+		return ( element.parent( thread_, position_ ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t subscript( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -146,7 +178,7 @@ public:
 		M_PROLOG
 		verify_arg_count( "Element.document", values_, 0, 0, thread_, position_ );
 		HElement& element( *static_cast<HElement*>( object_->raw() ) );
-		return ( element.document( thread_ ) );
+		return ( element.document( thread_, position_ ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t append( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -206,14 +238,14 @@ private:
 
 class HElementIterator : public HNotifableIterator {
 	HHuginn::HClass const* _class;
-	xml_t _xml;
+	HHuginn::value_t _doc;
 	yaal::tools::HXml::HNodeProxy _node;
 	yaal::tools::HXml::HIterator _it;
 public:
-	HElementIterator( HHuginn::HClass const* class_, xml_t xml_, HElement* element_ )
+	HElementIterator( HHuginn::HClass const* class_, HHuginn::value_t const& doc_, HElement* element_ )
 		: HNotifableIterator( element_ )
 		, _class( class_ )
-		, _xml( xml_ )
+		, _doc( doc_ )
 		, _node( element_->node() )
 		, _it( _node.begin() ) {
 		return;
@@ -245,27 +277,38 @@ private:
 	HElementIterator& operator = ( HElementIterator const& ) = delete;
 };
 
-HHuginn::HIterable::iterator_t HElement::do_iterator( HThread*, int ) {
-	return ( make_pointer<HElementIterator>( get_class(), _xml, this ) );
+HHuginn::HIterable::iterator_t HElement::do_iterator( HThread* thread_, int position_ ) {
+	ensure_valid( thread_, position_ );
+	return ( make_pointer<HElementIterator>( get_class(), _doc, this ) );
 }
 
-class HDocument : public HHuginn::HValue {
+class HDocument : public HHuginn::HValue, public HHuginn::HReferenceTracker {
+public:
+	typedef yaal::hcore::HHashMap<void const*, HHuginn::value_ref_t> element_refs_t;
 private:
 	xml_t _xml;
+	element_refs_t _elementRefs;
 public:
 	HDocument( HHuginn::HClass const* class_, yaal::hcore::HString const& name_ )
 		: HValue( class_ )
-		, _xml( make_pointer<yaal::tools::HXml>() ) {
+		, HReferenceTracker()
+		, _xml( make_pointer<yaal::tools::HXml>() )
+		, _elementRefs() {
 		_xml->create_root( name_ );
 		return;
 	}
 	HDocument( HHuginn::HClass const* class_, xml_t xml_ )
 		: HValue( class_ )
-		, _xml( xml_ ) {
+		, _xml( xml_ )
+		, _elementRefs() {
 		return;
 	}
-	HHuginn::value_t root( HThread* thread_, HHuginn::HClass const* class_ ) {
-		return ( thread_->object_factory().create<HElement>( class_, _xml, _xml->get_root() ) );
+	HHuginn::value_t create_element( HObjectFactory&, HHuginn::value_t&, yaal::tools::HXml::HNodeProxy const& );
+	void destroy_element( yaal::tools::HXml::HNodeProxy const& node_ ) {
+		_elementRefs.erase( node_.node_id() );
+	}
+	HHuginn::value_t root( HThread* thread_, HHuginn::value_t& object_ ) {
+		return ( create_element( thread_->object_factory(), object_, _xml->get_root() ) );
 	}
 	void save( HStream& stream_ ) {
 		M_PROLOG
@@ -277,6 +320,9 @@ public:
 		M_PROLOG
 		return ( thread_->object_factory().create<HDocument>( get_class(), make_pointer<yaal::tools::HXml>( *_xml ) ) );
 		M_EPILOG
+	}
+	xml_t const& xml( void ) const {
+		return ( _xml );
 	}
 };
 
@@ -347,8 +393,7 @@ public:
 		M_PROLOG
 		verify_arg_count( "Document.root", values_, 0, 0, thread_, position_ );
 		HDocument& document( *static_cast<HDocument*>( object_->raw() ) );
-		HDocumentClass const& documentClass( *static_cast<HDocumentClass const*>( document.get_class() ) );
-		return ( document.root( thread_, documentClass.element_class() ) );
+		return ( document.root( thread_, *object_ ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t save( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -409,12 +454,12 @@ HDocumentClass const* HElementClass::document_class( void ) const {
 
 namespace {
 
-HHuginn::value_t make_node_ref( HObjectFactory& of_, HDocumentClass const* dc_, xml_t const& xml_, yaal::tools::HXml::HNodeProxy const& n_ ) {
+HHuginn::value_t make_node_ref( HObjectFactory& of_, HDocumentClass const* dc_, HHuginn::value_t& doc_, yaal::tools::HXml::HNodeProxy const& n_ ) {
 	M_PROLOG
 	HHuginn::value_t v;
 	switch ( n_.get_type() ) {
 		case ( yaal::tools::HXml::HNode::TYPE::NODE ): {
-			v = of_.create<HElement>( dc_->element_class(), xml_, n_ );
+			v = static_cast<HDocument*>( doc_.raw() )->create_element( of_, doc_, n_ );
 		} break;
 		case ( yaal::tools::HXml::HNode::TYPE::CONTENT ): {
 			v = of_.create<HHuginn::HString>( dc_->text_class(), n_.get_value() );
@@ -430,10 +475,64 @@ HHuginn::value_t make_node_ref( HObjectFactory& of_, HDocumentClass const* dc_, 
 	M_EPILOG
 }
 
+void get_all_child_nodes( HHuginn::HReferenceTracker::ids_t& ids_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+	M_PROLOG
+	for ( yaal::tools::HXml::HConstNodeProxy const& n : node_ ) {
+		ids_.push_back( n.node_id() );
+		if ( n.get_type() == yaal::tools::HXml::HNode::TYPE::NODE ) {
+			get_all_child_nodes( ids_, n );
+		}
+	}
+	return;
+	M_EPILOG
+}
+
+}
+
+HHuginn::value_t HDocument::create_element( HObjectFactory& of_, HHuginn::value_t& doc_, yaal::tools::HXml::HNodeProxy const& node_ ) {
+	M_PROLOG
+	HDocumentClass const* dc( static_cast<HDocumentClass const*>( get_class() ) );
+	element_refs_t::iterator it( _elementRefs.find( node_.node_id() ) );
+	HHuginn::value_t v;
+	if ( it != _elementRefs.end() ) {
+		v = HHuginn::value_t( it->second );
+		M_ASSERT( !! v );
+	} else {
+		v = of_.create<HElement>( dc->element_class(), doc_, node_ );
+		_elementRefs.insert( make_pair( node_.node_id(), HHuginn::value_ref_t( v ) ) );
+	}
+	return ( v );
+	M_EPILOG
+}
+
+HElement::HElement( HHuginn::HClass const* class_, HHuginn::value_t& doc_, yaal::tools::HXml::HNodeProxy const& node_ )
+	: HInvalidatingIterable( class_ )
+	, _doc( doc_ )
+	, _node( node_ )
+	, _tracker( static_cast<HDocument*>( doc_.raw() ), *this ) {
+	return;
+}
+
+HElement::~HElement( void ) {
+	M_PROLOG
+	do_invalidate();
+	return;
+	M_DESTRUCTOR_EPILOG
+}
+
+void HElement::do_invalidate( void ) {
+	M_PROLOG
+	if ( !! _node ) {
+		static_cast<HDocument*>( _doc.raw() )->destroy_element( _node );
+	}
+	_node = yaal::tools::HXml::HNodeProxy();
+	return;
+	M_EPILOG
 }
 
 HHuginn::value_t HElement::append( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
+	ensure_valid( thread_, position_ );
 	if ( ! _node ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Referenced `XML.Element` was removed.",
@@ -463,18 +562,17 @@ HHuginn::value_t HElement::append( HThread* thread_, HHuginn::values_t& values_,
 			position_
 		);
 	}
-	return ( make_node_ref( *r.object_factory(), dc, _xml, *_node.add_node( t, s ) ) );
+	return ( make_node_ref( *r.object_factory(), dc, _doc, *_node.add_node( t, s ) ) );
 	M_EPILOG
 }
 
-HHuginn::value_t HElement::parent( HThread* thread_ ) {
+HHuginn::value_t HElement::parent( HThread* thread_, int position_ ) {
 	M_PROLOG
-	HElementClass const* ec( static_cast<HElementClass const*>( get_class() ) );
-	HDocumentClass const* dc( ec->document_class() );
+	ensure_valid( thread_, position_ );
 	yaal::tools::HXml::HNodeProxy n( _node.get_parent() );
 	return (
 		!! n
-			? thread_->object_factory().create<HElement>( dc->element_class(), _xml, n )
+			? static_cast<HDocument*>( _doc.raw() )->create_element( thread_->object_factory(), _doc, n )
 			: thread_->runtime().none_value()
 	);
 	M_EPILOG
@@ -482,6 +580,7 @@ HHuginn::value_t HElement::parent( HThread* thread_ ) {
 
 HHuginn::value_t HElement::nth_child( HThread* thread_, int index_, int position_ ) {
 	M_PROLOG
+	ensure_valid( thread_, position_ );
 	HElementClass const* ec( static_cast<HElementClass const*>( get_class() ) );
 	HDocumentClass const* dc( ec->document_class() );
 	if ( ( index_ < 0 ) || ( index_ >= _node.child_count() ) ) {
@@ -493,12 +592,13 @@ HHuginn::value_t HElement::nth_child( HThread* thread_, int index_, int position
 	}
 	yaal::tools::HXml::HIterator it( _node.begin() );
 	advance( it, index_ );
-	return ( make_node_ref( thread_->object_factory(), dc, _xml, *it ) );
+	return ( make_node_ref( thread_->object_factory(), dc, _doc, *it ) );
 	M_EPILOG
 }
 
 void HElement::remove( HThread* thread_, HElement* element_, int position_ ) {
 	M_PROLOG
+	ensure_valid( thread_, position_ );
 	yaal::tools::HXml::HIterator it(
 		yaal::find_if(
 			_node.begin(),
@@ -515,14 +615,14 @@ void HElement::remove( HThread* thread_, HElement* element_, int position_ ) {
 			position_
 		);
 	}
-	invalidate( it.node_id() );
-	_node.remove_node( it );
+	do_remove( it );
 	return;
 	M_EPILOG
 }
 
 void HElement::remove_nth( HThread* thread_, int nth_, int position_ ) {
 	M_PROLOG
+	ensure_valid( thread_, position_ );
 	if ( ( nth_ < 0 ) || ( nth_ >= _node.child_count() ) ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Invalid `XML.Element` child index: "_ys.append( nth_ ),
@@ -532,22 +632,32 @@ void HElement::remove_nth( HThread* thread_, int nth_, int position_ ) {
 	}
 	yaal::tools::HXml::HIterator it( _node.begin() );
 	advance( it, nth_ );
-	invalidate( it.node_id() );
-	_node.remove_node( it );
+	do_remove( it );
 	return;
 	M_EPILOG
 }
 
-HHuginn::value_t HElement::document( HThread* thread_ ) {
+void HElement::do_remove( yaal::tools::HXml::HIterator& it_ ) {
 	M_PROLOG
-	HElementClass const* ec( static_cast<HElementClass const*>( get_class() ) );
-	HDocumentClass const* dc( ec->document_class() );
-	return ( thread_->object_factory().create<xml::HDocument>( dc, _xml ) );
+	HHuginn::HReferenceTracker::ids_t ids;
+	get_all_child_nodes( ids, *it_ );
+	ids.push_back( (*it_).node_id() );
+	static_cast<HDocument*>( _doc.raw() )->invalidate( ids );
+	skip( it_.node_id() );
+	_node.remove_node( it_ );
+	return;
+	M_EPILOG
+}
+
+HHuginn::value_t HElement::document( HThread* thread_, int position_ ) {
+	M_PROLOG
+	ensure_valid( thread_, position_ );
+	return ( _doc );
 	M_EPILOG
 }
 
 HHuginn::value_t HElementIterator::do_value( HThread* thread_, int ) {
-	return ( make_node_ref( thread_->object_factory(), static_cast<HElementClass const*>( _class )->document_class(), _xml, *_it ) );
+	return ( make_node_ref( thread_->object_factory(), static_cast<HElementClass const*>( _class )->document_class(), _doc, *_it ) );
 }
 
 }

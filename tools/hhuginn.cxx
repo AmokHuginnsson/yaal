@@ -190,6 +190,30 @@ void HHuginn::HReferenceTracker::forget( HHuginn::HNotifableReference* ref_ ) {
 	M_EPILOG
 }
 
+void HHuginn::HReferenceTracker::invalidate( ids_t& ids_ ) {
+	M_PROLOG
+	sort( ids_.begin(), ids_.end() );
+	for ( HHuginn::HNotifableReference* nr : _observers ) {
+		ids_t::const_iterator it( lower_bound( ids_.begin(), ids_.end(), nr->id() ) );
+		if ( ( it != ids_.end() ) && ( *it == nr->id() ) ) {
+			nr->invalidate();
+		}
+	}
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HReferenceTracker::invalidate( void const* id_ ) {
+	M_PROLOG
+	for ( HHuginn::HNotifableReference* nr : _observers ) {
+		if ( nr->id() == id_ ) {
+			nr->invalidate();
+		}
+	}
+	return;
+	M_EPILOG
+}
+
 void HHuginn::HReferenceTracker::invalidate( void ) {
 	M_PROLOG
 	for ( HHuginn::HNotifableReference* nr : _observers ) {
@@ -205,7 +229,7 @@ HHuginn::HInvalidatingIterable::HInvalidatingIterable( HHuginn::HClass const* cl
 	return;
 }
 
-void HHuginn::HInvalidatingIterable::invalidate( void const* id_ ) {
+void HHuginn::HInvalidatingIterable::skip( void const* id_ ) {
 	M_PROLOG
 	for ( HHuginn::HNotifableReference* nr : _observers ) {
 		if ( nr->id() == id_ ) {

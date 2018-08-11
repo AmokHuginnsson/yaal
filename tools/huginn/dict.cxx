@@ -464,7 +464,7 @@ void HHuginn::HDict::erase( huginn::HThread* thread_, HHuginn::value_t const& ke
 	HAnchorGuard<HHuginn::HDict> ag( *this, thread_, position_ );
 	values_t::iterator it( _data.find( key_ ) );
 	if ( it != _data.end() ) {
-		invalidate( it.node_id() );
+		skip( it.node_id() );
 		_data.erase( it );
 	}
 	return;
