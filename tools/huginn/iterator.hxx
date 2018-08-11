@@ -7,7 +7,6 @@
 
 #include "tools/hhuginn.hxx"
 
-
 namespace yaal {
 
 namespace tools {

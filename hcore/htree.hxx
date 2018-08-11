@@ -746,6 +746,9 @@ public:
 		return ( _iterator != it._iterator );
 		M_EPILOG
 	}
+	void const* node_id( void ) const {
+		return ( _iterator.node_id() );
+	}
 private:
 	friend class HTree<value_t, allocator_t, sequence_t>::HNode;
 	template<typename other_const_qual_t>

@@ -42,7 +42,7 @@ HHuginn::class_t make_node_class( HRuntime* runtime_, HHuginn::HClass const* ori
 
 }
 
-class HElement : public HHuginn::HIterable {
+class HElement : public HHuginn::HInvalidatingIterable {
 public:
 	typedef yaal::hcore::HPointer<yaal::tools::HXml> xml_t;
 private:
@@ -50,7 +50,7 @@ private:
 	yaal::tools::HXml::HNodeProxy _node;
 public:
 	HElement( HHuginn::HClass const* class_, xml_t xml_, yaal::tools::HXml::HNodeProxy const& node_ )
-		: HIterable( class_ )
+		: HInvalidatingIterable( class_ )
 		, _xml( xml_ )
 		, _node( node_ ) {
 		return;
@@ -64,6 +64,9 @@ public:
 	void remove_nth( HThread*, int, int );
 	HHuginn::value_t parent( HThread* );
 	HHuginn::value_t document( HThread* );
+	yaal::tools::HXml::HNodeProxy const& node( void ) const {
+		return ( _node );
+	}
 protected:
 	virtual iterator_t do_iterator( HThread*, int ) override;
 	virtual int long do_size( huginn::HThread*, int ) const override {
@@ -201,16 +204,17 @@ private:
 	HElementClass& operator = ( HElementClass const& ) = delete;
 };
 
-class HElementIterator : public HIteratorInterface {
+class HElementIterator : public HNotifableIterator {
 	HHuginn::HClass const* _class;
 	xml_t _xml;
 	yaal::tools::HXml::HNodeProxy _node;
 	yaal::tools::HXml::HIterator _it;
 public:
-	HElementIterator( HHuginn::HClass const* class_, xml_t xml_, yaal::tools::HXml::HNodeProxy const& node_ )
-		: _class( class_ )
+	HElementIterator( HHuginn::HClass const* class_, xml_t xml_, HElement* element_ )
+		: HNotifableIterator( element_ )
+		, _class( class_ )
 		, _xml( xml_ )
-		, _node( node_ )
+		, _node( element_->node() )
 		, _it( _node.begin() ) {
 		return;
 	}
@@ -220,7 +224,21 @@ protected:
 		return ( _it != _node.end() );
 	}
 	virtual void do_next( HThread*, int ) override {
+		if ( _skip == 0 ) {
+			++ _it;
+		} else {
+			-- _skip;
+		}
+	}
+	virtual void do_invalidate( void ) override {
+		_it = _node.end();
+	}
+	virtual void do_skip( void ) override {
 		++ _it;
+		++ _skip;
+	}
+	virtual void const* do_node_id( void ) const override {
+		return ( _it.node_id() );
 	}
 private:
 	HElementIterator( HElementIterator const& ) = delete;
@@ -228,7 +246,7 @@ private:
 };
 
 HHuginn::HIterable::iterator_t HElement::do_iterator( HThread*, int ) {
-	return ( make_pointer<HElementIterator>( get_class(), _xml, _node ) );
+	return ( make_pointer<HElementIterator>( get_class(), _xml, this ) );
 }
 
 class HDocument : public HHuginn::HValue {
@@ -497,6 +515,7 @@ void HElement::remove( HThread* thread_, HElement* element_, int position_ ) {
 			position_
 		);
 	}
+	invalidate( it.node_id() );
 	_node.remove_node( it );
 	return;
 	M_EPILOG
@@ -513,6 +532,7 @@ void HElement::remove_nth( HThread* thread_, int nth_, int position_ ) {
 	}
 	yaal::tools::HXml::HIterator it( _node.begin() );
 	advance( it, nth_ );
+	invalidate( it.node_id() );
 	_node.remove_node( it );
 	return;
 	M_EPILOG

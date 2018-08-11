@@ -322,6 +322,9 @@ public:
 		-- _iterator;
 		return ( it );
 	}
+	void const* node_id( void ) const {
+		return ( _iterator.node_id() );
+	}
 	HIterator& operator = ( HIterator const& );
 	bool operator == ( HIterator const& ) const;
 	bool operator != ( HIterator const& ) const;
@@ -359,6 +362,9 @@ public:
 		HConstIterator it( *this );
 		-- _iterator;
 		return ( it );
+	}
+	void const* node_id( void ) const {
+		return ( _iterator.node_id() );
 	}
 	HConstIterator& operator = ( HConstIterator const& );
 	bool operator == ( HConstIterator const& ) const;

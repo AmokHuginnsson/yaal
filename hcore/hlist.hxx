@@ -1145,6 +1145,9 @@ public:
 	const_qual_t* operator-> ( void ) const {
 		return ( &_current->_value );
 	}
+	void const* node_id( void ) const {
+		return ( _current );
+	}
 protected:
 	friend class HList<type_t, allocator_t>;
 	HIterator( owner_t const* owner_, HElement* element_ )
