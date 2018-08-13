@@ -170,6 +170,69 @@ public:
 				dest.insert( it->value( thread_, position_ ) );
 				it->next( thread_, position_ );
 			}
+		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::dict ) ) {
+			v = thread_->object_factory().create_dict();
+			HHuginn::HDict* dict( static_cast<HHuginn::HDict*>( v.raw() ) );
+			HHuginn::HDict::values_t& dest( dict->value() );
+			HAnchorGuard<HHuginn::HDict> ag( *dict, thread_, position_ );
+			HHuginn::HClass const* keyType( nullptr );
+			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
+				HHuginn::value_t tuple( it->value( thread_, position_ ) );
+				if ( tuple->type_id() != HHuginn::TYPE::TUPLE ) {
+					throw HHuginn::HHuginnRuntimeException(
+						"Each value materialized into a `dict` must be a `tuple` not "_ys.append( a_type_name( tuple->get_class() ) ).append( "." ),
+						thread_->current_frame()->file_id(),
+						position_
+					);
+				}
+				HHuginn::HTuple::values_t const& data( static_cast<HHuginn::HTuple const*>( tuple.raw() )->value() );
+				if ( data.get_size() != 2 ) {
+					throw HHuginn::HHuginnRuntimeException(
+						"Each `tuple` materialized into a `dict` must be a key-value pair, i.e. contain exactly two elements.",
+						thread_->current_frame()->file_id(),
+						position_
+					);
+				}
+				HHuginn::HClass const* newKeyType( data.front()->get_class() );
+				if ( ! is_comparable( newKeyType ) || ( keyType && ( newKeyType != keyType ) ) ) {
+					throw HHuginn::HHuginnRuntimeException(
+						"Invalid key type: "_ys.append( a_type_name( newKeyType ) ).append( "." ),
+						thread_->current_frame()->file_id(),
+						position_
+					);
+				}
+				keyType = newKeyType;
+				dest.insert( make_pair( data.front(), data.back() ) );
+				it->next( thread_, position_ );
+			}
+			if ( keyType ) {
+				dict->update_key_type( thread_, keyType, position_ );
+			}
+		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::lookup ) ) {
+			v = thread_->object_factory().create_lookup();
+			HHuginn::HLookup* lookup( static_cast<HHuginn::HLookup*>( v.raw() ) );
+			HHuginn::HLookup::values_t& dest( lookup->value() );
+			HAnchorGuard<HHuginn::HLookup> ag( *lookup, thread_, position_ );
+			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
+				HHuginn::value_t tuple( it->value( thread_, position_ ) );
+				if ( tuple->type_id() != HHuginn::TYPE::TUPLE ) {
+					throw HHuginn::HHuginnRuntimeException(
+						"Each value materialized into a `lookup` must be a `tuple` not "_ys.append( a_type_name( tuple->get_class() ) ).append( "." ),
+						thread_->current_frame()->file_id(),
+						position_
+					);
+				}
+				HHuginn::HTuple::values_t const& data( static_cast<HHuginn::HTuple const*>( tuple.raw() )->value() );
+				if ( data.get_size() != 2 ) {
+					throw HHuginn::HHuginnRuntimeException(
+						"Each `tuple` materialized into a `lookup` must be a key-value pair, i.e. contain exactly two elements.",
+						thread_->current_frame()->file_id(),
+						position_
+					);
+				}
+				dest.insert( make_pair( data.front(), data.back() ) );
+				it->next( thread_, position_ );
+			}
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
 				"Invalid materialized type: `"_ys.append( thread_->runtime().function_name( fr.function().id() ) ).append( "'." ),
