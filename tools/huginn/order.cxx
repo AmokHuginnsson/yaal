@@ -180,7 +180,7 @@ inline HHuginn::value_t update( huginn::HThread* thread_, HHuginn::value_t* obje
 	HHuginn::HOrder& l( *static_cast<HHuginn::HOrder*>( object_->raw() ) );
 	HHuginn::HOrder const& r( *static_cast<HHuginn::HOrder const*>( values_[0].raw() ) );
 	if ( r.key_type()->type_id() != HHuginn::TYPE::NONE ) {
-		l.verify_key_type( thread_, r.key_type(), position_ );
+		l.update_key_type( thread_, r.key_type(), position_ );
 	}
 	HHuginn::HOrder::values_t& lv( l.value() );
 	HHuginn::HOrder::values_t const& rv( r.value() );
@@ -293,6 +293,7 @@ int long HHuginn::HOrder::do_size( huginn::HThread*, int ) const {
 }
 
 void HHuginn::HOrder::verify_key_type( huginn::HThread* thread_, HHuginn::HHuginn::HClass const* keyType_, int position_ ) const {
+	M_ASSERT( keyType_ );
 	if ( _keyType && ( keyType_ != _keyType ) ) {
 		throw HHuginnRuntimeException(
 			"Non-uniform key types, got "_ys.append( a_type_name( keyType_ ) ).append( " instead of " ).append( a_type_name( _keyType ) ).append( "." ),
@@ -307,6 +308,12 @@ void HHuginn::HOrder::verify_key_type( huginn::HThread* thread_, HHuginn::HHugin
 			position_
 		);
 	}
+	return;
+}
+
+void HHuginn::HOrder::update_key_type( huginn::HThread* thread_, HHuginn::HHuginn::HClass const* keyType_, int position_ ) {
+	verify_key_type( thread_, keyType_, position_ );
+	_keyType = keyType_;
 	return;
 }
 
@@ -333,10 +340,9 @@ void HHuginn::HOrder::erase( huginn::HThread* thread_, HHuginn::value_t const& v
 
 void HHuginn::HOrder::insert( huginn::HThread* thread_, HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
-	verify_key_type( thread_, value_->get_class(), position_ );
+	update_key_type( thread_, value_->get_class(), position_ );
 	HAnchorGuard<HHuginn::HOrder> ag( *this, thread_, position_ );
 	_data.insert( value_ );
-	_keyType = value_->get_class();
 	return;
 	M_EPILOG
 }
@@ -345,6 +351,7 @@ void HHuginn::HOrder::clear( void ) {
 	M_PROLOG
 	invalidate();
 	_data.clear();
+	_keyType = nullptr;
 	return;
 	M_EPILOG
 }

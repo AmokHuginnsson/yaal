@@ -143,9 +143,23 @@ public:
 			HHuginn::HOrder* order( static_cast<HHuginn::HOrder*>( v.raw() ) );
 			HHuginn::HOrder::values_t& dest( order->value() );
 			HAnchorGuard<HHuginn::HOrder> ag( *order, thread_, position_ );
+			HHuginn::HClass const* keyType( nullptr );
 			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
-				dest.insert( it->value( thread_, position_ ) );
+				HHuginn::value_t elem( it->value( thread_, position_ ) );
+				HHuginn::HClass const* newKeyType( elem->get_class() );
+				if ( ! is_comparable( newKeyType ) || ( keyType && ( newKeyType != keyType ) ) ) {
+					throw HHuginn::HHuginnRuntimeException(
+						"Invalid key type: "_ys.append( a_type_name( newKeyType ) ).append( "." ),
+						thread_->current_frame()->file_id(),
+						position_
+					);
+				}
+				keyType = newKeyType;
+				dest.insert( elem );
 				it->next( thread_, position_ );
+			}
+			if ( keyType ) {
+				order->update_key_type( thread_, keyType, position_ );
 			}
 		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::set ) ) {
 			v = thread_->object_factory().create_set();

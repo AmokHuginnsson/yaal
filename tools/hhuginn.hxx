@@ -1129,6 +1129,7 @@ public:
 		return ( _data );
 	}
 	void verify_key_type( huginn::HThread*, HHuginn::HClass const*, int ) const;
+	void update_key_type( huginn::HThread*, HHuginn::HClass const*, int );
 	void clear( void );
 	void anchor( huginn::HThread* thread_, int position_ ) const {
 		_helper.anchor( thread_, position_ );
@@ -1171,6 +1172,7 @@ public:
 		return ( _data );
 	}
 	void verify_key_type( huginn::HThread*, HHuginn::HClass const*, int ) const;
+	void update_key_type( huginn::HThread*, HHuginn::HClass const*, int );
 	void clear( void );
 	void anchor( huginn::HThread* thread_, int position_ ) const {
 		_helper.anchor( thread_, position_ );

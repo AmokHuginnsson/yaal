@@ -809,13 +809,17 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 			HAnchorGuard<HHuginn::HDict> ag( val, thread_, position_ );
 			for ( int long i( 0 ); f->can_continue() && ( i < len ); ++ i ) {
 				HHuginn::value_t key( deserialize_impl( thread_, position_ ) );
-				if ( ! is_comparable( key->get_class() ) || ( ( i > 0 ) && ( key->get_class() != keyType ) ) ) {
+				HHuginn::HClass const* newKeyType( key->get_class() );
+				if ( ! is_comparable( newKeyType ) || ( keyType && ( newKeyType != keyType ) ) ) {
 					raise( thread_, "Malformed Huginn data stream.", position_, exception_class() );
 					break;
 				}
-				keyType = key->get_class();
+				keyType = newKeyType;
 				HHuginn::value_t value( deserialize_impl( thread_, position_ ) );
 				data.insert( make_pair( key, value ) );
+			}
+			if ( keyType ) {
+				val.update_key_type( thread_, keyType, position_ );
 			}
 		} break;
 		case ( HHuginn::TYPE::LOOKUP ): {
@@ -843,12 +847,16 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 			HAnchorGuard<HHuginn::HOrder> ag( val, thread_, position_ );
 			for ( int long i( 0 ); f->can_continue() && ( i < len ); ++ i ) {
 				HHuginn::value_t key( deserialize_impl( thread_, position_ ) );
-				if ( ! is_comparable( key->get_class() ) || ( ( i > 0 ) && ( key->get_class() != keyType ) ) ) {
+				HHuginn::HClass const* newKeyType( key->get_class() );
+				if ( ! is_comparable( newKeyType ) || ( keyType && ( newKeyType != keyType ) ) ) {
 					raise( thread_, "Malformed Huginn data stream.", position_, exception_class() );
 					break;
 				}
-				keyType = key->get_class();
+				keyType = newKeyType;
 				data.insert( key );
+			}
+			if ( keyType ) {
+				val.update_key_type( thread_, keyType, position_ );
 			}
 		} break;
 		case ( HHuginn::TYPE::SET ): {

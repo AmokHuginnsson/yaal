@@ -260,7 +260,7 @@ inline HHuginn::value_t update( huginn::HThread* thread_, HHuginn::value_t* obje
 	HHuginn::HDict& l( *static_cast<HHuginn::HDict*>( object_->raw() ) );
 	HHuginn::HDict const& r( *static_cast<HHuginn::HDict const*>( values_[0].raw() ) );
 	if ( r.key_type()->type_id() != HHuginn::TYPE::NONE ) {
-		l.verify_key_type( thread_, r.key_type(), position_ );
+		l.update_key_type( thread_, r.key_type(), position_ );
 	}
 	HHuginn::HDict::values_t& lv( l.value() );
 	HHuginn::HDict::values_t const& rv( r.value() );
@@ -411,6 +411,7 @@ int long HHuginn::HDict::do_size( huginn::HThread*, int ) const {
 }
 
 void HHuginn::HDict::verify_key_type( huginn::HThread* thread_, HHuginn::HClass const* keyType_, int position_ ) const {
+	M_ASSERT( keyType_ );
 	if ( _keyType && ( keyType_ != _keyType ) ) {
 		throw HHuginnRuntimeException( "Non-uniform key types, got "_ys.append( a_type_name( keyType_ ) ).append( " instead of " ).append( a_type_name( _keyType ) ).append( "." ), thread_->current_frame()->file_id(), position_ );
 	}
@@ -421,6 +422,12 @@ void HHuginn::HDict::verify_key_type( huginn::HThread* thread_, HHuginn::HClass 
 			position_
 		);
 	}
+	return;
+}
+
+void HHuginn::HDict::update_key_type( huginn::HThread* thread_, HHuginn::HClass const* keyType_, int position_ ) {
+	verify_key_type( thread_, keyType_, position_ );
+	_keyType = keyType_;
 	return;
 }
 
@@ -473,8 +480,7 @@ void HHuginn::HDict::erase( huginn::HThread* thread_, HHuginn::value_t const& ke
 
 HHuginn::value_t& HHuginn::HDict::get_ref( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) {
 	M_PROLOG
-	verify_key_type( thread_, key_->get_class(), position_ );
-	_keyType = key_->get_class();
+	update_key_type( thread_, key_->get_class(), position_ );
 	HAnchorGuard<HHuginn::HDict> ag( *this, thread_, position_ );
 	return ( _data[key_] );
 	M_EPILOG
@@ -482,10 +488,9 @@ HHuginn::value_t& HHuginn::HDict::get_ref( huginn::HThread* thread_, HHuginn::va
 
 void HHuginn::HDict::insert( huginn::HThread* thread_, HHuginn::value_t const& key_, HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
-	verify_key_type( thread_, key_->get_class(), position_ );
+	update_key_type( thread_, key_->get_class(), position_ );
 	HAnchorGuard<HHuginn::HDict> ag( *this, thread_, position_ );
 	_data.insert( make_pair( key_, value_ ) );
-	_keyType = key_->get_class();
 	return;
 	M_EPILOG
 }
@@ -498,6 +503,7 @@ void HHuginn::HDict::clear( void ) {
 	M_PROLOG
 	invalidate();
 	_data.clear();
+	_keyType = nullptr;
 	return;
 	M_EPILOG
 }
