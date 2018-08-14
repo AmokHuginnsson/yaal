@@ -11,6 +11,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "helper.hxx"
 #include "thread.hxx"
 #include "stream.hxx"
+#include "enumeration.hxx"
 #include "packagefactory.hxx"
 #include "objectfactory.hxx"
 
@@ -27,10 +28,49 @@ namespace huginn {
 
 class HText : public HPackage {
 	HHuginn::class_t _streamClass;
+	enumeration::HEnumerationClass::ptr_t _characterClass;
 public:
 	HText( HHuginn::HClass* class_ )
 		: HPackage( class_ )
-		, _streamClass( HStream::get_class( class_->runtime() ) ) {
+		, _streamClass( HStream::get_class( class_->runtime() ) )
+		, _characterClass(
+			add_enumeration_as_member(
+				class_,
+				enumeration::create_class(
+					class_->runtime(),
+					"CHARACTER_CLASS",
+					enumeration::descriptions_t{
+						{ "WHITESPACE",                    "a set of white space characters",         static_cast<int>( CHARACTER_CLASS::WHITESPACE ) },
+						{ "BIN_DIGIT",                     "a set of binary digits",                  static_cast<int>( CHARACTER_CLASS::BIN_DIGIT ) },
+						{ "OCT_DIGIT",                     "a set of octal digits",                   static_cast<int>( CHARACTER_CLASS::OCT_DIGIT ) },
+						{ "DIGIT",                         "a set of decimal digits",                 static_cast<int>( CHARACTER_CLASS::DIGIT ) },
+						{ "HEX_DIGIT",                     "a set of hexadecimal digits",             static_cast<int>( CHARACTER_CLASS::HEX_DIGIT ) },
+						{ "LETTER",                        "a set of Latin letters",                  static_cast<int>( CHARACTER_CLASS::LETTER ) },
+						{ "LOWER_CASE_LETTER",             "a set of lower case Latin letters",       static_cast<int>( CHARACTER_CLASS::LOWER_CASE_LETTER ) },
+						{ "UPPER_CASE_LETTER",             "a set of upper case Latin letters",       static_cast<int>( CHARACTER_CLASS::UPPER_CASE_LETTER ) },
+						{ "WORD",                          "a set of word like characters",           static_cast<int>( CHARACTER_CLASS::WORD ) },
+						{ "VOWEL",                         "a set of vowels",                         static_cast<int>( CHARACTER_CLASS::VOWEL ) },
+						{ "GREEK",                         "a set of Greek letters",                  static_cast<int>( CHARACTER_CLASS::GREEK ) },
+						{ "LOWER_CASE_GREEK",              "a set of lower case Greek letters",       static_cast<int>( CHARACTER_CLASS::LOWER_CASE_GREEK ) },
+						{ "UPPER_CASE_GREEK",              "a set of upper case Greek letters",       static_cast<int>( CHARACTER_CLASS::UPPER_CASE_GREEK ) },
+						{ "SUBSCRIPT",                     "a set of subscript characters",           static_cast<int>( CHARACTER_CLASS::SUBSCRIPT ) },
+						{ "SUBSCRIPT_DIGIT",               "a set of subscript digits",               static_cast<int>( CHARACTER_CLASS::SUBSCRIPT_DIGIT ) },
+						{ "SUBSCRIPT_LETTER",              "a set of subscript letters",              static_cast<int>( CHARACTER_CLASS::SUBSCRIPT_LETTER ) },
+						{ "SUBSCRIPT_LOWER_CASE_LETTER",   "a set of subscript lower case letters",   static_cast<int>( CHARACTER_CLASS::SUBSCRIPT_LOWER_CASE_LETTER ) },
+						{ "SUBSCRIPT_UPPER_CASE_LETTER",   "a set of subscript upper case letters",   static_cast<int>( CHARACTER_CLASS::SUBSCRIPT_UPPER_CASE_LETTER ) },
+						{ "SUPERSCRIPT",                   "a set of superscript characters",         static_cast<int>( CHARACTER_CLASS::SUPERSCRIPT ) },
+						{ "SUPERSCRIPT_DIGIT",             "a set of superscript digits",             static_cast<int>( CHARACTER_CLASS::SUPERSCRIPT_DIGIT ) },
+						{ "SUPERSCRIPT_LETTER",            "a set of superscript letters",            static_cast<int>( CHARACTER_CLASS::SUPERSCRIPT_LETTER ) },
+						{ "SUPERSCRIPT_LOWER_CASE_LETTER", "a set of superscript lower case letters", static_cast<int>( CHARACTER_CLASS::SUPERSCRIPT_LOWER_CASE_LETTER ) },
+						{ "SUPERSCRIPT_UPPER_CASE_LETTER", "a set of superscript upper case letters", static_cast<int>( CHARACTER_CLASS::SUPERSCRIPT_UPPER_CASE_LETTER ) }
+					},
+					"The `CHARACTER_CLASS` is a set of interesting character classes.",
+					HHuginn::VISIBILITY::PACKAGE,
+					class_
+				),
+				"a set of interesting character classes"
+			)
+		) {
 		return;
 	}
 	static HHuginn::value_t stream( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -114,6 +154,45 @@ public:
 		return ( thread_->runtime().object_factory()->create_integer( string::distance( get_string( values_[0] ), get_string( values_[1] ) ) ) );
 		M_EPILOG
 	}
+	static HHuginn::value_t character_class( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		HText& t( *static_cast<HText*>( object_->raw() ) );
+		verify_signature_by_class( "Text.character_class", values_, { t._characterClass->enumeral_class() }, thread_, position_ );
+		HHuginn::HEnumeral::value_type val( get_enumeral( values_[0] ) );
+		character_class_t const* cc8( nullptr );
+		HCharacterClass<char16_t> const* cc16( nullptr );
+		switch ( static_cast<CHARACTER_CLASS>( val ) ) {
+			case ( CHARACTER_CLASS::WHITESPACE ):                    cc8  = &hcore::character_class<CHARACTER_CLASS::WHITESPACE>();                    break;
+			case ( CHARACTER_CLASS::BIN_DIGIT ):                     cc8  = &hcore::character_class<CHARACTER_CLASS::BIN_DIGIT>();                     break;
+			case ( CHARACTER_CLASS::OCT_DIGIT ):                     cc8  = &hcore::character_class<CHARACTER_CLASS::OCT_DIGIT>();                     break;
+			case ( CHARACTER_CLASS::DIGIT ):                         cc8  = &hcore::character_class<CHARACTER_CLASS::DIGIT>();                         break;
+			case ( CHARACTER_CLASS::HEX_DIGIT ):                     cc8  = &hcore::character_class<CHARACTER_CLASS::HEX_DIGIT>();                     break;
+			case ( CHARACTER_CLASS::LETTER ):                        cc8  = &hcore::character_class<CHARACTER_CLASS::LETTER>();                        break;
+			case ( CHARACTER_CLASS::LOWER_CASE_LETTER ):             cc8  = &hcore::character_class<CHARACTER_CLASS::LOWER_CASE_LETTER>();             break;
+			case ( CHARACTER_CLASS::UPPER_CASE_LETTER ):             cc8  = &hcore::character_class<CHARACTER_CLASS::UPPER_CASE_LETTER>();             break;
+			case ( CHARACTER_CLASS::WORD ):                          cc8  = &hcore::character_class<CHARACTER_CLASS::WORD>();                          break;
+			case ( CHARACTER_CLASS::VOWEL ):                         cc8  = &hcore::character_class<CHARACTER_CLASS::VOWEL>();                         break;
+			case ( CHARACTER_CLASS::GREEK ):                         cc16 = &hcore::character_class<CHARACTER_CLASS::GREEK>();                         break;
+			case ( CHARACTER_CLASS::LOWER_CASE_GREEK ):              cc16 = &hcore::character_class<CHARACTER_CLASS::LOWER_CASE_GREEK>();              break;
+			case ( CHARACTER_CLASS::UPPER_CASE_GREEK ):              cc16 = &hcore::character_class<CHARACTER_CLASS::UPPER_CASE_GREEK>();              break;
+			case ( CHARACTER_CLASS::SUBSCRIPT ):                     cc16 = &hcore::character_class<CHARACTER_CLASS::SUBSCRIPT>();                     break;
+			case ( CHARACTER_CLASS::SUBSCRIPT_DIGIT ):               cc16 = &hcore::character_class<CHARACTER_CLASS::SUBSCRIPT_DIGIT>();               break;
+			case ( CHARACTER_CLASS::SUBSCRIPT_LETTER ):              cc16 = &hcore::character_class<CHARACTER_CLASS::SUBSCRIPT_LETTER>();              break;
+			case ( CHARACTER_CLASS::SUBSCRIPT_LOWER_CASE_LETTER ):   cc16 = &hcore::character_class<CHARACTER_CLASS::SUBSCRIPT_LOWER_CASE_LETTER>();   break;
+			case ( CHARACTER_CLASS::SUBSCRIPT_UPPER_CASE_LETTER ):   cc16 = &hcore::character_class<CHARACTER_CLASS::SUBSCRIPT_UPPER_CASE_LETTER>();   break;
+			case ( CHARACTER_CLASS::SUPERSCRIPT ):                   cc16 = &hcore::character_class<CHARACTER_CLASS::SUPERSCRIPT>();                   break;
+			case ( CHARACTER_CLASS::SUPERSCRIPT_DIGIT ):             cc16 = &hcore::character_class<CHARACTER_CLASS::SUPERSCRIPT_DIGIT>();             break;
+			case ( CHARACTER_CLASS::SUPERSCRIPT_LETTER ):            cc16 = &hcore::character_class<CHARACTER_CLASS::SUPERSCRIPT_LETTER>();            break;
+			case ( CHARACTER_CLASS::SUPERSCRIPT_LOWER_CASE_LETTER ): cc16 = &hcore::character_class<CHARACTER_CLASS::SUPERSCRIPT_LOWER_CASE_LETTER>(); break;
+			case ( CHARACTER_CLASS::SUPERSCRIPT_UPPER_CASE_LETTER ): cc16 = &hcore::character_class<CHARACTER_CLASS::SUPERSCRIPT_UPPER_CASE_LETTER>(); break;
+		}
+		return (
+			cc8
+				? thread_->runtime().object_factory()->create_string( HString( cc8->data(), cc8->size() ) )
+				: thread_->runtime().object_factory()->create_string( HString( cc16->data(), cc16->size() ) )
+		);
+		M_EPILOG
+	}
 	static HHuginn::value_t repeat( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "Text.repeat", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::INTEGER }, thread_, position_ );
@@ -166,7 +245,8 @@ HHuginn::value_t HTextCreator::do_new_instance( HRuntime* runtime_ ) {
 		{ "repeat",   runtime_->create_method( &HText::repeat ),   "( *seed*, *count* ) - construct new `string` by repeating *seed* `string` *count* times" },
 		{ "hex",      runtime_->create_method( &HText::int_base_to_str, "Text.hex", BASE::HEX ), "( *int* ) - convert *int* value to a `string` using hexadecimal representation" },
 		{ "oct",      runtime_->create_method( &HText::int_base_to_str, "Text.oct", BASE::OCT ), "( *int* ) - convert *int* value to a `string` using octal representation" },
-		{ "bin",      runtime_->create_method( &HText::int_base_to_str, "Text.bin", BASE::BIN ), "( *int* ) - convert *int* value to a `string` using binary representation" }
+		{ "bin",      runtime_->create_method( &HText::int_base_to_str, "Text.bin", BASE::BIN ), "( *int* ) - convert *int* value to a `string` using binary representation" },
+		{ "character_class", runtime_->create_method( &HText::character_class ), "( *class* ) - get given character *class*" }
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );
