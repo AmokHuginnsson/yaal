@@ -133,17 +133,17 @@ struct ORCLoader {
 	HProgramOptionsHandler _optionHandler;
 	HString _section;
 	HProgramOptionsHandler::RC_CALLBACK_t rc_callback;
- 	ORCLoader( void )
+	ORCLoader( void )
 		: _optionHandler()
 		, _section()
 		, rc_callback( nullptr ) {
 	}
- 	ORCLoader( HProgramOptionsHandler const& optionHandler_, HString const& section_, HProgramOptionsHandler::RC_CALLBACK_t callback )
+	ORCLoader( HProgramOptionsHandler const& optionHandler_, HString const& section_, HProgramOptionsHandler::RC_CALLBACK_t callback )
 		: _optionHandler( optionHandler_ )
 		, _section( section_ )
 		, rc_callback( callback ) {
 	}
- 	ORCLoader( ORCLoader const& loader )
+	ORCLoader( ORCLoader const& loader )
 		: _optionHandler( loader._optionHandler )
 		, _section( loader._section )
 		, rc_callback( loader.rc_callback ) {
@@ -213,10 +213,13 @@ private:
 class HLocker {
 	HSetup& _setup;
 public:
-	HLocker( HSetup& setup_ ) : _setup( setup_ )
-		{ _setup.lock(); }
-	~HLocker( void )
-		{ _setup.unlock(); }
+	HLocker( HSetup& setup_ )
+		: _setup( setup_ ) {
+		_setup.lock();
+	}
+	~HLocker( void ) {
+		_setup.unlock();
+	}
 };
 
 }

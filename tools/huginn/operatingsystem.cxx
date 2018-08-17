@@ -9,6 +9,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
 #include "hcore/hfile.hxx"
+#include "hcore/hcore.hxx"
 #include "hcore/hsynchronizedstream.hxx"
 #include "runtime.hxx"
 #include "tools/huginn/thread.hxx"
@@ -46,6 +47,13 @@ public:
 		char const* val( ::getenv( utf8.c_str() ) );
 		HRuntime& rt( thread_->runtime() );
 		return ( val ? rt.object_factory()->create_string( val ) : rt.none_value() );
+		M_EPILOG
+	}
+	static HHuginn::value_t set_env( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "OperatingSystem.set_env", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, thread_, position_ );
+		hcore::set_env( get_string( values_[0] ), get_string( values_[1] ) );
+		return ( *object_ );
 		M_EPILOG
 	}
 	static HHuginn::value_t getpid( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -140,17 +148,18 @@ HHuginn::value_t HOperatingSystemCreator::do_new_instance( HRuntime* runtime_ ) 
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "env",    runtime_->create_method( &HOperatingSystem::env ),    "( *name* ) - get value of an environment variable named *name*" },
-		{ "getpid", runtime_->create_method( &HOperatingSystem::getpid ), "get Huginn's interpreter process id" },
-		{ "getuid", runtime_->create_method( &HOperatingSystem::getuid ), "get Huginn's interpreter process effective user id" },
-		{ "getgid", runtime_->create_method( &HOperatingSystem::getgid ), "get Huginn's interpreter process effective group id" },
-		{ "exec",   runtime_->create_method( &HOperatingSystem::exec ),   "( *prog*, *args*... ) - replace current process space with running image of *prog* providing it with *args* arguments" },
-		{ "exit",   runtime_->create_method( &HOperatingSystem::exit ),   "( *status* ) - exit the interpreter with the *status*" },
-		{ "spawn",  runtime_->create_method( &HOperatingSystem::spawn ),  "( *prog*, *args*... ) - start a subprocess *prog* providing it with *args* arguments" },
-		{ "stdin",  runtime_->create_method( &HOperatingSystem::stream, "OperatingSystem.stdin", &runtime_->huginn()->input_stream() ),   "get access to interpreter's standard input stream" },
-		{ "stdout", runtime_->create_method( &HOperatingSystem::stream, "OperatingSystem.stdout", &runtime_->huginn()->output_stream() ), "get access to interpreter's standard output stream" },
-		{ "stderr", runtime_->create_method( &HOperatingSystem::stream, "OperatingSystem.stderr", &runtime_->huginn()->error_stream() ),  "get access to interpreter's standard error stream" },
-		{ "stdlog", runtime_->create_method( &HOperatingSystem::stream, "OperatingSystem.stdlog", &runtime_->huginn()->log_stream() ),    "get access to interpreter's standard log stream" }
+		{ "env",       runtime_->create_method( &HOperatingSystem::env ),       "( *name* ) - get value of an environment variable named *name*" },
+		{ "set_env",   runtime_->create_method( &HOperatingSystem::set_env ),   "( *name*, *value* ) - set *name* environment variable to *value* value" },
+		{ "getpid",    runtime_->create_method( &HOperatingSystem::getpid ),    "get Huginn's interpreter process id" },
+		{ "getuid",    runtime_->create_method( &HOperatingSystem::getuid ),    "get Huginn's interpreter process effective user id" },
+		{ "getgid",    runtime_->create_method( &HOperatingSystem::getgid ),    "get Huginn's interpreter process effective group id" },
+		{ "exec",      runtime_->create_method( &HOperatingSystem::exec ),      "( *prog*, *args*... ) - replace current process space with running image of *prog* providing it with *args* arguments" },
+		{ "exit",      runtime_->create_method( &HOperatingSystem::exit ),      "( *status* ) - exit the interpreter with the *status*" },
+		{ "spawn",     runtime_->create_method( &HOperatingSystem::spawn ),     "( *prog*, *args*... ) - start a subprocess *prog* providing it with *args* arguments" },
+		{ "stdin",     runtime_->create_method( &HOperatingSystem::stream,      "OperatingSystem.stdin",  &runtime_->huginn()->input_stream() ),  "get access to interpreter's standard input stream" },
+		{ "stdout",    runtime_->create_method( &HOperatingSystem::stream,      "OperatingSystem.stdout", &runtime_->huginn()->output_stream() ), "get access to interpreter's standard output stream" },
+		{ "stderr",    runtime_->create_method( &HOperatingSystem::stream,      "OperatingSystem.stderr", &runtime_->huginn()->error_stream() ),  "get access to interpreter's standard error stream" },
+		{ "stdlog",    runtime_->create_method( &HOperatingSystem::stream,      "OperatingSystem.stdlog", &runtime_->huginn()->log_stream() ),    "get access to interpreter's standard log stream" }
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );
