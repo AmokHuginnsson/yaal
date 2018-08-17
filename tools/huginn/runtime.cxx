@@ -894,6 +894,7 @@ HHuginn::value_t input( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::va
 	M_EPILOG
 }
 
+#undef assert
 inline HHuginn::value_t assert( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "assert";
