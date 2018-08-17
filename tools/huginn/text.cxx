@@ -12,6 +12,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "thread.hxx"
 #include "stream.hxx"
 #include "enumeration.hxx"
+#include "hcore/hcore.hxx"
 #include "packagefactory.hxx"
 #include "objectfactory.hxx"
 
@@ -219,6 +220,21 @@ public:
 		);
 		M_EPILOG
 	}
+	static HHuginn::value_t substitute_environment( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "Text.substitute_environment";
+		verify_arg_count( name, values_, 1, 2, thread_, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, ARITY::MULTIPLE, thread_, position_ );
+		bool recursively( true );
+		if ( values_.get_size() > 1 ) {
+			verify_arg_type( name, values_, 1, HHuginn::TYPE::BOOLEAN, ARITY::MULTIPLE, thread_, position_ );
+			recursively = get_boolean( values_[1] );
+		}
+		HString s( get_string( values_[0] ) );
+		hcore::substitute_environment( s, recursively ? ENV_SUBST_MODE::RECURSIVE : ENV_SUBST_MODE::ONE_LAYER );
+		return ( thread_->object_factory().create_string( s ) );
+		M_EPILOG
+	}
 };
 
 namespace package_factory {
@@ -246,7 +262,8 @@ HHuginn::value_t HTextCreator::do_new_instance( HRuntime* runtime_ ) {
 		{ "hex",      runtime_->create_method( &HText::int_base_to_str, "Text.hex", BASE::HEX ), "( *int* ) - convert *int* value to a `string` using hexadecimal representation" },
 		{ "oct",      runtime_->create_method( &HText::int_base_to_str, "Text.oct", BASE::OCT ), "( *int* ) - convert *int* value to a `string` using octal representation" },
 		{ "bin",      runtime_->create_method( &HText::int_base_to_str, "Text.bin", BASE::BIN ), "( *int* ) - convert *int* value to a `string` using binary representation" },
-		{ "character_class", runtime_->create_method( &HText::character_class ), "( *class* ) - get given character *class*" }
+		{ "character_class",        runtime_->create_method( &HText::character_class ),        "( *class* ) - get given character *class*" },
+		{ "substitute_environment", runtime_->create_method( &HText::substitute_environment ), "( *str*[, *recursively*] ) - (*recursively*) substitute environment variables in *str*" }
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );
