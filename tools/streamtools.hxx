@@ -121,7 +121,9 @@ private:
 	yaal::hcore::HStreamInterface& _stream2;
 public:
 	HTee( yaal::hcore::HStreamInterface& stream1_, yaal::hcore::HStreamInterface& stream2_ )
-		: _stream1( stream1_ ), _stream2( stream2_ ) {}
+		: _stream1( stream1_ )
+		, _stream2( stream2_ ) {
+	}
 	HTee( HTee const& );
 protected:
 	virtual int long do_write( void const*, int long ) override;
@@ -147,8 +149,26 @@ namespace hcore {
 template<typename first_t, typename second_t>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& os, yaal::hcore::HPair<first_t, second_t> const& p ) {
 	M_PROLOG
-	os << "pair<" << p.first << "," << p.second << ">";
+	if ( os.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
+		os << "pair<" << p.first << "," << p.second << ">";
+	} else {
+		os << p.first << p.second;
+	}
 	return ( os );
+	M_EPILOG
+}
+
+template<typename first_t, typename second_t>
+yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface& is, yaal::hcore::HPair<first_t, second_t>& p ) {
+	M_PROLOG
+	if ( is.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
+		is.consume( "pair<" ) >> p.first;
+		is.consume( "," ) >> p.second;
+		is.consume( ">" );
+	} else {
+		is >> p.first >> p.second;
+	}
+	return ( is );
 	M_EPILOG
 }
 
