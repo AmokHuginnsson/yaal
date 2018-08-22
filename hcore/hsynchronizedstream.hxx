@@ -83,6 +83,8 @@ protected:
 	virtual int long do_read_until_n( yaal::hcore::HString&, int long, char const*, bool ) override;
 	virtual int long do_read_while( yaal::hcore::HString&, char const* ) override;
 	virtual int long do_read_while_n( yaal::hcore::HString&, int long, char const* ) override;
+	virtual HStreamInterface& do_consume( yaal::hcore::HString const& ) override;
+	virtual HStreamInterface& do_ignore( int ) override;
 	virtual int do_peek( void ) override;
 	virtual HStreamInterface& do_set_fill( code_point_t ) override;
 	virtual HStreamInterface& do_set_width( int ) override;

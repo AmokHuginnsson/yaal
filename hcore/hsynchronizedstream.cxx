@@ -350,6 +350,20 @@ int long HSynchronizedStream::do_read_while_n( yaal::hcore::HString& store, int 
 	M_EPILOG
 }
 
+HStreamInterface& HSynchronizedStream::do_consume( yaal::hcore::HString const& pattern_ ) {
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_consume( pattern_ ) );
+	M_EPILOG
+}
+
+HStreamInterface& HSynchronizedStream::do_ignore( int count_ ) {
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_ignore( count_ ) );
+	M_EPILOG
+}
+
 int HSynchronizedStream::do_peek( void ) {
 	M_PROLOG
 	HLock l( _mutex );

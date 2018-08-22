@@ -265,6 +265,24 @@ public:
 	 * \param anchor - count offset relative to given anchor.
 	 */
 	void seek( int long offset, SEEK anchor = SEEK::BEGIN );
+	/*! \brief Read data from stream as long as it matches given pattern.
+	 *
+	 * \post Sets fail-bit if pattern could not be read in its entirety.
+	 *
+	 * \param pattern_ - a pattern to be read from this stream.
+	 * \return Self.
+	 */
+	HStreamInterface& consume( yaal::hcore::HString const& pattern_ ) {
+		return ( do_consume( pattern_ ) );
+	}
+	/*! \brief Discard some data from the stream.
+	 *
+	 * \param count_ - how many bytes shall be discarded.
+	 * \return Self.
+	 */
+	HStreamInterface& ignore( int count_ ) {
+		return ( do_ignore( count_ ) );
+	}
 	M_YAAL_HCORE_PUBLIC_API static char const eols[];
 	/*! \brief Tell if given stream instance if a valid stream object.
 	 *
@@ -405,6 +423,8 @@ protected:
 	virtual int long do_read_until_n( yaal::hcore::HString&, int long, char const*, bool );
 	virtual int long do_read_while( yaal::hcore::HString&, char const* );
 	virtual int long do_read_while_n( yaal::hcore::HString&, int long, char const* );
+	virtual HStreamInterface& do_consume( yaal::hcore::HString const& );
+	virtual HStreamInterface& do_ignore( int );
 	virtual int do_peek( void );
 	virtual HStreamInterface& do_set_fill( code_point_t );
 	virtual HStreamInterface& do_set_width( int );

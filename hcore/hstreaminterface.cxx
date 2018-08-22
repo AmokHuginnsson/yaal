@@ -509,7 +509,7 @@ HStreamInterface::HManipulator setfill( code_point_t fill_ ) {
 int long HStreamInterface::do_read_until( HString& message_,
 		char const* stopSet_, bool stripDelim_ ) {
 	M_PROLOG
-	return ( HStreamInterface::read_until_n( message_, meta::max_signed<int long>::value, stopSet_, stripDelim_ ) );
+	return ( HStreamInterface::read_until_n( message_, meta::max_signed<int>::value, stopSet_, stripDelim_ ) );
 	M_EPILOG
 }
 
@@ -523,7 +523,7 @@ int long HStreamInterface::do_read_until_n( HString& message_, int long maxCount
 int long HStreamInterface::do_read_while( HString& message_,
 		char const* acquire_ ) {
 	M_PROLOG
-	return ( HStreamInterface::do_read_while_n( message_, meta::max_signed<int long>::value, acquire_ ) );
+	return ( HStreamInterface::do_read_while_n( message_, meta::max_signed<int>::value, acquire_ ) );
 	M_EPILOG
 }
 
@@ -537,10 +537,10 @@ int long HStreamInterface::do_read_while_n( HString& message_, int long maxCount
 int long HStreamInterface::read_while_retry( yaal::hcore::HString& message_,
 		char const* acquire_ ) {
 	M_PROLOG
-	int long nRead( 0 );
-	do {
+	int long nRead( -1 );
+	while ( good() && ( nRead < 0 ) ) {
 		nRead = HStreamInterface::do_read_while( message_, acquire_ );
-	} while ( good() && nRead < 0 );
+	}
 	return ( nRead );
 	M_EPILOG
 }
@@ -548,10 +548,10 @@ int long HStreamInterface::read_while_retry( yaal::hcore::HString& message_,
 int long HStreamInterface::read_until_retry( yaal::hcore::HString& message_,
 		char const* stopSet_, bool stripDelim_ ) {
 	M_PROLOG
-	int long nRead( 0 );
-	do {
+	int long nRead( -1 );
+	while ( good() && ( nRead < 0 ) ) {
 		nRead = HStreamInterface::do_read_until( message_, stopSet_, stripDelim_ );
-	} while ( good() && nRead < 0 );
+	}
 	return ( nRead );
 	M_EPILOG
 }
@@ -633,8 +633,42 @@ int long HStreamInterface::semantic_read(
 	M_EPILOG
 }
 
+HStreamInterface& HStreamInterface::do_consume( yaal::hcore::HString const& pattern_ ) {
+	M_PROLOG
+	_conversionCache.assign( pattern_ );
+	int len( static_cast<int>( _conversionCache.byte_count() ) );
+	char const* p( _conversionCache.raw() );
+	char dummy( 0 );
+	for ( int i( 0 ); good() && ( i < len ); ++ i ) {
+		int extracted( do_peek() );
+		if ( ( extracted == INVALID_CHARACTER ) || ( extracted != p[i] ) ) {
+			_fail = true;
+			break;
+		}
+		read( &dummy, 1 );
+	}
+	return ( *this );
+	M_EPILOG
+}
+
+HStreamInterface& HStreamInterface::do_ignore( int count_ ) {
+	M_PROLOG
+	static int const IGNORE_SIZE( 1024 );
+	char buffer[IGNORE_SIZE];
+	while ( good() && ( count_ > 0 ) ) {
+		int toRead( min( IGNORE_SIZE, count_ ) );
+		int nRead( static_cast<int>( read( buffer, toRead ) ) );
+		if ( nRead != toRead ) {
+			break;
+		}
+		count_ -= nRead;
+	}
+	return ( *this );
+	M_EPILOG
+}
+
 int HStreamInterface::do_peek( void ) {
-	if ( ! _offset ) {
+	if ( ! _offset && good() ) {
 		int long iPoolSize( _cache.size() );
 		if ( iPoolSize < 1 ) {
 			_cache.realloc( 1 );
@@ -647,7 +681,7 @@ int HStreamInterface::do_peek( void ) {
 			_offset = 1;
 		}
 	}
-	return ( _offset > 0 ? _cache.get<char>()[ _offset - 1 ] : INVALID_CHARACTER );
+	return ( _offset > 0 ? _cache.get<char>()[ 0 ] : INVALID_CHARACTER );
 }
 
 bool HStreamInterface::read_word( void ) {
