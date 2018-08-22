@@ -863,7 +863,12 @@ HStreamInterface& HStreamInterface::do_input( int short& is ) {
 	M_PROLOG
 	if ( _mode == MODE::TEXT ) {
 		if ( read_integer() ) {
-			is = lexical_cast<int short>( _wordCache );
+			try {
+				is = lexical_cast<int short>( _wordCache );
+			} catch ( ... ) {
+				_fail = true;
+				throw;
+			}
 		}
 	} else {
 		int short buffer( 0 );
@@ -881,7 +886,12 @@ HStreamInterface& HStreamInterface::do_input( int short unsigned& isu ) {
 	M_PROLOG
 	if ( _mode == MODE::TEXT ) {
 		if ( read_integer() ) {
-			isu = lexical_cast<int short unsigned>( _wordCache );
+			try {
+				isu = lexical_cast<int short unsigned>( _wordCache );
+			} catch ( ... ) {
+				_fail = true;
+				throw;
+			}
 		}
 	} else {
 		int short unsigned buffer( 0 );
@@ -899,7 +909,12 @@ HStreamInterface& HStreamInterface::do_input( int& i ) {
 	M_PROLOG
 	if ( _mode == MODE::TEXT ) {
 		if ( read_integer() ) {
-			i = lexical_cast<int>( _wordCache );
+			try {
+				i = lexical_cast<int>( _wordCache );
+			} catch ( ... ) {
+				_fail = true;
+				throw;
+			}
 		}
 	} else {
 		int buffer( 0 );
@@ -917,7 +932,12 @@ HStreamInterface& HStreamInterface::do_input( int unsigned& iu ) {
 	M_PROLOG
 	if ( _mode == MODE::TEXT ) {
 		if ( read_integer() ) {
-			iu = lexical_cast<int unsigned>( _wordCache );
+			try {
+				iu = lexical_cast<int unsigned>( _wordCache );
+			} catch ( ... ) {
+				_fail = true;
+				throw;
+			}
 		}
 	} else {
 		int unsigned buffer( 0 );
@@ -935,7 +955,12 @@ HStreamInterface& HStreamInterface::do_input( int long& il ) {
 	M_PROLOG
 	if ( _mode == MODE::TEXT ) {
 		if ( read_integer() ) {
-			il = lexical_cast<int long>( _wordCache );
+			try {
+				il = lexical_cast<int long>( _wordCache );
+			} catch ( ... ) {
+				_fail = true;
+				throw;
+			}
 		}
 	} else {
 		int long buffer( 0 );
@@ -953,7 +978,12 @@ HStreamInterface& HStreamInterface::do_input( int long unsigned& ilu ) {
 	M_PROLOG
 	if ( _mode == MODE::TEXT ) {
 		if ( read_integer() ) {
-			ilu = lexical_cast<int long unsigned>( _wordCache );
+			try {
+				ilu = lexical_cast<int long unsigned>( _wordCache );
+			} catch ( ... ) {
+				_fail = true;
+				throw;
+			}
 		}
 	} else {
 		int long unsigned buffer( 0 );
@@ -971,7 +1001,12 @@ HStreamInterface& HStreamInterface::do_input( int long long& ill ) {
 	M_PROLOG
 	if ( _mode == MODE::TEXT ) {
 		if ( read_integer() ) {
-			ill = lexical_cast<int long long>( _wordCache );
+			try {
+				ill = lexical_cast<int long long>( _wordCache );
+			} catch ( ... ) {
+				_fail = true;
+				throw;
+			}
 		}
 	} else {
 		int long long buffer( 0 );
@@ -989,7 +1024,12 @@ HStreamInterface& HStreamInterface::do_input( int long long unsigned& illu ) {
 	M_PROLOG
 	if ( _mode == MODE::TEXT ) {
 		if ( read_integer() ) {
-			illu = lexical_cast<int long long unsigned>( _wordCache );
+			try {
+				illu = lexical_cast<int long long unsigned>( _wordCache );
+			} catch ( ... ) {
+				_fail = true;
+				throw;
+			}
 		}
 	} else {
 		int long long unsigned buffer( 0 );
@@ -1007,7 +1047,12 @@ HStreamInterface& HStreamInterface::do_input( double& d ) {
 	M_PROLOG
 	if ( _mode == MODE::TEXT ) {
 		if ( read_floatint_point() ) {
-			d = lexical_cast<double>( _wordCache );
+			try {
+				d = lexical_cast<double>( _wordCache );
+			} catch ( ... ) {
+				_fail = true;
+				throw;
+			}
 		}
 	} else {
 		double buffer( 0 );
@@ -1025,7 +1070,12 @@ HStreamInterface& HStreamInterface::do_input( double long& dl ) {
 	M_PROLOG
 	if ( _mode == MODE::TEXT ) {
 		if ( read_floatint_point() ) {
-			dl = lexical_cast<double long>( _wordCache );
+			try {
+				dl = lexical_cast<double long>( _wordCache );
+			} catch ( ... ) {
+				_fail = true;
+				throw;
+			}
 		}
 	} else {
 		double long buffer( 0 );
@@ -1043,7 +1093,12 @@ HStreamInterface& HStreamInterface::do_input( float& f ) {
 	M_PROLOG
 	if ( _mode == MODE::TEXT ) {
 		if ( read_floatint_point() ) {
-			f = lexical_cast<float>( _wordCache );
+			try {
+				f = lexical_cast<float>( _wordCache );
+			} catch ( ... ) {
+				_fail = true;
+				throw;
+			}
 		}
 	} else {
 		float buffer( 0 );

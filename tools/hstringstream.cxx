@@ -30,6 +30,7 @@ HStringStream::HStringStream( HString const& init_ )
 
 void HStringStream::set_buffer( HString const& s_ ) {
 	M_PROLOG
+	clear();
 	_buffer.assign( s_ );
 	_utf8.reset();
 	_offset = 0;
