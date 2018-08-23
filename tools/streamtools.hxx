@@ -67,6 +67,8 @@ yaal::hcore::HString get_stream_id( yaal::hcore::HStreamInterface* );
 yaal::hcore::HStreamInterface& ensure( yaal::hcore::HStreamInterface& );
 yaal::hcore::HStreamInterface::ptr_t ensure( yaal::hcore::HStreamInterface::ptr_t );
 
+namespace stream {
+
 template<typename container>
 yaal::hcore::HStreamInterface& container_dump( yaal::hcore::HStreamInterface& out,
 		container const& container_, char sep_, char const* name_ ) {
@@ -94,21 +96,33 @@ template<typename container>
 yaal::hcore::HStreamInterface& container_dump( yaal::hcore::HStreamInterface& out,
 		container const& container_, char const* name_  ) {
 	M_PROLOG
-	return ( container_dump( out, container_, ' ', name_ ) );
+	return ( stream::container_dump( out, container_, ' ', name_ ) );
 	M_EPILOG
+}
+
+template<typename T>
+yaal::hcore::HStreamInterface& read( yaal::hcore::HStreamInterface& stream_, T& output_  ) {
+	return ( stream_.read( output_ ) );
+}
+
+template<typename T>
+yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& stream_, T const& value_  ) {
+	return ( stream_.write( value_ ) );
+}
+
 }
 
 template<typename tType>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::tools::HRing<tType> const& r_ ) {
 	M_PROLOG
-	return ( container_dump( out, r_, "ring" ) );
+	return ( stream::container_dump( out, r_, "ring" ) );
 	M_EPILOG
 }
 
 template<typename left_t, typename right_t>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::tools::HTwoWayMap<left_t, right_t> const& twm_ ) {
 	M_PROLOG
-	return ( container_dump( out, twm_, "twowaymap" ) );
+	return ( stream::container_dump( out, twm_, "twowaymap" ) );
 	M_EPILOG
 }
 
@@ -162,9 +176,8 @@ template<typename first_t, typename second_t>
 yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface& is, yaal::hcore::HPair<first_t, second_t>& p ) {
 	M_PROLOG
 	if ( is.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
-		is.consume( "pair<" ) >> p.first;
-		is.consume( "," ) >> p.second;
-		is.consume( ">" );
+		using tools::stream::read;
+		read( read( is.consume( "pair<" ), p.first ).consume( "," ), p.second ).consume( ">" );
 	} else {
 		is >> p.first >> p.second;
 	}
@@ -175,63 +188,72 @@ yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface& is, 
 template<typename tType, typename allocator_t>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HArray<tType, allocator_t> const& a_ ) {
 	M_PROLOG
-	return ( tools::container_dump( out, a_, "array" ) );
+	using tools::stream::container_dump;
+	return ( container_dump( out, a_, "array" ) );
 	M_EPILOG
 }
 
 template<typename tType, int const N>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HStaticArray<tType, N> const& sa_ ) {
 	M_PROLOG
-	return ( tools::container_dump( out, sa_, "staticarray" ) );
+	using tools::stream::container_dump;
+	return ( container_dump( out, sa_, "staticarray" ) );
 	M_EPILOG
 }
 
 template<typename tType, typename allocator_t>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HDeque<tType, allocator_t> const& d_ ) {
 	M_PROLOG
-	return ( tools::container_dump( out, d_, "deque" ) );
+	using tools::stream::container_dump;
+	return ( container_dump( out, d_, "deque" ) );
 	M_EPILOG
 }
 
 template<typename tType, typename allocator_t>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HList<tType, allocator_t> const& l_ ) {
 	M_PROLOG
-	return ( tools::container_dump( out, l_, "list" ) );
+	using tools::stream::container_dump;
+	return ( container_dump( out, l_, "list" ) );
 	M_EPILOG
 }
 
 template<typename tType, typename compare_t, typename allocator_t>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HSet<tType, compare_t, allocator_t> const& s_ ) {
 	M_PROLOG
-	return ( tools::container_dump( out, s_, "set" ) );
+	using tools::stream::container_dump;
+	return ( container_dump( out, s_, "set" ) );
 	M_EPILOG
 }
 
 template<typename key_t, typename value_t, typename compare_t, typename allocator_t>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HMap<key_t, value_t, compare_t, allocator_t, yaal::hcore::HSBBSTree<yaal::hcore::HPair<key_t const, value_t>, compare_t, yaal::hcore::map_helper<key_t, value_t>, allocator_t>> const& m_ ) {
 	M_PROLOG
-	return ( tools::container_dump( out, m_, "map" ) );
+	using tools::stream::container_dump;
+	return ( container_dump( out, m_, "map" ) );
 	M_EPILOG
 }
 
 template<typename key_t, typename value_t, typename compare_t, typename allocator_t>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HMap<key_t, value_t, compare_t, allocator_t, yaal::hcore::HLookup<yaal::hcore::HPair<key_t const, value_t>, compare_t, yaal::hcore::map_helper<key_t, value_t>, yaal::trait::no_type>> const& m_ ) {
 	M_PROLOG
-	return ( tools::container_dump( out, m_, "lookup" ) );
+	using tools::stream::container_dump;
+	return ( container_dump( out, m_, "lookup" ) );
 	M_EPILOG
 }
 
 template<typename value_t, typename hasher_t, typename allocator_t>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HHashSet<value_t, hasher_t, allocator_t> const& hs_ ) {
 	M_PROLOG
-	return ( tools::container_dump( out, hs_, "hash_set" ) );
+	using tools::stream::container_dump;
+	return ( container_dump( out, hs_, "hash_set" ) );
 	M_EPILOG
 }
 
 template<typename key_t, typename value_t, typename hasher_t, typename allocator_t>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HHashMap<key_t, value_t, hasher_t, allocator_t> const& hs_ ) {
 	M_PROLOG
-	return ( tools::container_dump( out, hs_, "hash_map" ) );
+	using tools::stream::container_dump;
+	return ( container_dump( out, hs_, "hash_map" ) );
 	M_EPILOG
 }
 

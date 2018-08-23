@@ -257,7 +257,109 @@ public:
 	int long read_while_n( yaal::hcore::HString& store, int long maxcount, char const* acquire ) {
 		return ( do_read_while_n( store, maxcount, acquire ) );
 	}
+	HStreamInterface& read( HString&  val_) {
+		return ( do_input( val_ ) );
+	}
+	HStreamInterface& read( bool& val_ ) {
+		return ( do_input( val_ ) );
+	}
+	HStreamInterface& read( code_point_t& val_ ) {
+		return ( do_input( val_ ) );
+	}
+	HStreamInterface& read( char& val_ ) {
+		return ( do_input( val_ ) );
+	}
+	HStreamInterface& read( char unsigned& val_ ) {
+		return ( do_input( val_ ) );
+	}
+	HStreamInterface& read( int short& val_ ) {
+		return ( do_input( val_ ) );
+	}
+	HStreamInterface& read( int short unsigned& val_ ) {
+		return ( do_input( val_ ) );
+	}
+	HStreamInterface& read( int& val_ ) {
+		return ( do_input( val_ ) );
+	}
+	HStreamInterface& read( int unsigned& val_ ) {
+		return ( do_input( val_ ) );
+	}
+	HStreamInterface& read( int long& val_ ) {
+		return ( do_input( val_ ) );
+	}
+	HStreamInterface& read( int long unsigned& val_ ) {
+		return ( do_input( val_ ) );
+	}
+	HStreamInterface& read( int long long& val_ ) {
+		return ( do_input( val_ ) );
+	}
+	HStreamInterface& read( int long long unsigned& val_ ) {
+		return ( do_input( val_ ) );
+	}
+	HStreamInterface& read( double& val_ ) {
+		return ( do_input( val_ ) );
+	}
+	HStreamInterface& read( double long& val_ ) {
+		return ( do_input( val_ ) );
+	}
+	HStreamInterface& read( float& val_ ) {
+		return ( do_input( val_ ) );
+	}
 	int long read( void*, int long );
+	HStreamInterface& write( HString const& val_ ) {
+		return ( do_output( val_ ) );
+	}
+	HStreamInterface& write( char const* val_ ) {
+		return ( do_output( val_ ) );
+	}
+	HStreamInterface& write( bool val_ ) {
+		return ( do_output( val_ ) );
+	}
+	HStreamInterface& write( code_point_t val_ ) {
+		return ( do_output( val_ ) );
+	}
+	HStreamInterface& write( char val_ ) {
+		return ( do_output( val_ ) );
+	}
+	HStreamInterface& write( char unsigned val_ ) {
+		return ( do_output( val_ ) );
+	}
+	HStreamInterface& write( int short val_ ) {
+		return ( do_output( val_ ) );
+	}
+	HStreamInterface& write( int short unsigned val_ ) {
+		return ( do_output( val_ ) );
+	}
+	HStreamInterface& write( int val_ ) {
+		return ( do_output( val_ ) );
+	}
+	HStreamInterface& write( int unsigned val_ ) {
+		return ( do_output( val_ ) );
+	}
+	HStreamInterface& write( int long val_ ) {
+		return ( do_output( val_ ) );
+	}
+	HStreamInterface& write( int long unsigned val_ ) {
+		return ( do_output( val_ ) );
+	}
+	HStreamInterface& write( int long long val_ ) {
+		return ( do_output( val_ ) );
+	}
+	HStreamInterface& write( int long long unsigned val_ ) {
+		return ( do_output( val_ ) );
+	}
+	HStreamInterface& write( double val_ ) {
+		return ( do_output( val_ ) );
+	}
+	HStreamInterface& write( double long val_ ) {
+		return ( do_output( val_ ) );
+	}
+	HStreamInterface& write( float val_ ) {
+		return ( do_output( val_ ) );
+	}
+	HStreamInterface& write( void const* val_ ) {
+		return ( do_output( val_ ) );
+	}
 	int long write( void const*, int long );
 	/*! \brief Move reading/writing position on seekable stream.
 	 *

@@ -127,8 +127,9 @@ template<typename call_t>
 HSynchronizedStream& HSynchronizedStream::operator()( call_t call_ ) {
 	M_PROLOG
 	HLock l( _mutex );
-	if ( _streamRef )
+	if ( _streamRef ) {
 		call_( _streamRef );
+	}
 	return ( *this );
 	M_EPILOG
 }
