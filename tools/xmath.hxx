@@ -237,7 +237,7 @@ private:
 		if ( ( _count > 0 ) && ( _aggregateType & AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION ) ) {
 			numeric_t acc( 0 );
 			for ( iterator_t it( first_ ); it != last_; ++ it ) {
-				acc += abs( *it - _arithmeticMean );
+				acc += math::abs( *it - _arithmeticMean );
 			}
 			_meanAbsoluteDeviation = acc / static_cast<numeric_t>( _count );
 		}

@@ -11,7 +11,7 @@
 
 #include "hcore/base.hxx"
 #include "hcore/allocator.hxx"
-#include "hcore/algorithm.hxx"
+#include "hcore/math.hxx"
 #include "hcore/functional.hxx"
 #include "hcore/pod.hxx"
 
@@ -357,10 +357,11 @@ public:
 	}
 	void resize( int long size_, type_t const& value_ = type_t() ) {
 		M_PROLOG
-		int long diff( abs( _size - size_ ) );
+		int long diff( math::abs( _size - size_ ) );
 		if ( _size > size_ ) {
-			while ( diff -- )
+			while ( diff -- ) {
 				pop_back();
+			}
 		} else if ( _size < size_ ) {
 			while ( diff -- ) {
 				push_back( value_ );

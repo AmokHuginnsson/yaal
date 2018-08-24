@@ -9,7 +9,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hnumber.hxx"
 #include "number.hxx"
-#include "algorithm.hxx"
+#include "math.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::math;
@@ -416,7 +416,7 @@ void HNumber::from_floating_point( double long number_ ) {
 
 void HNumber::from_integer( int long long number_ ) {
 	M_PROLOG
-	from_unsigned_integer( static_cast<int long long unsigned>( yaal::abs( number_ ) ) );
+	from_unsigned_integer( static_cast<int long long unsigned>( yaal::math::abs( number_ ) ) );
 	_negative = ( number_ < 0 );
 	return;
 	M_EPILOG
@@ -998,7 +998,7 @@ void HNumber::divide_by_leaf( i32_t leaf_, integer_t shift_ ) {
 	i32_t* data( _canonical.get<i32_t>() );
 	i64_t remainder( 0 );
 	bool negative( leaf_ < 0 );
-	leaf_ = yaal::abs( leaf_ );
+	leaf_ = yaal::math::abs( leaf_ );
 	M_ASSERT( leaf_ < LEAF );
 	if ( shift_ ) {
 		_integralPartSize += shift_;
@@ -1341,7 +1341,7 @@ HNumber HNumber::operator ^ ( int long long exp ) const {
 HNumber& HNumber::operator ^= ( int long long exp_ ) {
 	M_PROLOG
 	if ( _leafCount > 0 ) {
-		int long long unsigned exp( static_cast<int long long unsigned>( yaal::abs( exp_ ) ) );
+		int long long unsigned exp( static_cast<int long long unsigned>( yaal::math::abs( exp_ ) ) );
 		if ( exp > 1 ) {
 			int long long unsigned p( exp >> 1 );
 			HNumber n( *this );

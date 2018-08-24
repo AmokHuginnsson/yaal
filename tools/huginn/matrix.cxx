@@ -369,8 +369,8 @@ HHuginn::value_t HMatrix::scale_to( huginn::HThread* thread_, HHuginn::value_t* 
 		double long extremum( 0.L );
 		for ( int r( 0 ), rows( m.rows() ), cols( m.columns() ); r < rows; ++ r ) {
 			for ( int c( 0 ); c < cols; ++ c ) {
-				if ( abs( m[r][c] ) > extremum ) {
-					extremum = abs( m[r][c] );
+				if ( math::abs( m[r][c] ) > extremum ) {
+					extremum = math::abs( m[r][c] );
 				}
 			}
 		}

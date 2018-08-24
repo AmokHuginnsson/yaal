@@ -10,7 +10,7 @@
 #include "hcore/trait.hxx"
 #include "hcore/hchunk.hxx"
 #include "hcore/hpair.hxx"
-#include "hcore/algorithm.hxx"
+#include "hcore/math.hxx"
 #include "hcore/allocator.hxx"
 
 namespace yaal {
@@ -367,7 +367,7 @@ HHashContainer<value_t, hasher_t, equal_key_t, get_key_t, allocator_t>::find( ke
 	int long idx( 0 );
 	HAtom* atom( nullptr );
 	if ( _prime ) {
-		idx = yaal::abs( _hasher( key_ ) ) % _prime;
+		idx = yaal::math::abs( _hasher( key_ ) ) % _prime;
 		atom = _buckets.get<HAtom*>()[ idx ];
 		while ( atom && ! _equals( get_key_type::key( atom->_value ), key_ ) ) {
 			atom = atom->_next;
@@ -389,7 +389,7 @@ HHashContainer<value_t, hasher_t, equal_key_t, get_key_t, allocator_t>::insert_i
 			resize( ( _size + 1 ) * 2 );
 		}
 
-		int long newHash( yaal::abs( _hasher( get_key_type::key( constructor_._value ) ) ) % _prime );
+		int long newHash( yaal::math::abs( _hasher( get_key_type::key( constructor_._value ) ) ) % _prime );
 
 		HAtom* atom( _allocator.allocate( 1 ) );
 		try {
@@ -431,7 +431,7 @@ void HHashContainer<value_t, hasher_t, equal_key_t, get_key_t, allocator_t>::res
 			while ( a ) {
 				HAtom* atom( a );
 				a = a->_next;
-				int long newHash( yaal::abs( _hasher( get_key_type::key( atom->_value ) ) ) % prime );
+				int long newHash( yaal::math::abs( _hasher( get_key_type::key( atom->_value ) ) ) % prime );
 				atom->_next = newBuckets[ newHash ];
 				newBuckets[ newHash ] = atom;
 			}

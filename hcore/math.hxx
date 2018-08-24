@@ -15,6 +15,16 @@ namespace math {
 M_YAAL_HCORE_PUBLIC_API extern double long PI;
 M_YAAL_HCORE_PUBLIC_API extern double long E;
 
+/*! \brief Calculate absolute value of a number.
+ *
+ * \param val - a number which absolute value shall be calculated.
+ * \return |val|
+ */
+template<typename tType>
+inline tType abs( tType const& val ) {
+	return ( val >= 0 ? val : - val );
+}
+
 double long square_root_impl( double long );
 double long natural_exponential_impl( double long );
 double long natural_logarithm_impl( double long );

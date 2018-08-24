@@ -381,7 +381,7 @@ typename HMatrix<value_type_t>::value_type HMatrix<value_type_t>::det( void ) co
 		value_type tmpVal( 0 );
 		int maxRow( 0 );
 		for ( int k( r ); k < _rows; ++ k ) {
-			tmpVal = abs( matrix[k][r] );
+			tmpVal = math::abs( matrix[k][r] );
 			if ( tmpVal > maxVal ) {
 				maxVal = tmpVal;
 				maxRow = k;
@@ -435,7 +435,7 @@ HMatrix<value_type_t> HMatrix<value_type_t>::inverse( void ) const {
 		value_type tmpVal( 0 );
 		int maxRow( 0 );
 		for ( int k( r ); k < _rows; ++ k ) {
-			tmpVal = abs( matrix[k][r] );
+			tmpVal = math::abs( matrix[k][r] );
 			if ( tmpVal > maxVal ) {
 				maxVal = tmpVal;
 				maxRow = k;

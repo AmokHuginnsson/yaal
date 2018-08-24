@@ -1537,16 +1537,6 @@ tType max( std::initializer_list<tType> constants_ ) {
 	return ( *max_element( constants_.begin(), constants_.end() ) );
 }
 
-/*! \brief Calculate absolute value of a number.
- *
- * \param val - a number which absolute value shall be calculated.
- * \return |val|
- */
-template<typename tType>
-inline tType abs( tType const& val ) {
-	return ( val >= 0 ? val : - val );
-}
-
 /*! \brief Make heap from range of elements.
  *
  * \param first_ - beginning of the heap.

@@ -82,9 +82,9 @@ HComplex::value_type HComplex::modulus( void ) const {
 	M_PROLOG
 	value_type mod( 0.L );
 	if ( ( _imaginary + 0.L ) == 0.L ) {
-		mod = yaal::abs( _real );
+		mod = yaal::math::abs( _real );
 	} else if ( ( _real + 0.L ) == 0.L ) {
-		mod = yaal::abs( _imaginary );
+		mod = yaal::math::abs( _imaginary );
 	}	else {
 		mod = square_root( _real * _real + _imaginary * _imaginary );
 	}
@@ -94,8 +94,8 @@ HComplex::value_type HComplex::modulus( void ) const {
 
 HComplex::value_type HComplex::argument( void ) const {
 	M_PROLOG
-	bool reZero( yaal::abs( _real ) < ( 2.L * std::numeric_limits<value_type>::epsilon() ) );
-	bool imZero( yaal::abs( _imaginary ) < ( 2.L * std::numeric_limits<value_type>::epsilon() ) );
+	bool reZero( yaal::math::abs( _real ) < ( 2.L * std::numeric_limits<value_type>::epsilon() ) );
+	bool imZero( yaal::math::abs( _imaginary ) < ( 2.L * std::numeric_limits<value_type>::epsilon() ) );
 	if ( reZero && imZero  ) {
 		M_THROW( "Argument for 0 + 0i is undefined.", errno );
 	}
