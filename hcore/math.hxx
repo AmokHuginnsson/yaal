@@ -128,6 +128,8 @@ T error_function( T val_ ) {
 	return ( static_cast<T>( error_function_impl( val_ ) ) );
 }
 
+int long long greatest_common_divisor( int long long, int long long );
+
 }
 
 }
