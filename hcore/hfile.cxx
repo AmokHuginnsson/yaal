@@ -287,9 +287,9 @@ bool HFile::is_opened( void ) const {
 	M_EPILOG
 }
 
-bool HFile::operator ! ( void ) const {
+HFile::operator bool ( void ) const {
 	M_PROLOG
-	return ( ! is_opened() );
+	return ( is_opened() );
 	M_EPILOG
 }
 

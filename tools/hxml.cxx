@@ -1373,12 +1373,12 @@ HXml::HConstNodeProxy::const_reverse_iterator HXml::HConstNodeProxy::rend( void 
 	M_EPILOG
 }
 
-bool HXml::HNodeProxy::operator ! ( void ) const {
-	return ( ! _node );
+HXml::HNodeProxy::operator bool ( void ) const {
+	return ( !! _node );
 }
 
-bool HXml::HConstNodeProxy::operator ! ( void ) const {
-	return ( ! _node );
+HXml::HConstNodeProxy::operator bool ( void ) const {
+	return ( !! _node );
 }
 
 HXml::HIterator::HIterator( void )

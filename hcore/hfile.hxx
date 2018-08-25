@@ -80,7 +80,7 @@ public:
 	HString const& get_path( void ) const;
 	HString const& get_error( void ) const;
 	bool is_opened( void ) const;
-	bool operator ! ( void ) const;
+	explicit operator bool ( void ) const;
 protected:
 	virtual int do_open( HString const&, open_t const& mode );
 	virtual int do_close( void );

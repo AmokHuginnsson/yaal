@@ -515,8 +515,8 @@ public:
 	value_type* get( void ) {
 		return ( this->_shared ? this->_shared->_object : nullptr );
 	}
-	bool operator ! ( void ) const {
-		return ( ! ( this->_shared && this->_shared->_object ) );
+	explicit operator bool ( void ) const {
+		return ( this->_shared && this->_shared->_object );
 	}
 private:
 	friend struct value_reference_helper;

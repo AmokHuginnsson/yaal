@@ -193,9 +193,9 @@ public:
 		return;
 		M_EPILOG
 	}
-	bool operator ! ( void ) const {
+	explicit operator bool ( void ) const {
 		M_PROLOG
-		return ( ! _buf.get<type_t>() );
+		return ( ! is_empty() );
 		M_EPILOG
 	}
 	iterator insert( iterator, type_t const& );

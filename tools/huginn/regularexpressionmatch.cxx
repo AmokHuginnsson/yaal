@@ -72,7 +72,7 @@ HHuginn::value_t HRegularExpressionMatch::matched( huginn::HThread* thread_, HHu
 	char const name[] = "RegularExpressionMatch.matched";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HRegularExpressionMatch* rem( static_cast<HRegularExpressionMatch*>( object_->raw() ) );
-	return ( thread_->object_factory().create_boolean( rem->_regex->matches( rem->_fast ) ) );
+	return ( thread_->object_factory().create_boolean( static_cast<bool>( rem->_regex->matches( rem->_fast ) ) ) );
 	M_EPILOG
 }
 

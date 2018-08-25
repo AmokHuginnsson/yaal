@@ -222,8 +222,8 @@ public:
 		_holder._resource = nullptr;
 		return ( val );
 	}
-	bool operator ! ( void ) const {
-		return ( _holder._resource == nullptr );
+	explicit operator bool ( void ) const {
+		return ( _holder._resource != nullptr );
 	}
 	void swap( HResource& other_ ) {
 		_holder.swap( other_._holder );

@@ -172,12 +172,13 @@ void HFSItem::set_path( HString const& path_, int nameLen_ ) {
 	M_EPILOG
 }
 
-bool HFSItem::operator ! ( void ) const {
+HFSItem::operator bool ( void ) const {
 	struct stat dummy;
 	HUTF8String utf8( _path );
-	return ( ! ( ( ::stat( utf8.c_str(),
-						&dummy ) == 0 ) || ( ::lstat( utf8.c_str(),
-							&dummy ) == 0 ) ) );
+	return (
+		( ::stat( utf8.c_str(), &dummy ) == 0 )
+		|| ( ::lstat( utf8.c_str(), &dummy ) == 0 )
+	);
 }
 
 void HFSItem::swap( HFSItem& o ) {

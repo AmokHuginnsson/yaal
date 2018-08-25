@@ -602,8 +602,8 @@ public:
 	value_type* get( void ) {
 		return ( this->_object );
 	}
-	bool operator! ( void ) const {
-		return ( ! this->_object );
+	explicit operator bool ( void ) const {
+		return ( this->_object != nullptr );
 	}
 private:
 	friend struct pointer_helper;

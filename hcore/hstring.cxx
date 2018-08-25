@@ -1627,8 +1627,8 @@ bool HString::is_empty( void ) const {
 	return ( ! GET_SIZE );
 }
 
-bool HString::operator ! ( void ) const {
-	return ( is_empty() );
+HString::operator bool ( void ) const {
+	return ( ! is_empty() );
 }
 
 void HString::clear( void ) {

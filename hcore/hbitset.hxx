@@ -34,11 +34,11 @@ public:
 	}
 	HBitset( word_t val_ )
 		: _buf() {
-			_buf[0] = bit::reverse( val_ );
-			for ( int i( SIZE ); i < BITS_IN_WORD; ++ i ) {
-				_buf[0] &= ~( BIT >> i );
-			}
+		_buf[0] = bit::reverse( val_ );
+		for ( int i( SIZE ); i < BITS_IN_WORD; ++ i ) {
+			_buf[0] &= ~( BIT >> i );
 		}
+	}
 	HBitset( HBitset const& bs_ )
 		: _buf() {
 		copy( bs_._buf, end( bs_._buf ), _buf );
@@ -220,7 +220,7 @@ public:
 	bool operator != ( bool value_ ) const {
 		return ( _owner->get( _pos ) != value_ );
 	}
-	operator bool ( void ) const {
+	explicit operator bool ( void ) const {
 		return ( _owner->get( _pos ) );
 	}
 	void swap( typename HBitset::HBitReference& br_ ) {

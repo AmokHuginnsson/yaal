@@ -486,9 +486,9 @@ public:
 	}
 	/*! \brief Alias for HArray::is_empty().
 	 */
-	bool operator ! ( void ) const {
+	explicit operator  bool ( void ) const {
 		M_PROLOG
-		return ( is_empty() );
+		return ( ! is_empty() );
 		M_EPILOG
 	}
 	/*! \brief Get number of elements in array.

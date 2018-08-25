@@ -294,9 +294,9 @@ public:
 		return ( matrix );
 		M_EPILOG
 	}
-	bool operator ! ( void ) const {
+	explicit operator bool ( void ) const {
 		M_PROLOG
-		return ( ! det() );
+		return ( det() != 0.L );
 		M_EPILOG
 	}
 	bool operator == ( HMatrix const& matrix_ ) const {

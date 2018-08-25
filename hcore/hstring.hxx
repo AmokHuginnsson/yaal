@@ -314,11 +314,11 @@ public:
 	 * \return character at given position in this string.
 	 */
 	code_point_t const operator[] ( int long position ) const;
-	/*! \brief Check if string is empty (has zero length).
+	/*! \brief Check if string has some content.
 	 *
-	 * \return True iff this string is empty.
+	 * \return True iff this string is not empty.
 	 */
-	bool operator ! ( void ) const;
+	explicit operator bool ( void ) const;
 	/*! \brief Set given character at given position.
 	 *
 	 * \param position - index of a position where given character shall be set.

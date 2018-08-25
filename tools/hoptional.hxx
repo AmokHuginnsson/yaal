@@ -21,8 +21,6 @@ template<typename type_t>
 class HOptional final {
 public:
 	typedef HOptional<type_t> this_type;
-	struct SemanticContext { SemanticContext const& member( SemanticContext& ) const { return ( *this ); } };
-	typedef SemanticContext const& ( SemanticContext::* safe_bool_t )( SemanticContext& ) const;
 	typedef type_t value_type;
 private:
 	char _data[ sizeof ( value_type ) ];
@@ -66,11 +64,8 @@ public:
 		}
 		return;
 	}
-	operator safe_bool_t() const {
-		return ( _initialized ? &SemanticContext::member : nullptr );
-	}
-	bool operator! ( void ) const {
-		return ( ! _initialized );
+	explicit operator bool ( void ) const {
+		return ( _initialized );
 	}
 	value_type const& operator* ( void ) const {
 		M_ASSERT( _initialized );
@@ -96,8 +91,6 @@ public:
 template<typename type_t>
 class HOptional<type_t&> {
 public:
-	struct SemanticContext { SemanticContext const& member( SemanticContext& ) { return ( *this ); } };
-	typedef SemanticContext const& ( SemanticContext::* safe_bool_t )( SemanticContext& );
 	typedef typename trait::strip_reference<type_t>::type value_type;
 private:
 	value_type* _value;
@@ -160,11 +153,8 @@ public:
 		}
 		return;
 	}
-	operator safe_bool_t() const {
-		return ( _initialized ? &SemanticContext::member : nullptr );
-	}
-	bool operator! ( void ) const {
-		return ( ! _initialized );
+	explicit operator bool ( void ) const {
+		return ( _initialized );
 	}
 	value_type const& operator* ( void ) const {
 		M_ASSERT( _initialized );

@@ -126,8 +126,8 @@ public:
 	}
 	HNamedRule( yaal::hcore::HString const&, ptr_t );
 	HNamedRule( HRuleBase const& );
-	bool operator ! ( void ) const {
-		return ( ! _rule );
+	explicit operator bool ( void ) const {
+		return ( !! _rule );
 	}
 	ptr_t const& operator->( void ) const {
 		return ( _rule );

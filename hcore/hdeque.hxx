@@ -409,8 +409,8 @@ public:
 		return ( _size );
 	}
 	void clear( void );
-	bool operator ! ( void ) const {
-		return ( is_empty() );
+	explicit operator  bool ( void ) const {
+		return ( ! is_empty() );
 	}
 	iterator insert( iterator pos_, type_t const& val_ ) {
 		M_ASSERT( pos_._owner == this );

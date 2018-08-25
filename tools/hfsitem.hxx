@@ -42,7 +42,7 @@ public:
 	yaal::hcore::system::user_id_t get_gid( void ) const;
 	HIterator begin( void );
 	HIterator end( void );
-	bool operator ! ( void ) const;
+	explicit operator bool ( void ) const;
 	void swap( HFSItem& );
 	yaal::hcore::HString error_message( int ) const;
 private:

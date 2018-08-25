@@ -176,7 +176,7 @@ public:
 	bool operator <= ( HNumber const& ) const;
 	bool operator > ( HNumber const& ) const;
 	bool operator >= ( HNumber const& ) const;
-	bool operator ! ( void ) const;
+	explicit operator bool ( void ) const;
 	HNumber& operator += ( HNumber const& );
 	HNumber& operator *= ( HNumber const& );
 	HNumber& operator -= ( HNumber const& );

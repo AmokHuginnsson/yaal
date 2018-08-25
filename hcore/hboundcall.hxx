@@ -155,14 +155,14 @@ public:
 		}
 		return;
 	}
-	bool operator ! ( void ) const {
+	explicit operator bool ( void ) const {
 		int const t( _call.type() );
 		if ( t == 0 ) {
-			return ( ! _call.template get<call_ptr_t>() );
+			return ( !! _call.template get<call_ptr_t>() );
 		} else if ( t == 1 ) {
-			return ( ! _call.template get<function_ptr_t>() );
+			return ( !! _call.template get<function_ptr_t>() );
 		}
-		return ( true );
+		return ( false );
 	}
 	bool operator == ( HBoundCall const& other_ ) const {
 		return ( _call == other_._call );

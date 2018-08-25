@@ -202,9 +202,11 @@ public:
 	HBit( HBit const& );
 	HBit& operator = ( HBit const& );
 	HBit& operator = ( bool );
+	bool operator == ( HBit const& ) const;
 	bool operator == ( bool ) const;
+	bool operator != ( HBit const& ) const;
 	bool operator != ( bool ) const;
-	operator bool ( void ) const;
+	explicit operator bool ( void ) const;
 	void swap( HBit& );
 private:
 	friend class HBitmap::HIterator<HBitmap::HBit>;

@@ -560,8 +560,16 @@ bool HBitmap::HBit::operator == ( bool bit ) const {
 	return ( _owner->get( _index ) == bit );
 }
 
+bool HBitmap::HBit::operator == ( HBitmap::HBit const& bit_ ) const {
+	return ( _owner->get( _index ) == bit_._owner->get( bit_._index ) );
+}
+
 bool HBitmap::HBit::operator != ( bool bit ) const {
 	return ( _owner->get( _index ) != bit );
+}
+
+bool HBitmap::HBit::operator != ( HBitmap::HBit const& bit_ ) const {
+	return ( _owner->get( _index ) != bit_._owner->get( bit_._index ) );
 }
 
 HBitmap::HBit::operator bool ( void ) const {

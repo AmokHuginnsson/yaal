@@ -235,7 +235,7 @@ public:
 	HConstNodeProxy& operator = ( HConstNodeProxy const& );
 	bool operator == ( HConstNodeProxy const& ) const;
 	bool operator != ( HConstNodeProxy const& ) const;
-	bool operator ! ( void ) const;
+	explicit operator bool ( void ) const;
 	void const* node_id( void ) const {
 		return ( _node );
 	}
@@ -289,7 +289,7 @@ public:
 	HNodeProxy( void );
 	HNodeProxy( HNodeProxy const& );
 	HNodeProxy& operator = ( HNodeProxy const& );
-	bool operator ! ( void ) const;
+	explicit operator bool ( void ) const;
 private:
 	void reset_owner( HXml const* );
 	friend class HXml;
