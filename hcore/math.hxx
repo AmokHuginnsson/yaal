@@ -42,6 +42,7 @@ double long hyperbolic_tangens_impl( double long );
 double long hyperbolic_cotangens_impl( double long );
 double long sigmoid_impl( double long );
 double long error_function_impl( double long );
+int long long greatest_common_divisor_impl( int long long, int long long );
 
 template<typename T>
 T square_root( T val_ ) {
@@ -128,7 +129,10 @@ T error_function( T val_ ) {
 	return ( static_cast<T>( error_function_impl( val_ ) ) );
 }
 
-int long long greatest_common_divisor( int long long, int long long );
+template<typename T>
+T greatest_common_divisor( T a_, T b_ ) {
+	return ( static_cast<T>( greatest_common_divisor_impl( a_, b_ ) ) );
+}
 
 }
 

@@ -732,6 +732,19 @@ yaal::hcore::HNumber binomial_coefficient( int long long cardinal_, int long lon
 	return ( factorial( cardinal_ ) / ( factorial( subCardinal_ ) * factorial( cardinal_ - subCardinal_ ) ) );
 }
 
+inline yaal::hcore::HNumber greatest_common_divisor( yaal::hcore::HNumber&& a_, yaal::hcore::HNumber&& b_ ) {
+	a_.abs();
+	b_.abs();
+	while ( a_ && b_ ) {
+		if ( a_ > b_ ) {
+			a_ %= b_;
+		} else {
+			b_ %= a_;
+		}
+	}
+	return ( a_ ? a_ : b_ );
+}
+
 }
 
 }
@@ -837,6 +850,12 @@ yaal::hcore::HNumber sigmoid( yaal::hcore::HNumber const& value_ ) {
 yaal::hcore::HNumber error_function( yaal::hcore::HNumber const& value_ ) {
 	M_PROLOG
 	return ( yaal::hcore::HNumber::ElementaryFunctions::error_function( value_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HNumber greatest_common_divisor( yaal::hcore::HNumber a_, yaal::hcore::HNumber b_ ) {
+	M_PROLOG
+	return ( yaal::hcore::number::greatest_common_divisor( yaal::move( a_ ), yaal::move( b_ ) ) );
 	M_EPILOG
 }
 

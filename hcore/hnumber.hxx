@@ -295,6 +295,7 @@ yaal::hcore::HNumber hyperbolic_tangens( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber hyperbolic_cotangens( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber sigmoid( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber error_function( yaal::hcore::HNumber const& );
+yaal::hcore::HNumber greatest_common_divisor( yaal::hcore::HNumber, yaal::hcore::HNumber );
 
 }
 

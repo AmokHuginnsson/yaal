@@ -92,7 +92,7 @@ double long error_function_impl( double long val_ ) {
 	return ( erfl( val_ ) );
 }
 
-int long long greatest_common_divisor( int long long a_, int long long b_ ) {
+int long long greatest_common_divisor_impl( int long long a_, int long long b_ ) {
 	a_ = yaal::math::abs( a_ );
 	b_ = yaal::math::abs( b_ );
 	while ( a_ && b_ ) {
