@@ -60,6 +60,7 @@ public:
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 	typedef HPair<iterator, bool> insert_result;
 	typedef engine_t engine_type;
+	typedef typename engine_type::size_type size_type;
 	typedef typename engine_type::allocator_type allocator_type;
 	typedef typename engine_type::node_size node_size;
 	typedef typename engine_type::node_type node_type;
@@ -122,9 +123,9 @@ public:
 	allocator_type const& get_allocator( void ) const {
 		return ( _engine.get_allocator() );
 	}
-	int long size( void ) const
+	size_type size( void ) const
 		{ return ( get_size() ); }
-	int long get_size( void ) const
+	size_type get_size( void ) const
 		{ return ( _engine.get_size() );	}
 	bool empty( void ) const
 		{ return ( is_empty() );	}
@@ -158,10 +159,10 @@ public:
 		return;
 		M_EPILOG
 	}
-	int long erase( key_type const& key ) {
+	size_type erase( key_type const& key ) {
 		M_PROLOG
 		iterator it = find( key );
-		int long erased( 0 );
+		size_type erased( 0 );
 		if ( it != end() ) {
 			erased = 1;
 			_engine.remove( it._engine );
@@ -246,7 +247,7 @@ public:
 		return ( it->second );
 		M_EPILOG
 	}
-	int long count( key_type const& key_ ) const
+	size_type count( key_type const& key_ ) const
 		{ M_PROLOG return ( find( key_ ) != end() ? 1 : 0 ); M_EPILOG }
 	void clear( void )
 		{ _engine.clear(); }

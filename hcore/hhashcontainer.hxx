@@ -19,31 +19,35 @@ namespace hcore {
 
 template<typename key_t>
 struct hash {
-	int long operator () ( key_t const& ) const;
+	typedef int long size_type;
+	size_type operator () ( key_t const& ) const;
 };
 
 template<typename key_t>
 struct hash<key_t*> {
-	int long operator () ( key_t* const& key_ ) const {
-		return ( reinterpret_cast<int long>( key_ ) );
+	typedef int long size_type;
+	size_type operator () ( key_t* const& key_ ) const {
+		return ( reinterpret_cast<size_type>( key_ ) );
 	}
 };
 
 template<typename first_t, typename second_t>
 struct hash<yaal::hcore::HPair<first_t, second_t>> {
-	int long operator () ( yaal::hcore::HPair<first_t, second_t> const& key_ ) const {
+	typedef int long size_type;
+	size_type operator () ( yaal::hcore::HPair<first_t, second_t> const& key_ ) const {
 		return ( hash<first_t>()( key_.first ) * 3 + hash<second_t>()( key_.second ) );
 	}
 };
 
 template<typename key_t, typename TAG>
 struct hash<yaal::hcore::HTaggedPOD<key_t, TAG>> {
-	int long operator () ( HTaggedPOD<key_t, TAG> const& key_ ) const {
+	typedef int long size_type;
+	size_type operator () ( HTaggedPOD<key_t, TAG> const& key_ ) const {
 		return ( hash<key_t>()( key_.get() ) );
 	}
 };
 
-extern M_YAAL_HCORE_PUBLIC_API int long const* const _primes_;
+extern M_YAAL_HCORE_PUBLIC_API hash<trait::no_type>::size_type const* const _primes_;
 
 template<typename value_t, typename hasher_t, typename equal_key_t, typename get_key_t, typename allocator_t>
 class HHashContainer final {
@@ -54,6 +58,7 @@ public:
 	typedef equal_key_t equal_key_type;
 	typedef get_key_t get_key_type;
 	typedef typename get_key_type::key_type key_type;
+	typedef typename trait::strip<hasher_type>::type::size_type size_type;
 private:
 #ifndef __sun__
 #pragma pack( push, 1 )
@@ -111,7 +116,7 @@ public:
 	class HIterator {
 		typedef HHashContainer<value_type, hasher_type, equal_key_type, get_key_type, allocator_t> owner_t;
 		owner_t const* _owner;
-		int long _index;
+		size_type _index;
 		typename owner_t::HAtom* _atom;
 	public:
 		HIterator( void )
@@ -136,7 +141,7 @@ public:
 		HIterator& operator = ( HIterator&& ) noexcept = default;
 		HIterator& operator ++ ( void ) {
 			M_ASSERT( _owner );
-			int long oldIndex( _index );
+			size_type oldIndex( _index );
 			if ( _atom ) {
 				_atom = _atom->_next;
 				if ( ! _atom ) {
@@ -210,15 +215,15 @@ public:
 		}
 	private:
 		friend class HHashContainer<value_type, hasher_type, equal_key_type, get_key_type, allocator_t>;
-		explicit HIterator( owner_t const* owner_, int long index_, typename owner_t::HAtom* atom_ )
+		explicit HIterator( owner_t const* owner_, size_type index_, typename owner_t::HAtom* atom_ )
 			: _owner( owner_ )
 			, _index( index_ )
 			, _atom( atom_ ) {
 		}
 	};
 private:
-	int long _prime;
-	int _size;
+	size_type _prime;
+	size_type _size;
 	HChunk _buckets;
 	hasher_type _hasher;
 	equal_key_type _equals;
@@ -241,7 +246,7 @@ public:
 	allocator_type const& get_allocator( void ) const {
 		return ( _allocator );
 	}
-	int long get_size( void ) const {
+	size_type get_size( void ) const {
 		M_PROLOG
 		return ( _size );
 		M_EPILOG
@@ -254,7 +259,7 @@ public:
 	void clear( void ) {
 		M_PROLOG
 		HAtom** buckets = _buckets.get<HAtom*>();
-		for ( int long i = 0; i < _prime; i ++ ) {
+		for ( size_type i = 0; i < _prime; i ++ ) {
 			HAtom* atom( buckets[ i ] );
 			while ( atom ) {
 				HAtom* del( atom );
@@ -292,7 +297,7 @@ public:
 		return ( HIterator( this, _prime, nullptr ) );
 		M_EPILOG
 	}
-	void resize( int long );
+	void resize( size_type );
 	void erase( HIterator const& it ) {
 		M_PROLOG
 		HAtom** buckets = _buckets.get<HAtom*>();
@@ -321,7 +326,7 @@ public:
 			HChunk newBuckets( src_._buckets.get_size(), HChunk::STRATEGY::EXACT );
 			HAtom const* const* otherBuckets = src_._buckets.template get<HAtom const*>();
 			HAtom** buckets = newBuckets.get<HAtom*>();
-			for ( int long i( 0 ); i < src_._prime; ++ i ) {
+			for ( size_type i( 0 ); i < src_._prime; ++ i ) {
 				HAtom const* origAtom( otherBuckets[ i ] );
 				while ( origAtom ) {
 					HAtom* atom( _allocator.allocate( 1 ) );
@@ -364,7 +369,7 @@ template<typename value_t, typename hasher_t, typename equal_key_t, typename get
 typename HHashContainer<value_t, hasher_t, equal_key_t, get_key_t, allocator_t>::HIterator
 HHashContainer<value_t, hasher_t, equal_key_t, get_key_t, allocator_t>::find( key_type const& key_ ) const {
 	M_PROLOG
-	int long idx( 0 );
+	size_type idx( 0 );
 	HAtom* atom( nullptr );
 	if ( _prime ) {
 		idx = yaal::math::abs( _hasher( key_ ) ) % _prime;
@@ -389,7 +394,7 @@ HHashContainer<value_t, hasher_t, equal_key_t, get_key_t, allocator_t>::insert_i
 			resize( ( _size + 1 ) * 2 );
 		}
 
-		int long newHash( yaal::math::abs( _hasher( get_key_type::key( constructor_._value ) ) ) % _prime );
+		size_type newHash( yaal::math::abs( _hasher( get_key_type::key( constructor_._value ) ) ) % _prime );
 
 		HAtom* atom( _allocator.allocate( 1 ) );
 		try {
@@ -411,7 +416,7 @@ HHashContainer<value_t, hasher_t, equal_key_t, get_key_t, allocator_t>::insert_i
 }
 
 template<typename value_t, typename hasher_t, typename equal_key_t, typename get_key_t, typename allocator_t>
-void HHashContainer<value_t, hasher_t, equal_key_t, get_key_t, allocator_t>::resize( int long size_ ) {
+void HHashContainer<value_t, hasher_t, equal_key_t, get_key_t, allocator_t>::resize( size_type size_ ) {
 	M_PROLOG
 	if ( size_ < 1 )
 		M_THROW( "bad new container size", size_ );
@@ -421,17 +426,17 @@ void HHashContainer<value_t, hasher_t, equal_key_t, get_key_t, allocator_t>::res
 			size_ >>= 1;
 			n ++;
 		}
-		int long prime( _primes_[ n - 1 ] );
+		size_type prime( _primes_[ n - 1 ] );
 		HChunk buckets( chunk_size<HAtom*>( prime ), HChunk::STRATEGY::GEOMETRIC );
-		M_ASSERT( ( buckets.size() / static_cast<int long>( sizeof ( HAtom* ) ) ) >= prime );
+		M_ASSERT( ( buckets.size() / static_cast<size_type>( sizeof ( HAtom* ) ) ) >= prime );
 		HAtom** oldBuckets = _buckets.get<HAtom*>();
 		HAtom** newBuckets = buckets.get<HAtom*>();
-		for ( int long i( 0 ); i < _prime; ++ i ) {
+		for ( size_type i( 0 ); i < _prime; ++ i ) {
 			HAtom* a( oldBuckets[ i ] );
 			while ( a ) {
 				HAtom* atom( a );
 				a = a->_next;
-				int long newHash( yaal::math::abs( _hasher( get_key_type::key( atom->_value ) ) ) % prime );
+				size_type newHash( yaal::math::abs( _hasher( get_key_type::key( atom->_value ) ) ) % prime );
 				atom->_next = newBuckets[ newHash ];
 				newBuckets[ newHash ] = atom;
 			}

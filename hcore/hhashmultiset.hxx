@@ -19,8 +19,9 @@ namespace hcore {
 template<typename type_t>
 struct hashmultiset_helper {
 	typedef typename type_t::first_type key_type;
-	inline static key_type const& key( type_t const& key_ )
-		{	return ( key_.first );	}
+	inline static key_type const& key( type_t const& key_ ) {
+		return ( key_.first );
+	}
 };
 
 /*! \brief Hash multi-set container implementation.
@@ -40,12 +41,13 @@ public:
 	typedef equal_key_t equal_key_type;
 	typedef HPair<type_t, int long> elem_t;
 	typedef HHashContainer<elem_t, hasher_type, equal_key_type, hashmultiset_helper<elem_t>, allocator_t> engine_t;
+	typedef typename engine_t::size_type size_type;
 	typedef typename engine_t::allocator_type allocator_type;
 	typedef typename engine_t::node_size node_size;
 	typedef typename engine_t::node_type node_type;
 	typedef HHashMultiSet<value_type, hasher_type, equal_key_type, allocator_t> this_type;
 	class HIterator : public iterator_interface<value_type const, iterator_category::forward> {
-		int long _index;
+		size_type _index;
 		engine_t const* _owner;
 		typename engine_t::HIterator _engine;
 	public:
@@ -109,7 +111,7 @@ public:
 		}
 	private:
 		friend class HHashMultiSet<key_type, hasher_type, equal_key_type, allocator_t>;
-		explicit HIterator( engine_t const* owner_, typename engine_t::HIterator const& it, int long index_ )
+		explicit HIterator( engine_t const* owner_, typename engine_t::HIterator const& it, size_type index_ )
 			: base_type(), _index( index_ ), _owner( owner_ ), _engine( it ) {
 			return;
 		}
@@ -134,7 +136,7 @@ public:
 		return;
 	}
 	/*! \brief Lower bound of size of map's table */
-	explicit HHashMultiSet( int long size_ )
+	explicit HHashMultiSet( size_type size_ )
 		: _engine( hasher_type(), equal_key_type(), allocator_type() ) {
 		M_PROLOG
 		_engine.resize( size_ );
@@ -142,7 +144,7 @@ public:
 		M_EPILOG
 	}
 	HHashMultiSet(
-		int long size_,
+		size_type size_,
 		hasher_type const& hasher_,
 		equal_key_type const& equals_ = equal_key_type(),
 		allocator_type const& allocator_ = allocator_type()
@@ -171,7 +173,7 @@ public:
 	HHashMultiSet(
 		iterator_t first,
 		iterator_t last,
-		int long size_,
+		size_type size_,
 		hasher_type const& hasher_ = hasher_type(),
 		equal_key_type const& equals_ = equal_key_type(),
 		allocator_type const& allocator_ = allocator_type()
@@ -251,7 +253,7 @@ public:
 		return ( iterator( &_engine, p.first, p.first.get().second - 1 ) );
 		M_EPILOG
 	}
-	void resize( int long size_ ) {
+	void resize( size_type size_ ) {
 		M_PROLOG
 		_engine.resize( size_ );
 		return;
@@ -278,7 +280,7 @@ public:
 	 * \param key_ - key to be removed.
 	 * \return Number of erased elements.
 	 */
-	int long erase( type_t const& key_ ) {
+	size_type erase( type_t const& key_ ) {
 		M_PROLOG
 		iterator it( find( key_ ) );
 		bool erased( it != end() );
@@ -295,7 +297,7 @@ public:
 		return ( first_ );
 		M_EPILOG
 	}
-	int long count( value_type const& elem ) const {
+	size_type count( value_type const& elem ) const {
 		M_PROLOG
 		HIterator it( find( elem ) );
 		return ( it != end() ? it._engine.get().second : 0 );
@@ -306,15 +308,15 @@ public:
 		_engine.clear(); return;
 		M_EPILOG
 	}
-	int long get_size( void ) const {
+	size_type get_size( void ) const {
 		M_PROLOG
-		int long sizeAcc( 0 );
+		size_type sizeAcc( 0 );
 		for ( typename engine_t::HIterator it( _engine.begin() ), endIt( _engine.end() ); it != endIt; ++ it )
 			sizeAcc += it.get().second;
 		return ( sizeAcc );
 		M_EPILOG
 	}
-	int long size( void ) const {
+	size_type size( void ) const {
 		M_PROLOG
 		return ( get_size() );
 		M_EPILOG

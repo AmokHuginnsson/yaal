@@ -49,6 +49,7 @@ private:
 	typedef HMap<key_type, value_list_ptr_t, compare_type, allocator_t> multimap_engine_t;
 	multimap_engine_t _engine;
 public:
+	typedef typename multimap_engine_t::size_type size_type;
 	typedef typename multimap_engine_t::allocator_type allocator_type;
 	typedef typename multimap_engine_t::node_size node_size;
 	typedef typename multimap_engine_t::node_type node_type;
@@ -92,12 +93,12 @@ public:
 	allocator_type const& get_allocator( void ) const {
 		return ( _engine.get_allocator() );
 	}
-	int long size( void ) const {
+	size_type size( void ) const {
 		return ( get_size() );
 	}
-	int long get_size( void ) const {
+	size_type get_size( void ) const {
 		M_PROLOG
-		int long sizeAcc( 0 );
+		size_type sizeAcc( 0 );
 		for ( typename multimap_engine_t::const_iterator it( _engine.begin() ), endIt( _engine.end() ); it != endIt; ++ it )
 			sizeAcc += it->second->get_size();
 		return ( sizeAcc );
@@ -182,10 +183,10 @@ public:
 	 * \param key_ - erase elements with this key.
 	 * \return number of elements actually erased.
 	 */
-	int long erase( key_type const& key_ ) {
+	size_type erase( key_type const& key_ ) {
 		M_PROLOG
 		iterator it = find( key_ );
-		int long erased( 0 );
+		size_type erased( 0 );
 		if ( it != end() ) {
 			erased = it._major->second->get_size();
 			_engine.erase( it._major );
@@ -322,10 +323,10 @@ public:
 	void clear( void ) {
 		_engine.clear();
 	}
-	int long count( key_type const& key ) const {
+	size_type count( key_type const& key ) const {
 		M_PROLOG
 		typename multimap_engine_t::const_iterator major = _engine.find( key );
-		int long cnt = 0;
+		size_type cnt = 0;
 		if ( major != _engine.end() )
 			cnt = major->second->size();
 		return ( cnt );

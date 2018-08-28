@@ -41,6 +41,7 @@ public:
 	typedef hasher_t hasher_type;
 	typedef equal_key_t equal_key_type;
 	typedef HHashContainer<value_type, hasher_type, equal_key_type, hashset_helper<value_type>, allocator_t> engine_t;
+	typedef typename engine_t::size_type size_type;
 	typedef typename engine_t::allocator_type allocator_type;
 	typedef typename engine_t::node_size node_size;
 	typedef typename engine_t::node_type node_type;
@@ -116,7 +117,7 @@ public:
 		return;
 	}
 	/*! \brief Lower bound of size of map's table */
-	HHashSet( int long size_ )
+	HHashSet( size_type size_ )
 		: _engine( hasher_type(), equal_key_type(), allocator_type() ) {
 		M_PROLOG
 		_engine.resize( size_ );
@@ -124,7 +125,7 @@ public:
 		M_EPILOG
 	}
 	HHashSet(
-		int long size_,
+		size_type size_,
 		hasher_type const& hasher_,
 		equal_key_type const& equals_ = equal_key_type(),
 		allocator_type const& allocator_ = allocator_type()
@@ -153,7 +154,7 @@ public:
 	HHashSet(
 		iterator_t first,
 		iterator_t last,
-		int long size_,
+		size_type size_,
 		hasher_type const& hasher_ = hasher_type(),
 		equal_key_type const& equals_ = equal_key_type(),
 		allocator_type const& allocator_ = allocator_type()
@@ -237,7 +238,7 @@ public:
 		return ( make_pair( iterator( it.first ), it.second ) );
 		M_EPILOG
 	}
-	void resize( int long size_ ) {
+	void resize( size_type size_ ) {
 		M_PROLOG
 		_engine.resize( size_ );
 		return;
@@ -264,7 +265,7 @@ public:
 	 * \param key_ - key to be removed.
 	 * \return Number of erased elements.
 	 */
-	int long erase( type_t const& key_ ) {
+	size_type erase( type_t const& key_ ) {
 		M_PROLOG
 		iterator it( find( key_ ) );
 		bool erased( it != end() );
@@ -281,7 +282,7 @@ public:
 		return ( first_ );
 		M_EPILOG
 	}
-	int long count( type_t const& key_ ) const {
+	size_type count( type_t const& key_ ) const {
 		M_PROLOG
 		return ( find( key_ ) != end() ? 1 : 0 );
 		M_EPILOG
@@ -292,12 +293,12 @@ public:
 		return;
 		M_EPILOG
 	}
-	int long get_size( void ) const {
+	size_type get_size( void ) const {
 		M_PROLOG
 		return ( _engine.get_size() );
 		M_EPILOG
 	}
-	int long size( void ) const {
+	size_type size( void ) const {
 		M_PROLOG
 		return ( _engine.get_size() );
 		M_EPILOG

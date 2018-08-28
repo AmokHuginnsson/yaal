@@ -41,6 +41,7 @@ public:
 	typedef type_t key_type;
 	typedef compare_t compare_type;
 	typedef HSBBSTree<value_type, compare_type, set_helper<value_type>, allocator_t> engine_type;
+	typedef typename engine_type::size_type size_type;
 	typedef typename engine_type::allocator_type allocator_type;
 	typedef typename engine_type::node_size node_size;
 	typedef typename engine_type::node_type node_type;
@@ -159,9 +160,9 @@ public:
 	allocator_type const& get_allocator( void ) const {
 		return ( _engine.get_allocator() );
 	}
-	int long size( void ) const
+	size_type size( void ) const
 		{ return ( get_size() ); }
-	int long get_size( void ) const
+	size_type get_size( void ) const
 		{ return ( _engine.get_size() );	}
 	bool empty( void ) const
 		{ return ( is_empty() );	}
@@ -199,16 +200,16 @@ public:
 		return;
 		M_EPILOG
 	}
-	int long count( value_type const& elem ) const {
+	size_type count( value_type const& elem ) const {
 		M_PROLOG
 		HIterator it( find( elem ) );
 		return ( it != end() ? 1 : 0 );
 		M_EPILOG
 	}
-	int long erase( value_type const& elem ) {
+	size_type erase( value_type const& elem ) {
 		M_PROLOG
 		HIterator it( find( elem ) );
-		int long erased( 0 );
+		size_type erased( 0 );
 		if ( it != end() ) {
 			_engine.remove( it._engine );
 			erased = 1;

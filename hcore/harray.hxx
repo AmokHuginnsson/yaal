@@ -31,6 +31,7 @@ class HArray final {
 public:
 	typedef HArray<type_t, allocator_t> this_type;
 	typedef type_t value_type;
+	typedef int long size_type;
 	/*! \brief Error codes for HArray<> operations.
 	 */
 	struct ERROR {
@@ -47,8 +48,8 @@ public:
 private:
 	static allocator_type _allocator;
 	value_type* _buf;
-	int long _size;
-	int long _capacity;
+	size_type _size;
+	size_type _capacity;
 public:
 	template<typename const_qual_t>
 	class HIterator;
@@ -80,7 +81,7 @@ public:
 	 *
 	 * \param size_ - size for newly created array.
 	 */
-	explicit HArray( int long size_ )
+	explicit HArray( size_type size_ )
 		: _buf( nullptr )
 		, _size( 0 )
 		, _capacity( 0 ) {
@@ -96,7 +97,7 @@ public:
 	 * \param size_ - size for newly created array.
 	 * \param allocator_ - external allocator that should be used for all array's allocations.
 	 */
-	HArray( int long size_, allocator_t const& )
+	HArray( size_type size_, allocator_t const& )
 		: _buf( nullptr )
 		, _size( 0 )
 		, _capacity( 0 ) {
@@ -113,7 +114,7 @@ public:
 	 * \param fillWith_ - value prototype that should be set for all objects in this newly created array.
 	 * \param allocator_ - external allocator that should be used for all array's allocations.
 	 */
-	HArray( int long size_, type_t const& fillWith_, allocator_t const& = allocator_t() )
+	HArray( size_type size_, type_t const& fillWith_, allocator_t const& = allocator_t() )
 		: _buf( nullptr )
 		, _size( 0 )
 		, _capacity( 0 ) {
@@ -164,7 +165,7 @@ public:
 		if ( arr_._size > 0 ) {
 			reserve( arr_._size );
 			_size = arr_._size;
-			for ( int long i = 0; i < _size; ++ i )
+			for ( size_type i = 0; i < _size; ++ i )
 				new ( _buf + i ) value_type( arr_._buf[ i ] );
 		}
 		return;
@@ -196,7 +197,7 @@ public:
 		if ( arr_._size > 0 ) {
 			reserve( arr_._size );
 			_size = arr_._size;
-			for ( int long i = 0; i < _size; ++ i ) {
+			for ( size_type i = 0; i < _size; ++ i ) {
 				new ( _buf + i ) value_type( arr_._buf[ i ] );
 			}
 		}
@@ -236,11 +237,11 @@ public:
 			} else {
 				copy_n( arr_._buf, min( _size, arr_._size ), _buf );
 				if ( arr_._size > _size ) {
-					for ( int long i = _size; i < arr_._size; ++ i ) {
+					for ( size_type i = _size; i < arr_._size; ++ i ) {
 						new ( _buf + i ) value_type( arr_._buf[ i ] );
 					}
 				} else if ( arr_._size < _size ) {
-					for ( int long i = arr_._size; i < _size; ++ i ) {
+					for ( size_type i = arr_._size; i < _size; ++ i ) {
 						M_SAFE( _buf[ i ].~value_type() );
 					}
 				}
@@ -294,16 +295,16 @@ public:
 	 * \param size_ - requested new number of elements in this array.
 	 * \param fillWith_ - default value for new values if this array will be enlarged.
 	 */
-	void resize( int long size_, type_t const& fillWith_ = value_type() ) {
+	void resize( size_type size_, type_t const& fillWith_ = value_type() ) {
 		M_PROLOG
 		if ( size_ < 0 )
 			M_THROW( _errMsgHArray_[ ERROR::BAD_SIZE ], size_ );
 		if ( size_ > _size ) {
 			reserve( size_ );
-			for ( int long i( _size ); i < size_; ++ i )
+			for ( size_type i( _size ); i < size_; ++ i )
 				new ( _buf + i ) value_type( fillWith_ );
 		} else if ( size_ < _size ) {
-			for ( int long i( size_ ); i < _size; ++ i )
+			for ( size_type i( size_ ); i < _size; ++ i )
 				M_SAFE( _buf[ i ].~value_type() );
 		}
 		_size = size_;
@@ -317,17 +318,17 @@ public:
 	 *
 	 * \param capacity_ - number of elements that could be stored in array without next reallocation.
 	 */
-	void reserve( int long capacity_ ) {
+	void reserve( size_type capacity_ ) {
 		M_PROLOG
 		if ( capacity_ < 0 ) {
 			M_THROW( _errMsgHArray_[ ERROR::BAD_SIZE ], capacity_ );
 		}
 		if ( capacity_ > _capacity ) {
-			int long newCapacity( _capacity ? max( capacity_, _capacity * 2 ) : capacity_ );
-			value_type* newBuf( static_cast<value_type*>( ::operator new ( static_cast<size_t>( yaal::safe_int::mul<int long>( newCapacity, static_cast<int>( sizeof ( value_type ) ) ) ), memory::yaal ) ) );
-			for ( int long i( 0 ); i < _size; ++ i )
+			size_type newCapacity( _capacity ? max( capacity_, _capacity * 2 ) : capacity_ );
+			value_type* newBuf( static_cast<value_type*>( ::operator new ( static_cast<size_t>( yaal::safe_int::mul<size_type>( newCapacity, static_cast<int>( sizeof ( value_type ) ) ) ), memory::yaal ) ) );
+			for ( size_type i( 0 ); i < _size; ++ i )
 				new ( newBuf + i ) value_type( yaal::move( _buf[ i ] ) );
-			for ( int long i( 0 ); i < _size; ++ i )
+			for ( size_type i( 0 ); i < _size; ++ i )
 				M_SAFE( _buf[ i ].~value_type() );
 			using yaal::swap;
 			swap( newBuf, _buf );
@@ -344,12 +345,12 @@ public:
 	 * \param index_ - index of requested element in this array.
 	 * \return Reference to element at requested index.
 	 */
-	type_t& operator[] ( int long index_ ) {
+	type_t& operator[] ( size_type index_ ) {
 		M_PROLOG
 		return ( _buf[ index_ ] );
 		M_EPILOG
 	}
-	type_t const& operator[] ( int long index_ ) const {
+	type_t const& operator[] ( size_type index_ ) const {
 		M_PROLOG
 		return ( _buf[ index_ ] );
 		M_EPILOG
@@ -361,18 +362,18 @@ public:
 	 * \param index_ - index of requested element in this array.
 	 * \return Reference to element at requested index.
 	 */
-	type_t& at( int long index_ ) {
+	type_t& at( size_type index_ ) {
 		M_PROLOG
-		int long idx = ( index_ < 0 ) ? index_ + _size : index_;
+		size_type idx = ( index_ < 0 ) ? index_ + _size : index_;
 		if ( ( idx >= _size ) || ( idx < 0 ) ) {
 			throw HOutOfRangeException( yaal::hcore::to_string( _errMsgHArray_[ ERROR::BAD_INDEX ] ).append( idx ) );
 		}
 		return ( _buf[ idx ] );
 		M_EPILOG
 	}
-	type_t const& at( int long index_ ) const {
+	type_t const& at( size_type index_ ) const {
 		M_PROLOG
-		int long idx( ( index_ < 0 ) ? index_ + _size : index_ );
+		size_type idx( ( index_ < 0 ) ? index_ + _size : index_ );
 		if ( ( idx >= _size ) || ( idx < 0 ) ) {
 			throw HOutOfRangeException( yaal::hcore::to_string( _errMsgHArray_[ ERROR::BAD_INDEX ] ).append( idx ) );
 		}
@@ -474,14 +475,14 @@ public:
 	}
 	/*! \brief Alias for HArray::get_capacity().
 	 */
-	int long capacity( void ) const {
+	size_type capacity( void ) const {
 		return ( get_capacity() );
 	}
 	/*! \brief Retrieve information about how many elements could be potentially stored in this array without reallocation.
 	 *
 	 * \return Maximum number of elements that could be stored in this array without reallocation.
 	 */
-	int long get_capacity( void ) const {
+	size_type get_capacity( void ) const {
 		return ( _capacity );
 	}
 	/*! \brief Alias for HArray::is_empty().
@@ -495,12 +496,12 @@ public:
 	 *
 	 * \return Number of elements in this array.
 	 */
-	int long get_size( void ) const {
+	size_type get_size( void ) const {
 		return ( _size );
 	}
 	/*! \brief Alias for HArray::get_size().
 	 */
-	int long size( void ) const {
+	size_type size( void ) const {
 		return ( _size );
 	}
 	/*! \brief Tell if this array is empty.
@@ -535,9 +536,9 @@ public:
 	 * \param size_ - number of elements to fill this array with.
 	 * \param fillWith_ - value that shall be set for all elements in this array.
 	 */
-	void assign( int long size_, type_t const& fillWith_ ) {
+	void assign( size_type size_, type_t const& fillWith_ ) {
 		M_PROLOG
-		int long oldSize( _size );
+		size_type oldSize( _size );
 		resize( size_, fillWith_ );
 		if ( oldSize > 0 )
 			fill_n( begin(), oldSize, fillWith_ );
@@ -560,7 +561,7 @@ public:
 			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], pos_._index );
 		using yaal::distance;
 		insert_space( pos_._index, distance( first_, last_ ) );
-		for ( int long i( pos_._index ); first_ != last_; ++ first_,  ++ i )
+		for ( size_type i( pos_._index ); first_ != last_; ++ first_,  ++ i )
 			new ( _buf + i ) value_type( *first_ );
 		return;
 		M_EPILOG
@@ -571,13 +572,13 @@ public:
 	 * \param count_ - insert that many copies of given value.
 	 * \param value_ - insert copies of this value.
 	 */
-	void insert( iterator pos_, int long count_, type_t const& value_ ) {
+	void insert( iterator pos_, size_type count_, type_t const& value_ ) {
 		M_PROLOG
 		M_ASSERT( pos_._owner == this );
 		if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
 			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], pos_._index );
 		insert_space( pos_._index, count_ );
-		for ( int long i( pos_._index ), last( pos_._index + count_ ); i < last; ++ i )
+		for ( size_type i( pos_._index ), last( pos_._index + count_ ); i < last; ++ i )
 			new ( _buf + i ) value_type( value_ );
 		return;
 		M_EPILOG
@@ -677,7 +678,7 @@ public:
 	iterator begin( void ) {
 		return ( iterator( this, 0 ) );
 	}
-	iterator find( int long idx ) {
+	iterator find( size_type idx ) {
 		return ( iterator( this, min( idx, _size ) ) );
 	}
 	iterator end( void ) {
@@ -697,7 +698,7 @@ public:
 	const_iterator cbegin( void ) const {
 		return ( const_iterator( this, 0 ) );
 	}
-	const_iterator find( int long idx ) const {
+	const_iterator find( size_type idx ) const {
 		return ( const_iterator( this, min( idx, _size ) ) );
 	}
 	const_iterator end( void ) const {
@@ -752,18 +753,18 @@ private:
 		return;
 		M_EPILOG
 	}
-	void initialize( int long size_, type_t const& fillWith_, trait::true_type const* ) {
+	void initialize( size_type size_, type_t const& fillWith_, trait::true_type const* ) {
 		M_PROLOG
 		resize( size_, fillWith_ );
 		return;
 		M_EPILOG
 	}
-	void insert_space( int long pos_, int long size_ ) {
+	void insert_space( size_type pos_, size_type size_ ) {
 		M_PROLOG
-		int long oldSize( _size );
+		size_type oldSize( _size );
 		reserve( _size + size_ );
 		_size += size_;
-		for ( int long src( oldSize - 1 ), dst( _size - 1 ); src >= pos_; -- src, -- dst ) {
+		for ( size_type src( oldSize - 1 ), dst( _size - 1 ); src >= pos_; -- src, -- dst ) {
 			new ( _buf + dst ) value_type( yaal::move( _buf[ src ] ) );
 			M_SAFE( _buf[ src ].~value_type() );
 		}
@@ -786,7 +787,7 @@ template<typename const_qual_t>
 class HArray<type_t, allocator_t>::HIterator : public iterator_interface<const_qual_t, iterator_category::random_access> {
 	typedef HArray<type_t, allocator_t> array_t;
 	array_t const* _owner;
-	int long _index;
+	size_type _index;
 public:
 	typedef iterator_interface<const_qual_t, iterator_category::random_access> base_type;
 	HIterator( void )
@@ -837,23 +838,23 @@ public:
 		operator -- ();
 		return ( it );
 	}
-	HIterator operator + ( int long off_ ) const {
+	HIterator operator + ( size_type off_ ) const {
 		HIterator it( _owner, _index + off_ );
 		return ( it );
 	}
-	HIterator& operator += ( int long off_ ) {
+	HIterator& operator += ( size_type off_ ) {
 		_index += off_;
 		return ( *this );
 	}
-	HIterator operator - ( int long off_ ) const {
+	HIterator operator - ( size_type off_ ) const {
 		HIterator it( _owner, _index - off_ );
 		return ( it );
 	}
-	HIterator& operator -= ( int long off_ ) {
+	HIterator& operator -= ( size_type off_ ) {
 		_index -= off_;
 		return ( *this );
 	}
-	int long operator - ( HIterator const& it ) const {
+	size_type operator - ( HIterator const& it ) const {
 		M_ASSERT( _owner == it._owner );
 		return ( _index - it._index );
 	}
@@ -905,8 +906,11 @@ public:
 	}
 private:
 	friend class HArray<type_t, allocator_t>;
-	explicit HIterator( array_t const* owner_, int long idx )
-		: base_type(), _owner( owner_ ), _index( idx ) {};
+	explicit HIterator( array_t const* owner_, size_type idx )
+		: base_type()
+		, _owner( owner_ )
+		, _index( idx ) {
+	}
 };
 
 }

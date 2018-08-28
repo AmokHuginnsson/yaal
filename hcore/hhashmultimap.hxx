@@ -62,6 +62,7 @@ private:
 	typedef HHashMap<key_type, value_list_ptr_t, hasher_type, equal_key_type, allocator_t> hashmultimap_engine_t;
 	hashmultimap_engine_t _engine;
 public:
+	typedef typename hashmultimap_engine_t::size_type size_type;
 	typedef typename hashmultimap_engine_t::allocator_type allocator_type;
 	typedef typename hashmultimap_engine_t::node_size node_size;
 	typedef typename hashmultimap_engine_t::node_type node_type;
@@ -77,7 +78,7 @@ public:
 		: _engine( allocator_ ) {
 		return;
 	}
-	explicit HHashMultiMap( int long size_ )
+	explicit HHashMultiMap( size_type size_ )
 		: _engine( size_ ) {
 		return;
 	}
@@ -110,12 +111,12 @@ public:
 		return ( *this );
 		M_EPILOG
 	}
-	int long size( void ) const {
+	size_type size( void ) const {
 		return ( get_size() );
 	}
-	int long get_size( void ) const {
+	size_type get_size( void ) const {
 		M_PROLOG
-		int long sizeAcc( 0 );
+		size_type sizeAcc( 0 );
 		for ( typename hashmultimap_engine_t::const_iterator it( _engine.begin() ), endIt( _engine.end() ); it != endIt; ++ it )
 			sizeAcc += it->second->get_size();
 		return ( sizeAcc );
@@ -198,19 +199,19 @@ public:
 		return;
 		M_EPILOG
 	}
-	int long count( key_type const& key ) {
+	size_type count( key_type const& key ) {
 		M_PROLOG
 		iterator it = find( key );
-		int long num( 0 );
+		size_type num( 0 );
 		if ( it != end() )
 			num = it._major->second->get_size();
 		return ( num );
 		M_EPILOG
 	}
-	int long erase( key_type const& key ) {
+	size_type erase( key_type const& key ) {
 		M_PROLOG
 		iterator it = find( key );
-		int long erased( 0 );
+		size_type erased( 0 );
 		if ( it != end() ) {
 			erased = it._major->second->get_size();
 			_engine.erase( it._major );
@@ -350,10 +351,10 @@ public:
 	void clear( void ) {
 		_engine.clear();
 	}
-	int long count( key_type const& key ) const {
+	size_type count( key_type const& key ) const {
 		M_PROLOG
 		typename hashmultimap_engine_t::const_iterator major = _engine.find( key );
-		int long cnt = 0;
+		size_type cnt = 0;
 		if ( major != _engine.end() )
 			cnt = major->second->size();
 		return ( cnt );

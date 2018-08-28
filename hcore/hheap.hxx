@@ -22,6 +22,7 @@ private:
 	typedef sequence_t sequence_type;
 public:
 	typedef typename sequence_type::value_type value_type;
+	typedef typename sequence_type::size_type size_type;
 private:
 	sequence_type _sequence;
 public:
@@ -44,12 +45,12 @@ public:
 		return ( _sequence.is_empty() );
 		M_EPILOG
 	}
-	int long get_size( void ) const {
+	size_type get_size( void ) const {
 		M_PROLOG
 		return ( _sequence.get_size() );
 		M_EPILOG
 	}
-	int long size( void ) const {
+	size_type size( void ) const {
 		M_PROLOG
 		return ( _sequence.get_size() );
 		M_EPILOG

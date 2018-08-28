@@ -31,6 +31,7 @@ public:
 	typedef compare_t compare_type;
 	typedef key_get_t key_get_type;
 	typedef allocator_t allocator_type;
+	typedef int long size_type;
 	typedef trait::delayed_sizeof<key_value_type> node_size;
 	typedef key_value_type node_type;
 	typedef typename key_get_type::key_type key_type;
@@ -170,7 +171,7 @@ public:
 		return;
 		M_EPILOG
 	}
-	int long get_size( void ) const {
+	size_type get_size( void ) const {
 		return ( _data.get_size() );
 	}
 	bool is_empty( void ) const {

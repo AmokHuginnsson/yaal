@@ -27,6 +27,7 @@ class HTree final {
 public:
 	typedef HTree<value_t, allocator_t, sequence_t> this_type;
 	typedef value_t value_type;
+	typedef int long size_type;
 	class HNode;
 	typedef typename sequence_t<HNode*, allocator::ref<HNode*, allocator_t> >::allocator_type ref_branch_allocator_type;
 	typedef HNode* node_t;
@@ -53,7 +54,7 @@ public:
 		typedef allocator::ref<HNode, typename allocator_t::template rebind<HNode>::other> allocator_type;
 		allocator_type _allocator;
 	public:
-		int long child_count( void ) const {
+		size_type child_count( void ) const {
 			M_PROLOG
 			return ( _branch.size() );
 			M_EPILOG
@@ -702,23 +703,23 @@ public:
 		-- _iterator;
 		return ( it );
 	}
-	HIterator operator + ( int long off_ ) const {
+	HIterator operator + ( size_type off_ ) const {
 		HIterator it( _owner, _iterator + off_ );
 		return ( it );
 	}
-	HIterator& operator += ( int long off_ ) {
+	HIterator& operator += ( size_type off_ ) {
 		_iterator += off_;
 		return ( *this );
 	}
-	HIterator operator - ( int long off_ ) const {
+	HIterator operator - ( size_type off_ ) const {
 		HIterator it( _owner, _iterator - off_ );
 		return ( it );
 	}
-	HIterator& operator -= ( int long off_ ) {
+	HIterator& operator -= ( size_type off_ ) {
 		_iterator -= off_;
 		return ( *this );
 	}
-	int long operator - ( HIterator const& it ) const {
+	size_type operator - ( HIterator const& it ) const {
 		M_ASSERT( _owner == it._owner );
 		return ( _iterator - it._iterator );
 	}

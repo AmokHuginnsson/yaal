@@ -26,6 +26,7 @@ extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHSBBSTree_[];
 class HSBBSTreeBase {
 public:
 	typedef HSBBSTreeBase this_type;
+	typedef int long size_type;
 	/*! \brief HSBBSTreeBase operation error types.
 	 */
 	struct ERROR {
@@ -58,7 +59,7 @@ protected:
 	};
 protected:
 	HAbstractNode* _root;
-	int long _size;
+	size_type _size;
 public:
 	HSBBSTreeBase( void );
 	virtual ~HSBBSTreeBase( void ) {}
@@ -67,7 +68,7 @@ public:
 		swap( _size, other_._size );
 		swap( _root, other_._root );
 	}
-	int long get_size( void ) const;
+	size_type get_size( void ) const;
 	bool is_empty( void ) const;
 	HAbstractNode* leftmost( void ) const;
 	HAbstractNode* rightmost( void ) const;

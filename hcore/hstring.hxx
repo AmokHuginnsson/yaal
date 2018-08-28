@@ -126,13 +126,14 @@ class HUTF8String;
  */
 class HString final {
 public:
-	static_assert( sizeof ( int long ) <= sizeof ( int_native_t ), "length type overflows native integer type" );
+	typedef HString this_type;
+	typedef int long size_type;
+	static_assert( sizeof ( size_type ) <= sizeof ( int_native_t ), "length type overflows native integer type" );
 	/*
 	 * Divide by 4 because max string rank is 4 and string of rank
 	 * 4 requires 4 bytes per character and MAX_STRING_LENGTH is expressed in number of characters.
 	 */
-	static int long const MAX_STRING_LENGTH = ( meta::max_signed<int long>::value / 4 ) - 1;
-	typedef HString this_type;
+	static size_type const MAX_STRING_LENGTH = ( meta::max_signed<size_type>::value / 4 ) - 1;
 	class HConstIterator;
 	class HIterator;
 	class HCharRef;
@@ -148,7 +149,7 @@ private:
 	};
 	static_assert( sizeof ( HString::_mem ) == sizeof ( HString::_len ), "buffer views are misaligned" );
 public:
-	static int long const npos = -1;
+	static size_type const npos = -1;
 	typedef HIterator iterator; /*!< mutable iterator for string characters */
 	typedef HConstIterator const_iterator; /*!< const iterator for string characters */
 	/*! \brief Trivial constructor.
@@ -173,7 +174,7 @@ public:
 	 * \param size_ - capacity of newly constructed string.
 	 * \param fill_ - fill allocated space with given character.
 	 */
-	HString( int long size_, code_point_t fill_ );
+	HString( size_type size_, code_point_t fill_ );
 	/*! \brief Destroy string object and deallocate all resources.
 	 */
 	~HString( void );
@@ -186,7 +187,7 @@ public:
 	 *
 	 * \post String capacity has value of smallest (2^n)-1 greater or equal to \e size.
 	 */
-	void reserve( int long capacity, int rank );
+	void reserve( size_type capacity, int rank );
 	/*! \brief Increases string capacity for current rank.
 	 *
 	 * String capacity is always size of (2^n)-1 or MAX_INPLACE_CAPACITY.
@@ -195,7 +196,7 @@ public:
 	 *
 	 * \post String capacity has value of smallest (2^n)-1 greater or equal to \e size.
 	 */
-	void reserve( int long capacity );
+	void reserve( size_type capacity );
 	/*! \brief Construct string based on UTF-8 string.
 	 *
 	 * str - an UTF-8 encoded string.
@@ -217,9 +218,9 @@ public:
 	 * array - a character array where to initialize new HString object with.
 	 * size - at most that many characters from array are used.
 	 */
-	HString( char const* array, int long size );
-	HString( char16_t const* array, int long size );
-	HString( char32_t const* array, int long size );
+	HString( char const* array, size_type size );
+	HString( char16_t const* array, size_type size );
+	HString( char32_t const* array, size_type size );
 	/*! \brief Construct new HString from single code point.
 	 *
 	 * ch - a code point to initialize new string with.
@@ -313,7 +314,7 @@ public:
 	 * \param position - index of a position to get character for.
 	 * \return character at given position in this string.
 	 */
-	code_point_t const operator[] ( int long position ) const;
+	code_point_t const operator[] ( size_type position ) const;
 	/*! \brief Check if string has some content.
 	 *
 	 * \return True iff this string is not empty.
@@ -330,7 +331,7 @@ public:
 	bool operator <= ( HString const& ) const;
 	bool operator > ( HString const& ) const;
 	bool operator < ( HString const& ) const;
-	void set_at( int long position, code_point_t character );
+	void set_at( size_type position, code_point_t character );
 	/*! \brief Get access to first character in the string.
 	 *
 	 * String must be non-empty.
@@ -347,12 +348,12 @@ public:
 	 *
 	 * \return Maximum number of characters that can be stored in any string.
 	 */
-	int long max_size( void ) const;
+	size_type max_size( void ) const;
 	/*! \brief Get maximum number of characters that can be stored in any string.
 	 *
 	 * \return Maximum number of characters that can be stored in any string.
 	 */
-	int long get_max_size( void ) const;
+	size_type get_max_size( void ) const;
 	/*! \brief Get iterator pointing to beginning (a first character) of this string.
 	 *
 	 * \return Iterator pointing to beginning of this string.
@@ -396,40 +397,40 @@ public:
 	 *
 	 * \return String length in characters.
 	 */
-	int long get_length( void ) const;
+	size_type get_length( void ) const;
 	/*! \brief Get string length.
 	 *
 	 * length() is really an alias for get_length().
 	 *
 	 * \return String length in characters.
 	 */
-	int long length( void ) const;
+	size_type length( void ) const;
 	/*! \brief Get string length.
 	 *
 	 * get_size() is really an alias for get_length().
 	 *
 	 * \return String length in characters.
 	 */
-	int long get_size( void ) const;
+	size_type get_size( void ) const;
 	/*! \brief Get string length.
 	 *
 	 * size() is really an alias for get_length().
 	 *
 	 * \return String length in characters.
 	 */
-	int long size( void ) const;
+	size_type size( void ) const;
 	/*! \brief Tell how many characters excluding terminating NIL can this string store without memory reallocation.
 	 *
 	 * \return Number of characters excluding terminating NIL that can be stored in this string without reallocation.
 	 */
-	int long get_capacity( void ) const;
+	size_type get_capacity( void ) const;
 	/*! \brief Tell how many characters excluding terminating NIL can this string store without memory reallocation.
 	 *
 	 * capacity() is really an alias for get_capacity().
 	 *
 	 * \return Number of characters excluding terminating NIL that can be stored in this string without reallocation.
 	 */
-	int long capacity( void ) const;
+	size_type capacity( void ) const;
 	/*! \brief Swap contents of this string with another string.
 	 *
 	 * \param other - the other string to swap contents with.
@@ -441,7 +442,7 @@ public:
 	 * \param size - size of the date to be assigned.
 	 * \return Self.
 	 */
-	HString& assign( char const* data, int long length );
+	HString& assign( char const* data, size_type length );
 	/*! \brief Erase old content and assign a substring of given string.
 	 *
 	 * \param str - assign substring of this string.
@@ -449,7 +450,7 @@ public:
 	 * \param length - a length of substring to get.
 	 * \return Self.
 	 */
-	HString& assign( HString const& str, int long offset = 0, int long length = npos );
+	HString& assign( HString const& str, size_type offset = 0, size_type length = npos );
 	/*! \brief Erase old content and assign a range of characters to this string.
 	 *
 	 * first_ - beginning of the character range to copy.
@@ -461,21 +462,21 @@ public:
 	 * \param size_ - number of copies of given character to make.
 	 * \param fill_ - fill allocated space with given character.
 	 */
-	HString& assign( int long size_, code_point_t fill_ );
+	HString& assign( size_type size_, code_point_t fill_ );
 	/*! \brief Find position of given character in this string.
 	 *
 	 * \param character - a character to look for.
 	 * \param offset - position where searching for given character starts.
 	 * \return Position of given character in this string if given character is found or HString::npos otherwise.
 	 */
-	int long find( code_point_t character, int long offset = 0 ) const;
+	size_type find( code_point_t character, size_type offset = 0 ) const;
 	/*! \brief Find position of given sub-string in this string.
 	 *
 	 * \param str - a sub-string to look for.
 	 * \param offset - position where searching for given sub-string starts.
 	 * \return Position of given sub-string (first character of it) in this string if given sub-string is found or HString::npos otherwise.
 	 */
-	int long find( HString const& str, int long offset = 0 ) const;
+	size_type find( HString const& str, size_type offset = 0 ) const;
 	/*! \brief Find distance from the end of last occurrence of given character.
 	 *
 	 * HString::reverse_find() is really 100% equivalent of HString::find() on reversed string,
@@ -488,7 +489,7 @@ public:
 	 * \param before - skip that many positions from the end before start looking for given character.
 	 * \return Distance from the end to given character if given character can be found or HString::npos otherwise.
 	 */
-	int long reverse_find( code_point_t character, int long before = 0 ) const;
+	size_type reverse_find( code_point_t character, size_type before = 0 ) const;
 	/*! \brief Find index of last occurrence of given character.
 	 *
 	 * This method is totally different than HString::reverse_find().
@@ -497,7 +498,7 @@ public:
 	 * \param before - assume that this string is only that long.
 	 * \return Index of last occurrence of given character if given character can be found or HString::npos otherwise.
 	 */
-	int long find_last( code_point_t character, int long before = npos ) const;
+	size_type find_last( code_point_t character, size_type before = npos ) const;
 	/*! \brief Find index of last occurrence of given sub-string.
 	 *
 	 * This method is totally different than HString::reverse_find().
@@ -506,13 +507,13 @@ public:
 	 * \param before - assume that this string is only that long.
 	 * \return Index of last occurrence of given sub-string if given sub-string can be found or HString::npos otherwise.
 	 */
-	int long find_last( HString const& str, int long before = npos ) const;
-	int long find_one_of( HString const&, int long = 0 ) const;
-	int long reverse_find_one_of( HString const&, int long = 0 ) const;
-	int long find_last_one_of( HString const&, int long = npos ) const;
-	int long find_other_than( HString const&, int long = 0 ) const;
-	int long reverse_find_other_than( HString const&, int long = 0 ) const;
-	int long find_last_other_than( HString const&, int long = npos ) const;
+	size_type find_last( HString const& str, size_type before = npos ) const;
+	size_type find_one_of( HString const&, size_type = 0 ) const;
+	size_type reverse_find_one_of( HString const&, size_type = 0 ) const;
+	size_type find_last_one_of( HString const&, size_type = npos ) const;
+	size_type find_other_than( HString const&, size_type = 0 ) const;
+	size_type reverse_find_other_than( HString const&, size_type = 0 ) const;
+	size_type find_last_other_than( HString const&, size_type = npos ) const;
 	/*! \brief Replace each occurrence of given pattern with replacement.
 	 *
 	 * \param pattern - search and replace all occurrences of this pattern.
@@ -527,7 +528,7 @@ public:
 	 * \param replacement - replacement for given part.
 	 * \return Self.
 	 */
-	HString& replace( int long pos_, int long size_, HString const& replacement );
+	HString& replace( size_type pos_, size_type size_, HString const& replacement );
 	/*! \brief Replace part of a this string with supplied substring.
 	 *
 	 * \param pos_ - where replaced part starts.
@@ -537,7 +538,7 @@ public:
 	 * \param len_ - length of replacement.
 	 * \return Self.
 	 */
-	HString& replace( int long pos_, int long size_, HString const& replacement, int long offset_, int long len_ );
+	HString& replace( size_type pos_, size_type size_, HString const& replacement, size_type offset_, size_type len_ );
 	/*! \brief Replace part of a this string with supplied character buffer.
 	 *
 	 * \param pos_ - where replaced part starts.
@@ -546,7 +547,7 @@ public:
 	 * \param len_ - length of replacement.
 	 * \return Self.
 	 */
-	HString& replace( int long pos_, int long size_, char const* buffer_, int long len_ );
+	HString& replace( size_type pos_, size_type size_, char const* buffer_, size_type len_ );
 	/*! \brief Replace part of a this string with supplied character buffer.
 	 *
 	 * \param pos_ - where replaced part starts.
@@ -555,7 +556,7 @@ public:
 	 * \param value_ - copies of this value shall be used of replacement.
 	 * \return Self.
 	 */
-	HString& replace( int long pos_, int long size_, int long count_, code_point_t value_ );
+	HString& replace( size_type pos_, size_type size_, int long count_, code_point_t value_ );
 	/*! \brief Replace range in this string with supplied string.
 	 *
 	 * \param first_ - where replaced range starts.
@@ -571,7 +572,7 @@ public:
 	 * \param len - use at most \e len characters for comparison.
 	 * \return 0 iff compared (sub)strings are equal, -1 if this string comes lexicographically before \e other, 1 otherwise.
 	 */
-	int compare( HString const& other, int long from = 0, int long len = npos ) const;
+	int compare( HString const& other, size_type from = 0, size_type len = npos ) const;
 	/*! \brief Perform lexicographical comparison of the (sub-)strings.
 	 *
 	 * \param thisFrom - compare portion of \e this string starting at \e thisFrom position.
@@ -581,7 +582,7 @@ public:
 	 * \param len - use at most \e len characters from \e other string for comparison.
 	 * \return 0 iff compared (sub)strings are equal, -1 if this string comes lexicographically before \e other, 1 otherwise.
 	 */
-	int compare( int long thisFrom, int long thisLen, HString const& other, int long from = 0, int long len = npos ) const;
+	int compare( size_type thisFrom, size_type thisLen, HString const& other, size_type from = 0, size_type len = npos ) const;
 	/*! \brief Convert all characters of this string to upper case.
 	 *
 	 * \return Self.
@@ -603,13 +604,13 @@ public:
 	 * \param length - length of a substring.
 	 * \return Substring.
 	 */
-	HString substr( int long start, int long length = npos ) const;
+	HString substr( size_type start, size_type length = npos ) const;
 	/*! \brief Get left part of this string of given length.
 	 *
 	 * \param len - length of left part of this string to get.
 	 * \param left part of this string with at most len characters.
 	 */
-	HString left( int long len ) const;
+	HString left( size_type len ) const;
 	/*! \brief Get substring of this string by start position and length.
 	 *
 	 * mid() is really an alias for substr().
@@ -618,13 +619,13 @@ public:
 	 * \param length - length of a substring.
 	 * \return Substring.
 	 */
-	HString mid( int long start, int long length = npos ) const;
+	HString mid( size_type start, size_type length = npos ) const;
 	/*! \brief Get right part of this string of given length.
 	 *
 	 * \param len - length of right part of this string to get.
 	 * \param right part of this string with at most len characters.
 	 */
-	HString right( int long len ) const;
+	HString right( size_type len ) const;
 	/*! \brief Trim all consecutive occurrences of given characters from beginning of the string.
 	 *
 	 * \param set - set of characters that shall be removed.
@@ -647,8 +648,8 @@ public:
 	 * \param len - remove that many characters from beginning of this string.
 	 * \return Self.
 	 */
-	HString& shift_left( int long len );
-	HString& shift_right( int long, code_point_t = ' '_ycp );
+	HString& shift_left( size_type len );
+	HString& shift_right( size_type, code_point_t = ' '_ycp );
 	/*! \brief Fill portion of string with constant value.
 	 *
 	 * \param value - use this value as a filler.
@@ -656,7 +657,7 @@ public:
 	 * \param count - fill that many bytes.
 	 * \return Self.
 	 */
-	HString& fill( code_point_t value = 0_ycp, int long position = 0, int long length = npos );
+	HString& fill( code_point_t value = 0_ycp, size_type position = 0, size_type length = npos );
 	/*! \brief Fill portion of string with constant value and finish with \0 (zero) byte.
 	 *
 	 * \param value - use this value as a filler.
@@ -664,21 +665,21 @@ public:
 	 * \param count - fill that many bytes.
 	 * \return Self.
 	 */
-	HString& fillz( code_point_t value = 0_ycp, int long position = 0, int long count = npos );
+	HString& fillz( code_point_t value = 0_ycp, size_type position = 0, int long count = npos );
 	/*! \brief Erase part of the string.
 	 *
 	 * \param position_ - start position for part to be erased.
 	 * \param length_ - length of part to be erased.
 	 * \return Self.
 	 */
-	HString& erase( int long position_ = 0, int long length_ = npos );
+	HString& erase( size_type position_ = 0, size_type length_ = npos );
 	/*! \brief Insert given string at given position.
 	 *
 	 * \param pos - position where given string has to be inserted.
 	 * \param str - string to be inserted.
 	 * \return Self.
 	 */
-	HString& insert( int long pos, HString const& str );
+	HString& insert( size_type pos, HString const& str );
 	/*! \brief Insert given string at given position.
 	 *
 	 * \param pos_ - position where given string has to be inserted.
@@ -689,14 +690,14 @@ public:
 	 *
 	 * \pre \e str real length must not be smaller than \e len.
 	 */
-	HString& insert( int long pos_, HString const& str_, int long offset_, int long len_ = npos );
+	HString& insert( size_type pos_, HString const& str_, size_type offset_, size_type len_ = npos );
 	/*! \brief Insert given string at given position.
 	 *
 	 * \param pos - position where given string has to be inserted.
 	 * \param str - string to be inserted.
 	 * \return Self.
 	 */
-	HString& insert( int long pos, char const* str = nullptr );
+	HString& insert( size_type pos, char const* str = nullptr );
 	/*! \brief Insert given string at given position.
 	 *
 	 * \param pos - position where given string has to be inserted.
@@ -706,14 +707,14 @@ public:
 	 *
 	 * \pre \e str real length must not be smaller than \e len.
 	 */
-	HString& insert( int long pos, char const* str, int long len );
+	HString& insert( size_type pos, char const* str, size_type len );
 	/*! \brief Insert n copies of value before given position.
 	 *
 	 * \param position - where put inserted block.
 	 * \param n - number of bytes to insert.
 	 * \param value - copies of this value shall be inserted.
 	 */
-	HString& insert( int long position, int long n, code_point_t value );
+	HString& insert( size_type position, int long n, code_point_t value );
 	HString& append( HString const& );
 	/*! \brief Append a substring of given string to this string.
 	 *
@@ -722,7 +723,7 @@ public:
 	 * \param length - a length of substring to get.
 	 * \return Self.
 	 */
-	HString& append( HString const&, int long idx_, int long len_ = npos );
+	HString& append( HString const&, size_type idx_, size_type len_ = npos );
 	/*! \brief Append n copies of value at end of the string.
 	 *
 	 * \param position - where put inserted block.
@@ -736,7 +737,7 @@ public:
 	 * \param size - size of the date to be appended.
 	 * \return Self.
 	 */
-	HString& append( char const*, int long len_ );
+	HString& append( char const*, size_type len_ );
 	/*! \brief Append new data from a range of characters to already existing data in this string.
 	 *
 	 * first_ - beginning of the character range to copy.
@@ -752,21 +753,21 @@ public:
 	 */
 	void pop_back( void );
 private:
-	void from_utf8( int long, int long, char const*, int long );
-	void substr( HString&, int long, int long ) const;
-	void resize( int long capacity, int rank );
-	void replace_check( int long, int long, int long, int long, int long );
-	int long find( char, int long = 0 ) const = delete;
-	int long find_last( char, int long = npos ) const = delete;
-	HString& assign( int long, char ) = delete;
-	HString& append( int long, char ) = delete;
-	HString& insert( int long, int long, char ) = delete;
-	HString& replace( int long, int long, int long, char ) = delete;
+	void from_utf8( size_type, size_type, char const*, size_type );
+	void substr( HString&, size_type, size_type ) const;
+	void resize( size_type capacity, int rank );
+	void replace_check( size_type, size_type, size_type, size_type, size_type );
+	size_type find( char, size_type = 0 ) const = delete;
+	size_type find_last( char, size_type = npos ) const = delete;
+	HString& assign( size_type, char ) = delete;
+	HString& append( size_type, char ) = delete;
+	HString& insert( size_type, size_type, char ) = delete;
+	HString& replace( size_type, size_type, size_type, char ) = delete;
 };
 
 class HString::HCharRef {
 	HString& _string;
-	int long _index;
+	size_type _index;
 public:
 	operator code_point_t ( void ) {
 		return ( _string[ _index ] );
@@ -832,7 +833,7 @@ public:
 	void swap( HCharRef& );
 private:
 	friend class HString;
-	HCharRef( HString& string_, int long index_ )
+	HCharRef( HString& string_, size_type index_ )
 		: _string( string_ )
 		, _index( index_ ) {
 		return;
@@ -842,7 +843,7 @@ private:
 class HString::HConstIterator : public yaal::hcore::iterator_interface<code_point_t, yaal::hcore::iterator_category::random_access> {
 protected:
 	HString const* _owner;
-	int long _index;
+	size_type _index;
 public:
 	HConstIterator( void )
 		: _owner( nullptr )
@@ -891,7 +892,7 @@ public:
 		_index += offset_;
 		return ( *this );
 	}
-	HConstIterator& operator += ( int long offset_ ) {
+	HConstIterator& operator += ( size_type offset_ ) {
 		_index += offset_;
 		return ( *this );
 	}
@@ -899,20 +900,20 @@ public:
 		_index -= offset_;
 		return ( *this );
 	}
-	HConstIterator& operator -= ( int long offset_ ) {
+	HConstIterator& operator -= ( size_type offset_ ) {
 		_index -= offset_;
 		return ( *this );
 	}
 	HConstIterator operator + ( int offset_ ) {
 		return ( HConstIterator( _owner, _index + offset_ ) );
 	}
-	HConstIterator operator + ( int long offset_ ) {
+	HConstIterator operator + ( size_type offset_ ) {
 		return ( HConstIterator( _owner, _index + offset_ ) );
 	}
 	HConstIterator operator - ( int offset_ ) {
 		return ( HConstIterator( _owner, _index - offset_ ) );
 	}
-	HConstIterator operator - ( int long offset_ ) {
+	HConstIterator operator - ( size_type offset_ ) {
 		return ( HConstIterator( _owner, _index - offset_ ) );
 	}
 	bool operator < ( HConstIterator const& it_ ) const {
@@ -927,7 +928,7 @@ public:
 	bool operator >= ( HConstIterator const& it_ ) const {
 		return ( _index >= it_._index );
 	}
-	int long operator - ( HConstIterator const& it_ ) const {
+	size_type operator - ( HConstIterator const& it_ ) const {
 		return ( _index - it_._index );
 	}
 	code_point_t operator * ( void ) const {
@@ -935,7 +936,7 @@ public:
 	}
 private:
 	friend class HString;
-	HConstIterator( HString const* owner_, int long index_ )
+	HConstIterator( HString const* owner_, size_type index_ )
 		: _owner( owner_ )
 		, _index( index_ ) {
 		return;
@@ -962,7 +963,7 @@ public:
 	}
 private:
 	friend class HString;
-	HIterator( HString* owner_, int long index_ )
+	HIterator( HString* owner_, size_type index_ )
 		: HConstIterator( owner_,  index_ ) {
 		return;
 	}
@@ -995,6 +996,7 @@ private:
 class HUTF8String final {
 public:
 	typedef HUTF8String this_type;
+	typedef HString::size_type size_type;
 	class HIterator;
 	typedef HIterator iterator;
 	typedef HIterator const_iterator;
@@ -1049,8 +1051,8 @@ public:
 	char const* raw( void ) const;
 	bool is_empty( void ) const;
 	bool empty( void ) const;
-	int long byte_count( void ) const;
-	int long character_count( void ) const;
+	size_type byte_count( void ) const;
+	size_type character_count( void ) const;
 	int rank( void ) const;
 	void assign( HString const& );
 	void assign( HString::const_iterator, HString::const_iterator );
@@ -1063,7 +1065,7 @@ public:
 	reverse_iterator rend( void ) const;
 	reverse_iterator crbegin( void ) const;
 	reverse_iterator crend( void ) const;
-	HUTF8String substr( int long, int long = HString::npos ) const;
+	HUTF8String substr( size_type, size_type = HString::npos ) const;
 private:
 	/*! Allocate memory buffer.
 	 *
@@ -1071,7 +1073,7 @@ private:
 	 *
 	 * \param size_ - number of bytes to be allocated NOT INCLUDING terminating NIL or OBufferMeta.
 	 */
-	void alloc( int long size_ );
+	void alloc( size_type size_ );
 };
 
 class HUTF8String::HIterator final : public iterator_interface<code_point_t, iterator_category::random_access> {
@@ -1127,19 +1129,19 @@ public:
 		operator -- ();
 		return ( it );
 	}
-	HIterator& operator += ( int long );
-	HIterator operator + ( int long by_ ) const {
+	HIterator& operator += ( size_type );
+	HIterator operator + ( size_type by_ ) const {
 		HIterator it( *this );
 		it += by_;
 		return ( it );
 	}
-	HIterator& operator -= ( int long );
-	HIterator operator - ( int long by_ ) const {
+	HIterator& operator -= ( size_type );
+	HIterator operator - ( size_type by_ ) const {
 		HIterator it( *this );
 		it -= by_;
 		return ( it );
 	}
-	int long operator - ( HIterator const& other_ ) const {
+	size_type operator - ( HIterator const& other_ ) const {
 		return ( _characterIndex - other_._characterIndex );
 	}
 	code_point_t operator * ( void ) const;

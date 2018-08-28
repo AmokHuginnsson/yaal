@@ -28,6 +28,7 @@ class HList final {
 public:
 	typedef HList<type_t, allocator_t> this_type;
 	typedef type_t value_type;
+	typedef int long size_type;
 	/*! \brief Error codes for HList<> operations.
 	 */
 	struct ERROR {
@@ -57,15 +58,21 @@ private:
 		type_t _value; /*!< The Object itself. */
 		template<typename... arg_t>
 		explicit HElement( HElement* element_, trait::true_type const*, arg_t&&... arg_ )
-			: _previous( nullptr ), _next( nullptr ), _value( yaal::forward<arg_t>( arg_ )... ) {
+			: _previous( nullptr )
+			, _next( nullptr )
+			, _value( yaal::forward<arg_t>( arg_ )... ) {
 			connect( element_ );
 		}
 		explicit HElement( HElement* element_, trait::false_type const*, type_t const& value_ )
-			: _previous( nullptr ), _next( nullptr ), _value( value_ ) {
+			: _previous( nullptr )
+			, _next( nullptr )
+			, _value( value_ ) {
 			connect( element_ );
 		}
 		explicit HElement( HElement* element_, trait::false_type const*, type_t&& value_ )
-			: _previous( nullptr ), _next( nullptr ), _value( yaal::move( value_ ) ) {
+			: _previous( nullptr )
+			, _next( nullptr )
+			, _value( yaal::move( value_ ) ) {
 			connect( element_ );
 		}
 
@@ -105,7 +112,7 @@ public:
 
 private:
 	allocator_type _allocator;
-	int long _size;  /*!< how many elements this list contains */
+	size_type _size;  /*!< how many elements this list contains */
 	HElement* _hook; /*!< "beginning" of the list ( "first" element ) */
 
 public:
@@ -136,7 +143,7 @@ public:
 	 *
 	 * \param count_ - number of element for newly created list.
 	 */
-	explicit HList( int long count_ )
+	explicit HList( size_type count_ )
 		: _allocator( allocator_type() )
 		, _size( 0 )
 		, _hook( nullptr ) {
@@ -152,7 +159,7 @@ public:
 	 *
 	 * \param count_ - number of element for newly created list.
 	 */
-	HList( int long count_, allocator_type const& allocator_ )
+	HList( size_type count_, allocator_type const& allocator_ )
 		: _allocator( allocator_ )
 		, _size( 0 )
 		, _hook( nullptr ) {
@@ -205,7 +212,7 @@ public:
 	 * \param count_ - size of new list.
 	 * \param value_ - list initializer value.
 	 */
-	HList( int long count_, type_t const& value_, allocator_type const& allocator_ = allocator_type() )
+	HList( size_type count_, type_t const& value_, allocator_type const& allocator_ = allocator_type() )
 		: _allocator( allocator_ )
 		, _size( 0 )
 		, _hook( nullptr ) {
@@ -262,13 +269,14 @@ public:
 		if ( &list_ != this ) {
 			iterator thisIt = begin();
 			const_iterator otherIt = list_.begin();
-			int long ctr( 0 );
-			int long count( _size < list_._size ? _size : list_._size );
+			size_type ctr( 0 );
+			size_type count( _size < list_._size ? _size : list_._size );
 			if ( count > 0 ) {
 				for ( ; ctr < count; ++ ctr, ++ thisIt, ++ otherIt ) {
 					*thisIt = *otherIt;
-					if ( otherIt._current == list_._hook )
+					if ( otherIt._current == list_._hook ) {
 						_hook = thisIt._current;
+					}
 				}
 			}
 			if ( _size > list_._size ) {
@@ -355,9 +363,9 @@ public:
 		return ;
 		M_EPILOG
 	}
-	void resize( int long size_, type_t const& value_ = type_t() ) {
+	void resize( size_type size_, type_t const& value_ = type_t() ) {
 		M_PROLOG
-		int long diff( math::abs( _size - size_ ) );
+		size_type diff( math::abs( _size - size_ ) );
 		if ( _size > size_ ) {
 			while ( diff -- ) {
 				pop_back();
@@ -375,7 +383,7 @@ public:
 	 *
 	 * \return Number of element in this list.
 	 */
-	int long size( void ) const {
+	size_type size( void ) const {
 		return ( _size );
 	}
 
@@ -383,7 +391,7 @@ public:
 	 *
 	 * \return Number of element in this list.
 	 */
-	int long get_size( void ) const {
+	size_type get_size( void ) const {
 		return ( _size );
 	}
 	template<typename iterator_t>
@@ -393,7 +401,7 @@ public:
 		return;
 		M_EPILOG
 	}
-	void assign( int long size_, type_t const& fillWith_ ) {
+	void assign( size_type size_, type_t const& fillWith_ ) {
 		M_PROLOG
 		assign( size_, fillWith_, static_cast<trait::true_type const*>( nullptr ) );
 		return;
@@ -452,15 +460,17 @@ public:
 	template<typename iterator_t>
 	void insert( iterator const& it, iterator_t first, iterator_t last ) {
 		M_PROLOG
-		for ( ; first != last; ++ first )
+		for ( ; first != last; ++ first ) {
 			insert( it, *first );
+		}
 		return;
 		M_EPILOG
 	}
-	void insert( iterator const& it, int long count_, type_t const& val ) {
+	void insert( iterator const& it, size_type count_, type_t const& val ) {
 		M_PROLOG
-		for ( int long i = 0; i < count_; ++ i )
+		for ( size_type i = 0; i < count_; ++ i ) {
 			insert( it, val );
+		}
 		return;
 		M_EPILOG
 	}
@@ -487,8 +497,9 @@ public:
 		M_PROLOG
 		HElement* element( _allocator.allocate( 1 ) );
 		new ( element ) HElement( _hook, static_cast<trait::true_type const*>( nullptr ) );
-		if ( _size == 0 )
+		if ( _size == 0 ) {
 			_hook = element;
+		}
 		++ _size;
 		return ( element->_value );
 		M_EPILOG
@@ -497,8 +508,9 @@ public:
 		M_PROLOG
 		HElement* element( _allocator.allocate( 1 ) );
 		new ( element ) HElement( _hook, static_cast<trait::false_type const*>( nullptr ), object_ );
-		if ( _size == 0 )
+		if ( _size == 0 ) {
 			_hook = element;
+		}
 		++ _size;
 		return;
 		M_EPILOG
@@ -507,8 +519,9 @@ public:
 		M_PROLOG
 		HElement* element( _allocator.allocate( 1 ) );
 		new ( element ) HElement( _hook, static_cast<trait::false_type const*>( nullptr ), yaal::move( object_ ) );
-		if ( _size == 0 )
+		if ( _size == 0 ) {
 			_hook = element;
+		}
 		++ _size;
 		return;
 		M_EPILOG
@@ -518,8 +531,9 @@ public:
 		M_PROLOG
 		HElement* element( _allocator.allocate( 1 ) );
 		new ( element ) HElement( _hook, static_cast<trait::true_type const*>( nullptr ), yaal::forward<arg_t>( arg_ )... );
-		if ( _size == 0 )
+		if ( _size == 0 ) {
 			_hook = element;
+		}
 		++ _size;
 		return;
 		M_EPILOG
@@ -531,8 +545,9 @@ public:
 			M_SAFE( element->~HElement() );
 			_allocator.deallocate( element, 1 );
 			-- _size;
-			if ( _size == 0 )
+			if ( _size == 0 ) {
 				_hook = nullptr;
+			}
 		} else
 			M_THROW( _errMsgHList_[ ERROR::EMPTY ], errno );
 		return;
@@ -572,13 +587,15 @@ public:
 		if ( _size > 0 ) {
 			element = _hook;
 			_hook = _hook->_next;
-		} else
+		} else {
 			M_THROW( _errMsgHList_[ ERROR::EMPTY ], errno );
+		}
 		M_SAFE( element->~HElement() );
 		_allocator.deallocate( element, 1 );
 		-- _size;
-		if ( _size == 0 )
+		if ( _size == 0 ) {
 			_hook = nullptr;
+		}
 		return;
 		M_EPILOG
 	}
@@ -586,8 +603,9 @@ public:
 		M_PROLOG
 		iterator it( iterator_ );
 		++ it;
-		if ( ! _size )
+		if ( ! _size ) {
 			M_THROW( _errMsgHList_[ ERROR::EMPTY ], errno );
+		}
 		/*
 		 * What iterator shall be returned.
 		 *
@@ -611,14 +629,16 @@ public:
 		 * 1 2 3 4  (closed list)
 		 * ^
 		 */
-		if ( iterator_._current == _hook )
+		if ( iterator_._current == _hook ) {
 			_hook = _hook->_next;
+		}
 		HElement* element( iterator_._current );
 		M_SAFE( element->~HElement() );
 		_allocator.deallocate( element, 1 );
 		-- _size;
-		if ( _size == 0 )
+		if ( _size == 0 ) {
 			_hook = nullptr;
+		}
 		return ( it );
 		M_EPILOG
 	}
@@ -632,29 +652,33 @@ public:
 	}
 	type_t& front( void ) {
 		M_PROLOG
-		if ( _hook == 0 )
+		if ( _hook == 0 ) {
 			M_THROW( _errMsgHList_[ ERROR::EMPTY ], errno );
+		}
 		return ( _hook->_value );
 		M_EPILOG
 	}
 	type_t const& front( void ) const {
 		M_PROLOG
-		if ( _hook == 0 )
+		if ( _hook == 0 ) {
 			M_THROW( _errMsgHList_[ ERROR::EMPTY ], errno );
+		}
 		return ( _hook->_value );
 		M_EPILOG
 	}
 	type_t& back( void ) {
 		M_PROLOG
-		if ( _hook == 0 )
+		if ( _hook == 0 ) {
 			M_THROW( _errMsgHList_[ ERROR::EMPTY ], errno );
+		}
 		return ( _hook->_previous->_value );
 		M_EPILOG
 	}
 	type_t const& back( void ) const {
 		M_PROLOG
-		if ( _hook == 0 )
+		if ( _hook == 0 ) {
 			M_THROW( _errMsgHList_[ ERROR::EMPTY ], errno );
+		}
 		return ( _hook->_previous->_value );
 		M_EPILOG
 	}
@@ -691,8 +715,9 @@ public:
 				list_._hook->_previous->_next = e;
 				list_._hook->_previous = p;
 			}
-			if ( it_._current == _hook )
+			if ( it_._current == _hook ) {
 				_hook = list_._hook;
+			}
 			_size += list_._size;
 			list_._hook = nullptr;
 			list_._size = 0;
@@ -707,10 +732,12 @@ public:
 		M_ASSERT( from_._current && ( list_._size > 0 ) );
 		HElement* e( _hook ? ( to_._current ? to_._current : _hook ) : nullptr );
 		if ( ( from_._current != to_._current ) && ( from_._current->_next != to_._current ) ) {
-			if ( from_._current == list_._hook )
+			if ( from_._current == list_._hook ) {
 				list_._hook = ( list_._hook->_next != list_._hook ) ? list_._hook->_next : nullptr;
-			if ( to_._current == _hook )
+			}
+			if ( to_._current == _hook ) {
 				_hook = from_._current;
+			}
 			from_._current->_previous->_next = from_._current->_next;
 			from_._current->_next->_previous = from_._current->_previous;
 			if ( e ) {
@@ -738,9 +765,10 @@ public:
 			HElement* to( _hook ? ( it_._current ? it_._current : _hook ) : nullptr );
 			HElement* last( last_._current ? last_._current : list_._hook );
 			if ( ( ( last_._current != to ) || ( &list_ != this ) ) && ( last->_previous != to ) ) {
-				int long count( ( &list_ != this ) ? distance( first_, last_ ) : 0 );
-				if ( first_._current == list_._hook )
+				size_type count( ( &list_ != this ) ? distance( first_, last_ ) : 0 );
+				if ( first_._current == list_._hook ) {
 					list_._hook = last_._current;
+				}
 				HElement* lastPrev( last->_previous );
 				first_._current->_previous->_next = last;
 				last->_previous = first_._current->_previous;
@@ -753,8 +781,9 @@ public:
 					first_._current->_previous = lastPrev;
 					lastPrev->_next = first_._current;
 				}
-				if ( ! to || ( it_._current == _hook ) )
+				if ( ! to || ( it_._current == _hook ) ) {
 					_hook = first_._current;
+				}
 				list_._size -= count;
 				_size += count;
 			}
@@ -767,8 +796,9 @@ public:
 		for ( iterator it( begin() ), endIt( end() ); it != endIt; ) {
 			if ( *it == value_ ) {
 				it = erase( it );
-			} else
+			} else {
 				++ it;
+			}
 		}
 		return;
 		M_EPILOG
@@ -779,8 +809,9 @@ public:
 		for ( iterator it( begin() ), endIt( end() ); it != endIt; ) {
 			if ( condition_( *it ) ) {
 				it = erase( it );
-			} else
+			} else {
 				++ it;
+			}
 		}
 		return;
 		M_EPILOG
@@ -819,8 +850,9 @@ public:
 	}
 	void exchange( iterator const& left, iterator const& right ) {
 		M_PROLOG
-		if ( left != right )
+		if ( left != right ) {
 			exchange( left._current, right._current );
+		}
 		return;
 		M_EPILOG
 	}
@@ -867,7 +899,7 @@ private:
 		return;
 		M_EPILOG
 	}
-	void initialize( int long size_, type_t const& fillWith_, trait::true_type const* ) {
+	void initialize( size_type size_, type_t const& fillWith_, trait::true_type const* ) {
 		M_PROLOG
 		resize( size_, fillWith_ );
 		return;
@@ -876,18 +908,21 @@ private:
 	template<typename iterator_t>
 	void assign( iterator_t first, iterator_t last, trait::false_type const* ) {
 		M_PROLOG
-		int long count( 0 );
-		for ( iterator it( begin() ), endIt( end() ); ( it != endIt ) && ( first != last ); ++ it, ++ first, ++ count )
+		size_type count( 0 );
+		for ( iterator it( begin() ), endIt( end() ); ( it != endIt ) && ( first != last ); ++ it, ++ first, ++ count ) {
 			*it = *first;
+		}
 		if ( first != last ) {
-			for ( ; first != last; ++ first )
+			for ( ; first != last; ++ first ) {
 				push_back( *first );
-		} else
+			}
+		} else {
 			resize( count );
+		}
 		return;
 		M_EPILOG
 	}
-	void assign( int long size_, type_t const& fillWith_, trait::true_type const* ) {
+	void assign( size_type size_, type_t const& fillWith_, trait::true_type const* ) {
 		M_PROLOG
 		fill_n( begin(), min( size_, _size ), fillWith_ );
 		resize( size_, fillWith_ );
@@ -899,43 +934,50 @@ private:
 		M_PROLOG
 		HElement* leftIt = left;
 		HElement* rightIt = right;
-		int long stepsLeft = 0;
-		int long stepsRight = 0;
+		size_type stepsLeft = 0;
+		size_type stepsRight = 0;
 		while ( leftIt != rightIt ) {
-			if ( leftIt->_next == rightIt )
+			if ( leftIt->_next == rightIt ) {
 				break;
+			}
 			leftIt = leftIt->_next;
 			++ stepsLeft;
-			if ( leftIt == rightIt->_previous )
+			if ( leftIt == rightIt->_previous ) {
 				break;
+			}
 			rightIt = rightIt->_previous;
 			++ stepsRight;
 		}
 		int const ARBITRARILY_CHOSEN_THRESHOLD = 7;
-		if ( ( stepsLeft + stepsRight + 2 ) < ARBITRARILY_CHOSEN_THRESHOLD )
+		if ( ( stepsLeft + stepsRight + 2 ) < ARBITRARILY_CHOSEN_THRESHOLD ) {
 			insert_sort( left, right, comp_ );
-		else {
-			if ( stepsLeft < ARBITRARILY_CHOSEN_THRESHOLD )
+		} else {
+			if ( stepsLeft < ARBITRARILY_CHOSEN_THRESHOLD ) {
 				insert_sort( left, leftIt, comp_ );
-			else
+			} else {
 				merge_sort( left, leftIt, comp_ );
-			if ( stepsRight < ARBITRARILY_CHOSEN_THRESHOLD )
+			}
+			if ( stepsRight < ARBITRARILY_CHOSEN_THRESHOLD ) {
 				insert_sort( rightIt, right, comp_ );
-			else
+			} else {
 				merge_sort( rightIt, right, comp_ );
+			}
 			HElement* first = nullptr;
 			++ stepsLeft;
 			while ( stepsLeft -- ) {
 				if ( comp_( rightIt->_value, left->_value ) ) {
 					HElement* ptr = rightIt;
-					if ( ! first )
+					if ( ! first ) {
 						first = ptr;
-					while ( ( rightIt != right ) && comp_( rightIt->_next->_value, left->_value ) )
+					}
+					while ( ( rightIt != right ) && comp_( rightIt->_next->_value, left->_value ) ) {
 						rightIt = rightIt->_next;
+					}
 					HElement* nextRight = rightIt->_next;
 					bool to_break = false;
-					if ( rightIt == right )
+					if ( rightIt == right ) {
 						to_break = true;
+					}
 					ptr->_previous->_next = rightIt->_next;
 					rightIt->_next->_previous = ptr->_previous;
 					left->_previous->_next = ptr;
@@ -948,8 +990,9 @@ private:
 						break;
 					}
 				}
-				if ( ! first )
+				if ( ! first ) {
 					first = left;
+				}
 				left = left->_next;
 			}
 			left = first;
@@ -968,15 +1011,18 @@ private:
 			while ( top != baseUpper_ ) {
 				top = top->_next;
 				HElement* ptr = top;
-				while ( ( ptr != baseLower_ ) && comp_( top->_value, ptr->_previous->_value ) )
+				while ( ( ptr != baseLower_ ) && comp_( top->_value, ptr->_previous->_value ) ) {
 					ptr = ptr->_previous;
+				}
 				if ( ptr != top ) {
 					HElement* oldtop = top->_previous;
 					insert( ptr, top );
-					if ( top == baseUpper_ )
+					if ( top == baseUpper_ ) {
 						baseUpper_ = oldtop;
-					if ( ptr == baseLower_ )
+					}
+					if ( ptr == baseLower_ ) {
 						baseLower_ = top;
+					}
 					top = oldtop;
 				}
 			}
@@ -987,11 +1033,12 @@ private:
 	}
 	void insert( HElement* pos, HElement* elem ) {
 		M_ASSERT( pos != elem );
-		if ( pos->_next == elem )
+		if ( pos->_next == elem ) {
 			exchange( pos, elem );
-		else {
-			if ( pos == _hook )
+		} else {
+			if ( pos == _hook ) {
 				_hook = elem;
+			}
 			if ( pos->_previous != elem ) {
 				elem->_next->_previous = elem->_previous;
 				elem->_previous->_next = elem->_next;
@@ -1007,12 +1054,14 @@ private:
 		M_PROLOG
 		HElement* next = nullptr;
 		HElement* previous = nullptr;
-		if ( left_ == right_ )
+		if ( left_ == right_ ) {
 			return;
-		if ( left_ == _hook )
+		}
+		if ( left_ == _hook ) {
 			_hook = right_;
-		else if ( right_ == _hook )
+		} else if ( right_ == _hook ) {
 			_hook = left_;
+		}
 /*
  *                         ( p L n )
  *          ( p R n ) <------+   +------> ( p R n )
@@ -1081,8 +1130,9 @@ public:
 		M_ASSERT( _owner );
 		if ( _current ) {
 			_current = _current->_next;
-			if ( _current == _owner->_hook )
+			if ( _current == _owner->_hook ) {
 				_current = nullptr;
+			}
 		} else {
 			_current = _owner->_hook;
 		}

@@ -27,7 +27,7 @@ HHuginn::HValueHashHelper::HValueHashHelper( void )
 	, _position( 0 ) {
 }
 
-int long HHuginn::HValueHashHelper::operator()( HHuginn::value_t const& value_ ) const {
+HHuginn::HValueHashHelper::size_type HHuginn::HValueHashHelper::operator()( HHuginn::value_t const& value_ ) const {
 	M_ASSERT( _thread != nullptr );
 	return ( huginn::value_builtin::hash( _thread, value_, _position ) );
 }

@@ -22,6 +22,7 @@ private:
 	typedef sequence_t sequence_type;
 public:
 	typedef typename sequence_type::value_type value_type;
+	typedef typename sequence_type::size_type size_type;
 private:
 	sequence_type _sequence;
 public:
@@ -49,10 +50,10 @@ public:
 	bool empty( void ) const {
 		return ( _sequence.is_empty() );
 	}
-	int long get_size( void ) const {
+	size_type get_size( void ) const {
 		return ( _sequence.get_size() );
 	}
-	int long size( void ) const {
+	size_type size( void ) const {
 		return ( _sequence.get_size() );
 	}
 	value_type const& front( void ) const {

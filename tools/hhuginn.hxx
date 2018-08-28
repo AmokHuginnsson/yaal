@@ -1191,6 +1191,9 @@ private:
 };
 
 class HHuginn::HValueHashHelper final {
+public:
+	typedef int long size_type;
+private:
 	huginn::HThread* _thread;
 	int _position;
 public:
@@ -1199,7 +1202,7 @@ public:
 		_thread = thread_;
 		_position = position_;
 	}
-	int long operator()( HHuginn::value_t const& ) const;
+	size_type operator()( HHuginn::value_t const& ) const;
 	bool operator()( HHuginn::value_t const&, HHuginn::value_t const& ) const;
 	void detach( void ) {
 		_thread = nullptr;

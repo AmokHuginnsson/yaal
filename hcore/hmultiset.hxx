@@ -42,6 +42,7 @@ private:
 	typedef HPair<type_t, int long> elem_t;
 	typedef HSBBSTree<elem_t, compare_type, multiset_helper<elem_t>, allocator_t> engine_t;
 public:
+	typedef typename engine_t::size_type size_type;
 	typedef typename engine_t::allocator_type allocator_type;
 	typedef typename engine_t::node_size node_size;
 	typedef typename engine_t::node_type node_type;
@@ -49,7 +50,7 @@ public:
 	/*! \brief Iterator for HMultiSet<> data structure.
 	 */
 	class HIterator : public iterator_interface<value_type const, iterator_category::forward> {
-		int long _index;
+		size_type _index;
 		engine_t const* _owner;
 		typename engine_t::HIterator _engine;
 	public:
@@ -124,7 +125,7 @@ public:
 		}
 	private:
 		friend class HMultiSet<type_t, compare_type, allocator_t>;
-		explicit HIterator( engine_t const* owner_, typename engine_t::HIterator const& it, int long index_ )
+		explicit HIterator( engine_t const* owner_, typename engine_t::HIterator const& it, size_type index_ )
 			: base_type(), _index( index_ ), _owner( owner_ ), _engine( it ) {};
 	};
 	typedef HIterator iterator;
@@ -173,12 +174,12 @@ public:
 	allocator_type const& get_allocator( void ) const {
 		return ( _engine.get_allocator() );
 	}
-	int long size( void ) const {
+	size_type size( void ) const {
 		return ( get_size() );
 	}
-	int long get_size( void ) const {
+	size_type get_size( void ) const {
 		M_PROLOG
-		int long sizeAcc( 0 );
+		size_type sizeAcc( 0 );
 		for ( typename engine_t::HIterator it( _engine.begin() ), endIt( _engine.end() ); it != endIt; ++ it )
 			sizeAcc += it->second;
 		return ( sizeAcc );
@@ -217,16 +218,16 @@ public:
 		return;
 		M_EPILOG
 	}
-	int long count( value_type const& elem ) const {
+	size_type count( value_type const& elem ) const {
 		M_PROLOG
 		HIterator it( find( elem ) );
 		return ( it != end() ? it._engine->second : 0 );
 		M_EPILOG
 	}
-	int long erase( value_type const& elem ) {
+	size_type erase( value_type const& elem ) {
 		M_PROLOG
 		HIterator it( find( elem ) );
-		int long erased( 0 );
+		size_type erased( 0 );
 		if ( it != end() ) {
 			erased = it._engine->second;
 			_engine.remove( it._engine );
