@@ -486,6 +486,25 @@ public:
 		return ( thread_->object_factory().create_integer( number::differs_at( get_number( values_[0] ), get_number( values_[1] ) ) ) );
 		M_EPILOG
 	}
+	static HHuginn::value_t greatest_common_divisor( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "Mathematics.greatest_common_divisor";
+		verify_arg_count( name, values_, 2, 2, thread_, position_ );
+		HHuginn::type_id_t t( verify_arg_type( name, values_, 0, { HHuginn::TYPE::NUMBER, HHuginn::TYPE::INTEGER }, ARITY::MULTIPLE, thread_, position_ ) );
+		verify_arg_type( name, values_, 1, type_tag( t ), ARITY::MULTIPLE, thread_, position_ );
+		HHuginn::value_t v( thread_->runtime().none_value() );
+		if ( t == HHuginn::TYPE::NUMBER ) {
+			v = thread_->object_factory().create_number(
+				math::greatest_common_divisor( get_number( values_[0] ), get_number( values_[1] ) )
+			);
+		} else {
+			v = thread_->object_factory().create_integer(
+				math::greatest_common_divisor( get_integer( values_[0] ), get_integer( values_[1] ) )
+			);
+		}
+		return ( v );
+		M_EPILOG
+	}
 	static HHuginn::value_t statistics( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		HMathematics* m( static_cast<HMathematics*>( object_->raw() ) );
@@ -538,6 +557,10 @@ HHuginn::value_t HMathematicsCreator::do_new_instance( HRuntime* runtime_ ) {
 		{ "floor",                runtime_->create_method( &HMathematics::floor ),                "( *value* ) - get largest integral value not greater than *value*" },
 		{ "ceil",                 runtime_->create_method( &HMathematics::ceil ),                 "( *value* ) - get smallest integral value not less than *value*" },
 		{ "differs_at",           runtime_->create_method( &HMathematics::differs_at ),           "( *first*, *second* ) - tell at which decimal position *first* and *second* values have first occurrence of different digit" },
+		{ "greatest_common_divisor",
+			runtime_->create_method( &HMathematics::greatest_common_divisor ),
+			"( *num1*, *num2* ) - find greatest common divisor of two numbers, *num1* and *num2*"
+		},
 		{ "statistics",           runtime_->create_method( &HMathematics::statistics ),           "( *iterable* ) - create NumberSetStatistics over *iterable* of uniformly types values" }
 	};
 	c->redefine( nullptr, fd );
