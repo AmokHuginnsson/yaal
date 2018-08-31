@@ -69,17 +69,68 @@ yaal::hcore::HStreamInterface::ptr_t ensure( yaal::hcore::HStreamInterface::ptr_
 
 namespace stream {
 
+template<typename T>
+yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& stream_, T const& value_  ) {
+	return ( stream_.write( value_ ) );
+}
+
+template<typename T>
+yaal::hcore::HStreamInterface& read( yaal::hcore::HStreamInterface& stream_, T& output_  ) {
+	return ( stream_.read( output_ ) );
+}
+
+template<typename first_t, typename second_t>
+yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& os, yaal::hcore::HPair<first_t, second_t> const& p ) {
+	M_PROLOG
+	if ( os.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
+		os << "pair<" << p.first << "," << p.second << ">";
+	} else {
+		os << p.first << p.second;
+	}
+	return ( os );
+	M_EPILOG
+}
+
+template<typename first_t, typename second_t>
+yaal::hcore::HStreamInterface& read( yaal::hcore::HStreamInterface& is, yaal::hcore::HPair<first_t, second_t>& p ) {
+	M_PROLOG
+	if ( is.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
+		using tools::stream::read;
+		read( read( is.consume( "pair<" ), p.first ).consume( "," ), p.second ).consume( ">" );
+	} else {
+		is >> p.first >> p.second;
+	}
+	return ( is );
+	M_EPILOG
+}
+
+template<typename tag_t, typename T>
+yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& os, yaal::hcore::HTaggedPOD<tag_t, T> const& v ) {
+	M_PROLOG
+	return ( os.write( v.get() ) );
+	M_EPILOG
+}
+
 template<typename container>
 yaal::hcore::HStreamInterface& container_dump( yaal::hcore::HStreamInterface& out,
 		container const& container_, char sep_, char const* name_ ) {
 	M_PROLOG
-	out << ( name_ ? name_ : "" );
-	char sep( '(' );
-	for ( typename container::const_iterator it( container_.begin() ), end( container_.end() ); it != end; ++ it, sep = sep_ )
-		out << sep << *it;
-	if ( container_.empty() )
-		out << sep;
-	out << ")" << yaal::hcore::flush;
+	if ( out.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
+		out << ( name_ ? name_ : "" );
+		char sep( '(' );
+		for ( typename container::const_iterator it( container_.begin() ), end( container_.end() ); it != end; ++ it, sep = sep_ ) {
+			out << sep << *it;
+		}
+		if ( container_.empty() ) {
+			out << sep;
+		}
+		out << ")" << yaal::hcore::flush;
+	} else {
+		write( out, container_.get_size() );
+		for ( typename container::value_type const& e : container_ ) {
+			write( out, e );
+		}
+	}
 	return ( out );
 	M_EPILOG
 }
@@ -98,16 +149,6 @@ yaal::hcore::HStreamInterface& container_dump( yaal::hcore::HStreamInterface& ou
 	M_PROLOG
 	return ( stream::container_dump( out, container_, ' ', name_ ) );
 	M_EPILOG
-}
-
-template<typename T>
-yaal::hcore::HStreamInterface& read( yaal::hcore::HStreamInterface& stream_, T& output_  ) {
-	return ( stream_.read( output_ ) );
-}
-
-template<typename T>
-yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& stream_, T const& value_  ) {
-	return ( stream_.write( value_ ) );
 }
 
 }
@@ -163,25 +204,16 @@ namespace hcore {
 template<typename first_t, typename second_t>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& os, yaal::hcore::HPair<first_t, second_t> const& p ) {
 	M_PROLOG
-	if ( os.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
-		os << "pair<" << p.first << "," << p.second << ">";
-	} else {
-		os << p.first << p.second;
-	}
-	return ( os );
+	using tools::stream::write;
+	return ( write( os, p ) );
 	M_EPILOG
 }
 
 template<typename first_t, typename second_t>
 yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface& is, yaal::hcore::HPair<first_t, second_t>& p ) {
 	M_PROLOG
-	if ( is.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
-		using tools::stream::read;
-		read( read( is.consume( "pair<" ), p.first ).consume( "," ), p.second ).consume( ">" );
-	} else {
-		is >> p.first >> p.second;
-	}
-	return ( is );
+	using tools::stream::read;
+	return ( read( is, p ) );
 	M_EPILOG
 }
 
@@ -260,7 +292,11 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 template<typename T0>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0> const& t_ ) {
 	M_PROLOG
-	out << "tuple<" << t_.template get<0>() << ">" << yaal::hcore::flush;
+	if ( out.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
+		out << "tuple<" << t_.template get<0>() << ">" << yaal::hcore::flush;
+	} else {
+		out << t_.template get<0>();
+	}
 	return ( out );
 	M_EPILOG
 }
@@ -268,7 +304,11 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 template<typename T0, typename T1>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1> const& t_ ) {
 	M_PROLOG
-	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ">" << yaal::hcore::flush;
+	if ( out.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
+		out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ">" << yaal::hcore::flush;
+	} else {
+		out << t_.template get<0>() << t_.template get<1>();
+	}
 	return ( out );
 	M_EPILOG
 }
@@ -276,7 +316,11 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 template<typename T0, typename T1, typename T2>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2> const& t_ ) {
 	M_PROLOG
-	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", " << t_.template get<2>() << ">" << yaal::hcore::flush;
+	if ( out.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
+		out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", " << t_.template get<2>() << ">" << yaal::hcore::flush;
+	} else {
+		out << t_.template get<0>() << t_.template get<1>() << t_.template get<2>();
+	}
 	return ( out );
 	M_EPILOG
 }
@@ -284,8 +328,12 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 template<typename T0, typename T1, typename T2, typename T3>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3> const& t_ ) {
 	M_PROLOG
-	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
-		<< t_.template get<2>() << ", " << t_.template get<3>() << ">" << yaal::hcore::flush;
+	if ( out.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
+		out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
+			<< t_.template get<2>() << ", " << t_.template get<3>() << ">" << yaal::hcore::flush;
+	} else {
+		out << t_.template get<0>() << t_.template get<1>() << t_.template get<2>() << t_.template get<3>();
+	}
 	return ( out );
 	M_EPILOG
 }
@@ -293,9 +341,13 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 template<typename T0, typename T1, typename T2, typename T3, typename T4>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4> const& t_ ) {
 	M_PROLOG
-	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
-		<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
-		<< t_.template get<4>() << ">" << yaal::hcore::flush;
+	if ( out.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
+		out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
+			<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
+			<< t_.template get<4>() << ">" << yaal::hcore::flush;
+	} else {
+		out << t_.template get<0>() << t_.template get<1>() << t_.template get<2>() << t_.template get<3>() << t_.template get<4>();
+	}
 	return ( out );
 	M_EPILOG
 }
@@ -303,8 +355,15 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5> const& t_ ) {
 	M_PROLOG
-	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
-		<< t_.template get<2>() << ", " << t_.template get<3>() << t_.template get<4>() << t_.template get<5>() << ">" << yaal::hcore::flush;
+	if ( out.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
+		out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
+			<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
+			<< t_.template get<4>() << ", " << t_.template get<5>() << ">" << yaal::hcore::flush;
+	} else {
+		out << t_.template get<0>() << t_.template get<1>()
+			<< t_.template get<2>() << t_.template get<3>()
+			<< t_.template get<4>() << t_.template get<5>();
+	}
 	return ( out );
 	M_EPILOG
 }
@@ -312,10 +371,17 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6> const& t_ ) {
 	M_PROLOG
-	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
-		<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
-		<< t_.template get<4>() << ", " << t_.template get<5>() << ", "
-		<< t_.template get<6>() << ">" << yaal::hcore::flush;
+	if ( out.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
+		out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
+			<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
+			<< t_.template get<4>() << ", " << t_.template get<5>() << ", "
+			<< t_.template get<6>() << ">" << yaal::hcore::flush;
+	} else {
+		out << t_.template get<0>() << t_.template get<1>()
+			<< t_.template get<2>() << t_.template get<3>()
+			<< t_.template get<4>() << t_.template get<5>()
+			<< t_.template get<6>();
+	}
 	return ( out );
 	M_EPILOG
 }
@@ -323,10 +389,17 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6, T7> const& t_ ) {
 	M_PROLOG
-	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
-		<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
-		<< t_.template get<4>() << ", " << t_.template get<5>() << ", "
-		<< t_.template get<6>() << ", " << t_.template get<7>() << ">" << yaal::hcore::flush;
+	if ( out.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
+		out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
+			<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
+			<< t_.template get<4>() << ", " << t_.template get<5>() << ", "
+			<< t_.template get<6>() << ", " << t_.template get<7>() << ">" << yaal::hcore::flush;
+	} else {
+		out << t_.template get<0>() << t_.template get<1>()
+			<< t_.template get<2>() << t_.template get<3>()
+			<< t_.template get<4>() << t_.template get<5>()
+			<< t_.template get<6>() << t_.template get<7>();
+	}
 	return ( out );
 	M_EPILOG
 }
@@ -334,11 +407,19 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8> const& t_ ) {
 	M_PROLOG
-	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
-		<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
-		<< t_.template get<4>() << ", " << t_.template get<5>() << ", "
-		<< t_.template get<6>() << ", " << t_.template get<7>() << ", "
-		<< t_.template get<8>() << ">" << yaal::hcore::flush;
+	if ( out.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
+		out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
+			<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
+			<< t_.template get<4>() << ", " << t_.template get<5>() << ", "
+			<< t_.template get<6>() << ", " << t_.template get<7>() << ", "
+			<< t_.template get<8>() << ">" << yaal::hcore::flush;
+	} else {
+		out << t_.template get<0>() << t_.template get<1>()
+			<< t_.template get<2>() << t_.template get<3>()
+			<< t_.template get<4>() << t_.template get<5>()
+			<< t_.template get<6>() << t_.template get<7>()
+			<< t_.template get<8>();
+	}
 	return ( out );
 	M_EPILOG
 }
@@ -346,11 +427,19 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> const& t_ ) {
 	M_PROLOG
-	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
-		<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
-		<< t_.template get<4>() << ", " << t_.template get<5>() << ", "
-		<< t_.template get<6>() << ", " << t_.template get<7>() << ", "
-		<< t_.template get<8>() << ", " << t_.template get<9>() << ">" << yaal::hcore::flush;
+	if ( out.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
+		out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
+			<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
+			<< t_.template get<4>() << ", " << t_.template get<5>() << ", "
+			<< t_.template get<6>() << ", " << t_.template get<7>() << ", "
+			<< t_.template get<8>() << ", " << t_.template get<9>() << ">" << yaal::hcore::flush;
+	} else {
+		out << t_.template get<0>() << t_.template get<1>()
+			<< t_.template get<2>() << t_.template get<3>()
+			<< t_.template get<4>() << t_.template get<5>()
+			<< t_.template get<6>() << t_.template get<7>()
+			<< t_.template get<8>() << t_.template get<9>();
+	}
 	return ( out );
 	M_EPILOG
 }
@@ -361,12 +450,21 @@ template<typename T0, typename T1, typename T2, typename T3,
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 		yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> const& t_ ) {
 	M_PROLOG
-	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
-		<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
-		<< t_.template get<4>() << ", " << t_.template get<5>() << ", "
-		<< t_.template get<6>() << ", " << t_.template get<7>() << ", "
-		<< t_.template get<8>() << ", " << t_.template get<9>() << ", "
-		<< t_.template get<10>() << ">" << yaal::hcore::flush;
+	if ( out.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
+		out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
+			<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
+			<< t_.template get<4>() << ", " << t_.template get<5>() << ", "
+			<< t_.template get<6>() << ", " << t_.template get<7>() << ", "
+			<< t_.template get<8>() << ", " << t_.template get<9>() << ", "
+			<< t_.template get<10>() << ">" << yaal::hcore::flush;
+	} else {
+		out << t_.template get<0>() << t_.template get<1>()
+			<< t_.template get<2>() << t_.template get<3>()
+			<< t_.template get<4>() << t_.template get<5>()
+			<< t_.template get<6>() << t_.template get<7>()
+			<< t_.template get<8>() << t_.template get<9>()
+			<< t_.template get<10>();
+	}
 	return ( out );
 	M_EPILOG
 }
@@ -377,12 +475,21 @@ template<typename T0, typename T1, typename T2, typename T3,
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 		yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> const& t_ ) {
 	M_PROLOG
-	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
-		<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
-		<< t_.template get<4>() << ", " << t_.template get<5>() << ", "
-		<< t_.template get<6>() << ", " << t_.template get<7>() << ", "
-		<< t_.template get<8>() << ", " << t_.template get<9>() << ", "
-		<< t_.template get<10>() << ", " << t_.template get<11>() << ">" << yaal::hcore::flush;
+	if ( out.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
+		out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
+			<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
+			<< t_.template get<4>() << ", " << t_.template get<5>() << ", "
+			<< t_.template get<6>() << ", " << t_.template get<7>() << ", "
+			<< t_.template get<8>() << ", " << t_.template get<9>() << ", "
+			<< t_.template get<10>() << ", " << t_.template get<11>() << ">" << yaal::hcore::flush;
+	} else {
+		out << t_.template get<0>() << t_.template get<1>()
+			<< t_.template get<2>() << t_.template get<3>()
+			<< t_.template get<4>() << t_.template get<5>()
+			<< t_.template get<6>() << t_.template get<7>()
+			<< t_.template get<8>() << t_.template get<9>()
+			<< t_.template get<10>() << t_.template get<11>();
+	}
 	return ( out );
 	M_EPILOG
 }
