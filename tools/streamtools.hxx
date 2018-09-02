@@ -95,7 +95,6 @@ template<typename first_t, typename second_t>
 yaal::hcore::HStreamInterface& read( yaal::hcore::HStreamInterface& is, yaal::hcore::HPair<first_t, second_t>& p ) {
 	M_PROLOG
 	if ( is.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
-		using tools::stream::read;
 		read( read( is.consume( "pair<" ), p.first ).consume( "," ), p.second ).consume( ">" );
 	} else {
 		is >> p.first >> p.second;
@@ -121,7 +120,7 @@ yaal::hcore::HStreamInterface& container_dump( yaal::hcore::HStreamInterface& ou
 		for ( typename container::const_iterator it( container_.begin() ), end( container_.end() ); it != end; ++ it, sep = sep_ ) {
 			out << sep << *it;
 		}
-		if ( container_.empty() ) {
+		if ( container_.is_empty() ) {
 			out << sep;
 		}
 		out << ")" << yaal::hcore::flush;
@@ -147,7 +146,74 @@ template<typename container>
 yaal::hcore::HStreamInterface& container_dump( yaal::hcore::HStreamInterface& out,
 		container const& container_, char const* name_  ) {
 	M_PROLOG
-	return ( stream::container_dump( out, container_, ' ', name_ ) );
+	return ( container_dump( out, container_, ' ', name_ ) );
+	M_EPILOG
+}
+
+template<typename container_t>
+yaal::hcore::HStreamInterface& container_scan(
+	yaal::hcore::HStreamInterface& in,
+	container_t& container_, char sep_, char const* name_
+) {
+	M_PROLOG
+	container_t container;
+	do {
+		if ( in.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
+			if ( name_ ) {
+				in.consume( name_ );
+				if ( ! in.good() ) {
+					break;
+				}
+			}
+			in.consume( "(" );
+			if ( ! in.good() ) {
+				break;
+			}
+			typename container_t::value_type e;
+			while ( in.good() ) {
+				int next( in.peek() );
+				if ( ( next < 0 ) || ( next == ')' ) ) {
+					break;
+				}
+				if ( next == sep_ ) {
+					in.consume( sep_ );
+				}
+				read( in, e );
+				container.push_back( e );
+			}
+			in.consume( ")" );
+		} else {
+			typename container_t::size_type size( 0 );
+			read( in, size );
+			typename container_t::value_type e;
+			for ( typename container_t::size_type i( 0 ); in.good() && ( i < size ); ++ i ) {
+				read( in, e );
+				container.push_back( e );
+			}
+		}
+		container_ = yaal::move( container );
+	} while ( false );
+	return ( in );
+	M_EPILOG
+}
+
+template<typename container>
+yaal::hcore::HStreamInterface& container_scan(
+	yaal::hcore::HStreamInterface& in,
+	container& container_, char sep_
+) {
+	M_PROLOG
+	return ( container_scan( in, container_, sep_, nullptr ) );
+	M_EPILOG
+}
+
+template<typename container>
+yaal::hcore::HStreamInterface& container_scan(
+	yaal::hcore::HStreamInterface& in,
+	container& container_, char const* name_
+) {
+	M_PROLOG
+	return ( container_scan( in, container_, ' ', name_ ) );
 	M_EPILOG
 }
 
@@ -155,6 +221,13 @@ template<typename tType, typename allocator_t>
 yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::hcore::HArray<tType, allocator_t> const& a_ ) {
 	M_PROLOG
 	return ( container_dump( out, a_, "array" ) );
+	M_EPILOG
+}
+
+template<typename tType, typename allocator_t>
+yaal::hcore::HStreamInterface& read( yaal::hcore::HStreamInterface& out, yaal::hcore::HArray<tType, allocator_t>& a_ ) {
+	M_PROLOG
+	return ( container_scan( out, a_, "array" ) );
 	M_EPILOG
 }
 
@@ -498,6 +571,14 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 	M_PROLOG
 	using tools::stream::write;
 	return ( write( out, a_ ) );
+	M_EPILOG
+}
+
+template<typename tType, typename allocator_t>
+yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface& in, yaal::hcore::HArray<tType, allocator_t>& a_ ) {
+	M_PROLOG
+	using tools::stream::read;
+	return ( read( in, a_ ) );
 	M_EPILOG
 }
 
