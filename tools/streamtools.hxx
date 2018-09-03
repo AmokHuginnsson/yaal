@@ -150,10 +150,11 @@ yaal::hcore::HStreamInterface& container_dump( yaal::hcore::HStreamInterface& ou
 	M_EPILOG
 }
 
-template<typename container_t>
+template<typename container_t, typename method_t>
 yaal::hcore::HStreamInterface& container_scan(
 	yaal::hcore::HStreamInterface& in,
-	container_t& container_, char sep_, char const* name_
+	container_t& container_, method_t method_,
+	char sep_, char const* name_
 ) {
 	M_PROLOG
 	container_t container;
@@ -179,7 +180,7 @@ yaal::hcore::HStreamInterface& container_scan(
 					in.consume( sep_ );
 				}
 				read( in, e );
-				container.push_back( e );
+				( container.*method_ )( e );
 			}
 			in.consume( ")" );
 		} else {
@@ -188,7 +189,7 @@ yaal::hcore::HStreamInterface& container_scan(
 			typename container_t::value_type e;
 			for ( typename container_t::size_type i( 0 ); in.good() && ( i < size ); ++ i ) {
 				read( in, e );
-				container.push_back( e );
+				( container.*method_ )( e );
 			}
 		}
 		container_ = yaal::move( container );
@@ -197,23 +198,23 @@ yaal::hcore::HStreamInterface& container_scan(
 	M_EPILOG
 }
 
-template<typename container>
+template<typename container_t, typename method_t>
 yaal::hcore::HStreamInterface& container_scan(
 	yaal::hcore::HStreamInterface& in,
-	container& container_, char sep_
+	container_t& container_, method_t method_, char sep_
 ) {
 	M_PROLOG
-	return ( container_scan( in, container_, sep_, nullptr ) );
+	return ( container_scan( in, container_, method_, sep_, nullptr ) );
 	M_EPILOG
 }
 
-template<typename container>
+template<typename container_t, typename method_t>
 yaal::hcore::HStreamInterface& container_scan(
 	yaal::hcore::HStreamInterface& in,
-	container& container_, char const* name_
+	container_t& container_, method_t method_, char const* name_
 ) {
 	M_PROLOG
-	return ( container_scan( in, container_, ' ', name_ ) );
+	return ( container_scan( in, container_, method_, ' ', name_ ) );
 	M_EPILOG
 }
 
@@ -227,7 +228,8 @@ yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::
 template<typename tType, typename allocator_t>
 yaal::hcore::HStreamInterface& read( yaal::hcore::HStreamInterface& out, yaal::hcore::HArray<tType, allocator_t>& a_ ) {
 	M_PROLOG
-	return ( container_scan( out, a_, "array" ) );
+	typedef yaal::hcore::HArray<tType, allocator_t> array_t;
+	return ( container_scan( out, a_, static_cast<void ( array_t::* )( typename array_t::value_type const& )>( &array_t::push_back ), "array" ) );
 	M_EPILOG
 }
 
