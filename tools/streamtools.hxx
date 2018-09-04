@@ -236,7 +236,56 @@ yaal::hcore::HStreamInterface& read( yaal::hcore::HStreamInterface& out, yaal::h
 template<typename tType, int const N>
 yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::hcore::HStaticArray<tType, N> const& sa_ ) {
 	M_PROLOG
-	return ( container_dump( out, sa_, "staticarray" ) );
+	typedef yaal::hcore::HStaticArray<tType, N> container_t;
+	if ( out.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
+		out << "staticarray";
+		char sep( '(' );
+		for ( typename container_t::const_iterator it( sa_.begin() ), end( sa_.end() ); it != end; ++ it, sep = ' ' ) {
+			out << sep << *it;
+		}
+		if ( sa_.is_empty() ) {
+			out << sep;
+		}
+		out << ")" << yaal::hcore::flush;
+	} else {
+		for ( typename container_t::value_type const& e : sa_ ) {
+			write( out, e );
+		}
+	}
+	return ( out );
+	M_EPILOG
+}
+
+template<typename tType, int const N>
+yaal::hcore::HStreamInterface& read( yaal::hcore::HStreamInterface& in, yaal::hcore::HStaticArray<tType, N>& sa_ ) {
+	M_PROLOG
+	typedef yaal::hcore::HStaticArray<tType, N> container_t;
+	container_t container;
+	do {
+		if ( in.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
+			in.consume( "staticarray(" );
+			if ( ! in.good() ) {
+				break;
+			}
+			for ( typename container_t::size_type i( 0 ); in.good() && ( i < N ); ++ i ) {
+				int next( in.peek() );
+				if ( ( next < 0 ) || ( next == ')' ) ) {
+					break;
+				}
+				if ( next == ' ' ) {
+					in.consume( " " );
+				}
+				read( in, container[i] );
+			}
+			in.consume( ")" );
+		} else {
+			for ( typename container_t::size_type i( 0 ); in.good() && ( i < N ); ++ i ) {
+				read( in, container[i] );
+			}
+		}
+		sa_ = yaal::move( container );
+	} while ( false );
+	return ( in );
 	M_EPILOG
 }
 
@@ -589,6 +638,14 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 	M_PROLOG
 	using tools::stream::write;
 	return ( write( out, sa_ ) );
+	M_EPILOG
+}
+
+template<typename tType, int const N>
+yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface& in, yaal::hcore::HStaticArray<tType, N>& sa_ ) {
+	M_PROLOG
+	using tools::stream::read;
+	return ( read( in, sa_ ) );
 	M_EPILOG
 }
 

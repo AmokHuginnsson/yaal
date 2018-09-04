@@ -26,6 +26,7 @@ class HStaticArray final {
 public:
 	typedef HStaticArray<type_t, N> this_type;
 	typedef type_t value_type;
+	typedef int size_type;
 	struct ERROR {
 		/*! \brief Error codes for HStaticArray<> operations.
 		 */
@@ -70,17 +71,17 @@ public:
 		M_EPILOG
 	}
 	template<typename iterator_t>
-	HStaticArray( iterator_t first_, int count_ )
+	HStaticArray( iterator_t first_, size_type count_ )
 		: _data() {
 		M_PROLOG
 		assign( first_, count_ );
 		return;
 		M_EPILOG
 	}
-	int size( void ) const {
+	size_type size( void ) const {
 		return ( N );
 	}
-	int get_size( void ) const {
+	size_type get_size( void ) const {
 		return ( N );
 	}
 	bool is_empty( void ) const {
@@ -89,14 +90,16 @@ public:
 	bool empty( void ) const {
 		return ( N == 0 );
 	}
-	type_t const& operator[] ( int long idx_ ) const {
-		if ( ( idx_ >= N ) || ( idx_ < 0 ) )
+	type_t const& operator[] ( size_type idx_ ) const {
+		if ( ( idx_ >= N ) || ( idx_ < 0 ) ) {
 			M_THROW( _errMsgHStaticArray_[ ERROR::BAD_INDEX ], idx_ );
+		}
 		return ( _data[idx_] );
 	}
-	type_t& operator[] ( int long idx_ ) {
-		if ( ( idx_ >= N ) || ( idx_ < 0 ) )
+	type_t& operator[] ( size_type idx_ ) {
+		if ( ( idx_ >= N ) || ( idx_ < 0 ) ) {
 			M_THROW( _errMsgHStaticArray_[ ERROR::BAD_INDEX ], idx_ );
+		}
 		return ( _data[idx_] );
 	}
 	type_t const* data( void ) const {
@@ -107,8 +110,9 @@ public:
 	}
 	void fill( value_type const& filler_ ) {
 		M_PROLOG
-		for ( int i( 0 ); i < N; ++ i )
+		for ( size_type i( 0 ); i < N; ++ i ) {
 			_data[i] = filler_;
+		}
 		return;
 		M_EPILOG
 	}
@@ -116,8 +120,9 @@ public:
 		M_PROLOG
 		if ( &sa_ != this ) {
 			using yaal::swap;
-			for ( int i( 0 ); i < N; ++ i )
+			for ( size_type i( 0 ); i < N; ++ i ) {
 				swap( _data[i], sa_._data[i] );
+			}
 		}
 		return;
 		M_EPILOG
@@ -178,19 +183,19 @@ public:
 		if ( count != N ) {
 			M_THROW( _errMsgHStaticArray_[ ERROR::BAD_SEQUENCE_SIZE ], count );
 		}
-		for ( int i( 0 ); first_ != last_; ++ first_, ++ i ) {
+		for ( size_type i( 0 ); first_ != last_; ++ first_, ++ i ) {
 			_data[i] = *first_;
 		}
 		return;
 		M_EPILOG
 	}
 	template<typename iterator_t>
-	void assign( iterator_t first_, int count_ ) {
+	void assign( iterator_t first_, size_type count_ ) {
 		M_PROLOG
 		if ( count_ != N ) {
 			M_THROW( _errMsgHStaticArray_[ ERROR::COUNT_NOT_MATCH ], count_ );
 		}
-		for ( int i( 0 ); i < count_; ++ first_, ++ i ) {
+		for ( size_type i( 0 ); i < count_; ++ first_, ++ i ) {
 			_data[i] = *first_;
 		}
 		return;
@@ -198,9 +203,10 @@ public:
 	}
 	bool operator == ( HStaticArray const& sa_ ) const {
 		M_PROLOG
-		int i( 0 );
-		for ( ; i < N && ( _data[i] == sa_._data[i] ); ++ i )
+		size_type i( 0 );
+		for ( ; i < N && ( _data[i] == sa_._data[i] ); ++ i ) {
 			;
+		}
 		return ( i == N );
 		M_EPILOG
 	}
