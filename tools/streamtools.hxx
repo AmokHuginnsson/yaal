@@ -297,6 +297,14 @@ yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::
 }
 
 template<typename tType, typename allocator_t>
+yaal::hcore::HStreamInterface& read( yaal::hcore::HStreamInterface& out, yaal::hcore::HDeque<tType, allocator_t>& d_ ) {
+	M_PROLOG
+	typedef yaal::hcore::HDeque<tType, allocator_t> array_t;
+	return ( container_scan( out, d_, static_cast<void ( array_t::* )( typename array_t::value_type const& )>( &array_t::push_back ), "deque" ) );
+	M_EPILOG
+}
+
+template<typename tType, typename allocator_t>
 yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::hcore::HList<tType, allocator_t> const& l_ ) {
 	M_PROLOG
 	return ( container_dump( out, l_, "list" ) );
@@ -654,6 +662,14 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 	M_PROLOG
 	using tools::stream::write;
 	return ( write( out, d_ ) );
+	M_EPILOG
+}
+
+template<typename tType, typename allocator_t>
+yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface& in, yaal::hcore::HDeque<tType, allocator_t>& d_ ) {
+	M_PROLOG
+	using tools::stream::read;
+	return ( read( in, d_ ) );
 	M_EPILOG
 }
 
