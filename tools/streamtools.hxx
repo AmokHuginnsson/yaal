@@ -355,6 +355,18 @@ yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::
 	M_EPILOG
 }
 
+template<typename tType, typename compare_t, typename allocator_t>
+yaal::hcore::HStreamInterface& read( yaal::hcore::HStreamInterface& in, yaal::hcore::HHashSet<tType, compare_t, allocator_t>& hs_ ) {
+	M_PROLOG
+	typedef yaal::hcore::HHashSet<tType, compare_t, allocator_t> hash_set_t;
+	return (
+		container_scan(
+			in, hs_, static_cast<typename hash_set_t::insert_result ( hash_set_t::* )( typename hash_set_t::value_type const& )>( &hash_set_t::insert ), "hash_set"
+		)
+	);
+	M_EPILOG
+}
+
 template<typename key_t, typename value_t, typename hasher_t, typename allocator_t>
 yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::hcore::HHashMap<key_t, value_t, hasher_t, allocator_t> const& hs_ ) {
 	M_PROLOG
@@ -742,6 +754,14 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 	M_PROLOG
 	using tools::stream::write;
 	return ( write( out, hs_ ) );
+	M_EPILOG
+}
+
+template<typename value_t, typename hasher_t, typename allocator_t>
+yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface& in, yaal::hcore::HHashSet<value_t, hasher_t, allocator_t>& hs_ ) {
+	M_PROLOG
+	using tools::stream::read;
+	return ( read( in, hs_ ) );
 	M_EPILOG
 }
 
