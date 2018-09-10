@@ -41,6 +41,13 @@ struct delayed_sizeof {
 	static int const value = sizeof ( T );
 };
 
+/*! \brief Pass type information along.
+ */
+template<typename T>
+struct id {
+	typedef T type;
+};
+
 /*! \brief Conditionally expose given type.
  *
  * \tparam condition - condition on which given type should be exposed.

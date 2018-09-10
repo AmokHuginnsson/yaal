@@ -150,7 +150,7 @@ yaal::hcore::HStreamInterface& container_dump( yaal::hcore::HStreamInterface& ou
 	M_EPILOG
 }
 
-template<typename container_t, typename method_t>
+template<typename container_t, typename method_t, typename element_t = typename yaal::trait::id<typename container_t::value_type>::type>
 yaal::hcore::HStreamInterface& container_scan(
 	yaal::hcore::HStreamInterface& in,
 	container_t& container_, method_t method_,
@@ -170,7 +170,7 @@ yaal::hcore::HStreamInterface& container_scan(
 			if ( ! in.good() ) {
 				break;
 			}
-			typename container_t::value_type e;
+			element_t e;
 			while ( in.good() ) {
 				int next( in.peek() );
 				if ( ( next < 0 ) || ( next == ')' ) ) {
@@ -186,7 +186,7 @@ yaal::hcore::HStreamInterface& container_scan(
 		} else {
 			typename container_t::size_type size( 0 );
 			read( in, size );
-			typename container_t::value_type e;
+			element_t e;
 			for ( typename container_t::size_type i( 0 ); in.good() && ( i < size ); ++ i ) {
 				read( in, e );
 				( container.*method_ )( e );
@@ -198,23 +198,23 @@ yaal::hcore::HStreamInterface& container_scan(
 	M_EPILOG
 }
 
-template<typename container_t, typename method_t>
+template<typename container_t, typename method_t, typename element_t = typename yaal::trait::id<typename container_t::value_type>::type>
 yaal::hcore::HStreamInterface& container_scan(
 	yaal::hcore::HStreamInterface& in,
 	container_t& container_, method_t method_, char sep_
 ) {
 	M_PROLOG
-	return ( container_scan( in, container_, method_, sep_, nullptr ) );
+	return ( container_scan<container_t, method_t, element_t>( in, container_, method_, sep_, nullptr ) );
 	M_EPILOG
 }
 
-template<typename container_t, typename method_t>
+template<typename container_t, typename method_t, typename element_t = typename yaal::trait::id<typename container_t::value_type>::type>
 yaal::hcore::HStreamInterface& container_scan(
 	yaal::hcore::HStreamInterface& in,
 	container_t& container_, method_t method_, char const* name_
 ) {
 	M_PROLOG
-	return ( container_scan( in, container_, method_, ' ', name_ ) );
+	return ( container_scan<container_t, method_t, element_t>( in, container_, method_, ' ', name_ ) );
 	M_EPILOG
 }
 
@@ -338,6 +338,20 @@ template<typename key_t, typename value_t, typename compare_t, typename allocato
 yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::hcore::HMap<key_t, value_t, compare_t, allocator_t, yaal::hcore::HSBBSTree<yaal::hcore::HPair<key_t const, value_t>, compare_t, yaal::hcore::map_helper<key_t, value_t>, allocator_t>> const& m_ ) {
 	M_PROLOG
 	return ( container_dump( out, m_, "map" ) );
+	M_EPILOG
+}
+
+template<typename key_t, typename value_t, typename compare_t, typename allocator_t>
+yaal::hcore::HStreamInterface& read(
+	yaal::hcore::HStreamInterface& in,
+	yaal::hcore::HMap<key_t, value_t, compare_t, allocator_t, yaal::hcore::HSBBSTree<yaal::hcore::HPair<key_t const, value_t>, compare_t, yaal::hcore::map_helper<key_t, value_t>, allocator_t>>& m_
+) {
+	M_PROLOG
+	typedef yaal::hcore::HMap<key_t, value_t, compare_t, allocator_t, yaal::hcore::HSBBSTree<yaal::hcore::HPair<key_t const, value_t>, compare_t, yaal::hcore::map_helper<key_t, value_t>, allocator_t>> map_t;
+	typedef typename map_t::insert_result ( map_t::* inserter_t )( typename map_t::value_type const& );
+	typedef yaal::hcore::HPair< key_t, value_t> element_t;
+
+	return ( container_scan<map_t, inserter_t, element_t>( in, m_, static_cast<inserter_t>( &map_t::insert ), "map" ) );
 	M_EPILOG
 }
 
@@ -742,10 +756,32 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 }
 
 template<typename key_t, typename value_t, typename compare_t, typename allocator_t>
+yaal::hcore::HStreamInterface& operator >> (
+	yaal::hcore::HStreamInterface& in,
+	yaal::hcore::HMap<key_t, value_t, compare_t, allocator_t, yaal::hcore::HSBBSTree<yaal::hcore::HPair<key_t const, value_t>, compare_t, yaal::hcore::map_helper<key_t, value_t>, allocator_t>>& m_
+) {
+	M_PROLOG
+	using tools::stream::read;
+	return ( read( in, m_ ) );
+	M_EPILOG
+}
+
+template<typename key_t, typename value_t, typename compare_t, typename allocator_t>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HMap<key_t, value_t, compare_t, allocator_t, yaal::hcore::HLookup<yaal::hcore::HPair<key_t const, value_t>, compare_t, yaal::hcore::map_helper<key_t, value_t>, yaal::trait::no_type>> const& m_ ) {
 	M_PROLOG
 	using tools::stream::write;
 	return ( write( out, m_ ) );
+	M_EPILOG
+}
+
+template<typename key_t, typename value_t, typename compare_t, typename allocator_t>
+yaal::hcore::HStreamInterface& operator >> (
+	yaal::hcore::HStreamInterface& in,
+	yaal::hcore::HMap<key_t, value_t, compare_t, allocator_t, yaal::hcore::HLookup<yaal::hcore::HPair<key_t const, value_t>, compare_t, yaal::hcore::map_helper<key_t, value_t>, yaal::trait::no_type>>& m_
+) {
+	M_PROLOG
+	using tools::stream::read;
+	return ( read( in, m_ ) );
 	M_EPILOG
 }
 
