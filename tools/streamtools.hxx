@@ -349,7 +349,7 @@ yaal::hcore::HStreamInterface& read(
 	M_PROLOG
 	typedef yaal::hcore::HMap<key_t, value_t, compare_t, allocator_t, yaal::hcore::HSBBSTree<yaal::hcore::HPair<key_t const, value_t>, compare_t, yaal::hcore::map_helper<key_t, value_t>, allocator_t>> map_t;
 	typedef typename map_t::insert_result ( map_t::* inserter_t )( typename map_t::value_type const& );
-	typedef yaal::hcore::HPair< key_t, value_t> element_t;
+	typedef yaal::hcore::HPair<key_t, value_t> element_t;
 
 	return ( container_scan<map_t, inserter_t, element_t>( in, m_, static_cast<inserter_t>( &map_t::insert ), "map" ) );
 	M_EPILOG
@@ -385,6 +385,17 @@ template<typename key_t, typename value_t, typename hasher_t, typename allocator
 yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::hcore::HHashMap<key_t, value_t, hasher_t, allocator_t> const& hs_ ) {
 	M_PROLOG
 	return ( container_dump( out, hs_, "hash_map" ) );
+	M_EPILOG
+}
+
+template<typename key_t, typename value_t, typename hasher_t, typename allocator_t>
+yaal::hcore::HStreamInterface& read( yaal::hcore::HStreamInterface& in, yaal::hcore::HHashMap<key_t, value_t, hasher_t, allocator_t>& hm_ ) {
+	M_PROLOG
+	typedef yaal::hcore::HHashMap<key_t, value_t, hasher_t, allocator_t> hash_map_t;
+	typedef typename hash_map_t::insert_result ( hash_map_t::* inserter_t )( typename hash_map_t::value_type const& );
+	typedef yaal::hcore::HPair<key_t, value_t> element_t;
+
+	return ( container_scan<hash_map_t, inserter_t, element_t>( in, hm_, static_cast<inserter_t>( &hash_map_t::insert ), "hash_map" ) );
 	M_EPILOG
 }
 
@@ -806,6 +817,14 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 	M_PROLOG
 	using tools::stream::write;
 	return ( write( out, hs_ ) );
+	M_EPILOG
+}
+
+template<typename key_t, typename value_t, typename hasher_t, typename allocator_t>
+yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface& in, yaal::hcore::HHashMap<key_t, value_t, hasher_t, allocator_t>& hs_ ) {
+	M_PROLOG
+	using tools::stream::read;
+	return ( read( in, hs_ ) );
 	M_EPILOG
 }
 
