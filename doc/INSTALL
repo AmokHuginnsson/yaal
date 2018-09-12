@@ -218,8 +218,47 @@ and you are good to go.
 
 **** For Firebird 3.0 and newer.
 
-In Firebird 3.0 and newer the implementation of new security model is completely broken, so don't bother.
-For all administrative tasks you *MUST* use database connections as `sysdba` user with `RDB$ADMIN` role.
+First stop Firebird 3 server instance.
+
+Next, edit /etc/firebird/3.0/firebird.conf and setup database access:
+
+  DatabaseAccess = Restrict /var/lib/firebird/3.0/data
+
+Then, edit /etc/firebird/3.0/databases.conf, and add alias for `template` database:
+
+  template = $(dir_secDb)/template.fdb
+  {
+    RemoteAccess = true
+    DefaultDbCachePages = 50
+  }
+
+Next, assume firebird identity:
+
+  sudo -u firebird -s /bin/bash
+
+Next, log into `security` database consulting server configuration file:
+(${ETC}/firebird/3.0/databases.conf) for the name of the of the database:
+
+  isql-fb -user sysdba -r 'rdb$admin' security.db
+
+Create administrator user:
+
+  CREATE USER root PASSWORD '<your_password>' FIRSTNAME 'Database' MIDDLENAME 'System' LASTNAME 'Administrator' GRANT ADMIN ROLE using plugin Srp;
+
+Create `template` database:
+
+  CREATE DATABASE 'template';
+
+Connect to `template` database:
+
+  CONNECT 'template' USER 'sysdba' ROLE 'RDB$ADMIN';
+
+Grant it administrative privileges:
+
+  GRANT RDB$ADMIN TO root WITH ADMIN OPTION;
+
+Start Firebird 3 server instance.
+
 To create `tables`, `generators`, `triggers` that is accessible by non-`sysdba` user you *MUST*:
 1. Create non-privileged {user}.
 2. Grant RDB$ADMIN for that {user}.

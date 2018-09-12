@@ -24,7 +24,7 @@
 		<td>Fedora 27</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>FreeBSD 11.1 (compiled with clang)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>FreeBSD 11.2 (compiled with clang)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
 		<td>Raspbian</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>

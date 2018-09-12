@@ -12,7 +12,7 @@
   - Ubuntu (latest development branch and latest stable release, currently 18.04 and 18.10 respectively)
   - CentOS (latest stable release, currently 7)
   - Fedora (latest stable release, currently 27)
-  - FreeBSD (latest stable release, currently 11.1-RELEASE)
+  - FreeBSD (latest stable release, currently 11.2-RELEASE)
   - Oracle Solaris (latest stable release, currently 11.3)
   - Darwin (latest stable release, 14.5.0)
   - Windows 7 SP1 with Cygwin (latest available cygwin release, currently 2.9.0)
