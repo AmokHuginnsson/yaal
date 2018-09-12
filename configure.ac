@@ -176,19 +176,19 @@ MYSQL_REENTRANT=[""]
 CXXFLAGS_ORIG="${CXXFLAGS}"
 if test ["${MYSQL}"] != ["no"] ; then
 	LIBS=""
-	AC_CHECK_LIB([mysqlclient],[mysql_init])
+	AC_SEARCH_LIBS([mysql_init],[mysqlclient mariadbclient])
 	if test ["x${LIBS}"] = "x" ; then
 		CXXFLAGS=["${CXXFLAGS_ORIG} -L/usr/local/lib/mysql"]
-		unset ac_cv_lib_mysqlclient_mysql_init
-		AC_CHECK_LIB([mysqlclient],[mysql_init])
+		unset ac_cv_search_mysql_init
+		AC_SEARCH_LIBS([mysql_init],[mysqlclient mariadbclient])
 		if test ["x${LIBS}"] != "x" ; then
 			EXTRA_LIBRARY_PATHS="${EXTRA_LIBRARY_PATHS} -L/usr/local/lib/mysql"
 		fi
 	fi
 	if test ["x${LIBS}"] = "x" ; then
 		CXXFLAGS=["${CXXFLAGS_ORIG} -L/usr/lib64/mysql/"]
-		unset ac_cv_lib_mysqlclient_mysql_init
-		AC_CHECK_LIB([mysqlclient],[mysql_init])
+		unset ac_cv_search_mysql_init
+		AC_SEARCH_LIBS([mysql_init],[mysqlclient mariadbclient])
 		if test ["x${LIBS}"] != "x" ; then
 			EXTRA_LIBRARY_PATHS="${EXTRA_LIBRARY_PATHS} -L/usr/lib64/mysql/"
 		fi
