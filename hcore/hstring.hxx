@@ -104,7 +104,6 @@ HCharacterClass<typename trait::ternary<( characterClass >= CHARACTER_CLASS::GRE
 	return ( character_class<char_type>( characterClass ) );
 }
 
-
 class HUTF8String;
 
 /*! \brief Implementation of high level string operations.

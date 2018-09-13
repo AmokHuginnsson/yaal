@@ -28,8 +28,8 @@ namespace yaal {
  */
 template<typename iterator_t, typename value_t>
 inline iterator_t find( iterator_t it, iterator_t end, value_t const& v ) {
-	for ( ; ( it != end ) && ( *it != v ); ++ it )
-		;
+	for ( ; ( it != end ) && ( *it != v ); ++ it ) {
+	}
 	return ( it );
 }
 
@@ -42,8 +42,8 @@ inline iterator_t find( iterator_t it, iterator_t end, value_t const& v ) {
  */
 template<typename iterator_t, typename condition_t>
 inline iterator_t find_if( iterator_t it, iterator_t end, condition_t cond ) {
-	for ( ; ( it != end ) && ( ! cond( *it ) ); ++ it )
-		;
+	for ( ; ( it != end ) && ( ! cond( *it ) ); ++ it ) {
+	}
 	return ( it );
 }
 
@@ -56,8 +56,8 @@ inline iterator_t find_if( iterator_t it, iterator_t end, condition_t cond ) {
  */
 template<typename iterator_t, typename condition_t>
 inline iterator_t find_if_not( iterator_t it, iterator_t end, condition_t cond ) {
-	for ( ; ( it != end ) && cond( *it ); ++ it )
-		;
+	for ( ; ( it != end ) && cond( *it ); ++ it ) {
+	}
 	return ( it );
 }
 
@@ -108,8 +108,9 @@ inline bool none_of( iterator_t it, iterator_t end, condition_t cond ) {
 template<typename iterator_t, typename iter2_t>
 inline iterator_t find_first_of( iterator_t it, iterator_t end, iter2_t first2_, iter2_t last2_ ) {
 	for ( ; ( it != end ); ++ it ) {
-		if ( find( first2_, last2_, *it ) != last2_ )
+		if ( find( first2_, last2_, *it ) != last2_ ) {
 			break;
+		}
 	}
 	return ( it );
 }
@@ -127,10 +128,11 @@ template<typename iterator_t, typename iter2_t, typename cond_t>
 inline iterator_t find_first_of( iterator_t it, iterator_t end, iter2_t first2_, iter2_t last2_, cond_t cond_ ) {
 	for ( ; ( it != end ); ++ it ) {
 		iter2_t v( first2_ );
-		for ( ; ( v != last2_ ) && ( ! cond_( *it, *v ) ); ++ v )
-			;
-		if ( v != last2_ )
+		for ( ; ( v != last2_ ) && ( ! cond_( *it, *v ) ); ++ v ) {
+		}
+		if ( v != last2_ ) {
 			break;
+		}
 	}
 	return ( it );
 }
@@ -146,8 +148,9 @@ inline iterator_t find_first_of( iterator_t it, iterator_t end, iter2_t first2_,
 template<typename iterator_t, typename iter2_t>
 inline iterator_t find_first_not_of( iterator_t it, iterator_t end, iter2_t first2_, iter2_t last2_ ) {
 	for ( ; ( it != end ); ++ it ) {
-		if ( ! ( find( first2_, last2_, *it ) != last2_ ) )
+		if ( ! ( find( first2_, last2_, *it ) != last2_ ) ) {
 			break;
+		}
 	}
 	return ( it );
 }
@@ -165,10 +168,11 @@ template<typename iterator_t, typename iter2_t, typename cond_t>
 inline iterator_t find_first_not_of( iterator_t it, iterator_t end, iter2_t first2_, iter2_t last2_, cond_t cond_ ) {
 	for ( ; ( it != end ); ++ it ) {
 		iter2_t v( first2_ );
-		for ( ; ( v != last2_ ) && ( ! cond_( *it, *v ) ); ++ v )
-			;
-		if ( ! ( v != last2_ ) )
+		for ( ; ( v != last2_ ) && ( ! cond_( *it, *v ) ); ++ v ) {
+		}
+		if ( ! ( v != last2_ ) ) {
 			break;
+		}
 	}
 	return ( it );
 }
@@ -184,8 +188,9 @@ template<typename iterator_t, typename value_t>
 inline int long count( iterator_t it, iterator_t end, value_t const& v ) {
 	int long counter( 0 );
 	for ( ; it != end; ++ it ) {
-		if ( *it == v )
+		if ( *it == v ) {
 			++ counter;
+		}
 	}
 	return ( counter );
 }
@@ -201,8 +206,9 @@ template<typename iterator_t, typename condition_t>
 inline int long count_if( iterator_t it, iterator_t end, condition_t cond ) {
 	int long counter( 0 );
 	for ( ; it != end; ++ it ) {
-		if ( cond( *it ) )
+		if ( cond( *it ) ) {
 			++ counter;
+		}
 	}
 	return ( counter );
 }
@@ -215,8 +221,9 @@ inline int long count_if( iterator_t it, iterator_t end, condition_t cond ) {
  */
 template<typename iterator_t, typename call_t>
 inline void for_each( iterator_t it, iterator_t const& end, call_t CALL ) {
-	for ( ; it != end; ++ it )
+	for ( ; it != end; ++ it ) {
 		CALL( *it );
+	}
 }
 
 /*! \brief Replace elements in destination container by transformed elements from source range.
@@ -229,8 +236,9 @@ inline void for_each( iterator_t it, iterator_t const& end, call_t CALL ) {
  */
 template<typename src_iter_t, typename dst_iter_t, typename operation_t>
 inline dst_iter_t transform( src_iter_t it, src_iter_t end, dst_iter_t dst, operation_t op ) {
-	for ( ; it != end; ++ it, ++ dst )
+	for ( ; it != end; ++ it, ++ dst ) {
 		*dst = op( *it );
+	}
 	return ( dst );
 }
 
@@ -286,10 +294,11 @@ inline dst_iter_t remove_transform_if( src_iter_t it, src_iter_t end, dst_iter_t
 template<typename src_iter_t, typename dst_iter_t, typename operation_t, typename condition_t>
 inline dst_iter_t transform_if( src_iter_t it, src_iter_t end, dst_iter_t dst, operation_t op, condition_t cond ) {
 	for ( ; it != end; ++ it, ++ dst ) {
-		if ( cond( *it ) )
+		if ( cond( *it ) ) {
 			*dst = op( *it );
-		else
+		}	else {
 			*dst = *it;
+		}
 	}
 	return ( dst );
 }
@@ -305,8 +314,9 @@ inline dst_iter_t transform_if( src_iter_t it, src_iter_t end, dst_iter_t dst, o
  */
 template<typename src_iter_t, typename arg_iter_t, typename dst_iter_t, typename operation_t>
 inline dst_iter_t transform( src_iter_t it, src_iter_t end, arg_iter_t arg, dst_iter_t dst, operation_t op ) {
-	for ( ; it != end; ++ it, ++ arg, ++ dst )
+	for ( ; it != end; ++ it, ++ arg, ++ dst ) {
 		*dst = op( *it, *arg );
+	}
 	return ( dst );
 }
 
@@ -319,8 +329,9 @@ inline dst_iter_t transform( src_iter_t it, src_iter_t end, arg_iter_t arg, dst_
 template<typename iterator_t, typename value_t>
 inline void replace( iterator_t it, iterator_t end, value_t const& oldVal_, value_t const& newVal_ ) {
 	for ( ; it != end; ++ it ) {
-		if ( *it == oldVal_ )
+		if ( *it == oldVal_ ) {
 			*it = newVal_;
+		}
 	}
 	return;
 }
@@ -334,8 +345,9 @@ inline void replace( iterator_t it, iterator_t end, value_t const& oldVal_, valu
 template<typename iterator_t, typename value_t, typename predicate_t>
 inline void replace_if( iterator_t it, iterator_t end, predicate_t predicate_, value_t const& newVal_ ) {
 	for ( ; it != end; ++ it ) {
-		if ( predicate_( *it ) )
+		if ( predicate_( *it ) ) {
 			*it = newVal_;
+		}
 	}
 	return;
 }
@@ -350,10 +362,11 @@ inline void replace_if( iterator_t it, iterator_t end, predicate_t predicate_, v
 template<typename iterator_t, typename output_iterator_t, typename value_t>
 inline void replace_copy( iterator_t it, iterator_t end, output_iterator_t out, value_t const& oldVal_, value_t const& newVal_ ) {
 	for ( ; it != end; ++ it, ++ out ) {
-		if ( *it == oldVal_ )
+		if ( *it == oldVal_ ) {
 			*out = newVal_;
-		else
+		}	else {
 			*out = *it;
+		}
 	}
 	return;
 }
@@ -368,10 +381,11 @@ inline void replace_copy( iterator_t it, iterator_t end, output_iterator_t out, 
 template<typename iterator_t, typename output_iterator_t, typename predicate_t, typename value_t>
 inline void replace_copy_if( iterator_t it, iterator_t end, output_iterator_t out, predicate_t predicate_, value_t const& newVal_ ) {
 	for ( ; it != end; ++ it, ++ out ) {
-		if ( predicate_( *it ) )
+		if ( predicate_( *it ) ) {
 			*out = newVal_;
-		else
+		}	else {
 			*out = *it;
+		}
 	}
 	return;
 }
@@ -385,8 +399,9 @@ inline void replace_copy_if( iterator_t it, iterator_t end, output_iterator_t ou
  */
 template<typename src_it_t, typename dst_it_t>
 inline dst_it_t copy( src_it_t src, src_it_t const& end, dst_it_t dst ) {
-	for ( ; src != end; ++ src, ++ dst )
+	for ( ; src != end; ++ src, ++ dst ) {
 		*dst = *src;
+	}
 	return ( dst );
 }
 
@@ -402,8 +417,9 @@ inline dst_it_t copy_backward( src_it_t const& first, src_it_t last, dst_it_t ds
 	if ( first != last ) {
 		-- last;
 		-- dst;
-		for ( ; first != last; -- last, -- dst )
+		for ( ; first != last; -- last, -- dst ) {
 			*dst = *last;
+		}
 		*dst = *last;
 	}
 	return ( dst );
@@ -418,8 +434,9 @@ inline dst_it_t copy_backward( src_it_t const& first, src_it_t last, dst_it_t ds
  */
 template<typename src_it_t, typename dst_it_t>
 inline dst_it_t copy_n( src_it_t src, int long count, dst_it_t dst ) {
-	for ( int long i = 0; i < count; ++ i, ++ src, ++ dst )
+	for ( int long i = 0; i < count; ++ i, ++ src, ++ dst ) {
 		*dst = *src;
+	}
 	return ( dst );
 }
 
@@ -488,8 +505,9 @@ inline iterator_t remove( iterator_t first_, iterator_t const& last_, value_t va
 			move = true;
 			continue;
 		}
-		if ( move )
+		if ( move ) {
 			*first_ = *it;
+		}
 		++ first_;
 	}
 	return ( first_ );
@@ -510,8 +528,9 @@ inline iterator_t remove_if( iterator_t first_, iterator_t const& last_, conditi
 			move = true;
 			continue;
 		}
-		if ( move )
+		if ( move ) {
 			*first_ = *it;
+		}
 		++ first_;
 	}
 	return ( first_ );
@@ -566,8 +585,8 @@ inline iter2_t remove_copy_if( iter1_t first_, iter1_t const& last_, iter2_t res
  */
 template<typename iter1_t, typename iter2_t, typename equity_t>
 inline bool safe_equal( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2, equity_t equity ) {
-	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && equity( *it1, *it2 ); ++ it1, ++ it2 )
-		;
+	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && equity( *it1, *it2 ); ++ it1, ++ it2 ) {
+	}
 	return ( ( it1 == end1 ) && ( it2 == end2 ) );
 }
 
@@ -581,16 +600,16 @@ inline bool safe_equal( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2, eq
  */
 template<typename iter1_t, typename iter2_t>
 inline bool safe_equal( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 ) {
-	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && ( *it1 == *it2 ); ++ it1, ++ it2 )
-		;
+	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && ( *it1 == *it2 ); ++ it1, ++ it2 ) {
+	}
 	return ( ( it1 == end1 ) && ( it2 == end2 ) );
 }
 
 /*! \cond */
 template<typename iter1_t, typename iter2_t, typename equity_t>
 inline bool search_try_subsequence( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2, equity_t equity ) {
-	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && equity( *it1, *it2 ); ++ it1, ++ it2 )
-		;
+	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && equity( *it1, *it2 ); ++ it1, ++ it2 ) {
+	}
 	return ( it1 == end1 );
 }
 /*! \condend */
@@ -606,8 +625,9 @@ inline bool search_try_subsequence( iter1_t it1, iter1_t end1, iter2_t it2, iter
 template<typename iter1_t, typename iter2_t, typename equity_t>
 inline iter1_t search( iter1_t first1, iter1_t last1, iter2_t first2, iter2_t last2, equity_t equity ) {
 	/* Naive - quadratic complexity implementation. */
-	while ( ( first1 != last1 ) && ! search_try_subsequence( first2, last2, first1, last1, equity ) )
+	while ( ( first1 != last1 ) && ! search_try_subsequence( first2, last2, first1, last1, equity ) ) {
 		++ first1;
+	}
 	return ( first1 );
 }
 
@@ -632,8 +652,8 @@ inline iter1_t search( iter1_t first1, iter1_t last1, iter2_t first2, iter2_t la
  */
 template<typename iter1_t, typename iter2_t>
 inline bool equal( iter1_t it1, iter1_t end1, iter2_t it2 ) {
-	for ( ; ( it1 != end1 ) && ( *it1 == *it2 ); ++ it1, ++ it2 )
-		;
+	for ( ; ( it1 != end1 ) && ( *it1 == *it2 ); ++ it1, ++ it2 ) {
+	}
 	return ( it1 == end1 );
 }
 
@@ -647,8 +667,8 @@ inline bool equal( iter1_t it1, iter1_t end1, iter2_t it2 ) {
  */
 template<typename iter1_t, typename iter2_t, typename predicate_t>
 inline bool equal( iter1_t it1, iter1_t end1, iter2_t it2, predicate_t predicate_ ) {
-	for ( ; ( it1 != end1 ) && predicate_( *it1, *it2 ); ++ it1, ++ it2 )
-		;
+	for ( ; ( it1 != end1 ) && predicate_( *it1, *it2 ); ++ it1, ++ it2 ) {
+	}
 	return ( it1 == end1 );
 }
 
@@ -664,8 +684,8 @@ inline bool equal( iter1_t it1, iter1_t end1, iter2_t it2, predicate_t predicate
 template<typename iter1_t, typename iter2_t, typename compare_t>
 inline bool lexicographical_compare( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2, compare_t compare ) {
 	/* skip equals */
-	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && ( ! compare( *it1, *it2 ) ) && ( ! compare( *it2, *it1 ) ); ++ it1, ++ it2 )
-		;
+	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && ( ! compare( *it1, *it2 ) ) && ( ! compare( *it2, *it1 ) ); ++ it1, ++ it2 ) {
+	}
 	return ( ( ( it1 != end1 ) && ( it2 != end2 ) && compare( *it1, *it2 ) ) || ( ( it1 == end1 ) && ( it2 != end2 ) ) );
 }
 
@@ -680,8 +700,8 @@ inline bool lexicographical_compare( iter1_t it1, iter1_t end1, iter2_t it2, ite
 template<typename iter1_t, typename iter2_t>
 inline bool lexicographical_compare( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 ) {
 	/* skip equals */
-	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && ( *it1 == *it2 ); ++ it1, ++ it2 )
-		;
+	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && ( *it1 == *it2 ); ++ it1, ++ it2 ) {
+	}
 	return ( ( ( it1 != end1 ) && ( it2 != end2 ) && ( *it1 < *it2 ) ) || ( ( it1 == end1 ) && ( it2 != end2 ) ) );
 }
 
@@ -695,8 +715,8 @@ inline bool lexicographical_compare( iter1_t it1, iter1_t end1, iter2_t it2, ite
  */
 template<typename iter1_t, typename iter2_t>
 inline yaal::hcore::HPair<iter1_t, iter2_t> safe_mismatch( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 ) {
-	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && ( *it1 == *it2 ); ++ it1, ++ it2 )
-		;
+	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && ( *it1 == *it2 ); ++ it1, ++ it2 ) {
+	}
 	return ( make_pair( it1, it2 ) );
 }
 
@@ -709,8 +729,8 @@ inline yaal::hcore::HPair<iter1_t, iter2_t> safe_mismatch( iter1_t it1, iter1_t 
  */
 template<typename iter1_t, typename iter2_t>
 inline yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1, iter2_t it2 ) {
-	for ( ; ( it1 != end1 ) && ( *it1 == *it2 ); ++ it1, ++ it2 )
-		;
+	for ( ; ( it1 != end1 ) && ( *it1 == *it2 ); ++ it1, ++ it2 ) {
+	}
 	return ( make_pair( it1, it2 ) );
 }
 
@@ -724,8 +744,8 @@ inline yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1,
  */
 template<typename iter1_t, typename iter2_t, typename predicate_t>
 inline yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1, iter2_t it2, predicate_t predicate_ ) {
-	for ( ; ( it1 != end1 ) && predicate_( *it1, *it2 ); ++ it1, ++ it2 )
-		;
+	for ( ; ( it1 != end1 ) && predicate_( *it1, *it2 ); ++ it1, ++ it2 ) {
+	}
 	return ( make_pair( it1, it2 ) );
 }
 
@@ -781,19 +801,22 @@ inline iterator_t lower_bound( iterator_t first_, iterator_t last_, value_t cons
 	iterator_t mid( first_ );
 	while ( it != last_ ) {
 		++ it;
-		if ( ! ( it != last_ ) )
+		if ( ! ( it != last_ ) ) {
 			break;
+		}
 		++ mid;
 		++ it;
 	}
 	if ( mid != first_ ) {
-		if ( comp_( *mid, value_ ) )
+		if ( comp_( *mid, value_ ) ) {
 			mid = lower_bound( mid, last_, value_, comp_, hcore::iterator_category::forward() );
-		else
+		}	else {
 			mid = lower_bound( first_, mid, value_, comp_, hcore::iterator_category::forward() );
+		}
 	} else {
-		if ( ( mid != last_ ) && comp_( *mid, value_ ) )
+		if ( ( mid != last_ ) && comp_( *mid, value_ ) ) {
 			++ mid;
+		}
 	}
 	return ( mid );
 }
@@ -801,14 +824,16 @@ template<typename iterator_t, typename value_t, typename compare_t>
 inline iterator_t lower_bound( iterator_t first_, iterator_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::random_access ) {
 	iterator_t mid( first_ + ( last_ - first_ ) / 2 );
 	while ( mid != first_ ) {
-		if ( comp_( *mid, value_ ) )
+		if ( comp_( *mid, value_ ) ) {
 			first_ = mid;
-		else
+		}	else {
 			last_ = mid;
+		}
 		mid = ( first_ + ( last_ - first_ ) / 2 );
 	}
-	if ( ( mid != last_ ) && comp_( *mid, value_ ) )
+	if ( ( mid != last_ ) && comp_( *mid, value_ ) ) {
 		++ mid;
+	}
 	return ( mid );
 }
 /*! \endcond */
@@ -849,19 +874,22 @@ inline iterator_t upper_bound( iterator_t first_, iterator_t last_, value_t cons
 	iterator_t mid( first_ );
 	while ( it != last_ ) {
 		++ it;
-		if ( ! ( it != last_ ) )
+		if ( ! ( it != last_ ) ) {
 			break;
+		}
 		++ mid;
 		++ it;
 	}
 	if ( mid != first_ ) {
-		if ( ! comp_( value_, *mid ) )
+		if ( ! comp_( value_, *mid ) ) {
 			mid = upper_bound( mid, last_, value_, comp_, hcore::iterator_category::forward() );
-		else
+		}	else {
 			mid = upper_bound( first_, mid, value_, comp_, hcore::iterator_category::forward() );
+		}
 	} else {
-		if ( ( mid != last_ ) && ! comp_( value_, *mid ) )
+		if ( ( mid != last_ ) && ! comp_( value_, *mid ) ) {
 			++ mid;
+		}
 	}
 	return ( mid );
 }
@@ -869,14 +897,16 @@ template<typename iterator_t, typename value_t, typename compare_t>
 inline iterator_t upper_bound( iterator_t first_, iterator_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::random_access ) {
 	iterator_t mid( first_ + ( last_ - first_ ) / 2 );
 	while ( mid != first_ ) {
-		if ( ! comp_( value_, *mid ) )
+		if ( ! comp_( value_, *mid ) ) {
 			first_ = mid;
-		else
+		}	else {
 			last_ = mid;
+		}
 		mid = ( first_ + ( last_ - first_ ) / 2 );
 	}
-	if ( ( mid != last_ ) && ! comp_( value_, *mid ) )
+	if ( ( mid != last_ ) && ! comp_( value_, *mid ) ) {
 		++ mid;
+	}
 	return ( mid );
 }
 /*! \endcond */
@@ -918,19 +948,22 @@ inline bool binary_search( iterator_t first_, iterator_t last_, value_t const& v
 	iterator_t mid( first_ );
 	while ( it != last_ ) {
 		++ it;
-		if ( ! ( it != last_ ) )
+		if ( ! ( it != last_ ) ) {
 			break;
+		}
 		++ mid;
 		++ it;
 	}
 	if ( mid != first_ ) {
 		if ( ! comp_( value_, *mid ) ) {
-			if ( ! comp_( *mid, value_ ) )
+			if ( ! comp_( *mid, value_ ) ) {
 				found = true;
-			else
+			}	else {
 				found = binary_search( mid, last_, value_, comp_, hcore::iterator_category::forward() );
-		} else
+			}
+		} else {
 			found = binary_search( first_, mid, value_, comp_, hcore::iterator_category::forward() );
+		}
 	} else {
 		found = ( ! comp_( value_, *mid ) ) && ( ! comp_( *mid, value_ ) );
 	}
@@ -947,12 +980,14 @@ inline bool binary_search( iterator_t first_, iterator_t last_, value_t const& v
 				break;
 			}
 			first_ = mid;
-		} else
+		} else {
 			last_ = mid;
+		}
 		mid = ( first_ + ( last_ - first_ ) / 2 );
 	}
-	if ( ! found )
+	if ( ! found ) {
 		found = ( ! comp_( value_, *mid ) ) && ( ! comp_( *mid, value_ ) );
+	}
 	return ( found );
 }
 /*! \endcond */
@@ -1017,8 +1052,9 @@ inline void swap_ranges( first_it_t first, first_it_t const& end, second_it_t se
 template<typename iter_in1_t, typename iter_in2_t, typename iter_out_t, typename compare_t>
 inline iter_out_t merge( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t end2, iter_out_t out, compare_t comp_ ) {
 	for ( ; it1 != end1; ++ it1, ++ out ) {
-		for ( ; ( it2 != end2 ) && comp_( *it2, *it1 ); ++ it2, ++ out )
+		for ( ; ( it2 != end2 ) && comp_( *it2, *it1 ); ++ it2, ++ out ) {
 			*out = *it2;
+		}
 		*out = *it1;
 	}
 	return ( copy( it2, end2, out ) );
@@ -1042,27 +1078,30 @@ template<typename iterator_t, typename compare_t>
 inline void inplace_merge_impl( iterator_t first_, iterator_t mid_, iterator_t last_, compare_t comp_ ) {
 	iterator_t it( mid_ );
 	while ( ( first_ != it ) && ( it != last_ ) ) {
-		while ( ( first_ != it ) && ! comp_( *it, *first_ ) )
+		while ( ( first_ != it ) && ! comp_( *it, *first_ ) ) {
 			++ first_;
-		while ( ( it != last_ ) && comp_( *it, *first_ ) )
+		}
+		while ( ( it != last_ ) && comp_( *it, *first_ ) ) {
 			++ it;
+		}
 		first_ = rotate( first_, mid_, it );
 		mid_ = it;
-		if ( it == last_ )
+		if ( it == last_ ) {
 			it = mid_;
-		else if ( first_ == mid_ )
+		}	else if ( first_ == mid_ ) {
 			mid_ = it;
+		}
 	}
 	return;
 }
 template<typename iterator_t, typename compare_t>
 inline void inplace_merge_impl( iterator_t first_, iterator_t mid_, iterator_t last_, compare_t comp_,
-		hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iterator_t>::value_type>& aux_ ) {
+	hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iterator_t>::value_type>& aux_ ) {
 	typedef hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iterator_t>::value_type> aux_t;
 	if ( aux_.get_size() > 0 ) {
-		if ( aux_.get_size() == aux_.get_requested_size() )
+		if ( aux_.get_size() == aux_.get_requested_size() ) {
 			merge( aux_.begin(), aux_.end(), mid_, last_, first_, comp_ );
-		else {
+		}	else {
 			typename aux_t::value_type* out( aux_.begin() );
 			typename aux_t::value_type* end( aux_.end() );
 			iterator_t it1( first_ );
@@ -1089,8 +1128,9 @@ inline void inplace_merge_impl( iterator_t first_, iterator_t mid_, iterator_t l
 			}
 			swap_ranges( aux_.begin(), out, first_ );
 		}
-	} else
+	} else {
 		inplace_merge_impl( first_, mid_, last_, comp_ );
+	}
 	return;
 }
 /*! \endcond */
@@ -1107,10 +1147,11 @@ inline void inplace_merge( iterator_t first_, iterator_t mid_, iterator_t last_,
 	typedef typename hcore::iterator_traits<iterator_t>::value_type value_t;
 	typedef hcore::HAuxiliaryBuffer<value_t> aux_t;
 	aux_t aux( first_, mid_ );
-	if ( aux.get_size() > 0 )
+	if ( aux.get_size() > 0 ) {
 		inplace_merge_impl( first_, mid_, last_, comp_, aux );
-	else
+	}	else {
 		inplace_merge_impl( first_, mid_, last_, comp_ );
+	}
 	return;
 }
 
@@ -1225,8 +1266,9 @@ inline bool does_intersect( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, ite
  */
 template<typename dst_it_t, typename filler_t>
 inline void fill( dst_it_t it, dst_it_t end, filler_t const& filler ) {
-	for ( ; it != end; ++ it )
+	for ( ; it != end; ++ it ) {
 		*it = filler;
+	}
 	return;
 }
 
@@ -1238,8 +1280,9 @@ inline void fill( dst_it_t it, dst_it_t end, filler_t const& filler ) {
  */
 template<typename dst_it_t, typename filler_t>
 inline void fill_n( dst_it_t it, int long count, filler_t const& filler ) {
-	for ( int long i = 0; i < count; ++ i, ++ it )
+	for ( int long i = 0; i < count; ++ i, ++ it ) {
 		*it = filler;
+	}
 	return;
 }
 
@@ -1251,8 +1294,9 @@ inline void fill_n( dst_it_t it, int long count, filler_t const& filler ) {
  */
 template<typename iterator_t, typename generator_t>
 inline void generate( iterator_t it, iterator_t const& end, generator_t generator ) {
-	for ( ; it != end; ++ it )
+	for ( ; it != end; ++ it ) {
 		*it = static_cast<typename hcore::iterator_traits<iterator_t>::value_type>( generator() );
+	}
 	return;
 }
 
@@ -1264,8 +1308,9 @@ inline void generate( iterator_t it, iterator_t const& end, generator_t generato
  */
 template<typename iterator_t, typename generator_t>
 inline void generate_n( iterator_t it, int long count, generator_t generator ) {
-	for ( int long i = 0; i < count; ++ i, ++ it )
+	for ( int long i = 0; i < count; ++ i, ++ it ) {
 		*it = static_cast<typename hcore::iterator_traits<iterator_t>::value_type>( generator() );
+	}
 	return;
 }
 
@@ -1281,10 +1326,11 @@ inline void reverse( iterator_t it, iterator_t end ) {
 		while ( it != end ) {
 			swap( *it, *end );
 			++ it;
-			if ( it != end )
+			if ( it != end ) {
 				-- end;
-			else
+			}	else {
 				break;
+			}
 		}
 	}
 	return;
@@ -1300,8 +1346,9 @@ template<typename iterator_t>
 inline bool next_permutation( iterator_t it, iterator_t end ) {
 	int long count = 0;
 	iterator_t itLast;
-	for ( iterator_t itEnd = it; itEnd != end; ++ itEnd, ++ count )
+	for ( iterator_t itEnd = it; itEnd != end; ++ itEnd, ++ count ) {
 		itLast = itEnd;
+	}
 	bool gotNext = false;
 	if ( count > 1 ) {
 		do {
@@ -1311,22 +1358,26 @@ inline bool next_permutation( iterator_t it, iterator_t end ) {
 			iterator_t ie = itLast;
 			while ( *i >= *ie ) {
 				-- count;
-				if ( ! count )
+				if ( ! count ) {
 					break;
+				}
 				-- i, -- ie;
 			}
-			if ( ! count )
+			if ( ! count ) {
 				break;
+			}
 			iterator_t j = itLast;
-			while ( *j <= *i )
+			while ( *j <= *i ) {
 				-- j;
+			}
 			swap( *i, *j );
 			++ i;
 			reverse( i, end );
 			gotNext = true;
 		} while ( 0 );
-		if ( ! gotNext )
+		if ( ! gotNext ) {
 			reverse( it, end );
+		}
 	}
 	return ( gotNext );
 }
@@ -1341,8 +1392,9 @@ template<typename iterator_t>
 inline bool prev_permutation( iterator_t it, iterator_t end ) {
 	int long count = 0;
 	iterator_t itLast;
-	for ( iterator_t itEnd = it; itEnd != end; ++ itEnd, ++ count )
+	for ( iterator_t itEnd = it; itEnd != end; ++ itEnd, ++ count ) {
 		itLast = itEnd;
+	}
 	bool gotPrev = false;
 	if ( count > 1 ) {
 		do {
@@ -1352,22 +1404,26 @@ inline bool prev_permutation( iterator_t it, iterator_t end ) {
 			iterator_t ie = itLast;
 			while ( *i <= *ie ) {
 				-- count;
-				if ( ! count )
+				if ( ! count ) {
 					break;
+				}
 				-- i, -- ie;
 			}
-			if ( ! count )
+			if ( ! count ) {
 				break;
+			}
 			iterator_t j = itLast;
-			while ( *j >= *i )
+			while ( *j >= *i ) {
 				-- j;
+			}
 			swap( *i, *j );
 			++ i;
 			reverse( i, end );
 			gotPrev = true;
 		} while ( 0 );
-		if ( ! gotPrev )
+		if ( ! gotPrev ) {
 			reverse( it, end );
+		}
 	}
 	return ( gotPrev );
 }
@@ -1381,8 +1437,9 @@ inline bool prev_permutation( iterator_t it, iterator_t end ) {
  */
 template<typename iterator_t, typename return_t>
 inline return_t accumulate( iterator_t it, iterator_t end, return_t ret ) {
-	for ( ; it != end; ++ it )
+	for ( ; it != end; ++ it ) {
 		ret += *it;
+	}
 	return ( ret );
 }
 
@@ -1396,8 +1453,9 @@ inline return_t accumulate( iterator_t it, iterator_t end, return_t ret ) {
  */
 template<typename iterator_t, typename return_t, typename operator_t>
 inline return_t accumulate( iterator_t it, iterator_t end, return_t ret, operator_t oper ) {
-	for ( ; it != end; ++ it )
+	for ( ; it != end; ++ it ) {
 		ret = oper( ret, *it );
+	}
 	return ( ret );
 }
 
@@ -1415,9 +1473,10 @@ inline return_t accumulate( iterator_t it, iterator_t end, return_t ret, operato
  */
 template<typename iter_left_t, typename iter_right_t, typename return_t>
 inline return_t inner_product( iter_left_t itLeft, iter_left_t endLeft,
-		iter_right_t itRight, return_t ret ) {
-	for ( ; itLeft != endLeft; ++ itLeft, ++ itRight )
+	iter_right_t itRight, return_t ret ) {
+	for ( ; itLeft != endLeft; ++ itLeft, ++ itRight ) {
 		ret += ( ( *itLeft ) * ( *itRight ) );
+	}
 	return ( ret );
 }
 
@@ -1439,10 +1498,11 @@ inline return_t inner_product( iter_left_t itLeft, iter_left_t endLeft,
 template<typename iter_left_t, typename iter_right_t, typename return_t,
 	typename summator_t, typename multiplicator_t>
 inline return_t inner_product( iter_left_t itLeft, iter_left_t endLeft,
-		iter_right_t itRight, return_t ret,
-		summator_t summator, multiplicator_t multiplicator ) {
-	for ( ; itLeft != endLeft; ++ itLeft, ++ itRight )
+	iter_right_t itRight, return_t ret,
+	summator_t summator, multiplicator_t multiplicator ) {
+	for ( ; itLeft != endLeft; ++ itLeft, ++ itRight ) {
 		ret = summator( ret, multiplicator( *itLeft, *itRight ) );
+	}
 	return ( ret );
 }
 
@@ -1457,8 +1517,9 @@ inline iterator_t min_element( iterator_t it, iterator_t end ) {
 	iterator_t min( it );
 	++ it;
 	for ( ; ( it != end ); ++ it ) {
-		if ( *it < *min )
+		if ( *it < *min ) {
 			min = it;
+		}
 	}
 	return ( min );
 }
@@ -1475,8 +1536,9 @@ inline iterator_t min_element( iterator_t it, iterator_t end, predicate_t predic
 	iterator_t min( it );
 	++ it;
 	for ( ; ( it != end ); ++ it ) {
-		if ( predicate_( *it, *min ) )
+		if ( predicate_( *it, *min ) ) {
 			min = it;
+		}
 	}
 	return ( min );
 }
@@ -1502,8 +1564,9 @@ inline iterator_t max_element( iterator_t it, iterator_t end ) {
 	iterator_t max( it );
 	++ it;
 	for ( ; ( it != end ); ++ it ) {
-		if ( *it > *max )
+		if ( *it > *max ) {
 			max = it;
+		}
 	}
 	return ( max );
 }
@@ -1805,8 +1868,9 @@ template<typename iterator_t, typename compare_t>
 inline void selection_sort( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 	for ( ; first_ != last_; ++ first_ ) {
 		iterator_t min( min_element( first_, last_, comp_ ) );
-		if ( min != first_ )
+		if ( min != first_ ) {
 			swap( *min, *first_ );
+		}
 	}
 }
 /*! \endcond */
@@ -1819,7 +1883,7 @@ static int const YAAL_QUICK_SORT_ALGO_THRESHOLD = 8;
 /*! \cond */
 template<typename iterator_t, typename compare_t>
 inline void stable_sort_impl( iterator_t first_, iterator_t last_, compare_t comp_,
-		hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iterator_t>::value_type>& aux_ ) {
+	hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iterator_t>::value_type>& aux_ ) {
 	using yaal::distance;
 	int long size( distance( first_, last_, typename hcore::iterator_traits<iterator_t>::category_type() ) );
 	if ( size < YAAL_MERGE_SORT_ALGO_THRESHOLD ) {
@@ -1969,17 +2033,18 @@ inline void nth_element( iterator_t first_, iterator_t nth_, iterator_t last_ ) 
 template<typename iterator_t, typename predicate_t>
 inline iterator_t stable_partition_impl( iterator_t first_, iterator_t last_, predicate_t predicate_ ) {
 	using yaal::swap;
-	for ( ; ( first_ != last_ ) && predicate_( *first_ ); ++ first_ )
-		;
+	for ( ; ( first_ != last_ ) && predicate_( *first_ ); ++ first_ ) {
+	}
 	iterator_t unfit( first_ );
 	while ( first_ != last_ ) {
-		for ( ; ( first_ != last_ ) && ! predicate_( *first_ ); ++ first_ )
-			;
+		for ( ; ( first_ != last_ ) && ! predicate_( *first_ ); ++ first_ ) {
+		}
 		iterator_t fit( first_ );
-		for ( ; ( first_ != last_ ) && predicate_( *first_ ); ++ first_ )
-			;
-		if ( fit != last_ )
+		for ( ; ( first_ != last_ ) && predicate_( *first_ ); ++ first_ ) {
+		}
+		if ( fit != last_ ) {
 			unfit = rotate( unfit, fit, first_ );
+		}
 	}
 	return ( unfit );
 }
@@ -1994,7 +2059,7 @@ inline iterator_t stable_partition_impl( iterator_t first_, iterator_t last_, pr
  */
 template<typename iterator_t, typename predicate_t>
 inline iterator_t stable_partition_impl( iterator_t first_, iterator_t last_, predicate_t predicate_,
-		hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iterator_t>::value_type>& aux_ ) {
+	hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iterator_t>::value_type>& aux_ ) {
 	typedef typename hcore::iterator_traits<iterator_t>::value_type value_t;
 	value_t* aux( aux_.begin() );
 	value_t* auxEnd( aux_.end() );
@@ -2016,10 +2081,12 @@ inline iterator_t stable_partition_impl( iterator_t first_, iterator_t last_, pr
 				copy( aux, auxEnd, it );
 				if ( unfit != last_ ) {
 					unfit = rotate( unfit, fit, it );
-				} else
+				} else {
 					unfit = it;
-				while ( ( first_ != last_ ) && ! predicate_( *first_ ) )
+				}
+				while ( ( first_ != last_ ) && ! predicate_( *first_ ) ) {
 					++ first_;
+				}
 				fit = it = first_;
 				if ( first_ != last_ ) {
 					*it = *first_;
@@ -2030,10 +2097,11 @@ inline iterator_t stable_partition_impl( iterator_t first_, iterator_t last_, pr
 		}
 	}
 	copy( aux_.begin(), aux, it );
-	if ( unfit != last_ )
+	if ( unfit != last_ ) {
 		unfit = rotate( unfit, fit, it );
-	else
+	}	else {
 		unfit = it;
+	}
 	return ( unfit );
 }
 /*! \endcond */
@@ -2080,22 +2148,24 @@ inline void sort( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 			typename hcore::iterator_traits<iterator_t>::value_type pivot( *choose_pivot( l, r, comp_ ) );
 			using yaal::swap;
 			while ( l != r ) {
-				for ( ; ( l != r ) && comp_( *l, pivot ); ++ l )
-					;
-				for ( ; ( r != l ) && ! comp_( *r, pivot ); -- r )
-					;
+				for ( ; ( l != r ) && comp_( *l, pivot ); ++ l ) {
+				}
+				for ( ; ( r != l ) && ! comp_( *r, pivot ); -- r ) {
+				}
 				if ( l != r ) {
 					swap( *l, *r );
 					++ l;
-					if ( l != r )
+					if ( l != r ) {
 						-- r;
-					else
+					}	else {
 						break;
-				} else
+					}
+				} else {
 					break;
+				}
 			}
-			for ( ; ( l != last_ ) && comp_( *l, pivot ); ++ l )
-				;
+			for ( ; ( l != last_ ) && comp_( *l, pivot ); ++ l ) {
+			}
 			bool leftConstant( false );
 			if ( ! ( l != first_ ) ) {
 				/* if l == first_ it means that pivot is minimum of a set
@@ -2109,8 +2179,9 @@ inline void sort( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 				}
 			}
 			if ( l != last_ ) {
-				if ( ! leftConstant )
+				if ( ! leftConstant ) {
 					sort( first_, l, comp_ );
+				}
 				sort( l, last_, comp_ );
 			}
 		}
@@ -2176,13 +2247,15 @@ inline iterator_t unique_copy( iterator_t first_, iterator_t last_, iter_out_t d
 		*dest_ = *first_;
 		++ first_;
 		for ( ; first_ != last_; ++ first_ ) {
-			while ( ( first_ != last_ ) && comp_( *first_, *dest_ ) )
+			while ( ( first_ != last_ ) && comp_( *first_, *dest_ ) ) {
 				++ first_;
+			}
 			if ( first_ != last_ ) {
 				++ dest_;
 				*dest_ = *first_;
-			} else
+			} else {
 				break;
+			}
 		}
 		++ dest_;
 	}
@@ -2236,8 +2309,9 @@ inline void random_shuffle( iterator_t first_, iterator_t last_, generator_t ran
 		M_ASSERT( ( idx >= 0 ) && ( idx < count ) );
 		-- count;
 		using yaal::swap;
-		if ( idx != count )
+		if ( idx != count ) {
 			swap( *( first_ + idx ), *( first_ + count ) );
+		}
 	}
 	return;
 }
@@ -2264,14 +2338,16 @@ inline void random_shuffle( iterator_t first_, iterator_t last_ ) {
 template<typename source_iterator_t, typename destination_iterator_t, typename generator_t>
 inline void random_sample( source_iterator_t srcFirst_, source_iterator_t srcLast_, destination_iterator_t dstFirst_, destination_iterator_t dstLast_, generator_t randomGenerator_ ) {
 	source_iterator_t src( srcFirst_ );
-	for ( destination_iterator_t it( dstFirst_ ); it != dstLast_; ++ it, ++ src )
+	for ( destination_iterator_t it( dstFirst_ ); it != dstLast_; ++ it, ++ src ) {
 		*it = *src;
+	}
 	int long dstCount( dstLast_ - dstFirst_ );
 	int long srcTop( ( src - srcFirst_ ) + 1 );
 	while ( src != srcLast_ ) {
 		int long idx( static_cast<int long>( randomGenerator_( srcTop ) ) );
-		if ( idx < dstCount )
+		if ( idx < dstCount ) {
 			*( dstFirst_ + idx ) = *src;
+		}
 		++ srcTop;
 		++ src;
 	}

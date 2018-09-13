@@ -160,10 +160,10 @@ obscure system facilities.
 
 *** PostgreSQL.
 
-Run:
+Run (substituting {VER} with PostGreSQL version):
 
-  pg_dropcluster --stop 9.5 main
-  pg_createcluster --lc-ctype pl_PL.UTF-8 --lc-collate pl_PL.UTF-8 --lc-time en_DK --encoding UTF-8 --start 9.5 main
+  pg_dropcluster --stop {VER} main
+  pg_createcluster --lc-ctype pl_PL.UTF-8 --lc-collate pl_PL.UTF-8 --lc-time en_DK --encoding UTF-8 --start {VER} main
 
 Add:
 
@@ -236,8 +236,8 @@ Next, assume firebird identity:
 
   sudo -u firebird -s /bin/bash
 
-Next, log into `security` database consulting server configuration file:
-(${ETC}/firebird/3.0/databases.conf) for the name of the of the database:
+Next, log into `security` database consulting server configuration file
+(${ETC}/firebird/3.0/databases.conf) for the name of the of the database alias:
 
   isql-fb -user sysdba -r 'rdb$admin' security.db
 

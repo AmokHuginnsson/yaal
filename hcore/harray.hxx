@@ -26,7 +26,7 @@ extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHArray_[];
  * \tparam type_t - type of objects that will be stored in array.
  * \tparam allocator_t - type of internal allocator used for all array's allocations.
  */
-template<typename type_t, typename allocator_t = allocator::system<type_t> >
+template<typename type_t, typename allocator_t = allocator::system<type_t>>
 class HArray final {
 public:
 	typedef HArray<type_t, allocator_t> this_type;
@@ -165,8 +165,9 @@ public:
 		if ( arr_._size > 0 ) {
 			reserve( arr_._size );
 			_size = arr_._size;
-			for ( size_type i = 0; i < _size; ++ i )
+			for ( size_type i = 0; i < _size; ++ i ) {
 				new ( _buf + i ) value_type( arr_._buf[ i ] );
+			}
 		}
 		return;
 		M_EPILOG
@@ -297,15 +298,18 @@ public:
 	 */
 	void resize( size_type size_, type_t const& fillWith_ = value_type() ) {
 		M_PROLOG
-		if ( size_ < 0 )
+		if ( size_ < 0 ) {
 			M_THROW( _errMsgHArray_[ ERROR::BAD_SIZE ], size_ );
+		}
 		if ( size_ > _size ) {
 			reserve( size_ );
-			for ( size_type i( _size ); i < size_; ++ i )
+			for ( size_type i( _size ); i < size_; ++ i ) {
 				new ( _buf + i ) value_type( fillWith_ );
+			}
 		} else if ( size_ < _size ) {
-			for ( size_type i( size_ ); i < _size; ++ i )
+			for ( size_type i( size_ ); i < _size; ++ i ) {
 				M_SAFE( _buf[ i ].~value_type() );
+			}
 		}
 		_size = size_;
 		return;
@@ -326,10 +330,12 @@ public:
 		if ( capacity_ > _capacity ) {
 			size_type newCapacity( _capacity ? max( capacity_, _capacity * 2 ) : capacity_ );
 			value_type* newBuf( static_cast<value_type*>( ::operator new ( static_cast<size_t>( yaal::safe_int::mul<size_type>( newCapacity, static_cast<int>( sizeof ( value_type ) ) ) ), memory::yaal ) ) );
-			for ( size_type i( 0 ); i < _size; ++ i )
+			for ( size_type i( 0 ); i < _size; ++ i ) {
 				new ( newBuf + i ) value_type( yaal::move( _buf[ i ] ) );
-			for ( size_type i( 0 ); i < _size; ++ i )
+			}
+			for ( size_type i( 0 ); i < _size; ++ i ) {
 				M_SAFE( _buf[ i ].~value_type() );
+			}
 			using yaal::swap;
 			swap( newBuf, _buf );
 			_capacity = newCapacity;
@@ -387,8 +393,9 @@ public:
 	void push_back( type_t const& val_ ) {
 		M_PROLOG
 		M_ASSERT( _size <= _capacity );
-		if ( _size == _capacity )
+		if ( _size == _capacity ) {
 			reserve( _capacity + 1 );
+		}
 		new ( _buf + _size ) value_type( val_ );
 		++ _size;
 		return;
@@ -397,8 +404,9 @@ public:
 	void push_back( type_t&& val_ ) {
 		M_PROLOG
 		M_ASSERT( _size <= _capacity );
-		if ( _size == _capacity )
+		if ( _size == _capacity ) {
 			reserve( _capacity + 1 );
+		}
 		new ( _buf + _size ) value_type( yaal::move( val_ ) );
 		++ _size;
 		return;
@@ -411,8 +419,9 @@ public:
 	template<typename... arg_t>
 	void emplace_back( arg_t&&... arg_ ) {
 		M_ASSERT( _size <= _capacity );
-		if ( _size == _capacity )
+		if ( _size == _capacity ) {
 			reserve( _capacity + 1 );
+		}
 		new ( _buf + _size ) value_type( yaal::forward<arg_t>( arg_ )... );
 		++ _size;
 	}
@@ -540,8 +549,9 @@ public:
 		M_PROLOG
 		size_type oldSize( _size );
 		resize( size_, fillWith_ );
-		if ( oldSize > 0 )
+		if ( oldSize > 0 ) {
 			fill_n( begin(), oldSize, fillWith_ );
+		}
 		return;
 		M_EPILOG
 	}
@@ -557,12 +567,14 @@ public:
 	void insert( iterator pos_, iterator_t first_, iterator_t last_ ) {
 		M_PROLOG
 		M_ASSERT( pos_._owner == this );
-		if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
+		if ( ( pos_._index < 0 ) && ( pos_._index > _size ) ) {
 			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], pos_._index );
+		}
 		using yaal::distance;
 		insert_space( pos_._index, distance( first_, last_ ) );
-		for ( size_type i( pos_._index ); first_ != last_; ++ first_,  ++ i )
+		for ( size_type i( pos_._index ); first_ != last_; ++ first_,  ++ i ) {
 			new ( _buf + i ) value_type( *first_ );
+		}
 		return;
 		M_EPILOG
 	}
@@ -575,11 +587,13 @@ public:
 	void insert( iterator pos_, size_type count_, type_t const& value_ ) {
 		M_PROLOG
 		M_ASSERT( pos_._owner == this );
-		if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
+		if ( ( pos_._index < 0 ) && ( pos_._index > _size ) ) {
 			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], pos_._index );
+		}
 		insert_space( pos_._index, count_ );
-		for ( size_type i( pos_._index ), last( pos_._index + count_ ); i < last; ++ i )
+		for ( size_type i( pos_._index ), last( pos_._index + count_ ); i < last; ++ i ) {
 			new ( _buf + i ) value_type( value_ );
+		}
 		return;
 		M_EPILOG
 	}
@@ -592,8 +606,9 @@ public:
 	iterator insert( iterator pos_, type_t const& value_ ) {
 		M_PROLOG
 		M_ASSERT( pos_._owner == this );
-		if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
+		if ( ( pos_._index < 0 ) && ( pos_._index > _size ) ) {
 			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], pos_._index );
+		}
 		insert_space( pos_._index, 1 );
 		new ( _buf + pos_._index ) value_type( value_ );
 		return ( pos_ );
@@ -602,8 +617,9 @@ public:
 	iterator insert( iterator pos_, type_t&& value_ ) {
 		M_PROLOG
 		M_ASSERT( pos_._owner == this );
-		if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
+		if ( ( pos_._index < 0 ) && ( pos_._index > _size ) ) {
 			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], pos_._index );
+		}
 		insert_space( pos_._index, 1 );
 		new ( _buf + pos_._index ) value_type( yaal::move( value_ ) );
 		return ( pos_ );
@@ -619,8 +635,9 @@ public:
 	iterator emplace( iterator pos_, arg_t&&... arg_ ) {
 		M_PROLOG
 		M_ASSERT( pos_._owner == this );
-		if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
+		if ( ( pos_._index < 0 ) && ( pos_._index > _size ) ) {
 			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], pos_._index );
+		}
 		insert_space( pos_._index, 1 );
 		new ( _buf + pos_._index ) value_type( yaal::forward<arg_t>( arg_ )... );
 		return ( pos_ );

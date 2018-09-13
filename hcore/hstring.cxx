@@ -3026,8 +3026,9 @@ int long long stoll_impl( char const* str_, int* endIdx_, int base_ ) {
 			throw HOutOfRangeException( "Out of range value in conversion: "_ys.append( str_ ) );
 		}
 	}
-	if ( endIdx_ )
+	if ( endIdx_ ) {
 		*endIdx_ = static_cast<int>( end - str_ );
+	}
 	return ( val );
 	M_EPILOG
 }

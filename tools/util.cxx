@@ -466,9 +466,11 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 			it != end; ++ it ) {
 		HProgramOptionsHandler::HOption const& o = *it;
 		/* + 2 for --, + 1 for =, 2 for [] */
-		int tmp( static_cast<int>( ( ! o.long_form().is_empty() ? o.long_form().get_length() + 2 : 0 )
-					+ ( ! o.argument_name().is_empty() ? o.argument_name().get_length() + 1 : 0 )
-					+ ( o.switch_type() == HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL ? 2 : 0 ) ) );
+		int tmp(
+			static_cast<int>( ( ! o.long_form().is_empty() ? o.long_form().get_length() + 2 : 0 )
+				+ ( ! o.argument_name().is_empty() ? o.argument_name().get_length() + 1 : 0 )
+				+ ( o.switch_type() == HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL ? 2 : 0 ) )
+		);
 		if ( tmp > longestLongLength ) {
 			longestLongLength = tmp;
 		}
@@ -715,8 +717,9 @@ void dump_configuration( HOptionInfo const& info, HStreamInterface& out_ ) {
 			int eol = 0;
 			while ( ( eol < MAXIMUM_LINE_LENGTH ) && ( eol >= 0 ) ) {
 				eol = static_cast<int>( desc.find_one_of( character_class<CHARACTER_CLASS::WHITESPACE>().data(), eol ) );
-				if ( ( eol < 0 ) || ( eol > MAXIMUM_LINE_LENGTH ) )
+				if ( ( eol < 0 ) || ( eol > MAXIMUM_LINE_LENGTH ) ) {
 					break;
+				}
 				eol = static_cast<int>( desc.find_other_than( character_class<CHARACTER_CLASS::WHITESPACE>().data(), eol ) );
 			}
 			if ( eol >= MAXIMUM_LINE_LENGTH ) {

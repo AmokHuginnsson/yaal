@@ -49,22 +49,23 @@ coverage-stats:
 	lcov $(LCOV_PARAMS) \
 	     --base-directory ${HOME}/usr/include \
 	     --directory $(CLIENT_PATH)/$(DIR_COVERAGE)/$(lastword $(subst /, ,$(CLIENT_PATH))) \
-			 --ignore-errors gcov,source \
+	     --ignore-errors gcov,source \
 	     --capture --output-file $(DIR_COVERAGE)/$(LIB_NAME)-client-test.info ;\
 	sed -i -e 's@${HOME}/usr/include/$(LIB_NAME)@$(DIR_ROOT)@g' \
 	     $(DIR_COVERAGE)/$(LIB_NAME)-client-baseline.info $(DIR_COVERAGE)/$(LIB_NAME)-client-test.info ;\
 	lcov $(LCOV_PARAMS) \
 	     --add-tracefile $(DIR_COVERAGE)/$(LIB_NAME)-baseline.info \
 	     --add-tracefile $(DIR_COVERAGE)/$(LIB_NAME)-client-baseline.info \
-			 --add-tracefile $(DIR_COVERAGE)/$(LIB_NAME)-test.info \
-			 --add-tracefile $(DIR_ROOT)/$(DIR_COVERAGE)/$(LIB_NAME)-client-test.info \
-			 --output-file $(DIR_ROOT)/$(DIR_COVERAGE)/$(LIB_NAME)-total.info && \
+	     --add-tracefile $(DIR_COVERAGE)/$(LIB_NAME)-test.info \
+	     --add-tracefile $(DIR_ROOT)/$(DIR_COVERAGE)/$(LIB_NAME)-client-test.info \
+	     --output-file $(DIR_ROOT)/$(DIR_COVERAGE)/$(LIB_NAME)-total.info && \
 	lcov $(LCOV_PARAMS) \
 	     --extract $(DIR_COVERAGE)/$(LIB_NAME)-total.info '*/$(LIB_NAME)/*' \
-			 --output-file $(DIR_COVERAGE)/$(LIB_NAME)-coverage.info && \
+	     --output-file $(DIR_COVERAGE)/$(LIB_NAME)-coverage.info && \
 	/bin/rm -rf $(DIR_ROOT)/build/coverage-stats && \
 	$(MKDIR_P) $(DIR_ROOT)/build/coverage-stats && \
-	genhtml $(LCOV_PARAMS) $(DIR_COVERAGE)/$(LIB_NAME)-coverage.info --legend --output-directory=$(DIR_ROOT)/build/coverage-stats && \
+	genhtml $(LCOV_PARAMS) $(DIR_COVERAGE)/$(LIB_NAME)-coverage.info \
+	        --legend --num-spaces=2 --output-directory=$(DIR_ROOT)/build/coverage-stats && \
 	printf "%b\n" "done."
 
 HASH=\#
