@@ -267,13 +267,23 @@ private:
 };
 
 template<typename iterator_t>
-HNumberSetStats<typename trait::ternary<is_floating_point<typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type>::value,
-	typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type,
-	double long>::type> number_set_stats( iterator_t first_, iterator_t last_, aggregate_type_t aggregateType_ = AGGREGATE_TYPE::BASIC ) {
-	M_PROLOG
-	return ( HNumberSetStats<typename trait::ternary<is_floating_point<typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type>::value,
+HNumberSetStats<
+	typename trait::ternary<
+		is_floating_point<typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type>::value,
 		typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type,
-		double long>::type>( first_, last_, aggregateType_ ) );
+		double long
+	>::type
+> number_set_stats( iterator_t first_, iterator_t last_, aggregate_type_t aggregateType_ = AGGREGATE_TYPE::BASIC ) {
+	M_PROLOG
+	return (
+		HNumberSetStats<
+			typename trait::ternary<
+				is_floating_point<typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type>::value,
+				typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type,
+				double long
+			>::type
+		>( first_, last_, aggregateType_ )
+	);
 	M_EPILOG
 }
 
@@ -285,16 +295,21 @@ inline number_t clip( number_t const& lowerBound_, number_t const& number_, numb
 template<typename number_t>
 inline number_t factorial( number_t number_ ) {
 	number_t n = 1;
-	for ( number_t i = 2; i <= number_; ++ i )
+	for ( number_t i = 2; i <= number_; ++ i ) {
 		n *= i;
+	}
 	return ( n );
 }
 
 template<typename number_t>
 inline number_t binomial_coefficient( number_t cardinal_, number_t subCardinal_ ) {
-	if ( subCardinal_ > ( cardinal_ / 2 ) )
+	M_PROLOG
+	M_ENSURE( ( cardinal_ >= 0 ) && ( subCardinal_ >= 0 ) && ( cardinal_ >= subCardinal_ ) );
+	if ( subCardinal_ > ( cardinal_ / 2 ) ) {
 		subCardinal_ = cardinal_ - subCardinal_;
+	}
 	return ( factorial( cardinal_ ) / ( factorial( subCardinal_ ) * factorial( cardinal_ - subCardinal_ ) ) );
+	M_EPILOG
 }
 
 template<int long const M, typename number_t>
@@ -321,13 +336,15 @@ void central_moving_average( iterator_t first_, iterator_t last_, iterator_t dst
 		iterator_t backTracker_( first_ );
 		int long const preRange( ( range_ - 1 ) / 2 );
 		int long valuesInSum( 0 );
-		for ( ; ( valuesInSum <= preRange ) && ( frontTracker_ != last_ ); ++ valuesInSum, ++ frontTracker_ )
+		for ( ; ( valuesInSum <= preRange ) && ( frontTracker_ != last_ ); ++ valuesInSum, ++ frontTracker_ ) {
 			sum += *frontTracker_;
+		}
 		bool hadFullRange( false );
 		for ( ; first_ != last_; ++ first_, ++ dst_ ) {
 			*dst_ = sum / static_cast<value_type>( valuesInSum );
-			if ( valuesInSum == range_ )
+			if ( valuesInSum == range_ ) {
 				hadFullRange = true;
+			}
 			if ( hadFullRange ) {
 				sum -= *backTracker_;
 				++ backTracker_;
@@ -335,10 +352,12 @@ void central_moving_average( iterator_t first_, iterator_t last_, iterator_t dst
 			if ( frontTracker_ != last_ ) {
 				sum += *frontTracker_;
 				++ frontTracker_;
-				if ( valuesInSum < range_ )
+				if ( valuesInSum < range_ ) {
 					++ valuesInSum;
-			} else
+				}
+			} else {
 				-- valuesInSum;
+			}
 		}
 	}
 	return;
@@ -356,14 +375,16 @@ void moving_average( iterator_t first_, iterator_t last_, iterator_t dst_, int l
 		for ( ; first_ != last_; ++ first_, ++ dst_ ) {
 			sum += *first_;
 			*dst_ = sum / static_cast<value_type>( valuesInSum );
-			if ( valuesInSum == range_ )
+			if ( valuesInSum == range_ ) {
 				hadFullRange = true;
+			}
 			if ( hadFullRange ) {
 				sum -= *backTracker_;
 				++ backTracker_;
 			}
-			if ( valuesInSum < range_ )
+			if ( valuesInSum < range_ ) {
 				++ valuesInSum;
+			}
 		}
 	}
 	return;

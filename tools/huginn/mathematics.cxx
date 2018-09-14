@@ -494,8 +494,13 @@ public:
 		verify_arg_type( name, values_, 1, type_tag( t ), ARITY::MULTIPLE, thread_, position_ );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
+			HNumber const& n1( get_number( values_[0] ) );
+			HNumber const& n2( get_number( values_[1] ) );
+			if ( ! ( n1.is_integral() && n2.is_integral() ) ) {
+				throw HHuginn::HHuginnRuntimeException( "Invalid argument.", thread_->current_frame()->file_id(), position_ );
+			}
 			v = thread_->object_factory().create_number(
-				math::greatest_common_divisor( get_number( values_[0] ), get_number( values_[1] ) )
+				math::greatest_common_divisor( n1, n2 )
 			);
 		} else {
 			v = thread_->object_factory().create_integer(
@@ -503,6 +508,17 @@ public:
 			);
 		}
 		return ( v );
+		M_EPILOG
+	}
+	static HHuginn::value_t binomial_coefficient( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "Mathematics.binomial_coefficient", values_, { HHuginn::TYPE::NUMBER, HHuginn::TYPE::NUMBER }, thread_, position_ );
+		HNumber const& n1( get_number( values_[0] ) );
+		HNumber const& n2( get_number( values_[1] ) );
+		if ( ( n1 < 0 ) || ( n2 < 0 ) || ( n2 > n1 ) || ! n1.is_integral() || ! n2.is_integral() ) {
+			throw HHuginn::HHuginnRuntimeException( "Invalid argument.", thread_->current_frame()->file_id(), position_ );
+		}
+		return ( thread_->object_factory().create_number( xmath::binomial_coefficient( n1, n2 ) ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t statistics( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -560,6 +576,10 @@ HHuginn::value_t HMathematicsCreator::do_new_instance( HRuntime* runtime_ ) {
 		{ "greatest_common_divisor",
 			runtime_->create_method( &HMathematics::greatest_common_divisor ),
 			"( *num1*, *num2* ) - find greatest common divisor of two numbers, *num1* and *num2*"
+		},
+		{ "binomial_coefficient",
+			runtime_->create_method( &HMathematics::binomial_coefficient ),
+			"( *num1*, *num2* ) - calculate binomial coefficient of *num1* and *num2*"
 		},
 		{ "statistics",           runtime_->create_method( &HMathematics::statistics ),           "( *iterable* ) - create NumberSetStatistics over *iterable* of uniformly types values" }
 	};
