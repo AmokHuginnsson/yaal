@@ -684,71 +684,76 @@ int HProgramOptionsHandler::process_command_line( int argc_, char** argv_, int* 
 	for ( int i( 1 ); i < argc_; ++ i ) {
 		char const* arg( argv_[i] );
 		optValue.clear();
-		if ( ( arg[0] == '-' ) && ( arg[1] == '-' ) ) {
-			optName.assign( arg + 2 );
-			int long optNameEnd( optName.find( '='_ycp ) );
-			if ( optNameEnd != HString::npos ) {
-				optValue = optName.substr( optNameEnd + 1 );
-				optName.erase( optNameEnd );
-			}
-			HOption* opt( ( it = find_if( _options.begin(), _options.end(), [&optName]( HOption& opt_ ) { return ( opt_.long_form() == optName ); } ) ) != _options.end() ? &*it : nullptr );
-			if ( opt ) {
-				if ( ( opt->switch_type() == HOption::ARGUMENT::REQUIRED ) && ( optNameEnd == HString::npos ) ) {
-					++ i;
-					if ( i < argc_ ) {
-						optValue = argv_[i];
-					} else {
-						++ invalid;
-						cerr << argv_[0] << ": option '--" << optName << "' requires an argument" << endl;
-						continue;
-					}
+		try {
+			if ( ( arg[0] == '-' ) && ( arg[1] == '-' ) ) {
+				optName.assign( arg + 2 );
+				int long optNameEnd( optName.find( '='_ycp ) );
+				if ( optNameEnd != HString::npos ) {
+					optValue = optName.substr( optNameEnd + 1 );
+					optName.erase( optNameEnd );
 				}
-				set_option( *opt, optValue );
-			} else {
-				++ invalid;
-				cerr << argv_[0] << ": unrecognized option '" << argv_[i] << "'" << endl;
-			}
-		} else if ( arg[0] == '-' ) {
-			++ arg;
-			while ( *arg ) {
-				char on( *arg );
-				HOption* opt( ( it = find_if( _options.begin(), _options.end(), [&on]( HOption& opt_ ) { return ( opt_.short_form() == on ); } ) ) != _options.end() ? &*it : nullptr );
+				HOption* opt( ( it = find_if( _options.begin(), _options.end(), [&optName]( HOption& opt_ ) { return ( opt_.long_form() == optName ); } ) ) != _options.end() ? &*it : nullptr );
 				if ( opt ) {
-					/*
-					 * According to `man 1 getopt` an optional argument must immediately follow and option,
-					 * e.g., if `-s` is an option expecting an optional argument then:
-					 * -s/bin/sh
-					 * is interpreted as setting `s` value to `/bin/sh`, but
-					 * -s /bin/sh
-					 * is interpreted as setting `s` to empty value and passing `/bin/sh` as non-option argument.
-					 */
-					if ( ( opt->switch_type() == HOption::ARGUMENT::REQUIRED ) || ( opt->switch_type() == HOption::ARGUMENT::OPTIONAL ) ) {
-						optValue.assign( arg + 1 );
-						arg += optValue.get_length();
-					}
-					if ( ( opt->switch_type() == HOption::ARGUMENT::REQUIRED ) && optValue.is_empty() ) {
+					if ( ( opt->switch_type() == HOption::ARGUMENT::REQUIRED ) && ( optNameEnd == HString::npos ) ) {
 						++ i;
 						if ( i < argc_ ) {
 							optValue = argv_[i];
 						} else {
-							++ arg;
 							++ invalid;
-							cerr << argv_[0] << ": option requires an argument -- '" << on << "'" << endl;
+							cerr << argv_[0] << ": option '--" << optName << "' requires an argument" << endl;
 							continue;
 						}
 					}
 					set_option( *opt, optValue );
 				} else {
 					++ invalid;
-					cerr << argv_[0] << ": invalid option -- '" << on << "'" << endl;
+					cerr << argv_[0] << ": unrecognized option '" << argv_[i] << "'" << endl;
 				}
+			} else if ( arg[0] == '-' ) {
 				++ arg;
+				while ( *arg ) {
+					char on( *arg );
+					HOption* opt( ( it = find_if( _options.begin(), _options.end(), [&on]( HOption& opt_ ) { return ( opt_.short_form() == on ); } ) ) != _options.end() ? &*it : nullptr );
+					if ( opt ) {
+						/*
+						 * According to `man 1 getopt` an optional argument must immediately follow and option,
+						 * e.g., if `-s` is an option expecting an optional argument then:
+						 * -s/bin/sh
+						 * is interpreted as setting `s` value to `/bin/sh`, but
+						 * -s /bin/sh
+						 * is interpreted as setting `s` to empty value and passing `/bin/sh` as non-option argument.
+						 */
+						if ( ( opt->switch_type() == HOption::ARGUMENT::REQUIRED ) || ( opt->switch_type() == HOption::ARGUMENT::OPTIONAL ) ) {
+							optValue.assign( arg + 1 );
+							arg += optValue.get_length();
+						}
+						if ( ( opt->switch_type() == HOption::ARGUMENT::REQUIRED ) && optValue.is_empty() ) {
+							++ i;
+							if ( i < argc_ ) {
+								optValue = argv_[i];
+							} else {
+								++ arg;
+								++ invalid;
+								cerr << argv_[0] << ": option requires an argument -- '" << on << "'" << endl;
+								continue;
+							}
+						}
+						set_option( *opt, optValue );
+					} else {
+						++ invalid;
+						cerr << argv_[0] << ": invalid option -- '" << on << "'" << endl;
+					}
+					++ arg;
+				}
+			} else {
+				rotate( argv_ + i, argv_ + i + 1, argv_ + argc_ + nonOption - 1 );
+				-- i;
+				-- argc_;
+				++ nonOption;
 			}
-		} else {
-			rotate( argv_ + i, argv_ + i + 1, argv_ + argc_ + nonOption - 1 );
-			-- i;
-			-- argc_;
-			++ nonOption;
+		} catch ( HException const& e ) {
+			++ invalid;
+			cerr << argv_[0] << ": malformed data in argument #" << i << ": " << e.what() << endl;
 		}
 	}
 	set_from_env();
