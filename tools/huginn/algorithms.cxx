@@ -16,6 +16,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "mapper.hxx"
 #include "enumerator.hxx"
 #include "zip.hxx"
+#include "slice.hxx"
 #include "tuple.hxx"
 #include "list.hxx"
 #include "deque.hxx"
@@ -43,6 +44,7 @@ class HAlgorithms : public HHuginn::HValue {
 	HHuginn::class_t _rangeClass;
 	HHuginn::class_t _enumeratorClass;
 	HHuginn::class_t _zipClass;
+	HHuginn::class_t _sliceClass;
 	HHuginn::class_t _exceptionClass;
 public:
 	HAlgorithms( HHuginn::HClass* class_ )
@@ -53,6 +55,7 @@ public:
 		, _rangeClass( HRange::get_class( class_->runtime(), class_ ) )
 		, _enumeratorClass( HEnumerator::get_class( class_->runtime(), class_ ) )
 		, _zipClass( HZip::get_class( class_->runtime(), class_ ) )
+		, _sliceClass( HSlice::get_class( class_->runtime(), class_ ) )
 		, _exceptionClass( class_exception( class_ ) ) {
 		return;
 	}
@@ -245,6 +248,9 @@ public:
 	static HHuginn::value_t range( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		return ( static_cast<HAlgorithms*>( object_->raw() )->do_range( thread_, values_, position_ ) );
 	}
+	static HHuginn::value_t slice( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		return ( static_cast<HAlgorithms*>( object_->raw() )->do_slice( thread_, values_, position_ ) );
+	}
 	static HHuginn::value_t sorted( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Algorithms.sorted";
@@ -423,6 +429,47 @@ private:
 		);
 		M_EPILOG
 	}
+	HHuginn::value_t do_slice( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "Algorithms.slice";
+		verify_arg_count( name, values_, 2, 4, thread_, position_ );
+		verify_arg_collection( name, values_, 0, ARITY::MULTIPLE, ONTICALLY::VIRTUAL, thread_, position_ );
+		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
+		int long long from( 0 );
+		int long long stop( 0 );
+		int long long step( 1 );
+		int s( static_cast<int>( values_.get_size() ) );
+		switch ( s ) {
+			case ( 2 ): {
+				stop = get_integer( values_[1] );
+			} break;
+			case ( 4 ): {
+				verify_arg_type( name, values_, 3, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
+				step = get_integer( values_[3] );
+			} /* fall-through */
+			case ( 3 ): {
+				verify_arg_type( name, values_, 2, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
+				from = get_integer( values_[1] );
+				stop = get_integer( values_[2] );
+			} break;
+		}
+		if (
+			( ( step == 0 ) && ( stop != from ) )
+			|| ( from < 0 )
+			|| ( step < 0 )
+			|| ( stop < from )
+		) {
+			throw HHuginn::HHuginnRuntimeException( "Invalid slice.", thread_->current_frame()->file_id(), position_ );
+		}
+		return (
+			thread_->object_factory().create<HSlice>(
+				_sliceClass.raw(),
+				values_.front(),
+				from, stop, step
+			)
+		);
+		M_EPILOG
+	}
 	HHuginn::value_t do_range( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Algorithms.range";
@@ -446,7 +493,11 @@ private:
 				stop = get_integer( values_[1] );
 			} break;
 		}
-		if ( ( ( step == 0 ) && ( stop != from ) ) || ( ( stop > from ) && ( step < 0 ) ) || ( ( stop < from ) && ( step > 0 ) ) ) {
+		if (
+			( ( step == 0 ) && ( stop != from ) )
+			|| ( ( stop > from ) && ( step < 0 ) )
+			|| ( ( stop < from ) && ( step > 0 ) )
+		) {
 			throw HHuginn::HHuginnRuntimeException( "Invalid range.", thread_->current_frame()->file_id(), position_ );
 		}
 		return ( thread_->object_factory().create<HRange>( _rangeClass.raw(), from, stop, step ) );
@@ -477,6 +528,7 @@ HHuginn::value_t HAlgorithmsCreator::do_new_instance( HRuntime* runtime_ ) {
 		{ "materialize", runtime_->create_method( &HAlgorithms::materialize ), "( *iterable*, *colType* ) - copy elements from *iterable* to newly created instance of *colType*" },
 		{ "reduce",      runtime_->create_method( &HAlgorithms::reduce ),      "( *iterable*, *callable* [, *init*] ) - iteratively combine all elements from *iterable* using *callable(x,y)* and starting value of *init*" },
 		{ "range",       runtime_->create_method( &HAlgorithms::range ),       "( [*from*,] *until* [, *step*] ) - produce iterable sequence of `integer` values ranging from *from* up until *until* using *step* increments" },
+		{ "slice",       runtime_->create_method( &HAlgorithms::slice ),       "( *iterable*, [*from*,] *until* [, *step*] ) - produce an iterable view for selecting elements from a sequence ranging from *from* up until *until* using *step* increments" },
 		{ "min",         runtime_->create_method( &HAlgorithms::min ),         "( *arg1*, *arg2*[, argN...] ) - find minimum element from given set" },
 		{ "max",         runtime_->create_method( &HAlgorithms::max ),         "( *arg1*, *arg2*[, argN...] ) - find maximum element from given set" },
 		{ "sorted",      runtime_->create_method( &HAlgorithms::sorted ),      "( *iterable* [, *callable*] ) - return content of *iterable* as sorted `list`, using *callable* to retrieve keys for element comparison" },

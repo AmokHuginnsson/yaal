@@ -72,8 +72,7 @@ HHuginn::class_t HIterator::get_class( HRuntime* runtime_, HHuginn::HClass const
 		runtime_->create_class(
 			"Iterator",
 			"The `Iterator` class provides forward iterator view over an *iterable*.",
-			HHuginn::ACCESS::PRIVATE,
-			HHuginn::HClass::TYPE::BUILTIN
+			HHuginn::ACCESS::PRIVATE
 		)
 	);
 	HHuginn::field_definitions_t fd{
