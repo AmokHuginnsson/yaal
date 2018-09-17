@@ -10,6 +10,7 @@ export PREFIX=$(WINDOWS_PREFIX)
 endif
 
 CMAKE=$(wildcard /cygdrive/c/Program\ Files\ (x86)/CMake*/bin/cmake.exe)$(wildcard /cygdrive/c/Program\ Files/CMake*/bin/cmake.exe)
+CMAKE:=$(if $(CMAKE),$(CMAKE),$(wildcard c:/Program\ Files\ (x86)/CMake*/bin/cmake.exe)$(wildcard c:/Program\ Files/CMake*/bin/cmake.exe))
 CPUS=$(shell grep -c processor /proc/cpuinfo)
 INPUTS=$(sort $(wildcard */*.cxx) $(wildcard */*.hxx)  $(wildcard */*/*.cxx) $(wildcard */*/*.hxx))
 INPUTS:=$(filter-out build/debug/config.hxx build/debug/commit_id.hxx,$(INPUTS))
