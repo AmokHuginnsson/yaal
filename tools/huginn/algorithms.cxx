@@ -236,6 +236,21 @@ public:
 				dest.insert( make_pair( data.front(), data.back() ) );
 				it->next( thread_, position_ );
 			}
+		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::string ) ) {
+			HString s;
+			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
+				HHuginn::value_t c( it->value( thread_, position_ ) );
+				if ( c->type_id() != HHuginn::TYPE::CHARACTER ) {
+					throw HHuginn::HHuginnRuntimeException(
+						"A non-`character` type value materialized into a `string`.",
+						thread_->current_frame()->file_id(),
+						position_
+					);
+				}
+				s.push_back( get_character( c ) );
+				it->next( thread_, position_ );
+			}
+			v = thread_->object_factory().create_string( s );
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
 				"Invalid materialized type: `"_ys.append( thread_->runtime().function_name( fr.function().id() ) ).append( "'." ),
