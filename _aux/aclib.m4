@@ -284,6 +284,8 @@ AC_DEFUN_ONCE([YAAL_DETECT_COMMON_FLAGS], [
 	else
 		YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,--no-keep-memory], [C++])
 	fi
+	YAAL_DETECT_FLAGS(EXTRA_COMPILER_COVERAGE_FLAGS, [-fno-default-inline], [C++])
+	YAAL_DETECT_FLAGS(EXTRA_COMPILER_COVERAGE_FLAGS, [-fno-inline-small-functions], [C++])
 	if test ["x${START_GROUP}"] != ["x"] ; then
 		END_GROUP=["-Wl,--end-group"]
 	fi

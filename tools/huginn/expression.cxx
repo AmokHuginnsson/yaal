@@ -804,7 +804,7 @@ inline HHuginn::value_t fill_assoc( HThread* thread_, HHuginn::value_t&& assoc_,
 	for ( int i( 0 ), S( static_cast<int>( values_.get_size() ) ); i < S; i += 2 ) {
 		dict->insert( thread_, values_[i]._value, values_[i + 1]._value, values_[i]._position );
 	}
-	return ( assoc_ );
+	return ( yaal::move( assoc_ ) );
 }
 
 }

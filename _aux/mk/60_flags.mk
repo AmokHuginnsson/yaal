@@ -77,7 +77,7 @@ endif
 ifdef DO_COVERAGE
 	TARGET=cov
 	COMPILER_COVERAGE_FLAGS = --coverage
-	COMPILER_DEBUG_FLAGS = -D__DEBUG__ -fno-inline -fno-inline-small-functions -fno-default-inline
+	COMPILER_DEBUG_FLAGS = -D__DEBUG__ -fno-inline $(EXTRA_COMPILER_COVERAGE_FLAGS)
 	LINKER_COVERAGE_FLAGS   = --coverage
 	LIB_INFIX = -c
 endif
