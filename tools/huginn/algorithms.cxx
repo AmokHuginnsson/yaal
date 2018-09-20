@@ -17,6 +17,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "enumerator.hxx"
 #include "zip.hxx"
 #include "slice.hxx"
+#include "chain.hxx"
 #include "tuple.hxx"
 #include "list.hxx"
 #include "deque.hxx"
@@ -45,6 +46,7 @@ class HAlgorithms : public HHuginn::HValue {
 	HHuginn::class_t _enumeratorClass;
 	HHuginn::class_t _zipClass;
 	HHuginn::class_t _sliceClass;
+	HHuginn::class_t _chainClass;
 	HHuginn::class_t _exceptionClass;
 public:
 	HAlgorithms( HHuginn::HClass* class_ )
@@ -56,6 +58,7 @@ public:
 		, _enumeratorClass( HEnumerator::get_class( class_->runtime(), class_ ) )
 		, _zipClass( HZip::get_class( class_->runtime(), class_ ) )
 		, _sliceClass( HSlice::get_class( class_->runtime(), class_ ) )
+		, _chainClass( HChain::get_class( class_->runtime(), class_ ) )
 		, _exceptionClass( class_exception( class_ ) ) {
 		return;
 	}
@@ -73,6 +76,9 @@ public:
 	}
 	static HHuginn::value_t zip( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		return ( static_cast<HAlgorithms*>( object_->raw() )->do_zip( thread_, values_, position_ ) );
+	}
+	static HHuginn::value_t chain( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		return ( static_cast<HAlgorithms*>( object_->raw() )->do_chain( thread_, values_, position_ ) );
 	}
 	static HHuginn::value_t reduce( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		char const name[] = "Algorithms.reduce";
@@ -430,6 +436,17 @@ private:
 		return ( thread_->object_factory().create<HZip>( _zipClass.raw(), values_ ) );
 		M_EPILOG
 	}
+	HHuginn::value_t do_chain( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "Algorithms.chain";
+		verify_arg_count( name, values_, 1, meta::max_signed<int>::value, thread_, position_ );
+		int cols( static_cast<int>( values_.get_size() ) );
+		for ( int i( 0 ); i < cols; ++ i ) {
+			verify_arg_collection( name, values_, i, ARITY::MULTIPLE, ONTICALLY::VIRTUAL, thread_, position_ );
+		}
+		return ( thread_->object_factory().create<HChain>( _chainClass.raw(), values_ ) );
+		M_EPILOG
+	}
 	HHuginn::value_t do_iterator( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Algorithms.iterator";
@@ -548,6 +565,7 @@ HHuginn::value_t HAlgorithmsCreator::do_new_instance( HRuntime* runtime_ ) {
 		{ "max",         runtime_->create_method( &HAlgorithms::max ),         "( *arg1*, *arg2*[, argN...] ) - find maximum element from given set" },
 		{ "sorted",      runtime_->create_method( &HAlgorithms::sorted ),      "( *iterable* [, *callable*] ) - return content of *iterable* as sorted `list`, using *callable* to retrieve keys for element comparison" },
 		{ "zip",         runtime_->create_method( &HAlgorithms::zip ),         "( *iterable1*, *iterable2*, ... ) - create zipped iterable view of a set of iterables" },
+		{ "chain",       runtime_->create_method( &HAlgorithms::chain ),       "( *iterable1*, *iterable2*, ... ) - create iterable view of a chained set of iterables" },
 		{ "iterator",    runtime_->create_method( &HAlgorithms::iterator ),    "( *iterable* ) - create manual iterator object for given iterable" },
 		{ "reversed",    runtime_->create_method( &HAlgorithms::reversed ),    "( *coll* ) - create reversed iterable view of a *coll* materialized collection" }
 	};
