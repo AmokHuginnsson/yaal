@@ -168,7 +168,6 @@ public:
 	static HHuginn::value_t stat( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "FileSystem.stat", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
-		HHuginn::value_t v( thread_->runtime().none_value() );
 		HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
 		return (
 			thread_->object_factory().create<HFileStat>(
@@ -179,6 +178,12 @@ public:
 				get_string( values_[0] )
 			)
 		);
+		M_EPILOG
+	}
+	static HHuginn::value_t exists( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "FileSystem.stat", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
+		return ( filesystem::exists( get_string( values_[0] ) ) ? thread_->runtime().true_value() : thread_->runtime().false_value() );
 		M_EPILOG
 	}
 private:
@@ -232,6 +237,7 @@ HHuginn::value_t HFileSystemCreator::do_new_instance( HRuntime* runtime_ ) {
 		{ "chmod",                     runtime_->create_method( &HFileSystem::chmod ),   "( *path*, *mode* ) - change file mode bits for file *path* to new mode *mode*" },
 		{ "dir",                       runtime_->create_method( &HFileSystem::dir ),     "( *path* ) - list content of the directory given by *path*" },
 		{ "stat",                      runtime_->create_method( &HFileSystem::stat ),    "( *path* ) - get metadata information for file given by *path*" },
+		{ "exists",                    runtime_->create_method( &HFileSystem::exists ),  "( *path* ) - tell if given *path* exists, return false for broken links" },
 		{ "current_working_directory", runtime_->create_method( &HFileSystem::current_working_directory ), "get current working directory path" }
 	};
 	c->redefine( nullptr, fd );
