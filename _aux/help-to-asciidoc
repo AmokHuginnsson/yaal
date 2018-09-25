@@ -139,6 +139,26 @@ def main():
 	out.write( "NAME\n----\n" )
 	out.write( name + "\n\n" )
 	out.write( "SYNOPSIS\n--------\n" )
+
+	opts = ""
+	optsLen = 0
+	maxLen = 70 - len( args.project )
+	for o in options:
+		if o._short:
+			short = o._short.split( "," )[0]
+			valName = " "
+			if o._value:
+				valName = " *{}* ".format( o._value )
+				optsLen -= 2
+			opt = "[ **{}**{}] ".format( short, valName )
+			optsLen -= 4
+			opts += opt
+			optsLen += len( opt )
+			if optsLen > maxLen:
+				optsLen = 0
+				opts += "{zwsp}" + "{nbsp}" * ( len( args.project ) + 1 )
+	usage = usage.replace( "[*OPTION*]...", opts )
+
 	out.write( markdown_to_asciidoc( usage ) + "\n\n" )
 	out.write( "DESCRIPTION\n-----------\n" )
 	out.write( "\n".join( map( markdown_to_asciidoc, preamble[:-1] ) ) + "\n\n" )
