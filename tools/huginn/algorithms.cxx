@@ -18,6 +18,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "zip.hxx"
 #include "slice.hxx"
 #include "chain.hxx"
+#include "product.hxx"
 #include "tuple.hxx"
 #include "list.hxx"
 #include "deque.hxx"
@@ -47,6 +48,7 @@ class HAlgorithms : public HHuginn::HValue {
 	HHuginn::class_t _zipClass;
 	HHuginn::class_t _sliceClass;
 	HHuginn::class_t _chainClass;
+	HHuginn::class_t _productClass;
 	HHuginn::class_t _exceptionClass;
 public:
 	HAlgorithms( HHuginn::HClass* class_ )
@@ -59,6 +61,7 @@ public:
 		, _zipClass( HZip::get_class( class_->runtime(), class_ ) )
 		, _sliceClass( HSlice::get_class( class_->runtime(), class_ ) )
 		, _chainClass( HChain::get_class( class_->runtime(), class_ ) )
+		, _productClass( HProduct::get_class( class_->runtime(), class_ ) )
 		, _exceptionClass( class_exception( class_ ) ) {
 		return;
 	}
@@ -79,6 +82,9 @@ public:
 	}
 	static HHuginn::value_t chain( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		return ( static_cast<HAlgorithms*>( object_->raw() )->do_chain( thread_, values_, position_ ) );
+	}
+	static HHuginn::value_t product( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		return ( static_cast<HAlgorithms*>( object_->raw() )->do_product( thread_, values_, position_ ) );
 	}
 	static HHuginn::value_t reduce( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		char const name[] = "Algorithms.reduce";
@@ -447,6 +453,30 @@ private:
 		return ( thread_->object_factory().create<HChain>( _chainClass.raw(), values_ ) );
 		M_EPILOG
 	}
+	HHuginn::value_t do_product( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "Algorithms.product";
+		verify_arg_count( name, values_, 1, meta::max_signed<int>::value, thread_, position_ );
+		int cols( static_cast<int>( values_.get_size() ) );
+		for ( int i( 0 ); i < cols; ++ i ) {
+			verify_arg_collection( name, values_, i, ARITY::MULTIPLE, ONTICALLY::VIRTUAL, thread_, position_ );
+		}
+		HProduct::axes_t axes;
+		for ( HHuginn::value_t& v : values_ ) {
+			HHuginn::HIterable const* col( static_cast<HHuginn::HIterable const*>( v.raw() ) );
+			HHuginn::HIterable::iterator_t it( const_cast<HHuginn::HIterable*>( col )->iterator( thread_, position_ ) );
+			HProduct::axes_t::value_type axis;
+			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
+				axis.push_back( it->value( thread_, position_ ) );
+				it->next( thread_, position_ );
+			}
+			if ( ! axis.is_empty() ) {
+				axes.push_back( yaal::move( axis ) );
+			}
+		}
+		return ( thread_->object_factory().create<HProduct>( _productClass.raw(), yaal::move( axes ) ) );
+		M_EPILOG
+	}
 	HHuginn::value_t do_iterator( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Algorithms.iterator";
@@ -566,6 +596,7 @@ HHuginn::value_t HAlgorithmsCreator::do_new_instance( HRuntime* runtime_ ) {
 		{ "sorted",      runtime_->create_method( &HAlgorithms::sorted ),      "( *iterable* [, *callable*] ) - return content of *iterable* as sorted `list`, using *callable* to retrieve keys for element comparison" },
 		{ "zip",         runtime_->create_method( &HAlgorithms::zip ),         "( *iterable1*, *iterable2*, ... ) - create zipped iterable view of a set of iterables" },
 		{ "chain",       runtime_->create_method( &HAlgorithms::chain ),       "( *iterable1*, *iterable2*, ... ) - create iterable view of a chained set of iterables" },
+		{ "product",     runtime_->create_method( &HAlgorithms::product ),     "( *iterable1*, *iterable2*, ... ) - create iterable view of a Cartesian product of a set of iterables" },
 		{ "iterator",    runtime_->create_method( &HAlgorithms::iterator ),    "( *iterable* ) - create manual iterator object for given iterable" },
 		{ "reversed",    runtime_->create_method( &HAlgorithms::reversed ),    "( *coll* ) - create reversed iterable view of a *coll* materialized collection" }
 	};
