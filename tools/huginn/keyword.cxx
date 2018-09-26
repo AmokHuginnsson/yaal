@@ -38,12 +38,7 @@ HHuginn::identifier_id_t const NUMBER( REAL + 1 );
 HHuginn::identifier_id_t const STRING( NUMBER + 1 );
 HHuginn::identifier_id_t const CHARACTER( STRING + 1 );
 HHuginn::identifier_id_t const BOOLEAN( CHARACTER + 1 );
-HHuginn::identifier_id_t const SIZE( BOOLEAN + 1 );
-HHuginn::identifier_id_t const TYPE( SIZE + 1 );
-HHuginn::identifier_id_t const COPY( TYPE + 1 );
-HHuginn::identifier_id_t const OBSERVE( COPY + 1 );
-HHuginn::identifier_id_t const USE( OBSERVE + 1 );
-HHuginn::identifier_id_t const TUPLE( USE + 1 );
+HHuginn::identifier_id_t const TUPLE( BOOLEAN + 1 );
 HHuginn::identifier_id_t const LIST( TUPLE + 1 );
 HHuginn::identifier_id_t const DEQUE( LIST + 1 );
 HHuginn::identifier_id_t const DICT( DEQUE + 1 );
@@ -61,12 +56,17 @@ HHuginn::identifier_id_t const TYPE_UNBOUND_METHOD( TYPE_METHOD + 1 );
 HHuginn::identifier_id_t const TYPE_BOUND_METHOD( TYPE_UNBOUND_METHOD + 1 );
 HHuginn::identifier_id_t const TYPE_VARIADIC_PARAMETERS( TYPE_BOUND_METHOD + 1 );
 HHuginn::identifier_id_t const TYPE_NAMED_PARAMETERS( TYPE_VARIADIC_PARAMETERS + 1 );
+HHuginn::identifier_id_t const SIZE( TYPE_NAMED_PARAMETERS + 1 );
+HHuginn::identifier_id_t const TYPE( SIZE + 1 );
+HHuginn::identifier_id_t const COPY( TYPE + 1 );
+HHuginn::identifier_id_t const OBSERVE( COPY + 1 );
+HHuginn::identifier_id_t const USE( OBSERVE + 1 );
 
 }
 
 namespace INTERFACE {
 
-HHuginn::identifier_id_t const CLONE( BUILTIN::TYPE_NAMED_PARAMETERS + 1 );
+HHuginn::identifier_id_t const CLONE( BUILTIN::USE + 1 );
 HHuginn::identifier_id_t const GET_SIZE( CLONE + 1 );
 HHuginn::identifier_id_t const SUBSCRIPT( GET_SIZE + 1 );
 HHuginn::identifier_id_t const ITERATOR( SUBSCRIPT + 1 );
@@ -147,11 +147,6 @@ char const* NUMBER    = "number";
 char const* STRING    = "string";
 char const* CHARACTER = "character";
 char const* BOOLEAN   = "boolean";
-char const* SIZE      = "size";
-char const* TYPE      = "type";
-char const* COPY      = "copy";
-char const* OBSERVE   = "observe";
-char const* USE       = "use";
 char const* TUPLE     = "tuple";
 char const* LIST      = "list";
 char const* DEQUE     = "deque";
@@ -171,6 +166,11 @@ char const* TYPE_BOUND_METHOD        = "*bound_method*";
 char const* TYPE_VARIADIC_PARAMETERS = "*variadic_parameters*";
 char const* TYPE_NAMED_PARAMETERS    = "*named_parameters*";
 char const* TYPE_UNKNOWN             = "*unknown*";
+char const* SIZE      = "size";
+char const* TYPE      = "type";
+char const* COPY      = "copy";
+char const* OBSERVE   = "observe";
+char const* USE       = "use";
 
 }
 

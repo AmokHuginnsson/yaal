@@ -36,11 +36,6 @@ extern HHuginn::identifier_id_t const NUMBER;
 extern HHuginn::identifier_id_t const STRING;
 extern HHuginn::identifier_id_t const CHARACTER;
 extern HHuginn::identifier_id_t const BOOLEAN;
-extern HHuginn::identifier_id_t const SIZE;
-extern HHuginn::identifier_id_t const TYPE;
-extern HHuginn::identifier_id_t const COPY;
-extern HHuginn::identifier_id_t const OBSERVE;
-extern HHuginn::identifier_id_t const USE;
 extern HHuginn::identifier_id_t const TUPLE;
 extern HHuginn::identifier_id_t const LIST;
 extern HHuginn::identifier_id_t const DEQUE;
@@ -60,6 +55,11 @@ extern HHuginn::identifier_id_t const TYPE_BOUND_METHOD;
 extern HHuginn::identifier_id_t const TYPE_VARIADIC_PARAMETERS;
 extern HHuginn::identifier_id_t const TYPE_NAMED_PARAMETERS;
 extern HHuginn::identifier_id_t const TYPE_UNKNOWN;
+extern HHuginn::identifier_id_t const SIZE;
+extern HHuginn::identifier_id_t const TYPE;
+extern HHuginn::identifier_id_t const COPY;
+extern HHuginn::identifier_id_t const OBSERVE;
+extern HHuginn::identifier_id_t const USE;
 
 }
 
@@ -140,11 +140,6 @@ extern char const* NUMBER;
 extern char const* STRING;
 extern char const* CHARACTER;
 extern char const* BOOLEAN;
-extern char const* SIZE;
-extern char const* TYPE;
-extern char const* COPY;
-extern char const* OBSERVE;
-extern char const* USE;
 extern char const* TUPLE;
 extern char const* LIST;
 extern char const* DEQUE;
@@ -164,6 +159,11 @@ extern char const* TYPE_BOUND_METHOD;
 extern char const* TYPE_VARIADIC_PARAMETERS;
 extern char const* TYPE_NAMED_PARAMETERS;
 extern char const* TYPE_UNKNOWN;
+extern char const* SIZE;
+extern char const* TYPE;
+extern char const* COPY;
+extern char const* OBSERVE;
+extern char const* USE;
 
 }
 
