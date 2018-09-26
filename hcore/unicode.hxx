@@ -315,6 +315,10 @@ static code_point_t const LATIN_SUBSCRIPT_SEVEN                 = code_point_t( 
 static code_point_t const LATIN_SUBSCRIPT_EIGHT                 = code_point_t( 0x2088 );
 static code_point_t const LATIN_SUBSCRIPT_NINE                  = code_point_t( 0x2089 );
 
+/* Mathematical Operators */
+
+static code_point_t const SQUARE_ROOT                           = code_point_t( 0x221a );
+
 /* Miscellaneous Symbols. */
 static code_point_t const SYMBOL_WHITE_FROWINING_FACE           = code_point_t( 0x2639 );
 static code_point_t const SYMBOL_WHITE_SMILING_FACE             = code_point_t( 0x263a );

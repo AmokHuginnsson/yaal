@@ -10,6 +10,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "runtime.hxx"
 #include "tools/huginn/thread.hxx"
 #include "helper.hxx"
+#include "keyword.hxx"
 #include "exception.hxx"
 #include "objectfactory.hxx"
 #include "packagefactory.hxx"
@@ -108,29 +109,6 @@ public:
 	static HHuginn::value_t e( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		return ( get_constant( "Mathematics.e", &number::E, math::E, thread_, values_, position_ ) );
-		M_EPILOG
-	}
-	static HHuginn::value_t square_root( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-		M_PROLOG
-		char const name[] = "Mathematics.square_root";
-		verify_arg_count( name, values_, 1, 1, thread_, position_ );
-		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, thread_, position_ ) );
-		HHuginn::value_t v( thread_->runtime().none_value() );
-		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber const& val( get_number( values_[0] ) );
-			if ( val >= number::N0 ) {
-				v = thread_->object_factory().create_number( math::square_root( val ) );
-			}
-		} else {
-			double long val( get_real( values_[0] ) );
-			if ( val >= 0 ) {
-				v = thread_->object_factory().create_real( math::square_root( val ) );
-			}
-		}
-		if ( v == thread_->runtime().none_value() ) {
-			thread_->raise( static_cast<HMathematics*>( object_->raw() )->_exceptionClass.raw(), "bad domain", position_ );
-		}
-		return ( v );
 		M_EPILOG
 	}
 	static HHuginn::value_t natural_exponential( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -548,7 +526,7 @@ HHuginn::value_t HMathematicsCreator::do_new_instance( HRuntime* runtime_ ) {
 	HHuginn::field_definitions_t fd{
 		{ "pi",                   runtime_->create_method( &HMathematics::pi ),                   "( *type* [, *precision*] ) - get value of $\\pi$ of type *type*, potentially with given *precision*" },
 		{ "e",                    runtime_->create_method( &HMathematics::e ),                    "( *type* [, *precision*] ) - get value of $e$ of type *type*, potentially with given *precision*" },
-		{ "square_root",          runtime_->create_method( &HMathematics::square_root ),          "( *value* ) - calculate square root of given *value*" },
+		{ "square_root",          runtime_->create_method( &huginn_builtin::square_root, "Mathematics.square_root" ), "( *value* ) - calculate square root of given *value*" },
 		{ "natural_exponential",  runtime_->create_method( &HMathematics::natural_exponential ),  "( *x* ) - calculate value of $e^x$ (value of natural exponential of *x*)" },
 		{ "natural_logarithm",    runtime_->create_method( &HMathematics::natural_logarithm ),    "( *x* ) - find natural logarithm of value *x*" },
 		{ "sinus",                runtime_->create_method( &HMathematics::sinus ),                "( *arg* ) - calculate value of *sine* function of *arg* argument" },

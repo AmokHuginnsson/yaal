@@ -60,6 +60,7 @@ extern HHuginn::identifier_id_t const TYPE;
 extern HHuginn::identifier_id_t const COPY;
 extern HHuginn::identifier_id_t const OBSERVE;
 extern HHuginn::identifier_id_t const USE;
+extern HHuginn::identifier_id_t const SQUARE_ROOT;
 
 }
 
@@ -164,6 +165,7 @@ extern char const* TYPE;
 extern char const* COPY;
 extern char const* OBSERVE;
 extern char const* USE;
+extern char const* SQUARE_ROOT;
 
 }
 

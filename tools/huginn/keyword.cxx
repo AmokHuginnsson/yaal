@@ -61,12 +61,13 @@ HHuginn::identifier_id_t const TYPE( SIZE + 1 );
 HHuginn::identifier_id_t const COPY( TYPE + 1 );
 HHuginn::identifier_id_t const OBSERVE( COPY + 1 );
 HHuginn::identifier_id_t const USE( OBSERVE + 1 );
+HHuginn::identifier_id_t const SQUARE_ROOT( USE + 1 );
 
 }
 
 namespace INTERFACE {
 
-HHuginn::identifier_id_t const CLONE( BUILTIN::USE + 1 );
+HHuginn::identifier_id_t const CLONE( BUILTIN::SQUARE_ROOT + 1 );
 HHuginn::identifier_id_t const GET_SIZE( CLONE + 1 );
 HHuginn::identifier_id_t const SUBSCRIPT( GET_SIZE + 1 );
 HHuginn::identifier_id_t const ITERATOR( SUBSCRIPT + 1 );
@@ -171,6 +172,7 @@ char const* TYPE      = "type";
 char const* COPY      = "copy";
 char const* OBSERVE   = "observe";
 char const* USE       = "use";
+char const* SQUARE_ROOT              = "√";
 
 }
 
@@ -265,7 +267,8 @@ words_t _builtin_ = {{
 	BUILTIN::SIZE,
 	BUILTIN::COPY,
 	BUILTIN::OBSERVE,
-	BUILTIN::USE
+	BUILTIN::USE,
+	BUILTIN::SQUARE_ROOT
 }};
 
 words_t _standardLibrary_ = {{

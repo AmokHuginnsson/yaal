@@ -8,6 +8,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "keyword.hxx"
 #include "compiler.hxx"
 #include "tools/util.hxx"
+#include "hcore/unicode.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -23,6 +24,10 @@ namespace {
 typedef yaal::hcore::HArray<bool> flags_t;
 static code_point_t const CODE_POINT_CUT_OFF( 0x10000u );
 
+inline void common_specific( flags_t& flags_ ) {
+	flags_[ static_cast<int>( unicode::CODE_POINT::SQUARE_ROOT.get() ) ] = true;
+}
+
 flags_t make_heads( void ) {
 	flags_t heads;
 	heads.reserve( static_cast<int>( CODE_POINT_CUT_OFF.get() ) );
@@ -33,6 +38,7 @@ flags_t make_heads( void ) {
 			|| ( cp == '_'_ycp )
 		);
 	}
+	common_specific( heads );
 	return ( heads );
 }
 
@@ -48,6 +54,7 @@ flags_t make_tails( void ) {
 			|| ( cp == '_'_ycp )
 		);
 	}
+	common_specific( tails );
 	return ( tails );
 }
 
