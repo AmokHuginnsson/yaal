@@ -7,7 +7,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "thread.hxx"
 #include "keyword.hxx"
 #include "operator.hxx"
-#include "value_builtin.hxx"
+#include "instruction.hxx"
 #include "exception.hxx"
 #include "tools/util.hxx"
 #include "tools/hstringstream.hxx"
@@ -29,12 +29,12 @@ HHuginn::HValueHashHelper::HValueHashHelper( void )
 
 HHuginn::HValueHashHelper::size_type HHuginn::HValueHashHelper::operator()( HHuginn::value_t const& value_ ) const {
 	M_ASSERT( _thread != nullptr );
-	return ( huginn::value_builtin::hash( _thread, value_, _position ) );
+	return ( huginn::instruction::hash( _thread, value_, _position ) );
 }
 
 bool HHuginn::HValueHashHelper::operator()( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) const {
 	M_ASSERT( _thread != nullptr );
-	return ( ( v1_->type_id() == v2_->type_id() ) && huginn::value_builtin::equals( _thread, v1_, v2_, _position ) );
+	return ( ( v1_->type_id() == v2_->type_id() ) && huginn::instruction::equals( _thread, v1_, v2_, _position ) );
 }
 
 HHuginn::HValueCompareHelper::HValueCompareHelper( compare_t compare_ )

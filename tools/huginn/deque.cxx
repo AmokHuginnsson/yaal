@@ -5,10 +5,11 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "deque.hxx"
 #include "runtime.hxx"
+#include "builtin.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
 #include "objectfactory.hxx"
-#include "value_builtin.hxx"
+#include "instruction.hxx"
 #include "tools/xmath.hxx"
 
 using namespace yaal;
@@ -273,7 +274,7 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 	int long hashValue( static_cast<int long>( HHuginn::TYPE::DEQUE ) );
 	for ( HHuginn::value_t const& v : values ) {
 		hashValue *= 3;
-		hashValue += value_builtin::hash( thread_, v, position_ );
+		hashValue += instruction::hash( thread_, v, position_ );
 	}
 	return ( thread_->object_factory().create_integer( hashValue ) );
 	M_EPILOG
@@ -285,7 +286,7 @@ inline HHuginn::value_t less( huginn::HThread* thread_, HHuginn::value_t* object
 	verify_signature( "deque.less", values_, { HHuginn::TYPE::DEQUE }, thread_, position_ );
 	HHuginn::HDeque::values_t const& l( static_cast<HHuginn::HDeque*>( object_->raw() )->value() );
 	HHuginn::HDeque::values_t const& r( static_cast<HHuginn::HDeque const*>( values_[0].raw() )->value() );
-	HHuginn::HValueCompareHelper lessHelper( &value_builtin::less );
+	HHuginn::HValueCompareHelper lessHelper( &instruction::less );
 	lessHelper.anchor( thread_, position_ );
 	bool res( lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), cref( lessHelper ) ) );
 	return ( thread_->object_factory().create_boolean( res ) );
@@ -300,7 +301,7 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	HHuginn::HDeque::values_t const& r( static_cast<HHuginn::HDeque const*>( values_[0].raw() )->value() );
 	bool equal( l.get_size() == r.get_size() );
 	for ( int long i( 0 ), c( l.get_size() ); equal && ( i < c ); ++ i ) {
-		equal = value_builtin::equals( thread_, l[i], r[i], position_ );
+		equal = instruction::equals( thread_, l[i], r[i], position_ );
 	}
 	return ( thread_->object_factory().create_boolean( equal ) );
 	M_EPILOG
@@ -324,7 +325,7 @@ public:
 			"The `deque` is a collection type that is used to represent and operate on deque of values. "
 			"It supports basic subscript and range operators. "
 			"It also supports efficient operations of addition and removal of its elements at its both ends.",
-			&huginn_builtin::deque
+			&builtin::deque
 		)
 		, _reversedDequeClass( HReversedDeque::get_class( runtime_, this ) ) {
 		HHuginn::field_definitions_t fd{
@@ -428,7 +429,7 @@ int long HHuginn::HDeque::find( huginn::HThread* thread_, int position_, HHuginn
 			_data.cbegin() + start_,
 			_data.cbegin() + stop_,
 			[thread_, &val_, position_]( HHuginn::value_t const& elem_ ) {
-				return ( value_builtin::equals( thread_, val_, elem_, position_ ) );
+				return ( instruction::equals( thread_, val_, elem_, position_ ) );
 			}
 		)
 	);

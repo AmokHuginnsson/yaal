@@ -8,7 +8,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "helper.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
-#include "value_builtin.hxx"
+#include "instruction.hxx"
 #include "hcore/safe_int.hxx"
 
 using namespace yaal;

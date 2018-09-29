@@ -5,6 +5,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
 #include "runtime.hxx"
+#include "builtin.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
@@ -33,7 +34,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			"The `integer` is a scalar type that is used to represent and operate on integers. "
 			"It supports basic operations of addition, subtraction, multiplication, division, modulo and comparisons. "
 			"The range of possible values it can hold is [-2^32, 2^32).",
-			&huginn_builtin::integer
+			&builtin::integer
 		)
 	);
 	return ( c );

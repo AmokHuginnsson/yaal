@@ -5,10 +5,11 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "matrix.hxx"
 #include "runtime.hxx"
+#include "builtin.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
-#include "value_builtin.hxx"
+#include "instruction.hxx"
 #include "hcore/safe_int.hxx"
 
 using namespace yaal;
@@ -46,9 +47,9 @@ HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass const* class_, HHugi
 					position_
 				);
 			}
-			if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::number ) ) {
+			if ( fr.function().id() == bit_cast<void const*>( &builtin::number ) ) {
 				_data = data_t( make_resource<arbitrary_precision_matrix_t>( myRows, cols ) );
-			} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::real ) ) {
+			} else if ( fr.function().id() == bit_cast<void const*>( &builtin::real ) ) {
 				_data = data_t( make_resource<floating_point_matrix_t>( myRows, cols ) );
 			} else {
 				throw HHuginn::HHuginnRuntimeException(

@@ -2,8 +2,8 @@
 
 /* YAAL_PRIVATE_IMPLEMENTATION_DETAIL */
 
-#ifndef YAAL_TOOLS_HUGINN_GRAMMAR_HXX_INCLUDED
-#define YAAL_TOOLS_HUGINN_GRAMMAR_HXX_INCLUDED 1
+#ifndef YAAL_TOOLS_HUGINN_INSTRUCTION_HXX_INCLUDED
+#define YAAL_TOOLS_HUGINN_INSTRUCTION_HXX_INCLUDED 1
 
 #include "tools/hhuginn.hxx"
 #include "tools/huginn/frame.hxx"
@@ -16,7 +16,7 @@ namespace tools {
 
 namespace huginn {
 
-namespace value_builtin {
+namespace instruction {
 
 HHuginn::value_t subscript( HThread*, HFrame::ACCESS, HHuginn::value_t&, HHuginn::value_t const&, int );
 HHuginn::value_t range( HThread*, HHuginn::value_t&, HHuginn::value_t const&, HHuginn::value_t const&, HHuginn::value_t const&, int );
@@ -38,13 +38,14 @@ bool is_element_of( HThread*, OPERATOR, HHuginn::value_t const&, HHuginn::value_
 int long hash( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t boolean_xor( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 HHuginn::value_t boolean_not( HThread*, HHuginn::value_t const&, int );
+yaal::hcore::HString string_representation( HThread*, HHuginn::value_t const&, HCycleTracker&, int );
+
 HHuginn::value_t string( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t integer( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t real( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t boolean( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t character( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t number( HThread*, HHuginn::value_t const&, int );
-yaal::hcore::HString string_representation( HThread*, HHuginn::value_t const&, HCycleTracker&, int );
 
 }
 
@@ -54,5 +55,5 @@ yaal::hcore::HString string_representation( HThread*, HHuginn::value_t const&, H
 
 }
 
-#endif /* #ifndef YAAL_TOOLS_HUGINN_GRAMMAR_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_HUGINN_INSTRUCTION_HXX_INCLUDED */
 

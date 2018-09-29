@@ -5,13 +5,14 @@
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
-#include "value_builtin.hxx"
+#include "instruction.hxx"
 #include "runtime.hxx"
 #include "thread.hxx"
 #include "helper.hxx"
 #include "exception.hxx"
 #include "keyword.hxx"
 #include "operator.hxx"
+#include "builtin.hxx"
 #include "objectfactory.hxx"
 
 using namespace yaal;
@@ -23,7 +24,7 @@ namespace tools {
 
 namespace huginn {
 
-namespace value_builtin {
+namespace instruction {
 
 HHuginn::value_t subscript(
 	HThread* thread_,
@@ -878,7 +879,7 @@ HHuginn::value_t fallback_string_conversion( HThread* thread_, HHuginn::value_t 
 		v = thread_->object_factory().create_string( get_string( v_ ) );
 	} else {
 		HCycleTracker cycleTracker;
-		v = thread_->runtime().object_factory()->create_string( string_representation( thread_, v_, cycleTracker, position_ ) );
+		v = thread_->runtime().object_factory()->create_string( instruction::string_representation( thread_, v_, cycleTracker, position_ ) );
 	}
 	return ( v );
 }
@@ -1186,7 +1187,6 @@ HHuginn::value_t number( HThread* thread_, HHuginn::value_t const& v_, int posit
 }
 
 }
-
 
 }
 

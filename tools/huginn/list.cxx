@@ -6,7 +6,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "list.hxx"
 #include "helper.hxx"
 #include "iterator.hxx"
-#include "value_builtin.hxx"
+#include "instruction.hxx"
+#include "builtin.hxx"
 #include "runtime.hxx"
 #include "objectfactory.hxx"
 #include "tools/xmath.hxx"
@@ -207,7 +208,7 @@ HHuginn::value_t sort( huginn::HThread* thread_, HHuginn::value_t* object_, HHug
 	}
 	HHuginn::HList::values_t& data( static_cast<HHuginn::HList*>( object_->raw() )->value() );
 	if ( ! key ) {
-		HHuginn::HValueCompareHelper less( &value_builtin::less );
+		HHuginn::HValueCompareHelper less( &instruction::less );
 		less.anchor( thread_, position_ );
 		sort( data.begin(), data.end(), cref( less ) );
 	} else {
@@ -216,7 +217,7 @@ HHuginn::value_t sort( huginn::HThread* thread_, HHuginn::value_t* object_, HHug
 			data.begin(), data.end(),
 			[&k, &thread_, &position_]( HHuginn::value_t const& l_, HHuginn::value_t const& r_ ) {
 				return (
-					value_builtin::less(
+					instruction::less(
 						thread_,
 						k( thread_, nullptr, HArguments( thread_, l_ ), position_ ),
 						k( thread_, nullptr, HArguments( thread_, r_ ), position_ ),
@@ -269,7 +270,7 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 	int long hashValue( static_cast<int long>( HHuginn::TYPE::LIST ) );
 	for ( HHuginn::value_t const& v : values ) {
 		hashValue *= 3;
-		hashValue += value_builtin::hash( thread_, v, position_ );
+		hashValue += instruction::hash( thread_, v, position_ );
 	}
 	return ( thread_->object_factory().create_integer( hashValue ) );
 	M_EPILOG
@@ -281,7 +282,7 @@ inline HHuginn::value_t less( huginn::HThread* thread_, HHuginn::value_t* object
 	verify_signature( "list.less", values_, { HHuginn::TYPE::LIST }, thread_, position_ );
 	HHuginn::HList::values_t const& l( static_cast<HHuginn::HList*>( object_->raw() )->value() );
 	HHuginn::HList::values_t const& r( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
-	HHuginn::HValueCompareHelper lessHelper( &value_builtin::less );
+	HHuginn::HValueCompareHelper lessHelper( &instruction::less );
 	lessHelper.anchor( thread_, position_ );
 	bool res( lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), cref( lessHelper ) ) );
 	return ( thread_->object_factory().create_boolean( res ) );
@@ -296,7 +297,7 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	HHuginn::HList::values_t const& r( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
 	bool equal( l.get_size() == r.get_size() );
 	for ( int long i( 0 ), c( l.get_size() ); equal && ( i < c ); ++ i ) {
-		equal = value_builtin::equals( thread_, l[i], r[i], position_ );
+		equal = instruction::equals( thread_, l[i], r[i], position_ );
 	}
 	return ( thread_->object_factory().create_boolean( equal ) );
 	M_EPILOG
@@ -320,7 +321,7 @@ public:
 			"The `list` is a collection type that is used to represent and operate on `list` of values. "
 			"It supports basic subscript and range operators. "
 			"It also supports efficient operations of addition and removal of its elements from its (right) end.",
-			&huginn_builtin::list
+			&builtin::list
 		)
 		, _reversedListClass( HReversedList::get_class( runtime_, this ) ) {
 		HHuginn::field_definitions_t fd{
@@ -409,7 +410,7 @@ int long HHuginn::HList::find( huginn::HThread* thread_, int position_, HHuginn:
 			_data.cbegin() + start_,
 			_data.cbegin() + stop_,
 			[thread_, &val_, position_]( HHuginn::value_t const& elem_ ) {
-				return ( value_builtin::equals( thread_, val_, elem_, position_ ) );
+				return ( instruction::equals( thread_, val_, elem_, position_ ) );
 			}
 		)
 	);

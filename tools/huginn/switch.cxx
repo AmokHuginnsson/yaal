@@ -7,7 +7,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "thread.hxx"
 #include "expression.hxx"
 #include "scope.hxx"
-#include "value_builtin.hxx"
+#include "instruction.hxx"
 
 namespace yaal {
 
@@ -48,7 +48,7 @@ void HSwitch::do_execute( HThread* thread_ ) const {
 						throw HHuginn::HHuginnRuntimeException( "Case type does not match switch type.", file_id(), it->_expression->position() );
 					}
 				}
-				if ( matched || value_builtin::equals( thread_, v, f->result(), it->_expression->position() ) ) {
+				if ( matched || instruction::equals( thread_, v, f->result(), it->_expression->position() ) ) {
 					matched = true;
 					it->_scope->execute( thread_ );
 				}

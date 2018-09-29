@@ -22,7 +22,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/huginn/compiler.hxx"
 #include "tools/huginn/iterator.hxx"
 #include "tools/huginn/keyword.hxx"
-#include "tools/huginn/value_builtin.hxx"
+#include "tools/huginn/instruction.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -1125,7 +1125,7 @@ yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn* huginn_
 	HString s;
 	try {
 		HCycleTracker cycleTracker;
-		s = value_builtin::string_representation( threadHolder.raw(), value_, cycleTracker, 0 );
+		s = instruction::string_representation( threadHolder.raw(), value_, cycleTracker, 0 );
 	} catch ( HHuginn::HHuginnRuntimeException const& e ) {
 		s = e.message();
 	} catch ( HException const& e ) {

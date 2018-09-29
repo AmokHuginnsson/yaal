@@ -7,6 +7,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
 #include "runtime.hxx"
+#include "builtin.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
@@ -33,7 +34,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			type_id( HHuginn::TYPE::BLOB ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::BLOB ) ),
 			"The `blob` represents raw memory buffer.",
-			&huginn_builtin::blob
+			&builtin::blob
 		)
 	);
 	return ( c );

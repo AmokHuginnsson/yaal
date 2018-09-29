@@ -10,7 +10,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "time.hxx"
 #include "enumeration.hxx"
 #include "objectfactory.hxx"
-#include "value_builtin.hxx"
+#include "instruction.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;

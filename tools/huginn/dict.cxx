@@ -5,10 +5,11 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "dict.hxx"
 #include "runtime.hxx"
+#include "builtin.hxx"
 #include "iterator.hxx"
 #include "compiler.hxx"
 #include "thread.hxx"
-#include "value_builtin.hxx"
+#include "instruction.hxx"
 #include "helper.hxx"
 #include "objectfactory.hxx"
 
@@ -280,9 +281,9 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 	int long hashValue( static_cast<int long>( HHuginn::TYPE::DICT ) );
 	for ( HHuginn::HDict::values_t::value_type const& v : values ) {
 		hashValue *= 3;
-		hashValue += value_builtin::hash( thread_, v.first, position_ );
+		hashValue += instruction::hash( thread_, v.first, position_ );
 		hashValue *= 3;
-		hashValue += value_builtin::hash( thread_, v.second, position_ );
+		hashValue += instruction::hash( thread_, v.second, position_ );
 	}
 	return ( thread_->object_factory().create_integer( hashValue ) );
 	M_EPILOG
@@ -296,7 +297,7 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	HHuginn::HDict::values_t const& r( static_cast<HHuginn::HDict const*>( values_[0].raw() )->value() );
 	bool equal( l.get_size() == r.get_size() );
 	for ( HHuginn::HDict::values_t::const_iterator lit( l.begin() ), rit( r.begin() ), end( l.end() ); equal && ( lit != end ); ++ lit, ++ rit ) {
-		equal = value_builtin::equals( thread_, lit->first, rit->first, position_ ) && value_builtin::equals( thread_, lit->second, rit->second, position_ );
+		equal = instruction::equals( thread_, lit->first, rit->first, position_ ) && instruction::equals( thread_, lit->second, rit->second, position_ );
 	}
 	return ( thread_->object_factory().create_boolean( equal ) );
 	M_EPILOG
@@ -330,7 +331,7 @@ public:
 			typeId_,
 			identifierId_,
 			doc_,
-			&huginn_builtin::dict
+			&builtin::dict
 		)
 		, _keyValuesDictViewClass( HKeyValuesDictView::get_class( runtime_, this ) )
 		, _reversedDictClass( HReversedDict::get_class( runtime_, this ) ) {
@@ -400,7 +401,7 @@ HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const
 
 HHuginn::HDict::HDict( HHuginn::HClass const* class_, allocator_t const& allocator_ )
 	: HInvalidatingIterable( class_ )
-	, _helper( &value_builtin::less )
+	, _helper( &instruction::less )
 	, _data( _helper, allocator_ )
 	, _keyType( nullptr ) {
 	return;

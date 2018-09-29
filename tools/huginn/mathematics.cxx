@@ -8,6 +8,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/math.hxx"
 #include "tools/hhuginn.hxx"
 #include "runtime.hxx"
+#include "builtin.hxx"
 #include "tools/huginn/thread.hxx"
 #include "helper.hxx"
 #include "keyword.hxx"
@@ -84,9 +85,9 @@ public:
 			throw HHuginn::HHuginnRuntimeException( "Bad precision requested: "_ys.append( precision ), thread_->current_frame()->file_id(), position_ );
 		}
 		HHuginn::value_t v;
-		if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::number ) ) {
+		if ( fr.function().id() == bit_cast<void const*>( &builtin::number ) ) {
 			v = thread_->object_factory().create_number( constantGetter_( precision ) );
-		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::real ) ) {
+		} else if ( fr.function().id() == bit_cast<void const*>( &builtin::real ) ) {
 			v = thread_->object_factory().create_real( real_ );
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
@@ -526,7 +527,7 @@ HHuginn::value_t HMathematicsCreator::do_new_instance( HRuntime* runtime_ ) {
 	HHuginn::field_definitions_t fd{
 		{ "pi",                   runtime_->create_method( &HMathematics::pi ),                   "( *type* [, *precision*] ) - get value of $\\pi$ of type *type*, potentially with given *precision*" },
 		{ "e",                    runtime_->create_method( &HMathematics::e ),                    "( *type* [, *precision*] ) - get value of $e$ of type *type*, potentially with given *precision*" },
-		{ "square_root",          runtime_->create_method( &huginn_builtin::square_root, "Mathematics.square_root" ), "( *value* ) - calculate square root of given *value*" },
+		{ "square_root",          runtime_->create_method( &builtin::square_root, "Mathematics.square_root" ), "( *value* ) - calculate square root of given *value*" },
 		{ "natural_exponential",  runtime_->create_method( &HMathematics::natural_exponential ),  "( *x* ) - calculate value of $e^x$ (value of natural exponential of *x*)" },
 		{ "natural_logarithm",    runtime_->create_method( &HMathematics::natural_logarithm ),    "( *x* ) - find natural logarithm of value *x*" },
 		{ "sinus",                runtime_->create_method( &HMathematics::sinus ),                "( *arg* ) - calculate value of *sine* function of *arg* argument" },

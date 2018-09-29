@@ -7,6 +7,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "runtime.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
+#include "builtin.hxx"
 #include "objectfactory.hxx"
 
 using namespace yaal;
@@ -32,7 +33,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			runtime_->identifier_id( type_name( HHuginn::TYPE::BOOLEAN ) ),
 			"The `boolean` is a scalar type that is used to represent and operate on boolean values. "
 			"It supports basic operations of negation, logical \"and\", \"or\", and \"xor\" and comparisons.",
-			&huginn_builtin::boolean
+			&builtin::boolean
 		)
 	);
 	return ( c );

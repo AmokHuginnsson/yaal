@@ -5,9 +5,10 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "order.hxx"
 #include "runtime.hxx"
+#include "builtin.hxx"
 #include "iterator.hxx"
 #include "compiler.hxx"
-#include "value_builtin.hxx"
+#include "instruction.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
@@ -200,7 +201,7 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 	int long hashValue( static_cast<int long>( HHuginn::TYPE::ORDER ) );
 	for ( HHuginn::value_t const& v : values ) {
 		hashValue *= 3;
-		hashValue += value_builtin::hash( thread_, v, position_ );
+		hashValue += instruction::hash( thread_, v, position_ );
 	}
 	return ( thread_->object_factory().create_integer( hashValue ) );
 	M_EPILOG
@@ -214,7 +215,7 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	HHuginn::HOrder::values_t const& r( static_cast<HHuginn::HOrder const*>( values_[0].raw() )->value() );
 	bool equal( l.get_size() == r.get_size() );
 	for ( HHuginn::HOrder::values_t::const_iterator lit( l.begin() ), rit( r.begin() ), end( l.end() ); equal && ( lit != end ); ++ lit, ++ rit ) {
-		equal = value_builtin::equals( thread_, *lit, *rit, position_ );
+		equal = instruction::equals( thread_, *lit, *rit, position_ );
 	}
 	return ( thread_->object_factory().create_boolean( equal ) );
 	M_EPILOG
@@ -236,7 +237,7 @@ public:
 			huginn::type_id( HHuginn::TYPE::ORDER ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::ORDER ) ),
 			"The `order` is a collection of sorted values of uniform types. It supports operations of addition, search and element removal.",
-			&huginn_builtin::order
+			&builtin::order
 		)
 		, _reversedOrderClass( HReversedOrder::get_class( runtime_, this ) ) {
 		HHuginn::field_definitions_t fd{
@@ -282,7 +283,7 @@ HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const
 
 HHuginn::HOrder::HOrder( HHuginn::HClass const* class_, allocator_t const& allocator_ )
 	: HInvalidatingIterable( class_ )
-	, _helper( &value_builtin::less )
+	, _helper( &instruction::less )
 	, _data( _helper, allocator_ )
 	, _keyType( nullptr ) {
 	return;

@@ -5,11 +5,12 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "string.hxx"
 #include "runtime.hxx"
+#include "builtin.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
-#include "value_builtin.hxx"
+#include "instruction.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -286,7 +287,7 @@ public:
 					if ( ( type == HHuginn::TYPE::INTEGER ) && ( base != BASE::DEC ) ) {
 						formatedValue.assign( int_to_str( static_cast<HHuginn::HInteger const*>( v.raw() )->value(), base, prefix ) );
 					} else {
-						HHuginn::value_t sv( value_builtin::string( _thread, _values[idx], _position ) );
+						HHuginn::value_t sv( instruction::string( _thread, _values[idx], _position ) );
 						formatedValue.assign( static_cast<HHuginn::HString*>( sv.raw() )->value() );
 					}
 					if ( width > formatedValue.get_length() ) {
@@ -436,7 +437,7 @@ public:
 			runtime_->identifier_id( type_name( HHuginn::TYPE::STRING ) ),
 			"The `string` is a scalar type that is used to represent and operate on character strings. "
 			"It supports basic operations of addition and comparisons, it also supports subscript and range operators.",
-			&huginn_builtin::string
+			&builtin::string
 		)
 		, _reversedStringClass( HReversedString::get_class( runtime_, this ) ) {
 		HHuginn::field_definitions_t fd{

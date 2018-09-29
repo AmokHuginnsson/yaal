@@ -8,7 +8,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "runtime.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
-#include "value_builtin.hxx"
+#include "instruction.hxx"
+#include "builtin.hxx"
 #include "packagefactory.hxx"
 #include "objectfactory.hxx"
 #include "range.hxx"
@@ -132,28 +133,28 @@ public:
 		HHuginn::value_t v;
 		HHuginn::HIterable const* src( static_cast<HHuginn::HIterable const*>( values_[0].raw() ) );
 		HHuginn::HIterable::iterator_t it( const_cast<HHuginn::HIterable*>( src )->iterator( thread_, position_ ) );
-		if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::tuple ) ) {
+		if ( fr.function().id() == bit_cast<void const*>( &builtin::tuple ) ) {
 			HHuginn::HTuple::values_t dest;
 			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
 				dest.push_back( it->value( thread_, position_ ) );
 				it->next( thread_, position_ );
 			}
 			v = thread_->object_factory().create_tuple( yaal::move( dest ) );
-		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::list ) ) {
+		} else if ( fr.function().id() == bit_cast<void const*>( &builtin::list ) ) {
 			v = thread_->object_factory().create_list();
 			HHuginn::HList::values_t& dest( static_cast<HHuginn::HList*>( v.raw() )->value() );
 			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
 				dest.push_back( it->value( thread_, position_ ) );
 				it->next( thread_, position_ );
 			}
-		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::deque ) ) {
+		} else if ( fr.function().id() == bit_cast<void const*>( &builtin::deque ) ) {
 			v = thread_->object_factory().create_deque();
 			HHuginn::HDeque::values_t& dest( static_cast<HHuginn::HDeque*>( v.raw() )->value() );
 			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
 				dest.push_back( it->value( thread_, position_ ) );
 				it->next( thread_, position_ );
 			}
-		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::order ) ) {
+		} else if ( fr.function().id() == bit_cast<void const*>( &builtin::order ) ) {
 			v = thread_->object_factory().create_order();
 			HHuginn::HOrder* order( static_cast<HHuginn::HOrder*>( v.raw() ) );
 			HHuginn::HOrder::values_t& dest( order->value() );
@@ -176,7 +177,7 @@ public:
 			if ( keyType ) {
 				order->update_key_type( thread_, keyType, position_ );
 			}
-		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::set ) ) {
+		} else if ( fr.function().id() == bit_cast<void const*>( &builtin::set ) ) {
 			v = thread_->object_factory().create_set();
 			HHuginn::HSet* set( static_cast<HHuginn::HSet*>( v.raw() ) );
 			HHuginn::HSet::values_t& dest( set->value() );
@@ -185,7 +186,7 @@ public:
 				dest.insert( it->value( thread_, position_ ) );
 				it->next( thread_, position_ );
 			}
-		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::dict ) ) {
+		} else if ( fr.function().id() == bit_cast<void const*>( &builtin::dict ) ) {
 			v = thread_->object_factory().create_dict();
 			HHuginn::HDict* dict( static_cast<HHuginn::HDict*>( v.raw() ) );
 			HHuginn::HDict::values_t& dest( dict->value() );
@@ -223,7 +224,7 @@ public:
 			if ( keyType ) {
 				dict->update_key_type( thread_, keyType, position_ );
 			}
-		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::lookup ) ) {
+		} else if ( fr.function().id() == bit_cast<void const*>( &builtin::lookup ) ) {
 			v = thread_->object_factory().create_lookup();
 			HHuginn::HLookup* lookup( static_cast<HHuginn::HLookup*>( v.raw() ) );
 			HHuginn::HLookup::values_t& dest( lookup->value() );
@@ -248,7 +249,7 @@ public:
 				dest.insert( make_pair( data.front(), data.back() ) );
 				it->next( thread_, position_ );
 			}
-		} else if ( fr.function().id() == bit_cast<void const*>( &huginn_builtin::string ) ) {
+		} else if ( fr.function().id() == bit_cast<void const*>( &builtin::string ) ) {
 			HString s;
 			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
 				HHuginn::value_t c( it->value( thread_, position_ ) );
@@ -335,7 +336,7 @@ public:
 		M_PROLOG
 		char const name[] = "Algorithms.min";
 		verify_arg_count( name, values_, 1, meta::max_signed<int>::value, thread_, position_ );
-		HHuginn::HValueCompareHelper less( &value_builtin::less );
+		HHuginn::HValueCompareHelper less( &instruction::less );
 		less.anchor( thread_, position_ );
 		return ( *min_element( values_.begin(), values_.end(), cref( less ) ) );
 		M_EPILOG
@@ -344,7 +345,7 @@ public:
 		M_PROLOG
 		char const name[] = "Algorithms.max";
 		verify_arg_count( name, values_, 1, meta::max_signed<int>::value, thread_, position_ );
-		HHuginn::HValueCompareHelper less( &value_builtin::less );
+		HHuginn::HValueCompareHelper less( &instruction::less );
 		less.anchor( thread_, position_ );
 		return ( *max_element( values_.begin(), values_.end(), cref( less ) ) );
 		M_EPILOG

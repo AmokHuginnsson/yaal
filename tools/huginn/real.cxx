@@ -5,6 +5,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
 #include "runtime.hxx"
+#include "builtin.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
@@ -34,7 +35,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			"It supports basic operations of addition, subtraction, multiplication, division, modulo, power and comparisons, "
 			"it can also be used as an argument in functions and algorithms from Mathematics package. "
 			"The range of possible values it can hold is the same as `double long` from C++ programming language.",
-			&huginn_builtin::real
+			&builtin::real
 		)
 	);
 	return ( c );

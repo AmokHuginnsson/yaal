@@ -6,6 +6,7 @@
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
+#include "builtin.hxx"
 #include "runtime.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
@@ -63,7 +64,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			runtime_->identifier_id( type_name( HHuginn::TYPE::CHARACTER ) ),
 			"The `character` is a scalar type that is used to represent and operate on single characters. "
 			"It supports basic operations of comparisons, case modification and classification.",
-			&huginn_builtin::character
+			&builtin::character
 		)
 	);
 	HHuginn::field_definitions_t fd{

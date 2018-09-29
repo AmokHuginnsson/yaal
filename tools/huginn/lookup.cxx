@@ -5,8 +5,9 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "lookup.hxx"
 #include "runtime.hxx"
+#include "builtin.hxx"
 #include "iterator.hxx"
-#include "value_builtin.hxx"
+#include "instruction.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
@@ -269,9 +270,9 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 	int long hashValue( static_cast<int long>( HHuginn::TYPE::LOOKUP ) );
 	for ( HHuginn::HLookup::values_t::value_type const& v : values ) {
 		hashValue *= 3;
-		hashValue += value_builtin::hash( thread_, v.first, position_ );
+		hashValue += instruction::hash( thread_, v.first, position_ );
 		hashValue *= 3;
-		hashValue += value_builtin::hash( thread_, v.second, position_ );
+		hashValue += instruction::hash( thread_, v.second, position_ );
 	}
 	return ( thread_->object_factory().create_integer( hashValue ) );
 	M_EPILOG
@@ -285,7 +286,7 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	HHuginn::HLookup::values_t const& r( static_cast<HHuginn::HLookup const*>( values_[0].raw() )->value() );
 	bool equal( l.get_size() == r.get_size() );
 	for ( HHuginn::HLookup::values_t::const_iterator lit( l.begin() ), rit( r.begin() ), end( l.end() ); equal && ( lit != end ); ++ lit, ++ rit ) {
-		equal = value_builtin::equals( thread_, lit->first, rit->first, position_ ) && value_builtin::equals( thread_, lit->second, rit->second, position_ );
+		equal = instruction::equals( thread_, lit->first, rit->first, position_ ) && instruction::equals( thread_, lit->second, rit->second, position_ );
 	}
 	return ( thread_->object_factory().create_boolean( equal ) );
 	M_EPILOG
@@ -317,7 +318,7 @@ public:
 			huginn::type_id( HHuginn::TYPE::LOOKUP ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::LOOKUP ) ),
 			doc_,
-			&huginn_builtin::lookup
+			&builtin::lookup
 		)
 		, _keyValuesLookupViewClass( HKeyValuesLookupView::get_class( runtime_, this ) )
 		, _reversedLookupClass( HReversedLookup::get_class( runtime_, this ) ) {
