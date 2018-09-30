@@ -62,12 +62,13 @@ HHuginn::identifier_id_t const COPY( TYPE + 1 );
 HHuginn::identifier_id_t const OBSERVE( COPY + 1 );
 HHuginn::identifier_id_t const USE( OBSERVE + 1 );
 HHuginn::identifier_id_t const SQUARE_ROOT( USE + 1 );
+HHuginn::identifier_id_t const N_ARY_SUMMATION( SQUARE_ROOT + 1 );
 
 }
 
 namespace INTERFACE {
 
-HHuginn::identifier_id_t const CLONE( BUILTIN::SQUARE_ROOT + 1 );
+HHuginn::identifier_id_t const CLONE( BUILTIN::N_ARY_SUMMATION + 1 );
 HHuginn::identifier_id_t const GET_SIZE( CLONE + 1 );
 HHuginn::identifier_id_t const SUBSCRIPT( GET_SIZE + 1 );
 HHuginn::identifier_id_t const ITERATOR( SUBSCRIPT + 1 );
@@ -173,6 +174,7 @@ char const* COPY      = "copy";
 char const* OBSERVE   = "observe";
 char const* USE       = "use";
 char const* SQUARE_ROOT              = "√";
+char const* N_ARY_SUMMATION          = "∑";
 
 }
 

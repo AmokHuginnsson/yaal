@@ -13,6 +13,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "keyword.hxx"
 #include "operator.hxx"
 #include "instruction.hxx"
+#include "iterator.hxx"
 #include "objectfactory.hxx"
 #include "tools/streamtools.hxx"
 
@@ -263,6 +264,32 @@ HHuginn::value_t square_root( char const* name_, huginn::HThread* thread_, HHugi
 		thread_->raise( thread_->object_factory().arithmetic_exception_class(), "bad domain", position_ );
 	}
 	return ( v );
+	M_EPILOG
+}
+
+HHuginn::value_t n_ary_summation( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "∑";
+	verify_arg_count( name, values_, 1, 1, thread_, position_ );
+	verify_arg_collection( name, values_, 0, ARITY::UNARY, ONTICALLY::VIRTUAL, thread_, position_ );
+	HHuginn::value_t accumulator( thread_->runtime().none_value() );
+	HHuginn::HIterable const* src( static_cast<HHuginn::HIterable const*>( values_[0].raw() ) );
+	HHuginn::HIterable::iterator_t it( const_cast<HHuginn::HIterable*>( src )->iterator( thread_, position_ ) );
+	if ( ! it->is_valid( thread_, position_ ) ) {
+		throw HHuginn::HHuginnRuntimeException( "∑ on empty.", thread_->current_frame()->file_id(), position_ );
+	}
+	accumulator = it->value( thread_, position_ );
+	HHuginn::HClass const* c( accumulator->get_class() );
+	it->next( thread_, position_ );
+	while ( it->is_valid( thread_, position_ ) && thread_->can_continue() ) {
+		HHuginn::value_t v( it->value( thread_, position_ ) );
+		if ( v->get_class() != c ) {
+			throw HHuginn::HHuginnRuntimeException( "A non-uniform set under ∑.", thread_->current_frame()->file_id(), position_ );
+		}
+		instruction::add( thread_, accumulator, v, position_ );
+		it->next( thread_, position_ );
+	}
+	return ( accumulator );
 	M_EPILOG
 }
 

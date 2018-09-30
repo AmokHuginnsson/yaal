@@ -25,6 +25,7 @@ typedef yaal::hcore::HArray<bool> flags_t;
 static code_point_t const CODE_POINT_CUT_OFF( 0x10000u );
 
 inline void common_specific( flags_t& flags_ ) {
+	flags_[ static_cast<int>( unicode::CODE_POINT::N_ARY_SUMMATION.get() ) ] = true;
 	flags_[ static_cast<int>( unicode::CODE_POINT::SQUARE_ROOT.get() ) ] = true;
 }
 
