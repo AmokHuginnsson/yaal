@@ -317,6 +317,7 @@ static code_point_t const LATIN_SUBSCRIPT_NINE                  = code_point_t( 
 
 /* Mathematical Operators */
 
+static code_point_t const N_ARY_PRODUCT                         = code_point_t( 0x220F );
 static code_point_t const N_ARY_SUMMATION                       = code_point_t( 0x2211 );
 static code_point_t const SQUARE_ROOT                           = code_point_t( 0x221a );
 

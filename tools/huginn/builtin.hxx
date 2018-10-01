@@ -41,6 +41,7 @@ HHuginn::value_t observe( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t
 HHuginn::value_t use( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 HHuginn::value_t square_root( char const*, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 HHuginn::value_t n_ary_summation( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+HHuginn::value_t n_ary_product( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 HHuginn::value_t print( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 HHuginn::value_t input( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 

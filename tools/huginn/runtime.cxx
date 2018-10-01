@@ -65,6 +65,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			{ BUILTIN::USE, IDENTIFIER::BUILTIN::USE },
 			{ BUILTIN::SQUARE_ROOT, IDENTIFIER::BUILTIN::SQUARE_ROOT },
 			{ BUILTIN::N_ARY_SUMMATION, IDENTIFIER::BUILTIN::N_ARY_SUMMATION },
+			{ BUILTIN::N_ARY_PRODUCT, IDENTIFIER::BUILTIN::N_ARY_PRODUCT },
 			{ INTERFACE::CLONE,            IDENTIFIER::INTERFACE::CLONE },
 			{ INTERFACE::GET_SIZE,         IDENTIFIER::INTERFACE::GET_SIZE },
 			{ INTERFACE::SUBSCRIPT,        IDENTIFIER::INTERFACE::SUBSCRIPT },
@@ -133,6 +134,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			BUILTIN::USE,
 			BUILTIN::SQUARE_ROOT,
 			BUILTIN::N_ARY_SUMMATION,
+			BUILTIN::N_ARY_PRODUCT,
 			INTERFACE::CLONE,
 			INTERFACE::GET_SIZE,
 			INTERFACE::SUBSCRIPT,
@@ -690,6 +692,7 @@ void HRuntime::register_builtins( void ) {
 	M_ENSURE( ( identifier_id( BUILTIN::USE ) == IDENTIFIER::BUILTIN::USE ) && ( identifier_name( IDENTIFIER::BUILTIN::USE ) == BUILTIN::USE ) );
 	M_ENSURE( ( identifier_id( BUILTIN::SQUARE_ROOT ) == IDENTIFIER::BUILTIN::SQUARE_ROOT ) && ( identifier_name( IDENTIFIER::BUILTIN::SQUARE_ROOT ) == BUILTIN::SQUARE_ROOT ) );
 	M_ENSURE( ( identifier_id( BUILTIN::N_ARY_SUMMATION ) == IDENTIFIER::BUILTIN::N_ARY_SUMMATION ) && ( identifier_name( IDENTIFIER::BUILTIN::N_ARY_SUMMATION ) == BUILTIN::N_ARY_SUMMATION ) );
+	M_ENSURE( ( identifier_id( BUILTIN::N_ARY_PRODUCT ) == IDENTIFIER::BUILTIN::N_ARY_PRODUCT ) && ( identifier_name( IDENTIFIER::BUILTIN::N_ARY_PRODUCT ) == BUILTIN::N_ARY_PRODUCT ) );
 	M_ENSURE( ( identifier_id( INTERFACE::CLONE ) == IDENTIFIER::INTERFACE::CLONE ) && ( identifier_name( IDENTIFIER::INTERFACE::CLONE ) == INTERFACE::CLONE ) );
 	M_ENSURE( ( identifier_id( INTERFACE::GET_SIZE ) == IDENTIFIER::INTERFACE::GET_SIZE ) && ( identifier_name( IDENTIFIER::INTERFACE::GET_SIZE ) == INTERFACE::GET_SIZE ) );
 	M_ENSURE( ( identifier_id( INTERFACE::SUBSCRIPT ) == IDENTIFIER::INTERFACE::SUBSCRIPT ) && ( identifier_name( IDENTIFIER::INTERFACE::SUBSCRIPT ) == INTERFACE::SUBSCRIPT ) );
@@ -727,6 +730,7 @@ void HRuntime::register_builtins( void ) {
 	register_builtin_function( BUILTIN::USE, hcore::call( &builtin::use, _1, _2, _3, _4 ), "( *observer* ) - get a reference to a value from given *observer*" );
 	register_builtin_function( BUILTIN::SQUARE_ROOT, hcore::call( &builtin::square_root, BUILTIN::SQUARE_ROOT, _1, _2, _3, _4 ), "( *value* ) - calculate square root of given *value*" );
 	register_builtin_function( BUILTIN::N_ARY_SUMMATION, hcore::call( &builtin::n_ary_summation, _1, _2, _3, _4 ), "( *iterable* ) - calculate a sum of elements from *iterable*" );
+	register_builtin_function( BUILTIN::N_ARY_PRODUCT, hcore::call( &builtin::n_ary_product, _1, _2, _3, _4 ), "( *iterable* ) - calculate a product of elements from *iterable*" );
 	register_builtin_function( "print", hcore::call( &builtin::print, _1, _2, _3, _4 ), "( *str* ) - print a message given by *str* to interpreter's standard output" );
 	register_builtin_function( "input", hcore::call( &builtin::input, _1, _2, _3, _4 ), "read a line of text from interpreter's standard input" );
 	register_builtin_function( KEYWORD::ASSERT, hcore::call( &builtin::assert, _1, _2, _3, _4 ), "( *condition*[, *message*] ) - ensure *condition* is met or bailout with *message*" );

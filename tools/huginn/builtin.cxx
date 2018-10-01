@@ -267,29 +267,49 @@ HHuginn::value_t square_root( char const* name_, huginn::HThread* thread_, HHugi
 	M_EPILOG
 }
 
-HHuginn::value_t n_ary_summation( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	char const name[] = "∑";
-	verify_arg_count( name, values_, 1, 1, thread_, position_ );
-	verify_arg_collection( name, values_, 0, ARITY::UNARY, ONTICALLY::VIRTUAL, thread_, position_ );
+namespace {
+
+using n_ary_action_t = void ( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
+
+HHuginn::value_t n_ary_action( char const* name_, n_ary_action_t action_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
+	verify_arg_count( name_, values_, 1, 1, thread_, position_ );
+	verify_arg_collection( name_, values_, 0, ARITY::UNARY, ONTICALLY::VIRTUAL, thread_, position_ );
 	HHuginn::value_t accumulator( thread_->runtime().none_value() );
 	HHuginn::HIterable const* src( static_cast<HHuginn::HIterable const*>( values_[0].raw() ) );
 	HHuginn::HIterable::iterator_t it( const_cast<HHuginn::HIterable*>( src )->iterator( thread_, position_ ) );
 	if ( ! it->is_valid( thread_, position_ ) ) {
-		throw HHuginn::HHuginnRuntimeException( "∑ on empty.", thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException(
+			hcore::to_string( name_ ).append( " on empty." ), thread_->current_frame()->file_id(), position_
+		);
 	}
 	accumulator = it->value( thread_, position_ );
+	accumulator = accumulator->clone( thread_, &accumulator, position_ );
 	HHuginn::HClass const* c( accumulator->get_class() );
 	it->next( thread_, position_ );
 	while ( it->is_valid( thread_, position_ ) && thread_->can_continue() ) {
 		HHuginn::value_t v( it->value( thread_, position_ ) );
 		if ( v->get_class() != c ) {
-			throw HHuginn::HHuginnRuntimeException( "A non-uniform set under ∑.", thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException(
+				"A non-uniform set under "_ys.append( name_ ).append( "." ), thread_->current_frame()->file_id(), position_
+			);
 		}
-		instruction::add( thread_, accumulator, v, position_ );
+		action_( thread_, accumulator, v, position_ );
 		it->next( thread_, position_ );
 	}
 	return ( accumulator );
+}
+
+}
+
+HHuginn::value_t n_ary_summation( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	return ( n_ary_action( "∑", &instruction::add, thread_, values_, position_ ) );
+	M_EPILOG
+}
+
+HHuginn::value_t n_ary_product( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	return ( n_ary_action( "∏", &instruction::mul, thread_, values_, position_ ) );
 	M_EPILOG
 }
 

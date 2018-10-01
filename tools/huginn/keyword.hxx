@@ -62,6 +62,7 @@ extern HHuginn::identifier_id_t const OBSERVE;
 extern HHuginn::identifier_id_t const USE;
 extern HHuginn::identifier_id_t const SQUARE_ROOT;
 extern HHuginn::identifier_id_t const N_ARY_SUMMATION;
+extern HHuginn::identifier_id_t const N_ARY_PRODUCT;
 
 }
 
@@ -168,6 +169,7 @@ extern char const* OBSERVE;
 extern char const* USE;
 extern char const* SQUARE_ROOT;
 extern char const* N_ARY_SUMMATION;
+extern char const* N_ARY_PRODUCT;
 
 }
 
