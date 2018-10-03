@@ -272,7 +272,9 @@ words_t _builtin_ = {{
 	BUILTIN::COPY,
 	BUILTIN::OBSERVE,
 	BUILTIN::USE,
-	BUILTIN::SQUARE_ROOT
+	BUILTIN::SQUARE_ROOT,
+	BUILTIN::N_ARY_SUMMATION,
+	BUILTIN::N_ARY_PRODUCT
 }};
 
 words_t _standardLibrary_ = {{
