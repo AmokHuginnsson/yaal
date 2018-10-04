@@ -174,6 +174,7 @@ public:
 	void register_global( identifier_id_t, HHuginn::value_t const& );
 	void set_setup( HHuginn::paths_t const&, HHuginn::compiler_setup_t );
 	void register_package( identifier_id_t, identifier_id_t, int );
+	void import_symbols( identifier_id_t, HHuginn::identifiers_t const&, int );
 	class_t create_class(
 		identifier_id_t,
 		yaal::hcore::HString const&,

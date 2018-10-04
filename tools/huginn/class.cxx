@@ -222,7 +222,7 @@ int HHuginn::HClass::field_index( identifier_id_t const& identifierId_, MEMBER_T
 		fieldIndex = it->second;
 	} else if (
 		( memberType_ == MEMBER_TYPE::STATIC )
-		&& ( (	it = _staticFieldIndexes.find( identifierId_ ) ) != _staticFieldIndexes.end() )
+		&& ( ( it = _staticFieldIndexes.find( identifierId_ ) ) != _staticFieldIndexes.end() )
 	) {
 		fieldIndex = it->second;
 	}

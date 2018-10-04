@@ -417,6 +417,75 @@ void HRuntime::register_package(
 	M_EPILOG
 }
 
+namespace {
+
+HHuginn::value_t bound_method_call(
+	HHuginn::HClass::HMethod* method_,
+	HHuginn::value_t subject_,
+	huginn::HThread* thread_,
+	HHuginn::value_t*,
+	HHuginn::values_t& values_,
+	int position_
+) {
+	return ( method_->function()( thread_, &subject_, values_, position_ ) );
+}
+
+}
+
+void HRuntime::import_symbols( identifier_id_t package_, HHuginn::identifiers_t const& importedSymbols_, int position_ ) {
+	M_PROLOG
+	HHuginn::value_t package( find_package( package_ ) );
+	bool firstImported( false );
+	if ( ! package ) {
+		package = HPackageFactory::get_instance().create_package( this, identifier_name( package_ ), position_ );
+		firstImported = true;
+	}
+	HHuginn::HClass const* packageClass( package->get_class() );
+	HHuginn::identifiers_t const* importedSymbols(
+		! importedSymbols_.is_empty()
+			? &importedSymbols_
+			: &packageClass->field_identifiers()
+	);
+	for ( HHuginn::identifier_id_t id : *importedSymbols ) {
+		int idx( package->field_index( id ) );
+		if ( idx < 0 ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"Symbol `"_ys
+					.append( identifier_name( id ) )
+					.append( "' does not exist in `" )
+					.append( identifier_name( package_ ) )
+					.append( "' package." ),
+				MAIN_FILE_ID,
+				position_
+			);
+		}
+		HHuginn::value_t v( package->field( idx ) );
+		HHuginn::type_id_t t( v->type_id() );
+		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
+			register_global( id, v );
+		} else if ( t == HHuginn::TYPE::METHOD ) {
+			HHuginn::value_t f(
+				_objectFactory->create_function_reference(
+					id,
+					hcore::call(
+						&bound_method_call,
+						static_cast<HHuginn::HClass::HMethod*>( v.raw() ),
+						package,
+						_1, _2, _3, _4
+					),
+					packageClass->doc( id )
+				)
+			);
+			register_global( id, f );
+		}
+	}
+	if ( firstImported ) {
+		_valuesStore->push_back( package );
+	}
+	return;
+	M_EPILOG
+}
+
 HHuginn::class_t HRuntime::create_class(
 	identifier_id_t identifier_,
 	yaal::hcore::HString const& doc_,
@@ -741,7 +810,7 @@ void HRuntime::register_builtins( void ) {
 
 namespace {
 
-void sort_identifiers( identifiers_t& identifiers_, HRuntime const* runtime_ ) {
+void sort_identifiers( HHuginn::identifiers_t& identifiers_, HRuntime const* runtime_ ) {
 	sort(
 		identifiers_.begin(),
 		identifiers_.end(),
@@ -881,7 +950,7 @@ void HRuntime::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) const {
 			stream_ << *c << endl;
 		}
 	}
-	identifiers_t identifiers;
+	HHuginn::identifiers_t identifiers;
 	for ( global_definitions_t::value_type const& f : _globalDefinitions ) {
 		if ( ( (*f.second)->type_id() != HHuginn::TYPE::FUNCTION_REFERENCE ) || !! get_class( f.first ) ) {
 			continue;

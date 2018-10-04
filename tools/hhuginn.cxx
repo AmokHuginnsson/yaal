@@ -505,7 +505,11 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 void HHuginn::finalize_compilation( void ) {
 	M_PROLOG
 	for ( OCompiler::submitted_imports_t::value_type const& i : _compiler->_submittedImports ) {
-		_runtime->register_package( i._package, i._alias, i._position );
+		if ( i._alias != IDENTIFIER::INVALID ) {
+			_runtime->register_package( i._package, i._alias, i._position );
+		} else {
+			_runtime->import_symbols( i._package, i._importedSymbols, i._position );
+		}
 	}
 	for ( OCompiler::submitted_enums_t::value_type const& e : _compiler->_submittedEnums ) {
 		M_ASSERT( is_enum_class( e ) );

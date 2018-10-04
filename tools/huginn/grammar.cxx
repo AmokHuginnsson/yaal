@@ -716,7 +716,21 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		) >> ';',
 		HRuleBase::action_range_t( hcore::call( &OCompiler::commit_import, _compiler.get(), _1 ) )
 	);
-	HRule huginnGrammar( "huginnGrammar", + ( classDefinition | functionDefinition | enumDefinition | importStatement ) );
+	HIdentifierParser importedSymbol(
+		identifier(
+			"importedSymbol",
+			HIdentifierParser::action_string_range_t( hcore::call( &OCompiler::add_imported_symbol, _compiler.get(), _1, _2 ) )
+		)
+	);
+	HRule fromStatement(
+		"fromStatement",
+		constant( "from" ) >> packageName >> "import" >> (
+			( importedSymbol >> *( ',' >> importedSymbol ) )
+			| constant( "*", e_p::HString::action_string_range_t( hcore::call( &OCompiler::add_imported_symbol, _compiler.get(), _1, _2 ) ) )
+		) >> ';',
+		HRuleBase::action_range_t( hcore::call( &OCompiler::commit_import, _compiler.get(), _1 ) )
+	);
+	HRule huginnGrammar( "huginnGrammar", + ( classDefinition | functionDefinition | enumDefinition | importStatement | fromStatement ) );
 	return ( huginnGrammar );
 	M_EPILOG
 }

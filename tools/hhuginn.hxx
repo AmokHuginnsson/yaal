@@ -112,6 +112,7 @@ public:
 	class HCoordinate;
 	class HFieldDefinition;
 	typedef yaal::hcore::HArray<HFieldDefinition> field_definitions_t;
+	typedef yaal::hcore::HArray<identifier_id_t> identifiers_t;
 	typedef yaal::hcore::HArray<identifier_id_t> field_identifiers_t;
 	typedef yaal::hcore::HArray<yaal::hcore::HString> field_descriptions_t;
 	typedef yaal::hcore::HArray<value_t> values_t;

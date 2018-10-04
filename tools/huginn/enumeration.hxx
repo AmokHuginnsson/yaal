@@ -7,7 +7,6 @@
 #define YAAL_TOOLS_HUGINN_ENUMERATION_HXX_INCLUDED 1
 
 #include "tools/hhuginn.hxx"
-#include "tools/huginn/runtime.hxx"
 
 namespace yaal {
 

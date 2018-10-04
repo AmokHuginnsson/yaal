@@ -7,6 +7,7 @@
 #define YAAL_TOOLS_HUGINN_HELPER_HXX_INCLUDED 1
 
 #include "tools/hhuginn.hxx"
+#include "tools/huginn/runtime.hxx" /* For templated `C++ function` auto-registration code. */
 #include "tools/huginn/enumeration.hxx"
 
 namespace yaal {
@@ -50,7 +51,6 @@ public:
 	void done( HHuginn::value_t const& );
 };
 
-typedef yaal::hcore::HArray<HHuginn::identifier_id_t> identifiers_t;
 typedef yaal::hcore::HArray<HHuginn::TYPE> types_t;
 typedef yaal::hcore::HArray<HHuginn::HClass const*> classes_t;
 

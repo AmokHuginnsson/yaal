@@ -181,7 +181,9 @@ OCompiler::OIdentifierUse::OIdentifierUse( void )
 
 void OCompiler::OIdentifierUse::read( int range_, HHuginn::SYMBOL_KIND symbolKind_ ) {
 	if ( _readCount == 0 ) {
-		_type = symbolKind_;
+		if ( symbolKind_ != HHuginn::SYMBOL_KIND::UNKNOWN ) {
+			_type = symbolKind_;
+		}
 		_readPosition = range_;
 	}
 	++ _readCount;
@@ -221,6 +223,7 @@ void OCompiler::OClassNoter::note( yaal::hcore::HString const& name_, executing_
 OCompiler::OImportInfo::OImportInfo( void )
 	: _package( IDENTIFIER::INVALID )
 	, _alias( IDENTIFIER::INVALID )
+	, _importedSymbols()
 	, _position( 0 ) {
 	return;
 }
@@ -228,6 +231,7 @@ OCompiler::OImportInfo::OImportInfo( void )
 OCompiler::OImportInfo::OImportInfo( OImportInfo&& other_ )
 	: _package( IDENTIFIER::INVALID )
 	, _alias( IDENTIFIER::INVALID )
+	, _importedSymbols()
 	, _position( 0 ) {
 	swap( other_ );
 	return;
@@ -237,6 +241,7 @@ void OCompiler::OImportInfo::swap( OImportInfo& other_ ) {
 	using yaal::swap;
 	swap( _package, other_._package );
 	swap( _alias, other_._alias );
+	swap( _importedSymbols, other_._importedSymbols );
 	swap( _position, other_._position );
 	return;
 }
@@ -244,6 +249,7 @@ void OCompiler::OImportInfo::swap( OImportInfo& other_ ) {
 void OCompiler::OImportInfo::reset( void ) {
 	_package = IDENTIFIER::INVALID;
 	_alias = IDENTIFIER::INVALID;
+	_importedSymbols.clear();
 	_position = 0;
 	return;
 }
@@ -570,6 +576,7 @@ void OCompiler::detect_misuse( void ) const {
 	HHuginn::identifier_id_t implicitUse[] = {
 		IDENTIFIER::STANDARD_FUNCTIONS::MAIN,
 		_runtime->identifier_id( INTERFACE::GET_SIZE ),
+		_runtime->identifier_id( INTERFACE::SUBSCRIPT ),
 		_runtime->identifier_id( INTERFACE::ITERATOR ),
 		_runtime->identifier_id( INTERFACE::IS_VALID ),
 		_runtime->identifier_id( INTERFACE::NEXT ),
@@ -713,7 +720,11 @@ void OCompiler::check_name_import( HHuginn::identifier_id_t identifier_, executi
 			_submittedImports.begin(),
 			_submittedImports.end(),
 			[&identifier_]( OImportInfo const& info_ ) {
-				return ( ( identifier_ == info_._package ) || ( identifier_ == info_._alias ) );
+				return (
+					( identifier_ == info_._package )
+					|| ( identifier_ == info_._alias )
+					|| ( find( info_._importedSymbols.begin(), info_._importedSymbols.end(), identifier_ ) != info_._importedSymbols.end() )
+				);
 			}
 		) ) != _submittedImports.end()
 	) {
@@ -721,7 +732,11 @@ void OCompiler::check_name_import( HHuginn::identifier_id_t identifier_, executi
 		throw HHuginn::HHuginnRuntimeException(
 			identifier_ == it->_package
 				? "Package of the same name `"_ys.append( name ).append( "' is already imported." )
-				: "Package alias of the same name `"_ys.append( name ).append( "' is already defined." ),
+				: (
+					identifier_ == it->_alias
+						? "Package alias of the same name `"_ys.append( name ).append( "' is already defined." )
+						: "Symbol `"_ys.append( name ).append( "' was already brought into the global namespace." )
+				),
 			_fileId,
 			range_.start()
 		);
@@ -859,20 +874,38 @@ void OCompiler::set_import_name( executing_parser::range_t range_ ) {
 	M_EPILOG
 }
 
-void OCompiler::set_import_alias( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
+HHuginn::identifier_id_t OCompiler::prep_import_result( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	if ( is_restricted( name_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), _fileId, range_.start() );
 	}
-	HHuginn::identifier_id_t importAliasIdentifier( _runtime->identifier_id( name_ ) );
-	check_name_import( importAliasIdentifier, range_ );
-	check_name_enum( importAliasIdentifier, true, range_ );
-	check_name_class( importAliasIdentifier, true, range_ );
-	check_name_function( importAliasIdentifier, range_ );
-	_importInfo._alias = importAliasIdentifier;
-	_usedIdentifiers[importAliasIdentifier].write( range_.start(), HHuginn::SYMBOL_KIND::PACKAGE );
+	HHuginn::identifier_id_t importResultIdentifier( _runtime->identifier_id( name_ ) );
+	check_name_import( importResultIdentifier, range_ );
+	check_name_enum( importResultIdentifier, true, range_ );
+	check_name_class( importResultIdentifier, true, range_ );
+	check_name_function( importResultIdentifier, range_ );
+	_usedIdentifiers[importResultIdentifier].write( range_.start(), HHuginn::SYMBOL_KIND::PACKAGE );
+	return ( importResultIdentifier );
+	M_EPILOG
+}
+
+void OCompiler::set_import_alias( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
+	M_PROLOG
+	_importInfo._alias = prep_import_result( name_, range_ );
 	if ( _introspector ) {
 		_introspector->symbol( { _runtime->identifier_name( _importInfo._package ), name_ }, HHuginn::SYMBOL_KIND::PACKAGE, _fileId, range_.start() );
+	}
+	return;
+	M_EPILOG
+}
+
+void OCompiler::add_imported_symbol( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
+	M_PROLOG
+	if ( name_ != "*" ) {
+		_importInfo._importedSymbols.push_back( prep_import_result( name_, range_ ) );
+		if ( _introspector ) {
+			_introspector->symbol( { _runtime->identifier_name( _importInfo._package ), name_ }, HHuginn::SYMBOL_KIND::PACKAGE, _fileId, range_.start() );
+		}
 	}
 	return;
 	M_EPILOG

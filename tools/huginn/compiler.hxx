@@ -349,6 +349,7 @@ struct OCompiler {
 	struct OImportInfo {
 		HHuginn::identifier_id_t _package;
 		HHuginn::identifier_id_t _alias;
+		HHuginn::identifiers_t _importedSymbols;
 		int _position;
 		OImportInfo( void );
 		OImportInfo( OImportInfo&& );
@@ -420,6 +421,7 @@ struct OCompiler {
 	void build_import_name( yaal::hcore::HString const&, executing_parser::range_t );
 	void set_import_name( executing_parser::range_t );
 	void set_import_alias( yaal::hcore::HString const&, executing_parser::range_t );
+	void add_imported_symbol( yaal::hcore::HString const&, executing_parser::range_t );
 	void set_class_name( HHuginn::identifier_id_t, executing_parser::range_t );
 	void check_name_import( HHuginn::identifier_id_t, executing_parser::range_t );
 	void check_name_class( HHuginn::identifier_id_t, bool, executing_parser::range_t );
@@ -528,6 +530,8 @@ struct OCompiler {
 	void defer_call( yaal::hcore::HString const&, executing_parser::range_t );
 	HHuginn::expression_t new_expression( int, executing_parser::range_t const& = { 0, 0 } );
 	void merge( HHuginn::expression_t&, HHuginn::expression_t& );
+private:
+	HHuginn::identifier_id_t prep_import_result( yaal::hcore::HString const&, executing_parser::range_t );
 private:
 	HHuginn::HClass const* function_ref_to_class( HHuginn::identifier_id_t );
 	OCompiler( OCompiler const& ) = delete;
