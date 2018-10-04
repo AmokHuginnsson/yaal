@@ -53,10 +53,10 @@ namespace package_factory {
 
 class HDatabaseCreator : public HPackageCreatorInterface {
 protected:
-	virtual HHuginn::value_t do_new_instance( HRuntime* );
+	virtual HInstance do_new_instance( HRuntime* );
 } databaseCreator;
 
-HHuginn::value_t HDatabaseCreator::do_new_instance( HRuntime* runtime_ ) {
+HPackageCreatorInterface::HInstance HDatabaseCreator::do_new_instance( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
@@ -85,8 +85,7 @@ HHuginn::value_t HDatabaseCreator::do_new_instance( HRuntime* runtime_ ) {
 		{ "connect", runtime_->create_method( &HDatabase::connect ), "( *DSN* ) - create connection to the database specified by given *DSN*" }
 	};
 	c->redefine( nullptr, fd );
-	runtime_->huginn()->register_class( c );
-	return ( runtime_->object_factory()->create<HDatabase>( c.raw() ) );
+	return { c, runtime_->object_factory()->create<HDatabase>( c.raw() ) };
 	M_EPILOG
 }
 

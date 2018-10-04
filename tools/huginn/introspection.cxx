@@ -220,7 +220,7 @@ public:
 		}
 		HHuginn::value_t v( r.none_value() );
 		try {
-			v = HPackageFactory::get_instance().create_package( &r, package, position_ );
+			v = HPackageFactory::get_instance().create_package( &r, package, HHuginn::VISIBILITY::PACKAGE, position_ );
 		} catch ( HHuginn::HHuginnRuntimeException const& e ) {
 			thread_->raise( static_cast<HIntrospection*>( object_->raw() )->_exceptionClass.raw(), e.message(), position_ );
 		} catch ( HException const& e ) {
@@ -247,10 +247,10 @@ namespace package_factory {
 
 class HTntrospectionCreator : public HPackageCreatorInterface {
 protected:
-	virtual HHuginn::value_t do_new_instance( HRuntime* );
+	virtual HInstance do_new_instance( HRuntime* );
 } introspectionCreator;
 
-HHuginn::value_t HTntrospectionCreator::do_new_instance( HRuntime* runtime_ ) {
+HPackageCreatorInterface::HInstance HTntrospectionCreator::do_new_instance( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
@@ -270,8 +270,7 @@ HHuginn::value_t HTntrospectionCreator::do_new_instance( HRuntime* runtime_ ) {
 		{ "call_stack",      runtime_->create_method( &HIntrospection::call_stack ),      "get current call stack." }
 	};
 	c->redefine( nullptr, fd );
-	runtime_->huginn()->register_class( c );
-	return ( runtime_->object_factory()->create<HIntrospection>( c.raw() ) );
+	return { c, runtime_->object_factory()->create<HIntrospection>( c.raw() ) };
 	M_EPILOG
 }
 

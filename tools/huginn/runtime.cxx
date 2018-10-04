@@ -410,7 +410,7 @@ void HRuntime::register_package(
 	M_PROLOG
 	HHuginn::value_t package( find_package( package_ ) );
 	if ( ! package ) {
-		package = HPackageFactory::get_instance().create_package( this, identifier_name( package_ ), position_ );
+		package = HPackageFactory::get_instance().create_package( this, identifier_name( package_ ), HHuginn::VISIBILITY::PACKAGE, position_ );
 	}
 	register_global( alias_, package );
 	return;
@@ -437,7 +437,7 @@ void HRuntime::import_symbols( identifier_id_t package_, HHuginn::identifiers_t 
 	HHuginn::value_t package( find_package( package_ ) );
 	bool firstImported( false );
 	if ( ! package ) {
-		package = HPackageFactory::get_instance().create_package( this, identifier_name( package_ ), position_ );
+		package = HPackageFactory::get_instance().create_package( this, identifier_name( package_ ), HHuginn::VISIBILITY::HIDDEN, position_ );
 		firstImported = true;
 	}
 	HHuginn::HClass const* packageClass( package->get_class() );

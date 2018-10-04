@@ -172,7 +172,8 @@ public:
 	};
 	enum class VISIBILITY {
 		GLOBAL,
-		PACKAGE
+		PACKAGE,
+		HIDDEN
 	};
 	enum class SYMBOL_KIND {
 		UNKNOWN,

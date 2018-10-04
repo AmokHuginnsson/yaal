@@ -67,10 +67,10 @@ namespace package_factory {
 
 class HDateTimeCreator : public HPackageCreatorInterface {
 protected:
-	virtual HHuginn::value_t do_new_instance( HRuntime* );
+	virtual HInstance do_new_instance( HRuntime* );
 } datetimeCreator;
 
-HHuginn::value_t HDateTimeCreator::do_new_instance( HRuntime* runtime_ ) {
+HPackageCreatorInterface::HInstance HDateTimeCreator::do_new_instance( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
@@ -85,8 +85,7 @@ HHuginn::value_t HDateTimeCreator::do_new_instance( HRuntime* runtime_ ) {
 		{ "sleep", runtime_->create_method( &HDateTime::sleep ), "( *nanoseconds* ) - suspend program execution for specified amount of *nanoseconds*" }
 	};
 	c->redefine( nullptr, fd );
-	runtime_->huginn()->register_class( c );
-	return ( runtime_->object_factory()->create<HDateTime>( c.raw() ) );
+	return { c, runtime_->object_factory()->create<HDateTime>( c.raw() ) };
 	M_EPILOG
 }
 

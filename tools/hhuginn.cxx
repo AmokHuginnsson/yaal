@@ -532,17 +532,19 @@ void HHuginn::finalize_compilation( void ) {
 	M_EPILOG
 }
 
-void HHuginn::register_class( class_t class_, VISIBILITY classConstructorVisibility_ ) {
+void HHuginn::register_class( class_t class_, VISIBILITY classVisibility_ ) {
 	M_PROLOG
 	M_ENSURE( _state != STATE::COMPILED );
-	_runtime->register_class( class_, classConstructorVisibility_ );
-	OCompiler::OIdentifierUse& ciu( _compiler->_usedIdentifiers[class_->identifier_id()] );
-	ciu.write( 0, SYMBOL_KIND::CLASS );
-	ciu.read( 0 );
-	for ( identifier_id_t id : class_->field_identifiers() ) {
-		OCompiler::OIdentifierUse& iu( _compiler->_usedIdentifiers[id] );
-		iu.write( 0, SYMBOL_KIND::FIELD );
-		iu.read( 0 );
+	_runtime->register_class( class_, classVisibility_ );
+	if ( classVisibility_ != VISIBILITY::HIDDEN ) {
+		OCompiler::OIdentifierUse& ciu( _compiler->_usedIdentifiers[class_->identifier_id()] );
+		ciu.write( 0, SYMBOL_KIND::CLASS );
+		ciu.read( 0 );
+		for ( identifier_id_t id : class_->field_identifiers() ) {
+			OCompiler::OIdentifierUse& iu( _compiler->_usedIdentifiers[id] );
+			iu.write( 0, SYMBOL_KIND::FIELD );
+			iu.read( 0 );
+		}
 	}
 	return;
 	M_EPILOG

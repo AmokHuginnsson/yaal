@@ -50,10 +50,10 @@ namespace package_factory {
 
 class HRegularExpressionsCreator : public HPackageCreatorInterface {
 protected:
-	virtual HHuginn::value_t do_new_instance( HRuntime* );
+	virtual HInstance do_new_instance( HRuntime* );
 } regularexpressionsCreator;
 
-HHuginn::value_t HRegularExpressionsCreator::do_new_instance( HRuntime* runtime_ ) {
+HPackageCreatorInterface::HInstance HRegularExpressionsCreator::do_new_instance( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
@@ -66,8 +66,7 @@ HHuginn::value_t HRegularExpressionsCreator::do_new_instance( HRuntime* runtime_
 		{ "compile", runtime_->create_method( &HRegularExpressions::compile ), "( *pattern* ) - compile given regular expression pattern to be used for text searches" }
 	};
 	c->redefine( nullptr, fd );
-	runtime_->huginn()->register_class( c );
-	return ( runtime_->object_factory()->create<HRegularExpressions>( c.raw() ) );
+	return { c, runtime_->object_factory()->create<HRegularExpressions>( c.raw() ) };
 	M_EPILOG
 }
 

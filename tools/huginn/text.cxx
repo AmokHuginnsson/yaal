@@ -241,10 +241,10 @@ namespace package_factory {
 
 class HTextCreator : public HPackageCreatorInterface {
 protected:
-	virtual HHuginn::value_t do_new_instance( HRuntime* );
+	virtual HInstance do_new_instance( HRuntime* );
 } textCreator;
 
-HHuginn::value_t HTextCreator::do_new_instance( HRuntime* runtime_ ) {
+HPackageCreatorInterface::HInstance HTextCreator::do_new_instance( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
@@ -266,8 +266,7 @@ HHuginn::value_t HTextCreator::do_new_instance( HRuntime* runtime_ ) {
 		{ "substitute_environment", runtime_->create_method( &HText::substitute_environment ), "( *str*[, *recursively*] ) - (*recursively*) substitute environment variables in *str*" }
 	};
 	c->redefine( nullptr, fd );
-	runtime_->huginn()->register_class( c );
-	return ( runtime_->object_factory()->create<HText>( c.raw() ) );
+	return { c, runtime_->object_factory()->create<HText>( c.raw() ) };
 	M_EPILOG
 }
 

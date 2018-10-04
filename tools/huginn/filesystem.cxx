@@ -215,10 +215,10 @@ namespace package_factory {
 
 class HFileSystemCreator : public HPackageCreatorInterface {
 protected:
-	virtual HHuginn::value_t do_new_instance( HRuntime* );
+	virtual HInstance do_new_instance( HRuntime* );
 } filesystemCreator;
 
-HHuginn::value_t HFileSystemCreator::do_new_instance( HRuntime* runtime_ ) {
+HPackageCreatorInterface::HInstance HFileSystemCreator::do_new_instance( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
@@ -241,8 +241,7 @@ HHuginn::value_t HFileSystemCreator::do_new_instance( HRuntime* runtime_ ) {
 		{ "current_working_directory", runtime_->create_method( &HFileSystem::current_working_directory ), "get current working directory path" }
 	};
 	c->redefine( nullptr, fd );
-	runtime_->huginn()->register_class( c );
-	return ( runtime_->object_factory()->create<HFileSystem>( c.raw() ) );
+	return { c, runtime_->object_factory()->create<HFileSystem>( c.raw() ) };
 	M_EPILOG
 }
 

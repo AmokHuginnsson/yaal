@@ -704,10 +704,10 @@ namespace package_factory {
 
 class HXmlCreator : public HPackageCreatorInterface {
 protected:
-	virtual HHuginn::value_t do_new_instance( HRuntime* );
+	virtual HInstance do_new_instance( HRuntime* );
 } xmlCreator;
 
-HHuginn::value_t HXmlCreator::do_new_instance( HRuntime* runtime_ ) {
+HPackageCreatorInterface::HInstance HXmlCreator::do_new_instance( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
@@ -721,8 +721,7 @@ HHuginn::value_t HXmlCreator::do_new_instance( HRuntime* runtime_ ) {
 		{ "create", runtime_->create_method( &HXml::create ), "( *name* ) - create new `XML` document with given root node *name*" }
 	};
 	c->redefine( nullptr, fd );
-	runtime_->huginn()->register_class( c );
-	return ( runtime_->object_factory()->create<HXml>( c.raw() ) );
+	return { c, runtime_->object_factory()->create<HXml>( c.raw() ) };
 	M_EPILOG
 }
 

@@ -85,10 +85,10 @@ namespace package_factory {
 
 class HNetworkCreator : public HPackageCreatorInterface {
 protected:
-	virtual HHuginn::value_t do_new_instance( HRuntime* );
+	virtual HInstance do_new_instance( HRuntime* );
 } networkCreator;
 
-HHuginn::value_t HNetworkCreator::do_new_instance( HRuntime* runtime_ ) {
+HPackageCreatorInterface::HInstance HNetworkCreator::do_new_instance( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
@@ -102,8 +102,7 @@ HHuginn::value_t HNetworkCreator::do_new_instance( HRuntime* runtime_ ) {
 		{ "resolve", runtime_->create_method( &HNetwork::resolve ), "( *hostName* ) - resolve IP address of given *hostName*" }
 	};
 	c->redefine( nullptr, fd );
-	runtime_->huginn()->register_class( c );
-	return ( runtime_->object_factory()->create<HNetwork>( c.raw() ) );
+	return { c, runtime_->object_factory()->create<HNetwork>( c.raw() ) };
 	M_EPILOG
 }
 

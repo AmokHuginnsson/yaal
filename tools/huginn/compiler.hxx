@@ -531,7 +531,7 @@ struct OCompiler {
 	HHuginn::expression_t new_expression( int, executing_parser::range_t const& = { 0, 0 } );
 	void merge( HHuginn::expression_t&, HHuginn::expression_t& );
 private:
-	HHuginn::identifier_id_t prep_import_result( yaal::hcore::HString const&, executing_parser::range_t );
+	HHuginn::identifier_id_t prep_import_result( yaal::hcore::HString const&, HHuginn::SYMBOL_KIND, executing_parser::range_t );
 private:
 	HHuginn::HClass const* function_ref_to_class( HHuginn::identifier_id_t );
 	OCompiler( OCompiler const& ) = delete;

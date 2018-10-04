@@ -39,7 +39,7 @@ void HPackageCreatorInterface::cleanup_globals( void ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HPackageCreatorInterface::new_instance( HRuntime* runtime_ ) {
+HPackageCreatorInterface::HInstance HPackageCreatorInterface::new_instance( HRuntime* runtime_ ) {
 	M_PROLOG
 	return ( do_new_instance( runtime_ ) );
 	M_EPILOG
@@ -76,10 +76,10 @@ inline void remove_visited( HPackageFactory::visited_imports_t* vi_, HPackageFac
 }
 }
 
-HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, yaal::hcore::HString name_, int position_ ) {
+HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, yaal::hcore::HString name_, HHuginn::VISIBILITY visibility_, int position_ ) {
 	M_PROLOG
 	HLock l( _mutex );
-	HHuginn::value_t package;
+	HPackageCreatorInterface::HInstance package;
 	creators_t::iterator it = _creators.find( name_ );
 	if ( it != _creators.end() ) {
 		package = it->second._instantiator->new_instance( runtime_ );
@@ -109,11 +109,12 @@ HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, yaal::hcor
 			position_
 		);
 	}
-	return ( package );
+	runtime_->huginn()->register_class( package.package_class(), visibility_ );
+	return ( package.package_data() );
 	M_EPILOG
 }
 
-HHuginn::value_t HPackageFactory::load_binary( HRuntime* runtime_, HHuginn::paths_t const& paths_, yaal::hcore::HString const& name_, int position_ ) {
+HPackageCreatorInterface::HInstance HPackageFactory::load_binary( HRuntime* runtime_, HHuginn::paths_t const& paths_, yaal::hcore::HString const& name_, int position_ ) {
 	M_PROLOG
 	static HRegex const re( "([^.])[.]([^.])" );
 	HString name( re.replace( re.replace( name_, "$1/$2" ), "$1/$2" ) );
@@ -145,7 +146,7 @@ HHuginn::value_t HPackageFactory::load_binary( HRuntime* runtime_, HHuginn::path
 			}
 		}
 	}
-	HHuginn::value_t package;
+	HPackageCreatorInterface::HInstance package;
 	if ( plugin->is_loaded() ) {
 		try {
 			typedef HPackageCreatorInterface* (*instantiator_getter_t)( void );
@@ -163,7 +164,7 @@ HHuginn::value_t HPackageFactory::load_binary( HRuntime* runtime_, HHuginn::path
 	M_EPILOG
 }
 
-HHuginn::value_t HPackageFactory::load_module( HRuntime* runtime_, HHuginn::paths_t const& paths_, yaal::hcore::HString const& name_, int position_ ) {
+HPackageCreatorInterface::HInstance HPackageFactory::load_module( HRuntime* runtime_, HHuginn::paths_t const& paths_, yaal::hcore::HString const& name_, int position_ ) {
 	M_PROLOG
 	static HRegex const re( "([^.])[.]([^.])" );
 	HString name( re.replace( re.replace( name_, "$1/$2" ), "$1/$2" ) );
@@ -196,12 +197,12 @@ HHuginn::value_t HPackageFactory::load_module( HRuntime* runtime_, HHuginn::path
 	return (
 		! path.is_empty()
 			? compile_module( runtime_, paths_, path, name_, position_ )
-			: HHuginn::value_t()
+			: HPackageCreatorInterface::HInstance()
 	);
 	M_EPILOG
 }
 
-HHuginn::value_t HPackageFactory::compile_module(
+HPackageCreatorInterface::HInstance HPackageFactory::compile_module(
 	HRuntime* contextRuntime_,
 	HHuginn::paths_t const& paths_,
 	yaal::hcore::HString const& path_,
@@ -228,10 +229,9 @@ HHuginn::value_t HPackageFactory::compile_module(
 	loader._state = HHuginn::STATE::PARSED;
 	HHuginn::class_t c( loaderRuntime.make_package( name_, *contextRuntime_ ) );
 	contextRuntime_->copy_text( loaderRuntime );
-	contextHuginn.register_class( c );
 	contextHuginn._sources = yaal::move( loader._sources );
 	huginn::HThread t( contextRuntime_, hcore::HThread::get_current_thread_id() );
-	return ( contextRuntime_->object_factory()->create_object( c.raw(), c->get_defaults( &t, position_ ) ) );
+	return { c, contextRuntime_->object_factory()->create_object( c.raw(), c->get_defaults( &t, position_ ) ) };
 	M_EPILOG
 }
 

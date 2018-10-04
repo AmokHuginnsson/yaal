@@ -49,10 +49,10 @@ namespace package_factory {
 
 class HCryptographyCreator : public HPackageCreatorInterface {
 protected:
-	virtual HHuginn::value_t do_new_instance( HRuntime* );
+	virtual HInstance do_new_instance( HRuntime* );
 } cryptographyCreator;
 
-HHuginn::value_t HCryptographyCreator::do_new_instance( HRuntime* runtime_ ) {
+HPackageCreatorInterface::HInstance HCryptographyCreator::do_new_instance( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
@@ -70,8 +70,7 @@ HHuginn::value_t HCryptographyCreator::do_new_instance( HRuntime* runtime_ ) {
 		{ "hmac_sha512", runtime_->create_method( &HCryptography::hmac, "Cryptography.hmac_sha512", hash::FUNCTION::SHA512 ), "( *key*, *str* ) - calculate *HMAC-SHA512* verification code for given `string` *str* using given *key*" }
 	};
 	c->redefine( nullptr, fd );
-	runtime_->huginn()->register_class( c );
-	return ( runtime_->object_factory()->create<HCryptography>( c.raw() ) );
+	return { c, runtime_->object_factory()->create<HCryptography>( c.raw() ) };
 	M_EPILOG
 }
 

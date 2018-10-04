@@ -874,7 +874,7 @@ void OCompiler::set_import_name( executing_parser::range_t range_ ) {
 	M_EPILOG
 }
 
-HHuginn::identifier_id_t OCompiler::prep_import_result( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
+HHuginn::identifier_id_t OCompiler::prep_import_result( yaal::hcore::HString const& name_, HHuginn::SYMBOL_KIND kind_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	if ( is_restricted( name_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), _fileId, range_.start() );
@@ -884,14 +884,14 @@ HHuginn::identifier_id_t OCompiler::prep_import_result( yaal::hcore::HString con
 	check_name_enum( importResultIdentifier, true, range_ );
 	check_name_class( importResultIdentifier, true, range_ );
 	check_name_function( importResultIdentifier, range_ );
-	_usedIdentifiers[importResultIdentifier].write( range_.start(), HHuginn::SYMBOL_KIND::PACKAGE );
+	_usedIdentifiers[importResultIdentifier].write( range_.start(), kind_ );
 	return ( importResultIdentifier );
 	M_EPILOG
 }
 
 void OCompiler::set_import_alias( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
-	_importInfo._alias = prep_import_result( name_, range_ );
+	_importInfo._alias = prep_import_result( name_, HHuginn::SYMBOL_KIND::PACKAGE, range_ );
 	if ( _introspector ) {
 		_introspector->symbol( { _runtime->identifier_name( _importInfo._package ), name_ }, HHuginn::SYMBOL_KIND::PACKAGE, _fileId, range_.start() );
 	}
@@ -902,7 +902,7 @@ void OCompiler::set_import_alias( yaal::hcore::HString const& name_, executing_p
 void OCompiler::add_imported_symbol( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	if ( name_ != "*" ) {
-		_importInfo._importedSymbols.push_back( prep_import_result( name_, range_ ) );
+		_importInfo._importedSymbols.push_back( prep_import_result( name_, HHuginn::SYMBOL_KIND::UNKNOWN, range_ ) );
 		if ( _introspector ) {
 			_introspector->symbol( { _runtime->identifier_name( _importInfo._package ), name_ }, HHuginn::SYMBOL_KIND::PACKAGE, _fileId, range_.start() );
 		}

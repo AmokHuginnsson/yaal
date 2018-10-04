@@ -572,10 +572,10 @@ namespace package_factory {
 
 class HAlgorithmsCreator : public HPackageCreatorInterface {
 protected:
-	virtual HHuginn::value_t do_new_instance( HRuntime* );
+	virtual HInstance do_new_instance( HRuntime* );
 } algorithmsCreator;
 
-HHuginn::value_t HAlgorithmsCreator::do_new_instance( HRuntime* runtime_ ) {
+HPackageCreatorInterface::HInstance HAlgorithmsCreator::do_new_instance( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
@@ -602,8 +602,7 @@ HHuginn::value_t HAlgorithmsCreator::do_new_instance( HRuntime* runtime_ ) {
 		{ "reversed",    runtime_->create_method( &HAlgorithms::reversed ),    "( *coll* ) - create reversed iterable view of a *coll* materialized collection" }
 	};
 	c->redefine( nullptr, fd );
-	runtime_->huginn()->register_class( c );
-	return ( runtime_->object_factory()->create<HAlgorithms>( c.raw() ) );
+	return { c, runtime_->object_factory()->create<HAlgorithms>( c.raw() ) };
 	M_EPILOG
 }
 

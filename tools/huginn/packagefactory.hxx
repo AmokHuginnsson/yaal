@@ -21,15 +21,38 @@ class HPlugin;
 namespace huginn {
 
 class HPackageCreatorInterface {
+public:
+	class HInstance {
+		HHuginn::class_t _class;
+		HHuginn::value_t _package;
+	public:
+		HInstance( void )
+			: _class()
+			, _package() {
+		}
+		HInstance( HHuginn::class_t const& class_, HHuginn::value_t const& package_ )
+			: _class( class_ )
+			, _package( package_ ) {
+		}
+		HHuginn::class_t const& package_class( void ) const {
+			return ( _class );
+		}
+		HHuginn::value_t const& package_data( void ) const {
+			return ( _package );
+		}
+		bool operator ! ( void ) const {
+			return ( ( ! _class ) || ( ! _package ) );
+		}
+	};
 protected:
 	virtual void do_initialize_globals( void ){};
 	virtual void do_cleanup_globals( void ){};
-	virtual HHuginn::value_t do_new_instance( HRuntime* ) = 0;
+	virtual HInstance do_new_instance( HRuntime* ) = 0;
 public:
 	virtual ~HPackageCreatorInterface( void ){}
 	void initialize_globals( void );
 	void cleanup_globals( void );
-	HHuginn::value_t new_instance( HRuntime* );
+	HInstance new_instance( HRuntime* );
 };
 
 class M_YAAL_TOOLS_PUBLIC_API HPackageFactory : public yaal::hcore::HSingleton<HPackageFactory> {
@@ -55,15 +78,15 @@ private:
 	mutable yaal::hcore::HMutex _mutex;
 public:
 	void register_package_creator( yaal::hcore::HString const&, HPackageCreatorInterface* );
-	HHuginn::value_t create_package( HRuntime*, yaal::hcore::HString, int );
+	HHuginn::value_t create_package( HRuntime*, yaal::hcore::HString, HHuginn::VISIBILITY, int );
 	creators_t::iterator begin( void );
 	creators_t::iterator end( void );
 	void initialize_globals( void );
 	void cleanup_globals( void );
 private:
-	HHuginn::value_t load_binary( HRuntime*, HHuginn::paths_t const&, yaal::hcore::HString const&, int );
-	HHuginn::value_t load_module( HRuntime*, HHuginn::paths_t const&, yaal::hcore::HString const&, int );
-	HHuginn::value_t compile_module( HRuntime*, HHuginn::paths_t const&, yaal::hcore::HString const&, yaal::hcore::HString const&, int );
+	HPackageCreatorInterface::HInstance load_binary( HRuntime*, HHuginn::paths_t const&, yaal::hcore::HString const&, int );
+	HPackageCreatorInterface::HInstance load_module( HRuntime*, HHuginn::paths_t const&, yaal::hcore::HString const&, int );
+	HPackageCreatorInterface::HInstance compile_module( HRuntime*, HHuginn::paths_t const&, yaal::hcore::HString const&, yaal::hcore::HString const&, int );
 	HPackageFactory( void );
 	~HPackageFactory( void );
 	static int life_time( int );

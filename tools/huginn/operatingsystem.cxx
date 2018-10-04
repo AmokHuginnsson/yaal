@@ -135,10 +135,10 @@ namespace package_factory {
 
 class HOperatingSystemCreator : public HPackageCreatorInterface {
 protected:
-	virtual HHuginn::value_t do_new_instance( HRuntime* );
+	virtual HInstance do_new_instance( HRuntime* );
 } operatingsystemCreator;
 
-HHuginn::value_t HOperatingSystemCreator::do_new_instance( HRuntime* runtime_ ) {
+HPackageCreatorInterface::HInstance HOperatingSystemCreator::do_new_instance( HRuntime* runtime_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
@@ -162,8 +162,7 @@ HHuginn::value_t HOperatingSystemCreator::do_new_instance( HRuntime* runtime_ ) 
 		{ "stdlog",    runtime_->create_method( &HOperatingSystem::stream,      "OperatingSystem.stdlog", &runtime_->huginn()->log_stream() ),    "get access to interpreter's standard log stream" }
 	};
 	c->redefine( nullptr, fd );
-	runtime_->huginn()->register_class( c );
-	return ( runtime_->object_factory()->create<HOperatingSystem>( c.raw() ) );
+	return { c, runtime_->object_factory()->create<HOperatingSystem>( c.raw() ) };
 	M_EPILOG
 }
 
