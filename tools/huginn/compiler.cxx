@@ -883,7 +883,9 @@ HHuginn::identifier_id_t OCompiler::prep_import_result( yaal::hcore::HString con
 	check_name_import( importResultIdentifier, range_ );
 	check_name_enum( importResultIdentifier, true, range_ );
 	check_name_class( importResultIdentifier, true, range_ );
-	check_name_function( importResultIdentifier, range_ );
+	if ( ! _isIncremental || ( kind_ == HHuginn::SYMBOL_KIND::PACKAGE ) ) {
+		check_name_function( importResultIdentifier, range_ );
+	}
 	_usedIdentifiers[importResultIdentifier].write( range_.start(), kind_ );
 	return ( importResultIdentifier );
 	M_EPILOG
