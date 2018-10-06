@@ -139,7 +139,7 @@ HHuginn::value_t HEnumerationClass::to_string( huginn::HThread* thread_, HHuginn
 	HHuginn::HEnumeral* e( static_cast<HHuginn::HEnumeral*>( object_->raw() ) );
 	HEnumerationClass const* ec( static_cast<HEnumeralClass const*>( e->get_class() )->enumeration_class() );
 	HString s( ec->name() );
-	return ( thread_->object_factory().create_string( s.append( "." ).append( thread_->runtime().identifier_name( e->identifier() ) ) ) );
+	return ( thread_->object_factory().create_string( yaal::move( s.append( "." ).append( thread_->runtime().identifier_name( e->identifier() ) ) ) ) );
 	M_EPILOG
 }
 

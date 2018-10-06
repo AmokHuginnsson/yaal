@@ -119,7 +119,7 @@ private:
 		);
 		HString message( e->where() );
 		message.append( ": " ).append( e->what() );
-		return ( thread_->object_factory().create_string( message ) );
+		return ( thread_->object_factory().create_string( yaal::move( message ) ) );
 		M_EPILOG
 	}
 };
@@ -219,7 +219,7 @@ HHuginn::value_t HStackFrameInfo::to_string( huginn::HThread* thread_, HHuginn::
 		.append( ":" ).append( sfi->_callSite.line() )
 		.append( ":" ).append( sfi->_callSite.column() )
 		.append( ":" ).append( sfi->_callSite.context() );
-	return ( thread_->object_factory().create_string( s ) );
+	return ( thread_->object_factory().create_string( yaal::move( s ) ) );
 	M_EPILOG
 }
 

@@ -139,8 +139,8 @@ HHuginn::value_t HDatabaseConnection::do_table_names(
 		HDataBase::table_list_t tl( _database->get_tables() );
 		v = thread_->object_factory().create_list();
 		HHuginn::HList* l( static_cast<HHuginn::HList*>( v.raw() ) );
-		for ( yaal::hcore::HString const& tn : tl ) {
-			l->push_back( thread_->object_factory().create_string( tn ) );
+		for ( yaal::hcore::HString& tn : tl ) {
+			l->push_back( thread_->object_factory().create_string( yaal::move( tn ) ) );
 		}
 	} catch ( HException const& e ) {
 		thread_->raise( dbcClass->exception_class(), e.what(), position_ );
@@ -160,8 +160,8 @@ HHuginn::value_t HDatabaseConnection::do_column_names(
 		HDataBase::column_list_t cl( _database->get_columns( get_string( values_[0] ) ) );
 		v = thread_->object_factory().create_list();
 		HHuginn::HList* l( static_cast<HHuginn::HList*>( v.raw() ) );
-		for ( yaal::hcore::HString const& cn : cl ) {
-			l->push_back( thread_->object_factory().create_string( cn ) );
+		for ( yaal::hcore::HString& cn : cl ) {
+			l->push_back( thread_->object_factory().create_string( yaal::move( cn ) ) );
 		}
 	} catch ( HException const& e ) {
 		thread_->raise( dbcClass->exception_class(), e.what(), position_ );

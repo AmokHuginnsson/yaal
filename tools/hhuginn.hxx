@@ -336,7 +336,9 @@ public:
 	value_t value( code_point_t );
 	value_t value( double long );
 	value_t value( yaal::hcore::HNumber const& );
+	value_t value( yaal::hcore::HNumber&& );
 	value_t value( yaal::hcore::HString const& );
+	value_t value( yaal::hcore::HString&& );
 	value_t value( bool );
 	value_t value( void const* );
 	value_t const& value( value_t const& val_ ) const {

@@ -237,11 +237,17 @@ public:
 	HHuginn::value_t create_string( yaal::hcore::HString const& value_ = yaal::hcore::HString() ) const {
 		return ( _stringPool.create( value_ ) );
 	}
+	HHuginn::value_t create_string( yaal::hcore::HString&& value_ ) const {
+		return ( _stringPool.create( yaal::move( value_ ) ) );
+	}
 	HHuginn::value_t create_real( HHuginn::HReal::value_type value_ ) const {
 		return ( _realPool.create( value_ ) );
 	}
 	HHuginn::value_t create_number( HHuginn::HNumber::value_type const& value_ ) const {
 		return ( _numberPool.create( value_ ) );
+	}
+	HHuginn::value_t create_number( HHuginn::HNumber::value_type&& value_ ) const {
+		return ( _numberPool.create( yaal::move( value_ ) ) );
 	}
 	HHuginn::value_t create_character( HHuginn::HCharacter::value_type value_ ) const {
 		return ( _characterPool.create( value_ ) );

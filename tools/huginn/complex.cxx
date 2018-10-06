@@ -172,7 +172,7 @@ HHuginn::value_t HComplex::to_string( huginn::HThread* thread_, HHuginn::value_t
 		s.append( thread_->runtime().package_name( origin ) ).append( "." );
 	}
 	s.append( "Complex(" ).append( o->_data.re() ).append( ", " ).append( o->_data.im() ).append( ")" );
-	return ( thread_->runtime().object_factory()->create_string( s ) );
+	return ( thread_->runtime().object_factory()->create_string( yaal::move( s ) ) );
 	M_EPILOG
 }
 

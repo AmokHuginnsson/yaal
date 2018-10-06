@@ -51,7 +51,7 @@ private:
 	HHuginn::value_t read_character( HThread*, HHuginn::HInteger::value_type, int );
 	HHuginn::value_t read_line_impl( HThread*, int );
 	HHuginn::value_t deserialize_impl( HThread*, int );
-	yaal::hcore::HString const& read_line_raw( HThread*, int );
+	yaal::hcore::HString& read_line_raw( HThread*, int );
 	void write_blob( HThread*, HHuginn::value_t const&, HHuginn::HInteger::value_type, int );
 	void write_string( HThread*, HHuginn::value_t const&, HHuginn::HInteger::value_type, int );
 	void write_integer( HThread*, HHuginn::value_t const&, HHuginn::HInteger::value_type, int );

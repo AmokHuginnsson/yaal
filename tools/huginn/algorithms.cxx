@@ -263,7 +263,7 @@ public:
 				s.push_back( get_character( c ) );
 				it->next( thread_, position_ );
 			}
-			v = thread_->object_factory().create_string( s );
+			v = thread_->object_factory().create_string( yaal::move( s ) );
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
 				"Invalid materialized type: `"_ys.append( thread_->runtime().function_name( fr.function().id() ) ).append( "'." ),

@@ -373,7 +373,7 @@ HHuginn::value_t HStream::read_string( HThread* thread_, HHuginn::HInteger::valu
 		}
 	}
 	post_io( thread_, nRead, nRead, IO::READ, position_ );
-	return ( thread_->object_factory().create_string( s ) );
+	return ( thread_->object_factory().create_string( yaal::move( s ) ) );
 	M_EPILOG
 }
 
@@ -690,7 +690,7 @@ void HStream::write_character( HThread* thread_, HHuginn::value_t const& value_,
 	M_EPILOG
 }
 
-yaal::hcore::HString const& HStream::read_line_raw( HThread* thread_, int position_ ) {
+yaal::hcore::HString& HStream::read_line_raw( HThread* thread_, int position_ ) {
 	M_PROLOG
 	try {
 		_stream->read_until( _lineBuffer, HStreamInterface::eols, false );
@@ -705,8 +705,8 @@ yaal::hcore::HString const& HStream::read_line_raw( HThread* thread_, int positi
 
 HHuginn::value_t HStream::read_line_impl( HThread* thread_, int position_ ) {
 	M_PROLOG
-	HString const& line( read_line_raw( thread_, position_ ) );
-	return ( ! line.is_empty() ? thread_->object_factory().create_string( line ) : thread_->runtime().none_value() );
+	HString& line( read_line_raw( thread_, position_ ) );
+	return ( ! line.is_empty() ? thread_->object_factory().create_string( yaal::move( line ) ) : thread_->runtime().none_value() );
 	M_EPILOG
 }
 

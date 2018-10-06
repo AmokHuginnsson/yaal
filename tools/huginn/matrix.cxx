@@ -545,7 +545,7 @@ HHuginn::value_t HMatrix::to_string( huginn::HThread* thread_, HHuginn::value_t*
 		}
 	}
 	s.append( ")" );
-	return ( thread_->runtime().object_factory()->create_string( s ) );
+	return ( thread_->runtime().object_factory()->create_string( yaal::move( s ) ) );
 	M_EPILOG
 }
 

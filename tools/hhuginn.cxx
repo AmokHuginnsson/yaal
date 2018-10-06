@@ -825,15 +825,15 @@ HHuginn::value_t HHuginn::value( double long val_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::value( yaal::hcore::HNumber const& val_ ) {
+HHuginn::value_t HHuginn::value( yaal::hcore::HNumber&& val_ ) {
 	M_PROLOG
-	return ( _runtime->object_factory()->create_number( val_ ) );
+	return ( _runtime->object_factory()->create_number( yaal::move( val_ ) ) );
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::value( yaal::hcore::HString const& val_ ) {
+HHuginn::value_t HHuginn::value( yaal::hcore::HString&& val_ ) {
 	M_PROLOG
-	return ( _runtime->object_factory()->create_string( val_ ) );
+	return ( _runtime->object_factory()->create_string( yaal::move( val_ ) ) );
 	M_EPILOG
 }
 

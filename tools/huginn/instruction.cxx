@@ -500,7 +500,7 @@ HHuginn::value_t factorial( HThread* thread_, HHuginn::value_t const& v_, int po
 		} else if ( ! n.is_integral() ) {
 			thread_->raise( rt.object_factory()->arithmetic_exception_class(), "Factorial from fraction.", position_ );
 		} else {
-			res = thread_->object_factory().create_number( number::factorial( n.to_integer() ) );
+			res = thread_->object_factory().create_number( HNumber( number::factorial( n.to_integer() ) ) );
 		}
 	} else {
 		throw HHuginn::HHuginnRuntimeException(

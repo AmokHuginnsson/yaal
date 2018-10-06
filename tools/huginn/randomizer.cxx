@@ -110,7 +110,7 @@ HHuginn::value_t HRandomizer::to_string( huginn::HThread* thread_, HHuginn::valu
 		s.append( cap );
 	}
 	s.append( ")" );
-	return ( thread_->runtime().object_factory()->create_string( s ) );
+	return ( thread_->runtime().object_factory()->create_string( yaal::move( s ) ) );
 	M_EPILOG
 }
 

@@ -2374,7 +2374,7 @@ void OCompiler::dispatch_function_call( HExpression::OExecutionStep::action_t co
 				expr,
 				&HExpression::store_direct,
 				range_.start(),
-				_runtime->object_factory()->create_string( _runtime->huginn()->get_snippet( from, len ).trim() )
+				_runtime->object_factory()->create_string( yaal::move( _runtime->huginn()->get_snippet( from, len ).trim() ) )
 			)
 		);
 		fc._isAssert = false;

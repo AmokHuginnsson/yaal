@@ -413,7 +413,7 @@ public:
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
 			try {
-				v = thread_->object_factory().create_number( val.round( to ) );
+				v = thread_->object_factory().create_number( yaal::move( val.round( to ) ) );
 			} catch ( HNumberException const& e ) {
 				thread_->raise( static_cast<HMathematics*>( object_->raw() )->_exceptionClass.raw(), e.what(), position_ );
 			}
@@ -434,7 +434,7 @@ public:
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
-			v = thread_->object_factory().create_number( val.floor() );
+			v = thread_->object_factory().create_number( yaal::move( val.floor() ) );
 		} else {
 			double long val( get_real( values_[0] ) );
 			v = thread_->object_factory().create_real( floorl( val ) );
@@ -450,7 +450,7 @@ public:
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
-			v = thread_->object_factory().create_number( val.ceil() );
+			v = thread_->object_factory().create_number( yaal::move( val.ceil() ) );
 		} else {
 			double long val( get_real( values_[0] ) );
 			v = thread_->object_factory().create_real( ceill( val ) );

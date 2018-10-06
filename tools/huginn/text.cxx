@@ -94,8 +94,8 @@ public:
 		strings_t strings( string::split<strings_t>( get_string( values_[0] ), get_string( values_[1] ) ) );
 		HObjectFactory* of( thread_->runtime().object_factory() );
 		HHuginn::value_t l( of->create_list() );
-		for ( HString const& s : strings ) {
-			static_cast<HHuginn::HList*>( l.raw() )->push_back( of->create_string( s ) );
+		for ( HString& s : strings ) {
+			static_cast<HHuginn::HList*>( l.raw() )->push_back( of->create_string( yaal::move( s ) ) );
 		}
 		return ( l );
 		M_EPILOG
@@ -146,7 +146,7 @@ public:
 			addSep = true;
 			it->next( thread_, position_ );
 		}
-		return ( thread_->runtime().object_factory()->create_string( s ) );
+		return ( thread_->runtime().object_factory()->create_string( yaal::move( s ) ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t distance( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -207,7 +207,7 @@ public:
 		for ( int i( 0 ); i < count; ++ i ) {
 			out.append( s );
 		}
-		return ( thread_->runtime().object_factory()->create_string( out ) );
+		return ( thread_->runtime().object_factory()->create_string( yaal::move( out ) ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t int_base_to_str( char const* name_, BASE base_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -232,7 +232,7 @@ public:
 		}
 		HString s( get_string( values_[0] ) );
 		hcore::substitute_environment( s, recursively ? ENV_SUBST_MODE::RECURSIVE : ENV_SUBST_MODE::ONE_LAYER );
-		return ( thread_->object_factory().create_string( s ) );
+		return ( thread_->object_factory().create_string( yaal::move( s ) ) );
 		M_EPILOG
 	}
 };

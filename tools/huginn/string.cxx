@@ -364,7 +364,7 @@ inline HHuginn::value_t strip( HString&( HString::* trim_ )( HString const& ), h
 	}
 	HHuginn::value_t v;
 	if ( dest.get_length() != len ) {
-		v =  thread_->object_factory().create_string( dest );
+		v =  thread_->object_factory().create_string( yaal::move( dest ) );
 	} else {
 		v = *object_;
 	}

@@ -329,8 +329,8 @@ struct huginn_type_from_pod<yaal::hcore::HNumber> {
 	static yaal::hcore::HNumber const& get( utf8_converters_t&, huginn::HThread*, HHuginn::value_t const& value_, int ) {
 		return ( get_number( value_ ) );
 	}
-	static HHuginn::value_t make( HRuntime& runtime_, yaal::hcore::HNumber const& value_ ) {
-		return ( runtime_.object_factory()->create_number( value_ ) );
+	static HHuginn::value_t make( HRuntime& runtime_, yaal::hcore::HNumber&& value_ ) {
+		return ( runtime_.object_factory()->create_number( yaal::move( value_ ) ) );
 	}
 };
 
@@ -340,8 +340,8 @@ struct huginn_type_from_pod<yaal::hcore::HString> {
 	static yaal::hcore::HString const& get( utf8_converters_t&, huginn::HThread*, HHuginn::value_t const& value_, int ) {
 		return ( get_string( value_ ) );
 	}
-	static HHuginn::value_t make( HRuntime& runtime_, yaal::hcore::HString const& value_ ) {
-		return ( runtime_.object_factory()->create_string( value_ ) );
+	static HHuginn::value_t make( HRuntime& runtime_, yaal::hcore::HString&& value_ ) {
+		return ( runtime_.object_factory()->create_string( yaal::move( value_ ) ) );
 	}
 };
 
