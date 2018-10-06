@@ -1,5 +1,7 @@
 /* Read yaal/LICENSE.md file for copyright and licensing information. */
 
+#include <cwctype>
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
@@ -235,6 +237,15 @@ public:
 		return ( thread_->object_factory().create_string( yaal::move( s ) ) );
 		M_EPILOG
 	}
+	static HHuginn::value_t capitalize( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "Text.capitalize", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
+		HString s( get_string( values_[0] ) );
+		s.lower();
+		s.set_at( 0, code_point_t( static_cast<code_point_t::value_type>( std::towupper( static_cast<wint_t>( s[0].get() ) ) ) ) );
+		return ( thread_->runtime().object_factory()->create_string( yaal::move( s ) ) );
+		M_EPILOG
+	}
 };
 
 namespace package_factory {
@@ -262,6 +273,7 @@ HPackageCreatorInterface::HInstance HTextCreator::do_new_instance( HRuntime* run
 		{ "hex",      runtime_->create_method( &HText::int_base_to_str, "Text.hex", BASE::HEX ), "( *int* ) - convert *int* value to a `string` using hexadecimal representation" },
 		{ "oct",      runtime_->create_method( &HText::int_base_to_str, "Text.oct", BASE::OCT ), "( *int* ) - convert *int* value to a `string` using octal representation" },
 		{ "bin",      runtime_->create_method( &HText::int_base_to_str, "Text.bin", BASE::BIN ), "( *int* ) - convert *int* value to a `string` using binary representation" },
+		{ "capitalize",             runtime_->create_method( &HText::capitalize ), "( *str* ) - return \"Capitalized\" version of input \"capItaLiZeD\" *str*" },
 		{ "character_class",        runtime_->create_method( &HText::character_class ),        "( *class* ) - get given character *class*" },
 		{ "substitute_environment", runtime_->create_method( &HText::substitute_environment ), "( *str*[, *recursively*] ) - (*recursively*) substitute environment variables in *str*" }
 	};
