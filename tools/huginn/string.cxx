@@ -232,6 +232,7 @@ public:
 					ALIGN align( ( type == HHuginn::TYPE::STRING ) || ( type == HHuginn::TYPE::CHARACTER ) ? ALIGN::LEFT : ALIGN::RIGHT );
 					bool prefix( false );
 					int width( 0 );
+					int prec( -1 );
 					code_point_t fill( ' '_ycp );
 					if ( ! specRaw.is_empty() ) {
 						code_point_t typeSpec( specRaw.back() );
@@ -278,14 +279,43 @@ public:
 						}
 						if ( ! specRaw.is_empty() ) {
 							try {
-								width = lexical_cast<int>( specRaw );
+								int endWidth( 0 );
+								width = stoi( specRaw, &endWidth );
+								specRaw.shift_left( endWidth );
+							} catch ( HException const& e ) {
+								ensure( false, e.what() );
+							}
+						}
+						if ( ! specRaw.is_empty() ) {
+							ensure( ( ( type == HHuginn::TYPE::REAL ) || ( type == HHuginn::TYPE::NUMBER ) ) && ( specRaw.front() == '.' ), errMsg );
+							specRaw.shift_left( 1 );
+							try {
+								prec = lexical_cast<int>( specRaw );
 							} catch ( HLexicalCastException const& e ) {
 								ensure( false, e.what() );
 							}
+							ensure( prec >= 0, "Invalid precision specification" );
 						}
 					}
 					if ( ( type == HHuginn::TYPE::INTEGER ) && ( base != BASE::DEC ) ) {
 						formatedValue.assign( int_to_str( static_cast<HHuginn::HInteger const*>( v.raw() )->value(), base, prefix ) );
+					} else if ( ( ( type == HHuginn::TYPE::REAL ) || ( type == HHuginn::TYPE::NUMBER ) ) && ( prec >= 0 ) ) {
+						if ( type == HHuginn::TYPE::REAL ) {
+							formatedValue = get_real( v );
+						} else {
+							formatedValue = get_number( v ).to_string();
+						}
+						HString::size_type dotPos( formatedValue.find( '.'_ycp ) );
+						if ( dotPos == HString::npos ) {
+							dotPos = formatedValue.get_length();
+							formatedValue.push_back( '.'_ycp );
+						}
+						HString::size_type realPrec( formatedValue.get_length() - dotPos - 1 );
+						if ( realPrec > prec ) {
+							formatedValue.erase( dotPos + 1 + prec );
+						} else if ( prec > realPrec ) {
+							formatedValue.append( prec - realPrec, '0'_ycp );
+						}
 					} else {
 						HHuginn::value_t sv( instruction::string( _thread, _values[idx], _position ) );
 						formatedValue.assign( static_cast<HHuginn::HString*>( sv.raw() )->value() );
