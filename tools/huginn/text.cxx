@@ -241,8 +241,10 @@ public:
 		M_PROLOG
 		verify_signature( "Text.capitalize", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		HString s( get_string( values_[0] ) );
-		s.lower();
-		s.set_at( 0, code_point_t( static_cast<code_point_t::value_type>( std::towupper( static_cast<wint_t>( s[0].get() ) ) ) ) );
+		if ( ! s.is_empty() ) {
+			s.lower();
+			s.set_at( 0, code_point_t( static_cast<code_point_t::value_type>( std::towupper( static_cast<wint_t>( s[0].get() ) ) ) ) );
+		}
 		return ( thread_->runtime().object_factory()->create_string( yaal::move( s ) ) );
 		M_EPILOG
 	}

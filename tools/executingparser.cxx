@@ -2,6 +2,7 @@
 
 #include <cctype>
 #include <cstdlib>
+#include <cstring>
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
@@ -2569,7 +2570,6 @@ yaal::hcore::HUTF8String::const_iterator HReal::do_parse( HExecutingParser* exec
 			if ( stop ) {
 				break;
 			}
-			_stringCache.push_back( *scan );
 			++ scan;
 		}
 	} else {
@@ -2577,10 +2577,15 @@ yaal::hcore::HUTF8String::const_iterator HReal::do_parse( HExecutingParser* exec
 	}
 	if ( ( ( _parse == PARSE::GREEDY ) && ( state >= INTEGRAL ) ) || ( ( _parse == PARSE::STRICT ) && ( state >= DOT ) ) ) {
 		range_t rng( range( executingParser_, first_, scan ) );
+		HUTF8String view( first_, scan );
+		int len( static_cast<int>( view.byte_count() ) );
 		if ( !! _actionDouble || !! _actionDoublePosition || !! _actionDoubleLong || !! _actionDoubleLongPosition ) {
-			int bufSize( static_cast<int>( _stringCache.get_length() + 1 ) );
-			_cache.realloc( bufSize );
-			copy_ascii( _stringCache, _cache.get<char>(), bufSize );
+			_cache.realloc( len + 1 );
+			::memcpy( _cache.get<char>(), view.raw(), static_cast<size_t>( len ) );
+			_cache.get<char>()[len] = 0;
+		}
+		if ( !! _actionNumber || !! _actionNumberPosition || !! _actionString || !! _actionStringPosition ) {
+			_stringCache.assign( view.raw(), len );
 		}
 		if ( !! _actionDouble ) {
 			double d( ::strtod( _cache.get<char>(), nullptr ) );
