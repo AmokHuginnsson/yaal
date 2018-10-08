@@ -178,6 +178,182 @@ HValueUnboxingIterator<data_t, iterator_t> value_unboxing_iterator( iterator_t i
 	return ( HValueUnboxingIterator<data_t, iterator_t>( it_ ) );
 }
 
+inline HHuginn::HFieldDefinition create_field(
+	HRuntime* runtime_,
+	HHuginn::identifier_id_t id_,
+	HHuginn::value_t (*func_)( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int ),
+	char const* doc_
+) {
+	return {
+		runtime_->identifier_name( id_ ),
+		runtime_->object_factory()->create_function_reference(
+			id_, yaal::hcore::call( func_, yaal::hcore::_1, yaal::hcore::_2, yaal::hcore::_3, yaal::hcore::_4 ), doc_
+		),
+		doc_
+	};
+}
+
+inline HHuginn::HFieldDefinition create_field(
+	HRuntime* runtime_,
+	char const* name_,
+	HHuginn::value_t (*func_)(
+		huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int
+	),
+	char const* doc_
+) {
+	return ( create_field( runtime_, runtime_->identifier_id( name_ ), func_, doc_ ) );
+}
+
+template<typename T0>
+inline HHuginn::HFieldDefinition create_field(
+	HRuntime* runtime_, HHuginn::identifier_id_t id_,
+	T0&& a0_,
+	HHuginn::value_t (*func_)( typename trait::decay<T0>::type, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int ),
+	char const* doc_
+) {
+	return {
+		runtime_->identifier_name( id_ ),
+		runtime_->object_factory()->create_function_reference(
+			id_, yaal::hcore::call(
+				func_, yaal::forward<T0>( a0_ ),
+				yaal::hcore::_1, yaal::hcore::_2, yaal::hcore::_3, yaal::hcore::_4
+			), doc_
+		),
+		doc_
+	};
+}
+
+template<typename T0>
+inline HHuginn::HFieldDefinition create_field(
+	HRuntime* runtime_,
+	char const* name_,
+	T0&& a0_,
+	HHuginn::value_t (*func_)(
+		typename trait::decay<T0>::type,
+		huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int
+	),
+	char const* doc_
+) {
+	return ( create_field( runtime_, runtime_->identifier_id( name_ ), yaal::forward<T0>( a0_ ), func_, doc_ ) );
+}
+
+template<typename T0, typename T1>
+inline HHuginn::HFieldDefinition create_field(
+	HRuntime* runtime_,
+	HHuginn::identifier_id_t id_,
+	T0&& a0_, T1&& a1_,
+	HHuginn::value_t (*func_)(
+		typename trait::decay<T0>::type, typename trait::decay<T1>::type,
+		huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int
+	),
+	char const* doc_
+) {
+	return {
+		runtime_->identifier_name( id_ ),
+		runtime_->object_factory()->create_function_reference(
+			id_, yaal::hcore::call(
+				func_, yaal::forward<T0>( a0_ ), yaal::forward<T1>( a1_ ),
+				yaal::hcore::_1, yaal::hcore::_2, yaal::hcore::_3, yaal::hcore::_4
+			), doc_
+		),
+		doc_
+	};
+}
+
+template<typename T0, typename T1>
+inline HHuginn::HFieldDefinition create_field(
+	HRuntime* runtime_,
+	char const* name_,
+	T0&& a0_, T1&& a1_,
+	HHuginn::value_t (*func_)(
+		typename trait::decay<T0>::type, typename trait::decay<T1>::type,
+		huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int
+	),
+	char const* doc_
+) {
+	return ( create_field( runtime_, runtime_->identifier_id( name_ ), yaal::forward<T0>( a0_ ), yaal::forward<T1>( a1_ ), func_, doc_ ) );
+}
+
+template<typename T0, typename T1, typename T2>
+inline HHuginn::HFieldDefinition create_field(
+	HRuntime* runtime_,
+	HHuginn::identifier_id_t id_,
+	T0&& a0_, T1&& a1_, T2&& a2_,
+	HHuginn::value_t (*func_)(
+		typename trait::decay<T0>::type, typename trait::decay<T1>::type, typename trait::decay<T2>::type,
+		huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int
+	),
+	char const* doc_
+) {
+	return {
+		runtime_->identifier_name( id_ ),
+		runtime_->object_factory()->create_function_reference(
+			id_,
+			yaal::hcore::call(
+				func_,
+				yaal::forward<T0>( a0_ ), yaal::forward<T1>( a1_ ), yaal::forward<T2>( a2_ ),
+				yaal::hcore::_1, yaal::hcore::_2, yaal::hcore::_3, yaal::hcore::_4
+			),
+			doc_
+		),
+		doc_
+	};
+}
+
+template<typename T0, typename T1, typename T2>
+inline HHuginn::HFieldDefinition create_field(
+	HRuntime* runtime_,
+	char const* name_,
+	T0&& a0_, T1&& a1_, T2&& a2_,
+	HHuginn::value_t (*func_)(
+		typename trait::decay<T0>::type, typename trait::decay<T1>::type, typename trait::decay<T2>::type,
+		huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int
+	),
+	char const* doc_
+) {
+	return ( create_field( runtime_, runtime_->identifier_id( name_ ), yaal::forward<T0>( a0_ ), yaal::forward<T1>( a1_ ), yaal::forward<T2>( a2_ ), func_, doc_ ) );
+}
+
+template<typename T0, typename T1, typename T2, typename T3>
+inline HHuginn::HFieldDefinition create_field(
+	HRuntime* runtime_,
+	HHuginn::identifier_id_t id_,
+	T0&& a0_, T1&& a1_, T2&& a2_, T3&& a3_,
+	HHuginn::value_t (*func_)(
+		typename trait::decay<T0>::type, typename trait::decay<T1>::type, typename trait::decay<T2>::type, typename trait::decay<T3>::type,
+		huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int
+	),
+	char const* doc_
+) {
+	return {
+		runtime_->identifier_name( id_ ),
+		runtime_->object_factory()->create_function_reference(
+			id_,
+			yaal::hcore::call(
+				func_,
+				yaal::forward<T0>( a0_ ), yaal::forward<T1>( a1_ ), yaal::forward<T2>( a2_ ), yaal::forward<T3>( a3_ ),
+				yaal::hcore::_1, yaal::hcore::_2, yaal::hcore::_3, yaal::hcore::_4
+			),
+			doc_
+		),
+		doc_
+	};
+}
+
+template<typename T0, typename T1, typename T2, typename T3>
+inline HHuginn::HFieldDefinition create_field(
+	HRuntime* runtime_,
+	char const* name_,
+	T0&& a0_, T1&& a1_, T2&& a2_, T3&& a3_,
+	HHuginn::value_t (*func_)(
+		typename trait::decay<T0>::type, typename trait::decay<T1>::type, typename trait::decay<T2>::type, typename trait::decay<T3>::type,
+		huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int
+	),
+	char const* doc_
+) {
+	return ( create_field( runtime_, runtime_->identifier_id( name_ ), yaal::forward<T0>( a0_ ), yaal::forward<T1>( a1_ ), yaal::forward<T2>( a2_ ), yaal::forward<T3>( a3_ ), func_, doc_ ) );
+}
+
 typedef yaal::hcore::HArray<yaal::hcore::HUTF8String> utf8_converters_t;
 
 template<int const ARG_COUNT, bool const RETURN_VOID, typename F>
