@@ -122,14 +122,36 @@ HHuginn::value_t HTime::get_days_in_month( huginn::HThread* thread_, HHuginn::va
 
 HHuginn::value_t HTime::subtract( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
-	char const name[] = "Time.subtract";
-	verify_arg_count( name, values_, 1, 1, thread_, position_ );
-	HHuginn::HClass const* c( (*object_)->get_class() );
-	verify_arg_type( name, values_, 0, c, ARITY::UNARY, thread_, position_ );
+	verify_signature_by_class( "Time.subtract", values_, { (*object_)->get_class() }, thread_, position_ );
 	hcore::HTime& lt( static_cast<HTime*>( object_->raw() )->_time );
 	hcore::HTime const& rt( static_cast<HTime const*>( values_[0].raw() )->_time );
 	lt -= rt;
 	return ( *object_ );
+	M_EPILOG
+}
+
+HHuginn::value_t HTime::hash( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "Time.hash", values_, 0, 0, thread_, position_ );
+	return ( thread_->object_factory().create_integer( static_cast<HTime*>( object_->raw() )->_time.raw() ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HTime::equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_signature_by_class( "Time.equals", values_, { (*object_)->get_class() }, thread_, position_ );
+	hcore::HTime const& lt( static_cast<HTime*>( object_->raw() )->_time );
+	hcore::HTime const& rt( static_cast<HTime const*>( values_[0].raw() )->_time );
+	return ( lt == rt ? thread_->runtime().true_value() : thread_->runtime().false_value() );
+	M_EPILOG
+}
+
+HHuginn::value_t HTime::less( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_signature_by_class( "Time.less", values_, { (*object_)->get_class() }, thread_, position_ );
+	hcore::HTime const& lt( static_cast<HTime*>( object_->raw() )->_time );
+	hcore::HTime const& rt( static_cast<HTime const*>( values_[0].raw() )->_time );
+	return ( lt < rt ? thread_->runtime().true_value() : thread_->runtime().false_value() );
 	M_EPILOG
 }
 
@@ -173,6 +195,9 @@ HHuginn::class_t HTime::get_class( HRuntime* runtime_ ) {
 			{ "get_days_in_month", runtime_->create_method( &HTime::get_days_in_month ), "get number of days in month for this time" },
 			{ "subtract",     runtime_->create_method( &HTime::subtract ),     "( *time* ) - calculate time difference between this and *time* time points" },
 			{ "from_string",  runtime_->create_method( &HTime::from_string ),  "( *str* ) - set time from parsed `string` *str*" },
+			{ "hash",	        runtime_->create_method( &HTime::hash ),         "calculate hash value for this `Time` point" },
+			{ "equals",       runtime_->create_method( &HTime::equals ),       "( *other* ) - test if *other* `Time` point is the same" },
+			{ "less",         runtime_->create_method( &HTime::less ),         "( *other* ) - test if this `Time` point comes before *other* `Time` point" },
 			{ "to_string",    runtime_->create_method( &HTime::to_string ),    "get `string` representation of this point-in-time" }
 		};
 		c->redefine( nullptr, fd );
