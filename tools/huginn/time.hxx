@@ -19,14 +19,22 @@ typedef yaal::hcore::HTime& ( yaal::hcore::HTime::*time_set_t )( int, int, int )
 typedef int ( yaal::hcore::HTime::*time_get_t )( void ) const;
 
 class HTime : public HHuginn::HValue {
-	yaal::hcore::HTime _time;
+public:
+	typedef yaal::hcore::HTime value_type;
+private:
+	value_type _time;
 public:
 	HTime( HHuginn::HClass const*, yaal::hcore::HTime const& );
+	value_type const& value( void ) const {
+		return ( _time );
+	}
 	static HHuginn::value_t mod( char const*, time_mod_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t get( char const*, time_get_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t set( char const*, time_set_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t set_datetime( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t get_month( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+	static HHuginn::value_t get_day_of_week( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+	static HHuginn::value_t get_days_in_month( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t subtract( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t from_string( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t to_string( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );

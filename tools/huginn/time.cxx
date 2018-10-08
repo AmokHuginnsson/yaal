@@ -10,6 +10,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "objectfactory.hxx"
 #include "packagefactory.hxx"
 
+#include "hcore/hfile.hxx"
+
 using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::tools::huginn;
@@ -104,6 +106,20 @@ HHuginn::value_t HTime::get_month( huginn::HThread* thread_, HHuginn::value_t* o
 	M_EPILOG
 }
 
+HHuginn::value_t HTime::get_day_of_week( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "Time.get_day_of_week", values_, 0, 0, thread_, position_ );
+	return ( thread_->object_factory().create_integer( static_cast<int>( static_cast<HTime*>( object_->raw() )->_time.get_day_of_week() ) ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HTime::get_days_in_month( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "Time.get_days_in_month", values_, 0, 0, thread_, position_ );
+	return ( thread_->object_factory().create_integer( static_cast<HTime*>( object_->raw() )->_time.get_days_in_month() ) );
+	M_EPILOG
+}
+
 HHuginn::value_t HTime::subtract( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Time.subtract";
@@ -153,12 +169,14 @@ HHuginn::class_t HTime::get_class( HRuntime* runtime_ ) {
 			{ "get_second",   runtime_->create_method( &HTime::get, "Time.get_second", &hcore::HTime::get_second ), "get number of seconds from time" },
 			{ "set_datetime", runtime_->create_method( &HTime::set_datetime ), "( *YYYY*, *MM*, *DD*, *hh*, *mm*, *ss* ) - set date value to *YYYY*-*MM*-*DD* *hh*:*mm*:*ss*" },
 			{ "get_month",    runtime_->create_method( &HTime::get_month ),    "get number of months from time" },
+			{ "get_day_of_week",   runtime_->create_method( &HTime::get_day_of_week ),   "get day of the week for this time" },
+			{ "get_days_in_month", runtime_->create_method( &HTime::get_days_in_month ), "get number of days in month for this time" },
 			{ "subtract",     runtime_->create_method( &HTime::subtract ),     "( *time* ) - calculate time difference between this and *time* time points" },
 			{ "from_string",  runtime_->create_method( &HTime::from_string ),  "( *str* ) - set time from parsed `string` *str*" },
 			{ "to_string",    runtime_->create_method( &HTime::to_string ),    "get `string` representation of this point-in-time" }
 		};
 		c->redefine( nullptr, fd );
-		runtime_->huginn()->register_class( c );
+		runtime_->huginn()->register_class( c, HHuginn::VISIBILITY::GLOBAL );
 	}
 	return ( c );
 	M_EPILOG
