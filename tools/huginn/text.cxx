@@ -31,12 +31,12 @@ namespace huginn {
 
 class HText : public HPackage {
 	HHuginn::class_t _streamClass;
-	enumeration::HEnumerationClass::ptr_t _characterClass;
+	enumeration::HEnumerationClass::ptr_t _characterClassClass;
 public:
 	HText( HHuginn::HClass* class_ )
 		: HPackage( class_ )
 		, _streamClass( HStream::get_class( class_->runtime() ) )
-		, _characterClass(
+		, _characterClassClass(
 			add_enumeration_as_member(
 				class_,
 				enumeration::create_class(
@@ -160,7 +160,7 @@ public:
 	static HHuginn::value_t character_class( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		HText& t( *static_cast<HText*>( object_->raw() ) );
-		verify_signature_by_class( "Text.character_class", values_, { t._characterClass->enumeral_class() }, thread_, position_ );
+		verify_signature_by_class( "Text.character_class", values_, { t._characterClassClass->enumeral_class() }, thread_, position_ );
 		HHuginn::HEnumeral::value_type val( get_enumeral( values_[0] ) );
 		character_class_t const* cc8( nullptr );
 		HCharacterClass<char16_t> const* cc16( nullptr );

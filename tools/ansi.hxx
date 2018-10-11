@@ -16,12 +16,14 @@ private:
 	char const* const _data;
 public:
 	HSequence( char const* data_ )
-		: _data( data_ )
-		{}
+		: _data( data_ ) {
+	}
 	HSequence( HSequence const& seq_ )
-		: _data( seq_._data ) { }
-	char const* operator* ( void ) const
-		{ return ( _data ); }
+		: _data( seq_._data ) {
+	}
+	char const* operator* ( void ) const {
+		return ( _data );
+	}
 private:
 	HSequence& operator = ( HSequence const& );
 };
