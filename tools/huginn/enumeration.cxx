@@ -158,7 +158,7 @@ HHuginn::class_t create_class(
 	HHuginn::HClass const* origin_
 ) {
 	HHuginn::identifier_id_t classIdentifier( runtime_->identifier_id( name_ ) );
-	HHuginn::class_t c( runtime_ ? runtime_->get_class( classIdentifier ) : nullptr );
+	HHuginn::class_t c( runtime_ && ! origin_ ? runtime_->get_class( classIdentifier ) : nullptr );
 	if ( ! c ) {
 		c =	runtime_->create_class(
 			HRuntime::class_constructor_t(
