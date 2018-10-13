@@ -149,6 +149,11 @@ int long long unsigned stoull_impl( char const*, int*, int );
 }
 
 template<>
+int long long lexical_cast( double long const& val_ ) {
+	return ( static_cast<int long long>( val_ ) );
+}
+
+template<>
 int long long unsigned lexical_cast( HString const& str_ ) {
 	M_PROLOG
 	char alternateForm[ MAX_VALID_BINARY_INTEGER_LENGTH ];

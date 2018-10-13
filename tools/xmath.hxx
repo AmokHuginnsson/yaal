@@ -9,6 +9,7 @@
 #include "hcore/algorithm.hxx"
 #include "hcore/iterator.hxx"
 #include "hcore/hbitflag.hxx"
+#include "hcore/harray.hxx"
 
 /* *TODO* Add `mode`. */
 
@@ -35,6 +36,7 @@ struct AGGREGATE_TYPE {
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const MEDIAN;
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const MEAN_ABSOLUTE_DEVIATION;
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const INTERQUARTILE_RANGE;
+	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const HISTOGRAM;
 	static int long long required_data_points( aggregate_type_t const& );
 };
 
@@ -45,6 +47,7 @@ class HNumberSetStats {
 public:
 	typedef HNumberSetStats this_type;
 	typedef numeric_t value_type;
+	typedef yaal::hcore::HArray<int> buckets_t;
 private:
 	int long _count;
 	numeric_t _minimum;
@@ -56,6 +59,7 @@ private:
 	numeric_t _meanAbsoluteDeviation;
 	numeric_t _sampleVariance;
 	numeric_t _populationVariance;
+	buckets_t _histogram;
 	aggregate_type_t _aggregateType;
 public:
 	/*! \brief Construct statistics for given range of numbers.
@@ -68,7 +72,7 @@ public:
 	 * One can explicitly request `median' aggregation type.
 	 */
 	template<typename iterator_t>
-	HNumberSetStats( iterator_t first_, iterator_t last_, aggregate_type_t aggregateType_ = AGGREGATE_TYPE::BASIC )
+	HNumberSetStats( iterator_t first_, iterator_t last_, aggregate_type_t aggregateType_ = AGGREGATE_TYPE::BASIC, int buckets_ = 0 )
 		: _count( 0 )
 		, _minimum()
 		, _maximum()
@@ -79,10 +83,12 @@ public:
 		, _meanAbsoluteDeviation()
 		, _sampleVariance()
 		, _populationVariance()
+		, _histogram( buckets_ )
 		, _aggregateType( aggregateType_ ) {
 		M_PROLOG
-		if ( _aggregateType & ( AGGREGATE_TYPE::MEDIAN | AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION ) ) {
+		if ( _aggregateType & ( AGGREGATE_TYPE::MEDIAN | AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION | AGGREGATE_TYPE::HISTOGRAM ) ) {
 			typedef hcore::HAuxiliaryBuffer<numeric_t> aux_t;
+			M_ENSURE( ( buckets_ > 0 ) || ! ( aggregateType_ & AGGREGATE_TYPE::HISTOGRAM ) );
 			M_ENSURE( first_ != last_ );
 			aux_t aux( first_, last_ );
 			M_ENSURE( aux.get_size() == aux.get_requested_size() );
@@ -93,6 +99,9 @@ public:
 		}
 		return;
 		M_EPILOG
+	}
+	aggregate_type_t aggregate_type( void ) const {
+		return ( _aggregateType );
 	}
 	int long count( void ) const {
 		M_PROLOG
@@ -180,6 +189,12 @@ public:
 		return ( _interquartileRange );
 		M_EPILOG
 	}
+	buckets_t const& histogram( void ) const {
+		M_PROLOG
+		M_ENSURE( _aggregateType & AGGREGATE_TYPE::HISTOGRAM );
+		return ( _histogram );
+		M_EPILOG
+	}
 private:
 	template<typename iterator_t>
 	void calculate_basic_stats( iterator_t first_, iterator_t last_ ) {
@@ -241,6 +256,18 @@ private:
 			}
 			_meanAbsoluteDeviation = acc / static_cast<numeric_t>( _count );
 		}
+		if ( _aggregateType & AGGREGATE_TYPE::HISTOGRAM ) {
+			numeric_t bucketSize( ( _maximum - _minimum ) / numeric_t( _histogram.get_size() ) );
+			if ( bucketSize > 0 ) {
+				for ( iterator_t it( first_ ); it != last_; ++ it ) {
+					int bucketIndex( safe_int::cast<int>( lexical_cast<int long long>( ( *it - _minimum ) / bucketSize ) ) );
+					if ( bucketIndex >= static_cast<int>( _histogram.get_size() ) ) {
+						-- bucketIndex;
+					}
+					++ _histogram[ bucketIndex ];
+				}
+			}
+		}
 		return;
 		M_EPILOG
 	}
@@ -273,7 +300,7 @@ HNumberSetStats<
 		typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type,
 		double long
 	>::type
-> number_set_stats( iterator_t first_, iterator_t last_, aggregate_type_t aggregateType_ = AGGREGATE_TYPE::BASIC ) {
+> number_set_stats( iterator_t first_, iterator_t last_, aggregate_type_t aggregateType_ = AGGREGATE_TYPE::BASIC, int buckets_ = 0 ) {
 	M_PROLOG
 	return (
 		HNumberSetStats<
@@ -282,7 +309,7 @@ HNumberSetStats<
 				typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type,
 				double long
 			>::type
-		>( first_, last_, aggregateType_ )
+		>( first_, last_, aggregateType_, buckets_ )
 	);
 	M_EPILOG
 }

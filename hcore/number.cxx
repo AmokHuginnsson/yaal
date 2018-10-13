@@ -861,5 +861,10 @@ yaal::hcore::HNumber greatest_common_divisor( yaal::hcore::HNumber a_, yaal::hco
 
 }
 
+template<>
+int long long lexical_cast( HNumber const& val_ ) {
+	return ( val_.to_integer() );
+}
+
 }
 
