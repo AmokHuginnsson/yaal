@@ -104,15 +104,41 @@ static int const FWD_TIOCGWINSZ = TIOCGWINSZ;
 
 }
 
-HTerminal::coord_t HTerminal::size( void ) const {
+namespace {
+
+int from_env( char const* envVarName_ ) {
+	int val( -1 );
+	char const* envVarValue( ::getenv( envVarName_ ) );
+	if ( envVarValue ) {
+		try {
+			val = lexical_cast<int>( envVarValue );
+		} catch ( HException const& ) {
+		}
+	}
+	return ( val );
+}
+
+}
+
+HTerminal::HSize HTerminal::size( void ) const {
 	M_PROLOG
-	M_ENSURE( exists() );
-	winsize w;
-	::memset( &w, 0, sizeof ( w ) );
+	M_ENSURE( exists(), "Not connected to a terminal." );
 	int termFd( find_term_fd() );
 	M_ASSERT( termFd != BAD_FD );
-	M_ENSURE( ioctl( termFd, FWD_TIOCGWINSZ, &w ) >= 0 );
-	return ( coord_t( w.ws_row, w.ws_col ) );
+	int lines( from_env( "LINES" ) );
+	int columns( from_env( "COLUMNS" ) );
+	if ( ( lines < 0 ) || ( columns < 0 ) ) {
+		winsize w;
+		::memset( &w, 0, sizeof ( w ) );
+		M_ENSURE( ioctl( termFd, FWD_TIOCGWINSZ, &w ) >= 0 );
+		if ( lines < 0 ) {
+			lines = w.ws_row;
+		}
+		if ( columns < 0 ) {
+			columns = w.ws_col;
+		}
+	}
+	return ( HSize( lines, columns ) );
 	M_EPILOG
 }
 

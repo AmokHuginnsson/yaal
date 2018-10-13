@@ -16,7 +16,25 @@ class M_YAAL_TOOLS_PUBLIC_API HTerminal : public yaal::hcore::HSingleton<HTermin
 public:
 	typedef HTerminal this_type;
 	typedef yaal::hcore::HSingleton<HTerminal> base_type;
-	typedef yaal::hcore::HPair<int, int> coord_t;
+	class HSize {
+		int _lines;
+		int _columns;
+	public:
+		HSize( void )
+			: _lines( -1 )
+			, _columns( -1 ) {
+		}
+		HSize( int lines_, int columns_ )
+			: _lines( lines_ )
+			, _columns( columns_ ) {
+		}
+		int lines( void ) const {
+			return ( _lines );
+		}
+		int columns( void ) const {
+			return ( _columns );
+		}
+	};
 private:
 	yaal::hcore::HChunk _termios;
 public:
@@ -24,7 +42,7 @@ public:
 	bool exists( void ) const;
 	void init( void );
 	void flush( void );
-	coord_t size( void ) const;
+	HSize size( void ) const;
 	static int life_time( int ) {
 		return ( 50 );
 	}

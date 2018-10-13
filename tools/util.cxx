@@ -427,14 +427,8 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 	bool color( is_a_tty( out_ ) && info.color() );
 	int columns( 0 );
 	if ( color && HTerminal::get_instance().exists() ) {
-		HTerminal::coord_t c( HTerminal::get_instance().size() );
-		columns = c.second;
-	}
-	if ( columns <= 0 ) {
-		char const* envColumns( ::getenv( "COLUMNS" ) );
-		if ( envColumns ) {
-			columns = lexical_cast<int>( envColumns );
-		}
+		HTerminal::HSize s( HTerminal::get_instance().size() );
+		columns = s.columns();
 	}
 	columns = xmath::clip( 80, columns, 128 );
 	if ( color ) {

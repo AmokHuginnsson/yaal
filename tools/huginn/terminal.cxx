@@ -95,21 +95,36 @@ public:
 	static HHuginn::value_t lines( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "Terminal.lines", values_, 0, 0, thread_, position_ );
-		return ( thread_->object_factory().create_integer( tools::HTerminal::get_instance().size().first ) );
+		int l( -1 );
+		try {
+			l = tools::HTerminal::get_instance().size().lines();
+		} catch ( HException const& e ) {
+			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+		}
+		return ( thread_->object_factory().create_integer( l ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t columns( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "Terminal.columns", values_, 0, 0, thread_, position_ );
-		return ( thread_->object_factory().create_integer( tools::HTerminal::get_instance().size().second ) );
+		int c( -1 );
+		try {
+			c = tools::HTerminal::get_instance().size().columns();
+		} catch ( HException const& e ) {
+			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+		}
+		return ( thread_->object_factory().create_integer( c ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t move( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "Terminal.move", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER }, thread_, position_ );
-		tools::HTerminal& term( tools::HTerminal::get_instance() );
-		int l( term.size().first );
-		int c( term.size().second );
+		tools::HTerminal::HSize s;
+		try {
+			s = tools::HTerminal::get_instance().size();
+		} catch ( HException const& e ) {
+			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+		}
 		int row( safe_int::cast<int>( get_integer( values_[0] ) ) );
 		int column( safe_int::cast<int>( get_integer( values_[1] ) ) );
 		if ( ( row < 0 ) || ( column < 0 ) ) {
@@ -119,10 +134,10 @@ public:
 				position_
 			);
 		}
-		if ( ( row >= l ) || ( column >= c ) ) {
+		if ( ( row >= s.lines() ) || ( column >= s.columns() ) ) {
 			thread_->raise(
 				static_cast<HTerminal*>( object_->raw() )->_exceptionClass.raw(),
-				"Invalid "_ys.append( row >= l ? "row: " : "column: " ).append( row >= l ? row : column ),
+				"Invalid "_ys.append( row >= s.lines() ? "row: " : "column: " ).append( row >= s.lines() ? row : column ),
 				position_
 			);
 		}
