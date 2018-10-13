@@ -22,19 +22,24 @@ namespace tools {
 namespace huginn {
 
 template<typename coll_t>
-HNumberSetStatistics::number_set_stats_t make_data( HThread* thread_, HHuginn::type_id_t const& vt_, HHuginn::value_t const& col_, int position_ ) {
+HNumberSetStatistics::number_set_stats_t make_data( HThread* thread_, HHuginn::type_id_t const& vt_, HHuginn::value_t const& col_, int buckets_, int position_ ) {
 	M_PROLOG
 	typename coll_t::values_t const& src( static_cast<coll_t const*>( col_.raw() )->value() );
 	HNumberSetStatistics::number_set_stats_t nss;
 	if ( src.is_empty() ) {
 		throw HHuginn::HHuginnRuntimeException( "Cannot aggregate statistics over empty set.", thread_->current_frame()->file_id(), position_ );
 	}
+	aggregate_type_t a( AGGREGATE_TYPE::BASIC | AGGREGATE_TYPE::MEDIAN | AGGREGATE_TYPE::INTERQUARTILE_RANGE | AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION );
+	if ( buckets_ > 0 ) {
+		a |= AGGREGATE_TYPE::HISTOGRAM;
+	}
 	if ( vt_ == HHuginn::TYPE::REAL ) {
 		nss = HNumberSetStatistics::number_set_stats_t(
 			make_resource<HNumberSetStatistics::number_set_stats_real_t>(
 				value_unboxing_iterator<double long>( src.begin() ),
 				value_unboxing_iterator<double long>( src.end() ),
-				AGGREGATE_TYPE::BASIC | AGGREGATE_TYPE::MEDIAN | AGGREGATE_TYPE::INTERQUARTILE_RANGE | AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION
+				a,
+				buckets_
 			)
 		);
 	} else {
@@ -43,7 +48,8 @@ HNumberSetStatistics::number_set_stats_t make_data( HThread* thread_, HHuginn::t
 			make_resource<HNumberSetStatistics::number_set_stats_number_t>(
 				value_unboxing_iterator<yaal::hcore::HNumber>( src.begin() ),
 				value_unboxing_iterator<yaal::hcore::HNumber>( src.end() ),
-				AGGREGATE_TYPE::BASIC | AGGREGATE_TYPE::MEDIAN | AGGREGATE_TYPE::INTERQUARTILE_RANGE | AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION
+				a,
+				buckets_
 			)
 		);
 	}
@@ -55,19 +61,32 @@ HNumberSetStatistics::HNumberSetStatistics( huginn::HThread* thread_, HHuginn::H
 	: HValue( class_ )
 	, _stats() {
 	char const name[] = "NumberSetStatistics.constructor";
-	verify_arg_count( name, values_, 1, 1, thread_, position_ );
-	HHuginn::type_id_t t( verify_arg_type( name, values_, 0, { HHuginn::TYPE::TUPLE, HHuginn::TYPE::LIST, HHuginn::TYPE::DEQUE, HHuginn::TYPE::SET, HHuginn::TYPE::ORDER }, ARITY::UNARY, thread_, position_ ) );
-	HHuginn::type_id_t vt( verify_arg_collection_value_type( name, values_, 0, ARITY::UNARY, { HHuginn::TYPE::REAL, HHuginn::TYPE::NUMBER }, UNIFORMITY::REQUIRED, thread_, position_ ) );
+	verify_arg_count( name, values_, 1, 2, thread_, position_ );
+	HHuginn::type_id_t t(
+		verify_arg_type(
+			name, values_, 0,
+			{ HHuginn::TYPE::TUPLE, HHuginn::TYPE::LIST, HHuginn::TYPE::DEQUE, HHuginn::TYPE::SET, HHuginn::TYPE::ORDER },
+			ARITY::MULTIPLE, thread_, position_
+		)
+	);
+	HHuginn::type_id_t vt(
+		verify_arg_collection_value_type( name, values_, 0, ARITY::MULTIPLE, { HHuginn::TYPE::REAL, HHuginn::TYPE::NUMBER }, UNIFORMITY::REQUIRED, thread_, position_ )
+	);
+	int buckets( 0 );
+	if ( values_.get_size() > 1 ) {
+		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
+		buckets = safe_int::cast<int>( get_integer( values_[1] ) );
+	}
 	if ( t == HHuginn::TYPE::TUPLE ) {
-		_stats = make_data<HHuginn::HTuple>( thread_, vt, values_[0], position_ );
+		_stats = make_data<HHuginn::HTuple>( thread_, vt, values_[0], buckets, position_ );
 	} else if ( t == HHuginn::TYPE::LIST ) {
-		_stats = make_data<HHuginn::HList>( thread_, vt, values_[0], position_ );
+		_stats = make_data<HHuginn::HList>( thread_, vt, values_[0], buckets, position_ );
 	} else if ( t == HHuginn::TYPE::DEQUE ) {
-		_stats = make_data<HHuginn::HDeque>( thread_, vt, values_[0], position_ );
+		_stats = make_data<HHuginn::HDeque>( thread_, vt, values_[0], buckets, position_ );
 	} else if ( t == HHuginn::TYPE::SET ) {
-		_stats = make_data<HHuginn::HSet>( thread_, vt, values_[0], position_ );
+		_stats = make_data<HHuginn::HSet>( thread_, vt, values_[0], buckets, position_ );
 	} else if ( t == HHuginn::TYPE::ORDER ) {
-		_stats = make_data<HHuginn::HOrder>( thread_, vt, values_[0], position_ );
+		_stats = make_data<HHuginn::HOrder>( thread_, vt, values_[0], buckets, position_ );
 	}
 	return;
 }
@@ -164,6 +183,37 @@ HHuginn::value_t HNumberSetStatistics::count( huginn::HThread* thread_, HHuginn:
 	M_EPILOG
 }
 
+template<typename T>
+inline void histogram_impl( HObjectFactory& of_, T const& nss_, HHuginn::HList::values_t& data_ ) {
+	M_PROLOG
+	if ( nss_.aggregate_type() & AGGREGATE_TYPE::HISTOGRAM ) {
+		for ( int c : nss_.histogram() ) {
+			data_.push_back( of_.create_integer( c ) );
+		}
+	}
+	return;
+	M_EPILOG
+}
+
+HHuginn::value_t HNumberSetStatistics::histogram( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "NumberSetStatistics.histogram", values_, 0, 0, thread_, position_ );
+	HHuginn::HList::values_t data;
+	HNumberSetStatistics* o( static_cast<HNumberSetStatistics*>( object_->raw() ) );
+	if ( o->_stats.type() == 0 ) {
+		number_set_stats_real_t& nss( *( o->_stats.get<number_set_stats_real_ptr_t>().raw() ) );
+		histogram_impl( thread_->object_factory(), nss, data );
+	} else {
+		number_set_stats_number_t& nss( *( o->_stats.get<number_set_stats_number_ptr_t>().raw() ) );
+		histogram_impl( thread_->object_factory(), nss, data );
+	}
+	if ( data.is_empty() ) {
+		throw HHuginn::HHuginnRuntimeException( "No histogram information was requested not generated.", thread_->current_frame()->file_id(), position_ );
+	}
+	return ( thread_->object_factory().create_list( yaal::move( data ) ) );
+	M_EPILOG
+}
+
 HHuginn::value_t HNumberSetStatistics::create_instance( HHuginn::HClass const* class_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	return ( thread_->object_factory().create<HNumberSetStatistics>( thread_, class_, values_, position_ ) );
@@ -196,7 +246,8 @@ HHuginn::class_t HNumberSetStatistics::get_class( HRuntime* runtime_, HHuginn::H
 		{ "population_standard_deviation", runtime_->create_method( &HNumberSetStatistics::stat, "NumberSetStatistics.population_standard_deviation", AGGREGATE_TYPE::POPULATION_STANDARD_DEVIATION ), "a population standard deviation of the numeric set" },
 		{ "mean_absolute_deviation",       runtime_->create_method( &HNumberSetStatistics::stat, "NumberSetStatistics.mean_absolute_deviation",       AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION ),       "a mean absolute deviation of the numeric set" },
 		{ "range",                         runtime_->create_method( &HNumberSetStatistics::derivative_stat, "NumberSetStatistics.range",              DERIVATIVE_STAT::RANGE ),                        "a range of values in the numeric set" },
-		{ "mid_range",                     runtime_->create_method( &HNumberSetStatistics::derivative_stat, "NumberSetStatistics.mid_range",          DERIVATIVE_STAT::MID_RANGE ),                    "a mid range value of the numbers in the given set" }
+		{ "mid_range",                     runtime_->create_method( &HNumberSetStatistics::derivative_stat, "NumberSetStatistics.mid_range",          DERIVATIVE_STAT::MID_RANGE ),                    "a mid range value of the numbers in the given set" },
+		{ "histogram",                     runtime_->create_method( &HNumberSetStatistics::histogram ), "return a histogram calculated for given dataset" }
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );
