@@ -208,7 +208,7 @@ HHuginn::value_t HNumberSetStatistics::histogram( huginn::HThread* thread_, HHug
 		histogram_impl( thread_->object_factory(), nss, data );
 	}
 	if ( data.is_empty() ) {
-		throw HHuginn::HHuginnRuntimeException( "No histogram information was requested not generated.", thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "No histogram information was requested nor generated.", thread_->current_frame()->file_id(), position_ );
 	}
 	return ( thread_->object_factory().create_list( yaal::move( data ) ) );
 	M_EPILOG

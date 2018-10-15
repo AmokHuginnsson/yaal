@@ -417,6 +417,27 @@ void moving_average( iterator_t first_, iterator_t last_, iterator_t dst_, int l
 	return;
 }
 
+class HModularMultiplicativeInverse {
+	int long long _greatestCommonDivisor;
+	int long long _inverse;
+public:
+	HModularMultiplicativeInverse( void )
+		: _greatestCommonDivisor( -1 )
+		, _inverse( -1 ) {
+	}
+	HModularMultiplicativeInverse( int long long greatestCommonDivisor_, int long long inverse_ )
+		: _greatestCommonDivisor( greatestCommonDivisor_ )
+		, _inverse( inverse_ ) {
+	}
+	int long long greatest_common_divisor( void ) const {
+		return ( _greatestCommonDivisor );
+	}
+	int long long inverse( void ) const;
+};
+
+HModularMultiplicativeInverse modular_multiplicative_inverse( int long long, int long long );
+int long long modular_multiplication( int long long, int long long, int long long );
+
 }
 
 }
