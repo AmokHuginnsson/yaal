@@ -163,7 +163,7 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t&& value_, 
 			if ( ( state_ == HFrame::STATE::EXCEPTION ) || ( state_ == HFrame::STATE::RUNTIME_EXCEPTION ) ) {
 				target = nullptr;
 			} else {
-				M_ASSERT( state_ == HFrame::STATE::RETURN );
+				M_ASSERT( ( state_ == HFrame::STATE::RETURN ) || ( state_ == HFrame::STATE::EXIT ) );
 			}
 			break;
 		} else if ( ( state_ == HFrame::STATE::RETURN ) && ( parent->number() != no ) ) {
@@ -186,6 +186,8 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t&& value_, 
 				}
 				break;
 			}
+		} else if ( ( state_ == HFrame::STATE::EXIT ) && ! parent ) {
+			break;
 		}
 		target = parent;
 	}

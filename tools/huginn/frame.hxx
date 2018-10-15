@@ -37,8 +37,13 @@ public:
 		RETURN,
 		BREAK,
 		CONTINUE,
+		/*
+		 * Order matters! EXCEPTION, RUNTIME_EXCEPTION and EXIT must be
+		 * its own group at the end of enumeration
+		 */
 		EXCEPTION,
-		RUNTIME_EXCEPTION
+		RUNTIME_EXCEPTION,
+		EXIT
 	};
 	enum class ACCESS {
 		VALUE,
