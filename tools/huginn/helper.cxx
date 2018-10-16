@@ -167,7 +167,7 @@ enumeration::HEnumerationClass::ptr_t add_enumeration_as_member(
 	M_EPILOG
 }
 
-HHuginn::class_t class_exception( HHuginn::HClass* package_ ) {
+HHuginn::class_t class_exception( HHuginn::HClass* package_, HHuginn::HClass const* base_ ) {
 	HString name( package_->name() );
 	HString exName( name );
 	exName.append( "Exception" );
@@ -177,7 +177,9 @@ HHuginn::class_t class_exception( HHuginn::HClass* package_ ) {
 			exception::create_class(
 				package_->runtime(),
 				exName,
-				"The `"_ys.append( exName ).append( "` exception type for `" ).append( name ).append( "` package." )
+				"The `"_ys.append( exName ).append( "` exception type for `" ).append( name ).append( "` package." ),
+				HHuginn::VISIBILITY::PACKAGE,
+				base_
 			),
 			"( *message* ) - create instance of "_ys.append( exName ).append( " with given *message*" )
 		)

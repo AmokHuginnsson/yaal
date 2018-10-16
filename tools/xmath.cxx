@@ -95,6 +95,10 @@ int long long modular_multiplication( int long long a_, int long long b_, int lo
 	tb = tb % mod;
 	ta = ta % mod;
 	if ( ( tb > 0 ) && ( ta > ( meta::max_unsigned<int long long unsigned>::value / tb ) ) ) {
+		if ( tb > ta ) {
+			using yaal::swap;
+			swap( ta, tb );
+		}
 		while ( tb > 0ULL ) {
 			if ( ( tb % 2ULL ) == 1ULL ) {
 				r += ta;

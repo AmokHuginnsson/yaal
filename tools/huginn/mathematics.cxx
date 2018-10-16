@@ -22,6 +22,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 
 using namespace yaal;
 using namespace yaal::hcore;
+using namespace yaal::tools::xmath;
 using namespace yaal::tools::huginn;
 
 namespace yaal {
@@ -68,7 +69,7 @@ public:
 				"([ *cap* ]) - create random number generator which output values are capped at *cap*"
 			)
 		)
-		, _exceptionClass( class_exception( class_ ) ) {
+		, _exceptionClass( class_exception( class_, class_->runtime()->object_factory()->arithmetic_exception_class() ) ) {
 		return;
 	}
 	static HHuginn::value_t get_constant( char const* name_, constant_getter_t constantGetter_, double long real_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
@@ -500,6 +501,36 @@ public:
 		return ( thread_->object_factory().create_number( xmath::binomial_coefficient( n1, n2 ) ) );
 		M_EPILOG
 	}
+	static HHuginn::value_t modular_multiplicative_inverse( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "Mathematics.modular_multiplicative_inverse", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER }, thread_, position_ );
+		HHuginn::HInteger::value_type mod( get_integer( values_[0] ) );
+		HHuginn::HInteger::value_type val( get_integer( values_[1] ) );
+		if ( ( mod <= 0 ) || ( val <= 0 ) || ( val >= mod ) ) {
+			throw HHuginn::HHuginnRuntimeException( "Invalid argument.", thread_->current_frame()->file_id(), position_ );
+		}
+		HHuginn::HInteger::value_type res( 0 );
+		HModularMultiplicativeInverse mmi( xmath::modular_multiplicative_inverse( mod, val ) );
+		if ( mmi.greatest_common_divisor() == 1 ) {
+			res = mmi.inverse();
+		} else {
+			thread_->raise( static_cast<HMathematics*>( object_->raw() )->_exceptionClass.raw(), "Multiplicative inverse does not exist.", position_ );
+		}
+		return ( thread_->object_factory().create_integer( res ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t modular_multiplication( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "Mathematics.modular_multiplication", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER }, thread_, position_ );
+		HHuginn::HInteger::value_type fact1( get_integer( values_[0] ) );
+		HHuginn::HInteger::value_type fact2( get_integer( values_[1] ) );
+		HHuginn::HInteger::value_type mod( get_integer( values_[2] ) );
+		if ( ( mod <= 0 ) || ( fact1 < 0 ) || ( fact2 < 0 ) ) {
+			throw HHuginn::HHuginnRuntimeException( "Invalid argument.", thread_->current_frame()->file_id(), position_ );
+		}
+		return ( thread_->object_factory().create_integer( xmath::modular_multiplication( fact1, fact2, mod ) ) );
+		M_EPILOG
+	}
 	static HHuginn::value_t statistics( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		HMathematics* m( static_cast<HMathematics*>( object_->raw() ) );
@@ -559,6 +590,14 @@ HPackageCreatorInterface::HInstance HMathematicsCreator::do_new_instance( HRunti
 		{ "binomial_coefficient",
 			runtime_->create_method( &HMathematics::binomial_coefficient ),
 			"( *num1*, *num2* ) - calculate binomial coefficient of *num1* and *num2*"
+		},
+		{ "modular_multiplicative_inverse",
+			runtime_->create_method( &HMathematics::modular_multiplicative_inverse ),
+			"( *modulus*, *value* ) - find modular multiplicative inverse for given *value* with respect to *modulus*"
+		},
+		{ "modular_multiplication",
+			runtime_->create_method( &HMathematics::modular_multiplication ),
+			"( *fact1*, *fact2*, *modulus* ) - calculate result of modular multiplication of *fact1* and *fact2* with respect to *modulus*"
 		},
 		{ "statistics",           runtime_->create_method( &HMathematics::statistics ),           "( *iterable* ) - create NumberSetStatistics over *iterable* of uniformly types values" }
 	};
