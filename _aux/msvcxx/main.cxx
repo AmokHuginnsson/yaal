@@ -19,7 +19,6 @@
 #include "pwd.h"
 #include "grp.h"
 #include "dlfcn.h"
-#include "termios.h"
 #include "sys/mman.h"
 #include "sys/resource.h"
 #include "sys/socket.h"
@@ -75,8 +74,9 @@ int backtrace( void** buf_, int size_ ) {
 	int toFetch( std::min( size_, 62 ) );
 	::SetLastError( 0 );
 	int got( ::CaptureStackBackTrace( 0, toFetch, buf_, nullptr ) );
-	if ( ( toFetch > 0 ) && ( got < 1 ) && ( ::GetLastError() != 0 ) )
+	if ( ( toFetch > 0 ) && ( got < 1 ) && ( ::GetLastError() != 0 ) ) {
 		log_windows_error( "CaptureStackBackTrace" );
+	}
 	static bool once( false );
 	if ( ! once ) {
 		once = true;
@@ -660,37 +660,3 @@ int munmap( void* ptr_, size_t ) {
 	return ( UnmapViewOfFile( ptr_ ) ? 0 : -1 );
 }
 
-int tcgetattr( int, struct termios* ) {
-	errno = ENOSYS;
-	return ( -1 );
-}
-
-int cfsetospeed( struct termios*, speed_t ) {
-	errno = ENOSYS;
-	return ( -1 );
-}
-
-int cfsetispeed( struct termios*, speed_t ) {
-	errno = ENOSYS;
-	return ( -1 );
-}
-
-int tcsetattr( int, int, struct termios const* ) {
-	errno = ENOSYS;
-	return ( -1 );
-}
-
-int tcflush( int, int ) {
-	errno = ENOSYS;
-	return ( -1 );
-}
-
-int tcdrain( int ) {
-	errno = ENOSYS;
-	return ( -1 );
-}
-
-int tcsendbreak( int, int ) {
-	errno = ENOSYS;
-	return ( -1 );
-}

@@ -27,6 +27,7 @@
 #include "emu_unistd.hxx"
 
 char* basename( char* );
+
 #include "tools/hscheduledasynccaller.hxx"
 
 typedef int uid_t;
@@ -109,6 +110,8 @@ inline int close( int fd_ )
 
 inline int lockf( int fd_, int cmd_, size_t off_ )
 	{ return ( msvcxx::lockf( fd_, cmd_, off_ ) ); }
+
+DWORD win_read_console_key( void );
 
 #include "tools/hpipedchild.hxx"
 

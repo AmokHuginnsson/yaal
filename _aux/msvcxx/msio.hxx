@@ -17,6 +17,8 @@ namespace msvcxx {
 int const FALSE = 0;
 int const TRUE = 1;
 
+DWORD fd_to_handle( int );
+
 class SystemIO;
 
 class IO {

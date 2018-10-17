@@ -71,6 +71,7 @@
 ?FLOW_CONTROL_HARDWARE@FLAG@HSerial@tools@yaal@@2V?$HBitFlag@UFLAG@HSerial@tools@yaal@@@hcore@4@B
 ?FLOW_CONTROL_SOFTWARE@FLAG@HSerial@tools@yaal@@2V?$HBitFlag@UFLAG@HSerial@tools@yaal@@@hcore@4@B
 ?HANDLE_EMPTY_MASK@HTokenizer@hcore@yaal@@2V?$HBitFlag@VHTokenizer@hcore@yaal@@@23@B
+?HISTOGRAM@AGGREGATE_TYPE@xmath@tools@yaal@@2V?$HBitFlag@UAGGREGATE_TYPE@xmath@tools@yaal@@@hcore@4@B
 ?IGNORE_CASE@COMPILE@HRegex@hcore@yaal@@2V?$HBitFlag@UCOMPILE@HRegex@hcore@yaal@@@34@B
 ?IGNORE_CONVERSION_ERRORS@PARSER@HXml@tools@yaal@@2V?$HBitFlag@UPARSER@HXml@tools@yaal@@@hcore@4@B
 ?INCLUDE_EMPTY@HTokenizer@hcore@yaal@@2V?$HBitFlag@VHTokenizer@hcore@yaal@@@23@B

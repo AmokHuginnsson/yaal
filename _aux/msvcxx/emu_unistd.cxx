@@ -25,6 +25,8 @@
 #include "msvcxx.hxx"
 #include "emu_signals.hxx"
 
+#include "hconsole/console.hxx"
+
 using namespace std;
 using namespace yaal;
 using namespace yaal::hcore;
@@ -168,8 +170,9 @@ int APIENTRY CreatePipeEx( LPHANDLE lpReadPipe,
 		return FALSE;
 	}
 
-	if ( nSize == 0 )
+	if ( nSize == 0 ) {
 		nSize = 4096;
+	}
 	static int PipeSerialNumber = 0;
 	stringstream PipeName;
 	PipeName << "\\\\.\\Pipe\\RemoteExeAnon." << GetCurrentProcessId() << ( PipeSerialNumber ++ );
@@ -332,9 +335,9 @@ int close( int fd_ ) {
 M_EXPORT_SYMBOL
 int long read( int fd_, void* buf_, int long size_ ) {
 	int long nRead( -1 );
-	if ( fd_ < SystemIO::MANAGED_IO )
-		nRead = ::read( fd_, buf_, size_ );
-	else {
+	if ( fd_ < SystemIO::MANAGED_IO ) {
+		nRead = ::_read( fd_, buf_, size_ );
+	} else {
 		SystemIO& sysIo( SystemIO::get_instance() );
 		IO& io( *( sysIo.get_io( fd_ ).second ) );
 		nRead = io.read( buf_, size_ );
@@ -346,7 +349,7 @@ M_EXPORT_SYMBOL
 int long write( int fd_, void const* buf_, int long size_ ) {
 	int long nWritten( -1 );
 	if ( fd_ < SystemIO::MANAGED_IO ) {
-		nWritten = ::write( fd_, buf_, size_ );
+		nWritten = ::_write( fd_, buf_, size_ );
 	} else {
 		SystemIO& sysIo( SystemIO::get_instance() );
 		IO& io( *( sysIo.get_io( fd_ ).second ) );
@@ -421,9 +424,9 @@ mode_t umask( mode_t umask_ ) {
 	static bool initialized( false );
 	static mode_t currentUmask( 0 );
 	mode_t oldUmask( ::_umask( umask_ ) );
-	if ( initialized )
+	if ( initialized ) {
 		oldUmask = currentUmask;
-	else {
+	} else {
 		initialized = true;
 		if ( ! oldUmask ) {
 			/* Windows default umask is screwed. */
@@ -478,5 +481,81 @@ void get_module_file_name( yaal::hcore::HString& path_ ) {
 	return;
 }
 
+}
+
+DWORD win_read_console_key( void ) {
+	code_point_t::value_type key( 0 );
+
+	INPUT_RECORD inputRecord;
+	int modifierKeys = 0;
+	bool escSeen = false;
+	int highSurrogate( 0 );
+	while ( true ) {
+
+		DWORD count;
+		ReadConsoleInputW( ::GetStdHandle( STD_INPUT_HANDLE ), &inputRecord, 1, &count );
+		if ( inputRecord.EventType != KEY_EVENT ) {
+			continue;
+		}
+		KEY_EVENT_RECORD& event( inputRecord.Event.KeyEvent );
+		// Windows provides for entry of characters that are not on your keyboard by sending the
+		// Unicode characters as a "key up" with virtual keycode 0x12 (VK_MENU == Alt key) ...
+		// accept these characters, otherwise only process characters on "key down"
+		if ( ! event.bKeyDown && ( event.wVirtualKeyCode != VK_MENU ) ) {
+			continue;
+		}
+		modifierKeys = 0;
+		// AltGr is encoded as ( LEFT_CTRL_PRESSED | RIGHT_ALT_PRESSED ), so don't treat this
+		// combination as either CTRL or META we just turn off those two bits, so it is still
+		// possible to combine CTRL and/or META with an AltGr key by using right-Ctrl and/or
+		// left-Alt
+		static DWORD const ALT_GR( LEFT_CTRL_PRESSED | RIGHT_ALT_PRESSED );
+		if ( ( event.dwControlKeyState & ALT_GR ) ==	ALT_GR ) {
+			event.dwControlKeyState &= ~ALT_GR;
+		}
+		if ( event.dwControlKeyState & ( RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED ) ) {
+			modifierKeys |= 00;
+		}
+		if ( event.dwControlKeyState & ( RIGHT_ALT_PRESSED | LEFT_ALT_PRESSED ) ) {
+			modifierKeys |= 00;
+		}
+		if ( escSeen ) {
+			modifierKeys |= 00;
+		}
+		key = event.uChar.UnicodeChar;
+		if ( key == 0 ) {
+			switch ( event.wVirtualKeyCode ) {
+				case ( VK_LEFT ):   key = modifierKeys | 0; break;
+				case ( VK_RIGHT ):  key = modifierKeys | 0; break;
+				case ( VK_UP ):     key = modifierKeys | 0; break;
+				case ( VK_DOWN ):   key = modifierKeys | 0; break;
+				case ( VK_DELETE ): key = modifierKeys | 0; break;
+				case ( VK_HOME ):   key = modifierKeys | 0; break;
+				case ( VK_END ):    key = modifierKeys | 0; break;
+				case ( VK_PRIOR ):  key = modifierKeys | 0; break;
+				case ( VK_NEXT ):   key = modifierKeys | 0; break;
+				default: {
+					continue; // in raw mode, ReadConsoleInput shows shift, ctrl ...
+				}
+			}
+			break;
+		} else if ( key == hconsole::KEY<'['>::ctrl ) { // ESC, set flag for later
+			escSeen = true;
+			continue;
+		} else if ( ( key >= 0xD800 ) && ( key <= 0xDBFF ) ) {
+			highSurrogate = key - 0xD800;
+			continue;
+		} else {
+			// we got a real key, return it
+			if ( ( key >= 0xDC00 ) && ( key <= 0xDFFF ) ) {
+				key -= 0xDC00;
+				key |= ( highSurrogate << 10 );
+				key += 0x10000;
+			}
+			key |= modifierKeys;
+			break;
+		}
+	}
+	return ( key );
 }
 

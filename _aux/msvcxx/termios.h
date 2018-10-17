@@ -12,14 +12,32 @@ static int const TCIFLUSH  = 1;
 static int const TCOFLUSH  = 2;
 static int const TCIOFLUSH = 3;
 
-static tcflag_t const IGNBRK = 1 << 0;
-static tcflag_t const IGNPAR = 1 << 2;
-static tcflag_t const INPCK  = 1 << 4;
-static tcflag_t const ICRNL  = 1 << 8;
-static tcflag_t const IXON   = 1 << 9;
-static tcflag_t const IXOFF  = 1 << 10;
-static tcflag_t const IXANY  = 1 << 11;
+/* c_iflag */
+static tcflag_t const IGNBRK     = 1 << 0;
+static tcflag_t const BRKINT     = 1 << 1;
+static tcflag_t const IGNPAR     = 1 << 2;
+static tcflag_t const PARMARK    = 1 << 3;
+static tcflag_t const INPCK      = 1 << 4;
+static tcflag_t const ISTRIP     = 1 << 5;
+static tcflag_t const ICRNL      = 1 << 8;
+static tcflag_t const IXON       = 1 << 10;
+static tcflag_t const IXANY      = 1 << 11;
+static tcflag_t const IXOFF      = 1 << 12;
+static tcflag_t const IMAXBEL    = 1 << 13;
+static tcflag_t const W_INSERT   = 1 << 16;
+static tcflag_t const W_MOUSE    = 1 << 17;
+static tcflag_t const W_QUICK    = 1 << 18;
+static tcflag_t const W_WININPUT = 1 << 19;
+static tcflag_t const W_IVIRTTRM = 1 << 20;
 
+/* c_oflag */
+static tcflag_t const W_OPROCESS = 1 << 16;
+static tcflag_t const W_WRAP_EOL = 1 << 17;
+static tcflag_t const W_OVIRTTRM = 1 << 18;
+static tcflag_t const W_DIS_NLCR = 1 << 18;
+static tcflag_t const W_LVB_GRID = 1 << 20;
+
+/* c_cflag */
 static tcflag_t const CS5        = 0;
 static tcflag_t const CS6        = 1 << 8;
 static tcflag_t const CS7        = 1 << 9;
@@ -33,6 +51,8 @@ static tcflag_t const CCTS_OFLOW = 1 << 16;
 static tcflag_t const CRTS_IFLOW = 1 << 17;
 static tcflag_t const CRTSCTS    = CCTS_OFLOW | CRTS_IFLOW;
 
+/* c_lflag */
+static tcflag_t const ISIG   = 1 << 0;
 static tcflag_t const ECHO   = 1 << 3;
 static tcflag_t const ICANON = 1 << 8;
 static tcflag_t const IEXTEN = 1 << 10;

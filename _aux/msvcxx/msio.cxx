@@ -18,6 +18,16 @@ namespace msvcxx {
 
 static int const IO_BUFFER_SIZE( 256 );
 
+DWORD fd_to_handle( int fd_ ) {
+	DWORD h( static_cast<DWORD>( fd_ ) );
+	switch ( fd_ ) {
+		case ( STDIN_FILENO ):  h = STD_INPUT_HANDLE;  break;
+		case ( STDOUT_FILENO ): h = STD_OUTPUT_HANDLE; break;
+		case ( STDERR_FILENO ): h = STD_ERROR_HANDLE;  break;
+	}
+	return ( h );
+}
+
 IO::IO( TYPE::type_t t_, HANDLE h_, HANDLE e_, std::string const& p_ )
 	: _type( t_ )
 	, _handle( h_ )
@@ -301,6 +311,9 @@ SystemIO::SystemIO( void )
 	int err( WSAStartup( wVersionRequested, &wsaData ) );
 	setenv( "TZ", "", 1 );
 	_tzset();
+	static UINT const UNICODE_UTF_8_CODE_PAGE = 65001;
+	SetConsoleCP( UNICODE_UTF_8_CODE_PAGE );
+	SetConsoleOutputCP( UNICODE_UTF_8_CODE_PAGE );
 }
 
 SystemIO& SystemIO::get_instance( void ) {
