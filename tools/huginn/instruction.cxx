@@ -717,6 +717,15 @@ bool less( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const
 	return ( res );
 }
 
+bool checked_less( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
+	HHuginn::HClass const* c1( v1_->get_class() );
+	HHuginn::HClass const* c2( v2_->get_class() );
+	if ( c1 != c2 ) {
+		operands_type_mismatch( op_to_str( OPERATOR::LESS ), c1, c2, thread_->current_frame()->file_id(), position_ );
+	}
+	return ( less( thread_, v1_, v2_, position_ ) );
+}
+
 bool greater( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type_id() == v2_->type_id() );
 	bool res( false );

@@ -208,7 +208,7 @@ HHuginn::value_t sort( huginn::HThread* thread_, HHuginn::value_t* object_, HHug
 	}
 	HHuginn::HList::values_t& data( static_cast<HHuginn::HList*>( object_->raw() )->value() );
 	if ( ! key ) {
-		HHuginn::HValueCompareHelper less( &instruction::less );
+		HHuginn::HValueCompareHelper less( &instruction::checked_less );
 		less.anchor( thread_, position_ );
 		sort( data.begin(), data.end(), cref( less ) );
 	} else {
@@ -217,7 +217,7 @@ HHuginn::value_t sort( huginn::HThread* thread_, HHuginn::value_t* object_, HHug
 			data.begin(), data.end(),
 			[&k, &thread_, &position_]( HHuginn::value_t const& l_, HHuginn::value_t const& r_ ) {
 				return (
-					instruction::less(
+					instruction::checked_less(
 						thread_,
 						k( thread_, nullptr, HArguments( thread_, l_ ), position_ ),
 						k( thread_, nullptr, HArguments( thread_, r_ ), position_ ),

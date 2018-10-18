@@ -31,6 +31,7 @@ HHuginn::value_t neg( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t factorial( HThread*, HHuginn::value_t const&, int );
 bool equals( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 bool less( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
+bool checked_less( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 bool greater( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 bool less_or_equal( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 bool greater_or_equal( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
