@@ -60,8 +60,14 @@ public:
 private:
 	call_t _call;
 public:
-	HScopeExitCall( call_t&& call_ )
-		: _call( yaal::move( call_ ) ) {
+	HScopeExitCall( call_t&& call_, call_t&& exit_ = call_t() )
+		: _call() {
+		if ( !! exit_ ) {
+			call_();
+			_call = yaal::move( exit_ );
+		} else {
+			_call = yaal::move( call_ );
+		}
 		return;
 	}
 	~HScopeExitCall( void ) {

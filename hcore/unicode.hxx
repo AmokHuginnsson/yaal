@@ -41,7 +41,7 @@ static u32_t const UTF8_MAX_2_BYTE_CODE_POINT( 0x0007ff );
 static u32_t const UTF8_MAX_3_BYTE_CODE_POINT( 0x00ffff );
 static u32_t const UTF8_MAX_4_BYTE_CODE_POINT( 0x10ffff );
 
-inline int utf8_declared_length( char head_ ) {
+inline int utf8_declared_length( yaal::u8_t head_ ) {
 	int length( 0 );
 	if ( ! ( head_ & unicode::ENC_1_BYTES_MARK_MASK ) ) {
 		length = 1;
@@ -55,6 +55,10 @@ inline int utf8_declared_length( char head_ ) {
 		M_ASSERT( !"Invalid UTF-8 head sequence."[0] );
 	}
 	return ( length );
+}
+
+inline int utf8_declared_length( char head_ ) {
+	return ( utf8_declared_length( static_cast<yaal::u8_t>( head_ ) ) );
 }
 
 inline int count_characters( char const* str_, int size_ ) {
@@ -97,8 +101,11 @@ inline int utf8_length( code_point_t value_ ) {
 
 namespace CODE_POINT {
 
+static code_point_t const INVALID                               = code_point_t( static_cast<code_point_t::value_type>( -1 ) );
+
 /* UCS-1 code points, UTF-8 1-byte code points,     0 -  127, U+0000 - U+007f */
 
+static code_point_t const NUL                                   = code_point_t( 0x0000 );
 static code_point_t const LINE_FEED                             = code_point_t( 0x00a0 );
 static code_point_t const SPACE                                 = code_point_t( 0x0020 );
 static code_point_t const LATIN_CAPITAL_LETTER_O                = code_point_t( 0x004f );

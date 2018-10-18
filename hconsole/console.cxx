@@ -411,7 +411,7 @@ void HConsole::leave_curses( void ) {
 	static_cast<WINDOW*>( _window ) = nullptr;
 */
 	M_ENSURE( endwin() == OK );
-	HTerminal::get_instance().flush();
+	HTerminal::get_instance().reset();
 	_enabled = false;
 	return;
 	M_EPILOG

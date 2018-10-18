@@ -18,24 +18,36 @@
 #include <tty.h>
 #endif /* #ifdef HAVE_TTY_H */
 
+namespace {
+static tcflag_t const FWD_ECHO = ECHO;
+}
+
 #undef ECHO
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hterminal.hxx"
+#include "util.hxx"
 #include "tools.hxx"
+#include "hcore/unicode.hxx"
 #include "hcore/hfile.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::tools;
+using namespace yaal::tools::util;
 
 namespace yaal {
 
 namespace tools {
 
+namespace TERMIOS {
+static int const ORIGINAL = 0;
+static int const CANONICAL = 1;
+}
+
 HTerminal::HTerminal( void )
-	: _termios( chunk_size<struct termios>( 1 ) ) {
+	: _termios( chunk_size<struct termios>( 2 ) ) {
 	return;
 }
 
@@ -45,7 +57,7 @@ bool HTerminal::exists( void ) const {
 
 void HTerminal::init( void ) {
 	M_PROLOG
-	termios& backupTermios( *_termios.get<struct termios>() );
+	termios& backupTermios( _termios.get<struct termios>()[TERMIOS::ORIGINAL] );
 	::memset( &backupTermios, 0, sizeof ( backupTermios ) );
 	M_ENSURE( tcgetattr( STDIN_FILENO, &backupTermios ) == 0 );
 	termios newTermios;
@@ -74,9 +86,81 @@ void HTerminal::init( void ) {
 	M_EPILOG
 }
 
-void HTerminal::flush( void ) {
+void HTerminal::reset( void ) {
 	M_PROLOG
-	M_ENSURE( tcsetattr( STDIN_FILENO, TCSAFLUSH, _termios.get<termios>() ) == 0 );
+	M_ENSURE( tcsetattr( STDIN_FILENO, TCSAFLUSH, _termios.get<termios>() + TERMIOS::ORIGINAL ) == 0 );
+	return;
+	M_EPILOG
+}
+
+void HTerminal::enable_raw_mode( void ) {
+	M_PROLOG
+	termios& backupTermios( _termios.get<struct termios>()[TERMIOS::CANONICAL] );
+	::memset( &backupTermios, 0, sizeof ( backupTermios ) );
+	M_ENSURE( tcgetattr( STDIN_FILENO, &backupTermios ) == 0 );
+	termios newTermios;
+	::memset( &newTermios, 0, sizeof ( newTermios ) );
+	M_ENSURE( tcgetattr( STDIN_FILENO, &newTermios ) == 0 );
+
+	newTermios.c_iflag &= ~static_cast<int unsigned>( BRKINT | ICRNL | INPCK | ISTRIP | IXON );
+
+	/* Control modes - set 8 bit chars. */
+	newTermios.c_cflag |= ( CS8 );
+
+	/* Local modes - echoing off, canonical off, no extended functions,
+	 * no signal chars (^Z,^C) */
+	newTermios.c_lflag &= ~( FWD_ECHO | ICANON | IEXTEN | ISIG );
+
+	/* Control chars - set return condition: min number of bytes and timer.
+	 * We want read to return every single byte, without timeout. */
+	newTermios.c_cc[VMIN] = 1;
+	newTermios.c_cc[VTIME] = 0; /* 1 byte, no timer */
+
+	/* Put terminal in raw mode after flushing. */
+	M_ENSURE( tcsetattr( STDIN_FILENO, TCSAFLUSH, &newTermios ) == 0 );
+	return;
+	M_EPILOG
+}
+
+bool HTerminal::read_byte( yaal::u8_t& byte_ ) {
+	int nRead( 0 );
+	do {
+		nRead = static_cast<int>( ::read( STDIN_FILENO, &byte_, sizeof ( byte_ ) ) );
+	} while ( ( nRead == -1 ) && ( errno == EINTR ) );
+	return ( nRead == 1 );
+}
+
+code_point_t HTerminal::get_character( void ) {
+	M_PROLOG
+	HScopeExitCall sec( call( &HTerminal::enable_raw_mode, this ), call( &HTerminal::disable_raw_mode, this ) );
+	yaal::u32_t character( 0 );
+#ifndef __MSVCXX__
+	yaal::u8_t byte( 0 );
+	if ( read_byte( byte ) ) {
+		static u8_t const mask[] = { 0xff, unicode::ENC_2_BYTES_VALUE_MASK, unicode::ENC_3_BYTES_VALUE_MASK, unicode::ENC_4_BYTES_VALUE_MASK };
+		int tailLength( unicode::utf8_declared_length( byte ) - 1 );
+		character = byte;
+		character &= mask[tailLength];
+		for ( int i( 0 ); i < tailLength; ++ i ) {
+			character <<= 6;
+			if ( ! read_byte( byte ) ) {
+				character = unicode::CODE_POINT::INVALID.get();
+				break;
+			}
+			character |= ( static_cast<u8_t>( byte ) & unicode::TAIL_BYTES_VALUE_MASK );
+		}
+	}
+#else /* #ifndef __MSVCXX__ */
+	character = win_read_console_key();
+#endif /* #else #ifndef __MSVCXX__ */
+	return ( code_point_t( character ) );
+	M_EPILOG
+}
+
+
+void HTerminal::disable_raw_mode( void ) {
+	M_PROLOG
+	M_ENSURE( tcsetattr( STDIN_FILENO, TCSAFLUSH, _termios.get<termios>() + TERMIOS::CANONICAL ) == 0 );
 	return;
 	M_EPILOG
 }

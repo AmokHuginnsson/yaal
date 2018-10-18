@@ -4,7 +4,6 @@
 #define YAAL_TOOLS_HTERMINAL_HXX_INCLUDED 1
 
 #include "hcore/hchunk.hxx"
-#include "hcore/hpair.hxx"
 #include "hcore/hstreaminterface.hxx"
 #include "hcore/hsingleton.hxx"
 
@@ -41,11 +40,17 @@ public:
 	HTerminal( void );
 	bool exists( void ) const;
 	void init( void );
-	void flush( void );
+	void reset( void );
 	HSize size( void ) const;
 	static int life_time( int ) {
 		return ( 50 );
 	}
+	code_point_t get_character( void );
+	code_point_t get_key( void );
+private:
+	void enable_raw_mode( void );
+	void disable_raw_mode( void );
+	bool read_byte( yaal::u8_t& );
 private:
 	friend class yaal::hcore::HSingleton<HTerminal>;
 	friend class yaal::hcore::HDestructor<HTerminal>;
