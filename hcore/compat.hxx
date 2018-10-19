@@ -13,14 +13,14 @@
 
 /*! \cond */
 #if ! defined( HAVE_BASENAME_ARG_CONST )
-#undef basename
+#	undef basename
 inline char const* basename( char const* x ) {
 	return ( basename( const_cast<char*>( x ) ) );
 }
 #endif /* #if ! defined( HAVE_BASENAME_ARG_CONST ) */
 
 #if ! defined( HAVE_DECL_TEMP_FAILURE_RETRY ) || ( HAVE_DECL_TEMP_FAILURE_RETRY == 0 )
-#define TEMP_FAILURE_RETRY(x) (x)
+#	define TEMP_FAILURE_RETRY(x) (x)
 #endif /* #if ! defined( HAVE_DECL_TEMP_FAILURE_RETRY ) || ( HAVE_DECL_TEMP_FAILURE_RETRY == 0 ) */
 
 #if ! defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 )
@@ -32,7 +32,7 @@ int long strnlen( char const*, int long );
 #endif /* #if ! defined( HAVE_STRNLEN ) || ( HAVE_STRNLEN == 0 ) */
 
 #if ! defined( HAVE_DECL_SUN_LEN ) || ( HAVE_DECL_SUN_LEN == 0 )
-#define SUN_LEN( su ) ( ( sizeof ( *(su) ) - sizeof ( (su)->sun_path ) + std::strlen( (su)->sun_path ) ) )
+#	define SUN_LEN( su ) ( ( sizeof ( *(su) ) - sizeof ( (su)->sun_path ) + std::strlen( (su)->sun_path ) ) )
 #endif /* #if ! defined( HAVE_DECL_SUN_LEN ) || ( HAVE_DECL_SUN_LEN == 0 ) */
 
 #if ! defined( HAVE_GNU_GETHOSTBYNAME_R )
@@ -54,7 +54,7 @@ int clock_gettime( clockid_t, struct timespec* );
 #endif /* #if ! defined( HAVE_CLOCK_GETTIME ) */
 
 #if ! defined( HAVE_TIMER_CREATE )
-#include <ctime>
+#	include <ctime>
 class HDarwinTimer;
 typedef HDarwinTimer* timer_t;
 struct itimerspec {
@@ -137,9 +137,9 @@ static int const LOGIN_NAME_MAX = 16;
 #endif /* __YAAL_BUILD__ */
 
 #ifdef __GNUC__
-#define CXX_EXTENSION_TLS __thread
+#	define CXX_EXTENSION_TLS __thread
 #elif defined( __MSVCXX__ )
-#define CXX_EXTENSION_TLS __declspec( thread )
+#	define CXX_EXTENSION_TLS __declspec( thread )
 #endif /* #elif defined( __MSVCXX__ ) #ifdef __GNUC__ */
 
 /*
@@ -161,24 +161,26 @@ static int const LOGIN_NAME_MAX = 16;
  * will evaluate to false for all practical use cases.
  */
 #if defined ( __GNUC__ ) && ! defined ( __clang__ )
-#define __GCC_VERSION_LOWER_OR_EQUAL__ ( ( ( __GNUC__ * 1000 ) + __GNUC_MINOR__ ) * 1000 + __GNUC_PATCHLEVEL__ )
-#define __GCC_VERSION_GREATER_OR_EQUAL__ __GCC_VERSION_LOWER_OR_EQUAL__
+#	define __GCC_VERSION__ ( ( ( __GNUC__ * 1000 ) + __GNUC_MINOR__ ) * 1000 + __GNUC_PATCHLEVEL__ )
+#	define __GCC_VERSION_LOWER_OR_EQUAL__ __GCC_VERSION__
+#	define __GCC_VERSION_GREATER_OR_EQUAL__ __GCC_VERSION__
 #else /* #if defined ( __GNUC__ ) && ! defined ( __clang__ ) */
-#define __GCC_VERSION_LOWER_OR_EQUAL__ 999999999
-#define __GCC_VERSION_GREATER_OR_EQUAL__ 0
+#	define __GCC_VERSION__ -1
+#	define __GCC_VERSION_LOWER_OR_EQUAL__ 999999999
+#	define __GCC_VERSION_GREATER_OR_EQUAL__ 0
 #endif /* #else #if defined ( __GNUC__ ) && ! defined ( __clang__ ) */
 
 #if ! defined( HAVE_PRETTY_FUNCTION )
-#if ! defined( HAVE_FUNCTION )
-#if ! defined( HAVE_FUNC )
-#define __PRETTY_FUNCTION__ ""
-#endif
-#endif
+#	if ! defined( HAVE_FUNCTION )
+#		if ! defined( HAVE_FUNC )
+#			define __PRETTY_FUNCTION__ ""
+#		endif
+#	endif
 #endif
 
 #if ( HAVE_DECL_ERR == 1 )
-#include <cstdlib>
-#undef ERR
+#	include <cstdlib>
+#	undef ERR
 #endif /* HAVE_DECL_ERR */
 
 /*! \endcond */
