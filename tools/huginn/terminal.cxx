@@ -8,11 +8,12 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "helper.hxx"
 #include "thread.hxx"
 #include "enumeration.hxx"
+#include "packagefactory.hxx"
+#include "objectfactory.hxx"
+#include "hcore/unicode.hxx"
 #include "tools/ansi.hxx"
 #include "tools/color.hxx"
 #include "tools/hterminal.hxx"
-#include "packagefactory.hxx"
-#include "objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -203,6 +204,18 @@ public:
 		return ( thread_->object_factory().create_string( seq_ ) );
 		M_EPILOG
 	}
+	static HHuginn::value_t get_character( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( "Terminal.get_character", values_, 0, 0, thread_, position_ );
+		code_point_t cp( unicode::CODE_POINT::NUL );
+		try {
+			cp = tools::HTerminal::get_instance().get_character();
+		} catch ( HException const& e ) {
+			thread_->raise( static_cast<HTerminal*>( object_->raw() )->_exceptionClass.raw(), e.what(), position_ );
+		}
+		return ( thread_->object_factory().create_character( cp ) );
+		M_EPILOG
+	}
 };
 
 namespace package_factory {
@@ -228,6 +241,7 @@ HPackageCreatorInterface::HInstance HTerminalCreator::do_new_instance( HRuntime*
 		{ "attribute", runtime_->create_method( &HTerminal::attribute ), "( *attr*, *str* ) - wrap given `string` *str* with given attribute *attr*" },
 		{ "color",     runtime_->create_method( &HTerminal::color ),     "( *color*, *str* ) - wrap given `string` *str* with given *color*" },
 		{ "move",      runtime_->create_method( &HTerminal::move ),      "( *row*, *column* ) - move cursor to a new position indicated by *row* and *column*" },
+		{ "get_character", runtime_->create_method( &HTerminal::get_character ), "read single character from terminal" },
 		{ "clear_to_eol", runtime_->create_method( &HTerminal::seq_str, "Terminal.clear_to_eol", *ansi::clrtoeol ), "clear content of the current line til the end" },
 		{ "clear",     runtime_->create_method( &HTerminal::seq_str, "Terminal.clear",   *ansi::clear ),   "clear content of the terminal" },
 		{ "save",      runtime_->create_method( &HTerminal::seq_str, "Terminal.save",    *ansi::save ),    "save current cursor position" },
