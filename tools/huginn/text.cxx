@@ -7,8 +7,6 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
 #include "runtime.hxx"
-#include "tools/stringalgo.hxx"
-#include "tools/hstringstream.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
@@ -17,6 +15,9 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/hcore.hxx"
 #include "packagefactory.hxx"
 #include "objectfactory.hxx"
+#include "tools/stringalgo.hxx"
+#include "tools/hstringstream.hxx"
+#include "tools/util.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -248,6 +249,32 @@ public:
 		return ( thread_->runtime().object_factory()->create_string( yaal::move( s ) ) );
 		M_EPILOG
 	}
+	static HHuginn::value_t ordinal_cardinal( char const* name_, yaal::hcore::HString ( *func_ )( int ), huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( name_, values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
+		HString s;
+		try {
+		 int i( safe_int::cast<int>( get_integer( values_[0] ) ) );
+		 s = func_( i );
+		} catch ( HException const& e ) {
+			thread_->raise( thread_->object_factory().conversion_exception_class(), e.what(), position_ );
+		}
+		return ( thread_->runtime().object_factory()->create_string( yaal::move( s ) ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t parse_boolean_flag( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "Text.parse_boolean_flag", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
+		HString const& s( get_string( values_[0] ) );
+		bool flag( false );
+		try {
+			flag = lexical_cast<bool>( s );
+		} catch ( HException const& e ) {
+			thread_->raise( thread_->object_factory().conversion_exception_class(), e.what(), position_ );
+		}
+		return ( flag ? thread_->runtime().true_value() : thread_->runtime().false_value() );
+		M_EPILOG
+	}
 };
 
 namespace package_factory {
@@ -275,7 +302,10 @@ HPackageCreatorInterface::HInstance HTextCreator::do_new_instance( HRuntime* run
 		{ "hex",      runtime_->create_method( &HText::int_base_to_str, "Text.hex", BASE::HEX ), "( *int* ) - convert *int* value to a `string` using hexadecimal representation" },
 		{ "oct",      runtime_->create_method( &HText::int_base_to_str, "Text.oct", BASE::OCT ), "( *int* ) - convert *int* value to a `string` using octal representation" },
 		{ "bin",      runtime_->create_method( &HText::int_base_to_str, "Text.bin", BASE::BIN ), "( *int* ) - convert *int* value to a `string` using binary representation" },
-		{ "capitalize",             runtime_->create_method( &HText::capitalize ), "( *str* ) - return \"Capitalized\" version of input \"capItaLiZeD\" *str*" },
+		{ "ordinal",  runtime_->create_method( &HText::ordinal_cardinal, "Text.ordinal",  &util::ordinal ),    "( *int* ) - get text representation of an ordinal number *int*" },
+		{ "cardinal", runtime_->create_method( &HText::ordinal_cardinal, "Text.cardinal", &util::cardinal ),   "( *int* ) - get text representation of a cardinal number *int*" },
+		{ "capitalize",             runtime_->create_method( &HText::capitalize ),             "( *str* ) - return \"Capitalized\" version of input \"capItaLiZeD\" *str*" },
+		{ "parse_boolean_flag",     runtime_->create_method( &HText::parse_boolean_flag ),     "( *str* ) - interpret *str* as a boolean flag" },
 		{ "character_class",        runtime_->create_method( &HText::character_class ),        "( *class* ) - get given character *class*" },
 		{ "substitute_environment", runtime_->create_method( &HText::substitute_environment ), "( *str*[, *recursively*] ) - (*recursively*) substitute environment variables in *str*" }
 	};
