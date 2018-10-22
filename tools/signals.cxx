@@ -158,6 +158,7 @@ HSignalService::HSignalService( void )
 
 HSignalService::~HSignalService( void ) {
 	M_PROLOG
+	HThreadPool::get_instance().cancel_task( this );
 	return;
 	M_DESTRUCTOR_EPILOG
 }
@@ -308,8 +309,9 @@ void HSignalService::call_handler( int sigNo_ ) {
 				schedule_exit( status );
 			}
 		}
-	} else
+	} else {
 		M_ENSURE( ( sigNo_ == SIGURG ) || ( sigNo_ == SIGPIPE ) );
+	}
 	return;
 	M_EPILOG
 }

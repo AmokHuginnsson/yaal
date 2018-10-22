@@ -43,6 +43,16 @@ public:
 		return ( !! _wantRestart && _wantRestart() );
 		M_EPILOG
 	}
+	void const* id( void ) const {
+		M_PROLOG
+		return ( _call.id() );
+		M_EPILOG
+	}
+	void reset( void ) {
+		M_PROLOG
+		_asyncStop.reset();
+		M_EPILOG
+	}
 private:
 	HTask( HTask const& ) = delete;
 	HTask& operator = ( HTask const& ) = delete;
@@ -69,6 +79,7 @@ public:
 	void finish( void );
 	void async_stop( HWorkFlow::STATE );
 	void run( void );
+	void cancel_task( void const* );
 	bool has_task( void ) const {
 		return ( _hasTask );
 	}
@@ -170,6 +181,28 @@ void HWorkFlow::start_task( call_t task_, call_t asyncStop_, want_restart_t want
 	M_EPILOG
 }
 
+void HWorkFlow::cancel_task( void const* subject_ ) {
+	M_PROLOG
+	HLock l( _mutex );
+	for (
+		task_queue_t::iterator taskIt( _tasks.begin() ), taskEndId( _tasks.end() );
+		taskIt != taskEndId;
+		/* inc in the loop due to erase */
+	) {
+		if ( (*taskIt)->id() == subject_ ) {
+			taskIt = _tasks.erase( taskIt );
+			_semaphore.wait();
+		} else {
+			++ taskIt;
+		}
+	}
+	for ( worker_t& w : _workers ) {
+		w->cancel_task( subject_ );
+	}
+	return;
+	M_EPILOG
+}
+
 void HWorkFlow::start( void ) {
 	M_PROLOG
 	HLock l( _mutex );
@@ -198,10 +231,10 @@ void HWorkFlow::schedule_windup( WINDUP_MODE windupMode_ ) {
 			throw HWorkFlowException( "Parallel stop." );
 		}
 		switch ( windupMode_ ) {
-			case ( WINDUP_MODE::ABORT ): _state = STATE::ABORTING; break;
+			case ( WINDUP_MODE::ABORT ):     _state = STATE::ABORTING;     break;
 			case ( WINDUP_MODE::INTERRUPT ): _state = STATE::INTERRUPTING; break;
-			case ( WINDUP_MODE::SUSPEND ): _state = STATE::STOPPING; break;
-			case ( WINDUP_MODE::CLOSE ): _state = STATE::CLOSING; break;
+			case ( WINDUP_MODE::SUSPEND ):   _state = STATE::STOPPING;     break;
+			case ( WINDUP_MODE::CLOSE ):     _state = STATE::CLOSING;      break;
 		}
 	}
 	for ( int i( 0 ), SIZE( static_cast<int>( _workers.get_size() ) ); i < SIZE; ++ i ) {
@@ -342,7 +375,7 @@ void HWorkFlow::HWorker::run( void ) {
 		HLock l( _mutex );
 		if ( ! _task ) {
 			l.unlock();
-			task_t t =_workFlow->pop_task();
+			task_t t = _workFlow->pop_task();
 			l.lock();
 			if ( !! t ) {
 				_task = yaal::move( t );
@@ -371,6 +404,15 @@ void HWorkFlow::HWorker::run( void ) {
 	}
 	_canJoin = true;
 	return;
+	M_EPILOG
+}
+
+void HWorkFlow::HWorker::cancel_task( void const* id_ ) {
+	M_PROLOG
+	HLock l( _mutex );
+	if ( !! _task && ( _task->id() == id_ ) ) {
+		_task->reset();
+	}
 	M_EPILOG
 }
 

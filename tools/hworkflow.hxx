@@ -93,6 +93,12 @@ public:
 	 */
 	void start_task( call_t task, call_t asyncStop = call_t(), want_restart_t wantRestart = want_restart_t() );
 
+	/*! \brief Cancel scheduled tasks.
+	 *
+	 * \param subject - an identifier of an object on which behave task were scheduled.
+	 */
+	void cancel_task( void const* subject );
+
 	/*! \brief Restart execution of tasks scheduled in this HWorkFlow.
 	 *
 	 * \throw HWorkFlowException on parallel start.
