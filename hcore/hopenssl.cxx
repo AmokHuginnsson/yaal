@@ -375,8 +375,9 @@ void HOpenSSL::accept_or_connect( void ) {
 	if ( ret == -1 ) {
 		check_err( ret );
 		_pendingOperation = true;
-	} else
+	} else {
 		_pendingOperation = false;
+	}
 	return;
 	M_EPILOG
 }
@@ -402,14 +403,16 @@ int HOpenSSL::check_err( int code ) const {
 		int errTop( static_cast<int>( ERR_get_error() ) );
 		HString buffer;
 		if ( ! errTop && ( err == SSL_ERROR_SYSCALL ) ) {
-			if ( code == 0 )
+			if ( code == 0 ) {
 				buffer = "EOF that violates protocol was observed.";
-			else if ( code == -1 )
+			} else if ( code == -1 ) {
 				buffer = strerror( errno );
-			else
+			} else {
 				buffer = "unknown problem occurred!";
-		} else
+			}
+		} else {
 			openssl_helper::format_error_message( buffer, errTop );
+		}
 		throw HOpenSSLException( buffer );
 	}
 	return ( ( err == SSL_ERROR_WANT_READ ) || ( err == SSL_ERROR_WANT_WRITE ) ? -1 : 0 );
@@ -419,8 +422,9 @@ int HOpenSSL::check_err( int code ) const {
 int long HOpenSSL::read( void* buffer_, int long size_ ) {
 	M_PROLOG
 	M_ASSERT( _ssl );
-	if ( _pendingOperation )
+	if ( _pendingOperation ) {
 		accept_or_connect();
+	}
 	int nRead( -1 );
 	if ( ! _pendingOperation ) {
 		nRead = SSL_read( static_cast<SSL*>( _ssl ), buffer_, static_cast<int>( size_ ) );

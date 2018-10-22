@@ -44,11 +44,6 @@ public:
 		static M_YAAL_HCORE_PUBLIC_API socket_type_t const CLIENT;
 	};
 protected:
-	typedef HHashMap<int, ptr_t> clients_t;
-	typedef HResource<clients_t> clients_res_t;
-public:
-	typedef clients_t::const_iterator iterator;
-protected:
 	bool _needShutdown;
 	socket_type_t _type;
 	int _maximumNumberOfClients;

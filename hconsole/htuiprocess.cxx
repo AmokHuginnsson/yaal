@@ -60,12 +60,12 @@ void HTUIProcess::init_tui( yaal::hcore::HString const& processName_, HWindow::p
 	int alts[ ALTS_COUNT ];
 	int ctrls[] = { KEY<'l'>::ctrl, KEY<'x'>::ctrl };
 	HWindow::ptr_t mainWindow;
-	HIODispatcher::stream_t consIn( make_pointer<HRawFile>( STDIN_FILENO, HRawFile::OWNERSHIP::EXTERNAL ) );
+	HIODispatcher::HIOHandler::stream_t consIn( make_pointer<HRawFile>( STDIN_FILENO, HRawFile::OWNERSHIP::EXTERNAL ) );
 	_dispatcher.register_file_descriptor_handler( consIn, call( &HTUIProcess::process_stdin, this, _1 ) );
 	HConsole& cons = HConsole::get_instance();
 	int mouseDes( cons.get_mouse_fd() );
 	if ( ( _useMouse_ != USE_MOUSE::NO ) && ( mouseDes > 0 ) ) {
-		HIODispatcher::stream_t mouseStream( make_pointer<HRawFile>( mouseDes, HRawFile::OWNERSHIP::EXTERNAL ) );
+		HIODispatcher::HIOHandler::stream_t mouseStream( make_pointer<HRawFile>( mouseDes, HRawFile::OWNERSHIP::EXTERNAL ) );
 		_dispatcher.register_file_descriptor_handler( mouseStream, call( &HTUIProcess::process_mouse, this, _1 ) );
 	}
 	_dispatcher.register_file_descriptor_handler(
@@ -163,7 +163,7 @@ void HTUIProcess::add_window( HWindow::ptr_t window_ ) {
 	M_EPILOG
 }
 
-void HTUIProcess::process_stdin( HIODispatcher::stream_t& ) {
+void HTUIProcess::process_stdin( HIODispatcher::HIOHandler::stream_t& ) {
 	M_PROLOG
 	HString command;
 	HConsole& cons = HConsole::get_instance();
@@ -251,7 +251,7 @@ void HTUIProcess::handler_idle( void ) {
 	M_EPILOG
 }
 
-void HTUIProcess::process_mouse( HIODispatcher::stream_t& ) {
+void HTUIProcess::process_mouse( HIODispatcher::HIOHandler::stream_t& ) {
 	M_PROLOG
 	handler_mouse( HMouseEvent( mouse::OMouse() ) );
 	return;
@@ -279,7 +279,7 @@ bool HTUIProcess::handler_mouse( HEvent const& ) {
 	M_EPILOG
 }
 
-void HTUIProcess::process_terminal_event( HIODispatcher::stream_t& event_ ) {
+void HTUIProcess::process_terminal_event( HIODispatcher::HIOHandler::stream_t& event_ ) {
 	M_PROLOG
 	char type;
 	M_ENSURE( event_->read( &type, 1 ) == 1 );
@@ -288,11 +288,11 @@ void HTUIProcess::process_terminal_event( HIODispatcher::stream_t& event_ ) {
 			handler_refresh( HKeyPressEvent( 'r' ) );
 		} break;
 		case 'm': {
-			static HIODispatcher::stream_t dummy;
+			static HIODispatcher::HIOHandler::stream_t dummy;
 			process_mouse( dummy );
 		} break;
 		case 'k': {
-			static HIODispatcher::stream_t dummy;
+			static HIODispatcher::HIOHandler::stream_t dummy;
 			process_stdin( dummy );
 		} break;
 	}

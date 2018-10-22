@@ -7,6 +7,7 @@
 #include "hcore/hhashmap.hxx"
 #include "hcore/hboundcall.hxx"
 #include "hcore/htuple.hxx"
+#include "hcore/hhashset.hxx"
 #include "hcore/hstreaminterface.hxx"
 #include "hcore/hpipe.hxx"
 #include "tools/signals.hxx"
@@ -24,14 +25,29 @@ public:
 		READER,
 		WRITER
 	};
-	typedef yaal::hcore::HStreamInterface::ptr_t stream_t;
-	typedef yaal::hcore::HBoundCall<void ( stream_t& )> callback_t;
-	typedef yaal::hcore::HPair<stream_t, callback_t> io_handler_t;
-	typedef yaal::hcore::HArray<io_handler_t> io_handlers_t;
+	class HIOHandler {
+	public:
+		typedef yaal::hcore::HStreamInterface::ptr_t stream_t;
+		typedef yaal::hcore::HBoundCall<void ( stream_t& )> callback_t;
+		typedef void const* stream_id_t;
+	private:
+		stream_t _stream;
+		callback_t _callback;
+	public:
+		HIOHandler( stream_t const&, callback_t const& );
+		HIOHandler( HIOHandler const& ) = default;
+		HIOHandler( HIOHandler&& ) = default;
+		HIOHandler& operator = ( HIOHandler const& ) = default;
+		HIOHandler& operator = ( HIOHandler&& ) = default;
+		void call( void );
+	};
+	typedef HIOHandler::stream_t stream_t;
+	typedef HIOHandler::callback_t callback_t;
+	typedef yaal::hcore::HHashMap<HIOHandler::stream_id_t, HIOHandler> io_handlers_t;
 private:
 	typedef yaal::hcore::HBoundCall<> delayed_call_t;
-	typedef yaal::hcore::HTuple<FD_TYPE, stream_t, callback_t> new_io_handler_t;
-	typedef yaal::hcore::HArray<stream_t> dropped_io_handlers_t;
+	typedef yaal::hcore::HTuple<FD_TYPE, HIOHandler::stream_t, HIOHandler::callback_t> new_io_handler_t;
+	typedef yaal::hcore::HHashSet<HIOHandler::stream_id_t> dropped_io_handlers_t;
 	typedef yaal::hcore::HArray<delayed_call_t> delayed_calls_t;
 	typedef yaal::hcore::HArray<new_io_handler_t> new_io_handlers_t;
 	bool _initialized; /*!< did process has necessary initialization */
@@ -59,15 +75,16 @@ public:
 	void run( void );
 	void stop( void );
 	int idle_cycles( void ) const;
-	void register_file_descriptor_handler( stream_t, callback_t, FD_TYPE = FD_TYPE::READER );
-	void unregister_file_descriptor_handler( stream_t const& );
+	void register_file_descriptor_handler( HIOHandler::stream_t, HIOHandler::callback_t, FD_TYPE = FD_TYPE::READER );
+	void unregister_file_descriptor_handler( HIOHandler::stream_t const& );
 	void add_alert_handle( delayed_call_t );
 	void add_idle_handle( delayed_call_t );
 private:
+	void do_unregister_file_descriptor_handler( HIOHandler::stream_id_t );
 	void reconstruct_fdset( void );
 	/*! \brief Process incoming events from interrupt socket.
 	 */
-	void process_interrupt( stream_t& );
+	void process_interrupt( HIOHandler::stream_t& );
 	/*! \brief Callback for SignalService.
 	 */
 	int handler_interrupt( int );
