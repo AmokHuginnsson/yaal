@@ -22,6 +22,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/unicode.hxx"
 #include "tools/tools.hxx"
 #include "tools/hterminal.hxx"
+#include "tools/keycode.hxx"
 #include "hconsole.hxx"
 
 /* curses system header is polluted with huge number of macros
@@ -47,7 +48,7 @@ namespace yaal {
 
 namespace hconsole {
 
-static_assert( KEY_CODE::SPECIAL_KEY > KEY_MAX, "ncurses key codes overlap with KEY_CODE codes" );
+static_assert( KEY_CODE::BASE > KEY_MAX, "ncurses key codes overlap with KEY_CODE codes" );
 
 #ifdef HAVE_ASCII_GRAPHICS
 int GLYPH::ARROW::DOWN;
@@ -632,12 +633,20 @@ void HConsole::ungetch( int code_ ) {
 		default:
 		break;
 	}
+	int codes[] = { 0, 0, 0 };
+	int codeCount( 0 );
 	if ( code_ >= KEY_CODE::COMMAND_BASE ) {
 		code_ -= KEY_CODE::COMMAND_BASE;
-		M_ENSURE( ::ungetch( code_ ) != ERR );
-		code_ = KEY<>::ctrl_r( _commandComposeCharacter_ );
+		codes[codeCount ++] = KEY<>::ctrl_r( _commandComposeCharacter_ );
 	}
-	M_ENSURE( ::ungetch( code_ ) != ERR );
+	if ( code_ >= KEY_CODE::META_BASE ) {
+		code_ -= KEY_CODE::META_BASE;
+		codes[codeCount ++] = KEY_CODE::ESCAPE;
+	}
+	codes[codeCount ++] = code_;
+	for ( int i( codeCount - 1 ); i >= 0; -- i ) {
+		M_ENSURE( ::ungetch( codes[i] ) != ERR );
+	}
 	if ( ! _event.unique() ) {
 		notify_keyboard();
 	}
@@ -673,7 +682,7 @@ int HConsole::get_key( void ) const {
 	M_ENSURE( noecho() != ERR );
 	M_ENSURE( ::fflush( nullptr ) == 0 );
 	int key( wgetch( static_cast<WINDOW*>( _window ) ) );
-	M_ASSERT( key < KEY_CODE::SPECIAL_KEY );
+	M_ASSERT( key < KEY_CODE::BASE );
 	if ( key == KEY_CODE::ESCAPE ) {
 		M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), true ) != ERR );
 		key = wgetch( static_cast<WINDOW*>( _window ) );
@@ -840,13 +849,15 @@ int HConsole::wait_for_user_input( int& key_, mouse::OMouse& mouse_, int timeOut
 	int eventType( 0 );
 	if ( error > 0 ) {
 		if ( fds[0] != -1 ) {
-			key_ = get_key(), eventType = EVENT::KEYBOARD;
-			if ( key_ == KEY_MOUSE )
+			key_ = get_key();
+			eventType = EVENT::KEYBOARD;
+			if ( key_ == KEY_MOUSE ) {
 				eventType = 0;
+			}
 		}
-		if ( ( key_ == KEY_MOUSE )
-				|| ( _mouseDes && ( fds[1] != -1 ) ) )
+		if ( ( key_ == KEY_MOUSE ) || ( _mouseDes && ( fds[1] != -1 ) ) ) {
 			eventType |= EVENT::MOUSE, static_cast<void>( mouse::mouse_get( mouse_ ) );
+		}
 	}
 	return ( eventType );
 	M_EPILOG

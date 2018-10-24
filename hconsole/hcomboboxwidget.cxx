@@ -8,6 +8,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcomboboxwidget.hxx"
 #include "tools/hxml.hxx"
 #include "hconsole/hwindow.hxx"
+#include "tools/keycode.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;

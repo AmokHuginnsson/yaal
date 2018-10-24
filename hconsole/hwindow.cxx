@@ -10,6 +10,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "htuiprocess.hxx"
 #include "hcore/hlog.hxx"
 #include "hwidgetfactory.hxx"
+#include "tools/keycode.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::tools;
@@ -52,6 +53,7 @@ HWindow::~HWindow( void ) {
 void HWindow::init( void ) {
 	M_PROLOG
 	do_init();
+	_widgets.sync_focus();
 	return;
 	M_EPILOG
 }
@@ -165,8 +167,9 @@ bool HWindow::handler_jump_direct( HEvent const& event_ ) {
 		 * see console.h for details
 		 */
 		HWidgetList::cyclic_iterator it = _focusedChild;
-		if ( keyPress.get_key_code() & 0x0ff00 ) {
-			_widgets.next_enabled( static_cast<char>( keyPress.get_key_code() ) );
+		code_point_t::value_type keyCode( static_cast<code_point_t::value_type>( keyPress.get_key_code() ) );
+		if ( ( keyCode >= KEY_CODE::META_BASE ) && ( keyCode < KEY_CODE::COMMAND_BASE ) ) {
+			_widgets.next_enabled( static_cast<char>( keyCode ) );
 			if ( _focusedChild != it ) {
 				consumed = true;
 			}

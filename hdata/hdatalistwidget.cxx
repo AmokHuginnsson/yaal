@@ -11,6 +11,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/hset.hxx"
 #include "hcore/hlog.hxx"
 #include "tools/stringalgo.hxx"
+#include "tools/keycode.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::tools;

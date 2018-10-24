@@ -14,6 +14,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hconsole.hxx"
 #include "hmainwindow.hxx"
 #include "mouse.hxx"
+#include "tools/keycode.hxx"
 
 #ifdef __DEBUGGER_BABUNI__
 #include "hcore/hlog.hxx"
@@ -77,7 +78,7 @@ void HTUIProcess::init_tui( yaal::hcore::HString const& processName_, HWindow::p
 	register_postprocess_handler( CTRLS_COUNT, ctrls, call( &HTUIProcess::handler_refresh, this, _1 ) );
 	register_postprocess_handler( KEY<'x'>::command, nullptr, call( &HTUIProcess::handler_quit, this, _1 ) );
 	if ( _useMouse_ != USE_MOUSE::NO ) {
-		register_postprocess_handler( KEY_CODE::MOUSE, nullptr, call( &HTUIProcess::handler_mouse, this, _1 ) );
+		register_preprocess_handler( KEY_CODE::MOUSE, nullptr, call( &HTUIProcess::handler_mouse, this, _1 ) );
 	}
 	if ( !! mainWindow_ ) {
 		mainWindow = mainWindow_;

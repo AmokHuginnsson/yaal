@@ -37,6 +37,7 @@ public:
 	HWidget* get_widget_by_no( int );
 	void exchange( int, int );
 	void reorder_widgets( widget_order_t const& );
+	void sync_focus( void );
 };
 
 typedef yaal::hcore::HExceptionT<HWidgetList> HWidgetListException;

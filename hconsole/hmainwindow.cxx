@@ -5,8 +5,10 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hmainwindow.hxx"
 #include "hcore/memory.hxx"
+#include "tools/keycode.hxx"
 
 using namespace yaal::hcore;
+using namespace yaal::tools;
 using namespace yaal::hconsole::list_widget_helper;
 
 namespace yaal {

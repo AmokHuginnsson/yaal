@@ -14,6 +14,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hconsole.hxx"
 #include "tools/hxml.hxx"
 #include "hconsole/hwindow.hxx"
+#include "tools/keycode.hxx"
 #include "tools/hexpression.hxx"
 
 using namespace yaal;

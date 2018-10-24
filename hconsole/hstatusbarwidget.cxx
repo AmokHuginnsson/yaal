@@ -13,6 +13,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hsearchablewidget.hxx"
 #include "hcore/hformat.hxx"
 #include "hcore/hlog.hxx"
+#include "tools/keycode.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::tools;

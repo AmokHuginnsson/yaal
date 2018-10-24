@@ -54,6 +54,16 @@ void HWidgetList::add_widget( HWidget::ptr_t widget_ ) {
 	M_EPILOG
 }
 
+void HWidgetList::sync_focus( void ) {
+	M_PROLOG
+	if ( _focused != _list.end() ) {
+		(*_focused)->enable( true );
+		(*_focused)->set_focus();
+	}
+	return;
+	M_EPILOG
+}
+
 void HWidgetList::refresh_all( bool force_ ) {
 	M_PROLOG
 	bool focusedNeedRepaint( (*_focused)->need_repaint() );
@@ -71,8 +81,9 @@ void HWidgetList::refresh_all( bool force_ ) {
 
 void HWidgetList::update_all( void ) {
 	M_PROLOG
-	for ( model_t::iterator it( _list.begin() ), end( _list.end() ); it != end; ++ it )
+	for ( model_t::iterator it( _list.begin() ), end( _list.end() ); it != end; ++ it ) {
 		(*it)->update();
+	}
 	return;
 	M_EPILOG
 }
@@ -96,8 +107,9 @@ void HWidgetList::hit_test_all( mouse::OMouse& mouse_ ) {
 HWidget* HWidgetList::get_widget_by_no( int offset_ ) {
 	M_PROLOG
 	model_t::iterator it = _list.begin();
-	while ( offset_ -- > 0 )
+	while ( offset_ -- > 0 ) {
 		++ it;
+	}
 	return ( &**it );
 	M_EPILOG
 }
@@ -105,6 +117,7 @@ HWidget* HWidgetList::get_widget_by_no( int offset_ ) {
 void HWidgetList::pop_front( void ) {
 	M_PROLOG
 	_list.pop_front();
+	return;
 	M_EPILOG
 }
 

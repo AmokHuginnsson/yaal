@@ -17,6 +17,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hdataprocess.hxx"
 #include "hcore/hlog.hxx"
 #include "tools/stringalgo.hxx"
+#include "tools/keycode.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::tools;
@@ -28,12 +29,17 @@ namespace yaal {
 namespace hdata {
 
 HDataWindow::HDataWindow( HString const& title_, HDataProcess* owner_ )
-	: HWindow( title_ ),
-	_modified( false ), _documentMode( DOCUMENT::VIEW ), _mainWidget( nullptr ),
-	_viewModeWidgets(), _editModeWidgets(),
-	_crud( new ( memory::yaal ) HCRUDDescriptor( owner_->data_base() ) ),
-	_mode( HCRUDDescriptor::MODE::READ ),
-	_columns(), _idColumnName(), _dictionaries() {
+	: HWindow( title_ )
+	, _modified( false )
+	, _documentMode( DOCUMENT::VIEW )
+	, _mainWidget( nullptr )
+	, _viewModeWidgets()
+	, _editModeWidgets()
+	, _crud( new ( memory::yaal ) HCRUDDescriptor( owner_->data_base() ) )
+	, _mode( HCRUDDescriptor::MODE::READ )
+	, _columns()
+	, _idColumnName()
+	, _dictionaries() {
 	M_PROLOG
 	register_postprocess_handler( KEY<'n'>::command, nullptr, call( &HDataWindow::handler_add_new, this, _1 ) );
 	register_postprocess_handler( KEY<'e'>::command, nullptr, call( &HDataWindow::handler_edit, this, _1 ) );
@@ -55,8 +61,8 @@ HDataWindow::~HDataWindow( void ) {
 void HDataWindow::do_init( void ) {
 	M_PROLOG
 	HWindow::do_init();
-	_mainWidget->set_focus();
 	if ( _mainWidget ) {
+		_mainWidget->set_focus();
 		_mainWidget->load();
 		_mainWidget->process_input( KEY_CODE::HOME );
 	}
@@ -78,20 +84,22 @@ void HDataWindow::set_mode( DOCUMENT mode_ ) {
 		case ( DOCUMENT::EDIT ): {
 			_documentMode = mode_;
 			controls_t::iterator end = _editModeWidgets.end();
-			for ( controls_t::iterator it = _editModeWidgets.begin(); it != end; ++ it )
+			for ( controls_t::iterator it = _editModeWidgets.begin(); it != end; ++ it ) {
 				(*it)->enable( mode_ == DOCUMENT::EDIT );
+			}
 			end = _viewModeWidgets.end();
-			for ( controls_t::iterator it = _viewModeWidgets.begin(); it != end; ++ it )
+			for ( controls_t::iterator it = _viewModeWidgets.begin(); it != end; ++ it ) {
 				(*it)->enable( mode_ == DOCUMENT::VIEW );
+			}
 			controls_t::iterator begin = mode_ == DOCUMENT::EDIT ? _editModeWidgets.begin() : _viewModeWidgets.begin();
 			end = mode_ == DOCUMENT::EDIT ? _editModeWidgets.end() : _viewModeWidgets.end();
-			if ( begin != end )
+			if ( begin != end ) {
 				(*begin)->set_focus();
-		}
-		break;
-		default :
+			}
+		} break;
+		default: {
 			M_THROW( "unknown window mode", mode_ );
-		break;
+		} break;
 	}
 	return;
 	M_EPILOG
@@ -127,8 +135,9 @@ bool HDataWindow::handler_add_new( hconsole::HEvent const& ) {
 		return ( true );
 	}
 	_mode = HCRUDDescriptor::MODE::CREATE;
-	if ( _mainWidget )
+	if ( _mainWidget ) {
 		_mainWidget->add_new();
+	}
 	set_mode( DOCUMENT::EDIT );
 	return ( true );
 	M_EPILOG
@@ -270,8 +279,9 @@ void HDataWindow::set_modified( bool modified_ ) {
 	M_PROLOG
 	bool modified = _modified;
 	_modified = modified_;
-	if ( ! modified )
+	if ( ! modified ) {
 		_statusBar->paint();
+	}
 	return;
 	M_EPILOG
 }
@@ -283,18 +293,17 @@ void HDataWindow::set_widget_role( yaal::hdata::HDataWidget* widget_, HDataWidge
 			_mainWidget = widget_;
 			_viewModeWidgets.push_back( widget_ );
 			widget_->enable( true );
-		}
-		break;
-		case ( HDataWidget::ROLE::DATA ):
+		} break;
+		case ( HDataWidget::ROLE::DATA ): {
 			_editModeWidgets.push_back( widget_ );
-		break;
-		case ( HDataWidget::ROLE::FILTER ):
+		} break;
+		case ( HDataWidget::ROLE::FILTER ): {
 			widget_->enable( true );
 			_viewModeWidgets.push_back( widget_ );
-		break;
-		default :
+		} break;
+		default : {
 			M_THROW( "unknown resource purpose", role_ );
-		break;
+		} break;
 	}
 	return;
 	M_EPILOG

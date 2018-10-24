@@ -7,7 +7,7 @@
 #ifndef YAAL_HCORE_UTF8_HXX_INCLUDED
 #define YAAL_HCORE_UTF8_HXX_INCLUDED 1
 
-#include "hcore/hstring.hxx"
+#include "hcore/hexception.hxx"
 #include "hcore/numeric.hxx"
 
 namespace yaal {
@@ -40,6 +40,8 @@ static u32_t const UTF8_MAX_1_BYTE_CODE_POINT( 0x00007f );
 static u32_t const UTF8_MAX_2_BYTE_CODE_POINT( 0x0007ff );
 static u32_t const UTF8_MAX_3_BYTE_CODE_POINT( 0x00ffff );
 static u32_t const UTF8_MAX_4_BYTE_CODE_POINT( 0x10ffff );
+
+static u32_t const MASK( 0x1fffff );
 
 inline int utf8_declared_length( yaal::u8_t head_ ) {
 	int length( 0 );

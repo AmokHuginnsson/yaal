@@ -4,6 +4,7 @@
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "htimewidget.hxx"
+#include "tools/keycode.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::tools;

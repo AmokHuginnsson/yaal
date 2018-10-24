@@ -98,8 +98,9 @@ HWidget::~HWidget( void ) {
 void HWidget::enable( bool enable_ ) {
 	M_PROLOG
 	_enabled = enable_;
-	if ( ! _enabled )
+	if ( ! _enabled ) {
 		_focused = false;
+	}
 	schedule_repaint();
 	return;
 	M_EPILOG
@@ -107,8 +108,9 @@ void HWidget::enable( bool enable_ ) {
 
 int HWidget::process_input( int code_ ) {
 	M_PROLOG
-	if ( ! _valid )
+	if ( ! _valid ) {
 		update();
+	}
 	return ( do_process_input( code_ ) );
 	M_EPILOG
 }

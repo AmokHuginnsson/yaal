@@ -12,6 +12,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "heditwidget.hxx"
 #include "hwindow.hxx"
 #include "hcore/hlog.hxx"
+#include "tools/keycode.hxx"
 #include "tools/hxml.hxx"
 
 using namespace yaal::hcore;
@@ -210,12 +211,13 @@ int HEditWidget::go_to_eow( int length_ ) {
 
 int HEditWidget::kill_line( void ) {
 	M_PROLOG
-	if ( ! _readOnly ) {
+	bool doKill( ! ( _readOnly || _varTmpBuffer.is_empty() ) );
+	if ( doKill ) {
 		_varTmpBuffer.set_at( 0, 0_ycp );
 		_widgetOffset = 0;
 		_cursorPosition = 0;
 	}
-	return ( ! _readOnly ? 0 : 1 );
+	return ( doKill ? 0 : 1 );
 	M_EPILOG
 }
 

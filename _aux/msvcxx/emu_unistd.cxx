@@ -25,7 +25,7 @@
 #include "msvcxx.hxx"
 #include "emu_signals.hxx"
 
-#include "hconsole/console.hxx"
+#include "tools/keycode.hxx"
 
 using namespace std;
 using namespace yaal;
@@ -539,7 +539,7 @@ DWORD win_read_console_key( void ) {
 				}
 			}
 			break;
-		} else if ( key == hconsole::KEY<'['>::ctrl ) { // ESC, set flag for later
+		} else if ( key == KEY<'['>::ctrl ) { // ESC, set flag for later
 			escSeen = true;
 			continue;
 		} else if ( ( key >= 0xD800 ) && ( key <= 0xDBFF ) ) {
