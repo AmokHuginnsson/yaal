@@ -52,9 +52,9 @@ public:
 	void add_window( window_t );
 	HMainWindow* main_window( void );
 protected:
-	void process_stdin( tools::HIODispatcher::HIOHandler::stream_t& );
-	void process_mouse( tools::HIODispatcher::HIOHandler::stream_t& );
-	void process_terminal_event( tools::HIODispatcher::HIOHandler::stream_t& );
+	void process_stdin( tools::HIODispatcher::stream_t& );
+	void process_mouse( tools::HIODispatcher::stream_t& );
+	void process_terminal_event( tools::HIODispatcher::stream_t& );
 	int process_commands( void );
 	void select( HWindow const* );
 	void repaint( bool = false );
