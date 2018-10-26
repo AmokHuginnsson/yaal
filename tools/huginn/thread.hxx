@@ -31,6 +31,7 @@ private:
 	yaal::hcore::HString _exceptionMessage;
 	int _exceptionFileId;
 	int _exceptionPosition;
+	HHuginn::call_stack_t _trace;
 public:
 	HThread( HRuntime*, yaal::hcore::HThread::id_t );
 	~HThread( void );
@@ -73,6 +74,9 @@ public:
 	}
 	HHuginn::values_t& value_cache( void ) {
 		return ( _valueCache );
+	}
+	HHuginn::call_stack_t const& trace( void ) const {
+		return ( _trace );
 	}
 private:
 	void add_frame( void );

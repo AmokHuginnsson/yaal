@@ -107,6 +107,7 @@ private:
 	int _maxCallStackSize;
 	HHuginn::paths_t _modulePaths;
 	HHuginn::compiler_setup_t _compilerSetup;
+	HHuginn::call_stack_t _trace;
 public:
 	HRuntime( HHuginn* );
 	huginn::HThread* current_thread( void );
@@ -260,12 +261,13 @@ public:
 	HHuginn::paths_t const& module_paths( void ) const;
 	HHuginn::compiler_setup_t compiler_setup( void ) const;
 	int file_id( void );
-	call_stack_t get_call_stack( HThread* );
+	HHuginn::call_stack_t get_call_stack( HThread* );
+	HHuginn::call_stack_t const& trace( void ) const;
 	using HIntrospecteeInterface::get_call_stack;
 	variable_views_t get_locals( HThread*, int );
 	using HIntrospecteeInterface::get_locals;
 protected:
-	virtual call_stack_t do_get_call_stack( void ) override;
+	virtual HHuginn::call_stack_t do_get_call_stack( void ) override;
 	virtual variable_views_t do_get_locals( int ) override;
 private:
 	void register_builtin_function( yaal::hcore::HString const&, function_t&&, yaal::hcore::HString const& );

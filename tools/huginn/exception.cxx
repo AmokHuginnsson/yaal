@@ -100,11 +100,11 @@ private:
 			static_cast<HExceptionClass const*>( e->get_class() )->_traceName.c_str(),
 			values_, 0, 0, thread_, position_
 		);
-		HIntrospecteeInterface::call_stack_t const& traceData( e->trace() );
+		HHuginn::call_stack_t const& traceData( e->trace() );
 		HObjectFactory& of( thread_->object_factory() );
 		HHuginn::value_t traceValue( of.create_list() );
 		HHuginn::HList::values_t& traceList( static_cast<HHuginn::HList*>( traceValue.raw() )->value() );
-		for ( HIntrospecteeInterface::HCallSite const& cs : traceData ) {
+		for ( HHuginn::HCallSite const& cs : traceData ) {
 			traceList.push_back( of.create<HStackFrameInfo>( of.stack_frame_info_class(), cs ) );
 		}
 		return ( traceValue );
@@ -173,7 +173,7 @@ HHuginn::class_t create_class( HRuntime* runtime_, yaal::hcore::HString const& n
 	M_EPILOG
 }
 
-HStackFrameInfo::HStackFrameInfo( HHuginn::HClass const* class_, HIntrospecteeInterface::HCallSite const& callSite_ )
+HStackFrameInfo::HStackFrameInfo( HHuginn::HClass const* class_, HHuginn::HCallSite const& callSite_ )
 	: HValue( class_ )
 	, _callSite( callSite_ ) {
 }
@@ -260,7 +260,7 @@ HHuginn::HException::HException( huginn::HThread* thread_, HHuginn::HClass const
 	return;
 }
 
-HHuginn::HException::HException( HHuginn::HClass const* class_, yaal::hcore::HString const& message_, HIntrospecteeInterface::call_stack_t const& callStack_ )
+HHuginn::HException::HException( HHuginn::HClass const* class_, yaal::hcore::HString const& message_, HHuginn::call_stack_t const& callStack_ )
 	: HValue( class_ )
 	, _message( message_ )
 	, _callStack( callStack_ ) {
@@ -272,11 +272,11 @@ yaal::hcore::HString const& HHuginn::HException::what( void ) const {
 }
 
 yaal::hcore::HString HHuginn::HException::where( void ) const {
-	HIntrospecteeInterface::HCallSite const& cs( _callStack.front() );
+	HHuginn::HCallSite const& cs( _callStack.front() );
 	return ( to_string( cs.file() ).append( ":" ).append( cs.line() ).append( ":" ).append( cs.column() ) );
 }
 
-HIntrospecteeInterface::call_stack_t const& HHuginn::HException::trace( void ) const {
+HHuginn::call_stack_t const& HHuginn::HException::trace( void ) const {
 	return ( _callStack );
 }
 

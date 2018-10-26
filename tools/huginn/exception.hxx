@@ -17,9 +17,9 @@ namespace exception {
 
 class HStackFrameInfo : public HHuginn::HValue {
 private:
-	HIntrospecteeInterface::HCallSite _callSite;
+	HHuginn::HCallSite _callSite;
 public:
-	HStackFrameInfo( HHuginn::HClass const*, HIntrospecteeInterface::HCallSite const& );
+	HStackFrameInfo( HHuginn::HClass const*, HHuginn::HCallSite const& );
 	static HHuginn::value_t file( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t line( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t column( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );

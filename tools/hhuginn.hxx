@@ -110,6 +110,8 @@ public:
 	typedef yaal::hcore::HPointer<huginn::HExpression> expression_t;
 	typedef yaal::hcore::HArray<HHuginn::expression_t> expressions_t;
 	class HCoordinate;
+	class HCallSite;
+	typedef yaal::hcore::HArray<HCallSite> call_stack_t;
 	class HFieldDefinition;
 	typedef yaal::hcore::HArray<HFieldDefinition> field_definitions_t;
 	typedef yaal::hcore::HArray<identifier_id_t> identifiers_t;
@@ -202,6 +204,7 @@ private:
 	yaal::hcore::HString _errorMessage;
 	int _errorPosition;
 	int _errorFileId;
+	call_stack_t _trace;
 	typedef std::atomic<bool> flag_t;
 	yaal::hcore::HStreamInterface::ptr_t _inputStream;
 	yaal::hcore::HStreamInterface* _inputStreamRaw;
@@ -309,6 +312,7 @@ public:
 	int file_id( void ) const;
 	HCoordinate error_coordinate( void ) const;
 	HCoordinate get_coordinate( int, int ) const;
+	call_stack_t const& trace( void ) const;
 	int real_position( int, int ) const;
 	yaal::hcore::HString source_name( int ) const;
 	yaal::hcore::HString where( int, int ) const;
@@ -419,18 +423,6 @@ typedef yaal::hcore::HExceptionT<HHuginn> HHuginnException;
 
 class HIntrospecteeInterface {
 public:
-	class HCallSite {
-		yaal::hcore::HString _file;
-		int _line;
-		int _column;
-		yaal::hcore::HString _context;
-	public:
-		HCallSite( yaal::hcore::HString const&, int, int, yaal::hcore::HString const& );
-		yaal::hcore::HString const& file( void ) const;
-		int line( void ) const;
-		int column( void ) const;
-		yaal::hcore::HString const& context( void ) const;
-	};
 	class HVariableView {
 		yaal::hcore::HString _name;
 		HHuginn::value_ref_t _view;
@@ -439,14 +431,13 @@ public:
 		yaal::hcore::HString const& name( void ) const;
 		HHuginn::value_t value( void ) const;
 	};
-	typedef yaal::hcore::HArray<HCallSite> call_stack_t;
 	typedef yaal::hcore::HArray<HVariableView> variable_views_t;
 public:
 	virtual ~HIntrospecteeInterface( void ) {}
-	call_stack_t get_call_stack( void );
+	HHuginn::call_stack_t get_call_stack( void );
 	variable_views_t get_locals( int );
 protected:
-	virtual call_stack_t do_get_call_stack( void ) = 0;
+	virtual HHuginn::call_stack_t do_get_call_stack( void ) = 0;
 	virtual variable_views_t do_get_locals( int ) = 0;
 };
 
@@ -478,6 +469,18 @@ public:
 	int column( void ) const {
 		return ( _column );
 	}
+};
+
+class HHuginn::HCallSite {
+	yaal::hcore::HString _file;
+	HHuginn::HCoordinate _coordinate;
+	yaal::hcore::HString _context;
+public:
+	HCallSite( yaal::hcore::HString const&, int, int, yaal::hcore::HString const& );
+	yaal::hcore::HString const& file( void ) const;
+	int line( void ) const;
+	int column( void ) const;
+	yaal::hcore::HString const& context( void ) const;
 };
 
 class HHuginn::HHuginnRuntimeException {
@@ -1347,13 +1350,13 @@ public:
 	typedef HHuginn::HValue base_type;
 private:
 	yaal::hcore::HString _message;
-	HIntrospecteeInterface::call_stack_t _callStack;
+	HHuginn::call_stack_t _callStack;
 public:
 	HException( huginn::HThread*, HHuginn::HClass const*, yaal::hcore::HString const& );
-	HException( HHuginn::HClass const*, yaal::hcore::HString const&, HIntrospecteeInterface::call_stack_t const& );
+	HException( HHuginn::HClass const*, yaal::hcore::HString const&, HHuginn::call_stack_t const& );
 	yaal::hcore::HString const& what( void ) const;
 	yaal::hcore::HString where( void ) const;
-	HIntrospecteeInterface::call_stack_t const& trace( void ) const;
+	HHuginn::call_stack_t const& trace( void ) const;
 private:
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };

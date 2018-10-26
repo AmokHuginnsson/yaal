@@ -29,7 +29,8 @@ HThread::HThread( HRuntime* runtime_, yaal::hcore::HThread::id_t id_ )
 	, _objectFactory( *_runtime->object_factory() )
 	, _exceptionMessage()
 	, _exceptionFileId( INVALID_FILE_ID )
-	, _exceptionPosition( 0 ) {
+	, _exceptionPosition( 0 )
+	, _trace() {
 	_valueCache.reserve( _runtime->max_local_variable_count() );
 	return;
 }
@@ -201,6 +202,7 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t&& value_, 
 		_exceptionFileId = fileId_;
 		_exceptionPosition = position_;
 		_exceptionMessage.assign( "Uncaught " );
+		_trace = _runtime->get_call_stack( this );
 		if ( e ) {
 			_exceptionMessage
 				.append( e->get_class()->name() )

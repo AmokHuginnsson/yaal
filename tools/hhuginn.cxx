@@ -109,26 +109,25 @@ int HHuginn::HHuginnRuntimeException::file_id( void ) const {
 	return ( _fileId );
 }
 
-HIntrospecteeInterface::HCallSite::HCallSite( yaal::hcore::HString const& file_, int line_, int column_, yaal::hcore::HString const& context_ )
+HHuginn::HCallSite::HCallSite( yaal::hcore::HString const& file_, int line_, int column_, yaal::hcore::HString const& context_ )
 	: _file( file_ )
-	, _line( line_ )
-	, _column( column_ )
+	, _coordinate( line_, column_ )
 	, _context( context_ ) {
 }
 
-yaal::hcore::HString const& HIntrospecteeInterface::HCallSite::file( void ) const {
+yaal::hcore::HString const& HHuginn::HCallSite::file( void ) const {
 	return ( _file );
 }
 
-int HIntrospecteeInterface::HCallSite::line( void ) const {
-	return ( _line );
+int HHuginn::HCallSite::line( void ) const {
+	return ( _coordinate.line() );
 }
 
-int HIntrospecteeInterface::HCallSite::column( void ) const {
-	return ( _column );
+int HHuginn::HCallSite::column( void ) const {
+	return ( _coordinate.column() );
 }
 
-yaal::hcore::HString const& HIntrospecteeInterface::HCallSite::context( void ) const {
+yaal::hcore::HString const& HHuginn::HCallSite::context( void ) const {
 	return ( _context );
 }
 
@@ -145,7 +144,7 @@ HHuginn::value_t HIntrospecteeInterface::HVariableView::value( void ) const {
 	return ( _view );
 }
 
-HIntrospecteeInterface::call_stack_t HIntrospecteeInterface::get_call_stack( void ) {
+HHuginn::call_stack_t HIntrospecteeInterface::get_call_stack( void ) {
 	M_PROLOG
 	return ( do_get_call_stack() );
 	M_EPILOG
@@ -337,6 +336,7 @@ HHuginn::HHuginn( void )
 	, _errorMessage()
 	, _errorPosition( INVALID_POSITION )
 	, _errorFileId( INVALID_FILE_ID )
+	, _trace()
 	, _inputStream()
 	, _inputStreamRaw( &cin )
 	, _outputStream()
@@ -362,6 +362,7 @@ HHuginn::HHuginn( huginn::HRuntime* runtime_ )
 	, _errorMessage()
 	, _errorPosition( INVALID_POSITION )
 	, _errorFileId( INVALID_FILE_ID )
+	, _trace()
 	, _inputStream()
 	, _inputStreamRaw( &cin )
 	, _outputStream()
@@ -630,6 +631,7 @@ bool HHuginn::execute( void ) {
 		_errorMessage = e.message();
 		_errorPosition = e.position();
 		_errorFileId = e.file_id();
+		_trace = _runtime->trace();
 	}
 	return ( ok );
 	M_EPILOG
@@ -701,6 +703,10 @@ yaal::hcore::HString HHuginn::error_message( void ) const {
 
 char const* HHuginn::error_message( int code_ ) const {
 	return ( ::error_message( code_ ) );
+}
+
+HHuginn::call_stack_t const& HHuginn::trace( void ) const {
+	return ( _trace );
 }
 
 yaal::hcore::HString HHuginn::get_snippet( int from_, int len_ ) const {

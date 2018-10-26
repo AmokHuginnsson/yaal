@@ -182,7 +182,8 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 	, _maxLocalVariableCount( 0 )
 	, _maxCallStackSize( _huginnMaxCallStack_ )
 	, _modulePaths()
-	, _compilerSetup( HHuginn::COMPILER::DEFAULT ) {
+	, _compilerSetup( HHuginn::COMPILER::DEFAULT )
+	, _trace() {
 }
 
 void HRuntime::reset( void ) {
@@ -225,6 +226,7 @@ void HRuntime::copy_text( HRuntime& source_ ) {
 	_maxCallStackSize = source_._maxCallStackSize;
 	_modulePaths = source_._modulePaths;
 	_compilerSetup = source_._compilerSetup;
+	_trace = source_._trace;
 	fix_references();
 	/* Update global references in sub-module. */
 	if ( submoduleContext ) {
@@ -585,6 +587,7 @@ void HRuntime::execute( void ) {
 	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
 	huginn::HThread* t( _threads.insert( make_pair( threadId, make_pointer<huginn::HThread>( this, threadId ) ) ).first->second.get() );
 	_result = call( IDENTIFIER::STANDARD_FUNCTIONS::MAIN, args, 0 );
+	_trace = t->trace();
 	t->flush_runtime_exception();
 	return;
 	M_EPILOG
@@ -1085,9 +1088,9 @@ yaal::hcore::HString const& HRuntime::package_name( HHuginn::HClass const* class
 	M_EPILOG
 }
 
-HIntrospecteeInterface::call_stack_t HRuntime::get_call_stack( huginn::HThread* thread_ ) {
+HHuginn::call_stack_t HRuntime::get_call_stack( huginn::HThread* thread_ ) {
 	M_PROLOG
-	call_stack_t callStack;
+	HHuginn::call_stack_t callStack;
 	HFrame* f( thread_->current_frame() );
 	int position( f->position() );
 	while ( f ) {
@@ -1110,10 +1113,14 @@ HIntrospecteeInterface::call_stack_t HRuntime::get_call_stack( huginn::HThread* 
 	M_EPILOG
 }
 
-HIntrospecteeInterface::call_stack_t HRuntime::do_get_call_stack( void ) {
+HHuginn::call_stack_t HRuntime::do_get_call_stack( void ) {
 	M_PROLOG
 	return ( get_call_stack( current_thread() ) );
 	M_EPILOG
+}
+
+HHuginn::call_stack_t const& HRuntime::trace( void ) const {
+	return ( _trace );
 }
 
 HIntrospecteeInterface::variable_views_t HRuntime::get_locals( HThread* thread_, int frameNo_ ) {

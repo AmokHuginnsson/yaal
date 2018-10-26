@@ -232,10 +232,10 @@ public:
 	static HHuginn::value_t call_stack( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "Introspection.call_stack", values_, 0, 0, thread_, position_ );
-		HIntrospecteeInterface::call_stack_t callStack( thread_->runtime().get_call_stack( thread_ ) );
+		HHuginn::call_stack_t callStack( thread_->runtime().get_call_stack( thread_ ) );
 		HObjectFactory& of( thread_->object_factory() );
 		HHuginn::HList::values_t data;
-		for ( HIntrospecteeInterface::HCallSite const& cs : callStack ) {
+		for ( HHuginn::HCallSite const& cs : callStack ) {
 			data.push_back( of.create<exception::HStackFrameInfo>( of.stack_frame_info_class(), cs ) );
 		}
 		return ( of.create_list( yaal::move( data ) ) );
