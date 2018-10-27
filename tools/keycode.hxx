@@ -55,8 +55,9 @@ struct KEY_CODE {
 	static int const F24          = F23       + 1;
 	static int const MOUSE        = F24       + 1;
 	static int const CONTROL_BASE = 96;
-	static int const META_BASE    = BASE * 2;
-	static int const COMMAND_BASE = BASE * 4;
+	static int const SHIFT_BASE   = BASE * 2;
+	static int const META_BASE    = BASE * 4;
+	static int const COMMAND_BASE = BASE * 8;
 };
 
 typedef yaal::hcore::HExceptionT<KEY_CODE> HKeyCodeException;
@@ -70,19 +71,35 @@ typedef yaal::hcore::HExceptionT<KEY_CODE> HKeyCodeException;
  */
 template<int code = 0>
 struct KEY {
-	static int const meta = code + KEY_CODE::META_BASE;
-	static int meta_r( int code_ ) {
-		return ( code_ + KEY_CODE::META_BASE );
-	}
 	static int const ctrl = code - KEY_CODE::CONTROL_BASE;
 	static int ctrl_r( int code_ ) {
 		return ( code_ - KEY_CODE::CONTROL_BASE );
+	}
+	static int const shift = code + KEY_CODE::SHIFT_BASE;
+	static int shift_r( int code_ ) {
+		return ( code_ + KEY_CODE::SHIFT_BASE );
+	}
+	static int const meta = code + KEY_CODE::META_BASE;
+	static int meta_r( int code_ ) {
+		return ( code_ + KEY_CODE::META_BASE );
 	}
 	static int const command = code + KEY_CODE::COMMAND_BASE;
 	static int command_r( int code_ ) {
 		return ( code_ + KEY_CODE::COMMAND_BASE );
 	}
 };
+
+struct KeyEncoding {
+	code_point_t const keyCode;
+	char const* const escapeSequence;
+};
+
+struct KeyEncodingTable {
+	KeyEncoding const* data;
+	int const size;
+};
+
+KeyEncodingTable get_key_encoding_table( void );
 
 }
 

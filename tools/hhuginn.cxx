@@ -381,6 +381,7 @@ HHuginn::HHuginn( huginn::HRuntime* runtime_ )
 
 void HHuginn::reset( int undoSteps_ ) {
 	M_PROLOG
+	_trace.clear();
 	_errorPosition = INVALID_POSITION;
 	_errorFileId = INVALID_FILE_ID;
 	_errorMessage.clear();
