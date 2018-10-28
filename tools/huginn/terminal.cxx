@@ -14,6 +14,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/ansi.hxx"
 #include "tools/color.hxx"
 #include "tools/hterminal.hxx"
+#include "tools/keycode.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -26,9 +27,113 @@ namespace tools {
 
 namespace huginn {
 
+class HKeyPressEventClass : public HHuginn::HClass {
+	enumeration::HEnumerationClass::ptr_t _modifierClass;
+	enumeration::HEnumerationClass::ptr_t _keyClass;
+public:
+	HKeyPressEventClass( HRuntime* runtime_, HHuginn::type_id_t typeId_, HHuginn::HClass* origin_ )
+		: HHuginn::HClass(
+			runtime_,
+			typeId_,
+			runtime_->identifier_id( "KeyPressEvent" ),
+			"The `KeyPressEvent` represents information about key press event as received by terminal.",
+			HHuginn::ACCESS::PUBLIC
+		), _modifierClass(
+			add_enumeration_as_member(
+				this,
+				enumeration::create_class(
+					runtime_,
+					"MODIFIER",
+					enumeration::descriptions_t{
+						{ "SHIFT",   "SHIFT modifier has been pressed",   static_cast<int>( KEY_CODE::SHIFT_BASE ) },
+						{ "CONTROL", "CONTROL modifier has been pressed", static_cast<int>( KEY_CODE::CONTROL_BASE ) },
+						{ "META",    "META modifier has beeb pressed",    static_cast<int>( KEY_CODE::META_BASE ) },
+						{ "COMMAND", "key press in COMMAND context",      static_cast<int>( KEY_CODE::COMMAND_BASE ) }
+					},
+					"The `MODIFIER` is a set of known key press modifiers.",
+					HHuginn::VISIBILITY::PACKAGE,
+					this
+				),
+				"a set of key press modifiers"
+			)
+		), _keyClass(
+			add_enumeration_as_member(
+				this,
+				enumeration::create_class(
+					runtime_,
+					"KEY",
+					enumeration::descriptions_t{
+						{ "UP",        "Up Arrow key",     static_cast<int>( KEY_CODE::UP ) },
+						{ "DOWN",      "Down Arrow key",   static_cast<int>( KEY_CODE::DOWN ) },
+						{ "LEFT",      "Left Arrow key",   static_cast<int>( KEY_CODE::LEFT ) },
+						{ "RIGHT",     "Right Arrow key",  static_cast<int>( KEY_CODE::RIGHT ) },
+						{ "PAGE_UP",   "Page Up key",      static_cast<int>( KEY_CODE::PAGE_UP ) },
+						{ "PAGE_DOWN", "Page Down key",    static_cast<int>( KEY_CODE::PAGE_DOWN ) },
+						{ "INSERT",    "Insert key",       static_cast<int>( KEY_CODE::INSERT ) },
+						{ "DELETE",    "Delete key",       static_cast<int>( KEY_CODE::DELETE ) },
+						{ "HOME",      "Home key",         static_cast<int>( KEY_CODE::HOME ) },
+						{ "END",       "End key",          static_cast<int>( KEY_CODE::END ) },
+						{ "F1",        "F1 function key",  static_cast<int>( KEY_CODE::F1 ) },
+						{ "F2",        "F2 function key",  static_cast<int>( KEY_CODE::F2 ) },
+						{ "F3",        "F3 function key",  static_cast<int>( KEY_CODE::F3 ) },
+						{ "F4",        "F4 function key",  static_cast<int>( KEY_CODE::F4 ) },
+						{ "F5",        "F5 function key",  static_cast<int>( KEY_CODE::F5 ) },
+						{ "F6",        "F6 function key",  static_cast<int>( KEY_CODE::F6 ) },
+						{ "F7",        "F7 function key",  static_cast<int>( KEY_CODE::F7 ) },
+						{ "F8",        "F8 function key",  static_cast<int>( KEY_CODE::F8 ) },
+						{ "F9",        "F9 function key",  static_cast<int>( KEY_CODE::F9 ) },
+						{ "F10",       "F10 function key", static_cast<int>( KEY_CODE::F10 ) },
+						{ "F11",       "F11 function key", static_cast<int>( KEY_CODE::F11 ) },
+						{ "F12",       "F12 function key", static_cast<int>( KEY_CODE::F12 ) }
+					},
+					"The `KEY` is a set of known keys on the terminal's keyboard.",
+					HHuginn::VISIBILITY::PACKAGE,
+					this
+				),
+				"a set of known key on the keyboard"
+			)
+		) {
+		M_PROLOG
+		HHuginn::field_definitions_t fd{
+			{ "code",      runtime_->none_value(), "key pressed" },
+			{ "key",       runtime_->none_value(), "the key pressed" },
+			{ "modifiers", runtime_->none_value(), "modifiers used" },
+			{ "to_string", runtime_->create_method( &HKeyPressEventClass::to_string ), "get `string` representation of this key press event" }
+		};
+		set_origin( origin_ );
+		redefine( nullptr, fd );
+		return;
+		M_EPILOG
+	}
+	enumeration::HEnumerationClass const* modifier_class( void ) const {
+		return ( _modifierClass.raw() );
+	}
+	enumeration::HEnumerationClass const* key_class( void ) const {
+		return ( _keyClass.raw() );
+	}
+	static HHuginn::value_t to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "KeyPressEvent.to_string";
+		verify_arg_count( name, values_, 0, 0, thread_, position_ );
+		HString s( "KeyPressEvent" );
+		HHuginn::HObject& o( *static_cast<HHuginn::HObject*>( object_->raw() ) );
+		char const* extra( "(" );
+		char const comma[] = ", ";
+		for ( int i( 0 ); i < 3; ++ i ) {
+			s.append( extra );
+			s.append( tools::to_string( o.field_ref( i ), thread_->runtime().huginn() ) );
+			extra = comma;
+		}
+		s.append( ")" );
+		return ( thread_->object_factory().create_string( yaal::move( s ) ) );
+		M_EPILOG
+	}
+};
+
 class HTerminal : public HPackage {
 	enumeration::HEnumerationClass::ptr_t _attributeClass;
 	enumeration::HEnumerationClass::ptr_t _colorClass;
+	HHuginn::class_t _keyPressEventClass;
 	HHuginn::class_t _exceptionClass;
 public:
 	HTerminal( HHuginn::HClass* class_ )
@@ -84,8 +189,26 @@ public:
 				"a set of color from basic color palette"
 			)
 		)
+		, _keyPressEventClass()
 		, _exceptionClass( class_exception( class_ ) ) {
+		M_PROLOG
+		HRuntime* runtime( class_->runtime() );
+		_keyPressEventClass = runtime->create_class(
+			HRuntime::class_constructor_t(
+				[&runtime, class_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
+					return (
+						make_pointer<HKeyPressEventClass>(
+							runtime,
+							typeId_,
+							class_
+						)
+					);
+				}
+			)
+		);
+		runtime->huginn()->register_class( add_class_as_member( class_, _keyPressEventClass, "Representation of key press event." ) );
 		return;
+		M_EPILOG
 	}
 	static HHuginn::value_t is_valid( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
@@ -216,6 +339,49 @@ public:
 		return ( thread_->object_factory().create_character( cp ) );
 		M_EPILOG
 	}
+	static HHuginn::value_t get_key( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( "Terminal.get_key", values_, 0, 0, thread_, position_ );
+		code_point_t cp( unicode::CODE_POINT::NUL );
+		HTerminal* term( static_cast<HTerminal*>( object_->raw() ) );
+		HHuginn::values_t data;
+		HObjectFactory& of( *thread_->runtime().object_factory() );
+		HKeyPressEventClass const* keyPressEventClass( static_cast<HKeyPressEventClass const*>( term->_keyPressEventClass.raw() ) );
+		try {
+			cp = tools::HTerminal::get_instance().get_key();
+			int key( KEY_CODE::key( static_cast<int>( cp.get() ) ) );
+			int modifiers( KEY_CODE::modifiers( static_cast<int>( cp.get() ) ) );
+			if ( key < KEY_CODE::BASE ) {
+				data.push_back( of.create_character( code_point_t( static_cast<code_point_t::value_type>( key ) ) ) );
+			} else {
+				data.push_back( thread_->runtime().none_value() );
+			}
+			if ( key >= KEY_CODE::BASE ) {
+				data.push_back( keyPressEventClass->key_class()->enumeral( key ) );
+			} else {
+				data.push_back( thread_->runtime().none_value() );
+			}
+			if ( modifiers ) {
+				HHuginn::HTuple::values_t m;
+				int mods[] = {
+					KEY_CODE::COMMAND_BASE, KEY_CODE::META_BASE, KEY_CODE::SHIFT_BASE, KEY_CODE::CONTROL_BASE
+				};
+				for ( int mod : mods ) {
+					if ( modifiers & mod ) {
+						m.push_back( keyPressEventClass->modifier_class()->enumeral( mod ) );
+					}
+				}
+				data.push_back( of.create_tuple( yaal::move( m ) ) );
+			} else {
+				data.push_back( thread_->runtime().none_value() );
+			}
+			data.push_back( keyPressEventClass->get_default( thread_, 3, position_ ) );
+		} catch ( HException const& e ) {
+			thread_->raise( term->_exceptionClass.raw(), e.what(), position_ );
+		}
+		return ( of.create_object( keyPressEventClass, data ) );
+		M_EPILOG
+	}
 };
 
 namespace package_factory {
@@ -242,6 +408,7 @@ HPackageCreatorInterface::HInstance HTerminalCreator::do_new_instance( HRuntime*
 		{ "color",     runtime_->create_method( &HTerminal::color ),     "( *color*, *str* ) - wrap given `string` *str* with given *color*" },
 		{ "move",      runtime_->create_method( &HTerminal::move ),      "( *row*, *column* ) - move cursor to a new position indicated by *row* and *column*" },
 		{ "get_character", runtime_->create_method( &HTerminal::get_character ), "read single character from terminal" },
+		{ "get_key",   runtime_->create_method( &HTerminal::get_key ),   "read single key press from the keyboard" },
 		{ "clear_to_eol", runtime_->create_method( &HTerminal::seq_str, "Terminal.clear_to_eol", *ansi::clrtoeol ), "clear content of the current line til the end" },
 		{ "clear",     runtime_->create_method( &HTerminal::seq_str, "Terminal.clear",   *ansi::clear ),   "clear content of the terminal" },
 		{ "save",      runtime_->create_method( &HTerminal::seq_str, "Terminal.save",    *ansi::save ),    "save current cursor position" },
