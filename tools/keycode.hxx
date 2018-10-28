@@ -58,6 +58,8 @@ struct KEY_CODE {
 	static int const SHIFT_BASE   = BASE * 2;
 	static int const META_BASE    = BASE * 4;
 	static int const COMMAND_BASE = BASE * 8;
+	static int key( int );
+	static int modifiers( int );
 };
 
 typedef yaal::hcore::HExceptionT<KEY_CODE> HKeyCodeException;

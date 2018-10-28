@@ -12,8 +12,45 @@ namespace yaal {
 
 namespace tools {
 
+int KEY_CODE::key( int code_ ) {
+	if ( code_ > COMMAND_BASE ) {
+		code_ -= COMMAND_BASE;
+	}
+	if ( code_ > META_BASE ) {
+		code_ -= META_BASE;
+	}
+	if ( code_ > SHIFT_BASE ) {
+		code_ -= SHIFT_BASE;
+	}
+	if ( code_ <= CONTROL_BASE ) {
+		code_ += CONTROL_BASE;
+	}
+	return ( code_ );
+}
+
+int KEY_CODE::modifiers( int code_ ) {
+	int m( 0 );
+	if ( code_ > COMMAND_BASE ) {
+		code_ -= COMMAND_BASE;
+		m |= COMMAND_BASE;
+	}
+	if ( code_ > META_BASE ) {
+		code_ -= META_BASE;
+		m |= META_BASE;
+	}
+	if ( code_ > SHIFT_BASE ) {
+		code_ -= SHIFT_BASE;
+		m |= SHIFT_BASE;
+	}
+	if ( code_ <= CONTROL_BASE ) {
+		code_ += CONTROL_BASE;
+		m |= CONTROL_BASE;
+	}
+	return ( m );
+}
+
 KeyEncodingTable get_key_encoding_table( void ) {
-	KeyEncoding const keyEncodings[] = {
+	static KeyEncoding const keyEncodings[] = {
 		{ code_point_t( KEY_CODE::UP ),                               "[A" },
 		{ code_point_t( KEY_CODE::UP ),                               "OA" },
 		{ code_point_t( KEY_CODE::DOWN ),                             "[B" },
@@ -115,7 +152,7 @@ KeyEncodingTable get_key_encoding_table( void ) {
 		{ code_point_t( KEY<KEY<KEY_CODE::RIGHT>::ctrl>::meta ),      "[1;7C" },
 		{ code_point_t( KEY<KEY<KEY_CODE::DELETE>::ctrl>::meta ),     "[3;7~" }
 	};
-	return { keyEncodings, sizeof ( keyEncodings ) };
+	return { keyEncodings, yaal::size( keyEncodings ) };
 }
 
 }

@@ -32,6 +32,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools.hxx"
 #include "hcore/unicode.hxx"
 #include "hcore/hfile.hxx"
+#include "keycode.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::tools;
@@ -46,8 +47,93 @@ static int const ORIGINAL = 0;
 static int const CANONICAL = 1;
 }
 
+class HTerminal::HSequenceScanner {
+	class HNode {
+	public:
+		typedef yaal::hcore::HResource<HNode> node_t;
+	private:
+		struct HEdge {
+			char head;
+			node_t tail;
+			HEdge()
+				: head( 0 )
+				, tail() {
+			}
+		};
+		bool _complete;
+		static int const MAX_EDGES = 16;
+		HEdge _edges[MAX_EDGES];
+		code_point_t _keyCode;
+	public:
+		HNode( void )
+			: _complete( false )
+			, _edges()
+			, _keyCode( unicode::CODE_POINT::NUL ) {
+		}
+		void add_tail( char const* sequence_, code_point_t keyCode_ ) {
+			M_PROLOG
+			if ( sequence_[0] ) {
+				char key = sequence_[0];
+				int i( 0 );
+				for ( ; i < MAX_EDGES; ++ i ) {
+					if ( _edges[i].head == 0 ) {
+						_edges[i].head = key;
+						_edges[i].tail = make_resource<HNode>();
+						break;
+					} else if ( _edges[i].head == key ) {
+						break;
+					}
+				}
+				M_ASSERT( i < MAX_EDGES );
+				_edges[i].tail->add_tail( sequence_ + 1, keyCode_ );
+			} else {
+				_complete = true;
+				_keyCode = keyCode_;
+			}
+			M_EPILOG
+		}
+		code_point_t scan( HSequenceScanner& sequenceScanner_, HTerminal& term_ ) {
+			M_PROLOG
+			code_point_t cp( unicode::CODE_POINT::INVALID );
+			if ( _complete ) {
+				cp = _keyCode;
+			} else {
+				code_point_t character( sequenceScanner_.read_code_point( term_ ) );
+				int i( 0 );
+				for ( ; i < MAX_EDGES; ++ i ) {
+					if ( static_cast<code_point_t::value_type>( _edges[i].head ) == character ) {
+						cp = _edges[i].tail->scan( sequenceScanner_, term_ );
+						break;
+					}
+				}
+			}
+			return ( cp );
+			M_EPILOG
+		}
+	};
+	HNode::node_t _trie;
+public:
+	HSequenceScanner( void )
+		: _trie( make_resource<HNode>() ) {
+		KeyEncodingTable const& keyEncodingTable( get_key_encoding_table() );
+		for ( int i( 0 ); i < keyEncodingTable.size; ++ i  ) {
+			KeyEncoding const& ke( keyEncodingTable.data[i] );
+			_trie->add_tail( ke.escapeSequence, ke.keyCode );
+		}
+	}
+	code_point_t scan( HTerminal& term_ ) {
+		M_PROLOG
+		return ( _trie->scan( *this, term_ ) );
+		M_EPILOG
+	}
+	code_point_t read_code_point( HTerminal& term_ ) {
+		return ( term_.read_code_point() );
+	}
+};
+
 HTerminal::HTerminal( void )
-	: _termios( chunk_size<struct termios>( 2 ) ) {
+	: _termios( chunk_size<struct termios>( 2 ) )
+	, _sequenceScanner( make_pointer<HSequenceScanner>() ) {
 	return;
 }
 
@@ -130,9 +216,8 @@ bool HTerminal::read_byte( yaal::u8_t& byte_ ) {
 	return ( nRead == 1 );
 }
 
-code_point_t HTerminal::get_character( void ) {
+code_point_t HTerminal::read_code_point( void ) {
 	M_PROLOG
-	HScopeExitCall sec( call( &HTerminal::enable_raw_mode, this ), call( &HTerminal::disable_raw_mode, this ) );
 	yaal::u32_t character( 0 );
 #ifndef __MSVCXX__
 	yaal::u8_t byte( 0 );
@@ -157,6 +242,23 @@ code_point_t HTerminal::get_character( void ) {
 	M_EPILOG
 }
 
+code_point_t HTerminal::get_character( void ) {
+	M_PROLOG
+	HScopeExitCall sec( call( &HTerminal::enable_raw_mode, this ), call( &HTerminal::disable_raw_mode, this ) );
+	return ( read_code_point() );
+	M_EPILOG
+}
+
+code_point_t HTerminal::get_key( void ) {
+	M_PROLOG
+	HScopeExitCall sec( call( &HTerminal::enable_raw_mode, this ), call( &HTerminal::disable_raw_mode, this ) );
+	code_point_t key( read_code_point() );
+	if ( key == KEY_CODE::ESCAPE ) {
+		key = _sequenceScanner->scan( *this );
+	}
+	return ( key );
+	M_EPILOG
+}
 
 void HTerminal::disable_raw_mode( void ) {
 	M_PROLOG

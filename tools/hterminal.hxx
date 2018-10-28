@@ -15,6 +15,8 @@ class M_YAAL_TOOLS_PUBLIC_API HTerminal : public yaal::hcore::HSingleton<HTermin
 public:
 	typedef HTerminal this_type;
 	typedef yaal::hcore::HSingleton<HTerminal> base_type;
+	class HSequenceScanner;
+	typedef yaal::hcore::HPointer<HSequenceScanner> sequence_scanner_t;
 	class HSize {
 		int _lines;
 		int _columns;
@@ -36,6 +38,7 @@ public:
 	};
 private:
 	yaal::hcore::HChunk _termios;
+	sequence_scanner_t _sequenceScanner;
 public:
 	HTerminal( void );
 	bool exists( void ) const;
@@ -51,9 +54,11 @@ private:
 	void enable_raw_mode( void );
 	void disable_raw_mode( void );
 	bool read_byte( yaal::u8_t& );
+	code_point_t read_code_point( void );
 private:
 	friend class yaal::hcore::HSingleton<HTerminal>;
 	friend class yaal::hcore::HDestructor<HTerminal>;
+	friend class HSequenceScanner;
 };
 
 typedef yaal::hcore::HExceptionT<HTerminal, yaal::hcore::HExceptionT<yaal::hcore::HSingleton<HTerminal>>> HTerminalException;
