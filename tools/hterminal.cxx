@@ -92,7 +92,7 @@ class HTerminal::HSequenceScanner {
 			}
 			M_EPILOG
 		}
-		code_point_t scan( HSequenceScanner& sequenceScanner_, HTerminal& term_ ) {
+		code_point_t scan( HSequenceScanner& sequenceScanner_, HTerminal& term_, int level_ ) {
 			M_PROLOG
 			code_point_t cp( unicode::CODE_POINT::INVALID );
 			if ( _complete ) {
@@ -100,11 +100,14 @@ class HTerminal::HSequenceScanner {
 			} else {
 				code_point_t character( sequenceScanner_.read_code_point( term_ ) );
 				int i( 0 );
-				for ( ; i < MAX_EDGES; ++ i ) {
+				for ( ; ( i < MAX_EDGES ) && ( _edges[i].head != 0 ); ++ i ) {
 					if ( static_cast<code_point_t::value_type>( _edges[i].head ) == character ) {
-						cp = _edges[i].tail->scan( sequenceScanner_, term_ );
+						cp = _edges[i].tail->scan( sequenceScanner_, term_, level_ + 1 );
 						break;
 					}
+				}
+				if ( ( cp == unicode::CODE_POINT::INVALID ) && ( level_ == 0 ) ) {
+					cp = code_point_t( static_cast<code_point_t::value_type>( KEY<>::meta_r( static_cast<int>( character.get() ) ) ) );
 				}
 			}
 			return ( cp );
@@ -123,7 +126,7 @@ public:
 	}
 	code_point_t scan( HTerminal& term_ ) {
 		M_PROLOG
-		return ( _trie->scan( *this, term_ ) );
+		return ( _trie->scan( *this, term_, 0 ) );
 		M_EPILOG
 	}
 	code_point_t read_code_point( HTerminal& term_ ) {

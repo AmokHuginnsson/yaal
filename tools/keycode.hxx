@@ -54,6 +54,7 @@ struct KEY_CODE {
 	static int const F23          = F22       + 1;
 	static int const F24          = F23       + 1;
 	static int const MOUSE        = F24       + 1;
+	static int const CONTROL_SIZE = 32;
 	static int const CONTROL_BASE = 96;
 	static int const SHIFT_BASE   = BASE * 2;
 	static int const META_BASE    = BASE * 4;

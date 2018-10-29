@@ -22,7 +22,7 @@ int KEY_CODE::key( int code_ ) {
 	if ( code_ > SHIFT_BASE ) {
 		code_ -= SHIFT_BASE;
 	}
-	if ( code_ <= CONTROL_BASE ) {
+	if ( ( code_ <= CONTROL_SIZE ) || ( ( code_ >= ( BASE - CONTROL_BASE ) ) && ( code_ < BASE ) ) ) {
 		code_ += CONTROL_BASE;
 	}
 	return ( code_ );
@@ -42,7 +42,7 @@ int KEY_CODE::modifiers( int code_ ) {
 		code_ -= SHIFT_BASE;
 		m |= SHIFT_BASE;
 	}
-	if ( code_ <= CONTROL_BASE ) {
+	if ( ( code_ <= CONTROL_SIZE ) || ( ( code_ >= ( BASE - CONTROL_BASE ) ) && ( code_ < BASE ) ) ) {
 		code_ += CONTROL_BASE;
 		m |= CONTROL_BASE;
 	}
@@ -92,6 +92,12 @@ KeyEncodingTable get_key_encoding_table( void ) {
 		{ code_point_t( KEY<KEY_CODE::DOWN>::shift ),                 "[1;2B" },
 		{ code_point_t( KEY<KEY_CODE::LEFT>::shift ),                 "[1;2D" },
 		{ code_point_t( KEY<KEY_CODE::RIGHT>::shift ),                "[1;2C" },
+		{ code_point_t( KEY<KEY_CODE::PAGE_UP>::shift ),              "[5;2~" },
+		{ code_point_t( KEY<KEY_CODE::PAGE_DOWN>::shift ),            "[6;2~" },
+		{ code_point_t( KEY<KEY_CODE::INSERT>::shift ),               "[2;2~" },
+		{ code_point_t( KEY<KEY_CODE::DELETE>::shift ),               "[3;2~" },
+		{ code_point_t( KEY<KEY_CODE::HOME>::shift ),                 "[1;2H" },
+		{ code_point_t( KEY<KEY_CODE::END>::shift ),                  "[1;2F" },
 		{ code_point_t( KEY<KEY_CODE::F1>::shift ),                   "[1;2P" },
 		{ code_point_t( KEY<KEY_CODE::F2>::shift ),                   "[1;2Q" },
 		{ code_point_t( KEY<KEY_CODE::F3>::shift ),                   "[1;2R" },
@@ -108,6 +114,12 @@ KeyEncodingTable get_key_encoding_table( void ) {
 		{ code_point_t( KEY<KEY_CODE::DOWN>::ctrl ),                  "[1;5B" },
 		{ code_point_t( KEY<KEY_CODE::LEFT>::ctrl ),                  "[1;5D" },
 		{ code_point_t( KEY<KEY_CODE::RIGHT>::ctrl ),                 "[1;5C" },
+		{ code_point_t( KEY<KEY_CODE::PAGE_UP>::ctrl ),               "[5;5~" },
+		{ code_point_t( KEY<KEY_CODE::PAGE_DOWN>::ctrl ),             "[6;5~" },
+		{ code_point_t( KEY<KEY_CODE::INSERT>::ctrl ),                "[2;5~" },
+		{ code_point_t( KEY<KEY_CODE::DELETE>::ctrl ),                "[3;5~" },
+		{ code_point_t( KEY<KEY_CODE::HOME>::ctrl ),                  "[1;5H" },
+		{ code_point_t( KEY<KEY_CODE::END>::ctrl ),                   "[1;5F" },
 		{ code_point_t( KEY<KEY_CODE::F1>::ctrl ),                    "[1;5P" },
 		{ code_point_t( KEY<KEY_CODE::F2>::ctrl ),                    "[1;5Q" },
 		{ code_point_t( KEY<KEY_CODE::F3>::ctrl ),                    "[1;5R" },
@@ -124,6 +136,12 @@ KeyEncodingTable get_key_encoding_table( void ) {
 		{ code_point_t( KEY<KEY<KEY_CODE::DOWN>::ctrl>::shift ),      "[1;6B" },
 		{ code_point_t( KEY<KEY<KEY_CODE::LEFT>::ctrl>::shift ),      "[1;6D" },
 		{ code_point_t( KEY<KEY<KEY_CODE::RIGHT>::ctrl>::shift ),     "[1;6C" },
+		{ code_point_t( KEY<KEY<KEY_CODE::HOME>::ctrl>::shift ),      "[1;6H" },
+		{ code_point_t( KEY<KEY<KEY_CODE::END>::ctrl>::shift ),       "[1;6F" },
+		{ code_point_t( KEY<KEY<KEY_CODE::INSERT>::ctrl>::shift ),    "[2;6~" },
+		{ code_point_t( KEY<KEY<KEY_CODE::DELETE>::ctrl>::shift ),    "[3;6~" },
+		{ code_point_t( KEY<KEY<KEY_CODE::PAGE_UP>::ctrl>::shift ),   "[5;6~" },
+		{ code_point_t( KEY<KEY<KEY_CODE::PAGE_DOWN>::ctrl>::shift ), "[6;6~" },
 		{ code_point_t( KEY<KEY<KEY_CODE::F1>::ctrl>::shift ),        "[1;6P" },
 		{ code_point_t( KEY<KEY<KEY_CODE::F2>::ctrl>::shift ),        "[1;6Q" },
 		{ code_point_t( KEY<KEY<KEY_CODE::F3>::ctrl>::shift ),        "[1;6R" },
@@ -150,7 +168,12 @@ KeyEncodingTable get_key_encoding_table( void ) {
 		{ code_point_t( KEY<KEY<KEY_CODE::DOWN>::ctrl>::meta ),       "[1;7B" },
 		{ code_point_t( KEY<KEY<KEY_CODE::LEFT>::ctrl>::meta ),       "[1;7D" },
 		{ code_point_t( KEY<KEY<KEY_CODE::RIGHT>::ctrl>::meta ),      "[1;7C" },
-		{ code_point_t( KEY<KEY<KEY_CODE::DELETE>::ctrl>::meta ),     "[3;7~" }
+		{ code_point_t( KEY<KEY<KEY_CODE::INSERT>::ctrl>::meta ),     "[2;7~" },
+		{ code_point_t( KEY<KEY<KEY_CODE::DELETE>::ctrl>::meta ),     "[3;7~" },
+		{ code_point_t( KEY<KEY<KEY_CODE::PAGE_UP>::ctrl>::meta ),    "[5;7~" },
+		{ code_point_t( KEY<KEY<KEY_CODE::PAGE_DOWN>::ctrl>::meta ),  "[6;7~" },
+		{ code_point_t( KEY<KEY<KEY_CODE::HOME>::ctrl>::meta ),       "[1;7H" },
+		{ code_point_t( KEY<KEY<KEY_CODE::END>::ctrl>::meta ),        "[1;7F" }
 	};
 	return { keyEncodings, yaal::size( keyEncodings ) };
 }
