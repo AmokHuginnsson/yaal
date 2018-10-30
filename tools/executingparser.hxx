@@ -344,6 +344,7 @@ class HNot;
 class HCharacter;
 class HString;
 class HAction;
+class HSkip;
 
 HFollows operator >> ( HRuleBase const&, HRuleBase::action_range_t const& );
 HFollows operator >> ( HRuleBase const&, HRuleBase::action_t const& );
@@ -1097,6 +1098,29 @@ private:
 	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HFollows const&, action_t const& );
 };
 
+class HSkip : public HRuleBase {
+public:
+	typedef HSkip this_type;
+	typedef HRuleBase base_type;
+private:
+	HNamedRule _rule;
+public:
+	HSkip( HSkip const& );
+protected:
+	virtual ptr_t do_clone( void ) const override;
+	virtual void do_rule_use( rule_use_t& ) const override;
+	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator const&, yaal::hcore::HUTF8String::const_iterator const& ) const override;
+	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
+	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) override;
+	virtual bool do_detect_recursion( HRecursionDetector&, bool ) const override;
+	virtual void do_find_recursions( HRuleAggregator& ) override;
+	virtual HRuleBase const* do_find( yaal::hcore::HString const& ) const override;
+private:
+	HSkip( HRuleBase const& );
+	HSkip& operator = ( HSkip const& ) = delete;
+	friend HSkip skip( HRuleBase const& );
+};
+
 HCharacter constant( char, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO );
 HCharacter constant( char, HRuleBase::action_t const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO );
 HCharacter constant( char, HRuleBase::action_range_t const&, HRuleBase::WHITE_SPACE = HRuleBase::WHITE_SPACE::AUTO );
@@ -1137,6 +1161,7 @@ HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const&, HRuleBase
 HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const&, HRuleBase::action_range_t const&, bool = true );
 HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const&, HRegex::action_string_t const&, bool = true );
 HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const&, HRegex::action_string_range_t const&, bool = true );
+HSkip skip( HRuleBase const& );
 
 extern M_YAAL_TOOLS_PUBLIC_API util::EscapeTable const _escapes_;
 

@@ -4836,6 +4836,101 @@ HFollows operator >> ( HFollows const& predecessor_, HRuleBase::action_t const& 
 	return ( HFollows( predecessor_, HAction( action_ ) ) );
 }
 
+HSkip::HSkip( HRuleBase const& rule_ )
+	: HRuleBase( rule_.skips_ws() )
+	, _rule( rule_ ) {
+	return;
+}
+
+
+HSkip::HSkip( HSkip const& skip_ )
+	: HRuleBase( skip_._skipWS )
+	, _rule( skip_._rule ) {
+}
+
+HRuleBase::ptr_t HSkip::do_clone( void ) const {
+	M_PROLOG
+	return ( make_pointer<HSkip>( *this ) );
+	M_EPILOG
+}
+
+yaal::hcore::HUTF8String::const_iterator HSkip::do_parse( HExecutingParser* executingParser_, yaal::hcore::HUTF8String::const_iterator const& first_, yaal::hcore::HUTF8String::const_iterator const& last_ ) const {
+	M_PROLOG
+	int stepCount( execution_step_count( executingParser_ ) );
+	yaal::hcore::HUTF8String::const_iterator scan( !! _rule ? _rule->parse( executingParser_, first_, last_ ) : first_ );
+	drop_execution_steps( executingParser_, stepCount );
+	return ( scan );
+	M_EPILOG
+}
+
+void HSkip::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const {
+	M_PROLOG
+	rd_.desc( "skip(" );
+	_rule.describe( rd_, ru_ );
+	rd_.desc( ")" );
+	return;
+	M_EPILOG
+}
+
+void HSkip::do_rule_use( rule_use_t& ruleUse_ ) const {
+	M_PROLOG
+	int use( ++ ruleUse_[ this ] );
+	if ( use == 1 ) {
+		_rule->rule_use( ruleUse_ );
+	}
+	return;
+	M_EPILOG
+}
+
+void HSkip::do_detach( HRuleBase const* rule_, visited_t& visited_, bool& detachAll_ ) {
+	M_PROLOG
+	HRuleBase::ptr_t r( _rule.rule() );
+	if ( !! r ) {
+		bool detachThis( r.raw() == rule_ );
+		if ( detachThis && detachAll_ ) {
+			_rule.reset( make_pointer<HRuleRef>( r ) );
+		} else {
+			if ( detachThis ) {
+				detachAll_ = true;
+			}
+			r->detach( rule_, visited_, detachAll_ );
+		}
+	}
+	return;
+	M_EPILOG
+}
+
+bool HSkip::do_detect_recursion( HRecursionDetector& recursionDetector_, bool skipVisit_ ) const {
+	M_PROLOG
+	if ( ! skipVisit_ ) {
+		HRuleBase::ptr_t r( _rule.rule() );
+		if ( !! r ) {
+			recursionDetector_.checkpoints_push();
+			r->detect_recursion( recursionDetector_, skipVisit_ );
+			recursionDetector_.checkpoints_pop();
+		}
+	}
+	return ( false );
+	M_EPILOG
+}
+
+void HSkip::do_find_recursions( HRuleAggregator& recursions_ ) {
+	M_PROLOG
+	recursions_.verify( _rule );
+	return;
+	M_EPILOG
+}
+
+HRuleBase const* HSkip::do_find( yaal::hcore::HString const& name_ ) const {
+	M_PROLOG
+	return ( _rule.name() == name_ ? _rule.rule().raw() : _rule.rule()->find( name_ ) );
+	M_EPILOG
+}
+
+HSkip skip( HRuleBase const& rule_ ) {
+	return ( rule_ );
+}
+
 HRuleDescription::HRuleDescription( void )
 	: _children()
 	, _description()
