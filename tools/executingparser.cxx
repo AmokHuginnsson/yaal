@@ -2168,6 +2168,12 @@ HAlternative operator | ( HAlternative const& alternative_, HRuleBase const& cho
 	M_EPILOG
 }
 
+HAlternative operator | ( HAlternative const& alternative_, HRuleBase const* choice_ ) {
+	M_PROLOG
+	return ( choice_ ? HAlternative( alternative_, *choice_ ) : alternative_ );
+	M_EPILOG
+}
+
 HCharacter operator | ( HCharacter const& character_, code_point_t const& token_ ) {
 	M_PROLOG
 	return ( HCharacter( character_, token_ ) );

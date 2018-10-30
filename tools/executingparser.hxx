@@ -365,6 +365,7 @@ HFollows operator >> ( HFollows const&, char );
 HFollows operator >> ( HRuleBase const&, char );
 HAlternative operator | ( HRuleBase const&, HRuleBase const& );
 HAlternative operator | ( HAlternative const&, HRuleBase const& );
+HAlternative operator | ( HAlternative const&, HRuleBase const* );
 HCharacter operator | ( HCharacter const&, code_point_t const& );
 HString operator | ( HString const&, yaal::hcore::HString const& );
 HAnd operator & ( HRuleBase const&, HRuleBase const& );
@@ -542,6 +543,7 @@ private:
 	HAlternative& operator = ( HAlternative const& ) = delete;
 	friend yaal::tools::executing_parser::HAlternative yaal::tools::executing_parser::operator | ( yaal::tools::executing_parser::HRuleBase const&, yaal::tools::executing_parser::HRuleBase const& );
 	friend yaal::tools::executing_parser::HAlternative yaal::tools::executing_parser::operator | ( yaal::tools::executing_parser::HAlternative const&, yaal::tools::executing_parser::HRuleBase const& );
+	friend yaal::tools::executing_parser::HAlternative yaal::tools::executing_parser::operator | ( yaal::tools::executing_parser::HAlternative const&, yaal::tools::executing_parser::HRuleBase const* );
 };
 
 typedef yaal::hcore::HExceptionT<HAlternative, HRuleBaseException> HAlternativeException;

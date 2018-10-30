@@ -157,6 +157,7 @@ public:
 		static M_YAAL_TOOLS_PUBLIC_API compiler_setup_t const DEFAULT;
 		static M_YAAL_TOOLS_PUBLIC_API compiler_setup_t const BE_STRICT;
 		static M_YAAL_TOOLS_PUBLIC_API compiler_setup_t const BE_SLOPPY;
+		static M_YAAL_TOOLS_PUBLIC_API compiler_setup_t const OPTIMIZE;
 	};
 	class HHuginnRuntimeException;
 	typedef yaal::hcore::HPointer<huginn::HSource> source_t;
@@ -218,7 +219,7 @@ private:
 public:
 	static paths_t const MODULE_PATHS;
 public:
-	HHuginn( void );
+	HHuginn( compiler_setup_t = COMPILER::DEFAULT );
 	virtual ~HHuginn( void );
 
 	/*! \brief Store source in internal buffer.
@@ -325,7 +326,7 @@ public:
 	void set_error_stream( yaal::hcore::HStreamInterface::ptr_t );
 	void set_log_stream( yaal::hcore::HStreamInterface& );
 	void set_log_stream( yaal::hcore::HStreamInterface::ptr_t );
-	executing_parser::HRule make_engine( huginn::HRuntime* = nullptr );
+	executing_parser::HRule make_engine( huginn::HRuntime* = nullptr, compiler_setup_t = COMPILER::DEFAULT );
 	yaal::hcore::HStreamInterface& input_stream( void );
 	yaal::hcore::HStreamInterface& output_stream( void );
 	yaal::hcore::HStreamInterface& error_stream( void );

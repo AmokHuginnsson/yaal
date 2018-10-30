@@ -89,6 +89,7 @@ char const* _errMsgHHuginn_[ 11 ] = {
 HHuginn::compiler_setup_t const HHuginn::COMPILER::DEFAULT = HHuginn::compiler_setup_t::new_flag();
 HHuginn::compiler_setup_t const HHuginn::COMPILER::BE_STRICT = HHuginn::compiler_setup_t::new_flag();
 HHuginn::compiler_setup_t const HHuginn::COMPILER::BE_SLOPPY = HHuginn::compiler_setup_t::new_flag();
+HHuginn::compiler_setup_t const HHuginn::COMPILER::OPTIMIZE = HHuginn::compiler_setup_t::new_flag();
 
 HHuginn::HHuginnRuntimeException::HHuginnRuntimeException( yaal::hcore::HString const& message_, int fileId_, int position_ )
 	: _message( message_ )
@@ -327,12 +328,15 @@ void HHuginn::disable_grammar_verification( void ) {
 	_grammarVerified.store( true );
 }
 
-HHuginn::HHuginn( void )
+HHuginn::HHuginn( compiler_setup_t compilerSetup_ )
 	: _state( STATE::EMPTY )
 	, _runtime( make_resource<HRuntime>( this ) )
 	, _sources()
 	, _compiler( make_resource<OCompiler>( _runtime.raw() ) )
-	, _engine( make_engine( _runtime.raw() ), _grammarVerified.load() ? HExecutingParser::INIT_MODE::TRUST_GRAMMAR : HExecutingParser::INIT_MODE::VERIFY_GRAMMAR )
+	, _engine(
+		make_engine( _runtime.raw(), compilerSetup_ ),
+		_grammarVerified.load() ? HExecutingParser::INIT_MODE::TRUST_GRAMMAR : HExecutingParser::INIT_MODE::VERIFY_GRAMMAR
+	)
 	, _errorMessage()
 	, _errorPosition( INVALID_POSITION )
 	, _errorFileId( INVALID_FILE_ID )
@@ -358,7 +362,10 @@ HHuginn::HHuginn( huginn::HRuntime* runtime_ )
 	, _runtime( make_resource<HRuntime>( this ) )
 	, _sources()
 	, _compiler( make_resource<OCompiler>( _runtime.raw() ) )
-	, _engine( make_engine( runtime_ ), _grammarVerified.load() ? HExecutingParser::INIT_MODE::TRUST_GRAMMAR : HExecutingParser::INIT_MODE::VERIFY_GRAMMAR )
+	, _engine(
+		make_engine( runtime_, runtime_->compiler_setup() ),
+		_grammarVerified.load() ? HExecutingParser::INIT_MODE::TRUST_GRAMMAR : HExecutingParser::INIT_MODE::VERIFY_GRAMMAR
+	)
 	, _errorMessage()
 	, _errorPosition( INVALID_POSITION )
 	, _errorFileId( INVALID_FILE_ID )

@@ -167,7 +167,7 @@ inline HIdentifierParser identifier( yaal::hcore::HString const& name_, HIdentif
 	return ( HIdentifierParser( name_, action_ ) );
 }
 
-executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
+executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_, compiler_setup_t compilerSetup_ ) {
 	M_PROLOG
 	using namespace executing_parser;
 	namespace e_p = executing_parser;
@@ -641,6 +641,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		-( defaultStatement[HRuleBase::action_range_t( hcore::call( &OCompiler::commit_else_clause, _compiler.get(), _1 ) )] ) >> '}'
 	);
 	HRule returnStatement( "returnStatement", constant( KEYWORD::RETURN ) >> -( '(' >> expression >> ')' ) >> ';' );
+	HSkip assertStatement( skip( constant( KEYWORD::ASSERT ) >> functionCallOperator >> ';' ) );
 	statement %= (
 		ifStatement[HRuleBase::action_range_t( hcore::call( &OCompiler::add_if_statement, _compiler.get(), _1 ) )]
 		| whileStatement[HRuleBase::action_range_t( hcore::call( &OCompiler::add_while_statement, _compiler.get(), _1 ) )]
@@ -651,6 +652,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_ ) {
 		| breakStatement[HRuleBase::action_range_t( hcore::call( &OCompiler::add_break_statement, _compiler.get(), _1 ) )]
 		| continueStatement[HRuleBase::action_range_t( hcore::call( &OCompiler::add_continue_statement, _compiler.get(), _1 ) )]
 		| returnStatement[HRuleBase::action_range_t( hcore::call( &OCompiler::add_return_statement, _compiler.get(), _1 ) )]
+		| ( ( compilerSetup_ & COMPILER::OPTIMIZE ) ? &assertStatement : nullptr )
 		| expressionStatement
 		| scope[HRuleBase::action_range_t( hcore::call( &OCompiler::commit_scope, _compiler.get(), _1 ) )]
 	);
