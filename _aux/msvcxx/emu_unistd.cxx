@@ -513,30 +513,46 @@ DWORD win_read_console_key( void ) {
 		if ( ( event.dwControlKeyState & ALT_GR ) ==	ALT_GR ) {
 			event.dwControlKeyState &= ~ALT_GR;
 		}
-		if ( event.dwControlKeyState & ( RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED ) ) {
-			modifierKeys |= 00;
+		if ( event.dwControlKeyState & SHIFT_PRESSED ) {
+			modifierKeys |= KEY_CODE::SHIFT_BASE;
 		}
 		if ( event.dwControlKeyState & ( RIGHT_ALT_PRESSED | LEFT_ALT_PRESSED ) ) {
-			modifierKeys |= 00;
+			modifierKeys |= KEY_CODE::META_BASE;
 		}
 		if ( escSeen ) {
-			modifierKeys |= 00;
+			modifierKeys |= KEY_CODE::META_BASE;
 		}
 		key = event.uChar.UnicodeChar;
 		if ( key == 0 ) {
 			switch ( event.wVirtualKeyCode ) {
-				case ( VK_LEFT ):   key = modifierKeys | 0; break;
-				case ( VK_RIGHT ):  key = modifierKeys | 0; break;
-				case ( VK_UP ):     key = modifierKeys | 0; break;
-				case ( VK_DOWN ):   key = modifierKeys | 0; break;
-				case ( VK_DELETE ): key = modifierKeys | 0; break;
-				case ( VK_HOME ):   key = modifierKeys | 0; break;
-				case ( VK_END ):    key = modifierKeys | 0; break;
-				case ( VK_PRIOR ):  key = modifierKeys | 0; break;
-				case ( VK_NEXT ):   key = modifierKeys | 0; break;
+				case ( VK_LEFT ):   key = modifierKeys | KEY_CODE::LEFT;      break;
+				case ( VK_RIGHT ):  key = modifierKeys | KEY_CODE::RIGHT;     break;
+				case ( VK_UP ):     key = modifierKeys | KEY_CODE::UP;        break;
+				case ( VK_DOWN ):   key = modifierKeys | KEY_CODE::DOWN;      break;
+				case ( VK_INSERT ): key = modifierKeys | KEY_CODE::INSERT;    break;
+				case ( VK_DELETE ): key = modifierKeys | KEY_CODE::DELETE;    break;
+				case ( VK_HOME ):   key = modifierKeys | KEY_CODE::HOME;      break;
+				case ( VK_END ):    key = modifierKeys | KEY_CODE::END;       break;
+				case ( VK_PRIOR ):  key = modifierKeys | KEY_CODE::PAGE_UP;   break;
+				case ( VK_NEXT ):   key = modifierKeys | KEY_CODE::PAGE_DOWN; break;
+				case ( VK_F1 ):     key = modifierKeys | KEY_CODE::F1;        break;
+				case ( VK_F2 ):     key = modifierKeys | KEY_CODE::F2;        break;
+				case ( VK_F3 ):     key = modifierKeys | KEY_CODE::F3;        break;
+				case ( VK_F4 ):     key = modifierKeys | KEY_CODE::F4;        break;
+				case ( VK_F5 ):     key = modifierKeys | KEY_CODE::F5;        break;
+				case ( VK_F6 ):     key = modifierKeys | KEY_CODE::F6;        break;
+				case ( VK_F7 ):     key = modifierKeys | KEY_CODE::F7;        break;
+				case ( VK_F8 ):     key = modifierKeys | KEY_CODE::F8;        break;
+				case ( VK_F9 ):     key = modifierKeys | KEY_CODE::F9;        break;
+				case ( VK_F10 ):    key = modifierKeys | KEY_CODE::F10;       break;
+				case ( VK_F11 ):    key = modifierKeys | KEY_CODE::F11;       break;
+				case ( VK_F12 ):    key = modifierKeys | KEY_CODE::F12;       break;
 				default: {
 					continue; // in raw mode, ReadConsoleInput shows shift, ctrl ...
 				}
+			}
+			if ( event.dwControlKeyState & ( RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED ) ) {
+				key -= KEY_CODE::CONTROL_BASE;
 			}
 			break;
 		} else if ( key == KEY<'['>::ctrl ) { // ESC, set flag for later
