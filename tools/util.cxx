@@ -329,6 +329,7 @@ yaal::hcore::HString hl( HHighlighter& highlighter_, yaal::hcore::HString const&
 		s = highlighter_.highlight( str_ );
 	} else if ( markdown_ ) {
 		s = str_;
+		s.replace( "\\\\", "\\" );
 	} else {
 		HRegex re1( "(?<!\\\\)[*_$]" );
 		HRegex re2( "\\\\([`*{_$])" );

@@ -34,7 +34,7 @@ addons:
       - fakeroot
       - debhelper
       - doxygen
-      - asciidoc
+      - asciidoctor
       - graphviz
       - libboost-all-dev
       - lftp

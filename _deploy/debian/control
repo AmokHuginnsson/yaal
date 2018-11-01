@@ -1,7 +1,7 @@
 Source: yaal
 Priority: extra
 Maintainer: Marcin Konarski <amok@codestation.org>
-Build-Depends: debhelper (>= 8.0.0), g++ (>= 4.2), make (>= 3.81), autoconf, libtool, libpcre3-dev, libxml2-dev, libxslt1-dev, zlib1g-dev, libssl-dev, libncurses-dev, doxygen
+Build-Depends: debhelper (>= 8.0.0), g++ (>= 4.2), make (>= 3.81), autoconf, libtool, libpcre3-dev, libxml2-dev, libxslt1-dev, zlib1g-dev, libssl-dev, libncurses-dev, doxygen, graphviz, asciidoctor
 Standards-Version: 3.9.2
 Section: libs
 Homepage: http://codestation.org/

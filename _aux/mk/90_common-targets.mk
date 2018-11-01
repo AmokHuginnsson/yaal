@@ -43,8 +43,8 @@ bin:
 doc: $(DIR_ROOT)/build/doc/$(PRJNAME).1
 
 $(DIR_ROOT)/build/doc/$(PRJNAME).1: $(DIR_ROOT)/build/doc/$(PRJNAME).1.txt
-	a2x -f manpage $(<) && \
-	perl -i -0pe 's/.RE\n.sp\n.RS/.RE\n.RS/g;s/\\:\\/\n.br\n/g' $(@)
+	env -u PREFIX asciidoctor -b manpage $(<) && \
+	perl -i -0pe 's/.RE\n.sp\n.RS/.RE\n.RS/g' $(@)
 
 $(DIR_ROOT)/build/doc/$(PRJNAME).1.txt: $(DIR_ROOT)/build/release/$(PRJNAME)/1exec
 	cd $(DIR_ROOT) && mkdir -p $(DIR_ROOT)/build/doc && \

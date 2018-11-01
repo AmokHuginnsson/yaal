@@ -24,7 +24,8 @@ LIB_DEPENDS= \
 	libxslt.so:${PORTSDIR}/textproc/libxslt
 BUILD_DEPENDS= \
 	libtool:${PORTSDIR}/devel/libtool \
-	doxygen:${PORTSDIR}/devel/doxygen
+	doxygen:${PORTSDIR}/devel/doxygen \
+	asciidoctor:${PORTSDIR}/textproc/rubygem-asciidoctor
 
 USES+=gmake
 USE_AUTOTOOLS+=autoconf

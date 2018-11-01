@@ -4,6 +4,7 @@ import sys
 import subprocess
 import argparse
 import re
+from enum import Enum
 
 class Option:
 	def __init__( self_, short_, long_, value_, desc_, optional_ ):
@@ -21,27 +22,99 @@ def prepare_description( str_ ):
 			parts[i] = parts[i].replace( "_", "**" ).replace( "\\**", "\\_" )
 	return "_".join( parts )
 
-strongRe = re.compile( "(?<!\\\\)\\*\\*" )
-strongTag = "‼strongTag‼"
-emphasisRe = re.compile( "(?<!\\\\)\\*" )
-emphasisTag = "‼emphasisTag‼"
-codeRe = re.compile( "(?<!\\\\)[`$]" )
-codeTag = "‼codeTag‼"
-escapeRe = re.compile( "\\\\([*`$_])" )
+class Style( Enum ):
+	STRONG = 1
+	EMPHASIS = 2
+	CODE = 3
+
 def markdown_to_asciidoc( str_ ):
-	s = str_.strip()
-	s = re.sub( strongRe, strongTag, s )
-	s = re.sub( emphasisRe, emphasisTag, s )
-	s = re.sub( codeRe, codeTag, s )
-	s = s.replace( "+", "\\+" )
-	s = s.replace( strongTag, "*" )
-	s = s.replace( emphasisTag, "_" )
-	s = s.replace( codeTag, "+" )
-	s = s.replace( "\\*\\*", "$$**$$" )
-	s = re.sub( escapeRe, "+++\\1+++", s )
+	str_ = str_.strip()
+	styles = []
+	special = "*`$_"
+	escape = False
+	marker = False
+	s = ""
+
+	def apply( style_, mark_ ):
+		nonlocal s, styles, marker
+		markers = { Style.STRONG: "**", Style.EMPHASIS: "__" }
+		marker = False
+		if styles and styles[-1] == style_:
+			styles.pop()
+			s += mark_
+			if styles:
+				s += markers[styles[-1]]
+		else:
+			if styles:
+				s += markers[styles[-1]]
+			s += mark_
+			styles.append( style_ )
+
+	for c in str_:
+		if escape:
+			if c in special:
+				s += "+++{}+++".format( c )
+			else:
+				s += "\\{}".format( c )
+			escape = False
+			continue
+		if c in "*_":
+			if marker:
+				apply( Style.STRONG, "**" )
+			else:
+				marker = True
+			continue
+		if marker:
+			apply( Style.EMPHASIS, "__" )
+		if c == '\\':
+			escape = True
+			continue
+
+		s += c
+
 	return s
 
 testStr = "Some **text** with *markdown* and specials like: ^#!.\\*huginn.\\* - not so easy.\n"
+
+def words( str_ ):
+	pattern = re.compile( "([a-zA-Z]+)" )
+	m = pattern.search( str_ )
+	words = []
+	if m:
+		words = map( lambda x: x.lower(), m.groups() )
+	return words
+
+def find_urls( path_ ):
+	try:
+		with open( path_, "rb" ) as f:
+			data = f.read()
+	except:
+		return []
+	urls = []
+	size = len( data )
+	start = 0
+	while start >= 0:
+		lastStart = start
+		start = data.find( b"http", start )
+		if start >= 0:
+			bck = start
+			while ( bck > lastStart ) and ( data[bck] in range( 32, 128 ) ):
+				bck -= 1
+			context = words( data[bck:start].decode() )
+			fwd = start
+			while ( fwd < size ) and ( data[fwd] in range( 32, 128 ) ):
+				fwd += 1
+			urls.append( ( context, data[start:fwd].decode() ) )
+			start = fwd
+	return urls
+
+def url_info( url_ ):
+	wordsOfInterest = [ "homepage", "website", "home", "resource", "resources", "page" ]
+	urlInfo = url_[1]
+	for woi in wordsOfInterest:
+		if woi in url_[0]:
+			urlInfo = "{}: {}".format( woi.capitalize(), url_[1] )
+	return urlInfo
 
 def main():
 #	print( "{}{}".format( testStr, markdown_to_asciidoc( testStr ) ) )
@@ -61,6 +134,8 @@ def main():
 	isOptions = False
 	for l in lines:
 		line = l.strip()
+		if line == "Options:":
+			continue
 		optionStart = line.startswith( "-" ) and not line.startswith( "- " )
 		if optionStart:
 			isPreamble = False
@@ -136,8 +211,10 @@ def main():
 	out = open( args.output, "w" )
 	out.write( args.project.upper() + "(1)\n" )
 	out.write( "=" * ( len( args.project ) + 3 ) + "\n\n" )
+
 	out.write( "NAME\n----\n" )
 	out.write( name + "\n\n" )
+
 	out.write( "SYNOPSIS\n--------\n" )
 
 	opts = ""
@@ -156,12 +233,14 @@ def main():
 			optsLen += len( opt )
 			if optsLen > maxLen:
 				optsLen = 0
-				opts += "{zwsp}" + "{nbsp}" * ( len( args.project ) + 1 )
+				opts += " +\n" + " " * ( len( args.project ) + 1 )
 	usage = usage.replace( "[*OPTION*]...", opts )
 
 	out.write( markdown_to_asciidoc( usage ) + "\n\n" )
+
 	out.write( "DESCRIPTION\n-----------\n" )
 	out.write( "\n".join( map( markdown_to_asciidoc, preamble[:-1] ) ) + "\n\n" )
+
 	if len( options ) > 0:
 		out.write( "OPTIONS\n-------\n" )
 	for o in options:
@@ -182,15 +261,31 @@ def main():
 	out.write( "AUTHORS\n-------\n" )
 	authors = set( filter( lambda x : x, subprocess.check_output( [ "git", "log", "--format=%aN <%aE>" ], universal_newlines = True ).split( "\n" ) ) )
 	out.write( "$$" + ", ".join( list( authors ) ) + "$$\n\n" )
+
 	out.write( "RESOURCES\n---------\n" )
-	remotesRaw = subprocess.check_output( [ "git", "remote", "-v" ], universal_newlines = True )
+	for url in find_urls( binary ):
+		out.write( "$${}$$ +\n".format( url_info( url ) ) )
+
 	remote = ""
-	for r in remotesRaw.split( "\n" ):
-		w = r.split()
-		if w[0] == "origin":
-			remote = w[1]
+
+	urls = []
+	for f in [ "_deploy/debian/control", "_deploy/centos/{}.spec".format( args.project ) ]:
+		urls.extend( find_urls( f ) )
+
+	for url in urls:
+		if url[1].endswith( args.project + ".git" ):
+			remote = url[1]
 			break
-	out.write( "$$" + remote + "$$\n" )
+
+	if not remote:
+		remotesRaw = subprocess.check_output( [ "git", "remote", "-v" ], universal_newlines = True )
+		for r in remotesRaw.split( "\n" ):
+			w = r.split()
+			if w[0] == "origin":
+				remote = w[1]
+				break
+
+	out.write( "git repository: $$" + remote + "$$\n" )
 
 if __name__ == "__main__":
 	try:
