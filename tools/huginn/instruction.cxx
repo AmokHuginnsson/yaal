@@ -822,11 +822,7 @@ bool is_element_of( HThread* thread_, OPERATOR operator_, HHuginn::value_t const
 		}
 		res = string.find( static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() ) != HString::npos;
 	} else {
-		throw HHuginn::HHuginnRuntimeException(
-			"There is no `"_ys.append( op_to_str( operator_ ) ).append( "' operator for " ).append( a_type_name( v2_->get_class() ) ).append( "." ),
-			thread_->current_frame()->file_id(),
-			position_
-		);
+		res = fallback_compare( thread_, IDENTIFIER::INTERFACE::CONTAINS, op_to_str( operator_ ), v2_, v1_, position_ );
 	}
 	return ( res );
 }

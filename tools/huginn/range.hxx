@@ -36,6 +36,7 @@ protected:
 	virtual int long do_size( huginn::HThread*, int ) const override {
 		return ( safe_int::cast<int long>( ( _stop + _step - ( _from + 1 ) ) / _step ) );
 	}
+	static HHuginn::value_t contains( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 private:
 	virtual iterator_t do_iterator( HThread*, int ) override;
 private:

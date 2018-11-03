@@ -23,9 +23,35 @@ HHuginn::class_t HRange::get_class( HRuntime* runtime_, HHuginn::HClass const* o
 			HHuginn::ACCESS::PRIVATE
 		)
 	);
+	HHuginn::field_definitions_t fd{
+		{ "contains", runtime_->create_method( &HRange::contains ), "( *num* ) - test if a *num* is part of this `Range`" }
+	};
+	c->redefine( nullptr, fd );
 	c->set_origin( origin_ );
 	runtime_->huginn()->register_class( c );
 	return ( c );
+	M_EPILOG
+}
+
+HHuginn::value_t HRange::contains( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_signature( "Range.contains", values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
+	HRange& range( *static_cast<HRange*>( object_->raw() ) );
+	HHuginn::HInteger::value_type elem( get_integer( values_[0] ) );
+	HHuginn::HInteger::value_type from( range._from );
+	HHuginn::HInteger::value_type stop( range._stop );
+	HHuginn::HInteger::value_type step( range._step );
+	if ( step < 0 ) {
+		using yaal::swap;
+		swap( from, stop );
+		step = math::abs( step );
+	}
+	bool doesContain(
+		( ( range._step > 0 ) ? ( elem >= from ) : ( elem > from ) )
+		&& ( ( range._step > 0 ) ? ( elem < stop ) : ( elem <= stop ) )
+		&& ( ( ( elem - ( range._from % step ) ) % step ) == 0 )
+	);
+	return ( doesContain ? thread_->runtime().true_value() : thread_->runtime().false_value() );
 	M_EPILOG
 }
 
