@@ -60,8 +60,8 @@ private:
 	 */
 	object_factory_t _objectFactory;
 	value_t _none;
-	value_t _true;
-	value_t _false;
+	value_t const* _true;
+	value_t const* _false;
 	threads_t _threads;
 	/*
 	 * All classes must be kept directly in runtime so it will be simpler
@@ -117,11 +117,11 @@ public:
 	value_t& none_value( void ) {
 		return ( _none );
 	}
-	value_t& true_value( void ) {
-		return ( _true );
+	value_t const& true_value( void ) {
+		return ( *_true );
 	}
-	value_t& false_value( void ) {
-		return ( _false );
+	value_t const& false_value( void ) {
+		return ( *_false );
 	}
 	huginn::HObjectFactory* object_factory( void ) {
 		return ( _objectFactory.raw() );
@@ -255,6 +255,9 @@ public:
 		return (
 			_objectFactory->create_method( yaal::forward<T>( args_ )... )
 		);
+	}
+	HHuginn::value_t const& boolean_value( bool value_ ) const {
+		return ( value_ ? *_true : *_false );
 	}
 	void set_incremental_frame( huginn::HThread::frame_t const& );
 	huginn::HThread::frame_t const& incremental_frame( void ) const;

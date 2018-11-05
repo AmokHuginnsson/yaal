@@ -170,8 +170,8 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 		} )
 	, _objectFactory( make_pointer<HObjectFactory>( this ) )
 	, _none( _objectFactory->create<HHuginn::HValue>( _objectFactory->none_class() ) )
-	, _true( _objectFactory->create_boolean( true ) )
-	, _false( _objectFactory->create_boolean( false ) )
+	, _true( &_objectFactory->true_value() )
+	, _false( &_objectFactory->false_value() )
 	, _threads()
 	, _dependencies()
 	, _functionIds()
@@ -220,8 +220,8 @@ void HRuntime::copy_text( HRuntime& source_ ) {
 	_functionIds = source_._functionIds;
 	_dependencies = source_._dependencies;
 	_threads = source_._threads;
-	_false = source_._false;
 	_true = source_._true;
+	_false = source_._false;
 	_none = source_._none;
 	_objectFactory = source_._objectFactory;
 	_maxLocalVariableCount = source_._maxLocalVariableCount;

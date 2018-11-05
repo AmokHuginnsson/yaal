@@ -111,7 +111,7 @@ HHuginn::value_t HQueryResult::has_next( tools::huginn::HThread* thread_, HHugin
 	char const name[] = "QueryResult.has_next";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HQueryResult* qr( static_cast<HQueryResult*>( object_->raw() ) );
-	return ( thread_->object_factory().create_boolean( qr->_it != qr->_recordSet->end() ) );
+	return ( thread_->runtime().boolean_value( qr->_it != qr->_recordSet->end() ) );
 	M_EPILOG
 }
 

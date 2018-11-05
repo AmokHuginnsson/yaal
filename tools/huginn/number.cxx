@@ -26,7 +26,7 @@ inline HHuginn::value_t is_exact( huginn::HThread* thread_, HHuginn::value_t* ob
 	M_PROLOG
 	char const name[] = "number.is_exact";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
-	return ( thread_->object_factory().create_boolean( static_cast<HHuginn::HNumber*>( object_->raw() )->value().is_exact() ) );
+	return ( thread_->runtime().boolean_value( static_cast<HHuginn::HNumber*>( object_->raw() )->value().is_exact() ) );
 	M_EPILOG
 }
 
@@ -34,7 +34,7 @@ inline HHuginn::value_t is_integral( huginn::HThread* thread_, HHuginn::value_t*
 	M_PROLOG
 	char const name[] = "number.is_integral";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
-	return ( thread_->object_factory().create_boolean( static_cast<HHuginn::HNumber*>( object_->raw() )->value().is_integral() ) );
+	return ( thread_->runtime().boolean_value( static_cast<HHuginn::HNumber*>( object_->raw() )->value().is_integral() ) );
 	M_EPILOG
 }
 

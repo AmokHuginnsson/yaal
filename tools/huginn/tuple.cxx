@@ -163,7 +163,7 @@ inline HHuginn::value_t less( huginn::HThread* thread_, HHuginn::value_t* object
 	HHuginn::HValueCompareHelper lessHelper( &instruction::less );
 	lessHelper.anchor( thread_, position_ );
 	bool res( lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), cref( lessHelper ) ) );
-	return ( thread_->object_factory().create_boolean( res ) );
+	return ( thread_->runtime().boolean_value( res ) );
 	M_EPILOG
 }
 
@@ -177,7 +177,7 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	for ( int long i( 0 ), c( l.get_size() ); equal && ( i < c ); ++ i ) {
 		equal = instruction::equals( thread_, l[i], r[i], position_ );
 	}
-	return ( thread_->object_factory().create_boolean( equal ) );
+	return ( thread_->runtime().boolean_value( equal ) );
 	M_EPILOG
 }
 

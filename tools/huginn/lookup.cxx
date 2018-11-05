@@ -200,7 +200,7 @@ inline HHuginn::value_t has_key( huginn::HThread* thread_, HHuginn::value_t* obj
 	verify_arg_count( "lookup.has_key", values_, 1, 1, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LOOKUP );
 	bool hasKey( static_cast<HHuginn::HLookup*>( object_->raw() )->has_key( thread_, values_[0], position_ ) );
-	return ( thread_->object_factory().create_boolean( hasKey ) );
+	return ( thread_->runtime().boolean_value( hasKey ) );
 	M_EPILOG
 }
 
@@ -288,7 +288,7 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	for ( HHuginn::HLookup::values_t::const_iterator lit( l.begin() ), rit( r.begin() ), end( l.end() ); equal && ( lit != end ); ++ lit, ++ rit ) {
 		equal = instruction::equals( thread_, lit->first, rit->first, position_ ) && instruction::equals( thread_, lit->second, rit->second, position_ );
 	}
-	return ( thread_->object_factory().create_boolean( equal ) );
+	return ( thread_->runtime().boolean_value( equal ) );
 	M_EPILOG
 }
 

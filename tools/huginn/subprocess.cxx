@@ -76,7 +76,7 @@ HHuginn::value_t HSubprocess::is_alive(
 	char const name[] = "Subprocess.is_alive";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HSubprocess* o( static_cast<HSubprocess*>( object_->raw() ) );
-	return ( thread_->runtime().object_factory()->create_boolean( o->_pipedChild.is_running() ) );
+	return ( thread_->runtime().boolean_value( o->_pipedChild.is_running() ) );
 	M_EPILOG
 }
 

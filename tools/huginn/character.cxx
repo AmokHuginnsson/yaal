@@ -48,7 +48,7 @@ inline HHuginn::value_t is_of_a_kind( char const* name, bool (*isofakind)( code_
 	M_PROLOG
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HHuginn::HCharacter* c( static_cast<HHuginn::HCharacter*>( object_->raw() ) );
-	return ( thread_->object_factory().create_boolean( isofakind( c->value() ) != 0 ) );
+	return ( thread_->runtime().boolean_value( isofakind( c->value() ) != 0 ) );
 	M_EPILOG
 }
 

@@ -50,8 +50,8 @@ HHuginn::HBoolean::HBoolean( HHuginn::HClass const* class_, HHuginn::HBoolean::v
 	return;
 }
 
-HHuginn::value_t HHuginn::HBoolean::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
-	return ( thread_->runtime().object_factory()->create_boolean( _value ) );
+HHuginn::value_t HHuginn::HBoolean::do_clone( huginn::HThread*, HHuginn::value_t* object_, int ) const {
+	return ( *object_ );
 }
 
 }

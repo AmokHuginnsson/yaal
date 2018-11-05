@@ -902,10 +902,6 @@ public:
 	value_type value( void ) const {
 		return ( _value );
 	}
-	void flip( void ) {
-		_value = ! _value;
-		return;
-	}
 private:
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };

@@ -1079,7 +1079,7 @@ void HExpression::equals( OExecutionStep const&, HFrame* frame_ ) {
 	if ( ( c1 != c2 ) && ( c1->type_id() != HHuginn::TYPE::NONE ) && ( c2->type_id() != HHuginn::TYPE::NONE ) ) {
 		operands_type_mismatch( op_to_str( OPERATOR::EQUALS ), c1, c2, file_id(), p );
 	}
-	frame_->values().push( frame_->thread()->object_factory().create_boolean( instruction::equals( frame_->thread(), v1, v2, p ) ) );
+	frame_->values().push( frame_->thread()->runtime().boolean_value( instruction::equals( frame_->thread(), v1, v2, p ) ) );
 	return;
 	M_EPILOG
 }
@@ -1099,7 +1099,7 @@ void HExpression::not_equals( OExecutionStep const&, HFrame* frame_ ) {
 	if ( ( c1 != c2 ) && ( c1->type_id() != HHuginn::TYPE::NONE ) && ( c2->type_id() != HHuginn::TYPE::NONE ) ) {
 		operands_type_mismatch( op_to_str( OPERATOR::NOT_EQUALS ), c1, c2, file_id(), p );
 	}
-	frame_->values().push( frame_->thread()->object_factory().create_boolean( ! instruction::equals( frame_->thread(), v1, v2, p ) ) );
+	frame_->values().push( frame_->thread()->runtime().boolean_value( ! instruction::equals( frame_->thread(), v1, v2, p ) ) );
 	return;
 	M_EPILOG
 }
@@ -1119,7 +1119,7 @@ void HExpression::less( OExecutionStep const&, HFrame* frame_ ) {
 	if ( c1 != c2 ) {
 		operands_type_mismatch( op_to_str( OPERATOR::LESS ), c1, c2, file_id(), p );
 	}
-	frame_->values().push( frame_->thread()->object_factory().create_boolean( instruction::less( frame_->thread(), v1, v2, p ) ) );
+	frame_->values().push( frame_->thread()->runtime().boolean_value( instruction::less( frame_->thread(), v1, v2, p ) ) );
 	return;
 	M_EPILOG
 }
@@ -1139,7 +1139,7 @@ void HExpression::greater( OExecutionStep const&, HFrame* frame_ ) {
 	if ( c1 != c2 ) {
 		operands_type_mismatch( op_to_str( OPERATOR::GREATER ), c1, c2, file_id(), p );
 	}
-	frame_->values().push( frame_->thread()->object_factory().create_boolean( instruction::greater( frame_->thread(), v1, v2, p ) ) );
+	frame_->values().push( frame_->thread()->runtime().boolean_value( instruction::greater( frame_->thread(), v1, v2, p ) ) );
 	return;
 	M_EPILOG
 }
@@ -1159,7 +1159,7 @@ void HExpression::less_or_equal( OExecutionStep const&, HFrame* frame_ ) {
 	if ( c1 != c2 ) {
 		operands_type_mismatch( op_to_str( OPERATOR::LESS_OR_EQUAL ), c1, c2, file_id(), p );
 	}
-	frame_->values().push( frame_->thread()->object_factory().create_boolean( instruction::less_or_equal( frame_->thread(), v1, v2, p ) ) );
+	frame_->values().push( frame_->thread()->runtime().boolean_value( instruction::less_or_equal( frame_->thread(), v1, v2, p ) ) );
 	return;
 	M_EPILOG
 }
@@ -1179,7 +1179,7 @@ void HExpression::greater_or_equal( OExecutionStep const&, HFrame* frame_ ) {
 	if ( c1 != c2 ) {
 		operands_type_mismatch( op_to_str( OPERATOR::GREATER_OR_EQUAL ), c1, c2, file_id(), p );
 	}
-	frame_->values().push( frame_->thread()->object_factory().create_boolean( instruction::greater_or_equal( frame_->thread(), v1, v2, p ) ) );
+	frame_->values().push( frame_->thread()->runtime().boolean_value( instruction::greater_or_equal( frame_->thread(), v1, v2, p ) ) );
 	return;
 	M_EPILOG
 }
@@ -1198,7 +1198,7 @@ void HExpression::is_element_of( OExecutionStep const&, HFrame* frame_ ) {
 	if ( ( c2->type_id() <= type_id( HHuginn::TYPE::UNKNOWN ) ) && ! is_collection_like( c2 ) ) {
 		throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_COLL] ).append( a_type_name( c2 ) ), file_id(), p );
 	}
-	frame_->values().push( frame_->thread()->object_factory().create_boolean( instruction::is_element_of( frame_->thread(), OPERATOR::IS_ELEMENT_OF, v1, v2, p ) ) );
+	frame_->values().push( frame_->thread()->runtime().boolean_value( instruction::is_element_of( frame_->thread(), OPERATOR::IS_ELEMENT_OF, v1, v2, p ) ) );
 	return;
 	M_EPILOG
 }
@@ -1217,7 +1217,7 @@ void HExpression::is_not_element_of( OExecutionStep const&, HFrame* frame_ ) {
 	if ( ( c2->type_id() <= type_id( HHuginn::TYPE::UNKNOWN ) ) && ! is_collection_like( c2 ) ) {
 		throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_COLL] ).append( a_type_name( c2 ) ), file_id(), p );
 	}
-	frame_->values().push( frame_->thread()->object_factory().create_boolean( ! instruction::is_element_of( frame_->thread(), OPERATOR::IS_NOT_ELEMENT_OF, v1, v2, p ) ) );
+	frame_->values().push( frame_->thread()->runtime().boolean_value( ! instruction::is_element_of( frame_->thread(), OPERATOR::IS_NOT_ELEMENT_OF, v1, v2, p ) ) );
 	return;
 	M_EPILOG
 }
@@ -1230,7 +1230,7 @@ void HExpression::boolean_and( OExecutionStep const&, HFrame* frame_ ) {
 	HHuginn::value_t v( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	M_ASSERT( dynamic_cast<HBooleanEvaluator*>( v.raw() ) );
-	frame_->values().push( frame_->thread()->object_factory().create_boolean( static_cast<HBooleanEvaluator*>( v.raw() )->execute( frame_->thread() ) ) );
+	frame_->values().push( frame_->thread()->runtime().boolean_value( static_cast<HBooleanEvaluator*>( v.raw() )->execute( frame_->thread() ) ) );
 	return;
 	M_EPILOG
 }
@@ -1243,7 +1243,7 @@ void HExpression::boolean_or( OExecutionStep const&, HFrame* frame_ ) {
 	HHuginn::value_t v( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	M_ASSERT( dynamic_cast<HBooleanEvaluator*>( v.raw() ) );
-	frame_->values().push( frame_->thread()->object_factory().create_boolean( static_cast<HBooleanEvaluator*>( v.raw() )->execute( frame_->thread() ) ) );
+	frame_->values().push( frame_->thread()->runtime().boolean_value( static_cast<HBooleanEvaluator*>( v.raw() )->execute( frame_->thread() ) ) );
 	return;
 	M_EPILOG
 }
@@ -1283,11 +1283,7 @@ void HExpression::boolean_not( OExecutionStep const&, HFrame* frame_ ) {
 	if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
 		throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL] ).append( v->get_class()->name() ), file_id(), p );
 	}
-	if ( v.unique() ) {
-		static_cast<HHuginn::HBoolean*>( v.raw() )->flip();
-	} else {
-		v = instruction::boolean_not( frame_->thread(), v, p );
-	}
+	v = instruction::boolean_not( frame_->thread(), v, p );
 	return;
 	M_EPILOG
 }

@@ -207,10 +207,11 @@ class HObjectFactory final : public HObjectFactoryBase {
 	HHuginn::class_t _runtimeException;
 	HHuginn::class_t _conversionException;
 	HHuginn::class_t _arithmeticException;
+	HHuginn::value_t _true;
+	HHuginn::value_t _false;
 	/* Explicit pools. */
 	HObjectPool<HHuginn::HString> _stringPool;
 	HObjectPool<HHuginn::HInteger> _integerPool;
-	HObjectPool<HHuginn::HBoolean> _booleanPool;
 	HObjectPool<HHuginn::HReal> _realPool;
 	HObjectPool<HHuginn::HNumber> _numberPool;
 	HObjectPool<HHuginn::HCharacter> _characterPool;
@@ -228,8 +229,11 @@ public:
 	HRuntime& runtime( void ) const {
 		return ( *_runtime );
 	}
-	HHuginn::value_t create_boolean( HHuginn::HBoolean::value_type value_ ) const {
-		return ( _booleanPool.create( value_ ) );
+	HHuginn::value_t const& true_value( void ) const {
+		return ( _true );
+	}
+	HHuginn::value_t const& false_value( void ) const {
+		return ( _false );
 	}
 	HHuginn::value_t create_integer( HHuginn::HInteger::value_type value_ ) const {
 		return ( _integerPool.create( value_ ) );
