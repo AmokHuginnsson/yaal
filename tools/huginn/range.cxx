@@ -51,7 +51,7 @@ HHuginn::value_t HRange::contains( huginn::HThread* thread_, HHuginn::value_t* o
 		&& ( ( range._step > 0 ) ? ( elem < stop ) : ( elem <= stop ) )
 		&& ( ( ( elem - ( range._from % step ) ) % step ) == 0 )
 	);
-	return ( doesContain ? thread_->runtime().true_value() : thread_->runtime().false_value() );
+	return ( thread_->runtime().boolean_value( doesContain ) );
 	M_EPILOG
 }
 

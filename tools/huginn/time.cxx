@@ -142,7 +142,7 @@ HHuginn::value_t HTime::equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	verify_signature_by_class( "Time.equals", values_, { (*object_)->get_class() }, thread_, position_ );
 	hcore::HTime const& lt( static_cast<HTime*>( object_->raw() )->_time );
 	hcore::HTime const& rt( static_cast<HTime const*>( values_[0].raw() )->_time );
-	return ( lt == rt ? thread_->runtime().true_value() : thread_->runtime().false_value() );
+	return ( thread_->runtime().boolean_value( lt == rt ) );
 	M_EPILOG
 }
 
@@ -151,7 +151,7 @@ HHuginn::value_t HTime::less( huginn::HThread* thread_, HHuginn::value_t* object
 	verify_signature_by_class( "Time.less", values_, { (*object_)->get_class() }, thread_, position_ );
 	hcore::HTime const& lt( static_cast<HTime*>( object_->raw() )->_time );
 	hcore::HTime const& rt( static_cast<HTime const*>( values_[0].raw() )->_time );
-	return ( lt < rt ? thread_->runtime().true_value() : thread_->runtime().false_value() );
+	return ( thread_->runtime().boolean_value( lt < rt ) );
 	M_EPILOG
 }
 

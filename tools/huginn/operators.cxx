@@ -63,7 +63,7 @@ public:
 			operands_type_mismatch( op_to_str( op_ ), c1, c2, thread_->current_frame()->file_id(), position_ );
 		}
 		bool res( binaryBooleanOperator_( thread_, v1, v2, position_ ) );
-		return ( res ? thread_->runtime().true_value() : thread_->runtime().false_value() );
+		return ( thread_->runtime().boolean_value( res ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t boolean_binary_operator( char const* name_, OPERATOR op_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -80,7 +80,7 @@ public:
 				M_ASSERT( !"Invalid code path."[0] );
 			}
 		}
-		return ( res ? thread_->runtime().true_value() : thread_->runtime().false_value() );
+		return ( thread_->runtime().boolean_value( res ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t not_equals( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -94,7 +94,7 @@ public:
 			operands_type_mismatch( op_to_str( OPERATOR::NOT_EQUALS ), c1, c2, thread_->current_frame()->file_id(), position_ );
 		}
 		bool res( ! instruction::equals( thread_, v1, v2, position_ ) );
-		return ( res ? thread_->runtime().true_value() : thread_->runtime().false_value() );
+		return ( thread_->runtime().boolean_value( res ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t is_element_of( char const* name_, OPERATOR op_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -108,7 +108,7 @@ public:
 		}
 		bool res( instruction::is_element_of( thread_, op_, v1, v2, position_ ) );
 		res = op_ == OPERATOR::IS_ELEMENT_OF ? res : ! res;
-		return ( res ? thread_->runtime().true_value() : thread_->runtime().false_value() );
+		return ( thread_->runtime().boolean_value( res ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t unary_operator( char const* name_, unary_operator_t unaryOperator_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {

@@ -853,7 +853,7 @@ HHuginn::value_t HHuginn::value( yaal::hcore::HString&& val_ ) {
 
 HHuginn::value_t HHuginn::value( bool val_ ) {
 	M_PROLOG
-	return ( val_ ? _runtime->true_value() : _runtime->false_value() );
+	return ( _runtime->boolean_value( val_ ) );
 	M_EPILOG
 }
 

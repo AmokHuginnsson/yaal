@@ -213,7 +213,7 @@ public:
 	static HHuginn::value_t is_valid( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "Terminal.is_valid", values_, 0, 0, thread_, position_ );
-		return ( tools::HTerminal::get_instance().exists() ? thread_->runtime().true_value() : thread_->runtime().false_value() );
+		return ( thread_->runtime().boolean_value( tools::HTerminal::get_instance().exists() ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t lines( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {

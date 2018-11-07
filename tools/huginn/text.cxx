@@ -272,7 +272,7 @@ public:
 		} catch ( HException const& e ) {
 			thread_->raise( thread_->object_factory().conversion_exception_class(), e.what(), position_ );
 		}
-		return ( flag ? thread_->runtime().true_value() : thread_->runtime().false_value() );
+		return ( thread_->runtime().boolean_value( flag ) );
 		M_EPILOG
 	}
 };

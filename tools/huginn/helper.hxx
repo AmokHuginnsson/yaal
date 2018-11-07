@@ -414,7 +414,7 @@ struct huginn_type_from_pod<bool> {
 		return ( get_boolean( value_ ) );
 	}
 	static HHuginn::value_t make( HRuntime& runtime_, bool value_ ) {
-		return ( value_ ? runtime_.true_value() : runtime_.false_value() );
+		return ( runtime_.boolean_value( value_ ) );
 	}
 };
 

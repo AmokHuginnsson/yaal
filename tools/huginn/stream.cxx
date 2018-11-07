@@ -746,7 +746,7 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 				raise( thread_, "Malformed Huginn data stream.", position_, exception_class() );
 				break;
 			}
-			v = i8 ? thread_->runtime().true_value() : thread_->runtime().false_value();
+			v = thread_->runtime().boolean_value( i8 != 0 );
 		} break;
 		case ( HHuginn::TYPE::INTEGER ): {
 			v = read_integer( thread_, static_cast<int>( sizeof ( HHuginn::HInteger::value_type ) ), position_ );

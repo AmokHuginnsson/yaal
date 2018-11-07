@@ -183,7 +183,7 @@ public:
 	static HHuginn::value_t exists( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "FileSystem.stat", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
-		return ( filesystem::exists( get_string( values_[0] ) ) ? thread_->runtime().true_value() : thread_->runtime().false_value() );
+		return ( thread_->runtime().boolean_value( filesystem::exists( get_string( values_[0] ) ) ) );
 		M_EPILOG
 	}
 private:

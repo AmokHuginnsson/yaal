@@ -46,7 +46,7 @@ HHuginn::value_t HIterator::is_valid( huginn::HThread* thread_, HHuginn::value_t
 	M_PROLOG
 	verify_arg_count( "Iterator.is_valid", values_, 0, 0, thread_, position_ );
 	HIterator* ri( static_cast<HIterator*>( object_->raw() ) );
-	return ( ri->do_is_valid( thread_, position_ ) ? thread_->runtime().true_value() : thread_->runtime().false_value() );
+	return ( thread_->runtime().boolean_value( ri->do_is_valid( thread_, position_ ) ) );
 	M_EPILOG
 }
 
