@@ -192,7 +192,7 @@ public:
 		system::HResourceInfo ri;
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		try {
-			ri = ( system::get_disk_space_info( get_string( values_[0] ) ) );
+			ri = system::get_disk_space_info( get_string( values_[0] ) );
 			HHuginn::values_t data;
 			HObjectFactory& of( *thread_->runtime().object_factory() );
 			data.emplace_back( of.create_integer( ri.total() ) );

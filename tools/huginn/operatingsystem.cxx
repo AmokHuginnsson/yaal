@@ -40,6 +40,40 @@ public:
 		, _subprocessClass( HSubprocess::get_class( class_->runtime(), class_ ) ) {
 		return;
 	}
+	static HHuginn::value_t memory_size( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( "OperatingSystem.memory_size", values_, 0, 0, thread_, position_ );
+		system::HResourceInfo ri;
+		HHuginn::value_t v( thread_->runtime().none_value() );
+		try {
+			ri = system::get_memory_size_info();
+			HHuginn::values_t data;
+			HObjectFactory& of( *thread_->runtime().object_factory() );
+			data.emplace_back( of.create_integer( ri.total() ) );
+			data.emplace_back( of.create_integer( ri.free() ) );
+			data.emplace_back( of.create_integer( ri.available() ) );
+			v = of.create_tuple( yaal::move( data ) );
+		} catch ( HException const& e ) {
+			HOperatingSystem* osc( static_cast<HOperatingSystem*>( object_->raw() ) );
+			thread_->raise( osc->exception_class(), e.what(), position_ );
+		}
+		return ( v );
+		M_EPILOG
+	}
+	static HHuginn::value_t core_count( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( "OperatingSystem.core_count", values_, 0, 0, thread_, position_ );
+		system::HResourceInfo ri;
+		int nCPU( 0 );
+		try {
+			nCPU = system::get_core_count_info();
+		} catch ( HException const& e ) {
+			HOperatingSystem* osc( static_cast<HOperatingSystem*>( object_->raw() ) );
+			thread_->raise( osc->exception_class(), e.what(), position_ );
+		}
+		return ( thread_->object_factory().create_integer( nCPU ) );
+		M_EPILOG
+	}
 	static HHuginn::value_t env( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "OperatingSystem.env", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
@@ -147,6 +181,8 @@ HPackageCreatorInterface::HInstance HOperatingSystemCreator::do_new_instance( HR
 		)
 	);
 	HHuginn::field_definitions_t fd{
+		{ "memory_size", runtime_->create_method( &HOperatingSystem::memory_size ), "get information about system virtual memory_size size" },
+		{ "core_count",  runtime_->create_method( &HOperatingSystem::core_count ),  "get the number of CPUs in the system" },
 		{ "env",       runtime_->create_method( &HOperatingSystem::env ),       "( *name* ) - get value of an environment variable named *name*" },
 		{ "set_env",   runtime_->create_method( &HOperatingSystem::set_env ),   "( *name*, *value* ) - set *name* environment variable to *value* value" },
 		{ "getpid",    runtime_->create_method( &HOperatingSystem::getpid ),    "get Huginn's interpreter process id" },
