@@ -4,6 +4,7 @@
 #include <csignal>
 #include <cstring>
 #include <unistd.h>
+#include <fcntl.h>
 #include <sys/time.h>
 #include <pwd.h>
 #include <grp.h>
@@ -381,6 +382,15 @@ yaal::hcore::HString get_self_exec_path( void ) {
 	ms_get_module_file_name( path );
 #endif
 	return ( path );
+	M_EPILOG
+}
+
+void set_close_on_exec( int fd_ ) {
+	M_PROLOG
+	int fdFlags( ::fcntl( fd_, F_GETFD, 0 ) );
+	M_ENSURE( fdFlags >= 0 );
+	M_ENSURE( ::fcntl( fd_, F_SETFD, fdFlags | FD_CLOEXEC ) == 0 );
+	return;
 	M_EPILOG
 }
 

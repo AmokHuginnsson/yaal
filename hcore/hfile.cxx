@@ -114,9 +114,7 @@ int HFile::do_open( HString const& path_, open_t const& open_ ) {
 	} else {
 		int fd( ::fileno( static_cast<FILE*>( _handle ) ) );
 		M_ENSURE( fd >= 0 );
-		int fdFlags( ::fcntl( fd, F_GETFD, 0 ) );
-		M_ENSURE( fdFlags >= 0 );
-		M_ENSURE( ::fcntl( fd, F_SETFD, fdFlags | FD_CLOEXEC ) == 0 );
+		system::set_close_on_exec( fd );
 		_ownership = OWNERSHIP::ACQUIRED;
 	}
 	errno = saveErrno;

@@ -135,6 +135,12 @@ int get_page_size( void );
  */
 yaal::hcore::HString get_self_exec_path( void );
 
+/*! \brief Set CLOSE ON EXEC flag on given file descriptor.
+ *
+ * \param  fd - a file descriptor to act upon.
+ */
+void set_close_on_exec( int fd );
+
 }
 
 }
