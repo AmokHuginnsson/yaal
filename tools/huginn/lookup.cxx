@@ -227,11 +227,7 @@ inline HHuginn::value_t ensure( huginn::HThread* thread_, HHuginn::value_t* obje
 	verify_arg_count( "lookup.ensure", values_, 2, 2, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LOOKUP );
 	HHuginn::HLookup* l( static_cast<HHuginn::HLookup*>( object_->raw() ) );
-	HHuginn::value_t& v( l->get_ref( thread_, values_[0], position_ ) );
-	if ( ! v ) {
-		v = values_[1];
-	}
-	return ( v );
+	return ( l->get_ref( thread_, values_[0], values_[1], position_ ) );
 	M_EPILOG
 }
 
@@ -438,10 +434,10 @@ void HHuginn::HLookup::erase( huginn::HThread* thread_, HHuginn::value_t const& 
 	M_EPILOG
 }
 
-HHuginn::value_t& HHuginn::HLookup::get_ref( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) {
+HHuginn::value_t& HHuginn::HLookup::get_ref( huginn::HThread* thread_, HHuginn::value_t const& key_, HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
 	HAnchorGuard<HHuginn::HLookup> ag( *this, thread_, position_ );
-	return ( _data[key_] );
+	return ( _data.insert( make_pair( key_, value_ ) ).first->second );
 	M_EPILOG
 }
 

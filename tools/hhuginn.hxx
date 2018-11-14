@@ -1120,7 +1120,7 @@ private:
 public:
 	HDict( HHuginn::HClass const*, allocator_t const& );
 	value_t get( huginn::HThread*, HHuginn::value_t const&, int );
-	value_t& get_ref( huginn::HThread*, HHuginn::value_t const&, int );
+	value_t& get_ref( huginn::HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 	void insert( huginn::HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 	bool has_key( huginn::HThread*, HHuginn::value_t const&, int ) const;
 	bool try_get( huginn::HThread*, HHuginn::value_t const& key_, HHuginn::value_t& result_, int position_ );
@@ -1234,7 +1234,7 @@ public:
 	bool has_key( huginn::HThread*, HHuginn::value_t const&, int ) const;
 	void erase( huginn::HThread*, HHuginn::value_t const&, int );
 	value_t get( huginn::HThread*, HHuginn::value_t const&, int );
-	value_t& get_ref( huginn::HThread*, HHuginn::value_t const&, int );
+	value_t& get_ref( huginn::HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 	bool try_get( huginn::HThread*, HHuginn::value_t const&, HHuginn::value_t&, int );
 	values_t const& value( void ) const {
 		return ( _data );

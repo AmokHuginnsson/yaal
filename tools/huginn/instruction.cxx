@@ -75,10 +75,10 @@ HHuginn::value_t subscript(
 		}
 	} else if ( baseType == HHuginn::TYPE::DICT ) {
 		HHuginn::HDict* d( static_cast<HHuginn::HDict*>( base_.raw() ) );
-		res = ( subscript_ == HFrame::ACCESS::VALUE ? d->get( thread_, index_, position_ ) : of.create_reference( d->get_ref( thread_, index_, position_ ) ) );
+		res = ( subscript_ == HFrame::ACCESS::VALUE ? d->get( thread_, index_, position_ ) : of.create_reference( d->get_ref( thread_, index_, thread_->runtime().none_value(), position_ ) ) );
 	} else if ( baseType == HHuginn::TYPE::LOOKUP ) {
 		HHuginn::HLookup* l( static_cast<HHuginn::HLookup*>( base_.raw() ) );
-		res = ( subscript_ == HFrame::ACCESS::VALUE ? l->get( thread_, index_, position_ ) : of.create_reference( l->get_ref( thread_, index_, position_ ) ) );
+		res = ( subscript_ == HFrame::ACCESS::VALUE ? l->get( thread_, index_, position_ ) : of.create_reference( l->get_ref( thread_, index_, thread_->runtime().none_value(), position_ ) ) );
 	} else {
 		if ( subscript_ == HFrame::ACCESS::VALUE ) {
 			if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( base_.raw() ) ) {
