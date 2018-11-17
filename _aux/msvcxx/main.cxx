@@ -549,15 +549,19 @@ int statvfs( char const* path_, struct statvfs* fs_ ) {
 		DWORD bytesPerSector( 0 );
 		DWORD freeClusters( 0 );
 		DWORD clusters( 0 );
-		GetDiskFreeSpace( path_, &sectorsPerCluster, &bytesPerSector, &freeClusters, &clusters );
-		fs_->f_bsize = bytesPerSector;
-		fs_->f_frsize = bytesPerSector;
-		DWORD bytesPerCluster( bytesPerSector * sectorsPerCluster );
-		yaal::u64_t free( bytesPerCluster * freeClusters );
-		yaal::u64_t total( bytesPerCluster * clusters );
-		fs_->f_blocks = total / bytesPerSector;
-		fs_->f_bfree = free / bytesPerSector;
-		fs_->f_bavail = fs_->f_bfree;
+		if ( GetDiskFreeSpace( path_, &sectorsPerCluster, &bytesPerSector, &freeClusters, &clusters ) != 0 ) {
+			fs_->f_bsize = bytesPerSector;
+			fs_->f_frsize = bytesPerSector;
+			yaal::u64_t bytesPerCluster( bytesPerSector * sectorsPerCluster );
+			yaal::u64_t free( bytesPerCluster * freeClusters );
+			yaal::u64_t total( bytesPerCluster * clusters );
+			fs_->f_blocks = total / bytesPerSector;
+			fs_->f_bfree = free / bytesPerSector;
+			fs_->f_bavail = fs_->f_bfree;
+		} else {
+			code = -1;
+			errno = ENOENT;
+		}
 	} else {
 		code = -1;
 		errno = ENOENT;

@@ -101,6 +101,7 @@
 ?NOT_END_OF_LINE@MATCH@HRegex@hcore@yaal@@2V?$HBitFlag@UMATCH@HRegex@hcore@yaal@@@34@B
 ?NO_EXCEPTION@COMPILE@HRegex@hcore@yaal@@2V?$HBitFlag@UCOMPILE@HRegex@hcore@yaal@@@34@B
 ?N_1@number@hcore@yaal@@3VHNumber@23@B
+?OPTIMIZE@COMPILER@HHuginn@tools@yaal@@2V?$HBitFlag@UCOMPILER@HHuginn@tools@yaal@@@hcore@4@B
 ?OVERLAPPING@MATCH@HRegex@hcore@yaal@@2V?$HBitFlag@UMATCH@HRegex@hcore@yaal@@@34@B
 ?PARITY_CHECK@FLAG@HSerial@tools@yaal@@2V?$HBitFlag@UFLAG@HSerial@tools@yaal@@@hcore@4@B
 ?PARITY_ODD@FLAG@HSerial@tools@yaal@@2V?$HBitFlag@UFLAG@HSerial@tools@yaal@@@hcore@4@B

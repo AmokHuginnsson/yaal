@@ -333,7 +333,7 @@ HResourceInfo get_disk_space_info( yaal::hcore::HString const& path_ ) {
 	struct statvfs svfs;
 	::memset( &svfs, 0, sizeof ( svfs ) );
 	HUTF8String utf8( path_ );
-	M_ENSURE( ::statvfs( utf8.c_str(), &svfs ) == 0 );
+	M_ENSURE( ::statvfs( utf8.c_str(), &svfs ) == 0, path_ );
 	return ( HResourceInfo( static_cast<i64_t>( svfs.f_bavail ) * static_cast<i64_t>( svfs.f_frsize ),
 				static_cast<i64_t>( svfs.f_bfree ) * static_cast<i64_t>( svfs.f_frsize ),
 				static_cast<i64_t>( svfs.f_blocks ) * static_cast<i64_t>( svfs.f_frsize ) ) );

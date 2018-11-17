@@ -452,7 +452,12 @@ char const* windows_strerror( int code_ ) {
 		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 		nullptr, code_, MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),
 		p, MAX_MSG_LEN - 1, nullptr );
-
+	int lastCharPos( strlen( msg ) - 1 );
+	char const strip[] = ".\r\n";
+	while ( ( lastCharPos > 0 ) && strchr( strip, msg[lastCharPos] ) ) {
+		msg[lastCharPos] = 0;
+		-- lastCharPos;
+	}
 	return ( msg );
 }
 
