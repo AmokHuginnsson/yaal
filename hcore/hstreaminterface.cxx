@@ -629,6 +629,11 @@ int long HStreamInterface::semantic_read(
 			message_.clear();
 		}
 	}
+	/*
+	 * Returns number of bytes read which can be quite different than message_.length(), because:
+	 * 1. nRead can carry error information ( nRead < 0 )
+	 * 2. nRead is number of *bytes* as opposed to number of *code points* in message_.
+	 */
 	return ( nRead );
 	M_EPILOG
 }
@@ -686,7 +691,6 @@ int HStreamInterface::do_peek( void ) {
 
 bool HStreamInterface::read_word( void ) {
 	M_PROLOG
-	/* Regarding _whiteSpace_.size() + 1, about "+ 1" see comment in semantic_read in analogous context */
 	if ( ! _skipWS ) {
 		int peeked( HStreamInterface::do_peek() );
 		if ( ( peeked == INVALID_CHARACTER )
@@ -838,7 +842,6 @@ HStreamInterface& HStreamInterface::do_input( bool& b ) {
 HStreamInterface& HStreamInterface::do_input( code_point_t& char_ ) {
 	M_PROLOG
 	if ( _mode == MODE::TEXT ) {
-		/* Regarding _whiteSpace_.size() + 1, about "+ 1" see comment in semantic_read in analogous context */
 		char c( 0 );
 		do {
 			read( &c, 1 );
@@ -870,7 +873,6 @@ HStreamInterface& HStreamInterface::do_input( char& char_ ) {
 	char c( 0 );
 	int long toRead( static_cast<int>( sizeof ( c ) ) );
 	if ( _mode == MODE::TEXT ) {
-		/* Regarding _whiteSpace_.size() + 1, about "+ 1" see comment in semantic_read in analogous context */
 		do {
 			read( &c, toRead );
 		} while ( good() && _skipWS && character_class<CHARACTER_CLASS::WHITESPACE>().hasz( code_point_t( static_cast<yaal::u32_t>( c ) ) ) );

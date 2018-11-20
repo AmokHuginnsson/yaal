@@ -224,9 +224,7 @@ int long HFile::read_line( HString& line_, READ read_,
 		}
 	}
 	if ( length > 0 ) {
-		if ( ( length > 1 ) && ( line_[ length - 2 ] == '\r' ) ) {
-			line_.set_at( length - 2, 0_ycp );
-		}
+		line_.trim_right( "\r\n" );
 	} else {
 		length = -1;
 	}
