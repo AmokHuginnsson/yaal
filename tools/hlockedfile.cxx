@@ -13,14 +13,15 @@ namespace yaal {
 namespace tools {
 
 HLockedFile::HLockedFile( void )
-	: HFile()
-	{ }
+	: HFile() {
+}
 
-HLockedFile::HLockedFile( yaal::hcore::HString const& path, open_t const& mode )
+HLockedFile::HLockedFile( yaal::hcore::HString const& path, open_t mode )
 	: HFile( path, mode ) {
 	M_PROLOG
-	if ( is_opened() )
+	if ( is_opened() ) {
 		lock();
+	}
 	return;
 	M_EPILOG
 }
@@ -32,19 +33,21 @@ HLockedFile::~HLockedFile( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
-int HLockedFile::do_open( yaal::hcore::HString const& path_, open_t const& mode_ ) {
+int HLockedFile::do_open( yaal::hcore::HString const& path_, open_t mode_ ) {
 	M_PROLOG
 	int ret( HFile::do_open( path_, mode_ ) );
-	if ( ! ret )
+	if ( ! ret ) {
 		lock();
+	}
 	return ( ret );
 	M_EPILOG
 }
 
 int HLockedFile::do_close( void ) {
 	M_PROLOG
-	if ( is_opened() )
+	if ( is_opened() ) {
 		unlock();
+	}
 	return ( HFile::do_close() );
 	M_EPILOG
 }

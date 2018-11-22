@@ -45,7 +45,7 @@ struct RC_PATHER {
 	};
 };
 
-int read_rc_line( HString&, HString&, HFile&, int& );
+bool read_rc_line( HString&, HString&, HFile&, int& );
 
 namespace {
 
@@ -109,8 +109,9 @@ HString make_path( HString const& sysconfDir_, HString const& rcName_, RC_PATHER
 int rc_open( HString const& rcPath_, HFile& file_ ) {
 	M_PROLOG
 	int error = 0;
-	if ( !! file_ )
+	if ( !! file_ ) {
 		file_.close();
+	}
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	error = file_.open( rcPath_, HFile::OPEN::READING );
 	HString message( rcPath_ );
@@ -592,12 +593,12 @@ char const _keyValueSep_[] = " \t=";
 
 }
 
-int read_rc_line( HString& option_, HString& value_, HFile& file_,
-		int& line_ ) {
+bool read_rc_line( HString& option_, HString& value_, HFile& file_, int& line_ ) {
 	M_PROLOG
 	int long index = 0, length = 0, end = 0;
-	option_ = value_ = "";
-	while ( file_.read_line( option_ ) >= 0 ) {
+	option_.clear();
+	value_.clear();
+	while ( file_.read_line( option_ ).good() ) {
 		line_ ++;
 		index = 0;
 		if ( option_.is_empty() ) {
@@ -605,7 +606,7 @@ int read_rc_line( HString& option_, HString& value_, HFile& file_,
 		}
 		/* we are looking for first non-whitespace on the line */
 		index = option_.find_other_than( character_class<CHARACTER_CLASS::WHITESPACE>().data() );
-		if ( ! option_[ index ] || ( option_[ index ] == '#' ) ) {
+		if ( ( index == HString::npos ) || ( option_[ index ] == '#' ) ) {
 			continue; /* there is only white spaces or comments on that line */
 		}
 		/* at this point we know we have _some_ option */
@@ -639,9 +640,9 @@ int read_rc_line( HString& option_, HString& value_, HFile& file_,
 			}
 			option_.set_at( endOfOption, 0_ycp );
 		}
-		return ( 1 );
+		return ( true );
 	}
-	return ( 0 );
+	return ( false );
 	M_EPILOG
 }
 

@@ -203,7 +203,7 @@ mrproper: clean
 	printf "%b\n" "done."
 
 purge-local:
-	@/bin/rm -f $(DIR_ROOT)/dropprivs $(DIR_ROOT)/debian
+	@/bin/rm -fr $(DIR_ROOT)/dropprivs $(DIR_ROOT)/debian
 
 include $(DIR_ROOT)/_aux/mk/b0_target-tools.mk
 

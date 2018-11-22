@@ -84,22 +84,23 @@ public:
 		END
 	};
 	typedef HStreamInterface& ( *manipulator_t )( HStreamInterface& );
-protected:
-	HChunk _cache;  /*!< Read buffer. */
-	int _offset;    /*!< Position of where continued read (another read_until invocation after interrupted one) shall store consecutive bytes. */
-	HString _wordCache; /*!< Cache for operator >> () and operator << (). */
+private:
+	HString _wordCache;  /*!< Cache for operator >> () and operator << (). */
 	HUTF8String _conversionCache; /*!< Cache used for converting between UTF-8 and UCS */
 	code_point_t _fill;  /*!< Fill character for output operations. */
-	int _width;     /*!< Next output operation width. */
-	int _precision; /*!< Set number of significant digits to display for all subsequent outputs of floating point type values. */
+	int _width;          /*!< Next output operation width. */
+	int _precision;      /*!< Set number of significant digits to display for all subsequent outputs of floating point type values. */
 	MODE _mode;
 	BASE _base;
 	FLOAT_FORMAT _floatFormat;
 	ADJUST _adjust;
 	bool _skipWS;
 	bool _boolAlpha;
-	bool _valid;    /*!< Tells if further low-level IO is possible. */
-	bool _fail;     /*!< Tells if most recently performed data extraction failed at logical level. */
+protected:
+	bool _valid;      /*!< Tells if further low-level IO is possible. */
+	bool _fail;       /*!< Tells if most recently performed data extraction failed at logical level. */
+	HChunk _cache;    /*!< Read buffer. */
+	int _cachedBytes; /*!< Position of where continued read (another read_until invocation after interrupted one) shall store consecutive bytes. */
 public:
 	HStreamInterface( void );
 	virtual ~HStreamInterface( void );
@@ -424,6 +425,13 @@ public:
 		do_clear();
 		return;
 	}
+	/*! \brief Reset internal state so stream can be reused.
+	 */
+	void reset( void ) {
+		do_reset();
+	}
+	/*! \brief Flush all pending output.
+	 */
 	void flush( void );
 	int peek( void ) {
 		return ( do_peek() );
@@ -550,6 +558,7 @@ protected:
 	virtual bool do_fail( void ) const;
 	virtual bool do_bad( void ) const;
 	virtual void do_clear( void );
+	virtual void do_reset( void );
 private:
 	int long read_while_retry( yaal::hcore::HString&, char const* );
 	int long read_until_retry( yaal::hcore::HString&, char const*, bool );

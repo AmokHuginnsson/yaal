@@ -230,7 +230,7 @@ HResourceInfo get_memory_size_info( void ) {
 			{ "Cached", &cachedMemory }
 		};
 		int hit( 0 );
-		while ( ( hit < yaal::size( tagVars ) ) && ( meminfo.read_line( line ) > 0 ) ) {
+		while ( ( hit < yaal::size( tagVars ) ) && meminfo.read_line( line ).good() ) {
 			t.assign( line );
 			if ( t.begin() != t.end() ) {
 				tokens = *t.begin();

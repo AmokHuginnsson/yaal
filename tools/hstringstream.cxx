@@ -98,13 +98,13 @@ void HStringStream::use( void ) const {
 	return;
 }
 
-void HStringStream::reset( void ) {
+void HStringStream::do_reset( void ) {
 	M_PROLOG
+	HStreamInterface::do_reset();
 	_buffer.clear();
 	_utf8.reset();
 	_offset = 0;
 	_used = false;
-	clear();
 	return;
 	M_EPILOG
 }

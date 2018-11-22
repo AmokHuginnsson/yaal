@@ -24,10 +24,10 @@ public:
 	 * \param path - path to file item to be opened.
 	 * \param mode - open mode.
 	 */
-	HLockedFile( yaal::hcore::HString const& path, open_t const& mode );
+	HLockedFile( yaal::hcore::HString const& path, open_t mode );
 	virtual ~HLockedFile( void );
 protected:
-	virtual int do_open( yaal::hcore::HString const&, open_t const& mode ) override;
+	virtual int do_open( yaal::hcore::HString const&, open_t mode ) override;
 	virtual int do_close( void ) override;
 private:
 	void lock( void );

@@ -47,7 +47,7 @@ HFile::HFile( void* handle_, OWNERSHIP ownership_ )
 	M_EPILOG
 }
 
-HFile::HFile( yaal::hcore::HString const& path, open_t const& open_ )
+HFile::HFile( yaal::hcore::HString const& path, open_t open_ )
 	: HStreamInterface()
 	, _handle( nullptr )
 	, _path()
@@ -77,13 +77,13 @@ HFile::~HFile( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
-int HFile::open( HString const& path_, open_t const& open_ ) {
+int HFile::open( HString const& path_, open_t open_ ) {
 	M_PROLOG
 	return ( do_open( path_, open_ ) );
 	M_EPILOG
 }
 
-int HFile::do_open( HString const& path_, open_t const& open_ ) {
+int HFile::do_open( HString const& path_, open_t open_ ) {
 	M_PROLOG
 	M_ENSURE( ! _handle, "stream already opened" );
 	char const* mode( nullptr );
@@ -143,6 +143,7 @@ int HFile::do_close( void ) {
 	M_PROLOG
 	M_ENSURE( _handle && ( _ownership == OWNERSHIP::ACQUIRED ) );
 	int error( ::std::fclose( static_cast<FILE*>( _handle ) ) );
+	reset();
 	if ( error ) {
 		_error = error_message( error );
 	} else {
@@ -196,8 +197,7 @@ void HFile::do_seek( int long pos, SEEK seek_ ) {
 	M_EPILOG
 }
 
-int long HFile::read_line( HString& line_, READ read_,
-		int const maximumLength_ ) {
+HFile& HFile::read_line( HString& line_, READ read_, int maximumLength_ ) {
 	M_PROLOG
 	M_ASSERT( _handle );
 	READ readMode( read_ );
@@ -205,55 +205,46 @@ int long HFile::read_line( HString& line_, READ read_,
 		readMode = READ::BUFFERED_READS;
 	}
 	M_ENSURE( _handle, _error_ );
-	int long length( -1 );
+	int length( -1 );
 	if ( readMode == READ::BUFFERED_READS ) {
-		length = get_line_length();
-		if ( length ) {
-			if ( maximumLength_ && ( length > maximumLength_ ) ) {
-				M_THROW( _( "line too long" ), length );
+		int bufferSize( max( maximumLength_, system::get_page_size() ) );
+		char* nl( nullptr );
+		char* ptr( _cache.get<char>() );
+		if ( _cachedBytes > 0 ) {
+			nl = static_cast<char*>( memchr( ptr, '\n', static_cast<size_t>( _cachedBytes ) ) );
+		}
+		while ( ! nl ) {
+			ptr = static_cast<char*>( _cache.realloc( bufferSize ) );
+			int nRead( static_cast<int>( do_read( ptr + _cachedBytes, bufferSize - _cachedBytes ) ) );
+			if ( nRead < 0 ) {
+				_valid = false;
+				M_THROW( "read error", errno );
+			} else if ( nRead == 0 ) {
+				_valid = false;
+				nl = ptr + _cachedBytes;
+				break;
 			}
-			char* ptr( static_cast<char*>( _cache.realloc( length ) ) );
-			M_ENSURE( read( ptr, length ) == length );
-			ptr[ length - 1 ] = 0;
-			line_ = ptr;
+			_cachedBytes += nRead;
+			nl = static_cast<char*>( memchr( ptr, '\n', static_cast<size_t>( _cachedBytes ) ) );
+			bufferSize *= 2;
 		}
-	} else /* UNBUFFERED_READS */ {
-		length = read_until( line_, "\n", true );
-		if ( maximumLength_ && ( length > maximumLength_ ) ) {
-			M_THROW( _( "line too long" ), length );
+		length = static_cast<int>( nl - ptr );
+		line_.assign( ptr, length );
+		if ( _cachedBytes > length ) {
+			::memmove( ptr, nl + 1, static_cast<size_t>( _cachedBytes - ( length + 1 ) ) );
+			_cachedBytes -= ( length + 1 );
+		} else {
+			_cachedBytes = 0;
 		}
+	} else { /* UNBUFFERED_READS */
+		length = static_cast<int>( read_until( line_, "\n", true ) );
 	}
-	if ( length > 0 ) {
-		line_.trim_right( "\r\n" );
-	} else {
-		length = -1;
+	if ( maximumLength_ && ( length > maximumLength_ ) ) {
+		_fail = true;
+		M_THROW( _( "line too long" ), length );
 	}
-	return ( length );
-	M_EPILOG
-}
-
-int long HFile::get_line_length( void ) {
-	M_PROLOG
-	M_ASSERT( _handle );
-	static int const SCAN_BUFFER_SIZE( 8 );
-	char buffer[ SCAN_BUFFER_SIZE ];
-	char const* ptr( nullptr );
-	int long length( 0 );
-	int long size( 0 );
-	do {
-		size = static_cast<int long>( ::std::fread( buffer, sizeof ( char ),
-			SCAN_BUFFER_SIZE, static_cast<FILE*>( _handle ) ) );
-		length += size;
-		ptr = static_cast<char*>( ::std::memchr( buffer, '\n', static_cast<size_t>( size ) ) );
-		if ( ::std::memchr( buffer, 0, static_cast<size_t>( size ) ) != nullptr ) {
-			throw HFileException( "binary data in file" );
-		}
-	} while ( ! ptr && ( size == SCAN_BUFFER_SIZE ) );
-	M_ENSURE( ::std::fseek( static_cast<FILE*>( _handle ), -length, SEEK_CUR ) == 0 );
-	if ( ptr ) {
-		length -= ( size - static_cast<int long>( ptr + 1 - buffer ) ); /* + 1 for \n */
-	}
-	return ( length );
+	line_.trim_right( "\r\n" );
+	return ( *this );
 	M_EPILOG
 }
 

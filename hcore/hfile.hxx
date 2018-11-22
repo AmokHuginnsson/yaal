@@ -64,9 +64,9 @@ public:
 	 * \param path - path to file item to be opened.
 	 * \param mode - open mode.
 	 */
-	HFile( yaal::hcore::HString const& path, open_t const& mode );
+	HFile( yaal::hcore::HString const& path, open_t mode );
 	virtual ~HFile( void );
-	int open( HString const&, open_t const& mode );
+	int open( HString const&, open_t mode );
 	/*! \brief Assign existing low level stream to this file stream (may be closed).
 	 *
 	 * \param raw - low level interface stream handler.
@@ -75,14 +75,14 @@ public:
 	int open( void* raw, OWNERSHIP ownership );
 	int close( void );
 	void* release( void );
-	int long read_line( HString&, READ = READ::DEFAULTS, int const = 0 );
+	HFile& read_line( HString&, READ = READ::DEFAULTS, int = 0 );
 	int long tell( void ) const;
 	HString const& get_path( void ) const;
 	HString const& get_error( void ) const;
 	bool is_opened( void ) const;
 	explicit operator bool ( void ) const;
 protected:
-	virtual int do_open( HString const&, open_t const& mode );
+	virtual int do_open( HString const&, open_t mode );
 	virtual int do_close( void );
 	int get_file_descriptor( void ) const;
 private:
@@ -93,7 +93,6 @@ private:
 	virtual bool do_is_valid( void ) const override;
 	virtual POLL_TYPE do_poll_type( void ) const override;
 	virtual void const* do_data( void ) const override;
-	int long get_line_length( void );
 	HFile( HFile const& ) = delete;
 	HFile& operator = ( HFile const& ) = delete;
 };
