@@ -6,7 +6,6 @@ LIB_NAME       = $(PRJNAME)
 VERSION        = 0
 SUBVERSION     = 0
 EXTRAVERSION   = 42
-LIB_VERSION    = $(VERSION).$(SUBVERSION).$(EXTRAVERSION)
 COMPONENTS     = hcore tools dbwrapper hconsole hdata
 DRIVERS        = @DO_ORACLE_DRIVER@ @DO_FIREBIRD_DRIVER@ @DO_MYSQL_DRIVER@ @DO_POSTGRESQL_DRIVER@ @DO_SQLITE3_DRIVER@
 prefix         = @prefix@
@@ -179,7 +178,7 @@ install-environment:
 
 $(MAIN_LIB_HEADER): $(HDRS) $(DIR_BUILD)/config.hxx
 	@printf "%b" "Making headers ... " && \
-	$(call invoke,$(DIR_ROOT)/_aux/mkheaders --lib-name=$(LIB_NAME) --lib-version=$(LIB_VERSION) --dir-root="$(DIR_ROOT)" --dir-build="$(DIR_BUILD)" --headers="$(HDRS)" && ) \
+	$(call invoke,$(DIR_ROOT)/_aux/mkheaders --lib-name=$(LIB_NAME) --dir-root="$(DIR_ROOT)" --dir-build="$(DIR_BUILD)" --headers="$(HDRS)" && ) \
 	printf "%b$(NL)" "done.$(CL)$(BOLD)" && \
 	printf "%b\n" "All OK!$(RS)";
 

@@ -10,8 +10,6 @@ set( CPACK_COMPONENTS_ALL runtime dependencies configuration devel )
 
 include( common )
 
-set( PACKAGE_VERSION "\"${PROJECT_VERSION}.${PROJECT_SUBVERSION}.${PROJECT_EXTRAVERSION}\"" )
-
 option( YAAL_AUTO_SANITY "Enable automatic environment sanitization." OFF )
 
 if ( DEFINED BUILD_PACKAGE )
@@ -355,21 +353,20 @@ else ( CMAKE_HOST_WIN32 )
 	target_link_libraries( hdata hconsole dbwrapper tools hcore )
 	add_custom_command(
 		OUTPUT ${HEADER_TARGET}
-		COMMAND ./_aux/mkheaders
+		COMMAND ${CMAKE_HOME_DIRECTORY}/_aux/mkheaders
 			--lib-name=${CMAKE_PROJECT_NAME}
-			--lib-version=${PACKAGE_VERSION}
 			--dir-root=${CMAKE_HOME_DIRECTORY}
 			--dir-build=${TARGET_PATH}
 			--headers='${HEADERS}'
 		MAIN_DEPENDENCY ${TARGET_PATH}/config.hxx
-		DEPENDS _aux/mkheaders ${HEADERS}
+		DEPENDS ${CMAKE_HOME_DIRECTORY}/_aux/mkheaders ${HEADERS}
 	)
 endif ( CMAKE_HOST_WIN32 )
 
 add_custom_command(
 	OUTPUT ${SSL_KEYS_DIR}/pem
 	COMMAND ${CMAKE_HOME_DIRECTORY}/_aux/gen-keys ${TARGET_PATH}/${SSL_KEYS_DIR}
-	DEPENDS _aux/gen-keys
+	DEPENDS ${CMAKE_HOME_DIRECTORY}/_aux/gen-keys
 )
 
 add_dependencies( hcore commit_id )

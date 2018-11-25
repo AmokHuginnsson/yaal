@@ -211,6 +211,7 @@ use_cxx_compiler_flag( -Wl,--no-undefined )
 use_cxx_compiler_flag( -Wl,--enable-auto-import )
 use_cxx_compiler_flag( -Wl,--demangle )
 use_cxx_compiler_flag( -Wl,-C )
+use_cxx_compiler_flag( -Wl,--no-as-needed )
 use_cxx_compiler_flag( -Wextra )
 if ( NOT CMAKE_HOST_WIN32 )
 	get_directory_property( OPTIONS COMPILE_OPTIONS )
@@ -317,9 +318,6 @@ string( REGEX REPLACE "^SUBVERSION[\\t ]*=[\\t ]*" "" PROJECT_SUBVERSION ${PROJE
 file( STRINGS ${CMAKE_HOME_DIRECTORY}/Makefile.mk.in PROJECT_EXTRAVERSION LIMIT_COUNT 1 REGEX "^EXTRAVERSION[\\t ]*=[\\t ]*" )
 string( REGEX REPLACE "^EXTRAVERSION[\\t ]*=[\\t ]*" "" PROJECT_EXTRAVERSION ${PROJECT_EXTRAVERSION} )
 
-today( TODAY )
-set( VERSION "${PROJECT_VERSION}.${PROJECT_SUBVERSION}.${PROJECT_EXTRAVERSION}-${TODAY}" )
-
 link_directories( ${CMAKE_LIBRARY_PATH} )
 
 if ( NOT CMAKE_HOST_WIN32 )
@@ -382,4 +380,7 @@ if ( CMAKE_HOST_WIN32 )
 	include( InstallRequiredSystemLibraries )
 	include( CPack )
 endif()
+
+string( TIMESTAMP TODAY "%Y%m%d" )
+set( PACKAGE_VERSION "\"${PROJECT_VERSION}.${PROJECT_SUBVERSION}.${PROJECT_EXTRAVERSION}-${TODAY}\"" )
 

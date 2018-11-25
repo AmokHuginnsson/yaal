@@ -1,7 +1,6 @@
 #! /bin/sh
 
 LIB_NAME=""
-LIB_VERSION=""
 DIR_ROOT=""
 DIR_BUILD=""
 HDRS=""
@@ -15,7 +14,6 @@ export LANG="en"
 for arg in "${@}" ; do
 	case ${arg} in
 		--lib-name=*)    LIB_NAME=`echo ${arg} | sed 's;--lib-name=;;'` ;;
-		--lib-version=*) LIB_VERSION=`echo ${arg} | sed 's;--lib-version=;;'` ;;
 		--dir-root=*)    DIR_ROOT=`echo ${arg} | sed 's;--dir-root=;;'` ;;
 		--dir-build=*)   DIR_BUILD=`echo ${arg} | sed 's;--dir-build=;;'` ;;
 		--headers=*)     HDRS=`echo ${arg} | sed 's;--headers=;;'` ;;
@@ -26,14 +24,13 @@ for arg in "${@}" ; do
 	esac
 done
 
-if [ -z "${LIB_NAME}" -o -z "${LIB_VERSION}" -o -z "${DIR_ROOT}" -o -z "${DIR_BUILD}" -o -z "${HDRS}" ] ; then
+if [ -z "${LIB_NAME}" -o -z "${DIR_ROOT}" -o -z "${DIR_BUILD}" -o -z "${HDRS}" ] ; then
 	printf "%b\n" "Core settings not found!"
 	exit 1
 fi
 
 if [ "x${VERBOSE}" != "x" ] ; then
 	echo "LIB_NAME    = ${LIB_NAME}"
-	echo "LIB_VERSION = ${LIB_VERSION}"
 	echo "DIR_ROOT    = ${DIR_ROOT}"
 	echo "DIR_BUILD   = ${DIR_BUILD}"
 	echo "HDRS        = [${HDRS}]"
@@ -80,7 +77,7 @@ sed -e "s/define[ \t]*PACKAGE_/define ${LIB_NAME_UC}_PACKAGE_/g" \
 PROTO=`find ${DIR_HEADERS} ! -path "${DIR_HEADERS}/${LIB_NAME}.hxx" ! -name 'config.hxx' -type f | head -1 | sed -e "s@${DIR_HEADERS}/@@"`
 PROTO_TAG=`echo ${PROTO} | sed -e 's@.*/\([^\.]*\).*@\1@'`
 
-head -1 ${DIR_HEADERS}/${PROTO} | sed -e "s/${LIB_NAME}' (/${LIB_NAME}' ${LIB_VERSION} (/" -e "s/[a-z\./]*${PROTO_TAG}/${LIB_NAME}/" > ${DIR_HEADERS}/${LIB_NAME}.hxx
+head -1 ${DIR_HEADERS}/${PROTO} > ${DIR_HEADERS}/${LIB_NAME}.hxx
 
 cat << EOF >> ${DIR_HEADERS}/${LIB_NAME}.hxx
 
