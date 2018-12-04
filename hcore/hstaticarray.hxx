@@ -90,17 +90,29 @@ public:
 	bool empty( void ) const {
 		return ( N == 0 );
 	}
-	type_t const& operator[] ( size_type idx_ ) const {
-		if ( ( idx_ >= N ) || ( idx_ < 0 ) ) {
-			M_THROW( _errMsgHStaticArray_[ ERROR::BAD_INDEX ], idx_ );
-		}
-		return ( _data[idx_] );
+	type_t& operator[] ( size_type index_ ) {
+		return ( _data[ index_ ] );
 	}
-	type_t& operator[] ( size_type idx_ ) {
-		if ( ( idx_ >= N ) || ( idx_ < 0 ) ) {
-			M_THROW( _errMsgHStaticArray_[ ERROR::BAD_INDEX ], idx_ );
+	type_t const& operator[] ( size_type index_ ) const {
+		return ( _data[ index_ ] );
+	}
+	type_t const& at( size_type index_ ) const {
+		M_PROLOG
+		size_type idx = ( index_ < 0 ) ? index_ + N : index_;
+		if ( ( idx >= N ) || ( idx < 0 ) ) {
+			M_THROW( _errMsgHStaticArray_[ ERROR::BAD_INDEX ], idx );
 		}
-		return ( _data[idx_] );
+		return ( _data[idx] );
+		M_EPILOG
+	}
+	type_t& at( size_type index_ ) {
+		M_PROLOG
+		size_type idx = ( index_ < 0 ) ? index_ + N : index_;
+		if ( ( idx >= N ) || ( idx < 0 ) ) {
+			M_THROW( _errMsgHStaticArray_[ ERROR::BAD_INDEX ], idx );
+		}
+		return ( _data[idx] );
+		M_EPILOG
 	}
 	type_t const* data( void ) const {
 		return ( _data );

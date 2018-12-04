@@ -352,14 +352,10 @@ public:
 	 * \return Reference to element at requested index.
 	 */
 	type_t& operator[] ( size_type index_ ) {
-		M_PROLOG
 		return ( _buf[ index_ ] );
-		M_EPILOG
 	}
 	type_t const& operator[] ( size_type index_ ) const {
-		M_PROLOG
 		return ( _buf[ index_ ] );
-		M_EPILOG
 	}
 	/*! \brief Access element at given position in this array.
 	 *
