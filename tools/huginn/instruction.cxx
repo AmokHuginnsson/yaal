@@ -248,6 +248,115 @@ HHuginn::value_t range(
 	return ( res );
 }
 
+void no_such_member( HThread*, yaal::hcore::HString const&, HHuginn::identifier_id_t, int, HHuginn::HClass const* ) __attribute__(( noreturn ));
+inline void no_such_member(
+	HThread* thread_,
+	yaal::hcore::HString const& name_,
+	HHuginn::identifier_id_t memberId_,
+	int position_,
+	HHuginn::HClass const* context_ = nullptr
+) {
+	HString message;
+	HRuntime& rt( thread_->runtime() );
+	message
+		.append( "`" )
+		.append( name_ )
+		.append( "' does not have `" )
+		.append( rt.identifier_name( memberId_ ) )
+		.append( "' member (did you mean `" );
+	if ( context_ ) {
+		message.append( rt.suggestion( context_, memberId_ ) );
+	} else {
+		message.append( rt.suggestion( memberId_ ) );
+	}
+	message.append( "'?)." ),
+	throw HHuginn::HHuginnRuntimeException( message, thread_->current_frame()->file_id(), position_ );
+}
+
+HHuginn::value_t member( HThread* thread_, HFrame::ACCESS access_, HHuginn::value_t& v_, HHuginn::identifier_id_t memberId_, int position_ ) {
+	M_PROLOG
+	HRuntime& rt( thread_->runtime() );
+	HHuginn::value_t m;
+	HHuginn::HObjectReference* oref( nullptr );
+	if ( v_->get_class()->is_complex() ) {
+		int fi( v_->field_index( memberId_ ) );
+		if ( fi < 0 ) {
+			fi = v_->get_class()->field_index( memberId_, HHuginn::HClass::MEMBER_TYPE::STATIC );
+			if ( fi >= 0 ) {
+				throw HHuginn::HHuginnRuntimeException(
+					"`"_ys
+						.append( rt.identifier_name( memberId_ ) )
+						.append( "' member of `" )
+						.append( v_->get_class()->name() )
+						.append( "' must be accessed from static context." ),
+					thread_->current_frame()->file_id(),
+					position_
+				);
+			}
+			no_such_member( thread_, v_->get_class()->name(), memberId_, position_, v_->get_class() );
+		}
+		if ( access_ == HFrame::ACCESS::BOUND_CALL ) {
+			m = v_->field( fi );
+		} else if ( access_ == HFrame::ACCESS::VALUE ) {
+			m = v_->field( v_, fi );
+		} else if ( ! v_.unique() ) {
+			HHuginn::HObject* o( dynamic_cast<HHuginn::HObject*>( v_.raw() ) );
+			if ( o != nullptr ) {
+				m = rt.object_factory()->create_reference( o->field_ref( fi ) );
+			} else {
+				throw HHuginn::HHuginnRuntimeException( "Assignment to read-only location.", thread_->current_frame()->file_id(), position_ );
+			}
+		} else {
+			throw HHuginn::HHuginnRuntimeException( "Assignment to temporary.", thread_->current_frame()->file_id(), position_ );
+		}
+	} else if ( ( oref = dynamic_cast<HHuginn::HObjectReference*>( v_.raw() ) ) != nullptr ) { /* Handle `super' keyword. */
+		if ( access_ == HFrame::ACCESS::REFERENCE ) {
+			throw HHuginn::HHuginnRuntimeException( "Changing upcasted reference.", thread_->current_frame()->file_id(), position_ );
+		}
+		int fi( oref->field_index( memberId_ ) );
+		if ( fi >= 0 ) {
+			m = oref->field( thread_, fi, position_ );
+		} else if ( ( memberId_ == IDENTIFIER::KEYWORD::CONSTRUCTOR ) && ( oref->reference_class()->type() == HHuginn::HClass::TYPE::BUILTIN ) ) {
+			m = rt.object_factory()->create_bound_method(
+				hcore::call(
+					&HHuginn::HObject::init_base, _1, _2, _3, _4
+				),
+				oref->value()
+			);
+		} else {
+			no_such_member( thread_, oref->reference_class()->name(), memberId_, position_ );
+		}
+	} else {
+		HString const* n( &v_->get_class()->name() );
+		if ( v_->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) {
+			HHuginn::HFunctionReference* fr( static_cast<HHuginn::HFunctionReference*>( v_.raw() ) );
+			n = &rt.identifier_name( fr->identifier_id() );
+			HHuginn::class_t c( rt.get_class( fr->identifier_id() ) );
+			if ( !!c ) {
+				int fi( c->field_index( memberId_, HHuginn::HClass::MEMBER_TYPE::STATIC ) );
+				n = &c->name();
+				if ( fi < 0 ) {
+					no_such_member( thread_, *n, memberId_, position_ );
+				}
+				if ( access_ == HFrame::ACCESS::REFERENCE ) {
+					throw HHuginn::HHuginnRuntimeException( "Assignment to read-only location.", thread_->current_frame()->file_id(), position_ );
+				}
+				HHuginn::value_t const& f( c->field( fi ) );
+				m = f->type_id() == HHuginn::TYPE::METHOD
+					? rt.object_factory()->create_unbound_method( c.raw(), static_cast<HHuginn::HClass::HMethod const*>( f.raw() )->function() )
+					: f;
+			} else {
+				throw HHuginn::HHuginnRuntimeException( "`"_ys.append( *n ).append( "' is not a compound object." ), thread_->current_frame()->file_id(), position_ );
+			}
+		} else {
+			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( *n ).append( "' is not a compound object." ), thread_->current_frame()->file_id(), position_ );
+		}
+	}
+	M_ASSERT( !! m );
+	return ( m );
+	M_EPILOG
+}
+
 namespace {
 enum class OPERATION {
 	OPEN,

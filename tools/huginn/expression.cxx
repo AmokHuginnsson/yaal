@@ -458,119 +458,14 @@ void HExpression::get_field( OExecutionStep const& executionStep_,huginn::HFrame
 	HHuginn::value_t v( yaal::move( values.top() ) );
 	values.pop();
 	HThread* t( frame_->thread() );
-	HRuntime& rt( t->runtime() );
-	HHuginn::HObjectReference* oref( nullptr );
-	if ( v->get_class()->is_complex() ) {
-		int fi( v->field_index( executionStep_._identifierId ) );
-		if ( fi < 0 ) {
-			fi = v->get_class()->field_index( executionStep_._identifierId, HHuginn::HClass::MEMBER_TYPE::STATIC );
-			if ( fi >= 0 ) {
-				throw HHuginn::HHuginnRuntimeException(
-					"`"_ys
-						.append( rt.identifier_name( executionStep_._identifierId ) )
-						.append( "' member of `" )
-						.append( v->get_class()->name() )
-						.append( "' must be accessed from static context." ),
-					file_id(),
-					p
-				);
-			}
-			throw HHuginn::HHuginnRuntimeException(
-				"`"_ys
-					.append( v->get_class()->name() )
-					.append( "' does not have `" )
-					.append( rt.identifier_name( executionStep_._identifierId ) )
-					.append( "' member (did you mean `" )
-					.append( rt.suggestion( v->get_class(), executionStep_._identifierId ) )
-					.append( "'?)." ),
-				file_id(),
-				p
-			);
-		}
-		if ( executionStep_._access == HFrame::ACCESS::BOUND_CALL ) {
-			HHuginn::value_t const& f( v->field( fi ) );
-			if ( f->type_id() == HHuginn::TYPE::METHOD ) {
-				values.push( v );
-			}
-			values.push( f );
-		} else if ( executionStep_._access == HFrame::ACCESS::VALUE ) {
-			values.push( v->field( v, fi ) );
-		} else if ( ! v.unique() ) {
-			HHuginn::HObject* o( dynamic_cast<HHuginn::HObject*>( v.raw() ) );
-			if ( o != nullptr ) {
-				values.push( rt.object_factory()->create_reference( o->field_ref( fi ) ) );
-			} else {
-				throw HHuginn::HHuginnRuntimeException( "Assignment to read-only location.", file_id(), p );
-			}
-		} else {
-			throw HHuginn::HHuginnRuntimeException( "Assignment to temporary.", file_id(), p );
-		}
-	} else if ( ( oref = dynamic_cast<HHuginn::HObjectReference*>( v.raw() ) ) != nullptr ) { /* Handle `super' keyword. */
-		if ( executionStep_._access == HFrame::ACCESS::REFERENCE ) {
-			throw HHuginn::HHuginnRuntimeException( "Changing upcasted reference.", file_id(), p );
-		}
-		int fi( oref->field_index( executionStep_._identifierId ) );
-		if ( fi >= 0 ) {
-			values.push( oref->field( t, fi, p ) );
-		} else if ( ( executionStep_._identifierId == IDENTIFIER::KEYWORD::CONSTRUCTOR ) && ( oref->reference_class()->type() == HHuginn::HClass::TYPE::BUILTIN ) ) {
-			values.push(
-				rt.object_factory()->create_bound_method(
-					hcore::call(
-						&HHuginn::HObject::init_base, _1, _2, _3, _4
-					),
-					oref->value()
-				)
-			);
-		} else {
-			throw HHuginn::HHuginnRuntimeException(
-				"`"_ys
-					.append( oref->reference_class()->name() )
-					.append( "' does not have `" )
-					.append( rt.identifier_name( executionStep_._identifierId ) )
-					.append( "' member (did you mean `" )
-					.append( rt.suggestion( executionStep_._identifierId ) )
-					.append( "'?)." ),
-				file_id(),
-				p
-			);
-		}
+	if ( executionStep_._access != HFrame::ACCESS::BOUND_CALL ) {
+		values.push( instruction::member( t, executionStep_._access, v, executionStep_._identifierId, p ) );
 	} else {
-		HString const* n( &v->get_class()->name() );
-		if ( v->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-			HHuginn::HFunctionReference* fr( static_cast<HHuginn::HFunctionReference*>( v.raw() ) );
-			n = &rt.identifier_name( fr->identifier_id() );
-			HHuginn::class_t c( rt.get_class( fr->identifier_id() ) );
-			if ( !!c ) {
-				int fi( c->field_index( executionStep_._identifierId, HHuginn::HClass::MEMBER_TYPE::STATIC ) );
-				n = &c->name();
-				if ( fi < 0 ) {
-					throw HHuginn::HHuginnRuntimeException(
-						"`"_ys
-							.append( *n )
-							.append( "' does not have `" )
-							.append( rt.identifier_name( executionStep_._identifierId ) )
-							.append( "' member (did you mean `" )
-							.append( rt.suggestion( executionStep_._identifierId ) )
-							.append( "'?)." ),
-						file_id(),
-						p
-					);
-				}
-				if ( executionStep_._access == HFrame::ACCESS::REFERENCE ) {
-					throw HHuginn::HHuginnRuntimeException( "Assignment to read-only location.", file_id(), p );
-				}
-				HHuginn::value_t const& f( c->field( fi ) );
-				values.push(
-					f->type_id() == HHuginn::TYPE::METHOD
-						? rt.object_factory()->create_unbound_method( c.raw(), static_cast<HHuginn::HClass::HMethod const*>( f.raw() )->function() )
-						: f
-				);
-			} else {
-				throw HHuginn::HHuginnRuntimeException( "`"_ys.append( *n ).append( "' is not a compound object." ), file_id(), p );
-			}
-		} else {
-			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( *n ).append( "' is not a compound object." ), file_id(), p );
+		HHuginn::value_t f( instruction::member( t, executionStep_._access, v, executionStep_._identifierId, p ) );
+		if ( f->type_id() == HHuginn::TYPE::METHOD ) {
+			values.push( yaal::move( v ) );
 		}
+		values.push( yaal::move( f ) );
 	}
 	return;
 	M_EPILOG

@@ -20,6 +20,7 @@ namespace instruction {
 
 HHuginn::value_t subscript( HThread*, HFrame::ACCESS, HHuginn::value_t&, HHuginn::value_t const&, int );
 HHuginn::value_t range( HThread*, HHuginn::value_t&, HHuginn::value_t const&, HHuginn::value_t const&, HHuginn::value_t const&, int );
+HHuginn::value_t member( HThread*, HFrame::ACCESS, HHuginn::value_t&, HHuginn::identifier_id_t, int );
 void add( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
 void sub( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
 void mul( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
