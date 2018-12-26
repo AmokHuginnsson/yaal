@@ -52,6 +52,7 @@ void OCompiler::detect_misuse( void ) const {
 		IDENTIFIER::STANDARD_FUNCTIONS::MAIN,
 		_runtime->identifier_id( INTERFACE::GET_SIZE ),
 		_runtime->identifier_id( INTERFACE::SUBSCRIPT ),
+		_runtime->identifier_id( INTERFACE::MEMBER ),
 		_runtime->identifier_id( INTERFACE::ITERATOR ),
 		_runtime->identifier_id( INTERFACE::IS_VALID ),
 		_runtime->identifier_id( INTERFACE::NEXT ),
