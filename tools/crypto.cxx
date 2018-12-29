@@ -26,7 +26,6 @@ void crypt_3des( yaal::hcore::HStreamInterface& src_, yaal::hcore::HStreamInterf
 	static int const BUF_SIZE( 128 );
 	HChunk buf( BUF_SIZE );
 	HDes des( key_ );
-	HRandomizer r;
 	int long const toRead( buf.get_size() );
 	M_ASSERT( toRead == BUF_SIZE );
 	char gap( 0 );
@@ -35,7 +34,7 @@ void crypt_3des( yaal::hcore::HStreamInterface& src_, yaal::hcore::HStreamInterf
 		gap = static_cast<char>( nRead % 8 );
 		if ( gap ) {
 			gap = static_cast<char>( 8 - gap );
-			generate_n( buf.get<char>() + nRead, gap, randomizer_helper::make_randomizer( 255 ) );
+			generate_n( buf.get<char>() + nRead, gap, random::rng_helper::make_random_number_generator( 255 ) );
 		}
 		int long toWrite( nRead + gap );
 		M_ASSERT( toWrite <= toRead );

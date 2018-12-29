@@ -5,17 +5,19 @@
 #include "base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
-#include "hrandomizer.hxx"
+#include "random.hxx"
 #include "hexception.hxx"
 #include "algorithm.hxx"
 #include "system.hxx"
 
+using namespace yaal::hcore;
+
 namespace yaal {
 
-namespace hcore {
+namespace random {
 
 namespace {
-	static int const MM = HRandomizer::STATE_SIZE / 2;
+	static int const MM = HRandomNumberGenerator::STATE_SIZE / 2;
 	static u64_t const MATRIX_A = 0xB5026F5AA96619E9ULL;
 	static u64_t const UM = 0xFFFFFFFF80000000ULL; /* Most significant 33 bits */
 	static u64_t const LM = 0x7FFFFFFFULL; /* Least significant 31 bits */
@@ -60,7 +62,7 @@ private:
 	}
 };
 
-HRandomizer::HRandomizer( u64_t seed_, u64_t cap_ )
+HRandomNumberGenerator::HRandomNumberGenerator( u64_t seed_, u64_t cap_ )
 	: _index( STATE_SIZE + 1 )
 	, _range( cap_ )
 	, _state() {
@@ -77,7 +79,7 @@ HRandomizer::HRandomizer( u64_t seed_, u64_t cap_ )
 	M_EPILOG
 }
 
-HRandomizer::HRandomizer( u64_t const* stateFirst_, u64_t const* stateLast_, u64_t cap_ )
+HRandomNumberGenerator::HRandomNumberGenerator( u64_t const* stateFirst_, u64_t const* stateLast_, u64_t cap_ )
 	: _index( STATE_SIZE + 1 )
 	, _range( cap_ )
 	, _state() {
@@ -89,7 +91,7 @@ HRandomizer::HRandomizer( u64_t const* stateFirst_, u64_t const* stateLast_, u64
 	M_EPILOG
 }
 
-void HRandomizer::swap( HRandomizer& randomizer_ ) {
+void HRandomNumberGenerator::swap( HRandomNumberGenerator& randomizer_ ) {
 	M_PROLOG
 	if ( &randomizer_ != this ) {
 		using yaal::swap;
@@ -101,7 +103,7 @@ void HRandomizer::swap( HRandomizer& randomizer_ ) {
 	M_EPILOG
 }
 
-void HRandomizer::init( u64_t seed_ ) {
+void HRandomNumberGenerator::init( u64_t seed_ ) {
 	M_PROLOG
 	_state[0] = seed_;
 	for ( _index = 1; _index < STATE_SIZE; ++ _index ) {
@@ -112,7 +114,7 @@ void HRandomizer::init( u64_t seed_ ) {
 	M_EPILOG
 }
 
-void HRandomizer::init( u64_t const* state_, int stateSize_ ) {
+void HRandomNumberGenerator::init( u64_t const* state_, int stateSize_ ) {
 	M_PROLOG
 	init( 19650218ULL );
 	int i( 1 );
@@ -144,13 +146,13 @@ void HRandomizer::init( u64_t const* state_, int stateSize_ ) {
 	M_EPILOG
 }
 
-u64_t HRandomizer::operator()( u64_t range_ ) {
+u64_t HRandomNumberGenerator::operator()( u64_t range_ ) {
 	M_PROLOG
 	return ( operator()() % range_ );
 	M_EPILOG
 }
 
-u64_t HRandomizer::operator()( void ) {
+u64_t HRandomNumberGenerator::operator()( void ) {
 	M_PROLOG
 	u64_t x( 0 );
 	u64_t const mag01[ 2 ] = { 0ULL, MATRIX_A };
@@ -178,13 +180,13 @@ u64_t HRandomizer::operator()( void ) {
 	M_EPILOG
 }
 
-namespace randomizer_helper {
+namespace rng_helper {
 
-HRandomizer make_randomizer( u64_t cap_ ) {
+HRandomNumberGenerator make_random_number_generator( u64_t cap_ ) {
 	M_PROLOG
 	struct timeval tv;
 	M_ENSURE( gettimeofday( &tv, nullptr ) == 0 );
-	return ( HRandomizer( static_cast<u64_t>( tv.tv_sec + tv.tv_usec + system::getpid() ), cap_ ) );
+	return ( HRandomNumberGenerator( static_cast<u64_t>( tv.tv_sec + tv.tv_usec + system::getpid() ), cap_ ) );
 	M_EPILOG
 }
 

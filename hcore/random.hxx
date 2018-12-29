@@ -1,26 +1,26 @@
 /* Read yaal/LICENSE.md file for copyright and licensing information. */
 
-/*! \file hcore/hrandomizer.hxx
- * \brief Declaration of HRandomizer class.
+/*! \file hcore/random.hxx
+ * \brief Declaration of random namespace and HRandomNumberGenerator class.
  */
 
-#ifndef YAAL_HCORE_HRANDOMIZER_HXX_INCLUDED
-#define YAAL_HCORE_HRANDOMIZER_HXX_INCLUDED 1
+#ifndef YAAL_HCORE_RANDOM_HXX_INCLUDED
+#define YAAL_HCORE_RANDOM_HXX_INCLUDED 1
 
 #include "hcore/pod.hxx"
 #include "hcore/numeric.hxx"
 
 namespace yaal {
 
-namespace hcore {
+namespace random {
 
-/*! \brief Pseudo-random number generator.
+/*! \brief (Pseudo)Random number generator.
  *
  * Congruent pseudo random number generator class.
  */
-class HRandomizer final {
+class HRandomNumberGenerator final {
 public:
-	typedef HRandomizer this_type;
+	typedef HRandomNumberGenerator this_type;
 	static int const STATE_SIZE = 312;
 private:
 	int _index;
@@ -32,7 +32,7 @@ public:
  * \param seed - initialize pseudo-random number generator with seed.
  * \param range - upper limit for generated number.
  */
-	HRandomizer( u64_t seed = 5489ULL, u64_t range = meta::max_unsigned<u64_t>::value );
+	HRandomNumberGenerator( u64_t seed = 5489ULL, u64_t range = meta::max_unsigned<u64_t>::value );
 
 /*! \brief Construct new randomizer.
  *
@@ -40,7 +40,7 @@ public:
  * \param stateLast_ - one past the end of pseudo-random number generator initial state range.
  * \param range - upper limit for generated number.
  */
-	HRandomizer( u64_t const* stateFirst_, u64_t const* stateLast_, u64_t range = meta::max_unsigned<u64_t>::value );
+	HRandomNumberGenerator( u64_t const* stateFirst_, u64_t const* stateLast_, u64_t range = meta::max_unsigned<u64_t>::value );
 
 /*! \brief Generate next random number.
  *
@@ -62,21 +62,21 @@ public:
 		return ( _range );
 	}
 
-	void swap( HRandomizer& );
+	void swap( HRandomNumberGenerator& );
 private:
 	void init( u64_t );
 	void init( u64_t const*, int );
 };
 
-/*! \brief Helper namespace for HRandomizer related utilities.
+/*! \brief Helper namespace for HRandomNumberGenerator related utilities.
  */
-namespace randomizer_helper {
+namespace rng_helper {
 
 /*! \brief Make randomizer object initialized with "random" seed.
  *
  * \param range - upper limit for generated numbers.
  */
-HRandomizer make_randomizer( u64_t range = meta::max_unsigned<u64_t>::value );
+HRandomNumberGenerator make_random_number_generator( u64_t range = meta::max_unsigned<u64_t>::value );
 
 }
 
@@ -84,5 +84,5 @@ HRandomizer make_randomizer( u64_t range = meta::max_unsigned<u64_t>::value );
 
 }
 
-#endif /* #ifndef YAAL_HCORE_HRANDOMIZER_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_RANDOM_HXX_INCLUDED */
 

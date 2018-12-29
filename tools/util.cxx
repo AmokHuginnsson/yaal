@@ -17,7 +17,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "xmath.hxx"
 #include "ansi.hxx"
 #include "hcore/hprogramoptionshandler.hxx"
-#include "hcore/hrandomizer.hxx"
+#include "hcore/random.hxx"
 #include "hcore/hstack.hxx"
 #include "hcore/hregex.hxx"
 #include "hterminal.hxx"

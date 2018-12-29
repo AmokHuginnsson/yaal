@@ -20,19 +20,19 @@ namespace tools {
 
 namespace huginn {
 
-HRandomizer::HRandomizer( HHuginn::HClass const* class_, yaal::u64_t cap_ )
+HRandomNumberGenerator::HRandomNumberGenerator( HHuginn::HClass const* class_, yaal::u64_t cap_ )
 	: HValue( class_ )
-	, _generator( randomizer_helper::make_randomizer( cap_ ) ) {
+	, _generator( random::rng_helper::make_random_number_generator( cap_ ) ) {
 	return;
 }
 
-HRandomizer::HRandomizer( HHuginn::HClass const* class_, yaal::hcore::HRandomizer const& generator_ )
+HRandomNumberGenerator::HRandomNumberGenerator( HHuginn::HClass const* class_, yaal::random::HRandomNumberGenerator const& generator_ )
 	: HValue( class_ )
 	, _generator( generator_ ) {
 	return;
 }
 
-HHuginn::value_t HRandomizer::create_instance( HHuginn::HClass const* class_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
+HHuginn::value_t HRandomNumberGenerator::create_instance( HHuginn::HClass const* class_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Randomizer.constructor";
 	verify_arg_count( name, values_, 0, 1, thread_, position_ );
@@ -41,27 +41,27 @@ HHuginn::value_t HRandomizer::create_instance( HHuginn::HClass const* class_, hu
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, ARITY::UNARY, thread_, position_ );
 		cap = static_cast<yaal::u64_t>( get_integer( values_[0] ) );
 	}
-	return ( thread_->object_factory().create<huginn::HRandomizer>( class_, cap ) );
+	return ( thread_->object_factory().create<huginn::HRandomNumberGenerator>( class_, cap ) );
 	M_EPILOG
 }
 
-HHuginn::value_t HRandomizer::seed( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+HHuginn::value_t HRandomNumberGenerator::seed( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Randomizer.seed";
 	verify_arg_count( name, values_, 0, 1, thread_, position_ );
-	HRandomizer* o( static_cast<HRandomizer*>( object_->raw() ) );
+	HRandomNumberGenerator* o( static_cast<HRandomNumberGenerator*>( object_->raw() ) );
 	if ( ! values_.is_empty() ) {
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, ARITY::UNARY, thread_, position_ );
 		yaal::u64_t data( static_cast<yaal::u64_t>( get_integer( values_[0] ) ) );
-		o->_generator = hcore::HRandomizer( data, o->_generator.range() );
+		o->_generator = random::HRandomNumberGenerator( data, o->_generator.range() );
 	} else {
-		o->_generator = randomizer_helper::make_randomizer( o->_generator.range() );
+		o->_generator = random::rng_helper::make_random_number_generator( o->_generator.range() );
 	}
 	return ( *object_ );
 	M_EPILOG
 }
 
-HHuginn::value_t HRandomizer::next( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+HHuginn::value_t HRandomNumberGenerator::next( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Randomizer.next";
 	verify_arg_count( name, values_, 0, 1, thread_, position_ );
@@ -70,12 +70,12 @@ HHuginn::value_t HRandomizer::next( huginn::HThread* thread_, HHuginn::value_t* 
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, ARITY::UNARY, thread_, position_ );
 		cap = static_cast<yaal::u64_t>( get_integer( values_[0] ) );
 	}
-	HRandomizer* o( static_cast<HRandomizer*>( object_->raw() ) );
+	HRandomNumberGenerator* o( static_cast<HRandomNumberGenerator*>( object_->raw() ) );
 	return ( thread_->object_factory().create_integer( static_cast<HHuginn::HInteger::value_type>( cap ? o->_generator( cap ) : o->_generator() ) ) );
 	M_EPILOG
 }
 
-HHuginn::value_t HRandomizer::next_real( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+HHuginn::value_t HRandomNumberGenerator::next_real( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Randomizer.next_real";
 	verify_arg_count( name, values_, 0, 1, thread_, position_ );
@@ -87,18 +87,18 @@ HHuginn::value_t HRandomizer::next_real( huginn::HThread* thread_, HHuginn::valu
 	if ( range <= 0.L ) {
 		throw HHuginn::HHuginnRuntimeException( "Invalid range specified: "_ys.append( range ), thread_->current_frame()->file_id(), position_ );
 	}
-	HRandomizer* o( static_cast<HRandomizer*>( object_->raw() ) );
+	HRandomNumberGenerator* o( static_cast<HRandomNumberGenerator*>( object_->raw() ) );
 	yaal::u64_t cap( o->_generator.range() );
 	yaal::u64_t value( o->_generator() );
 	return ( thread_->object_factory().create_real( ( static_cast<double long>( value ) / static_cast<double long>( cap ) ) * range ) );
 	M_EPILOG
 }
 
-HHuginn::value_t HRandomizer::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+HHuginn::value_t HRandomNumberGenerator::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Randomizer.to_string";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
-	HRandomizer* o( static_cast<HRandomizer*>( object_->raw() ) );
+	HRandomNumberGenerator* o( static_cast<HRandomNumberGenerator*>( object_->raw() ) );
 	HHuginn::HClass const* origin( o->HValue::get_class()->origin() );
 	HString s;
 	if ( origin ) {
@@ -114,7 +114,7 @@ HHuginn::value_t HRandomizer::to_string( huginn::HThread* thread_, HHuginn::valu
 	M_EPILOG
 }
 
-HHuginn::class_t HRandomizer::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
+HHuginn::class_t HRandomNumberGenerator::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
@@ -123,14 +123,14 @@ HHuginn::class_t HRandomizer::get_class( HRuntime* runtime_, HHuginn::HClass con
 			HHuginn::ACCESS::PUBLIC,
 			HHuginn::HClass::TYPE::BUILTIN,
 			origin_,
-			&HRandomizer::create_instance
+			&HRandomNumberGenerator::create_instance
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "next",      runtime_->create_method( &HRandomizer::next ),      "([ *range* ]) - get next `integer` random number, possibly restricted to given range" },
-		{ "next_real", runtime_->create_method( &HRandomizer::next_real ), "([ *range* ]) - get next `real` random number, possibly restricted to given range" },
-		{ "seed",      runtime_->create_method( &HRandomizer::seed ),      "([ *data* ]) - initialize random generator internal state based on supplied *data*, or using system entropy if no data is given" },
-		{ "to_string", runtime_->create_method( &HRandomizer::to_string ), "get string representation of this `Randomizer`" }
+		{ "next",      runtime_->create_method( &HRandomNumberGenerator::next ),      "([ *range* ]) - get next `integer` random number, possibly restricted to given range" },
+		{ "next_real", runtime_->create_method( &HRandomNumberGenerator::next_real ), "([ *range* ]) - get next `real` random number, possibly restricted to given range" },
+		{ "seed",      runtime_->create_method( &HRandomNumberGenerator::seed ),      "([ *data* ]) - initialize random generator internal state based on supplied *data*, or using system entropy if no data is given" },
+		{ "to_string", runtime_->create_method( &HRandomNumberGenerator::to_string ), "get string representation of this `Randomizer`" }
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );
@@ -138,8 +138,8 @@ HHuginn::class_t HRandomizer::get_class( HRuntime* runtime_, HHuginn::HClass con
 	M_EPILOG
 }
 
-HHuginn::value_t HRandomizer::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
-	return ( thread_->object_factory().create<HRandomizer>( HValue::get_class(), _generator ) );
+HHuginn::value_t HRandomNumberGenerator::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
+	return ( thread_->object_factory().create<HRandomNumberGenerator>( HValue::get_class(), _generator ) );
 }
 
 }

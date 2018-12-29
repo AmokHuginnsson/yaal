@@ -65,7 +65,7 @@ public:
 		, _randomizerClass(
 			add_class_as_member(
 				class_,
-				HRandomizer::get_class( class_->runtime(), class_ ),
+				HRandomNumberGenerator::get_class( class_->runtime(), class_ ),
 				"([ *cap* ]) - create random number generator which output values are capped at *cap*"
 			)
 		)

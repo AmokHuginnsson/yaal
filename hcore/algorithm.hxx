@@ -15,7 +15,7 @@
 #include "hcore/iterator.hxx"
 #include "hcore/functional.hxx"
 #include "hcore/hauxiliarybuffer.hxx"
-#include "hcore/hrandomizer.hxx"
+#include "hcore/random.hxx"
 
 namespace yaal {
 
@@ -2323,7 +2323,7 @@ inline void random_shuffle( iterator_t first_, iterator_t last_, generator_t ran
  */
 template<typename iterator_t>
 inline void random_shuffle( iterator_t first_, iterator_t last_ ) {
-	random_shuffle( first_, last_, hcore::randomizer_helper::make_randomizer() );
+	random_shuffle( first_, last_, random::rng_helper::make_random_number_generator() );
 	return;
 }
 
@@ -2364,7 +2364,7 @@ inline void random_sample( source_iterator_t srcFirst_, source_iterator_t srcLas
  */
 template<typename source_iterator_t, typename destination_iterator_t>
 inline void random_sample( source_iterator_t srcFirst_, source_iterator_t srcLast_, destination_iterator_t dstFirst_, destination_iterator_t dstLast_ ) {
-	random_sample( srcFirst_, srcLast_, dstFirst_, dstLast_, hcore::randomizer_helper::make_randomizer() );
+	random_sample( srcFirst_, srcLast_, dstFirst_, dstLast_, random::rng_helper::make_random_number_generator() );
 	return;
 }
 
