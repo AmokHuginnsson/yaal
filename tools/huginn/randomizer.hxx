@@ -16,10 +16,10 @@ namespace huginn {
 
 class HRandomNumberGenerator : public HHuginn::HValue {
 private:
-	yaal::random::HRandomNumberGenerator _generator;
+	yaal::random::distribution::HDiscrete _generator;
 public:
-	HRandomNumberGenerator( HHuginn::HClass const*, yaal::u64_t );
-	HRandomNumberGenerator( HHuginn::HClass const*, yaal::random::HRandomNumberGenerator const& );
+	HRandomNumberGenerator( HHuginn::HClass const*, yaal::i64_t );
+	HRandomNumberGenerator( HHuginn::HClass const*, yaal::random::distribution::HDiscrete const& );
 	static HHuginn::value_t seed( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t next( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t next_real( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );

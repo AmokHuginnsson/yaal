@@ -20,13 +20,13 @@ namespace tools {
 
 namespace huginn {
 
-HRandomNumberGenerator::HRandomNumberGenerator( HHuginn::HClass const* class_, yaal::u64_t cap_ )
+HRandomNumberGenerator::HRandomNumberGenerator( HHuginn::HClass const* class_, yaal::i64_t cap_ )
 	: HValue( class_ )
 	, _generator( random::rng_helper::make_random_number_generator( cap_ ) ) {
 	return;
 }
 
-HRandomNumberGenerator::HRandomNumberGenerator( HHuginn::HClass const* class_, yaal::random::HRandomNumberGenerator const& generator_ )
+HRandomNumberGenerator::HRandomNumberGenerator( HHuginn::HClass const* class_, yaal::random::distribution::HDiscrete const& generator_ )
 	: HValue( class_ )
 	, _generator( generator_ ) {
 	return;
@@ -36,10 +36,10 @@ HHuginn::value_t HRandomNumberGenerator::create_instance( HHuginn::HClass const*
 	M_PROLOG
 	char const name[] = "Randomizer.constructor";
 	verify_arg_count( name, values_, 0, 1, thread_, position_ );
-	yaal::u64_t cap( meta::max_unsigned<yaal::u64_t>::value );
+	yaal::i64_t cap( meta::max_signed<yaal::i64_t>::value );
 	if ( ! values_.is_empty() ) {
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, ARITY::UNARY, thread_, position_ );
-		cap = static_cast<yaal::u64_t>( get_integer( values_[0] ) );
+		cap = get_integer( values_[0] );
 	}
 	return ( thread_->object_factory().create<huginn::HRandomNumberGenerator>( class_, cap ) );
 	M_EPILOG
@@ -53,9 +53,9 @@ HHuginn::value_t HRandomNumberGenerator::seed( huginn::HThread* thread_, HHuginn
 	if ( ! values_.is_empty() ) {
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, ARITY::UNARY, thread_, position_ );
 		yaal::u64_t data( static_cast<yaal::u64_t>( get_integer( values_[0] ) ) );
-		o->_generator = random::HRandomNumberGenerator( data, o->_generator.range() );
+		o->_generator.set_seed( data );
 	} else {
-		o->_generator = random::rng_helper::make_random_number_generator( o->_generator.range() );
+		o->_generator = random::rng_helper::make_random_number_generator( static_cast<yaal::i64_t>( o->_generator.range() ) );
 	}
 	return ( *object_ );
 	M_EPILOG
@@ -71,7 +71,7 @@ HHuginn::value_t HRandomNumberGenerator::next( huginn::HThread* thread_, HHuginn
 		cap = static_cast<yaal::u64_t>( get_integer( values_[0] ) );
 	}
 	HRandomNumberGenerator* o( static_cast<HRandomNumberGenerator*>( object_->raw() ) );
-	return ( thread_->object_factory().create_integer( static_cast<HHuginn::HInteger::value_type>( cap ? o->_generator( cap ) : o->_generator() ) ) );
+	return ( thread_->object_factory().create_integer( cap ? static_cast<HHuginn::HInteger::value_type>( static_cast<u64_t>( o->_generator() ) % cap ) : o->_generator() ) );
 	M_EPILOG
 }
 
@@ -89,7 +89,7 @@ HHuginn::value_t HRandomNumberGenerator::next_real( huginn::HThread* thread_, HH
 	}
 	HRandomNumberGenerator* o( static_cast<HRandomNumberGenerator*>( object_->raw() ) );
 	yaal::u64_t cap( o->_generator.range() );
-	yaal::u64_t value( o->_generator() );
+	yaal::u64_t value( static_cast<u64_t>( o->_generator() ) );
 	return ( thread_->object_factory().create_real( ( static_cast<double long>( value ) / static_cast<double long>( cap ) ) * range ) );
 	M_EPILOG
 }

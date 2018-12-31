@@ -2305,7 +2305,7 @@ template<typename iterator_t, typename generator_t>
 inline void random_shuffle( iterator_t first_, iterator_t last_, generator_t randomGenerator_ ) {
 	int long count( last_ - first_ );
 	while ( count > 1 ) {
-		int long idx( static_cast<int long>( randomGenerator_( count ) ) );
+		int long idx( static_cast<int long>( randomGenerator_() % count ) );
 		M_ASSERT( ( idx >= 0 ) && ( idx < count ) );
 		-- count;
 		using yaal::swap;
@@ -2344,7 +2344,7 @@ inline void random_sample( source_iterator_t srcFirst_, source_iterator_t srcLas
 	int long dstCount( dstLast_ - dstFirst_ );
 	int long srcTop( ( src - srcFirst_ ) + 1 );
 	while ( src != srcLast_ ) {
-		int long idx( static_cast<int long>( randomGenerator_( srcTop ) ) );
+		int long idx( static_cast<int long>( randomGenerator_() % srcTop ) );
 		if ( idx < dstCount ) {
 			*( dstFirst_ + idx ) = *src;
 		}

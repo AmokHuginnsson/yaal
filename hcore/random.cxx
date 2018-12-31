@@ -62,26 +62,17 @@ private:
 	}
 };
 
-HRandomNumberGenerator::HRandomNumberGenerator( u64_t seed_, u64_t cap_ )
+HRandomNumberGenerator::HRandomNumberGenerator( u64_t seed_ )
 	: _index( STATE_SIZE + 1 )
-	, _range( cap_ )
 	, _state() {
 	M_PROLOG
-	HSimpleRandom sr( static_cast<u32_t>( ( seed_ >> 32 ) ^ seed_ ) );
-	u64_t state[STATE_SIZE];
-	for ( int i( 0 ); i < STATE_SIZE; ++ i ) {
-		u64_t hi( sr() );
-		u64_t lo( sr() );
-		state[i] = hi << 32 | lo;
-	}
-	init( state, STATE_SIZE );
+	set_seed( seed_ );
 	return;
 	M_EPILOG
 }
 
-HRandomNumberGenerator::HRandomNumberGenerator( u64_t const* stateFirst_, u64_t const* stateLast_, u64_t cap_ )
+HRandomNumberGenerator::HRandomNumberGenerator( u64_t const* stateFirst_, u64_t const* stateLast_ )
 	: _index( STATE_SIZE + 1 )
-	, _range( cap_ )
 	, _state() {
 	M_PROLOG
 	M_ASSERT( stateFirst_ && stateLast_ );
@@ -96,9 +87,22 @@ void HRandomNumberGenerator::swap( HRandomNumberGenerator& randomizer_ ) {
 	if ( &randomizer_ != this ) {
 		using yaal::swap;
 		swap( _index, randomizer_._index );
-		swap( _range, randomizer_._range );
 		swap_ranges( _state, _state + yaal::size( _state ), randomizer_._state );
 	}
+	return;
+	M_EPILOG
+}
+
+void HRandomNumberGenerator::set_seed( u64_t seed_ ) {
+	M_PROLOG
+	HSimpleRandom sr( static_cast<u32_t>( ( seed_ >> 32 ) ^ seed_ ) );
+	u64_t state[STATE_SIZE];
+	for ( int i( 0 ); i < STATE_SIZE; ++ i ) {
+		u64_t hi( sr() );
+		u64_t lo( sr() );
+		state[i] = hi << 32 | lo;
+	}
+	init( state, STATE_SIZE );
 	return;
 	M_EPILOG
 }
@@ -146,12 +150,6 @@ void HRandomNumberGenerator::init( u64_t const* state_, int stateSize_ ) {
 	M_EPILOG
 }
 
-u64_t HRandomNumberGenerator::operator()( u64_t range_ ) {
-	M_PROLOG
-	return ( operator()() % range_ );
-	M_EPILOG
-}
-
 u64_t HRandomNumberGenerator::operator()( void ) {
 	M_PROLOG
 	u64_t x( 0 );
@@ -176,17 +174,66 @@ u64_t HRandomNumberGenerator::operator()( void ) {
 	x ^= ( x << 17 ) & 0x71D67FFFEDA60000ULL;
 	x ^= ( x << 37 ) & 0xFFF7EEE000000000ULL;
 	x ^= ( x >> 43 );
-	return ( x % _range );
+	return ( x );
 	M_EPILOG
+}
+
+namespace distribution {
+
+HDistribution::HDistribution( void )
+	: _rng() {
+	return;
+}
+
+void HDistribution::set_seed( yaal::u64_t seed_ ) {
+	M_PROLOG
+	_rng.set_seed( seed_ );
+	return;
+	M_EPILOG
+}
+
+HDiscrete::HDiscrete( yaal::i64_t from_, yaal::i64_t to_ )
+	: HDistribution()
+	, _base( from_ )
+	, _num( 0 ) {
+	M_ASSERT( to_ >= from_ );
+	if ( ( from_ * to_ ) >= 0 ) {
+		_num = static_cast<u64_t>( to_ - from_ ) + 1;
+	} else {
+		_num = static_cast<u64_t>( to_ ) + static_cast<u64_t>( - from_ ) + 1;
+	}
+	return;
+}
+
+yaal::i64_t HDiscrete::operator()( void ) {
+	return ( static_cast<i64_t>( _rng() % _num ) + _base );
+}
+
+yaal::u64_t HDiscrete::range( void ) const {
+	return ( _num );
+}
+
+yaal::i64_t HDiscrete::do_next_discrete( void ) {
+	return ( operator()() );
+}
+
+double long HDiscrete::do_next_continuous( void ) {
+	M_ASSERT( !"Invalid use of discrete distribution."[0] );
+	return ( 0.0L );
+}
+
 }
 
 namespace rng_helper {
 
-HRandomNumberGenerator make_random_number_generator( u64_t cap_ ) {
+distribution::HDiscrete make_random_number_generator( i64_t cap_ ) {
 	M_PROLOG
+	M_ASSERT( cap_ >= 1 );
 	struct timeval tv;
 	M_ENSURE( gettimeofday( &tv, nullptr ) == 0 );
-	return ( HRandomNumberGenerator( static_cast<u64_t>( tv.tv_sec + tv.tv_usec + system::getpid() ), cap_ ) );
+	distribution::HDiscrete rng( 0, cap_ - 1 );
+	rng.set_seed( static_cast<u64_t>( tv.tv_sec + tv.tv_usec + system::getpid() ) );
+	return ( rng );
 	M_EPILOG
 }
 
