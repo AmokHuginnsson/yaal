@@ -97,6 +97,9 @@ protected:
 };
 
 class HUniform : public HDistribution {
+private:
+	double long _base;
+	double long _range;
 public:
 	HUniform( double long lower_, double long upper_ );
 	double long operator()( void );
@@ -106,21 +109,37 @@ protected:
 };
 
 class HTriangle : public HDistribution {
+	double long _infimum;
+	double long _supremum;
+	double long _mode;
+	double long _modeValue;
+	double long _lowerMod;
+	double long _upperMod;
 public:
-	HTriangle( double long lower_, double long upper_, double long mode_ );
+	HTriangle( double long infimum_, double long supremum_, double long mode_ );
 	double long operator()( void );
 protected:
 	virtual yaal::i64_t do_next_discrete( void ) override;
 	virtual double long do_next_continuous( void ) override;
 };
 
-class HGaussian : public HDistribution {
+/*! \brief Normal distribution.
+ *
+ * Using `Marsaglia polar method`.
+ */
+class HNormal : public HDistribution {
+	double long _mu;
+	double long _sigma;
+	double long _cache;
+	bool _cached;
 public:
-	HGaussian( double long mu_, double long sigma_ );
+	HNormal( double long mu_, double long sigma_ );
 	double long operator()( void );
 protected:
 	virtual yaal::i64_t do_next_discrete( void ) override;
 	virtual double long do_next_continuous( void ) override;
+private:
+	double long uniform_sample( void );
 };
 
 }

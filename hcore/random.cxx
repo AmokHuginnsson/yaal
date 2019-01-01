@@ -7,6 +7,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "random.hxx"
 #include "hexception.hxx"
+#include "math.hxx"
 #include "algorithm.hxx"
 #include "system.hxx"
 
@@ -220,6 +221,124 @@ yaal::i64_t HDiscrete::do_next_discrete( void ) {
 double long HDiscrete::do_next_continuous( void ) {
 	M_ASSERT( !"Invalid use of discrete distribution."[0] );
 	return ( 0.0L );
+}
+
+HUniform::HUniform( double long lower_, double long upper_ )
+	: HDistribution()
+	, _base( lower_ )
+	, _range( upper_ - lower_ ) {
+	M_ASSERT( upper_ > lower_ );
+	return;
+}
+
+double long HUniform::operator()( void ) {
+	double long numerator( static_cast<double long>( _rng() ) );
+	double long denominator( static_cast<double long>( _rng() ) );
+	if ( denominator == 0.0 ) {
+		denominator = 1.0;
+	}
+	double long x( numerator / denominator );
+	x *= _range;
+	x += _base;
+	return ( x );
+}
+
+yaal::i64_t HUniform::do_next_discrete( void ) {
+	M_ASSERT( !"Invalid use of continuous distribution."[0] );
+	return ( 0.0L );
+}
+
+double long HUniform::do_next_continuous( void ) {
+	return ( operator()() );
+}
+
+HTriangle::HTriangle( double long infimum_, double long supremum_, double long mode_ )
+	: HDistribution()
+	, _infimum( infimum_ )
+	, _supremum( supremum_ )
+	, _mode( mode_ )
+	, _modeValue( 0.0L )
+	, _lowerMod( 0.0L )
+	, _upperMod( 0.0L ) {
+	M_ASSERT( ( supremum_ > infimum_ ) && ( mode_ >= infimum_ ) && ( mode_ <= supremum_ ) );
+	_modeValue = ( _mode - _infimum ) / ( _supremum - _infimum );
+	_lowerMod = ( _supremum - _infimum ) * ( _mode - _infimum );
+	_upperMod = ( _supremum - _infimum ) * ( _supremum - _mode );
+	return;
+}
+
+double long HTriangle::operator()( void ) {
+	double long numerator( static_cast<double long>( _rng() ) );
+	double long denominator( static_cast<double long>( _rng() ) );
+	if ( denominator == 0.0 ) {
+		denominator = 1.0;
+	}
+	double long x( numerator / denominator );
+	if ( x < _modeValue ) {
+		x = _infimum + math::square_root( x * _lowerMod );
+	} else {
+		x = _supremum - math::square_root( ( 1 - x ) * _upperMod );
+	}
+	return ( x );
+}
+
+yaal::i64_t HTriangle::do_next_discrete( void ) {
+	M_ASSERT( !"Invalid use of continuous distribution."[0] );
+	return ( 0.0L );
+}
+
+double long HTriangle::do_next_continuous( void ) {
+	return ( operator()() );
+}
+
+HNormal::HNormal( double long mu_, double long sigma_ )
+	: HDistribution()
+	, _mu( mu_ )
+	, _sigma( sigma_ )
+	, _cache( 0.0L )
+	, _cached( false ) {
+	M_ASSERT( sigma_ > 0 );
+	return;
+}
+
+double long HNormal::operator()( void ) {
+	double long x( 0.0L );
+	if ( _cached ) {
+		_cached = false;
+		x = _cache;
+	} else {
+		double long u( uniform_sample() );
+		double long v( uniform_sample() );
+		double long s( u * u + v * v );
+		double long z(
+			math::square_root(
+				( -2.0L * math::natural_logarithm( s ) ) / s
+			)
+		);
+		x = u * z;
+		_cache = v * z;
+		_cached = true;
+	}
+	return ( x * _sigma + _mu );
+}
+
+double long HNormal::uniform_sample( void ) {
+	double long numerator( static_cast<double long>( _rng() ) );
+	double long denominator( static_cast<double long>( _rng() ) );
+	if ( denominator == 0.0 ) {
+		denominator = 1.0;
+	}
+	double long x( 2.0L * ( numerator / denominator ) - 1.0L );
+	return ( x );
+}
+
+yaal::i64_t HNormal::do_next_discrete( void ) {
+	M_ASSERT( !"Invalid use of continuous distribution."[0] );
+	return ( 0.0L );
+}
+
+double long HNormal::do_next_continuous( void ) {
+	return ( operator()() );
 }
 
 }
