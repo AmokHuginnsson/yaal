@@ -9,7 +9,8 @@
 
 #include "hcore/base.hxx"
 #include "hcore/trait.hxx"
-#include "hcore/algorithm.hxx"
+#include "hcore/algorithm_low.hxx"
+#include "hcore/functional.hxx"
 #include "hcore/memory.hxx"
 
 namespace yaal {

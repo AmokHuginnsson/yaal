@@ -4,6 +4,7 @@
 #define YAAL_DBWRAPPER_DB_DRIVER_HXX_INCLUDED 1
 
 #include "tools/hplugin.hxx"
+#include "hcore/hpair.hxx"
 
 namespace yaal {
 

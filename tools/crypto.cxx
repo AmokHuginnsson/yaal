@@ -4,6 +4,7 @@
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "crypto.hxx"
+#include "hcore/algorithm.hxx"
 #include "hdes.hxx"
 
 using namespace yaal::hcore;
