@@ -182,14 +182,26 @@ u64_t HRandomNumberGenerator::operator()( void ) {
 namespace distribution {
 
 HDistribution::HDistribution( void )
-	: _rng() {
+	: _rng( make_pointer<HRandomNumberGenerator>() ) {
 	return;
 }
 
-void HDistribution::set_seed( yaal::u64_t seed_ ) {
+void HDistribution::set_generator( generator_t const& generator_ ) {
 	M_PROLOG
-	_rng.set_seed( seed_ );
+	_rng = generator_;
 	return;
+	M_EPILOG
+}
+
+HDistribution::generator_t const& HDistribution::generator( void ) const {
+	M_PROLOG
+	return ( _rng );
+	M_EPILOG
+}
+
+HDistribution::generator_t HDistribution::generator( void ) {
+	M_PROLOG
+	return ( _rng );
 	M_EPILOG
 }
 
@@ -207,7 +219,7 @@ HDiscrete::HDiscrete( yaal::i64_t from_, yaal::i64_t to_ )
 }
 
 yaal::i64_t HDiscrete::operator()( void ) {
-	return ( static_cast<i64_t>( _rng() % _num ) + _base );
+	return ( static_cast<i64_t>( (*_rng)() % _num ) + _base );
 }
 
 yaal::u64_t HDiscrete::range( void ) const {
@@ -232,8 +244,8 @@ HUniform::HUniform( double long lower_, double long upper_ )
 }
 
 double long HUniform::operator()( void ) {
-	double long numerator( static_cast<double long>( _rng() ) );
-	double long denominator( static_cast<double long>( _rng() ) );
+	double long numerator( static_cast<double long>( (*_rng)() ) );
+	double long denominator( static_cast<double long>( (*_rng)() ) );
 	if ( denominator == 0.0 ) {
 		denominator = 1.0;
 	}
@@ -268,8 +280,8 @@ HTriangle::HTriangle( double long infimum_, double long supremum_, double long m
 }
 
 double long HTriangle::operator()( void ) {
-	double long numerator( static_cast<double long>( _rng() ) );
-	double long denominator( static_cast<double long>( _rng() ) );
+	double long numerator( static_cast<double long>( (*_rng)() ) );
+	double long denominator( static_cast<double long>( (*_rng)() ) );
 	if ( denominator == 0.0 ) {
 		denominator = 1.0;
 	}
@@ -323,8 +335,8 @@ double long HNormal::operator()( void ) {
 }
 
 double long HNormal::uniform_sample( void ) {
-	double long numerator( static_cast<double long>( _rng() ) );
-	double long denominator( static_cast<double long>( _rng() ) );
+	double long numerator( static_cast<double long>( (*_rng)() ) );
+	double long denominator( static_cast<double long>( (*_rng)() ) );
 	if ( denominator == 0.0 ) {
 		denominator = 1.0;
 	}
@@ -351,7 +363,7 @@ distribution::HDiscrete make_random_number_generator( i64_t cap_ ) {
 	struct timeval tv;
 	M_ENSURE( gettimeofday( &tv, nullptr ) == 0 );
 	distribution::HDiscrete rng( 0, cap_ - 1 );
-	rng.set_seed( static_cast<u64_t>( tv.tv_sec + tv.tv_usec + system::getpid() ) );
+	rng.generator()->set_seed( static_cast<u64_t>( tv.tv_sec + tv.tv_usec + system::getpid() ) );
 	return ( rng );
 	M_EPILOG
 }

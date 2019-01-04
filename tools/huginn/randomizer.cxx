@@ -104,7 +104,7 @@ HHuginn::value_t HRandomizer::seed( huginn::HThread* thread_, HHuginn::value_t* 
 	if ( ! values_.is_empty() ) {
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, ARITY::UNARY, thread_, position_ );
 		yaal::u64_t data( static_cast<yaal::u64_t>( get_integer( values_[0] ) ) );
-		o->_generator.set_seed( data );
+		o->_generator.generator()->set_seed( data );
 	} else {
 		o->_generator = random::rng_helper::make_random_number_generator( static_cast<yaal::i64_t>( o->_generator.range() ) );
 	}
@@ -172,7 +172,9 @@ HHuginn::class_t HRandomizer::get_class( HRuntime* runtime_, HHuginn::HClass con
 }
 
 HHuginn::value_t HRandomizer::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
-	return ( thread_->object_factory().create<HRandomizer>( HValue::get_class(), _generator ) );
+	random::distribution::HDiscrete generator( _generator );
+	generator.set_generator( make_pointer<random::HRandomNumberGenerator>( *_generator.generator() ) );
+	return ( thread_->object_factory().create<HRandomizer>( HValue::get_class(), generator ) );
 }
 
 }

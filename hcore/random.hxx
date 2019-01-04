@@ -9,6 +9,7 @@
 
 #include "hcore/pod.hxx"
 #include "hcore/numeric.hxx"
+#include "hcore/hpointer.hxx"
 
 namespace yaal {
 
@@ -37,7 +38,6 @@ public:
  *
  * \param stateFirst_ - beginning of pseudo-random number generator initial state range.
  * \param stateLast_ - one past the end of pseudo-random number generator initial state range.
- * \param range - upper limit for generated number.
  */
 	HRandomNumberGenerator( u64_t const* stateFirst_, u64_t const* stateLast_ );
 
@@ -61,12 +61,16 @@ private:
 namespace distribution {
 
 class HDistribution {
+public:
+	typedef yaal::hcore::HPointer<yaal::random::HRandomNumberGenerator> generator_t;
 protected:
-	HRandomNumberGenerator _rng;
+	generator_t _rng;
 public:
 	HDistribution( void );
 	virtual ~HDistribution( void ) {}
-	void set_seed( yaal::u64_t );
+	void set_generator( generator_t const& );
+	generator_t const& generator( void ) const;
+	generator_t generator( void );
 
 /*! \brief Generate next random number from discrete distribution.
  *
