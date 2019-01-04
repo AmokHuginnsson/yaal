@@ -71,28 +71,80 @@ public:
 	}
 };
 
-HRandomizer::HRandomizer( HHuginn::HClass const* class_, yaal::i64_t cap_ )
+HRandomizer::HRandomizer( HHuginn::HClass const* class_, DISTRIBUTION distribution_, distribution_t&& generator_ )
 	: HValue( class_ )
-	, _generator( random::rng_helper::make_random_number_generator( cap_ ) ) {
-	return;
-}
-
-HRandomizer::HRandomizer( HHuginn::HClass const* class_, yaal::random::distribution::HDiscrete const& generator_ )
-	: HValue( class_ )
-	, _generator( generator_ ) {
+	, _distribution( distribution_ )
+	, _generator( yaal::move( generator_ ) ) {
 	return;
 }
 
 HHuginn::value_t HRandomizer::create_instance( HHuginn::HClass const* class_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Randomizer.constructor";
-	verify_arg_count( name, values_, 0, 1, thread_, position_ );
-	yaal::i64_t cap( meta::max_signed<yaal::i64_t>::value );
-	if ( ! values_.is_empty() ) {
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, ARITY::UNARY, thread_, position_ );
-		cap = get_integer( values_[0] );
+	verify_arg_count( name, values_, 3, 4, thread_, position_ );
+	HObjectFactory& of( thread_->object_factory() );
+	HHuginn::HClass const* dc( static_cast<HRandomizerClass const*>( class_ )->distribution_class() );
+	HHuginn::HClass const* ic( of.integer_class() );
+	HHuginn::HClass const* rc( of.real_class() );
+	verify_arg_type( name, values_, 0, dc, ARITY::MULTIPLE, thread_, position_ );
+	DISTRIBUTION distribution( static_cast<DISTRIBUTION>( get_enumeral( values_[0] ) ) );
+	distribution_t generator;
+	switch ( distribution ) {
+		case ( DISTRIBUTION::DISCRETE ): {
+			verify_signature_by_class( name, values_, { dc, ic, ic }, thread_, position_ );
+			yaal::i64_t from( get_integer( values_[1] ) );
+			yaal::i64_t to( get_integer( values_[2] ) );
+			if ( to < from ) {
+				throw HHuginn::HHuginnRuntimeException(
+					"Invalid DISCRETE parametrization.",
+					thread_->current_frame()->file_id(),
+					position_
+				);
+			}
+			generator = make_resource<random::distribution::HDiscrete>( from, to );
+		} break;
+		case ( DISTRIBUTION::UNIFORM ): {
+			verify_signature_by_class( name, values_, { dc, rc, rc }, thread_, position_ );
+			double long infimum( get_real( values_[1] ) );
+			double long supremum( get_real( values_[2] ) );
+			if ( infimum >= supremum ) {
+				throw HHuginn::HHuginnRuntimeException(
+					"Invalid UNIFORM parametrization.",
+					thread_->current_frame()->file_id(),
+					position_
+				);
+			}
+			generator = make_resource<random::distribution::HUniform>( infimum, supremum );
+		} break;
+		case ( DISTRIBUTION::TRIANGLE ): {
+			verify_signature_by_class( name, values_, { dc, rc, rc, rc }, thread_, position_ );
+			double long infimum( get_real( values_[1] ) );
+			double long supremum( get_real( values_[2] ) );
+			double long mode( get_real( values_[3] ) );
+			if ( ( infimum >= supremum ) || ( mode < infimum ) || ( mode > supremum ) ) {
+				throw HHuginn::HHuginnRuntimeException(
+					"Invalid TRIANGLE parametrization.",
+					thread_->current_frame()->file_id(),
+					position_
+				);
+			}
+			generator = make_resource<random::distribution::HTriangle>( infimum, supremum, mode );
+		} break;
+		case ( DISTRIBUTION::NORMAL ): {
+			verify_signature_by_class( name, values_, { dc, rc, rc }, thread_, position_ );
+			double long mu( get_real( values_[1] ) );
+			double long sigma( get_real( values_[2] ) );
+			if ( sigma <= 0 ) {
+				throw HHuginn::HHuginnRuntimeException(
+					"Invalid NORMAL parametrization.",
+					thread_->current_frame()->file_id(),
+					position_
+				);
+			}
+			generator = make_resource<random::distribution::HNormal>( mu, sigma );
+		} break;
 	}
-	return ( thread_->object_factory().create<huginn::HRandomizer>( class_, cap ) );
+	return ( of.create<HRandomizer>( class_, distribution, yaal::move( generator ) ) );
 	M_EPILOG
 }
 
@@ -104,9 +156,9 @@ HHuginn::value_t HRandomizer::seed( huginn::HThread* thread_, HHuginn::value_t* 
 	if ( ! values_.is_empty() ) {
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, ARITY::UNARY, thread_, position_ );
 		yaal::u64_t data( static_cast<yaal::u64_t>( get_integer( values_[0] ) ) );
-		o->_generator.generator()->set_seed( data );
+		o->_generator->generator()->set_seed( data );
 	} else {
-		o->_generator = random::rng_helper::make_random_number_generator( static_cast<yaal::i64_t>( o->_generator.range() ) );
+		o->_generator->set_generator( make_pointer<random::HRandomNumberGenerator>() );
 	}
 	return ( *object_ );
 	M_EPILOG
@@ -115,14 +167,13 @@ HHuginn::value_t HRandomizer::seed( huginn::HThread* thread_, HHuginn::value_t* 
 HHuginn::value_t HRandomizer::next( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Randomizer.next";
-	verify_arg_count( name, values_, 0, 1, thread_, position_ );
-	yaal::u64_t cap( 0 );
-	if ( ! values_.is_empty() ) {
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, ARITY::UNARY, thread_, position_ );
-		cap = static_cast<yaal::u64_t>( get_integer( values_[0] ) );
-	}
+	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HRandomizer* o( static_cast<HRandomizer*>( object_->raw() ) );
-	return ( thread_->object_factory().create_integer( cap ? static_cast<HHuginn::HInteger::value_type>( static_cast<u64_t>( o->_generator() ) % cap ) : o->_generator() ) );
+	return (
+		o->_distribution == DISTRIBUTION::DISCRETE
+			? thread_->object_factory().create_integer( o->_generator->next_discrete() )
+			: thread_->object_factory().create_real( o->_generator->next_continuous() )
+	);
 	M_EPILOG
 }
 
@@ -137,9 +188,28 @@ HHuginn::value_t HRandomizer::to_string( huginn::HThread* thread_, HHuginn::valu
 		s.append( thread_->runtime().package_name( origin ) ).append( "." );
 	}
 	s.append( "Randomizer(" );
-	yaal::u64_t cap( o->_generator.range() );
-	if ( cap != meta::max_unsigned<yaal::u64_t>::value ) {
-		s.append( cap );
+	if ( origin ) {
+		s.append( thread_->runtime().package_name( origin ) ).append( "." );
+	}
+	s.append( "Randomizer.DISTRIBUTION." );
+	random::distribution::HDistribution const* distribution( o->_generator.raw() );
+	switch ( o->_distribution ) {
+		case ( DISTRIBUTION::DISCRETE ): {
+			random::distribution::HDiscrete const& d( *static_cast<random::distribution::HDiscrete const*>( distribution ) );
+			s.append( "DISCRETE, " ).append( d.from() ).append( ", " ).append( d.to() );
+		} break;
+		case ( DISTRIBUTION::UNIFORM ): {
+			random::distribution::HUniform const& u( *static_cast<random::distribution::HUniform const*>( distribution ) );
+			s.append( "UNIFORM, " ).append( u.infimum() ).append( ", " ).append( u.supremum() );
+		} break;
+		case ( DISTRIBUTION::TRIANGLE ): {
+			random::distribution::HTriangle const& t( *static_cast<random::distribution::HTriangle const*>( distribution ) );
+			s.append( "TRIANGLE, " ).append( t.infimum() ).append( ", " ).append( t.supremum() ).append( ", " ).append( t.mode() );
+		} break;
+		case ( DISTRIBUTION::NORMAL ): {
+			random::distribution::HNormal const& n( *static_cast<random::distribution::HNormal const*>( distribution ) );
+			s.append( "NORMAL, " ).append( n.mu() ).append( ", " ).append( n.sigma() );
+		} break;
 	}
 	s.append( ")" );
 	return ( thread_->runtime().object_factory()->create_string( yaal::move( s ) ) );
@@ -171,10 +241,30 @@ HHuginn::class_t HRandomizer::get_class( HRuntime* runtime_, HHuginn::HClass con
 	M_EPILOG
 }
 
-HHuginn::value_t HRandomizer::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
-	random::distribution::HDiscrete generator( _generator );
-	generator.set_generator( make_pointer<random::HRandomNumberGenerator>( *_generator.generator() ) );
-	return ( thread_->object_factory().create<HRandomizer>( HValue::get_class(), generator ) );
+HHuginn::value_t HRandomizer::do_clone( huginn::HThread* thread_, HHuginn::value_t* object_, int ) const {
+	HRandomizer* o( static_cast<HRandomizer*>( object_->raw() ) );
+	distribution_t distribution;
+	random::distribution::HDistribution const* source( o->_generator.raw() );
+	switch ( o->_distribution ) {
+		case ( DISTRIBUTION::DISCRETE ): {
+			random::distribution::HDiscrete const& d( *static_cast<random::distribution::HDiscrete const*>( source ) );
+			distribution = make_resource<random::distribution::HDiscrete>( d.from(), d.to() );
+		} break;
+		case ( DISTRIBUTION::UNIFORM ): {
+			random::distribution::HUniform const& u( *static_cast<random::distribution::HUniform const*>( source ) );
+			distribution = make_resource<random::distribution::HUniform>( u.infimum(), u.supremum() );
+		} break;
+		case ( DISTRIBUTION::TRIANGLE ): {
+			random::distribution::HTriangle const& t( *static_cast<random::distribution::HTriangle const*>( source ) );
+			distribution = make_resource<random::distribution::HTriangle>( t.infimum(), t.supremum(), t.mode() );
+		} break;
+		case ( DISTRIBUTION::NORMAL ): {
+			random::distribution::HNormal const& n( *static_cast<random::distribution::HNormal const*>( source ) );
+			distribution = make_resource<random::distribution::HNormal>( n.mu(), n.sigma() );
+		} break;
+	}
+	distribution->set_generator( make_pointer<random::HRandomNumberGenerator>( *source->generator() ) );
+	return ( thread_->object_factory().create<HRandomizer>( HValue::get_class(), o->_distribution, yaal::move( distribution ) ) );
 }
 
 }

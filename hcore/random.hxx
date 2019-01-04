@@ -29,10 +29,15 @@ private:
 public:
 /*! \brief Construct new randomizer.
  *
- * \param seed - initialize pseudo-random number generator with seed.
- * \param range - upper limit for generated number.
+ * Initialize internal state from Realitys entropy.
  */
-	HRandomNumberGenerator( u64_t seed = 5489ULL );
+	HRandomNumberGenerator( void );
+
+/*! \brief Construct new randomizer.
+ *
+ * \param seed - initialize pseudo-random number generator with seed.
+ */
+	HRandomNumberGenerator( u64_t seed );
 
 /*! \brief Construct new randomizer.
  *
@@ -47,7 +52,6 @@ public:
 
 /*! \brief Generate next random number.
  *
- * \param range - upper limit for generated number.
  * \return next random number capped to randomizer instance default value.
  */
 	u64_t operator()( void );
@@ -94,7 +98,13 @@ private:
 public:
 	HDiscrete( yaal::i64_t from_, yaal::i64_t to_ );
 	i64_t operator()( void );
-	u64_t range( void ) const;
+	u64_t range( void ) const {
+		return ( _num );
+	}
+	i64_t from( void ) const {
+		return ( _base );
+	}
+	i64_t to( void ) const;
 protected:
 	virtual yaal::i64_t do_next_discrete( void ) override;
 	virtual double long do_next_continuous( void ) override;
@@ -107,6 +117,12 @@ private:
 public:
 	HUniform( double long lower_, double long upper_ );
 	double long operator()( void );
+	double long infimum( void ) const {
+		return ( _base );
+	}
+	double long supremum( void ) const {
+		return ( _base + _range );
+	}
 protected:
 	virtual yaal::i64_t do_next_discrete( void ) override;
 	virtual double long do_next_continuous( void ) override;
@@ -122,6 +138,15 @@ class HTriangle : public HDistribution {
 public:
 	HTriangle( double long infimum_, double long supremum_, double long mode_ );
 	double long operator()( void );
+	double long infimum( void ) const {
+		return ( _infimum );
+	}
+	double long supremum( void ) const {
+		return ( _supremum );
+	}
+	double long mode( void ) const {
+		return ( _mode );
+	}
 protected:
 	virtual yaal::i64_t do_next_discrete( void ) override;
 	virtual double long do_next_continuous( void ) override;
@@ -139,6 +164,12 @@ class HNormal : public HDistribution {
 public:
 	HNormal( double long mu_, double long sigma_ );
 	double long operator()( void );
+	double long mu( void ) const {
+		return ( _mu );
+	}
+	double long sigma( void ) const {
+		return ( _sigma );
+	}
 protected:
 	virtual yaal::i64_t do_next_discrete( void ) override;
 	virtual double long do_next_continuous( void ) override;

@@ -63,6 +63,37 @@ private:
 	}
 };
 
+namespace {
+u64_t entropy( void ) {
+	struct timeval tv;
+	M_ENSURE( gettimeofday( &tv, nullptr ) == 0 );
+	system::HResourceInfo ri( system::get_memory_size_info() );
+	u64_t pid( static_cast<u64_t>( system::getpid() ) );
+	u64_t hb( 1ULL << 63 );
+	while ( pid && ! ( pid & hb ) ) {
+		pid <<= 1;
+	}
+	u64_t time( static_cast<u64_t>( tv.tv_sec + tv.tv_usec ) );
+	int shift( 0 );
+	while ( time && ! ( time & hb ) ) {
+		time <<= 1;
+		++ shift;
+	}
+	time >>= ( shift / 2 );
+	u64_t mem( static_cast<u64_t>( ri.free() ) );
+	return ( pid ^ time ^ mem );
+}
+}
+
+HRandomNumberGenerator::HRandomNumberGenerator( void )
+	: _index( STATE_SIZE + 1 )
+	, _state() {
+	M_PROLOG
+	set_seed( entropy() );
+	return;
+	M_EPILOG
+}
+
 HRandomNumberGenerator::HRandomNumberGenerator( u64_t seed_ )
 	: _index( STATE_SIZE + 1 )
 	, _state() {
@@ -213,17 +244,25 @@ HDiscrete::HDiscrete( yaal::i64_t from_, yaal::i64_t to_ )
 	if ( ( from_ * to_ ) >= 0 ) {
 		_num = static_cast<u64_t>( to_ - from_ ) + 1;
 	} else {
-		_num = static_cast<u64_t>( to_ ) + static_cast<u64_t>( - from_ ) + 1;
+		_num = static_cast<u64_t>( to_ ) + static_cast<u64_t>( -from_ ) + 1;
 	}
 	return;
 }
 
-yaal::i64_t HDiscrete::operator()( void ) {
-	return ( static_cast<i64_t>( (*_rng)() % _num ) + _base );
+yaal::i64_t HDiscrete::to( void ) const {
+	yaal::i64_t t( 0 );
+	if ( _base > 0 ) {
+		t = _base + static_cast<yaal::i64_t>( _num - 1 );
+	} else if ( ( _num - 1 ) <= static_cast<u64_t>( meta::max_signed<yaal::i64_t>::value ) ) {
+		t = _base + static_cast<yaal::i64_t>( _num - 1 );
+	} else {
+		t = static_cast<yaal::i64_t>( _num - static_cast<yaal::u64_t>( -_base ) - 1 );
+	}
+	return ( t );
 }
 
-yaal::u64_t HDiscrete::range( void ) const {
-	return ( _num );
+yaal::i64_t HDiscrete::operator()( void ) {
+	return ( static_cast<i64_t>( (*_rng)() % _num ) + _base );
 }
 
 yaal::i64_t HDiscrete::do_next_discrete( void ) {
@@ -235,6 +274,12 @@ double long HDiscrete::do_next_continuous( void ) {
 	return ( 0.0L );
 }
 
+inline double long to_standard_uniform( yaal::u64_t x_ ) {
+	double long numerator( static_cast<double long>( x_ ) );
+	double long denominator( static_cast<double long>( meta::max_unsigned<yaal::u64_t>::value ) );
+	return ( min( max( 0.0L, numerator / denominator ), 1.0L ) );
+}
+
 HUniform::HUniform( double long lower_, double long upper_ )
 	: HDistribution()
 	, _base( lower_ )
@@ -244,12 +289,7 @@ HUniform::HUniform( double long lower_, double long upper_ )
 }
 
 double long HUniform::operator()( void ) {
-	double long numerator( static_cast<double long>( (*_rng)() ) );
-	double long denominator( static_cast<double long>( (*_rng)() ) );
-	if ( denominator == 0.0 ) {
-		denominator = 1.0;
-	}
-	double long x( numerator / denominator );
+	double long x( to_standard_uniform( (*_rng)() ) );
 	x *= _range;
 	x += _base;
 	return ( x );
@@ -280,12 +320,7 @@ HTriangle::HTriangle( double long infimum_, double long supremum_, double long m
 }
 
 double long HTriangle::operator()( void ) {
-	double long numerator( static_cast<double long>( (*_rng)() ) );
-	double long denominator( static_cast<double long>( (*_rng)() ) );
-	if ( denominator == 0.0 ) {
-		denominator = 1.0;
-	}
-	double long x( numerator / denominator );
+	double long x( to_standard_uniform( (*_rng)() ) );
 	if ( x < _modeValue ) {
 		x = _infimum + math::square_root( x * _lowerMod );
 	} else {
@@ -319,9 +354,14 @@ double long HNormal::operator()( void ) {
 		_cached = false;
 		x = _cache;
 	} else {
-		double long u( uniform_sample() );
-		double long v( uniform_sample() );
-		double long s( u * u + v * v );
+		double long s( 2.0L );
+		double long u( 0.0L );
+		double long v( 0.0L );
+		while ( s >= 1.0L ) {
+			u = uniform_sample();
+			v = uniform_sample();
+			s = u * u + v * v;
+		}
 		double long z(
 			math::square_root(
 				( -2.0L * math::natural_logarithm( s ) ) / s
@@ -335,13 +375,8 @@ double long HNormal::operator()( void ) {
 }
 
 double long HNormal::uniform_sample( void ) {
-	double long numerator( static_cast<double long>( (*_rng)() ) );
-	double long denominator( static_cast<double long>( (*_rng)() ) );
-	if ( denominator == 0.0 ) {
-		denominator = 1.0;
-	}
-	double long x( 2.0L * ( numerator / denominator ) - 1.0L );
-	return ( x );
+	double long x( to_standard_uniform( (*_rng)() ) );
+	return ( min( max( -1.0L, ( 2 * x ) - 1.0L ), 1.0L ) );
 }
 
 yaal::i64_t HNormal::do_next_discrete( void ) {
@@ -360,11 +395,7 @@ namespace rng_helper {
 distribution::HDiscrete make_random_number_generator( i64_t cap_ ) {
 	M_PROLOG
 	M_ASSERT( cap_ >= 1 );
-	struct timeval tv;
-	M_ENSURE( gettimeofday( &tv, nullptr ) == 0 );
-	distribution::HDiscrete rng( 0, cap_ - 1 );
-	rng.generator()->set_seed( static_cast<u64_t>( tv.tv_sec + tv.tv_usec + system::getpid() ) );
-	return ( rng );
+	return ( distribution::HDiscrete( 0, cap_ - 1 ) );
 	M_EPILOG
 }
 
