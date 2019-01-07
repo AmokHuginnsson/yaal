@@ -681,7 +681,11 @@ protected:
 		, DELETER( deleter_ )
 		, _allocator( allocator_ ) {
 	}
-	virtual void do_delete( void ) override {
+	virtual void do_delete( void ) override
+#if defined ( __GNUC__ ) && ! defined ( __clang__ ) && defined( NDEBUG )
+		__attribute__((used))
+#endif /* defined ( __GNUC__ ) && ! defined ( __clang__ ) && defined( NDEBUG ) */
+	{
 		DELETER( HSharedBase<tType>::_object );
 		HSharedBase<tType>::_object = nullptr;
 	}
