@@ -219,13 +219,12 @@ HPackageCreatorInterface::HInstance HPackageFactory::compile_module(
 	loader.load( src );
 	loader.preprocess();
 	M_ASSERT( static_cast<int>( contextHuginn._sources.get_size() - 1 ) == contextHuginn._compiler->_fileId );
-	loader._compiler->_fileId = contextHuginn._compiler->_fileId;
+	HScopedValueReplacement<int> saveFileId( loader._compiler->_fileId, contextHuginn._compiler->_fileId );
 	loader._sources.insert( loader._sources.begin(), contextHuginn._sources.begin(), contextHuginn._sources.end() );
 	if ( ! ( loader.parse() && loader.compile( paths_, contextRuntime_->compiler_setup() ) ) ) {
 		contextRuntime_->fix_references();
 		throw HHuginn::HHuginnRuntimeException( loader.error_message(), contextHuginn._compiler->_fileId, position_ );
 	}
-	contextHuginn._compiler->_fileId = loader._compiler->_fileId;
 	loader._state = HHuginn::STATE::PARSED;
 	HHuginn::class_t c( loaderRuntime.make_package( name_, *contextRuntime_ ) );
 	contextRuntime_->copy_text( loaderRuntime );
