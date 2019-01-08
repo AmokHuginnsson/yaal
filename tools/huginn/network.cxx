@@ -36,10 +36,16 @@ public:
 		, _streamClass( HStream::get_class( class_->runtime() ) ) {
 		return;
 	}
-	static HHuginn::value_t resolve( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+	static HHuginn::value_t resolve( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "Network.resolve", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
-		return ( thread_->object_factory().create_string( resolver::ip_to_string( resolver::get_ip( get_string( values_[0] ) ) ) ) );
+		HString s;
+		try {
+			s = resolver::ip_to_string( resolver::get_ip( get_string( values_[0] ) ) );
+		} catch ( HResolverException const& e ) {
+			thread_->raise( static_cast<HNetwork*>( object_->raw() )->exception_class(), e.what(), position_ );
+		}
+		return ( thread_->object_factory().create_string( yaal::move( s ) ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t connect( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
