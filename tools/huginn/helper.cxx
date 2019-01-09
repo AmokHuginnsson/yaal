@@ -225,6 +225,19 @@ void verify_arg_count( char const* name_, HHuginn::values_t& values_, int min_, 
 	M_EPILOG
 }
 
+yaal::hcore::HString full_class_name( huginn::HThread* thread_, HHuginn::value_t const& value_ ) {
+	M_PROLOG
+	HHuginn::HClass const* cls( value_->get_class() );
+	HString const* originName( thread_->runtime().package_name( cls->origin() ) );
+	HString cn;
+	if ( originName ) {
+		cn.append( *originName ).append( "." );
+	}
+	cn.append( cls->name() );
+	return ( cn );
+	M_EPILOG
+}
+
 yaal::hcore::HString a_type_name( HHuginn::TYPE type_ ) {
 	M_PROLOG
 	hcore::HString tn( type_name( type_ ) );

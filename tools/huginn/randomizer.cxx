@@ -182,16 +182,8 @@ HHuginn::value_t HRandomizer::to_string( huginn::HThread* thread_, HHuginn::valu
 	char const name[] = "Randomizer.to_string";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HRandomizer* o( static_cast<HRandomizer*>( object_->raw() ) );
-	HHuginn::HClass const* origin( o->HValue::get_class()->origin() );
-	HString s;
-	if ( origin ) {
-		s.append( thread_->runtime().package_name( origin ) ).append( "." );
-	}
-	s.append( "Randomizer(" );
-	if ( origin ) {
-		s.append( thread_->runtime().package_name( origin ) ).append( "." );
-	}
-	s.append( "Randomizer.DISTRIBUTION." );
+	HString s( full_class_name( thread_, *object_ ) );
+	s.append( "(" ).append( full_class_name( thread_, *object_ ) ).append( ".DISTRIBUTION." );
 	random::distribution::HDistribution const* distribution( o->_generator.raw() );
 	switch ( o->_distribution ) {
 		case ( DISTRIBUTION::DISCRETE ): {

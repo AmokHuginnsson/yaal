@@ -1050,8 +1050,9 @@ yaal::hcore::HString string_representation( HThread* thread_, HHuginn::value_t c
 				HHuginn::HFunctionReference const& fr( *static_cast<HHuginn::HFunctionReference const*>( value_.raw() ) );
 				HRuntime& r( thread_->runtime() );
 				HHuginn::HClass const* c( r.get_class( fr.function().id() ) );
-				if ( !! c && c->origin() ) {
-					str.assign( r.package_name( c->origin() ) ).append( "." );
+				HString const* originName( !!c ? r.package_name( c->origin() ) : nullptr );
+				if ( originName ) {
+					str.assign( *originName ).append( "." );
 				}
 				str.append( r.identifier_name( fr.identifier_id() ) );
 			} else {

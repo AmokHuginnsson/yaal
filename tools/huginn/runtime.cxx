@@ -1080,17 +1080,16 @@ yaal::hcore::HString const& HRuntime::function_name( void const* id_ ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString const& HRuntime::package_name( HHuginn::HClass const* class_ ) const {
+yaal::hcore::HString const* HRuntime::package_name( HHuginn::HClass const* class_ ) const {
 	M_PROLOG
-	static yaal::hcore::HString const unknown( "unknown" );
-	yaal::hcore::HString const* name( &unknown );
+	yaal::hcore::HString const* name( nullptr );
 	for ( global_definitions_t::value_type const& gd : _globalDefinitions ) {
 		if ( (*gd.second)->get_class() == class_ ) {
 			name = &identifier_name( gd.first );
 			break;
 		}
 	}
-	return ( *name );
+	return ( name );
 	M_EPILOG
 }
 

@@ -246,7 +246,7 @@ public:
 	yaal::hcore::HString suggestion( HHuginn::HClass const*, HHuginn::identifier_id_t ) const;
 
 	yaal::hcore::HString const& function_name( void const* ) const;
-	yaal::hcore::HString const& package_name( HHuginn::HClass const* ) const;
+	yaal::hcore::HString const* package_name( HHuginn::HClass const* ) const;
 	void copy_text( HRuntime& );
 	void fix_references( void );
 	HHuginn::class_t make_package( yaal::hcore::HString const&, HRuntime const& );

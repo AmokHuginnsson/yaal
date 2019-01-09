@@ -166,12 +166,8 @@ HHuginn::value_t HComplex::to_string( huginn::HThread* thread_, HHuginn::value_t
 	char const name[] = "Complex.to_string";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HComplex* o( static_cast<HComplex*>( object_->raw() ) );
-	HHuginn::HClass const* origin( o->HValue::get_class()->origin() );
-	HString s;
-	if ( origin ) {
-		s.append( thread_->runtime().package_name( origin ) ).append( "." );
-	}
-	s.append( "Complex(" ).append( o->_data.re() ).append( ", " ).append( o->_data.im() ).append( ")" );
+	HString s( full_class_name( thread_, *object_ ) );
+	s.append( "(" ).append( o->_data.re() ).append( ", " ).append( o->_data.im() ).append( ")" );
 	return ( thread_->runtime().object_factory()->create_string( yaal::move( s ) ) );
 	M_EPILOG
 }
