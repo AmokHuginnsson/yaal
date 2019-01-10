@@ -286,8 +286,8 @@ public:
 	HHuginn::value_t create_tagged_value( HHuginn::value_t const& value_, HHuginn::HClass const* tag_ ) const {
 		return ( _taggedValuePool.create( value_, tag_ ) );
 	}
-	HHuginn::value_t create_function_reference( HHuginn::identifier_id_t identifierId_, HHuginn::function_t const& function_, yaal::hcore::HString const& doc_ ) const {
-		return ( _functionReferencePool.create( identifierId_, function_, doc_ ) );
+	HHuginn::value_t create_function_reference( HHuginn::identifier_id_t identifierId_, HHuginn::function_t const& function_, yaal::hcore::HString const& doc_, HHuginn::HClass const* juncture_ = nullptr ) const {
+		return ( _functionReferencePool.create( identifierId_, function_, doc_, juncture_ ) );
 	}
 	template<typename... T>
 	HHuginn::value_t create_method( T&&... args_ ) {

@@ -182,8 +182,9 @@ HHuginn::value_t HRandomizer::to_string( huginn::HThread* thread_, HHuginn::valu
 	char const name[] = "Randomizer.to_string";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HRandomizer* o( static_cast<HRandomizer*>( object_->raw() ) );
-	HString s( full_class_name( thread_, *object_ ) );
-	s.append( "(" ).append( full_class_name( thread_, *object_ ) ).append( ".DISTRIBUTION." );
+	HRuntime& rt( thread_->runtime() );
+	HString s( full_class_name( rt, *object_ ) );
+	s.append( "(" ).append( full_class_name( rt, *object_ ) ).append( ".DISTRIBUTION." );
 	random::distribution::HDistribution const* distribution( o->_generator.raw() );
 	switch ( o->_distribution ) {
 		case ( DISTRIBUTION::DISCRETE ): {
@@ -204,7 +205,7 @@ HHuginn::value_t HRandomizer::to_string( huginn::HThread* thread_, HHuginn::valu
 		} break;
 	}
 	s.append( ")" );
-	return ( thread_->runtime().object_factory()->create_string( yaal::move( s ) ) );
+	return ( rt.object_factory()->create_string( yaal::move( s ) ) );
 	M_EPILOG
 }
 
@@ -227,7 +228,7 @@ HHuginn::class_t HRandomizer::get_class( HRuntime* runtime_, HHuginn::HClass con
 				}
 			)
 		);
-		runtime_->huginn()->register_class( c, HHuginn::VISIBILITY::GLOBAL );
+		runtime_->huginn()->register_class( c );
 	}
 	return ( c );
 	M_EPILOG

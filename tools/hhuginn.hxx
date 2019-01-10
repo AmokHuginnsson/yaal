@@ -1326,18 +1326,24 @@ private:
 	 * so this holder must have shared ownership.
 	 */
 	HHuginn::function_t _function;
+	HHuginn::HClass const* _juncture;
 	yaal::hcore::HString _doc;
 public:
-	HFunctionReference( HHuginn::HClass const*, identifier_id_t, HHuginn::function_t const&, yaal::hcore::HString const& );
+	HFunctionReference( HHuginn::HClass const*, identifier_id_t, HHuginn::function_t const&, yaal::hcore::HString const&, HHuginn::HClass const* );
 	identifier_id_t const& identifier_id( void ) const {
 		return ( _identifierId );
 	}
 	HHuginn::function_t const& function( void ) const {
 		return ( _function );
 	}
+	HHuginn::HClass const* juncture( void ) const {
+		return ( _juncture );
+	}
 	void reset( function_t const& );
 	yaal::hcore::HString const& doc( void ) const;
 private:
+	HFunctionReference( HFunctionReference const& ) = delete;
+	HFunctionReference& operator = ( HFunctionReference const& ) = delete;
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 

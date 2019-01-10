@@ -511,7 +511,7 @@ HHuginn::value_t HMatrix::to_string( huginn::HThread* thread_, HHuginn::value_t*
 	M_PROLOG
 	char const name[] = "Matrix.to_string";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
-	HString s( full_class_name( thread_, *object_ ) );
+	HString s( full_class_name( thread_->runtime(), *object_ ) );
 	s.append( "(" );
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	if ( o->_data.type() == 0 ) {

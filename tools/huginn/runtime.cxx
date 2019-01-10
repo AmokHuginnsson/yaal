@@ -320,6 +320,11 @@ void HRuntime::register_class( class_t class_, HHuginn::VISIBILITY classConstruc
 	if ( _functionIds.insert( class_.raw() ).second ) {
 		_dependencies.push_back( class_ );
 	}
+	/*
+	 * Classes from submodules shall not be added to global classes set
+	 * so that it is possible to have classes with _the same name_ in different
+	 * submodules and (one) in global scope.
+	 */
 	if ( classConstructorVisibility_ == HHuginn::VISIBILITY::GLOBAL ) {
 		_classes.insert( make_pair( class_->identifier_id(), class_ ) );
 		if ( ! is_enum_class( class_.raw() ) ) {
@@ -483,6 +488,8 @@ void HRuntime::import_symbols( identifier_id_t package_, HHuginn::identifiers_t 
 				)
 			);
 			register_global( id, f );
+		} else if ( is_enum_class( v ) ) {
+			register_global( id, v );
 		}
 	}
 	if ( firstImported ) {

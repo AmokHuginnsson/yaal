@@ -72,7 +72,7 @@ private:
 	 */
 	dependencies_t _dependencies; /*!< Extra pointers to classes available in runtime, used to enforce order of desturctors! */
 	function_ids_t _functionIds; /*!< Needed by `*function_reference*` to `string` conversion. */
-	classes_t _classes; /*!< All classes defined for this runtime, including classes from submodules. */
+	classes_t _classes; /*!< All classes defined for this runtime, but not including classes from submodules. */
 	/*
 	 * 1.
 	 * Resolved function references are kept by naked/weak/dumb pointer (value_t*) in runtime.

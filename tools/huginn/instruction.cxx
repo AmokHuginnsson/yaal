@@ -340,7 +340,10 @@ HHuginn::value_t member( HThread* thread_, HFrame::ACCESS access_, HHuginn::valu
 	} else if ( v_->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) {
 		HHuginn::HFunctionReference* fr( static_cast<HHuginn::HFunctionReference*>( v_.raw() ) );
 		HHuginn::identifier_id_t funcId( fr->identifier_id() );
-		HHuginn::class_t c( rt.get_class( funcId ) );
+		HHuginn::HClass const* c( fr->juncture() );
+		if ( ! c ) {
+			c = rt.get_class( funcId ).raw();
+		}
 		if ( ! c ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"`"_ys.append( rt.identifier_name( funcId ) ).append( "' is not a compound object." ),
@@ -357,7 +360,7 @@ HHuginn::value_t member( HThread* thread_, HFrame::ACCESS access_, HHuginn::valu
 		}
 		HHuginn::value_t const& f( c->field( fi ) );
 		m = f->type_id() == HHuginn::TYPE::METHOD
-			? rt.object_factory()->create_unbound_method( c.raw(), static_cast<HHuginn::HClass::HMethod const*>( f.raw() )->function() )
+			? rt.object_factory()->create_unbound_method( c, static_cast<HHuginn::HClass::HMethod const*>( f.raw() )->function() )
 			: f;
 	} else {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( cls->name() ).append( "' is not a compound object." ), thread_->current_frame()->file_id(), position_ );

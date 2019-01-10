@@ -1042,10 +1042,12 @@ HHuginn::HFunctionReference::HFunctionReference(
 	HHuginn::HClass const* class_,
 	identifier_id_t identifierId_,
 	function_t const& function_,
-	yaal::hcore::HString const& doc_
+	yaal::hcore::HString const& doc_,
+	HHuginn::HClass const* juncture_
 ) : HValue( class_ )
 	, _identifierId( identifierId_ )
 	, _function( function_ )
+	, _juncture( juncture_ )
 	, _doc( doc_ ) {
 	return;
 }

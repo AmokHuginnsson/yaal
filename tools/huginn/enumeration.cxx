@@ -138,14 +138,9 @@ HHuginn::value_t HEnumerationClass::to_string( huginn::HThread* thread_, HHuginn
 	verify_arg_count( "to_string", values_, 0, 0, thread_, position_ );
 	HHuginn::HEnumeral* e( static_cast<HHuginn::HEnumeral*>( object_->raw() ) );
 	HEnumerationClass const* ec( static_cast<HEnumeralClass const*>( e->get_class() )->enumeration_class() );
-	HHuginn::HClass const* origin( ec->origin() );
-	HString const* originName( thread_->runtime().package_name( origin ) );
-	HString s;
-	if ( originName ) {
-		s.append( *originName ).append( "." );
-	}
-	s.append( ec->name() );
-	return ( thread_->object_factory().create_string( yaal::move( s.append( "." ).append( thread_->runtime().identifier_name( e->identifier() ) ) ) ) );
+	HRuntime& rt( thread_->runtime() );
+	HString s( full_class_name( rt, ec ) );
+	return ( thread_->object_factory().create_string( yaal::move( s.append( "." ).append( rt.identifier_name( e->identifier() ) ) ) ) );
 	M_EPILOG
 }
 

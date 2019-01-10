@@ -130,16 +130,9 @@ HHuginn::class_t add_class_as_member(
 	HHuginn::HClass::MEMBER_TYPE memberType_
 ) {
 	M_PROLOG
-	HHuginn::value_t member(
-		juncture_->runtime()->object_factory()->create_function_reference(
-			class_->identifier_id(),
-			class_->constructor_function(),
-			"A constructor for "_ys.append( a_type_name( class_.raw() ) ).append( " class." )
-		)
-	);
 	juncture_->add_member(
 		HHuginn::HFieldDefinition(
-			class_->name(), member, doc_
+			class_->name(), class_->constructor(), doc_
 		),
 		memberType_
 	);
@@ -225,16 +218,24 @@ void verify_arg_count( char const* name_, HHuginn::values_t& values_, int min_, 
 	M_EPILOG
 }
 
-yaal::hcore::HString full_class_name( huginn::HThread* thread_, HHuginn::value_t const& value_ ) {
+yaal::hcore::HString full_class_name( huginn::HRuntime& runtime_, HHuginn::HClass const* class_ ) {
 	M_PROLOG
-	HHuginn::HClass const* cls( value_->get_class() );
-	HString const* originName( thread_->runtime().package_name( cls->origin() ) );
+	HHuginn::HClass const* origin( class_->origin() );
+	HString const* originName( runtime_.package_name( origin ) );
 	HString cn;
 	if ( originName ) {
 		cn.append( *originName ).append( "." );
+	} else if ( origin && ( origin->origin() || !! runtime_.get_class( origin->identifier_id() ) ) ) {
+		cn.append( full_class_name( runtime_, origin ) ).append( "." );
 	}
-	cn.append( cls->name() );
+	cn.append( class_->name() );
 	return ( cn );
+	M_EPILOG
+}
+
+yaal::hcore::HString full_class_name( huginn::HRuntime& runtime_, HHuginn::value_t const& value_ ) {
+	M_PROLOG
+	return ( full_class_name( runtime_, value_->get_class() ) );
 	M_EPILOG
 }
 

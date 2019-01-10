@@ -291,7 +291,8 @@ HHuginn::value_t HHuginn::HClass::make_constructor( HObjectFactory* objectFactor
 		objectFactory_->create_function_reference(
 			identifier,
 			func,
-			"automatic constructor for class: `"_ys.append( _runtime->identifier_name( identifier ) ).append( "`" )
+			"automatic constructor for class: `"_ys.append( _runtime->identifier_name( identifier ) ).append( "`" ),
+			this
 		)
 	);
 	return ( ctor );
@@ -306,7 +307,8 @@ HHuginn::value_t HHuginn::HClass::make_constructor( HObjectFactory* objectFactor
 		objectFactory_->create_function_reference(
 			identifier,
 			func,
-			"construct an instance of "_ys.append( a_type_name( this ) ).append( " type" )
+			"construct an instance of "_ys.append( a_type_name( this ) ).append( " type" ),
+			this
 		)
 	);
 	return ( ctor );
