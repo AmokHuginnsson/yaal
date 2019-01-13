@@ -218,8 +218,7 @@ HPackageCreatorInterface::HInstance HPackageFactory::compile_module(
 	loader._compiler->_isModule = true;
 	loader.load( src );
 	loader.preprocess();
-	M_ASSERT( static_cast<int>( contextHuginn._sources.get_size() - 1 ) == contextHuginn._compiler->_fileId );
-	HScopedValueReplacement<int> saveFileId( loader._compiler->_fileId, contextHuginn._compiler->_fileId );
+	loader._compiler->_fileId = contextHuginn.file_id();
 	loader._sources.insert( loader._sources.begin(), contextHuginn._sources.begin(), contextHuginn._sources.end() );
 	if ( ! ( loader.parse() && loader.compile( paths_, contextRuntime_->compiler_setup() ) ) ) {
 		contextRuntime_->fix_references();
