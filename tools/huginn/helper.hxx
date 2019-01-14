@@ -92,6 +92,9 @@ bool is_unknown( HHuginn::HClass const* );
 bool is_reference_congruent( HHuginn::HClass const* );
 bool is_integer_congruent( HHuginn::HClass const* );
 bool is_meta_class( HHuginn::HClass const* );
+inline bool is_enumeral( HHuginn::value_t const& val_ ) {
+	return ( dynamic_cast<HHuginn::HEnumeral const*>( val_.raw() ) != nullptr );
+}
 inline bool is_enum_class( HHuginn::HClass const* class_ ) {
 	return ( dynamic_cast<enumeration::HEnumerationClass const*>( class_ ) != nullptr );
 }

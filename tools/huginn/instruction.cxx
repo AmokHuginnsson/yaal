@@ -940,6 +940,16 @@ bool is_element_of( HThread* thread_, OPERATOR operator_, HHuginn::value_t const
 			);
 		}
 		res = string.find( static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() ) != HString::npos;
+	} else if ( is_enum_class( v2_ ) ) {
+		if ( is_enumeral( v1_ ) ) {
+			res = static_cast<enumeration::HEnumerationClass::HEnumeralClass const*>( static_cast<HHuginn::HEnumeral const*>( v1_.raw() )->get_class() )->enumeration_class() == v2_->get_class();
+		} else {
+			throw HHuginn::HHuginnRuntimeException(
+				"Only `ENUMERAL`s can be elements of `ENUMERATION`s.",
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
 	} else {
 		res = fallback_compare( thread_, IDENTIFIER::INTERFACE::CONTAINS, op_to_str( operator_ ), v2_, v1_, position_ );
 	}

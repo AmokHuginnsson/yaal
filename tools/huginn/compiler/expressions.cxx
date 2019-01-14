@@ -217,6 +217,8 @@ void OCompiler::make_reference( executing_parser::range_t range_ ) {
 	} else {
 		expr->execution_step( expr->execution_step_count() - 1 )._access = HFrame::ACCESS::REFERENCE;
 	}
+	fc._valueTypes.pop();
+	fc._valueTypes.push( type_to_class( HHuginn::TYPE::REFERENCE ) );
 	fc._variables.emplace( IDENTIFIER::INVALID, -1 );
 	return;
 	M_EPILOG
@@ -307,7 +309,7 @@ void OCompiler::defer_get_field_reference( yaal::hcore::HString const& value_, e
 	);
 	expr->commit_oper( OPERATOR::MEMBER_ACCESS );
 	fc._valueTypes.pop();
-	fc._valueTypes.push( type_to_class( HHuginn::TYPE::REFERENCE ) );
+	fc._valueTypes.push( type_to_class( HHuginn::TYPE::UNKNOWN ) );
 	return;
 	M_EPILOG
 }
@@ -553,8 +555,6 @@ void OCompiler::dispatch_member_access( executing_parser::range_t range_ ) {
 	if ( fc._isAssert && ( fc._nestedCalls == 0 ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`assert' is a restricted keyword.", _fileId, range_.start() );
 	}
-	fc._valueTypes.pop();
-	fc._valueTypes.push( type_to_class( HHuginn::TYPE::REFERENCE ) );
 	fc._operations.pop();
 	fc._lastDereferenceOperator = OPERATOR::MEMBER_ACCESS;
 	return;

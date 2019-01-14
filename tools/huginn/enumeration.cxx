@@ -22,39 +22,31 @@ namespace huginn {
 
 namespace enumeration {
 
-class HEnumerationClass::HEnumeralClass : public HHuginn::HClass {
-public:
-	typedef HEnumeralClass this_type;
-	typedef HHuginn::HClass base_type;
-public:
-	HEnumeralClass(
-		HEnumerationClass const* enumerationClass_,
-		HRuntime* runtime_,
-		HHuginn::type_id_t typeId_,
-		HHuginn::identifier_id_t identifierId_,
-		yaal::hcore::HString const& doc_
-	) : HHuginn::HClass(
-		runtime_,
-		typeId_,
-		identifierId_,
-		doc_,
-		HHuginn::ACCESS::PRIVATE
-	) {
-		set_origin( enumerationClass_ );
-	}
-	HEnumerationClass const* enumeration_class( void ) const {
-		return ( static_cast<HEnumerationClass const*>( origin() ) );
-	}
-protected:
-	virtual HHuginn::value_t do_create_instance( huginn::HThread* thread_, HHuginn::values_t&, int position_ ) const {
-		M_PROLOG
-		throw HHuginn::HHuginnRuntimeException( "Explicit construction of enumeral `"_ys.append( name() ).append( "' instances is forbidden." ), thread_->current_frame()->file_id(), position_ );
-		M_EPILOG
-	}
-private:
-	HEnumeralClass( HEnumeralClass const& ) = delete;
-	HEnumeralClass& operator = ( HEnumeralClass const& ) = delete;
-};
+HEnumerationClass::HEnumeralClass::HEnumeralClass(
+	HEnumerationClass const* enumerationClass_,
+	HRuntime* runtime_,
+	HHuginn::type_id_t typeId_,
+	HHuginn::identifier_id_t identifierId_,
+	yaal::hcore::HString const& doc_
+) : HHuginn::HClass(
+	runtime_,
+	typeId_,
+	identifierId_,
+	doc_,
+	HHuginn::ACCESS::PRIVATE
+) {
+	set_origin( enumerationClass_ );
+}
+
+HEnumerationClass const* HEnumerationClass::HEnumeralClass::enumeration_class( void ) const {
+	return ( static_cast<HEnumerationClass const*>( origin() ) );
+}
+
+HHuginn::value_t HEnumerationClass::HEnumeralClass::do_create_instance( huginn::HThread* thread_, HHuginn::values_t&, int position_ ) const {
+	M_PROLOG
+	throw HHuginn::HHuginnRuntimeException( "Explicit construction of enumeral `"_ys.append( name() ).append( "' instances is forbidden." ), thread_->current_frame()->file_id(), position_ );
+	M_EPILOG
+}
 
 HEnumerationClass::HEnumerationClass(
 	HRuntime* runtime_,

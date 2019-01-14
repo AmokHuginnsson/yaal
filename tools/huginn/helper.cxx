@@ -557,7 +557,7 @@ bool is_collection( HHuginn::HClass const* class_ ) {
 
 bool is_collection_like( HHuginn::HClass const* class_ ) {
 	HHuginn::type_id_t t( class_ ? class_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
-	return ( is_collection( class_ ) || ( t == HHuginn::TYPE::STRING ) || ( t == HHuginn::TYPE::UNKNOWN ) );
+	return ( is_collection( class_ ) || ( t == HHuginn::TYPE::STRING ) || ( t == HHuginn::TYPE::UNKNOWN ) || is_enum_class( class_ ) );
 }
 
 bool is_comparable( HHuginn::HClass const* class_ ) {

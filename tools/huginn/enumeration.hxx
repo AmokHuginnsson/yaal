@@ -47,8 +47,8 @@ public:
 	typedef HEnumerationClass this_type;
 	typedef HHuginn::HClass base_type;
 	typedef yaal::hcore::HPointer<HEnumerationClass> ptr_t;
-private:
 	class HEnumeralClass;
+private:
 	HHuginn::class_t _valueClass;
 public:
 	HEnumerationClass(
@@ -67,6 +67,20 @@ public:
 	HHuginn::value_t enumeral( HHuginn::HEnumeral::value_type ) const;
 private:
 	virtual HHuginn::value_t do_create_instance( huginn::HThread*, HHuginn::values_t&, int ) const __attribute__((noreturn));
+};
+
+class HEnumerationClass::HEnumeralClass : public HHuginn::HClass {
+public:
+	typedef HEnumeralClass this_type;
+	typedef HHuginn::HClass base_type;
+public:
+	HEnumeralClass( HEnumerationClass const*, HRuntime*, HHuginn::type_id_t, HHuginn::identifier_id_t, yaal::hcore::HString const& );
+	HEnumerationClass const* enumeration_class( void ) const;
+protected:
+	virtual HHuginn::value_t do_create_instance( huginn::HThread*, HHuginn::values_t&, int ) const override __attribute__((noreturn));
+private:
+	HEnumeralClass( HEnumeralClass const& ) = delete;
+	HEnumeralClass& operator = ( HEnumeralClass const& ) = delete;
 };
 
 class HEnumeration : HHuginn::HValue {
