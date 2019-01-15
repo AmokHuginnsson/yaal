@@ -66,7 +66,7 @@ public:
 			add_class_as_member(
 				class_,
 				HRandomizer::get_class( class_->runtime(), class_ ),
-				"([ *cap* ]) - create random number generator which output values are capped at *cap*"
+				"( *distribution*, *parameters...* ) - create random number generator of a given *distribution* that is parametrized by supplied *parameters*"
 			)
 		)
 		, _exceptionClass( class_exception( class_, class_->runtime()->object_factory()->arithmetic_exception_class() ) ) {
