@@ -996,13 +996,14 @@ void HRuntime::dump_docs( yaal::hcore::HStreamInterface& stream_ ) const {
 	huginn::classes_t classes( class_list( _dependencies ) );
 	for ( huginn::classes_t::value_type const& c : classes ) {
 		HHuginn::HClass const& cls( *c );
+		HString cn( full_class_name( *this, &cls, false ) );
 		if ( ! cls.doc().is_empty() ) {
-			stream_ << cls.name() << ":" << cls.doc() << endl;
+			stream_ << cn << ":" << cls.doc() << endl;
 		}
 		for ( HHuginn::field_identifiers_t::value_type const& f : cls.field_identifiers() ) {
 			HString const& doc( cls.doc( f ) );
 			if ( ! doc.is_empty() ) {
-				stream_ << cls.name() << "." << identifier_name( f ) << ":";
+				stream_ << cn << "." << identifier_name( f ) << ":";
 				int fi( cls.field_index( f, HHuginn::HClass::MEMBER_TYPE::STATIC ) );
 				HHuginn::type_id_t tid( cls.field( fi )->type_id() );
 				if ( ( doc.front() != '(' ) && ( tid == HHuginn::TYPE::METHOD ) ) {

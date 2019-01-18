@@ -58,8 +58,8 @@ bool is_keyword( yaal::hcore::HString const& );
 bool is_builtin( yaal::hcore::HString const& );
 bool is_restricted( yaal::hcore::HString const& );
 
-yaal::hcore::HString full_class_name( huginn::HRuntime&, HHuginn::HClass const* );
-yaal::hcore::HString full_class_name( huginn::HRuntime&, HHuginn::value_t const& );
+yaal::hcore::HString full_class_name( huginn::HRuntime const&, HHuginn::HClass const*, bool = true );
+yaal::hcore::HString full_class_name( huginn::HRuntime const&, HHuginn::value_t const&, bool = true );
 yaal::hcore::HString a_type_name( HHuginn::TYPE );
 yaal::hcore::HString a_type_name( HHuginn::HClass const* );
 inline yaal::hcore::HString a_type_name( HHuginn::type_id_t type_ ) {

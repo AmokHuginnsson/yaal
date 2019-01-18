@@ -218,24 +218,30 @@ void verify_arg_count( char const* name_, HHuginn::values_t& values_, int min_, 
 	M_EPILOG
 }
 
-yaal::hcore::HString full_class_name( huginn::HRuntime& runtime_, HHuginn::HClass const* class_ ) {
+yaal::hcore::HString full_class_name( huginn::HRuntime const& runtime_, HHuginn::HClass const* class_, bool preserveAliases_ ) {
 	M_PROLOG
 	HHuginn::HClass const* origin( class_->origin() );
-	HString const* originName( runtime_.package_name( origin ) );
+	HString const* originName( preserveAliases_ ? runtime_.package_name( origin ) : nullptr );
 	HString cn;
 	if ( originName ) {
 		cn.append( *originName ).append( "." );
-	} else if ( origin && ( origin->origin() || !! runtime_.get_class( origin->identifier_id() ) ) ) {
-		cn.append( full_class_name( runtime_, origin ) ).append( "." );
+	} else if (
+		origin && (
+			origin->origin()
+			|| !! runtime_.get_class( origin->identifier_id() )
+			|| ! preserveAliases_
+		)
+	) {
+		cn.append( full_class_name( runtime_, origin, preserveAliases_ ) ).append( "." );
 	}
 	cn.append( class_->name() );
 	return ( cn );
 	M_EPILOG
 }
 
-yaal::hcore::HString full_class_name( huginn::HRuntime& runtime_, HHuginn::value_t const& value_ ) {
+yaal::hcore::HString full_class_name( huginn::HRuntime const& runtime_, HHuginn::value_t const& value_, bool preserveAliases_ ) {
 	M_PROLOG
-	return ( full_class_name( runtime_, value_->get_class() ) );
+	return ( full_class_name( runtime_, value_->get_class(), preserveAliases_ ) );
 	M_EPILOG
 }
 
