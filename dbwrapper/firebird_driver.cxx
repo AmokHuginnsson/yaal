@@ -106,10 +106,10 @@ M_EXPORT_SYMBOL int COLUMN_NAME_INDEX = 0;
 M_EXPORT_SYMBOL bool db_connect( ODBLink&, yaal::hcore::HString const&,
 		yaal::hcore::HString const&, yaal::hcore::HString const&, yaal::hcore::HString const& );
 M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& dataBase_,
-		yaal::hcore::HString const& login_, yaal::hcore::HString const& password_, yaal::hcore::HString const& ) {
+		yaal::hcore::HString const& login_, yaal::hcore::HString const& password_, yaal::hcore::HString const& host_ ) {
 	typedef HResource<OFirebird> firebird_resource_guard_t;
 	firebird_resource_guard_t db( new OFirebird );
-	HUTF8String dataBase( dataBase_ );
+	HUTF8String dataBase( ! host_.is_empty() ? host_ + ":" + dataBase_ : dataBase_ );
 	HUTF8String login( login_ );
 	HUTF8String password( password_ );
 	int short dbLen( static_cast<int short>( dataBase.byte_count() ) );

@@ -89,17 +89,26 @@ M_EXPORT_SYMBOL int COLUMN_NAME_INDEX = 1;
 M_EXPORT_SYMBOL bool db_connect( ODBLink&, yaal::hcore::HString const&,
 		yaal::hcore::HString const&, yaal::hcore::HString const&, yaal::hcore::HString const& );
 M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& dataBase_,
-		yaal::hcore::HString const& login_, yaal::hcore::HString const& password_, yaal::hcore::HString const& ) {
+		yaal::hcore::HString const& login_, yaal::hcore::HString const& password_, yaal::hcore::HString const& host_ ) {
 	PGconn* connection( nullptr );
 	HUTF8String dataBase( dataBase_ );
 	HUTF8String login( login_ );
 	HUTF8String password( password_ );
-	dbLink_._conn = connection = PQsetdbLogin( nullptr /* host */,
-			nullptr /* port */, nullptr /* options */,
-			nullptr /* debugging tty */,
-			dataBase.c_str(), login.c_str(), password.c_str() );
-	if ( PQstatus( connection ) == CONNECTION_OK )
+	HString::size_type portIdx( host_.find_last( ':'_ycp ) );
+	HUTF8String host( host_.begin(), portIdx != HString::npos ? host_.begin() + portIdx : host_.end() );
+	HUTF8String port( portIdx != HString::npos ? host_.begin() + portIdx + 1 : host_.end(), host_.end() );
+	dbLink_._conn = connection = PQsetdbLogin(
+		! host.is_empty() ? host.c_str() : nullptr,
+		! port.is_empty() ? port.c_str() : nullptr,
+		nullptr /* options */,
+		nullptr /* debugging tty */,
+		dataBase.c_str(),
+		login.c_str(),
+		password.c_str()
+	);
+	if ( PQstatus( connection ) == CONNECTION_OK ) {
 		dbLink_._valid = true;
+	}
 	return ( dbLink_._valid );
 }
 

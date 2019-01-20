@@ -115,23 +115,52 @@ M_EXPORT_SYMBOL void driver_cleanup( void ) {
 M_EXPORT_SYMBOL bool db_connect( ODBLink&, yaal::hcore::HString const&,
 		yaal::hcore::HString const&, yaal::hcore::HString const&, yaal::hcore::HString const& );
 M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& dataBase_,
-		yaal::hcore::HString const& login_, yaal::hcore::HString const& password_, yaal::hcore::HString const& ) {
+		yaal::hcore::HString const& login_, yaal::hcore::HString const& password_, yaal::hcore::HString const& host_ ) {
 	MYSQL* mySQL( nullptr );
 	dbLink_._conn = mySQL = mysql_init( nullptr );
-	if ( mySQL ) {
-		int unsigned protocol( MYSQL_PROTOCOL_SOCKET );
-		HUTF8String utf8( _clientCharacterSet_ );
-		if ( ! ( mysql_options( mySQL, MYSQL_OPT_PROTOCOL, &protocol ) || mysql_options( mySQL, MYSQL_SET_CHARSET_NAME, utf8.c_str() ) ) ) {
-			HUTF8String dataBase( dataBase_ );
-			HUTF8String login( login_ );
-			HUTF8String password( password_ );
-			if ( mysql_real_connect( mySQL, nullptr,
-						login.c_str(), password.c_str(), dataBase.c_str(),
-						0, nullptr, CLIENT_IGNORE_SPACE | CLIENT_IGNORE_SIGPIPE ) ) {
-				dbLink_._valid = true;
+	do {
+		if ( ! mySQL ) {
+			break;
+		}
+		HUTF8String dataBase( dataBase_ );
+		HUTF8String login( login_ );
+		HUTF8String password( password_ );
+		HString::size_type portIdx( host_.find_last( ':'_ycp ) );
+		HUTF8String host( host_.begin(), portIdx != HString::npos ? host_.begin() + portIdx : host_.end() );
+		bool isUnixSocket( host_.find( '/'_ycp ) != HString::npos );
+		HString portStr( portIdx != HString::npos ? host_.substr( portIdx + 1 ) : "" );
+		int unsigned port( 0 );
+		if ( ! ( isUnixSocket || portStr.is_empty() ) ) {
+			try {
+				port = lexical_cast<int unsigned>( portStr );
+			} catch ( HException const& ) {
+				break;
 			}
 		}
-	}
+		int unsigned protocol( host_.is_empty() || isUnixSocket ? MYSQL_PROTOCOL_SOCKET : MYSQL_PROTOCOL_TCP );
+		HUTF8String utf8( _clientCharacterSet_ );
+		if ( mysql_options( mySQL, MYSQL_OPT_PROTOCOL, &protocol ) != 0 ) {
+			break;
+		}
+		if ( mysql_options( mySQL, MYSQL_SET_CHARSET_NAME, utf8.c_str() ) != 0 ) {
+			break;
+		}
+		if (
+			mysql_real_connect(
+				mySQL,
+				! ( isUnixSocket || host.is_empty() ) ? host.c_str() : nullptr,
+				login.c_str(),
+				password.c_str(),
+				dataBase.c_str(),
+				port,
+				isUnixSocket && ! host.is_empty() ? host.c_str() : nullptr,
+				CLIENT_IGNORE_SPACE | CLIENT_IGNORE_SIGPIPE
+			) == nullptr
+		) {
+			break;
+		}
+		dbLink_._valid = true;
+	} while ( false );
 	return ( dbLink_._valid );
 }
 
