@@ -1,0 +1,87 @@
+services:
+  - name: mysql:latest
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_general_ci", "--default-authentication-plugin=mysql_native_password"]
+  - postgres:latest
+
+variables:
+  MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+
+before_script:
+  - echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+  - apt-get update -y
+  - apt-get install -y
+    asciidoctor
+    autoconf
+    automake
+    bc
+    ccache
+    debhelper
+    default-mysql-client-core
+    devscripts
+    doxygen
+    dpkg-dev
+    fakeroot
+    g++
+    graphviz
+    lftp
+    libboost-all-dev
+    libdistro-info-perl
+    libmariadbclient-dev
+    libncursesw5-dev
+    libncurses5-dev
+    libncursesw5
+    libpcre3-dev
+    libpq-dev
+    libsqlite3-dev
+    libssl-dev
+    libtool
+    libxml2-dev
+    libxslt1-dev
+    locales
+    lsb-release
+    make
+    pkg-config
+    postgresql-client
+    socat
+    sqlite3
+    sudo
+    tzdata
+    zlib1g-dev
+  - ln -sf /usr/share/zoneinfo/Europe/Warsaw /etc/localtime
+  - echo "Europe/Warsaw" >> /etc/timezone
+  - dpkg-reconfigure -f noninteractive tzdata
+  - echo "pl_PL.UTF-8 UTF-8\nen_DK UTF-8\nen_DK.UTF-8 UTF-8" >> /etc/locale.gen
+  - locale-gen
+  - useradd -d /builds/codestation -g users -M -N hack
+  - chown -R hack:users ..
+  - |
+    sudo -i -u hack sh -e -x << EOS
+    mkdir -p tress
+    git -C tress init
+    git -C tress fetch https://codestation.org/repo/tress.git HEAD
+    git -C tress reset --hard FETCH_HEAD --
+    cd tress
+    mysql -u root -h mysql < ./data/mysql.sql
+    psql -U postgres -h postgres template1 < ./data/postgresql.sql
+    EOS
+
+cache:
+  paths:
+    - ../.ccache
+    - ../tress
+
+package:
+  image: ubuntu:bionic
+  script:
+    - |
+      sudo -H -i -u hack sh -e -x << EOS
+      umask 0077
+      export CONTINUOUS_INTEGRATION_SYSTEM="gitlab" TIMESTAMP=`date +%Y%m%d%H%M%S` DEFAULT_TARGET="debug"
+      export PREFIX="\${HOME}/usr" SYSCONFDIR="\${HOME}/etc/conf" LOCALSTATEDIR="\${HOME}/var"
+      export LC_CTYPE=pl_PL.UTF-8 LC_COLLATE=pl_PL.UTF-8 TZ=Europe/Warsaw
+      export TRESS_POSTGRESQL_HOST=postgres TRESS_MYSQL_HOST=mysql
+      cd yaal
+      make install
+      make -C _deploy/debian clean package bundle BUILD_ID="-0codestation\${TIMESTAMP}"
+      EOS
+    - lftp -e 'set xfer:timeout 10;set net:timeout 10;set net:persist-retries 10;set net:max-retries 20;set ftp:prefer-epsv false;set ftp:passive-mode true;put debian/tmp/yaal-bundle.tar;quit' -u "gitlab,${GITLAB_FTP_PASS}" codestation.org
