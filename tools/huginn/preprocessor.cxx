@@ -18,20 +18,39 @@ namespace tools {
 namespace huginn {
 
 /*
- * These cannot be declared inside HPrepocessor body because HIterator is not fully declared there.
+ * Try to skip leading:
+ * - shell comments                (# Some comment)
+ * - empty lines                   ([:white:]*)
+ * - shell interpreter spawner     (exec huginn -E "${0}" "${@}")
+ * - Huginn preprocessor directive (#! huginn opt1=val1 opt2=val2)
  */
 HPrepocessor::HIterator HPrepocessor::begin( void ) {
-	int len( static_cast<int>( _end - _beg ) );
-	static HString const hashBang( "#!" );
-	int const hashBangLen( static_cast<int>( hashBang.get_length() ) );
-	int offset( 0 );
-	if ( ( len >= hashBangLen ) && equal( _beg, _beg + hashBangLen, hashBang.begin() ) ) {
-		hcore::HString::const_iterator nlIt( find( _beg, _end, NEWLINE ) );
-		if ( nlIt != _end ) {
-			offset = static_cast<int>( nlIt + 1 - _beg );
+	M_PROLOG
+	HString const whitespace( character_class<CHARACTER_CLASS::WHITESPACE>().data() );
+	HString const spawner( "exec huginn " );
+	HString::const_iterator cur( _beg );
+	HString line;
+	while ( true ) {
+		HString::const_iterator eol( find( cur, _end, NEWLINE ) );
+		line.assign( cur, eol );
+		if (
+			( line.find_other_than( whitespace ) != HString::npos )
+			&& ( line.front() != '#'_ycp )
+			&& (
+				( line.get_length() < spawner.get_length() )
+				|| ( spawner.compare( line, 0, spawner.get_length() ) != 0 )
+			)
+		) {
+			break;
 		}
+		cur = eol;
+		if ( cur == _end ) {
+			break;
+		}
+		++ cur;
 	}
-	return ( HIterator( this, _beg + offset ) );
+	return ( HIterator( this, cur ) );
+	M_EPILOG
 }
 
 HPrepocessor::HIterator HPrepocessor::end( void ) {
