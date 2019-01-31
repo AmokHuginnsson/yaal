@@ -1,5 +1,7 @@
 /* Read yaal/LICENSE.md file for copyright and licensing information. */
 
+#include <cstdio>
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
@@ -277,7 +279,7 @@ public:
 							fill = '0'_ycp;
 							specRaw.shift_left( 1 );
 						}
-						if ( ! specRaw.is_empty() ) {
+						if ( ! specRaw.is_empty() && ( specRaw.front() != '.' ) ) {
 							try {
 								int endWidth( 0 );
 								width = stoi( specRaw, &endWidth );
@@ -301,7 +303,17 @@ public:
 						formatedValue.assign( int_to_str( static_cast<HHuginn::HInteger const*>( v.raw() )->value(), base, prefix ) );
 					} else if ( ( ( type == HHuginn::TYPE::REAL ) || ( type == HHuginn::TYPE::NUMBER ) ) && ( prec >= 0 ) ) {
 						if ( type == HHuginn::TYPE::REAL ) {
-							formatedValue = get_real( v );
+							static int const FMT_SIZE( 32 );
+							char fmt[FMT_SIZE];
+							snprintf( fmt, FMT_SIZE, "%%.%dLf", prec );
+							static int const MAX_FLOAT_DIGIT_COUNT( 8192 );
+							char buffer[MAX_FLOAT_DIGIT_COUNT] = "\0";
+							int charCount( snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, prec >= 0 ? fmt : "%Lf", get_real( v ) ) );
+							formatedValue.assign( buffer, charCount );
+						} else if ( prec >= 0 ) {
+							HNumber n( get_number( v ) );
+							n.round( prec );
+							formatedValue = n.to_string();
 						} else {
 							formatedValue = get_number( v ).to_string();
 						}
