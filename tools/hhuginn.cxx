@@ -465,7 +465,7 @@ bool HHuginn::parse( void ) {
 	if ( ! ok ) {
 		_errorMessage = _engine.error_messages()[0];
 		_errorPosition = _engine.error_position();
-		_errorFileId = static_cast<int>( _sources.get_size() ) - 1;
+		_errorFileId = _compiler->_isModule ? static_cast<int>( _sources.get_size() ) - 1 : MAIN_FILE_ID;
 	} else {
 		_state = STATE::PARSED;
 	}
