@@ -281,7 +281,7 @@ public:
 		return ( _blobPool.create( yaal::move( chunk_ ) ) );
 	}
 	HHuginn::value_t create_reference( HHuginn::value_t& value_ ) const {
-		return ( _referencePool.create( value_ ) );
+		return ( _referencePool.create( &value_ ) );
 	}
 	HHuginn::value_t create_tagged_value( HHuginn::value_t const& value_, HHuginn::HClass const* tag_ ) const {
 		return ( _taggedValuePool.create( value_, tag_ ) );

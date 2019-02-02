@@ -137,7 +137,7 @@ public:
 	HHuginn::value_t get_super( int );
 	void note_variable( HHuginn::identifier_id_t );
 	void note_variable( HHuginn::identifier_id_t, HStatement::statement_id_t, int );
-	void commit_variable( HHuginn::value_t const&, int );
+	void commit_variable( HHuginn::value_t&&, int );
 	bool can_continue( void ) const {
 		return ( _state == STATE::NORMAL );
 	}

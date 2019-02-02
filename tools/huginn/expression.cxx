@@ -489,7 +489,7 @@ void HExpression::set_variable( OExecutionStep const& es_, HFrame* frame_ ) {
 			if ( src->type_id() != HHuginn::TYPE::TUPLE ) {
 				throw HHuginn::HHuginnRuntimeException( "Assigner is not a `tuple` object.", file_id(), p );
 			}
-			HHuginn::HTuple::values_t const& srcData( static_cast<HHuginn::HTuple*>( src.raw() )->value() );
+			HHuginn::HTuple::values_t& srcData( static_cast<HHuginn::HTuple*>( src.raw() )->value() );
 			int ds( static_cast<int>( srcData.get_size() ) );
 			if ( ds != es_._index ) {
 				throw HHuginn::HHuginnRuntimeException(
@@ -505,36 +505,39 @@ void HExpression::set_variable( OExecutionStep const& es_, HFrame* frame_ ) {
 				HHuginn::value_t dst( yaal::move( values.top() ) );
 				values.pop();
 				M_ASSERT( dst->type_id() == HHuginn::TYPE::REFERENCE );
-				HHuginn::value_t& ref( static_cast<HHuginn::HReference*>( dst.raw() )->value() );
-				data[i] = ref = srcData[i];
+				HHuginn::HReference& ref( *static_cast<HHuginn::HReference*>( dst.raw() ) );
+				data[i] = srcData[i];
+				ref.set( t, yaal::move( srcData[i] ), p );
 			}
 			values.push( t->object_factory().create_tuple( yaal::move( data ) ) );
 		} else {
 			HHuginn::value_t dst( yaal::move( values.top() ) );
 			values.pop();
 			M_ASSERT( dst->type_id() == HHuginn::TYPE::REFERENCE );
-			HHuginn::value_t& ref( static_cast<HHuginn::HReference*>( dst.raw() )->value() );
+			HHuginn::HReference& ref( *static_cast<HHuginn::HReference*>( dst.raw() ) );
 			if ( operation._operator == OPERATOR::ASSIGN ) {
-				ref.swap( src );
+				ref.set( t, yaal::move( src ), p );
 			} else {
-				HHuginn::HClass const* refClass( ref->get_class() );
+				HHuginn::value_t v( ref.get( t, p ) );
+				HHuginn::HClass const* refClass( v->get_class() );
 				HHuginn::HClass const* srcClass( src->get_class() );
 				if ( refClass != srcClass ) {
 					operands_type_mismatch( op_to_str( operation._operator ), refClass, srcClass, file_id(), p );
 				}
 				switch ( operation._operator ) {
-					case ( OPERATOR::PLUS_ASSIGN ):     { instruction::add( t, ref, src, p ); } break;
-					case ( OPERATOR::MINUS_ASSIGN ):    { instruction::sub( t, ref, src, p ); } break;
-					case ( OPERATOR::MULTIPLY_ASSIGN ): { instruction::mul( t, ref, src, p ); } break;
-					case ( OPERATOR::DIVIDE_ASSIGN ):   { instruction::div( t, ref, src, p ); } break;
-					case ( OPERATOR::MODULO_ASSIGN ):   { instruction::mod( t, ref, src, p ); } break;
-					case ( OPERATOR::POWER_ASSIGN ):    { instruction::pow( t, ref, src, p ); } break;
+					case ( OPERATOR::PLUS_ASSIGN ):     { instruction::add( t, v, src, p ); } break;
+					case ( OPERATOR::MINUS_ASSIGN ):    { instruction::sub( t, v, src, p ); } break;
+					case ( OPERATOR::MULTIPLY_ASSIGN ): { instruction::mul( t, v, src, p ); } break;
+					case ( OPERATOR::DIVIDE_ASSIGN ):   { instruction::div( t, v, src, p ); } break;
+					case ( OPERATOR::MODULO_ASSIGN ):   { instruction::mod( t, v, src, p ); } break;
+					case ( OPERATOR::POWER_ASSIGN ):    { instruction::pow( t, v, src, p ); } break;
 					default: {
 						M_ASSERT( ! "bad code path"[0] );
 					} break;
 				}
+				ref.set( t, yaal::move( v ), p );
 			}
-			values.push( ref );
+			values.push( ref.get( t, p ) );
 		}
 	}
 	M_ASSERT( ( ip < static_cast<int>( _instructions.get_size() ) ) && (  _instructions[ip]._operator == OPERATOR::ASSIGN_TERM ) );

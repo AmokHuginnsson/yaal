@@ -36,7 +36,7 @@ void HTryCatch::HCatch::execute( HThread* thread_, HHuginn::value_t value_ ) con
 	thread_->create_scope_frame( this );
 	HFrame* f( thread_->current_frame() );
 	_control->execute( thread_ );
-	f->commit_variable( value_, _control->position() );
+	f->commit_variable( yaal::move( value_ ), _control->position() );
 	if ( f->can_continue() ) {
 		_scope->execute( thread_ );
 	}

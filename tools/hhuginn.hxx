@@ -806,12 +806,26 @@ public:
 	typedef HHuginn::HReference this_type;
 	typedef HHuginn::HValue base_type;
 private:
-	HHuginn::value_t& _value;
+	HHuginn::value_t* _ref;
 public:
-	HReference( HHuginn::HClass const*, HHuginn::value_t& );
-	HHuginn::value_t& value( void ) const;
+	HReference( HHuginn::HClass const* class_, HHuginn::value_t* value_ )
+		: HValue( class_ )
+		, _ref( value_ ) {
+		return;
+	}
+	HHuginn::value_t get( huginn::HThread* thread_, int position_ ) const {
+		return ( do_get( thread_, position_ ) );
+	}
+	void set( huginn::HThread* thread_, HHuginn::value_t&& value_, int position_ ) {
+		do_set( thread_, yaal::move( value_ ), position_ );
+	}
 private:
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override M_DEBUG_CODE( __attribute__((__noreturn__)) );
+	virtual HHuginn::value_t do_get( huginn::HThread*, int ) const;
+	virtual void do_set( huginn::HThread*, HHuginn::value_t&&, int );
+private:
+	HReference( HReference const& ) = delete;
+	HReference& operator = ( HReference const& ) = delete;
 };
 
 class HHuginn::HTernaryEvaluator : public HHuginn::HValue {

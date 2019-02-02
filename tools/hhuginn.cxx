@@ -986,23 +986,6 @@ HHuginn::value_t HHuginn::HObserver::do_clone( huginn::HThread* thread_, HHuginn
 	return ( thread_->object_factory().create<HObserver>( get_class(), _value ) );
 }
 
-HHuginn::HReference::HReference( HHuginn::HClass const* class_, HHuginn::value_t& value_ )
-	: HValue( class_ )
-	, _value( value_ ) {
-	return;
-}
-
-HHuginn::value_t& HHuginn::HReference::value( void ) const {
-	return ( _value );
-}
-
-HHuginn::value_t HHuginn::HReference::do_clone( huginn::HThread*, HHuginn::value_t*, int ) const {
-	M_ASSERT( 0 && "cloning reference"[0] );
-#if defined( NDEBUG ) || defined( __MSVCXX__ )
-	return ( HHuginn::value_t() );
-#endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
-}
-
 HHuginn::HTernaryEvaluator::HTernaryEvaluator(
 	expression_t const& condition_,
 	expression_t const& ifTrue_,

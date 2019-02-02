@@ -74,7 +74,7 @@ void HFor::do_execute( HThread* thread_ ) const {
 				if ( ! f->can_continue() ) {
 					break;
 				}
-				run_loop( thread_, f, value );
+				run_loop( thread_, f, yaal::move( value ) );
 				nextMethod->call( thread_, HArguments( thread_ ), sourcePosition );
 			}
 		} else {
@@ -86,17 +86,17 @@ void HFor::do_execute( HThread* thread_ ) const {
 	M_EPILOG
 }
 
-void HFor::run_loop( HThread* thread_, HFrame* frame_, HHuginn::value_t const& value_ ) const {
+void HFor::run_loop( HThread* thread_, HFrame* frame_, HHuginn::value_t&& value_ ) const {
 	M_PROLOG
 	int cs( static_cast<int>( _control.get_size() ) );
 	if ( cs == 1 ) {
 		_control.front()->execute( thread_ );
-		frame_->commit_variable( value_, _control.front()->position() );
+		frame_->commit_variable( yaal::move( value_ ), _control.front()->position() );
 	} else {
 		if ( value_->type_id() != HHuginn::TYPE::TUPLE ) {
 			throw HHuginn::HHuginnRuntimeException( "`For` source did not return a `tuple` object.", file_id(), _source->position() );
 		}
-		HHuginn::HTuple::values_t const& srcData( static_cast<HHuginn::HTuple const*>( value_.raw() )->value() );
+		HHuginn::HTuple::values_t& srcData( static_cast<HHuginn::HTuple*>( value_.raw() )->value() );
 		int ds( static_cast<int>( srcData.get_size() ) );
 		if ( ds != cs ) {
 			throw HHuginn::HHuginnRuntimeException(
@@ -110,7 +110,7 @@ void HFor::run_loop( HThread* thread_, HFrame* frame_, HHuginn::value_t const& v
 		int i( 0 );
 		for ( HHuginn::expression_t const& control : _control ) {
 			control->execute( thread_ );
-			frame_->commit_variable( srcData[i ++], control->position() );
+			frame_->commit_variable( yaal::move( srcData[i ++] ), control->position() );
 		}
 	}
 	if ( frame_->can_continue() ) {
