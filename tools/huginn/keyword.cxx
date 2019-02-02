@@ -72,7 +72,8 @@ namespace INTERFACE {
 HHuginn::identifier_id_t const CLONE( BUILTIN::N_ARY_PRODUCT + 1 );
 HHuginn::identifier_id_t const GET_SIZE( CLONE + 1 );
 HHuginn::identifier_id_t const SUBSCRIPT( GET_SIZE + 1 );
-HHuginn::identifier_id_t const MEMBER( SUBSCRIPT + 1 );
+HHuginn::identifier_id_t const SET_SUBSCRIPT( SUBSCRIPT + 1 );
+HHuginn::identifier_id_t const MEMBER( SET_SUBSCRIPT + 1 );
 HHuginn::identifier_id_t const ITERATOR( MEMBER + 1 );
 HHuginn::identifier_id_t const IS_VALID( ITERATOR + 1 );
 HHuginn::identifier_id_t const NEXT( IS_VALID + 1 );
@@ -187,6 +188,7 @@ namespace INTERFACE {
 char const* CLONE            = "clone";
 char const* GET_SIZE         = "get_size";
 char const* SUBSCRIPT        = "subscript";
+char const* SET_SUBSCRIPT    = "set_subscript";
 char const* MEMBER           = "member";
 char const* ITERATOR         = "iterator";
 char const* IS_VALID         = "is_valid";

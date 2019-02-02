@@ -41,6 +41,8 @@ int long hash( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t boolean_xor( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 HHuginn::value_t boolean_not( HThread*, HHuginn::value_t const&, int );
 yaal::hcore::HString string_representation( HThread*, HHuginn::value_t const&, HCycleTracker&, int );
+HHuginn::value_t subscript_value( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
+void subscript_assign( HThread*, HHuginn::value_t&, HHuginn::value_t const&, HHuginn::value_t const&, int );
 
 HHuginn::value_t string( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t integer( HThread*, HHuginn::value_t const&, int );

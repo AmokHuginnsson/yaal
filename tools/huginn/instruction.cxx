@@ -14,6 +14,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "operator.hxx"
 #include "builtin.hxx"
 #include "objectfactory.hxx"
+#include "reference.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -25,6 +26,52 @@ namespace tools {
 namespace huginn {
 
 namespace instruction {
+
+HHuginn::value_t subscript_value( HThread* thread_, HHuginn::value_t const& base_, HHuginn::value_t const& key_, int position_ ) {
+	M_PROLOG
+	HHuginn::value_t res;
+	if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( base_.raw() ) ) {
+		res = o->call_method( thread_, base_, IDENTIFIER::INTERFACE::SUBSCRIPT, HArguments( thread_, key_ ), position_ );
+	} else {
+		HHuginn::HClass const* c( base_->get_class() );
+		int idx( c->field_index( IDENTIFIER::INTERFACE::SUBSCRIPT ) );
+		if ( idx >= 0 ) {
+			HHuginn::HClass::HMethod const& m( *static_cast<HHuginn::HClass::HMethod const*>( c->field( idx ).raw() ) );
+			res = m.function()( thread_, const_cast<HHuginn::value_t*>( &base_ ), HArguments( thread_, key_ ), position_ );
+		}
+	}
+	if ( ! res ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"Subscript is not supported on "_ys.append( a_type_name( base_->get_class() ) ).append( "." ),
+			thread_->current_frame()->file_id(),
+			position_
+		);
+	}
+	return ( res );
+	M_EPILOG
+}
+
+void subscript_assign( HThread* thread_, HHuginn::value_t& base_, HHuginn::value_t const& key_, HHuginn::value_t const& value_, int position_ ) {
+	M_PROLOG
+	if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( base_.raw() ) ) {
+		o->call_method( thread_, base_, IDENTIFIER::INTERFACE::SET_SUBSCRIPT, HArguments( thread_, value_, key_ ), position_ );
+	} else {
+		HHuginn::HClass const* c( base_->get_class() );
+		int idx( c->field_index( IDENTIFIER::INTERFACE::SET_SUBSCRIPT ) );
+		if ( idx >= 0 ) {
+			HHuginn::HClass::HMethod const& m( *static_cast<HHuginn::HClass::HMethod const*>( c->field( idx ).raw() ) );
+			m.function()( thread_, const_cast<HHuginn::value_t*>( &base_ ), HArguments( thread_, value_, key_ ), position_ );
+		} else {
+			throw HHuginn::HHuginnRuntimeException(
+				"Subscript assignment is not supported on "_ys.append( a_type_name( base_->get_class() ) ).append( "." ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+	}
+	return;
+	M_EPILOG
+}
 
 HHuginn::value_t subscript(
 	HThread* thread_,
@@ -81,23 +128,9 @@ HHuginn::value_t subscript(
 		res = ( subscript_ == HFrame::ACCESS::VALUE ? l->get( thread_, index_, position_ ) : of.create_reference( l->get_ref( thread_, index_, thread_->runtime().none_value(), position_ ) ) );
 	} else {
 		if ( subscript_ == HFrame::ACCESS::VALUE ) {
-			if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( base_.raw() ) ) {
-				res = o->call_method( thread_, base_, IDENTIFIER::INTERFACE::SUBSCRIPT, HArguments( thread_, index_ ), position_ );
-			} else {
-				HHuginn::HClass const* c( base_->get_class() );
-				int idx( c->field_index( IDENTIFIER::INTERFACE::SUBSCRIPT ) );
-				if ( idx >= 0 ) {
-					HHuginn::HClass::HMethod const& m( *static_cast<HHuginn::HClass::HMethod const*>( c->field( idx ).raw() ) );
-					res = m.function()( thread_, const_cast<HHuginn::value_t*>( &base_ ), HArguments( thread_, index_ ), position_ );
-				}
-			}
-		}
-		if ( ! res ) {
-			throw HHuginn::HHuginnRuntimeException(
-				"Subscript is not supported on "_ys.append( a_type_name( base_->get_class() ) ).append( "." ),
-				thread_->current_frame()->file_id(),
-				position_
-			);
+			res = subscript_value( thread_, base_, index_, position_ );
+		} else {
+			res = of.create<HSubscriptReference>( of.reference_class(), base_, index_ );
 		}
 	}
 	return ( res );
