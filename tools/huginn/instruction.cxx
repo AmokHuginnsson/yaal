@@ -47,6 +47,9 @@ HHuginn::value_t subscript_value( HThread* thread_, HHuginn::value_t const& base
 			position_
 		);
 	}
+	if ( ! thread_->can_continue() ) {
+		throw Interrupt();
+	}
 	return ( res );
 	M_EPILOG
 }
@@ -68,6 +71,9 @@ void subscript_assign( HThread* thread_, HHuginn::value_t& base_, HHuginn::value
 				position_
 			);
 		}
+	}
+	if ( ! thread_->can_continue() ) {
+		throw Interrupt();
 	}
 	return;
 	M_EPILOG
@@ -306,6 +312,53 @@ inline void no_such_member(
 	throw HHuginn::HHuginnRuntimeException( message, thread_->current_frame()->file_id(), position_ );
 }
 
+HHuginn::value_t member_value( HThread* thread_, HHuginn::value_t const& object_, HHuginn::identifier_id_t memberId_, int position_ ) {
+	M_PROLOG
+	HHuginn::value_t m;
+	HRuntime& rt( thread_->runtime() );
+	HHuginn::value_t s( rt.object_factory()->create_string( rt.identifier_name( memberId_ ) ) );
+	if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( object_.raw() ) ) {
+		m = o->call_method( thread_, object_, IDENTIFIER::INTERFACE::MEMBER, HArguments( thread_, s ), position_ );
+	} else {
+		HHuginn::HClass const* cls( object_->get_class() );
+		int idx( cls->field_index( IDENTIFIER::INTERFACE::SET_MEMBER ) );
+		if ( idx >= 0 ) {
+			HHuginn::HClass::HMethod const& method( *static_cast<HHuginn::HClass::HMethod const*>( cls->field( idx ).raw() ) );
+			m = method.function()( thread_, const_cast<HHuginn::value_t*>( &object_ ), HArguments( thread_, s ), position_ );
+		} else {
+			no_such_member( thread_, cls->name(), memberId_, position_, cls );
+		}
+	}
+	if ( ! thread_->can_continue() ) {
+		throw Interrupt();
+	}
+	return ( m );
+	M_EPILOG
+}
+
+void member_assign( HThread* thread_, HHuginn::value_t& object_, HHuginn::identifier_id_t memberId_, HHuginn::value_t const& value_, int position_ ) {
+	M_PROLOG
+	HRuntime& rt( thread_->runtime() );
+	HHuginn::value_t s( rt.object_factory()->create_string( rt.identifier_name( memberId_ ) ) );
+	if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( object_.raw() ) ) {
+		o->call_method( thread_, object_, IDENTIFIER::INTERFACE::SET_MEMBER, HArguments( thread_, value_, s ), position_ );
+	} else {
+		HHuginn::HClass const* cls( object_->get_class() );
+		int idx( cls->field_index( IDENTIFIER::INTERFACE::SET_MEMBER ) );
+		if ( idx >= 0 ) {
+			HHuginn::HClass::HMethod const& m( *static_cast<HHuginn::HClass::HMethod const*>( cls->field( idx ).raw() ) );
+			m.function()( thread_, const_cast<HHuginn::value_t*>( &object_ ), HArguments( thread_, value_, s ), position_ );
+		} else {
+			no_such_member( thread_, cls->name(), memberId_, position_, cls );
+		}
+	}
+	if ( ! thread_->can_continue() ) {
+		throw Interrupt();
+	}
+	return;
+	M_EPILOG
+}
+
 HHuginn::value_t member( HThread* thread_, HFrame::ACCESS access_, HHuginn::value_t& v_, HHuginn::identifier_id_t memberId_, int position_ ) {
 	M_PROLOG
 	HRuntime& rt( thread_->runtime() );
@@ -340,17 +393,10 @@ HHuginn::value_t member( HThread* thread_, HFrame::ACCESS access_, HHuginn::valu
 					position_
 				);
 			}
-			if ( access_ == HFrame::ACCESS::REFERENCE ) {
-				no_such_member( thread_, cls->name(), memberId_, position_, cls );
-			}
-			HHuginn::value_t s( rt.object_factory()->create_string( rt.identifier_name( memberId_ ) ) );
-			if ( HHuginn::HObject* o = dynamic_cast<HHuginn::HObject*>( v_.raw() ) ) {
-				m = o->call_method( thread_, v_, IDENTIFIER::INTERFACE::MEMBER, HArguments( thread_, s ), position_ );
-			} else if ( ( fi = cls->field_index( IDENTIFIER::INTERFACE::MEMBER ) ) >= 0 ) {
-				HHuginn::HClass::HMethod const& method( *static_cast<HHuginn::HClass::HMethod const*>( cls->field( fi ).raw() ) );
-				m = method.function()( thread_, &v_, HArguments( thread_, s ), position_ );
+			if ( access_ != HFrame::ACCESS::REFERENCE ) {
+				m = member_value( thread_, v_, memberId_, position_ );
 			} else {
-				no_such_member( thread_, cls->name(), memberId_, position_, cls );
+				m = rt.object_factory()->create<HMemberReference>( rt.object_factory()->reference_class(), v_, memberId_ );
 			}
 		}
 	} else if ( HHuginn::HObjectReference* oref = dynamic_cast<HHuginn::HObjectReference*>( v_.raw() ) ) { /* Handle `super' keyword. */

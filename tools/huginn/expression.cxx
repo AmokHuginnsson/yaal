@@ -1253,11 +1253,14 @@ void HExpression::do_execute( huginn::HThread* thread_ ) const {
 		M_ASSERT( _operations.is_empty() );
 		HFrame* f( thread_->current_frame() );
 		f->start_expression();
-		for ( OExecutionStep const& e : _executionSteps ) {
-			( e._expression->*e._action )( e, f );
-			if ( ! thread_->can_continue() ) {
-				break;
+		try {
+			for ( OExecutionStep const& e : _executionSteps ) {
+				( e._expression->*e._action )( e, f );
+				if ( ! thread_->can_continue() ) {
+					break;
+				}
 			}
+		} catch ( instruction::Interrupt const& ) {
 		}
 		HFrame::STATE s( f->state() );
 		if ( s < HFrame::STATE::EXCEPTION ) {

@@ -45,6 +45,21 @@ void HSubscriptReference::do_set( huginn::HThread* thread_, HHuginn::value_t&& v
 	instruction::subscript_assign( thread_, _base, _key, yaal::move( value_ ), position_ );
 }
 
+HMemberReference::HMemberReference( HHuginn::HClass const* class_, HHuginn::value_t const& object_, HHuginn::identifier_id_t memberId_ )
+	: HReference( class_, nullptr )
+	, _object( object_ )
+	, _memberId( memberId_ ) {
+	return;
+}
+
+HHuginn::value_t HMemberReference::do_get( huginn::HThread* thread_, int position_ ) const {
+	return ( instruction::member_value( thread_, _object, _memberId, position_ ) );
+}
+
+void HMemberReference::do_set( huginn::HThread* thread_, HHuginn::value_t&& value_, int position_ ) {
+	instruction::member_assign( thread_, _object, _memberId, yaal::move( value_ ), position_ );
+}
+
 }
 
 }

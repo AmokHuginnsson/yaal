@@ -27,6 +27,20 @@ private:
 	virtual void do_set( huginn::HThread*, HHuginn::value_t&&, int ) override;
 };
 
+class HMemberReference : public HHuginn::HReference {
+public:
+	typedef HMemberReference this_type;
+	typedef HHuginn::HReference base_type;
+private:
+	HHuginn::value_t _object;
+	HHuginn::identifier_id_t _memberId;
+public:
+	HMemberReference( HHuginn::HClass const*, HHuginn::value_t const&, HHuginn::identifier_id_t );
+private:
+	virtual HHuginn::value_t do_get( huginn::HThread*, int ) const override;
+	virtual void do_set( huginn::HThread*, HHuginn::value_t&&, int ) override;
+};
+
 }
 
 }

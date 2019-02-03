@@ -54,6 +54,7 @@ void OCompiler::detect_misuse( void ) const {
 		_runtime->identifier_id( INTERFACE::SUBSCRIPT ),
 		_runtime->identifier_id( INTERFACE::SET_SUBSCRIPT ),
 		_runtime->identifier_id( INTERFACE::MEMBER ),
+		_runtime->identifier_id( INTERFACE::SET_MEMBER ),
 		_runtime->identifier_id( INTERFACE::ITERATOR ),
 		_runtime->identifier_id( INTERFACE::IS_VALID ),
 		_runtime->identifier_id( INTERFACE::NEXT ),
