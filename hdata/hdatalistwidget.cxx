@@ -214,6 +214,7 @@ void HDataListWidget::do_add_new( void ) {
 	for ( int i( 0 ); i < size; ++ i ) {
 		item[i].set_string( "" );
 		item[i].set_integer( -1 );
+		item[i].set_time( now_local() );
 	}
 	_dataModel->add_tail( item );
 	process_input( KEY_CODE::HOME );
