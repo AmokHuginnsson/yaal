@@ -70,13 +70,15 @@ double long atof_ex( HString const& string_, bool parse_ ) {
 	if ( parse_ ) {
 		HExpression analyzer;
 		try {
-			if ( analyzer.compile( str ) ) {
-				value = analyzer.evaluate();
-			} else {
-				throw HExpressionException( HString( analyzer.get_error() ) + " for: " + string_ + ", at: " + analyzer.get_error_token() );
-			}
+			analyzer.compile( str );
+			value = analyzer.evaluate();
 		} catch ( HExpressionException const& e ) {
-			throw HExpressionException( HString( e.what() ) + " - " + analyzer.get_error() + " for: " + string_ + ", at: " + analyzer.get_error_token() );
+			str.lower();
+			int end( 0 );
+			value = hidden::std_strtold( str, &end );
+			if ( end != safe_int::cast<int>( str.get_length() ) ) {
+				throw HExpressionException( HString( e.what() ) + " - " + analyzer.get_error() + " for: " + string_ + ", at: " + analyzer.get_error_token() );
+			}
 		}
 	} else {
 		value = hidden::std_strtold( str, nullptr );

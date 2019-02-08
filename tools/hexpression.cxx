@@ -678,11 +678,9 @@ bool HExpression::terminal_production( tree_t::node_t node_ ) {
 
 double long* HExpression::compile( HString const& formula_ ) {
 	M_PROLOG
-	int long length = 0;
 	_index = 0;
 	_error = OK;
-	length = formula_.get_length();
-	if ( length == 0 ) {
+	if ( formula_.is_empty() ) {
 		_error = PREMATURE_TERMINATION;
 		throw HExpressionException( _syntaxError_ );
 	}
@@ -690,7 +688,7 @@ double long* HExpression::compile( HString const& formula_ ) {
 		throw HExpressionException( _syntaxError_ );
 	}
 	_constantsPool.clear();
-	tree_t::node_t root = _equationTree.create_new_root();
+	tree_t::node_t root( _equationTree.create_new_root() );
 	if ( addition_production( root ) ) {
 		if ( ( _index < _length ) && ( _error == OK ) ) {
 			_error = UNEXPECTED_TOKEN;
