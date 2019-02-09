@@ -556,6 +556,8 @@ HPackageCreatorInterface::HInstance HMathematicsCreator::do_new_instance( HRunti
 		)
 	);
 	HHuginn::field_definitions_t fd{
+		{ "INFINITY",             runtime_->object_factory()->create_real( math::INFINITY ),      " - a `real` value representing a positive infinity" },
+		{ "NAN",                  runtime_->object_factory()->create_real( math::NAN ),           " - a moniker representing an invalid `real` value" },
 		{ "pi",                   runtime_->create_method( &HMathematics::pi ),                   "( *type* [, *precision*] ) - get value of $\\pi$ of type *type*, potentially with given *precision*" },
 		{ "e",                    runtime_->create_method( &HMathematics::e ),                    "( *type* [, *precision*] ) - get value of $e$ of type *type*, potentially with given *precision*" },
 		{ "square_root",          runtime_->create_method( &builtin::square_root, "Mathematics.square_root" ), "( *value* ) - calculate square root of given *value*" },

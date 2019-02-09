@@ -12,8 +12,12 @@ namespace yaal {
  */
 namespace math {
 
-M_YAAL_HCORE_PUBLIC_API extern double long PI;
-M_YAAL_HCORE_PUBLIC_API extern double long E;
+M_YAAL_HCORE_PUBLIC_API extern double long const PI;
+M_YAAL_HCORE_PUBLIC_API extern double long const E;
+#undef INFINITY
+M_YAAL_HCORE_PUBLIC_API extern double long const INFINITY;
+#undef NAN
+M_YAAL_HCORE_PUBLIC_API extern double long const NAN;
 
 /*! \brief Calculate absolute value of a number.
  *
