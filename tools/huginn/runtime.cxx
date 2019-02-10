@@ -494,6 +494,8 @@ void HRuntime::import_symbols( identifier_id_t package_, HHuginn::identifiers_t 
 			register_global( id, f );
 		} else if ( is_enum_class( v ) ) {
 			register_global( id, v );
+		} else if ( type_tag( v->type_id() ) < HHuginn::TYPE::UNKNOWN ) {
+			register_global( id, v );
 		}
 	}
 	if ( firstImported ) {
