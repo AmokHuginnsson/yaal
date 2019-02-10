@@ -276,16 +276,43 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 	M_EPILOG
 }
 
+inline bool less_impl( huginn::HThread* thread_, HHuginn::value_t const& l_, HHuginn::value_t const& r_, int position_ ) {
+	HHuginn::HList::values_t const& l( static_cast<HHuginn::HList const*>( l_.raw() )->value() );
+	HHuginn::HList::values_t const& r( static_cast<HHuginn::HList const*>( r_.raw() )->value() );
+	HHuginn::HValueCompareHelper lessHelper( &instruction::less );
+	lessHelper.anchor( thread_, position_ );
+	return ( lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), cref( lessHelper ) ) );
+}
+
 inline HHuginn::value_t less( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
 	verify_signature( "list.less", values_, { HHuginn::TYPE::LIST }, thread_, position_ );
-	HHuginn::HList::values_t const& l( static_cast<HHuginn::HList*>( object_->raw() )->value() );
-	HHuginn::HList::values_t const& r( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
-	HHuginn::HValueCompareHelper lessHelper( &instruction::less );
-	lessHelper.anchor( thread_, position_ );
-	bool res( lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), cref( lessHelper ) ) );
-	return ( thread_->runtime().boolean_value( res ) );
+	return ( thread_->runtime().boolean_value( less_impl( thread_, *object_, values_[0], position_ ) ) );
+	M_EPILOG
+}
+
+inline HHuginn::value_t less_or_equal( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
+	verify_signature( "list.less_or_equal", values_, { HHuginn::TYPE::LIST }, thread_, position_ );
+	return ( thread_->runtime().boolean_value( ! less_impl( thread_, values_[0], *object_, position_ ) ) );
+	M_EPILOG
+}
+
+inline HHuginn::value_t greater( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
+	verify_signature( "list.greater", values_, { HHuginn::TYPE::LIST }, thread_, position_ );
+	return ( thread_->runtime().boolean_value( less_impl( thread_, values_[0], *object_, position_ ) ) );
+	M_EPILOG
+}
+
+inline HHuginn::value_t greater_or_equal( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
+	verify_signature( "list.greater_or_equal", values_, { HHuginn::TYPE::LIST }, thread_, position_ );
+	return ( thread_->runtime().boolean_value( ! less_impl( thread_, *object_, values_[0], position_ ) ) );
 	M_EPILOG
 }
 
@@ -336,6 +363,9 @@ public:
 			{ "sort",   objectFactory_->create_method( &list::sort ),   "( [*callable*] ) - in-place sort this `list`, using *callable* to retrieve keys for element comparison" },
 			{ "hash",   objectFactory_->create_method( &list::hash ),   "calculate hash value for this `list`" },
 			{ "less",   objectFactory_->create_method( &list::less ),   "( *other* ) - test if this `list` comes lexicographically before *other* `list`" },
+			{ "less_or_equal",    objectFactory_->create_method( &list::less_or_equal ),    "( *other* ) - test if this `list` is equal to or comes lexicographically before *other* `list`" },
+			{ "greater",          objectFactory_->create_method( &list::greater ),          "( *other* ) - test if this `list` comes lexicographically after *other* `list`" },
+			{ "greater_or_equal", objectFactory_->create_method( &list::greater_or_equal ), "( *other* ) - test if this `list` is equal to or comes lexicographically after *other* `list`" },
 			{ "equals", objectFactory_->create_method( &list::equals ), "( *other* ) - test if *other* `list` has the same content" }
 		};
 		redefine( nullptr, fd );
