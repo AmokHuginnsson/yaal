@@ -331,19 +331,16 @@ HString HFormat::string( void ) const {
 			if ( !!( conv & HFormatImpl::CONVERSION::BYTE ) ) {
 				*fp++ = 'h';
 				*fp++ = 'h';
-			}
-			if ( !!( conv & HFormatImpl::CONVERSION::SHORT ) ) {
+			} else if ( !!( conv & HFormatImpl::CONVERSION::SHORT ) ) {
 				*fp++ = 'h';
-			}
-			if ( !!( conv & HFormatImpl::CONVERSION::LONG ) ) {
+			} else if ( !!( conv & HFormatImpl::CONVERSION::LONG ) ) {
 				if ( !!( conv & HFormatImpl::CONVERSION::INT ) ) {
 					*fp++ = 'l';
 				} else {
 					M_ASSERT( !!( conv & HFormatImpl::CONVERSION::DOUBLE ) );
 					*fp++ = 'L';
 				}
-			}
-			if ( !!( conv & HFormatImpl::CONVERSION::LONG_LONG ) ) {
+			} else if ( !!( conv & HFormatImpl::CONVERSION::LONG_LONG ) ) {
 				*fp++ = 'l';
 				*fp++ = 'l';
 			}
@@ -355,18 +352,19 @@ HString HFormat::string( void ) const {
 				*fp++ = 'u';
 			} else if ( !!( conv & HFormatImpl::CONVERSION::INT ) ) {
 				*fp++ = 'd';
-			}
-			if ( !!( conv & HFormatImpl::CONVERSION::DOUBLE ) ) {
+			} else if ( !!( conv & HFormatImpl::CONVERSION::DOUBLE ) ) {
+				if ( !!( conv & HFormatImpl::CONVERSION::SHORT ) ) {
+					-- fp;
+				}
 				*fp++ = 'f';
-			}
-			if ( !!( conv & HFormatImpl::CONVERSION::STRING ) ) {
+			} else if ( !!( conv & HFormatImpl::CONVERSION::STRING ) ) {
 				*fp++ = 's';
-			}
-			if ( !!( conv & HFormatImpl::CONVERSION::CHAR ) ) {
+			} else if ( !!( conv & HFormatImpl::CONVERSION::CHAR ) ) {
 				*fp++ = 'c';
-			}
-			if ( !!( conv & HFormatImpl::CONVERSION::CODE_POINT ) ) {
+			} else if ( !!( conv & HFormatImpl::CONVERSION::CODE_POINT ) ) {
 				*fp++ = 'C';
+			} else if ( !!( conv & HFormatImpl::CONVERSION::POINTER ) ) {
+				*fp++ = 'p';
 			}
 			*fp = 0;
 			static int const MAX_FLOAT_DIGIT_COUNT( 8192 );
@@ -381,7 +379,7 @@ HString HFormat::string( void ) const {
 				} else if ( !!( conv & HFormatImpl::CONVERSION::LONG_LONG ) ) {
 					snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, HFormatImpl::variant_shell<int long long>::get( *_impl->_args, it->_position ) );
 				} else {
-					M_ASSERT( ( conv & ~( HFormatImpl::CONVERSION::OCTAL | HFormatImpl::CONVERSION::HEXADECIMAL ) ) == HFormatImpl::CONVERSION::INT );
+					M_ASSERT( ( conv & ~( HFormatImpl::CONVERSION::UNSIGNED | HFormatImpl::CONVERSION::OCTAL | HFormatImpl::CONVERSION::HEXADECIMAL ) ) == HFormatImpl::CONVERSION::INT );
 					snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, HFormatImpl::variant_shell<int>::get( *_impl->_args, it->_position ) );
 				}
 			} else if ( !!( conv & HFormatImpl::CONVERSION::STRING ) ) {
@@ -396,6 +394,8 @@ HString HFormat::string( void ) const {
 			} else if ( !!( conv & HFormatImpl::CONVERSION::DOUBLE ) ) {
 				if ( !!( conv & ( HFormatImpl::CONVERSION::LONG ) ) ) {
 					snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, HFormatImpl::variant_shell<double long>::get( *_impl->_args, it->_position ) );
+				} else if ( !!( conv & ( HFormatImpl::CONVERSION::SHORT ) ) ) {
+					snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, HFormatImpl::variant_shell<float>::get( *_impl->_args, it->_position ) );
 				} else {
 					snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, fmt, HFormatImpl::variant_shell<double>::get( *_impl->_args, it->_position ) );
 				}
@@ -528,7 +528,7 @@ HFormat HFormat::operator % ( double long dl ) {
 HFormat HFormat::operator % ( float f ) {
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
-	int idx = _impl->next_token( HFormatImpl::CONVERSION::DOUBLE );
+	int idx = _impl->next_token( HFormatImpl::CONVERSION::DOUBLE | HFormatImpl::CONVERSION::SHORT );
 	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( f ) ) );
 	return ( _impl );
 	M_EPILOG
@@ -710,21 +710,23 @@ HFormat::HFormatImpl::conversion_t HFormat::HFormatImpl::get_conversion( HString
 	conversion_t conversion = CONVERSION::EMPTY;
 	M_ENSURE( i < s.get_length() );
 	struct OLength {
+		enum LENGTH { hh, h, ll, l, q, L };
 		char const* _label;
 		conversion_t _conversion;
-	} length[] = {
-		{ "hh", CONVERSION::BYTE },
-		{ "h", CONVERSION::SHORT },
-		{ "ll", CONVERSION::LONG_LONG },
-		{ "l", CONVERSION::LONG },
-		{ "q", CONVERSION::LONG_LONG },
-		{ "L", CONVERSION::LONG_LONG }
+		LENGTH _length;
+	} const lengthConversions[] = {
+		{ "hh", CONVERSION::BYTE,      OLength::hh },
+		{ "h",  CONVERSION::SHORT,     OLength::h },
+		{ "ll", CONVERSION::LONG_LONG, OLength::ll },
+		{ "l",  CONVERSION::LONG,      OLength::l },
+		{ "q",  CONVERSION::LONG_LONG, OLength::q },
+		{ "L",  CONVERSION::LONG_LONG, OLength::L }
 	};
-	int lenMod = -1;
-	for ( size_t k = 0; k < ( sizeof ( length ) / sizeof ( OLength ) ); ++ k ) {
-		if ( s.find( length[ k ]._label, i ) == i ) {
-			i += static_cast<int>( ::std::strlen( length[ k ]._label ) );
-			lenMod = static_cast<int>( k );
+	OLength const* cl( nullptr );
+	for ( OLength const& len : lengthConversions ) {
+		if ( s.find( len._label, i ) == i ) {
+			i += static_cast<int>( ::std::strlen( len._label ) );
+			cl = &len;
 			break;
 		}
 	}
@@ -777,28 +779,35 @@ HFormat::HFormatImpl::conversion_t HFormat::HFormatImpl::get_conversion( HString
 			break;
 		}
 	}
-	char const* const BAD_LEN_MOD = _( "bad length mod." );
-	switch ( lenMod ) {
-		case ( 0 ):
-		case ( 1 ):
-		case ( 2 ):
-		case ( 3 ):
-		case ( 4 ): {
-			if ( !!( conversion & CONVERSION::INT ) ) {
-				conversion |= length[ lenMod ]._conversion;
-			} else {
-				M_THROW( BAD_LEN_MOD, lenMod );
-			}
-		} break;
-		case ( 5 ): {
-			if ( !!( conversion & CONVERSION::DOUBLE ) ) {
-				conversion |= CONVERSION::LONG;
-			} else if ( !!( conversion & CONVERSION::INT ) ) {
-				conversion |= CONVERSION::LONG_LONG;
-			} else {
-				M_THROW( BAD_LEN_MOD, lenMod );
-			}
-		} break;
+	char const* const BAD_LEN_MOD = _( "bad lengthConversions mod." );
+	if ( cl ) {
+		switch ( cl->_length ) {
+			case ( OLength::hh ):
+			case ( OLength::h ): {
+				if ( !!( conversion & CONVERSION::DOUBLE ) ) {
+					conversion |= cl->_conversion;
+					break;
+				}
+			} /* fall-through */
+			case ( OLength::ll ):
+			case ( OLength::l ):
+			case ( OLength::q ): {
+				if ( !!( conversion & CONVERSION::INT ) ) {
+					conversion |= cl->_conversion;
+				} else {
+					M_THROW( BAD_LEN_MOD, cl->_length );
+				}
+			} break;
+			case ( OLength::L ): {
+				if ( !!( conversion & CONVERSION::DOUBLE ) ) {
+					conversion |= CONVERSION::LONG;
+				} else if ( !!( conversion & CONVERSION::INT ) ) {
+					conversion |= CONVERSION::LONG_LONG;
+				} else {
+					M_THROW( BAD_LEN_MOD, cl->_length );
+				}
+			} break;
+		}
 	}
 	++ i;
 	return ( conversion );
