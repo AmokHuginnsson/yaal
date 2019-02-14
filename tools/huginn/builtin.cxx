@@ -273,10 +273,10 @@ using n_ary_action_t = void ( HThread*, HHuginn::value_t&, HHuginn::value_t cons
 
 HHuginn::value_t n_ary_action( char const* name_, n_ary_action_t action_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 	verify_arg_count( name_, values_, 1, 1, thread_, position_ );
-	verify_arg_collection( name_, values_, 0, ARITY::UNARY, ONTICALLY::VIRTUAL, thread_, position_ );
+	HHuginn::value_t src( verify_arg_virtual_collection( name_, values_, 0, ARITY::UNARY, thread_, position_ ) );
 	HHuginn::value_t accumulator( thread_->runtime().none_value() );
-	HHuginn::HIterable const* src( static_cast<HHuginn::HIterable const*>( values_[0].raw() ) );
-	HHuginn::HIterable::iterator_t it( const_cast<HHuginn::HIterable*>( src )->iterator( thread_, position_ ) );
+	HHuginn::HIterable const* iterable( static_cast<HHuginn::HIterable const*>( values_[0].raw() ) );
+	HHuginn::HIterable::iterator_t it( const_cast<HHuginn::HIterable*>( iterable )->iterator( thread_, position_ ) );
 	if ( ! it->is_valid( thread_, position_ ) ) {
 		throw HHuginn::HHuginnRuntimeException(
 			hcore::to_string( name_ ).append( " on empty." ), thread_->current_frame()->file_id(), position_

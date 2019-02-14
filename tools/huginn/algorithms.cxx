@@ -90,15 +90,15 @@ public:
 	static HHuginn::value_t reduce( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		char const name[] = "Algorithms.reduce";
 		verify_arg_count( name, values_, 2, 3, thread_, position_ );
-		verify_arg_collection( name, values_, 0, ARITY::MULTIPLE, ONTICALLY::VIRTUAL, thread_, position_ );
+		HHuginn::value_t src( verify_arg_virtual_collection( name, values_, 0, ARITY::MULTIPLE, thread_, position_ ) );
 		HHuginn::type_id_t t( verify_arg_type( name, values_, 1, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::UNBOUND_METHOD, HHuginn::TYPE::BOUND_METHOD }, ARITY::MULTIPLE, thread_, position_ ) );
 		int argCount( static_cast<int>( values_.get_size() ) );
 		HHuginn::value_t accumulator( argCount == 3 ? values_[2] : HHuginn::value_t() );
-		HHuginn::HIterable const* src( static_cast<HHuginn::HIterable const*>( values_[0].raw() ) );
-		if ( ! accumulator && ( src->size( thread_, position_ ) == 0 ) ) {
+		HHuginn::HIterable const* iterable( static_cast<HHuginn::HIterable const*>( src.raw() ) );
+		if ( ! accumulator && ( iterable->size( thread_, position_ ) == 0 ) ) {
 			throw HHuginn::HHuginnRuntimeException( "reduce() on empty.", thread_->current_frame()->file_id(), position_ );
 		}
-		HHuginn::HIterable::iterator_t it( const_cast<HHuginn::HIterable*>( src )->iterator( thread_, position_ ) );
+		HHuginn::HIterable::iterator_t it( const_cast<HHuginn::HIterable*>( iterable )->iterator( thread_, position_ ) );
 		if ( ! accumulator ) {
 			accumulator = it->value( thread_, position_ );
 			it->next( thread_, position_ );
@@ -127,12 +127,12 @@ public:
 	static HHuginn::value_t materialize( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		char const name[] = "Algorithms.materialize";
 		verify_arg_count( name, values_, 2, 2, thread_, position_ );
-		verify_arg_collection( name, values_, 0, ARITY::MULTIPLE, ONTICALLY::VIRTUAL, thread_, position_ );
+		HHuginn::value_t src( verify_arg_virtual_collection( name, values_, 0, ARITY::MULTIPLE, thread_, position_ ) );
 		verify_arg_type( name, values_, 1, HHuginn::TYPE::FUNCTION_REFERENCE, ARITY::MULTIPLE, thread_, position_ );
 		HHuginn::HFunctionReference const& fr( *static_cast<HHuginn::HFunctionReference const*>( values_[1].raw() ) );
 		HHuginn::value_t v;
-		HHuginn::HIterable const* src( static_cast<HHuginn::HIterable const*>( values_[0].raw() ) );
-		HHuginn::HIterable::iterator_t it( const_cast<HHuginn::HIterable*>( src )->iterator( thread_, position_ ) );
+		HHuginn::HIterable const* iterable( static_cast<HHuginn::HIterable const*>( src.raw() ) );
+		HHuginn::HIterable::iterator_t it( const_cast<HHuginn::HIterable*>( iterable )->iterator( thread_, position_ ) );
 		if ( fr.function().id() == bit_cast<void const*>( &builtin::tuple ) ) {
 			HHuginn::HTuple::values_t dest;
 			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
@@ -283,42 +283,43 @@ public:
 		M_PROLOG
 		char const name[] = "Algorithms.sorted";
 		verify_arg_count( name, values_, 1, 2, thread_, position_ );
-		HHuginn::type_id_t t( verify_arg_collection( name, values_, 0, ARITY::MULTIPLE, ONTICALLY::VIRTUAL, thread_, position_ ) );
+		HHuginn::value_t src( verify_arg_virtual_collection( name, values_, 0, ARITY::MULTIPLE, thread_, position_ ) );
+		HHuginn::type_id_t t( src->type_id() );
 		HHuginn::value_t v( thread_->object_factory().create_list() );
 		HHuginn::HList::values_t& dest( static_cast<HHuginn::HList*>( v.raw() )->value() );
 		if ( t == HHuginn::TYPE::TUPLE ) {
-			HHuginn::HTuple::values_t const& k( static_cast<HHuginn::HTuple const*>( values_[0].raw() )->value() );
+			HHuginn::HTuple::values_t const& k( static_cast<HHuginn::HTuple const*>( src.raw() )->value() );
 			dest = k;
 		} else if ( t == HHuginn::TYPE::LIST ) {
-			HHuginn::HList::values_t const& l( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
+			HHuginn::HList::values_t const& l( static_cast<HHuginn::HList const*>( src.raw() )->value() );
 			dest = l;
 		} else if ( t == HHuginn::TYPE::DEQUE ) {
-			HHuginn::HDeque::values_t const& d( static_cast<HHuginn::HDeque const*>( values_[0].raw() )->value() );
+			HHuginn::HDeque::values_t const& d( static_cast<HHuginn::HDeque const*>( src.raw() )->value() );
 			dest.assign( d.begin(), d.end() );
 		} else if ( t == HHuginn::TYPE::ORDER ) {
-			HHuginn::HOrder::values_t const& s( static_cast<HHuginn::HOrder const*>( values_[0].raw() )->value() );
+			HHuginn::HOrder::values_t const& s( static_cast<HHuginn::HOrder const*>( src.raw() )->value() );
 			dest.assign( s.begin(), s.end() );
 		} else if ( t == HHuginn::TYPE::SET ) {
-			HHuginn::HSet::values_t const& s( static_cast<HHuginn::HSet const*>( values_[0].raw() )->value() );
+			HHuginn::HSet::values_t const& s( static_cast<HHuginn::HSet const*>( src.raw() )->value() );
 			dest.assign( s.begin(), s.end() );
 		} else if ( t == HHuginn::TYPE::DICT ) {
-			HHuginn::HDict::values_t const& s( static_cast<HHuginn::HDict const*>( values_[0].raw() )->value() );
+			HHuginn::HDict::values_t const& s( static_cast<HHuginn::HDict const*>( src.raw() )->value() );
 			for ( HHuginn::HDict::values_t::value_type const& e : s ) {
 				dest.push_back( e.first );
 			}
 		} else if ( t == HHuginn::TYPE::LOOKUP ) {
-			HHuginn::HLookup::values_t const& s( static_cast<HHuginn::HLookup const*>( values_[0].raw() )->value() );
+			HHuginn::HLookup::values_t const& s( static_cast<HHuginn::HLookup const*>( src.raw() )->value() );
 			for ( HHuginn::HLookup::values_t::value_type const& e : s ) {
 				dest.push_back( e.first );
 			}
 		} else if ( t == HHuginn::TYPE::STRING ) {
-			HString const& s( get_string( values_[0] ) );
+			HString const& s( get_string( src ) );
 			for ( code_point_t c : s ) {
 				dest.push_back( thread_->object_factory().create_character( c ) );
 			}
 		} else {
-			HHuginn::HIterable const* src( static_cast<HHuginn::HIterable const*>( values_[0].raw() ) );
-			HHuginn::HIterable::iterator_t it( const_cast<HHuginn::HIterable*>( src )->iterator( thread_, position_ ) );
+			HHuginn::HIterable const* iterable( static_cast<HHuginn::HIterable const*>( src.raw() ) );
+			HHuginn::HIterable::iterator_t it( const_cast<HHuginn::HIterable*>( iterable )->iterator( thread_, position_ ) );
 			while ( it->is_valid( thread_, position_ ) && thread_->can_continue() ) {
 				dest.push_back( it->value( thread_, position_ ) );
 				it->next( thread_, position_ );
@@ -354,7 +355,7 @@ public:
 		M_PROLOG
 		char const name[] = "Algorithms.reversed";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
-		HHuginn::type_id_t t( verify_arg_collection( name, values_, 0, ARITY::UNARY, ONTICALLY::MATERIALIZED, thread_, position_ ) );
+		HHuginn::type_id_t t( verify_arg_materialized_collection( name, values_, 0, ARITY::UNARY, thread_, position_ ) );
 		HHuginn::value_t v;
 		switch ( t.get() ) {
 			case ( static_cast<int>( HHuginn::TYPE::TUPLE ) ): {
@@ -393,13 +394,13 @@ private:
 		M_PROLOG
 		char const name[] = "Algorithms.filter";
 		verify_arg_count( name, values_, 2, 2, thread_, position_ );
-		verify_arg_collection( name, values_, 0, ARITY::MULTIPLE, ONTICALLY::VIRTUAL, thread_, position_ );
+		HHuginn::value_t src( verify_arg_virtual_collection( name, values_, 0, ARITY::MULTIPLE, thread_, position_ ) );
 		HHuginn::type_id_t t( verify_arg_type( name, values_, 1, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::UNBOUND_METHOD, HHuginn::TYPE::BOUND_METHOD }, ARITY::MULTIPLE, thread_, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-			v = thread_->object_factory().create<HFilter>( _filterClass.raw(), values_[0], static_cast<HHuginn::HFunctionReference const*>( values_[1].raw() )->function(), HHuginn::value_t() );
+			v = thread_->object_factory().create<HFilter>( _filterClass.raw(), src, static_cast<HHuginn::HFunctionReference const*>( values_[1].raw() )->function(), HHuginn::value_t() );
 		} else {
-			v = thread_->object_factory().create<HFilter>( _filterClass.raw(), values_[0], HHuginn::function_t(), values_[1] );
+			v = thread_->object_factory().create<HFilter>( _filterClass.raw(), src, HHuginn::function_t(), values_[1] );
 		}
 		return ( v );
 		M_EPILOG
@@ -408,13 +409,13 @@ private:
 		M_PROLOG
 		char const name[] = "Algorithms.map";
 		verify_arg_count( name, values_, 2, 2, thread_, position_ );
-		verify_arg_collection( name, values_, 0, ARITY::MULTIPLE, ONTICALLY::VIRTUAL, thread_, position_ );
+		HHuginn::value_t src( verify_arg_virtual_collection( name, values_, 0, ARITY::MULTIPLE, thread_, position_ ) );
 		HHuginn::type_id_t t( verify_arg_type( name, values_, 1, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::UNBOUND_METHOD, HHuginn::TYPE::BOUND_METHOD }, ARITY::MULTIPLE, thread_, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-			v = thread_->object_factory().create<HMapper>( _mapperClass.raw(), values_[0], static_cast<HHuginn::HFunctionReference const*>( values_[1].raw() )->function(), HHuginn::value_t() );
+			v = thread_->object_factory().create<HMapper>( _mapperClass.raw(), src, static_cast<HHuginn::HFunctionReference const*>( values_[1].raw() )->function(), HHuginn::value_t() );
 		} else {
-			v = thread_->object_factory().create<HMapper>( _mapperClass.raw(), values_[0], HHuginn::function_t(), values_[1] );
+			v = thread_->object_factory().create<HMapper>( _mapperClass.raw(), src, HHuginn::function_t(), values_[1] );
 		}
 		return ( v );
 		M_EPILOG
@@ -423,13 +424,13 @@ private:
 		M_PROLOG
 		char const name[] = "Algorithms.enumerate";
 		verify_arg_count( name, values_, 1, 2, thread_, position_ );
-		verify_arg_collection( name, values_, 0, ARITY::MULTIPLE, ONTICALLY::VIRTUAL, thread_, position_ );
+		HHuginn::value_t src( verify_arg_virtual_collection( name, values_, 0, ARITY::MULTIPLE, thread_, position_ ) );
 		HHuginn::HInteger::value_type start( 0 );
 		if ( values_.get_size() > 1 ) {
 			verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
 			start = get_integer( values_[1] );
 		}
-		return ( thread_->object_factory().create<HEnumerator>( _enumeratorClass.raw(), values_[0], start ) );
+		return ( thread_->object_factory().create<HEnumerator>( _enumeratorClass.raw(), src, start ) );
 		M_EPILOG
 	}
 	HHuginn::value_t do_zip( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
@@ -437,10 +438,11 @@ private:
 		char const name[] = "Algorithms.zip";
 		verify_arg_count( name, values_, 1, meta::max_signed<int>::value, thread_, position_ );
 		int cols( static_cast<int>( values_.get_size() ) );
+		HHuginn::values_t values;
 		for ( int i( 0 ); i < cols; ++ i ) {
-			verify_arg_collection( name, values_, i, ARITY::MULTIPLE, ONTICALLY::VIRTUAL, thread_, position_ );
+			values.push_back( verify_arg_virtual_collection( name, values_, i, ARITY::MULTIPLE, thread_, position_ ) );
 		}
-		return ( thread_->object_factory().create<HZip>( _zipClass.raw(), values_ ) );
+		return ( thread_->object_factory().create<HZip>( _zipClass.raw(), values ) );
 		M_EPILOG
 	}
 	HHuginn::value_t do_chain( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
@@ -448,10 +450,11 @@ private:
 		char const name[] = "Algorithms.chain";
 		verify_arg_count( name, values_, 1, meta::max_signed<int>::value, thread_, position_ );
 		int cols( static_cast<int>( values_.get_size() ) );
+		HHuginn::values_t values;
 		for ( int i( 0 ); i < cols; ++ i ) {
-			verify_arg_collection( name, values_, i, ARITY::MULTIPLE, ONTICALLY::VIRTUAL, thread_, position_ );
+			values.push_back( verify_arg_virtual_collection( name, values_, i, ARITY::MULTIPLE, thread_, position_ ) );
 		}
-		return ( thread_->object_factory().create<HChain>( _chainClass.raw(), values_ ) );
+		return ( thread_->object_factory().create<HChain>( _chainClass.raw(), values ) );
 		M_EPILOG
 	}
 	HHuginn::value_t do_product( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
@@ -459,11 +462,12 @@ private:
 		char const name[] = "Algorithms.product";
 		verify_arg_count( name, values_, 1, meta::max_signed<int>::value, thread_, position_ );
 		int cols( static_cast<int>( values_.get_size() ) );
+		HHuginn::values_t values;
 		for ( int i( 0 ); i < cols; ++ i ) {
-			verify_arg_collection( name, values_, i, ARITY::MULTIPLE, ONTICALLY::VIRTUAL, thread_, position_ );
+			values.push_back( verify_arg_virtual_collection( name, values_, i, ARITY::MULTIPLE, thread_, position_ ) );
 		}
 		HProduct::axes_t axes;
-		for ( HHuginn::value_t& v : values_ ) {
+		for ( HHuginn::value_t& v : values ) {
 			HHuginn::HIterable const* col( static_cast<HHuginn::HIterable const*>( v.raw() ) );
 			HHuginn::HIterable::iterator_t it( const_cast<HHuginn::HIterable*>( col )->iterator( thread_, position_ ) );
 			HProduct::axes_t::value_type axis;
@@ -482,12 +486,12 @@ private:
 		M_PROLOG
 		char const name[] = "Algorithms.iterator";
 		verify_arg_count( name, values_, 1, 1, thread_, position_ );
-		verify_arg_collection( name, values_, 0, ARITY::MULTIPLE, ONTICALLY::VIRTUAL, thread_, position_ );
+		HHuginn::value_t src( verify_arg_virtual_collection( name, values_, 0, ARITY::MULTIPLE, thread_, position_ ) );
 		return (
 			thread_->object_factory().create<HIterator>(
 				_iteratorClass.raw(),
-				values_.front(),
-				static_cast<HHuginn::HIterable*>( values_.front().raw() )->iterator( thread_, position_ )
+				src,
+				static_cast<HHuginn::HIterable*>( src.raw() )->iterator( thread_, position_ )
 			)
 		);
 		M_EPILOG
@@ -496,7 +500,7 @@ private:
 		M_PROLOG
 		char const name[] = "Algorithms.slice";
 		verify_arg_count( name, values_, 2, 4, thread_, position_ );
-		verify_arg_collection( name, values_, 0, ARITY::MULTIPLE, ONTICALLY::VIRTUAL, thread_, position_ );
+		HHuginn::value_t src( verify_arg_virtual_collection( name, values_, 0, ARITY::MULTIPLE, thread_, position_ ) );
 		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
 		int long long from( 0 );
 		int long long stop( 0 );
@@ -524,13 +528,7 @@ private:
 		) {
 			throw HHuginn::HHuginnRuntimeException( "Invalid slice.", thread_->current_frame()->file_id(), position_ );
 		}
-		return (
-			thread_->object_factory().create<HSlice>(
-				_sliceClass.raw(),
-				values_.front(),
-				from, stop, step
-			)
-		);
+		return ( thread_->object_factory().create<HSlice>( _sliceClass.raw(), src, from, stop, step ) );
 		M_EPILOG
 	}
 	HHuginn::value_t do_range( HThread* thread_, HHuginn::values_t& values_, int position_ ) {

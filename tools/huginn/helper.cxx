@@ -404,10 +404,30 @@ HHuginn::type_id_t verify_arg_numeric(
 	M_EPILOG
 }
 
-HHuginn::type_id_t verify_arg_collection(
+void not_a_collection( huginn::HThread*, char const*, HHuginn::HClass const*, int, ARITY, char const*, int ) __attribute__((noreturn));
+inline void not_a_collection( huginn::HThread* thread_, char const* name_, HHuginn::HClass const* class_, int no_, ARITY argsArity_, char const* extraMsg_, int position_ ) {
+	HString no;
+	if ( argsArity_ == ARITY::MULTIPLE ) {
+		no = util::ordinal( no_ + 1 ).append( " " );
+	}
+	throw HHuginn::HHuginnRuntimeException(
+		""_ys.append( name_ )
+			.append( "() " )
+			.append( no )
+			.append( "argument must be a" )
+			.append( extraMsg_ )
+			.append( " collection type, not " )
+			.append( a_type_name( class_ ) )
+			.append( "." ),
+		thread_->current_frame()->file_id(),
+		position_
+	);
+}
+
+HHuginn::type_id_t verify_arg_materialized_collection(
 	char const* name_,
 	HHuginn::values_t& values_,
-	int no_, ARITY argsArity_, ONTICALLY ontically_, huginn::HThread* thread_, int position_ ) {
+	int no_, ARITY argsArity_, huginn::HThread* thread_, int position_ ) {
 	M_PROLOG
 	static HHuginn::TYPE const material[] = {
 		HHuginn::TYPE::TUPLE,
@@ -419,27 +439,26 @@ HHuginn::type_id_t verify_arg_collection(
 		HHuginn::TYPE::LOOKUP,
 		HHuginn::TYPE::STRING
 	};
-	HHuginn::TYPE t( static_cast<HHuginn::TYPE>( values_[no_]->type_id().get() ) );
-	if ( ! dynamic_cast<HHuginn::HIterable const*>( values_[no_].raw() )
-		|| ( ( ontically_ == ONTICALLY::MATERIALIZED ) && ( find( begin( material ), end( material ), t ) == end( material ) ) ) ) {
-		HString no;
-		if ( argsArity_ == ARITY::MULTIPLE ) {
-			no = util::ordinal( no_ + 1 ).append( " " );
-		}
-		throw HHuginn::HHuginnRuntimeException(
-			""_ys.append( name_ )
-				.append( "() " )
-				.append( no )
-				.append( "argument must be a" )
-				.append( ( ontically_ == ONTICALLY::MATERIALIZED ) ? " materialized" : "" )
-				.append( " collection type, not " )
-				.append( a_type_name( values_[no_]->get_class() ) )
-				.append( "." ),
-			thread_->current_frame()->file_id(),
-			position_
-		);
+	HHuginn::value_t const& v( values_[no_] );
+	HHuginn::type_id_t t( v->type_id() );
+	auto end( yaal::end( material ) );
+	if ( find( begin( material ), end, type_tag( t ) ) == end ) {
+		not_a_collection( thread_, name_, v->get_class(), no_, argsArity_, " materialized", position_ );
 	}
-	return ( values_[no_]->type_id() );
+	return ( t );
+	M_EPILOG
+}
+
+HHuginn::value_t verify_arg_virtual_collection(
+	char const* name_,
+	HHuginn::values_t& values_,
+	int no_, ARITY argsArity_, huginn::HThread* thread_, int position_ ) {
+	M_PROLOG
+	HHuginn::value_t v( values_[no_] );
+	if ( ! dynamic_cast<HHuginn::HIterable const*>( v.raw() ) ) {
+		not_a_collection( thread_, name_, v->get_class(), no_, argsArity_, "", position_ );
+	}
+	return ( v );
 	M_EPILOG
 }
 
@@ -500,7 +519,7 @@ HHuginn::type_id_t verify_arg_collection_value_type(
 	huginn::HThread* thread_,
 	int position_
 ) {
-	verify_arg_collection( name_, values_, no_, argsArity_, ONTICALLY::MATERIALIZED, thread_, position_ );
+	verify_arg_materialized_collection( name_, values_, no_, argsArity_, thread_, position_ );
 	HHuginn::type_id_t type( type_id( HHuginn::TYPE::UNKNOWN ) );
 	switch ( values_[no_]->type_id().get() ) {
 		case ( static_cast<int>( HHuginn::TYPE::TUPLE ) ): {
