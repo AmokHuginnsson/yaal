@@ -7,6 +7,10 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "runtime.hxx"
 #include "thread.hxx"
 #include "helper.hxx"
+#include "keyword.hxx"
+
+using namespace yaal;
+using namespace yaal::hcore;
 
 namespace yaal {
 
@@ -84,6 +88,114 @@ HHuginn::class_t HIterator::get_class( HRuntime* runtime_, HHuginn::HClass const
 	c->set_origin( origin_ );
 	runtime_->huginn()->register_class( c );
 	return ( c );
+}
+
+HHuginn::class_t HIterableAdaptor::get_class( HRuntime* runtime_ ) {
+	M_PROLOG
+	HHuginn::class_t c(
+		runtime_->create_class(
+			"IterableAdaptor",
+			"The `IterableAdaptor` allows for user defined classes that implement `iterator` interface to be used in built-in algorithms and in `for` statement.",
+			HHuginn::ACCESS::PRIVATE
+		)
+	);
+	runtime_->huginn()->register_class( c, HHuginn::VISIBILITY::HIDDEN );
+	return ( c );
+	M_EPILOG
+}
+
+HIterableAdaptor::HIterableAdaptor( HHuginn::HClass const* class_, HHuginn::value_t const& source_ )
+	: HHuginn::HIterable( class_ )
+	, _source( source_ ) {
+	M_ASSERT( dynamic_cast<HHuginn::HObject*>( _source.raw() ) );
+	return;
+}
+
+HHuginn::HIterable::iterator_t HIterableAdaptor::do_iterator( HThread* thread_, int position_ ) {
+	M_PROLOG
+	HHuginn::HObject* obj( static_cast<HHuginn::HObject*>( _source.raw() ) );
+	HHuginn::value_t itVal( obj->call_method( thread_, _source, IDENTIFIER::INTERFACE::ITERATOR, HArguments( thread_ ), position_ ) );
+	HHuginn::HObject* itObj( dynamic_cast<HHuginn::HObject*>( itVal.raw() ) );
+	if ( ! itObj ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"User defined `iterable` "_ys
+				.append( a_type_name( _source->get_class() ) )
+				.append( " returned invalid iterator object - " )
+				.append( a_type_name( itVal->get_class() ) )
+				.append( "." ),
+			thread_->current_frame()->file_id(),
+			position_
+		);
+	}
+	return ( hcore::make_pointer<HIterableAdaptorIterator>( thread_, _source, itVal, position_ ) );
+	M_EPILOG
+}
+
+int long HIterableAdaptor::do_size( huginn::HThread* thread_, int position_ ) const {
+	HHuginn::HObject const* obj( static_cast<HHuginn::HObject const*>( _source.raw() ) );
+	HHuginn::value_t sizeVal( obj->call_method( thread_, _source, IDENTIFIER::INTERFACE::GET_SIZE, HArguments( thread_ ), position_ ) );
+	if ( sizeVal->type_id() != HHuginn::TYPE::INTEGER ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"User defined `iterable` "_ys
+				.append( a_type_name( _source->get_class() ) )
+				.append( " returned an invalid type " )
+				.append( a_type_name( sizeVal->get_class() ) )
+				.append( " instead of an `integer' from supplied `get_size' method." ),
+			thread_->current_frame()->file_id(),
+			position_
+		);
+	}
+	int long s( 0 );
+	try {
+		s = safe_int::cast<int long>( get_integer( sizeVal ) );
+	} catch ( hcore::HException const& e ) {
+		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+	}
+	return ( s );
+}
+
+HIterableAdaptorIterator::HIterableAdaptorIterator( HThread* thread_, HHuginn::value_t const& source_, HHuginn::value_t const& iterator_, int position_ )
+	: _source( source_ )
+	, _iterator( iterator_ )
+	, _isValidMethod()
+	, _valueMethod()
+	, _nextMethod() {
+	M_ASSERT( dynamic_cast<HHuginn::HObject*>( _iterator.raw() ) );
+	HHuginn::HObject* it( static_cast<HHuginn::HObject*>( _iterator.raw() ) );
+	HHuginn::value_t isValidField( it->get_method( thread_, _iterator, IDENTIFIER::INTERFACE::IS_VALID, position_ ) );
+	HHuginn::HClass::HBoundMethod* isValidMethod( static_cast<HHuginn::HClass::HBoundMethod*>( isValidField.raw() ) );
+	HHuginn::value_t valueField( it->get_method( thread_, _iterator, IDENTIFIER::INTERFACE::VALUE, position_ ) );
+	HHuginn::HClass::HBoundMethod* valueMethod( static_cast<HHuginn::HClass::HBoundMethod*>( valueField.raw() ) );
+	HHuginn::value_t nextField( it->get_method( thread_, _iterator, IDENTIFIER::INTERFACE::NEXT, position_ ) );
+	HHuginn::HClass::HBoundMethod* nextMethod( static_cast<HHuginn::HClass::HBoundMethod*>( nextField.raw() ) );
+	_isValidMethod = isValidMethod->function();
+	_valueMethod = valueMethod->function();
+	_nextMethod = nextMethod->function();
+	return;
+}
+
+bool HIterableAdaptorIterator::do_is_valid( HThread* thread_, int position_ ) {
+	HHuginn::value_t isValid( _isValidMethod( thread_, &_iterator, HArguments( thread_ ), position_ ) );
+	if ( isValid->type_id() != HHuginn::TYPE::BOOLEAN ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"User defined `iterator` "_ys
+				.append( a_type_name( _iterator->get_class() ) )
+				.append( " returned an invalid type " )
+				.append( a_type_name( isValid->get_class() ) )
+				.append( " instead of a `boolean' from supplied `is_valid' method." ),
+			thread_->current_frame()->file_id(),
+			position_
+		);
+	}
+	return ( get_boolean( isValid ) );
+}
+
+HHuginn::value_t HIterableAdaptorIterator::do_value( HThread* thread_, int position_ ) {
+	return ( _valueMethod( thread_, &_iterator, HArguments( thread_ ), position_ ) );
+}
+
+void HIterableAdaptorIterator::do_next( HThread* thread_, int position_ ) {
+	_nextMethod( thread_, &_iterator, HArguments( thread_ ), position_ );
 }
 
 }

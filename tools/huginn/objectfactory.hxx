@@ -207,6 +207,7 @@ class HObjectFactory final : public HObjectFactoryBase {
 	HHuginn::class_t _runtimeException;
 	HHuginn::class_t _conversionException;
 	HHuginn::class_t _arithmeticException;
+	HHuginn::class_t _iterableAdaptor;
 	HHuginn::value_t _true;
 	HHuginn::value_t _false;
 	/* Explicit pools. */
@@ -393,6 +394,9 @@ public:
 	}
 	HHuginn::HClass const* arithmetic_exception_class( void ) const {
 		return ( _arithmeticException.raw() );
+	}
+	HHuginn::HClass const* iterable_adaptor_class( void ) const {
+		return ( _iterableAdaptor.raw() );
 	}
 	template<typename T, typename... args_t>
 	HHuginn::value_t create( args_t&&... args_ )  {

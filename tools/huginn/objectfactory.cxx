@@ -7,6 +7,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "runtime.hxx"
 #include "keyword.hxx"
 #include "exception.hxx"
+#include "iterator.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -117,6 +118,7 @@ HObjectFactory::HObjectFactory( HRuntime* runtime_ )
 	, _runtimeException()
 	, _conversionException()
 	, _arithmeticException()
+	, _iterableAdaptor()
 	, _true( create<HHuginn::HBoolean>( _boolean.raw(), true ) )
 	, _false( create<HHuginn::HBoolean>( _boolean.raw(), false ) )
 	, _stringPool( this, _string.raw() )
@@ -185,6 +187,9 @@ void HObjectFactory::register_builtin_classes( void ) {
 		"The `ArithmeticException` is an exception class used to signal erroneous arithmetic operation.",
 		HHuginn::VISIBILITY::GLOBAL
 	);
+
+	_iterableAdaptor = HIterableAdaptor::get_class( _runtime );
+
 	return;
 	M_EPILOG
 }

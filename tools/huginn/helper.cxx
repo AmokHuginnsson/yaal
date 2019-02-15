@@ -8,6 +8,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "keyword.hxx"
 #include "operator.hxx"
 #include "instruction.hxx"
+#include "iterator.hxx"
 #include "exception.hxx"
 #include "tools/util.hxx"
 #include "tools/hstringstream.hxx"
@@ -427,7 +428,8 @@ inline void not_a_collection( huginn::HThread* thread_, char const* name_, HHugi
 HHuginn::type_id_t verify_arg_materialized_collection(
 	char const* name_,
 	HHuginn::values_t& values_,
-	int no_, ARITY argsArity_, huginn::HThread* thread_, int position_ ) {
+	int no_, ARITY argsArity_, huginn::HThread* thread_, int position_
+) {
 	M_PROLOG
 	static HHuginn::TYPE const material[] = {
 		HHuginn::TYPE::TUPLE,
@@ -452,12 +454,23 @@ HHuginn::type_id_t verify_arg_materialized_collection(
 HHuginn::value_t verify_arg_virtual_collection(
 	char const* name_,
 	HHuginn::values_t& values_,
-	int no_, ARITY argsArity_, huginn::HThread* thread_, int position_ ) {
+	int no_, ARITY argsArity_, huginn::HThread* thread_, int position_
+) {
 	M_PROLOG
 	HHuginn::value_t v( values_[no_] );
-	if ( ! dynamic_cast<HHuginn::HIterable const*>( v.raw() ) ) {
+	do {
+		if ( dynamic_cast<HHuginn::HIterable const*>( v.raw() ) ) {
+			break;
+		}
+		if (
+			dynamic_cast<HHuginn::HObject*>( v.raw() )
+			&& ( v->field_index( IDENTIFIER::INTERFACE::ITERATOR ) >= 0 )
+		) {
+			v = thread_->object_factory().create<HIterableAdaptor>( thread_->object_factory().iterable_adaptor_class(), v );
+			break;
+		}
 		not_a_collection( thread_, name_, v->get_class(), no_, argsArity_, "", position_ );
-	}
+	} while ( false );
 	return ( v );
 	M_EPILOG
 }

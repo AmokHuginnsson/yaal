@@ -80,6 +80,30 @@ protected:
 	virtual HHuginn::value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
+class HIterableAdaptorIterator : public HIteratorInterface {
+	HHuginn::value_t _source;
+	HHuginn::value_t _iterator;
+	HHuginn::function_t _isValidMethod;
+	HHuginn::function_t _valueMethod;
+	HHuginn::function_t _nextMethod;
+public:
+	HIterableAdaptorIterator( huginn::HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
+protected:
+	virtual bool do_is_valid( HThread*, int ) override;
+	virtual void do_next( HThread*, int ) override;
+	virtual HHuginn::value_t do_value( HThread*, int ) override;
+};
+
+class HIterableAdaptor : public HHuginn::HIterable {
+	HHuginn::value_t _source;
+public:
+	HIterableAdaptor( HHuginn::HClass const*, HHuginn::value_t const& );
+	static HHuginn::class_t get_class( HRuntime* );
+protected:
+	virtual iterator_t do_iterator( HThread*, int ) override;
+	virtual int long do_size( huginn::HThread*, int ) const override;
+};
+
 }
 
 }
