@@ -47,7 +47,7 @@ void HIf::do_execute( huginn::HThread* thread_ ) const {
 		if ( f->can_continue() ) {
 			HHuginn::value_t v( f->result() );
 			if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
-				throw HHuginn::HHuginnRuntimeException( "`If' argument is not a boolean.", file_id(), it->_expression->position() );
+				throw HHuginn::HHuginnRuntimeException( "`If` argument is not a boolean.", file_id(), it->_expression->position() );
 			}
 			if ( static_cast<HHuginn::HBoolean*>( v.raw() )->value() ) {
 				done = true;

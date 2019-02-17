@@ -53,7 +53,7 @@ HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass const* class_, HHugi
 				_data = data_t( make_resource<floating_point_matrix_t>( myRows, cols ) );
 			} else {
 				throw HHuginn::HHuginnRuntimeException(
-					"Bad matrix type: `"_ys.append( thread_->runtime().function_name( fr.function().id() ) ).append( "'." ),
+					"Bad matrix type: `"_ys.append( thread_->runtime().function_name( fr.function().id() ) ).append( "`." ),
 					thread_->current_frame()->file_id(),
 					position_
 				);
@@ -78,7 +78,7 @@ HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass const* class_, HHugi
 			} else if ( t == HHuginn::TYPE::REAL ) {
 				_data = data_t( make_resource<floating_point_matrix_t>( myRows, cols ) );
 			} else {
-				throw HHuginn::HHuginnRuntimeException( "Matrix must have numeric data, either `number' or `real'.", thread_->current_frame()->file_id(), position_ );
+				throw HHuginn::HHuginnRuntimeException( "Matrix must have numeric data, either `number` or `real`.", thread_->current_frame()->file_id(), position_ );
 			}
 		} catch ( HException const& e ) {
 			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
@@ -469,9 +469,9 @@ void matrix_apply( HHuginn::value_t store_, huginn::HThread* thread_, matrix_t& 
 				throw HHuginn::HHuginnRuntimeException(
 					"Applied transformation function shall return `"_ys
 						.append( store_->get_class()->name() )
-						.append( "', but result was a `" )
+						.append( "`, but result was a `" )
 						.append( res->get_class()->name() )
-						.append( "' instead." ),
+						.append( "` instead." ),
 					thread_->current_frame()->file_id(),
 					position_
 				);

@@ -658,7 +658,7 @@ void HExpression::function_call( OExecutionStep const& executionStep_, HFrame* f
 				values.push( m.function()( thread, &f, args, executionStep_._position ) );
 			} else {
 				throw HHuginn::HHuginnRuntimeException(
-					"Reference `"_ys.append( c->name() ).append( "' is not a callable." ),
+					"Reference `"_ys.append( c->name() ).append( "` is not a callable." ),
 					file_id(),
 					executionStep_._position
 				);
@@ -948,7 +948,7 @@ void HExpression::range( OExecutionStep const&, HFrame* frame_ ) {
 	if ( ! select && ( rangeOpCount > 0 ) ) {
 		HHuginn::type_id_t t( base->type_id() );
 		if ( ( t != HHuginn::TYPE::TUPLE ) && ( t != HHuginn::TYPE::LIST ) && ( t != HHuginn::TYPE::DEQUE ) && ( t != HHuginn::TYPE::STRING ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Range operator not supported on `"_ys.append( base->get_class()->name() ).append( "'." ), file_id(), p );
+			throw HHuginn::HHuginnRuntimeException( "Range operator not supported on `"_ys.append( base->get_class()->name() ).append( "`." ), file_id(), p );
 		}
 		frame_->values().push( yaal::move( base ) );
 	} else {

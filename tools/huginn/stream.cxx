@@ -882,9 +882,9 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 				HHuginn::identifier_id_t id( thread_->runtime().identifier_id( n ) );
 				HHuginn::value_t const* fun( thread_->runtime().get_global( id ) );
 				if ( ! fun ) {
-					raise( thread_, "Function `"_ys.append( n ).append( "' is not defined." ), position_, exception_class() );
+					raise( thread_, "Function `"_ys.append( n ).append( "` is not defined." ), position_, exception_class() );
 				} else if ( (*fun)->type_id() != HHuginn::TYPE::FUNCTION_REFERENCE ) {
-					raise( thread_, "Symbol `"_ys.append( n ).append( "' is not a function." ), position_, exception_class() );
+					raise( thread_, "Symbol `"_ys.append( n ).append( "` is not a function." ), position_, exception_class() );
 				} else {
 					v = *fun;
 				}
@@ -947,7 +947,7 @@ HHuginn::HIterable::iterator_t HStream::do_iterator( HThread* thread_, int posit
 }
 
 int long HStream::do_size( huginn::HThread* thread_, int position_ ) const {
-	throw HHuginn::HHuginnRuntimeException( "Getting size of `Stream' is an invalid operation.", thread_->current_frame()->file_id(), position_ );
+	throw HHuginn::HHuginnRuntimeException( "Getting size of `Stream` is an invalid operation.", thread_->current_frame()->file_id(), position_ );
 }
 
 HHuginn::class_t HStream::get_class( HRuntime* runtime_ ) {

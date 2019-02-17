@@ -414,7 +414,7 @@ void HHuginn::HDict::verify_key_type( huginn::HThread* thread_, HHuginn::HClass 
 	}
 	if ( ! is_comparable( keyType_ ) ) {
 		throw HHuginnRuntimeException(
-			"Key type `"_ys.append( keyType_->name() ).append( "' is not a comparable." ),
+			"Key type `"_ys.append( keyType_->name() ).append( "` is not a comparable." ),
 			thread_->current_frame()->file_id(),
 			position_
 		);
@@ -434,7 +434,7 @@ HHuginn::value_t HHuginn::HDict::get( huginn::HThread* thread_, HHuginn::value_t
 	HAnchorGuard<HHuginn::HDict> ag( *this, thread_, position_ );
 	values_t::iterator it( _data.find( key_ ) );
 	if ( ! ( it != _data.end() ) ) {
-		throw HHuginnRuntimeException( "Key does not exist in `dict'.", thread_->current_frame()->file_id(), position_ );
+		throw HHuginnRuntimeException( "Key does not exist in `dict`.", thread_->current_frame()->file_id(), position_ );
 	}
 	return ( it->second );
 	M_EPILOG

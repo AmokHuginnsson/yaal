@@ -34,6 +34,30 @@ HFor::HFor(
 	return;
 }
 
+inline HHuginn::value_t ensure_virtual_collection(
+	huginn::HThread* thread_,
+	HHuginn::value_t&& value_,
+	int position_
+) {
+	M_PROLOG
+	HHuginn::value_t v( yaal::move( value_ ) );
+	do {
+		if ( dynamic_cast<HHuginn::HIterable const*>( v.raw() ) ) {
+			break;
+		}
+		if (
+			dynamic_cast<HHuginn::HObject*>( v.raw() )
+			&& ( v->field_index( IDENTIFIER::INTERFACE::ITERATOR ) >= 0 )
+		) {
+			v = thread_->object_factory().create<HIterableAdaptor>( thread_->object_factory().iterable_adaptor_class(), v );
+			break;
+		}
+		throw HHuginn::HHuginnRuntimeException( "`For` source is not an iterable.", thread_->current_frame()->file_id(), position_ );
+	} while ( false );
+	return ( v );
+	M_EPILOG
+}
+
 void HFor::do_execute( HThread* thread_ ) const {
 	M_PROLOG
 	thread_->create_loop_frame( this );
@@ -41,44 +65,16 @@ void HFor::do_execute( HThread* thread_ ) const {
 	_source->execute( thread_ );
 	int sourcePosition( _source->position() );
 	if ( f->can_continue() ) {
-		HHuginn::value_t source( f->result() );
-		HHuginn::HIterable* coll( dynamic_cast<HHuginn::HIterable*>( source.raw() ) );
-		HHuginn::HObject* obj( nullptr );
-		if ( coll ) {
-			HHuginn::HIterable::iterator_t it( coll->iterator( thread_, sourcePosition ) );
-			while ( f->can_continue() && it->is_valid( thread_, sourcePosition ) ) {
+		HHuginn::value_t source( ensure_virtual_collection( thread_, f->result(), sourcePosition ) );
+		HHuginn::HIterable* coll( static_cast<HHuginn::HIterable*>( source.raw() ) );
+		HHuginn::HIterable::iterator_t it( coll->iterator( thread_, sourcePosition ) );
+		while ( f->can_continue() && it->is_valid( thread_, sourcePosition ) ) {
+			if ( f->can_continue() ) {
 				run_loop( thread_, f, it->value( thread_, sourcePosition ) );
+			}
+			if ( f->can_continue() ) {
 				it->next( thread_, sourcePosition );
 			}
-		} else if ( ( obj = dynamic_cast<HHuginn::HObject*>( source.raw() ) ) ) {
-			HHuginn::value_t itVal( obj->call_method( thread_, source, IDENTIFIER::INTERFACE::ITERATOR, HArguments( thread_ ), sourcePosition ) );
-			HHuginn::HObject* it( dynamic_cast<HHuginn::HObject*>( itVal.raw() ) );
-			if ( ! it ) {
-				throw HHuginn::HHuginnRuntimeException( "`For' source returned invalid iterator object.", file_id(), sourcePosition );
-			}
-			HHuginn::value_t isValidField( it->get_method( thread_, itVal, IDENTIFIER::INTERFACE::IS_VALID, sourcePosition ) );
-			HHuginn::HClass::HBoundMethod* isValidMethod( static_cast<HHuginn::HClass::HBoundMethod*>( isValidField.raw() ) );
-			HHuginn::value_t valueField( it->get_method( thread_, itVal, IDENTIFIER::INTERFACE::VALUE, sourcePosition ) );
-			HHuginn::HClass::HBoundMethod* valueMethod( static_cast<HHuginn::HClass::HBoundMethod*>( valueField.raw() ) );
-			HHuginn::value_t nextField( it->get_method( thread_, itVal, IDENTIFIER::INTERFACE::NEXT, sourcePosition ) );
-			HHuginn::HClass::HBoundMethod* nextMethod( static_cast<HHuginn::HClass::HBoundMethod*>( nextField.raw() ) );
-			while ( f->can_continue() ) {
-				HHuginn::value_t isValid( isValidMethod->call( thread_, HArguments( thread_ ), sourcePosition ) );
-				if ( isValid->type_id() != HHuginn::TYPE::BOOLEAN ) {
-					throw HHuginn::HHuginnRuntimeException( "`For' source iterator is_valid returned non-boolean value.", file_id(), sourcePosition );
-				}
-				if ( ! ( f->can_continue() && static_cast<HHuginn::HBoolean*>( isValid.raw() )->value() ) ) {
-					break;
-				}
-				HHuginn::value_t value( valueMethod->call( thread_, HArguments( thread_ ), sourcePosition ) );
-				if ( ! f->can_continue() ) {
-					break;
-				}
-				run_loop( thread_, f, yaal::move( value ) );
-				nextMethod->call( thread_, HArguments( thread_ ), sourcePosition );
-			}
-		} else {
-			throw HHuginn::HHuginnRuntimeException( "`For' source is not an iterable.", file_id(), sourcePosition );
 		}
 	}
 	thread_->pop_frame();

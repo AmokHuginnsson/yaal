@@ -186,9 +186,9 @@ HHuginn::function_t const& HHuginn::HObject::get_method(
 		throw HHuginn::HHuginnRuntimeException(
 			"Class `"_ys
 				.append( get_class()->name() )
-				.append( "' does not have `" )
+				.append( "` does not have `" )
 				.append( thread_->runtime().identifier_name( methodIdentifier_ ) )
-				.append( "' method." ),
+				.append( "` method." ),
 			thread_->current_frame()->file_id(),
 			position_
 		);
@@ -198,9 +198,9 @@ HHuginn::function_t const& HHuginn::HObject::get_method(
 		throw HHuginn::HHuginnRuntimeException(
 			"`"_ys
 				.append( thread_->runtime().identifier_name( methodIdentifier_ ) )
-				.append( "' in class `" )
+				.append( "` in class `" )
 				.append( get_class()->name() )
-				.append( "' is not a method." ),
+				.append( "` is not a method." ),
 			thread_->current_frame()->file_id(),
 			position_
 		);
@@ -230,7 +230,7 @@ HHuginn::value_t HHuginn::HObject::do_clone( huginn::HThread* thread_, HHuginn::
 		HHuginn::value_t const& cloneMember( _fields[ idx ] );
 		if ( cloneMember->type_id() != HHuginn::TYPE::METHOD ) {
 			throw HHuginn::HHuginnRuntimeException(
-				"`clone' in class "_ys
+				"`clone` in class "_ys
 					.append( a_type_name( get_class() ) )
 					.append( " is not a method." ),
 				thread_->current_frame()->file_id(),
@@ -241,7 +241,7 @@ HHuginn::value_t HHuginn::HObject::do_clone( huginn::HThread* thread_, HHuginn::
 		copy = m->function()( thread_, object_, HArguments( thread_ ), position_ );
 		if ( copy->get_class() != get_class() ) {
 			throw HHuginn::HHuginnRuntimeException(
-				"`clone' in class "_ys
+				"`clone` in class "_ys
 					.append( a_type_name( get_class() ) )
 					.append( " returned object of an invalid type: " )
 					.append( a_type_name( copy->get_class() ) )

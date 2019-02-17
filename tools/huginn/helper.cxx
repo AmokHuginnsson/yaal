@@ -116,7 +116,7 @@ void HCycleTracker::done( HHuginn::value_t const& value_ ) {
 void operands_type_mismatch( char const* op_, HHuginn::HClass const* c1_, HHuginn::HClass const* c2_, int fileId_, int pos_ ) {
 	hcore::HString msg( "Operand types for `" );
 	msg.append( op_ )
-		.append( "' do not match: " )
+		.append( "` do not match: " )
 		.append( a_type_name( c1_ ) )
 		.append( " vs " )
 		.append( a_type_name( c2_ ) )
@@ -187,7 +187,7 @@ void verify_arg_count( char const* name_, HHuginn::values_t& values_, int min_, 
 		if ( argCount != min_ ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"Bad number of parameters in call to: `"_ys
-					.append( name_ ).append( "()', expected exactly: " )
+					.append( name_ ).append( "()`, expected exactly: " )
 					.append( min_ ).append( ", got: " )
 					.append( argCount ).append( "." ),
 				thread_->current_frame()->file_id(),
@@ -198,7 +198,7 @@ void verify_arg_count( char const* name_, HHuginn::values_t& values_, int min_, 
 		if ( argCount < min_ ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"Bad number of parameters in call to: `"_ys
-					.append( name_ ).append( "()', expected at least: " )
+					.append( name_ ).append( "()`, expected at least: " )
 					.append( min_ ).append( ", got: " )
 					.append( argCount ).append( "." ),
 				thread_->current_frame()->file_id(),
@@ -207,7 +207,7 @@ void verify_arg_count( char const* name_, HHuginn::values_t& values_, int min_, 
 		} else if ( argCount > max_ ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"Bad number of parameters in call to: `"_ys
-					.append( name_ ).append( "()', expected at most: " )
+					.append( name_ ).append( "()`, expected at most: " )
 					.append( max_ ).append( ", got: " )
 					.append( argCount ).append( "." ),
 				thread_->current_frame()->file_id(),
@@ -250,7 +250,7 @@ yaal::hcore::HString a_type_name( HHuginn::TYPE type_ ) {
 	M_PROLOG
 	hcore::HString tn( type_name( type_ ) );
 	hcore::HString atn( article( tn ) );
-	atn.append( " `" ).append( tn ).append( "'" );
+	atn.append( " `" ).append( tn ).append( "`" );
 	return ( atn );
 	M_EPILOG
 }
@@ -259,7 +259,7 @@ yaal::hcore::HString a_type_name( HHuginn::HClass const* class_ ) {
 	M_PROLOG
 	hcore::HString const& cn( class_->name() );
 	hcore::HString atn( article( cn ) );
-	atn.append( " `" ).append( cn ).append( "'" );
+	atn.append( " `" ).append( cn ).append( "`" );
 	return ( atn );
 	M_EPILOG
 }
@@ -394,7 +394,7 @@ HHuginn::type_id_t verify_arg_numeric(
 			""_ys.append( name_ )
 				.append( "() " )
 				.append( no )
-				.append( "argument must be a numeric type, either a `number' or a `real', not " )
+				.append( "argument must be a numeric type, either a `number` or a `real`, not " )
 				.append( a_type_name( values_[no_]->get_class() ) )
 				.append( "." ),
 			thread_->current_frame()->file_id(),

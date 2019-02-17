@@ -181,9 +181,9 @@ HHuginn::value_t size( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 		HHuginn::value_t res( o->call_method( thread_, val, IDENTIFIER::INTERFACE::GET_SIZE, HArguments( thread_ ), position_ ) );
 		if ( res->type_id() != HHuginn::TYPE::INTEGER ) {
 			throw HHuginn::HHuginnRuntimeException(
-				"User supplied `get_size' method returned an invalid type "_ys
+				"User supplied `get_size` method returned an invalid type "_ys
 					.append( a_type_name( res->get_class() ) )
-					.append( " instead of an `integer'." ),
+					.append( " instead of an `integer`." ),
 				thread_->current_frame()->file_id(),
 				position_
 			);
@@ -333,7 +333,7 @@ HHuginn::value_t print( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::va
 		out << static_cast<HHuginn::HCharacter const*>( v )->value();
 	} else {
 		throw HHuginn::HHuginnRuntimeException(
-			"Printing `"_ys.append( v->get_class()->name() ).append( "'s is not supported." ),
+			"Printing `"_ys.append( v->get_class()->name() ).append( "`s is not supported." ),
 			thread_->current_frame()->file_id(),
 			position_
 		);

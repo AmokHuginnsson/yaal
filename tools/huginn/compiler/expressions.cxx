@@ -239,9 +239,9 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 			fc._isAssert = isAssert;
 		}
 		if ( ( ( value_ != KEYWORD::THIS ) && ( value_ != KEYWORD::SUPER ) && ! isAssert ) || ( isAssert && ! expr->is_empty() ) ) {
-			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted keyword." ), _fileId, range_.start() );
+			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "` is a restricted keyword." ), _fileId, range_.start() );
 		} else if ( ! isAssert && ! _classContext ) {
-			throw HHuginn::HHuginnRuntimeException( "Keyword `"_ys.append( value_ ).append( "' can be used only in class context." ), _fileId, range_.start() );
+			throw HHuginn::HHuginnRuntimeException( "Keyword `"_ys.append( value_ ).append( "` can be used only in class context." ), _fileId, range_.start() );
 		}
 	}
 	if ( _isIncremental && ( refIdentifier == IDENTIFIER::STANDARD_FUNCTIONS::MAIN ) ) {
@@ -263,7 +263,7 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 		);
 	} else {
 		if ( isFieldDefinition ) {
-			throw HHuginn::HHuginnRuntimeException( "Dereferencing symbol `"_ys.append( value_ ).append( "' in field definition is forbidden." ), _fileId, range_.start() );
+			throw HHuginn::HHuginnRuntimeException( "Dereferencing symbol `"_ys.append( value_ ).append( "` in field definition is forbidden." ), _fileId, range_.start() );
 		}
 		if ( refIdentifier == IDENTIFIER::KEYWORD::THIS ) {
 			expr->add_execution_step(
@@ -298,9 +298,9 @@ void OCompiler::defer_get_field_reference( yaal::hcore::HString const& value_, e
 	_usedIdentifiers[refIdentifier].read( range_.start(), HHuginn::SYMBOL_KIND::FIELD );
 	if ( huginn::is_keyword( value_ ) ) {
 		if ( refIdentifier != IDENTIFIER::KEYWORD::CONSTRUCTOR ) {
-			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted keyword." ), _fileId, range_.start() );
+			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "` is a restricted keyword." ), _fileId, range_.start() );
 		} else if ( ! _classContext ) {
-			throw HHuginn::HHuginnRuntimeException( "Keyword `"_ys.append( value_ ).append( "' can be used only in class context." ), _fileId, range_.start() );
+			throw HHuginn::HHuginnRuntimeException( "Keyword `"_ys.append( value_ ).append( "` can be used only in class context." ), _fileId, range_.start() );
 		}
 	}
 	HExpression* expr( current_expression().raw() );
@@ -318,11 +318,11 @@ void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executi
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	if ( huginn::is_restricted( value_ ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted name." ), _fileId, range_.start() );
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "` is a restricted name." ), _fileId, range_.start() );
 	}
 	bool isFieldDefinition( !! _classContext && ( _functionContexts.get_size() == 1 ) );
 	if ( isFieldDefinition ) {
-		throw HHuginn::HHuginnRuntimeException( "Defining symbol `"_ys.append( value_ ).append( "' in field definition is forbidden." ), _fileId, range_.start() );
+		throw HHuginn::HHuginnRuntimeException( "Defining symbol `"_ys.append( value_ ).append( "` in field definition is forbidden." ), _fileId, range_.start() );
 	}
 	HHuginn::identifier_id_t varIdentifier( _runtime->identifier_id( value_ ) );
 	HHuginn::expression_t& expression( current_expression() );
@@ -508,7 +508,7 @@ void OCompiler::dispatch_subscript( executing_parser::range_t range_ ) {
 	OFunctionContext& fc( f() );
 	int p( range_.start() );
 	if ( fc._isAssert && ( fc._nestedCalls == 0 ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`assert' is a restricted keyword.", _fileId, p );
+		throw HHuginn::HHuginnRuntimeException( "`assert` is a restricted keyword.", _fileId, p );
 	}
 	M_ASSERT( ! fc._operations.is_empty() );
 	HHuginn::expression_t& expression( current_expression() );
@@ -553,7 +553,7 @@ void OCompiler::dispatch_member_access( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	if ( fc._isAssert && ( fc._nestedCalls == 0 ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`assert' is a restricted keyword.", _fileId, range_.start() );
+		throw HHuginn::HHuginnRuntimeException( "`assert` is a restricted keyword.", _fileId, range_.start() );
 	}
 	fc._operations.pop();
 	fc._lastDereferenceOperator = OPERATOR::MEMBER_ACCESS;
@@ -1085,10 +1085,10 @@ void OCompiler::add_parameter( yaal::hcore::HString const& name_, executing_pars
 	HHuginn::identifier_id_t parameterIdentifier( _runtime->identifier_id( name_ ) );
 	captures_log_t::const_iterator cli( _capturesLog.find( fc._functionIdentifier ) );
 	if ( ( cli != _capturesLog.end() ) && ( find( cli->second.begin(), cli->second.end(), parameterIdentifier ) != cli->second.end() ) ) {
-		throw HHuginn::HHuginnRuntimeException( "Symbol `"_ys.append( name_ ).append( "' is a already used as a capture." ), _fileId, range_.start() );
+		throw HHuginn::HHuginnRuntimeException( "Symbol `"_ys.append( name_ ).append( "` is a already used as a capture." ), _fileId, range_.start() );
 	}
 	if ( find( fc._parameters.begin(), fc._parameters.end(), parameterIdentifier ) != fc._parameters.end() ) {
-		throw HHuginn::HHuginnRuntimeException( "Parameter `"_ys.append( name_ ).append( "' was already defined." ), _fileId, range_.start() );
+		throw HHuginn::HHuginnRuntimeException( "Parameter `"_ys.append( name_ ).append( "` was already defined." ), _fileId, range_.start() );
 	}
 	_usedIdentifiers[parameterIdentifier].write( range_.start(), HHuginn::SYMBOL_KIND::VARIABLE );
 	_executionStepsBacklog.emplace_back(
@@ -1134,7 +1134,7 @@ void OCompiler::add_capture( yaal::hcore::HString const& name_, executing_parser
 	OFunctionContext& fc( f() );
 	HHuginn::identifier_id_t captureIdentifier( _runtime->identifier_id( name_ ) );
 	if ( find( fc._captures.begin(), fc._captures.end(), captureIdentifier ) != fc._captures.end() ) {
-		throw HHuginn::HHuginnRuntimeException( "Capture `"_ys.append( name_ ).append( "' was already defined." ), _fileId, range_.start() );
+		throw HHuginn::HHuginnRuntimeException( "Capture `"_ys.append( name_ ).append( "` was already defined." ), _fileId, range_.start() );
 	}
 	if ( fc._captures.is_empty() ) {
 		current_expression()->oper( OPERATOR::FUNCTION_CALL, range_.start() );

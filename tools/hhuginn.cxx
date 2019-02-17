@@ -252,7 +252,7 @@ HHuginn::HObjectReference::HObjectReference( HHuginn::HClass const* class_, valu
 		HClass const* s( c->super() );
 		if ( ! s ) {
 			throw HHuginnRuntimeException(
-				"`"_ys.append( c->name() ).append( "' does not have superclass." ),
+				"`"_ys.append( c->name() ).append( "` does not have superclass." ),
 				fileId_,
 				position_
 			);
@@ -562,7 +562,7 @@ void HHuginn::register_class( class_t class_, VISIBILITY classVisibility_ ) {
 void HHuginn::register_function( yaal::hcore::HString const& name_, function_t&& func_, yaal::hcore::HString const& doc_ ) {
 	M_PROLOG
 	if ( is_restricted( name_ ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), MAIN_FILE_ID, 0 );
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "` is a restricted name." ), MAIN_FILE_ID, 0 );
 	}
 	identifier_id_t id( _runtime->identifier_id( name_ ) );
 	_runtime->register_function( id, func_, doc_ );

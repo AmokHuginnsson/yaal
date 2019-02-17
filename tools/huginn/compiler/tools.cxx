@@ -95,9 +95,9 @@ void OCompiler::detect_misuse( void ) const {
 					use_name( use._type )
 						.append( " `" )
 						.append( _runtime->identifier_name( id ) )
-						.append( "' is never used (did you mean `" )
+						.append( "` is never used (did you mean `" )
 						.append( _runtime->suggestion( id ) )
-						.append( "'?)." ),
+						.append( "`?)." ),
 					_fileId,
 					use._writePosition
 				);

@@ -157,13 +157,13 @@ HHuginn::value_t range(
 	HHuginn::value_t res;
 	if ( ( baseType == HHuginn::TYPE::TUPLE ) || ( baseType == HHuginn::TYPE::LIST ) || ( baseType == HHuginn::TYPE::DEQUE ) || ( baseType == HHuginn::TYPE::STRING ) ) {
 		if ( !! from_ && ( from_->type_id() != HHuginn::TYPE::INTEGER ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Range operand `from' is not an integer.", thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Range operand `from` is not an integer.", thread_->current_frame()->file_id(), position_ );
 		}
 		if ( !! to_ && ( to_->type_id() != HHuginn::TYPE::INTEGER ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Range operand `to' is not an integer.", thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Range operand `to` is not an integer.", thread_->current_frame()->file_id(), position_ );
 		}
 		if ( !! step_ && ( step_->type_id() != HHuginn::TYPE::INTEGER ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Range operand `step' is not an integer.", thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Range operand `step` is not an integer.", thread_->current_frame()->file_id(), position_ );
 		}
 		int long size( static_cast<HHuginn::HIterable*>( base_.raw() )->size( thread_, position_ ) );
 		if ( baseType == HHuginn::TYPE::TUPLE ) {
@@ -300,15 +300,15 @@ inline void no_such_member(
 	message
 		.append( "`" )
 		.append( name_ )
-		.append( "' does not have `" )
+		.append( "` does not have `" )
 		.append( rt.identifier_name( memberId_ ) )
-		.append( "' member (did you mean `" );
+		.append( "` member (did you mean `" );
 	if ( context_ ) {
 		message.append( rt.suggestion( context_, memberId_ ) );
 	} else {
 		message.append( rt.suggestion( memberId_ ) );
 	}
-	message.append( "'?)." ),
+	message.append( "`?)." ),
 	throw HHuginn::HHuginnRuntimeException( message, thread_->current_frame()->file_id(), position_ );
 }
 
@@ -386,9 +386,9 @@ HHuginn::value_t member( HThread* thread_, HFrame::ACCESS access_, HHuginn::valu
 				throw HHuginn::HHuginnRuntimeException(
 					"`"_ys
 						.append( rt.identifier_name( memberId_ ) )
-						.append( "' member of `" )
+						.append( "` member of `" )
 						.append( cls->name() )
-						.append( "' must be accessed from static context." ),
+						.append( "` must be accessed from static context." ),
 					thread_->current_frame()->file_id(),
 					position_
 				);
@@ -399,7 +399,7 @@ HHuginn::value_t member( HThread* thread_, HFrame::ACCESS access_, HHuginn::valu
 				m = rt.object_factory()->create<HMemberReference>( rt.object_factory()->reference_class(), v_, memberId_ );
 			}
 		}
-	} else if ( HHuginn::HObjectReference* oref = dynamic_cast<HHuginn::HObjectReference*>( v_.raw() ) ) { /* Handle `super' keyword. */
+	} else if ( HHuginn::HObjectReference* oref = dynamic_cast<HHuginn::HObjectReference*>( v_.raw() ) ) { /* Handle `super` keyword. */
 		if ( access_ == HFrame::ACCESS::REFERENCE ) {
 			throw HHuginn::HHuginnRuntimeException( "Changing upcasted reference.", thread_->current_frame()->file_id(), position_ );
 		}
@@ -425,7 +425,7 @@ HHuginn::value_t member( HThread* thread_, HFrame::ACCESS access_, HHuginn::valu
 		}
 		if ( ! c ) {
 			throw HHuginn::HHuginnRuntimeException(
-				"`"_ys.append( rt.identifier_name( funcId ) ).append( "' is not a compound object." ),
+				"`"_ys.append( rt.identifier_name( funcId ) ).append( "` is not a compound object." ),
 				thread_->current_frame()->file_id(),
 				position_
 			);
@@ -442,7 +442,7 @@ HHuginn::value_t member( HThread* thread_, HFrame::ACCESS access_, HHuginn::valu
 			? rt.object_factory()->create_unbound_method( c, static_cast<HHuginn::HClass::HMethod const*>( f.raw() )->function() )
 			: f;
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( cls->name() ).append( "' is not a compound object." ), thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( cls->name() ).append( "` is not a compound object." ), thread_->current_frame()->file_id(), position_ );
 	}
 	M_ASSERT( !! m );
 	return ( m );
@@ -464,7 +464,7 @@ void fallback_arithmetic( HThread* thread_, HHuginn::identifier_id_t methodIdent
 			throw HHuginn::HHuginnRuntimeException(
 				"Arithmetic method `"_ys
 					.append( thread_->runtime().identifier_name( methodIdentifier_ ) )
-					.append( "' on " )
+					.append( "` on " )
 					.append( a_type_name( v1_->get_class() ) )
 					.append( " returned result of incompatible type " )
 					.append( a_type_name( v->get_class() ) )
@@ -482,7 +482,7 @@ void fallback_arithmetic( HThread* thread_, HHuginn::identifier_id_t methodIdent
 			M_ASSERT( ( v->type_id() == t ) || ! thread_->can_continue() );
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
-				"There is no `"_ys.append( oper_ ).append( "' operator for " ).append( a_type_name( t ) ).append( "." ),
+				"There is no `"_ys.append( oper_ ).append( "` operator for " ).append( a_type_name( t ) ).append( "." ),
 				thread_->current_frame()->file_id(),
 				position_
 			);
@@ -500,7 +500,7 @@ HHuginn::value_t fallback_unary_arithmetic( HThread* thread_, HHuginn::identifie
 			throw HHuginn::HHuginnRuntimeException(
 				"Arithmetic method `"_ys
 					.append( thread_->runtime().identifier_name( methodIdentifier_ ) )
-					.append( "' on " )
+					.append( "` on " )
 					.append( a_type_name( v_->get_class() ) )
 					.append( " returned result of incompatible type " )
 					.append( a_type_name( v->get_class() ) )
@@ -518,7 +518,7 @@ HHuginn::value_t fallback_unary_arithmetic( HThread* thread_, HHuginn::identifie
 			M_ASSERT( ( operation_ == OPERATION::OPEN ) || ( v->type_id() == t ) || ! thread_->can_continue() );
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
-				"There is no `"_ys.append( oper_ ).append( "' operator for " ).append( a_type_name( v_->get_class() ) ).append( "." ),
+				"There is no `"_ys.append( oper_ ).append( "` operator for " ).append( a_type_name( v_->get_class() ) ).append( "." ),
 				thread_->current_frame()->file_id(),
 				position_
 			);
@@ -784,9 +784,9 @@ int long hash( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 			res = o->call_method( thread_, v_, IDENTIFIER::INTERFACE::HASH, HArguments( thread_ ), position_ );
 			if ( res->type_id() != HHuginn::TYPE::INTEGER ) {
 				throw HHuginn::HHuginnRuntimeException(
-					"User supplied `hash' function returned an invalid type "_ys
+					"User supplied `hash` function returned an invalid type "_ys
 						.append( a_type_name( res->get_class() ) )
-						.append( " instead of an `integer'." ),
+						.append( " instead of an `integer`." ),
 					thread_->current_frame()->file_id(),
 					position_
 				);
@@ -800,7 +800,7 @@ int long hash( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 				M_ASSERT( res->type_id() == HHuginn::TYPE::INTEGER );
 			} else {
 				throw HHuginn::HHuginnRuntimeException(
-					"There is no `hash' operator for "_ys
+					"There is no `hash` operator for "_ys
 						.append( a_type_name( v_->get_class() ) )
 						.append( "." ),
 					thread_->current_frame()->file_id(),
@@ -823,7 +823,7 @@ bool fallback_compare( HThread* thread_, HHuginn::identifier_id_t methodIdentifi
 			throw HHuginn::HHuginnRuntimeException(
 				"Comparison method `"_ys
 					.append( thread_->runtime().identifier_name( methodIdentifier_ ) )
-					.append( "' returned non-boolean result of " )
+					.append( "` returned non-boolean result of " )
 					.append( a_type_name( v->get_class() ) )
 					.append( " type." ),
 				thread_->current_frame()->file_id(),
@@ -839,7 +839,7 @@ bool fallback_compare( HThread* thread_, HHuginn::identifier_id_t methodIdentifi
 			M_ASSERT( ( v->type_id() == HHuginn::TYPE::BOOLEAN ) || ! thread_->can_continue() );
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
-				"There is no `"_ys.append( oper_ ).append( "' operator for " ).append( a_type_name( v1_->get_class() ) ).append( "." ),
+				"There is no `"_ys.append( oper_ ).append( "` operator for " ).append( a_type_name( v1_->get_class() ) ).append( "." ),
 				thread_->current_frame()->file_id(),
 				position_
 			);

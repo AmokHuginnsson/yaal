@@ -133,7 +133,7 @@ HHuginn::value_t HHuginn::HClass::base_class_not_initialized( huginn::HThread* t
 	throw HHuginn::HHuginnRuntimeException(
 		"Base class `"_ys
 			.append( _super->name() )
-			.append( "' is not initialized." )
+			.append( "` is not initialized." )
 		,
 		thread_->current_frame()->file_id(),
 		position_
@@ -269,7 +269,7 @@ HHuginn::value_t HHuginn::HClass::create_instance( huginn::HThread* thread_, val
 HHuginn::value_t HHuginn::HClass::access_violation( huginn::HThread* thread_, value_t*, values_t&, int position_ ) const {
 	M_PROLOG
 	throw HHuginn::HHuginnRuntimeException(
-		"Explicit construction of class `"_ys.append( name() ).append( "' objects (instances) is forbidden." ),
+		"Explicit construction of class `"_ys.append( name() ).append( "` objects (instances) is forbidden." ),
 		thread_->current_frame()->file_id(),
 		position_
 	);

@@ -198,7 +198,7 @@ OCompiler::OClassNoter::OClassNoter( OCompiler* compiler_ )
 void OCompiler::OClassNoter::note( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	if ( is_restricted( name_ ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), MAIN_FILE_ID, range_.start() );
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "` is a restricted name." ), MAIN_FILE_ID, range_.start() );
 	}
 	HHuginn::identifier_id_t identifier( _compiler->_runtime->identifier_id( name_ ) );
 	if ( _passThrough ) {
@@ -338,9 +338,9 @@ void OCompiler::resolve_symbols( void ) {
 							throw HHuginn::HHuginnRuntimeException(
 								"Method argument name `"_ys
 									.append( _runtime->identifier_name( es._identifier ) )
-									.append( "' conflicts with class `" )
+									.append( "` conflicts with class `" )
 									.append( _runtime->identifier_name( aClass->identifier_id() ) )
-									.append( "' field name." ),
+									.append( "` field name." ),
 								_fileId,
 								es._position
 							);
@@ -393,7 +393,7 @@ void OCompiler::resolve_symbols( void ) {
 				if ( es._operation == OExecutionStep::OPERATION::DEFINE ) {
 					if ( !! _runtime->get_class( es._identifier ) ) {
 						throw HHuginn::HHuginnRuntimeException(
-							"`"_ys.append( _runtime->identifier_name( es._identifier ) ).append( "' is a class name." ),
+							"`"_ys.append( _runtime->identifier_name( es._identifier ) ).append( "` is a class name." ),
 							_fileId,
 							es._position
 						);
@@ -404,17 +404,17 @@ void OCompiler::resolve_symbols( void ) {
 						/*
 						 * There are two kinds of OScopeContexts:
 						 * 1. Real scope context that is equivalent of {...} in program code.
-						 * 2. Virtual scope context that is necessary for proper scoping of `for' and `while' and `if'
+						 * 2. Virtual scope context that is necessary for proper scoping of `for` and `while` and `if`
 						 *    control variables e.g.:
 						 *        for ( e : list ) { ... }
-						 *    in this case `e' is in virtual scope.
+						 *    in this case `e` is in virtual scope.
 						 * Finding indices of local variables must take into account both types of scopes
-						 * because real scopes `{}' can be inlined in virtual scopes in run-time,
-						 * like it happens in case of `if/else' statement.
-						 * Inlining `if/else' real scopes has a side effect of allowing different
-						 * variables from different scopes (different `else if' stanzas in the same `if/else' chain)
-						 * to have the same index, this is possible because `[else] if' stanzas are mutually exclusive
-						 * in given `if/else' chain.
+						 * because real scopes `{}` can be inlined in virtual scopes in run-time,
+						 * like it happens in case of `if/else` statement.
+						 * Inlining `if/else` real scopes has a side effect of allowing different
+						 * variables from different scopes (different `else if` stanzas in the same `if/else` chain)
+						 * to have the same index, this is possible because `[else] if` stanzas are mutually exclusive
+						 * in given `if/else` chain.
 						 */
 						OScopeContext* parent( sc );
 						while ( parent->_parent && ( parent->_parent->_statementId == parent->_statementId ) ) {
@@ -469,7 +469,7 @@ void OCompiler::resolve_symbols( void ) {
 					if ( sc ) {
 						if ( es._expression.raw() == localVariable._definedBy ) {
 							throw HHuginn::HHuginnRuntimeException(
-								"Symbol `"_ys.append( _runtime->identifier_name( es._identifier ) ).append( "' is not yet defined in this expression." ),
+								"Symbol `"_ys.append( _runtime->identifier_name( es._identifier ) ).append( "` is not yet defined in this expression." ),
 								_fileId,
 								es._position
 							);
@@ -506,9 +506,9 @@ void OCompiler::resolve_symbols( void ) {
 				throw HHuginn::HHuginnRuntimeException(
 					"Symbol `"_ys
 						.append( _runtime->identifier_name( es._identifier ) )
-						.append( "' is not defined in this context (did you mean `" )
+						.append( "` is not defined in this context (did you mean `" )
 						.append( _runtime->suggestion( es._identifier ) )
-						.append( "'?)." ),
+						.append( "`?)." ),
 					_fileId,
 					es._position
 				);
@@ -549,11 +549,11 @@ void OCompiler::check_name_import( HHuginn::identifier_id_t identifier_, executi
 		HString const& name( _runtime->identifier_name( identifier_ ) );
 		throw HHuginn::HHuginnRuntimeException(
 			identifier_ == it->_package
-				? "Package of the same name `"_ys.append( name ).append( "' is already imported." )
+				? "Package of the same name `"_ys.append( name ).append( "` is already imported." )
 				: (
 					identifier_ == it->_alias
-						? "Package alias of the same name `"_ys.append( name ).append( "' is already defined." )
-						: "Symbol `"_ys.append( name ).append( "' was already brought into the global namespace." )
+						? "Package alias of the same name `"_ys.append( name ).append( "` is already defined." )
+						: "Symbol `"_ys.append( name ).append( "` was already brought into the global namespace." )
 				),
 			_fileId,
 			range_.start()
@@ -570,7 +570,7 @@ void OCompiler::check_name_class( HHuginn::identifier_id_t identifier_, bool tes
 		throw HHuginn::HHuginnRuntimeException(
 			"Class of the same name `"_ys
 				.append( _runtime->identifier_name( identifier_ ) )
-				.append( "' is already defined." ),
+				.append( "` is already defined." ),
 			_fileId,
 			range_.start()
 		);
@@ -598,7 +598,7 @@ void OCompiler::check_name_enum( HHuginn::identifier_id_t identifier_, bool test
 		throw HHuginn::HHuginnRuntimeException(
 			"Enumeration of the same name `"_ys
 				.append( _runtime->identifier_name( identifier_ ) )
-				.append( "' is already defined." ),
+				.append( "` is already defined." ),
 			_fileId,
 			range_.start()
 		);
@@ -614,7 +614,7 @@ void OCompiler::check_name_function( HHuginn::identifier_id_t identifier_, execu
 		throw HHuginn::HHuginnRuntimeException(
 			"Function `"_ys
 				.append( _runtime->identifier_name( identifier_ ) )
-				.append( "' was already defined." ),
+				.append( "` was already defined." ),
 			_fileId,
 			range_.start()
 		);
@@ -629,7 +629,7 @@ void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_
 	bool isCtorDtor( ( functionIdentifier == IDENTIFIER::KEYWORD::CONSTRUCTOR ) || ( functionIdentifier == IDENTIFIER::KEYWORD::DESTRUCTOR ) );
 	if ( is_restricted( name_ ) ) {
 		if ( ! _classContext || ! isCtorDtor ) {
-			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), _fileId, range_.start() );
+			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "` is a restricted name." ), _fileId, range_.start() );
 		}
 	}
 	if ( ! _classContext ) {
@@ -692,7 +692,7 @@ void OCompiler::commit_enum( executing_parser::range_t range_ ) {
 void OCompiler::set_enum_name( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	if ( is_restricted( name_ ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), _fileId, range_.start() );
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "` is a restricted name." ), _fileId, range_.start() );
 	}
 	HHuginn::identifier_id_t enumIdentifier( _runtime->identifier_id( name_ ) );
 	check_name_enum( enumIdentifier, false, range_ );
@@ -736,7 +736,7 @@ void OCompiler::set_class_name( HHuginn::identifier_id_t identifier_, executing_
 void OCompiler::set_base_name( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	if ( is_builtin( name_ ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), _fileId, range_.start() );
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "` is a restricted keyword." ), _fileId, range_.start() );
 	}
 	HHuginn::identifier_id_t baseClassIdentifier( _runtime->identifier_id( name_ ) );
 	_usedIdentifiers[baseClassIdentifier].read( range_.start() );
@@ -750,7 +750,7 @@ void OCompiler::add_field_name( yaal::hcore::HString const& name_, executing_par
 	M_PROLOG
 	if ( find( _classContext->_fieldNames.begin(), _classContext->_fieldNames.end(), name_ ) != _classContext->_fieldNames.end() ) {
 		throw HHuginn::HHuginnRuntimeException(
-			"Field `"_ys.append( name_ ).append( "' is already defined in `" ).append( _runtime->identifier_name( _classContext->_classIdentifier ) ).append( "'." ),
+			"Field `"_ys.append( name_ ).append( "` is already defined in `" ).append( _runtime->identifier_name( _classContext->_classIdentifier ) ).append( "`." ),
 			_fileId,
 			range_.start()
 		);
@@ -766,7 +766,7 @@ void OCompiler::add_field_name( yaal::hcore::HString const& name_, executing_par
 void OCompiler::set_field_name( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	if ( is_restricted( name_ ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), _fileId, range_.start() );
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "` is a restricted name." ), _fileId, range_.start() );
 	}
 	HHuginn::identifier_id_t fieldIdentifier( _runtime->identifier_id( name_ ) );
 	_usedIdentifiers[fieldIdentifier].write( range_.start(), HHuginn::SYMBOL_KIND::FIELD );
@@ -788,7 +788,7 @@ void OCompiler::create_function( executing_parser::range_t range_ ) {
 		_classContext->_docs.insert( make_pair( idx, doc ) );
 	} else {
 		if ( !! _runtime->get_class( fi.first ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Class of the same name `"_ys.append( _runtime->identifier_name( fi.first ) ).append( "' is already defined." ), _fileId, range_.start() );
+			throw HHuginn::HHuginnRuntimeException( "Class of the same name `"_ys.append( _runtime->identifier_name( fi.first ) ).append( "` is already defined." ), _fileId, range_.start() );
 		}
 		_runtime->register_function( fi.first, fi.second, doc );
 	}
@@ -870,7 +870,7 @@ void OCompiler::track_name_cycle( HHuginn::identifier_id_t identifierId_ ) {
 		if ( it == _submittedClasses.end() ) {
 			if ( ! _runtime->get_class( cc->_baseName ) ) {
 				throw HHuginn::HHuginnRuntimeException(
-					"Base class `"_ys.append( _runtime->identifier_name( cc->_baseName ) ).append( "' was not defined." ),
+					"Base class `"_ys.append( _runtime->identifier_name( cc->_baseName ) ).append( "` was not defined." ),
 					_fileId,
 					cc->_basePosition
 				);
@@ -886,7 +886,7 @@ void OCompiler::track_name_cycle( HHuginn::identifier_id_t identifierId_ ) {
 				hier.append( _runtime->identifier_name( n ) );
 			}
 			throw HHuginn::HHuginnRuntimeException(
-				"Class derivation cycle detected `"_ys.append( hier ).append( "'." ),
+				"Class derivation cycle detected `"_ys.append( hier ).append( "`." ),
 				_fileId,
 				cc->_basePosition
 			);

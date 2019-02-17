@@ -304,7 +304,7 @@ void HHuginn::HOrder::verify_key_type( huginn::HThread* thread_, HHuginn::HHugin
 	}
 	if ( ! is_comparable( keyType_ ) ) {
 		throw HHuginnRuntimeException(
-			"Key type `"_ys.append( keyType_->name() ).append( "' is not a comparable." ),
+			"Key type `"_ys.append( keyType_->name() ).append( "` is not a comparable." ),
 			thread_->current_frame()->file_id(),
 			position_
 		);

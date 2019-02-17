@@ -467,9 +467,9 @@ void HRuntime::import_symbols( identifier_id_t package_, HHuginn::identifiers_t 
 			throw HHuginn::HHuginnRuntimeException(
 				"Symbol `"_ys
 					.append( identifier_name( id ) )
-					.append( "' does not exist in `" )
+					.append( "` does not exist in `" )
 					.append( identifier_name( package_ ) )
-					.append( "' package." ),
+					.append( "` package." ),
 				MAIN_FILE_ID,
 				position_
 			);
@@ -702,7 +702,7 @@ HHuginn::value_t HRuntime::call( identifier_id_t identifier_, HHuginn::values_t&
 			throw HHuginn::HHuginnRuntimeException( "Symbol `"_ys.append( identifier_name( identifier_ ) ).append( "` is not callable." ), MAIN_FILE_ID, position_ );
 		}
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "Function `"_ys.append( identifier_name( identifier_ ) ).append( "(...)' is not defined." ), MAIN_FILE_ID, position_ );
+		throw HHuginn::HHuginnRuntimeException( "Function `"_ys.append( identifier_name( identifier_ ) ).append( "(...)` is not defined." ), MAIN_FILE_ID, position_ );
 	}
 	return ( res );
 	M_EPILOG
@@ -955,7 +955,7 @@ huginn::classes_t class_list( HRuntime::dependencies_t const& dependencies_ ) {
 
 void HRuntime::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) const {
 	M_PROLOG
-	stream_ << "Huginn VM state for `" << _huginn->source_name( MAIN_FILE_ID ) << "'" << endl;
+	stream_ << "Huginn VM state for `" << _huginn->source_name( MAIN_FILE_ID ) << "`" << endl;
 	for ( global_definitions_t::value_type const& gd : _globalDefinitions ) {
 		HHuginn::value_t const& v( *gd.second );
 		if ( ( v->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) || is_enum_class( v ) ) {

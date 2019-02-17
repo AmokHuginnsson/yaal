@@ -266,7 +266,7 @@ public:
 			v = thread_->object_factory().create_string( yaal::move( s ) );
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
-				"Invalid materialized type: `"_ys.append( thread_->runtime().function_name( fr.function().id() ) ).append( "'." ),
+				"Invalid materialized type: `"_ys.append( thread_->runtime().function_name( fr.function().id() ) ).append( "`." ),
 				thread_->current_frame()->file_id(),
 				position_
 			);

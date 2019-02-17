@@ -30,7 +30,7 @@ HHuginn::class_t HFilter::get_class( HRuntime* runtime_, HHuginn::HClass const* 
 }
 
 int long HFilter::do_size( huginn::HThread* thread_, int position_ ) const {
-	throw HHuginn::HHuginnRuntimeException( "Getting size of `Filter' is an invalid operation.", thread_->current_frame()->file_id(), position_ );
+	throw HHuginn::HHuginnRuntimeException( "Getting size of `Filter` is an invalid operation.", thread_->current_frame()->file_id(), position_ );
 }
 
 HHuginn::value_t HFilter::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
@@ -87,7 +87,7 @@ protected:
 		HHuginn::value_t v( _function( thread_, nullptr, HArguments( thread_, _value ), position_ ) );
 		if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
 			throw HHuginn::HHuginnRuntimeException(
-				hcore::to_string( "Filter function returned wrong type, expected `boolean' got: `" ).append( v->get_class()->name() ).append( "'." ),
+				hcore::to_string( "Filter function returned wrong type, expected `boolean` got: `" ).append( v->get_class()->name() ).append( "`." ),
 				thread_->current_frame()->file_id(),
 				position_
 			);
@@ -110,7 +110,7 @@ protected:
 		HHuginn::value_t v( _method.call( thread_, HArguments( thread_, _impl->value( thread_, position_ ) ), position_ ) );
 		if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
 			throw HHuginn::HHuginnRuntimeException(
-				hcore::to_string( "Filter functor returned wrong type, expected `boolean' got: `" ).append( v->get_class()->name() ).append( "'." ),
+				hcore::to_string( "Filter functor returned wrong type, expected `boolean` got: `" ).append( v->get_class()->name() ).append( "`." ),
 				thread_->current_frame()->file_id(),
 				position_
 			);
@@ -133,7 +133,7 @@ protected:
 		HHuginn::value_t v( _method.call( thread_, HArguments( thread_, _impl->value( thread_, position_ ) ), position_ ) );
 		if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
 			throw HHuginn::HHuginnRuntimeException(
-				hcore::to_string( "Filter functor returned wrong type, expected `boolean' got: `" ).append( v->get_class()->name() ).append( "'." ),
+				hcore::to_string( "Filter functor returned wrong type, expected `boolean` got: `" ).append( v->get_class()->name() ).append( "`." ),
 				thread_->current_frame()->file_id(),
 				position_
 			);

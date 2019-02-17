@@ -87,7 +87,7 @@ HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, yaal::hcor
 	visited_imports_t::insert_result ir( _visitedImports.insert( name_ ) );
 	if ( ! ir.second ) {
 		throw HHuginn::HHuginnRuntimeException(
-			"Package `"_ys.append( name_ ).append( "' is already being imported." ),
+			"Package `"_ys.append( name_ ).append( "` is already being imported." ),
 			runtime_->file_id(),
 			position_
 		);
@@ -104,7 +104,7 @@ HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, yaal::hcor
 	}
 	if ( ! package ) {
 		throw HHuginn::HHuginnRuntimeException(
-			"Package `"_ys.append( name_ ).append( "' does not exist." ),
+			"Package `"_ys.append( name_ ).append( "` does not exist." ),
 			runtime_->file_id(),
 			position_
 		);

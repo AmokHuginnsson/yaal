@@ -27,7 +27,7 @@ void OCompiler::build_import_name( yaal::hcore::HString const& name_, executing_
 void OCompiler::set_import_name( executing_parser::range_t range_ ) {
 	M_PROLOG
 	if ( is_restricted( _moduleName ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( _moduleName ).append( "' is a restricted name." ), _fileId, range_.start() );
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( _moduleName ).append( "` is a restricted name." ), _fileId, range_.start() );
 	}
 	HHuginn::identifier_id_t importIdentifier( _runtime->identifier_id( _moduleName ) );
 	_moduleName.clear();
@@ -44,7 +44,7 @@ void OCompiler::set_import_name( executing_parser::range_t range_ ) {
 HHuginn::identifier_id_t OCompiler::prep_import_result( yaal::hcore::HString const& name_, HHuginn::SYMBOL_KIND kind_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	if ( is_restricted( name_ ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), _fileId, range_.start() );
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "` is a restricted name." ), _fileId, range_.start() );
 	}
 	HHuginn::identifier_id_t importResultIdentifier( _runtime->identifier_id( name_ ) );
 	check_name_import( importResultIdentifier, range_ );

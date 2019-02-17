@@ -118,9 +118,9 @@ HHuginn::HIterable::iterator_t HIterableAdaptor::do_iterator( HThread* thread_, 
 	HHuginn::HObject* itObj( dynamic_cast<HHuginn::HObject*>( itVal.raw() ) );
 	if ( ! itObj ) {
 		throw HHuginn::HHuginnRuntimeException(
-			"User defined `iterable` "_ys
+			"User defined `iterable`, "_ys
 				.append( a_type_name( _source->get_class() ) )
-				.append( " returned invalid iterator object - " )
+				.append( ", returned invalid iterator object - " )
 				.append( a_type_name( itVal->get_class() ) )
 				.append( "." ),
 			thread_->current_frame()->file_id(),
@@ -136,11 +136,11 @@ int long HIterableAdaptor::do_size( huginn::HThread* thread_, int position_ ) co
 	HHuginn::value_t sizeVal( obj->call_method( thread_, _source, IDENTIFIER::INTERFACE::GET_SIZE, HArguments( thread_ ), position_ ) );
 	if ( sizeVal->type_id() != HHuginn::TYPE::INTEGER ) {
 		throw HHuginn::HHuginnRuntimeException(
-			"User defined `iterable` "_ys
+			"User defined `iterable`, "_ys
 				.append( a_type_name( _source->get_class() ) )
-				.append( " returned an invalid type " )
+				.append( ", returned an invalid type " )
 				.append( a_type_name( sizeVal->get_class() ) )
-				.append( " instead of an `integer' from supplied `get_size' method." ),
+				.append( " instead of an `integer` from supplied `get_size` method." ),
 			thread_->current_frame()->file_id(),
 			position_
 		);
@@ -178,11 +178,11 @@ bool HIterableAdaptorIterator::do_is_valid( HThread* thread_, int position_ ) {
 	HHuginn::value_t isValid( _isValidMethod( thread_, &_iterator, HArguments( thread_ ), position_ ) );
 	if ( isValid->type_id() != HHuginn::TYPE::BOOLEAN ) {
 		throw HHuginn::HHuginnRuntimeException(
-			"User defined `iterator` "_ys
+			"User defined `iterator`, "_ys
 				.append( a_type_name( _iterator->get_class() ) )
-				.append( " returned an invalid type " )
+				.append( ", returned an invalid type " )
 				.append( a_type_name( isValid->get_class() ) )
-				.append( " instead of a `boolean' from supplied `is_valid' method." ),
+				.append( " instead of a `boolean` from supplied `is_valid` method." ),
 			thread_->current_frame()->file_id(),
 			position_
 		);

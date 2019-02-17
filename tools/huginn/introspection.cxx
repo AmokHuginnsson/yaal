@@ -204,7 +204,7 @@ public:
 		bool functionExists( g && ( (*g)->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) );
 		if ( is_restricted( package ) ) {
 			throw HHuginn::HHuginnRuntimeException(
-				"`"_ys.append( package ).append( "' is restricted keyword." ),
+				"`"_ys.append( package ).append( "` is restricted keyword." ),
 				thread_->current_frame()->file_id(),
 				position_
 			);
