@@ -319,13 +319,15 @@ HHuginn::value_t member_value( HThread* thread_, HHuginn::value_t const& object_
 	HHuginn::value_t s( rt.object_factory()->create_string( rt.identifier_name( memberId_ ) ) );
 	if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( object_.raw() ) ) {
 		m = o->call_method( thread_, object_, IDENTIFIER::INTERFACE::MEMBER, HArguments( thread_, s ), position_ );
+		M_ASSERT( !! m );
 	} else {
 		HHuginn::HClass const* cls( object_->get_class() );
 		int idx( cls->field_index( IDENTIFIER::INTERFACE::SET_MEMBER ) );
 		if ( idx >= 0 ) {
 			HHuginn::HClass::HMethod const& method( *static_cast<HHuginn::HClass::HMethod const*>( cls->field( idx ).raw() ) );
 			m = method.function()( thread_, const_cast<HHuginn::value_t*>( &object_ ), HArguments( thread_, s ), position_ );
-		} else {
+		}
+		if ( ! m ) {
 			no_such_member( thread_, cls->name(), memberId_, position_, cls );
 		}
 	}
