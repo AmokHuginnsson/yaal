@@ -42,6 +42,34 @@ HHuginn::class_t make_node_class( HRuntime* runtime_, HHuginn::HClass const* ori
 
 }
 
+class HAttributes : public HHuginn::HInvalidatingIterable {
+private:
+	HHuginn::value_t _element;
+public:
+	HAttributes( HHuginn::HClass const* class_, HHuginn::value_t& element_ )
+		: HInvalidatingIterable( class_ )
+		, _element( element_ ) {
+	}
+	yaal::hcore::HString const& subscript( HThread*, yaal::hcore::HString const&, int );
+	void set_subscript( HThread*, yaal::hcore::HString const&, yaal::hcore::HString const&, int );
+	bool contains( HThread*, yaal::hcore::HString const&, int );
+	void remove( HThread*, yaal::hcore::HString const&, int );
+protected:
+	virtual iterator_t do_iterator( HThread*, int ) override;
+	virtual int long do_size( huginn::HThread*, int ) const override;
+private:
+	void ensure_valid( HThread*, int ) const;
+	HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const override {
+		M_PROLOG
+		throw HHuginn::HHuginnRuntimeException(
+			"Copy semantics is not supported on `XML.Element.Attributes`s.",
+			thread_->current_frame()->file_id(),
+			position_
+		);
+		M_EPILOG
+	}
+};
+
 class HElement : public HHuginn::HInvalidatingIterable {
 public:
 	typedef yaal::hcore::HPointer<yaal::tools::HXml> xml_t;
@@ -62,6 +90,7 @@ public:
 	};
 private:
 	HHuginn::value_t _doc;
+	HHuginn::value_ref_t _attributes;
 	yaal::tools::HXml::HNodeProxy _node;
 	HTrackerProxy _tracker;
 public:
@@ -76,9 +105,19 @@ public:
 	void remove( HThread*, HElement*, int );
 	void remove_nth( HThread*, int, int );
 	HHuginn::value_t parent( HThread*, int );
+	HHuginn::value_t attributes( HThread*, HHuginn::value_t*, int );
 	HHuginn::value_t document( HThread*, int );
 	yaal::tools::HXml::HNodeProxy const& node( void ) const {
 		return ( _node );
+	}
+	yaal::tools::HXml::HNode::properties_t& properties( void ) {
+		return ( _node.properties() );
+	}
+	yaal::tools::HXml::HNode::properties_t const& properties( void ) const {
+		return ( _node.properties() );
+	}
+	bool is_valid( void ) const {
+		return ( !! _node );
 	}
 protected:
 	virtual iterator_t do_iterator( HThread*, int ) override;
@@ -117,11 +156,94 @@ private:
 
 class HDocumentClass;
 
+class HAttributesClass : public HHuginn::HClass {
+public:
+	typedef HAttributesClass this_type;
+	typedef HHuginn::HClass base_type;
+public:
+	HAttributesClass(
+		HRuntime* runtime_,
+		HHuginn::type_id_t typeId_,
+		HHuginn::HClass const* origin_
+	) : HHuginn::HClass(
+			runtime_,
+			typeId_,
+			runtime_->identifier_id( "Attributes" ),
+			"The `Attributes` class represents a single `XML` `Document` `Element` `Attributes` reference.",
+			HHuginn::ACCESS::PRIVATE
+		) {
+		HHuginn::field_definitions_t fd{
+			{ "subscript",     runtime_->create_method( &HAttributesClass::subscript ),     "( *name* ) - get value of attribute of given *name*" },
+			{ "set_subscript", runtime_->create_method( &HAttributesClass::set_subscript ), "( *name*, *value* ) - set given *name* attribute value to *value*" },
+			{ "contains",      runtime_->create_method( &HAttributesClass::contains ),      "( *name* ) - check if given attribute exists in this attribute set" },
+			{ "remove",        runtime_->create_method( &HAttributesClass::remove ),        "( *name* ) - remove attribute of given *name*" }
+		};
+		set_origin( origin_ );
+		redefine( nullptr, fd );
+		return;
+	}
+	static HHuginn::value_t subscript( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "Attributes.subscript", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
+		HAttributes& attributes( *static_cast<HAttributes*>( object_->raw() ) );
+		return ( thread_->object_factory().create_string( attributes.subscript( thread_, get_string( values_[0] ), position_ ) ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t set_subscript( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "Attributes.set_subscript", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, thread_, position_ );
+		HAttributes& attributes( *static_cast<HAttributes*>( object_->raw() ) );
+		attributes.set_subscript( thread_, get_string( values_[0] ), get_string( values_[1] ), position_ );
+		return ( values_[1] );
+		M_EPILOG
+	}
+	static HHuginn::value_t contains( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "Attributes.contains", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
+		HAttributes& attributes( *static_cast<HAttributes*>( object_->raw() ) );
+		return ( thread_->runtime().boolean_value( attributes.contains( thread_, get_string( values_[0] ), position_ ) ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t remove( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "Attributes.remove", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
+		HAttributes& attributes( *static_cast<HAttributes*>( object_->raw() ) );
+		attributes.remove( thread_, get_string( values_[0] ), position_ );
+		return ( *object_ );
+		M_EPILOG
+	}
+	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
+		M_PROLOG
+		HHuginn::class_t c(
+			runtime_->create_class(
+				HRuntime::class_constructor_t(
+					[&runtime_, &origin_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
+						return (
+							make_pointer<HAttributesClass>(
+								runtime_,
+								typeId_,
+								origin_
+							)
+						);
+					}
+				)
+			)
+		);
+		runtime_->huginn()->register_class( c, HHuginn::VISIBILITY::PACKAGE );
+		return ( c );
+		M_EPILOG
+	}
+private:
+	HAttributesClass( HAttributesClass const& ) = delete;
+	HAttributesClass& operator = ( HAttributesClass const& ) = delete;
+};
+
 class HElementClass : public HHuginn::HClass {
 public:
 	typedef HElementClass this_type;
 	typedef HHuginn::HClass base_type;
 private:
+	HHuginn::class_t _attributesClass;
 	HHuginn::HClass const* _documentClass;
 	HHuginn::class_t const& _exceptionClass;
 public:
@@ -130,7 +252,7 @@ public:
 		HHuginn::type_id_t typeId_,
 		HHuginn::HClass const* documentClass_,
 		HHuginn::class_t const& exceptionClass_,
-		HHuginn::HClass const* origin_
+		HHuginn::HClass* origin_
 	) : HHuginn::HClass(
 			runtime_,
 			typeId_,
@@ -138,10 +260,18 @@ public:
 			"The `Element` class represents a single `XML` `Document` `Element` reference.",
 			HHuginn::ACCESS::PRIVATE
 		)
+		, _attributesClass(
+			add_class_as_member(
+				origin_,
+				HAttributesClass::get_class( runtime_, origin_ ),
+				"An `XML` `Element` `Attributes` reference type."
+			)
+		)
 		, _documentClass( documentClass_ )
 		, _exceptionClass( exceptionClass_ ) {
 		HHuginn::field_definitions_t fd{
 			{ "name",       runtime_->create_method( &HElementClass::element_name ), "get the name of this `Element`" },
+			{ "attributes", runtime_->create_method( &HElementClass::attributes ),   "get `Element`s attributes" },
 			{ "parent",     runtime_->create_method( &HElementClass::parent ),       "get parent node of this `Element`" },
 			{ "subscript",  runtime_->create_method( &HElementClass::subscript ),    "( *index* ) get *index*'th child node of this `Element`" },
 			{ "document",   runtime_->create_method( &HElementClass::document ),     "get an `XML` `Document` to which this `Element` belongs to" },
@@ -158,6 +288,13 @@ public:
 		verify_arg_count( "Element.name", values_, 0, 0, thread_, position_ );
 		HElement& element( *static_cast<HElement*>( object_->raw() ) );
 		return ( element.name( thread_, position_ ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t attributes( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( "Element.attributes", values_, 0, 0, thread_, position_ );
+		HElement& element( *static_cast<HElement*>( object_->raw() ) );
+		return ( element.attributes( thread_, object_, position_ ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t parent( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -205,10 +342,13 @@ public:
 		M_EPILOG
 	}
 	HDocumentClass const* document_class( void ) const;
+	HHuginn::HClass const* attributes_class( void ) const {
+		return ( _attributesClass.raw() );
+	}
 	HHuginn::HClass const* exception_class( void ) const {
 		return ( _exceptionClass.raw() );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::HClass const* documentClass_, HHuginn::class_t const& exceptionClass_ , HHuginn::HClass const* origin_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::HClass const* documentClass_, HHuginn::class_t const& exceptionClass_, HHuginn::HClass* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			runtime_->create_class(
@@ -236,15 +376,70 @@ private:
 	HElementClass& operator = ( HElementClass const& ) = delete;
 };
 
+class HAttributesIterator : public HNotifableIterator {
+	HHuginn::value_t _element;
+	yaal::tools::HXml::HNode::properties_t& _properties;
+	yaal::tools::HXml::HNode::properties_t::iterator _it;
+public:
+	HAttributesIterator( HHuginn::value_t const& element_, HAttributes* attributes_ )
+		: HNotifableIterator( attributes_ )
+		, _element( element_ )
+		, _properties( static_cast<HElement*>( _element.raw() )->properties() )
+		, _it( _properties.begin() ) {
+		return;
+	}
+protected:
+	virtual HHuginn::value_t do_value( HThread* thread_, int ) override {
+		HObjectFactory& of( thread_->object_factory() );
+		HHuginn::values_t data;
+		data.push_back( of.create_string( _it->first ) );
+		data.push_back( of.create_string( _it->second ) );
+		return ( of.create_tuple( yaal::move( data ) ) );
+	}
+	virtual bool do_is_valid( huginn::HThread*, int ) override {
+		return ( _it != _properties.end() );
+	}
+	virtual void do_next( HThread*, int ) override {
+		if ( _skip == 0 ) {
+			++ _it;
+		} else {
+			-- _skip;
+		}
+	}
+	virtual void do_invalidate( void ) override {
+		_it = _properties.end();
+	}
+	virtual void do_skip( void ) override {
+		++ _it;
+		++ _skip;
+	}
+	virtual void const* do_id( void ) const override {
+		return ( _it.node_id() );
+	}
+private:
+	HAttributesIterator( HAttributesIterator const& ) = delete;
+	HAttributesIterator& operator = ( HAttributesIterator const& ) = delete;
+};
+
+HHuginn::HIterable::iterator_t HAttributes::do_iterator( HThread* thread_, int position_ ) {
+	ensure_valid( thread_, position_ );
+	return ( make_pointer<HAttributesIterator>( _element, this ) );
+}
+
+int long HAttributes::do_size( huginn::HThread* thread_, int position_ ) const {
+	ensure_valid( thread_, position_ );
+	return ( static_cast<HElement const*>( _element.raw() )->properties().get_size() );
+}
+
 class HElementIterator : public HNotifableIterator {
-	HHuginn::HClass const* _class;
+	HElementClass const* _elementClass;
 	HHuginn::value_t _doc;
 	yaal::tools::HXml::HNodeProxy _node;
 	yaal::tools::HXml::HIterator _it;
 public:
-	HElementIterator( HHuginn::HClass const* class_, HHuginn::value_t const& doc_, HElement* element_ )
+	HElementIterator( HElementClass const* elementClass_, HHuginn::value_t const& doc_, HElement* element_ )
 		: HNotifableIterator( element_ )
-		, _class( class_ )
+		, _elementClass( elementClass_ )
 		, _doc( doc_ )
 		, _node( element_->node() )
 		, _it( _node.begin() ) {
@@ -279,7 +474,7 @@ private:
 
 HHuginn::HIterable::iterator_t HElement::do_iterator( HThread* thread_, int position_ ) {
 	ensure_valid( thread_, position_ );
-	return ( make_pointer<HElementIterator>( get_class(), _doc, this ) );
+	return ( make_pointer<HElementIterator>( static_cast<HElementClass const*>( get_class() ), _doc, this ) );
 }
 
 class HDocument : public HHuginn::HValue, public HHuginn::HReferenceTracker {
@@ -505,9 +700,53 @@ HHuginn::value_t HDocument::create_element( HObjectFactory& of_, HHuginn::value_
 	M_EPILOG
 }
 
+yaal::hcore::HString const& HAttributes::subscript( HThread* thread_, yaal::hcore::HString const& name_, int position_ ) {
+	ensure_valid( thread_, position_ );
+	try {
+		return ( static_cast<HElement*>( _element.raw() )->properties().at( name_ ) );
+	} catch ( HException const& e ) {
+		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+	}
+}
+
+void HAttributes::set_subscript( HThread* thread_, yaal::hcore::HString const& name_, yaal::hcore::HString const& value_, int position_ ) {
+	ensure_valid( thread_, position_ );
+	static_cast<HElement*>( _element.raw() )->properties()[name_] = value_;
+}
+
+bool HAttributes::contains( HThread* thread_, yaal::hcore::HString const& name_, int position_ ) {
+	ensure_valid( thread_, position_ );
+	return ( static_cast<HElement*>( _element.raw() )->properties().count( name_ ) > 0 );
+}
+
+void HAttributes::remove( HThread* thread_, yaal::hcore::HString const& name_, int position_ ) {
+	M_PROLOG
+	ensure_valid( thread_, position_ );
+	HElement* element( static_cast<HElement*>( _element.raw() ) );
+	yaal::tools::HXml::HNode::properties_t& properties( element->properties() );
+	yaal::tools::HXml::HNode::properties_t::iterator it( properties.find( name_ ) );
+	if ( it != properties.end() ) {
+		skip( it.node_id() );
+		properties.erase( it );
+	}
+	return;
+	M_EPILOG
+}
+
+void HAttributes::ensure_valid( HThread* thread_, int position_ ) const {
+	if ( !static_cast<HElement const*>( _element.raw() )->is_valid() ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"This `XML.Element.Attributes` reference is no longer attached to a valid node.",
+			thread_->current_frame()->file_id(),
+			position_
+		);
+	}
+}
+
 HElement::HElement( HHuginn::HClass const* class_, HHuginn::value_t& doc_, yaal::tools::HXml::HNodeProxy const& node_ )
 	: HInvalidatingIterable( class_ )
 	, _doc( doc_ )
+	, _attributes()
 	, _node( node_ )
 	, _tracker( static_cast<HDocument*>( doc_.raw() ), *this ) {
 	return;
@@ -563,6 +802,19 @@ HHuginn::value_t HElement::append( HThread* thread_, HHuginn::values_t& values_,
 		);
 	}
 	return ( make_node_ref( *r.object_factory(), dc, _doc, *_node.add_node( t, s ) ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HElement::attributes( HThread* thread_, HHuginn::value_t* self_, int position_ ) {
+	M_PROLOG
+	HElementClass const* ec( static_cast<HElementClass const*>( get_class() ) );
+	ensure_valid( thread_, position_ );
+	HHuginn::value_t attrs( _attributes );
+	if ( ! attrs ) {
+		attrs = thread_->object_factory().create<HAttributes>( ec->attributes_class(), *self_ );
+		_attributes = attrs;
+	}
+	return ( attrs );
 	M_EPILOG
 }
 
@@ -657,7 +909,7 @@ HHuginn::value_t HElement::document( HThread* thread_, int position_ ) {
 }
 
 HHuginn::value_t HElementIterator::do_value( HThread* thread_, int ) {
-	return ( make_node_ref( thread_->object_factory(), static_cast<HElementClass const*>( _class )->document_class(), _doc, *_it ) );
+	return ( make_node_ref( thread_->object_factory(), _elementClass->document_class(), _doc, *_it ) );
 }
 
 }
