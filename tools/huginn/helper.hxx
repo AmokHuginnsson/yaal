@@ -72,6 +72,7 @@ void verify_arg_type( char const*, HHuginn::values_t&, int, HHuginn::HClass cons
 void verify_signature( char const*, HHuginn::values_t&, types_t const&, huginn::HThread*, int );
 void verify_signature_by_class( char const*, HHuginn::values_t&, classes_t const&, huginn::HThread*, int );
 HHuginn::type_id_t verify_arg_numeric( char const*, HHuginn::values_t&, int, ARITY, huginn::HThread*, int );
+HHuginn::value_t verify_arg_callable( char const*, HHuginn::values_t&, int, ARITY, huginn::HThread*, int );
 HHuginn::type_id_t verify_arg_materialized_collection( char const*, HHuginn::values_t&, int, ARITY, huginn::HThread*, int );
 HHuginn::value_t verify_arg_virtual_collection( char const*, HHuginn::values_t&, int, ARITY, huginn::HThread*, int );
 HHuginn::type_id_t verify_arg_collection_value_type( char const*, HHuginn::values_t&, int, ARITY, types_t const&, UNIFORMITY, huginn::HThread*, int );

@@ -405,6 +405,50 @@ HHuginn::type_id_t verify_arg_numeric(
 	M_EPILOG
 }
 
+HHuginn::value_t verify_arg_callable(
+	char const* name_,
+	HHuginn::values_t& values_,
+	int no_, ARITY argsArity_, huginn::HThread* thread_, int position_ ) {
+	M_PROLOG
+	HHuginn::value_t v( values_[no_] );
+	HHuginn::type_id_t t( v->type_id() );
+	do {
+		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
+			break;
+		}
+		if ( t == HHuginn::TYPE::UNBOUND_METHOD ) {
+			break;
+		}
+		if ( t == HHuginn::TYPE::BOUND_METHOD ) {
+			break;
+		}
+		int fi( v->field_index( IDENTIFIER::INTERFACE::CALL ) );
+		if ( fi >= 0 ) {
+			v = v->field( v, fi );
+			if ( v->type_id() == HHuginn::TYPE::BOUND_METHOD ) {
+				break;
+			}
+		}
+
+		HString no;
+		if ( argsArity_ == ARITY::MULTIPLE ) {
+			no = util::ordinal( no_ + 1 ).append( " " );
+		}
+		throw HHuginn::HHuginnRuntimeException(
+			""_ys.append( name_ )
+				.append( "() " )
+				.append( no )
+				.append( "argument must be a callable type, either a `*function_reference*` or an `*unbound_method*` or a `*bound_method*` or implementing a `call()` method, not " )
+				.append( a_type_name( values_[no_]->get_class() ) )
+				.append( "." ),
+			thread_->current_frame()->file_id(),
+			position_
+		);
+	} while ( false );
+	return ( v );
+	M_EPILOG
+}
+
 void not_a_collection( huginn::HThread*, char const*, HHuginn::HClass const*, int, ARITY, char const*, int ) __attribute__((noreturn));
 inline void not_a_collection( huginn::HThread* thread_, char const* name_, HHuginn::HClass const* class_, int no_, ARITY argsArity_, char const* extraMsg_, int position_ ) {
 	HString no;
