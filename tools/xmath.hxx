@@ -38,6 +38,8 @@ struct AGGREGATE_TYPE {
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const INTERQUARTILE_RANGE;
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const SAMPLE_SKEWNESS;
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const POPULATION_SKEWNESS;
+	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const SAMPLE_KURTOSIS;
+	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const POPULATION_KURTOSIS;
 	static M_YAAL_TOOLS_PUBLIC_API aggregate_type_t const HISTOGRAM;
 	static int long long required_data_points( aggregate_type_t const& );
 };
@@ -63,6 +65,8 @@ private:
 	numeric_t _populationVariance;
 	numeric_t _sampleSkewness;
 	numeric_t _populationSkewness;
+	numeric_t _sampleKurtosis;
+	numeric_t _populationKurtosis;
 	buckets_t _histogram;
 	aggregate_type_t _aggregateType;
 public:
@@ -89,6 +93,8 @@ public:
 		, _populationVariance()
 		, _sampleSkewness()
 		, _populationSkewness()
+		, _sampleKurtosis()
+		, _populationKurtosis()
 		, _histogram( buckets_ )
 		, _aggregateType( aggregateType_ ) {
 		M_PROLOG
@@ -98,6 +104,8 @@ public:
 				| AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION
 				| AGGREGATE_TYPE::SAMPLE_SKEWNESS
 				| AGGREGATE_TYPE::POPULATION_SKEWNESS
+				| AGGREGATE_TYPE::SAMPLE_KURTOSIS
+				| AGGREGATE_TYPE::POPULATION_KURTOSIS
 				| AGGREGATE_TYPE::HISTOGRAM
 			)
 		) {
@@ -181,7 +189,7 @@ public:
 	}
 	numeric_t sample_skewness( void ) const {
 		M_PROLOG
-		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::SAMPLE_SKEWNESS ) && ( _count > 1 ) );
+		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::SAMPLE_SKEWNESS ) && ( _count > 2 ) );
 		return ( _sampleSkewness );
 		M_EPILOG
 	}
@@ -189,6 +197,18 @@ public:
 		M_PROLOG
 		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::POPULATION_SKEWNESS ) && ( _count > 0 ) );
 		return ( _populationSkewness );
+		M_EPILOG
+	}
+	numeric_t sample_kurtosis( void ) const {
+		M_PROLOG
+		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::SAMPLE_KURTOSIS ) && ( _count > 3 ) );
+		return ( _sampleKurtosis );
+		M_EPILOG
+	}
+	numeric_t population_kurtosis( void ) const {
+		M_PROLOG
+		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::POPULATION_KURTOSIS ) && ( _count > 0 ) );
+		return ( _populationKurtosis );
 		M_EPILOG
 	}
 	numeric_t mean_absolute_deviation( void ) const {
@@ -293,7 +313,22 @@ private:
 				numeric_t n( static_cast<numeric_t>( _count ) );
 				numeric_t stdDev( math::square_root( _populationVariance ) );
 				_populationSkewness = ( acc / static_cast<numeric_t>( _count ) ) / ( stdDev * stdDev * stdDev );
-				_sampleSkewness = _populationSkewness * math::square_root( n * ( n - 1 ) ) / ( n - 2 );
+				if ( _count > 2 ) {
+					_sampleSkewness = _populationSkewness * math::square_root( n * ( n - 1 ) ) / ( n - 2 );
+				}
+			}
+			if ( _aggregateType & ( AGGREGATE_TYPE::SAMPLE_KURTOSIS | AGGREGATE_TYPE::POPULATION_KURTOSIS ) ) {
+				numeric_t acc( 0 );
+				for ( iterator_t it( first_ ); it != last_; ++ it ) {
+					numeric_t x( *it - _arithmeticMean );
+					acc += ( x * x * x * x );
+				}
+				numeric_t n( static_cast<numeric_t>( _count ) );
+				numeric_t stdDev( math::square_root( _populationVariance ) );
+				_populationKurtosis = ( acc / static_cast<numeric_t>( _count ) ) / ( stdDev * stdDev * stdDev * stdDev ) - static_cast<numeric_t>( 3 );
+				if ( _count > 3 ) {
+					_sampleKurtosis = ( _populationKurtosis * ( n + 1 ) + 6 ) * ( ( n - 1 ) / ( ( n - 2 ) * ( n - 3 ) ) );
+				}
 			}
 		}
 		if ( _aggregateType & AGGREGATE_TYPE::HISTOGRAM ) {
