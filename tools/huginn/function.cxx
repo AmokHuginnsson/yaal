@@ -51,9 +51,9 @@ HFunction::HFunction(
 int HFunction::upcast( HHuginn::value_t* object_ ) const {
 	M_PROLOG
 	int upCast( 0 );
-	HHuginn::HObject* object( object_ ? static_cast<HHuginn::HObject*>( object_->raw() ) : nullptr );
+	HObject* object( object_ ? static_cast<HObject*>( object_->raw() ) : nullptr );
 	if ( object_ && ( object->field_index( _name ) >= 0 ) ) {
-		HHuginn::HClass const* c( object->get_class() );
+		HClass const* c( object->get_class() );
 		while ( c ) {
 			int idx( c->field_index( _name ) );
 			if ( ( idx >= 0 ) && ( c->function( idx ).id() == this ) ) {
@@ -111,7 +111,7 @@ HHuginn::value_t HFunction::execute_impl(
 	int positionalArgumentsCount( static_cast<int>( variables.get_size() ) );
 	bool hasKeywordArguments( ! variables.is_empty() && ( variables.back()->type_id() == HHuginn::TYPE::NAMED_PARAMETERS ) );
 	if ( hasKeywordArguments ) {
-		namedParameters = yaal::move( static_cast<HHuginn::HTaggedValue*>( variables.back().raw() )->value() );
+		namedParameters = yaal::move( static_cast<HTaggedValue*>( variables.back().raw() )->value() );
 		variables.pop_back();
 		-- positionalArgumentsCount;
 	}
@@ -119,10 +119,10 @@ HHuginn::value_t HFunction::execute_impl(
 		variables.resize( _parameterCount );
 	}
 	if ( hasKeywordArguments ) {
-		HHuginn::HLookup::values_t& namedParametersData( static_cast<HHuginn::HLookup*>( namedParameters.raw() )->value() );
+		huginn::HLookup::values_t& namedParametersData( static_cast<huginn::HLookup*>( namedParameters.raw() )->value() );
 		HRuntime& r( thread_->runtime() );
-		for ( HHuginn::HLookup::values_t::iterator it( namedParametersData.begin() ); it != namedParametersData.end(); ) {
-			HHuginn::HLookup::values_t::iterator del( it );
+		for ( huginn::HLookup::values_t::iterator it( namedParametersData.begin() ); it != namedParametersData.end(); ) {
+			huginn::HLookup::values_t::iterator del( it );
 			++ it;
 			if ( del->first->type_id() != HHuginn::TYPE::STRING ) {
 				throw HHuginn::HHuginnRuntimeException(
@@ -168,7 +168,7 @@ HHuginn::value_t HFunction::execute_impl(
 	}
 	if ( _isVariadic ) {
 		HHuginn::value_t v( thread_->object_factory().create_tuple() );
-		HHuginn::HTuple::values_t& variadic( static_cast<HHuginn::HTuple*>( v.raw() )->value() );
+		huginn::HTuple::values_t& variadic( static_cast<huginn::HTuple*>( v.raw() )->value() );
 		variadic.reserve( max( positionalArgumentsCount - _parameterCount, 0 ) );
 		for ( int i( _parameterCount ); i < positionalArgumentsCount; ++ i ) {
 			variadic.push_back( variables[i] );
@@ -184,7 +184,7 @@ HHuginn::value_t HFunction::execute_impl(
 			namedParameters = thread_->object_factory().create_lookup();
 		}
 		variables.push_back( namedParameters );
-	} else if ( !! namedParameters && ! static_cast<HHuginn::HLookup*>( namedParameters.raw() )->value().is_empty() ) {
+	} else if ( !! namedParameters && ! static_cast<huginn::HLookup*>( namedParameters.raw() )->value().is_empty() ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Call to `"_ys
 				.append( thread_->runtime().identifier_name( _name ) )
@@ -200,7 +200,7 @@ HHuginn::value_t HFunction::execute_impl(
 				missing.push_back( _parameterNames[i] );
 			}
 		}
-		HString missingList;
+		hcore::HString missingList;
 		bool first( true );
 		HRuntime& r( thread_->runtime() );
 		for ( HHuginn::identifier_id_t m : missing ) {
@@ -210,7 +210,7 @@ HHuginn::value_t HFunction::execute_impl(
 			missingList.append( '`' ).append( r.identifier_name( m ) ).append( '`' );
 			first = false;
 		}
-		HString msg( "In call to `" );
+		hcore::HString msg( "In call to `" );
 		msg.append( r.identifier_name( _name ) )
 			.append( "()`, missing required positional argument" )
 			.append( missing.get_size() > 1 ? "s: " : ": " )

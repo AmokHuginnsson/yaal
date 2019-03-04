@@ -42,11 +42,11 @@ inline HHuginn::value_t ensure_virtual_collection(
 	M_PROLOG
 	HHuginn::value_t v( yaal::move( value_ ) );
 	do {
-		if ( dynamic_cast<HHuginn::HIterable const*>( v.raw() ) ) {
+		if ( dynamic_cast<huginn::HIterable const*>( v.raw() ) ) {
 			break;
 		}
 		if (
-			dynamic_cast<HHuginn::HObject*>( v.raw() )
+			dynamic_cast<HObject*>( v.raw() )
 			&& ( v->field_index( IDENTIFIER::INTERFACE::ITERATOR ) >= 0 )
 		) {
 			v = thread_->object_factory().create<HIterableAdaptor>( thread_->object_factory().iterable_adaptor_class(), v );
@@ -66,8 +66,8 @@ void HFor::do_execute( HThread* thread_ ) const {
 	int sourcePosition( _source->position() );
 	if ( f->can_continue() ) {
 		HHuginn::value_t source( ensure_virtual_collection( thread_, f->result(), sourcePosition ) );
-		HHuginn::HIterable* coll( static_cast<HHuginn::HIterable*>( source.raw() ) );
-		HHuginn::HIterable::iterator_t it( coll->iterator( thread_, sourcePosition ) );
+		huginn::HIterable* coll( static_cast<huginn::HIterable*>( source.raw() ) );
+		huginn::HIterable::iterator_t it( coll->iterator( thread_, sourcePosition ) );
 		while ( f->can_continue() && it->is_valid( thread_, sourcePosition ) ) {
 			if ( f->can_continue() ) {
 				run_loop( thread_, f, it->value( thread_, sourcePosition ) );
@@ -92,7 +92,7 @@ void HFor::run_loop( HThread* thread_, HFrame* frame_, HHuginn::value_t&& value_
 		if ( value_->type_id() != HHuginn::TYPE::TUPLE ) {
 			throw HHuginn::HHuginnRuntimeException( "`For` source did not return a `tuple` object.", file_id(), _source->position() );
 		}
-		HHuginn::HTuple::values_t& srcData( static_cast<HHuginn::HTuple*>( value_.raw() )->value() );
+		huginn::HTuple::values_t& srcData( static_cast<huginn::HTuple*>( value_.raw() )->value() );
 		int ds( static_cast<int>( srcData.get_size() ) );
 		if ( ds != cs ) {
 			throw HHuginn::HHuginnRuntimeException(

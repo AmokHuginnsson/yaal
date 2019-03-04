@@ -13,24 +13,24 @@ namespace yaal {
 
 namespace tools {
 
-HHuginn::value_t HHuginn::HReference::do_get( huginn::HThread*, int ) const {
+namespace huginn {
+
+HHuginn::value_t HReference::do_get( huginn::HThread*, int ) const {
 	return ( *_ref );
 }
 
-void HHuginn::HReference::do_set( huginn::HThread*, HHuginn::value_t&& value_, int ) {
+void HReference::do_set( huginn::HThread*, HHuginn::value_t&& value_, int ) {
 	swap( *_ref, value_ );
 }
 
-HHuginn::value_t HHuginn::HReference::do_clone( huginn::HThread*, HHuginn::value_t*, int ) const {
+HHuginn::value_t HReference::do_clone( huginn::HThread*, HHuginn::value_t*, int ) const {
 	M_ASSERT( 0 && "cloning reference"[0] );
 #if defined( NDEBUG ) || defined( __MSVCXX__ )
 	return ( HHuginn::value_t() );
 #endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
 }
 
-namespace huginn {
-
-HSubscriptReference::HSubscriptReference( HHuginn::HClass const* class_, HHuginn::value_t const& base_, HHuginn::value_t const& key_ )
+HSubscriptReference::HSubscriptReference( HClass const* class_, HHuginn::value_t const& base_, HHuginn::value_t const& key_ )
 	: HReference( class_, nullptr )
 	, _base( base_ )
 	, _key( key_ ) {
@@ -45,7 +45,7 @@ void HSubscriptReference::do_set( huginn::HThread* thread_, HHuginn::value_t&& v
 	instruction::subscript_assign( thread_, _base, _key, yaal::move( value_ ), position_ );
 }
 
-HMemberReference::HMemberReference( HHuginn::HClass const* class_, HHuginn::value_t const& object_, HHuginn::identifier_id_t memberId_ )
+HMemberReference::HMemberReference( HClass const* class_, HHuginn::value_t const& object_, HHuginn::identifier_id_t memberId_ )
 	: HReference( class_, nullptr )
 	, _object( object_ )
 	, _memberId( memberId_ ) {

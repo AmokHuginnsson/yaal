@@ -14,7 +14,7 @@ namespace tools {
 
 namespace huginn {
 
-HHuginn::class_t HRange::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
+HHuginn::class_t HRange::get_class( HRuntime* runtime_, huginn::HClass const* origin_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
@@ -37,10 +37,10 @@ HHuginn::value_t HRange::contains( huginn::HThread* thread_, HHuginn::value_t* o
 	M_PROLOG
 	verify_signature( "Range.contains", values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
 	HRange& range( *static_cast<HRange*>( object_->raw() ) );
-	HHuginn::HInteger::value_type elem( get_integer( values_[0] ) );
-	HHuginn::HInteger::value_type from( range._from );
-	HHuginn::HInteger::value_type stop( range._stop );
-	HHuginn::HInteger::value_type step( range._step );
+	huginn::HInteger::value_type elem( get_integer( values_[0] ) );
+	huginn::HInteger::value_type from( range._from );
+	huginn::HInteger::value_type stop( range._stop );
+	huginn::HInteger::value_type step( range._step );
 	if ( step < 0 ) {
 		using yaal::swap;
 		swap( from, stop );

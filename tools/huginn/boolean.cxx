@@ -26,7 +26,7 @@ HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
 HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		make_pointer<HHuginn::HClass>(
+		make_pointer<huginn::HClass>(
 			runtime_,
 			objectFactory_,
 			type_id( HHuginn::TYPE::BOOLEAN ),
@@ -44,13 +44,13 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 
 }
 
-HHuginn::HBoolean::HBoolean( HHuginn::HClass const* class_, HHuginn::HBoolean::value_type value_ )
+HBoolean::HBoolean( huginn::HClass const* class_, HBoolean::value_type value_ )
 	: HValue( class_ )
 	, _value( value_ ) {
 	return;
 }
 
-HHuginn::value_t HHuginn::HBoolean::do_clone( huginn::HThread*, HHuginn::value_t* object_, int ) const {
+HHuginn::value_t HBoolean::do_clone( huginn::HThread*, HHuginn::value_t* object_, int ) const {
 	return ( *object_ );
 }
 

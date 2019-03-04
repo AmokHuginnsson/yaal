@@ -41,7 +41,7 @@ bool HBooleanEvaluator::execute( huginn::HThread* thread_ ) {
 				e->position()
 			);
 		}
-		bool v( static_cast<HHuginn::HBoolean*>( result.raw() )->value() );
+		bool v( static_cast<HBoolean*>( result.raw() )->value() );
 		if ( ( ( _operator == OPERATOR::BOOLEAN_AND ) && ! v ) || ( ( _operator == OPERATOR::BOOLEAN_OR ) && v ) ) {
 			all = false;
 			break;

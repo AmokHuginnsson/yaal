@@ -23,25 +23,25 @@ namespace dbwrapper {
 namespace huginn {
 
 HQuery::HQuery(
-	HHuginn::HClass const* class_,
+	HClass const* class_,
 	dbwrapper::HQuery::ptr_t const& query_
 ) : HValue( class_ )
 	, _query( query_ ) {
 	return;
 }
 
-class HQueryClass : public HHuginn::HClass {
+class HQueryClass : public HClass {
 	HHuginn::class_t const& _exceptionClass;
 	HHuginn::class_t _queryResultClass;
 public:
 	typedef HQueryClass this_type;
-	typedef HHuginn::HClass base_type;
+	typedef HClass base_type;
 	HQueryClass(
 		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_,
-		HHuginn::HClass const* origin_,
+		HClass const* origin_,
 		HHuginn::class_t const& exceptionClass_
-	) : HHuginn::HClass(
+	) : HClass(
 			runtime_,
 			typeId_,
 			runtime_->identifier_id( "Query" ),
@@ -58,10 +58,10 @@ public:
 		redefine( nullptr, fd );
 		return;
 	}
-	HHuginn::HClass const* query_result_class( void ) const {
+	HClass const* query_result_class( void ) const {
 		return ( _queryResultClass.raw() );
 	}
-	HHuginn::HClass const* exception_class( void ) const {
+	HClass const* exception_class( void ) const {
 		return ( _exceptionClass.raw() );
 	}
 };
@@ -75,7 +75,7 @@ HHuginn::value_t HQuery::bind( tools::huginn::HThread* thread_, HHuginn::value_t
 	try {
 		q->_query->bind( static_cast<int>( get_integer( values_[0] ) ), get_string( values_[1] ) );
 		v = *object_;
-	} catch ( HException const& e ) {
+	} catch ( hcore::HException const& e ) {
 		thread_->raise( qc->exception_class(), e.what(), position_ );
 	}
 	return ( v );
@@ -92,14 +92,14 @@ HHuginn::value_t HQuery::execute( tools::huginn::HThread* thread_, HHuginn::valu
 	try {
 		HRecordSet::ptr_t rs( q->_query->execute() );
 		v = thread_->object_factory().create<HQueryResult>( qc->query_result_class(), rs );
-	} catch ( HException const& e ) {
+	} catch ( hcore::HException const& e ) {
 		thread_->raise( qc->exception_class(), e.what(), position_ );
 	}
 	return ( v );
 	M_EPILOG
 }
 
-HHuginn::class_t HQuery::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_, HHuginn::class_t const& exceptionClass_ ) {
+HHuginn::class_t HQuery::get_class( HRuntime* runtime_, HClass const* origin_, HHuginn::class_t const& exceptionClass_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(

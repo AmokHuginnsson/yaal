@@ -140,7 +140,7 @@ public:
 	yaal::hcore::HString const& identifier_name( identifier_id_t ) const;
 	value_t const* get_global( identifier_id_t ) const;
 	class_t get_class( identifier_id_t ) const;
-	HHuginn::HClass const* get_class( void const* ) const;
+	huginn::HClass const* get_class( void const* ) const;
 	HHuginn::value_t find_package( identifier_id_t ) const;
 	void register_class( class_t, HHuginn::VISIBILITY );
 	/*! \brief Remove compiled class from runtime.
@@ -180,17 +180,17 @@ public:
 		identifier_id_t,
 		yaal::hcore::HString const&,
 		HHuginn::ACCESS,
-		HHuginn::HClass::TYPE = HHuginn::HClass::TYPE::BUILTIN,
-		HHuginn::HClass const* = nullptr,
-		HHuginn::HClass::create_instance_t = nullptr
+		huginn::HClass::TYPE = huginn::HClass::TYPE::BUILTIN,
+		huginn::HClass const* = nullptr,
+		huginn::HClass::create_instance_t = nullptr
 	);
 	class_t create_class(
 		yaal::hcore::HString const&,
 		yaal::hcore::HString const&,
 		HHuginn::ACCESS,
-		HHuginn::HClass::TYPE = HHuginn::HClass::TYPE::BUILTIN,
-		HHuginn::HClass const* = nullptr,
-		HHuginn::HClass::create_instance_t = nullptr
+		huginn::HClass::TYPE = huginn::HClass::TYPE::BUILTIN,
+		huginn::HClass const* = nullptr,
+		huginn::HClass::create_instance_t = nullptr
 	);
 	class_t create_class( class_constructor_t const& );
 	void execute( void );
@@ -243,10 +243,10 @@ public:
 	void register_builtins( void );
 
 	yaal::hcore::HString suggestion( HHuginn::identifier_id_t ) const;
-	yaal::hcore::HString suggestion( HHuginn::HClass const*, HHuginn::identifier_id_t ) const;
+	yaal::hcore::HString suggestion( huginn::HClass const*, HHuginn::identifier_id_t ) const;
 
 	yaal::hcore::HString const& function_name( void const* ) const;
-	yaal::hcore::HString const* package_name( HHuginn::HClass const* ) const;
+	yaal::hcore::HString const* package_name( huginn::HClass const* ) const;
 	void copy_text( HRuntime& );
 	void fix_references( void );
 	HHuginn::class_t make_package( yaal::hcore::HString const&, HRuntime const& );

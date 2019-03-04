@@ -40,7 +40,7 @@ class HFileSystem : public HPackage {
 	enumeration::HEnumerationClass::ptr_t _openModeClass;
 	enumeration::HEnumerationClass::ptr_t _fileTypeClass;
 public:
-	HFileSystem( HHuginn::HClass* class_ )
+	HFileSystem( huginn::HClass* class_ )
 		: HPackage( class_ )
 		, _streamClass( HStream::get_class( class_->runtime() ) )
 		, _directoryScanClass( HDirectoryScan::get_class( class_->runtime(), class_ ) )
@@ -199,7 +199,7 @@ public:
 			data.emplace_back( of.create_integer( ri.free() ) );
 			data.emplace_back( of.create_integer( ri.available() ) );
 			v = of.create_tuple( yaal::move( data ) );
-		} catch ( HException const& e ) {
+		} catch ( hcore::HException const& e ) {
 			HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
 			thread_->raise( fsc->exception_class(), e.what(), position_ );
 		}
@@ -211,7 +211,7 @@ private:
 		M_PROLOG
 		char const name[] = "FileSystem.open";
 		verify_signature_by_class( name, values_, { thread_->object_factory().string_class(), _openModeClass->enumeral_class() }, thread_, position_ );
-		HHuginn::HEnumeral::value_type val( get_enumeral( values_[1] ) );
+		HEnumeral::value_type val( get_enumeral( values_[1] ) );
 		HFile::open_t openMode( HFile::OPEN::READING );
 		if ( val == safe_int::cast<int>( HFile::OPEN::WRITING.value() ) ) {
 			openMode = HFile::OPEN::WRITING;

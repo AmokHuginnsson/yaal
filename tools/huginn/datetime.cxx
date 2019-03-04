@@ -29,7 +29,7 @@ class HDateTime : public HPackage {
 	HHuginn::class_t _clockClass;
 	HHuginn::class_t _exceptionClass;
 public:
-	HDateTime( HHuginn::HClass* class_ )
+	HDateTime( HClass* class_ )
 		: HPackage( class_ )
 		, _timeClass( HTime::get_class( class_->runtime() ) )
 		, _clockClass( HClock::get_class( class_->runtime(), class_ ) )
@@ -57,14 +57,14 @@ public:
 		HObjectFactory& of( thread_->object_factory() );
 		HDateTime& dtp( *static_cast<HDateTime*>( object_->raw() ) );
 		verify_signature_by_class( "DateTime.format", values_, { of.string_class(), dtp._timeClass.raw() }, thread_, position_ );
-		HString const& fmt( get_string( values_[0] ) );
+		hcore::HString const& fmt( get_string( values_[0] ) );
 		HTime const& dt( *static_cast<HTime*>( values_[1].raw() ) );
 		hcore::HTime t( dt.value() );
-		HString s;
+		hcore::HString s;
 		try {
 			t.set_format( fmt );
 			s = t.to_string();
-		} catch ( HException const& e ) {
+		} catch ( hcore::HException const& e ) {
 			thread_->raise( dtp._exceptionClass.raw(), e.what(), position_ );
 		}
 		return ( of.create_string( yaal::move( s ) ) );

@@ -31,7 +31,7 @@ public:
 	typedef bool ( * binary_boolean_operator_t )( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 	typedef bool ( * boolean_binary_operator_t )( bool, bool );
 	typedef HHuginn::value_t ( * unary_operator_t )( HThread*, HHuginn::value_t const&, int );
-	HOperators( HHuginn::HClass* class_ )
+	HOperators( huginn::HClass* class_ )
 		: HPackage( class_ ) {
 		return;
 	}
@@ -40,8 +40,8 @@ public:
 		verify_arg_count( name_, values_, 2, 2, thread_, position_ );
 		HHuginn::value_t& v1( values_[0] );
 		HHuginn::value_t& v2( values_[1] );
-		HHuginn::HClass const* c1( v1->get_class() );
-		HHuginn::HClass const* c2( v2->get_class() );
+		huginn::HClass const* c1( v1->get_class() );
+		huginn::HClass const* c2( v2->get_class() );
 		if ( c1 != c2 ) {
 			operands_type_mismatch( op_to_str( op_ ), c1, c2, thread_->current_frame()->file_id(), position_ );
 		}
@@ -57,8 +57,8 @@ public:
 		verify_arg_count( name_, values_, 2, 2, thread_, position_ );
 		HHuginn::value_t& v1( values_[0] );
 		HHuginn::value_t& v2( values_[1] );
-		HHuginn::HClass const* c1( v1->get_class() );
-		HHuginn::HClass const* c2( v2->get_class() );
+		huginn::HClass const* c1( v1->get_class() );
+		huginn::HClass const* c2( v2->get_class() );
 		if ( c1 != c2 ) {
 			operands_type_mismatch( op_to_str( op_ ), c1, c2, thread_->current_frame()->file_id(), position_ );
 		}
@@ -88,8 +88,8 @@ public:
 		verify_arg_count( "Operators.not_equals", values_, 2, 2, thread_, position_ );
 		HHuginn::value_t& v1( values_[0] );
 		HHuginn::value_t& v2( values_[1] );
-		HHuginn::HClass const* c1( v1->get_class() );
-		HHuginn::HClass const* c2( v2->get_class() );
+		huginn::HClass const* c1( v1->get_class() );
+		huginn::HClass const* c2( v2->get_class() );
 		if ( c1 != c2 ) {
 			operands_type_mismatch( op_to_str( OPERATOR::NOT_EQUALS ), c1, c2, thread_->current_frame()->file_id(), position_ );
 		}
@@ -102,7 +102,7 @@ public:
 		verify_arg_count( name_, values_, 2, 2, thread_, position_ );
 		HHuginn::value_t& v1( values_[0] );
 		HHuginn::value_t& v2( values_[1] );
-		HHuginn::HClass const* c2( v2->get_class() );
+		huginn::HClass const* c2( v2->get_class() );
 		if ( ( c2->type_id() <= huginn::type_id( HHuginn::TYPE::UNKNOWN ) ) && ! is_collection_like( c2 ) ) {
 			throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_COLL] ).append( a_type_name( c2 ) ), thread_->current_frame()->file_id(), position_ );
 		}

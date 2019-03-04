@@ -22,7 +22,7 @@ namespace tools {
 
 namespace huginn {
 
-HTime::HTime( HHuginn::HClass const* class_, yaal::hcore::HTime const& time_ )
+HTime::HTime( huginn::HClass const* class_, yaal::hcore::HTime const& time_ )
 	: HValue( class_ )
 	, _time( time_ ) {
 	return;
@@ -48,7 +48,7 @@ HHuginn::value_t HTime::set( char const* name_, time_set_t timeSet_, huginn::HTh
 	} catch ( HTimeException const& e ) {
 		HRuntime& r( thread_->runtime() );
 		HHuginn::value_t package( r.find_package( r.try_identifier_id( "DateTime" ) ) );
-		HHuginn::HClass const* ec( !! package ? static_cast<HPackage*>( package.raw() )->exception_class() : r.object_factory()->exception_class() );
+		huginn::HClass const* ec( !! package ? static_cast<HPackage*>( package.raw() )->exception_class() : r.object_factory()->exception_class() );
 		thread_->raise( ec, e.what(), position_ );
 	}
 	return ( *object_ );
@@ -70,7 +70,7 @@ HHuginn::value_t HTime::set_datetime( huginn::HThread* thread_, HHuginn::value_t
 	} catch ( HTimeException const& e ) {
 		HRuntime& r( thread_->runtime() );
 		HHuginn::value_t package( r.find_package( r.try_identifier_id( "DateTime" ) ) );
-		HHuginn::HClass const* ec( !! package ? static_cast<HPackage*>( package.raw() )->exception_class() : r.object_factory()->exception_class() );
+		huginn::HClass const* ec( !! package ? static_cast<HPackage*>( package.raw() )->exception_class() : r.object_factory()->exception_class() );
 		thread_->raise( ec, e.what(), position_ );
 	}
 	return ( *object_ );
@@ -85,7 +85,7 @@ HHuginn::value_t HTime::from_string( huginn::HThread* thread_, HHuginn::value_t*
 	} catch ( HTimeException const& e ) {
 		HRuntime& r( thread_->runtime() );
 		HHuginn::value_t package( r.find_package( r.try_identifier_id( "DateTime" ) ) );
-		HHuginn::HClass const* ec( !! package ? static_cast<HPackage*>( package.raw() )->exception_class() : r.object_factory()->exception_class() );
+		huginn::HClass const* ec( !! package ? static_cast<HPackage*>( package.raw() )->exception_class() : r.object_factory()->exception_class() );
 		thread_->raise( ec, e.what(), position_ );
 	}
 	return ( *object_ );

@@ -26,10 +26,10 @@ namespace huginn {
 namespace set {
 
 class HSetIterator : public HNotifableIterator {
-	HHuginn::HSet::values_t* _set;
-	HHuginn::HSet::values_t::iterator _it;
+	huginn::HSet::values_t* _set;
+	huginn::HSet::values_t::iterator _it;
 public:
-	HSetIterator( HHuginn::HSet* owner_ )
+	HSetIterator( huginn::HSet* owner_ )
 		: HNotifableIterator( owner_ )
 		, _set( &owner_->value() )
 		, _it( _set->begin() ) {
@@ -65,10 +65,10 @@ private:
 };
 
 class HSetReverseIterator : public HNotifableIterator {
-	HHuginn::HSet::values_t* _set;
-	HHuginn::HSet::values_t::reverse_iterator _it;
+	huginn::HSet::values_t* _set;
+	huginn::HSet::values_t::reverse_iterator _it;
 public:
-	HSetReverseIterator( HHuginn::HSet* owner_ )
+	HSetReverseIterator( huginn::HSet* owner_ )
 		: HNotifableIterator( owner_ )
 		, _set( &owner_->value() )
 		, _it( _set->rbegin() ) {
@@ -103,18 +103,18 @@ private:
 	HSetReverseIterator& operator = ( HSetReverseIterator const& ) = delete;
 };
 
-class HReversedSet : public HHuginn::HIterable {
+class HReversedSet : public huginn::HIterable {
 	HHuginn::value_t _set;
 public:
-	HReversedSet( HHuginn::HClass const* class_, HHuginn::value_t const& set_ )
+	HReversedSet( huginn::HClass const* class_, HHuginn::value_t const& set_ )
 		: HIterable( class_ )
 		, _set( set_ ) {
 		M_ASSERT( _set->type_id() == HHuginn::TYPE::SET );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, huginn::HClass const* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
-			make_pointer<HHuginn::HClass>(
+			make_pointer<huginn::HClass>(
 				runtime_,
 				"ReversedSetView",
 				"The `ReversedSetView` class represents *lazy* *iterable* reversed view of a `set`.",
@@ -126,11 +126,11 @@ public:
 	}
 protected:
 	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
-		return ( safe_int::cast<int long>( static_cast<HHuginn::HSet const*>( _set.raw() )->size( thread_, position_ ) ) );
+		return ( safe_int::cast<int long>( static_cast<huginn::HSet const*>( _set.raw() )->size( thread_, position_ ) ) );
 	}
 private:
 	virtual iterator_t do_iterator( HThread*, int ) override {
-		return ( make_pointer<HSetReverseIterator>( static_cast<HHuginn::HSet*>( _set.raw() ) ) );
+		return ( make_pointer<HSetReverseIterator>( static_cast<huginn::HSet*>( _set.raw() ) ) );
 	}
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
@@ -142,7 +142,7 @@ inline HHuginn::value_t insert( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_PROLOG
 	verify_arg_count( "set.insert", values_, 1, 1, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
-	static_cast<HHuginn::HSet*>( object_->raw() )->insert( thread_, values_[0], position_ );
+	static_cast<huginn::HSet*>( object_->raw() )->insert( thread_, values_[0], position_ );
 	return ( *object_ );
 	M_EPILOG
 }
@@ -151,7 +151,7 @@ inline HHuginn::value_t has_key( huginn::HThread* thread_, HHuginn::value_t* obj
 	M_PROLOG
 	verify_arg_count( "set.has_key", values_, 1, 1, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
-	bool hasKey( static_cast<HHuginn::HSet*>( object_->raw() )->has_key( thread_, values_[0], position_ ) );
+	bool hasKey( static_cast<huginn::HSet*>( object_->raw() )->has_key( thread_, values_[0], position_ ) );
 	return ( thread_->runtime().boolean_value( hasKey ) );
 	M_EPILOG
 }
@@ -160,7 +160,7 @@ inline HHuginn::value_t erase( huginn::HThread* thread_, HHuginn::value_t* objec
 	M_PROLOG
 	verify_arg_count( "set.erase", values_, 1, 1, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
-	static_cast<HHuginn::HSet*>( object_->raw() )->erase( thread_, values_[0], position_ );
+	static_cast<huginn::HSet*>( object_->raw() )->erase( thread_, values_[0], position_ );
 	return ( *object_ );
 	M_EPILOG
 }
@@ -169,7 +169,7 @@ inline HHuginn::value_t clear( huginn::HThread* thread_, HHuginn::value_t* objec
 	M_PROLOG
 	verify_arg_count( "set.clear", values_, 0, 0, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
-	static_cast<HHuginn::HSet*>( object_->raw() )->clear();
+	static_cast<huginn::HSet*>( object_->raw() )->clear();
 	return ( *object_ );
 	M_EPILOG
 }
@@ -178,11 +178,11 @@ inline HHuginn::value_t update( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
 	verify_signature( "set.update", values_, { HHuginn::TYPE::SET }, thread_, position_ );
-	HHuginn::HSet* s( static_cast<HHuginn::HSet*>( object_->raw() ) );
-	HHuginn::HSet::values_t& l( s->value() );
-	HHuginn::HSet::values_t const& r( static_cast<HHuginn::HSet const*>( values_[0].raw() )->value() );
-	HAnchorGuard<HHuginn::HSet> ag( *s, thread_, position_ );
-	for ( HHuginn::HSet::values_t::const_iterator it( r.begin() ), end( r.end() ); it != end; ++ it ) {
+	huginn::HSet* s( static_cast<huginn::HSet*>( object_->raw() ) );
+	huginn::HSet::values_t& l( s->value() );
+	huginn::HSet::values_t const& r( static_cast<huginn::HSet const*>( values_[0].raw() )->value() );
+	HAnchorGuard<huginn::HSet> ag( *s, thread_, position_ );
+	for ( huginn::HSet::values_t::const_iterator it( r.begin() ), end( r.end() ); it != end; ++ it ) {
 		l.insert( *it );
 	}
 	return ( *object_ );
@@ -193,7 +193,7 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 	M_PROLOG
 	verify_arg_count( "set.hash", values_, 0, 0, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
-	HHuginn::HSet::values_t const& values( static_cast<HHuginn::HSet*>( object_->raw() )->value() );
+	huginn::HSet::values_t const& values( static_cast<huginn::HSet*>( object_->raw() )->value() );
 	int long hashValue( static_cast<int long>( HHuginn::TYPE::SET ) );
 	for ( HHuginn::value_t const& v : values ) {
 		hashValue *= 3;
@@ -207,27 +207,27 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
 	verify_signature( "set.equals", values_, { HHuginn::TYPE::SET }, thread_, position_ );
-	HHuginn::HSet::values_t const& l( static_cast<HHuginn::HSet*>( object_->raw() )->value() );
-	HHuginn::HSet::values_t const& r( static_cast<HHuginn::HSet const*>( values_[0].raw() )->value() );
+	huginn::HSet::values_t const& l( static_cast<huginn::HSet*>( object_->raw() )->value() );
+	huginn::HSet::values_t const& r( static_cast<huginn::HSet const*>( values_[0].raw() )->value() );
 	bool equal( l.get_size() == r.get_size() );
-	for ( HHuginn::HSet::values_t::const_iterator lit( l.begin() ), rit( r.begin() ), end( l.end() ); equal && ( lit != end ); ++ lit, ++ rit ) {
+	for ( huginn::HSet::values_t::const_iterator lit( l.begin() ), rit( r.begin() ), end( l.end() ); equal && ( lit != end ); ++ lit, ++ rit ) {
 		equal = instruction::equals( thread_, *lit, *rit, position_ );
 	}
 	return ( thread_->runtime().boolean_value( equal ) );
 	M_EPILOG
 }
 
-class HSetClass : public HHuginn::HClass {
+class HSetClass : public huginn::HClass {
 public:
 	typedef HSetClass this_type;
-	typedef HHuginn::HClass base_type;
+	typedef huginn::HClass base_type;
 private:
 	HHuginn::class_t _reversedSetClass;
 public:
 	HSetClass(
 		HRuntime* runtime_,
 		HObjectFactory* objectFactory_
-	) : HHuginn::HClass(
+	) : huginn::HClass(
 			runtime_,
 			objectFactory_,
 			huginn::type_id( HHuginn::TYPE::SET ),
@@ -249,7 +249,7 @@ public:
 		redefine( nullptr, fd );
 		return;
 	}
-	HHuginn::HClass const* reversed_set_class( void ) const {
+	huginn::HClass const* reversed_set_class( void ) const {
 		return ( _reversedSetClass.raw() );
 	}
 protected:
@@ -277,27 +277,27 @@ HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const
 
 }
 
-HHuginn::HSet::HSet( HHuginn::HClass const* class_, allocator_t const& allocator_ )
+huginn::HSet::HSet( huginn::HClass const* class_, allocator_t const& allocator_ )
 	: HInvalidatingIterable( class_ )
 	, _helper()
 	, _data( _helper, _helper, allocator_ ) {
 	return;
 }
 
-int long HHuginn::HSet::do_size( huginn::HThread*, int ) const {
+int long huginn::HSet::do_size( huginn::HThread*, int ) const {
 	return ( _data.get_size() );
 }
 
-bool HHuginn::HSet::has_key( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) const {
+bool huginn::HSet::has_key( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) const {
 	M_PROLOG
-	HAnchorGuard<HHuginn::HSet> ag( *this, thread_, position_ );
+	HAnchorGuard<huginn::HSet> ag( *this, thread_, position_ );
 	return ( _data.find( key_ ) != _data.end() );
 	M_EPILOG
 }
 
-void HHuginn::HSet::erase( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) {
+void huginn::HSet::erase( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) {
 	M_PROLOG
-	HAnchorGuard<HHuginn::HSet> ag( *this, thread_, position_ );
+	HAnchorGuard<huginn::HSet> ag( *this, thread_, position_ );
 	values_t::iterator it( _data.find( key_ ) );
 	if ( it != _data.end() ) {
 		skip( it.node_id() );
@@ -307,15 +307,15 @@ void HHuginn::HSet::erase( huginn::HThread* thread_, HHuginn::value_t const& key
 	M_EPILOG
 }
 
-void HHuginn::HSet::insert( huginn::HThread* thread_, HHuginn::value_t const& value_, int position_ ) {
+void huginn::HSet::insert( huginn::HThread* thread_, HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
-	HAnchorGuard<HHuginn::HSet> ag( *this, thread_, position_ );
+	HAnchorGuard<huginn::HSet> ag( *this, thread_, position_ );
 	_data.insert( value_ );
 	return;
 	M_EPILOG
 }
 
-void HHuginn::HSet::clear( void ) {
+void huginn::HSet::clear( void ) {
 	M_PROLOG
 	invalidate();
 	_data.clear();
@@ -323,16 +323,16 @@ void HHuginn::HSet::clear( void ) {
 	M_EPILOG
 }
 
-HHuginn::HIterable::iterator_t HHuginn::HSet::do_iterator( huginn::HThread*, int ) {
+huginn::HIterable::iterator_t huginn::HSet::do_iterator( huginn::HThread*, int ) {
 	return ( make_pointer<huginn::set::HSetIterator>( this ) );
 }
 
-HHuginn::value_t HHuginn::HSet::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
+HHuginn::value_t huginn::HSet::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
 	M_PROLOG
 	HHuginn::value_t res( thread_->runtime().object_factory()->create_set() );
 	HSet* set( static_cast<HSet*>( res.raw() ) );
 	values_t& data( set->value() );
-	HAnchorGuard<HHuginn::HSet> ag( *set, thread_, position_ );
+	HAnchorGuard<huginn::HSet> ag( *set, thread_, position_ );
 	for ( values_t::value_type const& v : _data ) {
 		data.insert( v->clone( thread_, const_cast<HHuginn::value_t*>( &v ), position_ ) );
 	}

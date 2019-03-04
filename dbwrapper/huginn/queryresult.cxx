@@ -25,7 +25,7 @@ namespace {
 HHuginn::value_t fetch_row( HRecordSet::ptr_t const& rs_, HRecordSet::HIterator& it_, HRuntime& runtime_ ) {
 	HObjectFactory& objectFactory( *runtime_.object_factory() );
 	HHuginn::value_t v( objectFactory.create_list() );
-	HHuginn::HList* row( static_cast<HHuginn::HList*>( v.raw() ) );
+	tools::huginn::HList* row( static_cast<tools::huginn::HList*>( v.raw() ) );
 	HHuginn::value_t& none( runtime_.none_value() );
 	for ( int i( 0 ), fieldCount( rs_->get_field_count() ); i < fieldCount; ++ i ) {
 		HRecordSet::value_t f( it_[i] );
@@ -66,7 +66,7 @@ private:
 };
 
 HQueryResult::HQueryResult(
-	HHuginn::HClass const* class_,
+	HClass const* class_,
 	HRecordSet::ptr_t const& recordSet_
 ) : HIterable( class_ )
 	, _recordSet( recordSet_ )
@@ -115,7 +115,7 @@ HHuginn::value_t HQueryResult::has_next( tools::huginn::HThread* thread_, HHugin
 	M_EPILOG
 }
 
-HHuginn::HIterable::iterator_t HQueryResult::do_iterator( tools::huginn::HThread*, int ) {
+HIterable::iterator_t HQueryResult::do_iterator( tools::huginn::HThread*, int ) {
 	return ( make_pointer<HQueryResultIterator>( _recordSet, yaal::move( _it ), _runtime ) );
 }
 
@@ -123,17 +123,17 @@ int long HQueryResult::do_size( tools::huginn::HThread*, int ) const {
 	return ( _recordSet->get_dml_size() );
 }
 
-class HQueryResultClass : public HHuginn::HClass {
+class HQueryResultClass : public HClass {
 	HHuginn::class_t const& _exceptionClass;
 public:
 	typedef HQueryResultClass this_type;
-	typedef HHuginn::HClass base_type;
+	typedef HClass base_type;
 	HQueryResultClass(
 		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_,
-		HHuginn::HClass const* origin_,
+		HClass const* origin_,
 		HHuginn::class_t const& exceptionClass_
-	) : HHuginn::HClass(
+	) : HClass(
 			runtime_,
 			typeId_,
 			runtime_->identifier_id( "QueryResult" ),
@@ -152,7 +152,7 @@ public:
 		set_origin( origin_ );
 		return;
 	}
-	HHuginn::HClass const* exception_class( void ) const {
+	HClass const* exception_class( void ) const {
 		return ( _exceptionClass.raw() );
 	}
 };
@@ -167,14 +167,14 @@ HHuginn::value_t HQueryResult::fetch_row( tools::huginn::HThread* thread_, HHugi
 	try {
 		v = huginn::fetch_row( qr->_recordSet, qr->_it, thread_->runtime() );
 		++ qr->_it;
-	} catch ( HException const& e ) {
+	} catch ( hcore::HException const& e ) {
 		thread_->raise( qrc->exception_class(), e.what(), position_ );
 	}
 	return ( v );
 	M_EPILOG
 }
 
-HHuginn::class_t HQueryResult::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_, HHuginn::class_t const& exceptionClass_ ) {
+HHuginn::class_t HQueryResult::get_class( HRuntime* runtime_, HClass const* origin_, HHuginn::class_t const& exceptionClass_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(

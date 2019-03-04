@@ -14,6 +14,8 @@ namespace tools {
 
 namespace huginn {
 
+class HObjectFactory;
+
 class HThread final {
 public:
 	typedef HThread this_type;
@@ -62,7 +64,7 @@ public:
 	void flush_runtime_exception( void );
 	bool has_runtime_exception( void ) const;
 	bool has_exception( void ) const;
-	void raise( HHuginn::HClass const*, yaal::hcore::HString const&, int );
+	void raise( huginn::HClass const*, yaal::hcore::HString const&, int );
 	HRuntime& runtime( void ) {
 		return ( *_runtime );
 	}

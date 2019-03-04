@@ -57,9 +57,9 @@ HHuginn::HHuginn::expression_t& OCompiler::OScopeContext::expression( void ) {
 	return ( _expressionsStack.top().back() );
 }
 
-HHuginn::HClass const* OCompiler::OScopeContext::guess_type( OCompiler const* compiler_, HHuginn::identifier_id_t identifierId_ ) const {
+huginn::HClass const* OCompiler::OScopeContext::guess_type( OCompiler const* compiler_, HHuginn::identifier_id_t identifierId_ ) const {
 	M_PROLOG
-	HHuginn::HClass const* c( compiler_->type_to_class( HHuginn::TYPE::UNKNOWN ) );
+	huginn::HClass const* c( compiler_->type_to_class( HHuginn::TYPE::UNKNOWN ) );
 	OScopeContext const* sc( this );
 	while ( sc ) {
 		variable_types_t::const_iterator it( sc->_variableTypes.find( identifierId_ ) );
@@ -73,7 +73,7 @@ HHuginn::HClass const* OCompiler::OScopeContext::guess_type( OCompiler const* co
 	M_EPILOG
 }
 
-void OCompiler::OScopeContext::note_type( HHuginn::identifier_id_t identifierId_, HHuginn::HClass const* class_ ) {
+void OCompiler::OScopeContext::note_type( HHuginn::identifier_id_t identifierId_, huginn::HClass const* class_ ) {
 	M_PROLOG
 	OScopeContext* sc( this );
 	bool found( false );
@@ -546,7 +546,7 @@ void OCompiler::check_name_import( HHuginn::identifier_id_t identifier_, executi
 			}
 		) ) != _submittedImports.end()
 	) {
-		HString const& name( _runtime->identifier_name( identifier_ ) );
+		hcore::HString const& name( _runtime->identifier_name( identifier_ ) );
 		throw HHuginn::HHuginnRuntimeException(
 			identifier_ == it->_package
 				? "Package of the same name `"_ys.append( name ).append( "` is already imported." )
@@ -756,7 +756,7 @@ void OCompiler::add_field_name( yaal::hcore::HString const& name_, executing_par
 		);
 	}
 	_classContext->_fieldNames.push_back( name_ );
-	HString const& doc( _runtime->huginn()->get_comment( range_.start() ) );
+	hcore::HString const& doc( _runtime->huginn()->get_comment( range_.start() ) );
 	int idx( static_cast<int>( _classContext->_fieldNames.get_size() - 1 ) );
 	_classContext->_docs.insert( make_pair( idx, doc ) );
 	return;
@@ -780,7 +780,7 @@ void OCompiler::set_field_name( yaal::hcore::HString const& name_, executing_par
 
 void OCompiler::create_function( executing_parser::range_t range_ ) {
 	M_PROLOG
-	HString const& doc( _runtime->huginn()->get_comment( range_.start() ) );
+	hcore::HString const& doc( _runtime->huginn()->get_comment( range_.start() ) );
 	function_info_t fi( create_function_low( range_ ) );
 	if ( !! _classContext ) {
 		int idx( static_cast<int>( _classContext->_fieldNames.get_size() - 1 ) );

@@ -26,7 +26,7 @@ inline HHuginn::value_t is_exact( huginn::HThread* thread_, HHuginn::value_t* ob
 	M_PROLOG
 	char const name[] = "number.is_exact";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
-	return ( thread_->runtime().boolean_value( static_cast<HHuginn::HNumber*>( object_->raw() )->value().is_exact() ) );
+	return ( thread_->runtime().boolean_value( static_cast<HNumber*>( object_->raw() )->value().is_exact() ) );
 	M_EPILOG
 }
 
@@ -34,7 +34,7 @@ inline HHuginn::value_t is_integral( huginn::HThread* thread_, HHuginn::value_t*
 	M_PROLOG
 	char const name[] = "number.is_integral";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
-	return ( thread_->runtime().boolean_value( static_cast<HHuginn::HNumber*>( object_->raw() )->value().is_integral() ) );
+	return ( thread_->runtime().boolean_value( static_cast<HNumber*>( object_->raw() )->value().is_integral() ) );
 	M_EPILOG
 }
 
@@ -42,7 +42,7 @@ inline HHuginn::value_t get_precision( huginn::HThread* thread_, HHuginn::value_
 	M_PROLOG
 	char const name[] = "number.get_precision";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
-	return ( thread_->object_factory().create_integer( static_cast<HHuginn::HNumber*>( object_->raw() )->value().get_precision() ) );
+	return ( thread_->object_factory().create_integer( static_cast<HNumber*>( object_->raw() )->value().get_precision() ) );
 	M_EPILOG
 }
 
@@ -50,7 +50,7 @@ inline HHuginn::value_t set_precision( huginn::HThread* thread_, HHuginn::value_
 	M_PROLOG
 	verify_signature( "number.set_precision", values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
 	int precision = static_cast<int>( get_integer( values_[0] ) );
-	static_cast<HHuginn::HNumber*>( object_->raw() )->value().set_precision( precision );
+	static_cast<HNumber*>( object_->raw() )->value().set_precision( precision );
 	return ( *object_ );
 	M_EPILOG
 }
@@ -59,7 +59,7 @@ HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
 HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		make_pointer<HHuginn::HClass>(
+		make_pointer<HClass>(
 			runtime_,
 			objectFactory_,
 			type_id( HHuginn::TYPE::NUMBER ),
@@ -84,17 +84,16 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 
 }
 
-}
-
-
-HHuginn::HNumber::HNumber( HHuginn::HClass const* class_, HHuginn::HNumber::value_type const& value_ )
+HNumber::HNumber( HClass const* class_, HNumber::value_type const& value_ )
 	: HValue( class_ )
 	, _value( value_ ) {
 	return;
 }
 
-HHuginn::value_t HHuginn::HNumber::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
+HHuginn::value_t HNumber::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	return ( thread_->runtime().object_factory()->create_number( _value ) );
+}
+
 }
 
 }

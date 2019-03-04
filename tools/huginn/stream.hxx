@@ -5,8 +5,9 @@
 #ifndef YAAL_TOOLS_HUGINN_STREAM_HXX_INCLUDED
 #define YAAL_TOOLS_HUGINN_STREAM_HXX_INCLUDED 1
 
-#include "tools/hhuginn.hxx"
 #include "hcore/hstreaminterface.hxx"
+#include "tools/huginn/iterable.hxx"
+#include "tools/huginn/integer.hxx"
 
 namespace yaal {
 
@@ -14,10 +15,10 @@ namespace tools {
 
 namespace huginn {
 
-class HStream : public HHuginn::HIterable {
+class HStream : public huginn::HIterable {
 public:
-	typedef HHuginn::value_t ( HStream::*reader_t )( HThread*, HHuginn::HInteger::value_type, int );
-	typedef void ( HStream::*writer_t )( HThread*, HHuginn::value_t const&, HHuginn::HInteger::value_type, int );
+	typedef HHuginn::value_t ( HStream::*reader_t )( HThread*, huginn::HInteger::value_type, int );
+	typedef void ( HStream::*writer_t )( HThread*, HHuginn::value_t const&, huginn::HInteger::value_type, int );
 	enum class IO {
 		READ,
 		WRITE
@@ -28,7 +29,7 @@ private:
 	yaal::hcore::HString _lineBuffer;
 	yaal::hcore::HUTF8String _converter;
 public:
-	HStream( HHuginn::HClass const*, yaal::hcore::HStreamInterface::ptr_t );
+	HStream( HClass const*, yaal::hcore::HStreamInterface::ptr_t );
 	static HHuginn::value_t read_fwd( char const*, reader_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t read_line( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t deserialize( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
@@ -38,26 +39,26 @@ public:
 	static HHuginn::value_t seek( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	bool is_valid( void ) const;
 	static HHuginn::class_t get_class( HRuntime* );
-	void raise( HThread*, yaal::hcore::HString const&, int, HHuginn::HClass const* = nullptr ) const;
-	bool post_io( huginn::HThread*, int long, int long, IO, int, HHuginn::HClass const* = nullptr ) const;
-	HHuginn::HClass const* exception_class( void ) const;
+	void raise( HThread*, yaal::hcore::HString const&, int, HClass const* = nullptr ) const;
+	bool post_io( huginn::HThread*, int long, int long, IO, int, HClass const* = nullptr ) const;
+	HClass const* exception_class( void ) const;
 	yaal::hcore::HStreamInterface::ptr_t raw( void ) const;
 private:
-	HHuginn::value_t read_blob( HThread*, HHuginn::HInteger::value_type, int );
-	HHuginn::value_t read_string( HThread*, HHuginn::HInteger::value_type, int );
-	HHuginn::value_t read_integer( HThread*, HHuginn::HInteger::value_type, int );
-	HHuginn::value_t read_integer_unsigned( HThread*, HHuginn::HInteger::value_type, int );
-	HHuginn::value_t read_real( HThread*, HHuginn::HInteger::value_type, int );
-	HHuginn::value_t read_character( HThread*, HHuginn::HInteger::value_type, int );
+	HHuginn::value_t read_blob( HThread*, huginn::HInteger::value_type, int );
+	HHuginn::value_t read_string( HThread*, huginn::HInteger::value_type, int );
+	HHuginn::value_t read_integer( HThread*, huginn::HInteger::value_type, int );
+	HHuginn::value_t read_integer_unsigned( HThread*, huginn::HInteger::value_type, int );
+	HHuginn::value_t read_real( HThread*, huginn::HInteger::value_type, int );
+	HHuginn::value_t read_character( HThread*, huginn::HInteger::value_type, int );
 	HHuginn::value_t read_line_impl( HThread*, int );
 	HHuginn::value_t deserialize_impl( HThread*, int );
 	yaal::hcore::HString& read_line_raw( HThread*, int );
-	void write_blob( HThread*, HHuginn::value_t const&, HHuginn::HInteger::value_type, int );
-	void write_string( HThread*, HHuginn::value_t const&, HHuginn::HInteger::value_type, int );
-	void write_integer( HThread*, HHuginn::value_t const&, HHuginn::HInteger::value_type, int );
-	void write_integer_unsigned( HThread*, HHuginn::value_t const&, HHuginn::HInteger::value_type, int );
-	void write_real( HThread*, HHuginn::value_t const&, HHuginn::HInteger::value_type, int );
-	void write_character( HThread*, HHuginn::value_t const&, HHuginn::HInteger::value_type, int );
+	void write_blob( HThread*, HHuginn::value_t const&, huginn::HInteger::value_type, int );
+	void write_string( HThread*, HHuginn::value_t const&, huginn::HInteger::value_type, int );
+	void write_integer( HThread*, HHuginn::value_t const&, huginn::HInteger::value_type, int );
+	void write_integer_unsigned( HThread*, HHuginn::value_t const&, huginn::HInteger::value_type, int );
+	void write_real( HThread*, HHuginn::value_t const&, huginn::HInteger::value_type, int );
+	void write_character( HThread*, HHuginn::value_t const&, huginn::HInteger::value_type, int );
 	void write_line_impl( HThread*, yaal::hcore::HString const&, int );
 	void serialize_impl( HThread*, HHuginn::value_t const&, int );
 	void seek_impl( int long, yaal::hcore::HStreamInterface::SEEK );

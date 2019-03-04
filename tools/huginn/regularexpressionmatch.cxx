@@ -49,7 +49,7 @@ private:
 };
 
 HRegularExpressionMatch::HRegularExpressionMatch(
-	HHuginn::HClass const* class_,
+	huginn::HClass const* class_,
 	HCompiledRegularExpression::regex_t regularExpressionMatch_,
 	HHuginn::value_t const& string_
 ) : HIterable( class_ )
@@ -76,7 +76,7 @@ HHuginn::value_t HRegularExpressionMatch::matched( huginn::HThread* thread_, HHu
 	M_EPILOG
 }
 
-HHuginn::HIterable::iterator_t HRegularExpressionMatch::do_iterator( huginn::HThread*, int ) {
+huginn::HIterable::iterator_t HRegularExpressionMatch::do_iterator( huginn::HThread*, int ) {
 	return ( make_pointer<HRegularExpressionMatchIterator>( this, _regex->find( _fast ) ) );
 }
 
@@ -84,7 +84,7 @@ int long HRegularExpressionMatch::do_size( huginn::HThread*, int ) const {
 	return ( distance( _regex->find( _fast ), _regex->end() ) );
 }
 
-HHuginn::class_t HRegularExpressionMatch::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
+HHuginn::class_t HRegularExpressionMatch::get_class( HRuntime* runtime_, huginn::HClass const* origin_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(

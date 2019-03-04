@@ -26,7 +26,7 @@ HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
 HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		make_pointer<HHuginn::HClass>(
+		make_pointer<huginn::HClass>(
 			runtime_,
 			objectFactory_,
 			type_id( HHuginn::TYPE::REAL ),
@@ -46,13 +46,13 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 
 }
 
-HHuginn::HReal::HReal( HHuginn::HClass const* class_, HHuginn::HReal::value_type value_ )
+HReal::HReal( huginn::HClass const* class_, HReal::value_type value_ )
 	: HValue( class_ )
 	, _value( value_ ) {
 	return;
 }
 
-HHuginn::value_t HHuginn::HReal::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
+HHuginn::value_t HReal::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	return ( thread_->runtime().object_factory()->create_real( _value ) );
 }
 

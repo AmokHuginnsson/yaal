@@ -14,7 +14,7 @@ namespace tools {
 
 namespace huginn {
 
-HHuginn::class_t HZip::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
+HHuginn::class_t HZip::get_class( HRuntime* runtime_, huginn::HClass const* origin_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
@@ -46,7 +46,7 @@ HHuginn::value_t HZip::do_clone( huginn::HThread* thread_, HHuginn::value_t*, in
 
 class HZipIterator : public HIteratorInterface {
 public:
-	typedef yaal::hcore::HArray<HHuginn::HIterable::iterator_t> iterators_t;
+	typedef yaal::hcore::HArray<huginn::HIterable::iterator_t> iterators_t;
 protected:
 	iterators_t _impl;
 	HHuginn::values_t _cache;
@@ -85,7 +85,7 @@ protected:
 				position_
 			);
 		}
-		HHuginn::HTuple::values_t data( _cache );
+		huginn::HTuple::values_t data( _cache );
 		HObjectFactory& of( thread_->object_factory() );
 		return ( of.create_tuple( yaal::move( data ) ) );
 	}
@@ -98,7 +98,7 @@ HZip::iterator_t HZip::do_iterator( HThread* thread_, int position_ ) {
 	HZipIterator::iterators_t data;
 	data.reserve( _source.get_size() );
 	for ( HHuginn::value_t& v : _source ) {
-		data.emplace_back( static_cast<HHuginn::HIterable*>( v.raw() )->iterator( thread_, position_ ) );
+		data.emplace_back( static_cast<huginn::HIterable*>( v.raw() )->iterator( thread_, position_ ) );
 	}
 	return ( yaal::hcore::make_pointer<HZipIterator>( yaal::move( data ) ) );
 }

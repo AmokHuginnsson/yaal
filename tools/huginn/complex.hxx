@@ -5,8 +5,8 @@
 #ifndef YAAL_TOOLS_HUGINN_COMPLEX_HXX_INCLUDED
 #define YAAL_TOOLS_HUGINN_COMPLEX_HXX_INCLUDED 1
 
-#include "tools/hhuginn.hxx"
 #include "hcore/hcomplex.hxx"
+#include "tools/huginn/value.hxx"
 
 namespace yaal {
 
@@ -14,12 +14,12 @@ namespace tools {
 
 namespace huginn {
 
-class HComplex : public HHuginn::HValue {
+class HComplex : public HValue {
 	typedef yaal::hcore::HComplex data_t;
 	data_t _data;
 public:
-	HComplex( huginn::HThread*, HHuginn::HClass const*, HHuginn::values_t&, int );
-	HComplex( HHuginn::HClass const*, data_t const& );
+	HComplex( huginn::HThread*, HClass const*, HHuginn::values_t&, int );
+	HComplex( HClass const*, data_t const& );
 	static HHuginn::value_t real( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t imaginary( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t get( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
@@ -33,8 +33,8 @@ public:
 	static HHuginn::value_t negate( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t argument( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t to_string( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
-	static HHuginn::class_t get_class( HRuntime*, HHuginn::HClass const* );
-	static HHuginn::value_t create_instance( HHuginn::HClass const*, huginn::HThread*, HHuginn::values_t&, int );
+	static HHuginn::class_t get_class( HRuntime*, HClass const* );
+	static HHuginn::value_t create_instance( HClass const*, huginn::HThread*, HHuginn::values_t&, int );
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };

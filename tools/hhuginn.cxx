@@ -23,6 +23,10 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/huginn/iterator.hxx"
 #include "tools/huginn/keyword.hxx"
 #include "tools/huginn/instruction.hxx"
+#include "tools/huginn/iterable.hxx"
+#include "tools/huginn/objectreference.hxx"
+#include "tools/huginn/observer.hxx"
+#include "tools/huginn/ternaryevaluator.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -53,7 +57,7 @@ namespace {
 
 char const DEFAULT_PATHS[] = ".:" LIBDIR "/huginn:" DATADIR "/huginn";
 char const* const MODULE_PATHS_RAW( ::getenv( "HUGINNPATH" ) );
-HString MODULE_PATHS_S(
+hcore::HString MODULE_PATHS_S(
 	( MODULE_PATHS_RAW ? hcore::to_string( MODULE_PATHS_RAW ).append( ":" ) : hcore::to_string( "" ) )
 		.append( DEFAULT_PATHS )
 		.append( ":" )
@@ -223,13 +227,13 @@ void HHuginn::HReferenceTracker::invalidate( void ) {
 	M_EPILOG
 }
 
-HHuginn::HInvalidatingIterable::HInvalidatingIterable( HHuginn::HClass const* class_ )
+HInvalidatingIterable::HInvalidatingIterable( huginn::HClass const* class_ )
 	: HIterable( class_ )
 	, HReferenceTracker() {
 	return;
 }
 
-void HHuginn::HInvalidatingIterable::skip( void const* id_ ) {
+void HInvalidatingIterable::skip( void const* id_ ) {
 	M_PROLOG
 	for ( HHuginn::HNotifableReference* nr : _observers ) {
 		if ( nr->id() == id_ ) {
@@ -240,7 +244,7 @@ void HHuginn::HInvalidatingIterable::skip( void const* id_ ) {
 	M_EPILOG
 }
 
-HHuginn::HObjectReference::HObjectReference( HHuginn::HClass const* class_, value_t const& value_, int upCastLevel_, int fileId_, int position_ )
+HObjectReference::HObjectReference( huginn::HClass const* class_, value_t const& value_, int upCastLevel_, int fileId_, int position_ )
 	: HValue( class_ )
 	, _value( value_ )
 	, _referenceClass( nullptr ) {
@@ -251,7 +255,7 @@ HHuginn::HObjectReference::HObjectReference( HHuginn::HClass const* class_, valu
 	for ( int i( 0 ); i < ( upCastLevel_ + 1 ); ++ i ) {
 		HClass const* s( c->super() );
 		if ( ! s ) {
-			throw HHuginnRuntimeException(
+			throw HHuginn::HHuginnRuntimeException(
 				"`"_ys.append( c->name() ).append( "` does not have superclass." ),
 				fileId_,
 				position_
@@ -264,7 +268,7 @@ HHuginn::HObjectReference::HObjectReference( HHuginn::HClass const* class_, valu
 	M_EPILOG
 }
 
-HHuginn::HObjectReference::HObjectReference( HHuginn::HClass const* class_, value_t const& value_, HClass const* referenceClass_ )
+HObjectReference::HObjectReference( huginn::HClass const* class_, value_t const& value_, HClass const* referenceClass_ )
 	: HValue( class_ )
 	, _value( value_ )
 	, _referenceClass( referenceClass_ ) {
@@ -273,14 +277,14 @@ HHuginn::HObjectReference::HObjectReference( HHuginn::HClass const* class_, valu
 	M_EPILOG
 }
 
-int HHuginn::HObjectReference::field_index( identifier_id_t const& identifierId_ ) const {
+int HObjectReference::field_index( HHuginn::identifier_id_t const& identifierId_ ) const {
 	M_PROLOG
 	HValue const* v( _value.raw() );
 	return ( _referenceClass != v->get_class() ? _referenceClass->field_index( identifierId_ ) : v->field_index( identifierId_ ) );
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HObjectReference::field( huginn::HThread* thread_, int index_, int position_ ) {
+HHuginn::value_t HObjectReference::field( huginn::HThread* thread_, int index_, int position_ ) {
 	M_PROLOG
 	HObject* o( static_cast<HObject*>( _value.raw() ) );
 	value_t v;
@@ -289,7 +293,7 @@ HHuginn::value_t HHuginn::HObjectReference::field( huginn::HThread* thread_, int
 	} else {
 		v = o->field_ref( index_ );
 	}
-	if ( v->type_id() == TYPE::METHOD ) {
+	if ( v->type_id() == HHuginn::TYPE::METHOD ) {
 		v = _referenceClass->runtime()->object_factory()->create_bound_method(
 			static_cast<HClass::HMethod*>( v.raw() )->function(),
 			_value
@@ -299,13 +303,13 @@ HHuginn::value_t HHuginn::HObjectReference::field( huginn::HThread* thread_, int
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HObjectReference::do_clone( huginn::HThread* thread_, HHuginn::value_t* object_, int position_ ) const {
+HHuginn::value_t HObjectReference::do_clone( huginn::HThread* thread_, HHuginn::value_t* object_, int position_ ) const {
 	M_PROLOG
 	return ( thread_->object_factory().create<HObjectReference>( get_class(), _value->clone( thread_, object_, position_ ), _referenceClass ) );
 	M_EPILOG
 }
 
-HHuginn::HTaggedValue::HTaggedValue( value_t const& value_, HClass const* class_ )
+HTaggedValue::HTaggedValue( value_t const& value_, HClass const* class_ )
 	: HValue( class_ )
 	, _value( value_ ) {
 	M_PROLOG
@@ -313,7 +317,7 @@ HHuginn::HTaggedValue::HTaggedValue( value_t const& value_, HClass const* class_
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HTaggedValue::do_clone( huginn::HThread*, HHuginn::value_t*, int ) const {
+HHuginn::value_t HTaggedValue::do_clone( huginn::HThread*, HHuginn::value_t*, int ) const {
 	M_PROLOG
 	M_ASSERT( 0 && "cloning tagged value"[0] );
 #if defined( NDEBUG ) || defined( __MSVCXX__ )
@@ -473,7 +477,7 @@ bool HHuginn::parse( void ) {
 	M_EPILOG
 }
 
-HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
+huginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 	M_PROLOG
 	class_t cls( _runtime->get_class( identifierId_ ) );
 	if ( _compiler->_submittedClasses.count( identifierId_ ) > 0 ) {
@@ -926,28 +930,28 @@ void HHuginn::dump_docs( yaal::hcore::HStreamInterface& stream_ ) const {
 	M_EPILOG
 }
 
-HHuginn::HValue::HValue( HClass const* class_ )
+HValue::HValue( HClass const* class_ )
 	: _class( class_ ) {
 	return;
 }
 
-int HHuginn::HValue::field_index( identifier_id_t const& identifierId_ ) const {
+int HValue::field_index( HHuginn::identifier_id_t const& identifierId_ ) const {
 	M_PROLOG
 	return ( _class->field_index( identifierId_ ) );
 	M_EPILOG
 }
 
-bool HHuginn::HValue::is_kind_of( HHuginn::identifier_id_t const& typeName_ ) const {
+bool HValue::is_kind_of( HHuginn::identifier_id_t const& typeName_ ) const {
 	M_PROLOG
 	return ( _class->is_kind_of( typeName_ ) );
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HValue::do_field( HHuginn::value_t const& object_, int index_ ) const {
+HHuginn::value_t HValue::do_field( HHuginn::value_t const& object_, int index_ ) const {
 	M_PROLOG
 	value_t const& f( _class->field( index_ ) );
 	return (
-		( f->type_id() == TYPE::METHOD )
+		( f->type_id() == HHuginn::TYPE::METHOD )
 			?_class->runtime()->object_factory()->create_bound_method(
 				static_cast<HClass::HMethod const*>( f.raw() )->function(),
 				object_
@@ -957,39 +961,39 @@ HHuginn::value_t HHuginn::HValue::do_field( HHuginn::value_t const& object_, int
 	M_EPILOG
 }
 
-HHuginn::value_t const& HHuginn::HValue::do_field( int index_ ) const {
+HHuginn::value_t const& HValue::do_field( int index_ ) const {
 	M_PROLOG
 	return ( _class->field( index_ ) );
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HValue::clone( huginn::HThread* thread_, HHuginn::value_t* object_, int position_ ) const {
+HHuginn::value_t HValue::clone( huginn::HThread* thread_, HHuginn::value_t* object_, int position_ ) const {
 	return ( do_clone( thread_, object_, position_ ) );
 }
 
-HHuginn::value_t HHuginn::HValue::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
-	M_ASSERT( _class->type_id() == TYPE::NONE );
+HHuginn::value_t HValue::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
+	M_ASSERT( _class->type_id() == HHuginn::TYPE::NONE );
 	return ( thread_->runtime().none_value() );
 }
 
-HHuginn::HObserver::HObserver( HHuginn::HClass const* class_, HHuginn::value_t const& value_ )
+HObserver::HObserver( huginn::HClass const* class_, HHuginn::value_t const& value_ )
 	: HValue( class_ )
 	, _value( value_ ) {
 	return;
 }
 
-HHuginn::value_t HHuginn::HObserver::value( void ) const {
+HHuginn::value_t HObserver::value( void ) const {
 	return ( _value );
 }
 
-HHuginn::value_t HHuginn::HObserver::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
+HHuginn::value_t HObserver::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	return ( thread_->object_factory().create<HObserver>( get_class(), _value ) );
 }
 
-HHuginn::HTernaryEvaluator::HTernaryEvaluator(
-	expression_t const& condition_,
-	expression_t const& ifTrue_,
-	expression_t const& ifFalse_
+HTernaryEvaluator::HTernaryEvaluator(
+	HHuginn::expression_t const& condition_,
+	HHuginn::expression_t const& ifTrue_,
+	HHuginn::expression_t const& ifFalse_
 ) : HValue( nullptr ),
 	_condition( condition_ ),
 	_ifTrue( ifTrue_ ),
@@ -997,13 +1001,13 @@ HHuginn::HTernaryEvaluator::HTernaryEvaluator(
 	return;
 }
 
-HHuginn::value_t HHuginn::HTernaryEvaluator::execute( huginn::HThread* thread_ ) {
+HHuginn::value_t HTernaryEvaluator::execute( huginn::HThread* thread_ ) {
 	M_PROLOG
 	_condition->execute( thread_ );
 	HFrame* f( thread_->current_frame() );
 	value_t v( f->result() );
-	if ( v->type_id() != TYPE::BOOLEAN ) {
-		throw HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL] ).append( v->get_class()->name() ), f->file_id(), _condition->position() );
+	if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
+		throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL] ).append( v->get_class()->name() ), f->file_id(), _condition->position() );
 	}
 	if ( static_cast<HBoolean*>( v.raw() )->value() ) {
 		_ifTrue->execute( thread_ );
@@ -1014,19 +1018,19 @@ HHuginn::value_t HHuginn::HTernaryEvaluator::execute( huginn::HThread* thread_ )
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HTernaryEvaluator::do_clone( huginn::HThread*, HHuginn::value_t*, int ) const {
+HHuginn::value_t HTernaryEvaluator::do_clone( huginn::HThread*, HHuginn::value_t*, int ) const {
 	M_ASSERT( 0 && "cloning ternary evaluator"[0] );
 #if defined( NDEBUG ) || defined( __MSVCXX__ )
 	return ( HHuginn::value_t() );
 #endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
 }
 
-HHuginn::HFunctionReference::HFunctionReference(
-	HHuginn::HClass const* class_,
-	identifier_id_t identifierId_,
-	function_t const& function_,
+HFunctionReference::HFunctionReference(
+	huginn::HClass const* class_,
+	HHuginn::identifier_id_t identifierId_,
+	HHuginn::function_t const& function_,
 	yaal::hcore::HString const& doc_,
-	HHuginn::HClass const* juncture_
+	huginn::HClass const* juncture_
 ) : HValue( class_ )
 	, _identifierId( identifierId_ )
 	, _function( function_ )
@@ -1035,44 +1039,44 @@ HHuginn::HFunctionReference::HFunctionReference(
 	return;
 }
 
-void HHuginn::HFunctionReference::reset( function_t const& function_ ) {
+void HFunctionReference::reset( HHuginn::function_t const& function_ ) {
 	M_PROLOG
 	_function = function_;
 	return;
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HFunctionReference::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
+HHuginn::value_t HFunctionReference::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	return ( thread_->runtime().object_factory()->create_function_reference( _identifierId, _function, _doc ) );
 }
 
-yaal::hcore::HString const& HHuginn::HFunctionReference::doc( void ) const {
+yaal::hcore::HString const& HFunctionReference::doc( void ) const {
 	return ( _doc );
 }
 
-HHuginn::HClass::HMethod::HMethod(
-	HHuginn::HClass const* class_,
-	function_t const& function_
+huginn::HClass::HMethod::HMethod(
+	huginn::HClass const* class_,
+	HHuginn::function_t const& function_
 ) : HValue( class_ )
 	, _function( function_ ) {
 	return;
 }
 
-HHuginn::value_t HHuginn::HClass::HMethod::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
+HHuginn::value_t huginn::HClass::HMethod::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	return ( thread_->object_factory().create_method_raw( _function ) );
 }
 
-HHuginn::HClass::HUnboundMethod::HUnboundMethod(
-	HHuginn::HClass const* class_,
-	HHuginn::HClass const* juncture_,
-	function_t const& function_
+huginn::HClass::HUnboundMethod::HUnboundMethod(
+	huginn::HClass const* class_,
+	huginn::HClass const* juncture_,
+	HHuginn::function_t const& function_
 ) : HValue( class_ )
 	, _juncture( juncture_ )
 	, _function( function_ ) {
 	return;
 }
 
-HHuginn::value_t HHuginn::HClass::HUnboundMethod::call( huginn::HThread* thread_, values_t& arguments_, int position_ ) {
+HHuginn::value_t huginn::HClass::HUnboundMethod::call( huginn::HThread* thread_, HHuginn::values_t& arguments_, int position_ ) {
 	if ( arguments_.is_empty() ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Calling method without an object.",
@@ -1096,22 +1100,22 @@ HHuginn::value_t HHuginn::HClass::HUnboundMethod::call( huginn::HThread* thread_
 	return ( _function( thread_, &o, arguments_, position_ ) );
 }
 
-HHuginn::value_t HHuginn::HClass::HUnboundMethod::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
+HHuginn::value_t huginn::HClass::HUnboundMethod::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	return ( thread_->object_factory().create_unbound_method( _juncture, _function ) );
 }
 
-HHuginn::HClass::HBoundMethod::HBoundMethod( HHuginn::HClass const* class_, HHuginn::function_t const& method_, HHuginn::value_t const& object_ )
+huginn::HClass::HBoundMethod::HBoundMethod( huginn::HClass const* class_, HHuginn::function_t const& method_, HHuginn::value_t const& object_ )
 	: HValue( class_ )
 	, _function( method_ )
 	, _objectHolder( object_ ) {
 	return;
 }
 
-HHuginn::value_t HHuginn::HClass::HBoundMethod::call( huginn::HThread* thread_, values_t& arguments_, int position_ ) {
+HHuginn::value_t huginn::HClass::HBoundMethod::call( huginn::HThread* thread_, HHuginn::values_t& arguments_, int position_ ) {
 	return ( _function( thread_, &_objectHolder, arguments_, position_ ) );
 }
 
-HHuginn::value_t HHuginn::HClass::HBoundMethod::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
+HHuginn::value_t huginn::HClass::HBoundMethod::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
 	return (
 		thread_->runtime().object_factory()->create_bound_method(
 			_function,
@@ -1127,13 +1131,13 @@ yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn* huginn_
 		threadHolder.reset( new huginn::HThread( const_cast<HRuntime*>( &huginn_->runtime() ), hcore::HThread::get_current_thread_id() ) );
 		threadHolder->create_function_frame( &stmt, nullptr, 0 );
 	}
-	HString s;
+	hcore::HString s;
 	try {
 		HCycleTracker cycleTracker;
 		s = instruction::string_representation( threadHolder.raw(), value_, cycleTracker, 0 );
 	} catch ( HHuginn::HHuginnRuntimeException const& e ) {
 		s = e.message();
-	} catch ( HException const& e ) {
+	} catch ( hcore::HException const& e ) {
 		s = e.what();
 	}
 	return ( s );

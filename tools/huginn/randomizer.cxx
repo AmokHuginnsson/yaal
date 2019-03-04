@@ -20,22 +20,22 @@ namespace tools {
 
 namespace huginn {
 
-class HRandomizerClass : public HHuginn::HClass {
+class HRandomizerClass : public HClass {
 public:
 	typedef HRandomizerClass this_type;
-	typedef HHuginn::HClass base_type;
+	typedef HClass base_type;
 private:
 	enumeration::HEnumerationClass::ptr_t _distributionEnumerationClass;
 	HHuginn::class_t _exceptionClass;
 public:
-	HRandomizerClass( HRuntime* runtime_, HHuginn::type_id_t typeId_, HHuginn::identifier_id_t identifierId_, HHuginn::HClass const* origin_ )
+	HRandomizerClass( HRuntime* runtime_, HHuginn::type_id_t typeId_, HHuginn::identifier_id_t identifierId_, HClass const* origin_ )
 		: HClass(
 			runtime_,
 			typeId_,
 			identifierId_,
 			"The `Randomizer` class represents a random number generator concept. `Randomizer` can generate uniform distribution of either `integer` or `real` values from given range.",
 			HHuginn::ACCESS::PUBLIC,
-			HHuginn::HClass::TYPE::BUILTIN,
+			HClass::TYPE::BUILTIN,
 			origin_,
 			&HRandomizer::create_instance
 		)
@@ -63,29 +63,29 @@ public:
 				this
 			),
 			"set of available distributions used for Randomizer.",
-			HHuginn::HClass::MEMBER_TYPE::STATIC
+			HClass::MEMBER_TYPE::STATIC
 		);
 	}
-	HHuginn::HClass const* distribution_class( void ) const {
+	HClass const* distribution_class( void ) const {
 		return ( _distributionEnumerationClass->enumeral_class() );
 	}
 };
 
-HRandomizer::HRandomizer( HHuginn::HClass const* class_, DISTRIBUTION distribution_, distribution_t&& generator_ )
+HRandomizer::HRandomizer( HClass const* class_, DISTRIBUTION distribution_, distribution_t&& generator_ )
 	: HValue( class_ )
 	, _distribution( distribution_ )
 	, _generator( yaal::move( generator_ ) ) {
 	return;
 }
 
-HHuginn::value_t HRandomizer::create_instance( HHuginn::HClass const* class_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
+HHuginn::value_t HRandomizer::create_instance( HClass const* class_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Randomizer.constructor";
 	verify_arg_count( name, values_, 3, 4, thread_, position_ );
 	HObjectFactory& of( thread_->object_factory() );
-	HHuginn::HClass const* dc( static_cast<HRandomizerClass const*>( class_ )->distribution_class() );
-	HHuginn::HClass const* ic( of.integer_class() );
-	HHuginn::HClass const* rc( of.real_class() );
+	HClass const* dc( static_cast<HRandomizerClass const*>( class_ )->distribution_class() );
+	HClass const* ic( of.integer_class() );
+	HClass const* rc( of.real_class() );
 	verify_arg_type( name, values_, 0, dc, ARITY::MULTIPLE, thread_, position_ );
 	DISTRIBUTION distribution( static_cast<DISTRIBUTION>( get_enumeral( values_[0] ) ) );
 	distribution_t generator;
@@ -183,7 +183,7 @@ HHuginn::value_t HRandomizer::to_string( huginn::HThread* thread_, HHuginn::valu
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HRandomizer* o( static_cast<HRandomizer*>( object_->raw() ) );
 	HRuntime& rt( thread_->runtime() );
-	HString s( full_class_name( rt, *object_ ) );
+	hcore::HString s( full_class_name( rt, *object_ ) );
 	s.append( "(" ).append( full_class_name( rt, *object_ ) ).append( ".DISTRIBUTION." );
 	random::distribution::HDistribution const* distribution( o->_generator.raw() );
 	switch ( o->_distribution ) {
@@ -209,7 +209,7 @@ HHuginn::value_t HRandomizer::to_string( huginn::HThread* thread_, HHuginn::valu
 	M_EPILOG
 }
 
-HHuginn::class_t HRandomizer::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
+HHuginn::class_t HRandomizer::get_class( HRuntime* runtime_, HClass const* origin_ ) {
 	M_PROLOG
 	HHuginn::identifier_id_t classIdentifier( runtime_->identifier_id( "Randomizer" ) );
 	HHuginn::class_t c( runtime_->get_class( classIdentifier ) );

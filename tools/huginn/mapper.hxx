@@ -14,21 +14,21 @@ namespace tools {
 
 namespace huginn {
 
-class HMapper : public HHuginn::HIterable {
+class HMapper : public huginn::HIterable {
 	HHuginn::value_t _source;
 	HHuginn::function_t _function;
 	HHuginn::value_t _method;
 public:
-	HMapper( HHuginn::HClass const* class_, HHuginn::value_t source_, HHuginn::function_t function_, HHuginn::value_t method_ )
+	HMapper( huginn::HClass const* class_, HHuginn::value_t source_, HHuginn::function_t function_, HHuginn::value_t method_ )
 		: HIterable( class_ )
 		, _source( source_ )
 		, _function( function_ )
 		, _method( method_ ) {
 	}
-	static HHuginn::class_t get_class( HRuntime*, HHuginn::HClass const* );
+	static HHuginn::class_t get_class( HRuntime*, huginn::HClass const* );
 protected:
 	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
-		return ( static_cast<HHuginn::HIterable const*>( _source.raw() )->size( thread_, position_ ) );
+		return ( static_cast<huginn::HIterable const*>( _source.raw() )->size( thread_, position_ ) );
 	}
 private:
 	virtual iterator_t do_iterator( HThread*, int ) override;

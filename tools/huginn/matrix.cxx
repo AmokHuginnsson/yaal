@@ -22,14 +22,14 @@ namespace tools {
 
 namespace huginn {
 
-HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass const* class_, HHuginn::values_t& values_, int position_ )
+HMatrix::HMatrix( huginn::HThread* thread_, HClass const* class_, HHuginn::values_t& values_, int position_ )
 	: HValue( class_ )
 	, _data() {
 	char const name[] = "Matrix.constructor";
 	verify_arg_count( name, values_, 1, meta::max_signed<int>::value, thread_, position_ );
 	if ( values_[0]->type_id() != HHuginn::TYPE::LIST ) {
 		verify_signature( name, values_, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER }, thread_, position_ );
-		HHuginn::HFunctionReference const& fr( *static_cast<HHuginn::HFunctionReference const*>( values_[0].raw() ) );
+		huginn::HFunctionReference const& fr( *static_cast<huginn::HFunctionReference const*>( values_[0].raw() ) );
 		try {
 			int myRows( safe_int::cast<int>( get_integer( values_[1] ) ) );
 			if ( myRows < 1 ) {
@@ -58,11 +58,11 @@ HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass const* class_, HHugi
 					position_
 				);
 			}
-		} catch ( HException const& e ) {
+		} catch ( hcore::HException const& e ) {
 			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
 		}
 	} else {
-		HHuginn::HList::values_t const* rowData( nullptr );
+		huginn::HList::values_t const* rowData( nullptr );
 		HHuginn::type_id_t t( static_cast<int>( HHuginn::TYPE::UNKNOWN ) );
 		int myRows( 0 );
 		int cols( 0 );
@@ -80,7 +80,7 @@ HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass const* class_, HHugi
 			} else {
 				throw HHuginn::HHuginnRuntimeException( "Matrix must have numeric data, either `number` or `real`.", thread_->current_frame()->file_id(), position_ );
 			}
-		} catch ( HException const& e ) {
+		} catch ( hcore::HException const& e ) {
 			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
 		}
 		for ( int r( 0 ); r < myRows; ++ r ) {
@@ -113,12 +113,12 @@ HMatrix::HMatrix( huginn::HThread* thread_, HHuginn::HClass const* class_, HHugi
 	return;
 }
 
-HMatrix::HMatrix( HHuginn::HClass const* class_, arbitrary_precision_matrix_ptr_t&& data_ )
+HMatrix::HMatrix( HClass const* class_, arbitrary_precision_matrix_ptr_t&& data_ )
 	: HValue( class_ )
 	, _data( yaal::move( data_ ) ) {
 }
 
-HMatrix::HMatrix( HHuginn::HClass const* class_, floating_point_matrix_ptr_t&& data_ )
+HMatrix::HMatrix( HClass const* class_, floating_point_matrix_ptr_t&& data_ )
 	: HValue( class_ )
 	, _data( yaal::move( data_ ) ) {
 }
@@ -240,7 +240,7 @@ HHuginn::value_t HMatrix::add( huginn::HThread* thread_, HHuginn::value_t* objec
 			floating_point_matrix_t const& ma( *( arg->_data.get<floating_point_matrix_ptr_t>().raw() ) );
 			m += ma;
 		}
-	} catch ( HException const& e ) {
+	} catch ( hcore::HException const& e ) {
 		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
 	}
 	return ( *object_ );
@@ -268,7 +268,7 @@ HHuginn::value_t HMatrix::subtract( huginn::HThread* thread_, HHuginn::value_t* 
 			floating_point_matrix_t const& ma( *( arg->_data.get<floating_point_matrix_ptr_t>().raw() ) );
 			m -= ma;
 		}
-	} catch ( HException const& e ) {
+	} catch ( hcore::HException const& e ) {
 		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
 	}
 	return ( *object_ );
@@ -296,7 +296,7 @@ HHuginn::value_t HMatrix::multiply( huginn::HThread* thread_, HHuginn::value_t* 
 			floating_point_matrix_t const& ma( *( arg->_data.get<floating_point_matrix_ptr_t>().raw() ) );
 			m *= ma;
 		}
-	} catch ( HException const& e ) {
+	} catch ( hcore::HException const& e ) {
 		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
 	}
 	return ( *object_ );
@@ -317,7 +317,7 @@ HHuginn::value_t HMatrix::det( huginn::HThread* thread_, HHuginn::value_t* objec
 			floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
 			v = thread_->runtime().object_factory()->create_real( m.det() );
 		}
-	} catch ( HException const& e ) {
+	} catch ( hcore::HException const& e ) {
 		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
 	}
 	return ( v );
@@ -350,10 +350,10 @@ HHuginn::value_t HMatrix::scale_to( huginn::HThread* thread_, HHuginn::value_t* 
 	if ( o->_data.type() == 0 ) {
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::NUMBER, ARITY::UNARY, thread_, position_ );
 		arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
-		HNumber extremum;
+		hcore::HNumber extremum;
 		for ( int r( 0 ), rows( m.rows() ), cols( m.columns() ); r < rows; ++ r ) {
 			for ( int c( 0 ); c < cols; ++ c ) {
-				HNumber n( m[r][c] );
+				hcore::HNumber n( m[r][c] );
 				n.abs();
 				if ( n > extremum ) {
 					extremum = n;
@@ -396,7 +396,7 @@ HHuginn::value_t HMatrix::inverse( huginn::HThread* thread_, HHuginn::value_t* o
 		} else {
 			v = thread_->object_factory().create<HMatrix>( o->HValue::get_class(), make_resource<floating_point_matrix_t>( o->_data.get<floating_point_matrix_ptr_t>()->inverse() ) );
 		}
-	} catch ( HException const& e ) {
+	} catch ( hcore::HException const& e ) {
 		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
 	}
 	return ( v );
@@ -415,7 +415,7 @@ HHuginn::value_t HMatrix::negate( huginn::HThread* thread_, HHuginn::value_t* ob
 		} else {
 			v = thread_->object_factory().create<HMatrix>( o->HValue::get_class(), make_resource<floating_point_matrix_t>( -*o->_data.get<floating_point_matrix_ptr_t>() ) );
 		}
-	} catch ( HException const& e ) {
+	} catch ( hcore::HException const& e ) {
 		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
 	}
 	return ( v );
@@ -446,16 +446,16 @@ HHuginn::value_t do_matrix_apply( HHuginn::function_t call_, HThread* thread_, H
 }
 
 template<>
-HHuginn::value_t do_matrix_apply( HHuginn::HClass::HBoundMethod const* call_, HThread* thread_, HHuginn::values_t& values_, int position_ ) {
-	return ( const_cast<HHuginn::HClass::HBoundMethod*>( call_ )->call( thread_, values_, position_ ) );
+HHuginn::value_t do_matrix_apply( HClass::HBoundMethod const* call_, HThread* thread_, HHuginn::values_t& values_, int position_ ) {
+	return ( const_cast<HClass::HBoundMethod*>( call_ )->call( thread_, values_, position_ ) );
 }
 
 template<typename value_t, typename matrix_t, typename call_t>
 void matrix_apply( HHuginn::value_t store_, huginn::HThread* thread_, matrix_t& matrix_, call_t call_, int position_ ) {
 	HHuginn::value_t rowHolder( thread_->object_factory().create_integer( 0 ) );
 	HHuginn::value_t colHolder( thread_->object_factory().create_integer( 0 ) );
-	HHuginn::HInteger& row( *static_cast<HHuginn::HInteger*>( rowHolder.raw() ) );
-	HHuginn::HInteger& col( *static_cast<HHuginn::HInteger*>( colHolder.raw() ) );
+	huginn::HInteger& row( *static_cast<huginn::HInteger*>( rowHolder.raw() ) );
+	huginn::HInteger& col( *static_cast<huginn::HInteger*>( colHolder.raw() ) );
 	value_t& val( *static_cast<value_t*>( store_.raw() ) );
 	HHuginn::value_t res;
 	HHuginn::type_id_t expectedType( store_->type_id() );
@@ -491,16 +491,16 @@ HHuginn::value_t HMatrix::apply( huginn::HThread* thread_, HHuginn::value_t* obj
 	if ( o->_data.type() == 0 ) {
 		arbitrary_precision_matrix_t& m( *o->_data.get<arbitrary_precision_matrix_ptr_t>() );
 		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-			matrix_apply<HHuginn::HNumber>( thread_->object_factory().create_number( 0 ), thread_, m, static_cast<HHuginn::HFunctionReference const*>( values_[0].raw() )->function(), position_ );
+			matrix_apply<HNumber>( thread_->object_factory().create_number( 0 ), thread_, m, static_cast<huginn::HFunctionReference const*>( values_[0].raw() )->function(), position_ );
 		} else {
-			matrix_apply<HHuginn::HNumber>( thread_->object_factory().create_number( 0 ), thread_, m, static_cast<HHuginn::HClass::HBoundMethod const*>( values_[0].raw() ), position_ );
+			matrix_apply<HNumber>( thread_->object_factory().create_number( 0 ), thread_, m, static_cast<HClass::HBoundMethod const*>( values_[0].raw() ), position_ );
 		}
 	} else {
 		floating_point_matrix_t& m( *o->_data.get<floating_point_matrix_ptr_t>() );
 		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-			matrix_apply<HHuginn::HReal>( thread_->object_factory().create_real( 0 ), thread_, m, static_cast<HHuginn::HFunctionReference const*>( values_[0].raw() )->function(), position_ );
+			matrix_apply<HReal>( thread_->object_factory().create_real( 0 ), thread_, m, static_cast<huginn::HFunctionReference const*>( values_[0].raw() )->function(), position_ );
 		} else {
-			matrix_apply<HHuginn::HReal>( thread_->object_factory().create_real( 0 ), thread_, m, static_cast<HHuginn::HClass::HBoundMethod const*>( values_[0].raw() ), position_ );
+			matrix_apply<HReal>( thread_->object_factory().create_real( 0 ), thread_, m, static_cast<HClass::HBoundMethod const*>( values_[0].raw() ), position_ );
 		}
 	}
 	return ( *object_ );
@@ -511,7 +511,7 @@ HHuginn::value_t HMatrix::to_string( huginn::HThread* thread_, HHuginn::value_t*
 	M_PROLOG
 	char const name[] = "Matrix.to_string";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
-	HString s( full_class_name( thread_->runtime(), *object_ ) );
+	hcore::HString s( full_class_name( thread_->runtime(), *object_ ) );
 	s.append( "(" );
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	if ( o->_data.type() == 0 ) {
@@ -550,18 +550,18 @@ HHuginn::value_t HMatrix::to_string( huginn::HThread* thread_, HHuginn::value_t*
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::create_instance( HHuginn::HClass const* class_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
+HHuginn::value_t HMatrix::create_instance( HClass const* class_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 	return ( thread_->object_factory().create<HMatrix>( thread_, class_, values_, position_ ) );
 }
 
-HHuginn::class_t HMatrix::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
+HHuginn::class_t HMatrix::get_class( HRuntime* runtime_, HClass const* origin_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"Matrix",
 			"The `Matrix` class provides mathematical concept of number matrices. It supports operations of addition, multiplication, subtraction, scaling, inversion and transposition.",
 			HHuginn::ACCESS::PUBLIC,
-			HHuginn::HClass::TYPE::BUILTIN,
+			HClass::TYPE::BUILTIN,
 			origin_,
 			&HMatrix::create_instance
 		)

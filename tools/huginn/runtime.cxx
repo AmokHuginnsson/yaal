@@ -175,7 +175,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			BUILTIN::TYPE_UNKNOWN
 		} )
 	, _objectFactory( make_pointer<HObjectFactory>( this ) )
-	, _none( _objectFactory->create<HHuginn::HValue>( _objectFactory->none_class() ) )
+	, _none( _objectFactory->create<huginn::HValue>( _objectFactory->none_class() ) )
 	, _true( &_objectFactory->true_value() )
 	, _false( &_objectFactory->false_value() )
 	, _threads()
@@ -197,7 +197,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 void HRuntime::reset( void ) {
 	M_PROLOG
 	_result.reset();
-	static_cast<HHuginn::HList*>( _argv.raw() )->clear();
+	static_cast<huginn::HList*>( _argv.raw() )->clear();
 	_threads.clear();
 	_idGenerator = type_id( HHuginn::TYPE::NOT_BOOLEAN ).get();
 	return;
@@ -293,10 +293,10 @@ HHuginn::class_t HRuntime::get_class( identifier_id_t identifierId_ ) const {
 	M_EPILOG
 }
 
-HHuginn::HClass const* HRuntime::get_class( void const* id_ ) const {
+HClass const* HRuntime::get_class( void const* id_ ) const {
 	M_PROLOG
 	function_ids_t::const_iterator it( _functionIds.find( id_ ) );
-	return ( it != _functionIds.end() ? static_cast<HHuginn::HClass const*>( id_ ) : nullptr );
+	return ( it != _functionIds.end() ? static_cast<HClass const*>( id_ ) : nullptr );
 	M_EPILOG
 }
 
@@ -435,7 +435,7 @@ void HRuntime::register_package(
 namespace {
 
 HHuginn::value_t bound_method_call(
-	HHuginn::HClass::HMethod* method_,
+	HClass::HMethod* method_,
 	HHuginn::value_t subject_,
 	huginn::HThread* thread_,
 	HHuginn::value_t*,
@@ -455,7 +455,7 @@ void HRuntime::import_symbols( identifier_id_t package_, HHuginn::identifiers_t 
 		package = HPackageFactory::get_instance().create_package( this, identifier_name( package_ ), HHuginn::VISIBILITY::HIDDEN, position_ );
 		firstImported = true;
 	}
-	HHuginn::HClass const* packageClass( package->get_class() );
+	HClass const* packageClass( package->get_class() );
 	HHuginn::identifiers_t const* importedSymbols(
 		! importedSymbols_.is_empty()
 			? &importedSymbols_
@@ -484,7 +484,7 @@ void HRuntime::import_symbols( identifier_id_t package_, HHuginn::identifiers_t 
 					id,
 					hcore::call(
 						&bound_method_call,
-						static_cast<HHuginn::HClass::HMethod*>( v.raw() ),
+						static_cast<HClass::HMethod*>( v.raw() ),
 						package,
 						_1, _2, _3, _4
 					),
@@ -509,13 +509,13 @@ HHuginn::class_t HRuntime::create_class(
 	identifier_id_t identifier_,
 	yaal::hcore::HString const& doc_,
 	HHuginn::ACCESS access_,
-	HHuginn::HClass::TYPE type_,
-	HHuginn::HClass const* origin_,
-	HHuginn::HClass::create_instance_t createInstance_
+	HClass::TYPE type_,
+	HClass const* origin_,
+	HClass::create_instance_t createInstance_
 ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		make_pointer<HHuginn::HClass>(
+		make_pointer<HClass>(
 			this,
 			type_id_t( _idGenerator ),
 			identifier_,
@@ -535,9 +535,9 @@ HHuginn::class_t HRuntime::create_class(
 	yaal::hcore::HString const& name_,
 	yaal::hcore::HString const& doc_,
 	HHuginn::ACCESS access_,
-	HHuginn::HClass::TYPE type_,
-	HHuginn::HClass const* origin_,
-	HHuginn::HClass::create_instance_t createInstance_
+	HClass::TYPE type_,
+	HClass const* origin_,
+	HClass::create_instance_t createInstance_
 ) {
 	M_PROLOG
 	return (
@@ -597,7 +597,7 @@ void HRuntime::execute( void ) {
 	util::HScopeExitCall sec( hcore::call( &threads_t::clear, &_threads ) );
 	HHuginn::values_t args;
 	args.reserve( max_local_variable_count() );
-	HHuginn::HList& argv( *static_cast<HHuginn::HList*>( _argv.raw() ) );
+	huginn::HList& argv( *static_cast<huginn::HList*>( _argv.raw() ) );
 	if ( argv.size( nullptr, 0 ) > 0 ) {
 		args.push_back( _argv );
 	}
@@ -612,7 +612,7 @@ void HRuntime::execute( void ) {
 
 HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRuntime const& context_ ) {
 	M_PROLOG
-	HString doc( _huginn->get_comment( 1 ) );
+	hcore::HString doc( _huginn->get_comment( 1 ) );
 	HHuginn::class_t cls( create_class( name_, ! doc.is_empty() ? doc : "The `"_ys.append( name_ ).append( "` is an user defined submodule." ), HHuginn::ACCESS::PRIVATE ) );
 	HHuginn::field_definitions_t fds;
 	for ( classes_t::value_type const& c : _classes ) {
@@ -644,7 +644,7 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 			continue;
 		}
 		if ( (*gd.second)->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-			HHuginn::HFunctionReference const* fr( static_cast<HHuginn::HFunctionReference const*>( gd.second->raw() ) );
+			huginn::HFunctionReference const* fr( static_cast<huginn::HFunctionReference const*>( gd.second->raw() ) );
 			fds.emplace_back(
 				identifier_name( gd.first ),
 				_objectFactory->create_method_raw( fr->function() ),
@@ -697,7 +697,7 @@ HHuginn::value_t HRuntime::call( identifier_id_t identifier_, HHuginn::values_t&
 		threads_t::iterator t( _threads.find( threadId ) );
 		M_ASSERT( t != _threads.end() );
 		if ( (*gcIt->second)->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-			res = static_cast<HHuginn::HFunctionReference const*>( gcIt->second->raw() )->function()( t->second.raw(), nullptr, values_, position_ );
+			res = static_cast<huginn::HFunctionReference const*>( gcIt->second->raw() )->function()( t->second.raw(), nullptr, values_, position_ );
 		} else {
 			throw HHuginn::HHuginnRuntimeException( "Symbol `"_ys.append( identifier_name( identifier_ ) ).append( "` is not callable." ), MAIN_FILE_ID, position_ );
 		}
@@ -710,7 +710,7 @@ HHuginn::value_t HRuntime::call( identifier_id_t identifier_, HHuginn::values_t&
 
 void HRuntime::add_argument( yaal::hcore::HString const& arg_ ) {
 	M_PROLOG
-	HHuginn::HList& argv( *static_cast<HHuginn::HList*>( _argv.raw() ) );
+	huginn::HList& argv( *static_cast<huginn::HList*>( _argv.raw() ) );
 	argv.push_back( _objectFactory->create_string( arg_ ) );
 	return;
 	M_EPILOG
@@ -718,7 +718,7 @@ void HRuntime::add_argument( yaal::hcore::HString const& arg_ ) {
 
 void HRuntime::add_argument( HHuginn::value_t const& arg_ ) {
 	M_PROLOG
-	HHuginn::HList& argv( *static_cast<HHuginn::HList*>( _argv.raw() ) );
+	huginn::HList& argv( *static_cast<huginn::HList*>( _argv.raw() ) );
 	argv.push_back( arg_ );
 	return;
 	M_EPILOG
@@ -726,7 +726,7 @@ void HRuntime::add_argument( HHuginn::value_t const& arg_ ) {
 
 void HRuntime::clear_arguments( void ) {
 	M_PROLOG
-	HHuginn::HList& argv( *static_cast<HHuginn::HList*>( _argv.raw() ) );
+	huginn::HList& argv( *static_cast<huginn::HList*>( _argv.raw() ) );
 	argv.clear();
 	return;
 	M_EPILOG
@@ -846,7 +846,7 @@ void sort_identifiers( HHuginn::identifiers_t& identifiers_, HRuntime const* run
 
 }
 
-inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& stream_, HHuginn::HClass const& huginnClass_ ) {
+inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& stream_, HClass const& huginnClass_ ) {
 	M_PROLOG
 	HRuntime const* runtime( huginnClass_.runtime() );
 	stream_ << ( is_enum_class( &huginnClass_ ) ? "enum: " : "class: " );
@@ -859,9 +859,9 @@ inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterfac
 		stream_ << " : " << huginnClass_.super()->name();
 	}
 	HHuginn::field_identifiers_t newFields( huginnClass_.field_identifiers() );
-	typedef HStack<HHuginn::HClass const*> hierarchy_t;
+	typedef HStack<HClass const*> hierarchy_t;
 	hierarchy_t hierarchy;
-	HHuginn::HClass const* super( huginnClass_.super() );
+	HClass const* super( huginnClass_.super() );
 	while ( super ) {
 		hierarchy.push( super );
 		super = super->super();
@@ -933,7 +933,7 @@ huginn::classes_t class_list( HRuntime::dependencies_t const& dependencies_ ) {
 	sort(
 		classes.begin(),
 		classes.end(),
-		[]( HHuginn::HClass const* l, HHuginn::HClass const* r ) {
+		[]( HClass const* l, HClass const* r ) {
 			return ( l->name() < r->name() );
 		}
 	);
@@ -941,7 +941,7 @@ huginn::classes_t class_list( HRuntime::dependencies_t const& dependencies_ ) {
 		unique(
 			classes.begin(),
 			classes.end(),
-			[]( HHuginn::HClass const* l, HHuginn::HClass const* r ) {
+			[]( HClass const* l, HClass const* r ) {
 				return ( l->type_id() == r->type_id() );
 			}
 		),
@@ -964,12 +964,12 @@ void HRuntime::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) const {
 		stream_ << "package: " << identifier_name( gd.first ) << " = " << v->get_class()->name() << endl;
 	}
 	huginn::classes_t classes( class_list( _dependencies ) );
-	for ( HHuginn::HClass const* c : classes ) {
+	for ( HClass const* c : classes ) {
 		if ( ! is_enum_class( c ) ) {
 			stream_ << *c << endl;
 		}
 	}
-	for ( HHuginn::HClass const* c : classes ) {
+	for ( HClass const* c : classes ) {
 		if ( is_enum_class( c ) ) {
 			stream_ << *c << endl;
 		}
@@ -1003,16 +1003,16 @@ void HRuntime::dump_docs( yaal::hcore::HStreamInterface& stream_ ) const {
 	M_PROLOG
 	huginn::classes_t classes( class_list( _dependencies ) );
 	for ( huginn::classes_t::value_type const& c : classes ) {
-		HHuginn::HClass const& cls( *c );
-		HString cn( full_class_name( *this, &cls, false ) );
+		HClass const& cls( *c );
+		hcore::HString cn( full_class_name( *this, &cls, false ) );
 		if ( ! cls.doc().is_empty() ) {
 			stream_ << cn << ":" << cls.doc() << endl;
 		}
 		for ( HHuginn::field_identifiers_t::value_type const& f : cls.field_identifiers() ) {
-			HString const& doc( cls.doc( f ) );
+			hcore::HString const& doc( cls.doc( f ) );
 			if ( ! doc.is_empty() ) {
 				stream_ << cn << "." << identifier_name( f ) << ":";
-				int fi( cls.field_index( f, HHuginn::HClass::MEMBER_TYPE::STATIC ) );
+				int fi( cls.field_index( f, HClass::MEMBER_TYPE::STATIC ) );
 				HHuginn::type_id_t tid( cls.field( fi )->type_id() );
 				if ( ( doc.front() != '(' ) && ( tid == HHuginn::TYPE::METHOD ) ) {
 					stream_ << "() - ";
@@ -1025,7 +1025,7 @@ void HRuntime::dump_docs( yaal::hcore::HStreamInterface& stream_ ) const {
 		if ( ( (*gd.second)->type_id() != HHuginn::TYPE::FUNCTION_REFERENCE ) || ( _classes.count( gd.first ) > 0 ) ) {
 			continue;
 		}
-		HHuginn::HFunctionReference const& f( *static_cast<HHuginn::HFunctionReference const*>( gd.second->raw() ) );
+		huginn::HFunctionReference const& f( *static_cast<huginn::HFunctionReference const*>( gd.second->raw() ) );
 		if ( ! f.doc().is_empty() ) {
 			stream_ << identifier_name( gd.first ) << ":" << f.doc() << endl;
 		}
@@ -1036,11 +1036,11 @@ void HRuntime::dump_docs( yaal::hcore::HStreamInterface& stream_ ) const {
 
 yaal::hcore::HString HRuntime::suggestion( HHuginn::identifier_id_t identifier_ ) const {
 	M_PROLOG
-	HString identifier( identifier_name( identifier_ ) );
-	HString s;
+	hcore::HString identifier( identifier_name( identifier_ ) );
+	hcore::HString s;
 	int minDiff( meta::max_signed<int>::value );
 	for ( yaal::hcore::HString const& i : _identifierNames ) {
-		int diff( string::distance( i, identifier, string::DISTANCE_METRIC::QWERTY ) );
+		int diff( tools::string::distance( i, identifier, tools::string::DISTANCE_METRIC::QWERTY ) );
 		if ( ( diff > 0 ) && ( diff < minDiff ) ) {
 			minDiff = diff;
 			s = i;
@@ -1050,15 +1050,15 @@ yaal::hcore::HString HRuntime::suggestion( HHuginn::identifier_id_t identifier_ 
 	M_EPILOG
 }
 
-yaal::hcore::HString HRuntime::suggestion( HHuginn::HClass const* class_, HHuginn::identifier_id_t identifierId_ ) const {
+yaal::hcore::HString HRuntime::suggestion( HClass const* class_, HHuginn::identifier_id_t identifierId_ ) const {
 	M_PROLOG
-	HString identifierName( identifier_name( identifierId_ ) );
-	HString s;
+	hcore::HString identifierName( identifier_name( identifierId_ ) );
+	hcore::HString s;
 	int minDiff( meta::max_signed<int>::value );
 	while ( class_ ) {
 		for ( HHuginn::identifier_id_t identifierId : class_->field_identifiers() ) {
-			HString const& name( identifier_name( identifierId ) );
-			int diff( string::distance( name, identifierName, string::DISTANCE_METRIC::QWERTY ) );
+			hcore::HString const& name( identifier_name( identifierId ) );
+			int diff( tools::string::distance( name, identifierName, tools::string::DISTANCE_METRIC::QWERTY ) );
 			if ( ( diff > 0 ) && ( diff < minDiff ) ) {
 				minDiff = diff;
 				s = name;
@@ -1077,7 +1077,7 @@ yaal::hcore::HString const& HRuntime::function_name( void const* id_ ) const {
 	bool found( false );
 	for ( values_store_t::value_type const& f : *_valuesStore ) {
 		if ( f->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-			HHuginn::HFunctionReference const* fr( static_cast<HHuginn::HFunctionReference const*>( f.raw() ) );
+			huginn::HFunctionReference const* fr( static_cast<huginn::HFunctionReference const*>( f.raw() ) );
 			if ( fr->function().id() == id_ ) {
 				name = &identifier_name( fr->identifier_id() );
 				found = true;
@@ -1087,7 +1087,7 @@ yaal::hcore::HString const& HRuntime::function_name( void const* id_ ) const {
 	}
 	if ( ! found ) {
 		for ( HHuginn::class_t const& c : _dependencies ) {
-			if ( static_cast<HHuginn::HFunctionReference const*>( c->constructor().raw() )->function().id() == id_ ) {
+			if ( static_cast<huginn::HFunctionReference const*>( c->constructor().raw() )->function().id() == id_ ) {
 				name = &c->name();
 			}
 		}
@@ -1096,7 +1096,7 @@ yaal::hcore::HString const& HRuntime::function_name( void const* id_ ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString const* HRuntime::package_name( HHuginn::HClass const* class_ ) const {
+yaal::hcore::HString const* HRuntime::package_name( HClass const* class_ ) const {
 	M_PROLOG
 	yaal::hcore::HString const* name( nullptr );
 	for ( global_definitions_t::value_type const& gd : _globalDefinitions ) {

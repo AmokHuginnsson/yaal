@@ -25,10 +25,10 @@ namespace huginn {
 namespace tuple {
 
 class HTupleIterator : public HIteratorInterface {
-	HHuginn::HTuple* _tuple;
+	huginn::HTuple* _tuple;
 	int long _index;
 public:
-	HTupleIterator( HHuginn::HTuple* tuple_ )
+	HTupleIterator( huginn::HTuple* tuple_ )
 		: _tuple( tuple_ )
 		, _index( 0 ) {
 		return;
@@ -49,10 +49,10 @@ private:
 };
 
 class HTupleReverseIterator : public HIteratorInterface {
-	HHuginn::HTuple* _tuple;
+	huginn::HTuple* _tuple;
 	int long _index;
 public:
-	HTupleReverseIterator( HThread* thread_, HHuginn::HTuple* tuple_, int position_ )
+	HTupleReverseIterator( HThread* thread_, huginn::HTuple* tuple_, int position_ )
 		: _tuple( tuple_ )
 		, _index( tuple_->size( thread_, position_ ) - 1 ) {
 		return;
@@ -72,18 +72,18 @@ private:
 	HTupleReverseIterator& operator = ( HTupleReverseIterator const& ) = delete;
 };
 
-class HReversedTuple : public HHuginn::HIterable {
+class HReversedTuple : public huginn::HIterable {
 	HHuginn::value_t _tuple;
 public:
-	HReversedTuple( HHuginn::HClass const* class_, HHuginn::value_t const& tuple_ )
+	HReversedTuple( HClass const* class_, HHuginn::value_t const& tuple_ )
 		: HIterable( class_ )
 		, _tuple( tuple_ ) {
 		M_ASSERT( _tuple->type_id() == HHuginn::TYPE::TUPLE );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HClass const* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
-			make_pointer<HHuginn::HClass>(
+			make_pointer<HClass>(
 				runtime_,
 				"ReversedTupleView",
 				"The `ReversedTupleView` class represents *lazy* *iterable* reversed view of a `tuple`.",
@@ -95,11 +95,11 @@ public:
 	}
 protected:
 	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
-		return ( safe_int::cast<int long>( static_cast<HHuginn::HTuple const*>( _tuple.raw() )->size( thread_, position_ ) ) );
+		return ( safe_int::cast<int long>( static_cast<huginn::HTuple const*>( _tuple.raw() )->size( thread_, position_ ) ) );
 	}
 private:
 	virtual iterator_t do_iterator( HThread* thread_, int position_ ) override {
-		return ( make_pointer<HTupleReverseIterator>( thread_, static_cast<HHuginn::HTuple*>( _tuple.raw() ), position_ ) );
+		return ( make_pointer<HTupleReverseIterator>( thread_, static_cast<huginn::HTuple*>( _tuple.raw() ), position_ ) );
 	}
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
@@ -115,7 +115,7 @@ inline HHuginn::value_t find( huginn::HThread* thread_, HHuginn::value_t* object
 	int noArg( static_cast<int>( values_.get_size() ) );
 	int long start( 0 );
 	int long stop( -1 );
-	HHuginn::HTuple& l( *static_cast<HHuginn::HTuple*>( object_->raw() ) );
+	huginn::HTuple& l( *static_cast<huginn::HTuple*>( object_->raw() ) );
 	int long size( l.value().get_size() );
 	if ( noArg > 1 ) {
 		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
@@ -133,8 +133,8 @@ inline HHuginn::value_t add( huginn::HThread* thread_, HHuginn::value_t* object_
 	M_PROLOG
 	verify_signature( "tuple.add", values_, { HHuginn::TYPE::TUPLE }, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::TUPLE );
-	HHuginn::HTuple::values_t& dst( static_cast<HHuginn::HTuple*>( object_->raw() )->value() );
-	HHuginn::HTuple::values_t const& src( static_cast<HHuginn::HTuple const*>( values_[0].raw() )->value() );
+	huginn::HTuple::values_t& dst( static_cast<huginn::HTuple*>( object_->raw() )->value() );
+	huginn::HTuple::values_t const& src( static_cast<huginn::HTuple const*>( values_[0].raw() )->value() );
 	dst.insert( dst.end(), src.begin(), src.end() );
 	return ( *object_ );
 	M_EPILOG
@@ -144,7 +144,7 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 	M_PROLOG
 	verify_arg_count( "tuple.hash", values_, 0, 0, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::TUPLE );
-	HHuginn::HTuple::values_t const& values( static_cast<HHuginn::HTuple*>( object_->raw() )->value() );
+	huginn::HTuple::values_t const& values( static_cast<huginn::HTuple*>( object_->raw() )->value() );
 	int long hashValue( static_cast<int long>( HHuginn::TYPE::TUPLE ) );
 	for ( HHuginn::value_t const& v : values ) {
 		hashValue *= 3;
@@ -155,8 +155,8 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 }
 
 inline bool less_impl( huginn::HThread* thread_, HHuginn::value_t const& l_, HHuginn::value_t const& r_, int position_ ) {
-	HHuginn::HTuple::values_t const& l( static_cast<HHuginn::HTuple const*>( l_.raw() )->value() );
-	HHuginn::HTuple::values_t const& r( static_cast<HHuginn::HTuple const*>( r_.raw() )->value() );
+	huginn::HTuple::values_t const& l( static_cast<huginn::HTuple const*>( l_.raw() )->value() );
+	huginn::HTuple::values_t const& r( static_cast<huginn::HTuple const*>( r_.raw() )->value() );
 	HHuginn::HValueCompareHelper lessHelper( &instruction::less );
 	lessHelper.anchor( thread_, position_ );
 	return ( lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), cref( lessHelper ) ) );
@@ -198,8 +198,8 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::TUPLE );
 	verify_signature( "tuple.equals", values_, { HHuginn::TYPE::TUPLE }, thread_, position_ );
-	HHuginn::HTuple::values_t const& l( static_cast<HHuginn::HTuple*>( object_->raw() )->value() );
-	HHuginn::HTuple::values_t const& r( static_cast<HHuginn::HTuple const*>( values_[0].raw() )->value() );
+	huginn::HTuple::values_t const& l( static_cast<huginn::HTuple*>( object_->raw() )->value() );
+	huginn::HTuple::values_t const& r( static_cast<huginn::HTuple const*>( values_[0].raw() )->value() );
 	bool equal( l.get_size() == r.get_size() );
 	for ( int long i( 0 ), c( l.get_size() ); equal && ( i < c ); ++ i ) {
 		equal = instruction::equals( thread_, l[i], r[i], position_ );
@@ -208,17 +208,17 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_EPILOG
 }
 
-class HTupleClass : public HHuginn::HClass {
+class HTupleClass : public HClass {
 public:
 	typedef HTupleClass this_type;
-	typedef HHuginn::HClass base_type;
+	typedef HClass base_type;
 private:
 	HHuginn::class_t _reversedTupleClass;
 public:
 	HTupleClass(
 		HRuntime* runtime_,
 		HObjectFactory* objectFactory_
-	) : HHuginn::HClass(
+	) : HClass(
 			runtime_,
 			objectFactory_,
 			huginn::type_id( HHuginn::TYPE::TUPLE ),
@@ -241,7 +241,7 @@ public:
 		redefine( nullptr, fd );
 		return;
 	}
-	HHuginn::HClass const* reversed_tuple_class( void ) const {
+	HClass const* reversed_tuple_class( void ) const {
 		return ( _reversedTupleClass.raw() );
 	}
 protected:
@@ -270,17 +270,17 @@ HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const
 
 }
 
-HHuginn::HTuple::HTuple( HHuginn::HClass const* class_, values_t&& data_ )
+huginn::HTuple::HTuple( HClass const* class_, values_t&& data_ )
 	: HIterable( class_ )
 	, _data( yaal::move( data_ ) ) {
 	return;
 }
 
-int long HHuginn::HTuple::do_size( huginn::HThread*, int ) const {
+int long huginn::HTuple::do_size( huginn::HThread*, int ) const {
 	return ( _data.get_size() );
 }
 
-int long HHuginn::HTuple::find( huginn::HThread* thread_, int position_, HHuginn::value_t const& val_, int long start_, int long stop_ ) const {
+int long huginn::HTuple::find( huginn::HThread* thread_, int position_, HHuginn::value_t const& val_, int long start_, int long stop_ ) const {
 	M_PROLOG
 	if ( stop_ < 0 ) {
 		stop_ = _data.get_size();
@@ -299,18 +299,18 @@ int long HHuginn::HTuple::find( huginn::HThread* thread_, int position_, HHuginn
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HTuple::get( int long long index_ ) {
+HHuginn::value_t huginn::HTuple::get( int long long index_ ) {
 	M_PROLOG
 	M_ASSERT( ( index_ >= 0 ) && ( index_ < _data.get_size() ) );
 	return ( _data[static_cast<int>( index_ )] );
 	M_EPILOG
 }
 
-HHuginn::HIterable::iterator_t HHuginn::HTuple::do_iterator( huginn::HThread*, int ) {
+huginn::HIterable::iterator_t huginn::HTuple::do_iterator( huginn::HThread*, int ) {
 	return ( make_pointer<huginn::tuple::HTupleIterator>( this ) );
 }
 
-HHuginn::value_t HHuginn::HTuple::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
+HHuginn::value_t huginn::HTuple::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
 	values_t data;
 	data.reserve( _data.get_size() );
 	for ( values_t::value_type const& v : _data ) {

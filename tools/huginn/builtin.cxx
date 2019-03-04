@@ -14,6 +14,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "operator.hxx"
 #include "instruction.hxx"
 #include "iterator.hxx"
+#include "observer.hxx"
 #include "objectfactory.hxx"
 #include "tools/streamtools.hxx"
 
@@ -80,7 +81,7 @@ HHuginn::value_t tuple( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::va
 HHuginn::value_t list( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int ) {
 	M_PROLOG
 	HHuginn::value_t v( thread_->object_factory().create_list() );
-	HHuginn::HList* l( static_cast<HHuginn::HList*>( v.raw() ) );
+	huginn::HList* l( static_cast<huginn::HList*>( v.raw() ) );
 	for ( HHuginn::value_t const& e : values_ ) {
 		l->push_back( e );
 	}
@@ -91,7 +92,7 @@ HHuginn::value_t list( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 HHuginn::value_t deque( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int ) {
 	M_PROLOG
 	HHuginn::value_t v( thread_->object_factory().create_deque() );
-	HHuginn::HDeque* d( static_cast<HHuginn::HDeque*>( v.raw() ) );
+	huginn::HDeque* d( static_cast<huginn::HDeque*>( v.raw() ) );
 	for ( HHuginn::value_t const& e : values_ ) {
 		d->push_back( e );
 	}
@@ -109,7 +110,7 @@ HHuginn::value_t dict( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 HHuginn::value_t order( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	HHuginn::value_t v( thread_->object_factory().create_order() );
-	HHuginn::HOrder* o( static_cast<HHuginn::HOrder*>( v.raw() ) );
+	huginn::HOrder* o( static_cast<huginn::HOrder*>( v.raw() ) );
 	for ( HHuginn::value_t const& e : values_ ) {
 		o->insert( thread_, e, position_ );
 	}
@@ -127,7 +128,7 @@ HHuginn::value_t lookup( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::v
 HHuginn::value_t set( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	HHuginn::value_t v( thread_->object_factory().create_set() );
-	HHuginn::HSet* s( static_cast<HHuginn::HSet*>( v.raw() ) );
+	huginn::HSet* s( static_cast<huginn::HSet*>( v.raw() ) );
 	for ( HHuginn::value_t const& e : values_ ) {
 		s->insert( thread_, e, position_ );
 	}
@@ -138,7 +139,7 @@ HHuginn::value_t set( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::valu
 HHuginn::value_t blob( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_signature( "blob", values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
-	HHuginn::HInteger::value_type s( get_integer( values_[0] ) );
+	huginn::HInteger::value_type s( get_integer( values_[0] ) );
 	if ( s <= 0 ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Invalid `blob` size requested: "_ys.append( s ),
@@ -159,7 +160,7 @@ HHuginn::value_t blob( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 	HChunk c;
 	try {
 		c.realloc( rs, HChunk::STRATEGY::EXACT );
-	} catch ( HException const& e ) {
+	} catch ( hcore::HException const& e ) {
 		thread_->raise( thread_->object_factory().runtime_exception_class(), e.what(), position_ );
 	}
 	return ( thread_->object_factory().create_blob( yaal::move( c ) ) );
@@ -170,14 +171,14 @@ HHuginn::value_t size( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 	M_PROLOG
 	verify_arg_count( "size", values_, 1, 1, thread_, position_ );
 	HHuginn::value_t const& val( values_.front() );
-	HHuginn::HValue const* v( val.raw() );
+	huginn::HValue const* v( val.raw() );
 	int long long s( 0 );
-	HHuginn::HIterable const* iterable( dynamic_cast<HHuginn::HIterable const*>( v ) );
+	huginn::HIterable const* iterable( dynamic_cast<huginn::HIterable const*>( v ) );
 	if ( iterable ) {
 		s = iterable->size( thread_, position_ );
 	} else if ( v->type_id() == HHuginn::TYPE::BLOB ) {
-		s = static_cast<HHuginn::HBlob const*>( v )->get_size();
-	} else if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v ) ) {
+		s = static_cast<huginn::HBlob const*>( v )->get_size();
+	} else if ( HObject const* o = dynamic_cast<HObject const*>( v ) ) {
 		HHuginn::value_t res( o->call_method( thread_, val, IDENTIFIER::INTERFACE::GET_SIZE, HArguments( thread_ ), position_ ) );
 		if ( res->type_id() != HHuginn::TYPE::INTEGER ) {
 			throw HHuginn::HHuginnRuntimeException(
@@ -203,7 +204,7 @@ HHuginn::value_t size( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 HHuginn::value_t type( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "type", values_, 1, 1, thread_, position_ );
-	HHuginn::HValue const* v( values_.front().raw() );
+	huginn::HValue const* v( values_.front().raw() );
 	return ( v->get_class()->constructor() );
 	M_EPILOG
 }
@@ -228,14 +229,14 @@ HHuginn::value_t observe( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::
 		);
 	}
 	HObjectFactory& of( thread_->object_factory() );
-	return ( of.create<HHuginn::HObserver>( of.observer_class(), v ) );
+	return ( of.create<HObserver>( of.observer_class(), v ) );
 	M_EPILOG
 }
 
 HHuginn::value_t use( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_signature( "use", values_, { HHuginn::TYPE::OBSERVER }, thread_, position_ );
-	HHuginn::HObserver const* o( static_cast<HHuginn::HObserver const*>( values_.front().raw() ) );
+	HObserver const* o( static_cast<HObserver const*>( values_.front().raw() ) );
 	HHuginn::value_t v( o->value() );
 	if ( !v ) {
 		v = thread_->runtime().none_value();
@@ -250,7 +251,7 @@ HHuginn::value_t square_root( char const* name_, huginn::HThread* thread_, HHugi
 	HHuginn::type_id_t t( verify_arg_numeric( name_, values_, 0, ARITY::UNARY, thread_, position_ ) );
 	HHuginn::value_t v( thread_->runtime().none_value() );
 	if ( t == HHuginn::TYPE::NUMBER ) {
-		HNumber const& val( get_number( values_[0] ) );
+		hcore::HNumber const& val( get_number( values_[0] ) );
 		if ( val >= number::N0 ) {
 			v = thread_->object_factory().create_number( math::square_root( val ) );
 		}
@@ -275,8 +276,8 @@ HHuginn::value_t n_ary_action( char const* name_, n_ary_action_t action_, huginn
 	verify_arg_count( name_, values_, 1, 1, thread_, position_ );
 	HHuginn::value_t src( verify_arg_virtual_collection( name_, values_, 0, ARITY::UNARY, thread_, position_ ) );
 	HHuginn::value_t accumulator( thread_->runtime().none_value() );
-	HHuginn::HIterable const* iterable( static_cast<HHuginn::HIterable const*>( values_[0].raw() ) );
-	HHuginn::HIterable::iterator_t it( const_cast<HHuginn::HIterable*>( iterable )->iterator( thread_, position_ ) );
+	huginn::HIterable const* iterable( static_cast<huginn::HIterable const*>( values_[0].raw() ) );
+	huginn::HIterable::iterator_t it( const_cast<huginn::HIterable*>( iterable )->iterator( thread_, position_ ) );
 	if ( ! it->is_valid( thread_, position_ ) ) {
 		throw HHuginn::HHuginnRuntimeException(
 			hcore::to_string( name_ ).append( " on empty." ), thread_->current_frame()->file_id(), position_
@@ -284,7 +285,7 @@ HHuginn::value_t n_ary_action( char const* name_, n_ary_action_t action_, huginn
 	}
 	accumulator = it->value( thread_, position_ );
 	accumulator = accumulator->clone( thread_, &accumulator, position_ );
-	HHuginn::HClass const* c( accumulator->get_class() );
+	huginn::HClass const* c( accumulator->get_class() );
 	it->next( thread_, position_ );
 	while ( it->is_valid( thread_, position_ ) && thread_->can_continue() ) {
 		HHuginn::value_t v( it->value( thread_, position_ ) );
@@ -316,21 +317,21 @@ HHuginn::value_t n_ary_product( huginn::HThread* thread_, HHuginn::value_t*, HHu
 HHuginn::value_t print( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "print", values_, 1, 1, thread_, position_ );
-	HHuginn::HValue const* v( values_.front().raw() );
+	huginn::HValue const* v( values_.front().raw() );
 	yaal::hcore::HStreamInterface& out( thread_->runtime().huginn()->output_stream() );
 	HHuginn::type_id_t typeId( v->type_id() );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
-		out << static_cast<HHuginn::HInteger const*>( v )->value();
+		out << static_cast<huginn::HInteger const*>( v )->value();
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
-		out << static_cast<HHuginn::HReal const*>( v )->value();
+		out << static_cast<HReal const*>( v )->value();
 	} else if ( typeId == HHuginn::TYPE::STRING ) {
-		out << static_cast<HHuginn::HString const*>( v )->value();
+		out << static_cast<HString const*>( v )->value();
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
-		out << static_cast<HHuginn::HNumber const*>( v )->value();
+		out << static_cast<HNumber const*>( v )->value();
 	} else if ( typeId == HHuginn::TYPE::BOOLEAN ) {
-		out << static_cast<HHuginn::HBoolean const*>( v )->value();
+		out << static_cast<HBoolean const*>( v )->value();
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
-		out << static_cast<HHuginn::HCharacter const*>( v )->value();
+		out << static_cast<HCharacter const*>( v )->value();
 	} else {
 		throw HHuginn::HHuginnRuntimeException(
 			"Printing `"_ys.append( v->get_class()->name() ).append( "`s is not supported." ),
@@ -361,7 +362,7 @@ HHuginn::value_t assert( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::v
 	verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, ARITY::MULTIPLE, thread_, position_ );
 	if ( ! get_boolean( values_[0] ) ) {
 		int argc( static_cast<int>( values_.get_size() ) );
-		HString message( get_string( values_[argc - 1] ) );
+		hcore::HString message( get_string( values_[argc - 1] ) );
 		if ( argc > 2 ) {
 			message.append( " " ).append( get_string( values_[1] ) );
 		}

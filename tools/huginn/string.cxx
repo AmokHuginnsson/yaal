@@ -27,11 +27,11 @@ namespace huginn {
 namespace string {
 
 class HStringIterator : public HIteratorInterface {
-	HHuginn::HString* _string;
+	HString* _string;
 	HObjectFactory* _objectFactory;
 	int long _index;
 public:
-	HStringIterator( HHuginn::HString* string_ )
+	HStringIterator( HString* string_ )
 		: _string( string_ )
 		, _objectFactory( string_->get_class()->runtime()->object_factory() )
 		, _index( 0 ) {
@@ -53,11 +53,11 @@ private:
 };
 
 class HStringReverseIterator : public HIteratorInterface {
-	HHuginn::HString* _string;
+	HString* _string;
 	HObjectFactory* _objectFactory;
 	int long _index;
 public:
-	HStringReverseIterator( HHuginn::HString* string_ )
+	HStringReverseIterator( HString* string_ )
 		: _string( string_ )
 		, _objectFactory( string_->get_class()->runtime()->object_factory() )
 		, _index( string_->value().get_length() - 1 ) {
@@ -78,18 +78,18 @@ private:
 	HStringReverseIterator& operator = ( HStringReverseIterator const& ) = delete;
 };
 
-class HReversedString : public HHuginn::HIterable {
+class HReversedString : public huginn::HIterable {
 	HHuginn::value_t _string;
 public:
-	HReversedString( HHuginn::HClass const* class_, HHuginn::value_t const& string_ )
+	HReversedString( HClass const* class_, HHuginn::value_t const& string_ )
 		: HIterable( class_ )
 		, _string( string_ ) {
 		M_ASSERT( _string->type_id() == HHuginn::TYPE::STRING );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HClass const* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
-			make_pointer<HHuginn::HClass>(
+			make_pointer<HClass>(
 				runtime_,
 				"ReversedStringView",
 				"The `ReversedStringView` class represents *lazy* *iterable* reversed view of a `string`.",
@@ -101,11 +101,11 @@ public:
 	}
 protected:
 	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
-		return ( safe_int::cast<int long>( static_cast<HHuginn::HString const*>( _string.raw() )->size( thread_, position_ ) ) );
+		return ( safe_int::cast<int long>( static_cast<HString const*>( _string.raw() )->size( thread_, position_ ) ) );
 	}
 private:
 	virtual iterator_t do_iterator( HThread*, int ) override {
-		return ( make_pointer<HStringReverseIterator>( static_cast<HHuginn::HString*>( _string.raw() ) ) );
+		return ( make_pointer<HStringReverseIterator>( static_cast<HString*>( _string.raw() ) ) );
 	}
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
@@ -114,7 +114,7 @@ private:
 };
 
 typedef int long ( yaal::hcore::HString::*finder_t )( yaal::hcore::HString const&, int long ) const;
-typedef int long ( yaal::hcore::HString::*finder_raw_t )( HString const&, int long ) const;
+typedef int long ( yaal::hcore::HString::*finder_raw_t )( hcore::HString const&, int long ) const;
 
 inline HHuginn::value_t find( char const* name_, finder_t finder_, int long default_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
@@ -158,13 +158,13 @@ public:
 	static char const FMT_SPEC = ':';
 private:
 	HThread* _thread;
-	HString const& _format;
-	HString& _result;
-	HString::const_iterator _it;
+	hcore::HString const& _format;
+	hcore::HString& _result;
+	hcore::HString::const_iterator _it;
 	HHuginn::values_t& _values;
 	int _position;
 public:
-	HHuginnStringFormatter( HThread* thread_, HString const& format_, HString& result_, HHuginn::values_t& values_, int position_ )
+	HHuginnStringFormatter( HThread* thread_, hcore::HString const& format_, hcore::HString& result_, HHuginn::values_t& values_, int position_ )
 		: _thread( thread_ )
 		, _format( format_ )
 		, _result( result_ )
@@ -186,13 +186,13 @@ public:
 		character_class_t const ALIGN_CLASS( "<^>", 3 );
 		int fmtSubstCount( 0 );
 		bool autoIndex( false );
-		HString idxRaw;
-		HString specRaw;
-		HString formatedValue;
+		hcore::HString idxRaw;
+		hcore::HString specRaw;
+		hcore::HString formatedValue;
 		char const* errMsg( "Invalid format specification" );
 		int maxUsedValue( -1 );
 		int valCount( static_cast<int>( _values.get_size() ) );
-		for ( HString::const_iterator end( _format.end() ); _it != end; ++ _it ) {
+		for ( hcore::HString::const_iterator end( _format.end() ); _it != end; ++ _it ) {
 			if ( *_it == FMT_OPEN ) {
 				++ _it;
 				ensure( _it != end, "Single '{' encountered in format string" );
@@ -221,7 +221,7 @@ public:
 					if ( ! autoIndex ) {
 						try {
 							idx = lexical_cast<int>( idxRaw );
-						} catch ( HException const& e ) {
+						} catch ( hcore::HException const& e ) {
 							throw HHuginn::HHuginnRuntimeException( e.what(), _thread->current_frame()->file_id(), _position );
 						}
 					}
@@ -284,7 +284,7 @@ public:
 								int endWidth( 0 );
 								width = stoi( specRaw, &endWidth );
 								specRaw.shift_left( endWidth );
-							} catch ( HException const& e ) {
+							} catch ( hcore::HException const& e ) {
 								ensure( false, e.what() );
 							}
 						}
@@ -300,7 +300,7 @@ public:
 						}
 					}
 					if ( ( type == HHuginn::TYPE::INTEGER ) && ( base != BASE::DEC ) ) {
-						formatedValue.assign( int_to_str( static_cast<HHuginn::HInteger const*>( v.raw() )->value(), base, prefix ) );
+						formatedValue.assign( int_to_str( static_cast<huginn::HInteger const*>( v.raw() )->value(), base, prefix ) );
 					} else if ( ( ( type == HHuginn::TYPE::REAL ) || ( type == HHuginn::TYPE::NUMBER ) ) && ( prec >= 0 ) ) {
 						if ( type == HHuginn::TYPE::REAL ) {
 							static int const FMT_SIZE( 32 );
@@ -311,18 +311,18 @@ public:
 							int charCount( snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, prec >= 0 ? fmt : "%Lf", get_real( v ) ) );
 							formatedValue.assign( buffer, charCount );
 						} else if ( prec >= 0 ) {
-							HNumber n( get_number( v ) );
+							hcore::HNumber n( get_number( v ) );
 							n.round( prec );
 							formatedValue = n.to_string();
 						} else {
 							formatedValue = get_number( v ).to_string();
 						}
-						HString::size_type dotPos( formatedValue.find( '.'_ycp ) );
-						if ( dotPos == HString::npos ) {
+						hcore::HString::size_type dotPos( formatedValue.find( '.'_ycp ) );
+						if ( dotPos == hcore::HString::npos ) {
 							dotPos = formatedValue.get_length();
 							formatedValue.push_back( '.'_ycp );
 						}
-						HString::size_type realPrec( formatedValue.get_length() - dotPos - 1 );
+						hcore::HString::size_type realPrec( formatedValue.get_length() - dotPos - 1 );
 						if ( realPrec > prec ) {
 							formatedValue.erase( dotPos + 1 + prec );
 						} else if ( prec > realPrec ) {
@@ -330,7 +330,7 @@ public:
 						}
 					} else {
 						HHuginn::value_t sv( instruction::string( _thread, _values[idx], _position ) );
-						formatedValue.assign( static_cast<HHuginn::HString*>( sv.raw() )->value() );
+						formatedValue.assign( static_cast<HString*>( sv.raw() )->value() );
 					}
 					if ( width > formatedValue.get_length() ) {
 						int space( static_cast<int>( width - formatedValue.get_length() ) );
@@ -371,9 +371,9 @@ private:
 
 inline HHuginn::value_t format( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
-	HString const& fmt( static_cast<HHuginn::HString*>( object_->raw() )->value() );
+	hcore::HString const& fmt( static_cast<HString*>( object_->raw() )->value() );
 	HHuginn::value_t v( thread_->object_factory().create_string() );
-	HString& s( static_cast<HHuginn::HString*>( v.raw() )->value() );
+	hcore::HString& s( static_cast<HString*>( v.raw() )->value() );
 	HHuginnStringFormatter hsf( thread_, fmt, s, values_, position_ );
 	hsf.format();
 	return ( v );
@@ -383,21 +383,21 @@ inline HHuginn::value_t format( huginn::HThread* thread_, HHuginn::value_t* obje
 inline HHuginn::value_t replace( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_signature( "string.replace", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, thread_, position_ );
-	static_cast<HHuginn::HString*>( object_->raw() )->value().replace( get_string( values_[0] ), get_string( values_[1] ) );
+	static_cast<HString*>( object_->raw() )->value().replace( get_string( values_[0] ), get_string( values_[1] ) );
 	return ( *object_ );
 	M_EPILOG
 }
 
-inline HHuginn::value_t strip( HString&( HString::* trim_ )( HString const& ), huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+inline HHuginn::value_t strip( hcore::HString&( hcore::HString::* trim_ )( hcore::HString const& ), huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "string.strip";
 	verify_arg_count( name, values_, 0, 1, thread_, position_ );
-	HString const* trimChars( nullptr );
+	hcore::HString const* trimChars( nullptr );
 	if ( values_.get_size() > 0 ) {
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, ARITY::UNARY, thread_, position_ );
 		trimChars = &get_string( values_[0] );
 	}
-	HString dest( get_string( object_->raw() ) );
+	hcore::HString dest( get_string( object_->raw() ) );
 	int long len( dest.get_length() );
 	if ( trimChars ) {
 		(dest.*trim_)( *trimChars );
@@ -417,7 +417,7 @@ inline HHuginn::value_t strip( HString&( HString::* trim_ )( HString const& ), h
 inline HHuginn::value_t to_lower( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "string.to_lower", values_, 0, 0, thread_, position_ );
-	static_cast<HHuginn::HString*>( object_->raw() )->value().lower();
+	static_cast<HString*>( object_->raw() )->value().lower();
 	return ( *object_ );
 	M_EPILOG
 }
@@ -425,7 +425,7 @@ inline HHuginn::value_t to_lower( huginn::HThread* thread_, HHuginn::value_t* ob
 inline HHuginn::value_t to_upper( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "string.to_upper", values_, 0, 0, thread_, position_ );
-	static_cast<HHuginn::HString*>( object_->raw() )->value().upper();
+	static_cast<HString*>( object_->raw() )->value().upper();
 	return ( *object_ );
 	M_EPILOG
 }
@@ -433,7 +433,7 @@ inline HHuginn::value_t to_upper( huginn::HThread* thread_, HHuginn::value_t* ob
 inline HHuginn::value_t clear( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "string.clear", values_, 0, 0, thread_, position_ );
-	static_cast<HHuginn::HString*>( object_->raw() )->value().clear();
+	static_cast<HString*>( object_->raw() )->value().clear();
 	return ( *object_ );
 	M_EPILOG
 }
@@ -441,7 +441,7 @@ inline HHuginn::value_t clear( huginn::HThread* thread_, HHuginn::value_t* objec
 inline HHuginn::value_t starts_with( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_signature( "string.starts_with", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
-	hcore::HString const& subject( static_cast<HHuginn::HString*>( object_->raw() )->value() );
+	hcore::HString const& subject( static_cast<HString*>( object_->raw() )->value() );
 	hcore::HString const& object( get_string( values_[0] ) );
 	return ( thread_->runtime().boolean_value( object.is_empty() || ( subject.find( object ) == 0 ) ) );
 	M_EPILOG
@@ -450,7 +450,7 @@ inline HHuginn::value_t starts_with( huginn::HThread* thread_, HHuginn::value_t*
 inline HHuginn::value_t ends_with( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_signature( "string.ends_with", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
-	hcore::HString const& subject( static_cast<HHuginn::HString*>( object_->raw() )->value() );
+	hcore::HString const& subject( static_cast<HString*>( object_->raw() )->value() );
 	hcore::HString const& object( get_string( values_[0] ) );
 	int long pos( subject.find_last( object ) );
 	return (
@@ -462,17 +462,17 @@ inline HHuginn::value_t ends_with( huginn::HThread* thread_, HHuginn::value_t* o
 	M_EPILOG
 }
 
-class HStringClass : public HHuginn::HClass {
+class HStringClass : public HClass {
 public:
 	typedef HStringClass this_type;
-	typedef HHuginn::HClass base_type;
+	typedef HClass base_type;
 private:
 	HHuginn::class_t _reversedStringClass;
 public:
 	HStringClass(
 		HRuntime* runtime_,
 		HObjectFactory* objectFactory_
-	) : HHuginn::HClass(
+	) : HClass(
 			runtime_,
 			objectFactory_,
 			huginn::type_id( HHuginn::TYPE::STRING ),
@@ -483,12 +483,12 @@ public:
 		)
 		, _reversedStringClass( HReversedString::get_class( runtime_, this ) ) {
 		HHuginn::field_definitions_t fd{
-			{ "find",                 objectFactory_->create_method( &string::find,     "string.find",                 static_cast<finder_t>( &HString::find ),      0 ), "( *needle*, *from* ) - find position of substring *needle* that start not sooner than *from* position in the `string`" },
-			{ "find_last",            objectFactory_->create_method( &string::find,     "string.find_last",            static_cast<finder_t>( &HString::find_last ), hcore::HString::npos + 0 ), "( *needle*, *before* ) - find position of substring *needle* that ends just before *before* in the `string`" },
-			{ "find_one_of",          objectFactory_->create_method( &string::find_raw, "string.find_one_of",          static_cast<finder_raw_t>( &HString::find_one_of ), 0 ), "( *set* ) - find position of any of characters in given *set* that appears first in the `string` but not sooner than *from*" },
-			{ "find_last_one_of",     objectFactory_->create_method( &string::find_raw, "string.find_last_one_of",     static_cast<finder_raw_t>( &HString::find_last_one_of ), hcore::HString::npos + 0 ), "( *set* ) - find position of any characters from given *set* that appears last just before *before* position in the `string`" },
-			{ "find_other_than",      objectFactory_->create_method( &string::find_raw, "string.find_other_than",      static_cast<finder_raw_t>( &HString::find_other_than ), 0 ), "( *set* ) - find position of any of characters that is not present in given *set* that appears first in the `string` but not sooner than *from*"  },
-			{ "find_last_other_than", objectFactory_->create_method( &string::find_raw, "string.find_last_other_than", static_cast<finder_raw_t>( &HString::find_last_other_than ), hcore::HString::npos + 0 ), "( *set* ) - find position of any characters that in not present in given *set* that appears last just before *before* position in the `string`" },
+			{ "find",                 objectFactory_->create_method( &string::find,     "string.find",                 static_cast<finder_t>( &hcore::HString::find ),      0 ), "( *needle*, *from* ) - find position of substring *needle* that start not sooner than *from* position in the `string`" },
+			{ "find_last",            objectFactory_->create_method( &string::find,     "string.find_last",            static_cast<finder_t>( &hcore::HString::find_last ), hcore::HString::npos + 0 ), "( *needle*, *before* ) - find position of substring *needle* that ends just before *before* in the `string`" },
+			{ "find_one_of",          objectFactory_->create_method( &string::find_raw, "string.find_one_of",          static_cast<finder_raw_t>( &hcore::HString::find_one_of ), 0 ), "( *set* ) - find position of any of characters in given *set* that appears first in the `string` but not sooner than *from*" },
+			{ "find_last_one_of",     objectFactory_->create_method( &string::find_raw, "string.find_last_one_of",     static_cast<finder_raw_t>( &hcore::HString::find_last_one_of ), hcore::HString::npos + 0 ), "( *set* ) - find position of any characters from given *set* that appears last just before *before* position in the `string`" },
+			{ "find_other_than",      objectFactory_->create_method( &string::find_raw, "string.find_other_than",      static_cast<finder_raw_t>( &hcore::HString::find_other_than ), 0 ), "( *set* ) - find position of any of characters that is not present in given *set* that appears first in the `string` but not sooner than *from*"  },
+			{ "find_last_other_than", objectFactory_->create_method( &string::find_raw, "string.find_last_other_than", static_cast<finder_raw_t>( &hcore::HString::find_last_other_than ), hcore::HString::npos + 0 ), "( *set* ) - find position of any characters that in not present in given *set* that appears last just before *before* position in the `string`" },
 			{ "format",               objectFactory_->create_method( &string::format ),      "( *item...* ) - construct `string` based on *format template* using *item*s as format substitutions" },
 			{ "replace",              objectFactory_->create_method( &string::replace ),     "( *what*, *with* ) - replace all occurrences of *what* `string` with *with* `string`" },
 			{ "strip",                objectFactory_->create_method( &string::strip, &hcore::HString::trim ),       "( *set* ) - strip all occurrences of characters in *set* from both ends of the `string`" },
@@ -503,7 +503,7 @@ public:
 		redefine( nullptr, fd );
 		return;
 	}
-	HHuginn::HClass const* reversed_string_class( void ) const {
+	HClass const* reversed_string_class( void ) const {
 		return ( _reversedStringClass.raw() );
 	}
 protected:
@@ -529,24 +529,24 @@ HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const
 
 }
 
-}
-
-HHuginn::HString::HString( HHuginn::HClass const* class_, yaal::hcore::HString const& value_ )
+HString::HString( HClass const* class_, yaal::hcore::HString const& value_ )
 	: HIterable( class_ )
 	, _value( value_ ) {
 	return;
 }
 
-HHuginn::value_t HHuginn::HString::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
+HHuginn::value_t HString::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	return ( thread_->runtime().object_factory()->create_string( _value ) );
 }
 
-HHuginn::HIterable::iterator_t HHuginn::HString::do_iterator( huginn::HThread*, int ) {
+huginn::HIterable::iterator_t HString::do_iterator( huginn::HThread*, int ) {
 	return ( make_pointer<string::HStringIterator>( this ) );
 }
 
-int long HHuginn::HString::do_size( huginn::HThread*, int ) const {
+int long HString::do_size( huginn::HThread*, int ) const {
 	return ( _value.get_length() );
+}
+
 }
 
 }

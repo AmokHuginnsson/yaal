@@ -23,10 +23,10 @@ namespace huginn {
 
 namespace exception {
 
-class HExceptionClass : public HHuginn::HClass {
+class HExceptionClass : public huginn::HClass {
 public:
 	typedef HExceptionClass this_type;
-	typedef HHuginn::HClass base_type;
+	typedef huginn::HClass base_type;
 private:
 	HUTF8String _constructorName;
 	HUTF8String _whatName;
@@ -38,9 +38,9 @@ public:
 		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_,
 		HHuginn::identifier_id_t identifierId_,
-		HHuginn::HClass const* base_,
+		huginn::HClass const* base_,
 		yaal::hcore::HString const& doc_
-	) : HHuginn::HClass(
+	) : huginn::HClass(
 			runtime_,
 			typeId_,
 			identifierId_,
@@ -70,22 +70,22 @@ private:
 		M_PROLOG
 		verify_signature( _constructorName.c_str(), values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		thread_->current_frame()->set_position( position_ );
-		return ( thread_->object_factory().create<HHuginn::HException>( thread_, this, get_string( values_[0] ) ) );
+		return ( thread_->object_factory().create<huginn::HException>( thread_, this, get_string( values_[0] ) ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t what( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
-		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_->raw() ) );
+		huginn::HException* e( static_cast<huginn::HException*>( object_->raw() ) );
 		verify_arg_count(
 			static_cast<HExceptionClass const*>( e->get_class() )->_whatName.c_str(),
 			values_, 0, 0, thread_, position_
 		);
-		return ( thread_->object_factory().create_string( e->what() ) );
+		return ( thread_->object_factory().create_string( e->message() ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t where( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
-		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_->raw() ) );
+		huginn::HException* e( static_cast<huginn::HException*>( object_->raw() ) );
 		verify_arg_count(
 			static_cast<HExceptionClass const*>( e->get_class() )->_whereName.c_str(),
 			values_, 0, 0, thread_, position_
@@ -95,7 +95,7 @@ private:
 	}
 	static HHuginn::value_t trace( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
-		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_->raw() ) );
+		huginn::HException* e( static_cast<huginn::HException*>( object_->raw() ) );
 		verify_arg_count(
 			static_cast<HExceptionClass const*>( e->get_class() )->_traceName.c_str(),
 			values_, 0, 0, thread_, position_
@@ -103,7 +103,7 @@ private:
 		HHuginn::call_stack_t const& traceData( e->trace() );
 		HObjectFactory& of( thread_->object_factory() );
 		HHuginn::value_t traceValue( of.create_list() );
-		HHuginn::HList::values_t& traceList( static_cast<HHuginn::HList*>( traceValue.raw() )->value() );
+		huginn::HList::values_t& traceList( static_cast<huginn::HList*>( traceValue.raw() )->value() );
 		for ( HHuginn::HCallSite const& cs : traceData ) {
 			traceList.push_back( of.create<HStackFrameInfo>( of.stack_frame_info_class(), cs ) );
 		}
@@ -112,13 +112,13 @@ private:
 	}
 	static HHuginn::value_t message( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
-		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_->raw() ) );
+		huginn::HException* e( static_cast<huginn::HException*>( object_->raw() ) );
 		verify_arg_count(
 			static_cast<HExceptionClass const*>( e->get_class() )->_messageName.c_str(),
 			values_, 0, 0, thread_, position_
 		);
-		HString message( e->where() );
-		message.append( ": " ).append( e->what() );
+		hcore::HString message( e->where() );
+		message.append( ": " ).append( e->message() );
 		return ( thread_->object_factory().create_string( yaal::move( message ) ) );
 		M_EPILOG
 	}
@@ -147,7 +147,7 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 	M_EPILOG
 }
 
-HHuginn::class_t create_class( HRuntime* runtime_, yaal::hcore::HString const& name_, yaal::hcore::HString const& doc_, HHuginn::VISIBILITY visibility_, HHuginn::HClass const* base_ ) {
+HHuginn::class_t create_class( HRuntime* runtime_, yaal::hcore::HString const& name_, yaal::hcore::HString const& doc_, HHuginn::VISIBILITY visibility_, huginn::HClass const* base_ ) {
 	M_PROLOG
 	HHuginn::identifier_id_t classIdentifier( runtime_->identifier_id( name_ ) );
 	HHuginn::class_t c( runtime_ ? runtime_->get_class( classIdentifier ) : nullptr );
@@ -173,7 +173,7 @@ HHuginn::class_t create_class( HRuntime* runtime_, yaal::hcore::HString const& n
 	M_EPILOG
 }
 
-HStackFrameInfo::HStackFrameInfo( HHuginn::HClass const* class_, HHuginn::HCallSite const& callSite_ )
+HStackFrameInfo::HStackFrameInfo( huginn::HClass const* class_, HHuginn::HCallSite const& callSite_ )
 	: HValue( class_ )
 	, _callSite( callSite_ ) {
 }
@@ -251,38 +251,38 @@ HHuginn::class_t HStackFrameInfo::get_class( HRuntime* runtime_ ) {
 
 }
 
-}
-
-HHuginn::HException::HException( huginn::HThread* thread_, HHuginn::HClass const* class_, yaal::hcore::HString const& message_ )
+HException::HException( huginn::HThread* thread_, huginn::HClass const* class_, yaal::hcore::HString const& message_ )
 	: HValue( class_ )
 	, _message( message_ )
 	, _callStack( thread_->runtime().get_call_stack( thread_ ) ) {
 	return;
 }
 
-HHuginn::HException::HException( HHuginn::HClass const* class_, yaal::hcore::HString const& message_, HHuginn::call_stack_t const& callStack_ )
+HException::HException( huginn::HClass const* class_, yaal::hcore::HString const& message_, HHuginn::call_stack_t const& callStack_ )
 	: HValue( class_ )
 	, _message( message_ )
 	, _callStack( callStack_ ) {
 	return;
 }
 
-yaal::hcore::HString const& HHuginn::HException::what( void ) const {
+yaal::hcore::HString const& HException::message( void ) const {
 	return ( _message );
 }
 
-yaal::hcore::HString HHuginn::HException::where( void ) const {
+yaal::hcore::HString HException::where( void ) const {
 	HHuginn::HCallSite const& cs( _callStack.front() );
 	return ( to_string( cs.file() ).append( ":" ).append( cs.line() ).append( ":" ).append( cs.column() ) );
 }
 
-HHuginn::call_stack_t const& HHuginn::HException::trace( void ) const {
+HHuginn::call_stack_t const& HException::trace( void ) const {
 	return ( _callStack );
 }
 
-HHuginn::value_t HHuginn::HException::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
+HHuginn::value_t HException::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	HHuginn::value_t e( thread_->object_factory().create<HException>( get_class(), _message, _callStack ) );
 	return ( e );
+}
+
 }
 
 }

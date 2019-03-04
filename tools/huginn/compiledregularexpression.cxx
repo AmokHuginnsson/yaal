@@ -20,8 +20,8 @@ namespace tools {
 
 namespace huginn {
 
-HCompiledRegularExpression::HCompiledRegularExpression( HHuginn::HClass const* class_, regex_t regex_ )
-	: HHuginn::HValue( class_ )
+HCompiledRegularExpression::HCompiledRegularExpression( huginn::HClass const* class_, regex_t regex_ )
+	: huginn::HValue( class_ )
 	, _regex( yaal::move( regex_ ) ) {
 	return;
 }
@@ -56,18 +56,18 @@ HHuginn::value_t HCompiledRegularExpression::replace(
 	return ( cre->do_replace( thread_, values_, position_ ) );
 }
 
-class HCompiledRegularExpressionClass : public HHuginn::HClass {
+class HCompiledRegularExpressionClass : public huginn::HClass {
 	HHuginn::class_t const& _exceptionClass;
 	HHuginn::class_t _regularExpressionMatchClass;
 public:
 	typedef HCompiledRegularExpressionClass this_type;
-	typedef HHuginn::HClass base_type;
+	typedef huginn::HClass base_type;
 	HCompiledRegularExpressionClass(
 		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_,
-		HHuginn::HClass const* origin_,
+		huginn::HClass const* origin_,
 		HHuginn::class_t const& exceptionClass_
-	) : HHuginn::HClass(
+	) : huginn::HClass(
 			runtime_,
 			typeId_,
 			runtime_->identifier_id( "CompiledRegularExpression" ),
@@ -85,10 +85,10 @@ public:
 		redefine( nullptr, fd );
 		return;
 	}
-	HHuginn::HClass const* regular_expression_match_class( void ) const {
+	huginn::HClass const* regular_expression_match_class( void ) const {
 		return ( _regularExpressionMatchClass.raw() );
 	}
-	HHuginn::HClass const* exception_class( void ) const {
+	huginn::HClass const* exception_class( void ) const {
 		return ( _exceptionClass.raw() );
 	}
 private:
@@ -133,7 +133,7 @@ HHuginn::value_t HCompiledRegularExpression::do_replace(
 	HHuginn::value_t v;
 	try {
 		v = thread_->object_factory().create_string( _regex->replace( get_string( values_[0] ), get_string( values_[1] ) ) );
-	} catch ( HException const& e ) {
+	} catch ( hcore::HException const& e ) {
 		HCompiledRegularExpressionClass const* creClass( static_cast<HCompiledRegularExpressionClass const*>( HValue::get_class() ) );
 		thread_->raise( creClass->exception_class(), e.what(), position_ );
 	}
@@ -152,7 +152,7 @@ HHuginn::value_t HCompiledRegularExpression::do_groups(
 	HHuginn::value_t v( rt.none_value() );
 	if ( ! g.empty() ) {
 		v = thread_->object_factory().create_list();
-		HHuginn::HList* l( static_cast<HHuginn::HList*>( v.raw() ) );
+		huginn::HList* l( static_cast<huginn::HList*>( v.raw() ) );
 		for ( HRegex::HMatch const& m : g ) {
 			l->push_back( rt.object_factory()->create_string( string.substr( m.start(), m.size() ) ) );
 		}
@@ -160,7 +160,7 @@ HHuginn::value_t HCompiledRegularExpression::do_groups(
 	return ( v );
 }
 
-HHuginn::class_t HCompiledRegularExpression::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_, HHuginn::class_t const& exceptionClass_ ) {
+HHuginn::class_t HCompiledRegularExpression::get_class( HRuntime* runtime_, huginn::HClass const* origin_, HHuginn::class_t const& exceptionClass_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(

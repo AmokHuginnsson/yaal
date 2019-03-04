@@ -39,7 +39,7 @@ void HWhile::do_execute( huginn::HThread* thread_ ) const {
 			if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
 				throw HHuginn::HHuginnRuntimeException( "`While` argument is not a boolean.", file_id(), _condition->position() );
 			}
-			if ( static_cast<HHuginn::HBoolean*>( v.raw() )->value() ) {
+			if ( static_cast<HBoolean*>( v.raw() )->value() ) {
 				_loop->execute( thread_ );
 				f->continue_execution();
 			} else {

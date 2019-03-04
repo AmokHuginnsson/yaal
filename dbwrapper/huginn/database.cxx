@@ -25,11 +25,11 @@ namespace dbwrapper {
 
 namespace huginn {
 
-class HDatabase : public HHuginn::HValue {
+class HDatabase : public HValue {
 	HHuginn::class_t _databaseConnectionClass;
 	HHuginn::class_t _exceptionClass;
 public:
-	HDatabase( HHuginn::HClass* class_ )
+	HDatabase( HClass* class_ )
 		: HValue( class_ )
 		, _databaseConnectionClass( HDatabaseConnection::get_class( class_->runtime(), class_, _exceptionClass ) )
 		, _exceptionClass( class_exception( class_ ) ) {

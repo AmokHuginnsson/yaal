@@ -21,7 +21,7 @@ namespace tools {
 
 namespace huginn {
 
-HComplex::HComplex( huginn::HThread* thread_, HHuginn::HClass const* class_, HHuginn::values_t& values_, int position_ )
+HComplex::HComplex( huginn::HThread* thread_, HClass const* class_, HHuginn::values_t& values_, int position_ )
 	: HValue( class_ )
 	, _data() {
 	verify_signature( "Complex.constructor", values_, { HHuginn::TYPE::REAL, HHuginn::TYPE::REAL }, thread_, position_ );
@@ -29,7 +29,7 @@ HComplex::HComplex( huginn::HThread* thread_, HHuginn::HClass const* class_, HHu
 	return;
 }
 
-HComplex::HComplex( HHuginn::HClass const* class_, yaal::hcore::HComplex const& data_ )
+HComplex::HComplex( HClass const* class_, yaal::hcore::HComplex const& data_ )
 	: HValue( class_ )
 	, _data( data_ ) {
 }
@@ -121,7 +121,7 @@ HHuginn::value_t HComplex::divide( huginn::HThread* thread_, HHuginn::value_t* o
 	HComplex const* arg( static_cast<HComplex const*>( values_[0].raw() ) );
 	try {
 		o->_data /= arg->_data;
-	} catch ( HException const& e ) {
+	} catch ( hcore::HException const& e ) {
 		thread_->raise( thread_->object_factory().arithmetic_exception_class(), e.what(), position_ );
 		object_ = &thread_->runtime().none_value();
 	}
@@ -154,7 +154,7 @@ HHuginn::value_t HComplex::argument( huginn::HThread* thread_, HHuginn::value_t*
 	data_t::value_type arg( 0.L );
 	try {
 		arg = o->_data.argument();
-	} catch ( HException const& e ) {
+	} catch ( hcore::HException const& e ) {
 		thread_->raise( thread_->object_factory().arithmetic_exception_class(), e.what(), position_ );
 	}
 	return ( thread_->object_factory().create_real( arg ) );
@@ -167,24 +167,24 @@ HHuginn::value_t HComplex::to_string( huginn::HThread* thread_, HHuginn::value_t
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HComplex* o( static_cast<HComplex*>( object_->raw() ) );
 	HRuntime& rt( thread_->runtime() );
-	HString s( full_class_name( rt, *object_ ) );
+	hcore::HString s( full_class_name( rt, *object_ ) );
 	s.append( "(" ).append( o->_data.re() ).append( ", " ).append( o->_data.im() ).append( ")" );
 	return ( rt.object_factory()->create_string( yaal::move( s ) ) );
 	M_EPILOG
 }
 
-HHuginn::value_t HComplex::create_instance( HHuginn::HClass const* class_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
+HHuginn::value_t HComplex::create_instance( HClass const* class_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 	return ( thread_->object_factory().create<HComplex>( thread_, class_, values_, position_ ) );
 }
 
-HHuginn::class_t HComplex::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
+HHuginn::class_t HComplex::get_class( HRuntime* runtime_, HClass const* origin_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"Complex",
 			"The `Complex` class provides mathematical concept of complex numbers. It supports operations of addition, multiplication, subtraction, division, modulus and argument.",
 			HHuginn::ACCESS::PUBLIC,
-			HHuginn::HClass::TYPE::BUILTIN,
+			HClass::TYPE::BUILTIN,
 			origin_,
 			&HComplex::create_instance
 		)

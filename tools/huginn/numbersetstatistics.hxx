@@ -5,7 +5,7 @@
 #ifndef YAAL_TOOLS_HUGINN_NUMBERSETSTATISTICS_HXX_INCLUDED
 #define YAAL_TOOLS_HUGINN_NUMBERSETSTATISTICS_HXX_INCLUDED 1
 
-#include "tools/hhuginn.hxx"
+#include "tools/huginn/number.hxx"
 #include "tools/xmath.hxx"
 
 namespace yaal {
@@ -14,7 +14,7 @@ namespace tools {
 
 namespace huginn {
 
-class HNumberSetStatistics : public HHuginn::HValue {
+class HNumberSetStatistics : public HValue {
 public:
 	enum class DERIVATIVE_STAT {
 		RANGE,
@@ -28,13 +28,13 @@ public:
 private:
 	number_set_stats_t _stats;
 public:
-	HNumberSetStatistics( huginn::HThread*, HHuginn::HClass const*, HHuginn::values_t&, int );
+	HNumberSetStatistics( huginn::HThread*, HClass const*, HHuginn::values_t&, int );
 	static HHuginn::value_t stat( char const*, xmath::aggregate_type_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t derivative_stat( char const*, DERIVATIVE_STAT, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t count( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t histogram( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
-	static HHuginn::class_t get_class( HRuntime*, HHuginn::HClass const* );
-	static HHuginn::value_t create_instance( HHuginn::HClass const*, huginn::HThread*, HHuginn::values_t&, int );
+	static HHuginn::class_t get_class( HRuntime*, HClass const* );
+	static HHuginn::value_t create_instance( HClass const*, huginn::HThread*, HHuginn::values_t&, int );
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override __attribute__((noreturn));
 };

@@ -31,7 +31,7 @@ class HNetwork : public HPackage {
 	};
 	HHuginn::class_t _streamClass;
 public:
-	HNetwork( HHuginn::HClass* class_ )
+	HNetwork( HClass* class_ )
 		: HPackage( class_ )
 		, _streamClass( HStream::get_class( class_->runtime() ) ) {
 		return;
@@ -39,7 +39,7 @@ public:
 	static HHuginn::value_t resolve( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "Network.resolve", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
-		HString s;
+		hcore::HString s;
 		try {
 			s = resolver::ip_to_string( resolver::get_ip( get_string( values_[0] ) ) );
 		} catch ( HResolverException const& e ) {

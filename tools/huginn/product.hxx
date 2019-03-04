@@ -14,17 +14,17 @@ namespace tools {
 
 namespace huginn {
 
-class HProduct : public HHuginn::HIterable {
+class HProduct : public huginn::HIterable {
 public:
 	typedef yaal::hcore::HArray<HHuginn::values_t> axes_t;
 private:
 	axes_t _axes;
 public:
-	HProduct( HHuginn::HClass const* class_, axes_t&& source_ )
+	HProduct( huginn::HClass const* class_, axes_t&& source_ )
 		: HIterable( class_ )
 		, _axes( yaal::move( source_ ) ) {
 	}
-	static HHuginn::class_t get_class( HRuntime*, HHuginn::HClass const* );
+	static HHuginn::class_t get_class( HRuntime*, huginn::HClass const* );
 protected:
 	virtual int long do_size( huginn::HThread*, int ) const override {
 		int long s( 1 );

@@ -34,7 +34,7 @@ class HOperatingSystem : public HPackage {
 	HHuginn::class_t _streamClass;
 	HHuginn::class_t _subprocessClass;
 public:
-	HOperatingSystem( HHuginn::HClass* class_ )
+	HOperatingSystem( huginn::HClass* class_ )
 		: HPackage( class_ )
 		, _streamClass( HStream::get_class( class_->runtime() ) )
 		, _subprocessClass( HSubprocess::get_class( class_->runtime(), class_ ) ) {
@@ -53,7 +53,7 @@ public:
 			data.emplace_back( of.create_integer( ri.free() ) );
 			data.emplace_back( of.create_integer( ri.available() ) );
 			v = of.create_tuple( yaal::move( data ) );
-		} catch ( HException const& e ) {
+		} catch ( hcore::HException const& e ) {
 			HOperatingSystem* osc( static_cast<HOperatingSystem*>( object_->raw() ) );
 			thread_->raise( osc->exception_class(), e.what(), position_ );
 		}
@@ -67,7 +67,7 @@ public:
 		int nCPU( 0 );
 		try {
 			nCPU = system::get_core_count_info();
-		} catch ( HException const& e ) {
+		} catch ( hcore::HException const& e ) {
 			HOperatingSystem* osc( static_cast<HOperatingSystem*>( object_->raw() ) );
 			thread_->raise( osc->exception_class(), e.what(), position_ );
 		}
@@ -149,7 +149,7 @@ public:
 		try {
 			HOperatingSystem* o( static_cast<HOperatingSystem*>( object_->raw() ) );
 			v = thread_->object_factory().create<HSubprocess>( o->_subprocessClass.raw(), values_ );
-		} catch ( HException const& e ) {
+		} catch ( hcore::HException const& e ) {
 			thread_->raise( static_cast<HOperatingSystem*>( object_->raw() )->exception_class(), e.what(), position_ );
 		}
 		return ( v );

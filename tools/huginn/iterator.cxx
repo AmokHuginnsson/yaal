@@ -19,19 +19,19 @@ namespace tools {
 namespace huginn {
 
 
-HIterator::HIterator( HHuginn::HClass const* class_, HHuginn::value_t const& source_, HHuginn::HIterable::iterator_t const& impl_ )
+HIterator::HIterator( huginn::HClass const* class_, HHuginn::value_t const& source_, huginn::HIterable::iterator_t const& impl_ )
 	: HIterable( class_ )
 	, _source( source_ )
 	, _impl( impl_ ) {
 }
 
-HHuginn::HIterable::iterator_t HIterator::do_iterator( HThread*, int ) {
+huginn::HIterable::iterator_t HIterator::do_iterator( HThread*, int ) {
 	return ( _impl );
 }
 
 int long HIterator::do_size( huginn::HThread* thread_, int position_ ) const {
 	M_PROLOG
-	return ( static_cast<HHuginn::HIterable const*>( _source.raw() )->size( thread_, position_ ) );
+	return ( static_cast<huginn::HIterable const*>( _source.raw() )->size( thread_, position_ ) );
 	M_EPILOG
 }
 
@@ -41,7 +41,7 @@ HHuginn::value_t HIterator::do_clone( huginn::HThread* thread_, HHuginn::value_t
 		thread_->object_factory().create<HIterator>(
 			HIterable::get_class(),
 			s,
-			static_cast<HHuginn::HIterable*>( s.raw() )->iterator( thread_, position_ )
+			static_cast<huginn::HIterable*>( s.raw() )->iterator( thread_, position_ )
 		)
 	);
 }
@@ -71,7 +71,7 @@ HHuginn::value_t HIterator::next( huginn::HThread* thread_, HHuginn::value_t* ob
 	M_EPILOG
 }
 
-HHuginn::class_t HIterator::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
+HHuginn::class_t HIterator::get_class( HRuntime* runtime_, huginn::HClass const* origin_ ) {
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"Iterator",
@@ -104,18 +104,18 @@ HHuginn::class_t HIterableAdaptor::get_class( HRuntime* runtime_ ) {
 	M_EPILOG
 }
 
-HIterableAdaptor::HIterableAdaptor( HHuginn::HClass const* class_, HHuginn::value_t const& source_ )
-	: HHuginn::HIterable( class_ )
+HIterableAdaptor::HIterableAdaptor( huginn::HClass const* class_, HHuginn::value_t const& source_ )
+	: huginn::HIterable( class_ )
 	, _source( source_ ) {
-	M_ASSERT( dynamic_cast<HHuginn::HObject*>( _source.raw() ) );
+	M_ASSERT( dynamic_cast<HObject*>( _source.raw() ) );
 	return;
 }
 
-HHuginn::HIterable::iterator_t HIterableAdaptor::do_iterator( HThread* thread_, int position_ ) {
+huginn::HIterable::iterator_t HIterableAdaptor::do_iterator( HThread* thread_, int position_ ) {
 	M_PROLOG
-	HHuginn::HObject* obj( static_cast<HHuginn::HObject*>( _source.raw() ) );
+	HObject* obj( static_cast<HObject*>( _source.raw() ) );
 	HHuginn::value_t itVal( obj->call_method( thread_, _source, IDENTIFIER::INTERFACE::ITERATOR, HArguments( thread_ ), position_ ) );
-	HHuginn::HObject* itObj( dynamic_cast<HHuginn::HObject*>( itVal.raw() ) );
+	HObject* itObj( dynamic_cast<HObject*>( itVal.raw() ) );
 	if ( ! itObj ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"User defined `iterable`, "_ys
@@ -132,7 +132,7 @@ HHuginn::HIterable::iterator_t HIterableAdaptor::do_iterator( HThread* thread_, 
 }
 
 int long HIterableAdaptor::do_size( huginn::HThread* thread_, int position_ ) const {
-	HHuginn::HObject const* obj( static_cast<HHuginn::HObject const*>( _source.raw() ) );
+	HObject const* obj( static_cast<HObject const*>( _source.raw() ) );
 	HHuginn::value_t sizeVal( obj->call_method( thread_, _source, IDENTIFIER::INTERFACE::GET_SIZE, HArguments( thread_ ), position_ ) );
 	if ( sizeVal->type_id() != HHuginn::TYPE::INTEGER ) {
 		throw HHuginn::HHuginnRuntimeException(
@@ -160,14 +160,14 @@ HIterableAdaptorIterator::HIterableAdaptorIterator( HThread* thread_, HHuginn::v
 	, _isValidMethod()
 	, _valueMethod()
 	, _nextMethod() {
-	M_ASSERT( dynamic_cast<HHuginn::HObject*>( _iterator.raw() ) );
-	HHuginn::HObject* it( static_cast<HHuginn::HObject*>( _iterator.raw() ) );
+	M_ASSERT( dynamic_cast<HObject*>( _iterator.raw() ) );
+	HObject* it( static_cast<HObject*>( _iterator.raw() ) );
 	HHuginn::value_t isValidField( it->get_method( thread_, _iterator, IDENTIFIER::INTERFACE::IS_VALID, position_ ) );
-	HHuginn::HClass::HBoundMethod* isValidMethod( static_cast<HHuginn::HClass::HBoundMethod*>( isValidField.raw() ) );
+	huginn::HClass::HBoundMethod* isValidMethod( static_cast<huginn::HClass::HBoundMethod*>( isValidField.raw() ) );
 	HHuginn::value_t valueField( it->get_method( thread_, _iterator, IDENTIFIER::INTERFACE::VALUE, position_ ) );
-	HHuginn::HClass::HBoundMethod* valueMethod( static_cast<HHuginn::HClass::HBoundMethod*>( valueField.raw() ) );
+	huginn::HClass::HBoundMethod* valueMethod( static_cast<huginn::HClass::HBoundMethod*>( valueField.raw() ) );
 	HHuginn::value_t nextField( it->get_method( thread_, _iterator, IDENTIFIER::INTERFACE::NEXT, position_ ) );
-	HHuginn::HClass::HBoundMethod* nextMethod( static_cast<HHuginn::HClass::HBoundMethod*>( nextField.raw() ) );
+	huginn::HClass::HBoundMethod* nextMethod( static_cast<huginn::HClass::HBoundMethod*>( nextField.raw() ) );
 	_isValidMethod = isValidMethod->function();
 	_valueMethod = valueMethod->function();
 	_nextMethod = nextMethod->function();
@@ -200,16 +200,16 @@ void HIterableAdaptorIterator::do_next( HThread* thread_, int position_ ) {
 
 }
 
-HHuginn::HIterable::HIterable( HClass const* class_ )
+huginn::HIterable::HIterable( HClass const* class_ )
 	: HValue( class_ ) {
 	return;
 }
 
-HHuginn::HIterable::iterator_t HHuginn::HIterable::iterator( huginn::HThread* thread_, int position_ ) {
+huginn::HIterable::iterator_t huginn::HIterable::iterator( huginn::HThread* thread_, int position_ ) {
 	return ( do_iterator( thread_, position_ ) );
 }
 
-int long HHuginn::HIterable::size( huginn::HThread* thread_, int position_ ) const {
+int long huginn::HIterable::size( huginn::HThread* thread_, int position_ ) const {
 	return ( do_size( thread_, position_ ) );
 }
 

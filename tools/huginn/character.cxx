@@ -28,8 +28,8 @@ inline HHuginn::value_t to_lower( huginn::HThread* thread_, HHuginn::value_t* ob
 	M_PROLOG
 	char const name[] = "character.to_lower";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
-	HHuginn::HCharacter* c( static_cast<HHuginn::HCharacter*>( object_->raw() ) );
-	c->set( HHuginn::HCharacter::value_type( static_cast<yaal::u32_t>( std::towlower( static_cast<wint_t>( c->value().get() ) ) ) ) );
+	HCharacter* c( static_cast<HCharacter*>( object_->raw() ) );
+	c->set( HCharacter::value_type( static_cast<yaal::u32_t>( std::towlower( static_cast<wint_t>( c->value().get() ) ) ) ) );
 	return ( *object_ );
 	M_EPILOG
 }
@@ -38,8 +38,8 @@ inline HHuginn::value_t to_upper( huginn::HThread* thread_, HHuginn::value_t* ob
 	M_PROLOG
 	char const name[] = "character.to_upper";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
-	HHuginn::HCharacter* c( static_cast<HHuginn::HCharacter*>( object_->raw() ) );
-	c->set( HHuginn::HCharacter::value_type( static_cast<yaal::u32_t>( std::towupper( static_cast<wint_t>( c->value().get() ) ) ) ) );
+	HCharacter* c( static_cast<HCharacter*>( object_->raw() ) );
+	c->set( HCharacter::value_type( static_cast<yaal::u32_t>( std::towupper( static_cast<wint_t>( c->value().get() ) ) ) ) );
 	return ( *object_ );
 	M_EPILOG
 }
@@ -47,7 +47,7 @@ inline HHuginn::value_t to_upper( huginn::HThread* thread_, HHuginn::value_t* ob
 inline HHuginn::value_t is_of_a_kind( char const* name, bool (*isofakind)( code_point_t ), huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
-	HHuginn::HCharacter* c( static_cast<HHuginn::HCharacter*>( object_->raw() ) );
+	HCharacter* c( static_cast<HCharacter*>( object_->raw() ) );
 	return ( thread_->runtime().boolean_value( isofakind( c->value() ) != 0 ) );
 	M_EPILOG
 }
@@ -57,7 +57,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 	M_PROLOG
 
 	HHuginn::class_t c(
-		make_pointer<HHuginn::HClass>(
+		make_pointer<huginn::HClass>(
 			runtime_,
 			objectFactory_,
 			type_id( HHuginn::TYPE::CHARACTER ),
@@ -87,18 +87,18 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 
 }
 
-HHuginn::HCharacter::HCharacter( HHuginn::HClass const* class_, HHuginn::HCharacter::value_type value_ )
+HCharacter::HCharacter( huginn::HClass const* class_, HCharacter::value_type value_ )
 	: HValue( class_ )
 	, _value( value_ ) {
 	return;
 }
 
-void HHuginn::HCharacter::set( value_type value_ ) {
+void HCharacter::set( value_type value_ ) {
 	_value = value_;
 	return;
 }
 
-HHuginn::value_t HHuginn::HCharacter::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
+HHuginn::value_t HCharacter::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	return ( thread_->runtime().object_factory()->create_character( _value ) );
 }
 

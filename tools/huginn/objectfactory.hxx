@@ -7,6 +7,25 @@
 #define YAAL_TOOLS_HUGINN_OBJECTFACTORY_HXX_INCLUDED 1
 
 #include "tools/hhuginn.hxx"
+#include "tools/huginn/reference.hxx"
+#include "tools/huginn/boolean.hxx"
+#include "tools/huginn/integer.hxx"
+#include "tools/huginn/real.hxx"
+#include "tools/huginn/string.hxx"
+#include "tools/huginn/number.hxx"
+#include "tools/huginn/character.hxx"
+#include "tools/huginn/tuple.hxx"
+#include "tools/huginn/list.hxx"
+#include "tools/huginn/deque.hxx"
+#include "tools/huginn/dict.hxx"
+#include "tools/huginn/order.hxx"
+#include "tools/huginn/lookup.hxx"
+#include "tools/huginn/set.hxx"
+#include "tools/huginn/blob.hxx"
+#include "tools/huginn/taggedvalue.hxx"
+#include "tools/huginn/object.hxx"
+#include "tools/huginn/functionreference.hxx"
+#include "tools/huginn/method.hxx"
 
 namespace yaal {
 
@@ -104,11 +123,11 @@ class HObjectPool;
 template<typename T>
 class HObjectPool<T, POOL_TYPE::SCALAR> : public HObjectPoolBase<T> {
 #pragma GCC diagnostic pop
-	HHuginn::HClass const* _class;
+	huginn::HClass const* _class;
 public:
 	typedef HObjectPoolBase<T> base_type;
 	typedef typename base_type::allocator_t allocator_t;
-	HObjectPool( HObjectFactoryBase* objectFactory_, HHuginn::HClass const* class_ )
+	HObjectPool( HObjectFactoryBase* objectFactory_, huginn::HClass const* class_ )
 		: base_type( objectFactory_ )
 		, _class( class_ ) {
 		return;
@@ -127,13 +146,13 @@ private:
 template<typename T>
 class HObjectPool<T, POOL_TYPE::COLLECTION> : public HObjectPoolBase<T> {
 #pragma GCC diagnostic pop
-	HHuginn::HClass const* _class;
+	huginn::HClass const* _class;
 	typename T::pool_t _nodePool;
 	typename T::allocator_t _nodeAllocator;
 public:
 	typedef HObjectPoolBase<T> base_type;
 	typedef typename base_type::allocator_t allocator_t;
-	HObjectPool( HObjectFactoryBase* objectFactory_, HHuginn::HClass const* class_ )
+	HObjectPool( HObjectFactoryBase* objectFactory_, huginn::HClass const* class_ )
 		: base_type( objectFactory_ )
 		, _class( class_ )
 		, _nodePool()
@@ -168,8 +187,8 @@ public:
 };
 
 class HObjectFactory final : public HObjectFactoryBase {
-	HObjectPool<HHuginn::HTaggedValue, POOL_TYPE::CLASSLESS> _taggedValuePool;
-	HObjectPool<HHuginn::HObject, POOL_TYPE::CLASSLESS> _objectPool;
+	HObjectPool<huginn::HTaggedValue, POOL_TYPE::CLASSLESS> _taggedValuePool;
+	HObjectPool<huginn::HObject, POOL_TYPE::CLASSLESS> _objectPool;
 	/* Language semantics classes. */
 	HHuginn::class_t _none;
 	HHuginn::class_t _observer;
@@ -182,11 +201,11 @@ class HObjectFactory final : public HObjectFactoryBase {
 	HHuginn::class_t _variadicParameters;
 	HHuginn::class_t _namedParameters;
 	/* Language semantics pools. */
-	HObjectPool<HHuginn::HReference> _referencePool;
-	HObjectPool<HHuginn::HFunctionReference> _functionReferencePool;
-	HObjectPool<HHuginn::HClass::HMethod> _methodPool;
-	HObjectPool<HHuginn::HClass::HUnboundMethod> _unboundMethodPool;
-	HObjectPool<HHuginn::HClass::HBoundMethod> _boundMethodPool;
+	HObjectPool<huginn::HReference> _referencePool;
+	HObjectPool<huginn::HFunctionReference> _functionReferencePool;
+	HObjectPool<huginn::HClass::HMethod> _methodPool;
+	HObjectPool<huginn::HClass::HUnboundMethod> _unboundMethodPool;
+	HObjectPool<huginn::HClass::HBoundMethod> _boundMethodPool;
 	/* Built-in classes. */
 	HHuginn::class_t _boolean;
 	HHuginn::class_t _integer;
@@ -211,19 +230,19 @@ class HObjectFactory final : public HObjectFactoryBase {
 	HHuginn::value_t _true;
 	HHuginn::value_t _false;
 	/* Explicit pools. */
-	HObjectPool<HHuginn::HString> _stringPool;
-	HObjectPool<HHuginn::HInteger> _integerPool;
-	HObjectPool<HHuginn::HReal> _realPool;
-	HObjectPool<HHuginn::HNumber> _numberPool;
-	HObjectPool<HHuginn::HCharacter> _characterPool;
-	HObjectPool<HHuginn::HTuple> _tuplePool;
-	HObjectPool<HHuginn::HList> _listPool;
-	HObjectPool<HHuginn::HDeque> _dequePool;
-	HObjectPool<HHuginn::HDict, POOL_TYPE::COLLECTION> _dictPool;
-	HObjectPool<HHuginn::HLookup, POOL_TYPE::COLLECTION> _lookupPool;
-	HObjectPool<HHuginn::HOrder, POOL_TYPE::COLLECTION> _orderPool;
-	HObjectPool<HHuginn::HSet, POOL_TYPE::COLLECTION> _setPool;
-	HObjectPool<HHuginn::HBlob> _blobPool;
+	HObjectPool<huginn::HString> _stringPool;
+	HObjectPool<huginn::HInteger> _integerPool;
+	HObjectPool<huginn::HReal> _realPool;
+	HObjectPool<huginn::HNumber> _numberPool;
+	HObjectPool<huginn::HCharacter> _characterPool;
+	HObjectPool<huginn::HTuple> _tuplePool;
+	HObjectPool<huginn::HList> _listPool;
+	HObjectPool<huginn::HDeque> _dequePool;
+	HObjectPool<huginn::HDict, POOL_TYPE::COLLECTION> _dictPool;
+	HObjectPool<huginn::HLookup, POOL_TYPE::COLLECTION> _lookupPool;
+	HObjectPool<huginn::HOrder, POOL_TYPE::COLLECTION> _orderPool;
+	HObjectPool<huginn::HSet, POOL_TYPE::COLLECTION> _setPool;
+	HObjectPool<huginn::HBlob> _blobPool;
 public:
 	HObjectFactory( HRuntime* );
 	void register_builtin_classes( void );
@@ -236,7 +255,7 @@ public:
 	HHuginn::value_t const& false_value( void ) const {
 		return ( _false );
 	}
-	HHuginn::value_t create_integer( HHuginn::HInteger::value_type value_ ) const {
+	HHuginn::value_t create_integer( huginn::HInteger::value_type value_ ) const {
 		return ( _integerPool.create( value_ ) );
 	}
 	HHuginn::value_t create_string( yaal::hcore::HString const& value_ = yaal::hcore::HString() ) const {
@@ -245,16 +264,16 @@ public:
 	HHuginn::value_t create_string( yaal::hcore::HString&& value_ ) const {
 		return ( _stringPool.create( yaal::move( value_ ) ) );
 	}
-	HHuginn::value_t create_real( HHuginn::HReal::value_type value_ ) const {
+	HHuginn::value_t create_real( huginn::HReal::value_type value_ ) const {
 		return ( _realPool.create( value_ ) );
 	}
-	HHuginn::value_t create_number( HHuginn::HNumber::value_type const& value_ ) const {
+	HHuginn::value_t create_number( huginn::HNumber::value_type const& value_ ) const {
 		return ( _numberPool.create( value_ ) );
 	}
-	HHuginn::value_t create_number( HHuginn::HNumber::value_type&& value_ ) const {
+	HHuginn::value_t create_number( huginn::HNumber::value_type&& value_ ) const {
 		return ( _numberPool.create( yaal::move( value_ ) ) );
 	}
-	HHuginn::value_t create_character( HHuginn::HCharacter::value_type value_ ) const {
+	HHuginn::value_t create_character( huginn::HCharacter::value_type value_ ) const {
 		return ( _characterPool.create( value_ ) );
 	}
 	HHuginn::value_t create_tuple( HHuginn::values_t&& values_ = HHuginn::values_t() ) const {
@@ -263,7 +282,7 @@ public:
 	HHuginn::value_t create_list( HHuginn::values_t&& values_ = HHuginn::values_t() ) const {
 		return ( _listPool.create( yaal::move( values_ ) ) );
 	}
-	HHuginn::value_t create_deque( HHuginn::HDeque::values_t&& values_ = HHuginn::HDeque::values_t() ) const {
+	HHuginn::value_t create_deque( huginn::HDeque::values_t&& values_ = huginn::HDeque::values_t() ) const {
 		return ( _dequePool.create( yaal::move( values_ ) ) );
 	}
 	HHuginn::value_t create_dict( void ) const {
@@ -284,10 +303,10 @@ public:
 	HHuginn::value_t create_reference( HHuginn::value_t& value_ ) const {
 		return ( _referencePool.create( &value_ ) );
 	}
-	HHuginn::value_t create_tagged_value( HHuginn::value_t const& value_, HHuginn::HClass const* tag_ ) const {
+	HHuginn::value_t create_tagged_value( HHuginn::value_t const& value_, huginn::HClass const* tag_ ) const {
 		return ( _taggedValuePool.create( value_, tag_ ) );
 	}
-	HHuginn::value_t create_function_reference( HHuginn::identifier_id_t identifierId_, HHuginn::function_t const& function_, yaal::hcore::HString const& doc_, HHuginn::HClass const* juncture_ = nullptr ) const {
+	HHuginn::value_t create_function_reference( HHuginn::identifier_id_t identifierId_, HHuginn::function_t const& function_, yaal::hcore::HString const& doc_, huginn::HClass const* juncture_ = nullptr ) const {
 		return ( _functionReferencePool.create( identifierId_, function_, doc_, juncture_ ) );
 	}
 	template<typename... T>
@@ -299,103 +318,103 @@ public:
 	HHuginn::value_t create_method_raw( HHuginn::function_t const& method_ ) const {
 		return ( _methodPool.create( method_ ) );
 	}
-	HHuginn::value_t create_unbound_method( HHuginn::HClass const* juncture_, HHuginn::function_t const& method_ ) const {
+	HHuginn::value_t create_unbound_method( huginn::HClass const* juncture_, HHuginn::function_t const& method_ ) const {
 		return ( _unboundMethodPool.create( juncture_, method_ ) );
 	}
 	HHuginn::value_t create_bound_method( HHuginn::function_t const& method_, HHuginn::value_t const& object_ ) const {
 		return ( _boundMethodPool.create( method_, object_ ) );
 	}
-	HHuginn::value_t create_object( HHuginn::HClass const* class_, HHuginn::HObject::fields_t const& fields_ ) const {
+	HHuginn::value_t create_object( huginn::HClass const* class_, HObject::fields_t const& fields_ ) const {
 		return ( _objectPool.create( class_, fields_ ) );
 	}
-	HHuginn::HClass const* none_class( void ) const {
+	huginn::HClass const* none_class( void ) const {
 		return ( _none.raw() );
 	}
-	HHuginn::HClass const* observer_class( void ) const {
+	huginn::HClass const* observer_class( void ) const {
 		return ( _observer.raw() );
 	}
-	HHuginn::HClass const* reference_class( void ) const {
+	huginn::HClass const* reference_class( void ) const {
 		return ( _reference.raw() );
 	}
-	HHuginn::HClass const* function_reference_class( void ) const {
+	huginn::HClass const* function_reference_class( void ) const {
 		return ( _functionReference.raw() );
 	}
-	HHuginn::HClass const* object_reference_class( void ) const {
+	huginn::HClass const* object_reference_class( void ) const {
 		return ( _objectReference.raw() );
 	}
-	HHuginn::HClass const* method_class( void ) const {
+	huginn::HClass const* method_class( void ) const {
 		return ( _method.raw() );
 	}
-	HHuginn::HClass const* unbound_method_class( void ) const {
+	huginn::HClass const* unbound_method_class( void ) const {
 		return ( _unboundMethod.raw() );
 	}
-	HHuginn::HClass const* bound_method_class( void ) const {
+	huginn::HClass const* bound_method_class( void ) const {
 		return ( _boundMethod.raw() );
 	}
-	HHuginn::HClass const* variadic_parameters_class( void ) const {
+	huginn::HClass const* variadic_parameters_class( void ) const {
 		return ( _variadicParameters.raw() );
 	}
-	HHuginn::HClass const* named_parameters_class( void ) const {
+	huginn::HClass const* named_parameters_class( void ) const {
 		return ( _namedParameters.raw() );
 	}
-	HHuginn::HClass const* integer_class( void ) const {
+	huginn::HClass const* integer_class( void ) const {
 		return ( _integer.raw() );
 	}
-	HHuginn::HClass const* real_class( void ) const {
+	huginn::HClass const* real_class( void ) const {
 		return ( _real.raw() );
 	}
-	HHuginn::HClass const* string_class( void ) const {
+	huginn::HClass const* string_class( void ) const {
 		return ( _string.raw() );
 	}
-	HHuginn::HClass const* number_class( void ) const {
+	huginn::HClass const* number_class( void ) const {
 		return ( _number.raw() );
 	}
-	HHuginn::HClass const* character_class( void ) const {
+	huginn::HClass const* character_class( void ) const {
 		return ( _character.raw() );
 	}
-	HHuginn::HClass const* boolean_class( void ) const {
+	huginn::HClass const* boolean_class( void ) const {
 		return ( _boolean.raw() );
 	}
-	HHuginn::HClass const* tuple_class( void ) const {
+	huginn::HClass const* tuple_class( void ) const {
 		return ( _tuple.raw() );
 	}
-	HHuginn::HClass const* list_class( void ) const {
+	huginn::HClass const* list_class( void ) const {
 		return ( _list.raw() );
 	}
-	HHuginn::HClass const* deque_class( void ) const {
+	huginn::HClass const* deque_class( void ) const {
 		return ( _deque.raw() );
 	}
-	HHuginn::HClass const* dict_class( void ) const {
+	huginn::HClass const* dict_class( void ) const {
 		return ( _dict.raw() );
 	}
-	HHuginn::HClass const* lookup_class( void ) const {
+	huginn::HClass const* lookup_class( void ) const {
 		return ( _lookup.raw() );
 	}
-	HHuginn::HClass const* order_class( void ) const {
+	huginn::HClass const* order_class( void ) const {
 		return ( _order.raw() );
 	}
-	HHuginn::HClass const* set_class( void ) const {
+	huginn::HClass const* set_class( void ) const {
 		return ( _set.raw() );
 	}
-	HHuginn::HClass const* blob_class( void ) const {
+	huginn::HClass const* blob_class( void ) const {
 		return ( _blob.raw() );
 	}
-	HHuginn::HClass const* exception_class( void ) const {
+	huginn::HClass const* exception_class( void ) const {
 		return ( _exception.raw() );
 	}
-	HHuginn::HClass const* stack_frame_info_class( void ) const {
+	huginn::HClass const* stack_frame_info_class( void ) const {
 		return ( _stackFrameInfo.raw() );
 	}
-	HHuginn::HClass const* runtime_exception_class( void ) const {
+	huginn::HClass const* runtime_exception_class( void ) const {
 		return ( _runtimeException.raw() );
 	}
-	HHuginn::HClass const* conversion_exception_class( void ) const {
+	huginn::HClass const* conversion_exception_class( void ) const {
 		return ( _conversionException.raw() );
 	}
-	HHuginn::HClass const* arithmetic_exception_class( void ) const {
+	huginn::HClass const* arithmetic_exception_class( void ) const {
 		return ( _arithmeticException.raw() );
 	}
-	HHuginn::HClass const* iterable_adaptor_class( void ) const {
+	huginn::HClass const* iterable_adaptor_class( void ) const {
 		return ( _iterableAdaptor.raw() );
 	}
 	template<typename T, typename... args_t>

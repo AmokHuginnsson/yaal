@@ -9,6 +9,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "thread.hxx"
 #include "instruction.hxx"
 #include "booleanevaluator.hxx"
+#include "ternaryevaluator.hxx"
 #include "helper.hxx"
 #include "keyword.hxx"
 #include "objectfactory.hxx"
@@ -489,7 +490,7 @@ void HExpression::set_variable( OExecutionStep const& es_, HFrame* frame_ ) {
 			if ( src->type_id() != HHuginn::TYPE::TUPLE ) {
 				throw HHuginn::HHuginnRuntimeException( "Assigner is not a `tuple` object.", file_id(), p );
 			}
-			HHuginn::HTuple::values_t& srcData( static_cast<HHuginn::HTuple*>( src.raw() )->value() );
+			huginn::HTuple::values_t& srcData( static_cast<huginn::HTuple*>( src.raw() )->value() );
 			int ds( static_cast<int>( srcData.get_size() ) );
 			if ( ds != es_._index ) {
 				throw HHuginn::HHuginnRuntimeException(
@@ -500,12 +501,12 @@ void HExpression::set_variable( OExecutionStep const& es_, HFrame* frame_ ) {
 					p
 				);
 			}
-			HHuginn::HTuple::values_t data( es_._index );
+			huginn::HTuple::values_t data( es_._index );
 			for ( int i( ds - 1 ); i >= 0; -- i ) {
 				HHuginn::value_t dst( yaal::move( values.top() ) );
 				values.pop();
 				M_ASSERT( dst->type_id() == HHuginn::TYPE::REFERENCE );
-				HHuginn::HReference& ref( *static_cast<HHuginn::HReference*>( dst.raw() ) );
+				HReference& ref( *static_cast<HReference*>( dst.raw() ) );
 				data[i] = srcData[i];
 				ref.set( t, yaal::move( srcData[i] ), p );
 			}
@@ -514,13 +515,13 @@ void HExpression::set_variable( OExecutionStep const& es_, HFrame* frame_ ) {
 			HHuginn::value_t dst( yaal::move( values.top() ) );
 			values.pop();
 			M_ASSERT( dst->type_id() == HHuginn::TYPE::REFERENCE );
-			HHuginn::HReference& ref( *static_cast<HHuginn::HReference*>( dst.raw() ) );
+			HReference& ref( *static_cast<HReference*>( dst.raw() ) );
 			if ( operation._operator == OPERATOR::ASSIGN ) {
 				ref.set( t, yaal::move( src ), p );
 			} else {
 				HHuginn::value_t v( ref.get( t, p ) );
-				HHuginn::HClass const* refClass( v->get_class() );
-				HHuginn::HClass const* srcClass( src->get_class() );
+				HClass const* refClass( v->get_class() );
+				HClass const* srcClass( src->get_class() );
 				if ( refClass != srcClass ) {
 					operands_type_mismatch( op_to_str( operation._operator ), refClass, srcClass, file_id(), p );
 				}
@@ -559,8 +560,8 @@ void HExpression::grab_args( HFrame* frame_, HArguments& args_ ) {
 		if ( v->type_id() != HHuginn::TYPE::VARIADIC_PARAMETERS ) {
 			values.push_back( yaal::move( v ) );
 		} else {
-			HHuginn::value_t& vp( static_cast<HHuginn::HTaggedValue*>( v.raw() )->value() );
-			HHuginn::values_t& p( static_cast<HHuginn::HTuple*>( vp.raw() )->value() );
+			HHuginn::value_t& vp( static_cast<HTaggedValue*>( v.raw() )->value() );
+			HHuginn::values_t& p( static_cast<huginn::HTuple*>( vp.raw() )->value() );
 			values.insert( values.end(), p.rbegin(), p.rend() );
 		}
 		frame_->values().pop();
@@ -585,8 +586,8 @@ void HExpression::repack_named_parameters( OExecutionStep const& executionStep_,
 	}
 	HHuginn::value_t* pv( ! values.is_empty() ? &values.top() : nullptr );
 	if ( pv && ( (*pv)->type_id() == HHuginn::TYPE::NAMED_PARAMETERS ) ) {
-		HHuginn::HTaggedValue& tv( *static_cast<HHuginn::HTaggedValue*>( pv->raw() ) );
-		HHuginn::HLookup& l( *static_cast<HHuginn::HLookup*>( tv.value().raw() ) );
+		HTaggedValue& tv( *static_cast<HTaggedValue*>( pv->raw() ) );
+		huginn::HLookup& l( *static_cast<huginn::HLookup*>( tv.value().raw() ) );
 		l.update( frame_->thread(), v, executionStep_._position );
 		int& ip( frame_->ip() );
 		M_ASSERT( _instructions[ip]._operator == OPERATOR::FUNCTION_ARGUMENT );
@@ -625,7 +626,7 @@ void HExpression::function_call( OExecutionStep const& executionStep_, HFrame* f
 	int p( _instructions[ip]._position );
 	++ ip;
 	HFrame::values_t& values( frame_->values() );
-	HHuginn::HClass const* c( values.top()->get_class() );
+	HClass const* c( values.top()->get_class() );
 	HHuginn::type_id_t t( c->type_id() );
 	HHuginn::value_t f( yaal::move( values.top() ) );
 	values.pop();
@@ -635,26 +636,26 @@ void HExpression::function_call( OExecutionStep const& executionStep_, HFrame* f
 	}
 	frame_->set_position( p );
 	if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-		values.push( static_cast<HHuginn::HFunctionReference*>( f.raw() )->function()( thread, nullptr, args, p ) );
+		values.push( static_cast<huginn::HFunctionReference*>( f.raw() )->function()( thread, nullptr, args, p ) );
 	} else if ( t == HHuginn::TYPE::BOUND_METHOD ) {
-		HHuginn::HClass::HBoundMethod* m( static_cast<HHuginn::HClass::HBoundMethod*>( f.raw() ) );
+		HClass::HBoundMethod* m( static_cast<HClass::HBoundMethod*>( f.raw() ) );
 		values.push( m->call( thread, args, p ) );
 	} else if ( t == HHuginn::TYPE::UNBOUND_METHOD ) {
-		HHuginn::HClass::HUnboundMethod* m( static_cast<HHuginn::HClass::HUnboundMethod*>( f.raw() ) );
+		HClass::HUnboundMethod* m( static_cast<HClass::HUnboundMethod*>( f.raw() ) );
 		values.push( m->call( thread, args, p ) );
 	} else if ( t == HHuginn::TYPE::METHOD ) {
-		HHuginn::HClass::HMethod* m( static_cast<HHuginn::HClass::HMethod*>( f.raw() ) );
+		HClass::HMethod* m( static_cast<HClass::HMethod*>( f.raw() ) );
 		HHuginn::value_t v( yaal::move( values.top() ) );
 		values.pop();
 		values.push( m->function()( thread, &v, args, p ) );
 	} else {
-		HHuginn::HObject* o( nullptr );
-		if ( ( o = dynamic_cast<HHuginn::HObject*>( f.raw() ) ) ) {
+		HObject* o( nullptr );
+		if ( ( o = dynamic_cast<HObject*>( f.raw() ) ) ) {
 			values.push( o->call_method( thread, f, IDENTIFIER::INTERFACE::CALL, args, executionStep_._position ) );
 		} else {
 			int idx( c->field_index( IDENTIFIER::INTERFACE::CALL ) );
 			if ( idx >= 0 ) {
-				HHuginn::HClass::HMethod const& m( *static_cast<HHuginn::HClass::HMethod const*>( c->field( idx ).raw() ) );
+				HClass::HMethod const& m( *static_cast<HClass::HMethod const*>( c->field( idx ).raw() ) );
 				values.push( m.function()( thread, &f, args, executionStep_._position ) );
 			} else {
 				throw HHuginn::HHuginnRuntimeException(
@@ -680,7 +681,7 @@ void HExpression::create_closure( OExecutionStep const&, HFrame* frame_ ) {
 	M_ASSERT( f->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE );
 	HObjectFactory& of( frame_->thread()->object_factory() );
 	HHuginn::value_t closure( of.create_object( of.none_class(), args ) );
-	values.push( of.create_bound_method( static_cast<HHuginn::HFunctionReference*>( f.raw() )->function(), closure ) );
+	values.push( of.create_bound_method( static_cast<huginn::HFunctionReference*>( f.raw() )->function(), closure ) );
 	return;
 	M_EPILOG
 }
@@ -725,8 +726,8 @@ void HExpression::make_assoc( OPERATOR op_, HFrame* frame_, int ) {
 	HThread* t( frame_->thread() );
 	HHuginn::value_t v(
 		op_ == OPERATOR::MAKE_DICT
-		? fill_assoc<HHuginn::HDict>( t, t->object_factory().create_dict(), values )
-		: fill_assoc<HHuginn::HLookup>( t, t->object_factory().create_lookup(), values )
+		? fill_assoc<huginn::HDict>( t, t->object_factory().create_dict(), values )
+		: fill_assoc<huginn::HLookup>( t, t->object_factory().create_lookup(), values )
 	);
 	frame_->values().push( v );
 	return;
@@ -742,8 +743,8 @@ void HExpression::plus( OExecutionStep const&, HFrame* frame_ ) {
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	HHuginn::value_t& v1( frame_->values().top() );
-	HHuginn::HClass const* c1( v1->get_class() );
-	HHuginn::HClass const* c2( v2->get_class() );
+	HClass const* c1( v1->get_class() );
+	HClass const* c2( v2->get_class() );
 	if ( c1 != c2 ) {
 		operands_type_mismatch( op_to_str( OPERATOR::PLUS ), c1, c2, file_id(), p );
 	}
@@ -764,8 +765,8 @@ void HExpression::minus( OExecutionStep const&, HFrame* frame_ ) {
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	HHuginn::value_t& v1( frame_->values().top() );
-	HHuginn::HClass const* c1( v1->get_class() );
-	HHuginn::HClass const* c2( v2->get_class() );
+	HClass const* c1( v1->get_class() );
+	HClass const* c2( v2->get_class() );
 	if ( c1 != c2 ) {
 		operands_type_mismatch( op_to_str( OPERATOR::MINUS ), c1, c2, file_id(), p );
 	}
@@ -786,8 +787,8 @@ void HExpression::mul( OExecutionStep const&, HFrame* frame_ ) {
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	HHuginn::value_t& v1( frame_->values().top() );
-	HHuginn::HClass const* c1( v1->get_class() );
-	HHuginn::HClass const* c2( v2->get_class() );
+	HClass const* c1( v1->get_class() );
+	HClass const* c2( v2->get_class() );
 	if ( c1 != c2 ) {
 		operands_type_mismatch( op_to_str( OPERATOR::MULTIPLY ), c1, c2, file_id(), p );
 	}
@@ -808,8 +809,8 @@ void HExpression::div( OExecutionStep const&, HFrame* frame_ ) {
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	HHuginn::value_t& v1( frame_->values().top() );
-	HHuginn::HClass const* c1( v1->get_class() );
-	HHuginn::HClass const* c2( v2->get_class() );
+	HClass const* c1( v1->get_class() );
+	HClass const* c2( v2->get_class() );
 	if ( c1 != c2 ) {
 		operands_type_mismatch( op_to_str( OPERATOR::DIVIDE ), c1, c2, file_id(), p );
 	}
@@ -830,8 +831,8 @@ void HExpression::mod( OExecutionStep const&, HFrame* frame_ ) {
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	HHuginn::value_t& v1( frame_->values().top() );
-	HHuginn::HClass const* c1( v1->get_class() );
-	HHuginn::HClass const* c2( v2->get_class() );
+	HClass const* c1( v1->get_class() );
+	HClass const* c2( v2->get_class() );
 	if ( c1 != c2 ) {
 		operands_type_mismatch( op_to_str( OPERATOR::MODULO ), c1, c2, file_id(), p );
 	}
@@ -876,8 +877,8 @@ void HExpression::power( OExecutionStep const&, HFrame* frame_ ) {
 		HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 		frame_->values().pop();
 		HHuginn::value_t& v1( frame_->values().top() );
-		HHuginn::HClass const* c1( v1->get_class() );
-		HHuginn::HClass const* c2( v2->get_class() );
+		HClass const* c1( v1->get_class() );
+		HClass const* c2( v2->get_class() );
 		if ( c1 != c2 ) {
 			operands_type_mismatch( op_to_str( OPERATOR::POWER ), c1, c2, file_id(), p );
 		}
@@ -972,8 +973,8 @@ void HExpression::equals( OExecutionStep const&, HFrame* frame_ ) {
 	frame_->values().pop();
 	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	HHuginn::HClass const* c1( v1->get_class() );
-	HHuginn::HClass const* c2( v2->get_class() );
+	HClass const* c1( v1->get_class() );
+	HClass const* c2( v2->get_class() );
 	if ( ( c1 != c2 ) && ( c1->type_id() != HHuginn::TYPE::NONE ) && ( c2->type_id() != HHuginn::TYPE::NONE ) ) {
 		operands_type_mismatch( op_to_str( OPERATOR::EQUALS ), c1, c2, file_id(), p );
 	}
@@ -992,8 +993,8 @@ void HExpression::not_equals( OExecutionStep const&, HFrame* frame_ ) {
 	frame_->values().pop();
 	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	HHuginn::HClass const* c1( v1->get_class() );
-	HHuginn::HClass const* c2( v2->get_class() );
+	HClass const* c1( v1->get_class() );
+	HClass const* c2( v2->get_class() );
 	if ( ( c1 != c2 ) && ( c1->type_id() != HHuginn::TYPE::NONE ) && ( c2->type_id() != HHuginn::TYPE::NONE ) ) {
 		operands_type_mismatch( op_to_str( OPERATOR::NOT_EQUALS ), c1, c2, file_id(), p );
 	}
@@ -1012,8 +1013,8 @@ void HExpression::less( OExecutionStep const&, HFrame* frame_ ) {
 	frame_->values().pop();
 	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	HHuginn::HClass const* c1( v1->get_class() );
-	HHuginn::HClass const* c2( v2->get_class() );
+	HClass const* c1( v1->get_class() );
+	HClass const* c2( v2->get_class() );
 	if ( c1 != c2 ) {
 		operands_type_mismatch( op_to_str( OPERATOR::LESS ), c1, c2, file_id(), p );
 	}
@@ -1032,8 +1033,8 @@ void HExpression::greater( OExecutionStep const&, HFrame* frame_ ) {
 	frame_->values().pop();
 	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	HHuginn::HClass const* c1( v1->get_class() );
-	HHuginn::HClass const* c2( v2->get_class() );
+	HClass const* c1( v1->get_class() );
+	HClass const* c2( v2->get_class() );
 	if ( c1 != c2 ) {
 		operands_type_mismatch( op_to_str( OPERATOR::GREATER ), c1, c2, file_id(), p );
 	}
@@ -1052,8 +1053,8 @@ void HExpression::less_or_equal( OExecutionStep const&, HFrame* frame_ ) {
 	frame_->values().pop();
 	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	HHuginn::HClass const* c1( v1->get_class() );
-	HHuginn::HClass const* c2( v2->get_class() );
+	HClass const* c1( v1->get_class() );
+	HClass const* c2( v2->get_class() );
 	if ( c1 != c2 ) {
 		operands_type_mismatch( op_to_str( OPERATOR::LESS_OR_EQUAL ), c1, c2, file_id(), p );
 	}
@@ -1072,8 +1073,8 @@ void HExpression::greater_or_equal( OExecutionStep const&, HFrame* frame_ ) {
 	frame_->values().pop();
 	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	HHuginn::HClass const* c1( v1->get_class() );
-	HHuginn::HClass const* c2( v2->get_class() );
+	HClass const* c1( v1->get_class() );
+	HClass const* c2( v2->get_class() );
 	if ( c1 != c2 ) {
 		operands_type_mismatch( op_to_str( OPERATOR::GREATER_OR_EQUAL ), c1, c2, file_id(), p );
 	}
@@ -1092,7 +1093,7 @@ void HExpression::is_element_of( OExecutionStep const&, HFrame* frame_ ) {
 	frame_->values().pop();
 	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	HHuginn::HClass const* c2( v2->get_class() );
+	HClass const* c2( v2->get_class() );
 	if ( ( c2->type_id() <= type_id( HHuginn::TYPE::UNKNOWN ) ) && ! is_collection_like( c2 ) ) {
 		throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_COLL] ).append( a_type_name( c2 ) ), file_id(), p );
 	}
@@ -1111,7 +1112,7 @@ void HExpression::is_not_element_of( OExecutionStep const&, HFrame* frame_ ) {
 	frame_->values().pop();
 	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	HHuginn::HClass const* c2( v2->get_class() );
+	HClass const* c2( v2->get_class() );
 	if ( ( c2->type_id() <= type_id( HHuginn::TYPE::UNKNOWN ) ) && ! is_collection_like( c2 ) ) {
 		throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_COLL] ).append( a_type_name( c2 ) ), file_id(), p );
 	}
@@ -1193,8 +1194,8 @@ void HExpression::ternary( OExecutionStep const&, HFrame* frame_ ) {
 	++ frame_->ip();
 	HHuginn::value_t v( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	M_ASSERT( dynamic_cast<HHuginn::HTernaryEvaluator*>( v.raw() ) );
-	frame_->values().push( static_cast<HHuginn::HTernaryEvaluator*>( v.raw() )->execute( frame_->thread() ) );
+	M_ASSERT( dynamic_cast<HTernaryEvaluator*>( v.raw() ) );
+	frame_->values().push( static_cast<HTernaryEvaluator*>( v.raw() )->execute( frame_->thread() ) );
 	return;
 	M_EPILOG
 }

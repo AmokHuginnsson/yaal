@@ -5,7 +5,7 @@
 #ifndef YAAL_TOOLS_HUGINN_BOOLEANEVALUATOR_HXX_INCLUDED
 #define YAAL_TOOLS_HUGINN_BOOLEANEVALUATOR_HXX_INCLUDED 1
 
-#include "tools/hhuginn.hxx"
+#include "tools/huginn/value.hxx"
 #include "tools/huginn/operator.hxx"
 
 namespace yaal {
@@ -14,10 +14,10 @@ namespace tools {
 
 namespace huginn {
 
-class HBooleanEvaluator : public HHuginn::HValue {
+class HBooleanEvaluator : public huginn::HValue {
 public:
 	typedef HBooleanEvaluator this_type;
-	typedef HHuginn::HValue base_type;
+	typedef huginn::HValue base_type;
 	typedef yaal::hcore::HArray<HHuginn::expression_t> expressions_t;
 private:
 	expressions_t _expressions;

@@ -34,7 +34,7 @@ class HText : public HPackage {
 	HHuginn::class_t _streamClass;
 	enumeration::HEnumerationClass::ptr_t _characterClassClass;
 public:
-	HText( HHuginn::HClass* class_ )
+	HText( HClass* class_ )
 		: HPackage( class_ )
 		, _streamClass( HStream::get_class( class_->runtime() ) )
 		, _characterClassClass(
@@ -93,12 +93,12 @@ public:
 	static HHuginn::value_t split( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "Text.split", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, thread_, position_ );
-		typedef HArray<HString> strings_t;
-		strings_t strings( string::split<strings_t>( get_string( values_[0] ), get_string( values_[1] ) ) );
+		typedef HArray<hcore::HString> strings_t;
+		strings_t strings( tools::string::split<strings_t>( get_string( values_[0] ), get_string( values_[1] ) ) );
 		HObjectFactory* of( thread_->runtime().object_factory() );
 		HHuginn::value_t l( of->create_list() );
-		for ( HString& s : strings ) {
-			static_cast<HHuginn::HList*>( l.raw() )->push_back( of->create_string( yaal::move( s ) ) );
+		for ( hcore::HString& s : strings ) {
+			static_cast<huginn::HList*>( l.raw() )->push_back( of->create_string( yaal::move( s ) ) );
 		}
 		return ( l );
 		M_EPILOG
@@ -125,10 +125,10 @@ public:
 			);
 		}
 		verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, ARITY::MULTIPLE, thread_, position_ );
-		HString s;
-		HHuginn::HIterable* coll( static_cast<HHuginn::HIterable*>( const_cast<HHuginn::HValue*>( values_[0].raw() ) ) );
-		HString const& sep( get_string( values_[1] ) );
-		HHuginn::HIterable::iterator_t it( coll->iterator( thread_, position_ ) );
+		hcore::HString s;
+		huginn::HIterable* coll( static_cast<huginn::HIterable*>( const_cast<huginn::HValue*>( values_[0].raw() ) ) );
+		hcore::HString const& sep( get_string( values_[1] ) );
+		huginn::HIterable::iterator_t it( coll->iterator( thread_, position_ ) );
 		bool addSep( false );
 		while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
 			HHuginn::value_t v( it->value( thread_, position_ ) );
@@ -155,14 +155,14 @@ public:
 	static HHuginn::value_t distance( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "Text.distance", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, thread_, position_ );
-		return ( thread_->runtime().object_factory()->create_integer( string::distance( get_string( values_[0] ), get_string( values_[1] ) ) ) );
+		return ( thread_->runtime().object_factory()->create_integer( tools::string::distance( get_string( values_[0] ), get_string( values_[1] ) ) ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t character_class( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		HText& t( *static_cast<HText*>( object_->raw() ) );
 		verify_signature_by_class( "Text.character_class", values_, { t._characterClassClass->enumeral_class() }, thread_, position_ );
-		HHuginn::HEnumeral::value_type val( get_enumeral( values_[0] ) );
+		HEnumeral::value_type val( get_enumeral( values_[0] ) );
 		character_class_t const* cc8( nullptr );
 		HCharacterClass<char16_t> const* cc16( nullptr );
 		switch ( static_cast<CHARACTER_CLASS>( val ) ) {
@@ -192,16 +192,16 @@ public:
 		}
 		return (
 			cc8
-				? thread_->runtime().object_factory()->create_string( HString( cc8->data(), cc8->size() ) )
-				: thread_->runtime().object_factory()->create_string( HString( cc16->data(), cc16->size() ) )
+				? thread_->runtime().object_factory()->create_string( hcore::HString( cc8->data(), cc8->size() ) )
+				: thread_->runtime().object_factory()->create_string( hcore::HString( cc16->data(), cc16->size() ) )
 		);
 		M_EPILOG
 	}
 	static HHuginn::value_t repeat( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "Text.repeat", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::INTEGER }, thread_, position_ );
-		HString out;
-		HString const& s( get_string( values_[0] ) );
+		hcore::HString out;
+		hcore::HString const& s( get_string( values_[0] ) );
 		int count( static_cast<int>( get_integer( values_[1] ) ) );
 		if ( count < 0 ) {
 			throw HHuginn::HHuginnRuntimeException( "Negative repeat count: "_ys.append( count ), thread_->current_frame()->file_id(), position_ );
@@ -233,7 +233,7 @@ public:
 			verify_arg_type( name, values_, 1, HHuginn::TYPE::BOOLEAN, ARITY::MULTIPLE, thread_, position_ );
 			recursively = get_boolean( values_[1] );
 		}
-		HString s( get_string( values_[0] ) );
+		hcore::HString s( get_string( values_[0] ) );
 		hcore::substitute_environment( s, recursively ? ENV_SUBST_MODE::RECURSIVE : ENV_SUBST_MODE::ONE_LAYER );
 		return ( thread_->object_factory().create_string( yaal::move( s ) ) );
 		M_EPILOG
@@ -241,7 +241,7 @@ public:
 	static HHuginn::value_t capitalize( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "Text.capitalize", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
-		HString s( get_string( values_[0] ) );
+		hcore::HString s( get_string( values_[0] ) );
 		if ( ! s.is_empty() ) {
 			s.lower();
 			s.set_at( 0, code_point_t( static_cast<code_point_t::value_type>( std::towupper( static_cast<wint_t>( s[0].get() ) ) ) ) );
@@ -252,11 +252,11 @@ public:
 	static HHuginn::value_t ordinal_cardinal( char const* name_, yaal::hcore::HString ( *func_ )( int ), huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( name_, values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
-		HString s;
+		hcore::HString s;
 		try {
 		 int i( safe_int::cast<int>( get_integer( values_[0] ) ) );
 		 s = func_( i );
-		} catch ( HException const& e ) {
+		} catch ( hcore::HException const& e ) {
 			thread_->raise( thread_->object_factory().conversion_exception_class(), e.what(), position_ );
 		}
 		return ( thread_->runtime().object_factory()->create_string( yaal::move( s ) ) );
@@ -265,11 +265,11 @@ public:
 	static HHuginn::value_t parse_boolean_flag( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "Text.parse_boolean_flag", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
-		HString const& s( get_string( values_[0] ) );
+		hcore::HString const& s( get_string( values_[0] ) );
 		bool flag( false );
 		try {
 			flag = lexical_cast<bool>( s );
-		} catch ( HException const& e ) {
+		} catch ( hcore::HException const& e ) {
 			thread_->raise( thread_->object_factory().conversion_exception_class(), e.what(), position_ );
 		}
 		return ( thread_->runtime().boolean_value( flag ) );

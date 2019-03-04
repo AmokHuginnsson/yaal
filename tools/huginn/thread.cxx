@@ -8,6 +8,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "function.hxx"
 #include "keyword.hxx"
 #include "objectfactory.hxx"
+#include "exception.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -198,7 +199,7 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t&& value_, 
 		/*
 		 * Uncaught STATE::EXCEPTION becomes STATE::RUNTIME_EXCEPTION!
 		 */
-		HHuginn::HException const* e( dynamic_cast<HHuginn::HException const*>( value_.raw() ) );
+		huginn::HException const* e( dynamic_cast<huginn::HException const*>( value_.raw() ) );
 		_exceptionFileId = fileId_;
 		_exceptionPosition = position_;
 		_exceptionMessage.assign( "Uncaught " );
@@ -208,7 +209,7 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t&& value_, 
 				.append( e->get_class()->name() )
 				.append( exMsg )
 				.append( ": " )
-				.append( e->what() );
+				.append( e->message() );
 		} else {
 			_exceptionMessage
 				.append( "exception" )
@@ -222,11 +223,11 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t&& value_, 
 	M_EPILOG
 }
 
-void HThread::raise( HHuginn::HClass const* class_, yaal::hcore::HString const& message_, int position_ ) {
+void HThread::raise( HClass const* class_, yaal::hcore::HString const& message_, int position_ ) {
 	M_PROLOG
 	HFrame* f( current_frame() );
 	f->set_position( position_ );
-	HHuginn::value_t e( _runtime->object_factory()->create<HHuginn::HException>( this, class_, message_ ) );
+	HHuginn::value_t e( _runtime->object_factory()->create<HException>( this, class_, message_ ) );
 	int fileId( f->file_id() );
 	break_execution( HFrame::STATE::EXCEPTION, yaal::move( e ), 0, fileId, position_ );
 	return;
@@ -262,7 +263,7 @@ void HThread::flush_runtime_exception( void ) {
 		_exceptionFileId = INVALID_FILE_ID;
 		int position( _exceptionPosition );
 		_exceptionPosition = 0;
-		HString message( yaal::move( _exceptionMessage ) );
+		hcore::HString message( yaal::move( _exceptionMessage ) );
 		throw HHuginn::HHuginnRuntimeException( message, fileId, position );
 	}
 	M_EPILOG

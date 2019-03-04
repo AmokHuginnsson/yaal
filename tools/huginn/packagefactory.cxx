@@ -57,7 +57,7 @@ HPackageFactory::~HPackageFactory( void ) {
 	return;
 }
 
-void HPackageFactory::register_package_creator( HString const& name_, HPackageCreatorInterface* instantiator_ ) {
+void HPackageFactory::register_package_creator( hcore::HString const& name_, HPackageCreatorInterface* instantiator_ ) {
 	M_PROLOG
 	creators_t::iterator it = _creators.find( name_ );
 	if ( it != _creators.end() ) {
@@ -117,10 +117,10 @@ HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, yaal::hcor
 HPackageCreatorInterface::HInstance HPackageFactory::load_binary( HRuntime* runtime_, HHuginn::paths_t const& paths_, yaal::hcore::HString const& name_, int position_ ) {
 	M_PROLOG
 	static HRegex const re( "([^.])[.]([^.])" );
-	HString name( re.replace( re.replace( name_, "$1/$2" ), "$1/$2" ) );
+	hcore::HString name( re.replace( re.replace( name_, "$1/$2" ), "$1/$2" ) );
 	plugin_t plugin( make_pointer<HPlugin>() );
 	bool isSubDir( name.find( filesystem::path::SEPARATOR ) != HString::npos );
-	HString pluginName( isSubDir ? filesystem::dirname( name ).append( filesystem::path::SEPARATOR ) : "" );
+	hcore::HString pluginName( isSubDir ? filesystem::dirname( name ).append( filesystem::path::SEPARATOR ) : "" );
 	pluginName
 		.append( LIB_PREFIX )
 		.append( "huginn_" )
@@ -138,8 +138,8 @@ HPackageCreatorInterface::HInstance HPackageFactory::load_binary( HRuntime* runt
 		return ( plugin->is_loaded() );
 	};
 	if ( ! load( pluginName ) && filesystem::is_relative( name ) ) {
-		HString test;
-		for ( HString const& p : paths_ ) {
+		hcore::HString test;
+		for ( hcore::HString const& p : paths_ ) {
 			test.assign( p ).append( filesystem::path::SEPARATOR ).append( pluginName );
 			if ( load( test ) ) {
 				break;
@@ -167,9 +167,9 @@ HPackageCreatorInterface::HInstance HPackageFactory::load_binary( HRuntime* runt
 HPackageCreatorInterface::HInstance HPackageFactory::load_module( HRuntime* runtime_, HHuginn::paths_t const& paths_, yaal::hcore::HString const& name_, int position_ ) {
 	M_PROLOG
 	static HRegex const re( "([^.])[.]([^.])" );
-	HString name( re.replace( re.replace( name_, "$1/$2" ), "$1/$2" ) );
+	hcore::HString name( re.replace( re.replace( name_, "$1/$2" ), "$1/$2" ) );
 	name.append( ".hgn" );
-	HString path;
+	hcore::HString path;
 	auto acquire_path = []( yaal::hcore::HString module ) {
 		substitute_environment( module, ENV_SUBST_MODE::RECURSIVE );
 		try {
@@ -181,8 +181,8 @@ HPackageCreatorInterface::HInstance HPackageFactory::load_module( HRuntime* runt
 		return ( hcore::HString() );
 	};
 	if ( filesystem::is_relative( name ) ) {
-		HString test;
-		for ( HString const& p : paths_ ) {
+		hcore::HString test;
+		for ( hcore::HString const& p : paths_ ) {
 			if ( p.is_empty() ) {
 				continue;
 			}
@@ -277,13 +277,13 @@ void cleanup_packages( void ) {
 	M_EPILOG
 }
 
-HPackage::HPackage( HHuginn::HClass* class_ )
-	: HHuginn::HValue( class_ )
+HPackage::HPackage( huginn::HClass* class_ )
+	: huginn::HValue( class_ )
 	, _exceptionClass( class_exception( class_ ) ) {
 	return;
 }
 
-HHuginn::HClass const* HPackage::exception_class( void ) const {
+huginn::HClass const* HPackage::exception_class( void ) const {
 	return ( _exceptionClass.raw() );
 }
 

@@ -6,7 +6,7 @@
 #ifndef YAAL_TOOLS_HUGINN_HELPER_HXX_INCLUDED
 #define YAAL_TOOLS_HUGINN_HELPER_HXX_INCLUDED 1
 
-#include "tools/hhuginn.hxx"
+#include "tools/huginn/class.hxx"
 #include "tools/huginn/runtime.hxx" /* For templated `C++ function` auto-registration code. */
 #include "tools/huginn/enumeration.hxx"
 
@@ -36,7 +36,7 @@ enum class BASE {
 class HThread;
 class HCycleTracker {
 public:
-	typedef yaal::hcore::HSet<HHuginn::HValue const*> value_noter_t;
+	typedef yaal::hcore::HSet<huginn::HValue const*> value_noter_t;
 private:
 	value_noter_t _valueNoter;
 public:
@@ -47,28 +47,28 @@ public:
 };
 
 typedef yaal::hcore::HArray<HHuginn::TYPE> types_t;
-typedef yaal::hcore::HArray<HHuginn::HClass const*> classes_t;
+typedef yaal::hcore::HArray<huginn::HClass const*> classes_t;
 
 bool is_keyword( yaal::hcore::HString const& );
 bool is_builtin( yaal::hcore::HString const& );
 bool is_restricted( yaal::hcore::HString const& );
 
-yaal::hcore::HString full_class_name( huginn::HRuntime const&, HHuginn::HClass const*, bool = true );
+yaal::hcore::HString full_class_name( huginn::HRuntime const&, huginn::HClass const*, bool = true );
 yaal::hcore::HString full_class_name( huginn::HRuntime const&, HHuginn::value_t const&, bool = true );
 yaal::hcore::HString a_type_name( HHuginn::TYPE );
-yaal::hcore::HString a_type_name( HHuginn::HClass const* );
+yaal::hcore::HString a_type_name( huginn::HClass const* );
 inline yaal::hcore::HString a_type_name( HHuginn::type_id_t type_ ) {
 	return ( a_type_name( static_cast<HHuginn::TYPE>( type_.get() ) ) );
 }
 
-void operands_type_mismatch( char const*, HHuginn::HClass const*, HHuginn::HClass const*, int, int ) __attribute__(( noreturn ));
-HHuginn::class_t add_class_as_member( HHuginn::HClass*, HHuginn::class_t const&, yaal::hcore::HString const&, HHuginn::HClass::MEMBER_TYPE = HHuginn::HClass::MEMBER_TYPE::INSTANCE );
-enumeration::HEnumerationClass::ptr_t add_enumeration_as_member( HHuginn::HClass*, enumeration::HEnumerationClass::ptr_t const&, yaal::hcore::HString const&, HHuginn::HClass::MEMBER_TYPE = HHuginn::HClass::MEMBER_TYPE::INSTANCE );
-HHuginn::class_t class_exception( HHuginn::HClass*, HHuginn::HClass const* = nullptr );
+void operands_type_mismatch( char const*, huginn::HClass const*, huginn::HClass const*, int, int ) __attribute__(( noreturn ));
+HHuginn::class_t add_class_as_member( huginn::HClass*, HHuginn::class_t const&, yaal::hcore::HString const&, huginn::HClass::MEMBER_TYPE = huginn::HClass::MEMBER_TYPE::INSTANCE );
+enumeration::HEnumerationClass::ptr_t add_enumeration_as_member( huginn::HClass*, enumeration::HEnumerationClass::ptr_t const&, yaal::hcore::HString const&, huginn::HClass::MEMBER_TYPE = huginn::HClass::MEMBER_TYPE::INSTANCE );
+HHuginn::class_t class_exception( huginn::HClass*, huginn::HClass const* = nullptr );
 void verify_arg_count( char const*, HHuginn::values_t&, int, int, huginn::HThread*, int );
 void verify_arg_type( char const*, HHuginn::values_t&, int, HHuginn::TYPE, ARITY, huginn::HThread*, int );
 HHuginn::type_id_t verify_arg_type( char const*, HHuginn::values_t&, int, types_t const&, ARITY, huginn::HThread*, int );
-void verify_arg_type( char const*, HHuginn::values_t&, int, HHuginn::HClass const*, ARITY, huginn::HThread*, int );
+void verify_arg_type( char const*, HHuginn::values_t&, int, huginn::HClass const*, ARITY, huginn::HThread*, int );
 void verify_signature( char const*, HHuginn::values_t&, types_t const&, huginn::HThread*, int );
 void verify_signature_by_class( char const*, HHuginn::values_t&, classes_t const&, huginn::HThread*, int );
 HHuginn::type_id_t verify_arg_numeric( char const*, HHuginn::values_t&, int, ARITY, huginn::HThread*, int );
@@ -77,25 +77,25 @@ HHuginn::type_id_t verify_arg_materialized_collection( char const*, HHuginn::val
 HHuginn::value_t verify_arg_virtual_collection( char const*, HHuginn::values_t&, int, ARITY, huginn::HThread*, int );
 HHuginn::type_id_t verify_arg_collection_value_type( char const*, HHuginn::values_t&, int, ARITY, types_t const&, UNIFORMITY, huginn::HThread*, int );
 
-bool is_numeric( HHuginn::HClass const* );
-bool is_collection( HHuginn::HClass const* );
-bool is_collection_like( HHuginn::HClass const* );
-bool is_numeric_congruent( HHuginn::HClass const* );
-bool is_summable( HHuginn::HClass const* );
-bool is_comparable( HHuginn::HClass const* );
-bool is_comparable_congruent( HHuginn::HClass const* );
-bool is_boolean_congruent( HHuginn::HClass const* );
-bool is_unknown( HHuginn::HClass const* );
-bool is_reference_congruent( HHuginn::HClass const* );
-bool is_integer_congruent( HHuginn::HClass const* );
-bool is_meta_class( HHuginn::HClass const* );
+bool is_numeric( huginn::HClass const* );
+bool is_collection( huginn::HClass const* );
+bool is_collection_like( huginn::HClass const* );
+bool is_numeric_congruent( huginn::HClass const* );
+bool is_summable( huginn::HClass const* );
+bool is_comparable( huginn::HClass const* );
+bool is_comparable_congruent( huginn::HClass const* );
+bool is_boolean_congruent( huginn::HClass const* );
+bool is_unknown( huginn::HClass const* );
+bool is_reference_congruent( huginn::HClass const* );
+bool is_integer_congruent( huginn::HClass const* );
+bool is_meta_class( huginn::HClass const* );
 inline bool is_enumeral( HHuginn::value_t const& val_ ) {
-	return ( dynamic_cast<HHuginn::HEnumeral const*>( val_.raw() ) != nullptr );
+	return ( dynamic_cast<huginn::HEnumeral const*>( val_.raw() ) != nullptr );
 }
-inline bool is_enum_class( HHuginn::HClass const* class_ ) {
+inline bool is_enum_class( huginn::HClass const* class_ ) {
 	return ( dynamic_cast<enumeration::HEnumerationClass const*>( class_ ) != nullptr );
 }
-inline bool is_enum_class( HHuginn::HValue const* val_ ) {
+inline bool is_enum_class( huginn::HValue const* val_ ) {
 	return ( is_enum_class( val_->get_class() ) );
 }
 inline bool is_enum_class( HHuginn::value_t const* val_ ) {
@@ -104,24 +104,24 @@ inline bool is_enum_class( HHuginn::value_t const* val_ ) {
 inline bool is_enum_class( HHuginn::value_t const& val_ ) {
 	return ( is_enum_class( val_.raw() ) );
 }
-bool are_congruous( HHuginn::HClass const*, HHuginn::HClass const* );
+bool are_congruous( huginn::HClass const*, huginn::HClass const* );
 
-HHuginn::HString::value_type const& get_string( HHuginn::value_t const& );
-HHuginn::HInteger::value_type get_integer( HHuginn::value_t const& );
-HHuginn::HReal::value_type get_real( HHuginn::value_t const& );
-HHuginn::HNumber::value_type const& get_number( HHuginn::value_t const& );
-HHuginn::HBoolean::value_type get_boolean( HHuginn::value_t const& );
-HHuginn::HCharacter::value_type get_character( HHuginn::value_t const& );
-HHuginn::HList::values_t const& get_list( HHuginn::value_t const& );
-HHuginn::HEnumeral::value_type get_enumeral( HHuginn::value_t const& );
+huginn::HString::value_type const& get_string( HHuginn::value_t const& );
+huginn::HInteger::value_type get_integer( HHuginn::value_t const& );
+huginn::HReal::value_type get_real( HHuginn::value_t const& );
+huginn::HNumber::value_type const& get_number( HHuginn::value_t const& );
+huginn::HBoolean::value_type get_boolean( HHuginn::value_t const& );
+huginn::HCharacter::value_type get_character( HHuginn::value_t const& );
+huginn::HList::values_t const& get_list( HHuginn::value_t const& );
+huginn::HEnumeral::value_type get_enumeral( HHuginn::value_t const& );
 
-HHuginn::HString::value_type const& get_string( HHuginn::HValue const* );
-HHuginn::HInteger::value_type get_integer( HHuginn::HValue const* );
-HHuginn::HReal::value_type get_real( HHuginn::HValue const* );
-HHuginn::HNumber::value_type const& get_number( HHuginn::HValue const* );
-HHuginn::HBoolean::value_type get_boolean( HHuginn::HValue const* );
-HHuginn::HCharacter::value_type get_character( HHuginn::HValue const* );
-HHuginn::HEnumeral::value_type get_enumeral( HHuginn::HValue const* );
+huginn::HString::value_type const& get_string( huginn::HValue const* );
+huginn::HInteger::value_type get_integer( huginn::HValue const* );
+huginn::HReal::value_type get_real( huginn::HValue const* );
+huginn::HNumber::value_type const& get_number( huginn::HValue const* );
+huginn::HBoolean::value_type get_boolean( huginn::HValue const* );
+huginn::HCharacter::value_type get_character( huginn::HValue const* );
+huginn::HEnumeral::value_type get_enumeral( huginn::HValue const* );
 
 template<typename data_t>
 data_t get_by_type( HHuginn::value_t const& );
@@ -129,7 +129,7 @@ data_t get_by_type( HHuginn::value_t const& );
 template<typename data_t>
 data_t get_by_type( HHuginn::value_t& );
 
-yaal::hcore::HString int_to_str( HHuginn::HInteger::value_type, BASE, bool );
+yaal::hcore::HString int_to_str( huginn::HInteger::value_type, BASE, bool );
 
 template<typename T>
 class HAnchorGuard {
@@ -1120,7 +1120,7 @@ void register_function( HHuginn& h_, yaal::hcore::HString const& name_, F fun_, 
 namespace package {
 
 HHuginn::value_t value( HHuginn::value_t, yaal::hcore::HUTF8String, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
-HHuginn::value_t instance( HHuginn::HClass const*, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+HHuginn::value_t instance( huginn::HClass const*, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 
 }
 

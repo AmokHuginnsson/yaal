@@ -27,12 +27,12 @@ namespace tools {
 
 namespace huginn {
 
-class HKeyPressEventClass : public HHuginn::HClass {
+class HKeyPressEventClass : public HClass {
 	enumeration::HEnumerationClass::ptr_t _modifierClass;
 	enumeration::HEnumerationClass::ptr_t _keyClass;
 public:
-	HKeyPressEventClass( HRuntime* runtime_, HHuginn::type_id_t typeId_, HHuginn::HClass* origin_ )
-		: HHuginn::HClass(
+	HKeyPressEventClass( HRuntime* runtime_, HHuginn::type_id_t typeId_, HClass* origin_ )
+		: HClass(
 			runtime_,
 			typeId_,
 			runtime_->identifier_id( "KeyPressEvent" ),
@@ -115,8 +115,8 @@ public:
 		M_PROLOG
 		char const name[] = "KeyPressEvent.to_string";
 		verify_arg_count( name, values_, 0, 0, thread_, position_ );
-		HString s( "KeyPressEvent" );
-		HHuginn::HObject& o( *static_cast<HHuginn::HObject*>( object_->raw() ) );
+		hcore::HString s( "KeyPressEvent" );
+		HObject& o( *static_cast<HObject*>( object_->raw() ) );
 		char const* extra( "(" );
 		char const comma[] = ", ";
 		for ( int i( 0 ); i < 3; ++ i ) {
@@ -136,7 +136,7 @@ class HTerminal : public HPackage {
 	HHuginn::class_t _keyPressEventClass;
 	HHuginn::class_t _exceptionClass;
 public:
-	HTerminal( HHuginn::HClass* class_ )
+	HTerminal( HClass* class_ )
 		: HPackage( class_ )
 		, _attributeClass(
 			add_enumeration_as_member(
@@ -222,7 +222,7 @@ public:
 		int l( -1 );
 		try {
 			l = tools::HTerminal::get_instance().size().lines();
-		} catch ( HException const& e ) {
+		} catch ( hcore::HException const& e ) {
 			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
 		}
 		return ( thread_->object_factory().create_integer( l ) );
@@ -234,7 +234,7 @@ public:
 		int c( -1 );
 		try {
 			c = tools::HTerminal::get_instance().size().columns();
-		} catch ( HException const& e ) {
+		} catch ( hcore::HException const& e ) {
 			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
 		}
 		return ( thread_->object_factory().create_integer( c ) );
@@ -246,7 +246,7 @@ public:
 		tools::HTerminal::HSize s;
 		try {
 			s = tools::HTerminal::get_instance().size();
-		} catch ( HException const& e ) {
+		} catch ( hcore::HException const& e ) {
 			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
 		}
 		int row( safe_int::cast<int>( get_integer( values_[0] ) ) );
@@ -272,8 +272,8 @@ public:
 		M_PROLOG
 		HTerminal& t( *static_cast<HTerminal*>( object_->raw() ) );
 		verify_signature_by_class( "Terminal.color", values_, { t._colorClass->enumeral_class(), thread_->object_factory().string_class() }, thread_, position_ );
-		HHuginn::HEnumeral::value_type val( get_enumeral( values_[0] ) );
-		HString s;
+		HEnumeral::value_type val( get_enumeral( values_[0] ) );
+		hcore::HString s;
 		switch ( static_cast<COLOR::color_t>( val ) ) {
 			case ( COLOR::FG_BLACK ):         s.assign( *ansi::black );         break;
 			case ( COLOR::FG_RED ):           s.assign( *ansi::red );           break;
@@ -304,8 +304,8 @@ public:
 		M_PROLOG
 		HTerminal& t( *static_cast<HTerminal*>( object_->raw() ) );
 		verify_signature_by_class( "Terminal.attribute", values_, { t._attributeClass->enumeral_class(), thread_->object_factory().string_class() }, thread_, position_ );
-		HHuginn::HEnumeral::value_type val( get_enumeral( values_[0] ) );
-		HString s;
+		HEnumeral::value_type val( get_enumeral( values_[0] ) );
+		hcore::HString s;
 		switch ( static_cast<COLOR::color_t>( val ) ) {
 			case ( COLOR::ATTR_BOLD ):      s.assign( *ansi::bold );      break;
 			case ( COLOR::ATTR_UNDERLINE ): s.assign( *ansi::underline ); break;
@@ -333,7 +333,7 @@ public:
 		code_point_t cp( unicode::CODE_POINT::NUL );
 		try {
 			cp = tools::HTerminal::get_instance().get_character();
-		} catch ( HException const& e ) {
+		} catch ( hcore::HException const& e ) {
 			thread_->raise( static_cast<HTerminal*>( object_->raw() )->_exceptionClass.raw(), e.what(), position_ );
 		}
 		return ( thread_->object_factory().create_character( cp ) );
@@ -362,7 +362,7 @@ public:
 				data.push_back( thread_->runtime().none_value() );
 			}
 			if ( modifiers ) {
-				HHuginn::HTuple::values_t m;
+				huginn::HTuple::values_t m;
 				int mods[] = {
 					KEY_CODE::COMMAND_BASE, KEY_CODE::META_BASE, KEY_CODE::SHIFT_BASE, KEY_CODE::CONTROL_BASE
 				};
@@ -376,7 +376,7 @@ public:
 				data.push_back( thread_->runtime().none_value() );
 			}
 			data.push_back( keyPressEventClass->get_default( thread_, 3, position_ ) );
-		} catch ( HException const& e ) {
+		} catch ( hcore::HException const& e ) {
 			thread_->raise( term->_exceptionClass.raw(), e.what(), position_ );
 		}
 		return ( of.create_object( keyPressEventClass, data ) );

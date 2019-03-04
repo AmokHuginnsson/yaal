@@ -25,10 +25,10 @@ namespace huginn {
 namespace list {
 
 class HListIterator : public HIteratorInterface {
-	HHuginn::HList* _list;
+	huginn::HList* _list;
 	int long _index;
 public:
-	HListIterator( HHuginn::HList* list_ )
+	HListIterator( huginn::HList* list_ )
 		: _list( list_ )
 		, _index( 0 ) {
 		return;
@@ -49,10 +49,10 @@ private:
 };
 
 class HListReverseIterator : public HIteratorInterface {
-	HHuginn::HList* _list;
+	huginn::HList* _list;
 	int long _index;
 public:
-	HListReverseIterator( HThread* thread_, HHuginn::HList* list_, int position_ )
+	HListReverseIterator( HThread* thread_, huginn::HList* list_, int position_ )
 		: _list( list_ )
 		, _index( list_->size( thread_, position_ ) - 1 ) {
 		return;
@@ -72,18 +72,18 @@ private:
 	HListReverseIterator& operator = ( HListReverseIterator const& ) = delete;
 };
 
-class HReversedList : public HHuginn::HIterable {
+class HReversedList : public huginn::HIterable {
 	HHuginn::value_t _list;
 public:
-	HReversedList( HHuginn::HClass const* class_, HHuginn::value_t const& list_ )
+	HReversedList( HClass const* class_, HHuginn::value_t const& list_ )
 		: HIterable( class_ )
 		, _list( list_ ) {
 		M_ASSERT( _list->type_id() == HHuginn::TYPE::LIST );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HClass const* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
-			make_pointer<HHuginn::HClass>(
+			make_pointer<HClass>(
 				runtime_,
 				"ReversedListView",
 				"The `ReversedListView` class represents *lazy* *iterable* reversed view of a `list`.",
@@ -95,11 +95,11 @@ public:
 	}
 protected:
 	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
-		return ( safe_int::cast<int long>( static_cast<HHuginn::HList const*>( _list.raw() )->size( thread_, position_ ) ) );
+		return ( safe_int::cast<int long>( static_cast<huginn::HList const*>( _list.raw() )->size( thread_, position_ ) ) );
 	}
 private:
 	virtual iterator_t do_iterator( HThread* thread_, int position_ ) override {
-		return ( make_pointer<HListReverseIterator>( thread_, static_cast<HHuginn::HList*>( _list.raw() ), position_ ) );
+		return ( make_pointer<HListReverseIterator>( thread_, static_cast<huginn::HList*>( _list.raw() ), position_ ) );
 	}
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const override {
@@ -111,7 +111,7 @@ inline HHuginn::value_t push( huginn::HThread* thread_, HHuginn::value_t* object
 	M_PROLOG
 	verify_arg_count( "list.push", values_, 1, 1, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
-	static_cast<HHuginn::HList*>( object_->raw() )->push_back( values_[0] );
+	static_cast<huginn::HList*>( object_->raw() )->push_back( values_[0] );
 	return ( *object_ );
 	M_EPILOG
 }
@@ -128,26 +128,26 @@ inline HHuginn::value_t append( huginn::HThread* thread_, HHuginn::value_t* obje
 		)
 	);
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
-	HHuginn::HList::values_t& dst( static_cast<HHuginn::HList*>( object_->raw() )->value() );
+	huginn::HList::values_t& dst( static_cast<huginn::HList*>( object_->raw() )->value() );
 	switch( t.get() ) {
 		case ( static_cast<int>( HHuginn::TYPE::TUPLE ) ): {
-			HHuginn::HTuple::values_t const& src( static_cast<HHuginn::HTuple const*>( values_[0].raw() )->value() );
+			huginn::HTuple::values_t const& src( static_cast<huginn::HTuple const*>( values_[0].raw() )->value() );
 			dst.insert( dst.end(), src.begin(), src.end() );
 		} break;
 		case ( static_cast<int>( HHuginn::TYPE::LIST ) ): {
-			HHuginn::HList::values_t const& src( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
+			huginn::HList::values_t const& src( static_cast<huginn::HList const*>( values_[0].raw() )->value() );
 			dst.insert( dst.end(), src.begin(), src.end() );
 		} break;
 		case ( static_cast<int>( HHuginn::TYPE::DEQUE ) ): {
-			HHuginn::HDeque::values_t const& src( static_cast<HHuginn::HDeque const*>( values_[0].raw() )->value() );
+			huginn::HDeque::values_t const& src( static_cast<huginn::HDeque const*>( values_[0].raw() )->value() );
 			dst.insert( dst.end(), src.begin(), src.end() );
 		} break;
 		case ( static_cast<int>( HHuginn::TYPE::ORDER ) ): {
-			HHuginn::HOrder::values_t const& src( static_cast<HHuginn::HOrder const*>( values_[0].raw() )->value() );
+			huginn::HOrder::values_t const& src( static_cast<huginn::HOrder const*>( values_[0].raw() )->value() );
 			dst.insert( dst.end(), src.begin(), src.end() );
 		} break;
 		case ( static_cast<int>( HHuginn::TYPE::SET ) ): {
-			HHuginn::HSet::values_t const& src( static_cast<HHuginn::HSet const*>( values_[0].raw() )->value() );
+			huginn::HSet::values_t const& src( static_cast<huginn::HSet const*>( values_[0].raw() )->value() );
 			dst.insert( dst.end(), src.begin(), src.end() );
 		} break;
 	}
@@ -159,8 +159,8 @@ inline HHuginn::value_t insert( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_PROLOG
 	verify_signature( "list.insert", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::UNKNOWN }, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
-	HHuginn::HList::values_t& dst( static_cast<HHuginn::HList*>( object_->raw() )->value() );
-	HHuginn::HInteger::value_type pos( get_integer( values_[0] ) );
+	huginn::HList::values_t& dst( static_cast<huginn::HList*>( object_->raw() )->value() );
+	huginn::HInteger::value_type pos( get_integer( values_[0] ) );
 	if ( ( pos < 0 ) || ( pos > dst.get_size() ) ) {
 		throw HHuginn::HHuginnRuntimeException( "invalid insertion position: "_ys.append( pos ), thread_->current_frame()->file_id(), position_ );
 	}
@@ -173,8 +173,8 @@ inline HHuginn::value_t resize( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_PROLOG
 	verify_signature( "list.resize", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::UNKNOWN }, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
-	HHuginn::HList::values_t& dst( static_cast<HHuginn::HList*>( object_->raw() )->value() );
-	HHuginn::HInteger::value_type size( get_integer( values_[0] ) );
+	huginn::HList::values_t& dst( static_cast<huginn::HList*>( object_->raw() )->value() );
+	huginn::HInteger::value_type size( get_integer( values_[0] ) );
 	if ( size < 0 ) {
 		throw HHuginn::HHuginnRuntimeException( "invalid new size: "_ys.append( size ), thread_->current_frame()->file_id(), position_ );
 	}
@@ -192,7 +192,7 @@ inline HHuginn::value_t pop( huginn::HThread* thread_, HHuginn::value_t* object_
 	M_PROLOG
 	verify_arg_count( "list.pop", values_, 0, 0, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
-	static_cast<HHuginn::HList*>( object_->raw() )->pop_back();
+	static_cast<huginn::HList*>( object_->raw() )->pop_back();
 	return ( *object_ );
 	M_EPILOG
 }
@@ -206,13 +206,13 @@ HHuginn::value_t sort( huginn::HThread* thread_, HHuginn::value_t* object_, HHug
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::FUNCTION_REFERENCE, ARITY::MULTIPLE, thread_, position_ );
 		key = values_[0];
 	}
-	HHuginn::HList::values_t& data( static_cast<HHuginn::HList*>( object_->raw() )->value() );
+	huginn::HList::values_t& data( static_cast<HList*>( object_->raw() )->value() );
 	if ( ! key ) {
 		HHuginn::HValueCompareHelper less( &instruction::checked_less );
 		less.anchor( thread_, position_ );
 		sort( data.begin(), data.end(), cref( less ) );
 	} else {
-		HHuginn::function_t k( static_cast<HHuginn::HFunctionReference*>( key.raw() )->function() );
+		HHuginn::function_t k( static_cast<HFunctionReference*>( key.raw() )->function() );
 		yaal::sort(
 			data.begin(), data.end(),
 			[&k, &thread_, &position_]( HHuginn::value_t const& l_, HHuginn::value_t const& r_ ) {
@@ -235,7 +235,7 @@ inline HHuginn::value_t clear( huginn::HThread* thread_, HHuginn::value_t* objec
 	M_PROLOG
 	verify_arg_count( "list.clear", values_, 0, 0, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
-	static_cast<HHuginn::HList*>( object_->raw() )->clear();
+	static_cast<huginn::HList*>( object_->raw() )->clear();
 	return ( *object_ );
 	M_EPILOG
 }
@@ -248,7 +248,7 @@ inline HHuginn::value_t find( huginn::HThread* thread_, HHuginn::value_t* object
 	int noArg( static_cast<int>( values_.get_size() ) );
 	int long start( 0 );
 	int long stop( -1 );
-	HHuginn::HList& l( *static_cast<HHuginn::HList*>( object_->raw() ) );
+	huginn::HList& l( *static_cast<huginn::HList*>( object_->raw() ) );
 	int long size( l.value().get_size() );
 	if ( noArg > 1 ) {
 		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
@@ -266,7 +266,7 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 	M_PROLOG
 	verify_arg_count( "list.hash", values_, 0, 0, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
-	HHuginn::HList::values_t const& values( static_cast<HHuginn::HList*>( object_->raw() )->value() );
+	huginn::HList::values_t const& values( static_cast<huginn::HList*>( object_->raw() )->value() );
 	int long hashValue( static_cast<int long>( HHuginn::TYPE::LIST ) );
 	for ( HHuginn::value_t const& v : values ) {
 		hashValue *= 3;
@@ -277,8 +277,8 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 }
 
 inline bool less_impl( huginn::HThread* thread_, HHuginn::value_t const& l_, HHuginn::value_t const& r_, int position_ ) {
-	HHuginn::HList::values_t const& l( static_cast<HHuginn::HList const*>( l_.raw() )->value() );
-	HHuginn::HList::values_t const& r( static_cast<HHuginn::HList const*>( r_.raw() )->value() );
+	huginn::HList::values_t const& l( static_cast<huginn::HList const*>( l_.raw() )->value() );
+	huginn::HList::values_t const& r( static_cast<huginn::HList const*>( r_.raw() )->value() );
 	HHuginn::HValueCompareHelper lessHelper( &instruction::less );
 	lessHelper.anchor( thread_, position_ );
 	return ( lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), cref( lessHelper ) ) );
@@ -320,8 +320,8 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
 	verify_signature( "list.equals", values_, { HHuginn::TYPE::LIST }, thread_, position_ );
-	HHuginn::HList::values_t const& l( static_cast<HHuginn::HList*>( object_->raw() )->value() );
-	HHuginn::HList::values_t const& r( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
+	huginn::HList::values_t const& l( static_cast<huginn::HList*>( object_->raw() )->value() );
+	huginn::HList::values_t const& r( static_cast<huginn::HList const*>( values_[0].raw() )->value() );
 	bool equal( l.get_size() == r.get_size() );
 	for ( int long i( 0 ), c( l.get_size() ); equal && ( i < c ); ++ i ) {
 		equal = instruction::equals( thread_, l[i], r[i], position_ );
@@ -330,17 +330,17 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_EPILOG
 }
 
-class HListClass : public HHuginn::HClass {
+class HListClass : public HClass {
 public:
 	typedef HListClass this_type;
-	typedef HHuginn::HClass base_type;
+	typedef HClass base_type;
 private:
 	HHuginn::class_t _reversedListClass;
 public:
 	HListClass(
 		HRuntime* runtime_,
 		HObjectFactory* objectFactory_
-	) : HHuginn::HClass(
+	) : HClass(
 			runtime_,
 			objectFactory_,
 			huginn::type_id( HHuginn::TYPE::LIST ),
@@ -371,7 +371,7 @@ public:
 		redefine( nullptr, fd );
 		return;
 	}
-	HHuginn::HClass const* reversed_list_class( void ) const {
+	HClass const* reversed_list_class( void ) const {
 		return ( _reversedListClass.raw() );
 	}
 protected:
@@ -399,38 +399,38 @@ HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const
 
 }
 
-HHuginn::HList::HList( HHuginn::HClass const* class_, values_t&& data_ )
+huginn::HList::HList( HClass const* class_, values_t&& data_ )
 	: HIterable( class_ )
 	, _data( yaal::move( data_ ) ) {
 	return;
 }
 
-void HHuginn::HList::push_back( HHuginn::value_t const& value_ ) {
+void huginn::HList::push_back( HHuginn::value_t const& value_ ) {
 	M_PROLOG
 	_data.push_back( value_ );
 	return;
 	M_EPILOG
 }
 
-void HHuginn::HList::pop_back( void ) {
+void huginn::HList::pop_back( void ) {
 	M_PROLOG
 	_data.pop_back();
 	return;
 	M_EPILOG
 }
 
-int long HHuginn::HList::do_size( huginn::HThread*, int ) const {
+int long huginn::HList::do_size( huginn::HThread*, int ) const {
 	return ( _data.get_size() );
 }
 
-void HHuginn::HList::clear( void ) {
+void huginn::HList::clear( void ) {
 	M_PROLOG
 	_data.clear();
 	return;
 	M_EPILOG
 }
 
-int long HHuginn::HList::find( huginn::HThread* thread_, int position_, HHuginn::value_t const& val_, int long start_, int long stop_ ) const {
+int long huginn::HList::find( huginn::HThread* thread_, int position_, HHuginn::value_t const& val_, int long start_, int long stop_ ) const {
 	M_PROLOG
 	if ( stop_ < 0 ) {
 		stop_ = _data.get_size();
@@ -449,25 +449,25 @@ int long HHuginn::HList::find( huginn::HThread* thread_, int position_, HHuginn:
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HList::get( int long long index_ ) {
+HHuginn::value_t huginn::HList::get( int long long index_ ) {
 	M_PROLOG
 	M_ASSERT( ( index_ >= 0 ) && ( index_ < _data.get_size() ) );
 	return ( _data[static_cast<int>( index_ )] );
 	M_EPILOG
 }
 
-HHuginn::value_t& HHuginn::HList::get_ref( int long long index_ ) {
+HHuginn::value_t& huginn::HList::get_ref( int long long index_ ) {
 	M_PROLOG
 	M_ASSERT( ( index_ >= 0 ) && ( index_ < _data.get_size() ) );
 	return ( _data[static_cast<int>( index_ )] );
 	M_EPILOG
 }
 
-HHuginn::HIterable::iterator_t HHuginn::HList::do_iterator( huginn::HThread*, int ) {
+huginn::HIterable::iterator_t huginn::HList::do_iterator( huginn::HThread*, int ) {
 	return ( make_pointer<huginn::list::HListIterator>( this ) );
 }
 
-HHuginn::value_t HHuginn::HList::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
+HHuginn::value_t huginn::HList::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
 	values_t data;
 	data.reserve( _data.get_size() );
 	for ( values_t::value_type const& v : _data ) {

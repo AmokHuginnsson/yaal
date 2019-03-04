@@ -7,6 +7,7 @@
 
 #include "tools/hhuginn.hxx"
 #include "tools/huginn/iterator.hxx"
+#include "tools/huginn/integer.hxx"
 
 namespace yaal {
 
@@ -14,19 +15,19 @@ namespace tools {
 
 namespace huginn {
 
-class HEnumerator : public HHuginn::HIterable {
+class HEnumerator : public huginn::HIterable {
 	HHuginn::value_t _source;
-	HHuginn::HInteger::value_type _start;
+	huginn::HInteger::value_type _start;
 public:
-	HEnumerator( HHuginn::HClass const* class_, HHuginn::value_t source_, HHuginn::HInteger::value_type start_ )
+	HEnumerator( huginn::HClass const* class_, HHuginn::value_t source_, huginn::HInteger::value_type start_ )
 		: HIterable( class_ )
 		, _source( source_ )
 		, _start( start_ ) {
 	}
-	static HHuginn::class_t get_class( HRuntime*, HHuginn::HClass const* );
+	static HHuginn::class_t get_class( HRuntime*, huginn::HClass const* );
 protected:
 	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
-		return ( static_cast<HHuginn::HIterable const*>( _source.raw() )->size( thread_, position_ ) );
+		return ( static_cast<huginn::HIterable const*>( _source.raw() )->size( thread_, position_ ) );
 	}
 private:
 	virtual iterator_t do_iterator( HThread*, int ) override;

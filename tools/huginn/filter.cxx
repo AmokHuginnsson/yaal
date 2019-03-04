@@ -14,7 +14,7 @@ namespace tools {
 
 namespace huginn {
 
-HHuginn::class_t HFilter::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
+HHuginn::class_t HFilter::get_class( HRuntime* runtime_, huginn::HClass const* origin_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
@@ -39,10 +39,10 @@ HHuginn::value_t HFilter::do_clone( huginn::HThread* thread_, HHuginn::value_t*,
 
 class HFilterIterator : public HIteratorInterface {
 protected:
-	HHuginn::HIterable::iterator_t _impl;
+	huginn::HIterable::iterator_t _impl;
 	HHuginn::value_t _value;
 public:
-	HFilterIterator( HHuginn::HIterable::iterator_t&& iterator_ )
+	HFilterIterator( huginn::HIterable::iterator_t&& iterator_ )
 		: _impl( yaal::move( iterator_ ) )
 		, _value() {
 		return;
@@ -76,7 +76,7 @@ private:
 class HFunctionFilterIterator : public HFilterIterator {
 	HHuginn::function_t const& _function;
 public:
-	HFunctionFilterIterator( HHuginn::HIterable::iterator_t&& iterator_, HHuginn::function_t const& function_, HThread* thread_, int position_ )
+	HFunctionFilterIterator( huginn::HIterable::iterator_t&& iterator_, HHuginn::function_t const& function_, HThread* thread_, int position_ )
 		: HFilterIterator( yaal::move( iterator_ ) )
 		, _function( function_ ) {
 		scan( thread_, position_ );
@@ -92,14 +92,14 @@ protected:
 				position_
 			);
 		}
-		return ( static_cast<HHuginn::HBoolean*>( v.raw() )->value() );
+		return ( static_cast<HBoolean*>( v.raw() )->value() );
 	}
 };
 
 class HUnboundMethodFilterIterator : public HFilterIterator {
-	HHuginn::HClass::HUnboundMethod& _method;
+	huginn::HClass::HUnboundMethod& _method;
 public:
-	HUnboundMethodFilterIterator( HHuginn::HIterable::iterator_t&& iterator_, HHuginn::HClass::HUnboundMethod& method_, HThread* thread_, int position_ )
+	HUnboundMethodFilterIterator( huginn::HIterable::iterator_t&& iterator_, huginn::HClass::HUnboundMethod& method_, HThread* thread_, int position_ )
 		: HFilterIterator( yaal::move( iterator_ ) )
 		, _method( method_ ) {
 		scan( thread_, position_ );
@@ -115,14 +115,14 @@ protected:
 				position_
 			);
 		}
-		return ( static_cast<HHuginn::HBoolean*>( v.raw() )->value() );
+		return ( static_cast<HBoolean*>( v.raw() )->value() );
 	}
 };
 
 class HBoundMethodFilterIterator : public HFilterIterator {
-	HHuginn::HClass::HBoundMethod& _method;
+	huginn::HClass::HBoundMethod& _method;
 public:
-	HBoundMethodFilterIterator( HHuginn::HIterable::iterator_t&& iterator_, HHuginn::HClass::HBoundMethod& method_, HThread* thread_, int position_ )
+	HBoundMethodFilterIterator( huginn::HIterable::iterator_t&& iterator_, huginn::HClass::HBoundMethod& method_, HThread* thread_, int position_ )
 		: HFilterIterator( yaal::move( iterator_ ) )
 		, _method( method_ ) {
 		scan( thread_, position_ );
@@ -138,18 +138,18 @@ protected:
 				position_
 			);
 		}
-		return ( static_cast<HHuginn::HBoolean*>( v.raw() )->value() );
+		return ( static_cast<HBoolean*>( v.raw() )->value() );
 	}
 };
 
 HFilter::iterator_t HFilter::do_iterator( HThread* thread_, int position_ ) {
 	iterator_t impl;
 	if ( !! _function ) {
-		impl = hcore::make_pointer<HFunctionFilterIterator>( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), _function, thread_, position_ );
+		impl = hcore::make_pointer<HFunctionFilterIterator>( static_cast<huginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), _function, thread_, position_ );
 	} else if ( _method->type_id() == HHuginn::TYPE::UNBOUND_METHOD ) {
-		impl = hcore::make_pointer<HUnboundMethodFilterIterator>( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), *static_cast<HHuginn::HClass::HUnboundMethod*>( _method.raw() ), thread_, position_ );
+		impl = hcore::make_pointer<HUnboundMethodFilterIterator>( static_cast<huginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), *static_cast<huginn::HClass::HUnboundMethod*>( _method.raw() ), thread_, position_ );
 	} else {
-		impl = hcore::make_pointer<HBoundMethodFilterIterator>( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), *static_cast<HHuginn::HClass::HBoundMethod*>( _method.raw() ), thread_, position_ );
+		impl = hcore::make_pointer<HBoundMethodFilterIterator>( static_cast<huginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), *static_cast<huginn::HClass::HBoundMethod*>( _method.raw() ), thread_, position_ );
 	}
 	return ( impl );
 }

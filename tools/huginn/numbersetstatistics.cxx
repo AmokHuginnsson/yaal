@@ -57,7 +57,7 @@ HNumberSetStatistics::number_set_stats_t make_data( HThread* thread_, HHuginn::t
 	M_EPILOG
 }
 
-HNumberSetStatistics::HNumberSetStatistics( huginn::HThread* thread_, HHuginn::HClass const* class_, HHuginn::values_t& values_, int position_ )
+HNumberSetStatistics::HNumberSetStatistics( huginn::HThread* thread_, HClass const* class_, HHuginn::values_t& values_, int position_ )
 	: HValue( class_ )
 	, _stats() {
 	char const name[] = "NumberSetStatistics.constructor";
@@ -78,15 +78,15 @@ HNumberSetStatistics::HNumberSetStatistics( huginn::HThread* thread_, HHuginn::H
 		buckets = safe_int::cast<int>( get_integer( values_[1] ) );
 	}
 	if ( t == HHuginn::TYPE::TUPLE ) {
-		_stats = make_data<HHuginn::HTuple>( thread_, vt, values_[0], buckets, position_ );
+		_stats = make_data<huginn::HTuple>( thread_, vt, values_[0], buckets, position_ );
 	} else if ( t == HHuginn::TYPE::LIST ) {
-		_stats = make_data<HHuginn::HList>( thread_, vt, values_[0], buckets, position_ );
+		_stats = make_data<huginn::HList>( thread_, vt, values_[0], buckets, position_ );
 	} else if ( t == HHuginn::TYPE::DEQUE ) {
-		_stats = make_data<HHuginn::HDeque>( thread_, vt, values_[0], buckets, position_ );
+		_stats = make_data<huginn::HDeque>( thread_, vt, values_[0], buckets, position_ );
 	} else if ( t == HHuginn::TYPE::SET ) {
-		_stats = make_data<HHuginn::HSet>( thread_, vt, values_[0], buckets, position_ );
+		_stats = make_data<huginn::HSet>( thread_, vt, values_[0], buckets, position_ );
 	} else if ( t == HHuginn::TYPE::ORDER ) {
-		_stats = make_data<HHuginn::HOrder>( thread_, vt, values_[0], buckets, position_ );
+		_stats = make_data<huginn::HOrder>( thread_, vt, values_[0], buckets, position_ );
 	}
 	return;
 }
@@ -184,7 +184,7 @@ HHuginn::value_t HNumberSetStatistics::count( huginn::HThread* thread_, HHuginn:
 }
 
 template<typename T>
-inline void histogram_impl( HObjectFactory& of_, T const& nss_, HHuginn::HList::values_t& data_ ) {
+inline void histogram_impl( HObjectFactory& of_, T const& nss_, huginn::HList::values_t& data_ ) {
 	M_PROLOG
 	if ( nss_.aggregate_type() & AGGREGATE_TYPE::HISTOGRAM ) {
 		for ( int c : nss_.histogram() ) {
@@ -198,7 +198,7 @@ inline void histogram_impl( HObjectFactory& of_, T const& nss_, HHuginn::HList::
 HHuginn::value_t HNumberSetStatistics::histogram( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "NumberSetStatistics.histogram", values_, 0, 0, thread_, position_ );
-	HHuginn::HList::values_t data;
+	huginn::HList::values_t data;
 	HNumberSetStatistics* o( static_cast<HNumberSetStatistics*>( object_->raw() ) );
 	if ( o->_stats.type() == 0 ) {
 		number_set_stats_real_t& nss( *( o->_stats.get<number_set_stats_real_ptr_t>().raw() ) );
@@ -214,20 +214,20 @@ HHuginn::value_t HNumberSetStatistics::histogram( huginn::HThread* thread_, HHug
 	M_EPILOG
 }
 
-HHuginn::value_t HNumberSetStatistics::create_instance( HHuginn::HClass const* class_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
+HHuginn::value_t HNumberSetStatistics::create_instance( HClass const* class_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	return ( thread_->object_factory().create<HNumberSetStatistics>( thread_, class_, values_, position_ ) );
 	M_EPILOG
 }
 
-HHuginn::class_t HNumberSetStatistics::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
+HHuginn::class_t HNumberSetStatistics::get_class( HRuntime* runtime_, HClass const* origin_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
 			"NumberSetStatistics",
 			"The `NumberSetStatistics` is a class representing results of gathering numerical statistics over some uniformly typed number set.",
 			HHuginn::ACCESS::PUBLIC,
-			HHuginn::HClass::TYPE::BUILTIN,
+			HClass::TYPE::BUILTIN,
 			origin_,
 			&HNumberSetStatistics::create_instance
 		)
@@ -264,3 +264,4 @@ HHuginn::value_t HNumberSetStatistics::do_clone( huginn::HThread* thread_, HHugi
 }
 
 }
+

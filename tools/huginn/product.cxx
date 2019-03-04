@@ -14,7 +14,7 @@ namespace tools {
 
 namespace huginn {
 
-HHuginn::class_t HProduct::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
+HHuginn::class_t HProduct::get_class( HRuntime* runtime_, huginn::HClass const* origin_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(

@@ -14,7 +14,7 @@ namespace tools {
 
 namespace huginn {
 
-HHuginn::class_t HMapper::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
+HHuginn::class_t HMapper::get_class( HRuntime* runtime_, huginn::HClass const* origin_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
@@ -42,9 +42,9 @@ HHuginn::value_t HMapper::do_clone( huginn::HThread* thread_, HHuginn::value_t*,
 
 class HMapperIterator : public HIteratorInterface {
 protected:
-	HHuginn::HIterable::iterator_t _impl;
+	huginn::HIterable::iterator_t _impl;
 public:
-	HMapperIterator( HHuginn::HIterable::iterator_t&& iterator_ )
+	HMapperIterator( huginn::HIterable::iterator_t&& iterator_ )
 		: _impl( yaal::move( iterator_ ) ) {
 		return;
 	}
@@ -63,7 +63,7 @@ private:
 class HFunctionMapperIterator : public HMapperIterator {
 	HHuginn::function_t const& _function;
 public:
-	HFunctionMapperIterator( HHuginn::HIterable::iterator_t&& iterator_, HHuginn::function_t const& function_ )
+	HFunctionMapperIterator( huginn::HIterable::iterator_t&& iterator_, HHuginn::function_t const& function_ )
 		: HMapperIterator( yaal::move( iterator_ ) )
 		, _function( function_ ) {
 		return;
@@ -75,9 +75,9 @@ protected:
 };
 
 class HUnboundMethodMapperIterator : public HMapperIterator {
-	HHuginn::HClass::HUnboundMethod& _method;
+	huginn::HClass::HUnboundMethod& _method;
 public:
-	HUnboundMethodMapperIterator( HHuginn::HIterable::iterator_t&& iterator_, HHuginn::HClass::HUnboundMethod& method_ )
+	HUnboundMethodMapperIterator( huginn::HIterable::iterator_t&& iterator_, huginn::HClass::HUnboundMethod& method_ )
 		: HMapperIterator( yaal::move( iterator_ ) )
 		, _method( method_ ) {
 		return;
@@ -89,9 +89,9 @@ protected:
 };
 
 class HBoundMethodMapperIterator : public HMapperIterator {
-	HHuginn::HClass::HBoundMethod& _method;
+	huginn::HClass::HBoundMethod& _method;
 public:
-	HBoundMethodMapperIterator( HHuginn::HIterable::iterator_t&& iterator_, HHuginn::HClass::HBoundMethod& method_ )
+	HBoundMethodMapperIterator( huginn::HIterable::iterator_t&& iterator_, huginn::HClass::HBoundMethod& method_ )
 		: HMapperIterator( yaal::move( iterator_ ) )
 		, _method( method_ ) {
 		return;
@@ -105,11 +105,11 @@ protected:
 HMapper::iterator_t HMapper::do_iterator( HThread* thread_, int position_ ) {
 	iterator_t impl;
 	if ( !! _function ) {
-		impl = hcore::make_pointer<HFunctionMapperIterator>( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), _function );
+		impl = hcore::make_pointer<HFunctionMapperIterator>( static_cast<huginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), _function );
 	} else if ( _method->type_id() == HHuginn::TYPE::UNBOUND_METHOD ) {
-		impl = hcore::make_pointer<HUnboundMethodMapperIterator>( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), *static_cast<HHuginn::HClass::HUnboundMethod*>( _method.raw() ) );
+		impl = hcore::make_pointer<HUnboundMethodMapperIterator>( static_cast<huginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), *static_cast<huginn::HClass::HUnboundMethod*>( _method.raw() ) );
 	} else {
-		impl = hcore::make_pointer<HBoundMethodMapperIterator>( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), *static_cast<HHuginn::HClass::HBoundMethod*>( _method.raw() ) );
+		impl = hcore::make_pointer<HBoundMethodMapperIterator>( static_cast<huginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), *static_cast<huginn::HClass::HBoundMethod*>( _method.raw() ) );
 	}
 	return ( impl );
 }

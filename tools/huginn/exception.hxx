@@ -1,6 +1,8 @@
 /* Read yaal/LICENSE.md file for copyright and licensing information. */
 
-/* YAAL_PRIVATE_IMPLEMENTATION_DETAIL */
+/*! \file tools/huginn/exception.hxx
+ * \brief Declaration of huginn::HException class.
+ */
 
 #ifndef YAAL_TOOLS_HUGINN_EXCEPTION_HXX_INCLUDED
 #define YAAL_TOOLS_HUGINN_EXCEPTION_HXX_INCLUDED 1
@@ -13,13 +15,30 @@ namespace tools {
 
 namespace huginn {
 
+class HException : public HValue {
+public:
+	typedef HException this_type;
+	typedef HValue base_type;
+private:
+	yaal::hcore::HString _message;
+	HHuginn::call_stack_t _callStack;
+public:
+	HException( huginn::HThread*, HClass const*, yaal::hcore::HString const& );
+	HException( HClass const*, yaal::hcore::HString const&, HHuginn::call_stack_t const& );
+	yaal::hcore::HString const& message( void ) const;
+	yaal::hcore::HString where( void ) const;
+	HHuginn::call_stack_t const& trace( void ) const;
+private:
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
+};
+
 namespace exception {
 
-class HStackFrameInfo : public HHuginn::HValue {
+class HStackFrameInfo : public HValue {
 private:
 	HHuginn::HCallSite _callSite;
 public:
-	HStackFrameInfo( HHuginn::HClass const*, HHuginn::HCallSite const& );
+	HStackFrameInfo( huginn::HClass const*, HHuginn::HCallSite const& );
 	static HHuginn::value_t file( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t line( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t column( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
@@ -37,7 +56,7 @@ HHuginn::class_t create_class(
 	yaal::hcore::HString const&,
 	yaal::hcore::HString const&,
 	HHuginn::VISIBILITY = HHuginn::VISIBILITY::PACKAGE,
-	HHuginn::HClass const* = nullptr
+	huginn::HClass const* = nullptr
 );
 
 }

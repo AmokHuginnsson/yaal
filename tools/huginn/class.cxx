@@ -19,10 +19,12 @@ namespace yaal {
 
 namespace tools {
 
-HHuginn::HClass::HClass(
+namespace huginn {
+
+HClass::HClass(
 	HRuntime* runtime_,
-	type_id_t typeId_,
-	identifier_id_t identifierId_,
+	HHuginn::type_id_t typeId_,
+	HHuginn::identifier_id_t identifierId_,
 	yaal::hcore::HString const& doc_,
 	HHuginn::ACCESS access_,
 	TYPE type_,
@@ -48,7 +50,7 @@ HHuginn::HClass::HClass(
 }
 
 /* ReverseTupleView, ReverseListView, ReverseDequeView and so on */
-HHuginn::HClass::HClass(
+HClass::HClass(
 	HRuntime* runtime_,
 	char const* name_,
 	char const* doc_,
@@ -73,7 +75,7 @@ HHuginn::HClass::HClass(
 }
 
 /* *none_type*, *function_reference*, *observer* and so on */
-HHuginn::HClass::HClass(
+HClass::HClass(
 	HRuntime* runtime_,
 	HHuginn::TYPE typeTag_,
 	HHuginn::identifier_id_t identifierId_,
@@ -98,11 +100,11 @@ HHuginn::HClass::HClass(
 }
 
 /* from HObjectFactory constructor */
-HHuginn::HClass::HClass(
+HClass::HClass(
 	HRuntime* runtime_,
 	HObjectFactory* objectFactory_,
-	type_id_t typeId_,
-	identifier_id_t identifierId_,
+	HHuginn::type_id_t typeId_,
+	HHuginn::identifier_id_t identifierId_,
 	yaal::hcore::HString const& doc_,
 	constructor_t constructor_
 ) : _runtime( runtime_ )
@@ -129,7 +131,7 @@ HHuginn::HClass::HClass(
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wsuggest-attribute=noreturn"
-HHuginn::value_t HHuginn::HClass::base_class_not_initialized( huginn::HThread* thread_, value_t*, values_t&, int position_ ) const {
+HHuginn::value_t HClass::base_class_not_initialized( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t&, int position_ ) const {
 	throw HHuginn::HHuginnRuntimeException(
 		"Base class `"_ys
 			.append( _super->name() )
@@ -141,35 +143,35 @@ HHuginn::value_t HHuginn::HClass::base_class_not_initialized( huginn::HThread* t
 }
 #pragma GCC diagnostic pop
 
-bool HHuginn::HClass::has_builtin_base( void ) const {
+bool HClass::has_builtin_base( void ) const {
 	return ( _super && ( _super->_type == TYPE::BUILTIN ) && ( _type == TYPE::USER ) );
 }
 
-void HHuginn::HClass::redefine( HClass const* super_, field_definitions_t const& fieldDefinitions_ ) {
+void HClass::redefine( HClass const* super_, HHuginn::field_definitions_t const& fieldDefinitions_ ) {
 	M_PROLOG
 	_super = super_;
 	_fieldIdentifiers.clear();
 	_fieldIndexes = ( _super ? _super->_fieldIndexes : field_indexes_t() );
-	_fieldDefinitions = ( _super ? _super->_fieldDefinitions : values_t() );
-	_fieldDescriptions = ( _super ? _super->_fieldDescriptions : field_descriptions_t() );
+	_fieldDefinitions = ( _super ? _super->_fieldDefinitions : HHuginn::values_t() );
+	_fieldDescriptions = ( _super ? _super->_fieldDescriptions : HHuginn::field_descriptions_t() );
 	if ( has_builtin_base() ) {
 		for ( HHuginn::value_t& v : _fieldDefinitions ) {
 			v = _runtime->create_method(
-				&HHuginn::HClass::base_class_not_initialized,
+				&HClass::base_class_not_initialized,
 				this
 			);
 		}
 	}
-	for ( field_definitions_t::value_type const& fd : fieldDefinitions_ ) {
+	for ( HHuginn::field_definitions_t::value_type const& fd : fieldDefinitions_ ) {
 		add_member( fd );
 	}
 	return;
 	M_EPILOG
 }
 
-void HHuginn::HClass::add_member( HHuginn::HFieldDefinition const& fd_, MEMBER_TYPE memberType_ ) {
+void HClass::add_member( HHuginn::HFieldDefinition const& fd_, MEMBER_TYPE memberType_ ) {
 	M_PROLOG
-	identifier_id_t identifierId( _runtime->identifier_id( fd_.name() ) );
+	HHuginn::identifier_id_t identifierId( _runtime->identifier_id( fd_.name() ) );
 	_fieldIdentifiers.emplace_back( identifierId );
 	int fieldCount( static_cast<int>( _fieldIndexes.get_size() + _staticFieldIndexes.get_size() ) );
 	if (
@@ -193,18 +195,18 @@ void HHuginn::HClass::add_member( HHuginn::HFieldDefinition const& fd_, MEMBER_T
 	M_EPILOG
 }
 
-void HHuginn::HClass::update_runtime( huginn::HRuntime* runtime_ ) {
+void HClass::update_runtime( huginn::HRuntime* runtime_ ) {
 	_runtime = runtime_;
 	return;
 }
 
-void HHuginn::HClass::set_origin( HClass const* origin_ ) {
+void HClass::set_origin( HClass const* origin_ ) {
 	M_ASSERT( ! _origin && origin_ );
 	_origin = origin_;
 	return;
 }
 
-HHuginn::ACCESS HHuginn::HClass::access( void ) const {
+HHuginn::ACCESS HClass::access( void ) const {
 	M_PROLOG
 	return (
 		( ! _origin && ! is_meta_class( this ) )
@@ -214,7 +216,7 @@ HHuginn::ACCESS HHuginn::HClass::access( void ) const {
 	M_EPILOG
 }
 
-int HHuginn::HClass::field_index( identifier_id_t const& identifierId_, MEMBER_TYPE memberType_ ) const {
+int HClass::field_index( HHuginn::identifier_id_t const& identifierId_, MEMBER_TYPE memberType_ ) const {
 	M_PROLOG
 	int fieldIndex( -1 );
 	field_indexes_t::const_iterator it( _fieldIndexes.find( identifierId_ ) );
@@ -230,20 +232,20 @@ int HHuginn::HClass::field_index( identifier_id_t const& identifierId_, MEMBER_T
 	M_EPILOG
 }
 
-yaal::hcore::HString const& HHuginn::HClass::name( void ) const {
+yaal::hcore::HString const& HClass::name( void ) const {
 	M_PROLOG
 	return ( _runtime ? _runtime->identifier_name( _identifierId ) : type_name( _typeId ) );
 	M_EPILOG
 }
 
-HHuginn::function_t const& HHuginn::HClass::function( int index_ ) const {
+HHuginn::function_t const& HClass::function( int index_ ) const {
 	M_PROLOG
 	M_ASSERT( dynamic_cast<HMethod const*>( _fieldDefinitions[index_].raw() ) != nullptr );
 	return ( static_cast<HMethod const*>( _fieldDefinitions[index_].raw() )->function() );
 	M_EPILOG
 }
 
-void HHuginn::HClass::finalize_registration( huginn::HRuntime* runtime_ ) {
+void HClass::finalize_registration( huginn::HRuntime* runtime_ ) {
 	M_PROLOG
 	if ( ! _constructor ) {
 		_constructor = make_constructor( runtime_->object_factory(), HHuginn::ACCESS::PRIVATE );
@@ -253,20 +255,20 @@ void HHuginn::HClass::finalize_registration( huginn::HRuntime* runtime_ ) {
 	M_EPILOG
 }
 
-void HHuginn::HClass::do_finalize_registration( huginn::HRuntime* ) {
+void HClass::do_finalize_registration( huginn::HRuntime* ) {
 }
 
-HHuginn::value_t HHuginn::HClass::create_instance_default( HClass const* class_, huginn::HThread* thread_, values_t& values_, int position_ ) {
+HHuginn::value_t HClass::create_instance_default( HClass const* class_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 	return ( class_->do_create_instance( thread_, values_, position_ ) );
 }
 
-HHuginn::value_t HHuginn::HClass::create_instance( huginn::HThread* thread_, value_t*, values_t& values_, int position_ ) const {
+HHuginn::value_t HClass::create_instance( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) const {
 	M_PROLOG
 	return ( _createInstance( this, thread_, values_, position_ ) );
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HClass::access_violation( huginn::HThread* thread_, value_t*, values_t&, int position_ ) const {
+HHuginn::value_t HClass::access_violation( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t&, int position_ ) const {
 	M_PROLOG
 	throw HHuginn::HHuginnRuntimeException(
 		"Explicit construction of class `"_ys.append( name() ).append( "` objects (instances) is forbidden." ),
@@ -276,13 +278,13 @@ HHuginn::value_t HHuginn::HClass::access_violation( huginn::HThread* thread_, va
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HClass::make_constructor( HObjectFactory* objectFactory_, HHuginn::ACCESS access_ ) const {
+HHuginn::value_t HClass::make_constructor( HObjectFactory* objectFactory_, HHuginn::ACCESS access_ ) const {
 	M_PROLOG
 	HHuginn::function_t func(
 		hcore::call(
 			access_ == HHuginn::ACCESS::PUBLIC
-				? &HHuginn::HClass::create_instance
-				: &HHuginn::HClass::access_violation,
+				? &HClass::create_instance
+				: &HClass::access_violation,
 			this, _1, _2, _3, _4
 		)
 	);
@@ -299,7 +301,7 @@ HHuginn::value_t HHuginn::HClass::make_constructor( HObjectFactory* objectFactor
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HClass::make_constructor( HObjectFactory* objectFactory_, constructor_t constructor_ ) const {
+HHuginn::value_t HClass::make_constructor( HObjectFactory* objectFactory_, constructor_t constructor_ ) const {
 	M_PROLOG
 	HHuginn::function_t func( hcore::call( constructor_, _1, _2, _3, _4 ) );
 	HHuginn::identifier_id_t identifier( identifier_id() );
@@ -315,20 +317,20 @@ HHuginn::value_t HHuginn::HClass::make_constructor( HObjectFactory* objectFactor
 	M_EPILOG
 }
 
-HHuginn::function_t HHuginn::HClass::constructor_function( void ) const {
+HHuginn::function_t HClass::constructor_function( void ) const {
 	M_PROLOG
 	return ( static_cast<HFunctionReference const*>( _constructor.raw() )->function() );
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HClass::do_create_instance( huginn::HThread* thread_, values_t& values_, int position_ ) const {
+HHuginn::value_t HClass::do_create_instance( huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) const {
 	M_PROLOG
-	value_t v( thread_->runtime().object_factory()->create_object( this, get_defaults( thread_, position_ ) ) );
+	HHuginn::value_t v( thread_->runtime().object_factory()->create_object( this, get_defaults( thread_, position_ ) ) );
 	int constructorIdx( field_index( IDENTIFIER::KEYWORD::CONSTRUCTOR ) );
 	if ( constructorIdx >= 0 ) {
 		function( constructorIdx )( thread_, &v, values_, position_ );
 	} else {
-		HHuginn::HObject& o( *static_cast<HHuginn::HObject*>( v.raw() ) );
+		HObject& o( *static_cast<HObject*>( v.raw() ) );
 		int vi( 0 );
 		int const valueCount( static_cast<int>( values_.get_size() ) );
 		int const fieldCount( static_cast<int>( _fieldDefinitions.get_size() ) );
@@ -352,10 +354,10 @@ HHuginn::value_t HHuginn::HClass::do_create_instance( huginn::HThread* thread_, 
 	M_EPILOG
 }
 
-HHuginn::values_t HHuginn::HClass::get_defaults( huginn::HThread* thread_, int position_ ) const {
+HHuginn::values_t HClass::get_defaults( huginn::HThread* thread_, int position_ ) const {
 	M_PROLOG
-	values_t defaults;
-	for ( value_t const& v : _fieldDefinitions ) {
+	HHuginn::values_t defaults;
+	for ( HHuginn::value_t const& v : _fieldDefinitions ) {
 		defaults.push_back(
 			( v->type_id() != HHuginn::TYPE::METHOD ) && ( ! is_enum_class( v ) )
 				? v->clone( thread_, const_cast<HHuginn::value_t*>( &v ), position_ )
@@ -366,7 +368,7 @@ HHuginn::values_t HHuginn::HClass::get_defaults( huginn::HThread* thread_, int p
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HClass::get_default( huginn::HThread* thread_, int index_, int position_ ) const {
+HHuginn::value_t HClass::get_default( huginn::HThread* thread_, int index_, int position_ ) const {
 	M_PROLOG
 	HHuginn::value_t const& v( _fieldDefinitions[index_] );
 	return (
@@ -377,17 +379,17 @@ HHuginn::value_t HHuginn::HClass::get_default( huginn::HThread* thread_, int ind
 	M_EPILOG
 }
 
-bool HHuginn::HClass::is_kind_of( identifier_id_t const& identifierId_ ) const {
+bool HClass::is_kind_of( HHuginn::identifier_id_t const& identifierId_ ) const {
 	M_PROLOG
 	return ( ( identifierId_ == _identifierId ) || ( _super ? _super->is_kind_of( identifierId_ ) : false ) );
 	M_EPILOG
 }
 
-yaal::hcore::HString const& HHuginn::HClass::doc( void ) const {
+yaal::hcore::HString const& HClass::doc( void ) const {
 	return ( _doc );
 }
 
-yaal::hcore::HString const& HHuginn::HClass::doc( identifier_id_t member_ ) const {
+yaal::hcore::HString const& HClass::doc( HHuginn::identifier_id_t member_ ) const {
 	M_PROLOG
 	int fieldIndex( field_index( member_, MEMBER_TYPE::STATIC ) );
 	if ( fieldIndex < 0 ) {
@@ -395,6 +397,8 @@ yaal::hcore::HString const& HHuginn::HClass::doc( identifier_id_t member_ ) cons
 	}
 	return ( _fieldDescriptions[ fieldIndex ] );
 	M_EPILOG
+}
+
 }
 
 }

@@ -19,7 +19,7 @@ namespace tools {
 
 namespace huginn {
 
-HClock::HClock( HHuginn::HClass* class_ )
+HClock::HClock( HClass* class_ )
 	: HValue( class_ )
 	, _clock() {
 	return;
@@ -49,11 +49,11 @@ HHuginn::value_t HClock::to_string( huginn::HThread* thread_, HHuginn::value_t* 
 	char const name[] = "Clock.to_string";
 	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	huginn::HClock* c( static_cast<huginn::HClock*>( object_->raw() ) );
-	return ( thread_->object_factory().create_string( lexical_cast<HString>( time::duration( c->_clock.get_time_elapsed( time::UNIT::NANOSECOND ), time::UNIT::NANOSECOND ) ) ) );
+	return ( thread_->object_factory().create_string( lexical_cast<hcore::HString>( time::duration( c->_clock.get_time_elapsed( time::UNIT::NANOSECOND ), time::UNIT::NANOSECOND ) ) ) );
 	M_EPILOG
 }
 
-HHuginn::class_t HClock::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
+HHuginn::class_t HClock::get_class( HRuntime* runtime_, HClass const* origin_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(

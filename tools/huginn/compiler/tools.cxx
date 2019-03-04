@@ -30,8 +30,8 @@ void OCompiler::merge( HHuginn::expression_t& to_, HHuginn::expression_t& from_ 
 }
 
 namespace {
-HString use_name( HHuginn::SYMBOL_KIND symbolKind_ ) {
-	HString name;
+hcore::HString use_name( HHuginn::SYMBOL_KIND symbolKind_ ) {
+	hcore::HString name;
 	switch ( symbolKind_ ) {
 		case ( HHuginn::SYMBOL_KIND::UNKNOWN ):  name = "Symbol";   break;
 		case ( HHuginn::SYMBOL_KIND::CLASS ):    name = "Class";    break;
@@ -136,8 +136,8 @@ HHuginn::expression_t OCompiler::new_expression( int fileId_, executing_parser::
 	);
 }
 
-HHuginn::HClass const* OCompiler::guess_type( HHuginn::identifier_id_t identifierId_ ) const {
-	HHuginn::HClass const* c( f()._scopeStack.top()->guess_type( this, identifierId_ ) );
+HClass const* OCompiler::guess_type( HHuginn::identifier_id_t identifierId_ ) const {
+	HClass const* c( f()._scopeStack.top()->guess_type( this, identifierId_ ) );
 	if ( c == type_to_class( HHuginn::TYPE::UNKNOWN ) ) {
 		HHuginn::value_t const* v( _runtime->get_global( identifierId_ ) );
 		if ( ( v && ( (*v)->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) )
@@ -148,12 +148,12 @@ HHuginn::HClass const* OCompiler::guess_type( HHuginn::identifier_id_t identifie
 	return ( c );
 }
 
-HHuginn::HClass const* OCompiler::type_to_class( HHuginn::TYPE type_ ) const {
+HClass const* OCompiler::type_to_class( HHuginn::TYPE type_ ) const {
 	return ( type_id_to_class( type_id( type_ ) ) );
 }
 
-HHuginn::HClass const* OCompiler::type_id_to_class( HHuginn::type_id_t typeId_ ) const {
-	HHuginn::HClass const* c( nullptr );
+HClass const* OCompiler::type_id_to_class( HHuginn::type_id_t typeId_ ) const {
+	HClass const* c( nullptr );
 	HObjectFactory const& of( *_runtime->object_factory() );
 	switch ( static_cast<HHuginn::TYPE>( typeId_.get() ) ) {
 		case ( HHuginn::TYPE::INTEGER ):             c = of.integer_class();             break;
@@ -186,11 +186,11 @@ HHuginn::HClass const* OCompiler::type_id_to_class( HHuginn::type_id_t typeId_ )
 	return ( c );
 }
 
-void OCompiler::note_type( HHuginn::identifier_id_t identifierId_, HHuginn::HClass const* class_ ) {
+void OCompiler::note_type( HHuginn::identifier_id_t identifierId_, HClass const* class_ ) {
 	f()._scopeStack.top()->note_type( identifierId_, class_ );
 }
 
-HHuginn::HClass const* OCompiler::function_ref_to_class( HHuginn::identifier_id_t identifierId_ ) {
+HClass const* OCompiler::function_ref_to_class( HHuginn::identifier_id_t identifierId_ ) {
 	HHuginn::type_id_t t( type_id( HHuginn::TYPE::UNKNOWN ) );
 	typedef HHashMap<HHuginn::identifier_id_t, HHuginn::type_id_t> fun_to_type_t;
 	static fun_to_type_t const funToType = {
@@ -219,8 +219,8 @@ HHuginn::HClass const* OCompiler::function_ref_to_class( HHuginn::identifier_id_
 	return ( type_id_to_class( t ) );
 }
 
-HHuginn::HHuginn::HClass const* OCompiler::congruent( HHuginn::HClass const* c1_, HHuginn::HClass const* c2_ ) const {
-	HHuginn::HClass const* c( type_to_class( HHuginn::TYPE::NOT_BOOLEAN ) );
+HClass const* OCompiler::congruent( HClass const* c1_, HClass const* c2_ ) const {
+	HClass const* c( type_to_class( HHuginn::TYPE::NOT_BOOLEAN ) );
 	if ( c1_ == c2_ ) {
 		HHuginn::type_id_t t1( c1_ ? c1_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
 		if ( ( t1 != HHuginn::TYPE::UNKNOWN ) && ( t1 != HHuginn::TYPE::REFERENCE ) ) {

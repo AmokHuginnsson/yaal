@@ -28,7 +28,7 @@ HEnumerationClass::HEnumeralClass::HEnumeralClass(
 	HHuginn::type_id_t typeId_,
 	HHuginn::identifier_id_t identifierId_,
 	yaal::hcore::HString const& doc_
-) : HHuginn::HClass(
+) : HClass(
 	runtime_,
 	typeId_,
 	identifierId_,
@@ -54,9 +54,9 @@ HEnumerationClass::HEnumerationClass(
 	HHuginn::identifier_id_t identifierId_,
 	descriptions_t const& descriptions_,
 	yaal::hcore::HString const& doc_,
-	HHuginn::HClass const* origin_,
+	HClass const* origin_,
 	HHuginn::VISIBILITY visibility_
-) : HHuginn::HClass(
+) : HClass(
 		runtime_,
 		typeId_,
 		identifierId_,
@@ -65,7 +65,7 @@ HEnumerationClass::HEnumerationClass(
 	)
 	, _valueClass() {
 	M_PROLOG
-	HString valueName( name() );
+	hcore::HString valueName( name() );
 	HObjectFactory& of( *runtime_->object_factory() );
 	valueName.append( name().find_one_of( character_class<CHARACTER_CLASS::LOWER_CASE_LETTER>().data() ) != HString::npos ? "Enumeral" : "_ENUMERAL" );
 	_valueClass = runtime_->create_class(
@@ -99,7 +99,7 @@ HEnumerationClass::HEnumerationClass(
 		}
 		fd.emplace_back(
 			d.name(),
-			of.create<HHuginn::HEnumeral>( _valueClass.raw(), runtime_->identifier_id( d.name() ), id ),
+			of.create<HEnumeral>( _valueClass.raw(), runtime_->identifier_id( d.name() ), id ),
 			d.doc()
 		);
 		++ id;
@@ -112,11 +112,11 @@ HEnumerationClass::HEnumerationClass(
 	M_EPILOG
 }
 
-HHuginn::value_t HEnumerationClass::enumeral( HHuginn::HEnumeral::value_type id_ ) const {
+HHuginn::value_t HEnumerationClass::enumeral( HEnumeral::value_type id_ ) const {
 	M_PROLOG
 	HHuginn::value_t v;
 	for ( HHuginn::value_t const& e : field_definitions() ) {
-		if ( static_cast<HHuginn::HEnumeral const*>( e.raw() )->value() == id_ ) {
+		if ( static_cast<HEnumeral const*>( e.raw() )->value() == id_ ) {
 			v = e;
 			break;
 		}
@@ -128,10 +128,10 @@ HHuginn::value_t HEnumerationClass::enumeral( HHuginn::HEnumeral::value_type id_
 HHuginn::value_t HEnumerationClass::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "to_string", values_, 0, 0, thread_, position_ );
-	HHuginn::HEnumeral* e( static_cast<HHuginn::HEnumeral*>( object_->raw() ) );
+	HEnumeral* e( static_cast<HEnumeral*>( object_->raw() ) );
 	HEnumerationClass const* ec( static_cast<HEnumeralClass const*>( e->get_class() )->enumeration_class() );
 	HRuntime& rt( thread_->runtime() );
-	HString s( full_class_name( rt, ec ) );
+	hcore::HString s( full_class_name( rt, ec ) );
 	return ( thread_->object_factory().create_string( yaal::move( s.append( "." ).append( rt.identifier_name( e->identifier() ) ) ) ) );
 	M_EPILOG
 }
@@ -148,7 +148,7 @@ HHuginn::class_t create_class(
 	descriptions_t const& descriptions_,
 	yaal::hcore::HString const& doc_,
 	HHuginn::VISIBILITY visibility_,
-	HHuginn::HClass const* origin_
+	HClass const* origin_
 ) {
 	HHuginn::identifier_id_t classIdentifier( runtime_->identifier_id( name_ ) );
 	HHuginn::class_t c( runtime_ && ! origin_ ? runtime_->get_class( classIdentifier ) : nullptr );
@@ -175,7 +175,7 @@ HHuginn::class_t create_class(
 	return ( c );
 }
 
-HEnumeration::HEnumeration( HHuginn::HClass const* class_ )
+HEnumeration::HEnumeration( HClass const* class_ )
 	: HValue( class_ ) {
 }
 
@@ -187,14 +187,14 @@ HHuginn::value_t HEnumeration::do_clone( huginn::HThread* thread_, HHuginn::valu
 
 }
 
-HHuginn::HEnumeral::HEnumeral( HHuginn::HClass const* class_, HHuginn::identifier_id_t identifier_, value_type value_ )
+HEnumeral::HEnumeral( HClass const* class_, HHuginn::identifier_id_t identifier_, value_type value_ )
 	: HValue( class_ )
 	, _identifier( identifier_ )
 	, _value( value_ ) {
 	return;
 }
 
-HHuginn::value_t HHuginn::HEnumeral::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
+HHuginn::value_t HEnumeral::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
 	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on enumerals.", thread_->current_frame()->file_id(), position_ );
 }
 

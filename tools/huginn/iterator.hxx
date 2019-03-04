@@ -5,7 +5,7 @@
 #ifndef YAAL_TOOLS_HUGINN_ITERATOR_HXX_INCLUDED
 #define YAAL_TOOLS_HUGINN_ITERATOR_HXX_INCLUDED 1
 
-#include "tools/hhuginn.hxx"
+#include "tools/huginn/iterable.hxx"
 
 namespace yaal {
 
@@ -39,7 +39,7 @@ class HNotifableIterator : public HIteratorInterface, public HHuginn::HNotifable
 protected:
 	int _skip;
 public:
-	HNotifableIterator( HHuginn::HInvalidatingIterable* owner_ )
+	HNotifableIterator( HInvalidatingIterable* owner_ )
 		: HIteratorInterface()
 		, HNotifableReference( owner_ )
 		, _skip( 0 ) {
@@ -52,12 +52,12 @@ protected:
 	virtual void do_skip( void ) = 0;
 };
 
-class HIterator : public HHuginn::HIterable, public HIteratorInterface {
+class HIterator : public HIterable, public HIteratorInterface {
 	HHuginn::value_t _source;
-	HHuginn::HIterable::iterator_t _impl;
+	HIterable::iterator_t _impl;
 public:
-	HIterator( HHuginn::HClass const*, HHuginn::value_t const&, HHuginn::HIterable::iterator_t const& );
-	static HHuginn::class_t get_class( HRuntime*, HHuginn::HClass const* );
+	HIterator( huginn::HClass const*, HHuginn::value_t const&, HIterable::iterator_t const& );
+	static HHuginn::class_t get_class( HRuntime*, huginn::HClass const* );
 protected:
 	/* Value interface. */
 	static HHuginn::value_t is_valid( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
@@ -94,10 +94,10 @@ protected:
 	virtual HHuginn::value_t do_value( HThread*, int ) override;
 };
 
-class HIterableAdaptor : public HHuginn::HIterable {
+class HIterableAdaptor : public HIterable {
 	HHuginn::value_t _source;
 public:
-	HIterableAdaptor( HHuginn::HClass const*, HHuginn::value_t const& );
+	HIterableAdaptor( huginn::HClass const*, HHuginn::value_t const& );
 	static HHuginn::class_t get_class( HRuntime* );
 protected:
 	virtual iterator_t do_iterator( HThread*, int ) override;

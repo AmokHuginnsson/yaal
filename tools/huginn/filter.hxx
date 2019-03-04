@@ -14,18 +14,18 @@ namespace tools {
 
 namespace huginn {
 
-class HFilter : public HHuginn::HIterable {
+class HFilter : public huginn::HIterable {
 	HHuginn::value_t _source;
 	HHuginn::function_t _function;
 	HHuginn::value_t _method;
 public:
-	HFilter( HHuginn::HClass const* class_, HHuginn::value_t source_, HHuginn::function_t function_, HHuginn::value_t method_ )
+	HFilter( huginn::HClass const* class_, HHuginn::value_t source_, HHuginn::function_t function_, HHuginn::value_t method_ )
 		: HIterable( class_ )
 		, _source( source_ )
 		, _function( function_ )
 		, _method( method_ ) {
 	}
-	static HHuginn::class_t get_class( HRuntime*, HHuginn::HClass const* );
+	static HHuginn::class_t get_class( HRuntime*, huginn::HClass const* );
 protected:
 	virtual int long do_size( huginn::HThread*, int ) const override __attribute__(( noreturn ));
 private:

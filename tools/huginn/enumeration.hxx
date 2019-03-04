@@ -6,7 +6,7 @@
 #ifndef YAAL_TOOLS_HUGINN_ENUMERATION_HXX_INCLUDED
 #define YAAL_TOOLS_HUGINN_ENUMERATION_HXX_INCLUDED 1
 
-#include "tools/hhuginn.hxx"
+#include "tools/huginn/enumeral.hxx"
 
 namespace yaal {
 
@@ -42,10 +42,10 @@ public:
 
 typedef yaal::hcore::HArray<HDesctiption> descriptions_t;
 
-class HEnumerationClass : public HHuginn::HClass {
+class HEnumerationClass : public huginn::HClass {
 public:
 	typedef HEnumerationClass this_type;
-	typedef HHuginn::HClass base_type;
+	typedef huginn::HClass base_type;
 	typedef yaal::hcore::HPointer<HEnumerationClass> ptr_t;
 	class HEnumeralClass;
 private:
@@ -57,22 +57,22 @@ public:
 		HHuginn::identifier_id_t,
 		descriptions_t const&,
 		yaal::hcore::HString const&,
-		HHuginn::HClass const*,
+		huginn::HClass const*,
 		HHuginn::VISIBILITY visibility_
 	);
 	static HHuginn::value_t to_string( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
-	HHuginn::HClass const* enumeral_class( void ) const {
+	huginn::HClass const* enumeral_class( void ) const {
 		return ( _valueClass.raw() );
 	}
-	HHuginn::value_t enumeral( HHuginn::HEnumeral::value_type ) const;
+	HHuginn::value_t enumeral( huginn::HEnumeral::value_type ) const;
 private:
 	virtual HHuginn::value_t do_create_instance( huginn::HThread*, HHuginn::values_t&, int ) const __attribute__((noreturn));
 };
 
-class HEnumerationClass::HEnumeralClass : public HHuginn::HClass {
+class HEnumerationClass::HEnumeralClass : public huginn::HClass {
 public:
 	typedef HEnumeralClass this_type;
-	typedef HHuginn::HClass base_type;
+	typedef huginn::HClass base_type;
 public:
 	HEnumeralClass( HEnumerationClass const*, HRuntime*, HHuginn::type_id_t, HHuginn::identifier_id_t, yaal::hcore::HString const& );
 	HEnumerationClass const* enumeration_class( void ) const;
@@ -83,9 +83,9 @@ private:
 	HEnumeralClass& operator = ( HEnumeralClass const& ) = delete;
 };
 
-class HEnumeration : HHuginn::HValue {
+class HEnumeration : huginn::HValue {
 public:
-	HEnumeration( HHuginn::HClass const* );
+	HEnumeration( huginn::HClass const* );
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const __attribute__((noreturn));
 };
@@ -96,7 +96,7 @@ HHuginn::class_t create_class(
 	descriptions_t const&,
 	yaal::hcore::HString const&,
 	HHuginn::VISIBILITY,
-	HHuginn::HClass const* = nullptr
+	huginn::HClass const* = nullptr
 );
 
 }

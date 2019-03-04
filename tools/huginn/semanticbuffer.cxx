@@ -54,76 +54,76 @@ void HSemanticBuffer::serialize( HHuginn::value_t const& val_ ) {
 	switch ( static_cast<HHuginn::TYPE>( t ) ) {
 		case ( HHuginn::TYPE::NONE ): break;
 		case ( HHuginn::TYPE::BOOLEAN ): {
-			write( static_cast<i8_t>( static_cast<HHuginn::HBoolean const*>( val_.raw() )->value() ? 1 : 0 ) );
+			write( static_cast<i8_t>( static_cast<HBoolean const*>( val_.raw() )->value() ? 1 : 0 ) );
 		} break;
 		case ( HHuginn::TYPE::INTEGER ): {
-			write( static_cast<HHuginn::HInteger const*>( val_.raw() )->value() );
+			write( static_cast<huginn::HInteger const*>( val_.raw() )->value() );
 		} break;
 		case ( HHuginn::TYPE::REAL ): {
-			write( static_cast<HHuginn::HReal const*>( val_.raw() )->value() );
+			write( static_cast<HReal const*>( val_.raw() )->value() );
 		} break;
 		case ( HHuginn::TYPE::CHARACTER ): {
-			write( static_cast<HHuginn::HCharacter const*>( val_.raw() )->value().get() );
+			write( static_cast<HCharacter const*>( val_.raw() )->value().get() );
 		} break;
 		case ( HHuginn::TYPE::STRING ): {
-			write( static_cast<HHuginn::HString const*>( val_.raw() )->value() );
+			write( static_cast<HString const*>( val_.raw() )->value() );
 		} break;
 		case ( HHuginn::TYPE::NUMBER ): {
-			HNumber::ElementaryFunctions::serialize( *this, static_cast<HHuginn::HNumber const*>( val_.raw() )->value() );
+			hcore::HNumber::ElementaryFunctions::serialize( *this, static_cast<HNumber const*>( val_.raw() )->value() );
 		} break;
 		case ( HHuginn::TYPE::TUPLE ): {
-			HHuginn::HTuple::values_t const& val( static_cast<HHuginn::HTuple const*>( val_.raw() )->value() );
+			huginn::HTuple::values_t const& val( static_cast<huginn::HTuple const*>( val_.raw() )->value() );
 			write( val.get_size() );
 			for ( HHuginn::value_t const& v : val ) {
 				serialize( v );
 			}
 		} break;
 		case ( HHuginn::TYPE::LIST ): {
-			HHuginn::HList::values_t const& val( static_cast<HHuginn::HList const*>( val_.raw() )->value() );
+			huginn::HList::values_t const& val( static_cast<huginn::HList const*>( val_.raw() )->value() );
 			write( val.get_size() );
 			for ( HHuginn::value_t const& v : val ) {
 				serialize( v );
 			}
 		} break;
 		case ( HHuginn::TYPE::DEQUE ): {
-			HHuginn::HDeque::values_t const& val( static_cast<HHuginn::HDeque const*>( val_.raw() )->value() );
+			huginn::HDeque::values_t const& val( static_cast<huginn::HDeque const*>( val_.raw() )->value() );
 			write( val.get_size() );
 			for ( HHuginn::value_t const& v : val ) {
 				serialize( v );
 			}
 		} break;
 		case ( HHuginn::TYPE::DICT ): {
-			HHuginn::HDict::values_t const& val( static_cast<HHuginn::HDict const*>( val_.raw() )->value() );
+			huginn::HDict::values_t const& val( static_cast<huginn::HDict const*>( val_.raw() )->value() );
 			write( val.get_size() );
-			for ( HHuginn::HDict::values_t::value_type const& v : val ) {
+			for ( huginn::HDict::values_t::value_type const& v : val ) {
 				serialize( v.first );
 				serialize( v.second );
 			}
 		} break;
 		case ( HHuginn::TYPE::LOOKUP ): {
-			HHuginn::HLookup::values_t const& val( static_cast<HHuginn::HLookup const*>( val_.raw() )->value() );
+			huginn::HLookup::values_t const& val( static_cast<huginn::HLookup const*>( val_.raw() )->value() );
 			write( val.get_size() );
-			for ( HHuginn::HLookup::values_t::value_type const& v : val ) {
+			for ( huginn::HLookup::values_t::value_type const& v : val ) {
 				serialize( v.first );
 				serialize( v.second );
 			}
 		} break;
 		case ( HHuginn::TYPE::ORDER ): {
-			HHuginn::HOrder::values_t const& val( static_cast<HHuginn::HOrder const*>( val_.raw() )->value() );
+			huginn::HOrder::values_t const& val( static_cast<huginn::HOrder const*>( val_.raw() )->value() );
 			write( val.get_size() );
 			for ( HHuginn::value_t const& v : val ) {
 				serialize( v );
 			}
 		} break;
 		case ( HHuginn::TYPE::SET ): {
-			HHuginn::HSet::values_t const& val( static_cast<HHuginn::HSet const*>( val_.raw() )->value() );
+			huginn::HSet::values_t const& val( static_cast<huginn::HSet const*>( val_.raw() )->value() );
 			write( val.get_size() );
 			for ( HHuginn::value_t const& v : val ) {
 				serialize( v );
 			}
 		} break;
 		case ( HHuginn::TYPE::FUNCTION_REFERENCE ): {
-			HHuginn::identifier_id_t id(	static_cast<HHuginn::HFunctionReference const*>( val_.raw() )->identifier_id() );
+			HHuginn::identifier_id_t id(	static_cast<huginn::HFunctionReference const*>( val_.raw() )->identifier_id() );
 			write( _context._thread->runtime().identifier_name( id ) );
 		} break;
 		default: {

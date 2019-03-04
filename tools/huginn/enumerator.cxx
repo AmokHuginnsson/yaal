@@ -14,7 +14,7 @@ namespace tools {
 
 namespace huginn {
 
-HHuginn::class_t HEnumerator::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
+HHuginn::class_t HEnumerator::get_class( HRuntime* runtime_, huginn::HClass const* origin_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
@@ -35,10 +35,10 @@ HHuginn::value_t HEnumerator::do_clone( huginn::HThread* thread_, HHuginn::value
 
 class HEnumeratorIterator : public HIteratorInterface {
 protected:
-	HHuginn::HIterable::iterator_t _impl;
-	HHuginn::HInteger::value_type _counter;
+	huginn::HIterable::iterator_t _impl;
+	huginn::HInteger::value_type _counter;
 public:
-	HEnumeratorIterator( HHuginn::HIterable::iterator_t&& iterator_, HHuginn::HInteger::value_type start_ )
+	HEnumeratorIterator( huginn::HIterable::iterator_t&& iterator_, huginn::HInteger::value_type start_ )
 		: _impl( yaal::move( iterator_ ) )
 		, _counter( start_ ) {
 		return;
@@ -68,7 +68,7 @@ private:
 };
 
 HEnumerator::iterator_t HEnumerator::do_iterator( HThread* thread_, int position_ ) {
-	return ( hcore::make_pointer<HEnumeratorIterator>( static_cast<HHuginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), _start ) );
+	return ( hcore::make_pointer<HEnumeratorIterator>( static_cast<huginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), _start ) );
 }
 
 }

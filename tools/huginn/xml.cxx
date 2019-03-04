@@ -30,7 +30,7 @@ typedef yaal::hcore::HPointer<yaal::tools::HXml> xml_t;
 
 namespace {
 
-HHuginn::class_t make_node_class( HRuntime* runtime_, HHuginn::HClass const* origin_, char const* name_, char const* doc_ ) {
+HHuginn::class_t make_node_class( HRuntime* runtime_, HClass const* origin_, char const* name_, char const* doc_ ) {
 	M_PROLOG
 	HHuginn::class_t c( runtime_->create_class( name_, doc_, HHuginn::ACCESS::PRIVATE ) );
 	c->set_origin( origin_ );
@@ -42,11 +42,11 @@ HHuginn::class_t make_node_class( HRuntime* runtime_, HHuginn::HClass const* ori
 
 }
 
-class HAttributes : public HHuginn::HInvalidatingIterable {
+class HAttributes : public HInvalidatingIterable {
 private:
 	HHuginn::value_t _element;
 public:
-	HAttributes( HHuginn::HClass const* class_, HHuginn::value_t& element_ )
+	HAttributes( HClass const* class_, HHuginn::value_t& element_ )
 		: HInvalidatingIterable( class_ )
 		, _element( element_ ) {
 	}
@@ -70,7 +70,7 @@ private:
 	}
 };
 
-class HElement : public HHuginn::HInvalidatingIterable {
+class HElement : public HInvalidatingIterable {
 public:
 	typedef yaal::hcore::HPointer<yaal::tools::HXml> xml_t;
 	class HTrackerProxy : public HHuginn::HNotifableReference {
@@ -94,7 +94,7 @@ private:
 	yaal::tools::HXml::HNodeProxy _node;
 	HTrackerProxy _tracker;
 public:
-	HElement( HHuginn::HClass const*, HHuginn::value_t&, yaal::tools::HXml::HNodeProxy const& );
+	HElement( HClass const*, HHuginn::value_t&, yaal::tools::HXml::HNodeProxy const& );
 	virtual ~HElement( void );
 	HHuginn::value_t name( HThread* thread_, int position_ ) const {
 		ensure_valid( thread_, position_ );
@@ -156,16 +156,16 @@ private:
 
 class HDocumentClass;
 
-class HAttributesClass : public HHuginn::HClass {
+class HAttributesClass : public HClass {
 public:
 	typedef HAttributesClass this_type;
-	typedef HHuginn::HClass base_type;
+	typedef HClass base_type;
 public:
 	HAttributesClass(
 		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_,
-		HHuginn::HClass const* origin_
-	) : HHuginn::HClass(
+		HClass const* origin_
+	) : HClass(
 			runtime_,
 			typeId_,
 			runtime_->identifier_id( "Attributes" ),
@@ -212,7 +212,7 @@ public:
 		return ( *object_ );
 		M_EPILOG
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HClass const* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			runtime_->create_class(
@@ -238,22 +238,22 @@ private:
 	HAttributesClass& operator = ( HAttributesClass const& ) = delete;
 };
 
-class HElementClass : public HHuginn::HClass {
+class HElementClass : public HClass {
 public:
 	typedef HElementClass this_type;
-	typedef HHuginn::HClass base_type;
+	typedef HClass base_type;
 private:
 	HHuginn::class_t _attributesClass;
-	HHuginn::HClass const* _documentClass;
+	HClass const* _documentClass;
 	HHuginn::class_t const& _exceptionClass;
 public:
 	HElementClass(
 		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_,
-		HHuginn::HClass const* documentClass_,
+		HClass const* documentClass_,
 		HHuginn::class_t const& exceptionClass_,
-		HHuginn::HClass* origin_
-	) : HHuginn::HClass(
+		HClass* origin_
+	) : HClass(
 			runtime_,
 			typeId_,
 			runtime_->identifier_id( "Element" ),
@@ -342,13 +342,13 @@ public:
 		M_EPILOG
 	}
 	HDocumentClass const* document_class( void ) const;
-	HHuginn::HClass const* attributes_class( void ) const {
+	HClass const* attributes_class( void ) const {
 		return ( _attributesClass.raw() );
 	}
-	HHuginn::HClass const* exception_class( void ) const {
+	HClass const* exception_class( void ) const {
 		return ( _exceptionClass.raw() );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::HClass const* documentClass_, HHuginn::class_t const& exceptionClass_, HHuginn::HClass* origin_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HClass const* documentClass_, HHuginn::class_t const& exceptionClass_, HClass* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			runtime_->create_class(
@@ -421,7 +421,7 @@ private:
 	HAttributesIterator& operator = ( HAttributesIterator const& ) = delete;
 };
 
-HHuginn::HIterable::iterator_t HAttributes::do_iterator( HThread* thread_, int position_ ) {
+huginn::HIterable::iterator_t HAttributes::do_iterator( HThread* thread_, int position_ ) {
 	ensure_valid( thread_, position_ );
 	return ( make_pointer<HAttributesIterator>( _element, this ) );
 }
@@ -472,19 +472,19 @@ private:
 	HElementIterator& operator = ( HElementIterator const& ) = delete;
 };
 
-HHuginn::HIterable::iterator_t HElement::do_iterator( HThread* thread_, int position_ ) {
+huginn::HIterable::iterator_t HElement::do_iterator( HThread* thread_, int position_ ) {
 	ensure_valid( thread_, position_ );
 	return ( make_pointer<HElementIterator>( static_cast<HElementClass const*>( get_class() ), _doc, this ) );
 }
 
-class HDocument : public HHuginn::HValue, public HHuginn::HReferenceTracker {
+class HDocument : public huginn::HValue, public HHuginn::HReferenceTracker {
 public:
 	typedef yaal::hcore::HHashMap<void const*, HHuginn::value_ref_t> element_refs_t;
 private:
 	xml_t _xml;
 	element_refs_t _elementRefs;
 public:
-	HDocument( HHuginn::HClass const* class_, yaal::hcore::HString const& name_ )
+	HDocument( HClass const* class_, yaal::hcore::HString const& name_ )
 		: HValue( class_ )
 		, HReferenceTracker()
 		, _xml( make_pointer<yaal::tools::HXml>() )
@@ -492,7 +492,7 @@ public:
 		_xml->create_root( name_ );
 		return;
 	}
-	HDocument( HHuginn::HClass const* class_, xml_t xml_ )
+	HDocument( HClass const* class_, xml_t xml_ )
 		: HValue( class_ )
 		, _xml( xml_ )
 		, _elementRefs() {
@@ -521,10 +521,10 @@ public:
 	}
 };
 
-class HDocumentClass : public HHuginn::HClass {
+class HDocumentClass : public HClass {
 public:
 	typedef HDocumentClass this_type;
-	typedef HHuginn::HClass base_type;
+	typedef HClass base_type;
 private:
 	HHuginn::class_t _elementClass;
 	HHuginn::class_t _textClass;
@@ -538,8 +538,8 @@ public:
 		HHuginn::type_id_t typeId_,
 		HHuginn::class_t const& streamClass_,
 		HHuginn::class_t const& exceptionClass_,
-		HHuginn::HClass* origin_
-	) : HHuginn::HClass(
+		HClass* origin_
+	) : HClass(
 			runtime_,
 			typeId_,
 			runtime_->identifier_id( "Document" ),
@@ -600,22 +600,22 @@ public:
 		return ( *object_ );
 		M_EPILOG
 	}
-	HHuginn::HClass const* element_class( void ) const {
+	HClass const* element_class( void ) const {
 		return ( _elementClass.raw() );
 	}
-	HHuginn::HClass const* text_class( void ) const {
+	HClass const* text_class( void ) const {
 		return ( _textClass.raw() );
 	}
-	HHuginn::HClass const* comment_class( void ) const {
+	HClass const* comment_class( void ) const {
 		return ( _commentClass.raw() );
 	}
-	HHuginn::HClass const* entity_class( void ) const {
+	HClass const* entity_class( void ) const {
 		return ( _entityClass.raw() );
 	}
-	HHuginn::HClass const* exception_class( void ) const {
+	HClass const* exception_class( void ) const {
 		return ( _exceptionClass.raw() );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::class_t const& streamClass_, HHuginn::class_t const& exceptionClass_, HHuginn::HClass* origin_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::class_t const& streamClass_, HHuginn::class_t const& exceptionClass_, HClass* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			runtime_->create_class(
@@ -657,13 +657,13 @@ HHuginn::value_t make_node_ref( HObjectFactory& of_, HDocumentClass const* dc_, 
 			v = static_cast<HDocument*>( doc_.raw() )->create_element( of_, doc_, n_ );
 		} break;
 		case ( yaal::tools::HXml::HNode::TYPE::CONTENT ): {
-			v = of_.create<HHuginn::HString>( dc_->text_class(), n_.get_value() );
+			v = of_.create<HString>( dc_->text_class(), n_.get_value() );
 		} break;
 		case ( yaal::tools::HXml::HNode::TYPE::COMMENT ): {
-			v = of_.create<HHuginn::HString>( dc_->comment_class(), n_.get_value() );
+			v = of_.create<HString>( dc_->comment_class(), n_.get_value() );
 		} break;
 		case ( yaal::tools::HXml::HNode::TYPE::ENTITY ): {
-			v = of_.create<HHuginn::HString>( dc_->entity_class(), n_.get_value() );
+			v = of_.create<HString>( dc_->entity_class(), n_.get_value() );
 		} break;
 	}
 	return ( v );
@@ -704,7 +704,7 @@ yaal::hcore::HString const& HAttributes::subscript( HThread* thread_, yaal::hcor
 	ensure_valid( thread_, position_ );
 	try {
 		return ( static_cast<HElement*>( _element.raw() )->properties().at( name_ ) );
-	} catch ( HException const& e ) {
+	} catch ( hcore::HException const& e ) {
 		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
 	}
 }
@@ -743,7 +743,7 @@ void HAttributes::ensure_valid( HThread* thread_, int position_ ) const {
 	}
 }
 
-HElement::HElement( HHuginn::HClass const* class_, HHuginn::value_t& doc_, yaal::tools::HXml::HNodeProxy const& node_ )
+HElement::HElement( HClass const* class_, HHuginn::value_t& doc_, yaal::tools::HXml::HNodeProxy const& node_ )
 	: HInvalidatingIterable( class_ )
 	, _doc( doc_ )
 	, _attributes()
@@ -781,10 +781,10 @@ HHuginn::value_t HElement::append( HThread* thread_, HHuginn::values_t& values_,
 	}
 	HElementClass const* ec( static_cast<HElementClass const*>( get_class() ) );
 	HDocumentClass const* dc( ec->document_class() );
-	HHuginn::HFunctionReference& fr( *static_cast<HHuginn::HFunctionReference*>( values_[0].raw() ) );
+	huginn::HFunctionReference& fr( *static_cast<huginn::HFunctionReference*>( values_[0].raw() ) );
 	void const* id( fr.function().id() );
 	HRuntime& r( thread_->runtime() );
-	HString const& s( get_string( values_[1] ) );
+	hcore::HString const& s( get_string( values_[1] ) );
 	yaal::tools::HXml::HNode::TYPE t( yaal::tools::HXml::HNode::TYPE::ELEMENT );
 	if ( id == dc->element_class() ) {
 		/* node type already set */
@@ -914,12 +914,12 @@ HHuginn::value_t HElementIterator::do_value( HThread* thread_, int ) {
 
 }
 
-class HXml : public HHuginn::HValue {
+class HXml : public HValue {
 	HHuginn::class_t _documentClass;
 	HHuginn::class_t _streamClass;
 	HHuginn::class_t _exceptionClass;
 public:
-	HXml( HHuginn::HClass* class_ )
+	HXml( HClass* class_ )
 		: HValue( class_ )
 		, _documentClass( xml::HDocumentClass::get_class( class_->runtime(), _streamClass, _exceptionClass, class_ ) )
 		, _streamClass( HStream::get_class( class_->runtime() ) )
@@ -937,7 +937,7 @@ public:
 			HStream& stream( *static_cast<HStream*>( values_[0].raw() ) );
 			doc->load( stream.raw() );
 			v = thread_->object_factory().create<xml::HDocument>( XML._documentClass.raw(), doc );
-		} catch ( HException const& e ) {
+		} catch ( hcore::HException const& e ) {
 			thread_->raise( XML._exceptionClass.raw(), e.what(), position_ );
 		}
 		return ( v );

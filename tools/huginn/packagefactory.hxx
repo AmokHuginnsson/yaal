@@ -10,7 +10,7 @@
 #include "hcore/hpointer.hxx"
 #include "hcore/hsingleton.hxx"
 
-#include "tools/hhuginn.hxx"
+#include "tools/huginn/value.hxx"
 
 namespace yaal {
 
@@ -94,15 +94,15 @@ private:
 	friend class yaal::hcore::HDestructor<HPackageFactory>;
 };
 
-class HPackage : public HHuginn::HValue {
+class HPackage : public HValue {
 public:
 	typedef HPackage this_type;
-	typedef HHuginn::HValue base_type;
+	typedef HValue base_type;
 private:
 	HHuginn::class_t _exceptionClass;
 public:
-	HPackage( HHuginn::HClass* );
-	HHuginn::HClass const* exception_class( void ) const;
+	HPackage( HClass* );
+	HClass const* exception_class( void ) const;
 };
 
 }

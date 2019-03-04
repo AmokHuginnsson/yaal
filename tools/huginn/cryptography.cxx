@@ -23,10 +23,10 @@ namespace tools {
 
 namespace huginn {
 
-class HCryptography : public HHuginn::HValue {
+class HCryptography : public huginn::HValue {
 	HHuginn::class_t _exceptionClass;
 public:
-	HCryptography( HHuginn::HClass* class_ )
+	HCryptography( huginn::HClass* class_ )
 		: HValue( class_ )
 		, _exceptionClass( class_exception( class_ ) ) {
 		return;

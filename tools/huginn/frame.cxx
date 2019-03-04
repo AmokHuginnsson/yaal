@@ -8,6 +8,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "thread.hxx"
 #include "objectfactory.hxx"
 #include "keyword.hxx"
+#include "objectreference.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -145,7 +146,7 @@ void HFrame::note_variable( HHuginn::identifier_id_t identifier_, HStatement::st
 void HFrame::commit_variable( HHuginn::value_t&& value_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( _result->type_id() == HHuginn::TYPE::REFERENCE );
-	static_cast<HHuginn::HReference*>( _result.raw() )->set( _thread, yaal::move( value_ ), position_ );
+	static_cast<HReference*>( _result.raw() )->set( _thread, yaal::move( value_ ), position_ );
 	return;
 	M_EPILOG
 }
@@ -156,9 +157,9 @@ HHuginn::value_t HFrame::get_field( ACCESS access_, int index_ ) {
 	M_ASSERT( obj && !! *obj );
 	HHuginn::value_t v;
 	if ( access_ == ACCESS::VALUE ) {
-		v = static_cast<HHuginn::HObject*>( obj->raw() )->field( *obj, index_ );
+		v = static_cast<HObject*>( obj->raw() )->field( *obj, index_ );
 	} else {
-		HHuginn::value_t& ref( static_cast<HHuginn::HObject*>( obj->raw() )->field_ref( index_ ) );
+		HHuginn::value_t& ref( static_cast<HObject*>( obj->raw() )->field_ref( index_ ) );
 	  v = _thread->runtime().object_factory()->create_reference( ref );
 	}
 	return ( v );
@@ -220,7 +221,7 @@ HHuginn::value_t HFrame::get_super( int position_ ) {
 	HHuginn::value_t* obj( object() );
 	M_ASSERT( obj && !! *obj );
 	HObjectFactory* of( _thread->runtime().object_factory() );
-	return ( of->create<HHuginn::HObjectReference>( of->object_reference_class(), *obj, _upCast, file_id(), position_ ) );
+	return ( of->create<HObjectReference>( of->object_reference_class(), *obj, _upCast, file_id(), position_ ) );
 	M_EPILOG
 }
 

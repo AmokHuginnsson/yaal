@@ -5,6 +5,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/huginn/compiler.hxx"
 #include "tools/huginn/booleanevaluator.hxx"
+#include "tools/huginn/ternaryevaluator.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -24,7 +25,7 @@ OPERATOR _copyConstContext_[] = {
 	OPERATOR::SUBSCRIPT
 };
 
-inline HHuginn::TYPE compiled_type_id( HHuginn::HClass const* class_ ) {
+inline HHuginn::TYPE compiled_type_id( HClass const* class_ ) {
 	return ( class_ ? type_tag( class_->type_id() ) : HHuginn::TYPE::UNKNOWN );
 }
 
@@ -87,7 +88,7 @@ void OCompiler::dispatch_action( OPERATOR oper_, executing_parser::range_t range
 			defer_action( &HExpression::boolean_not, range_ );
 			current_expression()->commit_oper( o );
 			fc._operations.pop();
-			HHuginn::HClass const* c( fc._valueTypes.top()._class );
+			HClass const* c( fc._valueTypes.top()._class );
 			if ( ! is_boolean_congruent( c ) ) {
 				throw HHuginn::HHuginnRuntimeException(
 					hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL] ).append( a_type_name( c ) ),
@@ -388,12 +389,12 @@ void OCompiler::dispatch_assign( executing_parser::range_t range_ ) {
 			M_ASSERT( fc._valueTypes.get_size() >= 2 );
 			M_ASSERT( ! fc._variables.is_empty() );
 			M_ASSERT( o != OPERATOR::ASSIGN_PACK );
-			HHuginn::HClass const* srcType( fc._valueTypes.top()._class );
+			HClass const* srcType( fc._valueTypes.top()._class );
 			fc._valueTypes.pop();
-			HHuginn::HClass const* destType( fc._valueTypes.top()._class );
+			HClass const* destType( fc._valueTypes.top()._class );
 			fc._valueTypes.pop();
 			OFunctionContext::OVariableRef varRef( fc._variables.top() );
-			HHuginn::HClass const* realDestType( destType );
+			HClass const* realDestType( destType );
 			if ( compiled_type_id( realDestType ) == HHuginn::TYPE::UNKNOWN ) {
 				realDestType = guess_type( varRef._identifier );
 			}
@@ -416,7 +417,7 @@ void OCompiler::dispatch_assign( executing_parser::range_t range_ ) {
 				case ( OPERATOR::MINUS_ASSIGN ): {
 					if ( ! ( is_summable( srcType ) && is_summable( realDestType ) ) ) {
 						throw HHuginn::HHuginnRuntimeException(
-							HString( o == OPERATOR::PLUS_ASSIGN ? _errMsgHHuginn_[ERR_CODE::OP_NOT_SUM] : _errMsgHHuginn_[ERR_CODE::OP_NOT_SUB] )
+							hcore::HString( o == OPERATOR::PLUS_ASSIGN ? _errMsgHHuginn_[ERR_CODE::OP_NOT_SUM] : _errMsgHHuginn_[ERR_CODE::OP_NOT_SUB] )
 								.append( a_type_name( realDestType ) )
 								.append( ", " )
 								.append( a_type_name( srcType ) ),
@@ -431,7 +432,7 @@ void OCompiler::dispatch_assign( executing_parser::range_t range_ ) {
 				case ( OPERATOR::POWER_ASSIGN ): {
 					if ( ! ( is_numeric_congruent( srcType ) && is_numeric_congruent( realDestType ) ) ) {
 						throw HHuginn::HHuginnRuntimeException(
-							HString(
+							hcore::HString(
 								o == OPERATOR::MULTIPLY_ASSIGN
 									? _errMsgHHuginn_[ERR_CODE::OP_NOT_MUL]
 									: (
@@ -585,7 +586,7 @@ void OCompiler::dispatch_function_call( HExpression::OExecutionStep::action_t co
 		fc._operations.pop();
 		fc._valueTypes.pop();
 	}
-	HHuginn::HClass const* c( type_to_class( HHuginn::TYPE::UNKNOWN ) );
+	HClass const* c( type_to_class( HHuginn::TYPE::UNKNOWN ) );
 	if ( action_ == &HExpression::function_call ) {
 		OFunctionContext::OValueDesc vd( fc._valueTypes.top() );
 		fc._valueTypes.pop();
@@ -664,16 +665,16 @@ void OCompiler::dispatch_plus( executing_parser::range_t range_ ) {
 	defer_action( o == OPERATOR::PLUS ? &HExpression::plus : &HExpression::minus, range_ );
 	current_expression()->commit_oper( o );
 	fc._operations.pop();
-	HHuginn::HClass const* c1( fc._valueTypes.top()._class );
+	HClass const* c1( fc._valueTypes.top()._class );
 	fc._valueTypes.pop();
-	HHuginn::HClass const* c2( fc._valueTypes.top()._class );
+	HClass const* c2( fc._valueTypes.top()._class );
 	fc._valueTypes.pop();
 	if ( ! are_congruous( c1, c2 ) ) {
 		operands_type_mismatch( op_to_str( o ), c2, c1, _fileId, range_.start() );
 	}
 	if ( ! ( is_summable( c1 ) && is_summable( c2 ) ) ) {
 		throw HHuginn::HHuginnRuntimeException(
-			HString( o == OPERATOR::PLUS ? _errMsgHHuginn_[ERR_CODE::OP_NOT_SUM] : _errMsgHHuginn_[ERR_CODE::OP_NOT_SUB] )
+			hcore::HString( o == OPERATOR::PLUS ? _errMsgHHuginn_[ERR_CODE::OP_NOT_SUM] : _errMsgHHuginn_[ERR_CODE::OP_NOT_SUB] )
 				.append( a_type_name( c2 ) )
 				.append( ", " )
 				.append( a_type_name( c1 ) ),
@@ -698,16 +699,16 @@ void OCompiler::dispatch_mul( executing_parser::range_t range_ ) {
 	defer_action( o == OPERATOR::MULTIPLY ? &HExpression::mul : ( o == OPERATOR::DIVIDE ? &HExpression::div : &HExpression::mod ), range_ );
 	current_expression()->commit_oper( o );
 	fc._operations.pop();
-	HHuginn::HClass const* c1( fc._valueTypes.top()._class );
+	HClass const* c1( fc._valueTypes.top()._class );
 	fc._valueTypes.pop();
-	HHuginn::HClass const* c2( fc._valueTypes.top()._class );
+	HClass const* c2( fc._valueTypes.top()._class );
 	fc._valueTypes.pop();
 	if ( ! are_congruous( c1, c2 ) ) {
 		operands_type_mismatch( op_to_str( o ), c2, c1, _fileId, range_.start() );
 	}
 	if ( ! ( is_numeric_congruent( c1 ) && is_numeric_congruent( c2 ) ) ) {
 		throw HHuginn::HHuginnRuntimeException(
-			HString( o == OPERATOR::MULTIPLY ? _errMsgHHuginn_[ERR_CODE::OP_NOT_MUL] : _errMsgHHuginn_[ERR_CODE::OP_NOT_DIV] )
+			hcore::HString( o == OPERATOR::MULTIPLY ? _errMsgHHuginn_[ERR_CODE::OP_NOT_MUL] : _errMsgHHuginn_[ERR_CODE::OP_NOT_DIV] )
 				.append( a_type_name( c2 ) )
 				.append( ", " )
 				.append( a_type_name( c1 ) ),
@@ -728,9 +729,9 @@ void OCompiler::dispatch_power( executing_parser::range_t range_ ) {
 		M_ASSERT( fc._valueTypes.get_size() >= 2 );
 		int p( fc._operations.top()._position );
 		fc._operations.pop();
-		HHuginn::HClass const* c1( fc._valueTypes.top()._class );
+		HClass const* c1( fc._valueTypes.top()._class );
 		fc._valueTypes.pop();
-		HHuginn::HClass const* c2( fc._valueTypes.top()._class );
+		HClass const* c2( fc._valueTypes.top()._class );
 		fc._valueTypes.pop();
 		if ( ! are_congruous( c1, c2 ) ) {
 			operands_type_mismatch( op_to_str( OPERATOR::POWER ), c2, c1, _fileId, p );
@@ -825,9 +826,9 @@ void OCompiler::dispatch_compare( executing_parser::range_t range_ ) {
 	current_expression()->commit_oper( o );
 	fc._operations.pop();
 	M_ASSERT( fc._valueTypes.get_size() >= 2 );
-	HHuginn::HClass const* c1( fc._valueTypes.top()._class );
+	HClass const* c1( fc._valueTypes.top()._class );
 	fc._valueTypes.pop();
-	HHuginn::HClass const* c2( fc._valueTypes.top()._class );
+	HClass const* c2( fc._valueTypes.top()._class );
 	fc._valueTypes.pop();
 	if ( ( o != OPERATOR::IS_ELEMENT_OF ) && ( o != OPERATOR::IS_NOT_ELEMENT_OF ) ) {
 		if ( ! are_congruous( c1, c2 ) ) {
@@ -868,9 +869,9 @@ void OCompiler::dispatch_boolean( HExpression::OExecutionStep::action_t const& a
 	}
 	fc._operations.pop();
 	M_ASSERT( fc._valueTypes.get_size() >= 2 );
-	HHuginn::HClass const* c1( fc._valueTypes.top()._class );
+	HClass const* c1( fc._valueTypes.top()._class );
 	fc._valueTypes.pop();
-	HHuginn::HClass const* c2( fc._valueTypes.top()._class );
+	HClass const* c2( fc._valueTypes.top()._class );
 	fc._valueTypes.pop();
 	if ( ! ( is_boolean_congruent( c1 ) && is_boolean_congruent( c2 ) ) ) {
 		throw HHuginn::HHuginnRuntimeException(
@@ -896,11 +897,11 @@ void OCompiler::dispatch_ternary( void ) {
 	int p( fc._operations.top()._position );
 	fc._operations.pop();
 	M_ASSERT( fc._valueTypes.get_size() >= 3 );
-	HHuginn::HClass const* c1( fc._valueTypes.top()._class );
+	HClass const* c1( fc._valueTypes.top()._class );
 	fc._valueTypes.pop();
-	HHuginn::HClass const* c2( fc._valueTypes.top()._class );
+	HClass const* c2( fc._valueTypes.top()._class );
 	fc._valueTypes.pop();
-	HHuginn::HClass const* t0( fc._valueTypes.top()._class );
+	HClass const* t0( fc._valueTypes.top()._class );
 	fc._valueTypes.pop();
 	if ( ! is_boolean_congruent( t0 ) ) {
 		throw HHuginn::HHuginnRuntimeException(
@@ -925,9 +926,9 @@ void OCompiler::dispatch_equals( executing_parser::range_t range_ ) {
 	current_expression()->commit_oper( o );
 	fc._operations.pop();
 	M_ASSERT( fc._valueTypes.get_size() >= 2 );
-	HHuginn::HClass const* c1( fc._valueTypes.top()._class );
+	HClass const* c1( fc._valueTypes.top()._class );
 	fc._valueTypes.pop();
-	HHuginn::HClass const* c2( fc._valueTypes.top()._class );
+	HClass const* c2( fc._valueTypes.top()._class );
 	fc._valueTypes.pop();
 	if ( ! are_congruous( c1, c2 ) ) {
 		operands_type_mismatch( op_to_str( o ), c2, c1, _fileId, p );
@@ -1034,7 +1035,7 @@ void OCompiler::commit_ternary( executing_parser::range_t range_ ) {
 	HFunction::expressions_t const& exprs( fc.expressions_stack().top() );
 	if ( exprs.get_size() > 1 ) {
 		M_ASSERT( exprs.get_size() == 3 );
-		HHuginn::value_t ternary( _runtime->object_factory()->create<HHuginn::HTernaryEvaluator>( exprs[0], exprs[1], exprs[2] ) );
+		HHuginn::value_t ternary( _runtime->object_factory()->create<HTernaryEvaluator>( exprs[0], exprs[1], exprs[2] ) );
 		fc.expressions_stack().pop();
 		M_ASSERT( ! fc._valueTypes.is_empty() );
 		fc._valueTypes.pop();

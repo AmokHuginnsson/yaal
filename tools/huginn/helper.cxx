@@ -113,7 +113,7 @@ void HCycleTracker::done( HHuginn::value_t const& value_ ) {
 	M_EPILOG
 }
 
-void operands_type_mismatch( char const* op_, HHuginn::HClass const* c1_, HHuginn::HClass const* c2_, int fileId_, int pos_ ) {
+void operands_type_mismatch( char const* op_, HClass const* c1_, HClass const* c2_, int fileId_, int pos_ ) {
 	hcore::HString msg( "Operand types for `" );
 	msg.append( op_ )
 		.append( "` do not match: " )
@@ -125,10 +125,10 @@ void operands_type_mismatch( char const* op_, HHuginn::HClass const* c1_, HHugin
 }
 
 HHuginn::class_t add_class_as_member(
-	HHuginn::HClass* juncture_,
+	HClass* juncture_,
 	HHuginn::class_t const& class_,
 	yaal::hcore::HString const& doc_,
-	HHuginn::HClass::MEMBER_TYPE memberType_
+	HClass::MEMBER_TYPE memberType_
 ) {
 	M_PROLOG
 	juncture_->add_member(
@@ -142,10 +142,10 @@ HHuginn::class_t add_class_as_member(
 }
 
 enumeration::HEnumerationClass::ptr_t add_enumeration_as_member(
-	HHuginn::HClass* juncture_,
+	HClass* juncture_,
 	enumeration::HEnumerationClass::ptr_t const& class_,
 	yaal::hcore::HString const& doc_,
-	HHuginn::HClass::MEMBER_TYPE memberType_
+	HClass::MEMBER_TYPE memberType_
 ) {
 	M_PROLOG
 	HHuginn::value_t member(
@@ -161,9 +161,9 @@ enumeration::HEnumerationClass::ptr_t add_enumeration_as_member(
 	M_EPILOG
 }
 
-HHuginn::class_t class_exception( HHuginn::HClass* package_, HHuginn::HClass const* base_ ) {
-	HString name( package_->name() );
-	HString exName( name );
+HHuginn::class_t class_exception( HClass* package_, HClass const* base_ ) {
+	hcore::HString name( package_->name() );
+	hcore::HString exName( name );
 	exName.append( "Exception" );
 	return (
 		add_class_as_member(
@@ -219,11 +219,11 @@ void verify_arg_count( char const* name_, HHuginn::values_t& values_, int min_, 
 	M_EPILOG
 }
 
-yaal::hcore::HString full_class_name( huginn::HRuntime const& runtime_, HHuginn::HClass const* class_, bool preserveAliases_ ) {
+yaal::hcore::HString full_class_name( huginn::HRuntime const& runtime_, HClass const* class_, bool preserveAliases_ ) {
 	M_PROLOG
-	HHuginn::HClass const* origin( class_->origin() );
-	HString const* originName( preserveAliases_ ? runtime_.package_name( origin ) : nullptr );
-	HString cn;
+	HClass const* origin( class_->origin() );
+	hcore::HString const* originName( preserveAliases_ ? runtime_.package_name( origin ) : nullptr );
+	hcore::HString cn;
 	if ( originName ) {
 		cn.append( *originName ).append( "." );
 	} else if (
@@ -255,7 +255,7 @@ yaal::hcore::HString a_type_name( HHuginn::TYPE type_ ) {
 	M_EPILOG
 }
 
-yaal::hcore::HString a_type_name( HHuginn::HClass const* class_ ) {
+yaal::hcore::HString a_type_name( HClass const* class_ ) {
 	M_PROLOG
 	hcore::HString const& cn( class_->name() );
 	hcore::HString atn( article( cn ) );
@@ -277,7 +277,7 @@ void fail_arg_type(
 	int position_
 ) {
 	M_PROLOG
-	HString no;
+	hcore::HString no;
 	if ( argsArity_ == ARITY::MULTIPLE ) {
 		no = util::ordinal( no_ + 1 ).append( " " );
 	}
@@ -310,7 +310,7 @@ void verify_arg_type(
 void verify_arg_type(
 	char const* name_,
 	HHuginn::values_t& values_,
-	int no_, HHuginn::HClass const* class_, ARITY argsArity_, huginn::HThread* thread_, int position_ ) {
+	int no_, HClass const* class_, ARITY argsArity_, huginn::HThread* thread_, int position_ ) {
 	if ( values_[no_]->get_class() != class_ ) {
 		fail_arg_type( name_, values_, no_, a_type_name( class_ ), argsArity_, thread_, position_ );
 	}
@@ -350,11 +350,11 @@ HHuginn::type_id_t verify_arg_type(
 	M_PROLOG
 	HHuginn::type_id_t realType( values_[no_]->type_id() );
 	if ( find( types_.begin(), types_.end(), realType ) == types_.end() ) {
-		HString no;
+		hcore::HString no;
 		if ( argsArity_ == ARITY::MULTIPLE ) {
 			no = util::ordinal( no_ + 1 ).append( " " );
 		}
-		HString reqName;
+		hcore::HString reqName;
 		for ( HHuginn::TYPE t : types_ ) {
 			if ( ! reqName.is_empty() ) {
 				reqName.append( ", " );
@@ -386,7 +386,7 @@ HHuginn::type_id_t verify_arg_numeric(
 	M_PROLOG
 	HHuginn::type_id_t t( values_[no_]->type_id() );
 	if ( ( t != HHuginn::TYPE::NUMBER ) && ( t != HHuginn::TYPE::REAL ) ) {
-		HString no;
+		hcore::HString no;
 		if ( argsArity_ == ARITY::MULTIPLE ) {
 			no = util::ordinal( no_ + 1 ).append( " " );
 		}
@@ -430,7 +430,7 @@ HHuginn::value_t verify_arg_callable(
 			}
 		}
 
-		HString no;
+		hcore::HString no;
 		if ( argsArity_ == ARITY::MULTIPLE ) {
 			no = util::ordinal( no_ + 1 ).append( " " );
 		}
@@ -449,9 +449,9 @@ HHuginn::value_t verify_arg_callable(
 	M_EPILOG
 }
 
-void not_a_collection( huginn::HThread*, char const*, HHuginn::HClass const*, int, ARITY, char const*, int ) __attribute__((noreturn));
-inline void not_a_collection( huginn::HThread* thread_, char const* name_, HHuginn::HClass const* class_, int no_, ARITY argsArity_, char const* extraMsg_, int position_ ) {
-	HString no;
+void not_a_collection( huginn::HThread*, char const*, HClass const*, int, ARITY, char const*, int ) __attribute__((noreturn));
+inline void not_a_collection( huginn::HThread* thread_, char const* name_, HClass const* class_, int no_, ARITY argsArity_, char const* extraMsg_, int position_ ) {
+	hcore::HString no;
 	if ( argsArity_ == ARITY::MULTIPLE ) {
 		no = util::ordinal( no_ + 1 ).append( " " );
 	}
@@ -503,11 +503,11 @@ HHuginn::value_t verify_arg_virtual_collection(
 	M_PROLOG
 	HHuginn::value_t v( values_[no_] );
 	do {
-		if ( dynamic_cast<HHuginn::HIterable const*>( v.raw() ) ) {
+		if ( dynamic_cast<huginn::HIterable const*>( v.raw() ) ) {
 			break;
 		}
 		if (
-			dynamic_cast<HHuginn::HObject*>( v.raw() )
+			dynamic_cast<HObject*>( v.raw() )
 			&& ( v->field_index( IDENTIFIER::INTERFACE::ITERATOR ) >= 0 )
 		) {
 			v = thread_->object_factory().create<HIterableAdaptor>( thread_->object_factory().iterable_adaptor_class(), v );
@@ -580,21 +580,21 @@ HHuginn::type_id_t verify_arg_collection_value_type(
 	HHuginn::type_id_t type( type_id( HHuginn::TYPE::UNKNOWN ) );
 	switch ( values_[no_]->type_id().get() ) {
 		case ( static_cast<int>( HHuginn::TYPE::TUPLE ) ): {
-			type = verify_arg_collection_value_type_low( name_, *static_cast<HHuginn::HTuple const*>( values_[no_].raw() ), requiredTypes_, uniformity_, thread_, position_ );
+			type = verify_arg_collection_value_type_low( name_, *static_cast<huginn::HTuple const*>( values_[no_].raw() ), requiredTypes_, uniformity_, thread_, position_ );
 		} break;
 		case ( static_cast<int>( HHuginn::TYPE::LIST ) ): {
-			type = verify_arg_collection_value_type_low( name_, *static_cast<HHuginn::HList const*>( values_[no_].raw() ), requiredTypes_, uniformity_, thread_, position_ );
+			type = verify_arg_collection_value_type_low( name_, *static_cast<huginn::HList const*>( values_[no_].raw() ), requiredTypes_, uniformity_, thread_, position_ );
 		} break;
 		case ( static_cast<int>( HHuginn::TYPE::DEQUE ) ): {
-			type = verify_arg_collection_value_type_low( name_, *static_cast<HHuginn::HDeque const*>( values_[no_].raw() ), requiredTypes_, uniformity_, thread_, position_ );
+			type = verify_arg_collection_value_type_low( name_, *static_cast<huginn::HDeque const*>( values_[no_].raw() ), requiredTypes_, uniformity_, thread_, position_ );
 		} break;
 		case ( static_cast<int>( HHuginn::TYPE::SET ) ): {
-			type = verify_arg_collection_value_type_low( name_, *static_cast<HHuginn::HSet const*>( values_[no_].raw() ), requiredTypes_, uniformity_, thread_, position_ );
+			type = verify_arg_collection_value_type_low( name_, *static_cast<huginn::HSet const*>( values_[no_].raw() ), requiredTypes_, uniformity_, thread_, position_ );
 		} break;
 		case ( static_cast<int>( HHuginn::TYPE::ORDER ) ): {
-			HHuginn::HOrder::values_t const& o( static_cast<HHuginn::HOrder const*>( values_[no_].raw() )->value() );
+			huginn::HOrder::values_t const& o( static_cast<huginn::HOrder const*>( values_[no_].raw() )->value() );
 			if ( ! o.is_empty() ) {
-				HHuginn::HClass const* c( (*o.begin())->get_class() );
+				HClass const* c( (*o.begin())->get_class() );
 				type = c->type_id();
 				if ( find( requiredTypes_.begin(), requiredTypes_.end(), type ) == requiredTypes_.end() ) {
 					throw HHuginn::HHuginnRuntimeException(
@@ -615,7 +615,7 @@ HHuginn::type_id_t verify_arg_collection_value_type(
 	return ( type );
 }
 
-bool is_numeric( HHuginn::HClass const* class_ ) {
+bool is_numeric( HClass const* class_ ) {
 	HHuginn::type_id_t t( class_ ? class_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
 	return (
 		( t == HHuginn::TYPE::INTEGER )
@@ -624,7 +624,7 @@ bool is_numeric( HHuginn::HClass const* class_ ) {
 	);
 }
 
-bool is_collection( HHuginn::HClass const* class_ ) {
+bool is_collection( HClass const* class_ ) {
 	HHuginn::type_id_t t( class_ ? class_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
 	return (
 		( t == HHuginn::TYPE::TUPLE )
@@ -637,12 +637,12 @@ bool is_collection( HHuginn::HClass const* class_ ) {
 	);
 }
 
-bool is_collection_like( HHuginn::HClass const* class_ ) {
+bool is_collection_like( HClass const* class_ ) {
 	HHuginn::type_id_t t( class_ ? class_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
 	return ( is_collection( class_ ) || ( t == HHuginn::TYPE::STRING ) || ( t == HHuginn::TYPE::UNKNOWN ) || is_enum_class( class_ ) );
 }
 
-bool is_comparable( HHuginn::HClass const* class_ ) {
+bool is_comparable( HClass const* class_ ) {
 	HHuginn::type_id_t t( class_ ? class_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
 	return (
 		is_numeric( class_ )
@@ -655,7 +655,7 @@ bool is_comparable( HHuginn::HClass const* class_ ) {
 	);
 }
 
-bool is_boolean_congruent( HHuginn::HClass const* class_ ) {
+bool is_boolean_congruent( HClass const* class_ ) {
 	HHuginn::type_id_t t( class_ ? class_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
 	return (
 		( t == HHuginn::TYPE::BOOLEAN )
@@ -664,29 +664,29 @@ bool is_boolean_congruent( HHuginn::HClass const* class_ ) {
 	);
 }
 
-bool is_unknown( HHuginn::HClass const* class_ ) {
+bool is_unknown( HClass const* class_ ) {
 	HHuginn::type_id_t t( class_ ? class_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
 	return ( ( t == HHuginn::TYPE::NOT_BOOLEAN ) || ( t == HHuginn::TYPE::UNKNOWN ) || ( t == HHuginn::TYPE::REFERENCE ) );
 }
 
-bool is_numeric_congruent( HHuginn::HClass const* class_ ) {
+bool is_numeric_congruent( HClass const* class_ ) {
 	return ( is_numeric( class_ ) || is_unknown( class_ ) );
 }
 
-bool is_comparable_congruent( HHuginn::HClass const* class_ ) {
+bool is_comparable_congruent( HClass const* class_ ) {
 	return ( is_comparable( class_ ) || is_unknown( class_ ) );
 }
 
-bool is_reference_congruent( HHuginn::HClass const* class_ ) {
+bool is_reference_congruent( HClass const* class_ ) {
 	HHuginn::type_id_t t( class_ ? class_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
 	return ( ( t == HHuginn::TYPE::REFERENCE ) || ( t == HHuginn::TYPE::UNKNOWN ) );
 }
 
-bool is_integer_congruent( HHuginn::HClass const* class_ ) {
+bool is_integer_congruent( HClass const* class_ ) {
 	return ( ( class_ && ( class_->type_id() == HHuginn::TYPE::INTEGER ) ) || is_unknown( class_ ) );
 }
 
-bool is_summable( HHuginn::HClass const* class_ ) {
+bool is_summable( HClass const* class_ ) {
 	return (
 		is_numeric_congruent( class_ )
 		|| ( class_ && ( class_->type_id() == HHuginn::TYPE::STRING ) )
@@ -694,12 +694,12 @@ bool is_summable( HHuginn::HClass const* class_ ) {
 	);
 }
 
-bool is_meta_class( HHuginn::HClass const* class_ ) {
+bool is_meta_class( HClass const* class_ ) {
 	HHuginn::identifier_id_t id( class_->identifier_id() );
 	return ( ( id >= IDENTIFIER::BUILTIN::TYPE_NONE ) && ( id <= IDENTIFIER::BUILTIN::TYPE_NAMED_PARAMETERS ) );
 }
 
-bool are_congruous( HHuginn::HClass const* c1_, HHuginn::HClass const* c2_ ) {
+bool are_congruous( HClass const* c1_, HClass const* c2_ ) {
 	HHuginn::type_id_t t1( c1_ ? c1_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
 	HHuginn::type_id_t t2( c2_ ? c2_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
 	bool congruous(
@@ -716,147 +716,147 @@ bool are_congruous( HHuginn::HClass const* c1_, HHuginn::HClass const* c2_ ) {
 	return ( congruous );
 }
 
-HHuginn::HString::value_type const& get_string( HHuginn::value_t const& value_ ) {
+HString::value_type const& get_string( HHuginn::value_t const& value_ ) {
 	M_ASSERT( !! value_ );
-	M_ASSERT( dynamic_cast<HHuginn::HString const*>( value_.raw() ) );
-	return ( static_cast<HHuginn::HString const*>( value_.raw() )->value() );
+	M_ASSERT( dynamic_cast<HString const*>( value_.raw() ) );
+	return ( static_cast<HString const*>( value_.raw() )->value() );
 }
 
-HHuginn::HInteger::value_type get_integer( HHuginn::value_t const& value_ ) {
+huginn::HInteger::value_type get_integer( HHuginn::value_t const& value_ ) {
 	M_ASSERT( !! value_ );
-	M_ASSERT( dynamic_cast<HHuginn::HInteger const*>( value_.raw() ) );
-	return ( static_cast<HHuginn::HInteger const*>( value_.raw() )->value() );
+	M_ASSERT( dynamic_cast<huginn::HInteger const*>( value_.raw() ) );
+	return ( static_cast<huginn::HInteger const*>( value_.raw() )->value() );
 }
 
-HHuginn::HReal::value_type get_real( HHuginn::value_t const& value_ ) {
+HReal::value_type get_real( HHuginn::value_t const& value_ ) {
 	M_ASSERT( !! value_ );
-	M_ASSERT( dynamic_cast<HHuginn::HReal const*>( value_.raw() ) );
-	return ( static_cast<HHuginn::HReal const*>( value_.raw() )->value() );
+	M_ASSERT( dynamic_cast<HReal const*>( value_.raw() ) );
+	return ( static_cast<HReal const*>( value_.raw() )->value() );
 }
 
-HHuginn::HNumber::value_type const& get_number( HHuginn::value_t const& value_ ) {
+HNumber::value_type const& get_number( HHuginn::value_t const& value_ ) {
 	M_ASSERT( !! value_ );
-	M_ASSERT( dynamic_cast<HHuginn::HNumber const*>( value_.raw() ) );
-	return ( static_cast<HHuginn::HNumber const*>( value_.raw() )->value() );
+	M_ASSERT( dynamic_cast<HNumber const*>( value_.raw() ) );
+	return ( static_cast<HNumber const*>( value_.raw() )->value() );
 }
 
-HHuginn::HBoolean::value_type get_boolean( HHuginn::value_t const& value_ ) {
+HBoolean::value_type get_boolean( HHuginn::value_t const& value_ ) {
 	M_ASSERT( !! value_ );
-	M_ASSERT( dynamic_cast<HHuginn::HBoolean const*>( value_.raw() ) );
-	return ( static_cast<HHuginn::HBoolean const*>( value_.raw() )->value() );
+	M_ASSERT( dynamic_cast<HBoolean const*>( value_.raw() ) );
+	return ( static_cast<HBoolean const*>( value_.raw() )->value() );
 }
 
-HHuginn::HCharacter::value_type get_character( HHuginn::value_t const& value_ ) {
+HCharacter::value_type get_character( HHuginn::value_t const& value_ ) {
 	M_ASSERT( !! value_ );
-	M_ASSERT( dynamic_cast<HHuginn::HCharacter const*>( value_.raw() ) );
-	return ( static_cast<HHuginn::HCharacter const*>( value_.raw() )->value() );
+	M_ASSERT( dynamic_cast<HCharacter const*>( value_.raw() ) );
+	return ( static_cast<HCharacter const*>( value_.raw() )->value() );
 }
 
-HHuginn::HList::values_t const& get_list( HHuginn::value_t const& value_ ) {
+huginn::HList::values_t const& get_list( HHuginn::value_t const& value_ ) {
 	M_ASSERT( !! value_ );
-	M_ASSERT( dynamic_cast<HHuginn::HList const*>( value_.raw() ) );
-	return ( static_cast<HHuginn::HList const*>( value_.raw() )->value() );
+	M_ASSERT( dynamic_cast<huginn::HList const*>( value_.raw() ) );
+	return ( static_cast<huginn::HList const*>( value_.raw() )->value() );
 }
 
-HHuginn::HEnumeral::value_type get_enumeral( HHuginn::value_t const& value_ ) {
+HEnumeral::value_type get_enumeral( HHuginn::value_t const& value_ ) {
 	M_ASSERT( !! value_ );
-	M_ASSERT( dynamic_cast<HHuginn::HEnumeral const*>( value_.raw() ) );
-	return ( static_cast<HHuginn::HEnumeral const*>( value_.raw() )->value() );
+	M_ASSERT( dynamic_cast<HEnumeral const*>( value_.raw() ) );
+	return ( static_cast<HEnumeral const*>( value_.raw() )->value() );
 }
 
-HHuginn::HString::value_type const& get_string( HHuginn::HValue const* value_ ) {
+HString::value_type const& get_string( huginn::HValue const* value_ ) {
 	M_ASSERT( !! value_ );
-	M_ASSERT( dynamic_cast<HHuginn::HString const*>( value_ ) );
-	return ( static_cast<HHuginn::HString const*>( value_ )->value() );
+	M_ASSERT( dynamic_cast<HString const*>( value_ ) );
+	return ( static_cast<HString const*>( value_ )->value() );
 }
 
-HHuginn::HInteger::value_type get_integer( HHuginn::HValue const* value_ ) {
+huginn::HInteger::value_type get_integer( huginn::HValue const* value_ ) {
 	M_ASSERT( !! value_ );
-	M_ASSERT( dynamic_cast<HHuginn::HInteger const*>( value_ ) );
-	return ( static_cast<HHuginn::HInteger const*>( value_ )->value() );
+	M_ASSERT( dynamic_cast<huginn::HInteger const*>( value_ ) );
+	return ( static_cast<huginn::HInteger const*>( value_ )->value() );
 }
 
-HHuginn::HReal::value_type get_real( HHuginn::HValue const* value_ ) {
+HReal::value_type get_real( huginn::HValue const* value_ ) {
 	M_ASSERT( !! value_ );
-	M_ASSERT( dynamic_cast<HHuginn::HReal const*>( value_ ) );
-	return ( static_cast<HHuginn::HReal const*>( value_ )->value() );
+	M_ASSERT( dynamic_cast<HReal const*>( value_ ) );
+	return ( static_cast<HReal const*>( value_ )->value() );
 }
 
-HHuginn::HNumber::value_type const& get_number( HHuginn::HValue const* value_ ) {
+HNumber::value_type const& get_number( huginn::HValue const* value_ ) {
 	M_ASSERT( !! value_ );
-	M_ASSERT( dynamic_cast<HHuginn::HNumber const*>( value_ ) );
-	return ( static_cast<HHuginn::HNumber const*>( value_ )->value() );
+	M_ASSERT( dynamic_cast<HNumber const*>( value_ ) );
+	return ( static_cast<HNumber const*>( value_ )->value() );
 }
 
-HHuginn::HBoolean::value_type get_boolean( HHuginn::HValue const* value_ ) {
+HBoolean::value_type get_boolean( huginn::HValue const* value_ ) {
 	M_ASSERT( !! value_ );
-	M_ASSERT( dynamic_cast<HHuginn::HBoolean const*>( value_ ) );
-	return ( static_cast<HHuginn::HBoolean const*>( value_ )->value() );
+	M_ASSERT( dynamic_cast<HBoolean const*>( value_ ) );
+	return ( static_cast<HBoolean const*>( value_ )->value() );
 }
 
-HHuginn::HCharacter::value_type get_character( HHuginn::HValue const* value_ ) {
+HCharacter::value_type get_character( huginn::HValue const* value_ ) {
 	M_ASSERT( !! value_ );
-	M_ASSERT( dynamic_cast<HHuginn::HCharacter const*>( value_ ) );
-	return ( static_cast<HHuginn::HCharacter const*>( value_ )->value() );
+	M_ASSERT( dynamic_cast<HCharacter const*>( value_ ) );
+	return ( static_cast<HCharacter const*>( value_ )->value() );
 }
 
-HHuginn::HEnumeral::value_type get_enumeral( HHuginn::HValue const* value_ ) {
+HEnumeral::value_type get_enumeral( huginn::HValue const* value_ ) {
 	M_ASSERT( !! value_ );
-	M_ASSERT( dynamic_cast<HHuginn::HEnumeral const*>( value_ ) );
-	return ( static_cast<HHuginn::HEnumeral const*>( value_ )->value() );
+	M_ASSERT( dynamic_cast<HEnumeral const*>( value_ ) );
+	return ( static_cast<HEnumeral const*>( value_ )->value() );
 }
 
 template<>
 double long get_by_type<double long>( HHuginn::value_t const& value_ ) {
 	M_ENSURE( value_->type_id() == HHuginn::TYPE::REAL );
-	return ( static_cast<HHuginn::HReal const*>( value_.raw() )->value() );
+	return ( static_cast<HReal const*>( value_.raw() )->value() );
 }
 
 template<>
 double long get_by_type<double long>( HHuginn::value_t& value_ ) {
 	M_ENSURE( value_->type_id() == HHuginn::TYPE::REAL );
-	return ( static_cast<HHuginn::HReal*>( value_.raw() )->value() );
+	return ( static_cast<HReal*>( value_.raw() )->value() );
 }
 
 template<>
 yaal::hcore::HNumber const& get_by_type<yaal::hcore::HNumber const&>( HHuginn::value_t const& value_ ) {
 	M_ENSURE( value_->type_id() == HHuginn::TYPE::NUMBER );
-	return ( static_cast<HHuginn::HNumber const*>( value_.raw() )->value() );
+	return ( static_cast<HNumber const*>( value_.raw() )->value() );
 }
 
 template<>
 yaal::hcore::HNumber& get_by_type<yaal::hcore::HNumber&>( HHuginn::value_t& value_ ) {
 	M_ENSURE( value_->type_id() == HHuginn::TYPE::NUMBER );
-	return ( static_cast<HHuginn::HNumber*>( value_.raw() )->value() );
+	return ( static_cast<HNumber*>( value_.raw() )->value() );
 }
 
 yaal::hcore::HString const& type_name( HHuginn::TYPE type_ ) {
-	static HString const NAME_BOOLEAN   = BUILTIN::BOOLEAN;
-	static HString const NAME_INTEGER   = BUILTIN::INTEGER;
-	static HString const NAME_REAL      = BUILTIN::REAL;
-	static HString const NAME_STRING    = BUILTIN::STRING;
-	static HString const NAME_NUMBER    = BUILTIN::NUMBER;
-	static HString const NAME_CHARACTER = BUILTIN::CHARACTER;
-	static HString const NAME_TUPLE     = BUILTIN::TUPLE;
-	static HString const NAME_LIST      = BUILTIN::LIST;
-	static HString const NAME_DEQUE     = BUILTIN::DEQUE;
-	static HString const NAME_DICT      = BUILTIN::DICT;
-	static HString const NAME_LOOKUP    = BUILTIN::LOOKUP;
-	static HString const NAME_ORDER     = BUILTIN::ORDER;
-	static HString const NAME_SET       = BUILTIN::SET;
-	static HString const NAME_BLOB      = BUILTIN::BLOB;
-	static HString const NAME_NONE                = BUILTIN::TYPE_NONE;
-	static HString const NAME_OBSERVER            = BUILTIN::TYPE_OBSERVER;
-	static HString const NAME_REFERENCE           = BUILTIN::TYPE_REFERENCE;
-	static HString const NAME_FUNCTION_REFERENCE  = BUILTIN::TYPE_FUNCTION_REFERENCE;
-	static HString const NAME_OBJECT_REFERENCE    = BUILTIN::TYPE_OBJECT_REFERENCE;
-	static HString const NAME_METHOD              = BUILTIN::TYPE_METHOD;
-	static HString const NAME_UNBOUND_METHOD      = BUILTIN::TYPE_UNBOUND_METHOD;
-	static HString const NAME_BOUND_METHOD        = BUILTIN::TYPE_BOUND_METHOD;
-	static HString const NAME_VARIADIC_PARAMETERS = BUILTIN::TYPE_VARIADIC_PARAMETERS;
-	static HString const NAME_NAMED_PARAMETERS    = BUILTIN::TYPE_NAMED_PARAMETERS;
-	static HString const NAME_UNKNOWN             = BUILTIN::TYPE_UNKNOWN;
-	HString const* s( &NAME_UNKNOWN );
+	static hcore::HString const NAME_BOOLEAN   = BUILTIN::BOOLEAN;
+	static hcore::HString const NAME_INTEGER   = BUILTIN::INTEGER;
+	static hcore::HString const NAME_REAL      = BUILTIN::REAL;
+	static hcore::HString const NAME_STRING    = BUILTIN::STRING;
+	static hcore::HString const NAME_NUMBER    = BUILTIN::NUMBER;
+	static hcore::HString const NAME_CHARACTER = BUILTIN::CHARACTER;
+	static hcore::HString const NAME_TUPLE     = BUILTIN::TUPLE;
+	static hcore::HString const NAME_LIST      = BUILTIN::LIST;
+	static hcore::HString const NAME_DEQUE     = BUILTIN::DEQUE;
+	static hcore::HString const NAME_DICT      = BUILTIN::DICT;
+	static hcore::HString const NAME_LOOKUP    = BUILTIN::LOOKUP;
+	static hcore::HString const NAME_ORDER     = BUILTIN::ORDER;
+	static hcore::HString const NAME_SET       = BUILTIN::SET;
+	static hcore::HString const NAME_BLOB      = BUILTIN::BLOB;
+	static hcore::HString const NAME_NONE                = BUILTIN::TYPE_NONE;
+	static hcore::HString const NAME_OBSERVER            = BUILTIN::TYPE_OBSERVER;
+	static hcore::HString const NAME_REFERENCE           = BUILTIN::TYPE_REFERENCE;
+	static hcore::HString const NAME_FUNCTION_REFERENCE  = BUILTIN::TYPE_FUNCTION_REFERENCE;
+	static hcore::HString const NAME_OBJECT_REFERENCE    = BUILTIN::TYPE_OBJECT_REFERENCE;
+	static hcore::HString const NAME_METHOD              = BUILTIN::TYPE_METHOD;
+	static hcore::HString const NAME_UNBOUND_METHOD      = BUILTIN::TYPE_UNBOUND_METHOD;
+	static hcore::HString const NAME_BOUND_METHOD        = BUILTIN::TYPE_BOUND_METHOD;
+	static hcore::HString const NAME_VARIADIC_PARAMETERS = BUILTIN::TYPE_VARIADIC_PARAMETERS;
+	static hcore::HString const NAME_NAMED_PARAMETERS    = BUILTIN::TYPE_NAMED_PARAMETERS;
+	static hcore::HString const NAME_UNKNOWN             = BUILTIN::TYPE_UNKNOWN;
+	hcore::HString const* s( &NAME_UNKNOWN );
 	switch ( type_ ) {
 		case ( HHuginn::TYPE::NONE ):               s = &NAME_NONE;               break;
 		case ( HHuginn::TYPE::BOOLEAN ):            s = &NAME_BOOLEAN;            break;
@@ -952,7 +952,7 @@ char const* op_to_str( OPERATOR o_ ) {
 	return ( str );
 }
 
-yaal::hcore::HString int_to_str( HHuginn::HInteger::value_type int_, BASE base_, bool prefix_ ) {
+yaal::hcore::HString int_to_str( huginn::HInteger::value_type int_, BASE base_, bool prefix_ ) {
 	M_PROLOG
 	HStringStream ss;
 	switch ( base_ ) {
@@ -962,7 +962,7 @@ yaal::hcore::HString int_to_str( HHuginn::HInteger::value_type int_, BASE base_,
 		case ( BASE::BIN ): {
 			HStringStream bs;
 			bs << bin << int_;
-			HString s( bs.string() );
+			hcore::HString s( bs.string() );
 			s.trim_left( "0" );
 			if ( s.is_empty() ) {
 				s.assign( "0" );
@@ -983,7 +983,7 @@ HHuginn::value_t value( HHuginn::value_t value_, HUTF8String name_, HThread* thr
 	M_EPILOG
 }
 
-HHuginn::value_t instance( HHuginn::HClass const* class_, HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+HHuginn::value_t instance( HClass const* class_, HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	return ( class_->create_instance( thread_, object_, values_, position_ ) );
 	M_EPILOG

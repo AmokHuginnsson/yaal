@@ -21,13 +21,13 @@ namespace tools {
 
 namespace huginn {
 
-class HSubprocessClass : public HHuginn::HClass {
+class HSubprocessClass : public huginn::HClass {
 	HHuginn::class_t _streamClass;
 public:
 	HSubprocessClass(
 		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_
-	) : HHuginn::HClass(
+	) : huginn::HClass(
 			runtime_,
 			typeId_,
 			runtime_->identifier_id( "Subprocess" ),
@@ -47,15 +47,15 @@ public:
 		redefine( nullptr, fd );
 		return;
 	}
-	HHuginn::HClass const* stream_class( void ) const {
+	huginn::HClass const* stream_class( void ) const {
 		M_PROLOG
 		return ( _streamClass.raw() );
 		M_EPILOG
 	}
 };
 
-HSubprocess::HSubprocess( HHuginn::HClass const* class_, HHuginn::values_t& argv_ )
-	: HHuginn::HValue( class_ )
+HSubprocess::HSubprocess( huginn::HClass const* class_, HHuginn::values_t& argv_ )
+	: huginn::HValue( class_ )
 	, _pipedChild() {
 	HPipedChild::argv_t argv;
 	hcore::HString program( get_string( argv_[0] ) );
@@ -138,13 +138,13 @@ HHuginn::value_t HSubprocess::stream(
 	M_PROLOG
 	verify_arg_count( name_, values_, 0, 0, thread_, position_ );
 	HSubprocess* o( static_cast<HSubprocess*>( object_->raw() ) );
-	HSubprocessClass const* c( static_cast<HSubprocessClass const*>( o->HHuginn::HValue::get_class() ) );
-	HHuginn::HClass const* sc( c->stream_class() );
+	HSubprocessClass const* c( static_cast<HSubprocessClass const*>( o->huginn::HValue::get_class() ) );
+	huginn::HClass const* sc( c->stream_class() );
 	return ( thread_->object_factory().create<HStream>( sc, (o->_pipedChild.*streamGetter_)() ) );
 	M_EPILOG
 }
 
-HHuginn::class_t HSubprocess::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
+HHuginn::class_t HSubprocess::get_class( HRuntime* runtime_, huginn::HClass const* origin_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(

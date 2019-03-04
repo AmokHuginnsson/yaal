@@ -28,7 +28,7 @@ namespace tools {
 
 namespace huginn {
 
-class HIntrospection : public HHuginn::HValue {
+class HIntrospection : public HValue {
 private:
 	enumeration::HEnumerationClass::ptr_t _kindClass;
 	HHuginn::class_t _exceptionClass;
@@ -40,7 +40,7 @@ public:
 		PACKAGE,
 		LOCAL
 	};
-	HIntrospection( HHuginn::HClass* class_ )
+	HIntrospection( HClass* class_ )
 		: HValue( class_ )
 		, _kindClass(
 			add_enumeration_as_member(
@@ -79,7 +79,7 @@ public:
 		verify_signature( "Introspection.symbol", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		HRuntime& r( thread_->runtime() );
 		HHuginn::value_t v( r.none_value() );
-		HString const& name( get_string( values_[0] ) );
+		hcore::HString const& name( get_string( values_[0] ) );
 		HHuginn::identifier_id_t id( r.try_identifier_id( name ) );
 		HHuginn::value_t const* pv( nullptr );
 		if ( id != IDENTIFIER::INVALID ) {
@@ -96,19 +96,19 @@ public:
 		verify_signature( "Introspection.attribute", values_, { HHuginn::TYPE::UNKNOWN, HHuginn::TYPE::STRING }, thread_, position_ );
 		HRuntime& r( thread_->runtime() );
 		HHuginn::value_t v( r.none_value() );
-		HString const& name( get_string( values_[1] ) );
+		hcore::HString const& name( get_string( values_[1] ) );
 		HHuginn::identifier_id_t id( r.try_identifier_id( name ) );
 		if ( id != IDENTIFIER::INVALID ) {
 			HHuginn::value_t& s( values_[0] );
 			HHuginn::type_id_t t( s->type_id() );
 			if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-				HHuginn::class_t c( r.get_class( static_cast<HHuginn::HFunctionReference*>( s.raw() )->identifier_id() ) );
+				HHuginn::class_t c( r.get_class( static_cast<huginn::HFunctionReference*>( s.raw() )->identifier_id() ) );
 				if ( !! c ) {
-					int fi( c->field_index( id, HHuginn::HClass::MEMBER_TYPE::STATIC ) );
+					int fi( c->field_index( id, HClass::MEMBER_TYPE::STATIC ) );
 					if ( fi >= 0 ) {
 						HHuginn::value_t const& f( c->field( fi ) );
 						v = f->type_id() == HHuginn::TYPE::METHOD
-							? r.object_factory()->create_unbound_method( c.raw(), static_cast<HHuginn::HClass::HMethod const*>( f.raw() )->function() )
+							? r.object_factory()->create_unbound_method( c.raw(), static_cast<HClass::HMethod const*>( f.raw() )->function() )
 							: f;
 					}
 				}
@@ -129,9 +129,9 @@ public:
 		HObjectFactory& of( *r.object_factory() );
 		HHuginn::values_t attrs;
 		HHuginn::value_t& v( values_[0] );
-		HHuginn::HClass const* c( nullptr );
+		HClass const* c( nullptr );
 		if ( v->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-			c = r.get_class( static_cast<HHuginn::HFunctionReference*>( v.raw() )->identifier_id() ).raw();
+			c = r.get_class( static_cast<huginn::HFunctionReference*>( v.raw() )->identifier_id() ).raw();
 		}
 		if ( ! c ) {
 			c = v->get_class();
@@ -145,7 +145,7 @@ public:
 	static HHuginn::value_t subject( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "Introspection.subject", values_, { HHuginn::TYPE::BOUND_METHOD }, thread_, position_ );
-		HHuginn::HClass::HBoundMethod const& bm( *static_cast<HHuginn::HClass::HBoundMethod const*>( values_[0].raw() ) );
+		HClass::HBoundMethod const& bm( *static_cast<HClass::HBoundMethod const*>( values_[0].raw() ) );
 		return ( bm.subject() );
 		M_EPILOG
 	}
@@ -155,11 +155,11 @@ public:
 		HRuntime& r( thread_->runtime() );
 		enumeration::HEnumerationClass const& ec( *static_cast<enumeration::HEnumerationClass const*>( static_cast<HIntrospection const*>( object_->raw() )->_kindClass.raw() ) );
 		HHuginn::type_id_t t( values_[0]->type_id() );
-		HHuginn::HClass const* c( values_[0]->get_class() );
+		HClass const* c( values_[0]->get_class() );
 		HHuginn::identifier_id_t typeNameId( c->identifier_id() );
 		KIND k( KIND::LOCAL );
 		if ( t == HHuginn::TYPE::BOUND_METHOD ) {
-			HHuginn::HClass::HBoundMethod const& bm( *static_cast<HHuginn::HClass::HBoundMethod const*>( values_[0].raw() ) );
+			HClass::HBoundMethod const& bm( *static_cast<HClass::HBoundMethod const*>( values_[0].raw() ) );
 			if ( bm.function().id() == bit_cast<void const*>( &package::value ) ) {
 				k = KIND::PACKAGE;
 			} else if ( bm.function().id() == bit_cast<void const*>( &package::instance ) ) {
@@ -170,9 +170,9 @@ public:
 				for ( HHuginn::identifier_id_t fi : c->field_identifiers() ) {
 					int idx( c->field_index( fi ) );
 					HHuginn::value_t const& f( c->field_definitions()[idx] );
-					if ( ( f->type_id() == HHuginn::TYPE::METHOD ) && ( static_cast<HHuginn::HClass::HMethod const*>( f.raw() )->function() == bm.function() ) ) {
+					if ( ( f->type_id() == HHuginn::TYPE::METHOD ) && ( static_cast<HClass::HMethod const*>( f.raw() )->function() == bm.function() ) ) {
 						HHuginn::class_t cls( r.get_class( fi ) );
-						if ( !! cls && ( static_cast<HHuginn::HFunctionReference const*>( cls->constructor().raw() )->function() == bm.function() ) ) {
+						if ( !! cls && ( static_cast<huginn::HFunctionReference const*>( cls->constructor().raw() )->function() == bm.function() ) ) {
 							k = KIND::CLASS;
 						}
 						break;
@@ -182,8 +182,8 @@ public:
 		} else if ( is_enum_class( values_[0].raw() ) ) {
 			k = KIND::ENUM;
 		} else if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-			HHuginn::HFunctionReference const& fr( *static_cast<HHuginn::HFunctionReference const*>( values_[0].raw() ) );
-			HHuginn::HClass const* cls( r.get_class( fr.function().id() ) );
+			huginn::HFunctionReference const& fr( *static_cast<huginn::HFunctionReference const*>( values_[0].raw() ) );
+			HClass const* cls( r.get_class( fr.function().id() ) );
 			k = !! cls ? KIND::CLASS : KIND::FUNCTION;
 		} else if ( !! r.find_package( typeNameId ) ) {
 			k = KIND::PACKAGE;
@@ -195,7 +195,7 @@ public:
 		M_PROLOG
 		verify_signature( "Introspection.import", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		HRuntime& r( thread_->runtime() );
-		HString const& package( get_string( values_[0] ) );
+		hcore::HString const& package( get_string( values_[0] ) );
 		HHuginn::identifier_id_t id( r.try_identifier_id( package ) );
 		bool packageExists( !! r.find_package( id ) );
 		bool classExists( !! r.get_class( id ) );
@@ -223,7 +223,7 @@ public:
 			v = HPackageFactory::get_instance().create_package( &r, package, HHuginn::VISIBILITY::PACKAGE, position_ );
 		} catch ( HHuginn::HHuginnRuntimeException const& e ) {
 			thread_->raise( static_cast<HIntrospection*>( object_->raw() )->_exceptionClass.raw(), e.message(), position_ );
-		} catch ( HException const& e ) {
+		} catch ( hcore::HException const& e ) {
 			thread_->raise( static_cast<HIntrospection*>( object_->raw() )->_exceptionClass.raw(), e.what(), position_ );
 		}
 		return ( v );
@@ -234,7 +234,7 @@ public:
 		verify_arg_count( "Introspection.call_stack", values_, 0, 0, thread_, position_ );
 		HHuginn::call_stack_t callStack( thread_->runtime().get_call_stack( thread_ ) );
 		HObjectFactory& of( thread_->object_factory() );
-		HHuginn::HList::values_t data;
+		huginn::HList::values_t data;
 		for ( HHuginn::HCallSite const& cs : callStack ) {
 			data.push_back( of.create<exception::HStackFrameInfo>( of.stack_frame_info_class(), cs ) );
 		}

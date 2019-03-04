@@ -40,7 +40,7 @@ namespace tools {
 
 namespace huginn {
 
-class HAlgorithms : public HHuginn::HValue {
+class HAlgorithms : public huginn::HValue {
 	HHuginn::class_t _iteratorClass;
 	HHuginn::class_t _filterClass;
 	HHuginn::class_t _mapperClass;
@@ -52,7 +52,7 @@ class HAlgorithms : public HHuginn::HValue {
 	HHuginn::class_t _productClass;
 	HHuginn::class_t _exceptionClass;
 public:
-	HAlgorithms( HHuginn::HClass* class_ )
+	HAlgorithms( huginn::HClass* class_ )
 		: HValue( class_ )
 		, _iteratorClass( HIterator::get_class( class_->runtime(), class_ ) )
 		, _filterClass( HFilter::get_class( class_->runtime(), class_ ) )
@@ -95,30 +95,30 @@ public:
 		HHuginn::type_id_t t( callable->type_id() );
 		int argCount( static_cast<int>( values_.get_size() ) );
 		HHuginn::value_t accumulator( argCount == 3 ? values_[2] : HHuginn::value_t() );
-		HHuginn::HIterable const* iterable( static_cast<HHuginn::HIterable const*>( src.raw() ) );
+		huginn::HIterable const* iterable( static_cast<huginn::HIterable const*>( src.raw() ) );
 		if ( ! accumulator && ( iterable->size( thread_, position_ ) == 0 ) ) {
 			throw HHuginn::HHuginnRuntimeException( "reduce() on empty.", thread_->current_frame()->file_id(), position_ );
 		}
-		HHuginn::HIterable::iterator_t it( const_cast<HHuginn::HIterable*>( iterable )->iterator( thread_, position_ ) );
+		huginn::HIterable::iterator_t it( const_cast<huginn::HIterable*>( iterable )->iterator( thread_, position_ ) );
 		if ( ! accumulator ) {
 			accumulator = it->value( thread_, position_ );
 			it->next( thread_, position_ );
 		}
 		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-			HHuginn::function_t function( static_cast<HHuginn::HFunctionReference const*>( callable.raw() )->function() );
+			HHuginn::function_t function( static_cast<huginn::HFunctionReference const*>( callable.raw() )->function() );
 			while ( it->is_valid( thread_, position_ ) && thread_->can_continue() ) {
 				accumulator = function( thread_, nullptr, HArguments( thread_, it->value( thread_, position_ ), accumulator ), position_ );
 				it->next( thread_, position_ );
 			}
 		} else if ( t == HHuginn::TYPE::UNBOUND_METHOD ) {
-			HHuginn::HClass::HUnboundMethod* unboundMethod( static_cast<HHuginn::HClass::HUnboundMethod*>( callable.raw() ) );
+			huginn::HClass::HUnboundMethod* unboundMethod( static_cast<huginn::HClass::HUnboundMethod*>( callable.raw() ) );
 			while ( it->is_valid( thread_, position_ ) && thread_->can_continue() ) {
 				accumulator = unboundMethod->call( thread_, HArguments( thread_, it->value( thread_, position_ ), accumulator ), position_ );
 				it->next( thread_, position_ );
 			}
 		} else {
 			M_ASSERT( t == HHuginn::TYPE::BOUND_METHOD );
-			HHuginn::HClass::HBoundMethod* boundMethod( static_cast<HHuginn::HClass::HBoundMethod*>( callable.raw() ) );
+			huginn::HClass::HBoundMethod* boundMethod( static_cast<huginn::HClass::HBoundMethod*>( callable.raw() ) );
 			while ( it->is_valid( thread_, position_ ) && thread_->can_continue() ) {
 				accumulator = boundMethod->call( thread_, HArguments( thread_, it->value( thread_, position_ ), accumulator ), position_ );
 				it->next( thread_, position_ );
@@ -131,12 +131,12 @@ public:
 		verify_arg_count( name, values_, 2, 2, thread_, position_ );
 		HHuginn::value_t src( verify_arg_virtual_collection( name, values_, 0, ARITY::MULTIPLE, thread_, position_ ) );
 		verify_arg_type( name, values_, 1, HHuginn::TYPE::FUNCTION_REFERENCE, ARITY::MULTIPLE, thread_, position_ );
-		HHuginn::HFunctionReference const& fr( *static_cast<HHuginn::HFunctionReference const*>( values_[1].raw() ) );
+		huginn::HFunctionReference const& fr( *static_cast<huginn::HFunctionReference const*>( values_[1].raw() ) );
 		HHuginn::value_t v;
-		HHuginn::HIterable const* iterable( static_cast<HHuginn::HIterable const*>( src.raw() ) );
-		HHuginn::HIterable::iterator_t it( const_cast<HHuginn::HIterable*>( iterable )->iterator( thread_, position_ ) );
+		huginn::HIterable const* iterable( static_cast<huginn::HIterable const*>( src.raw() ) );
+		huginn::HIterable::iterator_t it( const_cast<huginn::HIterable*>( iterable )->iterator( thread_, position_ ) );
 		if ( fr.function().id() == bit_cast<void const*>( &builtin::tuple ) ) {
-			HHuginn::HTuple::values_t dest;
+			huginn::HTuple::values_t dest;
 			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
 				dest.push_back( it->value( thread_, position_ ) );
 				it->next( thread_, position_ );
@@ -144,27 +144,27 @@ public:
 			v = thread_->object_factory().create_tuple( yaal::move( dest ) );
 		} else if ( fr.function().id() == bit_cast<void const*>( &builtin::list ) ) {
 			v = thread_->object_factory().create_list();
-			HHuginn::HList::values_t& dest( static_cast<HHuginn::HList*>( v.raw() )->value() );
+			huginn::HList::values_t& dest( static_cast<huginn::HList*>( v.raw() )->value() );
 			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
 				dest.push_back( it->value( thread_, position_ ) );
 				it->next( thread_, position_ );
 			}
 		} else if ( fr.function().id() == bit_cast<void const*>( &builtin::deque ) ) {
 			v = thread_->object_factory().create_deque();
-			HHuginn::HDeque::values_t& dest( static_cast<HHuginn::HDeque*>( v.raw() )->value() );
+			huginn::HDeque::values_t& dest( static_cast<huginn::HDeque*>( v.raw() )->value() );
 			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
 				dest.push_back( it->value( thread_, position_ ) );
 				it->next( thread_, position_ );
 			}
 		} else if ( fr.function().id() == bit_cast<void const*>( &builtin::order ) ) {
 			v = thread_->object_factory().create_order();
-			HHuginn::HOrder* order( static_cast<HHuginn::HOrder*>( v.raw() ) );
-			HHuginn::HOrder::values_t& dest( order->value() );
-			HAnchorGuard<HHuginn::HOrder> ag( *order, thread_, position_ );
-			HHuginn::HClass const* keyType( nullptr );
+			huginn::HOrder* order( static_cast<huginn::HOrder*>( v.raw() ) );
+			huginn::HOrder::values_t& dest( order->value() );
+			HAnchorGuard<huginn::HOrder> ag( *order, thread_, position_ );
+			huginn::HClass const* keyType( nullptr );
 			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
 				HHuginn::value_t elem( it->value( thread_, position_ ) );
-				HHuginn::HClass const* newKeyType( elem->get_class() );
+				huginn::HClass const* newKeyType( elem->get_class() );
 				if ( ! is_comparable( newKeyType ) || ( keyType && ( newKeyType != keyType ) ) ) {
 					throw HHuginn::HHuginnRuntimeException(
 						"Invalid key type: "_ys.append( a_type_name( newKeyType ) ).append( "." ),
@@ -181,19 +181,19 @@ public:
 			}
 		} else if ( fr.function().id() == bit_cast<void const*>( &builtin::set ) ) {
 			v = thread_->object_factory().create_set();
-			HHuginn::HSet* set( static_cast<HHuginn::HSet*>( v.raw() ) );
-			HHuginn::HSet::values_t& dest( set->value() );
-			HAnchorGuard<HHuginn::HSet> ag( *set, thread_, position_ );
+			huginn::HSet* set( static_cast<huginn::HSet*>( v.raw() ) );
+			huginn::HSet::values_t& dest( set->value() );
+			HAnchorGuard<huginn::HSet> ag( *set, thread_, position_ );
 			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
 				dest.insert( it->value( thread_, position_ ) );
 				it->next( thread_, position_ );
 			}
 		} else if ( fr.function().id() == bit_cast<void const*>( &builtin::dict ) ) {
 			v = thread_->object_factory().create_dict();
-			HHuginn::HDict* dict( static_cast<HHuginn::HDict*>( v.raw() ) );
-			HHuginn::HDict::values_t& dest( dict->value() );
-			HAnchorGuard<HHuginn::HDict> ag( *dict, thread_, position_ );
-			HHuginn::HClass const* keyType( nullptr );
+			huginn::HDict* dict( static_cast<huginn::HDict*>( v.raw() ) );
+			huginn::HDict::values_t& dest( dict->value() );
+			HAnchorGuard<huginn::HDict> ag( *dict, thread_, position_ );
+			huginn::HClass const* keyType( nullptr );
 			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
 				HHuginn::value_t tuple( it->value( thread_, position_ ) );
 				if ( tuple->type_id() != HHuginn::TYPE::TUPLE ) {
@@ -203,7 +203,7 @@ public:
 						position_
 					);
 				}
-				HHuginn::HTuple::values_t const& data( static_cast<HHuginn::HTuple const*>( tuple.raw() )->value() );
+				huginn::HTuple::values_t const& data( static_cast<huginn::HTuple const*>( tuple.raw() )->value() );
 				if ( data.get_size() != 2 ) {
 					throw HHuginn::HHuginnRuntimeException(
 						"Each `tuple` materialized into a `dict` must be a key-value pair, i.e. contain exactly two elements.",
@@ -211,7 +211,7 @@ public:
 						position_
 					);
 				}
-				HHuginn::HClass const* newKeyType( data.front()->get_class() );
+				huginn::HClass const* newKeyType( data.front()->get_class() );
 				if ( ! is_comparable( newKeyType ) || ( keyType && ( newKeyType != keyType ) ) ) {
 					throw HHuginn::HHuginnRuntimeException(
 						"Invalid key type: "_ys.append( a_type_name( newKeyType ) ).append( "." ),
@@ -228,9 +228,9 @@ public:
 			}
 		} else if ( fr.function().id() == bit_cast<void const*>( &builtin::lookup ) ) {
 			v = thread_->object_factory().create_lookup();
-			HHuginn::HLookup* lookup( static_cast<HHuginn::HLookup*>( v.raw() ) );
-			HHuginn::HLookup::values_t& dest( lookup->value() );
-			HAnchorGuard<HHuginn::HLookup> ag( *lookup, thread_, position_ );
+			huginn::HLookup* lookup( static_cast<huginn::HLookup*>( v.raw() ) );
+			huginn::HLookup::values_t& dest( lookup->value() );
+			HAnchorGuard<huginn::HLookup> ag( *lookup, thread_, position_ );
 			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
 				HHuginn::value_t tuple( it->value( thread_, position_ ) );
 				if ( tuple->type_id() != HHuginn::TYPE::TUPLE ) {
@@ -240,7 +240,7 @@ public:
 						position_
 					);
 				}
-				HHuginn::HTuple::values_t const& data( static_cast<HHuginn::HTuple const*>( tuple.raw() )->value() );
+				huginn::HTuple::values_t const& data( static_cast<huginn::HTuple const*>( tuple.raw() )->value() );
 				if ( data.get_size() != 2 ) {
 					throw HHuginn::HHuginnRuntimeException(
 						"Each `tuple` materialized into a `lookup` must be a key-value pair, i.e. contain exactly two elements.",
@@ -252,7 +252,7 @@ public:
 				it->next( thread_, position_ );
 			}
 		} else if ( fr.function().id() == bit_cast<void const*>( &builtin::string ) ) {
-			HString s;
+			hcore::HString s;
 			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
 				HHuginn::value_t c( it->value( thread_, position_ ) );
 				if ( c->type_id() != HHuginn::TYPE::CHARACTER ) {
@@ -288,40 +288,40 @@ public:
 		HHuginn::value_t src( verify_arg_virtual_collection( name, values_, 0, ARITY::MULTIPLE, thread_, position_ ) );
 		HHuginn::type_id_t t( src->type_id() );
 		HHuginn::value_t v( thread_->object_factory().create_list() );
-		HHuginn::HList::values_t& dest( static_cast<HHuginn::HList*>( v.raw() )->value() );
+		huginn::HList::values_t& dest( static_cast<huginn::HList*>( v.raw() )->value() );
 		if ( t == HHuginn::TYPE::TUPLE ) {
-			HHuginn::HTuple::values_t const& k( static_cast<HHuginn::HTuple const*>( src.raw() )->value() );
+			huginn::HTuple::values_t const& k( static_cast<huginn::HTuple const*>( src.raw() )->value() );
 			dest = k;
 		} else if ( t == HHuginn::TYPE::LIST ) {
-			HHuginn::HList::values_t const& l( static_cast<HHuginn::HList const*>( src.raw() )->value() );
+			huginn::HList::values_t const& l( static_cast<huginn::HList const*>( src.raw() )->value() );
 			dest = l;
 		} else if ( t == HHuginn::TYPE::DEQUE ) {
-			HHuginn::HDeque::values_t const& d( static_cast<HHuginn::HDeque const*>( src.raw() )->value() );
+			huginn::HDeque::values_t const& d( static_cast<huginn::HDeque const*>( src.raw() )->value() );
 			dest.assign( d.begin(), d.end() );
 		} else if ( t == HHuginn::TYPE::ORDER ) {
-			HHuginn::HOrder::values_t const& s( static_cast<HHuginn::HOrder const*>( src.raw() )->value() );
+			huginn::HOrder::values_t const& s( static_cast<huginn::HOrder const*>( src.raw() )->value() );
 			dest.assign( s.begin(), s.end() );
 		} else if ( t == HHuginn::TYPE::SET ) {
-			HHuginn::HSet::values_t const& s( static_cast<HHuginn::HSet const*>( src.raw() )->value() );
+			huginn::HSet::values_t const& s( static_cast<huginn::HSet const*>( src.raw() )->value() );
 			dest.assign( s.begin(), s.end() );
 		} else if ( t == HHuginn::TYPE::DICT ) {
-			HHuginn::HDict::values_t const& s( static_cast<HHuginn::HDict const*>( src.raw() )->value() );
-			for ( HHuginn::HDict::values_t::value_type const& e : s ) {
+			huginn::HDict::values_t const& s( static_cast<huginn::HDict const*>( src.raw() )->value() );
+			for ( huginn::HDict::values_t::value_type const& e : s ) {
 				dest.push_back( e.first );
 			}
 		} else if ( t == HHuginn::TYPE::LOOKUP ) {
-			HHuginn::HLookup::values_t const& s( static_cast<HHuginn::HLookup const*>( src.raw() )->value() );
-			for ( HHuginn::HLookup::values_t::value_type const& e : s ) {
+			huginn::HLookup::values_t const& s( static_cast<huginn::HLookup const*>( src.raw() )->value() );
+			for ( huginn::HLookup::values_t::value_type const& e : s ) {
 				dest.push_back( e.first );
 			}
 		} else if ( t == HHuginn::TYPE::STRING ) {
-			HString const& s( get_string( src ) );
+			hcore::HString const& s( get_string( src ) );
 			for ( code_point_t c : s ) {
 				dest.push_back( thread_->object_factory().create_character( c ) );
 			}
 		} else {
-			HHuginn::HIterable const* iterable( static_cast<HHuginn::HIterable const*>( src.raw() ) );
-			HHuginn::HIterable::iterator_t it( const_cast<HHuginn::HIterable*>( iterable )->iterator( thread_, position_ ) );
+			huginn::HIterable const* iterable( static_cast<huginn::HIterable const*>( src.raw() ) );
+			huginn::HIterable::iterator_t it( const_cast<huginn::HIterable*>( iterable )->iterator( thread_, position_ ) );
 			while ( it->is_valid( thread_, position_ ) && thread_->can_continue() ) {
 				dest.push_back( it->value( thread_, position_ ) );
 				it->next( thread_, position_ );
@@ -401,7 +401,7 @@ private:
 		HHuginn::type_id_t t( callable->type_id() );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-			v = thread_->object_factory().create<HFilter>( _filterClass.raw(), src, static_cast<HHuginn::HFunctionReference const*>( callable.raw() )->function(), HHuginn::value_t() );
+			v = thread_->object_factory().create<HFilter>( _filterClass.raw(), src, static_cast<huginn::HFunctionReference const*>( callable.raw() )->function(), HHuginn::value_t() );
 		} else {
 			v = thread_->object_factory().create<HFilter>( _filterClass.raw(), src, HHuginn::function_t(), callable );
 		}
@@ -417,7 +417,7 @@ private:
 		HHuginn::type_id_t t( callable->type_id() );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-			v = thread_->object_factory().create<HMapper>( _mapperClass.raw(), src, static_cast<HHuginn::HFunctionReference const*>( callable.raw() )->function(), HHuginn::value_t() );
+			v = thread_->object_factory().create<HMapper>( _mapperClass.raw(), src, static_cast<huginn::HFunctionReference const*>( callable.raw() )->function(), HHuginn::value_t() );
 		} else {
 			v = thread_->object_factory().create<HMapper>( _mapperClass.raw(), src, HHuginn::function_t(), callable );
 		}
@@ -429,7 +429,7 @@ private:
 		char const name[] = "Algorithms.enumerate";
 		verify_arg_count( name, values_, 1, 2, thread_, position_ );
 		HHuginn::value_t src( verify_arg_virtual_collection( name, values_, 0, ARITY::MULTIPLE, thread_, position_ ) );
-		HHuginn::HInteger::value_type start( 0 );
+		huginn::HInteger::value_type start( 0 );
 		if ( values_.get_size() > 1 ) {
 			verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
 			start = get_integer( values_[1] );
@@ -472,8 +472,8 @@ private:
 		}
 		HProduct::axes_t axes;
 		for ( HHuginn::value_t& v : values ) {
-			HHuginn::HIterable const* col( static_cast<HHuginn::HIterable const*>( v.raw() ) );
-			HHuginn::HIterable::iterator_t it( const_cast<HHuginn::HIterable*>( col )->iterator( thread_, position_ ) );
+			huginn::HIterable const* col( static_cast<huginn::HIterable const*>( v.raw() ) );
+			huginn::HIterable::iterator_t it( const_cast<huginn::HIterable*>( col )->iterator( thread_, position_ ) );
 			HProduct::axes_t::value_type axis;
 			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
 				axis.push_back( it->value( thread_, position_ ) );
@@ -495,7 +495,7 @@ private:
 			thread_->object_factory().create<HIterator>(
 				_iteratorClass.raw(),
 				src,
-				static_cast<HHuginn::HIterable*>( src.raw() )->iterator( thread_, position_ )
+				static_cast<huginn::HIterable*>( src.raw() )->iterator( thread_, position_ )
 			)
 		);
 		M_EPILOG

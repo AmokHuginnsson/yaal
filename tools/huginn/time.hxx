@@ -5,8 +5,8 @@
 #ifndef YAAL_TOOLS_HUGINN_TIME_HXX_INCLUDED
 #define YAAL_TOOLS_HUGINN_TIME_HXX_INCLUDED 1
 
-#include "tools/hhuginn.hxx"
 #include "hcore/htime.hxx"
+#include "tools/huginn/value.hxx"
 
 namespace yaal {
 
@@ -18,13 +18,13 @@ typedef yaal::hcore::HTime& ( yaal::hcore::HTime::*time_mod_t )( int );
 typedef yaal::hcore::HTime& ( yaal::hcore::HTime::*time_set_t )( int, int, int );
 typedef int ( yaal::hcore::HTime::*time_get_t )( void ) const;
 
-class HTime : public HHuginn::HValue {
+class HTime : public HValue {
 public:
 	typedef yaal::hcore::HTime value_type;
 private:
 	value_type _time;
 public:
-	HTime( HHuginn::HClass const*, yaal::hcore::HTime const& );
+	HTime( HClass const*, yaal::hcore::HTime const& );
 	value_type const& value( void ) const {
 		return ( _time );
 	}

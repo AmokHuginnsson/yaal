@@ -31,7 +31,7 @@ namespace tools {
 
 namespace huginn {
 
-class HMathematics : public HHuginn::HValue {
+class HMathematics : public HValue {
 	typedef yaal::hcore::HNumber const& ( *constant_getter_t )( yaal::hcore::HNumber::integer_t );
 	HHuginn::class_t _complexClass;
 	HHuginn::class_t _matrixClass;
@@ -39,7 +39,7 @@ class HMathematics : public HHuginn::HValue {
 	HHuginn::class_t _randomizerClass;
 	HHuginn::class_t _exceptionClass;
 public:
-	HMathematics( HHuginn::HClass* class_ )
+	HMathematics( HClass* class_ )
 		: HValue( class_ )
 		, _complexClass(
 			add_class_as_member(
@@ -76,7 +76,7 @@ public:
 		M_PROLOG
 		verify_arg_count( name_, values_, 1, 2, thread_, position_ );
 		verify_arg_type( name_, values_, 0, HHuginn::TYPE::FUNCTION_REFERENCE, ARITY::MULTIPLE, thread_, position_ );
-		HHuginn::HFunctionReference const& fr( *static_cast<HHuginn::HFunctionReference const*>( values_[0].raw() ) );
+		huginn::HFunctionReference const& fr( *static_cast<huginn::HFunctionReference const*>( values_[0].raw() ) );
 		int precision( 0 );
 		if ( values_.get_size() > 1 ) {
 			verify_arg_type( name_, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
@@ -120,7 +120,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, thread_, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber const& val( get_number( values_[0] ) );
+			hcore::HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::natural_exponential( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -136,7 +136,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, thread_, position_ ) );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber const& val( get_number( values_[0] ) );
+			hcore::HNumber const& val( get_number( values_[0] ) );
 			if ( val > number::N0 ) {
 				v = thread_->object_factory().create_number( math::natural_logarithm( val ) );
 			}
@@ -159,7 +159,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, thread_, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber const& val( get_number( values_[0] ) );
+			hcore::HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::sinus( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -175,7 +175,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, thread_, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber const& val( get_number( values_[0] ) );
+			hcore::HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::cosinus( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -191,7 +191,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, thread_, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber const& val( get_number( values_[0] ) );
+			hcore::HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::tangens( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -207,7 +207,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, thread_, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber const& val( get_number( values_[0] ) );
+			hcore::HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::cotangens( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -223,7 +223,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, thread_, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber const& val( get_number( values_[0] ) );
+			hcore::HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::arcus_sinus( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -239,7 +239,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, thread_, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber const& val( get_number( values_[0] ) );
+			hcore::HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::arcus_cosinus( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -255,7 +255,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, thread_, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber const& val( get_number( values_[0] ) );
+			hcore::HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::arcus_tangens( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -271,7 +271,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, thread_, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber const& val( get_number( values_[0] ) );
+			hcore::HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::arcus_cotangens( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -287,7 +287,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, thread_, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber const& val( get_number( values_[0] ) );
+			hcore::HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::hyperbolic_sinus( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -303,7 +303,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, thread_, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber const& val( get_number( values_[0] ) );
+			hcore::HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::hyperbolic_cosinus( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -319,7 +319,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, thread_, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber const& val( get_number( values_[0] ) );
+			hcore::HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::hyperbolic_tangens( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -335,7 +335,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, thread_, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber const& val( get_number( values_[0] ) );
+			hcore::HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::hyperbolic_cotangens( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -351,7 +351,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, thread_, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber const& val( get_number( values_[0] ) );
+			hcore::HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::sigmoid( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -367,7 +367,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, thread_, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber const& val( get_number( values_[0] ) );
+			hcore::HNumber const& val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( math::error_function( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -384,9 +384,9 @@ public:
 		verify_signature( name, values_, t == HHuginn::TYPE::REAL ? types_t{ HHuginn::TYPE::REAL, HHuginn::TYPE::REAL, HHuginn::TYPE::REAL } : types_t{ HHuginn::TYPE::NUMBER, HHuginn::TYPE::NUMBER, HHuginn::TYPE::NUMBER, }, thread_, position_ );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber const& val( get_number( values_[0] ) );
-			HNumber const& mu( get_number( values_[1] ) );
-			HNumber const& sigma( get_number( values_[2] ) );
+			hcore::HNumber const& val( get_number( values_[0] ) );
+			hcore::HNumber const& mu( get_number( values_[1] ) );
+			hcore::HNumber const& sigma( get_number( values_[2] ) );
 			v = thread_->object_factory().create_number( xmath::cumulative_distribution_function( val, mu, sigma ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -412,7 +412,7 @@ public:
 		}
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber val( get_number( values_[0] ) );
+			hcore::HNumber val( get_number( values_[0] ) );
 			try {
 				v = thread_->object_factory().create_number( yaal::move( val.round( to ) ) );
 			} catch ( HNumberException const& e ) {
@@ -434,7 +434,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, thread_, position_ ) );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber val( get_number( values_[0] ) );
+			hcore::HNumber val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( yaal::move( val.floor() ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -450,7 +450,7 @@ public:
 		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, ARITY::UNARY, thread_, position_ ) );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber val( get_number( values_[0] ) );
+			hcore::HNumber val( get_number( values_[0] ) );
 			v = thread_->object_factory().create_number( yaal::move( val.ceil() ) );
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -474,8 +474,8 @@ public:
 		verify_arg_type( name, values_, 1, type_tag( t ), ARITY::MULTIPLE, thread_, position_ );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
-			HNumber const& n1( get_number( values_[0] ) );
-			HNumber const& n2( get_number( values_[1] ) );
+			hcore::HNumber const& n1( get_number( values_[0] ) );
+			hcore::HNumber const& n2( get_number( values_[1] ) );
 			if ( ! ( n1.is_integral() && n2.is_integral() ) ) {
 				throw HHuginn::HHuginnRuntimeException( "Invalid argument.", thread_->current_frame()->file_id(), position_ );
 			}
@@ -493,8 +493,8 @@ public:
 	static HHuginn::value_t binomial_coefficient( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "Mathematics.binomial_coefficient", values_, { HHuginn::TYPE::NUMBER, HHuginn::TYPE::NUMBER }, thread_, position_ );
-		HNumber const& n1( get_number( values_[0] ) );
-		HNumber const& n2( get_number( values_[1] ) );
+		hcore::HNumber const& n1( get_number( values_[0] ) );
+		hcore::HNumber const& n2( get_number( values_[1] ) );
 		if ( ( n1 < 0 ) || ( n2 < 0 ) || ( n2 > n1 ) || ! n1.is_integral() || ! n2.is_integral() ) {
 			throw HHuginn::HHuginnRuntimeException( "Invalid argument.", thread_->current_frame()->file_id(), position_ );
 		}
@@ -504,12 +504,12 @@ public:
 	static HHuginn::value_t modular_multiplicative_inverse( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "Mathematics.modular_multiplicative_inverse", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER }, thread_, position_ );
-		HHuginn::HInteger::value_type mod( get_integer( values_[0] ) );
-		HHuginn::HInteger::value_type val( get_integer( values_[1] ) );
+		huginn::HInteger::value_type mod( get_integer( values_[0] ) );
+		huginn::HInteger::value_type val( get_integer( values_[1] ) );
 		if ( ( mod <= 0 ) || ( val <= 0 ) || ( val >= mod ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Invalid argument.", thread_->current_frame()->file_id(), position_ );
 		}
-		HHuginn::HInteger::value_type res( 0 );
+		huginn::HInteger::value_type res( 0 );
 		HModularMultiplicativeInverse mmi( xmath::modular_multiplicative_inverse( mod, val ) );
 		if ( mmi.greatest_common_divisor() == 1 ) {
 			res = mmi.inverse();
@@ -522,9 +522,9 @@ public:
 	static HHuginn::value_t modular_multiplication( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "Mathematics.modular_multiplication", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER }, thread_, position_ );
-		HHuginn::HInteger::value_type fact1( get_integer( values_[0] ) );
-		HHuginn::HInteger::value_type fact2( get_integer( values_[1] ) );
-		HHuginn::HInteger::value_type mod( get_integer( values_[2] ) );
+		huginn::HInteger::value_type fact1( get_integer( values_[0] ) );
+		huginn::HInteger::value_type fact2( get_integer( values_[1] ) );
+		huginn::HInteger::value_type mod( get_integer( values_[2] ) );
 		if ( ( mod <= 0 ) || ( fact1 < 0 ) || ( fact2 < 0 ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Invalid argument.", thread_->current_frame()->file_id(), position_ );
 		}

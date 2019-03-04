@@ -16,13 +16,13 @@ namespace tools {
 
 namespace huginn {
 
-class HDirectoryScan : public HHuginn::HIterable {
+class HDirectoryScan : public huginn::HIterable {
 	typedef yaal::hcore::HResource<yaal::tools::HFSItem::HIterator> fs_iter_t;
 	yaal::tools::filesystem::path_t _path;
 	fs_iter_t _it;
 	fs_iter_t _end;
 public:
-	HDirectoryScan( HHuginn::HClass const* class_, yaal::tools::filesystem::path_t const& path_ )
+	HDirectoryScan( huginn::HClass const* class_, yaal::tools::filesystem::path_t const& path_ )
 		: HIterable( class_ )
 		, _path( path_ )
 		, _it()
@@ -34,7 +34,7 @@ public:
 		return;
 		M_EPILOG
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, huginn::HClass const* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			runtime_->create_class(

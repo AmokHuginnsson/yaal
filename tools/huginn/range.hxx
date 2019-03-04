@@ -14,12 +14,12 @@ namespace tools {
 
 namespace huginn {
 
-class HRange : public HHuginn::HIterable {
+class HRange : public huginn::HIterable {
 	int long long _from;
 	int long long _stop;
 	int long long _step;
 public:
-	HRange( HHuginn::HClass const* class_, int long long from_, int long long stop_, int long long step_ )
+	HRange( huginn::HClass const* class_, int long long from_, int long long stop_, int long long step_ )
 		: HIterable( class_ )
 		, _from( from_ )
 		, _stop( stop_ )
@@ -31,7 +31,7 @@ public:
 	int long long stop( void ) const {
 		return ( _stop );
 	}
-	static HHuginn::class_t get_class( HRuntime*, HHuginn::HClass const* );
+	static HHuginn::class_t get_class( HRuntime*, huginn::HClass const* );
 protected:
 	virtual int long do_size( huginn::HThread*, int ) const override {
 		return ( safe_int::cast<int long>( ( _stop + _step - ( _from + 1 ) ) / _step ) );

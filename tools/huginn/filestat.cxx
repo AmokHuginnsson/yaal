@@ -23,7 +23,7 @@ namespace tools {
 
 namespace huginn {
 
-HFileStat::HFileStat( HHuginn::HClass const* class_, HHuginn::HClass const* fileTypeClass_, HHuginn::HClass const* exceptionClass_, HHuginn::HClass const* timeClass_, filesystem::path_t const& path_ )
+HFileStat::HFileStat( huginn::HClass const* class_, huginn::HClass const* fileTypeClass_, huginn::HClass const* exceptionClass_, huginn::HClass const* timeClass_, filesystem::path_t const& path_ )
 	: HValue( class_ )
 	, _fileTypeClass( fileTypeClass_ )
 	, _exceptionClass( exceptionClass_ )
@@ -39,7 +39,7 @@ HHuginn::value_t HFileStat::id( huginn::HThread* thread_, HHuginn::value_t* obje
 	HFSItem fi( o->_path );
 	HHuginn::value_t v( thread_->runtime().none_value() );
 	try {
-		v = thread_->object_factory().create_integer( static_cast<HHuginn::HInteger::value_type>( fi.id() ) );
+		v = thread_->object_factory().create_integer( static_cast<huginn::HInteger::value_type>( fi.id() ) );
 	} catch ( HFSItemException const& e ) {
 		thread_->raise( o->_exceptionClass, e.what(), position_ );
 	}
@@ -153,7 +153,7 @@ HHuginn::value_t HFileStat::get_times( char const* name_, time_getter_t timeGett
 	M_EPILOG
 }
 
-HHuginn::class_t HFileStat::get_class( HRuntime* runtime_, HHuginn::HClass const* origin_ ) {
+HHuginn::class_t HFileStat::get_class( HRuntime* runtime_, huginn::HClass const* origin_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(
