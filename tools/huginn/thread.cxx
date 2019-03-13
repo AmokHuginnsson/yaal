@@ -66,6 +66,9 @@ void HThread::add_frame( void ) {
 
 void HThread::create_function_frame( HStatement const* statement_, HHuginn::value_t* object_, int upCast_ ) {
 	M_PROLOG
+	if ( call_stack_size() >= _runtime->max_call_stack_size() ) {
+		throw HHuginn::HHuginnRuntimeException( "Call stack size limit exceeded: "_ys.append( call_stack_size() + 1 ), _currentFrame->file_id(), _currentFrame->position() );
+	}
 	add_frame();
 	++ _functionFrameCount;
 	_currentFrame->init( HFrame::TYPE::FUNCTION, statement_, object_, upCast_ );

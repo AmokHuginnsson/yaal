@@ -631,9 +631,6 @@ void HExpression::function_call( OExecutionStep const& executionStep_, HFrame* f
 	HHuginn::value_t f( yaal::move( values.top() ) );
 	values.pop();
 	HThread* thread( frame_->thread() );
-	if ( thread->call_stack_size() >= thread->runtime().max_call_stack_size() ) {
-		throw HHuginn::HHuginnRuntimeException( "Call stack size limit exceeded: "_ys.append( thread->call_stack_size() + 1 ), file_id(), executionStep_._position );
-	}
 	frame_->set_position( p );
 	if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
 		values.push( static_cast<huginn::HFunctionReference*>( f.raw() )->function()( thread, nullptr, args, p ) );
