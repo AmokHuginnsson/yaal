@@ -20,6 +20,7 @@ namespace hcore {
 template<int const size>
 class HPool final {
 public:
+	typedef HPool<size> this_type;
 	typedef int long long aligner_t;
 	static int const OBJECTS_PER_BLOCK = 256;
 	static int const OBJECT_SIZE = size;
@@ -71,6 +72,19 @@ private:
 			return ( _used == OBJECTS_PER_BLOCK );
 		}
 	private:
+		void mark_used( char* state_ ) {
+			for ( int i( 0 ); i < OBJECTS_PER_BLOCK; ++ i ) {
+				state_[i] = 1;
+			}
+			int used( _used );
+			int free( _free );
+			while ( used < OBJECTS_PER_BLOCK ) {
+				state_[free] = 0;
+				void* p( reinterpret_cast<char*>( _mem ) + OBJECT_SPACE * free );
+				free = *static_cast<u8_t*>( p );
+				++ used;
+			}
+		}
 		friend class HPool<size>;
 		HPoolBlock( HPoolBlock const& ) = delete;
 		HPoolBlock& operator = ( HPoolBlock const& ) = delete;
@@ -157,6 +171,36 @@ public:
 			swap( _poolBlockCapacity, pool_._poolBlockCapacity );
 			swap( _free, pool_._free );
 		}
+	}
+	typedef void (*gc_t)( this_type&, void**, int, void* );
+	void run_gc( gc_t gc_, void* externalState_ ) {
+		char blockUsed[trait::to_unsigned<int, OBJECTS_PER_BLOCK>::value];
+		void** used = new ( memory::yaal ) void*[use_count()];
+		int usedIdx( 0 );
+		for ( int bi( 0 ); bi < _poolBlockCount; ++ bi ) {
+			HPoolBlock* pb( _poolBlocks[bi] );
+			pb->mark_used( blockUsed );
+			for ( int i( 0 ); i < OBJECTS_PER_BLOCK; ++ i ) {
+				if ( blockUsed[i] ) {
+					used[usedIdx] = reinterpret_cast<char*>( pb->_mem ) + OBJECT_SPACE * i;
+					++ usedIdx;
+				}
+			}
+		}
+		try {
+			gc_( *this, used, usedIdx, externalState_ );
+		} catch ( ... ) {
+			delete [] used;
+			throw;
+		}
+		delete [] used;
+	}
+	int use_count( void ) const {
+		int useCount( 0 );
+		for ( int i( 0 ); i < _poolBlockCount; ++ i ) {
+			useCount += _poolBlocks[i]->_used;
+		}
+		return ( useCount );
 	}
 private:
 	void get_free_block( void ) {
