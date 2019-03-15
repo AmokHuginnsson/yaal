@@ -77,11 +77,11 @@ private:
 				state_[i] = 1;
 			}
 			int used( _used );
-			int free( _free );
+			int vFree( _free );
 			while ( used < OBJECTS_PER_BLOCK ) {
-				state_[free] = 0;
-				void* p( reinterpret_cast<char*>( _mem ) + OBJECT_SPACE * free );
-				free = *static_cast<u8_t*>( p );
+				state_[vFree] = 0;
+				void* p( reinterpret_cast<char*>( _mem ) + OBJECT_SPACE * vFree );
+				vFree = *static_cast<u8_t*>( p );
 				++ used;
 			}
 		}
