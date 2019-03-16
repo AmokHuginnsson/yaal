@@ -78,6 +78,7 @@ protected:
 	friend class HValueReferenceBase;
 	template<typename>
 	friend class HValueReference;
+	friend class HObjectFactory;
 private:
 	HSharedBase( HSharedBase const& );
 	HSharedBase& operator = ( HSharedBase const& );
@@ -368,6 +369,11 @@ public:
 		this->_shared = allocator.allocate( 1 );
 		new ( this->_shared ) HSharedDeleterAllocatorImpl<tType, deleter_t, allocator_type>( deleter_, allocator, pointer_ );
 		return;
+	}
+	/* Used only in garbage collector. */
+	HValueReference( typename HValueReferenceBase<tType>::shared_t* shared_ )
+		: HValueReferenceBase<tType>( shared_ ) {
+		this->_shared->inc_reference_counter( static_cast<trait::true_type*>( nullptr ) );
 	}
 	HValueReference( HValueReference const& pointer_ )
 		: HValueReferenceBase<tType>() {

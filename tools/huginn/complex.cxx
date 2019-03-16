@@ -123,7 +123,7 @@ HHuginn::value_t HComplex::divide( huginn::HThread* thread_, HHuginn::value_t* o
 		o->_data /= arg->_data;
 	} catch ( hcore::HException const& e ) {
 		thread_->raise( thread_->object_factory().arithmetic_exception_class(), e.what(), position_ );
-		object_ = &thread_->runtime().none_value();
+		return ( thread_->runtime().none_value() );
 	}
 	return ( *object_ );
 	M_EPILOG

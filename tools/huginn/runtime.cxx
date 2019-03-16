@@ -175,7 +175,7 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 			BUILTIN::TYPE_UNKNOWN
 		} )
 	, _objectFactory( make_pointer<HObjectFactory>( this ) )
-	, _none( _objectFactory->create<huginn::HValue>( _objectFactory->none_class() ) )
+	, _none( &_objectFactory->none_value() )
 	, _true( &_objectFactory->true_value() )
 	, _false( &_objectFactory->false_value() )
 	, _threads()
@@ -185,13 +185,50 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 	, _valuesStore( make_pointer<values_store_t>() )
 	, _globalDefinitions()
 	, _argv( _objectFactory->create_list() )
-	, _result()
+	, _result( _objectFactory->none_value() )
 	, _incrementalFrame()
 	, _maxLocalVariableCount( 0 )
 	, _maxCallStackSize( _huginnMaxCallStack_ )
 	, _modulePaths()
 	, _compilerSetup( HHuginn::COMPILER::DEFAULT )
 	, _trace() {
+}
+
+HRuntime::~HRuntime( void ) {
+	M_PROLOG
+	finalize();
+	return;
+	M_DESTRUCTOR_EPILOG
+}
+
+void HRuntime::finalize( void ) {
+	M_PROLOG
+	if ( ! _objectFactory.unique() ) {
+		return;
+	}
+	if ( ! _result ) {
+		return;
+	}
+	_incrementalFrame.reset();
+	HObjectFactory::long_lived_t longLived;
+	for ( class_t const& c : _dependencies ) {
+		for ( HHuginn::value_t const& f : c->field_definitions() ) {
+			longLived.insert( f.raw() );
+		}
+	}
+	for ( HHuginn::value_t const& v : *_valuesStore ) {
+		longLived.insert( v.raw() );
+	}
+	_result.reset();
+	_argv.reset();
+	util::HScopeExitCall sec( hcore::call( &threads_t::clear, &_threads ) );
+	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
+	huginn::HThread* t( _threads.insert( make_pair( threadId, make_pointer<huginn::HThread>( this, threadId ) ) ).first->second.get() );
+	_objectFactory->cleanup( longLived );
+	_trace = t->trace();
+	t->flush_runtime_exception();
+	return;
+	M_EPILOG
 }
 
 void HRuntime::reset( void ) {

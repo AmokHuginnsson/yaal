@@ -59,7 +59,7 @@ private:
 	 * so it must be practically first to create - last to destroy.
 	 */
 	object_factory_t _objectFactory;
-	value_t _none;
+	value_t const* _none;
 	value_t const* _true;
 	value_t const* _false;
 	threads_t _threads;
@@ -110,12 +110,13 @@ private:
 	HHuginn::call_stack_t _trace;
 public:
 	HRuntime( HHuginn* );
+	virtual ~HRuntime( void );
 	huginn::HThread* current_thread( void );
 	HHuginn* huginn( void ) const {
 		return ( _huginn );
 	}
-	value_t& none_value( void ) {
-		return ( _none );
+	value_t const& none_value( void ) {
+		return ( *_none );
 	}
 	value_t const& true_value( void ) {
 		return ( *_true );
@@ -249,6 +250,7 @@ public:
 	yaal::hcore::HString const* package_name( huginn::HClass const* ) const;
 	void copy_text( HRuntime& );
 	void fix_references( void );
+	void finalize( void );
 	HHuginn::class_t make_package( yaal::hcore::HString const&, HRuntime const& );
 	template<typename... T>
 	HHuginn::value_t create_method( T&&... args_ ) {

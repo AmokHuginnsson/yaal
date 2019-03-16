@@ -378,6 +378,7 @@ public:
 	value_t value( std::nullptr_t ) {
 		return ( value( static_cast<void const*>( 0 ) ) );
 	}
+	void finalize( void );
 private:
 	HHuginn( huginn::HRuntime* );
 	huginn::HRuntime const& runtime( void ) const;

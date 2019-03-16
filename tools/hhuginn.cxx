@@ -404,6 +404,13 @@ void HHuginn::reset( int undoSteps_ ) {
 	M_EPILOG
 }
 
+void HHuginn::finalize( void ) {
+	M_PROLOG
+	_runtime->finalize();
+	return;
+	M_EPILOG
+}
+
 HHuginn::~HHuginn( void ) {
 	M_PROLOG
 	return;
@@ -632,7 +639,7 @@ bool HHuginn::compile( compiler_setup_t compilerSetup_, HIntrospectorInterface* 
 bool HHuginn::execute( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::COMPILED, "Program must be compiled before execution." );
-	HScopedValueReplacement<STATE> state(	_state, STATE::RUNNING );
+	HScopedValueReplacement<STATE> state( _state, STATE::RUNNING );
 	bool ok( false );
 	try {
 		_runtime->execute();

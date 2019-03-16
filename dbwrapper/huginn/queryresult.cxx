@@ -26,7 +26,7 @@ HHuginn::value_t fetch_row( HRecordSet::ptr_t const& rs_, HRecordSet::HIterator&
 	HObjectFactory& objectFactory( *runtime_.object_factory() );
 	HHuginn::value_t v( objectFactory.create_list() );
 	tools::huginn::HList* row( static_cast<tools::huginn::HList*>( v.raw() ) );
-	HHuginn::value_t& none( runtime_.none_value() );
+	HHuginn::value_t const& none( runtime_.none_value() );
 	for ( int i( 0 ), fieldCount( rs_->get_field_count() ); i < fieldCount; ++ i ) {
 		HRecordSet::value_t f( it_[i] );
 		if ( !! f ) {

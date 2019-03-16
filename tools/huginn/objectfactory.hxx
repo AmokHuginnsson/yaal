@@ -80,7 +80,7 @@ public:
 	HObjectFactoryBase( HRuntime* );
 	virtual ~HObjectFactoryBase( void ) {}
 	template<typename T>
-	typename pool_type_info<T>::allocator_t get_allocator( void ) {
+	typename pool_type_info<T>::pool_t& get_pool( void ) {
 		typedef typename pool_type_info<T>::pool_holder_t pool_holder_t;
 		typedef typename pool_type_info<T>::shared_t shared_t;
 		pools_t::iterator it( _memoryPools.find( shared_t::size + 0 ) );
@@ -94,6 +94,10 @@ public:
 			_memoryPools.insert( yaal::hcore::make_pair( shared_t::size + 0, phRaw ) );
 		}
 		return ( static_cast<pool_holder_t*>( phRaw )->get() );
+	}
+	template<typename T>
+	typename pool_type_info<T>::allocator_t get_allocator( void ) {
+		return ( get_pool<T>() );
 	}
 private:
 	template<typename T>
@@ -190,7 +194,7 @@ class HObjectFactory final : public HObjectFactoryBase {
 	HObjectPool<huginn::HTaggedValue, POOL_TYPE::CLASSLESS> _taggedValuePool;
 	HObjectPool<huginn::HObject, POOL_TYPE::CLASSLESS> _objectPool;
 	/* Language semantics classes. */
-	HHuginn::class_t _none;
+	HHuginn::class_t _noneClass;
 	HHuginn::class_t _observer;
 	HHuginn::class_t _reference;
 	HHuginn::class_t _functionReference;
@@ -227,6 +231,7 @@ class HObjectFactory final : public HObjectFactoryBase {
 	HHuginn::class_t _conversionException;
 	HHuginn::class_t _arithmeticException;
 	HHuginn::class_t _iterableAdaptor;
+	HHuginn::value_t _none;
 	HHuginn::value_t _true;
 	HHuginn::value_t _false;
 	/* Explicit pools. */
@@ -248,6 +253,9 @@ public:
 	void register_builtin_classes( void );
 	HRuntime& runtime( void ) const {
 		return ( *_runtime );
+	}
+	HHuginn::value_t const& none_value( void ) const {
+		return ( _none );
 	}
 	HHuginn::value_t const& true_value( void ) const {
 		return ( _true );
@@ -328,7 +336,7 @@ public:
 		return ( _objectPool.create( class_, fields_ ) );
 	}
 	huginn::HClass const* none_class( void ) const {
-		return ( _none.raw() );
+		return ( _noneClass.raw() );
 	}
 	huginn::HClass const* observer_class( void ) const {
 		return ( _observer.raw() );
@@ -422,7 +430,10 @@ public:
 		typedef typename pool_type_info<T>::allocator_t allocator_t;
 		return ( huginn::allocate_value<allocator_t, T>( get_allocator<T>(), yaal::forward<args_t>( args_ )... ) );
 	}
+	typedef yaal::hcore::HHashSet<huginn::HValue const*> long_lived_t;
+	void cleanup( long_lived_t const& );
 private:
+	int break_cycles( long_lived_t const&, void**, int );
 	HObjectFactory( HObjectFactory const& ) = delete;
 	HObjectFactory& operator = ( HObjectFactory const& ) = delete;
 };

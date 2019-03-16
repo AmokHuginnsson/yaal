@@ -8,6 +8,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "keyword.hxx"
 #include "exception.hxx"
 #include "iterator.hxx"
+#include "hcore/hfile.hxx"
+#include "hcore/hlog.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -84,7 +86,7 @@ HObjectFactory::HObjectFactory( HRuntime* runtime_ )
 	: HObjectFactoryBase( runtime_ )
 	, _taggedValuePool( this )
 	, _objectPool( this )
-	, _none( make_pointer<huginn::HClass>( runtime_, HHuginn::TYPE::NONE, IDENTIFIER::BUILTIN::TYPE_NONE, "A type of `none` value." ) )
+	, _noneClass( make_pointer<huginn::HClass>( runtime_, HHuginn::TYPE::NONE, IDENTIFIER::BUILTIN::TYPE_NONE, "A type of `none` value." ) )
 	, _observer( make_pointer<huginn::HClass>( runtime_, HHuginn::TYPE::OBSERVER, IDENTIFIER::BUILTIN::TYPE_OBSERVER, "The `*observer*` is a type representing a reference cycle breaking, non-owning weak \"pointer\" to a value." ) )
 	, _reference( make_pointer<huginn::HClass>( runtime_, HHuginn::TYPE::REFERENCE, IDENTIFIER::BUILTIN::TYPE_REFERENCE, "Write only reference. Allows assign operator to work." ) )
 	, _functionReference( make_pointer<huginn::HClass>( runtime_, HHuginn::TYPE::FUNCTION_REFERENCE, IDENTIFIER::BUILTIN::TYPE_FUNCTION_REFERENCE, "The `*function_reference*` is a Huginn's way of providing information about a value's *runtime* type." ) )
@@ -119,6 +121,7 @@ HObjectFactory::HObjectFactory( HRuntime* runtime_ )
 	, _conversionException()
 	, _arithmeticException()
 	, _iterableAdaptor()
+	, _none( create<huginn::HValue>( _noneClass.raw() ) )
 	, _true( create<HBoolean>( _boolean.raw(), true ) )
 	, _false( create<HBoolean>( _boolean.raw(), false ) )
 	, _stringPool( this, _string.raw() )
@@ -142,7 +145,7 @@ void HObjectFactory::register_builtin_classes( void ) {
 	_exception = exception::get_class( _runtime );
 	_stackFrameInfo = exception::HStackFrameInfo::get_class( _runtime );
 
-	_runtime->huginn()->register_class( _none, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _noneClass, HHuginn::VISIBILITY::GLOBAL );
 	_runtime->huginn()->register_class( _observer, HHuginn::VISIBILITY::GLOBAL );
 	_runtime->huginn()->register_class( _reference, HHuginn::VISIBILITY::GLOBAL );
 	_runtime->huginn()->register_class( _functionReference, HHuginn::VISIBILITY::GLOBAL );
@@ -190,6 +193,104 @@ void HObjectFactory::register_builtin_classes( void ) {
 
 	_iterableAdaptor = HIterableAdaptor::get_class( _runtime );
 
+	return;
+	M_EPILOG
+}
+
+namespace {
+
+template <typename T>
+inline int try_release( HHuginn::value_t& owner_ ) {
+	T& coll( *static_cast<T*>( owner_.get() ) );
+	int freed( 0 );
+	if ( ! coll.value().is_empty() ) {
+		coll.clear();
+		freed = 1;
+	}
+	return ( freed );
+}
+
+inline int try_release( huginn::HObject& object_, HHuginn::value_t& none_ ) {
+	int freed( 0 );
+	int fieldCount( static_cast<int>( object_.get_class()->field_definitions().get_size() ) );
+	for ( int i( 0 ); i < fieldCount; ++ i ) {
+		HHuginn::value_t& f( object_.field_ref( i ) );
+		HHuginn::type_id_t t( f->type_id() );
+		if ( ( t != HHuginn::TYPE::NONE ) && ( t != HHuginn::TYPE::METHOD ) ) {
+			f = none_;
+			freed = 1;
+		}
+	}
+	return ( freed );
+}
+
+}
+
+int HObjectFactory::break_cycles( long_lived_t const& longLived_, void** used_, int count_ ) {
+	M_PROLOG
+	int freed( 0 );
+	for ( int i( 0 ); ( freed == 0 ) && ( i < count_ ); ++ i ) {
+		HHuginn::value_t owner( static_cast<typename HHuginn::value_t::shared_t*>( used_[i] ) );
+		if ( longLived_.find( owner.get() ) != longLived_.end() ) {
+			continue;
+		}
+		switch ( owner->type_id().get() ) {
+			case ( static_cast<int>( HHuginn::TYPE::LIST ) ):   freed = try_release<huginn::HList>( owner );   break;
+			case ( static_cast<int>( HHuginn::TYPE::DEQUE ) ):  freed = try_release<huginn::HDeque>( owner );  break;
+			case ( static_cast<int>( HHuginn::TYPE::DICT ) ):   freed = try_release<huginn::HDict>( owner );   break;
+			case ( static_cast<int>( HHuginn::TYPE::LOOKUP ) ): freed = try_release<huginn::HLookup>( owner ); break;
+			case ( static_cast<int>( HHuginn::TYPE::ORDER ) ):  freed = try_release<huginn::HOrder>( owner );  break;
+			case ( static_cast<int>( HHuginn::TYPE::SET ) ):    freed = try_release<huginn::HSet>( owner );    break;
+			default: {
+				if ( HObject* o = dynamic_cast<HObject*>( owner.get() ) ) {
+					freed = try_release( *o, _none );
+				}
+			}
+		}
+	}
+	return ( freed );
+	M_EPILOG
+}
+
+void HObjectFactory::cleanup( long_lived_t const& longLived_ ) {
+	M_PROLOG
+	typedef typename pool_type_info<huginn::HList>::pool_t   list_pool_t;
+	typedef typename pool_type_info<huginn::HDeque>::pool_t  deque_pool_t;
+	typedef typename pool_type_info<huginn::HDict>::pool_t   dict_pool_t;
+	typedef typename pool_type_info<huginn::HLookup>::pool_t lookup_pool_t;
+	typedef typename pool_type_info<huginn::HOrder>::pool_t  order_pool_t;
+	typedef typename pool_type_info<huginn::HSet>::pool_t    set_pool_t;
+	typedef HBoundCall<int ( void**, int )> gc_t;
+	list_pool_t&   listPool( get_pool<huginn::HList>() );
+	deque_pool_t&  dequePool( get_pool<huginn::HDeque>() );
+	dict_pool_t&   dictPool( get_pool<huginn::HDict>() );
+	lookup_pool_t& lookupPool( get_pool<huginn::HLookup>() );
+	order_pool_t&  orderPool( get_pool<huginn::HOrder>() );
+	set_pool_t&    setPool( get_pool<huginn::HSet>() );
+	gc_t gc( hcore::call( &HObjectFactory::break_cycles, this, cref( longLived_ ), _1, _2 ) );
+	int dangling( 0 );
+	int freed( 0 );
+	do {
+		freed = 0;
+		freed += listPool.run_gc( gc );
+		freed += dequePool.run_gc( gc );
+		freed += dictPool.run_gc( gc );
+		freed += lookupPool.run_gc( gc );
+		freed += orderPool.run_gc( gc );
+		freed += setPool.run_gc( gc );
+		dangling += freed;
+	} while ( freed > 0 );
+	if ( dangling > 0 ) {
+		hcore::HString errMsg;
+		errMsg
+			.assign( "At least " )
+			.append( dangling )
+			.append( " reference cycle" )
+			.append( dangling > 1 ? "s" : "" )
+			.append( " found!" );
+		hcore::log( LOG_LEVEL::ERROR ) << errMsg << endl;
+		cerr << errMsg << endl;
+	}
 	return;
 	M_EPILOG
 }

@@ -172,10 +172,14 @@ public:
 			swap( _free, pool_._free );
 		}
 	}
-	typedef void (*gc_t)( this_type&, void**, int, void* );
-	void run_gc( gc_t gc_, void* externalState_ ) {
+	template<typename gc_t>
+	int run_gc( gc_t gc_ ) {
 		char blockUsed[trait::to_unsigned<int, OBJECTS_PER_BLOCK>::value];
-		void** used = new ( memory::yaal ) void*[use_count()];
+		int useCount( use_count() );
+		if ( ! useCount ) {
+			return ( 0 );
+		}
+		void** used = new ( memory::yaal ) void*[useCount];
 		int usedIdx( 0 );
 		for ( int bi( 0 ); bi < _poolBlockCount; ++ bi ) {
 			HPoolBlock* pb( _poolBlocks[bi] );
@@ -187,13 +191,16 @@ public:
 				}
 			}
 		}
+		M_ASSERT( usedIdx == useCount );
+		int freed( 0 );
 		try {
-			gc_( *this, used, usedIdx, externalState_ );
+			freed = gc_( used, useCount );
 		} catch ( ... ) {
 			delete [] used;
 			throw;
 		}
 		delete [] used;
+		return ( freed );
 	}
 	int use_count( void ) const {
 		int useCount( 0 );
