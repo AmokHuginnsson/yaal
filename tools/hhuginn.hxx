@@ -242,6 +242,14 @@ public:
 	 */
 	bool execute( void );
 
+	/*! \brief Call (execute) Huginn function.
+	 *
+	 * \param name_ - name of the function to call.
+	 * \param argv_ - array of arguments that shall be passed to function call.
+	 * \return Result returned by called Huginn function.
+	 */
+	value_t call( yaal::hcore::HString const& name_, HHuginn::values_t const& argv_ );
+
 	/*! \brief Get value returned by program's main().
 	 *
 	 * \return Value returned by program's main() function.
@@ -387,6 +395,7 @@ private:
 	huginn::HSource& current_source( void );
 	huginn::HSource const& current_source( void ) const;
 	char const* error_message( int ) const;
+	void consume_error( HHuginnRuntimeException const&, int );
 	HHuginn( HHuginn const& ) = delete;
 	HHuginn& operator = ( HHuginn const& ) = delete;
 	friend yaal::hcore::HString to_string( HHuginn::value_t const&, HHuginn* );

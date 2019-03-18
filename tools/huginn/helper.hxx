@@ -1113,6 +1113,31 @@ template<typename F>
 void register_function( HHuginn& h_, yaal::hcore::HString const& name_, F fun_, yaal::hcore::HString const& doc_ ) {
 	M_PROLOG
 	h_.register_function( name_, huginn::function( name_, fun_ ), doc_ );
+	return;
+	M_EPILOG
+}
+
+inline HHuginn::value_t call_function( yaal::tools::HHuginn& huginn_, yaal::tools::HHuginn::values_t& argsHuginn_, yaal::hcore::HString const& name_ ) {
+	return ( huginn_.call( name_, argsHuginn_ ) );
+}
+
+template<typename arg_t, typename... args_t>
+inline yaal::tools::HHuginn::value_t call_function(
+	yaal::tools::HHuginn& huginn_,
+	yaal::tools::HHuginn::values_t& argsHuginn_,
+	yaal::hcore::HString const& name_,
+	arg_t const& arg_,
+	args_t... argsCXX_
+) {
+	argsHuginn_.push_back( huginn_.value( arg_ ) );
+	return ( call_function( huginn_, argsHuginn_, name_, yaal::forward<args_t>( argsCXX_ )... ) );
+}
+
+template<typename... args_t>
+inline yaal::tools::HHuginn::value_t call_function( yaal::tools::HHuginn& huginn_, yaal::hcore::HString const& name_, args_t... argsCXX_ ) {
+	M_PROLOG
+	yaal::tools::HHuginn::values_t args;
+	return ( call_function( huginn_, args, name_, yaal::forward<args_t>( argsCXX_ )... ) );
 	M_EPILOG
 }
 

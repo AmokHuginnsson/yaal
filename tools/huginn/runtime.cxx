@@ -725,6 +725,24 @@ huginn::HThread::frame_t const& HRuntime::incremental_frame( void ) const {
 	M_EPILOG
 }
 
+HHuginn::value_t HRuntime::call( yaal::hcore::HString const& name_, HHuginn::values_t const& values_ ) {
+	M_PROLOG
+	HHuginn::identifier_id_t identifier( try_identifier_id( name_ ) );
+	if ( identifier == IDENTIFIER::INVALID ) {
+		throw HHuginn::HHuginnRuntimeException( "Symbol `"_ys.append( name_ ).append( "` is not defined." ), MAIN_FILE_ID, 0 );
+	}
+	util::HScopeExitCall sec( hcore::call( &threads_t::clear, &_threads ) );
+	HHuginn::values_t args( values_ );
+	args.reserve( max_local_variable_count() );
+	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
+	huginn::HThread* t( _threads.insert( make_pair( threadId, make_pointer<huginn::HThread>( this, threadId ) ) ).first->second.get() );
+	_result = call( identifier, args, 0 );
+	_trace = t->trace();
+	t->flush_runtime_exception();
+	return ( _result );
+	M_EPILOG
+}
+
 HHuginn::value_t HRuntime::call( identifier_id_t identifier_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	value_t res;

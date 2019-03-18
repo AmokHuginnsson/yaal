@@ -200,19 +200,9 @@ public:
 	 *
 	 * \param name_ - name of the function to call.
 	 * \param argv_ - array of arguments that shall be passed to function call.
-	 * \param position_ - call context information for error reporting.
 	 * \return Result returned by called Huginn function.
 	 */
-	value_t call( yaal::hcore::HString const& name_, HHuginn::values_t& argv_, int position_ );
-
-	/*! \brief Call (execute) Huginn function.
-	 *
-	 * \param identifier_ - identifier of the function to call.
-	 * \param argv_ - array of arguments that shall be passed to function call.
-	 * \param position_ - call context information for error reporting.
-	 * \return Result returned by called Huginn function.
-	 */
-	value_t call( identifier_id_t identifier_, HHuginn::values_t& argv_, int position_ );
+	value_t call( yaal::hcore::HString const& name_, HHuginn::values_t const& argv_ );
 
 	/*! \brief Get value returned by program's main().
 	 *
@@ -275,6 +265,7 @@ protected:
 	virtual HHuginn::call_stack_t do_get_call_stack( void ) override;
 	virtual variable_views_t do_get_locals( int ) override;
 private:
+	value_t call( identifier_id_t identifier_, HHuginn::values_t& argv_, int position_ );
 	void register_builtin_function( yaal::hcore::HString const&, function_t&&, yaal::hcore::HString const& );
 private:
 	HRuntime( HRuntime const& ) = delete;

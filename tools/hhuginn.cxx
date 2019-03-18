@@ -621,10 +621,7 @@ bool HHuginn::compile( paths_t const& paths_, compiler_setup_t compilerSetup_, H
 		_state = STATE::COMPILED;
 		ok = true;
 	} catch ( HHuginnRuntimeException const& e ) {
-		_compiler->_mainCompiledStatementCount = mainStatementCount;
-		_errorMessage = e.message();
-		_errorPosition = e.position();
-		_errorFileId = e.file_id();
+		consume_error( e, mainStatementCount );
 	}
 	return ( ok );
 	M_EPILOG
@@ -646,13 +643,35 @@ bool HHuginn::execute( void ) {
 		_compiler->_mainExecutedStatementCount = _compiler->_mainCompiledStatementCount;
 		ok = true;
 	} catch ( HHuginnRuntimeException const& e ) {
-		_compiler->_mainCompiledStatementCount = _compiler->_mainExecutedStatementCount;
-		_errorMessage = e.message();
-		_errorPosition = e.position();
-		_errorFileId = e.file_id();
-		_trace = _runtime->trace();
+		consume_error( e, _compiler->_mainExecutedStatementCount );
 	}
 	return ( ok );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::call( yaal::hcore::HString const& name_, HHuginn::values_t const& argv_ ) {
+	M_PROLOG
+	M_ENSURE( _state == STATE::COMPILED, "Program must be compiled before calling a function." );
+	HScopedValueReplacement<STATE> state( _state, STATE::RUNNING );
+	HHuginn::value_t res;
+	try {
+		res = _runtime->call( name_, argv_ );
+		_compiler->_mainExecutedStatementCount = _compiler->_mainCompiledStatementCount;
+	} catch ( HHuginnRuntimeException const& e ) {
+		consume_error( e, _compiler->_mainExecutedStatementCount );
+	}
+	return ( res );
+	M_EPILOG
+}
+
+void HHuginn::consume_error( HHuginnRuntimeException const& ex_, int statementCount_ ) {
+	M_PROLOG
+	_compiler->_mainCompiledStatementCount = statementCount_;
+	_errorMessage = ex_.message();
+	_errorPosition = ex_.position();
+	_errorFileId = ex_.file_id();
+	_trace = _runtime->trace();
+	return;
 	M_EPILOG
 }
 
