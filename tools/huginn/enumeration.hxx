@@ -83,7 +83,7 @@ private:
 	HEnumeralClass& operator = ( HEnumeralClass const& ) = delete;
 };
 
-class HEnumeration : huginn::HValue {
+class HEnumeration : public huginn::HValue {
 public:
 	HEnumeration( huginn::HClass const* );
 private:

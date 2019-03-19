@@ -176,15 +176,12 @@ HHuginn::value_t range(
 		} else {
 			res = thread_->object_factory().create_string();
 		}
-		huginn::HInteger const* integer( static_cast<huginn::HInteger const*>( step_.raw() ) );
-		int long step( integer ? static_cast<int long>( integer->value() ) : 1 );
+		int long step( step_ ? static_cast<int long>( get_integer( step_ ) ) : 1 );
 		if ( step == 0 ) {
 			throw HHuginn::HHuginnRuntimeException( "Range step cannot be zero.", thread_->current_frame()->file_id(), position_ );
 		}
-		huginn::HInteger const* integerFrom = static_cast<huginn::HInteger const*>( from_.raw() );
-		huginn::HInteger const* integerTo = static_cast<huginn::HInteger const*>( to_.raw() );
-		int long from( integerFrom ? static_cast<int long>( integerFrom->value() ) : ( step > 0 ? 0 : size ) );
-		int long to( integerTo ? static_cast<int long>( integerTo->value() ) : ( step > 0 ? size : -1 ) );
+		int long from( from_ ? static_cast<int long>( get_integer( from_ ) ) : ( step > 0 ? 0 : size ) );
+		int long to( to_ ? static_cast<int long>( get_integer( to_ ) ) : ( step > 0 ? size : -1 ) );
 
 		do {
 			if ( step > 0 ) {

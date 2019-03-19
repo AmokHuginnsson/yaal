@@ -201,7 +201,7 @@ namespace {
 
 template <typename T>
 inline int try_release( HHuginn::value_t& owner_ ) {
-	T& coll( *static_cast<T*>( owner_.get() ) );
+	T& coll( *static_cast<T*>( owner_.raw() ) );
 	int freed( 0 );
 	if ( ! coll.value().is_empty() ) {
 		coll.clear();
@@ -231,7 +231,7 @@ int HObjectFactory::break_cycles( long_lived_t const& longLived_, void** used_, 
 	int freed( 0 );
 	for ( int i( 0 ); ( freed == 0 ) && ( i < count_ ); ++ i ) {
 		HHuginn::value_t owner( static_cast<typename HHuginn::value_t::shared_t*>( used_[i] ) );
-		if ( longLived_.find( owner.get() ) != longLived_.end() ) {
+		if ( longLived_.find( owner.raw() ) != longLived_.end() ) {
 			continue;
 		}
 		switch ( owner->type_id().get() ) {
@@ -242,7 +242,7 @@ int HObjectFactory::break_cycles( long_lived_t const& longLived_, void** used_, 
 			case ( static_cast<int>( HHuginn::TYPE::ORDER ) ):  freed = try_release<huginn::HOrder>( owner );  break;
 			case ( static_cast<int>( HHuginn::TYPE::SET ) ):    freed = try_release<huginn::HSet>( owner );    break;
 			default: {
-				if ( HObject* o = dynamic_cast<HObject*>( owner.get() ) ) {
+				if ( HObject* o = dynamic_cast<HObject*>( owner.raw() ) ) {
 					freed = try_release( *o, _none );
 				}
 			}

@@ -73,6 +73,9 @@ protected:
 	virtual void destroy( void ) {
 		delete this;
 	}
+	tType* object( void ) {
+		return ( reinterpret_cast<tType*>( _object ) );
+	}
 	friend struct value_reference_helper;
 	template<typename>
 	friend class HValueReferenceBase;
@@ -96,8 +99,8 @@ protected:
 		, _allocator( allocator_ ) {
 	}
 	virtual void do_delete( void ) override {
-		DELETER( HSharedBase<tType>::_object );
-		HSharedBase<tType>::_object = nullptr;
+		M_ASSERT( this->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] == 1 );
+		DELETER( static_cast<tType*>( HSharedBase<tType>::object() ) );
 	}
 	friend struct value_reference_helper;
 	template<typename>
@@ -120,35 +123,6 @@ class HSharedDeleterAllocatorImpl : protected HSharedDeleterAllocator<tType, del
 };
 
 struct value_reference_helper {
-	template<typename to_t, typename from_t>
-	static typename yaal::tools::huginn::HValueReference<to_t> do_static_cast( HValueReference<from_t> const& from_ ) {
-		HValueReference<to_t> to;
-		if ( from_._shared->_object ) {
-			to._shared = reinterpret_cast<HSharedBase<to_t>*>( from_._shared );
-			to._shared->inc_reference_counter( static_cast<trait::true_type*>( nullptr ) );
-		}
-		return ( to );
-	}
-
-	template<typename to_t, typename from_t>
-	static typename yaal::tools::huginn::HValueReference<to_t> do_dynamic_cast( HValueReference<from_t> const& from_ ) {
-		HValueReference<to_t> to;
-		if ( dynamic_cast<to_t*>( from_._shared->_object ) ) {
-			to._shared = reinterpret_cast<HSharedBase<to_t>*>( from_._shared );
-			to._shared->inc_reference_counter( static_cast<trait::true_type*>( nullptr ) );
-		}
-		return ( to );
-	}
-
-	template<typename to_t, typename from_t>
-	static typename yaal::tools::huginn::HValueReference<to_t> do_const_cast( HValueReference<from_t> const& from_ ) {
-		HValueReference<to_t> to;
-		if ( dynamic_cast<to_t*>( from_._shared->_object ) ) {
-			to._shared = reinterpret_cast<HSharedBase<to_t>*>( from_._shared );
-			to._shared->inc_reference_counter( static_cast<trait::true_type*>( nullptr ) );
-		}
-		return ( to );
-	}
 
 	template<typename tType>
 	class HSpaceHolderDeleter {
@@ -197,19 +171,11 @@ protected:
 		}
 		return;
 	}
-	template<typename type>
-	void do_reset( void ) {
-		_shared && release<type>();
-		_shared = nullptr;
-		return;
-	}
 	template<typename type, typename alien_t>
 	void acquire( HValueReferenceBase<alien_t> const& from ) {
 		HValueReferenceBase const& alien = reinterpret_cast<HValueReferenceBase const&>( from );
 		if ( ( &alien != this ) && ( _shared != alien._shared ) ) {
-			if ( _shared ) {
-				release<type>();
-			}
+			release<type>();
 			if ( alien._shared && ( alien._shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] > 0 ) ) {
 				alien._shared->inc_reference_counter( static_cast<type*>( nullptr ) );
 				_shared = alien._shared;
@@ -220,17 +186,18 @@ protected:
 		return;
 	}
 	template<typename type>
-	bool release( void ) throw() {
-		M_ASSERT( _shared );
-		if ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] == 1 ) {
-			_shared->do_delete( static_cast<type*>( nullptr ) );
+	void release( void ) throw() {
+		if ( _shared ) {
+			if ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] == 1 ) {
+				_shared->do_delete( static_cast<type*>( nullptr ) );
+			}
+			_shared->dec_reference_counter( static_cast<type*>( nullptr ) );
+			if ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::OBSERVER ] == 0 ) {
+				_shared->destroy();
+			}
 		}
-		_shared->dec_reference_counter( static_cast<type*>( nullptr ) );
-		if ( ! _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::OBSERVER ] ) {
-			_shared->destroy();
-			_shared = nullptr;
-		}
-		return ( ! ( _shared && _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] ) );
+		_shared = nullptr;
+		return;
 	}
 private:
 	friend struct value_reference_helper;
@@ -258,12 +225,6 @@ public:
 		return;
 	}
 	HValueReferenceObserver( HValueReferenceObserver const& pointer_ )
-		: HValueReferenceBase<tType>() {
-		this->template acquire<trait::false_type>( pointer_ );
-		return;
-	}
-	template<typename alien_t>
-	HValueReferenceObserver( HValueReferenceObserver<alien_t> const& pointer_ )
 		: HValueReferenceBase<tType>() {
 		this->template acquire<trait::false_type>( pointer_ );
 		return;
@@ -302,12 +263,11 @@ public:
 		return ( *this );
 	}
 	void reset( void ) {
-		this->template do_reset<trait::false_type>();
+		this->template release<trait::false_type>();
 	}
 	void swap( HValueReferenceObserver& p ) {
 		/*
-		 * Both fields are POD types (pointers: tType*, HSharedBase*)
-		 * so they do not have a specialized implementation
+		 * HSharedBase* is a POD type so they do not have a specialized implementation
 		 * and we can explicitly request yaal generic implementation.
 		 */
 		yaal::swap( this->_shared, p._shared );
@@ -412,15 +372,9 @@ public:
 		other_.reset();
 		return ( *this );
 	}
-	template<typename alien_t>
-	HValueReference& operator = ( HValueReference<alien_t> const& pointer_ ) {
-		this->template acquire<trait::true_type>( pointer_ );
-		return ( *this );
-	}
 	void swap( HValueReference& p ) {
 		/*
-		 * Both fields are POD types (pointers: tType*, HSharedBase*)
-		 * so they do not have a specialized implementation
+		 * HSharedBase* is a POD type so they do not have a specialized implementation
 		 * and we can explicitly request yaal generic implementation.
 		 */
 		yaal::swap( this->_shared, p._shared );
@@ -433,15 +387,15 @@ public:
 		return ( this->_shared ? this->_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] : 0 );
 	}
 	void reset( void ) {
-		this->template do_reset<trait::true_type>();
+		this->template release<trait::true_type>();
 	}
 	const_reference operator* ( void ) const {
 		M_ASSERT( this->_shared && ( this->_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] > 0 ) );
-		return ( *(this->_shared->_object) );
+		return ( *(this->_shared->object()) );
 	}
 	reference operator* ( void ) {
 		M_ASSERT( this->_shared && ( this->_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] > 0 ) );
-		return ( *(this->_shared->_object) );
+		return ( *(this->_shared->object()) );
 	}
 
 	template<typename alien_t>
@@ -451,7 +405,7 @@ public:
 	}
 	template<typename alien_t>
 	bool operator == ( alien_t const* pointer_ ) const {
-		return ( get() == pointer_ );
+		return ( raw() == pointer_ );
 	}
 	template<typename alien_t>
 	bool operator != ( HValueReference<alien_t> const& pointer_ ) const {
@@ -460,97 +414,38 @@ public:
 	}
 	template<typename alien_t>
 	bool operator != ( alien_t const* pointer_ ) const {
-		return ( get() != pointer_ );
+		return ( raw() != pointer_ );
 	}
 
-	template<typename alien_t>
-	bool operator < ( HValueReference<alien_t> const& pointer_ ) const {
-		HValueReference const* alien = reinterpret_cast<HValueReference const *>( &pointer_ );
-		return ( this->_shared < alien->_shared );
-	}
-	template<typename alien_t>
-	bool operator < ( alien_t const* pointer_ ) const {
-		return ( get() < pointer_ );
-	}
-	template<typename alien_t>
-	bool operator > ( HValueReference<alien_t> const& pointer_ ) const {
-		HValueReference const* alien = reinterpret_cast<HValueReference const *>( &pointer_ );
-		return ( this->_shared > alien->_shared );
-	}
-	template<typename alien_t>
-	bool operator > ( alien_t const* pointer_ ) const {
-		return ( get() > pointer_ );
-	}
-
-	template<typename alien_t>
-	bool operator <= ( HValueReference<alien_t> const& pointer_ ) const {
-		HValueReference const* alien = reinterpret_cast<HValueReference const *>( &pointer_ );
-		return ( this->_shared <= alien->_shared );
-	}
-	template<typename alien_t>
-	bool operator <= ( alien_t const* pointer_ ) const {
-		return ( get() <= pointer_ );
-	}
-	template<typename alien_t>
-	bool operator >= ( HValueReference<alien_t> const& pointer_ ) const {
-		HValueReference const* alien = reinterpret_cast<HValueReference const *>( &pointer_ );
-		return ( this->_shared >= alien->_shared );
-	}
-	template<typename alien_t>
-	bool operator >= ( alien_t const* pointer_ ) const {
-		return ( get() >= pointer_ );
-	}
-
-	tType const* operator->( void ) const {
+	value_type const* operator->( void ) const {
 		M_ASSERT( this->_shared && ( this->_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] > 0 ) );
-		return ( this->_shared->_object );
+		return ( this->_shared->object() );
 	}
 	value_type* operator->( void ) {
 		M_ASSERT( this->_shared && ( this->_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] > 0 ) );
-		return ( this->_shared->_object );
+		return ( this->_shared->object() );
 	}
-	tType const* raw( void ) const {
-		return ( this->_shared ? this->_shared->_object : nullptr );
+	value_type const* raw( void ) const {
+		return ( this->_shared->object() );
 	}
 	value_type* raw( void ) {
-		return ( this->_shared ? this->_shared->_object : nullptr );
-	}
-	value_type const* get( void ) const {
-		return ( this->_shared ? this->_shared->_object : nullptr );
-	}
-	value_type* get( void ) {
-		return ( this->_shared ? this->_shared->_object : nullptr );
+		return ( this->_shared->object() );
 	}
 	explicit operator bool ( void ) const {
-		return ( this->_shared && this->_shared->_object );
+		return ( this->_shared && ( this->_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] > 0 ) );
 	}
 private:
 	friend struct value_reference_helper;
 };
 
-template<typename alien_t, typename tType>
-bool operator == ( alien_t const* pointer_, HValueReference<tType> const& smartValueReference_ ) {
+template<typename tType>
+bool operator == ( tType const* pointer_, HValueReference<tType> const& smartValueReference_ ) {
 	return ( smartValueReference_ == pointer_ );
 }
 
-template<typename alien_t, typename tType>
-bool operator != ( alien_t const* pointer_, HValueReference<tType> const& smartValueReference_ ) {
+template<typename tType>
+bool operator != ( tType const* pointer_, HValueReference<tType> const& smartValueReference_ ) {
 	return ( smartValueReference_ != pointer_ );
-}
-
-template<typename to_t, typename from_t>
-typename yaal::tools::huginn::HValueReference<to_t> value_reference_static_cast( HValueReference<from_t> const& from_ ) {
-	return ( value_reference_helper::do_static_cast<to_t>( from_ ) );
-}
-
-template<typename to_t, typename from_t>
-typename yaal::tools::huginn::HValueReference<to_t> value_reference_dynamic_cast( HValueReference<from_t> const& from_ ) {
-	return ( value_reference_helper::do_dynamic_cast<to_t>( from_ ) );
-}
-
-template<typename to_t, typename from_t>
-typename yaal::tools::huginn::HValueReference<to_t> value_reference_const_cast( HValueReference<from_t> const& from_ ) {
-	return ( value_reference_helper::do_const_cast<to_t>( from_ ) );
 }
 
 template<typename allocator_t, typename tType, typename... arg_t>
