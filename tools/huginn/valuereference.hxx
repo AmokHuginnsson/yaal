@@ -179,8 +179,6 @@ protected:
 			if ( alien._shared && ( alien._shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] > 0 ) ) {
 				alien._shared->inc_reference_counter( static_cast<type*>( nullptr ) );
 				_shared = alien._shared;
-			} else {
-				_shared = nullptr;
 			}
 		}
 		return;
@@ -195,8 +193,8 @@ protected:
 			if ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::OBSERVER ] == 0 ) {
 				_shared->destroy();
 			}
+			_shared = nullptr;
 		}
-		_shared = nullptr;
 		return;
 	}
 private:

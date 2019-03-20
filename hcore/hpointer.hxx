@@ -244,20 +244,6 @@ protected:
 		}
 		return;
 	}
-	template<typename type>
-	void do_reset( void ) {
-#if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7003001 )
-#	pragma GCC diagnostic push
-#	pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif /* ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7003001 ) */
-		_shared && release<type>();
-#if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7003001 )
-#	pragma GCC diagnostic pop
-#endif /* #if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7003001 ) */
-		_shared = nullptr;
-		_object = nullptr;
-		return;
-	}
 	template<typename type, typename alien_t>
 	void acquire( HPointerBase<alien_t> const& from ) {
 		typedef typename HPointerBase<alien_t>::pointer alien_pointer;
@@ -266,32 +252,37 @@ protected:
 			M_ASSERT( ( ! ( _shared && alien._shared ) )
 				|| ( ( _shared && alien._shared )
 					&& ( _object != static_cast<alien_pointer>( static_cast<void*>( alien._object ) ) ) ) );
-			if ( _shared ) {
-				release<type>();
-			}
+			release<type>();
 			if ( alien._shared && ( alien._shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] > 0 ) ) {
 				alien._shared->inc_reference_counter( static_cast<type*>( nullptr ) );
 				_shared = alien._shared;
 				assign( _object, static_cast<alien_pointer>( static_cast<void*>( alien._object ) ) );
-			} else {
-				_shared = nullptr;
-				_object = nullptr;
 			}
 		}
 		return;
 	}
 	template<typename type>
-	bool release( void ) throw() {
-		M_ASSERT( _shared && _object );
-		if ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] == 1 ) {
-			_shared->do_delete( static_cast<type*>( nullptr ) );
-		}
-		_shared->dec_reference_counter( static_cast<type*>( nullptr ) );
-		if ( ! _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::OBSERVER ] ) {
-			_shared->destroy();
+	void release( void ) throw() {
+#if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7003001 )
+#	pragma GCC diagnostic push
+#	pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif /* ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7003001 ) */
+		if ( _shared ) {
+#if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7003001 )
+#	pragma GCC diagnostic pop
+#endif /* #if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7003001 ) */
+			M_ASSERT( _object );
+			if ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] == 1 ) {
+				_shared->do_delete( static_cast<type*>( nullptr ) );
+			}
+			_shared->dec_reference_counter( static_cast<type*>( nullptr ) );
+			if ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::OBSERVER ] == 0 ) {
+				_shared->destroy();
+			}
+			_object = nullptr;
 			_shared = nullptr;
 		}
-		return ( ! ( _shared && _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] ) );
+		return;
 	}
 private:
 	void assign( pointer& to, pointer from ) {
@@ -372,7 +363,7 @@ public:
 		return ( *this );
 	}
 	void reset( void ) {
-		this->template do_reset<trait::false_type>();
+		this->template release<trait::false_type>();
 	}
 	void swap( HPointerObserver& p ) {
 		/*
@@ -513,7 +504,7 @@ public:
 		return ( this->_shared ? this->_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] : 0 );
 	}
 	void reset( void ) {
-		this->template do_reset<trait::true_type>();
+		this->template release<trait::true_type>();
 	}
 	const_reference operator* ( void ) const {
 		static_assert( !trait::is_array<tType>::value, "indirection operator is called for an array" );
