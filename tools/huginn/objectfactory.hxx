@@ -62,7 +62,7 @@ public:
 template<typename T>
 struct pool_type_info {
 	typedef yaal::tools::huginn::HValueReference<T> object_ptr_t;
-	typedef typename object_ptr_t::template allocated_shared<allocator::shared_pool<T>> shared_t;
+	typedef typename object_ptr_t::template allocated_shared<allocator::shared_pool<T>, T> shared_t;
 	typedef HPoolHolder<shared_t::size> pool_holder_t;
 	typedef typename pool_holder_t::pool_t pool_t;
 	typedef allocator::shared_pool<typename shared_t::type> allocator_t;
@@ -138,7 +138,7 @@ public:
 	}
 	template<typename... arg_t>
 	HHuginn::value_t create( arg_t&&... arg_ ) const {
-		return ( huginn::allocate_value<allocator_t, T>( this->_allocator, _class, yaal::forward<arg_t>( arg_ )... ) );
+		return ( huginn::allocate_value<allocator_t, HValue, T>( this->_allocator, _class, yaal::forward<arg_t>( arg_ )... ) );
 	}
 private:
 	HObjectPool( HObjectPool const& ) = delete;
@@ -165,7 +165,7 @@ public:
 	}
 	template<typename... arg_t>
 	HHuginn::value_t create( arg_t&&... arg_ ) const {
-		return ( huginn::allocate_value<allocator_t, T>( this->_allocator, _class, _nodeAllocator, yaal::forward<arg_t>( arg_ )... ) );
+		return ( huginn::allocate_value<allocator_t, HValue, T>( this->_allocator, _class, _nodeAllocator, yaal::forward<arg_t>( arg_ )... ) );
 	}
 private:
 	HObjectPool( HObjectPool const& ) = delete;
@@ -186,7 +186,7 @@ public:
 	}
 	template<typename... arg_t>
 	HHuginn::value_t create( arg_t&&... arg_ ) const {
-		return ( huginn::allocate_value<allocator_t, T>( this->_allocator, yaal::forward<arg_t>( arg_ )... ) );
+		return ( huginn::allocate_value<allocator_t, HValue, T>( this->_allocator, yaal::forward<arg_t>( arg_ )... ) );
 	}
 };
 
@@ -428,7 +428,7 @@ public:
 	template<typename T, typename... args_t>
 	HHuginn::value_t create( args_t&&... args_ )  {
 		typedef typename pool_type_info<T>::allocator_t allocator_t;
-		return ( huginn::allocate_value<allocator_t, T>( get_allocator<T>(), yaal::forward<args_t>( args_ )... ) );
+		return ( huginn::allocate_value<allocator_t, HValue, T>( get_allocator<T>(), yaal::forward<args_t>( args_ )... ) );
 	}
 	typedef yaal::hcore::HHashSet<huginn::HValue const*> long_lived_t;
 	void cleanup( long_lived_t const& );

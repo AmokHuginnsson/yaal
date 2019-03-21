@@ -41,7 +41,11 @@ public:
 	HHuginn::value_t const& field( int index_ ) const {
 		return ( do_field( index_ ) );
 	}
+	void destroy( HHuginn::value_t* object_ ) {
+		do_destroy( object_ );
+	}
 private:
+	virtual void do_destroy( HHuginn::value_t* ) {}
 	virtual HHuginn::value_t do_field( HHuginn::value_t const&, int ) const;
 	virtual HHuginn::value_t const& do_field( int ) const;
 	virtual HHuginn::value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const;

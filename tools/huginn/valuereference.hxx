@@ -26,6 +26,7 @@ namespace huginn {
 struct REFERENCE_COUNTER_TYPE {
 	static int const HOLDER = 0;
 	static int const OBSERVER = 1;
+	static int const OBJECT_OFFSET = 2;
 };
 
 template<typename tType>
@@ -40,12 +41,8 @@ public:
 	typedef typename trait::make_reference<value_type const>::type const_reference;
 protected:
 	int _referenceCounter[ 2 ];
-	value_type* _object;
-	HSharedBase( value_type* object_ )
-		: _referenceCounter()
-		, _object( object_ ) {
-		_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] = 1;
-		_referenceCounter[ REFERENCE_COUNTER_TYPE::OBSERVER ] = 1;
+	HSharedBase( void )
+		: _referenceCounter{ 0, 0 } {
 	}
 	void inc_reference_counter( trait::true_type* ) {
 		++ _referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ];
@@ -65,16 +62,14 @@ protected:
 		-- _referenceCounter[ REFERENCE_COUNTER_TYPE::OBSERVER ];
 	}
 	virtual ~HSharedBase( void ) {}
-	void do_delete( trait::true_type* ) {
-		do_delete();
+	void destroy( HValueReference<tType>* object_, trait::true_type* ) {
+		destroy( object_ );
 	}
-	void do_delete( trait::false_type* ) {}
-	virtual void do_delete( void ) = 0;
-	virtual void destroy( void ) {
-		delete this;
-	}
+	void destroy( HValueReference<tType>*, trait::false_type* ) {}
+	virtual void destroy( HValueReference<tType>* ) = 0;
+	virtual void deallocate( void ) = 0;
 	tType* object( void ) {
-		return ( reinterpret_cast<tType*>( _object ) );
+		return ( reinterpret_cast<tType*>( &_referenceCounter[REFERENCE_COUNTER_TYPE::OBJECT_OFFSET] ) );
 	}
 	friend struct value_reference_helper;
 	template<typename>
@@ -87,57 +82,33 @@ private:
 	HSharedBase& operator = ( HSharedBase const& );
 };
 
-template<typename tType, typename deleter_t, typename allocator_t>
-class HSharedDeleterAllocator : protected HSharedBase<tType> {
-	deleter_t DELETER;
+template<typename tType, typename value_t, typename allocator_t>
+class HSharedValueHolder : protected HSharedBase<tType> {
+public:
+	typedef typename memory::aligned<static_cast<int>( sizeof ( value_t ) ), value_t>::type aligner_t;
+private:
+	aligner_t _mem;
 protected:
 	allocator_t _allocator;
 	template<typename input_allocator>
-	HSharedDeleterAllocator( deleter_t const& deleter_, input_allocator const& allocator_, tType* object_ )
-		: HSharedBase<tType>( object_ )
-		, DELETER( deleter_ )
+	HSharedValueHolder( input_allocator const& allocator_ )
+		: HSharedBase<tType>()
+		, _mem()
 		, _allocator( allocator_ ) {
 	}
-	virtual void do_delete( void ) override {
+	virtual void destroy( HValueReference<tType>* object_ ) override {
 		M_ASSERT( this->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] == 1 );
-		DELETER( static_cast<tType*>( HSharedBase<tType>::object() ) );
+		this->HSharedBase<tType>::object()->destroy( object_ );
+		if ( this->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] == 1 ) {
+			this->HSharedBase<tType>::object()->~tType();
+		}
 	}
-	friend struct value_reference_helper;
-	template<typename>
-	friend class HValueReference;
-};
-
-template<typename tType, typename deleter_t, typename allocator_t>
-class HSharedDeleterAllocatorImpl : protected HSharedDeleterAllocator<tType, deleter_t, allocator_t> {
-	typedef HSharedDeleterAllocator<tType, deleter_t, allocator_t> base_type;
-	template<typename input_allocator>
-	HSharedDeleterAllocatorImpl( deleter_t const& deleter_, input_allocator const& allocator_, tType* object_ )
-		: base_type( deleter_, allocator_, object_ ) {
-	}
-	virtual void destroy( void ) override {
-		typedef typename allocator_t:: template rebind<HSharedDeleterAllocatorImpl>::other allocator_type;
+	virtual void deallocate( void ) override {
+		typedef typename allocator_t:: template rebind<HSharedValueHolder>::other allocator_type;
 		allocator_type( this->_allocator ).deallocate( this, 1 );
 	}
 	template<typename>
 	friend class HValueReference;
-};
-
-struct value_reference_helper {
-
-	template<typename tType>
-	class HSpaceHolderDeleter {
-		typedef typename memory::aligned<static_cast<int>( sizeof ( tType ) ), tType>::type aligner_t;
-		aligner_t _mem;
-	public:
-		HSpaceHolderDeleter( void ) : _mem() {}
-		void operator()( tType* ) {
-			mem()->~tType();
-		}
-		tType* mem( void ) {
-			return ( _mem.mem() );
-		}
-	};
-
 };
 
 template<typename tType>
@@ -166,7 +137,7 @@ protected:
 			/* This path is reached only when tType constructor throws
 			 * in make_value() helper function.
 			 */
-			_shared->destroy();
+			_shared->deallocate();
 			_shared = nullptr;
 		}
 		return;
@@ -187,11 +158,11 @@ protected:
 	void release( void ) throw() {
 		if ( _shared ) {
 			if ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] == 1 ) {
-				_shared->do_delete( static_cast<type*>( nullptr ) );
+				_shared->destroy( static_cast<HValueReference<tType>*>( this ), static_cast<type*>( nullptr ) );
 			}
 			_shared->dec_reference_counter( static_cast<type*>( nullptr ) );
 			if ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::OBSERVER ] == 0 ) {
-				_shared->destroy();
+				_shared->deallocate();
 			}
 			_shared = nullptr;
 		}
@@ -292,10 +263,10 @@ public:
 	typedef typename HValueReferenceBase<tType>::value_type value_type;
 	typedef typename HValueReferenceBase<tType>::reference reference;
 	typedef typename HValueReferenceBase<tType const>::const_reference const_reference;
-	typedef value_reference_helper::HSpaceHolderDeleter<tType> space_holder_deleter_t;
-	template<typename allocator_t>
+	typedef HSharedBase<tType> shared_t;
+	template<typename allocator_t, typename value_t>
 	struct allocated_shared {
-		typedef HSharedDeleterAllocator<tType, space_holder_deleter_t, allocator_t> type;
+		typedef HSharedValueHolder<tType, value_t, allocator_t> type;
 		static int const size = static_cast<int>( sizeof ( type ) );
 	};
 	HValueReference( void )
@@ -305,33 +276,25 @@ public:
 	HValueReference( std::nullptr_t )
 		: HValueReferenceBase<tType>() {
 	}
-	template<typename allocator_t, typename... args_t>
-	explicit HValueReference( allocator_t const& allocator_, args_t&&... args_  )
+	template<typename value_t, typename allocator_t, typename... args_t>
+	explicit HValueReference( value_t*, allocator_t const& allocator_, args_t&&... args_  )
 		: HValueReferenceBase<tType>() {
-		typedef typename allocator_t::template rebind<HSharedDeleterAllocator<tType, value_reference_helper::HSpaceHolderDeleter<tType>, allocator_t>>::other allocator_type;
+		typedef HSharedValueHolder<tType, value_t, allocator_t> shared_value_holder_t;
+		typedef typename allocator_t::template rebind<shared_value_holder_t>::other allocator_type;
 		allocator_type allocator( allocator_ );
-		this->_shared = allocator.allocate( 1 );
-		new ( this->_shared ) HSharedDeleterAllocatorImpl<tType, value_reference_helper::HSpaceHolderDeleter<tType>, allocator_t>( value_reference_helper::HSpaceHolderDeleter<tType>(), allocator, static_cast<tType*>( nullptr ) );
-		tType* ptr( static_cast<HSharedDeleterAllocator<tType, value_reference_helper::HSpaceHolderDeleter<tType>, allocator_t>*>( this->_shared )->DELETER.mem() );
-		new ( ptr ) tType( yaal::forward<args_t>( args_ )... );
-		this->_shared->_object = ptr;
-		return;
-	}
-	/* Used only in HObject::~HObject() */
-	template<typename deleter_t, typename allocator_t>
-	explicit HValueReference( tType* pointer_,  deleter_t deleter_, allocator_t allocator_ )
-		: HValueReferenceBase<tType>() {
-		M_ASSERT( pointer_ );
-		typedef typename allocator_t::template rebind<HSharedDeleterAllocator<tType, deleter_t, allocator_t>>::other allocator_type;
-		allocator_type allocator( allocator_ );
-		this->_shared = allocator.allocate( 1 );
-		new ( this->_shared ) HSharedDeleterAllocatorImpl<tType, deleter_t, allocator_type>( deleter_, allocator, pointer_ );
+		shared_value_holder_t* shared( allocator.allocate( 1 ) );
+		this->_shared = shared;
+		new ( shared ) shared_value_holder_t( allocator );
+		value_t* ptr( static_cast<value_t*>( shared->object() ) );
+		new ( ptr ) value_t( yaal::forward<args_t>( args_ )... );
+		shared->inc_reference_counter( static_cast<trait::true_type*>( nullptr ) );
 		return;
 	}
 	/* Used only in garbage collector. */
 	HValueReference( typename HValueReferenceBase<tType>::shared_t* shared_ )
 		: HValueReferenceBase<tType>( shared_ ) {
 		this->_shared->inc_reference_counter( static_cast<trait::true_type*>( nullptr ) );
+		return;
 	}
 	HValueReference( HValueReference const& pointer_ )
 		: HValueReferenceBase<tType>() {
@@ -446,9 +409,9 @@ bool operator != ( tType const* pointer_, HValueReference<tType> const& smartVal
 	return ( smartValueReference_ != pointer_ );
 }
 
-template<typename allocator_t, typename tType, typename... arg_t>
-HValueReference<tType> allocate_value( allocator_t const& allocator_, arg_t&&... arg_ ) {
-	return ( HValueReference<tType>( allocator_, yaal::forward<arg_t>( arg_ )... ) );
+template<typename allocator_t, typename base_t, typename tType, typename... arg_t>
+HValueReference<base_t> allocate_value( allocator_t const& allocator_, arg_t&&... arg_ ) {
+	return ( HValueReference<base_t>( static_cast<tType*>( nullptr ), allocator_, yaal::forward<arg_t>( arg_ )... ) );
 }
 
 template<typename tType>

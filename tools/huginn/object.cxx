@@ -18,56 +18,17 @@ namespace yaal {
 
 namespace tools {
 
-namespace hobject_destructor_helper {
-
-void deleter( huginn::HValue* );
-void deleter( huginn::HValue* ) {
-}
-
-template<typename T>
-struct allocator {
-	template<typename U>
-	struct rebind {
-		typedef allocator<U> other;
-	};
-	T* _mem;
-	allocator( T* mem_ )
-		: _mem( mem_ ) {
-	}
-	template<typename U>
-	allocator( allocator<U> const& other_ )
-		: _mem( reinterpret_cast<T*>( const_cast<U*>( other_._mem ) ) ) {
-	}
-	allocator( allocator const& ) = default;
-	allocator& operator = ( allocator const& ) = default;
-	T* allocate( int ) {
-		return ( _mem );
-	}
-	void deallocate( T*, int ) {
-	}
-};
-
-typedef yaal::hcore::HSharedDeleterAllocator<huginn::HValue, void(*)( huginn::HValue*), allocator<HObject>> holder_t;
-
-static int const BUFFER_SIZE = sizeof ( holder_t );
-typedef typename memory::aligned<BUFFER_SIZE, holder_t>::type buffer_t;
-
-}
-
 HObject::HObject( HClass const* class_, fields_t const& fields_ )
 	: HValue( class_ )
 	, _fields( fields_ ) {
 }
 
-HObject::~HObject( void ) {
+void HObject::do_destroy( HHuginn::value_t* object_ ) {
 	M_PROLOG
 	huginn::HClass const* clss( get_class() );
 	HRuntime* runtime( clss->runtime() );
 	huginn::HThread* t( runtime ? runtime->current_thread() : nullptr );
 	if ( t && ! t->has_runtime_exception() ) {
-		hobject_destructor_helper::buffer_t buffer;
-		hobject_destructor_helper::allocator<hobject_destructor_helper::holder_t> allocator( buffer.mem() );
-		HHuginn::value_t nonOwning( static_cast<huginn::HValue*>( this ), &hobject_destructor_helper::deleter, allocator );
 		int destructorIdx( clss->field_index( IDENTIFIER::KEYWORD::DESTRUCTOR ) );
 		HClass const* c( clss->super() );
 		if ( destructorIdx >= 0 ) {
@@ -75,7 +36,7 @@ HObject::~HObject( void ) {
 				M_ASSERT( _fields[destructorIdx]->type_id() == HHuginn::TYPE::METHOD );
 				static_cast<HClass::HMethod const*>(
 					_fields[destructorIdx].raw()
-				)->function()( t, &nonOwning, HArguments( t ), 0 );
+				)->function()( t, object_, HArguments( t ), 0 );
 			} catch ( HHuginn::HHuginnRuntimeException const& e ) {
 				t->break_execution( HFrame::STATE::RUNTIME_EXCEPTION );
 				t->set_exception( e.message(), e.file_id(), e.position() );
@@ -86,7 +47,7 @@ HObject::~HObject( void ) {
 			destructorIdx = c->field_index( IDENTIFIER::KEYWORD::DESTRUCTOR );
 			if ( destructorIdx >= 0 ) {
 				try {
-					c->function( destructorIdx )( t, &nonOwning, HArguments( t ), 0 );
+					c->function( destructorIdx )( t, object_, HArguments( t ), 0 );
 				} catch ( HHuginn::HHuginnRuntimeException const& e ) {
 					t->break_execution( HFrame::STATE::RUNTIME_EXCEPTION );
 					t->set_exception( e.message(), e.file_id(), e.position() );

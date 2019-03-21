@@ -28,8 +28,6 @@ private:
 	} _context;
 public:
 	HSemanticBuffer( yaal::hcore::HChunk&, yaal::hcore::HUTF8String&, huginn::HThread*, int );
-	HSemanticBuffer( HSemanticBuffer&& ) = default;
-	HSemanticBuffer& operator = ( HSemanticBuffer&& ) = default;
 	void* data( void ) const {
 		return ( _buffer.raw() );
 	}
@@ -50,6 +48,8 @@ public:
 	void write( yaal::hcore::HString const& );
 	void write( void const*, int long );
 private:
+	HSemanticBuffer( HSemanticBuffer&& ) = delete;
+	HSemanticBuffer& operator = ( HSemanticBuffer&& ) = delete;
 	HSemanticBuffer( HSemanticBuffer const& ) = delete;
 	HSemanticBuffer& operator = ( HSemanticBuffer const& ) = delete;
 };
