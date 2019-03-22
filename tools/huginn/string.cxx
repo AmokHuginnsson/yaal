@@ -188,7 +188,7 @@ public:
 		bool autoIndex( false );
 		hcore::HString idxRaw;
 		hcore::HString specRaw;
-		hcore::HString formatedValue;
+		hcore::HString formattedValue;
 		char const* errMsg( "Invalid format specification" );
 		int maxUsedValue( -1 );
 		int valCount( static_cast<int>( _values.get_size() ) );
@@ -300,7 +300,7 @@ public:
 						}
 					}
 					if ( ( type == HHuginn::TYPE::INTEGER ) && ( base != BASE::DEC ) ) {
-						formatedValue.assign( int_to_str( static_cast<huginn::HInteger const*>( v.raw() )->value(), base, prefix ) );
+						formattedValue.assign( int_to_str( static_cast<huginn::HInteger const*>( v.raw() )->value(), base, prefix ) );
 					} else if ( ( ( type == HHuginn::TYPE::REAL ) || ( type == HHuginn::TYPE::NUMBER ) ) && ( prec >= 0 ) ) {
 						if ( type == HHuginn::TYPE::REAL ) {
 							static int const FMT_SIZE( 32 );
@@ -309,49 +309,49 @@ public:
 							static int const MAX_FLOAT_DIGIT_COUNT( 8192 );
 							char buffer[MAX_FLOAT_DIGIT_COUNT] = "\0";
 							int charCount( snprintf( buffer, MAX_FLOAT_DIGIT_COUNT, prec >= 0 ? fmt : "%Lf", get_real( v ) ) );
-							formatedValue.assign( buffer, charCount );
+							formattedValue.assign( buffer, charCount );
 						} else if ( prec >= 0 ) {
 							hcore::HNumber n( get_number( v ) );
 							n.round( prec );
-							formatedValue = n.to_string();
+							formattedValue = n.to_string();
 						} else {
-							formatedValue = get_number( v ).to_string();
+							formattedValue = get_number( v ).to_string();
 						}
-						hcore::HString::size_type dotPos( formatedValue.find( '.'_ycp ) );
+						hcore::HString::size_type dotPos( formattedValue.find( '.'_ycp ) );
 						if ( dotPos == hcore::HString::npos ) {
-							dotPos = formatedValue.get_length();
-							formatedValue.push_back( '.'_ycp );
+							dotPos = formattedValue.get_length();
+							formattedValue.push_back( '.'_ycp );
 						}
-						hcore::HString::size_type realPrec( formatedValue.get_length() - dotPos - 1 );
+						hcore::HString::size_type realPrec( formattedValue.get_length() - dotPos - 1 );
 						if ( realPrec > prec ) {
-							formatedValue.erase( dotPos + 1 + prec );
+							formattedValue.erase( dotPos + 1 + prec );
 						} else if ( prec > realPrec ) {
-							formatedValue.append( prec - realPrec, '0'_ycp );
+							formattedValue.append( prec - realPrec, '0'_ycp );
 						}
 					} else {
 						HHuginn::value_t sv( instruction::string( _thread, _values[idx], _position ) );
-						formatedValue.assign( static_cast<HString*>( sv.raw() )->value() );
+						formattedValue.assign( static_cast<HString*>( sv.raw() )->value() );
 					}
-					if ( width > formatedValue.get_length() ) {
-						int space( static_cast<int>( width - formatedValue.get_length() ) );
+					if ( width > formattedValue.get_length() ) {
+						int space( static_cast<int>( width - formattedValue.get_length() ) );
 						switch ( align ) {
 							case ( ALIGN::LEFT ): {
-								formatedValue.append( space, fill );
+								formattedValue.append( space, fill );
 							} break;
 							case ( ALIGN::CENTER ): {
-								formatedValue.shift_right( space / 2, fill );
-								formatedValue.append( space - space / 2, fill );
+								formattedValue.shift_right( space / 2, fill );
+								formattedValue.append( space - space / 2, fill );
 							} break;
 							case ( ALIGN::RIGHT ): {
-								if ( ( type == HHuginn::TYPE::INTEGER ) && ( base != BASE::DEC ) && ( fill == '0'_ycp ) ) {
-									formatedValue.insert( 2, space, fill );
+								if ( prefix && ( type == HHuginn::TYPE::INTEGER ) && ( base != BASE::DEC ) && ( fill == '0'_ycp ) ) {
+									formattedValue.insert( 2, space, fill );
 								} else {
-									formatedValue.shift_right( space, fill );
+									formattedValue.shift_right( space, fill );
 								}
 							} break;
 						}
 					}
-					_result.append( formatedValue );
+					_result.append( formattedValue );
 					continue;
 				}
 			} else if ( *_it == FMT_CLOSE ) {
