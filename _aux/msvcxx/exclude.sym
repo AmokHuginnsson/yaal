@@ -65,6 +65,7 @@
 ?DELIMITED_BY_WHOLE_STRING@HTokenizer@hcore@yaal@@2V?$HBitFlag@VHTokenizer@hcore@yaal@@@23@B
 ?DRAW_HEADER@FLAG@HListWidget@hconsole@yaal@@2V?$HBitFlag@UFLAG@HListWidget@hconsole@yaal@@@hcore@4@B
 ?E@math@yaal@@3OA
+?E@math@yaal@@3OB
 ?ECHO@FLAG@HSerial@tools@yaal@@2V?$HBitFlag@UFLAG@HSerial@tools@yaal@@@hcore@4@B
 ?EDITABLE@FLAG@HListWidget@hconsole@yaal@@2V?$HBitFlag@UFLAG@HListWidget@hconsole@yaal@@@hcore@4@B
 ?FILE@TYPE@HSocket@hcore@yaal@@2V?$HBitFlag@UTYPE@HSocket@hcore@yaal@@@34@B
@@ -76,6 +77,7 @@
 ?IGNORE_CONVERSION_ERRORS@PARSER@HXml@tools@yaal@@2V?$HBitFlag@UPARSER@HXml@tools@yaal@@@hcore@4@B
 ?INCLUDE_EMPTY@HTokenizer@hcore@yaal@@2V?$HBitFlag@VHTokenizer@hcore@yaal@@@23@B
 ?INDENT@GENERATOR@HXml@tools@yaal@@2V?$HBitFlag@UGENERATOR@HXml@tools@yaal@@@hcore@4@B
+?INFINITY@math@yaal@@3OB
 ?INTERQUARTILE_RANGE@AGGREGATE_TYPE@xmath@tools@yaal@@2V?$HBitFlag@UAGGREGATE_TYPE@xmath@tools@yaal@@@hcore@4@B
 ?KEEP_EMPTY@PARSER@HXml@tools@yaal@@2V?$HBitFlag@UPARSER@HXml@tools@yaal@@@hcore@4@B
 ?MANAGED_IO@SystemIO@msvcxx@@2HB
@@ -91,6 +93,7 @@
 ?N4@number@hcore@yaal@@3VHNumber@23@B
 ?N5@number@hcore@yaal@@3VHNumber@23@B
 ?N6@number@hcore@yaal@@3VHNumber@23@B
+?NAN@math@yaal@@3OB
 ?NETWORK@TYPE@HSocket@hcore@yaal@@2V?$HBitFlag@UTYPE@HSocket@hcore@yaal@@@34@B
 ?NEWLINE@COMPILE@HRegex@hcore@yaal@@2V?$HBitFlag@UCOMPILE@HRegex@hcore@yaal@@@34@B
 ?NONBLOCKING@TYPE@HSocket@hcore@yaal@@2V?$HBitFlag@UTYPE@HSocket@hcore@yaal@@@34@B
@@ -106,10 +109,15 @@
 ?PARITY_CHECK@FLAG@HSerial@tools@yaal@@2V?$HBitFlag@UFLAG@HSerial@tools@yaal@@@hcore@4@B
 ?PARITY_ODD@FLAG@HSerial@tools@yaal@@2V?$HBitFlag@UFLAG@HSerial@tools@yaal@@@hcore@4@B
 ?PI@math@yaal@@3OA
+?PI@math@yaal@@3OB
+?POPULATION_KURTOSIS@AGGREGATE_TYPE@xmath@tools@yaal@@2V?$HBitFlag@UAGGREGATE_TYPE@xmath@tools@yaal@@@hcore@4@B
+?POPULATION_SKEWNESS@AGGREGATE_TYPE@xmath@tools@yaal@@2V?$HBitFlag@UAGGREGATE_TYPE@xmath@tools@yaal@@@hcore@4@B
 ?POPULATION_STANDARD_DEVIATION@AGGREGATE_TYPE@xmath@tools@yaal@@2V?$HBitFlag@UAGGREGATE_TYPE@xmath@tools@yaal@@@hcore@4@B
 ?POPULATION_VARIANCE@AGGREGATE_TYPE@xmath@tools@yaal@@2V?$HBitFlag@UAGGREGATE_TYPE@xmath@tools@yaal@@@hcore@4@B
 ?READING@OPEN@HFile@hcore@yaal@@2V?$HBitFlag@UOPEN@HFile@hcore@yaal@@@34@B
 ?RESOLVE_ENTITIES@PARSER@HXml@tools@yaal@@2V?$HBitFlag@UPARSER@HXml@tools@yaal@@@hcore@4@B
+?SAMPLE_KURTOSIS@AGGREGATE_TYPE@xmath@tools@yaal@@2V?$HBitFlag@UAGGREGATE_TYPE@xmath@tools@yaal@@@hcore@4@B
+?SAMPLE_SKEWNESS@AGGREGATE_TYPE@xmath@tools@yaal@@2V?$HBitFlag@UAGGREGATE_TYPE@xmath@tools@yaal@@@hcore@4@B
 ?SAMPLE_STANDARD_DEVIATION@AGGREGATE_TYPE@xmath@tools@yaal@@2V?$HBitFlag@UAGGREGATE_TYPE@xmath@tools@yaal@@@hcore@4@B
 ?SAMPLE_VARIANCE@AGGREGATE_TYPE@xmath@tools@yaal@@2V?$HBitFlag@UAGGREGATE_TYPE@xmath@tools@yaal@@@hcore@4@B
 ?SERVER@TYPE@HSocket@hcore@yaal@@2V?$HBitFlag@UTYPE@HSocket@hcore@yaal@@@34@B

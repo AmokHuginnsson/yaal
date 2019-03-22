@@ -297,7 +297,7 @@ double long HUniform::operator()( void ) {
 
 yaal::i64_t HUniform::do_next_discrete( void ) {
 	M_ASSERT( !"Invalid use of continuous distribution."[0] );
-	return ( 0.0L );
+	return ( 0LL );
 }
 
 double long HUniform::do_next_continuous( void ) {
@@ -331,7 +331,7 @@ double long HTriangle::operator()( void ) {
 
 yaal::i64_t HTriangle::do_next_discrete( void ) {
 	M_ASSERT( !"Invalid use of continuous distribution."[0] );
-	return ( 0.0L );
+	return ( 0LL );
 }
 
 double long HTriangle::do_next_continuous( void ) {
@@ -381,7 +381,7 @@ double long HNormal::uniform_sample( void ) {
 
 yaal::i64_t HNormal::do_next_discrete( void ) {
 	M_ASSERT( !"Invalid use of continuous distribution."[0] );
-	return ( 0.0L );
+	return ( 0LL );
 }
 
 double long HNormal::do_next_continuous( void ) {

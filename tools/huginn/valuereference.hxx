@@ -96,6 +96,23 @@ protected:
 		, _mem()
 		, _allocator( allocator_ ) {
 	}
+#ifdef __MSVCXX__
+	template<typename>
+	friend class HValueReference;
+};
+/*
+ * Visual Studio 2015 C++ compiler tries to instantiate all class virtual methods while
+ * compiling `sizeof ( HSharedValueHolder<base_t, value_t, allocator_t> )`,
+ * which fails.
+ * So we need to HIDE those methods implementation from the compiler.
+ */
+template<typename tType, typename value_t, typename allocator_t>
+class HSharedValueHolderImpl : protected HSharedValueHolder<tType, value_t, allocator_t> {
+	template<typename input_allocator>
+	HSharedValueHolderImpl( input_allocator const& allocator_ )
+		: HSharedValueHolder( allocator_ ) {
+	}
+#endif /* #ifdef __MSVCXX__ */
 	virtual void destroy( HValueReference<tType>* object_ ) override {
 		M_ASSERT( this->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] == 1 );
 		this->HSharedBase<tType>::object()->destroy( object_ );
@@ -284,7 +301,13 @@ public:
 		allocator_type allocator( allocator_ );
 		shared_value_holder_t* shared( allocator.allocate( 1 ) );
 		this->_shared = shared;
+#ifndef __MSVCXX__
 		new ( shared ) shared_value_holder_t( allocator );
+#else
+		/* See comment near HSharedValueHolderImpl definition. */
+		typedef HSharedValueHolderImpl<tType, value_t, allocator_t> shared_value_holder_impl_t;
+		new ( shared ) shared_value_holder_impl_t( allocator );
+#endif
 		value_t* ptr( static_cast<value_t*>( shared->object() ) );
 		new ( ptr ) value_t( yaal::forward<args_t>( args_ )... );
 		shared->inc_reference_counter( static_cast<trait::true_type*>( nullptr ) );
