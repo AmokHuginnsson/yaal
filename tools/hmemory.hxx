@@ -17,9 +17,8 @@ public:
 	void* get_memory( void ) const {
 		return ( do_get_memory() );
 	}
-	void commit( int long valid_, int long read_, int long write_, int long size_ ) {
-		do_commit( valid_, read_, write_, size_ );
-		return;
+	int long commit( int long valid_, int long read_, int long write_, int long size_ ) {
+		return ( do_commit( valid_, read_, write_, size_ ) );
 	}
 	virtual ~HMemoryHandlingStrategyInterface( void ) {
 		return;
@@ -27,12 +26,12 @@ public:
 protected:
 	virtual int long do_get_size( void ) const = 0;
 	virtual void* do_get_memory( void ) const = 0;
-	virtual void do_commit( int long, int long, int long, int long ) = 0;
+	virtual int long do_commit( int long, int long, int long, int long ) = 0;
 };
 
 class HMemoryObserver : public HMemoryHandlingStrategyInterface {
 	void* _block;
-	int long _size;
+	int long const _size;
 public:
 	/*! \brief Create new memory accessor.
 	 *
@@ -52,11 +51,7 @@ protected:
 	virtual void* do_get_memory( void ) const override {
 		return ( _block );
 	}
-	virtual void do_commit( int long valid_, int long M_DEBUG_CODE( read_ ), int long M_DEBUG_CODE( write_ ), int long size_ ) override {
-		M_ASSERT( ( valid_ == ( write_ - read_ ) ) || ( valid_ == ( ( _size - read_ ) + write_ ) ) );
-		M_ENSURE( size_ <= ( _size - valid_ ) );
-		return;
-	}
+	virtual int long do_commit( int long, int long, int long, int long ) override;
 private:
 	HMemoryObserver( HMemoryObserver const& ) = delete;
 	HMemoryObserver& operator = ( HMemoryObserver const& ) = delete;
@@ -77,11 +72,7 @@ protected:
 	virtual void* do_get_memory( void ) const override {
 		return ( _chunk.raw() );
 	}
-	virtual void do_commit( int long M_DEBUG_CODE( valid_ ), int long M_DEBUG_CODE( read_ ), int long write_, int long size_ ) override {
-		M_ASSERT( write_ >= read_ );
-		M_ASSERT( valid_ == ( write_ - read_ ) );
-		_chunk.realloc( _size = write_ + size_ );
-	}
+	virtual int long do_commit( int long, int long, int long, int long ) override;
 private:
 	HMemoryProvider( HMemoryProvider const& ) = delete;
 	HMemoryProvider& operator = ( HMemoryProvider const& ) = delete;
@@ -122,6 +113,7 @@ private:
 	virtual int long do_write( void const*, int long ) override;
 	virtual void do_flush( void ) override;
 	virtual int long do_read( void*, int long ) override;
+	virtual void do_seek( int long, SEEK ) override;
 	virtual bool do_is_valid( void ) const override;
 	virtual POLL_TYPE do_poll_type( void ) const override;
 	virtual void const* do_data( void ) const override;

@@ -20,6 +20,28 @@ static int const UNINITIALIZED = -1;
 
 }
 
+int long HMemoryObserver::do_commit( int long valid_, int long cursorRead_, int long cursorWrite_, int long size_ ) {
+	M_ENSURE_T( ( size_ >= 0 ) && ( size_ <= ( _size - valid_ ) ), HMemory );
+	M_ASSERT( cursorWrite_ <= ( ( cursorRead_ + valid_ ) % _size ) );
+	bool validWrapped( cursorRead_ > ( ( cursorRead_ + valid_ ) % _size ) );
+	int long flatCursorWrite( cursorWrite_ );
+	if ( validWrapped ) {
+		if ( cursorWrite_ < cursorRead_ ) {
+			flatCursorWrite += _size;
+		}
+	} else {
+		M_ASSERT( cursorWrite_ >= cursorRead_ );
+	}
+	return ( max( valid_, flatCursorWrite + size_ - cursorRead_ ) );
+}
+
+int long HMemoryProvider::do_commit( int long valid_, int long cursorRead_, int long cursorWrite_, int long size_ ) {
+	M_ASSERT( size_ >= 0 );
+	M_ASSERT( ( cursorWrite_ >= cursorRead_ ) && ( cursorWrite_ <= ( cursorRead_ + valid_ ) ) );
+	_chunk.realloc( _size = cursorWrite_ + size_ );
+	return ( max( valid_, cursorWrite_ + size_ - cursorRead_ ) );
+}
+
 HMemory::HMemory( HMemoryHandlingStrategyInterface& memory_, INITIAL_STATE initialState_ )
 	: _memory( memory_ )
 	, _valid( initialState_ == INITIAL_STATE::AUTO ? UNINITIALIZED : ( initialState_ == INITIAL_STATE::VALID ? memory_.get_size() : 0 ) )
@@ -46,20 +68,18 @@ int long HMemory::do_write( void const* src_, int long size_ ) {
 	if ( _valid == UNINITIALIZED ) { /* First data access. */
 		_valid = 0;
 	}
-	_memory.commit( _valid, _cursorRead, _cursorWrite, size_ );
-	int long maxWrite( _memory.get_size() - _valid );
-	int long size( min( size_, maxWrite ) );
+	_valid = _memory.commit( _valid, _cursorRead, _cursorWrite, size_ );
+	char const* src( static_cast<char const*>( src_ ) );
+	int long size( size_ );
 	if ( ( _cursorWrite + size ) > _memory.get_size() ) {
-		int long part1( _memory.get_size() - _cursorWrite );
-		int long part2( size - part1 );
-		::memcpy( static_cast<char*>( _memory.get_memory() ) + _cursorWrite, src_, static_cast<size_t>( part1 ) );
-		::memcpy( static_cast<char*>( _memory.get_memory() ), static_cast<char const*>( src_ ) + part1, static_cast<size_t>( part2 ) );
-		_cursorWrite = part2;
-	} else {
-		::memcpy( static_cast<char*>( _memory.get_memory() ) + _cursorWrite, src_, static_cast<size_t>( size ) );
-		_cursorWrite += size;
+		int long partSize( _memory.get_size() - _cursorWrite );
+		::memcpy( static_cast<char*>( _memory.get_memory() ) + _cursorWrite, src, static_cast<size_t>( partSize ) );
+		_cursorWrite = 0;
+		size -= partSize;
+		src += partSize;
 	}
-	_valid += size;
+	::memcpy( static_cast<char*>( _memory.get_memory() ) + _cursorWrite, src, static_cast<size_t>( size ) );
+	_cursorWrite += size;
 	return ( size );
 	M_EPILOG
 }
@@ -94,6 +114,32 @@ int long HMemory::do_read( void* dest_, int long size_ ) {
 		size = -1;
 	}
 	return ( size );
+	M_EPILOG
+}
+
+void HMemory::do_seek( int long offset_, SEEK seek_ ) {
+	M_PROLOG
+	M_ENSURE( _valid != UNINITIALIZED );
+	int long currentPosition( max( _cursorRead, _cursorWrite ) );
+	int long newPosition( UNINITIALIZED );
+	switch ( seek_ ) {
+		case ( SEEK::BEGIN ): {
+			newPosition = offset_;
+		} break;
+		case ( SEEK::CURRENT ): {
+			newPosition = currentPosition + offset_;
+		} break;
+		case ( SEEK::END ): {
+			newPosition = _cursorRead + _valid + offset_;
+		} break;
+	}
+	int long newValid( _cursorRead + _valid - newPosition );
+	M_ENSURE( ( newPosition >= 0 ) && ( newValid >= 0 ) );
+	M_ASSERT( newValid <= _memory.get_size() );
+	newPosition %= _memory.get_size();
+	_valid = newValid;
+	_cursorWrite = _cursorRead = newPosition;
+	return;
 	M_EPILOG
 }
 
