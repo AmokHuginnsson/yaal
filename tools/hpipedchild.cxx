@@ -29,6 +29,32 @@ namespace yaal {
 
 namespace tools {
 
+#undef OUT
+#undef IN
+enum class PIPE_END {
+	OUT = 0,
+	IN = 1
+};
+
+struct OPipeResGuard {
+	int _res[2];
+	OPipeResGuard( void )
+		: _res() {
+		_res[0] = _res[1] = -1;
+	}
+	~OPipeResGuard( void ) {
+		if ( _res[ 0 ] >= 0 ) {
+			M_ENSURE( M_TEMP_FAILURE_RETRY( hcore::system::close( _res[ 0 ] ) ) == 0 );
+		}
+		if ( _res[ 1 ] >= 0 ) {
+			M_ENSURE( M_TEMP_FAILURE_RETRY( hcore::system::close( _res[ 1 ] ) ) == 0 );
+		}
+	}
+	int& operator[]( PIPE_END pipeEnd_ ) {
+		return ( _res[static_cast<int>( pipeEnd_ )] );
+	}
+};
+
 inline int stream_to_fd( yaal::hcore::HStreamInterface const* stream_ ) {
 	return ( static_cast<int>( reinterpret_cast<int_native_t>( stream_->data() ) ) );
 }
@@ -58,21 +84,42 @@ static void close_and_invalidate( int& fd_ ) {
 	M_EPILOG
 }
 
-static void fixupFds( int& fd_, HStreamInterface::ptr_t const& owner_, HStreamInterface const*& ref_, char const* name_ ) {
+static void fixupFds( int& fd_, HStreamInterface::ptr_t const& owned_, HStreamInterface const*& ref_, char const* name_ ) {
 	M_PROLOG
-	if ( !! owner_ ) {
+	if ( !! owned_ ) {
 		if ( ref_ ) {
 			throw HPipedChildException( to_string( name_ ).append( " stream is already defined." ) );
 		} else {
-			ref_ = owner_.raw();
+			ref_ = owned_.raw();
 		}
 	}
 	if ( ref_ ) {
+		/*
+		 * We have a non-pipe stream so we can free internal pipe.
+		 */
 		close_and_invalidate( fd_ );
 		fd_ = stream_to_fd( ref_ );
-		if ( ! owner_ ) {
+		if ( ! owned_ ) {
+			/*
+			 * We do not own the external stream, so we should make a copy of the descriptor
+			 * so we do not break external stream when we clean up after `spawn()`.
+			 */
 			fd_ = ::dup( fd_ );
 		}
+	}
+	return;
+	M_EPILOG
+}
+
+static void fixupFds( HStreamInterface const* ref_, OPipeResGuard& pipe_, PIPE_END direction_, HStreamInterface::ptr_t& owned_ ) {
+	M_PROLOG
+	PIPE_END otherEnd( direction_ == PIPE_END::OUT ? PIPE_END::IN : PIPE_END::OUT );
+	if ( ! ref_ ) {
+		close_and_invalidate( pipe_[ otherEnd ] );
+		owned_ = make_pointer<HRawFile>( pipe_[ direction_ ], HRawFile::OWNERSHIP::ACQUIRED );
+		pipe_[direction_] = -1;
+	} else if ( !! owned_ ) {
+		pipe_[otherEnd] = -1;
 	}
 	return;
 	M_EPILOG
@@ -164,32 +211,6 @@ HPipedChild::STATUS HPipedChild::finish( int finishIn_ ) {
 	M_EPILOG
 }
 
-#undef IN
-#undef OUT
-enum class PIPE_END {
-	IN = 0,
-	OUT = 1
-};
-
-struct OPipeResGuard {
-	int _res[2];
-	OPipeResGuard( void )
-		: _res() {
-		_res[0] = _res[1] = -1;
-	}
-	~OPipeResGuard( void ) {
-		if ( _res[ 0 ] >= 0 ) {
-			M_ENSURE( M_TEMP_FAILURE_RETRY( hcore::system::close( _res[ 0 ] ) ) == 0 );
-		}
-		if ( _res[ 1 ] >= 0 ) {
-			M_ENSURE( M_TEMP_FAILURE_RETRY( hcore::system::close( _res[ 1 ] ) ) == 0 );
-		}
-	}
-	int& operator[]( PIPE_END pipeEnd_ ) {
-		return ( _res[static_cast<int>( pipeEnd_ )] );
-	}
-};
-
 void HPipedChild::spawn(
 	HString const& image_,
 	argv_t const& argv_,
@@ -217,18 +238,21 @@ void HPipedChild::spawn(
 	cout << hcore::flush;
 	::fflush( stdout );
 	cerr << hcore::flush;
-	fixupFds( pipeIn[ PIPE_END::IN ], _in, in_, "Input" );
-	fixupFds( pipeOut[ PIPE_END::OUT ], _out, out_, "Output" );
-	fixupFds( pipeErr[ PIPE_END::OUT ], _err, err_, "Error" );
+	/*
+	 * `fixupFds()` must be called before `fork()` due to how `fork()` call is emulated on `msvcxx` target.
+	 */
+	fixupFds( pipeIn[ PIPE_END::OUT ], _in, in_, "Input" );
+	fixupFds( pipeOut[ PIPE_END::IN ], _out, out_, "Output" );
+	fixupFds( pipeErr[ PIPE_END::IN ], _err, err_, "Error" );
 	_pid = ::fork();
 	M_ENSURE( _pid >= 0, "fork()" );
 	if ( ! _pid ) {
-		close_and_invalidate( pipeIn[ PIPE_END::OUT ] );
-		close_and_invalidate( pipeOut[ PIPE_END::IN ] );
-		close_and_invalidate( pipeErr[ PIPE_END::IN ] );
-		if ( ( ::dup2( pipeIn[ PIPE_END::IN ], stdinFd ) < 0 )
-				|| ( ::dup2( pipeOut[ PIPE_END::OUT ], stdoutFd ) < 0 )
-				|| ( ::dup2( pipeErr[ PIPE_END::OUT ], stderrFd ) < 0 ) ) {
+		close_and_invalidate( pipeIn[ PIPE_END::IN ] );
+		close_and_invalidate( pipeOut[ PIPE_END::OUT ] );
+		close_and_invalidate( pipeErr[ PIPE_END::OUT ] );
+		if ( ( ::dup2( pipeIn[ PIPE_END::OUT ], stdinFd ) < 0 )
+				|| ( ::dup2( pipeOut[ PIPE_END::IN ], stdoutFd ) < 0 )
+				|| ( ::dup2( pipeErr[ PIPE_END::IN ], stderrFd ) < 0 ) ) {
 			M_THROW( "dup2", errno );
 		}
 		HUTF8String utf8Image( image_ );
@@ -244,21 +268,9 @@ void HPipedChild::spawn(
 		::execv( argv.get<char const*>()[ 0 ], const_cast<char* const*>( argv.get<char const*>() ) );
 		M_ENSURE( !"execv"[0] );
 	} else {
-		if ( ! in_ ) {
-			close_and_invalidate( pipeIn[ PIPE_END::IN ] );
-			_in = make_pointer<HRawFile>( pipeIn[ PIPE_END::OUT ], HRawFile::OWNERSHIP::ACQUIRED );
-			pipeIn[PIPE_END::OUT] = -1;
-		}
-		if ( ! out_ ) {
-			close_and_invalidate( pipeOut[ PIPE_END::OUT ] );
-			_out = make_pointer<HRawFile>( pipeOut[ PIPE_END::IN ], HRawFile::OWNERSHIP::ACQUIRED );
-			pipeOut[PIPE_END::IN] = -1;
-		}
-		if ( ! err_ ) {
-			close_and_invalidate( pipeErr[ PIPE_END::OUT ] );
-			_err = make_pointer<HRawFile>( pipeErr[ PIPE_END::IN ], HRawFile::OWNERSHIP::ACQUIRED );
-			pipeErr[PIPE_END::IN] = -1;
-		}
+		fixupFds( in_, pipeIn, PIPE_END::IN, _in );
+		fixupFds( out_, pipeOut, PIPE_END::OUT, _out );
+		fixupFds( err_, pipeErr, PIPE_END::OUT, _err );
 	}
 	return;
 	M_EPILOG
