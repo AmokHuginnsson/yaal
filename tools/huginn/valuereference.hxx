@@ -26,7 +26,13 @@ namespace huginn {
 struct REFERENCE_COUNTER_TYPE {
 	static int const HOLDER = 0;
 	static int const OBSERVER = 1;
+#if SIZEOF_VOIDP < ALIGNOF_INT_LONG_LONG
+	static_assert( SIZEOF_VOIDP == 4, "extra alignment padding will fail" );
+	static_assert( ALIGNOF_INT_LONG_LONG == 8, "extra alignment padding will fail" );
+	static int const OBJECT_OFFSET = 3;
+#else
 	static int const OBJECT_OFFSET = 2;
+#endif
 };
 
 template<typename tType>
@@ -40,7 +46,7 @@ public:
 	typedef typename trait::make_reference<value_type>::type reference;
 	typedef typename trait::make_reference<value_type const>::type const_reference;
 protected:
-	int _referenceCounter[ 2 ];
+	int _referenceCounter[ trait::to_unsigned<int, REFERENCE_COUNTER_TYPE::OBJECT_OFFSET>::value ];
 	HSharedBase( void )
 		: _referenceCounter{ 0, 0 } {
 	}
