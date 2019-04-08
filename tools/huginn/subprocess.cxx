@@ -22,19 +22,17 @@ namespace tools {
 namespace huginn {
 
 class HSubprocessClass : public huginn::HClass {
-	HHuginn::class_t _streamClass;
 public:
 	HSubprocessClass(
 		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_
 	) : huginn::HClass(
-			runtime_,
-			typeId_,
-			runtime_->identifier_id( "Subprocess" ),
-			"The `Subprocess` class represents a system process spawned from this interpreter instance. It allows for a basic process life management.",
-			HHuginn::ACCESS::PRIVATE
-		)
-		, _streamClass( HStream::get_class( runtime_ ) ) {
+		runtime_,
+		typeId_,
+		runtime_->identifier_id( "Subprocess" ),
+		"The `Subprocess` class represents a system process spawned from this interpreter instance. It allows for a basic process life management.",
+		HHuginn::ACCESS::PRIVATE
+	) {
 		HHuginn::field_definitions_t fd{
 			{ "is_alive", runtime_->create_method( &HSubprocess::is_alive ), "tell if given subprocess is alive and running" },
 			{ "kill",     runtime_->create_method( &HSubprocess::kill ),     "kill this sub-process" },
@@ -46,11 +44,6 @@ public:
 		};
 		redefine( nullptr, fd );
 		return;
-	}
-	huginn::HClass const* stream_class( void ) const {
-		M_PROLOG
-		return ( _streamClass.raw() );
-		M_EPILOG
 	}
 };
 
@@ -138,9 +131,8 @@ HHuginn::value_t HSubprocess::stream(
 	M_PROLOG
 	verify_arg_count( name_, values_, 0, 0, thread_, position_ );
 	HSubprocess* o( static_cast<HSubprocess*>( object_->raw() ) );
-	HSubprocessClass const* c( static_cast<HSubprocessClass const*>( o->huginn::HValue::get_class() ) );
-	huginn::HClass const* sc( c->stream_class() );
-	return ( thread_->object_factory().create<HStream>( sc, (o->_pipedChild.*streamGetter_)() ) );
+	HObjectFactory& of( thread_->object_factory() );
+	return ( of.create<HStream>( of.stream_class(), (o->_pipedChild.*streamGetter_)() ) );
 	M_EPILOG
 }
 

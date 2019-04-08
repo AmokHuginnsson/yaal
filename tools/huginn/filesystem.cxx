@@ -33,7 +33,6 @@ namespace huginn {
 typedef yaal::hcore::HString (*str_transform_func_t)( yaal::hcore::HString const& );
 
 class HFileSystem : public HPackage {
-	HHuginn::class_t _streamClass;
 	HHuginn::class_t _directoryScanClass;
 	HHuginn::class_t _timeClass;
 	HHuginn::class_t _fileStatClass;
@@ -42,7 +41,6 @@ class HFileSystem : public HPackage {
 public:
 	HFileSystem( huginn::HClass* class_ )
 		: HPackage( class_ )
-		, _streamClass( HStream::get_class( class_->runtime() ) )
 		, _directoryScanClass( HDirectoryScan::get_class( class_->runtime(), class_ ) )
 		, _timeClass( huginn::HTime::get_class( class_->runtime() ) )
 		, _fileStatClass( HFileStat::get_class( class_->runtime(), class_ ) )
@@ -210,7 +208,8 @@ private:
 	HHuginn::value_t do_open( huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "FileSystem.open";
-		verify_signature_by_class( name, values_, { thread_->object_factory().string_class(), _openModeClass->enumeral_class() }, thread_, position_ );
+		HObjectFactory& of( thread_->object_factory() );
+		verify_signature_by_class( name, values_, { of.string_class(), _openModeClass->enumeral_class() }, thread_, position_ );
 		HEnumeral::value_type val( get_enumeral( values_[1] ) );
 		HFile::open_t openMode( HFile::OPEN::READING );
 		if ( val == safe_int::cast<int>( HFile::OPEN::WRITING.value() ) ) {
@@ -222,7 +221,7 @@ private:
 		HFile* f( static_cast<HFile*>( stream.raw() ) );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( f->is_opened() ) {
-			v = thread_->object_factory().create<HStream>( _streamClass.raw(), stream );
+			v = of.create<HStream>( of.stream_class(), stream );
 		} else {
 			thread_->raise( exception_class(), f->get_error(), position_ );
 		}

@@ -31,12 +31,10 @@ namespace tools {
 namespace huginn {
 
 class HText : public HPackage {
-	HHuginn::class_t _streamClass;
 	enumeration::HEnumerationClass::ptr_t _characterClassClass;
 public:
 	HText( HClass* class_ )
 		: HPackage( class_ )
-		, _streamClass( HStream::get_class( class_->runtime() ) )
 		, _characterClassClass(
 			add_enumeration_as_member(
 				class_,
@@ -77,17 +75,17 @@ public:
 		) {
 		return;
 	}
-	static HHuginn::value_t stream( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	static HHuginn::value_t stream( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Text.stream";
 		verify_arg_count( name, values_, 0, 1, thread_, position_ );
-		HText& t( *static_cast<HText*>( object_->raw() ) );
 		HStreamInterface::ptr_t stream( make_pointer<HStringStream>() );
 		HStringStream& ss( *static_cast<HStringStream*>( stream.raw() ) );
 		if ( values_.get_size() > 0 ) {
 			ss << get_string( values_[0] );
 		}
-		return ( thread_->object_factory().create<HStream>( t._streamClass.raw(), stream ) );
+		HObjectFactory& of( thread_->object_factory() );
+		return ( of.create<HStream>( of.stream_class(), stream ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t split( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {

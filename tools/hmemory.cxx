@@ -42,9 +42,9 @@ int long HMemoryProvider::do_commit( int long valid_, int long cursorRead_, int 
 	return ( max( valid_, cursorWrite_ + size_ - cursorRead_ ) );
 }
 
-HMemory::HMemory( HMemoryHandlingStrategyInterface& memory_, INITIAL_STATE initialState_ )
-	: _memory( memory_ )
-	, _valid( initialState_ == INITIAL_STATE::AUTO ? UNINITIALIZED : ( initialState_ == INITIAL_STATE::VALID ? memory_.get_size() : 0 ) )
+HMemory::HMemory( memory_strategy_interface_t&& memory_, INITIAL_STATE initialState_ )
+	: _memory( yaal::move( memory_ ) )
+	, _valid( initialState_ == INITIAL_STATE::AUTO ? UNINITIALIZED : ( initialState_ == INITIAL_STATE::VALID ? _memory->get_size() : 0 ) )
 	, _cursorRead( 0 )
 	, _cursorWrite( 0 ) {
 	return;
@@ -57,8 +57,8 @@ HMemory::~HMemory( void ) {
 bool HMemory::operator == ( HMemory const& other ) const {
 	M_PROLOG
 	return (
-		( other._memory.get_size() == _memory.get_size() )
-		&& ( ! ::memcmp( other._memory.get_memory(), _memory.get_memory(), static_cast<size_t>( _memory.get_size() ) ) )
+		( other._memory->get_size() == _memory->get_size() )
+		&& ( ! ::memcmp( other._memory->get_memory(), _memory->get_memory(), static_cast<size_t>( _memory->get_size() ) ) )
 	);
 	M_EPILOG
 }
@@ -68,17 +68,17 @@ int long HMemory::do_write( void const* src_, int long size_ ) {
 	if ( _valid == UNINITIALIZED ) { /* First data access. */
 		_valid = 0;
 	}
-	_valid = _memory.commit( _valid, _cursorRead, _cursorWrite, size_ );
+	_valid = _memory->commit( _valid, _cursorRead, _cursorWrite, size_ );
 	char const* src( static_cast<char const*>( src_ ) );
 	int long size( size_ );
-	if ( ( _cursorWrite + size ) > _memory.get_size() ) {
-		int long partSize( _memory.get_size() - _cursorWrite );
-		::memcpy( static_cast<char*>( _memory.get_memory() ) + _cursorWrite, src, static_cast<size_t>( partSize ) );
+	if ( ( _cursorWrite + size ) > _memory->get_size() ) {
+		int long partSize( _memory->get_size() - _cursorWrite );
+		::memcpy( static_cast<char*>( _memory->get_memory() ) + _cursorWrite, src, static_cast<size_t>( partSize ) );
 		_cursorWrite = 0;
 		size -= partSize;
 		src += partSize;
 	}
-	::memcpy( static_cast<char*>( _memory.get_memory() ) + _cursorWrite, src, static_cast<size_t>( size ) );
+	::memcpy( static_cast<char*>( _memory->get_memory() ) + _cursorWrite, src, static_cast<size_t>( size ) );
 	_cursorWrite += size;
 	return ( size );
 	M_EPILOG
@@ -95,17 +95,17 @@ void HMemory::do_flush( void ) {
 int long HMemory::do_read( void* dest_, int long size_ ) {
 	M_PROLOG
 	if ( _valid == UNINITIALIZED ) { /* First data access. */
-		_valid = _memory.get_size();
+		_valid = _memory->get_size();
 	}
 	int long size( min( size_, _valid ) );
-	if ( ( _cursorRead + size ) > _memory.get_size() ) {
-		int long part1( _memory.get_size() - _cursorRead );
+	if ( ( _cursorRead + size ) > _memory->get_size() ) {
+		int long part1( _memory->get_size() - _cursorRead );
 		int long part2( size - part1 );
-		::memcpy( dest_, static_cast<char*>( _memory.get_memory() ) + _cursorRead, static_cast<size_t>( part1 ) );
-		::memcpy( static_cast<char*>( dest_ ) + part1, static_cast<char*>( _memory.get_memory() ), static_cast<size_t>( part2 ) );
+		::memcpy( dest_, static_cast<char*>( _memory->get_memory() ) + _cursorRead, static_cast<size_t>( part1 ) );
+		::memcpy( static_cast<char*>( dest_ ) + part1, static_cast<char*>( _memory->get_memory() ), static_cast<size_t>( part2 ) );
 		_cursorRead = part2;
 	} else {
-		::memcpy( dest_, static_cast<char const*>( _memory.get_memory() ) + _cursorRead, static_cast<size_t>( size ) );
+		::memcpy( dest_, static_cast<char const*>( _memory->get_memory() ) + _cursorRead, static_cast<size_t>( size ) );
 		_cursorRead += size;
 	}
 	_valid -= size;
@@ -135,8 +135,8 @@ void HMemory::do_seek( int long offset_, SEEK seek_ ) {
 	}
 	int long newValid( _cursorRead + _valid - newPosition );
 	M_ENSURE( ( newPosition >= 0 ) && ( newValid >= 0 ) );
-	M_ASSERT( newValid <= _memory.get_size() );
-	newPosition %= _memory.get_size();
+	M_ASSERT( newValid <= _memory->get_size() );
+	newPosition %= _memory->get_size();
 	_valid = newValid;
 	_cursorWrite = _cursorRead = newPosition;
 	return;

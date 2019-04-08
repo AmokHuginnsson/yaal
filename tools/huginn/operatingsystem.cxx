@@ -31,12 +31,10 @@ namespace tools {
 namespace huginn {
 
 class HOperatingSystem : public HPackage {
-	HHuginn::class_t _streamClass;
 	HHuginn::class_t _subprocessClass;
 public:
 	HOperatingSystem( huginn::HClass* class_ )
 		: HPackage( class_ )
-		, _streamClass( HStream::get_class( class_->runtime() ) )
 		, _subprocessClass( HSubprocess::get_class( class_->runtime(), class_ ) ) {
 		return;
 	}
@@ -155,11 +153,11 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t stream( char const* name_, yaal::hcore::HStreamInterface* stream_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	static HHuginn::value_t stream( char const* name_, yaal::hcore::HStreamInterface* stream_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( name_, values_, 0, 0, thread_, position_ );
-		HOperatingSystem* o( static_cast<HOperatingSystem*>( object_->raw() ) );
-		return ( thread_->object_factory().create<HStream>( o->_streamClass.raw(), make_pointer<HSynchronizedStream>( *stream_ ) ) );
+		HObjectFactory& of( thread_->object_factory() );
+		return ( of.create<HStream>( of.stream_class(), make_pointer<HSynchronizedStream>( *stream_ ) ) );
 		M_EPILOG
 	}
 };

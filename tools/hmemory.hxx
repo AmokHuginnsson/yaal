@@ -4,6 +4,7 @@
 #define YAAL_TOOLS_HMEMORY_HXX_INCLUDED 1
 
 #include "hcore/hstreaminterface.hxx"
+#include "hcore/hresource.hxx"
 
 namespace yaal {
 
@@ -86,18 +87,19 @@ class HMemory : public yaal::hcore::HStreamInterface {
 public:
 	typedef HMemory this_type;
 	typedef yaal::hcore::HStreamInterface base_type;
+	typedef yaal::hcore::HResource<HMemoryHandlingStrategyInterface> memory_strategy_interface_t;
 	enum class INITIAL_STATE {
 		AUTO,
 		VALID,
 		INVALID
 	};
 private:
-	HMemoryHandlingStrategyInterface& _memory;
+	memory_strategy_interface_t _memory;
 	int long _valid;
 	int long _cursorRead;
 	int long _cursorWrite;
 public:
-	HMemory( HMemoryHandlingStrategyInterface& memory_, INITIAL_STATE = INITIAL_STATE::AUTO );
+	HMemory( memory_strategy_interface_t&& memory_, INITIAL_STATE = INITIAL_STATE::AUTO );
 	/*! \brief Destructor.
 	 */
 	virtual ~HMemory( void );

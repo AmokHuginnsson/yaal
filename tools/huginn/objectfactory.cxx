@@ -8,6 +8,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "keyword.hxx"
 #include "exception.hxx"
 #include "iterator.hxx"
+#include "stream.hxx"
 #include "hcore/hfile.hxx"
 #include "hcore/hlog.hxx"
 
@@ -121,6 +122,7 @@ HObjectFactory::HObjectFactory( HRuntime* runtime_ )
 	, _conversionException()
 	, _arithmeticException()
 	, _iterableAdaptor()
+	, _stream()
 	, _none( create<huginn::HValue>( _noneClass.raw() ) )
 	, _true( create<HBoolean>( _boolean.raw(), true ) )
 	, _false( create<HBoolean>( _boolean.raw(), false ) )
@@ -192,6 +194,7 @@ void HObjectFactory::register_builtin_classes( void ) {
 	);
 
 	_iterableAdaptor = HIterableAdaptor::get_class( _runtime );
+	_stream = HStream::get_class( _runtime );
 
 	return;
 	M_EPILOG

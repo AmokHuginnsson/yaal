@@ -11,6 +11,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "helper.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
+#include "stream.hxx"
+#include "tools/hmemory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -23,6 +25,16 @@ namespace tools {
 namespace huginn {
 
 namespace blob {
+
+inline HHuginn::value_t io( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "blob.io", values_, 0, 0, thread_, position_ );
+	HBlob* blob( static_cast<HBlob*>( object_->raw() ) );
+	HStreamInterface::ptr_t memory( make_pointer<HMemory>( make_resource<HMemoryProvider>( blob->value(), blob->get_size() ) ) );
+	HStreamInterface::ptr_t stream( make_pointer<HStreamDecorator>( *object_, memory ) );
+	return ( thread_->object_factory().create<HStream>( thread_->object_factory().stream_class(), stream ) );
+	M_EPILOG
+}
 
 HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
 HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ ) {
@@ -37,6 +49,10 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			&builtin::blob
 		)
 	);
+	HHuginn::field_definitions_t fd{
+		{ "io", objectFactory_->create_method( &blob::io ), "create IO stream for this `blob`" }
+	};
+	c->redefine( nullptr, fd );
 	return ( c );
 	M_EPILOG
 }
@@ -56,6 +72,10 @@ int long huginn::HBlob::get_size( void ) const {
 }
 
 huginn::HBlob::value_type const& huginn::HBlob::value( void ) const {
+	return ( _data );
+}
+
+huginn::HBlob::value_type& huginn::HBlob::value( void ) {
 	return ( _data );
 }
 

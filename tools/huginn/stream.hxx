@@ -40,7 +40,7 @@ public:
 	bool is_valid( void ) const;
 	static HHuginn::class_t get_class( HRuntime* );
 	void raise( HThread*, yaal::hcore::HString const&, int, HClass const* = nullptr ) const;
-	bool post_io( huginn::HThread*, int long, int long, IO, int, HClass const* = nullptr ) const;
+	bool post_io( huginn::HThread*, int long, int long, IO, int ) const;
 	HClass const* exception_class( void ) const;
 	yaal::hcore::HStreamInterface::ptr_t raw( void ) const;
 private:
@@ -69,6 +69,45 @@ private:
 private:
 	friend class HStreamClass;
 	friend class HStreamIterator;
+};
+
+class HStreamDecorator : public yaal::hcore::HStreamInterface {
+public:
+	typedef HStreamDecorator this_type;
+	typedef yaal::hcore::HStreamInterface base_type;
+private:
+	HHuginn::value_t _value;
+	yaal::hcore::HStreamInterface::ptr_t _stream;
+public:
+	HStreamDecorator( HHuginn::value_t const& value_, yaal::hcore::HStreamInterface::ptr_t const& stream_ )
+		: _value( value_ )
+		, _stream( stream_ ) {
+		return;
+	}
+private:
+	virtual int long do_write( void const* data_, int long size_ ) override {
+		return ( _stream->write( data_, size_ ) );
+	}
+	virtual void do_flush( void ) override {
+		_stream->flush();
+	}
+	virtual int long do_read( void* data_, int long size_ ) override {
+		return ( _stream->read( data_, size_ ) );
+	}
+	virtual void do_seek( int long pos_, SEEK seek_ ) override {
+		_stream->seek( pos_, seek_ );
+	}
+	virtual bool do_is_valid( void ) const override {
+		return ( _stream->is_valid() );
+	}
+	virtual POLL_TYPE do_poll_type( void ) const override {
+		return ( _stream->poll_type() );
+	}
+	virtual void const* do_data( void ) const override {
+		return ( _stream->data() );
+	}
+	HStreamDecorator( HStreamDecorator const& src ) = delete;
+	HStreamDecorator& operator = ( HStreamDecorator const& src ) = delete;
 };
 
 }

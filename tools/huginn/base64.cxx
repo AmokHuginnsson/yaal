@@ -28,19 +28,16 @@ namespace tools {
 namespace huginn {
 
 class HBase64 : public HPackage {
-	HHuginn::class_t _streamClass;
 public:
 	HBase64( HClass* class_ )
-		: HPackage( class_ )
-		, _streamClass( HStream::get_class( class_->runtime() ) ) {
+		: HPackage( class_ ) {
 		return;
 	}
 	static HHuginn::value_t encode( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "Base64.encode", values_, { HHuginn::TYPE::BLOB }, thread_, position_ );
 		HChunk const& blob( static_cast<HBlob*>( values_[0].raw() )->value() );
-		HMemoryObserver mo( const_cast<void*>( blob.raw() ), blob.size() );
-		HMemory ms( mo );
+		HMemory ms( make_resource<HMemoryObserver>( const_cast<void*>( blob.raw() ), blob.size() ) );
 		HStringStream ss;
 		base64::encode( ms, ss );
 		return ( thread_->object_factory().create_string( yaal::move( ss.str() ) ) );
@@ -50,12 +47,14 @@ public:
 		M_PROLOG
 		verify_signature( "Base64.decode", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		HChunk workBuffer;
-		HMemoryProvider mp( workBuffer, 0 );
-		HMemory ms( mp );
+		HMemoryProvider* mp( nullptr );
+		HMemory::memory_strategy_interface_t mpRef( make_resource<HMemoryProvider>( workBuffer, 0 ) );
+		mp = static_cast<HMemoryProvider*>( mpRef.get() );
+		HMemory ms( yaal::move( mpRef ) );
 		HStringStream ss( get_string( values_[0] ) );
 		base64::decode( ss, ms );
-		HChunk data( mp.get_size() );
-		::memcpy( data.raw(), workBuffer.raw(), static_cast<size_t>( mp.get_size() ) );
+		HChunk data( mp->get_size() );
+		::memcpy( data.raw(), workBuffer.raw(), static_cast<size_t>( mp->get_size() ) );
 		return ( thread_->object_factory().create_blob( yaal::move( data ) ) );
 		M_EPILOG
 	}

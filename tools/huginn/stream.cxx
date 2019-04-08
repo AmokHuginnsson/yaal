@@ -232,12 +232,12 @@ void HStream::raise( huginn::HThread* thread_, hcore::HString const& message_, i
 	M_EPILOG
 }
 
-bool HStream::post_io( huginn::HThread* thread_, int long expected_, int long actual_, IO io_, int position_, HClass const* excClass_ ) const {
+bool HStream::post_io( huginn::HThread* thread_, int long expected_, int long actual_, IO io_, int position_ ) const {
 	M_PROLOG
 	if ( actual_ < 0 ) {
-		raise( thread_, io_ == IO::READ ? "Read failed." : "Write failed.", position_, excClass_ );
+		raise( thread_, io_ == IO::READ ? "Read failed." : "Write failed.", position_ );
 	} else if ( actual_ != expected_ ) {
-		raise( thread_, io_ == IO::READ ? "Not enough data in the stream." : "Stream overflow on write.", position_, excClass_ );
+		raise( thread_, io_ == IO::READ ? "Not enough data in the stream." : "Stream overflow on write.", position_ );
 	}
 	return ( expected_ == actual_ );
 	M_EPILOG

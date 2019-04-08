@@ -29,11 +29,9 @@ class HNetwork : public HPackage {
 		static int const READING = 1;
 		static int const WRITING = 2;
 	};
-	HHuginn::class_t _streamClass;
 public:
 	HNetwork( HClass* class_ )
-		: HPackage( class_ )
-		, _streamClass( HStream::get_class( class_->runtime() ) ) {
+		: HPackage( class_ ) {
 		return;
 	}
 	static HHuginn::value_t resolve( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -75,7 +73,8 @@ private:
 			HSocket* s( static_cast<HSocket*>( stream.raw() ) );
 			try {
 				s->connect( get_string( values_[0] ), port );
-				v = thread_->object_factory().create<HStream>( _streamClass.raw(), stream );
+				HObjectFactory& of( thread_->object_factory() );
+				v = of.create<HStream>( of.stream_class(), stream );
 			} catch ( HResolverException const& e ) {
 				thread_->raise( exception_class(), e.what(), position_ );
 			} catch ( HSocketException const& e ) {

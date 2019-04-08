@@ -580,12 +580,10 @@ hash_t hmac( yaal::hcore::HString const& key_, yaal::hcore::HString const& messa
 		memxor( opad.raw(), keyBinHashed.data(), keyBinHashed.size() );
 	}
 	::memcpy( ipad.get<char>() + blockBytes, message.c_str(), static_cast<size_t>( message.byte_count() ) );
-	HMemoryObserver mo( ipad.raw(), blockBytes + message.byte_count() );
-	HMemory m( mo );
+	HMemory m( make_resource<HMemoryObserver>( ipad.raw(), blockBytes + message.byte_count() ) );
 	hash_t ipadHashed( f( m ) );
 	::memcpy( opad.get<char>() + blockBytes, ipadHashed.data(), static_cast<size_t>( hashLen ) );
-	HMemoryObserver out( opad.raw(), blockBytes + hashLen );
-	HMemory mout( out );
+	HMemory mout( make_resource<HMemoryObserver>( opad.raw(), blockBytes + hashLen ) );
 	return ( f( mout ) );
 	M_EPILOG
 }

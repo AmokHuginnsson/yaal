@@ -26,6 +26,7 @@ public:
 	HBlob( HClass const*, yaal::hcore::HChunk&& );
 	int long get_size( void ) const;
 	value_type const& value( void ) const;
+	value_type& value( void );
 private:
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
