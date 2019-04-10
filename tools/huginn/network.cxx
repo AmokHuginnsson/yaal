@@ -13,6 +13,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/resolver.hxx"
 #include "packagefactory.hxx"
 #include "objectfactory.hxx"
+#include "enumeration.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -24,14 +25,58 @@ namespace tools {
 
 namespace huginn {
 
+namespace {
+
+inline int socket_type_to_idx( HSocket::socket_type_t socketType_ ) {
+	int idx( -1 );
+	if ( socketType_ & HSocket::TYPE::SSL ) {
+		idx = 1;
+	} else if ( socketType_ & HSocket::TYPE::FILE ) {
+		idx = 2;
+	} else {
+		idx = 0;
+	}
+	return ( idx );
+}
+
+inline HSocket::socket_type_t connection_type_to_socket_type( HHuginn::value_t const& connectionType_ ) {
+	u64_t connTypeEnumRawVal( static_cast<u64_t>( get_enumeral( connectionType_ ) ) );
+	HSocket::socket_type_t socketType( HSocket::TYPE::DEFAULT | HSocket::TYPE::CLIENT | HSocket::TYPE::BLOCKING );
+	if ( connTypeEnumRawVal == HSocket::TYPE::NETWORK.value() ) {
+		socketType |= ( HSocket::TYPE::NETWORK );
+	} else if ( connTypeEnumRawVal == HSocket::TYPE::SSL.value() ) {
+		socketType |= ( HSocket::TYPE::NETWORK | HSocket::TYPE::SSL );
+	} else {
+		socketType |= HSocket::TYPE::FILE;
+	}
+	return ( socketType );
+}
+
+}
+
 class HNetwork : public HPackage {
-	struct OPERATIONS {
-		static int const READING = 1;
-		static int const WRITING = 2;
-	};
+	enumeration::HEnumerationClass::ptr_t _connectionTypeClass;
 public:
 	HNetwork( HClass* class_ )
-		: HPackage( class_ ) {
+		: HPackage( class_ )
+		, _connectionTypeClass(
+			add_enumeration_as_member(
+				class_,
+				enumeration::create_class(
+					class_->runtime(),
+					"CONNECTION_TYPE",
+					enumeration::descriptions_t{
+						{ "PLAIN", "a plain (unencrypted) connection to network socket", safe_int::cast<int>( HSocket::TYPE::NETWORK.value() ) },
+						{ "SSL",   "a SSL encrypted connection to network socket", safe_int::cast<int>( HSocket::TYPE::SSL.value() ) },
+						{ "FILE",  "a connection to Unix Domain Socket", safe_int::cast<int>( HSocket::TYPE::FILE.value() ) },
+					},
+					"The `CONNECTION_TYPE` enumeration is a set of possible connection types.",
+					HHuginn::VISIBILITY::PACKAGE,
+					class_
+				),
+				"a set of possible connection types."
+			)
+		) {
 		return;
 	}
 	static HHuginn::value_t resolve( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -54,14 +99,23 @@ public:
 private:
 	HHuginn::value_t do_connect( huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
-		char const name[] = "Network.connect";
-		verify_arg_count( name, values_, 1, 2, thread_, position_ );
-		ARITY arity( values_.get_size() > 1 ? ARITY::MULTIPLE : ARITY::UNARY );
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, arity, thread_, position_ );
-		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, arity, thread_, position_ );
+		char const name[][24] = {
+			"Network.connect",
+			"Network.connect[PLAIN]",
+			"Network.connect[SSL]",
+			"Network.connect[FILE]"
+		};
+		verify_arg_count( name[0], values_, 2, 3, thread_, position_ );
+		verify_arg_type( name[0], values_, 0, _connectionTypeClass->enumeral_class(), ARITY::MULTIPLE, thread_, position_ );
+		HSocket::socket_type_t socketType( connection_type_to_socket_type( values_[0] ) );
+		int socketTypeIdx( socket_type_to_idx( socketType ) + 1 );
+		int argCount( 2 + ( socketType & HSocket::TYPE::FILE ? 0 : 1 ) );
+		verify_arg_count( name[socketTypeIdx], values_, argCount, argCount, thread_, position_ );
+		verify_arg_type( name[socketTypeIdx], values_, 1, HHuginn::TYPE::STRING, ARITY::MULTIPLE, thread_, position_ );
 		int port( 0 );
-		if ( arity == ARITY::MULTIPLE ) {
-			port = static_cast<int>( get_integer( values_[1] ) );
+		if ( ! ( socketType & HSocket::TYPE::FILE ) ) {
+			verify_arg_type( name[socketTypeIdx], values_, 2, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
+			port = static_cast<int>( get_integer( values_[2] ) );
 			if ( ( port <= 0 ) || ( port > 65535 ) ) {
 				thread_->raise( exception_class(), "Bad port: "_ys.append( port ), position_ );
 				port = -1;
@@ -69,15 +123,17 @@ private:
 		}
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( port >= 0 ) {
-			HStreamInterface::ptr_t stream( make_pointer<HSocket>( port > 0 ? HSocket::TYPE::NETWORK : HSocket::TYPE::FILE ) );
+			HStreamInterface::ptr_t stream( make_pointer<HSocket>( socketType ) );
 			HSocket* s( static_cast<HSocket*>( stream.raw() ) );
 			try {
-				s->connect( get_string( values_[0] ), port );
+				s->connect( get_string( values_[1] ), port );
 				HObjectFactory& of( thread_->object_factory() );
 				v = of.create<HStream>( of.stream_class(), stream );
 			} catch ( HResolverException const& e ) {
 				thread_->raise( exception_class(), e.what(), position_ );
 			} catch ( HSocketException const& e ) {
+				thread_->raise( exception_class(), e.what(), position_ );
+			} catch ( HOpenSSLException const& e ) {
 				thread_->raise( exception_class(), e.what(), position_ );
 			}
 		}
@@ -103,7 +159,7 @@ HPackageCreatorInterface::HInstance HNetworkCreator::do_new_instance( HRuntime* 
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "connect", runtime_->create_method( &HNetwork::connect ), "( *host*, *port* ) - create a TCP connection to given *host* at given *port*" },
+		{ "connect", runtime_->create_method( &HNetwork::connect ), "( *connectionType*, *target*[, *port*] ) - create a TCP connection of type *connectionType* to given *target*, optionally at given *port*" },
 		{ "resolve", runtime_->create_method( &HNetwork::resolve ), "( *hostName* ) - resolve IP address of given *hostName*" }
 	};
 	c->redefine( nullptr, fd );
