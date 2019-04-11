@@ -62,7 +62,11 @@ public:
 	}
 protected:
 	virtual bool do_is_valid( HThread* thread_, int position_ ) override {
-		return ( ( _colIdx < _source.get_size() ) && _it->is_valid( thread_, position_ ) );
+		return (
+			thread_->can_continue()
+			&& ( _colIdx < _source.get_size() )
+			&& _it->is_valid( thread_, position_ )
+		);
 	}
 	virtual void do_next( HThread* thread_, int position_ ) override {
 		_it->next( thread_, position_ );

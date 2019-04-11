@@ -106,20 +106,20 @@ public:
 		}
 		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
 			HHuginn::function_t function( static_cast<huginn::HFunctionReference const*>( callable.raw() )->function() );
-			while ( it->is_valid( thread_, position_ ) && thread_->can_continue() ) {
+			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
 				accumulator = function( thread_, nullptr, HArguments( thread_, it->value( thread_, position_ ), accumulator ), position_ );
 				it->next( thread_, position_ );
 			}
 		} else if ( t == HHuginn::TYPE::UNBOUND_METHOD ) {
 			huginn::HClass::HUnboundMethod* unboundMethod( static_cast<huginn::HClass::HUnboundMethod*>( callable.raw() ) );
-			while ( it->is_valid( thread_, position_ ) && thread_->can_continue() ) {
+			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
 				accumulator = unboundMethod->call( thread_, HArguments( thread_, it->value( thread_, position_ ), accumulator ), position_ );
 				it->next( thread_, position_ );
 			}
 		} else {
 			M_ASSERT( t == HHuginn::TYPE::BOUND_METHOD );
 			huginn::HClass::HBoundMethod* boundMethod( static_cast<huginn::HClass::HBoundMethod*>( callable.raw() ) );
-			while ( it->is_valid( thread_, position_ ) && thread_->can_continue() ) {
+			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
 				accumulator = boundMethod->call( thread_, HArguments( thread_, it->value( thread_, position_ ), accumulator ), position_ );
 				it->next( thread_, position_ );
 			}
@@ -322,7 +322,7 @@ public:
 		} else {
 			huginn::HIterable const* iterable( static_cast<huginn::HIterable const*>( src.raw() ) );
 			huginn::HIterable::iterator_t it( const_cast<huginn::HIterable*>( iterable )->iterator( thread_, position_ ) );
-			while ( it->is_valid( thread_, position_ ) && thread_->can_continue() ) {
+			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
 				dest.push_back( it->value( thread_, position_ ) );
 				it->next( thread_, position_ );
 			}

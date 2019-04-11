@@ -60,9 +60,9 @@ public:
 		return;
 	}
 protected:
-	virtual bool do_is_valid( HThread*, int ) override {
+	virtual bool do_is_valid( HThread* thread_, int ) override {
 		HHuginn::values_t const& a( _axes.back() );
-		return ( _indexes.back() < a.get_size() );
+		return ( thread_->can_continue() && ( _indexes.back() < a.get_size() ) );
 	}
 	virtual void do_next( HThread*, int ) override {
 		int axesCount( static_cast<int>( _indexes.get_size() ) );

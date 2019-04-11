@@ -75,8 +75,8 @@ protected:
 	virtual HHuginn::value_t do_value( HThread*, int ) override {
 		return ( _objectFactory->create_string( _it->get_name() ) );
 	}
-	virtual bool do_is_valid( huginn::HThread*, int ) override {
-		return ( _it != _end );
+	virtual bool do_is_valid( huginn::HThread* thread_, int ) override {
+		return ( thread_->can_continue() && ( _it != _end ) );
 	}
 	virtual void do_next( HThread*, int ) override {
 		++ _it;

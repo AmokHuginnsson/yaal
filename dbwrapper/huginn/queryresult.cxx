@@ -54,8 +54,8 @@ protected:
 	virtual HHuginn::value_t do_value( tools::huginn::HThread*, int ) override {
 		return ( fetch_row( _recordSet, _it, *_runtime ) );
 	}
-	virtual bool do_is_valid( tools::huginn::HThread*, int ) override {
-		return ( _it != _recordSet->end() );
+	virtual bool do_is_valid( tools::huginn::HThread* thread_, int ) override {
+		return ( thread_->can_continue() && ( _it != _recordSet->end() ) );
 	}
 	virtual void do_next( tools::huginn::HThread*, int ) override {
 		++ _it;

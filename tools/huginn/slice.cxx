@@ -31,7 +31,9 @@ protected:
 	}
 	virtual bool do_is_valid( HThread* thread_, int position_ ) override {
 		return (
-			( _i < _slice->stop() ) && _impl->is_valid( thread_, position_ )
+			thread_->can_continue()
+			&& ( _i < _slice->stop() )
+			&& _impl->is_valid( thread_, position_ )
 		);
 	}
 	virtual void do_next( HThread* thread_, int position_ ) override {

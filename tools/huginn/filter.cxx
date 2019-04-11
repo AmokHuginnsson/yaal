@@ -49,7 +49,7 @@ public:
 	}
 protected:
 	virtual bool do_is_valid( HThread* thread_, int position_ ) override {
-		return ( _impl->is_valid( thread_, position_ ) );
+		return ( thread_->can_continue() && _impl->is_valid( thread_, position_ ) );
 	}
 	virtual void do_next( HThread* thread_, int position_ ) override {
 		_impl->next( thread_, position_ );

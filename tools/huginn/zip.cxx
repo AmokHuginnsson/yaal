@@ -59,6 +59,9 @@ public:
 	}
 protected:
 	virtual bool do_is_valid( HThread* thread_, int position_ ) override {
+		if ( ! thread_->can_continue() ) {
+			return ( false );
+		}
 		if ( _cache.is_empty() ) {
 			for ( iterators_t::value_type& it : _impl ) {
 				if ( ! it->is_valid( thread_, position_ ) ) {
