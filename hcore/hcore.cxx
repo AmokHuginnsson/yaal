@@ -132,10 +132,26 @@ void substitute_environment( HString& string_, ENV_SUBST_MODE mode_ ) {
 				pattern.replace(
 					string_,
 					HRegex::replacer_t(
-						[]( yaal::hcore::HString const& match_ ) {
-							HUTF8String utf8( match_.substr( 2, match_.get_length() - 3 ) );
+						[]( yaal::hcore::HString const& match_ ) -> yaal::hcore::HString {
+							HString name( match_.substr( 2, match_.get_length() - 3 ) );
+							HString::size_type modIdx( name.find( ':'_ycp ) );
+							HString option;
+							while ( modIdx != HString::npos ) {
+								option = name.substr( modIdx  + 1 );
+								name.erase( modIdx );
+								if ( option.is_empty() ) {
+									break;
+								}
+								if ( option.front() == '-' ) {
+									option.shift_left( 1 );
+								} else {
+									option.clear();
+								}
+								break;
+							}
+							HUTF8String utf8( name );
 							char const* envVal = ::getenv( utf8.c_str() );
-							return ( envVal ? envVal : "" );
+							return ( envVal ? envVal : option );
 						}
 					)
 				)
