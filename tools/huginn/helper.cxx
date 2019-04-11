@@ -316,22 +316,24 @@ void verify_arg_type(
 	}
 }
 
-void verify_signature( char const* name_, HHuginn::values_t& values_, types_t const& types_, huginn::HThread* thread_, int position_ ) {
+void verify_signature( char const* name_, HHuginn::values_t& values_, int optionalCount_, types_t const& types_, huginn::HThread* thread_, int position_ ) {
 	int const COUNT( static_cast<int>( types_.get_size() ) );
-	verify_arg_count( name_, values_, COUNT, COUNT, thread_, position_ );
-	ARITY arity( COUNT == 1 ? ARITY::UNARY : ARITY::MULTIPLE );
-	for ( int i( 0 ); i < COUNT; ++ i ) {
+	verify_arg_count( name_, values_, COUNT - optionalCount_, COUNT, thread_, position_ );
+	int argCount( static_cast<int>( values_.get_size() ) );
+	ARITY arity( argCount == 1 ? ARITY::UNARY : ARITY::MULTIPLE );
+	for ( int i( 0 ); i < argCount; ++ i ) {
 		if ( types_[i] != HHuginn::TYPE::UNKNOWN ) {
 			verify_arg_type( name_, values_, i, types_[i], arity, thread_, position_ );
 		}
 	}
 }
 
-void verify_signature_by_class( char const* name_, HHuginn::values_t& values_, classes_t const& classes_, huginn::HThread* thread_, int position_ ) {
+void verify_signature_by_class( char const* name_, HHuginn::values_t& values_, int optionalCount_, classes_t const& classes_, huginn::HThread* thread_, int position_ ) {
 	int const COUNT( static_cast<int>( classes_.get_size() ) );
-	verify_arg_count( name_, values_, COUNT, COUNT, thread_, position_ );
-	ARITY arity( COUNT == 1 ? ARITY::UNARY : ARITY::MULTIPLE );
-	for ( int i( 0 ); i < COUNT; ++ i ) {
+	verify_arg_count( name_, values_, COUNT - optionalCount_, COUNT, thread_, position_ );
+	int argCount( static_cast<int>( values_.get_size() ) );
+	ARITY arity( argCount == 1 ? ARITY::UNARY : ARITY::MULTIPLE );
+	for ( int i( 0 ); i < argCount; ++ i ) {
 		if ( classes_[i]->type_id() != HHuginn::TYPE::UNKNOWN ) {
 			verify_arg_type( name_, values_, i, classes_[i], arity, thread_, position_ );
 		}

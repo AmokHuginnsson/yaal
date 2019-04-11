@@ -74,11 +74,11 @@ public:
 	}
 	static HHuginn::value_t env( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
-		verify_signature( "OperatingSystem.env", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
+		verify_signature( "OperatingSystem.env", values_, 1, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, thread_, position_ );
 		HUTF8String utf8(  get_string( values_[0] ) );
 		char const* val( ::getenv( utf8.c_str() ) );
 		HRuntime& rt( thread_->runtime() );
-		return ( val ? rt.object_factory()->create_string( val ) : rt.none_value() );
+		return ( val ? rt.object_factory()->create_string( val ) : ( values_.get_size() > 1 ?  values_[1] : rt.none_value() ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t set_env( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {

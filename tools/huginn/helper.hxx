@@ -69,8 +69,14 @@ void verify_arg_count( char const*, HHuginn::values_t&, int, int, huginn::HThrea
 void verify_arg_type( char const*, HHuginn::values_t&, int, HHuginn::TYPE, ARITY, huginn::HThread*, int );
 HHuginn::type_id_t verify_arg_type( char const*, HHuginn::values_t&, int, types_t const&, ARITY, huginn::HThread*, int );
 void verify_arg_type( char const*, HHuginn::values_t&, int, huginn::HClass const*, ARITY, huginn::HThread*, int );
-void verify_signature( char const*, HHuginn::values_t&, types_t const&, huginn::HThread*, int );
-void verify_signature_by_class( char const*, HHuginn::values_t&, classes_t const&, huginn::HThread*, int );
+void verify_signature( char const*, HHuginn::values_t&, int, types_t const&, huginn::HThread*, int );
+void verify_signature_by_class( char const*, HHuginn::values_t&, int, classes_t const&, huginn::HThread*, int );
+inline void verify_signature( char const* name_, HHuginn::values_t& values_, types_t const& types_, huginn::HThread* thread_, int position_ ) {
+	verify_signature( name_, values_, 0, types_, thread_, position_ );
+}
+inline void verify_signature_by_class( char const* name_, HHuginn::values_t& values_, classes_t const& classes_, huginn::HThread* thread_, int position_ ) {
+	verify_signature_by_class( name_, values_, 0, classes_, thread_, position_ );
+}
 HHuginn::type_id_t verify_arg_numeric( char const*, HHuginn::values_t&, int, ARITY, huginn::HThread*, int );
 HHuginn::value_t verify_arg_callable( char const*, HHuginn::values_t&, int, ARITY, huginn::HThread*, int );
 HHuginn::type_id_t verify_arg_materialized_collection( char const*, HHuginn::values_t&, int, ARITY, huginn::HThread*, int );
