@@ -14,6 +14,7 @@ namespace yaal {
 namespace hcore {
 
 char const _rfc2822DateTimeFormat_[] = "%a, %d %b %Y %H:%M:%S %z";
+char const _rfc7231DateTimeFormat_[] = "%a, %d %b %Y %H:%M:%S %Z";
 char const _iso8601TimeFormat_[] = "%T";
 char const _iso8601DateFormat_[] = "%Y-%m-%d";
 char const _iso8601DateTimeFormat_[] = "%Y-%m-%d %T";

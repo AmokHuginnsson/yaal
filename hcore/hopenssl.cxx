@@ -337,11 +337,14 @@ void const* HOpenSSL::OSSLContextClient::do_method( void ) const {
 }
 
 HOpenSSL::HOpenSSL( int fileDescriptor_, TYPE type_ )
-	: _pendingOperation( false ), _ssl( nullptr ),
-	_ctx( ( type_ == TYPE::SERVER )
+	: _pendingOperation( false )
+	, _ssl( nullptr )
+	, _ctx(
+		( type_ == TYPE::SERVER )
 			? static_cast<OSSLContext*>( &OSSLContextServer::get_instance() )
-			: static_cast<OSSLContext*>( &OSSLContextClient::get_instance() ) ),
-	do_accept_or_connect( ( type_ == TYPE::SERVER ) ? &HOpenSSL::accept : &HOpenSSL::connect ) {
+			: static_cast<OSSLContext*>( &OSSLContextClient::get_instance() )
+	)
+	, do_accept_or_connect( ( type_ == TYPE::SERVER ) ? &HOpenSSL::accept : &HOpenSSL::connect ) {
 	M_PROLOG
 	try {
 		SSL* ssl( static_cast<SSL*>( _ctx->create_ssl() ) );

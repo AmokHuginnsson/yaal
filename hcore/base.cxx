@@ -93,7 +93,7 @@ int preparse_integer( HString const& str_, char* alternate_ ) {
 		}
 	} else {
 		if ( ! ( ( len > 0 ) && ( *it >= '0' ) && ( *it <= '9' ) ) ) {
-			M_THROW( "not a number: " + str_, 0 );
+			M_THROW( "not a number: `"_ys.append( str_ ).append( "`" ), 0 );
 		}
 		if ( *it == '0' ) {
 			len = 1;

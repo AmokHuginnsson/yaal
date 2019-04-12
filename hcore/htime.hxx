@@ -18,6 +18,7 @@ namespace yaal {
 namespace hcore {
 
 extern M_YAAL_HCORE_PUBLIC_API char const _rfc2822DateTimeFormat_[];
+extern M_YAAL_HCORE_PUBLIC_API char const _rfc7231DateTimeFormat_[];
 extern M_YAAL_HCORE_PUBLIC_API char const _iso8601DateFormat_[];
 extern M_YAAL_HCORE_PUBLIC_API char const _iso8601TimeFormat_[];
 extern M_YAAL_HCORE_PUBLIC_API char const _iso8601DateTimeFormat_[];
