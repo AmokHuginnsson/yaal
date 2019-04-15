@@ -7,6 +7,7 @@
 #include "hcore/system.hxx"
 #include "tools/stringalgo.hxx"
 #include "tools/base64.hxx"
+#include "tools/hzipstream.hxx"
 #include "hcore/hlog.hxx"
 
 M_VCSID( "$Id: " __ID__ " $" )
@@ -102,12 +103,15 @@ public:
 		: _socket( socket_ )
 		, _transferEncoding( transferEncoding_ )
 		, _contentLength( contentLength_ )
-		, _contentBytesLeft( contentLength_ )
+		, _contentBytesLeft( _transferEncoding & TRANSFER_ENCODING::CHUNKED ? 0 : contentLength_ )
 		, _httpCache()
 		, _cachedHTTPBytes( 0 )
 		, _offsetInChunk( 0 )
 		, _lineCache()
 		, _maxCacheSize( system::get_page_size() ) {
+		if ( _transferEncoding & TRANSFER_ENCODING::DEFLATE ) {
+			_socket = make_pointer<HZipStream>( _socket, HZipStream::MODE::INFLATE );
+		}
 		_cache.realloc( _maxCacheSize );
 		return;
 	}
@@ -157,6 +161,7 @@ HResponse get( HRequest const& request_ ) {
 	HStreamInterface::ptr_t stream;
 	HTime lastModified( now_local() );
 	HString contentType;
+	int contentLength( 0 );
 	while ( true ) {
 		URL url( parse_url( request ) );
 		if ( ( url.port != port ) || ( url.host != host ) ) {
@@ -174,7 +179,6 @@ HResponse get( HRequest const& request_ ) {
 		HString responseHeader( line );
 		STATUS status( get_response_status( responseHeader ) );
 		HHTTPStream::transfer_encoding_t transferEncoding( HHTTPStream::TRANSFER_ENCODING::IDENTITY );
-		int contentLength( 0 );
 		HString location;
 		while ( getline( *stream, line ).good() ) {
 			if ( line.is_empty() ) {
@@ -224,7 +228,7 @@ HResponse get( HRequest const& request_ ) {
 		stream = make_pointer<HHTTPStream>( stream, contentLength, transferEncoding );
 		break;
 	}
-	return ( HResponse( stream, lastModified, contentType ) );
+	return ( HResponse( stream, lastModified, contentType, contentLength ) );
 }
 
 namespace {
@@ -249,6 +253,10 @@ int long HHTTPStream::do_read( void* data_, int long size_ ) {
 				_cachedHTTPBytes = static_cast<int>( _socket->read( _httpCache.raw(), toCache ) );
 				_contentBytesLeft -= _cachedHTTPBytes;
 				_offsetInChunk = 0;
+				if ( ( _contentBytesLeft == 0 ) && ( _transferEncoding & TRANSFER_ENCODING::CHUNKED ) ) {
+					char waste[2];
+					_socket->read( waste, 2 );
+				}
 			} else {
 				return ( 0 );
 			}
@@ -257,15 +265,11 @@ int long HHTTPStream::do_read( void* data_, int long size_ ) {
 			return ( 0 );
 		}
 		int toRead( min( _cachedHTTPBytes, safe_int::cast<int>( size_ ) ) );
-		::memcpy( data_, _httpCache.get<char>() + _offsetInChunk, static_cast<size_t>( toRead ) );
+		::memcpy( static_cast<char*>( data_ ) + nWritten, _httpCache.get<char>() + _offsetInChunk, static_cast<size_t>( toRead ) );
 		size_ -= toRead;
 		_cachedHTTPBytes -= toRead;
 		_offsetInChunk += toRead;
 		nWritten += toRead;
-		if ( ( _cachedHTTPBytes == 0 ) && ( _transferEncoding & TRANSFER_ENCODING::CHUNKED ) ) {
-			char waste[2];
-			_socket->read( waste, 2 );
-		}
 	}
 	return ( nWritten );
 }
@@ -287,7 +291,11 @@ yaal::hcore::HString make_request_string( URL const& url_, HRequest const& reque
 	} else {
 		requestString.append( request_.user_agent() );
 	}
-	requestString.append( "\r\n" );
+	requestString.append(
+		"\r\n"
+		"Accept-Charset: utf-8\r\n"
+		"Accept-Encoding: identity, deflate\r\n"
+	);
 	for ( HRequest::HHeader const& header : request_.headers() ) {
 		requestString.append( header.name() ).append( ": " ).append( header.value() ).append( "\r\n" );
 	}
@@ -393,6 +401,8 @@ HHTTPStream::transfer_encoding_t parse_transfer_encoding( yaal::hcore::HString c
 			transferEncoding |= HHTTPStream::TRANSFER_ENCODING::CHUNKED;
 		} else if ( method == "deflate" ) {
 			transferEncoding |= HHTTPStream::TRANSFER_ENCODING::DEFLATE;
+		} else {
+			log( LOG_LEVEL::DEBUG ) << "unsupported transfer encoding: " << method << endl;
 		}
 	}
 	return ( transferEncoding );

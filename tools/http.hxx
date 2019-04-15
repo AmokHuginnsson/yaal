@@ -109,14 +109,17 @@ private:
 	yaal::hcore::HStreamInterface::ptr_t _stream;
 	yaal::hcore::HTime _lastModified;
 	yaal::hcore::HString _mimeType;
+	int _contentLength;
 public:
 	HResponse(
 		yaal::hcore::HStreamInterface::ptr_t const& stream_,
 		yaal::hcore::HTime const& lastModified_,
-		yaal::hcore::HString const& mimeType_
+		yaal::hcore::HString const& mimeType_,
+		int contentLength_
 	) : _stream( stream_ )
 		, _lastModified( lastModified_ )
-		, _mimeType( mimeType_ ) {
+		, _mimeType( mimeType_ )
+		, _contentLength( contentLength_ ) {
 	}
 	yaal::hcore::HStreamInterface& stream( void ) {
 		return ( *_stream );
@@ -126,6 +129,9 @@ public:
 	}
 	yaal::hcore::HString const& mime_type( void ) const {
 		return ( _mimeType );
+	}
+	int content_length( void ) const {
+		return ( _contentLength );
 	}
 };
 
