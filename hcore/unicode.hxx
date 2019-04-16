@@ -110,6 +110,9 @@ static code_point_t const INVALID                               = code_point_t( 
 static code_point_t const NUL                                   = code_point_t( 0x0000 );
 static code_point_t const LINE_FEED                             = code_point_t( 0x00a0 );
 static code_point_t const SPACE                                 = code_point_t( 0x0020 );
+static code_point_t const SLASH                                 = code_point_t( 0x002f );
+static code_point_t const COLON                                 = code_point_t( 0x003a );
+static code_point_t const SEMICOLON                             = code_point_t( 0x003b );
 static code_point_t const LATIN_CAPITAL_LETTER_O                = code_point_t( 0x004f );
 static code_point_t const LATIN_SMALL_LETTER_O                  = code_point_t( 0x006f );
 

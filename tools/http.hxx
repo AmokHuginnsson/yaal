@@ -110,16 +110,19 @@ private:
 	yaal::hcore::HTime _lastModified;
 	yaal::hcore::HString _mimeType;
 	int _contentLength;
+	yaal::hcore::HString _filename;
 public:
 	HResponse(
 		yaal::hcore::HStreamInterface::ptr_t const& stream_,
 		yaal::hcore::HTime const& lastModified_,
 		yaal::hcore::HString const& mimeType_,
-		int contentLength_
+		int contentLength_,
+		yaal::hcore::HString const& filename_
 	) : _stream( stream_ )
 		, _lastModified( lastModified_ )
 		, _mimeType( mimeType_ )
-		, _contentLength( contentLength_ ) {
+		, _contentLength( contentLength_ )
+		, _filename( filename_ ) {
 	}
 	yaal::hcore::HStreamInterface& stream( void ) {
 		return ( *_stream );
@@ -132,6 +135,9 @@ public:
 	}
 	int content_length( void ) const {
 		return ( _contentLength );
+	}
+	yaal::hcore::HString const& filename( void ) const {
+		return ( _filename );
 	}
 };
 

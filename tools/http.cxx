@@ -8,6 +8,7 @@
 #include "tools/stringalgo.hxx"
 #include "tools/base64.hxx"
 #include "tools/hzipstream.hxx"
+#include "hcore/unicode.hxx"
 #include "hcore/hlog.hxx"
 
 M_VCSID( "$Id: " __ID__ " $" )
@@ -143,13 +144,12 @@ HHTTPStream::transfer_encoding_t const HHTTPStream::TRANSFER_ENCODING::CHUNKED =
 HHTTPStream::transfer_encoding_t const HHTTPStream::TRANSFER_ENCODING::DEFLATE = transfer_encoding_t::new_flag();
 
 HHTTPStream::transfer_encoding_t parse_transfer_encoding( yaal::hcore::HString const& );
+yaal::hcore::HTime parse_time( yaal::hcore::HString const&, yaal::hcore::HString const& );
+yaal::hcore::HString parse_content_disposition( yaal::hcore::HString const& );
 char const* status_string( STATUS );
 URL parse_url( yaal::hcore::HString const& );
 STATUS get_response_status( yaal::hcore::HString const& );
 yaal::hcore::HString make_request_string( URL const&, HRequest const& );
-
-static code_point_t const SLASH( '/'_ycp );
-static code_point_t const COLON( ':'_ycp );
 
 }
 
@@ -162,6 +162,7 @@ HResponse get( HRequest const& request_ ) {
 	HTime lastModified( now_local() );
 	HString contentType;
 	int contentLength( 0 );
+	HString filename;
 	while ( true ) {
 		URL url( parse_url( request ) );
 		if ( ( url.port != port ) || ( url.host != host ) ) {
@@ -184,7 +185,7 @@ HResponse get( HRequest const& request_ ) {
 			if ( line.is_empty() ) {
 				break;
 			}
-			int long colonPos( line.find( COLON ) );
+			int long colonPos( line.find( unicode::CODE_POINT::COLON ) );
 			if ( colonPos == HString::npos ) {
 				throw HHTTPException( "Malformed header received: `"_ys.append( line ).append( "`" ) );
 			}
@@ -201,13 +202,9 @@ HResponse get( HRequest const& request_ ) {
 			} else if ( headerName == "location" ) {
 				location = headerValue;
 			} else if ( headerName == "last-modified" ) {
-				try {
-					lastModified.set_format( _rfc7231DateTimeFormat_ );
-					lastModified.from_string( headerValue );
-				} catch ( HException const& e ) {
-					log( LOG_LEVEL::DEBUG ) << "http::get(" << request_.url() << ") - " << headerName << ": " << headerValue << " - " << e.what() << endl;
-				}
-				lastModified.set_format( _iso8601DateTimeFormat_ );
+				lastModified = parse_time( headerValue, "http::get("_ys.append( request_.url() ).append( ") - " ).append( headerName ).append( ": " ) );
+			} else if ( headerName == "content-disposition" ) {
+				filename = parse_content_disposition( headerValue );
 #ifdef __DEBUG__
 			} else {
 				log( LOG_LEVEL::DEBUG ) << headerName << ": " << headerValue << endl;
@@ -228,7 +225,7 @@ HResponse get( HRequest const& request_ ) {
 		stream = make_pointer<HHTTPStream>( stream, contentLength, transferEncoding );
 		break;
 	}
-	return ( HResponse( stream, lastModified, contentType, contentLength ) );
+	return ( HResponse( stream, lastModified, contentType, contentLength, filename ) );
 }
 
 namespace {
@@ -281,7 +278,7 @@ yaal::hcore::HString make_request_string( URL const& url_, HRequest const& reque
 		.append(
 			" HTTP/1.1\r\n"
 			"Host: "
-		).append( url_.host ).append( COLON ).append( url_.port )
+		).append( url_.host ).append( unicode::CODE_POINT::COLON ).append( url_.port )
 		.append(
 			"\r\n"
 			"User-Agent: "
@@ -301,7 +298,7 @@ yaal::hcore::HString make_request_string( URL const& url_, HRequest const& reque
 	}
 	if ( ! ( request_.login().is_empty() && request_.password().is_empty() ) ) {
 		HString auth;
-		auth.assign( request_.login() ).append( COLON ).append( request_.password() );
+		auth.assign( request_.login() ).append( unicode::CODE_POINT::COLON ).append( request_.password() );
 		requestString.append( "Authorization: Basic " ).append( base64::encode( auth ) ).append( "\r\n" );
 	}
 	requestString.append( "\r\n" );
@@ -330,7 +327,7 @@ STATUS get_response_status( yaal::hcore::HString const& responseHeader_ ) {
 	try {
 		statusRaw = lexical_cast<int>( responseHeader_.substr( CODE_POS, CODE_LEN ) );
 	} catch ( HLexicalCastException const& e ) {
-		throw HHTTPException( "Malformed HTTP status code: `"_ys.append( responseHeader_ ).append( "`" ) );
+		throw HHTTPException( "Malformed HTTP status code: `"_ys.append( responseHeader_ ).append( "` - " ).append( e.what() ) );
 	}
 	STATUS status( static_cast<STATUS>( statusRaw ) );
 	if ( ! status_string( status ) ) {
@@ -342,17 +339,21 @@ STATUS get_response_status( yaal::hcore::HString const& responseHeader_ ) {
 
 URL parse_url( yaal::hcore::HString const& url_ ) {
 	M_PROLOG
-	bool isHTTP( url_.compare( 0, 7, "http://" ) == 0 );
-	bool isHTTPS( url_.compare( 0, 8, "https://" ) == 0 );
+	char const HTTP_SCHEME[] = "http://";
+	int const HTTP_SCHEME_LEN( static_cast<int>( sizeof ( HTTP_SCHEME ) ) - 1 );
+	char const HTTPS_SCHEME[] = "https://";
+	int const HTTPS_SCHEME_LEN( static_cast<int>( sizeof ( HTTPS_SCHEME ) ) - 1 );
+	bool isHTTP( ( url_.get_length() > HTTP_SCHEME_LEN ) && ( url_.compare( 0, HTTP_SCHEME_LEN, HTTP_SCHEME ) == 0 ) );
+	bool isHTTPS( ( url_.get_length() > HTTPS_SCHEME_LEN ) && ( url_.compare( 0, HTTPS_SCHEME_LEN, HTTPS_SCHEME ) == 0 ) );
 	if ( ! ( isHTTP || isHTTPS ) ) {
 		throw HHTTPException( "Not a valid HTTP(S) URL: "_ys.append( url_ ) );
 	}
-	int long slashPos( url_.find( SLASH ) );
+	int long slashPos( url_.find( unicode::CODE_POINT::SLASH ) );
 	M_ASSERT( slashPos != HString::npos );
 	HString url( url_.substr( slashPos ) );
-	url.trim_left( SLASH );
-	slashPos = url.find( SLASH );
-	int long colonPos( url.find( COLON ) );
+	url.trim_left( unicode::CODE_POINT::SLASH );
+	slashPos = url.find( unicode::CODE_POINT::SLASH );
+	int long colonPos( url.find( unicode::CODE_POINT::COLON ) );
 	int long hostEnd( url.get_length() );
 	int port( isHTTPS ? 443 : 80 );
 	if ( slashPos != HString::npos ) {
@@ -365,7 +366,7 @@ URL parse_url( yaal::hcore::HString const& url_ ) {
 	) {
 		hostEnd = colonPos;
 		int long portStart( colonPos + 1 );
-		slashPos = url.find( SLASH, portStart );
+		slashPos = url.find( unicode::CODE_POINT::SLASH, portStart );
 		pathStart = slashPos != HString::npos ? slashPos : url.get_length();
 		try {
 			port = lexical_cast<int>( url.substr( portStart, pathStart - portStart ) );
@@ -406,6 +407,41 @@ HHTTPStream::transfer_encoding_t parse_transfer_encoding( yaal::hcore::HString c
 		}
 	}
 	return ( transferEncoding );
+	M_EPILOG
+}
+
+yaal::hcore::HTime parse_time( yaal::hcore::HString const& value_, yaal::hcore::HString const& context_ ) {
+	M_PROLOG
+	HTime time( now_local() );
+	try {
+		time.set_format( _rfc7231DateTimeFormat_ );
+		time.from_string( value_ );
+	} catch ( HException const& e ) {
+		log( LOG_LEVEL::DEBUG ) << context_ << value_ << " - " << e.what() << endl;
+	}
+	time.set_format( _iso8601DateTimeFormat_ );
+	return ( time );
+	M_EPILOG
+}
+
+yaal::hcore::HString parse_content_disposition( yaal::hcore::HString const& value_ ) {
+	M_PROLOG
+	HString filename;
+	int long sepPos( value_.find( unicode::CODE_POINT::SEMICOLON ) );
+	if ( sepPos == HString::npos ) {
+		return ( HString() );
+	}
+	filename.assign( value_, sepPos + 1 );
+	filename.trim();
+	char const VALUE_NAME[] = "filename=";
+	int const VALUE_NAME_SIZE( static_cast<int>( sizeof ( VALUE_NAME ) ) - 1 );
+	if ( ( filename.get_length() <= VALUE_NAME_SIZE ) || ( filename.compare( 0, VALUE_NAME_SIZE, VALUE_NAME ) != 0 ) ) {
+		return ( HString() );
+	}
+	filename.shift_left( VALUE_NAME_SIZE );
+	filename.trim();
+	filename.trim( "\"" );
+	return ( filename );
 	M_EPILOG
 }
 

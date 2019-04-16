@@ -28,6 +28,7 @@ enum class ENV_SUBST_MODE {
 	ONE_LAYER
 };
 void substitute_environment( HString&, ENV_SUBST_MODE );
+yaal::hcore::HString substitute_environment( yaal::hcore::HString const& );
 void init_locale( char const* = nullptr );
 void banner( char const* = nullptr, char const* = nullptr );
 double long strtold( HString const&, int* = nullptr );

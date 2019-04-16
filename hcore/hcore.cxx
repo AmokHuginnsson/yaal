@@ -164,6 +164,14 @@ void substitute_environment( HString& string_, ENV_SUBST_MODE mode_ ) {
 	M_EPILOG
 }
 
+yaal::hcore::HString substitute_environment( yaal::hcore::HString const& str_ ) {
+	M_PROLOG
+	HString str( str_ );
+	substitute_environment( str, ENV_SUBST_MODE::RECURSIVE );
+	return ( str );
+	M_EPILOG
+}
+
 namespace hidden {
 
 inline HString::const_iterator skip_whitespace( HString const& str_ ) {
