@@ -65,6 +65,14 @@ void operands_type_mismatch( char const*, huginn::HClass const*, huginn::HClass 
 HHuginn::class_t add_class_as_member( huginn::HClass*, HHuginn::class_t const&, yaal::hcore::HString const&, huginn::HClass::MEMBER_TYPE = huginn::HClass::MEMBER_TYPE::INSTANCE );
 enumeration::HEnumerationClass::ptr_t add_enumeration_as_member( huginn::HClass*, enumeration::HEnumerationClass::ptr_t const&, yaal::hcore::HString const&, huginn::HClass::MEMBER_TYPE = huginn::HClass::MEMBER_TYPE::INSTANCE );
 HHuginn::class_t class_exception( huginn::HClass*, huginn::HClass const* = nullptr );
+HHuginn::class_t create_class(
+	HRuntime*,
+	yaal::hcore::HString const&,
+	HHuginn::field_definitions_t const&,
+	yaal::hcore::HString const&,
+	HHuginn::VISIBILITY,
+	huginn::HClass const* = nullptr
+);
 void verify_arg_count( char const*, HHuginn::values_t&, int, int, huginn::HThread*, int );
 void verify_arg_type( char const*, HHuginn::values_t&, int, HHuginn::TYPE, ARITY, huginn::HThread*, int );
 HHuginn::type_id_t verify_arg_type( char const*, HHuginn::values_t&, int, types_t const&, ARITY, huginn::HThread*, int );

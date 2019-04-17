@@ -25,23 +25,20 @@ namespace tools {
 namespace huginn {
 
 class HDateTime : public HPackage {
-	HHuginn::class_t _timeClass;
 	HHuginn::class_t _clockClass;
 	HHuginn::class_t _exceptionClass;
 public:
 	HDateTime( HClass* class_ )
 		: HPackage( class_ )
-		, _timeClass( HTime::get_class( class_->runtime() ) )
 		, _clockClass( HClock::get_class( class_->runtime(), class_ ) )
 		, _exceptionClass( class_exception( class_ ) ) {
 		return;
 	}
-	static HHuginn::value_t now( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	static HHuginn::value_t now( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "DateTime.now", values_, 0, 0, thread_, position_ );
-		HDateTime* dt( dynamic_cast<HDateTime*>( object_->raw() ) );
-		M_ASSERT( dt );
-		return ( thread_->object_factory().create<huginn::HTime>( dt->_timeClass.raw(), now_local() ) );
+		HObjectFactory& of( thread_->object_factory() );
+		return ( of.create<huginn::HTime>( of.time_class(), now_local() ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t clock( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -56,7 +53,7 @@ public:
 		M_PROLOG
 		HObjectFactory& of( thread_->object_factory() );
 		HDateTime& dtp( *static_cast<HDateTime*>( object_->raw() ) );
-		verify_signature_by_class( "DateTime.format", values_, { of.string_class(), dtp._timeClass.raw() }, thread_, position_ );
+		verify_signature_by_class( "DateTime.format", values_, { of.string_class(), of.time_class() }, thread_, position_ );
 		hcore::HString const& fmt( get_string( values_[0] ) );
 		HTime const& dt( *static_cast<HTime*>( values_[1].raw() ) );
 		hcore::HTime t( dt.value() );

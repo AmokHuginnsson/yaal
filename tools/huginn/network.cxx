@@ -14,6 +14,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "packagefactory.hxx"
 #include "objectfactory.hxx"
 #include "enumeration.hxx"
+#include "time.hxx"
+#include "tools/http.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -56,6 +58,7 @@ inline HSocket::socket_type_t connection_type_to_socket_type( HHuginn::value_t c
 
 class HNetwork : public HPackage {
 	enumeration::HEnumerationClass::ptr_t _connectionTypeClass;
+	HHuginn::class_t _httpResponseClass;
 public:
 	HNetwork( HClass* class_ )
 		: HPackage( class_ )
@@ -76,6 +79,25 @@ public:
 				),
 				"a set of possible connection types."
 			)
+		)
+		, _httpResponseClass(
+			add_class_as_member(
+				class_,
+				create_class(
+					class_->runtime(),
+					"HTTPResponse",
+					HHuginn::field_definitions_t{
+						{ "stream",       class_->runtime()->none_value(), "a HTTP connection stream to fetch requested resource" },
+						{ "mimeType",     class_->runtime()->none_value(), "a mime type of acquired resource" },
+						{ "lastModified", class_->runtime()->none_value(), "a time of last modification of acquired resource" },
+						{ "filename",     class_->runtime()->none_value(), "a suggested filename for acquired resource" }
+					},
+					"The `HTTPResponse` class is representing a response to `Network.get(...)` request",
+					HHuginn::VISIBILITY::PACKAGE,
+					class_
+				),
+				"a response to `Network.get(...)` request"
+			)
 		) {
 		return;
 	}
@@ -94,6 +116,11 @@ public:
 	static HHuginn::value_t connect( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		return ( static_cast<HNetwork*>( object_->raw() )->do_connect( thread_, values_, position_ ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t get( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		return ( static_cast<HNetwork*>( object_->raw() )->do_get( thread_, values_, position_ ) );
 		M_EPILOG
 	}
 private:
@@ -140,6 +167,39 @@ private:
 		return ( v );
 		M_EPILOG
 	}
+	HHuginn::value_t do_get( huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "Network.get", values_, 2, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, thread_, position_ );
+		HHuginn::value_t v( thread_->runtime().none_value() );
+		try {
+			http::HRequest request( get_string( values_[0] ) );
+			int argCount( static_cast<int>( values_.get_size() ) );
+			if ( argCount > 1 ) {
+				request.login( get_string( values_[1] ) );
+			}
+			if ( argCount > 2 ) {
+				request.password( get_string( values_[2] ) );
+			}
+			http::HResponse response( http::get( request ) );
+			HObjectFactory& of( thread_->object_factory() );
+			HObject::fields_t fields;
+			fields.push_back( of.create<HStream>( of.stream_class(), response.sock() ) );
+			fields.push_back( of.create_string( response.mime_type() ) );
+			fields.push_back( of.create<HTime>( of.time_class(), response.last_modified() ) );
+			fields.push_back( of.create_string( response.filename() ) );
+			v = of.create_object( _httpResponseClass.raw(), fields );
+		} catch ( HResolverException const& e ) {
+			thread_->raise( exception_class(), e.what(), position_ );
+		} catch ( HSocketException const& e ) {
+			thread_->raise( exception_class(), e.what(), position_ );
+		} catch ( HOpenSSLException const& e ) {
+			thread_->raise( exception_class(), e.what(), position_ );
+		} catch ( http::HHTTPException const& e ) {
+			thread_->raise( exception_class(), e.what(), position_ );
+		}
+		return ( v );
+		M_EPILOG
+	}
 };
 
 namespace package_factory {
@@ -160,6 +220,7 @@ HPackageCreatorInterface::HInstance HNetworkCreator::do_new_instance( HRuntime* 
 	);
 	HHuginn::field_definitions_t fd{
 		{ "connect", runtime_->create_method( &HNetwork::connect ), "( *connectionType*, *target*[, *port*] ) - create a TCP connection of type *connectionType* to given *target*, optionally at given *port*" },
+		{ "get", runtime_->create_method( &HNetwork::get ), "( *url* ) - fetch a resource from a remote HTTP server" },
 		{ "resolve", runtime_->create_method( &HNetwork::resolve ), "( *hostName* ) - resolve IP address of given *hostName*" }
 	};
 	c->redefine( nullptr, fd );

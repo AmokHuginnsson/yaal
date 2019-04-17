@@ -21,10 +21,9 @@ class HFileStat : public HValue {
 private:
 	HClass const* _fileTypeClass;
 	HClass const* _exceptionClass;
-	HClass const* _timeClass;
 	filesystem::path_t _path;
 public:
-	HFileStat( HClass const*, HClass const*, HClass const*, HClass const*, filesystem::path_t const& );
+	HFileStat( HClass const*, HClass const*, HClass const*, filesystem::path_t const& );
 	static HHuginn::value_t id( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t name( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t size( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );

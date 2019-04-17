@@ -34,7 +34,6 @@ typedef yaal::hcore::HString (*str_transform_func_t)( yaal::hcore::HString const
 
 class HFileSystem : public HPackage {
 	HHuginn::class_t _directoryScanClass;
-	HHuginn::class_t _timeClass;
 	HHuginn::class_t _fileStatClass;
 	enumeration::HEnumerationClass::ptr_t _openModeClass;
 	enumeration::HEnumerationClass::ptr_t _fileTypeClass;
@@ -42,7 +41,6 @@ public:
 	HFileSystem( huginn::HClass* class_ )
 		: HPackage( class_ )
 		, _directoryScanClass( HDirectoryScan::get_class( class_->runtime(), class_ ) )
-		, _timeClass( huginn::HTime::get_class( class_->runtime() ) )
 		, _fileStatClass( HFileStat::get_class( class_->runtime(), class_ ) )
 		, _openModeClass(
 			add_enumeration_as_member(
@@ -172,7 +170,6 @@ public:
 				fsc->_fileStatClass.raw(),
 				fsc->_fileTypeClass.raw(),
 				fsc->exception_class(),
-				fsc->_timeClass.raw(),
 				get_string( values_[0] )
 			)
 		);

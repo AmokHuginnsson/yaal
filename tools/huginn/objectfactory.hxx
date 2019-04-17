@@ -232,6 +232,7 @@ class HObjectFactory final : public HObjectFactoryBase {
 	HHuginn::class_t _arithmeticException;
 	HHuginn::class_t _iterableAdaptor;
 	HHuginn::class_t _stream;
+	HHuginn::class_t _time;
 	HHuginn::value_t _none;
 	HHuginn::value_t _true;
 	HHuginn::value_t _false;
@@ -428,6 +429,9 @@ public:
 	}
 	huginn::HClass const* stream_class( void ) const {
 		return ( _stream.raw() );
+	}
+	huginn::HClass const* time_class( void ) const {
+		return ( _time.raw() );
 	}
 	template<typename T, typename... args_t>
 	HHuginn::value_t create( args_t&&... args_ )  {

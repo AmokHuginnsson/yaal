@@ -23,11 +23,10 @@ namespace tools {
 
 namespace huginn {
 
-HFileStat::HFileStat( huginn::HClass const* class_, huginn::HClass const* fileTypeClass_, huginn::HClass const* exceptionClass_, huginn::HClass const* timeClass_, filesystem::path_t const& path_ )
+HFileStat::HFileStat( huginn::HClass const* class_, huginn::HClass const* fileTypeClass_, huginn::HClass const* exceptionClass_, filesystem::path_t const& path_ )
 	: HValue( class_ )
 	, _fileTypeClass( fileTypeClass_ )
 	, _exceptionClass( exceptionClass_ )
-	, _timeClass( timeClass_ )
 	, _path( path_ ) {
 	return;
 }
@@ -145,7 +144,8 @@ HHuginn::value_t HFileStat::get_times( char const* name_, time_getter_t timeGett
 	HFSItem fi( o->_path );
 	HHuginn::value_t v( thread_->runtime().none_value() );
 	try {
-		v = thread_->object_factory().create<huginn::HTime>( o->_timeClass, (fi.*timeGetter_)() );
+		HObjectFactory& of( thread_->object_factory() );
+		v = of.create<huginn::HTime>( of.time_class(), (fi.*timeGetter_)() );
 	} catch ( HFSItemException const& e ) {
 		thread_->raise( o->_exceptionClass, e.what(), position_ );
 	}

@@ -180,6 +180,30 @@ HHuginn::class_t class_exception( HClass* package_, HClass const* base_ ) {
 	);
 }
 
+HHuginn::class_t create_class(
+	HRuntime* runtime_,
+	yaal::hcore::HString const& name_,
+	HHuginn::field_definitions_t const& descriptions_,
+	yaal::hcore::HString const& doc_,
+	HHuginn::VISIBILITY visibility_,
+	HClass const* origin_
+) {
+	HHuginn::identifier_id_t classIdentifier( runtime_->identifier_id( name_ ) );
+	HHuginn::class_t c( runtime_ && ! origin_ ? runtime_->get_class( classIdentifier ) : nullptr );
+	if ( ! c ) {
+		c =	runtime_->create_class(
+			classIdentifier,
+			doc_,
+			HHuginn::ACCESS::PRIVATE,
+			HClass::TYPE::BUILTIN
+		);
+		c->redefine( nullptr, descriptions_ );
+		c->set_origin( origin_ );
+		runtime_->huginn()->register_class( c, visibility_ );
+	}
+	return ( c );
+}
+
 void verify_arg_count( char const* name_, HHuginn::values_t& values_, int min_, int max_, huginn::HThread* thread_, int position_ ) {
 	M_PROLOG
 	int argCount( static_cast<int>( values_.get_size() ) );

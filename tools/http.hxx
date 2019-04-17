@@ -139,6 +139,9 @@ public:
 	yaal::hcore::HString const& filename( void ) const {
 		return ( _filename );
 	}
+	yaal::hcore::HStreamInterface::ptr_t sock( void ) const {
+		return ( _stream );
+	}
 };
 
 HResponse get( HRequest const& );
