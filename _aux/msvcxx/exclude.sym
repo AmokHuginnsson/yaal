@@ -47,6 +47,7 @@
 ?BLOCKING@TYPE@HSocket@hcore@yaal@@2V?$HBitFlag@UTYPE@HSocket@hcore@yaal@@@34@B
 ?CANONICAL@FLAG@HSerial@tools@yaal@@2V?$HBitFlag@UFLAG@HSerial@tools@yaal@@@hcore@4@B
 ?CHECKABLE@FLAG@HListWidget@hconsole@yaal@@2V?$HBitFlag@UFLAG@HListWidget@hconsole@yaal@@@hcore@4@B
+?CHUNKED@TRANSFER_ENCODING@HHTTPStream@?A0x8659c7df@http@tools@yaal@@2V?$HBitFlag@UTRANSFER_ENCODING@HHTTPStream@?A0x8659c7df@http@tools@yaal@@@hcore@6@B
 ?CLIENT@TYPE@HSocket@hcore@yaal@@2V?$HBitFlag@UTYPE@HSocket@hcore@yaal@@@34@B
 ?COUNT@AGGREGATE_TYPE@xmath@tools@yaal@@2V?$HBitFlag@UAGGREGATE_TYPE@xmath@tools@yaal@@@hcore@4@B
 ?CR2NL@FLAG@HSerial@tools@yaal@@2V?$HBitFlag@UFLAG@HSerial@tools@yaal@@@hcore@4@B
@@ -60,6 +61,7 @@
 ?DEFAULT@PARSER@HXml@tools@yaal@@2V?$HBitFlag@UPARSER@HXml@tools@yaal@@@hcore@4@B
 ?DEFAULT@TYPE@HSocket@hcore@yaal@@2V?$HBitFlag@UTYPE@HSocket@hcore@yaal@@@34@B
 ?DEFAULT_PRECISION@HNumber@hcore@yaal@@2HA
+?DEFLATE@TRANSFER_ENCODING@HHTTPStream@?A0x8659c7df@http@tools@yaal@@2V?$HBitFlag@UTRANSFER_ENCODING@HHTTPStream@?A0x8659c7df@http@tools@yaal@@@hcore@6@B
 ?DELIMITED_BY_ANY_OF@HTokenizer@hcore@yaal@@2V?$HBitFlag@VHTokenizer@hcore@yaal@@@23@B
 ?DELIMITED_BY_MASK@HTokenizer@hcore@yaal@@2V?$HBitFlag@VHTokenizer@hcore@yaal@@@23@B
 ?DELIMITED_BY_WHOLE_STRING@HTokenizer@hcore@yaal@@2V?$HBitFlag@VHTokenizer@hcore@yaal@@@23@B
@@ -73,6 +75,7 @@
 ?FLOW_CONTROL_SOFTWARE@FLAG@HSerial@tools@yaal@@2V?$HBitFlag@UFLAG@HSerial@tools@yaal@@@hcore@4@B
 ?HANDLE_EMPTY_MASK@HTokenizer@hcore@yaal@@2V?$HBitFlag@VHTokenizer@hcore@yaal@@@23@B
 ?HISTOGRAM@AGGREGATE_TYPE@xmath@tools@yaal@@2V?$HBitFlag@UAGGREGATE_TYPE@xmath@tools@yaal@@@hcore@4@B
+?IDENTITY@TRANSFER_ENCODING@HHTTPStream@?A0x8659c7df@http@tools@yaal@@2V?$HBitFlag@UTRANSFER_ENCODING@HHTTPStream@?A0x8659c7df@http@tools@yaal@@@hcore@6@B
 ?IGNORE_CASE@COMPILE@HRegex@hcore@yaal@@2V?$HBitFlag@UCOMPILE@HRegex@hcore@yaal@@@34@B
 ?IGNORE_CONVERSION_ERRORS@PARSER@HXml@tools@yaal@@2V?$HBitFlag@UPARSER@HXml@tools@yaal@@@hcore@4@B
 ?INCLUDE_EMPTY@HTokenizer@hcore@yaal@@2V?$HBitFlag@VHTokenizer@hcore@yaal@@@23@B
@@ -203,6 +206,7 @@
 ?_primes_@hcore@yaal@@3QBJB
 ?_resolveHostnames@HSocket@hcore@yaal@@2_NA
 ?_rfc2822DateTimeFormat_@hcore@yaal@@3QBDB
+?_rfc7231DateTimeFormat_@hcore@yaal@@3QBDB
 ?_screenBackground_@hconsole@yaal@@3HA
 ?_screenBackground_@hconsole@yaal@@3W4color_t@COLOR@tools@2@A
 ?_serialDevice_@tools@yaal@@3VHString@hcore@2@A
