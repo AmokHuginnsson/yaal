@@ -19,6 +19,7 @@ class HProgramOptionsHandler;
 
 HProgramOptionsHandler& yaal_options( void );
 char const* yaal_version( bool );
+char const* host_info_string( void );
 bool eq( double long, double long );
 void set_env( HString const&, HString const&, bool = true );
 void unset_env( HString const& );

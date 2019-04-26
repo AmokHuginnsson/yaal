@@ -56,6 +56,10 @@ char const* yaal_version( bool commitId_ ) {
 	return ( commitId_ ? PACKAGE_VERSION " " COMMIT_ID : PACKAGE_VERSION );
 }
 
+char const* host_info_string( void ) {
+	return ( HOST_INFO " " TARGET_CPU );
+}
+
 /* mathematical macros */
 static double long const EPSILON = 0.000001;
 bool eq( double long left_, double long right_ ) {

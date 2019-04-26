@@ -114,7 +114,8 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 		AC_SUBST([SERIAL_DEVICE],['ttyS0'])
 		AC_CHECK_PROG([LINUX_DISTRO],[lsb_release],[yes])
 		if test ["x${LINUX_DISTRO}"] = ["xyes"] ; then
-			HOST_OS_TYPE=`lsb_release -i|awk '/Distributor/{print [$]3}'`
+			HOST_OS_TYPE=`lsb_release -si`
+			HOST_INFO=`lsb_release -sd | sed -e 's/^[["[:space:]]]*//' -e 's/[["[:space:]]]*$//'`
 		fi
 		AC_DEFINE([__HOST_OS_TYPE_LINUX__], [], [Your operating system is Linux.])
 		YAAL_LXXFLAGS=["-Wl,--entry=\"${PACKAGE_NAME}_\$(*)_main\""]
@@ -145,15 +146,18 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 	elif test ["x${UNAME_OS_NAME}"] = ["xFreeBSD"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_FREEBSD__], [], [Your operating system is FreeBSD.])
 		HOST_OS_TYPE=[FreeBSD]
+		HOST_INFO="${UNAME_OS_NAME} `freebsd-version`"
 		EXTRA_INCLUDE_PATHS=["${EXTRA_INCLUDE_PATHS} -I/usr/local/include"]
 		EXTRA_LIBRARY_PATHS=["${EXTRA_LIBRARY_PATHS} -L/usr/local/lib"]
 	elif test ["x${UNAME_OS_NAME}"] = ["xSunOS"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_SOLARIS__], [], [Your operating system is Solaris.])
 		HOST_OS_TYPE=[Solaris]
+		HOST_INFO="${UNAME_OS_NAME} `head -1 /etc/release`"
 		EXTRA_LIBRARY_PATHS=["${EXTRA_LIBRARY_PATHS} -L/usr/local/lib -L/usr/gnu/lib/amd64 -L/usr/gnu/lib"]
 	elif test ["x${UNAME_OS_NAME}"] = ["xDarwin"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_DARWIN__], [], [Your operating system is Darwin.])
 		HOST_OS_TYPE=[Darwin]
+		HOST_INFO="`sw_vers -productName` `sw_vers -productVersion`"
 		YAAL_LXXFLAGS=["${YAAL_LXXFLAGS} -Wl,-undefined,dynamic_lookup"]
 		EXTRA_INCLUDE_PATHS="-isystem /opt/local/include ${EXTRA_INCLUDE_PATHS}"
 		EXTRA_LIBRARY_PATHS=["${EXTRA_LIBRARY_PATHS} -L/opt/local/lib"]
@@ -161,11 +165,13 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 	elif test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/tizen-release] ; then
 		AC_DEFINE([__HOST_OS_TYPE_TIZEN__], [], [Your operating system is Tizen.])
 		HOST_OS_TYPE=[Tizen]
+		HOST_INFO="Tizen"
 	elif test ["x${UNAME_OS_NAME}"] = ["xCYGWIN"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_CYGWIN__], [], [Your operating system is Cygwin.])
 		EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -D_GNU_SOURCE -U__STRICT_ANSI__"]
 		YAAL_LXXFLAGS=["${YAAL_LXXFLAGS} -Wl,--export-all-symbols -Wl,--enable-auto-import -Wl,--out-implib=lib\$(*)\$(LIB_INFIX).\$(LIB_ARCHIVE_SUFFIX)"]
 		HOST_OS_TYPE=[Cygwin]
+		HOST_INFO="${UNAME_OS_NAME} `uname -r`"
 		LIB_PREFIX=["cyg"]
 		LIB_EXT=["dll"]
 		HCORE_LIBS=["${HCORE_LIBS} -liconv"]
@@ -179,6 +185,7 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 	AC_SUBST([LIB_EXT],[${LIB_EXT}])
 	AC_SUBST([UNAME_OS_NAME],[${UNAME_OS_NAME}])
 	AC_SUBST([HOST_OS_TYPE],[${HOST_OS_TYPE}])
+	AC_DEFINE_UNQUOTED([HOST_INFO],"${HOST_INFO}",[Target host information string.])
 
 	if test ["x${HOST_OS_TYPE}"] = ["x"] ; then
 		AC_MSG_ERROR([Cannot recognize host operating system type!])
