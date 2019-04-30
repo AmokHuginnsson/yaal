@@ -201,6 +201,18 @@ public:
 		return ( v );
 		M_EPILOG
 	}
+	static HHuginn::value_t glob( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "FileSystem.glob", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
+		filesystem::paths_t paths( filesystem::glob( get_string( values_[0] ) ) );
+		HHuginn::values_t data;
+		HObjectFactory& of( *thread_->runtime().object_factory() );
+		for ( filesystem::path_t& path : paths ) {
+			data.emplace_back( of.create_string( yaal::move( path ) ) );
+		}
+		return ( of.create_list( yaal::move( data ) ) );
+		M_EPILOG
+	}
 private:
 	HHuginn::value_t do_open( huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
@@ -254,6 +266,7 @@ HPackageCreatorInterface::HInstance HFileSystemCreator::do_new_instance( HRuntim
 		{ "dir",                       runtime_->create_method( &HFileSystem::dir ),     "( *path* ) - list content of the directory given by *path*" },
 		{ "stat",                      runtime_->create_method( &HFileSystem::stat ),    "( *path* ) - get metadata information for file given by *path*" },
 		{ "exists",                    runtime_->create_method( &HFileSystem::exists ),  "( *path* ) - tell if given *path* exists, return false for broken links" },
+		{ "glob",                      runtime_->create_method( &HFileSystem::glob ),    "( *pattern* ) - find pathnames matching a *pattern*" },
 		{ "disk_usage",                runtime_->create_method( &HFileSystem::disk_usage ),                "( *mountPoint* ) - get disk usage statistics for the file system mounted at *mountPoint*" },
 		{ "current_working_directory", runtime_->create_method( &HFileSystem::current_working_directory ), "get current working directory path" }
 	};
