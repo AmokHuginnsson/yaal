@@ -263,14 +263,14 @@ protected:
 	}
 	template<typename type>
 	void release( void ) throw() {
-#if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7003001 )
+#if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7004001 )
 #	pragma GCC diagnostic push
 #	pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif /* ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7003001 ) */
+#endif /* ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7004001 ) */
 		if ( _shared ) {
-#if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7003001 )
+#if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7004001 )
 #	pragma GCC diagnostic pop
-#endif /* #if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7003001 ) */
+#endif /* #if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7004001 ) */
 			M_ASSERT( _object );
 			if ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] == 1 ) {
 				_shared->do_delete( static_cast<type*>( nullptr ) );
@@ -462,16 +462,16 @@ public:
 	~HPointer( void ) {
 		/* The make_pointer() helper part.
 		 */
-#if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7003001 )
+#if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7004001 )
 #	pragma GCC diagnostic push
 #	pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif /* #if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7003001 ) */
+#endif /* #if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7004001 ) */
 		if ( this->_object ) {
 			reset();
 		}
-#if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7003001 )
+#if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7004001 )
 #	pragma GCC diagnostic pop
-#endif /* #if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7003001 ) */
+#endif /* #if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7004001 ) */
 	}
 	HPointer& operator = ( HPointer const& pointer_ ) {
 		this->template acquire<trait::true_type>( pointer_ );
