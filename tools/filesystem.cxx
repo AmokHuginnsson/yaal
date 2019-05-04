@@ -451,66 +451,61 @@ struct OScan {
 }
 
 yaal::tools::filesystem::paths_t glob( path_t const& path_ ) {
-	paths_t gr;
 	HString globChars( "*?" );
-	if ( path_.find_one_of( globChars ) != HString::npos ) {
-		tokens_t pathParts( split<>( filesystem::normalize_path( path_ ), filesystem::path::SEPARATOR ) );
-		typedef HQueue<OScan> scan_t;
-		HString base( "/" );
-		if ( pathParts.front().is_empty() ) {
-			pathParts.erase( pathParts.begin() );
-		} else {
-			base.assign( "./" );
+	if ( path_.find_one_of( globChars ) == HString::npos ) {
+		return ( paths_t( { path_ } ) );
+	}
+	paths_t result;
+	tokens_t pathParts( split<>( filesystem::normalize_path( path_ ), filesystem::path::SEPARATOR ) );
+	typedef HQueue<OScan> scan_t;
+	scan_t scan;
+	scan.emplace( "", 0 );
+	if ( pathParts.front().is_empty() ) {
+		pathParts.erase( pathParts.begin() );
+		scan.back()._path.assign( "/" );
+	}
+	HString trialPath;
+	while ( ! scan.is_empty() ) {
+		OScan trial( scan.front() );
+		scan.pop();
+		HString const& p( pathParts[trial._part] );
+		trialPath.assign( ! trial._path.is_empty() ? trial._path : "./" );
+		if ( ! trial._path.is_empty() && ( trial._path.back() != filesystem::path::SEPARATOR ) ) {
+			trial._path.append( filesystem::path::SEPARATOR );
 		}
-		scan_t scan;
-		scan.emplace( "", 0 );
-		HString trialPath;
-		while ( ! scan.is_empty() ) {
-			OScan trial( scan.front() );
-			scan.pop();
-			HString const& p( pathParts[trial._part] );
-			trialPath.assign( base ).append( trial._path );
-			if ( p.find_one_of( globChars ) != HString::npos ) {
-				HRegex globRE( glob_to_re( p ) );
-				if ( ! trial._path.is_empty() ) {
-					trial._path.append( filesystem::path::SEPARATOR );
+		if ( p.find_one_of( globChars ) != HString::npos ) {
+			HRegex globRE( glob_to_re( p ) );
+			HFSItem dir( trialPath );
+			if ( ! dir ) {
+				continue;
+			}
+			++ trial._part;
+			HString name;
+			HString newMatch;
+			for ( HFSItem const& f : dir ) {
+				name.assign( f.get_name() );
+				if ( ! globRE.matches( name ) || ( ( trial._part < pathParts.get_size() ) && ! f.is_directory() ) ) {
+					continue;
 				}
-				HFSItem dir( trialPath );
-				if ( !! dir ) {
-					++ trial._part;
-					HString name;
-					HString newMatch;
-					for ( HFSItem const& f : dir ) {
-						name.assign( f.get_name() );
-						newMatch.assign( trial._path );
-						if ( globRE.matches( f.get_name() ) && ( ( trial._part == pathParts.get_size() ) || ( f.is_directory() ) ) ) {
-							newMatch.append( name );
-							if ( trial._part < pathParts.get_size() ) {
-								scan.emplace( newMatch, trial._part );
-							} else {
-								gr.push_back( newMatch );
-							}
-						}
-					}
-				}
-			} else {
-				if ( ! trial._path.is_empty() ) {
-					trial._path.append( filesystem::path::SEPARATOR );
-				}
-				trial._path.append( p );
-				++ trial._part;
+				newMatch.assign( trial._path ).append( name );
 				if ( trial._part < pathParts.get_size() ) {
-					scan.emplace( trial );
+					scan.emplace( newMatch, trial._part );
 				} else {
-					gr.push_back( trial._path );
+					result.push_back( newMatch );
 				}
 			}
+		} else {
+			trial._path.append( p );
+			++ trial._part;
+			if ( trial._part < pathParts.get_size() ) {
+				scan.emplace( trial );
+			} else {
+				result.push_back( trial._path );
+			}
 		}
-	} else {
-		gr.push_back( path_ );
 	}
-	sort( gr.begin(), gr.end() );
-	return ( gr );
+	sort( result.begin(), result.end() );
+	return ( result );
 }
 
 }
