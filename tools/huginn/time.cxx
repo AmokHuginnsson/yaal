@@ -164,6 +164,55 @@ HHuginn::value_t HTime::to_string( huginn::HThread* thread_, HHuginn::value_t* o
 	M_EPILOG
 }
 
+namespace {
+void verify_range( HThread* thread_, char const* item_, HInteger::value_type value_, HInteger::value_type min_, HInteger::value_type max_, int position_ ) {
+	if ( ( value_ < min_ ) || ( value_ > max_ ) ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"Invalid value for `"_ys.append( item_ ).append( "` in Time constructor: " ).append( value_ ).append( "." ),
+			thread_->current_frame()->file_id(),
+			position_
+		);
+	}
+}
+}
+
+HHuginn::value_t HTime::create_instance( HClass const* class_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
+	verify_signature(
+		"Time.constructor",
+		values_,
+		{ HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER },
+		thread_,
+		position_
+	);
+	HInteger::value_type year(   get_integer( values_[0] ) );
+	HInteger::value_type month(  get_integer( values_[1] ) );
+	HInteger::value_type day(    get_integer( values_[2] ) );
+	HInteger::value_type hour(   get_integer( values_[3] ) );
+	HInteger::value_type minute( get_integer( values_[4] ) );
+	HInteger::value_type second( get_integer( values_[5] ) );
+	HInteger::value_type const MAX_YEAR( meta::max_signed<int>::value );
+	verify_range( thread_, "year",   year,   -MAX_YEAR, MAX_YEAR, position_ );
+	verify_range( thread_, "second", second, 0, 59, position_ );
+	verify_range( thread_, "minute", minute, 0, 59, position_ );
+	verify_range( thread_, "hour",   hour,   0, 23, position_ );
+	verify_range( thread_, "month",  month,  1, 12, position_ );
+	hcore::HTime trial( static_cast<int>( year ), static_cast<int>( month ), 1, 12, 0, 0 );
+	verify_range( thread_, "day",    day,    1, trial.get_days_in_month(), position_ );
+	return (
+		thread_->object_factory().create<HTime>(
+			class_,
+			hcore::HTime(
+				static_cast<int>( year ),
+				static_cast<int>( month ),
+				static_cast<int>( day ),
+				static_cast<int>( hour ),
+				static_cast<int>( minute ),
+				static_cast<int>( second )
+			)
+		)
+	);
+}
+
 HHuginn::class_t HTime::get_class( HRuntime* runtime_ ) {
 	M_PROLOG
 	char const name[] = "Time";
@@ -173,7 +222,10 @@ HHuginn::class_t HTime::get_class( HRuntime* runtime_ ) {
 		c = runtime_->create_class(
 			name,
 			"The `Time` class represent information about point-in-time.",
-			HHuginn::ACCESS::PRIVATE
+			HHuginn::ACCESS::PUBLIC,
+			HClass::TYPE::BUILTIN,
+			nullptr,
+			&HTime::create_instance
 		);
 		HHuginn::field_definitions_t fd{
 			{ "mod_year",     runtime_->create_method( &HTime::mod, "Time.mod_year",   &hcore::HTime::mod_year ),   "( *num* ) - modify time value by *num* of years" },
