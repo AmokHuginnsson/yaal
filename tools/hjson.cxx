@@ -1,6 +1,6 @@
 /* Read yaal/LICENSE.md file for copyright and licensing information. */
 
-#include "hcore/base.hxx"
+#include "tools/executingparser.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hjson.hxx"
@@ -252,6 +252,167 @@ void dump( HJSON::HValue const& value_, yaal::hcore::HStreamInterface& out_, int
 void HJSON::save( yaal::hcore::HStreamInterface& out_, bool indent_ ) {
 	M_PROLOG
 	dump( _element, out_, 0, indent_ );
+	out_ << endl;
+	return;
+	M_EPILOG
+}
+
+class HJSONParser {
+private:
+	typedef yaal::hcore::HStack<HJSON::HValue::array_t> store_t;
+	HExecutingParser _engine;
+	HJSON& _json;
+	store_t _store;
+public:
+	HJSONParser( HJSON& json_ )
+		: _engine( make_engine() )
+		, _json( json_ )
+		, _store() {
+		_store.push( HJSON::HValue::array_t() );
+	}
+	void parse( yaal::hcore::HString const& data_ ) {
+		M_PROLOG
+		if ( ! _engine.parse( data_.begin(), data_.end() ) ) {
+			throw HJSONException(
+				"Invalid JSON data at position "_ys
+					.append( _engine.error_position() )
+					.append( " in input stream, " )
+					.append( _engine.error_messages()[0] )
+			);
+		}
+		_engine.execute();
+		if ( ! _store.top().is_empty() ) {
+			_json.element() = yaal::move( _store.top().front() );
+		}
+		return;
+		M_EPILOG
+	}
+private:
+	void store_string( yaal::hcore::HString const& string_ ) {
+		M_PROLOG
+		_store.top().push_back( string_ );
+		return;
+		M_EPILOG
+	}
+	void store_real( yaal::hcore::HString const& real_ ) {
+		M_PROLOG
+		static int long const MAX_DECIMAL_DIGIT_DOUBLE_LONG_RESOLUTION( 22 );
+		if ( real_.get_length() > MAX_DECIMAL_DIGIT_DOUBLE_LONG_RESOLUTION ) {
+			_store.top().push_back( HNumber( real_ ) );
+		} else {
+			_store.top().push_back( lexical_cast<double long>( real_ ) );
+		}
+		return;
+		M_EPILOG
+	}
+	void store_integer( int long long integer_ ) {
+		M_PROLOG
+		_store.top().push_back( integer_ );
+		return;
+		M_EPILOG
+	}
+	void store_literal( HJSON::HValue::LITERAL literal_ ) {
+		M_PROLOG
+		_store.top().push_back( literal_ );
+		return;
+		M_EPILOG
+	}
+	void nest( void ) {
+		M_PROLOG
+		_store.push( HJSON::HValue::array_t() );
+		return;
+		M_EPILOG
+	}
+	void store_array( void ) {
+		M_PROLOG
+		HJSON::HValue::array_t array( yaal::move( _store.top() ) );
+		_store.pop();
+		_store.top().push_back( yaal::move( array ) );
+		return;
+		M_EPILOG
+	}
+	void store_object( void ) {
+		M_PROLOG
+		HJSON::HValue::array_t membersParts( yaal::move( _store.top() ) );
+		_store.pop();
+		M_ASSERT( ( membersParts.get_size() % 2 ) == 0 );
+		HJSON::HValue::members_t members;
+		for ( HJSON::HValue::array_t::iterator it( membersParts.begin() ), end( membersParts.end() ); it != end; ++ it ) {
+			HString key( it->get_string() );
+			++ it;
+			members.insert( make_pair( key, yaal::move( *it ) ) );
+		}
+		_store.top().push_back( yaal::move( members ) );
+		return;
+		M_EPILOG
+	}
+	executing_parser::HRule make_engine( void );
+};
+
+executing_parser::HRule HJSONParser::make_engine( void ) {
+	M_PROLOG
+	namespace e_p = executing_parser;
+	e_p::HRule element( "JSON.element" );
+	e_p::HRule literalTrue(
+		"JSON.Literal.true",
+		e_p::constant( "true" )[e_p::HRuleBase::action_t( hcore::call( &HJSONParser::store_literal, this, HJSON::HValue::LITERAL::TRUE ) )]
+	);
+	e_p::HRule literalFalse(
+		"JSON.Literal.false",
+		e_p::constant( "false" )[e_p::HRuleBase::action_t( hcore::call( &HJSONParser::store_literal, this, HJSON::HValue::LITERAL::FALSE ) )]
+	);
+	e_p::HRule literalNull(
+		"JSON.Literal.null",
+		e_p::constant( "null" )[e_p::HRuleBase::action_t( hcore::call( &HJSONParser::store_literal, this, HJSON::HValue::LITERAL::NULL ) )]
+	);
+	e_p::HRule stringLiteral(
+		"JSON.string",
+		e_p::string_literal[e_p::HStringLiteral::action_string_t( hcore::call( &HJSONParser::store_string, this, _1 ) )]
+	);
+	e_p::HRule integerLiteral(
+		"JSON.integer",
+		e_p::integer[e_p::HInteger::action_int_long_long_t( hcore::call( &HJSONParser::store_integer, this, _1 ) )]
+	);
+	e_p::HRule realLiteral(
+		"JSON.real",
+		e_p::real( e_p::HReal::PARSE::STRICT )[e_p::HReal::action_string_t( hcore::call( &HJSONParser::store_real, this, _1 ) )]
+	);
+	e_p::HRule elements( "JSON.Array.elements", element >> *( ',' >> element ) );
+	e_p::HRule array(
+		"JSON.Array",
+		e_p::constant( '[' )[e_p::HRuleBase::action_t( hcore::call( &HJSONParser::nest, this ) )] >> -elements >> ']',
+		e_p::HRuleBase::action_t( hcore::call( &HJSONParser::store_array, this ) )
+	);
+	e_p::HRule member( "JSON.Object.member", stringLiteral >> ":" >> element );
+	e_p::HRule members( "JSON.Object.members", member >> *( ',' >> member ) );
+	e_p::HRule object(
+		"JSON.Object",
+		e_p::constant( '{' )[e_p::HRuleBase::action_t( hcore::call( &HJSONParser::nest, this ) )] >> -members >> '}',
+		e_p::HRuleBase::action_t( hcore::call( &HJSONParser::store_object, this ) )
+	);
+	element %= ( object | array | stringLiteral | realLiteral | integerLiteral | literalTrue | literalFalse | literalNull );
+	e_p::HRule json( "JSON", element );
+	return ( json );
+	M_EPILOG
+}
+
+void HJSON::load( yaal::hcore::HStreamInterface& in_ ) {
+	M_PROLOG
+	static int const PAGE_SIZE( static_cast<int>( system::get_page_size() ) );
+	int nRead( 0 );
+	int block( 0 );
+	HChunk readBuffer;
+	int totalSize( 0 );
+	do {
+		readBuffer.realloc( ( block + 1 ) * PAGE_SIZE );
+		nRead = static_cast<int>( in_.read( readBuffer.get<char>() + block * PAGE_SIZE, PAGE_SIZE ) );
+		M_ENSURE( nRead >= 0 );
+		totalSize += nRead;
+		++ block;
+	} while ( nRead == PAGE_SIZE );
+	HString data( readBuffer.get<char>(), totalSize );
+	HJSONParser p( *this );
+	p.parse( data );
 	return;
 	M_EPILOG
 }
