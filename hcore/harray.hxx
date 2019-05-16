@@ -217,7 +217,12 @@ public:
 	 */
 	void clear( void ) {
 		M_PROLOG
+#	pragma GCC diagnostic push
+#if __GCC_VERSION__ > 0
+#	pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif /* #if __GCC_VERSION__ > 0 */
 		while ( _size > 0 ) {
+#	pragma GCC diagnostic pop
 			M_SAFE( _buf[ _size - 1 ].~value_type() );
 			-- _size;
 		}

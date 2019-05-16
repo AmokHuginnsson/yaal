@@ -259,7 +259,12 @@ public:
 	void clear( void ) {
 		M_PROLOG
 		HAtom** buckets = _buckets.get<HAtom*>();
+#	pragma GCC diagnostic push
+#if __GCC_VERSION__ > 0
+#	pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif /* #if __GCC_VERSION__ > 0 */
 		for ( size_type i = 0; i < _prime; i ++ ) {
+#	pragma GCC diagnostic pop
 			HAtom* atom( buckets[ i ] );
 			while ( atom ) {
 				HAtom* del( atom );
