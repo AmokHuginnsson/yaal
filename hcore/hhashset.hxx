@@ -322,12 +322,23 @@ public:
 	}
 	bool operator == ( HHashSet const& set_ ) const {
 		M_PROLOG
-		return ( ( &set_ == this ) || safe_equal( begin(), end(), set_.begin(), set_.end() ) );
+		if ( &set_ == this ) {
+			return ( true );
+		}
+		if ( _engine.get_size() != set_._engine.get_size() ) {
+			return ( false );
+		}
+		for ( value_type const& e : *this ) {
+			if ( set_._engine.find( e ) == set_._engine.end() ) {
+				return ( false );
+			}
+		}
+		return ( true );
 		M_EPILOG
 	}
-	bool operator < ( HHashSet const& set_ ) const {
+	bool operator != ( HHashSet const& set_ ) const {
 		M_PROLOG
-		return ( ( &set_ != this ) && lexicographical_compare( begin(), end(), set_.begin(), set_.end() ) );
+		return ( ! operator == ( set_ ) );
 		M_EPILOG
 	}
 private:

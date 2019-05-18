@@ -359,12 +359,27 @@ public:
 	}
 	bool operator == ( HHashMap const& map_ ) const {
 		M_PROLOG
-		return ( ( &map_ == this ) || safe_equal( begin(), end(), map_.begin(), map_.end() ) );
+		if ( &map_ == this ) {
+			return ( true );
+		}
+		if ( _engine.get_size() != map_._engine.get_size() ) {
+			return ( false );
+		}
+		for ( value_type const& e : *this ) {
+			const_iterator it( map_.find( e.first ) );
+			if ( it == map_.end() ) {
+				return ( false );
+			}
+			if ( ! ( it->second == e.second ) ) {
+				return ( false );
+			}
+		}
+		return ( true );
 		M_EPILOG
 	}
-	bool operator < ( HHashMap const& map_ ) const {
+	bool operator != ( HHashMap const& map_ ) const {
 		M_PROLOG
-		return ( ( &map_ != this ) && lexicographical_compare( begin(), end(), map_.begin(), map_.end() ) );
+		return ( ! operator == ( map_ ) );
 		M_EPILOG
 	}
 private:

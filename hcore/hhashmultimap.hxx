@@ -369,12 +369,27 @@ public:
 	}
 	bool operator == ( HHashMultiMap const& map_ ) const {
 		M_PROLOG
-		return ( ( &map_ == this ) || safe_equal( begin(), end(), map_.begin(), map_.end() ) );
+		if ( &map_ == this ) {
+			return ( true );
+		}
+		if ( _engine.get_size() != map_._engine.get_size() ) {
+			return ( false );
+		}
+		for ( typename hashmultimap_engine_t::value_type const& e : _engine ) {
+			typename hashmultimap_engine_t::const_iterator it( map_._engine.find( e.first ) );
+			if ( it == map_._engine.end() ) {
+				return ( false );
+			}
+			if ( ! ( *(e.second) == *(it->second) ) ) {
+				return ( false );
+			}
+		}
+		return ( true );
 		M_EPILOG
 	}
-	bool operator < ( HHashMultiMap const& map_ ) const {
+	bool operator != ( HHashMultiMap const& map_ ) const {
 		M_PROLOG
-		return ( ( &map_ != this ) && lexicographical_compare( begin(), end(), map_.begin(), map_.end() ) );
+		return ( ! operator == ( map_ ) );
 		M_EPILOG
 	}
 private:

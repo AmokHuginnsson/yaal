@@ -340,12 +340,27 @@ public:
 	}
 	bool operator == ( HHashMultiSet const& set_ ) const {
 		M_PROLOG
-		return ( ( &set_ == this ) || safe_equal( begin(), end(), set_.begin(), set_.end() ) );
+		if ( &set_ == this ) {
+			return ( true );
+		}
+		if ( _engine.get_size() != set_._engine.get_size() ) {
+			return ( false );
+		}
+		for ( typename engine_t::HIterator it( _engine.begin() ), endIt( _engine.end() ); it != endIt; ++ it ) {
+			typename engine_t::HIterator otherIt( set_._engine.find( it.get().first ) );
+			if ( otherIt == set_._engine.end() ) {
+				return ( false );
+			}
+			if ( ! ( it.get().second == otherIt.get().second ) ) {
+				return ( false );
+			}
+		}
+		return ( true );
 		M_EPILOG
 	}
-	bool operator < ( HHashMultiSet const& set_ ) const {
+	bool operator != ( HHashMultiSet const& set_ ) const {
 		M_PROLOG
-		return ( ( &set_ != this ) && lexicographical_compare( begin(), end(), set_.begin(), set_.end() ) );
+		return ( ! operator == ( set_ ) );
 		M_EPILOG
 	}
 private:
