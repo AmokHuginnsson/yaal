@@ -109,7 +109,7 @@ public:
 	}
 	~HVariant( void ) {
 		M_PROLOG
-		destroy( _type, _mem.mem() );
+		reset();
 		M_DESTRUCTOR_EPILOG
 	}
 	template<typename tType>
@@ -158,6 +158,10 @@ public:
 			v_._type = INVALID;
 		}
 		return ( *this );
+	}
+	void reset( void ) {
+		destroy( _type, _mem.mem() );
+		_type = INVALID;
 	}
 	void swap( HVariant& v_ ) noexcept {
 		if ( &v_ != this ) {

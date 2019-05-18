@@ -67,6 +67,10 @@ public:
 		HValue( array_t const& );
 		HValue( members_t const& );
 		HValue( LITERAL );
+		bool operator == ( HValue const& ) const;
+		bool operator != ( HValue const& other_ ) const {
+			return ( ! operator == ( other_ ) );
+		}
 		void push_back( HValue const& );
 		HValue& operator[] ( int );
 		HValue& operator[] ( int long );
@@ -80,17 +84,29 @@ public:
 		yaal::hcore::HNumber const& get_number( void ) const;
 		LITERAL get_literal( void ) const;
 		array_t const& get_elements( void ) const;
+		array_t& get_elements( void );
 		members_t const& get_members( void ) const;
+		members_t& get_members( void );
 		TYPE type( void ) const;
+		void reset( void );
 	};
 	typedef yaal::hcore::HResource<HValue> value_t;
 private:
 	HValue _element;
 public:
 	HJSON( void );
+	HJSON( HJSON const& ) = default;
+	HJSON( HJSON&& ) = default;
+	HJSON& operator = ( HJSON const& ) = default;
+	HJSON& operator = ( HJSON&& ) = default;
+	bool operator == ( HJSON const& ) const;
+	bool operator != ( HJSON const& other_ ) const {
+		return ( ! operator == ( other_ ) );
+	}
 	HValue& element( void );
 	void load( yaal::hcore::HStreamInterface& );
-	void save( yaal::hcore::HStreamInterface&, bool = true );
+	void save( yaal::hcore::HStreamInterface&, bool = true ) const;
+	void clear( void );
 };
 
 typedef yaal::hcore::HExceptionT<HJSON> HJSONException;

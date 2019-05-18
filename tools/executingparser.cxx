@@ -262,7 +262,6 @@ bool HExecutingParser::parse( yaal::hcore::HString::const_iterator first_, yaal:
 	M_EPILOG
 }
 
-
 bool HExecutingParser::do_parse( void ) {
 	M_PROLOG
 	_executors.clear();
@@ -270,14 +269,16 @@ bool HExecutingParser::do_parse( void ) {
 	_errorPosition = yaal::hcore::HString::npos;
 	_errorMessages.clear();
 	yaal::hcore::HUTF8String::const_iterator it( _grammar->parse( this, _buffer.begin(), _buffer.end() ) );
-	if ( ( it != _buffer.begin() ) && ( position( it ) != _errorPosition ) && ( executing_parser::HRuleBase::skip_space( it, _buffer.end() ) == _buffer.end() ) ) {
+	yaal::hcore::HUTF8String::const_iterator spaceSkipper( it );
+	bool consumedSpaceSkipped( executing_parser::HRuleBase::skip_space( spaceSkipper, _buffer.end() ) == _buffer.end() );
+	if ( ( it != _buffer.begin() ) && ( position( it ) != _errorPosition ) && consumedSpaceSkipped ) {
 		_errorPosition = yaal::hcore::HString::npos;
 		_errorMessages.clear();
 	} else if ( _errorPosition == yaal::hcore::HString::npos ) {
 		report_error( it, "failed to consume input" );
 	}
 	_inputStart = HUTF8String::const_iterator();
-	_matched = ( it == _buffer.end() ) && ( ( _buffer.begin() != _buffer.end() ) || _grammar->is_optional() );
+	_matched = consumedSpaceSkipped && ( ( ( _buffer.begin() != _buffer.end() ) && ( it != _buffer.begin() ) ) || _grammar->is_optional() );
 	return ( _matched );
 	M_EPILOG
 }

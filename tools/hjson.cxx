@@ -44,6 +44,41 @@ HJSON::HValue::HValue( members_t const& value_ )
 	: _data( value_ ) {
 }
 
+bool HJSON::HValue::operator == ( HValue const& other_ ) const {
+	M_PROLOG
+	TYPE t( type() );
+	if ( other_.type() != t ) {
+		return ( false );
+	}
+	switch ( t ) {
+		case ( TYPE::INTEGER ): return ( get_integer() == other_.get_integer() );
+		case ( TYPE::REAL ):    return ( get_real()    == other_.get_real() );
+		case ( TYPE::NUMBER ):  return ( get_number()  == other_.get_number() );
+		case ( TYPE::STRING ):  return ( get_string()  == other_.get_string() );
+		case ( TYPE::LITERAL ): return ( get_literal() == other_.get_literal() );
+		case ( TYPE::ARRAY ): {
+			array_t const& a( get_elements() );
+			array_t const& oa( other_.get_elements() );
+			return ( a == oa );
+		}
+		case ( TYPE::MAP ): {
+			members_t const& m( get_members() );
+			members_t const& om( other_.get_members() );
+			return ( m == om );
+		}
+		default: break;
+	}
+	return ( true );
+	M_EPILOG
+}
+
+void HJSON::HValue::reset( void ) {
+	M_PROLOG
+	_data.reset();
+	return;
+	M_EPILOG
+}
+
 void HJSON::HValue::push_back( HValue const& value_ ) {
 	M_PROLOG
 	int dt( _data.type() );
@@ -160,10 +195,36 @@ HJSON::HValue::array_t const& HJSON::HValue::get_elements( void ) const {
 	M_EPILOG
 }
 
+HJSON::HValue::array_t& HJSON::HValue::get_elements( void ) {
+	M_PROLOG
+	int dt( _data.type() );
+	if ( ( dt != data_t::INVALID ) && ( dt != static_cast<int>( TYPE::ARRAY ) ) ) {
+		throw HJSONException( "Pushing elements to non-array value." );
+	}
+	if ( dt == data_t::INVALID ) {
+		_data = data_t( array_t() );
+	}
+	return ( _data.get<array_t>() );
+	M_EPILOG
+}
+
 HJSON::HValue::members_t const& HJSON::HValue::get_members( void ) const {
 	M_PROLOG
 	if ( _data.type() != static_cast<int>( TYPE::MAP ) ) {
 		throw HJSONException( "Getting members of non-map value." );
+	}
+	return ( _data.get<members_t>() );
+	M_EPILOG
+}
+
+HJSON::HValue::members_t& HJSON::HValue::get_members( void ) {
+	M_PROLOG
+	int dt( _data.type() );
+	if ( ( dt != data_t::INVALID ) && ( dt != static_cast<int>( TYPE::MAP ) ) ) {
+		throw HJSONException( "Getting member of non-map value." );
+	}
+	if ( dt == data_t::INVALID ) {
+		_data = data_t( members_t() );
 	}
 	return ( _data.get<members_t>() );
 	M_EPILOG
@@ -249,10 +310,19 @@ void dump( HJSON::HValue const& value_, yaal::hcore::HStreamInterface& out_, int
 }
 }
 
-void HJSON::save( yaal::hcore::HStreamInterface& out_, bool indent_ ) {
+bool HJSON::operator == ( HJSON const& other_ ) const {
+	return ( _element == other_._element );
+}
+
+void HJSON::save( yaal::hcore::HStreamInterface& out_, bool indent_ ) const {
 	M_PROLOG
+	if ( _element.type() == HValue::TYPE::UNINITIALIZED ) {
+		return;
+	}
 	dump( _element, out_, 0, indent_ );
-	out_ << endl;
+	if ( indent_ ) {
+		out_ << endl;
+	}
 	return;
 	M_EPILOG
 }
@@ -412,7 +482,15 @@ void HJSON::load( yaal::hcore::HStreamInterface& in_ ) {
 	} while ( nRead == PAGE_SIZE );
 	HString data( readBuffer.get<char>(), totalSize );
 	HJSONParser p( *this );
+	clear();
 	p.parse( data );
+	return;
+	M_EPILOG
+}
+
+void HJSON::clear( void ) {
+	M_PROLOG
+	_element.reset();
 	return;
 	M_EPILOG
 }
