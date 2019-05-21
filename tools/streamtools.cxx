@@ -128,18 +128,9 @@ HBinaryFormatter& HBinaryFormatter::operator << ( double v_ ) {
 
 HBinaryFormatter& HBinaryFormatter::operator << ( double long v_ ) {
 	M_PROLOG
-#if SIZEOF_DOUBLE_LONG > 8
-	/*
-	 * Use only first 80 bits of input.
-	 */
-	static size_t const BUF_SIZE( 10 );
-#else
-	static size_t const BUF_SIZE( sizeof ( v_ ) );
-#endif
-	char buf[BUF_SIZE];
-	::memcpy( buf, &v_, sizeof ( buf ) );
-	reverse( buf, buf + sizeof ( buf ) );
-	return ( binary( buf, static_cast<int>( sizeof ( buf ) ) ) );
+	char* mem( static_cast<char*>( static_cast<void*>( &v_ ) ) );
+	reverse( mem, mem + SIZEOF_DOUBLE_LONG_PRECISION );
+	return ( binary( mem, SIZEOF_DOUBLE_LONG_PRECISION ) );
 	M_EPILOG
 }
 

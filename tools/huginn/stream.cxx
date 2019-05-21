@@ -112,10 +112,11 @@ public:
 			{ "read_integer_unsigned", runtime_->create_method( &HStream::read_fwd,  "Stream.read_integer_unsigned",    &HStream::read_integer_unsigned ), "( *count* ) read *count==(1|2|4|8)* bytes of data as an `integer` from this stream's unsigned raw storage" },
 			{ "read_real",       runtime_->create_method( &HStream::read_fwd,  "Stream.read_real",       &HStream::read_real ),
 				"( *count* ) read *count==(" M_STRINGIFY( SIZEOF_FLOAT )
-#if SIZEOF_DOUBLE != SIZEOF_DOUBLE_LONG
 					"|" M_STRINGIFY( SIZEOF_DOUBLE )
-#endif /* #if SIZEOF_DOUBLE != SIZEOF_DOUBLE_LONG */
-					"|" M_STRINGIFY( SIZEOF_DOUBLE_LONG ) ")* bytes of data as a `real` from this stream"
+#if SIZEOF_DOUBLE_LONG > SIZEOF_DOUBLE
+					"|" M_STRINGIFY( SIZEOF_DOUBLE_LONG )
+#endif /* #if SIZEOF_DOUBLE_LONG > SIZEOF_DOUBLE */
+					")* bytes of data as a `real` from this stream"
 			},
 			{ "read_character",  runtime_->create_method( &HStream::read_fwd,  "Stream.read_character",  &HStream::read_character ),  "( *count* ) read *count==(1|2|4)* bytes of data as a `character` from this stream" },
 			{ "write_blob",      runtime_->create_method( &HStream::write_fwd, "Stream.write_blob",      HHuginn::TYPE::BLOB,      &HStream::write_blob ),      "( *blobVal*, *count* ) - write *count* number of bytes from given *blobVal* info this stream" },
@@ -124,10 +125,11 @@ public:
 			{ "write_integer_unsigned",   runtime_->create_method( &HStream::write_fwd, "Stream.write_integer_unsigned",   HHuginn::TYPE::INTEGER,   &HStream::write_integer_unsigned ) ,  "( *intVal*, *count* ) - write *count==(1|2|4|8)* number of bytes from given *intVal* info this stream's unsigned raw storage" },
 			{ "write_real",      runtime_->create_method( &HStream::write_fwd, "Stream.write_real",      HHuginn::TYPE::REAL,      &HStream::write_real ),
 				"( *realVal*, *count* ) - write *count==(" M_STRINGIFY( SIZEOF_FLOAT )
-#if SIZEOF_DOUBLE != SIZEOF_DOUBLE_LONG
 					"|" M_STRINGIFY( SIZEOF_DOUBLE )
-#endif /* #if SIZEOF_DOUBLE != SIZEOF_DOUBLE_LONG */
-					"|" M_STRINGIFY( SIZEOF_DOUBLE_LONG ) ")* number of bytes from given *realVal* info this stream" },
+#if SIZEOF_DOUBLE_LONG > SIZEOF_DOUBLE
+					"|" M_STRINGIFY( SIZEOF_DOUBLE_LONG )
+#endif /* #if SIZEOF_DOUBLE_LONG > SIZEOF_DOUBLE */
+					")* number of bytes from given *realVal* info this stream" },
 			{ "write_character", runtime_->create_method( &HStream::write_fwd, "Stream.write_character", HHuginn::TYPE::CHARACTER, &HStream::write_character ), "( *charVal*, *count* ) - write *count==(1|2|4)* number of bytes from given *charVal* info this stream" },
 			{ "seek",            runtime_->create_method( &HStream::seek ),        "( *offset*, *anchor* ) - move reading/writing position to the *offset* counted from an *anchor*" },
 			{ "read_line",       runtime_->create_method( &HStream::read_line ),   "read single line of text from this stream" },
@@ -462,16 +464,16 @@ HHuginn::value_t HStream::read_real( HThread* thread_, huginn::HInteger::value_t
 			nRead = static_cast<int>( _stream->read( &f, toRead ) );
 			val = f;
 		} break;
-#if SIZEOF_DOUBLE != SIZEOF_DOUBLE_LONG
 		case ( sizeof ( double ) ): {
 			double d( 0 );
 			nRead = static_cast<int>( _stream->read( &d, toRead ) );
 			val = d;
 		} break;
-#endif /* #if SIZEOF_DOUBLE != SIZEOF_DOUBLE_LONG */
+#if SIZEOF_DOUBLE_LONG > SIZEOF_DOUBLE
 		case ( sizeof ( HReal::value_type ) ): {
 			nRead = static_cast<int>( _stream->read( &val, toRead ) );
 		} break;
+#endif /* #if SIZEOF_DOUBLE_LONG > SIZEOF_DOUBLE */
 		default: {
 			throw HHuginn::HHuginnRuntimeException(
 				"Invalid read size.",
@@ -638,15 +640,16 @@ void HStream::write_real( HThread* thread_, HHuginn::value_t const& value_, hugi
 			float f( static_cast<float>( val ) );
 			nWritten = static_cast<int>( _stream->write( &f, toWrite ) );
 		} break;
-#if SIZEOF_DOUBLE != SIZEOF_DOUBLE_LONG
 		case ( sizeof ( double ) ): {
 			double d( static_cast<double>( val ) );
 			nWritten = static_cast<int>( _stream->write( &d, toWrite ) );
 		} break;
-#endif /* #if SIZEOF_DOUBLE != SIZEOF_DOUBLE_LONG */
+#if SIZEOF_DOUBLE_LONG > SIZEOF_DOUBLE
 		case ( sizeof ( HReal::value_type ) ): {
+			normalize_double_long( val );
 			nWritten = static_cast<int>( _stream->write( &val, toWrite ) );
 		} break;
+#endif /* #if SIZEOF_DOUBLE > SIZEOF_DOUBLE_LONG */
 		default: {
 			throw HHuginn::HHuginnRuntimeException(
 				"Invalid write size.",

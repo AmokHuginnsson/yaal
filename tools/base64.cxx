@@ -38,6 +38,7 @@ public:
 namespace {
 
 void do_buf_3_to_4( HChunk& out, int long& outSize, u32_t in, int mode, int long pad = 0 ) {
+	M_ASSERT( ( mode == 0 ) || ( mode == 1 ) );
 	static int const ENC_OUT_SIZE( 4 );
 	out.realloc( outSize + ENC_OUT_SIZE );
 	char* buf( out.get<char>() + outSize );

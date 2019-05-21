@@ -53,8 +53,11 @@ public:
 		HMemory ms( yaal::move( mpRef ) );
 		HStringStream ss( get_string( values_[0] ) );
 		base64::decode( ss, ms );
-		HChunk data( mp->get_size() );
-		::memcpy( data.raw(), workBuffer.raw(), static_cast<size_t>( mp->get_size() ) );
+		HChunk data;
+		if ( mp->get_size() > 0 ) {
+			data.realloc( mp->get_size(), HChunk::STRATEGY::EXACT );
+			::memcpy( data.raw(), workBuffer.raw(), static_cast<size_t>( mp->get_size() ) );
+		}
 		return ( thread_->object_factory().create_blob( yaal::move( data ) ) );
 		M_EPILOG
 	}

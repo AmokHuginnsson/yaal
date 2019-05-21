@@ -76,10 +76,25 @@ to_t bit_cast( from_t val_ ) {
 		char _buf;
 	} cast;
 	/* We shall not use hcore/algorithm.hxx here or we suffer compilation slowdown. */
-	for ( int i( 0 ), SIZE( static_cast<int>( sizeof ( from_t ) > sizeof ( to_t ) ? sizeof ( from_t ) : sizeof ( to_t ) ) ); i < SIZE; ++ i )
+	int SIZE( static_cast<int>( sizeof ( from_t ) > sizeof ( to_t ) ? sizeof ( from_t ) : sizeof ( to_t ) ) );
+	for ( int i( 0 ); i < SIZE; ++ i ) {
 		(&cast._buf)[ i ] = 0;
+	}
 	cast._from = val_;
 	return ( cast._to );
+}
+
+#if SIZEOF_DOUBLE_LONG > SIZEOF_DOUBLE
+static int const SIZEOF_DOUBLE_LONG_PRECISION( 10 );
+#else /* #if SIZEOF_DOUBLE_LONG > SIZEOF_DOUBLE */
+static int const SIZEOF_DOUBLE_LONG_PRECISION( SIZEOF_DOUBLE_LONG );
+#endif /* #else #if SIZEOF_DOUBLE_LONG > SIZEOF_DOUBLE */
+inline void normalize_double_long( double long& val_ ) {
+	char* mem( static_cast<char*>( static_cast<void*>( &val_ ) ) );
+	for ( int i( SIZEOF_DOUBLE_LONG_PRECISION ); i < SIZEOF_DOUBLE_LONG; ++ i ) {
+		mem[ i ] = 0;
+	}
+	return;
 }
 
 /*! \brief Temporarily backup some value on a side and restore it at end of scope.

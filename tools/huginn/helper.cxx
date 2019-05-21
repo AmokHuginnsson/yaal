@@ -358,7 +358,7 @@ void verify_signature_by_class( char const* name_, HHuginn::values_t& values_, i
 	int argCount( static_cast<int>( values_.get_size() ) );
 	ARITY arity( argCount == 1 ? ARITY::UNARY : ARITY::MULTIPLE );
 	for ( int i( 0 ); i < argCount; ++ i ) {
-		if ( classes_[i]->type_id() != HHuginn::TYPE::UNKNOWN ) {
+		if ( classes_[i] != nullptr ) {
 			verify_arg_type( name_, values_, i, classes_[i], arity, thread_, position_ );
 		}
 	}
