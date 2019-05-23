@@ -231,13 +231,13 @@ HResponse get( HRequest const& request_ ) {
 namespace {
 
 int long HHTTPStream::do_read( void* data_, int long size_ ) {
-	int nWritten( 0 );
+	int nRead( 0 );
 	while ( size_ > 0 ) {
 		if ( _cachedHTTPBytes == 0 ) {
 			if ( _contentBytesLeft == 0 ) {
 				if ( _transferEncoding & TRANSFER_ENCODING::CHUNKED ) {
 					if ( ! getline( *_socket, _lineCache ).good() ) {
-						return ( 0 );
+						return ( nRead );
 					}
 					_contentBytesLeft = stoi( _lineCache, nullptr, 16 );
 				} else if ( _contentLength == 0 ) {
@@ -255,20 +255,20 @@ int long HHTTPStream::do_read( void* data_, int long size_ ) {
 					_socket->read( waste, 2 );
 				}
 			} else {
-				return ( 0 );
+				return ( nRead );
 			}
 		}
 		if ( _cachedHTTPBytes == 0 ) {
-			return ( 0 );
+			return ( nRead );
 		}
 		int toRead( min( _cachedHTTPBytes, safe_int::cast<int>( size_ ) ) );
-		::memcpy( static_cast<char*>( data_ ) + nWritten, _httpCache.get<char>() + _offsetInChunk, static_cast<size_t>( toRead ) );
+		::memcpy( static_cast<char*>( data_ ) + nRead, _httpCache.get<char>() + _offsetInChunk, static_cast<size_t>( toRead ) );
 		size_ -= toRead;
 		_cachedHTTPBytes -= toRead;
 		_offsetInChunk += toRead;
-		nWritten += toRead;
+		nRead += toRead;
 	}
-	return ( nWritten );
+	return ( nRead );
 }
 
 yaal::hcore::HString make_request_string( URL const& url_, HRequest const& request_ ) {
