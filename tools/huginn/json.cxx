@@ -52,7 +52,7 @@ public:
 			} break;
 			case ( HHuginn::TYPE::BOOLEAN ): {
 				bool booleanValue( get_boolean( v_ ) );
-				v = booleanValue ? tools::HJSON::HValue::LITERAL::TRUE : tools::HJSON::HValue::LITERAL::TRUE;
+				v = booleanValue ? tools::HJSON::HValue::LITERAL::TRUE : tools::HJSON::HValue::LITERAL::FALSE;
 			} break;
 			case ( HHuginn::TYPE::NONE ): {
 				v = tools::HJSON::HValue::LITERAL::NULL;

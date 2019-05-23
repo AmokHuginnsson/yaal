@@ -207,11 +207,14 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
 	verify_signature( "set.equals", values_, { HHuginn::TYPE::SET }, thread_, position_ );
-	huginn::HSet::values_t const& l( static_cast<huginn::HSet*>( object_->raw() )->value() );
-	huginn::HSet::values_t const& r( static_cast<huginn::HSet const*>( values_[0].raw() )->value() );
-	bool equal( l.get_size() == r.get_size() );
-	for ( huginn::HSet::values_t::const_iterator lit( l.begin() ), rit( r.begin() ), end( l.end() ); equal && ( lit != end ); ++ lit, ++ rit ) {
-		equal = instruction::equals( thread_, *lit, *rit, position_ );
+	huginn::HSet* self( static_cast<huginn::HSet*>( object_->raw() ) );
+	huginn::HSet::values_t const& selfData( self->value() );
+	huginn::HSet::values_t const& otherData( static_cast<huginn::HSet const*>( values_[0].raw() )->value() );
+	bool equal( selfData.get_size() == otherData.get_size() );
+	HAnchorGuard<huginn::HSet> ag( *self, thread_, position_ );
+	for ( huginn::HSet::values_t::const_iterator it( otherData.begin() ), end( otherData.end() ); equal && ( it != end ); ++ it ) {
+		huginn::HSet::values_t::const_iterator selfIt( selfData.find( *it ) );
+		equal = selfIt != selfData.end();
 	}
 	return ( thread_->runtime().boolean_value( equal ) );
 	M_EPILOG
