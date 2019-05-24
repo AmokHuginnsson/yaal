@@ -1396,6 +1396,10 @@ HNumber& HNumber::operator ^= ( int long long exp_ ) {
 				from_integer( 1 );
 				operator /= ( n );
 			}
+		} else if ( exp_ == -1 ) {
+			HNumber n( *this );
+			from_integer( 1 );
+			operator /= ( n );
 		} else if ( exp == 0 ) {
 			from_integer( 1 );
 		}
