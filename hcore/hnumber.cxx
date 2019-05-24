@@ -461,6 +461,7 @@ void HNumber::from_string( HString const& number_ ) {
 	integer_t idx( static_cast<integer_t>( number_.find_other_than( "0", start ) ) ); /* skip leading 0s */
 	_integralPartSize = 0;
 	_leafCount = 0;
+	int exponent( 0 );
 	if ( idx != HString::npos ) {
 		do { /* "!!![-][.1-9]???" or "000." */
 			integer_t firstValid( start );
@@ -478,6 +479,7 @@ void HNumber::from_string( HString const& number_ ) {
 			M_ENSURE( ( digit - start ) <= 1 ); /* exclude "-..!!" and "..!!" */
 			integer_t end( static_cast<integer_t>( number_.find_other_than( dot >= 0 ? DIGITS : DIGITS_AND_DOT, dot >= 0 ? dot + 1 : start ) ) );
 			( end != HString::npos ) || ( end = len );
+			int denormalizedEnd( end );
 			if ( dot != HString::npos ) {
 				idx = static_cast<integer_t>( number_.reverse_find_other_than( "0", len - end ) );
 				end = ( idx != HString::npos ) ? len - idx : start + 1;
@@ -532,10 +534,32 @@ void HNumber::from_string( HString const& number_ ) {
 			} else if ( ( end - dot - 1 ) >= _precision ) {
 				_precision = end - dot;
 			}
-		} while ( 0 );
+			if ( denormalizedEnd >= len ) {
+				break;
+			}
+			code_point_t afterDenormalizedForm( number_[denormalizedEnd] );
+			if ( ( afterDenormalizedForm != 'e'_ycp ) && ( afterDenormalizedForm != 'E'_ycp ) ) {
+				break;
+			}
+			int exponentStartIdx( denormalizedEnd + 1 );
+			M_ENSURE( exponentStartIdx < len );
+			int exponentIdx( exponentStartIdx );
+			code_point_t exponentStartChar( number_[exponentIdx] );
+			if ( ( exponentStartChar == '-'_ycp ) || ( exponentStartChar == '+'_ycp ) ) {
+				++ exponentIdx;
+			}
+			M_ENSURE( ( exponentIdx < len ) && ( DIGITS.find( number_[exponentIdx] ) != HString::npos ) );
+			if ( exponentStartChar == '+'_ycp ) {
+				++ exponentStartIdx;
+			}
+			exponent = lexical_cast<int>( number_.substr( exponentStartIdx ) );
+		} while ( false );
 	}
 	if ( _leafCount == 0 ) {
 		_negative = false;
+	} else if ( exponent ) {
+		HNumber ten( 10 );
+		operator *= ( ten ^ exponent );
 	}
 	return;
 	M_EPILOG

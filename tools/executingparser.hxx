@@ -672,13 +672,16 @@ private:
 	PARSE _parse;
 	mutable yaal::hcore::HString _stringCache;
 	mutable yaal::hcore::HChunk _cache;
-	typedef enum {
+	enum class PARSING_STATE {
 		START = 0,
 		MINUS = 1,
 		INTEGRAL = 2,
 		DOT = 3,
-		DECIMAL = 4
-	} real_paring_state_t;
+		DECIMAL = 4,
+		EXPONENT = 5,
+		EXPONENT_SIGN = 6,
+		EXPONENT_DIGIT = 7
+	};
 public:
 	HReal( HReal const& );
 	HReal operator[]( action_t const& ) const;
@@ -748,11 +751,6 @@ private:
 	action_string_t _actionString;
 	action_string_range_t _actionStringPosition;
 	mutable yaal::hcore::HString _cache;
-	typedef enum {
-		START = 0,
-		MINUS = 1,
-		DIGIT = 2
-	} real_paring_state_t;
 public:
 	HInteger( HInteger const& );
 	HInteger operator[]( action_t const& ) const;

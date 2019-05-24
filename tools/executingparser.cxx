@@ -2535,44 +2535,80 @@ yaal::hcore::HUTF8String::const_iterator HReal::do_parse( HExecutingParser* exec
 	M_PROLOG
 	yaal::hcore::HUTF8String::const_iterator scan( first_ );
 	_stringCache.clear();
-	real_paring_state_t state( START );
+	PARSING_STATE state( PARSING_STATE::START );
 	if ( scan != last_ ) {
 		while ( scan != last_ ) {
 			bool stop( false );
 			code_point_t ch( *scan );
 			switch ( state ) {
-				case ( START ): {
+				case ( PARSING_STATE::START ): {
 					if ( is_digit( ch ) ) {
-						state = INTEGRAL;
+						state = PARSING_STATE::INTEGRAL;
 					} else if ( ch == '-' ) {
-						state = MINUS;
+						state = PARSING_STATE::MINUS;
 					} else if ( ch == '.' ) {
-						state = DOT;
+						state = PARSING_STATE::DOT;
 					} else {
 						stop = true;
 					}
 				} break;
-				case ( MINUS ):
-				case ( INTEGRAL ): {
+				case ( PARSING_STATE::MINUS ): {
 					if ( is_digit( ch ) ) {
-						state = INTEGRAL;
+						state = PARSING_STATE::INTEGRAL;
 					} else if ( ch == '.' ) {
-						state = DOT;
+						state = PARSING_STATE::DOT;
 					} else {
 						stop = true;
 					}
 				} break;
-				case ( DOT ):
-				case ( DECIMAL ): {
+				case ( PARSING_STATE::INTEGRAL ): {
 					if ( is_digit( ch ) ) {
-						state = DECIMAL;
+					} else if ( ch == '.' ) {
+						state = PARSING_STATE::DOT;
+					} else if ( ( ch == 'e' ) || ( ch == 'E' ) ) {
+						state = PARSING_STATE::EXPONENT;
 					} else {
 						stop = true;
 					}
 				} break;
-				default: {
-					M_ASSERT( ! "invalid hardcoded state"[0] );
-				}
+				case ( PARSING_STATE::DOT ): {
+					if ( is_digit( ch ) ) {
+						state = PARSING_STATE::DECIMAL;
+					} else if ( ( ch == 'e' ) || ( ch == 'E' ) ) {
+						state = PARSING_STATE::EXPONENT;
+					} else {
+						stop = true;
+					}
+				} break;
+				case ( PARSING_STATE::DECIMAL ): {
+					if ( is_digit( ch ) ) {
+					} else if ( ( ch == 'e' ) || ( ch == 'E' ) ) {
+						state = PARSING_STATE::EXPONENT;
+					} else {
+						stop = true;
+					}
+				} break;
+				case ( PARSING_STATE::EXPONENT ): {
+					if ( is_digit( ch ) ) {
+						state = PARSING_STATE::EXPONENT_DIGIT;
+					} else if ( ( ch == '-' ) || ( ch == '+' ) ) {
+						state = PARSING_STATE::EXPONENT_SIGN;
+					} else {
+						stop = true;
+					}
+				} break;
+				case ( PARSING_STATE::EXPONENT_SIGN ): {
+					if ( is_digit( ch ) ) {
+						state = PARSING_STATE::EXPONENT_DIGIT;
+					} else {
+						stop = true;
+					}
+				} break;
+				case ( PARSING_STATE::EXPONENT_DIGIT ): {
+					if ( !is_digit( ch ) ) {
+						stop = true;
+					}
+				} break;
 			}
 			if ( stop ) {
 				break;
@@ -2582,7 +2618,14 @@ yaal::hcore::HUTF8String::const_iterator HReal::do_parse( HExecutingParser* exec
 	} else {
 		scan = first_;
 	}
-	if ( ( ( _parse == PARSE::GREEDY ) && ( state >= INTEGRAL ) ) || ( ( _parse == PARSE::STRICT ) && ( state >= DOT ) ) ) {
+	if (
+		( state != PARSING_STATE::EXPONENT )
+		&& ( state != PARSING_STATE::EXPONENT_SIGN )
+		&& (
+			( ( _parse == PARSE::GREEDY ) && ( state >= PARSING_STATE::INTEGRAL ) )
+			|| ( ( _parse == PARSE::STRICT ) && ( state >= PARSING_STATE::DOT ) )
+		)
+	) {
 		range_t rng( range( executingParser_, first_, scan ) );
 		HUTF8String view( first_, scan );
 		int len( static_cast<int>( view.byte_count() ) );
