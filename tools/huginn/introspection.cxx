@@ -229,6 +229,28 @@ public:
 		return ( v );
 		M_EPILOG
 	}
+	static HHuginn::value_t list_imports( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( "Introspection.list_imports", values_, 0, 0, thread_, position_ );
+		HRuntime& r( thread_->runtime() );
+		HRuntime::global_definitions_t const& gds( r.globals() );
+		HObjectFactory& of( *r.object_factory() );
+		HHuginn::values_t data;
+		for ( HRuntime::global_definitions_t::value_type const& gd : gds ) {
+			if (
+				gd.second
+				&& ( (*gd.second)->type_id() != HHuginn::TYPE::FUNCTION_REFERENCE )
+				&& ! is_enum_class( gd.second )
+			) {
+				HHuginn::values_t rec;
+				rec.push_back( of.create_string( r.identifier_name( gd.first ) ) );
+				rec.push_back( of.create_string( (*gd.second)->get_class()->name() ) );
+				data.push_back( of.create_tuple( yaal::move( rec ) ) );
+			}
+		}
+		return ( of.create_list( yaal::move( data ) ) );
+		M_EPILOG
+	}
 	static HHuginn::value_t call_stack( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "Introspection.call_stack", values_, 0, 0, thread_, position_ );
@@ -267,6 +289,7 @@ HPackageCreatorInterface::HInstance HTntrospectionCreator::do_new_instance( HRun
 		{ "subject",         runtime_->create_method( &HIntrospection::subject ),         "( *bound_method* ) - get subject of *bound_method*." },
 		{ "kind",            runtime_->create_method( &HIntrospection::kind ),            "( *object* ) - tell what *kind* of *object* it is." },
 		{ "import",          runtime_->create_method( &HIntrospection::import ),          "( *package* ) - import given *package*." },
+		{ "list_imports",    runtime_->create_method( &HIntrospection::list_imports ),    "list imported packages." },
 		{ "call_stack",      runtime_->create_method( &HIntrospection::call_stack ),      "get current call stack." }
 	};
 	c->redefine( nullptr, fd );

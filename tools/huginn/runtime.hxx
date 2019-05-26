@@ -30,7 +30,6 @@ private:
 	typedef yaal::hcore::HPointer<huginn::HObjectFactory> object_factory_t;
 	typedef yaal::hcore::HLookupMap<identifier_id_t, class_t> classes_t;
 	typedef yaal::hcore::HHashSet<void const*> function_ids_t;
-	typedef yaal::hcore::HLookupMap<identifier_id_t, value_t> values_t;
 	/*! \brief A type for storing functions.
 	 *
 	 * Symbol resolving stores pointers to map values (value_t*),
@@ -39,8 +38,8 @@ private:
 	 */
 	typedef yaal::hcore::HList<value_t> values_store_t;
 	typedef yaal::hcore::HPointer<values_store_t> shared_values_store_t;
-	typedef yaal::hcore::HHashMap<identifier_id_t, value_t const*> global_definitions_t;
 public:
+	typedef yaal::hcore::HHashMap<identifier_id_t, value_t const*> global_definitions_t;
 	typedef yaal::hcore::HArray<HHuginn::class_t> dependencies_t;
 	typedef yaal::hcore::HArray<yaal::hcore::HString> identifier_names_t;
 	typedef yaal::hcore::HBoundCall<HHuginn::class_t ( type_id_t )> class_constructor_t;
@@ -251,6 +250,7 @@ public:
 	HHuginn::value_t const& boolean_value( bool value_ ) const {
 		return ( value_ ? *_true : *_false );
 	}
+	global_definitions_t const& globals( void ) const;
 	void set_incremental_frame( huginn::HThread::frame_t const& );
 	huginn::HThread::frame_t const& incremental_frame( void ) const;
 	HHuginn::paths_t const& module_paths( void ) const;

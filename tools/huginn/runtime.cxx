@@ -1164,6 +1164,10 @@ yaal::hcore::HString const* HRuntime::package_name( HClass const* class_ ) const
 	M_EPILOG
 }
 
+HRuntime::global_definitions_t const& HRuntime::globals( void ) const {
+	return ( _globalDefinitions );
+}
+
 HHuginn::call_stack_t HRuntime::get_call_stack( huginn::HThread* thread_ ) {
 	M_PROLOG
 	HHuginn::call_stack_t callStack;
