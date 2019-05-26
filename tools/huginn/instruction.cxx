@@ -314,21 +314,18 @@ HHuginn::value_t member_value( HThread* thread_, HHuginn::value_t const& object_
 	M_PROLOG
 	HHuginn::value_t m;
 	HRuntime& rt( thread_->runtime() );
+	HClass const* cls( object_->get_class() );
+	int idx( cls->field_index( IDENTIFIER::INTERFACE::MEMBER ) );
 	HHuginn::value_t s( rt.object_factory()->create_string( rt.identifier_name( memberId_ ) ) );
-	if ( HObject const* o = dynamic_cast<HObject const*>( object_.raw() ) ) {
+	if ( idx < 0 ) {
+		no_such_member( thread_, cls->name(), memberId_, position_, cls );
+	} else if ( HObject const* o = dynamic_cast<HObject const*>( object_.raw() ) ) {
 		m = o->call_method( thread_, object_, IDENTIFIER::INTERFACE::MEMBER, HArguments( thread_, s ), position_ );
-		M_ASSERT( !! m );
 	} else {
-		HClass const* cls( object_->get_class() );
-		int idx( cls->field_index( IDENTIFIER::INTERFACE::SET_MEMBER ) );
-		if ( idx >= 0 ) {
-			HClass::HMethod const& method( *static_cast<HClass::HMethod const*>( cls->field( idx ).raw() ) );
-			m = method.function()( thread_, const_cast<HHuginn::value_t*>( &object_ ), HArguments( thread_, s ), position_ );
-		}
-		if ( ! m ) {
-			no_such_member( thread_, cls->name(), memberId_, position_, cls );
-		}
+		HClass::HMethod const& method( *static_cast<HClass::HMethod const*>( cls->field( idx ).raw() ) );
+		m = method.function()( thread_, const_cast<HHuginn::value_t*>( &object_ ), HArguments( thread_, s ), position_ );
 	}
+	M_ASSERT( !! m );
 	if ( ! thread_->can_continue() ) {
 		throw Interrupt();
 	}
@@ -340,17 +337,15 @@ void member_assign( HThread* thread_, HHuginn::value_t& object_, HHuginn::identi
 	M_PROLOG
 	HRuntime& rt( thread_->runtime() );
 	HHuginn::value_t s( rt.object_factory()->create_string( rt.identifier_name( memberId_ ) ) );
-	if ( HObject const* o = dynamic_cast<HObject const*>( object_.raw() ) ) {
+	HClass const* cls( object_->get_class() );
+	int idx( cls->field_index( IDENTIFIER::INTERFACE::SET_MEMBER ) );
+	if ( idx < 0 ) {
+		no_such_member( thread_, cls->name(), memberId_, position_, cls );
+	} else if ( HObject const* o = dynamic_cast<HObject const*>( object_.raw() ) ) {
 		o->call_method( thread_, object_, IDENTIFIER::INTERFACE::SET_MEMBER, HArguments( thread_, value_, s ), position_ );
 	} else {
-		HClass const* cls( object_->get_class() );
-		int idx( cls->field_index( IDENTIFIER::INTERFACE::SET_MEMBER ) );
-		if ( idx >= 0 ) {
-			HClass::HMethod const& m( *static_cast<HClass::HMethod const*>( cls->field( idx ).raw() ) );
-			m.function()( thread_, const_cast<HHuginn::value_t*>( &object_ ), HArguments( thread_, value_, s ), position_ );
-		} else {
-			no_such_member( thread_, cls->name(), memberId_, position_, cls );
-		}
+		HClass::HMethod const& m( *static_cast<HClass::HMethod const*>( cls->field( idx ).raw() ) );
+		m.function()( thread_, const_cast<HHuginn::value_t*>( &object_ ), HArguments( thread_, value_, s ), position_ );
 	}
 	if ( ! thread_->can_continue() ) {
 		throw Interrupt();
