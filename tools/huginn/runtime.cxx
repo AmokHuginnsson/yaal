@@ -901,15 +901,11 @@ void sort_identifiers( HHuginn::identifiers_t& identifiers_, HRuntime const* run
 
 }
 
-inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& stream_, HClass const& huginnClass_ ) {
+inline void dump_class_info( HRuntime const* runtime_, HClass const& huginnClass_, yaal::hcore::HStreamInterface& stream_ ) {
 	M_PROLOG
-	HRuntime const* runtime( huginnClass_.runtime() );
 	stream_ << ( is_enum_class( &huginnClass_ ) ? "enum: " : "class: " );
 	stream_ << ( ( huginnClass_.access() == HHuginn::ACCESS::PUBLIC ) ? "" : "-" );
-	if ( huginnClass_.origin() ) {
-		stream_ << huginnClass_.origin()->name() << ".";
-	}
-	stream_ << huginnClass_.name();
+	stream_ << full_class_name( *runtime_, &huginnClass_, false );
 	if ( huginnClass_.super() ) {
 		stream_ << " : " << huginnClass_.super()->name();
 	}
@@ -948,32 +944,32 @@ inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterfac
 	stream_ << " {";
 	bool next( false );
 	bool verbose( _debugLevel_ >= DEBUG_LEVEL::VERBOSE_MESSAGES );
-	sort_identifiers( derivedFields, runtime );
+	sort_identifiers( derivedFields, runtime_ );
 	for ( HHuginn::identifier_id_t f : derivedFields ) {
 		if ( next ) {
 			stream_ << ",";
 		}
 		next = true;
-		stream_ << " " << runtime->identifier_name( f ) << ( verbose ? "(derived)" : "" );
+		stream_ << " " << runtime_->identifier_name( f ) << ( verbose ? "(derived)" : "" );
 	}
-	sort_identifiers( overriddenFields, runtime );
+	sort_identifiers( overriddenFields, runtime_ );
 	for ( HHuginn::identifier_id_t f : overriddenFields ) {
 		if ( next ) {
 			stream_ << ",";
 		}
 		next = true;
-		stream_ << " " << runtime->identifier_name( f ) << ( verbose ? "(overridden)" : "" );
+		stream_ << " " << runtime_->identifier_name( f ) << ( verbose ? "(overridden)" : "" );
 	}
-	sort_identifiers( newFields, runtime );
+	sort_identifiers( newFields, runtime_ );
 	for ( HHuginn::identifier_id_t f : newFields ) {
 		if ( next ) {
 			stream_ << ",";
 		}
 		next = true;
-		stream_ << " " << runtime->identifier_name( f ) << ( verbose ? "(new)" : "" );
+		stream_ << " " << runtime_->identifier_name( f ) << ( verbose ? "(new)" : "" );
 	}
-	stream_ << ( next ? " " : "" ) << "}";
-	return ( stream_ );
+	stream_ << ( next ? " " : "" ) << "}" << endl;
+	return;
 	M_EPILOG
 }
 
@@ -1021,12 +1017,12 @@ void HRuntime::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) const {
 	huginn::classes_t classes( class_list( _dependencies ) );
 	for ( HClass const* c : classes ) {
 		if ( ! is_enum_class( c ) ) {
-			stream_ << *c << endl;
+			dump_class_info( this, *c, stream_ );
 		}
 	}
 	for ( HClass const* c : classes ) {
 		if ( is_enum_class( c ) ) {
-			stream_ << *c << endl;
+			dump_class_info( this, *c, stream_ );
 		}
 	}
 	HHuginn::identifiers_t identifiers;
