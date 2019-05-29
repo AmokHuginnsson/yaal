@@ -32,6 +32,7 @@ char* basename( char* );
 
 typedef int uid_t;
 typedef int gid_t;
+typedef int pid_t;
 #ifndef MODE_T_DEFINED
 typedef int unsigned mode_t;
 #define MODE_T_DEFINED 1
@@ -60,6 +61,7 @@ static int const _XOPEN_NAME_MAX = 2048;
 
 uid_t getuid( void );
 gid_t getgid( void );
+int setpgid( pid_t, pid_t );
 int readlink( char const*, char*, size_t );
 int setenv( char const*, char const*, int );
 int unsetenv( char const* );

@@ -265,6 +265,10 @@ void HPipedChild::spawn(
 			utf8Argv.emplace_back( *it );
 			argv.get<char const*>()[ i ] = utf8Argv.back().c_str();
 		}
+		M_ENSURE( ::setpgid( 0, 0 ) == 0 );
+		sigset_t all;
+		M_ENSURE( ::sigfillset( &all ) == 0 );
+		M_ENSURE( ::sigprocmask( SIG_UNBLOCK, &all, nullptr ) == 0 );
 		::execv( argv.get<char const*>()[ 0 ], const_cast<char* const*>( argv.get<char const*>() ) );
 		M_ENSURE( !"execv"[0] );
 	} else {

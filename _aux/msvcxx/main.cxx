@@ -265,7 +265,6 @@ uid_t getuid( void ) {
 	return ( uid );
 }
 
-
 uid_t getgid( void ) {
 	static int const SID_SIZE( 128 );
 	static int const TOKEN_USER_SIZE( sizeof ( TOKEN_USER ) + SID_SIZE );
@@ -273,6 +272,10 @@ uid_t getgid( void ) {
 	PSID sid( get_base_sid( tokenUserBuffer, TOKEN_USER_SIZE, TokenPrimaryGroup ) );
 	int uid( sid ? *::GetSidSubAuthority( sid, *::GetSidSubAuthorityCount( sid ) - 1 ) : -1 );
 	return ( uid );
+}
+
+int setpgid( pid_t, pid_t ) {
+	return ( 0 );
 }
 
 int readlink( char const* path_, char* buffer_, size_t size_ ) {

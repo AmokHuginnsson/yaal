@@ -707,7 +707,6 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 		}
 	}
 	cls->redefine( nullptr, fds );
-	_huginn->register_class( cls );
 	return ( cls );
 	M_EPILOG
 }

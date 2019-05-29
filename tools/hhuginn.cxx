@@ -431,7 +431,11 @@ huginn::HSource& HHuginn::current_source( void ) {
 			&& ( ( _state == STATE::PARSED ) || ( _state == STATE::COMPILED ) || ( _state == STATE::RUNNING ) )
 		)
 			? *_sources.front()
-			: *_sources.back()
+			: (
+				( ( _state == STATE::LOADED ) || ( _state == STATE::PREPROCESSED ) || ( _state == STATE::PARSED ) )
+					? *_sources.back()
+					: *_sources[fileId]
+			)
 	);
 	M_EPILOG
 }

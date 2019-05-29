@@ -134,7 +134,6 @@ class HTerminal : public HPackage {
 	enumeration::HEnumerationClass::ptr_t _attributeClass;
 	enumeration::HEnumerationClass::ptr_t _colorClass;
 	HHuginn::class_t _keyPressEventClass;
-	HHuginn::class_t _exceptionClass;
 public:
 	HTerminal( HClass* class_ )
 		: HPackage( class_ )
@@ -189,8 +188,7 @@ public:
 				"a set of color from basic color palette"
 			)
 		)
-		, _keyPressEventClass()
-		, _exceptionClass( class_exception( class_ ) ) {
+		, _keyPressEventClass() {
 		M_PROLOG
 		HRuntime* runtime( class_->runtime() );
 		_keyPressEventClass = runtime->create_class(
@@ -260,7 +258,7 @@ public:
 		}
 		if ( ( row >= s.lines() ) || ( column >= s.columns() ) ) {
 			thread_->raise(
-				static_cast<HTerminal*>( object_->raw() )->_exceptionClass.raw(),
+				static_cast<HTerminal*>( object_->raw() )->exception_class(),
 				"Invalid "_ys.append( row >= s.lines() ? "row: " : "column: " ).append( row >= s.lines() ? row : column ),
 				position_
 			);
@@ -334,7 +332,7 @@ public:
 		try {
 			cp = tools::HTerminal::get_instance().get_character();
 		} catch ( hcore::HException const& e ) {
-			thread_->raise( static_cast<HTerminal*>( object_->raw() )->_exceptionClass.raw(), e.what(), position_ );
+			thread_->raise( static_cast<HTerminal*>( object_->raw() )->exception_class(), e.what(), position_ );
 		}
 		return ( thread_->object_factory().create_character( cp ) );
 		M_EPILOG
@@ -377,7 +375,7 @@ public:
 			}
 			data.push_back( keyPressEventClass->get_default( thread_, 3, position_ ) );
 		} catch ( hcore::HException const& e ) {
-			thread_->raise( term->_exceptionClass.raw(), e.what(), position_ );
+			thread_->raise( term->exception_class(), e.what(), position_ );
 		}
 		return ( of.create_object( keyPressEventClass, data ) );
 		M_EPILOG

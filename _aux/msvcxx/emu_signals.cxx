@@ -233,6 +233,11 @@ int sigemptyset( sigset_t* set_ ) {
 	return ( 0 );
 }
 
+int sigfillset( sigset_t* set_ ) {
+	*set_ = 0xffffffffffffffffULL;
+	return ( 0 );
+}
+
 int sigpending( sigset_t* ) {
 	return ( 0 );
 }
@@ -313,6 +318,10 @@ int pthread_sigmask( int how_, sigset_t* set_, void* ) {
 		}
 	}
 	return ( 0 );
+}
+
+int sigprocmask( int how_, sigset_t const* set_, sigset_t* ) {
+	return ( pthread_sigmask( how_, set_, nullptr ) );
 }
 
 char const* strsignal( int signum_ ) {

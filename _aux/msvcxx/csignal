@@ -61,8 +61,10 @@ int sigismember( sigset_t*, int );
 int sigwait( sigset_t*, int* );
 int sigaction( int, struct sigaction*, void* );
 int sigemptyset( sigset_t* );
+int sigfillset( sigset_t* );
 int kill( int, int );
 int pthread_sigmask( int, sigset_t*, void* );
+int sigprocmask( int, sigset_t const*, sigset_t* );
 char const* strsignal( int );
 
 #endif /* not YAAL_MSVCXX_CSIGNAL_INCLUDED */

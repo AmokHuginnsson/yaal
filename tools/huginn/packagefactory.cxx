@@ -224,8 +224,10 @@ HPackageCreatorInterface::HInstance HPackageFactory::compile_module(
 		contextRuntime_->fix_references();
 		throw HHuginn::HHuginnRuntimeException( loader.error_message(), contextHuginn._compiler->_fileId, position_ );
 	}
-	loader._state = HHuginn::STATE::PARSED;
 	HHuginn::class_t c( loaderRuntime.make_package( name_, *contextRuntime_ ) );
+	loader._state = HHuginn::STATE::PARSED;
+	loader.register_class( c );
+	loader._state = HHuginn::STATE::COMPILED;
 	contextRuntime_->copy_text( loaderRuntime );
 	contextHuginn._sources = yaal::move( loader._sources );
 	huginn::HThread t( contextRuntime_, hcore::HThread::get_current_thread_id() );
