@@ -224,7 +224,7 @@ int sigdelset( sigset_t* set_, int sig_ ) {
 	return ( 0 );
 }
 
-int sigismember( sigset_t* set_, int sig_ ) {
+int sigismember( sigset_t const* set_, int sig_ ) {
 	return ( *set_ & sigmask( sig_ ) ? 1 : 0 );
 }
 
@@ -309,7 +309,7 @@ int sigaction( int signo, struct sigaction* sa_, void* ) {
 	return ( 0 );
 }
 
-int pthread_sigmask( int how_, sigset_t* set_, void* ) {
+int pthread_sigmask( int how_, sigset_t const* set_, void* ) {
 	if ( sigismember( set_, SIGALRM ) ) {
 		if ( _signalDispatcher_.is_started() ) {
 			_tlsSignalsSetup_->set_mask( how_, set_ );

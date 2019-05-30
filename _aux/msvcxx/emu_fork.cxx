@@ -37,13 +37,18 @@ typedef SynchronizedUnorderedSet<int> pid_set_t;
 pid_set_t _children_;
 
 M_EXPORT_SYMBOL
-HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int* in_, int* out_, int* err_ ) {
-	return ( HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn( path_, argv_, in_, out_, err_ ) );
+HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int* in_, int* out_, int* err_, int* message_ ) {
+	return ( HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn( path_, argv_, in_, out_, err_, message_ ) );
 }
 
 M_EXPORT_SYMBOL
-HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn( yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int* in_, int* out_, int* err_ )
-	: _path( path_ ), _argv( argv_ ), _in( in_ ), _out( out_ ), _err( err_ ) {
+HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn( yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int* in_, int* out_, int* err_, int* message_ )
+	: _path( path_ )
+	, _argv( argv_ )
+	, _in( in_ )
+	, _out( out_ )
+	, _err( err_ )
+	, _message( message_ ) {
 }
 
 char* xstrdup( char const* str_ ) {
@@ -113,6 +118,7 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void ) {
 	}
 	memory::free( argv );
 
+	M_ENSURE( msvcxx::write( _message[1], "\0", 1 ) == 1 );
 	_children_.insert( pid );
 	return ( pid );
 }

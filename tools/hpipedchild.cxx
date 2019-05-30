@@ -244,17 +244,17 @@ void HPipedChild::spawn(
 	fixupFds( pipeIn[ PIPE_END::OUT ], _in, in_, "Input" );
 	fixupFds( pipeOut[ PIPE_END::IN ], _out, out_, "Output" );
 	fixupFds( pipeErr[ PIPE_END::IN ], _err, err_, "Error" );
+	OPipeResGuard message;
+	M_ENSURE( ::pipe( message._res ) == 0 );
 	_pid = ::fork();
 	M_ENSURE( _pid >= 0, "fork()" );
 	if ( ! _pid ) {
 		close_and_invalidate( pipeIn[ PIPE_END::IN ] );
 		close_and_invalidate( pipeOut[ PIPE_END::OUT ] );
 		close_and_invalidate( pipeErr[ PIPE_END::OUT ] );
-		if ( ( ::dup2( pipeIn[ PIPE_END::OUT ], stdinFd ) < 0 )
-				|| ( ::dup2( pipeOut[ PIPE_END::IN ], stdoutFd ) < 0 )
-				|| ( ::dup2( pipeErr[ PIPE_END::IN ], stderrFd ) < 0 ) ) {
-			M_THROW( "dup2", errno );
-		}
+		M_ENSURE( ::dup2( pipeIn[ PIPE_END::OUT ], stdinFd ) >= 0 );
+		M_ENSURE( ::dup2( pipeOut[ PIPE_END::IN ], stdoutFd ) >= 0 );
+		M_ENSURE( ::dup2( pipeErr[ PIPE_END::IN ], stderrFd ) >= 0 );
 		HUTF8String utf8Image( image_ );
 		argv.get<char const*>()[ 0 ] = utf8Image.c_str();
 		int i( 1 );
@@ -269,12 +269,15 @@ void HPipedChild::spawn(
 		sigset_t all;
 		M_ENSURE( ::sigfillset( &all ) == 0 );
 		M_ENSURE( ::sigprocmask( SIG_UNBLOCK, &all, nullptr ) == 0 );
+		M_ENSURE( ::write( message[PIPE_END::IN], "\0", 1 ) == 1 );
 		::execv( argv.get<char const*>()[ 0 ], const_cast<char* const*>( argv.get<char const*>() ) );
 		M_ENSURE( !"execv"[0] );
 	} else {
 		fixupFds( in_, pipeIn, PIPE_END::IN, _in );
 		fixupFds( out_, pipeOut, PIPE_END::OUT, _out );
 		fixupFds( err_, pipeErr, PIPE_END::OUT, _err );
+		char dummy( 0 );
+		M_ENSURE( ::read( message[PIPE_END::OUT], &dummy, 1 ) == 1 );
 	}
 	return;
 	M_EPILOG
