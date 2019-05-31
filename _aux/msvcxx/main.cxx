@@ -274,7 +274,15 @@ uid_t getgid( void ) {
 	return ( uid );
 }
 
+int getpgrp( void ) {
+	return ( getpid() );
+}
+
 int setpgid( pid_t, pid_t ) {
+	return ( 0 );
+}
+
+int tcsetpgrp( int, pid_t ) {
 	return ( 0 );
 }
 

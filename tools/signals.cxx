@@ -320,7 +320,7 @@ namespace {
 
 /* signal handler definitions */
 
-int HBaseSignalHandlers::signal_INT ( int signum_ ) {
+int HBaseSignalHandlers::signal_INT( int signum_ ) {
 	M_PROLOG
 	if ( tools::_ignoreSignalSIGINT_ ) {
 		return ( 0 );

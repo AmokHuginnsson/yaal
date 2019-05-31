@@ -18,6 +18,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/duration.hxx"
 #include "util.hxx"
 #include "halarm.hxx"
+#include "hterminal.hxx"
 #ifdef __HOST_OS_TYPE_CYGWIN__
 /* Work around for buggy child process handling in Cygwin. */
 #	include "sleep.hxx"
@@ -134,7 +135,8 @@ HPipedChild::HPipedChild(
 ) : _pid( -1 )
 	, _in( in_ )
 	, _out( out_ )
-	, _err( err_ ) {
+	, _err( err_ )
+	, _foreground( false ) {
 	return;
 }
 
@@ -206,6 +208,15 @@ HPipedChild::STATUS HPipedChild::finish( int finishIn_ ) {
 			s.value = FWD_WTERMSIG( status );
 		}
 	}
+	int const stdinFd( fileno( stdin ) );
+	int iofds[] = { stdinFd, fileno( stdout ), fileno( stderr ) };
+	if ( _foreground && is_a_tty( stdinFd ) ) {
+		M_ENSURE( setpgid( 0, 0 ) == 0 );
+		for ( int fd : iofds ) {
+			M_ENSURE( ::tcsetpgrp( fd, getpgrp() ) == 0 );
+		}
+		_foreground = false;
+	}
 	_pid = 0;
 	return ( s );
 	M_EPILOG
@@ -216,7 +227,9 @@ void HPipedChild::spawn(
 	argv_t const& argv_,
 	yaal::hcore::HStreamInterface const* in_,
 	yaal::hcore::HStreamInterface const* out_,
-	yaal::hcore::HStreamInterface const* err_
+	yaal::hcore::HStreamInterface const* err_,
+	int pgid_,
+	bool foreground_
 ) {
 	M_PROLOG
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
@@ -234,6 +247,7 @@ void HPipedChild::spawn(
 	int const stdinFd( fileno( stdin ) );
 	int const stdoutFd( fileno( stdout ) );
 	int const stderrFd( fileno( stderr ) );
+	int iofds[] = { stdinFd, stdoutFd, stderrFd };
 	::fflush( stderr );
 	cout << hcore::flush;
 	::fflush( stdout );
@@ -249,35 +263,68 @@ void HPipedChild::spawn(
 	_pid = ::fork();
 	M_ENSURE( _pid >= 0, "fork()" );
 	if ( ! _pid ) {
-		close_and_invalidate( pipeIn[ PIPE_END::IN ] );
-		close_and_invalidate( pipeOut[ PIPE_END::OUT ] );
-		close_and_invalidate( pipeErr[ PIPE_END::OUT ] );
-		M_ENSURE( ::dup2( pipeIn[ PIPE_END::OUT ], stdinFd ) >= 0 );
-		M_ENSURE( ::dup2( pipeOut[ PIPE_END::IN ], stdoutFd ) >= 0 );
-		M_ENSURE( ::dup2( pipeErr[ PIPE_END::IN ], stderrFd ) >= 0 );
-		HUTF8String utf8Image( image_ );
-		argv.get<char const*>()[ 0 ] = utf8Image.c_str();
-		int i( 1 );
-		typedef HArray<HUTF8String> utf8_strings_t;
-		utf8_strings_t utf8Argv;
-		utf8Argv.reserve( argv.get_size() );
-		for ( argv_t::const_iterator it( argv_.begin() ), end( argv_.end() ); it != end; ++ it, ++ i ) {
-			utf8Argv.emplace_back( *it );
-			argv.get<char const*>()[ i ] = utf8Argv.back().c_str();
+		try {
+			HUTF8String utf8Image( image_ );
+			argv.get<char const*>()[ 0 ] = utf8Image.c_str();
+			int i( 1 );
+			typedef HArray<HUTF8String> utf8_strings_t;
+			utf8_strings_t utf8Argv;
+			utf8Argv.reserve( argv.get_size() );
+			for ( argv_t::const_iterator it( argv_.begin() ), end( argv_.end() ); it != end; ++ it, ++ i ) {
+				utf8Argv.emplace_back( *it );
+				argv.get<char const*>()[ i ] = utf8Argv.back().c_str();
+			}
+			sigset_t all;
+			M_ENSURE( ::sigfillset( &all ) == 0 );
+			M_ENSURE( ::sigprocmask( SIG_UNBLOCK, &all, nullptr ) == 0 );
+			if ( foreground_ && is_a_tty( stdinFd ) ) {
+				int pgid( pgid_ > 0 ? pgid_ : getpid() );
+				M_ENSURE( ::setpgid( 0, pgid ) == 0 );
+				M_ENSURE( signal( SIGTTOU, SIG_IGN ) != SIG_ERR );
+				M_ENSURE( signal( SIGTTIN, SIG_IGN ) != SIG_ERR );
+				for ( int fd : iofds ) {
+					M_ENSURE( ::tcsetpgrp( fd, pgid ) == 0 );
+				}
+			}
+			int signals[] = {
+#if defined( HAVE_DECL_SIGIOT ) && ( HAVE_DECL_SIGIOT == 1 )
+				SIGIOT,
+#endif /* HAVE_DECL_SIGIOT */
+				SIGURG, SIGINT, SIGHUP, SIGILL, SIGQUIT, SIGFPE, SIGSYS, SIGUSR1, SIGBUS, SIGSEGV,
+				SIGABRT, SIGTERM, SIGTSTP, SIGTRAP, SIGCONT, SIGPIPE, SIGALRM, SIGCHLD, SIGTTIN, SIGTTOU
+			};
+			for ( int s : signals ) {
+				M_ENSURE( signal( s, SIG_DFL ) != SIG_ERR );
+			}
+			M_ENSURE( ::dup2( pipeIn[ PIPE_END::OUT ], stdinFd ) >= 0 );
+			M_ENSURE( ::dup2( pipeOut[ PIPE_END::IN ], stdoutFd ) >= 0 );
+			M_ENSURE( ::dup2( pipeErr[ PIPE_END::IN ], stderrFd ) >= 0 );
+			M_ENSURE( ::write( message[PIPE_END::IN], "\0", 1 ) == 1 );
+			OPipeResGuard* pgs[] = { &pipeIn, &pipeOut, &pipeErr, &message };
+			for ( OPipeResGuard* pg : pgs ) {
+				close_and_invalidate( (*pg)[PIPE_END::IN] );
+				close_and_invalidate( (*pg)[PIPE_END::OUT] );
+			}
+			::execv( argv.get<char const*>()[ 0 ], const_cast<char* const*>( argv.get<char const*>() ) );
+			M_ENSURE( !"execv"[0] );
+		} catch ( ... ) {
+			M_ENSURE( ::write( message[PIPE_END::IN], "\0", 1 ) == 1 );
+			_exit( 1 );
 		}
-		M_ENSURE( ::setpgid( 0, 0 ) == 0 );
-		sigset_t all;
-		M_ENSURE( ::sigfillset( &all ) == 0 );
-		M_ENSURE( ::sigprocmask( SIG_UNBLOCK, &all, nullptr ) == 0 );
-		M_ENSURE( ::write( message[PIPE_END::IN], "\0", 1 ) == 1 );
-		::execv( argv.get<char const*>()[ 0 ], const_cast<char* const*>( argv.get<char const*>() ) );
-		M_ENSURE( !"execv"[0] );
 	} else {
 		fixupFds( in_, pipeIn, PIPE_END::IN, _in );
 		fixupFds( out_, pipeOut, PIPE_END::OUT, _out );
 		fixupFds( err_, pipeErr, PIPE_END::OUT, _err );
 		char dummy( 0 );
 		M_ENSURE( ::read( message[PIPE_END::OUT], &dummy, 1 ) == 1 );
+		if ( foreground_ && is_a_tty( stdinFd ) ) {
+			int pgid( pgid_ > 0 ? pgid_ : _pid );
+			M_ENSURE( ::setpgid( pgid, pgid ) == 0 );
+			for ( int fd : iofds ) {
+				M_ENSURE( ::tcsetpgrp( fd, pgid ) == 0 );
+			}
+		}
+		_foreground = foreground_;
 	}
 	return;
 	M_EPILOG

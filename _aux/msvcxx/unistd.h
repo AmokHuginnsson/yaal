@@ -62,6 +62,8 @@ static int const _XOPEN_NAME_MAX = 2048;
 uid_t getuid( void );
 gid_t getgid( void );
 int setpgid( pid_t, pid_t );
+int getpgrp( void );
+int tcsetpgrp( int, pid_t );
 int readlink( char const*, char*, size_t );
 int setenv( char const*, char const*, int );
 int unsetenv( char const* );
