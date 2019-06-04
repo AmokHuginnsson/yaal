@@ -29,7 +29,16 @@ HNumberSetStatistics::number_set_stats_t make_data( HThread* thread_, HHuginn::t
 	if ( src.is_empty() ) {
 		throw HHuginn::HHuginnRuntimeException( "Cannot aggregate statistics over empty set.", thread_->current_frame()->file_id(), position_ );
 	}
-	aggregate_type_t a( AGGREGATE_TYPE::BASIC | AGGREGATE_TYPE::MEDIAN | AGGREGATE_TYPE::INTERQUARTILE_RANGE | AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION );
+	aggregate_type_t a(
+		AGGREGATE_TYPE::BASIC
+		| AGGREGATE_TYPE::MEDIAN
+		| AGGREGATE_TYPE::INTERQUARTILE_RANGE
+		| AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION
+		| AGGREGATE_TYPE::SAMPLE_SKEWNESS
+		| AGGREGATE_TYPE::POPULATION_SKEWNESS
+		| AGGREGATE_TYPE::SAMPLE_KURTOSIS
+		| AGGREGATE_TYPE::POPULATION_KURTOSIS
+	);
 	if ( buckets_ > 0 ) {
 		a |= AGGREGATE_TYPE::HISTOGRAM;
 	}
@@ -116,6 +125,14 @@ typename stats_t::value_type stats_impl( stats_t const& stats_, aggregate_type_t
 		res = stats_.population_standard_deviation();
 	} else if ( aggregateType_ == AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION ) {
 		res = stats_.mean_absolute_deviation();
+	} else if ( aggregateType_ == AGGREGATE_TYPE::SAMPLE_SKEWNESS ) {
+		res = stats_.sample_skewness();
+	} else if ( aggregateType_ == AGGREGATE_TYPE::POPULATION_SKEWNESS ) {
+		res = stats_.population_skewness();
+	} else if ( aggregateType_ == AGGREGATE_TYPE::SAMPLE_KURTOSIS ) {
+		res = stats_.sample_kurtosis();
+	} else if ( aggregateType_ == AGGREGATE_TYPE::POPULATION_KURTOSIS ) {
+		res = stats_.population_kurtosis();
 	}
 	return ( res );
 }
@@ -245,6 +262,10 @@ HHuginn::class_t HNumberSetStatistics::get_class( HRuntime* runtime_, HClass con
 		{ "sample_standard_deviation",     runtime_->create_method( &HNumberSetStatistics::stat, "NumberSetStatistics.sample_standard_deviation",     AGGREGATE_TYPE::SAMPLE_STANDARD_DEVIATION ),     "a standard deviation of the numeric set" },
 		{ "population_standard_deviation", runtime_->create_method( &HNumberSetStatistics::stat, "NumberSetStatistics.population_standard_deviation", AGGREGATE_TYPE::POPULATION_STANDARD_DEVIATION ), "a population standard deviation of the numeric set" },
 		{ "mean_absolute_deviation",       runtime_->create_method( &HNumberSetStatistics::stat, "NumberSetStatistics.mean_absolute_deviation",       AGGREGATE_TYPE::MEAN_ABSOLUTE_DEVIATION ),       "a mean absolute deviation of the numeric set" },
+		{ "sample_skewness",               runtime_->create_method( &HNumberSetStatistics::stat, "NumberSetStatistics.sample_skewness",               AGGREGATE_TYPE::SAMPLE_SKEWNESS ),               "a sample skewness of the numeric set" },
+		{ "population_skewness",           runtime_->create_method( &HNumberSetStatistics::stat, "NumberSetStatistics.population_skewness",           AGGREGATE_TYPE::POPULATION_SKEWNESS ),           "a population skewness of the numeric set" },
+		{ "sample_kurtosis",               runtime_->create_method( &HNumberSetStatistics::stat, "NumberSetStatistics.sample_kurtosis",               AGGREGATE_TYPE::SAMPLE_KURTOSIS ),               "a sample kurtosis of the numeric set" },
+		{ "population_kurtosis",           runtime_->create_method( &HNumberSetStatistics::stat, "NumberSetStatistics.population_kurtosis",           AGGREGATE_TYPE::POPULATION_KURTOSIS ),           "a population kurtosis of the numeric set" },
 		{ "range",                         runtime_->create_method( &HNumberSetStatistics::derivative_stat, "NumberSetStatistics.range",              DERIVATIVE_STAT::RANGE ),                        "a range of values in the numeric set" },
 		{ "mid_range",                     runtime_->create_method( &HNumberSetStatistics::derivative_stat, "NumberSetStatistics.mid_range",          DERIVATIVE_STAT::MID_RANGE ),                    "a mid range value of the numbers in the given set" },
 		{ "histogram",                     runtime_->create_method( &HNumberSetStatistics::histogram ), "return a histogram calculated for given dataset" }
