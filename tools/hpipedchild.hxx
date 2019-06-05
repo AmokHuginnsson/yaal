@@ -32,6 +32,7 @@ public:
 			, value( 0 ) {
 		}
 	};
+	static int const PROCESS_GROUP_LEADER = 0;
 	typedef yaal::hcore::HArray<yaal::hcore::HString> argv_t;
 private:
 	int _pid;
@@ -53,7 +54,7 @@ public:
 		yaal::hcore::HStreamInterface const* = nullptr,
 		yaal::hcore::HStreamInterface const* = nullptr,
 		yaal::hcore::HStreamInterface const* = nullptr,
-		int = 0,
+		int = -1,
 		bool = false
 	);
 	STATUS finish( int = 0 );

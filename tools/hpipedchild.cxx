@@ -232,6 +232,7 @@ void HPipedChild::spawn(
 	bool foreground_
 ) {
 	M_PROLOG
+	M_ENSURE( !foreground_ || ( pgid_ >= PROCESS_GROUP_LEADER ) );
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	OPipeResGuard pipeIn, pipeOut, pipeErr;
 	HFSItem image( image_ );
@@ -277,13 +278,18 @@ void HPipedChild::spawn(
 			sigset_t all;
 			M_ENSURE( ::sigfillset( &all ) == 0 );
 			M_ENSURE( ::sigprocmask( SIG_UNBLOCK, &all, nullptr ) == 0 );
-			if ( foreground_ && is_a_tty( stdinFd ) ) {
-				int pgid( pgid_ > 0 ? pgid_ : getpid() );
-				M_ENSURE( ::setpgid( 0, pgid ) == 0 );
-				M_ENSURE( signal( SIGTTOU, SIG_IGN ) != SIG_ERR );
-				M_ENSURE( signal( SIGTTIN, SIG_IGN ) != SIG_ERR );
+			if ( pgid_ >= PROCESS_GROUP_LEADER ) {
+				int pid( getpid() );
+				int pgid( pgid_ > PROCESS_GROUP_LEADER ? pgid_ : pid );
+				M_ENSURE( ::setpgid( pid, pgid ) == 0 );
+				if ( foreground_ && is_a_tty( stdinFd ) ) {
+					M_ENSURE( signal( SIGTTOU, SIG_IGN ) != SIG_ERR );
+					M_ENSURE( signal( SIGTTIN, SIG_IGN ) != SIG_ERR );
+				}
 				for ( int fd : iofds ) {
-					M_ENSURE( ::tcsetpgrp( fd, pgid ) == 0 );
+					if ( foreground_ && is_a_tty( fd ) ) {
+						M_ENSURE( ::tcsetpgrp( fd, pgid ) == 0 );
+					}
 				}
 			}
 			int signals[] = {
@@ -317,11 +323,13 @@ void HPipedChild::spawn(
 		fixupFds( err_, pipeErr, PIPE_END::OUT, _err );
 		char dummy( 0 );
 		M_ENSURE( ::read( message[PIPE_END::OUT], &dummy, 1 ) == 1 );
-		if ( foreground_ && is_a_tty( stdinFd ) ) {
-			int pgid( pgid_ > 0 ? pgid_ : _pid );
-			M_ENSURE( ::setpgid( pgid, pgid ) == 0 );
+		if ( pgid_ >= PROCESS_GROUP_LEADER ) {
+			int pgid( pgid_ > PROCESS_GROUP_LEADER ? pgid_ : _pid );
+			M_ENSURE( ::setpgid( _pid, pgid ) == 0 );
 			for ( int fd : iofds ) {
-				M_ENSURE( ::tcsetpgrp( fd, pgid ) == 0 );
+				if ( foreground_ && is_a_tty( fd ) ) {
+					M_ENSURE( ::tcsetpgrp( fd, pgid ) == 0 );
+				}
 			}
 		}
 		_foreground = foreground_;
