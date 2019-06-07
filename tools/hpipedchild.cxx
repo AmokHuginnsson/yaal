@@ -281,14 +281,14 @@ void HPipedChild::spawn(
 			if ( pgid_ >= PROCESS_GROUP_LEADER ) {
 				int pid( getpid() );
 				int pgid( pgid_ > PROCESS_GROUP_LEADER ? pgid_ : pid );
-				M_ENSURE( ::setpgid( pid, pgid ) == 0 );
+				M_ENSURE( ( ::setpgid( pid, pgid ) == 0 ) || ( errno == EPERM ) );
 				if ( foreground_ && is_a_tty( stdinFd ) ) {
 					M_ENSURE( signal( SIGTTOU, SIG_IGN ) != SIG_ERR );
 					M_ENSURE( signal( SIGTTIN, SIG_IGN ) != SIG_ERR );
 				}
 				for ( int fd : iofds ) {
 					if ( foreground_ && is_a_tty( fd ) ) {
-						M_ENSURE( ::tcsetpgrp( fd, pgid ) == 0 );
+						M_ENSURE( ( ::tcsetpgrp( fd, pgid ) == 0 ) || ( errno == EPERM ) );
 					}
 				}
 			}
@@ -325,10 +325,10 @@ void HPipedChild::spawn(
 		M_ENSURE( ::read( message[PIPE_END::OUT], &dummy, 1 ) == 1 );
 		if ( pgid_ >= PROCESS_GROUP_LEADER ) {
 			int pgid( pgid_ > PROCESS_GROUP_LEADER ? pgid_ : _pid );
-			M_ENSURE( ::setpgid( _pid, pgid ) == 0 );
+			M_ENSURE( ( ::setpgid( _pid, pgid ) == 0 ) || ( errno == EPERM ) );
 			for ( int fd : iofds ) {
 				if ( foreground_ && is_a_tty( fd ) ) {
-					M_ENSURE( ::tcsetpgrp( fd, pgid ) == 0 );
+					M_ENSURE( ( ::tcsetpgrp( fd, pgid ) == 0 ) || ( errno == EPERM ) );
 				}
 			}
 		}
