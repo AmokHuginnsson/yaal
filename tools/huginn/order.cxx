@@ -211,10 +211,12 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::ORDER );
 	verify_signature( "order.equals", values_, { HHuginn::TYPE::ORDER }, thread_, position_ );
-	HOrder::values_t const& l( static_cast<HOrder*>( object_->raw() )->value() );
-	HOrder::values_t const& r( static_cast<HOrder const*>( values_[0].raw() )->value() );
-	bool equal( l.get_size() == r.get_size() );
-	for ( HOrder::values_t::const_iterator lit( l.begin() ), rit( r.begin() ), end( l.end() ); equal && ( lit != end ); ++ lit, ++ rit ) {
+	HOrder const& l( *static_cast<HOrder*>( object_->raw() ) );
+	HOrder const& r( *static_cast<HOrder const*>( values_[0].raw() ) );
+	HOrder::values_t const& ld( l.value() );
+	HOrder::values_t const& rd( r.value() );
+	bool equal( ( ld.get_size() == rd.get_size() ) && ( l.key_type() == r.key_type() ) );
+	for ( HOrder::values_t::const_iterator lit( ld.begin() ), rit( rd.begin() ), end( ld.end() ); equal && ( lit != end ); ++ lit, ++ rit ) {
 		HHuginn::value_t const& v( *lit );
 		equal = v->operator_equals( thread_, v, *rit, position_ );
 	}

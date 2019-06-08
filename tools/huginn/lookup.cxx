@@ -278,14 +278,18 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LOOKUP );
 	verify_signature( "lookup.equals", values_, { HHuginn::TYPE::LOOKUP }, thread_, position_ );
-	huginn::HLookup* self( static_cast<huginn::HLookup*>( object_->raw() ) );
-	huginn::HLookup::values_t const& selfData( self->value() );
-	huginn::HLookup::values_t const& otherData( static_cast<huginn::HLookup const*>( values_[0].raw() )->value() );
-	HAnchorGuard<huginn::HLookup> ag( *self, thread_, position_ );
+	huginn::HLookup const& self( *static_cast<huginn::HLookup*>( object_->raw() ) );
+	huginn::HLookup const& other( *static_cast<huginn::HLookup const*>( values_[0].raw() ) );
+	huginn::HLookup::values_t const& selfData( self.value() );
+	huginn::HLookup::values_t const& otherData( other.value() );
+	HAnchorGuard<huginn::HLookup> ag( other, thread_, position_ );
 	bool equal( selfData.get_size() == otherData.get_size() );
-	for ( huginn::HLookup::values_t::const_iterator it( otherData.begin() ), end( otherData.end() ); equal && ( it != end ); ++ it ) {
-		huginn::HLookup::values_t::const_iterator selfIt( selfData.find( it->first ) );
-		equal = ( selfIt != selfData.end() ) && selfIt->second->operator_equals( thread_, selfIt->second, it->second, position_ );
+	for ( huginn::HLookup::values_t::const_iterator it( selfData.begin() ), end( selfData.end() ); equal && ( it != end ); ++ it ) {
+		huginn::HLookup::values_t::const_iterator otherIt( otherData.find( it->first ) );
+		HHuginn::value_t const& lv( it->second );
+		equal = ( otherIt != otherData.end() )
+			&& ( lv->type_id() == otherIt->second->type_id() )
+			&& lv->operator_equals( thread_, lv, otherIt->second, position_ );
 	}
 	return ( thread_->runtime().boolean_value( equal ) );
 	M_EPILOG

@@ -46,7 +46,6 @@ HHuginn::HValueCompareHelper::HValueCompareHelper( compare_t compare_ )
 
 bool HHuginn::HValueCompareHelper::operator()( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) const {
 	M_ASSERT( _thread != nullptr );
-	M_ASSERT( v1_->type_id() == v2_->type_id() );
 	return ( _compare( _thread, v1_, v2_, _position ) );
 }
 

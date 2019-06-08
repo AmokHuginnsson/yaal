@@ -157,7 +157,7 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 inline bool less_impl( huginn::HThread* thread_, HHuginn::value_t const& l_, HHuginn::value_t const& r_, int position_ ) {
 	huginn::HTuple::values_t const& l( static_cast<huginn::HTuple const*>( l_.raw() )->value() );
 	huginn::HTuple::values_t const& r( static_cast<huginn::HTuple const*>( r_.raw() )->value() );
-	HHuginn::HValueCompareHelper lessHelper( &instruction::less );
+	HHuginn::HValueCompareHelper lessHelper( &instruction::checked_less );
 	lessHelper.anchor( thread_, position_ );
 	return ( lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), cref( lessHelper ) ) );
 }
@@ -202,8 +202,9 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	huginn::HTuple::values_t const& r( static_cast<huginn::HTuple const*>( values_[0].raw() )->value() );
 	bool equal( l.get_size() == r.get_size() );
 	for ( int long i( 0 ), c( l.get_size() ); equal && ( i < c ); ++ i ) {
-		HHuginn::value_t const& v( l[i] );
-		equal = v->operator_equals( thread_, v, r[i], position_ );
+		HHuginn::value_t const& lv( l[i] );
+		HHuginn::value_t const& rv( r[i] );
+		equal = ( lv->type_id() == rv->type_id() ) && lv->operator_equals( thread_, lv, rv, position_ );
 	}
 	return ( thread_->runtime().boolean_value( equal ) );
 	M_EPILOG

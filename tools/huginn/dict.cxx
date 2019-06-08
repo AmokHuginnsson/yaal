@@ -289,13 +289,19 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DICT );
 	verify_signature( "dict.equals", values_, { HHuginn::TYPE::DICT }, thread_, position_ );
-	huginn::HDict::values_t const& l( static_cast<huginn::HDict*>( object_->raw() )->value() );
-	huginn::HDict::values_t const& r( static_cast<huginn::HDict const*>( values_[0].raw() )->value() );
-	bool equal( l.get_size() == r.get_size() );
-	for ( huginn::HDict::values_t::const_iterator lit( l.begin() ), rit( r.begin() ), end( l.end() ); equal && ( lit != end ); ++ lit, ++ rit ) {
-		HHuginn::value_t const& f( lit->first );
-		HHuginn::value_t const& s( lit->second );
-		equal = f->operator_equals( thread_, f, rit->first, position_ ) && s->operator_equals( thread_, s, rit->second, position_ );
+	HDict const& l( *static_cast<huginn::HDict*>( object_->raw() ) );
+	HDict const& r( *static_cast<huginn::HDict const*>( values_[0].raw() ) );
+	huginn::HDict::values_t const& ld( l.value() );
+	huginn::HDict::values_t const& rd( r.value() );
+	bool equal( ( ld.get_size() == rd.get_size() ) && ( l.key_type() == r.key_type() ) );
+	for ( huginn::HDict::values_t::const_iterator lit( ld.begin() ), rit( rd.begin() ), end( ld.end() ); equal && ( lit != end ); ++ lit, ++ rit ) {
+		HHuginn::value_t const& lf( lit->first );
+		HHuginn::value_t const& ls( lit->second );
+		HHuginn::value_t const& rf( rit->first );
+		HHuginn::value_t const& rs( rit->second );
+		equal = ( ls->type_id() == rs->type_id() )
+			&& lf->operator_equals( thread_, lf, rf, position_ )
+			&& ls->operator_equals( thread_, ls, rs, position_ );
 	}
 	return ( thread_->runtime().boolean_value( equal ) );
 	M_EPILOG
