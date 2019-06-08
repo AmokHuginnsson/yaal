@@ -58,6 +58,10 @@ bool HReal::do_operator_equals( HThread*, HHuginn::value_t const&, HHuginn::valu
 	return ( _value == static_cast<HReal const*>( other_.raw() )->_value );
 }
 
+bool HReal::do_operator_less( HThread*, HHuginn::value_t const&, HHuginn::value_t const& other_, int ) const {
+	return ( _value < static_cast<HReal const*>( other_.raw() )->_value );
+}
+
 }
 
 }

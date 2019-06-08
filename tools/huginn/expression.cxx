@@ -1007,14 +1007,13 @@ void HExpression::less( OExecutionStep const&, HFrame* frame_ ) {
 	++ frame_->ip();
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
-	frame_->values().pop();
+	HHuginn::value_t& v1( frame_->values().top() );
 	HClass const* c1( v1->get_class() );
 	HClass const* c2( v2->get_class() );
 	if ( c1 != c2 ) {
 		operands_type_mismatch( op_to_str( OPERATOR::LESS ), c1, c2, file_id(), p );
 	}
-	frame_->values().push( frame_->thread()->runtime().boolean_value( instruction::less( frame_->thread(), v1, v2, p ) ) );
+	v1 = frame_->thread()->runtime().boolean_value( v1->operator_less( frame_->thread(), v1, v2, p ) );
 	return;
 	M_EPILOG
 }

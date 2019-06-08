@@ -32,6 +32,9 @@ void pow( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
 HHuginn::value_t abs( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t neg( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t factorial( HThread*, HHuginn::value_t const&, int );
+inline bool equals( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
+	return ( v1_->operator_equals( thread_, v1_, v2_, position_ ) );
+}
 bool less( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 bool checked_less( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 bool greater( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );

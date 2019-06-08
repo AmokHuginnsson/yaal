@@ -551,6 +551,10 @@ bool HString::do_operator_equals( HThread*, HHuginn::value_t const&, HHuginn::va
 	return ( _value == static_cast<HString const*>( other_.raw() )->_value );
 }
 
+bool HString::do_operator_less( HThread*, HHuginn::value_t const&, HHuginn::value_t const& other_, int ) const {
+	return ( _value < static_cast<HString const*>( other_.raw() )->_value );
+}
+
 }
 
 }
