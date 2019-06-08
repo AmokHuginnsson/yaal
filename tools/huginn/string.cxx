@@ -547,6 +547,10 @@ int long HString::do_size( huginn::HThread*, int ) const {
 	return ( _value.get_length() );
 }
 
+bool HString::do_operator_equals( HThread*, HHuginn::value_t const&, HHuginn::value_t const& other_, int ) const {
+	return ( _value == static_cast<HString const*>( other_.raw() )->_value );
+}
+
 }
 
 }

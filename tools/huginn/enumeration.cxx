@@ -187,17 +187,6 @@ HHuginn::value_t HEnumeration::do_clone( huginn::HThread* thread_, HHuginn::valu
 
 }
 
-HEnumeral::HEnumeral( HClass const* class_, HHuginn::identifier_id_t identifier_, value_type value_ )
-	: HValue( class_ )
-	, _identifier( identifier_ )
-	, _value( value_ ) {
-	return;
-}
-
-HHuginn::value_t HEnumeral::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
-	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on enumerals.", thread_->current_frame()->file_id(), position_ );
-}
-
 }
 
 }

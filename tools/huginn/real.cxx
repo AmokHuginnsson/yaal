@@ -44,9 +44,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 
 }
 
-}
-
-HReal::HReal( huginn::HClass const* class_, HReal::value_type value_ )
+HReal::HReal( HClass const* class_, HReal::value_type value_ )
 	: HValue( class_ )
 	, _value( value_ ) {
 	return;
@@ -54,6 +52,12 @@ HReal::HReal( huginn::HClass const* class_, HReal::value_type value_ )
 
 HHuginn::value_t HReal::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	return ( thread_->runtime().object_factory()->create_real( _value ) );
+}
+
+bool HReal::do_operator_equals( HThread*, HHuginn::value_t const&, HHuginn::value_t const& other_, int ) const {
+	return ( _value == static_cast<HReal const*>( other_.raw() )->_value );
+}
+
 }
 
 }

@@ -42,8 +42,6 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 
 }
 
-}
-
 HBoolean::HBoolean( huginn::HClass const* class_, HBoolean::value_type value_ )
 	: HValue( class_ )
 	, _value( value_ ) {
@@ -52,6 +50,12 @@ HBoolean::HBoolean( huginn::HClass const* class_, HBoolean::value_type value_ )
 
 HHuginn::value_t HBoolean::do_clone( huginn::HThread*, HHuginn::value_t* object_, int ) const {
 	return ( *object_ );
+}
+
+bool HBoolean::do_operator_equals( HThread*, HHuginn::value_t const&, HHuginn::value_t const& other_, int ) const {
+	return ( _value == static_cast<HBoolean const*>( other_.raw() )->_value );
+}
+
 }
 
 }

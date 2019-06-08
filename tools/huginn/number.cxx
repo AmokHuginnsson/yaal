@@ -94,6 +94,10 @@ HHuginn::value_t HNumber::do_clone( huginn::HThread* thread_, HHuginn::value_t*,
 	return ( thread_->runtime().object_factory()->create_number( _value ) );
 }
 
+bool HNumber::do_operator_equals( HThread*, HHuginn::value_t const&, HHuginn::value_t const& other_, int ) const {
+	return ( _value == static_cast<HNumber const*>( other_.raw() )->_value );
+}
+
 }
 
 }

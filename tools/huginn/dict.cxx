@@ -293,7 +293,9 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	huginn::HDict::values_t const& r( static_cast<huginn::HDict const*>( values_[0].raw() )->value() );
 	bool equal( l.get_size() == r.get_size() );
 	for ( huginn::HDict::values_t::const_iterator lit( l.begin() ), rit( r.begin() ), end( l.end() ); equal && ( lit != end ); ++ lit, ++ rit ) {
-		equal = instruction::equals( thread_, lit->first, rit->first, position_ ) && instruction::equals( thread_, lit->second, rit->second, position_ );
+		HHuginn::value_t const& f( lit->first );
+		HHuginn::value_t const& s( lit->second );
+		equal = f->operator_equals( thread_, f, rit->first, position_ ) && s->operator_equals( thread_, s, rit->second, position_ );
 	}
 	return ( thread_->runtime().boolean_value( equal ) );
 	M_EPILOG

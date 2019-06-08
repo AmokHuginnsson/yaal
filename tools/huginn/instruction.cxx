@@ -845,49 +845,6 @@ bool fallback_compare( HThread* thread_, HHuginn::identifier_id_t methodIdentifi
 }
 }
 
-bool equals( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	bool noneOperand( ( v1_->type_id() == HHuginn::TYPE::NONE ) || ( v2_->type_id() == HHuginn::TYPE::NONE ) );
-	M_ASSERT( noneOperand || ( v1_->type_id() == v2_->type_id() ) );
-	bool res( false );
-	if ( ! noneOperand ) {
-		HHuginn::type_id_t typeId( v1_->type_id() );
-		switch ( typeId.get() ) {
-			case ( static_cast<int>( HHuginn::TYPE::INTEGER ) ): {
-				res = static_cast<huginn::HInteger const*>( v1_.raw() )->value() == static_cast<huginn::HInteger const*>( v2_.raw() )->value();
-			} break;
-			case ( static_cast<int>( HHuginn::TYPE::REAL ) ): {
-				res = static_cast<HReal const*>( v1_.raw() )->value() == static_cast<HReal const*>( v2_.raw() )->value();
-			} break;
-			case ( static_cast<int>( HHuginn::TYPE::STRING ) ): {
-				res = static_cast<HString const*>( v1_.raw() )->value() == static_cast<HString const*>( v2_.raw() )->value();
-			} break;
-			case ( static_cast<int>( HHuginn::TYPE::NUMBER ) ): {
-				res = static_cast<HNumber const*>( v1_.raw() )->value() == static_cast<HNumber const*>( v2_.raw() )->value();
-			} break;
-			case ( static_cast<int>( HHuginn::TYPE::CHARACTER ) ): {
-				res = static_cast<HCharacter const*>( v1_.raw() )->value() == static_cast<HCharacter const*>( v2_.raw() )->value();
-			} break;
-			case ( static_cast<int>( HHuginn::TYPE::BOOLEAN ) ): {
-				res = static_cast<HBoolean const*>( v1_.raw() )->value() == static_cast<HBoolean const*>( v2_.raw() )->value();
-			} break;
-			case ( static_cast<int>( HHuginn::TYPE::FUNCTION_REFERENCE ) ): {
-				res = static_cast<huginn::HFunctionReference const*>( v1_.raw() )->identifier_id() == static_cast<huginn::HFunctionReference const*>( v2_.raw() )->identifier_id();
-			} break;
-			default: {
-				HEnumeral const* enumeral1( dynamic_cast<HEnumeral const*>( v1_.raw() ) );
-				if ( enumeral1 ) {
-					res = enumeral1->value() == static_cast<HEnumeral const*>( v2_.raw() )->value();
-				} else {
-					res = fallback_compare( thread_, IDENTIFIER::INTERFACE::EQUALS, op_to_str( OPERATOR::EQUALS ), v1_, v2_, position_ );
-				}
-			}
-		}
-	} else {
-		res = v1_->type_id() == v2_->type_id();
-	}
-	return ( res );
-}
-
 bool less( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type_id() == v2_->type_id() );
 	bool res( false );

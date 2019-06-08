@@ -960,52 +960,6 @@ void HHuginn::dump_docs( yaal::hcore::HStreamInterface& stream_ ) const {
 	M_EPILOG
 }
 
-HValue::HValue( HClass const* class_ )
-	: _class( class_ ) {
-	return;
-}
-
-int HValue::field_index( HHuginn::identifier_id_t const& identifierId_ ) const {
-	M_PROLOG
-	return ( _class->field_index( identifierId_ ) );
-	M_EPILOG
-}
-
-bool HValue::is_kind_of( HHuginn::identifier_id_t const& typeName_ ) const {
-	M_PROLOG
-	return ( _class->is_kind_of( typeName_ ) );
-	M_EPILOG
-}
-
-HHuginn::value_t HValue::do_field( HHuginn::value_t const& object_, int index_ ) const {
-	M_PROLOG
-	value_t const& f( _class->field( index_ ) );
-	return (
-		( f->type_id() == HHuginn::TYPE::METHOD )
-			?_class->runtime()->object_factory()->create_bound_method(
-				static_cast<HClass::HMethod const*>( f.raw() )->function(),
-				object_
-			)
-			: f
-	);
-	M_EPILOG
-}
-
-HHuginn::value_t const& HValue::do_field( int index_ ) const {
-	M_PROLOG
-	return ( _class->field( index_ ) );
-	M_EPILOG
-}
-
-HHuginn::value_t HValue::clone( huginn::HThread* thread_, HHuginn::value_t* object_, int position_ ) const {
-	return ( do_clone( thread_, object_, position_ ) );
-}
-
-HHuginn::value_t HValue::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
-	M_ASSERT( _class->type_id() == HHuginn::TYPE::NONE );
-	return ( thread_->runtime().none_value() );
-}
-
 HObserver::HObserver( huginn::HClass const* class_, HHuginn::value_t const& value_ )
 	: HValue( class_ )
 	, _value( value_ ) {
@@ -1053,35 +1007,6 @@ HHuginn::value_t HTernaryEvaluator::do_clone( huginn::HThread*, HHuginn::value_t
 #if defined( NDEBUG ) || defined( __MSVCXX__ )
 	return ( HHuginn::value_t() );
 #endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
-}
-
-HFunctionReference::HFunctionReference(
-	huginn::HClass const* class_,
-	HHuginn::identifier_id_t identifierId_,
-	HHuginn::function_t const& function_,
-	yaal::hcore::HString const& doc_,
-	huginn::HClass const* juncture_
-) : HValue( class_ )
-	, _identifierId( identifierId_ )
-	, _function( function_ )
-	, _juncture( juncture_ )
-	, _doc( doc_ ) {
-	return;
-}
-
-void HFunctionReference::reset( HHuginn::function_t const& function_ ) {
-	M_PROLOG
-	_function = function_;
-	return;
-	M_EPILOG
-}
-
-HHuginn::value_t HFunctionReference::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
-	return ( thread_->runtime().object_factory()->create_function_reference( _identifierId, _function, _doc ) );
-}
-
-yaal::hcore::HString const& HFunctionReference::doc( void ) const {
-	return ( _doc );
 }
 
 huginn::HClass::HMethod::HMethod(

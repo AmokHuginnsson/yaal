@@ -85,9 +85,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 
 }
 
-}
-
-HCharacter::HCharacter( huginn::HClass const* class_, HCharacter::value_type value_ )
+HCharacter::HCharacter( HClass const* class_, HCharacter::value_type value_ )
 	: HValue( class_ )
 	, _value( value_ ) {
 	return;
@@ -100,6 +98,12 @@ void HCharacter::set( value_type value_ ) {
 
 HHuginn::value_t HCharacter::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	return ( thread_->runtime().object_factory()->create_character( _value ) );
+}
+
+bool HCharacter::do_operator_equals( HThread*, HHuginn::value_t const&, HHuginn::value_t const& other_, int ) const {
+	return ( _value == static_cast<HCharacter const*>( other_.raw() )->_value );
+}
+
 }
 
 }

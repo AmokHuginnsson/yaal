@@ -215,7 +215,8 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	HOrder::values_t const& r( static_cast<HOrder const*>( values_[0].raw() )->value() );
 	bool equal( l.get_size() == r.get_size() );
 	for ( HOrder::values_t::const_iterator lit( l.begin() ), rit( r.begin() ), end( l.end() ); equal && ( lit != end ); ++ lit, ++ rit ) {
-		equal = instruction::equals( thread_, *lit, *rit, position_ );
+		HHuginn::value_t const& v( *lit );
+		equal = v->operator_equals( thread_, v, *rit, position_ );
 	}
 	return ( thread_->runtime().boolean_value( equal ) );
 	M_EPILOG

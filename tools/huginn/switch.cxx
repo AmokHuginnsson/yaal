@@ -48,7 +48,7 @@ void HSwitch::do_execute( HThread* thread_ ) const {
 						throw HHuginn::HHuginnRuntimeException( "Case type does not match switch type.", file_id(), it->_expression->position() );
 					}
 				}
-				if ( matched || instruction::equals( thread_, v, f->result(), it->_expression->position() ) ) {
+				if ( matched || v->operator_equals( thread_, v, f->result(), it->_expression->position() ) ) {
 					matched = true;
 					it->_scope->execute( thread_ );
 				}

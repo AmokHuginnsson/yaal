@@ -285,7 +285,7 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	bool equal( selfData.get_size() == otherData.get_size() );
 	for ( huginn::HLookup::values_t::const_iterator it( otherData.begin() ), end( otherData.end() ); equal && ( it != end ); ++ it ) {
 		huginn::HLookup::values_t::const_iterator selfIt( selfData.find( it->first ) );
-		equal = ( selfIt != selfData.end() ) && instruction::equals( thread_, selfIt->second, it->second, position_ );
+		equal = ( selfIt != selfData.end() ) && selfIt->second->operator_equals( thread_, selfIt->second, it->second, position_ );
 	}
 	return ( thread_->runtime().boolean_value( equal ) );
 	M_EPILOG

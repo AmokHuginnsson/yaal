@@ -93,7 +93,7 @@ public:
 		if ( c1 != c2 ) {
 			operands_type_mismatch( op_to_str( OPERATOR::NOT_EQUALS ), c1, c2, thread_->current_frame()->file_id(), position_ );
 		}
-		bool res( ! instruction::equals( thread_, v1, v2, position_ ) );
+		bool res( ! v1->operator_equals( thread_, v1, v2, position_ ) );
 		return ( thread_->runtime().boolean_value( res ) );
 		M_EPILOG
 	}
@@ -125,6 +125,12 @@ public:
 	}
 };
 
+namespace {
+bool equals( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
+	return ( v1_->operator_equals( thread_, v1_, v2_, position_ ) );
+}
+}
+
 namespace package_factory {
 
 class HOperatorsCreator : public HPackageCreatorInterface {
@@ -155,7 +161,7 @@ HPackageCreatorInterface::HInstance HOperatorsCreator::do_new_instance( HRuntime
 		create_field( runtime_, "self_modulo",   "Operators.self_modulo",   OPERATOR::MODULO_ASSIGN,   &instruction::mod, &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* **%=** *right* expression" ),
 		create_field( runtime_, "self_power",    "Operators.self_power",    OPERATOR::POWER_ASSIGN,    &instruction::pow, &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* **^=** *right* expression" ),
 		create_field( runtime_, "not_equals", &HOperators::not_equals, "( *left*, *right* ) - return result of *left* *≠* *right* expression" ),
-		create_field( runtime_, IDENTIFIER::INTERFACE::EQUALS,   "Operators.equals",   OPERATOR::EQUALS,   &instruction::equals,  &HOperators::binary_boolean_operator, "( *left*, *right* ) - return result of *left* **==** *right* expression" ),
+		create_field( runtime_, IDENTIFIER::INTERFACE::EQUALS,   "Operators.equals",   OPERATOR::EQUALS,   &equals,  &HOperators::binary_boolean_operator, "( *left*, *right* ) - return result of *left* **==** *right* expression" ),
 		create_field( runtime_, IDENTIFIER::INTERFACE::LESS,     "Operators.less",     OPERATOR::LESS,     &instruction::less,    &HOperators::binary_boolean_operator, "( *left*, *right* ) - return result of *left* **<** *right* expression" ),
 		create_field( runtime_, IDENTIFIER::INTERFACE::GREATER,  "Operators.greater",  OPERATOR::GREATER,  &instruction::greater, &HOperators::binary_boolean_operator, "( *left*, *right* ) - return result of *left* **>** *right* expression" ),
 		create_field( runtime_, IDENTIFIER::INTERFACE::LESS_OR_EQUAL,    "Operators.less_or_equal",     OPERATOR::LESS_OR_EQUAL,     &instruction::less_or_equal,    &HOperators::binary_boolean_operator, "( *left*, *right* ) - return result of *left* **≤** *right* expression" ),

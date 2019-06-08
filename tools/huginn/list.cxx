@@ -324,7 +324,8 @@ inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* obje
 	huginn::HList::values_t const& r( static_cast<huginn::HList const*>( values_[0].raw() )->value() );
 	bool equal( l.get_size() == r.get_size() );
 	for ( int long i( 0 ), c( l.get_size() ); equal && ( i < c ); ++ i ) {
-		equal = instruction::equals( thread_, l[i], r[i], position_ );
+		HHuginn::value_t const& v( l[i] );
+		equal = v->operator_equals( thread_, v, r[i], position_ );
 	}
 	return ( thread_->runtime().boolean_value( equal ) );
 	M_EPILOG
@@ -440,7 +441,7 @@ int long huginn::HList::find( huginn::HThread* thread_, int position_, HHuginn::
 			_data.cbegin() + start_,
 			_data.cbegin() + stop_,
 			[thread_, &val_, position_]( HHuginn::value_t const& elem_ ) {
-				return ( instruction::equals( thread_, val_, elem_, position_ ) );
+				return ( val_->operator_equals( thread_, val_, elem_, position_ ) );
 			}
 		)
 	);

@@ -44,7 +44,20 @@ public:
 	void destroy( HHuginn::value_t* object_ ) {
 		do_destroy( object_ );
 	}
+	bool operator_equals( HThread* thread_, HHuginn::value_t const& self_, HHuginn::value_t const& other_, int position_ ) const {
+		M_ASSERT( self_.raw() == this );
+		bool noneOperand( ( _class->type_id() == HHuginn::TYPE::NONE ) || ( other_->type_id() == HHuginn::TYPE::NONE ) );
+		M_ASSERT( noneOperand || ( _class->type_id() == other_->type_id() ) );
+		bool res( false );
+		if ( ! noneOperand ) {
+			res = do_operator_equals( thread_, self_, other_, position_ );
+		} else {
+			res = _class->type_id() == other_->type_id();
+		}
+		return ( res );
+	}
 private:
+	virtual bool do_operator_equals( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const;
 	virtual void do_destroy( HHuginn::value_t* ) {}
 	virtual HHuginn::value_t do_field( HHuginn::value_t const&, int ) const;
 	virtual HHuginn::value_t const& do_field( int ) const;

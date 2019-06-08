@@ -43,16 +43,20 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 
 }
 
-}
-
-huginn::HInteger::HInteger( huginn::HClass const* class_, huginn::HInteger::value_type value_ )
+HInteger::HInteger( huginn::HClass const* class_, huginn::HInteger::value_type value_ )
 	: HValue( class_ )
 	, _value( value_ ) {
 	return;
 }
 
-HHuginn::value_t huginn::HInteger::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
+HHuginn::value_t HInteger::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	return ( thread_->runtime().object_factory()->create_integer( _value ) );
+}
+
+bool HInteger::do_operator_equals( HThread*, HHuginn::value_t const&, HHuginn::value_t const& other_, int ) const {
+	return ( _value == static_cast<HInteger const*>( other_.raw() )->_value );
+}
+
 }
 
 }
