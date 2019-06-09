@@ -78,6 +78,10 @@ void HReal::do_operator_add( HThread*, HHuginn::value_t&, HHuginn::value_t const
 	_value += static_cast<HReal const*>( other_.raw() )->_value;
 }
 
+void HReal::do_operator_subtract( HThread*, HHuginn::value_t&, HHuginn::value_t const& other_, int ) {
+	_value -= static_cast<HReal const*>( other_.raw() )->_value;
+}
+
 }
 
 }

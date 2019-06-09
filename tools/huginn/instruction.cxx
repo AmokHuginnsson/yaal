@@ -494,17 +494,7 @@ void add( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 }
 
 void sub( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	M_ASSERT( v1_->type_id() == v2_->type_id() );
-	HHuginn::type_id_t typeId( v1_->type_id() );
-	if ( typeId == HHuginn::TYPE::INTEGER ) {
-		static_cast<huginn::HInteger*>( v1_.raw() )->value() -= static_cast<huginn::HInteger const*>( v2_.raw() )->value();
-	} else if ( typeId == HHuginn::TYPE::REAL ) {
-		static_cast<HReal*>( v1_.raw() )->value() -= static_cast<HReal const*>( v2_.raw() )->value();
-	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
-		static_cast<HNumber*>( v1_.raw() )->value() -= static_cast<HNumber const*>( v2_.raw() )->value();
-	} else {
-		fallback_arithmetic( thread_, IDENTIFIER::INTERFACE::SUBTRACT, op_to_str( OPERATOR::MINUS ), v1_, v2_, position_ );
-	}
+	v1_->operator_subtract( thread_, v1_, v2_, position_ );
 	return;
 }
 
