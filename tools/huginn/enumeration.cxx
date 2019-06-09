@@ -183,6 +183,17 @@ HHuginn::value_t HEnumeration::do_clone( huginn::HThread* thread_, HHuginn::valu
 	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on enumerations.", thread_->current_frame()->file_id(), position_ );
 }
 
+bool HEnumeration::do_operator_contains( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	if ( ! is_enumeral( other_ ) ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"Only `ENUMERAL`s can be elements of `ENUMERATION`s.",
+			thread_->current_frame()->file_id(),
+			position_
+		);
+	}
+	return ( static_cast<enumeration::HEnumerationClass::HEnumeralClass const*>( static_cast<HEnumeral const*>( other_.raw() )->get_class() )->enumeration_class() == get_class() );
+}
+
 }
 
 }

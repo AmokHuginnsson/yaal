@@ -56,6 +56,7 @@ private:
 	HLookup& operator = ( HLookup const& ) = delete;
 private:
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
+	virtual bool do_operator_contains( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const override;
 };
 
 namespace lookup {

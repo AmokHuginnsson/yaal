@@ -279,29 +279,27 @@ HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const
 
 }
 
-}
-
-huginn::HSet::HSet( huginn::HClass const* class_, allocator_t const& allocator_ )
+HSet::HSet( HClass const* class_, allocator_t const& allocator_ )
 	: HInvalidatingIterable( class_ )
 	, _helper()
 	, _data( _helper, _helper, allocator_ ) {
 	return;
 }
 
-int long huginn::HSet::do_size( huginn::HThread*, int ) const {
+int long HSet::do_size( huginn::HThread*, int ) const {
 	return ( _data.get_size() );
 }
 
-bool huginn::HSet::has_key( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) const {
+bool HSet::has_key( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) const {
 	M_PROLOG
-	HAnchorGuard<huginn::HSet> ag( *this, thread_, position_ );
+	HAnchorGuard<HSet> ag( *this, thread_, position_ );
 	return ( _data.find( key_ ) != _data.end() );
 	M_EPILOG
 }
 
-void huginn::HSet::erase( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) {
+void HSet::erase( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) {
 	M_PROLOG
-	HAnchorGuard<huginn::HSet> ag( *this, thread_, position_ );
+	HAnchorGuard<HSet> ag( *this, thread_, position_ );
 	values_t::iterator it( _data.find( key_ ) );
 	if ( it != _data.end() ) {
 		skip( it.node_id() );
@@ -311,15 +309,15 @@ void huginn::HSet::erase( huginn::HThread* thread_, HHuginn::value_t const& key_
 	M_EPILOG
 }
 
-void huginn::HSet::insert( huginn::HThread* thread_, HHuginn::value_t const& value_, int position_ ) {
+void HSet::insert( huginn::HThread* thread_, HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
-	HAnchorGuard<huginn::HSet> ag( *this, thread_, position_ );
+	HAnchorGuard<HSet> ag( *this, thread_, position_ );
 	_data.insert( value_ );
 	return;
 	M_EPILOG
 }
 
-void huginn::HSet::clear( void ) {
+void HSet::clear( void ) {
 	M_PROLOG
 	invalidate();
 	_data.clear();
@@ -327,21 +325,27 @@ void huginn::HSet::clear( void ) {
 	M_EPILOG
 }
 
-huginn::HIterable::iterator_t huginn::HSet::do_iterator( huginn::HThread*, int ) {
-	return ( make_pointer<huginn::set::HSetIterator>( this ) );
+HIterable::iterator_t HSet::do_iterator( huginn::HThread*, int ) {
+	return ( make_pointer<set::HSetIterator>( this ) );
 }
 
-HHuginn::value_t huginn::HSet::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
+HHuginn::value_t HSet::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
 	M_PROLOG
 	HHuginn::value_t res( thread_->runtime().object_factory()->create_set() );
 	HSet* set( static_cast<HSet*>( res.raw() ) );
 	values_t& data( set->value() );
-	HAnchorGuard<huginn::HSet> ag( *set, thread_, position_ );
+	HAnchorGuard<HSet> ag( *set, thread_, position_ );
 	for ( values_t::value_type const& v : _data ) {
 		data.insert( v->clone( thread_, const_cast<HHuginn::value_t*>( &v ), position_ ) );
 	}
 	return ( res );
 	M_EPILOG
+}
+
+bool HSet::do_operator_contains( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	return ( has_key( thread_, other_, position_ ) );
+}
+
 }
 
 }

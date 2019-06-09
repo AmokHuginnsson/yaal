@@ -282,8 +282,6 @@ HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const
 
 }
 
-}
-
 HOrder::HOrder( HClass const* class_, allocator_t const& allocator_ )
 	: HInvalidatingIterable( class_ )
 	, _helper( &instruction::less )
@@ -364,7 +362,7 @@ HClass const* HOrder::key_type( void ) const {
 	return ( _keyType );
 }
 
-huginn::HIterable::iterator_t HOrder::do_iterator( huginn::HThread*, int ) {
+HIterable::iterator_t HOrder::do_iterator( huginn::HThread*, int ) {
 	return ( make_pointer<huginn::order::HOrderIterator>( this ) );
 }
 
@@ -378,6 +376,12 @@ HHuginn::value_t HOrder::do_clone( huginn::HThread* thread_, HHuginn::value_t*, 
 		data.insert( data.end(), v->clone( thread_, const_cast<HHuginn::value_t*>( &v ), position_ ) );
 	}
 	return ( res );
+}
+
+bool HOrder::do_operator_contains( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	return ( has_key( thread_, other_, position_ ) );
+}
+
 }
 
 }

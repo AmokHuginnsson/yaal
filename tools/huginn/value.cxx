@@ -124,6 +124,11 @@ bool HValue::do_operator_greater_or_equal( HThread* thread_, HHuginn::value_t co
 	return ( fallback_compare( thread_, IDENTIFIER::INTERFACE::GREATER_OR_EQUAL, op_to_str( OPERATOR::GREATER_OR_EQUAL ), self_, other_, position_ ) );
 }
 
+bool HValue::do_operator_contains( HThread* thread_, HHuginn::value_t const& self_, HHuginn::value_t const& other_, int position_ ) const {
+	M_ASSERT( is_collection_like( _class ) || ( _class->type_id() > huginn::type_id( HHuginn::TYPE::UNKNOWN ) ) );
+	return ( fallback_compare( thread_, IDENTIFIER::INTERFACE::CONTAINS, op_to_str( OPERATOR::IS_ELEMENT_OF ), self_, other_, position_ ) );
+}
+
 }
 
 }

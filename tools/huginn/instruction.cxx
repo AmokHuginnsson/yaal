@@ -808,43 +808,6 @@ int long hash( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	return ( rt );
 }
 
-namespace {
-bool fallback_compare( HThread* thread_, HHuginn::identifier_id_t methodIdentifier_, char const* oper_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	HObject const* o( dynamic_cast<HObject const*>( v1_.raw() ) );
-	HHuginn::value_t v;
-	if ( o ) {
-		v = o->call_method( thread_, v1_, methodIdentifier_, HArguments( thread_, v2_ ), position_ );
-		if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
-			throw HHuginn::HHuginnRuntimeException(
-				"Comparison method `"_ys
-					.append( thread_->runtime().identifier_name( methodIdentifier_ ) )
-					.append( "` returned non-boolean result of " )
-					.append( a_type_name( v->get_class() ) )
-					.append( " type." ),
-				thread_->current_frame()->file_id(),
-				position_
-			);
-		}
-	} else {
-		HClass const* c( v1_->get_class() );
-		int idx( c->field_index( methodIdentifier_ ) );
-		if ( idx >= 0 ) {
-			HClass::HMethod const& m( *static_cast<HClass::HMethod const*>( c->field( idx ).raw() ) );
-			v = m.function()( thread_, const_cast<HHuginn::value_t*>( &v1_ ), HArguments( thread_, v2_ ), position_ );
-			M_ASSERT( ( v->type_id() == HHuginn::TYPE::BOOLEAN ) || ! thread_->can_continue() );
-		} else {
-			throw HHuginn::HHuginnRuntimeException(
-				"There is no `"_ys.append( oper_ ).append( "` operator for " ).append( a_type_name( v1_->get_class() ) ).append( "." ),
-				thread_->current_frame()->file_id(),
-				position_
-			);
-		}
-	}
-	HBoolean* b( static_cast<HBoolean*>( v.raw() ) );
-	return ( b->value() );
-}
-}
-
 bool less( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	return ( v1_->operator_less( thread_, v1_, v2_, position_ ) );
 }
@@ -870,55 +833,8 @@ bool greater_or_equal( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::v
 	return ( v1_->operator_greater_or_equal( thread_, v1_, v2_, position_ ) );
 }
 
-bool is_element_of( HThread* thread_, OPERATOR operator_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	M_ASSERT( is_collection_like( v2_->get_class() ) || ( v2_->type_id() > type_id( HHuginn::TYPE::UNKNOWN ) ) );
-	bool res( false );
-	HHuginn::type_id_t typeId( v2_->type_id() );
-	if ( typeId == HHuginn::TYPE::TUPLE ) {
-		huginn::HTuple const& tuple( *static_cast<huginn::HTuple const*>( v2_.raw() ) );
-		res = tuple.find( thread_, position_, v1_ ) != huginn::HTuple::npos;
-	} else if ( typeId == HHuginn::TYPE::LIST ) {
-		huginn::HList const& list( *static_cast<huginn::HList const*>( v2_.raw() ) );
-		res = list.find( thread_, position_, v1_ ) != huginn::HList::npos;
-	} else if ( typeId == HHuginn::TYPE::DEQUE ) {
-		huginn::HDeque const& deque( *static_cast<huginn::HDeque const*>( v2_.raw() ) );
-		res = deque.find( thread_, position_, v1_ ) != huginn::HDeque::npos;
-	} else if ( typeId == HHuginn::TYPE::DICT ) {
-		huginn::HDict const& dict( *static_cast<huginn::HDict const*>( v2_.raw() ) );
-		res = dict.has_key( thread_, v1_, position_ );
-	} else if ( typeId == HHuginn::TYPE::LOOKUP ) {
-		huginn::HLookup const& lookup( *static_cast<huginn::HLookup const*>( v2_.raw() ) );
-		res = lookup.has_key( thread_, v1_, position_ );
-	} else if ( typeId == HHuginn::TYPE::ORDER ) {
-		huginn::HOrder const& order( *static_cast<huginn::HOrder const*>( v2_.raw() ) );
-		res = order.has_key( thread_, v1_, position_ );
-	} else if ( typeId == HHuginn::TYPE::SET ) {
-		huginn::HSet const& set( *static_cast<huginn::HSet const*>( v2_.raw() ) );
-		res = set.has_key( thread_, v1_, position_ );
-	} else if ( typeId == HHuginn::TYPE::STRING ) {
-		hcore::HString const& string( static_cast<HString const*>( v2_.raw() )->value() );
-		if ( v1_->type_id() != HHuginn::TYPE::CHARACTER ) {
-			throw HHuginn::HHuginnRuntimeException(
-				"Only `character`s can be elements of `string`s.",
-				thread_->current_frame()->file_id(),
-				position_
-			);
-		}
-		res = string.find( static_cast<HCharacter const*>( v1_.raw() )->value() ) != HString::npos;
-	} else if ( is_enum_class( v2_ ) ) {
-		if ( is_enumeral( v1_ ) ) {
-			res = static_cast<enumeration::HEnumerationClass::HEnumeralClass const*>( static_cast<HEnumeral const*>( v1_.raw() )->get_class() )->enumeration_class() == v2_->get_class();
-		} else {
-			throw HHuginn::HHuginnRuntimeException(
-				"Only `ENUMERAL`s can be elements of `ENUMERATION`s.",
-				thread_->current_frame()->file_id(),
-				position_
-			);
-		}
-	} else {
-		res = fallback_compare( thread_, IDENTIFIER::INTERFACE::CONTAINS, op_to_str( operator_ ), v2_, v1_, position_ );
-	}
-	return ( res );
+bool is_element_of( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
+	return ( v2_->operator_contains( thread_, v2_, v1_, position_ ) );
 }
 
 HHuginn::value_t boolean_xor( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int ) {

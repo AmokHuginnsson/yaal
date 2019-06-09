@@ -399,8 +399,6 @@ HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const
 
 }
 
-}
-
 huginn::HList::HList( HClass const* class_, values_t&& data_ )
 	: HIterable( class_ )
 	, _data( yaal::move( data_ ) ) {
@@ -476,6 +474,12 @@ HHuginn::value_t huginn::HList::do_clone( huginn::HThread* thread_, HHuginn::val
 		data.push_back( v->clone( thread_, const_cast<HHuginn::value_t*>( &v ), position_ ) );
 	}
 	return ( thread_->runtime().object_factory()->create_list( yaal::move( data ) ) );
+}
+
+bool HList::do_operator_contains( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	return ( find( thread_, position_, other_ ) != huginn::HList::npos );
+}
+
 }
 
 }

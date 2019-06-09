@@ -385,22 +385,20 @@ HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const
 
 }
 
-}
-
-huginn::HLookup::HLookup( HClass const* class_, allocator_t const& allocator_ )
+HLookup::HLookup( HClass const* class_, allocator_t const& allocator_ )
 	: HInvalidatingIterable( class_ )
 	, _helper()
 	, _data( _helper, _helper, allocator_ ) {
 	return;
 }
 
-int long huginn::HLookup::do_size( huginn::HThread*, int ) const {
+int long HLookup::do_size( huginn::HThread*, int ) const {
 	return ( _data.get_size() );
 }
 
-HHuginn::value_t huginn::HLookup::get( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) {
+HHuginn::value_t HLookup::get( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) {
 	M_PROLOG
-	HAnchorGuard<huginn::HLookup> ag( *this, thread_, position_ );
+	HAnchorGuard<HLookup> ag( *this, thread_, position_ );
 	values_t::iterator it( _data.find( key_ ) );
 	if ( ! ( it != _data.end() ) ) {
 		throw HHuginn::HHuginnRuntimeException( "Key does not exist in `lookup`.", thread_->current_frame()->file_id(), position_ );
@@ -409,9 +407,9 @@ HHuginn::value_t huginn::HLookup::get( huginn::HThread* thread_, HHuginn::value_
 	M_EPILOG
 }
 
-bool huginn::HLookup::try_get( huginn::HThread* thread_, HHuginn::value_t const& key_, HHuginn::value_t& result_, int position_ ) {
+bool HLookup::try_get( huginn::HThread* thread_, HHuginn::value_t const& key_, HHuginn::value_t& result_, int position_ ) {
 	M_PROLOG
-	HAnchorGuard<huginn::HLookup> ag( *this, thread_, position_ );
+	HAnchorGuard<HLookup> ag( *this, thread_, position_ );
 	values_t::iterator it( _data.find( key_ ) );
 	bool found( false );
 	if ( it != _data.end() ) {
@@ -422,16 +420,16 @@ bool huginn::HLookup::try_get( huginn::HThread* thread_, HHuginn::value_t const&
 	M_EPILOG
 }
 
-bool huginn::HLookup::has_key( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) const {
+bool HLookup::has_key( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) const {
 	M_PROLOG
-	HAnchorGuard<huginn::HLookup> ag( *this, thread_, position_ );
+	HAnchorGuard<HLookup> ag( *this, thread_, position_ );
 	return ( _data.find( key_ ) != _data.end() );
 	M_EPILOG
 }
 
-void huginn::HLookup::erase( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) {
+void HLookup::erase( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) {
 	M_PROLOG
-	HAnchorGuard<huginn::HLookup> ag( *this, thread_, position_ );
+	HAnchorGuard<HLookup> ag( *this, thread_, position_ );
 	values_t::iterator it( _data.find( key_ ) );
 	if ( it != _data.end() ) {
 		skip( it.node_id() );
@@ -441,33 +439,33 @@ void huginn::HLookup::erase( huginn::HThread* thread_, HHuginn::value_t const& k
 	M_EPILOG
 }
 
-HHuginn::value_t& huginn::HLookup::get_ref( huginn::HThread* thread_, HHuginn::value_t const& key_, HHuginn::value_t const& value_, int position_ ) {
+HHuginn::value_t& HLookup::get_ref( huginn::HThread* thread_, HHuginn::value_t const& key_, HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
-	HAnchorGuard<huginn::HLookup> ag( *this, thread_, position_ );
+	HAnchorGuard<HLookup> ag( *this, thread_, position_ );
 	return ( _data.insert( make_pair( key_, value_ ) ).first->second );
 	M_EPILOG
 }
 
-void huginn::HLookup::insert( huginn::HThread* thread_, HHuginn::value_t const& key_, HHuginn::value_t const& value_, int position_ ) {
+void HLookup::insert( huginn::HThread* thread_, HHuginn::value_t const& key_, HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
-	HAnchorGuard<huginn::HLookup> ag( *this, thread_, position_ );
+	HAnchorGuard<HLookup> ag( *this, thread_, position_ );
 	_data.insert( make_pair( key_, value_ ) );
 	return;
 	M_EPILOG
 }
 
-void huginn::HLookup::update( huginn::HThread* thread_, HHuginn::value_t const& lookup_, int position_ ) {
+void HLookup::update( huginn::HThread* thread_, HHuginn::value_t const& lookup_, int position_ ) {
 	M_PROLOG
-	HAnchorGuard<huginn::HLookup> ag( *this, thread_, position_ );
-	huginn::HLookup::values_t const& r( static_cast<huginn::HLookup const*>( lookup_.raw() )->value() );
-	for ( huginn::HLookup::values_t::const_iterator it( r.begin() ), end( r.end() ); it != end; ++ it ) {
+	HAnchorGuard<HLookup> ag( *this, thread_, position_ );
+	HLookup::values_t const& r( static_cast<HLookup const*>( lookup_.raw() )->value() );
+	for ( HLookup::values_t::const_iterator it( r.begin() ), end( r.end() ); it != end; ++ it ) {
 		_data.insert( *it );
 	}
 	return;
 	M_EPILOG
 }
 
-void huginn::HLookup::clear( void ) {
+void HLookup::clear( void ) {
 	M_PROLOG
 	invalidate();
 	_data.clear();
@@ -475,17 +473,17 @@ void huginn::HLookup::clear( void ) {
 	M_EPILOG
 }
 
-huginn::HIterable::iterator_t huginn::HLookup::do_iterator( huginn::HThread*, int ) {
+HIterable::iterator_t HLookup::do_iterator( huginn::HThread*, int ) {
 	return (
-		make_pointer<huginn::lookup::HLookupIterator>(
+		make_pointer<lookup::HLookupIterator>(
 			this,
 			*get_class()->runtime()->object_factory(),
-			huginn::lookup::HLookupIterator::TYPE::KEYS
+			lookup::HLookupIterator::TYPE::KEYS
 		)
 	);
 }
 
-HHuginn::value_t huginn::HLookup::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
+HHuginn::value_t HLookup::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
 	M_PROLOG
 	HHuginn::value_t res( thread_->runtime().object_factory()->create_lookup() );
 	HLookup* lookup( static_cast<HLookup*>( res.raw() ) );
@@ -501,6 +499,12 @@ HHuginn::value_t huginn::HLookup::do_clone( huginn::HThread* thread_, HHuginn::v
 	}
 	return ( res );
 	M_EPILOG
+}
+
+bool HLookup::do_operator_contains( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	return ( has_key( thread_, other_, position_ ) );
+}
+
 }
 
 }

@@ -270,19 +270,17 @@ HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const
 
 }
 
-}
-
-huginn::HTuple::HTuple( HClass const* class_, values_t&& data_ )
+HTuple::HTuple( HClass const* class_, values_t&& data_ )
 	: HIterable( class_ )
 	, _data( yaal::move( data_ ) ) {
 	return;
 }
 
-int long huginn::HTuple::do_size( huginn::HThread*, int ) const {
+int long HTuple::do_size( huginn::HThread*, int ) const {
 	return ( _data.get_size() );
 }
 
-int long huginn::HTuple::find( huginn::HThread* thread_, int position_, HHuginn::value_t const& val_, int long start_, int long stop_ ) const {
+int long HTuple::find( huginn::HThread* thread_, int position_, HHuginn::value_t const& val_, int long start_, int long stop_ ) const {
 	M_PROLOG
 	if ( stop_ < 0 ) {
 		stop_ = _data.get_size();
@@ -308,17 +306,23 @@ HHuginn::value_t huginn::HTuple::get( int long long index_ ) {
 	M_EPILOG
 }
 
-huginn::HIterable::iterator_t huginn::HTuple::do_iterator( huginn::HThread*, int ) {
-	return ( make_pointer<huginn::tuple::HTupleIterator>( this ) );
+HIterable::iterator_t HTuple::do_iterator( huginn::HThread*, int ) {
+	return ( make_pointer<tuple::HTupleIterator>( this ) );
 }
 
-HHuginn::value_t huginn::HTuple::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
+HHuginn::value_t HTuple::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
 	values_t data;
 	data.reserve( _data.get_size() );
 	for ( values_t::value_type const& v : _data ) {
 		data.push_back( v->clone( thread_, const_cast<HHuginn::value_t*>( &v ), position_ ) );
 	}
 	return ( thread_->runtime().object_factory()->create_tuple( yaal::move( data ) ) );
+}
+
+bool HTuple::do_operator_contains( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	return ( find( thread_, position_, other_ ) != huginn::HTuple::npos );
+}
+
 }
 
 }

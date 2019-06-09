@@ -567,6 +567,17 @@ bool HString::do_operator_greater_or_equal( HThread*, HHuginn::value_t const&, H
 	return ( _value >= static_cast<HString const*>( other_.raw() )->_value );
 }
 
+bool HString::do_operator_contains( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	if ( other_->type_id() != HHuginn::TYPE::CHARACTER ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"Only `character`s can be elements of `string`s.",
+			thread_->current_frame()->file_id(),
+			position_
+		);
+	}
+	return ( _value.find( static_cast<HCharacter const*>( other_.raw() )->value() ) != HString::npos );
+}
+
 }
 
 }

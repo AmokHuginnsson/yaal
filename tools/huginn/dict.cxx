@@ -401,9 +401,7 @@ HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const
 
 }
 
-}
-
-huginn::HDict::HDict( HClass const* class_, allocator_t const& allocator_ )
+HDict::HDict( HClass const* class_, allocator_t const& allocator_ )
 	: HInvalidatingIterable( class_ )
 	, _helper( &instruction::less )
 	, _data( _helper, allocator_ )
@@ -411,11 +409,11 @@ huginn::HDict::HDict( HClass const* class_, allocator_t const& allocator_ )
 	return;
 }
 
-int long huginn::HDict::do_size( huginn::HThread*, int ) const {
+int long HDict::do_size( huginn::HThread*, int ) const {
 	return ( _data.get_size() );
 }
 
-void huginn::HDict::verify_key_type( huginn::HThread* thread_, HClass const* keyType_, int position_ ) const {
+void HDict::verify_key_type( huginn::HThread* thread_, HClass const* keyType_, int position_ ) const {
 	M_ASSERT( keyType_ );
 	if ( _keyType && ( keyType_ != _keyType ) ) {
 		throw HHuginn::HHuginnRuntimeException( "Non-uniform key types, got "_ys.append( a_type_name( keyType_ ) ).append( " instead of " ).append( a_type_name( _keyType ) ).append( "." ), thread_->current_frame()->file_id(), position_ );
@@ -430,16 +428,16 @@ void huginn::HDict::verify_key_type( huginn::HThread* thread_, HClass const* key
 	return;
 }
 
-void huginn::HDict::update_key_type( huginn::HThread* thread_, HClass const* keyType_, int position_ ) {
+void HDict::update_key_type( huginn::HThread* thread_, HClass const* keyType_, int position_ ) {
 	verify_key_type( thread_, keyType_, position_ );
 	_keyType = keyType_;
 	return;
 }
 
-HHuginn::value_t huginn::HDict::get( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) {
+HHuginn::value_t HDict::get( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) {
 	M_PROLOG
 	verify_key_type( thread_, key_->get_class(), position_ );
-	HAnchorGuard<huginn::HDict> ag( *this, thread_, position_ );
+	HAnchorGuard<HDict> ag( *this, thread_, position_ );
 	values_t::iterator it( _data.find( key_ ) );
 	if ( ! ( it != _data.end() ) ) {
 		throw HHuginn::HHuginnRuntimeException( "Key does not exist in `dict`.", thread_->current_frame()->file_id(), position_ );
@@ -448,10 +446,10 @@ HHuginn::value_t huginn::HDict::get( huginn::HThread* thread_, HHuginn::value_t 
 	M_EPILOG
 }
 
-bool huginn::HDict::try_get( huginn::HThread* thread_, HHuginn::value_t const& key_, HHuginn::value_t& result_, int position_ ) {
+bool HDict::try_get( huginn::HThread* thread_, HHuginn::value_t const& key_, HHuginn::value_t& result_, int position_ ) {
 	M_PROLOG
 	verify_key_type( thread_, key_->get_class(), position_ );
-	HAnchorGuard<huginn::HDict> ag( *this, thread_, position_ );
+	HAnchorGuard<HDict> ag( *this, thread_, position_ );
 	values_t::iterator it( _data.find( key_ ) );
 	bool found( false );
 	if ( it != _data.end() ) {
@@ -462,18 +460,18 @@ bool huginn::HDict::try_get( huginn::HThread* thread_, HHuginn::value_t const& k
 	M_EPILOG
 }
 
-bool huginn::HDict::has_key( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) const {
+bool HDict::has_key( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) const {
 	M_PROLOG
 	verify_key_type( thread_, key_->get_class(), position_ );
-	HAnchorGuard<huginn::HDict> ag( *this, thread_, position_ );
+	HAnchorGuard<HDict> ag( *this, thread_, position_ );
 	return ( _data.find( key_ ) != _data.end() );
 	M_EPILOG
 }
 
-void huginn::HDict::erase( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) {
+void HDict::erase( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) {
 	M_PROLOG
 	verify_key_type( thread_, key_->get_class(), position_ );
-	HAnchorGuard<huginn::HDict> ag( *this, thread_, position_ );
+	HAnchorGuard<HDict> ag( *this, thread_, position_ );
 	values_t::iterator it( _data.find( key_ ) );
 	if ( it != _data.end() ) {
 		skip( it.node_id() );
@@ -483,28 +481,28 @@ void huginn::HDict::erase( huginn::HThread* thread_, HHuginn::value_t const& key
 	M_EPILOG
 }
 
-HHuginn::value_t& huginn::HDict::get_ref( huginn::HThread* thread_, HHuginn::value_t const& key_, HHuginn::value_t const& value_, int position_ ) {
+HHuginn::value_t& HDict::get_ref( huginn::HThread* thread_, HHuginn::value_t const& key_, HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
 	update_key_type( thread_, key_->get_class(), position_ );
-	HAnchorGuard<huginn::HDict> ag( *this, thread_, position_ );
+	HAnchorGuard<HDict> ag( *this, thread_, position_ );
 	return ( _data.insert( make_pair( key_, value_ ) ).first->second );
 	M_EPILOG
 }
 
-void huginn::HDict::insert( huginn::HThread* thread_, HHuginn::value_t const& key_, HHuginn::value_t const& value_, int position_ ) {
+void HDict::insert( huginn::HThread* thread_, HHuginn::value_t const& key_, HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
 	update_key_type( thread_, key_->get_class(), position_ );
-	HAnchorGuard<huginn::HDict> ag( *this, thread_, position_ );
+	HAnchorGuard<HDict> ag( *this, thread_, position_ );
 	_data.insert( make_pair( key_, value_ ) );
 	return;
 	M_EPILOG
 }
 
-HClass const* huginn::HDict::key_type( void ) const {
+HClass const* HDict::key_type( void ) const {
 	return ( _keyType );
 }
 
-void huginn::HDict::clear( void ) {
+void HDict::clear( void ) {
 	M_PROLOG
 	invalidate();
 	_data.clear();
@@ -513,22 +511,22 @@ void huginn::HDict::clear( void ) {
 	M_EPILOG
 }
 
-huginn::HIterable::iterator_t huginn::HDict::do_iterator( huginn::HThread*, int ) {
+HIterable::iterator_t HDict::do_iterator( huginn::HThread*, int ) {
 	return (
-		make_pointer<huginn::dict::HDictIterator>(
+		make_pointer<dict::HDictIterator>(
 			this,
 			*get_class()->runtime()->object_factory(),
-			huginn::dict::HDictIterator::TYPE::KEYS
+			dict::HDictIterator::TYPE::KEYS
 		)
 	);
 }
 
-HHuginn::value_t huginn::HDict::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
+HHuginn::value_t HDict::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
 	HHuginn::value_t res( thread_->runtime().object_factory()->create_dict() );
 	HDict* dict( static_cast<HDict*>( res.raw() ) );
 	dict->_keyType = _keyType;
 	values_t& data( dict->value() );
-	HAnchorGuard<huginn::HDict> ag( *dict, thread_, position_ );
+	HAnchorGuard<HDict> ag( *dict, thread_, position_ );
 	for ( values_t::value_type const& v : _data ) {
 		data.insert(
 			data.end(),
@@ -539,6 +537,12 @@ HHuginn::value_t huginn::HDict::do_clone( huginn::HThread* thread_, HHuginn::val
 		);
 	}
 	return ( res );
+}
+
+bool HDict::do_operator_contains( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	return ( has_key( thread_, other_, position_ ) );
+}
+
 }
 
 }

@@ -1044,14 +1044,13 @@ void HExpression::less_or_equal( OExecutionStep const&, HFrame* frame_ ) {
 	++ frame_->ip();
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
-	frame_->values().pop();
+	HHuginn::value_t& v1( frame_->values().top() );
 	HClass const* c1( v1->get_class() );
 	HClass const* c2( v2->get_class() );
 	if ( c1 != c2 ) {
 		operands_type_mismatch( op_to_str( OPERATOR::LESS_OR_EQUAL ), c1, c2, file_id(), p );
 	}
-	frame_->values().push( frame_->thread()->runtime().boolean_value( instruction::less_or_equal( frame_->thread(), v1, v2, p ) ) );
+	v1 = frame_->thread()->runtime().boolean_value( v1->operator_less_or_equal( frame_->thread(), v1, v2, p ) );
 	return;
 	M_EPILOG
 }
@@ -1064,14 +1063,13 @@ void HExpression::greater_or_equal( OExecutionStep const&, HFrame* frame_ ) {
 	++ frame_->ip();
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
-	frame_->values().pop();
+	HHuginn::value_t& v1( frame_->values().top() );
 	HClass const* c1( v1->get_class() );
 	HClass const* c2( v2->get_class() );
 	if ( c1 != c2 ) {
 		operands_type_mismatch( op_to_str( OPERATOR::GREATER_OR_EQUAL ), c1, c2, file_id(), p );
 	}
-	frame_->values().push( frame_->thread()->runtime().boolean_value( instruction::greater_or_equal( frame_->thread(), v1, v2, p ) ) );
+	v1 = frame_->thread()->runtime().boolean_value( v1->operator_greater_or_equal( frame_->thread(), v1, v2, p ) );
 	return;
 	M_EPILOG
 }
@@ -1084,13 +1082,12 @@ void HExpression::is_element_of( OExecutionStep const&, HFrame* frame_ ) {
 	++ frame_->ip();
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
-	frame_->values().pop();
+	HHuginn::value_t& v1( frame_->values().top() );
 	HClass const* c2( v2->get_class() );
 	if ( ( c2->type_id() <= type_id( HHuginn::TYPE::UNKNOWN ) ) && ! is_collection_like( c2 ) ) {
 		throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_COLL] ).append( a_type_name( c2 ) ), file_id(), p );
 	}
-	frame_->values().push( frame_->thread()->runtime().boolean_value( instruction::is_element_of( frame_->thread(), OPERATOR::IS_ELEMENT_OF, v1, v2, p ) ) );
+	v1 = frame_->thread()->runtime().boolean_value( v2->operator_contains( frame_->thread(), v2, v1, p ) );
 	return;
 	M_EPILOG
 }
@@ -1103,13 +1100,12 @@ void HExpression::is_not_element_of( OExecutionStep const&, HFrame* frame_ ) {
 	++ frame_->ip();
 	HHuginn::value_t v2( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	HHuginn::value_t v1( yaal::move( frame_->values().top() ) );
-	frame_->values().pop();
+	HHuginn::value_t& v1( frame_->values().top() );
 	HClass const* c2( v2->get_class() );
 	if ( ( c2->type_id() <= type_id( HHuginn::TYPE::UNKNOWN ) ) && ! is_collection_like( c2 ) ) {
 		throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_COLL] ).append( a_type_name( c2 ) ), file_id(), p );
 	}
-	frame_->values().push( frame_->thread()->runtime().boolean_value( ! instruction::is_element_of( frame_->thread(), OPERATOR::IS_NOT_ELEMENT_OF, v1, v2, p ) ) );
+	v1 = frame_->thread()->runtime().boolean_value( ! v2->operator_contains( frame_->thread(), v2, v1, p ) );
 	return;
 	M_EPILOG
 }
