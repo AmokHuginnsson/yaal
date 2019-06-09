@@ -73,6 +73,10 @@ bool HInteger::do_operator_greater_or_equal( HThread*, HHuginn::value_t const&, 
 	return ( _value >= static_cast<HInteger const*>( other_.raw() )->_value );
 }
 
+void HInteger::do_operator_add( HThread*, HHuginn::value_t&, HHuginn::value_t const& other_, int ) {
+	_value += static_cast<HInteger const*>( other_.raw() )->_value;
+}
+
 }
 
 }

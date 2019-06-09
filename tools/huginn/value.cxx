@@ -104,6 +104,42 @@ bool fallback_compare( HThread* thread_, HHuginn::identifier_id_t methodIdentifi
 }
 }
 
+void fallback_arithmetic( HThread* thread_, HHuginn::identifier_id_t methodIdentifier_, char const* oper_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, int position_ ) {
+	HHuginn::value_t v;
+	HHuginn::type_id_t t( v1_->type_id() );
+	if ( HObject const* o = dynamic_cast<HObject const*>( v1_.raw() ) ) {
+		v = o->call_method( thread_, v1_, methodIdentifier_, HArguments( thread_, v2_ ), position_ );
+		if ( v->type_id() != t ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"Arithmetic method `"_ys
+					.append( thread_->runtime().identifier_name( methodIdentifier_ ) )
+					.append( "` on " )
+					.append( a_type_name( v1_->get_class() ) )
+					.append( " returned result of incompatible type " )
+					.append( a_type_name( v->get_class() ) )
+					.append( "." ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+	} else {
+		HClass const* c( v1_->get_class() );
+		int idx( c->field_index( methodIdentifier_ ) );
+		if ( idx >= 0 ) {
+			HClass::HMethod const& m( *static_cast<HClass::HMethod const*>( c->field( idx ).raw() ) );
+			v = m.function()( thread_, &v1_, HArguments( thread_, v2_ ), position_ );
+			M_ASSERT( ( v->type_id() == t ) || ! thread_->can_continue() );
+		} else {
+			throw HHuginn::HHuginnRuntimeException(
+				"There is no `"_ys.append( oper_ ).append( "` operator for " ).append( a_type_name( t ) ).append( "." ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+	}
+	return;
+}
+
 bool HValue::do_operator_equals( HThread* thread_, HHuginn::value_t const& self_, HHuginn::value_t const& other_, int position_ ) const {
 	return ( fallback_compare( thread_, IDENTIFIER::INTERFACE::EQUALS, op_to_str( OPERATOR::EQUALS ), self_, other_, position_ ) );
 }
@@ -127,6 +163,10 @@ bool HValue::do_operator_greater_or_equal( HThread* thread_, HHuginn::value_t co
 bool HValue::do_operator_contains( HThread* thread_, HHuginn::value_t const& self_, HHuginn::value_t const& other_, int position_ ) const {
 	M_ASSERT( is_collection_like( _class ) || ( _class->type_id() > huginn::type_id( HHuginn::TYPE::UNKNOWN ) ) );
 	return ( fallback_compare( thread_, IDENTIFIER::INTERFACE::CONTAINS, op_to_str( OPERATOR::IS_ELEMENT_OF ), self_, other_, position_ ) );
+}
+
+void HValue::do_operator_add( HThread* thread_, HHuginn::value_t& self_, HHuginn::value_t const& other_, int position_ ) {
+	fallback_arithmetic( thread_, IDENTIFIER::INTERFACE::ADD, op_to_str( OPERATOR::PLUS ), self_, other_, position_ );
 }
 
 }

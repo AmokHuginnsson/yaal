@@ -80,6 +80,11 @@ public:
 		M_ASSERT( self_.raw() == this );
 		return ( do_operator_contains( thread_, self_, other_, position_ ) );
 	}
+	void operator_add( HThread* thread_, HHuginn::value_t& self_, HHuginn::value_t const& other_, int position_ ) {
+		M_ASSERT( self_.raw() == this );
+		M_ASSERT( _class->type_id() == other_->type_id() );
+		do_operator_add( thread_, self_, other_, position_ );
+	}
 private:
 	virtual bool do_operator_equals( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const;
 	virtual bool do_operator_less( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const;
@@ -87,6 +92,7 @@ private:
 	virtual bool do_operator_less_or_equal( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const;
 	virtual bool do_operator_greater_or_equal( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const;
 	virtual bool do_operator_contains( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const;
+	virtual void do_operator_add( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
 	virtual void do_destroy( HHuginn::value_t* ) {}
 	virtual HHuginn::value_t do_field( HHuginn::value_t const&, int ) const;
 	virtual HHuginn::value_t const& do_field( int ) const;
@@ -94,6 +100,8 @@ private:
 	HValue( HValue const& ) = delete;
 	HValue& operator = ( HValue const& ) = delete;
 };
+
+void fallback_arithmetic( HThread*, HHuginn::identifier_id_t, char const*, HHuginn::value_t&, HHuginn::value_t const&, int );
 
 }
 

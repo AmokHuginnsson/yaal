@@ -578,6 +578,10 @@ bool HString::do_operator_contains( HThread* thread_, HHuginn::value_t const&, H
 	return ( _value.find( static_cast<HCharacter const*>( other_.raw() )->value() ) != HString::npos );
 }
 
+void HString::do_operator_add( HThread*, HHuginn::value_t&, HHuginn::value_t const& other_, int ) {
+	_value.append( static_cast<HString const*>( other_.raw() )->_value );
+}
+
 }
 
 }

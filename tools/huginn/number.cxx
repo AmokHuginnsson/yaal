@@ -114,6 +114,10 @@ bool HNumber::do_operator_greater_or_equal( HThread*, HHuginn::value_t const&, H
 	return ( _value >= static_cast<HNumber const*>( other_.raw() )->_value );
 }
 
+void HNumber::do_operator_add( HThread*, HHuginn::value_t&, HHuginn::value_t const& other_, int ) {
+	_value += static_cast<HNumber const*>( other_.raw() )->_value;
+}
+
 }
 
 }

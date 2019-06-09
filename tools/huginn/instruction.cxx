@@ -444,47 +444,12 @@ HHuginn::value_t member( HThread* thread_, HFrame::ACCESS access_, HHuginn::valu
 	M_EPILOG
 }
 
-namespace {
 enum class OPERATION {
 	OPEN,
 	CLOSED
 };
 
-void fallback_arithmetic( HThread* thread_, HHuginn::identifier_id_t methodIdentifier_, char const* oper_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	HHuginn::value_t v;
-	HHuginn::type_id_t t( v1_->type_id() );
-	if ( HObject const* o = dynamic_cast<HObject const*>( v1_.raw() ) ) {
-		v = o->call_method( thread_, v1_, methodIdentifier_, HArguments( thread_, v2_ ), position_ );
-		if ( v->type_id() != t ) {
-			throw HHuginn::HHuginnRuntimeException(
-				"Arithmetic method `"_ys
-					.append( thread_->runtime().identifier_name( methodIdentifier_ ) )
-					.append( "` on " )
-					.append( a_type_name( v1_->get_class() ) )
-					.append( " returned result of incompatible type " )
-					.append( a_type_name( v->get_class() ) )
-					.append( "." ),
-				thread_->current_frame()->file_id(),
-				position_
-			);
-		}
-	} else {
-		HClass const* c( v1_->get_class() );
-		int idx( c->field_index( methodIdentifier_ ) );
-		if ( idx >= 0 ) {
-			HClass::HMethod const& m( *static_cast<HClass::HMethod const*>( c->field( idx ).raw() ) );
-			v = m.function()( thread_, &v1_, HArguments( thread_, v2_ ), position_ );
-			M_ASSERT( ( v->type_id() == t ) || ! thread_->can_continue() );
-		} else {
-			throw HHuginn::HHuginnRuntimeException(
-				"There is no `"_ys.append( oper_ ).append( "` operator for " ).append( a_type_name( t ) ).append( "." ),
-				thread_->current_frame()->file_id(),
-				position_
-			);
-		}
-	}
-	return;
-}
+namespace {
 
 HHuginn::value_t fallback_unary_arithmetic( HThread* thread_, HHuginn::identifier_id_t methodIdentifier_, char const* oper_, HHuginn::value_t const& v_, OPERATION operation_, int position_ ) {
 	HHuginn::value_t v;
@@ -524,19 +489,7 @@ HHuginn::value_t fallback_unary_arithmetic( HThread* thread_, HHuginn::identifie
 }
 
 void add( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	M_ASSERT( v1_->type_id() == v2_->type_id() );
-	HHuginn::type_id_t typeId( v1_->type_id() );
-	if ( typeId == HHuginn::TYPE::INTEGER ) {
-		static_cast<huginn::HInteger*>( v1_.raw() )->value() += static_cast<huginn::HInteger const*>( v2_.raw() )->value();
-	} else if ( typeId == HHuginn::TYPE::REAL ) {
-		static_cast<HReal*>( v1_.raw() )->value() += static_cast<HReal const*>( v2_.raw() )->value();
-	} else if ( typeId == HHuginn::TYPE::STRING ) {
-		static_cast<HString*>( v1_.raw() )->value().append( static_cast<HString const*>( v2_.raw() )->value() );
-	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
-		static_cast<HNumber*>( v1_.raw() )->value() += static_cast<HNumber const*>( v2_.raw() )->value();
-	} else {
-		fallback_arithmetic( thread_, IDENTIFIER::INTERFACE::ADD, op_to_str( OPERATOR::PLUS ), v1_, v2_, position_ );
-	}
+	v1_->operator_add( thread_, v1_, v2_, position_ );
 	return;
 }
 
