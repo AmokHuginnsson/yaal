@@ -61,6 +61,10 @@ bool HInteger::do_operator_less( HThread*, HHuginn::value_t const&, HHuginn::val
 	return ( _value < static_cast<HInteger const*>( other_.raw() )->_value );
 }
 
+bool HInteger::do_operator_greater( HThread*, HHuginn::value_t const&, HHuginn::value_t const& other_, int ) const {
+	return ( _value > static_cast<HInteger const*>( other_.raw() )->_value );
+}
+
 }
 
 }

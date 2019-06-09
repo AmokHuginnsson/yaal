@@ -108,6 +108,10 @@ bool HCharacter::do_operator_less( HThread*, HHuginn::value_t const&, HHuginn::v
 	return ( _value < static_cast<HCharacter const*>( other_.raw() )->_value );
 }
 
+bool HCharacter::do_operator_greater( HThread*, HHuginn::value_t const&, HHuginn::value_t const& other_, int ) const {
+	return ( _value > static_cast<HCharacter const*>( other_.raw() )->_value );
+}
+
 }
 
 }

@@ -61,9 +61,15 @@ public:
 		M_ASSERT( _class->type_id() == other_->type_id() );
 		return ( do_operator_less( thread_, self_, other_, position_ ) );
 	}
+	bool operator_greater( HThread* thread_, HHuginn::value_t const& self_, HHuginn::value_t const& other_, int position_ ) const {
+		M_ASSERT( self_.raw() == this );
+		M_ASSERT( _class->type_id() == other_->type_id() );
+		return ( do_operator_greater( thread_, self_, other_, position_ ) );
+	}
 private:
 	virtual bool do_operator_equals( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const;
 	virtual bool do_operator_less( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const;
+	virtual bool do_operator_greater( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const;
 	virtual void do_destroy( HHuginn::value_t* ) {}
 	virtual HHuginn::value_t do_field( HHuginn::value_t const&, int ) const;
 	virtual HHuginn::value_t const& do_field( int ) const;

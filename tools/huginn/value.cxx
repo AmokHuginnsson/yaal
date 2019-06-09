@@ -112,6 +112,10 @@ bool HValue::do_operator_less( HThread* thread_, HHuginn::value_t const& self_, 
 	return ( fallback_compare( thread_, IDENTIFIER::INTERFACE::LESS, op_to_str( OPERATOR::LESS ), self_, other_, position_ ) );
 }
 
+bool HValue::do_operator_greater( HThread* thread_, HHuginn::value_t const& self_, HHuginn::value_t const& other_, int position_ ) const {
+	return ( fallback_compare( thread_, IDENTIFIER::INTERFACE::GREATER, op_to_str( OPERATOR::GREATER ), self_, other_, position_ ) );
+}
+
 }
 
 }
