@@ -40,6 +40,7 @@ private:
 	virtual void do_operator_add( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int ) override;
 	virtual void do_operator_subtract( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int ) override;
 	virtual void do_operator_multipy( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int ) override;
+	virtual void do_operator_divide( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int ) override;
 };
 
 }

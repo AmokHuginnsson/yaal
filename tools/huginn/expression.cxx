@@ -529,7 +529,7 @@ void HExpression::set_variable( OExecutionStep const& es_, HFrame* frame_ ) {
 					case ( OPERATOR::PLUS_ASSIGN ):     { v->operator_add( t, v, src, p ); } break;
 					case ( OPERATOR::MINUS_ASSIGN ):    { v->operator_subtract( t, v, src, p ); } break;
 					case ( OPERATOR::MULTIPLY_ASSIGN ): { v->operator_multiply( t, v, src, p ); } break;
-					case ( OPERATOR::DIVIDE_ASSIGN ):   { instruction::div( t, v, src, p ); } break;
+					case ( OPERATOR::DIVIDE_ASSIGN ):   { v->operator_divide( t, v, src, p ); } break;
 					case ( OPERATOR::MODULO_ASSIGN ):   { instruction::mod( t, v, src, p ); } break;
 					case ( OPERATOR::POWER_ASSIGN ):    { instruction::pow( t, v, src, p ); } break;
 					default: {
@@ -814,7 +814,7 @@ void HExpression::div( OExecutionStep const&, HFrame* frame_ ) {
 	if ( ! v1.unique() ) {
 		v1 = v1->clone( frame_->thread(), &v1, p );
 	}
-	instruction::div( frame_->thread(), v1, v2, p );
+	v1->operator_divide( frame_->thread(), v1, v2, p );
 	return;
 	M_EPILOG
 }

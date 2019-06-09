@@ -86,6 +86,17 @@ void HReal::do_operator_multipy( HThread*, HHuginn::value_t&, HHuginn::value_t c
 	_value *= static_cast<HReal const*>( other_.raw() )->_value;
 }
 
+void HReal::do_operator_divide( HThread* thread_, HHuginn::value_t& self_, HHuginn::value_t const& other_, int position_ ) {
+	HReal::value_type denominator( static_cast<HReal const*>( other_.raw() )->_value );
+	if ( denominator != 0.0l ) {
+		_value /= denominator;
+	} else {
+		HRuntime& rt( thread_->runtime() );
+		self_ = thread_->runtime().none_value();
+		thread_->raise( rt.object_factory()->arithmetic_exception_class(), "Division by zero.", position_ );
+	}
+}
+
 }
 
 }
