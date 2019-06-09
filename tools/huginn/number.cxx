@@ -137,6 +137,17 @@ void HNumber::do_operator_divide( HThread* thread_, HHuginn::value_t& self_, HHu
 	}
 }
 
+void HNumber::do_operator_modulo( HThread* thread_, HHuginn::value_t& self_, HHuginn::value_t const& other_, int position_ ) {
+	HNumber::value_type const& denominator( static_cast<HNumber const*>( other_.raw() )->_value );
+	if ( denominator != hcore::number::N0 ) {
+		_value %= denominator;
+	} else {
+		HRuntime& rt( thread_->runtime() );
+		self_ = thread_->runtime().none_value();
+		thread_->raise( rt.object_factory()->arithmetic_exception_class(), "Division by zero.", position_ );
+	}
+}
+
 }
 
 }

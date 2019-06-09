@@ -100,6 +100,21 @@ void HInteger::do_operator_divide( HThread* thread_, HHuginn::value_t& self_, HH
 	}
 }
 
+void HInteger::do_operator_modulo( HThread* thread_, HHuginn::value_t& self_, HHuginn::value_t const& other_, int position_ ) {
+	huginn::HInteger::value_type denominator( static_cast<huginn::HInteger const*>( other_.raw() )->_value );
+	if ( ( denominator != 0 ) && ( ( _value != meta::min_signed<huginn::HInteger::value_type>::value ) || ( denominator != -1 ) ) ) {
+		_value %= denominator;
+	} else {
+		HRuntime& rt( thread_->runtime() );
+		self_ = rt.none_value();
+		thread_->raise(
+			rt.object_factory()->arithmetic_exception_class(),
+			denominator ? "Division overflow." : "Division by zero.",
+			position_
+		);
+	}
+}
+
 }
 
 }

@@ -530,7 +530,7 @@ void HExpression::set_variable( OExecutionStep const& es_, HFrame* frame_ ) {
 					case ( OPERATOR::MINUS_ASSIGN ):    { v->operator_subtract( t, v, src, p ); } break;
 					case ( OPERATOR::MULTIPLY_ASSIGN ): { v->operator_multiply( t, v, src, p ); } break;
 					case ( OPERATOR::DIVIDE_ASSIGN ):   { v->operator_divide( t, v, src, p ); } break;
-					case ( OPERATOR::MODULO_ASSIGN ):   { instruction::mod( t, v, src, p ); } break;
+					case ( OPERATOR::MODULO_ASSIGN ):   { v->operator_modulo( t, v, src, p ); } break;
 					case ( OPERATOR::POWER_ASSIGN ):    { instruction::pow( t, v, src, p ); } break;
 					default: {
 						M_ASSERT( ! "bad code path"[0] );
@@ -836,7 +836,7 @@ void HExpression::mod( OExecutionStep const&, HFrame* frame_ ) {
 	if ( ! v1.unique() ) {
 		v1 = v1->clone( frame_->thread(), &v1, p );
 	}
-	instruction::mod( frame_->thread(), v1, v2, p );
+	v1->operator_modulo( frame_->thread(), v1, v2, p );
 	return;
 	M_EPILOG
 }

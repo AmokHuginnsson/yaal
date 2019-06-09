@@ -181,6 +181,10 @@ void HValue::do_operator_divide( HThread* thread_, HHuginn::value_t& self_, HHug
 	fallback_arithmetic( thread_, IDENTIFIER::INTERFACE::DIVIDE, op_to_str( OPERATOR::DIVIDE ), self_, other_, position_ );
 }
 
+void HValue::do_operator_modulo( HThread* thread_, HHuginn::value_t& self_, HHuginn::value_t const& other_, int position_ ) {
+	fallback_arithmetic( thread_, IDENTIFIER::INTERFACE::MODULO, op_to_str( OPERATOR::MODULO ), self_, other_, position_ );
+}
+
 }
 
 }
