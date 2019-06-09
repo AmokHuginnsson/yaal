@@ -526,9 +526,9 @@ void HExpression::set_variable( OExecutionStep const& es_, HFrame* frame_ ) {
 					operands_type_mismatch( op_to_str( operation._operator ), refClass, srcClass, file_id(), p );
 				}
 				switch ( operation._operator ) {
-					case ( OPERATOR::PLUS_ASSIGN ):     { instruction::add( t, v, src, p ); } break;
-					case ( OPERATOR::MINUS_ASSIGN ):    { instruction::sub( t, v, src, p ); } break;
-					case ( OPERATOR::MULTIPLY_ASSIGN ): { instruction::mul( t, v, src, p ); } break;
+					case ( OPERATOR::PLUS_ASSIGN ):     { v->operator_add( t, v, src, p ); } break;
+					case ( OPERATOR::MINUS_ASSIGN ):    { v->operator_subtract( t, v, src, p ); } break;
+					case ( OPERATOR::MULTIPLY_ASSIGN ): { v->operator_multiply( t, v, src, p ); } break;
 					case ( OPERATOR::DIVIDE_ASSIGN ):   { instruction::div( t, v, src, p ); } break;
 					case ( OPERATOR::MODULO_ASSIGN ):   { instruction::mod( t, v, src, p ); } break;
 					case ( OPERATOR::POWER_ASSIGN ):    { instruction::pow( t, v, src, p ); } break;
@@ -748,7 +748,7 @@ void HExpression::plus( OExecutionStep const&, HFrame* frame_ ) {
 	if ( ! v1.unique() ) {
 		v1 = v1->clone( frame_->thread(), &v1, p );
 	}
-	instruction::add( frame_->thread(), v1, v2, p );
+	v1->operator_add( frame_->thread(), v1, v2, p );
 	return;
 	M_EPILOG
 }
@@ -770,7 +770,7 @@ void HExpression::minus( OExecutionStep const&, HFrame* frame_ ) {
 	if ( ! v1.unique() ) {
 		v1 = v1->clone( frame_->thread(), &v1, p );
 	}
-	instruction::sub( frame_->thread(), v1, v2, p );
+	v1->operator_subtract( frame_->thread(), v1, v2, p );
 	return;
 	M_EPILOG
 }
@@ -792,7 +792,7 @@ void HExpression::mul( OExecutionStep const&, HFrame* frame_ ) {
 	if ( ! v1.unique() ) {
 		v1 = v1->clone( frame_->thread(), &v1, p );
 	}
-	instruction::mul( frame_->thread(), v1, v2, p );
+	v1->operator_multiply( frame_->thread(), v1, v2, p );
 	return;
 	M_EPILOG
 }

@@ -173,6 +173,10 @@ void HValue::do_operator_subtract( HThread* thread_, HHuginn::value_t& self_, HH
 	fallback_arithmetic( thread_, IDENTIFIER::INTERFACE::SUBTRACT, op_to_str( OPERATOR::MINUS ), self_, other_, position_ );
 }
 
+void HValue::do_operator_multipy( HThread* thread_, HHuginn::value_t& self_, HHuginn::value_t const& other_, int position_ ) {
+	fallback_arithmetic( thread_, IDENTIFIER::INTERFACE::MULTIPLY, op_to_str( OPERATOR::MULTIPLY ), self_, other_, position_ );
+}
+
 }
 
 }
