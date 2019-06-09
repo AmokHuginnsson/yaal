@@ -120,6 +120,10 @@ bool HValue::do_operator_less_or_equal( HThread* thread_, HHuginn::value_t const
 	return ( fallback_compare( thread_, IDENTIFIER::INTERFACE::LESS_OR_EQUAL, op_to_str( OPERATOR::LESS_OR_EQUAL ), self_, other_, position_ ) );
 }
 
+bool HValue::do_operator_greater_or_equal( HThread* thread_, HHuginn::value_t const& self_, HHuginn::value_t const& other_, int position_ ) const {
+	return ( fallback_compare( thread_, IDENTIFIER::INTERFACE::GREATER_OR_EQUAL, op_to_str( OPERATOR::GREATER_OR_EQUAL ), self_, other_, position_ ) );
+}
+
 }
 
 }
