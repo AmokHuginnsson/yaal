@@ -68,6 +68,7 @@ HHuginn::value_t HValue::do_clone( huginn::HThread* thread_, HHuginn::value_t*, 
 }
 
 namespace {
+
 bool fallback_compare( HThread* thread_, HHuginn::identifier_id_t methodIdentifier_, char const* oper_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	HObject const* o( dynamic_cast<HObject const*>( v1_.raw() ) );
 	HHuginn::value_t v;
@@ -101,7 +102,6 @@ bool fallback_compare( HThread* thread_, HHuginn::identifier_id_t methodIdentifi
 	}
 	HBoolean* b( static_cast<HBoolean*>( v.raw() ) );
 	return ( b->value() );
-}
 }
 
 void fallback_arithmetic( HThread* thread_, HHuginn::identifier_id_t methodIdentifier_, char const* oper_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, int position_ ) {
@@ -138,6 +138,8 @@ void fallback_arithmetic( HThread* thread_, HHuginn::identifier_id_t methodIdent
 		}
 	}
 	return;
+}
+
 }
 
 bool HValue::do_operator_equals( HThread* thread_, HHuginn::value_t const& self_, HHuginn::value_t const& other_, int position_ ) const {
@@ -183,6 +185,10 @@ void HValue::do_operator_divide( HThread* thread_, HHuginn::value_t& self_, HHug
 
 void HValue::do_operator_modulo( HThread* thread_, HHuginn::value_t& self_, HHuginn::value_t const& other_, int position_ ) {
 	fallback_arithmetic( thread_, IDENTIFIER::INTERFACE::MODULO, op_to_str( OPERATOR::MODULO ), self_, other_, position_ );
+}
+
+void HValue::do_operator_power( HThread* thread_, HHuginn::value_t& self_, HHuginn::value_t const& other_, int position_ ) {
+	fallback_arithmetic( thread_, IDENTIFIER::INTERFACE::POWER, op_to_str( OPERATOR::POWER ), self_, other_, position_ );
 }
 
 }

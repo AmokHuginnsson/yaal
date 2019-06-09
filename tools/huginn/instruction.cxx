@@ -1,7 +1,5 @@
 /* Read yaal/LICENSE.md file for copyright and licensing information. */
 
-#include <cmath>
-
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
@@ -514,36 +512,7 @@ void mod( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 }
 
 void pow( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	M_ASSERT( v1_->type_id() == v2_->type_id() );
-	HHuginn::value_t res;
-	HHuginn::type_id_t typeId( v1_->type_id() );
-	if ( typeId == HHuginn::TYPE::REAL ) {
-		HReal::value_type& val( static_cast<HReal*>( v1_.raw() )->value() );
-		HReal::value_type exp( static_cast<HReal const*>( v2_.raw() )->value() );
-		if ( ( val != 0.L ) || ( exp != 0.L ) ) {
-			val = ::powl( val, exp );
-		} else {
-			thread_->raise( thread_->runtime().object_factory()->arithmetic_exception_class(), "indeterminate form 0^0", position_ );
-		}
-	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
-		do {
-			hcore::HNumber const& exp( static_cast<HNumber const*>( v2_.raw() )->value() );
-			int long long expV( 0 );
-			try {
-				expV = exp.to_integer();
-			} catch ( HNumberException const& ) {
-				thread_->raise( thread_->runtime().object_factory()->arithmetic_exception_class(), "Exponent too big: "_ys.append( exp.to_string() ), position_ );
-				break;
-			}
-			try {
-				static_cast<HNumber*>( v1_.raw() )->value() ^= expV;
-			} catch ( HNumberException const& ex ) {
-				thread_->raise( thread_->runtime().object_factory()->arithmetic_exception_class(), ex.what(), position_ );
-			}
-		} while ( false );
-	} else {
-		fallback_arithmetic( thread_, IDENTIFIER::INTERFACE::POWER, op_to_str( OPERATOR::POWER ), v1_, v2_, position_ );
-	}
+	v1_->operator_power( thread_, v1_, v2_, position_ );
 	return;
 }
 

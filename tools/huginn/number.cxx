@@ -148,6 +148,28 @@ void HNumber::do_operator_modulo( HThread* thread_, HHuginn::value_t& self_, HHu
 	}
 }
 
+void HNumber::do_operator_power( HThread* thread_, HHuginn::value_t& self_, HHuginn::value_t const& other_, int position_ ) {
+	do {
+		hcore::HNumber const& exp( static_cast<HNumber const*>( other_.raw() )->_value );
+		int long long expV( 0 );
+		try {
+			expV = exp.to_integer();
+		} catch ( HNumberException const& ) {
+			HRuntime& rt( thread_->runtime() );
+			self_ = thread_->runtime().none_value();
+			thread_->raise( rt.object_factory()->arithmetic_exception_class(), "Exponent too big: "_ys.append( exp.to_string() ), position_ );
+			break;
+		}
+		try {
+			_value ^= expV;
+		} catch ( HNumberException const& ex ) {
+			HRuntime& rt( thread_->runtime() );
+			self_ = thread_->runtime().none_value();
+			thread_->raise( rt.object_factory()->arithmetic_exception_class(), ex.what(), position_ );
+		}
+	} while ( false );
+}
+
 }
 
 }

@@ -42,6 +42,7 @@ private:
 	virtual void do_operator_multipy( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int ) override;
 	virtual void do_operator_divide( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int ) override;
 	virtual void do_operator_modulo( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int ) override;
+	virtual void do_operator_power( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int ) override;
 };
 
 }
