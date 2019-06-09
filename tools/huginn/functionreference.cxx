@@ -61,6 +61,10 @@ bool HFunctionReference::do_operator_greater( HThread*, HHuginn::value_t const&,
 	return ( _identifierId > static_cast<huginn::HFunctionReference const*>( other_.raw() )->identifier_id() );
 }
 
+bool HFunctionReference::do_operator_less_or_equal( HThread*, HHuginn::value_t const&, HHuginn::value_t const& other_, int ) const {
+	return ( _identifierId <= static_cast<huginn::HFunctionReference const*>( other_.raw() )->identifier_id() );
+}
+
 }
 
 }
