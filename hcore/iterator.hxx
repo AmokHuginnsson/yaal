@@ -363,6 +363,64 @@ private:
 	friend class HReverseIterator;
 };
 
+template<typename T>
+class HReversed {
+public:
+	typedef T coll_type;
+	typedef typename coll_type::value_type value_type;
+	typedef typename coll_type::const_reverse_iterator const_iterator;
+	typedef typename coll_type::reverse_iterator iterator;
+	typedef typename coll_type::const_iterator const_reverse_iterator;
+	typedef typename coll_type::iterator reverse_iterator;
+private:
+	coll_type& _coll;
+public:
+	HReversed( coll_type& coll_ )
+		: _coll( coll_ ) {
+	}
+	const_iterator begin( void ) const {
+		return ( _coll.rbegin() );
+	}
+	const_iterator end( void ) const {
+		return ( _coll.rend() );
+	}
+	const_iterator cbegin( void ) const {
+		return ( _coll.rbegin() );
+	}
+	const_iterator cend( void ) const {
+		return ( _coll.rend() );
+	}
+	iterator begin( void ) {
+		return ( _coll.rbegin() );
+	}
+	iterator end( void ) {
+		return ( _coll.rend() );
+	}
+	const_iterator rbegin( void ) const {
+		return ( _coll.begin() );
+	}
+	const_iterator rend( void ) const {
+		return ( _coll.end() );
+	}
+	const_iterator crbegin( void ) const {
+		return ( _coll.begin() );
+	}
+	const_iterator crend( void ) const {
+		return ( _coll.end() );
+	}
+	iterator rbegin( void ) {
+		return ( _coll.begin() );
+	}
+	iterator rend( void ) {
+		return ( _coll.end() );
+	}
+};
+
+template<typename T>
+HReversed<T> reversed( T& coll_ ) {
+	return ( HReversed<T>( coll_ ) );
+}
+
 template<typename iterator_t>
 class HMoveIterator {
 	iterator_t _iterator;
