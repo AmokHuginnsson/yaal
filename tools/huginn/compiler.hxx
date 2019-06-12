@@ -364,6 +364,7 @@ struct OCompiler {
 	typedef yaal::hcore::HArray<HHuginn::identifier_id_t> class_identifiers_t;
 	typedef yaal::hcore::HResource<OClassContext> class_context_t;
 	typedef yaal::hcore::HHashMap<HHuginn::identifier_id_t, class_context_t> submitted_classes_t;
+	typedef yaal::hcore::HHashMap<HHuginn::identifier_id_t, HHuginn::identifier_id_t> lambda_definition_sites_t;
 	typedef yaal::hcore::HArray<OImportInfo> submitted_imports_t;
 	typedef HHuginn::values_t submitted_enums_t;
 	typedef yaal::hcore::HArray<OFunctionContext::scope_context_t> scope_context_cache_t;
@@ -386,6 +387,7 @@ struct OCompiler {
 	execution_steps_backlog_t _executionStepsBacklog;
 	used_identifiers_t _usedIdentifiers;
 	captures_log_t _capturesLog;
+	lambda_definition_sites_t _lambdaDefinitionSites;
 	HIntrospectorInterface* _introspector;
 	HStatement::statement_id_t _statementIdGenerator;
 	scope_context_cache_t _scopeContextCache;

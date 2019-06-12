@@ -1069,6 +1069,13 @@ void OCompiler::set_lambda_name( executing_parser::range_t range_ ) {
 void OCompiler::create_lambda( executing_parser::range_t range_ ) {
 	M_PROLOG
 	function_info_t fi( create_function_low( range_ ) );
+	OCompiler::OFunctionContext& fc( f() );
+	HHuginn::identifier_id_t enclosingFunctionId( fc._functionIdentifier );
+	lambda_definition_sites_t::const_iterator it( _lambdaDefinitionSites.find( enclosingFunctionId ) );
+	if ( it != _lambdaDefinitionSites.end() ) {
+		enclosingFunctionId = it->second;
+	}
+	_lambdaDefinitionSites.insert( make_pair( fi.first, enclosingFunctionId ) );
 	HHuginn::value_t fRef( _runtime->object_factory()->create_function_reference( fi.first, fi.second, "Lambda: "_ys.append( _runtime->identifier_name( fi.first ) ) ) );
 	defer_store_direct( fRef, range_ );
 	if ( _capturesLog.find( fi.first ) != _capturesLog.end() ) {

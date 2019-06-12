@@ -257,6 +257,7 @@ OCompiler::OCompiler( HRuntime* runtime_ )
 	, _executionStepsBacklog()
 	, _usedIdentifiers()
 	, _capturesLog()
+	, _lambdaDefinitionSites()
 	, _introspector( nullptr )
 	, _statementIdGenerator( INVALID_STATEMENT_IDENTIFIER )
 	, _scopeContextCache()
@@ -281,6 +282,7 @@ void OCompiler::reset( int undoSteps_ ) {
 	_scopeContextCache.clear();
 	_statementIdGenerator = INVALID_STATEMENT_IDENTIFIER;
 	_introspector = nullptr;
+	_lambdaDefinitionSites.clear();
 	_capturesLog.clear();
 	_usedIdentifiers.clear();
 	_executionStepsBacklog.clear();
@@ -518,7 +520,12 @@ void OCompiler::resolve_symbols( void ) {
 			if ( es._classId != IDENTIFIER::INVALID ) {
 				_runtime->drop_class( es._classId );
 			} else {
-				_runtime->drop_global( es._scope->_functionId );
+				lambda_definition_sites_t::const_iterator it( _lambdaDefinitionSites.find( es._scope->_functionId ) );
+				if ( it != _lambdaDefinitionSites.end() ) {
+					_runtime->drop_global( it->second );
+				} else {
+					_runtime->drop_global( es._scope->_functionId );
+				}
 			}
 			throw;
 		}
