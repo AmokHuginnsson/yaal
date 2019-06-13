@@ -486,36 +486,6 @@ HHuginn::value_t fallback_unary_arithmetic( HThread* thread_, HHuginn::identifie
 }
 }
 
-void add( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	v1_->operator_add( thread_, v1_, v2_, position_ );
-	return;
-}
-
-void sub( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	v1_->operator_subtract( thread_, v1_, v2_, position_ );
-	return;
-}
-
-void mul( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	v1_->operator_multiply( thread_, v1_, v2_, position_ );
-	return;
-}
-
-void div( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	v1_->operator_divide( thread_, v1_, v2_, position_ );
-	return;
-}
-
-void mod( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	v1_->operator_modulo( thread_, v1_, v2_, position_ );
-	return;
-}
-
-void pow( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	v1_->operator_power( thread_, v1_, v2_, position_ );
-	return;
-}
-
 HHuginn::value_t factorial( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res;
 	HHuginn::type_id_t typeId( v_->type_id() );
@@ -601,22 +571,6 @@ bool checked_less( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value
 		operands_type_mismatch( op_to_str( OPERATOR::LESS ), c1, c2, thread_->current_frame()->file_id(), position_ );
 	}
 	return ( v1_->operator_less( thread_, v1_, v2_, position_ ) );
-}
-
-bool greater( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	return ( v1_->operator_greater( thread_, v1_, v2_, position_ ) );
-}
-
-bool less_or_equal( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	return ( v1_->operator_less_or_equal( thread_, v1_, v2_, position_ ) );
-}
-
-bool greater_or_equal( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	return ( v1_->operator_greater_or_equal( thread_, v1_, v2_, position_ ) );
-}
-
-bool is_element_of( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	return ( v2_->operator_contains( thread_, v2_, v1_, position_ ) );
 }
 
 HHuginn::value_t boolean_xor( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int ) {

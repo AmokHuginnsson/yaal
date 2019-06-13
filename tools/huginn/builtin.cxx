@@ -270,7 +270,7 @@ HHuginn::value_t square_root( char const* name_, huginn::HThread* thread_, HHugi
 
 namespace {
 
-using n_ary_action_t = void ( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
+using n_ary_action_t = void ( HValue::* )( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
 
 HHuginn::value_t n_ary_action( char const* name_, n_ary_action_t action_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 	verify_arg_count( name_, values_, 1, 1, thread_, position_ );
@@ -294,7 +294,7 @@ HHuginn::value_t n_ary_action( char const* name_, n_ary_action_t action_, huginn
 				"A non-uniform set under "_ys.append( name_ ).append( "." ), thread_->current_frame()->file_id(), position_
 			);
 		}
-		action_( thread_, accumulator, v, position_ );
+		( accumulator.raw()->*action_ )( thread_, accumulator, v, position_ );
 		it->next( thread_, position_ );
 	}
 	return ( accumulator );
@@ -304,13 +304,13 @@ HHuginn::value_t n_ary_action( char const* name_, n_ary_action_t action_, huginn
 
 HHuginn::value_t n_ary_summation( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
-	return ( n_ary_action( "∑", &instruction::add, thread_, values_, position_ ) );
+	return ( n_ary_action( "∑", &HValue::operator_add, thread_, values_, position_ ) );
 	M_EPILOG
 }
 
 HHuginn::value_t n_ary_product( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
-	return ( n_ary_action( "∏", &instruction::mul, thread_, values_, position_ ) );
+	return ( n_ary_action( "∏", &HValue::operator_multiply, thread_, values_, position_ ) );
 	M_EPILOG
 }
 

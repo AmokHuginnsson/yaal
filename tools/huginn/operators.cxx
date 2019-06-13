@@ -27,9 +27,8 @@ namespace huginn {
 
 class HOperators : public HPackage {
 public:
-	typedef void ( * binary_operator_t )( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
-	typedef bool ( * binary_boolean_operator_t )( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
-	typedef bool ( * boolean_binary_operator_t )( bool, bool );
+	typedef void ( HValue::* binary_operator_t )( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
+	typedef bool ( HValue::* binary_boolean_operator_t )( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const;
 	typedef HHuginn::value_t ( * unary_operator_t )( HThread*, HHuginn::value_t const&, int );
 	HOperators( huginn::HClass* class_ )
 		: HPackage( class_ ) {
@@ -48,7 +47,7 @@ public:
 		if ( op_ < OPERATOR::ASSIGN ) {
 			v1 = v1->clone( thread_, &v1, position_ );
 		}
-		binaryOperator_( thread_, v1, v2, position_ );
+		( v1.raw()->*binaryOperator_ )( thread_, v1, v2, position_ );
 		return ( v1 );
 		M_EPILOG
 	}
@@ -62,7 +61,7 @@ public:
 		if ( c1 != c2 ) {
 			operands_type_mismatch( op_to_str( op_ ), c1, c2, thread_->current_frame()->file_id(), position_ );
 		}
-		bool res( binaryBooleanOperator_( thread_, v1, v2, position_ ) );
+		bool res( ( v1.raw()->*binaryBooleanOperator_ )( thread_, v1, v2, position_ ) );
 		return ( thread_->runtime().boolean_value( res ) );
 		M_EPILOG
 	}
@@ -107,7 +106,7 @@ public:
 		if ( ( c2->type_id() <= huginn::type_id( HHuginn::TYPE::UNKNOWN ) ) && ! is_collection_like( c2 ) ) {
 			throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_COLL] ).append( a_type_name( c2 ) ), thread_->current_frame()->file_id(), position_ );
 		}
-		bool res( instruction::is_element_of( thread_, v1, v2, position_ ) );
+		bool res( v2->operator_contains( thread_, v2, v1, position_ ) );
 		res = op_ == OPERATOR::IS_ELEMENT_OF ? res : ! res;
 		return ( thread_->runtime().boolean_value( res ) );
 		M_EPILOG
@@ -143,24 +142,24 @@ HPackageCreatorInterface::HInstance HOperatorsCreator::do_new_instance( HRuntime
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		create_field( runtime_, IDENTIFIER::INTERFACE::ADD,      "Operators.add",      OPERATOR::PLUS,     &instruction::add, &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* **+** *right* expression" ),
-		create_field( runtime_, IDENTIFIER::INTERFACE::SUBTRACT, "Operators.subtract", OPERATOR::MINUS,    &instruction::sub, &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* **-** *right* expression" ),
-		create_field( runtime_, IDENTIFIER::INTERFACE::MULTIPLY, "Operators.multiply", OPERATOR::MULTIPLY, &instruction::mul, &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* __\\*__ *right* expression" ),
-		create_field( runtime_, IDENTIFIER::INTERFACE::DIVIDE,   "Operators.divide",   OPERATOR::DIVIDE,   &instruction::div, &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* **/** *right* expression" ),
-		create_field( runtime_, IDENTIFIER::INTERFACE::MODULO,   "Operators.modulo",   OPERATOR::MODULO,   &instruction::mod, &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* **%** *right* expression" ),
-		create_field( runtime_, IDENTIFIER::INTERFACE::POWER,    "Operators.power",    OPERATOR::POWER,    &instruction::pow, &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* **^** *right* expression" ),
-		create_field( runtime_, "self_add",      "Operators.self_add",      OPERATOR::PLUS_ASSIGN,     &instruction::add, &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* **+=** *right* expression" ),
-		create_field( runtime_, "self_subtract", "Operators.self_subtract", OPERATOR::MINUS_ASSIGN,    &instruction::sub, &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* **-=** *right* expression" ),
-		create_field( runtime_, "self_multiply", "Operators.self_multiply", OPERATOR::MULTIPLY_ASSIGN, &instruction::mul, &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* __\\*=__ *right* expression" ),
-		create_field( runtime_, "self_divide",   "Operators.self_divide",   OPERATOR::DIVIDE_ASSIGN,   &instruction::div, &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* **/=** *right* expression" ),
-		create_field( runtime_, "self_modulo",   "Operators.self_modulo",   OPERATOR::MODULO_ASSIGN,   &instruction::mod, &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* **%=** *right* expression" ),
-		create_field( runtime_, "self_power",    "Operators.self_power",    OPERATOR::POWER_ASSIGN,    &instruction::pow, &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* **^=** *right* expression" ),
+		create_field( runtime_, IDENTIFIER::INTERFACE::ADD,      "Operators.add",      OPERATOR::PLUS,     &HValue::operator_add,      &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* **+** *right* expression" ),
+		create_field( runtime_, IDENTIFIER::INTERFACE::SUBTRACT, "Operators.subtract", OPERATOR::MINUS,    &HValue::operator_subtract, &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* **-** *right* expression" ),
+		create_field( runtime_, IDENTIFIER::INTERFACE::MULTIPLY, "Operators.multiply", OPERATOR::MULTIPLY, &HValue::operator_multiply, &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* __\\*__ *right* expression" ),
+		create_field( runtime_, IDENTIFIER::INTERFACE::DIVIDE,   "Operators.divide",   OPERATOR::DIVIDE,   &HValue::operator_divide,   &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* **/** *right* expression" ),
+		create_field( runtime_, IDENTIFIER::INTERFACE::MODULO,   "Operators.modulo",   OPERATOR::MODULO,   &HValue::operator_modulo,   &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* **%** *right* expression" ),
+		create_field( runtime_, IDENTIFIER::INTERFACE::POWER,    "Operators.power",    OPERATOR::POWER,    &HValue::operator_power,    &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* **^** *right* expression" ),
+		create_field( runtime_, "self_add",      "Operators.self_add",      OPERATOR::PLUS_ASSIGN,     &HValue::operator_add,      &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* **+=** *right* expression" ),
+		create_field( runtime_, "self_subtract", "Operators.self_subtract", OPERATOR::MINUS_ASSIGN,    &HValue::operator_subtract, &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* **-=** *right* expression" ),
+		create_field( runtime_, "self_multiply", "Operators.self_multiply", OPERATOR::MULTIPLY_ASSIGN, &HValue::operator_multiply, &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* __\\*=__ *right* expression" ),
+		create_field( runtime_, "self_divide",   "Operators.self_divide",   OPERATOR::DIVIDE_ASSIGN,   &HValue::operator_divide,   &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* **/=** *right* expression" ),
+		create_field( runtime_, "self_modulo",   "Operators.self_modulo",   OPERATOR::MODULO_ASSIGN,   &HValue::operator_modulo,   &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* **%=** *right* expression" ),
+		create_field( runtime_, "self_power",    "Operators.self_power",    OPERATOR::POWER_ASSIGN,    &HValue::operator_power,    &HOperators::binary_operator, "( *left*, *right* ) - return result of *left* **^=** *right* expression" ),
 		create_field( runtime_, IDENTIFIER::INTERFACE::EQUALS, "Operators.equals", OPERATOR::EQUALS, &HOperators::equals, "( *left*, *right* ) - return result of *left* **==** *right* expression" ),
 		create_field( runtime_, "not_equals", "Operators.not_equals", OPERATOR::NOT_EQUALS, &HOperators::equals, "( *left*, *right* ) - return result of *left* *≠* *right* expression" ),
-		create_field( runtime_, IDENTIFIER::INTERFACE::LESS,     "Operators.less",     OPERATOR::LESS,     &instruction::less,    &HOperators::binary_boolean_operator, "( *left*, *right* ) - return result of *left* **<** *right* expression" ),
-		create_field( runtime_, IDENTIFIER::INTERFACE::GREATER,  "Operators.greater",  OPERATOR::GREATER,  &instruction::greater, &HOperators::binary_boolean_operator, "( *left*, *right* ) - return result of *left* **>** *right* expression" ),
-		create_field( runtime_, IDENTIFIER::INTERFACE::LESS_OR_EQUAL,    "Operators.less_or_equal",     OPERATOR::LESS_OR_EQUAL,     &instruction::less_or_equal,    &HOperators::binary_boolean_operator, "( *left*, *right* ) - return result of *left* **≤** *right* expression" ),
-		create_field( runtime_, IDENTIFIER::INTERFACE::GREATER_OR_EQUAL, "Operators.greater_or_equal",  OPERATOR::GREATER_OR_EQUAL,  &instruction::greater_or_equal, &HOperators::binary_boolean_operator, "( *left*, *right* ) - return result of *left* **≥** *right* expression" ),
+		create_field( runtime_, IDENTIFIER::INTERFACE::LESS,     "Operators.less",     OPERATOR::LESS,     &HValue::operator_less,    &HOperators::binary_boolean_operator, "( *left*, *right* ) - return result of *left* **<** *right* expression" ),
+		create_field( runtime_, IDENTIFIER::INTERFACE::GREATER,  "Operators.greater",  OPERATOR::GREATER,  &HValue::operator_greater, &HOperators::binary_boolean_operator, "( *left*, *right* ) - return result of *left* **>** *right* expression" ),
+		create_field( runtime_, IDENTIFIER::INTERFACE::LESS_OR_EQUAL,    "Operators.less_or_equal",     OPERATOR::LESS_OR_EQUAL,     &HValue::operator_less_or_equal,    &HOperators::binary_boolean_operator, "( *left*, *right* ) - return result of *left* **≤** *right* expression" ),
+		create_field( runtime_, IDENTIFIER::INTERFACE::GREATER_OR_EQUAL, "Operators.greater_or_equal",  OPERATOR::GREATER_OR_EQUAL,  &HValue::operator_greater_or_equal, &HOperators::binary_boolean_operator, "( *left*, *right* ) - return result of *left* **≥** *right* expression" ),
 		create_field( runtime_, "is_element_of",     "Operators.is_element_of",     OPERATOR::IS_ELEMENT_OF,     &HOperators::is_element_of, "( *left*, *right* ) - return result of *left* **∈** *right* expression" ),
 		create_field( runtime_, "is_not_element_of", "Operators.is_not_element_of", OPERATOR::IS_NOT_ELEMENT_OF, &HOperators::is_element_of, "( *left*, *right* ) - return result of *left* **∉** *right* expression" ),
 		create_field( runtime_, "and", "Operators.and", OPERATOR::BOOLEAN_AND, &HOperators::boolean_binary_operator, "( *left*, *right* ) - return result of *left* **⋀** *right* expression" ),

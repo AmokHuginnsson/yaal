@@ -23,24 +23,11 @@ struct Interrupt {};
 HHuginn::value_t subscript( HThread*, HFrame::ACCESS, HHuginn::value_t&, HHuginn::value_t const&, int );
 HHuginn::value_t range( HThread*, HHuginn::value_t&, HHuginn::value_t const&, HHuginn::value_t const&, HHuginn::value_t const&, int );
 HHuginn::value_t member( HThread*, HFrame::ACCESS, HHuginn::value_t&, HHuginn::identifier_id_t, int );
-void add( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
-void sub( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
-void mul( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
-void div( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
-void mod( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
-void pow( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
 HHuginn::value_t abs( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t neg( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t factorial( HThread*, HHuginn::value_t const&, int );
-inline bool equals( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	return ( v1_->operator_equals( thread_, v1_, v2_, position_ ) );
-}
 bool less( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 bool checked_less( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
-bool greater( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
-bool less_or_equal( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
-bool greater_or_equal( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
-bool is_element_of( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 HHuginn::value_t boolean_xor( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 HHuginn::value_t boolean_not( HThread*, HHuginn::value_t const&, int );
 yaal::hcore::HString string_representation( HThread*, HHuginn::value_t const&, HCycleTracker&, int );
