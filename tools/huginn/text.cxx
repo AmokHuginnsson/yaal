@@ -90,15 +90,23 @@ public:
 	}
 	static HHuginn::value_t split( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
-		verify_signature( "Text.split", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, thread_, position_ );
+		verify_signature( "Text.split", values_, 1, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, thread_, position_ );
 		typedef HArray<hcore::HString> strings_t;
-		strings_t strings( tools::string::split<strings_t>( get_string( values_[0] ), get_string( values_[1] ) ) );
-		HObjectFactory* of( thread_->runtime().object_factory() );
-		HHuginn::value_t l( of->create_list() );
+		strings_t strings(
+			values_.get_size() > 1
+				? tools::string::split<strings_t>( get_string( values_[0] ), get_string( values_[1] ) )
+				: tools::string::split<strings_t>(
+					get_string( values_[0] ),
+					hcore::character_class<CHARACTER_CLASS::WHITESPACE>().data(),
+					HTokenizer::SKIP_EMPTY | HTokenizer::DELIMITED_BY_ANY_OF
+				)
+		);
+		HObjectFactory& of( *thread_->runtime().object_factory() );
+		HHuginn::values_t data;
 		for ( hcore::HString& s : strings ) {
-			static_cast<huginn::HList*>( l.raw() )->push_back( of->create_string( yaal::move( s ) ) );
+			data.push_back( of.create_string( yaal::move( s ) ) );
 		}
-		return ( l );
+		return ( of.create_list( yaal::move( data ) ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t join( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -293,7 +301,7 @@ HPackageCreatorInterface::HInstance HTextCreator::do_new_instance( HRuntime* run
 	);
 	HHuginn::field_definitions_t fd{
 		{ "stream",   runtime_->create_method( &HText::stream ),   "( [*str*] ) - create read/write text `Stream` object" },
-		{ "split",    runtime_->create_method( &HText::split ),    "( *str*, *sep* ) - split `string` *str* by separator *sep* into a `list` of `string`s" },
+		{ "split",    runtime_->create_method( &HText::split ),    "( *str*[, *sep*] ) - split `string` *str* by separator *sep* into a `list` of `string`s" },
 		{ "join",     runtime_->create_method( &HText::join ),     "( *coll*, *sep* ) - join all string from *coll* into one `string` using *sep* as separator" },
 		{ "distance", runtime_->create_method( &HText::distance ), "( *first*, *second* ) - calculate Damerau-Levenshtein distance between *first* and *second* `string`s" },
 		{ "repeat",   runtime_->create_method( &HText::repeat ),   "( *seed*, *count* ) - construct new `string` by repeating *seed* `string` *count* times" },
