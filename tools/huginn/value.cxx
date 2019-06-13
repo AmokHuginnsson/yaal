@@ -191,6 +191,41 @@ void HValue::do_operator_power( HThread* thread_, HHuginn::value_t& self_, HHugi
 	fallback_arithmetic( thread_, IDENTIFIER::INTERFACE::POWER, op_to_str( OPERATOR::POWER ), self_, other_, position_ );
 }
 
+int long HValue::do_operator_hash( HThread* thread_, HHuginn::value_t const& self_, int position_ ) const {
+	if ( _class->type_id() == HHuginn::TYPE::NONE ) {
+		return ( 0 );
+	}
+	HHuginn::value_t res;
+	if ( HObject const* o = dynamic_cast<HObject const*>( this ) ) {
+		res = o->call_method( thread_, self_, IDENTIFIER::INTERFACE::HASH, HArguments( thread_ ), position_ );
+		if ( res->type_id() != HHuginn::TYPE::INTEGER ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"User supplied `hash` function returned an invalid type "_ys
+					.append( a_type_name( res->get_class() ) )
+					.append( " instead of an `integer`." ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+	} else {
+		int idx( _class->field_index( IDENTIFIER::INTERFACE::HASH ) );
+		if ( idx >= 0 ) {
+			HClass::HMethod const& m( *static_cast<HClass::HMethod const*>( _class->field( idx ).raw() ) );
+			res = m.function()( thread_, const_cast<HHuginn::value_t*>( &self_ ), HArguments( thread_ ), position_ );
+			M_ASSERT( res->type_id() == HHuginn::TYPE::INTEGER );
+		} else {
+			throw HHuginn::HHuginnRuntimeException(
+				"There is no `hash` operator for "_ys
+					.append( a_type_name( _class ) )
+					.append( "." ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+	}
+	return ( hcore::hash<int long long>()( static_cast<huginn::HInteger const*>( res.raw() )->value() ) );
+}
+
 }
 
 }

@@ -582,6 +582,10 @@ void HString::do_operator_add( HThread*, HHuginn::value_t&, HHuginn::value_t con
 	_value.append( static_cast<HString const*>( other_.raw() )->_value );
 }
 
+int long HString::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
+	return ( hcore::hash<hcore::HString>()( _value ) );
+}
+
 }
 
 }

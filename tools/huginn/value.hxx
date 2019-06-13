@@ -110,6 +110,10 @@ public:
 		M_ASSERT( _class->type_id() == other_->type_id() );
 		do_operator_power( thread_, self_, other_, position_ );
 	}
+	int long operator_hash( HThread* thread_, HHuginn::value_t const& self_, int position_ ) const {
+		M_ASSERT( self_.raw() == this );
+		return ( do_operator_hash( thread_, self_, position_ ) );
+	}
 private:
 	virtual bool do_operator_equals( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const;
 	virtual bool do_operator_less( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const;
@@ -123,6 +127,7 @@ private:
 	virtual void do_operator_divide( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
 	virtual void do_operator_modulo( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
 	virtual void do_operator_power( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
+	virtual int long do_operator_hash( HThread*, HHuginn::value_t const&, int ) const;
 	virtual void do_destroy( HHuginn::value_t* ) {}
 	virtual HHuginn::value_t do_field( HHuginn::value_t const&, int ) const;
 	virtual HHuginn::value_t const& do_field( int ) const;

@@ -30,7 +30,7 @@ HHuginn::HValueHashHelper::HValueHashHelper( void )
 
 HHuginn::HValueHashHelper::size_type HHuginn::HValueHashHelper::operator()( HHuginn::value_t const& value_ ) const {
 	M_ASSERT( _thread != nullptr );
-	return ( huginn::instruction::hash( _thread, value_, _position ) );
+	return ( value_->operator_hash( _thread, value_, _position ) );
 }
 
 bool HHuginn::HValueHashHelper::operator()( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) const {

@@ -115,6 +115,10 @@ void HInteger::do_operator_modulo( HThread* thread_, HHuginn::value_t& self_, HH
 	}
 }
 
+int long HInteger::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
+	return ( hcore::hash<int long long>()( _value ) );
+}
+
 }
 
 }

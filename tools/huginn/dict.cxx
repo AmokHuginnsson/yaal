@@ -277,9 +277,9 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 	int long hashValue( static_cast<int long>( HHuginn::TYPE::DICT ) );
 	for ( huginn::HDict::values_t::value_type const& v : values ) {
 		hashValue *= 3;
-		hashValue += instruction::hash( thread_, v.first, position_ );
+		hashValue += v.first->operator_hash( thread_, v.first, position_ );
 		hashValue *= 3;
-		hashValue += instruction::hash( thread_, v.second, position_ );
+		hashValue += v.second->operator_hash( thread_, v.second, position_ );
 	}
 	return ( thread_->object_factory().create_integer( hashValue ) );
 	M_EPILOG

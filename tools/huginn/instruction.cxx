@@ -590,58 +590,6 @@ HHuginn::value_t neg( HThread* thread_, HHuginn::value_t const& v_, int position
 	return ( res );
 }
 
-int long hash( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
-	int long rt( 0 );
-	HHuginn::type_id_t typeId( v_->type_id() );
-	if ( typeId == HHuginn::TYPE::INTEGER ) {
-		rt = hcore::hash<int long long>()( static_cast<huginn::HInteger const*>( v_.raw() )->value() );
-	} else if ( typeId == HHuginn::TYPE::REAL ) {
-		rt = hcore::hash<double long>()( static_cast<HReal const*>( v_.raw() )->value() );
-	} else if ( typeId == HHuginn::TYPE::STRING ) {
-		rt = hcore::hash<hcore::HString>()( static_cast<HString const*>( v_.raw() )->value() );
-	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
-		rt = hcore::hash<hcore::HNumber>()( static_cast<HNumber const*>( v_.raw() )->value() );
-	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
-		rt = hcore::hash<code_point_t>()( static_cast<HCharacter const*>( v_.raw() )->value() );
-	} else if ( typeId == HHuginn::TYPE::BOOLEAN ) {
-		rt = hcore::hash<bool>()( static_cast<HBoolean const*>( v_.raw() )->value() );
-	} else if ( typeId == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-		rt = hcore::hash<int long>()( static_cast<huginn::HFunctionReference const*>( v_.raw() )->identifier_id().get() );
-	} else if ( typeId != HHuginn::TYPE::NONE ) {
-		HHuginn::value_t res;
-		if ( HObject const* o = dynamic_cast<HObject const*>( v_.raw() ) ) {
-			res = o->call_method( thread_, v_, IDENTIFIER::INTERFACE::HASH, HArguments( thread_ ), position_ );
-			if ( res->type_id() != HHuginn::TYPE::INTEGER ) {
-				throw HHuginn::HHuginnRuntimeException(
-					"User supplied `hash` function returned an invalid type "_ys
-						.append( a_type_name( res->get_class() ) )
-						.append( " instead of an `integer`." ),
-					thread_->current_frame()->file_id(),
-					position_
-				);
-			}
-		} else {
-			HClass const* c( v_->get_class() );
-			int idx( c->field_index( IDENTIFIER::INTERFACE::HASH ) );
-			if ( idx >= 0 ) {
-				HClass::HMethod const& m( *static_cast<HClass::HMethod const*>( c->field( idx ).raw() ) );
-				res = m.function()( thread_, const_cast<HHuginn::value_t*>( &v_ ), HArguments( thread_ ), position_ );
-				M_ASSERT( res->type_id() == HHuginn::TYPE::INTEGER );
-			} else {
-				throw HHuginn::HHuginnRuntimeException(
-					"There is no `hash` operator for "_ys
-						.append( a_type_name( v_->get_class() ) )
-						.append( "." ),
-					thread_->current_frame()->file_id(),
-					position_
-				);
-			}
-		}
-		rt = hcore::hash<int long long>()( static_cast<huginn::HInteger const*>( res.raw() )->value() );
-	}
-	return ( rt );
-}
-
 bool less( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	return ( v1_->operator_less( thread_, v1_, v2_, position_ ) );
 }

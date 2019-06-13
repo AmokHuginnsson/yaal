@@ -121,6 +121,10 @@ void HReal::do_operator_power( HThread* thread_, HHuginn::value_t& self_, HHugin
 	}
 }
 
+int long HReal::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
+	return ( hcore::hash<double long>()( _value ) );
+}
+
 }
 
 }

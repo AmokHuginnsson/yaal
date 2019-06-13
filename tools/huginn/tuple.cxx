@@ -148,7 +148,7 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 	int long hashValue( static_cast<int long>( HHuginn::TYPE::TUPLE ) );
 	for ( HHuginn::value_t const& v : values ) {
 		hashValue *= 3;
-		hashValue += instruction::hash( thread_, v, position_ );
+		hashValue += v->operator_hash( thread_, v, position_ );
 	}
 	return ( thread_->object_factory().create_integer( hashValue ) );
 	M_EPILOG

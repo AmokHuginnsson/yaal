@@ -51,6 +51,7 @@ private:
 	virtual bool do_operator_greater( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const override;
 	virtual bool do_operator_less_or_equal( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const override;
 	virtual bool do_operator_greater_or_equal( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const override;
+	virtual int long do_operator_hash( HThread*, HHuginn::value_t const&, int ) const override;
 };
 
 }
