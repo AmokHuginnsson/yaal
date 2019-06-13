@@ -930,7 +930,11 @@ void OCompiler::dispatch_equals( executing_parser::range_t range_ ) {
 	fc._valueTypes.pop();
 	HClass const* c2( fc._valueTypes.top()._class );
 	fc._valueTypes.pop();
-	if ( ! are_congruous( c1, c2 ) ) {
+	if (
+		! are_congruous( c1, c2 )
+		&& ( compiled_type_id( c1 ) != HHuginn::TYPE::NONE )
+		&& ( compiled_type_id( c2 ) != HHuginn::TYPE::NONE )
+	) {
 		operands_type_mismatch( op_to_str( o ), c2, c1, _fileId, p );
 	}
 	fc._valueTypes.push( type_to_class( HHuginn::TYPE::BOOLEAN ) );
