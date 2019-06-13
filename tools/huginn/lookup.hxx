@@ -19,12 +19,12 @@ class HLookup : public HInvalidatingIterable {
 public:
 	typedef HLookup this_type;
 	typedef HInvalidatingIterable base_type;
-	typedef yaal::hcore::HHashMap<HHuginn::value_t, HHuginn::value_t, HHuginn::HValueHashHelper&, HHuginn::HValueHashHelper&> values_prototype_t;
+	typedef yaal::hcore::HHashMap<HHuginn::value_t, HHuginn::value_t, HValueHashHelper&, HValueHashHelper&> values_prototype_t;
 	typedef yaal::hcore::HPool<values_prototype_t::node_size::value> pool_t;
 	typedef allocator::shared_pool<values_prototype_t::node_type> allocator_t;
-	typedef yaal::hcore::HHashMap<HHuginn::value_t, HHuginn::value_t, HHuginn::HValueHashHelper&, HHuginn::HValueHashHelper&, allocator_t> values_t;
+	typedef yaal::hcore::HHashMap<HHuginn::value_t, HHuginn::value_t, HValueHashHelper&, HValueHashHelper&, allocator_t> values_t;
 private:
-	mutable HHuginn::HValueHashHelper _helper;
+	mutable HValueHashHelper _helper;
 	values_t _data;
 public:
 	HLookup( HClass const*, allocator_t const& );

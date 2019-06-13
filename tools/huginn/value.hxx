@@ -136,6 +136,66 @@ private:
 	HValue& operator = ( HValue const& ) = delete;
 };
 
+class HValueHashHelper final {
+public:
+	typedef int long size_type;
+private:
+	huginn::HThread* _thread;
+	int _position;
+public:
+	HValueHashHelper( void )
+		: _thread( nullptr )
+		, _position( 0 ) {
+	}
+	void anchor( huginn::HThread* thread_, int position_ ) {
+		_thread = thread_;
+		_position = position_;
+	}
+	size_type operator()( HHuginn::value_t const& value_ ) const {
+		M_ASSERT( _thread != nullptr );
+		return ( value_->operator_hash( _thread, value_, _position ) );
+	}
+	bool operator()( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) const {
+		M_ASSERT( _thread != nullptr );
+		return ( ( v1_->type_id() == v2_->type_id() ) && v1_->operator_equals( _thread, v1_, v2_, _position ) );
+	}
+	void detach( void ) {
+		_thread = nullptr;
+		_position = 0;
+	}
+private:
+	HValueHashHelper( HValueHashHelper const& ) = delete;
+	HValueHashHelper& operator = ( HValueHashHelper const& ) = delete;
+};
+
+class HValueCompareHelper final {
+	typedef bool (*compare_t)( huginn::HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
+	huginn::HThread* _thread;
+	int _position;
+	compare_t _compare;
+public:
+	HValueCompareHelper( compare_t compare_ )
+		: _thread( nullptr )
+		, _position( 0 )
+		, _compare( compare_ ) {
+	}
+	void anchor( huginn::HThread* thread_, int position_ ) {
+		_thread = thread_;
+		_position = position_;
+	}
+	bool operator()( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) const {
+		M_ASSERT( _thread != nullptr );
+		return ( _compare( _thread, v1_, v2_, _position ) );
+	}
+	void detach( void ) {
+		_thread = nullptr;
+		_position = 0;
+	}
+private:
+	HValueCompareHelper( HValueCompareHelper const& ) = delete;
+	HValueCompareHelper& operator = ( HValueCompareHelper const& ) = delete;
+};
+
 }
 
 }

@@ -339,7 +339,7 @@ public:
 		M_PROLOG
 		char const name[] = "Algorithms.min";
 		verify_arg_count( name, values_, 1, meta::max_signed<int>::value, thread_, position_ );
-		HHuginn::HValueCompareHelper less( &instruction::less );
+		HValueCompareHelper less( &instruction::less );
 		less.anchor( thread_, position_ );
 		return ( *min_element( values_.begin(), values_.end(), cref( less ) ) );
 		M_EPILOG
@@ -348,7 +348,7 @@ public:
 		M_PROLOG
 		char const name[] = "Algorithms.max";
 		verify_arg_count( name, values_, 1, meta::max_signed<int>::value, thread_, position_ );
-		HHuginn::HValueCompareHelper less( &instruction::less );
+		HValueCompareHelper less( &instruction::less );
 		less.anchor( thread_, position_ );
 		return ( *max_element( values_.begin(), values_.end(), cref( less ) ) );
 		M_EPILOG

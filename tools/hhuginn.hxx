@@ -77,8 +77,6 @@ public:
 	typedef yaal::hcore::HPointer<huginn::HClass> class_t;
 	typedef yaal::tools::huginn::HValueReference<huginn::HValue> value_t;
 	typedef yaal::tools::huginn::HValueReferenceObserver<huginn::HValue> value_ref_t;
-	class HValueHashHelper;
-	class HValueCompareHelper;
 	typedef yaal::hcore::HPointer<huginn::HExpression> expression_t;
 	typedef yaal::hcore::HArray<HHuginn::expression_t> expressions_t;
 	class HCoordinate;
@@ -541,50 +539,6 @@ protected:
 private:
 	HNotifableReference( HNotifableReference const& ) = delete;
 	HNotifableReference& operator = ( HNotifableReference const& ) = delete;
-};
-
-class HHuginn::HValueCompareHelper final {
-	typedef bool (*compare_t)( huginn::HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
-	huginn::HThread* _thread;
-	int _position;
-	compare_t _compare;
-public:
-	HValueCompareHelper( compare_t );
-	void anchor( huginn::HThread* thread_, int position_ ) {
-		_thread = thread_;
-		_position = position_;
-	}
-	bool operator()( HHuginn::value_t const&, HHuginn::value_t const& ) const;
-	void detach( void ) {
-		_thread = nullptr;
-		_position = 0;
-	}
-private:
-	HValueCompareHelper( HValueCompareHelper const& ) = delete;
-	HValueCompareHelper& operator = ( HValueCompareHelper const& ) = delete;
-};
-
-class HHuginn::HValueHashHelper final {
-public:
-	typedef int long size_type;
-private:
-	huginn::HThread* _thread;
-	int _position;
-public:
-	HValueHashHelper( void );
-	void anchor( huginn::HThread* thread_, int position_ ) {
-		_thread = thread_;
-		_position = position_;
-	}
-	size_type operator()( HHuginn::value_t const& ) const;
-	bool operator()( HHuginn::value_t const&, HHuginn::value_t const& ) const;
-	void detach( void ) {
-		_thread = nullptr;
-		_position = 0;
-	}
-private:
-	HValueHashHelper( HValueHashHelper const& ) = delete;
-	HValueHashHelper& operator = ( HValueHashHelper const& ) = delete;
 };
 
 namespace huginn {

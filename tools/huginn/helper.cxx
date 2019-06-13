@@ -23,32 +23,6 @@ namespace yaal {
 
 namespace tools {
 
-HHuginn::HValueHashHelper::HValueHashHelper( void )
-	: _thread( nullptr )
-	, _position( 0 ) {
-}
-
-HHuginn::HValueHashHelper::size_type HHuginn::HValueHashHelper::operator()( HHuginn::value_t const& value_ ) const {
-	M_ASSERT( _thread != nullptr );
-	return ( value_->operator_hash( _thread, value_, _position ) );
-}
-
-bool HHuginn::HValueHashHelper::operator()( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) const {
-	M_ASSERT( _thread != nullptr );
-	return ( ( v1_->type_id() == v2_->type_id() ) && v1_->operator_equals( _thread, v1_, v2_, _position ) );
-}
-
-HHuginn::HValueCompareHelper::HValueCompareHelper( compare_t compare_ )
-	: _thread( nullptr )
-	, _position( 0 )
-	, _compare( compare_ ) {
-}
-
-bool HHuginn::HValueCompareHelper::operator()( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) const {
-	M_ASSERT( _thread != nullptr );
-	return ( _compare( _thread, v1_, v2_, _position ) );
-}
-
 namespace huginn {
 
 bool is_keyword( yaal::hcore::HString const& name_ ) {

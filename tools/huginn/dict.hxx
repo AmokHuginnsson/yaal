@@ -19,12 +19,12 @@ class HDict : public HInvalidatingIterable {
 public:
 	typedef HDict this_type;
 	typedef HInvalidatingIterable base_type;
-	typedef yaal::hcore::HMap<HHuginn::value_t, HHuginn::value_t, HHuginn::HValueCompareHelper&> values_prototype_t;
+	typedef yaal::hcore::HMap<HHuginn::value_t, HHuginn::value_t, HValueCompareHelper&> values_prototype_t;
 	typedef yaal::hcore::HPool<values_prototype_t::node_size::value> pool_t;
 	typedef allocator::shared_pool<values_prototype_t::node_type> allocator_t;
-	typedef yaal::hcore::HMap<HHuginn::value_t, HHuginn::value_t, HHuginn::HValueCompareHelper&, allocator_t> values_t;
+	typedef yaal::hcore::HMap<HHuginn::value_t, HHuginn::value_t, HValueCompareHelper&, allocator_t> values_t;
 private:
-	mutable HHuginn::HValueCompareHelper _helper;
+	mutable HValueCompareHelper _helper;
 	values_t _data;
 	HClass const* _keyType;
 public:

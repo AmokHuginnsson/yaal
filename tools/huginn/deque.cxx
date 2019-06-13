@@ -283,7 +283,7 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 inline bool less_impl( huginn::HThread* thread_, HHuginn::value_t const& l_, HHuginn::value_t const& r_, int position_ ) {
 	huginn::HDeque::values_t const& l( static_cast<huginn::HDeque const*>( l_.raw() )->value() );
 	huginn::HDeque::values_t const& r( static_cast<huginn::HDeque const*>( r_.raw() )->value() );
-	HHuginn::HValueCompareHelper lessHelper( &instruction::checked_less );
+	HValueCompareHelper lessHelper( &instruction::checked_less );
 	lessHelper.anchor( thread_, position_ );
 	return ( lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), cref( lessHelper ) ) );
 }

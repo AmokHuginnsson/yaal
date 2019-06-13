@@ -208,7 +208,7 @@ HHuginn::value_t sort( huginn::HThread* thread_, HHuginn::value_t* object_, HHug
 	}
 	huginn::HList::values_t& data( static_cast<HList*>( object_->raw() )->value() );
 	if ( ! key ) {
-		HHuginn::HValueCompareHelper less( &instruction::checked_less );
+		HValueCompareHelper less( &instruction::checked_less );
 		less.anchor( thread_, position_ );
 		sort( data.begin(), data.end(), cref( less ) );
 	} else {
@@ -279,7 +279,7 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 inline bool less_impl( huginn::HThread* thread_, HHuginn::value_t const& l_, HHuginn::value_t const& r_, int position_ ) {
 	huginn::HList::values_t const& l( static_cast<huginn::HList const*>( l_.raw() )->value() );
 	huginn::HList::values_t const& r( static_cast<huginn::HList const*>( r_.raw() )->value() );
-	HHuginn::HValueCompareHelper lessHelper( &instruction::checked_less );
+	HValueCompareHelper lessHelper( &instruction::checked_less );
 	lessHelper.anchor( thread_, position_ );
 	return ( lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), cref( lessHelper ) ) );
 }
