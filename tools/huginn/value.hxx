@@ -110,6 +110,10 @@ public:
 		M_ASSERT( _class->type_id() == other_->type_id() );
 		do_operator_power( thread_, self_, other_, position_ );
 	}
+	HHuginn::value_t operator_modulus( HThread* thread_, HHuginn::value_t const& self_, int position_ ) const {
+		M_ASSERT( self_.raw() == this );
+		return ( do_operator_modulus( thread_, self_, position_ ) );
+	}
 	int long operator_hash( HThread* thread_, HHuginn::value_t const& self_, int position_ ) const {
 		M_ASSERT( self_.raw() == this );
 		return ( do_operator_hash( thread_, self_, position_ ) );
@@ -127,6 +131,7 @@ private:
 	virtual void do_operator_divide( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
 	virtual void do_operator_modulo( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
 	virtual void do_operator_power( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
+	virtual HHuginn::value_t do_operator_modulus( HThread*, HHuginn::value_t const&, int ) const;
 	virtual int long do_operator_hash( HThread*, HHuginn::value_t const&, int ) const;
 	virtual void do_destroy( HHuginn::value_t* ) {}
 	virtual HHuginn::value_t do_field( HHuginn::value_t const&, int ) const;
@@ -195,6 +200,13 @@ private:
 	HValueCompareHelper( HValueCompareHelper const& ) = delete;
 	HValueCompareHelper& operator = ( HValueCompareHelper const& ) = delete;
 };
+
+enum class OPERATION {
+	OPEN,
+	CLOSED
+};
+
+HHuginn::value_t fallback_unary_arithmetic( HThread*, HHuginn::identifier_id_t, char const*, HHuginn::value_t const&, OPERATION, int );
 
 }
 

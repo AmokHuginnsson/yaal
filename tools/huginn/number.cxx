@@ -170,6 +170,10 @@ void HNumber::do_operator_power( HThread* thread_, HHuginn::value_t& self_, HHug
 	} while ( false );
 }
 
+HHuginn::value_t HNumber::do_operator_modulus( HThread* thread_, HHuginn::value_t const& self_, int ) const {
+	return ( _value >= 0 ? self_ : thread_->object_factory().create_number( -_value ) );
+}
+
 int long HNumber::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
 	return ( hcore::hash<hcore::HNumber>()( _value ) );
 }

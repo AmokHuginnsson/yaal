@@ -42,6 +42,7 @@ private:
 	virtual void do_operator_multipy( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int ) override;
 	virtual void do_operator_divide( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int ) override;
 	virtual void do_operator_modulo( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int ) override;
+	virtual HHuginn::value_t do_operator_modulus( HThread*, HHuginn::value_t const&, int ) const override;
 	virtual int long do_operator_hash( HThread*, HHuginn::value_t const&, int ) const override;
 };
 

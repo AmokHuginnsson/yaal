@@ -121,6 +121,10 @@ void HReal::do_operator_power( HThread* thread_, HHuginn::value_t& self_, HHugin
 	}
 }
 
+HHuginn::value_t HReal::do_operator_modulus( HThread* thread_, HHuginn::value_t const& self_, int ) const {
+	return ( _value >= 0 ? self_ : thread_->object_factory().create_real( -_value ) );
+}
+
 int long HReal::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
 	return ( hcore::hash<double long>()( _value ) );
 }

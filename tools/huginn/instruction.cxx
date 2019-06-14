@@ -442,50 +442,6 @@ HHuginn::value_t member( HThread* thread_, HFrame::ACCESS access_, HHuginn::valu
 	M_EPILOG
 }
 
-enum class OPERATION {
-	OPEN,
-	CLOSED
-};
-
-namespace {
-
-HHuginn::value_t fallback_unary_arithmetic( HThread* thread_, HHuginn::identifier_id_t methodIdentifier_, char const* oper_, HHuginn::value_t const& v_, OPERATION operation_, int position_ ) {
-	HHuginn::value_t v;
-	HHuginn::type_id_t t( v_->type_id() );
-	if ( HObject const* o = dynamic_cast<HObject const*>( v_.raw() ) ) {
-		v = o->call_method( thread_, v_, methodIdentifier_, HArguments( thread_ ), position_ );
-		if ( ( operation_ == OPERATION::CLOSED ) && ( v->type_id() != t ) ) {
-			throw HHuginn::HHuginnRuntimeException(
-				"Arithmetic method `"_ys
-					.append( thread_->runtime().identifier_name( methodIdentifier_ ) )
-					.append( "` on " )
-					.append( a_type_name( v_->get_class() ) )
-					.append( " returned result of incompatible type " )
-					.append( a_type_name( v->get_class() ) )
-					.append( "." ),
-				thread_->current_frame()->file_id(),
-				position_
-			);
-		}
-	} else {
-		HClass const* c( v_->get_class() );
-		int idx( c->field_index( methodIdentifier_ ) );
-		if ( idx >= 0 ) {
-			HClass::HMethod const& m( *static_cast<HClass::HMethod const*>( c->field( idx ).raw() ) );
-			v = m.function()( thread_, const_cast<HHuginn::value_t*>( &v_ ), HArguments( thread_ ), position_ );
-			M_ASSERT( ( operation_ == OPERATION::OPEN ) || ( v->type_id() == t ) || ! thread_->can_continue() );
-		} else {
-			throw HHuginn::HHuginnRuntimeException(
-				"There is no `"_ys.append( oper_ ).append( "` operator for " ).append( a_type_name( v_->get_class() ) ).append( "." ),
-				thread_->current_frame()->file_id(),
-				position_
-			);
-		}
-	}
-	return ( v );
-}
-}
-
 HHuginn::value_t factorial( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res;
 	HHuginn::type_id_t typeId( v_->type_id() );
@@ -509,35 +465,7 @@ HHuginn::value_t factorial( HThread* thread_, HHuginn::value_t const& v_, int po
 }
 
 HHuginn::value_t abs( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
-	HHuginn::value_t res;
-	HHuginn::type_id_t typeId( v_->type_id() );
-	if ( typeId == HHuginn::TYPE::INTEGER ) {
-		int long long v( static_cast<huginn::HInteger const*>( v_.raw() )->value() );
-		if ( v >= 0 ) {
-			res = v_;
-		} else if ( v != meta::min_signed<huginn::HInteger::value_type>::value ) {
-			res = thread_->object_factory().create_integer( -v );
-		} else {
-			thread_->raise( thread_->runtime().object_factory()->arithmetic_exception_class(), "Integer overflow.", position_ );
-		}
-	} else if ( typeId == HHuginn::TYPE::REAL ) {
-		double long v( static_cast<HReal const*>( v_.raw() )->value() );
-		if ( v >= 0 ) {
-			res = v_;
-		} else {
-			res = thread_->object_factory().create_real( -v );
-		}
-	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
-		yaal::hcore::HNumber const& v( static_cast<HNumber const*>( v_.raw() )->value() );
-		if ( v >= 0 ) {
-			res = v_;
-		} else {
-			res = thread_->object_factory().create_number( -v );
-		}
-	} else {
-		res = fallback_unary_arithmetic( thread_, IDENTIFIER::INTERFACE::MODULUS, op_to_str( OPERATOR::MODULUS ), v_, OPERATION::OPEN, position_ );
-	}
-	return ( res );
+	return ( v_->operator_modulus( thread_, v_, position_ ) );
 }
 
 HHuginn::value_t neg( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {

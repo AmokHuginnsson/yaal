@@ -142,6 +142,42 @@ void fallback_arithmetic( HThread* thread_, HHuginn::identifier_id_t methodIdent
 
 }
 
+HHuginn::value_t fallback_unary_arithmetic( HThread* thread_, HHuginn::identifier_id_t methodIdentifier_, char const* oper_, HHuginn::value_t const& v_, OPERATION operation_, int position_ ) {
+	HHuginn::value_t v;
+	HHuginn::type_id_t t( v_->type_id() );
+	if ( HObject const* o = dynamic_cast<HObject const*>( v_.raw() ) ) {
+		v = o->call_method( thread_, v_, methodIdentifier_, HArguments( thread_ ), position_ );
+		if ( ( operation_ == OPERATION::CLOSED ) && ( v->type_id() != t ) ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"Arithmetic method `"_ys
+					.append( thread_->runtime().identifier_name( methodIdentifier_ ) )
+					.append( "` on " )
+					.append( a_type_name( v_->get_class() ) )
+					.append( " returned result of incompatible type " )
+					.append( a_type_name( v->get_class() ) )
+					.append( "." ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+	} else {
+		HClass const* c( v_->get_class() );
+		int idx( c->field_index( methodIdentifier_ ) );
+		if ( idx >= 0 ) {
+			HClass::HMethod const& m( *static_cast<HClass::HMethod const*>( c->field( idx ).raw() ) );
+			v = m.function()( thread_, const_cast<HHuginn::value_t*>( &v_ ), HArguments( thread_ ), position_ );
+			M_ASSERT( ( operation_ == OPERATION::OPEN ) || ( v->type_id() == t ) || ! thread_->can_continue() );
+		} else {
+			throw HHuginn::HHuginnRuntimeException(
+				"There is no `"_ys.append( oper_ ).append( "` operator for " ).append( a_type_name( v_->get_class() ) ).append( "." ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+	}
+	return ( v );
+}
+
 bool HValue::do_operator_equals( HThread* thread_, HHuginn::value_t const& self_, HHuginn::value_t const& other_, int position_ ) const {
 	return ( fallback_compare( thread_, IDENTIFIER::INTERFACE::EQUALS, op_to_str( OPERATOR::EQUALS ), self_, other_, position_ ) );
 }
@@ -189,6 +225,10 @@ void HValue::do_operator_modulo( HThread* thread_, HHuginn::value_t& self_, HHug
 
 void HValue::do_operator_power( HThread* thread_, HHuginn::value_t& self_, HHuginn::value_t const& other_, int position_ ) {
 	fallback_arithmetic( thread_, IDENTIFIER::INTERFACE::POWER, op_to_str( OPERATOR::POWER ), self_, other_, position_ );
+}
+
+HHuginn::value_t HValue::do_operator_modulus( HThread* thread_, HHuginn::value_t const& self_, int position_ ) const {
+	return ( fallback_unary_arithmetic( thread_, IDENTIFIER::INTERFACE::MODULUS, op_to_str( OPERATOR::MODULUS ), self_, OPERATION::OPEN, position_ ) );
 }
 
 int long HValue::do_operator_hash( HThread* thread_, HHuginn::value_t const& self_, int position_ ) const {

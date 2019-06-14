@@ -401,7 +401,7 @@ void HExpression::close_parenthesis( OExecutionStep const& executionStep_, HFram
 	if ( o == OPERATOR::MODULUS ) {
 		HHuginn::value_t v( yaal::move( frame_->values().top() ) );
 		frame_->values().pop();
-		frame_->values().push( instruction::abs( frame_->thread(), v, executionStep_._position ) );
+		frame_->values().push( v->operator_modulus( frame_->thread(), v, executionStep_._position ) );
 	}
 	return;
 	M_EPILOG
