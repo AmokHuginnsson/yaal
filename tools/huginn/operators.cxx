@@ -29,7 +29,7 @@ class HOperators : public HPackage {
 public:
 	typedef void ( HValue::* binary_operator_t )( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
 	typedef bool ( HValue::* binary_boolean_operator_t )( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const;
-	typedef HHuginn::value_t ( * unary_operator_t )( HThread*, HHuginn::value_t const&, int );
+	typedef HHuginn::value_t ( HValue::* unary_operator_t )( HThread*, HHuginn::value_t const&, int ) const;
 	HOperators( huginn::HClass* class_ )
 		: HPackage( class_ ) {
 		return;
@@ -114,7 +114,8 @@ public:
 	static HHuginn::value_t unary_operator( char const* name_, unary_operator_t unaryOperator_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( name_, values_, 1, 1, thread_, position_ );
-		return ( unaryOperator_( thread_, values_[0], position_ ) );
+		HHuginn::value_t& v( values_[0] );
+		return ( ( v.raw()->*unaryOperator_ )( thread_, v, position_ ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t boolean_not( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -165,9 +166,9 @@ HPackageCreatorInterface::HInstance HOperatorsCreator::do_new_instance( HRuntime
 		create_field( runtime_, "and", "Operators.and", OPERATOR::BOOLEAN_AND, &HOperators::boolean_binary_operator, "( *left*, *right* ) - return result of *left* **⋀** *right* expression" ),
 		create_field( runtime_, "or",  "Operators.or",  OPERATOR::BOOLEAN_OR,  &HOperators::boolean_binary_operator, "( *left*, *right* ) - return result of *left* **⋁** *right* expression" ),
 		create_field( runtime_, "xor", "Operators.xor", OPERATOR::BOOLEAN_XOR, &HOperators::boolean_binary_operator, "( *left*, *right* ) - return result of *left* **⊕** *right* expression" ),
-		create_field( runtime_, IDENTIFIER::INTERFACE::NEGATE,  "Operators.negate",  &instruction::neg, &HOperators::unary_operator, "( *val* ) - return result of __-__*val* expression" ),
-		create_field( runtime_, IDENTIFIER::INTERFACE::MODULUS, "Operators.modulus", &instruction::abs, &HOperators::unary_operator, "( *val* ) - return result of **|** *val* **|** expression" ),
-		create_field( runtime_, "factorial", "Operators.factorial", &instruction::factorial, &HOperators::unary_operator, "( *val* ) - return result of *val*__!__ expression" ),
+		create_field( runtime_, IDENTIFIER::INTERFACE::NEGATE,  "Operators.negate",  &HValue::operator_negate, &HOperators::unary_operator, "( *val* ) - return result of __-__*val* expression" ),
+		create_field( runtime_, IDENTIFIER::INTERFACE::MODULUS, "Operators.modulus", &HValue::operator_modulus, &HOperators::unary_operator, "( *val* ) - return result of **|** *val* **|** expression" ),
+		create_field( runtime_, "factorial", "Operators.factorial", &HValue::operator_factorial, &HOperators::unary_operator, "( *val* ) - return result of *val*__!__ expression" ),
 		create_field( runtime_, "not", &HOperators::boolean_not, "( *val* ) - return result of __¬__*val* expression" )
 	};
 	c->redefine( nullptr, fd );

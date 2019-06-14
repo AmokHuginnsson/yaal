@@ -140,7 +140,10 @@ void fallback_arithmetic( HThread* thread_, HHuginn::identifier_id_t methodIdent
 	return;
 }
 
-}
+enum class OPERATION {
+	OPEN,
+	CLOSED
+};
 
 HHuginn::value_t fallback_unary_arithmetic( HThread* thread_, HHuginn::identifier_id_t methodIdentifier_, char const* oper_, HHuginn::value_t const& v_, OPERATION operation_, int position_ ) {
 	HHuginn::value_t v;
@@ -176,6 +179,8 @@ HHuginn::value_t fallback_unary_arithmetic( HThread* thread_, HHuginn::identifie
 		}
 	}
 	return ( v );
+}
+
 }
 
 bool HValue::do_operator_equals( HThread* thread_, HHuginn::value_t const& self_, HHuginn::value_t const& other_, int position_ ) const {
@@ -234,6 +239,19 @@ HHuginn::value_t HValue::do_operator_modulus( HThread* thread_, HHuginn::value_t
 HHuginn::value_t HValue::do_operator_negate( HThread* thread_, HHuginn::value_t const& self_, int position_ ) const {
 	return ( fallback_unary_arithmetic( thread_, IDENTIFIER::INTERFACE::NEGATE, op_to_str( OPERATOR::NEGATE ), self_, OPERATION::CLOSED, position_ ) );
 }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wsuggest-attribute=noreturn"
+HHuginn::value_t HValue::do_operator_factorial( HThread* thread_, HHuginn::value_t const& self_, int position_ ) const {
+	throw HHuginn::HHuginnRuntimeException(
+		"There is no `!` operator for "_ys.append( a_type_name( self_->get_class() ) ).append( "." ),
+		thread_->current_frame()->file_id(), position_
+	);
+}
+#pragma GCC diagnostic pop
 
 int long HValue::do_operator_hash( HThread* thread_, HHuginn::value_t const& self_, int position_ ) const {
 	if ( _class->type_id() == HHuginn::TYPE::NONE ) {

@@ -442,36 +442,6 @@ HHuginn::value_t member( HThread* thread_, HFrame::ACCESS access_, HHuginn::valu
 	M_EPILOG
 }
 
-HHuginn::value_t factorial( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
-	HHuginn::value_t res;
-	HHuginn::type_id_t typeId( v_->type_id() );
-	if ( typeId == HHuginn::TYPE::NUMBER ) {
-		hcore::HNumber const& n( static_cast<HNumber const*>( v_.raw() )->value() );
-		HRuntime& rt( thread_->runtime() );
-		if ( n < number::N0 ) {
-			thread_->raise( rt.object_factory()->arithmetic_exception_class(), "Factorial from negative.", position_ );
-		} else if ( ! n.is_integral() ) {
-			thread_->raise( rt.object_factory()->arithmetic_exception_class(), "Factorial from fraction.", position_ );
-		} else {
-			res = thread_->object_factory().create_number( hcore::HNumber( number::factorial( n.to_integer() ) ) );
-		}
-	} else {
-		throw HHuginn::HHuginnRuntimeException(
-			"There is no `!` operator for "_ys.append( a_type_name( v_->get_class() ) ).append( "." ),
-			thread_->current_frame()->file_id(), position_
-		);
-	}
-	return ( res );
-}
-
-HHuginn::value_t abs( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
-	return ( v_->operator_modulus( thread_, v_, position_ ) );
-}
-
-HHuginn::value_t neg( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
-	return ( v_->operator_negate( thread_, v_, position_ ) );
-}
-
 bool less( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	return ( v1_->operator_less( thread_, v1_, v2_, position_ ) );
 }

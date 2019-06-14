@@ -846,7 +846,7 @@ void HExpression::factorial( OExecutionStep const& executionStep_, huginn::HFram
 	M_ASSERT( ! frame_->values().is_empty() );
 	HHuginn::value_t v( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	frame_->values().push( instruction::factorial( frame_->thread(), v, executionStep_._position ) );
+	frame_->values().push( v->operator_factorial( frame_->thread(), v, executionStep_._position ) );
 	return;
 	M_EPILOG
 }

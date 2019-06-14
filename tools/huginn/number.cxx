@@ -178,6 +178,19 @@ HHuginn::value_t HNumber::do_operator_negate( HThread* thread_, HHuginn::value_t
 	return ( thread_->object_factory().create_number( -_value ) );
 }
 
+HHuginn::value_t HNumber::do_operator_factorial( HThread* thread_, HHuginn::value_t const&, int position_ ) const {
+	HObjectFactory& of( thread_->object_factory() );
+	HHuginn::value_t res( of.none_value() );
+	if ( _value < hcore::number::N0 ) {
+		thread_->raise( of.arithmetic_exception_class(), "Factorial from negative.", position_ );
+	} else if ( ! _value.is_integral() ) {
+		thread_->raise( of.arithmetic_exception_class(), "Factorial from fraction.", position_ );
+	} else {
+		res = of.create_number( hcore::number::factorial( _value.to_integer() ) );
+	}
+	return ( res );
+}
+
 int long HNumber::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
 	return ( hcore::hash<hcore::HNumber>()( _value ) );
 }
