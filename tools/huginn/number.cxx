@@ -174,6 +174,10 @@ HHuginn::value_t HNumber::do_operator_modulus( HThread* thread_, HHuginn::value_
 	return ( _value >= 0 ? self_ : thread_->object_factory().create_number( -_value ) );
 }
 
+HHuginn::value_t HNumber::do_operator_negate( HThread* thread_, HHuginn::value_t const&, int ) const {
+	return ( thread_->object_factory().create_number( -_value ) );
+}
+
 int long HNumber::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
 	return ( hcore::hash<hcore::HNumber>()( _value ) );
 }

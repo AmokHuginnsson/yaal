@@ -114,6 +114,10 @@ public:
 		M_ASSERT( self_.raw() == this );
 		return ( do_operator_modulus( thread_, self_, position_ ) );
 	}
+	HHuginn::value_t operator_negate( HThread* thread_, HHuginn::value_t const& self_, int position_ ) const {
+		M_ASSERT( self_.raw() == this );
+		return ( do_operator_negate( thread_, self_, position_ ) );
+	}
 	int long operator_hash( HThread* thread_, HHuginn::value_t const& self_, int position_ ) const {
 		M_ASSERT( self_.raw() == this );
 		return ( do_operator_hash( thread_, self_, position_ ) );
@@ -132,6 +136,7 @@ private:
 	virtual void do_operator_modulo( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
 	virtual void do_operator_power( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
 	virtual HHuginn::value_t do_operator_modulus( HThread*, HHuginn::value_t const&, int ) const;
+	virtual HHuginn::value_t do_operator_negate( HThread*, HHuginn::value_t const&, int ) const;
 	virtual int long do_operator_hash( HThread*, HHuginn::value_t const&, int ) const;
 	virtual void do_destroy( HHuginn::value_t* ) {}
 	virtual HHuginn::value_t do_field( HHuginn::value_t const&, int ) const;

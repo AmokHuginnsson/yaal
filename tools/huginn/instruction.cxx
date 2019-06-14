@@ -469,23 +469,7 @@ HHuginn::value_t abs( HThread* thread_, HHuginn::value_t const& v_, int position
 }
 
 HHuginn::value_t neg( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
-	HHuginn::value_t res;
-	HHuginn::type_id_t typeId( v_->type_id() );
-	if ( typeId == HHuginn::TYPE::INTEGER ) {
-		huginn::HInteger::value_type v( static_cast<huginn::HInteger const*>( v_.raw() )->value() );
-		if ( v != meta::min_signed<huginn::HInteger::value_type>::value ) {
-			res = thread_->object_factory().create_integer( -v );
-		} else {
-			thread_->raise( thread_->runtime().object_factory()->arithmetic_exception_class(), "Integer overflow.", position_ );
-		}
-	} else if ( typeId == HHuginn::TYPE::REAL ) {
-		res = thread_->object_factory().create_real( -static_cast<HReal const*>( v_.raw() )->value() );
-	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
-		res = thread_->object_factory().create_number( -static_cast<HNumber const*>( v_.raw() )->value() );
-	} else {
-		res = fallback_unary_arithmetic( thread_, IDENTIFIER::INTERFACE::NEGATE, op_to_str( OPERATOR::NEGATE ), v_, OPERATION::CLOSED, position_ );
-	}
-	return ( res );
+	return ( v_->operator_negate( thread_, v_, position_ ) );
 }
 
 bool less( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {

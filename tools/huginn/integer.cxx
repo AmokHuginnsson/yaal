@@ -128,6 +128,17 @@ HHuginn::value_t HInteger::do_operator_modulus( HThread* thread_, HHuginn::value
 	return ( res );
 }
 
+HHuginn::value_t HInteger::do_operator_negate( HThread* thread_, HHuginn::value_t const&, int position_ ) const {
+	HObjectFactory& of( thread_->object_factory() );
+	HHuginn::value_t res( of.none_value() );
+	if ( _value != meta::min_signed<huginn::HInteger::value_type>::value ) {
+		res = of.create_integer( -_value );
+	} else {
+		thread_->raise( of.arithmetic_exception_class(), "Integer overflow.", position_ );
+	}
+	return ( res );
+}
+
 int long HInteger::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
 	return ( hcore::hash<int long long>()( _value ) );
 }

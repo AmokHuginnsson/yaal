@@ -231,6 +231,10 @@ HHuginn::value_t HValue::do_operator_modulus( HThread* thread_, HHuginn::value_t
 	return ( fallback_unary_arithmetic( thread_, IDENTIFIER::INTERFACE::MODULUS, op_to_str( OPERATOR::MODULUS ), self_, OPERATION::OPEN, position_ ) );
 }
 
+HHuginn::value_t HValue::do_operator_negate( HThread* thread_, HHuginn::value_t const& self_, int position_ ) const {
+	return ( fallback_unary_arithmetic( thread_, IDENTIFIER::INTERFACE::NEGATE, op_to_str( OPERATOR::NEGATE ), self_, OPERATION::CLOSED, position_ ) );
+}
+
 int long HValue::do_operator_hash( HThread* thread_, HHuginn::value_t const& self_, int position_ ) const {
 	if ( _class->type_id() == HHuginn::TYPE::NONE ) {
 		return ( 0 );

@@ -860,7 +860,7 @@ void HExpression::negate( OExecutionStep const&, HFrame* frame_ ) {
 	M_ASSERT( ! frame_->values().is_empty() );
 	HHuginn::value_t v( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	frame_->values().push( instruction::neg( frame_->thread(), v, p ) );
+	frame_->values().push( v->operator_negate( frame_->thread(), v, p ) );
 	return;
 	M_EPILOG
 }
