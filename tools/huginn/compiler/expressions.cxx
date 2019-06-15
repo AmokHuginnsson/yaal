@@ -22,7 +22,8 @@ OPERATOR _copyConstContext_[] = {
 	OPERATOR::ASSIGN,
 	OPERATOR::FUNCTION_CALL,
 	OPERATOR::FUNCTION_ARGUMENT,
-	OPERATOR::SUBSCRIPT
+	OPERATOR::SUBSCRIPT,
+	OPERATOR::TERNARY
 };
 
 inline HHuginn::TYPE compiled_type_id( HClass const* class_ ) {
