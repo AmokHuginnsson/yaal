@@ -111,6 +111,7 @@ OCompiler::OFunctionContext::OFunctionContext(
 	, _variableCount()
 	, _loopCount( 0 )
 	, _loopSwitchCount( 0 )
+	, _shortCircuit( 0 )
 	, _nestedCalls( 0 )
 	, _lastDereferenceOperator( OPERATOR::NONE )
 	, _isAssert( false )
@@ -149,14 +150,16 @@ OCompiler::OExecutionStep::OExecutionStep(
 	HHuginn::identifier_id_t classId_,
 	int index_,
 	HHuginn::identifier_id_t identifier_,
-	int range_
+	int range_,
+	bool shortCircuit_
 ) : _operation( operation_ )
 	, _expression( expression_ )
 	, _scope( scope_ )
 	, _classId( classId_ )
 	, _index( index_ )
 	, _identifier( identifier_ )
-	, _position( range_ ) {
+	, _position( range_ )
+	, _shortCircuit( shortCircuit_ ) {
 	return;
 }
 
@@ -402,6 +405,13 @@ void OCompiler::resolve_symbols( void ) {
 					}
 					bool make( ! sc );
 					if ( make ) {
+						if ( es._shortCircuit ) {
+							throw HHuginn::HHuginnRuntimeException(
+								"`"_ys.append( _runtime->identifier_name( es._identifier ) ).append( "` is defined in short-circuitable context." ),
+								_fileId,
+								es._position
+							);
+						}
 						sc = es._scope.raw();
 						/*
 						 * There are two kinds of OScopeContexts:
@@ -947,6 +957,7 @@ void OCompiler::pop_function_context( void ) {
 	OFunctionContext& fc( f() );
 	M_ASSERT( fc._loopCount == 0 );
 	M_ASSERT( fc._loopSwitchCount == 0 );
+	M_ASSERT( fc._shortCircuit == 0 );
 	while ( ! fc._scopeStack.is_empty() ) {
 		pop_scope_context_low();
 	}

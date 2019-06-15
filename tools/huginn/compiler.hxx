@@ -225,6 +225,13 @@ struct OCompiler {
 		 */
 		int _loopSwitchCount;
 
+
+		/*! \brief Count how many nested short-circuitable sub-expressions we have.
+		 *
+		 * Helps with preventing definition of variables in paths that could never be executed.
+		 */
+		int _shortCircuit;
+
 		/*! \brief Count how many nested calls we have at current stage of compilation of an expression.
 		 *
 		 * This count is used to support `assert' statement.
@@ -312,8 +319,9 @@ struct OCompiler {
 		int _index;
 		HHuginn::identifier_id_t _identifier;
 		int _position;
+		bool _shortCircuit;
 		OExecutionStep(
-			OPERATION, HHuginn::expression_t const&, OFunctionContext::scope_context_t const&, HHuginn::identifier_id_t, int, HHuginn::identifier_id_t, int
+			OPERATION, HHuginn::expression_t const&, OFunctionContext::scope_context_t const&, HHuginn::identifier_id_t, int, HHuginn::identifier_id_t, int, bool = false
 		);
 	};
 	struct OIdentifierUse {

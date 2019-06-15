@@ -336,7 +336,8 @@ void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executi
 		!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : IDENTIFIER::INVALID,
 		index,
 		varIdentifier,
-		range_.start()
+		range_.start(),
+		fc._shortCircuit > 0
 	);
 	fc._valueTypes.push( type_to_class( HHuginn::TYPE::UNKNOWN ) );
 	fc._variables.emplace( varIdentifier, static_cast<int>( _executionStepsBacklog.get_size() - 1 ) );
@@ -1016,11 +1017,13 @@ void OCompiler::defer_store_character( code_point_t value_, executing_parser::ra
 void OCompiler::commit_boolean( OPERATOR operator_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	if ( fc.expressions_stack().top().get_size() > 1 ) {
+	int expressionCount( static_cast<int>( fc.expressions_stack().top().get_size() ) );
+	if ( expressionCount > 1 ) {
 		HHuginn::value_t And( _runtime->object_factory()->create<HBooleanEvaluator>( _runtime, fc.expressions_stack().top(), operator_ ) );
 		fc.expressions_stack().pop();
 		M_ASSERT( ! fc._valueTypes.is_empty() && ( compiled_type_id( fc._valueTypes.top()._class ) == HHuginn::TYPE::BOOLEAN ) );
 		fc._valueTypes.pop();
+		fc._shortCircuit -= ( expressionCount - 1 );
 		defer_store_direct( And, range_ );
 		HExpression& expression( *current_expression() );
 		expression.oper( operator_, range_.start() );
@@ -1044,6 +1047,7 @@ void OCompiler::commit_ternary( executing_parser::range_t range_ ) {
 		fc.expressions_stack().pop();
 		M_ASSERT( ! fc._valueTypes.is_empty() );
 		fc._valueTypes.pop();
+		fc._shortCircuit -= 2;
 		defer_store_direct( ternary, range_ );
 		HExpression& expression( *current_expression() );
 		expression.oper( OPERATOR::TERNARY, range_.start() );
@@ -1202,6 +1206,7 @@ void OCompiler::add_subexpression( OPERATOR op_, executing_parser::range_t range
 	OFunctionContext& fc( f() );
 	fc.expressions_stack().top().emplace_back( new_expression( _fileId, range_ ) );
 	fc._operations.emplace( op_, range_.start() );
+	++ fc._shortCircuit;
 	return;
 	M_EPILOG
 }
