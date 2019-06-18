@@ -141,7 +141,7 @@ void HLog::do_rehash( void* src_, char const* processName_ ) {
 		}
 		len = static_cast<int>( ::strlen( buf ) );
 		if ( ( len > 0 ) && ( buf[ len - 1 ] == '\n' ) ) {
-			_type = LOG_LEVEL::MAX;
+			_type = _logLevel;
 		}
 		::fclose( src );
 	}

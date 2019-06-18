@@ -94,7 +94,7 @@ bool fallback_compare( HThread* thread_, HHuginn::identifier_id_t methodIdentifi
 			M_ASSERT( ( v->type_id() == HHuginn::TYPE::BOOLEAN ) || ! thread_->can_continue() );
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
-				"There is no `"_ys.append( oper_ ).append( "` operator for " ).append( a_type_name( v1_->get_class() ) ).append( "." ),
+				"There is no `"_ys.append( oper_ ).append( "` operator for " ).append( a_type_name( c ) ).append( "." ),
 				thread_->current_frame()->file_id(),
 				position_
 			);
@@ -106,32 +106,32 @@ bool fallback_compare( HThread* thread_, HHuginn::identifier_id_t methodIdentifi
 
 void fallback_arithmetic( HThread* thread_, HHuginn::identifier_id_t methodIdentifier_, char const* oper_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	HHuginn::value_t v;
-	HHuginn::type_id_t t( v1_->type_id() );
+	HClass const* c( v1_->get_class() );
 	if ( HObject const* o = dynamic_cast<HObject const*>( v1_.raw() ) ) {
 		v = o->call_method( thread_, v1_, methodIdentifier_, HArguments( thread_, v2_ ), position_ );
-		if ( v->type_id() != t ) {
+		HClass const* rc( v->get_class() );
+		if ( rc != c ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"Arithmetic method `"_ys
 					.append( thread_->runtime().identifier_name( methodIdentifier_ ) )
 					.append( "` on " )
-					.append( a_type_name( v1_->get_class() ) )
+					.append( a_type_name( c ) )
 					.append( " returned result of incompatible type " )
-					.append( a_type_name( v->get_class() ) )
+					.append( a_type_name( rc ) )
 					.append( "." ),
 				thread_->current_frame()->file_id(),
 				position_
 			);
 		}
 	} else {
-		HClass const* c( v1_->get_class() );
 		int idx( c->field_index( methodIdentifier_ ) );
 		if ( idx >= 0 ) {
 			HClass::HMethod const& m( *static_cast<HClass::HMethod const*>( c->field( idx ).raw() ) );
 			v = m.function()( thread_, &v1_, HArguments( thread_, v2_ ), position_ );
-			M_ASSERT( ( v->type_id() == t ) || ! thread_->can_continue() );
+			M_ASSERT( ( v->get_class() == c ) || ! thread_->can_continue() );
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
-				"There is no `"_ys.append( oper_ ).append( "` operator for " ).append( a_type_name( t ) ).append( "." ),
+				"There is no `"_ys.append( oper_ ).append( "` operator for " ).append( a_type_name( c ) ).append( "." ),
 				thread_->current_frame()->file_id(),
 				position_
 			);
@@ -147,32 +147,32 @@ enum class OPERATION {
 
 HHuginn::value_t fallback_unary_arithmetic( HThread* thread_, HHuginn::identifier_id_t methodIdentifier_, char const* oper_, HHuginn::value_t const& v_, OPERATION operation_, int position_ ) {
 	HHuginn::value_t v;
-	HHuginn::type_id_t t( v_->type_id() );
+	HClass const* c( v_->get_class() );
 	if ( HObject const* o = dynamic_cast<HObject const*>( v_.raw() ) ) {
 		v = o->call_method( thread_, v_, methodIdentifier_, HArguments( thread_ ), position_ );
-		if ( ( operation_ == OPERATION::CLOSED ) && ( v->type_id() != t ) ) {
+		HClass const* rc( v->get_class() );
+		if ( ( operation_ == OPERATION::CLOSED ) && ( rc != c ) ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"Arithmetic method `"_ys
 					.append( thread_->runtime().identifier_name( methodIdentifier_ ) )
 					.append( "` on " )
-					.append( a_type_name( v_->get_class() ) )
+					.append( a_type_name( c ) )
 					.append( " returned result of incompatible type " )
-					.append( a_type_name( v->get_class() ) )
+					.append( a_type_name( rc ) )
 					.append( "." ),
 				thread_->current_frame()->file_id(),
 				position_
 			);
 		}
 	} else {
-		HClass const* c( v_->get_class() );
 		int idx( c->field_index( methodIdentifier_ ) );
 		if ( idx >= 0 ) {
 			HClass::HMethod const& m( *static_cast<HClass::HMethod const*>( c->field( idx ).raw() ) );
 			v = m.function()( thread_, const_cast<HHuginn::value_t*>( &v_ ), HArguments( thread_ ), position_ );
-			M_ASSERT( ( operation_ == OPERATION::OPEN ) || ( v->type_id() == t ) || ! thread_->can_continue() );
+			M_ASSERT( ( operation_ == OPERATION::OPEN ) || ( v->get_class() == c ) || ! thread_->can_continue() );
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
-				"There is no `"_ys.append( oper_ ).append( "` operator for " ).append( a_type_name( v_->get_class() ) ).append( "." ),
+				"There is no `"_ys.append( oper_ ).append( "` operator for " ).append( a_type_name( c ) ).append( "." ),
 				thread_->current_frame()->file_id(),
 				position_
 			);
