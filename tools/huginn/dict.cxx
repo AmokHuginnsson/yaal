@@ -227,8 +227,11 @@ inline HHuginn::value_t ensure( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_PROLOG
 	verify_arg_count( "dict.ensure", values_, 2, 2, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DICT );
-	huginn::HDict* l( static_cast<huginn::HDict*>( object_->raw() ) );
-	return ( l->get_ref( thread_, values_[0], values_[1], position_ ) );
+	huginn::HDict& d( *static_cast<huginn::HDict*>( object_->raw() ) );
+	HHuginn::value_t const& key( values_[0] );
+	d.update_key_type( thread_, key->get_class(), position_ );
+	HAnchorGuard<HDict> ag( d, thread_, position_ );
+	return ( d.value().insert( make_pair( key, values_[1] ) ).first->second );
 	M_EPILOG
 }
 
@@ -434,11 +437,11 @@ void HDict::update_key_type( huginn::HThread* thread_, HClass const* keyType_, i
 	return;
 }
 
-HHuginn::value_t HDict::get( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) {
+HHuginn::value_t HDict::get( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) const {
 	M_PROLOG
 	verify_key_type( thread_, key_->get_class(), position_ );
 	HAnchorGuard<HDict> ag( *this, thread_, position_ );
-	values_t::iterator it( _data.find( key_ ) );
+	values_t::const_iterator it( _data.find( key_ ) );
 	if ( ! ( it != _data.end() ) ) {
 		throw HHuginn::HHuginnRuntimeException( "Key does not exist in `dict`.", thread_->current_frame()->file_id(), position_ );
 	}
@@ -478,14 +481,6 @@ void HDict::erase( huginn::HThread* thread_, HHuginn::value_t const& key_, int p
 		_data.erase( it );
 	}
 	return;
-	M_EPILOG
-}
-
-HHuginn::value_t& HDict::get_ref( huginn::HThread* thread_, HHuginn::value_t const& key_, HHuginn::value_t const& value_, int position_ ) {
-	M_PROLOG
-	update_key_type( thread_, key_->get_class(), position_ );
-	HAnchorGuard<HDict> ag( *this, thread_, position_ );
-	return ( _data.insert( make_pair( key_, value_ ) ).first->second );
 	M_EPILOG
 }
 
@@ -541,6 +536,16 @@ HHuginn::value_t HDict::do_clone( huginn::HThread* thread_, HHuginn::value_t*, i
 
 bool HDict::do_operator_contains( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
 	return ( has_key( thread_, other_, position_ ) );
+}
+
+HHuginn::value_t HDict::do_operator_subscript( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& key_, int position_ ) const {
+	return ( get( thread_, key_, position_ ) );
+}
+
+void HDict::do_operator_subscript_assign( HThread* thread_, HHuginn::value_t&, HHuginn::value_t const& key_, HHuginn::value_t&& value_, int position_ ) {
+	update_key_type( thread_, key_->get_class(), position_ );
+	HAnchorGuard<HDict> ag( *this, thread_, position_ );
+	_data[key_] = yaal::move( value_ );
 }
 
 }

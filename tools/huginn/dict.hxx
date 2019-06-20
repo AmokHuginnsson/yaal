@@ -29,8 +29,7 @@ private:
 	HClass const* _keyType;
 public:
 	HDict( HClass const*, allocator_t const& );
-	value_t get( huginn::HThread*, HHuginn::value_t const&, int );
-	value_t& get_ref( huginn::HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
+	value_t get( huginn::HThread*, HHuginn::value_t const&, int ) const;
 	void insert( huginn::HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 	bool has_key( huginn::HThread*, HHuginn::value_t const&, int ) const;
 	bool try_get( huginn::HThread*, HHuginn::value_t const& key_, HHuginn::value_t& result_, int position_ );
@@ -60,6 +59,8 @@ private:
 private:
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 	virtual bool do_operator_contains( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const override;
+	virtual HHuginn::value_t do_operator_subscript( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const override;
+	virtual void do_operator_subscript_assign( HThread*, HHuginn::value_t&, HHuginn::value_t const&, HHuginn::value_t&&, int ) override;
 };
 
 namespace dict {

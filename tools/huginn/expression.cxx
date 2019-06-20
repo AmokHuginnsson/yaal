@@ -896,15 +896,21 @@ void HExpression::subscript( OExecutionStep const& executionStep_, HFrame* frame
 	M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[ip]._operator == OPERATOR::FUNCTION_ARGUMENT );
 	++ ip;
-	HHuginn::value_t index( yaal::move( frame_->values().top() ) );
-	frame_->values().pop();
+	HFrame::values_t& values( frame_->values() );
+	HHuginn::value_t index( yaal::move( values.top() ) );
+	values.pop();
 	M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[ip]._operator == OPERATOR::SUBSCRIPT );
 	int p( _instructions[ip]._position );
 	++ ip;
-	HHuginn::value_t base( yaal::move( frame_->values().top() ) );
-	frame_->values().pop();
-	frame_->values().push( instruction::subscript( frame_->thread(), executionStep_._access, base, index, p ) );
+	HHuginn::value_t base( yaal::move( values.top() ) );
+	values.pop();
+	if ( executionStep_._access == HFrame::ACCESS::VALUE ) {
+		values.push( base->operator_subscript( frame_->thread(), base, index, p ) );
+	} else {
+		HObjectFactory& of( frame_->thread()->object_factory() );
+		values.push( of.create<HSubscriptReference>( of.reference_class(), yaal::move( base ), yaal::move( index ), p ) );
+	}
 	return;
 	M_EPILOG
 }

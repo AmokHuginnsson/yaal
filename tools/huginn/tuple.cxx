@@ -323,6 +323,16 @@ bool HTuple::do_operator_contains( HThread* thread_, HHuginn::value_t const&, HH
 	return ( find( thread_, position_, other_ ) != huginn::HTuple::npos );
 }
 
+HHuginn::value_t HTuple::do_operator_subscript( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& index_, int position_ ) const {
+	int long long index( extract_index( thread_, index_, position_ ) );
+	M_ASSERT( ( index >= 0 ) && ( index < _data.get_size() ) );
+	return ( _data[static_cast<int>( index )] );
+}
+
+void HTuple::do_operator_subscript_assign( HThread* thread_, HHuginn::value_t&, HHuginn::value_t const&, HHuginn::value_t&&, int position_ ) {
+	throw HHuginn::HHuginnRuntimeException( "`tuple` does not support item assignment.", thread_->current_frame()->file_id(), position_ );
+}
+
 }
 
 }

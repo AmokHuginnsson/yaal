@@ -49,8 +49,9 @@ public:
 private:
 	HHuginn::value_t _base;
 	HHuginn::value_t _key;
+	int _position;
 public:
-	HSubscriptReference( HClass const*, HHuginn::value_t const&, HHuginn::value_t const& );
+	HSubscriptReference( HClass const*, HHuginn::value_t&&, HHuginn::value_t&&, int );
 private:
 	virtual HHuginn::value_t do_get( huginn::HThread*, int ) const override;
 	virtual void do_set( huginn::HThread*, HHuginn::value_t&&, int ) override;

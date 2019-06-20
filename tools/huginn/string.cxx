@@ -582,6 +582,15 @@ void HString::do_operator_add( HThread*, HHuginn::value_t&, HHuginn::value_t con
 	_value.append( static_cast<HString const*>( other_.raw() )->_value );
 }
 
+HHuginn::value_t HString::do_operator_subscript( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& index_, int position_ ) const {
+	int long long index( extract_index( thread_, index_, position_ ) );
+	return ( thread_->object_factory().create_character( _value[static_cast<int>( index )] ) );
+}
+
+void HString::do_operator_subscript_assign( HThread* thread_, HHuginn::value_t&, HHuginn::value_t const&, HHuginn::value_t&&, int position_ ) {
+	throw HHuginn::HHuginnRuntimeException( "`string` does not support item assignment.", thread_->current_frame()->file_id(), position_ );
+}
+
 int long HString::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
 	return ( hcore::hash<hcore::HString>()( _value ) );
 }

@@ -29,6 +29,7 @@ public:
 protected:
 	virtual iterator_t do_iterator( huginn::HThread*, int ) = 0;
 	virtual int long do_size( huginn::HThread*, int ) const = 0;
+	int long long extract_index( huginn::HThread*, HHuginn::value_t const&, int ) const;
 };
 
 class HInvalidatingIterable : public HIterable, public HHuginn::HReferenceTracker {

@@ -29,7 +29,6 @@ public:
 	void clear( void );
 	int long find( huginn::HThread*, int, HHuginn::value_t const&, int long = 0, int long = -1 ) const;
 	value_t get( int long long );
-	value_t& get_ref( int long long );
 	values_t const& value( void ) const {
 		return ( _data );
 	}
@@ -42,6 +41,8 @@ protected:
 private:
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 	virtual bool do_operator_contains( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const override;
+	virtual HHuginn::value_t do_operator_subscript( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const override;
+	virtual void do_operator_subscript_assign( HThread*, HHuginn::value_t&, HHuginn::value_t const&, HHuginn::value_t&&, int ) override;
 };
 
 namespace list {

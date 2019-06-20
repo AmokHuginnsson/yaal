@@ -30,19 +30,20 @@ HHuginn::value_t HReference::do_clone( huginn::HThread*, HHuginn::value_t*, int 
 #endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
 }
 
-HSubscriptReference::HSubscriptReference( HClass const* class_, HHuginn::value_t const& base_, HHuginn::value_t const& key_ )
+HSubscriptReference::HSubscriptReference( HClass const* class_, HHuginn::value_t&& base_, HHuginn::value_t&& key_, int position_ )
 	: HReference( class_, nullptr )
-	, _base( base_ )
-	, _key( key_ ) {
+	, _base( yaal::move( base_ ) )
+	, _key( yaal::move( key_ ) )
+	, _position( position_ ) {
 	return;
 }
 
-HHuginn::value_t HSubscriptReference::do_get( huginn::HThread* thread_, int position_ ) const {
-	return ( instruction::subscript_value( thread_, _base, _key, position_ ) );
+HHuginn::value_t HSubscriptReference::do_get( huginn::HThread* thread_, int ) const {
+	return ( _base->operator_subscript( thread_, _base, _key, _position ) );
 }
 
-void HSubscriptReference::do_set( huginn::HThread* thread_, HHuginn::value_t&& value_, int position_ ) {
-	instruction::subscript_assign( thread_, _base, _key, yaal::move( value_ ), position_ );
+void HSubscriptReference::do_set( huginn::HThread* thread_, HHuginn::value_t&& value_, int ) {
+	_base->operator_subscript_assign( thread_, _base, _key, yaal::move( value_ ), _position );
 }
 
 HMemberReference::HMemberReference( HClass const* class_, HHuginn::value_t const& object_, HHuginn::identifier_id_t memberId_ )

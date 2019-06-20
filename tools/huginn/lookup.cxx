@@ -226,8 +226,9 @@ inline HHuginn::value_t ensure( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_PROLOG
 	verify_arg_count( "lookup.ensure", values_, 2, 2, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LOOKUP );
-	huginn::HLookup* l( static_cast<huginn::HLookup*>( object_->raw() ) );
-	return ( l->get_ref( thread_, values_[0], values_[1], position_ ) );
+	huginn::HLookup& l( *static_cast<huginn::HLookup*>( object_->raw() ) );
+	HAnchorGuard<HLookup> ag( l, thread_, position_ );
+	return ( l.value().insert( make_pair( values_[0], values_[1] ) ).first->second );
 	M_EPILOG
 }
 
@@ -396,10 +397,10 @@ int long HLookup::do_size( huginn::HThread*, int ) const {
 	return ( _data.get_size() );
 }
 
-HHuginn::value_t HLookup::get( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) {
+HHuginn::value_t HLookup::get( huginn::HThread* thread_, HHuginn::value_t const& key_, int position_ ) const {
 	M_PROLOG
 	HAnchorGuard<HLookup> ag( *this, thread_, position_ );
-	values_t::iterator it( _data.find( key_ ) );
+	values_t::const_iterator it( _data.find( key_ ) );
 	if ( ! ( it != _data.end() ) ) {
 		throw HHuginn::HHuginnRuntimeException( "Key does not exist in `lookup`.", thread_->current_frame()->file_id(), position_ );
 	}
@@ -436,13 +437,6 @@ void HLookup::erase( huginn::HThread* thread_, HHuginn::value_t const& key_, int
 		_data.erase( it );
 	}
 	return;
-	M_EPILOG
-}
-
-HHuginn::value_t& HLookup::get_ref( huginn::HThread* thread_, HHuginn::value_t const& key_, HHuginn::value_t const& value_, int position_ ) {
-	M_PROLOG
-	HAnchorGuard<HLookup> ag( *this, thread_, position_ );
-	return ( _data.insert( make_pair( key_, value_ ) ).first->second );
 	M_EPILOG
 }
 
@@ -503,6 +497,15 @@ HHuginn::value_t HLookup::do_clone( huginn::HThread* thread_, HHuginn::value_t*,
 
 bool HLookup::do_operator_contains( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
 	return ( has_key( thread_, other_, position_ ) );
+}
+
+HHuginn::value_t HLookup::do_operator_subscript( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& key_, int position_ ) const {
+	return ( get( thread_, key_, position_ ) );
+}
+
+void HLookup::do_operator_subscript_assign( HThread* thread_, HHuginn::value_t&, HHuginn::value_t const& key_, HHuginn::value_t&& value_, int position_ ) {
+	HAnchorGuard<HLookup> ag( *this, thread_, position_ );
+	_data[key_] = yaal::move( value_ );
 }
 
 }

@@ -18,7 +18,6 @@ namespace tools {
 
 namespace huginn {
 
-
 HIterator::HIterator( huginn::HClass const* class_, HHuginn::value_t const& source_, huginn::HIterable::iterator_t const& impl_ )
 	: HIterable( class_ )
 	, _source( source_ )
@@ -198,19 +197,40 @@ void HIterableAdaptorIterator::do_next( HThread* thread_, int position_ ) {
 	_nextMethod( thread_, &_iterator, HArguments( thread_ ), position_ );
 }
 
-}
-
-huginn::HIterable::HIterable( HClass const* class_ )
+HIterable::HIterable( HClass const* class_ )
 	: HValue( class_ ) {
 	return;
 }
 
-huginn::HIterable::iterator_t huginn::HIterable::iterator( huginn::HThread* thread_, int position_ ) {
+HIterable::iterator_t HIterable::iterator( huginn::HThread* thread_, int position_ ) {
 	return ( do_iterator( thread_, position_ ) );
 }
 
-int long huginn::HIterable::size( huginn::HThread* thread_, int position_ ) const {
+int long HIterable::size( huginn::HThread* thread_, int position_ ) const {
 	return ( do_size( thread_, position_ ) );
+}
+
+int long long HIterable::extract_index( huginn::HThread* thread_, HHuginn::value_t const& index_, int position_ ) const {
+	M_PROLOG
+	if ( index_->type_id() != HHuginn::TYPE::INTEGER ) {
+		throw HHuginn::HHuginnRuntimeException(
+			hcore::to_string( _errMsgHHuginn_[ERR_CODE::IDX_NOT_INT] ).append( a_type_name( index_->get_class() ) ),
+			thread_->current_frame()->file_id(),
+			position_
+		);
+	}
+	int long long index( get_integer( index_ ) );
+	int long s( size( thread_, position_ ) );
+	if ( ( index < -s ) || ( index >= s ) ) {
+		throw HHuginn::HHuginnRuntimeException( "Bad index.", thread_->current_frame()->file_id(), position_ );
+	}
+	if ( index < 0 ) {
+		index += s;
+	}
+	return ( index );
+	M_EPILOG
+}
+
 }
 
 }

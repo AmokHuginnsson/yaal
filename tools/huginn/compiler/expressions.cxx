@@ -540,7 +540,7 @@ void OCompiler::dispatch_subscript( executing_parser::range_t range_ ) {
 		expression->commit_oper( OPERATOR::RANGE );
 		fc._lastDereferenceOperator = OPERATOR::RANGE;
 	} else {
-		expression->add_execution_step( HExpression::OExecutionStep( expression.raw(), &HExpression::subscript, range_.start(), HFrame::ACCESS::VALUE ) );
+		expression->add_execution_step( HExpression::OExecutionStep( expression.raw(), &HExpression::subscript, range_.start() ) );
 		expression->commit_oper( OPERATOR::SUBSCRIPT );
 		fc._lastDereferenceOperator = OPERATOR::SUBSCRIPT;
 	}

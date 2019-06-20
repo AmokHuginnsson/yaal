@@ -456,13 +456,6 @@ HHuginn::value_t huginn::HList::get( int long long index_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t& huginn::HList::get_ref( int long long index_ ) {
-	M_PROLOG
-	M_ASSERT( ( index_ >= 0 ) && ( index_ < _data.get_size() ) );
-	return ( _data[static_cast<int>( index_ )] );
-	M_EPILOG
-}
-
 huginn::HIterable::iterator_t huginn::HList::do_iterator( huginn::HThread*, int ) {
 	return ( make_pointer<huginn::list::HListIterator>( this ) );
 }
@@ -478,6 +471,18 @@ HHuginn::value_t huginn::HList::do_clone( huginn::HThread* thread_, HHuginn::val
 
 bool HList::do_operator_contains( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
 	return ( find( thread_, position_, other_ ) != huginn::HList::npos );
+}
+
+HHuginn::value_t HList::do_operator_subscript( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& index_, int position_ ) const {
+	int long long index( extract_index( thread_, index_, position_ ) );
+	M_ASSERT( ( index >= 0 ) && ( index < _data.get_size() ) );
+	return ( _data[static_cast<int>( index )] );
+}
+
+void HList::do_operator_subscript_assign( HThread* thread_, HHuginn::value_t&, HHuginn::value_t const& index_, HHuginn::value_t&& value_, int position_ ) {
+	int long long index( extract_index( thread_, index_, position_ ) );
+	M_ASSERT( ( index >= 0 ) && ( index < _data.get_size() ) );
+	_data[static_cast<int>( index )] = yaal::move( value_ );
 }
 
 }
