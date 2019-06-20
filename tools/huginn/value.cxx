@@ -341,6 +341,20 @@ int long HValue::do_operator_hash( HThread* thread_, HHuginn::value_t const& sel
 	return ( hcore::hash<int long long>()( static_cast<huginn::HInteger const*>( res.raw() )->value() ) );
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wsuggest-attribute=noreturn"
+HHuginn::value_t HValue::do_operator_range( HThread* thread_, HHuginn::value_t const& self_, HHuginn::value_t const&, HHuginn::value_t const&, HHuginn::value_t const&, int position_ ) const {
+	throw HHuginn::HHuginnRuntimeException(
+		"Range operator is not supported on "_ys.append( a_type_name( self_->get_class() ) ).append( "." ),
+		thread_->current_frame()->file_id(),
+		position_
+	);
+}
+#pragma GCC diagnostic pop
+
 }
 
 }

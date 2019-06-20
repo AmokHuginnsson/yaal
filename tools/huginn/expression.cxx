@@ -960,7 +960,7 @@ void HExpression::range( OExecutionStep const&, HFrame* frame_ ) {
 			from = yaal::move( to );
 			to = yaal::move( step );
 		}
-		frame_->values().push( instruction::range( frame_->thread(), base, from, to, step, p ) );
+		frame_->values().push( base->operator_range( frame_->thread(), base, from, to, step, p ) );
 	}
 	return;
 	M_EPILOG

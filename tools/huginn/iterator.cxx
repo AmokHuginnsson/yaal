@@ -231,6 +231,66 @@ int long long HIterable::extract_index( huginn::HThread* thread_, HHuginn::value
 	M_EPILOG
 }
 
+HIterable::ORange HIterable::extract_range( huginn::HThread* thread_, HHuginn::value_t const& from_, HHuginn::value_t const& to_, HHuginn::value_t const& step_, int position_ ) const {
+	if ( !! from_ && ( from_->type_id() != HHuginn::TYPE::INTEGER ) ) {
+		throw HHuginn::HHuginnRuntimeException( "Range operand `from` is not an integer.", thread_->current_frame()->file_id(), position_ );
+	}
+	if ( !! to_ && ( to_->type_id() != HHuginn::TYPE::INTEGER ) ) {
+		throw HHuginn::HHuginnRuntimeException( "Range operand `to` is not an integer.", thread_->current_frame()->file_id(), position_ );
+	}
+	if ( !! step_ && ( step_->type_id() != HHuginn::TYPE::INTEGER ) ) {
+		throw HHuginn::HHuginnRuntimeException( "Range operand `step` is not an integer.", thread_->current_frame()->file_id(), position_ );
+	}
+	int long s( size( thread_, position_ ) );
+	int long step( step_ ? static_cast<int long>( get_integer( step_ ) ) : 1 );
+	if ( step == 0 ) {
+		throw HHuginn::HHuginnRuntimeException( "Range step cannot be zero.", thread_->current_frame()->file_id(), position_ );
+	}
+	int long from( from_ ? static_cast<int long>( get_integer( from_ ) ) : ( step > 0 ? 0 : s ) );
+	int long to( to_ ? static_cast<int long>( get_integer( to_ ) ) : ( step > 0 ? s : -1 ) );
+
+	bool valid( false );
+	do {
+		if ( step > 0 ) {
+			if ( ( from >= s ) || ( to == 0 ) || ( to <= -s ) ) {
+				break;
+			}
+			if ( from < -s ) {
+				from = 0;
+			} else if ( from < 0 ) {
+				from += s;
+			}
+			if ( to > s ) {
+				to = s;
+			} else if ( to < 0 ) {
+				to += s;
+			}
+			if ( to <= from ) {
+				break;
+			}
+		} else {
+			if ( ( to >= ( s - 1 ) ) || ( from < -s ) ) {
+				break;
+			}
+			if ( from >= s ) {
+				from = s - 1;
+			} else if ( from < 0 ) {
+				from += s;
+			}
+			if ( to < - ( s + 1 ) ) {
+				to = -1;
+			} else if ( to < -1 ) {
+				to += s;
+			}
+			if ( from <= to ) {
+				break;
+			}
+		}
+		valid = true;
+	} while ( false );
+	return ( ORange{ from, to, step, valid } );
+}
+
 }
 
 }

@@ -130,6 +130,10 @@ public:
 		M_ASSERT( self_.raw() == this );
 		do_operator_subscript_assign( thread_, self_, key_, yaal::move( value_ ), position_ );
 	}
+	HHuginn::value_t operator_range( HThread* thread_, HHuginn::value_t const& self_, HHuginn::value_t const& start_, HHuginn::value_t const& stop_, HHuginn::value_t const& step_, int position_ ) const {
+		M_ASSERT( self_.raw() == this );
+		return ( do_operator_range( thread_, self_, start_, stop_, step_, position_ ) );
+	}
 	int long operator_hash( HThread* thread_, HHuginn::value_t const& self_, int position_ ) const {
 		M_ASSERT( self_.raw() == this );
 		return ( do_operator_hash( thread_, self_, position_ ) );
@@ -152,6 +156,7 @@ private:
 	virtual HHuginn::value_t do_operator_factorial( HThread*, HHuginn::value_t const&, int ) const;
 	virtual HHuginn::value_t do_operator_subscript( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const;
 	virtual void do_operator_subscript_assign( HThread*, HHuginn::value_t&, HHuginn::value_t const&, HHuginn::value_t&&, int );
+	virtual HHuginn::value_t do_operator_range( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, HHuginn::value_t const&, HHuginn::value_t const&, int ) const;
 	virtual int long do_operator_hash( HThread*, HHuginn::value_t const&, int ) const;
 	virtual void do_destroy( HHuginn::value_t* ) {}
 	virtual HHuginn::value_t do_field( HHuginn::value_t const&, int ) const;

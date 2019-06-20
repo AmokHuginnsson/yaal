@@ -20,14 +20,12 @@ namespace instruction {
 
 struct Interrupt {};
 
-HHuginn::value_t range( HThread*, HHuginn::value_t&, HHuginn::value_t const&, HHuginn::value_t const&, HHuginn::value_t const&, int );
 HHuginn::value_t member( HThread*, HFrame::ACCESS, HHuginn::value_t&, HHuginn::identifier_id_t, int );
 bool less( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 bool checked_less( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 HHuginn::value_t boolean_xor( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 HHuginn::value_t boolean_not( HThread*, HHuginn::value_t const&, int );
 yaal::hcore::HString string_representation( HThread*, HHuginn::value_t const&, HCycleTracker&, int );
-HHuginn::value_t subscript_value( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 HHuginn::value_t member_value( HThread*, HHuginn::value_t const&, HHuginn::identifier_id_t, int );
 void member_assign( HThread*, HHuginn::value_t&, HHuginn::identifier_id_t, HHuginn::value_t const&, int );
 

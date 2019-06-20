@@ -449,7 +449,7 @@ int long huginn::HList::find( huginn::HThread* thread_, int position_, HHuginn::
 	M_EPILOG
 }
 
-HHuginn::value_t huginn::HList::get( int long long index_ ) {
+HHuginn::value_t huginn::HList::get( int long long index_ ) const {
 	M_PROLOG
 	M_ASSERT( ( index_ >= 0 ) && ( index_ < _data.get_size() ) );
 	return ( _data[static_cast<int>( index_ )] );
@@ -483,6 +483,23 @@ void HList::do_operator_subscript_assign( HThread* thread_, HHuginn::value_t&, H
 	int long long index( extract_index( thread_, index_, position_ ) );
 	M_ASSERT( ( index >= 0 ) && ( index < _data.get_size() ) );
 	_data[static_cast<int>( index )] = yaal::move( value_ );
+}
+
+HHuginn::value_t HList::do_operator_range( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& from_, HHuginn::value_t const& to_, HHuginn::value_t const& step_, int position_ ) const {
+	HIterable::ORange range( extract_range( thread_, from_, to_, step_, position_ ) );
+	HHuginn::values_t v;
+	if ( range.valid ) {
+		if ( range.step > 0 ) {
+			for ( int long i( range.from ); i < range.to; i += range.step ) {
+				v.push_back( get( i ) );
+			}
+		} else {
+			for ( int long i( range.from ); i > range.to; i += range.step ) {
+				v.push_back( get( i ) );
+			}
+		}
+	}
+	return ( thread_->object_factory().create_list( yaal::move( v ) ) );
 }
 
 }

@@ -25,7 +25,7 @@ private:
 public:
 	HTuple( HClass const*, values_t&& );
 	int long find( huginn::HThread*, int, HHuginn::value_t const&, int long = 0, int long = -1 ) const;
-	value_t get( int long long );
+	value_t get( int long long ) const;
 	values_t const& value( void ) const {
 		return ( _data );
 	}
@@ -40,6 +40,7 @@ private:
 	virtual bool do_operator_contains( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const override;
 	virtual HHuginn::value_t do_operator_subscript( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const override;
 	virtual void do_operator_subscript_assign( HThread*, HHuginn::value_t&, HHuginn::value_t const&, HHuginn::value_t&&, int ) override __attribute__((noreturn));
+	virtual HHuginn::value_t do_operator_range( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, HHuginn::value_t const&, HHuginn::value_t const&, int ) const override;
 };
 
 namespace tuple {

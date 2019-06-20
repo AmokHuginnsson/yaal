@@ -591,6 +591,27 @@ void HString::do_operator_subscript_assign( HThread* thread_, HHuginn::value_t&,
 	throw HHuginn::HHuginnRuntimeException( "`string` does not support item assignment.", thread_->current_frame()->file_id(), position_ );
 }
 
+HHuginn::value_t HString::do_operator_range( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& from_, HHuginn::value_t const& to_, HHuginn::value_t const& step_, int position_ ) const {
+	HIterable::ORange range( extract_range( thread_, from_, to_, step_, position_ ) );
+	hcore::HString r;
+	if ( range.valid ) {
+		if ( range.step == 1 ) {
+			r.assign( _value, range.from, range.to - range.from );
+		} else {
+			if ( range.step > 0 ) {
+				for ( int long i( range.from ); i < range.to; i += range.step ) {
+					r.push_back( _value[ i ] );
+				}
+			} else {
+				for ( int long i( range.from ); i > range.to; i += range.step ) {
+					r.push_back( _value[ i ] );
+				}
+			}
+		}
+	}
+	return ( thread_->object_factory().create_string( yaal::move( r ) ) );
+}
+
 int long HString::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
 	return ( hcore::hash<hcore::HString>()( _value ) );
 }
