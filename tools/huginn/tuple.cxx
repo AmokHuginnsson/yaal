@@ -129,87 +129,6 @@ inline HHuginn::value_t find( huginn::HThread* thread_, HHuginn::value_t* object
 	M_EPILOG
 }
 
-inline HHuginn::value_t add( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	verify_signature( "tuple.add", values_, { HHuginn::TYPE::TUPLE }, thread_, position_ );
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::TUPLE );
-	huginn::HTuple::values_t& dst( static_cast<huginn::HTuple*>( object_->raw() )->value() );
-	huginn::HTuple::values_t const& src( static_cast<huginn::HTuple const*>( values_[0].raw() )->value() );
-	dst.insert( dst.end(), src.begin(), src.end() );
-	return ( *object_ );
-	M_EPILOG
-}
-
-inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	verify_arg_count( "tuple.hash", values_, 0, 0, thread_, position_ );
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::TUPLE );
-	huginn::HTuple::values_t const& values( static_cast<huginn::HTuple*>( object_->raw() )->value() );
-	int long hashValue( static_cast<int long>( HHuginn::TYPE::TUPLE ) );
-	for ( HHuginn::value_t const& v : values ) {
-		hashValue *= 3;
-		hashValue += v->operator_hash( thread_, v, position_ );
-	}
-	return ( thread_->object_factory().create_integer( hashValue ) );
-	M_EPILOG
-}
-
-inline bool less_impl( huginn::HThread* thread_, HHuginn::value_t const& l_, HHuginn::value_t const& r_, int position_ ) {
-	huginn::HTuple::values_t const& l( static_cast<huginn::HTuple const*>( l_.raw() )->value() );
-	huginn::HTuple::values_t const& r( static_cast<huginn::HTuple const*>( r_.raw() )->value() );
-	HValueCompareHelper lessHelper( &instruction::checked_less );
-	lessHelper.anchor( thread_, position_ );
-	return ( lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), cref( lessHelper ) ) );
-}
-
-inline HHuginn::value_t less( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::TUPLE );
-	verify_signature( "tuple.less", values_, { HHuginn::TYPE::TUPLE }, thread_, position_ );
-	return ( thread_->runtime().boolean_value( less_impl( thread_, *object_, values_[0], position_ ) ) );
-	M_EPILOG
-}
-
-inline HHuginn::value_t less_or_equal( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::TUPLE );
-	verify_signature( "tuple.less_or_equal", values_, { HHuginn::TYPE::TUPLE }, thread_, position_ );
-	return ( thread_->runtime().boolean_value( ! less_impl( thread_, values_[0], *object_, position_ ) ) );
-	M_EPILOG
-}
-
-inline HHuginn::value_t greater( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::TUPLE );
-	verify_signature( "tuple.greater", values_, { HHuginn::TYPE::TUPLE }, thread_, position_ );
-	return ( thread_->runtime().boolean_value( less_impl( thread_, values_[0], *object_, position_ ) ) );
-	M_EPILOG
-}
-
-inline HHuginn::value_t greater_or_equal( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::TUPLE );
-	verify_signature( "tuple.greater_or_equal", values_, { HHuginn::TYPE::TUPLE }, thread_, position_ );
-	return ( thread_->runtime().boolean_value( ! less_impl( thread_, *object_, values_[0], position_ ) ) );
-	M_EPILOG
-}
-
-inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::TUPLE );
-	verify_signature( "tuple.equals", values_, { HHuginn::TYPE::TUPLE }, thread_, position_ );
-	huginn::HTuple::values_t const& l( static_cast<huginn::HTuple*>( object_->raw() )->value() );
-	huginn::HTuple::values_t const& r( static_cast<huginn::HTuple const*>( values_[0].raw() )->value() );
-	bool equal( l.get_size() == r.get_size() );
-	for ( int long i( 0 ), c( l.get_size() ); equal && ( i < c ); ++ i ) {
-		HHuginn::value_t const& lv( l[i] );
-		HHuginn::value_t const& rv( r[i] );
-		equal = ( lv->type_id() == rv->type_id() ) && lv->operator_equals( thread_, lv, rv, position_ );
-	}
-	return ( thread_->runtime().boolean_value( equal ) );
-	M_EPILOG
-}
-
 class HTupleClass : public HClass {
 public:
 	typedef HTupleClass this_type;
@@ -231,14 +150,7 @@ public:
 		)
 		, _reversedTupleClass( HReversedTuple::get_class( runtime_, this ) ) {
 		HHuginn::field_definitions_t fd{
-			{ "find",   objectFactory_->create_method( &tuple::find ),   "( *elem*[, *start*[, *stop*]] ) - get index of first *elem*ent of the `tuple` not before *start* and before *stop*, return -1 if not found" },
-			{ "add",    objectFactory_->create_method( &tuple::add ),    "( *other* ) - append all elements from *other* `tuple` at the end of this `tuple`" },
-			{ "hash",   objectFactory_->create_method( &tuple::hash ),   "calculate hash value for this `tuple`" },
-			{ "less",   objectFactory_->create_method( &tuple::less ),   "( *other* ) - test if this `tuple` comes lexicographically before *other* `tuple`" },
-			{ "less_or_equal",    objectFactory_->create_method( &tuple::less_or_equal ),    "( *other* ) - test if this `tuple` is equal to or comes lexicographically before *other* `tuple`" },
-			{ "greater",          objectFactory_->create_method( &tuple::greater ),          "( *other* ) - test if this `tuple` comes lexicographically after *other* `tuple`" },
-			{ "greater_or_equal", objectFactory_->create_method( &tuple::greater_or_equal ), "( *other* ) - test if this `tuple` is equal to or comes lexicographically after *other* `tuple`" },
-			{ "equals", objectFactory_->create_method( &tuple::equals ), "( *other* ) - test if *other* `tuple` has the same content" }
+			{ "find", objectFactory_->create_method( &tuple::find ), "( *elem*[, *start*[, *stop*]] ) - get index of first *elem*ent of the `tuple` not before *start* and before *stop*, return -1 if not found" }
 		};
 		redefine( nullptr, fd );
 		return;
@@ -266,7 +178,6 @@ HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const
 	return ( thread_->object_factory().create<HReversedTuple>( lc->reversed_tuple_class(), value_ ) );
 	M_EPILOG
 }
-
 
 }
 
@@ -321,6 +232,75 @@ HHuginn::value_t HTuple::do_clone( huginn::HThread* thread_, HHuginn::value_t*, 
 
 bool HTuple::do_operator_contains( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
 	return ( find( thread_, position_, other_ ) != huginn::HTuple::npos );
+}
+
+void HTuple::do_operator_add( HThread*, HHuginn::value_t&, HHuginn::value_t const& other_, int ) {
+	M_PROLOG
+	huginn::HTuple::values_t const& src( static_cast<huginn::HTuple const*>( other_.raw() )->value() );
+	_data.insert( _data.end(), src.begin(), src.end() );
+	return;
+	M_EPILOG
+}
+
+int long HTuple::do_operator_hash( HThread* thread_, HHuginn::value_t const&, int position_ ) const {
+	M_PROLOG
+	int long hashValue( static_cast<int long>( HHuginn::TYPE::TUPLE ) );
+	for ( HHuginn::value_t const& v : _data ) {
+		hashValue *= 3;
+		hashValue += v->operator_hash( thread_, v, position_ );
+	}
+	return ( hashValue );
+	M_EPILOG
+}
+
+bool HTuple::do_operator_less( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	M_PROLOG
+	huginn::HTuple::values_t const& other( static_cast<huginn::HTuple const*>( other_.raw() )->value() );
+	HValueCompareHelper lessHelper( &instruction::checked_less );
+	lessHelper.anchor( thread_, position_ );
+	return ( lexicographical_compare( _data.begin(), _data.end(), other.begin(), other.end(), cref( lessHelper ) ) );
+	M_EPILOG
+}
+
+bool HTuple::do_operator_less_or_equal( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	M_PROLOG
+	huginn::HTuple::values_t const& other( static_cast<huginn::HTuple const*>( other_.raw() )->value() );
+	HValueCompareHelper lessHelper( &instruction::checked_less );
+	lessHelper.anchor( thread_, position_ );
+	return ( ! lexicographical_compare( other.begin(), other.end(), _data.begin(), _data.end(), cref( lessHelper ) ) );
+	M_EPILOG
+}
+
+bool HTuple::do_operator_greater( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	M_PROLOG
+	huginn::HTuple::values_t const& other( static_cast<huginn::HTuple const*>( other_.raw() )->value() );
+	HValueCompareHelper lessHelper( &instruction::checked_less );
+	lessHelper.anchor( thread_, position_ );
+	return ( lexicographical_compare( other.begin(), other.end(), _data.begin(), _data.end(), cref( lessHelper ) ) );
+	M_EPILOG
+}
+
+bool HTuple::do_operator_greater_or_equal( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	M_PROLOG
+	huginn::HTuple::values_t const& other( static_cast<huginn::HTuple const*>( other_.raw() )->value() );
+	HValueCompareHelper lessHelper( &instruction::checked_less );
+	lessHelper.anchor( thread_, position_ );
+	return ( ! lexicographical_compare( _data.begin(), _data.end(), other.begin(), other.end(), cref( lessHelper ) ) );
+	M_EPILOG
+}
+
+bool HTuple::do_operator_equals( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	M_PROLOG
+	huginn::HTuple::values_t const& other( static_cast<huginn::HTuple const*>( other_.raw() )->value() );
+	int long s( _data.get_size() );
+	bool equal( s == other.get_size() );
+	for ( int long i( 0 ); equal && ( i < s ); ++ i ) {
+		HHuginn::value_t const& lv( _data[i] );
+		HHuginn::value_t const& rv( other[i] );
+		equal = ( lv->type_id() == rv->type_id() ) && lv->operator_equals( thread_, lv, rv, position_ );
+	}
+	return ( equal );
+	M_EPILOG
 }
 
 HHuginn::value_t HTuple::do_operator_subscript( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& index_, int position_ ) const {
