@@ -276,62 +276,6 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 	M_EPILOG
 }
 
-inline bool less_impl( huginn::HThread* thread_, HHuginn::value_t const& l_, HHuginn::value_t const& r_, int position_ ) {
-	huginn::HList::values_t const& l( static_cast<huginn::HList const*>( l_.raw() )->value() );
-	huginn::HList::values_t const& r( static_cast<huginn::HList const*>( r_.raw() )->value() );
-	HValueCompareHelper lessHelper( &instruction::checked_less );
-	lessHelper.anchor( thread_, position_ );
-	return ( lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), cref( lessHelper ) ) );
-}
-
-inline HHuginn::value_t less( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
-	verify_signature( "list.less", values_, { HHuginn::TYPE::LIST }, thread_, position_ );
-	return ( thread_->runtime().boolean_value( less_impl( thread_, *object_, values_[0], position_ ) ) );
-	M_EPILOG
-}
-
-inline HHuginn::value_t less_or_equal( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
-	verify_signature( "list.less_or_equal", values_, { HHuginn::TYPE::LIST }, thread_, position_ );
-	return ( thread_->runtime().boolean_value( ! less_impl( thread_, values_[0], *object_, position_ ) ) );
-	M_EPILOG
-}
-
-inline HHuginn::value_t greater( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
-	verify_signature( "list.greater", values_, { HHuginn::TYPE::LIST }, thread_, position_ );
-	return ( thread_->runtime().boolean_value( less_impl( thread_, values_[0], *object_, position_ ) ) );
-	M_EPILOG
-}
-
-inline HHuginn::value_t greater_or_equal( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
-	verify_signature( "list.greater_or_equal", values_, { HHuginn::TYPE::LIST }, thread_, position_ );
-	return ( thread_->runtime().boolean_value( ! less_impl( thread_, *object_, values_[0], position_ ) ) );
-	M_EPILOG
-}
-
-inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
-	verify_signature( "list.equals", values_, { HHuginn::TYPE::LIST }, thread_, position_ );
-	huginn::HList::values_t const& l( static_cast<huginn::HList*>( object_->raw() )->value() );
-	huginn::HList::values_t const& r( static_cast<huginn::HList const*>( values_[0].raw() )->value() );
-	bool equal( l.get_size() == r.get_size() );
-	for ( int long i( 0 ), c( l.get_size() ); equal && ( i < c ); ++ i ) {
-		HHuginn::value_t const& lv( l[i] );
-		HHuginn::value_t const& rv( r[i] );
-		equal = ( lv->type_id() == rv->type_id() ) && lv->operator_equals( thread_, lv, rv, position_ );
-	}
-	return ( thread_->runtime().boolean_value( equal ) );
-	M_EPILOG
-}
-
 class HListClass : public HClass {
 public:
 	typedef HListClass this_type;
@@ -356,19 +300,12 @@ public:
 		HHuginn::field_definitions_t fd{
 			{ "push",   objectFactory_->create_method( &list::push ),   "( *elem* ) - add new *elem* at the end of the `list`, `list` grows in size by 1" },
 			{ "pop",    objectFactory_->create_method( &list::pop ),    "remove last element from the `list`, `list` shrinks by 1" },
-			{ "add",    objectFactory_->create_method( &list::append ), "( *other* ) - append all elements from *other* collection at the end of this `list`" },
 			{ "append", objectFactory_->create_method( &list::append ), "( *other* ) - append all elements from *other* collection at the end of this `list`" },
 			{ "insert", objectFactory_->create_method( &list::insert ), "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
 			{ "resize", objectFactory_->create_method( &list::resize ), "( *size*, *elem* ) - resize `list` to given *size* optionally filling new elements with **copies** of value *elem*" },
 			{ "clear",  objectFactory_->create_method( &list::clear ),  "erase `list`'s content, `list` becomes empty" },
 			{ "find",   objectFactory_->create_method( &list::find ),   "( *elem*[, *start*[, *stop*]] ) - get index of first *elem*ent of the `list` not before *start* and before *stop*, return -1 if not found" },
-			{ "sort",   objectFactory_->create_method( &list::sort ),   "( [*callable*] ) - in-place sort this `list`, using *callable* to retrieve keys for element comparison" },
-			{ "hash",   objectFactory_->create_method( &list::hash ),   "calculate hash value for this `list`" },
-			{ "less",   objectFactory_->create_method( &list::less ),   "( *other* ) - test if this `list` comes lexicographically before *other* `list`" },
-			{ "less_or_equal",    objectFactory_->create_method( &list::less_or_equal ),    "( *other* ) - test if this `list` is equal to or comes lexicographically before *other* `list`" },
-			{ "greater",          objectFactory_->create_method( &list::greater ),          "( *other* ) - test if this `list` comes lexicographically after *other* `list`" },
-			{ "greater_or_equal", objectFactory_->create_method( &list::greater_or_equal ), "( *other* ) - test if this `list` is equal to or comes lexicographically after *other* `list`" },
-			{ "equals", objectFactory_->create_method( &list::equals ), "( *other* ) - test if *other* `list` has the same content" }
+			{ "sort",   objectFactory_->create_method( &list::sort ),   "( [*callable*] ) - in-place sort this `list`, using *callable* to retrieve keys for element comparison" }
 		};
 		redefine( nullptr, fd );
 		return;
@@ -469,8 +406,77 @@ HHuginn::value_t huginn::HList::do_clone( huginn::HThread* thread_, HHuginn::val
 	return ( thread_->runtime().object_factory()->create_list( yaal::move( data ) ) );
 }
 
+bool HList::do_operator_less( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	M_PROLOG
+	huginn::HList::values_t const& other( static_cast<huginn::HList const*>( other_.raw() )->value() );
+	HValueCompareHelper lessHelper( &instruction::checked_less );
+	lessHelper.anchor( thread_, position_ );
+	return ( lexicographical_compare( _data.begin(), _data.end(), other.begin(), other.end(), cref( lessHelper ) ) );
+	M_EPILOG
+}
+
+bool HList::do_operator_less_or_equal( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	M_PROLOG
+	huginn::HList::values_t const& other( static_cast<huginn::HList const*>( other_.raw() )->value() );
+	HValueCompareHelper lessHelper( &instruction::checked_less );
+	lessHelper.anchor( thread_, position_ );
+	return ( ! lexicographical_compare( other.begin(), other.end(), _data.begin(), _data.end(), cref( lessHelper ) ) );
+	M_EPILOG
+}
+
+bool HList::do_operator_greater( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	M_PROLOG
+	huginn::HList::values_t const& other( static_cast<huginn::HList const*>( other_.raw() )->value() );
+	HValueCompareHelper lessHelper( &instruction::checked_less );
+	lessHelper.anchor( thread_, position_ );
+	return ( lexicographical_compare( other.begin(), other.end(), _data.begin(), _data.end(), cref( lessHelper ) ) );
+	M_EPILOG
+}
+
+bool HList::do_operator_greater_or_equal( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	M_PROLOG
+	huginn::HList::values_t const& other( static_cast<huginn::HList const*>( other_.raw() )->value() );
+	HValueCompareHelper lessHelper( &instruction::checked_less );
+	lessHelper.anchor( thread_, position_ );
+	return ( ! lexicographical_compare( _data.begin(), _data.end(), other.begin(), other.end(), cref( lessHelper ) ) );
+	M_EPILOG
+}
+
+bool HList::do_operator_equals( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	M_PROLOG
+	huginn::HList::values_t const& other( static_cast<huginn::HList const*>( other_.raw() )->value() );
+	int long s( _data.get_size() );
+	bool equal( s == other.get_size() );
+	for ( int long i( 0 ); equal && ( i < s ); ++ i ) {
+		HHuginn::value_t const& lv( _data[i] );
+		HHuginn::value_t const& rv( other[i] );
+		equal = ( lv->type_id() == rv->type_id() ) && lv->operator_equals( thread_, lv, rv, position_ );
+	}
+	return ( equal );
+	M_EPILOG
+}
+
 bool HList::do_operator_contains( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
 	return ( find( thread_, position_, other_ ) != huginn::HList::npos );
+}
+
+void HList::do_operator_add( HThread*, HHuginn::value_t&, HHuginn::value_t const& other_, int ) {
+	M_PROLOG
+	huginn::HList::values_t const& src( static_cast<huginn::HList const*>( other_.raw() )->value() );
+	_data.insert( _data.end(), src.begin(), src.end() );
+	return;
+	M_EPILOG
+}
+
+int long HList::do_operator_hash( HThread* thread_, HHuginn::value_t const&, int position_ ) const {
+	M_PROLOG
+	int long hashValue( static_cast<int long>( HHuginn::TYPE::LIST ) );
+	for ( HHuginn::value_t const& v : _data ) {
+		hashValue *= 3;
+		hashValue += v->operator_hash( thread_, v, position_ );
+	}
+	return ( hashValue );
+	M_EPILOG
 }
 
 HHuginn::value_t HList::do_operator_subscript( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& index_, int position_ ) const {
