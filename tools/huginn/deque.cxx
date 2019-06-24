@@ -266,76 +266,6 @@ inline HHuginn::value_t find( huginn::HThread* thread_, HHuginn::value_t* object
 	M_EPILOG
 }
 
-inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	verify_arg_count( "deque.hash", values_, 0, 0, thread_, position_ );
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
-	huginn::HDeque::values_t const& values( static_cast<huginn::HDeque*>( object_->raw() )->value() );
-	int long hashValue( static_cast<int long>( HHuginn::TYPE::DEQUE ) );
-	for ( HHuginn::value_t const& v : values ) {
-		hashValue *= 3;
-		hashValue += v->operator_hash( thread_, v, position_ );
-	}
-	return ( thread_->object_factory().create_integer( hashValue ) );
-	M_EPILOG
-}
-
-inline bool less_impl( huginn::HThread* thread_, HHuginn::value_t const& l_, HHuginn::value_t const& r_, int position_ ) {
-	huginn::HDeque::values_t const& l( static_cast<huginn::HDeque const*>( l_.raw() )->value() );
-	huginn::HDeque::values_t const& r( static_cast<huginn::HDeque const*>( r_.raw() )->value() );
-	HValueCompareHelper lessHelper( &instruction::checked_less );
-	lessHelper.anchor( thread_, position_ );
-	return ( lexicographical_compare( l.begin(), l.end(), r.begin(), r.end(), cref( lessHelper ) ) );
-}
-
-inline HHuginn::value_t less( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
-	verify_signature( "deque.less", values_, { HHuginn::TYPE::DEQUE }, thread_, position_ );
-	return ( thread_->runtime().boolean_value( less_impl( thread_, *object_, values_[0], position_ ) ) );
-	M_EPILOG
-}
-
-inline HHuginn::value_t less_or_equal( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
-	verify_signature( "deque.less_or_equal", values_, { HHuginn::TYPE::DEQUE }, thread_, position_ );
-	return ( thread_->runtime().boolean_value( ! less_impl( thread_, values_[0], *object_, position_ ) ) );
-	M_EPILOG
-}
-
-inline HHuginn::value_t greater( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
-	verify_signature( "deque.greater", values_, { HHuginn::TYPE::DEQUE }, thread_, position_ );
-	return ( thread_->runtime().boolean_value( less_impl( thread_, values_[0], *object_, position_ ) ) );
-	M_EPILOG
-}
-
-inline HHuginn::value_t greater_or_equal( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
-	verify_signature( "deque.greater_or_equal", values_, { HHuginn::TYPE::DEQUE }, thread_, position_ );
-	return ( thread_->runtime().boolean_value( ! less_impl( thread_, *object_, values_[0], position_ ) ) );
-	M_EPILOG
-}
-
-inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
-	verify_signature( "deque.equals", values_, { HHuginn::TYPE::DEQUE }, thread_, position_ );
-	huginn::HDeque::values_t const& l( static_cast<huginn::HDeque*>( object_->raw() )->value() );
-	huginn::HDeque::values_t const& r( static_cast<huginn::HDeque const*>( values_[0].raw() )->value() );
-	bool equal( l.get_size() == r.get_size() );
-	for ( int long i( 0 ), c( l.get_size() ); equal && ( i < c ); ++ i ) {
-		HHuginn::value_t const& lv( l[i] );
-		HHuginn::value_t const& rv( r[i] );
-		equal = ( lv->type_id() == rv->type_id() ) && lv->operator_equals( thread_, lv, rv, position_ );
-	}
-	return ( thread_->runtime().boolean_value( equal ) );
-	M_EPILOG
-}
-
 class HDequeClass : public HClass {
 public:
 	typedef HDequeClass this_type;
@@ -362,18 +292,11 @@ public:
 			{ "pop",        objectFactory_->create_method( &deque::pop ),        "remove last element from the deque, deque shrinks by 1" },
 			{ "push_front", objectFactory_->create_method( &deque::push_front ), "( *elem* ) - add new *elem* at the (left/front) beginning of the `deque`, `deque` grows in size by 1" },
 			{ "pop_front",  objectFactory_->create_method( &deque::pop_front ),  "remove first element from the `deque`, `deque` shrinks by 1" },
-			{ "add",        objectFactory_->create_method( &deque::append ),     "( *other* ) - append all elements from *other* collection at the end of  `deque`" },
 			{ "append",     objectFactory_->create_method( &deque::append ),     "( *other* ) - append all elements from *other* collection at the end of  `deque`" },
 			{ "prepend",    objectFactory_->create_method( &deque::prepend ),    "( *other* ) - prepend all elements from *other* collection in front of  `deque`" },
 			{ "insert",     objectFactory_->create_method( &deque::insert ),     "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
 			{ "clear",      objectFactory_->create_method( &deque::clear ),      "erase `deque`'s content, `deque` becomes empty" },
-			{ "find",       objectFactory_->create_method( &deque::find ),       "( *elem*[, *start*[, *stop*]] ) - get index of first *elem*ent of the `deque` not before *start* and before *stop*, return -1 if not found" },
-			{ "hash",       objectFactory_->create_method( &deque::hash ),       "calculate hash value for  `deque`" },
-			{ "less",       objectFactory_->create_method( &deque::less ),       "( *other* ) - test if  `deque` comes lexicographically before *other* `deque`" },
-			{ "less_or_equal",    objectFactory_->create_method( &deque::less_or_equal ),    "( *other* ) - test if this `deque` is equal to or comes lexicographically before *other* `deque`" },
-			{ "greater",          objectFactory_->create_method( &deque::greater ),          "( *other* ) - test if this `deque` comes lexicographically after *other* `deque`" },
-			{ "greater_or_equal", objectFactory_->create_method( &deque::greater_or_equal ), "( *other* ) - test if this `deque` is equal to or comes lexicographically after *other* `deque`" },
-			{ "equals",     objectFactory_->create_method( &deque::equals ),     "( *other* ) - test if *other* `deque` has the same content" }
+			{ "find",       objectFactory_->create_method( &deque::find ),       "( *elem*[, *start*[, *stop*]] ) - get index of first *elem*ent of the `deque` not before *start* and before *stop*, return -1 if not found" }
 		};
 		redefine( nullptr, fd );
 		return;
@@ -487,8 +410,77 @@ HHuginn::value_t huginn::HDeque::do_clone( huginn::HThread* thread_, HHuginn::va
 	return ( thread_->runtime().object_factory()->create_deque( yaal::move( data ) ) );
 }
 
+bool HDeque::do_operator_less( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	M_PROLOG
+	huginn::HDeque::values_t const& other( static_cast<huginn::HDeque const*>( other_.raw() )->value() );
+	HValueCompareHelper lessHelper( &instruction::checked_less );
+	lessHelper.anchor( thread_, position_ );
+	return ( lexicographical_compare( _data.begin(), _data.end(), other.begin(), other.end(), cref( lessHelper ) ) );
+	M_EPILOG
+}
+
+bool HDeque::do_operator_less_or_equal( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	M_PROLOG
+	huginn::HDeque::values_t const& other( static_cast<huginn::HDeque const*>( other_.raw() )->value() );
+	HValueCompareHelper lessHelper( &instruction::checked_less );
+	lessHelper.anchor( thread_, position_ );
+	return ( ! lexicographical_compare( other.begin(), other.end(), _data.begin(), _data.end(), cref( lessHelper ) ) );
+	M_EPILOG
+}
+
+bool HDeque::do_operator_greater( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	M_PROLOG
+	huginn::HDeque::values_t const& other( static_cast<huginn::HDeque const*>( other_.raw() )->value() );
+	HValueCompareHelper lessHelper( &instruction::checked_less );
+	lessHelper.anchor( thread_, position_ );
+	return ( lexicographical_compare( other.begin(), other.end(), _data.begin(), _data.end(), cref( lessHelper ) ) );
+	M_EPILOG
+}
+
+bool HDeque::do_operator_greater_or_equal( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	M_PROLOG
+	huginn::HDeque::values_t const& other( static_cast<huginn::HDeque const*>( other_.raw() )->value() );
+	HValueCompareHelper lessHelper( &instruction::checked_less );
+	lessHelper.anchor( thread_, position_ );
+	return ( ! lexicographical_compare( _data.begin(), _data.end(), other.begin(), other.end(), cref( lessHelper ) ) );
+	M_EPILOG
+}
+
+bool HDeque::do_operator_equals( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	M_PROLOG
+	huginn::HDeque::values_t const& other( static_cast<huginn::HDeque const*>( other_.raw() )->value() );
+	int long s( _data.get_size() );
+	bool equal( s == other.get_size() );
+	for ( int long i( 0 ); equal && ( i < s ); ++ i ) {
+		HHuginn::value_t const& lv( _data[i] );
+		HHuginn::value_t const& rv( other[i] );
+		equal = ( lv->type_id() == rv->type_id() ) && lv->operator_equals( thread_, lv, rv, position_ );
+	}
+	return ( equal );
+	M_EPILOG
+}
+
 bool HDeque::do_operator_contains( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
 	return ( find( thread_, position_, other_ ) != huginn::HDeque::npos );
+}
+
+void HDeque::do_operator_add( HThread*, HHuginn::value_t&, HHuginn::value_t const& other_, int ) {
+	M_PROLOG
+	huginn::HDeque::values_t const& src( static_cast<huginn::HDeque const*>( other_.raw() )->value() );
+	_data.insert( _data.end(), src.begin(), src.end() );
+	return;
+	M_EPILOG
+}
+
+int long HDeque::do_operator_hash( HThread* thread_, HHuginn::value_t const&, int position_ ) const {
+	M_PROLOG
+	int long hashValue( static_cast<int long>( HHuginn::TYPE::DEQUE ) );
+	for ( HHuginn::value_t const& v : _data ) {
+		hashValue *= 3;
+		hashValue += v->operator_hash( thread_, v, position_ );
+	}
+	return ( hashValue );
+	M_EPILOG
 }
 
 HHuginn::value_t HDeque::do_operator_subscript( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& index_, int position_ ) const {
