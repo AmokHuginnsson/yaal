@@ -122,7 +122,7 @@ void HNumber::do_operator_subtract( HThread*, HHuginn::value_t&, HHuginn::value_
 	_value -= static_cast<HNumber const*>( other_.raw() )->_value;
 }
 
-void HNumber::do_operator_multipy( HThread*, HHuginn::value_t&, HHuginn::value_t const& other_, int ) {
+void HNumber::do_operator_multiply( HThread*, HHuginn::value_t&, HHuginn::value_t const& other_, int ) {
 	_value *= static_cast<HNumber const*>( other_.raw() )->_value;
 }
 

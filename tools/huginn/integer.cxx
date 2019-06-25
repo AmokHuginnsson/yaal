@@ -81,7 +81,7 @@ void HInteger::do_operator_subtract( HThread*, HHuginn::value_t&, HHuginn::value
 	_value -= static_cast<HInteger const*>( other_.raw() )->_value;
 }
 
-void HInteger::do_operator_multipy( HThread*, HHuginn::value_t&, HHuginn::value_t const& other_, int ) {
+void HInteger::do_operator_multiply( HThread*, HHuginn::value_t&, HHuginn::value_t const& other_, int ) {
 	_value *= static_cast<HInteger const*>( other_.raw() )->_value;
 }
 
