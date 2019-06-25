@@ -120,38 +120,52 @@ HHuginn::value_t HTime::get_days_in_month( huginn::HThread* thread_, HHuginn::va
 	M_EPILOG
 }
 
-HHuginn::value_t HTime::subtract( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+void HTime::do_operator_subtract( HThread*, HHuginn::value_t&, HHuginn::value_t const& other_, int ) {
 	M_PROLOG
-	verify_signature_by_class( "Time.subtract", values_, { (*object_)->get_class() }, thread_, position_ );
-	hcore::HTime& lt( static_cast<HTime*>( object_->raw() )->_time );
-	hcore::HTime const& rt( static_cast<HTime const*>( values_[0].raw() )->_time );
-	lt -= rt;
-	return ( *object_ );
+	hcore::HTime const& other( static_cast<HTime const*>( other_.raw() )->_time );
+	_time -= other;
+	return;
 	M_EPILOG
 }
 
-HHuginn::value_t HTime::hash( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+int long HTime::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
 	M_PROLOG
-	verify_arg_count( "Time.hash", values_, 0, 0, thread_, position_ );
-	return ( thread_->object_factory().create_integer( static_cast<HTime*>( object_->raw() )->_time.raw() ) );
+	return ( static_cast<int long>( _time.raw() ) );
 	M_EPILOG
 }
 
-HHuginn::value_t HTime::equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+bool HTime::do_operator_equals( HThread*, HHuginn::value_t const&, HHuginn::value_t const& other_, int ) const {
 	M_PROLOG
-	verify_signature_by_class( "Time.equals", values_, { (*object_)->get_class() }, thread_, position_ );
-	hcore::HTime const& lt( static_cast<HTime*>( object_->raw() )->_time );
-	hcore::HTime const& rt( static_cast<HTime const*>( values_[0].raw() )->_time );
-	return ( thread_->runtime().boolean_value( lt == rt ) );
+	hcore::HTime const& other( static_cast<HTime const*>( other_.raw() )->_time );
+	return ( _time == other );
 	M_EPILOG
 }
 
-HHuginn::value_t HTime::less( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+bool HTime::do_operator_less( HThread*, HHuginn::value_t const&, HHuginn::value_t const& other_, int ) const {
 	M_PROLOG
-	verify_signature_by_class( "Time.less", values_, { (*object_)->get_class() }, thread_, position_ );
-	hcore::HTime const& lt( static_cast<HTime*>( object_->raw() )->_time );
-	hcore::HTime const& rt( static_cast<HTime const*>( values_[0].raw() )->_time );
-	return ( thread_->runtime().boolean_value( lt < rt ) );
+	hcore::HTime const& other( static_cast<HTime const*>( other_.raw() )->_time );
+	return ( _time < other );
+	M_EPILOG
+}
+
+bool HTime::do_operator_less_or_equal( HThread*, HHuginn::value_t const&, HHuginn::value_t const& other_, int ) const {
+	M_PROLOG
+	hcore::HTime const& other( static_cast<HTime const*>( other_.raw() )->_time );
+	return ( _time <= other );
+	M_EPILOG
+}
+
+bool HTime::do_operator_greater( HThread*, HHuginn::value_t const&, HHuginn::value_t const& other_, int ) const {
+	M_PROLOG
+	hcore::HTime const& other( static_cast<HTime const*>( other_.raw() )->_time );
+	return ( _time > other );
+	M_EPILOG
+}
+
+bool HTime::do_operator_greater_or_equal( HThread*, HHuginn::value_t const&, HHuginn::value_t const& other_, int ) const {
+	M_PROLOG
+	hcore::HTime const& other( static_cast<HTime const*>( other_.raw() )->_time );
+	return ( _time >= other );
 	M_EPILOG
 }
 
@@ -245,11 +259,7 @@ HHuginn::class_t HTime::get_class( HRuntime* runtime_ ) {
 			{ "get_month",    runtime_->create_method( &HTime::get_month ),    "get number of months from time" },
 			{ "get_day_of_week",   runtime_->create_method( &HTime::get_day_of_week ),   "get day of the week for this time" },
 			{ "get_days_in_month", runtime_->create_method( &HTime::get_days_in_month ), "get number of days in month for this time" },
-			{ "subtract",     runtime_->create_method( &HTime::subtract ),     "( *time* ) - calculate time difference between this and *time* time points" },
 			{ "from_string",  runtime_->create_method( &HTime::from_string ),  "( *str* ) - set time from parsed `string` *str*" },
-			{ "hash",	        runtime_->create_method( &HTime::hash ),         "calculate hash value for this `Time` point" },
-			{ "equals",       runtime_->create_method( &HTime::equals ),       "( *other* ) - test if *other* `Time` point is the same" },
-			{ "less",         runtime_->create_method( &HTime::less ),         "( *other* ) - test if this `Time` point comes before *other* `Time` point" },
 			{ "to_string",    runtime_->create_method( &HTime::to_string ),    "get `string` representation of this point-in-time" }
 		};
 		c->redefine( nullptr, fd );
