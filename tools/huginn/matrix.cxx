@@ -219,102 +219,87 @@ HHuginn::value_t HMatrix::set( huginn::HThread* thread_, HHuginn::value_t* objec
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::add( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+void HMatrix::do_operator_add( HThread* thread_, HHuginn::value_t&, HHuginn::value_t const& other_, int position_ ) {
 	M_PROLOG
-	char const name[] = "Matrix.add";
-	verify_arg_count( name, values_, 1, 1, thread_, position_ );
-	verify_arg_type( name, values_, 0, (*object_)->get_class(), ARITY::UNARY, thread_, position_ );
 	HHuginn::value_t v;
-	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
-	HMatrix const* arg( static_cast<HMatrix const*>( values_[0].raw() ) );
-	if ( o->_data.type() != arg->_data.type() ) {
+	HMatrix const* arg( static_cast<HMatrix const*>( other_.raw() ) );
+	if ( _data.type() != arg->_data.type() ) {
 		throw HHuginn::HHuginnRuntimeException( "Non matching data types.", thread_->current_frame()->file_id(), position_ );
 	}
 	try {
-		if ( o->_data.type() == 0 ) {
-			arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
+		if ( _data.type() == 0 ) {
+			arbitrary_precision_matrix_t& m( *( _data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
 			arbitrary_precision_matrix_t const& ma( *( arg->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
 			m += ma;
 		} else {
-			floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
+			floating_point_matrix_t& m( *( _data.get<floating_point_matrix_ptr_t>().raw() ) );
 			floating_point_matrix_t const& ma( *( arg->_data.get<floating_point_matrix_ptr_t>().raw() ) );
 			m += ma;
 		}
 	} catch ( hcore::HException const& e ) {
 		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
 	}
-	return ( *object_ );
+	return;
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::subtract( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+void HMatrix::do_operator_subtract( HThread* thread_, HHuginn::value_t&, HHuginn::value_t const& other_, int position_ ) {
 	M_PROLOG
-	char const name[] = "Matrix.subtract";
-	verify_arg_count( name, values_, 1, 1, thread_, position_ );
-	verify_arg_type( name, values_, 0, (*object_)->get_class(), ARITY::UNARY, thread_, position_ );
 	HHuginn::value_t v;
-	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
-	HMatrix const* arg( static_cast<HMatrix const*>( values_[0].raw() ) );
-	if ( o->_data.type() != arg->_data.type() ) {
+	HMatrix const* arg( static_cast<HMatrix const*>( other_.raw() ) );
+	if ( _data.type() != arg->_data.type() ) {
 		throw HHuginn::HHuginnRuntimeException( "Non matching data types.", thread_->current_frame()->file_id(), position_ );
 	}
 	try {
-		if ( o->_data.type() == 0 ) {
-			arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
+		if ( _data.type() == 0 ) {
+			arbitrary_precision_matrix_t& m( *( _data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
 			arbitrary_precision_matrix_t const& ma( *( arg->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
 			m -= ma;
 		} else {
-			floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
+			floating_point_matrix_t& m( *( _data.get<floating_point_matrix_ptr_t>().raw() ) );
 			floating_point_matrix_t const& ma( *( arg->_data.get<floating_point_matrix_ptr_t>().raw() ) );
 			m -= ma;
 		}
 	} catch ( hcore::HException const& e ) {
 		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
 	}
-	return ( *object_ );
+	return;
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::multiply( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+void HMatrix::do_operator_multiply( HThread* thread_, HHuginn::value_t&, HHuginn::value_t const& other_, int position_ ) {
 	M_PROLOG
-	char const name[] = "Matrix.multiply";
-	verify_arg_count( name, values_, 1, 1, thread_, position_ );
-	verify_arg_type( name, values_, 0, (*object_)->get_class(), ARITY::UNARY, thread_, position_ );
 	HHuginn::value_t v;
-	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
-	HMatrix const* arg( static_cast<HMatrix const*>( values_[0].raw() ) );
-	if ( o->_data.type() != arg->_data.type() ) {
+	HMatrix const* arg( static_cast<HMatrix const*>( other_.raw() ) );
+	if ( _data.type() != arg->_data.type() ) {
 		throw HHuginn::HHuginnRuntimeException( "Non matching data types.", thread_->current_frame()->file_id(), position_ );
 	}
 	try {
-		if ( o->_data.type() == 0 ) {
-			arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
+		if ( _data.type() == 0 ) {
+			arbitrary_precision_matrix_t& m( *( _data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
 			arbitrary_precision_matrix_t const& ma( *( arg->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
 			m *= ma;
 		} else {
-			floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
+			floating_point_matrix_t& m( *( _data.get<floating_point_matrix_ptr_t>().raw() ) );
 			floating_point_matrix_t const& ma( *( arg->_data.get<floating_point_matrix_ptr_t>().raw() ) );
 			m *= ma;
 		}
 	} catch ( hcore::HException const& e ) {
 		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
 	}
-	return ( *object_ );
+	return;
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::det( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+HHuginn::value_t HMatrix::do_operator_modulus( HThread* thread_, HHuginn::value_t const&, int position_ ) const {
 	M_PROLOG
-	char const name[] = "Matrix.det";
-	verify_arg_count( name, values_, 0, 0, thread_, position_ );
 	HHuginn::value_t v;
-	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	try {
-		if ( o->_data.type() == 0 ) {
-			arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
+		if ( _data.type() == 0 ) {
+			arbitrary_precision_matrix_t const& m( *( _data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
 			v = thread_->runtime().object_factory()->create_number( m.det() );
 		} else {
-			floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
+			floating_point_matrix_t const& m( *( _data.get<floating_point_matrix_ptr_t>().raw() ) );
 			v = thread_->runtime().object_factory()->create_real( m.det() );
 		}
 	} catch ( hcore::HException const& e ) {
@@ -403,23 +388,42 @@ HHuginn::value_t HMatrix::inverse( huginn::HThread* thread_, HHuginn::value_t* o
 	M_EPILOG
 }
 
-HHuginn::value_t HMatrix::negate( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+HHuginn::value_t HMatrix::do_operator_negate( HThread* thread_, HHuginn::value_t const&, int position_ ) const {
 	M_PROLOG
-	char const name[] = "Matrix.negate";
-	verify_arg_count( name, values_, 0, 0, thread_, position_ );
-	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	HHuginn::value_t v;
 	try {
-		if ( o->_data.type() == 0 ) {
-			v = thread_->object_factory().create<HMatrix>( o->HValue::get_class(), make_resource<arbitrary_precision_matrix_t>( -*o->_data.get<arbitrary_precision_matrix_ptr_t>() ) );
+		if ( _data.type() == 0 ) {
+			v = thread_->object_factory().create<HMatrix>( HValue::get_class(), make_resource<arbitrary_precision_matrix_t>( -*_data.get<arbitrary_precision_matrix_ptr_t>() ) );
 		} else {
-			v = thread_->object_factory().create<HMatrix>( o->HValue::get_class(), make_resource<floating_point_matrix_t>( -*o->_data.get<floating_point_matrix_ptr_t>() ) );
+			v = thread_->object_factory().create<HMatrix>( HValue::get_class(), make_resource<floating_point_matrix_t>( -*_data.get<floating_point_matrix_ptr_t>() ) );
 		}
 	} catch ( hcore::HException const& e ) {
 		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
 	}
 	return ( v );
 	M_EPILOG
+}
+
+bool HMatrix::do_operator_equals( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	bool res( false );
+	HMatrix const* arg( static_cast<HMatrix const*>( other_.raw() ) );
+	if ( _data.type() != arg->_data.type() ) {
+		throw HHuginn::HHuginnRuntimeException( "Non matching data types.", thread_->current_frame()->file_id(), position_ );
+	}
+	try {
+		if ( _data.type() == 0 ) {
+			arbitrary_precision_matrix_t const& m( *( _data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
+			arbitrary_precision_matrix_t const& ma( *( arg->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
+			res = m == ma;
+		} else {
+			floating_point_matrix_t const& m( *( _data.get<floating_point_matrix_ptr_t>().raw() ) );
+			floating_point_matrix_t const& ma( *( arg->_data.get<floating_point_matrix_ptr_t>().raw() ) );
+			res = m == ma;
+		}
+	} catch ( hcore::HException const& e ) {
+		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+	}
+	return ( res );
 }
 
 HHuginn::value_t HMatrix::transpose( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -571,17 +575,11 @@ HHuginn::class_t HMatrix::get_class( HRuntime* runtime_, HClass const* origin_ )
 		{ "rows",      runtime_->create_method( &HMatrix::rows ),      "get row dimension of this `Matrix`" },
 		{ "get",       runtime_->create_method( &HMatrix::get ),       "( *row*, *column* ) - get numeric value present at given *row* and *column* in this `Matrix`" },
 		{ "set",       runtime_->create_method( &HMatrix::set ),       "( *row*, *column*, *value* ) - set given numeric *value* at given *row* and *column* in this `Matrix`" },
-		{ "add",       runtime_->create_method( &HMatrix::add ),       "( *other* ) - add *other* `Matrix` to this `Matrix`" },
-		{ "subtract",  runtime_->create_method( &HMatrix::subtract ),  "( *other* ) - subtract *other* `Matrix` from this `Matrix`" },
-		{ "multiply",  runtime_->create_method( &HMatrix::multiply ),  "( *other* ) - multiply this `Matrix` by *other* `Matrix`" },
-		{ "det",       runtime_->create_method( &HMatrix::det ),       "find value of determinant of this `Matrix`" },
-		{ "modulus",   runtime_->create_method( &HMatrix::det ),       "find value of determinant of this `Matrix`" },
 		{ "scale",     runtime_->create_method( &HMatrix::scale ),     "( *factor* ) - scale all values in this `Matrix` by given *factor*" },
 		{ "scale_to",  runtime_->create_method( &HMatrix::scale_to ),  "( *cap* ) - rescale values in this `Matrix` so maximum of its values is equal to *cap*" },
 		{ "inverse",   runtime_->create_method( &HMatrix::inverse ),   "find *inverse* of this `Matrix`" },
 		{ "transpose", runtime_->create_method( &HMatrix::transpose ), "create transposed version of this `Matrix`" },
 		{ "apply",     runtime_->create_method( &HMatrix::apply ),     "( *fun* ) - apply unary function *fun* over all values in this `Matrix`" },
-		{ "negate",    runtime_->create_method( &HMatrix::negate ),    "get negation of this `Matrix`" },
 		{ "to_string", runtime_->create_method( &HMatrix::to_string ), "get string representation of this `Matrix`" }
 	};
 	c->redefine( nullptr, fd );
