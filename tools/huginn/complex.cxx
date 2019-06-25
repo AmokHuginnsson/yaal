@@ -76,75 +76,43 @@ HHuginn::value_t HComplex::set( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_EPILOG
 }
 
-HHuginn::value_t HComplex::add( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	char const name[] = "Complex.add";
-	verify_arg_count( name, values_, 1, 1, thread_, position_ );
-	verify_arg_type( name, values_, 0, (*object_)->get_class(), ARITY::UNARY, thread_, position_ );
-	HComplex* o( static_cast<HComplex*>( object_->raw() ) );
-	HComplex const* arg( static_cast<HComplex const*>( values_[0].raw() ) );
-	o->_data += arg->_data;
-	return ( *object_ );
-	M_EPILOG
+bool HComplex::do_operator_equals( HThread*, HHuginn::value_t const&, HHuginn::value_t const& other_, int ) const {
+	return ( _data == static_cast<HComplex const*>( other_.raw() )->_data );
 }
 
-HHuginn::value_t HComplex::subtract( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	char const name[] = "Complex.subtract";
-	verify_arg_count( name, values_, 1, 1, thread_, position_ );
-	verify_arg_type( name, values_, 0, (*object_)->get_class(), ARITY::UNARY, thread_, position_ );
-	HComplex* o( static_cast<HComplex*>( object_->raw() ) );
-	HComplex const* arg( static_cast<HComplex const*>( values_[0].raw() ) );
-	o->_data -= arg->_data;
-	return ( *object_ );
-	M_EPILOG
+void HComplex::do_operator_add( HThread*, HHuginn::value_t&, HHuginn::value_t const& other_, int ) {
+	_data += static_cast<HComplex const*>( other_.raw() )->_data;
 }
 
-HHuginn::value_t HComplex::multiply( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	char const name[] = "Complex.multiply";
-	verify_arg_count( name, values_, 1, 1, thread_, position_ );
-	verify_arg_type( name, values_, 0, (*object_)->get_class(), ARITY::UNARY, thread_, position_ );
-	HComplex* o( static_cast<HComplex*>( object_->raw() ) );
-	HComplex const* arg( static_cast<HComplex const*>( values_[0].raw() ) );
-	o->_data *= arg->_data;
-	return ( *object_ );
-	M_EPILOG
+void HComplex::do_operator_subtract( HThread*, HHuginn::value_t&, HHuginn::value_t const& other_, int ) {
+	_data -= static_cast<HComplex const*>( other_.raw() )->_data;
 }
 
-HHuginn::value_t HComplex::divide( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+void HComplex::do_operator_multiply( HThread*, HHuginn::value_t&, HHuginn::value_t const& other_, int ) {
+	_data *= static_cast<HComplex const*>( other_.raw() )->_data;
+}
+
+void HComplex::do_operator_divide( HThread* thread_, HHuginn::value_t&, HHuginn::value_t const& other_, int position_ ) {
 	M_PROLOG
-	char const name[] = "Complex.divide";
-	verify_arg_count( name, values_, 1, 1, thread_, position_ );
-	verify_arg_type( name, values_, 0, (*object_)->get_class(), ARITY::UNARY, thread_, position_ );
-	HComplex* o( static_cast<HComplex*>( object_->raw() ) );
-	HComplex const* arg( static_cast<HComplex const*>( values_[0].raw() ) );
+	hcore::HComplex const& other( static_cast<HComplex const*>( other_.raw() )->_data );
 	try {
-		o->_data /= arg->_data;
+		_data /= other;
 	} catch ( hcore::HException const& e ) {
 		thread_->raise( thread_->object_factory().arithmetic_exception_class(), e.what(), position_ );
-		return ( thread_->runtime().none_value() );
 	}
-	return ( *object_ );
 	M_EPILOG
 }
 
-HHuginn::value_t HComplex::modulus( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	verify_arg_count( "Complex.modulus", values_, 0, 0, thread_, position_ );
-	HComplex* o( static_cast<HComplex*>( object_->raw() ) );
-	data_t::value_type mod( 0.L );
-	mod = o->_data.modulus();
-	return ( thread_->object_factory().create_real( mod ) );
-	M_EPILOG
+HHuginn::value_t HComplex::do_operator_modulus( HThread* thread_, HHuginn::value_t const&, int ) const {
+	return ( thread_->object_factory().create_real( _data.modulus() ) );
 }
 
-HHuginn::value_t HComplex::negate( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	verify_arg_count( "Complex.negate", values_, 0, 0, thread_, position_ );
-	HComplex* o( static_cast<HComplex*>( object_->raw() ) );
-	return ( thread_->object_factory().create<HComplex>( (*object_)->get_class(), - o->_data ) );
-	M_EPILOG
+HHuginn::value_t HComplex::do_operator_negate( HThread* thread_, HHuginn::value_t const&, int ) const {
+	return ( thread_->object_factory().create<HComplex>( HValue::get_class(), -_data ) );
+}
+
+int long HComplex::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
+	return ( hcore::hash<double long>()( _data.re() ) ^ hcore::hash<double long>()( _data.im() ) );
 }
 
 HHuginn::value_t HComplex::argument( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -194,13 +162,7 @@ HHuginn::class_t HComplex::get_class( HRuntime* runtime_, HClass const* origin_ 
 		{ "imaginary", runtime_->create_method( &HComplex::imaginary ), "get imaginary part of this `Complex` number" },
 		{ "get",       runtime_->create_method( &HComplex::get ),       "get both real and imaginary part of this `Complex`" },
 		{ "set",       runtime_->create_method( &HComplex::set ),       "( *real*, *imaginary* ) - set both real and imaginary part of this `Complex` number" },
-		{ "add",       runtime_->create_method( &HComplex::add ),       "( *other* ) - add *other* `Complex` to this `Complex` number" },
-		{ "subtract",  runtime_->create_method( &HComplex::subtract ),  "( *other* ) - subtract *other* `Complex` from this `Complex` number" },
-		{ "multiply",  runtime_->create_method( &HComplex::multiply ),  "( *other* ) - multiply this `Complex` by *other* `Complex` number" },
-		{ "divide",    runtime_->create_method( &HComplex::divide ),    "( *other* ) - divide this `Complex` by *other* `Complex` number" },
-		{ "modulus",   runtime_->create_method( &HComplex::modulus ),   "get modulus value of this `Complex` number" },
 		{ "argument",  runtime_->create_method( &HComplex::argument ),  "get argument value of this `Complex` number" },
-		{ "negate",    runtime_->create_method( &HComplex::negate ),    "get negation of this `Complex` number" },
 		{ "to_string", runtime_->create_method( &HComplex::to_string ), "get string representation of this `Complex` number" }
 	};
 	c->redefine( nullptr, fd );
