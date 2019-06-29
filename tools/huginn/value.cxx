@@ -182,6 +182,56 @@ HHuginn::value_t fallback_unary_arithmetic( HThread* thread_, HHuginn::identifie
 	return ( v );
 }
 
+HHuginn::value_t nullary_fallback( HThread* thread_, HHuginn::value_t const& v_, HHuginn::identifier_id_t methodIdentifier_, HClass const* resType_, int position_ ) {
+	HHuginn::value_t res;
+	if ( HObject const* o = dynamic_cast<HObject const*>( v_.raw() ) ) {
+		res = o->call_method( thread_, v_, methodIdentifier_, HArguments( thread_ ), position_ );
+		if ( res->get_class() != resType_ ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"User supplied `"_ys
+					.append( thread_->runtime().identifier_name( methodIdentifier_ ) )
+					.append( "` function returned an invalid type " )
+					.append( a_type_name( res->get_class() ) )
+					.append( " instead of " )
+					.append( a_type_name( resType_ ) )
+					.append( "." ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+	} else {
+		HClass const* c( v_->get_class() );
+		int idx( c->field_index( methodIdentifier_ ) );
+		if ( idx >= 0 ) {
+			HClass::HMethod const& m( *static_cast<HClass::HMethod const*>( c->field( idx ).raw() ) );
+			res = m.function()( thread_, const_cast<HHuginn::value_t*>( &v_ ), HArguments( thread_ ), position_ );
+			M_ASSERT( res->get_class() == resType_ );
+		} else {
+			throw HHuginn::HHuginnRuntimeException(
+				"There is no `"_ys
+					.append( thread_->runtime().identifier_name( methodIdentifier_ ) )
+					.append( "` method in " )
+					.append( a_type_name( c ) )
+					.append( "." ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+	}
+	return ( res );
+}
+
+char const* type_to_cycle_str( HHuginn::TYPE type_ ) {
+	char const* sym( "/*cycle*/" );
+	switch ( type_ ) {
+		case ( HHuginn::TYPE::TUPLE ):  { sym = "/*(cycle)*/"; } break;
+		case ( HHuginn::TYPE::LIST ):   { sym = "/*[cycle]*/"; } break;
+		case ( HHuginn::TYPE::LOOKUP ): { sym = "/*{cycle}*/"; } break;
+		default:;
+	}
+	return ( sym );
+}
+
 }
 
 bool HValue::do_operator_equals( HThread* thread_, HHuginn::value_t const& self_, HHuginn::value_t const& other_, int position_ ) const {
@@ -306,41 +356,6 @@ void HValue::do_operator_subscript_assign( HThread* thread_, HHuginn::value_t& s
 	M_EPILOG
 }
 
-int long HValue::do_operator_hash( HThread* thread_, HHuginn::value_t const& self_, int position_ ) const {
-	if ( _class->type_id() == HHuginn::TYPE::NONE ) {
-		return ( 0 );
-	}
-	HHuginn::value_t res;
-	if ( HObject const* o = dynamic_cast<HObject const*>( this ) ) {
-		res = o->call_method( thread_, self_, IDENTIFIER::INTERFACE::HASH, HArguments( thread_ ), position_ );
-		if ( res->type_id() != HHuginn::TYPE::INTEGER ) {
-			throw HHuginn::HHuginnRuntimeException(
-				"User supplied `hash` function returned an invalid type "_ys
-					.append( a_type_name( res->get_class() ) )
-					.append( " instead of an `integer`." ),
-				thread_->current_frame()->file_id(),
-				position_
-			);
-		}
-	} else {
-		int idx( _class->field_index( IDENTIFIER::INTERFACE::HASH ) );
-		if ( idx >= 0 ) {
-			HClass::HMethod const& m( *static_cast<HClass::HMethod const*>( _class->field( idx ).raw() ) );
-			res = m.function()( thread_, const_cast<HHuginn::value_t*>( &self_ ), HArguments( thread_ ), position_ );
-			M_ASSERT( res->type_id() == HHuginn::TYPE::INTEGER );
-		} else {
-			throw HHuginn::HHuginnRuntimeException(
-				"There is no `hash` operator for "_ys
-					.append( a_type_name( _class ) )
-					.append( "." ),
-				thread_->current_frame()->file_id(),
-				position_
-			);
-		}
-	}
-	return ( hcore::hash<int long long>()( static_cast<huginn::HInteger const*>( res.raw() )->value() ) );
-}
-
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
@@ -354,6 +369,115 @@ HHuginn::value_t HValue::do_operator_range( HThread* thread_, HHuginn::value_t c
 	);
 }
 #pragma GCC diagnostic pop
+
+int long HValue::do_operator_hash( HThread* thread_, HHuginn::value_t const& self_, int position_ ) const {
+	if ( _class->type_id() == HHuginn::TYPE::NONE ) {
+		return ( 0 );
+	}
+	HHuginn::value_t res( nullary_fallback( thread_, self_, IDENTIFIER::INTERFACE::HASH, thread_->runtime().object_factory()->integer_class(), position_ ) );
+	return ( hcore::hash<int long long>()( get_integer( res ) ) );
+}
+
+yaal::hcore::HString HValue::do_code( huginn::HThread* thread_, HHuginn::value_t const& self_, HCycleTracker&, int position_ ) const {
+	if ( _class->type_id() == HHuginn::TYPE::NONE ) {
+		return ( KEYWORD::NONE );
+	}
+	if ( ! thread_ ) {
+		return ( _class->name() );
+	}
+	return ( get_string( nullary_fallback( thread_, self_, IDENTIFIER::INTERFACE::CODE, thread_->runtime().object_factory()->string_class(), position_ ) ) );
+}
+
+yaal::hcore::HString HValue::code( HThread* thread_, HHuginn::value_t const& self_, HCycleTracker& cycleTracker_, int position_ ) const {
+	M_ASSERT( self_.raw() == this );
+	if ( ! cycleTracker_.track( this ) ) {
+		return ( hcore::to_string( KEYWORD::NONE ).append( type_to_cycle_str( static_cast<HHuginn::TYPE>( type_id().get() ) ) ) );
+	}
+	yaal::hcore::HString str;
+	do {
+		try {
+			str = do_code( thread_, self_, cycleTracker_, position_ );
+		} catch ( ... ) {
+			try {
+				str = do_to_string( thread_, self_, cycleTracker_, position_ );
+				break;
+			} catch ( ... ) {
+			}
+			throw;
+		}
+	} while ( false );
+	cycleTracker_.done( this );
+	return ( str );
+}
+
+yaal::hcore::HString HValue::do_to_string( huginn::HThread* thread_, HHuginn::value_t const& self_, HCycleTracker&, int position_ ) const {
+	if ( _class->type_id() == HHuginn::TYPE::NONE ) {
+		return ( KEYWORD::NONE );
+	}
+	if ( ! thread_ ) {
+		return ( _class->name() );
+	}
+	return ( get_string( nullary_fallback( thread_, self_, IDENTIFIER::INTERFACE::TO_STRING, thread_->runtime().object_factory()->string_class(), position_ ) ) );
+}
+
+yaal::hcore::HString HValue::to_string( HThread* thread_, HHuginn::value_t const& self_, HCycleTracker& cycleTracker_, int position_ ) const {
+	M_ASSERT( self_.raw() == this );
+	if ( ! cycleTracker_.track( this ) ) {
+		return ( hcore::to_string( KEYWORD::NONE ).append( type_to_cycle_str( static_cast<HHuginn::TYPE>( type_id().get() ) ) ) );
+	}
+	yaal::hcore::HString str;
+	do {
+		try {
+			str = do_to_string( thread_, self_, cycleTracker_, position_ );
+		} catch ( ... ) {
+			try {
+				str = do_code( thread_, self_, cycleTracker_, position_ );
+				break;
+			} catch ( ... ) {
+			}
+			throw;
+		}
+	} while ( false );
+	cycleTracker_.done( this );
+	return ( str );
+}
+
+HCycleTracker::HCycleTracker( void )
+	: _valueNoter() {
+}
+
+bool HCycleTracker::track( HValue const* value_ ) {
+	M_PROLOG
+	HHuginn::type_id_t t( value_->type_id() );
+	return (
+		( t == HHuginn::TYPE::NONE )
+		|| ( t == HHuginn::TYPE::BOOLEAN )
+		|| ( t == HHuginn::TYPE::FUNCTION_REFERENCE )
+		|| ( t == HHuginn::TYPE::UNBOUND_METHOD )
+		|| _valueNoter.insert( value_ ).second
+	);
+	M_EPILOG
+}
+
+void HCycleTracker::check( HValue const* value_, int fileId_, int position_ ) {
+	M_PROLOG
+	if ( ! track( value_ ) ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"Cycle detected on type: "_ys.append( value_->get_class()->name() ),
+			fileId_,
+			position_
+		);
+	}
+	return;
+	M_EPILOG
+}
+
+void HCycleTracker::done( HValue const* value_ ) {
+	M_PROLOG
+	_valueNoter.erase( value_ );
+	return;
+	M_EPILOG
+}
 
 }
 

@@ -43,8 +43,7 @@ public:
 		, _exceptionClass() {
 		HHuginn::field_definitions_t fd{
 			{ "next",      runtime_->create_method( &HRandomizer::next ),      "get next random number from this distribution" },
-			{ "seed",      runtime_->create_method( &HRandomizer::seed ),      "([ *data* ]) - initialize random generator internal state based on supplied *data*, or using system entropy if no data is given" },
-			{ "to_string", runtime_->create_method( &HRandomizer::to_string ), "get string representation of this `Randomizer`" }
+			{ "seed",      runtime_->create_method( &HRandomizer::seed ),      "([ *data* ]) - initialize random generator internal state based on supplied *data*, or using system entropy if no data is given" }
 		};
 		redefine( nullptr, fd );
 		_distributionEnumerationClass = add_enumeration_as_member(
@@ -177,16 +176,14 @@ HHuginn::value_t HRandomizer::next( huginn::HThread* thread_, HHuginn::value_t* 
 	M_EPILOG
 }
 
-HHuginn::value_t HRandomizer::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+
+yaal::hcore::HString HRandomizer::do_code( huginn::HThread* thread_, HHuginn::value_t const&, HCycleTracker&, int ) const {
 	M_PROLOG
-	char const name[] = "Randomizer.to_string";
-	verify_arg_count( name, values_, 0, 0, thread_, position_ );
-	HRandomizer* o( static_cast<HRandomizer*>( object_->raw() ) );
 	HRuntime& rt( thread_->runtime() );
-	hcore::HString s( full_class_name( rt, *object_ ) );
-	s.append( "(" ).append( full_class_name( rt, *object_ ) ).append( ".DISTRIBUTION." );
-	random::distribution::HDistribution const* distribution( o->_generator.raw() );
-	switch ( o->_distribution ) {
+	hcore::HString s( full_class_name( rt, HValue::get_class() ) );
+	s.append( "(" ).append( full_class_name( rt, HValue::get_class() ) ).append( ".DISTRIBUTION." );
+	random::distribution::HDistribution const* distribution( _generator.raw() );
+	switch ( _distribution ) {
 		case ( DISTRIBUTION::DISCRETE ): {
 			random::distribution::HDiscrete const& d( *static_cast<random::distribution::HDiscrete const*>( distribution ) );
 			s.append( "DISCRETE, " ).append( d.from() ).append( ", " ).append( d.to() );
@@ -205,7 +202,7 @@ HHuginn::value_t HRandomizer::to_string( huginn::HThread* thread_, HHuginn::valu
 		} break;
 	}
 	s.append( ")" );
-	return ( rt.object_factory()->create_string( yaal::move( s ) ) );
+	return ( s );
 	M_EPILOG
 }
 

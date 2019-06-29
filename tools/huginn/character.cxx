@@ -124,6 +124,14 @@ int long HCharacter::do_operator_hash( HThread*, HHuginn::value_t const&, int ) 
 	return ( hcore::hash<code_point_t>()( _value ) );
 }
 
+yaal::hcore::HString HCharacter::do_code( huginn::HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const {
+	return ( "'"_ys.append( _value ).append( "'" ) );
+}
+
+yaal::hcore::HString HCharacter::do_to_string( huginn::HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const {
+	return ( hcore::to_string( _value ) );
+}
+
 }
 
 }

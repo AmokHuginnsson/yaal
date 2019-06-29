@@ -616,6 +616,14 @@ int long HString::do_operator_hash( HThread*, HHuginn::value_t const&, int ) con
 	return ( hcore::hash<hcore::HString>()( _value ) );
 }
 
+yaal::hcore::HString HString::do_code( huginn::HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const {
+	return ( "\""_ys.append( _value ).append( "\"" ) );
+}
+
+yaal::hcore::HString HString::do_to_string( huginn::HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const {
+	return ( _value );
+}
+
 }
 
 }

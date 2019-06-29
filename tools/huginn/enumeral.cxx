@@ -9,6 +9,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "helper.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
+#include "enumeration.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -33,6 +34,17 @@ HHuginn::value_t HEnumeral::do_clone( huginn::HThread* thread_, HHuginn::value_t
 
 bool HEnumeral::do_operator_equals( HThread*, HHuginn::value_t const&, HHuginn::value_t const& other_, int ) const {
 	return ( _value == static_cast<HEnumeral const*>( other_.raw() )->_value );
+}
+
+yaal::hcore::HString HEnumeral::do_code( huginn::HThread* thread_, HHuginn::value_t const&, HCycleTracker&, int ) const {
+	enumeration::HEnumerationClass const* ec( static_cast<enumeration::HEnumerationClass::HEnumeralClass const*>( HValue::get_class() )->enumeration_class() );
+	HRuntime& rt( thread_->runtime() );
+	hcore::HString s( full_class_name( rt, ec ) );
+	return ( s.append( "." ).append( rt.identifier_name( _identifier ) ) );
+}
+
+yaal::hcore::HString HEnumeral::do_to_string( huginn::HThread* thread_, HHuginn::value_t const& self_, HCycleTracker& cycleTracker_, int position_ ) const {
+	return ( do_code( thread_, self_, cycleTracker_, position_ ) );
 }
 
 }

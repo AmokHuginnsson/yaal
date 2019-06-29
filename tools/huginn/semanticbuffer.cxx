@@ -45,7 +45,7 @@ HSemanticBuffer::HSemanticBuffer( yaal::hcore::HChunk& buffer_, yaal::hcore::HUT
 void HSemanticBuffer::serialize( HHuginn::value_t const& val_ ) {
 	M_PROLOG
 	_cycleTracker.check(
-		val_,
+		val_.raw(),
 		_context._thread->current_frame()->file_id(),
 		_context._position
 	);
@@ -136,7 +136,7 @@ void HSemanticBuffer::serialize( HHuginn::value_t const& val_ ) {
 			);
 		}
 	}
-	_cycleTracker.done( val_ );
+	_cycleTracker.done( val_.raw() );
 	return;
 	M_EPILOG
 }

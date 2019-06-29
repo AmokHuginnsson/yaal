@@ -44,6 +44,7 @@ private:
 	HUnboundMethod( HUnboundMethod const& ) = delete;
 	HUnboundMethod& operator = ( HUnboundMethod const& ) = delete;
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
+	virtual yaal::hcore::HString do_code( HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const override;
 };
 
 class HClass::HBoundMethod : public HValue {

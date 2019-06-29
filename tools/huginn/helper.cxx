@@ -43,49 +43,6 @@ bool is_restricted( yaal::hcore::HString const& name_ ) {
 	M_EPILOG
 }
 
-HCycleTracker::HCycleTracker( void )
-	: _valueNoter() {
-}
-
-bool HCycleTracker::track( HHuginn::value_t const& value_ ) {
-	M_PROLOG
-	HHuginn::type_id_t t( value_->type_id() );
-	return (
-		( t == HHuginn::TYPE::NONE )
-		|| ( t == HHuginn::TYPE::BOOLEAN )
-		|| ( t == HHuginn::TYPE::FUNCTION_REFERENCE )
-		|| ( t == HHuginn::TYPE::UNBOUND_METHOD )
-		|| _valueNoter.insert( value_.raw() ).second
-	);
-	M_EPILOG
-}
-
-void HCycleTracker::check( HHuginn::value_t const& value_, int fileId_, int position_ ) {
-	M_PROLOG
-	HHuginn::type_id_t t( value_->type_id() );
-	if (
-		( t != HHuginn::TYPE::NONE )
-		&& ( t != HHuginn::TYPE::BOOLEAN )
-		&& ( t != HHuginn::TYPE::FUNCTION_REFERENCE )
-		&& ( t != HHuginn::TYPE::UNBOUND_METHOD )
-		&& ! _valueNoter.insert( value_.raw() ).second ) {
-		throw HHuginn::HHuginnRuntimeException(
-			"Cycle detected on type: "_ys.append( value_->get_class()->name() ),
-			fileId_,
-			position_
-		);
-	}
-	return;
-	M_EPILOG
-}
-
-void HCycleTracker::done( HHuginn::value_t const& value_ ) {
-	M_PROLOG
-	_valueNoter.erase( value_.raw() );
-	return;
-	M_EPILOG
-}
-
 void operands_type_mismatch( char const* op_, HClass const* c1_, HClass const* c2_, int fileId_, int pos_ ) {
 	hcore::HString msg( "Operand types for `" );
 	msg.append( op_ )

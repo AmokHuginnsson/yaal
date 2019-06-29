@@ -169,12 +169,27 @@ bool HTime::do_operator_greater_or_equal( HThread*, HHuginn::value_t const&, HHu
 	M_EPILOG
 }
 
-HHuginn::value_t HTime::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+yaal::hcore::HString HTime::do_code( huginn::HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const {
+	return (
+		"Time("_ys
+			.append( _time.get_year() )
+			.append( ", " )
+			.append( static_cast<int>( _time.get_month() ) )
+			.append( ", " )
+			.append( _time.get_day() )
+			.append( ", " )
+			.append( _time.get_hour() )
+			.append( ", " )
+			.append( _time.get_minute() )
+			.append( ", " )
+			.append( _time.get_second() )
+			.append( ")" )
+	);
+}
+
+yaal::hcore::HString HTime::do_to_string( huginn::HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const {
 	M_PROLOG
-	char const name[] = "Time.to_string";
-	verify_arg_count( name, values_, 0, 0, thread_, position_ );
-	huginn::HTime* t( static_cast<huginn::HTime*>( object_->raw() ) );
-	return ( thread_->object_factory().create_string( t->_time.to_string() ) );
+	return ( _time.to_string() );
 	M_EPILOG
 }
 
@@ -259,8 +274,7 @@ HHuginn::class_t HTime::get_class( HRuntime* runtime_ ) {
 			{ "get_month",    runtime_->create_method( &HTime::get_month ),    "get number of months from time" },
 			{ "get_day_of_week",   runtime_->create_method( &HTime::get_day_of_week ),   "get day of the week for this time" },
 			{ "get_days_in_month", runtime_->create_method( &HTime::get_days_in_month ), "get number of days in month for this time" },
-			{ "from_string",  runtime_->create_method( &HTime::from_string ),  "( *str* ) - set time from parsed `string` *str*" },
-			{ "to_string",    runtime_->create_method( &HTime::to_string ),    "get `string` representation of this point-in-time" }
+			{ "from_string",  runtime_->create_method( &HTime::from_string ),  "( *str* ) - set time from parsed `string` *str*" }
 		};
 		c->redefine( nullptr, fd );
 		runtime_->huginn()->register_class( c, HHuginn::VISIBILITY::GLOBAL );

@@ -106,6 +106,7 @@ public:
 	HHuginn::value_t const& constructor( void ) const {
 		return ( _constructor );
 	}
+	HHuginn::identifier_id_t method_id( void const* ) const;
 	static HHuginn::value_t create_instance_default( HClass const*, huginn::HThread*, HHuginn::values_t&, int );
 	HHuginn::value_t create_instance( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int ) const;
 	yaal::hcore::HString const& doc( void ) const;

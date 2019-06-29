@@ -83,12 +83,6 @@ HEnumerationClass::HEnumerationClass(
 			}
 		)
 	);
-	_valueClass->redefine(
-		nullptr,
-		HHuginn::field_definitions_t{
-			{ "to_string", runtime_->create_method( &HEnumerationClass::to_string ), "Get enumeration name." }
-		}
-	);
 	runtime_->huginn()->register_class( _valueClass, visibility_ );
 	HHuginn::field_definitions_t fd;
 	fd.reserve( descriptions_.get_size() + 1 );
@@ -122,17 +116,6 @@ HHuginn::value_t HEnumerationClass::enumeral( HEnumeral::value_type id_ ) const 
 		}
 	}
 	return ( v );
-	M_EPILOG
-}
-
-HHuginn::value_t HEnumerationClass::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	verify_arg_count( "to_string", values_, 0, 0, thread_, position_ );
-	HEnumeral* e( static_cast<HEnumeral*>( object_->raw() ) );
-	HEnumerationClass const* ec( static_cast<HEnumeralClass const*>( e->get_class() )->enumeration_class() );
-	HRuntime& rt( thread_->runtime() );
-	hcore::HString s( full_class_name( rt, ec ) );
-	return ( thread_->object_factory().create_string( yaal::move( s.append( "." ).append( rt.identifier_name( e->identifier() ) ) ) ) );
 	M_EPILOG
 }
 

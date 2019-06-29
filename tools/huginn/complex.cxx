@@ -115,6 +115,14 @@ int long HComplex::do_operator_hash( HThread*, HHuginn::value_t const&, int ) co
 	return ( hcore::hash<double long>()( _data.re() ) ^ hcore::hash<double long>()( _data.im() ) );
 }
 
+yaal::hcore::HString HComplex::do_code( huginn::HThread* thread_, HHuginn::value_t const&, HCycleTracker&, int ) const {
+	M_PROLOG
+	hcore::HString s( full_class_name( thread_->runtime(), HValue::get_class() ) );
+	s.append( "(" ).append( _data.re() ).append( ", " ).append( _data.im() ).append( ")" );
+	return ( s );
+	M_EPILOG
+}
+
 HHuginn::value_t HComplex::argument( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "Complex.argument", values_, 0, 0, thread_, position_ );

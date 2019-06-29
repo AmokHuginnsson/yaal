@@ -143,6 +143,14 @@ int long HInteger::do_operator_hash( HThread*, HHuginn::value_t const&, int ) co
 	return ( hcore::hash<int long long>()( _value ) );
 }
 
+yaal::hcore::HString HInteger::do_code( huginn::HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const {
+	return ( _value );
+}
+
+yaal::hcore::HString HInteger::do_to_string( huginn::HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const {
+	return ( _value );
+}
+
 }
 
 }

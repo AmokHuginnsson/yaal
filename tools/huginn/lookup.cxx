@@ -508,6 +508,40 @@ void HLookup::do_operator_subscript_assign( HThread* thread_, HHuginn::value_t&,
 	_data[key_] = yaal::move( value_ );
 }
 
+yaal::hcore::HString HLookup::do_code( huginn::HThread* thread_, HHuginn::value_t const&, HCycleTracker& cycleTracker_, int position_ ) const {
+	if ( _data.is_empty() ) {
+		return ( "{}" );
+	}
+	hcore::HString str( "{" );
+	bool next( false );
+	for ( huginn::HLookup::values_t::value_type const& v : _data ) {
+		if ( next ) {
+			str.append( ", " );
+		}
+		next = true;
+		str.append( v.first->code( thread_, v.first, cycleTracker_, position_ ) ).append( ": " ).append( v.second->code( thread_, v.second, cycleTracker_, position_ ) );
+	}
+	str.append( "}" );
+	return ( str );
+}
+
+yaal::hcore::HString HLookup::do_to_string( huginn::HThread* thread_, HHuginn::value_t const&, HCycleTracker& cycleTracker_, int position_ ) const {
+	if ( _data.is_empty() ) {
+		return ( "{}" );
+	}
+	hcore::HString str( "{" );
+	bool next( false );
+	for ( huginn::HLookup::values_t::value_type const& v : _data ) {
+		if ( next ) {
+			str.append( ", " );
+		}
+		next = true;
+		str.append( v.first->to_string( thread_, v.first, cycleTracker_, position_ ) ).append( ": " ).append( v.second->to_string( thread_, v.second, cycleTracker_, position_ ) );
+	}
+	str.append( "}" );
+	return ( str );
+}
+
 }
 
 }

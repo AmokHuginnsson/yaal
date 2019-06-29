@@ -382,6 +382,40 @@ bool HOrder::do_operator_contains( HThread* thread_, HHuginn::value_t const&, HH
 	return ( has_key( thread_, other_, position_ ) );
 }
 
+yaal::hcore::HString HOrder::do_code( huginn::HThread* thread_, HHuginn::value_t const&, HCycleTracker& cycleTracker_, int position_ ) const {
+	if ( _data.is_empty() ) {
+		return ( "order()" );
+	}
+	hcore::HString str( "order(" );
+	bool next( false );
+	for ( HHuginn::value_t const& v : _data ) {
+		if ( next ) {
+			str.append( ", " );
+		}
+		next = true;
+		str.append( v->code( thread_, v, cycleTracker_, position_ ) );
+	}
+	str.append( ")" );
+	return ( str );
+}
+
+yaal::hcore::HString HOrder::do_to_string( huginn::HThread* thread_, HHuginn::value_t const&, HCycleTracker& cycleTracker_, int position_ ) const {
+	if ( _data.is_empty() ) {
+		return ( "order()" );
+	}
+	hcore::HString str( "order(" );
+	bool next( false );
+	for ( HHuginn::value_t const& v : _data ) {
+		if ( next ) {
+			str.append( ", " );
+		}
+		next = true;
+		str.append( v->to_string( thread_, v, cycleTracker_, position_ ) );
+	}
+	str.append( ")" );
+	return ( str );
+}
+
 }
 
 }

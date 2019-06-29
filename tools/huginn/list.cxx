@@ -468,17 +468,6 @@ void HList::do_operator_add( HThread*, HHuginn::value_t&, HHuginn::value_t const
 	M_EPILOG
 }
 
-int long HList::do_operator_hash( HThread* thread_, HHuginn::value_t const&, int position_ ) const {
-	M_PROLOG
-	int long hashValue( static_cast<int long>( HHuginn::TYPE::LIST ) );
-	for ( HHuginn::value_t const& v : _data ) {
-		hashValue *= 3;
-		hashValue += v->operator_hash( thread_, v, position_ );
-	}
-	return ( hashValue );
-	M_EPILOG
-}
-
 HHuginn::value_t HList::do_operator_subscript( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& index_, int position_ ) const {
 	int long long index( extract_index( thread_, index_, position_ ) );
 	M_ASSERT( ( index >= 0 ) && ( index < _data.get_size() ) );
@@ -506,6 +495,45 @@ HHuginn::value_t HList::do_operator_range( HThread* thread_, HHuginn::value_t co
 		}
 	}
 	return ( thread_->object_factory().create_list( yaal::move( v ) ) );
+}
+
+int long HList::do_operator_hash( HThread* thread_, HHuginn::value_t const&, int position_ ) const {
+	M_PROLOG
+	int long hashValue( static_cast<int long>( HHuginn::TYPE::LIST ) );
+	for ( HHuginn::value_t const& v : _data ) {
+		hashValue *= 3;
+		hashValue += v->operator_hash( thread_, v, position_ );
+	}
+	return ( hashValue );
+	M_EPILOG
+}
+
+yaal::hcore::HString HList::do_code( huginn::HThread* thread_, HHuginn::value_t const&, HCycleTracker& cycleTracker_, int position_ ) const {
+	hcore::HString str( "[" );
+	bool next( false );
+	for ( HHuginn::value_t const& v : _data ) {
+		if ( next ) {
+			str.append( ", " );
+		}
+		next = true;
+		str.append( v->code( thread_, v, cycleTracker_, position_ ) );
+	}
+	str.append( "]" );
+	return ( str );
+}
+
+yaal::hcore::HString HList::do_to_string( huginn::HThread* thread_, HHuginn::value_t const&, HCycleTracker& cycleTracker_, int position_ ) const {
+	hcore::HString str( "[" );
+	bool next( false );
+	for ( HHuginn::value_t const& v : _data ) {
+		if ( next ) {
+			str.append( ", " );
+		}
+		next = true;
+		str.append( v->to_string( thread_, v, cycleTracker_, position_ ) );
+	}
+	str.append( "]" );
+	return ( str );
 }
 
 }

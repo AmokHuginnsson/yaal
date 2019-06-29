@@ -81,6 +81,15 @@ public:
 		return ( of.create_integer( reinterpret_cast<HInteger::value_type>( values_.front().raw() ) ) );
 		M_EPILOG
 	}
+	static HHuginn::value_t code( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( "Introspection.code", values_, 1, 1, thread_, position_ );
+		HObjectFactory& of( *thread_->runtime().object_factory() );
+		HHuginn::value_t const& v( values_.front() );
+		HCycleTracker cycleTracker;
+		return ( of.create_string( v->code( thread_, v, cycleTracker, position_ ) ) );
+		M_EPILOG
+	}
 	static HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "Introspection.hash", values_, 1, 1, thread_, position_ );
@@ -300,6 +309,7 @@ HPackageCreatorInterface::HInstance HTntrospectionCreator::do_new_instance( HRun
 		{ "version",         runtime_->create_method( &HIntrospection::version ),         "return runtime version information." },
 		{ "id",              runtime_->create_method( &HIntrospection::id ),              "( *ref* ) - get globally unique object identification number" },
 		{ "hash",            runtime_->create_method( &HIntrospection::hash ),            "( *ref* ) - get hash value for given object" },
+		{ "code",            runtime_->create_method( &HIntrospection::code ),            "( *ref* ) - get Huginn code string representation of an value" },
 		{ "symbol",          runtime_->create_method( &HIntrospection::symbol ),          "( *name* ) - get global symbol by *name*." },
 		{ "attribute",       runtime_->create_method( &HIntrospection::attribute ),       "( *object*, *name* ) - get *object*'s attribute (a field or method) by *name*." },
 		{ "list_attributes", runtime_->create_method( &HIntrospection::list_attributes ), "( *object* ) - list attributes of given *object*." },

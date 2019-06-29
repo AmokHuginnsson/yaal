@@ -210,16 +210,14 @@ HHuginn::value_t HStackFrameInfo::context( huginn::HThread* thread_, HHuginn::va
 	M_EPILOG
 }
 
-HHuginn::value_t HStackFrameInfo::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+yaal::hcore::HString HStackFrameInfo::do_to_string( huginn::HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const {
 	M_PROLOG
-	verify_arg_count( "to_string", values_, 0, 0, thread_, position_ );
-	HStackFrameInfo* sfi( static_cast<HStackFrameInfo*>( object_->raw() ) );
 	hcore::HString s;
-	s.assign( sfi->_callSite.file() )
-		.append( ":" ).append( sfi->_callSite.line() )
-		.append( ":" ).append( sfi->_callSite.column() )
-		.append( ":" ).append( sfi->_callSite.context() );
-	return ( thread_->object_factory().create_string( yaal::move( s ) ) );
+	s.assign( _callSite.file() )
+		.append( ":" ).append( _callSite.line() )
+		.append( ":" ).append( _callSite.column() )
+		.append( ":" ).append( _callSite.context() );
+	return ( s );
 	M_EPILOG
 }
 
@@ -240,8 +238,7 @@ HHuginn::class_t HStackFrameInfo::get_class( HRuntime* runtime_ ) {
 		{ "file",      runtime_->create_method( &HStackFrameInfo::file ),      "a name of the file where exception went through" },
 		{ "line",      runtime_->create_method( &HStackFrameInfo::line ),      "a line number in given file where an exception went through" },
 		{ "column",    runtime_->create_method( &HStackFrameInfo::column ),    "a column number where an exception went through" },
-		{ "context",   runtime_->create_method( &HStackFrameInfo::context ),   "a calling context for given execution frame" },
-		{ "to_string", runtime_->create_method( &HStackFrameInfo::to_string ), "a string representation of a StackFrameInfo value" }
+		{ "context",   runtime_->create_method( &HStackFrameInfo::context ),   "a calling context for given execution frame" }
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );
@@ -271,7 +268,7 @@ yaal::hcore::HString const& HException::message( void ) const {
 
 yaal::hcore::HString HException::where( void ) const {
 	HHuginn::HCallSite const& cs( _callStack.front() );
-	return ( to_string( cs.file() ).append( ":" ).append( cs.line() ).append( ":" ).append( cs.column() ) );
+	return ( hcore::to_string( cs.file() ).append( ":" ).append( cs.line() ).append( ":" ).append( cs.column() ) );
 }
 
 HHuginn::call_stack_t const& HException::trace( void ) const {

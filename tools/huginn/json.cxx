@@ -48,7 +48,7 @@ public:
 				v = get_number( v_ );
 			} break;
 			case ( HHuginn::TYPE::CHARACTER ): {
-				v = to_string( get_character( v_ ) );
+				v = hcore::to_string( get_character( v_ ) );
 			} break;
 			case ( HHuginn::TYPE::BOOLEAN ): {
 				bool booleanValue( get_boolean( v_ ) );

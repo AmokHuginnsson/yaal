@@ -242,17 +242,6 @@ void HTuple::do_operator_add( HThread*, HHuginn::value_t&, HHuginn::value_t cons
 	M_EPILOG
 }
 
-int long HTuple::do_operator_hash( HThread* thread_, HHuginn::value_t const&, int position_ ) const {
-	M_PROLOG
-	int long hashValue( static_cast<int long>( HHuginn::TYPE::TUPLE ) );
-	for ( HHuginn::value_t const& v : _data ) {
-		hashValue *= 3;
-		hashValue += v->operator_hash( thread_, v, position_ );
-	}
-	return ( hashValue );
-	M_EPILOG
-}
-
 bool HTuple::do_operator_less( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
 	M_PROLOG
 	huginn::HTuple::values_t const& other( static_cast<huginn::HTuple const*>( other_.raw() )->value() );
@@ -328,6 +317,51 @@ HHuginn::value_t HTuple::do_operator_range( HThread* thread_, HHuginn::value_t c
 		}
 	}
 	return ( thread_->object_factory().create_tuple( yaal::move( v ) ) );
+}
+
+int long HTuple::do_operator_hash( HThread* thread_, HHuginn::value_t const&, int position_ ) const {
+	M_PROLOG
+	int long hashValue( static_cast<int long>( HHuginn::TYPE::TUPLE ) );
+	for ( HHuginn::value_t const& v : _data ) {
+		hashValue *= 3;
+		hashValue += v->operator_hash( thread_, v, position_ );
+	}
+	return ( hashValue );
+	M_EPILOG
+}
+
+yaal::hcore::HString HTuple::do_code( huginn::HThread* thread_, HHuginn::value_t const&, HCycleTracker& cycleTracker_, int position_ ) const {
+	hcore::HString str( "(" );
+	bool next( false );
+	for ( HHuginn::value_t const& v : _data ) {
+		if ( next ) {
+			str.append( ", " );
+		}
+		next = true;
+		str.append( v->code( thread_, v, cycleTracker_, position_ ) );
+	}
+	if ( _data.get_size() == 1 ) {
+		str.append( "," );
+	}
+	str.append( ")" );
+	return ( str );
+}
+
+yaal::hcore::HString HTuple::do_to_string( huginn::HThread* thread_, HHuginn::value_t const&, HCycleTracker& cycleTracker_, int position_ ) const {
+	hcore::HString str( "(" );
+	bool next( false );
+	for ( HHuginn::value_t const& v : _data ) {
+		if ( next ) {
+			str.append( ", " );
+		}
+		next = true;
+		str.append( v->to_string( thread_, v, cycleTracker_, position_ ) );
+	}
+	if ( _data.get_size() == 1 ) {
+		str.append( "," );
+	}
+	str.append( ")" );
+	return ( str );
 }
 
 }

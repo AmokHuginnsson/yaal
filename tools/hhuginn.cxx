@@ -1009,76 +1009,6 @@ HHuginn::value_t HTernaryEvaluator::do_clone( huginn::HThread*, HHuginn::value_t
 #endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
 }
 
-huginn::HClass::HMethod::HMethod(
-	huginn::HClass const* class_,
-	HHuginn::function_t const& function_
-) : HValue( class_ )
-	, _function( function_ ) {
-	return;
-}
-
-HHuginn::value_t huginn::HClass::HMethod::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
-	return ( thread_->object_factory().create_method_raw( _function ) );
-}
-
-huginn::HClass::HUnboundMethod::HUnboundMethod(
-	huginn::HClass const* class_,
-	huginn::HClass const* juncture_,
-	HHuginn::function_t const& function_
-) : HValue( class_ )
-	, _juncture( juncture_ )
-	, _function( function_ ) {
-	return;
-}
-
-HHuginn::value_t huginn::HClass::HUnboundMethod::call( huginn::HThread* thread_, HHuginn::values_t& arguments_, int position_ ) {
-	if ( arguments_.is_empty() ) {
-		throw HHuginn::HHuginnRuntimeException(
-			"Calling method without an object.",
-			thread_->current_frame()->file_id(),
-			position_
-		);
-	}
-	HHuginn::value_t o( yaal::move( arguments_.front() ) );
-	if ( o->get_class() != _juncture ) {
-		throw HHuginn::HHuginnRuntimeException(
-			"Method of class "_ys
-				.append( a_type_name( _juncture ) )
-				.append( " called on an object of type " )
-				.append( a_type_name( o->get_class() ) )
-				.append( "." ),
-			thread_->current_frame()->file_id(),
-			position_
-		);
-	}
-	arguments_.erase( arguments_.begin() );
-	return ( _function( thread_, &o, arguments_, position_ ) );
-}
-
-HHuginn::value_t huginn::HClass::HUnboundMethod::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
-	return ( thread_->object_factory().create_unbound_method( _juncture, _function ) );
-}
-
-huginn::HClass::HBoundMethod::HBoundMethod( huginn::HClass const* class_, HHuginn::function_t const& method_, HHuginn::value_t const& object_ )
-	: HValue( class_ )
-	, _function( method_ )
-	, _objectHolder( object_ ) {
-	return;
-}
-
-HHuginn::value_t huginn::HClass::HBoundMethod::call( huginn::HThread* thread_, HHuginn::values_t& arguments_, int position_ ) {
-	return ( _function( thread_, &_objectHolder, arguments_, position_ ) );
-}
-
-HHuginn::value_t huginn::HClass::HBoundMethod::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
-	return (
-		thread_->runtime().object_factory()->create_bound_method(
-			_function,
-			_objectHolder->clone( thread_, const_cast<HHuginn::value_t*>( &_objectHolder ), position_ )
-		)
-	);
-}
-
 yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn* huginn_ ) {
 	HResource<huginn::HThread> threadHolder;
 	HStatement stmt( HStatement::statement_id_t( 0 ), 0, { 0, 0 } );
@@ -1089,7 +1019,7 @@ yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn* huginn_
 	hcore::HString s;
 	try {
 		HCycleTracker cycleTracker;
-		s = instruction::string_representation( threadHolder.raw(), value_, cycleTracker, 0 );
+		s = value_->code( threadHolder.raw(), value_, cycleTracker, 0 );
 	} catch ( HHuginn::HHuginnRuntimeException const& e ) {
 		s = e.message();
 	} catch ( hcore::HException const& e ) {

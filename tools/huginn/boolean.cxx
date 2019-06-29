@@ -9,6 +9,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "thread.hxx"
 #include "builtin.hxx"
 #include "objectfactory.hxx"
+#include "keyword.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -58,6 +59,14 @@ bool HBoolean::do_operator_equals( HThread*, HHuginn::value_t const&, HHuginn::v
 
 int long HBoolean::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
 	return ( hcore::hash<bool>()( _value ) );
+}
+
+yaal::hcore::HString HBoolean::do_code( huginn::HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const {
+	return ( _value ? KEYWORD::TRUE : KEYWORD::FALSE );
+}
+
+yaal::hcore::HString HBoolean::do_to_string( huginn::HThread* thread_, HHuginn::value_t const& self_, HCycleTracker& cycleTracker_, int position_ ) const {
+	return ( do_code( thread_, self_, cycleTracker_, position_ ) );
 }
 
 }

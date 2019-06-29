@@ -15,6 +15,8 @@ namespace tools {
 
 namespace huginn {
 
+class HCycleTracker;
+
 class HValue {
 public:
 	typedef HValue this_type;
@@ -138,6 +140,8 @@ public:
 		M_ASSERT( self_.raw() == this );
 		return ( do_operator_hash( thread_, self_, position_ ) );
 	}
+	yaal::hcore::HString code( HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const;
+	yaal::hcore::HString to_string( HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const;
 private:
 	virtual bool do_operator_equals( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const;
 	virtual bool do_operator_less( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const;
@@ -158,6 +162,8 @@ private:
 	virtual void do_operator_subscript_assign( HThread*, HHuginn::value_t&, HHuginn::value_t const&, HHuginn::value_t&&, int );
 	virtual HHuginn::value_t do_operator_range( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, HHuginn::value_t const&, HHuginn::value_t const&, int ) const;
 	virtual int long do_operator_hash( HThread*, HHuginn::value_t const&, int ) const;
+	virtual yaal::hcore::HString do_code( HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const;
+	virtual yaal::hcore::HString do_to_string( HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const;
 	virtual void do_destroy( HHuginn::value_t* ) {}
 	virtual HHuginn::value_t do_field( HHuginn::value_t const&, int ) const;
 	virtual HHuginn::value_t const& do_field( int ) const;
@@ -224,6 +230,18 @@ public:
 private:
 	HValueCompareHelper( HValueCompareHelper const& ) = delete;
 	HValueCompareHelper& operator = ( HValueCompareHelper const& ) = delete;
+};
+
+class HCycleTracker {
+public:
+	typedef yaal::hcore::HHashSet<HValue const*> value_noter_t;
+private:
+	value_noter_t _valueNoter;
+public:
+	HCycleTracker( void );
+	bool track( HValue const* );
+	void check( HValue const*, int, int );
+	void done( HValue const* );
 };
 
 }

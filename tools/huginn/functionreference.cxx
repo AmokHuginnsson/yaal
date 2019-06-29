@@ -73,6 +73,25 @@ int long HFunctionReference::do_operator_hash( HThread*, HHuginn::value_t const&
 	return ( hcore::hash<int long>()( _identifierId.get() ) );
 }
 
+yaal::hcore::HString HFunctionReference::do_code( huginn::HThread* thread_, HHuginn::value_t const&, HCycleTracker&, int ) const {
+	if ( ! thread_ ) {
+		return ( type_name( HHuginn::TYPE::FUNCTION_REFERENCE ) );
+	}
+	HRuntime& r( thread_->runtime() );
+	HClass const* c( r.get_class( _function.id() ) );
+	hcore::HString const* originName( !!c ? r.package_name( c->origin() ) : nullptr );
+	hcore::HString str;
+	if ( originName ) {
+		str.assign( *originName ).append( "." );
+	}
+	str.append( r.identifier_name( _identifierId ) );
+	return ( str );
+}
+
+yaal::hcore::HString HFunctionReference::do_to_string( huginn::HThread* thread_, HHuginn::value_t const& self_, HCycleTracker& cycleTracker_, int position_ ) const {
+	return ( do_code( thread_, self_, cycleTracker_, position_ ) );
+}
+
 }
 
 }

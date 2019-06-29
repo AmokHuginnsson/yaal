@@ -385,6 +385,18 @@ bool HClass::is_kind_of( HHuginn::identifier_id_t const& identifierId_ ) const {
 	M_EPILOG
 }
 
+HHuginn::identifier_id_t HClass::method_id( void const* functionId_ ) const {
+	HHuginn::identifier_id_t id( IDENTIFIER::INVALID );
+	for ( field_indexes_t::value_type const& fi : _fieldIndexes ) {
+		HHuginn::value_t const& f( _fieldDefinitions[fi.second] );
+		if ( ( f->type_id() == HHuginn::TYPE::METHOD ) && ( static_cast<HClass::HMethod const*>( f.raw() )->function().id() == functionId_ ) ) {
+			id = fi.first;
+			break;
+		}
+	}
+	return ( id );
+}
+
 yaal::hcore::HString const& HClass::doc( void ) const {
 	return ( _doc );
 }

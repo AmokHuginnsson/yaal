@@ -133,6 +133,14 @@ int long HReal::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const
 	return ( hcore::hash<double long>()( _value ) );
 }
 
+yaal::hcore::HString HReal::do_code( huginn::HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const {
+	return ( _value );
+}
+
+yaal::hcore::HString HReal::do_to_string( huginn::HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const {
+	return ( _value );
+}
+
 }
 
 }

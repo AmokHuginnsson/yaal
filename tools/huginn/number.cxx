@@ -195,6 +195,14 @@ int long HNumber::do_operator_hash( HThread*, HHuginn::value_t const&, int ) con
 	return ( hcore::hash<hcore::HNumber>()( _value ) );
 }
 
+yaal::hcore::HString HNumber::do_code( huginn::HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const {
+	return ( "$"_ys.append( _value.to_string() ) );
+}
+
+yaal::hcore::HString HNumber::do_to_string( huginn::HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const {
+	return ( _value.to_string() );
+}
+
 }
 
 }
