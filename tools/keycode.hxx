@@ -16,7 +16,10 @@ namespace tools {
 /*! \brief Special key codes.
  */
 struct KEY_CODE {
+	static int const TAB          = 9;
+	static int const ENTER        = 13;
 	static int const ESCAPE       = 27;
+	static int const BACKSPACE    = 127;
 	static int const BASE         = unicode::MASK + 1;
 	static int const PAGE_UP      = BASE;
 	static int const PAGE_DOWN    = PAGE_UP   + 1;
@@ -28,8 +31,7 @@ struct KEY_CODE {
 	static int const END          = HOME      + 1;
 	static int const DELETE       = END       + 1;
 	static int const INSERT       = DELETE    + 1;
-	static int const BACKSPACE    = INSERT    + 1;
-	static int const F1           = BACKSPACE + 1;
+	static int const F1           = INSERT    + 1;
 	static int const F2           = F1        + 1;
 	static int const F3           = F2        + 1;
 	static int const F4           = F3        + 1;

@@ -22,7 +22,7 @@ int KEY_CODE::key( int code_ ) {
 	if ( code_ > SHIFT_BASE ) {
 		code_ -= SHIFT_BASE;
 	}
-	if ( ( code_ <= CONTROL_SIZE ) || ( ( code_ >= ( BASE - CONTROL_BASE ) ) && ( code_ < BASE ) ) ) {
+	if ( ( ( code_ <= CONTROL_SIZE ) && ( code_ != TAB ) && ( code_ != ENTER ) ) || ( ( code_ >= ( BASE - CONTROL_BASE ) ) && ( code_ < BASE ) ) ) {
 		code_ += CONTROL_BASE;
 	}
 	return ( code_ );
@@ -42,7 +42,7 @@ int KEY_CODE::modifiers( int code_ ) {
 		code_ -= SHIFT_BASE;
 		m |= SHIFT_BASE;
 	}
-	if ( ( code_ <= CONTROL_SIZE ) || ( ( code_ >= ( BASE - CONTROL_BASE ) ) && ( code_ < BASE ) ) ) {
+	if ( ( ( code_ <= CONTROL_SIZE ) && ( code_ != TAB ) && ( code_ != ENTER ) ) || ( ( code_ >= ( BASE - CONTROL_BASE ) ) && ( code_ < BASE ) ) ) {
 		code_ += CONTROL_BASE;
 		m |= CONTROL_BASE;
 	}
@@ -105,6 +105,7 @@ KeyEncodingTable get_key_encoding_table( void ) {
 		{ code_point_t( KEY_CODE::F11 ),                              "[234z" },
 		{ code_point_t( KEY_CODE::F12 ),                              "[24~" },
 		{ code_point_t( KEY_CODE::F12 ),                              "[235z" },
+		{ code_point_t( KEY<KEY_CODE::TAB>::shift ),                  "[Z" },
 		{ code_point_t( KEY<KEY_CODE::UP>::shift ),                   "[1;2A" },
 		{ code_point_t( KEY<KEY_CODE::DOWN>::shift ),                 "[1;2B" },
 		{ code_point_t( KEY<KEY_CODE::LEFT>::shift ),                 "[1;2D" },

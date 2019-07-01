@@ -63,6 +63,9 @@ public:
 					runtime_,
 					"KEY",
 					enumeration::descriptions_t{
+						{ "TAB",       "Tab key",          static_cast<int>( KEY_CODE::TAB ) },
+						{ "ENTER",     "Enter key",        static_cast<int>( KEY_CODE::ENTER ) },
+						{ "BACKSPACE", "Backspace key",    static_cast<int>( KEY_CODE::BACKSPACE ) },
 						{ "UP",        "Up Arrow key",     static_cast<int>( KEY_CODE::UP ) },
 						{ "DOWN",      "Down Arrow key",   static_cast<int>( KEY_CODE::DOWN ) },
 						{ "LEFT",      "Left Arrow key",   static_cast<int>( KEY_CODE::LEFT ) },
@@ -354,7 +357,7 @@ public:
 			} else {
 				data.push_back( thread_->runtime().none_value() );
 			}
-			if ( key >= KEY_CODE::BASE ) {
+			if ( ( key >= KEY_CODE::BASE ) || ( key == KEY_CODE::TAB ) || ( key == KEY_CODE::ENTER ) || ( key == KEY_CODE::BACKSPACE ) ) {
 				data.push_back( keyPressEventClass->key_class()->enumeral( key ) );
 			} else {
 				data.push_back( thread_->runtime().none_value() );
