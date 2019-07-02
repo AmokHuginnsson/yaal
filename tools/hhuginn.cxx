@@ -1009,17 +1009,23 @@ HHuginn::value_t HTernaryEvaluator::do_clone( huginn::HThread*, HHuginn::value_t
 #endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
 }
 
-yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn* huginn_ ) {
+namespace {
+
+yaal::hcore::HString string_form(
+	HHuginn::value_t const& value_,
+	yaal::hcore::HString ( HValue::* stringifier_ )( huginn::HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const,
+	HRuntime const* runtime_
+) {
 	HResource<huginn::HThread> threadHolder;
 	HStatement stmt( HStatement::statement_id_t( 0 ), 0, { 0, 0 } );
-	if ( huginn_ ) {
-		threadHolder.reset( new huginn::HThread( const_cast<HRuntime*>( &huginn_->runtime() ), hcore::HThread::get_current_thread_id() ) );
+	if ( runtime_ ) {
+		threadHolder.reset( new huginn::HThread( const_cast<HRuntime*>( runtime_ ), hcore::HThread::get_current_thread_id() ) );
 		threadHolder->create_function_frame( &stmt, nullptr, 0 );
 	}
 	hcore::HString s;
 	try {
 		HCycleTracker cycleTracker;
-		s = value_->code( threadHolder.raw(), value_, cycleTracker, 0 );
+		s = ( value_.raw()->*stringifier_ )( threadHolder.raw(), value_, cycleTracker, 0 );
 	} catch ( HHuginn::HHuginnRuntimeException const& e ) {
 		s = e.message();
 	} catch ( hcore::HException const& e ) {
@@ -1028,8 +1034,22 @@ yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn* huginn_
 	return ( s );
 }
 
+}
+
+yaal::hcore::HString code( HHuginn::value_t const& value_, HHuginn* huginn_ ) {
+	return ( string_form( value_, &HValue::code, huginn_ ? &huginn_->runtime() : nullptr ) );
+}
+
+yaal::hcore::HString code( HHuginn::value_t const& value_ ) {
+	return ( string_form( value_, &HValue::code, nullptr ) );
+}
+
+yaal::hcore::HString to_string( HHuginn::value_t const& value_, HHuginn* huginn_ ) {
+	return ( string_form( value_, &HValue::to_string, huginn_ ? &huginn_->runtime() : nullptr ) );
+}
+
 yaal::hcore::HString to_string( HHuginn::value_t const& value_ ) {
-	return ( to_string( value_, nullptr ) );
+	return ( string_form( value_, &HValue::to_string, nullptr ) );
 }
 
 }
