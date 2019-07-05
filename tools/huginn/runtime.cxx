@@ -269,7 +269,7 @@ void HRuntime::copy_text( HRuntime& source_ ) {
 	_false = source_._false;
 	_none = source_._none;
 	_objectFactory = source_._objectFactory;
-	_maxLocalVariableCount = source_._maxLocalVariableCount;
+	_maxLocalVariableCount = max( _maxLocalVariableCount, source_._maxLocalVariableCount );
 	_maxCallStackSize = source_._maxCallStackSize;
 	_modulePaths = source_._modulePaths;
 	_compilerSetup = source_._compilerSetup;
