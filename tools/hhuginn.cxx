@@ -879,9 +879,21 @@ HHuginn::value_t HHuginn::value( yaal::hcore::HNumber&& val_ ) {
 	M_EPILOG
 }
 
+HHuginn::value_t HHuginn::value( yaal::hcore::HNumber const& val_ ) {
+	M_PROLOG
+	return ( _runtime->object_factory()->create_number( val_ ) );
+	M_EPILOG
+}
+
 HHuginn::value_t HHuginn::value( yaal::hcore::HString&& val_ ) {
 	M_PROLOG
 	return ( _runtime->object_factory()->create_string( yaal::move( val_ ) ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::value( yaal::hcore::HString const& val_ ) {
+	M_PROLOG
+	return ( _runtime->object_factory()->create_string( val_ ) );
 	M_EPILOG
 }
 

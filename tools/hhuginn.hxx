@@ -324,7 +324,7 @@ public:
 	value_t value( yaal::hcore::HString&& );
 	value_t value( bool );
 	value_t value( void const* );
-	value_t const& value( value_t const& val_ ) const {
+	value_t const& value( value_t const& val_ ) {
 		return ( val_ );
 	}
 	value_t value( values_t&& val_ );
