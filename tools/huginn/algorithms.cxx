@@ -28,6 +28,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "lookup.hxx"
 #include "set.hxx"
 #include "string.hxx"
+#include "stream.hxx"
 #include "exception.hxx"
 
 using namespace yaal;
@@ -129,12 +130,30 @@ public:
 	static HHuginn::value_t materialize( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		char const name[] = "Algorithms.materialize";
 		verify_arg_count( name, values_, 2, 2, thread_, position_ );
+		HObjectFactory& of( thread_->object_factory() );
 		HHuginn::value_t src( verify_arg_virtual_collection( name, values_, 0, ARITY::MULTIPLE, thread_, position_ ) );
-		verify_arg_type( name, values_, 1, HHuginn::TYPE::FUNCTION_REFERENCE, ARITY::MULTIPLE, thread_, position_ );
-		huginn::HFunctionReference const& fr( *static_cast<huginn::HFunctionReference const*>( values_[1].raw() ) );
+		HClass const* streamClass( of.stream_class() );
+		HHuginn::type_id_t t( verify_arg_type( name, values_, 1, classes_t{ of.function_reference_class(), streamClass, of.none_class() }, ARITY::MULTIPLE, thread_, position_ ) );
 		HHuginn::value_t v;
 		huginn::HIterable const* iterable( static_cast<huginn::HIterable const*>( src.raw() ) );
 		huginn::HIterable::iterator_t it( const_cast<huginn::HIterable*>( iterable )->iterator( thread_, position_ ) );
+		if ( t == streamClass->type_id() ) {
+			HStream& stream( *static_cast<HStream*>( values_[1].raw() ) );
+			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
+				v = it->value( thread_, position_ );
+				stream.write( thread_, v, position_ );
+				it->next( thread_, position_ );
+			}
+			return ( values_[1] );
+		}
+		if ( t == HHuginn::TYPE::NONE ) {
+			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
+				it->value( thread_, position_ );
+				it->next( thread_, position_ );
+			}
+			return ( of.none_value() );
+		}
+		huginn::HFunctionReference const& fr( *static_cast<huginn::HFunctionReference const*>( values_[1].raw() ) );
 		if ( fr.function().id() == bit_cast<void const*>( &builtin::tuple ) ) {
 			huginn::HTuple::values_t dest;
 			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {

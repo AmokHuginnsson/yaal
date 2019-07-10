@@ -65,6 +65,7 @@ HHuginn::class_t create_class(
 void verify_arg_count( char const*, HHuginn::values_t&, int, int, huginn::HThread*, int );
 void verify_arg_type( char const*, HHuginn::values_t&, int, HHuginn::TYPE, ARITY, huginn::HThread*, int );
 HHuginn::type_id_t verify_arg_type( char const*, HHuginn::values_t&, int, types_t const&, ARITY, huginn::HThread*, int );
+HHuginn::type_id_t verify_arg_type( char const*, HHuginn::values_t&, int, classes_t const&, ARITY, huginn::HThread*, int );
 void verify_arg_type( char const*, HHuginn::values_t&, int, huginn::HClass const*, ARITY, huginn::HThread*, int );
 void verify_signature( char const*, HHuginn::values_t&, int, types_t const&, huginn::HThread*, int );
 void verify_signature_by_class( char const*, HHuginn::values_t&, int, classes_t const&, huginn::HThread*, int );

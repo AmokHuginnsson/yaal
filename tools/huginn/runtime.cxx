@@ -247,7 +247,7 @@ void HRuntime::copy_text( HRuntime& source_ ) {
 	M_PROLOG
 	M_ASSERT( &source_ != this );
 	bool submoduleContext( _globalDefinitions.at( IDENTIFIER::KEYWORD::ASSERT ) != source_._globalDefinitions.at( IDENTIFIER::KEYWORD::ASSERT ) );
-	_idGenerator = source_._idGenerator;
+	_idGenerator = max( _idGenerator, source_._idGenerator );
 	_identifierIds = source_._identifierIds;
 	_identifierNames = source_._identifierNames;
 	_incrementalFrame = source_._incrementalFrame;

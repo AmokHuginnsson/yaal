@@ -41,6 +41,7 @@ public:
 	static HHuginn::class_t get_class( HRuntime* );
 	void raise( HThread*, yaal::hcore::HString const&, int, HClass const* = nullptr ) const;
 	bool post_io( huginn::HThread*, int long, int long, IO, int ) const;
+	void write( HThread*, HHuginn::value_t const&, int );
 	HClass const* exception_class( void ) const;
 	yaal::hcore::HStreamInterface::ptr_t raw( void ) const;
 private:

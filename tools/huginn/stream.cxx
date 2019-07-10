@@ -17,6 +17,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/hsocket.hxx"
 #include "hcore/unicode.hxx"
 #include "tools/hstringstream.hxx"
+#include "tools/streamtools.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -300,6 +301,45 @@ HHuginn::value_t HStream::write_line( huginn::HThread* thread_, HHuginn::value_t
 	HStream* s( static_cast<HStream*>( object_->raw() ) );
 	s->write_line_impl( thread_, get_string( values_[0] ), position_ );
 	return ( *object_ );
+	M_EPILOG
+}
+
+void HStream::write( HThread* thread_, HHuginn::value_t const& value_, int position_ ) {
+	M_PROLOG
+	if ( _stream->get_mode() == HStreamInterface::MODE::TEXT ) {
+		HCycleTracker cycleTracker;
+		*_stream << value_->to_string( thread_, value_, cycleTracker, position_ );
+	} else {
+		HHuginn::type_id_t::value_type t( value_->type_id().get() );
+		switch ( static_cast<HHuginn::TYPE>( t ) ) {
+			case ( HHuginn::TYPE::BOOLEAN ): {
+				*_stream << static_cast<HBoolean const*>( value_.raw() )->value();
+			} break;
+			case ( HHuginn::TYPE::INTEGER ): {
+				*_stream << static_cast<huginn::HInteger const*>( value_.raw() )->value();
+			} break;
+			case ( HHuginn::TYPE::REAL ): {
+				*_stream << static_cast<HReal const*>( value_.raw() )->value();
+			} break;
+			case ( HHuginn::TYPE::CHARACTER ): {
+				*_stream << static_cast<HCharacter const*>( value_.raw() )->value().get();
+			} break;
+			case ( HHuginn::TYPE::STRING ): {
+				*_stream << static_cast<HString const*>( value_.raw() )->value();
+			} break;
+			case ( HHuginn::TYPE::NUMBER ): {
+				*_stream << static_cast<HNumber const*>( value_.raw() )->value();
+			} break;
+			default: {
+				throw HHuginn::HHuginnRuntimeException(
+					a_type_name( value_->get_class() ).append( " has no binary stream write method." ),
+					thread_->current_frame()->file_id(),
+					position_
+				);
+			}
+		}
+	}
+	return;
 	M_EPILOG
 }
 

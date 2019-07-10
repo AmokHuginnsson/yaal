@@ -470,7 +470,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.greatest_common_divisor";
 		verify_arg_count( name, values_, 2, 2, thread_, position_ );
-		HHuginn::type_id_t t( verify_arg_type( name, values_, 0, { HHuginn::TYPE::NUMBER, HHuginn::TYPE::INTEGER }, ARITY::MULTIPLE, thread_, position_ ) );
+		HHuginn::type_id_t t( verify_arg_type( name, values_, 0, types_t{ HHuginn::TYPE::NUMBER, HHuginn::TYPE::INTEGER }, ARITY::MULTIPLE, thread_, position_ ) );
 		verify_arg_type( name, values_, 1, type_tag( t ), ARITY::MULTIPLE, thread_, position_ );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {

@@ -298,6 +298,47 @@ HHuginn::type_id_t verify_arg_type(
 	char const* name_,
 	HHuginn::values_t& values_,
 	int no_,
+	classes_t const& classes_,
+	ARITY argsArity_,
+	huginn::HThread* thread_,
+	int position_
+) {
+	M_PROLOG
+	HClass const* realClass( values_[no_]->get_class() );
+	if ( find( classes_.begin(), classes_.end(), realClass ) == classes_.end() ) {
+		hcore::HString no;
+		if ( argsArity_ == ARITY::MULTIPLE ) {
+			no = util::ordinal( no_ + 1 ).append( " " );
+		}
+		hcore::HString reqName;
+		for ( HClass const* c : classes_ ) {
+			if ( ! reqName.is_empty() ) {
+				reqName.append( ", " );
+			}
+			reqName.append( a_type_name( c ) );
+		}
+		throw HHuginn::HHuginnRuntimeException(
+			""_ys.append( name_ )
+				.append( "() " )
+				.append( no )
+				.append( "argument must be one of" )
+				.append( " {" )
+				.append( reqName )
+				.append( "}, not " )
+				.append( a_type_name( values_[no_]->get_class() ) )
+				.append( "." ),
+			thread_->current_frame()->file_id(),
+			position_
+		);
+	}
+	return ( realClass->type_id() );
+	M_EPILOG
+}
+
+HHuginn::type_id_t verify_arg_type(
+	char const* name_,
+	HHuginn::values_t& values_,
+	int no_,
 	types_t const& types_,
 	ARITY argsArity_,
 	huginn::HThread* thread_,

@@ -489,7 +489,7 @@ HHuginn::value_t HMatrix::apply( huginn::HThread* thread_, HHuginn::value_t* obj
 	M_PROLOG
 	char const name[] = "Matrix.apply";
 	verify_arg_count( name, values_, 1, 1, thread_, position_ );
-	HHuginn::type_id_t t( verify_arg_type( name, values_, 0, { HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::BOUND_METHOD }, ARITY::UNARY, thread_, position_ ) );
+	HHuginn::type_id_t t( verify_arg_type( name, values_, 0, types_t{ HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::BOUND_METHOD }, ARITY::UNARY, thread_, position_ ) );
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	HHuginn::value_t v;
 	if ( o->_data.type() == 0 ) {
