@@ -400,6 +400,7 @@ public:
 		: base_type(), _engine() {
 		return;
 	}
+	HIterator( HIterator const& ) = default;
 	template<typename other_const_qual_t>
 	HIterator( HIterator<other_const_qual_t> const& it_ )
 		: base_type(), _engine( it_._engine ) {

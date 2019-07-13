@@ -54,6 +54,7 @@ public:
 			: base_type(), _engine() {
 			return;
 		}
+		HIterator( HIterator const& ) = default;
 		HIterator& operator = ( HIterator const& it_ ) {
 			if ( &it_ != this )
 				_engine = it_._engine;

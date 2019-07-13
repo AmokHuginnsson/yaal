@@ -462,14 +462,14 @@ public:
 	~HPointer( void ) {
 		/* The make_pointer() helper part.
 		 */
-#if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7004001 )
+#if ( __GCC_VERSION__ >= 7002001 )
 #	pragma GCC diagnostic push
 #	pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif /* #if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7004001 ) */
 		if ( this->_object ) {
 			reset();
 		}
-#if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7004001 )
+#if ( __GCC_VERSION__ >= 7002001 )
 #	pragma GCC diagnostic pop
 #endif /* #if ( __GCC_VERSION__ >= 7002001 ) && ( __GCC_VERSION__ <= 7004001 ) */
 	}

@@ -277,6 +277,7 @@ public:
 	typedef iterator_interface<const_qual_t, iterator_category::forward> base_type;
 	HIterator( void )
 		: base_type(), _engine() {}
+	HIterator( HIterator const& ) = default;
 	template<typename other_const_qual_t>
 	HIterator( HIterator<other_const_qual_t> const& it_ )
 		: base_type(), _engine( it_._engine ) {
