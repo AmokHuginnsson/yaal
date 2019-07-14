@@ -267,7 +267,7 @@ HResourceInfo get_memory_size_info( void ) {
 	::memset( &vm, 0, sizeof ( vm ) );
 	size = sizeof ( vmtotal );
 	M_ENSURE( sysctl( mib, 2, &vm, &size, nullptr, 0 ) == 0 );
-	freeMemory = vm.t_free * pagesize;
+	freeMemory = static_cast<i64_t>( vm.t_free ) * pagesize;
 	totalMemory = physmem;
 #elif defined ( __HOST_OS_TYPE_SOLARIS__ ) /* #elif defined ( __HOST_OS_TYPE_FREEBSD__ ) #if defined ( __HOST_OS_TYPE_LINUX__ ) || defined ( __HOST_OS_TYPE_CYGWIN__ ) */
 	usedMemory = ru.ru_maxrss * ::getpagesize();

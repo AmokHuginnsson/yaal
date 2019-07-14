@@ -25,6 +25,20 @@
 #include <cstring>
 #endif /* #if ! defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 ) || ! defined( HAVE_STRNLEN ) || ( HAVE_STRNLEN == 0 ) */
 
+#if ! defined( HAVE_BASENAME_ARG_CONST )
+#	undef basename
+#	ifndef _LIBGEN_H_
+#		ifndef HAVE_BASENAME_IN_CSTRING
+#			ifdef HAVE_LIBGEN_H
+#				include <libgen.h>
+#			endif /* #ifdef HAVE_LIBGEN_H */
+#		endif /* not HAVE_BASENAME_IN_CSTRING */
+#	endif /* #	ifndef _LIBGEN_H_ */
+char const* basename_nc_impl( char const* x ) {
+	return ( basename( const_cast<char*>( x ) ) );
+}
+#endif /* #if ! defined( HAVE_BASENAME_ARG_CONST ) */
+
 #if ( defined( HAVE_GETHOSTBYNAME_R ) && ( ! defined( HAVE_GNU_GETHOSTBYNAME_R ) ) ) || ( defined( HAVE_GETHOSTBYADDR_R ) && ( ! defined( HAVE_GNU_GETHOSTBYADDR_R ) ) )
 #include <cerrno>
 #endif /* ( HAVE_GETHOSTBYNAME_R && not HAVE_GNU_GETHOSTBYNAME_R ) || ( HAVE_GETHOSTBYADDR_R && not HAVE_GNU_GETHOSTBYADDR_R ) */

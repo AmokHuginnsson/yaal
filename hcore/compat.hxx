@@ -14,8 +14,9 @@
 /*! \cond */
 #if ! defined( HAVE_BASENAME_ARG_CONST )
 #	undef basename
+char const* basename_nc_impl( char const* );
 inline char const* basename( char const* x ) {
-	return ( basename( const_cast<char*>( x ) ) );
+	return ( basename_nc_impl( x ) );
 }
 #endif /* #if ! defined( HAVE_BASENAME_ARG_CONST ) */
 
