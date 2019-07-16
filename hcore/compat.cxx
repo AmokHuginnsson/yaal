@@ -31,6 +31,8 @@
 #		ifndef HAVE_BASENAME_IN_CSTRING
 #			ifdef HAVE_LIBGEN_H
 #				include <libgen.h>
+#			elif defined( __MSVCXX__ )
+#				include <unistd.h>
 #			endif /* #ifdef HAVE_LIBGEN_H */
 #		endif /* not HAVE_BASENAME_IN_CSTRING */
 #	endif /* #	ifndef _LIBGEN_H_ */
