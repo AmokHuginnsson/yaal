@@ -3,7 +3,7 @@
 .PHONY: all debug release install install-debug install-release clean-debug clean-release purge mrproper
 .SECONDEXPANSION:
 
-PROJECT_NAME=$(notdir $(CURDIR))
+PROJECT_NAME=$(strip $(shell awk -F '=' '/PRJNAME\s*=/{print $$2}' Makefile.mk.in))
 
 ifneq ($(WINDOWS_PREFIX),)
 export PREFIX=$(WINDOWS_PREFIX)
