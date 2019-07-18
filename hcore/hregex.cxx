@@ -287,44 +287,53 @@ yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, yaal::h
 	int offset( 0 );
 	int endPos( 0 );
 	_utf8ConversionCache = text_;
-	while ( true ) {
+	while ( ! _isKilled_ ) {
+		if ( _utf8ConversionCache.is_empty() ) {
+			break;
+		}
 		_utf8ConversionCache = _utf8ConversionCache.substr( offset );
 		groups_t g( groups_impl( _utf8ConversionCache, match_ ) );
 		if ( g.is_empty() ) {
 			res.append( text_, endPos );
 			break;
 		}
+		offset = g[0].size();
+		if ( offset == 0 ) {
+			offset = 1;
+			res.append( *_utf8ConversionCache.begin() );
+			continue;
+		}
 		res.append( text_, endPos, g[0].start() );
 		for ( HString::const_iterator r( replacement_.begin() ), e( replacement_.end() ); r != e; ) {
-			if ( *r == BACK_REF ) {
-				++ r;
-				if ( r == e ) {
-					throw HRegexException( errMsg );
-				}
-				if ( *r == BACK_REF ) {
-					res.append( BACK_REF );
-					++ r;
-				} else {
-					HString idS;
-					while ( ( r != e ) && character_class<CHARACTER_CLASS::DIGIT>().has( *r ) ) {
-						idS.push_back( *r );
-						++ r;
-					}
-					if ( idS.is_empty() ) {
-						throw HRegexException( errMsg );
-					}
-					int id( lexical_cast<int>( idS ) );
-					if ( id >= g.get_size() ) {
-						throw HRegexException( "Invalid back-reference number in replacement string: "_ys.append( id ).append( "." ) );
-					}
-					res.append( text_, endPos + g[id].start(), g[id].size() );
-				}
-			} else {
+			if ( *r != BACK_REF ) {
 				res.push_back( *r );
 				++ r;
+				continue;
 			}
+			++ r;
+			if ( r == e ) {
+				throw HRegexException( errMsg );
+			}
+			if ( *r == BACK_REF ) {
+				res.append( BACK_REF );
+				++ r;
+				continue;
+			}
+			HString idS;
+			while ( ( r != e ) && character_class<CHARACTER_CLASS::DIGIT>().has( *r ) ) {
+				idS.push_back( *r );
+				++ r;
+			}
+			if ( idS.is_empty() ) {
+				throw HRegexException( errMsg );
+			}
+			int id( lexical_cast<int>( idS ) );
+			if ( id >= g.get_size() ) {
+				throw HRegexException( "Invalid back-reference number in replacement string: "_ys.append( id ).append( "." ) );
+			}
+			res.append( text_, endPos + g[id].start(), g[id].size() );
 		}
-		offset = ( g[0].start() + g[0].size() );
+		offset += g[0].start();
 		endPos += offset;
 	}
 	return ( res );
@@ -463,8 +472,17 @@ bool HRegex::HMatchIterator::operator == ( HMatchIterator const& mi_ ) const {
 HRegex::HMatchIterator& HRegex::HMatchIterator::operator ++ ( void ) {
 	M_PROLOG
 	M_ASSERT( _match._start != NO_MATCH );
+	if ( _string.is_empty() ) {
+		_match._size = 0;
+		_match._start = NO_MATCH;
+		return ( *this );
+	}
 	int start( NO_MATCH );
 	int matchSize( _match._size );
+	if ( matchSize == 0 ) {
+		matchSize = 1;
+		_string = _string.substr( 1 );
+	}
 	_string = _owner->matches_impl( _string, start, _match._size, _flags );
 	_match._start = start != NO_MATCH ? _match._start + start + matchSize : NO_MATCH;
 	return ( *this );
