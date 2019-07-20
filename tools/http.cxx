@@ -163,7 +163,7 @@ HResponse get( HRequest const& request_ ) {
 	HString contentType;
 	int contentLength( 0 );
 	HString filename;
-	while ( true ) {
+	while ( ! _isKilled_ ) {
 		URL url( parse_url( request ) );
 		if ( ( url.port != port ) || ( url.host != host ) ) {
 			stream = make_pointer<HSocket>( url.socketType );

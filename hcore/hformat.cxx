@@ -168,7 +168,7 @@ HFormat::HFormat( HString const& aFmt_ )
 	HFormatImpl::OToken t;
 	int idx = 0;
 	HFormatImpl& impl( *_impl );
-	while ( true ) {
+	while ( ! _isKilled_ ) {
 		t = HFormatImpl::OToken();
 		if ( impl.has_conversion( aFmt_, idx ) ) {
 			t = impl.next_conversion( aFmt_, idx );

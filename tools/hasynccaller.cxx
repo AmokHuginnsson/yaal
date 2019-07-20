@@ -50,7 +50,7 @@ void HAsyncCaller::register_call( priority_t prio_, call_t call_ ) {
 void HAsyncCaller::run( void ) {
 	M_PROLOG
 	HThread::set_name( "HAsyncCaller" );
-	while ( true ) {
+	while ( ! _isKilled_ ) {
 		_semaphore.wait();
 		HLock l( _mutex );
 		if ( _stopRequests > 0 ) {

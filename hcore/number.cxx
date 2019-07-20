@@ -98,7 +98,7 @@ struct HNumber::ElementaryFunctions {
 			n = s;
 			HNumber::integer_t precision( max( n.fractional_decimal_digits() + 1, value_.fractional_decimal_digits(), HARDCODED_MINIMUM_PRECISION ) );
 			HNumber tmp;
-			while ( true ) {
+			while ( ! _isKilled_ ) {
 				tmp = value_;
 				n.set_precision( precision );
 				tmp.set_precision( precision );

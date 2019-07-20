@@ -30,7 +30,7 @@ HPrepocessor::HIterator HPrepocessor::begin( void ) {
 	HString const spawner( "exec huginn " );
 	HString::const_iterator cur( _beg );
 	HString line;
-	while ( true ) {
+	while ( ! _isKilled_ ) {
 		HString::const_iterator eol( find( cur, _end, NEWLINE ) );
 		line.assign( cur, eol );
 		if (
@@ -60,7 +60,7 @@ HPrepocessor::HIterator HPrepocessor::end( void ) {
 yaal::hcore::HString::const_iterator HPrepocessor::HIterator::skip_comment( yaal::hcore::HString::const_iterator pos_ ) {
 	yaal::hcore::HString::const_iterator pos( pos_ );
 	yaal::hcore::HString::const_iterator goodPos( pos_ );
-	while ( true ) {
+	while ( ! _isKilled_ ) {
 		if ( *pos == COMMENT_START_CHAR1 ) {
 			/* we are possibly in comment, lets check next character */
 			++ pos;
