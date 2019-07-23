@@ -111,9 +111,22 @@ struct OCompiler {
 
 		/*! \brief Variable name to index map for variables defined in this scope.
 		 *
-		 * Used during local symbols dereferencing stage.
+		 * Used during local symbols dereferencing stage (in `resolve_symbols()`).
 		 */
 		local_variables_t _variables;
+
+		/*! \brief Tells if given scope has any local variables defined.
+		 *
+		 * Used during statements/expressions compilation, i.e. before local
+		 * symbols dereferencing stage (before `resolve_symbols()`)
+		 */
+		bool _hasLocalVariables;
+
+		/*! \brief Tells if direct children of a given scope has any local variables defined.
+		 *
+		 * Used during `HIf` object construction.
+		 */
+		bool _hasLocalVariablesInDirectChildren;
 
 		OScopeContext( OFunctionContext*, HStatement::statement_id_t, int, executing_parser::range_t );
 		HHuginn::expression_t& expression( void );

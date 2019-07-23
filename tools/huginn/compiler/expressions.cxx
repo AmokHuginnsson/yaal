@@ -329,10 +329,12 @@ void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executi
 	HHuginn::identifier_id_t varIdentifier( _runtime->identifier_id( value_ ) );
 	HHuginn::expression_t& expression( current_expression() );
 	int index( expression->add_execution_step( HExpression::OExecutionStep() ) );
+	OFunctionContext::scope_context_t sc( fc._scopeStack.top() );
+	sc->_hasLocalVariables = true;
 	_executionStepsBacklog.emplace_back(
 		OExecutionStep::OPERATION::DEFINE,
 		expression,
-		fc._scopeStack.top(),
+		sc,
 		!! _classContext && ! fc._isLambda ? _classContext->_classIdentifier : IDENTIFIER::INVALID,
 		index,
 		varIdentifier,

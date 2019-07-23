@@ -19,11 +19,13 @@ HIf::HIf(
 	HStatement::statement_id_t id_,
 	OCompiler::OScopeContext::active_scopes_t const& ifClause_,
 	HHuginn::scope_t const& elseClause_,
+	bool hasLocalVariables_,
 	int fileId_,
 	executing_parser::range_t range_
-) : HStatement( id_, fileId_, range_ ),
-	_ifClauses( ifClause_ ),
-	_elseClause( elseClause_ ) {
+) : HStatement( id_, fileId_, range_ )
+	, _ifClauses( ifClause_ )
+	, _elseClause( elseClause_ )
+	, _hasLocalVariables( hasLocalVariables_ ) {
 	for ( OCompiler::OActiveScope& as : _ifClauses ) {
 		as._scope->make_inline();
 	}
@@ -35,7 +37,9 @@ HIf::HIf(
 
 void HIf::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
-	thread_->create_scope_frame( this );
+	if ( _hasLocalVariables ) {
+		thread_->create_scope_frame( this );
+	}
 	HFrame* f( thread_->current_frame() );
 	bool done( false );
 	for (
@@ -60,7 +64,9 @@ void HIf::do_execute( huginn::HThread* thread_ ) const {
 	if ( ! done && f->can_continue() && !! _elseClause ) {
 		_elseClause->execute( thread_ );
 	}
-	thread_->pop_frame();
+	if ( _hasLocalVariables ) {
+		thread_->pop_frame();
+	}
 	return;
 	M_EPILOG
 }

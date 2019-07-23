@@ -191,7 +191,7 @@ void OCompiler::add_if_statement( executing_parser::range_t range_ ) {
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	OScopeContext& sc( *fc._scopeStack.top() );
-	HScope::statement_t ifStatement( make_pointer<HIf>( sc._statementId, sc._scopeChain, sc._else, _fileId, range_ ) );
+	HScope::statement_t ifStatement( make_pointer<HIf>( sc._statementId, sc._scopeChain, sc._else, sc._hasLocalVariables || sc._hasLocalVariablesInDirectChildren, _fileId, range_ ) );
 	sc._scopeChain.clear();
 	sc._else.reset();
 	pop_scope_context_low();
