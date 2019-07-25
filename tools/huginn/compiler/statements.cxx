@@ -130,7 +130,7 @@ void OCompiler::add_while_statement( executing_parser::range_t range_ ) {
 	HHuginn::scope_t scope( pop_scope_context() );
 	OScopeContext& sc( current_scope_context() );
 	HScope::statement_t whileStatement(
-		make_pointer<HWhile>( sc._statementId, current_expression(), scope, _fileId, range_ )
+		make_pointer<HWhile>( sc._statementId, current_expression(), scope, sc._hasLocalVariables || sc._hasLocalVariablesInDirectChildren, _fileId, range_ )
 	);
 	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );
