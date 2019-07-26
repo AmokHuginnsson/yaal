@@ -152,7 +152,7 @@ void OCompiler::add_for_statement( executing_parser::range_t range_ ) {
 	HHuginn::expression_t source( exprs.back() );
 	exprs.pop_back();
 	HScope::statement_t forStatement(
-		make_pointer<HFor>( sc._statementId, yaal::move( exprs ), source, scope, _fileId, range_ )
+		make_pointer<HFor>( sc._statementId, yaal::move( exprs ), source, scope, sc._hasLocalVariables || sc._hasLocalVariablesInDirectChildren, _fileId, range_ )
 	);
 	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );

@@ -24,12 +24,14 @@ HFor::HFor(
 	HHuginn::expressions_t&& control_,
 	HHuginn::expression_t const& source_,
 	HHuginn::scope_t const& loop_,
+	bool hasLocalVariables_,
 	int fileId_,
 	executing_parser::range_t range_
 ) : HStatement( id_, fileId_, range_ )
 	, _control( yaal::move( control_ ) )
 	, _source( source_ )
-	, _loop( loop_ ) {
+	, _loop( loop_ )
+	, _hasLocalVariables( hasLocalVariables_ ) {
 	_loop->make_inline();
 	return;
 }
@@ -60,7 +62,9 @@ inline HHuginn::value_t ensure_virtual_collection(
 
 void HFor::do_execute( HThread* thread_ ) const {
 	M_PROLOG
-	thread_->create_loop_frame( this );
+	if ( _hasLocalVariables ) {
+		thread_->create_loop_frame( this );
+	}
 	HFrame* f( thread_->current_frame() );
 	_source->execute( thread_ );
 	int sourcePosition( _source->position() );
@@ -77,7 +81,9 @@ void HFor::do_execute( HThread* thread_ ) const {
 			}
 		}
 	}
-	thread_->pop_frame();
+	if ( _hasLocalVariables ) {
+		thread_->pop_frame();
+	}
 	return;
 	M_EPILOG
 }
