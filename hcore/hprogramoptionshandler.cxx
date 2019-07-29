@@ -15,6 +15,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hstring.hxx"
 #include "hformat.hxx"
 #include "hchunk.hxx"
+#include "system.hxx"
 #include "hlog.hxx"
 #include "hcore.hxx"
 
@@ -75,14 +76,7 @@ HString make_path( HString const& sysconfDir_, HString const& rcName_, RC_PATHER
 		case ( RC_PATHER::PLACEMENT::HOME_ETC ):
 		case ( RC_PATHER::PLACEMENT::HOME ):
 		case ( RC_PATHER::PLACEMENT::HOME_CONFIG ): {
-#if ! defined( __MSVCXX__ )
-			char const USER_HOME_ENV[] = "HOME";
-#else /* #if ! defined( __MSVCXX__ ) */
-			char const USER_HOME_ENV[] = "USERPROFILE";
-#endif /* #else #if ! defined( __MSVCXX__ ) */
-			char const* homePath( ::getenv( USER_HOME_ENV ) );
-			M_ENSURE( homePath );
-			rcPath.assign( homePath );
+			rcPath.assign( system::home_path() );
 			if ( placement_ == RC_PATHER::PLACEMENT::HOME_ETC_CONF ) {
 				rcPath.append( "/etc/conf/" );
 			} else if ( placement_ == RC_PATHER::PLACEMENT::HOME_ETC ) {

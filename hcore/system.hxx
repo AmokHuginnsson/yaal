@@ -141,6 +141,12 @@ yaal::hcore::HString get_self_exec_path( void );
  */
 void set_close_on_exec( int fd );
 
+/*! \brief Get path to current user home directory.
+ *
+ * \return Current user home directory.
+ */
+yaal::hcore::HString home_path( void );
+
 }
 
 }

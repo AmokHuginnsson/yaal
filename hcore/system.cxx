@@ -143,18 +143,16 @@ int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, i
 	return ( ret );
 }
 
+user_id_t get_user_id( void ) {
+	return ( getuid() );
+}
+
 namespace {
 
 static int const GETPW_R_SIZE   = 1024;
 static int const GETGR_R_SIZE   = 1024;
 
-}
-
-user_id_t get_user_id( void ) {
-	return ( getuid() );
-}
-
-HString get_user_name( user_id_t uid_ ) {
+HString get_user_name_impl( user_id_t uid_, bool throwOnFailure_ ) {
 	M_PROLOG
 	passwd accountInfo;
 	int bufferSize( static_cast<int>( ::sysconf( _SC_GETPW_R_SIZE_MAX ) ) );
@@ -164,7 +162,18 @@ HString get_user_name( user_id_t uid_ ) {
 	HChunk buffer( bufferSize );
 	passwd* any( nullptr );
 	M_ENSURE( ! getpwuid_r( static_cast<uid_t>( uid_ ), &accountInfo, buffer.get<char>(), static_cast<size_t>( bufferSize ), &any ) );
+	if ( throwOnFailure_ && ! any ) {
+		throw HRuntimeException( "Cannot resolve user ID." );
+	}
 	return ( any ? HString( accountInfo.pw_name ) : HString( uid_ ) );
+	M_EPILOG
+}
+
+}
+
+HString get_user_name( user_id_t uid_ ) {
+	M_PROLOG
+	return ( get_user_name_impl( uid_, false ) );
 	M_EPILOG
 }
 
@@ -392,6 +401,36 @@ void set_close_on_exec( int fd_ ) {
 	M_ENSURE( ::fcntl( fd_, F_SETFD, fdFlags | FD_CLOEXEC ) == 0 );
 	return;
 	M_EPILOG
+}
+
+yaal::hcore::HString home_path( void ) {
+	char const* const homePath( ::getenv( HOME_ENV_VAR ) );
+	if ( homePath ) {
+		return ( homePath );
+	}
+	char const* loginFromEnv( ::getenv( "LOGIN" ) );
+	if ( ! loginFromEnv ) {
+		loginFromEnv = ::getenv( "USERNAME" );
+	}
+	if ( ! loginFromEnv ) {
+		loginFromEnv = ::getenv( "USER" );
+	}
+	if ( ! loginFromEnv ) {
+		loginFromEnv = ::getenv( "LOGNAME" );
+	}
+	HString login;
+	if ( loginFromEnv ) {
+		login.assign( loginFromEnv );
+	} else {
+		try {
+			login.assign( get_user_name_impl( get_user_id(), true ) );
+		} catch ( HException const& ) {
+			return ( HString() );
+		}
+	}
+	HString hp( "/home/" );
+	hp.append( login );
+	return ( hp );
 }
 
 }
