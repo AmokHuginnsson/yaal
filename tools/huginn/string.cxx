@@ -443,7 +443,7 @@ inline HHuginn::value_t starts_with( huginn::HThread* thread_, HHuginn::value_t*
 	verify_signature( "string.starts_with", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 	hcore::HString const& subject( static_cast<HString*>( object_->raw() )->value() );
 	hcore::HString const& object( get_string( values_[0] ) );
-	return ( thread_->runtime().boolean_value( object.is_empty() || ( subject.find( object ) == 0 ) ) );
+	return ( thread_->runtime().boolean_value( subject.starts_with( object ) ) );
 	M_EPILOG
 }
 
@@ -452,13 +452,7 @@ inline HHuginn::value_t ends_with( huginn::HThread* thread_, HHuginn::value_t* o
 	verify_signature( "string.ends_with", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 	hcore::HString const& subject( static_cast<HString*>( object_->raw() )->value() );
 	hcore::HString const& object( get_string( values_[0] ) );
-	int long pos( subject.find_last( object ) );
-	return (
-		thread_->runtime().boolean_value(
-			object.is_empty()
-			|| ( ( pos != HString::npos ) && ( pos == ( subject.get_length() - object.get_length() ) ) )
-		)
-	);
+	return ( thread_->runtime().boolean_value( subject.ends_with( object ) ) );
 	M_EPILOG
 }
 

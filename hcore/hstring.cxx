@@ -1580,6 +1580,17 @@ int HString::compare( size_type thisFrom_, size_type thisLen_, HString const& ot
 	M_EPILOG
 }
 
+bool HString::starts_with( HString const& other_ ) const {
+	size_type os( EXT_GET_SIZE( other_ ) );
+	return ( ( os <= GET_SIZE ) && ( compare( 0, os, other_, 0 ) == 0 ) );
+}
+
+bool HString::ends_with( HString const& other_ ) const {
+	size_type s( GET_SIZE );
+	size_type os( EXT_GET_SIZE( other_ ) );
+	return ( ( os <= s ) && ( compare( s - os, os, other_ ) == 0 ) );
+}
+
 code_point_t HString::front( void ) const {
 	if ( GET_SIZE == 0 ) {
 		M_THROW( err_msg( ERROR::INDEX_OOB ), 0 );
@@ -2651,6 +2662,7 @@ HUTF8String::reverse_iterator HUTF8String::crend( void ) const {
 }
 
 HUTF8String HUTF8String::substr( size_type from_, size_type len_ ) const {
+	M_PROLOG
 	if ( len_ == HString::npos ) {
 		len_ = HString::MAX_STRING_LENGTH;
 	}
@@ -2674,6 +2686,18 @@ HUTF8String HUTF8String::substr( size_type from_, size_type len_ ) const {
 	s._byteCount = endIt._byteIndex - it._byteIndex;
 	s._characterCount = safe_int::cast<int>( len_ );
 	return ( s );
+	M_EPILOG
+}
+
+code_point_t HUTF8String::front( void ) const {
+	M_PROLOG
+	M_ASSERT( _ptr );
+	if ( _characterCount < 1 ) {
+		M_THROW( err_msg( ERROR::INDEX_OOB ), 0 );
+	}
+	char const* ptr( _ptr + sizeof ( HUTF8String::OBufferMeta ) + _offset );
+	return ( utf8::decode_forward( ptr ) );
+	M_EPILOG
 }
 
 bool operator == ( char const* left_, HUTF8String const& right_ ) {

@@ -751,6 +751,18 @@ public:
 	/*! \brief Remove single character from end of this string.
 	 */
 	void pop_back( void );
+	/*! \brief Check if given string starts with other string.
+	 *
+	 * \param other - string to check against.
+	 * \return True iff \e other is a prefix of this string.
+	 */
+	bool starts_with( HString const& other ) const;
+	/*! \brief Check if given string ends with other string.
+	 *
+	 * \param other - string to check against.
+	 * \return True iff \e other is a suffix of this string.
+	 */
+	bool ends_with( HString const& other ) const;
 private:
 	void from_utf8( size_type, size_type, char const*, size_type );
 	void substr( HString&, size_type, size_type ) const;
@@ -1065,6 +1077,7 @@ public:
 	reverse_iterator crbegin( void ) const;
 	reverse_iterator crend( void ) const;
 	HUTF8String substr( size_type, size_type = HString::npos ) const;
+	code_point_t front( void ) const;
 private:
 	/*! Allocate memory buffer.
 	 *
