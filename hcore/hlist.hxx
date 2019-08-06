@@ -82,7 +82,7 @@ private:
 			return;
 		}
 		void connect( HElement* element_ ) {
-			if ( element_ == 0 ) {
+			if ( element_ == nullptr ) {
 				_previous = this;
 				_next = this;
 			} else {
@@ -652,7 +652,7 @@ public:
 	}
 	type_t& front( void ) {
 		M_PROLOG
-		if ( _hook == 0 ) {
+		if ( _hook == nullptr ) {
 			M_THROW( _errMsgHList_[ ERROR::EMPTY ], errno );
 		}
 		return ( _hook->_value );
@@ -660,7 +660,7 @@ public:
 	}
 	type_t const& front( void ) const {
 		M_PROLOG
-		if ( _hook == 0 ) {
+		if ( _hook == nullptr ) {
 			M_THROW( _errMsgHList_[ ERROR::EMPTY ], errno );
 		}
 		return ( _hook->_value );
@@ -668,7 +668,7 @@ public:
 	}
 	type_t& back( void ) {
 		M_PROLOG
-		if ( _hook == 0 ) {
+		if ( _hook == nullptr ) {
 			M_THROW( _errMsgHList_[ ERROR::EMPTY ], errno );
 		}
 		return ( _hook->_previous->_value );
@@ -676,7 +676,7 @@ public:
 	}
 	type_t const& back( void ) const {
 		M_PROLOG
-		if ( _hook == 0 ) {
+		if ( _hook == nullptr ) {
 			M_THROW( _errMsgHList_[ ERROR::EMPTY ], errno );
 		}
 		return ( _hook->_previous->_value );

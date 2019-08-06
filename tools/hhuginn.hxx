@@ -382,7 +382,7 @@ public:
 		return ( value( yaal::hcore::HString( val_ ) ) );
 	}
 	value_t value( std::nullptr_t ) {
-		return ( value( static_cast<void const*>( 0 ) ) );
+		return ( value( static_cast<void const*>( nullptr ) ) );
 	}
 	void finalize( void );
 private:

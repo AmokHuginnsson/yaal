@@ -136,7 +136,7 @@ void HGlobalScopeExceptionHandlingPolicy::handle_exception( void ) {
 HString demangle( char const* symbolName_ ) {
 	int status = 0;
 	HString symbol;
-	char* p( abi::__cxa_demangle( symbolName_, 0, 0, &status ) );
+	char* p( abi::__cxa_demangle( symbolName_, nullptr, nullptr, &status ) );
 	if ( p ) {
 		symbol = p;
 		memory::free( p );

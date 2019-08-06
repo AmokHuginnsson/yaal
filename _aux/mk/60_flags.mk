@@ -19,7 +19,8 @@ CXXWARNING_FLAGS = \
 						-Wold-style-cast \
 						-Woverloaded-virtual \
 						-Wsign-conversion \
-						-Wsign-promo
+						-Wsign-promo \
+						-Wzero-as-null-pointer-constant
 # -Waggregate-return makes no sense for C++ as it effectively banishes return by value.
 PURE_C_WARNING_FLAGS = \
 						-Waggregate-return \

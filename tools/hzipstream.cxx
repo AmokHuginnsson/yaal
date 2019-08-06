@@ -105,13 +105,13 @@ inline int fwd_deflateInit( T1 arg1_, T2 arg2_ ) {
 void HZipStream::init( void ) {
 	M_PROLOG
 	z_stream* zstream( _zStream.get<z_stream>() );
-	zstream->zalloc = Z_NULL;
-	zstream->zfree = Z_NULL;
-	zstream->opaque = Z_NULL;
+	zstream->zalloc = static_cast<decltype ( z_stream::zalloc )>( nullptr );
+	zstream->zfree = static_cast<decltype ( z_stream::zfree )>( nullptr );
+	zstream->opaque = static_cast<decltype ( z_stream::opaque )>( nullptr );
 	zstream->avail_in = 0;
-	zstream->next_in = Z_NULL;
+	zstream->next_in = static_cast<decltype ( z_stream::next_in )>( nullptr );
 	zstream->avail_out = static_cast<uInt>( _zBufferOut.get_size() );
-	zstream->next_out = Z_NULL;
+	zstream->next_out = static_cast<decltype ( z_stream::next_out )>( nullptr );
 	M_ENSURE( ( _error = ( ( _mode == MODE::DEFLATE ) ? fwd_deflateInit( zstream, _compressionLevel_ ) : fwd_inflateInit( zstream ) ) ) == Z_OK );
 	return;
 	M_EPILOG

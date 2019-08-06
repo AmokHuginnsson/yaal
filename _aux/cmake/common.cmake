@@ -252,6 +252,7 @@ use_cxx_compiler_flag( -Weffc++ )
 use_cxx_compiler_flag( -Wold-style-cast )
 use_cxx_compiler_flag( -Woverloaded-virtual )
 use_cxx_compiler_flag( -Wsign-promo )
+use_cxx_compiler_flag( -Wzero-as-null-pointer-constant )
 
 if ( "${CMAKE_BUILD_TYPE}" STREQUAL "debug" )
 	msg( "Generating debug build." )
