@@ -9,6 +9,7 @@
 #include "hcore/hstring.hxx"
 #include "hcore/harray.hxx"
 #include "hcore/htokenizer.hxx"
+#include "hcore/unicode.hxx"
 
 namespace yaal {
 
@@ -41,6 +42,72 @@ yaal::hcore::HString join( collection const& container_, yaal::hcore::HString co
 		value.append( to_string( part ) );
 	}
 	return ( value );
+}
+
+template<typename iterator_t>
+yaal::hcore::HString longest_common_prefix_impl( iterator_t first_, iterator_t last_, hcore::iterator_category::random_access ) {
+	yaal::hcore::HString prefix;
+	if ( first_ == last_ ) {
+		return ( yaal::hcore::HString() );
+	}
+	yaal::hcore::HString const& base( *first_ );
+	iterator_t first( first_ );
+	++ first;
+	yaal::hcore::HString::size_type len( 0 );
+	while ( true ) {
+		if ( base.get_length() <= len ) {
+			break;
+		}
+		yaal::code_point_t character( base[len] );
+		bool common( true );
+		for ( iterator_t it( first_ ); it != last_; ++ it ) {
+			if ( it->get_length() <= len ) {
+				common = false;
+				break;
+			}
+			if ( (*it)[len] != character ) {
+				common = false;
+				break;
+			}
+		}
+		if ( ! common ) {
+			break;
+		}
+		prefix.push_back( character );
+		++ len;
+	}
+	return ( prefix );
+}
+
+yaal::hcore::HString::size_type common_prefix_length(
+	yaal::hcore::HString const&,
+	yaal::hcore::HString const&,
+	yaal::hcore::HString::size_type = yaal::meta::min_signed<yaal::hcore::HString::size_type>::value
+);
+
+template<typename iterator_t>
+yaal::hcore::HString longest_common_prefix_impl( iterator_t first_, iterator_t last_, hcore::iterator_category::forward ) {
+	if ( first_ == last_ ) {
+		return ( yaal::hcore::HString() );
+	}
+	yaal::hcore::HString const& base( *first_ );
+	yaal::hcore::HString::size_type commonPrefixLength( base.get_length() );
+	++ first_;
+	while ( first_ != last_ ) {
+		commonPrefixLength = common_prefix_length( base, *first_, commonPrefixLength );
+		++ first_;
+	}
+	return ( base.left( commonPrefixLength ) );
+}
+
+template<typename iterator_t>
+yaal::hcore::HString longest_common_prefix( iterator_t first_, iterator_t last_ ) {
+	return ( longest_common_prefix_impl( first_, last_, typename hcore::iterator_traits<iterator_t>::category_type() ) );
+}
+
+template<typename collection>
+yaal::hcore::HString longest_common_prefix( collection const& container_ ) {
+	return ( longest_common_prefix( yaal::begin( container_ ), yaal::end( container_ ) ) );
 }
 
 /*! \brief The string distance metrics.

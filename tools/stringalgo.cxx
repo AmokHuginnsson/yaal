@@ -83,6 +83,19 @@ int distance( yaal::hcore::HString const& one_, yaal::hcore::HString const& two_
 	M_EPILOG
 }
 
+yaal::hcore::HString::size_type common_prefix_length(
+	yaal::hcore::HString const& str1_,
+	yaal::hcore::HString const& str2_,
+	yaal::hcore::HString::size_type maxLen_
+) {
+	HString::size_type len( 0 );
+	maxLen_ = min( str1_.get_length(), str2_.get_length(), maxLen_ );
+	while ( ( len < maxLen_ ) && ( str1_[len] == str2_[len] ) ) {
+		++ len;
+	}
+	return ( len );
+}
+
 }
 
 }
