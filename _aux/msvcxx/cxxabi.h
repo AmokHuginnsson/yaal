@@ -3,7 +3,7 @@
 
 namespace abi {
 
-char* __cxa_demangle( char const*, int, int, int* );
+char* __cxa_demangle( char const*, void*, void*, int* );
 
 }
 

@@ -220,7 +220,7 @@ struct context_hier {
 	static trait::true_type has_hier( typename real_class::base_type* );
 	template<typename real_class>
 	static trait::false_type has_hier( ... );
-	typedef typename existing_hier<static_cast<int>( sizeof ( has_hier<tType>( 0 ) ) ), tType>::type type;
+	typedef typename existing_hier<static_cast<int>( sizeof ( has_hier<tType>( nullptr ) ) ), tType>::type type;
 };
 
 /*! \brief Get type of existing superclass (in hierarchy) of a type.

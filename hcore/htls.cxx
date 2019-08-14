@@ -27,7 +27,11 @@ inline to_t old_style_cast( from_t val_ ) {
 
 key_t create( destruct_t destruct_ ) {
 	M_PROLOG
+#ifdef __HOST_OS_TYPE_CYGWIN__
+	pthread_key_t key( nullptr );
+#else
 	pthread_key_t key( 0 );
+#endif
 	M_ENSURE( pthread_key_create( &key, destruct_ ) == 0 );
 	return ( old_style_cast<key_t>( key ) );
 	M_EPILOG

@@ -1017,7 +1017,7 @@ struct functional_return_type {
 	static true_type has_result_type( typename strip_reference<typename real_class::result_type>::type* );
 	template<typename real_class>
 	static false_type has_result_type( ... );
-	static bool const has_result_type_value = ( sizeof ( has_result_type<T>( 0 ) ) == sizeof ( true_type ) );
+	static bool const has_result_type_value = ( sizeof ( has_result_type<T>( nullptr ) ) == sizeof ( true_type ) );
 
 	template<typename U, bool const has_type>
 	struct get
@@ -1086,51 +1086,51 @@ struct functional_argument_type {
 
 	template<typename U>
 	struct idx<U, 0> {
-		static bool const value = ( sizeof ( has_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+		static bool const value = ( sizeof ( has_argument_type<U>( nullptr ) ) == sizeof ( true_type ) );
 	};
 	template<typename U>
 	struct idx<U, 1> {
-		static bool const value = ( sizeof ( has_first_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+		static bool const value = ( sizeof ( has_first_argument_type<U>( nullptr ) ) == sizeof ( true_type ) );
 	};
 	template<typename U>
 	struct idx<U, 2> {
-		static bool const value = ( sizeof ( has_second_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+		static bool const value = ( sizeof ( has_second_argument_type<U>( nullptr ) ) == sizeof ( true_type ) );
 	};
 	template<typename U>
 	struct idx<U, 3> {
-		static bool const value = ( sizeof ( has_third_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+		static bool const value = ( sizeof ( has_third_argument_type<U>( nullptr ) ) == sizeof ( true_type ) );
 	};
 	template<typename U>
 	struct idx<U, 4> {
-		static bool const value = ( sizeof ( has_fourth_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+		static bool const value = ( sizeof ( has_fourth_argument_type<U>( nullptr ) ) == sizeof ( true_type ) );
 	};
 	template<typename U>
 	struct idx<U, 5> {
-		static bool const value = ( sizeof ( has_fifth_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+		static bool const value = ( sizeof ( has_fifth_argument_type<U>( nullptr ) ) == sizeof ( true_type ) );
 	};
 	template<typename U>
 	struct idx<U, 6> {
-		static bool const value = ( sizeof ( has_sixth_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+		static bool const value = ( sizeof ( has_sixth_argument_type<U>( nullptr ) ) == sizeof ( true_type ) );
 	};
 	template<typename U>
 	struct idx<U, 7> {
-		static bool const value = ( sizeof ( has_seventh_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+		static bool const value = ( sizeof ( has_seventh_argument_type<U>( nullptr ) ) == sizeof ( true_type ) );
 	};
 	template<typename U>
 	struct idx<U, 8> {
-		static bool const value = ( sizeof ( has_eighth_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+		static bool const value = ( sizeof ( has_eighth_argument_type<U>( nullptr ) ) == sizeof ( true_type ) );
 	};
 	template<typename U>
 	struct idx<U, 9> {
-		static bool const value = ( sizeof ( has_ninth_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+		static bool const value = ( sizeof ( has_ninth_argument_type<U>( nullptr ) ) == sizeof ( true_type ) );
 	};
 	template<typename U>
 	struct idx<U, 10> {
-		static bool const value = ( sizeof ( has_tenth_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+		static bool const value = ( sizeof ( has_tenth_argument_type<U>( nullptr ) ) == sizeof ( true_type ) );
 	};
 	template<typename U>
 	struct idx<U, 11> {
-		static bool const value = ( sizeof ( has_eleventh_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+		static bool const value = ( sizeof ( has_eleventh_argument_type<U>( nullptr ) ) == sizeof ( true_type ) );
 	};
 
 	template<typename U, int const no>
@@ -1271,7 +1271,7 @@ struct class_type {
 	static true_type has_this_type( typename strip_reference<typename real_class::this_type>::type* );
 	template<typename real_class>
 	static false_type has_this_type( ... );
-	static bool const is_functional = ( sizeof ( has_this_type<class_t>( 0 ) ) == sizeof ( true_type ) );
+	static bool const is_functional = ( sizeof ( has_this_type<class_t>( nullptr ) ) == sizeof ( true_type ) );
 	template<typename U, int const no>
 	struct get
 		{ typedef no_type type; };
@@ -1390,18 +1390,18 @@ struct functional_argument_count {
 	template<typename real_class>
 	static false_type has_eleventh_argument_type( ... );
 
-	static bool const ta0 = sizeof ( has_argument_type<T>( 0 ) ) == sizeof ( true_type );
-	static bool const ta1 = sizeof ( has_first_argument_type<T>( 0 ) ) == sizeof ( true_type );
-	static bool const ta2 = sizeof ( has_second_argument_type<T>( 0 ) ) == sizeof ( true_type );
-	static bool const ta3 = sizeof ( has_third_argument_type<T>( 0 ) ) == sizeof ( true_type );
-	static bool const ta4 = sizeof ( has_fourth_argument_type<T>( 0 ) ) == sizeof ( true_type );
-	static bool const ta5 = sizeof ( has_fifth_argument_type<T>( 0 ) ) == sizeof ( true_type );
-	static bool const ta6 = sizeof ( has_sixth_argument_type<T>( 0 ) ) == sizeof ( true_type );
-	static bool const ta7 = sizeof ( has_seventh_argument_type<T>( 0 ) ) == sizeof ( true_type );
-	static bool const ta8 = sizeof ( has_eighth_argument_type<T>( 0 ) ) == sizeof ( true_type );
-	static bool const ta9 = sizeof ( has_ninth_argument_type<T>( 0 ) ) == sizeof ( true_type );
-	static bool const ta10 = sizeof ( has_tenth_argument_type<T>( 0 ) ) == sizeof ( true_type );
-	static bool const ta11 = sizeof ( has_eleventh_argument_type<T>( 0 ) ) == sizeof ( true_type );
+	static bool const ta0 = sizeof ( has_argument_type<T>( nullptr ) ) == sizeof ( true_type );
+	static bool const ta1 = sizeof ( has_first_argument_type<T>( nullptr ) ) == sizeof ( true_type );
+	static bool const ta2 = sizeof ( has_second_argument_type<T>( nullptr ) ) == sizeof ( true_type );
+	static bool const ta3 = sizeof ( has_third_argument_type<T>( nullptr ) ) == sizeof ( true_type );
+	static bool const ta4 = sizeof ( has_fourth_argument_type<T>( nullptr ) ) == sizeof ( true_type );
+	static bool const ta5 = sizeof ( has_fifth_argument_type<T>( nullptr ) ) == sizeof ( true_type );
+	static bool const ta6 = sizeof ( has_sixth_argument_type<T>( nullptr ) ) == sizeof ( true_type );
+	static bool const ta7 = sizeof ( has_seventh_argument_type<T>( nullptr ) ) == sizeof ( true_type );
+	static bool const ta8 = sizeof ( has_eighth_argument_type<T>( nullptr ) ) == sizeof ( true_type );
+	static bool const ta9 = sizeof ( has_ninth_argument_type<T>( nullptr ) ) == sizeof ( true_type );
+	static bool const ta10 = sizeof ( has_tenth_argument_type<T>( nullptr ) ) == sizeof ( true_type );
+	static bool const ta11 = sizeof ( has_eleventh_argument_type<T>( nullptr ) ) == sizeof ( true_type );
 
 	template<typename U, int const no, bool const exists>
 	struct get

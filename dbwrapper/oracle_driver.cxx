@@ -258,9 +258,11 @@ void* oracle_query_execute( ODBLink& dbLink_, void* data_ ) {
 	params_t params;
 	do {
 		ub2 stmtType( static_cast<ub2>( -1 ) );
-		if ( ( ( *query->_status ) = OCIAttrGet( query->_statement,
-						OCI_HTYPE_STMT, &stmtType, 0, OCI_ATTR_STMT_TYPE,
-						query->_error ) ) != OCI_SUCCESS ) {
+		if (
+			( ( *query->_status ) = OCIAttrGet(
+				query->_statement, OCI_HTYPE_STMT, &stmtType, nullptr, OCI_ATTR_STMT_TYPE, query->_error
+			) ) != OCI_SUCCESS
+		) {
 			fail = true;
 			break;
 		}
@@ -302,9 +304,11 @@ void* oracle_query_execute( ODBLink& dbLink_, void* data_ ) {
 			log( LOG_LEVEL::INFO ) << _logTag_ <<  __FUNCTION__ << ": " << dbrs_error( dbLink_, nullptr ) << endl;
 		}
 		int fc( -1 );
-		if ( ( ( *query->_status ) = OCIAttrGet( query->_statement,
-						OCI_HTYPE_STMT, &fc, 0, OCI_ATTR_PARAM_COUNT,
-						query->_error ) ) != OCI_SUCCESS ) {
+		if (
+			( ( *query->_status ) = OCIAttrGet(
+				query->_statement, OCI_HTYPE_STMT, &fc, nullptr, OCI_ATTR_PARAM_COUNT, query->_error
+			) ) != OCI_SUCCESS
+		) {
 			fail = true;
 			break;
 		}
@@ -317,9 +321,10 @@ void* oracle_query_execute( ODBLink& dbLink_, void* data_ ) {
 				if ( ( ( *query->_status ) = OCIParamGet( query->_statement,
 								OCI_HTYPE_STMT, query->_error,
 								reinterpret_cast<void**>( &params[i] ), static_cast<ub4>( i + 1 ) ) ) == OCI_SUCCESS ) {
-					if ( ( ( *query->_status ) = OCIAttrGet( params[i],
-									OCI_DTYPE_PARAM, &fi._size, 0, OCI_ATTR_DATA_SIZE,
-									query->_error ) ) == OCI_SUCCESS ) {
+					if (
+						( ( *query->_status ) = OCIAttrGet(
+							params[i], OCI_DTYPE_PARAM, &fi._size, nullptr, OCI_ATTR_DATA_SIZE, query->_error
+						) ) == OCI_SUCCESS ) {
 						maxRowSize += fi._size;
 					} else {
 						fail = true;
@@ -504,10 +509,13 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* dataR_ ) {
 			}
 		}
 	}
-	if ( ( ( *query->_status ) = OCIAttrGet( query->_statement,
-					OCI_HTYPE_STMT, &rows, 0, OCI_ATTR_ROW_COUNT,
-					query->_error ) ) != OCI_SUCCESS )
+	if (
+		( ( *query->_status ) = OCIAttrGet(
+			query->_statement, OCI_HTYPE_STMT, &rows, nullptr, OCI_ATTR_ROW_COUNT, query->_error
+		) ) != OCI_SUCCESS
+	) {
 		rows = -1;
+	}
 	return ( rows );
 }
 

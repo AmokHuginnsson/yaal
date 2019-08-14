@@ -52,7 +52,7 @@ rlimit _nofile_{ RLIM_INFINITY, RLIM_INFINITY };
 
 namespace abi {
 
-char* __cxa_demangle( char const* a, int, int, int* ) {
+char* __cxa_demangle( char const* a, void*, void*, int* ) {
 	char* buf = memory::calloc<char>( MAX_SYMBOL_NAME_LEN );
 	::UnDecorateSymbolName( a, buf, MAX_SYMBOL_NAME_LEN - 1, 0 );
 	return ( buf );

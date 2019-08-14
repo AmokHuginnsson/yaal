@@ -48,7 +48,7 @@ struct iterator_traits {
 	template<typename U>
 	struct get_category<U, true>
 		{ typedef typename U::category_type type; };
-	typedef typename get_category<iterator, sizeof ( has_category<iterator>( 0 ) ) == sizeof ( trait::true_type )>::type category_type;
+	typedef typename get_category<iterator, sizeof ( has_category<iterator>( nullptr ) ) == sizeof ( trait::true_type )>::type category_type;
 };
 
 template<typename T>
