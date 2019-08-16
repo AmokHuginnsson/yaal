@@ -29,6 +29,7 @@ struct iterator_interface {
 	typedef typename trait::make_reference<T>::type reference;
 	typedef typename trait::add_pointer<T>::type pointer;
 	typedef category category_type;
+	typedef int long size_type;
 	virtual ~iterator_interface( void ) {}
 };
 
@@ -49,6 +50,7 @@ struct iterator_traits {
 	struct get_category<U, true>
 		{ typedef typename U::category_type type; };
 	typedef typename get_category<iterator, sizeof ( has_category<iterator>( nullptr ) ) == sizeof ( trait::true_type )>::type category_type;
+	typedef typename iterator::size_type size_type;
 };
 
 template<typename T>
@@ -57,6 +59,7 @@ struct iterator_traits<T*> {
 	typedef T& reference;
 	typedef T* pointer;
 	typedef typename iterator_category::random_access category_type;
+	typedef int long size_type;
 };
 
 }
@@ -263,6 +266,7 @@ public:
 	typedef typename iterator_traits<iterator_t>::pointer pointer;
 	typedef typename iterator_traits<iterator_t>::reference reference;
 	typedef typename iterator_traits<iterator_t>::category_type category_type;
+	typedef typename iterator_traits<iterator_t>::size_type size_type;
 	HReverseIterator( void )
 		: _iterator() {
 		return;
@@ -429,6 +433,7 @@ public:
 	typedef typename iterator_traits<iterator_t>::pointer pointer;
 	typedef typename trait::strip_reference<typename iterator_traits<iterator_t>::reference>::type&& reference;
 	typedef typename iterator_traits<iterator_t>::category_type category_type;
+	typedef typename iterator_traits<iterator_t>::size_type size_type;
 	HMoveIterator( void )
 		: _iterator() {
 		return;
@@ -647,6 +652,272 @@ public:
 template<typename container_t>
 HCyclicIterator<container_t> cyclic_iterator( container_t& container_ ) {
 	return ( HCyclicIterator<container_t>( &container_, container_.begin() ) );
+}
+
+template<typename iterator_t, typename projection_t>
+class HView {
+public:
+	template<typename T, typename category>
+	class HIterator;
+	typedef decltype( trait::declval<projection_t>()( trait::declval<typename iterator_t::value_type>() ) ) value_t;
+	typedef typename trait::decay<value_t>::type value_type;
+	typedef HIterator<value_type, typename hcore::iterator_traits<iterator_t>::category_type> iterator;
+	typedef HIterator<value_type const, typename hcore::iterator_traits<iterator_t>::category_type> const_iterator;
+private:
+	iterator_t _first;
+	iterator_t _last;
+	projection_t _projection;
+public:
+	HView( iterator_t first_, iterator_t last_, projection_t projection_ )
+		: _first( first_ )
+		, _last( last_ )
+		, _projection( projection_ ) {
+	}
+	iterator begin( void ) {
+		return ( iterator( this, _first ) );
+	}
+	iterator end( void ) {
+		return ( iterator( this, _last ) );
+	}
+	const_iterator begin( void ) const {
+		return ( const_iterator( this, _first ) );
+	}
+	const_iterator end( void ) const {
+		return ( const_iterator( this, _last ) );
+	}
+	projection_t const& projection( void ) const {
+		return ( _projection );
+	}
+};
+
+template<typename iterator_t, typename projection_t>
+template<typename const_qual_t>
+class HView<iterator_t, projection_t>::HIterator<const_qual_t, iterator_category::random_access> : public iterator_interface<const_qual_t, iterator_category::random_access> {
+public:
+	typedef HView<iterator_t, projection_t> owner_t;
+	typedef HIterator<const_qual_t, iterator_category::random_access> this_type;
+	typedef iterator_interface<const_qual_t, iterator_category::random_access> base_type;
+	typedef typename base_type::value_type value_type;
+	typedef typename base_type::pointer pointer;
+	typedef typename base_type::reference reference;
+	typedef typename base_type::category_type category_type;
+	typedef typename base_type::size_type size_type;
+private:
+	owner_t const* _owner;
+	iterator_t _impl;
+public:
+	HIterator( void )
+		: base_type()
+		, _owner( nullptr )
+		, _impl() {
+		return;
+	}
+	HIterator( HIterator const& it_ ) = default;
+	template<typename other_const_qual_t, typename>
+	HIterator( HIterator<other_const_qual_t, iterator_category::random_access> const& it_ )
+		: base_type()
+		, _owner( it_._owner )
+		, _impl( it_._impl ) {
+		static_assert(
+			( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ),
+			"creating non-const iterator instance discards qualifiers"
+		);
+		return;
+	}
+	HIterator& operator = ( HIterator const& it_ ) = default;
+	HIterator& operator ++ ( void ) {
+		++ _impl;
+		return ( *this );
+	}
+	HIterator const operator ++ ( int ) {
+		HIterator it( *this );
+		operator ++ ();
+		return ( it );
+	}
+	HIterator& operator -- ( void ) {
+		-- _impl;
+		return ( *this );
+	}
+	HIterator const operator -- ( int ) {
+		HIterator it( *this );
+		operator -- ();
+		return ( it );
+	}
+	HIterator operator + ( size_type off_ ) const {
+		HIterator it( _owner, _impl + off_ );
+		return ( it );
+	}
+	HIterator& operator += ( size_type off_ ) {
+		_impl += off_;
+		return ( *this );
+	}
+	HIterator operator - ( size_type off_ ) const {
+		HIterator it( _owner, _impl - off_ );
+		return ( it );
+	}
+	HIterator& operator -= ( size_type off_ ) {
+		_impl -= off_;
+		return ( *this );
+	}
+	size_type operator - ( HIterator const& it ) const {
+		M_ASSERT( _owner == it._owner );
+		return ( _impl - it._impl );
+	}
+	const_qual_t& operator* ( void ) {
+		M_ASSERT( _owner );
+		return ( const_cast<const_qual_t&>( _owner->projection()( *_impl ) ) );
+	}
+	const_qual_t& operator* ( void ) const {
+		M_ASSERT( _owner );
+		return ( _owner->projection()( *_impl ) );
+	}
+	const_qual_t* operator-> ( void ) {
+		M_ASSERT( _owner );
+		return ( const_cast<const_qual_t*>( &_owner->projection()( *_impl ) ) );
+	}
+	const_qual_t* operator-> ( void ) const {
+		M_ASSERT( _owner );
+		return ( &_owner->projection()( *_impl ) );
+	}
+	template<typename other_const_qual_t>
+	bool operator == ( HIterator<other_const_qual_t, iterator_category::random_access> const& it ) const {
+		M_ASSERT( _owner == it._owner );
+		return ( _impl == it._impl );
+	}
+	template<typename other_const_qual_t>
+	bool operator != ( HIterator<other_const_qual_t, iterator_category::random_access> const& it ) const {
+		M_ASSERT( _owner == it._owner );
+		return ( _impl != it._impl );
+	}
+	template<typename other_const_qual_t>
+	bool operator < ( HIterator<other_const_qual_t, iterator_category::random_access> const& it ) const {
+		M_ASSERT( _owner == it._owner );
+		return ( _impl < it._impl );
+	}
+	template<typename other_const_qual_t>
+	bool operator <= ( HIterator<other_const_qual_t, iterator_category::random_access> const& it ) const {
+		M_ASSERT( _owner == it._owner );
+		return ( _impl <= it._impl );
+	}
+	template<typename other_const_qual_t>
+	bool operator > ( HIterator<other_const_qual_t, iterator_category::random_access> const& it ) const {
+		M_ASSERT( _owner == it._owner );
+		return ( _impl > it._impl );
+	}
+	template<typename other_const_qual_t>
+	bool operator >= ( HIterator<other_const_qual_t, iterator_category::random_access> const& it ) const {
+		M_ASSERT( _owner == it._owner );
+		return ( _impl >= it._impl );
+	}
+private:
+	HIterator( owner_t const* owner_, iterator_t impl_ )
+		: base_type()
+		, _owner( owner_ )
+		, _impl( impl_ ) {
+	}
+private:
+	template<typename iterator, typename projection>
+	friend class HView;
+};
+
+template<typename iterator_t, typename projection_t>
+template<typename const_qual_t>
+class HView<iterator_t, projection_t>::HIterator<const_qual_t, iterator_category::forward> : public iterator_interface<const_qual_t, iterator_category::forward> {
+public:
+	typedef HView<iterator_t, projection_t> owner_t;
+	typedef HIterator<const_qual_t, iterator_category::forward> this_type;
+	typedef iterator_interface<const_qual_t, iterator_category::forward> base_type;
+	typedef typename base_type::value_type value_type;
+	typedef typename base_type::pointer pointer;
+	typedef typename base_type::reference reference;
+	typedef typename base_type::category_type category_type;
+	typedef typename base_type::size_type size_type;
+private:
+	owner_t const* _owner;
+	iterator_t _impl;
+public:
+	HIterator( void )
+		: base_type()
+		, _owner( nullptr )
+		, _impl() {
+		return;
+	}
+	HIterator( HIterator const& it_ ) = default;
+	template<typename other_const_qual_t, typename>
+	HIterator( HIterator<other_const_qual_t, iterator_category::forward> const& it_ )
+		: base_type()
+		, _owner( it_._owner )
+		, _impl( it_._impl ) {
+		static_assert(
+			( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ),
+			"creating non-const iterator instance discards qualifiers"
+		);
+		return;
+	}
+	HIterator& operator = ( HIterator const& it_ ) = default;
+	HIterator& operator ++ ( void ) {
+		++ _impl;
+		return ( *this );
+	}
+	HIterator const operator ++ ( int ) {
+		HIterator it( *this );
+		operator ++ ();
+		return ( it );
+	}
+	HIterator& operator -- ( void ) {
+		-- _impl;
+		return ( *this );
+	}
+	HIterator const operator -- ( int ) {
+		HIterator it( *this );
+		operator -- ();
+		return ( it );
+	}
+	const_qual_t& operator* ( void ) {
+		M_ASSERT( _owner );
+		return ( const_cast<const_qual_t&>( _owner->projection()( *_impl ) ) );
+	}
+	const_qual_t& operator* ( void ) const {
+		M_ASSERT( _owner );
+		return ( _owner->projection()( *_impl ) );
+	}
+	const_qual_t* operator-> ( void ) {
+		M_ASSERT( _owner );
+		return ( const_cast<const_qual_t*>( &_owner->projection()( *_impl ) ) );
+	}
+	const_qual_t* operator-> ( void ) const {
+		M_ASSERT( _owner );
+		return ( &_owner->projection()( *_impl ) );
+	}
+	template<typename other_const_qual_t>
+	bool operator == ( HIterator<other_const_qual_t, iterator_category::forward> const& it ) const {
+		M_ASSERT( _owner == it._owner );
+		return ( _impl == it._impl );
+	}
+	template<typename other_const_qual_t>
+	bool operator != ( HIterator<other_const_qual_t, iterator_category::forward> const& it ) const {
+		M_ASSERT( _owner == it._owner );
+		return ( _impl != it._impl );
+	}
+private:
+	HIterator( owner_t const* owner_, iterator_t impl_ )
+		: base_type()
+		, _owner( owner_ )
+		, _impl( impl_ ) {
+	}
+private:
+	template<typename iterator, typename projection>
+	friend class HView;
+};
+
+template<typename iterator_t, typename projection_t>
+HView<iterator_t, projection_t> view( iterator_t first_, iterator_t last_, projection_t projection_ ) {
+	return ( HView<iterator_t, projection_t>( first_, last_, projection_ ) );
+}
+
+template<typename collection_t, typename projection_t>
+HView<typename collection_t::const_iterator, projection_t> view( collection_t const& collection_, projection_t projection_ ) {
+	return ( HView<typename collection_t::const_iterator, projection_t>( begin( collection_ ), end( collection_ ), projection_ ) );
 }
 
 /*! \brief (Back)Insertion concept for HInsertingIterator.

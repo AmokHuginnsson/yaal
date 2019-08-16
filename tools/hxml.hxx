@@ -503,6 +503,7 @@ struct iterator_traits<tools::HXml::HConstIterator> {
 	typedef tools::HXml::HConstNodeProxy reference;
 	typedef tools::HXml::HConstNodeProxy pointer;
 	typedef typename iterator_category::forward category_type;
+	typedef int long size_type;
 };
 
 template<>
@@ -511,6 +512,7 @@ struct iterator_traits<tools::HXml::HIterator> {
 	typedef tools::HXml::HNodeProxy reference;
 	typedef tools::HXml::HNodeProxy pointer;
 	typedef typename iterator_category::forward category_type;
+	typedef int long size_type;
 };
 
 }
