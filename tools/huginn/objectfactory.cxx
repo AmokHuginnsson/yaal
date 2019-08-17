@@ -74,6 +74,10 @@ namespace set {
 HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
 }
 
+namespace heap {
+HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
+}
+
 namespace blob {
 HHuginn::class_t get_class( HRuntime*, HObjectFactory* );
 }
@@ -116,6 +120,7 @@ HObjectFactory::HObjectFactory( HRuntime* runtime_ )
 	, _order( order::get_class( runtime_, this ) )
 	, _lookup( lookup::get_class( runtime_, this ) )
 	, _set( set::get_class( runtime_, this ) )
+	, _heap( heap::get_class( runtime_, this ) )
 	, _blob( blob::get_class( runtime_, this ) )
 	, _exception()
 	, _stackFrameInfo()
@@ -140,6 +145,7 @@ HObjectFactory::HObjectFactory( HRuntime* runtime_ )
 	, _lookupPool( this, _lookup.raw() )
 	, _orderPool( this, _order.raw() )
 	, _setPool( this, _set.raw() )
+	, _heapPool( this, _heap.raw() )
 	, _blobPool( this, _blob.raw() ) {
 	return;
 }
@@ -172,6 +178,7 @@ void HObjectFactory::register_builtin_classes( void ) {
 	_runtime->huginn()->register_class( _order, HHuginn::VISIBILITY::GLOBAL );
 	_runtime->huginn()->register_class( _lookup, HHuginn::VISIBILITY::GLOBAL );
 	_runtime->huginn()->register_class( _set, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _heap, HHuginn::VISIBILITY::GLOBAL );
 	_runtime->huginn()->register_class( _blob, HHuginn::VISIBILITY::GLOBAL );
 
 	_runtime->huginn()->register_class( _exception, HHuginn::VISIBILITY::GLOBAL );

@@ -21,6 +21,7 @@
 #include "tools/huginn/order.hxx"
 #include "tools/huginn/lookup.hxx"
 #include "tools/huginn/set.hxx"
+#include "tools/huginn/heap.hxx"
 #include "tools/huginn/blob.hxx"
 #include "tools/huginn/taggedvalue.hxx"
 #include "tools/huginn/object.hxx"
@@ -224,6 +225,7 @@ class HObjectFactory final : public HObjectFactoryBase {
 	HHuginn::class_t _order;
 	HHuginn::class_t _lookup;
 	HHuginn::class_t _set;
+	HHuginn::class_t _heap;
 	HHuginn::class_t _blob;
 	HHuginn::class_t _exception;
 	HHuginn::class_t _stackFrameInfo;
@@ -249,6 +251,7 @@ class HObjectFactory final : public HObjectFactoryBase {
 	HObjectPool<huginn::HLookup, POOL_TYPE::COLLECTION> _lookupPool;
 	HObjectPool<huginn::HOrder, POOL_TYPE::COLLECTION> _orderPool;
 	HObjectPool<huginn::HSet, POOL_TYPE::COLLECTION> _setPool;
+	HObjectPool<huginn::HHeap> _heapPool;
 	HObjectPool<huginn::HBlob> _blobPool;
 public:
 	HObjectFactory( HRuntime* );
@@ -306,6 +309,9 @@ public:
 	}
 	HHuginn::value_t create_set( void ) const {
 		return ( _setPool.create() );
+	}
+	HHuginn::value_t create_heap( void ) const {
+		return ( _heapPool.create() );
 	}
 	HHuginn::value_t create_blob( yaal::hcore::HChunk&& chunk_ ) const {
 		return ( _blobPool.create( yaal::move( chunk_ ) ) );
@@ -405,6 +411,9 @@ public:
 	}
 	huginn::HClass const* set_class( void ) const {
 		return ( _set.raw() );
+	}
+	huginn::HClass const* heap_class( void ) const {
+		return ( _heap.raw() );
 	}
 	huginn::HClass const* blob_class( void ) const {
 		return ( _blob.raw() );

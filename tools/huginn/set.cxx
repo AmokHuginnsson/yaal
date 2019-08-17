@@ -52,7 +52,7 @@ protected:
 	virtual void do_invalidate( void ) override {
 		_it = _set->end();
 	}
-	virtual void do_skip( void ) override {
+	virtual void do_skip( HThread*, int ) override {
 		++ _it;
 		++ _skip;
 	}
@@ -91,7 +91,7 @@ protected:
 	virtual void do_invalidate( void ) override {
 		_it = _set->rend();
 	}
-	virtual void do_skip( void ) override {
+	virtual void do_skip( HThread*, int ) override {
 		++ _it;
 		++ _skip;
 	}
@@ -302,7 +302,7 @@ void HSet::erase( huginn::HThread* thread_, HHuginn::value_t const& key_, int po
 	HAnchorGuard<HSet> ag( *this, thread_, position_ );
 	values_t::iterator it( _data.find( key_ ) );
 	if ( it != _data.end() ) {
-		skip( it.node_id() );
+		skip( thread_, it.node_id(), position_ );
 		_data.erase( it );
 	}
 	return;

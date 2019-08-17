@@ -106,6 +106,7 @@ public:
 		ORDER,
 		LOOKUP,
 		SET,
+		HEAP,
 		BLOB,
 		OBSERVER,
 		REFERENCE,

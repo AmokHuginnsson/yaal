@@ -42,7 +42,7 @@ protected:
 class HInvalidatingIterable : public HIterable, public HHuginn::HReferenceTracker {
 public:
 	HInvalidatingIterable( HClass const* );
-	void skip( void const* );
+	void skip( HThread*, void const*, int );
 };
 
 }

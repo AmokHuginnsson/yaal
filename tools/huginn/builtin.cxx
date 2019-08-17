@@ -136,6 +136,17 @@ HHuginn::value_t set( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::valu
 	M_EPILOG
 }
 
+HHuginn::value_t heap( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	HHuginn::value_t v( thread_->object_factory().create_heap() );
+	huginn::HHeap* h( static_cast<huginn::HHeap*>( v.raw() ) );
+	for ( HHuginn::value_t const& e : values_ ) {
+		h->push( thread_, e, position_ );
+	}
+	return ( v );
+	M_EPILOG
+}
+
 HHuginn::value_t blob( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_signature( "blob", values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );

@@ -45,7 +45,8 @@ HHuginn::identifier_id_t const DICT( DEQUE + 1 );
 HHuginn::identifier_id_t const LOOKUP( DICT + 1 );
 HHuginn::identifier_id_t const ORDER( LOOKUP + 1 );
 HHuginn::identifier_id_t const SET( ORDER + 1 );
-HHuginn::identifier_id_t const BLOB( SET + 1 );
+HHuginn::identifier_id_t const HEAP( SET + 1 );
+HHuginn::identifier_id_t const BLOB( HEAP + 1 );
 HHuginn::identifier_id_t const TYPE_NONE( BLOB + 1 );
 HHuginn::identifier_id_t const TYPE_OBSERVER( TYPE_NONE + 1 );
 HHuginn::identifier_id_t const TYPE_REFERENCE( TYPE_OBSERVER + 1 );
@@ -162,6 +163,7 @@ char const* DICT      = "dict";
 char const* LOOKUP    = "lookup";
 char const* ORDER     = "order";
 char const* SET       = "set";
+char const* HEAP      = "heap";
 char const* BLOB      = "blob";
 char const* TYPE_NONE                = "*none*";
 char const* TYPE_OBSERVER            = "*observer*";
@@ -277,6 +279,7 @@ words_t _builtin_ = {{
 	type_name( HHuginn::TYPE::REAL ),
 	type_name( HHuginn::TYPE::SET ),
 	type_name( HHuginn::TYPE::STRING ),
+	type_name( HHuginn::TYPE::HEAP ),
 	BUILTIN::TYPE,
 	BUILTIN::SIZE,
 	BUILTIN::COPY,

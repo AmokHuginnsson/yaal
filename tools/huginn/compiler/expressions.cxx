@@ -549,7 +549,7 @@ void OCompiler::dispatch_subscript( executing_parser::range_t range_ ) {
 	fc._operations.pop();
 	M_ASSERT( fc._valueTypes.get_size() >= 1 );
 	fc._valueTypes.pop();
-	fc._valueTypes.push( type_to_class( HHuginn::TYPE::REFERENCE ) );
+	fc._valueTypes.push( type_to_class( HHuginn::TYPE::UNKNOWN ) );
 	return;
 	M_EPILOG
 }
@@ -822,7 +822,7 @@ void OCompiler::dispatch_compare( executing_parser::range_t range_ ) {
 		case ( OPERATOR::LESS_OR_EQUAL ):    { defer_action( &HExpression::less_or_equal, range_ );    } break;
 		case ( OPERATOR::GREATER_OR_EQUAL ): { defer_action( &HExpression::greater_or_equal, range_ ); } break;
 		case ( OPERATOR::IS_ELEMENT_OF ):    { defer_action( &HExpression::is_element_of, range_ );    } break;
-		case ( OPERATOR::IS_NOT_ELEMENT_OF ):{ defer_action( &HExpression::is_not_element_of, range_ );    } break;
+		case ( OPERATOR::IS_NOT_ELEMENT_OF ):{ defer_action( &HExpression::is_not_element_of, range_ ); } break;
 		default: {
 			M_ASSERT( ! "bad code path"[0] );
 		}

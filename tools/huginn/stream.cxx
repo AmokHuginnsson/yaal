@@ -914,6 +914,18 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 				data.insert( deserialize_impl( thread_, position_ ) );
 			}
 		} break;
+		case ( HHuginn::TYPE::HEAP ): {
+			if ( ( len = read_len( thread_, position_ ) ) < 0 ) {
+				break;
+			}
+			v = thread_->object_factory().create_heap();
+			huginn::HHeap& val( *static_cast<huginn::HHeap*>( v.raw() ) );
+			huginn::HHeap::values_t& data( val.value() );
+			HAnchorGuard<huginn::HHeap> ag( val, thread_, position_ );
+			for ( int long i( 0 ); f->can_continue() && ( i < len ); ++ i ) {
+				data.push( deserialize_impl( thread_, position_ ) );
+			}
+		} break;
 		case ( HHuginn::TYPE::FUNCTION_REFERENCE ): {
 			if ( ( len = read_len( thread_, position_ ) ) < 0 ) {
 				break;

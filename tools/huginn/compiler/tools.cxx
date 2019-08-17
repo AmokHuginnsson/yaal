@@ -169,6 +169,7 @@ HClass const* OCompiler::type_id_to_class( HHuginn::type_id_t typeId_ ) const {
 		case ( HHuginn::TYPE::LOOKUP ):              c = of.lookup_class();              break;
 		case ( HHuginn::TYPE::ORDER ):               c = of.order_class();               break;
 		case ( HHuginn::TYPE::SET ):                 c = of.set_class();                 break;
+		case ( HHuginn::TYPE::HEAP ):                c = of.heap_class();                break;
 		case ( HHuginn::TYPE::BLOB ):                c = of.blob_class();                break;
 		case ( HHuginn::TYPE::NONE ):                c = of.none_class();                break;
 		case ( HHuginn::TYPE::OBSERVER ):            c = of.observer_class();            break;
@@ -208,6 +209,7 @@ HClass const* OCompiler::function_ref_to_class( HHuginn::identifier_id_t identif
 		{ IDENTIFIER::BUILTIN::LOOKUP,    type_id( HHuginn::TYPE::LOOKUP ) },
 		{ IDENTIFIER::BUILTIN::ORDER,     type_id( HHuginn::TYPE::ORDER ) },
 		{ IDENTIFIER::BUILTIN::SET,       type_id( HHuginn::TYPE::SET ) },
+		{ IDENTIFIER::BUILTIN::HEAP,      type_id( HHuginn::TYPE::HEAP ) },
 		{ IDENTIFIER::BUILTIN::BLOB,      type_id( HHuginn::TYPE::BLOB ) },
 		{ IDENTIFIER::BUILTIN::OBSERVE,   type_id( HHuginn::TYPE::OBSERVER ) },
 		{ IDENTIFIER::BUILTIN::TYPE,      type_id( HHuginn::TYPE::FUNCTION_REFERENCE ) }

@@ -122,6 +122,16 @@ void HSemanticBuffer::serialize( HHuginn::value_t const& val_ ) {
 				serialize( v );
 			}
 		} break;
+		case ( HHuginn::TYPE::HEAP ): {
+			huginn::HHeap const& heap( *static_cast<huginn::HHeap const*>( val_.raw() ) );
+			huginn::HHeap::values_t val( heap.value() );
+			write( val.get_size() );
+			HAnchorGuard<huginn::HHeap> ag( heap, _context._thread, _context._position );
+			while ( ! val.is_empty() ) {
+				serialize( val.top() );
+				val.pop();
+			}
+		} break;
 		case ( HHuginn::TYPE::FUNCTION_REFERENCE ): {
 			HHuginn::identifier_id_t id(	static_cast<huginn::HFunctionReference const*>( val_.raw() )->identifier_id() );
 			write( _context._thread->runtime().identifier_name( id ) );

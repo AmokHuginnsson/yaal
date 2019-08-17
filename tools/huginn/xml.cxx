@@ -140,7 +140,7 @@ private:
 		}
 		return;
 	}
-	void do_remove( yaal::tools::HXml::HIterator& );
+	void do_remove( HThread*, yaal::tools::HXml::HIterator&, int );
 	HHuginn::value_t do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const override {
 		M_PROLOG
 		throw HHuginn::HHuginnRuntimeException(
@@ -409,7 +409,7 @@ protected:
 	virtual void do_invalidate( void ) override {
 		_it = _properties.end();
 	}
-	virtual void do_skip( void ) override {
+	virtual void do_skip( HThread*, int ) override {
 		++ _it;
 		++ _skip;
 	}
@@ -460,7 +460,7 @@ protected:
 	virtual void do_invalidate( void ) override {
 		_it = _node.end();
 	}
-	virtual void do_skip( void ) override {
+	virtual void do_skip( HThread*, int ) override {
 		++ _it;
 		++ _skip;
 	}
@@ -721,7 +721,7 @@ void HAttributes::remove( HThread* thread_, yaal::hcore::HString const& name_, i
 	yaal::tools::HXml::HNode::properties_t& properties( element->properties() );
 	yaal::tools::HXml::HNode::properties_t::iterator it( properties.find( name_ ) );
 	if ( it != properties.end() ) {
-		skip( it.node_id() );
+		skip( thread_, it.node_id(), position_ );
 		properties.erase( it );
 	}
 	return;
@@ -862,7 +862,7 @@ void HElement::remove( HThread* thread_, HElement* element_, int position_ ) {
 			position_
 		);
 	}
-	do_remove( it );
+	do_remove( thread_, it, position_ );
 	return;
 	M_EPILOG
 }
@@ -879,18 +879,18 @@ void HElement::remove_nth( HThread* thread_, int nth_, int position_ ) {
 	}
 	yaal::tools::HXml::HIterator it( _node.begin() );
 	advance( it, nth_ );
-	do_remove( it );
+	do_remove( thread_, it, position_ );
 	return;
 	M_EPILOG
 }
 
-void HElement::do_remove( yaal::tools::HXml::HIterator& it_ ) {
+void HElement::do_remove( HThread* thread_, yaal::tools::HXml::HIterator& it_, int position_ ) {
 	M_PROLOG
 	HHuginn::HReferenceTracker::ids_t ids;
 	get_all_child_nodes( ids, *it_ );
 	ids.push_back( (*it_).node_id() );
 	static_cast<HDocument*>( _doc.raw() )->invalidate( ids );
-	skip( it_.node_id() );
+	skip( thread_, it_.node_id(), position_ );
 	_node.remove_node( it_ );
 	return;
 	M_EPILOG

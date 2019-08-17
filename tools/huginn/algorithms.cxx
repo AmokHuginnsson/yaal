@@ -207,6 +207,29 @@ public:
 				dest.insert( it->value( thread_, position_ ) );
 				it->next( thread_, position_ );
 			}
+		} else if ( fr.function().id() == bit_cast<void const*>( &builtin::heap ) ) {
+			v = thread_->object_factory().create_heap();
+			huginn::HHeap* heap( static_cast<huginn::HHeap*>( v.raw() ) );
+			huginn::HHeap::values_t& dest( heap->value() );
+			HAnchorGuard<huginn::HHeap> ag( *heap, thread_, position_ );
+			huginn::HClass const* keyType( nullptr );
+			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
+				HHuginn::value_t elem( it->value( thread_, position_ ) );
+				huginn::HClass const* newKeyType( elem->get_class() );
+				if ( ! is_comparable( newKeyType ) || ( keyType && ( newKeyType != keyType ) ) ) {
+					throw HHuginn::HHuginnRuntimeException(
+						"Invalid key type: "_ys.append( a_type_name( newKeyType ) ).append( "." ),
+						thread_->current_frame()->file_id(),
+						position_
+					);
+				}
+				keyType = newKeyType;
+				dest.push( elem );
+				it->next( thread_, position_ );
+			}
+			if ( keyType ) {
+				heap->update_key_type( thread_, keyType, position_ );
+			}
 		} else if ( fr.function().id() == bit_cast<void const*>( &builtin::dict ) ) {
 			v = thread_->object_factory().create_dict();
 			huginn::HDict* dict( static_cast<huginn::HDict*>( v.raw() ) );
@@ -333,6 +356,16 @@ public:
 			for ( huginn::HLookup::values_t::value_type const& e : s ) {
 				dest.push_back( e.first );
 			}
+		} else if ( t == HHuginn::TYPE::HEAP ) {
+			huginn::HHeap const& heap( *static_cast<huginn::HHeap const*>( src.raw() ) );
+			huginn::HHeap::values_t s( heap.value() );
+			HAnchorGuard<HHeap> ag( heap, thread_, position_ );
+			while ( ! s.is_empty() ) {
+				dest.push_back( s.top() );
+				s.pop();
+			}
+			reverse( dest.begin(), dest.end() );
+			return ( v );
 		} else if ( t == HHuginn::TYPE::STRING ) {
 			hcore::HString const& s( get_string( src ) );
 			for ( code_point_t c : s ) {

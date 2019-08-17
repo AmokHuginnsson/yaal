@@ -33,6 +33,7 @@ HHuginn::value_t dict( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, 
 HHuginn::value_t order( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 HHuginn::value_t lookup( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 HHuginn::value_t set( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+HHuginn::value_t heap( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 HHuginn::value_t blob( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 HHuginn::value_t size( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 HHuginn::value_t type( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );

@@ -233,11 +233,11 @@ HInvalidatingIterable::HInvalidatingIterable( huginn::HClass const* class_ )
 	return;
 }
 
-void HInvalidatingIterable::skip( void const* id_ ) {
+void HInvalidatingIterable::skip( huginn::HThread* thread_, void const* id_, int position_ ) {
 	M_PROLOG
 	for ( HHuginn::HNotifableReference* nr : _observers ) {
 		if ( nr->id() == id_ ) {
-			static_cast<huginn::HNotifableIterator*>( nr )->skip();
+			static_cast<huginn::HNotifableIterator*>( nr )->skip( thread_, position_ );
 		}
 	}
 	return;

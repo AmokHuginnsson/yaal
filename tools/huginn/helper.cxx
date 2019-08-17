@@ -841,6 +841,7 @@ yaal::hcore::HString const& type_name( HHuginn::TYPE type_ ) {
 	static hcore::HString const NAME_LOOKUP    = BUILTIN::LOOKUP;
 	static hcore::HString const NAME_ORDER     = BUILTIN::ORDER;
 	static hcore::HString const NAME_SET       = BUILTIN::SET;
+	static hcore::HString const NAME_HEAP      = BUILTIN::HEAP;
 	static hcore::HString const NAME_BLOB      = BUILTIN::BLOB;
 	static hcore::HString const NAME_NONE                = BUILTIN::TYPE_NONE;
 	static hcore::HString const NAME_OBSERVER            = BUILTIN::TYPE_OBSERVER;
@@ -869,6 +870,7 @@ yaal::hcore::HString const& type_name( HHuginn::TYPE type_ ) {
 		case ( HHuginn::TYPE::ORDER ):              s = &NAME_ORDER;              break;
 		case ( HHuginn::TYPE::LOOKUP ):             s = &NAME_LOOKUP;             break;
 		case ( HHuginn::TYPE::SET ):                s = &NAME_SET;                break;
+		case ( HHuginn::TYPE::HEAP ):               s = &NAME_HEAP;               break;
 		case ( HHuginn::TYPE::BLOB ):               s = &NAME_BLOB;               break;
 		case ( HHuginn::TYPE::OBSERVER ):           s = &NAME_OBSERVER;           break;
 		case ( HHuginn::TYPE::REFERENCE ):          s = &NAME_REFERENCE;          break;

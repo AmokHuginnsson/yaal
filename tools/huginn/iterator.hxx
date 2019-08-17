@@ -45,11 +45,11 @@ public:
 		, _skip( 0 ) {
 		return;
 	}
-	void skip( void ) {
-		do_skip();
+	void skip( HThread* thread_, int position_ ) {
+		do_skip( thread_, position_ );
 	}
 protected:
-	virtual void do_skip( void ) = 0;
+	virtual void do_skip( HThread*, int ) = 0;
 };
 
 class HIterator : public HIterable, public HIteratorInterface {
