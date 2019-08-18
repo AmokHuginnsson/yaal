@@ -853,7 +853,7 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 			for ( int long i( 0 ); f->can_continue() && ( i < len ); ++ i ) {
 				HHuginn::value_t key( deserialize_impl( thread_, position_ ) );
 				HClass const* newKeyType( key->get_class() );
-				if ( ! is_comparable( newKeyType ) || ( keyType && ( newKeyType != keyType ) ) ) {
+				if ( keyType && ( newKeyType != keyType ) ) {
 					raise( thread_, "Malformed Huginn data stream.", position_, exception_class() );
 					break;
 				}
@@ -891,7 +891,7 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 			for ( int long i( 0 ); f->can_continue() && ( i < len ); ++ i ) {
 				HHuginn::value_t key( deserialize_impl( thread_, position_ ) );
 				HClass const* newKeyType( key->get_class() );
-				if ( ! is_comparable( newKeyType ) || ( keyType && ( newKeyType != keyType ) ) ) {
+				if ( keyType && ( newKeyType != keyType ) ) {
 					raise( thread_, "Malformed Huginn data stream.", position_, exception_class() );
 					break;
 				}
@@ -921,9 +921,20 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 			v = thread_->object_factory().create_heap();
 			huginn::HHeap& val( *static_cast<huginn::HHeap*>( v.raw() ) );
 			huginn::HHeap::values_t& data( val.value() );
+			HClass const* keyType( nullptr );
 			HAnchorGuard<huginn::HHeap> ag( val, thread_, position_ );
 			for ( int long i( 0 ); f->can_continue() && ( i < len ); ++ i ) {
-				data.push( deserialize_impl( thread_, position_ ) );
+				HHuginn::value_t key( deserialize_impl( thread_, position_ ) );
+				HClass const* newKeyType( key->get_class() );
+				if ( keyType && ( newKeyType != keyType ) ) {
+					raise( thread_, "Malformed Huginn data stream.", position_, exception_class() );
+					break;
+				}
+				keyType = newKeyType;
+				data.push( key );
+			}
+			if ( keyType ) {
+				val.update_key_type( thread_, keyType, position_ );
 			}
 		} break;
 		case ( HHuginn::TYPE::FUNCTION_REFERENCE ): {

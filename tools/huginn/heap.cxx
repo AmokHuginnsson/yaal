@@ -218,13 +218,6 @@ void HHeap::verify_key_type( huginn::HThread* thread_, HClass const* keyType_, i
 			position_
 		);
 	}
-	if ( ! is_comparable( keyType_ ) ) {
-		throw HHuginn::HHuginnRuntimeException(
-			"Key type `"_ys.append( keyType_->name() ).append( "` is not a comparable." ),
-			thread_->current_frame()->file_id(),
-			position_
-		);
-	}
 	return;
 }
 

@@ -184,7 +184,7 @@ public:
 			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
 				HHuginn::value_t elem( it->value( thread_, position_ ) );
 				huginn::HClass const* newKeyType( elem->get_class() );
-				if ( ! is_comparable( newKeyType ) || ( keyType && ( newKeyType != keyType ) ) ) {
+				if ( keyType && ( newKeyType != keyType ) ) {
 					throw HHuginn::HHuginnRuntimeException(
 						"Invalid key type: "_ys.append( a_type_name( newKeyType ) ).append( "." ),
 						thread_->current_frame()->file_id(),
@@ -216,7 +216,7 @@ public:
 			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
 				HHuginn::value_t elem( it->value( thread_, position_ ) );
 				huginn::HClass const* newKeyType( elem->get_class() );
-				if ( ! is_comparable( newKeyType ) || ( keyType && ( newKeyType != keyType ) ) ) {
+				if ( keyType && ( newKeyType != keyType ) ) {
 					throw HHuginn::HHuginnRuntimeException(
 						"Invalid key type: "_ys.append( a_type_name( newKeyType ) ).append( "." ),
 						thread_->current_frame()->file_id(),
@@ -254,7 +254,7 @@ public:
 					);
 				}
 				huginn::HClass const* newKeyType( data.front()->get_class() );
-				if ( ! is_comparable( newKeyType ) || ( keyType && ( newKeyType != keyType ) ) ) {
+				if ( keyType && ( newKeyType != keyType ) ) {
 					throw HHuginn::HHuginnRuntimeException(
 						"Invalid key type: "_ys.append( a_type_name( newKeyType ) ).append( "." ),
 						thread_->current_frame()->file_id(),
