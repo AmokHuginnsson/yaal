@@ -632,36 +632,13 @@ void HExpression::function_call( OExecutionStep const& executionStep_, HFrame* f
 	values.pop();
 	HThread* thread( frame_->thread() );
 	frame_->set_position( p );
-	if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-		values.push( static_cast<huginn::HFunctionReference*>( f.raw() )->function()( thread, nullptr, args, p ) );
-	} else if ( t == HHuginn::TYPE::BOUND_METHOD ) {
-		HClass::HBoundMethod* m( static_cast<HClass::HBoundMethod*>( f.raw() ) );
-		values.push( m->call( thread, args, p ) );
-	} else if ( t == HHuginn::TYPE::UNBOUND_METHOD ) {
-		HClass::HUnboundMethod* m( static_cast<HClass::HUnboundMethod*>( f.raw() ) );
-		values.push( m->call( thread, args, p ) );
-	} else if ( t == HHuginn::TYPE::METHOD ) {
-		HClass::HMethod* m( static_cast<HClass::HMethod*>( f.raw() ) );
+	if ( t == HHuginn::TYPE::METHOD ) {
 		HHuginn::value_t v( yaal::move( values.top() ) );
 		values.pop();
-		values.push( m->function()( thread, &v, args, p ) );
+		HClass::HMethod* m( static_cast<HClass::HMethod*>( f.raw() ) );
+		values.push( m->fast_call( thread, &v, args, executionStep_._position ) );
 	} else {
-		HObject* o( nullptr );
-		if ( ( o = dynamic_cast<HObject*>( f.raw() ) ) ) {
-			values.push( o->call_method( thread, f, IDENTIFIER::INTERFACE::CALL, args, executionStep_._position ) );
-		} else {
-			int idx( c->field_index( IDENTIFIER::INTERFACE::CALL ) );
-			if ( idx >= 0 ) {
-				HClass::HMethod const& m( *static_cast<HClass::HMethod const*>( c->field( idx ).raw() ) );
-				values.push( m.function()( thread, &f, args, executionStep_._position ) );
-			} else {
-				throw HHuginn::HHuginnRuntimeException(
-					"Reference `"_ys.append( c->name() ).append( "` is not a callable." ),
-					file_id(),
-					executionStep_._position
-				);
-			}
-		}
+		values.push( f->operator_call( thread, f, args, executionStep_._position ) );
 	}
 	return;
 	M_EPILOG

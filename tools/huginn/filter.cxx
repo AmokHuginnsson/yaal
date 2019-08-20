@@ -34,17 +34,20 @@ int long HFilter::do_size( huginn::HThread* thread_, int position_ ) const {
 }
 
 HHuginn::value_t HFilter::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
-	return ( thread_->object_factory().create<HFilter>( HIterable::get_class(), _source->clone( thread_, const_cast<HHuginn::value_t*>( &_source ), position_ ), _function, _method ) );
+	return ( thread_->object_factory().create<HFilter>( HIterable::get_class(), _source->clone( thread_, const_cast<HHuginn::value_t*>( &_source ), position_ ), _callable ) );
 }
 
 class HFilterIterator : public HIteratorInterface {
 protected:
 	huginn::HIterable::iterator_t _impl;
 	HHuginn::value_t _value;
+	HHuginn::value_t& _callable;
 public:
-	HFilterIterator( huginn::HIterable::iterator_t&& iterator_ )
+	HFilterIterator( huginn::HIterable::iterator_t&& iterator_, HHuginn::value_t& callable_, HThread* thread_, int position_ )
 		: _impl( yaal::move( iterator_ ) )
-		, _value() {
+		, _value()
+		, _callable( callable_ ) {
+		scan( thread_, position_ );
 		return;
 	}
 protected:
@@ -61,96 +64,30 @@ protected:
 	void scan( HThread* thread_, int position_ ) {
 		while ( _impl->is_valid( thread_, position_ ) ) {
 			_value = _impl->value( thread_, position_ );
-			if ( do_test( thread_, position_ ) ) {
+			if ( test( thread_, position_ ) ) {
 				break;
 			}
 			_impl->next( thread_, position_ );
 		}
 	}
-	virtual bool do_test( HThread*, int ) = 0;
+	bool test( HThread* thread_, int position_ ) {
+		HHuginn::value_t v( _callable->operator_call( thread_, _callable, HArguments( thread_, _value ), position_ ) );
+		if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
+			throw HHuginn::HHuginnRuntimeException(
+				hcore::to_string( "Filter functor returned wrong type, expected `boolean` got: `" ).append( v->get_class()->name() ).append( "`." ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+		return ( static_cast<HBoolean*>( v.raw() )->value() );
+	}
 private:
 	HFilterIterator( HFilterIterator const& ) = delete;
 	HFilterIterator& operator = ( HFilterIterator const& ) = delete;
 };
 
-class HFunctionFilterIterator : public HFilterIterator {
-	HHuginn::function_t const& _function;
-public:
-	HFunctionFilterIterator( huginn::HIterable::iterator_t&& iterator_, HHuginn::function_t const& function_, HThread* thread_, int position_ )
-		: HFilterIterator( yaal::move( iterator_ ) )
-		, _function( function_ ) {
-		scan( thread_, position_ );
-		return;
-	}
-protected:
-	virtual bool do_test( HThread* thread_, int position_ ) override {
-		HHuginn::value_t v( _function( thread_, nullptr, HArguments( thread_, _value ), position_ ) );
-		if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
-			throw HHuginn::HHuginnRuntimeException(
-				hcore::to_string( "Filter function returned wrong type, expected `boolean` got: `" ).append( v->get_class()->name() ).append( "`." ),
-				thread_->current_frame()->file_id(),
-				position_
-			);
-		}
-		return ( static_cast<HBoolean*>( v.raw() )->value() );
-	}
-};
-
-class HUnboundMethodFilterIterator : public HFilterIterator {
-	huginn::HClass::HUnboundMethod& _method;
-public:
-	HUnboundMethodFilterIterator( huginn::HIterable::iterator_t&& iterator_, huginn::HClass::HUnboundMethod& method_, HThread* thread_, int position_ )
-		: HFilterIterator( yaal::move( iterator_ ) )
-		, _method( method_ ) {
-		scan( thread_, position_ );
-		return;
-	}
-protected:
-	virtual bool do_test( HThread* thread_, int position_ ) override {
-		HHuginn::value_t v( _method.call( thread_, HArguments( thread_, _impl->value( thread_, position_ ) ), position_ ) );
-		if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
-			throw HHuginn::HHuginnRuntimeException(
-				hcore::to_string( "Filter functor returned wrong type, expected `boolean` got: `" ).append( v->get_class()->name() ).append( "`." ),
-				thread_->current_frame()->file_id(),
-				position_
-			);
-		}
-		return ( static_cast<HBoolean*>( v.raw() )->value() );
-	}
-};
-
-class HBoundMethodFilterIterator : public HFilterIterator {
-	huginn::HClass::HBoundMethod& _method;
-public:
-	HBoundMethodFilterIterator( huginn::HIterable::iterator_t&& iterator_, huginn::HClass::HBoundMethod& method_, HThread* thread_, int position_ )
-		: HFilterIterator( yaal::move( iterator_ ) )
-		, _method( method_ ) {
-		scan( thread_, position_ );
-		return;
-	}
-protected:
-	virtual bool do_test( HThread* thread_, int position_ ) override {
-		HHuginn::value_t v( _method.call( thread_, HArguments( thread_, _impl->value( thread_, position_ ) ), position_ ) );
-		if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
-			throw HHuginn::HHuginnRuntimeException(
-				hcore::to_string( "Filter functor returned wrong type, expected `boolean` got: `" ).append( v->get_class()->name() ).append( "`." ),
-				thread_->current_frame()->file_id(),
-				position_
-			);
-		}
-		return ( static_cast<HBoolean*>( v.raw() )->value() );
-	}
-};
-
 HFilter::iterator_t HFilter::do_iterator( HThread* thread_, int position_ ) {
-	iterator_t impl;
-	if ( !! _function ) {
-		impl = hcore::make_pointer<HFunctionFilterIterator>( static_cast<huginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), _function, thread_, position_ );
-	} else if ( _method->type_id() == HHuginn::TYPE::UNBOUND_METHOD ) {
-		impl = hcore::make_pointer<HUnboundMethodFilterIterator>( static_cast<huginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), *static_cast<huginn::HClass::HUnboundMethod*>( _method.raw() ), thread_, position_ );
-	} else {
-		impl = hcore::make_pointer<HBoundMethodFilterIterator>( static_cast<huginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), *static_cast<huginn::HClass::HBoundMethod*>( _method.raw() ), thread_, position_ );
-	}
+	iterator_t impl( hcore::make_pointer<HFilterIterator>( static_cast<huginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), _callable, thread_, position_ ) );
 	return ( impl );
 }
 

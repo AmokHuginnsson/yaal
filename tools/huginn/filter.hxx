@@ -16,14 +16,12 @@ namespace huginn {
 
 class HFilter : public huginn::HIterable {
 	HHuginn::value_t _source;
-	HHuginn::function_t _function;
-	HHuginn::value_t _method;
+	HHuginn::value_t _callable;
 public:
-	HFilter( huginn::HClass const* class_, HHuginn::value_t source_, HHuginn::function_t function_, HHuginn::value_t method_ )
+	HFilter( huginn::HClass const* class_, HHuginn::value_t source_, HHuginn::value_t callable_ )
 		: HIterable( class_ )
 		, _source( source_ )
-		, _function( function_ )
-		, _method( method_ ) {
+		, _callable( callable_ ) {
 	}
 	static HHuginn::class_t get_class( HRuntime*, huginn::HClass const* );
 protected:

@@ -34,6 +34,10 @@ HFunctionReference::HFunctionReference(
 	return;
 }
 
+HHuginn::value_t HFunctionReference::do_operator_call( huginn::HThread* thread_, HHuginn::value_t& object_, HHuginn::values_t& arguments_, int position_ ) {
+	return ( _function( thread_, &object_, arguments_, position_ ) );
+}
+
 void HFunctionReference::reset( HHuginn::function_t const& function_ ) {
 	M_PROLOG
 	_function = function_;

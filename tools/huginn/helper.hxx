@@ -567,11 +567,11 @@ static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, hug
 
 template<typename F>
 struct function_wrapper<0, true, F> {
-static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( name_.c_str(), values_, 0, 0, thread_, position_ );
 	fun_();
-	return ( object_ ? *object_ : thread_->runtime().none_value() );
+	return ( thread_->runtime().none_value() );
 	M_EPILOG
 }
 };
@@ -597,7 +597,7 @@ static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, hug
 
 template<typename F>
 struct function_wrapper<1, true, F> {
-static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( name_.c_str(), values_, 1, 1, thread_, position_ );
 	verify_arg_type( name_.c_str(), values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::UNARY, thread_, position_ );
@@ -605,7 +605,7 @@ static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, hug
 	fun_(
 		huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::get( utf8, thread_, values_[0], position_ )
 	);
-	return ( object_ ? *object_ : thread_->runtime().none_value() );
+	return ( thread_->runtime().none_value() );
 	M_EPILOG
 }
 };
@@ -633,7 +633,7 @@ static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, hug
 
 template<typename F>
 struct function_wrapper<2, true, F> {
-static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( name_.c_str(), values_, 2, 2, thread_, position_ );
 	verify_arg_type( name_.c_str(), values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
@@ -643,7 +643,7 @@ static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, hug
 		huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::get( utf8, thread_, values_[0], position_ ),
 		huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::get( utf8, thread_, values_[1], position_ )
 	);
-	return ( object_ ? *object_ : thread_->runtime().none_value() );
+	return ( thread_->runtime().none_value() );
 	M_EPILOG
 }
 };
@@ -673,7 +673,7 @@ static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, hug
 
 template<typename F>
 struct function_wrapper<3, true, F> {
-static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( name_.c_str(), values_, 3, 3, thread_, position_ );
 	verify_arg_type( name_.c_str(), values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
@@ -685,7 +685,7 @@ static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, hug
 		huginn_type_from_pod<typename decayed_argument_type<F, 1>::type>::get( utf8, thread_, values_[1], position_ ),
 		huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::get( utf8, thread_, values_[2], position_ )
 	);
-	return ( object_ ? *object_ : thread_->runtime().none_value() );
+	return ( thread_->runtime().none_value() );
 	M_EPILOG
 }
 };
@@ -717,7 +717,7 @@ static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, hug
 
 template<typename F>
 struct function_wrapper<4, true, F> {
-static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( name_.c_str(), values_, 4, 4, thread_, position_ );
 	verify_arg_type( name_.c_str(), values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
@@ -731,7 +731,7 @@ static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, hug
 		huginn_type_from_pod<typename decayed_argument_type<F, 2>::type>::get( utf8, thread_, values_[2], position_ ),
 		huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::get( utf8, thread_, values_[3], position_ )
 	);
-	return ( object_ ? *object_ : thread_->runtime().none_value() );
+	return ( thread_->runtime().none_value() );
 	M_EPILOG
 }
 };
@@ -765,7 +765,7 @@ static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, hug
 
 template<typename F>
 struct function_wrapper<5, true, F> {
-static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( name_.c_str(), values_, 5, 5, thread_, position_ );
 	verify_arg_type( name_.c_str(), values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
@@ -781,7 +781,7 @@ static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, hug
 		huginn_type_from_pod<typename decayed_argument_type<F, 3>::type>::get( utf8, thread_, values_[3], position_ ),
 		huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::get( utf8, thread_, values_[4], position_ )
 	);
-	return ( object_ ? *object_ : thread_->runtime().none_value() );
+	return ( thread_->runtime().none_value() );
 	M_EPILOG
 }
 };
@@ -817,7 +817,7 @@ static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, hug
 
 template<typename F>
 struct function_wrapper<6, true, F> {
-static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( name_.c_str(), values_, 6, 6, thread_, position_ );
 	verify_arg_type( name_.c_str(), values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
@@ -835,7 +835,7 @@ static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, hug
 		huginn_type_from_pod<typename decayed_argument_type<F, 4>::type>::get( utf8, thread_, values_[4], position_ ),
 		huginn_type_from_pod<typename decayed_argument_type<F, 5>::type>::get( utf8, thread_, values_[5], position_ )
 	);
-	return ( object_ ? *object_ : thread_->runtime().none_value() );
+	return ( thread_->runtime().none_value() );
 	M_EPILOG
 }
 };
@@ -873,7 +873,7 @@ static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, hug
 
 template<typename F>
 struct function_wrapper<7, true, F> {
-static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( name_.c_str(), values_, 7, 7, thread_, position_ );
 	verify_arg_type( name_.c_str(), values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
@@ -893,7 +893,7 @@ static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, hug
 		huginn_type_from_pod<typename decayed_argument_type<F, 5>::type>::get( utf8, thread_, values_[5], position_ ),
 		huginn_type_from_pod<typename decayed_argument_type<F, 6>::type>::get( utf8, thread_, values_[6], position_ )
 	);
-	return ( object_ ? *object_ : thread_->runtime().none_value() );
+	return ( thread_->runtime().none_value() );
 	M_EPILOG
 }
 };
@@ -933,7 +933,7 @@ static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, hug
 
 template<typename F>
 struct function_wrapper<8, true, F> {
-static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( name_.c_str(), values_, 8, 8, thread_, position_ );
 	verify_arg_type( name_.c_str(), values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
@@ -955,7 +955,7 @@ static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, hug
 		huginn_type_from_pod<typename decayed_argument_type<F, 6>::type>::get( utf8, thread_, values_[6], position_ ),
 		huginn_type_from_pod<typename decayed_argument_type<F, 7>::type>::get( utf8, thread_, values_[7], position_ )
 	);
-	return ( object_ ? *object_ : thread_->runtime().none_value() );
+	return ( thread_->runtime().none_value() );
 	M_EPILOG
 }
 };
@@ -997,7 +997,7 @@ static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, hug
 
 template<typename F>
 struct function_wrapper<9, true, F> {
-static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( name_.c_str(), values_, 9, 9, thread_, position_ );
 	verify_arg_type( name_.c_str(), values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
@@ -1021,7 +1021,7 @@ static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, hug
 		huginn_type_from_pod<typename decayed_argument_type<F, 7>::type>::get( utf8, thread_, values_[7], position_ ),
 		huginn_type_from_pod<typename decayed_argument_type<F, 8>::type>::get( utf8, thread_, values_[8], position_ )
 	);
-	return ( object_ ? *object_ : thread_->runtime().none_value() );
+	return ( thread_->runtime().none_value() );
 	M_EPILOG
 }
 };
@@ -1065,7 +1065,7 @@ static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, hug
 
 template<typename F>
 struct function_wrapper<10, true, F> {
-static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( name_.c_str(), values_, 10, 10, thread_, position_ );
 	verify_arg_type( name_.c_str(), values_, 0, huginn_type_from_pod<typename decayed_argument_type<F, 0>::type>::value, ARITY::MULTIPLE, thread_, position_ );
@@ -1091,13 +1091,13 @@ static HHuginn::value_t impl( F fun_, yaal::hcore::HUTF8String const& name_, hug
 		huginn_type_from_pod<typename decayed_argument_type<F, 8>::type>::get( utf8, thread_, values_[8], position_ ),
 		huginn_type_from_pod<typename decayed_argument_type<F, 9>::type>::get( utf8, thread_, values_[9], position_ )
 	);
-	return ( object_ ? *object_ : thread_->runtime().none_value() );
+	return ( thread_->runtime().none_value() );
 	M_EPILOG
 }
 };
 
 template<typename F>
-HHuginn::function_t function( yaal::hcore::HString const& name_,  F fun_ ) {
+HHuginn::function_t function( yaal::hcore::HString const& name_, F fun_ ) {
 	typedef typename trait::return_type<F>::type return_type;
 	bool const returns_void( trait::same_type<return_type, void>::value || trait::same_type<return_type, trait::no_type>::value );
 	return (

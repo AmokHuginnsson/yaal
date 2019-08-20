@@ -93,7 +93,6 @@ public:
 		verify_arg_count( name, values_, 2, 3, thread_, position_ );
 		HHuginn::value_t src( verify_arg_virtual_collection( name, values_, 0, ARITY::MULTIPLE, thread_, position_ ) );
 		HHuginn::value_t callable( verify_arg_callable( name, values_, 1, ARITY::MULTIPLE, thread_, position_ ) );
-		HHuginn::type_id_t t( callable->type_id() );
 		int argCount( static_cast<int>( values_.get_size() ) );
 		HHuginn::value_t accumulator( argCount == 3 ? values_[2] : HHuginn::value_t() );
 		huginn::HIterable const* iterable( static_cast<huginn::HIterable const*>( src.raw() ) );
@@ -105,25 +104,9 @@ public:
 			accumulator = it->value( thread_, position_ );
 			it->next( thread_, position_ );
 		}
-		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-			HHuginn::function_t function( static_cast<huginn::HFunctionReference const*>( callable.raw() )->function() );
-			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
-				accumulator = function( thread_, nullptr, HArguments( thread_, it->value( thread_, position_ ), accumulator ), position_ );
-				it->next( thread_, position_ );
-			}
-		} else if ( t == HHuginn::TYPE::UNBOUND_METHOD ) {
-			huginn::HClass::HUnboundMethod* unboundMethod( static_cast<huginn::HClass::HUnboundMethod*>( callable.raw() ) );
-			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
-				accumulator = unboundMethod->call( thread_, HArguments( thread_, it->value( thread_, position_ ), accumulator ), position_ );
-				it->next( thread_, position_ );
-			}
-		} else {
-			M_ASSERT( t == HHuginn::TYPE::BOUND_METHOD );
-			huginn::HClass::HBoundMethod* boundMethod( static_cast<huginn::HClass::HBoundMethod*>( callable.raw() ) );
-			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
-				accumulator = boundMethod->call( thread_, HArguments( thread_, it->value( thread_, position_ ), accumulator ), position_ );
-				it->next( thread_, position_ );
-			}
+		while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
+			accumulator = callable->operator_call( thread_, callable, HArguments( thread_, it->value( thread_, position_ ), accumulator ), position_ );
+			it->next( thread_, position_ );
 		}
 		return ( accumulator );
 	}
@@ -450,14 +433,7 @@ private:
 		verify_arg_count( name, values_, 2, 2, thread_, position_ );
 		HHuginn::value_t src( verify_arg_virtual_collection( name, values_, 0, ARITY::MULTIPLE, thread_, position_ ) );
 		HHuginn::value_t callable( verify_arg_callable( name, values_, 1, ARITY::MULTIPLE, thread_, position_ ) );
-		HHuginn::type_id_t t( callable->type_id() );
-		HHuginn::value_t v;
-		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-			v = thread_->object_factory().create<HFilter>( _filterClass.raw(), src, static_cast<huginn::HFunctionReference const*>( callable.raw() )->function(), HHuginn::value_t() );
-		} else {
-			v = thread_->object_factory().create<HFilter>( _filterClass.raw(), src, HHuginn::function_t(), callable );
-		}
-		return ( v );
+		return ( thread_->object_factory().create<HFilter>( _filterClass.raw(), src, callable ) );
 		M_EPILOG
 	}
 	HHuginn::value_t do_map( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
@@ -466,14 +442,7 @@ private:
 		verify_arg_count( name, values_, 2, 2, thread_, position_ );
 		HHuginn::value_t src( verify_arg_virtual_collection( name, values_, 0, ARITY::MULTIPLE, thread_, position_ ) );
 		HHuginn::value_t callable( verify_arg_callable( name, values_, 1, ARITY::MULTIPLE, thread_, position_ ) );
-		HHuginn::type_id_t t( callable->type_id() );
-		HHuginn::value_t v;
-		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-			v = thread_->object_factory().create<HMapper>( _mapperClass.raw(), src, static_cast<huginn::HFunctionReference const*>( callable.raw() )->function(), HHuginn::value_t() );
-		} else {
-			v = thread_->object_factory().create<HMapper>( _mapperClass.raw(), src, HHuginn::function_t(), callable );
-		}
-		return ( v );
+		return ( thread_->object_factory().create<HMapper>( _mapperClass.raw(), src, callable ) );
 		M_EPILOG
 	}
 	HHuginn::value_t do_enumerate( HThread* thread_, HHuginn::values_t& values_, int position_ ) {

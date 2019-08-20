@@ -29,6 +29,10 @@ HClass::HMethod::HMethod(
 	return;
 }
 
+HHuginn::value_t HClass::HMethod::fast_call( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& arguments_, int position_ ) {
+	return ( _function( thread_, object_, arguments_, position_ ) );
+}
+
 HHuginn::value_t HClass::HMethod::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	return ( thread_->object_factory().create_method_raw( _function ) );
 }
@@ -43,7 +47,7 @@ HClass::HUnboundMethod::HUnboundMethod(
 	return;
 }
 
-HHuginn::value_t HClass::HUnboundMethod::call( huginn::HThread* thread_, HHuginn::values_t& arguments_, int position_ ) {
+HHuginn::value_t HClass::HUnboundMethod::do_operator_call( huginn::HThread* thread_, HHuginn::value_t&, HHuginn::values_t& arguments_, int position_ ) {
 	if ( arguments_.is_empty() ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Calling method without an object.",
@@ -83,7 +87,7 @@ HClass::HBoundMethod::HBoundMethod( huginn::HClass const* class_, HHuginn::funct
 	return;
 }
 
-HHuginn::value_t HClass::HBoundMethod::call( huginn::HThread* thread_, HHuginn::values_t& arguments_, int position_ ) {
+HHuginn::value_t HClass::HBoundMethod::do_operator_call( huginn::HThread* thread_, HHuginn::value_t&, HHuginn::values_t& arguments_, int position_ ) {
 	return ( _function( thread_, &_objectHolder, arguments_, position_ ) );
 }
 

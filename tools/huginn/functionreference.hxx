@@ -45,6 +45,7 @@ public:
 private:
 	HFunctionReference( HFunctionReference const& ) = delete;
 	HFunctionReference& operator = ( HFunctionReference const& ) = delete;
+	virtual HHuginn::value_t do_operator_call( huginn::HThread*, HHuginn::value_t&, HHuginn::values_t&, int ) override;
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 	virtual bool do_operator_equals( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const override;
 	virtual bool do_operator_less( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const override;

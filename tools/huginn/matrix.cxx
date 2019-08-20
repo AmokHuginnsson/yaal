@@ -441,21 +441,8 @@ HHuginn::value_t HMatrix::transpose( huginn::HThread* thread_, HHuginn::value_t*
 	M_EPILOG
 }
 
-template<typename call_t>
-HHuginn::value_t do_matrix_apply( call_t call_, HThread* thread_, HHuginn::values_t& values_, int position_ );
-
-template<>
-HHuginn::value_t do_matrix_apply( HHuginn::function_t call_, HThread* thread_, HHuginn::values_t& values_, int position_ ) {
-	return ( call_( thread_, nullptr, values_, position_ ) );
-}
-
-template<>
-HHuginn::value_t do_matrix_apply( HClass::HBoundMethod const* call_, HThread* thread_, HHuginn::values_t& values_, int position_ ) {
-	return ( const_cast<HClass::HBoundMethod*>( call_ )->call( thread_, values_, position_ ) );
-}
-
 template<typename value_t, typename matrix_t, typename call_t>
-void matrix_apply( HHuginn::value_t store_, huginn::HThread* thread_, matrix_t& matrix_, call_t call_, int position_ ) {
+void matrix_apply( HHuginn::value_t store_, huginn::HThread* thread_, matrix_t& matrix_, call_t& call_, int position_ ) {
 	HHuginn::value_t rowHolder( thread_->object_factory().create_integer( 0 ) );
 	HHuginn::value_t colHolder( thread_->object_factory().create_integer( 0 ) );
 	huginn::HInteger& row( *static_cast<huginn::HInteger*>( rowHolder.raw() ) );
@@ -468,7 +455,7 @@ void matrix_apply( HHuginn::value_t store_, huginn::HThread* thread_, matrix_t& 
 			row.value() = r;
 			col.value() = c;
 			val.value() = matrix_[r][c];
-			res = do_matrix_apply( call_, thread_, HArguments( thread_, store_, colHolder, rowHolder ), position_ );
+			res = call_->operator_call( thread_, call_, HArguments( thread_, store_, colHolder, rowHolder ), position_ );
 			if ( res->type_id() != expectedType ) {
 				throw HHuginn::HHuginnRuntimeException(
 					"Applied transformation function shall return `"_ys
@@ -489,23 +476,15 @@ HHuginn::value_t HMatrix::apply( huginn::HThread* thread_, HHuginn::value_t* obj
 	M_PROLOG
 	char const name[] = "Matrix.apply";
 	verify_arg_count( name, values_, 1, 1, thread_, position_ );
-	HHuginn::type_id_t t( verify_arg_type( name, values_, 0, types_t{ HHuginn::TYPE::FUNCTION_REFERENCE, HHuginn::TYPE::BOUND_METHOD }, ARITY::UNARY, thread_, position_ ) );
+	verify_arg_callable( name, values_, 0, ARITY::UNARY, thread_, position_ );
 	HMatrix* o( static_cast<HMatrix*>( object_->raw() ) );
 	HHuginn::value_t v;
 	if ( o->_data.type() == 0 ) {
 		arbitrary_precision_matrix_t& m( *o->_data.get<arbitrary_precision_matrix_ptr_t>() );
-		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-			matrix_apply<HNumber>( thread_->object_factory().create_number( 0 ), thread_, m, static_cast<huginn::HFunctionReference const*>( values_[0].raw() )->function(), position_ );
-		} else {
-			matrix_apply<HNumber>( thread_->object_factory().create_number( 0 ), thread_, m, static_cast<HClass::HBoundMethod const*>( values_[0].raw() ), position_ );
-		}
+		matrix_apply<HNumber>( thread_->object_factory().create_number( 0 ), thread_, m, values_[0], position_ );
 	} else {
 		floating_point_matrix_t& m( *o->_data.get<floating_point_matrix_ptr_t>() );
-		if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-			matrix_apply<HReal>( thread_->object_factory().create_real( 0 ), thread_, m, static_cast<huginn::HFunctionReference const*>( values_[0].raw() )->function(), position_ );
-		} else {
-			matrix_apply<HReal>( thread_->object_factory().create_real( 0 ), thread_, m, static_cast<HClass::HBoundMethod const*>( values_[0].raw() ), position_ );
-		}
+		matrix_apply<HReal>( thread_->object_factory().create_real( 0 ), thread_, m, values_[0], position_ );
 	}
 	return ( *object_ );
 	M_EPILOG

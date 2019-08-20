@@ -378,6 +378,26 @@ int long HValue::do_operator_hash( HThread* thread_, HHuginn::value_t const& sel
 	return ( hcore::hash<int long long>()( get_integer( res ) ) );
 }
 
+HHuginn::value_t HValue::do_operator_call( huginn::HThread* thread_, HHuginn::value_t& self_, HHuginn::values_t& arguments_, int position_ ) {
+	HHuginn::value_t v;
+	if ( HObject* o = dynamic_cast<HObject*>( this ) ) {
+		v = o->call_method( thread_, self_, IDENTIFIER::INTERFACE::CALL, arguments_, position_ );
+	} else {
+		int idx( _class->field_index( IDENTIFIER::INTERFACE::CALL ) );
+		if ( idx >= 0 ) {
+			HClass::HMethod const& m( *static_cast<HClass::HMethod const*>( _class->field( idx ).raw() ) );
+			v = m.function()( thread_, &self_, arguments_, position_ );
+		} else {
+			throw HHuginn::HHuginnRuntimeException(
+				"Reference `"_ys.append( _class->name() ).append( "` is not a callable." ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+	}
+	return ( v );
+}
+
 yaal::hcore::HString HValue::do_code( huginn::HThread* thread_, HHuginn::value_t const& self_, HCycleTracker&, int position_ ) const {
 	if ( _class->type_id() == HHuginn::TYPE::NONE ) {
 		return ( KEYWORD::NONE );

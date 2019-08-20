@@ -25,10 +25,12 @@ public:
 	HHuginn::function_t const& function( void ) const {
 		return ( _function );
 	}
+	HHuginn::value_t fast_call( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+private:
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 private:
 	HMethod( HMethod const& ) = delete;
 	HMethod& operator = ( HMethod const& ) = delete;
-	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 class HClass::HUnboundMethod : public HValue {
@@ -39,12 +41,13 @@ protected:
 	HHuginn::function_t _function;
 public:
 	HUnboundMethod( HClass const*, HClass const*, HHuginn::function_t const& );
-	HHuginn::value_t call( huginn::HThread*, HHuginn::values_t&, int );
+private:
+	virtual HHuginn::value_t do_operator_call( huginn::HThread*, HHuginn::value_t&, HHuginn::values_t&, int ) override;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
+	virtual yaal::hcore::HString do_code( HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const override;
 private:
 	HUnboundMethod( HUnboundMethod const& ) = delete;
 	HUnboundMethod& operator = ( HUnboundMethod const& ) = delete;
-	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
-	virtual yaal::hcore::HString do_code( HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const override;
 };
 
 class HClass::HBoundMethod : public HValue {
@@ -55,7 +58,6 @@ private:
 	HHuginn::value_t _objectHolder;
 public:
 	HBoundMethod( HClass const*, HHuginn::function_t const&, HHuginn::value_t const& );
-	HHuginn::value_t call( huginn::HThread*, HHuginn::values_t&, int );
 	HHuginn::value_t const& subject( void ) const {
 		return ( _objectHolder );
 	}
@@ -63,9 +65,11 @@ public:
 		return ( _function );
 	}
 private:
+	virtual HHuginn::value_t do_operator_call( huginn::HThread*, HHuginn::value_t&, HHuginn::values_t&, int ) override;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
+private:
 	HBoundMethod( HBoundMethod const& ) = delete;
 	HBoundMethod& operator = ( HBoundMethod const& ) = delete;
-	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 };
 
 }

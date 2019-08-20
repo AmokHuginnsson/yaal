@@ -203,8 +203,7 @@ HHuginn::value_t sort( huginn::HThread* thread_, HHuginn::value_t* object_, HHug
 	verify_arg_count( name, values_, 0, 1, thread_, position_ );
 	HHuginn::value_t key;
 	if ( values_.get_size() > 0 ) {
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::FUNCTION_REFERENCE, ARITY::MULTIPLE, thread_, position_ );
-		key = values_[0];
+		key = verify_arg_callable( name, values_, 0, ARITY::MULTIPLE, thread_, position_ );
 	}
 	huginn::HList::values_t& data( static_cast<HList*>( object_->raw() )->value() );
 	if ( ! key ) {
@@ -212,15 +211,14 @@ HHuginn::value_t sort( huginn::HThread* thread_, HHuginn::value_t* object_, HHug
 		less.anchor( thread_, position_ );
 		sort( data.begin(), data.end(), cref( less ) );
 	} else {
-		HHuginn::function_t k( static_cast<HFunctionReference*>( key.raw() )->function() );
 		yaal::sort(
 			data.begin(), data.end(),
-			[&k, &thread_, &position_]( HHuginn::value_t const& l_, HHuginn::value_t const& r_ ) {
+			[&key, &thread_, &position_]( HHuginn::value_t const& l_, HHuginn::value_t const& r_ ) {
 				return (
 					instruction::checked_less(
 						thread_,
-						k( thread_, nullptr, HArguments( thread_, l_ ), position_ ),
-						k( thread_, nullptr, HArguments( thread_, r_ ), position_ ),
+						key->operator_call( thread_, key, HArguments( thread_, l_ ), position_ ),
+						key->operator_call( thread_, key, HArguments( thread_, r_ ), position_ ),
 						position_
 					)
 				);
