@@ -31,16 +31,15 @@ namespace tools {
 
 namespace huginn {
 
-class HMathematics : public HValue {
+class HMathematics : public HPackage {
 	typedef yaal::hcore::HNumber const& ( *constant_getter_t )( yaal::hcore::HNumber::integer_t );
 	HHuginn::class_t _complexClass;
 	HHuginn::class_t _matrixClass;
 	HHuginn::class_t _numberSetStatisticsClass;
 	HHuginn::class_t _randomizerClass;
-	HHuginn::class_t _exceptionClass;
 public:
 	HMathematics( HClass* class_ )
-		: HValue( class_ )
+		: HPackage( class_, class_->runtime()->object_factory()->arithmetic_exception_class() )
 		, _complexClass(
 			add_class_as_member(
 				class_,
@@ -68,8 +67,7 @@ public:
 				HRandomizer::get_class( class_->runtime(), class_ ),
 				"( *distribution*, *parameters...* ) - create random number generator of a given *distribution* that is parametrized by supplied *parameters*"
 			)
-		)
-		, _exceptionClass( class_exception( class_, class_->runtime()->object_factory()->arithmetic_exception_class() ) ) {
+		) {
 		return;
 	}
 	static HHuginn::value_t get_constant( char const* name_, constant_getter_t constantGetter_, double long real_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
@@ -147,7 +145,7 @@ public:
 			}
 		}
 		if ( v == thread_->runtime().none_value() ) {
-			thread_->raise( static_cast<HMathematics*>( object_->raw() )->_exceptionClass.raw(), "bad domain", position_ );
+			thread_->raise( static_cast<HMathematics*>( object_->raw() )->exception_class(), "bad domain", position_ );
 		}
 		return ( v );
 		M_EPILOG
@@ -416,7 +414,7 @@ public:
 			try {
 				v = thread_->object_factory().create_number( yaal::move( val.round( to ) ) );
 			} catch ( HNumberException const& e ) {
-				thread_->raise( static_cast<HMathematics*>( object_->raw() )->_exceptionClass.raw(), e.what(), position_ );
+				thread_->raise( static_cast<HMathematics*>( object_->raw() )->exception_class(), e.what(), position_ );
 			}
 		} else {
 			double long val( get_real( values_[0] ) );
@@ -514,7 +512,7 @@ public:
 		if ( mmi.greatest_common_divisor() == 1 ) {
 			res = mmi.inverse();
 		} else {
-			thread_->raise( static_cast<HMathematics*>( object_->raw() )->_exceptionClass.raw(), "Multiplicative inverse does not exist.", position_ );
+			thread_->raise( static_cast<HMathematics*>( object_->raw() )->exception_class(), "Multiplicative inverse does not exist.", position_ );
 		}
 		return ( thread_->object_factory().create_integer( res ) );
 		M_EPILOG

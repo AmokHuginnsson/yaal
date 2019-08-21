@@ -279,9 +279,9 @@ void cleanup_packages( void ) {
 	M_EPILOG
 }
 
-HPackage::HPackage( huginn::HClass* class_ )
+HPackage::HPackage( huginn::HClass* class_, huginn::HClass const* base_ )
 	: huginn::HValue( class_ )
-	, _exceptionClass( class_exception( class_ ) ) {
+	, _exceptionClass( class_exception( class_, base_ ) ) {
 	return;
 }
 

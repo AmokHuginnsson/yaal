@@ -41,7 +41,7 @@ namespace tools {
 
 namespace huginn {
 
-class HAlgorithms : public huginn::HValue {
+class HAlgorithms : public huginn::HPackage {
 	HHuginn::class_t _iteratorClass;
 	HHuginn::class_t _filterClass;
 	HHuginn::class_t _mapperClass;
@@ -51,10 +51,9 @@ class HAlgorithms : public huginn::HValue {
 	HHuginn::class_t _sliceClass;
 	HHuginn::class_t _chainClass;
 	HHuginn::class_t _productClass;
-	HHuginn::class_t _exceptionClass;
 public:
 	HAlgorithms( huginn::HClass* class_ )
-		: HValue( class_ )
+		: HPackage( class_ )
 		, _iteratorClass( HIterator::get_class( class_->runtime(), class_ ) )
 		, _filterClass( HFilter::get_class( class_->runtime(), class_ ) )
 		, _mapperClass( HMapper::get_class( class_->runtime(), class_ ) )
@@ -63,8 +62,7 @@ public:
 		, _zipClass( HZip::get_class( class_->runtime(), class_ ) )
 		, _sliceClass( HSlice::get_class( class_->runtime(), class_ ) )
 		, _chainClass( HChain::get_class( class_->runtime(), class_ ) )
-		, _productClass( HProduct::get_class( class_->runtime(), class_ ) )
-		, _exceptionClass( class_exception( class_ ) ) {
+		, _productClass( HProduct::get_class( class_->runtime(), class_ ) ) {
 		return;
 	}
 	static HHuginn::value_t iterator( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -370,22 +368,91 @@ public:
 		return ( v );
 		M_EPILOG
 	}
+	typedef bool ( HValue::* compare_t )( HThread*, HHuginn::value_t const&, HHuginn::value_t  const&, int ) const;
+	static HHuginn::value_t minmax( char const* name_, compare_t compare_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( name_, values_, 1, 2, thread_, position_ );
+		HHuginn::value_t src( verify_arg_virtual_collection( name_, values_, 0, ARITY::MULTIPLE, thread_, position_ ) );
+		HHuginn::value_t key;
+		if ( values_.get_size() > 1 ) {
+			key = verify_arg_callable( name_, values_, 1, ARITY::MULTIPLE, thread_, position_ );
+		}
+		HHuginn::type_id_t t( src->type_id() );
+		HHuginn::value_t v;
+		if ( ! key && ( t == HHuginn::TYPE::ORDER ) ) {
+			huginn::HOrder::values_t const& s( static_cast<huginn::HOrder const*>( src.raw() )->value() );
+			if ( ! s.is_empty() ) {
+				v = ( compare_ == &HValue::operator_greater ) ? *s.begin() : *s.rbegin();
+			}
+		} else if ( ! key && ( t == HHuginn::TYPE::DICT ) ) {
+			huginn::HDict::values_t const& s( static_cast<huginn::HDict const*>( src.raw() )->value() );
+			if ( ! s.is_empty() ) {
+				huginn::HDict::values_t::value_type const& kv( compare_ == &HValue::operator_greater ? *s.begin() : *s.rbegin() );
+				v = thread_->object_factory().create_tuple( { kv.first, kv.second } );
+			}
+		} else {
+			if ( t == HHuginn::TYPE::DICT ) {
+				src = dict::key_values_view( thread_, src );
+			} else if ( t == HHuginn::TYPE::LOOKUP ) {
+				src = lookup::key_values_view( thread_, src );
+			}
+			huginn::HIterable const* iterable( static_cast<huginn::HIterable const*>( src.raw() ) );
+			huginn::HIterable::iterator_t it( const_cast<huginn::HIterable*>( iterable )->iterator( thread_, position_ ) );
+			if ( ! key ) {
+				if ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
+					v = it->value( thread_, position_ );
+					it->next( thread_, position_ );
+				}
+				while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
+					HHuginn::value_t n( it->value( thread_, position_ ) );
+					if ( (v.raw()->*compare_)( thread_, v, n, position_ ) ) {
+						v = n;
+					}
+					it->next( thread_, position_ );
+				}
+			} else {
+				HHuginn::value_t kofv;
+				if ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
+					v = it->value( thread_, position_ );
+					kofv = key->operator_call( thread_, key, HArguments( thread_, v ), position_ );
+					it->next( thread_, position_ );
+				}
+				while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
+					HHuginn::value_t n( it->value( thread_, position_ ) );
+					HHuginn::value_t kofn( key->operator_call( thread_, key, HArguments( thread_, n ), position_ ) );
+					if (
+						(kofv.raw()->*compare_)(
+							thread_,
+							kofv,
+							kofn,
+							position_
+						)
+					) {
+						v = n;
+						kofv = kofn;
+					}
+					it->next( thread_, position_ );
+				}
+			}
+		}
+		if ( ! v ) {
+			throw HHuginn::HHuginnRuntimeException(
+				hcore::to_string( name_ ).append( " argument is an empty sequence." ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+		return ( v );
+		M_EPILOG
+	}
 	static HHuginn::value_t min( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
-		char const name[] = "Algorithms.min";
-		verify_arg_count( name, values_, 1, meta::max_signed<int>::value, thread_, position_ );
-		HValueCompareHelper less( &instruction::less );
-		less.anchor( thread_, position_ );
-		return ( *min_element( values_.begin(), values_.end(), cref( less ) ) );
+		return ( minmax( "Algorithms.min", &HValue::operator_greater, thread_, values_, position_ ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t max( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
-		char const name[] = "Algorithms.max";
-		verify_arg_count( name, values_, 1, meta::max_signed<int>::value, thread_, position_ );
-		HValueCompareHelper less( &instruction::less );
-		less.anchor( thread_, position_ );
-		return ( *max_element( values_.begin(), values_.end(), cref( less ) ) );
+		return ( minmax( "Algorithms.max", &HValue::operator_less, thread_, values_, position_ ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t reversed( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {

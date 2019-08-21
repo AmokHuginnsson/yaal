@@ -101,7 +101,7 @@ public:
 private:
 	HHuginn::class_t _exceptionClass;
 public:
-	HPackage( HClass* );
+	HPackage( HClass*, HClass const* = nullptr );
 	HClass const* exception_class( void ) const;
 };
 

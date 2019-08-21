@@ -22,14 +22,12 @@ namespace tools {
 
 namespace huginn {
 
-class HRegularExpressions : public huginn::HValue {
+class HRegularExpressions : public huginn::HPackage {
 	HHuginn::class_t _compiledRegularExpressionClass;
-	HHuginn::class_t _exceptionClass;
 public:
 	HRegularExpressions( huginn::HClass* class_ )
-		: HValue( class_ )
-		, _compiledRegularExpressionClass( HCompiledRegularExpression::get_class( class_->runtime(), class_, _exceptionClass ) )
-		, _exceptionClass( class_exception( class_ ) ) {
+		: HPackage( class_ )
+		, _compiledRegularExpressionClass( HCompiledRegularExpression::get_class( class_->runtime(), class_, exception_class() ) ) {
 		return;
 	}
 	static HHuginn::value_t compile( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
