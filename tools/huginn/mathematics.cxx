@@ -11,6 +11,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "builtin.hxx"
 #include "tools/huginn/thread.hxx"
 #include "helper.hxx"
+#include "instruction.hxx"
 #include "keyword.hxx"
 #include "exception.hxx"
 #include "objectfactory.hxx"
@@ -529,6 +530,24 @@ public:
 		return ( thread_->object_factory().create_integer( xmath::modular_multiplication( fact1, fact2, mod ) ) );
 		M_EPILOG
 	}
+	static HHuginn::value_t min( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "Mathematics.min";
+		verify_arg_count( name, values_, 1, meta::max_signed<int>::value, thread_, position_ );
+		HValueCompareHelper less( &instruction::checked_less );
+		less.anchor( thread_, position_ );
+		return ( *min_element( values_.begin(), values_.end(), cref( less ) ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t max( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "Mathematics.max";
+		verify_arg_count( name, values_, 1, meta::max_signed<int>::value, thread_, position_ );
+		HValueCompareHelper less( &instruction::checked_less );
+		less.anchor( thread_, position_ );
+		return ( *max_element( values_.begin(), values_.end(), cref( less ) ) );
+		M_EPILOG
+	}
 	static HHuginn::value_t statistics( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		HMathematics* m( static_cast<HMathematics*>( object_->raw() ) );
@@ -583,6 +602,8 @@ HPackageCreatorInterface::HInstance HMathematicsCreator::do_new_instance( HRunti
 		{ "floor",                runtime_->create_method( &HMathematics::floor ),                "( *value* ) - get largest integral value not greater than *value*" },
 		{ "ceil",                 runtime_->create_method( &HMathematics::ceil ),                 "( *value* ) - get smallest integral value not less than *value*" },
 		{ "differs_at",           runtime_->create_method( &HMathematics::differs_at ),           "( *first*, *second* ) - tell at which decimal position *first* and *second* values have first occurrence of different digit" },
+		{ "min",                  runtime_->create_method( &HMathematics::min ),                  "( *arg1*, *arg2*[, argN...] ) - find minimum element from given set" },
+		{ "max",                  runtime_->create_method( &HMathematics::max ),                  "( *arg1*, *arg2*[, argN...] ) - find maximum element from given set" },
 		{ "greatest_common_divisor",
 			runtime_->create_method( &HMathematics::greatest_common_divisor ),
 			"( *num1*, *num2* ) - find greatest common divisor of two numbers, *num1* and *num2*"

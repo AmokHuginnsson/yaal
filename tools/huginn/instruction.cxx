@@ -198,6 +198,15 @@ bool checked_less( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value
 	return ( v1_->operator_less( thread_, v1_, v2_, position_ ) );
 }
 
+bool checked_greater( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
+	HClass const* c1( v1_->get_class() );
+	HClass const* c2( v2_->get_class() );
+	if ( c1 != c2 ) {
+		operands_type_mismatch( op_to_str( OPERATOR::LESS ), c1, c2, thread_->current_frame()->file_id(), position_ );
+	}
+	return ( v1_->operator_greater( thread_, v1_, v2_, position_ ) );
+}
+
 HHuginn::value_t boolean_xor( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int ) {
 	M_ASSERT( ( v1_->type_id() == HHuginn::TYPE::BOOLEAN ) && ( v2_->type_id() == HHuginn::TYPE::BOOLEAN ) );
 	bool v1( static_cast<HBoolean const*>( v1_.raw() )->value() );

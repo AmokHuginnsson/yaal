@@ -368,8 +368,8 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	typedef bool ( HValue::* compare_t )( HThread*, HHuginn::value_t const&, HHuginn::value_t  const&, int ) const;
-	static HHuginn::value_t minmax( char const* name_, compare_t compare_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
+	typedef bool ( *compare_t )( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
+	static HHuginn::value_t minmax( char const* name_, compare_t const& compare_, huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( name_, values_, 1, 2, thread_, position_ );
 		HHuginn::value_t src( verify_arg_virtual_collection( name_, values_, 0, ARITY::MULTIPLE, thread_, position_ ) );
@@ -382,12 +382,12 @@ public:
 		if ( ! key && ( t == HHuginn::TYPE::ORDER ) ) {
 			huginn::HOrder::values_t const& s( static_cast<huginn::HOrder const*>( src.raw() )->value() );
 			if ( ! s.is_empty() ) {
-				v = ( compare_ == &HValue::operator_greater ) ? *s.begin() : *s.rbegin();
+				v = ( compare_ == instruction::checked_greater ) ? *s.begin() : *s.rbegin();
 			}
 		} else if ( ! key && ( t == HHuginn::TYPE::DICT ) ) {
 			huginn::HDict::values_t const& s( static_cast<huginn::HDict const*>( src.raw() )->value() );
 			if ( ! s.is_empty() ) {
-				huginn::HDict::values_t::value_type const& kv( compare_ == &HValue::operator_greater ? *s.begin() : *s.rbegin() );
+				huginn::HDict::values_t::value_type const& kv( compare_ == instruction::checked_greater ? *s.begin() : *s.rbegin() );
 				v = thread_->object_factory().create_tuple( { kv.first, kv.second } );
 			}
 		} else {
@@ -405,7 +405,7 @@ public:
 				}
 				while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
 					HHuginn::value_t n( it->value( thread_, position_ ) );
-					if ( (v.raw()->*compare_)( thread_, v, n, position_ ) ) {
+					if ( compare_( thread_, v, n, position_ ) ) {
 						v = n;
 					}
 					it->next( thread_, position_ );
@@ -420,14 +420,7 @@ public:
 				while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
 					HHuginn::value_t n( it->value( thread_, position_ ) );
 					HHuginn::value_t kofn( key->operator_call( thread_, key, HArguments( thread_, n ), position_ ) );
-					if (
-						(kofv.raw()->*compare_)(
-							thread_,
-							kofv,
-							kofn,
-							position_
-						)
-					) {
+					if ( compare_( thread_, kofv, kofn, position_ ) ) {
 						v = n;
 						kofv = kofn;
 					}
@@ -447,12 +440,12 @@ public:
 	}
 	static HHuginn::value_t min( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
-		return ( minmax( "Algorithms.min", &HValue::operator_greater, thread_, values_, position_ ) );
+		return ( minmax( "Algorithms.min", instruction::checked_greater, thread_, values_, position_ ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t max( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
-		return ( minmax( "Algorithms.max", &HValue::operator_less, thread_, values_, position_ ) );
+		return ( minmax( "Algorithms.max", instruction::checked_less, thread_, values_, position_ ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t reversed( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -682,8 +675,8 @@ HPackageCreatorInterface::HInstance HAlgorithmsCreator::do_new_instance( HRuntim
 		{ "reduce",      runtime_->create_method( &HAlgorithms::reduce ),      "( *iterable*, *callable* [, *init*] ) - iteratively combine all elements from *iterable* using *callable(x,y)* and starting value of *init*" },
 		{ "range",       runtime_->create_method( &HAlgorithms::range ),       "( [*from*,] *until* [, *step*] ) - produce iterable sequence of `integer` values ranging from *from* up until *until* using *step* increments" },
 		{ "slice",       runtime_->create_method( &HAlgorithms::slice ),       "( *iterable*, [*from*,] *until* [, *step*] ) - produce an iterable view for selecting elements from a sequence ranging from *from* up until *until* using *step* increments" },
-		{ "min",         runtime_->create_method( &HAlgorithms::min ),         "( *arg1*, *arg2*[, argN...] ) - find minimum element from given set" },
-		{ "max",         runtime_->create_method( &HAlgorithms::max ),         "( *arg1*, *arg2*[, argN...] ) - find maximum element from given set" },
+		{ "min",         runtime_->create_method( &HAlgorithms::min ),         "( *iterable* ) - find minimum element from given *iterable* set" },
+		{ "max",         runtime_->create_method( &HAlgorithms::max ),         "( *iterable* ) - find maximum element from given *iterable* set" },
 		{ "sorted",      runtime_->create_method( &HAlgorithms::sorted ),      "( *iterable* [, *callable*] ) - return content of *iterable* as sorted `list`, using *callable* to retrieve keys for element comparison" },
 		{ "zip",         runtime_->create_method( &HAlgorithms::zip ),         "( *iterable1*, *iterable2*, ... ) - create zipped iterable view of a set of iterables" },
 		{ "chain",       runtime_->create_method( &HAlgorithms::chain ),       "( *iterable1*, *iterable2*, ... ) - create iterable view of a chained set of iterables" },
