@@ -128,9 +128,9 @@ void HTime::do_operator_subtract( HThread*, HHuginn::value_t&, HHuginn::value_t 
 	M_EPILOG
 }
 
-int long HTime::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
+hash_value_t HTime::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
 	M_PROLOG
-	return ( static_cast<int long>( _time.raw() ) );
+	return ( hash<hcore::HTime::value_type>()( _time.raw() ) );
 	M_EPILOG
 }
 

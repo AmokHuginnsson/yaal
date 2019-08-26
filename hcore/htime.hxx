@@ -35,6 +35,7 @@ extern M_YAAL_HCORE_PUBLIC_API char const _iso8601DateTimeFormat_[];
 class HTime final {
 public:
 	typedef HTime this_type;
+	typedef i64_t value_type;
 	enum class TZ {
 		UTC,
 		LOCAL
@@ -71,7 +72,7 @@ public:
 	static int const SECONDS_IN_MINUTE = 60;
 	static i64_t const SECONDS_TO_UNIX_EPOCH = 62167219200LL;
 private:
-	i64_t _value;
+	value_type _value;
 	tm _broken;
 	TZ _tz;
 	HUTF8String _format;

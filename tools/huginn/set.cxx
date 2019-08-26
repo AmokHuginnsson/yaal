@@ -194,12 +194,12 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 	verify_arg_count( "set.hash", values_, 0, 0, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
 	huginn::HSet::values_t const& values( static_cast<huginn::HSet*>( object_->raw() )->value() );
-	int long hashValue( static_cast<int long>( HHuginn::TYPE::SET ) );
+	hash_value_t hashValue( static_cast<hash_value_t>( HHuginn::TYPE::SET ) );
 	for ( HHuginn::value_t const& v : values ) {
 		hashValue *= 3;
 		hashValue += v->operator_hash( thread_, v, position_ );
 	}
-	return ( thread_->object_factory().create_integer( hashValue ) );
+	return ( thread_->object_factory().create_integer( static_cast<HInteger::value_type>( hashValue ) ) );
 	M_EPILOG
 }
 

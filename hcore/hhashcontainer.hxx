@@ -10,7 +10,6 @@
 #include "hcore/trait.hxx"
 #include "hcore/hchunk.hxx"
 #include "hcore/hpair.hxx"
-#include "hcore/math.hxx"
 #include "hcore/allocator.hxx"
 
 namespace yaal {
@@ -19,35 +18,33 @@ namespace hcore {
 
 template<typename key_t>
 struct hash {
-	typedef int long size_type;
-	size_type operator () ( key_t const& ) const;
+	typedef hash_value_t hash_value_type;
+	hash_value_type operator () ( key_t const& ) const;
 };
 
 template<typename key_t>
 struct hash<key_t*> {
-	typedef int long size_type;
-	size_type operator () ( key_t* const& key_ ) const {
-		return ( reinterpret_cast<size_type>( key_ ) );
+	typedef hash_value_t hash_value_type;
+	hash_value_type operator () ( key_t* const& key_ ) const {
+		return ( reinterpret_cast<hash_value_type>( key_ ) );
 	}
 };
 
 template<typename first_t, typename second_t>
 struct hash<yaal::hcore::HPair<first_t, second_t>> {
-	typedef int long size_type;
-	size_type operator () ( yaal::hcore::HPair<first_t, second_t> const& key_ ) const {
+	typedef hash_value_t hash_value_type;
+	hash_value_type operator () ( yaal::hcore::HPair<first_t, second_t> const& key_ ) const {
 		return ( hash<first_t>()( key_.first ) * 3 + hash<second_t>()( key_.second ) );
 	}
 };
 
 template<typename key_t, typename TAG>
 struct hash<yaal::hcore::HTaggedPOD<key_t, TAG>> {
-	typedef int long size_type;
-	size_type operator () ( HTaggedPOD<key_t, TAG> const& key_ ) const {
+	typedef hash_value_t hash_value_type;
+	hash_value_type operator () ( HTaggedPOD<key_t, TAG> const& key_ ) const {
 		return ( hash<key_t>()( key_.get() ) );
 	}
 };
-
-extern M_YAAL_HCORE_PUBLIC_API hash<trait::no_type>::size_type const* const _primes_;
 
 template<typename value_t, typename hasher_t, typename equal_key_t, typename get_key_t, typename allocator_t>
 class HHashContainer final {
@@ -58,7 +55,7 @@ public:
 	typedef equal_key_t equal_key_type;
 	typedef get_key_t get_key_type;
 	typedef typename get_key_type::key_type key_type;
-	typedef typename trait::strip<hasher_type>::type::size_type size_type;
+	typedef int long size_type;
 private:
 #ifndef __sun__
 #pragma pack( push, 1 )
@@ -377,7 +374,9 @@ HHashContainer<value_t, hasher_t, equal_key_t, get_key_t, allocator_t>::find( ke
 	size_type idx( 0 );
 	HAtom* atom( nullptr );
 	if ( _prime ) {
-		idx = yaal::math::abs( _hasher( key_ ) ) % _prime;
+		idx = static_cast<size_type>(
+			static_cast<hash_value_t>( _hasher( key_ ) ) % static_cast<hash_value_t>( _prime )
+		);
 		atom = _buckets.get<HAtom*>()[ idx ];
 		while ( atom && ! _equals( get_key_type::key( atom->_value ), key_ ) ) {
 			atom = atom->_next;
@@ -399,7 +398,11 @@ HHashContainer<value_t, hasher_t, equal_key_t, get_key_t, allocator_t>::insert_i
 			resize( ( _size + 1 ) * 2 );
 		}
 
-		size_type newHash( yaal::math::abs( _hasher( get_key_type::key( constructor_._value ) ) ) % _prime );
+		size_type newHash(
+			static_cast<size_type>(
+				static_cast<hash_value_t>( _hasher( get_key_type::key( constructor_._value ) ) ) % static_cast<hash_value_t>( _prime )
+			)
+		);
 
 		HAtom* atom( _allocator.allocate( 1 ) );
 		try {
@@ -419,6 +422,8 @@ HHashContainer<value_t, hasher_t, equal_key_t, get_key_t, allocator_t>::insert_i
 	return ( make_pair( it, inserted ) );
 	M_EPILOG
 }
+
+extern M_YAAL_HCORE_PUBLIC_API int long const* const _primes_;
 
 template<typename value_t, typename hasher_t, typename equal_key_t, typename get_key_t, typename allocator_t>
 void HHashContainer<value_t, hasher_t, equal_key_t, get_key_t, allocator_t>::resize( size_type size_ ) {
@@ -441,7 +446,11 @@ void HHashContainer<value_t, hasher_t, equal_key_t, get_key_t, allocator_t>::res
 			while ( a ) {
 				HAtom* atom( a );
 				a = a->_next;
-				size_type newHash( yaal::math::abs( _hasher( get_key_type::key( atom->_value ) ) ) % prime );
+				size_type newHash(
+					static_cast<size_type>(
+						static_cast<hash_value_t>( _hasher( get_key_type::key( atom->_value ) ) ) % static_cast<hash_value_t>( prime )
+					)
+				);
 				atom->_next = newBuckets[ newHash ];
 				newBuckets[ newHash ] = atom;
 			}

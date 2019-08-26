@@ -370,7 +370,7 @@ HHuginn::value_t HValue::do_operator_range( HThread* thread_, HHuginn::value_t c
 }
 #pragma GCC diagnostic pop
 
-int long HValue::do_operator_hash( HThread* thread_, HHuginn::value_t const& self_, int position_ ) const {
+hash_value_t HValue::do_operator_hash( HThread* thread_, HHuginn::value_t const& self_, int position_ ) const {
 	if ( _class->type_id() == HHuginn::TYPE::NONE ) {
 		return ( 0 );
 	}

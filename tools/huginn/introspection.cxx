@@ -95,7 +95,7 @@ public:
 		verify_arg_count( "Introspection.hash", values_, 1, 1, thread_, position_ );
 		HObjectFactory& of( *thread_->runtime().object_factory() );
 		HHuginn::value_t const& v( values_.front() );
-		return ( of.create_integer( v->operator_hash( thread_, v, position_ ) ) );
+		return ( of.create_integer( static_cast<HInteger::value_type>( v->operator_hash( thread_, v, position_ ) ) ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t symbol( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {

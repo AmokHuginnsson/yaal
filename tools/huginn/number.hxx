@@ -46,7 +46,7 @@ private:
 	virtual HHuginn::value_t do_operator_modulus( HThread*, HHuginn::value_t const&, int ) const override;
 	virtual HHuginn::value_t do_operator_negate( HThread*, HHuginn::value_t const&, int ) const override;
 	virtual HHuginn::value_t do_operator_factorial( HThread*, HHuginn::value_t const&, int ) const override;
-	virtual int long do_operator_hash( HThread*, HHuginn::value_t const&, int ) const override;
+	virtual hash_value_t do_operator_hash( HThread*, HHuginn::value_t const&, int ) const override;
 	virtual yaal::hcore::HString do_code( HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const override;
 	virtual yaal::hcore::HString do_to_string( HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const override;
 };

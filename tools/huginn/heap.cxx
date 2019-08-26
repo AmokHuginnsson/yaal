@@ -124,7 +124,7 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::HEAP );
 	HHeap& heap( *static_cast<HHeap*>( object_->raw() ) );
 	HHeap::values_t values( static_cast<HHeap*>( object_->raw() )->value() );
-	int long hashValue( static_cast<int long>( HHuginn::TYPE::HEAP ) );
+	hash_value_t hashValue( static_cast<hash_value_t>( HHuginn::TYPE::HEAP ) );
 	HAnchorGuard<HHeap> ag( heap, thread_, position_ );
 	while ( ! values.is_empty() ) {
 		hashValue *= 3;
@@ -132,7 +132,7 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 		hashValue += v->operator_hash( thread_, v, position_ );
 		values.pop();
 	}
-	return ( thread_->object_factory().create_integer( hashValue ) );
+	return ( thread_->object_factory().create_integer( static_cast<HInteger::value_type>( hashValue ) ) );
 	M_EPILOG
 }
 

@@ -277,14 +277,14 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 	verify_arg_count( "dict.hash", values_, 0, 0, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DICT );
 	huginn::HDict::values_t const& values( static_cast<huginn::HDict*>( object_->raw() )->value() );
-	int long hashValue( static_cast<int long>( HHuginn::TYPE::DICT ) );
+	hash_value_t hashValue( static_cast<hash_value_t>( HHuginn::TYPE::DICT ) );
 	for ( huginn::HDict::values_t::value_type const& v : values ) {
 		hashValue *= 3;
 		hashValue += v.first->operator_hash( thread_, v.first, position_ );
 		hashValue *= 3;
 		hashValue += v.second->operator_hash( thread_, v.second, position_ );
 	}
-	return ( thread_->object_factory().create_integer( hashValue ) );
+	return ( thread_->object_factory().create_integer( static_cast<HInteger::value_type>( hashValue ) ) );
 	M_EPILOG
 }
 

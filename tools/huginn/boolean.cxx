@@ -57,7 +57,7 @@ bool HBoolean::do_operator_equals( HThread*, HHuginn::value_t const&, HHuginn::v
 	return ( _value == static_cast<HBoolean const*>( other_.raw() )->_value );
 }
 
-int long HBoolean::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
+hash_value_t HBoolean::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
 	return ( hcore::hash<bool>()( _value ) );
 }
 

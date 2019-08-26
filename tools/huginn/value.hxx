@@ -136,7 +136,7 @@ public:
 		M_ASSERT( self_.raw() == this );
 		return ( do_operator_range( thread_, self_, start_, stop_, step_, position_ ) );
 	}
-	int long operator_hash( HThread* thread_, HHuginn::value_t const& self_, int position_ ) const {
+	hash_value_t operator_hash( HThread* thread_, HHuginn::value_t const& self_, int position_ ) const {
 		M_ASSERT( self_.raw() == this );
 		return ( do_operator_hash( thread_, self_, position_ ) );
 	}
@@ -165,7 +165,7 @@ private:
 	virtual HHuginn::value_t do_operator_subscript( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const;
 	virtual void do_operator_subscript_assign( HThread*, HHuginn::value_t&, HHuginn::value_t const&, HHuginn::value_t&&, int );
 	virtual HHuginn::value_t do_operator_range( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, HHuginn::value_t const&, HHuginn::value_t const&, int ) const;
-	virtual int long do_operator_hash( HThread*, HHuginn::value_t const&, int ) const;
+	virtual hash_value_t do_operator_hash( HThread*, HHuginn::value_t const&, int ) const;
 	virtual HHuginn::value_t do_operator_call( huginn::HThread*, HHuginn::value_t&, HHuginn::values_t&, int );
 	virtual yaal::hcore::HString do_code( HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const;
 	virtual yaal::hcore::HString do_to_string( HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const;
@@ -179,7 +179,7 @@ private:
 
 class HValueHashHelper final {
 public:
-	typedef int long size_type;
+	typedef hash_value_t hash_value_type;
 private:
 	huginn::HThread* _thread;
 	int _position;
@@ -192,7 +192,7 @@ public:
 		_thread = thread_;
 		_position = position_;
 	}
-	size_type operator()( HHuginn::value_t const& value_ ) const {
+	hash_value_type operator()( HHuginn::value_t const& value_ ) const {
 		M_ASSERT( _thread != nullptr );
 		return ( value_->operator_hash( _thread, value_, _position ) );
 	}

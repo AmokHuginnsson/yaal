@@ -73,7 +73,7 @@ bool HFunctionReference::do_operator_greater_or_equal( HThread*, HHuginn::value_
 	return ( _identifierId >= static_cast<huginn::HFunctionReference const*>( other_.raw() )->identifier_id() );
 }
 
-int long HFunctionReference::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
+hash_value_t HFunctionReference::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
 	return ( hcore::hash<int long>()( _identifierId.get() ) );
 }
 

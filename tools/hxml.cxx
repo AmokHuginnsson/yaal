@@ -1883,7 +1883,7 @@ value_t try_attr_val_by_path( HXml::HConstIterator const& it_, yaal::hcore::HStr
 namespace hcore {
 
 template<>
-int long hash<HXml::HNameSpace>::operator () ( HXml::HNameSpace const& ns_ ) const {
+hash<HXml::HNameSpace>::hash_value_type hash<HXml::HNameSpace>::operator () ( HXml::HNameSpace const& ns_ ) const {
 	return ( hash<HString>()( ns_.prefix() ) + hash<HString>()( ns_.href() ) );
 }
 

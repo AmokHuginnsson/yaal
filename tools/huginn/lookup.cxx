@@ -264,14 +264,14 @@ inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object
 	verify_arg_count( "lookup.hash", values_, 0, 0, thread_, position_ );
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LOOKUP );
 	huginn::HLookup::values_t const& values( static_cast<huginn::HLookup*>( object_->raw() )->value() );
-	int long hashValue( static_cast<int long>( HHuginn::TYPE::LOOKUP ) );
+	hash_value_t hashValue( static_cast<hash_value_t>( HHuginn::TYPE::LOOKUP ) );
 	for ( huginn::HLookup::values_t::value_type const& v : values ) {
 		hashValue *= 3;
 		hashValue += v.first->operator_hash( thread_, v.first, position_ );
 		hashValue *= 3;
 		hashValue += v.second->operator_hash( thread_, v.second, position_ );
 	}
-	return ( thread_->object_factory().create_integer( hashValue ) );
+	return ( thread_->object_factory().create_integer( static_cast<HInteger::value_type>( hashValue ) ) );
 	M_EPILOG
 }
 

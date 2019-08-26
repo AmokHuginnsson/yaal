@@ -35,7 +35,7 @@ public:
 	virtual void do_operator_divide( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int ) override;
 	virtual HHuginn::value_t do_operator_modulus( HThread*, HHuginn::value_t const&, int ) const override;
 	virtual HHuginn::value_t do_operator_negate( HThread*, HHuginn::value_t const&, int ) const override;
-	virtual int long do_operator_hash( HThread*, HHuginn::value_t const&, int ) const override;
+	virtual hash_value_t do_operator_hash( HThread*, HHuginn::value_t const&, int ) const override;
 	virtual yaal::hcore::HString do_code( HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const override;
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;

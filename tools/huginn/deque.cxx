@@ -501,9 +501,9 @@ HHuginn::value_t HDeque::do_operator_range( HThread* thread_, HHuginn::value_t c
 	return ( thread_->object_factory().create_deque( yaal::move( v ) ) );
 }
 
-int long HDeque::do_operator_hash( HThread* thread_, HHuginn::value_t const&, int position_ ) const {
+hash_value_t HDeque::do_operator_hash( HThread* thread_, HHuginn::value_t const&, int position_ ) const {
 	M_PROLOG
-	int long hashValue( static_cast<int long>( HHuginn::TYPE::DEQUE ) );
+	hash_value_t hashValue( static_cast<hash_value_t>( HHuginn::TYPE::DEQUE ) );
 	for ( HHuginn::value_t const& v : _data ) {
 		hashValue *= 3;
 		hashValue += v->operator_hash( thread_, v, position_ );

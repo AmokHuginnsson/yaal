@@ -20,28 +20,28 @@ int long const x_tag_g_pulPrimes[ 32 ] = {
 }, * const _primes_ = x_tag_g_pulPrimes;
 
 template<>
-int long hash<HString>::operator () ( HString const& string_ ) const {
-	int long h( 0 );
+hash<HString>::hash_value_type hash<HString>::operator () ( HString const& string_ ) const {
+	hash_value_type h( 0 );
 	for ( code_point_t c : string_ ) {
 		h *= 101;
-		h += static_cast<int>( c.get() );
+		h += c.get();
 	}
 	return ( h );
 }
 
 template<>
-int long hash<code_point_t>::operator () ( code_point_t const& val_ ) const {
-	return ( static_cast<int long>( val_.get() ) );
+hash<code_point_t>::hash_value_type hash<code_point_t>::operator () ( code_point_t const& val_ ) const {
+	return ( static_cast<hash_value_type>( val_.get() ) );
 }
 
 template<>
-int long hash<double long>::operator () ( double long const& val_ ) const {
-	return ( static_cast<int long>( reinterpret_cast<int long long const&>( static_cast<double const&>( val_ ) ) ) );
+hash<double long>::hash_value_type hash<double long>::operator () ( double long const& val_ ) const {
+	return ( static_cast<hash_value_type>( reinterpret_cast<int long long unsigned const&>( static_cast<double const&>( val_ ) ) ) );
 }
 
 template<typename T>
-int long hash<T>::operator () ( T const& key_ ) const {
-	return ( static_cast<int long>( key_ ) );
+typename hash<T>::hash_value_type hash<T>::operator () ( T const& key_ ) const {
+	return ( static_cast<hash_value_type>( key_ ) );
 }
 
 template struct hash<bool>;

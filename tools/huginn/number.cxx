@@ -191,7 +191,7 @@ HHuginn::value_t HNumber::do_operator_factorial( HThread* thread_, HHuginn::valu
 	return ( res );
 }
 
-int long HNumber::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
+hash_value_t HNumber::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
 	return ( hcore::hash<hcore::HNumber>()( _value ) );
 }
 

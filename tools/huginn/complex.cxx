@@ -111,7 +111,7 @@ HHuginn::value_t HComplex::do_operator_negate( HThread* thread_, HHuginn::value_
 	return ( thread_->object_factory().create<HComplex>( HValue::get_class(), -_data ) );
 }
 
-int long HComplex::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
+hash_value_t HComplex::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
 	return ( hcore::hash<double long>()( _data.re() ) ^ hcore::hash<double long>()( _data.im() ) );
 }
 

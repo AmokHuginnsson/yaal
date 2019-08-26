@@ -120,7 +120,7 @@ bool HCharacter::do_operator_greater_or_equal( HThread*, HHuginn::value_t const&
 	return ( _value >= static_cast<HCharacter const*>( other_.raw() )->_value );
 }
 
-int long HCharacter::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
+hash_value_t HCharacter::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
 	return ( hcore::hash<code_point_t>()( _value ) );
 }
 

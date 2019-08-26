@@ -199,6 +199,8 @@ typedef int long long          int_native_t;
 #error Cannot establish native integer type.
 #endif /* Native integer type detection */
 
+typedef int long unsigned hash_value_t;
+
 }
 
 #endif /* #ifndef YAAL_HCORE_POD_HXX_INCLUDED */

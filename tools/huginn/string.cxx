@@ -606,7 +606,7 @@ HHuginn::value_t HString::do_operator_range( HThread* thread_, HHuginn::value_t 
 	return ( thread_->object_factory().create_string( yaal::move( r ) ) );
 }
 
-int long HString::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
+hash_value_t HString::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
 	return ( hcore::hash<hcore::HString>()( _value ) );
 }
 

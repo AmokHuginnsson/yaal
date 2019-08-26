@@ -30,7 +30,7 @@ public:
 private:
 	virtual HHuginn::value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 	virtual bool do_operator_equals( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const override;
-	virtual int long do_operator_hash( HThread*, HHuginn::value_t const&, int ) const override;
+	virtual hash_value_t do_operator_hash( HThread*, HHuginn::value_t const&, int ) const override;
 	virtual yaal::hcore::HString do_code( HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const override;
 	virtual yaal::hcore::HString do_to_string( HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const override;
 };

@@ -139,7 +139,7 @@ HHuginn::value_t HInteger::do_operator_negate( HThread* thread_, HHuginn::value_
 	return ( res );
 }
 
-int long HInteger::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
+hash_value_t HInteger::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {
 	return ( hcore::hash<int long long>()( _value ) );
 }
 
