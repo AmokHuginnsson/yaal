@@ -26,12 +26,10 @@ namespace huginn {
 
 class HDateTime : public HPackage {
 	HHuginn::class_t _clockClass;
-	HHuginn::class_t _exceptionClass;
 public:
 	HDateTime( HClass* class_ )
 		: HPackage( class_ )
-		, _clockClass( HClock::get_class( class_->runtime(), class_ ) )
-		, _exceptionClass( class_exception( class_ ) ) {
+		, _clockClass( HClock::get_class( class_->runtime(), class_ ) ) {
 		return;
 	}
 	static HHuginn::value_t now( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -62,7 +60,7 @@ public:
 			t.set_format( fmt );
 			s = t.to_string();
 		} catch ( hcore::HException const& e ) {
-			thread_->raise( dtp._exceptionClass.raw(), e.what(), position_ );
+			thread_->raise( dtp.exception_class(), e.what(), position_ );
 		}
 		return ( of.create_string( yaal::move( s ) ) );
 		M_EPILOG

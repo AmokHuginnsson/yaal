@@ -240,7 +240,6 @@ void HRuntime::reset( void ) {
 	_result.reset();
 	static_cast<huginn::HList*>( _argv.raw() )->clear();
 	_threads.clear();
-	_idGenerator = type_id( HHuginn::TYPE::NOT_BOOLEAN ).get();
 	return;
 	M_EPILOG
 }
@@ -558,7 +557,7 @@ HHuginn::class_t HRuntime::create_class(
 	HHuginn::class_t c(
 		make_pointer<HClass>(
 			this,
-			type_id_t( _idGenerator ),
+			type_id_t( new_type_id() ),
 			identifier_,
 			doc_,
 			access_,
@@ -567,7 +566,6 @@ HHuginn::class_t HRuntime::create_class(
 			createInstance_
 		)
 	);
-	++ _idGenerator;
 	return ( c );
 	M_EPILOG
 }
@@ -589,9 +587,7 @@ HHuginn::class_t HRuntime::create_class(
 
 HHuginn::class_t HRuntime::create_class( class_constructor_t const& classConstructor_ ) {
 	M_PROLOG
-	type_id_t id( _idGenerator );
-	++ _idGenerator;
-	class_t c( classConstructor_( id ) );
+	class_t c( classConstructor_( new_type_id() ) );
 	return ( c );
 	M_EPILOG
 }
