@@ -178,49 +178,8 @@ inline HHuginn::value_t update( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::ORDER );
 	verify_signature( "order.update", values_, { HHuginn::TYPE::ORDER }, thread_, position_ );
-	HOrder& l( *static_cast<HOrder*>( object_->raw() ) );
-	HOrder const& r( *static_cast<HOrder const*>( values_[0].raw() ) );
-	if ( r.key_type()->type_id() != HHuginn::TYPE::NONE ) {
-		l.update_key_type( thread_, r.key_type(), position_ );
-	}
-	HOrder::values_t& lv( l.value() );
-	HOrder::values_t const& rv( r.value() );
-	HAnchorGuard<HOrder> ag( l, thread_, position_ );
-	for ( HOrder::values_t::const_iterator it( rv.begin() ), end( rv.end() ); it != end; ++ it ) {
-		lv.insert( *it );
-	}
+	(*object_)->operator_add( thread_, *object_, values_[0], position_ );
 	return ( *object_ );
-	M_EPILOG
-}
-
-inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	verify_arg_count( "order.hash", values_, 0, 0, thread_, position_ );
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::ORDER );
-	HOrder::values_t const& values( static_cast<HOrder*>( object_->raw() )->value() );
-	hash_value_t hashValue( static_cast<hash_value_t>( HHuginn::TYPE::ORDER ) );
-	for ( HHuginn::value_t const& v : values ) {
-		hashValue *= 3;
-		hashValue += v->operator_hash( thread_, v, position_ );
-	}
-	return ( thread_->object_factory().create_integer( static_cast<HInteger::value_type>( hashValue ) ) );
-	M_EPILOG
-}
-
-inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::ORDER );
-	verify_signature( "order.equals", values_, { HHuginn::TYPE::ORDER }, thread_, position_ );
-	HOrder const& l( *static_cast<HOrder*>( object_->raw() ) );
-	HOrder const& r( *static_cast<HOrder const*>( values_[0].raw() ) );
-	HOrder::values_t const& ld( l.value() );
-	HOrder::values_t const& rd( r.value() );
-	bool equal( ( ld.get_size() == rd.get_size() ) && ( l.key_type() == r.key_type() ) );
-	for ( HOrder::values_t::const_iterator lit( ld.begin() ), rit( rd.begin() ), end( ld.end() ); equal && ( lit != end ); ++ lit, ++ rit ) {
-		HHuginn::value_t const& v( *lit );
-		equal = v->operator_equals( thread_, v, *rit, position_ );
-	}
-	return ( thread_->runtime().boolean_value( equal ) );
 	M_EPILOG
 }
 
@@ -248,10 +207,7 @@ public:
 			{ "has_key", objectFactory_->create_method( &order::has_key ), "( *elem* ) - tell if given element *elem* is in the `order`" },
 			{ "erase",   objectFactory_->create_method( &order::erase ),   "( *elem* ) - remove given element *elem* from the `order`" },
 			{ "clear",   objectFactory_->create_method( &order::clear ),   "erase `order`'s content, `order` becomes empty" },
-			{ "add",     objectFactory_->create_method( &order::update ),  "( *other* ) - update content of this `order` with values added from *other* `order`" },
-			{ "update",  objectFactory_->create_method( &order::update ),  "( *other* ) - update content of this `order` with values from *other* `order`" },
-			{ "hash",    objectFactory_->create_method( &order::hash ),    "calculate hash value for this `order`" },
-			{ "equals",  objectFactory_->create_method( &order::equals ),  "( *other* ) - test if *other* `order` has the same content" }
+			{ "update",  objectFactory_->create_method( &order::update ),  "( *other* ) - update content of this `order` with values from *other* `order`" }
 		};
 		redefine( nullptr, fd );
 		return;
@@ -371,8 +327,41 @@ HHuginn::value_t HOrder::do_clone( huginn::HThread* thread_, HHuginn::value_t*, 
 	return ( res );
 }
 
+bool HOrder::do_operator_equals( huginn::HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	HOrder const& otherValue( *static_cast<HOrder const*>( other_.raw() ) );
+	HOrder::values_t const& otherData( otherValue.value() );
+	bool equal( ( _data.get_size() == otherData.get_size() ) && ( _keyType == otherValue._keyType ) );
+	for ( HOrder::values_t::const_iterator lit( _data.begin() ), rit( otherData.begin() ), end( _data.end() ); equal && ( lit != end ); ++ lit, ++ rit ) {
+		HHuginn::value_t const& v( *lit );
+		equal = v->operator_equals( thread_, v, *rit, position_ );
+	}
+	return ( equal );
+}
+
+void HOrder::do_operator_add( HThread* thread_, HHuginn::value_t&, HHuginn::value_t const& other_, int position_ ) {
+	HOrder const& otherValue( *static_cast<HOrder const*>( other_.raw() ) );
+	if ( otherValue.key_type()->type_id() != HHuginn::TYPE::NONE ) {
+		update_key_type( thread_, otherValue.key_type(), position_ );
+	}
+	HOrder::values_t const& otherData( otherValue.value() );
+	HAnchorGuard<HOrder> ag( *this, thread_, position_ );
+	for ( HOrder::values_t::const_iterator it( otherData.begin() ), end( otherData.end() ); it != end; ++ it ) {
+		_data.insert( *it );
+	}
+	return;
+}
+
 bool HOrder::do_operator_contains( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
 	return ( has_key( thread_, other_, position_ ) );
+}
+
+hash_value_t HOrder::do_operator_hash( HThread* thread_, HHuginn::value_t const&, int position_ ) const {
+	hash_value_t hashValue( static_cast<hash_value_t>( HHuginn::TYPE::ORDER ) );
+	for ( HHuginn::value_t const& v : _data ) {
+		hashValue *= 3;
+		hashValue += v->operator_hash( thread_, v, position_ );
+	}
+	return ( hashValue );
 }
 
 yaal::hcore::HString HOrder::do_code( huginn::HThread* thread_, HHuginn::value_t const&, HCycleTracker& cycleTracker_, int position_ ) const {

@@ -178,46 +178,8 @@ inline HHuginn::value_t update( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
 	verify_signature( "set.update", values_, { HHuginn::TYPE::SET }, thread_, position_ );
-	huginn::HSet* s( static_cast<huginn::HSet*>( object_->raw() ) );
-	huginn::HSet::values_t& l( s->value() );
-	huginn::HSet::values_t const& r( static_cast<huginn::HSet const*>( values_[0].raw() )->value() );
-	HAnchorGuard<huginn::HSet> ag( *s, thread_, position_ );
-	for ( huginn::HSet::values_t::const_iterator it( r.begin() ), end( r.end() ); it != end; ++ it ) {
-		l.insert( *it );
-	}
+	(*object_)->operator_add( thread_, *object_, values_[0], position_ );
 	return ( *object_ );
-	M_EPILOG
-}
-
-inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	verify_arg_count( "set.hash", values_, 0, 0, thread_, position_ );
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
-	huginn::HSet::values_t const& values( static_cast<huginn::HSet*>( object_->raw() )->value() );
-	hash_value_t hashValue( static_cast<hash_value_t>( HHuginn::TYPE::SET ) );
-	for ( HHuginn::value_t const& v : values ) {
-		hashValue *= 3;
-		hashValue += v->operator_hash( thread_, v, position_ );
-	}
-	return ( thread_->object_factory().create_integer( static_cast<HInteger::value_type>( hashValue ) ) );
-	M_EPILOG
-}
-
-inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::SET );
-	verify_signature( "set.equals", values_, { HHuginn::TYPE::SET }, thread_, position_ );
-	huginn::HSet const& self( *static_cast<huginn::HSet*>( object_->raw() ) );
-	huginn::HSet const& other( *static_cast<huginn::HSet const*>( values_[0].raw() ) );
-	huginn::HSet::values_t const& selfData( self.value() );
-	huginn::HSet::values_t const& otherData( other.value() );
-	bool equal( selfData.get_size() == otherData.get_size() );
-	HAnchorGuard<huginn::HSet> ag( other, thread_, position_ );
-	for ( huginn::HSet::values_t::const_iterator it( selfData.begin() ), end( selfData.end() ); equal && ( it != end ); ++ it ) {
-		huginn::HSet::values_t::const_iterator otherIt( otherData.find( *it ) );
-		equal = otherIt != otherData.end();
-	}
-	return ( thread_->runtime().boolean_value( equal ) );
 	M_EPILOG
 }
 
@@ -245,10 +207,7 @@ public:
 			{ "has_key", objectFactory_->create_method( &set::has_key ), "( *elem* ) - tell if given element *elem* is present in the `set`" },
 			{ "erase",   objectFactory_->create_method( &set::erase ),   "( *elem* ) - remove given element *elem* from the `set`" },
 			{ "clear",   objectFactory_->create_method( &set::clear ),   "erase `set`'s content, `set` becomes empty" },
-			{ "add",     objectFactory_->create_method( &set::update ),  "( *other* ) - update content of this `set` with values from *other* `set`" },
-			{ "update",  objectFactory_->create_method( &set::update ),  "( *other* ) - update content of this `set` with values from *other* `set`" },
-			{ "hash",    objectFactory_->create_method( &set::hash ),    "calculate hash value for this `set`" },
-			{ "equals",  objectFactory_->create_method( &set::equals ),  "( *other* ) - test if *other* `set` has the same content" }
+			{ "update",  objectFactory_->create_method( &set::update ),  "( *other* ) - update content of this `set` with values from *other* `set`" }
 		};
 		redefine( nullptr, fd );
 		return;
@@ -342,8 +301,38 @@ HHuginn::value_t HSet::do_clone( huginn::HThread* thread_, HHuginn::value_t*, in
 	M_EPILOG
 }
 
+bool HSet::do_operator_equals( huginn::HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	huginn::HSet const& other( *static_cast<huginn::HSet const*>( other_.raw() ) );
+	huginn::HSet::values_t const& otherData( other.value() );
+	bool equal( _data.get_size() == otherData.get_size() );
+	HAnchorGuard<huginn::HSet> ag( other, thread_, position_ );
+	for ( huginn::HSet::values_t::const_iterator it( _data.begin() ), end( _data.end() ); equal && ( it != end ); ++ it ) {
+		huginn::HSet::values_t::const_iterator otherIt( otherData.find( *it ) );
+		equal = otherIt != otherData.end();
+	}
+	return ( equal );
+}
+
+void HSet::do_operator_add( HThread* thread_, HHuginn::value_t&, HHuginn::value_t const& other_, int position_ ) {
+	huginn::HSet::values_t const& otherData( static_cast<huginn::HSet const*>( other_.raw() )->value() );
+	HAnchorGuard<huginn::HSet> ag( *this, thread_, position_ );
+	for ( huginn::HSet::values_t::const_iterator it( otherData.begin() ), end( otherData.end() ); it != end; ++ it ) {
+		_data.insert( *it );
+	}
+	return;
+}
+
 bool HSet::do_operator_contains( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
 	return ( has_key( thread_, other_, position_ ) );
+}
+
+hash_value_t HSet::do_operator_hash( HThread* thread_, HHuginn::value_t const&, int position_ ) const {
+	hash_value_t hashValue( static_cast<hash_value_t>( HHuginn::TYPE::SET ) );
+	for ( HHuginn::value_t const& v : _data ) {
+		hashValue *= 3;
+		hashValue += v->operator_hash( thread_, v, position_ );
+	}
+	return ( hashValue );
 }
 
 yaal::hcore::HString HSet::do_code( huginn::HThread* thread_, HHuginn::value_t const&, HCycleTracker& cycleTracker_, int position_ ) const {

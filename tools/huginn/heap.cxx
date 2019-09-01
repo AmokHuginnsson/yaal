@@ -101,59 +101,8 @@ inline HHuginn::value_t update( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::HEAP );
 	verify_signature( "heap.update", values_, { HHuginn::TYPE::HEAP }, thread_, position_ );
-	HHeap& l( *static_cast<HHeap*>( object_->raw() ) );
-	HHeap const& r( *static_cast<HHeap const*>( values_[0].raw() ) );
-	if ( r.key_type()->type_id() != HHuginn::TYPE::NONE ) {
-		l.update_key_type( thread_, r.key_type(), position_ );
-	}
-	HHeap::values_t& lv( l.value() );
-	HHeap::values_t rv( r.value() );
-	HAnchorGuard<HHeap> agL( l, thread_, position_ );
-	HAnchorGuard<HHeap> agR( r, thread_, position_ );
-	while ( ! rv.is_empty() ) {
-		lv.push( rv.top() );
-		rv.pop();
-	}
+	(*object_)->operator_add( thread_, *object_, values_[0], position_ );
 	return ( *object_ );
-	M_EPILOG
-}
-
-inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	verify_arg_count( "heap.hash", values_, 0, 0, thread_, position_ );
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::HEAP );
-	HHeap& heap( *static_cast<HHeap*>( object_->raw() ) );
-	HHeap::values_t values( static_cast<HHeap*>( object_->raw() )->value() );
-	hash_value_t hashValue( static_cast<hash_value_t>( HHuginn::TYPE::HEAP ) );
-	HAnchorGuard<HHeap> ag( heap, thread_, position_ );
-	while ( ! values.is_empty() ) {
-		hashValue *= 3;
-		HHuginn::value_t const& v( values.top() );
-		hashValue += v->operator_hash( thread_, v, position_ );
-		values.pop();
-	}
-	return ( thread_->object_factory().create_integer( static_cast<HInteger::value_type>( hashValue ) ) );
-	M_EPILOG
-}
-
-inline HHuginn::value_t equals( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::HEAP );
-	verify_signature( "heap.equals", values_, { HHuginn::TYPE::HEAP }, thread_, position_ );
-	HHeap const& l( *static_cast<HHeap*>( object_->raw() ) );
-	HHeap const& r( *static_cast<HHeap const*>( values_[0].raw() ) );
-	HHeap::values_t ld( l.value() );
-	HHeap::values_t rd( r.value() );
-	bool equal( ( ld.get_size() == rd.get_size() ) && ( l.key_type() == r.key_type() ) );
-	HAnchorGuard<HHeap> agL( l, thread_, position_ );
-	HAnchorGuard<HHeap> agR( r, thread_, position_ );
-	while ( equal && ! ld.is_empty() ) {
-		HHuginn::value_t const& v( ld.top() );
-		equal = v->operator_equals( thread_, v, rd.top(), position_ );
-		ld.pop();
-		rd.pop();
-	}
-	return ( thread_->runtime().boolean_value( equal ) );
 	M_EPILOG
 }
 
@@ -178,10 +127,7 @@ public:
 			{ "pop",    objectFactory_->create_method( &heap::pop ),    "remove (and retrieve) top element from the `heap`" },
 			{ "top",    objectFactory_->create_method( &heap::top ),    "inspect the top element on the `heap`" },
 			{ "clear",  objectFactory_->create_method( &heap::clear ),  "clear `heap`'s content, `heap` becomes empty" },
-			{ "add",    objectFactory_->create_method( &heap::update ), "( *other* ) - update content of this `heap` with values added from *other* `heap`" },
-			{ "update", objectFactory_->create_method( &heap::update ), "( *other* ) - update content of this `heap` with values from *other* `heap`" },
-			{ "hash",   objectFactory_->create_method( &heap::hash ),   "calculate hash value for this `heap`" },
-			{ "equals", objectFactory_->create_method( &heap::equals ), "( *other* ) - test if *other* `heap` has the same content" }
+			{ "update", objectFactory_->create_method( &heap::update ), "( *other* ) - update content of this `heap` with values from *other* `heap`" }
 		};
 		redefine( nullptr, fd );
 		return;
@@ -297,6 +243,50 @@ HHuginn::value_t HHeap::do_clone( huginn::HThread* thread_, HHuginn::value_t*, i
 		values.pop();
 	}
 	return ( res );
+}
+
+bool HHeap::do_operator_equals( huginn::HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	HHeap const& otherValue( *static_cast<HHeap const*>( other_.raw() ) );
+	HHeap::values_t data( _data );
+	HHeap::values_t otherData( otherValue.value() );
+	bool equal( ( _data.get_size() == otherData.get_size() ) && ( _keyType == otherValue._keyType ) );
+	HAnchorGuard<HHeap> agL( *this, thread_, position_ );
+	HAnchorGuard<HHeap> agR( otherValue, thread_, position_ );
+	while ( equal && ! data.is_empty() ) {
+		HHuginn::value_t const& v( data.top() );
+		equal = v->operator_equals( thread_, v, otherData.top(), position_ );
+		data.pop();
+		otherData.pop();
+	}
+	return ( equal );
+}
+
+void HHeap::do_operator_add( HThread* thread_, HHuginn::value_t&, HHuginn::value_t const& other_, int position_ ) {
+	HHeap const& otherValue( *static_cast<HHeap const*>( other_.raw() ) );
+	if ( otherValue.key_type()->type_id() != HHuginn::TYPE::NONE ) {
+		update_key_type( thread_, otherValue.key_type(), position_ );
+	}
+	HHeap::values_t otherData( otherValue.value() );
+	HAnchorGuard<HHeap> agL( *this, thread_, position_ );
+	HAnchorGuard<HHeap> agR( otherValue, thread_, position_ );
+	while ( ! otherData.is_empty() ) {
+		_data.push( otherData.top() );
+		otherData.pop();
+	}
+	return;
+}
+
+hash_value_t HHeap::do_operator_hash( HThread* thread_, HHuginn::value_t const&, int position_ ) const {
+	hash_value_t hashValue( static_cast<hash_value_t>( HHuginn::TYPE::HEAP ) );
+	HHeap::values_t data( _data );
+	HAnchorGuard<HHeap> ag( *this, thread_, position_ );
+	while ( ! data.is_empty() ) {
+		hashValue *= 3;
+		HHuginn::value_t const& v( data.top() );
+		hashValue += v->operator_hash( thread_, v, position_ );
+		data.pop();
+	}
+	return ( hashValue );
 }
 
 yaal::hcore::HString HHeap::do_code( huginn::HThread* thread_, HHuginn::value_t const&, HCycleTracker& cycleTracker_, int position_ ) const {

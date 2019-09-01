@@ -587,8 +587,8 @@ void HExpression::repack_named_parameters( OExecutionStep const& executionStep_,
 	HHuginn::value_t* pv( ! values.is_empty() ? &values.top() : nullptr );
 	if ( pv && ( (*pv)->type_id() == HHuginn::TYPE::NAMED_PARAMETERS ) ) {
 		HTaggedValue& tv( *static_cast<HTaggedValue*>( pv->raw() ) );
-		huginn::HLookup& l( *static_cast<huginn::HLookup*>( tv.value().raw() ) );
-		l.update( frame_->thread(), v, executionStep_._position );
+		HHuginn::value_t& l( tv.value() );
+		l->operator_add( frame_->thread(), l, v, executionStep_._position );
 		int& ip( frame_->ip() );
 		M_ASSERT( _instructions[ip]._operator == OPERATOR::FUNCTION_ARGUMENT );
 		++ ip;

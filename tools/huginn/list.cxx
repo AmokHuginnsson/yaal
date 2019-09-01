@@ -260,20 +260,6 @@ inline HHuginn::value_t find( huginn::HThread* thread_, HHuginn::value_t* object
 	M_EPILOG
 }
 
-inline HHuginn::value_t hash( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
-	M_PROLOG
-	verify_arg_count( "list.hash", values_, 0, 0, thread_, position_ );
-	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
-	huginn::HList::values_t const& values( static_cast<huginn::HList*>( object_->raw() )->value() );
-	hash_value_t hashValue( static_cast<hash_value_t>( HHuginn::TYPE::LIST ) );
-	for ( HHuginn::value_t const& v : values ) {
-		hashValue *= 3;
-		hashValue += v->operator_hash( thread_, v, position_ );
-	}
-	return ( thread_->object_factory().create_integer( static_cast<HInteger::value_type>( hashValue ) ) );
-	M_EPILOG
-}
-
 class HListClass : public HClass {
 public:
 	typedef HListClass this_type;
