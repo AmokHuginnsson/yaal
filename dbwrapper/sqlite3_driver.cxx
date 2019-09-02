@@ -242,6 +242,7 @@ M_EXPORT_SYMBOL void* db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
 sqlite3_destructor_type SQLITE_STATIC_FWD{ SQLITE_STATIC };
 #pragma GCC diagnostic pop
 

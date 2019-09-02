@@ -149,6 +149,18 @@ HPipedChild::~HPipedChild( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
+#ifndef HAVE_SIGHANDLER_T
+#ifdef HAVE___SIGHANDLER_T
+typedef __sighandler_t* sighandler_t;
+#elif defined ( HAVE_SIG_PF )
+typedef SIG_PF sighandler_t;
+#elif defined ( __HOST_OS_TYPE_DARWIN__ )
+typedef void (*sighandler_t)( int );
+#else /* #elif defined ( __HOST_OS_TYPE_DARWIN__ ) */
+#error No signal handler type definition available.
+#endif /* #else #elif defined ( __HOST_OS_TYPE_DARWIN__ ) */
+#endif /* #ifndef HAVE_SIGHANDLER_T */
+
 namespace {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
@@ -168,6 +180,10 @@ template<typename T>
 inline int FWD_WTERMSIG( T val_ ) {
 	return ( WTERMSIG( val_ ) );
 }
+static sighandler_t const FWD_SIG_ERR = SIG_ERR;
+static sighandler_t const FWD_SIG_IGN = SIG_IGN;
+#pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
+static sighandler_t const FWD_SIG_DFL = SIG_DFL;
 #pragma GCC diagnostic pop
 }
 
@@ -283,8 +299,8 @@ void HPipedChild::spawn(
 				int pgid( pgid_ > PROCESS_GROUP_LEADER ? pgid_ : pid );
 				M_ENSURE( ( ::setpgid( pid, pgid ) == 0 ) || ( errno == EACCES ) );
 				if ( foreground_ && is_a_tty( stdinFd ) ) {
-					M_ENSURE( signal( SIGTTOU, SIG_IGN ) != SIG_ERR );
-					M_ENSURE( signal( SIGTTIN, SIG_IGN ) != SIG_ERR );
+					M_ENSURE( signal( SIGTTOU, FWD_SIG_IGN ) != FWD_SIG_ERR );
+					M_ENSURE( signal( SIGTTIN, FWD_SIG_IGN ) != FWD_SIG_ERR );
 				}
 				for ( int fd : iofds ) {
 					if ( foreground_ && is_a_tty( fd ) ) {
@@ -300,7 +316,7 @@ void HPipedChild::spawn(
 				SIGABRT, SIGTERM, SIGTSTP, SIGTRAP, SIGCONT, SIGPIPE, SIGALRM, SIGCHLD, SIGTTIN, SIGTTOU
 			};
 			for ( int s : signals ) {
-				M_ENSURE( signal( s, SIG_DFL ) != SIG_ERR );
+				M_ENSURE( signal( s, FWD_SIG_DFL ) != FWD_SIG_ERR );
 			}
 			M_ENSURE( ::dup2( pipeIn[ PIPE_END::OUT ], stdinFd ) >= 0 );
 			M_ENSURE( ::dup2( pipeOut[ PIPE_END::IN ], stdoutFd ) >= 0 );

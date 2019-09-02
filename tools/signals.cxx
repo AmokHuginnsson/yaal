@@ -64,8 +64,9 @@ typedef void (*sighandler_t)( int );
 namespace {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
-static sighandler_t const FWD_SIG_DFL = SIG_DFL;
 static sighandler_t const FWD_SIG_ERR = SIG_ERR;
+#pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
+static sighandler_t const FWD_SIG_DFL = SIG_DFL;
 #pragma GCC diagnostic pop
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-conversion"
