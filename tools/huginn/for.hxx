@@ -22,7 +22,7 @@ private:
 	HHuginn::expressions_t _control;
 	HHuginn::expression_t _source;
 	HHuginn::scope_t _loop;
-	bool _hasLocalVariables;
+	bool _needsFrame;
 public:
 	HFor( HStatement::statement_id_t, HHuginn::expressions_t&&, HHuginn::expression_t const&, HHuginn::scope_t const&, bool, int, executing_parser::range_t );
 protected:

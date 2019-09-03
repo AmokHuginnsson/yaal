@@ -115,6 +115,15 @@ struct OCompiler {
 		 */
 		local_variables_t _variables;
 
+		/*! \brief Tells if given scope needs to have a fully materialized frame.
+		 *
+		 * Reasons for necessity of frame materialization:
+		 *
+		 * - existance of a local variable in direct children
+		 * - break/continue statement in any of the children
+		 */
+		bool _needsFrame;
+
 		/*! \brief Tells if given scope has any local variables defined.
 		 *
 		 * Used during statements/expressions compilation, i.e. before local

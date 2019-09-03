@@ -49,6 +49,7 @@ OCompiler::OScopeContext::OScopeContext(
 	, _statementId( statementId_ )
 	, _functionId( functionContext_->_functionIdentifier )
 	, _variables()
+	, _needsFrame( false )
 	, _hasLocalVariables( false )
 	, _hasLocalVariablesInDirectChildren( false ) {
 	_expressionsStack.emplace( 1, functionContext_->_compiler->new_expression( fileId_ ) );
@@ -993,12 +994,14 @@ void OCompiler::pop_scope_context_low( void ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	OFunctionContext::scope_context_t& childScope( fc._scopeStack.top() );
+	bool needsFrame( childScope->_needsFrame );
 	bool childHasLocalVariables( childScope->_hasLocalVariables );
 	_scopeContextCache.push_back( yaal::move( childScope ) );
 	fc._scopeStack.pop();
 	if ( ! fc._scopeStack.is_empty() ) {
 		OFunctionContext::scope_context_t& sc( fc._scopeStack.top() );
 		sc->_hasLocalVariablesInDirectChildren = sc->_hasLocalVariablesInDirectChildren || childHasLocalVariables;
+		sc->_needsFrame = sc->_needsFrame || needsFrame;
 	}
 	return;
 	M_EPILOG

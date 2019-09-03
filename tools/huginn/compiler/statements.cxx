@@ -104,6 +104,8 @@ void OCompiler::add_break_statement( executing_parser::range_t range_ ) {
 	if ( fc._loopSwitchCount == 0 ) {
 		throw HHuginn::HHuginnRuntimeException( "Invalid context for `break` statement.", _fileId, range_.start() );
 	}
+	OScopeContext& sc( *fc._scopeStack.top() );
+	sc._needsFrame = true;
 	terminate_scope( make_pointer<HBreak>( HFrame::STATE::BREAK, _fileId, range_ ) );
 	reset_expression();
 	return;
@@ -130,7 +132,7 @@ void OCompiler::add_while_statement( executing_parser::range_t range_ ) {
 	HHuginn::scope_t scope( pop_scope_context() );
 	OScopeContext& sc( current_scope_context() );
 	HScope::statement_t whileStatement(
-		make_pointer<HWhile>( sc._statementId, current_expression(), scope, sc._hasLocalVariables || sc._hasLocalVariablesInDirectChildren, _fileId, range_ )
+		make_pointer<HWhile>( sc._statementId, current_expression(), scope, sc._needsFrame || sc._hasLocalVariables || sc._hasLocalVariablesInDirectChildren, _fileId, range_ )
 	);
 	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );
@@ -152,7 +154,7 @@ void OCompiler::add_for_statement( executing_parser::range_t range_ ) {
 	HHuginn::expression_t source( exprs.back() );
 	exprs.pop_back();
 	HScope::statement_t forStatement(
-		make_pointer<HFor>( sc._statementId, yaal::move( exprs ), source, scope, sc._hasLocalVariables || sc._hasLocalVariablesInDirectChildren, _fileId, range_ )
+		make_pointer<HFor>( sc._statementId, yaal::move( exprs ), source, scope, sc._needsFrame || sc._hasLocalVariables || sc._hasLocalVariablesInDirectChildren, _fileId, range_ )
 	);
 	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );

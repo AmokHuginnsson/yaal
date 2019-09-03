@@ -19,20 +19,20 @@ HWhile::HWhile(
 	HStatement::statement_id_t id_,
 	HHuginn::expression_t const& condition_,
 	HHuginn::scope_t const& loop_,
-	bool hasLocalVariables_,
+	bool needsFrame_,
 	int fileId_,
 	executing_parser::range_t range_
 ) : HStatement( id_, fileId_, range_ )
 	, _condition( condition_ )
 	, _loop( loop_ )
-	, _hasLocalVariables( hasLocalVariables_ ) {
+	, _needsFrame( needsFrame_ ) {
 	_loop->make_inline();
 	return;
 }
 
 void HWhile::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
-	if ( _hasLocalVariables ) {
+	if ( _needsFrame ) {
 		thread_->create_loop_frame( _loop.raw() );
 	}
 	HFrame* f( thread_->current_frame() );
@@ -51,7 +51,7 @@ void HWhile::do_execute( huginn::HThread* thread_ ) const {
 			}
 		}
 	}
-	if ( _hasLocalVariables ) {
+	if ( _needsFrame ) {
 		thread_->pop_frame();
 	}
 	return;

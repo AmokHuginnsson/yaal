@@ -21,7 +21,7 @@ public:
 private:
 	HHuginn::expression_t _condition;
 	HHuginn::scope_t _loop;
-	bool _hasLocalVariables;
+	bool _needsFrame;
 public:
 	HWhile( HStatement::statement_id_t, HHuginn::expression_t const&, HHuginn::scope_t const&, bool, int, executing_parser::range_t );
 protected:
