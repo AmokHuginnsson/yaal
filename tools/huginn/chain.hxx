@@ -35,6 +35,7 @@ protected:
 		}
 		return ( s );
 	}
+	virtual bool do_operator_contains( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const override;
 private:
 	virtual iterator_t do_iterator( HThread*, int ) override;
 private:

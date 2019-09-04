@@ -81,7 +81,8 @@ private:
 	HChainIterator& operator = ( HChainIterator const& ) = delete;
 private:
 	void ensure( HThread* thread_, int position_ ) {
-		while ( ! _it->is_valid( thread_, position_ ) ) {
+		HFrame* f( thread_->current_frame() );
+		while ( f->can_continue() && ! _it->is_valid( thread_, position_ ) ) {
 			++ _colIdx;
 			if ( _colIdx >= _source.get_size() ) {
 				break;
@@ -94,6 +95,21 @@ private:
 
 HChain::iterator_t HChain::do_iterator( HThread* thread_, int position_ ) {
 	return ( yaal::hcore::make_pointer<HChainIterator>( thread_, _source, position_ ) );
+}
+
+bool HChain::do_operator_contains( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
+	M_PROLOG
+	HFrame* f( thread_->current_frame() );
+	for ( HHuginn::value_t const& v : _source ) {
+		if ( ! f->can_continue() ) {
+			return ( false );
+		}
+		if ( v->operator_contains( thread_, v, other_, position_ ) ) {
+			return ( true );
+		}
+	}
+	return ( false );
+	M_EPILOG
 }
 
 }
