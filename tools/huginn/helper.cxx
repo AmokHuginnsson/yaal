@@ -211,7 +211,7 @@ yaal::hcore::HString a_type_name( HHuginn::TYPE type_ ) {
 
 yaal::hcore::HString a_type_name( HClass const* class_ ) {
 	M_PROLOG
-	hcore::HString const& cn( class_->name() );
+	hcore::HString const& cn( class_ ? class_->name() : "*unknown*" );
 	hcore::HString atn( article( cn ) );
 	atn.append( " `" ).append( cn ).append( "`" );
 	return ( atn );
@@ -668,6 +668,11 @@ bool is_unknown( HClass const* class_ ) {
 
 bool is_numeric_congruent( HClass const* class_ ) {
 	return ( is_numeric( class_ ) || is_unknown( class_ ) );
+}
+
+bool is_set_congruent( HClass const* class_ ) {
+	HHuginn::type_id_t t( class_ ? class_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
+	return ( ( t == HHuginn::TYPE::SET ) || is_unknown( class_ ) );
 }
 
 bool is_comparable_congruent( HClass const* class_ ) {

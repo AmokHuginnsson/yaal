@@ -416,6 +416,7 @@ void OCompiler::dispatch_assign( executing_parser::range_t range_ ) {
 					operands_type_mismatch( op_to_str( o ), realDestType, srcType, _fileId, p );
 				}
 			}
+			bool setCongruous( false );
 			switch ( o ) {
 				case ( OPERATOR::PLUS_ASSIGN ):
 				case ( OPERATOR::MINUS_ASSIGN ): {
@@ -430,11 +431,13 @@ void OCompiler::dispatch_assign( executing_parser::range_t range_ ) {
 						);
 					}
 				} break;
-				case ( OPERATOR::MULTIPLY_ASSIGN ):
+				case ( OPERATOR::MULTIPLY_ASSIGN ): {
+					setCongruous = is_set_congruent( srcType ) && is_set_congruent( realDestType );
+				} /* fallthrough */
 				case ( OPERATOR::DIVIDE_ASSIGN ):
 				case ( OPERATOR::MODULO_ASSIGN ):
 				case ( OPERATOR::POWER_ASSIGN ): {
-					if ( ! ( is_numeric_congruent( srcType ) && is_numeric_congruent( realDestType ) ) ) {
+					if ( ! ( ( is_numeric_congruent( srcType ) && is_numeric_congruent( realDestType ) ) || setCongruous ) ) {
 						throw HHuginn::HHuginnRuntimeException(
 							hcore::HString(
 								o == OPERATOR::MULTIPLY_ASSIGN
@@ -710,7 +713,8 @@ void OCompiler::dispatch_mul( executing_parser::range_t range_ ) {
 	if ( ! are_congruous( c1, c2 ) ) {
 		operands_type_mismatch( op_to_str( o ), c2, c1, _fileId, range_.start() );
 	}
-	if ( ! ( is_numeric_congruent( c1 ) && is_numeric_congruent( c2 ) ) ) {
+	bool setCongruous( ( o == OPERATOR::MULTIPLY ) && is_set_congruent( c1 ) && is_set_congruent( c2 ) );
+	if ( ! ( ( is_numeric_congruent( c1 ) && is_numeric_congruent( c2 ) ) || setCongruous ) ) {
 		throw HHuginn::HHuginnRuntimeException(
 			hcore::HString( o == OPERATOR::MULTIPLY ? _errMsgHHuginn_[ERR_CODE::OP_NOT_MUL] : _errMsgHHuginn_[ERR_CODE::OP_NOT_DIV] )
 				.append( a_type_name( c2 ) )

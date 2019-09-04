@@ -54,6 +54,8 @@ private:
 	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
 	virtual bool do_operator_equals( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const override;
 	virtual void do_operator_add( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int ) override;
+	virtual void do_operator_subtract( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int ) override;
+	virtual void do_operator_multiply( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int ) override;
 	virtual bool do_operator_contains( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const override;
 	virtual hash_value_t do_operator_hash( HThread*, HHuginn::value_t const&, int ) const override;
 	virtual yaal::hcore::HString do_code( HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const override;

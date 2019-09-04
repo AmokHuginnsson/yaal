@@ -322,6 +322,42 @@ void HSet::do_operator_add( HThread* thread_, HHuginn::value_t&, HHuginn::value_
 	return;
 }
 
+void HSet::do_operator_subtract( HThread* thread_, HHuginn::value_t&, HHuginn::value_t const& other_, int position_ ) {
+	huginn::HSet const& otherValue( *static_cast<huginn::HSet const*>( other_.raw() ) );
+	huginn::HSet::values_t const& otherData( otherValue.value() );
+	HAnchorGuard<huginn::HSet> agSelf( *this, thread_, position_ );
+	HAnchorGuard<huginn::HSet> agOther( otherValue, thread_, position_ );
+	if ( otherData.get_size() < _data.get_size() ) {
+		for ( huginn::HSet::values_t::const_iterator it( otherData.begin() ), end( otherData.end() ); it != end; ++ it ) {
+			_data.erase( *it );
+		}
+	} else {
+		for ( huginn::HSet::values_t::const_iterator it( _data.begin() ); it != _data.end(); ) {
+			if ( otherData.find( *it ) != otherData.end() ) {
+				it = _data.erase( it );
+			} else {
+				++ it;
+			}
+		}
+	}
+	return;
+}
+
+void HSet::do_operator_multiply( HThread* thread_, HHuginn::value_t&, HHuginn::value_t const& other_, int position_ ) {
+	huginn::HSet const& otherValue( *static_cast<huginn::HSet const*>( other_.raw() ) );
+	huginn::HSet::values_t const& otherData( otherValue.value() );
+	HAnchorGuard<huginn::HSet> agOther( otherValue, thread_, position_ );
+	HAnchorGuard<huginn::HSet> agSelf( *this, thread_, position_ );
+	for ( huginn::HSet::values_t::const_iterator it( _data.begin() ); it != _data.end(); ) {
+		if ( otherData.find( *it ) != otherData.end() ) {
+			++ it;
+		} else {
+			it = _data.erase( it );
+		}
+	}
+	return;
+}
+
 bool HSet::do_operator_contains( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
 	return ( has_key( thread_, other_, position_ ) );
 }
