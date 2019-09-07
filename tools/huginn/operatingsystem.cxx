@@ -135,6 +135,23 @@ public:
 		return ( thread_->runtime().none_value() );
 		M_EPILOG
 	}
+	static HHuginn::value_t set_umask( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "OperatingSystem.set_umask", values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
+		HInteger::value_type v( get_integer( values_[0] ) );
+		if ( ( v < 0 ) || ( v > 07777 ) ) {
+			throw HHuginn::HHuginnRuntimeException( "Bad umask value: "_ys.append( v ), thread_->current_frame()->file_id(), position_ );
+		}
+		system::set_umask( static_cast<system::mode_t>( v ) );
+		return ( *object_ );
+		M_EPILOG
+	}
+	static HHuginn::value_t umask( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( "OperatingSystem.umask", values_, 0, 0, thread_, position_ );
+		return ( thread_->object_factory().create_integer( static_cast<HInteger::value_type>( system::get_umask() ) ) );
+		M_EPILOG
+	}
 	static HHuginn::value_t spawn( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "OperatingSystem.spawn";
@@ -183,6 +200,8 @@ HPackageCreatorInterface::HInstance HOperatingSystemCreator::do_new_instance( HR
 		{ "core_count",  runtime_->create_method( &HOperatingSystem::core_count ),  "get the number of CPUs in the system" },
 		{ "env",       runtime_->create_method( &HOperatingSystem::env ),       "( *name* ) - get value of an environment variable named *name*" },
 		{ "set_env",   runtime_->create_method( &HOperatingSystem::set_env ),   "( *name*, *value* ) - set *name* environment variable to *value* value" },
+		{ "umask",     runtime_->create_method( &HOperatingSystem::umask ),     "get value of system's umask" },
+		{ "set_umask", runtime_->create_method( &HOperatingSystem::set_umask ), "( *newUmask* ) - set value of system's umask to *newUmask*" },
 		{ "getpid",    runtime_->create_method( &HOperatingSystem::getpid ),    "get Huginn's interpreter process id" },
 		{ "getuid",    runtime_->create_method( &HOperatingSystem::getuid ),    "get Huginn's interpreter process effective user id" },
 		{ "getgid",    runtime_->create_method( &HOperatingSystem::getgid ),    "get Huginn's interpreter process effective group id" },
