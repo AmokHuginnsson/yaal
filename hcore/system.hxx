@@ -147,6 +147,11 @@ void set_close_on_exec( int fd );
  */
 yaal::hcore::HString home_path( void );
 
+typedef yaal::u32_t mode_t;
+
+mode_t get_umask( void );
+void set_umask( mode_t );
+
 }
 
 }

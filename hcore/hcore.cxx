@@ -315,24 +315,22 @@ void ensure_limit( int resource_, char const* message_, bool autoSanity_ ) {
 }
 
 void sanitize( bool autoSanity_ ) {
-	mode_t const modestUmask( S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IWOTH | S_IXOTH );
-	mode_t const lockOutUmask( S_IRUSR | S_IWUSR | S_IXUSR | modestUmask );
-	mode_t curUmask( ::umask( lockOutUmask ) );
-	if ( ::umask( curUmask ) != lockOutUmask ) {
+	try {
+		system::mode_t tooLooseUmask( S_IROTH | S_IWOTH | S_IXOTH );
+		system::mode_t curUmask( system::get_umask() );
+		if ( ( ~curUmask ) & tooLooseUmask ) {
+			if ( autoSanity_ ) {
+				system::mode_t const modestUmask( S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IWOTH | S_IXOTH );
+				system::set_umask( modestUmask );
+				log( LOG_LEVEL::WARNING ) << "running with too permissive umask - setting umask automatically" << endl;
+			} else {
+				::perror( "running with too permissive umask - bailing out" );
+				::exit( 1 );
+			}
+		}
+	} catch ( ... ) {
 		::perror( SYSCALL_FAILURE );
 		exit( 1 );
-	}
-	if ( ( ~curUmask ) & ( S_IROTH | S_IWOTH | S_IXOTH ) ) {
-		if ( autoSanity_ ) {
-			if ( ::umask( modestUmask ) != curUmask ) {
-				::perror( SYSCALL_FAILURE );
-				exit( 1 );
-			}
-			log( LOG_LEVEL::WARNING ) << "running with too permissive umask - setting umask automatically" << endl;
-		} else {
-			::perror( "running with too permissive umask - bailing out" );
-			::exit( 1 );
-		}
 	}
 #ifndef __HOST_OS_TYPE_CYGWIN__
 #if ( HAVE_DECL_RLIMIT_AS == 1 )

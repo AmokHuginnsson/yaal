@@ -113,6 +113,8 @@
 #cmakedefine HAVE_IBASE_H
 #cmakedefine HAVE_OCI_H
 #cmakedefine HAVE_SYS_IOCTL_H
+#cmakedefine HAVE_SYS_UTIME_H
+#cmakedefine HAVE_UTIME_H
 #cmakedefine HAVE_SYS_CONSIO_H
 #cmakedefine HAVE_GPM_H
 #cmakedefine01 HAVE_NCURSES_CURSES_H

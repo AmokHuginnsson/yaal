@@ -10,6 +10,7 @@
 #include <grp.h>
 #include <sys/statvfs.h>
 #include <sys/resource.h>
+#include <sys/stat.h>
 #ifdef __HOST_OS_TYPE_CYGWIN__
 #include <ctime> /* nanosleep */
 #endif /* #ifdef __HOST_OS_TYPE_CYGWIN__ */
@@ -431,6 +432,18 @@ yaal::hcore::HString home_path( void ) {
 	HString hp( "/home/" );
 	hp.append( login );
 	return ( hp );
+}
+
+mode_t get_umask( void ) {
+	mode_t const lockOutUmask( S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IWOTH | S_IXOTH );
+	mode_t curUmask( static_cast<mode_t>( ::umask( lockOutUmask ) ) );
+	M_ENSURE( static_cast<mode_t>( ::umask( static_cast<::mode_t>( curUmask ) ) ) == lockOutUmask );
+	return ( static_cast<mode_t>( curUmask ) );
+}
+
+void set_umask( mode_t umask_ ) {
+	::umask( static_cast<::mode_t>( umask_ ) );
+	return;
 }
 
 }

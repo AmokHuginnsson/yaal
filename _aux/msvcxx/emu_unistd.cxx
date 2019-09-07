@@ -400,7 +400,6 @@ int unix_stat( char const* path_, struct stat* s_ ) {
 			owner_t owner( get_path_owner( path ) );
 			s_->st_uid = owner.first;
 			s_->st_gid = owner.second;
-			s_->st_ctime = s_->st_mtime = yaal::max( s_->st_ctime, s_->st_mtime );
 			OFSTRUCT of;
 			HFILE hf( ::OpenFile( path_, &of, 0 ) );
 			if ( hf != HFILE_ERROR ) {
@@ -430,10 +429,11 @@ mode_t umask( mode_t umask_ ) {
 		initialized = true;
 		if ( ! oldUmask ) {
 			/* Windows default umask is screwed. */
-			oldUmask = 7;
+			oldUmask = 077;
 		}
 	}
 	currentUmask = umask_;
+	printf( "%o %o %d\n", oldUmask, umask_, initialized ? 1 : 0 );
 	return ( oldUmask );
 }
 
