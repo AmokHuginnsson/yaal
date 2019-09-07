@@ -8,6 +8,7 @@
 
 #include "hcore/harray.hxx"
 #include "hcore/hregex.hxx"
+#include "hcore/htime.hxx"
 
 namespace yaal {
 
@@ -51,6 +52,7 @@ path_t basename( path_t const& );
 path_t readlink( path_t const& );
 void chmod( path_t const&, u32_t );
 void chdir( path_t const& );
+void update_times( path_t const&, yaal::hcore::HTime const&, yaal::hcore::HTime const& );
 
 namespace path {
 

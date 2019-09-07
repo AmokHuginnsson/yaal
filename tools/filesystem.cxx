@@ -8,6 +8,16 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
+#include "config.hxx"
+
+#ifdef HAVE_UTIME_H
+#include <utime.h>
+#elif defined( HAVE_SYS_UTIME_H )
+#include <sys/utime.h>
+#else
+#error No utime.h found on this system.
+#endif
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
@@ -506,6 +516,17 @@ yaal::tools::filesystem::paths_t glob( path_t const& path_ ) {
 	}
 	sort( result.begin(), result.end() );
 	return ( result );
+}
+
+void update_times( path_t const& path_, yaal::hcore::HTime const& modTime_, yaal::hcore::HTime const& accessTime_ ) {
+	HUTF8String utf8( path_ );
+	utimbuf rawTimes = {
+		static_cast<time_t>( accessTime_.raw() - HTime::SECONDS_TO_UNIX_EPOCH ),
+		static_cast<time_t>( modTime_.raw() - HTime::SECONDS_TO_UNIX_EPOCH )
+	};
+	if ( ::utime( utf8.c_str(), &rawTimes ) != 0 ) {
+		throw HFileSystemException( to_string( "Failed to update times for: `" ).append( path_ ).append( "'" ) );
+	}
 }
 
 }
