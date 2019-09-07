@@ -181,6 +181,23 @@ public:
 		return ( thread_->runtime().boolean_value( filesystem::exists( get_string( values_[0] ) ) ) );
 		M_EPILOG
 	}
+	static HHuginn::value_t update_times( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		HObjectFactory& of( thread_->object_factory() );
+		verify_signature_by_class( "FileSystem.update_times", values_, { of.string_class(), of.time_class(), of.time_class() }, thread_, position_ );
+		try {
+			filesystem::update_times(
+				get_string( values_[0] ),
+				static_cast<HTime*>( values_[1].raw() )->value(),
+				static_cast<HTime*>( values_[2].raw() )->value()
+			);
+		} catch ( hcore::HException const& e ) {
+			HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
+			thread_->raise( fsc->exception_class(), e.what(), position_ );
+		}
+		return ( *object_ );
+		M_EPILOG
+	}
 	static HHuginn::value_t disk_usage( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "FileSystem.disk_usage", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
@@ -268,6 +285,7 @@ HPackageCreatorInterface::HInstance HFileSystemCreator::do_new_instance( HRuntim
 		{ "exists",                    runtime_->create_method( &HFileSystem::exists ),  "( *path* ) - tell if given *path* exists, return false for broken links" },
 		{ "glob",                      runtime_->create_method( &HFileSystem::glob ),    "( *pattern* ) - find pathnames matching a *pattern*" },
 		{ "disk_usage",                runtime_->create_method( &HFileSystem::disk_usage ),                "( *mountPoint* ) - get disk usage statistics for the file system mounted at *mountPoint*" },
+		{ "update_times",              runtime_->create_method( &HFileSystem::update_times ), "( *path*, *modTime*, *accessTime* ) - update modification (*modTime*) and access (*accessTime*) times of the file given by *path*" },
 		{ "current_working_directory", runtime_->create_method( &HFileSystem::current_working_directory ), "get current working directory path" }
 	};
 	c->redefine( nullptr, fd );
