@@ -60,7 +60,7 @@ bool HScheduledAsyncCaller::want_restart( void ) const {
 void HScheduledAsyncCaller::call_at( yaal::hcore::HTime const& time_, call_t call_ ) {
 	M_PROLOG
 	HLock l( _mutex );
-	i64_t secondsFromUnixEpoch( time_.raw() - HTime::SECONDS_TO_UNIX_EPOCH );
+	i64_t secondsFromUnixEpoch( yaal_epoch_to_unix_epoch( time_.raw() ) );
 	_queue.push_back( make_pair( secondsFromUnixEpoch * si::NANO_IN_WHOLE, call_ ) );
 	_condition.signal();
 	return;

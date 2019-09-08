@@ -100,7 +100,7 @@ yaal::hcore::HTime HFSItem::modified( void ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HTime HFSItem::created( void ) const {
+yaal::hcore::HTime HFSItem::status_changed( void ) const {
 	M_PROLOG
 	struct stat s;
 	do_stat( &s );

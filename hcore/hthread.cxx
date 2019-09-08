@@ -480,7 +480,7 @@ HCondition::status_t HCondition::do_wait( time_t timeOutSeconds_,
 
 HCondition::status_t HCondition::wait_until( HTime const& time_ ) {
 	M_PROLOG
-	return ( do_wait( static_cast<time_t>( time_.raw() - HTime::SECONDS_TO_UNIX_EPOCH ), 0 ) );
+	return ( do_wait( yaal_epoch_to_unix_epoch( time_.raw() ), 0 ) );
 	M_EPILOG
 }
 

@@ -412,6 +412,10 @@ int unix_stat( char const* path_, struct stat* s_ ) {
 					s_->st_ino = static_cast<_ino_t>( fi.nFileIndexLow );
 #endif
 				}
+				FILE_BASIC_INFO bi;
+				if ( ::GetFileInformationByHandleEx( h, FileBasicInfo, &bi, sizeof ( bi ) ) ) {
+					s_->st_ctime = static_cast<time_t>( bi.ChangeTime.QuadPart / 10000000ULL - 11644473600ULL );
+				}
 				::CloseHandle( h );
 			}
 		}
@@ -433,7 +437,6 @@ mode_t umask( mode_t umask_ ) {
 		}
 	}
 	currentUmask = umask_;
-	printf( "%o %o %d\n", oldUmask, umask_, initialized ? 1 : 0 );
 	return ( oldUmask );
 }
 

@@ -31,10 +31,6 @@ inline bool is_leap_year( int year_ ) {
 	return ( ( ( ( year_ % 4 ) == 0 ) && ( year_ % 100 ) != 0 ) || ( ( year_ % 400 ) == 0 ) );
 }
 
-inline i64_t yaal_epoch_to_unix_epoch( i64_t time_ ) {
-	return ( time_ - HTime::SECONDS_TO_UNIX_EPOCH );
-}
-
 HTime::HTime( TZ tz_, char const* format_ )
 	: _value()
 	, _broken()

@@ -521,8 +521,8 @@ yaal::tools::filesystem::paths_t glob( path_t const& path_ ) {
 void update_times( path_t const& path_, yaal::hcore::HTime const& modTime_, yaal::hcore::HTime const& accessTime_ ) {
 	HUTF8String utf8( path_ );
 	utimbuf rawTimes = {
-		static_cast<time_t>( accessTime_.raw() - HTime::SECONDS_TO_UNIX_EPOCH ),
-		static_cast<time_t>( modTime_.raw() - HTime::SECONDS_TO_UNIX_EPOCH )
+		yaal_epoch_to_unix_epoch( accessTime_.raw() ),
+		yaal_epoch_to_unix_epoch( modTime_.raw() )
 	};
 	if ( ::utime( utf8.c_str(), &rawTimes ) != 0 ) {
 		throw HFileSystemException( to_string( "Failed to update times for: `" ).append( path_ ).append( "'" ) );

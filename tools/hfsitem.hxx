@@ -32,7 +32,7 @@ public:
 	yaal::hcore::HString get_path( void ) const;
 	yaal::hcore::HString get_name( void ) const;
 	yaal::hcore::HTime modified( void ) const;
-	yaal::hcore::HTime created( void ) const;
+	yaal::hcore::HTime status_changed( void ) const;
 	yaal::hcore::HTime accessed( void ) const;
 	yaal::hcore::HString get_user( void ) const;
 	yaal::hcore::HString get_group( void ) const;

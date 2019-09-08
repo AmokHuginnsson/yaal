@@ -173,6 +173,15 @@ inline i64_t unix_epoch_to_yaal_epoch( i64_t time_ ) {
 	return ( time_ + HTime::SECONDS_TO_UNIX_EPOCH );
 }
 
+/*! \brief Convert absolute time to UNIX timestamp.
+ *
+ * \param time_ - number of seconds since beginning of AD era.
+ * \return Number of seconds since beginning of UNIX epoch.
+ */
+inline time_t yaal_epoch_to_unix_epoch( i64_t time_ ) {
+	return ( static_cast<time_t>( time_ - HTime::SECONDS_TO_UNIX_EPOCH ) );
+}
+
 inline void swap( yaal::hcore::HTime& a, yaal::hcore::HTime& b ) {
 	a.swap( b );
 }

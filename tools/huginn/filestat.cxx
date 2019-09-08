@@ -170,8 +170,7 @@ HHuginn::class_t HFileStat::get_class( HRuntime* runtime_, huginn::HClass const*
 		{ "type",     runtime_->create_method( &HFileStat::type ),  "get the type of the file" },
 		{ "user",     runtime_->create_method( &HFileStat::user ),  "get an user name of the file owner" },
 		{ "group",    runtime_->create_method( &HFileStat::group ), "get a group name of the file owner" },
-		{ "created",  runtime_->create_method( &HFileStat::get_times, "FileStat.created",  &HFSItem::created ),  "get file's metadata modification `time`" },
-		{ "changed",  runtime_->create_method( &HFileStat::get_times, "FileStat.changed",  &HFSItem::created ),  "get file's metadata modification `time`" },
+		{ "status_changed", runtime_->create_method( &HFileStat::get_times, "FileStat.status_changed", &HFSItem::status_changed ), "get file's metadata modification `time`" },
 		{ "modified", runtime_->create_method( &HFileStat::get_times, "FileStat.modified", &HFSItem::modified ), "get file's data modification `time`" },
 		{ "accessed", runtime_->create_method( &HFileStat::get_times, "FileStat.accessed", &HFSItem::accessed ), "get file's last access `time`" }
 	};
