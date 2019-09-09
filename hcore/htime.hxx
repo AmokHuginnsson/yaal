@@ -70,7 +70,6 @@ public:
 	static int const HOURS_IN_DAY = 24;
 	static int const MINUTES_IN_HOUR = 60;
 	static int const SECONDS_IN_MINUTE = 60;
-	static i64_t const SECONDS_TO_UNIX_EPOCH = 62167219200LL;
 private:
 	value_type _value;
 	tm _broken;
@@ -169,18 +168,14 @@ i64_t mkgmtime( struct tm* tm_ );
  * \param time_ - number of seconds since beginning of UNIX epoch.
  * \return Number of seconds since beginning of AD era.
  */
-inline i64_t unix_epoch_to_yaal_epoch( i64_t time_ ) {
-	return ( time_ + HTime::SECONDS_TO_UNIX_EPOCH );
-}
+i64_t unix_epoch_to_yaal_epoch( i64_t time_ );
 
 /*! \brief Convert absolute time to UNIX timestamp.
  *
  * \param time_ - number of seconds since beginning of AD era.
  * \return Number of seconds since beginning of UNIX epoch.
  */
-inline time_t yaal_epoch_to_unix_epoch( i64_t time_ ) {
-	return ( static_cast<time_t>( time_ - HTime::SECONDS_TO_UNIX_EPOCH ) );
-}
+i64_t yaal_epoch_to_unix_epoch( i64_t time_ );
 
 inline void swap( yaal::hcore::HTime& a, yaal::hcore::HTime& b ) {
 	a.swap( b );

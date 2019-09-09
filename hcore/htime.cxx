@@ -20,6 +20,7 @@ char const _iso8601DateFormat_[] = "%Y-%m-%d";
 char const _iso8601DateTimeFormat_[] = "%Y-%m-%d %T";
 
 static i64_t const DAYS_IN_MILLION_MONTHS = 30436875;
+static i64_t const SECONDS_TO_UNIX_EPOCH = 62167219200LL;
 static int const DAYS_IN_MONTH[] = {
 	31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
 };
@@ -29,6 +30,14 @@ static int const DAYS_SINCE_JANUARY_FOR_MONTH[] = {
 
 inline bool is_leap_year( int year_ ) {
 	return ( ( ( ( year_ % 4 ) == 0 ) && ( year_ % 100 ) != 0 ) || ( ( year_ % 400 ) == 0 ) );
+}
+
+i64_t unix_epoch_to_yaal_epoch( i64_t time_ ) {
+	return ( time_ + SECONDS_TO_UNIX_EPOCH );
+}
+
+i64_t yaal_epoch_to_unix_epoch( i64_t time_ ) {
+	return ( time_ - SECONDS_TO_UNIX_EPOCH );
 }
 
 HTime::HTime( TZ tz_, char const* format_ )
@@ -443,17 +452,22 @@ HString HTime::to_string( HUTF8String const& format_ ) const {
 #ifdef HAVE_SMART_STRFTIME
 	static int const MIN_TIME_STRING_LENGTH( 32 );
 	int long size( static_cast<int long>( ::strftime( nullptr, 1024, format.c_str(), &_broken ) + 1 ) );
-	if ( size < 2 )
+	if ( size < 2 ) {
 		M_THROW( "bad format", errno );
+	}
 	_cache.realloc( max<int long>( size, MIN_TIME_STRING_LENGTH ) );
-	M_ENSURE( static_cast<int>( ::strftime( _cache.get<char>(),
-					static_cast<size_t>( size ), format.c_str(), &_broken ) ) < size );
+	M_ENSURE(
+		static_cast<int>(
+			::strftime( _cache.get<char>(), static_cast<size_t>( size ), format.c_str(), &_broken )
+		) < size
+	);
 #else /* HAVE_SMART_STRFTIME */
 	static int const MIN_TIME_STRING_LENGTH( 64 );
 	_cache.realloc( MIN_TIME_STRING_LENGTH ); /* FIXME that is pretty dumb hack */
 	int long size( static_cast<int long>( ::strftime( _cache.get<char>(), MIN_TIME_STRING_LENGTH - 1, format.c_str(), &_broken ) ) + 1 );
-	if ( size < 2 )
+	if ( size < 2 ) {
 		M_THROW( "bad format", errno );
+	}
 #endif /* not HAVE_SMART_STRFTIME */
 	return ( _cache.get<char>() );
 	M_EPILOG
