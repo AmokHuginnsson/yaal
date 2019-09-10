@@ -221,7 +221,7 @@ public:
 		HRuntime& r( thread_->runtime() );
 		hcore::HString const& package( get_string( values_[0] ) );
 		HHuginn::identifier_id_t id( r.try_identifier_id( package ) );
-		bool packageExists( !! r.find_package( id ) );
+		HHuginn::value_t v( r.find_package( id ) );
 		bool classExists( !! r.get_class( id ) );
 		HHuginn::value_t const* g( r.get_global( id ) );
 		bool enumerationExists( g && is_enum_class( g ) );
@@ -233,22 +233,26 @@ public:
 				position_
 			);
 		}
-		if ( classExists || functionExists || g || packageExists ) {
+		if ( classExists || functionExists || g ) {
 			throw HHuginn::HHuginnRuntimeException(
 				hcore::to_string(
-					enumerationExists ? "Enumeration" : ( classExists ? "Class" : ( functionExists ? "Function" : ( packageExists ? "Package" : "Package alias" ) ) )
+					enumerationExists ? "Enumeration" : ( classExists ? "Class" : ( functionExists ? "Function" : "Package alias" ) )
 				).append( " of the same name already exists." ),
 				thread_->current_frame()->file_id(),
 				position_
 			);
 		}
-		HHuginn::value_t v( r.none_value() );
 		try {
-			v = HPackageFactory::get_instance().create_package( &r, package, HHuginn::VISIBILITY::PACKAGE, position_ );
+			if ( ! v ) {
+				v = HPackageFactory::get_instance().create_package( &r, package, HHuginn::VISIBILITY::PACKAGE, position_ );
+			}
 		} catch ( HHuginn::HHuginnRuntimeException const& e ) {
 			thread_->raise( static_cast<HIntrospection*>( object_->raw() )->_exceptionClass.raw(), e.message(), position_ );
 		} catch ( hcore::HException const& e ) {
 			thread_->raise( static_cast<HIntrospection*>( object_->raw() )->_exceptionClass.raw(), e.what(), position_ );
+		}
+		if ( ! v ) {
+			v = r.none_value();
 		}
 		return ( v );
 		M_EPILOG
