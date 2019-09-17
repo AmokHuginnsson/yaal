@@ -29,6 +29,10 @@ double long natural_logarithm_impl( double long val_ ) {
 	return ( logl( val_ ) );
 }
 
+double long power_impl( double long base_, double long exponent_ ) {
+	return ( powl( base_, exponent_ ) );
+}
+
 double long sinus_impl( double long val_ ) {
 	return ( sinl( val_ ) );
 }

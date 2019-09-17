@@ -211,6 +211,26 @@ struct HNumber::ElementaryFunctions {
 		return ( v );
 		M_EPILOG
 	}
+	static yaal::hcore::HNumber power( yaal::hcore::HNumber const& base_, yaal::hcore::HNumber const& exponent_ ) {
+		M_PROLOG
+		HNumber n;
+		if ( exponent_.is_integral() ) {
+			n = base_;
+			int long long exp( 0 );
+			try {
+				exp = exponent_.to_integer();
+			} catch ( HNumberException const& ) {
+				throw HNumberException( "Exponent too big: "_ys.append( exponent_.to_string() ) );
+			}
+			n ^= exp;
+		} else if ( exponent_ == number::N0_5 ) {
+			n = square_root( base_ );
+		} else {
+			n = natural_exponential( exponent_ * natural_logarithm( base_ ) );
+		}
+		return ( n );
+		M_EPILOG
+	}
 	static yaal::hcore::HNumber sinus( yaal::hcore::HNumber const& value_ ) {
 		M_PROLOG
 		integer_t precision( value_.get_precision() * 2 );
@@ -766,6 +786,12 @@ yaal::hcore::HNumber natural_exponential( yaal::hcore::HNumber const& value_ ) {
 yaal::hcore::HNumber natural_logarithm( yaal::hcore::HNumber const& value_ ) {
 	M_PROLOG
 	return ( yaal::hcore::HNumber::ElementaryFunctions::natural_logarithm( value_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HNumber power( yaal::hcore::HNumber const& base_, yaal::hcore::HNumber const& exponent_ ) {
+	M_PROLOG
+	return ( yaal::hcore::HNumber::ElementaryFunctions::power( base_, exponent_ ) );
 	M_EPILOG
 }
 

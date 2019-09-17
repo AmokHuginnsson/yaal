@@ -419,7 +419,7 @@ public:
 			}
 		} else {
 			double long val( get_real( values_[0] ) );
-			double long order( powl( 10.L, static_cast<double long>( to ) ) );
+			double long order( math::power( 10.L, static_cast<double long>( to ) ) );
 			val = to == 0 ? roundl( val ) : roundl( val * order ) / order;
 			v = thread_->object_factory().create_real( val );
 		}

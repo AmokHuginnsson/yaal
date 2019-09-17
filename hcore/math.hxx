@@ -32,6 +32,7 @@ inline tType abs( tType const& val ) {
 double long square_root_impl( double long );
 double long natural_exponential_impl( double long );
 double long natural_logarithm_impl( double long );
+double long power_impl( double long, double long );
 double long sinus_impl( double long );
 double long cosinus_impl( double long );
 double long tangens_impl( double long );
@@ -61,6 +62,11 @@ T natural_exponential( T val_ ) {
 template<typename T>
 T natural_logarithm( T val_ ) {
 	return ( static_cast<T>( natural_logarithm_impl( val_ ) ) );
+}
+
+template<typename T>
+T power( T base_, T exponent_ ) {
+	return ( static_cast<T>( power_impl( base_, exponent_ ) ) );
 }
 
 template<typename T>

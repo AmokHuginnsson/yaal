@@ -371,10 +371,10 @@ double long HExpression::power( tree_t::const_node_t node_ ) {
 	tree_t::HNode::const_iterator it = node_->begin();
 	leftValue = count_branch ( &*it );
 	rightValue = count_branch ( &*( ++ it ) );
-	if ( ( leftValue < 0 )
-			&& ( ! eq( rightValue, ::floorl( rightValue ) ) ) )
+	if ( ( leftValue < 0 ) && ( ! eq( rightValue, ::floorl( rightValue ) ) ) ) {
 		return ( 0 );
-	return ( ::powl( leftValue, rightValue ) );
+	}
+	return ( math::power( leftValue, rightValue ) );
 	M_EPILOG
 }
 

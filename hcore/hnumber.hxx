@@ -281,6 +281,7 @@ namespace math {
 yaal::hcore::HNumber square_root( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber natural_exponential( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber natural_logarithm( yaal::hcore::HNumber const& );
+yaal::hcore::HNumber power( yaal::hcore::HNumber const&, yaal::hcore::HNumber const& );
 yaal::hcore::HNumber sinus( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber cosinus( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber tangens( yaal::hcore::HNumber const& );

@@ -113,7 +113,7 @@ void HReal::do_operator_modulo( HThread* thread_, HHuginn::value_t& self_, HHugi
 void HReal::do_operator_power( HThread* thread_, HHuginn::value_t& self_, HHuginn::value_t const& other_, int position_ ) {
 	HReal::value_type exp( static_cast<HReal const*>( other_.raw() )->value() );
 	if ( ( _value != 0.L ) || ( exp != 0.L ) ) {
-		_value = ::powl( _value, exp );
+		_value = math::power( _value, exp );
 	} else {
 		HRuntime& rt( thread_->runtime() );
 		self_ = thread_->runtime().none_value();
