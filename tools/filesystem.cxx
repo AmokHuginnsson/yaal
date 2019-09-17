@@ -424,8 +424,6 @@ paths_t find( path_t const& in, yaal::hcore::HRegex const& pattern_,
 	return ( result );
 }
 
-namespace {
-
 HString glob_to_re( yaal::hcore::HString const& globStr_ ) {
 	HString globRE( "^" );
 	bool escaped( false );
@@ -446,6 +444,8 @@ HString glob_to_re( yaal::hcore::HString const& globStr_ ) {
 	globRE.push_back( '$'_ycp );
 	return ( globRE );
 }
+
+namespace {
 
 struct OScan {
 	filesystem::path_t _path;

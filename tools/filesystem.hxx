@@ -85,6 +85,7 @@ paths_t find( path_t const&, yaal::hcore::HString const&,
 		int = 0, int = meta::max_signed<int>::value, FIND_TYPE::enum_t = FIND_TYPE::ALL );
 paths_t find( path_t const&, yaal::hcore::HRegex const&,
 		int = 0, int = meta::max_signed<int>::value, FIND_TYPE::enum_t = FIND_TYPE::ALL );
+yaal::hcore::HString glob_to_re( yaal::hcore::HString const& );
 paths_t glob( path_t const& );
 
 }
