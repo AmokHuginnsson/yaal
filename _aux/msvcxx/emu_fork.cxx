@@ -37,18 +37,19 @@ typedef SynchronizedUnorderedSet<int> pid_set_t;
 pid_set_t _children_;
 
 M_EXPORT_SYMBOL
-HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int* in_, int* out_, int* err_, int* message_ ) {
-	return ( HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn( path_, argv_, in_, out_, err_, message_ ) );
+HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int* in_, int* out_, int* err_, int* message_, bool joinedErr_ ) {
+	return ( HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn( path_, argv_, in_, out_, err_, message_, joinedErr_ ) );
 }
 
 M_EXPORT_SYMBOL
-HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn( yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int* in_, int* out_, int* err_, int* message_ )
+HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn( yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int* in_, int* out_, int* err_, int* message_, bool joinedErr_ )
 	: _path( path_ )
 	, _argv( argv_ )
 	, _in( in_ )
 	, _out( out_ )
 	, _err( err_ )
-	, _message( message_ ) {
+	, _message( message_ )
+	, _joinedErr( joinedErr_ ) {
 }
 
 char* xstrdup( char const* str_ ) {
@@ -80,7 +81,7 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void ) {
 	/* Overwrite *standard* descriptors with our communication pipe descriptors. */
 	M_ENSURE( ::dup2( _in[0], stdinFd ) == 0 );
 	M_ENSURE( ::dup2( _out[1], stdoutFd ) == 0 );
-	M_ENSURE( ::dup2( _err[1], stderrFd ) == 0 );
+	M_ENSURE( ::dup2( ( _joinedErr ? _out : _err )[1], stderrFd ) == 0 );
 
 	char** argv = memory::calloc<char*>( _argv.size() + 2 );
 	HUTF8String utf8( _path );

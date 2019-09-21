@@ -54,6 +54,9 @@ struct OPipeResGuard {
 	int& operator[]( PIPE_END pipeEnd_ ) {
 		return ( _res[static_cast<int>( pipeEnd_ )] );
 	}
+	bool uninitialized( void ) {
+		return ( ( _res[0] == -1 ) && ( _res[1] == -1 ) );
+	}
 };
 
 inline int stream_to_fd( yaal::hcore::HStreamInterface const* stream_ ) {
@@ -87,6 +90,9 @@ static void close_and_invalidate( int& fd_ ) {
 
 static void fixupFds( int& fd_, HStreamInterface::ptr_t const& owned_, HStreamInterface const*& ref_, char const* name_ ) {
 	M_PROLOG
+	if ( fd_ < 0 ) {
+		return;
+	}
 	if ( !! owned_ ) {
 		if ( ref_ ) {
 			throw HPipedChildException( to_string( name_ ).append( " stream is already defined." ) );
@@ -114,6 +120,9 @@ static void fixupFds( int& fd_, HStreamInterface::ptr_t const& owned_, HStreamIn
 
 static void fixupFds( HStreamInterface const* ref_, OPipeResGuard& pipe_, PIPE_END direction_, HStreamInterface::ptr_t& owned_ ) {
 	M_PROLOG
+	if ( pipe_.uninitialized() ) {
+		return;
+	}
 	PIPE_END otherEnd( direction_ == PIPE_END::OUT ? PIPE_END::IN : PIPE_END::OUT );
 	if ( ! ref_ ) {
 		close_and_invalidate( pipe_[ otherEnd ] );
@@ -256,7 +265,12 @@ void HPipedChild::spawn(
 	if ( ! ( image.is_executable() && image.is_file() ) ) {
 		throw HPipedChildException( "Not an executable: "_ys.append( image_ ) );
 	}
-	M_ENSURE( ( ! ::pipe( pipeIn._res ) ) && ( ! ::pipe( pipeOut._res ) ) && ( ! ::pipe( pipeErr._res ) ) );
+	bool joinedErr( ( !! _out && ( _out == _err ) ) || ( ! _out && out_ && ( out_ == err_ ) ) );
+	M_ENSURE(
+		( ! ::pipe( pipeIn._res ) )
+		&& ( ! ::pipe( pipeOut._res ) )
+		&& ( joinedErr || ( ! ::pipe( pipeErr._res ) ) )
+	);
 	HChunk argv( chunk_size<char const*>( argv_.size() + 2 ) );
 	HLock stdinLock( cin.acquire() );
 	HLock stdoutLock( cout.acquire() );
@@ -320,9 +334,9 @@ void HPipedChild::spawn(
 			}
 			M_ENSURE( ::dup2( pipeIn[ PIPE_END::OUT ], stdinFd ) >= 0 );
 			M_ENSURE( ::dup2( pipeOut[ PIPE_END::IN ], stdoutFd ) >= 0 );
-			M_ENSURE( ::dup2( pipeErr[ PIPE_END::IN ], stderrFd ) >= 0 );
+			M_ENSURE( ::dup2( ( joinedErr ? pipeOut : pipeErr )[ PIPE_END::IN ], stderrFd ) >= 0 );
 			M_ENSURE( ::write( message[PIPE_END::IN], "\0", 1 ) == 1 );
-			OPipeResGuard* pgs[] = { &pipeIn, &pipeOut, &pipeErr, &message };
+			OPipeResGuard* pgs[] = { &pipeIn, &pipeOut, joinedErr ? &pipeOut : &pipeErr, &message };
 			for ( OPipeResGuard* pg : pgs ) {
 				close_and_invalidate( (*pg)[PIPE_END::IN] );
 				close_and_invalidate( (*pg)[PIPE_END::OUT] );
