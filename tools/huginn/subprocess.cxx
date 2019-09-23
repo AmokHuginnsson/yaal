@@ -47,15 +47,18 @@ public:
 	}
 };
 
-HSubprocess::HSubprocess( huginn::HClass const* class_, HHuginn::values_t& argv_ )
+HSubprocess::HSubprocess( huginn::HClass const* class_, HHuginn* huginn_, yaal::hcore::HString const& program_, yaal::tools::HPipedChild::argv_t&& argv_, bool foreground_ )
 	: huginn::HValue( class_ )
 	, _pipedChild() {
-	HPipedChild::argv_t argv;
-	hcore::HString program( get_string( argv_[0] ) );
-	for ( int i( 1 ), C( static_cast<int>( argv_.get_size() ) ); i < C; ++ i ) {
-		argv.push_back( get_string( argv_[i] ) );
-	}
-	_pipedChild.spawn( program, argv );
+	_pipedChild.spawn(
+		program_,
+		argv_,
+		foreground_ ? &huginn_->input_stream() : nullptr,
+		foreground_ ? &huginn_->output_stream() : nullptr,
+		foreground_ ? &huginn_->error_stream() : nullptr,
+		foreground_ ? HPipedChild::PROCESS_GROUP_LEADER : -1,
+		foreground_
+	);
 	return;
 }
 
@@ -109,13 +112,19 @@ HHuginn::value_t HSubprocess::wait(
 	int position_
 ) {
 	M_PROLOG
-	verify_signature( "Subprocess.wait", values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
+	char const name[] = "Subprocess.wait";
+	verify_arg_count( name, values_, 0, 1, thread_, position_ );
+	HInteger::value_type const MAX_WAIT_FOR( meta::max_signed<i32_t>::value );
+	HInteger::value_type waitFor( MAX_WAIT_FOR );
+	if ( ! values_.is_empty() ) {
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, ARITY::UNARY, thread_, position_ );
+		waitFor = get_integer( values_[0] );
+	}
 	HSubprocess* o( static_cast<HSubprocess*>( object_->raw() ) );
-	int waitFor( static_cast<int>( get_integer( values_[0] ) ) );
-	if ( waitFor < 0 ) {
+	if ( ( waitFor < 0 ) || ( waitFor > MAX_WAIT_FOR ) ) {
 		throw HHuginn::HHuginnRuntimeException( "invalid wait time: "_ys.append( waitFor ), thread_->current_frame()->file_id(), position_ );
 	}
-	HPipedChild::STATUS s( o->_pipedChild.finish( waitFor ) );
+	HPipedChild::STATUS s( o->_pipedChild.finish( static_cast<i32_t>( waitFor ) ) );
 	return ( thread_->runtime().object_factory()->create_integer( s.value ) );
 	M_EPILOG
 }
@@ -132,7 +141,8 @@ HHuginn::value_t HSubprocess::stream(
 	verify_arg_count( name_, values_, 0, 0, thread_, position_ );
 	HSubprocess* o( static_cast<HSubprocess*>( object_->raw() ) );
 	HObjectFactory& of( thread_->object_factory() );
-	return ( of.create<HStream>( of.stream_class(), (o->_pipedChild.*streamGetter_)() ) );
+	HStreamInterface::ptr_t s( (o->_pipedChild.*streamGetter_)() );
+	return ( !! s ? of.create<HStream>( of.stream_class(), s ) : of.none_value() );
 	M_EPILOG
 }
 

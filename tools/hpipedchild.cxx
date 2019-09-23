@@ -125,6 +125,7 @@ static void fixupFds( HStreamInterface const* ref_, OPipeResGuard& pipe_, PIPE_E
 	}
 	PIPE_END otherEnd( direction_ == PIPE_END::OUT ? PIPE_END::IN : PIPE_END::OUT );
 	if ( ! ref_ ) {
+		M_ASSERT( ! owned_ );
 		close_and_invalidate( pipe_[ otherEnd ] );
 		owned_ = make_pointer<HRawFile>( pipe_[ direction_ ], HRawFile::OWNERSHIP::ACQUIRED );
 		pipe_[direction_] = -1;
@@ -209,7 +210,7 @@ HPipedChild::STATUS HPipedChild::finish( int finishIn_ ) {
 			HClock clock;
 			int elapsed( 0 );
 			while ( ( pid != _pid ) && ( ( elapsed = static_cast<int>( clock.get_time_elapsed( time::UNIT::SECOND ) ) ) < finishIn_ ) ) {
-				HAlarm alarm( static_cast<int>( time::in_units<time::UNIT::MILLISECOND>( time::duration( finishIn_ - elapsed, time::UNIT::SECOND ) ) ) );
+				HAlarm alarm( static_cast<int long>( time::in_units<time::UNIT::MILLISECOND>( time::duration( finishIn_ - elapsed, time::UNIT::SECOND ) ) ) );
 				M_ENSURE( ( ( pid = ::waitpid( _pid, &status, WUNTRACED | WCONTINUED ) ) != -1 ) || ( errno == EINTR ) );
 			}
 		} else {

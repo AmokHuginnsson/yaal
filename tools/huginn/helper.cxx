@@ -766,6 +766,32 @@ HEnumeral::value_type get_enumeral( HHuginn::value_t const& value_ ) {
 	return ( static_cast<HEnumeral const*>( value_.raw() )->value() );
 }
 
+template<typename coll_t>
+inline yaal::tools::string::tokens_t get_strings_impl( coll_t const& coll_ ) {
+	tools::string::tokens_t tokens;
+	for ( HHuginn::value_t const& v : coll_ ) {
+		tokens.push_back( get_string( v ) );
+	}
+	return ( tokens );
+}
+
+yaal::tools::string::tokens_t get_strings( HHuginn::value_t const& coll_ ) {
+	HHuginn::type_id_t t( coll_->type_id() );
+	tools::string::tokens_t tokens;
+	if ( t == HHuginn::TYPE::TUPLE ) {
+		tokens = get_strings_impl( static_cast<HTuple const*>( coll_.raw() )->value() );
+	} else if ( t == HHuginn::TYPE::LIST ) {
+		tokens = get_strings_impl( static_cast<HList const*>( coll_.raw() )->value() );
+	} else if ( t == HHuginn::TYPE::DEQUE ) {
+		tokens = get_strings_impl( static_cast<HDeque const*>( coll_.raw() )->value() );
+	} else if ( t == HHuginn::TYPE::ORDER ) {
+		tokens = get_strings_impl( static_cast<HOrder const*>( coll_.raw() )->value() );
+	} else if ( t == HHuginn::TYPE::SET ) {
+		tokens = get_strings_impl( static_cast<HSet const*>( coll_.raw() )->value() );
+	}
+	return ( tokens );
+}
+
 HString::value_type const& get_string( huginn::HValue const* value_ ) {
 	M_ASSERT( !! value_ );
 	M_ASSERT( dynamic_cast<HString const*>( value_ ) );

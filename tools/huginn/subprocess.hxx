@@ -19,7 +19,7 @@ private:
 	HPipedChild _pipedChild;
 public:
 	typedef yaal::hcore::HStreamInterface::ptr_t ( HPipedChild::* stream_getter_t )( void );
-	HSubprocess( HClass const*, HHuginn::values_t& );
+	HSubprocess( HClass const*, HHuginn*, yaal::hcore::HString const&, yaal::tools::HPipedChild::argv_t&&, bool );
 	static HHuginn::value_t is_alive( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t get_pid( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t wait( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );

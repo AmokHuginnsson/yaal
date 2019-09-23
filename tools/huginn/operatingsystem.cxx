@@ -155,15 +155,28 @@ public:
 	static HHuginn::value_t spawn( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "OperatingSystem.spawn";
-		verify_arg_count( name, values_, 1, meta::max_signed<int short>::value, thread_, position_ );
- 		int argc( static_cast<int>( values_.get_size() ) );
-		for ( int i( 0 ); i < argc; ++ i ) {
-			verify_arg_type( name, values_, i, HHuginn::TYPE::STRING, argc == 1 ? ARITY::UNARY : ARITY::MULTIPLE, thread_, position_ );
+		verify_arg_count( name, values_, 2, 3, thread_, position_ );
+		int argc( static_cast<int>( values_.get_size() ) );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, ARITY::MULTIPLE, thread_, position_ );
+		verify_arg_type( name, values_, 1, { HHuginn::TYPE::TUPLE, HHuginn::TYPE::LIST, HHuginn::TYPE::DEQUE }, ARITY::MULTIPLE, thread_, position_ );
+		verify_arg_collection_value_type( name, values_, 1, ARITY::MULTIPLE, { HHuginn::TYPE::STRING }, UNIFORMITY::REQUIRED, thread_, position_ );
+		hcore::HString program( get_string( values_[0] ) );
+		HPipedChild::argv_t argv( get_strings( values_[1] ) );
+		bool foreground( false );
+		if ( argc == 3 ) {
+			verify_arg_type( name, values_, 2, HHuginn::TYPE::BOOLEAN, ARITY::MULTIPLE, thread_, position_ );
+			foreground = get_boolean( values_[2] );
 		}
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		try {
 			HOperatingSystem* o( static_cast<HOperatingSystem*>( object_->raw() ) );
-			v = thread_->object_factory().create<HSubprocess>( o->_subprocessClass.raw(), values_ );
+			v = thread_->object_factory().create<HSubprocess>(
+				o->_subprocessClass.raw(),
+				thread_->runtime().huginn(),
+				program,
+				yaal::move( argv ),
+				foreground
+			);
 		} catch ( hcore::HException const& e ) {
 			thread_->raise( static_cast<HOperatingSystem*>( object_->raw() )->exception_class(), e.what(), position_ );
 		}

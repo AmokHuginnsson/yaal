@@ -9,6 +9,7 @@
 #include "tools/huginn/class.hxx"
 #include "tools/huginn/runtime.hxx" /* For templated `C++ function` auto-registration code. */
 #include "tools/huginn/enumeration.hxx"
+#include "tools/stringalgo.hxx"
 
 namespace yaal {
 
@@ -119,6 +120,7 @@ huginn::HBoolean::value_type get_boolean( HHuginn::value_t const& );
 huginn::HCharacter::value_type get_character( HHuginn::value_t const& );
 huginn::HList::values_t const& get_list( HHuginn::value_t const& );
 huginn::HEnumeral::value_type get_enumeral( HHuginn::value_t const& );
+yaal::tools::string::tokens_t get_strings( HHuginn::value_t const& );
 
 huginn::HString::value_type const& get_string( huginn::HValue const* );
 huginn::HInteger::value_type get_integer( huginn::HValue const* );
