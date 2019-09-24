@@ -155,7 +155,7 @@ public:
 	static HHuginn::value_t spawn( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "OperatingSystem.spawn";
-		verify_arg_count( name, values_, 2, 3, thread_, position_ );
+		verify_arg_count( name, values_, 2, 6, thread_, position_ );
 		int argc( static_cast<int>( values_.get_size() ) );
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, ARITY::MULTIPLE, thread_, position_ );
 		verify_arg_type( name, values_, 1, { HHuginn::TYPE::TUPLE, HHuginn::TYPE::LIST, HHuginn::TYPE::DEQUE }, ARITY::MULTIPLE, thread_, position_ );
@@ -163,19 +163,38 @@ public:
 		hcore::HString program( get_string( values_[0] ) );
 		HPipedChild::argv_t argv( get_strings( values_[1] ) );
 		bool foreground( false );
-		if ( argc == 3 ) {
+		if ( argc >= 3 ) {
 			verify_arg_type( name, values_, 2, HHuginn::TYPE::BOOLEAN, ARITY::MULTIPLE, thread_, position_ );
 			foreground = get_boolean( values_[2] );
+		}
+		HObjectFactory& of( thread_->object_factory() );
+		HHuginn::value_t stream[3];
+		char const streamName[][8] = { "input", "output", "error" };
+		for ( int i( 3 ); i < argc; ++ i ) {
+			verify_arg_type( name, values_, i, classes_t{ of.stream_class(), of.none_class() }, ARITY::MULTIPLE, thread_, position_ );
+			if ( values_[i]->get_class() != of.stream_class() ) {
+				continue;
+			}
+			if ( static_cast<HStream*>( values_[i].raw() )->raw()->poll_type() == HStreamInterface::POLL_TYPE::EMULATED ) {
+				throw HHuginn::HHuginnRuntimeException(
+					"Invalid `"_ys.append( streamName[i - 3] ).append( "` stream type." ),
+					thread_->current_frame()->file_id(),
+					position_
+				);
+			}
+			stream[i - 3] = values_[i];
 		}
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		try {
 			HOperatingSystem* o( static_cast<HOperatingSystem*>( object_->raw() ) );
 			v = thread_->object_factory().create<HSubprocess>(
 				o->_subprocessClass.raw(),
-				thread_->runtime().huginn(),
 				program,
 				yaal::move( argv ),
-				foreground
+				foreground,
+				stream[0],
+				stream[1],
+				stream[2]
 			);
 		} catch ( hcore::HException const& e ) {
 			thread_->raise( static_cast<HOperatingSystem*>( object_->raw() )->exception_class(), e.what(), position_ );

@@ -47,15 +47,25 @@ public:
 	}
 };
 
-HSubprocess::HSubprocess( huginn::HClass const* class_, HHuginn* huginn_, yaal::hcore::HString const& program_, yaal::tools::HPipedChild::argv_t&& argv_, bool foreground_ )
-	: huginn::HValue( class_ )
+HSubprocess::HSubprocess(
+	huginn::HClass const* class_,
+	yaal::hcore::HString const& program_,
+	yaal::tools::HPipedChild::argv_t&& argv_,
+	bool foreground_,
+	HHuginn::value_t const& in_,
+	HHuginn::value_t const& out_,
+	HHuginn::value_t const& err_
+) : huginn::HValue( class_ )
+	, _in( in_ )
+	, _out( out_ )
+	, _err( err_ )
 	, _pipedChild() {
 	_pipedChild.spawn(
 		program_,
 		argv_,
-		foreground_ ? &huginn_->input_stream() : nullptr,
-		foreground_ ? &huginn_->output_stream() : nullptr,
-		foreground_ ? &huginn_->error_stream() : nullptr,
+		!! _in  ? static_cast<HStream*>( _in.raw()  )->raw().raw() : nullptr,
+		!! _out ? static_cast<HStream*>( _out.raw() )->raw().raw() : nullptr,
+		!! _err ? static_cast<HStream*>( _err.raw() )->raw().raw() : nullptr,
 		foreground_ ? HPipedChild::PROCESS_GROUP_LEADER : -1,
 		foreground_
 	);

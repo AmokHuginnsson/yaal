@@ -16,10 +16,13 @@ namespace huginn {
 
 class HSubprocess : public HValue {
 private:
+	HHuginn::value_t _in;
+	HHuginn::value_t _out;
+	HHuginn::value_t _err;
 	HPipedChild _pipedChild;
 public:
 	typedef yaal::hcore::HStreamInterface::ptr_t ( HPipedChild::* stream_getter_t )( void );
-	HSubprocess( HClass const*, HHuginn*, yaal::hcore::HString const&, yaal::tools::HPipedChild::argv_t&&, bool );
+	HSubprocess( HClass const*, yaal::hcore::HString const&, yaal::tools::HPipedChild::argv_t&&, bool, HHuginn::value_t const&, HHuginn::value_t const&, HHuginn::value_t const& );
 	static HHuginn::value_t is_alive( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t get_pid( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t wait( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
