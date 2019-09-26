@@ -95,6 +95,18 @@ public:
 		return ( thread_->object_factory().create_string( filesystem::current_working_directory() ) );
 		M_EPILOG
 	}
+	static HHuginn::value_t set_working_directory( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "FileSystem.set_working_directory", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
+		try {
+			filesystem::chdir( get_string( values_[0] ) );
+		} catch ( HFSItemException const& e ) {
+			HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
+			thread_->raise( fsc->exception_class(), e.what(), position_ );
+		}
+		return ( *object_ );
+		M_EPILOG
+	}
 	static HHuginn::value_t rename( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "FileSystem.rename", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, thread_, position_ );
@@ -148,9 +160,9 @@ public:
 		return ( *object_ );
 		M_EPILOG
 	}
-	static HHuginn::value_t dir( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	static HHuginn::value_t list_directory( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
-		verify_signature( "FileSystem.dir", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
+		verify_signature( "FileSystem.list_directory", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
 		try {
@@ -177,7 +189,7 @@ public:
 	}
 	static HHuginn::value_t exists( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
-		verify_signature( "FileSystem.stat", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
+		verify_signature( "FileSystem.exists", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		return ( thread_->runtime().boolean_value( filesystem::exists( get_string( values_[0] ) ) ) );
 		M_EPILOG
 	}
@@ -278,14 +290,15 @@ HPackageCreatorInterface::HInstance HFileSystemCreator::do_new_instance( HRuntim
 		{ "remove",                    runtime_->create_method( &HFileSystem::remove ),  "( *path* ) - remove file with given *path* from attached file system" },
 		{ "readlink",                  runtime_->create_method( &HFileSystem::path_transform, "FileSystem.readlink", &filesystem::readlink ), "( *path* ) - get resolved symbolic links or canonical file name for given *path*" },
 		{ "basename",                  runtime_->create_method( &HFileSystem::path_transform, "FileSystem.basename", &filesystem::basename ), "( *path* ) - strip directory from filename for given *path*" },
-		{ "dirname",                   runtime_->create_method( &HFileSystem::path_transform, "FileSystem.dirname", &filesystem::dirname ),   "( *path* ) - strip last component from file name for given *path*" },
+		{ "dirname",                   runtime_->create_method( &HFileSystem::path_transform, "FileSystem.dirname",  &filesystem::dirname ),  "( *path* ) - strip last component from file name for given *path*" },
 		{ "chmod",                     runtime_->create_method( &HFileSystem::chmod ),   "( *path*, *mode* ) - change file mode bits for file *path* to new mode *mode*" },
-		{ "dir",                       runtime_->create_method( &HFileSystem::dir ),     "( *path* ) - list content of the directory given by *path*" },
 		{ "stat",                      runtime_->create_method( &HFileSystem::stat ),    "( *path* ) - get metadata information for file given by *path*" },
 		{ "exists",                    runtime_->create_method( &HFileSystem::exists ),  "( *path* ) - tell if given *path* exists, return false for broken links" },
 		{ "glob",                      runtime_->create_method( &HFileSystem::glob ),    "( *pattern* ) - find pathnames matching a *pattern*" },
-		{ "disk_usage",                runtime_->create_method( &HFileSystem::disk_usage ),                "( *mountPoint* ) - get disk usage statistics for the file system mounted at *mountPoint*" },
+		{ "disk_usage",                runtime_->create_method( &HFileSystem::disk_usage ),   "( *mountPoint* ) - get disk usage statistics for the file system mounted at *mountPoint*" },
 		{ "update_times",              runtime_->create_method( &HFileSystem::update_times ), "( *path*, *modTime*, *accessTime* ) - update modification (*modTime*) and access (*accessTime*) times of the file given by *path*" },
+		{ "list_directory",            runtime_->create_method( &HFileSystem::list_directory ),        "( *path* ) - list content of the directory given by *path*" },
+		{ "set_working_directory",     runtime_->create_method( &HFileSystem::set_working_directory ), "( *path* ) - change working directory to given *path*" },
 		{ "current_working_directory", runtime_->create_method( &HFileSystem::current_working_directory ), "get current working directory path" }
 	};
 	c->redefine( nullptr, fd );
