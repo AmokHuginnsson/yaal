@@ -86,7 +86,7 @@ cat << EOF >> ${DIR_HEADERS}/${LIB_NAME}.hxx
 
 EOF
 
-find ${DIR_HEADERS} ! -path "${DIR_HEADERS}/${LIB_NAME}.hxx" -type f | awk -v LIB_NAME=${LIB_NAME} '/.*\.hxx$/{ printf "#include <%s>\n", substr( $1, match( $1, LIB_NAME"(/[^/]*){0,2}/[^/]*.hxx" ), 255 ) }' | sort >> ${DIR_HEADERS}/${LIB_NAME}.hxx
+find ${DIR_HEADERS} ! -path "${DIR_HEADERS}/${LIB_NAME}.hxx" -type f | sed -E -e "s@.*(${LIB_NAME}(/[^/]*){0,2}/[^/]*[.]hxx)@#include <\1>@g" | sort >> ${DIR_HEADERS}/${LIB_NAME}.hxx
 
 cat << EOF >> ${DIR_HEADERS}/${LIB_NAME}.hxx
 
