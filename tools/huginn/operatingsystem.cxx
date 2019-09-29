@@ -202,11 +202,13 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t stream( char const* name_, yaal::hcore::HStreamInterface* stream_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+	typedef yaal::hcore::HStreamInterface& ( HHuginn::* stream_getter_t )( void );
+	static HHuginn::value_t stream( char const* name_, stream_getter_t streamGetter_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( name_, values_, 0, 0, thread_, position_ );
 		HObjectFactory& of( thread_->object_factory() );
-		return ( of.create<HStream>( of.stream_class(), make_pointer<HSynchronizedStream>( *stream_ ) ) );
+		HHuginn& h( *thread_->runtime().huginn() );
+		return ( of.create<HStream>( of.stream_class(), make_pointer<HSynchronizedStream>( ( h.*streamGetter_ )() ) ) );
 		M_EPILOG
 	}
 };
@@ -240,10 +242,10 @@ HPackageCreatorInterface::HInstance HOperatingSystemCreator::do_new_instance( HR
 		{ "exec",      runtime_->create_method( &HOperatingSystem::exec ),      "( *prog*, *args*... ) - replace current process space with running image of *prog* providing it with *args* arguments" },
 		{ "exit",      runtime_->create_method( &HOperatingSystem::exit ),      "( *status* ) - exit the interpreter with the *status*" },
 		{ "spawn",     runtime_->create_method( &HOperatingSystem::spawn ),     "( *prog*, *args*... ) - start a subprocess *prog* providing it with *args* arguments" },
-		{ "stdin",     runtime_->create_method( &HOperatingSystem::stream,      "OperatingSystem.stdin",  &runtime_->huginn()->input_stream() ),  "get access to interpreter's standard input stream" },
-		{ "stdout",    runtime_->create_method( &HOperatingSystem::stream,      "OperatingSystem.stdout", &runtime_->huginn()->output_stream() ), "get access to interpreter's standard output stream" },
-		{ "stderr",    runtime_->create_method( &HOperatingSystem::stream,      "OperatingSystem.stderr", &runtime_->huginn()->error_stream() ),  "get access to interpreter's standard error stream" },
-		{ "stdlog",    runtime_->create_method( &HOperatingSystem::stream,      "OperatingSystem.stdlog", &runtime_->huginn()->log_stream() ),    "get access to interpreter's standard log stream" }
+		{ "stdin",     runtime_->create_method( &HOperatingSystem::stream,      "OperatingSystem.stdin",  &HHuginn::input_stream ),  "get access to interpreter's standard input stream" },
+		{ "stdout",    runtime_->create_method( &HOperatingSystem::stream,      "OperatingSystem.stdout", &HHuginn::output_stream ), "get access to interpreter's standard output stream" },
+		{ "stderr",    runtime_->create_method( &HOperatingSystem::stream,      "OperatingSystem.stderr", &HHuginn::error_stream ),  "get access to interpreter's standard error stream" },
+		{ "stdlog",    runtime_->create_method( &HOperatingSystem::stream,      "OperatingSystem.stdlog", &HHuginn::log_stream ),    "get access to interpreter's standard log stream" }
 	};
 	c->redefine( nullptr, fd );
 	return { c, runtime_->object_factory()->create<HOperatingSystem>( c.raw() ) };
