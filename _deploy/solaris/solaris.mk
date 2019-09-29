@@ -1,5 +1,6 @@
 VERIFY_DIR=../../yaalrc.in
-PKGFILENAME=yaal-$(VERSION)-solaris$(OS)-$(ARCH).pkg
+CANONICAL_PKGFILENAME=yaal-$(VERSION)-solaris$(OS)-$(ARCH).pkg
+PKGFILENAME=$(CANONICAL_PKGFILENAME).gz
 PREFIX=/usr/local
 SYSCONFDIR=/etc
 LOCALSTATEDIR=/var
@@ -30,13 +31,14 @@ $(PKGFILENAME): $(TEST_ARTIFACT) pkginfo.in solaris.mk GNUmakefile makefile
 	pkgproto pkg= | awk '{print $$1" "$$2" "$$3" "$$4" root root"}' | sed -e 's/ 0700 / 0755 /' >> Prototype && \
 	sed -e 's/@VERSION@/$(VERSION)/' -e 's/@ARCH@/$(ARCH)/' pkginfo.in > pkginfo && \
 	pkgmk -o -r . -d . -f Prototype && \
-	pkgtrans -s ./ $(PKGFILENAME) yaal && \
+	pkgtrans -s ./ $(CANONICAL_PKGFILENAME) yaal && \
+	gzip -9 $(CANONICAL_PKGFILENAME) && \
 	/bin/rm -rf yaal
 
 package: $(PKGFILENAME)
 
 clean: $(VERIFY_DIR)
-	@/bin/rm -rf pkg tmp yaal-*-solaris*-*.pkg pkginfo Prototype && \
+	@/bin/rm -rf pkg tmp yaal-*-solaris*-*.pkg{,.gz} pkginfo Prototype && \
 	cd ../../ && $(MAKE) purge
 
 tmp/$(BUNDLE): $(PKGFILENAME)
