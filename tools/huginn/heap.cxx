@@ -119,7 +119,7 @@ public:
 			objectFactory_,
 			huginn::type_id( HHuginn::TYPE::HEAP ),
 			runtime_->identifier_id( type_name( HHuginn::TYPE::HEAP ) ),
-			"The `heap` is a collection of sorted values of uniform types. It supports operations of addition, search and element removal.",
+			"The `heap` is a collection representing a priority queue of values of uniform types. It supports operations of addition of elements and retrieval of top element.",
 			&builtin::heap
 		) {
 		HHuginn::field_definitions_t fd{
