@@ -4,7 +4,7 @@
 # Project related configuration options
 #---------------------------------------------------------------------------
 PROJECT_NAME           = yaal
-PROJECT_NUMBER         = 0.0.42
+PROJECT_NUMBER         = 0.0.43
 OUTPUT_DIRECTORY       = build/doc
 CREATE_SUBDIRS         = YES
 OUTPUT_LANGUAGE        = English
