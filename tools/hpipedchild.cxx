@@ -295,6 +295,7 @@ void HPipedChild::spawn(
 	_pid = ::fork();
 	M_ENSURE( _pid >= 0, "fork()" );
 	if ( ! _pid ) {
+		bool notified( false );
 		try {
 			HUTF8String utf8Image( image_ );
 			argv.get<char const*>()[ 0 ] = utf8Image.c_str();
@@ -336,18 +337,25 @@ void HPipedChild::spawn(
 			M_ENSURE( ::dup2( pipeIn[ PIPE_END::OUT ], stdinFd ) >= 0 );
 			M_ENSURE( ::dup2( pipeOut[ PIPE_END::IN ], stdoutFd ) >= 0 );
 			M_ENSURE( ::dup2( ( joinedErr ? pipeOut : pipeErr )[ PIPE_END::IN ], stderrFd ) >= 0 );
-			M_ENSURE( ::write( message[PIPE_END::IN], "\0", 1 ) == 1 );
+			M_ENSURE( ( notified = ( ::write( message[PIPE_END::IN], "\0", 1 ) == 1 ) ) );
 			OPipeResGuard* pgs[] = { &pipeIn, &pipeOut, joinedErr ? &pipeOut : &pipeErr, &message };
 			for ( OPipeResGuard* pg : pgs ) {
 				close_and_invalidate( (*pg)[PIPE_END::IN] );
 				close_and_invalidate( (*pg)[PIPE_END::OUT] );
 			}
 			::execv( argv.get<char const*>()[ 0 ], const_cast<char* const*>( argv.get<char const*>() ) );
-			M_ENSURE( !"execv"[0] );
+			::fprintf( stderr, "%s\n", error_message( errno ) );
+		} catch ( HException const& e ) {
+			e.print_error();
 		} catch ( ... ) {
-			M_ENSURE( ::write( message[PIPE_END::IN], "\0", 1 ) == 1 );
-			_exit( 1 );
 		}
+		if ( ! notified ) {
+			M_ENSURE( ::write( message[PIPE_END::IN], "\0", 1 ) == 1 );
+		}
+		::close( stdinFd );
+		::close( stdoutFd );
+		::close( stderrFd );
+		_exit( 1 );
 	} else {
 		fixupFds( in_, pipeIn, PIPE_END::IN, _in );
 		fixupFds( out_, pipeOut, PIPE_END::OUT, _out );
