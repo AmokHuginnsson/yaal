@@ -12,21 +12,20 @@ namespace ansi {
 class HSequence {
 public:
 	typedef HSequence this_type;
+	static int const SEQUENCE_BUFFER_SIZE = 32;
 private:
-	char const* const _data;
+	char _data[SEQUENCE_BUFFER_SIZE];
 public:
-	HSequence( char const* data_ )
-		: _data( data_ ) {
-	}
-	HSequence( HSequence const& seq_ )
-		: _data( seq_._data ) {
-	}
+	HSequence( char const* );
+	HSequence( HSequence const& ) = default;
 	char const* operator* ( void ) const {
 		return ( _data );
 	}
 private:
 	HSequence& operator = ( HSequence const& );
 };
+
+typedef yaal::hcore::HExceptionT<HSequence> HSequenceException;
 
 extern M_YAAL_TOOLS_PUBLIC_API HSequence const reset;
 extern M_YAAL_TOOLS_PUBLIC_API HSequence const bold;
@@ -88,6 +87,15 @@ HSequence down_n( int );
 HSequence left_n( int );
 HSequence right_n( int );
 HSequence up_bol_n( int );
+
+enum class PLANE {
+	FOREGROUND,
+	BACKGROUND
+};
+
+HSequence gray_scale( PLANE, int );
+HSequence color256( PLANE, int, int, int );
+HSequence rgb( PLANE, int, int, int );
 
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface&, HSequence const& );
 

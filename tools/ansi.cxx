@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
@@ -20,6 +21,13 @@ namespace ansi {
 namespace {
 static char const* TERM( getenv( "TERM" ) );
 static bool const has256colors( TERM ? ( to_string( TERM ).find( "256" ) != HString::npos ) : false );
+}
+
+HSequence::HSequence( char const* data_ )
+	: _data() {
+	::strncpy( _data, data_, SEQUENCE_BUFFER_SIZE );
+	_data[SEQUENCE_BUFFER_SIZE - 1] = 0;
+	return;
 }
 
 HSequence const reset( "\033[0m" );
@@ -78,52 +86,89 @@ HSequence const clrtoeol( "\033[K" );
 
 HSequence const up_bol( "\033[F" );
 
+HSequence gray_scale( PLANE plane_, int level_ ) {
+	if ( ( level_ < 0 ) || ( level_ >= 24 ) ) {
+		throw HSequenceException( "Invalid gray scale level value: "_ys.append( level_ ) );
+	}
+	char code[HSequence::SEQUENCE_BUFFER_SIZE];
+	::snprintf(
+		code,
+		HSequence::SEQUENCE_BUFFER_SIZE - 1,
+		"\033[%d;5;%dm",
+		plane_ == PLANE::FOREGROUND ? 38 : 48, level_ + 232
+	);
+	return ( code );
+}
+
+HSequence color256( PLANE plane_, int r_, int g_, int b_ ) {
+	if ( ( r_ < 0 ) || ( r_ >= 6 ) || ( g_ < 0 ) || ( g_ >= 6 ) || ( b_ < 0 ) || ( b_ >= 6 ) ) {
+		throw HSequenceException( "Invalid 6x6x6 color cube value: "_ys.append( r_ ).append( ", " ).append( g_ ).append( ", " ).append( b_ ) );
+	}
+	char code[HSequence::SEQUENCE_BUFFER_SIZE];
+	::snprintf(
+		code,
+		HSequence::SEQUENCE_BUFFER_SIZE - 1,
+		"\033[%d;5;%dm",
+		plane_ == PLANE::FOREGROUND ? 38 : 48, r_ * 36 + g_ * 6 + b_ + 16
+	);
+	return ( code );
+}
+
+HSequence rgb( PLANE plane_, int r_, int g_, int b_ ) {
+	if ( ( r_ < 0 ) || ( r_ >= 256 ) || ( g_ < 0 ) || ( g_ >= 256 ) || ( b_ < 0 ) || ( b_ >= 256 ) ) {
+		throw HSequenceException( "Invalid RGB color value: "_ys.append( r_ ).append( ", " ).append( g_ ).append( ", " ).append( b_ ) );
+	}
+	char code[HSequence::SEQUENCE_BUFFER_SIZE];
+	::snprintf(
+		code,
+		HSequence::SEQUENCE_BUFFER_SIZE - 1,
+		"\033[%d;2;%d;%d;%dm",
+		plane_ == PLANE::FOREGROUND ? 38 : 48, r_, g_, b_
+	);
+	return ( code );
+}
+
 HSequence move( int row_, int col_ ) {
-	static int const codeBufferSize( 32 );
-	static char code[codeBufferSize];
-	snprintf( code, codeBufferSize - 1, "\033[%d;%dH", row_, col_ );
+	char code[HSequence::SEQUENCE_BUFFER_SIZE];
+	::snprintf( code, HSequence::SEQUENCE_BUFFER_SIZE - 1, "\033[%d;%dH", row_, col_ );
 	return ( code );
 }
 
 HSequence up_n( int by_ ) {
-	static int const codeBufferSize( 16 );
-	static char code[codeBufferSize];
-	snprintf( code, codeBufferSize - 1, "\033[%dA", by_ );
+	char code[HSequence::SEQUENCE_BUFFER_SIZE];
+	::snprintf( code, HSequence::SEQUENCE_BUFFER_SIZE - 1, "\033[%dA", by_ );
 	return ( code );
 }
 
 HSequence down_n( int by_ ) {
-	static int const codeBufferSize( 16 );
-	static char code[codeBufferSize];
-	snprintf( code, codeBufferSize - 1, "\033[%dB", by_ );
+	char code[HSequence::SEQUENCE_BUFFER_SIZE];
+	::snprintf( code, HSequence::SEQUENCE_BUFFER_SIZE - 1, "\033[%dB", by_ );
 	return ( code );
 }
 
 HSequence left_n( int by_ ) {
-	static int const codeBufferSize( 16 );
-	static char code[codeBufferSize];
-	snprintf( code, codeBufferSize - 1, "\033[%dD", by_ );
+	char code[HSequence::SEQUENCE_BUFFER_SIZE];
+	::snprintf( code, HSequence::SEQUENCE_BUFFER_SIZE - 1, "\033[%dD", by_ );
 	return ( code );
 }
 
 HSequence right_n( int by_ ) {
-	static int const codeBufferSize( 16 );
-	static char code[codeBufferSize];
-	snprintf( code, codeBufferSize - 1, "\033[%dC", by_ );
+	static char code[HSequence::SEQUENCE_BUFFER_SIZE];
+	::snprintf( code, HSequence::SEQUENCE_BUFFER_SIZE - 1, "\033[%dC", by_ );
 	return ( code );
 }
 
 HSequence up_bol_n( int by_ ) {
-	static int const codeBufferSize( 16 );
-	static char code[codeBufferSize];
-	snprintf( code, codeBufferSize - 1, "\033[%dF", by_ );
+	char code[HSequence::SEQUENCE_BUFFER_SIZE];
+	::snprintf( code, HSequence::SEQUENCE_BUFFER_SIZE - 1, "\033[%dF", by_ );
 	return ( code );
 }
 
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& stream_, HSequence const& seq_ ) {
 	M_PROLOG
-	if ( is_a_tty( stream_ ) )
+	if ( is_a_tty( stream_ ) ) {
 		stream_ << *seq_;
+	}
 	return ( stream_ );
 	M_EPILOG
 }
