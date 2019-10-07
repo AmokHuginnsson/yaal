@@ -301,6 +301,79 @@ public:
 		return ( thread_->object_factory().create_string( yaal::move( s ) ) );
 		M_EPILOG
 	}
+	static HHuginn::value_t gray_scale( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "Terminal.gray_scale", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::STRING }, thread_, position_ );
+		hcore::HString s;
+		try {
+			s.append(
+				*ansi::gray_scale(
+					ansi::PLANE::FOREGROUND,
+					safe_int::cast<int>( get_integer( values_[0] ) )
+				)
+			);
+		} catch ( HException const& e ) {
+			throw HHuginn::HHuginnRuntimeException(
+				e.what(),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+		s.append( get_string( values_[1] ) );
+		s.append( *ansi::reset );
+		return ( thread_->object_factory().create_string( yaal::move( s ) ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t color256( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "Terminal.color256", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER, HHuginn::TYPE::STRING }, thread_, position_ );
+		hcore::HString s;
+		try {
+			s.append(
+				*ansi::color256(
+					ansi::PLANE::FOREGROUND,
+					safe_int::cast<int>( get_integer( values_[0] ) ),
+					safe_int::cast<int>( get_integer( values_[1] ) ),
+					safe_int::cast<int>( get_integer( values_[2] ) )
+				)
+			);
+		} catch ( HException const& e ) {
+			throw HHuginn::HHuginnRuntimeException(
+				e.what(),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+		s.append( get_string( values_[3] ) );
+		s.append( *ansi::reset );
+		return ( thread_->object_factory().create_string( yaal::move( s ) ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t rgb( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "Terminal.rgb", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER, HHuginn::TYPE::STRING }, thread_, position_ );
+		hcore::HString s;
+		try {
+			s.append(
+				*ansi::rgb(
+					ansi::PLANE::FOREGROUND,
+					safe_int::cast<int>( get_integer( values_[0] ) ),
+					safe_int::cast<int>( get_integer( values_[1] ) ),
+					safe_int::cast<int>( get_integer( values_[2] ) )
+				)
+			);
+		} catch ( HException const& e ) {
+			throw HHuginn::HHuginnRuntimeException(
+				e.what(),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+		s.append( get_string( values_[3] ) );
+		s.append( *ansi::reset );
+		return ( thread_->object_factory().create_string( yaal::move( s ) ) );
+		M_EPILOG
+	}
 	static HHuginn::value_t attribute( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		HTerminal& t( *static_cast<HTerminal*>( object_->raw() ) );
@@ -407,6 +480,9 @@ HPackageCreatorInterface::HInstance HTerminalCreator::do_new_instance( HRuntime*
 		{ "columns",   runtime_->create_method( &HTerminal::columns ),   "get number of columns for current terminal" },
 		{ "attribute", runtime_->create_method( &HTerminal::attribute ), "( *attr*, *str* ) - wrap given `string` *str* with given attribute *attr*" },
 		{ "color",     runtime_->create_method( &HTerminal::color ),     "( *color*, *str* ) - wrap given `string` *str* with given *color*" },
+		{ "gray_scale", runtime_->create_method( &HTerminal::gray_scale ), "( *level*, *str* ) - wrap given `string` *str* with gray intensity described *level*" },
+		{ "color256",  runtime_->create_method( &HTerminal::color256 ),  "( *red*, *green*, *blue*, *str* ) - wrap given `string` *str* with color described by point in 6x6x6 color cube" },
+		{ "rgb",       runtime_->create_method( &HTerminal::rgb ),       "( *red*, *green*, *blue*, *str* ) - wrap given `string` *str* with True Color described by *red*, *green*, *blue* tuple" },
 		{ "move",      runtime_->create_method( &HTerminal::move ),      "( *row*, *column* ) - move cursor to a new position indicated by *row* and *column*" },
 		{ "get_character", runtime_->create_method( &HTerminal::get_character ), "read single character from terminal" },
 		{ "get_key",   runtime_->create_method( &HTerminal::get_key ),   "read single key press from the keyboard" },
