@@ -427,16 +427,32 @@ paths_t find( path_t const& in, yaal::hcore::HRegex const& pattern_,
 HString glob_to_re( yaal::hcore::HString const& globStr_ ) {
 	HString globRE( "^" );
 	bool escaped( false );
+	bool specificSet( false );
 	for ( code_point_t c : globStr_ ) {
-		if ( escaped || ( ( c != '\\' ) && ( c != '*' ) && ( c != '?' ) ) ) {
-			globRE.push_back( '['_ycp );
+		if ( specificSet ) {
 			globRE.push_back( c );
-			globRE.push_back( ']'_ycp );
+			if ( c == ']' ) {
+				specificSet = false;
+			}
+			continue;
+		}
+		if ( escaped || ( ( c != '\\' ) && ( c != '*' ) && ( c != '?' ) && ( c != '[' ) ) ) {
+			bool special( is_ascii( c ) && ! is_alnum( c ) );
+			if ( special || escaped ) {
+				globRE.push_back( '['_ycp );
+			}
+			globRE.push_back( c );
+			if ( special || escaped ) {
+				globRE.push_back( ']'_ycp );
+			}
 			escaped = false;
 		} else if ( c == '\\' ) {
 			escaped = true;
 		} else if ( c == '*' ) {
 			globRE.append( ".*" );
+		} else if ( c == '[' ) {
+			globRE.push_back( c );
+			specificSet = true;
 		} else {
 			globRE.push_back( '.'_ycp );
 		}
@@ -461,7 +477,7 @@ struct OScan {
 }
 
 yaal::tools::filesystem::paths_t glob( path_t const& path_ ) {
-	HString globChars( "*?" );
+	HString globChars( "*?[" );
 	if ( path_.find_one_of( globChars ) == HString::npos ) {
 		return ( paths_t( { path_ } ) );
 	}
