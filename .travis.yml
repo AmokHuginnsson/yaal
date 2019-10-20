@@ -1,5 +1,5 @@
 language: C++
-dist: xenial
+dist: bionic
 install:
   - mkdir -p ../tress
   - git -C ../tress init
@@ -7,6 +7,7 @@ install:
   - git -C ../tress reset --hard FETCH_HEAD --
   - sed -e '/DROP .* IF EXISTS/d' ../tress/data/mysql.sql > ../tress/mysql.sql
   - mysql -u root < ../tress/mysql.sql
+before_script:
   - psql -U postgres < ../tress/data/postgresql.sql
 script:
   - umask 0077
@@ -39,6 +40,9 @@ addons:
       - graphviz
       - libboost-all-dev
       - lftp
+      - postgresql-10
+      - postgresql-client-10
+  postgresql: "10"
 sudo: false
 cache:
   ccache: true
