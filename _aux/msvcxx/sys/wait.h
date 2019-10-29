@@ -28,6 +28,14 @@ constexpr bool WIFSTOPPED( int status_ ) {
 	return ( ( status_ & 0xff ) == 0x7f );
 }
 
+constexpr int WSTOPSIG( int status_ ) {
+	return ( WEXITSTATUS( status_ ) );
+}
+
+constexpr bool WIFCONTINUED( int status_ ) {
+	return ( status_ == 0xffff );
+}
+
 constexpr bool WIFSIGNALED( int status_ ) {
 	return ( ! ( WIFSTOPPED( status_ ) || WIFEXITED( status_ ) ) );
 }

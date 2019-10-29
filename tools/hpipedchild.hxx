@@ -21,14 +21,16 @@ public:
 		/*! \brief Status flags.
 		 */
 		enum class TYPE {
-			NORMAL, /*!< process is running. */
-			ABORT, /*!< process has been stopped. */
-			NOT_SPAWNED /*!< process has not been spawned yet. */
+			RUNNING,  /*!< process is running. */
+			FINISHED, /*!< process finished normally. */
+			ABORTED,  /*!< process has been abnormally terminated. */
+			PAUSED,   /*!< process has been paused by STOP or TSTP signal. */
+			UNSPAWNED /*!< process has not been spawned yet. */
 		};
 		TYPE type; /*!< child process current status. */
 		int value; /*!< exit value of finished child process. */
 		STATUS( void )
-			: type( TYPE::NOT_SPAWNED )
+			: type( TYPE::UNSPAWNED )
 			, value( 0 ) {
 		}
 	};
@@ -40,6 +42,7 @@ private:
 	yaal::hcore::HStreamInterface::ptr_t _out;
 	yaal::hcore::HStreamInterface::ptr_t _err;
 	bool _foreground;
+	STATUS _status;
 public:
 	M_YAAL_TOOLS_PUBLIC_API static int _killGracePeriod;
 	HPipedChild(
@@ -57,7 +60,8 @@ public:
 		int = -1,
 		bool = false
 	);
-	STATUS finish( int = 0 );
+	STATUS const& finish( int = 0 );
+	STATUS const& get_status( void );
 	bool is_running( void ) const;
 	int get_pid( void ) const;
 	yaal::hcore::HStreamInterface& in( void );

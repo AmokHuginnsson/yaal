@@ -146,7 +146,8 @@ HPipedChild::HPipedChild(
 	, _in( in_ )
 	, _out( out_ )
 	, _err( err_ )
-	, _foreground( false ) {
+	, _foreground( false )
+	, _status() {
 	return;
 }
 
@@ -190,6 +191,18 @@ template<typename T>
 inline int FWD_WTERMSIG( T val_ ) {
 	return ( WTERMSIG( val_ ) );
 }
+template<typename T>
+inline bool FWD_WIFSTOPPED( T val_ ) {
+	return ( WIFSTOPPED( val_ ) ? true : false );
+}
+template<typename T>
+inline int FWD_WSTOPSIG( T val_ ) {
+	return ( WSTOPSIG( val_ ) );
+}
+template<typename T>
+inline bool FWD_WIFCONTINUED( T val_ ) {
+	return ( WIFCONTINUED( val_ ) ? true : false );
+}
 static sighandler_t const FWD_SIG_ERR = SIG_ERR;
 static sighandler_t const FWD_SIG_IGN = SIG_IGN;
 #pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
@@ -197,12 +210,61 @@ static sighandler_t const FWD_SIG_DFL = SIG_DFL;
 #pragma GCC diagnostic pop
 }
 
-HPipedChild::STATUS HPipedChild::finish( int finishIn_ ) {
+HPipedChild::STATUS const& HPipedChild::get_status( void ) {
 	M_PROLOG
+	if ( _pid <= 0 ) {
+		M_ASSERT( ( _status.type == STATUS::TYPE::UNSPAWNED ) || ( _status.type == STATUS::TYPE::FINISHED ) || ( _status.type == STATUS::TYPE::ABORTED ) );
+		return ( _status );
+	}
+	M_ASSERT( ( _status.type == STATUS::TYPE::RUNNING ) || ( _status.type == STATUS::TYPE::PAUSED ) );
+	int status( 0 );
+	int pid( 0 );
+	M_ENSURE( ( pid = ::waitpid( _pid, &status, WNOHANG | WUNTRACED | WCONTINUED ) ) != -1 );
+	if ( pid == 0 ) {
+		return ( _status );
+	}
+	if ( FWD_WIFEXITED( status ) ) {
+		_status.type = STATUS::TYPE::FINISHED;
+		_status.value = FWD_WEXITSTATUS( status );
+		_pid = -1;
+	} else if ( FWD_WIFSIGNALED( status ) ) {
+		_status.type = STATUS::TYPE::ABORTED;
+		_status.value = FWD_WTERMSIG( status );
+		_pid = -1;
+	} else if ( FWD_WIFSTOPPED( status ) ) {
+		_status.type = STATUS::TYPE::PAUSED;
+		_status.value = FWD_WSTOPSIG( status );
+	} else if ( FWD_WIFCONTINUED( status ) ) {
+		_status.type = STATUS::TYPE::RUNNING;
+	}
+	return ( _status );
+	M_EPILOG
+}
+
+HPipedChild::STATUS const& HPipedChild::finish( int finishIn_ ) {
+	M_PROLOG
+	M_ASSERT( _pid != 0 );
+	get_status();
+	if ( _pid <= 0 ) {
+		M_ASSERT( ( _status.type == STATUS::TYPE::UNSPAWNED ) || ( _status.type == STATUS::TYPE::FINISHED ) || ( _status.type == STATUS::TYPE::ABORTED ) );
+		return ( _status );
+	}
+	M_ASSERT( ( _status.type == STATUS::TYPE::RUNNING ) || ( _status.type == STATUS::TYPE::PAUSED ) );
+	if ( _status.type == STATUS::TYPE::PAUSED ) {
+		M_ENSURE( hcore::system::kill( _pid, SIGCONT ) == 0 );
+		int pid( 0 );
+		int status( 0 );
+		do {
+			M_ENSURE( ( ( pid = ::waitpid( _pid, &status, WUNTRACED | WCONTINUED ) ) != -1 ) || ( errno == EINTR ) );
+			if ( ( pid != _pid ) && ( errno == EINTR ) ) {
+				continue;
+			}
+			M_ASSERT( pid == _pid );
+		} while ( ! FWD_WIFCONTINUED( status ) );
+	}
 	close_and_invalidate( _err );
 	close_and_invalidate( _out );
 	close_and_invalidate( _in );
-	STATUS s;
 	if ( _pid > 0 ) {
 		int status( 0 );
 		int pid( 0 );
@@ -211,27 +273,26 @@ HPipedChild::STATUS HPipedChild::finish( int finishIn_ ) {
 			int elapsed( 0 );
 			while ( ( pid != _pid ) && ( ( elapsed = static_cast<int>( clock.get_time_elapsed( time::UNIT::SECOND ) ) ) < finishIn_ ) ) {
 				HAlarm alarm( static_cast<int long>( time::in_units<time::UNIT::MILLISECOND>( time::duration( finishIn_ - elapsed, time::UNIT::SECOND ) ) ) );
-				M_ENSURE( ( ( pid = ::waitpid( _pid, &status, WUNTRACED | WCONTINUED ) ) != -1 ) || ( errno == EINTR ) );
+				M_ENSURE( ( ( pid = ::waitpid( _pid, &status, WUNTRACED ) ) != -1 ) || ( errno == EINTR ) );
 			}
 		} else {
-			M_ENSURE( ( pid = ::waitpid( _pid, &status, WNOHANG | WUNTRACED | WCONTINUED ) ) != -1 );
+			M_ENSURE( ( pid = ::waitpid( _pid, &status, WNOHANG | WUNTRACED ) ) != -1 );
 		}
 		if ( pid != _pid ) {
-			M_ENSURE( hcore::system::kill( _pid, SIGTERM ) == 0 ); {
-				HAlarm alarm( _killGracePeriod );
-				M_ENSURE( ( ( pid = ::waitpid( _pid, &status, 0 ) ) != -1 ) || ( errno == EINTR ) );
-			}
-			if ( pid != _pid ) {
-				M_ENSURE( hcore::system::kill( _pid, SIGKILL ) == 0 );
-				M_ENSURE( ::waitpid( _pid, &status, 0 ) == _pid );
-			}
+			M_ENSURE( hcore::system::kill( _pid, SIGTERM ) == 0 );
+			HAlarm alarm( _killGracePeriod );
+			M_ENSURE( ( ( pid = ::waitpid( _pid, &status, 0 ) ) != -1 ) || ( errno == EINTR ) );
+		}
+		if ( pid != _pid ) {
+			M_ENSURE( hcore::system::kill( _pid, SIGKILL ) == 0 );
+			M_ENSURE( ::waitpid( _pid, &status, 0 ) == _pid );
 		}
 		if ( FWD_WIFEXITED( status ) ) {
-			s.type = STATUS::TYPE::NORMAL;
-			s.value = FWD_WEXITSTATUS( status );
+			_status.type = STATUS::TYPE::FINISHED;
+			_status.value = FWD_WEXITSTATUS( status );
 		} else if ( FWD_WIFSIGNALED( status ) ) {
-			s.type = STATUS::TYPE::ABORT;
-			s.value = FWD_WTERMSIG( status );
+			_status.type = STATUS::TYPE::ABORTED;
+			_status.value = FWD_WTERMSIG( status );
 		}
 	}
 	int const stdinFd( fileno( stdin ) );
@@ -243,8 +304,8 @@ HPipedChild::STATUS HPipedChild::finish( int finishIn_ ) {
 		}
 		_foreground = false;
 	}
-	_pid = 0;
-	return ( s );
+	_pid = -1;
+	return ( _status );
 	M_EPILOG
 }
 
@@ -357,6 +418,7 @@ void HPipedChild::spawn(
 		::close( stderrFd );
 		_exit( 1 );
 	} else {
+		_status.type = STATUS::TYPE::RUNNING;
 		fixupFds( in_, pipeIn, PIPE_END::IN, _in );
 		fixupFds( out_, pipeOut, PIPE_END::OUT, _out );
 		fixupFds( err_, pipeErr, PIPE_END::OUT, _err );

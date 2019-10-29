@@ -59,7 +59,7 @@ int kill( int pid_, int signal_ ) {
 #ifdef __HOST_OS_TYPE_CYGWIN__
 	/* Work around for buggy child process handling in Cygwin. */
 	int retriesLeft( 32 );
-	while ( ( retriesLeft -- > 0 ) && ( result == -1 ) && ( errno == ESRCH ) ) {
+	while ( ( retriesLeft -- > 0 ) && ( result == -1 ) && ( ( errno == ESRCH ) || ( errno == EACCES ) ) ) {
 		timespec ts{ 0, 1000 * 1000 }; /* sleep for 1 millisecond */
 		::nanosleep( &ts, nullptr );
 		result = ::kill( pid_, signal_ );

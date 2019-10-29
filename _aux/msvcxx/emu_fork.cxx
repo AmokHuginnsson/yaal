@@ -129,8 +129,9 @@ namespace msvcxx {
 #undef waitpid
 int waitpid( int pid_, int* status_, int options_ ) {
 	int ret( -1 );
+	HANDLE proc( nullptr );
 	do {
-		if ( ( options_ & ~( WNOHANG | WUNTRACED ) ) != 0 ) {
+		if ( ( options_ & ~( WNOHANG | WUNTRACED | WCONTINUED ) ) != 0 ) {
 			errno = EINVAL;
 			break;
 		}
@@ -138,12 +139,19 @@ int waitpid( int pid_, int* status_, int options_ ) {
 			errno = ECHILD;
 			break;
 		}
-		HANDLE proc( OpenProcess( SYNCHRONIZE, FALSE, pid_ ) );
+		proc = OpenProcess( SYNCHRONIZE | PROCESS_QUERY_INFORMATION, FALSE, pid_ );
 		if ( proc == nullptr ) {
 			errno = ECHILD;
 			break;
 		}
-		if ( ::WaitForSingleObject( proc, static_cast<DWORD>( -1L ) ) == WAIT_FAILED ) {
+		if ( options_ & WNOHANG ) {
+			if ( status_ ) {
+				*status_ = 0;
+			}
+			return ( 0 );
+		}
+		DWORD waitRes( ::WaitForSingleObject( proc,  static_cast<DWORD>( -1L ) ) );
+		if ( waitRes == WAIT_FAILED ) {
 			errno = ECHILD;
 			break;
 		}
@@ -153,15 +161,15 @@ int waitpid( int pid_, int* status_, int options_ ) {
 			break;
 		}
 		if ( status_ ) {
-			*status_ = status;
+			*status_ = status << 8;
 		}
-		CloseHandle( proc );
 		ret = pid_;
 	} while ( false );
-	if ( ( ret == -1 ) && ( _children_.count( pid_ ) > 0 ) ) {
-		if ( ! kill( pid_, 0 ) ) {
-			ret = pid_;
-		}
+	if ( proc ) {
+		CloseHandle( proc );
+	}
+	if ( ( ret == -1 ) && ( _children_.count( pid_ ) > 0 ) && ! kill( pid_, 0 ) ) {
+		ret = pid_;
 	}
 	if ( ret == pid_ ) {
 		_children_.erase( pid_ );
