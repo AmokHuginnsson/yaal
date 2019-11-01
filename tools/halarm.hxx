@@ -32,7 +32,7 @@ public:
 	 *
 	 * milliseconds_ - alarm shall come in milliseconds_ milliseconds.
 	 */
-	HAlarm( int long milliseconds_ );
+	HAlarm( i64_t milliseconds_ );
 
 	/*! \brief Deregister alarm if it has not came.
 	 */

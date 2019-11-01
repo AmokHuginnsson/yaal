@@ -60,7 +60,15 @@ public:
 		int = -1,
 		bool = false
 	);
-	STATUS const& finish( int = 0 );
+	/*! \brief Terminate process execution gracefully.
+	 *
+	 * This method tries to terminate the child process immediatelly.
+	 * The \e delay is NOT ment to guarantee an extra time to finish
+	 * the child process normal work.
+	 *
+	 * \param delay - time in milliseconds between closing all I/O and sending TERM signal.
+	 */
+	STATUS const& finish( i64_t delay = 0 );
 	STATUS const& get_status( void );
 	bool is_running( void ) const;
 	int get_pid( void ) const;
@@ -74,6 +82,8 @@ public:
 	void close_out( void );
 	void close_err( void );
 private:
+	void restore_parent_term( void );
+	void do_continue( void );
 	HPipedChild( HPipedChild const& ) = delete;
 	HPipedChild& operator = ( HPipedChild const& ) = delete;
 };

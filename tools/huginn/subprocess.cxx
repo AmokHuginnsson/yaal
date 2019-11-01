@@ -10,6 +10,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "thread.hxx"
 #include "objectfactory.hxx"
 #include "stream.hxx"
+#include "hcore/si.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -37,7 +38,7 @@ public:
 			{ "is_alive", runtime_->create_method( &HSubprocess::is_alive ), "tell if given subprocess is alive and running" },
 			{ "kill",     runtime_->create_method( &HSubprocess::kill ),     "kill this sub-process" },
 			{ "get_pid",  runtime_->create_method( &HSubprocess::get_pid ),  "get operating system Process IDentification-number of this subprocess" },
-			{ "wait",     runtime_->create_method( &HSubprocess::wait ),     "wait for this subprocess to finish is execution and return its exit status" },
+			{ "wait",     runtime_->create_method( &HSubprocess::wait ),     "( [milliseconds] ) wait for *milliseconds* for this subprocess to finish is execution and return its exit status" },
 			{ "in",       runtime_->create_method( &HSubprocess::stream, "Subprocess.in", &HPipedChild::stream_in ),   "standard input stream of a subprocess" },
 			{ "out",      runtime_->create_method( &HSubprocess::stream, "Subprocess.out", &HPipedChild::stream_out ), "standard output stream of a subprocess" },
 			{ "err",      runtime_->create_method( &HSubprocess::stream, "Subprocess.err", &HPipedChild::stream_err ), "standard error stream of a subprocess" }
@@ -124,7 +125,7 @@ HHuginn::value_t HSubprocess::wait(
 	M_PROLOG
 	char const name[] = "Subprocess.wait";
 	verify_arg_count( name, values_, 0, 1, thread_, position_ );
-	HInteger::value_type const MAX_WAIT_FOR( meta::max_signed<i32_t>::value );
+	HInteger::value_type const MAX_WAIT_FOR( meta::max_signed<i32_t>::value * si::MILLI_IN_WHOLE );
 	HInteger::value_type waitFor( MAX_WAIT_FOR );
 	if ( ! values_.is_empty() ) {
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, ARITY::UNARY, thread_, position_ );
@@ -134,7 +135,7 @@ HHuginn::value_t HSubprocess::wait(
 	if ( ( waitFor < 0 ) || ( waitFor > MAX_WAIT_FOR ) ) {
 		throw HHuginn::HHuginnRuntimeException( "invalid wait time: "_ys.append( waitFor ), thread_->current_frame()->file_id(), position_ );
 	}
-	HPipedChild::STATUS s( o->_pipedChild.finish( static_cast<i32_t>( waitFor ) ) );
+	HPipedChild::STATUS s( o->_pipedChild.finish( waitFor ) );
 	return ( thread_->runtime().object_factory()->create_integer( s.value ) );
 	M_EPILOG
 }

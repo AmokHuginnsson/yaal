@@ -38,7 +38,7 @@ static void dummy_signal_handler( int )
 
 yaal::hcore::HMutex HAlarm::_mutex;
 
-HAlarm::HAlarm( int long milliseconds_ )
+HAlarm::HAlarm( i64_t milliseconds_ )
 	: _timer( -1 )
 	, _action( chunk_size<struct sigaction>( 1 ) )
 	, _lock( _mutex ) {
@@ -66,7 +66,7 @@ HAlarm::HAlarm( int long milliseconds_ )
 
 		itimerspec timeout;
 		::memset( &timeout, 0, sizeof ( timeout ) );
-		timeout.it_value.tv_sec = milliseconds_ / si::MILLI_IN_WHOLE;
+		timeout.it_value.tv_sec = static_cast<int long>( milliseconds_ / si::MILLI_IN_WHOLE );
 		timeout.it_value.tv_nsec = static_cast<int long>( ( milliseconds_ % si::MILLI_IN_WHOLE ) * si::NANO_IN_MILLI );
 		M_ENSURE( timer_settime( *t, 0, &timeout, nullptr ) == 0 );
 		++ step;
