@@ -210,7 +210,7 @@ static sighandler_t const FWD_SIG_DFL = SIG_DFL;
 #pragma GCC diagnostic pop
 }
 
-HPipedChild::STATUS const& HPipedChild::get_status( void ) {
+HPipedChild::STATUS const& HPipedChild::get_status_change( bool noHang_ ) {
 	M_PROLOG
 	if ( _pid <= 0 ) {
 		M_ASSERT( ( _status.type == STATUS::TYPE::UNSPAWNED ) || ( _status.type == STATUS::TYPE::FINISHED ) || ( _status.type == STATUS::TYPE::ABORTED ) );
@@ -219,7 +219,7 @@ HPipedChild::STATUS const& HPipedChild::get_status( void ) {
 	M_ASSERT( ( _status.type == STATUS::TYPE::RUNNING ) || ( _status.type == STATUS::TYPE::PAUSED ) );
 	int status( 0 );
 	int pid( 0 );
-	M_ENSURE( ( pid = ::waitpid( _pid, &status, WNOHANG | WUNTRACED | WCONTINUED ) ) != -1 );
+	M_ENSURE( ( pid = ::waitpid( _pid, &status, ( noHang_ ? WNOHANG : 0 ) | WUNTRACED | WCONTINUED ) ) != -1 );
 	if ( pid == 0 ) {
 		return ( _status );
 	}
@@ -236,6 +236,27 @@ HPipedChild::STATUS const& HPipedChild::get_status( void ) {
 		_status.value = FWD_WSTOPSIG( status );
 	} else if ( FWD_WIFCONTINUED( status ) ) {
 		_status.type = STATUS::TYPE::RUNNING;
+	}
+	return ( _status );
+	M_EPILOG
+}
+
+HPipedChild::STATUS const& HPipedChild::get_status( void ) {
+	M_PROLOG
+	return ( get_status_change( true ) );
+	M_EPILOG
+}
+
+HPipedChild::STATUS const& HPipedChild::wait( void ) {
+	M_PROLOG
+	close_and_invalidate( _in );
+	if ( _pid > 0 ) {
+		get_status_change( false );
+	}
+	if ( _pid <= 0 ) {
+		close_and_invalidate( _out );
+		close_and_invalidate( _err );
+		restore_parent_term();
 	}
 	return ( _status );
 	M_EPILOG
@@ -285,9 +306,9 @@ HPipedChild::STATUS const& HPipedChild::finish( i64_t finishIn_ ) {
 	if ( _status.type == STATUS::TYPE::PAUSED ) {
 		do_continue();
 	}
-	close_and_invalidate( _err );
-	close_and_invalidate( _out );
 	close_and_invalidate( _in );
+	close_and_invalidate( _out );
+	close_and_invalidate( _err );
 	int status( 0 );
 	int pid( 0 );
 	if ( finishIn_ > 0 ) {
@@ -316,8 +337,8 @@ HPipedChild::STATUS const& HPipedChild::finish( i64_t finishIn_ ) {
 		_status.type = STATUS::TYPE::ABORTED;
 		_status.value = FWD_WTERMSIG( status );
 	}
-	restore_parent_term();
 	_pid = -1;
+	restore_parent_term();
 	return ( _status );
 	M_EPILOG
 }

@@ -70,6 +70,7 @@ public:
 	 */
 	STATUS const& finish( i64_t delay = 0 );
 	STATUS const& get_status( void );
+	STATUS const& wait( void );
 	bool is_running( void ) const;
 	int get_pid( void ) const;
 	yaal::hcore::HStreamInterface& in( void );
@@ -81,9 +82,10 @@ public:
 	void close_in( void );
 	void close_out( void );
 	void close_err( void );
-private:
 	void restore_parent_term( void );
+private:
 	void do_continue( void );
+	STATUS const& get_status_change( bool );
 	HPipedChild( HPipedChild const& ) = delete;
 	HPipedChild& operator = ( HPipedChild const& ) = delete;
 };
