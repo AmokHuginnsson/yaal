@@ -41,6 +41,7 @@ private:
 	yaal::hcore::HStreamInterface::ptr_t _in;
 	yaal::hcore::HStreamInterface::ptr_t _out;
 	yaal::hcore::HStreamInterface::ptr_t _err;
+	int _processGroupId;
 	bool _foreground;
 	STATUS _status;
 public:
@@ -82,9 +83,10 @@ public:
 	void close_in( void );
 	void close_out( void );
 	void close_err( void );
+	void bring_to_foreground( void );
 	void restore_parent_term( void );
-private:
 	void do_continue( void );
+private:
 	STATUS const& get_status_change( bool );
 	HPipedChild( HPipedChild const& ) = delete;
 	HPipedChild& operator = ( HPipedChild const& ) = delete;

@@ -146,6 +146,7 @@ HPipedChild::HPipedChild(
 	, _in( in_ )
 	, _out( out_ )
 	, _err( err_ )
+	, _processGroupId( -1 )
 	, _foreground( false )
 	, _status() {
 	return;
@@ -264,15 +265,31 @@ HPipedChild::STATUS const& HPipedChild::wait( void ) {
 
 void HPipedChild::restore_parent_term( void ) {
 	M_PROLOG
-	int const stdinFd( fileno( stdin ) );
-	int iofds[] = { stdinFd, fileno( stdout ), fileno( stderr ) };
-	if ( _foreground && is_a_tty( stdinFd ) ) {
-		M_ENSURE( setpgid( 0, 0 ) == 0 );
-		for ( int fd : iofds ) {
-			M_ENSURE( ::tcsetpgrp( fd, getpgrp() ) == 0 );
-		}
-		_foreground = false;
+	if ( ! _foreground ) {
+		return;
 	}
+	int iofds[] = { fileno( stdin ), fileno( stdout ), fileno( stderr ) };
+	for ( int fd : iofds ) {
+		if ( ! is_a_tty( fd ) ) {
+			continue;
+		}
+		M_ENSURE( ::tcsetpgrp( fd, getpgrp() ) == 0 );
+	}
+	_foreground = false;
+	return;
+	M_EPILOG
+}
+
+void HPipedChild::bring_to_foreground( void ) {
+	M_PROLOG
+	int iofds[] = { fileno( stdin ), fileno( stdout ), fileno( stderr ) };
+	for ( int fd : iofds ) {
+		if ( ! is_a_tty( fd ) ) {
+			continue;
+		}
+		M_ENSURE( ( ::tcsetpgrp( fd, _processGroupId ) == 0 ) || ( errno == EACCES ) );
+	}
+	_foreground = true;
 	return;
 	M_EPILOG
 }
@@ -459,15 +476,12 @@ void HPipedChild::spawn(
 		char dummy( 0 );
 		M_ENSURE( ::read( message[PIPE_END::OUT], &dummy, 1 ) == 1 );
 		if ( pgid_ >= PROCESS_GROUP_LEADER ) {
-			int pgid( pgid_ > PROCESS_GROUP_LEADER ? pgid_ : _pid );
-			M_ENSURE( ( ::setpgid( _pid, pgid ) == 0 ) || ( errno == EACCES ) );
-			for ( int fd : iofds ) {
-				if ( foreground_ && is_a_tty( fd ) ) {
-					M_ENSURE( ( ::tcsetpgrp( fd, pgid ) == 0 ) || ( errno == EACCES ) );
-				}
+			_processGroupId = pgid_ > PROCESS_GROUP_LEADER ? pgid_ : _pid;
+			M_ENSURE( ( ::setpgid( _pid, _processGroupId ) == 0 ) || ( errno == EACCES ) );
+			if ( foreground_ ) {
+				bring_to_foreground();
 			}
 		}
-		_foreground = foreground_;
 	}
 	return;
 	M_EPILOG
