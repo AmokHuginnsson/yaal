@@ -224,22 +224,27 @@ HPipedChild::STATUS const& HPipedChild::get_status_change( bool noHang_ ) {
 	if ( pid == 0 ) {
 		return ( _status );
 	}
-	if ( FWD_WIFEXITED( status ) ) {
-		_status.type = STATUS::TYPE::FINISHED;
-		_status.value = FWD_WEXITSTATUS( status );
-		_pid = -1;
-	} else if ( FWD_WIFSIGNALED( status ) ) {
-		_status.type = STATUS::TYPE::ABORTED;
-		_status.value = FWD_WTERMSIG( status );
-		_pid = -1;
-	} else if ( FWD_WIFSTOPPED( status ) ) {
-		_status.type = STATUS::TYPE::PAUSED;
-		_status.value = FWD_WSTOPSIG( status );
-	} else if ( FWD_WIFCONTINUED( status ) ) {
-		_status.type = STATUS::TYPE::RUNNING;
-	}
+	update_status( status );
 	return ( _status );
 	M_EPILOG
+}
+
+void HPipedChild::update_status( int status_ ) {
+	if ( FWD_WIFEXITED( status_ ) ) {
+		_status.type = STATUS::TYPE::FINISHED;
+		_status.value = FWD_WEXITSTATUS( status_ );
+		_pid = -1;
+	} else if ( FWD_WIFSIGNALED( status_ ) ) {
+		_status.type = STATUS::TYPE::ABORTED;
+		_status.value = FWD_WTERMSIG( status_ );
+		_pid = -1;
+	} else if ( FWD_WIFSTOPPED( status_ ) ) {
+		_status.type = STATUS::TYPE::PAUSED;
+		_status.value = FWD_WSTOPSIG( status_ );
+	} else if ( FWD_WIFCONTINUED( status_ ) ) {
+		_status.type = STATUS::TYPE::RUNNING;
+	}
+	return;
 }
 
 HPipedChild::STATUS const& HPipedChild::get_status( void ) {
@@ -306,6 +311,7 @@ void HPipedChild::do_continue( void ) {
 		}
 		M_ASSERT( pid == _pid );
 	} while ( ! FWD_WIFCONTINUED( status ) );
+	update_status( status );
 	return;
 	M_EPILOG
 }
@@ -347,13 +353,7 @@ HPipedChild::STATUS const& HPipedChild::finish( i64_t finishIn_ ) {
 		M_ENSURE( hcore::system::kill( _pid, SIGKILL ) == 0 );
 		M_ENSURE( ::waitpid( _pid, &status, 0 ) == _pid );
 	}
-	if ( FWD_WIFEXITED( status ) ) {
-		_status.type = STATUS::TYPE::FINISHED;
-		_status.value = FWD_WEXITSTATUS( status );
-	} else if ( FWD_WIFSIGNALED( status ) ) {
-		_status.type = STATUS::TYPE::ABORTED;
-		_status.value = FWD_WTERMSIG( status );
-	}
+	update_status( status );
 	_pid = -1;
 	restore_parent_term();
 	return ( _status );

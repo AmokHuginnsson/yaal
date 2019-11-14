@@ -88,6 +88,7 @@ public:
 	void do_continue( void );
 private:
 	STATUS const& get_status_change( bool );
+	void update_status( int );
 	HPipedChild( HPipedChild const& ) = delete;
 	HPipedChild& operator = ( HPipedChild const& ) = delete;
 };
