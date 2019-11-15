@@ -23,6 +23,7 @@ struct EscapeTable {
 
 void escape( yaal::hcore::HString&, EscapeTable const&, yaal::code_point_t = '\\'_ycp );
 void unescape( yaal::hcore::HString&, EscapeTable const&, yaal::code_point_t = '\\'_ycp );
+void semantic_unescape( yaal::hcore::HString& );
 yaal::hcore::HString escape_copy( yaal::hcore::HString, EscapeTable const&, yaal::code_point_t = '\\'_ycp );
 yaal::hcore::HString unescape_copy( yaal::hcore::HString, EscapeTable const&, yaal::code_point_t = '\\'_ycp );
 

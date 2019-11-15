@@ -227,7 +227,7 @@ HUTF8String HRegex::matches_impl( HUTF8String const& str_, int& start_, int& mat
 		str,
 		static_cast<int>( str_.byte_count() ),
 		0,
-		( ( match_ & MATCH::NOT_BEGINNING_OF_LINE ) ? PCRE_NOTBOL : 0 ) | ( ( match_ & MATCH::NOT_END_OF_LINE ) ? PCRE_NOTEOL : 0 ),
+		PCRE_NO_UTF8_CHECK | ( ( match_ & MATCH::NOT_BEGINNING_OF_LINE ) ? PCRE_NOTBOL : 0 ) | ( ( match_ & MATCH::NOT_END_OF_LINE ) ? PCRE_NOTEOL : 0 ),
 		match, 3
 	);
 	if ( ( _lastError >= 0 ) && ( match[0] >= 0 ) ) {
@@ -254,7 +254,7 @@ HRegex::groups_t HRegex::groups_impl( HUTF8String const& string_, match_t match_
 		str,
 		static_cast<int>( string_.byte_count() ),
 		0,
-		( ( match_ & MATCH::NOT_BEGINNING_OF_LINE ) ? PCRE_NOTBOL : 0 ) | ( ( match_ & MATCH::NOT_END_OF_LINE ) ? PCRE_NOTEOL : 0 ),
+		PCRE_NO_UTF8_CHECK | ( ( match_ & MATCH::NOT_BEGINNING_OF_LINE ) ? PCRE_NOTBOL : 0 ) | ( ( match_ & MATCH::NOT_END_OF_LINE ) ? PCRE_NOTEOL : 0 ),
 		matchesBuffer.data(),
 		expectedGroupCount * 3
 	);

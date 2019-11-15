@@ -109,6 +109,63 @@ void unescape( yaal::hcore::HString& string_, EscapeTable const& et_, code_point
 	M_EPILOG
 }
 
+void semantic_unescape( yaal::hcore::HString& str_ ) {
+	M_PROLOG
+	for ( int i( 0 ); i < str_.get_length(); ++ i ) {
+		int k( i );
+		if ( ( str_[k] == '\\' ) && ( ( k + 1 ) < str_.get_length() ) ) {
+			++ k;
+			if ( str_[k] == '\\' ) {
+				++ i;
+				continue;
+			}
+			code_point_t prefix( str_[k] );
+			int codeLen( 0 );
+			switch ( prefix.get() ) {
+				case ( 'x' ): { codeLen = 2; } break;
+				case ( 'u' ): { codeLen = 4; } break;
+				case ( 'U' ): { codeLen = 8; } break;
+			}
+			int base( 16 );
+			bool good( false );
+			char num[10];
+			if ( codeLen > 0 ) {
+				if ( ( k + codeLen ) < str_.get_length() ) {
+					good = true;
+					++ k;
+					for ( int n( 0 ); n < codeLen; ++ n ) {
+						code_point_t d( str_[k + n] );
+						if ( ! is_hex_digit( d ) ) {
+							good = false;
+							break;
+						}
+						num[n] = static_cast<char>( d.get() );
+					}
+				}
+			} else {
+				base = 8;
+				for ( int len( min( 3, static_cast<int>( str_.get_length() ) - k ) ); codeLen < len; ++ codeLen ) {
+					code_point_t d( str_[k + codeLen] );
+					if ( ! is_oct_digit( d ) ) {
+						break;
+					}
+					num[codeLen] = static_cast<char>( d.get() );
+					good = true;
+				}
+			}
+			if ( good ) {
+				num[codeLen] = 0;
+				code_point_t c( static_cast<u32_t>( stoul( num, nullptr, base ) ) );
+				if ( ( c != 0_ycp ) && ( c < unicode::UCS_MAX_4_BYTE_CODE_POINT ) ) {
+					str_.replace( i, ( base == 16 ? 2 : 1 ) + codeLen, 1, c );
+				}
+			}
+		}
+	}
+	return;
+	M_EPILOG
+}
+
 HString escape_copy( yaal::hcore::HString string_, EscapeTable const& et_, code_point_t escape_ ) {
 	M_PROLOG
 	escape( string_, et_, escape_ );
