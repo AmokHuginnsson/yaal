@@ -446,6 +446,44 @@ void set_umask( mode_t umask_ ) {
 	return;
 }
 
+inline int resource_limit_type( RESOURCE_LIMIT_TYPE resourceLimitType_ ) {
+	int rlt( 0 );
+	switch ( resourceLimitType_ ) {
+		case ( RESOURCE_LIMIT_TYPE::MEMORY_SIZE ):   rlt = RLIMIT_DATA;   break;
+		case ( RESOURCE_LIMIT_TYPE::STACK_SIZE ):    rlt = RLIMIT_STACK;  break;
+		case ( RESOURCE_LIMIT_TYPE::CPU_TIME ):      rlt = RLIMIT_CPU;    break;
+		case ( RESOURCE_LIMIT_TYPE::OPEN_FILES ):    rlt = RLIMIT_NOFILE; break;
+		case ( RESOURCE_LIMIT_TYPE::FILE_SIZE ):     rlt = RLIMIT_FSIZE;  break;
+		case ( RESOURCE_LIMIT_TYPE::PROCESS_COUNT ): rlt = RLIMIT_NPROC;  break;
+		case ( RESOURCE_LIMIT_TYPE::CORE_SIZE ):     rlt = RLIMIT_CORE;   break;
+	}
+	return ( rlt );
+}
+
+HResourceLimit get_limit( RESOURCE_LIMIT_TYPE resourceLimitType_ ) {
+	M_PROLOG
+	rlimit rl = { 0, 0 };
+	M_ENSURE( ::getrlimit( resource_limit_type( resourceLimitType_ ), &rl ) == 0 );
+	return (
+		HResourceLimit(
+			rl.rlim_cur != RLIM_INFINITY ? static_cast<i64_t>( rl.rlim_cur ) : HResourceLimit::UNLIMITED,
+			rl.rlim_max != RLIM_INFINITY ? static_cast<i64_t>( rl.rlim_max ) : HResourceLimit::UNLIMITED
+		)
+	);
+	M_EPILOG
+}
+
+void set_limit( RESOURCE_LIMIT_TYPE resourceLimitType_, HResourceLimit const& resourceLimit_ ) {
+	M_PROLOG
+	rlimit rl = {
+		resourceLimit_.soft() != HResourceLimit::UNLIMITED ? static_cast<rlim_t>( resourceLimit_.soft() ) : RLIM_INFINITY,
+		resourceLimit_.hard() != HResourceLimit::UNLIMITED ? static_cast<rlim_t>( resourceLimit_.hard() ) : RLIM_INFINITY
+	};
+	M_ENSURE( ::setrlimit( resource_limit_type( resourceLimitType_ ), &rl ) == 0 );
+	return;
+	M_EPILOG
+}
+
 }
 
 }

@@ -37,9 +37,9 @@ int kill( int, int );
  */
 int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, int long* timeOut_, bool restartable_ = true );
 
-/*! \brief Get current process'es effecive user id.
+/*! \brief Get current process'es effective user id.
  *
- * \return Current process'es effecive user id.
+ * \return Current process'es effective user id.
  */
 user_id_t get_user_id( void );
 
@@ -50,9 +50,9 @@ user_id_t get_user_id( void );
  */
 yaal::hcore::HString get_user_name( user_id_t uid_ );
 
-/*! \brief Get current process'es effecive group id.
+/*! \brief Get current process'es effective group id.
  *
- * \return Current process'es effecive group id.
+ * \return Current process'es effective group id.
  */
 user_id_t get_group_id( void );
 
@@ -151,6 +151,42 @@ typedef yaal::u32_t mode_t;
 
 mode_t get_umask( void );
 void set_umask( mode_t );
+
+/*! \brief Types of system resources limits.
+ */
+enum class RESOURCE_LIMIT_TYPE {
+	MEMORY_SIZE,
+	STACK_SIZE,
+	CPU_TIME,
+	OPEN_FILES,
+	FILE_SIZE,
+	PROCESS_COUNT,
+	CORE_SIZE
+};
+
+/*! \brief Store information about given resource limits.
+ */
+class HResourceLimit {
+public:
+	static i64_t const UNLIMITED = -1;
+private:
+	i64_t _soft;
+	i64_t _hard;
+public:
+	HResourceLimit( i64_t soft_, i64_t hard_ )
+		: _soft( soft_ )
+		, _hard( hard_ ) {
+	}
+	i64_t soft( void ) const {
+		return ( _soft );
+	}
+	i64_t hard( void ) const {
+		return ( _hard );
+	}
+};
+
+HResourceLimit get_limit( RESOURCE_LIMIT_TYPE );
+void set_limit( RESOURCE_LIMIT_TYPE, HResourceLimit const& );
 
 }
 
