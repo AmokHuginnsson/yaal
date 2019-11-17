@@ -447,15 +447,22 @@ void set_umask( mode_t umask_ ) {
 }
 
 inline int resource_limit_type( RESOURCE_LIMIT_TYPE resourceLimitType_ ) {
-	int rlt( 0 );
+	int rlt( -1 );
 	switch ( resourceLimitType_ ) {
+#ifndef __HOST_OS_TYPE_CYGWIN__
 		case ( RESOURCE_LIMIT_TYPE::MEMORY_SIZE ):   rlt = RLIMIT_DATA;   break;
+#endif /* #ifndef __HOST_OS_TYPE_CYGWIN__ */
 		case ( RESOURCE_LIMIT_TYPE::STACK_SIZE ):    rlt = RLIMIT_STACK;  break;
 		case ( RESOURCE_LIMIT_TYPE::CPU_TIME ):      rlt = RLIMIT_CPU;    break;
 		case ( RESOURCE_LIMIT_TYPE::OPEN_FILES ):    rlt = RLIMIT_NOFILE; break;
 		case ( RESOURCE_LIMIT_TYPE::FILE_SIZE ):     rlt = RLIMIT_FSIZE;  break;
+#if ( HAVE_DECL_RLIMIT_NPROC == 1 )
 		case ( RESOURCE_LIMIT_TYPE::PROCESS_COUNT ): rlt = RLIMIT_NPROC;  break;
+#endif /* #if ( HAVE_DECL_RLIMIT_NPROC == 1 ) */
 		case ( RESOURCE_LIMIT_TYPE::CORE_SIZE ):     rlt = RLIMIT_CORE;   break;
+		default: {
+			throw HRuntimeException( "Unsupported resource limit type." );
+		} break;
 	}
 	return ( rlt );
 }
@@ -480,6 +487,13 @@ void set_limit( RESOURCE_LIMIT_TYPE resourceLimitType_, HResourceLimit const& re
 		resourceLimit_.hard() != HResourceLimit::UNLIMITED ? static_cast<rlim_t>( resourceLimit_.hard() ) : RLIM_INFINITY
 	};
 	M_ENSURE( ::setrlimit( resource_limit_type( resourceLimitType_ ), &rl ) == 0 );
+#ifndef __HOST_OS_TYPE_CYGWIN__
+#if ( HAVE_DECL_RLIMIT_AS == 1 )
+	if ( resourceLimitType_ == RESOURCE_LIMIT_TYPE::MEMORY_SIZE ) {
+		M_ENSURE( ::setrlimit( RLIMIT_AS, &rl ) == 0 );
+	}
+#endif /* #if ( HAVE_DECL_RLIMIT_AS == 1 ) */
+#endif /* #ifndef __HOST_OS_TYPE_CYGWIN__ */
 	return;
 	M_EPILOG
 }

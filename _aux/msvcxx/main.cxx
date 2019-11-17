@@ -44,8 +44,11 @@ static int const MAX_SYMBOL_NAME_LEN( 2048 );
 namespace {
 SystemIO const& _systemIOInit_( SystemIO::get_instance() );
 namespace limits {
-rlimit _data_{ RLIM_INFINITY, RLIM_INFINITY };
+rlimit _cpu_{ RLIM_INFINITY, RLIM_INFINITY };
+rlimit _fsize_{ RLIM_INFINITY, RLIM_INFINITY };
+rlimit _core_{ RLIM_INFINITY, RLIM_INFINITY };
 rlimit _stack_{ RLIM_INFINITY, RLIM_INFINITY };
+rlimit _data_{ RLIM_INFINITY, RLIM_INFINITY };
 rlimit _nofile_{ RLIM_INFINITY, RLIM_INFINITY };
 }
 }
@@ -455,11 +458,20 @@ int getrlimit( rlimit_resource_t limType_, struct rlimit* rl_ ) {
 	errno = ENOSYS;
 	rl_->rlim_cur = rl_->rlim_max = RLIM_INFINITY;
 	switch ( limType_ ) {
+		case ( RLIMIT_CPU ): {
+			*rl_ = limits::_cpu_;
+		} break;
+		case ( RLIMIT_FSIZE ): {
+			*rl_ = limits::_fsize_;
+		} break;
 		case ( RLIMIT_DATA ): {
 			*rl_ = limits::_data_;
 		} break;
 		case ( RLIMIT_STACK ): {
 			*rl_ = limits::_stack_;
+		} break;
+		case ( RLIMIT_CORE ): {
+			*rl_ = limits::_core_;
 		} break;
 		case ( RLIMIT_NOFILE ): {
 			*rl_ = limits::_nofile_;
@@ -471,11 +483,20 @@ int getrlimit( rlimit_resource_t limType_, struct rlimit* rl_ ) {
 int setrlimit( rlimit_resource_t limType_, struct rlimit const* rl_ ) {
 	errno = ENOSYS;
 	switch ( limType_ ) {
+		case ( RLIMIT_CPU ): {
+			limits::_cpu_ = *rl_;
+		} break;
+		case ( RLIMIT_FSIZE ): {
+			limits::_fsize_ = *rl_;
+		} break;
 		case ( RLIMIT_DATA ): {
 			limits::_data_ = *rl_;
 		} break;
 		case ( RLIMIT_STACK ): {
 			limits::_stack_ = *rl_;
+		} break;
+		case ( RLIMIT_CORE ): {
+			limits::_core_ = *rl_;
 		} break;
 		case ( RLIMIT_NOFILE ): {
 			limits::_nofile_ = *rl_;

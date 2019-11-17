@@ -8,9 +8,12 @@ typedef int rusage_who_t;
 typedef int rlimit_resource_t;
 typedef yaal::i64_t rlim_t;
 static rusage_who_t const RUSAGE_SELF = 0;
-static rlimit_resource_t const RLIMIT_DATA = 2;
-static rlimit_resource_t const RLIMIT_STACK = 3;
-static rlimit_resource_t const RLIMIT_NOFILE = 8;
+static rlimit_resource_t const RLIMIT_CPU    = 0;
+static rlimit_resource_t const RLIMIT_FSIZE  = 1;
+static rlimit_resource_t const RLIMIT_DATA   = 2;
+static rlimit_resource_t const RLIMIT_STACK  = 3;
+static rlimit_resource_t const RLIMIT_CORE   = 4;
+static rlimit_resource_t const RLIMIT_NOFILE = 7;
 static rlim_t const RLIM_INFINITY = yaal::meta::max_signed<rlim_t>::value;
 
 struct rusage {

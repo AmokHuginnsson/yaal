@@ -32,10 +32,33 @@ namespace huginn {
 
 class HOperatingSystem : public HPackage {
 	HHuginn::class_t _subprocessClass;
+	enumeration::HEnumerationClass::ptr_t _resourceLimitTypeClass;
 public:
 	HOperatingSystem( huginn::HClass* class_ )
 		: HPackage( class_ )
-		, _subprocessClass( HSubprocess::get_class( class_->runtime(), class_ ) ) {
+		, _subprocessClass( HSubprocess::get_class( class_->runtime(), class_ ) )
+		, _resourceLimitTypeClass(
+			add_enumeration_as_member(
+				class_,
+				enumeration::create_class(
+					class_->runtime(),
+					"RESOURCE_LIMIT_TYPE",
+					enumeration::descriptions_t{
+						{ "MEMORY_SIZE",   "This is the maximum size of the process's data segment specified in bytes", static_cast<int>( system::RESOURCE_LIMIT_TYPE::MEMORY_SIZE ) },
+						{ "STACK_SIZE",    "This is the maximum size of the process stack, in bytes.", static_cast<int>( system::RESOURCE_LIMIT_TYPE::STACK_SIZE ) },
+						{ "CPU_TIME",      "This is a limit, in seconds, on the amount of CPU time that the process can consume.", static_cast<int>( system::RESOURCE_LIMIT_TYPE::CPU_TIME ) },
+						{ "OPEN_FILES",    "This specifies a value one greater than the maximum file descriptor number that can be opened by this process.", static_cast<int>( system::RESOURCE_LIMIT_TYPE::OPEN_FILES ) },
+						{ "FILE_SIZE",     "This is the maximum size in bytes of files that the process may create.", static_cast<int>( system::RESOURCE_LIMIT_TYPE::FILE_SIZE ) },
+						{ "PROCESS_COUNT", "This is a limit on the number of extant process for the real user ID of the calling process.", static_cast<int>( system::RESOURCE_LIMIT_TYPE::PROCESS_COUNT ) },
+						{ "CORE_SIZE",     "This is the maximum size of a core file in bytes that the process may dump.", static_cast<int>( system::RESOURCE_LIMIT_TYPE::CORE_SIZE ) }
+					},
+					"The `RESOURCE_LIMIT_TYPE` is set of possible resource limit types.",
+					HHuginn::VISIBILITY::PACKAGE,
+					class_
+				),
+				"set of all possible resource limit types."
+			)
+		) {
 		return;
 	}
 	static HHuginn::value_t memory_size( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -152,6 +175,50 @@ public:
 		return ( thread_->object_factory().create_integer( static_cast<HInteger::value_type>( system::get_umask() ) ) );
 		M_EPILOG
 	}
+	static HHuginn::value_t get_limit( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		HOperatingSystem* o( static_cast<HOperatingSystem*>( object_->raw() ) );
+		verify_signature_by_class( "OperatingSystem.get_limit", values_, { o->_resourceLimitTypeClass->enumeral_class() }, thread_, position_ );
+		HEnumeral::value_type val( get_enumeral( values_[0] ) );
+		system::HResourceLimit rl( system::get_limit( static_cast<system::RESOURCE_LIMIT_TYPE>( val ) ) );
+		HHuginn::values_t data;
+		HObjectFactory& of( thread_->object_factory() );
+		data.push_back( of.create_integer( rl.soft() ) );
+		data.push_back( of.create_integer( rl.hard() ) );
+		return ( of.create_tuple( yaal::move( data ) ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t set_limit( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		HOperatingSystem* o( static_cast<HOperatingSystem*>( object_->raw() ) );
+		HObjectFactory& of( thread_->object_factory() );
+		verify_signature_by_class( "OperatingSystem.set_limit", values_, { o->_resourceLimitTypeClass->enumeral_class(), of.tuple_class() }, thread_, position_ );
+		HEnumeral::value_type val( get_enumeral( values_[0] ) );
+		HTuple::values_t& data( static_cast<HTuple*>( values_[1].raw() )->value() );
+		if ( data.get_size() != 2 ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"Invalid resource limit shape: "_ys.append( data.get_size() ),
+				thread_->current_frame()->file_id(),
+				position_
+			);
+		}
+		verify_signature(
+			"OperatingSystem.set_limit( res, ( soft, hard ) ) - resource limit definition ( soft, hard ) -",
+			data,
+			{ HHuginn::TYPE::INTEGER, HHuginn::TYPE::INTEGER },
+			thread_,
+			position_
+		);
+		HInteger::value_type soft( get_integer( data[0] ) );
+		HInteger::value_type hard( get_integer( data[1] ) );
+		try {
+			system::set_limit( static_cast<system::RESOURCE_LIMIT_TYPE>( val ), system::HResourceLimit( soft, hard ) );
+		} catch ( hcore::HException const& e ) {
+			thread_->raise( o->exception_class(), e.what(), position_ );
+		}
+		return ( *object_ );
+		M_EPILOG
+	}
 	static HHuginn::value_t spawn( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "OperatingSystem.spawn";
@@ -236,6 +303,8 @@ HPackageCreatorInterface::HInstance HOperatingSystemCreator::do_new_instance( HR
 		{ "set_env",   runtime_->create_method( &HOperatingSystem::set_env ),   "( *name*, *value* ) - set *name* environment variable to *value* value" },
 		{ "umask",     runtime_->create_method( &HOperatingSystem::umask ),     "get value of system's umask" },
 		{ "set_umask", runtime_->create_method( &HOperatingSystem::set_umask ), "( *newUmask* ) - set value of system's umask to *newUmask*" },
+		{ "get_limit", runtime_->create_method( &HOperatingSystem::get_limit ), "( *resourceLimitType* ) - get current value of given resource limit designated by given *resourceLimitType*" },
+		{ "set_limit", runtime_->create_method( &HOperatingSystem::set_limit ), "( *resourceLimitType*, ( soft, hard ) ) - set new *soft* and *hard* limit for a resource designated by given *resourceLimitType*" },
 		{ "getpid",    runtime_->create_method( &HOperatingSystem::getpid ),    "get Huginn's interpreter process id" },
 		{ "getuid",    runtime_->create_method( &HOperatingSystem::getuid ),    "get Huginn's interpreter process effective user id" },
 		{ "getgid",    runtime_->create_method( &HOperatingSystem::getgid ),    "get Huginn's interpreter process effective group id" },

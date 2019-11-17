@@ -1,5 +1,7 @@
 /* Read yaal/LICENSE.md file for copyright and licensing information. */
 
+#include <cstring>
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
@@ -134,6 +136,13 @@ HHuginn::class_t create_class(
 	return ( c );
 }
 
+inline char const* parens_for_name( char const* name_ ) {
+	int len( static_cast<int>( ::strlen( name_ ) ) );
+	static char const parens[] = "()";
+	static char const noParens[] = "";
+	return ( is_alpha( code_point_t( static_cast<code_point_t::value_type>( name_[len - 1] ) ) ) ? parens : noParens );
+}
+
 void verify_arg_count( char const* name_, HHuginn::values_t& values_, int min_, int max_, huginn::HThread* thread_, int position_ ) {
 	M_PROLOG
 	int argCount( static_cast<int>( values_.get_size() ) );
@@ -141,7 +150,9 @@ void verify_arg_count( char const* name_, HHuginn::values_t& values_, int min_, 
 		if ( argCount != min_ ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"Bad number of parameters in call to: `"_ys
-					.append( name_ ).append( "()`, expected exactly: " )
+					.append( name_ )
+					.append( parens_for_name( name_ ) )
+					.append( "`, expected exactly: " )
 					.append( min_ ).append( ", got: " )
 					.append( argCount ).append( "." ),
 				thread_->current_frame()->file_id(),
@@ -152,7 +163,9 @@ void verify_arg_count( char const* name_, HHuginn::values_t& values_, int min_, 
 		if ( argCount < min_ ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"Bad number of parameters in call to: `"_ys
-					.append( name_ ).append( "()`, expected at least: " )
+					.append( name_ )
+					.append( parens_for_name( name_ ) )
+					.append( "`, expected at least: " )
 					.append( min_ ).append( ", got: " )
 					.append( argCount ).append( "." ),
 				thread_->current_frame()->file_id(),
@@ -161,7 +174,9 @@ void verify_arg_count( char const* name_, HHuginn::values_t& values_, int min_, 
 		} else if ( argCount > max_ ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"Bad number of parameters in call to: `"_ys
-					.append( name_ ).append( "()`, expected at most: " )
+					.append( name_ )
+					.append( parens_for_name( name_ ) )
+					.append( "`, expected at most: " )
 					.append( max_ ).append( ", got: " )
 					.append( argCount ).append( "." ),
 				thread_->current_frame()->file_id(),
@@ -237,7 +252,8 @@ void fail_arg_type(
 	}
 	throw HHuginn::HHuginnRuntimeException(
 		""_ys.append( name_ )
-			.append( "() " )
+			.append( parens_for_name( name_ ) )
+			.append( " " )
 			.append( no )
 			.append( "argument must be " )
 			.append( reqName_ )
@@ -319,7 +335,8 @@ HHuginn::type_id_t verify_arg_type(
 		}
 		throw HHuginn::HHuginnRuntimeException(
 			""_ys.append( name_ )
-				.append( "() " )
+				.append( parens_for_name( name_ ) )
+				.append( " " )
 				.append( no )
 				.append( "argument must be one of" )
 				.append( " {" )
@@ -360,7 +377,8 @@ HHuginn::type_id_t verify_arg_type(
 		}
 		throw HHuginn::HHuginnRuntimeException(
 			""_ys.append( name_ )
-				.append( "() " )
+				.append( parens_for_name( name_ ) )
+				.append( " " )
 				.append( no )
 				.append( "argument must be one of" )
 				.append( " {" )
@@ -389,7 +407,8 @@ HHuginn::type_id_t verify_arg_numeric(
 		}
 		throw HHuginn::HHuginnRuntimeException(
 			""_ys.append( name_ )
-				.append( "() " )
+				.append( parens_for_name( name_ ) )
+				.append( " " )
 				.append( no )
 				.append( "argument must be a numeric type, either a `number` or a `real`, not " )
 				.append( a_type_name( values_[no_]->get_class() ) )
@@ -433,7 +452,8 @@ HHuginn::value_t verify_arg_callable(
 		}
 		throw HHuginn::HHuginnRuntimeException(
 			""_ys.append( name_ )
-				.append( "() " )
+				.append( parens_for_name( name_ ) )
+				.append( " " )
 				.append( no )
 				.append( "argument must be a callable type, either a `*function_reference*` or an `*unbound_method*` or a `*bound_method*` or implementing a `call()` method, not " )
 				.append( a_type_name( values_[no_]->get_class() ) )
@@ -454,7 +474,8 @@ inline void not_a_collection( huginn::HThread* thread_, char const* name_, HClas
 	}
 	throw HHuginn::HHuginnRuntimeException(
 		""_ys.append( name_ )
-			.append( "() " )
+			.append( parens_for_name( name_ ) )
+			.append( " " )
 			.append( no )
 			.append( "argument must be a" )
 			.append( extraMsg_ )
@@ -534,7 +555,8 @@ HHuginn::type_id_t verify_arg_collection_value_type_low(
 		if ( find( requiredTypes_.begin(), requiredTypes_.end(), curType ) == requiredTypes_.end() ) {
 			throw HHuginn::HHuginnRuntimeException(
 				hcore::to_string( name_ )
-					.append( "() a collection contains value of an unexpected type: " )
+					.append( parens_for_name( name_ ) )
+					.append( " a collection contains value of an unexpected type: " )
 					.append( a_type_name( v->get_class() ) )
 					.append( ", at position: " )
 					.append( pos ),
@@ -549,7 +571,8 @@ HHuginn::type_id_t verify_arg_collection_value_type_low(
 			if ( curType != type ) {
 				throw HHuginn::HHuginnRuntimeException(
 					hcore::to_string( name_ )
-						.append( "() a collection is not uniformly typed: " )
+						.append( parens_for_name( name_ ) )
+						.append( " a collection is not uniformly typed: " )
 						.append( a_type_name( v->get_class() ) )
 						.append( ", at position: " )
 						.append( pos ),
@@ -596,7 +619,8 @@ HHuginn::type_id_t verify_arg_collection_value_type(
 				if ( find( requiredTypes_.begin(), requiredTypes_.end(), type ) == requiredTypes_.end() ) {
 					throw HHuginn::HHuginnRuntimeException(
 						hcore::to_string( name_ )
-							.append( "() a collection contains value of an unexpected type: " )
+							.append( parens_for_name( name_ ) )
+							.append( " a collection contains value of an unexpected type: " )
 							.append( a_type_name( c ) )
 							.append( "." ),
 						thread_->current_frame()->file_id(),

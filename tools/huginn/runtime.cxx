@@ -877,7 +877,7 @@ void HRuntime::register_builtins( void ) {
 	register_builtin_function( BUILTIN::COPY, hcore::call( &builtin::copy, _1, _2, _3, _4 ), "( *ref* ) - make a deep copy of a value given given by *ref*" );
 	register_builtin_function( BUILTIN::OBSERVE, hcore::call( &builtin::observe, _1, _2, _3, _4 ), "( *ref* ) - create an `*observer*` for a value given by *ref*" );
 	register_builtin_function( BUILTIN::USE, hcore::call( &builtin::use, _1, _2, _3, _4 ), "( *observer* ) - get a reference to a value from given *observer*" );
-	register_builtin_function( BUILTIN::SQUARE_ROOT, hcore::call( &builtin::square_root, BUILTIN::SQUARE_ROOT, _1, _2, _3, _4 ), "( *value* ) - calculate square root of given *value*" );
+	register_builtin_function( BUILTIN::SQUARE_ROOT, hcore::call( &builtin::square_root, "√()", _1, _2, _3, _4 ), "( *value* ) - calculate square root of given *value*" );
 	register_builtin_function( BUILTIN::N_ARY_SUMMATION, hcore::call( &builtin::n_ary_summation, _1, _2, _3, _4 ), "( *iterable* ) - calculate a sum of elements from *iterable*" );
 	register_builtin_function( BUILTIN::N_ARY_PRODUCT, hcore::call( &builtin::n_ary_product, _1, _2, _3, _4 ), "( *iterable* ) - calculate a product of elements from *iterable*" );
 	register_builtin_function( "print", hcore::call( &builtin::print, _1, _2, _3, _4 ), "( *str* ) - print a message given by *str* to interpreter's standard output" );
