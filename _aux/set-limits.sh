@@ -34,7 +34,9 @@ else
 	ulimit -p ${PROC_LIMIT} > /dev/null 2>&1 || true
 fi
 ulimit -s 8192
-if [ ${PHYS_MEM} -ne 0 ] ; then
+
+LIMITED=$(ulimit -v)
+if [ ${PHYS_MEM} -ne 0 -a -z "${LIMITED}" ] ; then
 	if [ -z "${MAX_32BIT_PHYS_MEM}" ] ; then
 		MAX_32BIT_PHYS_MEM=`expr 4095 \* 1024`
 	fi

@@ -304,7 +304,7 @@ HPackageCreatorInterface::HInstance HOperatingSystemCreator::do_new_instance( HR
 		{ "umask",     runtime_->create_method( &HOperatingSystem::umask ),     "get value of system's umask" },
 		{ "set_umask", runtime_->create_method( &HOperatingSystem::set_umask ), "( *newUmask* ) - set value of system's umask to *newUmask*" },
 		{ "get_limit", runtime_->create_method( &HOperatingSystem::get_limit ), "( *resourceLimitType* ) - get current value of given resource limit designated by given *resourceLimitType*" },
-		{ "set_limit", runtime_->create_method( &HOperatingSystem::set_limit ), "( *resourceLimitType*, ( soft, hard ) ) - set new *soft* and *hard* limit for a resource designated by given *resourceLimitType*" },
+		{ "set_limit", runtime_->create_method( &HOperatingSystem::set_limit ), "( *resourceLimitType*, ( *soft*, *hard* ) ) - set new *soft* and *hard* limit for a resource designated by given *resourceLimitType*" },
 		{ "getpid",    runtime_->create_method( &HOperatingSystem::getpid ),    "get Huginn's interpreter process id" },
 		{ "getuid",    runtime_->create_method( &HOperatingSystem::getuid ),    "get Huginn's interpreter process effective user id" },
 		{ "getgid",    runtime_->create_method( &HOperatingSystem::getgid ),    "get Huginn's interpreter process effective group id" },

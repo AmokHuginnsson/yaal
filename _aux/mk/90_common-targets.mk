@@ -50,7 +50,7 @@ $(DIR_ROOT)/build/doc/$(PRJNAME).1.txt: $(DIR_ROOT)/build/release/$(PRJNAME)/1ex
 	cd $(DIR_ROOT) && mkdir -p $(DIR_ROOT)/build/doc && \
 	$(DIR_ROOT)/_aux/help-to-asciidoc -p $(PRJNAME) -o $(@)
 
-install: all
+do-install: all
 	@$(call msg_always,printf "%b\n" "i: you need to become root to do this" && ) \
 	$(if $(CLOU_BIN), $(call invoke,$(INSTALL) -d -m755 $(DIR_BIN) $(foreach clou,$(CLOU_BIN),&& $(INSTALL) -m755 $(clou) $(DIR_BIN)/$(patsubst %$(EXEC_NAME),$(PRJNAME),$(clou)) ) ) && ) \
 	$(if $(CLOU_LIB), $(call invoke,$(INSTALL) -d -m755 $(DIR_LIB) && $(INSTALL) -m755 $(CLOU_LIB) $(DIR_LIB)/ ) && ) \
@@ -64,7 +64,11 @@ install: all
 	$(call msg_always,printf "%b\n" "i: now if you wish you can suid $(DIR_BIN)/$(PRJNAME)" && ) \
 	$(call msg_always,printf "%b$(NL)" "done.$(CL)" )
 
-uninstall:
+install: do-install install-local
+
+install-local:
+
+do-uninstall:
 	@$(call msg_always,printf "%b\n" "i: you need to become root to do this" && ) \
 	$(if $(CLOU_BIN), $(call invoke,/bin/rm -f $(foreach clou,$(CLOU_BIN),$(DIR_BIN)/$(patsubst %$(EXEC_NAME),$(PRJNAME),$(clou)) ) ) && ) \
 	$(if $(CLOU_LIB), $(call invoke,/bin/rm -f $(addprefix $(DIR_LIB)/,$(notdir $(CLOU_LIB))) ) && ) \
@@ -76,3 +80,8 @@ uninstall:
 	$(if $(CLOU_DOC), $(call invoke,/bin/rm -rf $(DIR_DOC) ) && ) \
 	$(if $(CLOU_BIN), $(call invoke,$(foreach clou,$(CLOU_MAN),/bin/rm -f $(DIR_MAN)/man$(subst .,,$(suffix $(clou)))/$(notdir $(clou)) && ) ) ) \
 	$(call msg_always,printf "%b$(NL)" "done.$(CL)" )
+
+uninstall: uninstall-local do-uninstall
+
+uninstall-local:
+
