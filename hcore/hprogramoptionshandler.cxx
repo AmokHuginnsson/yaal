@@ -28,11 +28,14 @@ namespace hcore {
 
 struct RC_PATHER {
 	enum class PLACEMENT {
+		ETC_PRJNAME,
 		ETC_CONF,
 		ETC,
 		ENV,
+		HOME_ETC_PRJNAME,
 		HOME_ETC_CONF,
 		HOME_ETC,
+		HOME_PRJNAME,
 		HOME,
 		HOME_CONFIG,
 		LOCAL
@@ -55,12 +58,16 @@ HString make_path( HString const& sysconfDir_, HString const& rcName_, RC_PATHER
 	static const char RC[] = "rc";
 	HString rcPath;
 	switch ( placement_ ) {
+		case ( RC_PATHER::PLACEMENT::ETC_PRJNAME ):
 		case ( RC_PATHER::PLACEMENT::ETC_CONF ):
 		case ( RC_PATHER::PLACEMENT::ETC ): {
 			rcPath.assign( sysconfDir_ )
 				.append( ( placement_ == RC_PATHER::PLACEMENT::ETC_CONF ) ? "/conf/" : "/" )
-				.append( rcName_ )
-				.append( RC );
+				.append( rcName_ );
+			if ( placement_ == RC_PATHER::PLACEMENT::ETC_PRJNAME ) {
+				rcPath.append( "/" );
+			}
+			rcPath.append( RC );
 		} break;
 		case ( RC_PATHER::PLACEMENT::ENV ): {
 			HString envName( rcName_ );
@@ -72,22 +79,28 @@ HString make_path( HString const& sysconfDir_, HString const& rcName_, RC_PATHER
 				rcPath = envPath;
 			}
 		} break;
+		case ( RC_PATHER::PLACEMENT::HOME_ETC_PRJNAME ):
 		case ( RC_PATHER::PLACEMENT::HOME_ETC_CONF ):
 		case ( RC_PATHER::PLACEMENT::HOME_ETC ):
 		case ( RC_PATHER::PLACEMENT::HOME ):
+		case ( RC_PATHER::PLACEMENT::HOME_PRJNAME ):
 		case ( RC_PATHER::PLACEMENT::HOME_CONFIG ): {
 			rcPath.assign( system::home_path() );
 			if ( placement_ == RC_PATHER::PLACEMENT::HOME_ETC_CONF ) {
 				rcPath.append( "/etc/conf/" );
-			} else if ( placement_ == RC_PATHER::PLACEMENT::HOME_ETC ) {
+			} else if ( ( placement_ == RC_PATHER::PLACEMENT::HOME_ETC_PRJNAME ) || ( placement_ == RC_PATHER::PLACEMENT::HOME_ETC ) ) {
 				rcPath.append( "/etc/" );
-			} else if ( placement_ == RC_PATHER::PLACEMENT::HOME ) {
+			} else if ( ( placement_ == RC_PATHER::PLACEMENT::HOME_PRJNAME ) || ( placement_ == RC_PATHER::PLACEMENT::HOME ) ) {
 				rcPath.append( "/." );
 			} else {
 				M_ASSERT( placement_ == RC_PATHER::PLACEMENT::HOME_CONFIG );
 				rcPath.append( "/.config/" );
 			}
-			rcPath.append( rcName_ ).append( placement_ != RC_PATHER::PLACEMENT::HOME_CONFIG ? RC : ".conf" );
+			rcPath.append( rcName_ );
+			if ( ( placement_ == RC_PATHER::PLACEMENT::HOME_ETC_PRJNAME ) || ( placement_ == RC_PATHER::PLACEMENT::HOME_PRJNAME ) ) {
+				rcPath.append( "/" );
+			}
+			rcPath.append( placement_ != RC_PATHER::PLACEMENT::HOME_CONFIG ? RC : ".conf" );
 		}	break;
 		case ( RC_PATHER::PLACEMENT::LOCAL ): {
 			char* cwd( ::getcwd( nullptr, 0 ) );
@@ -397,11 +410,14 @@ int HProgramOptionsHandler::process_rc_file( HString const& section_, RC_CALLBAC
 		RC_PATHER::PLACEMENT _placement;
 		RC_PATHER::PHASE _placementBit;
 	} const placementTab[] = {
+		{ RC_PATHER::PLACEMENT::ETC_PRJNAME, RC_PATHER::PHASE::GLOBAL },
 		{ RC_PATHER::PLACEMENT::ETC_CONF, RC_PATHER::PHASE::GLOBAL },
 		{ RC_PATHER::PLACEMENT::ETC, RC_PATHER::PHASE::GLOBAL },
 		{ RC_PATHER::PLACEMENT::ENV, RC_PATHER::PHASE::USER },
+		{ RC_PATHER::PLACEMENT::HOME_ETC_PRJNAME, RC_PATHER::PHASE::USER },
 		{ RC_PATHER::PLACEMENT::HOME_ETC_CONF, RC_PATHER::PHASE::USER },
 		{ RC_PATHER::PLACEMENT::HOME_ETC, RC_PATHER::PHASE::USER },
+		{ RC_PATHER::PLACEMENT::HOME_PRJNAME, RC_PATHER::PHASE::USER },
 		{ RC_PATHER::PLACEMENT::HOME, RC_PATHER::PHASE::USER },
 		{ RC_PATHER::PLACEMENT::HOME_CONFIG, RC_PATHER::PHASE::USER },
 		{ RC_PATHER::PLACEMENT::LOCAL, RC_PATHER::PHASE::LOCAL }
@@ -714,7 +730,7 @@ int HProgramOptionsHandler::process_command_line( int argc_, char** argv_, int* 
 						 * According to `man 1 getopt` an optional argument must immediately follow and option,
 						 * e.g., if `-s` is an option expecting an optional argument then:
 						 * -s/bin/sh
-						 * is interpreted as setting `s` value to `/bin/sh`, but
+						 * is interpreted as setting `s` option to `/bin/sh`, but
 						 * -s /bin/sh
 						 * is interpreted as setting `s` to empty value and passing `/bin/sh` as non-option argument.
 						 */
