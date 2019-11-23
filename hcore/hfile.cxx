@@ -143,14 +143,24 @@ int HFile::do_close( void ) {
 	M_PROLOG
 	M_ENSURE( _handle && ( _ownership == OWNERSHIP::ACQUIRED ) );
 	int error( ::std::fclose( static_cast<FILE*>( _handle ) ) );
-	reset();
 	if ( error ) {
 		_error = error_message( error );
 	} else {
 		_handle = nullptr;
 		_ownership = OWNERSHIP::NONE;
 	}
+	reset();
 	return ( error );
+	M_EPILOG
+}
+
+void HFile::do_clear( void ) {
+	M_PROLOG
+	if ( _handle ) {
+		clearerr( static_cast<FILE*>( _handle ) );
+	}
+	HStreamInterface::do_clear();
+	return;
 	M_EPILOG
 }
 

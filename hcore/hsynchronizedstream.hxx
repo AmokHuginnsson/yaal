@@ -108,6 +108,7 @@ protected:
 	virtual bool do_fail( void ) const override;
 	virtual bool do_bad( void ) const override;
 	virtual void do_clear( void ) override;
+	virtual void do_reset( void ) override;
 	virtual int long do_write( void const*, int long ) override;
 	virtual int long do_read( void*, int long ) override;
 	virtual void do_seek( int long, SEEK ) override;
