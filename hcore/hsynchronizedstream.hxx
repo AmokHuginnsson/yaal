@@ -35,8 +35,8 @@ public:
 	HSynchronizedStream( void );
 	explicit HSynchronizedStream( owned_stream_t );
 	explicit HSynchronizedStream( ref_stream_t );
-	void reset( owned_stream_t = owned_stream_t() );
-	void reset( ref_stream_t );
+	void reset_owned( owned_stream_t = owned_stream_t() );
+	void reset_referenced( ref_stream_t );
 	HLock acquire( void );
 	template<typename call_t>
 	HSynchronizedStream& operator()( call_t );

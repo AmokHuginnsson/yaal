@@ -34,7 +34,7 @@ HSynchronizedStream::HSynchronizedStream( ref_stream_t stream_ )
 	M_EPILOG
 }
 
-void HSynchronizedStream::reset( owned_stream_t stream_ ) {
+void HSynchronizedStream::reset_owned( owned_stream_t stream_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	_streamOwned = stream_;
@@ -43,7 +43,7 @@ void HSynchronizedStream::reset( owned_stream_t stream_ ) {
 	M_EPILOG
 }
 
-void HSynchronizedStream::reset( ref_stream_t stream_ ) {
+void HSynchronizedStream::reset_referenced( ref_stream_t stream_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	_streamOwned.reset();

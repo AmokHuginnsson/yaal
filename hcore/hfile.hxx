@@ -84,7 +84,7 @@ public:
 protected:
 	virtual int do_open( HString const&, open_t mode );
 	virtual int do_close( void );
-	virtual void do_clear( void );
+	virtual void do_clear( void ) override;
 	int get_file_descriptor( void ) const;
 private:
 	virtual int long do_write( void const*, int long ) override;
