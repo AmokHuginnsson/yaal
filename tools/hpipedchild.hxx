@@ -36,6 +36,7 @@ public:
 	};
 	static int const PROCESS_GROUP_LEADER = 0;
 	typedef yaal::hcore::HArray<yaal::hcore::HString> argv_t;
+	typedef yaal::hcore::HArray<HPipedChild*> process_group_t;
 private:
 	int _pid;
 	yaal::hcore::HStreamInterface::ptr_t _in;
@@ -86,6 +87,7 @@ public:
 	void bring_to_foreground( void );
 	void restore_parent_term( void );
 	void do_continue( void );
+	static process_group_t::iterator wait_for_process_group( process_group_t& );
 private:
 	STATUS const& get_status_change( bool );
 	void update_status( int );

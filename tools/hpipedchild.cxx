@@ -558,6 +558,30 @@ void HPipedChild::close_err( void ) {
 	M_EPILOG
 }
 
+HPipedChild::process_group_t::iterator HPipedChild::wait_for_process_group( process_group_t& processGroup_ ) {
+	M_PROLOG
+	if ( processGroup_.is_empty() ) {
+		return ( processGroup_.end() );
+	}
+	int leader( processGroup_.front()->_processGroupId );
+#ifdef __DEBUG__
+	for ( process_group_t::iterator it( processGroup_.begin() ), end( processGroup_.end() ); it != end; ++ it ) {
+		M_ASSERT( (*it)->_processGroupId == leader );
+	}
+#endif
+	int status( 0 );
+	int pid( 0 );
+	M_ENSURE( ( pid = ::waitpid( -leader, &status, WUNTRACED | WCONTINUED ) ) != -1 );
+	for ( process_group_t::iterator it( processGroup_.begin() ), end( processGroup_.end() ); it != end; ++ it ) {
+		if ( (*it)->_pid == pid ) {
+			(*it)->update_status( status );
+			return ( it );
+		}
+	}
+	return ( processGroup_.end() );
+	M_EPILOG
+}
+
 }
 
 }
