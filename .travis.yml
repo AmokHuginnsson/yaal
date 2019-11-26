@@ -15,7 +15,7 @@ script:
   - export PREFIX="${HOME}/usr" SYSCONFDIR="${HOME}/etc/conf" LOCALSTATEDIR="${HOME}/var"
   - make && make install
   - make -C _deploy/debian clean package bundle BUILD_ID="-0codestation${TIMESTAMP}"
-  - lftp -e 'set xfer:timeout 4;set net:timeout 4;set net:persist-retries 1024;set net:max-retries 1024;set ftp:prefer-epsv false;set ftp:passive-mode true;put debian/tmp/yaal-bundle.tar;quit' -u "travis,${TRAVIS_FTP_PASS}" codestation.org
+  - lftp -e 'set xfer:timeout 3600;set net:timeout 4;set net:persist-retries 1024;set net:max-retries 1024;set ftp:prefer-epsv false;set ftp:passive-mode true;put debian/tmp/yaal-bundle.tar;quit' -u "travis,${TRAVIS_FTP_PASS}" codestation.org
 services:
   - mysql
   - postgresql

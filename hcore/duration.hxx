@@ -37,6 +37,7 @@ duration_t duration( yaal::i64_t, UNIT );
 template <UNIT const u>
 yaal::i64_t in_units( duration_t );
 yaal::hcore::HString duration_to_string( duration_t, UNIT );
+UNIT scale( duration_t, UNIT = UNIT::WEEK );
 
 }
 

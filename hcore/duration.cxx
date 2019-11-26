@@ -139,6 +139,43 @@ yaal::hcore::HString duration_to_string( duration_t val_, time::UNIT unit_ ) {
 	M_EPILOG
 }
 
+UNIT scale( duration_t duration_, UNIT minScale_ ) {
+	UNIT unit( UNIT::WEEK );
+	i64_t x( 0 );
+	x = time::in_units<UNIT::MICROSECOND>( duration_ );
+	if ( x > 0 ) {
+		unit = UNIT::NANOSECOND;
+	}
+	x = time::in_units<UNIT::MILLISECOND>( duration_ );
+	if ( x > 0 ) {
+		unit = UNIT::MICROSECOND;
+	}
+	x = time::in_units<UNIT::SECOND>( duration_ );
+	if ( x > 0 ) {
+		unit = UNIT::MILLISECOND;
+	}
+	x = time::in_units<UNIT::MINUTE>( duration_ );
+	if ( x > 0 ) {
+		unit = UNIT::SECOND;
+	}
+	x = time::in_units<UNIT::HOUR>( duration_ );
+	if ( x > 0 ) {
+		unit = UNIT::MINUTE;
+	}
+	x = time::in_units<UNIT::DAY>( duration_ );
+	if ( x > 0 ) {
+		unit = UNIT::HOUR;
+	}
+	x = time::in_units<UNIT::WEEK>( duration_ );
+	if ( x > 0 ) {
+		unit = UNIT::DAY;
+	}
+	if ( minScale_ < unit ) {
+		unit = minScale_;
+	}
+	return ( unit );
+}
+
 }
 
 }
@@ -218,7 +255,7 @@ hcore::time::duration_t lexical_cast( hcore::HString const& val_ ) {
 
 template<>
 HString lexical_cast( hcore::time::duration_t const& val_ ) {
-	return ( duration_to_string( val_, time::UNIT::NANOSECOND ) );
+	return ( duration_to_string( val_, scale( val_ ) ) );
 }
 
 }
