@@ -10,6 +10,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hfile.hxx"
 #include "hcore/memory.hxx"
+#include "hcore/hcore.hxx"
 
 namespace yaal {
 
@@ -47,7 +48,7 @@ HFile::HFile( void* handle_, OWNERSHIP ownership_ )
 	M_EPILOG
 }
 
-HFile::HFile( yaal::hcore::HString const& path, open_t open_ )
+HFile::HFile( yaal::hcore::HString const& path_, open_t open_ )
 	: HStreamInterface()
 	, _handle( nullptr )
 	, _path()
@@ -55,7 +56,7 @@ HFile::HFile( yaal::hcore::HString const& path, open_t open_ )
 	, _ownership( OWNERSHIP::ACQUIRED ) {
 	M_PROLOG
 	try {
-		open( path, open_ );
+		open( path_, open_ );
 	} catch ( ... ) {
 		if ( _handle ) {
 			::fclose( static_cast<FILE*>( _handle ) );
@@ -104,8 +105,8 @@ int HFile::do_open( HString const& path_, open_t open_ ) {
 	}
 	int saveErrno( errno );
 	_path = path_;
-	HUTF8String utf8( path_ );
-	_handle = ::std::fopen( utf8.c_str(), mode );
+	bytes_t bytes( string_to_bytes( path_ ) );
+	_handle = ::std::fopen( bytes.data(), mode );
 	int error( 0 );
 	if ( ! _handle ) {
 		saveErrno = error = errno;

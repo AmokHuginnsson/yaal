@@ -26,6 +26,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hfsitem.hxx"
 #include "hcore/hqueue.hxx"
 #include "hcore/hcall.hxx"
+#include "hcore/hcore.hxx"
 
 #undef YAAL_USES_STAT
 
@@ -61,8 +62,8 @@ void do_stat( struct stat* s, path_t const& path_, bool resolve_ = true ) {
 	M_PROLOG
 	::memset( s, 0, sizeof ( *s ) );
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
-	HUTF8String utf8( path_ );
-	if ( ! ( ( resolve_ && ( ::stat( utf8.c_str(), s ) == 0 ) ) || ( ::lstat( utf8.c_str(), s ) == 0 ) ) ) {
+	bytes_t bytes( string_to_bytes( path_ ) );
+	if ( ! ( ( resolve_ && ( ::stat( bytes.data(), s ) == 0 ) ) || ( ::lstat( bytes.data(), s ) == 0 ) ) ) {
 		throw HFileSystemException( to_string( "Cannot acquire metadata for `" ).append( path_ ).append( "'" ) );
 	}
 	return;
@@ -143,8 +144,8 @@ path_t normalize_path( path_t const& path_ ) {
 }
 
 bool exists( path_t const& path_ ) {
-	HUTF8String utf8( path_ );
-	int err( ::access( utf8.c_str(), F_OK ) );
+	bytes_t bytes( string_to_bytes( path_ ) );
+	int err( ::access( bytes.data(), F_OK ) );
 	if ( ( err != 0 ) && ( errno != ENOENT ) ) {
 		throw HFileSystemException( to_string( "Failed to determine `" ).append( path_ ).append( "'s ontological status." ) );
 	}
@@ -279,11 +280,11 @@ path_t readlink( path_t const& path_ ) {
 	static int const MIN_BUF_SIZE( 8 );
 	int alloc( MIN_BUF_SIZE );
 	HChunk buffer;
+	bytes_t bytes( string_to_bytes( path_ ) );
 	do {
 		alloc <<= 1;
 		buffer.realloc( alloc, HChunk::STRATEGY::EXACT );
-		HUTF8String utf8( path_ );
-		len = static_cast<int>( ::readlink( utf8.c_str(), buffer.get<char>(), static_cast<size_t>( alloc ) ) );
+		len = static_cast<int>( ::readlink( bytes.data(), buffer.get<char>(), static_cast<size_t>( alloc ) ) );
 	} while ( len >= alloc );
 	if ( len < 0 ) {
 		throw HFileSystemException( "readlink failed: `"_ys.append( path_ ).append( "'" ) );
@@ -294,8 +295,8 @@ path_t readlink( path_t const& path_ ) {
 }
 
 void remove( path_t const& path_ ) {
-	HUTF8String utf8( path_ );
-	int err( ::unlink( utf8.c_str() ) );
+	bytes_t bytes( string_to_bytes( path_ ) );
+	int err( ::unlink( bytes.data() ) );
 	if ( ( err != 0 ) && ( errno != ENOENT ) ) {
 		throw HFileSystemException( to_string( "Failed to remove: `" ).append( path_ ).append( "'" ) );
 	}
@@ -318,8 +319,8 @@ void create_directory( path_t const& path_, u32_t mode_, DIRECTORY_MODIFICATION 
 	M_ENSURE( ! path.is_empty() );
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	if ( directoryModification_ == DIRECTORY_MODIFICATION::EXACT ) {
-		HUTF8String utf8( path );
-		int err( ::mkdir( utf8.c_str(), static_cast<mode_t>( mode_ ) ) );
+		bytes_t bytes( string_to_bytes( path_ ) );
+		int err( ::mkdir( bytes.data(), static_cast<mode_t>( mode_ ) ) );
 		if ( ( err != 0 ) && ( ( errno != EEXIST ) || ! is_directory( path ) ) ) {
 			throw HFileSystemException( to_string( "Failed to create directory `" ).append( path ).append( "'" ) );
 		}
@@ -345,8 +346,8 @@ void create_directory( path_t const& path_, u32_t mode_, DIRECTORY_MODIFICATION 
 
 void chmod( path_t const& path_, u32_t mode_ ) {
 	M_PROLOG
-	HUTF8String utf8( path_ );
-	if ( ::chmod( utf8.c_str(), static_cast<mode_t>( mode_ ) ) < 0 ) {
+	bytes_t bytes( string_to_bytes( path_ ) );
+	if ( ::chmod( bytes.data(), static_cast<mode_t>( mode_ ) ) < 0 ) {
 		throw HFileSystemException( "chmod failed: `"_ys.append( path_ ).append( "'" ) );
 	}
 	return;
@@ -355,8 +356,8 @@ void chmod( path_t const& path_, u32_t mode_ ) {
 
 void chdir( path_t const& path_ ) {
 	M_PROLOG
-	HUTF8String utf8( path_ );
-	if ( ::chdir( utf8.c_str() ) < 0 ) {
+	bytes_t bytes( string_to_bytes( path_ ) );
+	if ( ::chdir( bytes.data() ) < 0 ) {
 		throw HFileSystemException( "chdir failed: `"_ys.append( path_ ).append( "'" ) );
 	}
 	return;
@@ -368,8 +369,8 @@ void remove_directory( path_t const& path_, DIRECTORY_MODIFICATION directoryModi
 	M_ENSURE( ! path.is_empty() );
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	if ( directoryModification_ == DIRECTORY_MODIFICATION::EXACT ) {
-		HUTF8String utf8( path );
-		int err( ::rmdir( utf8.c_str() ) );
+		bytes_t bytes( string_to_bytes( path ) );
+		int err( ::rmdir( bytes.data() ) );
 		if ( ( err != 0 ) && ( ( errno != ENOENT ) || is_directory( path ) ) ) {
 			throw HFileSystemException( to_string( "Failed to remove directory `" ).append( path ).append( "'" ) );
 		}
@@ -535,12 +536,12 @@ yaal::tools::filesystem::paths_t glob( path_t const& path_ ) {
 }
 
 void update_times( path_t const& path_, yaal::hcore::HTime const& modTime_, yaal::hcore::HTime const& accessTime_ ) {
-	HUTF8String utf8( path_ );
+	bytes_t bytes( string_to_bytes( path_ ) );
 	utimbuf rawTimes = {
 		static_cast<time_t>( yaal_epoch_to_unix_epoch( accessTime_.raw() ) ),
 		static_cast<time_t>( yaal_epoch_to_unix_epoch( modTime_.raw() ) )
 	};
-	if ( ::utime( utf8.c_str(), &rawTimes ) != 0 ) {
+	if ( ::utime( bytes.data(), &rawTimes ) != 0 ) {
 		throw HFileSystemException( to_string( "Failed to update times for: `" ).append( path_ ).append( "'" ) );
 	}
 }

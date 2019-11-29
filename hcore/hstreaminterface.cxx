@@ -10,6 +10,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hstreaminterface.hxx"
 #include "hstring.hxx"
 #include "unicode.hxx"
+#include "hcore.hxx"
 
 namespace yaal {
 
@@ -618,7 +619,8 @@ int long HStreamInterface::semantic_read(
 			if ( byDelim && ! isStopSet_ ) {
 				-- nRead;
 			}
-			message_.assign( buffer, nRead - ( ( ( nRead > 0 ) && byDelim && stripDelim_ ) ? 1 : 0 ) );
+			int long messageByteCount( nRead - ( ( ( nRead > 0 ) && byDelim && stripDelim_ ) ? 1 : 0 ) );
+			bytes_to_string( message_, buffer, messageByteCount );
 			if ( byDelim && ! isStopSet_ ) {
 				buffer[0] = buffer[_cachedBytes - 1];
 				_cachedBytes = 1;

@@ -12,6 +12,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hfsitem.hxx"
 #include "hcore/memory.hxx"
+#include "hcore/hcore.hxx"
 #include "hcore/system.hxx"
 
 #undef YAAL_USES_STAT
@@ -118,9 +119,9 @@ yaal::hcore::HTime HFSItem::accessed( void ) const {
 
 void HFSItem::do_stat( void* buf ) const {
 	M_PROLOG
-	HUTF8String utf8( _path );
-	M_ENSURE( ( ::stat( utf8.c_str(),
-					static_cast<struct stat*>( buf ) ) == 0 ) || ( ::lstat( utf8.c_str(),
+	bytes_t bytes( string_to_bytes( _path ) );
+	M_ENSURE( ( ::stat( bytes.data(),
+					static_cast<struct stat*>( buf ) ) == 0 ) || ( ::lstat( bytes.data(),
 					static_cast<struct stat*>( buf ) ) == 0 ) );
 	return;
 	M_EPILOG
@@ -174,10 +175,10 @@ void HFSItem::set_path( HString const& path_, int nameLen_ ) {
 
 HFSItem::operator bool ( void ) const {
 	struct stat dummy;
-	HUTF8String utf8( _path );
+	bytes_t bytes( string_to_bytes( _path ) );
 	return (
-		( ::stat( utf8.c_str(), &dummy ) == 0 )
-		|| ( ::lstat( utf8.c_str(), &dummy ) == 0 )
+		( ::stat( bytes.data(), &dummy ) == 0 )
+		|| ( ::lstat( bytes.data(), &dummy ) == 0 )
 	);
 }
 
@@ -214,8 +215,8 @@ HFSItem::HIterator::HIterator( HString const& path_ )
 	, _item( "" ) {
 	M_PROLOG
 	if ( ! _path.is_empty() ) {
-		HUTF8String utf8( _path );
-		_dir = ::opendir( utf8.c_str() );
+		bytes_t bytes( string_to_bytes( _path ) );
+		_dir = ::opendir( bytes.data() );
 		if ( _dir == nullptr ) {
 			throw HFSItemException( "opendir failed: "_ys.append( _path ) );
 		}
@@ -234,8 +235,8 @@ HFSItem::HIterator::HIterator( HIterator const& it_ )
 	, _item( "" ) {
 	M_PROLOG
 	if ( it_._dir ) {
-		HUTF8String utf8( _path );
-		_dir = ::opendir( utf8.c_str() );
+		bytes_t bytes( string_to_bytes( _path ) );
+		_dir = ::opendir( bytes.data() );
 		if ( _dir == nullptr ) {
 			throw HFSItemException( "opendir failed: "_ys.append( _path ) );
 		}
@@ -309,7 +310,7 @@ HFSItem::HIterator& HFSItem::HIterator::operator++( void ) {
 	++ _pos;
 	if ( result ) {
 		_inode = result->d_ino;
-		_name = result->d_name;
+		bytes_to_string( _name, result->d_name );
 	} else {
 		cleanup();
 	}
