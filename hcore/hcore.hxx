@@ -10,6 +10,7 @@
 #define YAAL_HCORE_HCORE_HXX_INCLUDED 1
 
 #include "hcore/hstring.hxx"
+#include "hcore/harray.hxx"
 
 namespace yaal {
 
@@ -28,6 +29,10 @@ enum class ENV_SUBST_MODE {
 	RECURSIVE,
 	ONE_LAYER
 };
+HString bytes_to_string( char const*, HString::size_type = HString::npos );
+void bytes_to_string( HString&, char const*, HString::size_type = HString::npos );
+typedef yaal::hcore::HArray<char> bytes_t;
+bytes_t string_to_bytes( HString const& );
 void substitute_environment( HString&, ENV_SUBST_MODE );
 yaal::hcore::HString substitute_environment( yaal::hcore::HString const& );
 void init_locale( char const* = nullptr );

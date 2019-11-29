@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <cctype>
 #include <libintl.h>
 #include <locale.h>
 #include <sys/stat.h>
@@ -122,6 +123,183 @@ void decode_set_env( HString line ) {
 	line.set_at( eon, 0_ycp );
 	set_env( line, val );
 	return;
+	M_EPILOG
+}
+
+namespace {
+
+class HPermissiveUTF8Decoder {
+private:
+	HChunk _buffer;
+	HString::size_type _characterCount;
+	int _rank;
+public:
+	HPermissiveUTF8Decoder( void )
+		: _buffer()
+		, _characterCount( 0 )
+		, _rank( 1 ) {
+	}
+
+	void push_back( u32_t character_, int newRank_ ) {
+		int newRank( max( _rank, newRank_ ) );
+		_buffer.realloc( ( _characterCount + 1 ) * newRank );
+		if ( newRank > _rank ) {
+			switch ( 4 * newRank + _rank ) {
+				case ( 4 * 2 + 1 ): copy_backward( _buffer.get<u8_t>(), _buffer.get<u8_t>() + _characterCount, _buffer.get<u16_t>() + _characterCount ); break;
+				case ( 4 * 4 + 1 ): copy_backward( _buffer.get<u8_t>(), _buffer.get<u8_t>() + _characterCount, _buffer.get<u32_t>() + _characterCount ); break;
+				case ( 4 * 4 + 2 ): copy_backward( _buffer.get<u16_t>(), _buffer.get<u16_t>() + _characterCount, _buffer.get<u32_t>() + _characterCount ); break;
+			}
+		}
+		switch ( newRank ) {
+			case ( 1 ): _buffer.get<u8_t>()[_characterCount] = static_cast<u8_t>( character_ ); break;
+			case ( 2 ): _buffer.get<char16_t>()[_characterCount] = static_cast<u16_t>( character_ ); break;
+			case ( 4 ): _buffer.get<char32_t>()[_characterCount] = character_; break;
+		}
+		++ _characterCount;
+		_rank = newRank;
+	}
+
+	u8_t to_hex( u8_t val_ ) {
+		char val( static_cast<char>( val_ ) );
+		return ( static_cast<u8_t>( val > 9 ? 'a' + val - 10 : '0' + val ) );
+	}
+
+	void escape_invalid( u8_t invalid_ ) {
+		push_back( '\\', 1 );
+		push_back( 'x', 1 );
+		push_back( to_hex( invalid_ / 16 ), 1 );
+		push_back( to_hex( invalid_ % 16 ), 1 );
+	}
+
+	void decode_bytes( HString& str_, char const* bytes_, HString::size_type size_ ) {
+		M_PROLOG
+		int byteCount( 0 );
+		int charBytesLeft( 0 );
+		int charBytesExpected( 0 );
+		int tryRank( 0 );
+		u32_t cp( 0 );
+		char const* p( bytes_ );
+		while ( ( byteCount < size_ ) && *p ) {
+			if ( charBytesLeft == 0 ) {
+				if ( ! ( *p & unicode::ENC_1_BYTES_MARK_MASK ) ) {
+					push_back( static_cast<u8_t>( *p ), 1 );
+				} else if ( ( *p & unicode::ENC_2_BYTES_MARK_MASK ) == unicode::ENC_2_BYTES_MARK_VALUE ) {
+					charBytesLeft = 1;
+					charBytesExpected = charBytesLeft + 1;
+					tryRank = 0; /* 3 byte UTF-8 sequence can have either _rank == 2 or _rank == 1 */
+					cp = ( *p & unicode::ENC_2_BYTES_VALUE_MASK );
+				} else if ( ( *p & unicode::ENC_3_BYTES_MARK_MASK ) == unicode::ENC_3_BYTES_MARK_VALUE ) {
+					charBytesLeft = 2;
+					charBytesExpected = charBytesLeft + 1;
+					tryRank = 1; /* 3 byte UTF-8 sequence can have either _rank == 4 or _rank == 2 */
+					cp = ( *p & unicode::ENC_3_BYTES_VALUE_MASK );
+				} else if ( ( *p & unicode::ENC_4_BYTES_MARK_MASK ) == unicode::ENC_4_BYTES_MARK_VALUE ) {
+					charBytesLeft = 3;
+					charBytesExpected = charBytesLeft + 1;
+					tryRank = 2;
+					cp = ( *p & unicode::ENC_4_BYTES_VALUE_MASK );
+				} else {
+					escape_invalid( static_cast<u8_t>( *p ) );
+					charBytesLeft = 0;
+				}
+			} else if ( ( *p & unicode::TAIL_BYTES_MARK_MASK ) == unicode::TAIL_BYTES_MARK_VALUE ) {
+				-- charBytesLeft;
+				cp <<= 6;
+				cp |= ( *p & unicode::TAIL_BYTES_VALUE_MASK );
+				if ( ! charBytesLeft ) {
+					static u32_t const UCS_RANK_CUTOFF[] = {
+						unicode::UCS_MAX_1_BYTE_CODE_POINT,
+						unicode::UCS_MAX_2_BYTE_CODE_POINT,
+						0
+					};
+					static int const RANKS[][3] = { { 1, 2, 4 }, { 2, 4, 4 } };
+					push_back( cp, RANKS[ cp > UCS_RANK_CUTOFF[tryRank] ][tryRank] );
+				}
+			} else {
+				int backtrackSize( charBytesExpected - charBytesLeft );
+				for ( int i( 0 ); i < backtrackSize; ++ i ) {
+					escape_invalid( static_cast<u8_t>( *( p - backtrackSize + i ) ) );
+				}
+				charBytesLeft = 0;
+				continue;
+			}
+			++ p;
+			++ byteCount;
+		}
+		if ( charBytesLeft > 0 ) {
+			int backtrackSize( charBytesExpected - charBytesLeft );
+			for ( int i( 0 ); i < backtrackSize; ++ i ) {
+				escape_invalid( static_cast<u8_t>( *( p - backtrackSize + i ) ) );
+			}
+		}
+		if ( _characterCount == 0 ) {
+			str_.clear();
+			return;
+		}
+		switch ( _rank ) {
+			case ( 1 ): str_.assign( _buffer.raw(), _characterCount ); break;
+			case ( 2 ): str_.assign( _buffer.get<char16_t>(), _characterCount ); break;
+			case ( 4 ): str_.assign( _buffer.get<char32_t>(), _characterCount ); break;
+		}
+		return;
+		M_EPILOG
+	}
+};
+
+}
+
+HString bytes_to_string( char const* bytes_, HString::size_type size_ ) {
+	M_PROLOG
+	HString str;
+	HPermissiveUTF8Decoder permissiveUtf8Decoder;
+	permissiveUtf8Decoder.decode_bytes( str, bytes_, size_ != HString::npos ? size_ : static_cast<HString::size_type>( ::strlen( bytes_ ) ) );
+	return ( str );
+	M_EPILOG
+}
+
+void bytes_to_string( HString& str_, char const* bytes_, HString::size_type size_ ) {
+	M_PROLOG
+	HPermissiveUTF8Decoder permissiveUtf8Decoder;
+	permissiveUtf8Decoder.decode_bytes( str_, bytes_, size_ != HString::npos ? size_ : static_cast<HString::size_type>( ::strlen( bytes_ ) ) );
+	return;
+	M_EPILOG
+}
+
+inline char from_hex( int hi_, int lo_ ) {
+	int hi( isdigit( hi_ ) ? hi_ - '0' : tolower( hi_ ) + 10 - 'a' );
+	int lo( isdigit( lo_ ) ? lo_ - '0' : tolower( lo_ ) + 10 - 'a' );
+	return ( static_cast<char>( hi * 16 + lo ) );
+}
+
+bytes_t string_to_bytes( HString const& str_ ) {
+	M_PROLOG
+	HUTF8String utf8( str_ );
+	bytes_t bytes( utf8.c_str(), utf8.c_str() + utf8.byte_count() + 1 );
+	char const* p( bytes.data() );
+	while ( p ) {
+		p = strstr( p, "\\x" );
+		if ( ! p ) {
+			break;
+		}
+		int long idx( p - bytes.data() );
+		if ( idx > ( bytes.get_size() - 5 ) ) {
+			break;
+		}
+		int hi( p[2] );
+		if ( ! isxdigit( hi ) ) {
+			p += 2;
+			continue;
+		}
+		int lo( p[3] );
+		if ( ! isxdigit( lo ) ) {
+			p += 3;
+			continue;
+		}
+		bytes.erase( bytes.begin() + idx + 1, bytes.begin() + idx + 4 );
+		bytes[idx] = from_hex( hi, lo );
+		++ p;
+	}
+	return ( bytes );
 	M_EPILOG
 }
 
