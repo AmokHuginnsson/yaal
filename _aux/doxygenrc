@@ -217,7 +217,7 @@ DOT_TRANSPARENT        = NO
 DOT_MULTI_TARGETS      = NO
 GENERATE_LEGEND        = YES
 DOT_CLEANUP            = YES
-DOT_NUM_THREADS        = 1
+DOT_NUM_THREADS        = 0
 #---------------------------------------------------------------------------
 # Configuration::additions related to the search engine
 #---------------------------------------------------------------------------
