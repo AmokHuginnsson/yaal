@@ -62,9 +62,9 @@ protected:
 		return ( _value );
 	}
 	void scan( HThread* thread_, int position_ ) {
-		while ( _impl->is_valid( thread_, position_ ) ) {
+		while ( thread_->can_continue() && _impl->is_valid( thread_, position_ ) ) {
 			_value = _impl->value( thread_, position_ );
-			if ( test( thread_, position_ ) ) {
+			if ( ! thread_->can_continue() || test( thread_, position_ ) ) {
 				break;
 			}
 			_impl->next( thread_, position_ );
@@ -72,6 +72,9 @@ protected:
 	}
 	bool test( HThread* thread_, int position_ ) {
 		HHuginn::value_t v( _callable->operator_call( thread_, _callable, HArguments( thread_, _value ), position_ ) );
+		if ( ! thread_->can_continue() ) {
+			return ( false );
+		}
 		if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
 			throw HHuginn::HHuginnRuntimeException(
 				hcore::to_string( "Filter functor returned wrong type, expected `boolean` got: `" ).append( v->get_class()->name() ).append( "`." ),
