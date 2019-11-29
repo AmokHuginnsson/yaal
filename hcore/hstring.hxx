@@ -218,6 +218,7 @@ public:
 	 * size - at most that many characters from array are used.
 	 */
 	HString( char const* array, size_type size );
+	HString( void const* array, size_type size );
 	HString( char16_t const* array, size_type size );
 	HString( char32_t const* array, size_type size );
 	/*! \brief Construct new HString from single code point.
@@ -442,6 +443,9 @@ public:
 	 * \return Self.
 	 */
 	HString& assign( char const* data, size_type length );
+	HString& assign( void const* data, size_type length );
+	HString& assign( char16_t const* data, size_type length );
+	HString& assign( char32_t const* data, size_type length );
 	/*! \brief Erase old content and assign a substring of given string.
 	 *
 	 * \param str - assign substring of this string.

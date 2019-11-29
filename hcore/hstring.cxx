@@ -677,28 +677,27 @@ OUTF8StringStats get_string_stats( char const* str_, HString::size_type size_ ) 
 			} else if ( ( *p & unicode::ENC_4_BYTES_MARK_MASK ) == unicode::ENC_4_BYTES_MARK_VALUE ) {
 				charBytesLeft = 3;
 				tryRank = 2;
+				cp = ( *p & unicode::ENC_4_BYTES_VALUE_MASK );
 			} else {
 				throw HUTF8StringException( "Invalid UTF-8 head sequence at: "_ys.append( byteCount ) );
 			}
-		} else {
-			if ( ( *p & unicode::TAIL_BYTES_MARK_MASK ) == unicode::TAIL_BYTES_MARK_VALUE ) {
-				-- charBytesLeft;
-				cp <<= 6;
-				cp |= ( *p & unicode::TAIL_BYTES_VALUE_MASK );
-				if ( ! charBytesLeft ) {
-					static u32_t const UCS_RANK_CUTOFF[] = {
-						unicode::UCS_MAX_1_BYTE_CODE_POINT,
-						unicode::UCS_MAX_2_BYTE_CODE_POINT,
-						0
-					};
-					static int const RANKS[][3] = { { 1, 2, 4 }, { 2, 4, 4 } };
+		} else if ( ( *p & unicode::TAIL_BYTES_MARK_MASK ) == unicode::TAIL_BYTES_MARK_VALUE ) {
+			-- charBytesLeft;
+			cp <<= 6;
+			cp |= ( *p & unicode::TAIL_BYTES_VALUE_MASK );
+			if ( ! charBytesLeft ) {
+				static u32_t const UCS_RANK_CUTOFF[] = {
+					unicode::UCS_MAX_1_BYTE_CODE_POINT,
+					unicode::UCS_MAX_2_BYTE_CODE_POINT,
+					0
+				};
+				static int const RANKS[][3] = { { 1, 2, 4 }, { 2, 4, 4 } };
 
-					++ characterCount;
-					rank = max( RANKS[ cp > UCS_RANK_CUTOFF[tryRank] ][tryRank], rank );
-				}
-			} else {
-				throw HUTF8StringException( "Invalid UTF-8 tail sequence at: "_ys.append( byteCount ) );
+				++ characterCount;
+				rank = max( RANKS[ cp > UCS_RANK_CUTOFF[tryRank] ][tryRank], rank );
 			}
+		} else {
+			throw HUTF8StringException( "Invalid UTF-8 tail sequence at: "_ys.append( byteCount ) );
 		}
 		++ p;
 		++ byteCount;
@@ -1200,9 +1199,7 @@ HString::HString( char const* array_, size_type size_ )
 HString::HString( char16_t const* array_, size_type size_ )
 	: _len() {
 	M_PROLOG
-	int rank( 2 );
-	resize( size_, rank );
-	adaptive::copy( MEM, rank, 0, array_, rank, 0, size_ );
+	assign( array_, size_ );
 	return;
 	M_EPILOG
 }
@@ -1210,9 +1207,7 @@ HString::HString( char16_t const* array_, size_type size_ )
 HString::HString( char32_t const* array_, size_type size_ )
 	: _len() {
 	M_PROLOG
-	int rank( 4 );
-	resize( size_, rank );
-	adaptive::copy( MEM, rank, 0, array_, rank, 0, size_ );
+	assign( array_, size_ );
 	return;
 	M_EPILOG
 }
@@ -1733,6 +1728,54 @@ HString& HString::assign( char const* data_, size_type length_ ) {
 	size_type len( static_cast<size_type>( ::strnlen( data_, static_cast<size_t>( length_ ) ) ) );
 	clear();
 	from_utf8( 0, GET_SIZE, data_, len );
+	return ( *this );
+	M_EPILOG
+}
+
+HString& HString::assign( void const* data_, size_type size_ ) {
+	M_PROLOG
+	if ( ! data_ ) {
+		M_THROW( err_msg(  ERROR::NULL_PTR  ), errno );
+	}
+	if ( size_ < 0 ) {
+		M_THROW( err_msg(  ERROR::BAD_LENGTH  ), size_ );
+	}
+	clear();
+	int rank( 1 );
+	resize( size_, rank );
+	adaptive::copy( MEM, rank, 0, data_, rank, 0, size_ );
+	return ( *this );
+	M_EPILOG
+}
+
+HString& HString::assign( char16_t const* data_, size_type size_ ) {
+	M_PROLOG
+	if ( ! data_ ) {
+		M_THROW( err_msg(  ERROR::NULL_PTR  ), errno );
+	}
+	if ( size_ < 0 ) {
+		M_THROW( err_msg(  ERROR::BAD_LENGTH  ), size_ );
+	}
+	clear();
+	int rank( 2 );
+	resize( size_, rank );
+	adaptive::copy( MEM, rank, 0, data_, rank, 0, size_ );
+	return ( *this );
+	M_EPILOG
+}
+
+HString& HString::assign( char32_t const* data_, size_type size_ ) {
+	M_PROLOG
+	if ( ! data_ ) {
+		M_THROW( err_msg(  ERROR::NULL_PTR  ), errno );
+	}
+	if ( size_ < 0 ) {
+		M_THROW( err_msg(  ERROR::BAD_LENGTH  ), size_ );
+	}
+	clear();
+	int rank( 4 );
+	resize( size_, rank );
+	adaptive::copy( MEM, rank, 0, data_, rank, 0, size_ );
 	return ( *this );
 	M_EPILOG
 }
