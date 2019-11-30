@@ -155,21 +155,69 @@ void HTerminal::init( void ) {
 	if ( _disableXON_ ) {
 		newTermios.c_iflag &= ~static_cast<int unsigned>( IXON );
 	}
+	M_ENSURE( tcsetattr( STDIN_FILENO, TCSAFLUSH, &newTermios ) == 0 );
 	if ( _leaveCtrlC_ ) {
-		newTermios.c_cc[ VINTR ] = 0;
+		control_character_disable( ACTION::INTERRUPT );
 	}
 	if ( _leaveCtrlZ_ ) {
-		newTermios.c_cc[ VSUSP ] = 0;
+		control_character_disable( ACTION::SUSPEND );
 	}
 	if ( _leaveCtrlS_ ) {
-		newTermios.c_cc[ VSTOP ] = 0;
+		control_character_disable( ACTION::STOP );
 	}
 	if ( _leaveCtrlQ_ ) {
-		newTermios.c_cc[ VSTART ] = 0;
+		control_character_disable( ACTION::START );
 	}
 	if ( _leaveCtrlBackSlash_ ) {
-		newTermios.c_cc[ VQUIT ] = 0;
+		control_character_disable( ACTION::QUIT );
 	}
+	return;
+	M_EPILOG
+}
+
+namespace {
+
+int terminal_action_to_cc_subscript( HTerminal::ACTION action_ ) {
+	int ccSubscript( VINTR );
+	switch ( action_ ) {
+		case ( HTerminal::ACTION::INTERRUPT ): ccSubscript = VINTR;  break;
+		case ( HTerminal::ACTION::START ):     ccSubscript = VSTART; break;
+		case ( HTerminal::ACTION::STOP ):      ccSubscript = VSTOP;  break;
+		case ( HTerminal::ACTION::QUIT ):      ccSubscript = VQUIT;  break;
+		case ( HTerminal::ACTION::SUSPEND ):   ccSubscript = VSUSP;  break;
+	}
+	return ( ccSubscript );
+}
+
+char unsigned terminal_action_to_default_key_code( HTerminal::ACTION action_ ) {
+	char unsigned keyCode( 0 );
+	switch ( action_ ) {
+		case ( HTerminal::ACTION::INTERRUPT ): keyCode =  3; break;
+		case ( HTerminal::ACTION::START ):     keyCode = 17; break;
+		case ( HTerminal::ACTION::STOP ):      keyCode = 19; break;
+		case ( HTerminal::ACTION::QUIT ):      keyCode = 28; break;
+		case ( HTerminal::ACTION::SUSPEND ):   keyCode = 26; break;
+	}
+	return ( keyCode );
+}
+
+}
+
+void HTerminal::control_character_enable( ACTION action_ ) {
+	M_PROLOG
+	termios newTermios;
+	M_ENSURE( tcgetattr( STDIN_FILENO, &newTermios ) == 0 );
+	newTermios.c_cc[terminal_action_to_cc_subscript( action_ )] = terminal_action_to_default_key_code( action_ );
+	M_ENSURE( tcsetattr( STDIN_FILENO, TCSAFLUSH, &newTermios ) == 0 );
+	return;
+	M_EPILOG
+}
+
+void HTerminal::control_character_disable( ACTION action_ ) {
+	M_PROLOG
+	termios newTermios;
+	M_ENSURE( tcgetattr( STDIN_FILENO, &newTermios ) == 0 );
+	newTermios.c_cc[terminal_action_to_cc_subscript( action_ )] = 0;
 	M_ENSURE( tcsetattr( STDIN_FILENO, TCSAFLUSH, &newTermios ) == 0 );
 	return;
 	M_EPILOG

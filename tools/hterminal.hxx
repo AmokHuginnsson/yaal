@@ -36,6 +36,13 @@ public:
 			return ( _columns );
 		}
 	};
+	enum class ACTION {
+		INTERRUPT,
+		START,
+		STOP,
+		QUIT,
+		SUSPEND
+	};
 private:
 	yaal::hcore::HChunk _termios;
 	sequence_scanner_t _sequenceScanner;
@@ -50,6 +57,8 @@ public:
 	}
 	code_point_t get_character( void );
 	code_point_t get_key( void );
+	void control_character_enable( ACTION );
+	void control_character_disable( ACTION );
 private:
 	void enable_raw_mode( void );
 	void disable_raw_mode( void );
