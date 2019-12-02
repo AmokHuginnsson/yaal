@@ -23,9 +23,11 @@ template<typename collection = tokens_t>
 collection split(
 		yaal::hcore::HString const& string_,
 		yaal::hcore::HString const& separator_,
-		yaal::hcore::HTokenizer::behavior_t behavior_ = yaal::hcore::HTokenizer::DEFAULT ) {
+		yaal::hcore::HTokenizer::behavior_t behavior_ = yaal::hcore::HTokenizer::DEFAULT,
+		code_point_t escape_ = code_point_t( 0 )
+) {
 	collection coll;
-	yaal::hcore::HTokenizer t( string_, separator_, behavior_ );
+	yaal::hcore::HTokenizer t( string_, separator_, behavior_, escape_ );
 	for ( yaal::hcore::HString const& s : t ) {
 		coll.emplace_back( s );
 	}

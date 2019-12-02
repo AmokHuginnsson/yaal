@@ -33,14 +33,15 @@ private:
 	behavior_t _behavior;
 	HString _string;
 	HString _delimiter;
+	code_point_t _escape;
 	mutable HString _buffer;
 public:
 	class HIterator;
 	typedef HIterator iterator;
 	typedef HIterator const_iterator;
 public:
-	HTokenizer( HString const&, HString const&, behavior_t const& = DEFAULT );
-	HTokenizer( HString const&, behavior_t const& = DEFAULT );
+	HTokenizer( HString const&, HString const&, behavior_t const& = DEFAULT, code_point_t = code_point_t( 0 ) );
+	HTokenizer( HString const&, behavior_t const& = DEFAULT, code_point_t = code_point_t( 0 ) );
 	void assign( HString const& );
 	HIterator begin( void ) const;
 	HIterator end( void ) const;
@@ -56,7 +57,8 @@ private:
 class HTokenizer::HIterator {
 	typedef HTokenizer::HIterator this_type;
 	HTokenizer const* _owner;
-	int long _start;
+	HString::size_type _start;
+	HString::size_type _end;
 	mutable HString _buffer;
 public:
 	HIterator( HIterator const& );
@@ -67,6 +69,7 @@ public:
 	bool operator == ( HIterator const& ) const;
 	HIterator& operator ++ ( void );
 private:
+	void find_end( void );
 	HIterator( HTokenizer const*, int long );
 	friend class HTokenizer;
 };
