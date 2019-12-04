@@ -225,6 +225,12 @@ public:
 	explicit operator bool ( void ) const {
 		return ( _holder._resource != nullptr );
 	}
+	bool operator == ( HResource const& other_ ) const {
+		return ( _holder._resource == other_._holder._resource );
+	}
+	bool operator != ( HResource const& other_ ) const {
+		return ( _holder._resource != other_._holder._resource );
+	}
 	void swap( HResource& other_ ) {
 		_holder.swap( other_._holder );
 		return;
