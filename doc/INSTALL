@@ -2,7 +2,7 @@
 
 First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
 
-* System requirements.
+# System requirements.
 
   required libraries:
     - pthread (libpthread)
@@ -37,18 +37,18 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
   other:
     - lots of grace and patience
 
-* Installation process.
+# Installation process.
 
   1. Create new (possibly persistent) environment variables (see your shell documentation)
      three named: PREFIX, SYSCONFDIR and LOCALSTATEDIR
      and set its values to desired installation destination directories,
-     another named DEFAULT_TARGET and set to desired build mode, a `debug' value is advised.
-  2. Go to sources directory and type `make'.
+     another named DEFAULT_TARGET and set to desired build mode, a `debug` value is advised.
+  2. Go to sources directory and type `make`.
   3. (Required only once.) Still in yaal sources directory type `make install-environment'.
   4. Still in yaal sources directory type `make install'.
   5. Spawn new shell instance to get yaal installed headers and libraries visible.
 
-** Installation process details.
+## Installation process details.
 
 First we make sure we start the procedure from your home directory.
 
@@ -63,7 +63,7 @@ This code will add new environment variables to your shell sessions:
                    they run are stored,
   DEFAULT_TARGET - which configures default build type.
 
-In case of our example ${PREFIX} will be the `usr' directory located directly in your home
+In case of our example ${PREFIX} will be the `usr` directory located directly in your home
 directory.
 
     # for bash shell
@@ -103,16 +103,16 @@ persistent environment variables to currently running shell session.
 
       % source "${HOME}/.tcshrc"
 
-Now you are expected to enter a directory with `yaal' sources.
+Now you are expected to enter a directory with `yaal` sources.
 
       $ cd "${HOME}/src/yaal/"
 
-Next, you run build of `yaal' sources.
+Next, you run build of `yaal` sources.
 
       $ make
 
-By default `yaal' is build into shared (aka dynamically loaded) libraries,
-moreover one does not need root privileges to install `yaal' libraries.
+By default `yaal` is build into shared (aka dynamically loaded) libraries,
+moreover one does not need root privileges to install `yaal` libraries.
 All installed files can be stored in your home directory.
 Because you will install yaal headers outside of default header directory location
 (like /usr/include or /usr/local/include), and you will install binary libraries
@@ -126,7 +126,7 @@ to your's shell environment. In this step you shall do precisely that.
 
       $ make install-environment
 
-In next step you will install `yaal' headers and binary libraries into correct paths:
+In next step you will install `yaal` headers and binary libraries into correct paths:
 headers into ${PREFIX}/include, libraries into ${PREFIX}/lib,
 configuration into ${SYSCONFDIR}.
 
@@ -145,20 +145,20 @@ for yaal SSL related routines, finally we create SSL root certificate.
 
 Next, spawn new shell and you are done!
 
-Please observe that we assumed you downloaded `yaal' sources
+Please observe that we assumed you downloaded `yaal` sources
 into "${HOME}/src/yaal' directory, if not please modify paths in this procedure
 accordingly.
 
-* System configuration.
+# System configuration.
 
 This part if totally optional.
 It can be used as handbook by developers who want to try and play with
 yaal but do not want to spend time learning how to setup some
 obscure system facilities.
 
-** Configuration of databases.
+## Configuration of databases.
 
-*** PostgreSQL.
+### PostgreSQL.
 
 Run (substituting {VER} with PostGreSQL version):
 
@@ -177,8 +177,8 @@ Edit pg_hba.conf and disable all authentication methods but:
   local all all md5
 
 Restart server.
-Add user named `root' as database administrator.
-Log in as system user `postgres', connect to database with:
+Add user named `root` as database administrator.
+Log in as system user `postgres`, connect to database with:
 
   psql template1
 
@@ -186,37 +186,14 @@ While connected do database server run query:
 
   CREATE USER root SUPERUSER CREATEDB CREATEROLE REPLICATION ENCRYPTED PASSWORD '<your_password>';
 
-*** MySQL.
+### MySQL.
 
-Add `skip-networking' option in `[mysqld]' section of /etc/mysql/my.cnf file.
+Add `skip-networking` option in `[mysqld]` section of /etc/mysql/my.cnf file.
 Restart server.
 
-*** Firebird.
+### Firebird.
 
-**** For Firebird version 2.5.
-
-Edit /etc/firebird/2.5/firebird.conf and setup database access:
-
-  DatabaseAccess = Restrict /var/lib/firebird/2.5/data
-
-and disable legacy hash:
-
-  LegacyHash = 0
-
-Next, setup administrative user for database and user creation:
-
-  gsec -user sysdba -password <your_password>
-
-!!! Note: If you cannot login with administrator password you believe you have set during installation,
-try using default Firebird sysdba password 'masterkey' instead.
-
-in gsec tool add new user:
-
-  GSEC> add root -pw <your_password> -fname Database -mname System -lname Administrator -admin yes
-
-and you are good to go.
-
-**** For Firebird 3.0 and newer.
+#### For Firebird 3.0 and newer.
 
 First stop Firebird 3 server instance.
 
@@ -266,17 +243,40 @@ To create `tables`, `generators`, `triggers` that is accessible by non-`sysdba` 
 4. Create objects you require.
 5. Revoke RDB$ADMIN from that {user}.
 
-* Testing the installation.
+#### For Firebird version 2.5.
 
-`yaal' has its own test suite that is a separate application.
-To confirm that `yaal' installation was in fact successful you will need
+Edit /etc/firebird/2.5/firebird.conf and setup database access:
+
+  DatabaseAccess = Restrict /var/lib/firebird/2.5/data
+
+and disable legacy hash:
+
+  LegacyHash = 0
+
+Next, setup administrative user for database and user creation:
+
+  gsec -user sysdba -password <your_password>
+
+!!! Note: If you cannot login with administrator password you believe you have set during installation,
+try using default Firebird sysdba password 'masterkey' instead.
+
+in gsec tool add new user:
+
+  GSEC> add root -pw <your_password> -fname Database -mname System -lname Administrator -admin yes
+
+and you are good to go.
+
+# Testing the installation.
+
+`yaal` has its own test suite that is a separate application.
+To confirm that `yaal` installation was in fact successful you will need
 to get, build and run this suite.
 
-The suite is called `tress' and can be obtained from git repository.
+The suite is called `tress` and can be obtained from git repository.
 
 $ git clone https://codestation.org/repo/tress.git tress
 
-After you get `tress' sources look for README file there.
+After you get `tress` sources look for README file there.
 
 Good luck!
 

@@ -1,14 +1,14 @@
 *** yaal documentation ***
 
-* Supported platforms:
+# Supported platforms:
 
-** Hardware:
+## Hardware:
   - amd64 aka x64.
   - x86 aka i386 (soon to be deprecated).
   - armhf (32 bit arm architecture).
 
-** Software:
-  - Debian (latest development branch, currently `unstable' aka `Sid', and always latest stable release)
+## Software:
+  - Debian (latest development branch, currently `unstable` aka `Sid`, and always latest stable release)
   - Ubuntu (latest development branch and latest stable release, currently 18.04 and 19.10 respectively)
   - CentOS (latest stable release, currently 7)
   - Fedora (latest stable release, currently 27)
