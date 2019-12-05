@@ -55,14 +55,13 @@ void* DEFAULT_LOG_STREAM( stderr );
 
 HLog::HLog( void )
 	: HField<HFile>( tmpfile(), HFile::OWNERSHIP::ACQUIRED )
-	, HSynchronizedStream( _file::ref() )
+	, HSynchronizedStream( *static_cast<HStreamInterface*>( this ) )
 	, _realMode( false )
 	, _newLine( true )
 	, _type( LOG_LEVEL::DEBUG )
 	, _bufferSize( BUFFER_SIZE )
 	, _tag()
-	, _buffer( static_cast<int>( _bufferSize )
-) {
+	, _buffer( static_cast<int>( _bufferSize ) ) {
 	M_PROLOG
 	if ( ! _file::ref() ) {
 		M_THROW( "tmpfile() failed", errno );
@@ -79,7 +78,7 @@ HLog::~HLog( void ) {
 		if ( _newLine ) {
 			timestamp();
 		}
-		_file::ref() << "Process exited normally.\n";
+		_file::ref().write( "Process exited normally.\n" );
 	}
 	if ( ! _realMode ) {
 		if ( _autoRehash ) {
@@ -126,7 +125,7 @@ void HLog::do_rehash( void* src_, char const* processName_ ) {
 #ifndef HAVE_GETLINE
 			ptr = static_cast<char*>( ::memchr( buf, '\n', len ) );
 			if ( ! ptr ) {
-				_file::ref() << buf;
+				do_write( buf, len );
 				continue;
 			}
 			* ++ ptr = 0;
@@ -136,7 +135,7 @@ void HLog::do_rehash( void* src_, char const* processName_ ) {
 			if ( _type <= _logLevel ) {
 				timestamp();
 				static int const TIMESTAMP_LENGTH( 10 );
-				_file::ref() << buf + TIMESTAMP_LENGTH;
+				_file::ref().write( buf + TIMESTAMP_LENGTH );
 			}
 		}
 		len = static_cast<int>( ::strlen( buf ) );
@@ -186,8 +185,8 @@ void HLog::timestamp( void ) {
 	char buffer[ TIMESTAMP_SIZE ];
 	if ( ! _realMode ) {
 		if ( !! _file::ref() ) {
-			::snprintf( buffer, TIMESTAMP_SIZE - 1, "%-10x", _type );
-			_file::ref() << buffer;
+			int len( static_cast<int>( ::snprintf( buffer, TIMESTAMP_SIZE - 1, "%-10x", _type ) ) );
+			_file::ref().write( buffer, len );
 		}
 		return;
 	}
@@ -199,15 +198,20 @@ void HLog::timestamp( void ) {
 	/* (range ` 1' through `31'). */
 	/* This format was first standardized by POSIX.2-1992 and by ISO C99.*/
 	/* I will have to wait with using `%e'. */
-	int long size = static_cast<int long>(
-		::strftime( buffer, TIMESTAMP_SIZE, "%b %d %H:%M:%S", brokenTime )
+	int size(
+		static_cast<int>(
+			::strftime( buffer, TIMESTAMP_SIZE, "%b %d %H:%M:%S", brokenTime )
+		)
 	);
 	if ( size > TIMESTAMP_SIZE ) {
 		M_THROW( _( "strftime returned more than TIMESTAMP_SIZE" ), size );
 	}
-	_file::ref() << buffer << _tag;
+	_file::ref().write( buffer, size );
+	_file::ref().write( _tag );
 	if ( _type <= LOG_LEVEL::WARNING ) {
-		_file::ref() << "(" << LOG_LEVEL::name( _type ) << ") ";
+		_file::ref().write( "(", 1 );
+		_file::ref().write( LOG_LEVEL::name( _type ) );
+		_file::ref().write( ") ", 2 );
 	}
 	return;
 	M_EPILOG
@@ -220,7 +224,7 @@ void HLog::eol_reset( char const* buf_, int long len_ ) {
 	} else {
 		_type = _logLevel;
 		_newLine = true;
-		_file::ref().flush();
+		do_flush();
 	}
 	return;
 	M_EPILOG
@@ -228,40 +232,39 @@ void HLog::eol_reset( char const* buf_, int long len_ ) {
 
 int HLog::vformat( char const* format_, va_list ap_ ) {
 	M_PROLOG
-	int err = 0;
-	if ( _newLine )
-		timestamp();
-	char* buf = _buffer.get<char>();
-	::memset( buf, 0, _bufferSize );
-	err = ::vsnprintf( buf, _bufferSize, format_, ap_ );
-	if ( ! _realMode || ( _type <= _logLevel ) ) {
-		_file::ref() << buf;
+	if ( _realMode && ( _type > _logLevel ) ) {
+		return ( 0 );
 	}
-	eol_reset( buf, static_cast<int>( ::strlen( buf ) ) );
-	return ( err );
+	if ( _newLine ) {
+		timestamp();
+	}
+	char* buf( _buffer.get<char>() );
+	::memset( buf, 0, _bufferSize );
+	int len( ::vsnprintf( buf, _bufferSize, format_, ap_ ) );
+	int nWritten( static_cast<int>( _file::ref().write( buf, len ) ) );
+	eol_reset( buf, len );
+	return ( nWritten );
 	M_EPILOG
 }
 
 int HLog::operator() ( char const * format_, ... ) {
 	M_PROLOG
-	int err = 0;
 	va_list ap;
 	va_start( ap, format_ );
-	err = vformat( format_, ap );
+	int len( vformat( format_, ap ) );
 	va_end( ap );
-	return ( err );
+	return ( len );
 	M_EPILOG
 }
 
 int HLog::operator() ( LOG_LEVEL::priority_t type_, char const* format_, ... ) {
 	M_PROLOG
-	int err = 0;
 	va_list ap;
 	_type = type_;
 	va_start( ap, format_ );
-	err = vformat( format_, ap );
+	int len( vformat( format_, ap ) );
 	va_end( ap );
-	return ( err );
+	return ( len );
 	M_EPILOG
 }
 
@@ -281,16 +284,17 @@ HLog& HLog::filter( LOG_LEVEL::priority_t type_ ) {
 
 int long HLog::do_write( void const* string_, int long size_ ) {
 	M_PROLOG
-	if ( ! string_ )
+	if ( ! string_ ) {
 		return ( 0 );
-	int len = 0;
-	char const* str = static_cast<char const*>( string_ );
-	if ( ! _realMode || ( _type <= _logLevel ) ) {
-		if ( _newLine ) {
-			timestamp();
-		}
-		len = static_cast<int>( _file::ref().write( str, size_ ) );
 	}
+	if ( _realMode && ( _type > _logLevel ) ) {
+		return ( 0 );
+	}
+	char const* str( static_cast<char const*>( string_ ) );
+	if ( _newLine ) {
+		timestamp();
+	}
+	int len( static_cast<int>( _file::ref().write( str, size_ ) ) );
 	eol_reset( str, size_ );
 	return ( len );
 	M_EPILOG
