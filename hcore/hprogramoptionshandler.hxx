@@ -133,6 +133,7 @@ public:
 	};
 	template<typename tType>
 	class HOptionValue;
+	typedef HArray<HString> argv_t;
 	typedef HArray<HOption> options_t;
 private:
 	options_t _options;
@@ -158,6 +159,7 @@ public:
 	 * \param[out] unknown - index of first unknown option in \e argv.
 	 */
 	int process_command_line( int argc, char** argv, int* unknown = nullptr );
+	argv_t process_command_line( argv_t&& argv, int* unknown = nullptr );
 	/*! \brief Reading configuration files.
 	 *
 	 * process_rc_file gives easy to use API for reading configuration files
@@ -169,6 +171,7 @@ public:
 	options_t const& get_options( void ) const
 		{ return ( _options ); }
 private:
+	argv_t process_command_line( argv_t&&, char**, int* );
 	void verify_new_option( HOption& );
 	void set_option( HOption&, HString const& );
 	void set_from_env( void );

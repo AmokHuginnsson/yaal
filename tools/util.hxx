@@ -137,6 +137,7 @@ class HOptionInfo {
 	char const* _description;
 	char const* _note;
 	HTheme _theme;
+	bool _brief;
 	bool _color;
 	bool _markdown;
 public:
@@ -149,6 +150,7 @@ public:
 		, _description( nullptr )
 		, _note( nullptr )
 		, _theme()
+		, _brief( false )
 		, _color( true )
 		, _markdown( false ) {
 	}
@@ -164,6 +166,8 @@ public:
 	char const* note( void ) const;
 	HOptionInfo& theme( HTheme const& );
 	HTheme const& theme( void ) const;
+	HOptionInfo& brief( bool );
+	bool brief( void ) const;
 	HOptionInfo& color( bool );
 	bool color( void ) const;
 	HOptionInfo& markdown( bool );

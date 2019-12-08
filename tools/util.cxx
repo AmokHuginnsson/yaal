@@ -232,6 +232,15 @@ HTheme const& HOptionInfo::theme( void ) const {
 	return ( _theme );
 }
 
+HOptionInfo& HOptionInfo::brief( bool brief_ ) {
+	_brief = brief_;
+	return ( *this );
+}
+
+bool HOptionInfo::brief( void ) const {
+	return ( _brief );
+}
+
 HOptionInfo& HOptionInfo::color( bool color_ ) {
 	_color = color_;
 	return ( *this );
@@ -453,9 +462,11 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 	out_ << "Usage: " << name << " " << hl( syntax, info.theme(), color, info.markdown() ) << "\n"
 		<< ( info.markdown() ? "\n" : "" )
 		<< name << " - " << hl( info.intro(), info.theme(), color, info.markdown() ) << "\n\n"
-		<< ( info.description() ? hl( desc, info.theme(), color, info.markdown() ) : "" ) << ( info.description() ? "\n\n" : "" )
-		<< "Mandatory arguments to long options are mandatory for short options too." << ( info.markdown() ? "  \n" : "\n" )
-		<< "Options:\n" << ( info.markdown() ? "\n" : "" );
+		<< ( info.description() ? hl( desc, info.theme(), color, info.markdown() ) : "" ) << ( info.description() ? "\n\n" : "" );
+	if ( ! info.brief() ) {
+		out_ << "Mandatory arguments to long options are mandatory for short options too." << ( info.markdown() ? "  \n" : "\n" );
+	}
+	out_ << "Options:\n" << ( info.markdown() ? "\n" : "" );
 	int longestLongLength( 0 );
 	int longestShortLength( 0 );
 	HProgramOptionsHandler::options_t const& opts( info.opt().get_options() );
@@ -611,12 +622,14 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 			}
 		} while ( loop );
 	}
-	out_ << "\n"
-		<< hl(
-			"All long form options can be used in program configuration file: *"_ys
-				.append( info.name() ).append( "rc*." ),
-			info.theme(), color, info.markdown()
-		) << endl;
+	if ( ! info.brief() ) {
+		out_ << "\n"
+			<< hl(
+				"All long form options can be used in program configuration file: *"_ys
+					.append( info.name() ).append( "rc*." ),
+				info.theme(), color, info.markdown()
+			) << endl;
+	}
 	if ( info.note() ) {
 		out_ << "\n" << hl( info.note(), info.theme(), color, info.markdown() ) << endl;
 	}

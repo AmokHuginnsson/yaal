@@ -684,7 +684,25 @@ void HProgramOptionsHandler::set_option( HOption& option_, HString const& value_
 	M_EPILOG
 }
 
+
 int HProgramOptionsHandler::process_command_line( int argc_, char** argv_, int* invalid_ ) {
+	M_PROLOG
+	argv_t argv;
+	for ( int i( 0 ); i < argc_; ++ i ) {
+		argv.push_back( bytes_to_string( argv_[i] ) );
+	}
+	argv = process_command_line( yaal::move( argv ), argv_, invalid_ );
+	return ( argc_ + 1 - static_cast<int>( argv.get_size() ) );
+	M_EPILOG
+}
+
+HProgramOptionsHandler::argv_t HProgramOptionsHandler::process_command_line( argv_t&& argv_, int* unknown_ ) {
+	M_PROLOG
+	return ( process_command_line( yaal::move( argv_ ), nullptr, unknown_ ) );
+	M_EPILOG
+}
+
+HProgramOptionsHandler::argv_t HProgramOptionsHandler::process_command_line( argv_t&& argv_, char** argvRaw_, int* invalid_ ) {
 	M_PROLOG
 	hcore::log( LOG_LEVEL::INFO ) << "Decoding switches ... ";
 	HString optName;
@@ -692,12 +710,13 @@ int HProgramOptionsHandler::process_command_line( int argc_, char** argv_, int* 
 	int invalid( 0 );
 	int nonOption( 1 ); /* 1 because argv[0] -- a program name is first non-option */
 	options_t::iterator it;
-	for ( int i( 1 ); i < argc_; ++ i ) {
-		char const* arg( argv_[i] );
+	int argc( static_cast<int>( argv_.get_size() ) );
+	for ( int i( 1 ); i < argc; ++ i ) {
+		HString arg( argv_[i] );
 		optValue.clear();
 		try {
-			if ( ( arg[0] == '-' ) && ( arg[1] == '-' ) ) {
-				optName.assign( arg + 2 );
+			if ( ( arg.get_length() >= 2 ) && ( arg[0] == '-' ) && ( arg[1] == '-' ) ) {
+				optName.assign( arg, 2 );
 				int long optNameEnd( optName.find( '='_ycp ) );
 				if ( optNameEnd != HString::npos ) {
 					optValue = optName.substr( optNameEnd + 1 );
@@ -707,7 +726,7 @@ int HProgramOptionsHandler::process_command_line( int argc_, char** argv_, int* 
 				if ( opt ) {
 					if ( ( opt->switch_type() == HOption::ARGUMENT::REQUIRED ) && ( optNameEnd == HString::npos ) ) {
 						++ i;
-						if ( i < argc_ ) {
+						if ( i < argc ) {
 							optValue = argv_[i];
 						} else {
 							++ invalid;
@@ -721,10 +740,10 @@ int HProgramOptionsHandler::process_command_line( int argc_, char** argv_, int* 
 					cerr << argv_[0] << ": unrecognized option '" << argv_[i] << "'" << endl;
 				}
 			} else if ( arg[0] == '-' ) {
-				++ arg;
-				while ( *arg ) {
-					char on( *arg );
-					HOption* opt( ( it = find_if( _options.begin(), _options.end(), [&on]( HOption& opt_ ) { return ( opt_.short_form() == on ); } ) ) != _options.end() ? &*it : nullptr );
+				arg.shift_left( 1 );
+				while ( ! arg.is_empty() ) {
+					code_point_t on( arg.front() );
+					HOption* opt( ( it = find_if( _options.begin(), _options.end(), [&on]( HOption& opt_ ) { return ( opt_.short_form() == static_cast<int>( on.get() ) ); } ) ) != _options.end() ? &*it : nullptr );
 					if ( opt ) {
 						/*
 						 * According to `man 1 getopt` an optional argument must immediately follow and option,
@@ -735,15 +754,15 @@ int HProgramOptionsHandler::process_command_line( int argc_, char** argv_, int* 
 						 * is interpreted as setting `s` to empty value and passing `/bin/sh` as non-option argument.
 						 */
 						if ( ( opt->switch_type() == HOption::ARGUMENT::REQUIRED ) || ( opt->switch_type() == HOption::ARGUMENT::OPTIONAL ) ) {
-							optValue.assign( arg + 1 );
-							arg += optValue.get_length();
+							optValue.assign( arg, 1 );
+							arg.shift_left( optValue.get_length() );
 						}
 						if ( ( opt->switch_type() == HOption::ARGUMENT::REQUIRED ) && optValue.is_empty() ) {
 							++ i;
-							if ( i < argc_ ) {
+							if ( i < argc ) {
 								optValue = argv_[i];
 							} else {
-								++ arg;
+								arg.shift_left( 1 );
 								++ invalid;
 								cerr << argv_[0] << ": option requires an argument -- '" << on << "'" << endl;
 								continue;
@@ -754,12 +773,15 @@ int HProgramOptionsHandler::process_command_line( int argc_, char** argv_, int* 
 						++ invalid;
 						cerr << argv_[0] << ": invalid option -- '" << on << "'" << endl;
 					}
-					++ arg;
+					arg.shift_left( 1 );
 				}
 			} else {
-				rotate( argv_ + i, argv_ + i + 1, argv_ + argc_ + nonOption - 1 );
+				rotate( argv_.begin() + i, argv_.begin() + i + 1, argv_.begin() + argc + nonOption - 1 );
+				if ( argvRaw_ ) {
+					rotate( argvRaw_ + i, argvRaw_ + i + 1, argvRaw_ + argc + nonOption - 1 );
+				}
 				-- i;
-				-- argc_;
+				-- argc;
 				++ nonOption;
 			}
 		} catch ( HException const& e ) {
@@ -771,8 +793,9 @@ int HProgramOptionsHandler::process_command_line( int argc_, char** argv_, int* 
 	if ( invalid_ ) {
 		*invalid_ = invalid;
 	}
+	argv_.erase( argv_.begin() + 1, argv_.end() - ( nonOption - 1 ) );
 	hcore::log << "done." << endl;
-	return ( argc_ );
+	return ( argv_ );
 	M_EPILOG
 }
 
