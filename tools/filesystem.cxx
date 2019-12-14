@@ -74,6 +74,9 @@ void do_stat( struct stat* s, path_t const& path_, bool resolve_ = true ) {
 
 path_t current_working_directory( void ) {
 	char* cwd( ::getcwd( nullptr, 0 ) );
+	if ( ! cwd ) {
+		throw HFileSystemException( "Failed to get current working directory" );
+	}
 	path_t p( cwd );
 	::free( cwd );
 	return ( p );
@@ -147,7 +150,7 @@ bool exists( path_t const& path_ ) {
 	bytes_t bytes( string_to_bytes( path_ ) );
 	int err( ::access( bytes.data(), F_OK ) );
 	if ( ( err != 0 ) && ( errno != ENOENT ) ) {
-		throw HFileSystemException( to_string( "Failed to determine `" ).append( path_ ).append( "'s ontological status." ) );
+		throw HFileSystemException( to_string( "Failed to determine `" ).append( path_ ).append( "'s ontological status" ) );
 	}
 	return ( err == 0 );
 }

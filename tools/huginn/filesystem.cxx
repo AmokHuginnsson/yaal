@@ -89,10 +89,19 @@ public:
 		return ( static_cast<HFileSystem*>( object_->raw() )->do_open( thread_, values_, position_ ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t current_working_directory( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+	static HHuginn::value_t current_working_directory( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "FileSystem.current_working_directory", values_, 0, 0, thread_, position_ );
-		return ( thread_->object_factory().create_string( filesystem::current_working_directory() ) );
+		HObjectFactory& of( thread_->object_factory() );
+		HHuginn::value_t v( of.none_value() );
+		try {
+			hcore::HString cwd( filesystem::current_working_directory() );
+			v = thread_->object_factory().create_string( yaal::move( cwd ) );
+		} catch ( HFileSystemException const& e ) {
+			HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
+			thread_->raise( fsc->exception_class(), e.what(), position_ );
+		}
+		return ( v );
 		M_EPILOG
 	}
 	static HHuginn::value_t set_working_directory( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
