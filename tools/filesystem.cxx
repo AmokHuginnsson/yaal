@@ -495,6 +495,7 @@ yaal::tools::filesystem::paths_t glob( path_t const& path_ ) {
 		scan.back()._path.assign( "/" );
 	}
 	HString trialPath;
+	HRegex globRE;
 	while ( ! scan.is_empty() ) {
 		OScan trial( scan.front() );
 		scan.pop();
@@ -503,8 +504,15 @@ yaal::tools::filesystem::paths_t glob( path_t const& path_ ) {
 		if ( ! trial._path.is_empty() && ( trial._path.back() != filesystem::path::SEPARATOR ) ) {
 			trial._path.append( filesystem::path::SEPARATOR );
 		}
+		bool haveGlob( false );
 		if ( p.find_one_of( globChars ) != HString::npos ) {
-			HRegex globRE( glob_to_re( p ) );
+			try {
+				globRE.compile( glob_to_re( p ) );
+				haveGlob = true;
+			} catch ( HRegexException const& ) {
+			}
+		}
+		if ( haveGlob ) {
 			HFSItem dir( trialPath );
 			if ( ! dir ) {
 				continue;
