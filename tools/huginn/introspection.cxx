@@ -74,6 +74,13 @@ public:
 		return ( of.create_tuple( { ver, ci } ) );
 		M_EPILOG
 	}
+	static HHuginn::value_t executable( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( "Introspection.executable", values_, 0, 0, thread_, position_ );
+		HObjectFactory& of( *thread_->runtime().object_factory() );
+		return ( of.create_string( system::get_self_exec_path() ) );
+		M_EPILOG
+	}
 	static HHuginn::value_t id( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "Introspection.id", values_, 1, 1, thread_, position_ );
@@ -311,6 +318,7 @@ HPackageCreatorInterface::HInstance HTntrospectionCreator::do_new_instance( HRun
 	);
 	HHuginn::field_definitions_t fd{
 		{ "version",         runtime_->create_method( &HIntrospection::version ),         "return runtime version information." },
+		{ "executable",      runtime_->create_method( &HIntrospection::executable ),      "return this process executable path." },
 		{ "id",              runtime_->create_method( &HIntrospection::id ),              "( *ref* ) - get globally unique object identification number" },
 		{ "hash",            runtime_->create_method( &HIntrospection::hash ),            "( *ref* ) - get hash value for given object" },
 		{ "code",            runtime_->create_method( &HIntrospection::code ),            "( *ref* ) - get Huginn code string representation of an value" },

@@ -116,6 +116,13 @@ def url_info( url_ ):
 			urlInfo = "{}: {}".format( woi.capitalize(), url_[1] )
 	return urlInfo
 
+def local():
+	try:
+		return subprocess.check_output(["src/gen-asciidoc"]).decode()
+	except:
+		pass
+	return ""
+
 def main():
 #	print( "{}{}".format( testStr, markdown_to_asciidoc( testStr ) ) )
 #	return ( 0 )
@@ -257,6 +264,8 @@ def main():
 
 	if len( footer ) > 1:
 		out.write( markdown_to_asciidoc( footer.replace( binary, args.project ) ) + "\n\n" )
+
+	out.write( local() )
 
 	out.write( "AUTHORS\n-------\n" )
 	authors = set( filter( lambda x : x, subprocess.check_output( [ "git", "log", "--format=%aN <%aE>" ], universal_newlines = True ).split( "\n" ) ) )
