@@ -240,8 +240,8 @@ def main():
 			optsLen += len( opt )
 			if optsLen > maxLen:
 				optsLen = 0
-				opts += " +\n" + " " * ( len( args.project ) + 1 )
-	usage = usage.replace( "[*OPTION*]...", opts )
+				opts += " +\n**" + " " * ( len( args.project ) ) + "** "
+	usage = usage.replace( "[*OPTION*]... ", opts )
 
 	out.write( markdown_to_asciidoc( usage ) + "\n\n" )
 
