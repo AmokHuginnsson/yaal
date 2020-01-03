@@ -65,7 +65,7 @@ public:
 	HCompiledRegularExpressionClass(
 		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_,
-		huginn::HClass const* origin_,
+		huginn::HClass* origin_,
 		HClass const* exceptionClass_
 	) : huginn::HClass(
 			runtime_,
@@ -75,7 +75,12 @@ public:
 			HHuginn::ACCESS::PRIVATE
 		)
 		, _exceptionClass( exceptionClass_ )
-		, _regularExpressionMatchClass( HRegularExpressionMatch::get_class( runtime_, origin_ ) ) {
+		, _regularExpressionMatchClass(
+			add_class_as_type_reference(
+				origin_,
+				HRegularExpressionMatch::get_class( runtime_, origin_ )
+			)
+		) {
 		HHuginn::field_definitions_t fd{
 			{ "match",   runtime_->create_method( &HCompiledRegularExpression::match ),   "( *text* ) - find a match of this compiled regular expression in given *text*" },
 			{ "groups",  runtime_->create_method( &HCompiledRegularExpression::groups ),  "( *text* ) - get all matching regular expression groups from this regular expression in given *text*" },
@@ -163,7 +168,7 @@ HHuginn::value_t HCompiledRegularExpression::do_groups(
 	return ( v );
 }
 
-HHuginn::class_t HCompiledRegularExpression::get_class( HRuntime* runtime_, huginn::HClass const* origin_, HClass const* exceptionClass_ ) {
+HHuginn::class_t HCompiledRegularExpression::get_class( HRuntime* runtime_, huginn::HClass* origin_, HClass const* exceptionClass_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(

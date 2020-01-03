@@ -54,15 +54,15 @@ class HAlgorithms : public huginn::HPackage {
 public:
 	HAlgorithms( huginn::HClass* class_ )
 		: HPackage( class_ )
-		, _iteratorClass( HIterator::get_class( class_->runtime(), class_ ) )
-		, _filterClass( HFilter::get_class( class_->runtime(), class_ ) )
-		, _mapperClass( HMapper::get_class( class_->runtime(), class_ ) )
-		, _rangeClass( HRange::get_class( class_->runtime(), class_ ) )
-		, _enumeratorClass( HEnumerator::get_class( class_->runtime(), class_ ) )
-		, _zipClass( HZip::get_class( class_->runtime(), class_ ) )
-		, _sliceClass( HSlice::get_class( class_->runtime(), class_ ) )
-		, _chainClass( HChain::get_class( class_->runtime(), class_ ) )
-		, _productClass( HProduct::get_class( class_->runtime(), class_ ) ) {
+		, _iteratorClass( add_class_as_type_reference( class_, HIterator::get_class( class_->runtime(), class_ ) ) )
+		, _filterClass( add_class_as_type_reference( class_, HFilter::get_class( class_->runtime(), class_ ) ) )
+		, _mapperClass( add_class_as_type_reference( class_, HMapper::get_class( class_->runtime(), class_ ) ) )
+		, _rangeClass( add_class_as_type_reference( class_, HRange::get_class( class_->runtime(), class_ ) ) )
+		, _enumeratorClass( add_class_as_type_reference( class_, HEnumerator::get_class( class_->runtime(), class_ ) ) )
+		, _zipClass( add_class_as_type_reference( class_, HZip::get_class( class_->runtime(), class_ ) ) )
+		, _sliceClass( add_class_as_type_reference( class_, HSlice::get_class( class_->runtime(), class_ ) ) )
+		, _chainClass( add_class_as_type_reference( class_, HChain::get_class( class_->runtime(), class_ ) ) )
+		, _productClass( add_class_as_type_reference( class_, HProduct::get_class( class_->runtime(), class_ ) ) ) {
 		return;
 	}
 	static HHuginn::value_t iterator( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {

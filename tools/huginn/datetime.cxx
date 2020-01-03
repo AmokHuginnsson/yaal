@@ -29,7 +29,12 @@ class HDateTime : public HPackage {
 public:
 	HDateTime( HClass* class_ )
 		: HPackage( class_ )
-		, _clockClass( HClock::get_class( class_->runtime(), class_ ) ) {
+		, _clockClass(
+			add_class_as_type_reference(
+				class_,
+				HClock::get_class( class_->runtime(), class_ )
+			)
+		) {
 		return;
 	}
 	static HHuginn::value_t now( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {

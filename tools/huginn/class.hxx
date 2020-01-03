@@ -53,7 +53,7 @@ private:
 public:
 	HClass( huginn::HRuntime*, HHuginn::type_id_t, HHuginn::identifier_id_t, yaal::hcore::HString const&, HHuginn::ACCESS, TYPE = TYPE::BUILTIN, HClass const* = nullptr, create_instance_t = nullptr );
 	HClass( huginn::HRuntime*, huginn::HObjectFactory*, HHuginn::type_id_t, HHuginn::identifier_id_t, yaal::hcore::HString const&, constructor_t ); /* from HObjectFactory constructor */
-	HClass( huginn::HRuntime*, char const*, char const*, HClass const* ); /* ReversedTupleView, ReversedListView, ... */
+	HClass( huginn::HRuntime*, huginn::HObjectFactory*, char const*, char const*, HClass const* ); /* ReversedTupleView, ReversedListView, ... */
 	HClass( huginn::HRuntime*, HHuginn::TYPE, HHuginn::identifier_id_t, char const* ); /* *none*, *function_reference*, *observer*, ... */
 	virtual ~HClass( void ) {
 	}

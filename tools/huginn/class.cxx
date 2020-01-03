@@ -52,6 +52,7 @@ HClass::HClass(
 /* ReverseTupleView, ReverseListView, ReverseDequeView and so on */
 HClass::HClass(
 	HRuntime* runtime_,
+	HObjectFactory* objectFactory_,
 	char const* name_,
 	char const* doc_,
 	HClass const* origin_
@@ -64,7 +65,7 @@ HClass::HClass(
 	, _staticFieldIndexes()
 	, _fieldIndexes()
 	, _fieldDefinitions()
-	, _constructor()
+	, _constructor( make_constructor( objectFactory_, HHuginn::ACCESS::PRIVATE ) )
 	, _fieldDescriptions()
 	, _doc( doc_ )
 	, _type( TYPE::BUILTIN )

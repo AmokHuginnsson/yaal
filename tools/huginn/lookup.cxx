@@ -88,11 +88,12 @@ public:
 		, _lookup( lookup_ ) {
 		M_ASSERT( _lookup->type_id() == HHuginn::TYPE::LOOKUP );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HClass const* origin_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_, HClass const* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			make_pointer<HClass>(
 				runtime_,
+				objectFactory_,
 				"KeyValuesLookupView",
 				"The `KeyValuesLookupView` class represents *lazy* *iterable* view of a `lookup` consisted of key-value pairs.",
 				origin_
@@ -168,11 +169,12 @@ public:
 		, _lookup( lookup_ ) {
 		M_ASSERT( _lookup->type_id() == HHuginn::TYPE::LOOKUP );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HClass const* origin_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_, HClass const* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			make_pointer<HClass>(
 				runtime_,
+				objectFactory_,
 				"ReversedLookupView",
 				"The `ReversedLookupView` class represents *lazy* *iterable* reversed view of a `lookup`.",
 				origin_
@@ -287,8 +289,20 @@ public:
 			doc_,
 			&builtin::lookup
 		)
-		, _keyValuesLookupViewClass( HKeyValuesLookupView::get_class( runtime_, this ) )
-		, _reversedLookupClass( HReversedLookup::get_class( runtime_, this ) ) {
+		, _keyValuesLookupViewClass()
+		, _reversedLookupClass() {
+		HHuginn::field_definitions_t fd{
+			{ "has_key", objectFactory_->create_method( &lookup::has_key ), "( *key* ) - tell if given *key* can be found in this `lookup`" },
+			{ "get",     objectFactory_->create_method( &lookup::get ),     "( *key*, *default* ) - get value for given *key* from this `lookup`, or *default* if given *key* is not present in the `lookup`" },
+			{ "ensure",  objectFactory_->create_method( &lookup::ensure ),  "( *key*, *default* ) - get value for given *key* from this `lookup`, if given *key* is not present in the `lookup` insert *default* into this `lookup` before returning it" },
+			{ "erase",   objectFactory_->create_method( &lookup::erase ),   "( *key* ) - remove given *key* from this `lookup`" },
+			{ "clear",   objectFactory_->create_method( &lookup::clear ),   "erase `lookup`'s content, `lookup` becomes empty" },
+			{ "update",  objectFactory_->create_method( &lookup::update ),  "( *other* ) - update content of this `lookup` with key/value pairs from *other* `lookup`" },
+			{ "values",  objectFactory_->create_method( &lookup::values ),  "get key-value pairs view of this `lookup`" }
+		};
+		redefine( nullptr, fd );
+		_keyValuesLookupViewClass = add_class_as_type_reference( this, HKeyValuesLookupView::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
+		_reversedLookupClass = add_class_as_type_reference( this, HReversedLookup::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
 		return;
 	}
 	HClass const* key_values_lookup_view_class( void ) const {
@@ -314,16 +328,6 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			"The `lookup` is a collection providing a sorted key to value map. It supports operations of iteration, key-value insertion, key removal and key search."
 		)
 	);
-	HHuginn::field_definitions_t fd{
-		{ "has_key", objectFactory_->create_method( &lookup::has_key ), "( *key* ) - tell if given *key* can be found in this `lookup`" },
-		{ "get",     objectFactory_->create_method( &lookup::get ),     "( *key*, *default* ) - get value for given *key* from this `lookup`, or *default* if given *key* is not present in the `lookup`" },
-		{ "ensure",  objectFactory_->create_method( &lookup::ensure ),  "( *key*, *default* ) - get value for given *key* from this `lookup`, if given *key* is not present in the `lookup` insert *default* into this `lookup` before returning it" },
-		{ "erase",   objectFactory_->create_method( &lookup::erase ),   "( *key* ) - remove given *key* from this `lookup`" },
-		{ "clear",   objectFactory_->create_method( &lookup::clear ),   "erase `lookup`'s content, `lookup` becomes empty" },
-		{ "update",  objectFactory_->create_method( &lookup::update ),  "( *other* ) - update content of this `lookup` with key/value pairs from *other* `lookup`" },
-		{ "values",  objectFactory_->create_method( &lookup::values ),  "get key-value pairs view of this `lookup`" }
-	};
-	c->redefine( nullptr, fd );
 	return ( c );
 	M_EPILOG
 }

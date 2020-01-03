@@ -89,11 +89,12 @@ public:
 		, _dict( dict_ ) {
 		M_ASSERT( _dict->type_id() == HHuginn::TYPE::DICT );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HClass const* origin_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_, HClass const* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			make_pointer<HClass>(
 				runtime_,
+				objectFactory_,
 				"KeyValuesDictView",
 				"The `KeyValuesDictView` class represents *lazy* *iterable* view of a `dict` consisted of key-value pairs.",
 				origin_
@@ -169,11 +170,12 @@ public:
 		, _dict( dict_ ) {
 		M_ASSERT( _dict->type_id() == HHuginn::TYPE::DICT );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HClass const* origin_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_, HClass const* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			make_pointer<HClass>(
 				runtime_,
+				objectFactory_,
 				"ReversedDictView",
 				"The `ReversedDictView` class represents *lazy* *iterable* reversed view of a `dict`.",
 				origin_
@@ -292,8 +294,20 @@ public:
 			doc_,
 			&builtin::dict
 		)
-		, _keyValuesDictViewClass( HKeyValuesDictView::get_class( runtime_, this ) )
-		, _reversedDictClass( HReversedDict::get_class( runtime_, this ) ) {
+		, _keyValuesDictViewClass()
+		, _reversedDictClass() {
+		HHuginn::field_definitions_t fd{
+			{ "has_key", objectFactory_->create_method( &dict::has_key ), "( *key* ) - tell if given *key* can be found in this `dict`" },
+			{ "get",     objectFactory_->create_method( &dict::get ),     "( *key*, *default* ) - get value for given *key* from this `dict`, or *default* if given *key* is not present in the `dict`" },
+			{ "erase",   objectFactory_->create_method( &dict::erase ),   "( *key* ) - remove given *key* from this `dict`" },
+			{ "ensure",  objectFactory_->create_method( &dict::ensure ),  "( *key*, *default* ) - get value for given *key* from this `dict`, if given *key* is not present in the `dict` insert *default* into this `dict` before returning it" },
+			{ "clear",   objectFactory_->create_method( &dict::clear ),   "erase `dict`'s content, `dict` becomes empty" },
+			{ "update",  objectFactory_->create_method( &dict::update ),  "( *other* ) - update content of this `dict` with key/value pairs from *other* `dict`" },
+			{ "values",  objectFactory_->create_method( &dict::values ),  "get key-value pairs view of this `dict`" }
+		};
+		redefine( nullptr, fd );
+		_keyValuesDictViewClass = add_class_as_type_reference( this, HKeyValuesDictView::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
+		_reversedDictClass = add_class_as_type_reference( this, HReversedDict::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
 		return;
 	}
 	HClass const* key_values_dict_view_class( void ) const {
@@ -321,16 +335,6 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			"The `dict` is a collection providing a sorted key to value map. It supports operations of iteration, key-value insertion, key removal and key search. The keys stored in given `dict` instance must be of uniform type."
 		)
 	);
-	HHuginn::field_definitions_t fd{
-		{ "has_key", objectFactory_->create_method( &dict::has_key ), "( *key* ) - tell if given *key* can be found in this `dict`" },
-		{ "get",     objectFactory_->create_method( &dict::get ),     "( *key*, *default* ) - get value for given *key* from this `dict`, or *default* if given *key* is not present in the `dict`" },
-		{ "erase",   objectFactory_->create_method( &dict::erase ),   "( *key* ) - remove given *key* from this `dict`" },
-		{ "ensure",  objectFactory_->create_method( &dict::ensure ),  "( *key*, *default* ) - get value for given *key* from this `dict`, if given *key* is not present in the `dict` insert *default* into this `dict` before returning it" },
-		{ "clear",   objectFactory_->create_method( &dict::clear ),   "erase `dict`'s content, `dict` becomes empty" },
-		{ "update",  objectFactory_->create_method( &dict::update ),  "( *other* ) - update content of this `dict` with key/value pairs from *other* `dict`" },
-		{ "values",  objectFactory_->create_method( &dict::values ),  "get key-value pairs view of this `dict`" }
-	};
-	c->redefine( nullptr, fd );
 	return ( c );
 	M_EPILOG
 }

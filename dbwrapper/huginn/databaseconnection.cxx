@@ -67,7 +67,7 @@ public:
 	HDatabaseConnectionClass(
 		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_,
-		HClass const* origin_,
+		HClass* origin_,
 		HHuginn::class_t const& exceptionClass_
 	) : HClass(
 			runtime_,
@@ -77,7 +77,12 @@ public:
 			HHuginn::ACCESS::PRIVATE
 		)
 		, _exceptionClass( exceptionClass_ )
-		, _queryClass( huginn::HQuery::get_class( runtime_, origin_, exceptionClass_ ) ) {
+		, _queryClass(
+			add_class_as_type_reference(
+				origin_,
+				huginn::HQuery::get_class( runtime_, origin_, exceptionClass_ )
+			)
+		) {
 		HHuginn::field_definitions_t fd{
 			{ "query",        runtime_->create_method( &HDatabaseConnection::query ),        "( *sql* ) - create query object for given *sql* `string`" },
 			{ "table_names",  runtime_->create_method( &HDatabaseConnection::table_names ),  "get list of table names available in connected database" },
@@ -169,7 +174,7 @@ HHuginn::value_t HDatabaseConnection::do_column_names(
 	return ( v );
 }
 
-HHuginn::class_t HDatabaseConnection::get_class( HRuntime* runtime_, HClass const* origin_, HHuginn::class_t const& exceptionClass_ ) {
+HHuginn::class_t HDatabaseConnection::get_class( HRuntime* runtime_, HClass* origin_, HHuginn::class_t const& exceptionClass_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(

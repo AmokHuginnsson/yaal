@@ -39,7 +39,7 @@ public:
 	HQueryClass(
 		HRuntime* runtime_,
 		HHuginn::type_id_t typeId_,
-		HClass const* origin_,
+		HClass* origin_,
 		HHuginn::class_t const& exceptionClass_
 	) : HClass(
 			runtime_,
@@ -49,7 +49,12 @@ public:
 			HHuginn::ACCESS::PRIVATE
 		)
 		, _exceptionClass( exceptionClass_ )
-		, _queryResultClass( huginn::HQueryResult::get_class( runtime_, origin_, exceptionClass_ ) ) {
+		, _queryResultClass(
+			add_class_as_type_reference(
+				origin_,
+				huginn::HQueryResult::get_class( runtime_, origin_, exceptionClass_ )
+			)
+		) {
 		HHuginn::field_definitions_t fd{
 			{ "bind",    runtime_->create_method( &HQuery::bind ),    "( *index*, *value* ) - bind given *value* for query variable at given *index*" },
 			{ "execute", runtime_->create_method( &HQuery::execute ), "execute query" }
@@ -99,7 +104,7 @@ HHuginn::value_t HQuery::execute( tools::huginn::HThread* thread_, HHuginn::valu
 	M_EPILOG
 }
 
-HHuginn::class_t HQuery::get_class( HRuntime* runtime_, HClass const* origin_, HHuginn::class_t const& exceptionClass_ ) {
+HHuginn::class_t HQuery::get_class( HRuntime* runtime_, HClass* origin_, HHuginn::class_t const& exceptionClass_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		runtime_->create_class(

@@ -53,6 +53,7 @@ inline yaal::hcore::HString a_type_name( HHuginn::type_id_t type_ ) {
 
 void operands_type_mismatch( char const*, huginn::HClass const*, huginn::HClass const*, int, int ) __attribute__(( noreturn ));
 HHuginn::class_t add_class_as_member( huginn::HClass*, HHuginn::class_t const&, yaal::hcore::HString const&, huginn::HClass::MEMBER_TYPE = huginn::HClass::MEMBER_TYPE::INSTANCE );
+HHuginn::class_t add_class_as_type_reference( huginn::HClass*, HHuginn::class_t const&, huginn::HClass::MEMBER_TYPE = huginn::HClass::MEMBER_TYPE::INSTANCE );
 enumeration::HEnumerationClass::ptr_t add_enumeration_as_member( huginn::HClass*, enumeration::HEnumerationClass::ptr_t const&, yaal::hcore::HString const&, huginn::HClass::MEMBER_TYPE = huginn::HClass::MEMBER_TYPE::INSTANCE );
 HHuginn::class_t class_exception( huginn::HClass*, huginn::HClass const* = nullptr );
 HHuginn::class_t create_class(

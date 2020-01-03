@@ -80,11 +80,12 @@ public:
 		, _tuple( tuple_ ) {
 		M_ASSERT( _tuple->type_id() == HHuginn::TYPE::TUPLE );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HClass const* origin_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectfactory_, HClass const* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			make_pointer<HClass>(
 				runtime_,
+				objectfactory_,
 				"ReversedTupleView",
 				"The `ReversedTupleView` class represents *lazy* *iterable* reversed view of a `tuple`.",
 				origin_
@@ -148,11 +149,12 @@ public:
 			"It supports basic subscript and range operators.",
 			&builtin::tuple
 		)
-		, _reversedTupleClass( HReversedTuple::get_class( runtime_, this ) ) {
+		, _reversedTupleClass() {
 		HHuginn::field_definitions_t fd{
 			{ "find", objectFactory_->create_method( &tuple::find ), "( *elem*[, *start*[, *stop*]] ) - get index of first *elem*ent of the `tuple` not before *start* and before *stop*, return -1 if not found" }
 		};
 		redefine( nullptr, fd );
+		_reversedTupleClass = add_class_as_type_reference( this, HReversedTuple::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
 		return;
 	}
 	HClass const* reversed_tuple_class( void ) const {

@@ -40,8 +40,18 @@ class HFileSystem : public HPackage {
 public:
 	HFileSystem( huginn::HClass* class_ )
 		: HPackage( class_ )
-		, _directoryScanClass( HDirectoryScan::get_class( class_->runtime(), class_ ) )
-		, _fileStatClass( HFileStat::get_class( class_->runtime(), class_ ) )
+		, _directoryScanClass(
+			add_class_as_type_reference(
+				class_,
+				HDirectoryScan::get_class( class_->runtime(), class_ )
+			)
+		)
+		, _fileStatClass(
+			add_class_as_type_reference(
+				class_,
+				HFileStat::get_class( class_->runtime(), class_ )
+			)
+		)
 		, _openModeClass(
 			add_enumeration_as_member(
 				class_,

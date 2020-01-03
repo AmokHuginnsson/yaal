@@ -36,7 +36,12 @@ class HOperatingSystem : public HPackage {
 public:
 	HOperatingSystem( huginn::HClass* class_ )
 		: HPackage( class_ )
-		, _subprocessClass( HSubprocess::get_class( class_->runtime(), class_ ) )
+		, _subprocessClass(
+			add_class_as_type_reference(
+				class_,
+				HSubprocess::get_class( class_->runtime(), class_ )
+			)
+		)
 		, _resourceLimitTypeClass(
 			add_enumeration_as_member(
 				class_,

@@ -80,11 +80,12 @@ public:
 		, _list( list_ ) {
 		M_ASSERT( _list->type_id() == HHuginn::TYPE::LIST );
 	}
-	static HHuginn::class_t get_class( HRuntime* runtime_, HClass const* origin_ ) {
+	static HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectfactory_, HClass const* origin_ ) {
 		M_PROLOG
 		HHuginn::class_t c(
 			make_pointer<HClass>(
 				runtime_,
+				objectfactory_,
 				"ReversedListView",
 				"The `ReversedListView` class represents *lazy* *iterable* reversed view of a `list`.",
 				origin_
@@ -280,7 +281,7 @@ public:
 			"It also supports efficient operations of addition and removal of its elements from its (right) end.",
 			&builtin::list
 		)
-		, _reversedListClass( HReversedList::get_class( runtime_, this ) ) {
+		, _reversedListClass() {
 		HHuginn::field_definitions_t fd{
 			{ "push",   objectFactory_->create_method( &list::push ),   "( *elem* ) - add new *elem* at the end of the `list`, `list` grows in size by 1" },
 			{ "pop",    objectFactory_->create_method( &list::pop ),    "remove last element from the `list`, `list` shrinks by 1" },
@@ -292,6 +293,7 @@ public:
 			{ "sort",   objectFactory_->create_method( &list::sort ),   "( [*callable*] ) - in-place sort this `list`, using *callable* to retrieve keys for element comparison" }
 		};
 		redefine( nullptr, fd );
+		_reversedListClass = add_class_as_type_reference( this, HReversedList::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
 		return;
 	}
 	HClass const* reversed_list_class( void ) const {

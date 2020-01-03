@@ -27,7 +27,12 @@ class HRegularExpressions : public huginn::HPackage {
 public:
 	HRegularExpressions( huginn::HClass* class_ )
 		: HPackage( class_ )
-		, _compiledRegularExpressionClass( HCompiledRegularExpression::get_class( class_->runtime(), class_, exception_class() ) ) {
+		, _compiledRegularExpressionClass(
+			add_class_as_type_reference(
+				class_,
+				HCompiledRegularExpression::get_class( class_->runtime(), class_, exception_class() )
+			)
+		) {
 		return;
 	}
 	static HHuginn::value_t compile( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
