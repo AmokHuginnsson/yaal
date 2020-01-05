@@ -15,6 +15,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/hrawfile.hxx"
 #include "hcore/hfile.hxx"
 #include "hcore/hclock.hxx"
+#include "hcore/hcore.hxx"
 #include "hcore/duration.hxx"
 #include "util.hxx"
 #include "halarm.hxx"
@@ -409,15 +410,15 @@ void HPipedChild::spawn(
 	if ( ! _pid ) {
 		bool notified( false );
 		try {
-			HUTF8String utf8Image( image_ );
-			argv.get<char const*>()[ 0 ] = utf8Image.c_str();
+			bytes_t utf8ishImage( string_to_bytes( image_ ) );
+			argv.get<char const*>()[ 0 ] = utf8ishImage.data();
 			int i( 1 );
-			typedef HArray<HUTF8String> utf8_strings_t;
-			utf8_strings_t utf8Argv;
-			utf8Argv.reserve( argv.get_size() );
+			typedef HArray<bytes_t> utf8ish_strings_t;
+			utf8ish_strings_t utf8ishArgv;
+			utf8ishArgv.reserve( argv.get_size() );
 			for ( argv_t::const_iterator it( argv_.begin() ), end( argv_.end() ); it != end; ++ it, ++ i ) {
-				utf8Argv.emplace_back( *it );
-				argv.get<char const*>()[ i ] = utf8Argv.back().c_str();
+				utf8ishArgv.emplace_back( string_to_bytes( *it ) );
+				argv.get<char const*>()[ i ] = utf8ishArgv.back().data();
 			}
 			sigset_t all;
 			M_ENSURE( ::sigfillset( &all ) == 0 );
