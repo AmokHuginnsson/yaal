@@ -8,6 +8,7 @@
 
 #include "hcore/hstring.hxx"
 #include "hcore/pod.hxx"
+#include "hcore/harray.hxx"
 
 namespace yaal {
 
@@ -20,6 +21,7 @@ namespace system {
 /*! \brief System user id type.
  */
 typedef yaal::u32_t user_id_t;
+typedef yaal::hcore::HArray<yaal::hcore::HString> argv_t;
 
 int close( int );
 int getpid( void );
@@ -185,8 +187,26 @@ public:
 	}
 };
 
-HResourceLimit get_limit( RESOURCE_LIMIT_TYPE );
-void set_limit( RESOURCE_LIMIT_TYPE, HResourceLimit const& );
+/*! \brief Get value of system resource limit.
+ *
+ * \param resourceLimitType - a type of a resource to get a value of limit for.
+ * \return A resource limit information.
+ */
+HResourceLimit get_limit( RESOURCE_LIMIT_TYPE resourceLimitType );
+
+/*! \brief Set resource limit to new value.
+ *
+ * \param resourceLimitType - a type of a resource to set a new limit value for.
+ * \param resourceLimits - soft and hard resource limit values to set.
+ */
+void set_limit( RESOURCE_LIMIT_TYPE resourceLimitType, HResourceLimit const& resourceLimits );
+
+/*! \brief Replace current process image by running other program.
+ *
+ * \param image - an program to run.
+ * \param args - arguments to pass to newly executed program.
+ */
+void exec( yaal::hcore::HString const& image, argv_t const& args ) __attribute__((noreturn));
 
 }
 

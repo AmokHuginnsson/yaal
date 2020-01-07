@@ -32,7 +32,8 @@ int setrlimit( rlimit_resource_t, struct rlimit const* );
 #ifdef YAAL_MSVCXX_SYS_STATVFS_H_INCLUDED
 #define close M_CONCAT( close, __COUNTER__ )
 #define close1 close
-#define close2 msvcxx::close
+#define close2 close
+#define close3 msvcxx::close
 #endif /* #ifdef YAAL_MSVCXX_SYS_STATVFS_H_INCLUDED */
 
 #endif /* not YAAL_MSVCXX_SYS_RESOURCE_H_INCLUDED */

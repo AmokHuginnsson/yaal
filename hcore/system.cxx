@@ -37,6 +37,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "algorithm.hxx"
 #include "hclock.hxx"
 #include "hchunk.hxx"
+#include "hcore.hxx"
 #include "hfile.hxx"
 #include "htokenizer.hxx"
 
@@ -495,6 +496,25 @@ void set_limit( RESOURCE_LIMIT_TYPE resourceLimitType_, HResourceLimit const& re
 #endif /* #if ( HAVE_DECL_RLIMIT_AS == 1 ) */
 #endif /* #ifndef __HOST_OS_TYPE_CYGWIN__ */
 	return;
+	M_EPILOG
+}
+
+void exec( yaal::hcore::HString const& image_, argv_t const& args_ ) {
+	M_PROLOG
+	int argc( static_cast<int>( args_.get_size() ) );
+	HResource<char*[]> argvHolder( new char*[argc + 1] );
+	char** argv( argvHolder.get() );
+	argv[argc] = nullptr;
+	typedef yaal::hcore::HArray<bytes_t> utf8ish_strings_t;
+	utf8ish_strings_t argvDataHolder;
+	argvDataHolder.reserve( argc );
+	bytes_t image( string_to_bytes( image_ ) );
+	for ( int i( 0 ); i < argc; ++ i ) {
+		argvDataHolder.emplace_back( string_to_bytes( args_[i] ) );
+		argv[i] = const_cast<char*>( argvDataHolder.back().data() );
+	}
+	::execvp( image.data(), argv );
+	throw HRuntimeException( "exec: `"_ys.append( image_ ).append( "`: " ).append( strerror( errno ) ) );
 	M_EPILOG
 }
 

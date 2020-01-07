@@ -21,6 +21,7 @@
 
 #include "hcore/memory.hxx"
 #include "hcore/harray.hxx"
+#include "hcore/system.hxx"
 #include "dbwrapper/db_driver.hxx"
 
 using namespace yaal;

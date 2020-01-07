@@ -13,9 +13,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "exception.hxx"
 #include "packagefactory.hxx"
 #include "objectfactory.hxx"
+#include "hcore/system.hxx"
 #include "commit_id.hxx"
-
-#include "hcore/hfile.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;

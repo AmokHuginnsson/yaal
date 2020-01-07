@@ -9,6 +9,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "preprocessor.hxx"
 #include "tools/streamtools.hxx"
 #include "tools/stringalgo.hxx"
+#include "hcore/system.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;

@@ -10,6 +10,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
 #include "hcore/hfile.hxx"
 #include "hcore/hcore.hxx"
+#include "hcore/system.hxx"
 #include "hcore/hsynchronizedstream.hxx"
 #include "runtime.hxx"
 #include "tools/huginn/thread.hxx"
@@ -140,19 +141,17 @@ public:
 		char const name[] = "OperatingSystem.exec";
 		verify_arg_count( name, values_, 1, MAX_ARG_COUNT, thread_, position_ );
 		int argc( static_cast<int>( values_.get_size() ) );
-		HResource<char*[]> argvHolder( new char*[argc + 1] );
-		char** argv( argvHolder.get() );
-		argv[argc] = nullptr;
-		typedef yaal::hcore::HArray<HUTF8String> utf8_strings_t;
-		utf8_strings_t argvDataHolder;
-		argvDataHolder.reserve( argc );
+		system::argv_t argv;
+		argv.reserve( argc );
 		for ( int i( 0 ); i < argc; ++ i ) {
 			verify_arg_type( name, values_, i, HHuginn::TYPE::STRING, argc == 1 ? ARITY::UNARY : ARITY::MULTIPLE, thread_, position_ );
-			argvDataHolder.emplace_back( get_string( values_[i] ) );
-			argv[i] = const_cast<char*>( argvDataHolder.back().c_str() );
+			argv.push_back( get_string( values_[i] ) );
 		}
-		::execvp( argv[0], argv );
-		thread_->raise( static_cast<HOperatingSystem*>( object_->raw() )->exception_class(), strerror( errno ), position_ );
+		try {
+			system::exec( argv.front(), argv );
+		} catch ( hcore::HException const& e ) {
+			thread_->raise( static_cast<HOperatingSystem*>( object_->raw() )->exception_class(), e.what(), position_ );
+		}
 		return ( thread_->runtime().none_value() );
 		M_EPILOG
 	}

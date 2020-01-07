@@ -687,7 +687,7 @@ void HProgramOptionsHandler::set_option( HOption& option_, HString const& value_
 
 int HProgramOptionsHandler::process_command_line( int argc_, char** argv_, int* invalid_ ) {
 	M_PROLOG
-	argv_t argv;
+	system::argv_t argv;
 	for ( int i( 0 ); i < argc_; ++ i ) {
 		argv.push_back( bytes_to_string( argv_[i] ) );
 	}
@@ -696,13 +696,13 @@ int HProgramOptionsHandler::process_command_line( int argc_, char** argv_, int* 
 	M_EPILOG
 }
 
-HProgramOptionsHandler::argv_t HProgramOptionsHandler::process_command_line( argv_t&& argv_, int* unknown_ ) {
+system::argv_t HProgramOptionsHandler::process_command_line( system::argv_t&& argv_, int* unknown_ ) {
 	M_PROLOG
 	return ( process_command_line( yaal::move( argv_ ), nullptr, unknown_ ) );
 	M_EPILOG
 }
 
-HProgramOptionsHandler::argv_t HProgramOptionsHandler::process_command_line( argv_t&& argv_, char** argvRaw_, int* invalid_ ) {
+system::argv_t HProgramOptionsHandler::process_command_line( system::argv_t&& argv_, char** argvRaw_, int* invalid_ ) {
 	M_PROLOG
 	hcore::log( LOG_LEVEL::INFO ) << "Decoding switches ... ";
 	HString optName;

@@ -14,6 +14,7 @@
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hudpsocket.hxx"
+#include "system.hxx"
 
 namespace yaal {
 

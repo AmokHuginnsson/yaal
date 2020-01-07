@@ -10,6 +10,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hfile.hxx"
 #include "hcore/memory.hxx"
+#include "hcore/system.hxx"
 #include "hcore/hcore.hxx"
 
 namespace yaal {

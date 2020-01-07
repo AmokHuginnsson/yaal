@@ -4,6 +4,7 @@
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hjson.hxx"
+#include "hcore/system.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
