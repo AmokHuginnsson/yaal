@@ -56,6 +56,16 @@ HHuginn::value_t HCompiledRegularExpression::replace(
 	return ( cre->do_replace( thread_, values_, position_ ) );
 }
 
+HHuginn::value_t HCompiledRegularExpression::map(
+	huginn::HThread* thread_,
+	HHuginn::value_t* object_,
+	HHuginn::values_t& values_,
+	int position_
+) {
+	HCompiledRegularExpression* cre( static_cast<HCompiledRegularExpression*>( object_->raw() ) );
+	return ( cre->do_map( thread_, values_, position_ ) );
+}
+
 class HCompiledRegularExpressionClass : public huginn::HClass {
 	HClass const* _exceptionClass;
 	HHuginn::class_t _regularExpressionMatchClass;
@@ -84,7 +94,8 @@ public:
 		HHuginn::field_definitions_t fd{
 			{ "match",   runtime_->create_method( &HCompiledRegularExpression::match ),   "( *text* ) - find a match of this compiled regular expression in given *text*" },
 			{ "groups",  runtime_->create_method( &HCompiledRegularExpression::groups ),  "( *text* ) - get all matching regular expression groups from this regular expression in given *text*" },
-			{ "replace", runtime_->create_method( &HCompiledRegularExpression::replace ), "( *text*, *replacement* ) - replace each occurrence of matched groups in *text* with *replacement* pattern" }
+			{ "replace", runtime_->create_method( &HCompiledRegularExpression::replace ), "( *text*, *replacement* ) - replace each occurrence of matched groups in *text* with *replacement* pattern" },
+			{ "map",     runtime_->create_method( &HCompiledRegularExpression::map ),     "( *text*, *replacer* ) - replace each occurrence of matched groups in *text* by result of calling *map* with value of matched group as an argument" }
 		};
 		set_origin( origin_ );
 		redefine( nullptr, fd );
@@ -138,9 +149,51 @@ HHuginn::value_t HCompiledRegularExpression::do_replace(
 	int position_
 ) {
 	verify_signature( "CompiledRegularExpression.replace", values_, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, thread_, position_ );
-	HHuginn::value_t v;
+	HObjectFactory& of( thread_->object_factory() );
+	HHuginn::value_t v( of.none_value() );
 	try {
-		v = thread_->object_factory().create_string( _regex->replace( get_string( values_[0] ), get_string( values_[1] ) ) );
+		v = of.create_string( _regex->replace( get_string( values_[0] ), get_string( values_[1] ) ) );
+	} catch ( hcore::HException const& e ) {
+		HCompiledRegularExpressionClass const* creClass( static_cast<HCompiledRegularExpressionClass const*>( HValue::get_class() ) );
+		thread_->raise( creClass->exception_class(), e.what(), position_ );
+	}
+	return ( v );
+}
+
+namespace {
+
+yaal::hcore::HString replacer( huginn::HThread* thread_, HHuginn::value_t& replacer_, yaal::hcore::HString const& s_, int position_ ) {
+	HObjectFactory& of( thread_->object_factory() );
+	HHuginn::value_t a( of.create_string( s_ ) );
+	HHuginn::value_t v( replacer_->operator_call( thread_, replacer_, HArguments( thread_, a ), position_ ) );
+	if ( v->type_id() != HHuginn::TYPE::STRING ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"User supplied `replacer` function must return a string type instead of "_ys
+				.append( a_type_name( v->get_class() ) )
+				.append( "." ),
+			thread_->current_frame()->file_id(),
+			position_
+		);
+	}
+	return ( get_string( v ) );
+}
+
+}
+
+HHuginn::value_t HCompiledRegularExpression::do_map(
+	huginn::HThread* thread_,
+	HHuginn::values_t& values_,
+	int position_
+) {
+	char const name[] = "CompiledRegularExpression.map";
+	verify_arg_count( name, values_, 2, 2, thread_, position_ );
+	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, ARITY::MULTIPLE, thread_, position_ );
+	verify_arg_callable( name, values_, 1, ARITY::MULTIPLE, thread_, position_ );
+	HObjectFactory& of( thread_->object_factory() );
+	HHuginn::value_t v( of.none_value() );
+	try {
+		hcore::HString s( _regex->replace( get_string( values_[0] ), call( replacer, thread_, ref( values_[1] ), _1, position_ ) ) );
+		v = of.create_string( yaal::move( s ) );
 	} catch ( hcore::HException const& e ) {
 		HCompiledRegularExpressionClass const* creClass( static_cast<HCompiledRegularExpressionClass const*>( HValue::get_class() ) );
 		thread_->raise( creClass->exception_class(), e.what(), position_ );
