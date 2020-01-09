@@ -363,4 +363,6 @@ LIBEXECDIR=`eval echo ${libexecdir}`
 AC_DEFINE_UNQUOTED([LIBEXECDIR], "${LIBEXECDIR}", [The directory for installing executable programs to be run by other programs rather than by users.])
 LIBDIR=`eval echo ${libdir}`
 AC_DEFINE_UNQUOTED([LIBDIR], "${LIBDIR}", [The directory for object files and libraries of object code.])
+BINDIR=`eval echo ${bindir}`
+AC_DEFINE_UNQUOTED([BINDIR], "${BINDIR}", [The directory for installing executable programs that users can run.])
 

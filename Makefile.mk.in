@@ -229,6 +229,7 @@ test: all
 		env EXTRA_CXXFLAGS="-isystem $(DIR_BUILD)/include -I$(DIR_BUILD)/include" \
 				EXTRA_LXXFLAGS="-L$(DIR_BUILD)" \
 				LD_LIBRARY_PATH="$(DIR_BUILD):$(subst $( ),:,$(subst -L,,$(EXTRA_LIBRARY_PATHS)))" \
+				BINDIR=$(DIR_BIN) \
 				SYSCONFDIR=$(DIR_SYSCONF) \
 				LOCALSTATEDIR=$(DIR_LOCALSTATE) \
 			$(MAKE) purge debug test ; \

@@ -117,9 +117,17 @@ else()
 	set( libdir "${CMAKE_INSTALL_LIBDIR}" )
 endif ()
 
+if ( NOT ( "$ENV{BINDIR}" STREQUAL "" ) )
+	set( CMAKE_INSTALL_FULL_BINDIR  $ENV{BINDIR} CACHE PATH "The directory for installing executable programs that users can run." FORCE )
+	set( bindir "$ENV{BINDIR}" )
+else()
+	set( bindir "${CMAKE_INSTALL_BINDIR}" )
+endif ()
+
 set( prefix ${CMAKE_INSTALL_PREFIX} )
 set( exec_prefix "\${prefix}" )
 set( libdir "\${prefix}/${CMAKE_INSTALL_LIBDIR}" )
+set( bindir "\${prefix}/${CMAKE_INSTALL_BINDIR}" )
 set( includedir "\${prefix}/${CMAKE_INSTALL_INCLUDEDIR}" )
 
 set( V ${VERBOSE} )

@@ -124,6 +124,7 @@ int main( int argc_, char** argv_ ) {
 		static string const CONFLICTING[] = {
 			"PACKAGE_",
 			"SYSCONFDIR",
+			"BINDIR",
 			"LIBDIR",
 			"LIBEXECDIR",
 			"DATADIR",

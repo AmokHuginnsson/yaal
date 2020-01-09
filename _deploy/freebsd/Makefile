@@ -1,6 +1,6 @@
 # Created by: Marcin Konarski <amok@codestation.org>
 # $FreeBSD$
-# yaal (R) 2012 Copyright codestation.org all rights reserved.
+# yaal (R) 2020 Copyright codestation.org all rights reserved.
 # NATIVE_MAKE
 
 PORTNAME=      yaal
@@ -54,7 +54,7 @@ WRKDIR=$(.CURDIR)/work
 PLIST=$(WRKDIR)/pkg-plist
 PKG_DBDIR=$(WRKDIR)/pkg
 PORT_DBDIR=$(WRKDIR)/port
-BUILD_ENV=PREFIX=$(PREFIX) DESTDIR=$(STAGEDIR) SYSCONFDIR=$(PREFIX)/etc LOCALSTATEDIR=$(PREFIX)/var CONFIGURE="--enable-auto-sanity"
+BUILD_ENV=PREFIX=$(PREFIX) DESTDIR=$(STAGEDIR) SYSCONFDIR=$(PREFIX)/etc LOCALSTATEDIR=/var CONFIGURE="--enable-auto-sanity"
 BINOWN=root
 SHAREOWN=root
 SYSTEM!= uname -s | tr A-Z a-z
