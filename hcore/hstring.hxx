@@ -862,7 +862,7 @@ protected:
 public:
 	HConstIterator( void )
 		: _owner( nullptr )
-		, _index( 0 ) {
+		, _index( HString::npos ) {
 		return;
 	}
 	HConstIterator( HConstIterator const& it_ )

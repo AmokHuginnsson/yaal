@@ -303,45 +303,116 @@ bytes_t string_to_bytes( HString const& str_ ) {
 	M_EPILOG
 }
 
-void substitute_environment( HString& string_, ENV_SUBST_MODE mode_ ) {
+namespace {
+
+yaal::hcore::HString get_env_var_val( yaal::hcore::HString const& envVarRef_ ) {
 	M_PROLOG
-	bool envVarRefFound( false );
-	do {
-		envVarRefFound = false;
-		if ( ! string_.is_empty() ) {
-			HRegex pattern( "[$][{][^{}]+[}]" );
-			HString substituted(
-				pattern.replace(
-					string_,
-					HRegex::replacer_t(
-						[]( yaal::hcore::HString const& match_ ) -> yaal::hcore::HString {
-							HString name( match_.substr( 2, match_.get_length() - 3 ) );
-							HString::size_type modIdx( name.find( ':'_ycp ) );
-							HString option;
-							while ( modIdx != HString::npos ) {
-								option = name.substr( modIdx  + 1 );
-								name.erase( modIdx );
-								if ( option.is_empty() ) {
-									break;
-								}
-								if ( option.front() == '-' ) {
-									option.shift_left( 1 );
-								} else {
-									option.clear();
-								}
-								break;
-							}
-							HUTF8String utf8( name );
-							char const* envVal = ::getenv( utf8.c_str() );
-							return ( envVal ? envVal : option );
-						}
-					)
-				)
-			);
-			envVarRefFound = ( substituted != string_ );
-			string_.assign( substituted	);
+	HString name( envVarRef_.substr( 2, envVarRef_.get_length() - 3 ) );
+	HString::size_type modIdx( name.find( ':'_ycp ) );
+	HString option;
+	while ( modIdx != HString::npos ) {
+		option = name.substr( modIdx  + 1 );
+		name.erase( modIdx );
+		if ( option.is_empty() ) {
+			break;
 		}
-	} while ( ( mode_ == ENV_SUBST_MODE::RECURSIVE ) && envVarRefFound );
+		if ( option.front() == '-' ) {
+			option.shift_left( 1 );
+		} else {
+			option.clear();
+		}
+		break;
+	}
+	HUTF8String utf8( name );
+	char const* envVal = ::getenv( utf8.c_str() );
+	return ( envVal ? envVal : option );
+	M_EPILOG
+}
+
+bool escaped_environment_substitution( yaal::hcore::HString& string_, code_point_t escape_ ) {
+	M_PROLOG
+	bool escape( false );
+	enum class ENV_REF_PARSE_STATE {
+		OUTSIDE,
+		DOLLAR,
+		INSIDE
+	};
+	ENV_REF_PARSE_STATE envRefParseState( ENV_REF_PARSE_STATE::OUTSIDE );
+	ENV_REF_PARSE_STATE envRefParseInsideState( ENV_REF_PARSE_STATE::OUTSIDE );
+	HString::size_type refStart( HString::npos );
+	bool didSubstitute( false );
+	for ( HString::size_type pos( 0 ); pos < string_.get_length(); ++ pos ) {
+		if ( escape ) {
+			escape = false;
+			continue;
+		}
+		code_point_t c( string_[pos] );
+		if ( c == escape_ ) {
+			escape = true;
+			continue;
+		}
+		if ( ( envRefParseState == ENV_REF_PARSE_STATE::OUTSIDE ) && ( c == '$' ) ) {
+			envRefParseState = ENV_REF_PARSE_STATE::DOLLAR;
+			continue;
+		}
+		if ( envRefParseState == ENV_REF_PARSE_STATE::DOLLAR ) {
+			if ( c == '{' ) {
+				envRefParseState = ENV_REF_PARSE_STATE::INSIDE;
+				refStart = pos;
+			} else if ( c != '$' ) {
+				envRefParseState = ENV_REF_PARSE_STATE::OUTSIDE;
+			}
+			continue;
+		}
+		if ( envRefParseState != ENV_REF_PARSE_STATE::INSIDE ) {
+			continue;
+		}
+		if ( c == '$' ) {
+			envRefParseInsideState = ENV_REF_PARSE_STATE::DOLLAR;
+			continue;
+		}
+		if ( envRefParseInsideState == ENV_REF_PARSE_STATE::DOLLAR ) {
+			if ( c == '{' ) {
+				envRefParseInsideState = ENV_REF_PARSE_STATE::OUTSIDE;
+				refStart = pos;
+			} else if ( c != '$' ) {
+				envRefParseInsideState = ENV_REF_PARSE_STATE::OUTSIDE;
+			}
+			continue;
+		}
+		if ( c == '}' ) {
+			-- refStart;
+			HString::size_type refEnd( pos + 1 );
+			string_.replace( refStart, refEnd - refStart, get_env_var_val( string_.substr( refStart, refEnd - refStart ) ) );
+			envRefParseState = ENV_REF_PARSE_STATE::OUTSIDE;
+			envRefParseInsideState = ENV_REF_PARSE_STATE::OUTSIDE;
+			didSubstitute = true;
+		}
+	}
+	return ( didSubstitute );
+	M_EPILOG
+}
+
+}
+
+void substitute_environment( HString& string_, ENV_SUBST_MODE mode_, code_point_t escape_ ) {
+	M_PROLOG
+	if ( string_.is_empty() ) {
+		return;
+	}
+	bool didSubstitute( false );
+	HRegex pattern( "[$][{][^{}]+[}]" );
+	HString substituted;
+	do {
+		didSubstitute = false;
+		if ( !! escape_ ) {
+			didSubstitute = escaped_environment_substitution( string_, escape_ );
+		} else {
+			substituted.assign( pattern.replace( string_, call( get_env_var_val, _1 ) ) );
+			didSubstitute = ( substituted != string_ );
+			string_.assign( substituted );
+		}
+	} while ( ! string_.is_empty() && ( mode_ == ENV_SUBST_MODE::RECURSIVE ) && didSubstitute );
 	return;
 	M_EPILOG
 }

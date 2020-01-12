@@ -33,7 +33,7 @@ HString bytes_to_string( char const*, HString::size_type = HString::npos );
 void bytes_to_string( HString&, char const*, HString::size_type = HString::npos );
 typedef yaal::hcore::HArray<char> bytes_t;
 bytes_t string_to_bytes( HString const& );
-void substitute_environment( HString&, ENV_SUBST_MODE );
+void substitute_environment( HString&, ENV_SUBST_MODE, code_point_t = code_point_t( '\\' ) );
 yaal::hcore::HString substitute_environment( yaal::hcore::HString const& );
 void init_locale( char const* = nullptr );
 void banner( char const* = nullptr, char const* = nullptr );
