@@ -7,6 +7,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/hexception.hxx"
 #include "hcore/htls.hxx"
 #include "hcore/unicode.hxx"
+#include "hcore/hhashmap.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -18,7 +19,8 @@ namespace tools {
 namespace util {
 
 EscapeTable::EscapeTable( char const* raw_, int rawLen_, char const* safe_, int M_DEBUG_CODE( safeLen_ ) )
-	: _rawToSafe(), _safeToRaw() {
+	: _rawToSafe()
+	, _safeToRaw() {
 	M_PROLOG
 	M_ASSERT( ( rawLen_ > 0 ) && ( safeLen_ == rawLen_ ) && raw_ && safe_ );
 	for ( int i( 0 ); i < EscapeTable::ESCAPE_TABLE_SIZE; ++ i ) {
@@ -34,43 +36,44 @@ EscapeTable::EscapeTable( char const* raw_, int rawLen_, char const* safe_, int 
 
 void escape( yaal::hcore::HString& string_, EscapeTable const& et_, code_point_t escape_ ) {
 	M_PROLOG
-	if ( ! string_.is_empty() ) {
-		typedef HTLS<HChunk> cache_t;
-		static cache_t _cache_;
-		HChunk& cache( *_cache_ );
-		static int const CODE_POINT_SIZE( static_cast<int>( sizeof ( code_point_t ) ) );
-		int cacheSize( 0 );
-		code_point_t* ptr( nullptr );
-		auto cache_update = [&cache, &cacheSize, &ptr]( int size_ ) {
-			if ( size_ > cacheSize ) {
-				cache.realloc( chunk_size<code_point_t>( max( cacheSize * 2, size_ ) ) );
-				cacheSize = static_cast<int>( cache.get_size() ) / CODE_POINT_SIZE;
-				ptr = cache.get<code_point_t>();
-			}
-		};
-		cache_update( static_cast<int>( string_.get_length() ) );
-		int pos( 0 );
-		for ( HString::const_iterator it( string_.begin() ), end( string_.end() ); it != end; ++ it, ++ pos ) {
-			code_point_t ch(
-				unicode::rank( *it ) == 1
-				? code_point_t(
-						static_cast<char unsigned>(
-							et_._rawToSafe[static_cast<char unsigned>( (*it).get() )]
-						)
+	if ( string_.is_empty() ) {
+		return;
+	}
+	typedef HTLS<HChunk> cache_t;
+	static cache_t _cache_;
+	HChunk& cache( *_cache_ );
+	static int const CODE_POINT_SIZE( static_cast<int>( sizeof ( code_point_t ) ) );
+	int cacheSize( 0 );
+	code_point_t* ptr( nullptr );
+	auto cache_update = [&cache, &cacheSize, &ptr]( int size_ ) {
+		if ( size_ > cacheSize ) {
+			cache.realloc( chunk_size<code_point_t>( max( cacheSize * 2, size_ ) ) );
+			cacheSize = static_cast<int>( cache.get_size() ) / CODE_POINT_SIZE;
+			ptr = cache.get<code_point_t>();
+		}
+	};
+	cache_update( static_cast<int>( string_.get_length() ) );
+	int pos( 0 );
+	for ( HString::const_iterator it( string_.begin() ), end( string_.end() ); it != end; ++ it, ++ pos ) {
+		code_point_t ch(
+			unicode::rank( *it ) == 1
+			? code_point_t(
+					static_cast<char unsigned>(
+						et_._rawToSafe[static_cast<char unsigned>( (*it).get() )]
 					)
-				: *it
-			);
+				)
+			: *it
+		);
+		cache_update( pos + 1 );
+		if ( ch != *it ) {
+			ptr[pos ++] = escape_;
 			cache_update( pos + 1 );
-			if ( ch != *it ) {
-				ptr[pos ++] = escape_;
-				cache_update( pos + 1 );
-			}
-			ptr[ pos ] = ch;
 		}
-		string_.clear();
-		for ( int long i( 0 ); i < pos; ++ i ) {
-			string_.push_back( ptr[i] );
-		}
+		ptr[ pos ] = ch;
+	}
+	string_.clear();
+	for ( int long i( 0 ); i < pos; ++ i ) {
+		string_.push_back( ptr[i] );
 	}
 	return;
 	M_EPILOG
@@ -78,32 +81,33 @@ void escape( yaal::hcore::HString& string_, EscapeTable const& et_, code_point_t
 
 void unescape( yaal::hcore::HString& string_, EscapeTable const& et_, code_point_t escape_ ) {
 	M_PROLOG
-	if ( ! string_.is_empty() ) {
-		typedef HTLS<HChunk> cache_t;
-		static cache_t _cache_;
-		HChunk& cache( *_cache_ );
-		cache.realloc( chunk_size<code_point_t>( string_.get_length() ) );
-		int pos( 0 );
-		code_point_t* ptr( cache.get<code_point_t>() );
-		for ( HString::const_iterator it( string_.begin() ), end( string_.end() ); it != end; ++ it, ++ pos ) {
-			if ( *it == escape_ ) {
-				++ it;
-				if ( ! ( it != end ) ) {
-					break;
-				}
-				ptr[pos] = unicode::rank( *it ) == 1
-					? code_point_t(
-							static_cast<char unsigned>( et_._safeToRaw[static_cast<char unsigned>( (*it).get() )] )
-						)
-					: *it;
-			} else {
-				ptr[pos] = *it;
+	if ( string_.is_empty() ) {
+		return;
+	}
+	typedef HTLS<HChunk> cache_t;
+	static cache_t _cache_;
+	HChunk& cache( *_cache_ );
+	cache.realloc( chunk_size<code_point_t>( string_.get_length() ) );
+	int pos( 0 );
+	code_point_t* ptr( cache.get<code_point_t>() );
+	for ( HString::const_iterator it( string_.begin() ), end( string_.end() ); it != end; ++ it, ++ pos ) {
+		if ( *it == escape_ ) {
+			++ it;
+			if ( ! ( it != end ) ) {
+				break;
 			}
+			ptr[pos] = unicode::rank( *it ) == 1
+				? code_point_t(
+						static_cast<char unsigned>( et_._safeToRaw[static_cast<char unsigned>( (*it).get() )] )
+					)
+				: *it;
+		} else {
+			ptr[pos] = *it;
 		}
-		string_.clear();
-		for ( int long i( 0 ); i < pos; ++ i ) {
-			string_.push_back( ptr[i] );
-		}
+	}
+	string_.clear();
+	for ( int long i( 0 ); i < pos; ++ i ) {
+		string_.push_back( ptr[i] );
 	}
 	return;
 	M_EPILOG
@@ -113,52 +117,53 @@ void semantic_unescape( yaal::hcore::HString& str_ ) {
 	M_PROLOG
 	for ( int i( 0 ); i < str_.get_length(); ++ i ) {
 		int k( i );
-		if ( ( str_[k] == '\\' ) && ( ( k + 1 ) < str_.get_length() ) ) {
-			++ k;
-			if ( str_[k] == '\\' ) {
-				++ i;
-				continue;
-			}
-			code_point_t prefix( str_[k] );
-			int codeLen( 0 );
-			switch ( prefix.get() ) {
-				case ( 'x' ): { codeLen = 2; } break;
-				case ( 'u' ): { codeLen = 4; } break;
-				case ( 'U' ): { codeLen = 8; } break;
-			}
-			int base( 16 );
-			bool good( false );
-			char num[10];
-			if ( codeLen > 0 ) {
-				if ( ( k + codeLen ) < str_.get_length() ) {
-					good = true;
-					++ k;
-					for ( int n( 0 ); n < codeLen; ++ n ) {
-						code_point_t d( str_[k + n] );
-						if ( ! is_hex_digit( d ) ) {
-							good = false;
-							break;
-						}
-						num[n] = static_cast<char>( d.get() );
-					}
-				}
-			} else {
-				base = 8;
-				for ( int len( min( 3, static_cast<int>( str_.get_length() ) - k ) ); codeLen < len; ++ codeLen ) {
-					code_point_t d( str_[k + codeLen] );
-					if ( ! is_oct_digit( d ) ) {
+		if ( ( str_[k] != '\\' ) || ( ( k + 1 ) >= str_.get_length() ) ) {
+			continue;
+		}
+		++ k;
+		if ( str_[k] == '\\' ) {
+			++ i;
+			continue;
+		}
+		code_point_t prefix( str_[k] );
+		int codeLen( 0 );
+		switch ( prefix.get() ) {
+			case ( 'x' ): { codeLen = 2; } break;
+			case ( 'u' ): { codeLen = 4; } break;
+			case ( 'U' ): { codeLen = 8; } break;
+		}
+		int base( 16 );
+		bool good( false );
+		char num[10];
+		if ( codeLen > 0 ) {
+			if ( ( k + codeLen ) < str_.get_length() ) {
+				good = true;
+				++ k;
+				for ( int n( 0 ); n < codeLen; ++ n ) {
+					code_point_t d( str_[k + n] );
+					if ( ! is_hex_digit( d ) ) {
+						good = false;
 						break;
 					}
-					num[codeLen] = static_cast<char>( d.get() );
-					good = true;
+					num[n] = static_cast<char>( d.get() );
 				}
 			}
-			if ( good ) {
-				num[codeLen] = 0;
-				code_point_t c( static_cast<u32_t>( stoul( num, nullptr, base ) ) );
-				if ( ( c != 0_ycp ) && ( c < unicode::UCS_MAX_4_BYTE_CODE_POINT ) ) {
-					str_.replace( i, ( base == 16 ? 2 : 1 ) + codeLen, 1, c );
+		} else {
+			base = 8;
+			for ( int len( min( 3, static_cast<int>( str_.get_length() ) - k ) ); codeLen < len; ++ codeLen ) {
+				code_point_t d( str_[k + codeLen] );
+				if ( ! is_oct_digit( d ) ) {
+					break;
 				}
+				num[codeLen] = static_cast<char>( d.get() );
+				good = true;
+			}
+		}
+		if ( good ) {
+			num[codeLen] = 0;
+			code_point_t c( static_cast<u32_t>( stoul( num, nullptr, base ) ) );
+			if ( ( c != 0_ycp ) && ( c < unicode::UCS_MAX_4_BYTE_CODE_POINT ) ) {
+				str_.replace( i, ( base == 16 ? 2 : 1 ) + codeLen, 1, c );
 			}
 		}
 	}
@@ -177,6 +182,93 @@ HString unescape_copy( yaal::hcore::HString string_, EscapeTable const& et_, cod
 	M_PROLOG
 	unescape( string_, et_, escape_ );
 	return ( string_ );
+	M_EPILOG
+}
+
+void mask_escape( yaal::hcore::HString& string_, escape_mask_map_t& escapeMaskMap_, yaal::code_point_t escape_ ) {
+	M_PROLOG
+	if ( string_.is_empty() ) {
+		return;
+	}
+	typedef HHashMap<code_point_t, escape_mask_map_t::size_type> mask_map_t;
+	mask_map_t maskMap;
+	typedef HTLS<HChunk> cache_t;
+	static cache_t _cache_;
+	HChunk& cache( *_cache_ );
+	cache.realloc( chunk_size<code_point_t>( string_.get_length() ) );
+	code_point_t* ptr( cache.get<code_point_t>() );
+	bool escaped( false );
+	for ( code_point_t c : string_ ) {
+		if ( escaped ) {
+			escaped = false;
+			mask_map_t::insert_result insertResult( maskMap.insert( make_pair( c, escapeMaskMap_.get_size() ) ) );
+			if ( insertResult.second ) {
+				escapeMaskMap_.push_back( c );
+			}
+			c = code_point_t( unicode::CODE_POINT::SUPPLEMENTARY_PRIVATE_USE_AREA_B.get() + static_cast<code_point_t::value_type>( insertResult.first->second ) );
+		} else if ( c == escape_ ) {
+			escaped = true;
+		}
+		*ptr = c;
+		++ ptr;
+	}
+	string_.assign( cache.get<char32_t>(), string_.get_length() );
+	return;
+	M_EPILOG
+}
+
+template<typename iterator_t, typename U>
+inline void copy_n_cast( iterator_t src_, HString::size_type size_, U* dst_ ) {
+	for ( HString::size_type i( 0 ); i < size_; ++ i, ++ src_, ++ dst_ ) {
+		*dst_ = static_cast<U>( *src_ );
+	}
+	return;
+}
+
+void unmask_escape( yaal::hcore::HString& string_, escape_mask_map_t const& escapeMaskMap_, yaal::code_point_t escape_ ) {
+	M_PROLOG
+	if ( string_.is_empty() ) {
+		return;
+	}
+	typedef HHashMap<code_point_t, escape_mask_map_t::size_type> mask_map_t;
+	mask_map_t maskMap;
+	typedef HTLS<HChunk> cache_t;
+	static cache_t _cache_;
+	HChunk& cache( *_cache_ );
+	cache.realloc( chunk_size<code_point_t>( string_.get_length() ) );
+	code_point_t* ptr( cache.get<code_point_t>() );
+	bool escaped( false );
+	int rank( 1 );
+	for ( code_point_t c : string_ ) {
+		if ( escaped && is_pua<CHARACTER_CLASS::SUPPLEMENTARY_PRIVATE_USE_AREA_B>( c ) ) {
+			escaped = false;
+			mask_map_t::size_type idx( static_cast<mask_map_t::size_type>( c.get() ) - static_cast<mask_map_t::size_type>( unicode::CODE_POINT::SUPPLEMENTARY_PRIVATE_USE_AREA_B.get() ) );
+			if ( ( idx >= 0 ) && ( idx < escapeMaskMap_.get_size() ) ) {
+				c = escapeMaskMap_[idx];
+			}
+		} else if ( escaped ) {
+			escaped = false;
+		} else if ( c == escape_ ) {
+			escaped = true;
+		}
+		rank = max( unicode::rank( c ), rank );
+		*ptr = c;
+		++ ptr;
+	}
+	switch ( rank ) {
+		case ( 1 ): {
+			copy_n_cast( cache.get<code_point_t::value_type>(), string_.get_length(), cache.get<u8_t>() );
+			string_.assign( cache.raw(), string_.get_length() );
+		} break;
+		case ( 2 ): {
+			copy_n_cast( cache.get<code_point_t::value_type>(), string_.get_length(), cache.get<u16_t>() );
+			string_.assign( cache.get<char16_t>(), string_.get_length() );
+		} break;
+		case ( 4 ): {
+			string_.assign( cache.get<char32_t>(), string_.get_length() );
+		} break;
+	}
+	return;
 	M_EPILOG
 }
 

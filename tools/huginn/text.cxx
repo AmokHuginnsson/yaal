@@ -195,6 +195,11 @@ public:
 			case ( CHARACTER_CLASS::SUPERSCRIPT_LETTER ):            cc16 = &hcore::character_class<CHARACTER_CLASS::SUPERSCRIPT_LETTER>();            break;
 			case ( CHARACTER_CLASS::SUPERSCRIPT_LOWER_CASE_LETTER ): cc16 = &hcore::character_class<CHARACTER_CLASS::SUPERSCRIPT_LOWER_CASE_LETTER>(); break;
 			case ( CHARACTER_CLASS::SUPERSCRIPT_UPPER_CASE_LETTER ): cc16 = &hcore::character_class<CHARACTER_CLASS::SUPERSCRIPT_UPPER_CASE_LETTER>(); break;
+			case ( CHARACTER_CLASS::PRIVATE_USE_AREA ): /* fall-through */
+			case ( CHARACTER_CLASS::SUPPLEMENTARY_PRIVATE_USE_AREA_A ): /* fall-through */
+			case ( CHARACTER_CLASS::SUPPLEMENTARY_PRIVATE_USE_AREA_B ): /* fall-through */ {
+				M_ASSERT( !"Wrong character class!"[0] );
+			}
 		}
 		return (
 			cc8

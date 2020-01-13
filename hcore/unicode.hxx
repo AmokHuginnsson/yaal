@@ -346,6 +346,15 @@ static code_point_t const EMOJI_PENGUIN                         = code_point_t( 
 static code_point_t const EMOJI_PERSON_WALKING                  = code_point_t( 0x1f6b6 );
 static code_point_t const EMOJI_STOP_SIGN                       = code_point_t( 0x1f6d1 );
 
+/* Private Use Areas */
+
+static code_point_t const PRIVATE_USE_AREA                      = code_point_t( 0xe000 );
+static code_point_t const PRIVATE_USE_AREA_END                  = code_point_t( 0xf8ff );
+static code_point_t const SUPPLEMENTARY_PRIVATE_USE_AREA_A      = code_point_t( 0xF0000 );
+static code_point_t const SUPPLEMENTARY_PRIVATE_USE_AREA_A_END  = code_point_t( 0xFFFFF );
+static code_point_t const SUPPLEMENTARY_PRIVATE_USE_AREA_B      = code_point_t( 0x100000 );
+static code_point_t const SUPPLEMENTARY_PRIVATE_USE_AREA_B_END  = code_point_t( 0x10FFFF );
+
 }
 
 }

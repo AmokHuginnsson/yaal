@@ -7,6 +7,7 @@
 #define YAAL_TOOLS_UTIL_ESCAPE_HXX_INCLUDED 1
 
 #include "hcore/hstring.hxx"
+#include "hcore/harray.hxx"
 
 namespace yaal {
 
@@ -26,6 +27,9 @@ void unescape( yaal::hcore::HString&, EscapeTable const&, yaal::code_point_t = '
 void semantic_unescape( yaal::hcore::HString& );
 yaal::hcore::HString escape_copy( yaal::hcore::HString, EscapeTable const&, yaal::code_point_t = '\\'_ycp );
 yaal::hcore::HString unescape_copy( yaal::hcore::HString, EscapeTable const&, yaal::code_point_t = '\\'_ycp );
+typedef yaal::hcore::HArray<yaal::code_point_t> escape_mask_map_t;
+void mask_escape( yaal::hcore::HString&, escape_mask_map_t&, yaal::code_point_t = '\\'_ycp );
+void unmask_escape( yaal::hcore::HString&, escape_mask_map_t const&, yaal::code_point_t = '\\'_ycp );
 
 }
 

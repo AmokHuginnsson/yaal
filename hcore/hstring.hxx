@@ -94,7 +94,10 @@ enum class CHARACTER_CLASS {
 	SUPERSCRIPT_DIGIT = 19,
 	SUPERSCRIPT_LETTER = 20,
 	SUPERSCRIPT_LOWER_CASE_LETTER = 21,
-	SUPERSCRIPT_UPPER_CASE_LETTER = 22
+	SUPERSCRIPT_UPPER_CASE_LETTER = 22,
+	PRIVATE_USE_AREA = -1,
+	SUPPLEMENTARY_PRIVATE_USE_AREA_A = -2,
+	SUPPLEMENTARY_PRIVATE_USE_AREA_B = -3
 };
 template<typename char_type>
 HCharacterClass<char_type> const& character_class( CHARACTER_CLASS );
@@ -1227,6 +1230,9 @@ bool is_upper_greek( code_point_t );
 bool is_lower_greek( code_point_t );
 bool is_subscript( code_point_t );
 bool is_superscript( code_point_t );
+bool is_pua( code_point_t );
+template<CHARACTER_CLASS>
+bool is_pua( code_point_t );
 
 inline void swap( yaal::hcore::HString& a, yaal::hcore::HString& b ) {
 	a.swap( b );

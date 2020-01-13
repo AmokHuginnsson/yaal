@@ -3250,6 +3250,29 @@ bool is_superscript( code_point_t char_ ) {
 	return ( character_class<CHARACTER_CLASS::SUPERSCRIPT>().has( char_ ) );
 }
 
+bool is_pua( code_point_t char_ ) {
+	return (
+		( ( char_ >= unicode::CODE_POINT::PRIVATE_USE_AREA ) && ( char_ <= unicode::CODE_POINT::PRIVATE_USE_AREA_END ) )
+		|| ( ( char_ >= unicode::CODE_POINT::SUPPLEMENTARY_PRIVATE_USE_AREA_A ) && ( char_ <= unicode::CODE_POINT::SUPPLEMENTARY_PRIVATE_USE_AREA_A_END ) )
+		|| ( ( char_ >= unicode::CODE_POINT::SUPPLEMENTARY_PRIVATE_USE_AREA_B ) && ( char_ <= unicode::CODE_POINT::SUPPLEMENTARY_PRIVATE_USE_AREA_B_END ) )
+	);
+}
+
+template<>
+bool is_pua<CHARACTER_CLASS::PRIVATE_USE_AREA>( code_point_t char_ ) {
+	return ( ( char_ >= unicode::CODE_POINT::PRIVATE_USE_AREA ) && ( char_ <= unicode::CODE_POINT::PRIVATE_USE_AREA_END ) );
+}
+
+template<>
+bool is_pua<CHARACTER_CLASS::SUPPLEMENTARY_PRIVATE_USE_AREA_A>( code_point_t char_ ) {
+	return ( ( char_ >= unicode::CODE_POINT::SUPPLEMENTARY_PRIVATE_USE_AREA_A ) && ( char_ <= unicode::CODE_POINT::SUPPLEMENTARY_PRIVATE_USE_AREA_A_END ) );
+}
+
+template<>
+bool is_pua<CHARACTER_CLASS::SUPPLEMENTARY_PRIVATE_USE_AREA_B>( code_point_t char_ ) {
+	return ( ( char_ >= unicode::CODE_POINT::SUPPLEMENTARY_PRIVATE_USE_AREA_B ) && ( char_ <= unicode::CODE_POINT::SUPPLEMENTARY_PRIVATE_USE_AREA_B_END ) );
+}
+
 inline wint_t to_lower( code_point_t codePoint_ ) {
 	return ( ::std::towlower( static_cast<wint_t>( codePoint_.get() ) ) );
 }
