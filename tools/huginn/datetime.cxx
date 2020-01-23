@@ -81,6 +81,36 @@ public:
 		return ( *object_ );
 		M_EPILOG
 	}
+	static HHuginn::value_t time_to_ad_epoch( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		HObjectFactory& of( thread_->object_factory() );
+		verify_signature_by_class( "DateTime.time_to_ad_epoch", values_, { of.time_class() }, thread_, position_ );
+		HTime& time( *static_cast<HTime*>( values_[0].raw() ) );
+		return ( of.create_integer( time.value().raw() ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t time_to_unix_epoch( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		HObjectFactory& of( thread_->object_factory() );
+		verify_signature_by_class( "DateTime.time_to_unix_epoch", values_, { of.time_class() }, thread_, position_ );
+		HTime& time( *static_cast<HTime*>( values_[0].raw() ) );
+		return ( of.create_integer( yaal_epoch_to_unix_epoch( time.value().raw() ) ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t ad_epoch_to_time( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "DateTime.ad_epoch_to_time", values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
+		HObjectFactory& of( thread_->object_factory() );
+		return ( of.create<huginn::HTime>( of.time_class(), get_integer( values_[0] ) ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t unix_epoch_to_time( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "DateTime.unix_epoch_to_time", values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
+		HObjectFactory& of( thread_->object_factory() );
+		return ( of.create<huginn::HTime>( of.time_class(), unix_epoch_to_yaal_epoch( get_integer( values_[0] ) ) ) );
+		M_EPILOG
+	}
 };
 
 namespace package_factory {
@@ -103,7 +133,11 @@ HPackageCreatorInterface::HInstance HDateTimeCreator::do_new_instance( HRuntime*
 		{ "now",    runtime_->create_method( &HDateTime::now ),    "get information about current point-in-time" },
 		{ "clock",  runtime_->create_method( &HDateTime::clock ),  "create a stopper-watch instance" },
 		{ "format", runtime_->create_method( &HDateTime::format ), "( *fmt*, *dt* ) - get string representation of time given by *dt* using *fmt* format specification" },
-		{ "sleep",  runtime_->create_method( &HDateTime::sleep ),  "( *nanoseconds* ) - suspend program execution for specified amount of *nanoseconds*" }
+		{ "sleep",  runtime_->create_method( &HDateTime::sleep ),  "( *nanoseconds* ) - suspend program execution for specified amount of *nanoseconds*" },
+		{ "time_to_ad_epoch",   runtime_->create_method( &HDateTime::time_to_ad_epoch ),   "( *time* ) - convert *time* to number of seconds since Anno Domini Epoch" },
+		{ "time_to_unix_epoch", runtime_->create_method( &HDateTime::time_to_unix_epoch ), "( *time* ) - convert *time* to number of seconds since Unix Epoch" },
+		{ "ad_epoch_to_time",   runtime_->create_method( &HDateTime::ad_epoch_to_time ),   "( *seconds* ) - convert number of *seconds* since Anno Domini Epoch to `Time` object" },
+		{ "unix_epoch_to_time", runtime_->create_method( &HDateTime::unix_epoch_to_time ), "( *seconds* ) - convert number of *seconds* since Unix Epoch to `Time` object" }
 	};
 	c->redefine( nullptr, fd );
 	return { c, runtime_->object_factory()->create<HDateTime>( c.raw() ) };
