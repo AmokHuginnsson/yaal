@@ -548,19 +548,19 @@ bool HString::do_operator_equals( HThread*, HHuginn::value_t const&, HHuginn::va
 }
 
 bool HString::do_operator_less( HThread*, HHuginn::value_t const&, HHuginn::value_t const& other_, int ) const {
-	return ( _value < static_cast<HString const*>( other_.raw() )->_value );
+	return ( collate_compare( _value, static_cast<HString const*>( other_.raw() )->_value ) < 0 );
 }
 
 bool HString::do_operator_greater( HThread*, HHuginn::value_t const&, HHuginn::value_t const& other_, int ) const {
-	return ( _value > static_cast<HString const*>( other_.raw() )->_value );
+	return ( collate_compare( _value, static_cast<HString const*>( other_.raw() )->_value ) > 0 );
 }
 
 bool HString::do_operator_less_or_equal( HThread*, HHuginn::value_t const&, HHuginn::value_t const& other_, int ) const {
-	return ( _value <= static_cast<HString const*>( other_.raw() )->_value );
+	return ( collate_compare( _value, static_cast<HString const*>( other_.raw() )->_value ) <= 0 );
 }
 
 bool HString::do_operator_greater_or_equal( HThread*, HHuginn::value_t const&, HHuginn::value_t const& other_, int ) const {
-	return ( _value >= static_cast<HString const*>( other_.raw() )->_value );
+	return ( collate_compare( _value, static_cast<HString const*>( other_.raw() )->_value ) >= 0 );
 }
 
 bool HString::do_operator_contains( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
