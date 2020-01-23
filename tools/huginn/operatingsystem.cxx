@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <clocale>
 #include <unistd.h>
 
 #include "hcore/base.hxx"
@@ -31,9 +32,30 @@ namespace tools {
 
 namespace huginn {
 
+enum class LOCALE_FACET {
+	CTYPE,
+	COLLATE,
+	NUMERIC,
+	TIME
+};
+
+namespace {
+int locale_facet_to_category( LOCALE_FACET localeFacet_ ) {
+	int category( 0 );
+	switch ( localeFacet_ ) {
+		case ( LOCALE_FACET::CTYPE ):   category = LC_CTYPE;   break;
+		case ( LOCALE_FACET::COLLATE ): category = LC_COLLATE; break;
+		case ( LOCALE_FACET::NUMERIC ): category = LC_NUMERIC; break;
+		case ( LOCALE_FACET::TIME ):    category = LC_TIME;    break;
+	}
+	return ( category );
+}
+}
+
 class HOperatingSystem : public HPackage {
 	HHuginn::class_t _subprocessClass;
 	enumeration::HEnumerationClass::ptr_t _resourceLimitTypeClass;
+	enumeration::HEnumerationClass::ptr_t _localeFacetClass;
 public:
 	HOperatingSystem( huginn::HClass* class_ )
 		: HPackage( class_ )
@@ -63,6 +85,25 @@ public:
 					class_
 				),
 				"set of all possible resource limit types."
+			)
+		)
+		, _localeFacetClass(
+			add_enumeration_as_member(
+				class_,
+				enumeration::create_class(
+					class_->runtime(),
+					"LOCALE_FACET",
+					enumeration::descriptions_t{
+						{ "CTYPE",   "The interpretation of byte sequences as characters.",       static_cast<int>( LOCALE_FACET::CTYPE ) },
+						{ "COLLATE", "The collation rules used for string sorting.",              static_cast<int>( LOCALE_FACET::COLLATE ) },
+						{ "NUMERIC", "The formatting rules used for nonmonetary numeric values.", static_cast<int>( LOCALE_FACET::NUMERIC ) },
+						{ "TIME",    "The formatting used for date and time values.",             static_cast<int>( LOCALE_FACET::TIME ) }
+					},
+					"The `LOCALE_FACET` is set of possible locale facets.",
+					HHuginn::VISIBILITY::PACKAGE,
+					class_
+				),
+				"set of all possible locale facets."
 			)
 		) {
 		return;
@@ -223,6 +264,25 @@ public:
 		return ( *object_ );
 		M_EPILOG
 	}
+	static HHuginn::value_t set_locale( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		HOperatingSystem* o( static_cast<HOperatingSystem*>( object_->raw() ) );
+		HObjectFactory& of( thread_->object_factory() );
+		char const name[] = "OperatingSystem.set_locale";
+		verify_arg_count( name, values_, 2, 2, thread_, position_ );
+		verify_arg_type( name, values_, 0, o->_localeFacetClass->enumeral_class(), ARITY::MULTIPLE, thread_, position_ );
+		HHuginn::type_id_t t( verify_arg_type( name, values_, 1, types_t{ HHuginn::TYPE::STRING, HHuginn::TYPE::NONE }, ARITY::MULTIPLE, thread_, position_ ) );
+		int category( locale_facet_to_category( static_cast<LOCALE_FACET>( get_enumeral( values_[0] ) ) ) );
+		HUTF8String utf8;
+		char const* locale( nullptr );
+		if ( t == HHuginn::TYPE::STRING ) {
+			utf8.assign( get_string( values_[1] ) );
+			locale = utf8.c_str();
+		}
+		locale = setlocale( category, locale );
+		return ( locale ? of.create_string( locale ) : of.none_value() );
+		M_EPILOG
+	}
 	static HHuginn::value_t spawn( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "OperatingSystem.spawn";
@@ -303,6 +363,7 @@ HPackageCreatorInterface::HInstance HOperatingSystemCreator::do_new_instance( HR
 	HHuginn::field_definitions_t fd{
 		{ "memory_size", runtime_->create_method( &HOperatingSystem::memory_size ), "get information about system virtual memory_size size" },
 		{ "core_count",  runtime_->create_method( &HOperatingSystem::core_count ),  "get the number of CPUs in the system" },
+		{ "set_locale",  runtime_->create_method( &HOperatingSystem::set_locale ),  "( *localeFacet*, *id* ) - set *id* as new active locale facet *localeFacet*" },
 		{ "env",       runtime_->create_method( &HOperatingSystem::env ),       "( *name* ) - get value of an environment variable named *name*" },
 		{ "set_env",   runtime_->create_method( &HOperatingSystem::set_env ),   "( *name*, *value* ) - set *name* environment variable to *value* value" },
 		{ "umask",     runtime_->create_method( &HOperatingSystem::umask ),     "get value of system's umask" },
