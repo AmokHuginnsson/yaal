@@ -1182,6 +1182,7 @@ bool operator < ( char const*, HString const& );
 bool operator == ( char const*, HUTF8String const& );
 bool operator != ( char const*, HUTF8String const& );
 int stricasecmp( HString const&, HString const& );
+int collate_compare( HString const&, HString const& );
 int long icasesearch( HString const&, HString const& );
 HString to_string( char );
 HString to_string( char unsigned );

@@ -3292,6 +3292,12 @@ int stricasecmp( HString const& left_, HString const& right_ ) {
 	return ( diff ? diff : ( left_.get_size() == right_.get_size() ? 0 : ( left_.get_size() < right_.get_size() ? -1 : 1 ) ) );
 }
 
+int collate_compare( HString const& left_, HString const& right_ ) {
+	HUTF8String left( left_ );
+	HUTF8String right( right_ );
+	return ( strcoll( left.c_str(), right.c_str() ) );
+}
+
 }
 
 }
