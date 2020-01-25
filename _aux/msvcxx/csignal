@@ -65,7 +65,7 @@ int sigaction( int, struct sigaction*, void* );
 int sigemptyset( sigset_t* );
 int sigfillset( sigset_t* );
 int kill( int, int );
-int pthread_sigmask( int, sigset_t const*, void* );
+int pthread_sigmask( int, sigset_t const*, sigset_t* );
 int sigprocmask( int, sigset_t const*, sigset_t* );
 char const* strsignal( int );
 

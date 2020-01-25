@@ -513,7 +513,12 @@ void exec( yaal::hcore::HString const& image_, argv_t const& args_ ) {
 		argvDataHolder.emplace_back( string_to_bytes( args_[i] ) );
 		argv[i] = const_cast<char*>( argvDataHolder.back().data() );
 	}
+	sigset_t all;
+	sigset_t old;
+	M_ENSURE( ::sigfillset( &all ) == 0 );
+	M_ENSURE( ::sigprocmask( SIG_UNBLOCK, &all, &old ) == 0 );
 	::execvp( image.data(), argv );
+	M_ENSURE( ::sigprocmask( SIG_SETMASK, &old, nullptr ) == 0 );
 	throw HRuntimeException( "exec: `"_ys.append( image_ ).append( "`: " ).append( strerror( errno ) ) );
 	M_EPILOG
 }

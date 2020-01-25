@@ -309,7 +309,14 @@ int sigaction( int signo, struct sigaction* sa_, void* ) {
 	return ( 0 );
 }
 
-int pthread_sigmask( int how_, sigset_t const* set_, void* ) {
+int pthread_sigmask( int how_, sigset_t const* set_, sigset_t* old_ ) {
+	if ( old_ ) {
+		if ( _signalDispatcher_.is_started() ) {
+			*old_ = _tlsSignalsSetup_->get_mask();
+		} else {
+			*old_ = _signalDispatcher_.get_mask();
+		}
+	}
 	if ( sigismember( set_, SIGALRM ) ) {
 		if ( _signalDispatcher_.is_started() ) {
 			_tlsSignalsSetup_->set_mask( how_, set_ );
@@ -320,8 +327,8 @@ int pthread_sigmask( int how_, sigset_t const* set_, void* ) {
 	return ( 0 );
 }
 
-int sigprocmask( int how_, sigset_t const* set_, sigset_t* ) {
-	return ( pthread_sigmask( how_, set_, nullptr ) );
+int sigprocmask( int how_, sigset_t const* set_, sigset_t* old_ ) {
+	return ( pthread_sigmask( how_, set_, old_ ) );
 }
 
 char const* strsignal( int signum_ ) {
