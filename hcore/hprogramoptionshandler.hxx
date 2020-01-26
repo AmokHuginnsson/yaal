@@ -56,6 +56,7 @@ public:
 		setter_t _setter;
 		getter_t _getter;
 		TYPE _recipientType;
+		bool _verbatim;
 		u64_t _valueId;
 	public:
 		HOption( void );
@@ -72,6 +73,8 @@ public:
 		HOption& argument_name( yaal::hcore::HString const& );
 		yaal::hcore::HString const& default_value( void ) const;
 		HOption& default_value( yaal::hcore::HString const& );
+		bool verbatim( void ) const;
+		HOption& verbatim( bool );
 		HOption& setter( setter_t const& );
 		HOption& setter( setter_t::function_t const& setter_ ) {
 			return ( setter( setter_t( setter_ ) ) );

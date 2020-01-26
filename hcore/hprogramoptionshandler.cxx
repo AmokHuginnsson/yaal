@@ -242,6 +242,7 @@ HProgramOptionsHandler::HOption::HOption( void )
 	, _setter()
 	, _getter()
 	, _recipientType( TYPE::UNKNOWN )
+	, _verbatim( false )
 	, _valueId( 0 ) {
 	return;
 }
@@ -256,6 +257,7 @@ HProgramOptionsHandler::HOption::HOption( HProgramOptionsHandler::HOption const&
 	, _setter( o._setter )
 	, _getter( o._getter )
 	, _recipientType( o._recipientType )
+	, _verbatim( o._verbatim )
 	, _valueId( o._valueId ) {
 	return;
 }
@@ -283,6 +285,7 @@ void HProgramOptionsHandler::HOption::swap( HProgramOptionsHandler::HOption& o )
 		swap( _setter, o._setter );
 		swap( _getter, o._getter );
 		swap( _recipientType, o._recipientType );
+		swap( _verbatim, o._verbatim );
 		swap( _valueId, o._valueId );
 	}
 	return;
@@ -391,6 +394,15 @@ HProgramOptionsHandler::HOption& HProgramOptionsHandler::HOption::default_value(
 	_defaultValue = defaultValue_;
 	return ( *this );
 	M_EPILOG
+}
+
+bool HProgramOptionsHandler::HOption::verbatim( void ) const {
+	return ( _verbatim );
+}
+
+HProgramOptionsHandler::HOption& HProgramOptionsHandler::HOption::verbatim( bool verbatim_ ) {
+	_verbatim = verbatim_;
+	return ( *this );
 }
 
 HProgramOptionsHandler::HProgramOptionsHandler( yaal::hcore::HString const& projectName_, yaal::hcore::HString const& sysconfDir_ )
@@ -659,7 +671,9 @@ bool read_rc_line( HString& option_, HString& value_, HFile& file_, int& line_ )
 void HProgramOptionsHandler::set_option( HOption& option_, HString const& value_ ) {
 	M_PROLOG
 	HString value( value_ );
-	substitute_environment( value, ENV_SUBST_MODE::RECURSIVE );
+	if ( ! option_.verbatim() ) {
+		substitute_environment( value, ENV_SUBST_MODE::RECURSIVE );
+	}
 	if ( _debugLevel_ >= DEBUG_LEVEL::DEBUG_MESSAGES ) {
 		HString name;
 		if ( ! option_.long_form().is_empty() ) {
