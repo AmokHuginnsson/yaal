@@ -310,13 +310,18 @@ yaal::hcore::HString get_env_var_val( yaal::hcore::HString const& envVarRef_ ) {
 	HString name( envVarRef_.substr( 2, envVarRef_.get_length() - 3 ) );
 	HString::size_type modIdx( name.find( ':'_ycp ) );
 	HString option;
+	bool defaultValue( false );
+	bool alternativeValue( false );
 	while ( modIdx != HString::npos ) {
 		option = name.substr( modIdx  + 1 );
 		name.erase( modIdx );
 		if ( option.is_empty() ) {
 			break;
 		}
-		if ( option.front() == '-' ) {
+		code_point_t optionFront( option.front() );
+		defaultValue = ( optionFront == '-' );
+		alternativeValue = ( optionFront == '+' );
+		if ( defaultValue || alternativeValue ) {
 			option.shift_left( 1 );
 		} else {
 			option.clear();
@@ -325,7 +330,11 @@ yaal::hcore::HString get_env_var_val( yaal::hcore::HString const& envVarRef_ ) {
 	}
 	HUTF8String utf8( name );
 	char const* envVal = ::getenv( utf8.c_str() );
-	return ( envVal ? envVal : option );
+	return (
+		envVal
+			? ( alternativeValue ? option : envVal )
+			: ( defaultValue ? option : "" )
+	);
 	M_EPILOG
 }
 
