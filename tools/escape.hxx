@@ -30,6 +30,8 @@ yaal::hcore::HString unescape_copy( yaal::hcore::HString, EscapeTable const&, ya
 typedef yaal::hcore::HArray<yaal::code_point_t> escape_mask_map_t;
 void mask_escape( yaal::hcore::HString&, escape_mask_map_t&, yaal::code_point_t = '\\'_ycp );
 void unmask_escape( yaal::hcore::HString&, escape_mask_map_t const&, yaal::code_point_t = '\\'_ycp );
+void hide( yaal::hcore::HString&, yaal::hcore::HString const& );
+void unhide( yaal::hcore::HString&, yaal::hcore::HString const& );
 
 }
 

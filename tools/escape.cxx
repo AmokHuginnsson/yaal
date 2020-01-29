@@ -272,6 +272,37 @@ void unmask_escape( yaal::hcore::HString& string_, escape_mask_map_t const& esca
 	M_EPILOG
 }
 
+namespace {
+
+yaal::hcore::HString make_shroud( yaal::hcore::HString const& pattern_ ) {
+	M_PROLOG
+	HString shroud;
+	for ( code_point_t c : pattern_ ) {
+		shroud.push_back( code_point_t( c.get() + unicode::CODE_POINT::SUPPLEMENTARY_PRIVATE_USE_AREA_A ) );
+	}
+	return ( shroud );
+	M_EPILOG
+}
+
+}
+
+void hide( yaal::hcore::HString& string_, yaal::hcore::HString const& pattern_ ) {
+	M_PROLOG
+	util::escape_mask_map_t emm;
+	mask_escape( string_, emm );
+	string_.replace( pattern_, make_shroud( pattern_ ) );
+	unmask_escape( string_, emm );
+	return;
+	M_EPILOG
+}
+
+void unhide( yaal::hcore::HString& string_, yaal::hcore::HString const& pattern_ ) {
+	M_PROLOG
+	string_.replace( make_shroud( pattern_ ), pattern_ );
+	return;
+	M_EPILOG
+}
+
 }
 
 }
