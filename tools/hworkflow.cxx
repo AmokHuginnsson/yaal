@@ -171,12 +171,17 @@ void HWorkFlow::start_task( call_t task_, call_t asyncStop_, want_restart_t want
 	if ( _state != STATE::RUNNING ) {
 		throw HWorkFlowException( "Cannot start new task now." );
 	}
-	worker_t w( make_resource<HWorker>( this ) );
 	task_t t( make_resource<HTask>( task_, asyncStop_, wantRestart_ ) );
-	w->spawn( yaal::move( t ) );
-	_workers.emplace_back( yaal::move( w ) );
-	++ _busyWorkers;
-	++ _workerPoolSize;
+	if ( ( _busyWorkers + _tasks.get_size() ) >= _workers.get_size() ) {
+		worker_t w( make_resource<HWorker>( this ) );
+		w->spawn( yaal::move( t ) );
+		_workers.emplace_back( yaal::move( w ) );
+		++ _busyWorkers;
+		++ _workerPoolSize;
+	} else {
+		_tasks.emplace_back( yaal::move( t ) );
+		_semaphore.signal();
+	}
 	return;
 	M_EPILOG
 }
