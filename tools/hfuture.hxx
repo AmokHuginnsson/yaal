@@ -6,7 +6,7 @@
 #ifndef YAAL_TOOLS_HFUTURE_HXX_INCLUDED
 #define YAAL_TOOLS_HFUTURE_HXX_INCLUDED 1
 
-#include "tools/hasynccaller.hxx"
+#include "tools/hthreadpool.hxx"
 
 namespace yaal {
 
@@ -39,14 +39,14 @@ private:
 	return_type _return;
 	bool _finished;
 public:
-	HFuture( call_t const& call_ )
+	HFuture( call_t const& call_, HWorkFlow::SCHEDULE_POLICY schedulePolicy_ = HWorkFlow::SCHEDULE_POLICY::LAZY )
 		: _call( call_ )
 		, _mutex()
 		, _condVar( _mutex )
 		, _return()
 		, _finished( false ) {
 		M_PROLOG
-		HAsyncCaller::get_instance().register_call( 0, yaal::hcore::call( &this_type::execute, this ) );
+		HThreadPool::get_instance().schedule_task( schedulePolicy_, yaal::hcore::call( &this_type::execute, this ) );
 		return;
 		M_EPILOG
 	}
