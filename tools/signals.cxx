@@ -148,7 +148,8 @@ HSignalService::HSignalService( void )
 	register_handler( SIGSYS, fatal );
 	catch_signal( SIGPIPE );
 	block_signal( SIGALRM );
-	HThreadPool::get_instance().start_task(
+	HThreadPool::get_instance().schedule_task(
+		HWorkFlow::SCHEDULE_POLICY::EAGER,
 		call( &HSignalService::run, this ),
 		call( &HSignalService::stop, this ),
 		call( &HSignalService::want_restart, this )

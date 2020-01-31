@@ -22,7 +22,8 @@ HAsyncCaller::HAsyncCaller( void )
 	M_PROLOG
 	HThreadPool& tp( HThreadPool::get_instance() );
 	for ( int i( 0 ); i < system::get_core_count_info(); ++ i ) {
-		tp.start_task(
+		tp.schedule_task(
+			HWorkFlow::SCHEDULE_POLICY::EAGER,
 			call( &HAsyncCaller::run, this ),
 			call( &HAsyncCaller::stop, this ),
 			call( &HAsyncCaller::want_restart, this )

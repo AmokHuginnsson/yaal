@@ -23,7 +23,8 @@ HScheduledAsyncCaller::HScheduledAsyncCaller( void )
 	, _condition( _mutex )
 	, _loop( true ) {
 	M_PROLOG
-	HThreadPool::get_instance().start_task(
+	HThreadPool::get_instance().schedule_task(
+		HWorkFlow::SCHEDULE_POLICY::EAGER,
 		call( &HScheduledAsyncCaller::run, this ),
 		call( &HScheduledAsyncCaller::stop, this ),
 		call( &HScheduledAsyncCaller::want_restart, this )

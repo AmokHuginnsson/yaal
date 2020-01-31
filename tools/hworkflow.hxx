@@ -28,6 +28,7 @@ public:
 	 */
 	typedef yaal::hcore::HBoundCall<> call_t;
 	typedef yaal::hcore::HBoundCall<bool()> want_restart_t; /*!< Callable type to represent means for inquiring task if it should be restarted. */
+
 	/*! \brief Current state of HWorkFlow.
 	 */
 	enum class STATE {
@@ -39,6 +40,7 @@ public:
 		CLOSING,      /*!< This HWorkFlow is currently being stopped but new tasks are rejected. */
 		CLOSED        /*!< This HWorkFlow is stopped now, new tasks are rejected. */
 	};
+
 	/*! \brief Mode for winding up HWorkFlow.
 	 */
 	enum class WINDUP_MODE {
@@ -46,6 +48,13 @@ public:
 		INTERRUPT, /*!< Interrupt currently running tasks, keep scheduled tasks, new tasks can be scheduled. _state -> INTERRUPTING */
 		SUSPEND,   /*!< Finish currently running tasks normally, new tasks can be scheduled. _state -> STOPPING */
 		CLOSE      /*!< Finish currently running tasks normally, new tasks are rejected. _state -> STOPPING */
+	};
+
+	/*! \brief Schedule policy for new tasks.
+	 */
+	enum class SCHEDULE_POLICY {
+		EAGER, /*!< Start execution of a task immediately even if new thread needs to be started to do so. */
+		LAZY   /*!< Start execution of a task when some existing worker thread becomes available. */
 	};
 
 private:
@@ -79,19 +88,12 @@ public:
 
 	/*! \brief Schedule execution of task in this worker pool.
 	 *
+	 * \param schedulePolicy - a schedule policy used for staring this task.
 	 * \param task - task to execute by this worker pool.
 	 * \param asyncStop - how to notify executing task that it should stop its execution.
 	 * \param wantRestart - test telling if task should be restarted if stopped by asyncStop.
 	 */
-	void schedule_task( call_t task, call_t asyncStop = call_t(), want_restart_t wantRestart = want_restart_t() );
-
-	/*! \brief Immediately start execution of given task in this worker pool.
-	 *
-	 * \param task - task to execute by this worker pool.
-	 * \param asyncStop - how to notify executing task that it should stop its execution.
-	 * \param wantRestart - test telling if task should be restarted if stopped by asyncStop.
-	 */
-	void start_task( call_t task, call_t asyncStop = call_t(), want_restart_t wantRestart = want_restart_t() );
+	void schedule_task( SCHEDULE_POLICY schedulePolicy, call_t task, call_t asyncStop = call_t(), want_restart_t wantRestart = want_restart_t() );
 
 	/*! \brief Cancel scheduled tasks.
 	 *
@@ -143,6 +145,8 @@ private:
 	 * \return Next task to be executer or task_t(nullptr) for no more tasks.
 	 */
 	task_t pop_task( void );
+	void add_task_eager( call_t, call_t, want_restart_t );
+	void add_task_lazy( call_t, call_t, want_restart_t );
 	HWorkFlow( HWorkFlow const& ) = delete;
 	HWorkFlow& operator = ( HWorkFlow const& ) = delete;
 	friend class HWorker;

@@ -141,7 +141,21 @@ HWorkFlow::~HWorkFlow( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
-void HWorkFlow::schedule_task( call_t task_, call_t asyncStop_, want_restart_t wantRestart_ ) {
+void HWorkFlow::schedule_task( SCHEDULE_POLICY schedulePolicy_, call_t task_, call_t asyncStop_, want_restart_t wantRestart_ ) {
+	M_PROLOG
+	switch ( schedulePolicy_ ) {
+		case ( SCHEDULE_POLICY::EAGER ): {
+			add_task_eager( task_, asyncStop_, wantRestart_ );
+		} break;
+		case ( SCHEDULE_POLICY::LAZY ): {
+			add_task_lazy( task_, asyncStop_, wantRestart_ );
+		} break;
+	}
+	return;
+	M_EPILOG
+}
+
+void HWorkFlow::add_task_lazy( call_t task_, call_t asyncStop_, want_restart_t wantRestart_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	int activeWorkers( static_cast<int>( _workers.get_size() ) );
@@ -164,7 +178,7 @@ void HWorkFlow::schedule_task( call_t task_, call_t asyncStop_, want_restart_t w
 	M_EPILOG
 }
 
-void HWorkFlow::start_task( call_t task_, call_t asyncStop_, want_restart_t wantRestart_ ) {
+void HWorkFlow::add_task_eager( call_t task_, call_t asyncStop_, want_restart_t wantRestart_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	M_ASSERT( _busyWorkers <= static_cast<int>( _workers.get_size() ) );
