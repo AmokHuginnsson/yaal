@@ -408,7 +408,15 @@ void set_close_on_exec( int fd_ ) {
 yaal::hcore::HString home_path( void ) {
 	char const* const homePath( ::getenv( HOME_ENV_VAR ) );
 	if ( homePath ) {
-		return ( homePath );
+		HString hp;
+#ifdef __HOST_OS_TYPE_WINDOWS__
+		char const* const homeDrive( ::getenv( "HOMEDRIVE" ) );
+		if ( homeDrive ) {
+			hp.assign( homeDrive );
+		}
+#endif
+		hp.append( homePath );
+		return ( hp );
 	}
 	char const* loginFromEnv( ::getenv( "LOGIN" ) );
 	if ( ! loginFromEnv ) {

@@ -84,6 +84,11 @@ path_t current_working_directory( void ) {
 
 bool is_absolute( path_t const& path_ ) {
 	M_PROLOG
+#ifdef __HOST_OS_TYPE_WINDOWS__
+	if ( ( path_.get_length() > 1 ) && is_letter( path_.front() ) && ( path_[1] == ':' ) ) {
+		return ( true );
+	}
+#endif
 	return ( ! path_.is_empty() && ( path_.front() == path::ROOT.front() ) );
 	M_EPILOG
 }
