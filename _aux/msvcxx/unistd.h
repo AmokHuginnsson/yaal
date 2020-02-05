@@ -12,6 +12,10 @@
 #include <direct.h>
 #include <libintl.h>
 
+#if _MSC_VER >= 1920
+#include <emmintrin.h>
+#endif
+
 #define _SYS_SOCKET_H 1
 #define _STRUCT_TIMEVAL 1
 #undef EDEADLOCK

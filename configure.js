@@ -17,6 +17,14 @@ var ForWriting = 2;
 var ForAppending = 8;
 var FAST = -1;
 
+String.prototype.trim = function() {
+	return ( this.replace( /^\s+|\s+$/g, '' ) );
+}
+
+String.prototype.endsWith = function( target ) {
+	return ( this.slice( - target.length ) == target );
+}
+
 function checkKey( key ) {
 	var has = false;
 	var value;
@@ -109,6 +117,15 @@ function boostInfo( install_path ) {
 }
 
 function vcVersion() {
+	try {
+		var vswhere = "c:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vswhere.exe";
+		var cmd = shell.exec( vswhere + " -latest -property catalog_productName" );
+		var version = cmd.stdout.readAll().trim().concat( " " );
+		var cmd = shell.exec( vswhere + " -latest -property installationVersion" );
+		version += cmd.stdout.readAll().split( "." )[0];
+		return ( version );
+	} catch ( ex ) {
+	}
 	var versions = [
 		[ "Wow6432Node\\", "14.0", "Visual Studio 14" ],
 		[ "", "14.0", "Visual Studio 14" ]
@@ -319,24 +336,26 @@ try {
 
 		if ( ! boostInfo.exists ) {
 			msg( "Cannot locate boost installation (havent you used BoostPro?)!" );
-			terminate( 1 );
+		} else {
+			BOOST_VERSION = boostInfo.version.vc
+				+ "-" + boostInfo.version.thread
+				+ "-" + boostInfo.version.target
+				+ "-" + boostInfo.version.lib;
+
+			eol = boostInfo.installPath.charAt( boostInfo.installPath.length - 1 );
+			if ( ( eol != "\\" ) && ( eol != "/" ) ) {
+				boostInfo.installPath += "/";
+			}
+			boostInfo.installPath = boostInfo.installPath.replace( /\\/gm, "/" );
+
+			msg( makeBoostDesc( boostInfo ) );
 		}
-
-		BOOST_VERSION = boostInfo.version.vc
-			+ "-" + boostInfo.version.thread
-			+ "-" + boostInfo.version.target
-			+ "-" + boostInfo.version.lib;
-
-		eol = boostInfo.installPath.charAt( boostInfo.installPath.length - 1 );
-		if ( ( eol != "\\" ) && ( eol != "/" ) ) {
-			boostInfo.installPath += "/";
-		}
-		boostInfo.installPath = boostInfo.installPath.replace( /\\/gm, "/" );
-
-		msg( makeBoostDesc( boostInfo ) );
 	}
 
 	var cmdline = "cmake -G \"" + VISUAL_STUDIO_VERSION + "\"";
+	if ( VISUAL_STUDIO_VERSION.endsWith( " 16" ) ) {
+		cmdline += " -T host=x86 -A Win32";
+	}
 	cmdline += " -DCMAKE_BUILD_TYPE=" + BUILD_TYPE;
 	if ( BUILD_PACKAGE ) {
 		cmdline += " -DBUILD_PACKAGE=1";

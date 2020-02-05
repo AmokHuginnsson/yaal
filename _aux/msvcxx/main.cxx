@@ -696,3 +696,8 @@ int munmap( void* ptr_, size_t ) {
 	return ( UnmapViewOfFile( ptr_ ) ? 0 : -1 );
 }
 
+extern "C" double log( double );
+
+double hide_log_from_global_namespace( double v_ ) {
+	return ( ::log( v_ ) );
+}

@@ -303,6 +303,10 @@ void HPipedChild::bring_to_foreground( void ) {
 void HPipedChild::do_continue( void ) {
 	M_PROLOG
 	M_ENSURE( hcore::system::kill( _pid, SIGCONT ) == 0 );
+#ifdef __HOST_OS_TYPE_CYGWIN__
+	/* Work around for buggy child process handling in Cygwin. */
+	sleep_for( duration( 16, time::UNIT::MILLISECOND ), true );
+#endif /* #ifdef __HOST_OS_TYPE_CYGWIN__ */
 	int pid( 0 );
 	int status( 0 );
 	do {

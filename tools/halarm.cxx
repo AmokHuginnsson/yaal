@@ -91,7 +91,14 @@ HAlarm::~HAlarm( void ) {
 
 	cleanup_sigsetup( 2 );
 
-	M_ENSURE( timer_delete( *t ) == 0 );
+#ifdef __HOST_OS_TYPE_CYGWIN__
+#	define OR_CLEAN_ERRNO || ( errno == 0 )
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
+#else
+#	define OR_CLEAN_ERRNO /**/
+#endif
+	M_ENSURE( ( timer_delete( *t ) == 0 ) OR_CLEAN_ERRNO );
+#undef OR_CLEAN_ERRNO
 	return;
 	M_DESTRUCTOR_EPILOG
 }

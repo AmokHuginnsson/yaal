@@ -28,6 +28,10 @@
 /* warning LNK4221 goes bye bye */
 namespace { char dummy_symbol_to_quiet_down_LNK4221_warning = 0; };
 
+#define log hide_log_from_global_namespace
+#include <cmath>
+#undef log
+
 #else /* #ifdef __YAAL_BUILD__ */
 
 #define _restrict m_restrict0

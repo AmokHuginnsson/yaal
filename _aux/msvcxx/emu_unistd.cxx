@@ -27,7 +27,6 @@
 
 #include "tools/keycode.hxx"
 
-using namespace std;
 using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::tools;
@@ -78,8 +77,9 @@ int select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, stru
 				}
 				std::remove( readFds->_data, readFds->_data + readFds->_count, -1 );
 				readFds->_count = ret;
-				if ( writeFds )
+				if ( writeFds ) {
 					FD_ZERO( writeFds );
+				}
 				break; /* !!! Early exit. !!! */
 			}
 			std::transform( ios, ios + readFds->_count, handles, osCast );
@@ -174,7 +174,7 @@ int APIENTRY CreatePipeEx( LPHANDLE lpReadPipe,
 		nSize = 4096;
 	}
 	static int PipeSerialNumber = 0;
-	stringstream PipeName;
+	std::stringstream PipeName;
 	PipeName << "\\\\.\\Pipe\\RemoteExeAnon." << GetCurrentProcessId() << ( PipeSerialNumber ++ );
 
 	ReadPipeHandle = CreateNamedPipe(
@@ -377,12 +377,12 @@ int long recvfrom( int fd_, void* buf_, int long size_, int flags_, sockaddr* fr
 }
 
 int unix_stat( char const* path_, struct stat* s_ ) {
-	string path( path_ );
+	std::string path( path_ );
 	size_t dotLnkPos( path.rfind( ".lnk" ) );
-	bool isLink( ( dotLnkPos != string::npos ) && ( dotLnkPos == ( path.length() - 4 ) ) );
-	string::size_type lastNonSeparator( path.find_last_not_of( "/\\" ) );
+	bool isLink( ( dotLnkPos != std::string::npos ) && ( dotLnkPos == ( path.length() - 4 ) ) );
+	std::string::size_type lastNonSeparator( path.find_last_not_of( "/\\" ) );
 	int len( path.length() );
-	if ( lastNonSeparator != string::npos ) {
+	if ( lastNonSeparator != std::string::npos ) {
 		path.erase( lastNonSeparator + 1 );
 	} else {
 		path.erase( 1 );
