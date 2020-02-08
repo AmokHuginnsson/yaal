@@ -355,6 +355,8 @@ try {
 	var cmdline = "cmake -G \"" + VISUAL_STUDIO_VERSION + "\"";
 	if ( VISUAL_STUDIO_VERSION.endsWith( " 16" ) ) {
 		cmdline += " -T host=x86 -A Win32";
+	} else if ( VISUAL_STUDIO_VERSION.endsWith( " 15" ) ) {
+		cmdline += " Win32";
 	}
 	cmdline += " -DCMAKE_BUILD_TYPE=" + BUILD_TYPE;
 	if ( BUILD_PACKAGE ) {

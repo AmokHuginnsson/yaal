@@ -12,7 +12,7 @@
 #include <direct.h>
 #include <libintl.h>
 
-#if _MSC_VER >= 1920
+#if _MSC_VER >= 1910
 #include <emmintrin.h>
 #endif
 
