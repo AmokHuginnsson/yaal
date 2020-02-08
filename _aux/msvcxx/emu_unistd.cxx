@@ -384,7 +384,7 @@ int unix_stat( char const* path_, struct stat* s_ ) {
 	int len( path.length() );
 	if ( lastNonSeparator != std::string::npos ) {
 		path.erase( lastNonSeparator + 1 );
-	} else {
+	} else if ( ! path.empty() ) {
 		path.erase( 1 );
 	}
 	int res( ::stat( path.c_str(), s_ ) );
