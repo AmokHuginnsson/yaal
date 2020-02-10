@@ -376,6 +376,14 @@ int long recvfrom( int fd_, void* buf_, int long size_, int flags_, sockaddr* fr
 	);
 }
 
+inline time_t filetime_to_unix_epoch( int long long ft_ ) {
+	return ( static_cast<time_t>( ft_ / 10000000ULL - 11644473600ULL ) );
+}
+
+inline time_t filetime_to_unix_epoch( FILETIME ft_ ) {
+	return ( filetime_to_unix_epoch( ( static_cast<int long long unsigned>( ft_.dwHighDateTime ) << 32 ) + ft_.dwLowDateTime ) );
+}
+
 int unix_stat( char const* path_, struct stat* s_ ) {
 	std::string path( path_ );
 	size_t dotLnkPos( path.rfind( ".lnk" ) );
@@ -388,37 +396,46 @@ int unix_stat( char const* path_, struct stat* s_ ) {
 		path.erase( 1 );
 	}
 	int res( ::stat( path.c_str(), s_ ) );
-	if ( ! res ) {
-		if ( ( len != path.length() ) && ! ( S_IFDIR & s_->st_mode ) ) {
-			res = -1;
-			errno = ENOTDIR;
-		} else {
-			if ( isLink ) {
-				s_->st_mode &= ~TYPE_REG;
-				s_->st_mode |= TYPE_LNK;
-			}
-			owner_t owner( get_path_owner( path ) );
-			s_->st_uid = owner.first;
-			s_->st_gid = owner.second;
-			OFSTRUCT of;
-			HFILE hf( ::OpenFile( path_, &of, 0 ) );
-			if ( hf != HFILE_ERROR ) {
-				HANDLE h( reinterpret_cast<HANDLE>( hf ) );
-				BY_HANDLE_FILE_INFORMATION fi;
-				if ( ::GetFileInformationByHandle( h, &fi ) ) {
-#if SIZE_INO_T == 8
-					s_->st_ino = ( static_cast<_ino_t>( fi.nFileIndexHigh ) << 32 ) | static_cast<_ino_t>( fi.nFileIndexLow );
-#else
-					s_->st_ino = static_cast<_ino_t>( fi.nFileIndexLow );
-#endif
-				}
-				FILE_BASIC_INFO bi;
-				if ( ::GetFileInformationByHandleEx( h, FileBasicInfo, &bi, sizeof ( bi ) ) ) {
-					s_->st_ctime = static_cast<time_t>( bi.ChangeTime.QuadPart / 10000000ULL - 11644473600ULL );
-				}
-				::CloseHandle( h );
-			}
+	OFSTRUCT of;
+	HFILE hf( ::OpenFile( path_, &of, 0 ) );
+	if ( ( res != 0 ) && ( hf == HFILE_ERROR ) ) {
+		WIN32_FIND_DATA info;
+		HANDLE h( ::FindFirstFile( path_, &info ) );
+		if ( h == INVALID_HANDLE_VALUE ) {
+			return ( res );
 		}
+		s_->st_mtime = filetime_to_unix_epoch( info.ftLastWriteTime );
+		s_->st_ctime = filetime_to_unix_epoch( info.ftCreationTime );
+		s_->st_atime = filetime_to_unix_epoch( info.ftLastAccessTime );
+		s_->st_size = ( static_cast<int long long>( info.nFileSizeHigh ) << 32 ) + info.nFileSizeLow;
+		::FindClose( h );
+		return ( 0 );
+	}
+	HANDLE h( reinterpret_cast<HANDLE>( hf ) );
+	BY_HANDLE_FILE_INFORMATION fi;
+	if ( ::GetFileInformationByHandle( h, &fi ) ) {
+#if SIZE_INO_T == 8
+		s_->st_ino = ( static_cast<_ino_t>( fi.nFileIndexHigh ) << 32 ) | static_cast<_ino_t>( fi.nFileIndexLow );
+#else
+		s_->st_ino = static_cast<_ino_t>( fi.nFileIndexLow );
+#endif
+	}
+	FILE_BASIC_INFO bi;
+	if ( ::GetFileInformationByHandleEx( h, FileBasicInfo, &bi, sizeof ( bi ) ) ) {
+		s_->st_ctime = filetime_to_unix_epoch( bi.ChangeTime.QuadPart );
+	}
+	::CloseHandle( h );
+	if ( ( len != path.length() ) && ! ( S_IFDIR & s_->st_mode ) ) {
+		res = -1;
+		errno = ENOTDIR;
+	} else {
+		if ( isLink ) {
+			s_->st_mode &= ~TYPE_REG;
+			s_->st_mode |= TYPE_LNK;
+		}
+		owner_t owner( get_path_owner( path ) );
+		s_->st_uid = owner.first;
+		s_->st_gid = owner.second;
 	}
 	return ( res );
 }

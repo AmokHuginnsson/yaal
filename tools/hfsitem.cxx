@@ -319,14 +319,20 @@ HFSItem::HIterator& HFSItem::HIterator::operator++( void ) {
 
 void HFSItem::HIterator::update( void ) {
 	M_PROLOG
-	_item.set_path( _path + "/" + _name, static_cast<int>( _name.get_length() ) );
+	HString path( _path );
+	if ( path != "/" ) {
+		path.append( "/" );
+	}
+	path.append( _name );
+	_item.set_path( path, static_cast<int>( _name.get_length() ) );
 	return;
 	M_EPILOG
 }
 
 void HFSItem::HIterator::cleanup( void ) {
-	if ( _dir )
+	if ( _dir ) {
 		closedir( static_cast<DIR*>( _dir ) );
+	}
 	_dir = nullptr;
 	_path = "";
 	return;

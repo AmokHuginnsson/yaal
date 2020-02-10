@@ -188,6 +188,9 @@ struct DIR {
 DIR* opendir( char const* path_ ) {
 	WIN32_FIND_DATA d;
 	HString path( path_ );
+	if ( path == "/" ) {
+		path.clear();
+	}
 	path.append( "/*" );
 	HUTF8String utf8( path );
 	HANDLE h( ::FindFirstFile( utf8.c_str(), &d ) );
