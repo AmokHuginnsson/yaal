@@ -406,6 +406,8 @@ bool is_a_tty( HStreamInterface const& stream_ ) {
 		isTty = ::isatty( STDERR_FILENO ) ? true : false;
 	} else if ( &stream_ == &cin ) {
 		isTty = ::isatty( STDIN_FILENO ) ? true : false;
+	} else if ( stream_.poll_type() == HStreamInterface::POLL_TYPE::NATIVE ) {
+		isTty = ::isatty( static_cast<int>( reinterpret_cast<int_native_t>( stream_.data() ) ) ) ? true : false;
 	}
 	return ( isTty );
 }
