@@ -31,6 +31,7 @@ struct RC_PATHER {
 		ETC_PRJNAME,
 		ETC_CONF,
 		ETC,
+		BY_EXEC,
 		ENV,
 		HOME_ETC_PRJNAME,
 		HOME_ETC_CONF,
@@ -66,6 +67,16 @@ HString make_path( HString const& sysconfDir_, HString const& rcName_, RC_PATHER
 				.append( rcName_ );
 			if ( placement_ == RC_PATHER::PLACEMENT::ETC_PRJNAME ) {
 				rcPath.append( "/" );
+			}
+			rcPath.append( RC );
+		} break;
+		case ( RC_PATHER::PLACEMENT::BY_EXEC ): {
+			rcPath.assign( system::get_self_exec_path() ).replace( "\\", "/" );
+			HString::size_type sepPos( rcPath.find_last( '/'_ycp ) );
+			if ( sepPos != HString::npos ) {
+				rcPath.erase( sepPos + 1 ).append( rcName_ );
+			} else {
+				rcPath.assign( rcName_ );
 			}
 			rcPath.append( RC );
 		} break;
@@ -425,6 +436,7 @@ int HProgramOptionsHandler::process_rc_file( HString const& section_, RC_CALLBAC
 		{ RC_PATHER::PLACEMENT::ETC_PRJNAME, RC_PATHER::PHASE::GLOBAL },
 		{ RC_PATHER::PLACEMENT::ETC_CONF, RC_PATHER::PHASE::GLOBAL },
 		{ RC_PATHER::PLACEMENT::ETC, RC_PATHER::PHASE::GLOBAL },
+		{ RC_PATHER::PLACEMENT::BY_EXEC, RC_PATHER::PHASE::GLOBAL },
 		{ RC_PATHER::PLACEMENT::ENV, RC_PATHER::PHASE::USER },
 		{ RC_PATHER::PLACEMENT::HOME_ETC_PRJNAME, RC_PATHER::PHASE::USER },
 		{ RC_PATHER::PLACEMENT::HOME_ETC_CONF, RC_PATHER::PHASE::USER },
