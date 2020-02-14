@@ -103,75 +103,75 @@ dnl --------------------------------------------------------------------------
 AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 	AC_MSG_CHECKING([host operating system])
 	AC_CANONICAL_HOST
-	HOST_OS_TYPE=""
-	UNAME_OS_NAME=["`uname -s | sed -e 's/[^a-zA-Z].*//g'`"]
+	HOST_OS_VENDOR=""
+	HOST_OS_TYPE=["`uname -s | sed -e 's/[^a-zA-Z].*//g'`"]
 	LIB_PREFIX=["lib"]
 	LIB_EXT=["so"]
 	EXE_SUFFIX=[""]
 	HOME_ENV_VAR=['"HOME"']
 	SYMBOL_PREFIX=['""']
-	if test ["x${UNAME_OS_NAME}"] = ["xLinux"] ; then
+	if test ["x${HOST_OS_TYPE}"] = ["xLinux"] ; then
 		AC_SUBST([SERIAL_DEVICE],['ttyS0'])
 		AC_CHECK_PROG([LINUX_DISTRO],[lsb_release],[yes])
 		if test ["x${LINUX_DISTRO}"] = ["xyes"] ; then
-			HOST_OS_TYPE=`lsb_release -si`
+			HOST_OS_VENDOR=`lsb_release -si`
 			HOST_INFO=`lsb_release -sd | sed -e 's/^[["[:space:]]]*//' -e 's/[["[:space:]]]*$//'`
 		fi
 		AC_DEFINE([__HOST_OS_TYPE_LINUX__], [], [Your operating system is Linux.])
 		YAAL_LXXFLAGS=["-Wl,--entry=\"${PACKAGE_NAME}_\$(*)_main\""]
-		if test ["x${HOST_OS_TYPE}"] = ["xDebian"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/debconf.conf] \) ; then
+		if test ["x${HOST_OS_VENDOR}"] = ["xDebian"] -o \( ["x${HOST_OS_VENDOR}"] = ["x"] -a -f [/etc/debconf.conf] \) ; then
 			AC_DEFINE([__HOST_OS_TYPE_DEBIAN__], [], [Your specific Linux version is Debian.])
-			HOST_OS_TYPE=[Debian]
-		elif test ["x${HOST_OS_TYPE}"] = ["xUbuntu"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/00-header] \) ; then
+			HOST_OS_VENDOR=[Debian]
+		elif test ["x${HOST_OS_VENDOR}"] = ["xUbuntu"] -o ["x${HOST_OS_VENDOR}"] = ["xLinuxMint"] -o \( ["x${HOST_OS_VENDOR}"] = ["x"] -a -f [/etc/00-header] \) ; then
 			AC_DEFINE([__HOST_OS_TYPE_UBUNTU__], [], [Your specific Linux version is Ubuntu.])
-			HOST_OS_TYPE=[Ubuntu]
-		elif test ["x${HOST_OS_TYPE}"] = ["xCentOS"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/yum.repos.d/CentOS-Base.repo] \) ; then
+			HOST_OS_VENDOR=[Ubuntu]
+		elif test ["x${HOST_OS_VENDOR}"] = ["xCentOS"] -o \( ["x${HOST_OS_VENDOR}"] = ["x"] -a -f [/etc/yum.repos.d/CentOS-Base.repo] \) ; then
 			AC_DEFINE([__HOST_OS_TYPE_CENTOS__], [], [Your specific Linux version is CentOS.])
-			HOST_OS_TYPE=[CentOS]
-		elif test ["x${HOST_OS_TYPE}"] = ["xFedora"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/yum.repos.d/CentOS-Base.repo] \) ; then
+			HOST_OS_VENDOR=[CentOS]
+		elif test ["x${HOST_OS_VENDOR}"] = ["xFedora"] -o \( ["x${HOST_OS_VENDOR}"] = ["x"] -a -f [/etc/yum.repos.d/CentOS-Base.repo] \) ; then
 			AC_DEFINE([__HOST_OS_TYPE_FEDORA__], [], [Your specific Linux version is Fedora.])
-			HOST_OS_TYPE=[CentOS]
-		elif test ["x${HOST_OS_TYPE}"] = ["xRaspbian"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/rpi-issue] \) ; then
+			HOST_OS_VENDOR=[CentOS]
+		elif test ["x${HOST_OS_VENDOR}"] = ["xRaspbian"] -o \( ["x${HOST_OS_VENDOR}"] = ["x"] -a -f [/etc/rpi-issue] \) ; then
 			AC_DEFINE([__HOST_OS_TYPE_RASPBIAN__], [], [Your specific Linux version is Raspbian.])
-			HOST_OS_TYPE=[Raspbian]
-		elif test ["x${HOST_OS_TYPE}"] = ["xPLD"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/poldek/poldek.conf] \) ; then
+			HOST_OS_VENDOR=[Raspbian]
+		elif test ["x${HOST_OS_VENDOR}"] = ["xPLD"] -o \( ["x${HOST_OS_VENDOR}"] = ["x"] -a -f [/etc/poldek/poldek.conf] \) ; then
 			AC_DEFINE([__HOST_OS_TYPE_PLD__], [], [Your specific Linux version is PLD.])
-			HOST_OS_TYPE=[PLD]
-		elif test ["x${HOST_OS_TYPE}"] = ["xSlackware"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/random-seed] \) ; then
+			HOST_OS_VENDOR=[PLD]
+		elif test ["x${HOST_OS_VENDOR}"] = ["xSlackware"] -o \( ["x${HOST_OS_VENDOR}"] = ["x"] -a -f [/etc/random-seed] \) ; then
 			AC_DEFINE([__HOST_OS_TYPE_SLACKWARE__], [], [Your specific Linux version is Slackware.])
-			HOST_OS_TYPE=[Slackware]
+			HOST_OS_VENDOR=[Slackware]
 		else
-			HOST_OS_TYPE=[Linux]
+			HOST_OS_VENDOR=[Unknown]
 		fi
-	elif test ["x${UNAME_OS_NAME}"] = ["xFreeBSD"] ; then
+	elif test ["x${HOST_OS_TYPE}"] = ["xFreeBSD"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_FREEBSD__], [], [Your operating system is FreeBSD.])
-		HOST_OS_TYPE=[FreeBSD]
-		HOST_INFO="${UNAME_OS_NAME} `freebsd-version`"
+		HOST_OS_VENDOR=[FreeBSD]
+		HOST_INFO="${HOST_OS_TYPE} `freebsd-version`"
 		EXTRA_INCLUDE_PATHS=["${EXTRA_INCLUDE_PATHS} -I/usr/local/include"]
 		EXTRA_LIBRARY_PATHS=["${EXTRA_LIBRARY_PATHS} -L/usr/local/lib"]
-	elif test ["x${UNAME_OS_NAME}"] = ["xSunOS"] ; then
+	elif test ["x${HOST_OS_TYPE}"] = ["xSunOS"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_SOLARIS__], [], [Your operating system is Solaris.])
-		HOST_OS_TYPE=[Solaris]
-		HOST_INFO="${UNAME_OS_NAME} `head -1 /etc/release`"
+		HOST_OS_VENDOR=[Oracle]
+		HOST_INFO="${HOST_OS_TYPE} `head -1 /etc/release`"
 		EXTRA_LIBRARY_PATHS=["${EXTRA_LIBRARY_PATHS} -L/usr/local/lib -L/usr/gnu/lib/amd64 -L/usr/gnu/lib"]
-	elif test ["x${UNAME_OS_NAME}"] = ["xDarwin"] ; then
+	elif test ["x${HOST_OS_TYPE}"] = ["xDarwin"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_DARWIN__], [], [Your operating system is Darwin.])
-		HOST_OS_TYPE=[Darwin]
+		HOST_OS_VENDOR=[Apple]
 		HOST_INFO="`sw_vers -productName` `sw_vers -productVersion`"
 		YAAL_LXXFLAGS=["${YAAL_LXXFLAGS} -Wl,-undefined,dynamic_lookup"]
 		EXTRA_INCLUDE_PATHS="-isystem /opt/local/include ${EXTRA_INCLUDE_PATHS}"
 		EXTRA_LIBRARY_PATHS=["${EXTRA_LIBRARY_PATHS} -L/opt/local/lib"]
 		LIB_EXT=["dylib"]
-	elif test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/tizen-release] ; then
+	elif test ["x${HOST_OS_VENDOR}"] = ["x"] -a -f [/etc/tizen-release] ; then
 		AC_DEFINE([__HOST_OS_TYPE_TIZEN__], [], [Your operating system is Tizen.])
-		HOST_OS_TYPE=[Tizen]
+		HOST_OS_VENDOR=[Tizen]
 		HOST_INFO="Tizen"
-	elif test ["x${UNAME_OS_NAME}"] = ["xCYGWIN"] ; then
+	elif test ["x${HOST_OS_TYPE}"] = ["xCYGWIN"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_CYGWIN__], [], [Your operating system is Cygwin.])
 		EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -D_GNU_SOURCE -U__STRICT_ANSI__"]
 		YAAL_LXXFLAGS=["${YAAL_LXXFLAGS} -Wl,--export-all-symbols -Wl,--enable-auto-import -Wl,--out-implib=lib\$(*)\$(LIB_INFIX).\$(LIB_ARCHIVE_SUFFIX)"]
-		HOST_OS_TYPE=[Cygwin]
-		HOST_INFO="${UNAME_OS_NAME} `uname -r`"
+		HOST_OS_VENDOR=[Cygwin]
+		HOST_INFO="${HOST_OS_TYPE} `uname -r`"
 		LIB_PREFIX=["cyg"]
 		LIB_EXT=["dll"]
 		HCORE_LIBS=["${HCORE_LIBS} -liconv"]
@@ -183,14 +183,16 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 	AC_DEFINE_UNQUOTED([EXE_SUFFIX],${EXE_SUFFIX},[Suffix used for binary program executable on this platform.])
 	AC_DEFINE_UNQUOTED([HOME_ENV_VAR],${HOME_ENV_VAR},[Name of environment variable used to point to user home directory.])
 	AC_SUBST([LIB_EXT],[${LIB_EXT}])
-	AC_SUBST([UNAME_OS_NAME],[${UNAME_OS_NAME}])
 	AC_SUBST([HOST_OS_TYPE],[${HOST_OS_TYPE}])
-	AC_DEFINE_UNQUOTED([HOST_INFO],"${HOST_INFO}",[Target host information string.])
+	AC_SUBST([HOST_OS_VENDOR],[${HOST_OS_VENDOR}])
+	AC_DEFINE_UNQUOTED([HOST_INFO],"${HOST_INFO}",[Target host Operating System version information string.])
+	AC_DEFINE_UNQUOTED([HOST_OS_TYPE],"${HOST_OS_TYPE}",[Target Operating System type string.])
+	AC_DEFINE_UNQUOTED([HOST_OS_VENDOR],"${HOST_OS_VENDOR}",[Target Operating System vendor information string.])
 
-	if test ["x${HOST_OS_TYPE}"] = ["x"] ; then
+	if test ["x${HOST_OS_VENDOR}"] = ["x"] ; then
 		AC_MSG_ERROR([Cannot recognize host operating system type!])
 	else
-		AC_MSG_RESULT([Your system type is $HOST_OS_TYPE.])
+		AC_MSG_RESULT([Your system type is ${HOST_OS_VENDOR} - ${HOST_OS_TYPE}.])
 	fi
 ])
 
@@ -246,11 +248,11 @@ dnl YAAL_DETECT_COMMON_FLAGS
 dnl What special compiler flags we can set?
 dnl --------------------------------------------------------------------------
 AC_DEFUN_ONCE([YAAL_DETECT_COMMON_FLAGS], [
-	if test ["x${HOST_OS_TYPE}"] != ["xDarwin"] ; then
+	if test ["x${HOST_OS_VENDOR}"] != ["xDarwin"] ; then
 		YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-pthread], [C++])
 		YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-pthread], [C++])
 	fi
-	if test ["x${HOST_OS_TYPE}"] == ["xRaspbian"] ; then
+	if test ["x${HOST_OS_VENDOR}"] == ["xRaspbian"] ; then
 		YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-mcpu=cortex-a53], [C++])
 		YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-mtune=cortex-a53], [C++])
 		YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-mfpu=neon-fp-armv8], [C++])
@@ -282,10 +284,10 @@ AC_DEFUN_ONCE([YAAL_DETECT_COMMON_FLAGS], [
 
 	YAAL_DETECT_FLAGS(START_GROUP, [-Wl,--start-group], [C++])
 	YAAL_DETECT_FLAGS(SONAME_FLAG, [-Wl,-soname,foo], [C++])
-	if test ["x${HOST_OS_TYPE}"] = ["xSolaris"] ; then
+	if test ["x${HOST_OS_VENDOR}"] = ["xSolaris"] ; then
 		YAAL_DETECT_FLAGS(EXTRA_COMPILER_DEBUG_FLAGS, [-gstabs+], [C++])
 	fi
-	if test ["x${HOST_OS_TYPE}"] != ["xRaspbian"] ; then
+	if test ["x${HOST_OS_VENDOR}"] != ["xRaspbian"] ; then
 		YAAL_DETECT_FLAGS(EXTRA_COMPILER_DEBUG_FLAGS, [-femit-class-debug-always], [C++])
 		YAAL_DETECT_FLAGS(EXTRA_COMPILER_DEBUG_FLAGS, [-fno-eliminate-unused-debug-types], [C++])
 	else

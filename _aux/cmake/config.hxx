@@ -6,6 +6,8 @@
 #define TARGET_CPU "@CMAKE_SYSTEM_PROCESSOR@"
 #define TARGET_CPU_BITS @TARGET_CPU_BITS@
 #define HOST_INFO "@HOST_INFO@"
+#define HOST_OS_TYPE "@HOST_OS_TYPE@"
+#define HOST_OS_VENDOR "@HOST_OS_VENDOR@"
 #cmakedefine __HOST_OS_TYPE_LINUX__
 #cmakedefine __HOST_OS_TYPE_DEBIAN__
 #cmakedefine __HOST_OS_TYPE_UBUNTU__

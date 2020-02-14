@@ -206,10 +206,17 @@ public:
 		);
 		M_EPILOG
 	}
-	static HHuginn::value_t exists( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+	static HHuginn::value_t exists( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "FileSystem.exists", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
-		return ( thread_->runtime().boolean_value( filesystem::exists( get_string( values_[0] ) ) ) );
+		bool ontologicalStatus( false );
+		try {
+			ontologicalStatus = filesystem::exists( get_string( values_[0] ) );
+		} catch ( hcore::HException const& e ) {
+			HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
+			thread_->raise( fsc->exception_class(), e.what(), position_ );
+		}
+		return ( thread_->runtime().boolean_value( ontologicalStatus ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t update_times( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {

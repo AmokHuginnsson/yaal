@@ -73,6 +73,16 @@ public:
 		return ( of.create_tuple( { ver, ci } ) );
 		M_EPILOG
 	}
+	static HHuginn::value_t build_host_info( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( "Introspection.build_host_info", values_, 0, 0, thread_, position_ );
+		HObjectFactory& of( *thread_->runtime().object_factory() );
+		HHuginn::value_t osType( of.create_string( HOST_OS_TYPE ) );
+		HHuginn::value_t vendor( of.create_string( HOST_OS_VENDOR ) );
+		HHuginn::value_t info( of.create_string( HOST_INFO ) );
+		return ( of.create_tuple( { osType, vendor, info } ) );
+		M_EPILOG
+	}
 	static HHuginn::value_t executable( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "Introspection.executable", values_, 0, 0, thread_, position_ );
@@ -317,6 +327,7 @@ HPackageCreatorInterface::HInstance HTntrospectionCreator::do_new_instance( HRun
 	);
 	HHuginn::field_definitions_t fd{
 		{ "version",         runtime_->create_method( &HIntrospection::version ),         "return runtime version information." },
+		{ "build_host_info", runtime_->create_method( &HIntrospection::build_host_info ), "return build target host information." },
 		{ "executable",      runtime_->create_method( &HIntrospection::executable ),      "return this process executable path." },
 		{ "id",              runtime_->create_method( &HIntrospection::id ),              "( *ref* ) - get globally unique object identification number" },
 		{ "hash",            runtime_->create_method( &HIntrospection::hash ),            "( *ref* ) - get hash value for given object" },

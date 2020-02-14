@@ -71,7 +71,7 @@ else
 fi
 
 AC_MSG_CHECKING([host dynamic linker])
-if test ["x${UNAME_OS_NAME}"] = ["xLinux"] ; then
+if test ["x${HOST_OS_TYPE}"] = ["xLinux"] ; then
 	READELF=`whereis -b readelf | awk '{print $2}'`
 	DYNAMIC_LINKER=`test "x${READELF}" != "x" && ${READELF} -l /usr/bin/readelf | awk 'BEGIN{FS=":"};/program interp/{gsub("[[]] ]","",$2);print $2}'`
 fi
