@@ -153,7 +153,7 @@ int long IO::read( void* buf_, int long size_ ) {
 		} else {
 			get_socket_errno() = EAGAIN;
 		}
-	} else if ( errCode == ERROR_HANDLE_EOF ) {
+	} else if ( ( errCode == ERROR_HANDLE_EOF ) || ( errCode == ERROR_BROKEN_PIPE ) ) {
 		ok = true;
 		iRead = 0;
 	} else {

@@ -254,7 +254,7 @@
 ?cout@hcore@yaal@@3VHSynchronizedStream@12@A
 ?cyan@ansi@yaal@@3VHSequence@12@B
 ?down@ansi@yaal@@3VHSequence@12@B
-?eols@HStreamInterface@hcore@yaal@@2QBDB
+?eol@HStreamInterface@hcore@yaal@@2QBDB
 ?gray@ansi@yaal@@3VHSequence@12@B
 ?green@ansi@yaal@@3VHSequence@12@B
 ?integer@executing_parser@tools@yaal@@3ABVHInteger@123@B

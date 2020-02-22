@@ -20,7 +20,7 @@ static int const INVALID_CHARACTER( -256 );
 static int const MAX_INTEGER_DIGIT_COUNT( 64 );
 static int const MAX_FLOAT_DIGIT_COUNT( 8192 );
 static int const MAX_FLOAT_FORMAT_SIZE( 64 );
-char const HStreamInterface::eols[] = "\r\n"; /* order matters */
+char const HStreamInterface::eol[] = "\n";
 
 HStreamInterface::HStreamInterface( void )
 	: _wordCache()
@@ -1402,7 +1402,7 @@ void HStreamInterface::HManipulator::set_precision( HStreamInterface& iface_ ) c
 
 HStreamInterface& getline( HStreamInterface& stream_, yaal::hcore::HString& store_ ) {
 	M_PROLOG
-	stream_.read_until( store_, "\n" );
+	stream_.read_until( store_, HStreamInterface::eol );
 	store_.trim_right( "\r" );
 	return ( stream_ );
 	M_EPILOG

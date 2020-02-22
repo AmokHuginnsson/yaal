@@ -225,7 +225,7 @@ public:
 	 * \param strip - Remove delimiting stop char from output buffer.
 	 * \return number of bytes read.
 	 */
-	int long read_until( yaal::hcore::HString& store, char const* delim = eols, bool strip = true ) {
+	int long read_until( yaal::hcore::HString& store, char const* delim = eol, bool strip = true ) {
 		return ( do_read_until( store, delim, strip ) );
 	}
 	/*! \brief Read data from stream until end of it or until delimiter is encountered or enough data has been acquired.
@@ -236,7 +236,7 @@ public:
 	 * \param strip - Remove delimiting stop char from output buffer.
 	 * \return number of bytes read.
 	 */
-	int long read_until_n( yaal::hcore::HString& store, int long maxcount, char const* delim = eols, bool strip = true ) {
+	int long read_until_n( yaal::hcore::HString& store, int long maxcount, char const* delim = eol, bool strip = true ) {
 		return ( do_read_until_n( store, maxcount, delim, strip ) );
 	}
 	/*! \brief Read data from stream as long as read characters are in set and end of stream has not been reached.
@@ -386,7 +386,7 @@ public:
 	HStreamInterface& ignore( int count_ ) {
 		return ( do_ignore( count_ ) );
 	}
-	M_YAAL_HCORE_PUBLIC_API static char const eols[];
+	M_YAAL_HCORE_PUBLIC_API static char const eol[];
 	/*! \brief Tell if given stream instance if a valid stream object.
 	 *
 	 * Note: Implementation is not a trivial forward.

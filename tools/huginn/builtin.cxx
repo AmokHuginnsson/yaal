@@ -359,7 +359,7 @@ HHuginn::value_t input( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::va
 	M_PROLOG
 	verify_arg_count( "input", values_, 0, 0, thread_, position_ );
 	yaal::hcore::HString l;
-	int len( static_cast<int>( thread_->runtime().huginn()->input_stream().read_until( l, HStreamInterface::eols, false ) ) );
+	int len( static_cast<int>( thread_->runtime().huginn()->input_stream().read_until( l, HStreamInterface::eol, false ) ) );
 	return ( len > 0 ? thread_->object_factory().create_string( yaal::move( l ) ) : thread_->runtime().none_value() );
 	M_EPILOG
 }
