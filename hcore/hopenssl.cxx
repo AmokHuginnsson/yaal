@@ -200,24 +200,14 @@ void HOpenSSL::OSSLContext::init( void ) {
 	}
 	SSL_METHOD const* method( static_cast<SSL_METHOD const*>( select_method() ) );
 	SSL_CTX* ctx( nullptr );
-	HString buffer;
 	ERR_clear_error();
 	_context = ctx = SSL_CTX_new( const_cast<SSL_METHOD*>( method ) );
 	if ( ! _context ) {
+		HString buffer;
 		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) );
 	}
 	++ _instances;
-	HUTF8String utf8( _sSLKey );
-	if ( SSL_CTX_use_PrivateKey_file( ctx, utf8.c_str(), SSL_FILETYPE_PEM ) <= 0 ) {
-		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) + ", key: `" + _sSLKey + "'" );
-	}
-	utf8 = _sSLCert;
-	if ( SSL_CTX_use_certificate_file( ctx, utf8.c_str(), SSL_FILETYPE_PEM ) <= 0 ) {
-		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) + ": cert: `" + _sSLCert + "'" );
-	}
-	if ( ! SSL_CTX_check_private_key( ctx ) ) {
-		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) );
-	}
+	do_init();
 	return;
 	M_EPILOG
 }
@@ -311,6 +301,26 @@ void HOpenSSL::OSSLContext::libssl_rule_mutex( int mode, int nth, char const* /*
 HOpenSSL::OSSLContextServer::OSSLContextServer( void ) {
 	M_PROLOG
 	init();
+	return;
+	M_EPILOG
+}
+
+void HOpenSSL::OSSLContextServer::do_init( void ) {
+	M_PROLOG
+	SSL_CTX* ctx( static_cast<SSL_CTX*>( data() ) );
+	HString buffer;
+	HUTF8String utf8( _sslKey );
+	if ( SSL_CTX_use_PrivateKey_file( ctx, utf8.c_str(), SSL_FILETYPE_PEM ) <= 0 ) {
+		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) + ", key: `" + _sslKey + "'" );
+	}
+	utf8 = _sslCert;
+	if ( SSL_CTX_use_certificate_file( ctx, utf8.c_str(), SSL_FILETYPE_PEM ) <= 0 ) {
+		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) + ": cert: `" + _sslCert + "'" );
+	}
+	if ( ! SSL_CTX_check_private_key( ctx ) ) {
+		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) );
+	}
+	return;
 	M_EPILOG
 }
 
@@ -326,6 +336,10 @@ HOpenSSL::OSSLContextClient::OSSLContextClient( void ) {
 	M_PROLOG
 	init();
 	M_EPILOG
+}
+
+void HOpenSSL::OSSLContextClient::do_init( void ) {
+	return;
 }
 
 void const* HOpenSSL::OSSLContextClient::do_method( void ) const {

@@ -21,15 +21,36 @@ void handle_options( int argc_, char** argv_, dictionary_t& opts_ ) {
 	for ( int i( 1 ); i < argc_; ++ i ) {
 		ASSERT( i % 2 ); /* option name */
 		string name( argv_[ i ] );
-		if ( name.substr( 0, 2 ) != "--" )
+		if ( name.substr( 0, 2 ) != "--" ) {
 			throw runtime_error( "Expected option, got: `" + name + "'." );
+		}
 		dictionary_t::iterator it( opts_.find( name ) );
-		if ( it == opts_.end() )
+		if ( it == opts_.end() ) {
 			throw runtime_error( "Option: `" + name + "' is not supported." );
+		}
 		ENSURE( ++ i < argc_ );
 		it->second = argv_[i];
 	}
 	return;
+}
+
+std::string remove_address( std::string s_ ) {
+	while ( ! s_.empty() ) {
+		std::string::size_type hexPos( s_.find( "0x" ) );
+		if ( hexPos == std::string::npos ) {
+			break;
+		}
+		std::string::size_type atPos( s_.find( "@", hexPos ) );
+		if ( atPos == std::string::npos ) {
+			break;
+		}
+		s_.erase( hexPos, atPos - hexPos );
+	}
+	return ( s_ );
+}
+
+bool compare_symbols( std::string const& left_, std::string const& right_ ) {
+	return ( remove_address( left_ ) < remove_address( right_ ) );
 }
 
 int main( int argc_, char** argv_ ) {
@@ -50,8 +71,9 @@ int main( int argc_, char** argv_ ) {
 			ifstream excludeFile( excludeOption->second.c_str() );
 			ENSURE( !! excludeFile );
 			string line;
-			while ( ! getline( excludeFile, line ).fail() )
+			while ( ! getline( excludeFile, line ).fail() ) {
 				exclude.insert( line );
+			}
 		}
 		dictionary_t::const_iterator sourceOption( options.find( "--source" ) );
 		ASSERT( sourceOption != options.end() );
@@ -63,8 +85,12 @@ int main( int argc_, char** argv_ ) {
 		ASSERT( appendOption != options.end() );
 		ifstream sourceFile( sourceOption->second.c_str() );
 		ENSURE( !! sourceFile );
-		ofstream destinationFile( destinationOption->second.c_str(),
-			( appendOption->second == "true" ) ? ios::app : 0 );
+		ofstream destinationFile(
+			destinationOption->second.c_str(),
+			( appendOption->second == "true" )
+				? ios::app
+				: ios::trunc
+		);
 		ENSURE( !! destinationFile );
 		string line;
 		word_list_t s;
@@ -74,23 +100,30 @@ int main( int argc_, char** argv_ ) {
 				inSymbols = true;
 				continue;
 			}
-			if ( line.find( "  Summary" ) != string::npos )
+			if ( line.find( "  Summary" ) != string::npos ) {
 				break;
+			}
 			if ( inSymbols ) {
 				vector<string> t;
 				tokenize( line, t );
-				if ( ( t.size() > 1 ) && ( t[1].find( "??_C@_" ) != 0 ) )
+				if ( ( t.size() > 1 ) && ( t[1].find( "??_C@_" ) != 0 ) ) {
 					s.insert( t[1] );
+				}
 			}
 		}
-		if ( appendOption->second != "true" )
+		if ( appendOption->second != "true" ) {
 			destinationFile << "EXPORTS" << endl;
-		set_difference( s.begin(), s.end(),
+		}
+		set_difference(
+			s.begin(), s.end(),
 			exclude.begin(), exclude.end(),
-			ostream_iterator<string>( destinationFile, "\n" ) );
+			ostream_iterator<string>( destinationFile, "\n" ),
+			compare_symbols
+		);
 	} catch ( exception const& e ) {
 		ret = 1;
 		cerr << "Exception caught: " << e.what() << endl;
 	}
 	return ( ret );
 }
+

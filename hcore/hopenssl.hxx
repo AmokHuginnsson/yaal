@@ -26,8 +26,8 @@ namespace hcore {
 class HOpenSSL {
 public:
 	typedef HOpenSSL this_type;
-	static yaal::hcore::HString _sSLKey;
-	static yaal::hcore::HString _sSLCert;
+	static yaal::hcore::HString _sslKey;
+	static yaal::hcore::HString _sslCert;
 	/*! \brief SSL object types.
 	 */
 	enum class TYPE {
@@ -49,7 +49,11 @@ private:
 		virtual ~OSSLContext( void );
 		void init( void );
 		virtual void const* do_method( void ) const = 0;
+		virtual void do_init( void ) = 0;
 		static void libssl_rule_mutex( int, int, char const*, int );
+		void* data( void ) {
+			return ( _context );
+		}
 	public:
 		void* create_ssl( void );
 		void consume_ssl( void* );
@@ -60,13 +64,15 @@ private:
 	};
 	class M_YAAL_HCORE_PUBLIC_API OSSLContextServer : public OSSLContext, public HSingleton<OSSLContextServer> {
 		OSSLContextServer( void );
-		virtual void const* do_method( void ) const;
+		virtual void const* do_method( void ) const override;
+		virtual void do_init( void ) override;
 		friend class HSingleton<OSSLContextServer>;
 		friend class HDestructor<OSSLContextServer>;
 	};
 	class M_YAAL_HCORE_PUBLIC_API OSSLContextClient : public OSSLContext, public HSingleton<OSSLContextClient> {
 		OSSLContextClient( void );
-		virtual void const* do_method( void ) const;
+		virtual void const* do_method( void ) const override;
+		virtual void do_init( void ) override;
 		friend class HSingleton<OSSLContextClient>;
 		friend class HDestructor<OSSLContextClient>;
 	};

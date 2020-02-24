@@ -43,8 +43,8 @@ namespace hcore {
 int _debugLevel_( 0 );
 HLog& log( HLog::get_instance( 1000 ) );
 
-yaal::hcore::HString HOpenSSL::_sSLKey;
-yaal::hcore::HString HOpenSSL::_sSLCert;
+yaal::hcore::HString HOpenSSL::_sslKey;
+yaal::hcore::HString HOpenSSL::_sslCert;
 
 HProgramOptionsHandler& yaal_options( void ) {
 	M_PROLOG
@@ -681,14 +681,14 @@ HCoreInitDeinit::HCoreInitDeinit( void ) {
 			.long_form( "ssl_key" )
 			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
 			.description( "Path to the OpenSSL private key file." )
-			.recipient( HOpenSSL::_sSLKey )
+			.recipient( HOpenSSL::_sslKey )
 			.argument_name( "path" )
 		)(
 			HProgramOptionsHandler::HOption()
 			.long_form( "ssl_cert" )
 			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
 			.description( "Path to the OpenSSL certificate file." )
-			.recipient( HOpenSSL::_sSLCert )
+			.recipient( HOpenSSL::_sslCert )
 			.argument_name( "path" )
 		)(
 			HProgramOptionsHandler::HOption()
