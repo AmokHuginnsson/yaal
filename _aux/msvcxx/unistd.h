@@ -123,18 +123,19 @@ DWORD win_read_console_key( void );
 
 #include "tools/hpipedchild.hxx"
 
-#define ms_fork HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( image_, argv_, pipeIn._res, pipeOut._res, pipeErr._res, message._res, joinedErr )
+#define ms_fork HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( image_, argv_, pgid_, pipeIn._res, pipeOut._res, pipeErr._res, message._res, joinedErr )
 class M_YAAL_HCORE_PUBLIC_API HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn {
+	yaal::hcore::HString _path;
+	yaal::tools::HPipedChild::argv_t _argv;
+	int _pgid;
 	int* _in;
 	int* _out;
 	int* _err;
 	int* _message;
-	yaal::hcore::HString _path;
-	yaal::tools::HPipedChild::argv_t _argv;
 	bool _joinedErr;
 public:
-	static HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn create_spawner( yaal::hcore::HString const&, yaal::tools::HPipedChild::argv_t const&, int*, int*, int*, int*, bool );
-	HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn( yaal::hcore::HString const&, yaal::tools::HPipedChild::argv_t const&, int*, int*, int*, int*, bool );
+	static HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn create_spawner( yaal::hcore::HString const&, yaal::tools::HPipedChild::argv_t const&, int, int*, int*, int*, int*, bool );
+	HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn( yaal::hcore::HString const&, yaal::tools::HPipedChild::argv_t const&, int, int*, int*, int*, int*, bool );
 	int operator()( void );
 };
 

@@ -146,10 +146,10 @@ bool SignalDispatcher::is_started( void ) const {
 
 void SignalDispatcher::set_enabled_console_event( DWORD controlType_, bool enabled_ ) {
 	switch ( controlType_ ) {
-		case ( CTRL_C_EVENT ): _acceptedConsoleEvents._ctrlC = enabled_; break;
-		case ( CTRL_BREAK_EVENT ): _acceptedConsoleEvents._break = enabled_; break;
-		case ( CTRL_CLOSE_EVENT ): _acceptedConsoleEvents._close = enabled_; break;
-		case ( CTRL_LOGOFF_EVENT ): _acceptedConsoleEvents._logoff = enabled_; break;
+		case ( CTRL_C_EVENT ):        _acceptedConsoleEvents._ctrlC    = enabled_; break;
+		case ( CTRL_BREAK_EVENT ):    _acceptedConsoleEvents._break    = enabled_; break;
+		case ( CTRL_CLOSE_EVENT ):    _acceptedConsoleEvents._close    = enabled_; break;
+		case ( CTRL_LOGOFF_EVENT ):   _acceptedConsoleEvents._logoff   = enabled_; break;
 		case ( CTRL_SHUTDOWN_EVENT ): _acceptedConsoleEvents._shutdown = enabled_; break;
 	}
 }
@@ -157,21 +157,23 @@ void SignalDispatcher::set_enabled_console_event( DWORD controlType_, bool enabl
 bool SignalDispatcher::is_console_event_enabled( DWORD controlType_ ) const {
 	bool enabled( false );
 	switch ( controlType_ ) {
-		case ( CTRL_C_EVENT ): enabled = _acceptedConsoleEvents._ctrlC; break;
-		case ( CTRL_BREAK_EVENT ): enabled = _acceptedConsoleEvents._break; break;
-		case ( CTRL_CLOSE_EVENT ): enabled = _acceptedConsoleEvents._close; break;
-		case ( CTRL_LOGOFF_EVENT ): enabled = _acceptedConsoleEvents._logoff; break;
+		case ( CTRL_C_EVENT ):        enabled = _acceptedConsoleEvents._ctrlC;    break;
+		case ( CTRL_BREAK_EVENT ):    enabled = _acceptedConsoleEvents._break;    break;
+		case ( CTRL_CLOSE_EVENT ):    enabled = _acceptedConsoleEvents._close;    break;
+		case ( CTRL_LOGOFF_EVENT ):   enabled = _acceptedConsoleEvents._logoff;   break;
 		case ( CTRL_SHUTDOWN_EVENT ): enabled = _acceptedConsoleEvents._shutdown; break;
 	}
 	return ( enabled );
 }
 
 bool SignalDispatcher::is_console_event_enabled( void ) const {
-	return ( _acceptedConsoleEvents._ctrlC
-			|| _acceptedConsoleEvents._break
-			|| _acceptedConsoleEvents._close
-			|| _acceptedConsoleEvents._logoff
-			|| _acceptedConsoleEvents._shutdown );
+	return (
+		_acceptedConsoleEvents._ctrlC
+		|| _acceptedConsoleEvents._break
+		|| _acceptedConsoleEvents._close
+		|| _acceptedConsoleEvents._logoff
+		|| _acceptedConsoleEvents._shutdown
+	);
 }
 
 }
@@ -358,3 +360,4 @@ void sendalarm() {
 	return;
 }
 }
+

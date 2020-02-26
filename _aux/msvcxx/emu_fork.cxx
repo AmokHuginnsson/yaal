@@ -1,6 +1,6 @@
 #include <iostream>
 #include <algorithm>
-#include <unordered_set>
+#include <unordered_map>
 #include <process.h>
 #include <io.h>
 
@@ -20,11 +20,11 @@
 #undef waitpid
 #include "sys/wait.h"
 
-#include "synchronizedunorderedset.hxx"
 #include "hcore/memory.hxx"
 #include "hcore/hfile.hxx"
 #include "msio.hxx"
 #include "emu_unistd.hxx"
+#include "crit.hxx"
 
 using namespace std;
 using namespace yaal;
@@ -32,19 +32,69 @@ using namespace yaal::hcore;
 using namespace yaal::tools;
 using namespace msvcxx;
 
-typedef SynchronizedUnorderedSet<int> pid_set_t;
-
-pid_set_t _children_;
+class ProcessTable {
+public:
+	static int const PROCESS_GROUP_LEADER = 0;
+	typedef std::vector<int> process_group_t;
+	typedef std::unordered_map<int, int> processes_t;
+	typedef std::unordered_map<int, process_group_t> process_groups_t;
+private:
+	processes_t _processes;
+	process_groups_t _processGroups;
+	mutable CMutex _mutex;
+public:
+	void insert( int pid_, int pgid_ ) {
+		CLock l( _mutex );
+		_processes.insert( std::make_pair( pid_, pgid_ ) );
+		_processGroups[pgid_].push_back( pid_ );
+	}
+	void erase( int pid_ ) {
+		CLock l( _mutex );
+		processes_t::iterator pit( _processes.find( pid_ ) );
+		if ( pit == _processes.end() ) {
+			return;
+		}
+		int pgid( pit->second );
+		_processes.erase( pit );
+		process_groups_t::iterator git( _processGroups.find( pgid ) );
+		if ( git == _processGroups.end() ) {
+			return;
+		}
+		process_group_t& pg( git->second );
+		pg.erase( std::remove( pg.begin(), pg.end(), pid_ ), pg.end() );
+		if ( pg.empty() ) {
+			_processGroups.erase( git );
+		}
+		return;
+	}
+	process_group_t process_group( int pgid_ ) const {
+		CLock l( _mutex );
+		process_groups_t::const_iterator git( _processGroups.find( pgid_ ) );
+		if ( git == _processGroups.end() ) {
+			return ( process_group_t() );
+		}
+		return ( git->second );
+	}
+	bool is_known_pid( int pid_ ) const {
+		CLock l( _mutex );
+		bool isKnownPid( _processes.find( pid_ ) != _processes.end() );
+		return ( isKnownPid );
+	}
+} _processTable_;
 
 M_EXPORT_SYMBOL
-HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int* in_, int* out_, int* err_, int* message_, bool joinedErr_ ) {
-	return ( HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn( path_, argv_, in_, out_, err_, message_, joinedErr_ ) );
+HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner(
+	yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int pgid_, int* in_, int* out_, int* err_, int* message_, bool joinedErr_
+) {
+	return ( HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn( path_, argv_, pgid_, in_, out_, err_, message_, joinedErr_ ) );
 }
 
 M_EXPORT_SYMBOL
-HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn( yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int* in_, int* out_, int* err_, int* message_, bool joinedErr_ )
-	: _path( path_ )
+HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn(
+	yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int pgid_, int* in_, int* out_, int* err_, int* message_, bool joinedErr_
+) : _path( path_ )
 	, _argv( argv_ )
+	, _pgid( pgid_ )
 	, _in( in_ )
 	, _out( out_ )
 	, _err( err_ )
@@ -108,9 +158,11 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void ) {
 	M_ENSURE( ::dup2( hStdErr, stderrFd ) == 0 );
 
 	/* Close backups. */
-	if ( TEMP_FAILURE_RETRY( ::close( hStdIn ) )
+	if (
+		TEMP_FAILURE_RETRY( ::close( hStdIn ) )
 		|| TEMP_FAILURE_RETRY( ::close( hStdOut ) )
-		|| TEMP_FAILURE_RETRY( ::close( hStdErr ) ) ) {
+		|| TEMP_FAILURE_RETRY( ::close( hStdErr ) )
+	) {
 		M_THROW( "close", errno );
 	}
 
@@ -119,30 +171,46 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void ) {
 	}
 	memory::free( argv );
 
+	if ( pid >= 0 ) {
+		int pgid( _pgid > ProcessTable::PROCESS_GROUP_LEADER ? _pgid : pid );
+		_processTable_.insert( pid, pgid );
+	}
 	M_ENSURE( msvcxx::write( _message[1], "\0", 1 ) == 1 );
-	_children_.insert( pid );
 	return ( pid );
 }
 
 namespace msvcxx {
 
+inline bool is_in_range( int val_, int start_, int end_ ) {
+	return ( ( val_ >= start_ ) && ( val_ <= end_ ) );
+}
+
 #undef waitpid
 int waitpid( int pid_, int* status_, int options_ ) {
-	int ret( -1 );
-	HANDLE proc( nullptr );
-	do {
-		if ( ( options_ & ~( WNOHANG | WUNTRACED | WCONTINUED ) ) != 0 ) {
-			errno = EINVAL;
-			break;
-		}
-		if ( ( pid_ == -1 ) || ( pid_ == -2 ) ) {
-			errno = ECHILD;
-			break;
-		}
-		proc = OpenProcess( SYNCHRONIZE | PROCESS_QUERY_INFORMATION, FALSE, pid_ );
-		if ( proc == nullptr ) {
-			errno = ECHILD;
-			break;
+	if ( ( options_ & ~( WNOHANG | WUNTRACED | WCONTINUED ) ) != 0 ) {
+		errno = EINVAL;
+		return ( -1 );
+	}
+	if ( ( pid_ == -1 ) || ( pid_ == -2 ) ) {
+		errno = ECHILD;
+		return ( -1 );
+	}
+	if ( ( pid_ > 0 ) && ! _processTable_.is_known_pid( pid_ ) ) {
+		errno = ECHILD;
+		return ( -1 );
+	}
+	ProcessTable::process_group_t pg(
+		pid_ < 0
+			? _processTable_.process_group( -pid_ )
+			: ProcessTable::process_group_t( { pid_ } )
+	);
+	typedef std::vector<Handle> processes_t;
+	typedef std::vector<HANDLE> handles_t;
+	processes_t processes;
+	for ( int pid : pg ) {
+		Handle proc( OpenProcess( SYNCHRONIZE | PROCESS_QUERY_INFORMATION, FALSE, pid ) );
+		if ( proc.get() == INVALID_HANDLE_VALUE ) {
+			continue;
 		}
 		if ( options_ & WNOHANG ) {
 			if ( status_ ) {
@@ -150,31 +218,39 @@ int waitpid( int pid_, int* status_, int options_ ) {
 			}
 			return ( 0 );
 		}
-		DWORD waitRes( ::WaitForSingleObject( proc,  static_cast<DWORD>( -1L ) ) );
-		if ( waitRes == WAIT_FAILED ) {
-			errno = ECHILD;
-			break;
-		}
-		DWORD status( 0 );
-		if ( !GetExitCodeProcess( proc, &status ) ) {
-			errno = ECHILD;
-			break;
-		}
-		if ( status_ ) {
-			*status_ = status << 8;
-		}
-		ret = pid_;
-	} while ( false );
-	if ( proc ) {
-		CloseHandle( proc );
+		processes.push_back( std::move( proc ) );
 	}
-	if ( ( ret == -1 ) && ( _children_.count( pid_ ) > 0 ) && ! kill( pid_, 0 ) ) {
-		ret = pid_;
+	if ( processes.empty() ) {
+		errno = ECHILD;
+		return ( -1 );
 	}
-	if ( ret == pid_ ) {
-		_children_.erase( pid_ );
+	handles_t handles;
+	for ( Handle const& h : processes ) {
+		handles.push_back( h.get() );
 	}
-	return ( ret );
+	DWORD waitRes( ::WaitForMultipleObjects( handles.size(), handles.data(), FALSE, INFINITE ) );
+	if (
+		( waitRes == WAIT_FAILED )
+		|| ( waitRes == WAIT_TIMEOUT )
+		|| ! (
+			is_in_range( waitRes, WAIT_OBJECT_0, WAIT_OBJECT_0 + handles.size() )
+			|| is_in_range( waitRes, WAIT_ABANDONED_0, WAIT_ABANDONED_0 + handles.size() )
+		)
+	) {
+		errno = ECHILD;
+		return ( -1 );
+	}
+	int idx( waitRes - ( is_in_range( waitRes, WAIT_OBJECT_0, WAIT_OBJECT_0 + handles.size() ) ? WAIT_OBJECT_0 : WAIT_ABANDONED_0 ) );
+	DWORD status( 0 );
+	if ( ! GetExitCodeProcess( handles[idx], &status ) ) {
+		errno = ECHILD;
+		return ( -1 );
+	}
+	if ( status_ ) {
+		*status_ = status << 8;
+	}
+	_processTable_.erase( pg[idx] );
+	return ( pg[idx] );
 }
 
 }

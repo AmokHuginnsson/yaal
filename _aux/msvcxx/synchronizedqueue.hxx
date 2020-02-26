@@ -6,6 +6,8 @@
 #include "crit.hxx"
 #include "hcore/hthread.hxx"
 
+namespace msvcxx {
+
 template<typename T>
 class SynchronizedQueue {
 	std::queue<T> _data;
@@ -38,6 +40,8 @@ void SynchronizedQueue<T>::push( T const& elem ) {
 	_data.push( elem );
 	_semaphore.signal();
 	return;
+}
+
 }
 
 #endif /* #ifndef YAAL_MSVCXX_SYNCHRONIZEDQUEUE_HXX_INCLUDED */
