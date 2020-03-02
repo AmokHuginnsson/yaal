@@ -45,8 +45,9 @@ M_EXPORT_SYMBOL int COLUMN_NAME_INDEX = 0;
 
 struct OMySQLResult {
 	struct OField {
+		typedef trait::strip_pointer<decltype ( MYSQL_BIND::is_null )>::type mysql_bool_t;
 		int long unsigned _length;
-		my_bool _isNull;
+		mysql_bool_t _isNull;
 	};
 	typedef HArray<MYSQL_BIND> binds_t;
 	typedef HArray<OField> field_meta_t;
