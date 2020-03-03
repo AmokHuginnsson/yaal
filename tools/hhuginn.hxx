@@ -294,6 +294,7 @@ public:
 	HCoordinate get_coordinate( int, int ) const;
 	call_stack_t const& trace( void ) const;
 	int real_position( int, int ) const;
+	int new_statement_count( void ) const;
 	yaal::hcore::HString source_name( int ) const;
 	yaal::hcore::HString where( int, int ) const;
 	yaal::hcore::HString error_message( void ) const;

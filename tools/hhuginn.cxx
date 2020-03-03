@@ -637,6 +637,14 @@ bool HHuginn::compile( compiler_setup_t compilerSetup_, HIntrospectorInterface* 
 	M_EPILOG
 }
 
+int HHuginn::new_statement_count( void ) const {
+	M_PROLOG
+	M_ENSURE( _compiler->_isIncremental, "Statement count query makes sense only in incremental mode." );
+	M_ENSURE( _state == STATE::COMPILED, "Program must be compiled and not executed for querying new statement count." );
+	return ( _compiler->_mainCompiledStatementCount - _compiler->_mainExecutedStatementCount );
+	M_EPILOG
+}
+
 bool HHuginn::execute( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::COMPILED, "Program must be compiled before execution." );
