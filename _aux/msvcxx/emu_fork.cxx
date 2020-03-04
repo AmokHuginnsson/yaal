@@ -134,15 +134,18 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void ) {
 	M_ENSURE( ::dup2( ( _joinedErr ? _out : _err )[1], stderrFd ) == 0 );
 
 	char** argv = memory::calloc<char*>( _argv.size() + 2 );
-	HUTF8String utf8( _path );
+	HString quotes;
+	quotes.assign( _path ).replace( "\"", "\\\"" ).shift_right( 1, '"'_ycp ).push_back( '"'_ycp );
+	HUTF8String utf8( quotes );
 	argv[ 0 ] = xstrdup( utf8.c_str() );
 	int i = 1;
 	for ( HPipedChild::argv_t::iterator it( _argv.begin() ), end( _argv.end() ); it != end; ++ it, ++ i ) {
-		utf8 = *it;
+		quotes.assign( *it ).replace( "\"", "\\\"" ).shift_right( 1, '"'_ycp ).push_back( '"'_ycp );
+		utf8.assign( quotes );
 		argv[ i ] = xstrdup( utf8.c_str() );
 	}
 
-	utf8 = _path;
+	utf8.assign( _path );
 	intptr_t processHandle( ::spawnvp( P_NOWAIT, utf8.c_str(), argv ) );
 	if ( processHandle == -1 ) {
 		log_windows_error( "spawnvp" );
