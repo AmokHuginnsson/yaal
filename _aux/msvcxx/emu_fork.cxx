@@ -4,15 +4,6 @@
 #include <process.h>
 #include <io.h>
 
-#define execl execl_off
-#define execle execle_off
-#define execv execv_off
-#define execve execve_off
-#define execlp execlp_off
-#define execvp execvp_off
-#define access access_off
-#define lseek lseek_off
-
 #define fill fill_off
 #include "csignal"
 #include "unistd.h"
@@ -31,6 +22,8 @@ using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::tools;
 using namespace msvcxx;
+
+namespace msvcxx {
 
 class ProcessTable {
 public:
@@ -82,6 +75,57 @@ public:
 	}
 } _processTable_;
 
+namespace {
+
+char* xstrdup( char const* str_ ) {
+	char* str = 0;
+	if ( ! str_ ) {
+		::perror( "xstrdup: request to duplicate NULL pointer string" );
+		::abort();
+	}
+	str = memory::calloc<char>( static_cast<int long>( ::strlen( str_ ) ) + 1 );
+	::strcpy( str, str_ );
+	return ( str );
+}
+
+HString quoted( HString const& s_ ) {
+	if ( s_.find( ' '_ycp ) == HString::npos ) {
+		return ( s_ );
+	}
+	HString s;
+	s.assign( s_ ).replace( "\"", "\\\"" ).shift_right( 1, '"'_ycp ).push_back( '"'_ycp );
+	return ( s );
+}
+
+inline bool is_in_range( int val_, int start_, int end_ ) {
+	return ( ( val_ >= start_ ) && ( val_ <= end_ ) );
+}
+
+}
+
+int spawn_and_exit( char const* image_, char const* const* argv_ ) {
+	int argc( 0 );
+	for ( char const* const* a( argv_ ); *a; ++ a ) {
+		++ argc;
+	}
+	char** argv = memory::calloc<char*>( argc + 1 );
+	HUTF8String utf8;
+	for ( int i( 0 ); i < argc; ++ i ) {
+		utf8.assign( quoted( argv_[i] ) );
+		argv[ i ] = xstrdup( utf8.c_str() );
+	}
+	intptr_t processHandle( ::spawnvp( P_WAIT, image_, argv ) );
+	if ( processHandle != -1 ) {
+		TerminateProcess( OpenProcess( SYNCHRONIZE | PROCESS_TERMINATE, TRUE, GetCurrentProcessId() ), 0 );
+	} else {
+		for ( int i( 0 ); i < argc; ++ i ) {
+			memory::free( argv[ i ] );
+		}
+		memory::free( argv );
+	}
+	return ( -1 );
+}
+
 M_EXPORT_SYMBOL
 HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner(
 	yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int pgid_, int* in_, int* out_, int* err_, int* message_, bool joinedErr_
@@ -100,17 +144,6 @@ HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::HYaalWorkAroundForNoForkOn
 	, _err( err_ )
 	, _message( message_ )
 	, _joinedErr( joinedErr_ ) {
-}
-
-char* xstrdup( char const* str_ ) {
-	char* str = 0;
-	if ( ! str_ ) {
-		::perror( "xstrdup: request to duplicate NULL pointer string" );
-		::abort();
-	}
-	str = memory::calloc<char>( static_cast<int long>( ::strlen( str_ ) ) + 1 );
-	::strcpy( str, str_ );
-	return ( str );
 }
 
 M_EXPORT_SYMBOL
@@ -134,14 +167,11 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void ) {
 	M_ENSURE( ::dup2( ( _joinedErr ? _out : _err )[1], stderrFd ) == 0 );
 
 	char** argv = memory::calloc<char*>( _argv.size() + 2 );
-	HString quotes;
-	quotes.assign( _path ).replace( "\"", "\\\"" ).shift_right( 1, '"'_ycp ).push_back( '"'_ycp );
-	HUTF8String utf8( quotes );
+	HUTF8String utf8( quoted( _path ) );
 	argv[ 0 ] = xstrdup( utf8.c_str() );
 	int i = 1;
 	for ( HPipedChild::argv_t::iterator it( _argv.begin() ), end( _argv.end() ); it != end; ++ it, ++ i ) {
-		quotes.assign( *it ).replace( "\"", "\\\"" ).shift_right( 1, '"'_ycp ).push_back( '"'_ycp );
-		utf8.assign( quotes );
+		utf8.assign( quoted( *it ) );
 		argv[ i ] = xstrdup( utf8.c_str() );
 	}
 
@@ -180,12 +210,6 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void ) {
 	}
 	M_ENSURE( msvcxx::write( _message[1], "\0", 1 ) == 1 );
 	return ( pid );
-}
-
-namespace msvcxx {
-
-inline bool is_in_range( int val_, int start_, int end_ ) {
-	return ( ( val_ >= start_ ) && ( val_ <= end_ ) );
 }
 
 #undef waitpid

@@ -59,6 +59,7 @@ static int const _PC_NAME_MAX = 3;
 static int const _XOPEN_NAME_MAX = 2048;
 
 #define fork ms_fork
+#define execvp msvcxx::spawn_and_exit
 #define geteuid getuid
 #undef gai_strerror
 #define gai_strerror msvcxx::windows_strerror
@@ -121,23 +122,7 @@ inline int lockf( int fd_, int cmd_, size_t off_ )
 
 DWORD win_read_console_key( void );
 
-#include "tools/hpipedchild.hxx"
-
-#define ms_fork HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( image_, argv_, pgid_, pipeIn._res, pipeOut._res, pipeErr._res, message._res, joinedErr )
-class M_YAAL_HCORE_PUBLIC_API HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn {
-	yaal::hcore::HString _path;
-	yaal::tools::HPipedChild::argv_t _argv;
-	int _pgid;
-	int* _in;
-	int* _out;
-	int* _err;
-	int* _message;
-	bool _joinedErr;
-public:
-	static HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn create_spawner( yaal::hcore::HString const&, yaal::tools::HPipedChild::argv_t const&, int, int*, int*, int*, int*, bool );
-	HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn( yaal::hcore::HString const&, yaal::tools::HPipedChild::argv_t const&, int, int*, int*, int*, int*, bool );
-	int operator()( void );
-};
+#define ms_fork msvcxx::HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( image_, argv_, pgid_, pipeIn._res, pipeOut._res, pipeErr._res, message._res, joinedErr )
 
 #endif /* not YAAL_MSVCXX_UNISTD_H_INCLUDED */
 

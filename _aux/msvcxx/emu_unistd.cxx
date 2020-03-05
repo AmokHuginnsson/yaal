@@ -59,23 +59,29 @@ int select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, stru
 		if ( readFds && writeFds ) {
 			std::sort( readFds->_data, readFds->_data + readFds->_count );
 			std::sort( writeFds->_data, writeFds->_data + writeFds->_count );
-			int* end( std::set_difference( readFds->_data, readFds->_data + readFds->_count,
-				writeFds->_data, writeFds->_data + writeFds->_count,
-				readFds->_data ) );
+			int* end(
+				std::set_difference(
+					readFds->_data, readFds->_data + readFds->_count,
+					writeFds->_data, writeFds->_data + writeFds->_count,
+					readFds->_data
+				)
+			);
 			readFds->_count = end - readFds->_data;
 		}
 		if ( readFds ) {
 			std::transform( readFds->_data, readFds->_data + readFds->_count, ios, osCast );
 			for ( int i( 0 ); i < readFds->_count; ++ i ) {
-				if ( ios[i]->ready() )
+				if ( ios[i]->ready() ) {
 					++ ret;
+				}
 			}
 			if ( ret > 0 ) {
 				for ( int i( 0 ); i < readFds->_count; ++ i ) {
-					if ( ! ios[i]->ready() )
+					if ( ! ios[i]->ready() ) {
 						readFds->_data[ i ] = -1;
+					}
 				}
-				std::remove( readFds->_data, readFds->_data + readFds->_count, -1 );
+				static_cast<void>( std::remove( readFds->_data, readFds->_data + readFds->_count, -1 ) == readFds->_data );
 				readFds->_count = ret;
 				if ( writeFds ) {
 					FD_ZERO( writeFds );
@@ -87,18 +93,21 @@ int select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, stru
 		if ( writeFds ) {
 			std::transform( writeFds->_data, writeFds->_data + writeFds->_count, stdext::checked_array_iterator<IO**>( ios + offset, writeFds->_count), osCast );
 			for ( int i( 0 ); i < writeFds->_count; ++ i ) {
-				if ( ios[i + offset]->is_connected() )
+				if ( ios[i + offset]->is_connected() ) {
 					++ ret;
+				}
 			}
 			if ( ret > 0 ) {
 				for ( int i( 0 ); i < writeFds->_count; ++ i ) {
-					if ( ! ios[i + offset]->is_connected() )
+					if ( ! ios[i + offset]->is_connected() ) {
 						writeFds->_data[ i ] = -1;
+					}
 				}
-				std::remove( writeFds->_data, writeFds->_data + writeFds->_count, -1 );
+				static_cast<void>( std::remove( writeFds->_data, writeFds->_data + writeFds->_count, -1 ) == writeFds->_data );
 				writeFds->_count = ret;
-				if ( readFds )
+				if ( readFds ) {
 					FD_ZERO( readFds );
+				}
 				break; /* !!! Early exit. !!! */
 			}
 			std::transform( ios + offset, ios + count, handles, osCast );
@@ -113,32 +122,37 @@ int select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, stru
 			if ( readFds ) {
 				for ( int i( 0 ); i < readFds->_count; ++ i ) {
 					int upL( ::WaitForSingleObject( handles[ i ], 0 ) );
-					if ( ( i == ( up - WAIT_OBJECT_0 ) ) || ( upL == WAIT_OBJECT_0 ) )
+					if ( ( i == ( up - WAIT_OBJECT_0 ) ) || ( upL == WAIT_OBJECT_0 ) ) {
 						++ ret;
-					else
+					} else {
 						readFds->_data[ i ] = -1;
+					}
 				}
-				std::remove( readFds->_data, readFds->_data + readFds->_count, -1 );
+				static_cast<void>( std::remove( readFds->_data, readFds->_data + readFds->_count, -1 ) == readFds->_data );
 				readFds->_count = ret;
 			}
 			if ( writeFds ) {
 				for ( int i( 0 ); i < writeFds->_count; ++ i ) {
 					int upL( ::WaitForSingleObject( handles[ i + offset ], 0 ) );
 					if ( ( ( i + offset ) == ( up - WAIT_OBJECT_0 ) ) || ( upL == WAIT_OBJECT_0 ) ) {
-						if ( ! ios[i + offset]->is_connected() )
+						if ( ! ios[i + offset]->is_connected() ) {
 							ios[i + offset]->sync();
+						}
 						++ ret;
-					} else
+					} else {
 						writeFds->_data[ i ] = -1;
+					}
 				}
-				std::remove( writeFds->_data, writeFds->_data + writeFds->_count, -1 );
+				static_cast<void>( std::remove( writeFds->_data, writeFds->_data + writeFds->_count, -1 ) == writeFds->_data );
 				writeFds->_count = ( ret - ( readFds ? readFds->_count : 0 ) );
 			}
 		} else {
-			if ( readFds )
+			if ( readFds ) {
 				FD_ZERO( readFds );
-			if ( writeFds )
+			}
+			if ( writeFds ) {
 				FD_ZERO( writeFds );
+			}
 			milliseconds = 0;
 			if ( up != WAIT_TIMEOUT ) {
 				ret = -1;

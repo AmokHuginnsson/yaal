@@ -2,6 +2,7 @@
 #define YAAL_MSVCXX_EMU_UNISTD_HXX_INCLUDED 1
 
 #include "hcore/pod.hxx"
+#include "tools/hpipedchild.hxx"
 
 namespace yaal {
 namespace hcore {
@@ -22,8 +23,24 @@ M_YAAL_HCORE_PUBLIC_API int dup( int );
 M_YAAL_HCORE_PUBLIC_API int dup2( int, int );
 M_YAAL_HCORE_PUBLIC_API void log_windows_error( char const* );
 M_YAAL_HCORE_PUBLIC_API int lockf( int, int, int long long );
+M_YAAL_HCORE_PUBLIC_API int spawn_and_exit( char const*, char const* const* );
 void get_memory_size_info( yaal::i64_t&, yaal::i64_t& );
 void get_module_file_name( yaal::hcore::HString& );
+
+class M_YAAL_HCORE_PUBLIC_API HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn {
+	yaal::hcore::HString _path;
+	yaal::tools::HPipedChild::argv_t _argv;
+	int _pgid;
+	int* _in;
+	int* _out;
+	int* _err;
+	int* _message;
+	bool _joinedErr;
+public:
+	static HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn create_spawner( yaal::hcore::HString const&, yaal::tools::HPipedChild::argv_t const&, int, int*, int*, int*, int*, bool );
+	HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn( yaal::hcore::HString const&, yaal::tools::HPipedChild::argv_t const&, int, int*, int*, int*, int*, bool );
+	int operator()( void );
+};
 
 } /* namespace msvcxx */
 
