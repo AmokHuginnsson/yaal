@@ -1,5 +1,6 @@
 param (
 	[Parameter(Mandatory=$True)] [string]$target,
+	[Parameter(Mandatory=$False)] [string]$prefix = "$pwd/build/windows",
 	[Parameter(Mandatory=$False)] [string]$EXTRA_FLAGS,
 	[Parameter(Mandatory=$False)] [switch]$auto_setup
 )
@@ -21,6 +22,7 @@ function build( [string]$config, [string]$extraFlags ) {
 function install( [string]$config ) {
 	Push-Location "build/$config"
 	cmake --build . --target install --config $config
+	Pop-Location
 }
 
 function debug( [string]$extraFlags = $EXTRA_FLAGS ) {
@@ -60,23 +62,11 @@ function auto_setup {
 			$uri = "https://codestation.org/download/windows-dev.zip"
 			Invoke-WebRequest -Uri $uri -OutFile $out
 	}
-	if ( -Not( Test-Path( "build/windows/bin/pcre.dll" ) ) ) {
-		Expand-Archive -LiteralPath $out -DestinationPath "build/"
-	}
-	if ( -Not( Test-Path( "local.js" ) ) ) {
-		$winPath = "$pwd/build/windows".Replace( "\", "/" )
-		$local_js = (
-			"PREFIX = `"$winPath`";`n" +
-			"SYSCONFDIR = `"$winPath/etc`";`n" +
-			"DATADIR = `"$winPath/share`";`n" +
-			"LOCALSTATEDIR = `"$winPath/var`";`n" +
-			"EXTRA_INCLUDE_PATH = `"$winPath/include`";`n" +
-			"EXTRA_LIBRARY_PATH = `"$winPath/lib`";`n" +
-			"VERBOSE = 1;`n" +
-			"FAST = 1;`n"
-		)
-		$Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
-		[System.IO.File]::WriteAllText( "$pwd/local.js", $local_js, $Utf8NoBomEncoding )
+	if ( -Not( Test-Path( "$prefix/bin/pcre.dll" ) ) ) {
+		Expand-Archive -LiteralPath $out -DestinationPath "build/cache" -Force
+		$extract = "build/cache/windows/"
+		Copy-Item -Path $extract -Destination "$prefix" -Recurse -Force
+		Remove-Item -Path $extract -Recurse -Force
 	}
 }
 
@@ -93,22 +83,44 @@ if (
 	exit 1
 }
 
-if ( $auto_setup ) {
-	auto_setup
-}
-
-$origEnvPath=$env:Path
-
-Select-String -ErrorAction Ignore -Path "local.js" -Pattern "PREFIX\s=\s[`"]([^`"]+)[`"]" | ForEach-Object {
-	$prefix="$($_.Matches.groups[1])"
-	$env:Path="$prefix\bin;$env:Path"
-	$env:OPENSSL_CONF="$prefix/bin/openssl.cfg"
+function make_absolute( [string]$path ) {
+	if ( -Not( [System.IO.Path]::IsPathRooted( $path ) ) ) {
+		$path = [IO.Path]::GetFullPath( [IO.Path]::Combine( ( ($pwd).Path ), ( $path ) ) )
+	}
+	return $path.Replace( "\", "/" )
 }
 
 try {
+	if ( Test-Path( "local.js" ) ) {
+		Select-String -ErrorAction Ignore -Path "local.js" -Pattern "PREFIX\s=\s[`"]([^`"]+)[`"]" | ForEach-Object {
+			$prefix = make_absolute( "$($_.Matches.groups[1])" )
+		}
+	} elseif ( $auto_setup ) {
+		$prefix = make_absolute( $prefix )
+		$local_js = (
+			"PREFIX = `"$prefix`";`n" +
+			"SYSCONFDIR = `"$prefix/etc`";`n" +
+			"DATADIR = `"$prefix/share`";`n" +
+			"LOCALSTATEDIR = `"$prefix/var`";`n" +
+			"EXTRA_INCLUDE_PATH = `"$prefix/include`";`n" +
+			"EXTRA_LIBRARY_PATH = `"$prefix/lib`";`n" +
+			"VERBOSE = 1;`n" +
+			"FAST = 1;`n"
+		)
+		$Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
+		[System.IO.File]::WriteAllText( "$pwd/local.js", $local_js, $Utf8NoBomEncoding )
+	}
+	if ( $auto_setup ) {
+		auto_setup
+	}
+	$origEnvPath=$env:Path
+	$env:Path="$prefix\bin;$env:Path"
+	$env:OPENSSL_CONF="$prefix/bin/openssl.cfg"
 	&$target
+} catch {
+	Pop-Location
+	Write-Error "$_"
 } finally {
 	$env:Path=$origEnvPath
-	Pop-Location
 }
 
