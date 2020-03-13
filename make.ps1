@@ -62,7 +62,7 @@ function package {
 
 function deploy {
 	package
-	$version = "" 
+	$version = ""
 	Select-String `
 		-ErrorAction Ignore `
 		-Path "Makefile.mk.in" `
@@ -144,8 +144,9 @@ try {
 		auto_setup
 	}
 	$origEnvPath=$env:Path
-	$env:Path="$prefix\bin;$env:Path"
-	$env:OPENSSL_CONF="$prefix/bin/openssl.cfg"
+	$env:Path = ( $env:Path.Split( ';')  | Where-Object { -Not( $_.ToLower().Contains( "cygwin" ) ) } ) -join ';'
+	$env:Path = "$prefix\bin;$env:Path"
+	$env:OPENSSL_CONF = "$prefix/bin/openssl.cfg"
 	&$target
 } catch {
 	Pop-Location
