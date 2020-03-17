@@ -332,35 +332,70 @@ bool get_system_account_name( int id_, char* buf_, int size_ ) {
 	static int const TOKEN_USER_SIZE( sizeof ( TOKEN_USER ) + SID_SIZE );
 	char tokenUserBuffer[ TOKEN_USER_SIZE ];
 	PSID sid( get_base_sid( tokenUserBuffer, TOKEN_USER_SIZE, TokenUser ) );
-	bool fail( true );
-	if ( sid ) {
+	if ( ! sid ) {
+		return ( false );
+	}
+	HString sidStr;
+	if ( id_ >= 0 ) {
 		LPTSTR sidStrBuffer( nullptr );
-		if ( ::ConvertSidToStringSid( sid, &sidStrBuffer ) ) {
-			HString sidStr( sidStrBuffer );
-			::LocalFree( sidStrBuffer );
-			sidStr.erase( sidStr.find_last( '-'_ycp ) + 1 );
-			sidStr += id_;
-			PSID newSid( nullptr );
-			HUTF8String utf8( sidStr );
-			if ( ::ConvertStringSidToSid( utf8.c_str(), &newSid ) ) {
-				DWORD size( size_ );
-				static int const DUMMY_BUFFER_SIZE = 128;
-				char dummy[DUMMY_BUFFER_SIZE];
-				DWORD dummyLen( DUMMY_BUFFER_SIZE );
-				SID_NAME_USE eUse = SidTypeUnknown;
-				if ( ::LookupAccountSid( nullptr, newSid, buf_, &size, dummy, &dummyLen, &eUse ) )
-					fail = false;
-				::LocalFree( newSid );
+		if ( ::ConvertSidToStringSid( sid, &sidStrBuffer ) == 0 ) {
+			log_windows_error( "ConvertSidToStringSid" );
+			return ( false );
+		}
+		sidStr.assign( sidStrBuffer );
+		::LocalFree( sidStrBuffer );
+		sidStr.erase( sidStr.find_last( '-'_ycp ) + 1 );
+		sidStr.append( id_ );
+	} else {
+		id_ = -id_;
+		int mask[] = { 7, 7, 255, 4095 };
+		int shift[] = { 26, 23, 15, 0 };
+		sidStr.assign( "S" );
+		int blockCount( id_ >> 29 );
+		if ( blockCount > 0 ) {
+			for ( int nth( 0 ); nth < blockCount; ++ nth ) {
+				int block( ( id_ >> shift[nth] ) & mask[nth] );
+				sidStr.append( "-" ).append( block );
+			}
+		} else {
+			int block( id_ >> 10 );
+			if ( block > 0 ) {
+				block &= 15;
+				sidStr.append( "-1-5-" ).append( block ? block : 32 ).append( "-" ).append( id_ & 1023 );
+			} else {
+				sidStr.append( "-1-5-" ).append( id_ );
 			}
 		}
 	}
-	return ( fail );
+	HUTF8String utf8( sidStr );
+	PSID newSid( nullptr );
+	if ( ::ConvertStringSidToSid( utf8.c_str(), &newSid ) == 0 ) {
+		log_windows_error( "ConvertSidToStringSid" );
+		return ( false );
+	}
+	DWORD size( size_ );
+	static int const DUMMY_BUFFER_SIZE = 128;
+	char dummy[DUMMY_BUFFER_SIZE];
+	DWORD dummyLen( DUMMY_BUFFER_SIZE );
+	SID_NAME_USE eUse = SidTypeUnknown;
+	bool ok( false );
+	if ( ::LookupAccountSid( nullptr, newSid, buf_, &size, dummy, &dummyLen, &eUse ) ) {
+		ok = true;
+	} else {
+		if ( size_ > 10 ) {
+			strcpy( buf_, "*unknown*" );
+			ok = true;
+		}
+		log_windows_error( "LookupAccountSid" );
+	}
+	::LocalFree( newSid );
+	return ( ok );
 }
 
 int getpwuid_r( uid_t uid_, struct passwd* p_, char* buf_, int size_, struct passwd** result_ ) {
 	p_->pw_name = buf_;
 	int err( -1 );
-	if ( ! get_system_account_name( uid_, buf_, size_ ) ) {
+	if ( get_system_account_name( uid_, buf_, size_ ) ) {
 		err = 0;
 		*result_ = p_;
 	}
@@ -370,7 +405,7 @@ int getpwuid_r( uid_t uid_, struct passwd* p_, char* buf_, int size_, struct pas
 int getgrgid_r( gid_t gid_, struct group* g_, char* buf_, int size_, struct group** result_ ) {
 	g_->gr_name = buf_;
 	int err( -1 );
-	if ( ! get_system_account_name( gid_, buf_, size_ ) ) {
+	if ( get_system_account_name( gid_, buf_, size_ ) ) {
 		err = 0;
 		*result_ = g_;
 	}

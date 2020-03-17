@@ -28,29 +28,18 @@ install:
   - mv c:\cygwin\bin\cyg-git.exe c:\cygwin\bin\git.exe
   - cmd: bash -c "git config core.symlinks true && git config --global core.ignorecase false && git config --global core.filemode true"
   - cmd: bash -c "git reset --hard && git checkout -fq master"
-  - cmd: md c:\tmp c:\msvcxx
-  - curl -fsS -o c:\tmp\windows-dev.zip https://codestation.org/download/windows-dev.zip
-  - unzip -q c:\tmp\windows-dev.zip -d c:\msvcxx
-  - cmd: FOR /d %%e IN ( "c:\msvcxx\windows\*" ) DO ( move "%%~e" "c:\msvcxx" )
-  - echo PREFIX = "c:/msvcxx"; > local.js
-  - echo SYSCONFDIR = "c:/msvcxx/etc"; >> local.js
-  - echo LOCALSTATEDIR = "c:/msvcxx/var"; >> local.js
-  - echo EXTRA_INCLUDE_PATH = "c:/msvcxx/include"; >> local.js
-  - echo EXTRA_LIBRARY_PATH = "c:/msvcxx/lib"; >> local.js
-  - echo VERBOSE = 1; >> local.js
-  - echo FAST = 1; >> local.js
   - cmd: bash -c "git clone -q --branch=master https://codestation.org/repo/tress.git ../tress"
   - cmd: bash -c "sed -i -e '15d' -e '/BOOST/d' -e '/\<Boost\>/d' -e 's/${Boost_LIBRARIES}//' ../tress/CMakeLists.txt"
+  - cmd: md c:\tmp
   - del ..\tress\src\tut_boost.cxx
-  - cp local.js ../tress/
   - cinst cmake
   - C:\cygwin\setup-x86.exe -qgnNdO -l C:\cygwin\var\cache\setup -R c:\cygwin -s http://cygwin.mirror.constant.com -P sqlite3 -P bc
   - vcpkg integrate remove
 
 build_script:
   - chdir
-  - type local.js
-  - cmd: bash -c "make -f msvcxx.mk install"
+  - ps: .\make.ps1 -target install-debug -prefix c:/msvcxx -auto_setup
+  - cp local.js ../tress/
   - cmd: set YAAL_SOURCE_PATH=%APPVEYOR_BUILD_FOLDER%
   - cmd: bash -c "make -C ../tress/ -f msvcxx.mk"
   - cp ../tress/tressrc c:/msvcxx/etc/

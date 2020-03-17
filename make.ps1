@@ -102,7 +102,8 @@ function auto_setup {
 	if ( -Not( Test-Path( "$prefix/bin/pcre.dll" ) ) ) {
 		Expand-Archive -LiteralPath $out -DestinationPath "build/cache" -Force
 		$extract = "build/cache/windows/"
-		Copy-Item -Path $extract -Destination "$prefix" -Recurse -Force
+		New-Item -ItemType Directory -Force -Path "$prefix" > $null
+		Copy-Item -Path "$extract/*" -Destination "$prefix/" -Recurse -Force
 		Remove-Item -Path $extract -Recurse -Force
 	}
 }
