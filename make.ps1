@@ -153,10 +153,12 @@ try {
 	&$target
 } catch {
 	Write-Error "$_"
+	$LASTEXITCODE = 1
 } finally {
 	while ( ( Get-Location -Stack ).Count -gt $stackSize ) {
 		Pop-Location
 	}
 	$env:Path=$origEnvPath
+	exit $LASTEXITCODE
 }
 

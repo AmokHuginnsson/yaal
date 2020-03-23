@@ -292,6 +292,32 @@ int tcsetpgrp( int, pid_t ) {
 	return ( 0 );
 }
 
+typedef struct _REPARSE_DATA_BUFFER {
+	ULONG  ReparseTag;
+	USHORT ReparseDataLength;
+	USHORT Reserved;
+	union {
+		struct {
+			USHORT SubstituteNameOffset;
+			USHORT SubstituteNameLength;
+			USHORT PrintNameOffset;
+			USHORT PrintNameLength;
+			ULONG  Flags;
+			WCHAR  PathBuffer[1];
+		} SymbolicLinkReparseBuffer;
+		struct {
+			USHORT SubstituteNameOffset;
+			USHORT SubstituteNameLength;
+			USHORT PrintNameOffset;
+			USHORT PrintNameLength;
+			WCHAR  PathBuffer[1];
+		} MountPointReparseBuffer;
+		struct {
+			UCHAR DataBuffer[1];
+		} GenericReparseBuffer;
+	} DUMMYUNIONNAME;
+} REPARSE_DATA_BUFFER, *PREPARSE_DATA_BUFFER;
+
 int readlink( char const* path_, char* buffer_, size_t size_ ) {
 	int len( -1 );
 	HANDLE h( ::CreateFile( path_, GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr ) );
@@ -323,6 +349,53 @@ int readlink( char const* path_, char* buffer_, size_t size_ ) {
 			len = static_cast<int>( ::GetFinalPathNameByHandle( h, buffer_, size_, VOLUME_NAME_NONE ) );
 		}
 		::CloseHandle( h );
+	} else {
+		h = ::CreateFile(
+			path_,
+			FILE_READ_ATTRIBUTES,
+			FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+			nullptr,
+			OPEN_EXISTING,
+			FILE_FLAG_BACKUP_SEMANTICS | FILE_ATTRIBUTE_REPARSE_POINT | FILE_FLAG_OPEN_REPARSE_POINT,
+			nullptr
+		);
+		if ( h == INVALID_HANDLE_VALUE ) {
+			return ( len );
+		}
+		DWORD returnedDataSize( 0 );
+		int size( sizeof ( REPARSE_DATA_BUFFER ) + size_ * 2 + 1 );
+		void* buf( memory::calloc<char>( size ) );
+		BOOL success(
+			DeviceIoControl(
+				h,
+				FSCTL_GET_REPARSE_POINT,
+				NULL,
+				0,
+				buf,
+				size,
+				&returnedDataSize,
+				nullptr
+			)
+		);
+		::CloseHandle( h );
+		if ( ! success ) {
+			DWORD e( GetLastError() );
+			if ( ( e == ERROR_INSUFFICIENT_BUFFER ) || ( e == ERROR_MORE_DATA ) ) {
+				len = size_ * 2;
+			}
+			memory::free( buf );
+			return ( len );
+		}
+		REPARSE_DATA_BUFFER* reparseDataBuffer( static_cast<REPARSE_DATA_BUFFER*>( buf ) );
+		if ( reparseDataBuffer->ReparseTag == IO_REPARSE_TAG_SYMLINK ) {
+			wchar_t* p( reparseDataBuffer->SymbolicLinkReparseBuffer.PathBuffer );
+			int utf16len( reparseDataBuffer->SymbolicLinkReparseBuffer.PrintNameLength / 2 );
+			len = WideCharToMultiByte( CP_UTF8, 0, p, utf16len, NULL, 0, NULL, NULL );
+			if ( len < static_cast<int>( size_ ) ) {
+				WideCharToMultiByte( CP_UTF8, 0, p, utf16len, buffer_, len, 0, 0 );
+			}
+		}
+		memory::free( buf );
 	}
 	return ( len );
 }

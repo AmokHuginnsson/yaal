@@ -18,33 +18,26 @@ init:
 environment:
   CYGWIN: c:\cygwin
   PATH: c:\msvcxx\bin;/bin;c:\cygwin\bin;c:\mingw\bin;C:\MinGW\msys\1.0\bin;c:\Program Files\CMake\bin;$(PATH)
-  YAAL_AUTO_SANITY: 1
-  TRESS_CLOCK_QUALITY_MULTIPLIER: 256
-  DEFAULT_TARGET: debug
   BC_PATH: c:\msvcxx\bin\bc.exe
   CONTINUOUS_INTEGRATION_SYSTEM: appveyor
 
 install:
-  - mv c:\cygwin\bin\cyg-git.exe c:\cygwin\bin\git.exe
-  - cmd: bash -c "git config core.symlinks true && git config --global core.ignorecase false && git config --global core.filemode true"
-  - cmd: bash -c "git reset --hard && git checkout -fq master"
-  - cmd: bash -c "git clone -q --branch=master https://codestation.org/repo/tress.git ../tress"
-  - cmd: bash -c "sed -i -e '15d' -e '/BOOST/d' -e '/\<Boost\>/d' -e 's/${Boost_LIBRARIES}//' ../tress/CMakeLists.txt"
+  - ps: ( git config core.symlinks true ) -And ( git config --global core.ignorecase false ) -And ( git config --global core.filemode true )
+  - ps: ( git reset --hard ) -And ( git checkout -fq master )
+  - ps: git clone -q --branch=master https://codestation.org/repo/tress.git ../tress
   - cmd: md c:\tmp
   - del ..\tress\src\tut_boost.cxx
   - cinst cmake
-  - C:\cygwin\setup-x86.exe -qgnNdO -l C:\cygwin\var\cache\setup -R c:\cygwin -s http://cygwin.mirror.constant.com -P sqlite3 -P bc
   - vcpkg integrate remove
 
 build_script:
   - chdir
   - ps: .\make.ps1 -target install-debug -prefix c:/msvcxx -auto_setup
   - cp local.js ../tress/
-  - cmd: set YAAL_SOURCE_PATH=%APPVEYOR_BUILD_FOLDER%
-  - cmd: bash -c "make -C ../tress/ -f msvcxx.mk"
   - cp ../tress/tressrc c:/msvcxx/etc/
-  - cmd: bash -c "make -C ../tress -f tress.mk"
-  - cmd: bash -c "make -f msvcxx.mk EXTRA_FLAGS=YAAL_AUTO_SANITY=1 install-release"
+  - cmd: set YAAL_SOURCE_PATH=%APPVEYOR_BUILD_FOLDER%
+  - cmd: powershell -F ..\tress\make.ps1 -target test
+  - ps: .\make.ps1 -target install-release -EXTRA_FLAGS YAAL_AUTO_SANITY=1
 
 # Build execution time has the maximum allowed time = 60 minutes.
 #  - cmd: bash -c "umask 0077 && make -C _deploy/windows clean package bundle BUILD_ID=`date +%Y%m%d%H%M%S`.codestation"

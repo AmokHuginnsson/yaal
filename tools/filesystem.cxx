@@ -290,7 +290,9 @@ path_t readlink( path_t const& path_ ) {
 	HChunk buffer;
 	bytes_t bytes( string_to_bytes( path_ ) );
 	do {
-		alloc <<= 1;
+		while ( alloc <= len ) {
+			alloc <<= 1;
+		}
 		buffer.realloc( alloc, HChunk::STRATEGY::EXACT );
 		len = static_cast<int>( ::readlink( bytes.data(), buffer.get<char>(), static_cast<size_t>( alloc ) ) );
 	} while ( len >= alloc );
