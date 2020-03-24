@@ -12,17 +12,16 @@ max_jobs: 1
 image: Visual Studio 2017
 
 init:
-  - mv c:\cygwin\bin\git.exe c:\cygwin\bin\cyg-git.exe
   - tzutil /s "Central European Standard Time"
 
 environment:
-  CYGWIN: c:\cygwin
-  PATH: c:\msvcxx\bin;/bin;c:\cygwin\bin;c:\mingw\bin;C:\MinGW\msys\1.0\bin;c:\Program Files\CMake\bin;$(PATH)
+  PATH: c:\msvcxx\bin;c:\mingw\bin;C:\MinGW\msys\1.0\bin;c:\Program Files\CMake\bin;$(PATH)
   BC_PATH: c:\msvcxx\bin\bc.exe
   CONTINUOUS_INTEGRATION_SYSTEM: appveyor
 
 install:
-  - ps: ( git config core.symlinks true ) -And ( git config --global core.ignorecase false ) -And ( git config --global core.filemode true )
+  - ps: ( git config --global core.symlinks true ) ; ( git config --global core.ignorecase false ) ; ( git config --global core.filemode true )
+  - ps: ( git config --global core.eol lf ) ; ( git config --global core.autocrlf false ) ; ( git config --global core.safecrlf false )
   - ps: ( git reset --hard ) -And ( git checkout -fq master )
   - ps: git clone -q --branch=master https://codestation.org/repo/tress.git ../tress
   - cmd: md c:\tmp
@@ -35,10 +34,10 @@ build_script:
   - ps: .\make.ps1 -target install-debug -prefix c:/msvcxx -auto_setup
   - cp local.js ../tress/
   - cp ../tress/tressrc c:/msvcxx/etc/
-  - cmd: set YAAL_SOURCE_PATH=%APPVEYOR_BUILD_FOLDER%
   - cmd: powershell -F ..\tress\make.ps1 -target test
   - ps: .\make.ps1 -target install-release -EXTRA_FLAGS YAAL_AUTO_SANITY=1
 
 # Build execution time has the maximum allowed time = 60 minutes.
-#  - cmd: bash -c "umask 0077 && make -C _deploy/windows clean package bundle BUILD_ID=`date +%Y%m%d%H%M%S`.codestation"
+#  - ps: .\make.ps1 -target purge
+#  - ps: .\make.ps1 -target bundle -BUILD_ID "`date +%Y%m%d%H%M%S`.codestation"
 

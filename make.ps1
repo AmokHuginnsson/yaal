@@ -60,7 +60,7 @@ function package {
 	Pop-Location
 }
 
-function deploy {
+function bundle {
 	package
 	$version = ""
 	Select-String `
@@ -115,7 +115,7 @@ if (
 	( $target -ne "install-release" ) -and
 	( $target -ne "purge" ) -and
 	( $target -ne "package" ) -and
-	( $target -ne "deploy" )
+	( $target -ne "bundle" )
 ) {
 	Write-Error "Unknown target: ``$target``"
 	exit 1
