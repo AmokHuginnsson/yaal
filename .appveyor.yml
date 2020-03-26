@@ -34,10 +34,10 @@ build_script:
   - ps: .\make.ps1 -target install-debug -prefix c:/msvcxx -auto_setup
   - cp local.js ../tress/
   - cp ../tress/tressrc c:/msvcxx/etc/
-  - cmd: powershell -F ..\tress\make.ps1 -target test
+  # Need to wrap invocation in `cmd` so stderr output will not trash the logs.
+  - cmd: powershell -Command ..\tress\make.ps1 -target purge,test
   - ps: .\make.ps1 -target install-release -EXTRA_FLAGS YAAL_AUTO_SANITY=1
 
 # Build execution time has the maximum allowed time = 60 minutes.
-#  - ps: .\make.ps1 -target purge
-#  - ps: .\make.ps1 -target bundle -BUILD_ID "`date +%Y%m%d%H%M%S`.codestation"
+#  - ps: .\make.ps1 -target purge,bundle -BUILD_ID "$(Get-Date -UFormat %Y%m%d%H%M%S).codestation"
 
