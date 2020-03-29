@@ -54,6 +54,7 @@ function install-release {
 function package {
 	debug "BUILD_PACKAGE=1"
 	release "BUILD_PACKAGE=1"
+	Remove-Item "build/msi" -Recurse -ErrorAction Ignore
 	$packagePath = make_absolute( "build/msi" )
 	Push-Location "build/release"
 	cpack -B $packagePath
@@ -92,14 +93,14 @@ function auto_setup( $parameters ) {
 	if ( $parameters.ContainsKey( "EXTRA_FLAGS" ) ) {
 		throw "You cannot specify EXTRA_FLAGS in auto_setup mode!"
 	}
-	New-Item -ItemType Directory -Force -Path "build/cache" > $null
-	$out = "build/cache/windows-dev.zip"
-	if ( -Not( Test-Path( $out ) ) ) {
-			$EXTRA_FLAGS="EXTRA_FLAGS=YAAL_AUTO_SANITY"
-			$uri = "https://codestation.org/download/windows-dev.zip"
-			Invoke-WebRequest -Uri $uri -OutFile $out
-	}
 	if ( -Not( Test-Path( "$prefix/bin/pcre.dll" ) ) ) {
+		$out = "build/cache/windows-dev.zip"
+		if ( -Not( Test-Path( $out ) ) ) {
+				New-Item -ItemType Directory -Force -Path "build/cache" > $null
+				$EXTRA_FLAGS="EXTRA_FLAGS=YAAL_AUTO_SANITY"
+				$uri = "https://codestation.org/download/windows-dev.zip"
+				Invoke-WebRequest -Uri $uri -OutFile $out
+		}
 		Expand-Archive -LiteralPath $out -DestinationPath "build/cache" -Force
 		$extract = "build/cache/windows/"
 		New-Item -ItemType Directory -Force -Path "$prefix" > $null
