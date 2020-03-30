@@ -74,8 +74,8 @@ function bundle {
 		}
 		$version += "$($_.Matches.groups[1])"
 	}
-	$bundlePath = "build/yaal-deploy/windows/$version"
-	Remove-Item "build/yaal-deploy" -Recurse -ErrorAction Ignore
+	$bundlePath = "build/msi/yaal-bundle/windows/$version"
+	Remove-Item "build/msi/yaal-bundle" -Recurse -ErrorAction Ignore
 	New-Item -ItemType Directory -Force -Path "$bundlePath" > $null
 	$sys = "win32"
 	$tag = $version
@@ -86,7 +86,8 @@ function bundle {
 		-Path build/msi/yaal-$version-$sys.msi `
 		-Destination "$bundlePath/yaal-$tag-$sys.msi" `
 		-Force
-	Compress-Archive -Path build/yaal-deploy -DestinationPath build/yaal-deploy.zip -Force
+	Compress-Archive -Path build/msi/yaal-bundle -DestinationPath build/msi/yaal-$version-windows.zip -Force
+	Compress-Archive -Path build/msi/yaal-$version-windows.zip -DestinationPath build/msi/yaal-bundle.zip -Force
 }
 
 function auto_setup( $parameters ) {
