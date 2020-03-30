@@ -33,6 +33,7 @@ if( CMAKE_HOST_WIN32 )
 	set( CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /SAFESEH:NO" )
 	add_definitions( /utf-8 )
 	if ( NOT ( "${PROJECT_NAME}" STREQUAL "yaal" ) ) # For clients only.
+		set( YAAL_SCOPE "yaal-" )
 		add_definitions( -D__MSVCXX__ /FIyaal/fix.hxx )
 	endif()
 endif()
@@ -354,7 +355,7 @@ if ( NOT CMAKE_HOST_WIN32 )
 else()
 	add_custom_target(
 		commit_id ALL
-		COMMAND update-commit-id "${CMAKE_HOME_DIRECTORY}" "${TARGET_PATH}/commit_id.hxx"
+		COMMAND ${YAAL_SCOPE}update-commit-id "${CMAKE_HOME_DIRECTORY}" "${TARGET_PATH}/commit_id.hxx"
 		DEPENDS update-config-id
 		COMMENT "Regenerating commit_id.hxx."
 	)
@@ -371,7 +372,7 @@ if ( EXISTS "${CMAKE_HOME_DIRECTORY}/LICENSE.md" )
 	else()
 		add_custom_command(
 			OUTPUT ${TARGET_PATH}/license.hxx
-			COMMAND mklicense "${TARGET_PATH}/license.hxx" "${CMAKE_HOME_DIRECTORY}/LICENSE.md"
+			COMMAND ${YAAL_SCOPE}mklicense "${TARGET_PATH}/license.hxx" "${CMAKE_HOME_DIRECTORY}/LICENSE.md"
 			DEPENDS "${CMAKE_HOME_DIRECTORY}/LICENSE.md" mklicense
 			COMMENT "Generating license.hxx."
 		)
