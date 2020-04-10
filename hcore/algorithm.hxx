@@ -1990,6 +1990,54 @@ inline iterator_t partition( iterator_t first_, iterator_t last_, predicate_t pr
 	return ( fit );
 }
 
+template<typename iterator_t, typename compare_t>
+inline iterator_t partition_by_pivot(
+	iterator_t first_,
+	iterator_t last_,
+	compare_t const& compare_,
+	typename hcore::iterator_traits<iterator_t>::value_type const& pivot_,
+	bool& leftConstant_
+) {
+	if ( first_ == last_ ) {
+		return ( first_ );
+	}
+	iterator_t l( first_ );
+	iterator_t r( last_ - 1 );
+	using yaal::swap;
+	while ( l != r ) {
+		for ( ; ( l != r ) && compare_( *l, pivot_ ); ++ l ) {
+		}
+		for ( ; ( r != l ) && ! compare_( *r, pivot_ ); -- r ) {
+		}
+		if ( l != r ) {
+			swap( *l, *r );
+			++ l;
+			if ( l != r ) {
+				-- r;
+			}	else {
+				break;
+			}
+		} else {
+			break;
+		}
+	}
+	for ( ; ( l != last_ ) && compare_( *l, pivot_ ); ++ l ) {
+	}
+	leftConstant_ = false;
+	if ( ! ( l != first_ ) ) {
+		/* if l == first_ it means that pivot_ is minimum of a set
+		 */
+		leftConstant_ = true;
+		for ( r = l; r != last_; ++ r ) {
+			if ( ( ! compare_( pivot_, *r ) ) && ( r != l ) ) {
+				swap( *r, *l );
+				++ l;
+			}
+		}
+	}
+	return ( l );
+}
+
 /*! \brief Reorder range of elements so element at given position would be preserved if range were to be sorted.
  *
  * \param first_ - beginning of the range to reorder.
@@ -2003,13 +2051,16 @@ inline void nth_element( iterator_t first_, iterator_t nth_, iterator_t last_, c
 		iterator_t pivotIt( choose_pivot( first_, last_ - 1, comp_ ) );
 		using yaal::swap;
 		swap( *pivotIt, *( last_ - 1 ) );
-		pivotIt = partition( first_, last_ - 1, bind2nd( comp_, *( last_ - 1 ) ) );
+		bool leftConstant( false );
+		pivotIt = partition_by_pivot( first_, last_ - 1, comp_, *( last_ - 1 ), leftConstant );
 		swap( *pivotIt, *( last_ - 1 ) );
 		if ( pivotIt == nth_ ) {
 			break;
 		}
 		if ( pivotIt < nth_ ) {
 			first_ = pivotIt + 1;
+		} else if ( leftConstant ) {
+			break;
 		} else {
 			last_ = pivotIt;
 		}
@@ -2143,46 +2194,14 @@ inline void sort( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 		if ( size < YAAL_QUICK_SORT_ALGO_THRESHOLD ) {
 			insert_sort( first_, last_, comp_, typename hcore::iterator_traits<iterator_t>::category_type() );
 		} else {
-			iterator_t l( first_ );
-			iterator_t r( last_ - 1 );
-			typename hcore::iterator_traits<iterator_t>::value_type pivot( *choose_pivot( l, r, comp_ ) );
-			using yaal::swap;
-			while ( l != r ) {
-				for ( ; ( l != r ) && comp_( *l, pivot ); ++ l ) {
-				}
-				for ( ; ( r != l ) && ! comp_( *r, pivot ); -- r ) {
-				}
-				if ( l != r ) {
-					swap( *l, *r );
-					++ l;
-					if ( l != r ) {
-						-- r;
-					}	else {
-						break;
-					}
-				} else {
-					break;
-				}
-			}
-			for ( ; ( l != last_ ) && comp_( *l, pivot ); ++ l ) {
-			}
+			typename hcore::iterator_traits<iterator_t>::value_type pivot( *choose_pivot( first_, last_ - 1, comp_ ) );
 			bool leftConstant( false );
-			if ( ! ( l != first_ ) ) {
-				/* if l == first_ it means that pivot is minimum of a set
-				 */
-				leftConstant = true;
-				for ( r = l; r != last_; ++ r ) {
-					if ( ( ! comp_( pivot, *r ) ) && ( r != l ) ) {
-						swap( *r, *l );
-						++ l;
-					}
-				}
-			}
-			if ( l != last_ ) {
+			iterator_t it( partition_by_pivot( first_, last_, comp_, pivot, leftConstant ) );
+			if ( it != last_ ) {
 				if ( ! leftConstant ) {
-					sort( first_, l, comp_ );
+					sort( first_, it, comp_ );
 				}
-				sort( l, last_, comp_ );
+				sort( it, last_, comp_ );
 			}
 		}
 	}
