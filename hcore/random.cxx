@@ -388,6 +388,34 @@ double long HNormal::do_next_continuous( void ) {
 	return ( operator()() );
 }
 
+HPoisson::HPoisson( double long lambda_ )
+	: HDistribution()
+	, _lambda( lambda_ ) {
+	M_ASSERT( lambda_ > 0.L );
+	return;
+}
+
+i64_t HPoisson::operator()( void ) {
+	double long L( math::natural_exponential( - _lambda ) );
+	i64_t k( 0 );
+	double long p( 1.L );
+	do {
+		++ k;
+		double long u( to_standard_uniform( (*_rng)() ) );
+		p *= u;
+	} while ( p > L );
+	return ( k - 1 );
+}
+
+yaal::i64_t HPoisson::do_next_discrete( void ) {
+	return ( operator()() );
+}
+
+double long HPoisson::do_next_continuous( void ) {
+	M_ASSERT( !"Invalid use of discrete distribution."[0] );
+	return ( 0.L );
+}
+
 }
 
 namespace rng_helper {

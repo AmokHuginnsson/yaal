@@ -177,6 +177,24 @@ private:
 	double long uniform_sample( void );
 };
 
+/*! \brief Poisson distribution.
+ *
+ * Using `Junhao (feat. Knuth) algorithm`.
+ */
+class HPoisson : public HDistribution {
+	double long _lambda;
+public:
+	HPoisson( double long lambda_ );
+	i64_t operator()( void );
+	double long lambda( void ) const {
+		return ( _lambda );
+	}
+protected:
+	virtual yaal::i64_t do_next_discrete( void ) override;
+	virtual double long do_next_continuous( void ) override;
+private:
+};
+
 }
 
 /*! \brief Helper namespace for HRandomNumberGenerator related utilities.
