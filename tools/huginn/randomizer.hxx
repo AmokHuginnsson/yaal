@@ -20,7 +20,8 @@ public:
 		DISCRETE,
 		UNIFORM,
 		TRIANGLE,
-		NORMAL
+		NORMAL,
+		POISSON
 	};
 	typedef yaal::hcore::HResource<yaal::random::distribution::HDistribution> distribution_t;
 private:
