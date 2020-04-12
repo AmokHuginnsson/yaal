@@ -396,14 +396,25 @@ HPoisson::HPoisson( double long lambda_ )
 }
 
 i64_t HPoisson::operator()( void ) {
-	double long L( math::natural_exponential( - _lambda ) );
+	double long const STEP( 100.L );
+	double long const eSTEP( math::natural_exponential( STEP ) );
+	double long lambdaLeft( _lambda );
 	i64_t k( 0 );
 	double long p( 1.L );
 	do {
 		++ k;
 		double long u( to_standard_uniform( (*_rng)() ) );
 		p *= u;
-	} while ( p > L );
+		while ( ( p < math::E ) && ( lambdaLeft > 0.L ) ) {
+			if ( lambdaLeft > STEP ) {
+				p *= eSTEP;
+				lambdaLeft -= STEP;
+			} else {
+				p *= math::natural_exponential( lambdaLeft );
+				lambdaLeft = -1.L;
+			}
+		}
+	} while ( p > 1.L );
 	return ( k - 1 );
 }
 
