@@ -1,5 +1,7 @@
 /* Read yaal/LICENSE.md file for copyright and licensing information. */
 
+#include <cmath>
+#include <limits>
 #include <sys/time.h>
 
 #include "base.hxx"
@@ -388,34 +390,117 @@ double long HNormal::do_next_continuous( void ) {
 	return ( operator()() );
 }
 
+namespace {
+static double long const POISSON_REJECTION_PRECISION_LIMIT( 1e8 );
+}
+
 HPoisson::HPoisson( double long lambda_ )
 	: HDistribution()
-	, _lambda( lambda_ ) {
-	M_ASSERT( lambda_ > 0.L );
+	, _lambda( lambda_ )
+	, _normal() {
+	M_ASSERT( ( lambda_ > 0.L ) && ! std::isinf( _lambda ) );
+	if ( _lambda > POISSON_REJECTION_PRECISION_LIMIT ) {
+		_normal = make_pointer<HNormal>( 0.L, 1.L );
+	}
 	return;
 }
 
-i64_t HPoisson::operator()( void ) {
-	double long const STEP( 100.L );
-	double long const eSTEP( math::natural_exponential( STEP ) );
-	double long lambdaLeft( _lambda );
-	i64_t k( 0 );
-	double long p( 1.L );
-	do {
-		++ k;
-		double long u( to_standard_uniform( (*_rng)() ) );
-		p *= u;
-		while ( ( p < math::E ) && ( lambdaLeft > 0.L ) ) {
-			if ( lambdaLeft > STEP ) {
-				p *= eSTEP;
-				lambdaLeft -= STEP;
-			} else {
-				p *= math::natural_exponential( lambdaLeft );
-				lambdaLeft = -1.L;
-			}
+namespace {
+
+template<int const N>
+constexpr double long logarithm_sum( void );
+
+template<>
+constexpr double long logarithm_sum<1>( void ) {
+	return ( 0.L );
+}
+
+template<int const N>
+constexpr double long logarithm_sum() {
+	return ( math::natural_logarithm( static_cast<double long>( N ) ) + logarithm_sum<N - 1>() );
+}
+
+double long logarithm_of_factorial( double long k ) {
+	static double long const C0(  9.18938533204672742e-01 );
+	static double long const C1(  8.33333333333333333e-02 );
+	static double long const C3( -2.77777777777777778e-03 );
+	static double long const C5(  7.93650793650793651e-04 );
+	static double long const C7( -5.95238095238095238e-04 );
+
+	static double long PRECOMPUTED_LOG_FACT[30L] = {
+		0.0000000000000000L, 0.0000000000000000L, logarithm_sum<2>(),
+		logarithm_sum<3>(),  logarithm_sum<4>(),  logarithm_sum<5>(),
+		logarithm_sum<6>(),  logarithm_sum<7>(),  logarithm_sum<8>(),
+		logarithm_sum<9>(),  logarithm_sum<10>(), logarithm_sum<11>(),
+		logarithm_sum<12>(), logarithm_sum<13>(), logarithm_sum<14>(),
+		logarithm_sum<15>(), logarithm_sum<16>(), logarithm_sum<17>(),
+		logarithm_sum<18>(), logarithm_sum<19>(), logarithm_sum<20>(),
+		logarithm_sum<21>(), logarithm_sum<22>(), logarithm_sum<23>(),
+		logarithm_sum<24>(), logarithm_sum<25>(), logarithm_sum<26>(),
+		logarithm_sum<27>(), logarithm_sum<28>(), logarithm_sum<29>()
+	};
+
+	double long x( 0.L );
+	if ( k >= 30.0L ) {
+		double long r( 1.0L / k );
+		double long rr( r * r );
+		x = ( ( k + 0.5 ) * math::natural_logarithm( k ) - k + C0 + r * ( C1 + rr * ( C3 + rr * ( C5 + rr * C7 ) ) ) );
+	} else {
+		x = PRECOMPUTED_LOG_FACT[static_cast<int>( k )];
+	}
+	return ( x );
+}
+
+double long poisson_rejection( double long lambda, HRandomNumberGenerator& rng_ ) {
+	double long sq( math::square_root( 2.0L * lambda ) );
+	double long alxm( math::natural_logarithm( lambda ) );
+	double long g( lambda * alxm - lgammal( lambda + 1.0L ) );
+
+	double long em( 0.L );
+	for ( ;; ) {
+		double long y( 0.L );
+		do {
+			double long u( to_standard_uniform( rng_() ) );
+			y = math::tangens( math::PI * u );
+			em = sq * y + lambda;
+		} while ( em < 0.0L );
+		em = floorl( em );
+		double long t( 0.9L * ( 1.0L + y * y ) * math::natural_exponential( em * alxm - logarithm_of_factorial( em ) - g ) );
+		double long u( to_standard_uniform( rng_() ) );
+		if ( u <= t ) {
+			break;
 		}
-	} while ( p > 1.L );
-	return ( k - 1 );
+	}
+	return ( em );
+}
+
+}
+
+i64_t HPoisson::operator()( void ) {
+	static double long const EXPONENTIAL_PRECISION_LIMIT( 12.L );
+	i64_t ret( 0 );
+	if ( _lambda <= EXPONENTIAL_PRECISION_LIMIT ) {
+		/* From Press, et al. Numerical recipes */
+		double long L( math::natural_exponential( - _lambda ) );
+		int k( -1 );
+		double long p( 1.0L );
+		do {
+			++ k;
+			double long u( to_standard_uniform( (*_rng)() ) );
+			p *= u;
+		} while ( p > L );
+		ret = k;
+	} else if ( _lambda <= POISSON_REJECTION_PRECISION_LIMIT ) {
+		/* numerical recipes */
+		ret = static_cast<i64_t>( poisson_rejection( _lambda, *_rng ) );
+	} else {
+		/* normal approximation: from Phys. Rev. D (1994) v50 p1284 */
+		ret = static_cast<i64_t>( floorl( _normal->next_continuous() * math::square_root( _lambda ) + _lambda + 0.5 ) );
+		if ( ret < 0 ) {
+			ret = 0; /* will probably never happen */
+		}
+	}
+	return ( ret );
 }
 
 yaal::i64_t HPoisson::do_next_discrete( void ) {

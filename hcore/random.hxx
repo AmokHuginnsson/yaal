@@ -179,10 +179,12 @@ private:
 
 /*! \brief Poisson distribution.
  *
- * Using `Junhao (feat. Knuth) algorithm`.
+ * Using Knuth algorithm or rejection method depending on `lambda` value.
  */
 class HPoisson : public HDistribution {
 	double long _lambda;
+	typedef yaal::hcore::HPointer<HDistribution> distribution_t;
+	distribution_t _normal;
 public:
 	HPoisson( double long lambda_ );
 	i64_t operator()( void );
