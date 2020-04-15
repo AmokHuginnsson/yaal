@@ -821,7 +821,7 @@ system::argv_t HProgramOptionsHandler::process_command_line( system::argv_t&& ar
 	}
 	argv_.erase( argv_.begin() + 1, argv_.end() - ( nonOption - 1 ) );
 	hcore::log << "done." << endl;
-	return ( argv_ );
+	return ( yaal::move( argv_ ) );
 	M_EPILOG
 }
 
