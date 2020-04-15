@@ -128,9 +128,9 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 		elif test ["x${HOST_OS_VENDOR}"] = ["xCentOS"] -o \( ["x${HOST_OS_VENDOR}"] = ["x"] -a -f [/etc/yum.repos.d/CentOS-Base.repo] \) ; then
 			AC_DEFINE([__HOST_OS_TYPE_CENTOS__], [], [Your specific Linux version is CentOS.])
 			HOST_OS_VENDOR=[CentOS]
-		elif test ["x${HOST_OS_VENDOR}"] = ["xFedora"] -o \( ["x${HOST_OS_VENDOR}"] = ["x"] -a -f [/etc/yum.repos.d/CentOS-Base.repo] \) ; then
+		elif test ["x${HOST_OS_VENDOR}"] = ["xFedora"] -o \( ["x${HOST_OS_VENDOR}"] = ["x"] -a -f [/etc/fedora-release] \) ; then
 			AC_DEFINE([__HOST_OS_TYPE_FEDORA__], [], [Your specific Linux version is Fedora.])
-			HOST_OS_VENDOR=[CentOS]
+			HOST_OS_VENDOR=[Fedora]
 		elif test ["x${HOST_OS_VENDOR}"] = ["xRaspbian"] -o \( ["x${HOST_OS_VENDOR}"] = ["x"] -a -f [/etc/rpi-issue] \) ; then
 			AC_DEFINE([__HOST_OS_TYPE_RASPBIAN__], [], [Your specific Linux version is Raspbian.])
 			HOST_OS_VENDOR=[Raspbian]
