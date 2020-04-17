@@ -38,7 +38,6 @@ HFrame::HFrame(
 	, _state( STATE::NORMAL )
 	, _statement( nullptr )
 	, _position( INVALID_POSITION ) {
-	_variables.reserve( _thread->runtime().max_local_variable_count() );
 	return;
 }
 
@@ -53,6 +52,8 @@ void HFrame::init(
 	_statement = statement_;
 	_object = object_;
 	_upCast = upCast_;
+	_variables.reserve( _thread->runtime().max_local_variable_count() );
+	reshape();
 	_result = _thread->runtime().none_value();
 	_number = _parent ? ( _parent->_number + ( ( type_ == TYPE::FUNCTION ) ? 1 : 0 ) ) : 1;
 	_state = STATE::NORMAL;
@@ -60,13 +61,19 @@ void HFrame::init(
 	M_EPILOG
 }
 
-void HFrame::reshape( HThread* thread_, int size_ ) {
+void HFrame::reshape( void ) {
+	M_PROLOG
+	int maxLocalVariableCount( _thread->runtime().max_local_variable_count() );
+	for ( values_holder_t& v : _valueCache ) {
+		v->reserve( maxLocalVariableCount );
+	}
+	return;
+	M_EPILOG
+}
+
+void HFrame::set_thread( HThread* thread_ ) {
 	M_PROLOG
 	_thread = thread_;
-	_variables.reserve( size_ );
-	for ( values_holder_t& v : _valueCache ) {
-		v->reserve( size_ );
-	}
 	return;
 	M_EPILOG
 }
@@ -191,6 +198,7 @@ HHuginn::value_t HFrame::make_variable( HStatement::statement_id_t M_DEBUG_CODE(
 	 * and not in reverse order of their definition as it would be expected.
 	 */
 	if ( static_cast<int>( _variables.get_size() ) == index_ ) {
+		M_ASSERT( _variables.get_capacity() >= ( _variables.get_size() + 1 ) );
 		_variables.push_back( HHuginn::value_t() );
 	}
 	return ( _thread->runtime().object_factory()->create_reference( _variables[index_] ) );

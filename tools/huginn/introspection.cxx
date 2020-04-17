@@ -261,6 +261,11 @@ public:
 		try {
 			if ( ! v ) {
 				v = HPackageFactory::get_instance().create_package( &r, package, HHuginn::VISIBILITY::PACKAGE, position_ );
+				HFrame* f( thread_->current_frame() );
+				while ( f ) {
+					f->reshape();
+					f = f->parent();
+				}
 			}
 		} catch ( HHuginn::HHuginnRuntimeException const& e ) {
 			thread_->raise( static_cast<HIntrospection*>( object_->raw() )->_exceptionClass.raw(), e.message(), position_ );

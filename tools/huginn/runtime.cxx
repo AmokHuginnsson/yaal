@@ -343,7 +343,7 @@ HClass const* HRuntime::get_class( void const* id_ ) const {
 void HRuntime::set_max_local_variable_count( int maxLocalVariableCount_ ) {
 	M_PROLOG
 	M_ASSERT( maxLocalVariableCount_ >= 0 );
-	_maxLocalVariableCount = maxLocalVariableCount_;
+	_maxLocalVariableCount = max( _maxLocalVariableCount, maxLocalVariableCount_ );
 	return;
 	M_EPILOG
 }
@@ -1215,7 +1215,7 @@ HIntrospecteeInterface::variable_views_t HRuntime::get_locals( HThread* thread_,
 		-- frameNo_;
 	}
 	while ( f ) {
-		HHuginn::values_t& variableValues( f->variable_values() );
+		HHuginn::values_t const& variableValues( f->variable_values() );
 		HFrame::identifiers_t const& variableIdentifiers( f->variable_identifiers() );
 		M_ASSERT( variableIdentifiers.get_size() == variableValues.get_size() );
 		for ( int i( 0 ), COUNT( static_cast<int>( variableValues.get_size() ) ); i < COUNT; ++ i ) {

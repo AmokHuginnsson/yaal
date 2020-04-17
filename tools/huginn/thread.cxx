@@ -89,7 +89,7 @@ void HThread::create_incremental_function_frame( HStatement const* statement_, H
 		add_frame();
 	}
 	_runtime->set_incremental_frame( _frames.back() );
-	_currentFrame->reshape( this, _runtime->max_local_variable_count() );
+	_currentFrame->set_thread( this );
 	_currentFrame->init( HFrame::TYPE::FUNCTION, statement_, object_, upCast_ );
 	return;
 	M_EPILOG
