@@ -49,6 +49,7 @@ OCompiler::OScopeContext::OScopeContext(
 	, _statementId( statementId_ )
 	, _functionId( functionContext_->_functionIdentifier )
 	, _variables()
+	, _argumentIndexes()
 	, _needsFrame( false )
 	, _hasLocalVariables( false )
 	, _hasLocalVariablesInDirectChildren( false ) {

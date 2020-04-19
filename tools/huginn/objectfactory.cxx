@@ -100,6 +100,7 @@ HObjectFactory::HObjectFactory( HRuntime* runtime_ )
 	, _method( make_pointer<huginn::HClass>( runtime_, HHuginn::TYPE::METHOD, IDENTIFIER::BUILTIN::TYPE_METHOD, "Raw *uncallable* method." ) )
 	, _unboundMethod( make_pointer<huginn::HClass>( runtime_, HHuginn::TYPE::UNBOUND_METHOD, IDENTIFIER::BUILTIN::TYPE_UNBOUND_METHOD, "A reference to a callable but unbound method." ) )
 	, _boundMethod( make_pointer<huginn::HClass>( runtime_, HHuginn::TYPE::BOUND_METHOD, IDENTIFIER::BUILTIN::TYPE_BOUND_METHOD, "A reference to a callable method with a valid runtime value bound to it." ) )
+	, _partial( make_pointer<huginn::HClass>( runtime_, HHuginn::TYPE::PARTIAL, IDENTIFIER::BUILTIN::TYPE_PARTIAL, "A function/method call with partially bound arguments." ) )
 	, _variadicParameters( make_pointer<huginn::HClass>( runtime_, HHuginn::TYPE::VARIADIC_PARAMETERS, IDENTIFIER::BUILTIN::TYPE_VARIADIC_PARAMETERS, "Variadic parameters pack." ) )
 	, _namedParameters( make_pointer<huginn::HClass>( runtime_, HHuginn::TYPE::NAMED_PARAMETERS, IDENTIFIER::BUILTIN::TYPE_NAMED_PARAMETERS, "Named parameters pack." ) )
 	, _referencePool( this, _reference.raw() )
@@ -107,6 +108,7 @@ HObjectFactory::HObjectFactory( HRuntime* runtime_ )
 	, _methodPool( this, _method.raw() )
 	, _unboundMethodPool( this, _unboundMethod.raw() )
 	, _boundMethodPool( this, _boundMethod.raw() )
+	, _partialPool( this, _partial.raw() )
 	, _boolean( boolean::get_class( runtime_, this ) )
 	, _integer( integer::get_class( runtime_, this ) )
 	, _string( string::get_class( runtime_, this ) )
@@ -163,6 +165,7 @@ void HObjectFactory::register_builtin_classes( void ) {
 	_runtime->huginn()->register_class( _method, HHuginn::VISIBILITY::GLOBAL );
 	_runtime->huginn()->register_class( _unboundMethod, HHuginn::VISIBILITY::GLOBAL );
 	_runtime->huginn()->register_class( _boundMethod, HHuginn::VISIBILITY::GLOBAL );
+	_runtime->huginn()->register_class( _partial, HHuginn::VISIBILITY::GLOBAL );
 	_runtime->huginn()->register_class( _variadicParameters, HHuginn::VISIBILITY::GLOBAL );
 	_runtime->huginn()->register_class( _namedParameters, HHuginn::VISIBILITY::GLOBAL );
 	_runtime->huginn()->register_class( _boolean, HHuginn::VISIBILITY::GLOBAL );
@@ -273,7 +276,7 @@ void HObjectFactory::cleanup( long_lived_t const& longLived_ ) {
 	typedef typename pool_type_info<huginn::HLookup>::pool_t lookup_pool_t;
 	typedef typename pool_type_info<huginn::HOrder>::pool_t  order_pool_t;
 	typedef typename pool_type_info<huginn::HSet>::pool_t    set_pool_t;
-	typedef HBoundCall<int ( void**, int )> gc_t;
+	typedef hcore::HBoundCall<int ( void**, int )> gc_t;
 	list_pool_t&   listPool( get_pool<huginn::HList>() );
 	deque_pool_t&  dequePool( get_pool<huginn::HDeque>() );
 	dict_pool_t&   dictPool( get_pool<huginn::HDict>() );

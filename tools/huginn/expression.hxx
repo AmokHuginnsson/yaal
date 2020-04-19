@@ -26,6 +26,7 @@ class HExpression : public HStatement {
 public:
 	typedef HExpression this_type;
 	typedef HStatement base_type;
+	static int const UNBOUND_INDEX_BASE = 0;
 	struct OExecutionStep {
 		typedef void ( HExpression::*action_t ) ( OExecutionStep const&, huginn::HFrame* );
 		HExpression* _expression;
@@ -41,6 +42,7 @@ public:
 		int long long _integer;
 		yaal::hcore::HString _string;
 		code_point_t _character;
+		HPartial::unbound_indexes_t _unboundIndexes;
 		OExecutionStep( void );
 		OExecutionStep( HExpression*, action_t, int );
 		OExecutionStep( HExpression*, action_t, int, HFrame::ACCESS, int );
@@ -54,6 +56,7 @@ public:
 		OExecutionStep( HExpression*, action_t, int, int long long );
 		OExecutionStep( HExpression*, action_t, int, yaal::hcore::HString const& );
 		OExecutionStep( HExpression*, action_t, int, code_point_t );
+		OExecutionStep( HExpression*, action_t, int, HPartial::unbound_indexes_t const&, int );
 		OExecutionStep( OExecutionStep const& ) = default;
 		OExecutionStep( OExecutionStep&& ) = default;
 		OExecutionStep& operator = ( OExecutionStep const& ) = default;
@@ -93,6 +96,7 @@ public:
 	void make_lookup( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
 		make_assoc( OPERATOR::MAKE_LOOKUP, frame_, executionStep_._position );
 	}
+	void make_partial( OExecutionStep const&, huginn::HFrame* );
 	void get_field_direct( OExecutionStep const&, huginn::HFrame* );
 	void get_variable_value( OExecutionStep const&, huginn::HFrame* );
 	void get_variable_reference( OExecutionStep const&, huginn::HFrame* );
@@ -128,6 +132,7 @@ public:
 	bool is_empty( void ) const;
 protected:
 	void grab_args( HFrame*, HArguments& );
+	HHuginn::values_t grab_args( HFrame*, HPartial::unbound_indexes_t& );
 	virtual void do_execute( huginn::HThread* ) const override;
 private:
 	HExpression( HExpression const& ) = delete;

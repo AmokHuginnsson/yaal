@@ -451,6 +451,9 @@ HHuginn::value_t verify_arg_callable(
 		if ( t == HHuginn::TYPE::BOUND_METHOD ) {
 			break;
 		}
+		if ( t == HHuginn::TYPE::PARTIAL ) {
+			break;
+		}
 		int fi( v->field_index( IDENTIFIER::INTERFACE::CALL ) );
 		if ( fi >= 0 ) {
 			v = v->field( v, fi );
@@ -919,6 +922,7 @@ yaal::hcore::HString const& type_name( HHuginn::TYPE type_ ) {
 	static hcore::HString const NAME_METHOD              = BUILTIN::TYPE_METHOD;
 	static hcore::HString const NAME_UNBOUND_METHOD      = BUILTIN::TYPE_UNBOUND_METHOD;
 	static hcore::HString const NAME_BOUND_METHOD        = BUILTIN::TYPE_BOUND_METHOD;
+	static hcore::HString const NAME_PARTIAL             = BUILTIN::TYPE_PARTIAL;
 	static hcore::HString const NAME_VARIADIC_PARAMETERS = BUILTIN::TYPE_VARIADIC_PARAMETERS;
 	static hcore::HString const NAME_NAMED_PARAMETERS    = BUILTIN::TYPE_NAMED_PARAMETERS;
 	static hcore::HString const NAME_UNKNOWN             = BUILTIN::TYPE_UNKNOWN;
@@ -947,6 +951,7 @@ yaal::hcore::HString const& type_name( HHuginn::TYPE type_ ) {
 		case ( HHuginn::TYPE::METHOD ):             s = &NAME_METHOD;             break;
 		case ( HHuginn::TYPE::UNBOUND_METHOD ):     s = &NAME_UNBOUND_METHOD;     break;
 		case ( HHuginn::TYPE::BOUND_METHOD ):       s = &NAME_BOUND_METHOD;       break;
+		case ( HHuginn::TYPE::PARTIAL ):            s = &NAME_PARTIAL;            break;
 		case ( HHuginn::TYPE::VARIADIC_PARAMETERS ):s = &NAME_VARIADIC_PARAMETERS;break;
 		case ( HHuginn::TYPE::NAMED_PARAMETERS ):   s = &NAME_NAMED_PARAMETERS;   break;
 		case ( HHuginn::TYPE::UNKNOWN ):            s = &NAME_UNKNOWN;            break;
@@ -999,6 +1004,7 @@ char const* op_to_symbol_str( OPERATOR o_ ) {
 		case ( OPERATOR::TERNARY ):            str = "?:";     break;
 		case ( OPERATOR::MAKE_DICT ):          str = "{k:v}";  break;
 		case ( OPERATOR::MAKE_LOOKUP ):        str = "[k:v]";  break;
+		case ( OPERATOR::MAKE_PARTIAL ):       str = "f(~)";   break;
 		case ( OPERATOR::NONE ): break;
 	}
 	return ( str );

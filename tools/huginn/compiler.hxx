@@ -9,6 +9,7 @@
 #include "hcore/hstack.hxx"
 #include "tools/huginn/operator.hxx"
 #include "tools/huginn/function.hxx"
+#include "tools/huginn/functionreference.hxx"
 #include "tools/huginn/frame.hxx"
 #include "tools/huginn/trycatch.hxx"
 #include "tools/huginn/scope.hxx"
@@ -27,6 +28,8 @@ class HExpression;
 /*! \brief Huginn language compiler.
  */
 struct OCompiler {
+	static int const BOUND_INDEX = -1;
+	static int const IMPLICIT_UNBOUND_INDEX = HExpression::UNBOUND_INDEX_BASE;
 	typedef yaal::hcore::HStack<HFunction::expressions_t> expressions_stack_t;
 	typedef yaal::hcore::HHashMap<HHuginn::identifier_id_t, huginn::HClass const*> variable_types_t;
 	/*! \brief Saves _compiled_ `if'/`case' expression-scope pairs.
@@ -45,6 +48,8 @@ struct OCompiler {
 	/*! \brief Huginn program scope as seen by the compiler.
 	 */
 	struct OScopeContext {
+		typedef yaal::hcore::HArray<int> argument_indexes_t;
+		typedef yaal::hcore::HStack<argument_indexes_t> nested_unbound_indexes_t;
 		typedef yaal::hcore::HArray<OActiveScope> active_scopes_t;
 		struct OLocalVariable {
 			int _index;
@@ -114,6 +119,13 @@ struct OCompiler {
 		 * Used during local symbols dereferencing stage (in `resolve_symbols()`).
 		 */
 		local_variables_t _variables;
+
+		/*! \brief Note indexes of unbound arguments in function calls.
+		 *
+		 * foo( a, ~, b )
+		 * foo( a, ~2, b, ~1 )
+		 */
+		nested_unbound_indexes_t _argumentIndexes;
 
 		/*! \brief Tells if given scope needs to have a fully materialized frame.
 		 *
@@ -471,6 +483,7 @@ struct OCompiler {
 	void commit_import( executing_parser::range_t );
 	void submit_class( executing_parser::range_t );
 	void commit_enum( executing_parser::range_t );
+	bool commit_unbound( HExpression::OExecutionStep::action_t const&, executing_parser::range_t );
 	void create_lambda( executing_parser::range_t );
 	void commit_assignable( executing_parser::range_t );
 	void save_control_variable( executing_parser::range_t );
@@ -532,6 +545,8 @@ struct OCompiler {
 	void make_reference( executing_parser::range_t );
 	void repack_named_parameters( executing_parser::range_t );
 	void unpack_variadic_parameters( executing_parser::range_t );
+	void note_function_argument( int, executing_parser::range_t );
+	void index_unbound( int, executing_parser::range_t );
 	void defer_get_reference( yaal::hcore::HString const&, executing_parser::range_t );
 	void defer_get_field_reference( yaal::hcore::HString const&, executing_parser::range_t );
 	void defer_make_variable( yaal::hcore::HString const&, executing_parser::range_t );
@@ -553,6 +568,7 @@ struct OCompiler {
 	void dispatch_function_call( HExpression::OExecutionStep::action_t const&, executing_parser::range_t );
 	void dispatch_member_access( executing_parser::range_t );
 	void defer_action( HExpression::OExecutionStep::action_t const&, executing_parser::range_t );
+	void defer_function_call( HExpression::OExecutionStep::action_t, executing_parser::range_t );
 	void defer_store_direct( HHuginn::value_t const&, executing_parser::range_t );
 	void defer_store_real( double long, executing_parser::range_t );
 	void defer_store_integer( int long long, executing_parser::range_t );

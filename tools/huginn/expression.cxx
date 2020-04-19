@@ -36,7 +36,8 @@ HExpression::OExecutionStep::OExecutionStep( void )
 	, _real( 0.0L )
 	, _integer( 0 )
 	, _string()
-	, _character( 0 ) {
+	, _character( 0 )
+	, _unboundIndexes() {
 }
 
 HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_ )
@@ -52,7 +53,8 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( 0.0L )
 	, _integer( 0 )
 	, _string()
-	, _character( 0 ) {
+	, _character( 0 )
+	, _unboundIndexes() {
 }
 
 HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HFrame::ACCESS access_ )
@@ -68,7 +70,8 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( 0.0L )
 	, _integer( 0 )
 	, _string()
-	, _character( 0 ) {
+	, _character( 0 )
+	, _unboundIndexes() {
 }
 
 HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HFrame::ACCESS access_, int index_ )
@@ -84,7 +87,8 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( 0.0L )
 	, _integer( 0 )
 	, _string()
-	, _character( 0 ) {
+	, _character( 0 )
+	, _unboundIndexes() {
 }
 
 HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HFrame::ACCESS access_, HHuginn::identifier_id_t identifierId_ )
@@ -100,7 +104,8 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( 0.0L )
 	, _integer( 0 )
 	, _string()
-	, _character( 0 ) {
+	, _character( 0 )
+	, _unboundIndexes() {
 }
 
 HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HFrame::ACCESS access_, HStatement::statement_id_t statementId_, int index_ )
@@ -116,7 +121,8 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( 0.0L )
 	, _integer( 0 )
 	, _string()
-	, _character( 0 ) {
+	, _character( 0 )
+	, _unboundIndexes() {
 }
 
 HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HFrame::ACCESS access_, HStatement::statement_id_t statementId_, int index_, HHuginn::identifier_id_t identifierId_ )
@@ -132,7 +138,8 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( 0.0L )
 	, _integer( 0 )
 	, _string()
-	, _character( 0 ) {
+	, _character( 0 )
+	, _unboundIndexes() {
 }
 
 HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HHuginn::value_t const* valueRef_ )
@@ -148,7 +155,8 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( 0.0L )
 	, _integer( 0 )
 	, _string()
-	, _character( 0 ) {
+	, _character( 0 )
+	, _unboundIndexes() {
 }
 
 HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HHuginn::value_t const& value_ )
@@ -164,7 +172,8 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( 0.0L )
 	, _integer( 0 )
 	, _string()
-	, _character( 0 ) {
+	, _character( 0 )
+	, _unboundIndexes() {
 }
 
 HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, double long doubleLong_ )
@@ -180,7 +189,8 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( doubleLong_ )
 	, _integer( 0 )
 	, _string()
-	, _character( 0 ) {
+	, _character( 0 )
+	, _unboundIndexes() {
 }
 
 HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, int long long integer_ )
@@ -196,7 +206,8 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( 0.0L )
 	, _integer( integer_ )
 	, _string()
-	, _character( 0 ) {
+	, _character( 0 )
+	, _unboundIndexes() {
 }
 
 HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, yaal::hcore::HString const& string_ )
@@ -212,7 +223,8 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( 0.0L )
 	, _integer( 0 )
 	, _string( string_ )
-	, _character( 0 ) {
+	, _character( 0 )
+	, _unboundIndexes() {
 }
 
 HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, code_point_t character_ )
@@ -228,7 +240,26 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( 0.0L )
 	, _integer( 0 )
 	, _string()
-	, _character( character_ ) {
+	, _character( character_ )
+	, _unboundIndexes() {
+}
+
+HExpression::OExecutionStep::OExecutionStep(
+	HExpression* expression_, action_t action_, int position_, HPartial::unbound_indexes_t const& unboundIndexes_, int argumentCount_
+) : _expression( expression_ )
+	, _action( action_ )
+	, _position( position_ )
+	, _access( HFrame::ACCESS::VALUE )
+	, _statementId( INVALID_STATEMENT_IDENTIFIER )
+	, _index( -1 )
+	, _identifierId( IDENTIFIER::INVALID )
+	, _value()
+	, _valueRef()
+	, _real( 0.0L )
+	, _integer( argumentCount_ )
+	, _string()
+	, _character( 0 )
+	, _unboundIndexes( unboundIndexes_ ) {
 }
 
 HExpression::HExpression( int fileId_, executing_parser::range_t range_ )
@@ -551,23 +582,24 @@ void HExpression::grab_args( HFrame* frame_, HArguments& args_ ) {
 	M_PROLOG
 	int& ip( frame_->ip() );
 	M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );
-	M_ASSERT( ! frame_->values().is_empty() );
-	HHuginn::values_t& values( args_ );
+	HFrame::values_t& values( frame_->values() );
+	M_ASSERT( ! values.is_empty() );
+	HHuginn::values_t& arguments( args_ );
 	while ( _instructions[ip]._operator == OPERATOR::FUNCTION_ARGUMENT ) {
 		++ ip;
 		M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );
-		HHuginn::value_t& v( frame_->values().top() );
+		HHuginn::value_t& v( values.top() );
 		if ( v->type_id() != HHuginn::TYPE::VARIADIC_PARAMETERS ) {
-			values.push_back( yaal::move( v ) );
+			arguments.push_back( yaal::move( v ) );
 		} else {
 			HHuginn::value_t& vp( static_cast<HTaggedValue*>( v.raw() )->value() );
 			HHuginn::values_t& p( static_cast<huginn::HTuple*>( vp.raw() )->value() );
-			values.insert( values.end(), p.rbegin(), p.rend() );
+			arguments.insert( arguments.end(), p.rbegin(), p.rend() );
 		}
-		frame_->values().pop();
+		values.pop();
 	}
 	M_ASSERT( _instructions[ip]._operator == OPERATOR::FUNCTION_CALL );
-	reverse( values.begin(), values.end() );
+	reverse( arguments.begin(), arguments.end() );
 	return;
 	M_EPILOG
 }
@@ -626,10 +658,10 @@ void HExpression::function_call( OExecutionStep const& executionStep_, HFrame* f
 	int p( _instructions[ip]._position );
 	++ ip;
 	HFrame::values_t& values( frame_->values() );
-	HClass const* c( values.top()->get_class() );
-	HHuginn::type_id_t t( c->type_id() );
 	HHuginn::value_t f( yaal::move( values.top() ) );
 	values.pop();
+	HClass const* c( f->get_class() );
+	HHuginn::type_id_t t( c->type_id() );
 	HThread* thread( frame_->thread() );
 	frame_->set_position( p );
 	if ( t == HHuginn::TYPE::METHOD ) {
@@ -640,6 +672,78 @@ void HExpression::function_call( OExecutionStep const& executionStep_, HFrame* f
 	} else {
 		values.push( f->operator_call( thread, f, args, executionStep_._position ) );
 	}
+	return;
+	M_EPILOG
+}
+
+HHuginn::values_t HExpression::grab_args( HFrame* frame_, HPartial::unbound_indexes_t& unboundIndexes_ ) {
+	M_PROLOG
+	int& ip( frame_->ip() );
+	M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );
+	HFrame::values_t& values( frame_->values() );
+	M_ASSERT( ! values.is_empty() );
+	HHuginn::values_t argumentsRaw;
+	while ( _instructions[ip]._operator == OPERATOR::FUNCTION_ARGUMENT ) {
+		++ ip;
+		M_ASSERT( ip < static_cast<int>( _instructions.get_size() ) );
+		argumentsRaw.push_back( yaal::move( values.top() ) );
+		values.pop();
+	}
+	M_ASSERT( _instructions[ip]._operator == OPERATOR::FUNCTION_CALL );
+	reverse( argumentsRaw.begin(), argumentsRaw.end() );
+	HHuginn::values_t arguments;
+	int offset( 0 );
+	int index( 0 );
+	int unboundIndex( 0 );
+	for ( HHuginn::value_t const& v : argumentsRaw ) {
+		while ( ( unboundIndex < unboundIndexes_.get_size() ) && ( index == unboundIndexes_[unboundIndex].internal_index() ) ) {
+			arguments.push_back( HHuginn::value_t() );
+			unboundIndexes_[unboundIndex].shift( offset );
+			++ unboundIndex;
+			++ index;
+		}
+		if ( v->type_id() != HHuginn::TYPE::VARIADIC_PARAMETERS ) {
+			arguments.push_back( v );
+		} else {
+			HHuginn::value_t const& vp( static_cast<HTaggedValue const*>( v.raw() )->value() );
+			HHuginn::values_t const& p( static_cast<huginn::HTuple const*>( vp.raw() )->value() );
+			arguments.insert( arguments.end(), p.begin(), p.end() );
+			offset += static_cast<int>( p.get_size() - 1 );
+		}
+		++ index;
+	}
+	while ( unboundIndex < unboundIndexes_.get_size() ) {
+		arguments.push_back( HHuginn::value_t() );
+		unboundIndexes_[unboundIndex].shift( offset );
+		++ unboundIndex;
+	}
+	return ( arguments );
+	M_EPILOG
+}
+
+void HExpression::make_partial( OExecutionStep const& executionStep_, HFrame* frame_ ) {
+	M_PROLOG
+	M_ASSERT( executionStep_._integer > 0 );
+	M_ASSERT( ! executionStep_._unboundIndexes.is_empty() );
+	M_ASSERT( executionStep_._integer <= executionStep_._unboundIndexes.get_size() );
+	HPartial::unbound_indexes_t unboundIndexes( executionStep_._unboundIndexes );
+	HHuginn::values_t arguments( grab_args( frame_, unboundIndexes ) );
+	M_ASSERT( ! frame_->values().is_empty() );
+	int& ip( frame_->ip() );
+	++ ip;
+	HFrame::values_t& values( frame_->values() );
+	HHuginn::value_t f( yaal::move( values.top() ) );
+	values.pop();
+	HClass const* c( f->get_class() );
+	HHuginn::type_id_t t( c->type_id() );
+	HObjectFactory& of( frame_->thread()->object_factory() );
+	if ( t == HHuginn::TYPE::METHOD ) {
+		HHuginn::value_t v( yaal::move( values.top() ) );
+		values.pop();
+		HClass::HMethod* m( static_cast<HClass::HMethod*>( f.raw() ) );
+		f = of.create_bound_method( m->function(), v );
+	}
+	values.push( of.create_partial( f, yaal::move( arguments ), unboundIndexes, static_cast<int>( executionStep_._integer ) ) );
 	return;
 	M_EPILOG
 }

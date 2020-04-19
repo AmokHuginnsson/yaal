@@ -203,6 +203,7 @@ class HObjectFactory final : public HObjectFactoryBase {
 	HHuginn::class_t _method;
 	HHuginn::class_t _unboundMethod;
 	HHuginn::class_t _boundMethod;
+	HHuginn::class_t _partial;
 	HHuginn::class_t _variadicParameters;
 	HHuginn::class_t _namedParameters;
 	/* Language semantics pools. */
@@ -211,6 +212,7 @@ class HObjectFactory final : public HObjectFactoryBase {
 	HObjectPool<huginn::HClass::HMethod> _methodPool;
 	HObjectPool<huginn::HClass::HUnboundMethod> _unboundMethodPool;
 	HObjectPool<huginn::HClass::HBoundMethod> _boundMethodPool;
+	HObjectPool<huginn::HPartial> _partialPool;
 	/* Built-in classes. */
 	HHuginn::class_t _boolean;
 	HHuginn::class_t _integer;
@@ -340,6 +342,9 @@ public:
 	HHuginn::value_t create_bound_method( HHuginn::function_t const& method_, HHuginn::value_t const& object_ ) const {
 		return ( _boundMethodPool.create( method_, object_ ) );
 	}
+	HHuginn::value_t create_partial( HHuginn::value_t const& callable_, HHuginn::values_t&& arguments_, HPartial::unbound_indexes_t const& unboundIndexes_, int argumentCount_ ) const {
+		return ( _partialPool.create( callable_, yaal::move( arguments_ ), unboundIndexes_, argumentCount_ ) );
+	}
 	HHuginn::value_t create_object( huginn::HClass const* class_, HObject::fields_t const& fields_ ) const {
 		return ( _objectPool.create( class_, fields_ ) );
 	}
@@ -366,6 +371,9 @@ public:
 	}
 	huginn::HClass const* bound_method_class( void ) const {
 		return ( _boundMethod.raw() );
+	}
+	huginn::HClass const* partial_class( void ) const {
+		return ( _partial.raw() );
 	}
 	huginn::HClass const* variadic_parameters_class( void ) const {
 		return ( _variadicParameters.raw() );

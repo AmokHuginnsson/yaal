@@ -60,6 +60,7 @@ enum class OPERATOR {
 	TERNARY,
 	MAKE_DICT,
 	MAKE_LOOKUP,
+	MAKE_PARTIAL,
 	NONE
 };
 

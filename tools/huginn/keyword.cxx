@@ -55,7 +55,8 @@ HHuginn::identifier_id_t const TYPE_OBJECT_REFERENCE( TYPE_FUNCTION_REFERENCE + 
 HHuginn::identifier_id_t const TYPE_METHOD( TYPE_OBJECT_REFERENCE + 1 );
 HHuginn::identifier_id_t const TYPE_UNBOUND_METHOD( TYPE_METHOD + 1 );
 HHuginn::identifier_id_t const TYPE_BOUND_METHOD( TYPE_UNBOUND_METHOD + 1 );
-HHuginn::identifier_id_t const TYPE_VARIADIC_PARAMETERS( TYPE_BOUND_METHOD + 1 );
+HHuginn::identifier_id_t const TYPE_PARTIAL( TYPE_BOUND_METHOD + 1 );
+HHuginn::identifier_id_t const TYPE_VARIADIC_PARAMETERS( TYPE_PARTIAL + 1 );
 HHuginn::identifier_id_t const TYPE_NAMED_PARAMETERS( TYPE_VARIADIC_PARAMETERS + 1 );
 HHuginn::identifier_id_t const SIZE( TYPE_NAMED_PARAMETERS + 1 );
 HHuginn::identifier_id_t const TYPE( SIZE + 1 );
@@ -173,6 +174,7 @@ char const* TYPE_OBJECT_REFERENCE    = "*object_reference*";
 char const* TYPE_METHOD              = "*method*";
 char const* TYPE_UNBOUND_METHOD      = "*unbound_method*";
 char const* TYPE_BOUND_METHOD        = "*bound_method*";
+char const* TYPE_PARTIAL             = "*partial*";
 char const* TYPE_VARIADIC_PARAMETERS = "*variadic_parameters*";
 char const* TYPE_NAMED_PARAMETERS    = "*named_parameters*";
 char const* TYPE_UNKNOWN             = "*unknown*";

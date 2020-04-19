@@ -185,9 +185,22 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_, compiler_setup
 		expression,
 		HRuleBase::action_range_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_ARGUMENT, _1 ) )
 	);
+	HRule unbound(
+		"unbound",
+		constant( '~', e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::note_function_argument, _compiler.get(), OCompiler::IMPLICIT_UNBOUND_INDEX + 0, _1 ) ) )
+		>> -integer[e_p::HInteger::action_int_range_t( hcore::call( &OCompiler::index_unbound, _compiler.get(), _1, _2 ) )]
+	);
+	/*
+	 * b = ( 1, 2, 3 );
+	 * g = foo( a, ~, b..., c );
+	 * h = foo( a, b..., ~, c );
+	 * g( 7 ) ~~~ foo( a, 7, 1, 2, 3, c )
+	 * h( 7 ) ~~~ foo( a, 1, 2, 3, 7, c )
+	 */
 	HRule functionArgument(
-		"functionArgument",
-		( arg ^ ':' ) >> -constant( "..." )[HRuleBase::action_range_t( hcore::call( &OCompiler::unpack_variadic_parameters, _compiler.get(), _1 ) )]
+		"functionArgument", (
+			( arg ^ ':' ) >> -constant( "..." )[HRuleBase::action_range_t( hcore::call( &OCompiler::unpack_variadic_parameters, _compiler.get(), _1 ) )]
+		)[e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::note_function_argument, _compiler.get(), OCompiler::BOUND_INDEX + 0, _1 ) )] | unbound
 	);
 	HRule unpackedNamedParameters(
 		"unpackedNamedParameters",
@@ -226,7 +239,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_, compiler_setup
 		constant( '(', HRuleBase::action_range_t( hcore::call( &OCompiler::start_function_call, _compiler.get(), _1 ) ) )
 		>> -( ( argList >> -( ',' >> repackedNamedParameters ) ) | repackedNamedParameters ) >>
 		constant( ')', HRuleBase::action_range_t( hcore::call( &OCompiler::close_function_call, _compiler.get(), _1 ) ) ),
-		HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
+		HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MAKE_PARTIAL, _1 ) )
 	);
 	HRule stringLiteral(
 		"stringLiteral",
@@ -254,7 +267,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_, compiler_setup
 			'(',
 			HRuleBase::action_range_t( hcore::call( &OCompiler::defer_call, _compiler.get(), "tuple", _1 ) )
 		) >> -argList >> -constant( ',' ) >> ')',
-		HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
+		HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MAKE_PARTIAL, _1 ) )
 	);
 	HRule listLiteral(
 		"listLiteral",
@@ -262,7 +275,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_, compiler_setup
 			'[',
 			HRuleBase::action_range_t( hcore::call( &OCompiler::defer_call, _compiler.get(), "list", _1 ) )
 		) >> -argList >> ']',
-		HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
+		HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MAKE_PARTIAL, _1 ) )
 	);
 	HRule dictLiteralElement(
 		"dictLiteralElement",
@@ -290,7 +303,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_, compiler_setup
 			'{',
 			HRuleBase::action_range_t( hcore::call( &OCompiler::defer_call, _compiler.get(), "set", _1 ) )
 		) >> arg >> *( ',' >> arg ) >> '}',
-		HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
+		HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MAKE_PARTIAL, _1 ) )
 	);
 	HIdentifierParser parameterIdentifier(
 		identifier(

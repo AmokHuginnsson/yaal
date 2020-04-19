@@ -96,6 +96,63 @@ yaal::hcore::HString HFunctionReference::do_to_string( huginn::HThread* thread_,
 	return ( do_code( thread_, self_, cycleTracker_, position_ ) );
 }
 
+HPartial::HPartial(
+	HClass const* class_, HHuginn::value_t const& callable_, HHuginn::values_t&& arguments_, unbound_indexes_t const& unboundIndexes_, int argumentCount_
+) : HValue( class_ )
+	, _callable( callable_ )
+	, _arguments( yaal::move( arguments_ ) )
+	, _cache()
+	, _unboundIndexes( unboundIndexes_ )
+	, _argumentCount( argumentCount_ ) {
+	M_ASSERT( _argumentCount <= _unboundIndexes.get_size() );
+#ifdef __DEBUG__
+	for ( HIndexMap const& indexMap : _unboundIndexes ) {
+		M_ASSERT( indexMap.internal_index() >= 0 );
+		M_ASSERT( indexMap.external_index() >= 0 );
+		M_ASSERT( indexMap.internal_index() < _arguments.get_size() );
+		M_ASSERT( ! _arguments[indexMap.internal_index()] );
+	}
+	int index( 0 );
+	for ( HHuginn::value_t const& arg : _arguments ) {
+		M_ASSERT( ! exor( !arg, find( _unboundIndexes.begin(), _unboundIndexes.end(), index ) != _unboundIndexes.end() ) );
+		++ index;
+	}
+#endif
+	return;
+}
+
+HHuginn::value_t HPartial::do_operator_call( huginn::HThread* thread_, HHuginn::value_t&, HHuginn::values_t& arguments_, int position_ ) {
+	verify_arg_count( "*partial*", arguments_, _argumentCount, _argumentCount, thread_, position_ );
+	HHuginn::value_t ret;
+	try {
+		_cache = _arguments;
+		for ( HIndexMap const& indexMap : _unboundIndexes ) {
+			_cache[indexMap.internal_index()] = arguments_[indexMap.external_index()];
+		}
+		ret = _callable->operator_call( thread_, _callable, _cache, position_ );
+	} catch ( ... ) {
+		_cache.clear();
+		throw;
+	}
+	_cache.clear();
+	return ( ret );
+}
+
+HHuginn::value_t HPartial::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
+	HHuginn::values_t arguments;
+	arguments.reserve( _arguments.get_size() );
+	for ( HHuginn::value_t v : _arguments ) {
+		if ( !! v ) {
+			arguments.push_back( v->clone( thread_, &v, position_ ) );
+		} else {
+			arguments.push_back( HHuginn::value_t() );
+		}
+	}
+	HHuginn::value_t callable( _callable );
+	HObjectFactory& of( *thread_->runtime().object_factory() );
+	return ( of.create_partial( _callable->clone( thread_, &callable, position_ ), yaal::move( arguments ), _unboundIndexes, _argumentCount ) );
+}
+
 }
 
 }

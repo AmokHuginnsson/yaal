@@ -49,6 +49,7 @@ void OCompiler::dispatch_action( OPERATOR oper_, executing_parser::range_t range
 		case ( OPERATOR::ASSIGN ):        { dispatch_assign( range_ );        } break;
 		case ( OPERATOR::MEMBER_ACCESS ): { dispatch_member_access( range_ ); } break;
 		case ( OPERATOR::FUNCTION_CALL ): { dispatch_function_call( &HExpression::function_call, range_ ); } break;
+		case ( OPERATOR::MAKE_PARTIAL ):  { dispatch_function_call( &HExpression::make_partial, range_ ); }  break;
 		case ( OPERATOR::MAKE_DICT ):     { dispatch_function_call( &HExpression::make_dict, range_ ); }     break;
 		case ( OPERATOR::MAKE_LOOKUP ):   { dispatch_function_call( &HExpression::make_lookup, range_ ); }   break;
 		case ( OPERATOR::PARENTHESIS ):
@@ -358,6 +359,7 @@ void OCompiler::defer_action( HExpression::OExecutionStep::action_t const& expre
 void OCompiler::defer_call( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	defer_get_reference( name_, range_ );
+	current_scope_context()._argumentIndexes.emplace();
 	defer_oper_direct( OPERATOR::FUNCTION_CALL, range_ );
 	return;
 	M_EPILOG
@@ -594,7 +596,7 @@ void OCompiler::dispatch_function_call( HExpression::OExecutionStep::action_t co
 		fc._valueTypes.pop();
 	}
 	HClass const* c( type_to_class( HHuginn::TYPE::UNKNOWN ) );
-	if ( action_ == &HExpression::function_call ) {
+	if ( ( action_ == &HExpression::function_call ) || ( action_ == &HExpression::make_partial ) ) {
 		OFunctionContext::OValueDesc vd( fc._valueTypes.top() );
 		fc._valueTypes.pop();
 		if ( compiled_type_id( vd._class ) == HHuginn::TYPE::FUNCTION_REFERENCE ) {
@@ -607,9 +609,22 @@ void OCompiler::dispatch_function_call( HExpression::OExecutionStep::action_t co
 	}
 	fc._valueTypes.push( c );
 	M_ASSERT( fc._operations.top()._operator == OPERATOR::FUNCTION_CALL );
-	defer_action( action_, range_ );
+	defer_function_call( action_, range_ );
 	expr->commit_oper( OPERATOR::FUNCTION_CALL );
 	fc._operations.pop();
+	return;
+	M_EPILOG
+}
+
+void OCompiler::defer_function_call( HExpression::OExecutionStep::action_t action_, executing_parser::range_t range_ ) {
+	M_PROLOG
+	if ( commit_unbound( action_, range_ ) ) {
+		return;
+	}
+	if ( action_ == &HExpression::make_partial ) {
+		action_ = &HExpression::function_call;
+	}
+	defer_action( action_, range_ );
 	return;
 	M_EPILOG
 }
@@ -622,6 +637,7 @@ void OCompiler::start_function_call( executing_parser::range_t range_ ) {
 		HExpression* expr( current_expression().raw() );
 		expr->execution_step( expr->execution_step_count() - 1 )._access = HFrame::ACCESS::BOUND_CALL;
 	}
+	fc._scopeStack.top()->_argumentIndexes.emplace();
 	defer_oper_direct( OPERATOR::FUNCTION_CALL, range_ );
 	if ( fc._isAssert ) {
 		++ fc._nestedCalls;
@@ -646,6 +662,23 @@ void OCompiler::unpack_variadic_parameters( executing_parser::range_t range_ ) {
 	M_EPILOG
 }
 
+void OCompiler::note_function_argument( int index_, executing_parser::range_t ) {
+	M_PROLOG
+	current_scope_context()._argumentIndexes.top().push_back( index_ );
+	return;
+	M_EPILOG
+}
+
+void OCompiler::index_unbound( int index_, executing_parser::range_t range_ ) {
+	M_PROLOG
+	if ( index_ <= IMPLICIT_UNBOUND_INDEX ) {
+		throw HHuginn::HHuginnRuntimeException( "Invalid explicit unbound index value: "_ys.append( index_ ), _fileId, range_.start() );
+	}
+	current_scope_context()._argumentIndexes.top().back() = index_;
+	return;
+	M_EPILOG
+}
+
 void OCompiler::close_function_call( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
@@ -657,6 +690,58 @@ void OCompiler::close_function_call( executing_parser::range_t range_ ) {
 		}
 	}
 	return;
+	M_EPILOG
+}
+
+bool OCompiler::commit_unbound( HExpression::OExecutionStep::action_t const& action_, executing_parser::range_t range_ ) {
+	M_PROLOG
+	if ( action_ != &HExpression::make_partial ) {
+		return ( false );
+	}
+	OScopeContext& sc( current_scope_context() );
+	OScopeContext::argument_indexes_t const& argumentIndexesFound( sc._argumentIndexes.top() );
+	if ( count( argumentIndexesFound.begin(), argumentIndexesFound.end(), BOUND_INDEX + 0 ) == argumentIndexesFound.get_size() ) {
+		return ( false );
+	}
+	OScopeContext::argument_indexes_t argumentIndexes( argumentIndexesFound );
+	sort( argumentIndexes.begin(), argumentIndexes.end() );
+	int previous( BOUND_INDEX );
+	bool hasImplicit( false );
+	bool hasExplicit( false );
+	for( int current : argumentIndexes ) {
+		hasImplicit = hasImplicit || ( current == IMPLICIT_UNBOUND_INDEX );
+		hasExplicit = hasExplicit || ( current > IMPLICIT_UNBOUND_INDEX );
+		if ( ( ( current - previous ) > 1 ) && ( ( previous != BOUND_INDEX ) || ( current != ( IMPLICIT_UNBOUND_INDEX + 1 ) ) ) ) {
+			throw HHuginn::HHuginnRuntimeException( "A hole in explicit unbound indexing.", _fileId, range_.start() );
+		}
+		previous = current;
+	}
+	M_ASSERT( hasImplicit || hasExplicit );
+	if ( hasImplicit && hasExplicit ) {
+		throw HHuginn::HHuginnRuntimeException( "Implicit and explicit unbound indexes cannot be mixed.", _fileId, range_.start() );
+	}
+	HPartial::unbound_indexes_t unboundIndexes;
+	int internalIndex( 0 );
+	int externalIndex( 1 );
+	for ( int index : argumentIndexesFound ) {
+		if ( index == IMPLICIT_UNBOUND_INDEX ) {
+			index = externalIndex;
+			++ externalIndex;
+		}
+		if ( index > IMPLICIT_UNBOUND_INDEX ) {
+			unboundIndexes.emplace_back( internalIndex, index - 1 );
+		}
+		++ internalIndex;
+	}
+	sc._argumentIndexes.pop();
+	OScopeContext::argument_indexes_t uniqCounter( unboundIndexes.get_size(), IMPLICIT_UNBOUND_INDEX + 0 );
+	for ( HPartial::HIndexMap const& indexMap : unboundIndexes ) {
+		uniqCounter[indexMap.external_index()] = IMPLICIT_UNBOUND_INDEX + 1;
+	}
+	int argCount( static_cast<int>( count( uniqCounter.begin(), uniqCounter.end(), IMPLICIT_UNBOUND_INDEX + 1 ) ) );
+	HExpression* expr( current_expression().raw() );
+	expr->add_execution_step( HExpression::OExecutionStep( expr, action_, range_.start(), unboundIndexes, argCount ) );
+	return ( true );
 	M_EPILOG
 }
 

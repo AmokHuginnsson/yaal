@@ -179,6 +179,7 @@ HClass const* OCompiler::type_id_to_class( HHuginn::type_id_t typeId_ ) const {
 		case ( HHuginn::TYPE::METHOD ):              c = of.method_class();              break;
 		case ( HHuginn::TYPE::UNBOUND_METHOD ):      c = of.unbound_method_class();      break;
 		case ( HHuginn::TYPE::BOUND_METHOD ):        c = of.bound_method_class();        break;
+		case ( HHuginn::TYPE::PARTIAL ):             c = of.partial_class();             break;
 		case ( HHuginn::TYPE::VARIADIC_PARAMETERS ): c = of.variadic_parameters_class(); break;
 		case ( HHuginn::TYPE::NAMED_PARAMETERS ):    c = of.named_parameters_class();    break;
 		case ( HHuginn::TYPE::NOT_BOOLEAN ):

@@ -57,6 +57,48 @@ private:
 	virtual yaal::hcore::HString do_to_string( HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const override;
 };
 
+class HPartial : public HValue {
+public:
+	typedef HPartial this_type;
+	typedef HValue base_type;
+	class HIndexMap {
+		int _internalIndex;
+		int _externalIndex;
+	public:
+		HIndexMap( int internalIndex_, int externalIndex_ )
+			: _internalIndex( internalIndex_ )
+			, _externalIndex( externalIndex_ ) {
+		}
+		bool operator != ( int internalIndex_ ) const {
+			return ( internalIndex_ != _internalIndex );
+		}
+		int internal_index( void ) const {
+			return ( _internalIndex );
+		}
+		int external_index( void ) const {
+			return ( _externalIndex );
+		}
+		void shift( int by_ ) {
+			_internalIndex += by_;
+		}
+	};
+	typedef yaal::hcore::HArray<HIndexMap> unbound_indexes_t;
+private:
+	HHuginn::value_t _callable;
+	HHuginn::values_t _arguments;
+	HHuginn::values_t _cache;
+	unbound_indexes_t _unboundIndexes;
+	int _argumentCount;
+public:
+	HPartial( HClass const*, HHuginn::value_t const&, HHuginn::values_t&&, unbound_indexes_t const&, int );
+private:
+	virtual HHuginn::value_t do_operator_call( huginn::HThread*, HHuginn::value_t&, HHuginn::values_t&, int ) override;
+	virtual value_t do_clone( huginn::HThread*, HHuginn::value_t*, int ) const override;
+private:
+	HPartial( HPartial const& ) = delete;
+	HPartial& operator = ( HPartial const& ) = delete;
+};
+
 }
 
 }
