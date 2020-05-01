@@ -80,7 +80,7 @@ void OCompiler::add_return_statement( executing_parser::range_t range_ ) {
 	M_ASSERT( ! f()._scopeStack.is_empty() );
 	HHuginn::expression_t& e( current_expression() );
 	if ( e->is_empty() ) {
-		e->add_execution_step( HExpression::OExecutionStep( e.raw(), &HExpression::store_direct, range_.start(), _runtime->none_value() ) );
+		e->add_execution_step( HExpression::OExecutionStep( e.raw(), &HExpression::store_direct, range_.start(), _runtime->none_value(), HHuginn::TYPE::NONE ) );
 	}
 	terminate_scope( make_pointer<HReturn>( e, _fileId, range_ ) );
 	reset_expression();

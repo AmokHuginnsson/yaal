@@ -36,7 +36,9 @@ HExpression::OExecutionStep::OExecutionStep( void )
 	, _real( 0.0L )
 	, _integer( 0 )
 	, _string()
+	, _number()
 	, _character( 0 )
+	, _literalType( HHuginn::TYPE::UNKNOWN )
 	, _unboundIndexes() {
 }
 
@@ -53,7 +55,9 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( 0.0L )
 	, _integer( 0 )
 	, _string()
+	, _number()
 	, _character( 0 )
+	, _literalType( HHuginn::TYPE::UNKNOWN )
 	, _unboundIndexes() {
 }
 
@@ -70,7 +74,9 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( 0.0L )
 	, _integer( 0 )
 	, _string()
+	, _number()
 	, _character( 0 )
+	, _literalType( HHuginn::TYPE::UNKNOWN )
 	, _unboundIndexes() {
 }
 
@@ -87,7 +93,9 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( 0.0L )
 	, _integer( 0 )
 	, _string()
+	, _number()
 	, _character( 0 )
+	, _literalType( HHuginn::TYPE::UNKNOWN )
 	, _unboundIndexes() {
 }
 
@@ -104,7 +112,9 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( 0.0L )
 	, _integer( 0 )
 	, _string()
+	, _number()
 	, _character( 0 )
+	, _literalType( HHuginn::TYPE::UNKNOWN )
 	, _unboundIndexes() {
 }
 
@@ -121,7 +131,9 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( 0.0L )
 	, _integer( 0 )
 	, _string()
+	, _number()
 	, _character( 0 )
+	, _literalType( HHuginn::TYPE::UNKNOWN )
 	, _unboundIndexes() {
 }
 
@@ -138,7 +150,9 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( 0.0L )
 	, _integer( 0 )
 	, _string()
+	, _number()
 	, _character( 0 )
+	, _literalType( HHuginn::TYPE::UNKNOWN )
 	, _unboundIndexes() {
 }
 
@@ -155,11 +169,13 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( 0.0L )
 	, _integer( 0 )
 	, _string()
+	, _number()
 	, _character( 0 )
+	, _literalType( HHuginn::TYPE::UNKNOWN )
 	, _unboundIndexes() {
 }
 
-HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HHuginn::value_t const& value_ )
+HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HHuginn::value_t const& value_, HHuginn::TYPE type_ )
 	: _expression( expression_ )
 	, _action( action_ )
 	, _position( position_ )
@@ -172,7 +188,9 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( 0.0L )
 	, _integer( 0 )
 	, _string()
+	, _number()
 	, _character( 0 )
+	, _literalType( type_ )
 	, _unboundIndexes() {
 }
 
@@ -189,7 +207,9 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( doubleLong_ )
 	, _integer( 0 )
 	, _string()
+	, _number()
 	, _character( 0 )
+	, _literalType( HHuginn::TYPE::REAL )
 	, _unboundIndexes() {
 }
 
@@ -206,7 +226,9 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( 0.0L )
 	, _integer( integer_ )
 	, _string()
+	, _number()
 	, _character( 0 )
+	, _literalType( HHuginn::TYPE::INTEGER )
 	, _unboundIndexes() {
 }
 
@@ -223,7 +245,28 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( 0.0L )
 	, _integer( 0 )
 	, _string( string_ )
+	, _number()
 	, _character( 0 )
+	, _literalType( HHuginn::TYPE::STRING )
+	, _unboundIndexes() {
+}
+
+HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, yaal::hcore::HNumber const& number_ )
+	: _expression( expression_ )
+	, _action( action_ )
+	, _position( position_ )
+	, _access( HFrame::ACCESS::VALUE )
+	, _statementId( INVALID_STATEMENT_IDENTIFIER )
+	, _index( -1 )
+	, _identifierId( IDENTIFIER::INVALID )
+	, _value()
+	, _valueRef()
+	, _real( 0.0L )
+	, _integer( 0 )
+	, _string()
+	, _number( number_ )
+	, _character( 0 )
+	, _literalType( HHuginn::TYPE::STRING )
 	, _unboundIndexes() {
 }
 
@@ -240,7 +283,9 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _real( 0.0L )
 	, _integer( 0 )
 	, _string()
+	, _number()
 	, _character( character_ )
+	, _literalType( HHuginn::TYPE::CHARACTER )
 	, _unboundIndexes() {
 }
 
@@ -258,8 +303,134 @@ HExpression::OExecutionStep::OExecutionStep(
 	, _real( 0.0L )
 	, _integer( argumentCount_ )
 	, _string()
+	, _number()
 	, _character( 0 )
+	, _literalType( HHuginn::TYPE::UNKNOWN )
 	, _unboundIndexes( unboundIndexes_ ) {
+}
+
+HExpression::OExecutionStep& HExpression::OExecutionStep::operator += ( OExecutionStep const& other_ ) {
+	M_PROLOG
+	M_ASSERT( ( _literalType == other_._literalType ) && ( _literalType != HHuginn::TYPE::UNKNOWN ) );
+	if ( !! _value ) {
+		if ( !! other_._value ) {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::INTEGER ): { static_cast<HInteger*>( _value.raw() )->value() += static_cast<HInteger const*>( other_._value.raw() )->value(); } break;
+				case ( HHuginn::TYPE::REAL ):    { static_cast<HReal*>( _value.raw() )->value()    += static_cast<HReal const*>( other_._value.raw() )->value();    } break;
+				case ( HHuginn::TYPE::NUMBER ):  { static_cast<HNumber*>( _value.raw() )->value()  += static_cast<HNumber const*>( other_._value.raw() )->value();  } break;
+				case ( HHuginn::TYPE::STRING ):  { static_cast<HString*>( _value.raw() )->value()  += static_cast<HString const*>( other_._value.raw() )->value();  } break;
+				default: {}
+			}
+		} else {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::INTEGER ): { static_cast<HInteger*>( _value.raw() )->value() += other_._integer; } break;
+				case ( HHuginn::TYPE::REAL ):    { static_cast<HReal*>( _value.raw() )->value()    += other_._real;    } break;
+				case ( HHuginn::TYPE::NUMBER ):  { static_cast<HNumber*>( _value.raw() )->value()  += other_._number;  } break;
+				case ( HHuginn::TYPE::STRING ):  { static_cast<HString*>( _value.raw() )->value()  += other_._string;  } break;
+				default: {}
+			}
+		}
+	} else {
+		if ( !! other_._value ) {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::INTEGER ): { _integer += static_cast<HInteger const*>( other_._value.raw() )->value(); } break;
+				case ( HHuginn::TYPE::REAL ):    { _real    += static_cast<HReal const*>( other_._value.raw() )->value();    } break;
+				case ( HHuginn::TYPE::NUMBER ):  { _number  += static_cast<HNumber const*>( other_._value.raw() )->value();  } break;
+				case ( HHuginn::TYPE::STRING ):  { _string  += static_cast<HString const*>( other_._value.raw() )->value();  } break;
+				default: {}
+			}
+		} else {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::INTEGER ): { _integer += other_._integer; } break;
+				case ( HHuginn::TYPE::REAL ):    { _real    += other_._real;    } break;
+				case ( HHuginn::TYPE::NUMBER ):  { _number  += other_._number;  } break;
+				case ( HHuginn::TYPE::STRING ):  { _string  += other_._string;  } break;
+				default: {}
+			}
+		}
+	}
+	return ( *this );
+	M_EPILOG
+}
+
+HExpression::OExecutionStep& HExpression::OExecutionStep::operator -= ( OExecutionStep const& other_ ) {
+	M_PROLOG
+	M_ASSERT( ( _literalType == other_._literalType ) && ( _literalType != HHuginn::TYPE::UNKNOWN ) );
+	if ( !! _value ) {
+		if ( !! other_._value ) {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::INTEGER ): { static_cast<HInteger*>( _value.raw() )->value() -= static_cast<HInteger const*>( other_._value.raw() )->value(); } break;
+				case ( HHuginn::TYPE::REAL ):    { static_cast<HReal*>( _value.raw() )->value()    -= static_cast<HReal const*>( other_._value.raw() )->value();    } break;
+				case ( HHuginn::TYPE::NUMBER ):  { static_cast<HNumber*>( _value.raw() )->value()  -= static_cast<HNumber const*>( other_._value.raw() )->value();  } break;
+				default: {}
+			}
+		} else {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::INTEGER ): { static_cast<HInteger*>( _value.raw() )->value() -= other_._integer; } break;
+				case ( HHuginn::TYPE::REAL ):    { static_cast<HReal*>( _value.raw() )->value()    -= other_._real;    } break;
+				case ( HHuginn::TYPE::NUMBER ):  { static_cast<HNumber*>( _value.raw() )->value()  -= other_._number;  } break;
+				default: {}
+			}
+		}
+	} else {
+		if ( !! other_._value ) {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::INTEGER ): { _integer -= static_cast<HInteger const*>( other_._value.raw() )->value(); } break;
+				case ( HHuginn::TYPE::REAL ):    { _real    -= static_cast<HReal const*>( other_._value.raw() )->value();    } break;
+				case ( HHuginn::TYPE::NUMBER ):  { _number  -= static_cast<HNumber const*>( other_._value.raw() )->value();  } break;
+				default: {}
+			}
+		} else {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::INTEGER ): { _integer -= other_._integer; } break;
+				case ( HHuginn::TYPE::REAL ):    { _real    -= other_._real;    } break;
+				case ( HHuginn::TYPE::NUMBER ):  { _number  -= other_._number;  } break;
+				default: {}
+			}
+		}
+	}
+	return ( *this );
+	M_EPILOG
+}
+
+HExpression::OExecutionStep& HExpression::OExecutionStep::operator *= ( OExecutionStep const& other_ ) {
+	M_PROLOG
+	M_ASSERT( ( _literalType == other_._literalType ) && ( _literalType != HHuginn::TYPE::UNKNOWN ) );
+	if ( !! _value ) {
+		if ( !! other_._value ) {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::INTEGER ): { static_cast<HInteger*>( _value.raw() )->value() *= static_cast<HInteger const*>( other_._value.raw() )->value(); } break;
+				case ( HHuginn::TYPE::REAL ):    { static_cast<HReal*>( _value.raw() )->value()    *= static_cast<HReal const*>( other_._value.raw() )->value();    } break;
+				case ( HHuginn::TYPE::NUMBER ):  { static_cast<HNumber*>( _value.raw() )->value()  *= static_cast<HNumber const*>( other_._value.raw() )->value();  } break;
+				default: {}
+			}
+		} else {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::INTEGER ): { static_cast<HInteger*>( _value.raw() )->value() *= other_._integer; } break;
+				case ( HHuginn::TYPE::REAL ):    { static_cast<HReal*>( _value.raw() )->value()    *= other_._real;    } break;
+				case ( HHuginn::TYPE::NUMBER ):  { static_cast<HNumber*>( _value.raw() )->value()  *= other_._number;  } break;
+				default: {}
+			}
+		}
+	} else {
+		if ( !! other_._value ) {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::INTEGER ): { _integer *= static_cast<HInteger const*>( other_._value.raw() )->value(); } break;
+				case ( HHuginn::TYPE::REAL ):    { _real    *= static_cast<HReal const*>( other_._value.raw() )->value();    } break;
+				case ( HHuginn::TYPE::NUMBER ):  { _number  *= static_cast<HNumber const*>( other_._value.raw() )->value();  } break;
+				default: {}
+			}
+		} else {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::INTEGER ): { _integer *= other_._integer; } break;
+				case ( HHuginn::TYPE::REAL ):    { _real    *= other_._real;    } break;
+				case ( HHuginn::TYPE::NUMBER ):  { _number  *= other_._number;  } break;
+				default: {}
+			}
+		}
+	}
+	return ( *this );
+	M_EPILOG
 }
 
 HExpression::HExpression( int fileId_, executing_parser::range_t range_ )
@@ -416,6 +587,42 @@ void HExpression::commit_oper( OPERATOR operator_ ) {
 		} break;
 		default: {
 			M_ASSERT( ! "Invalid code path."[0] );
+		}
+	}
+	try_collape();
+	return;
+	M_EPILOG
+}
+
+void HExpression::try_collape( void ) {
+	M_PROLOG
+	if ( _instructions.is_empty() ) {
+		return;
+	}
+	int stepCount( static_cast<int>( _executionSteps.get_size() ) );
+	OPERATOR op( _instructions.back()._operator );
+	switch ( op ) {
+		case ( OPERATOR::PLUS ):
+		case ( OPERATOR::MINUS ):
+		case ( OPERATOR::MULTIPLY ): {
+			if (
+				( _executionSteps[stepCount - 2]._literalType != HHuginn::TYPE::UNKNOWN )
+				&& ( _executionSteps[stepCount - 2]._literalType == _executionSteps[stepCount - 3]._literalType )
+			) {
+				_executionSteps.pop_back();
+				if ( op == OPERATOR::PLUS ) {
+					_executionSteps[stepCount - 3] += _executionSteps.back();
+				} else if ( op == OPERATOR::MINUS ) {
+					_executionSteps[stepCount - 3] -= _executionSteps.back();
+				} else {
+					_executionSteps[stepCount - 3] *= _executionSteps.back();
+				}
+				_executionSteps.pop_back();
+				_instructions.pop_back();
+			}
+		} break;
+		default: {
+			return;
 		}
 	}
 	return;
@@ -1313,7 +1520,7 @@ void HExpression::store_string( OExecutionStep const& executionStep_, HFrame* fr
 
 void HExpression::store_number( OExecutionStep const& executionStep_, HFrame* frame_ ) {
 	M_PROLOG
-	frame_->values().push( frame_->thread()->object_factory().create_number( executionStep_._string ) );
+	frame_->values().push( frame_->thread()->object_factory().create_number( executionStep_._number ) );
 	return;
 	M_EPILOG
 }

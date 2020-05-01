@@ -41,7 +41,9 @@ public:
 		double long _real;
 		int long long _integer;
 		yaal::hcore::HString _string;
+		yaal::hcore::HNumber _number;
 		code_point_t _character;
+		HHuginn::TYPE _literalType;
 		HPartial::unbound_indexes_t _unboundIndexes;
 		OExecutionStep( void );
 		OExecutionStep( HExpression*, action_t, int );
@@ -51,16 +53,20 @@ public:
 		OExecutionStep( HExpression*, action_t, int, HFrame::ACCESS, HStatement::statement_id_t, int );
 		OExecutionStep( HExpression*, action_t, int, HFrame::ACCESS, HStatement::statement_id_t, int, HHuginn::identifier_id_t );
 		OExecutionStep( HExpression*, action_t, int, HHuginn::value_t const* );
-		OExecutionStep( HExpression*, action_t, int, HHuginn::value_t const& );
+		OExecutionStep( HExpression*, action_t, int, HHuginn::value_t const&, HHuginn::TYPE = HHuginn::TYPE::UNKNOWN );
 		OExecutionStep( HExpression*, action_t, int, double long );
 		OExecutionStep( HExpression*, action_t, int, int long long );
 		OExecutionStep( HExpression*, action_t, int, yaal::hcore::HString const& );
+		OExecutionStep( HExpression*, action_t, int, yaal::hcore::HNumber const& );
 		OExecutionStep( HExpression*, action_t, int, code_point_t );
 		OExecutionStep( HExpression*, action_t, int, HPartial::unbound_indexes_t const&, int );
 		OExecutionStep( OExecutionStep const& ) = default;
 		OExecutionStep( OExecutionStep&& ) = default;
 		OExecutionStep& operator = ( OExecutionStep const& ) = default;
 		OExecutionStep& operator = ( OExecutionStep&& ) = default;
+		OExecutionStep& operator += ( OExecutionStep const& );
+		OExecutionStep& operator -= ( OExecutionStep const& );
+		OExecutionStep& operator *= ( OExecutionStep const& );
 	};
 private:
 	typedef yaal::hcore::HArray<OExecutionStep> execution_steps_t;
@@ -78,6 +84,7 @@ public:
 	void merge( HExpression& );
 	void oper( OPERATOR, int );
 	void commit_oper( OPERATOR );
+	void try_collape( void );
 	void close_parenthesis( OExecutionStep const&, huginn::HFrame* );
 	void plus( OExecutionStep const&, huginn::HFrame* );
 	void minus( OExecutionStep const&, huginn::HFrame* );

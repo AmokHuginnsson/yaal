@@ -1040,7 +1040,7 @@ void OCompiler::defer_store_real( double long value_, executing_parser::range_t 
 	OFunctionContext& fc( f() );
 	HExpression* expr( current_expression().raw() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, range_.start(), _runtime->object_factory()->create_real( value_ ) ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, range_.start(), _runtime->object_factory()->create_real( value_ ), HHuginn::TYPE::REAL ) );
 	} else {
 		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_real, range_.start(), value_ ) );
 	}
@@ -1054,7 +1054,7 @@ void OCompiler::defer_store_integer( int long long value_, executing_parser::ran
 	OFunctionContext& fc( f() );
 	HExpression* expr( current_expression().raw() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, range_.start(), _runtime->object_factory()->create_integer( value_ ) ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, range_.start(), _runtime->object_factory()->create_integer( value_ ), HHuginn::TYPE::INTEGER ) );
 	} else {
 		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_integer, range_.start(), value_ ) );
 	}
@@ -1068,7 +1068,7 @@ void OCompiler::defer_store_string( yaal::hcore::HString const& value_, executin
 	OFunctionContext& fc( f() );
 	HExpression* expr( current_expression().raw() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, range_.start(), _runtime->object_factory()->create_string( value_ ) ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, range_.start(), _runtime->object_factory()->create_string( value_ ), HHuginn::TYPE::STRING ) );
 	} else {
 		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_string, range_.start(), value_ ) );
 	}
@@ -1077,12 +1077,12 @@ void OCompiler::defer_store_string( yaal::hcore::HString const& value_, executin
 	M_EPILOG
 }
 
-void OCompiler::defer_store_number( yaal::hcore::HString const& value_, executing_parser::range_t range_ ) {
+void OCompiler::defer_store_number( yaal::hcore::HNumber const& value_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	HExpression* expr( current_expression().raw() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, range_.start(), _runtime->object_factory()->create_number( value_ ) ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, range_.start(), _runtime->object_factory()->create_number( value_ ), HHuginn::TYPE::NUMBER ) );
 	} else {
 		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_number, range_.start(), value_ ) );
 	}
@@ -1096,7 +1096,7 @@ void OCompiler::defer_store_character( code_point_t value_, executing_parser::ra
 	OFunctionContext& fc( f() );
 	HExpression* expr( current_expression().raw() );
 	if ( fc._operations.is_empty() || ( find( begin( _copyConstContext_ ), end( _copyConstContext_ ), fc._operations.top()._operator ) == end( _copyConstContext_ ) ) ) {
-		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, range_.start(), _runtime->object_factory()->create_character( value_ ) ) );
+		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_direct, range_.start(), _runtime->object_factory()->create_character( value_ ), HHuginn::TYPE::CHARACTER ) );
 	} else {
 		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::store_character, range_.start(), value_ ) );
 	}

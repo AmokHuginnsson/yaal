@@ -573,7 +573,7 @@ struct OCompiler {
 	void defer_store_real( double long, executing_parser::range_t );
 	void defer_store_integer( int long long, executing_parser::range_t );
 	void defer_store_string( yaal::hcore::HString const&, executing_parser::range_t );
-	void defer_store_number( yaal::hcore::HString const&, executing_parser::range_t );
+	void defer_store_number( yaal::hcore::HNumber const&, executing_parser::range_t );
 	void defer_store_character( code_point_t, executing_parser::range_t );
 	void defer_call( yaal::hcore::HString const&, executing_parser::range_t );
 	HHuginn::expression_t new_expression( int, executing_parser::range_t const& = { 0, 0 } );

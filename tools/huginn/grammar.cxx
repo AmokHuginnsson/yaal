@@ -259,7 +259,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_, compiler_setup
 	);
 	HRule numberLiteral(
 		"numberLiteral",
-		constant( '$' ) >> real[e_p::HReal::action_string_range_t( hcore::call( &OCompiler::defer_store_number, _compiler.get(), _1, _2 ) )]
+		constant( '$' ) >> real[e_p::HReal::action_number_range_t( hcore::call( &OCompiler::defer_store_number, _compiler.get(), _1, _2 ) )]
 	);
 	HRule tupleLiteral(
 		"tupleLiteral",
