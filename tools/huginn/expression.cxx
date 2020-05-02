@@ -1,5 +1,7 @@
 /* Read yaal/LICENSE.md file for copyright and licensing information. */
 
+#include <cmath>
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
@@ -433,6 +435,175 @@ HExpression::OExecutionStep& HExpression::OExecutionStep::operator *= ( OExecuti
 	M_EPILOG
 }
 
+namespace {
+
+void do_divide( HReal::value_type& value_, HReal::value_type const& denominator_, int fileId_, int position_ ) {
+	if ( denominator_ != 0.0L ) {
+		value_ /= denominator_;
+	} else {
+		throw HHuginn::HHuginnRuntimeException( "Division by zero.", fileId_, position_ );
+	}
+}
+
+void do_divide( HInteger::value_type& value_, HInteger::value_type const& denominator_, int fileId_, int position_ ) {
+	if ( ( denominator_ != 0L ) && ( ( value_ != meta::min_signed<huginn::HInteger::value_type>::value ) || ( denominator_ != -1 ) ) ) {
+		value_ /= denominator_;
+	} else {
+		throw HHuginn::HHuginnRuntimeException( denominator_ ? "Division overflow." : "Division by zero.", fileId_, position_ );
+	}
+}
+
+void do_divide( HNumber::value_type& value_, HNumber::value_type const& denominator_, int fileId_, int position_ ) {
+	if ( denominator_ != number::N0 ) {
+		value_ /= denominator_;
+	} else {
+		throw HHuginn::HHuginnRuntimeException( "Division by zero.", fileId_, position_ );
+	}
+}
+
+}
+
+HExpression::OExecutionStep& HExpression::OExecutionStep::divide( OExecutionStep const& other_, int fileId_, int position_ ) {
+	M_PROLOG
+	M_ASSERT( ( _literalType == other_._literalType ) && ( _literalType != HHuginn::TYPE::UNKNOWN ) );
+	if ( !! _value ) {
+		if ( !! other_._value ) {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::INTEGER ): { do_divide( static_cast<HInteger*>( _value.raw() )->value(), static_cast<HInteger const*>( other_._value.raw() )->value(), fileId_, position_ ); } break;
+				case ( HHuginn::TYPE::REAL ):    { do_divide( static_cast<HReal*>( _value.raw() )->value(),    static_cast<HReal const*>( other_._value.raw() )->value(),    fileId_, position_ ); } break;
+				case ( HHuginn::TYPE::NUMBER ):  { do_divide( static_cast<HNumber*>( _value.raw() )->value(),  static_cast<HNumber const*>( other_._value.raw() )->value(),  fileId_, position_ ); } break;
+				default: {}
+			}
+		} else {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::INTEGER ): { do_divide( static_cast<HInteger*>( _value.raw() )->value(), other_._integer, fileId_, position_ ); } break;
+				case ( HHuginn::TYPE::REAL ):    { do_divide( static_cast<HReal*>( _value.raw() )->value(),    other_._real,    fileId_, position_ ); } break;
+				case ( HHuginn::TYPE::NUMBER ):  { do_divide( static_cast<HNumber*>( _value.raw() )->value(),  other_._number,  fileId_, position_ ); } break;
+				default: {}
+			}
+		}
+	} else {
+		if ( !! other_._value ) {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::INTEGER ): { do_divide( _integer, static_cast<HInteger const*>( other_._value.raw() )->value(), fileId_, position_ ); } break;
+				case ( HHuginn::TYPE::REAL ):    { do_divide( _real,    static_cast<HReal const*>( other_._value.raw() )->value(),    fileId_, position_ ); } break;
+				case ( HHuginn::TYPE::NUMBER ):  { do_divide( _number,  static_cast<HNumber const*>( other_._value.raw() )->value(),  fileId_, position_ ); } break;
+				default: {}
+			}
+		} else {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::INTEGER ): { do_divide( _integer, other_._integer, fileId_, position_ ); } break;
+				case ( HHuginn::TYPE::REAL ):    { do_divide( _real,    other_._real,    fileId_, position_ ); } break;
+				case ( HHuginn::TYPE::NUMBER ):  { do_divide( _number,  other_._number,  fileId_, position_ ); } break;
+				default: {}
+			}
+		}
+	}
+	return ( *this );
+	M_EPILOG
+}
+
+namespace {
+
+void do_modulo( HReal::value_type& value_, HReal::value_type const& denominator_, int fileId_, int position_ ) {
+	if ( denominator_ != 0.0L ) {
+		value_ = fmodl( value_, denominator_ );
+	} else {
+		throw HHuginn::HHuginnRuntimeException( "Division by zero.", fileId_, position_ );
+	}
+}
+
+void do_modulo( HInteger::value_type& value_, HInteger::value_type const& denominator_, int fileId_, int position_ ) {
+	if ( ( denominator_ != 0L ) && ( ( value_ != meta::min_signed<huginn::HInteger::value_type>::value ) || ( denominator_ != -1 ) ) ) {
+		value_ %= denominator_;
+	} else {
+		throw HHuginn::HHuginnRuntimeException( denominator_ ? "Division overflow." : "Division by zero.", fileId_, position_ );
+	}
+}
+
+void do_modulo( HNumber::value_type& value_, HNumber::value_type const& denominator_, int fileId_, int position_ ) {
+	if ( denominator_ != number::N0 ) {
+		value_ %= denominator_;
+	} else {
+		throw HHuginn::HHuginnRuntimeException( "Division by zero.", fileId_, position_ );
+	}
+}
+
+}
+
+HExpression::OExecutionStep& HExpression::OExecutionStep::modulo( OExecutionStep const& other_, int fileId_, int position_ ) {
+	M_PROLOG
+	M_ASSERT( ( _literalType == other_._literalType ) && ( _literalType != HHuginn::TYPE::UNKNOWN ) );
+	if ( !! _value ) {
+		if ( !! other_._value ) {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::INTEGER ): { do_modulo( static_cast<HInteger*>( _value.raw() )->value(), static_cast<HInteger const*>( other_._value.raw() )->value(), fileId_, position_ ); } break;
+				case ( HHuginn::TYPE::REAL ):    { do_modulo( static_cast<HReal*>( _value.raw() )->value(),    static_cast<HReal const*>( other_._value.raw() )->value(),    fileId_, position_ ); } break;
+				case ( HHuginn::TYPE::NUMBER ):  { do_modulo( static_cast<HNumber*>( _value.raw() )->value(),  static_cast<HNumber const*>( other_._value.raw() )->value(),  fileId_, position_ ); } break;
+				default: {}
+			}
+		} else {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::INTEGER ): { do_modulo( static_cast<HInteger*>( _value.raw() )->value(), other_._integer, fileId_, position_ ); } break;
+				case ( HHuginn::TYPE::REAL ):    { do_modulo( static_cast<HReal*>( _value.raw() )->value(),    other_._real,    fileId_, position_ ); } break;
+				case ( HHuginn::TYPE::NUMBER ):  { do_modulo( static_cast<HNumber*>( _value.raw() )->value(),  other_._number,  fileId_, position_ ); } break;
+				default: {}
+			}
+		}
+	} else {
+		if ( !! other_._value ) {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::INTEGER ): { do_modulo( _integer, static_cast<HInteger const*>( other_._value.raw() )->value(), fileId_, position_ ); } break;
+				case ( HHuginn::TYPE::REAL ):    { do_modulo( _real,    static_cast<HReal const*>( other_._value.raw() )->value(),    fileId_, position_ ); } break;
+				case ( HHuginn::TYPE::NUMBER ):  { do_modulo( _number,  static_cast<HNumber const*>( other_._value.raw() )->value(),  fileId_, position_ ); } break;
+				default: {}
+			}
+		} else {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::INTEGER ): { do_modulo( _integer, other_._integer, fileId_, position_ ); } break;
+				case ( HHuginn::TYPE::REAL ):    { do_modulo( _real,    other_._real,    fileId_, position_ ); } break;
+				case ( HHuginn::TYPE::NUMBER ):  { do_modulo( _number,  other_._number,  fileId_, position_ ); } break;
+				default: {}
+			}
+		}
+	}
+	return ( *this );
+	M_EPILOG
+}
+
+HExpression::OExecutionStep& HExpression::OExecutionStep::negate( int fileId_, int position_ ) {
+	M_PROLOG
+	M_ASSERT( _literalType != HHuginn::TYPE::UNKNOWN );
+	if ( !! _value ) {
+		switch ( _literalType ) {
+			case ( HHuginn::TYPE::INTEGER ): {
+				HInteger::value_type& value( static_cast<HInteger*>( _value.raw() )->value() );
+				if ( value == meta::min_signed<huginn::HInteger::value_type>::value ) {
+					throw HHuginn::HHuginnRuntimeException( "Integer overflow.", fileId_, position_ );
+				}
+				value = -value;
+			} break;
+			case ( HHuginn::TYPE::REAL ):    { static_cast<HReal*>( _value.raw() )->value()    = -static_cast<HReal*>( _value.raw() )->value();    } break;
+			case ( HHuginn::TYPE::NUMBER ):  { static_cast<HNumber*>( _value.raw() )->value()  = -static_cast<HNumber*>( _value.raw() )->value();  } break;
+			default: {}
+		}
+	} else {
+		switch ( _literalType ) {
+			case ( HHuginn::TYPE::INTEGER ): {
+				if ( _integer == meta::min_signed<huginn::HInteger::value_type>::value ) {
+					throw HHuginn::HHuginnRuntimeException( "Integer overflow.", fileId_, position_ );
+				}
+				_integer = -_integer;
+			} break;
+			case ( HHuginn::TYPE::REAL ):    { _real    = -_real;    } break;
+			case ( HHuginn::TYPE::NUMBER ):  { _number  = -_number;  } break;
+			default: {}
+		}
+	}
+	return ( *this );
+	M_EPILOG
+}
+
 HExpression::HExpression( int fileId_, executing_parser::range_t range_ )
 	: HStatement( INVALID_STATEMENT_IDENTIFIER, fileId_, range_ )
 	, _executionSteps()
@@ -509,7 +680,7 @@ void HExpression::oper( OPERATOR operator_, int position_ ) {
 	M_EPILOG
 }
 
-void HExpression::commit_oper( OPERATOR operator_ ) {
+void HExpression::commit_oper( OPERATOR operator_, int fileId_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( ! _operations.is_empty() );
 	switch ( operator_ ) {
@@ -589,12 +760,12 @@ void HExpression::commit_oper( OPERATOR operator_ ) {
 			M_ASSERT( ! "Invalid code path."[0] );
 		}
 	}
-	try_collape();
+	try_collape( fileId_, position_ );
 	return;
 	M_EPILOG
 }
 
-void HExpression::try_collape( void ) {
+void HExpression::try_collape( int fileId_, int position_ ) {
 	M_PROLOG
 	if ( _instructions.is_empty() ) {
 		return;
@@ -604,23 +775,33 @@ void HExpression::try_collape( void ) {
 	switch ( op ) {
 		case ( OPERATOR::PLUS ):
 		case ( OPERATOR::MINUS ):
-		case ( OPERATOR::MULTIPLY ): {
+		case ( OPERATOR::MULTIPLY ):
+		case ( OPERATOR::DIVIDE ):
+		case ( OPERATOR::MODULO ): {
 			if (
 				( _executionSteps[stepCount - 2]._literalType != HHuginn::TYPE::UNKNOWN )
 				&& ( _executionSteps[stepCount - 2]._literalType == _executionSteps[stepCount - 3]._literalType )
 			) {
 				_executionSteps.pop_back();
-				if ( op == OPERATOR::PLUS ) {
-					_executionSteps[stepCount - 3] += _executionSteps.back();
-				} else if ( op == OPERATOR::MINUS ) {
-					_executionSteps[stepCount - 3] -= _executionSteps.back();
-				} else {
-					_executionSteps[stepCount - 3] *= _executionSteps.back();
+				switch ( op ) {
+					case ( OPERATOR::PLUS ):     { _executionSteps[stepCount - 3] += _executionSteps.back(); } break;
+					case ( OPERATOR::MINUS ):    { _executionSteps[stepCount - 3] -= _executionSteps.back(); } break;
+					case ( OPERATOR::MULTIPLY ): { _executionSteps[stepCount - 3] *= _executionSteps.back(); } break;
+					case ( OPERATOR::DIVIDE ):   { _executionSteps[stepCount - 3].divide( _executionSteps.back(), fileId_, position_ ); } break;
+					case ( OPERATOR::MODULO ):   { _executionSteps[stepCount - 3].modulo( _executionSteps.back(), fileId_, position_ ); } break;
+					default: {}
 				}
 				_executionSteps.pop_back();
 				_instructions.pop_back();
 			}
 		} break;
+		case ( OPERATOR::NEGATE ): {
+			if ( _executionSteps[stepCount - 2]._literalType != HHuginn::TYPE::UNKNOWN ) {
+				_executionSteps.pop_back();
+				_executionSteps.back().negate( fileId_, position_ );
+				_instructions.pop_back();
+			}
+		};
 		default: {
 			return;
 		}

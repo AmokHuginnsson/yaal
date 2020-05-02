@@ -56,7 +56,7 @@ void OCompiler::dispatch_action( OPERATOR oper_, executing_parser::range_t range
 		case ( OPERATOR::MODULUS ): {
 			M_ASSERT( ( o == OPERATOR::MODULUS ) || ( o == OPERATOR::PARENTHESIS ) );
 			defer_action( &HExpression::close_parenthesis, range_ );
-			current_expression()->commit_oper( o );
+			current_expression()->commit_oper( o, _fileId, p );
 			fc._operations.pop();
 			if ( o == OPERATOR::MODULUS ) {
 				M_ASSERT( ! fc._valueTypes.is_empty() );
@@ -88,7 +88,7 @@ void OCompiler::dispatch_action( OPERATOR oper_, executing_parser::range_t range
 			M_ASSERT( o == OPERATOR::BOOLEAN_NOT );
 			M_ASSERT( ! fc._valueTypes.is_empty() );
 			defer_action( &HExpression::boolean_not, range_ );
-			current_expression()->commit_oper( o );
+			current_expression()->commit_oper( o, _fileId, p );
 			fc._operations.pop();
 			HClass const* c( fc._valueTypes.top()._class );
 			if ( ! is_boolean_congruent( c ) ) {
@@ -307,10 +307,11 @@ void OCompiler::defer_get_field_reference( yaal::hcore::HString const& value_, e
 		}
 	}
 	HExpression* expr( current_expression().raw() );
+	int p( range_.start() );
 	expr->add_execution_step(
-		HExpression::OExecutionStep( expr, &HExpression::get_field, range_.start(), HFrame::ACCESS::VALUE, refIdentifier )
+		HExpression::OExecutionStep( expr, &HExpression::get_field, p, HFrame::ACCESS::VALUE, refIdentifier )
 	);
-	expr->commit_oper( OPERATOR::MEMBER_ACCESS );
+	expr->commit_oper( OPERATOR::MEMBER_ACCESS, _fileId, p );
 	fc._valueTypes.pop();
 	fc._valueTypes.push( type_to_class( HHuginn::TYPE::UNKNOWN ) );
 	return;
@@ -490,7 +491,7 @@ void OCompiler::dispatch_assign( executing_parser::range_t range_ ) {
 	if ( hasAssign ) {
 		HExpression* expr( current_expression().raw() );
 		expr->add_execution_step( HExpression::OExecutionStep( expr, &HExpression::set_variable, range_.start(), HFrame::ACCESS::REFERENCE, varCount ) );
-		expr->commit_oper( OPERATOR::ASSIGN_TERM );
+		expr->commit_oper( OPERATOR::ASSIGN_TERM, _fileId, range_.start() );
 	}
 	return;
 	M_EPILOG
@@ -544,11 +545,11 @@ void OCompiler::dispatch_subscript( executing_parser::range_t range_ ) {
 			throw HHuginn::HHuginnRuntimeException( "Range specifier is not an integer.", _fileId, p );
 		}
 		expression->add_execution_step( HExpression::OExecutionStep( expression.raw(), &HExpression::range, range_.start() ) );
-		expression->commit_oper( OPERATOR::RANGE );
+		expression->commit_oper( OPERATOR::RANGE, _fileId, p );
 		fc._lastDereferenceOperator = OPERATOR::RANGE;
 	} else {
 		expression->add_execution_step( HExpression::OExecutionStep( expression.raw(), &HExpression::subscript, range_.start() ) );
-		expression->commit_oper( OPERATOR::SUBSCRIPT );
+		expression->commit_oper( OPERATOR::SUBSCRIPT, _fileId, p );
 		fc._lastDereferenceOperator = OPERATOR::SUBSCRIPT;
 	}
 	fc._operations.pop();
@@ -610,7 +611,7 @@ void OCompiler::dispatch_function_call( HExpression::OExecutionStep::action_t co
 	fc._valueTypes.push( c );
 	M_ASSERT( fc._operations.top()._operator == OPERATOR::FUNCTION_CALL );
 	defer_function_call( action_, range_ );
-	expr->commit_oper( OPERATOR::FUNCTION_CALL );
+	expr->commit_oper( OPERATOR::FUNCTION_CALL, _fileId, range_.start() );
 	fc._operations.pop();
 	return;
 	M_EPILOG
@@ -755,7 +756,7 @@ void OCompiler::dispatch_plus( executing_parser::range_t range_ ) {
 	int p( po._position );
 	M_ASSERT( ( o == OPERATOR::PLUS ) || ( o == OPERATOR::MINUS ) );
 	defer_action( o == OPERATOR::PLUS ? &HExpression::plus : &HExpression::minus, range_ );
-	current_expression()->commit_oper( o );
+	current_expression()->commit_oper( o, _fileId, p );
 	fc._operations.pop();
 	HClass const* c1( fc._valueTypes.top()._class );
 	fc._valueTypes.pop();
@@ -789,7 +790,7 @@ void OCompiler::dispatch_mul( executing_parser::range_t range_ ) {
 	int p( po._position );
 	M_ASSERT( ( o == OPERATOR::MULTIPLY ) || ( o == OPERATOR::DIVIDE ) || ( o == OPERATOR::MODULO ) );
 	defer_action( o == OPERATOR::MULTIPLY ? &HExpression::mul : ( o == OPERATOR::DIVIDE ? &HExpression::div : &HExpression::mod ), range_ );
-	current_expression()->commit_oper( o );
+	current_expression()->commit_oper( o, _fileId, p );
 	fc._operations.pop();
 	HClass const* c1( fc._valueTypes.top()._class );
 	fc._valueTypes.pop();
@@ -844,7 +845,7 @@ void OCompiler::dispatch_power( executing_parser::range_t range_ ) {
 	}
 	if ( hasPower ) {
 		defer_action( &HExpression::power, range_ );
-		current_expression()->commit_oper( OPERATOR::POWER_TERM );
+		current_expression()->commit_oper( OPERATOR::POWER_TERM, _fileId, range_.start() );
 	}
 	return;
 	M_EPILOG
@@ -876,7 +877,7 @@ void OCompiler::dispatch_negate( executing_parser::range_t range_ ) {
 	M_ASSERT( po._operator == OPERATOR::NEGATE );
 	M_ASSERT( ! fc._valueTypes.is_empty() );
 	defer_action( &HExpression::negate, range_ );
-	current_expression()->commit_oper( OPERATOR::NEGATE );
+	current_expression()->commit_oper( OPERATOR::NEGATE, _fileId, p );
 	fc._operations.pop();
 	if ( ! is_numeric_congruent( fc._valueTypes.top()._class ) ) {
 		throw HHuginn::HHuginnRuntimeException(
@@ -916,7 +917,7 @@ void OCompiler::dispatch_compare( executing_parser::range_t range_ ) {
 			M_ASSERT( ! "bad code path"[0] );
 		}
 	}
-	current_expression()->commit_oper( o );
+	current_expression()->commit_oper( o, _fileId, p );
 	fc._operations.pop();
 	M_ASSERT( fc._valueTypes.get_size() >= 2 );
 	HClass const* c1( fc._valueTypes.top()._class );
@@ -958,7 +959,7 @@ void OCompiler::dispatch_boolean( HExpression::OExecutionStep::action_t const& a
 	if ( !! action_ ) {
 		M_ASSERT( action_ == &HExpression::boolean_xor );
 		defer_action( action_, range_ );
-		current_expression()->commit_oper( po._operator );
+		current_expression()->commit_oper( po._operator, _fileId, p );
 	}
 	fc._operations.pop();
 	M_ASSERT( fc._valueTypes.get_size() >= 2 );
@@ -1016,7 +1017,7 @@ void OCompiler::dispatch_equals( executing_parser::range_t range_ ) {
 	int p( po._position );
 	M_ASSERT( ( o == OPERATOR::EQUALS ) || ( o == OPERATOR::NOT_EQUALS ) );
 	defer_action( o == OPERATOR::EQUALS ? &HExpression::equals : &HExpression::not_equals, range_ );
-	current_expression()->commit_oper( o );
+	current_expression()->commit_oper( o, _fileId, p );
 	fc._operations.pop();
 	M_ASSERT( fc._valueTypes.get_size() >= 2 );
 	HClass const* c1( fc._valueTypes.top()._class );
@@ -1119,7 +1120,7 @@ void OCompiler::commit_boolean( OPERATOR operator_, executing_parser::range_t ra
 		HExpression& expression( *current_expression() );
 		expression.oper( operator_, range_.start() );
 		defer_action( operator_ == OPERATOR::BOOLEAN_AND ? &HExpression::boolean_and : &HExpression::boolean_or, range_ );
-		expression.commit_oper( operator_ );
+		expression.commit_oper( operator_, _fileId, range_.start() );
 	} else {
 		HHuginn::expression_t e( fc._scopeStack.top()->expression() );
 		fc.expressions_stack().pop();
@@ -1143,7 +1144,7 @@ void OCompiler::commit_ternary( executing_parser::range_t range_ ) {
 		HExpression& expression( *current_expression() );
 		expression.oper( OPERATOR::TERNARY, range_.start() );
 		defer_action( &HExpression::ternary, range_ );
-		expression.commit_oper( OPERATOR::TERNARY );
+		expression.commit_oper( OPERATOR::TERNARY, _fileId, range_.start() );
 	} else {
 		HHuginn::expression_t e( fc._scopeStack.top()->expression() );
 		fc.expressions_stack().pop();
@@ -1180,7 +1181,7 @@ void OCompiler::create_lambda( executing_parser::range_t range_ ) {
 	defer_store_direct( fRef, range_ );
 	if ( _capturesLog.find( fi.first ) != _capturesLog.end() ) {
 		defer_action( &HExpression::create_closure, range_ );
-		current_expression()->commit_oper( OPERATOR::FUNCTION_CALL );
+		current_expression()->commit_oper( OPERATOR::FUNCTION_CALL, _fileId, range_.start() );
 		f()._valueTypes.top()._class = type_to_class( HHuginn::TYPE::BOUND_METHOD );
 	}
 	return;

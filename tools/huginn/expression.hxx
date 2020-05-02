@@ -67,6 +67,10 @@ public:
 		OExecutionStep& operator += ( OExecutionStep const& );
 		OExecutionStep& operator -= ( OExecutionStep const& );
 		OExecutionStep& operator *= ( OExecutionStep const& );
+		OExecutionStep& divide( OExecutionStep const&, int, int );
+		OExecutionStep& modulo( OExecutionStep const&, int, int );
+		OExecutionStep& operator ^= ( OExecutionStep const& );
+		OExecutionStep& negate( int, int );
 	};
 private:
 	typedef yaal::hcore::HArray<OExecutionStep> execution_steps_t;
@@ -83,8 +87,8 @@ public:
 	void pop_execution_step( void );
 	void merge( HExpression& );
 	void oper( OPERATOR, int );
-	void commit_oper( OPERATOR );
-	void try_collape( void );
+	void commit_oper( OPERATOR, int, int );
+	void try_collape( int, int );
 	void close_parenthesis( OExecutionStep const&, huginn::HFrame* );
 	void plus( OExecutionStep const&, huginn::HFrame* );
 	void minus( OExecutionStep const&, huginn::HFrame* );
