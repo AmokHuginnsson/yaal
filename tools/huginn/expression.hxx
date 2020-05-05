@@ -69,8 +69,10 @@ public:
 		OExecutionStep& operator *= ( OExecutionStep const& );
 		OExecutionStep& divide( OExecutionStep const&, int, int );
 		OExecutionStep& modulo( OExecutionStep const&, int, int );
-		OExecutionStep& operator ^= ( OExecutionStep const& );
+		OExecutionStep& power( OExecutionStep const&, int, int );
 		OExecutionStep& negate( int, int );
+		OExecutionStep& modulus( int, int );
+		OExecutionStep& factorial( int, int );
 	};
 private:
 	typedef yaal::hcore::HArray<OExecutionStep> execution_steps_t;

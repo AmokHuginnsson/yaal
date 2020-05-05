@@ -728,10 +728,10 @@ bool is_integer_congruent( HClass const* class_ ) {
 	return ( ( class_ && ( class_->type_id() == HHuginn::TYPE::INTEGER ) ) || is_unknown( class_ ) );
 }
 
-bool is_summable( HClass const* class_ ) {
+bool is_summable( HClass const* class_, bool withString_ ) {
 	return (
 		is_numeric_congruent( class_ )
-		|| ( class_ && ( class_->type_id() == HHuginn::TYPE::STRING ) )
+		|| ( withString_ && class_ && ( class_->type_id() == HHuginn::TYPE::STRING ) )
 		|| is_collection( class_ )
 	);
 }

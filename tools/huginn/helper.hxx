@@ -88,7 +88,7 @@ bool is_collection( huginn::HClass const* );
 bool is_collection_like( huginn::HClass const* );
 bool is_numeric_congruent( huginn::HClass const* );
 bool is_set_congruent( huginn::HClass const* );
-bool is_summable( huginn::HClass const* );
+bool is_summable( huginn::HClass const*, bool );
 bool is_comparable( huginn::HClass const* );
 bool is_comparable_congruent( huginn::HClass const* );
 bool is_boolean_congruent( huginn::HClass const* );

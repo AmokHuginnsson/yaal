@@ -571,6 +571,62 @@ HExpression::OExecutionStep& HExpression::OExecutionStep::modulo( OExecutionStep
 	M_EPILOG
 }
 
+namespace {
+
+void do_power( HReal::value_type& value_, HReal::value_type const& exponent_, int fileId_, int position_ ) {
+	if ( ( value_ != 0.L ) || ( exponent_ != 0.L ) ) {
+		value_ = math::power( value_, exponent_ );
+	} else {
+		throw HHuginn::HHuginnRuntimeException( "indeterminate form 0^0", fileId_, position_ );
+	}
+}
+
+void do_power( HNumber::value_type& value_, HNumber::value_type const& exponent_, int fileId_, int position_ ) {
+	try {
+		value_ = math::power( value_, exponent_ );
+	} catch ( HNumberException const& ex ) {
+		throw HHuginn::HHuginnRuntimeException( ex.what(), fileId_, position_ );
+	}
+}
+
+}
+
+HExpression::OExecutionStep& HExpression::OExecutionStep::power( OExecutionStep const& other_, int fileId_, int position_ ) {
+	M_PROLOG
+	M_ASSERT( ( _literalType == other_._literalType ) && ( _literalType != HHuginn::TYPE::UNKNOWN ) );
+	if ( !! _value ) {
+		if ( !! other_._value ) {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::REAL ):    { do_power( static_cast<HReal*>( _value.raw() )->value(),    static_cast<HReal const*>( other_._value.raw() )->value(),    fileId_, position_ ); } break;
+				case ( HHuginn::TYPE::NUMBER ):  { do_power( static_cast<HNumber*>( _value.raw() )->value(),  static_cast<HNumber const*>( other_._value.raw() )->value(),  fileId_, position_ ); } break;
+				default: {}
+			}
+		} else {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::REAL ):    { do_power( static_cast<HReal*>( _value.raw() )->value(),    other_._real,    fileId_, position_ ); } break;
+				case ( HHuginn::TYPE::NUMBER ):  { do_power( static_cast<HNumber*>( _value.raw() )->value(),  other_._number,  fileId_, position_ ); } break;
+				default: {}
+			}
+		}
+	} else {
+		if ( !! other_._value ) {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::REAL ):    { do_power( _real,    static_cast<HReal const*>( other_._value.raw() )->value(),    fileId_, position_ ); } break;
+				case ( HHuginn::TYPE::NUMBER ):  { do_power( _number,  static_cast<HNumber const*>( other_._value.raw() )->value(),  fileId_, position_ ); } break;
+				default: {}
+			}
+		} else {
+			switch ( _literalType ) {
+				case ( HHuginn::TYPE::REAL ):    { do_power( _real,    other_._real,    fileId_, position_ ); } break;
+				case ( HHuginn::TYPE::NUMBER ):  { do_power( _number,  other_._number,  fileId_, position_ ); } break;
+				default: {}
+			}
+		}
+	}
+	return ( *this );
+	M_EPILOG
+}
+
 HExpression::OExecutionStep& HExpression::OExecutionStep::negate( int fileId_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( _literalType != HHuginn::TYPE::UNKNOWN );
@@ -583,8 +639,8 @@ HExpression::OExecutionStep& HExpression::OExecutionStep::negate( int fileId_, i
 				}
 				value = -value;
 			} break;
-			case ( HHuginn::TYPE::REAL ):    { static_cast<HReal*>( _value.raw() )->value()    = -static_cast<HReal*>( _value.raw() )->value();    } break;
-			case ( HHuginn::TYPE::NUMBER ):  { static_cast<HNumber*>( _value.raw() )->value()  = -static_cast<HNumber*>( _value.raw() )->value();  } break;
+			case ( HHuginn::TYPE::REAL ):    { static_cast<HReal*>( _value.raw() )->value()    = -static_cast<HReal*>( _value.raw() )->value();   } break;
+			case ( HHuginn::TYPE::NUMBER ):  { static_cast<HNumber*>( _value.raw() )->value()  = -static_cast<HNumber*>( _value.raw() )->value(); } break;
 			default: {}
 		}
 	} else {
@@ -595,10 +651,69 @@ HExpression::OExecutionStep& HExpression::OExecutionStep::negate( int fileId_, i
 				}
 				_integer = -_integer;
 			} break;
-			case ( HHuginn::TYPE::REAL ):    { _real    = -_real;    } break;
-			case ( HHuginn::TYPE::NUMBER ):  { _number  = -_number;  } break;
+			case ( HHuginn::TYPE::REAL ):    { _real    = -_real;   } break;
+			case ( HHuginn::TYPE::NUMBER ):  { _number  = -_number; } break;
 			default: {}
 		}
+	}
+	return ( *this );
+	M_EPILOG
+}
+
+HExpression::OExecutionStep& HExpression::OExecutionStep::modulus( int fileId_, int position_ ) {
+	M_PROLOG
+	M_ASSERT( _literalType != HHuginn::TYPE::UNKNOWN );
+	if ( !! _value ) {
+		switch ( _literalType ) {
+			case ( HHuginn::TYPE::INTEGER ): {
+				HInteger::value_type& value( static_cast<HInteger*>( _value.raw() )->value() );
+				if ( value == meta::min_signed<huginn::HInteger::value_type>::value ) {
+					throw HHuginn::HHuginnRuntimeException( "Integer overflow.", fileId_, position_ );
+				}
+				value = math::abs( value );
+			} break;
+			case ( HHuginn::TYPE::REAL ):    { static_cast<HReal*>( _value.raw() )->value()    = math::abs( static_cast<HReal*>( _value.raw() )->value() );   } break;
+			case ( HHuginn::TYPE::NUMBER ):  { static_cast<HNumber*>( _value.raw() )->value()  = math::abs( static_cast<HNumber*>( _value.raw() )->value() ); } break;
+			default: {}
+		}
+	} else {
+		switch ( _literalType ) {
+			case ( HHuginn::TYPE::INTEGER ): {
+				if ( _integer == meta::min_signed<huginn::HInteger::value_type>::value ) {
+					throw HHuginn::HHuginnRuntimeException( "Integer overflow.", fileId_, position_ );
+				}
+				_integer = math::abs( _integer );
+			} break;
+			case ( HHuginn::TYPE::REAL ):    { _real    = math::abs( _real );   } break;
+			case ( HHuginn::TYPE::NUMBER ):  { _number  = math::abs( _number ); } break;
+			default: {}
+		}
+	}
+	return ( *this );
+	M_EPILOG
+}
+
+namespace {
+
+void do_factorial( HNumber::value_type& value_, int fileId_, int position_ ) {
+	if ( value_ < hcore::number::N0 ) {
+		throw HHuginn::HHuginnRuntimeException( "Factorial from negative.", fileId_, position_ );
+	} else if ( ! value_.is_integral() ) {
+		throw HHuginn::HHuginnRuntimeException( "Factorial from fraction.", fileId_, position_ );
+	} else {
+		value_ = hcore::number::factorial( value_.to_integer() );
+	}
+}
+
+}
+
+HExpression::OExecutionStep& HExpression::OExecutionStep::factorial( int fileId_, int position_ ) {
+	M_PROLOG
+	M_ASSERT( _literalType != HHuginn::TYPE::UNKNOWN );
+	if ( !! _value ) {
+		do_factorial( static_cast<HNumber*>( _value.raw() )->value(), fileId_, position_ );
+	} else {
+		do_factorial( _number, fileId_, position_ );
 	}
 	return ( *this );
 	M_EPILOG
@@ -698,6 +813,7 @@ void HExpression::commit_oper( OPERATOR operator_, int fileId_, int position_ ) 
 		case ( OPERATOR::DIVIDE ):
 		case ( OPERATOR::MODULO ):
 		case ( OPERATOR::NEGATE ):
+		case ( OPERATOR::FACTORIAL ):
 		case ( OPERATOR::BOOLEAN_AND ):
 		case ( OPERATOR::BOOLEAN_OR ):
 		case ( OPERATOR::BOOLEAN_XOR ):
@@ -795,13 +911,54 @@ void HExpression::try_collape( int fileId_, int position_ ) {
 				_instructions.pop_back();
 			}
 		} break;
+		case ( OPERATOR::POWER_TERM ): {
+			_instructions.pop_back();
+			int exponentIdx( stepCount - 2 );
+			while (
+				! _instructions.is_empty()
+				&& ( _instructions.back()._operator == OPERATOR::POWER )
+				&& (
+					( _executionSteps[exponentIdx]._literalType == HHuginn::TYPE::REAL )
+					|| ( _executionSteps[exponentIdx]._literalType == HHuginn::TYPE::NUMBER )
+				)
+				&& ( _executionSteps[exponentIdx]._literalType == _executionSteps[exponentIdx - 1]._literalType )
+			) {
+				_executionSteps[exponentIdx - 1].power( _executionSteps[exponentIdx], fileId_, position_ );
+				-- exponentIdx;
+				_instructions.pop_back();
+			}
+			if ( ! _instructions.is_empty() && ( _instructions.back()._operator == OPERATOR::POWER ) ) {
+				++ exponentIdx;
+				_executionSteps[exponentIdx] = _executionSteps.back();
+				_instructions.push_back( OPositionedOperator( OPERATOR::POWER_TERM, 0 ) );
+			}
+			++ exponentIdx;
+			while ( exponentIdx < stepCount ) {
+				_executionSteps.pop_back();
+				++ exponentIdx;
+			}
+		} break;
 		case ( OPERATOR::NEGATE ): {
 			if ( _executionSteps[stepCount - 2]._literalType != HHuginn::TYPE::UNKNOWN ) {
 				_executionSteps.pop_back();
 				_executionSteps.back().negate( fileId_, position_ );
 				_instructions.pop_back();
 			}
-		};
+		} break;
+		case ( OPERATOR::MODULUS ): {
+			if ( _executionSteps[stepCount - 2]._literalType != HHuginn::TYPE::UNKNOWN ) {
+				_executionSteps.pop_back();
+				_executionSteps.back().modulus( fileId_, position_ );
+				_instructions.pop_back();
+			}
+		} break;
+		case ( OPERATOR::FACTORIAL ): {
+			if ( _executionSteps[stepCount - 2]._literalType != HHuginn::TYPE::UNKNOWN ) {
+				_executionSteps.pop_back();
+				_executionSteps.back().factorial( fileId_, position_ );
+				_instructions.pop_back();
+			}
+		} break;
 		default: {
 			return;
 		}
@@ -1310,12 +1467,16 @@ void HExpression::mod( OExecutionStep const&, HFrame* frame_ ) {
 	M_EPILOG
 }
 
-void HExpression::factorial( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
+void HExpression::factorial( OExecutionStep const&, huginn::HFrame* frame_ ) {
 	M_PROLOG
+	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::FACTORIAL );
+	int p( _instructions[frame_->ip()]._position );
+	++ frame_->ip();
 	M_ASSERT( ! frame_->values().is_empty() );
 	HHuginn::value_t v( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	frame_->values().push( v->operator_factorial( frame_->thread(), v, executionStep_._position ) );
+	frame_->values().push( v->operator_factorial( frame_->thread(), v, p ) );
 	return;
 	M_EPILOG
 }
