@@ -959,6 +959,12 @@ void HExpression::try_collape( int fileId_, int position_ ) {
 				_instructions.pop_back();
 			}
 		} break;
+		case ( OPERATOR::PARENTHESIS ): {
+			if ( _executionSteps[stepCount - 2]._literalType != HHuginn::TYPE::UNKNOWN ) {
+				_executionSteps.pop_back();
+				_instructions.pop_back();
+			}
+		} break;
 		default: {
 			return;
 		}
