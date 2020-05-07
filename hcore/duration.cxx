@@ -140,7 +140,7 @@ yaal::hcore::HString duration_to_string( duration_t val_, time::UNIT unit_ ) {
 }
 
 UNIT scale( duration_t duration_, UNIT minScale_ ) {
-	UNIT unit( UNIT::WEEK );
+	UNIT unit( UNIT::NANOSECOND );
 	i64_t x( 0 );
 	x = time::in_units<UNIT::MICROSECOND>( duration_ );
 	if ( x > 0 ) {
