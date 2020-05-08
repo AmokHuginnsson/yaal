@@ -167,6 +167,50 @@ inline HIdentifierParser identifier( yaal::hcore::HString const& name_, HIdentif
 	return ( HIdentifierParser( name_, action_ ) );
 }
 
+class HNumberParser : public executing_parser::HReal {
+public:
+	typedef HNumberParser this_type;
+	typedef HReal base_type;
+public:
+	HNumberParser( action_number_range_t const& action_ )
+		: HReal( action_ ) {
+		return;
+	}
+	HNumberParser( HNumberParser const& numberParser_ )
+		: HReal( numberParser_ ) {
+		return;
+	}
+protected:
+	virtual ptr_t do_clone( void ) const override {
+		M_PROLOG
+		return ( make_pointer<HNumberParser>( *this ) );
+		M_EPILOG
+	}
+	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const override {
+		M_PROLOG
+		if ( first_ == last_ ) {
+			return ( first_ );
+		}
+		if ( *first_ != '$' ) {
+			report_error( executingParser_, first_, "expected a number" );
+			return ( first_ );
+		}
+		hcore::HUTF8String::const_iterator scan( first_ );
+		++ scan;
+		hcore::HUTF8String::const_iterator scanned( HReal::do_parse( executingParser_, scan, last_ ) );
+		return ( scanned != scan ? scanned : first_ );
+		M_EPILOG
+	}
+	virtual void do_describe( executing_parser::HRuleDescription& rd_, executing_parser::rule_use_t const& ) const override {
+		M_PROLOG
+		rd_.desc( "number" );
+		return;
+		M_EPILOG
+	}
+private:
+	HNumberParser& operator = ( HNumberParser const& ) = delete;
+};
+
 executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_, compiler_setup_t compilerSetup_ ) {
 	M_PROLOG
 	using namespace executing_parser;
@@ -256,10 +300,6 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_, compiler_setup
 	HRule booleanLiteralFalse(
 		"false",
 		constant( KEYWORD::FALSE, e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::defer_store_direct, _compiler.get(), runtime_ ? runtime_->false_value() : value_t(), _1 ) ) )
-	);
-	HRule numberLiteral(
-		"numberLiteral",
-		constant( '$' ) >> real[e_p::HReal::action_number_range_t( hcore::call( &OCompiler::defer_store_number, _compiler.get(), _1, _2 ) )]
 	);
 	HRule tupleLiteral(
 		"tupleLiteral",
@@ -400,13 +440,14 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_, compiler_setup
 		e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MEMBER_ACCESS, _1 ) )
 	);
 	HRule dereference( "dereference", *( subscriptOperator | functionCallOperator | memberAccess ) );
+	HNumberParser number( e_p::HReal::action_number_range_t( hcore::call( &OCompiler::defer_store_number, _compiler.get(), _1, _2 ) ) );
 	HRule atom( "atom",
 		modulus
 		| parenthesis >> -( memberAccess >> dereference )
 		| real( e_p::HReal::PARSE::STRICT )[e_p::HReal::action_double_long_range_t( hcore::call( &OCompiler::defer_store_real, _compiler.get(), _1, _2 ) )]
 		| integer[e_p::HInteger::action_int_long_long_range_t( hcore::call( &OCompiler::defer_store_integer, _compiler.get(), _1, _2 ) )]
 		| (
-			( numberLiteral
+			( number
 				| character_literal[e_p::HCharacterLiteral::action_character_range_t( hcore::call( &OCompiler::defer_store_character, _compiler.get(), _1, _2 ) )] )
 			>> -( memberAccess >> functionCallOperator )
 		)
