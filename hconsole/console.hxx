@@ -107,6 +107,7 @@ public:
 private:
 	bool _initialized;
 	bool _enabled;
+	bool _brightByBold;
 	bool _brokenBrightBackground;
 	int _width;
 	int _height;

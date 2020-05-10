@@ -160,6 +160,9 @@ void init_glyphs( void ) {
  */
 struct ATTR {
 	inline static int encode( int attr_ ) {
+		return ( static_cast<int>( COLOR_PAIR( static_cast<int unsigned>( attr_ ) ) ) );
+	}
+	inline static int encode_bright_by_bold( int attr_ ) {
 		return (
 			static_cast<int>(
 				COLOR_PAIR(
@@ -172,7 +175,10 @@ struct ATTR {
 			)
 		);
 	}
-	inline static int decode( int color_, int attr_ ) {
+	inline static int decode( int color_, int ) {
+		return ( static_cast<int>( color_ ) );
+	}
+	inline static int decode_bright_by_bold( int color_, int attr_ ) {
 		return (
 			static_cast<int>(
 				( color_ & static_cast<int>( obinary<0111>::value ) )
@@ -182,7 +188,7 @@ struct ATTR {
 			)
 		);
 	}
-	inline static int encode_fix( int attr_ ) {
+	inline static int encode_broken_bright_background( int attr_ ) {
 		int attr( 0 );
 		/*
 		 * On broken terminals we use trick to get bright background,
@@ -202,11 +208,11 @@ struct ATTR {
 				)
 			);
 		} else {
-			attr = encode( attr_ );
+			attr = encode_bright_by_bold( attr_ );
 		}
 		return ( attr );
 	}
-	inline static int decode_fix( int color_, int attr_ ) {
+	inline static int decode_broken_bright_background( int color_, int attr_ ) {
 		int attr( 0 );
 		if ( attr_ & static_cast<int>( A_REVERSE ) ) {
 			attr = static_cast<int>(
@@ -216,13 +222,17 @@ struct ATTR {
 				| COLOR::BG_BLINK
 			);
 		} else {
-			attr = decode( color_, attr_ );
+			attr = decode_bright_by_bold( color_, attr_ );
 		}
 		return ( attr );
 	}
 };
 
 namespace {
+
+bool make_bright_by_bold( void ) {
+	return ( ::getenv( "YAAL_MAKE_BRIGHT_BY_BOLD" ) != nullptr );
+}
 
 bool has_broken_bright_background( void ) {
 	bool hasBrokenBrightBackground(
@@ -240,6 +250,7 @@ bool has_broken_bright_background( void ) {
 HConsole::HConsole( void )
 	: _initialized( false )
 	, _enabled( false )
+	, _brightByBold( make_bright_by_bold() )
 	, _brokenBrightBackground( has_broken_bright_background() )
 	, _width( 0 )
 	, _height( 0 )
@@ -302,11 +313,26 @@ void HConsole::enter_curses( void ) {
 	if ( ! HTerminal::get_instance().exists() ) {
 		throw HConsoleException( "Not connected to a terminal." );
 	}
+	static int const BASE_COLOR_COUNT = 8;
 	static short const colors[] = {
-		COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
-		COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE
+		COLOR_BLACK,
+		COLOR_RED,
+		COLOR_GREEN,
+		COLOR_YELLOW,
+		COLOR_BLUE,
+		COLOR_MAGENTA,
+		COLOR_CYAN,
+		COLOR_WHITE,
+		COLOR_BLACK   + BASE_COLOR_COUNT,
+		COLOR_RED     + BASE_COLOR_COUNT,
+		COLOR_GREEN   + BASE_COLOR_COUNT,
+		COLOR_YELLOW  + BASE_COLOR_COUNT,
+		COLOR_BLUE    + BASE_COLOR_COUNT,
+		COLOR_MAGENTA + BASE_COLOR_COUNT,
+		COLOR_CYAN    + BASE_COLOR_COUNT,
+		COLOR_WHITE   + BASE_COLOR_COUNT
 	};
-/*	def_shell_mode(); */
+/* def_shell_mode(); */
 /* this is done automatically by initscr(), read man next time */
 	if ( ! _initialized ) {
 		init();
@@ -332,11 +358,14 @@ void HConsole::enter_curses( void ) {
 	/* init color pairs */
 	M_ENSURE( use_default_colors() == OK );
 	M_ENSURE( assume_default_colors( COLOR_BLACK, COLOR_BLACK ) == OK );
-	static int const COLOR_MAX( yaal::size( colors ) );
+	static int const COLOR_MAX( yaal::size( colors ) / ( _brightByBold ? 2 : 1 ) );
 	for ( int bg( 0 ); bg < COLOR_MAX; ++ bg ) {
 		for ( int fg( 0 ); fg < COLOR_MAX; ++ fg ) {
-			init_pair( static_cast<short>( bg * COLOR_MAX + fg ),
-					colors[ fg ], colors[ bg ] );
+			init_pair(
+				static_cast<short>( bg * COLOR_MAX + fg ),
+				colors[ fg ],
+				colors[ bg ]
+			);
 		}
 	}
 	_enabled = true;
@@ -436,9 +465,13 @@ void HConsole::set_attr( COLOR::color_t attr_ ) const {
 	char unsigned byte( static_cast<char unsigned>( attr_ ) );
 	fwd_wattrset(
 		static_cast<WINDOW*>( _window ),
-		_brokenBrightBackground
-			? static_cast<attr_t>( ATTR::encode_fix( byte ) )
-			: static_cast<attr_t>( ATTR::encode( byte ) )
+		! _brightByBold
+			? static_cast<attr_t>( ATTR::encode( byte ) )
+			: (
+				_brokenBrightBackground
+					? static_cast<attr_t>( ATTR::encode_broken_bright_background( byte ) )
+					: static_cast<attr_t>( ATTR::encode_bright_by_bold( byte ) )
+			)
 	);
 	return;
 	M_EPILOG
@@ -452,9 +485,13 @@ void HConsole::set_background( COLOR::color_t color_ ) const {
 	wbkgd(
 		static_cast<WINDOW*>( _window ),
 		' ' | static_cast<chtype>(
-			_brokenBrightBackground
-				? ATTR::encode_fix( COLOR::FG_BLACK | color_ )
-				: ATTR::encode( COLOR::FG_BLACK | color_ )
+			! _brightByBold
+				? ATTR::encode( COLOR::FG_BLACK | color_ )
+				: (
+					_brokenBrightBackground
+						? ATTR::encode_broken_bright_background( COLOR::FG_BLACK | color_ )
+						: ATTR::encode_bright_by_bold( COLOR::FG_BLACK | color_ )
+				)
 		)
 	); /* meaningless value from macro */
 	return;
@@ -807,9 +844,12 @@ COLOR::color_t HConsole::get_attr( void ) const {
 	NCURSES_ATTR_GET_SECOND_ARG_TYPE* pc( &color );
 	fwd_attr_get( static_cast<WINDOW*>( _window ), pa, pc, nullptr );
 	int attribute(
-		_brokenBrightBackground
-			? ATTR::decode_fix( static_cast<int>( color ), static_cast<int>( attr ) )
-			: ATTR::decode( static_cast<int>( color ), static_cast<int>( attr ) )
+		! _brightByBold
+			? ATTR::decode( static_cast<int>( color ), static_cast<int>( attr ) )
+			: ( _brokenBrightBackground
+				? ATTR::decode_broken_bright_background( static_cast<int>( color ), static_cast<int>( attr ) )
+				: ATTR::decode_bright_by_bold( static_cast<int>( color ), static_cast<int>( attr ) )
+			)
 	);
 	return ( static_cast<COLOR::color_t>( attribute ) );
 	M_EPILOG
