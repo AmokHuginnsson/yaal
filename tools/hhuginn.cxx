@@ -759,6 +759,13 @@ HHuginn::call_stack_t const& HHuginn::trace( void ) const {
 	return ( _trace );
 }
 
+yaal::hcore::time::duration_t HHuginn::execution_time( void ) const {
+	M_PROLOG
+	M_ENSURE( _state == STATE::COMPILED );
+	return ( _runtime->execution_time() );
+	M_EPILOG
+}
+
 yaal::hcore::HString HHuginn::get_snippet( int from_, int len_ ) const {
 	M_PROLOG
 	return ( current_source().get_snippet( from_, len_ ) );

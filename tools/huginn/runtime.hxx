@@ -9,6 +9,7 @@
 #include "tools/hhuginn.hxx"
 #include "tools/huginn/thread.hxx"
 #include "tools/huginn/objectfactory.hxx"
+#include "hcore/duration.hxx"
 
 namespace yaal {
 
@@ -107,6 +108,7 @@ private:
 	HHuginn::paths_t _modulePaths;
 	HHuginn::compiler_setup_t _compilerSetup;
 	HHuginn::call_stack_t _trace;
+	yaal::hcore::time::duration_t _time;
 public:
 	HRuntime( HHuginn* );
 	virtual ~HRuntime( void );
@@ -258,6 +260,7 @@ public:
 	int file_id( void );
 	HHuginn::call_stack_t get_call_stack( HThread* );
 	HHuginn::call_stack_t const& trace( void ) const;
+	yaal::hcore::time::duration_t execution_time( void ) const;
 	using HIntrospecteeInterface::get_call_stack;
 	variable_views_t get_locals( HThread*, int );
 	using HIntrospecteeInterface::get_locals;

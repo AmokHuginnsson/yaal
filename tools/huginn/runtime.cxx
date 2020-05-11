@@ -12,6 +12,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "helper.hxx"
 #include "compiler.hxx"
 #include "packagefactory.hxx"
+#include "hcore/hclock.hxx"
 #include "tools/util.hxx"
 #include "tools/stringalgo.hxx"
 #include "tools/tools.hxx"
@@ -197,7 +198,8 @@ HRuntime::HRuntime( HHuginn* huginn_ )
 	, _maxCallStackSize( _huginnMaxCallStack_ )
 	, _modulePaths()
 	, _compilerSetup( HHuginn::COMPILER::DEFAULT )
-	, _trace() {
+	, _trace()
+	, _time( 0 ) {
 }
 
 HRuntime::~HRuntime( void ) {
@@ -277,6 +279,7 @@ void HRuntime::copy_text( HRuntime& source_ ) {
 	_modulePaths = source_._modulePaths;
 	_compilerSetup = source_._compilerSetup;
 	_trace = source_._trace;
+	_time = source_._time;
 	fix_references();
 	/* Update global references in sub-module. */
 	if ( submoduleContext ) {
@@ -753,7 +756,10 @@ HHuginn::value_t HRuntime::call( identifier_id_t identifier_, HHuginn::values_t&
 		threads_t::iterator t( _threads.find( threadId ) );
 		M_ASSERT( t != _threads.end() );
 		if ( (*gcIt->second)->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) {
-			res = static_cast<huginn::HFunctionReference const*>( gcIt->second->raw() )->function()( t->second.raw(), nullptr, values_, position_ );
+			function_t const& f( static_cast<huginn::HFunctionReference const*>( gcIt->second->raw() )->function() );
+			HClock c;
+			res = f( t->second.raw(), nullptr, values_, position_ );
+			_time = time::duration_t( c.get_time_elapsed( time::UNIT::NANOSECOND ) );
 		} else {
 			throw HHuginn::HHuginnRuntimeException( "Symbol `"_ys.append( identifier_name( identifier_ ) ).append( "` is not callable." ), MAIN_FILE_ID, position_ );
 		}
@@ -1201,6 +1207,10 @@ HHuginn::call_stack_t HRuntime::do_get_call_stack( void ) {
 
 HHuginn::call_stack_t const& HRuntime::trace( void ) const {
 	return ( _trace );
+}
+
+yaal::hcore::time::duration_t HRuntime::execution_time( void ) const {
+	return ( _time );
 }
 
 HIntrospecteeInterface::variable_views_t HRuntime::get_locals( HThread* thread_, int frameNo_ ) {
