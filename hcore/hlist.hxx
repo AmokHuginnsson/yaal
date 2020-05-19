@@ -731,27 +731,31 @@ public:
 		M_ASSERT( from_._owner == &list_ );
 		M_ASSERT( from_._current && ( list_._size > 0 ) );
 		HElement* e( _hook ? ( to_._current ? to_._current : _hook ) : nullptr );
-		if ( ( from_._current != to_._current ) && ( from_._current->_next != to_._current ) ) {
-			if ( from_._current == list_._hook ) {
-				list_._hook = ( list_._hook->_next != list_._hook ) ? list_._hook->_next : nullptr;
-			}
-			if ( to_._current == _hook ) {
-				_hook = from_._current;
-			}
-			from_._current->_previous->_next = from_._current->_next;
-			from_._current->_next->_previous = from_._current->_previous;
-			if ( e ) {
-				from_._current->_next = e;
-				from_._current->_previous = e->_previous;
-				e->_previous->_next = from_._current;
-				e->_previous = from_._current;
-			} else {
-				_hook->_next = _hook;
-				_hook->_previous = _hook;
-			}
-			-- list_._size;
-			++ _size;
+		if ( from_._current == to_._current ) {
+			return;
 		}
+		if ( ( from_._current->_next == to_._current ) && ( to_._current != _hook ) ) {
+			return;
+		}
+		if ( from_._current == list_._hook ) {
+			list_._hook = ( list_._hook->_next != list_._hook ) ? list_._hook->_next : nullptr;
+		}
+		if ( to_._current == _hook ) {
+			_hook = from_._current;
+		}
+		from_._current->_previous->_next = from_._current->_next;
+		from_._current->_next->_previous = from_._current->_previous;
+		if ( e ) {
+			from_._current->_next = e;
+			from_._current->_previous = e->_previous;
+			e->_previous->_next = from_._current;
+			e->_previous = from_._current;
+		} else {
+			_hook->_next = _hook;
+			_hook->_previous = _hook;
+		}
+		-- list_._size;
+		++ _size;
 		return;
 		M_EPILOG
 	}
@@ -761,32 +765,33 @@ public:
 		M_ASSERT( first_._owner == &list_ );
 		M_ASSERT( last_._owner == &list_ );
 		M_ASSERT( first_._current || ( first_._current == last_._current ) );
-		if ( first_._current != last_._current ) {
-			HElement* to( _hook ? ( it_._current ? it_._current : _hook ) : nullptr );
-			HElement* last( last_._current ? last_._current : list_._hook );
-			if ( ( ( last_._current != to ) || ( &list_ != this ) ) && ( last->_previous != to ) ) {
-				size_type count( ( &list_ != this ) ? distance( first_, last_ ) : 0 );
-				if ( first_._current == list_._hook ) {
-					list_._hook = last_._current;
-				}
-				HElement* lastPrev( last->_previous );
-				first_._current->_previous->_next = last;
-				last->_previous = first_._current->_previous;
-				if ( to ) {
-					first_._current->_previous = to->_previous;
-					to->_previous->_next = first_._current;
-					lastPrev->_next = to;
-					to->_previous = lastPrev;
-				} else {
-					first_._current->_previous = lastPrev;
-					lastPrev->_next = first_._current;
-				}
-				if ( ! to || ( it_._current == _hook ) ) {
-					_hook = first_._current;
-				}
-				list_._size -= count;
-				_size += count;
+		if ( first_._current == last_._current ) {
+			return;
+		}
+		HElement* to( _hook ? ( it_._current ? it_._current : _hook ) : nullptr );
+		HElement* last( last_._current ? last_._current : list_._hook );
+		if ( ( ( last_._current != to ) || ( &list_ != this ) ) && ( last->_previous != to ) ) {
+			size_type count( ( &list_ != this ) ? distance( first_, last_ ) : 0 );
+			if ( first_._current == list_._hook ) {
+				list_._hook = last_._current;
 			}
+			HElement* lastPrev( last->_previous );
+			first_._current->_previous->_next = last;
+			last->_previous = first_._current->_previous;
+			if ( to ) {
+				first_._current->_previous = to->_previous;
+				to->_previous->_next = first_._current;
+				lastPrev->_next = to;
+				to->_previous = lastPrev;
+			} else {
+				first_._current->_previous = lastPrev;
+				lastPrev->_next = first_._current;
+			}
+			if ( ! to || ( it_._current == _hook ) ) {
+				_hook = first_._current;
+			}
+			list_._size -= count;
+			_size += count;
 		}
 		return;
 		M_EPILOG
