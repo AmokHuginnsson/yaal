@@ -40,8 +40,6 @@ addons:
       - graphviz
       - libboost-all-dev
       - lftp
-      - postgresql-10
-      - postgresql-client-10
       - language-pack-pl
   postgresql: "10"
 sudo: false
