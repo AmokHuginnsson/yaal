@@ -95,8 +95,12 @@ protected:
 	virtual HStreamInterface& do_set_adjust( ADJUST ) override;
 	virtual HStreamInterface& do_set_skipws( bool ) override;
 	virtual HStreamInterface& do_set_boolalpha( bool ) override;
+	virtual HStreamInterface& do_set_buffered_io( bool ) override;
+	virtual HStreamInterface& do_set_io_buffer_size( int ) override;
 	virtual bool do_get_skipws( void ) const override;
 	virtual bool do_get_boolalpha( void ) const override;
+	virtual bool do_get_buffered_io( void ) const override;
+	virtual int do_get_io_buffer_size( void ) const override;
 	virtual code_point_t do_get_fill( void ) const override;
 	virtual int do_get_width( void ) const override;
 	virtual int do_get_precision( void ) const override;

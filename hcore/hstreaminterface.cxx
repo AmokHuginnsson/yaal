@@ -20,6 +20,7 @@ static int const INVALID_CHARACTER( -256 );
 static int const MAX_INTEGER_DIGIT_COUNT( 64 );
 static int const MAX_FLOAT_DIGIT_COUNT( 8192 );
 static int const MAX_FLOAT_FORMAT_SIZE( 64 );
+static int const DEFAULT_IO_BUFFER_SIZE( 1024 );
 char const HStreamInterface::eol[] = "\n";
 
 HStreamInterface::HStreamInterface( void )
@@ -34,6 +35,8 @@ HStreamInterface::HStreamInterface( void )
 	, _adjust( ADJUST::RIGHT )
 	, _skipWS( true )
 	, _boolAlpha( false )
+	, _bufferedIO( true )
+	, _ioBufferSize( DEFAULT_IO_BUFFER_SIZE )
 	, _valid( true )
 	, _fail( false )
 	, _cache( 1, HChunk::STRATEGY::GEOMETRIC )
@@ -557,6 +560,49 @@ int long HStreamInterface::read_until_retry( yaal::hcore::HString& message_,
 	M_EPILOG
 }
 
+inline char const* find_first_of( char const* buffer_, int long size_, char const* set_, int setLen_ ) {
+	char const* ptr( nullptr );
+	int long size( size_ );
+	int long smallestIndex( size_ + 1 );
+	for ( int i( 0 ); i < setLen_; ++ i ) {
+		char const* p( static_cast<char const*>( ::memchr( buffer_, set_[i], static_cast<size_t>( size ) ) ) );
+		if ( ! p ) {
+			continue;
+		}
+		int long index( p - buffer_ );
+		if ( index >= smallestIndex ) {
+			continue;
+		}
+		smallestIndex = index;
+		ptr = p;
+	}
+	return ( ptr );
+}
+
+inline char const* find_first_other_than( char const* buffer_, int long size_, char const* set_, int setLen_ ) {
+	char const* ptr( nullptr );
+	for ( int i( 0 ); i < size_; ++ i ) {
+		char const* p( static_cast<char const*>( ::memchr( set_, buffer_[i], static_cast<size_t>( setLen_ ) ) ) );
+		if ( p ) {
+			continue;
+		}
+		ptr = buffer_ + i;
+		break;
+	}
+	return ( ptr );
+}
+
+inline char const* find_delim( char const* buffer_, int long size_, char const* set_, int setLen_, bool isStopSet_ ) {
+	return ( ( isStopSet_ ? find_first_of : find_first_other_than )( buffer_, size_, set_, setLen_ ) );
+}
+
+inline void consume( HString& message_, int long consumedSize_, char* buffer_, int& bufferSize_, bool delim_, bool stripDelim_ ) {
+	int long messageByteCount( consumedSize_ - ( ( ( consumedSize_ > 0 ) && delim_ && stripDelim_ ) ? 1 : 0 ) );
+	bytes_to_string( message_, buffer_, messageByteCount );
+	bufferSize_ -= static_cast<int>( consumedSize_ );
+	::memmove( buffer_, buffer_ + consumedSize_, static_cast<size_t>( bufferSize_ ) );
+}
+
 int long HStreamInterface::semantic_read(
 	yaal::hcore::HString& message_,
 	int long maxCount_,
@@ -575,58 +621,63 @@ int long HStreamInterface::semantic_read(
 	if ( _cachedBytes ) {
 		int cached( 0 );
 		int long toReadFromCache( min( _cachedBytes, static_cast<int>( maxCount_ ) ) );
-		for ( ; cached < toReadFromCache; ++ cached ) {
-			if ( ( byDelim = ( ::memchr( set_, buffer[ cached ], static_cast<size_t>( setLen ) ) ? isStopSet_ : ! isStopSet_ ) ) ) {
-				if ( isStopSet_ ) {
-					++ cached;
-				}
-				break;
-			}
+		char const* p( find_delim( buffer, toReadFromCache, set_, setLen, isStopSet_ ) );
+		if ( p ) {
+			byDelim = true;
+			cached = static_cast<int>( p - buffer ) + ( isStopSet_ ? 1 : 0 );
+		} else {
+			cached = static_cast<int>( toReadFromCache );
 		}
 		if ( ( cached == maxCount_ ) || byDelim ) {
 			nRead = cached;
-			message_.assign( buffer, nRead - ( ( ( nRead > 0 ) && byDelim && stripDelim_ ) ? 1 : 0 ) );
-			_cachedBytes -= static_cast<int>( nRead );
-			::memmove( buffer, buffer + nRead, static_cast<size_t>( _cachedBytes ) );
+			hcore::consume( message_, nRead, buffer, _cachedBytes, byDelim, stripDelim_ );
 		}
 	}
 	if ( ! ( nRead || byDelim ) ) {
-		do {
+		int long reqReadSize( _bufferedIO ? _ioBufferSize : 1 );
+		while ( true ) {
+			int long readSize( min<int long>( reqReadSize, maxCount_ - _cachedBytes ) );
+			M_ASSERT( readSize > 0 );
 			/* Let's check if next read won't exceed size of our read buffer.
 			 * 1 byte or terminating zero and one byte for at least one new character,
 			 * hence + 2 in condition.
 			 */
-			if ( ( _cachedBytes + 2 ) > iPoolSize ) {
-				_cache.realloc( _cachedBytes + 2 );
+			if ( ( _cachedBytes + readSize ) > iPoolSize ) {
+				_cache.realloc( _cachedBytes + readSize );
 				buffer = _cache.get<char>(); /* update read cache buffer ptr, reallocation could move previous buffer into another memory position */
 				iPoolSize = _cache.size();
 			}
-			/* We read only one byte at a time. */
-			nRead = do_read( buffer + _cachedBytes, static_cast<int>( sizeof ( char ) ) * 1 );
-			/* nRead can be one of the following:
+			nRead = do_read( buffer + _cachedBytes, static_cast<int>( sizeof ( char ) ) * readSize );
+			/*
+			 * nRead can be one of the following:
 			 * nRead > 0 - a successful read, we shall check for stop char and possibly continue reading.
 			 * nRead == 0 - stream is blocking and has just been closed or has no data to read and is internally non-blocking.
 			 * nRead < 0 - an error occurred, read operation could be externally interrupted.
 			 */
-		} while ( ( nRead > 0 ) /* We increment _cachedBytes only if read succeeded. */
-				&& ( ! ( byDelim = ( ::memchr( set_, buffer[ _cachedBytes ++ ], static_cast<size_t>( setLen ) ) ? isStopSet_ : ! isStopSet_ ) ) )
-				&& ( ! ( _cachedBytes >= maxCount_ ) ) );
-		if ( nRead >= 0 ) {
-			if ( ! nRead ) {
-				_valid = false;
+			if ( nRead <= 0 ) {
+				break;
 			}
-			nRead = _cachedBytes;
-			if ( byDelim && ! isStopSet_ ) {
+			char const* p( find_delim( buffer + _cachedBytes, nRead, set_, setLen, isStopSet_ ) );
+			byDelim = p != nullptr;
+			/* We increment _cachedBytes only if read succeeded. */
+			_cachedBytes += static_cast<int>( nRead );
+			if ( byDelim ) {
+				nRead = ( p - buffer ) + 1;
+				break;
+			}
+			if ( _cachedBytes >= maxCount_ ) {
+				nRead = maxCount_;
+				break;
+			}
+		}
+		if ( nRead >= 0 ) {
+			_valid = !! nRead;
+			if ( ! byDelim ) {
+				nRead = _cachedBytes;
+			} else if ( ! isStopSet_ ) {
 				-- nRead;
 			}
-			int long messageByteCount( nRead - ( ( ( nRead > 0 ) && byDelim && stripDelim_ ) ? 1 : 0 ) );
-			bytes_to_string( message_, buffer, messageByteCount );
-			if ( byDelim && ! isStopSet_ ) {
-				buffer[0] = buffer[_cachedBytes - 1];
-				_cachedBytes = 1;
-			} else {
-				_cachedBytes = 0;
-			}
+			hcore::consume( message_, nRead, buffer, _cachedBytes, byDelim, stripDelim_ );
 		} else {
 			message_.clear();
 		}
@@ -756,7 +807,7 @@ bool HStreamInterface::read_integer( void ) {
 	M_EPILOG
 }
 
-bool HStreamInterface::read_floatint_point( void ) {
+bool HStreamInterface::read_floating_point( void ) {
 	M_PROLOG
 	do {
 		read_while_retry( _wordCache, character_class<CHARACTER_CLASS::WHITESPACE>().data() );
@@ -1084,7 +1135,7 @@ HStreamInterface& HStreamInterface::do_input( int long long unsigned& illu ) {
 HStreamInterface& HStreamInterface::do_input( double& d ) {
 	M_PROLOG
 	if ( _mode == MODE::TEXT ) {
-		if ( read_floatint_point() ) {
+		if ( read_floating_point() ) {
 			try {
 				d = lexical_cast<double>( _wordCache );
 			} catch ( ... ) {
@@ -1107,7 +1158,7 @@ HStreamInterface& HStreamInterface::do_input( double& d ) {
 HStreamInterface& HStreamInterface::do_input( double long& dl ) {
 	M_PROLOG
 	if ( _mode == MODE::TEXT ) {
-		if ( read_floatint_point() ) {
+		if ( read_floating_point() ) {
 			try {
 				dl = lexical_cast<double long>( _wordCache );
 			} catch ( ... ) {
@@ -1130,7 +1181,7 @@ HStreamInterface& HStreamInterface::do_input( double long& dl ) {
 HStreamInterface& HStreamInterface::do_input( float& f ) {
 	M_PROLOG
 	if ( _mode == MODE::TEXT ) {
-		if ( read_floatint_point() ) {
+		if ( read_floating_point() ) {
 			try {
 				f = lexical_cast<float>( _wordCache );
 			} catch ( ... ) {
@@ -1183,6 +1234,7 @@ int long HStreamInterface::read( void* buffer_, int long size_ ) {
 			::memcpy( buffer_, buffer, static_cast<size_t>( nRead = size_ ) );
 			::memmove( buffer, static_cast<char const*>( buffer ) + size_, static_cast<size_t>( _cachedBytes - size_ ) );
 			_cachedBytes -= static_cast<int>( size_ );
+			size_ = 0;
 		} else {
 			::memcpy( buffer_, buffer, static_cast<size_t>( nRead = _cachedBytes ) );
 			size_ -= _cachedBytes;
@@ -1332,12 +1384,34 @@ HStreamInterface& HStreamInterface::do_set_boolalpha( bool boolalpha_ ) {
 	M_EPILOG
 }
 
+HStreamInterface& HStreamInterface::do_set_buffered_io( bool bufferedIo_ ) {
+	M_PROLOG
+	_bufferedIO = bufferedIo_;
+	return ( *this );
+	M_EPILOG
+}
+
+HStreamInterface& HStreamInterface::do_set_io_buffer_size( int ioBufferSize_ ) {
+	M_PROLOG
+	_ioBufferSize = ioBufferSize_;
+	return ( *this );
+	M_EPILOG
+}
+
 bool HStreamInterface::do_get_skipws( void ) const {
 	return ( _skipWS );
 }
 
 bool HStreamInterface::do_get_boolalpha( void ) const {
 	return ( _boolAlpha );
+}
+
+bool HStreamInterface::do_get_buffered_io( void ) const {
+	return ( _bufferedIO );
+}
+
+int HStreamInterface::do_get_io_buffer_size( void ) const {
+	return ( _ioBufferSize );
 }
 
 code_point_t HStreamInterface::do_get_fill( void ) const {

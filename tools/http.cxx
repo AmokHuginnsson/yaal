@@ -239,6 +239,9 @@ int long HHTTPStream::do_read( void* data_, int long size_ ) {
 					if ( ! getline( *_socket, _lineCache ).good() ) {
 						return ( nRead );
 					}
+					if ( _lineCache.is_empty() ) {
+						return ( nRead );
+					}
 					_contentBytesLeft = stoi( _lineCache, nullptr, 16 );
 				} else if ( _contentLength == 0 ) {
 					_contentBytesLeft = _maxCacheSize;

@@ -711,6 +711,30 @@ HStreamInterface& HSynchronizedStream::do_set_boolalpha( bool val_ ) {
 	M_EPILOG
 }
 
+HStreamInterface& HSynchronizedStream::do_set_buffered_io( bool val_ ) {
+	M_PROLOG
+	HLock l( _mutex );
+	if ( _streamRef == this ) {
+		HStreamInterface::do_set_buffered_io( val_ );
+	} else if ( _streamRef ) {
+		_streamRef->set_buffered_io( val_ );
+	}
+	return ( *this );
+	M_EPILOG
+}
+
+HStreamInterface& HSynchronizedStream::do_set_io_buffer_size( int val_ ) {
+	M_PROLOG
+	HLock l( _mutex );
+	if ( _streamRef == this ) {
+		HStreamInterface::do_set_io_buffer_size( val_ );
+	} else if ( _streamRef ) {
+		_streamRef->set_io_buffer_size( val_ );
+	}
+	return ( *this );
+	M_EPILOG
+}
+
 bool HSynchronizedStream::do_get_skipws( void ) const {
 	M_PROLOG
 	HLock l( _mutex );
@@ -722,6 +746,20 @@ bool HSynchronizedStream::do_get_boolalpha( void ) const {
 	M_PROLOG
 	HLock l( _mutex );
 	return ( ( _streamRef && ( _streamRef != this ) ) ? _streamRef->get_boolalpha() : HStreamInterface::do_get_boolalpha() );
+	M_EPILOG
+}
+
+bool HSynchronizedStream::do_get_buffered_io( void ) const {
+	M_PROLOG
+	HLock l( _mutex );
+	return ( ( _streamRef && ( _streamRef != this ) ) ? _streamRef->get_buffered_io() : HStreamInterface::do_get_buffered_io() );
+	M_EPILOG
+}
+
+int HSynchronizedStream::do_get_io_buffer_size( void ) const {
+	M_PROLOG
+	HLock l( _mutex );
+	return ( ( _streamRef && ( _streamRef != this ) ) ? _streamRef->get_io_buffer_size() : HStreamInterface::do_get_io_buffer_size() );
 	M_EPILOG
 }
 

@@ -96,6 +96,8 @@ private:
 	ADJUST _adjust;
 	bool _skipWS;
 	bool _boolAlpha;
+	bool _bufferedIO;
+	int _ioBufferSize;
 protected:
 	bool _valid;      /*!< Tells if further low-level IO is possible. */
 	bool _fail;       /*!< Tells if most recently performed data extraction failed at logical level. */
@@ -442,6 +444,12 @@ public:
 	HStreamInterface& set_boolalpha( bool boolalpha_ ) {
 		return ( do_set_boolalpha( boolalpha_ ) );
 	}
+	HStreamInterface& set_buffered_io( bool bufferedIo_ ) {
+		return ( do_set_buffered_io( bufferedIo_ ) );
+	}
+	HStreamInterface& set_io_buffer_size( int ioBufferSize_ ) {
+		return ( do_set_io_buffer_size( ioBufferSize_ ) );
+	}
 	HStreamInterface& set_fill( code_point_t val_ ) {
 		return ( do_set_fill( val_ ) );
 	}
@@ -468,6 +476,12 @@ public:
 	}
 	bool get_boolalpha( void ) const {
 		return ( do_get_boolalpha() );
+	}
+	bool get_buffered_io( void ) const {
+		return ( do_get_buffered_io() );
+	}
+	int get_io_buffer_size( void ) const {
+		return ( do_get_io_buffer_size() );
 	}
 	code_point_t get_fill( void ) const {
 		return ( do_get_fill() );
@@ -545,8 +559,12 @@ protected:
 	virtual HStreamInterface& do_set_adjust( ADJUST );
 	virtual HStreamInterface& do_set_skipws( bool );
 	virtual HStreamInterface& do_set_boolalpha( bool );
+	virtual HStreamInterface& do_set_buffered_io( bool );
+	virtual HStreamInterface& do_set_io_buffer_size( int );
 	virtual bool do_get_skipws( void ) const;
 	virtual bool do_get_boolalpha( void ) const;
+	virtual bool do_get_buffered_io( void ) const;
+	virtual int do_get_io_buffer_size( void ) const;
 	virtual code_point_t do_get_fill( void ) const;
 	virtual int do_get_width( void ) const;
 	virtual int do_get_precision( void ) const;
@@ -564,7 +582,7 @@ private:
 	int long read_until_retry( yaal::hcore::HString&, char const*, bool );
 	bool read_word( void );
 	bool read_integer( void );
-	bool read_floatint_point( void );
+	bool read_floating_point( void );
 	int long semantic_read( yaal::hcore::HString&, int long, char const*, bool, bool );
 	void reformat( void );
 	void apply_precision( void );
