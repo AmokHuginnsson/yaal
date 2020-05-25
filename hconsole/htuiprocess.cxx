@@ -21,6 +21,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #endif /* __DEBUGGER_BABUNI__ */
 
 using namespace yaal::hcore;
+using namespace yaal::hcore::system;
 using namespace yaal::tools;
 
 namespace yaal {
@@ -62,16 +63,17 @@ void HTUIProcess::init_tui( yaal::hcore::HString const& processName_, HWindow::p
 	int ctrls[] = { KEY<'l'>::ctrl, KEY<'x'>::ctrl };
 	HWindow::ptr_t mainWindow;
 	HIODispatcher::stream_t consIn( make_pointer<HRawFile>( STDIN_FILENO, HRawFile::OWNERSHIP::EXTERNAL ) );
-	_dispatcher.register_file_descriptor_handler( consIn, call( &HTUIProcess::process_stdin, this, _1 ) );
+	_dispatcher.register_file_descriptor_handler( consIn, call( &HTUIProcess::process_stdin, this, _1, _2 ), IO_EVENT_TYPE::READ );
 	HConsole& cons = HConsole::get_instance();
 	int mouseDes( cons.get_mouse_fd() );
 	if ( ( _useMouse_ != USE_MOUSE::NO ) && ( mouseDes > 0 ) ) {
 		HIODispatcher::stream_t mouseStream( make_pointer<HRawFile>( mouseDes, HRawFile::OWNERSHIP::EXTERNAL ) );
-		_dispatcher.register_file_descriptor_handler( mouseStream, call( &HTUIProcess::process_mouse, this, _1 ) );
+		_dispatcher.register_file_descriptor_handler( mouseStream, call( &HTUIProcess::process_mouse, this, _1, _2 ), IO_EVENT_TYPE::READ );
 	}
 	_dispatcher.register_file_descriptor_handler(
 		cons.get_event_source(),
-		call( &HTUIProcess::process_terminal_event, this, _1 )
+		call( &HTUIProcess::process_terminal_event, this, _1, _2 ),
+		IO_EVENT_TYPE::READ
 	);
 	_dispatcher.add_alert_handle( call( &HTUIProcess::handler_alert, this ) );
 	_dispatcher.add_idle_handle( call( &HTUIProcess::handler_idle, this ) );
@@ -164,7 +166,7 @@ void HTUIProcess::add_window( HWindow::ptr_t window_ ) {
 	M_EPILOG
 }
 
-void HTUIProcess::process_stdin( HIODispatcher::stream_t& ) {
+void HTUIProcess::process_stdin( HIODispatcher::stream_t&, yaal::hcore::system::IO_EVENT_TYPE ) {
 	M_PROLOG
 	HString command;
 	HConsole& cons = HConsole::get_instance();
@@ -252,7 +254,7 @@ void HTUIProcess::handler_idle( void ) {
 	M_EPILOG
 }
 
-void HTUIProcess::process_mouse( HIODispatcher::stream_t& ) {
+void HTUIProcess::process_mouse( HIODispatcher::stream_t&, yaal::hcore::system::IO_EVENT_TYPE ) {
 	M_PROLOG
 	handler_mouse( HMouseEvent( mouse::OMouse() ) );
 	return;
@@ -280,7 +282,7 @@ bool HTUIProcess::handler_mouse( HEvent const& ) {
 	M_EPILOG
 }
 
-void HTUIProcess::process_terminal_event( HIODispatcher::stream_t& event_ ) {
+void HTUIProcess::process_terminal_event( HIODispatcher::stream_t& event_, yaal::hcore::system::IO_EVENT_TYPE ) {
 	M_PROLOG
 	char type;
 	M_ENSURE( event_->read( &type, 1 ) == 1 );
@@ -290,11 +292,11 @@ void HTUIProcess::process_terminal_event( HIODispatcher::stream_t& event_ ) {
 		} break;
 		case 'm': {
 			static HIODispatcher::stream_t dummy;
-			process_mouse( dummy );
+			process_mouse( dummy, IO_EVENT_TYPE::READ );
 		} break;
 		case 'k': {
 			static HIODispatcher::stream_t dummy;
-			process_stdin( dummy );
+			process_stdin( dummy, IO_EVENT_TYPE::READ );
 		} break;
 	}
 	return;

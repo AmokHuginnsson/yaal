@@ -14,6 +14,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hclock.hxx"
 #include "hlog.hxx"
 
+using namespace yaal::hcore::system;
+
 namespace yaal {
 
 namespace hcore {
@@ -141,34 +143,34 @@ int long HRawFile::do_write( void const* buffer_, int long size_ ) {
 	M_EPILOG
 }
 
-bool HRawFile::wait_for( ACTION::action_t const& action_, int long* time_ ) {
-	int fdR( action_ & ACTION::READ ? _fileDescriptor : -1 );
-	int fdW( action_ & ACTION::WRITE ? _fileDescriptor : -1 );
-	int error( system::wait_for_io( action_ & ACTION::READ ? &fdR : nullptr,
-				action_ & ACTION::READ ? 1 : 0,
-				action_ & ACTION::WRITE ? &fdW : nullptr,
-				action_ & ACTION::WRITE ? 1 : 0, time_ ) );
-	return ( ( error <= 0 ) || ( ( fdR == -1 ) && ( fdW == -1 ) ) );
-}
-
 int long HRawFile::write_plain( void const* buffer_, int long size_ ) {
 	M_PROLOG
 	if ( _fileDescriptor < 0 ) {
 		M_THROW( _error_, errno );
 	}
 	int long iWritten = 0;
-	int long timeOut( _timeout );
 	do {
-		if ( ( _timeout > 0 ) && wait_for( ACTION::WRITE, &timeOut ) )
-			throw HStreamInterfaceException( _( "timeout on write" ) );
-		int long ret = M_TEMP_FAILURE_RETRY( ::write( _fileDescriptor,
-					static_cast<char const*>( buffer_ ) + iWritten,
-					static_cast<size_t>( size_ - iWritten ) ) );
+		IO_EVENT_TYPE ioEventType( wait_for_io( _fileDescriptor, IO_EVENT_TYPE::WRITE, static_cast<int>( _timeout ) ) );
+		if ( ioEventType != IO_EVENT_TYPE::WRITE ) {
+			throw HStreamInterfaceException(
+				ioEventType == IO_EVENT_TYPE::TIMEOUT
+					? _( "timeout on write" )
+					: _( "wait on write failed (interrupted)" )
+			);
+		}
+		int long ret = M_TEMP_FAILURE_RETRY(
+			::write(
+				_fileDescriptor,
+				static_cast<char const*>( buffer_ ) + iWritten,
+				static_cast<size_t>( size_ - iWritten )
+			)
+		);
 		if ( ret < 0 ) {
 			iWritten = ret;
 			break;
-		} else
+		} else {
 			iWritten += ret;
+		}
 	} while ( iWritten < size_ );
 	return ( iWritten );
 	M_EPILOG
@@ -181,16 +183,24 @@ int long HRawFile::write_ssl( void const* buffer_, int long size_ ) {
 	}
 	HClock clk;
 	int long nWritten = 0;
-	int long timeOut( _timeout );
 	do {
-		if ( ( _timeout > 0 ) && wait_for( ACTION::BOTH, &timeOut ) )
-			throw HStreamInterfaceException( _( "timeout on write" ) );
+		IO_EVENT_TYPE ioEventType(
+			wait_for_io( _fileDescriptor, IO_EVENT_TYPE::READ | IO_EVENT_TYPE::WRITE, static_cast<int>( _timeout ) )
+		);
+		if ( ! ( ioEventType & ( IO_EVENT_TYPE::READ | IO_EVENT_TYPE::WRITE ) ) ) {
+			throw HStreamInterfaceException(
+				ioEventType == IO_EVENT_TYPE::TIMEOUT
+					? _( "timeout on SSL write" )
+					: _( "wait on SSL write failed (interrupted)" )
+			);
+		}
 		int long ret = _ssl->write( static_cast<char const*>( buffer_ ) + nWritten, size_ );
 		if ( ! ret ) {
 			nWritten = ret;
 			break;
-		} else if ( ret > 0 )
+		} else if ( ret > 0 ) {
 			nWritten += ret;
+		}
 	} while ( nWritten < size_ );
 	return ( nWritten );
 	M_EPILOG

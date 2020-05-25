@@ -5,6 +5,7 @@
 #include <cstring>
 #include <unistd.h>
 #include <fcntl.h>
+#include <poll.h>
 #include <sys/time.h>
 #include <pwd.h>
 #include <grp.h>
@@ -69,80 +70,32 @@ int kill( int pid_, int signal_ ) {
 	return ( result );
 }
 
+IO_EVENT_TYPE wait_for_io( file_descriptor_t fd_, IO_EVENT_TYPE ioEventType_, int timeout_ ) {
+	pollfd pfd{
+		fd_,
+		static_cast<int short>(
+			( !! ( ioEventType_ & IO_EVENT_TYPE::READ ) ? POLLIN : 0 )
+			| ( !! ( ioEventType_ & IO_EVENT_TYPE::WRITE ) ? POLLOUT : 0 )
+		),
+		0
+	};
+	int status( ::poll( &pfd, 1, timeout_ ) );
+	IO_EVENT_TYPE res( IO_EVENT_TYPE::NONE );
+	if ( status == 1 ) {
+		res |= ( pfd.revents & POLLIN ? IO_EVENT_TYPE::READ : IO_EVENT_TYPE::NONE );
+		res |= ( pfd.revents & POLLOUT ? IO_EVENT_TYPE::WRITE : IO_EVENT_TYPE::NONE );
+	} else if ( status == 0 ) {
+		res = IO_EVENT_TYPE::TIMEOUT;
+	} else if ( errno == EINTR ) {
+		res = IO_EVENT_TYPE::INTERRUPT;
+	}
+	return ( res );
+}
+
 namespace {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-template<typename T1>
-inline void FWD_FD_ZERO( T1 val1_ ) {
-	FD_ZERO( val1_ );
-}
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wsign-conversion"
-template<typename T1, typename T2>
-inline void FWD_FD_SET( T1 val1_, T2 val2_ ) {
-	FD_SET( val1_, val2_ );
-}
-template<typename T1, typename T2>
-inline bool FWD_FD_ISSET( T1 val1_, T2 val2_ ) {
-	return ( FD_ISSET( val1_, val2_ ) );
-}
-#pragma GCC diagnostic pop
 #ifdef __HOST_OS_TYPE_DARWIN__
 mach_msg_type_number_t HOST_VM_INFO_COUNT_FWD{ HOST_VM_INFO_COUNT };
 #endif /* #ifdef __HOST_OS_TYPE_DARWIN__ */
-#pragma GCC diagnostic pop
-}
-
-int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, int long* timeOut_, bool restartable_ ) {
-	M_ASSERT( ( inputCount_ >= 0 ) && ( outputCount_ >= 0 ) && ( ( inputCount_ + outputCount_ ) > 0 ) );
-	M_ASSERT( ! inputCount_ || input_ );
-	M_ASSERT( ! outputCount_ || output_ );
-	HClock clock;
-	fd_set readers;
-	fd_set writers;
-	if ( inputCount_ ) {
-		FWD_FD_ZERO( &readers );
-	}
-	if ( outputCount_ ) {
-		FWD_FD_ZERO( &writers );
-	}
-	for ( int i( 0 ); i < inputCount_; ++ i ) {
-		FWD_FD_SET( input_[ i ], &readers );
-	}
-	for ( int i( 0 ); i < outputCount_; ++ i ) {
-		FWD_FD_SET( output_[ i ], &writers );
-	}
-	timeval timeOut;
-	timeval* timeOutP( timeOut_ ? &timeOut : nullptr );
-	if ( timeOut_ ) {
-		timeOut.tv_usec = static_cast<suseconds_t>( ( *timeOut_ % 1000 ) * 1000 );
-		timeOut.tv_sec = *timeOut_ / 1000;
-	}
-	int ret( 0 );
-	i64_t elapsed( 0 );
-	do {
-		ret = ::select( FD_SETSIZE, inputCount_ ? &readers : nullptr, outputCount_ ? &writers : nullptr, nullptr, timeOutP );
-		elapsed = clock.get_time_elapsed( time::UNIT::MILLISECOND );
-	} while (
-		restartable_
-		&& ( ret == -1 )
-		&& ( errno == EINTR )
-		&& ( ! timeOut_ || ( elapsed < *timeOut_ ) )
-	);
-	for ( int i( 0 ); i < inputCount_; ++ i ) {
-		if ( ! FWD_FD_ISSET( input_[ i ], &readers ) ) {
-			input_[ i ] = -1;
-		}
-	}
-	for ( int i( 0 ); i < outputCount_; ++ i ) {
-		if ( ! FWD_FD_ISSET( output_[ i ], &writers ) ) {
-			output_[ i ] = -1;
-		}
-	}
-	if ( timeOut_ ) {
-		*timeOut_ -= min( *timeOut_, static_cast<int long>( clock.get_time_elapsed( time::UNIT::MILLISECOND ) ) );
-	}
-	return ( ret );
 }
 
 user_id_t get_user_id( void ) {

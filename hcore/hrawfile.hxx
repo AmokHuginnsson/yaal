@@ -7,14 +7,13 @@
 #ifndef YAAL_HCORE_HRAWFILE_HXX_INCLUDED
 #define YAAL_HCORE_HRAWFILE_HXX_INCLUDED 1
 
+#include "hcore/system.hxx"
 #include "hcore/hopenssl.hxx"
 #include "hcore/hstreaminterface.hxx"
 
 namespace yaal {
 
 namespace hcore {
-
-typedef int file_descriptor_t;
 
 /*! \brief Raw low level IO operations abstraction.
  */
@@ -34,15 +33,6 @@ public:
 			SSL_CLIENT  = 4  /*!< fd represents SSL client part of IO */
 		} raw_file_type_t;
 	};
-	/*! \brief HRawFile event type that HRawFile user can wait for.
-	 */
-	struct ACTION {
-		typedef enum {
-			READ = 1,
-			WRITE = 2,
-			BOTH = READ | WRITE
-		} action_t;
-	};
 	/*! \brief Ownership.
 	 */
 	enum class OWNERSHIP {
@@ -55,7 +45,7 @@ protected:
 	typedef int long ( HRawFile::* WRITER_t )( void const*, int long );
 	typedef int ( HRawFile::* CLOSER_t )( void );
 	TYPE::raw_file_type_t _type;
-	file_descriptor_t _fileDescriptor; /* raw file descriptor of the file */
+	system::file_descriptor_t _fileDescriptor; /* raw file descriptor of the file */
 	int long _timeout;
 	HOpenSSL::ptr_t _ssl;
 	READER_t reader;
@@ -63,11 +53,11 @@ protected:
 	CLOSER_t closer;
 	OWNERSHIP _ownership;
 public:
-	HRawFile( file_descriptor_t, OWNERSHIP ownership );
+	HRawFile( system::file_descriptor_t, OWNERSHIP ownership );
 	HRawFile( TYPE::raw_file_type_t = TYPE::DEFAULT );
 	virtual ~HRawFile( void );
 	int close( void );
-	file_descriptor_t get_file_descriptor( void ) const;
+	system::file_descriptor_t get_file_descriptor( void ) const;
 	/*! \brief Set write timeout for this raw file.
 	 *
 	 * \param timeout - a new timeout value in milliseconds.
@@ -89,7 +79,6 @@ protected:
 	virtual bool do_is_valid( void ) const override;
 	virtual POLL_TYPE do_poll_type( void ) const override;
 	virtual void const* do_data( void ) const override;
-	bool wait_for( ACTION::action_t const&, int long* );
 };
 
 typedef HExceptionT<HRawFile, HStreamInterfaceException> HRawFileException;

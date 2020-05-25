@@ -9,6 +9,7 @@
 #include "hcore/hstring.hxx"
 #include "hcore/pod.hxx"
 #include "hcore/harray.hxx"
+#include "hcore/bitmaskenum.hxx"
 
 namespace yaal {
 
@@ -17,6 +18,10 @@ namespace hcore {
 /*! \brief Low level system interface belongs here.
  */
 namespace system {
+
+/*! \brief Raw file descriptor type.
+ */
+typedef int file_descriptor_t;
 
 /*! \brief System user id type.
  */
@@ -27,17 +32,35 @@ int close( int );
 int getpid( void );
 int kill( int, int );
 
-/*! \brief Wait for input/output event on given descriptor set.
- *
- * \param[in,out] input_ - set of input descriptors to observe.
- * \param inputCount_ - a number of input descriptors to observe.
- * \param[in,out] output_ - set of output descriptors to observe.
- * \param outputCount_ - a number of output descriptors to observe.
- * \param timeOut_ - wait that many milliseconds for an event.
- * \param restartable_ - should wait be automatically restarted after interrupt from signal.
- * \return number of signaled events.
+/*! \brief I/O event type that user can wait for.
  */
-int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, int long* timeOut_, bool restartable_ = true );
+enum class IO_EVENT_TYPE {
+	NONE = 0,
+	READ = 1,
+	WRITE = 2,
+	INTERRUPT = 4,
+	TIMEOUT = 8
+};
+M_USING_ENUMBITMASK();
+
+}
+
+}
+
+M_ENUM_IS_A_BITMASK( ::yaal::hcore::system::IO_EVENT_TYPE );
+
+namespace hcore {
+
+namespace system {
+
+/*! \brief Wait for input/output event on given file descriptor.
+ *
+ * \param fd - a file descriptor to observe.
+ * \param eventType - an event type to check for.
+ * \param timeoutMS - wait that many milliseconds for an event.
+ * \return A type of event that actually occurred.
+ */
+IO_EVENT_TYPE wait_for_io( file_descriptor_t fd, IO_EVENT_TYPE eventType, int timeoutMS = -1 );
 
 /*! \brief Get current process'es effective user id.
  *

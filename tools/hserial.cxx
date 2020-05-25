@@ -21,6 +21,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/hlog.hxx"
 
 using namespace yaal::hcore;
+using namespace yaal::hcore::system;
 
 namespace yaal {
 
@@ -360,9 +361,8 @@ int HSerial::timed_read( void* buffer_, int const size_, int timeOut_ ) {
 	if ( _fileDescriptor < 0 ) {
 		M_THROW( _eNotOpened_, errno );
 	}
-	int long timeOut( timeOut_ );
 	int nRead( -1 );
-	if ( ! wait_for( ACTION::READ, &timeOut ) ) {
+	if ( system::wait_for_io( _fileDescriptor, IO_EVENT_TYPE::READ, timeOut_ ) == IO_EVENT_TYPE::READ ) {
 		nRead = static_cast<int>( HRawFile::read( buffer_, size_ ) );
 	}
 	return ( nRead );

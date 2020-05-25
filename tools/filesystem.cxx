@@ -339,7 +339,7 @@ void create_directory( path_t const& path_, u32_t mode_, DIRECTORY_MODIFICATION 
 		file_names_t fileNames( string::split<file_names_t>( path, "/", HTokenizer::SKIP_EMPTY ) );
 		path.assign( path[0] == '/' ? "/" : "" );
 		bool real( false );
-		for ( yaal::hcore::HString const fn : fileNames ) {
+		for ( yaal::hcore::HString const& fn : fileNames ) {
 			if ( fn != ".." ) {
 				real = true;
 			}

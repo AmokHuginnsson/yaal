@@ -971,6 +971,7 @@ public:
 		: HConstIterator( it_._owner,  it_._index ) {
 		return;
 	}
+	HIterator( HIterator const& it_ ) = default;
 	HIterator& operator = ( HIterator const& it_ ) {
 		_owner = it_._owner;
 		_index = it_._index;

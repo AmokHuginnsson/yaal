@@ -23,6 +23,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "resolver.hxx"
 #include "system.hxx"
 
+using namespace yaal::hcore::system;
+
 namespace yaal {
 
 namespace hcore {
@@ -266,14 +268,11 @@ void HSocket::connect( yaal::hcore::HString const& address_, int port_ ) {
 	make_address( address_, port_ );
 	int error( ::connect( _fileDescriptor, static_cast<sockaddr*>( _address ), static_cast<socklen_t>( _addressSize ) ) );
 	if ( ( !!( _type & TYPE::NONBLOCKING ) ) && error && ( errno == EINPROGRESS ) ) {
-		int fd( _fileDescriptor );
-		int long timeout( _timeout );
-		int up( hcore::system::wait_for_io( nullptr, 0, &fd, 1, &timeout ) );
-		if ( up == 1 ) {
-			M_ASSERT( fd == _fileDescriptor );
+		IO_EVENT_TYPE waitResult( hcore::system::wait_for_io( _fileDescriptor, IO_EVENT_TYPE::WRITE, static_cast<int>( _timeout ) ) );
+		if ( waitResult == IO_EVENT_TYPE::WRITE ) {
 			socklen_t optLen( static_cast<socklen_t>( sizeof ( error ) ) );
 			M_ENSURE( ::getsockopt( _fileDescriptor, SOL_SOCKET, SO_ERROR, &error, &optLen ) == 0 );
-		} else if ( ! timeout ) {
+		} else if ( waitResult == IO_EVENT_TYPE::TIMEOUT ) {
 			int curErrno( errno );
 			M_ENSURE( ! "connection timedout"[0], !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_, curErrno );
 		}

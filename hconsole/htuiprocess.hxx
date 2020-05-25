@@ -52,9 +52,9 @@ public:
 	void add_window( window_t );
 	HMainWindow* main_window( void );
 protected:
-	void process_stdin( tools::HIODispatcher::stream_t& );
-	void process_mouse( tools::HIODispatcher::stream_t& );
-	void process_terminal_event( tools::HIODispatcher::stream_t& );
+	void process_stdin( tools::HIODispatcher::stream_t&, yaal::hcore::system::IO_EVENT_TYPE );
+	void process_mouse( tools::HIODispatcher::stream_t&, yaal::hcore::system::IO_EVENT_TYPE );
+	void process_terminal_event( tools::HIODispatcher::stream_t&, yaal::hcore::system::IO_EVENT_TYPE );
 	int process_commands( void );
 	void select( HWindow const* );
 	void repaint( bool = false );

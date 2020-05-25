@@ -4,6 +4,7 @@
 #include <cstring>
 #include <csignal>  /* signal handling */
 #include <unistd.h>
+#include <poll.h>
 #include <libintl.h>
 
 #undef ECHO
@@ -883,19 +884,21 @@ bool HConsole::is_enabled( void ) const {
 
 int HConsole::wait_for_user_input( int& key_, mouse::OMouse& mouse_, int timeOut_ ) const {
 	M_PROLOG
-	int fds[2] = { STDIN_FILENO, _mouseDes };
-	int long wait( timeOut_ );
-	int error( hcore::system::wait_for_io( fds, _mouseDes ? 2 : 1, nullptr, 0, timeOut_ ? &wait : nullptr ) );
+	pollfd pfd[2] = {
+		{ STDIN_FILENO, POLLIN, 0 },
+		{ _mouseDes, POLLIN, 0 }
+	};
+	int error( ::poll( pfd, _mouseDes ? 2 : 1, timeOut_ ? timeOut_ : -1 ) );
 	int eventType( 0 );
 	if ( error > 0 ) {
-		if ( fds[0] != -1 ) {
+		if ( pfd[0].revents & POLLIN ) {
 			key_ = get_key();
 			eventType = EVENT::KEYBOARD;
 			if ( key_ == KEY_MOUSE ) {
 				eventType = 0;
 			}
 		}
-		if ( ( key_ == KEY_MOUSE ) || ( _mouseDes && ( fds[1] != -1 ) ) ) {
+		if ( ( key_ == KEY_MOUSE ) || ( _mouseDes && ( pfd[1].revents & POLLIN ) ) ) {
 			eventType |= EVENT::MOUSE, static_cast<void>( mouse::mouse_get( mouse_ ) );
 		}
 	}
