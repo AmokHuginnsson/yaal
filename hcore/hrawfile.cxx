@@ -2,6 +2,7 @@
 
 #include <cstring>
 #include <unistd.h>
+#include <fcntl.h>
 #include <libintl.h>
 #include <sys/time.h> /* timeval */
 
@@ -39,6 +40,11 @@ HRawFile::HRawFile( TYPE::raw_file_type_t type_ )
 			: &HRawFile::write_plain
 		)
 	, closer( &HRawFile::close_plain )
+	, some_reader(
+		( ( type_ & TYPE::SSL_SERVER ) || ( type_ & TYPE::SSL_CLIENT ) )
+			? &HRawFile::read_some_ssl_loader
+			: &HRawFile::read_some_plain
+		)
 	, _ownership( OWNERSHIP::ACQUIRED ) {
 	M_PROLOG
 	M_ASSERT( ! ( ( type_ == TYPE::DEFAULT ) && ( type_ & TYPE::SSL_SERVER ) ) );
@@ -58,6 +64,7 @@ HRawFile::HRawFile( file_descriptor_t fd_, OWNERSHIP ownership_ )
 	, reader( &HRawFile::read_plain )
 	, writer( &HRawFile::write_plain )
 	, closer( &HRawFile::close_plain )
+	, some_reader( &HRawFile::read_some_plain )
 	, _ownership( fd_ >= 0 ? ownership_ : OWNERSHIP::NONE ) {
 	M_PROLOG
 	return;
@@ -133,7 +140,19 @@ int long HRawFile::read_ssl_loader( void* buffer_, int long size_ ) {
 	reader = &HRawFile::read_ssl;
 	writer = &HRawFile::write_ssl;
 	closer = &HRawFile::close_ssl;
+	some_reader = &HRawFile::read_some_ssl;
 	return ( read_ssl( buffer_, size_ ) );
+	M_EPILOG
+}
+
+int long HRawFile::read_some_ssl_loader( void* buffer_, int long size_ ) {
+	M_PROLOG
+	_ssl = HOpenSSL::ptr_t( make_pointer<HOpenSSL>( _fileDescriptor, _type & TYPE::SSL_SERVER ? HOpenSSL::TYPE::SERVER : HOpenSSL::TYPE::CLIENT ) );
+	reader = &HRawFile::read_ssl;
+	writer = &HRawFile::write_ssl;
+	closer = &HRawFile::close_ssl;
+	some_reader = &HRawFile::read_some_ssl;
+	return ( read_some_ssl( buffer_, size_ ) );
 	M_EPILOG
 }
 
@@ -212,6 +231,7 @@ int long HRawFile::write_ssl_loader( void const* buffer_, int long size_ ) {
 	reader = &HRawFile::read_ssl;
 	writer = &HRawFile::write_ssl;
 	closer = &HRawFile::close_ssl;
+	some_reader = &HRawFile::read_some_ssl;
 	return ( write_ssl( buffer_, size_ ) );
 	M_EPILOG
 }
@@ -219,6 +239,46 @@ int long HRawFile::write_ssl_loader( void const* buffer_, int long size_ ) {
 int long HRawFile::do_read( void* buffer_, int long size_ ) {
 	M_PROLOG
 	return ( (this->*reader)( buffer_, size_ ) );
+	M_EPILOG
+}
+
+int long HRawFile::read_some_plain( void* buffer_, int long size_ ) {
+	M_PROLOG
+	int statusFlags( ::fcntl( _fileDescriptor, F_GETFL, 0 ) );
+	M_ENSURE( statusFlags >= 0 );
+	bool wasNonBlocking( ( statusFlags & O_NONBLOCK ) != 0 );
+	if ( ! wasNonBlocking ) {
+		M_ENSURE( ::fcntl( _fileDescriptor, F_SETFL, statusFlags | O_NONBLOCK ) == 0 );
+	}
+	wait_for_io( _fileDescriptor, IO_EVENT_TYPE::READ, INFINITY );
+	int long len( (this->*reader)( buffer_, size_ ) );
+	if ( ! wasNonBlocking ) {
+		M_ENSURE( ::fcntl( _fileDescriptor, F_SETFL, statusFlags ) == 0 );
+	}
+	return ( len );
+	M_EPILOG
+}
+
+int long HRawFile::read_some_ssl( void* buffer_, int long size_ ) {
+	M_PROLOG
+	int statusFlags( ::fcntl( _fileDescriptor, F_GETFL, 0 ) );
+	M_ENSURE( statusFlags >= 0 );
+	bool wasNonBlocking( ( statusFlags & O_NONBLOCK ) != 0 );
+	if ( ! wasNonBlocking ) {
+		_ssl->set_nonblocking( true );
+	}
+	wait_for_io( _fileDescriptor, IO_EVENT_TYPE::READ, INFINITY );
+	int long len( (this->*reader)( buffer_, size_ ) );
+	if ( ! wasNonBlocking ) {
+		_ssl->set_nonblocking( false );
+	}
+	return ( len );
+	M_EPILOG
+}
+
+int long HRawFile::do_read_some( void* buffer_, int long size_ ) {
+	M_PROLOG
+	return ( (this->*some_reader)( buffer_, size_ ) );
 	M_EPILOG
 }
 

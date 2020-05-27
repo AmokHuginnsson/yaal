@@ -85,6 +85,7 @@ public:
 	~HOpenSSL( void );
 	int long read( void*, int long );
 	int long write( void const*, int long );
+	void set_nonblocking( bool );
 	void shutdown( void );
 private:
 	void accept_or_connect( void );

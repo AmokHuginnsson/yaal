@@ -309,6 +309,9 @@ public:
 		return ( do_input( val_ ) );
 	}
 	int long read( void*, int long );
+	int long read_some( void* buffer_, int long size_ ) {
+		return ( do_read_some( buffer_, size_ ) );
+	}
 	HStreamInterface& write( HString const& val_ ) {
 		return ( do_output( val_ ) );
 	}
@@ -547,6 +550,7 @@ protected:
 	virtual int long do_read_until_n( yaal::hcore::HString&, int long, char const*, bool );
 	virtual int long do_read_while( yaal::hcore::HString&, char const* );
 	virtual int long do_read_while_n( yaal::hcore::HString&, int long, char const* );
+	virtual int long do_read_some( void*, int long );
 	virtual HStreamInterface& do_consume( yaal::hcore::HString const& );
 	virtual HStreamInterface& do_ignore( int );
 	virtual int do_peek( void );

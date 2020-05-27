@@ -635,6 +635,8 @@ int long HStreamInterface::semantic_read(
 	}
 	if ( ! ( nRead || byDelim ) ) {
 		int long reqReadSize( _bufferedIO ? _ioBufferSize : 1 );
+		typedef int long ( HStreamInterface::* phys_reader_t )( void*, int long );
+		phys_reader_t physReader( _bufferedIO ? &HStreamInterface::do_read_some : &HStreamInterface::do_read );
 		while ( true ) {
 			int long readSize( min<int long>( reqReadSize, maxCount_ - _cachedBytes ) );
 			M_ASSERT( readSize > 0 );
@@ -647,7 +649,7 @@ int long HStreamInterface::semantic_read(
 				buffer = _cache.get<char>(); /* update read cache buffer ptr, reallocation could move previous buffer into another memory position */
 				iPoolSize = _cache.size();
 			}
-			nRead = do_read( buffer + _cachedBytes, static_cast<int>( sizeof ( char ) ) * readSize );
+			nRead = (this->*physReader)( buffer + _cachedBytes, static_cast<int>( sizeof ( char ) ) * readSize );
 			/*
 			 * nRead can be one of the following:
 			 * nRead > 0 - a successful read, we shall check for stop char and possibly continue reading.
@@ -1223,6 +1225,10 @@ HStreamInterface& HStreamInterface::do_input( manipulator_t const& HFILE_INTERFA
 	M_PROLOG
 	return ( HFILE_INTERFACE( *this ) );
 	M_EPILOG
+}
+
+int long HStreamInterface::do_read_some( void* buffer_, int long size_ ) {
+	return ( do_read( buffer_, size_ ) );
 }
 
 int long HStreamInterface::read( void* buffer_, int long size_ ) {

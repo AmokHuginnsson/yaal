@@ -53,6 +53,9 @@ namespace hcore {
 
 namespace system {
 
+#undef INFINITY
+static int const INFINITY = -1;
+
 /*! \brief Wait for input/output event on given file descriptor.
  *
  * \param fd - a file descriptor to observe.
@@ -60,7 +63,7 @@ namespace system {
  * \param timeoutMS - wait that many milliseconds for an event.
  * \return A type of event that actually occurred.
  */
-IO_EVENT_TYPE wait_for_io( file_descriptor_t fd, IO_EVENT_TYPE eventType, int timeoutMS = -1 );
+IO_EVENT_TYPE wait_for_io( file_descriptor_t fd, IO_EVENT_TYPE eventType, int timeoutMS = INFINITY );
 
 /*! \brief Get current process'es effective user id.
  *

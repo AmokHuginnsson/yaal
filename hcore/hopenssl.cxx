@@ -486,6 +486,16 @@ void HOpenSSL::shutdown( void ) {
 	M_PROLOG
 	M_ASSERT( _ssl );
 	SSL_shutdown( static_cast<SSL*>( _ssl ) );
+	return;
+	M_EPILOG
+}
+
+void HOpenSSL::set_nonblocking( bool nonBlocking_ ) {
+	M_PROLOG
+	M_ASSERT( _ssl );
+	BIO* bio( SSL_get_rbio( static_cast<SSL*>( _ssl ) ) );
+	BIO_set_nbio( bio, nonBlocking_ ? 1 : 0 );
+	return;
 	M_EPILOG
 }
 

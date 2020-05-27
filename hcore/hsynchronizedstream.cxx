@@ -838,6 +838,19 @@ int long HSynchronizedStream::do_read( void* buf_, int long size_ ) {
 	M_EPILOG
 }
 
+int long HSynchronizedStream::do_read_some( void* buf_, int long size_ ) {
+	M_PROLOG
+	HLock l( _mutex );
+	int long nRead( 0 );
+	if ( _streamRef == this ) {
+		M_ASSERT( !"Missing implementation of `do_read_some()` in HSynchronizedStream inherited class."[0] );
+	} else if ( _streamRef ) {
+		nRead = _streamRef->read_some( buf_, size_ );
+	}
+	return ( nRead );
+	M_EPILOG
+}
+
 void HSynchronizedStream::do_seek( int long offset_, SEEK anchor_ ) {
 	M_PROLOG
 	HLock l( _mutex );

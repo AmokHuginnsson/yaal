@@ -51,6 +51,7 @@ protected:
 	READER_t reader;
 	WRITER_t writer;
 	CLOSER_t closer;
+	READER_t some_reader;
 	OWNERSHIP _ownership;
 public:
 	HRawFile( system::file_descriptor_t, OWNERSHIP ownership );
@@ -69,12 +70,16 @@ protected:
 	int close_ssl( void );
 	int long read_plain( void*, int long );
 	int long write_plain( void const*, int long );
+	int long read_some_plain( void*, int long );
 	int long read_ssl_loader( void*, int long );
+	int long read_some_ssl_loader( void*, int long );
 	int long write_ssl_loader( void const*, int long );
 	int long read_ssl( void*, int long );
+	int long read_some_ssl( void*, int long );
 	int long write_ssl( void const*, int long );
 	virtual int long do_write( void const*, int long ) override;
 	virtual int long do_read( void*, int long ) override;
+	virtual int long do_read_some( void*, int long ) override;
 	virtual void do_flush( void ) override;
 	virtual bool do_is_valid( void ) const override;
 	virtual POLL_TYPE do_poll_type( void ) const override;

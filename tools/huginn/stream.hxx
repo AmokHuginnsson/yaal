@@ -95,6 +95,9 @@ private:
 	virtual int long do_read( void* data_, int long size_ ) override {
 		return ( _stream->read( data_, size_ ) );
 	}
+	virtual int long do_read_some( void* data_, int long size_ ) override {
+		return ( _stream->read_some( data_, size_ ) );
+	}
 	virtual void do_seek( int long pos_, SEEK seek_ ) override {
 		_stream->seek( pos_, seek_ );
 	}
