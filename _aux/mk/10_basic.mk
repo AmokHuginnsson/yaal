@@ -34,11 +34,7 @@ define NEW_TARGET
 	SRC_TARGETS := $$(SRC_TARGETS) $(2)
 endef
 
-,        :=,
-SPACE    :=
-SPACE    +=
-$(SPACE) :=
-$(SPACE) +=
+, :=,
 
 uniq = $(if $(1),$(firstword $(1)) $(call uniq,$(filter-out $(firstword $(1)),$(1))))
 quotecomma=$(subst $(,),$$(,),$(subst -EOC,,$(subst $(,)-EOC,,$(subst $(,)$(,),,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8),$(9),$(10),$(11),$(12),$(13),$(14),$(15),-EOC))))

@@ -788,6 +788,9 @@ void HHuginn::set_input_stream( yaal::hcore::HStreamInterface::ptr_t stream_ ) {
 
 void HHuginn::set_input_stream( yaal::hcore::HStreamInterface& stream_ ) {
 	M_PROLOG
+	if ( &stream_ == _inputStreamRaw ) {
+		return;
+	}
 	_inputStream.reset();
 	_inputStreamRaw = &stream_;
 	return;
@@ -804,6 +807,9 @@ void HHuginn::set_output_stream( yaal::hcore::HStreamInterface::ptr_t stream_ ) 
 
 void HHuginn::set_output_stream( yaal::hcore::HStreamInterface& stream_ ) {
 	M_PROLOG
+	if ( &stream_ == _outputStreamRaw ) {
+		return;
+	}
 	_outputStream.reset();
 	_outputStreamRaw = &stream_;
 	return;
@@ -820,6 +826,9 @@ void HHuginn::set_error_stream( yaal::hcore::HStreamInterface::ptr_t stream_ ) {
 
 void HHuginn::set_error_stream( yaal::hcore::HStreamInterface& stream_ ) {
 	M_PROLOG
+	if ( &stream_ == _errorStreamRaw ) {
+		return;
+	}
 	_errorStream.reset();
 	_errorStreamRaw = &stream_;
 	return;
