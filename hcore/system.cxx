@@ -70,7 +70,7 @@ int kill( int pid_, int signal_ ) {
 	return ( result );
 }
 
-IO_EVENT_TYPE wait_for_io( file_descriptor_t fd_, IO_EVENT_TYPE ioEventType_, int timeout_ ) {
+IO_EVENT_TYPE wait_for_io( file_descriptor_t fd_, IO_EVENT_TYPE ioEventType_, int timeout_, bool restartable_ ) {
 	pollfd pfd{
 		fd_,
 		static_cast<int short>(
@@ -79,7 +79,13 @@ IO_EVENT_TYPE wait_for_io( file_descriptor_t fd_, IO_EVENT_TYPE ioEventType_, in
 		),
 		0
 	};
-	int status( ::poll( &pfd, 1, timeout_ ) );
+	int status( 0 );
+	do {
+		status = ::poll( &pfd, 1, timeout_ );
+		if ( timeout_ > 0 ) {
+			-- timeout_;
+		}
+	} while ( restartable_ && ( status == -1 ) && ( errno == EINTR ) );
 	IO_EVENT_TYPE res( IO_EVENT_TYPE::NONE );
 	if ( status == 1 ) {
 		res |= ( pfd.revents & POLLIN ? IO_EVENT_TYPE::READ : IO_EVENT_TYPE::NONE );

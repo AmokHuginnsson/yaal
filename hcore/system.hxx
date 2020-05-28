@@ -61,9 +61,10 @@ static int const INFINITY = -1;
  * \param fd - a file descriptor to observe.
  * \param eventType - an event type to check for.
  * \param timeoutMS - wait that many milliseconds for an event.
+ * \param restartable - should wait be automatically restarted after interrupt from signal.
  * \return A type of event that actually occurred.
  */
-IO_EVENT_TYPE wait_for_io( file_descriptor_t fd, IO_EVENT_TYPE eventType, int timeoutMS = INFINITY );
+IO_EVENT_TYPE wait_for_io( file_descriptor_t fd, IO_EVENT_TYPE eventType, int timeoutMS = INFINITY, bool restartable = true );
 
 /*! \brief Get current process'es effective user id.
  *

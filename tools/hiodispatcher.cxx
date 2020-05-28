@@ -194,8 +194,15 @@ void HIODispatcher::run( void ) {
 		_callbackContext = true;
 		handle_alerts();
 		reconstruct();
-		int pollResult( ::poll( _pollfds.get<pollfd>(), static_cast<nfds_t>( _handlers.get_size() ), _latency ) );
-		if ( pollResult ) {
+		int pollResult( 0 );
+		int latency( _latency );
+		do {
+			pollResult = ::poll( _pollfds.get<pollfd>(), static_cast<nfds_t>( _handlers.get_size() ), latency );
+			if ( latency > 0 ) {
+				-- latency;
+			}
+		} while ( ( pollResult == -1 ) && ( errno == EINTR ) );
+		if ( pollResult > 0 ) {
 			M_ENSURE( pollResult >= 0 );
 			if ( dispatch( _droppedIOHandlers ) ) {
 				_idleCycles = 0;
