@@ -317,15 +317,14 @@ int long HFile::do_read_some( void* buffer_, int long size_ ) {
 	M_ENSURE( _handle, _error_ );
 	system::file_descriptor_t fd( static_cast<system::file_descriptor_t>( get_file_descriptor() ) );
 	int statusFlags( ::fcntl( fd, F_GETFL, 0 ) );
-	M_ENSURE( statusFlags >= 0 );
 	bool wasNonBlocking( ( statusFlags & O_NONBLOCK ) != 0 );
 	if ( ! wasNonBlocking ) {
-		M_ENSURE( ::fcntl( fd, F_SETFL, statusFlags | O_NONBLOCK ) == 0 );
+		::fcntl( fd, F_SETFL, statusFlags | O_NONBLOCK );
 	}
 	wait_for_io( fd, IO_EVENT_TYPE::READ, INFINITY );
 	int long len( static_cast<int long>( ::std::fread( buffer_, sizeof ( char ), static_cast<size_t>( size_ ), static_cast<FILE*>( _handle ) ) ) );
 	if ( ! wasNonBlocking ) {
-		M_ENSURE( ::fcntl( fd, F_SETFL, statusFlags ) == 0 );
+		::fcntl( fd, F_SETFL, statusFlags );
 	}
 	return ( len ? len : ( ::std::ferror( static_cast<FILE*>( _handle ) ) ? -1 : len ) );
 	M_EPILOG

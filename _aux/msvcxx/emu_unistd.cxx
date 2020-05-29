@@ -57,8 +57,16 @@ int poll( msvcxx::pollfd* pfd_, nfds_t count_, int timeout_ ) {
 			++ ret;
 			ready = true;
 		}
+		bool invalid( false );
 		if ( ! ready ) {
-			ios[i]->schedule_read();
+			invalid = ! ios[i]->schedule_read();
+		}
+		if ( invalid || ( ( pfd_[i].events & POLLIN ) && ios[i]->ready() ) ) {
+			pfd_[i].revents = POLLIN;
+			++ ret;
+			ready = true;
+		}
+		if ( ! ready ) {
 			handles[waiterCount] = ios[i]->event();
 			handles2iosIdx[waiterCount] = i;
 			pfd_[i].revents = 0;
@@ -84,7 +92,8 @@ int poll( msvcxx::pollfd* pfd_, nfds_t count_, int timeout_ ) {
 				int handleIdx( handles2iosIdx[i] );
 				int short reqEvents( pfd_[handleIdx].events );
 				pfd_[handleIdx].revents = reqEvents;
-				if ( ( reqEvents & POLLOUT ) && ! ios[handleIdx]->is_connected() ) {
+				bool isConnected( ios[handleIdx]->is_connected() );
+				if ( ( ! isConnected && ( reqEvents & POLLOUT ) ) || ( isConnected && ( reqEvents & POLLIN ) ) ) {
 					ios[handleIdx]->sync();
 				}
 				++ ret;

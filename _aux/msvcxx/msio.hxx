@@ -36,7 +36,6 @@ private:
 	TYPE::type_t _type;
 	HANDLE _handle;
 	OVERLAPPED _overlapped;
-	int _readRequest; /* size of pending read request */
 	int _inBuffer; /* amount of data already in buffer ready for immediate access */
 	yaal::hcore::HChunk _buffer;
 	bool _connected;
@@ -48,8 +47,8 @@ public:
 	IO( TYPE::type_t, HANDLE, HANDLE = nullptr, std::string const& = std::string() );
 	~IO( void );
 	HANDLE event( void ) const;
-	void schedule_read( void );
-	void sync( void );
+	bool schedule_read( int = 1 );
+	bool sync( bool = true );
 	int long read( void*, int long );
 	int long write( void const*, int long );
 	int sendto( char const*, int, int, struct sockaddr const*, int );
@@ -71,6 +70,7 @@ private:
 	friend class SystemIO;
 	int close( void );
 	IO( IO const& );
+	int consume( char*, int long& );
 	IO& operator = ( IO const& );
 };
 

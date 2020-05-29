@@ -245,15 +245,14 @@ int long HRawFile::do_read( void* buffer_, int long size_ ) {
 int long HRawFile::read_some_plain( void* buffer_, int long size_ ) {
 	M_PROLOG
 	int statusFlags( ::fcntl( _fileDescriptor, F_GETFL, 0 ) );
-	M_ENSURE( statusFlags >= 0 );
 	bool wasNonBlocking( ( statusFlags & O_NONBLOCK ) != 0 );
 	if ( ! wasNonBlocking ) {
-		M_ENSURE( ::fcntl( _fileDescriptor, F_SETFL, statusFlags | O_NONBLOCK ) == 0 );
+		::fcntl( _fileDescriptor, F_SETFL, statusFlags | O_NONBLOCK );
 	}
 	wait_for_io( _fileDescriptor, IO_EVENT_TYPE::READ, INFINITY );
 	int long len( (this->*reader)( buffer_, size_ ) );
 	if ( ! wasNonBlocking ) {
-		M_ENSURE( ::fcntl( _fileDescriptor, F_SETFL, statusFlags ) == 0 );
+		::fcntl( _fileDescriptor, F_SETFL, statusFlags );
 	}
 	return ( len );
 	M_EPILOG
