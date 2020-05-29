@@ -15,13 +15,37 @@ namespace tools {
 
 namespace util {
 
+/*! \brief A set of dubious ASCII characters.
+ */
+class EscapeSet {
+	static int const ESCAPE_SET_SIZE = 128;
+	char _data[ESCAPE_SET_SIZE];
+public:
+	EscapeSet( char const*, int );
+	bool has( int ) const;
+};
+
+/*! \brief Escape dubious ASCII characters in string.
+ *
+ * \param string - a string to escape.
+ * \param dubious - an EscapeSet of duboius characters to escape in the string.
+ * \param esc - a special character to be used for escaping duboius characters.
+ */
+void escape( yaal::hcore::HString& string, EscapeSet const& duboius, yaal::code_point_t esc = '\\'_ycp );
+
+/*! \brief A two-way map of ASCII characters.
+ */
 struct EscapeTable {
-	static int const ESCAPE_TABLE_SIZE = 256;
+	static int const ESCAPE_TABLE_SIZE = 128;
 	char _rawToSafe[ESCAPE_TABLE_SIZE];
 	char _safeToRaw[ESCAPE_TABLE_SIZE];
 	EscapeTable( char const*, int, char const*, int );
 };
 
+/*! \brief Mask sensitive ASCII characters with thier plain counterparts.
+ *
+ * Example use is to change '\n' in string into '\\n'.
+ */
 void escape( yaal::hcore::HString&, EscapeTable const&, yaal::code_point_t = '\\'_ycp );
 void unescape( yaal::hcore::HString&, EscapeTable const&, yaal::code_point_t = '\\'_ycp );
 void semantic_unescape( yaal::hcore::HString& );
