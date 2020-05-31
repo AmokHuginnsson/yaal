@@ -33,6 +33,13 @@ public:
  */
 void escape( yaal::hcore::HString& string, EscapeSet const& duboius, yaal::code_point_t esc = '\\'_ycp );
 
+/*! \brief Drop escape character from string.
+ *
+ * \param string - a string to process.
+ * \param esc - an escape character to be dropped.
+ */
+void unescape( yaal::hcore::HString& string, yaal::code_point_t esc = '\\'_ycp );
+
 /*! \brief A two-way map of ASCII characters.
  */
 struct EscapeTable {

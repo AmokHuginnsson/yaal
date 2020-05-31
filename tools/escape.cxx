@@ -72,6 +72,35 @@ void escape( yaal::hcore::HString& string_, EscapeSet const& es_, code_point_t e
 	M_EPILOG
 }
 
+void unescape( yaal::hcore::HString& string_, yaal::code_point_t esc_ ) {
+	M_PROLOG
+	if ( string_.is_empty() ) {
+		return;
+	}
+	typedef HTLS<HChunk> cache_t;
+	static cache_t _cache_;
+	HChunk& cache( *_cache_ );
+	cache.realloc( chunk_size<code_point_t>( string_.get_length() ) );
+	code_point_t* ptr( cache.get<code_point_t>() );
+	bool escape( false );
+	int long pos( 0 );
+	for ( code_point_t cp : string_ ) {
+		if ( ! escape && ( cp == esc_ ) ) {
+			escape = true;
+			continue;
+		}
+		escape = false;
+		ptr[pos] = cp;
+		++ pos;
+	}
+	string_.clear();
+	for ( int long i( 0 ); i < pos; ++ i ) {
+		string_.push_back( ptr[i] );
+	}
+	return;
+	M_EPILOG
+}
+
 EscapeTable::EscapeTable( char const* raw_, int rawLen_, char const* safe_, int M_DEBUG_CODE( safeLen_ ) )
 	: _rawToSafe()
 	, _safeToRaw() {
@@ -142,22 +171,21 @@ void unescape( yaal::hcore::HString& string_, EscapeTable const& et_, code_point
 	static cache_t _cache_;
 	HChunk& cache( *_cache_ );
 	cache.realloc( chunk_size<code_point_t>( string_.get_length() ) );
-	int pos( 0 );
 	code_point_t* ptr( cache.get<code_point_t>() );
-	for ( HString::const_iterator it( string_.begin() ), end( string_.end() ); it != end; ++ it, ++ pos ) {
-		if ( *it == escape_ ) {
-			++ it;
-			if ( ! ( it != end ) ) {
-				break;
-			}
-			ptr[pos] = unicode::rank( *it ) == 1
-				? code_point_t(
-						static_cast<char unsigned>( et_._safeToRaw[static_cast<char unsigned>( (*it).get() )] )
-					)
-				: *it;
-		} else {
-			ptr[pos] = *it;
+	int long pos( 0 );
+	bool escape( false );
+	for ( code_point_t cp : string_ ) {
+		if ( ! escape && ( cp == escape_ ) ) {
+			escape = true;
+			continue;
 		}
+		ptr[pos] = escape && ( cp < EscapeTable::ESCAPE_TABLE_SIZE )
+			? code_point_t(
+					static_cast<char unsigned>( et_._safeToRaw[static_cast<char unsigned>( cp.get() )] )
+				)
+			: cp;
+		++ pos;
+		escape = false;
 	}
 	string_.clear();
 	for ( int long i( 0 ); i < pos; ++ i ) {
