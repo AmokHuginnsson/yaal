@@ -916,6 +916,7 @@ void HConsole::bell( void ) const {
 void HConsole::notify_terminal( void ) {
 	M_PROLOG
 	_event->write( "t", 1 );
+	_event->flush();
 	return;
 	M_EPILOG
 }
@@ -923,6 +924,7 @@ void HConsole::notify_terminal( void ) {
 void HConsole::notify_mouse( void ) {
 	M_PROLOG
 	_event->write( "m", 1 );
+	_event->flush();
 	return;
 	M_EPILOG
 }
@@ -930,6 +932,7 @@ void HConsole::notify_mouse( void ) {
 void HConsole::notify_keyboard( void ) {
 	M_PROLOG
 	_event->write( "k", 1 );
+	_event->flush();
 	return;
 	M_EPILOG
 }

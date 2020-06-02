@@ -28,6 +28,7 @@ public:
 	~HPipe( void );
 	int long read( void*, int long );
 	int long write( void const*, int long );
+	void flush( void );
 	yaal::hcore::HStreamInterface::ptr_t const& in( void ) const;
 	yaal::hcore::HStreamInterface::ptr_t const& out( void ) const;
 };

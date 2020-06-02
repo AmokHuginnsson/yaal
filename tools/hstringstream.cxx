@@ -47,6 +47,7 @@ void HStringStream::str( HString const& s_ ) {
 }
 
 yaal::hcore::HString const& HStringStream::string( void ) const {
+	const_cast<HStringStream*>( this )->flush();
 	return ( _buffer );
 }
 
@@ -111,6 +112,7 @@ void HStringStream::do_reset( void ) {
 
 HString const& HStringStream::consume( void ) const {
 	M_PROLOG
+	const_cast<HStringStream*>( this )->flush();
 	use();
 	return ( _buffer );
 	M_EPILOG

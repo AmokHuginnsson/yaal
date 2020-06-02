@@ -202,6 +202,13 @@ HTee::HTee( HTee const& tee_ )
 	, _stream2( tee_._stream2 ) {
 }
 
+HTee::~HTee( void ) {
+	M_PROLOG
+	flush();
+	return;
+	M_DESTRUCTOR_EPILOG
+}
+
 int long HTee::do_write( void const* data_, int long size_ ) {
 	M_PROLOG
 	int long w1( _stream1.write( data_, size_ ) );

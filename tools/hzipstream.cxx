@@ -77,11 +77,13 @@ void HZipStream::cleanup( void ) {
 	M_PROLOG
 	z_stream* zstream( _zStream.get<z_stream>() );
 	if ( _mode == MODE::DEFLATE ) {
-		if ( ! _flushed )
+		if ( ! _flushed ) {
 			flush();
+		}
 		deflateEnd( zstream );
-	} else
+	} else {
 		inflateEnd( zstream );
+	}
 	_offset = 0;
 	_error = Z_OK;
 	return;
@@ -104,6 +106,7 @@ inline int fwd_deflateInit( T1 arg1_, T2 arg2_ ) {
 
 void HZipStream::init( void ) {
 	M_PROLOG
+	set_buffered_io( false );
 	z_stream* zstream( _zStream.get<z_stream>() );
 	zstream->zalloc = static_cast<decltype ( z_stream::zalloc )>( nullptr );
 	zstream->zfree = static_cast<decltype ( z_stream::zfree )>( nullptr );
@@ -212,8 +215,9 @@ int long HZipStream::do_read( void* buf_, int long size_ ) {
 void HZipStream::do_flush( void ) {
 	M_PROLOG
 	M_ASSERT( _streamRef );
-	if ( ( _mode == MODE::DEFLATE ) && ! _flushed )
+	if ( ( _mode == MODE::DEFLATE ) && ! _flushed ) {
 		do_write( nullptr, 0 );
+	}
 	_flushed = true;
 	_streamRef->flush();
 	return;

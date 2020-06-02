@@ -350,7 +350,7 @@ HHuginn::value_t print( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::va
 			position_
 		);
 	}
-	out << flush;
+	out.flush();
 	return ( thread_->runtime().none_value() );
 	M_EPILOG
 }

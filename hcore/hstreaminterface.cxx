@@ -40,7 +40,8 @@ HStreamInterface::HStreamInterface( void )
 	, _valid( true )
 	, _fail( false )
 	, _cache( 1, HChunk::STRATEGY::GEOMETRIC )
-	, _cachedBytes( 0 ) {
+	, _cachedBytes( 0 )
+	, _cacheContent( CACHE_CONTENT::READ ) {
 	return;
 }
 
@@ -58,7 +59,7 @@ HStreamInterface& HStreamInterface::do_output( HString const& string_ ) {
 		_conversionCache = string_;
 		do_output( static_cast<i32_t>( _conversionCache.byte_count() ) );
 	}
-	do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+	write( _conversionCache.raw(), _conversionCache.byte_count() );
 	return ( *this );
 	M_EPILOG
 }
@@ -69,11 +70,11 @@ HStreamInterface& HStreamInterface::do_output( char const* string_ ) {
 		_wordCache = string_;
 		reformat();
 		_conversionCache = _wordCache;
-		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+		write( _conversionCache.raw(), _conversionCache.byte_count() );
 	} else {
 		i32_t len( static_cast<i32_t>( strlen( string_ ) ) );
 		do_output( len );
-		do_write( string_, len );
+		write( string_, len );
 	}
 	return ( *this );
 	M_EPILOG
@@ -85,10 +86,10 @@ HStreamInterface& HStreamInterface::do_output( bool bool_ ) {
 		_wordCache = _boolAlpha ? ( bool_ ? "true" : "false" ) : ( bool_ ? "1" : "0" );
 		reformat();
 		_conversionCache = _wordCache;
-		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+		write( _conversionCache.raw(), _conversionCache.byte_count() );
 	} else {
 		i8_t buffer( bool_ ? 1 : 0 );
-		do_write( &buffer, static_cast<int>( sizeof ( buffer ) ) );
+		write( &buffer, static_cast<int>( sizeof ( buffer ) ) );
 	}
 	return ( *this );
 	M_EPILOG
@@ -100,9 +101,9 @@ HStreamInterface& HStreamInterface::do_output( code_point_t char_ ) {
 		_wordCache = char_;
 		reformat();
 		_conversionCache = _wordCache;
-		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+		write( _conversionCache.raw(), _conversionCache.byte_count() );
 	} else {
-		do_write( &char_.get(), static_cast<int>( sizeof ( char_.get() ) ) );
+		write( &char_.get(), static_cast<int>( sizeof ( char_.get() ) ) );
 	}
 	return ( *this );
 	M_EPILOG
@@ -114,9 +115,9 @@ HStreamInterface& HStreamInterface::do_output( char char_ ) {
 		_wordCache = char_;
 		reformat();
 		_conversionCache = _wordCache;
-		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+		write( _conversionCache.raw(), _conversionCache.byte_count() );
 	} else {
-		do_write( &char_, static_cast<int>( sizeof ( char_ ) ) );
+		write( &char_, static_cast<int>( sizeof ( char_ ) ) );
 	}
 	return ( *this );
 	M_EPILOG
@@ -128,9 +129,9 @@ HStreamInterface& HStreamInterface::do_output( char unsigned charUnsigned_ ) {
 		_wordCache = charUnsigned_;
 		reformat();
 		_conversionCache = _wordCache;
-		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+		write( _conversionCache.raw(), _conversionCache.byte_count() );
 	} else {
-		do_write( &charUnsigned_, static_cast<int>( sizeof ( charUnsigned_ ) ) );
+		write( &charUnsigned_, static_cast<int>( sizeof ( charUnsigned_ ) ) );
 	}
 	return ( *this );
 	M_EPILOG
@@ -142,7 +143,7 @@ HStreamInterface& HStreamInterface::do_output( int short shortInteger_ ) {
 		int long tmp( shortInteger_ );
 		do_output( tmp );
 	} else {
-		do_write( &shortInteger_, static_cast<int>( sizeof ( shortInteger_ ) ) );
+		write( &shortInteger_, static_cast<int>( sizeof ( shortInteger_ ) ) );
 	}
 	return ( *this );
 	M_EPILOG
@@ -154,7 +155,7 @@ HStreamInterface& HStreamInterface::do_output( int short unsigned unsignedShortI
 		int long unsigned tmp( unsignedShortInteger_ );
 		do_output( tmp );
 	} else {
-		do_write( &unsignedShortInteger_, static_cast<int>( sizeof ( unsignedShortInteger_ ) ) );
+		write( &unsignedShortInteger_, static_cast<int>( sizeof ( unsignedShortInteger_ ) ) );
 	}
 	return ( *this );
 	M_EPILOG
@@ -166,7 +167,7 @@ HStreamInterface& HStreamInterface::do_output( int integer_ ) {
 		int long tmp( integer_ );
 		do_output( tmp );
 	} else {
-		do_write( &integer_, static_cast<int>( sizeof ( integer_ ) ) );
+		write( &integer_, static_cast<int>( sizeof ( integer_ ) ) );
 	}
 	return ( *this );
 	M_EPILOG
@@ -178,7 +179,7 @@ HStreamInterface& HStreamInterface::do_output( int unsigned unsignedInteger_ ) {
 		int long unsigned tmp( unsignedInteger_ );
 		do_output( tmp );
 	} else {
-		do_write( &unsignedInteger_, static_cast<int>( sizeof ( unsignedInteger_ ) ) );
+		write( &unsignedInteger_, static_cast<int>( sizeof ( unsignedInteger_ ) ) );
 	}
 	return ( *this );
 	M_EPILOG
@@ -192,9 +193,9 @@ HStreamInterface& HStreamInterface::do_output( int long longInteger_ ) {
 		_wordCache = buffer;
 		reformat();
 		_conversionCache = _wordCache;
-		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+		write( _conversionCache.raw(), _conversionCache.byte_count() );
 	} else {
-		do_write( &longInteger_, static_cast<int>( sizeof ( longInteger_ ) ) );
+		write( &longInteger_, static_cast<int>( sizeof ( longInteger_ ) ) );
 	}
 	return ( *this );
 	M_EPILOG
@@ -208,9 +209,9 @@ HStreamInterface& HStreamInterface::do_output( int long long longLongInteger_ ) 
 		_wordCache = buffer;
 		reformat();
 		_conversionCache = _wordCache;
-		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+		write( _conversionCache.raw(), _conversionCache.byte_count() );
 	} else {
-		do_write( &longLongInteger_, static_cast<int>( sizeof ( longLongInteger_ ) ) );
+		write( &longLongInteger_, static_cast<int>( sizeof ( longLongInteger_ ) ) );
 	}
 	return ( *this );
 	M_EPILOG
@@ -251,9 +252,9 @@ HStreamInterface& HStreamInterface::do_output( int long unsigned unsignedLongInt
 		_wordCache = buffer;
 		reformat();
 		_conversionCache = _wordCache;
-		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+		write( _conversionCache.raw(), _conversionCache.byte_count() );
 	} else {
-		do_write( &unsignedLongInteger_, static_cast<int>( sizeof ( unsignedLongInteger_ ) ) );
+		write( &unsignedLongInteger_, static_cast<int>( sizeof ( unsignedLongInteger_ ) ) );
 	}
 	return ( *this );
 	M_EPILOG
@@ -267,9 +268,9 @@ HStreamInterface& HStreamInterface::do_output( int long long unsigned unsignedLo
 		_wordCache = buffer;
 		reformat();
 		_conversionCache = _wordCache;
-		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+		write( _conversionCache.raw(), _conversionCache.byte_count() );
 	} else {
-		do_write( &unsignedLongLongInteger_, static_cast<int>( sizeof ( unsignedLongLongInteger_ ) ) );
+		write( &unsignedLongLongInteger_, static_cast<int>( sizeof ( unsignedLongLongInteger_ ) ) );
 	}
 	return ( *this );
 	M_EPILOG
@@ -305,9 +306,9 @@ HStreamInterface& HStreamInterface::do_output( double double_ ) {
 		apply_precision();
 		reformat();
 		_conversionCache = _wordCache;
-		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+		write( _conversionCache.raw(), _conversionCache.byte_count() );
 	} else {
-		do_write( &double_, static_cast<int>( sizeof ( double_ ) ) );
+		write( &double_, static_cast<int>( sizeof ( double_ ) ) );
 	}
 	return ( *this );
 	M_EPILOG
@@ -326,9 +327,9 @@ HStreamInterface& HStreamInterface::do_output( double long longDouble_ ) {
 		apply_precision();
 		reformat();
 		_conversionCache = _wordCache;
-		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+		write( _conversionCache.raw(), _conversionCache.byte_count() );
 	} else {
-		do_write( &longDouble_, static_cast<int>( sizeof ( longDouble_ ) ) );
+		write( &longDouble_, static_cast<int>( sizeof ( longDouble_ ) ) );
 	}
 	return ( *this );
 	M_EPILOG
@@ -347,9 +348,9 @@ HStreamInterface& HStreamInterface::do_output( float float_ ) {
 		apply_precision();
 		reformat();
 		_conversionCache = _wordCache;
-		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+		write( _conversionCache.raw(), _conversionCache.byte_count() );
 	} else {
-		do_write( &float_, static_cast<int>( sizeof ( float_ ) ) );
+		write( &float_, static_cast<int>( sizeof ( float_ ) ) );
 	}
 	return ( *this );
 	M_EPILOG
@@ -363,9 +364,9 @@ HStreamInterface& HStreamInterface::do_output( void const* ptr_ ) {
 		_wordCache = buffer;
 		reformat();
 		_conversionCache = _wordCache;
-		do_write( _conversionCache.raw(), _conversionCache.byte_count() );
+		write( _conversionCache.raw(), _conversionCache.byte_count() );
 	} else {
-		do_write( &ptr_, static_cast<int>( sizeof ( ptr_ ) ) );
+		write( &ptr_, static_cast<int>( sizeof ( ptr_ ) ) );
 	}
 	return ( *this );
 	M_EPILOG
@@ -389,15 +390,15 @@ HStreamInterface& endl( HStreamInterface& file_ ) {
 	if ( file_.get_mode() != HStreamInterface::MODE::TEXT ) {
 		throw HStreamInterfaceException( "Invalid output conversion for binary mode." );
 	}
-	file_.do_write( "\n", 1 );
-	file_.do_flush();
+	file_.write( "\n", 1 );
+	file_.flush();
 	return ( file_ );
 	M_EPILOG
 }
 
 HStreamInterface& flush( HStreamInterface& file_ ) {
 	M_PROLOG
-	file_.do_flush();
+	file_.flush();
 	return ( file_ );
 	M_EPILOG
 }
@@ -613,6 +614,7 @@ int long HStreamInterface::semantic_read(
 	M_PROLOG
 	M_ASSERT( isStopSet_ || ! stripDelim_ );
 	M_ASSERT( _cachedBytes >= 0 );
+	flush_write_buffer();
 	int long nRead( 0 ); /* how many bytes were read in this single invocation */
 	int long iPoolSize( _cache.size() );
 	char* buffer( _cache.get<char>() ); /* read cache buffer */
@@ -663,6 +665,7 @@ int long HStreamInterface::semantic_read(
 			byDelim = p != nullptr;
 			/* We increment _cachedBytes only if read succeeded. */
 			_cachedBytes += static_cast<int>( nRead );
+			_cacheContent = CACHE_CONTENT::READ;
 			if ( byDelim ) {
 				nRead = ( p - buffer ) + 1;
 				break;
@@ -728,6 +731,7 @@ HStreamInterface& HStreamInterface::do_ignore( int count_ ) {
 }
 
 int HStreamInterface::do_peek( void ) {
+	flush_write_buffer();
 	if ( ! _cachedBytes && good() ) {
 		int long iPoolSize( _cache.size() );
 		if ( iPoolSize < 1 ) {
@@ -739,6 +743,7 @@ int HStreamInterface::do_peek( void ) {
 		} while ( nRead < 0 );
 		if ( nRead > 0 ) {
 			_cachedBytes = 1;
+			_cacheContent = CACHE_CONTENT::READ;
 		}
 	}
 	return ( _cachedBytes > 0 ? _cache.get<char>()[ 0 ] : INVALID_CHARACTER );
@@ -864,6 +869,7 @@ HStreamInterface& HStreamInterface::do_input( HString& word ) {
 			_fail = do_read( _cache.get<char>() + _cachedBytes, toRead ) != toRead;
 			if ( ! _fail ) {
 				_cachedBytes = static_cast<int>( len );
+				_cacheContent = CACHE_CONTENT::READ;
 			}
 		}
 		if ( good() ) {
@@ -1234,6 +1240,7 @@ int long HStreamInterface::do_read_some( void* buffer_, int long size_ ) {
 int long HStreamInterface::read( void* buffer_, int long size_ ) {
 	M_PROLOG
 	int long nRead( 0 );
+	flush_write_buffer();
 	if ( _cachedBytes ) {
 		void* buffer( _cache.raw() );
 		if ( _cachedBytes > size_ ) {
@@ -1292,7 +1299,33 @@ void HStreamInterface::do_seek( int long, SEEK ) {
 
 int long HStreamInterface::write( void const* buffer_, int long size_ ) {
 	M_PROLOG
-	return ( do_write( buffer_, size_ ) );
+	if ( size_ == 0 ) {
+		return ( 0 );
+	}
+	if ( ! _bufferedIO || ( ( _cacheContent == CACHE_CONTENT::READ ) && ( _cachedBytes > 0 ) ) ) {
+		return ( do_write( buffer_, size_ ) );
+	}
+	int maxWrite( max( max( _ioBufferSize, static_cast<int>( _cache.get_size() ) ) - _cachedBytes, 0 ) );
+	if ( ( size_ > maxWrite ) && ( _cachedBytes > 0 ) ) {
+		do_write( _cache.raw(), _cachedBytes );
+		maxWrite += _cachedBytes;
+		_cachedBytes = 0;
+	}
+	if ( size_ > maxWrite ) {
+		M_ASSERT( _cachedBytes == 0 );
+		return ( do_write( buffer_, size_ ) );
+	}
+	_cache.realloc( _cachedBytes + size_ );
+	::memcpy( static_cast<char*>( _cache.raw() ) + _cachedBytes, buffer_, static_cast<size_t>( size_ ) );
+	_cachedBytes += static_cast<int>( size_ );
+	_cacheContent = CACHE_CONTENT::WRITE;
+	M_ASSERT( _cachedBytes <= static_cast<int>( _cache.get_size() ) );
+	if ( _cachedBytes == static_cast<int>( _cache.get_size() ) ) {
+		do_write( _cache.raw(), _cachedBytes );
+		_cachedBytes = 0;
+		_cacheContent = CACHE_CONTENT::READ;
+	}
+	return ( size_ );
 	M_EPILOG
 }
 
@@ -1320,11 +1353,31 @@ void HStreamInterface::do_clear( void ) {
 	return;
 }
 
+void HStreamInterface::flush_write_buffer( void ) {
+	M_PROLOG
+	if ( ( _cacheContent != CACHE_CONTENT::WRITE ) || ( _cachedBytes == 0 ) ) {
+		return;
+	}
+	flush();
+	return;
+	M_EPILOG
+}
+
 void HStreamInterface::flush( void ) {
 	M_PROLOG
+	if ( ( _cacheContent == CACHE_CONTENT::WRITE ) && ( _cachedBytes > 0 ) ) {
+		do_write( _cache.raw(), _cachedBytes );
+		_cachedBytes = 0;
+		_cacheContent = CACHE_CONTENT::READ;
+	}
 	do_flush();
 	return;
 	M_EPILOG
+}
+
+void const* HStreamInterface::data( void ) const {
+	const_cast<HStreamInterface*>( this )->flush_write_buffer();
+	return ( do_data() );
 }
 
 HStreamInterface& HStreamInterface::do_set_fill( code_point_t fill_ ) {
@@ -1392,6 +1445,7 @@ HStreamInterface& HStreamInterface::do_set_boolalpha( bool boolalpha_ ) {
 
 HStreamInterface& HStreamInterface::do_set_buffered_io( bool bufferedIo_ ) {
 	M_PROLOG
+	flush_write_buffer();
 	_bufferedIO = bufferedIo_;
 	return ( *this );
 	M_EPILOG
@@ -1399,6 +1453,7 @@ HStreamInterface& HStreamInterface::do_set_buffered_io( bool bufferedIo_ ) {
 
 HStreamInterface& HStreamInterface::do_set_io_buffer_size( int ioBufferSize_ ) {
 	M_PROLOG
+	flush_write_buffer();
 	_ioBufferSize = ioBufferSize_;
 	return ( *this );
 	M_EPILOG

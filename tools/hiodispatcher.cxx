@@ -239,6 +239,7 @@ void HIODispatcher::stop( void ) {
 	HLock l( _mutex );
 	int sigNo = SIGINT;
 	M_ENSURE( _event.write( &sigNo, static_cast<int>( sizeof ( sigNo ) ) ) == static_cast<int>( sizeof ( sigNo ) ) );
+	_event.flush();
 	return;
 	M_EPILOG
 }
@@ -247,6 +248,7 @@ int HIODispatcher::handler_interrupt( int sigNo_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	M_ENSURE( _event.write( &sigNo_, static_cast<int>( sizeof ( sigNo_ ) ) ) == static_cast<int>( sizeof ( sigNo_ ) ) );
+	_event.flush();
 	return ( 1 );
 	M_EPILOG
 }

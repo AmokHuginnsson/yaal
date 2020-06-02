@@ -94,6 +94,7 @@ int HRawFile::close_plain( void ) {
 
 int HRawFile::close_ssl( void ) {
 	M_PROLOG
+	flush();
 	_ssl->shutdown();
 	return ( do_close() );
 	M_EPILOG
@@ -101,10 +102,11 @@ int HRawFile::close_ssl( void ) {
 
 int HRawFile::do_close( void ) {
 	M_PROLOG
-	int error( 0 );
-	if ( _fileDescriptor < 0 )
+	if ( _fileDescriptor < 0 ) {
 		M_THROW( "file is not opened", errno );
-	error = static_cast<int>( M_TEMP_FAILURE_RETRY( system::close( _fileDescriptor ) ) );
+	}
+	flush();
+	int error( static_cast<int>( M_TEMP_FAILURE_RETRY( system::close( _fileDescriptor ) ) ) );
 	_fileDescriptor = -1;
 	return ( error );
 	M_EPILOG

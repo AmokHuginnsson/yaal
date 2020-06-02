@@ -646,6 +646,7 @@ public:
 		, _stream2( stream2_ ) {
 	}
 	HTee( HTee const& );
+	virtual ~HTee( void );
 protected:
 	virtual int long do_write( void const*, int long ) override;
 	virtual int long do_read( void*, int long ) override M_DEBUG_CODE( __attribute__((noreturn)) );

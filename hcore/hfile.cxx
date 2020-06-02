@@ -146,6 +146,7 @@ int HFile::close( void ) {
 int HFile::do_close( void ) {
 	M_PROLOG
 	M_ENSURE( _handle && ( _ownership == OWNERSHIP::ACQUIRED ) );
+	flush();
 	int error( ::std::fclose( static_cast<FILE*>( _handle ) ) );
 	if ( error ) {
 		_error = error_message( error );
@@ -214,6 +215,7 @@ void HFile::do_seek( int long pos, SEEK seek_ ) {
 HFile& HFile::read_line( HString& line_, READ read_, int maximumLength_ ) {
 	M_PROLOG
 	M_ASSERT( _handle );
+	flush_write_buffer();
 	READ readMode( read_ );
 	if ( readMode == READ::DEFAULTS ) {
 		readMode = READ::BUFFERED_READS;

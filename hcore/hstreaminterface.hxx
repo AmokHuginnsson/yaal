@@ -85,6 +85,10 @@ public:
 	};
 	typedef HStreamInterface& ( *manipulator_t )( HStreamInterface& );
 private:
+	enum class CACHE_CONTENT {
+		READ,
+		WRITE
+	};
 	HString _wordCache;  /*!< Cache for operator >> () and operator << (). */
 	HUTF8String _conversionCache; /*!< Cache used for converting between UTF-8 and UCS */
 	code_point_t _fill;  /*!< Fill character for output operations. */
@@ -101,8 +105,9 @@ private:
 protected:
 	bool _valid;      /*!< Tells if further low-level IO is possible. */
 	bool _fail;       /*!< Tells if most recently performed data extraction failed at logical level. */
-	HChunk _cache;    /*!< Read buffer. */
+	HChunk _cache;    /*!< Read/write buffer. */
 	int _cachedBytes; /*!< Position of where continued read (another read_until invocation after interrupted one) shall store consecutive bytes. */
+	CACHE_CONTENT _cacheContent;
 public:
 	HStreamInterface( void );
 	virtual ~HStreamInterface( void );
@@ -400,9 +405,7 @@ public:
 	POLL_TYPE poll_type( void ) const {
 		return ( do_poll_type() );
 	}
-	void const* data( void ) const {
-		return ( do_data() );
-	}
+	void const* data( void ) const;
 	/*! \brief Tell if all operations until now succeeded.
 	 *
 	 * \return True iff all operations until now succeeded.
@@ -581,6 +584,7 @@ protected:
 	virtual bool do_bad( void ) const;
 	virtual void do_clear( void );
 	virtual void do_reset( void );
+	void flush_write_buffer( void );
 private:
 	int long read_while_retry( yaal::hcore::HString&, char const* );
 	int long read_until_retry( yaal::hcore::HString&, char const*, bool );

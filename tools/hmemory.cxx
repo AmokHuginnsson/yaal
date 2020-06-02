@@ -47,6 +47,7 @@ HMemory::HMemory( memory_strategy_interface_t&& memory_, INITIAL_STATE initialSt
 	, _valid( initialState_ == INITIAL_STATE::AUTO ? UNINITIALIZED : ( initialState_ == INITIAL_STATE::VALID ? _memory->get_size() : 0 ) )
 	, _cursorRead( 0 )
 	, _cursorWrite( 0 ) {
+	set_buffered_io( false );
 	return;
 }
 

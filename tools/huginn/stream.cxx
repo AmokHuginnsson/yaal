@@ -973,6 +973,7 @@ void HStream::write_line_impl( HThread* thread_, hcore::HString const& val_, int
 		_converter = val_;
 		int long toWrite( _converter.byte_count() );
 		int long nWritten( _stream->write( _converter.c_str(), toWrite ) );
+		_stream->flush();
 		post_io( thread_, toWrite, nWritten, IO::WRITE, position_ );
 	} catch ( hcore::HException const& e ) {
 		raise( thread_, e.what(), position_ );

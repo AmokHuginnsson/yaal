@@ -159,6 +159,7 @@ void HSocket::cleanup( void ) {
 int HSocket::do_close( void ) {
 	M_PROLOG
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
+	flush();
 	if ( _type & TYPE::SERVER ) {
 		cleanup();
 	}

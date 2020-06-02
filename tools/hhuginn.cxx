@@ -657,6 +657,8 @@ bool HHuginn::execute( void ) {
 	} catch ( HHuginnRuntimeException const& e ) {
 		consume_error( e, _compiler->_mainExecutedStatementCount );
 	}
+	_outputStreamRaw->flush();
+	_errorStreamRaw->flush();
 	return ( ok );
 	M_EPILOG
 }
@@ -672,6 +674,8 @@ HHuginn::value_t HHuginn::call( yaal::hcore::HString const& name_, HHuginn::valu
 	} catch ( HHuginnRuntimeException const& e ) {
 		consume_error( e, _compiler->_mainExecutedStatementCount );
 	}
+	_outputStreamRaw->flush();
+	_errorStreamRaw->flush();
 	return ( res );
 	M_EPILOG
 }

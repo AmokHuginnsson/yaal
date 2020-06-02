@@ -53,6 +53,13 @@ int long HPipe::write( void const* buffer_, int long size_ ) {
 	M_EPILOG
 }
 
+void HPipe::flush( void ) {
+	M_PROLOG
+	_in->flush();
+	return;
+	M_EPILOG
+}
+
 yaal::hcore::HStreamInterface::ptr_t const& HPipe::in( void ) const {
 	return ( _in );
 }
