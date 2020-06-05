@@ -3316,7 +3316,7 @@ yaal::hcore::HUTF8String::const_iterator HStringLiteral::do_parse( HExecutingPar
 	if ( parseResult.valid() ) {
 		++ scan;
 		semantic_unescape( _cache );
-		unescape( _cache, _escapes_ );
+		unescape( _cache, _escapes_, '\\'_ycp, true );
 		range_t rng( range( executingParser_, first_, scan ) );
 		if ( !! _actionString ) {
 			add_execution_step( executingParser_, call( _actionString, yaal::move( _cache ) ) );
@@ -3458,7 +3458,7 @@ yaal::hcore::HUTF8String::const_iterator HCharacterLiteral::do_parse( HExecuting
 	if ( parseResult.valid() ) {
 		++ scan;
 		semantic_unescape( _cache );
-		unescape( _cache, _escapes_ );
+		unescape( _cache, _escapes_, '\\'_ycp, true );
 		if ( _cache.get_length() == 1 ) {
 			range_t rng( range( executingParser_, first_, scan ) );
 			if ( !! _actionCharacter ) {

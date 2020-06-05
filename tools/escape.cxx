@@ -162,7 +162,7 @@ void escape( yaal::hcore::HString& string_, EscapeTable const& et_, code_point_t
 	M_EPILOG
 }
 
-void unescape( yaal::hcore::HString& string_, EscapeTable const& et_, code_point_t escape_ ) {
+void unescape( yaal::hcore::HString& string_, EscapeTable const& et_, code_point_t escape_, bool dropUnmatched_ ) {
 	M_PROLOG
 	if ( string_.is_empty() ) {
 		return;
@@ -179,13 +179,23 @@ void unescape( yaal::hcore::HString& string_, EscapeTable const& et_, code_point
 			escape = true;
 			continue;
 		}
-		ptr[pos] = escape && ( cp < EscapeTable::ESCAPE_TABLE_SIZE )
-			? code_point_t(
-					static_cast<char unsigned>( et_._safeToRaw[static_cast<char unsigned>( cp.get() )] )
-				)
-			: cp;
-		++ pos;
+		if ( ! escape ) {
+			ptr[pos] = cp;
+			++ pos;
+			continue;
+		}
 		escape = false;
+		code_point_t translated(
+			cp < EscapeTable::ESCAPE_TABLE_SIZE
+				? code_point_t( static_cast<char unsigned>( et_._safeToRaw[static_cast<char unsigned>( cp.get() )] ) )
+				: cp
+		);
+		if ( ( translated == cp ) && ! dropUnmatched_ ) {
+			ptr[pos] = escape_;
+			++ pos;
+		}
+		ptr[pos] = translated;
+		++ pos;
 	}
 	string_.clear();
 	for ( int long i( 0 ); i < pos; ++ i ) {

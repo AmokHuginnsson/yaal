@@ -28,8 +28,8 @@ public:
 /*! \brief Escape dubious ASCII characters in string.
  *
  * \param string - a string to escape.
- * \param dubious - an EscapeSet of duboius characters to escape in the string.
- * \param esc - a special character to be used for escaping duboius characters.
+ * \param dubious - an EscapeSet of dubious characters to escape in the string.
+ * \param esc - a special character to be used for escaping dubious characters.
  */
 void escape( yaal::hcore::HString& string, EscapeSet const& duboius, yaal::code_point_t esc = '\\'_ycp );
 
@@ -49,12 +49,20 @@ struct EscapeTable {
 	EscapeTable( char const*, int, char const*, int );
 };
 
-/*! \brief Mask sensitive ASCII characters with thier plain counterparts.
+/*! \brief Mask sensitive ASCII characters with their plain counterparts.
  *
  * Example use is to change '\n' in string into '\\n'.
  */
 void escape( yaal::hcore::HString&, EscapeTable const&, yaal::code_point_t = '\\'_ycp );
-void unescape( yaal::hcore::HString&, EscapeTable const&, yaal::code_point_t = '\\'_ycp );
+
+/*! \brief Render sensitive ASCII characters from their escaped form.
+ *
+ * \param string - an escaped string to render.
+ * \param escapeTable - a two-way translation table containing mapping of sensitive ASCII characters.
+ * \param esc - an escape character used for escaping.
+ * \param dropUnmatched - remove `esc` character from escaped string also for characters that were not found in escapeTable.
+ */
+void unescape( yaal::hcore::HString& string, EscapeTable const& escapeTable, yaal::code_point_t esc = '\\'_ycp, bool dropUnmatched = false );
 void semantic_unescape( yaal::hcore::HString& );
 yaal::hcore::HString escape_copy( yaal::hcore::HString, EscapeTable const&, yaal::code_point_t = '\\'_ycp );
 yaal::hcore::HString unescape_copy( yaal::hcore::HString, EscapeTable const&, yaal::code_point_t = '\\'_ycp );
