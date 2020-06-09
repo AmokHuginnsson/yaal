@@ -105,7 +105,7 @@ HSocket::HSocket( socket_type_t const& socketType_,
 				M_ENSURE( statusFlags >= 0 );
 				M_ENSURE( ::fcntl( _fileDescriptor, F_SETFL, statusFlags | O_NONBLOCK ) == 0 );
 			}
-			system::set_close_on_exec( _fileDescriptor );
+			system::set_close_on_exec( _fileDescriptor, true );
 		} catch ( ... ) {
 			M_TEMP_FAILURE_RETRY( hcore::system::close( _fileDescriptor ) );
 			_fileDescriptor = -1;
@@ -245,7 +245,7 @@ HSocket::ptr_t HSocket::accept( void ) {
 		M_ENSURE( statusFlags >= 0 );
 		M_ENSURE( ::fcntl( socket->_fileDescriptor, F_SETFL, statusFlags | O_NONBLOCK ) == 0 );
 	}
-	system::set_close_on_exec( socket->_fileDescriptor );
+	system::set_close_on_exec( socket->_fileDescriptor, true );
 	socket->_addressSize = static_cast<int>( addressSize );
 	socket->_needShutdown = true;
 	socket->set_timeout( _timeout );

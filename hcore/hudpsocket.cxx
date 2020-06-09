@@ -77,7 +77,7 @@ void HUDPSocket::init( MODE type_ ) {
 			M_ENSURE( statusFlags >= 0 );
 			M_ENSURE( ::fcntl( _fileDescriptor, F_SETFL, statusFlags | O_NONBLOCK ) == 0 );
 		}
-	system::set_close_on_exec( _fileDescriptor );
+	system::set_close_on_exec( _fileDescriptor, true );
 	return;
 	M_EPILOG
 }

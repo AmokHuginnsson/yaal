@@ -355,11 +355,16 @@ yaal::hcore::HString get_self_exec_path( void ) {
 	M_EPILOG
 }
 
-void set_close_on_exec( int fd_ ) {
+void set_close_on_exec( int fd_, bool setIt_ ) {
 	M_PROLOG
 	int fdFlags( ::fcntl( fd_, F_GETFD, 0 ) );
 	M_ENSURE( fdFlags >= 0 );
-	M_ENSURE( ::fcntl( fd_, F_SETFD, fdFlags | FD_CLOEXEC ) == 0 );
+	if ( setIt_ ) {
+		fdFlags = fdFlags | FD_CLOEXEC;
+	} else {
+		fdFlags = fdFlags & ~FD_CLOEXEC;
+	}
+	M_ENSURE( ::fcntl( fd_, F_SETFD, fdFlags ) == 0 );
 	return;
 	M_EPILOG
 }
