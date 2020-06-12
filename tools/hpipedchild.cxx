@@ -482,7 +482,7 @@ void HPipedChild::spawn(
 		M_ENSURE( ::read( message[PIPE_END::OUT], &dummy, 1 ) == 1 );
 		if ( pgid_ >= PROCESS_GROUP_LEADER ) {
 			_processGroupId = pgid_ > PROCESS_GROUP_LEADER ? pgid_ : _pid;
-			M_ENSURE( ( ::setpgid( _pid, _processGroupId ) == 0 ) || ( errno == EACCES ) );
+			M_ENSURE( ( ::setpgid( _pid, _processGroupId ) == 0 ) || ( errno == EACCES ) || ( errno == ESRCH ) );
 			if ( foreground_ ) {
 				bring_to_foreground();
 			}
