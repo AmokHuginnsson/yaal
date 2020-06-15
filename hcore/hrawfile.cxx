@@ -169,7 +169,7 @@ int long HRawFile::write_plain( void const* buffer_, int long size_ ) {
 	if ( _fileDescriptor < 0 ) {
 		M_THROW( _error_, errno );
 	}
-	int long iWritten = 0;
+	int long totalWritten( 0 );
 	do {
 		IO_EVENT_TYPE ioEventType( wait_for_io( _fileDescriptor, IO_EVENT_TYPE::WRITE, static_cast<int>( _timeout ) ) );
 		if ( ioEventType != IO_EVENT_TYPE::WRITE ) {
@@ -179,21 +179,25 @@ int long HRawFile::write_plain( void const* buffer_, int long size_ ) {
 					: _( "wait on write failed (interrupted)" )
 			);
 		}
-		int long ret = M_TEMP_FAILURE_RETRY(
-			::write(
-				_fileDescriptor,
-				static_cast<char const*>( buffer_ ) + iWritten,
-				static_cast<size_t>( size_ - iWritten )
+		int long nWrittenChunk(
+			M_TEMP_FAILURE_RETRY(
+				::write(
+					_fileDescriptor,
+					static_cast<char const*>( buffer_ ) + totalWritten,
+					static_cast<size_t>( size_ - totalWritten )
+				)
 			)
 		);
-		if ( ret < 0 ) {
-			iWritten = ret;
+		if ( nWrittenChunk > 0 ) {
+			totalWritten += nWrittenChunk;
+		} else if ( totalWritten > 0 ) {
 			break;
 		} else {
-			iWritten += ret;
+			totalWritten = nWrittenChunk;
+			break;
 		}
-	} while ( iWritten < size_ );
-	return ( iWritten );
+	} while ( totalWritten < size_ );
+	return ( totalWritten );
 	M_EPILOG
 }
 

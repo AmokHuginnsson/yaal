@@ -41,6 +41,7 @@ private:
 		void call( yaal::hcore::system::IO_EVENT_TYPE );
 		stream_id_t id( void ) const;
 		yaal::hcore::system::IO_EVENT_TYPE req_io_event_type( void ) const;
+		bool can_read_now( void ) const;
 	};
 	typedef yaal::hcore::HHashSet<HIOHandler::stream_id_t> dropped_io_handlers_t;
 public:
@@ -86,6 +87,7 @@ public:
 private:
 	void reconstruct( void );
 	bool dispatch( dropped_io_handlers_t const& );
+	bool dispatch_pending_reads( dropped_io_handlers_t const& );
 	void do_unregister_file_descriptor_handler( HIOHandler::stream_id_t );
 	/*! \brief Process incoming events from interrupt socket.
 	 */

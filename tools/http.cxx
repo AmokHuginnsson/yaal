@@ -136,6 +136,12 @@ private:
 	virtual void const* do_data( void ) const override {
 		return ( _socket->data() );
 	}
+	virtual int do_immediate_read_size( void ) const override {
+		return ( _socket->immediate_read_size() );
+	}
+	virtual int do_pending_write_size( void ) const override {
+		return ( _socket->pending_write_size() );
+	}
 	HHTTPStream( HHTTPStream const& src ) = delete;
 	HHTTPStream& operator = ( HHTTPStream const& src ) = delete;
 };

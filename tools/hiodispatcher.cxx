@@ -47,6 +47,10 @@ yaal::hcore::system::IO_EVENT_TYPE HIODispatcher::HIOHandler::req_io_event_type(
 	return ( _reqIOEventType );
 }
 
+bool HIODispatcher::HIOHandler::can_read_now( void ) const {
+	return ( _stream->immediate_read_size() > 0 );
+}
+
 HIODispatcher::HIODispatcher( int noFileHandlers_, int latency_ )
 	: _initialized( false )
 	, _loop( true )
@@ -150,7 +154,7 @@ void HIODispatcher::reconstruct( void ) {
 			pfd[i].fd = static_cast<int>( reinterpret_cast<int_native_t>( ioHandler.first->data() ) );
 			IO_EVENT_TYPE reqIOEventType( ioHandler.second.req_io_event_type() );
 			pfd[i].events = static_cast<int short>(
-				( !! ( reqIOEventType & IO_EVENT_TYPE::READ ) ? POLLIN : 0 )
+				( !! ( reqIOEventType & IO_EVENT_TYPE::READ ) ? ( POLLIN | POLLPRI ) : 0 )
 				| ( !! ( reqIOEventType & IO_EVENT_TYPE::WRITE ) ? POLLOUT : 0 )
 			);
 			pfd[i].revents = 0;
@@ -174,10 +178,24 @@ bool HIODispatcher::dispatch( dropped_io_handlers_t const& droppedIOHandlers_ ) 
 	for ( int i( 0 ), handlersCount( static_cast<int>( _handlers.get_size() ) ); i < handlersCount; ++ i ) {
 		HIOHandler& ioHandler( *_refs[i] );
 		yaal::hcore::system::IO_EVENT_TYPE res( IO_EVENT_TYPE::NONE );
-		res |= ( pfd[i].revents & POLLIN ? IO_EVENT_TYPE::READ : IO_EVENT_TYPE::NONE );
+		res |= ( pfd[i].revents & ( POLLIN | POLLPRI | POLLHUP ) ? IO_EVENT_TYPE::READ : IO_EVENT_TYPE::NONE );
 		res |= ( pfd[i].revents & POLLOUT ? IO_EVENT_TYPE::WRITE : IO_EVENT_TYPE::NONE );
 		if ( ( res != IO_EVENT_TYPE::NONE ) && ( droppedIOHandlers_.find( ioHandler.id() ) == droppedIOHandlers_.end() ) ) {
 			ioHandler.call( res );
+			active = true;
+		}
+	}
+	return ( active );
+	M_EPILOG
+}
+
+bool HIODispatcher::dispatch_pending_reads( dropped_io_handlers_t const& droppedIOHandlers_ ) {
+	M_PROLOG
+	bool active( false );
+	for ( int i( 0 ), handlersCount( static_cast<int>( _handlers.get_size() ) ); i < handlersCount; ++ i ) {
+		HIOHandler& ioHandler( *_refs[i] );
+		if ( ioHandler.can_read_now() && ( droppedIOHandlers_.find( ioHandler.id() ) == droppedIOHandlers_.end() ) ) {
+			ioHandler.call( IO_EVENT_TYPE::READ );
 			active = true;
 		}
 	}
@@ -196,6 +214,9 @@ void HIODispatcher::run( void ) {
 		reconstruct();
 		int pollResult( 0 );
 		int latency( _latency );
+		while ( dispatch_pending_reads( _droppedIOHandlers ) ) {
+			_idleCycles = 0;
+		}
 		do {
 			pollResult = ::poll( _pollfds.get<pollfd>(), static_cast<nfds_t>( _handlers.get_size() ), latency );
 			if ( latency > 0 ) {

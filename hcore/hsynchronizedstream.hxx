@@ -86,6 +86,8 @@ protected:
 	virtual HStreamInterface& do_consume( yaal::hcore::HString const& ) override;
 	virtual HStreamInterface& do_ignore( int ) override;
 	virtual int do_peek( void ) override;
+	virtual int do_immediate_read_size( void ) const override;
+	virtual int do_pending_write_size( void ) const override;
 	virtual HStreamInterface& do_set_fill( code_point_t ) override;
 	virtual HStreamInterface& do_set_width( int ) override;
 	virtual HStreamInterface& do_set_precision( int ) override;

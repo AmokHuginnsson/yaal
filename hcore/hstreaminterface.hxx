@@ -444,6 +444,20 @@ public:
 	int peek( void ) {
 		return ( do_peek() );
 	}
+	/*! \brief Get number of bytes available immediately for reading.
+	 *
+	 * Get number of bytes that were already read from the underlying medium and are ready for immediate extraction.
+	 */
+	int immediate_read_size( void ) const {
+		return ( do_immediate_read_size() );
+	}
+	/*! \brief Get number of bytes pending for write operation.
+	 *
+	 * In other words, get number of bytes that are buffered and ready to be flushed to the underlying medium.
+	 */
+	int pending_write_size( void ) const {
+		return ( do_pending_write_size() );
+	}
 	HStreamInterface& set_skipws( bool skipWS_ ) {
 		return ( do_set_skipws( skipWS_ ) );
 	}
@@ -557,6 +571,8 @@ protected:
 	virtual HStreamInterface& do_consume( yaal::hcore::HString const& );
 	virtual HStreamInterface& do_ignore( int );
 	virtual int do_peek( void );
+	virtual int do_immediate_read_size( void ) const;
+	virtual int do_pending_write_size( void ) const;
 	virtual HStreamInterface& do_set_fill( code_point_t );
 	virtual HStreamInterface& do_set_width( int );
 	virtual HStreamInterface& do_set_precision( int );

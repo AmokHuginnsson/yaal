@@ -657,6 +657,8 @@ protected:
 	virtual bool do_good( void ) const override;
 	virtual bool do_fail( void ) const override;
 	virtual bool do_bad( void ) const override;
+	virtual int do_immediate_read_size( void ) const override;
+	virtual int do_pending_write_size( void ) const override;
 };
 
 HTee tee( yaal::hcore::HStreamInterface::ptr_t, yaal::hcore::HStreamInterface::ptr_t  );

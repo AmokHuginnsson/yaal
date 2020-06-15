@@ -603,6 +603,32 @@ int HSynchronizedStream::do_peek( void ) {
 	M_EPILOG
 }
 
+int HSynchronizedStream::do_immediate_read_size( void ) const {
+	M_PROLOG
+	HLock l( _mutex );
+	int code( 0 );
+	if ( _streamRef == this ) {
+		code = HStreamInterface::do_immediate_read_size();
+	} else if ( _streamRef ) {
+		code = _streamRef->immediate_read_size();
+	}
+	return ( code );
+	M_EPILOG
+}
+
+int HSynchronizedStream::do_pending_write_size( void ) const {
+	M_PROLOG
+	HLock l( _mutex );
+	int code( 0 );
+	if ( _streamRef == this ) {
+		code = HStreamInterface::do_pending_write_size();
+	} else if ( _streamRef ) {
+		code = _streamRef->pending_write_size();
+	}
+	return ( code );
+	M_EPILOG
+}
+
 HStreamInterface& HSynchronizedStream::do_set_fill( code_point_t val_ ) {
 	M_PROLOG
 	HLock l( _mutex );

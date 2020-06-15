@@ -749,6 +749,14 @@ int HStreamInterface::do_peek( void ) {
 	return ( _cachedBytes > 0 ? _cache.get<char>()[ 0 ] : INVALID_CHARACTER );
 }
 
+int HStreamInterface::do_immediate_read_size( void ) const {
+	return ( _cacheContent == CACHE_CONTENT::READ ? _cachedBytes : 0 );
+}
+
+int HStreamInterface::do_pending_write_size( void ) const {
+	return ( _cacheContent == CACHE_CONTENT::WRITE ? _cachedBytes : 0 );
+}
+
 bool HStreamInterface::read_word( void ) {
 	M_PROLOG
 	if ( ! _skipWS ) {

@@ -110,6 +110,12 @@ private:
 	virtual void const* do_data( void ) const override {
 		return ( _stream->data() );
 	}
+	virtual int do_immediate_read_size( void ) const override {
+		return ( _stream->immediate_read_size() );
+	}
+	virtual int do_pending_write_size( void ) const override {
+		return ( _stream->pending_write_size() );
+	}
 	HStreamDecorator( HStreamDecorator const& src ) = delete;
 	HStreamDecorator& operator = ( HStreamDecorator const& src ) = delete;
 };

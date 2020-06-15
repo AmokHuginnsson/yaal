@@ -270,6 +270,18 @@ bool HTee::do_bad( void ) const {
 	M_EPILOG
 }
 
+int HTee::do_immediate_read_size( void ) const {
+	M_PROLOG
+	return ( min( _stream1.immediate_read_size(), _stream2.immediate_read_size() ) );
+	M_EPILOG
+}
+
+int HTee::do_pending_write_size( void ) const {
+	M_PROLOG
+	return ( min( _stream1.pending_write_size(), _stream2.pending_write_size() ) );
+	M_EPILOG
+}
+
 HTee tee( HStreamInterface::ptr_t stream1_, HStreamInterface::ptr_t stream2_ ) {
 	M_PROLOG
 	return ( HTee( *stream1_, *stream2_ ) );
