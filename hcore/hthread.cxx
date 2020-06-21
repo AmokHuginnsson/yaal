@@ -290,12 +290,27 @@ HMutex::~HMutex( void ) {
 
 void HMutex::lock( void ) {
 	M_PROLOG
-	int error = ::pthread_mutex_lock( _buf.get<pthread_mutex_t>() );
+	int error( ::pthread_mutex_lock( _buf.get<pthread_mutex_t>() ) );
 	if ( _type != TYPE::RECURSIVE ) {
 		M_ENSURE( error != EDEADLK );
 	}
 	_owner = HThread::get_current_thread_id();
 	return;
+	M_EPILOG
+}
+
+bool HMutex::try_lock( void ) {
+	M_PROLOG
+	int error( ::pthread_mutex_trylock( _buf.get<pthread_mutex_t>() ) );
+	if ( _type != TYPE::RECURSIVE ) {
+		M_ENSURE( error != EDEADLK );
+	}
+	if ( error == EBUSY ) {
+		return ( false );
+	}
+	M_ASSERT( error == 0 );
+	_owner = HThread::get_current_thread_id();
+	return ( true );
 	M_EPILOG
 }
 
@@ -320,12 +335,16 @@ void HMutex::reown( void ) {
 	M_EPILOG
 }
 
-HLock::HLock( HMutex& mutex_ )
+HLock::HLock( HMutex& mutex_, TYPE type_ )
 	: _mutex( &mutex_ )
 	, _locked( false ) {
 	M_PROLOG
-	_mutex->lock();
-	_locked = true;
+	if ( type_ == TYPE::DEFINITE ) {
+		_mutex->lock();
+		_locked = true;
+	} else {
+		_locked = _mutex->try_lock();
+	}
 	return;
 	M_EPILOG
 }

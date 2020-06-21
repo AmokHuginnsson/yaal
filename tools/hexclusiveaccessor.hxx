@@ -18,16 +18,19 @@ class HExclusiveAccessor final {
 	yaal::hcore::HLock _lock;
 public:
 	HExclusiveAccessor( yaal::hcore::HLock lock_, T object_ )
-		: _object( yaal::move( object_ ) ), _lock( yaal::move( lock_ ) ) {
+		: _object( yaal::move( object_ ) )
+		, _lock( yaal::move( lock_ ) ) {
 		return;
 	}
 	HExclusiveAccessor( HExclusiveAccessor&& ea_ )
-		: _object( yaal::move( ea_._object ) ), _lock( yaal::move( ea_._lock ) ) {
+		: _object( yaal::move( ea_._object ) )
+		, _lock( yaal::move( ea_._lock ) ) {
 		return;
 	}
 	template<typename real_t>
 	HExclusiveAccessor( HExclusiveAccessor<real_t>&& ea_ )
-		: _object( yaal::move( ea_._object ) ), _lock( yaal::move( ea_._lock ) ) {
+		: _object( yaal::move( ea_._object ) )
+		, _lock( yaal::move( ea_._lock ) ) {
 		return;
 	}
 	HExclusiveAccessor& operator = ( HExclusiveAccessor&& ea_ ) {

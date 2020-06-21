@@ -59,6 +59,12 @@ public:
 		return ( _return );
 		M_EPILOG
 	}
+	bool is_ready( void ) {
+		M_PROLOG
+		yaal::hcore::HLock l( _mutex, yaal::hcore::HLock::TYPE::TENTATIVE );
+		return ( l.owns_lock() ? _finished : false );
+		M_EPILOG
+	}
 private:
 	void execute( void ) {
 		M_PROLOG

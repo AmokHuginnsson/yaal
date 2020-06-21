@@ -223,12 +223,16 @@ typedef HExceptionT<HThread> HThreadException;
  */
 class HLock final {
 public:
+	enum class TYPE {
+		DEFINITE,
+		TENTATIVE
+	};
 	typedef HLock this_type;
 private:
 	HMutex* _mutex;
 	bool _locked;
 public:
-	explicit HLock( HMutex& );
+	explicit HLock( HMutex&, TYPE = TYPE::DEFINITE );
 	HLock( HLock&& ) noexcept;
 	HLock& operator = ( HLock&& ) noexcept;
 	~HLock( void );
