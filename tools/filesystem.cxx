@@ -323,7 +323,7 @@ void rename( path_t const& old_, path_t const& new_ ) {
 	return;
 }
 
-void create_directory( path_t const& path_, u32_t mode_, DIRECTORY_MODIFICATION directoryModification_ ) {
+void create_directory( path_t const& path_, DIRECTORY_MODIFICATION directoryModification_, u32_t mode_ ) {
 	M_PROLOG
 	HString path( normalize_path( path_ ) );
 	M_ENSURE( ! path.is_empty() );
@@ -345,7 +345,7 @@ void create_directory( path_t const& path_, u32_t mode_, DIRECTORY_MODIFICATION 
 			}
 			path.append( fn );
 			if ( real ) {
-				create_directory( path, mode_, DIRECTORY_MODIFICATION::EXACT );
+				create_directory( path, DIRECTORY_MODIFICATION::EXACT, mode_ );
 			}
 			path.append( "/" );
 		}
@@ -544,7 +544,7 @@ yaal::tools::filesystem::paths_t glob( path_t const& path_ ) {
 			++ trial._part;
 			if ( trial._part < pathParts.get_size() ) {
 				scan.emplace( trial );
-			} else {
+			} else if ( filesystem::exists( trial._path ) ) {
 				result.push_back( trial._path );
 			}
 		}

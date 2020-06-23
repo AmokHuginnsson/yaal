@@ -68,7 +68,7 @@ enum class DIRECTORY_MODIFICATION {
 	RECURSIVE
 };
 
-void create_directory( path_t const&, u32_t, DIRECTORY_MODIFICATION = DIRECTORY_MODIFICATION::EXACT );
+void create_directory( path_t const&, DIRECTORY_MODIFICATION = DIRECTORY_MODIFICATION::EXACT, u32_t = 0700 );
 void remove_directory( path_t const&, DIRECTORY_MODIFICATION = DIRECTORY_MODIFICATION::EXACT );
 
 typedef yaal::hcore::HArray<path_t> paths_t;

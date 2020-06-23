@@ -150,6 +150,30 @@ public:
 		return ( *object_ );
 		M_EPILOG
 	}
+	static HHuginn::value_t create_directory( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "FileSystem.create_directory", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
+		try {
+			filesystem::create_directory( get_string( values_[0] ), DIRECTORY_MODIFICATION::RECURSIVE );
+		} catch ( HFileSystemException const& e ) {
+			HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
+			thread_->raise( fsc->exception_class(), e.what(), position_ );
+		}
+		return ( *object_ );
+		M_EPILOG
+	}
+	static HHuginn::value_t remove_directory( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "FileSystem.remove_directory", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
+		try {
+			filesystem::remove_directory( get_string( values_[0] ), DIRECTORY_MODIFICATION::RECURSIVE );
+		} catch ( HFileSystemException const& e ) {
+			HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
+			thread_->raise( fsc->exception_class(), e.what(), position_ );
+		}
+		return ( *object_ );
+		M_EPILOG
+	}
 	static HHuginn::value_t path_transform( char const* name_, str_transform_func_t pathTransformFunc_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( name_, values_, { HHuginn::TYPE::STRING }, thread_, position_ );
@@ -323,6 +347,8 @@ HPackageCreatorInterface::HInstance HFileSystemCreator::do_new_instance( HRuntim
 		{ "glob",                      runtime_->create_method( &HFileSystem::glob ),    "( *pattern* ) - find pathnames matching a *pattern*" },
 		{ "disk_usage",                runtime_->create_method( &HFileSystem::disk_usage ),   "( *mountPoint* ) - get disk usage statistics for the file system mounted at *mountPoint*" },
 		{ "update_times",              runtime_->create_method( &HFileSystem::update_times ), "( *path*, *modTime*, *accessTime* ) - update modification (*modTime*) and access (*accessTime*) times of the file given by *path*" },
+		{ "create_directory",          runtime_->create_method( &HFileSystem::create_directory ),      "( *path* ) - create a new directory with given *path*" },
+		{ "remove_directory",          runtime_->create_method( &HFileSystem::remove_directory ),      "( *path* ) - recursively remove a directory at given *path*" },
 		{ "list_directory",            runtime_->create_method( &HFileSystem::list_directory ),        "( *path* ) - list content of the directory given by *path*" },
 		{ "set_working_directory",     runtime_->create_method( &HFileSystem::set_working_directory ), "( *path* ) - change working directory to given *path*" },
 		{ "current_working_directory", runtime_->create_method( &HFileSystem::current_working_directory ), "get current working directory path" }
