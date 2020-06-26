@@ -652,6 +652,21 @@ HHuginn::type_id_t verify_arg_collection_value_type(
 	return ( type );
 }
 
+void dispatch_callback_exception( yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, int position_ ) {
+	hcore::HString message;
+	message.assign( "Callback `" ).append( name_ ).append( "` throws an " );
+	try {
+		throw;
+	} catch ( yaal::hcore::HException const& e ) {
+		message.append( "exception: " ).append( e.what() );
+	} catch ( std::exception const& e ) {
+		message.append( "exception: " ).append( e.what() );
+	} catch ( ... ) {
+		message.append( "unknown exception!" );
+	}
+	thread_->raise( thread_->object_factory().exception_class(), message, position_ );
+}
+
 bool is_numeric( HClass const* class_ ) {
 	HHuginn::type_id_t t( class_ ? class_->type_id() : type_id( HHuginn::TYPE::UNKNOWN ) );
 	return (
