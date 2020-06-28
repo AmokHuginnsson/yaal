@@ -519,34 +519,37 @@ yaal::tools::filesystem::paths_t glob( path_t const& path_ ) {
 			} catch ( HRegexException const& ) {
 			}
 		}
-		if ( haveGlob ) {
-			HFSItem dir( trialPath );
-			if ( ! dir ) {
-				continue;
-			}
-			++ trial._part;
-			HString name;
-			HString newMatch;
-			for ( HFSItem const& f : dir ) {
-				name.assign( f.get_name() );
-				if ( ! globRE.matches( name ) || ( ( trial._part < pathParts.get_size() ) && ! f.is_directory() ) ) {
+		try {
+			if ( haveGlob ) {
+				HFSItem dir( trialPath );
+				if ( ! dir ) {
 					continue;
 				}
-				newMatch.assign( trial._path ).append( name );
+				++ trial._part;
+				HString name;
+				HString newMatch;
+				for ( HFSItem const& f : dir ) {
+					name.assign( f.get_name() );
+					if ( ! globRE.matches( name ) || ( ( trial._part < pathParts.get_size() ) && ! f.is_directory() ) ) {
+						continue;
+					}
+					newMatch.assign( trial._path ).append( name );
+					if ( trial._part < pathParts.get_size() ) {
+						scan.emplace( newMatch, trial._part );
+					} else {
+						result.push_back( newMatch );
+					}
+				}
+			} else {
+				trial._path.append( p );
+				++ trial._part;
 				if ( trial._part < pathParts.get_size() ) {
-					scan.emplace( newMatch, trial._part );
-				} else {
-					result.push_back( newMatch );
+					scan.emplace( trial );
+				} else if ( filesystem::exists( trial._path ) ) {
+					result.push_back( trial._path );
 				}
 			}
-		} else {
-			trial._path.append( p );
-			++ trial._part;
-			if ( trial._part < pathParts.get_size() ) {
-				scan.emplace( trial );
-			} else if ( filesystem::exists( trial._path ) ) {
-				result.push_back( trial._path );
-			}
+		} catch ( ... ) {
 		}
 	}
 	sort( result.begin(), result.end() );

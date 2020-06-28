@@ -280,16 +280,23 @@ public:
 		return ( v );
 		M_EPILOG
 	}
-	static HHuginn::value_t glob( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+	static HHuginn::value_t glob( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "FileSystem.glob", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
-		filesystem::paths_t paths( filesystem::glob( get_string( values_[0] ) ) );
+		HHuginn::value_t v( thread_->runtime().none_value() );
 		HHuginn::values_t data;
 		HObjectFactory& of( *thread_->runtime().object_factory() );
-		for ( filesystem::path_t& path : paths ) {
-			data.emplace_back( of.create_string( yaal::move( path ) ) );
+		try {
+			filesystem::paths_t paths( filesystem::glob( get_string( values_[0] ) ) );
+			for ( filesystem::path_t& path : paths ) {
+				data.emplace_back( of.create_string( yaal::move( path ) ) );
+			}
+			v = of.create_list( yaal::move( data ) );
+		} catch ( hcore::HException const& e ) {
+			HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
+			thread_->raise( fsc->exception_class(), e.what(), position_ );
 		}
-		return ( of.create_list( yaal::move( data ) ) );
+		return ( v );
 		M_EPILOG
 	}
 private:
