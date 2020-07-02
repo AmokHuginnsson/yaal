@@ -128,7 +128,8 @@ int main( int argc_, char** argv_ ) {
 			"LIBDIR",
 			"LIBEXECDIR",
 			"DATADIR",
-			"LOCALSTATEDIR"
+			"LOCALSTATEDIR",
+			"SHAREDSTATEDIR"
 		};
 		char const DEF[] = "define ";
 		static char const LIB_INFIX[] = "define LIB_INFIX";

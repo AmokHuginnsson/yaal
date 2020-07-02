@@ -52,6 +52,7 @@ build/%/$(1): configure $(1).in
 				$$(if $$(MANDIR),--mandir=$$(MANDIR)) \
 				$$(if $$(INCLUDEDIR),--includedir=$$(INCLUDEDIR)) \
 				$$(if $$(LOCALSTATEDIR),--localstatedir=$$(LOCALSTATEDIR)) \
+				$$(if $$(SHAREDSTATEDIR),--sharedstatedir=$$(SHAREDSTATEDIR)) \
 				$$(CONFIGURE) | tee -a make.log | awk -v CL="`tput cr;tput dl1`" '{printf CL"%s\r", $$$$0}' ; \
 		else \
 			../../configure \
@@ -66,6 +67,7 @@ build/%/$(1): configure $(1).in
 				$$(if $$(MANDIR),--mandir=$$(MANDIR)) \
 				$$(if $$(INCLUDEDIR),--includedir=$$(INCLUDEDIR)) \
 				$$(if $$(LOCALSTATEDIR),--localstatedir=$$(LOCALSTATEDIR)) \
+				$$(if $$(SHAREDSTATEDIR),--sharedstatedir=$$(SHAREDSTATEDIR)) \
 				$$(CONFIGURE) | tee -a make.log ; \
 		fi ; test -f $$(notdir $$(@)) || exit 1 ; touch -c config.hxx Makefile.mk yaalrc yaal.pc ; true)
 endef

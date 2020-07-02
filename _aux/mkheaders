@@ -69,6 +69,7 @@ fi
 sed -e "s/define[ \t]*PACKAGE_/define ${LIB_NAME_UC}_PACKAGE_/g" \
 	-e "s/define[ \t]*SYSCONFDIR/define ${LIB_NAME_UC}_SYSCONFDIR/g" \
 	-e "s/define[ \t]*LOCALSTATEDIR/define ${LIB_NAME_UC}_LOCALSTATEDIR/g" \
+	-e "s/define[ \t]*SHAREDSTATEDIR/define ${LIB_NAME_UC}_SHAREDSTATEDIR/g" \
 	-e "s/define[ \t]*BINDIR/define ${LIB_NAME_UC}_BINDIR/g" \
 	-e "s/define[ \t]*LIBDIR/define ${LIB_NAME_UC}_LIBDIR/g" \
 	-e "s/define[ \t]*LIBEXECDIR/define ${LIB_NAME_UC}_LIBEXECDIR/g" \

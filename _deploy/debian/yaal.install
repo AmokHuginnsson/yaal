@@ -1,2 +1,3 @@
 etc/*
 usr/lib/lib*[a-z]?.so*
+var/*

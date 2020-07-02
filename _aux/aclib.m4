@@ -110,6 +110,7 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 	EXE_SUFFIX=[""]
 	HOME_ENV_VAR=['"HOME"']
 	SYMBOL_PREFIX=['""']
+	sharedStateSubDir=["lib"]
 	if test ["x${HOST_OS_TYPE}"] = ["xLinux"] ; then
 		AC_SUBST([SERIAL_DEVICE],['ttyS0'])
 		AC_CHECK_PROG([LINUX_DISTRO],[lsb_release],[yes])
@@ -149,6 +150,7 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 		HOST_INFO="${HOST_OS_TYPE} `freebsd-version`"
 		EXTRA_INCLUDE_PATHS=["${EXTRA_INCLUDE_PATHS} -I/usr/local/include"]
 		EXTRA_LIBRARY_PATHS=["${EXTRA_LIBRARY_PATHS} -L/usr/local/lib"]
+		sharedStateSubDir=["db"]
 	elif test ["x${HOST_OS_TYPE}"] = ["xSunOS"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_SOLARIS__], [], [Your operating system is Solaris.])
 		HOST_OS_VENDOR=[Oracle]
@@ -176,6 +178,9 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 		LIB_EXT=["dll"]
 		HCORE_LIBS=["${HCORE_LIBS} -liconv"]
 	fi
+	if test ["x${sharedstatedir}"] = ["x\${prefix}/com"] ; then
+		sharedstatedir=["\${localstatedir}/${sharedStateSubDir}"]
+	fi
 	AC_DEFINE_UNQUOTED([SYMBOL_PREFIX],${SYMBOL_PREFIX},[Symbol prefix used on this platform.])
 	AC_DEFINE_UNQUOTED([LIB_PREFIX],"${LIB_PREFIX}",[Dynamic library file name prefix used on this platform.])
 	AC_DEFINE_UNQUOTED([LIB_INFIX],"${LIB_INFIX}",[Target dependent library name infix.])
@@ -188,6 +193,9 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 	AC_DEFINE_UNQUOTED([HOST_INFO],"${HOST_INFO}",[Target host Operating System version information string.])
 	AC_DEFINE_UNQUOTED([HOST_OS_TYPE],"${HOST_OS_TYPE}",[Target Operating System type string.])
 	AC_DEFINE_UNQUOTED([HOST_OS_VENDOR],"${HOST_OS_VENDOR}",[Target Operating System vendor information string.])
+	SHAREDSTATEDIR=`eval echo ${sharedstatedir}`
+	AC_DEFINE_UNQUOTED([SHAREDSTATEDIR], "${SHAREDSTATEDIR}", [The directory for installing architecture-independent data files which the programs modify while they run.])
+	AC_SUBST(SHAREDSTATEDIR,[${SHAREDSTATEDIR}])
 
 	if test ["x${HOST_OS_VENDOR}"] = ["x"] ; then
 		AC_MSG_ERROR([Cannot recognize host operating system type!])

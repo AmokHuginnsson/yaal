@@ -5,5 +5,5 @@ Abstract: This manual describes what yaal is and how it can be used.
 Section: Programming
 
 Format: HTML
-Index: /usr/share/doc/yaal-doc/html/index.html
-Files: /usr/share/doc/yaal-doc/html/*.html
+Index: /usr/share/doc/yaal/html/index.html
+Files: /usr/share/doc/yaal/html/*.html

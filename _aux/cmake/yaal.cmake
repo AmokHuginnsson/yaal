@@ -290,7 +290,7 @@ add_dependencies( hdata hconsole dbwrapper tools hcore )
 
 set( RUNTIME_DESTINATION lib )
 set( HEADER_TARGET "${TARGET_PATH}/include/yaal/yaal.hxx" )
-set( SSL_KEYS_DIR "db/${PROJECT_NAME}/keys/" )
+set( SSL_KEYS_DIR "${CMAKE_INSTALL_SHAREDSTATEDIR}/${PROJECT_NAME}/keys/" )
 set( SSL_KEYS "${SSL_KEYS_DIR}/key ${SSL_KEYS_DIR}/pem" )
 
 if ( CMAKE_HOST_WIN32 )
@@ -446,7 +446,7 @@ else()
 endif()
 
 install( DIRECTORY ${TARGET_PATH}/include/yaal DESTINATION include COMPONENT devel )
-install( DIRECTORY ${TARGET_PATH}/db DESTINATION ${localstatedir} )
+install( DIRECTORY ${TARGET_PATH}/${CMAKE_INSTALL_SHAREDSTATEDIR} DESTINATION ${localstatedir} )
 install( FILES ${TARGET_PATH}/yaalrc DESTINATION ${CMAKE_INSTALL_FULL_SYSCONFDIR} )
 install( FILES ${TARGET_PATH}/yaal.pc DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/pkgconfig )
 

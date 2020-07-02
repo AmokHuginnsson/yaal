@@ -1,6 +1,5 @@
 usr/include/*
-usr/lib/lib*-d.a
+usr/lib/lib*.a
 usr/lib/lib*-d.so*
 usr/share/pkgconfig/*
 usr/share/yaal
-
