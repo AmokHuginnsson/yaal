@@ -286,6 +286,45 @@ public:
 		return ( thread_->runtime().boolean_value( flag ) );
 		M_EPILOG
 	}
+	static HHuginn::value_t parse_integer( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "Text.parse_integer", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
+		hcore::HString const& s( get_string( values_[0] ) );
+		int long long val( 0L );
+		try {
+			val = util::unit_str_to_integer( s );
+		} catch ( hcore::HException const& e ) {
+			thread_->raise( thread_->object_factory().conversion_exception_class(), e.what(), position_ );
+		}
+		return ( thread_->object_factory().create_integer( val ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t parse_real( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "Text.parse_real", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
+		hcore::HString const& s( get_string( values_[0] ) );
+		double long val( 0.L );
+		try {
+			val = util::unit_str_to_real( s );
+		} catch ( hcore::HException const& e ) {
+			thread_->raise( thread_->object_factory().conversion_exception_class(), e.what(), position_ );
+		}
+		return ( thread_->object_factory().create_real( val ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t parse_number( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_signature( "Text.parse_number", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
+		hcore::HString const& s( get_string( values_[0] ) );
+		yaal::hcore::HNumber val;
+		try {
+			val = util::unit_str_to_number( s );
+		} catch ( hcore::HException const& e ) {
+			thread_->raise( thread_->object_factory().conversion_exception_class(), e.what(), position_ );
+		}
+		return ( thread_->object_factory().create_number( yaal::move( val ) ) );
+		M_EPILOG
+	}
 };
 
 namespace package_factory {
@@ -317,6 +356,9 @@ HPackageCreatorInterface::HInstance HTextCreator::do_new_instance( HRuntime* run
 		{ "cardinal", runtime_->create_method( &HText::ordinal_cardinal, "Text.cardinal", &util::cardinal ),   "( *int* ) - get text representation of a cardinal number *int*" },
 		{ "capitalize",             runtime_->create_method( &HText::capitalize ),             "( *str* ) - return \"Capitalized\" version of input \"capItaLiZeD\" *str*" },
 		{ "parse_boolean_flag",     runtime_->create_method( &HText::parse_boolean_flag ),     "( *str* ) - interpret *str* as a boolean flag" },
+		{ "parse_integer",          runtime_->create_method( &HText::parse_integer ),          "( *str* ) - interpret *str* as an integer with a SI unit suffix" },
+		{ "parse_real",             runtime_->create_method( &HText::parse_real ),             "( *str* ) - interpret *str* as a real with a SI unit suffix" },
+		{ "parse_number",           runtime_->create_method( &HText::parse_number ),           "( *str* ) - interpret *str* as a number with a SI unit suffix" },
 		{ "character_class",        runtime_->create_method( &HText::character_class ),        "( *class* ) - get given character *class*" },
 		{ "substitute_environment", runtime_->create_method( &HText::substitute_environment ), "( *str*[, *recursively*] ) - (*recursively*) substitute environment variables in *str*" }
 	};

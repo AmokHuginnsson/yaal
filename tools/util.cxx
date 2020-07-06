@@ -17,6 +17,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "xmath.hxx"
 #include "ansi.hxx"
 #include "hcore/hprogramoptionshandler.hxx"
+#include "hcore/si.hxx"
 #include "hcore/random.hxx"
 #include "hcore/hstack.hxx"
 #include "hcore/hregex.hxx"
@@ -60,6 +61,74 @@ HString& usun_ogonki( HString& string_ ) {
 yaal::hcore::HString article( yaal::hcore::HString const& word_ ) {
 	int long pos( word_.find_one_of( character_class<CHARACTER_CLASS::LETTER>().data() ) );
 	return ( pos != HString::npos ? ( character_class<CHARACTER_CLASS::VOWEL>().has( word_[pos] ) ? "an" : "a" ) : "" );
+}
+
+namespace {
+
+int long long str_to_unit( yaal::hcore::HString const& str_ ) {
+	typedef yaal::hcore::HHashMap<yaal::hcore::HString, int long long> str_to_unit_t;
+	static str_to_unit_t const strToUnit( {
+		{ "K",   si::PREFIX::KILO }, { "KB",  si::PREFIX::KILO }, { "Ki",  si::PREFIX::KIBI }, { "Ko",  si::PREFIX::KIBI }, { "KiB", si::PREFIX::KIBI },
+		{ "M",   si::PREFIX::MEGA }, { "MB",  si::PREFIX::MEGA }, { "Mi",  si::PREFIX::MEBI }, { "Mo",  si::PREFIX::MEBI }, { "MiB", si::PREFIX::MEBI },
+		{ "G",   si::PREFIX::GIGA }, { "GB",  si::PREFIX::GIGA }, { "Gi",  si::PREFIX::GIBI }, { "Go",  si::PREFIX::GIBI }, { "GiB", si::PREFIX::GIBI },
+		{ "T",   si::PREFIX::TERA }, { "TB",  si::PREFIX::TERA }, { "Ti",  si::PREFIX::TEBI }, { "To",  si::PREFIX::TEBI }, { "TiB", si::PREFIX::TEBI },
+		{ "P",   si::PREFIX::PETA }, { "PB",  si::PREFIX::PETA }, { "Pi",  si::PREFIX::PEBI }, { "Po",  si::PREFIX::PEBI }, { "PiB", si::PREFIX::PEBI },
+		{ "E",   si::PREFIX::EXA  }, { "PB",  si::PREFIX::EXA  }, { "Ei",  si::PREFIX::EXBI }, { "Eo",  si::PREFIX::EXBI }, { "EiB", si::PREFIX::EXBI }
+	} );
+	if ( str_.is_empty() ) {
+		return ( 1LL );
+	}
+	str_to_unit_t::const_iterator it( strToUnit.find( str_ ) );
+	if ( it == strToUnit.end() ) {
+		throw HRuntimeException( "Not a SI unit suffix: `"_ys.append( str_ ).append( "`" ) );
+	}
+	return ( it->second );
+}
+
+char const UNIT_START_CHAR[] = "KMGTPE";
+
+}
+
+int long long unit_str_to_integer( yaal::hcore::HString const& str_ ) {
+	M_PROLOG
+	int len( 0 );
+	int long long val( stoll( str_, &len ) );
+	HString unitStr( str_.substr( len ) );
+	unitStr.trim();
+	return ( val * str_to_unit( unitStr ) );
+	M_EPILOG
+}
+
+double long unit_str_to_real( yaal::hcore::HString const& str_ ) {
+	M_PROLOG
+	HString::size_type pos( str_.find_one_of( UNIT_START_CHAR ) );
+	HString unitStr;
+	HString str;
+	if ( pos != HString::npos ) {
+		unitStr.assign( str_, pos );
+		str.assign( str_, 0, pos );
+	} else {
+		str.assign( str_ );
+	}
+	double long val( atof_ex( str, true ) );
+	return ( val * static_cast<double long>( str_to_unit( unitStr ) ) );
+	M_EPILOG
+}
+
+yaal::hcore::HNumber unit_str_to_number( yaal::hcore::HString const& str_ ) {
+	M_PROLOG
+	HString::size_type pos( str_.find_one_of( UNIT_START_CHAR ) );
+	HString unitStr;
+	HString str;
+	if ( pos != HString::npos ) {
+		unitStr.assign( str_, pos );
+		str.assign( str_, 0, pos );
+	} else {
+		str.assign( str_ );
+	}
+	HNumber val( str );
+	return ( val * str_to_unit( unitStr ) );
+	M_EPILOG
 }
 
 double long atof_ex( HString const& string_, bool parse_ ) {

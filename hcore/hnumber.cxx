@@ -449,15 +449,25 @@ void HNumber::from_unsigned_integer( int long long unsigned number_ ) {
 void HNumber::from_string( HString const& number_ ) {
 	M_PROLOG
 	/* ! - represent known but invalid character, ? - represent unknown character */
+	if ( number_.is_empty() ) {
+		throw HNumberException( "Invalid argument: empty string" ); /* exclude "" */
+	}
 	integer_t start( static_cast<integer_t>( number_.find_one_of( VALID_CHARACTERS ) ) );
-	M_ENSURE( start != HString::npos ); /* exclude "!!!!" */
+	char const NO_DIGITS[] = "Invalid argument: no digits found";
+	if ( start == HString::npos ) {
+		throw HNumberException( NO_DIGITS ); /* exclude "!!!!" */
+	}
 	_negative = ( number_[ start ] == VALID_CHARACTERS[ A_MINUS ] ); /* "!!!-???" */
 	if ( _negative ) {
 		++ start;
 	}
 	integer_t len( static_cast<integer_t>( number_.get_length() ) );
-	M_ENSURE( start < len ); /* exclude "!!-" */
-	M_ENSURE( number_.find_one_of( DIGITS_AND_DOT, start ) == start ); /* exclude "--" and "-!!" */
+	if ( start >= len ) {
+		throw HNumberException( NO_DIGITS ); /* exclude "!!-" */
+	}
+	if ( number_.find_one_of( DIGITS_AND_DOT, start ) != start ) {
+		throw HNumberException( NO_DIGITS ); /* exclude "--" and "-!!" */
+	}
 	integer_t idx( static_cast<integer_t>( number_.find_other_than( "0", start ) ) ); /* skip leading 0s */
 	_integralPartSize = 0;
 	_leafCount = 0;
@@ -475,8 +485,12 @@ void HNumber::from_string( HString const& number_ ) {
 			if ( ( digit == HString::npos ) && ( firstValid < start ) ) {
 				break;
 			}
-			M_ENSURE( digit != HString::npos ); /* must have digit */
-			M_ENSURE( ( digit - start ) <= 1 ); /* exclude "-..!!" and "..!!" */
+			if ( digit == HString::npos ) {
+				throw HNumberException( NO_DIGITS ); /* must have digit */
+			}
+			if ( ( digit - start ) > 1 ) {
+				throw HNumberException( "Invalid argument: malformed point notation" ); /* exclude "-..!!" and "..!!" */
+			}
 			integer_t end( static_cast<integer_t>( number_.find_other_than( dot >= 0 ? DIGITS : DIGITS_AND_DOT, dot >= 0 ? dot + 1 : start ) ) );
 			( end != HString::npos ) || ( end = len );
 			int denormalizedEnd( end );
@@ -542,13 +556,18 @@ void HNumber::from_string( HString const& number_ ) {
 				break;
 			}
 			int exponentStartIdx( denormalizedEnd + 1 );
-			M_ENSURE( exponentStartIdx < len );
+			char const ERR_EXPON[] = "Invalid argument: malformed exponential notation";
+			if ( exponentStartIdx >= len ) {
+				throw HNumberException( ERR_EXPON );
+			}
 			int exponentIdx( exponentStartIdx );
 			code_point_t exponentStartChar( number_[exponentIdx] );
 			if ( ( exponentStartChar == '-'_ycp ) || ( exponentStartChar == '+'_ycp ) ) {
 				++ exponentIdx;
 			}
-			M_ENSURE( ( exponentIdx < len ) && ( DIGITS.find( number_[exponentIdx] ) != HString::npos ) );
+			if ( ( exponentIdx >= len ) || ( DIGITS.find( number_[exponentIdx] ) == HString::npos ) ) {
+				throw HNumberException( ERR_EXPON );
+			}
 			if ( exponentStartChar == '+'_ycp ) {
 				++ exponentStartIdx;
 			}
