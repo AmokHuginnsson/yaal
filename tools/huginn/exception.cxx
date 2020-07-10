@@ -222,7 +222,7 @@ yaal::hcore::HString HStackFrameInfo::do_to_string( huginn::HThread*, HHuginn::v
 }
 
 HHuginn::value_t HStackFrameInfo::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
-	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on StackFrameInfo.", thread_->current_frame()->file_id(), position_ );
+	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on StackFrameInfo.", thread_->file_id(), position_ );
 }
 
 HHuginn::class_t HStackFrameInfo::get_class( HRuntime* runtime_ ) {

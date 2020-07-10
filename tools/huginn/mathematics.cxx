@@ -82,7 +82,7 @@ public:
 			precision = static_cast<int>( get_integer( values_[1] ) );
 		}
 		if ( precision < 0 ) {
-			throw HHuginn::HHuginnRuntimeException( "Bad precision requested: "_ys.append( precision ), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Bad precision requested: "_ys.append( precision ), thread_->file_id(), position_ );
 		}
 		HHuginn::value_t v;
 		if ( fr.function().id() == bit_cast<void const*>( &builtin::number ) ) {
@@ -95,7 +95,7 @@ public:
 					.append( " can be either `number' or `real' type, not a `" )
 					.append( thread_->runtime().identifier_name( fr.identifier_id() ) )
 					.append( "'." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -407,7 +407,7 @@ public:
 			to = static_cast<int>( get_integer( values_[1] ) );
 		}
 		if ( to < 0 ) {
-			throw HHuginn::HHuginnRuntimeException( "Invalid requested round value: "_ys.append( to ), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Invalid requested round value: "_ys.append( to ), thread_->file_id(), position_ );
 		}
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
@@ -476,7 +476,7 @@ public:
 			hcore::HNumber const& n1( get_number( values_[0] ) );
 			hcore::HNumber const& n2( get_number( values_[1] ) );
 			if ( ! ( n1.is_integral() && n2.is_integral() ) ) {
-				throw HHuginn::HHuginnRuntimeException( "Invalid argument.", thread_->current_frame()->file_id(), position_ );
+				throw HHuginn::HHuginnRuntimeException( "Invalid argument.", thread_->file_id(), position_ );
 			}
 			v = thread_->object_factory().create_number(
 				math::greatest_common_divisor( n1, n2 )
@@ -495,7 +495,7 @@ public:
 		hcore::HNumber const& n1( get_number( values_[0] ) );
 		hcore::HNumber const& n2( get_number( values_[1] ) );
 		if ( ( n1 < 0 ) || ( n2 < 0 ) || ( n2 > n1 ) || ! n1.is_integral() || ! n2.is_integral() ) {
-			throw HHuginn::HHuginnRuntimeException( "Invalid argument.", thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Invalid argument.", thread_->file_id(), position_ );
 		}
 		return ( thread_->object_factory().create_number( xmath::binomial_coefficient( n1, n2 ) ) );
 		M_EPILOG
@@ -506,7 +506,7 @@ public:
 		huginn::HInteger::value_type mod( get_integer( values_[0] ) );
 		huginn::HInteger::value_type val( get_integer( values_[1] ) );
 		if ( ( mod <= 0 ) || ( val <= 0 ) || ( val >= mod ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Invalid argument.", thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Invalid argument.", thread_->file_id(), position_ );
 		}
 		huginn::HInteger::value_type res( 0 );
 		HModularMultiplicativeInverse mmi( xmath::modular_multiplicative_inverse( mod, val ) );
@@ -525,7 +525,7 @@ public:
 		huginn::HInteger::value_type fact2( get_integer( values_[1] ) );
 		huginn::HInteger::value_type mod( get_integer( values_[2] ) );
 		if ( ( mod <= 0 ) || ( fact1 < 0 ) || ( fact2 < 0 ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Invalid argument.", thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Invalid argument.", thread_->file_id(), position_ );
 		}
 		return ( thread_->object_factory().create_integer( xmath::modular_multiplication( fact1, fact2, mod ) ) );
 		M_EPILOG

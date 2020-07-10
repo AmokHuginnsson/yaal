@@ -171,7 +171,7 @@ yaal::hcore::HString replacer( huginn::HThread* thread_, HHuginn::value_t& repla
 			"User supplied `replacer` function must return a string type instead of "_ys
 				.append( a_type_name( v->get_class() ) )
 				.append( "." ),
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}

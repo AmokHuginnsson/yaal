@@ -208,7 +208,7 @@ public:
 		verify_signature( "OperatingSystem.set_umask", values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
 		HInteger::value_type v( get_integer( values_[0] ) );
 		if ( ( v < 0 ) || ( v > 07777 ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Bad umask value: "_ys.append( v ), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Bad umask value: "_ys.append( v ), thread_->file_id(), position_ );
 		}
 		system::set_umask( static_cast<system::mode_t>( v ) );
 		return ( *object_ );
@@ -243,7 +243,7 @@ public:
 		if ( data.get_size() != 2 ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"Invalid resource limit shape: "_ys.append( data.get_size() ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -309,7 +309,7 @@ public:
 			if ( static_cast<HStream*>( values_[i].raw() )->raw()->poll_type() == HStreamInterface::POLL_TYPE::EMULATED ) {
 				throw HHuginn::HHuginnRuntimeException(
 					"Invalid `"_ys.append( streamName[i - 3] ).append( "` stream type." ),
-					thread_->current_frame()->file_id(),
+					thread_->file_id(),
 					position_
 				);
 			}

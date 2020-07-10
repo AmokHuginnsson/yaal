@@ -154,7 +154,7 @@ HHuginn::value_t blob( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 	if ( s <= 0 ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Invalid `blob` size requested: "_ys.append( s ),
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -164,7 +164,7 @@ HHuginn::value_t blob( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 	} catch ( ... ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Requested `blob` size is too big: "_ys.append( s ),
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -196,7 +196,7 @@ HHuginn::value_t size( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 				"User supplied `get_size` method returned an invalid type "_ys
 					.append( a_type_name( res->get_class() ) )
 					.append( " instead of an `integer`." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -204,7 +204,7 @@ HHuginn::value_t size( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 	} else {
 		throw HHuginn::HHuginnRuntimeException(
 			"Getting size of "_ys.append( a_type_name( v->get_class() ) ).append( "s is not supported." ),
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -235,7 +235,7 @@ HHuginn::value_t observe( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::
 	if ( v->type_id() == HHuginn::TYPE::OBSERVER ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Making an *observer* out of an *observer*.",
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -291,7 +291,7 @@ HHuginn::value_t n_ary_action( char const* name_, n_ary_action_t action_, huginn
 	huginn::HIterable::iterator_t it( const_cast<huginn::HIterable*>( iterable )->iterator( thread_, position_ ) );
 	if ( ! it->is_valid( thread_, position_ ) ) {
 		throw HHuginn::HHuginnRuntimeException(
-			hcore::to_string( name_ ).append( " on empty." ), thread_->current_frame()->file_id(), position_
+			hcore::to_string( name_ ).append( " on empty." ), thread_->file_id(), position_
 		);
 	}
 	accumulator = it->value( thread_, position_ );
@@ -302,7 +302,7 @@ HHuginn::value_t n_ary_action( char const* name_, n_ary_action_t action_, huginn
 		HHuginn::value_t v( it->value( thread_, position_ ) );
 		if ( v->get_class() != c ) {
 			throw HHuginn::HHuginnRuntimeException(
-				"A non-uniform set under "_ys.append( name_ ).append( "." ), thread_->current_frame()->file_id(), position_
+				"A non-uniform set under "_ys.append( name_ ).append( "." ), thread_->file_id(), position_
 			);
 		}
 		( accumulator.raw()->*action_ )( thread_, accumulator, v, position_ );
@@ -346,7 +346,7 @@ HHuginn::value_t print( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::va
 	} else {
 		throw HHuginn::HHuginnRuntimeException(
 			"Printing `"_ys.append( v->get_class()->name() ).append( "`s is not supported." ),
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -377,7 +377,7 @@ HHuginn::value_t assert( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::v
 		if ( argc > 2 ) {
 			message.append( " " ).append( get_string( values_[1] ) );
 		}
-		throw HHuginn::HHuginnRuntimeException( message, thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( message, thread_->file_id(), position_ );
 	}
 	return ( thread_->runtime().none_value() );
 	M_EPILOG

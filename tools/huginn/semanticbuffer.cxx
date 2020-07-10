@@ -46,7 +46,7 @@ void HSemanticBuffer::serialize( HHuginn::value_t const& val_ ) {
 	M_PROLOG
 	_cycleTracker.check(
 		val_.raw(),
-		_context._thread->current_frame()->file_id(),
+		_context._thread->file_id(),
 		_context._position
 	);
 	yaal::u8_t t( static_cast<u8_t>( val_->type_id().get() ) );
@@ -141,7 +141,7 @@ void HSemanticBuffer::serialize( HHuginn::value_t const& val_ ) {
 				"`"_ys
 					.append( val_->get_class()->name() )
 					.append( "` is not a serializable type." ),
-				_context._thread->current_frame()->file_id(),
+				_context._thread->file_id(),
 				_context._position
 			);
 		}

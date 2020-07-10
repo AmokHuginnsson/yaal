@@ -301,7 +301,7 @@ HHuginn::value_t HTuple::do_operator_subscript( HThread* thread_, HHuginn::value
 }
 
 void HTuple::do_operator_subscript_assign( HThread* thread_, HHuginn::value_t&, HHuginn::value_t const&, HHuginn::value_t&&, int position_ ) {
-	throw HHuginn::HHuginnRuntimeException( "`tuple` does not support item assignment.", thread_->current_frame()->file_id(), position_ );
+	throw HHuginn::HHuginnRuntimeException( "`tuple` does not support item assignment.", thread_->file_id(), position_ );
 }
 
 HHuginn::value_t HTuple::do_operator_range( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& from_, HHuginn::value_t const& to_, HHuginn::value_t const& step_, int position_ ) const {

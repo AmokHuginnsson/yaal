@@ -366,7 +366,7 @@ HHuginn::value_t HLookup::get( huginn::HThread* thread_, HHuginn::value_t const&
 	HAnchorGuard<HLookup> ag( *this, thread_, position_ );
 	values_t::const_iterator it( _data.find( key_ ) );
 	if ( ! ( it != _data.end() ) ) {
-		throw HHuginn::HHuginnRuntimeException( "Key does not exist in `lookup`.", thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Key does not exist in `lookup`.", thread_->file_id(), position_ );
 	}
 	return ( it->second );
 	M_EPILOG

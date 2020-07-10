@@ -257,7 +257,7 @@ void HOrder::verify_key_type( huginn::HThread* thread_, HClass const* keyType_, 
 	if ( _keyType && ( keyType_ != _keyType ) ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Non-uniform key types, got "_ys.append( a_type_name( keyType_ ) ).append( " instead of " ).append( a_type_name( _keyType ) ).append( "." ),
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}

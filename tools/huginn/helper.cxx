@@ -168,7 +168,7 @@ void verify_arg_count( char const* name_, HHuginn::values_t& values_, int min_, 
 					.append( "`, expected exactly: " )
 					.append( min_ ).append( ", got: " )
 					.append( argCount ).append( "." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -181,7 +181,7 @@ void verify_arg_count( char const* name_, HHuginn::values_t& values_, int min_, 
 					.append( "`, expected at least: " )
 					.append( min_ ).append( ", got: " )
 					.append( argCount ).append( "." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		} else if ( argCount > max_ ) {
@@ -192,7 +192,7 @@ void verify_arg_count( char const* name_, HHuginn::values_t& values_, int min_, 
 					.append( "`, expected at most: " )
 					.append( max_ ).append( ", got: " )
 					.append( argCount ).append( "." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -273,7 +273,7 @@ void fail_arg_type(
 			.append( ", not " )
 			.append( a_type_name( values_[no_]->get_class() ) )
 			.append( "." ),
-		thread_->current_frame()->file_id(),
+		thread_->file_id(),
 		position_
 	);
 	M_EPILOG
@@ -357,7 +357,7 @@ HHuginn::type_id_t verify_arg_type(
 				.append( "}, not " )
 				.append( a_type_name( values_[no_]->get_class() ) )
 				.append( "." ),
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -399,7 +399,7 @@ HHuginn::type_id_t verify_arg_type(
 				.append( "}, not " )
 				.append( a_type_name( values_[no_]->get_class() ) )
 				.append( "." ),
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -426,7 +426,7 @@ HHuginn::type_id_t verify_arg_numeric(
 				.append( "argument must be a numeric type, either a `number` or a `real`, not " )
 				.append( a_type_name( values_[no_]->get_class() ) )
 				.append( "." ),
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -474,7 +474,7 @@ HHuginn::value_t verify_arg_callable(
 				.append( "argument must be a callable type, either a `*function_reference*` or an `*unbound_method*` or a `*bound_method*` or implementing a `call()` method, not " )
 				.append( a_type_name( values_[no_]->get_class() ) )
 				.append( "." ),
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	} while ( false );
@@ -498,7 +498,7 @@ inline void not_a_collection( huginn::HThread* thread_, char const* name_, HClas
 			.append( " collection type, not " )
 			.append( a_type_name( class_ ) )
 			.append( "." ),
-		thread_->current_frame()->file_id(),
+		thread_->file_id(),
 		position_
 	);
 }
@@ -576,7 +576,7 @@ HHuginn::type_id_t verify_arg_collection_value_type_low(
 					.append( a_type_name( v->get_class() ) )
 					.append( ", at position: " )
 					.append( pos ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -592,7 +592,7 @@ HHuginn::type_id_t verify_arg_collection_value_type_low(
 						.append( a_type_name( v->get_class() ) )
 						.append( ", at position: " )
 						.append( pos ),
-					thread_->current_frame()->file_id(),
+					thread_->file_id(),
 					position_
 				);
 			}
@@ -639,7 +639,7 @@ HHuginn::type_id_t verify_arg_collection_value_type(
 							.append( " a collection contains value of an unexpected type: " )
 							.append( a_type_name( c ) )
 							.append( "." ),
-						thread_->current_frame()->file_id(),
+						thread_->file_id(),
 						position_
 					);
 				}

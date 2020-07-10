@@ -63,7 +63,7 @@ private:
 		M_PROLOG
 		throw HHuginn::HHuginnRuntimeException(
 			"Copy semantics is not supported on `XML.Element.Attributes`s.",
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 		M_EPILOG
@@ -134,7 +134,7 @@ private:
 		if ( ! _node ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"This `XML.Element` reference is no longer a valid node.",
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -145,7 +145,7 @@ private:
 		M_PROLOG
 		throw HHuginn::HHuginnRuntimeException(
 			"Copy semantics is not supported on `XML.Element`s.",
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 		M_EPILOG
@@ -700,7 +700,7 @@ yaal::hcore::HString const& HAttributes::subscript( HThread* thread_, yaal::hcor
 	try {
 		return ( static_cast<HElement*>( _element.raw() )->properties().at( name_ ) );
 	} catch ( hcore::HException const& e ) {
-		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->file_id(), position_ );
 	}
 }
 
@@ -732,7 +732,7 @@ void HAttributes::ensure_valid( HThread* thread_, int position_ ) const {
 	if ( !static_cast<HElement const*>( _element.raw() )->is_valid() ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"This `XML.Element.Attributes` reference is no longer attached to a valid node.",
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -770,7 +770,7 @@ HHuginn::value_t HElement::append( HThread* thread_, HHuginn::values_t& values_,
 	if ( ! _node ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Referenced `XML.Element` was removed.",
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -792,7 +792,7 @@ HHuginn::value_t HElement::append( HThread* thread_, HHuginn::values_t& values_,
 	} else {
 		throw HHuginn::HHuginnRuntimeException(
 			"Node type must be one of: `XML.Element`, `XML.Text`, `XML.Comment` or `XML.Entity`, not `"_ys.append( r.identifier_name( fr.identifier_id() ) ).append( "`." ),
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -833,7 +833,7 @@ HHuginn::value_t HElement::nth_child( HThread* thread_, int index_, int position
 	if ( ( index_ < 0 ) || ( index_ >= _node.child_count() ) ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Invalid `XML.Element` child index: "_ys.append( index_ ),
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -858,7 +858,7 @@ void HElement::remove( HThread* thread_, HElement* element_, int position_ ) {
 	if ( it == _node.end() ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Given `XML.Element` in not a child node of this `Element`. ",
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -873,7 +873,7 @@ void HElement::remove_nth( HThread* thread_, int nth_, int position_ ) {
 	if ( ( nth_ < 0 ) || ( nth_ >= _node.child_count() ) ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Invalid `XML.Element` child index: "_ys.append( nth_ ),
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}

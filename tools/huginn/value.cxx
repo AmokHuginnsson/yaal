@@ -82,7 +82,7 @@ bool fallback_compare( HThread* thread_, HHuginn::identifier_id_t methodIdentifi
 					.append( "` returned non-boolean result of " )
 					.append( a_type_name( v->get_class() ) )
 					.append( " type." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -96,7 +96,7 @@ bool fallback_compare( HThread* thread_, HHuginn::identifier_id_t methodIdentifi
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
 				"There is no `"_ys.append( oper_ ).append( "` operator for " ).append( a_type_name( c ) ).append( "." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -120,7 +120,7 @@ void fallback_arithmetic( HThread* thread_, HHuginn::identifier_id_t methodIdent
 					.append( " returned result of incompatible type " )
 					.append( a_type_name( rc ) )
 					.append( "." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -133,7 +133,7 @@ void fallback_arithmetic( HThread* thread_, HHuginn::identifier_id_t methodIdent
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
 				"There is no `"_ys.append( oper_ ).append( "` operator for " ).append( a_type_name( c ) ).append( "." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -161,7 +161,7 @@ HHuginn::value_t fallback_unary_arithmetic( HThread* thread_, HHuginn::identifie
 					.append( " returned result of incompatible type " )
 					.append( a_type_name( rc ) )
 					.append( "." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -174,7 +174,7 @@ HHuginn::value_t fallback_unary_arithmetic( HThread* thread_, HHuginn::identifie
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
 				"There is no `"_ys.append( oper_ ).append( "` operator for " ).append( a_type_name( c ) ).append( "." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -195,7 +195,7 @@ HHuginn::value_t nullary_fallback( HThread* thread_, HHuginn::value_t const& v_,
 					.append( " instead of " )
 					.append( a_type_name( resType_ ) )
 					.append( "." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -213,7 +213,7 @@ HHuginn::value_t nullary_fallback( HThread* thread_, HHuginn::value_t const& v_,
 					.append( "` method in " )
 					.append( a_type_name( c ) )
 					.append( "." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -299,7 +299,7 @@ HHuginn::value_t HValue::do_operator_negate( HThread* thread_, HHuginn::value_t 
 HHuginn::value_t HValue::do_operator_factorial( HThread* thread_, HHuginn::value_t const& self_, int position_ ) const {
 	throw HHuginn::HHuginnRuntimeException(
 		"There is no `!` operator for "_ys.append( a_type_name( self_->get_class() ) ).append( "." ),
-		thread_->current_frame()->file_id(), position_
+		thread_->file_id(), position_
 	);
 }
 #pragma GCC diagnostic pop
@@ -320,7 +320,7 @@ HHuginn::value_t HValue::do_operator_subscript( HThread* thread_, HHuginn::value
 	if ( ! res ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Subscript is not supported on "_ys.append( a_type_name( self_->get_class() ) ).append( "." ),
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -344,7 +344,7 @@ void HValue::do_operator_subscript_assign( HThread* thread_, HHuginn::value_t& s
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
 				"Subscript assignment is not supported on "_ys.append( a_type_name( self_->get_class() ) ).append( "." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -364,7 +364,7 @@ void HValue::do_operator_subscript_assign( HThread* thread_, HHuginn::value_t& s
 HHuginn::value_t HValue::do_operator_range( HThread* thread_, HHuginn::value_t const& self_, HHuginn::value_t const&, HHuginn::value_t const&, HHuginn::value_t const&, int position_ ) const {
 	throw HHuginn::HHuginnRuntimeException(
 		"Range operator is not supported on "_ys.append( a_type_name( self_->get_class() ) ).append( "." ),
-		thread_->current_frame()->file_id(),
+		thread_->file_id(),
 		position_
 	);
 }
@@ -390,7 +390,7 @@ HHuginn::value_t HValue::do_operator_call( huginn::HThread* thread_, HHuginn::va
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
 				"Reference `"_ys.append( _class->name() ).append( "` is not a callable." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}

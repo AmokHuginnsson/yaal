@@ -198,7 +198,7 @@ void verify_range( HThread* thread_, char const* item_, HInteger::value_type val
 	if ( ( value_ < min_ ) || ( value_ > max_ ) ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Invalid value for `"_ys.append( item_ ).append( "` in Time constructor: " ).append( value_ ).append( "." ),
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}

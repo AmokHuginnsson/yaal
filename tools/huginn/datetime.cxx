@@ -75,7 +75,7 @@ public:
 		verify_signature( "DateTime.sleep", values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
 		int long long nanoseconds( get_integer( values_[0] ) );
 		if ( nanoseconds < 0 ) {
-			throw HHuginn::HHuginnRuntimeException( "Negative sleep time: "_ys.append( nanoseconds ), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Negative sleep time: "_ys.append( nanoseconds ), thread_->file_id(), position_ );
 		}
 		sleep_for( time::duration( nanoseconds, time::UNIT::NANOSECOND ) );
 		return ( *object_ );

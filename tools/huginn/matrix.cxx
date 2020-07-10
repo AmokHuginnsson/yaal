@@ -35,7 +35,7 @@ HMatrix::HMatrix( huginn::HThread* thread_, HClass const* class_, HHuginn::value
 			if ( myRows < 1 ) {
 				throw HHuginn::HHuginnRuntimeException(
 					"Invalid number of rows in matrix specification: "_ys.append( myRows ).append( "." ),
-					thread_->current_frame()->file_id(),
+					thread_->file_id(),
 					position_
 				);
 			}
@@ -43,7 +43,7 @@ HMatrix::HMatrix( huginn::HThread* thread_, HClass const* class_, HHuginn::value
 			if ( cols < 1 ) {
 				throw HHuginn::HHuginnRuntimeException(
 					"Invalid number of columns in matrix specification: "_ys.append( cols ).append( "." ),
-					thread_->current_frame()->file_id(),
+					thread_->file_id(),
 					position_
 				);
 			}
@@ -54,12 +54,12 @@ HMatrix::HMatrix( huginn::HThread* thread_, HClass const* class_, HHuginn::value
 			} else {
 				throw HHuginn::HHuginnRuntimeException(
 					"Bad matrix type: `"_ys.append( thread_->runtime().function_name( fr.function().id() ) ).append( "`." ),
-					thread_->current_frame()->file_id(),
+					thread_->file_id(),
 					position_
 				);
 			}
 		} catch ( hcore::HException const& e ) {
-			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->file_id(), position_ );
 		}
 	} else {
 		huginn::HList::values_t const* rowData( nullptr );
@@ -70,7 +70,7 @@ HMatrix::HMatrix( huginn::HThread* thread_, HClass const* class_, HHuginn::value
 			myRows = safe_int::cast<int>( values_.get_size() );
 			cols = safe_int::cast<int>( ( rowData = &get_list( values_[0] ) )->get_size() );
 			if ( cols < 1 ) {
-				throw HHuginn::HHuginnRuntimeException( "Invalid number of columns in matrix specification: "_ys.append( cols ).append( "." ), thread_->current_frame()->file_id(), position_ );
+				throw HHuginn::HHuginnRuntimeException( "Invalid number of columns in matrix specification: "_ys.append( cols ).append( "." ), thread_->file_id(), position_ );
 			}
 			t = (*rowData)[0]->type_id();
 			if ( t == HHuginn::TYPE::NUMBER ) {
@@ -78,10 +78,10 @@ HMatrix::HMatrix( huginn::HThread* thread_, HClass const* class_, HHuginn::value
 			} else if ( t == HHuginn::TYPE::REAL ) {
 				_data = data_t( make_resource<floating_point_matrix_t>( myRows, cols ) );
 			} else {
-				throw HHuginn::HHuginnRuntimeException( "Matrix must have numeric data, either `number` or `real`.", thread_->current_frame()->file_id(), position_ );
+				throw HHuginn::HHuginnRuntimeException( "Matrix must have numeric data, either `number` or `real`.", thread_->file_id(), position_ );
 			}
 		} catch ( hcore::HException const& e ) {
-			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->file_id(), position_ );
 		}
 		for ( int r( 0 ); r < myRows; ++ r ) {
 			verify_arg_type( name, values_, r, HHuginn::TYPE::LIST, ARITY::MULTIPLE, thread_, position_ );
@@ -89,7 +89,7 @@ HMatrix::HMatrix( huginn::HThread* thread_, HClass const* class_, HHuginn::value
 			if ( ( otherCols = static_cast<int>( ( rowData = &get_list( values_[r] ) )->get_size() ) ) != cols ) {
 				throw HHuginn::HHuginnRuntimeException(
 					"Inconsistent number of columns across rows: "_ys.append( otherCols ).append( " vs " ).append( cols ).append( "." ),
-					thread_->current_frame()->file_id(),
+					thread_->file_id(),
 					position_
 				);
 			}
@@ -98,7 +98,7 @@ HMatrix::HMatrix( huginn::HThread* thread_, HClass const* class_, HHuginn::value
 				if ( v->type_id() != t ) {
 					throw HHuginn::HHuginnRuntimeException(
 						"Non uniformly typed data in matrix definition, in row: "_ys.append( r ).append( ", column: " ).append( c ).append( "." ),
-						thread_->current_frame()->file_id(),
+						thread_->file_id(),
 						position_
 					);
 				}
@@ -167,19 +167,19 @@ HHuginn::value_t HMatrix::get( huginn::HThread* thread_, HHuginn::value_t* objec
 	if ( o->_data.type() == 0 ) {
 		arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
 		if ( ( row < 0 ) || ( row >= m.rows() ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), thread_->file_id(), position_ );
 		}
 		if ( ( col < 0 ) || ( col >= m.columns() ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), thread_->file_id(), position_ );
 		}
 		v = thread_->runtime().object_factory()->create_number( m[row][col] );
 	} else {
 		floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
 		if ( ( row < 0 ) || ( row >= m.rows() ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), thread_->file_id(), position_ );
 		}
 		if ( ( col < 0 ) || ( col >= m.columns() ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), thread_->file_id(), position_ );
 		}
 		v = thread_->runtime().object_factory()->create_real( m[row][col] );
 	}
@@ -198,20 +198,20 @@ HHuginn::value_t HMatrix::set( huginn::HThread* thread_, HHuginn::value_t* objec
 		verify_arg_type( name, values_, 2, HHuginn::TYPE::NUMBER, ARITY::MULTIPLE, thread_, position_ );
 		arbitrary_precision_matrix_t& m( *( o->_data.get<arbitrary_precision_matrix_ptr_t>().raw() ) );
 		if ( ( row < 0 ) || ( row >= m.rows() ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), thread_->file_id(), position_ );
 		}
 		if ( ( col < 0 ) || ( col >= m.columns() ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), thread_->file_id(), position_ );
 		}
 		m[row][col] = get_number( values_[2] );
 	} else {
 		verify_arg_type( name, values_, 2, HHuginn::TYPE::REAL, ARITY::MULTIPLE, thread_, position_ );
 		floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
 		if ( ( row < 0 ) || ( row >= m.rows() ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Bad row: "_ys.append( row ), thread_->file_id(), position_ );
 		}
 		if ( ( col < 0 ) || ( col >= m.columns() ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Bad column: "_ys.append( col ), thread_->file_id(), position_ );
 		}
 		m[row][col] = get_real( values_[2] );
 	}
@@ -224,7 +224,7 @@ void HMatrix::do_operator_add( HThread* thread_, HHuginn::value_t&, HHuginn::val
 	HHuginn::value_t v;
 	HMatrix const* arg( static_cast<HMatrix const*>( other_.raw() ) );
 	if ( _data.type() != arg->_data.type() ) {
-		throw HHuginn::HHuginnRuntimeException( "Non matching data types.", thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Non matching data types.", thread_->file_id(), position_ );
 	}
 	try {
 		if ( _data.type() == 0 ) {
@@ -237,7 +237,7 @@ void HMatrix::do_operator_add( HThread* thread_, HHuginn::value_t&, HHuginn::val
 			m += ma;
 		}
 	} catch ( hcore::HException const& e ) {
-		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->file_id(), position_ );
 	}
 	return;
 	M_EPILOG
@@ -248,7 +248,7 @@ void HMatrix::do_operator_subtract( HThread* thread_, HHuginn::value_t&, HHuginn
 	HHuginn::value_t v;
 	HMatrix const* arg( static_cast<HMatrix const*>( other_.raw() ) );
 	if ( _data.type() != arg->_data.type() ) {
-		throw HHuginn::HHuginnRuntimeException( "Non matching data types.", thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Non matching data types.", thread_->file_id(), position_ );
 	}
 	try {
 		if ( _data.type() == 0 ) {
@@ -261,7 +261,7 @@ void HMatrix::do_operator_subtract( HThread* thread_, HHuginn::value_t&, HHuginn
 			m -= ma;
 		}
 	} catch ( hcore::HException const& e ) {
-		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->file_id(), position_ );
 	}
 	return;
 	M_EPILOG
@@ -272,7 +272,7 @@ void HMatrix::do_operator_multiply( HThread* thread_, HHuginn::value_t&, HHuginn
 	HHuginn::value_t v;
 	HMatrix const* arg( static_cast<HMatrix const*>( other_.raw() ) );
 	if ( _data.type() != arg->_data.type() ) {
-		throw HHuginn::HHuginnRuntimeException( "Non matching data types.", thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Non matching data types.", thread_->file_id(), position_ );
 	}
 	try {
 		if ( _data.type() == 0 ) {
@@ -285,7 +285,7 @@ void HMatrix::do_operator_multiply( HThread* thread_, HHuginn::value_t&, HHuginn
 			m *= ma;
 		}
 	} catch ( hcore::HException const& e ) {
-		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->file_id(), position_ );
 	}
 	return;
 	M_EPILOG
@@ -303,7 +303,7 @@ HHuginn::value_t HMatrix::do_operator_modulus( HThread* thread_, HHuginn::value_
 			v = thread_->runtime().object_factory()->create_real( m.det() );
 		}
 	} catch ( hcore::HException const& e ) {
-		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->file_id(), position_ );
 	}
 	return ( v );
 	M_EPILOG
@@ -346,7 +346,7 @@ HHuginn::value_t HMatrix::scale_to( huginn::HThread* thread_, HHuginn::value_t* 
 			}
 		}
 		if ( extremum == number::N0 ) {
-			throw HHuginn::HHuginnRuntimeException( "Zeroed matrix cannot be scaled.", thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Zeroed matrix cannot be scaled.", thread_->file_id(), position_ );
 		}
 		m *= get_number( values_[0] ) / extremum;
 	} else {
@@ -361,7 +361,7 @@ HHuginn::value_t HMatrix::scale_to( huginn::HThread* thread_, HHuginn::value_t* 
 			}
 		}
 		if ( extremum == 0.L ) {
-			throw HHuginn::HHuginnRuntimeException( "Zeroed matrix cannot be scaled.", thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Zeroed matrix cannot be scaled.", thread_->file_id(), position_ );
 		}
 		m *= get_real( values_[0] ) / extremum;
 	}
@@ -382,7 +382,7 @@ HHuginn::value_t HMatrix::inverse( huginn::HThread* thread_, HHuginn::value_t* o
 			v = thread_->object_factory().create<HMatrix>( o->HValue::get_class(), make_resource<floating_point_matrix_t>( o->_data.get<floating_point_matrix_ptr_t>()->inverse() ) );
 		}
 	} catch ( hcore::HException const& e ) {
-		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->file_id(), position_ );
 	}
 	return ( v );
 	M_EPILOG
@@ -398,7 +398,7 @@ HHuginn::value_t HMatrix::do_operator_negate( HThread* thread_, HHuginn::value_t
 			v = thread_->object_factory().create<HMatrix>( HValue::get_class(), make_resource<floating_point_matrix_t>( -*_data.get<floating_point_matrix_ptr_t>() ) );
 		}
 	} catch ( hcore::HException const& e ) {
-		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->file_id(), position_ );
 	}
 	return ( v );
 	M_EPILOG
@@ -408,7 +408,7 @@ bool HMatrix::do_operator_equals( HThread* thread_, HHuginn::value_t const&, HHu
 	bool res( false );
 	HMatrix const* arg( static_cast<HMatrix const*>( other_.raw() ) );
 	if ( _data.type() != arg->_data.type() ) {
-		throw HHuginn::HHuginnRuntimeException( "Non matching data types.", thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Non matching data types.", thread_->file_id(), position_ );
 	}
 	try {
 		if ( _data.type() == 0 ) {
@@ -421,7 +421,7 @@ bool HMatrix::do_operator_equals( HThread* thread_, HHuginn::value_t const&, HHu
 			res = m == ma;
 		}
 	} catch ( hcore::HException const& e ) {
-		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->file_id(), position_ );
 	}
 	return ( res );
 }
@@ -463,7 +463,7 @@ void matrix_apply( HHuginn::value_t store_, huginn::HThread* thread_, matrix_t& 
 						.append( "`, but result was a `" )
 						.append( res->get_class()->name() )
 						.append( "` instead." ),
-					thread_->current_frame()->file_id(),
+					thread_->file_id(),
 					position_
 				);
 			}

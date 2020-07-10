@@ -80,6 +80,9 @@ public:
 	HHuginn::call_stack_t const& trace( void ) const {
 		return ( _trace );
 	}
+	int file_id( void ) const {
+		return ( _currentFrame ? _currentFrame->file_id() : 0 );
+	}
 private:
 	void add_frame( void );
 	HThread( HThread const& ) = delete;

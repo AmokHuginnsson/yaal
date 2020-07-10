@@ -122,7 +122,7 @@ huginn::HIterable::iterator_t HIterableAdaptor::do_iterator( HThread* thread_, i
 				.append( ", returned invalid iterator object - " )
 				.append( a_type_name( itVal->get_class() ) )
 				.append( "." ),
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -140,7 +140,7 @@ int long HIterableAdaptor::do_size( huginn::HThread* thread_, int position_ ) co
 				.append( ", returned an invalid type " )
 				.append( a_type_name( sizeVal->get_class() ) )
 				.append( " instead of an `integer` from supplied `get_size` method." ),
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -148,7 +148,7 @@ int long HIterableAdaptor::do_size( huginn::HThread* thread_, int position_ ) co
 	try {
 		s = safe_int::cast<int long>( get_integer( sizeVal ) );
 	} catch ( hcore::HException const& e ) {
-		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->file_id(), position_ );
 	}
 	return ( s );
 }
@@ -182,7 +182,7 @@ bool HIterableAdaptorIterator::do_is_valid( HThread* thread_, int position_ ) {
 				.append( ", returned an invalid type " )
 				.append( a_type_name( isValid->get_class() ) )
 				.append( " instead of a `boolean` from supplied `is_valid` method." ),
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -215,14 +215,14 @@ int long long HIterable::extract_index( huginn::HThread* thread_, HHuginn::value
 	if ( index_->type_id() != HHuginn::TYPE::INTEGER ) {
 		throw HHuginn::HHuginnRuntimeException(
 			hcore::to_string( _errMsgHHuginn_[ERR_CODE::IDX_NOT_INT] ).append( a_type_name( index_->get_class() ) ),
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
 	int long long index( get_integer( index_ ) );
 	int long s( size( thread_, position_ ) );
 	if ( ( index < -s ) || ( index >= s ) ) {
-		throw HHuginn::HHuginnRuntimeException( "Bad index.", thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Bad index.", thread_->file_id(), position_ );
 	}
 	if ( index < 0 ) {
 		index += s;
@@ -233,18 +233,18 @@ int long long HIterable::extract_index( huginn::HThread* thread_, HHuginn::value
 
 HIterable::ORange HIterable::extract_range( huginn::HThread* thread_, HHuginn::value_t const& from_, HHuginn::value_t const& to_, HHuginn::value_t const& step_, int position_ ) const {
 	if ( !! from_ && ( from_->type_id() != HHuginn::TYPE::INTEGER ) ) {
-		throw HHuginn::HHuginnRuntimeException( "Range operand `from` is not an integer.", thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Range operand `from` is not an integer.", thread_->file_id(), position_ );
 	}
 	if ( !! to_ && ( to_->type_id() != HHuginn::TYPE::INTEGER ) ) {
-		throw HHuginn::HHuginnRuntimeException( "Range operand `to` is not an integer.", thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Range operand `to` is not an integer.", thread_->file_id(), position_ );
 	}
 	if ( !! step_ && ( step_->type_id() != HHuginn::TYPE::INTEGER ) ) {
-		throw HHuginn::HHuginnRuntimeException( "Range operand `step` is not an integer.", thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Range operand `step` is not an integer.", thread_->file_id(), position_ );
 	}
 	int long s( size( thread_, position_ ) );
 	int long step( step_ ? static_cast<int long>( get_integer( step_ ) ) : 1 );
 	if ( step == 0 ) {
-		throw HHuginn::HHuginnRuntimeException( "Range step cannot be zero.", thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Range step cannot be zero.", thread_->file_id(), position_ );
 	}
 	int long from( from_ ? static_cast<int long>( get_integer( from_ ) ) : ( step > 0 ? 0 : s ) );
 	int long to( to_ ? static_cast<int long>( get_integer( to_ ) ) : ( step > 0 ? s : -1 ) );

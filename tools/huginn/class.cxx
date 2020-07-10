@@ -138,7 +138,7 @@ HHuginn::value_t HClass::base_class_not_initialized( huginn::HThread* thread_, H
 			.append( _super->name() )
 			.append( "` is not initialized." )
 		,
-		thread_->current_frame()->file_id(),
+		thread_->file_id(),
 		position_
 	);
 }
@@ -273,7 +273,7 @@ HHuginn::value_t HClass::access_violation( huginn::HThread* thread_, HHuginn::va
 	M_PROLOG
 	throw HHuginn::HHuginnRuntimeException(
 		"Explicit construction of class `"_ys.append( name() ).append( "` objects (instances) is forbidden." ),
-		thread_->current_frame()->file_id(),
+		thread_->file_id(),
 		position_
 	);
 	M_EPILOG
@@ -346,7 +346,7 @@ HHuginn::value_t HClass::do_create_instance( huginn::HThread* thread_, HHuginn::
 		if ( vi < valueCount ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"Too many arguments for class initializer, expected at most: "_ys.append( vi ).append( "." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}

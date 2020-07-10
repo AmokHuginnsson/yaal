@@ -372,7 +372,7 @@ int long HDict::do_size( huginn::HThread*, int ) const {
 void HDict::verify_key_type( huginn::HThread* thread_, HClass const* keyType_, int position_ ) const {
 	M_ASSERT( keyType_ );
 	if ( _keyType && ( keyType_ != _keyType ) ) {
-		throw HHuginn::HHuginnRuntimeException( "Non-uniform key types, got "_ys.append( a_type_name( keyType_ ) ).append( " instead of " ).append( a_type_name( _keyType ) ).append( "." ), thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Non-uniform key types, got "_ys.append( a_type_name( keyType_ ) ).append( " instead of " ).append( a_type_name( _keyType ) ).append( "." ), thread_->file_id(), position_ );
 	}
 	return;
 }
@@ -389,7 +389,7 @@ HHuginn::value_t HDict::get( huginn::HThread* thread_, HHuginn::value_t const& k
 	HAnchorGuard<HDict> ag( *this, thread_, position_ );
 	values_t::const_iterator it( _data.find( key_ ) );
 	if ( ! ( it != _data.end() ) ) {
-		throw HHuginn::HHuginnRuntimeException( "Key does not exist in `dict`.", thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Key does not exist in `dict`.", thread_->file_id(), position_ );
 	}
 	return ( it->second );
 	M_EPILOG

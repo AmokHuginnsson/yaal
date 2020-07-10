@@ -211,7 +211,7 @@ inline HHuginn::value_t insert( huginn::HThread* thread_, HHuginn::value_t* obje
 	huginn::HDeque::values_t& dst( static_cast<huginn::HDeque*>( object_->raw() )->value() );
 	huginn::HInteger::value_type pos( get_integer( values_[0] ) );
 	if ( ( pos < 0 ) || ( pos > dst.get_size() ) ) {
-		throw HHuginn::HHuginnRuntimeException( "invalid insertion position: "_ys.append( pos ), thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "invalid insertion position: "_ys.append( pos ), thread_->file_id(), position_ );
 	}
 	dst.insert( dst.begin() + static_cast<int long>( pos ), values_[1] );
 	return ( *object_ );

@@ -84,7 +84,7 @@ protected:
 		if ( _cache.get_size() < _impl.get_size() ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"Getting value from an invalid iterator.",
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}

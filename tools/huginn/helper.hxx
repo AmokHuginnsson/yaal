@@ -377,7 +377,7 @@ struct huginn_type_from_integer {
 		try {
 			val = safe_int::cast<T>( get_integer( value_ ) );
 		} catch ( yaal::hcore::HOutOfRangeException const& e ) {
-			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->file_id(), position_ );
 		}
 		return ( val );
 	}
@@ -394,7 +394,7 @@ struct huginn_type_from_character {
 		try {
 			val = safe_int::cast<T>( get_character( value_ ).get() );
 		} catch ( yaal::hcore::HOutOfRangeException const& e ) {
-			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->file_id(), position_ );
 		}
 		return ( val );
 	}

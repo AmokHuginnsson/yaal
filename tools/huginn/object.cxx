@@ -150,7 +150,7 @@ HHuginn::function_t const& HObject::get_method(
 				.append( "` does not have `" )
 				.append( thread_->runtime().identifier_name( methodIdentifier_ ) )
 				.append( "` method." ),
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -162,7 +162,7 @@ HHuginn::function_t const& HObject::get_method(
 				.append( "` in class `" )
 				.append( get_class()->name() )
 				.append( "` is not a method." ),
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -194,7 +194,7 @@ HHuginn::value_t HObject::do_clone( huginn::HThread* thread_, HHuginn::value_t* 
 				"`clone` in class "_ys
 					.append( a_type_name( get_class() ) )
 					.append( " is not a method." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -207,7 +207,7 @@ HHuginn::value_t HObject::do_clone( huginn::HThread* thread_, HHuginn::value_t* 
 					.append( " returned object of an invalid type: " )
 					.append( a_type_name( copy->get_class() ) )
 					.append( "." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}

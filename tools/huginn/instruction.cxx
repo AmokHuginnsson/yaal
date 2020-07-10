@@ -48,7 +48,7 @@ inline void no_such_member(
 		message.append( rt.suggestion( memberId_ ) );
 	}
 	message.append( "`?)." ),
-	throw HHuginn::HHuginnRuntimeException( message, thread_->current_frame()->file_id(), position_ );
+	throw HHuginn::HHuginnRuntimeException( message, thread_->file_id(), position_ );
 }
 
 HHuginn::value_t member_value( HThread* thread_, HHuginn::value_t const& object_, HHuginn::identifier_id_t memberId_, int position_ ) {
@@ -111,10 +111,10 @@ HHuginn::value_t member( HThread* thread_, HFrame::ACCESS access_, HHuginn::valu
 				if ( HObject* o = dynamic_cast<HObject*>( v_.raw() ) ) {
 					m = rt.object_factory()->create_reference( o->field_ref( fi ) );
 				} else {
-					throw HHuginn::HHuginnRuntimeException( "Assignment to read-only location.", thread_->current_frame()->file_id(), position_ );
+					throw HHuginn::HHuginnRuntimeException( "Assignment to read-only location.", thread_->file_id(), position_ );
 				}
 			} else {
-				throw HHuginn::HHuginnRuntimeException( "Assignment to temporary.", thread_->current_frame()->file_id(), position_ );
+				throw HHuginn::HHuginnRuntimeException( "Assignment to temporary.", thread_->file_id(), position_ );
 			}
 		} else {
 			fi = cls->field_index( memberId_, HClass::MEMBER_TYPE::STATIC );
@@ -125,7 +125,7 @@ HHuginn::value_t member( HThread* thread_, HFrame::ACCESS access_, HHuginn::valu
 						.append( "` member of `" )
 						.append( cls->name() )
 						.append( "` must be accessed from static context." ),
-					thread_->current_frame()->file_id(),
+					thread_->file_id(),
 					position_
 				);
 			}
@@ -137,7 +137,7 @@ HHuginn::value_t member( HThread* thread_, HFrame::ACCESS access_, HHuginn::valu
 		}
 	} else if ( HObjectReference* oref = dynamic_cast<HObjectReference*>( v_.raw() ) ) { /* Handle `super` keyword. */
 		if ( access_ == HFrame::ACCESS::REFERENCE ) {
-			throw HHuginn::HHuginnRuntimeException( "Changing upcasted reference.", thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Changing upcasted reference.", thread_->file_id(), position_ );
 		}
 		int fi( oref->field_index( memberId_ ) );
 		if ( fi >= 0 ) {
@@ -162,7 +162,7 @@ HHuginn::value_t member( HThread* thread_, HFrame::ACCESS access_, HHuginn::valu
 		if ( ! c ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"`"_ys.append( rt.identifier_name( funcId ) ).append( "` is not a compound object." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -171,14 +171,14 @@ HHuginn::value_t member( HThread* thread_, HFrame::ACCESS access_, HHuginn::valu
 			no_such_member( thread_, c->name(), memberId_, position_ );
 		}
 		if ( access_ == HFrame::ACCESS::REFERENCE ) {
-			throw HHuginn::HHuginnRuntimeException( "Assignment to read-only location.", thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Assignment to read-only location.", thread_->file_id(), position_ );
 		}
 		HHuginn::value_t const& f( c->field( fi ) );
 		m = f->type_id() == HHuginn::TYPE::METHOD
 			? rt.object_factory()->create_unbound_method( c, static_cast<HClass::HMethod const*>( f.raw() )->function() )
 			: f;
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( cls->name() ).append( "` is not a compound object." ), thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( cls->name() ).append( "` is not a compound object." ), thread_->file_id(), position_ );
 	}
 	M_ASSERT( !! m );
 	return ( m );
@@ -193,7 +193,7 @@ bool checked_less( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value
 	HClass const* c1( v1_->get_class() );
 	HClass const* c2( v2_->get_class() );
 	if ( c1 != c2 ) {
-		operands_type_mismatch( op_to_str( OPERATOR::LESS ), c1, c2, thread_->current_frame()->file_id(), position_ );
+		operands_type_mismatch( op_to_str( OPERATOR::LESS ), c1, c2, thread_->file_id(), position_ );
 	}
 	return ( v1_->operator_less( thread_, v1_, v2_, position_ ) );
 }
@@ -202,7 +202,7 @@ bool checked_greater( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::va
 	HClass const* c1( v1_->get_class() );
 	HClass const* c2( v2_->get_class() );
 	if ( c1 != c2 ) {
-		operands_type_mismatch( op_to_str( OPERATOR::LESS ), c1, c2, thread_->current_frame()->file_id(), position_ );
+		operands_type_mismatch( op_to_str( OPERATOR::LESS ), c1, c2, thread_->file_id(), position_ );
 	}
 	return ( v1_->operator_greater( thread_, v1_, v2_, position_ ) );
 }
@@ -232,7 +232,7 @@ HHuginn::value_t fallback_conversion( HHuginn::type_id_t type_, HThread* thread_
 					.append( " instead of " )
 					.append( a_type_name( type_ ) )
 					.append( "." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -250,7 +250,7 @@ HHuginn::value_t fallback_conversion( HHuginn::type_id_t type_, HThread* thread_
 					.append( " to " )
 					.append( a_type_name( type_ ) )
 					.append( " is not supported." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}

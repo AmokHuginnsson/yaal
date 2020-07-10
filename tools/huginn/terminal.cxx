@@ -224,7 +224,7 @@ public:
 		try {
 			l = tools::HTerminal::get_instance().size().lines();
 		} catch ( hcore::HException const& e ) {
-			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->file_id(), position_ );
 		}
 		return ( thread_->object_factory().create_integer( l ) );
 		M_EPILOG
@@ -236,7 +236,7 @@ public:
 		try {
 			c = tools::HTerminal::get_instance().size().columns();
 		} catch ( hcore::HException const& e ) {
-			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->file_id(), position_ );
 		}
 		return ( thread_->object_factory().create_integer( c ) );
 		M_EPILOG
@@ -248,14 +248,14 @@ public:
 		try {
 			s = tools::HTerminal::get_instance().size();
 		} catch ( hcore::HException const& e ) {
-			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->file_id(), position_ );
 		}
 		int row( safe_int::cast<int>( get_integer( values_[0] ) ) );
 		int column( safe_int::cast<int>( get_integer( values_[1] ) ) );
 		if ( ( row < 0 ) || ( column < 0 ) ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"Invalid "_ys.append( row < 0 ? "row: " : "column: " ).append( row < 0 ? row : column ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -315,7 +315,7 @@ public:
 		} catch ( HException const& e ) {
 			throw HHuginn::HHuginnRuntimeException(
 				e.what(),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -340,7 +340,7 @@ public:
 		} catch ( HException const& e ) {
 			throw HHuginn::HHuginnRuntimeException(
 				e.what(),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -365,7 +365,7 @@ public:
 		} catch ( HException const& e ) {
 			throw HHuginn::HHuginnRuntimeException(
 				e.what(),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}

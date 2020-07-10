@@ -133,7 +133,7 @@ HHuginn::value_t HSubprocess::wait(
 	}
 	HSubprocess* o( static_cast<HSubprocess*>( object_->raw() ) );
 	if ( ( waitFor < 0 ) || ( waitFor > MAX_WAIT_FOR ) ) {
-		throw HHuginn::HHuginnRuntimeException( "invalid wait time: "_ys.append( waitFor ), thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "invalid wait time: "_ys.append( waitFor ), thread_->file_id(), position_ );
 	}
 	HPipedChild::STATUS s( o->_pipedChild.finish( waitFor ) );
 	return ( thread_->runtime().object_factory()->create_integer( s.value ) );
@@ -181,7 +181,7 @@ HHuginn::class_t HSubprocess::get_class( HRuntime* runtime_, huginn::HClass cons
 
 HHuginn::value_t HSubprocess::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
 	M_PROLOG
-	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on Subprocess.", thread_->current_frame()->file_id(), position_ );
+	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on Subprocess.", thread_->file_id(), position_ );
 	M_EPILOG
 }
 

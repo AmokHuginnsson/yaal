@@ -316,7 +316,7 @@ huginn::HThread* HRuntime::current_thread( void ) {
 int HRuntime::file_id( void ) {
 	M_PROLOG
 	huginn::HThread* t( current_thread() );
-	return ( t ? t->current_frame()->file_id() : _huginn->file_id() );
+	return ( t ? t->file_id() : _huginn->file_id() );
 	M_EPILOG
 }
 

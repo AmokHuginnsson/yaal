@@ -126,7 +126,7 @@ public:
 					.append( "() first argument must be a flat uniform collection of strings, not " )
 					.append( a_type_name( values_[0]->get_class() ) )
 					.append( "." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -144,7 +144,7 @@ public:
 						.append( "() first argument must be a flat uniform collection of strings, but it contains " )
 						.append( a_type_name( v->get_class() ) )
 						.append( "." ),
-					thread_->current_frame()->file_id(),
+					thread_->file_id(),
 					position_
 				);
 			}
@@ -215,7 +215,7 @@ public:
 		hcore::HString const& s( get_string( values_[0] ) );
 		int count( static_cast<int>( get_integer( values_[1] ) ) );
 		if ( count < 0 ) {
-			throw HHuginn::HHuginnRuntimeException( "Negative repeat count: "_ys.append( count ), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Negative repeat count: "_ys.append( count ), thread_->file_id(), position_ );
 		}
 		out.reserve( count * s.get_length() );
 		for ( int i( 0 ); i < count; ++ i ) {

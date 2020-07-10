@@ -44,7 +44,7 @@ HEnumerationClass const* HEnumerationClass::HEnumeralClass::enumeration_class( v
 
 HHuginn::value_t HEnumerationClass::HEnumeralClass::do_create_instance( huginn::HThread* thread_, HHuginn::values_t&, int position_ ) const {
 	M_PROLOG
-	throw HHuginn::HHuginnRuntimeException( "Explicit construction of enumeral `"_ys.append( name() ).append( "' instances is forbidden." ), thread_->current_frame()->file_id(), position_ );
+	throw HHuginn::HHuginnRuntimeException( "Explicit construction of enumeral `"_ys.append( name() ).append( "' instances is forbidden." ), thread_->file_id(), position_ );
 	M_EPILOG
 }
 
@@ -121,7 +121,7 @@ HHuginn::value_t HEnumerationClass::enumeral( HEnumeral::value_type id_ ) const 
 
 HHuginn::value_t HEnumerationClass::do_create_instance( huginn::HThread* thread_, HHuginn::values_t&, int position_ ) const {
 	M_PROLOG
-	throw HHuginn::HHuginnRuntimeException( "Explicit construction of enumeration `"_ys.append( name() ).append( "' instances is forbidden." ), thread_->current_frame()->file_id(), position_ );
+	throw HHuginn::HHuginnRuntimeException( "Explicit construction of enumeration `"_ys.append( name() ).append( "' instances is forbidden." ), thread_->file_id(), position_ );
 	M_EPILOG
 }
 
@@ -163,14 +163,14 @@ HEnumeration::HEnumeration( HClass const* class_ )
 }
 
 HHuginn::value_t HEnumeration::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
-	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on enumerations.", thread_->current_frame()->file_id(), position_ );
+	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on enumerations.", thread_->file_id(), position_ );
 }
 
 bool HEnumeration::do_operator_contains( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
 	if ( ! is_enumeral( other_ ) ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Only `ENUMERAL`s can be elements of `ENUMERATION`s.",
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}

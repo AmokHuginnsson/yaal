@@ -163,7 +163,7 @@ inline HHuginn::value_t insert( huginn::HThread* thread_, HHuginn::value_t* obje
 	huginn::HList::values_t& dst( static_cast<huginn::HList*>( object_->raw() )->value() );
 	huginn::HInteger::value_type pos( get_integer( values_[0] ) );
 	if ( ( pos < 0 ) || ( pos > dst.get_size() ) ) {
-		throw HHuginn::HHuginnRuntimeException( "invalid insertion position: "_ys.append( pos ), thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "invalid insertion position: "_ys.append( pos ), thread_->file_id(), position_ );
 	}
 	dst.insert( dst.begin() + static_cast<int long>( pos ), values_[1] );
 	return ( *object_ );
@@ -177,7 +177,7 @@ inline HHuginn::value_t resize( huginn::HThread* thread_, HHuginn::value_t* obje
 	huginn::HList::values_t& dst( static_cast<huginn::HList*>( object_->raw() )->value() );
 	huginn::HInteger::value_type size( get_integer( values_[0] ) );
 	if ( size < 0 ) {
-		throw HHuginn::HHuginnRuntimeException( "invalid new size: "_ys.append( size ), thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "invalid new size: "_ys.append( size ), thread_->file_id(), position_ );
 	}
 	int long oldSize( dst.get_size() );
 	dst.resize( static_cast<int long>( size ) );

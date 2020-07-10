@@ -54,7 +54,7 @@ inline HHuginn::value_t ensure_virtual_collection(
 			v = thread_->object_factory().create<HIterableAdaptor>( thread_->object_factory().iterable_adaptor_class(), v );
 			break;
 		}
-		throw HHuginn::HHuginnRuntimeException( "`For` source is not an iterable.", thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "`For` source is not an iterable.", thread_->file_id(), position_ );
 	} while ( false );
 	return ( v );
 	M_EPILOG

@@ -27,7 +27,7 @@ HNumberSetStatistics::number_set_stats_t make_data( HThread* thread_, HHuginn::t
 	typename coll_t::values_t const& src( static_cast<coll_t const*>( col_.raw() )->value() );
 	HNumberSetStatistics::number_set_stats_t nss;
 	if ( src.is_empty() ) {
-		throw HHuginn::HHuginnRuntimeException( "Cannot aggregate statistics over empty set.", thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Cannot aggregate statistics over empty set.", thread_->file_id(), position_ );
 	}
 	aggregate_type_t a(
 		AGGREGATE_TYPE::BASIC
@@ -225,7 +225,7 @@ HHuginn::value_t HNumberSetStatistics::histogram( huginn::HThread* thread_, HHug
 		histogram_impl( thread_->object_factory(), nss, data );
 	}
 	if ( data.is_empty() ) {
-		throw HHuginn::HHuginnRuntimeException( "No histogram information was requested nor generated.", thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "No histogram information was requested nor generated.", thread_->file_id(), position_ );
 	}
 	return ( thread_->object_factory().create_list( yaal::move( data ) ) );
 	M_EPILOG
@@ -277,7 +277,7 @@ HHuginn::class_t HNumberSetStatistics::get_class( HRuntime* runtime_, HClass con
 }
 
 HHuginn::value_t HNumberSetStatistics::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
-	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on NumberSetStatistics.", thread_->current_frame()->file_id(), position_ );
+	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on NumberSetStatistics.", thread_->file_id(), position_ );
 }
 
 }

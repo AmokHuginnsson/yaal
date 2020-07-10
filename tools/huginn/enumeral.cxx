@@ -29,7 +29,7 @@ HEnumeral::HEnumeral( HClass const* class_, HHuginn::identifier_id_t identifier_
 }
 
 HHuginn::value_t HEnumeral::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
-	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on enumerals.", thread_->current_frame()->file_id(), position_ );
+	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on enumerals.", thread_->file_id(), position_ );
 }
 
 bool HEnumeral::do_operator_equals( HThread*, HHuginn::value_t const&, HHuginn::value_t const& other_, int ) const {

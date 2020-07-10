@@ -160,7 +160,7 @@ void HHeap::verify_key_type( huginn::HThread* thread_, HClass const* keyType_, i
 	if ( _keyType && ( keyType_ != _keyType ) ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Non-uniform key types, got "_ys.append( a_type_name( keyType_ ) ).append( " instead of " ).append( a_type_name( _keyType ) ).append( "." ),
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -178,7 +178,7 @@ HHuginn::value_t HHeap::pop( huginn::HThread* thread_, int position_ ) {
 	if ( _data.is_empty() ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"The `heap` is empty.",
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -195,7 +195,7 @@ HHuginn::value_t HHeap::top( huginn::HThread* thread_, int position_ ) {
 	if ( _data.is_empty() ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"The `heap` is empty.",
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}

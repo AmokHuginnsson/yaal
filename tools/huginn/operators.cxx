@@ -42,7 +42,7 @@ public:
 		huginn::HClass const* c1( v1->get_class() );
 		huginn::HClass const* c2( v2->get_class() );
 		if ( c1 != c2 ) {
-			operands_type_mismatch( op_to_str( op_ ), c1, c2, thread_->current_frame()->file_id(), position_ );
+			operands_type_mismatch( op_to_str( op_ ), c1, c2, thread_->file_id(), position_ );
 		}
 		if ( op_ < OPERATOR::ASSIGN ) {
 			v1 = v1->clone( thread_, &v1, position_ );
@@ -59,7 +59,7 @@ public:
 		huginn::HClass const* c1( v1->get_class() );
 		huginn::HClass const* c2( v2->get_class() );
 		if ( c1 != c2 ) {
-			operands_type_mismatch( op_to_str( op_ ), c1, c2, thread_->current_frame()->file_id(), position_ );
+			operands_type_mismatch( op_to_str( op_ ), c1, c2, thread_->file_id(), position_ );
 		}
 		bool res( ( v1.raw()->*binaryBooleanOperator_ )( thread_, v1, v2, position_ ) );
 		return ( thread_->runtime().boolean_value( res ) );
@@ -90,7 +90,7 @@ public:
 		huginn::HClass const* c1( v1->get_class() );
 		huginn::HClass const* c2( v2->get_class() );
 		if ( ( c1 != c2 ) && ( c1->type_id() != HHuginn::TYPE::NONE ) && ( c2->type_id() != HHuginn::TYPE::NONE ) ) {
-			operands_type_mismatch( op_to_str( OPERATOR::EQUALS ), c1, c2, thread_->current_frame()->file_id(), position_ );
+			operands_type_mismatch( op_to_str( OPERATOR::EQUALS ), c1, c2, thread_->file_id(), position_ );
 		}
 		bool res( v1->operator_equals( thread_, v1, v2, position_ ) );
 		res = op_ == OPERATOR::EQUALS ? res : ! res;
@@ -104,7 +104,7 @@ public:
 		HHuginn::value_t& v2( values_[1] );
 		huginn::HClass const* c2( v2->get_class() );
 		if ( ( c2->type_id() <= huginn::type_id( HHuginn::TYPE::UNKNOWN ) ) && ! is_collection_like( c2 ) ) {
-			throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_COLL] ).append( a_type_name( c2 ) ), thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_COLL] ).append( a_type_name( c2 ) ), thread_->file_id(), position_ );
 		}
 		bool res( v2->operator_contains( thread_, v2, v1, position_ ) );
 		res = op_ == OPERATOR::IS_ELEMENT_OF ? res : ! res;

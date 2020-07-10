@@ -193,7 +193,7 @@ public:
 		try {
 			int long long mode( get_integer( values_[1] ) );
 			if ( ( mode < 0 ) || ( mode > 07777 ) ) {
-				throw HHuginn::HHuginnRuntimeException( "Bad mode: "_ys.append( mode ), thread_->current_frame()->file_id(), position_ );
+				throw HHuginn::HHuginnRuntimeException( "Bad mode: "_ys.append( mode ), thread_->file_id(), position_ );
 			}
 			filesystem::chmod( get_string( values_[0] ), static_cast<u32_t>( mode ) );
 		} catch ( HFileSystemException const& e ) {

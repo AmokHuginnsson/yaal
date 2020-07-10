@@ -333,7 +333,7 @@ void HStream::write( HThread* thread_, HHuginn::value_t const& value_, int posit
 			default: {
 				throw HHuginn::HHuginnRuntimeException(
 					a_type_name( value_->get_class() ).append( " has no binary stream write method." ),
-					thread_->current_frame()->file_id(),
+					thread_->file_id(),
 					position_
 				);
 			}
@@ -371,7 +371,7 @@ HHuginn::value_t HStream::read_blob( HThread* thread_, huginn::HInteger::value_t
 	if ( toRead_ < 0 ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Invalid read size.",
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -396,7 +396,7 @@ HHuginn::value_t HStream::read_string( HThread* thread_, huginn::HInteger::value
 	if ( toRead_ < 0 ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Invalid read size.",
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -446,7 +446,7 @@ HHuginn::value_t HStream::read_integer( HThread* thread_, huginn::HInteger::valu
 		default: {
 			throw HHuginn::HHuginnRuntimeException(
 				"Invalid read size.",
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -483,7 +483,7 @@ HHuginn::value_t HStream::read_integer_unsigned( HThread* thread_, huginn::HInte
 		default: {
 			throw HHuginn::HHuginnRuntimeException(
 				"Invalid read size.",
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -517,7 +517,7 @@ HHuginn::value_t HStream::read_real( HThread* thread_, huginn::HInteger::value_t
 		default: {
 			throw HHuginn::HHuginnRuntimeException(
 				"Invalid read size.",
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -549,7 +549,7 @@ HHuginn::value_t HStream::read_character( HThread* thread_, huginn::HInteger::va
 		default: {
 			throw HHuginn::HHuginnRuntimeException(
 				"Invalid read size.",
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -619,7 +619,7 @@ void HStream::write_integer( HThread* thread_, HHuginn::value_t const& value_, h
 		default: {
 			throw HHuginn::HHuginnRuntimeException(
 				"Invalid write size.",
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -636,7 +636,7 @@ void HStream::write_integer_unsigned( HThread* thread_, HHuginn::value_t const& 
 	if ( ( val < 0 ) && ( toWrite != static_cast<int>( sizeof ( huginn::HInteger::value_type ) ) ) ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Missuse of _unsigned_ integer writer.",
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -660,7 +660,7 @@ void HStream::write_integer_unsigned( HThread* thread_, HHuginn::value_t const& 
 		default: {
 			throw HHuginn::HHuginnRuntimeException(
 				"Invalid write size.",
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -693,7 +693,7 @@ void HStream::write_real( HThread* thread_, HHuginn::value_t const& value_, hugi
 		default: {
 			throw HHuginn::HHuginnRuntimeException(
 				"Invalid write size.",
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -723,7 +723,7 @@ void HStream::write_character( HThread* thread_, HHuginn::value_t const& value_,
 		default: {
 			throw HHuginn::HHuginnRuntimeException(
 				"Invalid write size.",
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -1014,7 +1014,7 @@ huginn::HIterable::iterator_t HStream::do_iterator( HThread* thread_, int positi
 }
 
 int long HStream::do_size( huginn::HThread* thread_, int position_ ) const {
-	throw HHuginn::HHuginnRuntimeException( "Getting size of `Stream` is an invalid operation.", thread_->current_frame()->file_id(), position_ );
+	throw HHuginn::HHuginnRuntimeException( "Getting size of `Stream` is an invalid operation.", thread_->file_id(), position_ );
 }
 
 HHuginn::class_t HStream::get_class( HRuntime* runtime_ ) {
@@ -1043,7 +1043,7 @@ HHuginn::class_t HStream::get_class( HRuntime* runtime_ ) {
 
 HHuginn::value_t HStream::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
 	M_PROLOG
-	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on Stream.", thread_->current_frame()->file_id(), position_ );
+	throw HHuginn::HHuginnRuntimeException( "Copy semantics is not supported on Stream.", thread_->file_id(), position_ );
 	M_EPILOG
 }
 

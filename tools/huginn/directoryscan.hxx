@@ -50,7 +50,7 @@ public:
 	}
 protected:
 	virtual int long do_size( huginn::HThread* thread_, int position_ ) const override {
-		throw HHuginn::HHuginnRuntimeException( "Getting size of `DirectoryScan' is an invalid operation.", thread_->current_frame()->file_id(), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Getting size of `DirectoryScan' is an invalid operation.", thread_->file_id(), position_ );
 	}
 private:
 	virtual iterator_t do_iterator( HThread*, int ) override;

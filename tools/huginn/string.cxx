@@ -177,7 +177,7 @@ public:
 	void ensure( bool condResult_, char const* msg_ ) {
 		if ( ! condResult_ ) {
 			throw HHuginn::HHuginnRuntimeException(
-				hcore::to_string( msg_ ).append( " at: " ).append( _it - _format.begin() ), _thread->current_frame()->file_id(),
+				hcore::to_string( msg_ ).append( " at: " ).append( _it - _format.begin() ), _thread->file_id(),
 				_position
 			);
 		}
@@ -223,7 +223,7 @@ public:
 						try {
 							idx = lexical_cast<int>( idxRaw );
 						} catch ( hcore::HException const& e ) {
-							throw HHuginn::HHuginnRuntimeException( e.what(), _thread->current_frame()->file_id(), _position );
+							throw HHuginn::HHuginnRuntimeException( e.what(), _thread->file_id(), _position );
 						}
 					}
 					++ fmtSubstCount;
@@ -567,7 +567,7 @@ bool HString::do_operator_contains( HThread* thread_, HHuginn::value_t const&, H
 	if ( other_->type_id() != HHuginn::TYPE::CHARACTER ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Only `character`s can be elements of `string`s.",
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -584,7 +584,7 @@ HHuginn::value_t HString::do_operator_subscript( HThread* thread_, HHuginn::valu
 }
 
 void HString::do_operator_subscript_assign( HThread* thread_, HHuginn::value_t&, HHuginn::value_t const&, HHuginn::value_t&&, int position_ ) {
-	throw HHuginn::HHuginnRuntimeException( "`string` does not support item assignment.", thread_->current_frame()->file_id(), position_ );
+	throw HHuginn::HHuginnRuntimeException( "`string` does not support item assignment.", thread_->file_id(), position_ );
 }
 
 HHuginn::value_t HString::do_operator_range( HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& from_, HHuginn::value_t const& to_, HHuginn::value_t const& step_, int position_ ) const {

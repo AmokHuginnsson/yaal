@@ -97,7 +97,7 @@ HHuginn::value_t HRandomizer::create_instance( HClass const* class_, huginn::HTh
 			if ( to < from ) {
 				throw HHuginn::HHuginnRuntimeException(
 					"Invalid DISCRETE parametrization.",
-					thread_->current_frame()->file_id(),
+					thread_->file_id(),
 					position_
 				);
 			}
@@ -110,7 +110,7 @@ HHuginn::value_t HRandomizer::create_instance( HClass const* class_, huginn::HTh
 			if ( infimum >= supremum ) {
 				throw HHuginn::HHuginnRuntimeException(
 					"Invalid UNIFORM parametrization.",
-					thread_->current_frame()->file_id(),
+					thread_->file_id(),
 					position_
 				);
 			}
@@ -124,7 +124,7 @@ HHuginn::value_t HRandomizer::create_instance( HClass const* class_, huginn::HTh
 			if ( ( infimum >= supremum ) || ( mode < infimum ) || ( mode > supremum ) ) {
 				throw HHuginn::HHuginnRuntimeException(
 					"Invalid TRIANGLE parametrization.",
-					thread_->current_frame()->file_id(),
+					thread_->file_id(),
 					position_
 				);
 			}
@@ -137,7 +137,7 @@ HHuginn::value_t HRandomizer::create_instance( HClass const* class_, huginn::HTh
 			if ( sigma <= 0 ) {
 				throw HHuginn::HHuginnRuntimeException(
 					"Invalid NORMAL parametrization.",
-					thread_->current_frame()->file_id(),
+					thread_->file_id(),
 					position_
 				);
 			}
@@ -149,7 +149,7 @@ HHuginn::value_t HRandomizer::create_instance( HClass const* class_, huginn::HTh
 			if ( lambda <= 0 ) {
 				throw HHuginn::HHuginnRuntimeException(
 					"Invalid POISSON parametrization.",
-					thread_->current_frame()->file_id(),
+					thread_->file_id(),
 					position_
 				);
 			}

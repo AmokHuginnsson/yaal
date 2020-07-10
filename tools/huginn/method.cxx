@@ -51,7 +51,7 @@ HHuginn::value_t HClass::HUnboundMethod::do_operator_call( huginn::HThread* thre
 	if ( arguments_.is_empty() ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Calling method without an object.",
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}
@@ -63,7 +63,7 @@ HHuginn::value_t HClass::HUnboundMethod::do_operator_call( huginn::HThread* thre
 				.append( " called on an object of type " )
 				.append( a_type_name( o->get_class() ) )
 				.append( "." ),
-			thread_->current_frame()->file_id(),
+			thread_->file_id(),
 			position_
 		);
 	}

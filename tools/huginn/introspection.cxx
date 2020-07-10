@@ -245,7 +245,7 @@ public:
 		if ( is_restricted( package ) ) {
 			throw HHuginn::HHuginnRuntimeException(
 				"`"_ys.append( package ).append( "` is restricted keyword." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -254,7 +254,7 @@ public:
 				hcore::to_string(
 					enumerationExists ? "Enumeration" : ( classExists ? "Class" : ( functionExists ? "Function" : "Package alias" ) )
 				).append( " of the same name already exists." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}

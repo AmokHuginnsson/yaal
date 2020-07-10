@@ -95,7 +95,7 @@ public:
 		HHuginn::value_t accumulator( argCount == 3 ? values_[2] : HHuginn::value_t() );
 		huginn::HIterable const* iterable( static_cast<huginn::HIterable const*>( src.raw() ) );
 		if ( ! accumulator && ( iterable->size( thread_, position_ ) == 0 ) ) {
-			throw HHuginn::HHuginnRuntimeException( "reduce() on empty.", thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "reduce() on empty.", thread_->file_id(), position_ );
 		}
 		huginn::HIterable::iterator_t it( const_cast<huginn::HIterable*>( iterable )->iterator( thread_, position_ ) );
 		if ( ! accumulator ) {
@@ -168,7 +168,7 @@ public:
 				if ( keyType && ( newKeyType != keyType ) ) {
 					throw HHuginn::HHuginnRuntimeException(
 						"Invalid key type: "_ys.append( a_type_name( newKeyType ) ).append( "." ),
-						thread_->current_frame()->file_id(),
+						thread_->file_id(),
 						position_
 					);
 				}
@@ -200,7 +200,7 @@ public:
 				if ( keyType && ( newKeyType != keyType ) ) {
 					throw HHuginn::HHuginnRuntimeException(
 						"Invalid key type: "_ys.append( a_type_name( newKeyType ) ).append( "." ),
-						thread_->current_frame()->file_id(),
+						thread_->file_id(),
 						position_
 					);
 				}
@@ -222,7 +222,7 @@ public:
 				if ( tuple->type_id() != HHuginn::TYPE::TUPLE ) {
 					throw HHuginn::HHuginnRuntimeException(
 						"Each value materialized into a `dict` must be a `tuple` not "_ys.append( a_type_name( tuple->get_class() ) ).append( "." ),
-						thread_->current_frame()->file_id(),
+						thread_->file_id(),
 						position_
 					);
 				}
@@ -230,7 +230,7 @@ public:
 				if ( data.get_size() != 2 ) {
 					throw HHuginn::HHuginnRuntimeException(
 						"Each `tuple` materialized into a `dict` must be a key-value pair, i.e. contain exactly two elements.",
-						thread_->current_frame()->file_id(),
+						thread_->file_id(),
 						position_
 					);
 				}
@@ -238,7 +238,7 @@ public:
 				if ( keyType && ( newKeyType != keyType ) ) {
 					throw HHuginn::HHuginnRuntimeException(
 						"Invalid key type: "_ys.append( a_type_name( newKeyType ) ).append( "." ),
-						thread_->current_frame()->file_id(),
+						thread_->file_id(),
 						position_
 					);
 				}
@@ -259,7 +259,7 @@ public:
 				if ( tuple->type_id() != HHuginn::TYPE::TUPLE ) {
 					throw HHuginn::HHuginnRuntimeException(
 						"Each value materialized into a `lookup` must be a `tuple` not "_ys.append( a_type_name( tuple->get_class() ) ).append( "." ),
-						thread_->current_frame()->file_id(),
+						thread_->file_id(),
 						position_
 					);
 				}
@@ -267,7 +267,7 @@ public:
 				if ( data.get_size() != 2 ) {
 					throw HHuginn::HHuginnRuntimeException(
 						"Each `tuple` materialized into a `lookup` must be a key-value pair, i.e. contain exactly two elements.",
-						thread_->current_frame()->file_id(),
+						thread_->file_id(),
 						position_
 					);
 				}
@@ -281,7 +281,7 @@ public:
 				if ( c->type_id() != HHuginn::TYPE::CHARACTER ) {
 					throw HHuginn::HHuginnRuntimeException(
 						"A non-`character` type value materialized into a `string`.",
-						thread_->current_frame()->file_id(),
+						thread_->file_id(),
 						position_
 					);
 				}
@@ -292,7 +292,7 @@ public:
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
 				"Invalid materialized type: `"_ys.append( thread_->runtime().function_name( fr.function().id() ) ).append( "`." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -431,7 +431,7 @@ public:
 		if ( ! v ) {
 			throw HHuginn::HHuginnRuntimeException(
 				hcore::to_string( name_ ).append( " argument is an empty sequence." ),
-				thread_->current_frame()->file_id(),
+				thread_->file_id(),
 				position_
 			);
 		}
@@ -611,7 +611,7 @@ private:
 			|| ( step < 0 )
 			|| ( stop < from )
 		) {
-			throw HHuginn::HHuginnRuntimeException( "Invalid slice.", thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Invalid slice.", thread_->file_id(), position_ );
 		}
 		return ( thread_->object_factory().create<HSlice>( _sliceClass.raw(), src, from, stop, step ) );
 		M_EPILOG
@@ -644,7 +644,7 @@ private:
 			|| ( ( stop > from ) && ( step < 0 ) )
 			|| ( ( stop < from ) && ( step > 0 ) )
 		) {
-			throw HHuginn::HHuginnRuntimeException( "Invalid range.", thread_->current_frame()->file_id(), position_ );
+			throw HHuginn::HHuginnRuntimeException( "Invalid range.", thread_->file_id(), position_ );
 		}
 		return ( thread_->object_factory().create<HRange>( _rangeClass.raw(), from, stop, step ) );
 		M_EPILOG
