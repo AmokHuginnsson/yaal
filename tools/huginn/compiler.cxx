@@ -432,13 +432,11 @@ void OCompiler::resolve_symbols( void ) {
 						 * to have the same index, this is possible because `[else] if` stanzas are mutually exclusive
 						 * in given `if/else` chain.
 						 */
+						M_ASSERT( localVariable._index == -1 );
+						localVariable._index = static_cast<int>( sc->_variables.get_size() );
 						OScopeContext* parent( sc );
 						while ( parent->_parent && ( parent->_parent->_statementId == parent->_statementId ) ) {
 							parent = parent->_parent;
-						}
-						M_ASSERT( localVariable._index == -1 );
-						localVariable._index = static_cast<int>( sc->_variables.get_size() );
-						if ( parent != sc ) {
 							localVariable._index += static_cast<int>( parent->_variables.get_size() );
 						}
 						localVariable._definedBy = es._expression.raw();
