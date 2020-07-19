@@ -33,7 +33,7 @@ public:
 		action_t _action;
 		int _position;
 		HFrame::ACCESS _access;
-		HStatement::statement_id_t _statementId;
+		HHuginn::statement_id_t _statementId;
 		int _index;
 		HHuginn::identifier_id_t _identifierId;
 		HHuginn::value_t _value;
@@ -50,8 +50,8 @@ public:
 		OExecutionStep( HExpression*, action_t, int, HFrame::ACCESS, int );
 		OExecutionStep( HExpression*, action_t, int, HFrame::ACCESS );
 		OExecutionStep( HExpression*, action_t, int, HFrame::ACCESS, HHuginn::identifier_id_t );
-		OExecutionStep( HExpression*, action_t, int, HFrame::ACCESS, HStatement::statement_id_t, int );
-		OExecutionStep( HExpression*, action_t, int, HFrame::ACCESS, HStatement::statement_id_t, int, HHuginn::identifier_id_t );
+		OExecutionStep( HExpression*, action_t, int, HFrame::ACCESS, HHuginn::statement_id_t, int );
+		OExecutionStep( HExpression*, action_t, int, HFrame::ACCESS, HHuginn::statement_id_t, int, HHuginn::identifier_id_t );
 		OExecutionStep( HExpression*, action_t, int, HHuginn::value_t const* );
 		OExecutionStep( HExpression*, action_t, int, HHuginn::value_t const&, HHuginn::TYPE = HHuginn::TYPE::UNKNOWN );
 		OExecutionStep( HExpression*, action_t, int, double long );

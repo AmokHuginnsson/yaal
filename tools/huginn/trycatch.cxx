@@ -19,7 +19,7 @@ namespace tools {
 namespace huginn {
 
 HTryCatch::HCatch::HCatch(
-	HStatement::statement_id_t id_,
+	HHuginn::statement_id_t id_,
 	HHuginn::identifier_id_t type_,
 	HHuginn::expression_t const& control_,
 	HHuginn::scope_t const& scope_

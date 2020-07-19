@@ -16,7 +16,7 @@ namespace tools {
 namespace huginn {
 
 HSwitch::HSwitch(
-	HStatement::statement_id_t id_,
+	HHuginn::statement_id_t id_,
 	HHuginn::expression_t const& expression_,
 	cases_t const& cases_,
 	HHuginn::scope_t const& default_,

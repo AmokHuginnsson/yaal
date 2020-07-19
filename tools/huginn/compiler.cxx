@@ -22,7 +22,7 @@ namespace tools {
 
 namespace huginn {
 
-HStatement::statement_id_t const INVALID_STATEMENT_IDENTIFIER( -1 );
+HHuginn::statement_id_t const INVALID_STATEMENT_IDENTIFIER( -1 );
 static int const NOT_TERMINATED( -1 );
 
 OCompiler::OActiveScope::OActiveScope( HHuginn::scope_t& scope_, HHuginn::expression_t& expression_ )
@@ -33,7 +33,7 @@ OCompiler::OActiveScope::OActiveScope( HHuginn::scope_t& scope_, HHuginn::expres
 
 OCompiler::OScopeContext::OScopeContext(
 	OFunctionContext* functionContext_,
-	HStatement::statement_id_t statementId_,
+	HHuginn::statement_id_t statementId_,
 	int fileId_,
 	executing_parser::range_t range_
 ) : _parent( ! functionContext_->_scopeStack.is_empty() ? functionContext_->_scopeStack.top().raw() : nullptr )
@@ -100,7 +100,7 @@ void OCompiler::OScopeContext::note_type( HHuginn::identifier_id_t identifierId_
 OCompiler::OFunctionContext::OFunctionContext(
 	OCompiler* compiler_,
 	HHuginn::identifier_id_t functionId_,
-	HStatement::statement_id_t statementId_,
+	HHuginn::statement_id_t statementId_,
 	int fileId_,
 	bool isLambda_
 ) : _functionIdentifier( functionId_ )
@@ -930,7 +930,7 @@ void OCompiler::verify_default_argument( executing_parser::range_t range_ ) {
 void OCompiler::create_scope( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	HStatement::statement_id_t sid( INVALID_STATEMENT_IDENTIFIER );
+	HHuginn::statement_id_t sid( INVALID_STATEMENT_IDENTIFIER );
 	if ( ! fc._inline ) {
 		++ _statementIdGenerator;
 		sid = _statementIdGenerator;

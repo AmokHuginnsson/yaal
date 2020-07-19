@@ -5,6 +5,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "frame.hxx"
 #include "runtime.hxx"
+#include "statement.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
 #include "keyword.hxx"
@@ -141,7 +142,7 @@ void HFrame::note_variable( HHuginn::identifier_id_t identifier_ ) {
 	M_EPILOG
 }
 
-void HFrame::note_variable( HHuginn::identifier_id_t identifier_, HStatement::statement_id_t statementId_, int index_ ) {
+void HFrame::note_variable( HHuginn::identifier_id_t identifier_, HHuginn::statement_id_t statementId_, int index_ ) {
 	M_PROLOG
 	if ( ( statementId_ == _statement->id() ) && ( static_cast<int>( _variableIdentifiers.get_size() ) == index_ ) ) {
 		_variableIdentifiers.push_back( identifier_ );
@@ -156,6 +157,10 @@ void HFrame::commit_variable( HHuginn::value_t&& value_, int position_ ) {
 	static_cast<HReference*>( _result.raw() )->set( _thread, yaal::move( value_ ), position_ );
 	return;
 	M_EPILOG
+}
+
+int HFrame::file_id( void ) const {
+	return ( _statement->file_id() );
 }
 
 HHuginn::value_t HFrame::get_field( ACCESS access_, int index_ ) {
@@ -173,7 +178,7 @@ HHuginn::value_t HFrame::get_field( ACCESS access_, int index_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t const& HFrame::get_variable_value( HStatement::statement_id_t statementId_, int index_ ) {
+HHuginn::value_t const& HFrame::get_variable_value( HHuginn::statement_id_t statementId_, int index_ ) {
 	M_PROLOG
 	HFrame* f( this );
 	while ( statementId_ != f->_statement->id() ) {
@@ -184,7 +189,7 @@ HHuginn::value_t const& HFrame::get_variable_value( HStatement::statement_id_t s
 	M_EPILOG
 }
 
-HHuginn::value_t HFrame::make_variable( HStatement::statement_id_t M_DEBUG_CODE( statementId_ ), int index_ ) {
+HHuginn::value_t HFrame::make_variable( HHuginn::statement_id_t M_DEBUG_CODE( statementId_ ), int index_ ) {
 	M_PROLOG
 	M_ASSERT( statementId_ == _statement->id() );
 	/*
@@ -205,7 +210,7 @@ HHuginn::value_t HFrame::make_variable( HStatement::statement_id_t M_DEBUG_CODE(
 	M_EPILOG
 }
 
-HHuginn::value_t HFrame::get_variable_reference( HStatement::statement_id_t statementId_, int index_ ) {
+HHuginn::value_t HFrame::get_variable_reference( HHuginn::statement_id_t statementId_, int index_ ) {
 	M_PROLOG
 	HFrame* f( this );
 	while ( statementId_ != f->_statement->id() ) {

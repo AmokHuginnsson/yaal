@@ -108,7 +108,7 @@ struct OCompiler {
 
 		/*! \brief Identifier of currently compiled statement.
 		 */
-		HStatement::statement_id_t _statementId;
+		HHuginn::statement_id_t _statementId;
 
 		/*! \brief Context of a function this scope belongs to.
 		 */
@@ -149,7 +149,7 @@ struct OCompiler {
 		 */
 		bool _hasLocalVariablesInDirectChildren;
 
-		OScopeContext( OFunctionContext*, HStatement::statement_id_t, int, executing_parser::range_t );
+		OScopeContext( OFunctionContext*, HHuginn::statement_id_t, int, executing_parser::range_t );
 		HHuginn::expression_t& expression( void );
 		huginn::HClass const* guess_type( OCompiler const*, HHuginn::identifier_id_t ) const;
 		void note_type( HHuginn::identifier_id_t, huginn::HClass const* );
@@ -310,7 +310,7 @@ struct OCompiler {
 		 */
 		OCompiler* _compiler;
 
-		OFunctionContext( OCompiler*, HHuginn::identifier_id_t, HStatement::statement_id_t, int, bool );
+		OFunctionContext( OCompiler*, HHuginn::identifier_id_t, HHuginn::statement_id_t, int, bool );
 		expressions_stack_t& expressions_stack( void );
 	private:
 		OFunctionContext( OFunctionContext const& ) = delete;
@@ -431,7 +431,7 @@ struct OCompiler {
 	captures_log_t _capturesLog;
 	lambda_definition_sites_t _lambdaDefinitionSites;
 	HIntrospectorInterface* _introspector;
-	HStatement::statement_id_t _statementIdGenerator;
+	HHuginn::statement_id_t _statementIdGenerator;
 	scope_context_cache_t _scopeContextCache;
 	/*! \brief Tells if this compiler instance is used for sub-module.
 	 */

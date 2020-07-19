@@ -20,7 +20,7 @@ namespace tools {
 namespace huginn {
 
 HFor::HFor(
-	HStatement::statement_id_t id_,
+	HHuginn::statement_id_t id_,
 	HHuginn::expressions_t&& control_,
 	HHuginn::expression_t const& source_,
 	HHuginn::scope_t const& loop_,

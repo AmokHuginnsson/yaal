@@ -23,7 +23,7 @@ private:
 	HHuginn::scope_t _loop;
 	bool _needsFrame;
 public:
-	HWhile( HStatement::statement_id_t, HHuginn::expression_t const&, HHuginn::scope_t const&, bool, int, executing_parser::range_t );
+	HWhile( HHuginn::statement_id_t, HHuginn::expression_t const&, HHuginn::scope_t const&, bool, int, executing_parser::range_t );
 protected:
 	virtual void do_execute( HThread* ) const override;
 };

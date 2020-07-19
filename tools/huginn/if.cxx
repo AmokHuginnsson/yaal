@@ -16,7 +16,7 @@ namespace tools {
 namespace huginn {
 
 HIf::HIf(
-	HStatement::statement_id_t id_,
+	HHuginn::statement_id_t id_,
 	OCompiler::OScopeContext::active_scopes_t const& ifClause_,
 	HHuginn::scope_t const& elseClause_,
 	bool needsFrame_,

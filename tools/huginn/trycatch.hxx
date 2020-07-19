@@ -24,7 +24,7 @@ public:
 		HHuginn::scope_t _scope;
 	public:
 		HCatch(
-			HStatement::statement_id_t,
+			HHuginn::statement_id_t,
 			HHuginn::identifier_id_t,
 			HHuginn::expression_t const&,
 			HHuginn::scope_t const&

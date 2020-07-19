@@ -7,7 +7,6 @@
 #define YAAL_TOOLS_HUGINN_FRAME_HXX_INCLUDED 1
 
 #include "tools/hhuginn.hxx"
-#include "tools/huginn/statement.hxx"
 
 namespace yaal {
 
@@ -17,6 +16,7 @@ namespace huginn {
 
 class HThread;
 class HFunction;
+class HStatement;
 
 class HFrame {
 public:
@@ -131,13 +131,13 @@ public:
 	void set_thread( HThread* );
 	void reshape( void );
 	HHuginn::value_t get_field( ACCESS, int );
-	HHuginn::value_t const& get_variable_value( HStatement::statement_id_t, int );
-	HHuginn::value_t get_variable_reference( HStatement::statement_id_t, int );
-	HHuginn::value_t make_variable( HStatement::statement_id_t, int );
+	HHuginn::value_t const& get_variable_value( HHuginn::statement_id_t, int );
+	HHuginn::value_t get_variable_reference( HHuginn::statement_id_t, int );
+	HHuginn::value_t make_variable( HHuginn::statement_id_t, int );
 	HHuginn::value_t get_this( void );
 	HHuginn::value_t get_super( int );
 	void note_variable( HHuginn::identifier_id_t );
-	void note_variable( HHuginn::identifier_id_t, HStatement::statement_id_t, int );
+	void note_variable( HHuginn::identifier_id_t, HHuginn::statement_id_t, int );
 	void commit_variable( HHuginn::value_t&&, int );
 	bool can_continue( void ) const {
 		return ( _state == STATE::NORMAL );
@@ -188,9 +188,7 @@ public:
 	HStatement const* statement( void ) const {
 		return ( _statement );
 	}
-	int file_id( void ) const {
-		return ( _statement->file_id() );
-	}
+	int file_id( void ) const;
 	void set_position( int position_ ) {
 		_position = position_;
 	}

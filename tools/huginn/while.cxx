@@ -16,7 +16,7 @@ namespace tools {
 namespace huginn {
 
 HWhile::HWhile(
-	HStatement::statement_id_t id_,
+	HHuginn::statement_id_t id_,
 	HHuginn::expression_t const& condition_,
 	HHuginn::scope_t const& loop_,
 	bool needsFrame_,

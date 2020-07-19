@@ -65,10 +65,9 @@ class HIntrospectorInterface;
 class HHuginn {
 public:
 	typedef HHuginn this_type;
-	struct type_tag;
-	struct identifier_tag;
-	typedef yaal::hcore::HTaggedPOD<int, type_tag> type_id_t;
-	typedef yaal::hcore::HTaggedPOD<int, identifier_tag> identifier_id_t;
+	typedef yaal::hcore::HTaggedPOD<int, struct type_tag> type_id_t;
+	typedef yaal::hcore::HTaggedPOD<int, struct identifier_tag> identifier_id_t;
+	typedef yaal::hcore::HTaggedPOD<int, struct statement_tag> statement_id_t;
 	typedef yaal::hcore::HPointer<HHuginn> ptr_t;
 	class HNotifableReference;
 	class HReferenceTracker;
@@ -561,6 +560,8 @@ inline yaal::hcore::HString const& type_name( HHuginn::type_id_t const& type_ ) 
 
 void initialize_packages( void );
 void cleanup_packages( void );
+
+static int const MAIN_FILE_ID = 0;
 
 }
 

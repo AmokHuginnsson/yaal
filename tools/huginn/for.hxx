@@ -24,7 +24,7 @@ private:
 	HHuginn::scope_t _loop;
 	bool _needsFrame;
 public:
-	HFor( HStatement::statement_id_t, HHuginn::expressions_t&&, HHuginn::expression_t const&, HHuginn::scope_t const&, bool, int, executing_parser::range_t );
+	HFor( HHuginn::statement_id_t, HHuginn::expressions_t&&, HHuginn::expression_t const&, HHuginn::scope_t const&, bool, int, executing_parser::range_t );
 protected:
 	virtual void do_execute( HThread* ) const override;
 private:

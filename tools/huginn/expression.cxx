@@ -120,7 +120,7 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _unboundIndexes() {
 }
 
-HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HFrame::ACCESS access_, HStatement::statement_id_t statementId_, int index_ )
+HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HFrame::ACCESS access_, HHuginn::statement_id_t statementId_, int index_ )
 	: _expression( expression_ )
 	, _action( action_ )
 	, _position( position_ )
@@ -139,7 +139,7 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _unboundIndexes() {
 }
 
-HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HFrame::ACCESS access_, HStatement::statement_id_t statementId_, int index_, HHuginn::identifier_id_t identifierId_ )
+HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HFrame::ACCESS access_, HHuginn::statement_id_t statementId_, int index_, HHuginn::identifier_id_t identifierId_ )
 	: _expression( expression_ )
 	, _action( action_ )
 	, _position( position_ )

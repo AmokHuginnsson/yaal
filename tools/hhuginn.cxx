@@ -1057,7 +1057,7 @@ yaal::hcore::HString string_form(
 	HRuntime const* runtime_
 ) {
 	HResource<huginn::HThread> threadHolder;
-	HStatement stmt( HStatement::statement_id_t( 0 ), 0, { 0, 0 } );
+	HStatement stmt( HHuginn::statement_id_t( 0 ), 0, { 0, 0 } );
 	if ( runtime_ ) {
 		threadHolder.reset( new huginn::HThread( const_cast<HRuntime*>( runtime_ ), hcore::HThread::get_current_thread_id() ) );
 		threadHolder->create_function_frame( &stmt, nullptr, 0 );
