@@ -81,6 +81,12 @@ private:
 	HHuginn::values_t _variables;
 
 	/*!
+	 * A number of local variables defined and available for reference at this
+	 * point in function frame execution.
+	 */
+	int _activeVariableCount;
+
+	/*!
 	 * Identifiers for the variables defined in current scope (frame) so far.
 	 */
 	identifiers_t _variableIdentifiers; /*!< Used for introspection only. */
@@ -187,6 +193,13 @@ public:
 	}
 	HStatement const* statement( void ) const {
 		return ( _statement );
+	}
+	void pop_local_variables( int count_ ) {
+		for ( int i( 0 ); i < count_; ++ i ) {
+			-- _activeVariableCount;
+			_variables[_activeVariableCount].reset();
+		}
+		return;
 	}
 	int file_id( void ) const;
 	void set_position( int position_ ) {

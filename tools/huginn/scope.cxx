@@ -12,8 +12,18 @@ namespace tools {
 
 namespace huginn {
 
-HScope::HScope( HHuginn::statement_id_t id_, int fileId_, executing_parser::range_t range_ )
+HVirtualScope::HVirtualScope( HHuginn::statement_id_t id_, int fileId_, executing_parser::range_t range_ )
 	: HStatement( id_, fileId_, range_ )
+	, _variableCount( 0 ) {
+	return;
+}
+
+void HVirtualScope::do_execute( HThread* thread_ ) const {
+	execute_internal( thread_ );
+}
+
+HScope::HScope( HHuginn::statement_id_t id_, int fileId_, executing_parser::range_t range_ )
+	: HVirtualScope( id_, fileId_, range_ )
 	, _statements()
 	, _inline( false ) {
 	return;
@@ -37,7 +47,7 @@ int HScope::statement_position_at( int index_ ) const {
 	return ( _statements[index_]->position() );
 }
 
-void HScope::do_execute( HThread* thread_ ) const {
+void HScope::do_execute_internal( HThread* thread_ ) const {
 	M_PROLOG
 	if ( ! _inline ) {
 		thread_->create_scope_frame( this );

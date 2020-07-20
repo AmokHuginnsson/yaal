@@ -6,7 +6,7 @@
 #define YAAL_TOOLS_HUGINN_WHILE_HXX_INCLUDED 1
 
 #include "tools/hhuginn.hxx"
-#include "tools/huginn/statement.hxx"
+#include "tools/huginn/scope.hxx"
 
 namespace yaal {
 
@@ -14,7 +14,7 @@ namespace tools {
 
 namespace huginn {
 
-class HWhile : public HStatement {
+class HWhile : public HVirtualScope {
 public:
 	typedef HWhile this_type;
 	typedef HStatement base_type;
@@ -25,7 +25,7 @@ private:
 public:
 	HWhile( HHuginn::statement_id_t, HHuginn::expression_t const&, HHuginn::scope_t const&, bool, int, executing_parser::range_t );
 protected:
-	virtual void do_execute( HThread* ) const override;
+	virtual void do_execute_internal( HThread* ) const override;
 };
 
 }

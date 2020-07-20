@@ -22,7 +22,7 @@ HIf::HIf(
 	bool needsFrame_,
 	int fileId_,
 	executing_parser::range_t range_
-) : HStatement( id_, fileId_, range_ )
+) : HVirtualScope( id_, fileId_, range_ )
 	, _ifClauses( ifClause_ )
 	, _elseClause( elseClause_ )
 	, _needsFrame( needsFrame_ ) {
@@ -35,7 +35,7 @@ HIf::HIf(
 	return;
 }
 
-void HIf::do_execute( huginn::HThread* thread_ ) const {
+void HIf::do_execute_internal( huginn::HThread* thread_ ) const {
 	M_PROLOG
 	if ( _needsFrame ) {
 		thread_->create_scope_frame( this );
@@ -55,7 +55,7 @@ void HIf::do_execute( huginn::HThread* thread_ ) const {
 			}
 			if ( static_cast<HBoolean*>( v.raw() )->value() ) {
 				done = true;
-				it->_scope->execute( thread_ );
+				it->_scope->execute_internal( thread_ );
 			}
 		} else {
 			break;

@@ -28,6 +28,7 @@ HFrame::HFrame(
 	, _object( nullptr )
 	, _upCast( 0 )
 	, _variables()
+	, _activeVariableCount( 0 )
 	, _variableIdentifiers()
 	, _instructionPointers()
 	, _values()

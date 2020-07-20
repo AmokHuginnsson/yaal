@@ -15,10 +15,34 @@ namespace tools {
 
 namespace huginn {
 
-class HScope : public HStatement {
+class HVirtualScope : public HStatement {
+public:
+	typedef HVirtualScope this_type;
+	typedef HStatement base_type;
+private:
+	int _variableCount;
+public:
+	HVirtualScope( HHuginn::statement_id_t, int, executing_parser::range_t );
+	virtual ~HVirtualScope( void ) {
+		return;
+	}
+	void execute_internal( HThread* thread_ ) const {
+		do_execute_internal( thread_ );
+		thread_->current_frame()->pop_local_variables( _variableCount );
+	}
+protected:
+	virtual void do_execute( HThread* ) const override;
+	virtual void do_execute_internal( HThread* ) const = 0;
+private:
+	HVirtualScope( HVirtualScope const& ) = delete;
+	HVirtualScope( HVirtualScope&& ) = delete;
+	HVirtualScope& operator = ( HVirtualScope const& ) = delete;
+};
+
+class HScope : public HVirtualScope {
 public:
 	typedef HScope this_type;
-	typedef HStatement base_type;
+	typedef HVirtualScope base_type;
 	typedef yaal::hcore::HPointer<HStatement> statement_t;
 	typedef yaal::hcore::HArray<statement_t> statement_list_t;
 private:
@@ -37,7 +61,7 @@ public:
 		return ( static_cast<int>( _statements.get_size() ) );
 	}
 protected:
-	virtual void do_execute( HThread* ) const override;
+	virtual void do_execute_internal( HThread* ) const override;
 private:
 	HScope( HScope const& ) = delete;
 	HScope( HScope&& ) = delete;

@@ -46,17 +46,17 @@ void HTryCatch::HCatch::execute( HThread* thread_, HHuginn::value_t value_ ) con
 }
 
 HTryCatch::HTryCatch( HHuginn::scope_t const& try_, catches_t const& catches_, int fileId_, executing_parser::range_t range_ )
-	: HStatement( try_->id(), fileId_, range_ )
+	: HVirtualScope( try_->id(), fileId_, range_ )
 	, _try( try_ )
 	, _catches( catches_ ) {
 	_try->make_inline();
 	return;
 }
 
-void HTryCatch::do_execute( huginn::HThread* thread_ ) const {
+void HTryCatch::do_execute_internal( huginn::HThread* thread_ ) const {
 	M_PROLOG
 	thread_->create_try_catch_frame( this );
-	_try->execute( thread_ );
+	_try->execute_internal( thread_ );
 	if ( thread_->has_exception() ) {
 		HFrame* f( thread_->current_frame() );
 		HHuginn::value_t v( f->result() );

@@ -6,7 +6,7 @@
 #define YAAL_TOOLS_HUGINN_TRYCATCH_HXX_INCLUDED 1
 
 #include "tools/hhuginn.hxx"
-#include "tools/huginn/statement.hxx"
+#include "tools/huginn/scope.hxx"
 
 namespace yaal {
 
@@ -14,7 +14,7 @@ namespace tools {
 
 namespace huginn {
 
-class HTryCatch : public HStatement {
+class HTryCatch : public HVirtualScope {
 public:
 	typedef HTryCatch this_type;
 	typedef HStatement base_type;
@@ -41,7 +41,7 @@ private:
 public:
 	HTryCatch( HHuginn::scope_t const&, catches_t const&, int, executing_parser::range_t );
 protected:
-	virtual void do_execute( HThread* ) const override;
+	virtual void do_execute_internal( HThread* ) const override;
 };
 
 }

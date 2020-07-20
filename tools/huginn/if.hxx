@@ -6,7 +6,7 @@
 #define YAAL_TOOLS_HUGINN_IF_HXX_INCLUDED 1
 
 #include "compiler.hxx"
-#include "tools/huginn/statement.hxx"
+#include "tools/huginn/scope.hxx"
 
 namespace yaal {
 
@@ -14,7 +14,7 @@ namespace tools {
 
 namespace huginn {
 
-class HIf : public HStatement {
+class HIf : public HVirtualScope {
 public:
 	typedef HIf this_type;
 	typedef HStatement base_type;
@@ -26,7 +26,7 @@ private:
 public:
 	HIf( HHuginn::statement_id_t, if_clauses_t const&, HHuginn::scope_t const&, bool, int, executing_parser::range_t );
 protected:
-	virtual void do_execute( HThread* ) const override;
+	virtual void do_execute_internal( HThread* ) const override;
 };
 
 }

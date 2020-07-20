@@ -22,7 +22,7 @@ HWhile::HWhile(
 	bool needsFrame_,
 	int fileId_,
 	executing_parser::range_t range_
-) : HStatement( id_, fileId_, range_ )
+) : HVirtualScope( id_, fileId_, range_ )
 	, _condition( condition_ )
 	, _loop( loop_ )
 	, _needsFrame( needsFrame_ ) {
@@ -30,7 +30,7 @@ HWhile::HWhile(
 	return;
 }
 
-void HWhile::do_execute( huginn::HThread* thread_ ) const {
+void HWhile::do_execute_internal( huginn::HThread* thread_ ) const {
 	M_PROLOG
 	if ( _needsFrame ) {
 		thread_->create_loop_frame( _loop.raw() );
@@ -44,7 +44,7 @@ void HWhile::do_execute( huginn::HThread* thread_ ) const {
 				throw HHuginn::HHuginnRuntimeException( "`While` argument is not a boolean.", file_id(), _condition->position() );
 			}
 			if ( static_cast<HBoolean*>( v.raw() )->value() ) {
-				_loop->execute( thread_ );
+				_loop->execute_internal( thread_ );
 				f->continue_execution();
 			} else {
 				break;

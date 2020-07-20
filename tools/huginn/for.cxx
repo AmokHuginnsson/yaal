@@ -27,7 +27,7 @@ HFor::HFor(
 	bool needsFrame_,
 	int fileId_,
 	executing_parser::range_t range_
-) : HStatement( id_, fileId_, range_ )
+) : HVirtualScope( id_, fileId_, range_ )
 	, _control( yaal::move( control_ ) )
 	, _source( source_ )
 	, _loop( loop_ )
@@ -60,7 +60,7 @@ inline HHuginn::value_t ensure_virtual_collection(
 	M_EPILOG
 }
 
-void HFor::do_execute( HThread* thread_ ) const {
+void HFor::do_execute_internal( HThread* thread_ ) const {
 	M_PROLOG
 	if ( _needsFrame ) {
 		thread_->create_loop_frame( this );
@@ -116,7 +116,7 @@ void HFor::run_loop( HThread* thread_, HFrame* frame_, HHuginn::value_t&& value_
 		}
 	}
 	if ( frame_->can_continue() ) {
-		_loop->execute( thread_ );
+		_loop->execute_internal( thread_ );
 	}
 	frame_->continue_execution();
 	return;
