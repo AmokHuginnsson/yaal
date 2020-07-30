@@ -112,7 +112,7 @@ struct OCompiler {
 
 		/*! \brief Context of a function this scope belongs to.
 		 */
-		HHuginn::identifier_id_t _functionId;
+		OFunctionContext* _functionContext;
 
 		/*! \brief Variable name to index map for variables defined in this scope.
 		 *
@@ -410,6 +410,7 @@ struct OCompiler {
 	typedef yaal::hcore::HArray<OImportInfo> submitted_imports_t;
 	typedef HHuginn::values_t submitted_enums_t;
 	typedef yaal::hcore::HArray<OFunctionContext::scope_context_t> scope_context_cache_t;
+	typedef yaal::hcore::HArray<function_context_t> function_context_cache_t;
 	typedef yaal::hcore::HPair<HHuginn::identifier_id_t, HHuginn::function_t> function_info_t;
 	function_contexts_t _functionContexts;
 	class_context_t _classContext;
@@ -432,6 +433,7 @@ struct OCompiler {
 	lambda_definition_sites_t _lambdaDefinitionSites;
 	HIntrospectorInterface* _introspector;
 	HHuginn::statement_id_t _statementIdGenerator;
+	function_context_cache_t _functionContextCache;
 	scope_context_cache_t _scopeContextCache;
 	/*! \brief Tells if this compiler instance is used for sub-module.
 	 */

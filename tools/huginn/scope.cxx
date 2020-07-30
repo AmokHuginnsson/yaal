@@ -19,7 +19,16 @@ HVirtualScope::HVirtualScope( HHuginn::statement_id_t id_, int fileId_, executin
 }
 
 void HVirtualScope::do_execute( HThread* thread_ ) const {
+	M_PROLOG
 	execute_internal( thread_ );
+	return;
+	M_EPILOG
+}
+
+void HVirtualScope::set_variable_count( int variableCount_ ) {
+	M_ASSERT( variableCount_ >= 0 );
+	_variableCount = variableCount_;
+	return;
 }
 
 HScope::HScope( HHuginn::statement_id_t id_, int fileId_, executing_parser::range_t range_ )

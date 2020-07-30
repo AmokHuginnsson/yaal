@@ -30,6 +30,7 @@ public:
 		do_execute_internal( thread_ );
 		thread_->current_frame()->pop_local_variables( _variableCount );
 	}
+	void set_variable_count( int );
 protected:
 	virtual void do_execute( HThread* ) const override;
 	virtual void do_execute_internal( HThread* ) const = 0;

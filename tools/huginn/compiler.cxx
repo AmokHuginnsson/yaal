@@ -47,7 +47,7 @@ OCompiler::OScopeContext::OScopeContext(
 	, _catches()
 	, _terminatedAt( NOT_TERMINATED )
 	, _statementId( statementId_ )
-	, _functionId( functionContext_->_functionIdentifier )
+	, _functionContext( functionContext_ )
 	, _variables()
 	, _argumentIndexes()
 	, _needsFrame( false )
@@ -267,6 +267,7 @@ OCompiler::OCompiler( HRuntime* runtime_ )
 	, _lambdaDefinitionSites()
 	, _introspector( nullptr )
 	, _statementIdGenerator( INVALID_STATEMENT_IDENTIFIER )
+	, _functionContextCache()
 	, _scopeContextCache()
 	, _isModule( false )
 	, _preloaded( false )
@@ -287,6 +288,7 @@ void OCompiler::reset( int undoSteps_ ) {
 	_mainExecutedStatementCount = _mainCompiledStatementCount;
 	_isIncremental = true;
 	_scopeContextCache.clear();
+	_functionContextCache.clear();
 	_statementIdGenerator = INVALID_STATEMENT_IDENTIFIER;
 	_introspector = nullptr;
 	_lambdaDefinitionSites.clear();
@@ -367,7 +369,7 @@ void OCompiler::resolve_symbols( void ) {
 						break;
 					}
 				}
-				captures_log_t::const_iterator cli( _capturesLog.find( es._scope->_functionId ) );
+				captures_log_t::const_iterator cli( _capturesLog.find( es._scope->_functionContext->_functionIdentifier ) );
 				if ( cli != _capturesLog.end() ) {
 					HFunction::parameter_names_t::const_iterator ci( find( cli->second.begin(), cli->second.end(), es._identifier ) );
 					if ( ci != cli->second.end() ) {
@@ -385,7 +387,7 @@ void OCompiler::resolve_symbols( void ) {
 					}
 				}
 				OScopeContext* sc( es._scope.raw() );
-				HHuginn::identifier_id_t fi( sc->_functionId );
+				HHuginn::identifier_id_t fi( sc->_functionContext->_functionIdentifier );
 				OScopeContext::OLocalVariable localVariable;
 				while ( sc ) {
 					OScopeContext::local_variables_t::const_iterator it( sc->_variables.find( es._identifier ) );
@@ -393,7 +395,7 @@ void OCompiler::resolve_symbols( void ) {
 						localVariable = it->second;
 						break;
 					}
-					if ( sc->_parent && ( sc->_parent->_functionId == fi ) ) {
+					if ( sc->_parent && ( sc->_parent->_functionContext->_functionIdentifier == fi ) ) {
 						sc = sc->_parent;
 					} else {
 						sc = nullptr;
@@ -532,11 +534,11 @@ void OCompiler::resolve_symbols( void ) {
 			if ( es._classId != IDENTIFIER::INVALID ) {
 				_runtime->drop_class( es._classId );
 			} else {
-				lambda_definition_sites_t::const_iterator it( _lambdaDefinitionSites.find( es._scope->_functionId ) );
+				lambda_definition_sites_t::const_iterator it( _lambdaDefinitionSites.find( es._scope->_functionContext->_functionIdentifier ) );
 				if ( it != _lambdaDefinitionSites.end() ) {
 					_runtime->drop_global( it->second );
 				} else {
-					_runtime->drop_global( es._scope->_functionId );
+					_runtime->drop_global( es._scope->_functionContext->_functionIdentifier );
 				}
 			}
 			throw;
@@ -544,6 +546,7 @@ void OCompiler::resolve_symbols( void ) {
 	}
 	_runtime->set_max_local_variable_count( maxLocalVariableCount );
 	_scopeContextCache.clear();
+	_functionContextCache.clear();
 	_executionStepsBacklog.clear();
 	return;
 	M_EPILOG
@@ -963,6 +966,8 @@ void OCompiler::pop_function_context( void ) {
 	while ( ! fc._scopeStack.is_empty() ) {
 		pop_scope_context_low();
 	}
+	_functionContextCache.push_back( yaal::move( _functionContexts.top() ) );
+	_functionContextCache.back()->_variableCount.clear();
 	_functionContexts.pop();
 	return;
 	M_EPILOG
