@@ -619,7 +619,7 @@ bool HHuginn::compile( paths_t const& paths_, compiler_setup_t compilerSetup_, H
 		);
 		_runtime->set_setup( paths_, compilerSetup_ );
 		_engine.execute( &( _compiler->_classNoter ) );
-		_compiler->_classNoter._passThrough = true;
+		_compiler->_classNoter.set_final_pass();
 		_engine.execute();
 		finalize_compilation();
 		_state = STATE::COMPILED;

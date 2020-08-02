@@ -196,13 +196,23 @@ void OCompiler::OIdentifierUse::write( int range_, HHuginn::SYMBOL_KIND symbolKi
 	return;
 }
 
-OCompiler::OClassNoter::OClassNoter( OCompiler* compiler_ )
+OCompiler::HMultiPassDispatcher::HMultiPassDispatcher( OCompiler* compiler_ )
 	: _compiler( compiler_ )
 	, _passThrough( false ) {
 	return;
 }
 
-void OCompiler::OClassNoter::note( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
+void OCompiler::HMultiPassDispatcher::reset_pass( void ) {
+	_passThrough = false;
+	return;
+}
+
+void OCompiler::HMultiPassDispatcher::set_final_pass( void ) {
+	_passThrough = true;
+	return;
+}
+
+void OCompiler::HMultiPassDispatcher::set_class_name( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	if ( is_restricted( name_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "` is a restricted name." ), MAIN_FILE_ID, range_.start() );
@@ -300,7 +310,7 @@ void OCompiler::reset( int undoSteps_ ) {
 	_submittedImports.clear();
 	_submittedEnums.clear();
 	_submittedClasses.clear();
-	_classNoter._passThrough = false;
+	_classNoter.reset_pass();
 	_classIdentifiers.clear();
 	_classContext.reset();
 	_functionContexts.clear();

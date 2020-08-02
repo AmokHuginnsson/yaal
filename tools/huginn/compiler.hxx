@@ -370,7 +370,7 @@ struct OCompiler {
 	};
 	/*! \brief Class used to gather information about all user defined classes prior to real compilation.
 	 */
-	struct OClassNoter {
+	class HMultiPassDispatcher {
 		OCompiler* _compiler;
 		/*! \brief Compilation stage.
 		 *
@@ -382,11 +382,14 @@ struct OCompiler {
 		 *
 		 * Depending on compilation stage.
 		 */
-		void note( yaal::hcore::HString const&, executing_parser::range_t );
-		OClassNoter( OCompiler* );
+	public:
+		HMultiPassDispatcher( OCompiler* );
+		void set_class_name( yaal::hcore::HString const&, executing_parser::range_t );
+		void set_final_pass( void );
+		void reset_pass( void );
 	private:
-		OClassNoter( OClassNoter const& ) = delete;
-		OClassNoter& operator = ( OClassNoter const& ) = delete;
+		HMultiPassDispatcher( HMultiPassDispatcher const& ) = delete;
+		HMultiPassDispatcher& operator = ( HMultiPassDispatcher const& ) = delete;
 	};
 	struct OImportInfo {
 		HHuginn::identifier_id_t _package;
@@ -421,7 +424,7 @@ struct OCompiler {
 	 * Thanks to the fact that it can be bound directly to executing_parser callback
 	 * it allows the diversification of compilation passes by callback id.
 	 */
-	OClassNoter _classNoter;
+	HMultiPassDispatcher _classNoter;
 	submitted_classes_t _submittedClasses;
 	submitted_enums_t _submittedEnums;
 	submitted_imports_t _submittedImports;

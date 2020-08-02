@@ -729,7 +729,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_, compiler_setup
 		"classDefinition",
 		constant( KEYWORD::CLASS ) >> identifier(
 			"classIdentifier",
-			HIdentifierParser::action_string_range_t( hcore::call( &OCompiler::OClassNoter::note, &(_compiler->_classNoter), _1, _2 ) )
+			HIdentifierParser::action_string_range_t( hcore::call( &OCompiler::HMultiPassDispatcher::set_class_name, &(_compiler->_classNoter), _1, _2 ) )
 		) >> -(
 			':' >> identifier(
 				"baseIdentifier",
