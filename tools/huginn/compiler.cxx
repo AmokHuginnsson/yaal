@@ -198,17 +198,12 @@ void OCompiler::OIdentifierUse::write( int range_, HHuginn::SYMBOL_KIND symbolKi
 
 OCompiler::HMultiPassDispatcher::HMultiPassDispatcher( OCompiler* compiler_ )
 	: _compiler( compiler_ )
-	, _passThrough( false ) {
+	, _pass( PASS::SYMBOL_RESOLVER ) {
 	return;
 }
 
-void OCompiler::HMultiPassDispatcher::reset_pass( void ) {
-	_passThrough = false;
-	return;
-}
-
-void OCompiler::HMultiPassDispatcher::set_final_pass( void ) {
-	_passThrough = true;
+void OCompiler::HMultiPassDispatcher::set_pass( PASS pass_ ) {
+	_pass = pass_;
 	return;
 }
 
@@ -218,7 +213,7 @@ void OCompiler::HMultiPassDispatcher::set_class_name( yaal::hcore::HString const
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "` is a restricted name." ), MAIN_FILE_ID, range_.start() );
 	}
 	HHuginn::identifier_id_t identifier( _compiler->_runtime->identifier_id( name_ ) );
-	if ( _passThrough ) {
+	if ( _pass == PASS::FINAL ) {
 		_compiler->set_class_name( identifier, range_ );
 	} else {
 		_compiler->_classIdentifiers.push_back( identifier );
@@ -310,7 +305,7 @@ void OCompiler::reset( int undoSteps_ ) {
 	_submittedImports.clear();
 	_submittedEnums.clear();
 	_submittedClasses.clear();
-	_classNoter.reset_pass();
+	_classNoter.set_pass( HMultiPassDispatcher::PASS::SYMBOL_RESOLVER );
 	_classIdentifiers.clear();
 	_classContext.reset();
 	_functionContexts.clear();

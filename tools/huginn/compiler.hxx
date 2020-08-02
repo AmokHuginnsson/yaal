@@ -371,13 +371,19 @@ struct OCompiler {
 	/*! \brief Class used to gather information about all user defined classes prior to real compilation.
 	 */
 	class HMultiPassDispatcher {
+	public:
+		enum class PASS {
+			SYMBOL_RESOLVER,
+			FINAL
+		};
+	private:
 		OCompiler* _compiler;
 		/*! \brief Compilation stage.
 		 *
 		 * false - just note class names.
 		 * true - actual compilation, initialize class definition creation.
 		 */
-		bool _passThrough;
+		PASS _pass;
 		/*! \brief Either note user defined class name or forward call to OCompiler::set_class_name.
 		 *
 		 * Depending on compilation stage.
@@ -385,8 +391,7 @@ struct OCompiler {
 	public:
 		HMultiPassDispatcher( OCompiler* );
 		void set_class_name( yaal::hcore::HString const&, executing_parser::range_t );
-		void set_final_pass( void );
-		void reset_pass( void );
+		void set_pass( PASS );
 	private:
 		HMultiPassDispatcher( HMultiPassDispatcher const& ) = delete;
 		HMultiPassDispatcher& operator = ( HMultiPassDispatcher const& ) = delete;
