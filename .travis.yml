@@ -1,23 +1,24 @@
 language: C++
-dist: bionic
+dist: focal
 install:
   - mkdir -p ../tress
   - git -C ../tress init
   - git -C ../tress fetch https://codestation.org/repo/tress.git HEAD
   - git -C ../tress reset --hard FETCH_HEAD --
-  - sed -e '/DROP .* IF EXISTS/d' ../tress/data/mysql.sql > ../tress/mysql.sql
-  - mysql -u root < ../tress/mysql.sql
+  - sudo mysql -u root < ../tress/data/mysql.sql
+  - echo "local all postgres peer" | sudo tee /etc/postgresql/12/main/pg_hba.conf
+  - echo "local all all md5" | sudo tee -a /etc/postgresql/12/main/pg_hba.conf
+  - sudo systemctl restart postgresql
 before_script:
-  - psql -U postgres < ../tress/data/postgresql.sql
+  - sudo -u postgres psql -U postgres < ../tress/data/postgresql.sql
 script:
   - umask 0077
   - export CONTINUOUS_INTEGRATION_SYSTEM="travis" TIMESTAMP=`date +%Y%m%d%H%M%S`
   - export PREFIX="${HOME}/usr" SYSCONFDIR="${HOME}/etc/conf" LOCALSTATEDIR="${HOME}/var"
   - make && make install
   - make -C _deploy/debian clean package bundle BUILD_ID="-0codestation${TIMESTAMP}"
-  - while ! lftp -e 'set xfer:timeout 4;set net:timeout 4;set net:persist-retries 1024;set net:max-retries 1024;set ftp:prefer-epsv false;set ftp:passive-mode true;put debian/tmp/yaal-bundle.tar;quit' -u "travis,${TRAVIS_FTP_PASS}" codestation.org ; do true ; done
+  - test -f debian/tmp/yaal-bundle.tar && while ! lftp -e 'set xfer:timeout 4;set net:timeout 4;set net:persist-retries 1024;set net:max-retries 1024;set ftp:prefer-epsv false;set ftp:passive-mode true;put debian/tmp/yaal-bundle.tar;quit' -u "travis,${TRAVIS_FTP_PASS}" codestation.org ; do true ; done
 services:
-  - mysql
   - postgresql
 addons:
   apt:
@@ -26,6 +27,11 @@ addons:
       - libssl-dev
       - libsqlite3-dev
       - sqlite3
+      - libmysqlclient-dev
+      - mariadb-client-10.3
+      - mariadb-server-10.3
+      - libpq-dev
+      - postgresql-12
       - libxml2-dev
       - libxslt1-dev
       - zlib1g-dev
@@ -41,7 +47,7 @@ addons:
       - libboost-all-dev
       - lftp
       - language-pack-pl
-  postgresql: "10"
+  postgresql: "12"
 sudo: false
 cache:
   ccache: true
