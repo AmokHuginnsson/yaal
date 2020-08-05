@@ -5,6 +5,7 @@ services:
 
 variables:
   MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+  POSTGRES_HOST_AUTH_METHOD: "trust"
 
 before_script:
   - echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
@@ -71,7 +72,7 @@ cache:
     - ../tress
 
 package:
-  image: ubuntu:bionic
+  image: ubuntu:focal
   script:
     - |
       sudo -H -i -u hack sh -e -x << EOS
