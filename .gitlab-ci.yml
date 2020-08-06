@@ -27,7 +27,7 @@ before_script:
     lftp
     libboost-all-dev
     libdistro-info-perl
-    libmariadbclient-dev
+    libmysqlclient-dev
     libncursesw5-dev
     libncurses5-dev
     libncursesw5
