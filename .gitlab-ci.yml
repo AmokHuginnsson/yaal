@@ -85,4 +85,4 @@ package:
       make install
       make -C _deploy/debian clean package bundle BUILD_ID="-0codestation\${TIMESTAMP}"
       EOS
-    - lftp -e 'set xfer:timeout 10;set net:timeout 10;set net:persist-retries 10;set net:max-retries 20;set ftp:prefer-epsv false;set ftp:passive-mode true;put debian/tmp/yaal-bundle.tar;quit' -u "gitlab,${GITLAB_FTP_PASS}" codestation.org
+    - test -f debian/tmp/yaal-bundle.tar && while ! lftp -e 'set xfer:timeout 4;set net:timeout 4;set net:persist-retries 1024;set net:max-retries 1024;set ftp:prefer-epsv false;set ftp:passive-mode true;put debian/tmp/yaal-bundle.tar;quit' -u "gitlab,${GITLAB_FTP_PASS}" codestation.org ; do true ; done
