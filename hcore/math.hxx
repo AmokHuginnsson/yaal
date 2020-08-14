@@ -6,6 +6,8 @@
 #ifndef YAAL_HCORE_MATH_HXX_INCLUDED
 #define YAAL_HCORE_MATH_HXX_INCLUDED 1
 
+#include "hcore/pod.hxx"
+
 namespace yaal {
 
 /*! \brief Basic mathematical declarations.
@@ -24,7 +26,12 @@ M_YAAL_HCORE_PUBLIC_API extern double long const NAN;
  * \param val - a number which absolute value shall be calculated.
  * \return |val|
  */
-template<typename tType>
+template<typename tType, typename trait::enable_if<is_pod<typename trait::strip<tType>::type>::value, int>::type = 0>
+inline constexpr tType abs( tType val ) {
+	return ( val >= 0 ? val : - val );
+}
+
+template<typename tType, typename trait::enable_if<!is_pod<typename trait::strip<tType>::type>::value, int>::type = 0>
 inline tType abs( tType const& val ) {
 	return ( val >= 0 ? val : - val );
 }
