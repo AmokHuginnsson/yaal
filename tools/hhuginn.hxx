@@ -90,7 +90,7 @@ public:
 	typedef yaal::hcore::HPointer<huginn::HFrame> frame_t;
 	typedef yaal::hcore::HBoundCall<value_t ( huginn::HThread*, value_t*, values_t&, int )> function_t;
 	typedef yaal::hcore::HArray<yaal::hcore::HString> paths_t;
-	enum class TYPE {
+	enum class TYPE : int {
 		NONE,
 		BOOLEAN,
 		INTEGER,
@@ -563,6 +563,10 @@ void cleanup_packages( void );
 
 static int const MAIN_FILE_ID = 0;
 
+}
+
+inline HHuginn::TYPE operator - ( HHuginn::TYPE type_ ) {
+	return ( static_cast<HHuginn::TYPE>( -static_cast<std::underlying_type<HHuginn::TYPE>::type>( type_ ) ) );
 }
 
 inline bool operator == ( HHuginn::TYPE t1_, HHuginn::type_id_t const& t2_ ) {

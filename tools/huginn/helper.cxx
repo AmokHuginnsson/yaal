@@ -279,15 +279,24 @@ void fail_arg_type(
 	M_EPILOG
 }
 
+inline constexpr HHuginn::TYPE abs( HHuginn::TYPE type_ ) {
+	return ( static_cast<HHuginn::TYPE>( math::abs( static_cast<std::underlying_type<HHuginn::TYPE>::type>( type_ ) ) ) );
+}
+
 }
 
 void verify_arg_type(
 	char const* name_,
 	HHuginn::values_t& values_,
 	int no_, HHuginn::TYPE type_, ARITY argsArity_, huginn::HThread* thread_, int position_ ) {
-	if ( values_[no_]->type_id() != type_ ) {
-		fail_arg_type( name_, values_, no_, a_type_name( type_ ), argsArity_, thread_, position_ );
+	HHuginn::type_id_t t( values_[no_]->type_id() );
+	if ( t == type_ ) {
+		return;
 	}
+	if ( ( type_ < HHuginn::TYPE::NONE ) && ( ( t == abs( type_ ) ) || ( t == HHuginn::TYPE::NONE ) ) ) {
+		return;
+	}
+	fail_arg_type( name_, values_, no_, a_type_name( type_ ), argsArity_, thread_, position_ );
 }
 
 void verify_arg_type(
