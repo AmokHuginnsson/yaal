@@ -90,10 +90,10 @@ public:
 	}
 	static HHuginn::value_t split( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
-		verify_signature( "Text.split", values_, 1, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, thread_, position_ );
+		verify_signature( "Text.split", values_, 1, { HHuginn::TYPE::STRING, -HHuginn::TYPE::STRING }, thread_, position_ );
 		typedef HArray<hcore::HString> strings_t;
 		strings_t strings(
-			values_.get_size() > 1
+			( values_.get_size() > 1 ) && ( values_[1]->type_id() == HHuginn::TYPE::STRING )
 				? tools::string::split<strings_t>( get_string( values_[0] ), get_string( values_[1] ) )
 				: tools::string::split<strings_t>(
 					get_string( values_[0] ),
