@@ -124,6 +124,13 @@ public:
 		return ( instruction::boolean_not( thread_, values_[0], position_ ) );
 		M_EPILOG
 	}
+	static HHuginn::value_t subscript( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( "Operators.subscript", values_, 2, 2, thread_, position_ );
+		HHuginn::value_t& v( values_[0] );
+		return ( v->operator_subscript( thread_, v, values_[1], position_ ) );
+		M_EPILOG
+	}
 };
 
 namespace package_factory {
@@ -169,6 +176,7 @@ HPackageCreatorInterface::HInstance HOperatorsCreator::do_new_instance( HRuntime
 		create_field( runtime_, IDENTIFIER::INTERFACE::NEGATE,  "Operators.negate",  &HValue::operator_negate, &HOperators::unary_operator, "( *val* ) - return result of __-__*val* expression" ),
 		create_field( runtime_, IDENTIFIER::INTERFACE::MODULUS, "Operators.modulus", &HValue::operator_modulus, &HOperators::unary_operator, "( *val* ) - return result of **|** *val* **|** expression" ),
 		create_field( runtime_, "factorial", "Operators.factorial", &HValue::operator_factorial, &HOperators::unary_operator, "( *val* ) - return result of *val*__!__ expression" ),
+		create_field( runtime_, IDENTIFIER::INTERFACE::SUBSCRIPT, &HOperators::subscript, "( *coll*, *key* ) - return result of *coll*[*key*] expression" ),
 		create_field( runtime_, "not", &HOperators::boolean_not, "( *val* ) - return result of __¬__*val* expression" )
 	};
 	c->redefine( nullptr, fd );
