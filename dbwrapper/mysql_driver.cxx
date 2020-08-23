@@ -138,6 +138,14 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& d
 				break;
 			}
 		}
+#ifdef __HOST_OS_TYPE_FREEBSD__
+		static char const MY_CNF_PATH[] = "/usr/local/etc/mysql/my.cnf";
+#else
+		static char const MY_CNF_PATH[] = "/etc/mysql/my.cnf";
+#endif
+		if ( mysql_options( mySQL, MYSQL_READ_DEFAULT_FILE, MY_CNF_PATH ) != 0 ) {
+			break;
+		}
 		int unsigned protocol( host_.is_empty() || isUnixSocket ? MYSQL_PROTOCOL_SOCKET : MYSQL_PROTOCOL_TCP );
 		HUTF8String utf8( _clientCharacterSet_ );
 		if ( mysql_options( mySQL, MYSQL_OPT_PROTOCOL, &protocol ) != 0 ) {
