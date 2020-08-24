@@ -20,6 +20,7 @@ script:
   - test -f debian/tmp/yaal-bundle.tar && while ! lftp -e 'set xfer:timeout 4;set net:timeout 4;set net:persist-retries 1024;set net:max-retries 1024;set ftp:prefer-epsv false;set ftp:passive-mode true;put debian/tmp/yaal-bundle.tar;quit' -u "travis,${TRAVIS_FTP_PASS}" codestation.org ; do true ; done
 services:
   - postgresql
+  - mysql
 addons:
   apt:
     packages:
@@ -28,8 +29,6 @@ addons:
       - libsqlite3-dev
       - sqlite3
       - libmysqlclient-dev
-      - mariadb-client-10.3
-      - mariadb-server-10.3
       - libpq-dev
       - postgresql-12
       - libxml2-dev
