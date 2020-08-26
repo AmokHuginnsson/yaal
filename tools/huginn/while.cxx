@@ -36,16 +36,16 @@ void HWhile::do_execute_internal( huginn::HThread* thread_ ) const {
 		thread_->create_loop_frame( _loop.raw() );
 	}
 	HFrame* f( thread_->current_frame() );
-	while ( f->can_continue() ) {
+	while ( thread_->can_continue() ) {
 		_condition->execute( thread_ );
-		if ( f->can_continue() ) {
-			HHuginn::value_t v( f->result() );
+		if ( thread_->can_continue() ) {
+			HHuginn::value_t v( yaal::move( f->result() ) );
 			if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
 				throw HHuginn::HHuginnRuntimeException( "`While` argument is not a boolean.", file_id(), _condition->position() );
 			}
 			if ( static_cast<HBoolean*>( v.raw() )->value() ) {
 				_loop->execute_internal( thread_ );
-				f->continue_execution();
+				thread_->state_transition( HThread::STATE::CONTINUE, HThread::STATE::NORMAL );
 			} else {
 				break;
 			}
@@ -54,6 +54,7 @@ void HWhile::do_execute_internal( huginn::HThread* thread_ ) const {
 	if ( _needsFrame ) {
 		thread_->pop_frame();
 	}
+	thread_->state_unbreak();
 	return;
 	M_EPILOG
 }

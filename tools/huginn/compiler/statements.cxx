@@ -106,7 +106,7 @@ void OCompiler::add_break_statement( executing_parser::range_t range_ ) {
 	}
 	OScopeContext& sc( *fc._scopeStack.top() );
 	sc._needsFrame = true;
-	terminate_scope( make_pointer<HBreak>( HFrame::STATE::BREAK, _fileId, range_ ) );
+	terminate_scope( make_pointer<HBreak>( HThread::STATE::BREAK, _fileId, range_ ) );
 	reset_expression();
 	return;
 	M_EPILOG
@@ -119,7 +119,7 @@ void OCompiler::add_continue_statement( executing_parser::range_t range_ ) {
 	if ( fc._loopCount == 0 ) {
 		throw HHuginn::HHuginnRuntimeException( "Invalid context for `continue` statement.", _fileId, range_.start() );
 	}
-	terminate_scope( make_pointer<HBreak>( HFrame::STATE::CONTINUE, _fileId, range_ ) );
+	terminate_scope( make_pointer<HBreak>( HThread::STATE::CONTINUE, _fileId, range_ ) );
 	reset_expression();
 	return;
 	M_EPILOG

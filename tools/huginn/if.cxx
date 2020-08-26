@@ -44,12 +44,12 @@ void HIf::do_execute_internal( huginn::HThread* thread_ ) const {
 	bool done( false );
 	for (
 		if_clauses_t::const_iterator it( _ifClauses.begin() ), end( _ifClauses.end() );
-		( it != end ) && ! done && f->can_continue();
+		( it != end ) && ! done && thread_->can_continue();
 		++ it
 	) {
 		it->_expression->execute( thread_ );
-		if ( f->can_continue() ) {
-			HHuginn::value_t v( f->result() );
+		if ( thread_->can_continue() ) {
+			HHuginn::value_t v( yaal::move( f->result() ) );
 			if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
 				throw HHuginn::HHuginnRuntimeException( "`If` argument is not a boolean.", file_id(), it->_expression->position() );
 			}
@@ -61,7 +61,7 @@ void HIf::do_execute_internal( huginn::HThread* thread_ ) const {
 			break;
 		}
 	}
-	if ( ! done && f->can_continue() && !! _elseClause ) {
+	if ( ! done && thread_->can_continue() && !! _elseClause ) {
 		_elseClause->execute( thread_ );
 	}
 	if ( _needsFrame ) {

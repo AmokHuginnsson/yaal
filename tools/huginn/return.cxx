@@ -25,7 +25,7 @@ void HReturn::do_execute( HThread* thread_ ) const {
 		_expression->execute( thread_ );
 	}
 	if ( thread_->can_continue() ) {
-		thread_->break_execution( HFrame::STATE::RETURN, thread_->current_frame()->result() );
+		thread_->state_set( HThread::STATE::RETURN );
 	}
 	return;
 	M_EPILOG

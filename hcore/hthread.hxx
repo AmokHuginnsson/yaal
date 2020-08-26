@@ -146,7 +146,11 @@ private:
 		bool _stacked;
 		int _code;
 		yaal::hcore::HString _message;
-		OExceptionInfo( void ) : _stacked( false ), _code( 0 ), _message() {}
+		OExceptionInfo( void )
+			: _stacked( false )
+			, _code( 0 )
+			, _message() {
+		}
 	};
 	status_t _status;
 	HChunk _buf;
@@ -272,8 +276,9 @@ private:
 		int _count;
 		bool _firstLockRead;
 		OLockInfo( void )
-			: _count( 0 ), _firstLockRead( false )
-			{}
+			: _count( 0 )
+			, _firstLockRead( false ) {
+		}
 	};
 	typedef yaal::hcore::HMap<HThread::id_t, OLockInfo> lock_info_t;
 	HMutex _mutex;

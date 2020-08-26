@@ -828,6 +828,7 @@ OCompiler::function_info_t OCompiler::create_function_low( executing_parser::ran
 	M_ASSERT( fc._functionIdentifier != IDENTIFIER::INVALID );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	HHuginn::scope_t scope( pop_scope_context() );
+	bool isDestructor( fc._functionIdentifier == IDENTIFIER::KEYWORD::DESTRUCTOR );
 	bool isIncrementalMain( _isIncremental && ( fc._functionIdentifier == IDENTIFIER::STANDARD_FUNCTIONS::MAIN ) && ! _classContext );
 	if ( isIncrementalMain ) {
 		for ( int i( _mainExecutedStatementCount ); i > 0; -- i ) {
@@ -839,7 +840,7 @@ OCompiler::function_info_t OCompiler::create_function_low( executing_parser::ran
 		_introspector
 			? HHuginn::function_t(
 				hcore::call(
-					isIncrementalMain ? &HIntroFunction::execute_incremental_main : &HIntroFunction::execute,
+					isIncrementalMain ? &HIntroFunction::execute_incremental_main : ( isDestructor ? &HFunction::execute_destructor : &HIntroFunction::execute ),
 					make_pointer<HIntroFunction>(
 						fc._functionIdentifier,
 						fc._parameters,
@@ -853,7 +854,7 @@ OCompiler::function_info_t OCompiler::create_function_low( executing_parser::ran
 			)
 			: HHuginn::function_t(
 				hcore::call(
-					isIncrementalMain ? &HFunction::execute_incremental_main : &HFunction::execute,
+					isIncrementalMain ? &HFunction::execute_incremental_main : ( isDestructor ? &HFunction::execute_destructor : &HFunction::execute ),
 					make_pointer<HFunction>(
 						fc._functionIdentifier,
 						fc._parameters,

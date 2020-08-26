@@ -37,7 +37,7 @@ void HTryCatch::HCatch::execute( HThread* thread_, HHuginn::value_t value_ ) con
 	HFrame* f( thread_->current_frame() );
 	_control->execute( thread_ );
 	f->commit_variable( yaal::move( value_ ), _control->position() );
-	if ( f->can_continue() ) {
+	if ( thread_->can_continue() ) {
 		_scope->execute( thread_ );
 	}
 	thread_->pop_frame();
@@ -58,23 +58,16 @@ void HTryCatch::do_execute_internal( huginn::HThread* thread_ ) const {
 	thread_->create_try_catch_frame( this );
 	_try->execute_internal( thread_ );
 	if ( thread_->has_exception() ) {
-		HFrame* f( thread_->current_frame() );
-		HHuginn::value_t v( f->result() );
-		bool handled( false );
+		HHuginn::value_t v( thread_->exception() );
 		for ( HCatch const& c : _catches ) {
 			if ( v->is_kind_of( c.type() ) ) {
+				thread_->clean_exception();
 				c.execute( thread_, v );
-				handled = true;
 				break;
 			}
 		}
-		thread_->pop_frame();
-		if ( ! handled ) {
-			thread_->break_execution( HFrame::STATE::EXCEPTION, yaal::move( v ) );
-		}
-	} else {
-		thread_->pop_frame();
 	}
+	thread_->pop_frame();
 	return;
 	M_EPILOG
 }

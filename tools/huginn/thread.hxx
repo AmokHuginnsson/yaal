@@ -14,11 +14,26 @@ namespace tools {
 
 namespace huginn {
 
+static int const INVALID_FILE_ID = -1;
+
 class HObjectFactory;
 
 class HThread final {
 public:
 	typedef HThread this_type;
+	enum class STATE {
+		NORMAL,
+		RETURN,
+		BREAK,
+		CONTINUE,
+		/*
+		 * Order matters! EXCEPTION, RUNTIME_EXCEPTION and EXIT must be
+		 * its own group at the end of enumeration
+		 */
+		EXCEPTION,
+		RUNTIME_EXCEPTION,
+		EXIT
+	};
 	typedef yaal::hcore::HPointer<huginn::HFrame> frame_t;
 	typedef yaal::hcore::HArray<frame_t> frames_t;
 private:
@@ -26,14 +41,26 @@ private:
 	HFrame* _currentFrame;
 	int _frameCount;
 	int _functionFrameCount;
+	STATE _state;
+	int _breakLevel;
 	yaal::hcore::HThread::id_t _id;
 	HRuntime* _runtime;
+	HHuginn::value_t _result;
 	HHuginn::values_t _valueCache;
 	HObjectFactory& _objectFactory;
-	yaal::hcore::HString _exceptionMessage;
-	int _exceptionFileId;
-	int _exceptionPosition;
-	HHuginn::call_stack_t _trace;
+	struct OException {
+		yaal::hcore::HString _message;
+		int _fileId;
+		int _position;
+		HHuginn::call_stack_t _trace;
+		OException( void )
+			: _message()
+			, _fileId( INVALID_FILE_ID )
+			, _position( 0 )
+			, _trace() {
+			return;
+		}
+	} _exception;
 public:
 	HThread( HRuntime*, yaal::hcore::HThread::id_t );
 	~HThread( void );
@@ -50,17 +77,53 @@ public:
 	HFrame const* current_frame( void ) const {
 		return ( _currentFrame );
 	}
-	void break_execution( HFrame::STATE, HHuginn::value_t&& = HHuginn::value_t(), int = 0, int = MAIN_FILE_ID, int = 0 );
+	void state_transition( STATE old_, STATE new_, HHuginn::value_t&& value_ ) {
+		if ( _state == old_ ) {
+			_currentFrame->set_result( yaal::move( value_ ) );
+			_state = new_;
+		}
+	}
+	void state_transition( STATE old_, STATE new_ ) {
+		if ( ( old_ == STATE::BREAK ) && ( _breakLevel > 0 ) ) {
+			-- _breakLevel;
+		} else if ( _state == old_ ) {
+			_state = new_;
+		}
+	}
+	void state_unbreak( void ) {
+		if ( _state != STATE::BREAK ) {
+			return;
+		}
+		if ( _breakLevel > 0 ) {
+			-- _breakLevel;
+		} else {
+			_state = STATE::NORMAL;
+		}
+		return;
+	}
+	void state_set( STATE new_, HHuginn::value_t&& value_ ) {
+		_result = yaal::move( value_ );
+		_state = new_;
+	}
+	void state_set( STATE new_ ) {
+		_state = new_;
+	}
+	void state_throw( HHuginn::value_t&&, int, int );
+	STATE state( void ) const {
+		return ( _state );
+	}
 	void set_exception( yaal::hcore::HString const&, int, int );
 	bool can_continue( void ) const {
-		M_PROLOG
-		M_ASSERT( _currentFrame );
-		return ( _currentFrame->can_continue() );
-		M_EPILOG
+		return ( _state == STATE::NORMAL );
 	}
 	yaal::hcore::HThread::id_t id( void ) const {
 		return ( _id );
 	}
+	HHuginn::value_t exception( void ) {
+		return ( _result );
+	}
+	void clean_exception( void );
+	void flush_uncaught_exception( char const* = "" );
 	void flush_runtime_exception( void );
 	bool has_runtime_exception( void ) const;
 	bool has_exception( void ) const;
@@ -78,7 +141,7 @@ public:
 		return ( _valueCache );
 	}
 	HHuginn::call_stack_t const& trace( void ) const {
-		return ( _trace );
+		return ( _exception._trace );
 	}
 	int file_id( void ) const {
 		return ( _currentFrame ? _currentFrame->file_id() : 0 );

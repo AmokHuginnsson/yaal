@@ -61,11 +61,11 @@ void HScope::do_execute_internal( HThread* thread_ ) const {
 	if ( ! _inline ) {
 		thread_->create_scope_frame( this );
 	}
-	HFrame* f( thread_->current_frame() );
+	M_DEBUG_CODE( HFrame* f( thread_->current_frame() ) );
 	for ( statement_t const& s : _statements ) {
 		s->execute( thread_ );
 		M_ASSERT( f->values().is_empty() );
-		if ( ! f->can_continue() ) {
+		if ( ! thread_->can_continue() ) {
 			break;
 		}
 	}

@@ -35,6 +35,7 @@ private:
 public:
 	HFunction( HHuginn::identifier_id_t, parameter_names_t const&, HHuginn::scope_t const&, expressions_t const&, bool, bool );
 	HHuginn::value_t execute( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int ) const;
+	HHuginn::value_t execute_destructor( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int ) const;
 	HHuginn::value_t execute_incremental_main( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int ) const;
 	HHuginn::identifier_id_t name( void ) const {
 		return ( _name );

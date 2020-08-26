@@ -6,7 +6,6 @@
 #define YAAL_TOOLS_HUGINN_BREAK_HXX_INCLUDED 1
 
 #include "tools/huginn/statement.hxx"
-#include "tools/huginn/frame.hxx"
 
 namespace yaal {
 
@@ -21,9 +20,9 @@ public:
 	typedef HBreak this_type;
 	typedef HStatement base_type;
 private:
-	HFrame::STATE _state;
+	HThread::STATE _state;
 public:
-	HBreak( HFrame::STATE, int, executing_parser::range_t );
+	HBreak( HThread::STATE, int, executing_parser::range_t );
 protected:
 	virtual void do_execute( HThread* ) const override;
 private:

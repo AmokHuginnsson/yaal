@@ -1894,8 +1894,8 @@ void HExpression::do_execute( huginn::HThread* thread_ ) const {
 			}
 		} catch ( instruction::Interrupt const& ) {
 		}
-		HFrame::STATE s( f->state() );
-		if ( s < HFrame::STATE::EXCEPTION ) {
+		HThread::STATE s( thread_->state() );
+		if ( s < HThread::STATE::EXCEPTION ) {
 			f->set_result( yaal::move( f->values().top() ) );
 			M_ASSERT( f->ip() == static_cast<int>( _instructions.get_size() ) );
 			f->values().pop();

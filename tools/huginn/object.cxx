@@ -38,7 +38,7 @@ void HObject::do_destroy( HHuginn::value_t* object_ ) {
 					_fields[destructorIdx].raw()
 				)->function()( t, object_, HArguments( t ), 0 );
 			} catch ( HHuginn::HHuginnRuntimeException const& e ) {
-				t->break_execution( HFrame::STATE::RUNTIME_EXCEPTION );
+				t->state_set( HThread::STATE::RUNTIME_EXCEPTION );
 				t->set_exception( e.message(), e.file_id(), e.position() );
 				c = nullptr;
 			}
@@ -49,7 +49,7 @@ void HObject::do_destroy( HHuginn::value_t* object_ ) {
 				try {
 					c->function( destructorIdx )( t, object_, HArguments( t ), 0 );
 				} catch ( HHuginn::HHuginnRuntimeException const& e ) {
-					t->break_execution( HFrame::STATE::RUNTIME_EXCEPTION );
+					t->state_set( HThread::STATE::RUNTIME_EXCEPTION );
 					t->set_exception( e.message(), e.file_id(), e.position() );
 					break;
 				}

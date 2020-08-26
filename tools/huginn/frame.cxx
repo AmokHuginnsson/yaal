@@ -37,7 +37,6 @@ HFrame::HFrame(
 	, _result()
 	, _number( 0 )
 	, _type( TYPE::SCOPE )
-	, _state( STATE::NORMAL )
 	, _statement( nullptr )
 	, _position( INVALID_POSITION ) {
 	return;
@@ -58,7 +57,6 @@ void HFrame::init(
 	reshape();
 	_result = _thread->runtime().none_value();
 	_number = _parent ? ( _parent->_number + ( ( type_ == TYPE::FUNCTION ) ? 1 : 0 ) ) : 1;
-	_state = STATE::NORMAL;
 	return;
 	M_EPILOG
 }
@@ -80,7 +78,7 @@ void HFrame::set_thread( HThread* thread_ ) {
 	M_EPILOG
 }
 
-void HFrame::break_execution( STATE state_ ) {
+void HFrame::reset_expression_state( void ) {
 	/*
 	 * Order of those two calls matters.
 	 * In case of uncaught exception from Huginn user defined destructor
@@ -89,15 +87,7 @@ void HFrame::break_execution( STATE state_ ) {
 	 * Setting state first here ensures that no more user defined desturctors
 	 * will be called.
 	 */
-	_state = state_;
 	_values.clear();
-	return;
-}
-
-void HFrame::continue_execution( void ) {
-	if ( _state == STATE::CONTINUE ) {
-		_state = STATE::NORMAL;
-	}
 	return;
 }
 
@@ -131,7 +121,6 @@ void HFrame::reset( void ) {
 	r.reset();
 	_variableIdentifiers.clear();
 	_variables.clear();
-	_state = STATE::NORMAL;
 	return;
 	M_EPILOG
 }

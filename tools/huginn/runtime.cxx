@@ -753,13 +753,15 @@ HHuginn::value_t HRuntime::call( identifier_id_t identifier_, HHuginn::values_t&
 	global_definitions_t::iterator gcIt( _globalDefinitions.find( identifier_ ) );
 	if ( gcIt != _globalDefinitions.end() ) {
 		yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
-		threads_t::iterator t( _threads.find( threadId ) );
-		M_ASSERT( t != _threads.end() );
+		threads_t::iterator it( _threads.find( threadId ) );
+		M_ASSERT( it != _threads.end() );
 		if ( (*gcIt->second)->type_id() == HHuginn::TYPE::FUNCTION_REFERENCE ) {
 			function_t const& f( static_cast<huginn::HFunctionReference const*>( gcIt->second->raw() )->function() );
 			HClock c;
-			res = f( t->second.raw(), nullptr, values_, position_ );
+			HThread* t( it->second.raw() );
+			res = f( t, nullptr, values_, position_ );
 			_time = time::duration_t( c.get_time_elapsed( time::UNIT::NANOSECOND ) );
+			t->flush_uncaught_exception();
 		} else {
 			throw HHuginn::HHuginnRuntimeException( "Symbol `"_ys.append( identifier_name( identifier_ ) ).append( "` is not callable." ), MAIN_FILE_ID, position_ );
 		}

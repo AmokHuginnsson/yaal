@@ -199,7 +199,7 @@ public:
 	static HHuginn::value_t exit( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "OperatingSystem.exit", values_, { HHuginn::TYPE::INTEGER }, thread_, position_ );
-		thread_->break_execution( HFrame::STATE::EXIT, values_[0]->clone( thread_, &values_[0], position_ ) );
+		thread_->state_set( HThread::STATE::EXIT, values_[0]->clone( thread_, &values_[0], position_ ) );
 		return ( thread_->runtime().none_value() );
 		M_EPILOG
 	}

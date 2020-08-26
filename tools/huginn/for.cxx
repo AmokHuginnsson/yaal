@@ -68,15 +68,15 @@ void HFor::do_execute_internal( HThread* thread_ ) const {
 	HFrame* f( thread_->current_frame() );
 	_source->execute( thread_ );
 	int sourcePosition( _source->position() );
-	if ( f->can_continue() ) {
-		HHuginn::value_t source( ensure_virtual_collection( thread_, f->result(), sourcePosition ) );
+	if ( thread_->can_continue() ) {
+		HHuginn::value_t source( ensure_virtual_collection( thread_, yaal::move( f->result() ), sourcePosition ) );
 		huginn::HIterable* coll( static_cast<huginn::HIterable*>( source.raw() ) );
 		huginn::HIterable::iterator_t it( coll->iterator( thread_, sourcePosition ) );
-		while ( f->can_continue() && it->is_valid( thread_, sourcePosition ) ) {
-			if ( f->can_continue() ) {
+		while ( thread_->can_continue() && it->is_valid( thread_, sourcePosition ) ) {
+			if ( thread_->can_continue() ) {
 				run_loop( thread_, f, it->value( thread_, sourcePosition ) );
 			}
-			if ( f->can_continue() ) {
+			if ( thread_->can_continue() ) {
 				it->next( thread_, sourcePosition );
 			}
 		}
@@ -84,6 +84,7 @@ void HFor::do_execute_internal( HThread* thread_ ) const {
 	if ( _needsFrame ) {
 		thread_->pop_frame();
 	}
+	thread_->state_unbreak();
 	return;
 	M_EPILOG
 }
@@ -115,10 +116,10 @@ void HFor::run_loop( HThread* thread_, HFrame* frame_, HHuginn::value_t&& value_
 			frame_->commit_variable( yaal::move( srcData[i ++] ), control->position() );
 		}
 	}
-	if ( frame_->can_continue() ) {
+	if ( thread_->can_continue() ) {
 		_loop->execute_internal( thread_ );
 	}
-	frame_->continue_execution();
+	thread_->state_transition( HThread::STATE::CONTINUE, HThread::STATE::NORMAL );
 	return;
 	M_EPILOG
 }

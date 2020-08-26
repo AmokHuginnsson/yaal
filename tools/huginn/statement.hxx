@@ -63,7 +63,6 @@ protected:
 };
 
 extern HHuginn::statement_id_t const INVALID_STATEMENT_IDENTIFIER;
-static int const INVALID_FILE_ID = -1;
 static int const INVALID_POSITION = -1;
 
 }

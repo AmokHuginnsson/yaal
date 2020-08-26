@@ -84,6 +84,24 @@ HHuginn::value_t HFunction::execute(
 	M_EPILOG
 }
 
+HHuginn::value_t HFunction::execute_destructor(
+	huginn::HThread* thread_,
+	HHuginn::value_t* object_,
+	HHuginn::values_t& values_,
+	int position_
+) const {
+	M_PROLOG
+	HThread::STATE state( thread_->state() );
+	thread_->state_set( HThread::STATE::NORMAL );
+	HHuginn::value_t res( execute( thread_, object_, values_, position_ ) );
+	if ( thread_->state() == HThread::STATE::EXCEPTION ) {
+		thread_->flush_uncaught_exception( " from destructor" );
+	}
+	thread_->state_set( state );
+	return ( res );
+	M_EPILOG
+}
+
 HHuginn::value_t HFunction::execute_incremental_main(
 	huginn::HThread* thread_,
 	HHuginn::value_t* object_,
@@ -159,7 +177,7 @@ HHuginn::value_t HFunction::execute_impl(
 		int defaultValueIndex( i - _defaultParametersStart );
 		if ( ! variables[i] ) {
 			_defaultValues[defaultValueIndex]->execute( thread_ );
-			if ( ! f->can_continue() ) {
+			if ( ! thread_->can_continue() ) {
 				break;
 			}
 			variables[i] = f->result();
@@ -247,9 +265,15 @@ HHuginn::value_t HFunction::execute_impl(
 			);
 		}
 	}
-	if ( f->can_continue() ) {
+	if ( thread_->can_continue() ) {
 		_scope->execute( thread_ );
 	}
+	thread_->state_transition( HThread::STATE::RETURN, HThread::STATE::NORMAL );
+	M_ASSERT(
+		( thread_->state() != HThread::STATE::BREAK )
+		&& ( thread_->state() != HThread::STATE::CONTINUE )
+		&& ( thread_->state() != HThread::STATE::RETURN )
+	);
 	return ( f->result() );
 	M_EPILOG
 }

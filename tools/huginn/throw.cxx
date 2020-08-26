@@ -27,7 +27,7 @@ void HThrow::do_execute( HThread* thread_ ) const {
 		_expression->execute( thread_ );
 	}
 	HHuginn::value_t v( thread_->current_frame()->result() );
-	thread_->break_execution( HFrame::STATE::EXCEPTION, yaal::move( v ), 0, file_id(), position() );
+	thread_->state_throw( yaal::move( v ), file_id(), position() );
 	return;
 	M_EPILOG
 }

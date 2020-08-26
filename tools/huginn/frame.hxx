@@ -32,19 +32,6 @@ public:
 		TRY_CATCH,
 		FUNCTION
 	};
-	enum class STATE {
-		NORMAL,
-		RETURN,
-		BREAK,
-		CONTINUE,
-		/*
-		 * Order matters! EXCEPTION, RUNTIME_EXCEPTION and EXIT must be
-		 * its own group at the end of enumeration
-		 */
-		EXCEPTION,
-		RUNTIME_EXCEPTION,
-		EXIT
-	};
 	enum class ACCESS {
 		VALUE,
 		REFERENCE,
@@ -128,7 +115,6 @@ private:
 	int _number;
 
 	TYPE _type;
-	STATE _state;
 	HStatement const* _statement;
 	int _position;
 public:
@@ -145,11 +131,6 @@ public:
 	void note_variable( HHuginn::identifier_id_t );
 	void note_variable( HHuginn::identifier_id_t, HHuginn::statement_id_t, int );
 	void commit_variable( HHuginn::value_t&&, int );
-	bool can_continue( void ) const {
-		return ( _state == STATE::NORMAL );
-	}
-	void break_execution( STATE );
-	void continue_execution( void );
 	int number( void ) const {
 		return ( _number );
 	}
@@ -168,10 +149,7 @@ public:
 	TYPE type( void ) const {
 		return ( _type );
 	}
-	STATE state( void ) const {
-		return ( _state );
-	}
-	HHuginn::value_t result( void ) const {
+	HHuginn::value_t& result( void ) {
 		return ( _result );
 	}
 	void set_result( HHuginn::value_t&& );
@@ -179,6 +157,7 @@ public:
 		return ( _values );
 	}
 	void reset( void );
+	void reset_expression_state( void );
 	/*! \brief Cleanup before unwinding caused by C++ exception.
 	 */
 	void cleanup( void );

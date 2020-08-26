@@ -34,15 +34,18 @@ void HSwitch::do_execute( HThread* thread_ ) const {
 	thread_->create_loop_frame( this );
 	HFrame* f( thread_->current_frame() );
 	_expression->execute( thread_ );
-	if ( f->can_continue() ) {
+	if ( thread_->can_continue() ) {
 		HHuginn::value_t v( f->result() );
 		bool matched( false );
-		for ( cases_t::const_iterator it( _cases.begin() ), end( _cases.end() );
-			( it != end ) && f->can_continue(); ++ it ) {
+		for (
+			cases_t::const_iterator it( _cases.begin() ), end( _cases.end() );
+			( it != end ) && thread_->can_continue();
+			++ it
+		) {
 			if ( ! matched ) {
 				it->_expression->execute( thread_ );
 			}
-			if ( f->can_continue() ) {
+			if ( thread_->can_continue() ) {
 				if ( ! matched ) {
 					if ( v->type_id() != f->result()->type_id() ) {
 						throw HHuginn::HHuginnRuntimeException( "Case type does not match switch type.", file_id(), it->_expression->position() );
@@ -56,11 +59,12 @@ void HSwitch::do_execute( HThread* thread_ ) const {
 				break;
 			}
 		}
-		if ( f->can_continue() && !! _default ) {
+		if ( thread_->can_continue() && !! _default ) {
 			_default->execute( thread_ );
 		}
 	}
 	thread_->pop_frame();
+	thread_->state_unbreak();
 	return;
 	M_EPILOG
 }
