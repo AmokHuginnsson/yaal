@@ -47,7 +47,15 @@ make purge
 %build
 umask 0077
 %{clearflags}
-make %{?_smp_mflags} debug release doc PREFIX=%{_prefix} SYSCONFDIR=%{_sysconfdir} LIBDIR=%{_libdir} DOCDIR=%{_pkgdocdir} MANDIR=%{_mandir} LOCALSTATEDIR=%{_localstatedir} CONFIGURE="--enable-auto-sanity"
+make %{?_smp_mflags} debug release doc \
+	PREFIX=%{_prefix} \
+	SYSCONFDIR=%{_sysconfdir} \
+	LIBDIR=%{_libdir} \
+	DOCDIR=%{_pkgdocdir} \
+	MANDIR=%{_mandir} \
+	LOCALSTATEDIR=%{_localstatedir} \
+	SHAREDSTATEDIR=%{_sharedstatedir} \
+	CONFIGURE="--enable-auto-sanity"
 
 %install
 rm -rf ${RPM_BUILD_ROOT}
