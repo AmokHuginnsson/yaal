@@ -131,6 +131,23 @@ public:
 		return ( v->operator_subscript( thread_, v, values_[1], position_ ) );
 		M_EPILOG
 	}
+	static HHuginn::value_t range( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( "Operators.range", values_, 2, 4, thread_, position_ );
+		int argCount( static_cast<int>( values_.get_size() ) );
+		HHuginn::value_t& v( values_[0] );
+		return (
+			v->operator_range(
+				thread_,
+				v,
+				values_[1],
+				argCount >= 3 ? values_[2] : HHuginn::value_t(),
+				argCount >= 4 ? values_[3] : HHuginn::value_t(),
+				position_
+			)
+		);
+		M_EPILOG
+	}
 };
 
 namespace package_factory {
@@ -177,6 +194,7 @@ HPackageCreatorInterface::HInstance HOperatorsCreator::do_new_instance( HRuntime
 		create_field( runtime_, IDENTIFIER::INTERFACE::MODULUS, "Operators.modulus", &HValue::operator_modulus, &HOperators::unary_operator, "( *val* ) - return result of **|** *val* **|** expression" ),
 		create_field( runtime_, "factorial", "Operators.factorial", &HValue::operator_factorial, &HOperators::unary_operator, "( *val* ) - return result of *val*__!__ expression" ),
 		create_field( runtime_, IDENTIFIER::INTERFACE::SUBSCRIPT, &HOperators::subscript, "( *coll*, *key* ) - return result of *coll*[*key*] expression" ),
+		create_field( runtime_, "range", &HOperators::range, "( *coll*, *from*, *to*, *step* ) - return result of *coll*[*from*:*to*:*step*] expression" ),
 		create_field( runtime_, "not", &HOperators::boolean_not, "( *val* ) - return result of __¬__*val* expression" )
 	};
 	c->redefine( nullptr, fd );
