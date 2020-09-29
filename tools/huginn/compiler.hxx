@@ -500,7 +500,7 @@ struct OCompiler {
 	void commit_catch_control_variable( executing_parser::range_t );
 	void start_function_call( executing_parser::range_t );
 	void close_function_call( executing_parser::range_t );
-	void set_type_name( yaal::hcore::HString const&, executing_parser::range_t );
+	void start_catch_statement( yaal::hcore::HString const&, executing_parser::range_t );
 	void add_parameter( yaal::hcore::HString const&, executing_parser::range_t );
 	void add_capture( yaal::hcore::HString const&, executing_parser::range_t );
 	void commit_capture( executing_parser::range_t );

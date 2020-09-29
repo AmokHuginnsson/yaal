@@ -616,7 +616,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_, compiler_setup
 		constant( KEYWORD::CATCH ) >> '(' >>
 		identifier(
 			"exceptionType",
-			HIdentifierParser::action_string_range_t( hcore::call( &OCompiler::set_type_name, _compiler.get(), _1, _2 ) )
+			HIdentifierParser::action_string_range_t( hcore::call( &OCompiler::start_catch_statement, _compiler.get(), _1, _2 ) )
 		) >> assignable[e_p::HRuleBase::action_range_t( hcore::call( &OCompiler::commit_catch_control_variable, _compiler.get(), _1 ) )] >> ')' >>
 		scope[HRuleBase::action_range_t( hcore::call( &OCompiler::commit_catch, _compiler.get(), _1 ) )]
 	);

@@ -1058,7 +1058,7 @@ void OCompiler::commit_catch_control_variable( executing_parser::range_t range_ 
 	M_EPILOG
 }
 
-void OCompiler::set_type_name( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
+void OCompiler::start_catch_statement( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, range_ ) );
