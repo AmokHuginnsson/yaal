@@ -91,9 +91,11 @@ public:
 		return ( N == 0 );
 	}
 	type_t& operator[] ( size_type index_ ) {
+		M_ASSERT( ( index_ >= 0 ) && ( index_ < N ) );
 		return ( _data[ index_ ] );
 	}
 	type_t const& operator[] ( size_type index_ ) const {
+		M_ASSERT( ( index_ >= 0 ) && ( index_ < N ) );
 		return ( _data[ index_ ] );
 	}
 	type_t const& at( size_type index_ ) const {

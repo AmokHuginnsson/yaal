@@ -357,9 +357,11 @@ public:
 	 * \return Reference to element at requested index.
 	 */
 	type_t& operator[] ( size_type index_ ) {
+		M_ASSERT( ( index_ >= 0 ) && ( index_ < _size ) );
 		return ( _buf[ index_ ] );
 	}
 	type_t const& operator[] ( size_type index_ ) const {
+		M_ASSERT( ( index_ >= 0 ) && ( index_ < _size ) );
 		return ( _buf[ index_ ] );
 	}
 	/*! \brief Access element at given position in this array.

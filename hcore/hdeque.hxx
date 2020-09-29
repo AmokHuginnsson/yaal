@@ -260,10 +260,12 @@ public:
 	 * \return Reference to element at requested index.
 	 */
 	type_t const& operator[] ( size_type index_ ) const {
+		M_ASSERT( ( index_ >= 0 ) && ( index_ < _size ) );
 		size_type itemIndex( _start + index_ );
 		return ( _chunks.get<value_type const*>()[ itemIndex / VALUES_PER_CHUNK][ itemIndex % VALUES_PER_CHUNK ] );
 	}
 	type_t& operator[] ( size_type index_ ) {
+		M_ASSERT( ( index_ >= 0 ) && ( index_ < _size ) );
 		size_type itemIndex( _start + index_ );
 		return ( _chunks.get<value_type*>()[ itemIndex / VALUES_PER_CHUNK][ itemIndex % VALUES_PER_CHUNK ] );
 	}
