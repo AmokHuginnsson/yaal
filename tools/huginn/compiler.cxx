@@ -936,33 +936,6 @@ void OCompiler::verify_default_argument( executing_parser::range_t range_ ) {
 	M_EPILOG
 }
 
-void OCompiler::create_scope( executing_parser::range_t range_ ) {
-	M_PROLOG
-	OFunctionContext& fc( f() );
-	HHuginn::statement_id_t sid( INVALID_STATEMENT_IDENTIFIER );
-	if ( ! fc._inline ) {
-		++ _statementIdGenerator;
-		sid = _statementIdGenerator;
-	} else {
-		sid = fc._scopeStack.top()->_statementId;
-	}
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, sid, _fileId, range_ ) );
-	fc._inline = false;
-	return;
-	M_EPILOG
-}
-
-void OCompiler::commit_scope( executing_parser::range_t ) {
-	M_PROLOG
-	M_DEBUG_CODE( OFunctionContext& fc( f() ); );
-	M_ASSERT( ! fc._scopeStack.is_empty() );
-	HHuginn::scope_t scope( pop_scope_context() );
-	M_ASSERT( ! fc._scopeStack.is_empty() );
-	current_scope()->add_statement( scope );
-	return;
-	M_EPILOG
-}
-
 void OCompiler::pop_function_context( void ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
@@ -1054,16 +1027,6 @@ void OCompiler::commit_catch_control_variable( executing_parser::range_t range_ 
 	commit_assignable( range_ );
 	OFunctionContext& fc( f() );
 	fc._inline = true;
-	return;
-	M_EPILOG
-}
-
-void OCompiler::start_catch_statement( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
-	M_PROLOG
-	OFunctionContext& fc( f() );
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, range_ ) );
-	OScopeContext& sc( current_scope_context() );
-	sc._exceptionType = _runtime->identifier_id( name_ );
 	return;
 	M_EPILOG
 }
