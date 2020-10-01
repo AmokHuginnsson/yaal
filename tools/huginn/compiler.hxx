@@ -526,7 +526,8 @@ struct OCompiler {
 	void terminate_scope( HScope::statement_t&& );
 	void start_if_statement( executing_parser::range_t );
 	void start_else_clause( executing_parser::range_t );
-	void start_loop_statement( executing_parser::range_t );
+	void start_while_statement( executing_parser::range_t );
+	void start_for_statement( executing_parser::range_t );
 	void start_switch_statement( executing_parser::range_t );
 	void start_subexpression( executing_parser::range_t );
 	void start_assignable( executing_parser::range_t );

@@ -664,7 +664,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_, compiler_setup
 		"whileStatement",
 		constant(
 			KEYWORD::WHILE,
-			bound_call<e_p::HRuleBase::action_range_t>( &OCompiler::start_loop_statement, _compiler.get(), _1 )
+			bound_call<e_p::HRuleBase::action_range_t>( &OCompiler::start_while_statement, _compiler.get(), _1 )
 		) >> '(' >> expression >> ')' >> scope
 	);
 	HRule forCtrlVar(
@@ -675,7 +675,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_, compiler_setup
 		"forStatement",
 		constant(
 			KEYWORD::FOR,
-			bound_call<e_p::HRuleBase::action_range_t>( &OCompiler::start_loop_statement, _compiler.get(), _1 )
+			bound_call<e_p::HRuleBase::action_range_t>( &OCompiler::start_for_statement, _compiler.get(), _1 )
 		) >> '(' >> forCtrlVar >> * ( ',' >> forCtrlVar ) >> ':' >> expression >> ')' >> scope
 	);
 	HRule caseStatement(

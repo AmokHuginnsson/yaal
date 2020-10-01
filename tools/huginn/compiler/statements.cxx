@@ -105,7 +105,7 @@ void OCompiler::add_if_statement( executing_parser::range_t range_ ) {
 	M_EPILOG
 }
 
-void OCompiler::start_loop_statement( executing_parser::range_t range_ ) {
+void OCompiler::start_for_statement( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	fc._inline = true;
@@ -134,6 +134,17 @@ void OCompiler::add_for_statement( executing_parser::range_t range_ ) {
 	-- fc._loopCount;
 	-- fc._loopSwitchCount;
 	reset_expression();
+	return;
+	M_EPILOG
+}
+
+void OCompiler::start_while_statement( executing_parser::range_t range_ ) {
+	M_PROLOG
+	OFunctionContext& fc( f() );
+	fc._inline = true;
+	++ fc._loopCount;
+	++ fc._loopSwitchCount;
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, range_ ) );
 	return;
 	M_EPILOG
 }
