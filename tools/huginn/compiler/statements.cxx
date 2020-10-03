@@ -83,7 +83,7 @@ void OCompiler::commit_else_clause( executing_parser::range_t ) {
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	HHuginn::scope_t scope( pop_scope_context() ); /* don't squash! pop_scope_context() changes fc._scopeStack */
-	fc._scopeStack.top()->_else = scope;
+	fc._scopeStack.top()->_auxScope = scope;
 	reset_expression();
 	return;
 	M_EPILOG
@@ -94,9 +94,9 @@ void OCompiler::add_if_statement( executing_parser::range_t range_ ) {
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	OScopeContext& sc( *fc._scopeStack.top() );
-	HScope::statement_t ifStatement( make_pointer<HIf>( sc._statementId, sc._scopeChain, sc._else, sc._hasLocalVariables || sc._hasLocalVariablesInDirectChildren, _fileId, range_ ) );
+	HScope::statement_t ifStatement( make_pointer<HIf>( sc._statementId, sc._scopeChain, sc._auxScope, sc._hasLocalVariables || sc._hasLocalVariablesInDirectChildren, _fileId, range_ ) );
 	sc._scopeChain.clear();
-	sc._else.reset();
+	sc._auxScope.reset();
 	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	current_scope()->add_statement( ifStatement );
@@ -182,7 +182,7 @@ void OCompiler::add_switch_statement( executing_parser::range_t range_ ) {
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	OScopeContext::active_scopes_t contexts( yaal::move( fc._scopeStack.top()->_scopeChain ) );
-	HHuginn::scope_t Default( fc._scopeStack.top()->_else );
+	HHuginn::scope_t Default( fc._scopeStack.top()->_auxScope );
 	pop_scope_context_low();
 	OScopeContext& sc( *fc._scopeStack.top() );
 	HScope::statement_t switchStatement(

@@ -43,7 +43,7 @@ OCompiler::OScopeContext::OScopeContext(
 	, _exceptionType( IDENTIFIER::INVALID )
 	, _assertExpressionEnd( 0 )
 	, _scopeChain()
-	, _else()
+	, _auxScope()
 	, _catches()
 	, _terminatedAt( NOT_TERMINATED )
 	, _statementId( statementId_ )

@@ -96,7 +96,7 @@ struct OCompiler {
 		/*! \brief Already fully compiled scope for `else' in if/else-if/else chain.
 		 * Also used as fully compiled `default' clause in `switch' statement.
 		 */
-		HHuginn::scope_t _else;
+		HHuginn::scope_t _auxScope;
 
 		/*! \brief Fully compiled chain of catch statements.
 		 */
