@@ -538,6 +538,7 @@ struct OCompiler {
 	void commit_ternary( executing_parser::range_t );
 	void create_scope( executing_parser::range_t );
 	void commit_scope( executing_parser::range_t );
+	void commit_try( executing_parser::range_t );
 	void commit_catch( executing_parser::range_t );
 	void commit_if_clause( executing_parser::range_t );
 	void commit_else_clause( executing_parser::range_t );

@@ -622,7 +622,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_, compiler_setup
 	);
 	HRule tryCatchStatement(
 		"tryCatchStatement",
-		constant( KEYWORD::TRY ) >> scope >> +catchStatement
+		constant( KEYWORD::TRY ) >> scope[HRuleBase::action_range_t( hcore::call( &OCompiler::commit_try, _compiler.get(), _1 ) )] >> +catchStatement
 	);
 	HRule ifClause(
 		"ifClause",

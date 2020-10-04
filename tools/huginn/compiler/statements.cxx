@@ -204,6 +204,18 @@ void OCompiler::add_switch_statement( executing_parser::range_t range_ ) {
 	M_EPILOG
 }
 
+void OCompiler::commit_try( executing_parser::range_t ) {
+	M_PROLOG
+	OFunctionContext& fc( f() );
+	M_ASSERT( ! fc._scopeStack.is_empty() );
+	HHuginn::scope_t scope( pop_scope_context() );
+	M_ASSERT( ! fc._scopeStack.is_empty() );
+	OScopeContext& sc( *fc._scopeStack.top() );
+	sc._auxScope = scope;
+	return;
+	M_EPILOG
+}
+
 void OCompiler::start_catch_statement( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
@@ -233,10 +245,10 @@ void OCompiler::add_try_catch_statement( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
-	HTryCatch::catches_t catches( yaal::move( fc._scopeStack.top()->_catches ) );
-	HHuginn::scope_t scope( pop_scope_context() );
+	OScopeContext& sc( *fc._scopeStack.top() );
+	HTryCatch::catches_t catches( yaal::move( sc._catches ) );
 	HScope::statement_t tryCatchStatement(
-		make_pointer<HTryCatch>( scope, catches, _fileId, range_ )
+		make_pointer<HTryCatch>( yaal::move( sc._auxScope ), catches, _fileId, range_ )
 	);
 	current_scope()->add_statement( tryCatchStatement );
 	reset_expression();
