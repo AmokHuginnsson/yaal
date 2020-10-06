@@ -151,6 +151,7 @@ struct OCompiler {
 
 		OScopeContext( OFunctionContext*, HHuginn::statement_id_t, int, executing_parser::range_t );
 		HHuginn::expression_t& expression( void );
+		int add_statement( HScope::statement_t&& );
 		huginn::HClass const* guess_type( OCompiler const*, HHuginn::identifier_id_t ) const;
 		void note_type( HHuginn::identifier_id_t, huginn::HClass const* );
 	private:
@@ -512,7 +513,6 @@ struct OCompiler {
 	void verify_default_argument( executing_parser::range_t );
 	void track_name_cycle( HHuginn::identifier_id_t );
 	huginn::HClass const* congruent( huginn::HClass const*, huginn::HClass const* ) const;
-	HHuginn::scope_t& current_scope( void );
 	HHuginn::expression_t& current_expression( void );
 	OScopeContext& current_scope_context( void );
 	huginn::HClass const* guess_type( HHuginn::identifier_id_t ) const;

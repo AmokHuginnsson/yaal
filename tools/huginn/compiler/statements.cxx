@@ -43,7 +43,7 @@ void OCompiler::commit_scope( executing_parser::range_t ) {
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	HHuginn::scope_t scope( pop_scope_context() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
-	current_scope()->add_statement( scope );
+	current_scope_context().add_statement( yaal::move( scope ) );
 	return;
 	M_EPILOG
 }
@@ -99,7 +99,7 @@ void OCompiler::add_if_statement( executing_parser::range_t range_ ) {
 	sc._auxScope.reset();
 	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );
-	current_scope()->add_statement( ifStatement );
+	current_scope_context().add_statement( yaal::move( ifStatement ) );
 	reset_expression();
 	return;
 	M_EPILOG
@@ -130,7 +130,7 @@ void OCompiler::add_for_statement( executing_parser::range_t range_ ) {
 	);
 	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );
-	current_scope()->add_statement( forStatement );
+	current_scope_context().add_statement( move( forStatement ) );
 	-- fc._loopCount;
 	-- fc._loopSwitchCount;
 	reset_expression();
@@ -160,7 +160,7 @@ void OCompiler::add_while_statement( executing_parser::range_t range_ ) {
 	);
 	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );
-	current_scope()->add_statement( whileStatement );
+	current_scope_context().add_statement( yaal::move( whileStatement ) );
 	-- fc._loopCount;
 	-- fc._loopSwitchCount;
 	reset_expression();
@@ -198,7 +198,7 @@ void OCompiler::add_switch_statement( executing_parser::range_t range_ ) {
 	-- fc._loopSwitchCount;
 	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );
-	current_scope()->add_statement( switchStatement );
+	current_scope_context().add_statement( yaal::move( switchStatement ) );
 	reset_expression();
 	return;
 	M_EPILOG
@@ -250,7 +250,7 @@ void OCompiler::add_try_catch_statement( executing_parser::range_t range_ ) {
 	HScope::statement_t tryCatchStatement(
 		make_pointer<HTryCatch>( yaal::move( sc._auxScope ), catches, _fileId, range_ )
 	);
-	current_scope()->add_statement( tryCatchStatement );
+	current_scope_context().add_statement( yaal::move( tryCatchStatement ) );
 	reset_expression();
 	return;
 	M_EPILOG

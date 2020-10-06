@@ -116,16 +116,17 @@ OCompiler::OFunctionContext const& OCompiler::f( void ) const {
 	return ( *_functionContexts.top() );
 }
 
-HHuginn::HHuginn::scope_t& OCompiler::current_scope( void ) {
-	return ( f()._scopeStack.top()->_scope );
-}
-
 HHuginn::HHuginn::expression_t& OCompiler::current_expression( void ) {
 	return ( f()._scopeStack.top()->expression() );
 }
 
 OCompiler::OScopeContext& OCompiler::current_scope_context( void ) {
 	return ( *f()._scopeStack.top() );
+}
+
+int OCompiler::OScopeContext::add_statement( HScope::statement_t&& statement_ ) {
+	M_ASSERT( dynamic_cast<HScope*>( _scope.raw() ) );
+	return ( static_cast<HScope*>( _scope.raw() )->add_statement( statement_ ) );
 }
 
 HHuginn::expression_t OCompiler::new_expression( int fileId_, executing_parser::range_t const& range_ ) {

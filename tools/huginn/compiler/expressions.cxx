@@ -1323,7 +1323,7 @@ void OCompiler::add_subexpression( OPERATOR op_, executing_parser::range_t range
 void OCompiler::commit_expression( executing_parser::range_t ) {
 	M_PROLOG
 	M_ASSERT( ! f()._scopeStack.is_empty() );
-	current_scope()->add_statement( current_expression() );
+	current_scope_context().add_statement( current_expression() );
 	reset_expression();
 	return;
 	M_EPILOG
