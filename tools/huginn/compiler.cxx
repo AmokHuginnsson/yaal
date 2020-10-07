@@ -486,28 +486,26 @@ void OCompiler::resolve_symbols( void ) {
 						 */
 					}
 					break;
-				} else {
-					if ( sc ) {
-						if ( es._expression.raw() == localVariable._definedBy ) {
-							throw HHuginn::HHuginnRuntimeException(
-								"Symbol `"_ys.append( _runtime->identifier_name( es._identifier ) ).append( "` is not yet defined in this expression." ),
-								_fileId,
-								es._position
-							);
-						}
-						es._expression->replace_execution_step(
-							es._index,
-							HExpression::OExecutionStep(
-								es._expression.raw(),
-								es._operation == OExecutionStep::OPERATION::USE ? &HExpression::get_variable_value : &HExpression::get_variable_reference,
-								es._position,
-								es._operation == OExecutionStep::OPERATION::USE ? HFrame::ACCESS::VALUE : HFrame::ACCESS::REFERENCE,
-								sc->_statementId,
-								localVariable._index
-							)
+				} else if ( sc ) {
+					if ( es._expression.raw() == localVariable._definedBy ) {
+						throw HHuginn::HHuginnRuntimeException(
+							"Symbol `"_ys.append( _runtime->identifier_name( es._identifier ) ).append( "` is not yet defined in this expression." ),
+							_fileId,
+							es._position
 						);
-						break;
 					}
+					es._expression->replace_execution_step(
+						es._index,
+						HExpression::OExecutionStep(
+							es._expression.raw(),
+							es._operation == OExecutionStep::OPERATION::USE ? &HExpression::get_variable_value : &HExpression::get_variable_reference,
+							es._position,
+							es._operation == OExecutionStep::OPERATION::USE ? HFrame::ACCESS::VALUE : HFrame::ACCESS::REFERENCE,
+							sc->_statementId,
+							localVariable._index
+						)
+					);
+					break;
 				}
 				if ( ( es._operation == OExecutionStep::OPERATION::USE ) && ! is_keyword( _runtime->identifier_name( es._identifier ) ) ) {
 					HHuginn::value_t const* v( _runtime->get_global( es._identifier ) );
