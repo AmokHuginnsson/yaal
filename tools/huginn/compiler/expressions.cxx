@@ -222,7 +222,7 @@ void OCompiler::make_reference( executing_parser::range_t range_ ) {
 	}
 	fc._valueTypes.pop();
 	fc._valueTypes.push( type_to_class( HHuginn::TYPE::REFERENCE ) );
-	fc._variables.emplace( IDENTIFIER::INVALID, -1 );
+	fc._assignmentVariables.emplace( IDENTIFIER::INVALID, -1 );
 	return;
 	M_EPILOG
 }
@@ -344,7 +344,7 @@ void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executi
 		fc._shortCircuit > 0
 	);
 	fc._valueTypes.push( type_to_class( HHuginn::TYPE::UNKNOWN ) );
-	fc._variables.emplace( varIdentifier, static_cast<int>( _executionStepsBacklog.get_size() - 1 ) );
+	fc._assignmentVariables.emplace( varIdentifier, static_cast<int>( _executionStepsBacklog.get_size() - 1 ) );
 	return;
 	M_EPILOG
 }
@@ -394,13 +394,13 @@ void OCompiler::dispatch_assign( executing_parser::range_t range_ ) {
 		varCount = fc._variableCount.top();
 		if ( varCount == 1 ) {
 			M_ASSERT( fc._valueTypes.get_size() >= 2 );
-			M_ASSERT( ! fc._variables.is_empty() );
+			M_ASSERT( ! fc._assignmentVariables.is_empty() );
 			M_ASSERT( o != OPERATOR::ASSIGN_PACK );
 			HClass const* srcType( fc._valueTypes.top()._class );
 			fc._valueTypes.pop();
 			HClass const* destType( fc._valueTypes.top()._class );
 			fc._valueTypes.pop();
-			OFunctionContext::OVariableRef varRef( fc._variables.top() );
+			OFunctionContext::OVariableRef varRef( fc._assignmentVariables.top() );
 			HClass const* realDestType( destType );
 			if ( compiled_type_id( realDestType ) == HHuginn::TYPE::UNKNOWN ) {
 				realDestType = guess_type( varRef._identifier );
@@ -465,22 +465,22 @@ void OCompiler::dispatch_assign( executing_parser::range_t range_ ) {
 			if ( ! is_reference_congruent( destType ) ) {
 				throw HHuginn::HHuginnRuntimeException( "Setting a non reference location.", _fileId, p );
 			}
-			fc._variables.pop();
+			fc._assignmentVariables.pop();
 			fc._valueTypes.push( congruent( srcType, destType ) );
 		} else if ( o != OPERATOR::ASSIGN_PACK ) {
 			M_ASSERT( o != OPERATOR::ASSIGN );
 			throw HHuginn::HHuginnRuntimeException( "Mutating variable pack is not supported.", _fileId, p );
 		} else {
 			M_ASSERT( fc._valueTypes.get_size() >= ( varCount + 1 ) );
-			M_ASSERT( fc._variables.get_size() >= varCount );
+			M_ASSERT( fc._assignmentVariables.get_size() >= varCount );
 			fc._valueTypes.pop(); /* src value */
 			for ( int i( 0 ); i < varCount; ++ i ) {
 				fc._valueTypes.pop();
-				OFunctionContext::OVariableRef varRef( fc._variables.top() );
+				OFunctionContext::OVariableRef varRef( fc._assignmentVariables.top() );
 				if ( varRef._identifier != IDENTIFIER::INVALID ) {
 					_usedIdentifiers[varRef._identifier].write( range_.start(), HHuginn::SYMBOL_KIND::VARIABLE );
 				}
-				fc._variables.pop();
+				fc._assignmentVariables.pop();
 			}
 			fc._valueTypes.push( type_to_class( HHuginn::TYPE::TUPLE ) );
 			assignPack = true;
@@ -500,7 +500,7 @@ void OCompiler::dispatch_assign( executing_parser::range_t range_ ) {
 void OCompiler::start_assignable( executing_parser::range_t ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	fc._variableCount.push( static_cast<int>( fc._variables.get_size() ) );
+	fc._variableCount.push( static_cast<int>( fc._assignmentVariables.get_size() ) );
 	return;
 	M_EPILOG
 }
@@ -509,7 +509,7 @@ void OCompiler::finish_assignable( executing_parser::range_t ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	int& varCount( fc._variableCount.top() );
-	varCount = static_cast<int>( fc._variables.get_size() ) - varCount;
+	varCount = static_cast<int>( fc._assignmentVariables.get_size() ) - varCount;
 	return;
 	M_EPILOG
 }
@@ -1297,7 +1297,7 @@ void OCompiler::reset_expression( void ) {
 	current_expression() = new_expression( _fileId );
 	OFunctionContext& fc( f() );
 	M_ASSERT( fc._operations.is_empty() );
-	M_ASSERT( fc._variables.is_empty() );
+	M_ASSERT( fc._assignmentVariables.is_empty() );
 	fc._valueTypes.clear();
 	return;
 	M_EPILOG

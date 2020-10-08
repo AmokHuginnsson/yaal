@@ -111,7 +111,7 @@ OCompiler::OFunctionContext::OFunctionContext(
 	, _scopeStack()
 	, _operations()
 	, _valueTypes()
-	, _variables()
+	, _assignmentVariables()
 	, _variableCount()
 	, _loopCount( 0 )
 	, _loopSwitchCount( 0 )
@@ -1003,11 +1003,11 @@ void OCompiler::commit_assignable( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	mark_expression_position( range_ );
-	M_ASSERT( ! fc._variables.is_empty() );
-	if ( fc._variables.top()._identifier != IDENTIFIER::INVALID ) {
-		note_type( fc._variables.top()._identifier, type_to_class( HHuginn::TYPE::UNKNOWN ) );
+	M_ASSERT( ! fc._assignmentVariables.is_empty() );
+	if ( fc._assignmentVariables.top()._identifier != IDENTIFIER::INVALID ) {
+		note_type( fc._assignmentVariables.top()._identifier, type_to_class( HHuginn::TYPE::UNKNOWN ) );
 	}
-	fc._variables.clear();
+	fc._assignmentVariables.clear();
 	return;
 	M_EPILOG
 }

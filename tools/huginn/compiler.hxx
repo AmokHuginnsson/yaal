@@ -240,7 +240,7 @@ struct OCompiler {
 		 * Those remembered variable identifiers are used in dispatch_assign()
 		 * to link types to variables in current compilation context.
 		 */
-		variable_stack_t _variables;
+		variable_stack_t _assignmentVariables;
 
 		/*! \brief Number of variables on left side of the assignment (`=` sign).
 		 *
