@@ -94,7 +94,7 @@ void OCompiler::add_if_statement( executing_parser::range_t range_ ) {
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	OScopeContext& sc( *fc._scopeStack.top() );
-	HScope::statement_t ifStatement( make_pointer<HIf>( sc._statementId, sc._scopeChain, sc._auxScope, sc._hasLocalVariables || sc._hasLocalVariablesInDirectChildren, _fileId, range_ ) );
+	HScope::statement_t ifStatement( make_pointer<HIf>( sc._statementId, sc._scopeChain, sc._auxScope, _fileId, range_ ) );
 	sc._scopeChain.clear();
 	sc._auxScope.reset();
 	pop_scope_context_low();
@@ -126,7 +126,7 @@ void OCompiler::add_for_statement( executing_parser::range_t range_ ) {
 	HHuginn::expression_t source( exprs.back() );
 	exprs.pop_back();
 	HScope::statement_t forStatement(
-		make_pointer<HFor>( sc._statementId, yaal::move( exprs ), source, scope, sc._needsFrame || sc._hasLocalVariables || sc._hasLocalVariablesInDirectChildren, _fileId, range_ )
+		make_pointer<HFor>( sc._statementId, yaal::move( exprs ), source, scope, _fileId, range_ )
 	);
 	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );
@@ -156,7 +156,7 @@ void OCompiler::add_while_statement( executing_parser::range_t range_ ) {
 	HHuginn::scope_t scope( pop_scope_context() );
 	OScopeContext& sc( current_scope_context() );
 	HScope::statement_t whileStatement(
-		make_pointer<HWhile>( sc._statementId, current_expression(), scope, sc._needsFrame || sc._hasLocalVariables || sc._hasLocalVariablesInDirectChildren, _fileId, range_ )
+		make_pointer<HWhile>( sc._statementId, current_expression(), scope, _fileId, range_ )
 	);
 	pop_scope_context_low();
 	M_ASSERT( ! fc._scopeStack.is_empty() );
@@ -285,8 +285,6 @@ void OCompiler::add_break_statement( executing_parser::range_t range_ ) {
 	if ( fc._loopSwitchCount == 0 ) {
 		throw HHuginn::HHuginnRuntimeException( "Invalid context for `break` statement.", _fileId, range_.start() );
 	}
-	OScopeContext& sc( *fc._scopeStack.top() );
-	sc._needsFrame = true;
 	terminate_scope( make_pointer<HBreak>( HThread::STATE::BREAK, _fileId, range_ ) );
 	reset_expression();
 	return;

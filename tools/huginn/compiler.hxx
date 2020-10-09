@@ -127,28 +127,6 @@ struct OCompiler {
 		 */
 		nested_unbound_indexes_t _argumentIndexes;
 
-		/*! \brief Tells if given scope needs to have a fully materialized frame.
-		 *
-		 * Reasons for necessity of frame materialization:
-		 *
-		 * - existance of a local variable in direct children
-		 * - break/continue statement in any of the children
-		 */
-		bool _needsFrame;
-
-		/*! \brief Tells if given scope has any local variables defined.
-		 *
-		 * Used during statements/expressions compilation, i.e. before local
-		 * symbols dereferencing stage (before `resolve_symbols()`)
-		 */
-		bool _hasLocalVariables;
-
-		/*! \brief Tells if direct children of a given scope has any local variables defined.
-		 *
-		 * Used during `HIf` object construction.
-		 */
-		bool _hasLocalVariablesInDirectChildren;
-
 		OScopeContext( OFunctionContext*, HHuginn::statement_id_t, int, executing_parser::range_t );
 		HHuginn::expression_t& expression( void );
 		int add_statement( HScope::statement_t&& );

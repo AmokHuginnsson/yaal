@@ -332,7 +332,6 @@ void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executi
 	HHuginn::expression_t& expression( current_expression() );
 	int index( expression->add_execution_step( HExpression::OExecutionStep() ) );
 	OFunctionContext::scope_context_t sc( fc._scopeStack.top() );
-	sc->_hasLocalVariables = true;
 	_executionStepsBacklog.emplace_back(
 		OExecutionStep::OPERATION::DEFINE,
 		expression,

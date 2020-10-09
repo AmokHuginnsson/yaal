@@ -19,13 +19,11 @@ HIf::HIf(
 	HHuginn::statement_id_t id_,
 	OCompiler::OScopeContext::active_scopes_t const& ifClause_,
 	HHuginn::scope_t const& elseClause_,
-	bool needsFrame_,
 	int fileId_,
 	executing_parser::range_t range_
 ) : HVirtualScope( id_, fileId_, range_ )
 	, _ifClauses( ifClause_ )
-	, _elseClause( elseClause_ )
-	, _needsFrame( needsFrame_ ) {
+	, _elseClause( elseClause_ ) {
 	for ( OCompiler::OActiveScope& as : _ifClauses ) {
 		as._scope->make_inline();
 	}
@@ -37,9 +35,7 @@ HIf::HIf(
 
 void HIf::do_execute_internal( huginn::HThread* thread_ ) const {
 	M_PROLOG
-	if ( _needsFrame ) {
-		thread_->create_scope_frame( this );
-	}
+	thread_->create_scope_frame( this );
 	HFrame* f( thread_->current_frame() );
 	bool done( false );
 	for (
@@ -64,9 +60,7 @@ void HIf::do_execute_internal( huginn::HThread* thread_ ) const {
 	if ( ! done && thread_->can_continue() && !! _elseClause ) {
 		_elseClause->execute( thread_ );
 	}
-	if ( _needsFrame ) {
-		thread_->pop_frame();
-	}
+	thread_->pop_frame();
 	return;
 	M_EPILOG
 }

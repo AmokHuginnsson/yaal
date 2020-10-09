@@ -22,9 +22,8 @@ public:
 private:
 	if_clauses_t _ifClauses;
 	HHuginn::scope_t _elseClause;
-	bool _needsFrame;
 public:
-	HIf( HHuginn::statement_id_t, if_clauses_t const&, HHuginn::scope_t const&, bool, int, executing_parser::range_t );
+	HIf( HHuginn::statement_id_t, if_clauses_t const&, HHuginn::scope_t const&, int, executing_parser::range_t );
 protected:
 	virtual void do_execute_internal( HThread* ) const override;
 };
