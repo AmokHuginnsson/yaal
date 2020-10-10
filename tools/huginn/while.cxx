@@ -31,11 +31,9 @@ HWhile::HWhile(
 void HWhile::do_execute_internal( huginn::HThread* thread_ ) const {
 	M_PROLOG
 	thread_->create_loop_frame( _loop.raw() );
-	HFrame* f( thread_->current_frame() );
 	while ( thread_->can_continue() ) {
-		_condition->execute( thread_ );
+		HHuginn::value_t v( _condition->evaluate( thread_ ) );
 		if ( thread_->can_continue() ) {
-			HHuginn::value_t v( yaal::move( f->result() ) );
 			if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
 				throw HHuginn::HHuginnRuntimeException( "`While` argument is not a boolean.", file_id(), _condition->position() );
 			}

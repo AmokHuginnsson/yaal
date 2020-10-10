@@ -1880,8 +1880,8 @@ void HExpression::store_character( OExecutionStep const& executionStep_, HFrame*
 	M_EPILOG
 }
 
-void HExpression::do_execute( huginn::HThread* thread_ ) const {
-	try {
+HHuginn::value_t HExpression::evaluate( huginn::HThread* thread_ ) const {
+	M_PROLOG
 		M_ASSERT( _operations.is_empty() );
 		HFrame* f( thread_->current_frame() );
 		f->start_expression();
@@ -1894,22 +1894,33 @@ void HExpression::do_execute( huginn::HThread* thread_ ) const {
 			}
 		} catch ( instruction::Interrupt const& ) {
 		}
-		HThread::STATE s( thread_->state() );
-		if ( s < HThread::STATE::EXCEPTION ) {
-			f->set_result( yaal::move( f->values().top() ) );
+		HHuginn::value_t result;
+		if ( thread_->state() < HThread::STATE::EXCEPTION ) {
+			result = yaal::move( f->values().top() );
 			M_ASSERT( f->ip() == static_cast<int>( _instructions.get_size() ) );
 			f->values().pop();
 		} else {
 			f->values().clear();
 		}
 		f->end_expression();
-		return;
+		return ( result );
 	} catch ( HHuginn::HHuginnRuntimeException const& e ) {
 		if ( e.position() <= 0 ) {
 			throw HHuginn::HHuginnRuntimeException( e.message(), file_id(), position() );
 		} else {
 			throw;
 		}
+	M_EPILOG
+}
+
+void HExpression::do_execute( huginn::HThread* thread_ ) const {
+	M_PROLOG
+	HHuginn::value_t result( evaluate( thread_ ) );
+	if ( thread_->state() < HThread::STATE::EXCEPTION ) {
+		HFrame* f( thread_->current_frame() );
+		f->set_result( yaal::move( result ) );
+	}
+	return;
 	M_EPILOG
 }
 

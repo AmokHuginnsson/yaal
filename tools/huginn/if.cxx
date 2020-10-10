@@ -36,16 +36,14 @@ HIf::HIf(
 void HIf::do_execute_internal( huginn::HThread* thread_ ) const {
 	M_PROLOG
 	thread_->create_scope_frame( this );
-	HFrame* f( thread_->current_frame() );
 	bool done( false );
 	for (
 		if_clauses_t::const_iterator it( _ifClauses.begin() ), end( _ifClauses.end() );
 		( it != end ) && ! done && thread_->can_continue();
 		++ it
 	) {
-		it->_expression->execute( thread_ );
+		HHuginn::value_t v( it->_expression->evaluate( thread_ ) );
 		if ( thread_->can_continue() ) {
-			HHuginn::value_t v( yaal::move( f->result() ) );
 			if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
 				throw HHuginn::HHuginnRuntimeException( "`If` argument is not a boolean.", file_id(), it->_expression->position() );
 			}
