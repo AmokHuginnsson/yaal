@@ -27,7 +27,7 @@ public:
 protected:
 	virtual void do_execute_internal( HThread* ) const override;
 private:
-	void run_loop( HThread*, HFrame*, HHuginn::value_t&& ) const;
+	void run_loop( HThread*, HHuginn::value_t&& ) const;
 };
 
 }

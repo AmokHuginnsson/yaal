@@ -144,6 +144,7 @@ public:
 	void store_character( OExecutionStep const&, huginn::HFrame* );
 	bool is_empty( void ) const;
 	HHuginn::value_t evaluate( huginn::HThread* ) const;
+	void commit( huginn::HThread*, HHuginn::value_t&& ) const;
 protected:
 	void grab_args( HFrame*, HArguments& );
 	HHuginn::values_t grab_args( HFrame*, HPartial::unbound_indexes_t& );

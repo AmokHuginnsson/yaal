@@ -34,9 +34,7 @@ HTryCatch::HCatch::HCatch(
 void HTryCatch::HCatch::execute( HThread* thread_, HHuginn::value_t value_ ) const {
 	M_PROLOG
 	thread_->create_scope_frame( this );
-	HFrame* f( thread_->current_frame() );
-	_control->execute( thread_ );
-	f->commit_variable( yaal::move( value_ ), _control->position() );
+	_control->commit( thread_, yaal::move( value_ ) );
 	if ( thread_->can_continue() ) {
 		_scope->execute( thread_ );
 	}

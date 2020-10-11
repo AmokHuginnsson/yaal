@@ -141,14 +141,6 @@ void HFrame::note_variable( HHuginn::identifier_id_t identifier_, HHuginn::state
 	M_EPILOG
 }
 
-void HFrame::commit_variable( HHuginn::value_t&& value_, int position_ ) {
-	M_PROLOG
-	M_ASSERT( _result->type_id() == HHuginn::TYPE::REFERENCE );
-	static_cast<HReference*>( _result.raw() )->set( _thread, yaal::move( value_ ), position_ );
-	return;
-	M_EPILOG
-}
-
 int HFrame::file_id( void ) const {
 	return ( _statement->file_id() );
 }

@@ -1924,6 +1924,15 @@ void HExpression::do_execute( huginn::HThread* thread_ ) const {
 	M_EPILOG
 }
 
+void HExpression::commit( huginn::HThread* thread_, HHuginn::value_t&& value_ ) const {
+	M_PROLOG
+	HHuginn::value_t ref( evaluate( thread_ ) );
+	M_ASSERT( ref->type_id() == HHuginn::TYPE::REFERENCE );
+	static_cast<HReference*>( ref.raw() )->set( thread_, yaal::move( value_ ), position() );
+	return;
+	M_EPILOG
+}
+
 }
 
 }

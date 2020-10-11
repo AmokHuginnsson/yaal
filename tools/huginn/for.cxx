@@ -61,16 +61,15 @@ inline HHuginn::value_t ensure_virtual_collection(
 void HFor::do_execute_internal( HThread* thread_ ) const {
 	M_PROLOG
 	thread_->create_loop_frame( this );
-	HFrame* f( thread_->current_frame() );
-	_source->execute( thread_ );
+	HHuginn::value_t source( _source->evaluate( thread_ ) );
 	int sourcePosition( _source->position() );
 	if ( thread_->can_continue() ) {
-		HHuginn::value_t source( ensure_virtual_collection( thread_, yaal::move( f->result() ), sourcePosition ) );
+		source = ensure_virtual_collection( thread_, yaal::move( source ), sourcePosition );
 		huginn::HIterable* coll( static_cast<huginn::HIterable*>( source.raw() ) );
 		huginn::HIterable::iterator_t it( coll->iterator( thread_, sourcePosition ) );
 		while ( thread_->can_continue() && it->is_valid( thread_, sourcePosition ) ) {
 			if ( thread_->can_continue() ) {
-				run_loop( thread_, f, it->value( thread_, sourcePosition ) );
+				run_loop( thread_, it->value( thread_, sourcePosition ) );
 			}
 			if ( thread_->can_continue() ) {
 				it->next( thread_, sourcePosition );
@@ -83,12 +82,11 @@ void HFor::do_execute_internal( HThread* thread_ ) const {
 	M_EPILOG
 }
 
-void HFor::run_loop( HThread* thread_, HFrame* frame_, HHuginn::value_t&& value_ ) const {
+void HFor::run_loop( HThread* thread_, HHuginn::value_t&& value_ ) const {
 	M_PROLOG
 	int cs( static_cast<int>( _control.get_size() ) );
 	if ( cs == 1 ) {
-		_control.front()->execute( thread_ );
-		frame_->commit_variable( yaal::move( value_ ), _control.front()->position() );
+		_control.front()->commit( thread_, yaal::move( value_ ) );
 	} else {
 		if ( value_->type_id() != HHuginn::TYPE::TUPLE ) {
 			throw HHuginn::HHuginnRuntimeException( "`For` source did not return a `tuple` object.", file_id(), _source->position() );
@@ -106,8 +104,7 @@ void HFor::run_loop( HThread* thread_, HFrame* frame_, HHuginn::value_t&& value_
 		}
 		int i( 0 );
 		for ( HHuginn::expression_t const& control : _control ) {
-			control->execute( thread_ );
-			frame_->commit_variable( yaal::move( srcData[i ++] ), control->position() );
+			control->commit( thread_, yaal::move( srcData[i ++] ) );
 		}
 	}
 	if ( thread_->can_continue() ) {
