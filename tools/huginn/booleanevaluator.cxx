@@ -27,13 +27,11 @@ HBooleanEvaluator::HBooleanEvaluator( HRuntime* runtime_, expressions_t const& e
 bool HBooleanEvaluator::execute( huginn::HThread* thread_ ) {
 	M_PROLOG
 	bool all( true );
-	HFrame* f( thread_->current_frame() );
 	for ( HHuginn::expression_t const& e : _expressions ) {
-		e->execute( thread_ );
+		HHuginn::value_t result( e->evaluate( thread_ ) );
 		if ( ! thread_->can_continue() ) {
 			break;
 		}
-		HHuginn::value_t result( f->result() );
 		if ( result->type_id() != HHuginn::TYPE::BOOLEAN ) {
 			throw HHuginn::HHuginnRuntimeException(
 				hcore::to_string( _errMsgHHuginn_[ERR_CODE::OPS_NOT_BOOL] ).append( type_name( result->type_id() ) ),

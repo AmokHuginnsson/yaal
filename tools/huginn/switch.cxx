@@ -32,26 +32,25 @@ HSwitch::HSwitch(
 void HSwitch::do_execute( HThread* thread_ ) const {
 	M_PROLOG
 	thread_->create_loop_frame( this );
-	HFrame* f( thread_->current_frame() );
-	_expression->execute( thread_ );
+	HHuginn::value_t switchValue( _expression->evaluate( thread_ ) );
 	if ( thread_->can_continue() ) {
-		HHuginn::value_t v( f->result() );
 		bool matched( false );
 		for (
 			cases_t::const_iterator it( _cases.begin() ), end( _cases.end() );
 			( it != end ) && thread_->can_continue();
 			++ it
 		) {
+			HHuginn::value_t caseValue;
 			if ( ! matched ) {
-				it->_expression->execute( thread_ );
+				caseValue = it->_expression->evaluate( thread_ );
 			}
 			if ( thread_->can_continue() ) {
 				if ( ! matched ) {
-					if ( v->type_id() != f->result()->type_id() ) {
+					if ( switchValue->type_id() != caseValue->type_id() ) {
 						throw HHuginn::HHuginnRuntimeException( "Case type does not match switch type.", file_id(), it->_expression->position() );
 					}
 				}
-				if ( matched || v->operator_equals( thread_, v, f->result(), it->_expression->position() ) ) {
+				if ( matched || switchValue->operator_equals( thread_, switchValue, caseValue, it->_expression->position() ) ) {
 					matched = true;
 					it->_scope->execute( thread_ );
 				}
