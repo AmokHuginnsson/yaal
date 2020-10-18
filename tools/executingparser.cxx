@@ -3163,38 +3163,43 @@ HInteger const& get_integer_instance( void ) {
 
 HInteger const& integer( get_integer_instance() );
 
-HStringLiteral::HStringLiteral( void )
+HStringLiteral::HStringLiteral( SEMANTIC semantic_ )
 	: HRuleBase( true )
 	, _actionString()
 	, _actionStringPosition()
+	, _evaluate( semantic_ == SEMANTIC::EVALUATE )
 	, _cache() {
 }
 
-HStringLiteral::HStringLiteral( action_t const& action_ )
+HStringLiteral::HStringLiteral( action_t const& action_, SEMANTIC semantic_ )
 	: HRuleBase( action_, true )
 	, _actionString()
 	, _actionStringPosition()
+	, _evaluate( semantic_ == SEMANTIC::EVALUATE )
 	, _cache() {
 }
 
-HStringLiteral::HStringLiteral( action_range_t const& action_ )
+HStringLiteral::HStringLiteral( action_range_t const& action_, SEMANTIC semantic_ )
 	: HRuleBase( action_, true )
 	, _actionString()
 	, _actionStringPosition()
+	, _evaluate( semantic_ == SEMANTIC::EVALUATE )
 	, _cache() {
 }
 
-HStringLiteral::HStringLiteral( action_string_t const& action_ )
+HStringLiteral::HStringLiteral( action_string_t const& action_, SEMANTIC semantic_ )
 	: HRuleBase( true )
 	, _actionString( action_ )
 	, _actionStringPosition()
+	, _evaluate( semantic_ == SEMANTIC::EVALUATE )
 	, _cache() {
 }
 
-HStringLiteral::HStringLiteral( action_string_range_t const& action_ )
+HStringLiteral::HStringLiteral( action_string_range_t const& action_, SEMANTIC semantic_ )
 	: HRuleBase( true )
 	, _actionString()
 	, _actionStringPosition( action_ )
+	, _evaluate( semantic_ == SEMANTIC::EVALUATE )
 	, _cache() {
 }
 
@@ -3202,34 +3207,42 @@ HStringLiteral::HStringLiteral( HStringLiteral const& stringLiteral_ )
 	: HRuleBase( stringLiteral_._action, stringLiteral_._actionPosition, stringLiteral_._skipWS )
 	, _actionString( stringLiteral_._actionString )
 	, _actionStringPosition( stringLiteral_._actionStringPosition )
+	, _evaluate( stringLiteral_._evaluate )
 	, _cache( stringLiteral_._cache ) {
 }
 
 HStringLiteral HStringLiteral::operator[]( action_t const& action_ ) const {
 	M_PROLOG
 	M_ENSURE( ! has_action() );
-	return ( HStringLiteral( action_ ) );
+	return ( HStringLiteral( action_, _evaluate ? SEMANTIC::EVALUATE : SEMANTIC::RAW ) );
 	M_EPILOG
 }
 
 HStringLiteral HStringLiteral::operator[]( action_range_t const& action_ ) const {
 	M_PROLOG
 	M_ENSURE( ! has_action() );
-	return ( HStringLiteral( action_ ) );
+	return ( HStringLiteral( action_, _evaluate ? SEMANTIC::EVALUATE : SEMANTIC::RAW ) );
 	M_EPILOG
 }
 
 HStringLiteral HStringLiteral::operator[]( action_string_t const& action_ ) const {
 	M_PROLOG
 	M_ENSURE( ! has_action() );
-	return ( HStringLiteral( action_ ) );
+	return ( HStringLiteral( action_, _evaluate ? SEMANTIC::EVALUATE : SEMANTIC::RAW ) );
 	M_EPILOG
 }
 
 HStringLiteral HStringLiteral::operator[]( action_string_range_t const& action_ ) const {
 	M_PROLOG
 	M_ENSURE( ! has_action() );
-	return ( HStringLiteral( action_ ) );
+	return ( HStringLiteral( action_, _evaluate ? SEMANTIC::EVALUATE : SEMANTIC::RAW ) );
+	M_EPILOG
+}
+
+HStringLiteral HStringLiteral::operator() ( SEMANTIC semantic_ ) const {
+	M_PROLOG
+	M_ENSURE( ! has_action() );
+	return ( HStringLiteral( semantic_ ) );
 	M_EPILOG
 }
 
@@ -3315,8 +3328,10 @@ yaal::hcore::HUTF8String::const_iterator HStringLiteral::do_parse( HExecutingPar
 	yaal::hcore::HUTF8String::const_iterator scan( parseResult.scan() );
 	if ( parseResult.valid() ) {
 		++ scan;
-		semantic_unescape( _cache );
-		unescape( _cache, _escapes_, '\\'_ycp, true );
+		if ( _evaluate ) {
+			semantic_unescape( _cache );
+			unescape( _cache, _escapes_, '\\'_ycp, true );
+		}
 		range_t rng( range( executingParser_, first_, scan ) );
 		if ( !! _actionString ) {
 			add_execution_step( executingParser_, call( _actionString, yaal::move( _cache ) ) );
@@ -3369,45 +3384,87 @@ void HStringLiteral::do_find_recursions( HRuleAggregator& ) {
 
 HStringLiteral const& get_string_literal_instance( void ) {
 	M_PROLOG
-	static HStringLiteral stringLiteralInstance;
+	static HStringLiteral stringLiteralInstance( HRuleBase::SEMANTIC::EVALUATE );
 	return ( stringLiteralInstance );
 	M_EPILOG
 }
 
 HStringLiteral const& string_literal( get_string_literal_instance() );
 
-HCharacterLiteral::HCharacterLiteral( void )
+HCharacterLiteral::HCharacterLiteral( SEMANTIC semantic_ )
 	: HRuleBase( true )
 	, _actionCharacter()
 	, _actionCharacterPosition()
+	, _actionString()
+	, _actionStringPosition()
+	, _evaluate( semantic_ == SEMANTIC::EVALUATE )
+	, _raw()
 	, _cache() {
 }
 
-HCharacterLiteral::HCharacterLiteral( action_t const& action_ )
+HCharacterLiteral::HCharacterLiteral( action_t const& action_, SEMANTIC semantic_ )
 	: HRuleBase( action_, true )
 	, _actionCharacter()
 	, _actionCharacterPosition()
+	, _actionString()
+	, _actionStringPosition()
+	, _evaluate( semantic_ == SEMANTIC::EVALUATE )
+	, _raw()
 	, _cache() {
 }
 
-HCharacterLiteral::HCharacterLiteral( action_range_t const& action_ )
+HCharacterLiteral::HCharacterLiteral( action_range_t const& action_, SEMANTIC semantic_ )
 	: HRuleBase( action_, true )
 	, _actionCharacter()
 	, _actionCharacterPosition()
+	, _actionString()
+	, _actionStringPosition()
+	, _evaluate( semantic_ == SEMANTIC::EVALUATE )
+	, _raw()
 	, _cache() {
 }
 
-HCharacterLiteral::HCharacterLiteral( action_character_t const& action_ )
+HCharacterLiteral::HCharacterLiteral( action_character_t const& action_, SEMANTIC semantic_ )
 	: HRuleBase( true )
 	, _actionCharacter( action_ )
 	, _actionCharacterPosition()
+	, _actionString()
+	, _actionStringPosition()
+	, _evaluate( semantic_ == SEMANTIC::EVALUATE )
+	, _raw()
 	, _cache() {
 }
 
-HCharacterLiteral::HCharacterLiteral( action_character_range_t const& action_ )
+HCharacterLiteral::HCharacterLiteral( action_character_range_t const& action_, SEMANTIC semantic_ )
 	: HRuleBase( true )
 	, _actionCharacter()
 	, _actionCharacterPosition( action_ )
+	, _actionString()
+	, _actionStringPosition()
+	, _evaluate( semantic_ == SEMANTIC::EVALUATE )
+	, _raw()
+	, _cache() {
+}
+
+HCharacterLiteral::HCharacterLiteral( action_string_t const& action_, SEMANTIC semantic_ )
+	: HRuleBase( true )
+	, _actionCharacter()
+	, _actionCharacterPosition()
+	, _actionString( action_ )
+	, _actionStringPosition()
+	, _evaluate( semantic_ == SEMANTIC::EVALUATE )
+	, _raw()
+	, _cache() {
+}
+
+HCharacterLiteral::HCharacterLiteral( action_string_range_t const& action_, SEMANTIC semantic_ )
+	: HRuleBase( true )
+	, _actionCharacter()
+	, _actionCharacterPosition()
+	, _actionString()
+	, _actionStringPosition( action_ )
+	, _evaluate( semantic_ == SEMANTIC::EVALUATE )
+	, _raw()
 	, _cache() {
 }
 
@@ -3415,39 +3472,64 @@ HCharacterLiteral::HCharacterLiteral( HCharacterLiteral const& characterLiteral_
 	: HRuleBase( characterLiteral_._action, characterLiteral_._actionPosition, characterLiteral_._skipWS )
 	, _actionCharacter( characterLiteral_._actionCharacter )
 	, _actionCharacterPosition( characterLiteral_._actionCharacterPosition )
+	, _actionString( characterLiteral_._actionString )
+	, _actionStringPosition( characterLiteral_._actionStringPosition )
+	, _evaluate( characterLiteral_._evaluate )
+	, _raw( characterLiteral_._raw )
 	, _cache( characterLiteral_._cache ) {
 }
 
 HCharacterLiteral HCharacterLiteral::operator[]( action_t const& action_ ) const {
 	M_PROLOG
 	M_ENSURE( ! has_action() );
-	return ( HCharacterLiteral( action_ ) );
+	return ( HCharacterLiteral( action_, _evaluate ? SEMANTIC::EVALUATE : SEMANTIC::RAW ) );
 	M_EPILOG
 }
 
 HCharacterLiteral HCharacterLiteral::operator[]( action_range_t const& action_ ) const {
 	M_PROLOG
 	M_ENSURE( ! has_action() );
-	return ( HCharacterLiteral( action_ ) );
+	return ( HCharacterLiteral( action_, _evaluate ? SEMANTIC::EVALUATE : SEMANTIC::RAW ) );
 	M_EPILOG
 }
 
 HCharacterLiteral HCharacterLiteral::operator[]( action_character_t const& action_ ) const {
 	M_PROLOG
 	M_ENSURE( ! has_action() );
-	return ( HCharacterLiteral( action_ ) );
+	return ( HCharacterLiteral( action_, _evaluate ? SEMANTIC::EVALUATE : SEMANTIC::RAW ) );
 	M_EPILOG
 }
 
 HCharacterLiteral HCharacterLiteral::operator[]( action_character_range_t const& action_ ) const {
 	M_PROLOG
 	M_ENSURE( ! has_action() );
-	return ( HCharacterLiteral( action_ ) );
+	return ( HCharacterLiteral( action_, _evaluate ? SEMANTIC::EVALUATE : SEMANTIC::RAW ) );
+	M_EPILOG
+}
+
+HCharacterLiteral HCharacterLiteral::operator[]( action_string_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ! has_action() );
+	return ( HCharacterLiteral( action_, _evaluate ? SEMANTIC::EVALUATE : SEMANTIC::RAW ) );
+	M_EPILOG
+}
+
+HCharacterLiteral HCharacterLiteral::operator[]( action_string_range_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ! has_action() );
+	return ( HCharacterLiteral( action_, _evaluate ? SEMANTIC::EVALUATE : SEMANTIC::RAW ) );
+	M_EPILOG
+}
+
+HCharacterLiteral HCharacterLiteral::operator() ( SEMANTIC semantic_ ) const {
+	M_PROLOG
+	M_ENSURE( ! has_action() );
+	return ( HCharacterLiteral( semantic_ ) );
 	M_EPILOG
 }
 
 bool HCharacterLiteral::do_has_action( void ) const {
-	return ( HRuleBase::do_has_action() || ( !! _actionCharacter ) || ( !! _actionCharacterPosition ) );
+	return ( HRuleBase::do_has_action() || ( !! _actionCharacter ) || ( !! _actionCharacterPosition ) || ( !! _actionString ) || ( !! _actionStringPosition ) );
 }
 
 yaal::hcore::HUTF8String::const_iterator HCharacterLiteral::do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const {
@@ -3455,26 +3537,38 @@ yaal::hcore::HUTF8String::const_iterator HCharacterLiteral::do_parse( HExecuting
 	HParseResult parseResult( parse_quoted( _cache, first_, first_, last_, '\''_ycp ) );
 	yaal::hcore::HUTF8String::const_iterator scan( parseResult.scan() );
 	static char const errMsg[] = "expected literal character";
-	if ( parseResult.valid() ) {
-		++ scan;
+	bool ok( false );
+	do {
+		if ( ! parseResult.valid() ) {
+			break;
+		}
+		_raw = _cache;
 		semantic_unescape( _cache );
 		unescape( _cache, _escapes_, '\\'_ycp, true );
-		if ( _cache.get_length() == 1 ) {
-			range_t rng( range( executingParser_, first_, scan ) );
-			if ( !! _actionCharacter ) {
-				add_execution_step( executingParser_, call( _actionCharacter, _cache[0] ) );
-			} else if ( !! _actionCharacterPosition ) {
-				add_execution_step( executingParser_, call( _actionCharacterPosition, _cache[0], rng ) );
-			} else if ( !! _action ) {
-				add_execution_step( executingParser_, _action );
-			} else if ( !! _actionPosition ) {
-				add_execution_step( executingParser_, call( _actionPosition, rng ) );
-			}
-		} else {
-			report_error( executingParser_, scan, errMsg );
-			scan = first_;
+		if ( _cache.get_length() != 1 ) {
+			break;
 		}
-	} else {
+		if ( ! _evaluate && ( _raw.get_length() != 1 ) && ( !! _actionCharacter || !! _actionCharacterPosition ) ) {
+			break;
+		}
+		++ scan;
+		range_t rng( range( executingParser_, first_, scan ) );
+		if ( !! _actionCharacter ) {
+			add_execution_step( executingParser_, call( _actionCharacter, _cache.front() ) );
+		} else if ( !! _actionCharacterPosition ) {
+			add_execution_step( executingParser_, call( _actionCharacterPosition, _cache.front(), rng ) );
+		} else if ( !! _actionString ) {
+			add_execution_step( executingParser_, call( _actionString, _evaluate ? _cache : _raw ) );
+		} else if ( !! _actionStringPosition ) {
+			add_execution_step( executingParser_, call( _actionStringPosition, _evaluate ? _cache : _raw, rng ) );
+		} else if ( !! _action ) {
+			add_execution_step( executingParser_, _action );
+		} else if ( !! _actionPosition ) {
+			add_execution_step( executingParser_, call( _actionPosition, rng ) );
+		}
+		ok = true;
+	} while ( false );
+	if ( ! ok ) {
 		report_error( executingParser_, scan, errMsg );
 		scan = first_;
 	}
@@ -3516,7 +3610,7 @@ void HCharacterLiteral::do_find_recursions( HRuleAggregator& ) {
 
 HCharacterLiteral const& get_character_literal_instance( void ) {
 	M_PROLOG
-	static HCharacterLiteral characterLiteralInstance;
+	static HCharacterLiteral characterLiteralInstance( HRuleBase::SEMANTIC::EVALUATE );
 	return ( characterLiteralInstance );
 	M_EPILOG
 }

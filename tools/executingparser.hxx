@@ -156,6 +156,10 @@ public:
 		KEEP,
 		AUTO
 	};
+	enum class SEMANTIC {
+		EVALUATE,
+		RAW
+	};
 protected:
 	action_t _action;
 	action_range_t _actionPosition;
@@ -804,6 +808,7 @@ public:
 private:
 	action_string_t _actionString;
 	action_string_range_t _actionStringPosition;
+	bool _evaluate;
 	mutable yaal::hcore::HString _cache;
 public:
 	HStringLiteral( HStringLiteral const& );
@@ -811,11 +816,12 @@ public:
 	HStringLiteral operator[]( action_range_t const& ) const;
 	HStringLiteral operator[]( action_string_t const& ) const;
 	HStringLiteral operator[]( action_string_range_t const& ) const;
+	HStringLiteral operator() ( SEMANTIC ) const;
 protected:
-	HStringLiteral( action_t const& );
-	HStringLiteral( action_range_t const& );
-	HStringLiteral( action_string_t const& );
-	HStringLiteral( action_string_range_t const& );
+	HStringLiteral( action_t const&, SEMANTIC );
+	HStringLiteral( action_range_t const&, SEMANTIC );
+	HStringLiteral( action_string_t const&, SEMANTIC );
+	HStringLiteral( action_string_range_t const&, SEMANTIC );
 	virtual ptr_t do_clone( void ) const override;
 	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator const&, yaal::hcore::HUTF8String::const_iterator const& ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
@@ -824,7 +830,7 @@ protected:
 	virtual void do_find_recursions( HRuleAggregator& ) override;
 	virtual bool do_has_action( void ) const override;
 private:
-	HStringLiteral( void );
+	HStringLiteral( SEMANTIC );
 	HStringLiteral& operator = ( HStringLiteral const& ) = delete;
 	friend HStringLiteral const& get_string_literal_instance( void );
 };
@@ -839,9 +845,15 @@ public:
 	typedef HRuleBase base_type;
 	typedef yaal::hcore::HBoundCall<void ( code_point_t )> action_character_t;
 	typedef yaal::hcore::HBoundCall<void ( code_point_t, range_t )> action_character_range_t;
+	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const& )> action_string_t;
+	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const&, range_t )> action_string_range_t;
 private:
 	action_character_t _actionCharacter;
 	action_character_range_t _actionCharacterPosition;
+	action_string_t _actionString;
+	action_string_range_t _actionStringPosition;
+	bool _evaluate;
+	mutable yaal::hcore::HString _raw;
 	mutable yaal::hcore::HString _cache;
 public:
 	HCharacterLiteral( HCharacterLiteral const& );
@@ -849,11 +861,16 @@ public:
 	HCharacterLiteral operator[]( action_range_t const& ) const;
 	HCharacterLiteral operator[]( action_character_t const& ) const;
 	HCharacterLiteral operator[]( action_character_range_t const& ) const;
+	HCharacterLiteral operator[]( action_string_t const& ) const;
+	HCharacterLiteral operator[]( action_string_range_t const& ) const;
+	HCharacterLiteral operator() ( SEMANTIC ) const;
 protected:
-	HCharacterLiteral( action_t const& );
-	HCharacterLiteral( action_range_t const& );
-	HCharacterLiteral( action_character_t const& );
-	HCharacterLiteral( action_character_range_t const& );
+	HCharacterLiteral( action_t const&, SEMANTIC );
+	HCharacterLiteral( action_range_t const&, SEMANTIC );
+	HCharacterLiteral( action_character_t const&, SEMANTIC );
+	HCharacterLiteral( action_character_range_t const&, SEMANTIC );
+	HCharacterLiteral( action_string_t const&, SEMANTIC );
+	HCharacterLiteral( action_string_range_t const&, SEMANTIC );
 	virtual ptr_t do_clone( void ) const override;
 	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator const&, yaal::hcore::HUTF8String::const_iterator const& ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
@@ -862,7 +879,7 @@ protected:
 	virtual void do_find_recursions( HRuleAggregator& ) override;
 	virtual bool do_has_action( void ) const override;
 private:
-	HCharacterLiteral( void );
+	HCharacterLiteral( SEMANTIC );
 	HCharacterLiteral& operator = ( HCharacterLiteral const& ) = delete;
 	friend HCharacterLiteral const& get_character_literal_instance( void );
 };
