@@ -51,6 +51,7 @@ public:
 						{ "LOWER_CASE_LETTER",             "a set of lower case Latin letters",       static_cast<int>( CHARACTER_CLASS::LOWER_CASE_LETTER ) },
 						{ "UPPER_CASE_LETTER",             "a set of upper case Latin letters",       static_cast<int>( CHARACTER_CLASS::UPPER_CASE_LETTER ) },
 						{ "WORD",                          "a set of word like characters",           static_cast<int>( CHARACTER_CLASS::WORD ) },
+						{ "PUNCTATION",                    "a set of punctation characters",          static_cast<int>( CHARACTER_CLASS::PUNCTATION ) },
 						{ "VOWEL",                         "a set of vowels",                         static_cast<int>( CHARACTER_CLASS::VOWEL ) },
 						{ "GREEK",                         "a set of Greek letters",                  static_cast<int>( CHARACTER_CLASS::GREEK ) },
 						{ "LOWER_CASE_GREEK",              "a set of lower case Greek letters",       static_cast<int>( CHARACTER_CLASS::LOWER_CASE_GREEK ) },
@@ -181,6 +182,7 @@ public:
 			case ( CHARACTER_CLASS::LOWER_CASE_LETTER ):             cc8  = &hcore::character_class<CHARACTER_CLASS::LOWER_CASE_LETTER>();             break;
 			case ( CHARACTER_CLASS::UPPER_CASE_LETTER ):             cc8  = &hcore::character_class<CHARACTER_CLASS::UPPER_CASE_LETTER>();             break;
 			case ( CHARACTER_CLASS::WORD ):                          cc8  = &hcore::character_class<CHARACTER_CLASS::WORD>();                          break;
+			case ( CHARACTER_CLASS::PUNCTATION ):                    cc8  = &hcore::character_class<CHARACTER_CLASS::PUNCTATION>();                    break;
 			case ( CHARACTER_CLASS::VOWEL ):                         cc8  = &hcore::character_class<CHARACTER_CLASS::VOWEL>();                         break;
 			case ( CHARACTER_CLASS::GREEK ):                         cc16 = &hcore::character_class<CHARACTER_CLASS::GREEK>();                         break;
 			case ( CHARACTER_CLASS::LOWER_CASE_GREEK ):              cc16 = &hcore::character_class<CHARACTER_CLASS::LOWER_CASE_GREEK>();              break;

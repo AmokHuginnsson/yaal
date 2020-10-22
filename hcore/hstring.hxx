@@ -72,32 +72,33 @@ public:
 typedef HCharacterClass<char> character_class_t;
 
 enum class CHARACTER_CLASS {
-	WHITESPACE = 0,
-	BIN_DIGIT  = 1,
-	OCT_DIGIT  = 2,
-	DIGIT      = 3,
-	HEX_DIGIT  = 4,
-	LETTER     = 5,
-	LOWER_CASE_LETTER = 6,
-	UPPER_CASE_LETTER = 7,
-	WORD = 8,
-	VOWEL = 9,
-	GREEK = 10,
-	LOWER_CASE_GREEK = 11,
-	UPPER_CASE_GREEK = 12,
-	SUBSCRIPT = 13,
-	SUBSCRIPT_DIGIT = 14,
-	SUBSCRIPT_LETTER = 15,
-	SUBSCRIPT_LOWER_CASE_LETTER = 16,
-	SUBSCRIPT_UPPER_CASE_LETTER = 17,
-	SUPERSCRIPT = 18,
-	SUPERSCRIPT_DIGIT = 19,
-	SUPERSCRIPT_LETTER = 20,
-	SUPERSCRIPT_LOWER_CASE_LETTER = 21,
-	SUPERSCRIPT_UPPER_CASE_LETTER = 22,
-	PRIVATE_USE_AREA = -1,
-	SUPPLEMENTARY_PRIVATE_USE_AREA_A = -2,
-	SUPPLEMENTARY_PRIVATE_USE_AREA_B = -3
+	WHITESPACE                       = 0,
+	BIN_DIGIT                        = WHITESPACE                    + 1,
+	OCT_DIGIT                        = BIN_DIGIT                     + 1,
+	DIGIT                            = OCT_DIGIT                     + 1,
+	HEX_DIGIT                        = DIGIT                         + 1,
+	LETTER                           = HEX_DIGIT                     + 1,
+	LOWER_CASE_LETTER                = LETTER                        + 1,
+	UPPER_CASE_LETTER                = LOWER_CASE_LETTER             + 1,
+	WORD                             = UPPER_CASE_LETTER             + 1,
+	PUNCTATION                       = WORD                          + 1,
+	VOWEL                            = PUNCTATION                    + 1,
+	GREEK                            = VOWEL                         + 1,
+	LOWER_CASE_GREEK                 = GREEK                         + 1,
+	UPPER_CASE_GREEK                 = LOWER_CASE_GREEK              + 1,
+	SUBSCRIPT                        = UPPER_CASE_GREEK              + 1,
+	SUBSCRIPT_DIGIT                  = SUBSCRIPT                     + 1,
+	SUBSCRIPT_LETTER                 = SUBSCRIPT_DIGIT               + 1,
+	SUBSCRIPT_LOWER_CASE_LETTER      = SUBSCRIPT_LETTER              + 1,
+	SUBSCRIPT_UPPER_CASE_LETTER      = SUBSCRIPT_LOWER_CASE_LETTER   + 1,
+	SUPERSCRIPT                      = SUBSCRIPT_UPPER_CASE_LETTER   + 1,
+	SUPERSCRIPT_DIGIT                = SUPERSCRIPT                   + 1,
+	SUPERSCRIPT_LETTER               = SUPERSCRIPT_DIGIT             + 1,
+	SUPERSCRIPT_LOWER_CASE_LETTER    = SUPERSCRIPT_LETTER            + 1,
+	SUPERSCRIPT_UPPER_CASE_LETTER    = SUPERSCRIPT_LOWER_CASE_LETTER + 1,
+	PRIVATE_USE_AREA                 = -1,
+	SUPPLEMENTARY_PRIVATE_USE_AREA_A = PRIVATE_USE_AREA                 - 1,
+	SUPPLEMENTARY_PRIVATE_USE_AREA_B = SUPPLEMENTARY_PRIVATE_USE_AREA_A - 1
 };
 template<typename char_type>
 HCharacterClass<char_type> const& character_class( CHARACTER_CLASS );
@@ -1226,6 +1227,7 @@ bool is_upper( code_point_t );
 bool is_lower( code_point_t );
 bool is_alpha( code_point_t );
 bool is_alnum( code_point_t );
+bool is_punct( code_point_t );
 bool is_ascii( code_point_t );
 bool is_greek( code_point_t );
 bool is_upper_greek( code_point_t );

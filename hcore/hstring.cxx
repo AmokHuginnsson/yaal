@@ -809,15 +809,19 @@ HCharacterClass<char> const& character_class( CHARACTER_CLASS characterClass_ ) 
 #define D_DEC_DIGIT D_OCT_DIGIT "89"
 #undef D_HEX_DIGIT
 #define D_HEX_DIGIT D_DEC_DIGIT "aAbBcCdDeEfF"
-	static character_class_t const binDigit = character_class_t( D_BIN_DIGIT, static_cast<int>( sizeof ( D_BIN_DIGIT ) - 1 ) );
-	static character_class_t const octDigit = character_class_t( D_OCT_DIGIT, static_cast<int>( sizeof ( D_OCT_DIGIT ) - 1 ) );
-	static character_class_t const digit = character_class_t( D_DEC_DIGIT, static_cast<int>( sizeof ( D_DEC_DIGIT ) - 1 ) );
-	static character_class_t const hexDigit = character_class_t( D_HEX_DIGIT, static_cast<int>( sizeof ( D_HEX_DIGIT ) - 1 ) );
-	static character_class_t const letter = character_class_t( D_LETTER, static_cast<int>( sizeof ( D_LETTER ) - 1 ) );
-	static character_class_t const lowerCaseLetter = character_class_t( D_LOWER_CASE_LETTER, static_cast<int>( sizeof ( D_LOWER_CASE_LETTER ) - 1 ) );
-	static character_class_t const upperCaseLetter = character_class_t( D_UPPER_CASE_LETTER, static_cast<int>( sizeof ( D_UPPER_CASE_LETTER ) - 1 ) );
-	static character_class_t const word = character_class_t( D_LETTER D_DEC_DIGIT "_", static_cast<int>( sizeof ( D_LETTER D_DEC_DIGIT "_" ) - 1 ) );
-	static character_class_t const vowel = character_class_t( D_VOWEL, static_cast<int>( sizeof ( D_VOWEL ) - 1 ) );
+#undef D_PUNCTATION
+#define D_PUNCTATION "`~!@#$%^&*()-=+[{]};:'\",<.>/?"
+	static character_class_t const binDigit        = character_class_t( D_BIN_DIGIT,              static_cast<int>( sizeof ( D_BIN_DIGIT ) - 1 ) );
+	static character_class_t const octDigit        = character_class_t( D_OCT_DIGIT,              static_cast<int>( sizeof ( D_OCT_DIGIT ) - 1 ) );
+	static character_class_t const digit           = character_class_t( D_DEC_DIGIT,              static_cast<int>( sizeof ( D_DEC_DIGIT ) - 1 ) );
+	static character_class_t const hexDigit        = character_class_t( D_HEX_DIGIT,              static_cast<int>( sizeof ( D_HEX_DIGIT ) - 1 ) );
+	static character_class_t const letter          = character_class_t( D_LETTER,                 static_cast<int>( sizeof ( D_LETTER ) - 1 ) );
+	static character_class_t const lowerCaseLetter = character_class_t( D_LOWER_CASE_LETTER,      static_cast<int>( sizeof ( D_LOWER_CASE_LETTER ) - 1 ) );
+	static character_class_t const upperCaseLetter = character_class_t( D_UPPER_CASE_LETTER,      static_cast<int>( sizeof ( D_UPPER_CASE_LETTER ) - 1 ) );
+	static character_class_t const word            = character_class_t( D_LETTER D_DEC_DIGIT "_", static_cast<int>( sizeof ( D_LETTER D_DEC_DIGIT "_" ) - 1 ) );
+	static character_class_t const punctation      = character_class_t( D_PUNCTATION,             static_cast<int>( sizeof ( D_PUNCTATION ) - 1 ) );
+	static character_class_t const vowel           = character_class_t( D_VOWEL,                  static_cast<int>( sizeof ( D_VOWEL ) - 1 ) );
+#undef D_PUNCTATION
 #undef D_HEX_DIGIT
 #undef D_DEC_DIGIT
 #undef D_OCT_DIGIT
@@ -836,6 +840,7 @@ HCharacterClass<char> const& character_class( CHARACTER_CLASS characterClass_ ) 
 		&lowerCaseLetter,
 		&upperCaseLetter,
 		&word,
+		&punctation,
 		&vowel
 	};
 	return ( *characterClass[static_cast<int>( characterClass_ )] );
@@ -3210,6 +3215,10 @@ bool is_alpha( code_point_t char_ ) {
 
 bool is_alnum( code_point_t char_ ) {
 	return ( ::std::iswalnum( static_cast<wint_t>( char_.get() ) ) ? true : false );
+}
+
+bool is_punct( code_point_t char_ ) {
+	return ( ::std::iswpunct( static_cast<wint_t>( char_.get() ) ) ? true : false );
 }
 
 bool is_ascii( code_point_t char_ ) {
