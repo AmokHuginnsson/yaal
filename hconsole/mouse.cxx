@@ -107,7 +107,7 @@ int console_mouse_open( void ) {
 		throw HMouseException( to_string( _( "cannot setup mouse mode, " ) ).append( err ), err );
 	}
 
-	log( LOG_LEVEL::INFO ) << "i have opened device: `" << tty << '\'' << endl;
+	hcore::log( LOG_LEVEL::INFO ) << "i have opened device: `" << tty << '\'' << endl;
 
 	return ( 0 );
 	M_EPILOG
@@ -155,7 +155,7 @@ int console_mouse_open( void ) {
 	if ( Gpm_Open( &gpm, vC ) == -1 ) {
 		throw HMouseException( "Can't open mouse connection: "_ys.append( error_message( errno ) ), vC );
 	}
-	log( LOG_LEVEL::INFO ) << "i have opened device: `" << vC << '\'' << endl;
+	hcore::log( LOG_LEVEL::INFO ) << "i have opened device: `" << vC << '\'' << endl;
 	return ( gpm_fd );
 	M_EPILOG
 }

@@ -43,7 +43,7 @@ void dbwrapper_error( void ) {
 	M_PROLOG
 	HString message;
 	message = HPlugin().error_message( 0 );
-	log( LOG_LEVEL::ERROR ) << message << endl;
+	hcore::log( LOG_LEVEL::ERROR ) << message << endl;
 	cerr << "(" << message << "), ";
 	return;
 	M_EPILOG
@@ -63,9 +63,9 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 	if ( it == _dBDrivers_.end() ) /* given driver has not been loaded yet */ {
 		try {
 			driver = make_pair( make_pointer<HPlugin>(), make_pointer<ODBConnector>() );
-			log( LOG_LEVEL::NOTICE ) << "Loading [" << _driver_[ driverId_ + 1 ] << "] driver ... ";
+			hcore::log( LOG_LEVEL::NOTICE ) << "Loading [" << _driver_[ driverId_ + 1 ] << "] driver ... ";
 			driver.first->load( _driver_[ driverId_ + 1 ] );
-			log( LOG_LEVEL::NOTICE ) << "(linking symbols ...) " << flush;
+			hcore::log( LOG_LEVEL::NOTICE ) << "(linking symbols ...) " << flush;
 			driver.first->try_resolve( SYMBOL_PREFIX"driver_init", driver.second->driver_init );
 			driver.first->try_resolve( SYMBOL_PREFIX"driver_cleanup", driver.second->driver_cleanup );
 			driver.first->resolve( SYMBOL_PREFIX"db_disconnect", driver.second->db_disconnect );
@@ -99,13 +99,13 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 			it = _dBDrivers_.insert( make_pair( driverId_, driver ) ).first;
 			driver.second->init();
 		} catch ( HPluginException& e ) {
-			log( LOG_LEVEL::NOTICE ) << "fail." << endl;
+			hcore::log( LOG_LEVEL::NOTICE ) << "fail." << endl;
 			HStringStream reason;
 			reason << _( "cannot load database driver: " ) << e.what();
 			M_THROW( reason.string(), _dataBaseDriver_ );
 		}
 		if ( driver.first->is_loaded() ) {
-			log( LOG_LEVEL::NOTICE ) << "success." << endl;
+			hcore::log( LOG_LEVEL::NOTICE ) << "success." << endl;
 		} else {
 			dbwrapper_error();
 			dbwrapper_exit();
@@ -120,7 +120,7 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 	M_PROLOG
 	errno = 0;
-	log( LOG_LEVEL::NOTICE ) << "Using dynamic database driver [" << _driver_[ driverId_ + 1 ] << "] ... " << flush;
+	hcore::log( LOG_LEVEL::NOTICE ) << "Using dynamic database driver [" << _driver_[ driverId_ + 1 ] << "] ... " << flush;
 	ODBConnector const* pConnector( nullptr );
 	if ( driverId_ == ODBConnector::DRIVER::DEFAULT ) {
 		for ( int i( 0 ); i < ODBConnector::DRIVER::TERMINATOR; ++ i ) {
@@ -132,7 +132,7 @@ ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 		pConnector = try_load_driver( static_cast<ODBConnector::DRIVER::enum_t>( driverId_ ) );
 	}
 	if ( ! pConnector || ( pConnector->db_connect != nullptr ) ) {
-		log( LOG_LEVEL::NOTICE ) << _done_ << flush;
+		hcore::log( LOG_LEVEL::NOTICE ) << _done_ << flush;
 	}
 	return ( pConnector );
 	M_EPILOG

@@ -7,6 +7,8 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "math.hxx"
 
+#undef INFINITY
+
 namespace yaal {
 
 namespace math {

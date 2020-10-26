@@ -387,7 +387,7 @@ void HConsole::enter_curses( void ) {
 		}
 		try {
 			if ( ( _mouseDes = mouse::mouse_open() ) >= 0 ) {
-				log( LOG_LEVEL::INFO )
+				hcore::log( LOG_LEVEL::INFO )
 					<< ( ( mouse::mouse_open == mouse::x_mouse_open ) ? _( "using ncurses mouse support, at fd(" ) : _( "using console mouse support, at fd(" ) )
 					<< _mouseDes << ')' << endl;
 			} else if ( _useMouse_ == USE_MOUSE::YES ) {
@@ -943,7 +943,7 @@ int HConsole::on_terminal_resize( int signum_ ) {
 	message = "Terminal size changed: ";
 	message += strsignal( signum_ );
 	message += '.';
-	log << message << endl;
+	hcore::log << message << endl;
 	if ( is_enabled() ) {
 		notify_terminal();
 	} else {

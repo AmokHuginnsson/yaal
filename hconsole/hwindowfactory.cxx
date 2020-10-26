@@ -24,7 +24,7 @@ void HWindowFactory::register_window_creator( HString const& name_, HWindowCreat
 		M_THROW( _( "Window already registered" ), errno );
 	}
 	_creators[ name_ ] = creator_;
-	log << "window creator for: `" << name_ << "' registered" << endl;
+	hcore::log << "window creator for: `" << name_ << "' registered" << endl;
 	return;
 	M_EPILOG
 }

@@ -15,6 +15,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hclock.hxx"
 #include "hlog.hxx"
 
+#undef INFINITY
+
 using namespace yaal::hcore::system;
 
 namespace yaal {

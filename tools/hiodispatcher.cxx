@@ -84,7 +84,7 @@ HIODispatcher::HIODispatcher( int noFileHandlers_, int latency_ )
 		IO_EVENT_TYPE::READ
 	);
 	if ( _latency < LOW_LATENCY_WARNING ) {
-		log( LOG_LEVEL::WARNING ) << "Low latency on IO Dispatcher!" << endl;
+		hcore::log( LOG_LEVEL::WARNING ) << "Low latency on IO Dispatcher!" << endl;
 	}
 	return;
 	M_EPILOG

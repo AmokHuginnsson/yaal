@@ -21,6 +21,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "numbersetstatistics.hxx"
 #include "randomizer.hxx"
 
+#undef INFINITY
+
 using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::tools::xmath;

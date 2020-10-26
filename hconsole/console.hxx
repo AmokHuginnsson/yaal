@@ -70,8 +70,10 @@ struct GLYPH {
 		static int APPROXIMATELY;
 		static int SQUARE_ROOT;
 		static int PI;
+#pragma push_macro( "INFINITY" )
 #undef INFINITY
 		static int INFINITY;
+#pragma pop_macro( "INFINITY" )
 	};
 	struct FACE {
 		static int WHITE;

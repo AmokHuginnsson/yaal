@@ -51,7 +51,7 @@ HRecordSet::ptr_t HQuery::execute( void ) {
 		M_THROW( "not connected to database", errno );
 	}
 	if ( _logSQL_ ) {
-		log << "SQL: " << _sql << endl;
+		hcore::log << "SQL: " << _sql << endl;
 	}
 	HRecordSet::ptr_t rs( _resultObserver );
 	if ( !! rs ) {

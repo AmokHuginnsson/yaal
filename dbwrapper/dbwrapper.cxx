@@ -107,8 +107,8 @@ bool set_dbwrapper_variables( HString& option_, HString& value_ ) {
 		try {
 			dbwrapper::_dataBaseDriver_ = db_driver_from_string( value_ );
 		} catch ( HDataBaseException const& ) {
-			log( LOG_LEVEL::ERROR ) << "Error: `" << value_;
-			log << "' is unknown driver." << endl;
+			hcore::log( LOG_LEVEL::ERROR ) << "Error: `" << value_;
+			hcore::log << "' is unknown driver." << endl;
 			exit( 1 );
 		}
 	} else {

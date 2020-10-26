@@ -113,7 +113,7 @@ void HWidgetCreatorInterface::apply_resources( HWidget::ptr_t widget_, yaal::too
 		if ( ! do_apply_resources( widget_, n ) ) {
 			HString const& name( n.get_name() );
 			if ( ( name != POSITION_NAME ) && ( name != LABEL_NAME ) ) {
-				log << "unknown " << node_.get_name() << " attribute name: " << name << ", at: " << n.get_line() << endl;
+				hcore::log << "unknown " << node_.get_name() << " attribute name: " << name << ", at: " << n.get_line() << endl;
 			}
 		}
 	}
@@ -192,7 +192,7 @@ void HWidgetCreatorInterface::prepare_attributes( HWidgetAttributesInterface& at
 			wa.attribute_disabled( make_attr( "disabled", n, _attributeDisabled_ ) );
 		} else if ( ! do_prepare_attributes( attrs_, n ) ) {
 			if ( ( name != POSITION_NAME ) && ( name != LABEL_NAME ) ) {
-				log << "unknown " << node_.get_name() << " attribute name: " << name << ", at: " << n.get_line() << endl;
+				hcore::log << "unknown " << node_.get_name() << " attribute name: " << name << ", at: " << n.get_line() << endl;
 			}
 		}
 	}

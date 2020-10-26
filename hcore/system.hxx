@@ -11,6 +11,8 @@
 #include "hcore/harray.hxx"
 #include "hcore/bitmaskenum.hxx"
 
+#pragma push_macro( "INFINITY" )
+
 namespace yaal {
 
 namespace hcore {
@@ -241,6 +243,8 @@ void exec( yaal::hcore::HString const& image, argv_t const& args ) __attribute__
 }
 
 }
+
+#pragma pop_macro( "INFINITY" )
 
 #endif /* #ifndef YAAL_HCORE_SYSTEM_HXX_INCLUDED */
 

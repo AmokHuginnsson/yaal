@@ -13,6 +13,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/system.hxx"
 #include "hcore/hcore.hxx"
 
+#undef INFINITY
+
 using namespace yaal::hcore::system;
 
 namespace yaal {

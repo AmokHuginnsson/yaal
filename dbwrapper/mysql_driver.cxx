@@ -86,7 +86,7 @@ void mysql_query_free( void*, bool );
 M_EXPORT_SYMBOL void driver_init( void );
 M_EXPORT_SYMBOL void driver_init( void ) {
 	M_PROLOG
-	log << "Initializing MySQL driver." << endl;
+	hcore::log << "Initializing MySQL driver." << endl;
 	M_ENSURE( mysql_library_init( 0, nullptr, nullptr ) == 0 );
 	return;
 	M_EPILOG
@@ -106,7 +106,7 @@ M_EXPORT_SYMBOL void driver_cleanup( void ) {
 	 * stack, it is probably an invalid free in OpenSSL library.
 	 *
 	 */
-	log << "Cleaning up after MySQL driver." << endl;
+	hcore::log << "Cleaning up after MySQL driver." << endl;
 	mysql_library_end();
 #endif /* #ifndef __HOST_OS_TYPE_FEDORA__ */
 	return;

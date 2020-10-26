@@ -213,7 +213,7 @@ HResponse get( HRequest const& request_ ) {
 				filename = parse_content_disposition( headerValue );
 #ifdef __DEBUG__
 			} else {
-				log( LOG_LEVEL::DEBUG ) << headerName << ": " << headerValue << endl;
+				hcore::log( LOG_LEVEL::DEBUG ) << headerName << ": " << headerValue << endl;
 #endif
 			}
 		}
@@ -412,7 +412,7 @@ HHTTPStream::transfer_encoding_t parse_transfer_encoding( yaal::hcore::HString c
 		} else if ( method == "deflate" ) {
 			transferEncoding |= HHTTPStream::TRANSFER_ENCODING::DEFLATE;
 		} else {
-			log( LOG_LEVEL::DEBUG ) << "unsupported transfer encoding: " << method << endl;
+			hcore::log( LOG_LEVEL::DEBUG ) << "unsupported transfer encoding: " << method << endl;
 		}
 	}
 	return ( transferEncoding );
@@ -426,7 +426,7 @@ yaal::hcore::HTime parse_time( yaal::hcore::HString const& value_, yaal::hcore::
 		time.set_format( _rfc7231DateTimeFormat_ );
 		time.from_string( value_ );
 	} catch ( HException const& e ) {
-		log( LOG_LEVEL::DEBUG ) << context_ << value_ << " - " << e.what() << endl;
+		hcore::log( LOG_LEVEL::DEBUG ) << context_ << value_ << " - " << e.what() << endl;
 	}
 	time.set_format( _iso8601DateTimeFormat_ );
 	return ( time );

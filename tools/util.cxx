@@ -856,7 +856,7 @@ void failure( int exitStatus_, char const* format_, ... ) {
 	HString formated( color ? highlighter.highlight( msg ) : msg );
 	HUTF8String utf8( formated );
 	fwrite( utf8.c_str(), 1, static_cast<size_t>( utf8.byte_count() ), stderr );
-	log << "failure: " << plain( msg );
+	hcore::log << "failure: " << plain( msg );
 	throw ( exitStatus_ );
 	M_EPILOG
 }

@@ -118,7 +118,7 @@ public:
 			} break;
 		}
 		if ( ! instance->_msg.is_empty() ) {
-			log( l ) << "XML: " << instance->_msg << endl;
+			hcore::log( l ) << "XML: " << instance->_msg << endl;
 			instance->_msg.clear();
 		}
 	}
@@ -160,16 +160,16 @@ void verify_encoding( yaal::hcore::HString const& encoding_, xmlNodePtr root_ = 
 			if ( ::xmlParseCharEncoding( utf8.c_str() ) > XML_CHAR_ENCODING_NONE ) {
 				ok = true;
 			} else {
-				log( LOG_LEVEL::WARNING ) << _( "HXml: Encoding alias not found: `" ) << encoding_ << "'";
+				hcore::log( LOG_LEVEL::WARNING ) << _( "HXml: Encoding alias not found: `" ) << encoding_ << "'";
 				if ( root_ ) {
-					log << " in `" << fileName_ << ":" << root_->line <<"'." << endl;
+					hcore::log << " in `" << fileName_ << ":" << root_->line <<"'." << endl;
 				} else {
-					log << "." << endl;
+					hcore::log << "." << endl;
 				}
 			}
 		}
 	} else if ( root_ ) {
-		log( LOG_LEVEL::WARNING ) << _( "HXml: No encoding declared in `" )
+		hcore::log( LOG_LEVEL::WARNING ) << _( "HXml: No encoding declared in `" )
 			<< fileName_ << ":" << root_->line <<"'." << endl;
 	}
 	if ( ! ok ) {
@@ -180,7 +180,7 @@ void verify_encoding( yaal::hcore::HString const& encoding_, xmlNodePtr root_ = 
 		}
 	}
 	if ( ! ok && root_ ) {
-		log( LOG_LEVEL::WARNING ) << _( "HXml: Character encoding handler not found in `" )
+		hcore::log( LOG_LEVEL::WARNING ) << _( "HXml: Character encoding handler not found in `" )
 			<< fileName_ << ":" << root_->line << "'." << endl;
 		xmlChar* content( xmlNodeGetContent( root_ ) );
 		xmlCharEncoding encoding( ::xmlDetectCharEncoding( content, xmlStrlen( content ) ) );
@@ -464,8 +464,8 @@ void HXml::init( yaal::hcore::HStreamInterface& stream, parser_t parser_ ) {
 	doc_resource_t doc( ::xmlReadIO( reader_callback, nullptr, &stream, _xml->_utf8[0].c_str(), nullptr, LOW_LEVEL_PARSING_OPTIONS ),
 			xmlFreeDoc );
 	if ( errno ) {
-		log( LOG_LEVEL::WARNING ) << "XML: " << error_message( errno ) << ": " << _streamId;
-		log << ", code: " << errno << '.' << endl;
+		hcore::log( LOG_LEVEL::WARNING ) << "XML: " << error_message( errno ) << ": " << _streamId;
+		hcore::log << ", code: " << errno << '.' << endl;
 	}
 	errno = savedErrno;
 	if ( ! doc.get() ) {
@@ -502,7 +502,7 @@ void HXml::parse_dtd( void* dtd_ ) {
 			if ( ( node->type == XML_ENTITY_DECL ) && ( node->name && node->content ) ) {
 				_entities[ reinterpret_cast<char const*>( node->name ) ] = reinterpret_cast<char const*>( node->content );
 			} else {
-				log( LOG_LEVEL::ERROR ) << "XML: `" << _streamId << ":" << node->line
+				hcore::log( LOG_LEVEL::ERROR ) << "XML: `" << _streamId << ":" << node->line
 					<< "' failed to handle DTD child: " << static_cast<int>( node->type )
 					<< " " << ( node->name ? reinterpret_cast<char const*>( node->name ) : "(nil)" )
 					<< " " << ( node->content ? reinterpret_cast<char const*>( node->content ) : "(nil)" )<< endl;
@@ -627,7 +627,7 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 				 */
 			break;
 			default:
-				log( LOG_LEVEL::WARNING ) << "XML: `" << _streamId << "' unsupported type: " << static_cast<int>( node->type )
+				hcore::log( LOG_LEVEL::WARNING ) << "XML: `" << _streamId << "' unsupported type: " << static_cast<int>( node->type )
 					<< ", at: " << node->line << endl;
 			break;
 		}

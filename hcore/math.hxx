@@ -16,8 +16,10 @@ namespace math {
 
 M_YAAL_HCORE_PUBLIC_API extern double long const PI;
 M_YAAL_HCORE_PUBLIC_API extern double long const E;
+#pragma push_macro( "INFINITY" )
 #undef INFINITY
 M_YAAL_HCORE_PUBLIC_API extern double long const INFINITY;
+#pragma pop_macro( "INFINITY" )
 #undef NAN
 M_YAAL_HCORE_PUBLIC_API extern double long const NAN;
 
