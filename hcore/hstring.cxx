@@ -810,7 +810,7 @@ HCharacterClass<char> const& character_class( CHARACTER_CLASS characterClass_ ) 
 #undef D_HEX_DIGIT
 #define D_HEX_DIGIT D_DEC_DIGIT "aAbBcCdDeEfF"
 #undef D_PUNCTATION
-#define D_PUNCTATION "`~!@#$%^&*()-=+[{]};:'\",<.>/?"
+#define D_PUNCTATION "`~!@#$%^&*()-=+[{]}\\|;:'\",<.>/?"
 	static character_class_t const binDigit        = character_class_t( D_BIN_DIGIT,              static_cast<int>( sizeof ( D_BIN_DIGIT ) - 1 ) );
 	static character_class_t const octDigit        = character_class_t( D_OCT_DIGIT,              static_cast<int>( sizeof ( D_OCT_DIGIT ) - 1 ) );
 	static character_class_t const digit           = character_class_t( D_DEC_DIGIT,              static_cast<int>( sizeof ( D_DEC_DIGIT ) - 1 ) );
