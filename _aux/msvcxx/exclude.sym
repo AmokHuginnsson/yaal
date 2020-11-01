@@ -164,7 +164,6 @@
 ?_errMsgHSBBSTree_@hcore@yaal@@3QBQBDB
 ?_errMsgHStaticArray_@hcore@yaal@@3QBQBDB
 ?_errMsgHVector_@hcore@yaal@@3PAPBDA
-?_escapes_@executing_parser@tools@yaal@@3UEscapeTable@util@23@B
 ?_exitStatus@HSignalService@tools@yaal@@0HA
 ?_ignoreSignalSIGINT_@tools@yaal@@3_NA
 ?_ignoreSignalSIGQUIT_@tools@yaal@@3_NA

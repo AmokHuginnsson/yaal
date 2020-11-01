@@ -25,19 +25,12 @@ namespace executing_parser {
 
 namespace {
 
-static char const _raw_[] = "\n\r\t\b\a\f\033\v";
-static char const _safe_[] = "nrtbafev";
 HNamedRule named_clone( HRuleBase const& rule_ ) {
 	HRule const* r( dynamic_cast<HRule const*>( &rule_ ) );
 	return ( HNamedRule( r ? r->get_name() : "", rule_.clone() ) );
 }
 
 }
-
-EscapeTable const _escapes_(
-	_raw_,  static_cast<int>( sizeof ( _raw_ ) )  - 1,
-	_safe_, static_cast<int>( sizeof ( _safe_ ) ) - 1
-);
 
 HRecursionDetector::HRecursionDetector( void )
 	: _visited()
@@ -3330,7 +3323,7 @@ yaal::hcore::HUTF8String::const_iterator HStringLiteral::do_parse( HExecutingPar
 		++ scan;
 		if ( _evaluate ) {
 			semantic_unescape( _cache );
-			unescape( _cache, _escapes_, '\\'_ycp, true );
+			unescape( _cache, cxx_escape_table(), '\\'_ycp, true );
 		}
 		range_t rng( range( executingParser_, first_, scan ) );
 		if ( !! _actionString ) {
@@ -3544,7 +3537,7 @@ yaal::hcore::HUTF8String::const_iterator HCharacterLiteral::do_parse( HExecuting
 		}
 		_raw = _cache;
 		semantic_unescape( _cache );
-		unescape( _cache, _escapes_, '\\'_ycp, true );
+		unescape( _cache, cxx_escape_table(), '\\'_ycp, true );
 		if ( _cache.get_length() != 1 ) {
 			break;
 		}

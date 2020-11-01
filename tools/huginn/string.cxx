@@ -16,6 +16,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 
 using namespace yaal;
 using namespace yaal::hcore;
+using namespace yaal::tools::util;
 using namespace yaal::tools::huginn;
 
 namespace yaal {
@@ -613,7 +614,20 @@ hash_value_t HString::do_operator_hash( HThread*, HHuginn::value_t const&, int )
 }
 
 yaal::hcore::HString HString::do_code( huginn::HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const {
-	return ( "\""_ys.append( _value ).append( "\"" ) );
+	hcore::HString s( "\"" );
+	EscapeTable const& et( cxx_escape_table() );
+	for ( code_point_t c : _value ) {
+		code_point_t escaped( c );
+		if ( static_cast<int>( c.get() ) < et.ESCAPE_TABLE_SIZE ) {
+			escaped = code_point_t( static_cast<char unsigned>( et._rawToSafe[c.get()] ) );
+		}
+		if ( ( escaped != c ) || ( c == '\\'_ycp ) || ( c == '"' ) ) {
+			s.push_back( '\\'_ycp );
+		}
+		s.push_back( escaped );
+	}
+	s.push_back( '"'_ycp );
+	return ( s );
 }
 
 yaal::hcore::HString HString::do_to_string( huginn::HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const {

@@ -49,6 +49,8 @@ struct EscapeTable {
 	EscapeTable( char const*, int, char const*, int );
 };
 
+EscapeTable const& cxx_escape_table( void );
+
 /*! \brief Mask sensitive ASCII characters with their plain counterparts.
  *
  * Example use is to change '\n' in string into '\\n'.

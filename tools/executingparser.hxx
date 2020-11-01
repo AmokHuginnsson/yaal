@@ -1180,8 +1180,6 @@ HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const&, HRegex::a
 HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const&, HRegex::action_string_range_t const&, bool = true );
 HSkip skip( HRuleBase const& );
 
-extern M_YAAL_TOOLS_PUBLIC_API util::EscapeTable const _escapes_;
-
 }
 
 class HExecutingParser : private trait::HNonCopyable {

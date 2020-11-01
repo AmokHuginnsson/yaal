@@ -117,6 +117,16 @@ EscapeTable::EscapeTable( char const* raw_, int rawLen_, char const* safe_, int 
 	M_EPILOG
 }
 
+EscapeTable const& cxx_escape_table( void ) {
+	static char const raw[] = "\n\r\t\b\a\f\033\v";
+	static char const safe[] = "nrtbafev";
+	static EscapeTable const escapes(
+		raw,  static_cast<int>( sizeof ( raw ) )  - 1,
+		safe, static_cast<int>( sizeof ( safe ) ) - 1
+	);
+	return ( escapes );
+}
+
 void escape( yaal::hcore::HString& string_, EscapeTable const& et_, code_point_t escape_ ) {
 	M_PROLOG
 	if ( string_.is_empty() ) {
