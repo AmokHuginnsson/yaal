@@ -831,6 +831,7 @@ OCompiler::function_info_t OCompiler::create_function_low( executing_parser::ran
 		}
 		_mainCompiledStatementCount += scope->statement_count();
 	}
+	scope->finalize_function();
 	HHuginn::function_t fun(
 		_introspector
 			? HHuginn::function_t(

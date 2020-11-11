@@ -80,6 +80,7 @@ private:
 	execution_steps_t _executionSteps;
 	instructions_t _instructions;
 	operations_t _operations;
+	bool _final;
 public:
 	HExpression( int = MAIN_FILE_ID, executing_parser::range_t = { 0, 0 } );
 	int execution_step_count( void ) const;
@@ -145,6 +146,7 @@ public:
 	bool is_empty( void ) const;
 	HHuginn::value_t evaluate( huginn::HThread* ) const;
 	void commit( huginn::HThread*, HHuginn::value_t&& ) const;
+	void mark_final( void );
 protected:
 	void grab_args( HFrame*, HArguments& );
 	HHuginn::values_t grab_args( HFrame*, HPartial::unbound_indexes_t& );

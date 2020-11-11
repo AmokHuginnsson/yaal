@@ -506,12 +506,10 @@ huginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 		field_definitions_t fieldDefinitions;
 		huginn::HThread t( _runtime.raw(), hcore::HThread::get_current_thread_id() );
 		t.create_function_frame( nullptr, nullptr, 0 );
-		HFrame* frame( t.current_frame() );
 		for ( int i( 0 ), size( static_cast<int>( cc->_fieldNames.get_size() ) ); i < size; ++ i ) {
 			OCompiler::OClassContext::expressions_t::const_iterator f( cc->_fieldDefinitions.find( i ) );
 			if ( f != cc->_fieldDefinitions.end() ) {
-				f->second->execute( &t );
-				fieldDefinitions.emplace_back( cc->_fieldNames[i], frame->result(), cc->_docs.at( i ) );
+				fieldDefinitions.emplace_back( cc->_fieldNames[i], f->second->evaluate( &t ), cc->_docs.at( i ) );
 			} else {
 				OCompiler::OClassContext::methods_t::const_iterator m( cc->_methods.find( i ) );
 				M_ASSERT( m != cc->_methods.end() );
@@ -1027,18 +1025,18 @@ HTernaryEvaluator::HTernaryEvaluator(
 
 HHuginn::value_t HTernaryEvaluator::execute( huginn::HThread* thread_ ) {
 	M_PROLOG
-	_condition->execute( thread_ );
+	;
 	HFrame* f( thread_->current_frame() );
-	value_t v( f->result() );
+	value_t v( _condition->evaluate( thread_ ) );
 	if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
 		throw HHuginn::HHuginnRuntimeException( hcore::to_string( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL] ).append( v->get_class()->name() ), f->file_id(), _condition->position() );
 	}
 	if ( static_cast<HBoolean*>( v.raw() )->value() ) {
-		_ifTrue->execute( thread_ );
+		v = _ifTrue->evaluate( thread_ );
 	} else {
-		_ifFalse->execute( thread_ );
+		v = _ifFalse->evaluate( thread_ );
 	}
-	return ( f->result() );
+	return ( v );
 	M_EPILOG
 }
 

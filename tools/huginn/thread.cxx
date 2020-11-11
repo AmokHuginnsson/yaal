@@ -136,6 +136,7 @@ void HThread::pop_frame( void ) {
 	if ( _currentFrame->type() == HFrame::TYPE::FUNCTION ) {
 		-- _functionFrameCount;
 	} else if ( parent && ( _state == STATE::RETURN ) ) {
+		M_ASSERT( !! _currentFrame->result() );
 		parent->set_result( yaal::move( _currentFrame->result() ) );
 	}
 	_currentFrame->reset();

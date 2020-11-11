@@ -61,6 +61,7 @@ public:
 	int statement_count( void ) const {
 		return ( static_cast<int>( _statements.get_size() ) );
 	}
+	void finalize_function( void );
 protected:
 	virtual void do_execute_internal( HThread* ) const override;
 private:

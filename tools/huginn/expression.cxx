@@ -723,7 +723,8 @@ HExpression::HExpression( int fileId_, executing_parser::range_t range_ )
 	: HStatement( INVALID_STATEMENT_IDENTIFIER, fileId_, range_ )
 	, _executionSteps()
 	, _instructions()
-	, _operations() {
+	, _operations()
+	, _final( false ) {
 	return;
 }
 
@@ -1916,7 +1917,7 @@ HHuginn::value_t HExpression::evaluate( huginn::HThread* thread_ ) const {
 void HExpression::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
 	HHuginn::value_t result( evaluate( thread_ ) );
-	if ( thread_->state() < HThread::STATE::EXCEPTION ) {
+	if ( _final && ( thread_->state() < HThread::STATE::EXCEPTION ) ) {
 		HFrame* f( thread_->current_frame() );
 		f->set_result( yaal::move( result ) );
 	}
@@ -1931,6 +1932,10 @@ void HExpression::commit( huginn::HThread* thread_, HHuginn::value_t&& value_ ) 
 	static_cast<HReference*>( ref.raw() )->set( thread_, yaal::move( value_ ), position() );
 	return;
 	M_EPILOG
+}
+
+void HExpression::mark_final( void ) {
+	_final = true;
 }
 
 }

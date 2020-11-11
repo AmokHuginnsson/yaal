@@ -16,6 +16,7 @@ namespace huginn {
 HReturn::HReturn( HHuginn::expression_t const& expression_, int fileId_, executing_parser::range_t range_ )
 	: HStatement( INVALID_STATEMENT_IDENTIFIER, fileId_, range_ )
 	, _expression( expression_ ) {
+	_expression->mark_final();
 	return;
 }
 

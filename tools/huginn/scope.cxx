@@ -4,6 +4,7 @@
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "scope.hxx"
+#include "expression.hxx"
 #include "thread.hxx"
 
 namespace yaal {
@@ -78,6 +79,20 @@ void HScope::do_execute_internal( HThread* thread_ ) const {
 
 void HScope::make_inline( void ) {
 	_inline = true;
+}
+
+void HScope::finalize_function( void ) {
+	M_PROLOG
+	if ( _statements.is_empty() ) {
+		return;
+	}
+	HExpression* expr( dynamic_cast<HExpression*>( _statements.back().raw() ) );
+	if ( ! expr ) {
+		return;
+	}
+	expr->mark_final();
+	return;
+	M_EPILOG
 }
 
 }
