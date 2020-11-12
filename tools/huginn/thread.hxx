@@ -40,7 +40,6 @@ private:
 	frames_t _frames;
 	HFrame* _currentFrame;
 	int _frameCount;
-	int _functionFrameCount;
 	STATE _state;
 	int _breakLevel;
 	yaal::hcore::HThread::id_t _id;
@@ -64,11 +63,8 @@ private:
 public:
 	HThread( HRuntime*, yaal::hcore::HThread::id_t );
 	~HThread( void );
-	void create_function_frame( HStatement const*, HHuginn::value_t*, int );
-	void create_incremental_function_frame( HStatement const*, HHuginn::value_t*, int );
-	void create_loop_frame( HStatement const* );
-	void create_scope_frame( HStatement const* );
-	void create_try_catch_frame( HStatement const* );
+	void create_frame( HStatement const*, HHuginn::value_t*, int );
+	void create_incremental_frame( HStatement const*, HHuginn::value_t*, int );
 	void pop_frame( void );
 	void pop_incremental_frame( void );
 	HFrame* current_frame( void ) {
@@ -119,7 +115,7 @@ public:
 	yaal::hcore::HThread::id_t id( void ) const {
 		return ( _id );
 	}
-	HHuginn::value_t exception( void ) {
+	HHuginn::value_t const& exception( void ) const {
 		return ( _result );
 	}
 	void clean_exception( void );
@@ -135,7 +131,7 @@ public:
 		return ( _objectFactory );
 	}
 	int call_stack_size( void ) const {
-		return ( _functionFrameCount );
+		return ( _frameCount );
 	}
 	HHuginn::values_t& value_cache( void ) {
 		return ( _valueCache );

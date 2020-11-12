@@ -23,7 +23,8 @@ private:
 	HHuginn::expression_t _source;
 	HHuginn::scope_t _loop;
 public:
-	HFor( HHuginn::statement_id_t, HHuginn::expressions_t&&, HHuginn::expression_t const&, HHuginn::scope_t const&, int, executing_parser::range_t );
+	HFor( HHuginn::statement_id_t, int, executing_parser::range_t );
+	void init( HHuginn::expressions_t&&, HHuginn::expression_t const&, HHuginn::scope_t const& );
 protected:
 	virtual void do_execute_internal( HThread* ) const override;
 private:

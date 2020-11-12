@@ -35,12 +35,12 @@ OCompiler::OScopeContext::OScopeContext(
 	OFunctionContext* functionContext_,
 	HHuginn::statement_id_t statementId_,
 	int fileId_,
-	executing_parser::range_t range_
+	executing_parser::range_t range_,
+	HHuginn::scope_t const& scope_
 ) : _parent( ! functionContext_->_scopeStack.is_empty() ? functionContext_->_scopeStack.top().raw() : nullptr )
-	, _scope( make_pointer<HScope>( statementId_, fileId_, range_ ) )
+	, _scope( scope_ )
 	, _expressionsStack()
 	, _variableTypes()
-	, _exceptionType( IDENTIFIER::INVALID )
 	, _assertExpressionEnd( 0 )
 	, _scopeChain()
 	, _auxScope()
@@ -48,8 +48,12 @@ OCompiler::OScopeContext::OScopeContext(
 	, _terminatedAt( NOT_TERMINATED )
 	, _statementId( statementId_ )
 	, _functionContext( functionContext_ )
-	, _variables()
-	, _argumentIndexes() {
+	, _localVariables()
+	, _argumentIndexes()
+	, _localVariableCount( UNINITIALIZED_LOCAL_VARIABLE_COUNT ) {
+	if ( ! _scope ) {
+		_scope = make_pointer<HScope>( statementId_, fileId_, range_ );
+	}
 	_expressionsStack.emplace( 1, functionContext_->_compiler->new_expression( fileId_ ) );
 	return;
 }
@@ -119,7 +123,6 @@ OCompiler::OFunctionContext::OFunctionContext(
 	, _isLambda( isLambda_ )
 	, _isVariadic( false )
 	, _capturesNamedParameters( false )
-	, _inline( true )
 	, _compiler( compiler_ ) {
 	_scopeStack.emplace( make_pointer<OScopeContext>( this, statementId_, fileId_, executing_parser::HRange( 0, 0 ) ) );
 	return;
@@ -323,6 +326,8 @@ void OCompiler::resolve_symbols( void ) {
 	HHuginn::identifier_id_t lastClassId( IDENTIFIER::INVALID );
 	HHuginn::class_t aClass;
 	int maxLocalVariableCount( 0 );
+	typedef yaal::hcore::HArray<OScopeContext*> local_scope_stack_t;
+	local_scope_stack_t localScopeStack;
 	for ( OExecutionStep& es : _executionStepsBacklog ) {
 		try {
 			if ( es._classId != lastClassId ) {
@@ -389,19 +394,15 @@ void OCompiler::resolve_symbols( void ) {
 					}
 				}
 				OScopeContext* sc( es._scope.raw() );
-				HHuginn::identifier_id_t fi( sc->_functionContext->_functionIdentifier );
 				OScopeContext::OLocalVariable localVariable;
-				while ( sc ) {
-					OScopeContext::local_variables_t::const_iterator it( sc->_variables.find( es._identifier ) );
-					if ( it != sc->_variables.end() ) {
+				OScopeContext* varScope( sc );
+				while ( varScope ) {
+					OScopeContext::local_variables_t::const_iterator it( varScope->_localVariables.find( es._identifier ) );
+					if ( it != varScope->_localVariables.end() ) {
 						localVariable = it->second;
 						break;
 					}
-					if ( sc->_parent && ( sc->_parent->_functionContext->_functionIdentifier == fi ) ) {
-						sc = sc->_parent;
-					} else {
-						sc = nullptr;
-					}
+					varScope = varScope->_parent;
 				}
 				if ( es._operation == OExecutionStep::OPERATION::DEFINE ) {
 					if ( !! _runtime->get_class( es._identifier ) ) {
@@ -411,7 +412,7 @@ void OCompiler::resolve_symbols( void ) {
 							es._position
 						);
 					}
-					bool make( ! sc );
+					bool make( ! localVariable._definedBy && ( localVariable._index == -1 ) );
 					if ( make ) {
 						if ( es._shortCircuit ) {
 							throw HHuginn::HHuginnRuntimeException(
@@ -420,7 +421,18 @@ void OCompiler::resolve_symbols( void ) {
 								es._position
 							);
 						}
-						sc = es._scope.raw();
+						localScopeStack.clear();
+						OScopeContext* base( sc );
+						while ( base->_parent && ( base->_localVariableCount == OScopeContext::UNINITIALIZED_LOCAL_VARIABLE_COUNT ) ) {
+							localScopeStack.push_back( base );
+							base = base->_parent;
+						}
+						if ( base->_localVariableCount == OScopeContext::UNINITIALIZED_LOCAL_VARIABLE_COUNT ) {
+							base->_localVariableCount = 0;
+						}
+						for ( OScopeContext* lsc : localScopeStack ) {
+							lsc->_localVariableCount = base->_localVariableCount;
+						}
 						/*
 						 * There are two kinds of OScopeContexts:
 						 * 1. Real scope context that is equivalent of {...} in program code.
@@ -437,16 +449,12 @@ void OCompiler::resolve_symbols( void ) {
 						 * in given `if/else` chain.
 						 */
 						M_ASSERT( localVariable._index == -1 );
-						localVariable._index = static_cast<int>( sc->_variables.get_size() );
-						OScopeContext* parent( sc );
-						while ( parent->_parent && ( parent->_parent->_statementId == parent->_statementId ) ) {
-							parent = parent->_parent;
-							localVariable._index += static_cast<int>( parent->_variables.get_size() );
-						}
+						localVariable._index = sc->_localVariableCount;
+						++ sc->_localVariableCount;
 						localVariable._definedBy = es._expression.raw();
-						sc->_variables[es._identifier] = localVariable;
-						if ( ( localVariable._index + 1 ) > maxLocalVariableCount ) {
-							maxLocalVariableCount = localVariable._index + 1;
+						sc->_localVariables[es._identifier] = localVariable;
+						if ( sc->_localVariableCount > maxLocalVariableCount ) {
+							maxLocalVariableCount = sc->_localVariableCount;
 						}
 					}
 					if ( !! es._expression ) {
@@ -458,7 +466,6 @@ void OCompiler::resolve_symbols( void ) {
 									static_cast<HExpression::OExecutionStep::action_t>( make ? &HIntroExpression::make_variable : &HIntroExpression::get_variable_reference ),
 									es._position,
 									HFrame::ACCESS::REFERENCE,
-									sc->_statementId,
 									localVariable._index,
 									es._identifier
 								)
@@ -471,7 +478,6 @@ void OCompiler::resolve_symbols( void ) {
 									make ? &HExpression::make_variable : &HExpression::get_variable_reference,
 									es._position,
 									HFrame::ACCESS::REFERENCE,
-									sc->_statementId,
 									localVariable._index
 								)
 							);
@@ -483,8 +489,8 @@ void OCompiler::resolve_symbols( void ) {
 						 */
 					}
 					break;
-				} else if ( sc ) {
-					if ( es._expression.raw() == localVariable._definedBy ) {
+				} else if ( localVariable._index >= 0 ) {
+					if ( localVariable._definedBy && ( es._expression.raw() == localVariable._definedBy ) ) {
 						throw HHuginn::HHuginnRuntimeException(
 							"Symbol `"_ys.append( _runtime->identifier_name( es._identifier ) ).append( "` is not yet defined in this expression." ),
 							_fileId,
@@ -498,7 +504,6 @@ void OCompiler::resolve_symbols( void ) {
 							es._operation == OExecutionStep::OPERATION::USE ? &HExpression::get_variable_value : &HExpression::get_variable_reference,
 							es._position,
 							es._operation == OExecutionStep::OPERATION::USE ? HFrame::ACCESS::VALUE : HFrame::ACCESS::REFERENCE,
-							sc->_statementId,
 							localVariable._index
 						)
 					);
@@ -672,7 +677,7 @@ void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_
 	if ( !! _classContext ) {
 		add_field_name( name_, range_ );
 	}
-	create_scope( range_ );
+	create_scope_impl( _isIncremental && ( functionIdentifier == IDENTIFIER::STANDARD_FUNCTIONS::MAIN ), range_ );
 	if ( _introspector ) {
 		_introspector->symbol(
 			!! _classContext
@@ -825,13 +830,15 @@ OCompiler::function_info_t OCompiler::create_function_low( executing_parser::ran
 	HHuginn::scope_t scope( pop_scope_context() );
 	bool isDestructor( fc._functionIdentifier == IDENTIFIER::KEYWORD::DESTRUCTOR );
 	bool isIncrementalMain( _isIncremental && ( fc._functionIdentifier == IDENTIFIER::STANDARD_FUNCTIONS::MAIN ) && ! _classContext );
+	M_ASSERT( dynamic_cast<HScope*>( scope.raw() ) );
+	HScope* realScope( static_cast<HScope*>( scope.raw() ) );
 	if ( isIncrementalMain ) {
 		for ( int i( _mainExecutedStatementCount ); i > 0; -- i ) {
-			scope->remove_statement( i - 1 );
+			realScope->remove_statement( i - 1 );
 		}
-		_mainCompiledStatementCount += scope->statement_count();
+		_mainCompiledStatementCount += realScope->statement_count();
 	}
-	scope->finalize_function();
+	realScope->finalize_function();
 	HHuginn::function_t fun(
 		_introspector
 			? HHuginn::function_t(
@@ -942,7 +949,6 @@ void OCompiler::pop_function_context( void ) {
 		pop_scope_context_low();
 	}
 	_functionContextCache.push_back( yaal::move( _functionContexts.top() ) );
-	_functionContextCache.back()->_variableCount.clear();
 	_functionContexts.pop();
 	return;
 	M_EPILOG
@@ -952,9 +958,10 @@ HHuginn::scope_t OCompiler::pop_scope_context( void ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	OScopeContext& sc( *fc._scopeStack.top() );
-	HHuginn::scope_t scope( yaal::move( sc._scope ) );
+	HScope* scope( dynamic_cast<HScope*>( sc._scope.raw() ) );
 	if (
-		( _runtime->compiler_setup() & HHuginn::COMPILER::BE_STRICT )
+		scope
+		&& ( _runtime->compiler_setup() & HHuginn::COMPILER::BE_STRICT )
 		&& ( sc._terminatedAt != NOT_TERMINATED )
 		&& ( scope->statement_count() > ( sc._terminatedAt + 1 ) )
 	) {
@@ -964,8 +971,9 @@ HHuginn::scope_t OCompiler::pop_scope_context( void ) {
 			scope->statement_position_at( sc._terminatedAt + 1 )
 		);
 	}
+	HHuginn::scope_t virtScope( sc._scope );
 	pop_scope_context_low();
-	return ( scope );
+	return ( virtScope );
 	M_EPILOG
 }
 
@@ -982,7 +990,7 @@ void OCompiler::pop_scope_context_low( void ) {
 void OCompiler::terminate_scope( HScope::statement_t&& statement_ ) {
 	M_PROLOG
 	OScopeContext& sc( current_scope_context() );
-	int terminatedAt( sc._scope->add_statement( statement_ ) );
+	int terminatedAt( sc.add_statement( yaal::move( statement_ ) ) );
 	if ( sc._terminatedAt == NOT_TERMINATED ) {
 		sc._terminatedAt = terminatedAt;
 	}
@@ -1014,8 +1022,6 @@ void OCompiler::save_control_variable( executing_parser::range_t range_ ) {
 void OCompiler::commit_catch_control_variable( executing_parser::range_t range_ ) {
 	M_PROLOG
 	commit_assignable( range_ );
-	OFunctionContext& fc( f() );
-	fc._inline = true;
 	return;
 	M_EPILOG
 }

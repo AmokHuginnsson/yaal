@@ -1182,13 +1182,11 @@ HHuginn::call_stack_t HRuntime::get_call_stack( huginn::HThread* thread_ ) {
 	HFrame* f( thread_->current_frame() );
 	int position( f->position() );
 	while ( f ) {
-		if ( f->type() == HFrame::TYPE::FUNCTION ) {
-			int fileId( f->file_id() );
-			HHuginn::HCoordinate coord( _huginn->get_coordinate( fileId, position ) );
-			HFunction const* func( static_cast<HFunction const*>( f->statement() ) );
-			callStack.emplace_back( _huginn->source_name( fileId ), coord.line(), coord.column(), identifier_name( func->name() ) );
-			position = INVALID_POSITION;
-		}
+		int fileId( f->file_id() );
+		HHuginn::HCoordinate coord( _huginn->get_coordinate( fileId, position ) );
+		HFunction const* func( static_cast<HFunction const*>( f->statement() ) );
+		callStack.emplace_back( _huginn->source_name( fileId ), coord.line(), coord.column(), identifier_name( func->name() ) );
+		position = INVALID_POSITION;
 		f = f->parent();
 		if ( f && ( position == INVALID_POSITION ) ) {
 			position = f->position();
@@ -1220,26 +1218,16 @@ HIntrospecteeInterface::variable_views_t HRuntime::get_locals( HThread* thread_,
 	variable_views_t variableViews;
 	HFrame* f( thread_->current_frame() );
 	while ( frameNo_ > 0 ) {
-		while ( f ) {
-			HFrame::TYPE t( f->type() );
-			f = f->parent();
-			if ( t == HFrame::TYPE::FUNCTION ) {
-				break;
-			}
-		}
+		f = f->parent();
 		-- frameNo_;
 	}
-	while ( f ) {
+	if ( f ) {
 		HHuginn::values_t const& variableValues( f->variable_values() );
 		HFrame::identifiers_t const& variableIdentifiers( f->variable_identifiers() );
-		M_ASSERT( variableIdentifiers.get_size() == variableValues.get_size() );
+		M_ASSERT( variableIdentifiers.get_size() >= variableValues.get_size() );
 		for ( int i( 0 ), COUNT( static_cast<int>( variableValues.get_size() ) ); i < COUNT; ++ i ) {
 			variableViews.emplace_back( identifier_name( variableIdentifiers[ i ] ), variableValues[ i ] );
 		}
-		if ( f->type() == HFrame::TYPE::FUNCTION ) {
-			break;
-		}
-		f = f->parent();
 	}
 	return ( variableViews );
 	M_EPILOG

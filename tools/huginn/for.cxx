@@ -21,16 +21,23 @@ namespace huginn {
 
 HFor::HFor(
 	HHuginn::statement_id_t id_,
-	HHuginn::expressions_t&& control_,
-	HHuginn::expression_t const& source_,
-	HHuginn::scope_t const& loop_,
 	int fileId_,
 	executing_parser::range_t range_
 ) : HVirtualScope( id_, fileId_, range_ )
-	, _control( yaal::move( control_ ) )
-	, _source( source_ )
-	, _loop( loop_ ) {
-	_loop->make_inline();
+	, _control()
+	, _source()
+	, _loop() {
+	return;
+}
+
+void HFor::init(
+	HHuginn::expressions_t&& control_,
+	HHuginn::expression_t const& source_,
+	HHuginn::scope_t const& loop_
+) {
+	_control = yaal::move( control_ );
+	_source = source_;
+	_loop = loop_;
 	return;
 }
 
@@ -60,7 +67,6 @@ inline HHuginn::value_t ensure_virtual_collection(
 
 void HFor::do_execute_internal( HThread* thread_ ) const {
 	M_PROLOG
-	thread_->create_loop_frame( this );
 	HHuginn::value_t source( _source->evaluate( thread_ ) );
 	int sourcePosition( _source->position() );
 	if ( thread_->can_continue() ) {
@@ -76,7 +82,6 @@ void HFor::do_execute_internal( HThread* thread_ ) const {
 			}
 		}
 	}
-	thread_->pop_frame();
 	thread_->state_unbreak();
 	return;
 	M_EPILOG

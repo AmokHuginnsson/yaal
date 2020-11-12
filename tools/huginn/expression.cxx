@@ -30,7 +30,6 @@ HExpression::OExecutionStep::OExecutionStep( void )
 	, _action( nullptr )
 	, _position( INVALID_POSITION )
 	, _access( HFrame::ACCESS::VALUE )
-	, _statementId( INVALID_STATEMENT_IDENTIFIER )
 	, _index( -1 )
 	, _identifierId( IDENTIFIER::INVALID )
 	, _value()
@@ -49,7 +48,6 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _action( action_ )
 	, _position( position_ )
 	, _access( HFrame::ACCESS::VALUE )
-	, _statementId( INVALID_STATEMENT_IDENTIFIER )
 	, _index( -1 )
 	, _identifierId( IDENTIFIER::INVALID )
 	, _value()
@@ -68,7 +66,6 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _action( action_ )
 	, _position( position_ )
 	, _access( access_ )
-	, _statementId( INVALID_STATEMENT_IDENTIFIER )
 	, _index( -1 )
 	, _identifierId( IDENTIFIER::INVALID )
 	, _value()
@@ -87,7 +84,6 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _action( action_ )
 	, _position( position_ )
 	, _access( access_ )
-	, _statementId( INVALID_STATEMENT_IDENTIFIER )
 	, _index( index_ )
 	, _identifierId( IDENTIFIER::INVALID )
 	, _value()
@@ -106,7 +102,6 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _action( action_ )
 	, _position( position_ )
 	, _access( access_ )
-	, _statementId( INVALID_STATEMENT_IDENTIFIER )
 	, _index( -1 )
 	, _identifierId( identifierId_ )
 	, _value()
@@ -120,31 +115,11 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _unboundIndexes() {
 }
 
-HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HFrame::ACCESS access_, HHuginn::statement_id_t statementId_, int index_ )
+HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HFrame::ACCESS access_, int index_, HHuginn::identifier_id_t identifierId_ )
 	: _expression( expression_ )
 	, _action( action_ )
 	, _position( position_ )
 	, _access( access_ )
-	, _statementId( statementId_ )
-	, _index( index_ )
-	, _identifierId( IDENTIFIER::INVALID )
-	, _value()
-	, _valueRef()
-	, _real( 0.0L )
-	, _integer( 0 )
-	, _string()
-	, _number()
-	, _character( 0 )
-	, _literalType( HHuginn::TYPE::UNKNOWN )
-	, _unboundIndexes() {
-}
-
-HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t action_, int position_, HFrame::ACCESS access_, HHuginn::statement_id_t statementId_, int index_, HHuginn::identifier_id_t identifierId_ )
-	: _expression( expression_ )
-	, _action( action_ )
-	, _position( position_ )
-	, _access( access_ )
-	, _statementId( statementId_ )
 	, _index( index_ )
 	, _identifierId( identifierId_ )
 	, _value()
@@ -163,7 +138,6 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _action( action_ )
 	, _position( position_ )
 	, _access( HFrame::ACCESS::VALUE )
-	, _statementId( INVALID_STATEMENT_IDENTIFIER )
 	, _index( -1 )
 	, _identifierId( IDENTIFIER::INVALID )
 	, _value()
@@ -182,7 +156,6 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _action( action_ )
 	, _position( position_ )
 	, _access( HFrame::ACCESS::VALUE )
-	, _statementId( INVALID_STATEMENT_IDENTIFIER )
 	, _index( -1 )
 	, _identifierId( IDENTIFIER::INVALID )
 	, _value( value_ )
@@ -201,7 +174,6 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _action( action_ )
 	, _position( position_ )
 	, _access( HFrame::ACCESS::VALUE )
-	, _statementId( INVALID_STATEMENT_IDENTIFIER )
 	, _index( -1 )
 	, _identifierId( IDENTIFIER::INVALID )
 	, _value()
@@ -220,7 +192,6 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _action( action_ )
 	, _position( position_ )
 	, _access( HFrame::ACCESS::VALUE )
-	, _statementId( INVALID_STATEMENT_IDENTIFIER )
 	, _index( -1 )
 	, _identifierId( IDENTIFIER::INVALID )
 	, _value()
@@ -239,7 +210,6 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _action( action_ )
 	, _position( position_ )
 	, _access( HFrame::ACCESS::VALUE )
-	, _statementId( INVALID_STATEMENT_IDENTIFIER )
 	, _index( -1 )
 	, _identifierId( IDENTIFIER::INVALID )
 	, _value()
@@ -258,7 +228,6 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _action( action_ )
 	, _position( position_ )
 	, _access( HFrame::ACCESS::VALUE )
-	, _statementId( INVALID_STATEMENT_IDENTIFIER )
 	, _index( -1 )
 	, _identifierId( IDENTIFIER::INVALID )
 	, _value()
@@ -277,7 +246,6 @@ HExpression::OExecutionStep::OExecutionStep( HExpression* expression_, action_t 
 	, _action( action_ )
 	, _position( position_ )
 	, _access( HFrame::ACCESS::VALUE )
-	, _statementId( INVALID_STATEMENT_IDENTIFIER )
 	, _index( -1 )
 	, _identifierId( IDENTIFIER::INVALID )
 	, _value()
@@ -297,7 +265,6 @@ HExpression::OExecutionStep::OExecutionStep(
 	, _action( action_ )
 	, _position( position_ )
 	, _access( HFrame::ACCESS::VALUE )
-	, _statementId( INVALID_STATEMENT_IDENTIFIER )
 	, _index( -1 )
 	, _identifierId( IDENTIFIER::INVALID )
 	, _value()
@@ -999,21 +966,21 @@ void HExpression::get_field_direct( OExecutionStep const& executionStep_, huginn
 
 void HExpression::get_variable_value( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
 	M_PROLOG
-	frame_->values().emplace( frame_->get_variable_value( executionStep_._statementId, executionStep_._index ) );
+	frame_->values().emplace( frame_->get_variable_value( executionStep_._index ) );
 	return;
 	M_EPILOG
 }
 
 void HExpression::get_variable_reference( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
 	M_PROLOG
-	frame_->values().emplace( frame_->get_variable_reference( executionStep_._statementId, executionStep_._index ) );
+	frame_->values().emplace( frame_->get_variable_reference( executionStep_._index ) );
 	return;
 	M_EPILOG
 }
 
 void HExpression::make_variable( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
 	M_PROLOG
-	frame_->values().emplace( frame_->make_variable( executionStep_._statementId, executionStep_._index ) );
+	frame_->values().emplace( frame_->make_variable( executionStep_._index ) );
 	return;
 	M_EPILOG
 }

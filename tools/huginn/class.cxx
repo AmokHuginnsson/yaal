@@ -30,7 +30,7 @@ HClass::HClass(
 	TYPE type_,
 	HClass const* origin_,
 	create_instance_t createInstance_
-)	: _runtime( runtime_ )
+) : _runtime( runtime_ )
 	, _typeId( typeId_ )
 	, _identifierId( identifierId_ )
 	, _super( nullptr )

@@ -44,7 +44,6 @@ HFunction::HFunction(
 		-- _defaultParametersStart;
 		-- _parameterCount;
 	}
-	_scope->make_inline();
 	return;
 }
 
@@ -77,7 +76,7 @@ HHuginn::value_t HFunction::execute(
 	int position_
 ) const {
 	M_PROLOG
-	thread_->create_function_frame( this, object_, upcast( object_ ) );
+	thread_->create_frame( this, object_, upcast( object_ ) );
 	HHuginn::value_t res( execute_impl( thread_, values_, position_ ) );
 	thread_->pop_frame();
 	return ( res );
@@ -97,7 +96,9 @@ HHuginn::value_t HFunction::execute_destructor(
 	if ( thread_->state() == HThread::STATE::EXCEPTION ) {
 		thread_->flush_uncaught_exception( " from destructor" );
 	}
-	thread_->state_set( state );
+	if ( thread_->state() != HThread::STATE::RUNTIME_EXCEPTION ) {
+		thread_->state_set( state );
+	}
 	return ( res );
 	M_EPILOG
 }
@@ -109,7 +110,7 @@ HHuginn::value_t HFunction::execute_incremental_main(
 	int
 ) const {
 	M_PROLOG
-	thread_->create_incremental_function_frame( this, object_, upcast( object_ ) );
+	thread_->create_incremental_frame( this, object_, upcast( object_ ) );
 	HHuginn::value_t res( execute_incremental_main_impl( thread_ ) );
 	thread_->pop_incremental_frame();
 	return ( res );
@@ -266,6 +267,7 @@ HHuginn::value_t HFunction::execute_impl(
 	}
 	if ( thread_->can_continue() ) {
 		_scope->execute( thread_ );
+		f->pop_local_variables( 0 );
 	}
 	thread_->state_transition( HThread::STATE::RETURN, HThread::STATE::NORMAL );
 	M_ASSERT(

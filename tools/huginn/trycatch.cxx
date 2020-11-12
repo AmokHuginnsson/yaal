@@ -21,51 +21,55 @@ namespace huginn {
 HTryCatch::HCatch::HCatch(
 	HHuginn::statement_id_t id_,
 	HHuginn::identifier_id_t type_,
-	HHuginn::expression_t const& control_,
-	HHuginn::scope_t const& scope_
-) : HStatement( id_, scope_->file_id(), scope_->range() )
+	int fileId_,
+	executing_parser::range_t range_
+) : HVirtualScope( id_, fileId_, range_ )
 	, _type( type_ )
-	, _control( control_ )
-	, _scope( scope_ ) {
-	_scope->make_inline();
+	, _control()
+	, _scope() {
 	return;
 }
 
-void HTryCatch::HCatch::execute( HThread* thread_, HHuginn::value_t value_ ) const {
+void HTryCatch::HCatch::init(
+	HHuginn::expression_t const& control_,
+	HHuginn::scope_t const& scope_
+) {
+	_control = control_;
+	_scope = scope_;
+	return;
+}
+
+void HTryCatch::HCatch::do_execute_internal( HThread* thread_ ) const {
 	M_PROLOG
-	thread_->create_scope_frame( this );
-	_control->commit( thread_, yaal::move( value_ ) );
+	HHuginn::value_t ex( thread_->exception() );
+	thread_->clean_exception();
+	_control->commit( thread_, yaal::move( ex ) );
 	if ( thread_->can_continue() ) {
 		_scope->execute( thread_ );
 	}
-	thread_->pop_frame();
 	return;
 	M_EPILOG
 }
 
-HTryCatch::HTryCatch( HHuginn::scope_t const& try_, catches_t const& catches_, int fileId_, executing_parser::range_t range_ )
+HTryCatch::HTryCatch( HHuginn::scope_t const& try_, catches_t&& catches_, int fileId_, executing_parser::range_t range_ )
 	: HVirtualScope( try_->id(), fileId_, range_ )
 	, _try( try_ )
-	, _catches( catches_ ) {
-	_try->make_inline();
+	, _catches( yaal::move( catches_ ) ) {
 	return;
 }
 
 void HTryCatch::do_execute_internal( huginn::HThread* thread_ ) const {
 	M_PROLOG
-	thread_->create_try_catch_frame( this );
 	_try->execute_internal( thread_ );
 	if ( thread_->has_exception() ) {
-		HHuginn::value_t v( thread_->exception() );
-		for ( HCatch const& c : _catches ) {
-			if ( v->is_kind_of( c.type() ) ) {
-				thread_->clean_exception();
-				c.execute( thread_, v );
+		HHuginn::value_t const& v( thread_->exception() );
+		for ( HHuginn::scope_t const& c : _catches ) {
+			if ( v->is_kind_of( static_cast<HCatch const*>( c.raw() )->type() ) ) {
+				c->execute( thread_ );
 				break;
 			}
 		}
 	}
-	thread_->pop_frame();
 	return;
 	M_EPILOG
 }

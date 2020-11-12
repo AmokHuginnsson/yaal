@@ -36,7 +36,7 @@ HHuginn::value_t HIntroFunction::execute(
 	int position_
 ) const {
 	M_PROLOG
-	thread_->create_function_frame( this, object_, upcast( object_ ) );
+	thread_->create_frame( this, object_, upcast( object_ ) );
 	note_parameters( thread_ );
 	HHuginn::value_t res( execute_impl( thread_, values_, position_ ) );
 	thread_->pop_frame();
@@ -51,7 +51,7 @@ HHuginn::value_t HIntroFunction::execute_incremental_main(
 	int
 ) const {
 	M_PROLOG
-	thread_->create_incremental_function_frame( this, object_, upcast( object_ ) );
+	thread_->create_incremental_frame( this, object_, upcast( object_ ) );
 	note_parameters( thread_ );
 	HHuginn::value_t res( execute_incremental_main_impl( thread_ ) );
 	thread_->pop_incremental_frame();

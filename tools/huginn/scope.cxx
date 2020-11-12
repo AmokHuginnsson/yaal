@@ -14,8 +14,7 @@ namespace tools {
 namespace huginn {
 
 HVirtualScope::HVirtualScope( HHuginn::statement_id_t id_, int fileId_, executing_parser::range_t range_ )
-	: HStatement( id_, fileId_, range_ )
-	, _variableCount( 0 ) {
+	: HStatement( id_, fileId_, range_ ) {
 	return;
 }
 
@@ -26,16 +25,9 @@ void HVirtualScope::do_execute( HThread* thread_ ) const {
 	M_EPILOG
 }
 
-void HVirtualScope::set_variable_count( int variableCount_ ) {
-	M_ASSERT( variableCount_ >= 0 );
-	_variableCount = variableCount_;
-	return;
-}
-
 HScope::HScope( HHuginn::statement_id_t id_, int fileId_, executing_parser::range_t range_ )
 	: HVirtualScope( id_, fileId_, range_ )
-	, _statements()
-	, _inline( false ) {
+	, _statements() {
 	return;
 }
 
@@ -59,9 +51,6 @@ int HScope::statement_position_at( int index_ ) const {
 
 void HScope::do_execute_internal( HThread* thread_ ) const {
 	M_PROLOG
-	if ( ! _inline ) {
-		thread_->create_scope_frame( this );
-	}
 	M_DEBUG_CODE( HFrame* f( thread_->current_frame() ) );
 	for ( statement_t const& s : _statements ) {
 		s->execute( thread_ );
@@ -70,15 +59,8 @@ void HScope::do_execute_internal( HThread* thread_ ) const {
 			break;
 		}
 	}
-	if ( ! _inline ) {
-		thread_->pop_frame();
-	}
 	return;
 	M_EPILOG
-}
-
-void HScope::make_inline( void ) {
-	_inline = true;
 }
 
 void HScope::finalize_function( void ) {
@@ -91,6 +73,18 @@ void HScope::finalize_function( void ) {
 		return;
 	}
 	expr->mark_final();
+	return;
+	M_EPILOG
+}
+
+HIncrementalScope::HIncrementalScope( HHuginn::statement_id_t id_, int fileId_, executing_parser::range_t range_ )
+	: HScope( id_, fileId_, range_ ) {
+	return;
+}
+
+void HIncrementalScope::do_execute( HThread* thread_ ) const {
+	M_PROLOG
+	do_execute_internal( thread_ );
 	return;
 	M_EPILOG
 }

@@ -81,10 +81,6 @@ struct OCompiler {
 		 */
 		variable_types_t _variableTypes;
 
-		/*! \brief Type of currently compiled exception catch clause.
-		 */
-		HHuginn::identifier_id_t _exceptionType;
-
 		/*! \brief Source code position where currently evaluated `assert' expression ends.
 		 */
 		int _assertExpressionEnd;
@@ -93,7 +89,7 @@ struct OCompiler {
 		 */
 		active_scopes_t _scopeChain;
 
-		/*! \brief Already fully compiled scope for `else' in if/else-if/else chain.
+		/*! \brief Already fully compiled scope for `try` in try/catch or `else' in if/else-if/else chain.
 		 * Also used as fully compiled `default' clause in `switch' statement.
 		 */
 		HHuginn::scope_t _auxScope;
@@ -118,7 +114,7 @@ struct OCompiler {
 		 *
 		 * Used during local symbols dereferencing stage (in `resolve_symbols()`).
 		 */
-		local_variables_t _variables;
+		local_variables_t _localVariables;
 
 		/*! \brief Note indexes of unbound arguments in function calls.
 		 *
@@ -127,7 +123,14 @@ struct OCompiler {
 		 */
 		nested_unbound_indexes_t _argumentIndexes;
 
-		OScopeContext( OFunctionContext*, HHuginn::statement_id_t, int, executing_parser::range_t );
+		static int const UNINITIALIZED_LOCAL_VARIABLE_COUNT = -1;
+		/*! \brief Number of local variables defined so far in this very scope.
+		 *
+		 * Used only in `resolve_symbols()`.
+		 */
+		int _localVariableCount;
+
+		OScopeContext( OFunctionContext*, HHuginn::statement_id_t, int, executing_parser::range_t, HHuginn::scope_t const& = HHuginn::scope_t{} );
 		HHuginn::expression_t& expression( void );
 		int add_statement( HScope::statement_t&& );
 		huginn::HClass const* guess_type( OCompiler const*, HHuginn::identifier_id_t ) const;
@@ -280,10 +283,6 @@ struct OCompiler {
 		/*! \brief Tell if this function captures non-positional named parameters.
 		 */
 		bool _capturesNamedParameters;
-
-		/*! \brief Tell if next scope created with {...} should be inlined.
-		 */
-		bool _inline;
 
 		/*! \brief Compiler reference.
 		 */
@@ -503,9 +502,8 @@ struct OCompiler {
 	void pop_scope_context_low( void );
 	void terminate_scope( HScope::statement_t&& );
 	void start_if_statement( executing_parser::range_t );
-	void start_else_clause( executing_parser::range_t );
-	void start_while_statement( executing_parser::range_t );
 	void start_for_statement( executing_parser::range_t );
+	void start_while_statement( executing_parser::range_t );
 	void start_switch_statement( executing_parser::range_t );
 	void start_subexpression( executing_parser::range_t );
 	void start_assignable( executing_parser::range_t );
@@ -514,6 +512,7 @@ struct OCompiler {
 	void add_field_definition( executing_parser::range_t );
 	void commit_boolean( OPERATOR, executing_parser::range_t );
 	void commit_ternary( executing_parser::range_t );
+	void create_scope_impl( bool, executing_parser::range_t );
 	void create_scope( executing_parser::range_t );
 	void commit_scope( executing_parser::range_t );
 	void commit_try( executing_parser::range_t );

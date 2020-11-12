@@ -26,12 +26,6 @@ public:
 	typedef yaal::hcore::HArray<HHuginn::identifier_id_t> identifiers_t;
 	typedef yaal::hcore::HResource<HHuginn::values_t> values_holder_t;
 	typedef yaal::hcore::HArray<values_holder_t> value_cache_t;
-	enum class TYPE {
-		SCOPE,
-		LOOP,
-		TRY_CATCH,
-		FUNCTION
-	};
 	enum class ACCESS {
 		VALUE,
 		REFERENCE,
@@ -66,12 +60,6 @@ private:
 	 * and available in this scope (frame) so far.
 	 */
 	HHuginn::values_t _variables;
-
-	/*!
-	 * A number of local variables defined and available for reference at this
-	 * point in function frame execution.
-	 */
-	int _activeVariableCount;
 
 	/*!
 	 * Identifiers for the variables defined in current scope (frame) so far.
@@ -114,22 +102,21 @@ private:
 	 */
 	int _number;
 
-	TYPE _type;
 	HStatement const* _statement;
 	int _position;
 public:
 	HFrame( HThread*, HFrame* );
-	void init( TYPE, HStatement const*, HHuginn::value_t* = nullptr, int = 0 );
+	void init( HStatement const*, HHuginn::value_t* = nullptr, int = 0 );
 	void set_thread( HThread* );
 	void reshape( void );
 	HHuginn::value_t get_field( ACCESS, int );
-	HHuginn::value_t const& get_variable_value( HHuginn::statement_id_t, int );
-	HHuginn::value_t get_variable_reference( HHuginn::statement_id_t, int );
-	HHuginn::value_t make_variable( HHuginn::statement_id_t, int );
+	HHuginn::value_t const& get_variable_value( int );
+	HHuginn::value_t get_variable_reference( int );
+	HHuginn::value_t make_variable( int );
 	HHuginn::value_t get_this( void );
 	HHuginn::value_t get_super( int );
 	void note_variable( HHuginn::identifier_id_t );
-	void note_variable( HHuginn::identifier_id_t, HHuginn::statement_id_t, int );
+	void note_variable( HHuginn::identifier_id_t, int );
 	int number( void ) const {
 		return ( _number );
 	}
@@ -138,15 +125,6 @@ public:
 	}
 	HThread* thread( void ) const {
 		return ( _thread );
-	}
-	bool is_loop( void ) const {
-		return ( _type == TYPE::LOOP );
-	}
-	bool has_catch( void ) const {
-		return ( _type == TYPE::TRY_CATCH );
-	}
-	TYPE type( void ) const {
-		return ( _type );
 	}
 	HHuginn::value_t& result( void ) {
 		return ( _result );
@@ -172,10 +150,14 @@ public:
 	HStatement const* statement( void ) const {
 		return ( _statement );
 	}
-	void pop_local_variables( int count_ ) {
-		for ( int i( 0 ); i < count_; ++ i ) {
-			-- _activeVariableCount;
-			_variables[_activeVariableCount].reset();
+	int get_variable_count( void ) const {
+		return ( static_cast<int>( _variables.get_size() ) );
+	}
+	void pop_local_variables( int to_ ) {
+		int activeVariableCount( get_variable_count() );
+		while ( activeVariableCount > to_ ) {
+			-- activeVariableCount;
+			_variables.pop_back();
 		}
 		return;
 	}

@@ -14,7 +14,7 @@ namespace tools {
 
 namespace huginn {
 
-class HSwitch : public HStatement {
+class HSwitch : public HVirtualScope {
 public:
 	typedef HSwitch this_type;
 	typedef HStatement base_type;
@@ -24,9 +24,10 @@ private:
 	cases_t _cases;
 	HHuginn::scope_t _default;
 public:
-	HSwitch( HHuginn::statement_id_t, HHuginn::expression_t const&, cases_t const&, HHuginn::scope_t const&, int, executing_parser::range_t );
+	HSwitch( HHuginn::statement_id_t, int, executing_parser::range_t );
+	void init( HHuginn::expression_t const&, cases_t const&, HHuginn::scope_t const& );
 protected:
-	virtual void do_execute( huginn::HThread* ) const override;
+	virtual void do_execute_internal( huginn::HThread* ) const override;
 };
 
 }

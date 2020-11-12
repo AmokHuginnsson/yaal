@@ -28,7 +28,7 @@ class HSource;
 class HFrame;
 class HThread;
 class HExpression;
-class HScope;
+class HVirtualScope;
 /*! \brief ObjectFactory holds built-in type definitions local to HHuginn instance.
  */
 struct OCompiler;
@@ -72,7 +72,7 @@ public:
 	class HNotifableReference;
 	class HReferenceTracker;
 	typedef yaal::hcore::HPointer<huginn::HIterable> iterable_t;
-	typedef yaal::hcore::HPointer<huginn::HScope> scope_t;
+	typedef yaal::hcore::HPointer<huginn::HVirtualScope> scope_t;
 	typedef yaal::hcore::HPointer<huginn::HClass> class_t;
 	typedef yaal::tools::huginn::HValueReference<huginn::HValue> value_t;
 	typedef yaal::tools::huginn::HValueReferenceObserver<huginn::HValue> value_ref_t;

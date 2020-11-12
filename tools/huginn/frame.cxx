@@ -28,7 +28,6 @@ HFrame::HFrame(
 	, _object( nullptr )
 	, _upCast( 0 )
 	, _variables()
-	, _activeVariableCount( 0 )
 	, _variableIdentifiers()
 	, _instructionPointers()
 	, _values()
@@ -36,27 +35,24 @@ HFrame::HFrame(
 	, _valueCacheSize( 0 )
 	, _result()
 	, _number( 0 )
-	, _type( TYPE::SCOPE )
 	, _statement( nullptr )
 	, _position( INVALID_POSITION ) {
 	return;
 }
 
 void HFrame::init(
-	TYPE type_,
 	HStatement const* statement_,
 	HHuginn::value_t* object_,
 	int upCast_
 ) {
 	M_PROLOG
-	_type = type_;
 	_statement = statement_;
 	_object = object_;
 	_upCast = upCast_;
 	_variables.reserve( _thread->runtime().max_local_variable_count() );
 	reshape();
 	_result = _thread->runtime().none_value();
-	_number = _parent ? ( _parent->_number + ( ( type_ == TYPE::FUNCTION ) ? 1 : 0 ) ) : 1;
+	_number = _parent ? ( _parent->_number + 1 ) : 1;
 	return;
 	M_EPILOG
 }
@@ -132,9 +128,9 @@ void HFrame::note_variable( HHuginn::identifier_id_t identifier_ ) {
 	M_EPILOG
 }
 
-void HFrame::note_variable( HHuginn::identifier_id_t identifier_, HHuginn::statement_id_t statementId_, int index_ ) {
+void HFrame::note_variable( HHuginn::identifier_id_t identifier_, int index_ ) {
 	M_PROLOG
-	if ( ( statementId_ == _statement->id() ) && ( static_cast<int>( _variableIdentifiers.get_size() ) == index_ ) ) {
+	if ( static_cast<int>( _variableIdentifiers.get_size() ) == index_ ) {
 		_variableIdentifiers.push_back( identifier_ );
 	}
 	return;
@@ -160,20 +156,15 @@ HHuginn::value_t HFrame::get_field( ACCESS access_, int index_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t const& HFrame::get_variable_value( HHuginn::statement_id_t statementId_, int index_ ) {
+HHuginn::value_t const& HFrame::get_variable_value( int index_ ) {
 	M_PROLOG
-	HFrame* f( this );
-	while ( statementId_ != f->_statement->id() ) {
-		f = f->_parent;
-		M_ASSERT( f );
-	}
-	return ( f->_variables[index_] );
+	return ( _variables[index_] );
 	M_EPILOG
 }
 
-HHuginn::value_t HFrame::make_variable( HHuginn::statement_id_t M_DEBUG_CODE( statementId_ ), int index_ ) {
+HHuginn::value_t HFrame::make_variable( int index_ ) {
 	M_PROLOG
-	M_ASSERT( statementId_ == _statement->id() );
+	M_ASSERT( index_ <= static_cast<int>( _variables.get_size() ) );
 	/*
 	 * It is very difficult to remove following if() statement due to
 	 * loop statements in Huginn language.
@@ -184,7 +175,7 @@ HHuginn::value_t HFrame::make_variable( HHuginn::statement_id_t M_DEBUG_CODE( st
 	 * in all but last of iterations are destroyed in order of their definition
 	 * and not in reverse order of their definition as it would be expected.
 	 */
-	if ( static_cast<int>( _variables.get_size() ) == index_ ) {
+	if ( index_ == static_cast<int>( _variables.get_size() ) ) {
 		M_ASSERT( _variables.get_capacity() >= ( _variables.get_size() + 1 ) );
 		_variables.push_back( HHuginn::value_t() );
 	}
@@ -192,14 +183,9 @@ HHuginn::value_t HFrame::make_variable( HHuginn::statement_id_t M_DEBUG_CODE( st
 	M_EPILOG
 }
 
-HHuginn::value_t HFrame::get_variable_reference( HHuginn::statement_id_t statementId_, int index_ ) {
+HHuginn::value_t HFrame::get_variable_reference( int index_ ) {
 	M_PROLOG
-	HFrame* f( this );
-	while ( statementId_ != f->_statement->id() ) {
-		f = f->_parent;
-		M_ASSERT( f );
-	}
-	return ( _thread->runtime().object_factory()->create_reference( f->_variables[index_] ) );
+	return ( _thread->runtime().object_factory()->create_reference( _variables[index_] ) );
 	M_EPILOG
 }
 

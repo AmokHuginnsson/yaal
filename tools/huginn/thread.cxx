@@ -23,7 +23,6 @@ HThread::HThread( HRuntime* runtime_, yaal::hcore::HThread::id_t id_ )
 	: _frames()
 	, _currentFrame( nullptr )
 	, _frameCount( 0 )
-	, _functionFrameCount( 0 )
 	, _state( STATE::NORMAL )
 	, _breakLevel( 0 )
 	, _id( id_ )
@@ -64,19 +63,18 @@ void HThread::add_frame( void ) {
 	++ _frameCount;
 }
 
-void HThread::create_function_frame( HStatement const* statement_, HHuginn::value_t* object_, int upCast_ ) {
+void HThread::create_frame( HStatement const* statement_, HHuginn::value_t* object_, int upCast_ ) {
 	M_PROLOG
 	if ( call_stack_size() >= _runtime->max_call_stack_size() ) {
 		throw HHuginn::HHuginnRuntimeException( "Call stack size limit exceeded: "_ys.append( call_stack_size() + 1 ), _currentFrame->file_id(), _currentFrame->position() );
 	}
 	add_frame();
-	++ _functionFrameCount;
-	_currentFrame->init( HFrame::TYPE::FUNCTION, statement_, object_, upCast_ );
+	_currentFrame->init( statement_, object_, upCast_ );
 	return;
 	M_EPILOG
 }
 
-void HThread::create_incremental_function_frame( HStatement const* statement_, HHuginn::value_t* object_, int upCast_ ) {
+void HThread::create_incremental_frame( HStatement const* statement_, HHuginn::value_t* object_, int upCast_ ) {
 	M_PROLOG
 	frame_t incrementalFrame( _runtime->incremental_frame() );
 	M_ASSERT( _frameCount == 0 );
@@ -90,31 +88,7 @@ void HThread::create_incremental_function_frame( HStatement const* statement_, H
 	}
 	_runtime->set_incremental_frame( _frames.back() );
 	_currentFrame->set_thread( this );
-	_currentFrame->init( HFrame::TYPE::FUNCTION, statement_, object_, upCast_ );
-	return;
-	M_EPILOG
-}
-
-void HThread::create_loop_frame( HStatement const* statement_ ) {
-	M_PROLOG
-	add_frame();
-	_currentFrame->init( HFrame::TYPE::LOOP, statement_ );
-	return;
-	M_EPILOG
-}
-
-void HThread::create_scope_frame( HStatement const* statement_ ) {
-	M_PROLOG
-	add_frame();
-	_currentFrame->init( HFrame::TYPE::SCOPE, statement_ );
-	return;
-	M_EPILOG
-}
-
-void HThread::create_try_catch_frame( HStatement const* statement_ ) {
-	M_PROLOG
-	add_frame();
-	_currentFrame->init( HFrame::TYPE::TRY_CATCH, statement_ );
+	_currentFrame->init( statement_, object_, upCast_ );
 	return;
 	M_EPILOG
 }
@@ -133,12 +107,6 @@ void HThread::pop_frame( void ) {
 	 */
 	M_ASSERT( _currentFrame );
 	HFrame* parent( _currentFrame->parent() );
-	if ( _currentFrame->type() == HFrame::TYPE::FUNCTION ) {
-		-- _functionFrameCount;
-	} else if ( parent && ( _state == STATE::RETURN ) ) {
-		M_ASSERT( !! _currentFrame->result() );
-		parent->set_result( yaal::move( _currentFrame->result() ) );
-	}
 	_currentFrame->reset();
 	_currentFrame = parent;
 	-- _frameCount;
@@ -188,7 +156,7 @@ void HThread::flush_uncaught_exception( char const* exMsg_ ) {
 	 */
 	huginn::HException const* e( dynamic_cast<huginn::HException const*>( _result.raw() ) );
 	_exception._message.assign( "Uncaught " );
-	_state = HThread::STATE::EXCEPTION;
+	_state = HThread::STATE::RUNTIME_EXCEPTION;
 	if ( e ) {
 		_exception._message
 			.append( e->get_class()->name() )
@@ -232,15 +200,15 @@ bool HThread::has_exception( void ) const {
 }
 
 bool HThread::has_runtime_exception( void ) const {
-	return (
-		( _state == HThread::STATE::RUNTIME_EXCEPTION ) /* Needed by ~HObject() from DTOR_FIX. */
-		|| ! _exception._message.is_empty()
-		|| ( _exception._position != 0 )
-	);
+	/* Needed by ~HObject() from DTOR_FIX. */
+	return ( _state == HThread::STATE::RUNTIME_EXCEPTION );
 }
 
 void HThread::flush_runtime_exception( void ) {
 	M_PROLOG
+	if ( ! has_runtime_exception() ) {
+		flush_uncaught_exception();
+	}
 	if ( has_runtime_exception() ) {
 		int fileId( _exception._fileId );
 		_exception._fileId = INVALID_FILE_ID;

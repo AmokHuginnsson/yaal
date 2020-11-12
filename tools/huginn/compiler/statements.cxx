@@ -21,18 +21,22 @@ namespace tools {
 
 namespace huginn {
 
-void OCompiler::create_scope( executing_parser::range_t range_ ) {
+void OCompiler::create_scope_impl( bool incremental_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	HHuginn::statement_id_t sid( INVALID_STATEMENT_IDENTIFIER );
-	if ( ! fc._inline ) {
-		++ _statementIdGenerator;
-		sid = _statementIdGenerator;
-	} else {
-		sid = fc._scopeStack.top()->_statementId;
+	++ _statementIdGenerator;
+	HHuginn::scope_t scope;
+	if ( incremental_ ) {
+		scope = make_pointer<HIncrementalScope>( _statementIdGenerator, _fileId, range_ );
 	}
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, sid, _fileId, range_ ) );
-	fc._inline = false;
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, _statementIdGenerator, _fileId, range_, scope ) );
+	return;
+	M_EPILOG
+}
+
+void OCompiler::create_scope( executing_parser::range_t range_ ) {
+	M_PROLOG
+	create_scope_impl( false, range_ );
 	return;
 	M_EPILOG
 }
@@ -43,7 +47,7 @@ void OCompiler::commit_scope( executing_parser::range_t ) {
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	HHuginn::scope_t scope( pop_scope_context() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
-	current_scope_context().add_statement( yaal::move( scope ) );
+	current_scope_context().add_statement( scope );
 	return;
 	M_EPILOG
 }
@@ -52,9 +56,10 @@ void OCompiler::start_if_statement( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	if ( fc._scopeStack.top()->_scopeChain.is_empty() ) {
-		fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, range_ ) );
+		++ _statementIdGenerator;
+		HHuginn::scope_t ifScope( make_pointer<HIf>( _statementIdGenerator, _fileId, range_ ) );
+		fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, _statementIdGenerator, _fileId, range_, ifScope ) );
 	}
-	fc._inline = true;
 	return;
 	M_EPILOG
 }
@@ -70,14 +75,6 @@ void OCompiler::commit_if_clause( executing_parser::range_t ) {
 	M_EPILOG
 }
 
-void OCompiler::start_else_clause( executing_parser::range_t ) {
-	M_PROLOG
-	OFunctionContext& fc( f() );
-	fc._inline = true;
-	return;
-	M_EPILOG
-}
-
 void OCompiler::commit_else_clause( executing_parser::range_t ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
@@ -89,15 +86,16 @@ void OCompiler::commit_else_clause( executing_parser::range_t ) {
 	M_EPILOG
 }
 
-void OCompiler::add_if_statement( executing_parser::range_t range_ ) {
+void OCompiler::add_if_statement( executing_parser::range_t ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	OScopeContext& sc( *fc._scopeStack.top() );
-	HScope::statement_t ifStatement( make_pointer<HIf>( sc._statementId, sc._scopeChain, sc._auxScope, _fileId, range_ ) );
-	sc._scopeChain.clear();
-	sc._auxScope.reset();
-	pop_scope_context_low();
+	OScopeContext::active_scopes_t scopeChain( yaal::move( sc._scopeChain ) );
+	HHuginn::scope_t auxScope( yaal::move( sc._auxScope ) );
+	HScope::statement_t ifStatement( pop_scope_context() );
+	M_ASSERT( dynamic_cast<HIf*>( ifStatement.raw() ) );
+	static_cast<HIf*>( ifStatement.raw() )->init( yaal::move( scopeChain ), yaal::move( auxScope ) );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	current_scope_context().add_statement( yaal::move( ifStatement ) );
 	reset_expression();
@@ -108,29 +106,28 @@ void OCompiler::add_if_statement( executing_parser::range_t range_ ) {
 void OCompiler::start_for_statement( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	fc._inline = true;
 	++ fc._loopCount;
 	++ fc._loopSwitchCount;
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, range_ ) );
+	++ _statementIdGenerator;
+	HHuginn::scope_t forScope( make_pointer<HFor>( _statementIdGenerator, _fileId, range_ ) );
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, _statementIdGenerator, _fileId, range_, forScope ) );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::add_for_statement( executing_parser::range_t range_ ) {
+void OCompiler::add_for_statement( executing_parser::range_t ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	HHuginn::scope_t scope( pop_scope_context() ); /* don't squash! pop_scope_context() changes fc._scopeStack */
-	OScopeContext& sc( *fc._scopeStack.top() );
 	HHuginn::expressions_t& exprs( fc.expressions_stack().top() );
 	HHuginn::expression_t source( exprs.back() );
 	exprs.pop_back();
-	HScope::statement_t forStatement(
-		make_pointer<HFor>( sc._statementId, yaal::move( exprs ), source, scope, _fileId, range_ )
-	);
-	pop_scope_context_low();
+	HScope::statement_t forStatement( pop_scope_context() );
+	M_ASSERT( dynamic_cast<HFor*>( forStatement.raw() ) );
+	static_cast<HFor*>( forStatement.raw() )->init( yaal::move( exprs ), source, scope );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
-	current_scope_context().add_statement( move( forStatement ) );
+	current_scope_context().add_statement( yaal::move( forStatement ) );
 	-- fc._loopCount;
 	-- fc._loopSwitchCount;
 	reset_expression();
@@ -141,24 +138,24 @@ void OCompiler::add_for_statement( executing_parser::range_t range_ ) {
 void OCompiler::start_while_statement( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	fc._inline = true;
 	++ fc._loopCount;
 	++ fc._loopSwitchCount;
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, range_ ) );
+	++ _statementIdGenerator;
+	HHuginn::scope_t whileScope( make_pointer<HWhile>( _statementIdGenerator, _fileId, range_ ) );
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, _statementIdGenerator, _fileId, range_, whileScope ) );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::add_while_statement( executing_parser::range_t range_ ) {
+void OCompiler::add_while_statement( executing_parser::range_t ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
-	HHuginn::scope_t scope( pop_scope_context() );
-	OScopeContext& sc( current_scope_context() );
-	HScope::statement_t whileStatement(
-		make_pointer<HWhile>( sc._statementId, current_expression(), scope, _fileId, range_ )
-	);
-	pop_scope_context_low();
+	HHuginn::scope_t scope( pop_scope_context() ); /* don't squash! pop_scope_context() changes fc._scopeStack */
+	HHuginn::expression_t expr( current_expression() );
+	HScope::statement_t whileStatement( pop_scope_context() );
+	M_ASSERT( dynamic_cast<HWhile*>( whileStatement.raw() ) );
+	static_cast<HWhile*>( whileStatement.raw() )->init( expr, scope );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	current_scope_context().add_statement( yaal::move( whileStatement ) );
 	-- fc._loopCount;
@@ -172,31 +169,26 @@ void OCompiler::start_switch_statement( executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	++ fc._loopSwitchCount;
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, range_ ) );
+	++ _statementIdGenerator;
+	HHuginn::scope_t switchScope( make_pointer<HSwitch>( _statementIdGenerator, _fileId, range_ ) );
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, _statementIdGenerator, _fileId, range_, switchScope ) );
 	return;
 	M_EPILOG
 }
 
-void OCompiler::add_switch_statement( executing_parser::range_t range_ ) {
+void OCompiler::add_switch_statement( executing_parser::range_t ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
-	OScopeContext::active_scopes_t contexts( yaal::move( fc._scopeStack.top()->_scopeChain ) );
-	HHuginn::scope_t Default( fc._scopeStack.top()->_auxScope );
-	pop_scope_context_low();
 	OScopeContext& sc( *fc._scopeStack.top() );
-	HScope::statement_t switchStatement(
-		make_pointer<HSwitch>(
-			sc._statementId,
-			current_expression(),
-			contexts,
-			Default,
-			_fileId,
-			range_
-		)
-	);
-	-- fc._loopSwitchCount;
+	OScopeContext::active_scopes_t contexts( yaal::move( sc._scopeChain ) );
+	HHuginn::scope_t Default( sc._auxScope );
 	pop_scope_context_low();
+	HHuginn::expression_t expr( current_expression() );
+	-- fc._loopSwitchCount;
+	HScope::statement_t switchStatement( pop_scope_context() );
+	M_ASSERT( dynamic_cast<HSwitch*>( switchStatement.raw() ) );
+	static_cast<HSwitch*>( switchStatement.raw() )->init( expr, contexts, Default );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	current_scope_context().add_statement( yaal::move( switchStatement ) );
 	reset_expression();
@@ -219,9 +211,9 @@ void OCompiler::commit_try( executing_parser::range_t ) {
 void OCompiler::start_catch_statement( yaal::hcore::HString const& name_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, ++ _statementIdGenerator, _fileId, range_ ) );
-	OScopeContext& sc( current_scope_context() );
-	sc._exceptionType = _runtime->identifier_id( name_ );
+	++ _statementIdGenerator;
+	HHuginn::scope_t catchScope( make_pointer<HTryCatch::HCatch>( _statementIdGenerator, _runtime->identifier_id( name_ ), _fileId, range_ ) );
+	fc._scopeStack.emplace( make_pointer<OScopeContext>( &fc, _statementIdGenerator, _fileId, range_, catchScope ) );
 	return;
 	M_EPILOG
 }
@@ -231,11 +223,12 @@ void OCompiler::commit_catch( executing_parser::range_t ) {
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
 	HHuginn::scope_t scope( pop_scope_context() ); /* don't squash! pop_scope_context() changes fc._scopeStack */
-	OScopeContext& sc( *fc._scopeStack.top() );
-	HTryCatch::HCatch c( sc._statementId, sc._exceptionType, current_expression(), scope );
-	pop_scope_context_low();
+	HHuginn::expression_t expr( current_expression() );
+	HScope::statement_t catchStatement( pop_scope_context() );
+	M_ASSERT( dynamic_cast<HTryCatch::HCatch*>( catchStatement.raw() ) );
+	static_cast<HTryCatch::HCatch*>( catchStatement.raw() )->init( expr, scope );
 	M_ASSERT( ! fc._scopeStack.is_empty() );
-	fc._scopeStack.top()->_catches.emplace_back( c );
+	fc._scopeStack.top()->_catches.emplace_back( catchStatement );
 	reset_expression();
 	return;
 	M_EPILOG
@@ -248,7 +241,7 @@ void OCompiler::add_try_catch_statement( executing_parser::range_t range_ ) {
 	OScopeContext& sc( *fc._scopeStack.top() );
 	HTryCatch::catches_t catches( yaal::move( sc._catches ) );
 	HScope::statement_t tryCatchStatement(
-		make_pointer<HTryCatch>( yaal::move( sc._auxScope ), catches, _fileId, range_ )
+		make_pointer<HTryCatch>( yaal::move( sc._auxScope ), yaal::move( catches ), _fileId, range_ )
 	);
 	current_scope_context().add_statement( yaal::move( tryCatchStatement ) );
 	reset_expression();

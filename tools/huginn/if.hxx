@@ -23,7 +23,8 @@ private:
 	if_clauses_t _ifClauses;
 	HHuginn::scope_t _elseClause;
 public:
-	HIf( HHuginn::statement_id_t, if_clauses_t const&, HHuginn::scope_t const&, int, executing_parser::range_t );
+	HIf( HHuginn::statement_id_t, int, executing_parser::range_t );
+	void init( if_clauses_t const&, HHuginn::scope_t const& );
 protected:
 	virtual void do_execute_internal( HThread* ) const override;
 };

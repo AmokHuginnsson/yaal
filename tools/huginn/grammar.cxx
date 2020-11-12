@@ -637,11 +637,8 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_, compiler_setup
 		ifClause >>
 		*( constant( KEYWORD::ELSE ) >> ifClause ) >>
 		-(
-			/* `else' clause */(
-				constant(
-					KEYWORD::ELSE,
-					bound_call<e_p::HRuleBase::action_range_t>( &OCompiler::start_else_clause, _compiler.get(), _1 )
-				) >> scope
+			/* `else' clause */ (
+				constant( KEYWORD::ELSE ) >> scope
 			)[
 				HRuleBase::action_range_t( hcore::call( &OCompiler::commit_else_clause, _compiler.get(), _1 ) )
 			]

@@ -505,7 +505,7 @@ huginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 		_runtime->register_class( cls, VISIBILITY::GLOBAL );
 		field_definitions_t fieldDefinitions;
 		huginn::HThread t( _runtime.raw(), hcore::HThread::get_current_thread_id() );
-		t.create_function_frame( nullptr, nullptr, 0 );
+		t.create_frame( nullptr, nullptr, 0 );
 		for ( int i( 0 ), size( static_cast<int>( cc->_fieldNames.get_size() ) ); i < size; ++ i ) {
 			OCompiler::OClassContext::expressions_t::const_iterator f( cc->_fieldDefinitions.find( i ) );
 			if ( f != cc->_fieldDefinitions.end() ) {
@@ -1058,7 +1058,7 @@ yaal::hcore::HString string_form(
 	HStatement stmt( HHuginn::statement_id_t( 0 ), 0, { 0, 0 } );
 	if ( runtime_ ) {
 		threadHolder.reset( new huginn::HThread( const_cast<HRuntime*>( runtime_ ), hcore::HThread::get_current_thread_id() ) );
-		threadHolder->create_function_frame( &stmt, nullptr, 0 );
+		threadHolder->create_frame( &stmt, nullptr, 0 );
 	}
 	hcore::HString s;
 	try {
