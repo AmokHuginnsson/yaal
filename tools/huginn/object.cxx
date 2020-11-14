@@ -97,12 +97,6 @@ HHuginn::value_t const& HObject::do_field( int index_ ) const {
 	M_EPILOG
 }
 
-HHuginn::value_t& HObject::field_ref( int index_ ) {
-	M_PROLOG
-	return ( _fields[index_] );
-	M_EPILOG
-}
-
 HHuginn::value_t HObject::do_field( HHuginn::value_t const& object_, int index_ ) const {
 	M_PROLOG
 	value_t const& f( _fields[index_] );

@@ -6,7 +6,7 @@
 #ifndef YAAL_TOOLS_HUGINN_FRAME_HXX_INCLUDED
 #define YAAL_TOOLS_HUGINN_FRAME_HXX_INCLUDED 1
 
-#include "tools/hhuginn.hxx"
+#include "tools/huginn/object.hxx"
 
 namespace yaal {
 
@@ -109,11 +109,60 @@ public:
 	void init( HStatement const*, HHuginn::value_t* = nullptr, int = 0 );
 	void set_thread( HThread* );
 	void reshape( void );
-	HHuginn::value_t get_field( ACCESS, int );
-	HHuginn::value_t const& get_variable_value( int );
-	HHuginn::value_t get_variable_reference( int );
-	HHuginn::value_t make_variable( int );
-	HHuginn::value_t get_this( void );
+	HHuginn::value_t get_field( int index_ ) {
+		M_PROLOG
+		M_ASSERT( _object && !! *_object );
+		return ( static_cast<HObject*>( _object->raw() )->field( *_object, index_ ) );
+		M_EPILOG
+	}
+
+	HHuginn::value_t& get_field_ref( int index_ ) {
+		M_PROLOG
+		M_ASSERT( _object && !! *_object );
+		return ( static_cast<HObject*>( _object->raw() )->field_ref( index_ ) );
+		M_EPILOG
+	}
+
+	HHuginn::value_t const& get_variable_value( int index_ ) {
+		M_PROLOG
+		return ( _variables[index_] );
+		M_EPILOG
+	}
+
+	HHuginn::value_t& make_variable( int index_ ) {
+		M_PROLOG
+		M_ASSERT( index_ <= static_cast<int>( _variables.get_size() ) );
+		/*
+		 * It is very difficult to remove following if() statement due to
+		 * loop statements in Huginn language.
+		 * For `for' and `while' loop statement variables that are local to their scope ({...})
+		 * shall be created during first iteration and only updated during subsequent iterations.
+		 *
+		 * Current implementation has interesting side effect that local variables
+		 * in all but last of iterations are destroyed in order of their definition
+		 * and not in reverse order of their definition as it would be expected.
+		 */
+		if ( index_ == static_cast<int>( _variables.get_size() ) ) {
+			M_ASSERT( _variables.get_capacity() >= ( _variables.get_size() + 1 ) );
+			_variables.push_back( HHuginn::value_t() );
+		}
+		return ( _variables[index_] );
+		M_EPILOG
+	}
+
+	HHuginn::value_t& get_variable_reference( int index_ ) {
+		M_PROLOG
+		return ( _variables[index_] );
+		M_EPILOG
+	}
+
+	HHuginn::value_t get_this( void ) {
+		M_PROLOG
+		M_ASSERT( _object && !! *_object );
+		return ( *_object );
+		M_EPILOG
+	}
+
 	HHuginn::value_t get_super( int );
 	void note_variable( HHuginn::identifier_id_t );
 	void note_variable( HHuginn::identifier_id_t, int );
@@ -193,7 +242,6 @@ protected:
 private:
 	HFrame( HFrame const& ) = delete;
 	HFrame& operator = ( HFrame const& ) = delete;
-	HHuginn::value_t* object( void ) const;
 };
 
 }

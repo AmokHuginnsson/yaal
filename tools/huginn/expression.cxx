@@ -959,7 +959,14 @@ void HExpression::close_parenthesis( OExecutionStep const& executionStep_, HFram
 
 void HExpression::get_field_direct( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
 	M_PROLOG
-	frame_->values().emplace( frame_->get_field( executionStep_._access, executionStep_._index ) );
+	frame_->values().emplace( frame_->get_field( executionStep_._index ) );
+	return;
+	M_EPILOG
+}
+
+void HExpression::get_field_ref_direct( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
+	M_PROLOG
+	frame_->values().emplace( frame_->thread()->object_factory().create_reference( frame_->get_field_ref( executionStep_._index ) ) );
 	return;
 	M_EPILOG
 }
@@ -973,14 +980,14 @@ void HExpression::get_variable_value( OExecutionStep const& executionStep_, hugi
 
 void HExpression::get_variable_reference( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
 	M_PROLOG
-	frame_->values().emplace( frame_->get_variable_reference( executionStep_._index ) );
+	frame_->values().emplace( frame_->thread()->object_factory().create_reference( frame_->get_variable_reference( executionStep_._index ) ) );
 	return;
 	M_EPILOG
 }
 
 void HExpression::make_variable( OExecutionStep const& executionStep_, huginn::HFrame* frame_ ) {
 	M_PROLOG
-	frame_->values().emplace( frame_->make_variable( executionStep_._index ) );
+	frame_->values().emplace( frame_->thread()->object_factory().create_reference( frame_->make_variable( executionStep_._index ) ) );
 	return;
 	M_EPILOG
 }

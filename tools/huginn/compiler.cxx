@@ -367,7 +367,7 @@ void OCompiler::resolve_symbols( void ) {
 							es._index,
 							HExpression::OExecutionStep(
 								es._expression.raw(),
-								&HExpression::get_field_direct,
+								es._operation == OExecutionStep::OPERATION::USE ? &HExpression::get_field_direct : &HExpression::get_field_ref_direct,
 								es._position,
 								es._operation == OExecutionStep::OPERATION::USE ? HFrame::ACCESS::VALUE : HFrame::ACCESS::REFERENCE,
 								index
@@ -384,7 +384,7 @@ void OCompiler::resolve_symbols( void ) {
 							es._index,
 							HExpression::OExecutionStep(
 								es._expression.raw(),
-								&HExpression::get_field_direct,
+								es._operation == OExecutionStep::OPERATION::USE ? &HExpression::get_field_direct : &HExpression::get_field_ref_direct,
 								es._position,
 								es._operation == OExecutionStep::OPERATION::USE ? HFrame::ACCESS::VALUE : HFrame::ACCESS::REFERENCE,
 								static_cast<int>( distance( cli->second.begin(), ci ) )

@@ -141,78 +141,12 @@ int HFrame::file_id( void ) const {
 	return ( _statement->file_id() );
 }
 
-HHuginn::value_t HFrame::get_field( ACCESS access_, int index_ ) {
-	M_PROLOG
-	HHuginn::value_t* obj( object() );
-	M_ASSERT( obj && !! *obj );
-	HHuginn::value_t v;
-	if ( access_ == ACCESS::VALUE ) {
-		v = static_cast<HObject*>( obj->raw() )->field( *obj, index_ );
-	} else {
-		HHuginn::value_t& ref( static_cast<HObject*>( obj->raw() )->field_ref( index_ ) );
-	  v = _thread->runtime().object_factory()->create_reference( ref );
-	}
-	return ( v );
-	M_EPILOG
-}
-
-HHuginn::value_t const& HFrame::get_variable_value( int index_ ) {
-	M_PROLOG
-	return ( _variables[index_] );
-	M_EPILOG
-}
-
-HHuginn::value_t HFrame::make_variable( int index_ ) {
-	M_PROLOG
-	M_ASSERT( index_ <= static_cast<int>( _variables.get_size() ) );
-	/*
-	 * It is very difficult to remove following if() statement due to
-	 * loop statements in Huginn language.
-	 * For `for' and `while' loop statement variables that are local to their scope ({...})
-	 * shall be created during first iteration and only updated during subsequent iterations.
-	 *
-	 * Current implementation has interesting side effect that local variables
-	 * in all but last of iterations are destroyed in order of their definition
-	 * and not in reverse order of their definition as it would be expected.
-	 */
-	if ( index_ == static_cast<int>( _variables.get_size() ) ) {
-		M_ASSERT( _variables.get_capacity() >= ( _variables.get_size() + 1 ) );
-		_variables.push_back( HHuginn::value_t() );
-	}
-	return ( _thread->runtime().object_factory()->create_reference( _variables[index_] ) );
-	M_EPILOG
-}
-
-HHuginn::value_t HFrame::get_variable_reference( int index_ ) {
-	M_PROLOG
-	return ( _thread->runtime().object_factory()->create_reference( _variables[index_] ) );
-	M_EPILOG
-}
-
-HHuginn::value_t HFrame::get_this( void ) {
-	M_PROLOG
-	HHuginn::value_t* obj( object() );
-	M_ASSERT( obj && !! *obj );
-	return ( *obj );
-	M_EPILOG
-}
-
 HHuginn::value_t HFrame::get_super( int position_ ) {
 	M_PROLOG
-	HHuginn::value_t* obj( object() );
-	M_ASSERT( obj && !! *obj );
+	M_ASSERT( _object && !! *_object );
 	HObjectFactory* of( _thread->runtime().object_factory() );
-	return ( of->create<HObjectReference>( of->object_reference_class(), *obj, _upCast, file_id(), position_ ) );
+	return ( of->create<HObjectReference>( of->object_reference_class(), *_object, _upCast, file_id(), position_ ) );
 	M_EPILOG
-}
-
-HHuginn::value_t* HFrame::object( void ) const {
-	HFrame const* f( this );
-	while ( ! f->_object ) {
-		M_ASSERT( f->_parent && ( f->_parent->_number == _number ) );
-		f = f->_parent;
-	}
-	return ( f->_object );
 }
 
 }

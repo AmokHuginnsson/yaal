@@ -110,6 +110,7 @@ public:
 	}
 	void make_partial( OExecutionStep const&, huginn::HFrame* );
 	void get_field_direct( OExecutionStep const&, huginn::HFrame* );
+	void get_field_ref_direct( OExecutionStep const&, huginn::HFrame* );
 	void get_variable_value( OExecutionStep const&, huginn::HFrame* );
 	void get_variable_reference( OExecutionStep const&, huginn::HFrame* );
 	void make_variable( OExecutionStep const&, huginn::HFrame* );

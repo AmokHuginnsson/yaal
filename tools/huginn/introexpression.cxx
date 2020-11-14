@@ -37,7 +37,7 @@ void HIntroExpression::get_variable_reference(
 	huginn::HFrame* frame_
 ) {
 	M_PROLOG
-	frame_->values().emplace( frame_->get_variable_reference( execionStep_._index ) );
+	frame_->values().emplace( frame_->thread()->object_factory().create_reference( frame_->get_variable_reference( execionStep_._index ) ) );
 	frame_->note_variable( execionStep_._identifierId, execionStep_._index );
 	return;
 	M_EPILOG
@@ -48,7 +48,7 @@ void HIntroExpression::make_variable(
 	huginn::HFrame* frame_
 ) {
 	M_PROLOG
-	frame_->values().emplace( frame_->make_variable( execionStep_._index ) );
+	frame_->values().emplace( frame_->thread()->object_factory().create_reference( frame_->make_variable( execionStep_._index ) ) );
 	frame_->note_variable( execionStep_._identifierId, execionStep_._index );
 	return;
 	M_EPILOG

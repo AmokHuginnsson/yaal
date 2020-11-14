@@ -24,7 +24,11 @@ private:
 	fields_t _fields;
 public:
 	HObject( HClass const*, fields_t const& );
-	value_t& field_ref( int );
+	HHuginn::value_t& field_ref( int index_ ) {
+		M_PROLOG
+		return ( _fields[index_] );
+		M_EPILOG
+	}
 	HHuginn::value_t call_method( huginn::HThread*, HHuginn::value_t const&, HHuginn::identifier_id_t const&, HHuginn::values_t&, int ) const;
 	HHuginn::value_t get_method( huginn::HThread*, HHuginn::value_t const&, HHuginn::identifier_id_t const&, int ) const;
 	static HHuginn::value_t init_base( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
