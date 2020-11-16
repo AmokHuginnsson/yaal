@@ -34,7 +34,7 @@ USE_AUTOTOOLS+=autoconf
 RESTRICTED=1
 NO_CDROM=1
 NO_CHECKSUM=1
-INSTALL_AS_USER=yo
+INSTALL_AS_USER=no
 NEED_ROOT=no
 
 .if ${.MAKE.LEVEL} == 0
@@ -102,8 +102,6 @@ do-install:
 	@cd $(WRKSRC) && $(MAKE) $(BUILD_ENV) DEFAULT_TARGET=debug LC_CTYPE=pl_PL.UTF-8 test
 
 .include <bsd.port.mk>
-
-$(ARTIFACT): $(PACKAGE_COOKIE)
 
 $(WRKDIR)/$(BUNDLE): $(ARTIFACT)
 	@cd $(WRKDIR) && \
