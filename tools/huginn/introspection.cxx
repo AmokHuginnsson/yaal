@@ -237,7 +237,6 @@ public:
 		HRuntime& r( thread_->runtime() );
 		hcore::HString const& package( get_string( values_[0] ) );
 		HHuginn::identifier_id_t id( r.try_identifier_id( package ) );
-		HHuginn::value_t v( r.find_package( id ) );
 		bool classExists( !! r.get_class( id ) );
 		HHuginn::value_t const* g( r.get_global( id ) );
 		bool enumerationExists( g && is_enum_class( g ) );
@@ -249,7 +248,8 @@ public:
 				position_
 			);
 		}
-		if ( classExists || functionExists || g ) {
+		HHuginn::value_t v( r.find_package( id ) );
+		if ( classExists || functionExists || enumerationExists || ( g && ! v ) ) {
 			throw HHuginn::HHuginnRuntimeException(
 				hcore::to_string(
 					enumerationExists ? "Enumeration" : ( classExists ? "Class" : ( functionExists ? "Function" : "Package alias" ) )
@@ -260,7 +260,9 @@ public:
 		}
 		try {
 			if ( ! v ) {
-				v = HPackageFactory::get_instance().create_package( &r, package, HHuginn::VISIBILITY::PACKAGE, position_ );
+				id = r.identifier_id( package );
+				r.register_package( id, id, position_ );
+				v = r.find_package( id );
 				HFrame* f( thread_->current_frame() );
 				while ( f ) {
 					f->reshape();
