@@ -70,7 +70,13 @@ public:
 		return ( _store.front().value() );
 		M_EPILOG
 	}
-
+	void clear( void ) {
+		M_PROLOG
+		_store.clear();
+		_lookup.clear();
+		return;
+		M_EPILOG
+	}
 };
 
 }
