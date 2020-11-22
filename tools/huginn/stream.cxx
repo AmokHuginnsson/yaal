@@ -134,6 +134,7 @@ public:
 			{ "write_character", runtime_->create_method( &HStream::write_fwd, "Stream.write_character", HHuginn::TYPE::CHARACTER, &HStream::write_character ), "( *charVal*, *count* ) - write *count==(1|2|4)* number of bytes from given *charVal* info this stream" },
 			{ "seek",            runtime_->create_method( &HStream::seek ),        "( *offset*, *anchor* ) - move reading/writing position to the *offset* counted from an *anchor*" },
 			{ "read_line",       runtime_->create_method( &HStream::read_line ),   "read single line of text from this stream" },
+			{ "flush",           runtime_->create_method( &HStream::flush ),       "flush write buffer associated with the stream" },
 			{ "deserialize",     runtime_->create_method( &HStream::deserialize ), "deserialize single Huginn object from this stream" },
 			{ "write_line",      runtime_->create_method( &HStream::write_line ),  "( *strVal* ) - write entriety of given *strVal* info this stream" },
 			{ "serialize",       runtime_->create_method( &HStream::serialize ),   "( *val* ) - serialize given *val* info this stream" }
@@ -278,6 +279,19 @@ HHuginn::value_t HStream::read_line( huginn::HThread* thread_, HHuginn::value_t*
 	verify_arg_count( "Stream.read_line", values_, 0, 0, thread_, position_ );
 	HStream* s( static_cast<HStream*>( object_->raw() ) );
 	return ( s->read_line_impl( thread_, position_ ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HStream::flush( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "Stream.flush", values_, 0, 0, thread_, position_ );
+	HStream* s( static_cast<HStream*>( object_->raw() ) );
+	try {
+		s->_stream->flush();
+	} catch ( hcore::HException const& e ) {
+		s->raise( thread_, e.what(), position_ );
+	}
+	return ( *object_ );
 	M_EPILOG
 }
 
