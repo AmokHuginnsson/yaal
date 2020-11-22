@@ -182,7 +182,7 @@ protected:
 		return ( ! _lineCache.is_empty() ? _objectFactory->create_string( _lineCache ) : _objectFactory->runtime().none_value() );
 	}
 	virtual bool do_is_valid( huginn::HThread* thread_, int ) override {
-		return ( thread_->can_continue() && _stream->is_valid() );
+		return ( thread_->can_continue() && ( ! _lineCache.is_empty() || _stream->is_valid() ) );
 	}
 	virtual void do_next( HThread* thread_, int position_ ) override {
 		_lineCache = _stream->read_line_raw( thread_, position_ );

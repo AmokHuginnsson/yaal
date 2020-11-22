@@ -128,7 +128,7 @@ private:
 		throw HHTTPException( "Seek on a read only, forward only stream" );
 	}
 	virtual bool do_is_valid( void ) const override {
-		return ( _socket->is_valid() );
+		return ( ( _cachedHTTPBytes > 0 ) || _socket->is_valid() );
 	}
 	virtual POLL_TYPE do_poll_type( void ) const override {
 		return ( _socket->poll_type() );
