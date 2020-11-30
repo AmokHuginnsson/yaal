@@ -7,11 +7,11 @@ dnl --------------------------------------------------------------------------
 dnl Bail out if running as root.
 dnl --------------------------------------------------------------------------
 AC_DEFUN_ONCE([PRIVILEGES_SANITY], [
-	EID=`id -u`
+	EID=$(id -u)
 	if test "x${EID}" = "x0" ; then
 		AC_MSG_ERROR([running with super-user privileges - bailing out])
 	fi
-	UMASK=`umask | sed 's/0077/77/'`
+	UMASK=$(umask | sed 's/0077/77/')
 	if test "x${UMASK}" != "x77" ; then
 		AC_MSG_ERROR([running with too permissive umask: `${UMASK}', must be: `0077' - bailing out])
 	fi
@@ -33,7 +33,7 @@ AC_DEFUN([YAAL_DETECT_FLAGS], [
 			FLAGS="-Werror $FLAGS $flag -pedantic-errors $4"
 			AC_MSG_CHECKING([whether COMPILER compiler understands [$]flag])
 			touch conftest.c
-			UNRECOGNIZED=`${CC} -o conftest.o -c ${FLAGS} conftest.c 2>&1 | grep "unrecognized option"`
+			UNRECOGNIZED=$(${CC} -o conftest.o -c ${FLAGS} conftest.c 2>&1 | grep "unrecognized option")
 			/bin/rm -f conftest.c conftest.o
 			if test "x${UNRECOGNIZED}" = "x" ; then
 				AC_LINK_IFELSE([AC_LANG_SOURCE([[int main( int, char** ) { return ( 0 ); }]])], [$1_works=yes], [$1_works=no])
@@ -104,7 +104,7 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 	AC_MSG_CHECKING([host operating system])
 	AC_CANONICAL_HOST
 	HOST_OS_VENDOR=""
-	HOST_OS_TYPE=["`uname -s | sed -e 's/[^a-zA-Z].*//g'`"]
+	HOST_OS_TYPE=["$(uname -s | sed -e 's/[^a-zA-Z].*//g')"]
 	LIB_PREFIX=["lib"]
 	LIB_EXT=["so"]
 	EXE_SUFFIX=[""]
@@ -115,8 +115,8 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 		AC_SUBST([SERIAL_DEVICE],['ttyS0'])
 		AC_CHECK_PROG([LINUX_DISTRO],[lsb_release],[yes])
 		if test ["x${LINUX_DISTRO}"] = ["xyes"] ; then
-			HOST_OS_VENDOR=`lsb_release -si`
-			HOST_INFO=`lsb_release -sd | sed -e 's/^[["[:space:]]]*//' -e 's/[["[:space:]]]*$//'`
+			HOST_OS_VENDOR=$(lsb_release -si)
+			HOST_INFO=$(lsb_release -sd | sed -e 's/^[["[:space:]]]*//' -e 's/[["[:space:]]]*$//')
 		fi
 		AC_DEFINE([__HOST_OS_TYPE_LINUX__], [], [Your operating system is Linux.])
 		YAAL_LXXFLAGS=["-Wl,--entry=\"${PACKAGE_NAME}_\$(*)_main\""]
@@ -147,22 +147,25 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 	elif test ["x${HOST_OS_TYPE}"] = ["xFreeBSD"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_FREEBSD__], [], [Your operating system is FreeBSD.])
 		HOST_OS_VENDOR=[FreeBSD]
-		HOST_INFO="${HOST_OS_TYPE} `freebsd-version`"
+		HOST_INFO="${HOST_OS_TYPE} $(freebsd-version)"
 		EXTRA_INCLUDE_PATHS=["${EXTRA_INCLUDE_PATHS} -I/usr/local/include"]
 		EXTRA_LIBRARY_PATHS=["${EXTRA_LIBRARY_PATHS} -L/usr/local/lib"]
 		sharedStateSubDir=["db"]
 	elif test ["x${HOST_OS_TYPE}"] = ["xSunOS"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_SOLARIS__], [], [Your operating system is Solaris.])
 		HOST_OS_VENDOR=[Oracle]
-		HOST_INFO="${HOST_OS_TYPE} `head -1 /etc/release`"
+		HOST_INFO="${HOST_OS_TYPE} $(head -1 /etc/release)"
 		EXTRA_LIBRARY_PATHS=["${EXTRA_LIBRARY_PATHS} -L/usr/local/lib -L/usr/gnu/lib/amd64 -L/usr/gnu/lib"]
 	elif test ["x${HOST_OS_TYPE}"] = ["xDarwin"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_DARWIN__], [], [Your operating system is Darwin.])
 		HOST_OS_VENDOR=[Apple]
-		HOST_INFO="`sw_vers -productName` `sw_vers -productVersion`"
+		HOST_INFO="$(sw_vers -productName) $(sw_vers -productVersion)"
 		YAAL_LXXFLAGS=["${YAAL_LXXFLAGS} -Wl,-undefined,dynamic_lookup"]
 		EXTRA_INCLUDE_PATHS="-isystem /opt/local/include ${EXTRA_INCLUDE_PATHS}"
-		EXTRA_LIBRARY_PATHS=["${EXTRA_LIBRARY_PATHS} -L/opt/local/lib"]
+		if test -d /opt/local/lib ; then
+			EXTRA_LIBRARY_PATHS=["${EXTRA_LIBRARY_PATHS} -L/opt/local/lib"]
+		fi
+		PKG_CONFIG_PATH=["${PKG_CONFIG_PATH}:/usr/local/opt/openssl/lib/pkgconfig"]
 		LIB_EXT=["dylib"]
 	elif test ["x${HOST_OS_VENDOR}"] = ["x"] -a -f [/etc/tizen-release] ; then
 		AC_DEFINE([__HOST_OS_TYPE_TIZEN__], [], [Your operating system is Tizen.])
@@ -173,7 +176,7 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 		EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -D_GNU_SOURCE -U__STRICT_ANSI__"]
 		YAAL_LXXFLAGS=["${YAAL_LXXFLAGS} -Wl,--export-all-symbols -Wl,--enable-auto-import -Wl,--out-implib=lib\$(*)\$(LIB_INFIX).\$(LIB_ARCHIVE_SUFFIX)"]
 		HOST_OS_VENDOR=[Cygwin]
-		HOST_INFO="${HOST_OS_TYPE} `uname -r`"
+		HOST_INFO="${HOST_OS_TYPE} $(uname -r)"
 		LIB_PREFIX=["cyg"]
 		LIB_EXT=["dll"]
 		HCORE_LIBS=["${HCORE_LIBS} -liconv"]
@@ -193,7 +196,7 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 	AC_DEFINE_UNQUOTED([HOST_INFO],"${HOST_INFO}",[Target host Operating System version information string.])
 	AC_DEFINE_UNQUOTED([HOST_OS_TYPE],"${HOST_OS_TYPE}",[Target Operating System type string.])
 	AC_DEFINE_UNQUOTED([HOST_OS_VENDOR],"${HOST_OS_VENDOR}",[Target Operating System vendor information string.])
-	SHAREDSTATEDIR=`eval echo ${sharedstatedir}`
+	SHAREDSTATEDIR=$(eval echo ${sharedstatedir})
 	AC_DEFINE_UNQUOTED([SHAREDSTATEDIR], "${SHAREDSTATEDIR}", [The directory for installing architecture-independent data files which the programs modify while they run.])
 	AC_SUBST(SHAREDSTATEDIR,[${SHAREDSTATEDIR}])
 
@@ -213,7 +216,7 @@ AC_DEFUN_ONCE([YAAL_CHECK_GIT], [
 	AC_SUBST(GITID,[true])
 	if test ["$HAS_GIT"] = ["yes"] ; then
 		if test -e "${srcdir}/.git" ; then
-			THIS_ID=`git id ${0}.ac 2> /dev/null`
+			THIS_ID=$(git id ${0}.ac 2> /dev/null)
 			if test ["x${THIS_ID}"] != ["x"] ; then
 				AC_SUBST(GITID,["git id"])
 				AC_MSG_RESULT([yes])
@@ -247,8 +250,8 @@ dnl --------------------------------------------------------------------------
 AC_DEFUN_ONCE([YAAL_CHECK_COMPILER_VERSION], [
 	AC_REQUIRE([YAAL_DETECT_COMPILER])
 	AC_MSG_CHECKING([compiler version])
-	GCC_MAJOR=`echo | cpp -dM | grep __GNUC__ | awk '{print [$]3}'`
-	GCC_MINOR=`echo | cpp -dM | grep __GNUC_MINOR__ | awk '{print [$]3}'`
+	GCC_MAJOR=$(echo | cpp -dM | grep __GNUC__ | awk '{print [$]3}')
+	GCC_MINOR=$(echo | cpp -dM | grep __GNUC_MINOR__ | awk '{print [$]3}')
 	AC_MSG_RESULT([major $GCC_MAJOR, minor $GCC_MINOR. ])
 ])
 
@@ -362,17 +365,17 @@ if test "$exec_prefix" = "NONE"; then
 	exec_prefix="${prefix}"
 fi
 
-SYSCONFDIR=`eval echo ${sysconfdir}`
+SYSCONFDIR=$(eval echo ${sysconfdir})
 AC_DEFINE_UNQUOTED([SYSCONFDIR], "${SYSCONFDIR}", [Path to global system configuration directory.])
-LOCALSTATEDIR=`eval echo ${localstatedir}`
+LOCALSTATEDIR=$(eval echo ${localstatedir})
 AC_DEFINE_UNQUOTED([LOCALSTATEDIR], "${LOCALSTATEDIR}", [Path to data files which the programs modify while they run.])
-datadir_int=`eval echo ${datadir}`
-DATADIR=`eval echo ${datadir_int}`
+datadir_int=$(eval echo ${datadir})
+DATADIR=$(eval echo ${datadir_int})
 AC_DEFINE_UNQUOTED([DATADIR], "${DATADIR}", [Path to read only application speciffic data files.])
-LIBEXECDIR=`eval echo ${libexecdir}`
+LIBEXECDIR=$(eval echo ${libexecdir})
 AC_DEFINE_UNQUOTED([LIBEXECDIR], "${LIBEXECDIR}", [The directory for installing executable programs to be run by other programs rather than by users.])
-LIBDIR=`eval echo ${libdir}`
+LIBDIR=$(eval echo ${libdir})
 AC_DEFINE_UNQUOTED([LIBDIR], "${LIBDIR}", [The directory for object files and libraries of object code.])
-BINDIR=`eval echo ${bindir}`
+BINDIR=$(eval echo ${bindir})
 AC_DEFINE_UNQUOTED([BINDIR], "${BINDIR}", [The directory for installing executable programs that users can run.])
 

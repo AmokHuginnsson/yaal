@@ -36,6 +36,7 @@ enum ERROR {
 	INDEX_OOB,
 	BAD_LENGTH,
 	BAD_OFFSET,
+#undef OVERFLOW
 	OVERFLOW
 };
 

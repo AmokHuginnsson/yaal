@@ -460,7 +460,7 @@ HCondition::~HCondition( void ) {
 namespace {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
-static int const FWD_CLOCK_REALTIME = CLOCK_REALTIME;
+static clockid_t const FWD_CLOCK_REALTIME = CLOCK_REALTIME;
 #pragma GCC diagnostic pop
 }
 

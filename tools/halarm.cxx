@@ -23,7 +23,7 @@ static_assert( sizeof ( timer_t ) <= sizeof ( HAlarm::timer_handle_t ), "timer h
 namespace {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
-static int const FWD_CLOCK_REALTIME = CLOCK_REALTIME;
+static clockid_t const FWD_CLOCK_REALTIME = CLOCK_REALTIME;
 #pragma GCC diagnostic pop
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-conversion"

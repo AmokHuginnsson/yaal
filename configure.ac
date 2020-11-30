@@ -139,7 +139,12 @@ AC_CHECK_ALIGNOF([time_t])
 dnl Now we can look for all needed libraries.
 AC_MSG_RESULT([--- Looking for needed libraries ... ---                [[67%]]])
 AC_SEARCH_LIBS([pthread_create],[thr pthread],,[AC_MSG_ERROR([Cannot build without threading library.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
-AC_CHECK_LIB([ssl],[SSL_CTX_new],,[AC_MSG_ERROR([Cannot continue without OpenSSL library.])]) LIBS=""
+PKG_CHECK_MODULES(
+	SSL,
+	[libssl],
+	[true],
+	[AC_CHECK_LIB([ssl],[SSL_CTX_new],,[AC_MSG_ERROR([Cannot continue without OpenSSL library.])]) LIBS=""]
+)
 PKG_CHECK_MODULES(PCRE, [libpcre], [true], [AC_MSG_ERROR([Cannot continue without PCRE library.])])
 AC_SEARCH_LIBS([clock_gettime],[rt]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([timer_create],[rt]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
@@ -174,6 +179,7 @@ if test ["${POSTGRES}"] != ["no"] ; then
 fi
 MYSQL_REENTRANT=[""]
 CXXFLAGS_ORIG="${CXXFLAGS}"
+CPPFLAGS_ORIG="${CPPFLAGS}"
 if test ["${MYSQL}"] != ["no"] ; then
 	LIBS=""
 	AC_SEARCH_LIBS([mysql_init],[mysqlclient mariadbclient])
@@ -327,7 +333,11 @@ DEFAULT_DRIVER=["null"]
 
 AC_MSG_RESULT([--- Looking for needed headers ... ---                  [[77%]]])
 
+CXXFLAGS=["${CXXFLAGS_ORIG} ${SSL_CFLAGS}"]
+CPPFLAGS=["${CPPFLAGS_ORIG} ${SSL_CFLAGS}"]
 AC_CHECK_HEADERS([openssl/ssl.h],[],[AC_MSG_ERROR([Cannot continue without SSL development files.])])
+CXXFLAGS=["${CXXFLAGS_ORIG}"]
+CPPFLAGS=["${CPPFLAGS_ORIG}"]
 _CONSOLE_MOUSE=[""];
 CXXFLAGS=["${CXXFLAGS_ORIG} ${PCRE_CFLAGS}"]
 AC_CHECK_HEADERS([pcre.h], [], [AC_MSG_ERROR([Cannot continue without PCRE library.])])

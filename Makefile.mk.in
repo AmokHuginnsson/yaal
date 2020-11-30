@@ -51,7 +51,8 @@ EXTRA_INCLUDE_PATHS=@EXTRA_INCLUDE_PATHS@
 EXTRA_LIBRARY_PATHS=@EXTRA_LIBRARY_PATHS@
 override EXTRA_CXXFLAGS+=@EXTRA_CXXFLAGS@
 override EXTRA_LXXFLAGS+=@EXTRA_LXXFLAGS@
-override CXXFLAGS+= -D__YAAL_BUILD__ @DEFS@ @PCRE_CFLAGS@ @XML2_CFLAGS@ @XSLT_CFLAGS@ @EXSLT_CFLAGS@
+override CXXFLAGS+= -D__YAAL_BUILD__ @DEFS@ \
+	$(patsubst -I%, -isystem %, @PCRE_CFLAGS@ @SSL_CFLAGS@ @XML2_CFLAGS@ @XSLT_CFLAGS@ @EXSLT_CFLAGS@)
 override LXXFLAGS+= -shared @YAAL_LXXFLAGS@
 
 include $(DIR_ROOT)/_aux/mk/80_func_lib.mk
@@ -63,7 +64,7 @@ $(foreach IT,$(DRIVERS),$(eval $(call CONFIGURE_DRIVER,$(IT),$(LIB_NAME)_)))
 
 # Solaris is seriously broken operating system.
 LIBS_BASE      = -lc
-HCORE_LIBS     = @HCORE_LIBS@ @PCRE_LIBS@
+HCORE_LIBS     = @HCORE_LIBS@ @PCRE_LIBS@ @SSL_LIBS@
 TOOLS_LIBS     = @TOOLS_LIBS@ @XML2_LIBS@ @XSLT_LIBS@ @EXSLT_LIBS@
 
 LIBS_hcore     = $(LIBS_BASE) -lssl -lcrypto $(HCORE_LIBS)

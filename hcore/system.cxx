@@ -487,7 +487,7 @@ void exec( yaal::hcore::HString const& image_, argv_t const& args_ ) {
 	}
 	sigset_t all;
 	sigset_t old;
-	M_ENSURE( ::sigfillset( &all ) == 0 );
+	M_ENSURE( sigfillset( &all ) == 0 );
 	M_ENSURE( ::sigprocmask( SIG_UNBLOCK, &all, &old ) == 0 );
 	::execvp( image.data(), argv );
 	M_ENSURE( ::sigprocmask( SIG_SETMASK, &old, nullptr ) == 0 );

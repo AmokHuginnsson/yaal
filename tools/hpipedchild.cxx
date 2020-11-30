@@ -425,7 +425,7 @@ void HPipedChild::spawn(
 				argv.get<char const*>()[ i ] = utf8ishArgv.back().data();
 			}
 			sigset_t all;
-			M_ENSURE( ::sigfillset( &all ) == 0 );
+			M_ENSURE( sigfillset( &all ) == 0 );
 			M_ENSURE( ::sigprocmask( SIG_UNBLOCK, &all, nullptr ) == 0 );
 			if ( pgid_ >= PROCESS_GROUP_LEADER ) {
 				int pid( getpid() );

@@ -68,7 +68,7 @@ AC_CHECK_LIB([yaal_dbwrapper${LIB_INFIX}],[yaal_dbwrapper_main],
 AC_CHECK_LIB([yaal_hconsole${LIB_INFIX}],[yaal_hconsole_main],
 							[],[AC_MSG_ERROR([Can not continue without yaal hconsole library.])],[-lyaal_tools${LIB_INFIX}])
 
-REV_LIBS=`echo "${LIBS}" | awk '{ for (i=NF; i>1; i--) printf("%s ",[$]i); print [$]1; }'`
+REV_LIBS=$(echo "${LIBS}" | awk '{ for (i=NF; i>1; i--) printf("%s ",[$]i); print [$]1; }')
 
 AC_CHECK_LIB([yaal_hdata${LIB_INFIX}],[yaal_hdata_main],
 							[],[AC_MSG_ERROR([Can not continue without yaal hdata library.])])
