@@ -341,8 +341,9 @@ yaal::hcore::HString get_self_exec_path( void ) {
 #endif
 #ifdef __HOST_OS_TYPE_DARWIN__
 	char buf[PROC_PIDPATHINFO_MAXSIZE];
-	if ( proc_pidpath( getpid(), buf, sizeof ( buf ) ) == 0 ) {
-		path = buf;
+	int pidPathLen( proc_pidpath( getpid(), buf, sizeof ( buf ) ) );
+	if ( pidPathLen > 0 ) {
+		path.assign( buf, pidPathLen );
 	}
 #endif
 #ifdef __HOST_OS_TYPE_SOLARIS__
