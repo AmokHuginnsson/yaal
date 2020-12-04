@@ -156,10 +156,11 @@ char const* status_string( STATUS );
 URL parse_url( yaal::hcore::HString const& );
 STATUS get_response_status( yaal::hcore::HString const& );
 yaal::hcore::HString make_request_string( URL const&, HRequest const& );
+void push_payload( yaal::hcore::HStreamInterface&, yaal::hcore::HStreamInterface& );
 
 }
 
-HResponse get( HRequest const& request_ ) {
+HResponse call( HRequest const& request_ ) {
 	HString request( request_.url() );
 	HChunk devNull;
 	HString host;
@@ -177,6 +178,9 @@ HResponse get( HRequest const& request_ ) {
 		HSocket* sock( static_cast<HSocket*>( stream.raw() ) );
 		sock->connect( url.host, url.port );
 		*stream << make_request_string( url, request_ ) << flush;
+		if ( request_.payload() ) {
+			push_payload( *stream, *request_.payload() );
+		}
 		HString line;
 		HString headerName;
 		HString headerValue;
@@ -208,7 +212,7 @@ HResponse get( HRequest const& request_ ) {
 			} else if ( headerName == "location" ) {
 				location = headerValue;
 			} else if ( headerName == "last-modified" ) {
-				lastModified = parse_time( headerValue, "http::get("_ys.append( request_.url() ).append( ") - " ).append( headerName ).append( ": " ) );
+				lastModified = parse_time( headerValue, "http::call("_ys.append( request_.url() ).append( ") - " ).append( headerName ).append( ": " ) );
 			} else if ( headerName == "content-disposition" ) {
 				filename = parse_content_disposition( headerValue );
 #ifdef __DEBUG__
@@ -280,10 +284,24 @@ int long HHTTPStream::do_read( void* data_, int long size_ ) {
 	return ( nRead );
 }
 
+namespace {
+char const* http_type_to_str( HTTP type_ ) {
+	switch ( type_ ) {
+		case ( HTTP::GET ):    return ( "GET" );
+		case ( HTTP::POST ):   return ( "POST" );
+		case ( HTTP::PUT ):    return ( "PUT" );
+		case ( HTTP::DELETE ): return ( "DELETE" );
+		case ( HTTP::PATCH ):  return ( "PATCH" );
+		case ( HTTP::HEAD ):   return ( "HEAD" );
+	}
+	return ( nullptr );
+}
+}
+
 yaal::hcore::HString make_request_string( URL const& url_, HRequest const& request_ ) {
 	HString requestString;
 	requestString
-		.assign( "GET " ).append( url_.path )
+		.assign( http_type_to_str( request_.type() ) ).append( " " ).append( url_.path )
 		.append(
 			" HTTP/1.1\r\n"
 			"Host: "
@@ -302,6 +320,18 @@ yaal::hcore::HString make_request_string( URL const& url_, HRequest const& reque
 		"Accept-Charset: utf-8\r\n"
 		"Accept-Encoding: identity, deflate\r\n"
 	);
+	if ( request_.payload() ) {
+		requestString.append(
+			"Transfer-Encoding: chunked\r\n"
+			"Content-Type: "
+		);
+		if ( ! request_.mime_type().is_empty() ) {
+			requestString.append( request_.mime_type() );
+		} else {
+			requestString.append( "application/octet-stream" );
+		}
+		requestString.append( "\r\n" );
+	}
 	for ( HRequest::HHeader const& header : request_.headers() ) {
 		requestString.append( header.name() ).append( ": " ).append( header.value() ).append( "\r\n" );
 	}
@@ -312,6 +342,40 @@ yaal::hcore::HString make_request_string( URL const& url_, HRequest const& reque
 	}
 	requestString.append( "\r\n" );
 	return ( requestString );
+}
+
+void push_payload( yaal::hcore::HStreamInterface& socket_, yaal::hcore::HStreamInterface& payload_ ) {
+	M_PROLOG
+	static int const CHUNK_SIZE( system::get_page_size() );
+	HChunk chunk( CHUNK_SIZE );
+	char* buf( chunk.get<char>() );
+	bool ok( true );
+	HStreamInterface::BASE base( socket_.get_base() );
+	socket_.set_base( HStreamInterface::BASE::HEX );
+	while ( ok ) {
+		int nRead( static_cast<int>( payload_.read( buf, CHUNK_SIZE ) ) );
+		if ( nRead <= 0 ) {
+			break;
+		}
+		socket_.write( nRead ).write( "\r\n", 2 );
+		int toWrite( nRead );
+		char* p( buf );
+		while ( toWrite > 0 ) {
+			int nWritten( static_cast<int>( socket_.write( p, toWrite ) ) );
+			if ( nWritten <= 0 ) {
+				ok = false;
+				break;
+			}
+			toWrite -= nWritten;
+			p += nWritten;
+		}
+		socket_.write( "\r\n", 2 );
+	}
+	socket_.write( "0\r\n\r\n", 5 );
+	socket_.flush();
+	socket_.set_base( base );
+	return;
+	M_EPILOG
 }
 
 STATUS get_response_status( yaal::hcore::HString const& responseHeader_ ) {

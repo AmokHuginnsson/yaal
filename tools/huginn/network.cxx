@@ -172,7 +172,7 @@ private:
 		verify_signature( "Network.get", values_, 2, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, thread_, position_ );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		try {
-			http::HRequest request( get_string( values_[0] ) );
+			http::HRequest request( http::HTTP::GET, get_string( values_[0] ) );
 			int argCount( static_cast<int>( values_.get_size() ) );
 			if ( argCount > 1 ) {
 				request.login( get_string( values_[1] ) );
@@ -180,7 +180,7 @@ private:
 			if ( argCount > 2 ) {
 				request.password( get_string( values_[2] ) );
 			}
-			http::HResponse response( http::get( request ) );
+			http::HResponse response( http::call( request ) );
 			HObjectFactory& of( thread_->object_factory() );
 			HObject::fields_t fields;
 			fields.push_back( of.create<HStream>( of.stream_class(), response.sock() ) );

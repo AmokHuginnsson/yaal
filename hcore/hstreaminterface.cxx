@@ -189,7 +189,16 @@ HStreamInterface& HStreamInterface::do_output( int long longInteger_ ) {
 	M_PROLOG
 	if ( _mode == MODE::TEXT ) {
 		char buffer[MAX_INTEGER_DIGIT_COUNT];
-		snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, _base == BASE::DEC ? "%ld" : ( _base == BASE::HEX ) ? "%lx" : "%lo", longInteger_ );
+		snprintf(
+			buffer,
+			MAX_INTEGER_DIGIT_COUNT,
+			_base == BASE::DEC
+				? "%ld"
+				: (
+					( _base == BASE::HEX ) ? "%lx" : "%lo"
+				),
+			longInteger_
+		);
 		_wordCache = buffer;
 		reformat();
 		_conversionCache = _wordCache;
@@ -205,7 +214,16 @@ HStreamInterface& HStreamInterface::do_output( int long long longLongInteger_ ) 
 	M_PROLOG
 	if ( _mode == MODE::TEXT ) {
 		char buffer[MAX_INTEGER_DIGIT_COUNT];
-		snprintf( buffer, MAX_INTEGER_DIGIT_COUNT, _base == BASE::DEC ? "%lld" : ( _base == BASE::HEX ) ? "%llx" : "%llo", longLongInteger_ );
+		snprintf(
+			buffer,
+			MAX_INTEGER_DIGIT_COUNT,
+			_base == BASE::DEC
+				? "%lld"
+				: (
+					( _base == BASE::HEX ) ? "%llx" : "%llo"
+				),
+			longLongInteger_
+		);
 		_wordCache = buffer;
 		reformat();
 		_conversionCache = _wordCache;

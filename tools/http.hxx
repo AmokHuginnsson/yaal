@@ -17,7 +17,14 @@ namespace tools {
 
 namespace http {
 
-struct HTTP {};
+enum class HTTP {
+	GET,
+	POST,
+	PUT,
+	DELETE,
+	PATCH,
+	HEAD
+};
 typedef yaal::hcore::HExceptionT<HTTP> HHTTPException;
 
 class HRequest {
@@ -48,24 +55,40 @@ public:
 	};
 	typedef yaal::hcore::HArray<HHeader> headers_t;
 private:
+	HTTP _type;
 	yaal::hcore::HString _url;
+	headers_t _headers;
+	yaal::hcore::HStreamInterface* _payload;
+	yaal::hcore::HString _mimeType;
 	yaal::hcore::HString _login;
 	yaal::hcore::HString _password;
-	headers_t _headers;
 	yaal::hcore::HString _userAgent;
 public:
 	HRequest(
+		HTTP type_ = HTTP::GET,
 		yaal::hcore::HString const& url_ = yaal::hcore::HString(),
+		yaal::hcore::HStreamInterface* payload_ = nullptr,
+		yaal::hcore::HString const& mimeType_ = yaal::hcore::HString(),
 		yaal::hcore::HString const& login_ = yaal::hcore::HString(),
 		yaal::hcore::HString const& password_ = yaal::hcore::HString(),
 		headers_t const& headers_ = headers_t(),
 		yaal::hcore::HString const& userAgent_ = yaal::hcore::HString()
-	) : _url( url_ )
+	) : _type( type_ )
+		, _url( url_ )
+		, _headers( headers_ )
+		, _payload( payload_ )
+		, _mimeType( mimeType_ )
 		, _login( login_ )
 		, _password( password_ )
-		, _headers( headers_ )
 		, _userAgent( userAgent_ ) {
 		return;
+	}
+	HRequest& type( HTTP type_ ) {
+		_type = type_;
+		return ( *this );
+	}
+	HTTP type( void ) const {
+		return ( _type );
 	}
 	HRequest& url( yaal::hcore::HString const& url_ ) {
 		_url = url_;
@@ -102,6 +125,23 @@ public:
 	yaal::hcore::HString const& user_agent( void ) const {
 		return ( _userAgent );
 	}
+	HRequest& payload( yaal::hcore::HStreamInterface& payload_ ) {
+		_payload = &payload_;
+		return ( *this );
+	}
+	yaal::hcore::HStreamInterface* payload( void ) const {
+		return ( _payload );
+	}
+	HRequest& mime_type( yaal::hcore::HString const& mimeType_ ) {
+		_mimeType = mimeType_;
+		return ( *this );
+	}
+	yaal::hcore::HString const& mime_type( void ) const {
+		return ( _mimeType );
+	}
+private:
+	HRequest( HRequest const& ) = delete;
+	HRequest& operator = ( HRequest const& ) = delete;
 };
 
 class HResponse {
@@ -144,7 +184,7 @@ public:
 	}
 };
 
-HResponse get( HRequest const& );
+HResponse call( HRequest const& );
 
 }
 
