@@ -156,7 +156,8 @@ char const* status_string( STATUS );
 URL parse_url( yaal::hcore::HString const& );
 STATUS get_response_status( yaal::hcore::HString const& );
 yaal::hcore::HString make_request_string( URL const&, HRequest const& );
-void push_payload( yaal::hcore::HStreamInterface&, yaal::hcore::HStreamInterface& );
+void push_payload( yaal::hcore::HStreamInterface&, HRequest::HPayload const& );
+void push_payloads( yaal::hcore::HStreamInterface&, HRequest::payloads_t const& );
 
 }
 
@@ -178,9 +179,7 @@ HResponse call( HRequest const& request_ ) {
 		HSocket* sock( static_cast<HSocket*>( stream.raw() ) );
 		sock->connect( url.host, url.port );
 		*stream << make_request_string( url, request_ ) << flush;
-		if ( request_.payload() ) {
-			push_payload( *stream, *request_.payload() );
-		}
+		push_payloads( *stream, request_.payloads() );
 		HString line;
 		HString headerName;
 		HString headerValue;
@@ -320,18 +319,6 @@ yaal::hcore::HString make_request_string( URL const& url_, HRequest const& reque
 		"Accept-Charset: utf-8\r\n"
 		"Accept-Encoding: identity, deflate\r\n"
 	);
-	if ( request_.payload() ) {
-		requestString.append(
-			"Transfer-Encoding: chunked\r\n"
-			"Content-Type: "
-		);
-		if ( ! request_.mime_type().is_empty() ) {
-			requestString.append( request_.mime_type() );
-		} else {
-			requestString.append( "application/octet-stream" );
-		}
-		requestString.append( "\r\n" );
-	}
 	for ( HRequest::HHeader const& header : request_.headers() ) {
 		requestString.append( header.name() ).append( ": " ).append( header.value() ).append( "\r\n" );
 	}
@@ -340,20 +327,50 @@ yaal::hcore::HString make_request_string( URL const& url_, HRequest const& reque
 		auth.assign( request_.login() ).append( unicode::CODE_POINT::COLON ).append( request_.password() );
 		requestString.append( "Authorization: Basic " ).append( base64::encode( auth ) ).append( "\r\n" );
 	}
-	requestString.append( "\r\n" );
 	return ( requestString );
 }
 
-void push_payload( yaal::hcore::HStreamInterface& socket_, yaal::hcore::HStreamInterface& payload_ ) {
+void push_payloads( yaal::hcore::HStreamInterface& socket_, HRequest::payloads_t const& payloads_ ) {
+	M_PROLOG
+	if ( payloads_.is_empty() ) {
+		socket_.write( "\r\n", 2 );
+		return;
+	}
+	for ( HRequest::HPayload const& p : payloads_ ) {
+		if ( ! p.stream() ) {
+			throw HHTTPException( "Invalid payload!" );
+		}
+	}
+	int payloadCount( static_cast<int>( payloads_.get_size() ) );
+	HString requestString( "Transfer-Encoding: chunked\r\n" );
+	if ( payloadCount == 1 ) {
+		HRequest::HPayload const& payload( payloads_.front() );
+		requestString.append( "Content-Type: " );
+		if ( ! payload.mime_type().is_empty() ) {
+			requestString.append( payload.mime_type() );
+		} else {
+			requestString.append( "application/octet-stream" );
+		}
+		requestString.append( "\r\n\r\n" );
+		socket_ << requestString;
+		push_payload( socket_, payload );
+	}
+	return;
+	M_EPILOG
+}
+
+void push_payload( yaal::hcore::HStreamInterface& socket_, HRequest::HPayload const& payload_ ) {
 	M_PROLOG
 	static int const CHUNK_SIZE( system::get_page_size() );
+	M_ASSERT( payload_.stream() );
+	HStreamInterface& payloadStream( *payload_.stream() );
 	HChunk chunk( CHUNK_SIZE );
 	char* buf( chunk.get<char>() );
 	bool ok( true );
 	HStreamInterface::BASE base( socket_.get_base() );
 	socket_.set_base( HStreamInterface::BASE::HEX );
 	while ( ok ) {
-		int nRead( static_cast<int>( payload_.read( buf, CHUNK_SIZE ) ) );
+		int nRead( static_cast<int>( payloadStream.read( buf, CHUNK_SIZE ) ) );
 		if ( nRead <= 0 ) {
 			break;
 		}

@@ -53,13 +53,51 @@ public:
 			return ( _value );
 		}
 	};
+	class HPayload {
+	private:
+		yaal::hcore::HStreamInterface* _stream;
+		yaal::hcore::HString _mimeType;
+		yaal::hcore::HString _filename;
+	public:
+		HPayload(
+			yaal::hcore::HStreamInterface* stream_ = nullptr,
+			yaal::hcore::HString const& mimeType_ = yaal::hcore::HString(),
+			yaal::hcore::HString const& filename_ = yaal::hcore::HString()
+		) : _stream( stream_ )
+			, _mimeType( mimeType_ )
+			, _filename( filename_ ) {
+		}
+		HPayload( HPayload const& ) = default;
+		HPayload& operator = ( HPayload const& ) = default;
+		HPayload& stream( yaal::hcore::HStreamInterface& stream_ ) {
+			_stream = &stream_;
+			return ( *this );
+		}
+		yaal::hcore::HStreamInterface* stream( void ) const {
+			return ( _stream );
+		}
+		HPayload& mime_type( yaal::hcore::HString const& mimeType_ ) {
+			_mimeType = mimeType_;
+			return ( *this );
+		}
+		yaal::hcore::HString const& mime_type( void ) const {
+			return ( _mimeType );
+		}
+		HPayload& filename( yaal::hcore::HString const& filename_ ) {
+			_filename = filename_;
+			return ( *this );
+		}
+		yaal::hcore::HString const& filename( void ) const {
+			return ( _filename );
+		}
+	};
 	typedef yaal::hcore::HArray<HHeader> headers_t;
+	typedef yaal::hcore::HArray<HPayload> payloads_t;
 private:
 	HTTP _type;
 	yaal::hcore::HString _url;
 	headers_t _headers;
-	yaal::hcore::HStreamInterface* _payload;
-	yaal::hcore::HString _mimeType;
+	payloads_t _payloads;
 	yaal::hcore::HString _login;
 	yaal::hcore::HString _password;
 	yaal::hcore::HString _userAgent;
@@ -67,17 +105,15 @@ public:
 	HRequest(
 		HTTP type_ = HTTP::GET,
 		yaal::hcore::HString const& url_ = yaal::hcore::HString(),
-		yaal::hcore::HStreamInterface* payload_ = nullptr,
-		yaal::hcore::HString const& mimeType_ = yaal::hcore::HString(),
 		yaal::hcore::HString const& login_ = yaal::hcore::HString(),
 		yaal::hcore::HString const& password_ = yaal::hcore::HString(),
+		payloads_t const& payloads_ = payloads_t(),
 		headers_t const& headers_ = headers_t(),
 		yaal::hcore::HString const& userAgent_ = yaal::hcore::HString()
 	) : _type( type_ )
 		, _url( url_ )
 		, _headers( headers_ )
-		, _payload( payload_ )
-		, _mimeType( mimeType_ )
+		, _payloads( payloads_ )
 		, _login( login_ )
 		, _password( password_ )
 		, _userAgent( userAgent_ ) {
@@ -118,26 +154,19 @@ public:
 	headers_t const& headers( void ) const {
 		return ( _headers );
 	}
+	HRequest& payload( HPayload const& payload_ ) {
+		_payloads.push_back( payload_ );
+		return ( *this );
+	}
+	payloads_t const& payloads( void ) const {
+		return ( _payloads );
+	}
 	HRequest& user_agent( yaal::hcore::HString const& userAgent_ ) {
 		_userAgent = userAgent_;
 		return ( *this );
 	}
 	yaal::hcore::HString const& user_agent( void ) const {
 		return ( _userAgent );
-	}
-	HRequest& payload( yaal::hcore::HStreamInterface& payload_ ) {
-		_payload = &payload_;
-		return ( *this );
-	}
-	yaal::hcore::HStreamInterface* payload( void ) const {
-		return ( _payload );
-	}
-	HRequest& mime_type( yaal::hcore::HString const& mimeType_ ) {
-		_mimeType = mimeType_;
-		return ( *this );
-	}
-	yaal::hcore::HString const& mime_type( void ) const {
-		return ( _mimeType );
 	}
 private:
 	HRequest( HRequest const& ) = delete;
