@@ -57,7 +57,7 @@ public:
 	private:
 		yaal::hcore::HStreamInterface* _stream;
 		yaal::hcore::HString _mimeType;
-		yaal::hcore::HString _filename;
+		mutable yaal::hcore::HString _filename;
 	public:
 		HPayload(
 			yaal::hcore::HStreamInterface* stream_ = nullptr,
@@ -87,9 +87,7 @@ public:
 			_filename = filename_;
 			return ( *this );
 		}
-		yaal::hcore::HString const& filename( void ) const {
-			return ( _filename );
-		}
+		yaal::hcore::HString const& filename( void ) const;
 	};
 	typedef yaal::hcore::HArray<HHeader> headers_t;
 	typedef yaal::hcore::HArray<HPayload> payloads_t;

@@ -9,6 +9,8 @@
 #include "tools/base64.hxx"
 #include "tools/hzipstream.hxx"
 #include "hcore/unicode.hxx"
+#include "tools/streamtools.hxx"
+#include "tools/filesystem.hxx"
 #include "hcore/hlog.hxx"
 
 M_VCSID( "$Id: " __ID__ " $" )
@@ -18,6 +20,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::tools;
+using namespace yaal::tools::filesystem;
 
 namespace yaal {
 
@@ -159,6 +162,13 @@ yaal::hcore::HString make_request_string( URL const&, HRequest const& );
 void push_payload( yaal::hcore::HStreamInterface&, HRequest::HPayload const& );
 void push_payloads( yaal::hcore::HStreamInterface&, HRequest::payloads_t const& );
 
+}
+
+yaal::hcore::HString const& HRequest::HPayload::filename( void ) const {
+	if ( _filename.is_empty() ) {
+		_filename.assign( get_stream_id( _stream ) );
+	}
+	return ( _filename );
 }
 
 HResponse call( HRequest const& request_ ) {
@@ -341,11 +351,16 @@ void push_payloads( yaal::hcore::HStreamInterface& socket_, HRequest::payloads_t
 			throw HHTTPException( "Invalid payload!" );
 		}
 	}
+	HStreamInterface::BASE base( socket_.get_base() );
+	socket_.set_base( HStreamInterface::BASE::HEX );
 	int payloadCount( static_cast<int>( payloads_.get_size() ) );
 	HString requestString( "Transfer-Encoding: chunked\r\n" );
 	if ( payloadCount == 1 ) {
 		HRequest::HPayload const& payload( payloads_.front() );
-		requestString.append( "Content-Type: " );
+		requestString
+			.append( "Content-Disposition: attachment; filename=\"" )
+			.append( payload.filename() )
+			.append( "\"\r\nContent-Type: " );
 		if ( ! payload.mime_type().is_empty() ) {
 			requestString.append( payload.mime_type() );
 		} else {
@@ -354,7 +369,40 @@ void push_payloads( yaal::hcore::HStreamInterface& socket_, HRequest::payloads_t
 		requestString.append( "\r\n\r\n" );
 		socket_ << requestString;
 		push_payload( socket_, payload );
+	} else {
+		static char const BOUNDARY[] = "yaal-http-post-boundary";
+		requestString.append( "Content-Type: multipart/form-data; boundary=" ).append( BOUNDARY ).append( "\r\n\r\n" );
+		socket_ << requestString;
+		int i( 0 );
+		HString path;
+		HUTF8String utf8;
+		for ( HRequest::HPayload const& payload : payloads_ ) {
+			path.assign( payload.filename() );
+			requestString
+				.assign( i > 0 ? "\r\n--" : "--" )
+				.append( BOUNDARY )
+				.append( "\r\nContent-Disposition: form-data; name=\"" )
+				.append( basename( path ) )
+				.append( "\"; filename=\"" )
+				.append( path )
+				.append( "\"\r\nContent-Type: " );
+			if ( ! payload.mime_type().is_empty() ) {
+				requestString.append( payload.mime_type() );
+			} else {
+				requestString.append( "application/octet-stream" );
+			}
+			requestString.append( "\r\n\r\n" );
+			utf8.assign( requestString );
+			socket_ << utf8.byte_count() << "\r\n" << requestString << "\r\n";
+			push_payload( socket_, payload );
+			++ i;
+		}
+		requestString.assign( "\r\n--" ).append( BOUNDARY ).append( "--\r\n" );
+		socket_ << requestString.get_length() << "\r\n" << requestString << "\r\n";
 	}
+	socket_.write( "0\r\n\r\n", 5 );
+	socket_.flush();
+	socket_.set_base( base );
 	return;
 	M_EPILOG
 }
@@ -367,8 +415,6 @@ void push_payload( yaal::hcore::HStreamInterface& socket_, HRequest::HPayload co
 	HChunk chunk( CHUNK_SIZE );
 	char* buf( chunk.get<char>() );
 	bool ok( true );
-	HStreamInterface::BASE base( socket_.get_base() );
-	socket_.set_base( HStreamInterface::BASE::HEX );
 	while ( ok ) {
 		int nRead( static_cast<int>( payloadStream.read( buf, CHUNK_SIZE ) ) );
 		if ( nRead <= 0 ) {
@@ -388,9 +434,6 @@ void push_payload( yaal::hcore::HStreamInterface& socket_, HRequest::HPayload co
 		}
 		socket_.write( "\r\n", 2 );
 	}
-	socket_.write( "0\r\n\r\n", 5 );
-	socket_.flush();
-	socket_.set_base( base );
 	return;
 	M_EPILOG
 }
