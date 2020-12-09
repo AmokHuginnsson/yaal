@@ -5,6 +5,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
 #include "hcore/safe_int.hxx"
+#include "tools/streamtools.hxx"
 #include "runtime.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
@@ -116,13 +117,19 @@ public:
 		HClass const* streamClass( of.stream_class() );
 		HHuginn::type_id_t t( verify_arg_type( name, values_, 1, classes_t{ of.function_reference_class(), streamClass, of.none_class() }, ARITY::MULTIPLE, thread_, position_ ) );
 		HHuginn::value_t v;
+		if ( ( t == streamClass->type_id() ) && ( src->get_class() == streamClass ) ) {
+			HStream& source( *static_cast<HStream*>( values_[0].raw() ) );
+			HStream& sink( *static_cast<HStream*>( values_[1].raw() ) );
+			stream::pump( *source.raw(), *sink.raw() );
+			return ( values_[1] );
+		}
 		huginn::HIterable const* iterable( static_cast<huginn::HIterable const*>( src.raw() ) );
 		huginn::HIterable::iterator_t it( const_cast<huginn::HIterable*>( iterable )->iterator( thread_, position_ ) );
 		if ( t == streamClass->type_id() ) {
-			HStream& stream( *static_cast<HStream*>( values_[1].raw() ) );
+			HStream& sink( *static_cast<HStream*>( values_[1].raw() ) );
 			while ( thread_->can_continue() && it->is_valid( thread_, position_ ) ) {
 				v = it->value( thread_, position_ );
-				stream.write( thread_, v, position_ );
+				sink.write( thread_, v, position_ );
 				it->next( thread_, position_ );
 			}
 			return ( values_[1] );
