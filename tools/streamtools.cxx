@@ -196,6 +196,43 @@ HStreamInterface::ptr_t ensure( HStreamInterface::ptr_t stream_ ) {
 	M_EPILOG
 }
 
+namespace stream {
+
+int long pump( yaal::hcore::HStreamInterface& source_, yaal::hcore::HStreamInterface& sink_ ) {
+	M_PROLOG
+	static int const CHUNK_SIZE( system::get_page_size() );
+	HChunk chunk( CHUNK_SIZE );
+	char* buf( chunk.get<char>() );
+	bool ok( true );
+	int long nWrittenTotal( 0 );
+	while ( ok ) {
+		int nRead( static_cast<int>( M_TEMP_FAILURE_RETRY( source_.read( buf, CHUNK_SIZE ) ) ) );
+		if ( nRead <= 0 ) {
+			break;
+		}
+		int toWrite( nRead );
+		char* p( buf );
+		while ( toWrite > 0 ) {
+			int nWritten( static_cast<int>( M_TEMP_FAILURE_RETRY( sink_.write( p, toWrite ) ) ) );
+			if ( nWritten <= 0 ) {
+				ok = false;
+				if ( nWritten < 0 ) {
+					nWrittenTotal = -1;
+				}
+				break;
+			}
+			nWrittenTotal += nWritten;
+			toWrite -= nWritten;
+			p += nWritten;
+		}
+	}
+	sink_.flush();
+	return ( nWrittenTotal );
+	M_EPILOG
+}
+
+}
+
 HTee::HTee( HTee const& tee_ )
 	: HStreamInterface()
 	, _stream1( tee_._stream1 )
