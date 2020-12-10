@@ -34,6 +34,50 @@ enum class BASE {
 	BIN
 };
 
+class HParameter {
+	char const* _name;
+	HClass const* _class;
+	HHuginn::TYPE _type;
+	HHuginn::value_t _value;
+public:
+	HParameter( void )
+		: _name( nullptr )
+		, _class( nullptr )
+		, _type( HHuginn::TYPE::UNKNOWN )
+		, _value() {
+	}
+	HParameter( char const* name_, HClass const* class_ )
+		: _name( name_ )
+		, _class( class_ )
+		, _type( HHuginn::TYPE::UNKNOWN )
+		, _value() {
+	}
+	HParameter( char const* name_, HHuginn::TYPE type_ )
+		: _name( name_ )
+		, _class( nullptr )
+		, _type( type_ )
+		, _value() {
+	}
+	char const* name( void ) const {
+		return ( _name );
+	}
+	HClass const* cls( void ) const {
+		return ( _class );
+	}
+	HHuginn::TYPE type( void ) const {
+		return ( _type );
+	}
+	HHuginn::value_t const& value( void ) const {
+		return ( _value );
+	}
+	void set_value( HHuginn::value_t&& value_ ) {
+		_value = yaal::move( value_ );
+	}
+private:
+	HParameter( HParameter const& ) = delete;
+	HParameter& operator = ( HParameter const& ) = delete;
+};
+
 class HThread;
 
 typedef yaal::hcore::HArray<HHuginn::TYPE> types_t;
@@ -82,6 +126,7 @@ HHuginn::value_t verify_arg_callable( char const*, HHuginn::values_t&, int, ARIT
 HHuginn::type_id_t verify_arg_materialized_collection( char const*, HHuginn::values_t&, int, ARITY, huginn::HThread*, int );
 HHuginn::value_t verify_arg_virtual_collection( char const*, HHuginn::values_t&, int, ARITY, huginn::HThread*, int );
 HHuginn::type_id_t verify_arg_collection_value_type( char const*, HHuginn::values_t&, int, ARITY, types_t const&, UNIFORMITY, huginn::HThread*, int );
+void verify_named_parameters( char const*, HHuginn::values_t&, HParameter*, huginn::HThread*, int );
 
 bool is_numeric( huginn::HClass const* );
 bool is_collection( huginn::HClass const* );

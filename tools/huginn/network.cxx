@@ -15,6 +15,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "objectfactory.hxx"
 #include "enumeration.hxx"
 #include "time.hxx"
+#include "json.hxx"
+#include "tools/hstringstream.hxx"
 #include "tools/http.hxx"
 
 using namespace yaal;
@@ -123,6 +125,11 @@ public:
 		return ( static_cast<HNetwork*>( object_->raw() )->do_get( thread_, values_, position_ ) );
 		M_EPILOG
 	}
+	static HHuginn::value_t post( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		return ( static_cast<HNetwork*>( object_->raw() )->do_post( thread_, values_, position_ ) );
+		M_EPILOG
+	}
 private:
 	HHuginn::value_t do_connect( huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
@@ -200,6 +207,59 @@ private:
 		return ( v );
 		M_EPILOG
 	}
+	HHuginn::value_t do_post( huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		HParameter namedParameters[] = {
+			{ "login", HHuginn::TYPE::STRING },
+			{ "password", HHuginn::TYPE::STRING },
+			{}
+		};
+		char const name[] = "Network.post";
+		verify_named_parameters( name, values_, namedParameters, thread_, position_ );
+		verify_arg_count( name, values_, 2, meta::max_signed<int>::value, thread_, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, ARITY::MULTIPLE, thread_, position_ );
+		HHuginn::value_t v( thread_->runtime().none_value() );
+		try {
+			HObjectFactory& of( thread_->object_factory() );
+			http::HRequest request( http::HTTP::POST, get_string( values_[0] ) );
+			int argCount( static_cast<int>( values_.get_size() ) );
+			http::HRequest::payloads_t payloads;
+			typedef yaal::hcore::HArray<yaal::hcore::HStreamInterface::ptr_t> json_streams_t;
+			json_streams_t jsonStreams;
+			for ( int i( 1 ); i < argCount; ++ i ) {
+				if ( values_[i]->get_class() == of.stream_class() ) {
+					request.payload( static_cast<HStream*>( values_[i].raw() )->raw().raw() );
+				} else {
+					jsonStreams.push_back( make_pointer<HStringStream>() );
+					json_serialize( thread_, values_[i], *jsonStreams.back(), false, position_ );
+					request.payload( http::HRequest::HPayload( jsonStreams.back().raw(), "application/json" ) );
+				}
+			}
+			if ( !! namedParameters[0].value() ) {
+				request.login( get_string( namedParameters[0].value() ) );
+			}
+			if ( !! namedParameters[1].value() ) {
+				request.password( get_string( namedParameters[1].value() ) );
+			}
+			http::HResponse response( http::call( request ) );
+			HObject::fields_t fields;
+			fields.push_back( of.create<HStream>( of.stream_class(), response.sock() ) );
+			fields.push_back( of.create_string( response.mime_type() ) );
+			fields.push_back( of.create<HTime>( of.time_class(), response.last_modified() ) );
+			fields.push_back( of.create_string( response.filename() ) );
+			v = of.create_object( _httpResponseClass.raw(), fields );
+		} catch ( HResolverException const& e ) {
+			thread_->raise( exception_class(), e.what(), position_ );
+		} catch ( HSocketException const& e ) {
+			thread_->raise( exception_class(), e.what(), position_ );
+		} catch ( HOpenSSLException const& e ) {
+			thread_->raise( exception_class(), e.what(), position_ );
+		} catch ( http::HHTTPException const& e ) {
+			thread_->raise( exception_class(), e.what(), position_ );
+		}
+		return ( v );
+		M_EPILOG
+	}
 };
 
 namespace package_factory {
@@ -220,7 +280,8 @@ HPackageCreatorInterface::HInstance HNetworkCreator::do_new_instance( HRuntime* 
 	);
 	HHuginn::field_definitions_t fd{
 		{ "connect", runtime_->create_method( &HNetwork::connect ), "( *connectionType*, *target*[, *port*] ) - create a TCP connection of type *connectionType* to given *target*, optionally at given *port*" },
-		{ "get", runtime_->create_method( &HNetwork::get ), "( *url* ) - fetch a resource from a remote HTTP server" },
+		{ "get",     runtime_->create_method( &HNetwork::get ),     "( *url* ) - fetch a resource from a remote HTTP server" },
+		{ "post",    runtime_->create_method( &HNetwork::post ),    "( *url*, *payload1*, [*payload2*, ..., *login*:*{login}*, *password*:*{pass}*] ) - push *payloads* to a remote HTTP server" },
 		{ "resolve", runtime_->create_method( &HNetwork::resolve ), "( *hostName* ) - resolve IP address of given *hostName*" }
 	};
 	c->redefine( nullptr, fd );

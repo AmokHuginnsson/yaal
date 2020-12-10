@@ -11,6 +11,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "stream.hxx"
 #include "helper.hxx"
 #include "exception.hxx"
+#include "json.hxx"
 #include "packagefactory.hxx"
 #include "objectfactory.hxx"
 #include "tools/hjson.hxx"
@@ -25,120 +26,132 @@ namespace tools {
 
 namespace huginn {
 
+namespace {
+
+static tools::HJSON::HValue huginn_to_cxx( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
+	M_PROLOG
+	tools::HJSON::HValue v;
+	switch ( type_tag( v_->type_id() ) ) {
+		case ( HHuginn::TYPE::STRING ): {
+			v = get_string( v_ );
+		} break;
+		case ( HHuginn::TYPE::INTEGER ): {
+			v = get_integer( v_ );
+		} break;
+		case ( HHuginn::TYPE::REAL ): {
+			v = get_real( v_ );
+		} break;
+		case ( HHuginn::TYPE::NUMBER ): {
+			v = get_number( v_ );
+		} break;
+		case ( HHuginn::TYPE::CHARACTER ): {
+			v = hcore::to_string( get_character( v_ ) );
+		} break;
+		case ( HHuginn::TYPE::BOOLEAN ): {
+			bool booleanValue( get_boolean( v_ ) );
+			v = booleanValue ? tools::HJSON::HValue::LITERAL::TRUE : tools::HJSON::HValue::LITERAL::FALSE;
+		} break;
+		case ( HHuginn::TYPE::NONE ): {
+			v = tools::HJSON::HValue::LITERAL::NULL;
+		} break;
+		case ( HHuginn::TYPE::TUPLE ): {
+			HTuple::values_t const& data( static_cast<HTuple const*>( v_.raw() )->value() );
+			for ( HHuginn::value_t const& e : data ) {
+				v.push_back( huginn_to_cxx( thread_, e, position_ ) );
+			}
+		} break;
+		case ( HHuginn::TYPE::LIST ): {
+			HList::values_t const& data( static_cast<HList const*>( v_.raw() )->value() );
+			for ( HHuginn::value_t const& e : data ) {
+				v.push_back( huginn_to_cxx( thread_, e, position_ ) );
+			}
+		} break;
+		case ( HHuginn::TYPE::LOOKUP ): {
+			HLookup::values_t const& data( static_cast<HLookup const*>( v_.raw() )->value() );
+			tools::HJSON::HValue::members_t& m( v.get_members() );
+			for ( HLookup::values_t::value_type const& e : data ) {
+				if ( e.first->type_id() != HHuginn::TYPE::STRING ) {
+					throw HHuginn::HHuginnRuntimeException(
+						"Keys in JSON objects must be `string`s, not "_ys.append( a_type_name( e.first->get_class() ) ).append( "." ),
+						thread_->runtime().file_id(),
+						position_
+					);
+				}
+				m.insert( make_pair( get_string( e.first ), huginn_to_cxx( thread_, e.second, position_ ) ) );
+			}
+		} break;
+		case ( HHuginn::TYPE::DEQUE ): {
+			HDeque::values_t const& data( static_cast<HDeque const*>( v_.raw() )->value() );
+			for ( HHuginn::value_t const& e : data ) {
+				v.push_back( huginn_to_cxx( thread_, e, position_ ) );
+			}
+		} break;
+		case ( HHuginn::TYPE::DICT ): {
+			HDict const& dict( *static_cast<HDict const*>( v_.raw() ) );
+			HDict::values_t const& data( dict.value() );
+			tools::HJSON::HValue::members_t& m( v.get_members() );
+			if ( ! data.is_empty() && ( dict.key_type()->type_id() != HHuginn::TYPE::STRING ) ) {
+				throw HHuginn::HHuginnRuntimeException(
+					"Keys in JSON objects must be `string`s, not "_ys.append( a_type_name( dict.key_type() ) ).append( "." ),
+					thread_->runtime().file_id(),
+					position_
+				);
+			}
+			for ( HLookup::values_t::value_type const& e : data ) {
+				m.insert( make_pair( get_string( e.first ), huginn_to_cxx( thread_, e.second, position_ ) ) );
+			}
+		} break;
+		case ( HHuginn::TYPE::ORDER ): {
+			HOrder::values_t const& data( static_cast<HOrder const*>( v_.raw() )->value() );
+			for ( HHuginn::value_t const& e : data ) {
+				v.push_back( huginn_to_cxx( thread_, e, position_ ) );
+			}
+		} break;
+		case ( HHuginn::TYPE::SET ): {
+			HSet::values_t const& data( static_cast<HSet const*>( v_.raw() )->value() );
+			for ( HHuginn::value_t const& e : data ) {
+				v.push_back( huginn_to_cxx( thread_, e, position_ ) );
+			}
+		} break;
+		default: {
+			throw HHuginn::HHuginnRuntimeException(
+				"Value of type "_ys.append( a_type_name( v_->get_class() ) ).append( " is not JSON serializable." ),
+				thread_->runtime().file_id(),
+				position_
+			);
+		}
+	}
+	return ( v );
+	M_EPILOG
+}
+
+}
+
+void json_serialize( huginn::HThread* thread_, yaal::tools::HHuginn::value_t const& value_, yaal::hcore::HStreamInterface& stream_, bool indent_, int position_ ) {
+	M_PROLOG
+	tools::HJSON json;
+	json.element() = huginn_to_cxx( thread_, value_, position_ );
+	json.save( stream_, indent_ );
+	return;
+	M_EPILOG
+}
+
 class HJSON : public HPackage {
 public:
 	HJSON( HClass* class_ )
 		: HPackage( class_ ) {
 		return;
 	}
-	static tools::HJSON::HValue huginn_to_cxx( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
-		M_PROLOG
-		tools::HJSON::HValue v;
-		switch ( type_tag( v_->type_id() ) ) {
-			case ( HHuginn::TYPE::STRING ): {
-				v = get_string( v_ );
-			} break;
-			case ( HHuginn::TYPE::INTEGER ): {
-				v = get_integer( v_ );
-			} break;
-			case ( HHuginn::TYPE::REAL ): {
-				v = get_real( v_ );
-			} break;
-			case ( HHuginn::TYPE::NUMBER ): {
-				v = get_number( v_ );
-			} break;
-			case ( HHuginn::TYPE::CHARACTER ): {
-				v = hcore::to_string( get_character( v_ ) );
-			} break;
-			case ( HHuginn::TYPE::BOOLEAN ): {
-				bool booleanValue( get_boolean( v_ ) );
-				v = booleanValue ? tools::HJSON::HValue::LITERAL::TRUE : tools::HJSON::HValue::LITERAL::FALSE;
-			} break;
-			case ( HHuginn::TYPE::NONE ): {
-				v = tools::HJSON::HValue::LITERAL::NULL;
-			} break;
-			case ( HHuginn::TYPE::TUPLE ): {
-				HTuple::values_t const& data( static_cast<HTuple const*>( v_.raw() )->value() );
-				for ( HHuginn::value_t const& e : data ) {
-					v.push_back( huginn_to_cxx( thread_, e, position_ ) );
-				}
-			} break;
-			case ( HHuginn::TYPE::LIST ): {
-				HList::values_t const& data( static_cast<HList const*>( v_.raw() )->value() );
-				for ( HHuginn::value_t const& e : data ) {
-					v.push_back( huginn_to_cxx( thread_, e, position_ ) );
-				}
-			} break;
-			case ( HHuginn::TYPE::LOOKUP ): {
-				HLookup::values_t const& data( static_cast<HLookup const*>( v_.raw() )->value() );
-				tools::HJSON::HValue::members_t& m( v.get_members() );
-				for ( HLookup::values_t::value_type const& e : data ) {
-					if ( e.first->type_id() != HHuginn::TYPE::STRING ) {
-						throw HHuginn::HHuginnRuntimeException(
-							"Keys in JSON objects must be `string`s, not "_ys.append( a_type_name( e.first->get_class() ) ).append( "." ),
-							thread_->runtime().file_id(),
-							position_
-						);
-					}
-					m.insert( make_pair( get_string( e.first ), huginn_to_cxx( thread_, e.second, position_ ) ) );
-				}
-			} break;
-			case ( HHuginn::TYPE::DEQUE ): {
-				HDeque::values_t const& data( static_cast<HDeque const*>( v_.raw() )->value() );
-				for ( HHuginn::value_t const& e : data ) {
-					v.push_back( huginn_to_cxx( thread_, e, position_ ) );
-				}
-			} break;
-			case ( HHuginn::TYPE::DICT ): {
-				HDict const& dict( *static_cast<HDict const*>( v_.raw() ) );
-				HDict::values_t const& data( dict.value() );
-				tools::HJSON::HValue::members_t& m( v.get_members() );
-				if ( ! data.is_empty() && ( dict.key_type()->type_id() != HHuginn::TYPE::STRING ) ) {
-					throw HHuginn::HHuginnRuntimeException(
-						"Keys in JSON objects must be `string`s, not "_ys.append( a_type_name( dict.key_type() ) ).append( "." ),
-						thread_->runtime().file_id(),
-						position_
-					);
-				}
-				for ( HLookup::values_t::value_type const& e : data ) {
-					m.insert( make_pair( get_string( e.first ), huginn_to_cxx( thread_, e.second, position_ ) ) );
-				}
-			} break;
-			case ( HHuginn::TYPE::ORDER ): {
-				HOrder::values_t const& data( static_cast<HOrder const*>( v_.raw() )->value() );
-				for ( HHuginn::value_t const& e : data ) {
-					v.push_back( huginn_to_cxx( thread_, e, position_ ) );
-				}
-			} break;
-			case ( HHuginn::TYPE::SET ): {
-				HSet::values_t const& data( static_cast<HSet const*>( v_.raw() )->value() );
-				for ( HHuginn::value_t const& e : data ) {
-					v.push_back( huginn_to_cxx( thread_, e, position_ ) );
-				}
-			} break;
-			default: {
-				throw HHuginn::HHuginnRuntimeException(
-					"Value of type "_ys.append( a_type_name( v_->get_class() ) ).append( " is not JSON serializable." ),
-					thread_->runtime().file_id(),
-					position_
-				);
-			}
-		}
-		return ( v );
-		M_EPILOG
-	}
 	static HHuginn::value_t save( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		HObjectFactory& of( thread_->object_factory() );
 		verify_signature_by_class( "JSON.save", values_, 1, { nullptr, of.stream_class(), of.boolean_class() }, thread_, position_ );
-		tools::HJSON json;
-		json.element() = huginn_to_cxx( thread_, values_[0], position_ );
 		HStream& s( *static_cast<HStream*>( values_[1].raw() ) );
 		bool indent( true );
 		if ( values_.get_size() > 2 ) {
 			indent = get_boolean( values_[2] );
 		}
-		json.save( *s.raw(), indent );
+		json_serialize( thread_, values_[0], *s.raw(), indent, position_ );
 		return ( *object_ );
 		M_EPILOG
 	}

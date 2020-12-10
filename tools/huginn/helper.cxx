@@ -661,6 +661,63 @@ HHuginn::type_id_t verify_arg_collection_value_type(
 	return ( type );
 }
 
+void verify_named_parameters( char const* name_, HHuginn::values_t& values_, HParameter* parameters_, huginn::HThread* thread_, int position_ ) {
+	if ( values_.is_empty() || ( values_.back()->type_id() != HHuginn::TYPE::NAMED_PARAMETERS ) ) {
+		return;
+	}
+	HHuginn::value_t namedParametersWrapper( yaal::move( values_.back() ) );
+	values_.pop_back();
+	HHuginn::value_t& namedParametersHolder( static_cast<HTaggedValue*>( namedParametersWrapper.raw() )->value() );
+	HLookup::values_t& namedParameters( static_cast<HLookup*>( namedParametersHolder.raw() )->value() );
+	for ( HLookup::values_t::value_type& npp : namedParameters ) {
+		if ( npp.first->type_id() != HHuginn::TYPE::STRING ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"In call to `"_ys
+					.append( name_ )
+					.append( "()`, a non-string name in named parameter." ),
+				thread_->file_id(),
+				position_
+			);
+		}
+		hcore::HString const& name( get_string( npp.first ) );
+		HParameter* parameter( parameters_ );
+		while ( parameter->name() ) {
+			if ( name == parameter->name() ) {
+				break;
+			}
+			++ parameter;
+		}
+		if ( ! parameter->name() ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"In call to `"_ys
+					.append( name_ )
+					.append( "()`, an unknown named parameter `" )
+					.append( name )
+					.append( "` was encountered." ),
+				thread_->file_id(),
+				position_
+			);
+		}
+		if ( ( npp.second->get_class() != parameter->cls() ) && ( npp.second->type_id() != parameter->type() ) ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"In call to `"_ys
+					.append( name_ )
+					.append( "()`, a named parameter `" )
+					.append( name )
+					.append( "` argument has an invalid type, got " )
+					.append( a_type_name( npp.second->get_class() ) )
+					.append( ", but expected " )
+					.append( parameter->cls() ? a_type_name( parameter->cls() ) : a_type_name( parameter->type() ) )
+					.append( "." ),
+				thread_->file_id(),
+				position_
+			);
+		}
+		parameter->set_value( yaal::move( npp.second ) );
+	}
+	return;
+}
+
 void dispatch_callback_exception( yaal::hcore::HUTF8String const& name_, huginn::HThread* thread_, int position_ ) {
 	hcore::HString message;
 	message.assign( "Callback `" ).append( name_ ).append( "` throws an " );
