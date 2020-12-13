@@ -143,15 +143,7 @@ HHuginn::value_t HFunction::execute_impl(
 		for ( huginn::HLookup::values_t::iterator it( namedParametersData.begin() ); it != namedParametersData.end(); ) {
 			huginn::HLookup::values_t::iterator del( it );
 			++ it;
-			if ( del->first->type_id() != HHuginn::TYPE::STRING ) {
-				throw HHuginn::HHuginnRuntimeException(
-					"In call to `"_ys
-						.append( thread_->runtime().identifier_name( _name ) )
-						.append( "()`, a non-string name in named parameter." ),
-					f->parent() ? f->parent()->file_id() : f->file_id(),
-					position_
-				);
-			}
+			M_ASSERT( del->first->type_id() == HHuginn::TYPE::STRING );
 			hcore::HString const& keywordName( get_string( del->first ) );
 			HHuginn::identifier_id_t keywordIdentifier( r.identifier_id( keywordName ) );
 			parameter_names_t::const_iterator positionalPosition( find( _parameterNames.begin(), _parameterNames.end(), keywordIdentifier ) );

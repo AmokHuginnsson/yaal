@@ -176,16 +176,22 @@ private:
 	}
 	HHuginn::value_t do_get( huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
-		verify_signature( "Network.get", values_, 2, { HHuginn::TYPE::STRING, HHuginn::TYPE::STRING, HHuginn::TYPE::STRING }, thread_, position_ );
+		HParameter namedParameters[] = {
+			{ "login", HHuginn::TYPE::STRING },
+			{ "password", HHuginn::TYPE::STRING },
+			{}
+		};
+		char const name[] = "Network.get";
+		verify_named_parameters( name, values_, namedParameters, thread_, position_ );
+		verify_signature( name, values_, { HHuginn::TYPE::STRING }, thread_, position_ );
 		HHuginn::value_t v( thread_->runtime().none_value() );
 		try {
 			http::HRequest request( http::HTTP::GET, get_string( values_[0] ) );
-			int argCount( static_cast<int>( values_.get_size() ) );
-			if ( argCount > 1 ) {
-				request.login( get_string( values_[1] ) );
+			if ( !! namedParameters[0].value() ) {
+				request.login( get_string( namedParameters[0].value() ) );
 			}
-			if ( argCount > 2 ) {
-				request.password( get_string( values_[2] ) );
+			if ( !! namedParameters[1].value() ) {
+				request.password( get_string( namedParameters[1].value() ) );
 			}
 			http::HResponse response( http::call( request ) );
 			HObjectFactory& of( thread_->object_factory() );
@@ -280,7 +286,7 @@ HPackageCreatorInterface::HInstance HNetworkCreator::do_new_instance( HRuntime* 
 	);
 	HHuginn::field_definitions_t fd{
 		{ "connect", runtime_->create_method( &HNetwork::connect ), "( *connectionType*, *target*[, *port*] ) - create a TCP connection of type *connectionType* to given *target*, optionally at given *port*" },
-		{ "get",     runtime_->create_method( &HNetwork::get ),     "( *url* ) - fetch a resource from a remote HTTP server" },
+		{ "get",     runtime_->create_method( &HNetwork::get ),     "( *url*[, *login*:*{login}*, *password*:*{pass}*] ) - fetch a resource from a remote HTTP server" },
 		{ "post",    runtime_->create_method( &HNetwork::post ),    "( *url*, *payload1*, [*payload2*, ..., *login*:*{login}*, *password*:*{pass}*] ) - push *payloads* to a remote HTTP server" },
 		{ "resolve", runtime_->create_method( &HNetwork::resolve ), "( *hostName* ) - resolve IP address of given *hostName*" }
 	};
