@@ -496,6 +496,9 @@ void init_locale( char const* package_ ) {
 		textdomain( package_ );
 	}
 	setlocale( LC_ALL, "" );
+#ifdef __HOST_OS_TYPE_WINDOWS__
+	msvcxx::fixup_locale();
+#endif
 	return;
 	M_EPILOG
 }

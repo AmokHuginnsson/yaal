@@ -124,5 +124,9 @@ DWORD win_read_console_key( void );
 
 #define ms_fork msvcxx::HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( image_, argv_, pgid_, pipeIn._res, pipeOut._res, pipeErr._res, message._res, joinedErr )
 
+namespace msvcxx {
+void fixup_locale( void );
+}
+
 #endif /* not YAAL_MSVCXX_UNISTD_H_INCLUDED */
 

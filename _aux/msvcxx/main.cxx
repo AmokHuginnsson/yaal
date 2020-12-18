@@ -306,6 +306,10 @@ typedef struct _REPARSE_DATA_BUFFER {
 			WCHAR  PathBuffer[1];
 		} SymbolicLinkReparseBuffer;
 		struct {
+			ULONG  Flags;
+			char  PathBuffer[1];
+		} LxSymbolicLinkReparseBuffer;
+		struct {
 			USHORT SubstituteNameOffset;
 			USHORT SubstituteNameLength;
 			USHORT PrintNameOffset;
@@ -387,12 +391,20 @@ int readlink( char const* path_, char* buffer_, size_t size_ ) {
 			return ( len );
 		}
 		REPARSE_DATA_BUFFER* reparseDataBuffer( static_cast<REPARSE_DATA_BUFFER*>( buf ) );
+		static int long unsigned const IO_REPARSE_TAG_LX_SYMLINK( 0xa000001d );
 		if ( reparseDataBuffer->ReparseTag == IO_REPARSE_TAG_SYMLINK ) {
 			wchar_t* p( reparseDataBuffer->SymbolicLinkReparseBuffer.PathBuffer );
 			int utf16len( reparseDataBuffer->SymbolicLinkReparseBuffer.PrintNameLength / 2 );
 			len = WideCharToMultiByte( CP_UTF8, 0, p, utf16len, NULL, 0, NULL, NULL );
 			if ( len < static_cast<int>( size_ ) ) {
 				WideCharToMultiByte( CP_UTF8, 0, p, utf16len, buffer_, len, 0, 0 );
+			}
+		} else if ( reparseDataBuffer->ReparseTag == IO_REPARSE_TAG_LX_SYMLINK ) {
+			char* p( reparseDataBuffer->LxSymbolicLinkReparseBuffer.PathBuffer );
+			len = reparseDataBuffer->ReparseDataLength - 4;
+			if ( len < static_cast<int>( size_ ) ) {
+				strncpy( buffer_, p, static_cast<size_t>( len ) );
+				buffer_[len] = 0;
 			}
 		}
 		memory::free( buf );
@@ -812,3 +824,27 @@ extern "C" double log( double );
 double hide_log_from_global_namespace( double v_ ) {
 	return ( ::log( v_ ) );
 }
+
+namespace msvcxx {
+
+void fixup_locale( void ) {
+	char const* VAR_LC_CTYPE = ::getenv( "LC_CTYPE" );
+	if ( VAR_LC_CTYPE ) {
+		setlocale( LC_CTYPE, VAR_LC_CTYPE );
+	}
+	char const* VAR_LC_COLLATE = ::getenv( "LC_COLLATE" );
+	if ( VAR_LC_COLLATE ) {
+		setlocale( LC_COLLATE, VAR_LC_COLLATE );
+	}
+	char const* VAR_LC_NUMERIC = ::getenv( "LC_NUMERIC" );
+	if ( VAR_LC_NUMERIC ) {
+		setlocale( LC_NUMERIC, VAR_LC_NUMERIC );
+	}
+	char const* VAR_LC_TIME = ::getenv( "LC_TIME" );
+	if ( VAR_LC_TIME ) {
+		setlocale( LC_TIME, VAR_LC_TIME );
+	}
+}
+
+}
+
