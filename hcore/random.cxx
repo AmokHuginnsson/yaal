@@ -271,10 +271,16 @@ yaal::i64_t HDiscrete::do_next_discrete( void ) {
 	return ( operator()() );
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wsuggest-attribute=noreturn"
 double long HDiscrete::do_next_continuous( void ) {
 	M_ASSERT( !"Invalid use of discrete distribution."[0] );
 	return ( 0.0L );
 }
+#pragma GCC diagnostic pop
 
 inline double long to_standard_uniform( yaal::u64_t x_ ) {
 	double long numerator( static_cast<double long>( x_ ) );
@@ -297,10 +303,16 @@ double long HUniform::operator()( void ) {
 	return ( x );
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wsuggest-attribute=noreturn"
 yaal::i64_t HUniform::do_next_discrete( void ) {
 	M_ASSERT( !"Invalid use of continuous distribution."[0] );
 	return ( 0LL );
 }
+#pragma GCC diagnostic pop
 
 double long HUniform::do_next_continuous( void ) {
 	return ( operator()() );
@@ -331,10 +343,16 @@ double long HTriangle::operator()( void ) {
 	return ( x );
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wsuggest-attribute=noreturn"
 yaal::i64_t HTriangle::do_next_discrete( void ) {
 	M_ASSERT( !"Invalid use of continuous distribution."[0] );
 	return ( 0LL );
 }
+#pragma GCC diagnostic pop
 
 double long HTriangle::do_next_continuous( void ) {
 	return ( operator()() );
@@ -381,10 +399,16 @@ double long HNormal::uniform_sample( void ) {
 	return ( min( max( -1.0L, ( 2 * x ) - 1.0L ), 1.0L ) );
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wsuggest-attribute=noreturn"
 yaal::i64_t HNormal::do_next_discrete( void ) {
 	M_ASSERT( !"Invalid use of continuous distribution."[0] );
 	return ( 0LL );
 }
+#pragma GCC diagnostic pop
 
 double long HNormal::do_next_continuous( void ) {
 	return ( operator()() );
@@ -507,10 +531,16 @@ yaal::i64_t HPoisson::do_next_discrete( void ) {
 	return ( operator()() );
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wsuggest-attribute=noreturn"
 double long HPoisson::do_next_continuous( void ) {
 	M_ASSERT( !"Invalid use of discrete distribution."[0] );
 	return ( 0.L );
 }
+#pragma GCC diagnostic pop
 
 }
 
