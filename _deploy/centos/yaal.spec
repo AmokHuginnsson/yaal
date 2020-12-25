@@ -4,7 +4,7 @@ Release: %{?BUILD_ID}%{!?BUILD_ID:1}%{?dist}
 Summary: Yet Another Abstraction Layer - general purpose C++ library.
 
 Group:   System Environment/Libraries
-License: Commercial (CC BY-ND-NC 4.0, AFPL)
+License: Commercial (CC-BY-NC-ND-4.0, AFPL)
 URL:     https://codestation.org/
 Source:  https://codestation.org/repo/yaal.git
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
