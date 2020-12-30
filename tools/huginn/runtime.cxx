@@ -1241,7 +1241,21 @@ HIntrospecteeInterface::variable_views_t HRuntime::do_get_locals( int frameNo_ )
 
 void HRuntime::set_setup( HHuginn::paths_t const& paths_, HHuginn::compiler_setup_t setup_ ) {
 	M_PROLOG
-	_modulePaths = paths_;
+	_modulePaths.clear();
+	hcore::HString homePath( system::home_path() );
+	homePath.append( "/" );
+	for ( HHuginn::paths_t::value_type path : paths_ ) {
+		if ( find( _modulePaths.begin(), _modulePaths.end(), path ) != _modulePaths.end() ) {
+			continue;
+		}
+		if ( path.starts_with( "~/" ) ) {
+			path.replace( 0, 1, "${HOME}" );
+		}
+		if ( path.starts_with( homePath ) ) {
+			path.replace( 0, homePath.get_length(), "${HOME}/" );
+		}
+		_modulePaths.push_back( path );
+	}
 	_compilerSetup = setup_;
 	return;
 	M_EPILOG
