@@ -95,7 +95,12 @@ HHuginn::value_t HPackageFactory::create_package( HRuntime* runtime_, yaal::hcor
 	HScopeExitCall::call_t bc( call( &remove_visited, &_visitedImports, &ir.first ) );
 	HScopeExitCall sec( yaal::move( bc ) );
 	HHuginn::paths_t paths( runtime_->module_paths() );
-	paths.insert( paths.end(), HHuginn::MODULE_PATHS.begin(), HHuginn::MODULE_PATHS.end() );
+	for ( HHuginn::paths_t::value_type const& path : HHuginn::MODULE_PATHS ) {
+		if ( find( paths.begin(), paths.end(), path ) != paths.end() ) {
+			continue;
+		}
+		paths.push_back( path );
+	}
 	if ( ! package ) {
 		package = load_binary( runtime_, paths, name_, position_ );
 	}
