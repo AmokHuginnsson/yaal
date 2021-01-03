@@ -54,4 +54,6 @@ if [ ${PHYS_MEM} -gt ${MAX_64BIT_PHYS_MEM} ] ; then
 	ulimit -d ${PHYS_MEM}
 fi
 
+true
+
 # vim: ft=sh
