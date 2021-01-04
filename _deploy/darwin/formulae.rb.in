@@ -2,7 +2,7 @@ class Yaal < Formula
 	desc "`yaal` is a cross platform, general purpose C++ library."
 	homepage "https://codestation.org/"
 	license "CC-BY-NC-ND-4.0"
-	url ".", :using => :git
+	url "@repo@", :using => :git
 	version "@version@@revision@"
 
 	depends_on "pcre"
@@ -12,14 +12,14 @@ class Yaal < Formula
 	depends_on "gettext"
 	depends_on "sqlite"
 	depends_on "ncurses"
-	depends_on "pkg-config" => :build
-	depends_on "autoconf" => :build
-	depends_on "automake" => :build
-	depends_on "libtool" => :build
+	depends_on "pkg-config"  => :build
+	depends_on "autoconf"    => :build
+	depends_on "automake"    => :build
+	depends_on "libtool"     => :build
 	depends_on "asciidoctor" => :build
-	depends_on "doxygen" => :build
-	depends_on "make" => :build
-	depends_on "ccache" => :build
+	depends_on "doxygen"     => :build
+	depends_on "make"        => :build
+	depends_on "ccache"      => :build
 
 	def install
 		ENV.deparallelize
