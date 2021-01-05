@@ -23,7 +23,7 @@ class Yaal < Formula
 
 	def install
 		ENV.deparallelize
-		system "make", "PREFIX=#{prefix}", "CONFIGURE=--enable-auto-sanity", "SYSCONFDIR=#{etc}", "LOCALSTATEDIR=#{var}", "debug", "release"
+		system "make", "PREFIX=#{prefix}", "CONFIGURE=--enable-auto-sanity", "LOCALSTATEDIR=#{var}", "debug", "release"
 		system "make", "doc"
 		system "make", "install-debug", "install-release"
 	end
