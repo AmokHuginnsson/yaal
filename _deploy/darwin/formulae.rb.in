@@ -27,4 +27,10 @@ class Yaal < Formula
 		system "make", "doc"
 		system "make", "install-debug", "install-release"
 	end
+
+	def post_install
+		unless File.exist? "#{var}/lib/yaal/keys/key"
+			system "#{share}/yaal/_aux/gen-keys" "#{var}/lib/yaal/keys"
+		end
+	end
 end
