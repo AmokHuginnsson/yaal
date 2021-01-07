@@ -21,6 +21,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "slice.hxx"
 #include "chain.hxx"
 #include "product.hxx"
+#include "permutation.hxx"
 #include "tuple.hxx"
 #include "list.hxx"
 #include "deque.hxx"
@@ -52,6 +53,7 @@ class HAlgorithms : public huginn::HPackage {
 	HHuginn::class_t _sliceClass;
 	HHuginn::class_t _chainClass;
 	HHuginn::class_t _productClass;
+	HHuginn::class_t _permutationClass;
 public:
 	HAlgorithms( huginn::HClass* class_ )
 		: HPackage( class_ )
@@ -63,7 +65,8 @@ public:
 		, _zipClass( add_class_as_type_reference( class_, HZip::get_class( class_->runtime(), class_ ) ) )
 		, _sliceClass( add_class_as_type_reference( class_, HSlice::get_class( class_->runtime(), class_ ) ) )
 		, _chainClass( add_class_as_type_reference( class_, HChain::get_class( class_->runtime(), class_ ) ) )
-		, _productClass( add_class_as_type_reference( class_, HProduct::get_class( class_->runtime(), class_ ) ) ) {
+		, _productClass( add_class_as_type_reference( class_, HProduct::get_class( class_->runtime(), class_ ) ) )
+		, _permutationClass( add_class_as_type_reference( class_, HPermutation::get_class( class_->runtime(), class_ ) ) ) {
 		return;
 	}
 	static HHuginn::value_t iterator( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -86,6 +89,9 @@ public:
 	}
 	static HHuginn::value_t product( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		return ( static_cast<HAlgorithms*>( object_->raw() )->do_product( thread_, values_, position_ ) );
+	}
+	static HHuginn::value_t permutation( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		return ( static_cast<HAlgorithms*>( object_->raw() )->do_permutation( thread_, values_, position_ ) );
 	}
 	static HHuginn::value_t reduce( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		char const name[] = "Algorithms.reduce";
@@ -574,6 +580,31 @@ private:
 		return ( thread_->object_factory().create<HProduct>( _productClass.raw(), yaal::move( axes ) ) );
 		M_EPILOG
 	}
+	HHuginn::value_t do_permutation( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "Algorithms.permutation";
+		verify_arg_count( name, values_, 1, 1, thread_, position_ );
+		verify_arg_type( name, values_, 0, types_t{ HHuginn::TYPE::TUPLE, HHuginn::TYPE::LIST, HHuginn::TYPE::DEQUE }, ARITY::UNARY, thread_, position_ );
+		HHuginn::value_t& v( values_[0] );
+		HHuginn::TYPE t( type_tag( v->type_id() ) );
+		HHuginn::values_t dataSet;
+		switch ( t ) {
+			case ( HHuginn::TYPE::TUPLE ): { dataSet = static_cast<HTuple*>( v.raw() )->value(); } break;
+			case ( HHuginn::TYPE::LIST ):  { dataSet = static_cast<HList*>( v.raw() )->value();  } break;
+			case ( HHuginn::TYPE::DEQUE ): {
+				HDeque::values_t const& values( static_cast<HDeque*>( v.raw() )->value() );
+				dataSet.reserve( values.get_size() );
+				for ( HHuginn::value_t const& e : values ) {
+					dataSet.push_back( e );
+				}
+			} break;
+			default: {
+				M_ASSERT( !"bad code path"[0] );
+			} break;
+		}
+		return ( thread_->object_factory().create<HPermutation>( _permutationClass.raw(), yaal::move( dataSet ), t ) );
+		M_EPILOG
+	}
 	HHuginn::value_t do_iterator( HThread* thread_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Algorithms.iterator";
@@ -688,6 +719,7 @@ HPackageCreatorInterface::HInstance HAlgorithmsCreator::do_new_instance( HRuntim
 		{ "zip",         runtime_->create_method( &HAlgorithms::zip ),         "( *iterable1*, *iterable2*, ... ) - create zipped iterable view of a set of iterables" },
 		{ "chain",       runtime_->create_method( &HAlgorithms::chain ),       "( *iterable1*, *iterable2*, ... ) - create iterable view of a chained set of iterables" },
 		{ "product",     runtime_->create_method( &HAlgorithms::product ),     "( *iterable1*, *iterable2*, ... ) - create iterable view of a Cartesian product of a set of iterables" },
+		{ "permutation", runtime_->create_method( &HAlgorithms::permutation ), "( *coll* ) - list all permutations of a given uniform collection *coll*" },
 		{ "iterator",    runtime_->create_method( &HAlgorithms::iterator ),    "( *iterable* ) - create manual iterator object for given iterable" },
 		{ "reversed",    runtime_->create_method( &HAlgorithms::reversed ),    "( *coll* ) - create reversed iterable view of a *coll* materialized collection" }
 	};
