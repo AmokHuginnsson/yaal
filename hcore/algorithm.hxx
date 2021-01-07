@@ -1336,14 +1336,15 @@ inline void reverse( iterator_t it, iterator_t end ) {
 	return;
 }
 
-/*! \brief Generate next, in lexicographical order, permutation of the range of elements.
+/*! \brief Generate next, in lexicographical order, permutation of the range of elements using explicit comparator.
  *
  * \param it - beginning of range of elements for permutation.
  * \param end - one past last element of range for permutation.
- * \return true iff last, in lexicographical order, permutation has been generated.
+ * \param comp_ - comparison operator used for sorting.
+ * \return false iff last, in lexicographical order, permutation has been generated, true otherwise.
  */
-template<typename iterator_t>
-inline bool next_permutation( iterator_t it, iterator_t end ) {
+template<typename iterator_t, typename compare_t>
+inline bool next_permutation( iterator_t it, iterator_t end, compare_t comp_ ) {
 	int long count = 0;
 	iterator_t itLast;
 	for ( iterator_t itEnd = it; itEnd != end; ++ itEnd, ++ count ) {
@@ -1356,7 +1357,7 @@ inline bool next_permutation( iterator_t it, iterator_t end ) {
 			-- i;
 			-- count;
 			iterator_t ie = itLast;
-			while ( *i >= *ie ) {
+			while ( comp_( *ie, *i ) ) {
 				-- count;
 				if ( ! count ) {
 					break;
@@ -1367,7 +1368,7 @@ inline bool next_permutation( iterator_t it, iterator_t end ) {
 				break;
 			}
 			iterator_t j = itLast;
-			while ( *j <= *i ) {
+			while ( ! comp_( *i, *j ) ) {
 				-- j;
 			}
 			swap( *i, *j );
@@ -1382,14 +1383,26 @@ inline bool next_permutation( iterator_t it, iterator_t end ) {
 	return ( gotNext );
 }
 
-/*! \brief Generate previous, in lexicographical order, permutation of the range of elements.
+/*! \brief Generate next, in lexicographical order, permutation of the range of elements.
  *
  * \param it - beginning of range of elements for permutation.
  * \param end - one past last element of range for permutation.
- * \return true iff first, in lexicographical order, permutation has been generated.
+ * \return false iff last, in lexicographical order, permutation has been generated, true, otherwise.
  */
 template<typename iterator_t>
-inline bool prev_permutation( iterator_t it, iterator_t end ) {
+inline bool next_permutation( iterator_t it, iterator_t end ) {
+	return ( next_permutation( it, end, less<typename hcore::iterator_traits<iterator_t>::value_type>() ) );
+}
+
+/*! \brief Generate previous, in lexicographical order, permutation of the range of elements using explicit comparator.
+ *
+ * \param it - beginning of range of elements for permutation.
+ * \param end - one past last element of range for permutation.
+ * \param comp_ - comparison operator used for sorting.
+ * \return false iff first, in lexicographical order, permutation has been generated, true otherwise.
+ */
+template<typename iterator_t, typename compare_t>
+inline bool prev_permutation( iterator_t it, iterator_t end, compare_t comp_ ) {
 	int long count = 0;
 	iterator_t itLast;
 	for ( iterator_t itEnd = it; itEnd != end; ++ itEnd, ++ count ) {
@@ -1402,7 +1415,7 @@ inline bool prev_permutation( iterator_t it, iterator_t end ) {
 			-- i;
 			-- count;
 			iterator_t ie = itLast;
-			while ( *i <= *ie ) {
+			while ( ! comp_( *ie, *i ) ) {
 				-- count;
 				if ( ! count ) {
 					break;
@@ -1413,7 +1426,7 @@ inline bool prev_permutation( iterator_t it, iterator_t end ) {
 				break;
 			}
 			iterator_t j = itLast;
-			while ( *j >= *i ) {
+			while ( comp_( *i, *j ) ) {
 				-- j;
 			}
 			swap( *i, *j );
@@ -1426,6 +1439,17 @@ inline bool prev_permutation( iterator_t it, iterator_t end ) {
 		}
 	}
 	return ( gotPrev );
+}
+
+/*! \brief Generate previous, in lexicographical order, permutation of the range of elements.
+ *
+ * \param it - beginning of range of elements for permutation.
+ * \param end - one past last element of range for permutation.
+ * \return false iff first, in lexicographical order, permutation has been generated, true otherwise.
+ */
+template<typename iterator_t>
+inline bool prev_permutation( iterator_t it, iterator_t end ) {
+	return ( prev_permutation( it, end, less<typename hcore::iterator_traits<iterator_t>::value_type>() ) );
 }
 
 /*! \brief Calculate sum of elements in range.
