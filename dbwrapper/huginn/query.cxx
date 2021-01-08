@@ -50,7 +50,7 @@ public:
 		)
 		, _exceptionClass( exceptionClass_ )
 		, _queryResultClass(
-			add_class_as_type_reference(
+			add_class_as_member(
 				origin_,
 				huginn::HQueryResult::get_class( runtime_, origin_, exceptionClass_ )
 			)

@@ -211,7 +211,7 @@ public:
 			{ "update",  objectFactory_->create_method( &set::update ),  "( *other* ) - update content of this `set` with values from *other* `set`" }
 		};
 		redefine( nullptr, fd );
-		_reversedSetClass = add_class_as_type_reference( this, HReversedSet::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
+		_reversedSetClass = add_class_as_member( this, HReversedSet::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
 		return;
 	}
 	huginn::HClass const* reversed_set_class( void ) const {

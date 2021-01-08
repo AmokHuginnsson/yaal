@@ -301,8 +301,8 @@ public:
 			{ "values",  objectFactory_->create_method( &lookup::values ),  "get key-value pairs view of this `lookup`" }
 		};
 		redefine( nullptr, fd );
-		_keyValuesLookupViewClass = add_class_as_type_reference( this, HKeyValuesLookupView::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
-		_reversedLookupClass = add_class_as_type_reference( this, HReversedLookup::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
+		_keyValuesLookupViewClass = add_class_as_member( this, HKeyValuesLookupView::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
+		_reversedLookupClass = add_class_as_member( this, HReversedLookup::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
 		return;
 	}
 	HClass const* key_values_lookup_view_class( void ) const {

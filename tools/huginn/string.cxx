@@ -497,7 +497,7 @@ public:
 			{ "clear",                objectFactory_->create_method( &string::clear ),       "erase `string` content" }
 		};
 		redefine( nullptr, fd );
-		_reversedStringClass = add_class_as_type_reference( this, HReversedString::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
+		_reversedStringClass = add_class_as_member( this, HReversedString::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
 		return;
 	}
 	HClass const* reversed_string_class( void ) const {

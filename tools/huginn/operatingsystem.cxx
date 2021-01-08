@@ -60,7 +60,7 @@ public:
 	HOperatingSystem( huginn::HClass* class_ )
 		: HPackage( class_ )
 		, _subprocessClass(
-			add_class_as_type_reference(
+			add_class_as_member(
 				class_,
 				HSubprocess::get_class( class_->runtime(), class_ )
 			)

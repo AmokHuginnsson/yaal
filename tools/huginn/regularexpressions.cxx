@@ -28,7 +28,7 @@ public:
 	HRegularExpressions( huginn::HClass* class_ )
 		: HPackage( class_ )
 		, _compiledRegularExpressionClass(
-			add_class_as_type_reference(
+			add_class_as_member(
 				class_,
 				HCompiledRegularExpression::get_class( class_->runtime(), class_, exception_class() )
 			)

@@ -32,7 +32,7 @@ public:
 	HDatabase( HClass* class_ )
 		: HValue( class_ )
 		, _databaseConnectionClass(
-			add_class_as_type_reference(
+			add_class_as_member(
 				class_,
 				HDatabaseConnection::get_class( class_->runtime(), class_, _exceptionClass )
 			)

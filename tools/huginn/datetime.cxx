@@ -30,7 +30,7 @@ public:
 	HDateTime( HClass* class_ )
 		: HPackage( class_ )
 		, _clockClass(
-			add_class_as_type_reference(
+			add_class_as_member(
 				class_,
 				HClock::get_class( class_->runtime(), class_ )
 			)

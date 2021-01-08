@@ -57,16 +57,16 @@ class HAlgorithms : public huginn::HPackage {
 public:
 	HAlgorithms( huginn::HClass* class_ )
 		: HPackage( class_ )
-		, _iteratorClass( add_class_as_type_reference( class_, HIterator::get_class( class_->runtime(), class_ ) ) )
-		, _filterClass( add_class_as_type_reference( class_, HFilter::get_class( class_->runtime(), class_ ) ) )
-		, _mapperClass( add_class_as_type_reference( class_, HMapper::get_class( class_->runtime(), class_ ) ) )
-		, _rangeClass( add_class_as_type_reference( class_, HRange::get_class( class_->runtime(), class_ ) ) )
-		, _enumeratorClass( add_class_as_type_reference( class_, HEnumerator::get_class( class_->runtime(), class_ ) ) )
-		, _zipClass( add_class_as_type_reference( class_, HZip::get_class( class_->runtime(), class_ ) ) )
-		, _sliceClass( add_class_as_type_reference( class_, HSlice::get_class( class_->runtime(), class_ ) ) )
-		, _chainClass( add_class_as_type_reference( class_, HChain::get_class( class_->runtime(), class_ ) ) )
-		, _productClass( add_class_as_type_reference( class_, HProduct::get_class( class_->runtime(), class_ ) ) )
-		, _permutationClass( add_class_as_type_reference( class_, HPermutation::get_class( class_->runtime(), class_ ) ) ) {
+		, _iteratorClass( add_class_as_member( class_, HIterator::get_class( class_->runtime(), class_ ) ) )
+		, _filterClass( add_class_as_member( class_, HFilter::get_class( class_->runtime(), class_ ) ) )
+		, _mapperClass( add_class_as_member( class_, HMapper::get_class( class_->runtime(), class_ ) ) )
+		, _rangeClass( add_class_as_member( class_, HRange::get_class( class_->runtime(), class_ ) ) )
+		, _enumeratorClass( add_class_as_member( class_, HEnumerator::get_class( class_->runtime(), class_ ) ) )
+		, _zipClass( add_class_as_member( class_, HZip::get_class( class_->runtime(), class_ ) ) )
+		, _sliceClass( add_class_as_member( class_, HSlice::get_class( class_->runtime(), class_ ) ) )
+		, _chainClass( add_class_as_member( class_, HChain::get_class( class_->runtime(), class_ ) ) )
+		, _productClass( add_class_as_member( class_, HProduct::get_class( class_->runtime(), class_ ) ) )
+		, _permutationClass( add_class_as_member( class_, HPermutation::get_class( class_->runtime(), class_ ) ) ) {
 		return;
 	}
 	static HHuginn::value_t iterator( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {

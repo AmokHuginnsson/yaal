@@ -154,7 +154,7 @@ public:
 			{ "find", objectFactory_->create_method( &tuple::find ), "( *elem*[, *start*[, *stop*]] ) - get index of first *elem*ent of the `tuple` not before *start* and before *stop*, return -1 if not found" }
 		};
 		redefine( nullptr, fd );
-		_reversedTupleClass = add_class_as_type_reference( this, HReversedTuple::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
+		_reversedTupleClass = add_class_as_member( this, HReversedTuple::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
 		return;
 	}
 	HClass const* reversed_tuple_class( void ) const {

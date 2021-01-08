@@ -211,7 +211,7 @@ public:
 			{ "update",  objectFactory_->create_method( &order::update ),  "( *other* ) - update content of this `order` with values from *other* `order`" }
 		};
 		redefine( nullptr, fd );
-		_reversedOrderClass = add_class_as_type_reference( this, HReversedOrder::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
+		_reversedOrderClass = add_class_as_member( this, HReversedOrder::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
 		return;
 	}
 	HClass const* reversed_order_class( void ) const {

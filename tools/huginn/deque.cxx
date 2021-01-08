@@ -300,7 +300,7 @@ public:
 			{ "find",       objectFactory_->create_method( &deque::find ),       "( *elem*[, *start*[, *stop*]] ) - get index of first *elem*ent of the `deque` not before *start* and before *stop*, return -1 if not found" }
 		};
 		redefine( nullptr, fd );
-		_reversedDequeClass = add_class_as_type_reference( this, HReversedDeque::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
+		_reversedDequeClass = add_class_as_member( this, HReversedDeque::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
 		return;
 	}
 	HClass const* reversed_deque_class( void ) const {

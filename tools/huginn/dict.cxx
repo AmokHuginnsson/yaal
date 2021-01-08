@@ -306,8 +306,8 @@ public:
 			{ "values",  objectFactory_->create_method( &dict::values ),  "get key-value pairs view of this `dict`" }
 		};
 		redefine( nullptr, fd );
-		_keyValuesDictViewClass = add_class_as_type_reference( this, HKeyValuesDictView::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
-		_reversedDictClass = add_class_as_type_reference( this, HReversedDict::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
+		_keyValuesDictViewClass = add_class_as_member( this, HKeyValuesDictView::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
+		_reversedDictClass = add_class_as_member( this, HReversedDict::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
 		return;
 	}
 	HClass const* key_values_dict_view_class( void ) const {

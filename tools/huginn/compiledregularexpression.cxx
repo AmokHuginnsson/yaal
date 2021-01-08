@@ -86,7 +86,7 @@ public:
 		)
 		, _exceptionClass( exceptionClass_ )
 		, _regularExpressionMatchClass(
-			add_class_as_type_reference(
+			add_class_as_member(
 				origin_,
 				HRegularExpressionMatch::get_class( runtime_, origin_ )
 			)

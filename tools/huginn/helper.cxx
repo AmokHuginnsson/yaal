@@ -73,16 +73,9 @@ HHuginn::class_t add_class_as_member(
 	M_EPILOG
 }
 
-HHuginn::class_t add_class_as_type_reference( huginn::HClass* juncture_, HHuginn::class_t const& class_, HClass::MEMBER_TYPE memberType_ ) {
+HHuginn::class_t add_class_as_member( huginn::HClass* juncture_, HHuginn::class_t const& class_, HClass::MEMBER_TYPE memberType_ ) {
 	M_PROLOG
-	return (
-		add_class_as_member(
-			juncture_,
-			class_,
-			hcore::to_string( class_->name() ).append( " implicit private constructor provides type reference." ),
-			memberType_
-		)
-	);
+	return ( add_class_as_member( juncture_, class_, class_->doc(), memberType_ ) );
 	M_EPILOG
 }
 

@@ -293,7 +293,7 @@ public:
 			{ "sort",   objectFactory_->create_method( &list::sort ),   "( [*callable*] ) - in-place sort this `list`, using *callable* to retrieve keys for element comparison" }
 		};
 		redefine( nullptr, fd );
-		_reversedListClass = add_class_as_type_reference( this, HReversedList::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
+		_reversedListClass = add_class_as_member( this, HReversedList::get_class( runtime_, objectFactory_, this ), HClass::MEMBER_TYPE::STATIC );
 		return;
 	}
 	HClass const* reversed_list_class( void ) const {
