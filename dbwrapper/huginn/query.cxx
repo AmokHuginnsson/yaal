@@ -56,7 +56,7 @@ public:
 			)
 		) {
 		HHuginn::field_definitions_t fd{
-			{ "bind",    runtime_->create_method( &HQuery::bind ),    "( *index*, *value* ) - bind given *value* for query variable at given *index*" },
+			{ "bind",    runtime_->create_method( &HQuery::bind ),    "( *index*, *value* ) - bind given *value* for query variable at given 1-based *index*" },
 			{ "execute", runtime_->create_method( &HQuery::execute ), "execute query" }
 		};
 		set_origin( origin_ );

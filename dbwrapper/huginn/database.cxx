@@ -76,6 +76,9 @@ HPackageCreatorInterface::HInstance HDatabaseCreator::do_new_instance( HRuntime*
 #ifdef HAVE_LIBMYSQLCLIENT
 			" MySQL"
 #endif
+#ifdef HAVE_LIBMARIADBCLIENT
+			" MariaDB"
+#endif
 #ifdef HAVE_LIBFBCLIENT
 			" Firebird"
 #endif

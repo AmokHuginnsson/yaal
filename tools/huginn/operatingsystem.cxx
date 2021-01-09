@@ -361,7 +361,7 @@ HPackageCreatorInterface::HInstance HOperatingSystemCreator::do_new_instance( HR
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "memory_size", runtime_->create_method( &HOperatingSystem::memory_size ), "get information about system virtual memory_size size" },
+		{ "memory_size", runtime_->create_method( &HOperatingSystem::memory_size ), "get information about system physical memory size" },
 		{ "core_count",  runtime_->create_method( &HOperatingSystem::core_count ),  "get the number of CPUs in the system" },
 		{ "set_locale",  runtime_->create_method( &HOperatingSystem::set_locale ),  "( *localeFacet*, *id* ) - set *id* as new active locale facet *localeFacet*" },
 		{ "env",       runtime_->create_method( &HOperatingSystem::env ),       "( *name* ) - get value of an environment variable named *name*" },

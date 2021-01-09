@@ -95,7 +95,7 @@ public:
 			{ "match",   runtime_->create_method( &HCompiledRegularExpression::match ),   "( *text* ) - find a match of this compiled regular expression in given *text*" },
 			{ "groups",  runtime_->create_method( &HCompiledRegularExpression::groups ),  "( *text* ) - get all matching regular expression groups from this regular expression in given *text*" },
 			{ "replace", runtime_->create_method( &HCompiledRegularExpression::replace ), "( *text*, *replacement* ) - replace each occurrence of matched groups in *text* with *replacement* pattern" },
-			{ "map",     runtime_->create_method( &HCompiledRegularExpression::map ),     "( *text*, *replacer* ) - replace each occurrence of matched groups in *text* by result of calling *map* with value of matched group as an argument" }
+			{ "map",     runtime_->create_method( &HCompiledRegularExpression::map ),     "( *text*, *replacer* ) - replace each occurrence of matched groups in *text* by result of calling *replacer* with value of matched group as an argument" }
 		};
 		set_origin( origin_ );
 		redefine( nullptr, fd );
