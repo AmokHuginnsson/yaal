@@ -810,8 +810,8 @@ HCharacterClass<char> const& character_class( CHARACTER_CLASS characterClass_ ) 
 #define D_DEC_DIGIT D_OCT_DIGIT "89"
 #undef D_HEX_DIGIT
 #define D_HEX_DIGIT D_DEC_DIGIT "aAbBcCdDeEfF"
-#undef D_PUNCTATION
-#define D_PUNCTATION "`~!@#$%^&*()-=+[{]}\\|;:'\",<.>/?"
+#undef D_PUNCTUATION
+#define D_PUNCTUATION "`~!@#$%^&*()-=+[{]}\\|;:'\",<.>/?"
 	static character_class_t const binDigit        = character_class_t( D_BIN_DIGIT,              static_cast<int>( sizeof ( D_BIN_DIGIT ) - 1 ) );
 	static character_class_t const octDigit        = character_class_t( D_OCT_DIGIT,              static_cast<int>( sizeof ( D_OCT_DIGIT ) - 1 ) );
 	static character_class_t const digit           = character_class_t( D_DEC_DIGIT,              static_cast<int>( sizeof ( D_DEC_DIGIT ) - 1 ) );
@@ -820,9 +820,9 @@ HCharacterClass<char> const& character_class( CHARACTER_CLASS characterClass_ ) 
 	static character_class_t const lowerCaseLetter = character_class_t( D_LOWER_CASE_LETTER,      static_cast<int>( sizeof ( D_LOWER_CASE_LETTER ) - 1 ) );
 	static character_class_t const upperCaseLetter = character_class_t( D_UPPER_CASE_LETTER,      static_cast<int>( sizeof ( D_UPPER_CASE_LETTER ) - 1 ) );
 	static character_class_t const word            = character_class_t( D_LETTER D_DEC_DIGIT "_", static_cast<int>( sizeof ( D_LETTER D_DEC_DIGIT "_" ) - 1 ) );
-	static character_class_t const punctation      = character_class_t( D_PUNCTATION,             static_cast<int>( sizeof ( D_PUNCTATION ) - 1 ) );
+	static character_class_t const punctuation     = character_class_t( D_PUNCTUATION,            static_cast<int>( sizeof ( D_PUNCTUATION ) - 1 ) );
 	static character_class_t const vowel           = character_class_t( D_VOWEL,                  static_cast<int>( sizeof ( D_VOWEL ) - 1 ) );
-#undef D_PUNCTATION
+#undef D_PUNCTUATION
 #undef D_HEX_DIGIT
 #undef D_DEC_DIGIT
 #undef D_OCT_DIGIT
@@ -841,7 +841,7 @@ HCharacterClass<char> const& character_class( CHARACTER_CLASS characterClass_ ) 
 		&lowerCaseLetter,
 		&upperCaseLetter,
 		&word,
-		&punctation,
+		&punctuation,
 		&vowel
 	};
 	return ( *characterClass[static_cast<int>( characterClass_ )] );
