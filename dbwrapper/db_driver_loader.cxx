@@ -102,7 +102,7 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 			hcore::log( LOG_LEVEL::NOTICE ) << "fail." << endl;
 			HStringStream reason;
 			reason << _( "cannot load database driver: " ) << e.what();
-			M_THROW( reason.string(), _dataBaseDriver_ );
+			M_THROW( reason.string(), driverId_ );
 		}
 		if ( driver.first->is_loaded() ) {
 			hcore::log( LOG_LEVEL::NOTICE ) << "success." << endl;

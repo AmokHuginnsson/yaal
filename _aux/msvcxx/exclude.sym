@@ -147,7 +147,6 @@
 ?_commandComposeDelay_@hconsole@yaal@@3HA
 ?_compressionLevel_@tools@yaal@@3HA
 ?_dBDrivers_@dbwrapper@yaal@@3V?$HMap@W4enum_t@DRIVER@ODBConnector@dbwrapper@yaal@@V?$HPair@V?$HPointer@VHPlugin@tools@yaal@@@hcore@yaal@@V?$HPointer@UODBConnector@dbwrapper@yaal@@@23@@hcore@5@U?$less@W4enum_t@DRIVER@ODBConnector@dbwrapper@yaal@@@5@U?$system@V?$HPair@W4enum_t@DRIVER@ODBConnector@dbwrapper@yaal@@V?$HPair@V?$HPointer@VHPlugin@tools@yaal@@@hcore@yaal@@V?$HPointer@UODBConnector@dbwrapper@yaal@@@23@@hcore@5@@hcore@yaal@@@allocator@5@V?$HSBBSTree@V?$HPair@$$CBW4enum_t@DRIVER@ODBConnector@dbwrapper@yaal@@V?$HPair@V?$HPointer@VHPlugin@tools@yaal@@@hcore@yaal@@V?$HPointer@UODBConnector@dbwrapper@yaal@@@23@@hcore@5@@hcore@yaal@@U?$less@W4enum_t@DRIVER@ODBConnector@dbwrapper@yaal@@@3@U?$map_helper@W4enum_t@DRIVER@ODBConnector@dbwrapper@yaal@@V?$HPair@V?$HPointer@VHPlugin@tools@yaal@@@hcore@yaal@@V?$HPointer@UODBConnector@dbwrapper@yaal@@@23@@hcore@5@@23@U?$system@V?$HPair@W4enum_t@DRIVER@ODBConnector@dbwrapper@yaal@@V?$HPair@V?$HPointer@VHPlugin@tools@yaal@@@hcore@yaal@@V?$HPointer@UODBConnector@dbwrapper@yaal@@@23@@hcore@5@@hcore@yaal@@@allocator@3@@75@@hcore@2@A
-?_dataBaseDriver_@dbwrapper@yaal@@3W4enum_t@DRIVER@ODBConnector@12@A
 ?_debugLevel_@hcore@yaal@@3HA
 ?_defaultEncoding_@tools@yaal@@3VHString@hcore@2@A
 ?_disableXON_@tools@yaal@@3_NA

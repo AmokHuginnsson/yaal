@@ -255,17 +255,6 @@ attribute_search_highlight BLACK YELLOW BLACK BROWN
 # log SQL queries
 log_sql true
 
-# select data base driver
-# accepted drivers are:
-# SQLite3, PostgreSQL, MySQL, Firebird, Oracle
-# last two drivers disables database interface completely,
-# it can by useful for programs that does not use databases
-# or for debugging purposes
-
-# data_base_driver
-# type: string, default: (installation dependent)
-data_base_driver '@DEFAULT_DRIVER@'
-
 ### dbwrapper END
 
 ### mysql driver BEGIN

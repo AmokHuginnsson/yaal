@@ -94,7 +94,6 @@ HDataBase::ptr_t connect( yaal::hcore::HString const& dsn_ ) {
 }
 
 bool _logSQL_ = false;
-ODBConnector::DRIVER::enum_t _dataBaseDriver_ = ODBConnector::DRIVER::DEFAULT;
 
 namespace {
 
@@ -103,14 +102,6 @@ bool set_dbwrapper_variables( HString& option_, HString& value_ ) {
 	bool fail( false );
 	if ( ! stricasecmp( option_, "set_env" ) ) {
 		decode_set_env( value_ );
-	} else if ( ! stricasecmp( option_, "data_base_driver" ) ) {
-		try {
-			dbwrapper::_dataBaseDriver_ = db_driver_from_string( value_ );
-		} catch ( HDataBaseException const& ) {
-			hcore::log( LOG_LEVEL::ERROR ) << "Error: `" << value_;
-			hcore::log << "' is unknown driver." << endl;
-			exit( 1 );
-		}
 	} else {
 		fail = true;
 	}
