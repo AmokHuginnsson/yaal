@@ -431,7 +431,7 @@ void HPipedChild::spawn(
 				int pid( getpid() );
 				int pgid( pgid_ > PROCESS_GROUP_LEADER ? pgid_ : pid );
 				M_ENSURE( ( ::setpgid( pid, pgid ) == 0 ) || ( errno == EACCES ) );
-				if ( foreground_ && is_a_tty( stdinFd ) ) {
+				if ( foreground_ && ( is_a_tty( stdinFd ) || is_a_tty( stdoutFd ) || is_a_tty( stderrFd ) ) ) {
 					M_ENSURE( signal( SIGTTOU, FWD_SIG_IGN ) != FWD_SIG_ERR );
 					M_ENSURE( signal( SIGTTIN, FWD_SIG_IGN ) != FWD_SIG_ERR );
 				}
