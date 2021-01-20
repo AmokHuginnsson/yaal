@@ -103,6 +103,18 @@ public:
 		) {
 		return;
 	}
+	static HHuginn::value_t hostname( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( "Network.resolve", values_, 0, 0, thread_, position_ );
+		hcore::HString s;
+		try {
+			s = system::get_host_name();
+		} catch ( hcore::HException const& e ) {
+			thread_->raise( static_cast<HNetwork*>( object_->raw() )->exception_class(), e.what(), position_ );
+		}
+		return ( thread_->object_factory().create_string( yaal::move( s ) ) );
+		M_EPILOG
+	}
 	static HHuginn::value_t resolve( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		verify_signature( "Network.resolve", values_, { HHuginn::TYPE::STRING }, thread_, position_ );
@@ -285,10 +297,11 @@ HPackageCreatorInterface::HInstance HNetworkCreator::do_new_instance( HRuntime* 
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "connect", runtime_->create_method( &HNetwork::connect ), "( *connectionType*, *target*[, *port*] ) - create a TCP connection of type *connectionType* to given *target*, optionally at given *port*" },
-		{ "get",     runtime_->create_method( &HNetwork::get ),     "( *url*[, *login*:*{login}*, *password*:*{pass}*] ) - fetch a resource from a remote HTTP server" },
-		{ "post",    runtime_->create_method( &HNetwork::post ),    "( *url*, *payload1*, [*payload2*, ..., *login*:*{login}*, *password*:*{pass}*] ) - push *payloads* to a remote HTTP server" },
-		{ "resolve", runtime_->create_method( &HNetwork::resolve ), "( *hostName* ) - resolve IP address of given *hostName*" }
+		{ "hostname", runtime_->create_method( &HNetwork::hostname ), "get this host network name" },
+		{ "connect",  runtime_->create_method( &HNetwork::connect ),  "( *connectionType*, *target*[, *port*] ) - create a TCP connection of type *connectionType* to given *target*, optionally at given *port*" },
+		{ "get",      runtime_->create_method( &HNetwork::get ),      "( *url*[, *login*:*{login}*, *password*:*{pass}*] ) - fetch a resource from a remote HTTP server" },
+		{ "post",     runtime_->create_method( &HNetwork::post ),     "( *url*, *payload1*, [*payload2*, ..., *login*:*{login}*, *password*:*{pass}*] ) - push *payloads* to a remote HTTP server" },
+		{ "resolve",  runtime_->create_method( &HNetwork::resolve ),  "( *hostName* ) - resolve IP address of given *hostName*" }
 	};
 	c->redefine( nullptr, fd );
 	return { c, runtime_->object_factory()->create<HNetwork>( c.raw() ) };
