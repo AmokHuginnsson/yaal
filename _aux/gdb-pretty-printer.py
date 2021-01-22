@@ -180,6 +180,7 @@ class YaalToolsHuginnHValueReferencePrinter:
 	def __init__( self, val_ ):
 		self._val = val_
 		self._ptr = None
+		self._innerPrinter = None
 		shared = self._val["_shared"]
 		if shared == 0:
 			return
@@ -197,7 +198,7 @@ class YaalToolsHuginnHValueReferencePrinter:
 			self._innerPrinter = yaal_lookup_function( self._ptr.cast( YaalToolsHuginnHValueReferencePrinter.Collections.get( typeId ) )["_data"] )
 		else:
 			self._innerPrinter = yaal_lookup_function( self._ptr.dereference() )
-		if not self._innerPrinter:
+		if self._innerPrinter is None:
 			return
 		if hasattr( self._innerPrinter, "children" ):
 			def children():
@@ -206,15 +207,15 @@ class YaalToolsHuginnHValueReferencePrinter:
 
 	def to_string( self ):
 		s = "NULL"
-		if self._innerPrinter != None:
+		if self._innerPrinter is not None:
 			s = self._innerPrinter.to_string()
-		else:
+		elif self._ptr is not None:
 			s = self._ptr.dereference()
 		return s
 
 	def display_hint( self ):
 		s = "string";
-		if ( self._ptr != 0 ) and ( self._innerPrinter != None ):
+		if ( self._ptr is not None ) and ( self._innerPrinter is not None ):
 			s = self._innerPrinter.display_hint()
 		return s
 

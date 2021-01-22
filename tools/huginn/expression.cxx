@@ -710,7 +710,17 @@ int HExpression::add_execution_step( OExecutionStep const& executionStep_ ) {
 
 void HExpression::replace_execution_step( int index_, OExecutionStep const& executionStep_ ) {
 	M_PROLOG
-	_executionSteps[index_] = executionStep_;
+	OExecutionStep& es( _executionSteps[index_] );
+	bool optimize( es._literalType != HHuginn::TYPE::UNKNOWN );
+	OExecutionStep::action_t action( es._action );
+	es = executionStep_;
+	if ( optimize ) {
+		if ( es._action == &HExpression::get_variable_reference ) {
+			es._action = &HExpression::get_variable_value;
+		} else if ( es._action == &HExpression::get_field_ref_direct ) {
+			_executionSteps[index_ + 1]._action = action;
+		}
+	}
 	return;
 	M_EPILOG
 }
@@ -934,9 +944,54 @@ void HExpression::try_collape( int fileId_, int position_ ) {
 			}
 		} break;
 		default: {
-			return;
+			break;
 		}
 	}
+	if ( _instructions.is_empty() ) {
+		return;
+	}
+	op = _instructions.back()._operator;
+	if ( op == OPERATOR::ASSIGN_TERM ) {
+		try_collape_assign( fileId_, position_ );
+		return;
+	}
+	return;
+	M_EPILOG
+}
+
+void HExpression::try_collape_assign( int, int ) {
+	M_PROLOG
+	int instructionCount( static_cast<int>( _instructions.get_size() ) );
+	int stepCount( static_cast<int>( _executionSteps.get_size() ) );
+	if ( ( instructionCount < 2 ) || ( stepCount < 2 ) ) {
+		return;
+	}
+	if ( _instructions[instructionCount - 2]._operator != OPERATOR::PLUS_ASSIGN ) {
+		return;
+	}
+	OExecutionStep& es( _executionSteps[stepCount - 2] );
+	if ( es._literalType != HHuginn::TYPE::INTEGER ) {
+		return;
+	}
+	M_ASSERT( !! es._value && ( es._value->type_id() == HHuginn::TYPE::INTEGER ) );
+	if (
+		( ( stepCount == 3 ) && ( _executionSteps[0]._action == nullptr ) )
+		|| (
+			( stepCount > 3 )
+			&& ( _executionSteps[stepCount - 3]._action != &HExpression::subscript )
+			&& ( _executionSteps[stepCount - 3]._action != &HExpression::get_field )
+		)
+	) {
+		_executionSteps[stepCount - 3]._action = &HExpression::plus_assign_integer_ref;
+		_executionSteps[stepCount - 3]._literalType = HHuginn::TYPE::NONE;
+		es._action = &HExpression::plus_assign_integer_val;
+	} else {
+		es._action = &HExpression::plus_assign_integer_ref;
+	}
+	_instructions.pop_back();
+	_executionSteps.pop_back();
+	es._integer = get_integer( es._value );
+	es._value.reset();
 	return;
 	M_EPILOG
 }
@@ -1356,6 +1411,88 @@ void HExpression::plus( OExecutionStep const&, HFrame* frame_ ) {
 		v1 = v1->clone( frame_->thread(), &v1, p );
 	}
 	v1->operator_add( frame_->thread(), v1, v2, p );
+	return;
+	M_EPILOG
+}
+
+void HExpression::plus_assign_integer_ref( OExecutionStep const& es_, HFrame* frame_ ) {
+	M_PROLOG
+	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::PLUS_ASSIGN );
+	int p( _instructions[frame_->ip()]._position );
+	++ frame_->ip();
+	HFrame::values_t& values( frame_->values() );
+	HHuginn::value_t refVal( yaal::move( values.top() ) );
+	values.pop();
+	M_ASSERT( refVal->type_id() == HHuginn::TYPE::REFERENCE );
+	HReference& ref( *static_cast<HReference*>( refVal.raw() ) );
+	HThread* t( frame_->thread() );
+	HHuginn::value_t v( ref.get( t, p ) );
+	HClass const* c( v->get_class() );
+	if ( c->type_id() != HHuginn::TYPE::INTEGER ) {
+		operands_type_mismatch( op_to_str( OPERATOR::PLUS_ASSIGN ), c, t->object_factory().integer_class(), file_id(), p );
+	}
+	static_cast<HInteger*>( v.raw() )->value() += es_._integer;
+	ref.set( t, yaal::move( v ), p );
+	values.push( ref.get( t, p ) );
+	return;
+	M_EPILOG
+}
+
+void HExpression::plus_assign_integer_val( OExecutionStep const& es_, HFrame* frame_ ) {
+	M_PROLOG
+	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
+	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::PLUS_ASSIGN );
+	int p( _instructions[frame_->ip()]._position );
+	++ frame_->ip();
+	HHuginn::value_t& v( frame_->values().top() );
+	HClass const* c( v->get_class() );
+	if ( c->type_id() != HHuginn::TYPE::INTEGER ) {
+		operands_type_mismatch( op_to_str( OPERATOR::PLUS_ASSIGN ), c, frame_->thread()->object_factory().integer_class(), file_id(), p );
+	}
+	static_cast<HInteger*>( v.raw() )->value() += es_._integer;
+	return;
+	M_EPILOG
+}
+
+void HExpression::plus_assign_real( OExecutionStep const&, HFrame* ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+void HExpression::plus_assign_number( OExecutionStep const&, HFrame* ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+void HExpression::plus_assign_string( OExecutionStep const&, HFrame* ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+void HExpression::plus_integer( OExecutionStep const&, HFrame* ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+void HExpression::plus_real( OExecutionStep const&, HFrame* ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+void HExpression::plus_number( OExecutionStep const&, HFrame* ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+void HExpression::plus_string( OExecutionStep const&, HFrame* ) {
+	M_PROLOG
 	return;
 	M_EPILOG
 }

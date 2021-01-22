@@ -90,8 +90,18 @@ public:
 	void oper( OPERATOR, int );
 	void commit_oper( OPERATOR, int, int );
 	void try_collape( int, int );
+	void try_collape_assign( int, int );
 	void close_parenthesis( OExecutionStep const&, huginn::HFrame* );
 	void plus( OExecutionStep const&, huginn::HFrame* );
+	void plus_assign_integer_ref( OExecutionStep const&, huginn::HFrame* );
+	void plus_assign_integer_val( OExecutionStep const&, huginn::HFrame* );
+	void plus_assign_real( OExecutionStep const&, huginn::HFrame* );
+	void plus_assign_number( OExecutionStep const&, huginn::HFrame* );
+	void plus_assign_string( OExecutionStep const&, huginn::HFrame* );
+	void plus_integer( OExecutionStep const&, huginn::HFrame* );
+	void plus_real( OExecutionStep const&, huginn::HFrame* );
+	void plus_number( OExecutionStep const&, huginn::HFrame* );
+	void plus_string( OExecutionStep const&, huginn::HFrame* );
 	void minus( OExecutionStep const&, huginn::HFrame* );
 	void mul( OExecutionStep const&, huginn::HFrame* );
 	void div( OExecutionStep const&, huginn::HFrame* );
