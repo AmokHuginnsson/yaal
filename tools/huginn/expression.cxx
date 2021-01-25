@@ -25,6 +25,31 @@ namespace tools {
 
 namespace huginn {
 
+template<typename T>
+void self_plus( T& self_, T const& other_ ) {
+	self_ += other_;
+}
+
+template<typename T>
+void self_minus( T& self_, T const& other_ ) {
+	self_ -= other_;
+}
+
+template<typename T>
+void self_multiply( T& self_, T const& other_ ) {
+	self_ *= other_;
+}
+
+template<typename T>
+void self_divide( T& self_, T const& other_ ) {
+	self_ /= other_;
+}
+
+template<typename T>
+void self_modulo( T& self_, T const& other_ ) {
+	self_ %= other_;
+}
+
 HExpression::OExecutionStep::OExecutionStep( void )
 	: _expression( nullptr )
 	, _action( nullptr )
@@ -966,13 +991,39 @@ void HExpression::try_collape_assign( int, int ) {
 	if ( ( instructionCount < 2 ) || ( stepCount < 2 ) ) {
 		return;
 	}
-	if ( _instructions[instructionCount - 2]._operator != OPERATOR::PLUS_ASSIGN ) {
-		return;
-	}
 	OExecutionStep& es( _executionSteps[stepCount - 2] );
-	if ( es._literalType != HHuginn::TYPE::INTEGER ) {
+	if ( es._literalType == HHuginn::TYPE::INTEGER ) {
+		try_collape_assign_integer();
 		return;
 	}
+	return;
+	M_EPILOG
+}
+
+void HExpression::try_collape_assign_integer( void ) {
+	M_PROLOG
+	int instructionCount( static_cast<int>( _instructions.get_size() ) );
+	switch ( _instructions[instructionCount - 2]._operator ) {
+		case ( OPERATOR::PLUS_ASSIGN ): {
+			try_collape_assign_integer_action( &HExpression::plus_assign_integer_ref, &HExpression::plus_assign_integer_val );
+			break;
+		}
+		case ( OPERATOR::MINUS_ASSIGN ): {
+			//try_collape_assign_integer_action( &HExpression::minus_assign_integer_ref, &HExpression::minus_assign_integer_val );
+			break;
+		}
+		default: {
+			break;
+		}
+	}
+	return;
+	M_EPILOG
+}
+
+void HExpression::try_collape_assign_integer_action( OExecutionStep::action_t refAction_, OExecutionStep::action_t valAction_ ) {
+	M_PROLOG
+	int stepCount( static_cast<int>( _executionSteps.get_size() ) );
+	OExecutionStep& es( _executionSteps[stepCount - 2] );
 	M_ASSERT( !! es._value && ( es._value->type_id() == HHuginn::TYPE::INTEGER ) );
 	if (
 		( ( stepCount == 3 ) && ( _executionSteps[0]._action == nullptr ) )
@@ -982,11 +1033,11 @@ void HExpression::try_collape_assign( int, int ) {
 			&& ( _executionSteps[stepCount - 3]._action != &HExpression::get_field )
 		)
 	) {
-		_executionSteps[stepCount - 3]._action = &HExpression::plus_assign_integer_ref;
+		_executionSteps[stepCount - 3]._action = refAction_;
 		_executionSteps[stepCount - 3]._literalType = HHuginn::TYPE::NONE;
-		es._action = &HExpression::plus_assign_integer_val;
+		es._action = valAction_;
 	} else {
-		es._action = &HExpression::plus_assign_integer_ref;
+		es._action = refAction_;
 	}
 	_instructions.pop_back();
 	_executionSteps.pop_back();
@@ -1415,10 +1466,18 @@ void HExpression::plus( OExecutionStep const&, HFrame* frame_ ) {
 	M_EPILOG
 }
 
-void HExpression::plus_assign_integer_ref( OExecutionStep const& es_, HFrame* frame_ ) {
+template<typename huginn_type, typename operator_type>
+void HExpression::oper_assign_ref(
+	HFrame* frame_,
+	OPERATOR op_,
+	HHuginn::TYPE type_,
+	class_getter_t classGetter_,
+	operator_type operator_,
+	typename huginn_type::value_type const& other_
+) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
-	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::PLUS_ASSIGN );
+	M_ASSERT( _instructions[frame_->ip()]._operator == op_ );
 	int p( _instructions[frame_->ip()]._position );
 	++ frame_->ip();
 	HFrame::values_t& values( frame_->values() );
@@ -1429,17 +1488,39 @@ void HExpression::plus_assign_integer_ref( OExecutionStep const& es_, HFrame* fr
 	HThread* t( frame_->thread() );
 	HHuginn::value_t v( ref.get( t, p ) );
 	HClass const* c( v->get_class() );
-	if ( c->type_id() != HHuginn::TYPE::INTEGER ) {
-		operands_type_mismatch( op_to_str( OPERATOR::PLUS_ASSIGN ), c, t->object_factory().integer_class(), file_id(), p );
+	if ( c->type_id() != type_ ) {
+		operands_type_mismatch( op_to_str( op_ ), c, (t->object_factory().*classGetter_)(), file_id(), p );
 	}
-	static_cast<HInteger*>( v.raw() )->value() += es_._integer;
+	operator_( static_cast<huginn_type*>( v.raw() )->value(), other_ );
 	ref.set( t, yaal::move( v ), p );
 	values.push( ref.get( t, p ) );
 	return;
 	M_EPILOG
 }
 
-void HExpression::plus_assign_integer_val( OExecutionStep const& es_, HFrame* frame_ ) {
+void HExpression::plus_assign_integer_ref( OExecutionStep const& es_, HFrame* frame_ ) {
+	M_PROLOG
+	oper_assign_ref<HInteger>(
+		frame_,
+		OPERATOR::PLUS_ASSIGN,
+		HHuginn::TYPE::INTEGER,
+		&HObjectFactory::integer_class,
+		&self_plus<HInteger::value_type>,
+		es_._integer
+	);
+	return;
+	M_EPILOG
+}
+
+template<typename huginn_type, typename operator_type>
+void HExpression::oper_assign_val(
+	HFrame* frame_,
+	OPERATOR op_,
+	HHuginn::TYPE type_,
+	class_getter_t classGetter_,
+	operator_type operator_,
+	typename huginn_type::value_type const& other_
+) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
 	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::PLUS_ASSIGN );
@@ -1447,10 +1528,24 @@ void HExpression::plus_assign_integer_val( OExecutionStep const& es_, HFrame* fr
 	++ frame_->ip();
 	HHuginn::value_t& v( frame_->values().top() );
 	HClass const* c( v->get_class() );
-	if ( c->type_id() != HHuginn::TYPE::INTEGER ) {
-		operands_type_mismatch( op_to_str( OPERATOR::PLUS_ASSIGN ), c, frame_->thread()->object_factory().integer_class(), file_id(), p );
+	if ( c->type_id() != type_ ) {
+		operands_type_mismatch( op_to_str( op_ ), c, (frame_->thread()->object_factory().*classGetter_)(), file_id(), p );
 	}
-	static_cast<HInteger*>( v.raw() )->value() += es_._integer;
+	operator_( static_cast<huginn_type*>( v.raw() )->value(), other_ );
+	return;
+	M_EPILOG
+}
+
+void HExpression::plus_assign_integer_val( OExecutionStep const& es_, HFrame* frame_ ) {
+	M_PROLOG
+	oper_assign_val<HInteger>(
+		frame_,
+		OPERATOR::PLUS_ASSIGN,
+		HHuginn::TYPE::INTEGER,
+		&HObjectFactory::integer_class,
+		&self_plus<HInteger::value_type>,
+		es_._integer
+	);
 	return;
 	M_EPILOG
 }

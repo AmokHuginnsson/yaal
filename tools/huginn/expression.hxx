@@ -75,6 +75,7 @@ public:
 private:
 	typedef yaal::hcore::HArray<OExecutionStep> execution_steps_t;
 	typedef yaal::hcore::HArray<OPositionedOperator> instructions_t;
+	typedef HClass const* ( HObjectFactory::* class_getter_t )( void ) const;
 	execution_steps_t _executionSteps;
 	instructions_t _instructions;
 	operations_t _operations;
@@ -91,10 +92,18 @@ public:
 	void commit_oper( OPERATOR, int, int );
 	void try_collape( int, int );
 	void try_collape_assign( int, int );
+	void try_collape_assign_integer( void );
+	void try_collape_assign_integer_action( OExecutionStep::action_t, OExecutionStep::action_t );
 	void close_parenthesis( OExecutionStep const&, huginn::HFrame* );
 	void plus( OExecutionStep const&, huginn::HFrame* );
+	template<typename huginn_type, typename operator_type>
+	void oper_assign_ref( HFrame*, OPERATOR, HHuginn::TYPE, class_getter_t, operator_type, typename huginn_type::value_type const& );
+	template<typename huginn_type, typename operator_type>
+	void oper_assign_val( HFrame*, OPERATOR, HHuginn::TYPE, class_getter_t, operator_type, typename huginn_type::value_type const& );
 	void plus_assign_integer_ref( OExecutionStep const&, huginn::HFrame* );
 	void plus_assign_integer_val( OExecutionStep const&, huginn::HFrame* );
+	void minus_assign_integer_ref( OExecutionStep const&, huginn::HFrame* );
+	void minus_assign_integer_val( OExecutionStep const&, huginn::HFrame* );
 	void plus_assign_real( OExecutionStep const&, huginn::HFrame* );
 	void plus_assign_number( OExecutionStep const&, huginn::HFrame* );
 	void plus_assign_string( OExecutionStep const&, huginn::HFrame* );
