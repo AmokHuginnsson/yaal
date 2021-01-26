@@ -100,8 +100,10 @@ public:
 	void oper_assign_ref( HFrame*, OPERATOR, HHuginn::TYPE, class_getter_t, operator_type, typename huginn_type::value_type const& );
 	template<typename huginn_type, typename operator_type>
 	void oper_assign_val( HFrame*, OPERATOR, HHuginn::TYPE, class_getter_t, operator_type, typename huginn_type::value_type const& );
-	void plus_assign_integer_ref( OExecutionStep const&, huginn::HFrame* );
-	void plus_assign_integer_val( OExecutionStep const&, huginn::HFrame* );
+	template<OPERATOR>
+	void oper_assign_integer_ref( OExecutionStep const&, huginn::HFrame* );
+	template<OPERATOR>
+	void oper_assign_integer_val( OExecutionStep const&, huginn::HFrame* );
 	void minus_assign_integer_ref( OExecutionStep const&, huginn::HFrame* );
 	void minus_assign_integer_val( OExecutionStep const&, huginn::HFrame* );
 	void plus_assign_real( OExecutionStep const&, huginn::HFrame* );

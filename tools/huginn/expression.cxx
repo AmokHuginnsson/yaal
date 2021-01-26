@@ -25,8 +25,15 @@ namespace tools {
 
 namespace huginn {
 
+template<OPERATOR>
+struct operator_dispatcher {
 template<typename T>
-void self_plus( T& self_, T const& other_ ) {
+static void self( T&, T const& );
+};
+
+template<>
+template<typename T>
+void operator_dispatcher<OPERATOR::PLUS_ASSIGN>::self( T& self_, T const& other_ ) {
 	self_ += other_;
 }
 
@@ -1005,7 +1012,7 @@ void HExpression::try_collape_assign_integer( void ) {
 	int instructionCount( static_cast<int>( _instructions.get_size() ) );
 	switch ( _instructions[instructionCount - 2]._operator ) {
 		case ( OPERATOR::PLUS_ASSIGN ): {
-			try_collape_assign_integer_action( &HExpression::plus_assign_integer_ref, &HExpression::plus_assign_integer_val );
+			try_collape_assign_integer_action( &HExpression::oper_assign_integer_ref<OPERATOR::PLUS_ASSIGN>, &HExpression::oper_assign_integer_val<OPERATOR::PLUS_ASSIGN> );
 			break;
 		}
 		case ( OPERATOR::MINUS_ASSIGN ): {
@@ -1498,14 +1505,16 @@ void HExpression::oper_assign_ref(
 	M_EPILOG
 }
 
-void HExpression::plus_assign_integer_ref( OExecutionStep const& es_, HFrame* frame_ ) {
+template<OPERATOR oper>
+void HExpression::oper_assign_integer_ref( OExecutionStep const& es_, HFrame* frame_ ) {
 	M_PROLOG
+	typedef operator_dispatcher<oper> operator_dispatcher_type;
 	oper_assign_ref<HInteger>(
 		frame_,
-		OPERATOR::PLUS_ASSIGN,
+		oper,
 		HHuginn::TYPE::INTEGER,
 		&HObjectFactory::integer_class,
-		&self_plus<HInteger::value_type>,
+		&operator_dispatcher_type::template self<HInteger::value_type>,
 		es_._integer
 	);
 	return;
@@ -1523,7 +1532,7 @@ void HExpression::oper_assign_val(
 ) {
 	M_PROLOG
 	M_ASSERT( frame_->ip() < static_cast<int>( _instructions.get_size() ) );
-	M_ASSERT( _instructions[frame_->ip()]._operator == OPERATOR::PLUS_ASSIGN );
+	M_ASSERT( _instructions[frame_->ip()]._operator == op_ );
 	int p( _instructions[frame_->ip()]._position );
 	++ frame_->ip();
 	HHuginn::value_t& v( frame_->values().top() );
@@ -1536,14 +1545,16 @@ void HExpression::oper_assign_val(
 	M_EPILOG
 }
 
-void HExpression::plus_assign_integer_val( OExecutionStep const& es_, HFrame* frame_ ) {
+template<OPERATOR oper>
+void HExpression::oper_assign_integer_val( OExecutionStep const& es_, HFrame* frame_ ) {
 	M_PROLOG
+	typedef operator_dispatcher<oper> operator_dispatcher_type;
 	oper_assign_val<HInteger>(
 		frame_,
-		OPERATOR::PLUS_ASSIGN,
+		oper,
 		HHuginn::TYPE::INTEGER,
 		&HObjectFactory::integer_class,
-		&self_plus<HInteger::value_type>,
+		&operator_dispatcher_type::template self<HInteger::value_type>,
 		es_._integer
 	);
 	return;
