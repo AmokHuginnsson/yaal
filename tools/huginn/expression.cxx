@@ -37,23 +37,27 @@ void operator_dispatcher<OPERATOR::PLUS_ASSIGN>::self( T& self_, T const& other_
 	self_ += other_;
 }
 
+template<>
 template<typename T>
-void self_minus( T& self_, T const& other_ ) {
+void operator_dispatcher<OPERATOR::MINUS_ASSIGN>::self( T& self_, T const& other_ ) {
 	self_ -= other_;
 }
 
+template<>
 template<typename T>
-void self_multiply( T& self_, T const& other_ ) {
+void operator_dispatcher<OPERATOR::MULTIPLY_ASSIGN>::self( T& self_, T const& other_ ) {
 	self_ *= other_;
 }
 
+template<>
 template<typename T>
-void self_divide( T& self_, T const& other_ ) {
+void operator_dispatcher<OPERATOR::DIVIDE_ASSIGN>::self( T& self_, T const& other_ ) {
 	self_ /= other_;
 }
 
+template<>
 template<typename T>
-void self_modulo( T& self_, T const& other_ ) {
+void operator_dispatcher<OPERATOR::MODULO_ASSIGN>::self( T& self_, T const& other_ ) {
 	self_ %= other_;
 }
 
@@ -1016,7 +1020,19 @@ void HExpression::try_collape_assign_integer( void ) {
 			break;
 		}
 		case ( OPERATOR::MINUS_ASSIGN ): {
-			//try_collape_assign_integer_action( &HExpression::minus_assign_integer_ref, &HExpression::minus_assign_integer_val );
+			try_collape_assign_integer_action( &HExpression::oper_assign_integer_ref<OPERATOR::MINUS_ASSIGN>, &HExpression::oper_assign_integer_val<OPERATOR::MINUS_ASSIGN> );
+			break;
+		}
+		case ( OPERATOR::MULTIPLY_ASSIGN ): {
+			try_collape_assign_integer_action( &HExpression::oper_assign_integer_ref<OPERATOR::MULTIPLY_ASSIGN>, &HExpression::oper_assign_integer_val<OPERATOR::MULTIPLY_ASSIGN> );
+			break;
+		}
+		case ( OPERATOR::DIVIDE_ASSIGN ): {
+			try_collape_assign_integer_action( &HExpression::oper_assign_integer_ref<OPERATOR::DIVIDE_ASSIGN>, &HExpression::oper_assign_integer_val<OPERATOR::DIVIDE_ASSIGN> );
+			break;
+		}
+		case ( OPERATOR::MODULO_ASSIGN ): {
+			try_collape_assign_integer_action( &HExpression::oper_assign_integer_ref<OPERATOR::MODULO_ASSIGN>, &HExpression::oper_assign_integer_val<OPERATOR::MODULO_ASSIGN> );
 			break;
 		}
 		default: {
