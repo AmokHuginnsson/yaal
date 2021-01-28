@@ -61,6 +61,12 @@ void operator_dispatcher<OPERATOR::MODULO_ASSIGN>::self( T& self_, T const& othe
 	self_ %= other_;
 }
 
+template<>
+template<>
+void operator_dispatcher<OPERATOR::MODULO_ASSIGN>::self( double long& self_, double long const& other_ ) {
+	self_ = fmodl( self_, other_ );
+}
+
 HExpression::OExecutionStep::OExecutionStep( void )
 	: _expression( nullptr )
 	, _action( nullptr )
@@ -1003,9 +1009,17 @@ void HExpression::try_collape_assign( int, int ) {
 		return;
 	}
 	OExecutionStep& es( _executionSteps[stepCount - 2] );
-	if ( es._literalType == HHuginn::TYPE::INTEGER ) {
-		try_collape_assign_integer();
-		return;
+	switch ( es._literalType ) {
+		case ( HHuginn::TYPE::INTEGER ): {
+			try_collape_assign_integer();
+			break;
+		}
+		case ( HHuginn::TYPE::REAL ): {
+			try_collape_assign_real();
+			break;
+		}
+		default: {
+		}
 	}
 	return;
 	M_EPILOG
@@ -1016,23 +1030,23 @@ void HExpression::try_collape_assign_integer( void ) {
 	int instructionCount( static_cast<int>( _instructions.get_size() ) );
 	switch ( _instructions[instructionCount - 2]._operator ) {
 		case ( OPERATOR::PLUS_ASSIGN ): {
-			try_collape_assign_integer_action( &HExpression::oper_assign_integer_ref<OPERATOR::PLUS_ASSIGN>, &HExpression::oper_assign_integer_val<OPERATOR::PLUS_ASSIGN> );
+			try_collape_assign_action( HHuginn::TYPE::INTEGER, &HExpression::oper_assign_integer_ref<OPERATOR::PLUS_ASSIGN>, &HExpression::oper_assign_integer_val<OPERATOR::PLUS_ASSIGN> );
 			break;
 		}
 		case ( OPERATOR::MINUS_ASSIGN ): {
-			try_collape_assign_integer_action( &HExpression::oper_assign_integer_ref<OPERATOR::MINUS_ASSIGN>, &HExpression::oper_assign_integer_val<OPERATOR::MINUS_ASSIGN> );
+			try_collape_assign_action( HHuginn::TYPE::INTEGER, &HExpression::oper_assign_integer_ref<OPERATOR::MINUS_ASSIGN>, &HExpression::oper_assign_integer_val<OPERATOR::MINUS_ASSIGN> );
 			break;
 		}
 		case ( OPERATOR::MULTIPLY_ASSIGN ): {
-			try_collape_assign_integer_action( &HExpression::oper_assign_integer_ref<OPERATOR::MULTIPLY_ASSIGN>, &HExpression::oper_assign_integer_val<OPERATOR::MULTIPLY_ASSIGN> );
+			try_collape_assign_action( HHuginn::TYPE::INTEGER, &HExpression::oper_assign_integer_ref<OPERATOR::MULTIPLY_ASSIGN>, &HExpression::oper_assign_integer_val<OPERATOR::MULTIPLY_ASSIGN> );
 			break;
 		}
 		case ( OPERATOR::DIVIDE_ASSIGN ): {
-			try_collape_assign_integer_action( &HExpression::oper_assign_integer_ref<OPERATOR::DIVIDE_ASSIGN>, &HExpression::oper_assign_integer_val<OPERATOR::DIVIDE_ASSIGN> );
+			try_collape_assign_action( HHuginn::TYPE::INTEGER, &HExpression::oper_assign_integer_ref<OPERATOR::DIVIDE_ASSIGN>, &HExpression::oper_assign_integer_val<OPERATOR::DIVIDE_ASSIGN> );
 			break;
 		}
 		case ( OPERATOR::MODULO_ASSIGN ): {
-			try_collape_assign_integer_action( &HExpression::oper_assign_integer_ref<OPERATOR::MODULO_ASSIGN>, &HExpression::oper_assign_integer_val<OPERATOR::MODULO_ASSIGN> );
+			try_collape_assign_action( HHuginn::TYPE::INTEGER, &HExpression::oper_assign_integer_ref<OPERATOR::MODULO_ASSIGN>, &HExpression::oper_assign_integer_val<OPERATOR::MODULO_ASSIGN> );
 			break;
 		}
 		default: {
@@ -1043,11 +1057,43 @@ void HExpression::try_collape_assign_integer( void ) {
 	M_EPILOG
 }
 
-void HExpression::try_collape_assign_integer_action( OExecutionStep::action_t refAction_, OExecutionStep::action_t valAction_ ) {
+void HExpression::try_collape_assign_real( void ) {
+	M_PROLOG
+	int instructionCount( static_cast<int>( _instructions.get_size() ) );
+	switch ( _instructions[instructionCount - 2]._operator ) {
+		case ( OPERATOR::PLUS_ASSIGN ): {
+			try_collape_assign_action( HHuginn::TYPE::REAL, &HExpression::oper_assign_real_ref<OPERATOR::PLUS_ASSIGN>, &HExpression::oper_assign_real_val<OPERATOR::PLUS_ASSIGN> );
+			break;
+		}
+		case ( OPERATOR::MINUS_ASSIGN ): {
+			try_collape_assign_action( HHuginn::TYPE::REAL, &HExpression::oper_assign_real_ref<OPERATOR::MINUS_ASSIGN>, &HExpression::oper_assign_real_val<OPERATOR::MINUS_ASSIGN> );
+			break;
+		}
+		case ( OPERATOR::MULTIPLY_ASSIGN ): {
+			try_collape_assign_action( HHuginn::TYPE::REAL, &HExpression::oper_assign_real_ref<OPERATOR::MULTIPLY_ASSIGN>, &HExpression::oper_assign_real_val<OPERATOR::MULTIPLY_ASSIGN> );
+			break;
+		}
+		case ( OPERATOR::DIVIDE_ASSIGN ): {
+			try_collape_assign_action( HHuginn::TYPE::REAL, &HExpression::oper_assign_real_ref<OPERATOR::DIVIDE_ASSIGN>, &HExpression::oper_assign_real_val<OPERATOR::DIVIDE_ASSIGN> );
+			break;
+		}
+		case ( OPERATOR::MODULO_ASSIGN ): {
+			try_collape_assign_action( HHuginn::TYPE::REAL, &HExpression::oper_assign_real_ref<OPERATOR::MODULO_ASSIGN>, &HExpression::oper_assign_real_val<OPERATOR::MODULO_ASSIGN> );
+			break;
+		}
+		default: {
+			break;
+		}
+	}
+	return;
+	M_EPILOG
+}
+
+void HExpression::try_collape_assign_action( HHuginn::TYPE type_, OExecutionStep::action_t refAction_, OExecutionStep::action_t valAction_ ) {
 	M_PROLOG
 	int stepCount( static_cast<int>( _executionSteps.get_size() ) );
 	OExecutionStep& es( _executionSteps[stepCount - 2] );
-	M_ASSERT( !! es._value && ( es._value->type_id() == HHuginn::TYPE::INTEGER ) );
+	M_ASSERT( !! es._value && ( es._value->type_id() == type_ ) );
 	if (
 		( ( stepCount == 3 ) && ( _executionSteps[0]._action == nullptr ) )
 		|| (
@@ -1064,7 +1110,19 @@ void HExpression::try_collape_assign_integer_action( OExecutionStep::action_t re
 	}
 	_instructions.pop_back();
 	_executionSteps.pop_back();
-	es._integer = get_integer( es._value );
+	switch ( type_ ) {
+		case ( HHuginn::TYPE::INTEGER ): {
+			es._integer = get_integer( es._value );
+			break;
+		}
+		case ( HHuginn::TYPE::REAL ): {
+			es._real = get_real( es._value );
+			break;
+		}
+		default: {
+			M_ASSERT( !"Invalid code path!"[0] );
+		}
+	}
 	es._value.reset();
 	return;
 	M_EPILOG
@@ -1521,22 +1579,6 @@ void HExpression::oper_assign_ref(
 	M_EPILOG
 }
 
-template<OPERATOR oper>
-void HExpression::oper_assign_integer_ref( OExecutionStep const& es_, HFrame* frame_ ) {
-	M_PROLOG
-	typedef operator_dispatcher<oper> operator_dispatcher_type;
-	oper_assign_ref<HInteger>(
-		frame_,
-		oper,
-		HHuginn::TYPE::INTEGER,
-		&HObjectFactory::integer_class,
-		&operator_dispatcher_type::template self<HInteger::value_type>,
-		es_._integer
-	);
-	return;
-	M_EPILOG
-}
-
 template<typename huginn_type, typename operator_type>
 void HExpression::oper_assign_val(
 	HFrame* frame_,
@@ -1562,6 +1604,22 @@ void HExpression::oper_assign_val(
 }
 
 template<OPERATOR oper>
+void HExpression::oper_assign_integer_ref( OExecutionStep const& es_, HFrame* frame_ ) {
+	M_PROLOG
+	typedef operator_dispatcher<oper> operator_dispatcher_type;
+	oper_assign_ref<HInteger>(
+		frame_,
+		oper,
+		HHuginn::TYPE::INTEGER,
+		&HObjectFactory::integer_class,
+		&operator_dispatcher_type::template self<HInteger::value_type>,
+		es_._integer
+	);
+	return;
+	M_EPILOG
+}
+
+template<OPERATOR oper>
 void HExpression::oper_assign_integer_val( OExecutionStep const& es_, HFrame* frame_ ) {
 	M_PROLOG
 	typedef operator_dispatcher<oper> operator_dispatcher_type;
@@ -1577,8 +1635,34 @@ void HExpression::oper_assign_integer_val( OExecutionStep const& es_, HFrame* fr
 	M_EPILOG
 }
 
-void HExpression::plus_assign_real( OExecutionStep const&, HFrame* ) {
+template<OPERATOR oper>
+void HExpression::oper_assign_real_ref( OExecutionStep const& es_, HFrame* frame_ ) {
 	M_PROLOG
+	typedef operator_dispatcher<oper> operator_dispatcher_type;
+	oper_assign_ref<HReal>(
+		frame_,
+		oper,
+		HHuginn::TYPE::REAL,
+		&HObjectFactory::real_class,
+		&operator_dispatcher_type::template self<HReal::value_type>,
+		es_._real
+	);
+	return;
+	M_EPILOG
+}
+
+template<OPERATOR oper>
+void HExpression::oper_assign_real_val( OExecutionStep const& es_, HFrame* frame_ ) {
+	M_PROLOG
+	typedef operator_dispatcher<oper> operator_dispatcher_type;
+	oper_assign_val<HReal>(
+		frame_,
+		oper,
+		HHuginn::TYPE::REAL,
+		&HObjectFactory::real_class,
+		&operator_dispatcher_type::template self<HReal::value_type>,
+		es_._real
+	);
 	return;
 	M_EPILOG
 }
