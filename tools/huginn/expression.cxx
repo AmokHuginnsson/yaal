@@ -1603,13 +1603,13 @@ void HExpression::oper_assign_val(
 	M_EPILOG
 }
 
-template<OPERATOR oper>
+template<OPERATOR operator_tag>
 void HExpression::oper_assign_integer_ref( OExecutionStep const& es_, HFrame* frame_ ) {
 	M_PROLOG
-	typedef operator_dispatcher<oper> operator_dispatcher_type;
+	typedef operator_dispatcher<operator_tag> operator_dispatcher_type;
 	oper_assign_ref<HInteger>(
 		frame_,
-		oper,
+		operator_tag,
 		HHuginn::TYPE::INTEGER,
 		&HObjectFactory::integer_class,
 		&operator_dispatcher_type::template self<HInteger::value_type>,
@@ -1619,13 +1619,13 @@ void HExpression::oper_assign_integer_ref( OExecutionStep const& es_, HFrame* fr
 	M_EPILOG
 }
 
-template<OPERATOR oper>
+template<OPERATOR operator_tag>
 void HExpression::oper_assign_integer_val( OExecutionStep const& es_, HFrame* frame_ ) {
 	M_PROLOG
-	typedef operator_dispatcher<oper> operator_dispatcher_type;
+	typedef operator_dispatcher<operator_tag> operator_dispatcher_type;
 	oper_assign_val<HInteger>(
 		frame_,
-		oper,
+		operator_tag,
 		HHuginn::TYPE::INTEGER,
 		&HObjectFactory::integer_class,
 		&operator_dispatcher_type::template self<HInteger::value_type>,
@@ -1635,13 +1635,13 @@ void HExpression::oper_assign_integer_val( OExecutionStep const& es_, HFrame* fr
 	M_EPILOG
 }
 
-template<OPERATOR oper>
+template<OPERATOR operator_tag>
 void HExpression::oper_assign_real_ref( OExecutionStep const& es_, HFrame* frame_ ) {
 	M_PROLOG
-	typedef operator_dispatcher<oper> operator_dispatcher_type;
+	typedef operator_dispatcher<operator_tag> operator_dispatcher_type;
 	oper_assign_ref<HReal>(
 		frame_,
-		oper,
+		operator_tag,
 		HHuginn::TYPE::REAL,
 		&HObjectFactory::real_class,
 		&operator_dispatcher_type::template self<HReal::value_type>,
@@ -1651,13 +1651,13 @@ void HExpression::oper_assign_real_ref( OExecutionStep const& es_, HFrame* frame
 	M_EPILOG
 }
 
-template<OPERATOR oper>
+template<OPERATOR operator_tag>
 void HExpression::oper_assign_real_val( OExecutionStep const& es_, HFrame* frame_ ) {
 	M_PROLOG
-	typedef operator_dispatcher<oper> operator_dispatcher_type;
+	typedef operator_dispatcher<operator_tag> operator_dispatcher_type;
 	oper_assign_val<HReal>(
 		frame_,
-		oper,
+		operator_tag,
 		HHuginn::TYPE::REAL,
 		&HObjectFactory::real_class,
 		&operator_dispatcher_type::template self<HReal::value_type>,
