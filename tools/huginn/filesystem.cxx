@@ -59,8 +59,9 @@ public:
 					class_->runtime(),
 					"OPEN_MODE",
 					enumeration::descriptions_t{
-						{ "READ", "Open file for reading only.", safe_int::cast<int>( HFile::OPEN::READING.value() ) },
-						{ "WRITE", "Open file for writing while truncating existing content.", safe_int::cast<int>( HFile::OPEN::WRITING.value() ) },
+						{ "READ",   "Open file for reading only.", safe_int::cast<int>( HFile::OPEN::READING.value() ) },
+						{ "WRITE",  "Open file for writing while truncating existing content.", safe_int::cast<int>( HFile::OPEN::WRITING.value() ) },
+						{ "EDIT",   "Open file for reading and writing, writing begins at beginning of file and the file is not truncated.", safe_int::cast<int>( ( HFile::OPEN::READING | HFile::OPEN::WRITING ).value() ) },
 						{ "APPEND", "Open file for appending, writing begins at end of file.", safe_int::cast<int>( HFile::OPEN::APPEND.value() ) },
 					},
 					"The `OPEN_MODE` is set of possible modes used for opening the files.",
@@ -309,6 +310,8 @@ private:
 		HFile::open_t openMode( HFile::OPEN::READING );
 		if ( val == safe_int::cast<int>( HFile::OPEN::WRITING.value() ) ) {
 			openMode = HFile::OPEN::WRITING;
+		} else if ( val == safe_int::cast<int>( ( HFile::OPEN::READING | HFile::OPEN::WRITING ).value() ) ) {
+			openMode = HFile::OPEN::READING | HFile::OPEN::WRITING;
 		} else if ( val == safe_int::cast<int>( HFile::OPEN::APPEND.value() ) ) {
 			openMode = HFile::OPEN::APPEND | HFile::OPEN::WRITING;
 		}
