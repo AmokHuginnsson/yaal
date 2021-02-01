@@ -67,6 +67,12 @@ void operator_dispatcher<OPERATOR::MODULO_ASSIGN>::self( double long& self_, dou
 	self_ = fmodl( self_, other_ );
 }
 
+template<>
+template<>
+void operator_dispatcher<OPERATOR::POWER_ASSIGN>::self( double long& self_, double long const& other_ ) {
+	self_ = math::power( self_, other_ );
+}
+
 HExpression::OExecutionStep::OExecutionStep( void )
 	: _expression( nullptr )
 	, _action( nullptr )
@@ -1079,6 +1085,10 @@ void HExpression::try_collape_assign_real( void ) {
 		}
 		case ( OPERATOR::MODULO_ASSIGN ): {
 			try_collape_assign_action( HHuginn::TYPE::REAL, &HExpression::oper_assign_real_ref<OPERATOR::MODULO_ASSIGN>, &HExpression::oper_assign_real_val<OPERATOR::MODULO_ASSIGN> );
+			break;
+		}
+		case ( OPERATOR::POWER_ASSIGN ): {
+			try_collape_assign_action( HHuginn::TYPE::REAL, &HExpression::oper_assign_real_ref<OPERATOR::POWER_ASSIGN>, &HExpression::oper_assign_real_val<OPERATOR::POWER_ASSIGN> );
 			break;
 		}
 		default: {
