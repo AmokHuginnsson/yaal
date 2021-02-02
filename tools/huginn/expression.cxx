@@ -28,48 +28,69 @@ namespace huginn {
 template<OPERATOR>
 struct operator_dispatcher {
 template<typename T>
-static void self( T&, T const& );
+static void self( T&, T const&, HFrame*, int );
 };
 
 template<>
 template<typename T>
-void operator_dispatcher<OPERATOR::PLUS_ASSIGN>::self( T& self_, T const& other_ ) {
+void operator_dispatcher<OPERATOR::PLUS_ASSIGN>::self( T& self_, T const& other_, HFrame*, int ) {
 	self_ += other_;
 }
 
 template<>
 template<typename T>
-void operator_dispatcher<OPERATOR::MINUS_ASSIGN>::self( T& self_, T const& other_ ) {
+void operator_dispatcher<OPERATOR::MINUS_ASSIGN>::self( T& self_, T const& other_, HFrame*, int ) {
 	self_ -= other_;
 }
 
 template<>
 template<typename T>
-void operator_dispatcher<OPERATOR::MULTIPLY_ASSIGN>::self( T& self_, T const& other_ ) {
+void operator_dispatcher<OPERATOR::MULTIPLY_ASSIGN>::self( T& self_, T const& other_, HFrame*, int ) {
 	self_ *= other_;
 }
 
 template<>
 template<typename T>
-void operator_dispatcher<OPERATOR::DIVIDE_ASSIGN>::self( T& self_, T const& other_ ) {
+void operator_dispatcher<OPERATOR::DIVIDE_ASSIGN>::self( T& self_, T const& other_, HFrame*, int ) {
+	self_ /= other_;
+}
+
+template<>
+template<>
+void operator_dispatcher<OPERATOR::DIVIDE_ASSIGN>::self( HInteger::value_type& self_, HInteger::value_type const& other_, HFrame* frame_, int position_ ) {
+	if ( ( self_ == meta::min_signed<HInteger::value_type>::value ) && ( other_ == -1 ) ) {
+		throw HHuginn::HHuginnRuntimeException( "Division overflow.", frame_->file_id(), position_ );
+	}
 	self_ /= other_;
 }
 
 template<>
 template<typename T>
-void operator_dispatcher<OPERATOR::MODULO_ASSIGN>::self( T& self_, T const& other_ ) {
+void operator_dispatcher<OPERATOR::MODULO_ASSIGN>::self( T& self_, T const& other_, HFrame*, int ) {
 	self_ %= other_;
 }
 
 template<>
 template<>
-void operator_dispatcher<OPERATOR::MODULO_ASSIGN>::self( double long& self_, double long const& other_ ) {
+void operator_dispatcher<OPERATOR::MODULO_ASSIGN>::self( HInteger::value_type& self_, HInteger::value_type const& other_, HFrame* frame_, int position_ ) {
+	if ( ( self_ == meta::min_signed<HInteger::value_type>::value ) && ( other_ == -1 ) ) {
+		throw HHuginn::HHuginnRuntimeException( "Division overflow.", frame_->file_id(), position_ );
+	}
+	self_ %= other_;
+}
+
+template<>
+template<>
+void operator_dispatcher<OPERATOR::MODULO_ASSIGN>::self( HReal::value_type& self_, HReal::value_type const& other_, HFrame*, int ) {
 	self_ = fmodl( self_, other_ );
 }
 
 template<>
 template<>
-void operator_dispatcher<OPERATOR::POWER_ASSIGN>::self( double long& self_, double long const& other_ ) {
+void operator_dispatcher<OPERATOR::POWER_ASSIGN>::self( HReal::value_type& self_, HReal::value_type const& other_, HFrame* frame_, int position_ ) {
+	if ( ( self_ == 0.0L ) && ( other_ == 0.0L ) ) {
+		throw HHuginn::HHuginnRuntimeException( "indeterminate form 0^0", frame_->file_id(), position_ );
+	}
 	self_ = math::power( self_, other_ );
 }
 
@@ -1007,7 +1028,7 @@ void HExpression::try_collape( int fileId_, int position_ ) {
 	M_EPILOG
 }
 
-void HExpression::try_collape_assign( int, int ) {
+void HExpression::try_collape_assign( int fileId_, int position_ ) {
 	M_PROLOG
 	int instructionCount( static_cast<int>( _instructions.get_size() ) );
 	int stepCount( static_cast<int>( _executionSteps.get_size() ) );
@@ -1017,11 +1038,11 @@ void HExpression::try_collape_assign( int, int ) {
 	OExecutionStep& es( _executionSteps[stepCount - 2] );
 	switch ( es._literalType ) {
 		case ( HHuginn::TYPE::INTEGER ): {
-			try_collape_assign_integer();
+			try_collape_assign_integer( fileId_, position_ );
 			break;
 		}
 		case ( HHuginn::TYPE::REAL ): {
-			try_collape_assign_real();
+			try_collape_assign_real( fileId_, position_ );
 			break;
 		}
 		default: {
@@ -1031,9 +1052,11 @@ void HExpression::try_collape_assign( int, int ) {
 	M_EPILOG
 }
 
-void HExpression::try_collape_assign_integer( void ) {
+void HExpression::try_collape_assign_integer( int fileId_, int position_ ) {
 	M_PROLOG
 	int instructionCount( static_cast<int>( _instructions.get_size() ) );
+	int stepCount( static_cast<int>( _executionSteps.get_size() ) );
+	OExecutionStep& es( _executionSteps[stepCount - 2] );
 	switch ( _instructions[instructionCount - 2]._operator ) {
 		case ( OPERATOR::PLUS_ASSIGN ): {
 			try_collape_assign_action( HHuginn::TYPE::INTEGER, &HExpression::oper_assign_integer_ref<OPERATOR::PLUS_ASSIGN>, &HExpression::oper_assign_integer_val<OPERATOR::PLUS_ASSIGN> );
@@ -1048,10 +1071,16 @@ void HExpression::try_collape_assign_integer( void ) {
 			break;
 		}
 		case ( OPERATOR::DIVIDE_ASSIGN ): {
+			if ( get_integer( es._value ) == 0LL ) {
+				throw HHuginn::HHuginnRuntimeException( "Division by zero.", fileId_, position_ );
+			}
 			try_collape_assign_action( HHuginn::TYPE::INTEGER, &HExpression::oper_assign_integer_ref<OPERATOR::DIVIDE_ASSIGN>, &HExpression::oper_assign_integer_val<OPERATOR::DIVIDE_ASSIGN> );
 			break;
 		}
 		case ( OPERATOR::MODULO_ASSIGN ): {
+			if ( get_integer( es._value ) == 0LL ) {
+				throw HHuginn::HHuginnRuntimeException( "Division by zero.", fileId_, position_ );
+			}
 			try_collape_assign_action( HHuginn::TYPE::INTEGER, &HExpression::oper_assign_integer_ref<OPERATOR::MODULO_ASSIGN>, &HExpression::oper_assign_integer_val<OPERATOR::MODULO_ASSIGN> );
 			break;
 		}
@@ -1063,9 +1092,11 @@ void HExpression::try_collape_assign_integer( void ) {
 	M_EPILOG
 }
 
-void HExpression::try_collape_assign_real( void ) {
+void HExpression::try_collape_assign_real( int fileId_, int position_ ) {
 	M_PROLOG
 	int instructionCount( static_cast<int>( _instructions.get_size() ) );
+	int stepCount( static_cast<int>( _executionSteps.get_size() ) );
+	OExecutionStep& es( _executionSteps[stepCount - 2] );
 	switch ( _instructions[instructionCount - 2]._operator ) {
 		case ( OPERATOR::PLUS_ASSIGN ): {
 			try_collape_assign_action( HHuginn::TYPE::REAL, &HExpression::oper_assign_real_ref<OPERATOR::PLUS_ASSIGN>, &HExpression::oper_assign_real_val<OPERATOR::PLUS_ASSIGN> );
@@ -1080,10 +1111,16 @@ void HExpression::try_collape_assign_real( void ) {
 			break;
 		}
 		case ( OPERATOR::DIVIDE_ASSIGN ): {
+			if ( get_real( es._value ) == 0.0L ) {
+				throw HHuginn::HHuginnRuntimeException( "Division by zero.", fileId_, position_ );
+			}
 			try_collape_assign_action( HHuginn::TYPE::REAL, &HExpression::oper_assign_real_ref<OPERATOR::DIVIDE_ASSIGN>, &HExpression::oper_assign_real_val<OPERATOR::DIVIDE_ASSIGN> );
 			break;
 		}
 		case ( OPERATOR::MODULO_ASSIGN ): {
+			if ( get_real( es._value ) == 0.0L ) {
+				throw HHuginn::HHuginnRuntimeException( "Division by zero.", fileId_, position_ );
+			}
 			try_collape_assign_action( HHuginn::TYPE::REAL, &HExpression::oper_assign_real_ref<OPERATOR::MODULO_ASSIGN>, &HExpression::oper_assign_real_val<OPERATOR::MODULO_ASSIGN> );
 			break;
 		}
@@ -1582,7 +1619,7 @@ void HExpression::oper_assign_ref(
 	if ( c->type_id() != type_ ) {
 		operands_type_mismatch( op_to_str( op_ ), c, (t->object_factory().*classGetter_)(), file_id(), p );
 	}
-	operator_( static_cast<huginn_type*>( v.raw() )->value(), other_ );
+	operator_( static_cast<huginn_type*>( v.raw() )->value(), other_, frame_, p );
 	ref.set( t, yaal::move( v ), p );
 	values.push( ref.get( t, p ) );
 	return;
@@ -1608,7 +1645,7 @@ void HExpression::oper_assign_val(
 	if ( c->type_id() != type_ ) {
 		operands_type_mismatch( op_to_str( op_ ), c, (frame_->thread()->object_factory().*classGetter_)(), file_id(), p );
 	}
-	operator_( static_cast<huginn_type*>( v.raw() )->value(), other_ );
+	operator_( static_cast<huginn_type*>( v.raw() )->value(), other_, frame_, p );
 	return;
 	M_EPILOG
 }

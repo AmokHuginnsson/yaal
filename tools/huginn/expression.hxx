@@ -93,8 +93,8 @@ public:
 	void try_collape( int, int );
 	void try_collape_assign( int, int );
 	void try_collape_assign_action( HHuginn::TYPE, OExecutionStep::action_t, OExecutionStep::action_t );
-	void try_collape_assign_integer( void );
-	void try_collape_assign_real( void );
+	void try_collape_assign_integer( int, int );
+	void try_collape_assign_real( int, int );
 	void close_parenthesis( OExecutionStep const&, huginn::HFrame* );
 	void plus( OExecutionStep const&, huginn::HFrame* );
 	template<typename huginn_type, typename operator_type>
