@@ -10,97 +10,97 @@ if [ ${#} -ne 1 ] ; then
 	exit 1
 fi
 
-CHANGELOG="${1}"
-CODENAME=`lsb_release -sc | tr A-Z a-z`
-PROJECT=`awk -F '= ' '/^PRJNAME.*=/{print $2}' Makefile.mk.in`
+changelogFile="${1}"
+codename=$(lsb_release -sc | tr A-Z a-z)
+project=$(awk -F '= ' '/^PRJNAME.*=/{print $2}' Makefile.mk.in)
 
-if [ -f "${CHANGELOG}" ] ; then
+if [ -f "${changelogFile}" ] ; then
 	echo "Changelog file already exits"
 	exit 1
 fi
 
 git_get_author() {
-	REF="${1}"
-	git log --no-color -n 1 --pretty=format:"%an" "${REF}"
+	local ref="${1}"
+	git log --no-color -n 1 --pretty=format:"%an" "${ref}"
 }
 
 git_get_date() {
-	REF="${1}"
-	git log --no-color -n 1 --pretty=format:"%aD" "${REF}"
+	local ref="${1}"
+	git log --no-color -n 1 --pretty=format:"%aD" "${ref}"
 }
 
 git_get_email() {
-	REF="${1}"
-	git log --no-color -n 1 --pretty=format:"%ae" "${REF}"
+	local ref="${1}"
+	git log --no-color -n 1 --pretty=format:"%ae" "${ref}"
 }
 
 git_get_body_from_tag() {
-	TAG="${1}"
-	git tag -n100 -l ${TAG} | tail -n+3 | sed -e 's/^    /  /'
+	local tag="${1}"
+	git tag -n100 -l ${tag} | tail -n+3 | sed -e 's/^    /  /'
 }
 
 gen_changelog_entry() {
-	if [ -f "${CHANGELOG}" ] ; then
-		mv -f "${CHANGELOG}" "${CHANGELOG}.tmp"
+	if [ -f "${changelogFile}" ] ; then
+		mv -f "${changelogFile}" "${changelogFile}.tmp"
 	fi
-	TAG="${1}"
-	VERSION=`echo "${TAG}" | awk -F '-' '{print $2}'`
-	AUTHOR=`git_get_author "${TAG}"`
-	EMAIL=`git_get_email "${TAG}"`
-	DATE=`git_get_date "${TAG}"`
-	BODY=`git_get_body_from_tag "${TAG}"`
-	cat > "${CHANGELOG}" << EOF
-${PROJECT} (${VERSION}) ${CODENAME}; urgency=medium
+	local tag="${1}"
+	local version="$(echo "${tag}" | awk -F '-' '{print $2}')"
+	local author="$(git_get_author "${tag}")"
+	local email="$(git_get_email "${tag}")"
+	local tagDate="$(git_get_date "${tag}")"
+	local body="$(git_get_body_from_tag "${tag}")"
+	cat > "${changelogFile}" << EOF
+${project} (${version}) ${codename}; urgency=medium
 
   * Vendor stable release.
-${BODY}
+${body}
 
- -- ${AUTHOR} <${EMAIL}>  ${DATE}
+ -- ${author} <${email}>  ${tagDate}
 
 EOF
-	if [ -f "${CHANGELOG}.tmp" ] ; then
-		cat "${CHANGELOG}.tmp" >> "${CHANGELOG}"
-		/bin/rm "${CHANGELOG}.tmp"
+	if [ -f "${changelogFile}.tmp" ] ; then
+		cat "${changelogFile}.tmp" >> "${changelogFile}"
+		/bin/rm "${changelogFile}.tmp"
 	fi
 }
 
-echo "Generating chagelog for project: \`${PROJECT}'"
+echo "Generating chagelog for project: \`${project}'"
 
-HAS_TAGS=0
-git for-each-ref --sort='taggerdate' --format='%(tag)' refs/tags | while read TAG ; do
-	BODY=`git_get_body_from_tag "${TAG}"`
-	if [ ! -z "${BODY}" ] ; then
-		gen_changelog_entry "${TAG}"
+hasTags=0
+git for-each-ref --sort='taggerdate' --format='%(tag)' refs/tags | while read tag ; do
+body=$(git_get_body_from_tag "${tag}")
+	if [ ! -z "${body}" ] ; then
+		gen_changelog_entry "${tag}"
 	fi
-	HAS_TAGS=1
+	hasTags=1
 done
 
-LAST_TAG_REV=""
-if [ $HAS_TAGS -eq 1 ] ; then
-	LAST_TAG_REV=`git rev-list --tags --max-count=1`
+lastTagRev=""
+if [ $hasTags -eq 1 ] ; then
+	lastTagRev=$(git rev-list --tags --max-count=1)
 fi
-HEAD=`git rev-parse HEAD`
+head=$(git rev-parse HEAD)
 
-if [ "x${HEAD}" != "x${LAST_TAG_REV}" ] ; then
-	VERSION=`awk '/^VERSION *=|SUBVERSION *=|EXTRAVERSION *=/{VERSION=VERSION DOT $3;DOT="."}END{print VERSION}' ./Makefile.mk.in`
-	AUTHOR=`git_get_author "${HEAD}"`
-	EMAIL=`git_get_email "${HEAD}"`
-	DATE=`git_get_date "${HEAD}"`
-	if [ -f "${CHANGELOG}" ] ; then
-		mv -f "${CHANGELOG}" "${CHANGELOG}.tmp"
+if [ "x${head}" != "x${lastTagRev}" ] ; then
+	version=$(awk '/^VERSION *=|SUBVERSION *=|EXTRAVERSION *=/{version=version DOT $3;DOT="."}END{print version}' ./Makefile.mk.in)
+	author=$(git_get_author "${head}")
+	email=$(git_get_email "${head}")
+	date=$(git_get_date "${head}")
+	if [ -f "${changelogFile}" ] ; then
+		mv -f "${changelogFile}" "${changelogFile}.tmp"
 	fi
-	cat > "${CHANGELOG}" << EOF
-${PROJECT} (${VERSION}) ${CODENAME}; urgency=medium
+	cat > "${changelogFile}" << EOF
+${project} (${version}) ${codename}; urgency=medium
 
   * Vendor test release.
-  * commit: ${HEAD}
+  * commit: ${head}
 
- -- ${AUTHOR} <${EMAIL}>  ${DATE}
+ -- ${author} <${email}>  ${date}
 
 EOF
-	if [ -f "${CHANGELOG}.tmp" ] ; then
-		cat "${CHANGELOG}.tmp" >> "${CHANGELOG}"
-		/bin/rm "${CHANGELOG}.tmp"
+	if [ -f "${changelogFile}.tmp" ] ; then
+		cat "${changelogFile}.tmp" >> "${changelogFile}"
+		/bin/rm "${changelogFile}.tmp"
 	fi
 fi
 
