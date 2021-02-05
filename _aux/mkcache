@@ -1,34 +1,34 @@
 #! /bin/sh
 
-HOST_OS_TYPE=`uname -s`
+hostOsType=$(uname -s)
 
-DIR_LIB=""
+dirLib=""
 
 for arg in "${@}" ; do
 	case ${arg} in
-		--lib-dir=*) DIR_LIB=`echo ${arg} | sed 's;--lib-dir=;;'` ;;
+		--lib-dir=*) dirLib="$(echo ${arg} | sed 's;--lib-dir=;;')" ;;
 		*)
 			echo "unknown option: ${arg}"
 		;;
 	esac
 done
 
-if [ ! -z "${DIR_LIB}" ] ; then
+if [ ! -z "${dirLib}" ] ; then
 
-	/bin/rm -f ${DIR_LIB}/ld.so.cache
+	/bin/rm -f ${dirLib}/ld.so.cache
 
-	case "${HOST_OS_TYPE}" in
+	case "${hostOsType}" in
 		FreeBSD)
-			/sbin/ldconfig -i -f ${DIR_LIB}/ld.so.cache ${DIR_LIB}
+			/sbin/ldconfig -i -f ${dirLib}/ld.so.cache ${dirLib}
 		;;
 		Linux)
-			/sbin/ldconfig -f ${DIR_LIB}/ld.so.conf -C ${DIR_LIB}/ld.so.cache ${DIR_LIB} > /dev/null 2> /dev/null
+			/sbin/ldconfig -f ${dirLib}/ld.so.conf -C ${dirLib}/ld.so.cache ${dirLib} > /dev/null 2> /dev/null
 		;;
 		SunOS)
-			/bin/crle -64 -c ${DIR_LIB}/ls.so.conf -l ${DIR_LIB}
+			/bin/crle -64 -c ${dirLib}/ls.so.conf -l ${dirLib}
 		;;
 		CYGWIN*)
-			cd ${DIR_LIB}
+			cd ${dirLib}
 			ls -1 cyg*.dll > dlls.txt
 			/bin/rebaseall -v -p -T ./dlls.txt > /dev/null 2>&1
 			/bin/rm ./dlls.txt
