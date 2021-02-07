@@ -1,9 +1,9 @@
 #! /bin/sh
 
-LIB_NAME=""
-DIR_ROOT=""
-DIR_BUILD=""
-HDRS=""
+libName=""
+dirRoot=""
+dirBuild=""
+headers=""
 export LC_COLLATE="C"
 export LC_CTYPE="C"
 export LC_TIME="C"
@@ -13,10 +13,10 @@ export LANG="en"
 
 for arg in "${@}" ; do
 	case ${arg} in
-		--lib-name=*)    LIB_NAME=`echo ${arg} | sed 's;--lib-name=;;'` ;;
-		--dir-root=*)    DIR_ROOT=`echo ${arg} | sed 's;--dir-root=;;'` ;;
-		--dir-build=*)   DIR_BUILD=`echo ${arg} | sed 's;--dir-build=;;'` ;;
-		--headers=*)     HDRS=`echo ${arg} | sed 's;--headers=;;'` ;;
+		--lib-name=*)    libName="$(echo ${arg} | sed 's;--lib-name=;;')" ;;
+		--dir-root=*)    dirRoot="$(echo ${arg} | sed 's;--dir-root=;;')" ;;
+		--dir-build=*)   dirBuild="$(echo ${arg} | sed 's;--dir-build=;;')" ;;
+		--headers=*)     headers="$(echo ${arg} | sed 's;--headers=;;')" ;;
 		*)
 			echo "unknown option: ${arg}"
 			exit 1
@@ -24,75 +24,75 @@ for arg in "${@}" ; do
 	esac
 done
 
-if [ -z "${LIB_NAME}" -o -z "${DIR_ROOT}" -o -z "${DIR_BUILD}" -o -z "${HDRS}" ] ; then
+if [ -z "${libName}" -o -z "${dirRoot}" -o -z "${dirBuild}" -o -z "${headers}" ] ; then
 	printf "%b\n" "Core settings not found!"
 	exit 1
 fi
 
 if [ "x${VERBOSE}" != "x" ] ; then
-	echo "LIB_NAME    = ${LIB_NAME}"
-	echo "DIR_ROOT    = ${DIR_ROOT}"
-	echo "DIR_BUILD   = ${DIR_BUILD}"
-	echo "HDRS        = [${HDRS}]"
+	echo "libName    = ${libName}"
+	echo "dirRoot    = ${dirRoot}"
+	echo "dirBuild   = ${dirBuild}"
+	echo "headers    = [${headers}]"
 fi
 
 umask 022
 
-LIB_NAME_UC=`echo ${LIB_NAME} | tr [a-z] [A-Z]`
+libNameUC="$(echo ${libName} | tr [a-z] [A-Z])"
 
-cd ${DIR_ROOT}
+cd ${dirRoot}
 
-DIR_HEADERS="${DIR_BUILD}/include/${LIB_NAME}"
+dirHeaders="${dirBuild}/include/${libName}"
 
-for FILE in ${HDRS}; do
-	if grep -q -w 'YAAL_PRIVATE_IMPLEMENTATION_DETAIL' "${FILE}"; then
+for file in ${headers}; do
+	if grep -q -w 'YAAL_PRIVATE_IMPLEMENTATION_DETAIL' "${file}"; then
 		continue
 	fi
-	mkdir -p ${DIR_HEADERS}/`dirname ${FILE}`
-	awk -f - ${FILE} > ${DIR_HEADERS}/${FILE} << EOF
+	mkdir -p "${dirHeaders}/$(dirname ${file})"
+	awk -f - ${file} > ${dirHeaders}/${file} << EOF
 /^#\\t*include "/ {
 	match(\$0, "#\\t*include");
 	printf "%s", substr( \$0, RSTART, RLENGTH );
 	match(\$0, "\"[a-z_./-]+");
-	printf " <${LIB_NAME}/%s>\\n", substr(\$0, RSTART + 1, RLENGTH - 1) }
+	printf " <${libName}/%s>\\n", substr(\$0, RSTART + 1, RLENGTH - 1) }
 !/^#\\t*include "/
 EOF
-	touch -r ${FILE} ${DIR_HEADERS}/${FILE}
+	touch -r ${file} ${dirHeaders}/${file}
 done
 
-CONFIG_SRC_PATH="${DIR_BUILD}/config.hxx"
+configSrcPath="${dirBuild}/config.hxx"
 
-if [ ! -f "${CONFIG_SRC_PATH}" ] ; then
-	CONFIG_SRC_PATH="${DIR_ROOT}/config.hxx"
+if [ ! -f "${configSrcPath}" ] ; then
+	configSrcPath="${dirRoot}/config.hxx"
 fi
 
-sed -e "s/define[ \t]*PACKAGE_/define ${LIB_NAME_UC}_PACKAGE_/g" \
-	-e "s/define[ \t]*SYSCONFDIR/define ${LIB_NAME_UC}_SYSCONFDIR/g" \
-	-e "s/define[ \t]*LOCALSTATEDIR/define ${LIB_NAME_UC}_LOCALSTATEDIR/g" \
-	-e "s/define[ \t]*SHAREDSTATEDIR/define ${LIB_NAME_UC}_SHAREDSTATEDIR/g" \
-	-e "s/define[ \t]*BINDIR/define ${LIB_NAME_UC}_BINDIR/g" \
-	-e "s/define[ \t]*LIBDIR/define ${LIB_NAME_UC}_LIBDIR/g" \
-	-e "s/define[ \t]*LIBEXECDIR/define ${LIB_NAME_UC}_LIBEXECDIR/g" \
-	-e "s/define[ \t]*DATADIR/define ${LIB_NAME_UC}_DATADIR/g" \
-	-e 's/#define[ \t]*LIB_INFIX.*/#undef LIB_INFIX/g' "${CONFIG_SRC_PATH}" > ${DIR_HEADERS}/config.hxx
+sed -e "s/define[ \t]*PACKAGE_/define ${libNameUC}_PACKAGE_/g" \
+	-e "s/define[ \t]*SYSCONFDIR/define ${libNameUC}_SYSCONFDIR/g" \
+	-e "s/define[ \t]*LOCALSTATEDIR/define ${libNameUC}_LOCALSTATEDIR/g" \
+	-e "s/define[ \t]*SHAREDSTATEDIR/define ${libNameUC}_SHAREDSTATEDIR/g" \
+	-e "s/define[ \t]*BINDIR/define ${libNameUC}_BINDIR/g" \
+	-e "s/define[ \t]*LIBDIR/define ${libNameUC}_LIBDIR/g" \
+	-e "s/define[ \t]*LIBEXECDIR/define ${libNameUC}_LIBEXECDIR/g" \
+	-e "s/define[ \t]*DATADIR/define ${libNameUC}_DATADIR/g" \
+	-e 's/#define[ \t]*LIB_INFIX.*/#undef LIB_INFIX/g' "${configSrcPath}" > ${dirHeaders}/config.hxx
 
-PROTO=`find ${DIR_HEADERS} ! -path "${DIR_HEADERS}/${LIB_NAME}.hxx" ! -name 'config.hxx' -type f | head -1 | sed -e "s@${DIR_HEADERS}/@@"`
-PROTO_TAG=`echo ${PROTO} | sed -e 's@.*/\([^\.]*\).*@\1@'`
+proto="$(find ${dirHeaders} ! -path "${dirHeaders}/${libName}.hxx" ! -name 'config.hxx' -type f | head -1 | sed -e "s@${dirHeaders}/@@")"
+protoTag="$(echo ${proto} | sed -e 's@.*/\([^\.]*\).*@\1@')"
 
-head -1 ${DIR_HEADERS}/${PROTO} > ${DIR_HEADERS}/${LIB_NAME}.hxx
+head -1 ${dirHeaders}/${proto} > ${dirHeaders}/${libName}.hxx
 
-cat << EOF >> ${DIR_HEADERS}/${LIB_NAME}.hxx
+cat << EOF >> ${dirHeaders}/${libName}.hxx
 
-#ifndef ${LIB_NAME_UC}_${LIB_NAME_UC}_HXX_INCLUDED
-#define ${LIB_NAME_UC}_${LIB_NAME_UC}_HXX_INCLUDED 1
+#ifndef ${libNameUC}_${libNameUC}_HXX_INCLUDED
+#define ${libNameUC}_${libNameUC}_HXX_INCLUDED 1
 
 EOF
 
-find ${DIR_HEADERS} ! -path "${DIR_HEADERS}/${LIB_NAME}.hxx" -type f | sed -E -e "s@.*(${LIB_NAME}(/[^/]*){0,2}/[^/]*[.]hxx)@#include <\1>@g" | sort >> ${DIR_HEADERS}/${LIB_NAME}.hxx
+find ${dirHeaders} ! -path "${dirHeaders}/${libName}.hxx" -type f | sed -E -e "s@.*(${libName}(/[^/]*){0,2}/[^/]*[.]hxx)@#include <\1>@g" | sort >> ${dirHeaders}/${libName}.hxx
 
-cat << EOF >> ${DIR_HEADERS}/${LIB_NAME}.hxx
+cat << EOF >> ${dirHeaders}/${libName}.hxx
 
-#endif /* #ifndef ${LIB_NAME_UC}_${LIB_NAME_UC}_HXX_INCLUDED */
+#endif /* #ifndef ${libNameUC}_${libNameUC}_HXX_INCLUDED */
 
 EOF
 
