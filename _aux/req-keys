@@ -36,24 +36,24 @@ openssl x509 \
 
 # echo "${certData}"
 
-commonName=`echo "${certData}" | awk -F '=' '/commonName/{print $2}'`
-emailAddress=`echo "${certData}" | awk -F '=' '/emailAddress/{print $2}'`
-organizationName=`echo "${certData}" | awk -F '=' '/organizationName/{print $2}'`
-organizationalUnitName=`echo "${certData}" | awk -F '=' '/organizationalUnitName/{print $2}'`
-countryName=`echo "${certData}" | awk -F '=' '/countryName/{print $2}'`
-stateOrProvinceName=`echo "${certData}" | awk -F '=' '/stateOrProvinceName/{print $2}'`
-localityName=`echo "${certData}" | awk -F '=' '/localityName/{print $2}'`
-notAfter=`echo "${certData}" | awk -F '=' '/notAfter/{print $2}'`
+commonName="$(echo "${certData}" | awk -F '=' '/commonName/{print $2}')"
+emailAddress="$(echo "${certData}" | awk -F '=' '/emailAddress/{print $2}')"
+organizationName="$(echo "${certData}" | awk -F '=' '/organizationName/{print $2}')"
+organizationalUnitName="$(echo "${certData}" | awk -F '=' '/organizationalUnitName/{print $2}')"
+countryName="$(echo "${certData}" | awk -F '=' '/countryName/{print $2}')"
+stateOrProvinceName="$(echo "${certData}" | awk -F '=' '/stateOrProvinceName/{print $2}')"
+localityName="$(echo "${certData}" | awk -F '=' '/localityName/{print $2}')"
+notAfter="$(echo "${certData}" | awk -F '=' '/notAfter/{print $2}')"
 
-notAfter=`date -d "${notAfter}" +%s`
-notBefore=`date +%s`
+notAfter="$(date -d "${notAfter}" +%s)"
+notBefore="$(date +%s)"
 
-days=`expr \( ${notAfter} - ${notBefore} \) / \( 3600 '*' 24 \) - 1`
+days="$(expr \( ${notAfter} - ${notBefore} \) / \( 3600 '*' 24 \) - 1)"
 
 
-host=`echo "${commonName}" | awk -F '.' '{print $(NF-1)"."$NF}'`
+host="$(echo "${commonName}" | awk -F '.' '{print $(NF-1)"."$NF}')"
 commonName="${subject}.${host}"
-user=`echo "${emailAddress}" | awk -F '@' '{print $1}'`
+user="$(echo "${emailAddress}" | awk -F '@' '{print $1}')"
 emailAddress="${user}@${commonName}"
 
 echo "commonName = ${commonName}"
