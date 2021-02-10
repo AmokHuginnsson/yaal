@@ -1,13 +1,13 @@
 #! /bin/sh
 # Read yaal/LICENSE.md file for copyright and licensing information.
 
-DIR_ROOT=""
-DIR_PREFIX=""
+dirRoot=""
+dirPrefix=""
 
 for arg in "${@}" ; do
 	case ${arg} in
-		--dir-root=*)    DIR_ROOT=`echo ${arg} | sed 's;--dir-root=;;'` ;;
-		--dir-prefix=*)  DIR_PREFIX=`echo ${arg} | sed 's;--dir-prefix=;;'` ;;
+		--dir-root=*)    dirRoot="$(echo ${arg} | sed 's;--dir-root=;;')" ;;
+		--dir-prefix=*)  dirPrefix="$(echo ${arg} | sed 's;--dir-prefix=;;')" ;;
 		*)
 			echo "unknown option: ${arg}"
 			exit 1
@@ -15,22 +15,22 @@ for arg in "${@}" ; do
 	esac
 done
 
-if [ -z "${DIR_ROOT}" -o -z "${DIR_PREFIX}" ] ; then
+if [ -z "${dirRoot}" -o -z "${dirPrefix}" ] ; then
 	printf "%b\n" "Core settings not found!"
 	exit 1
 fi
 
-line=`grep -s LD_LIBRARY_PATH ${HOME}/.profile ${HOME}/.bashrc ${HOME}/.bash_profile ${HOME}/.cshrc ${HOME}/.tcshrc ${HOME}/.login ${HOME}/.zshrc ${HOME}/.zlogin ${HOME}/.zshenv ${HOME}/.zsh/zlogin ${HOME}/.zsh/zshrc ${HOME}/.zsh/zshenv`
+line="$(grep -s LD_LIBRARY_PATH ${HOME}/.profile ${HOME}/.bashrc ${HOME}/.bash_profile ${HOME}/.cshrc ${HOME}/.tcshrc ${HOME}/.login ${HOME}/.zshrc ${HOME}/.zlogin ${HOME}/.zshenv ${HOME}/.zsh/zlogin ${HOME}/.zsh/zshrc ${HOME}/.zsh/zshenv)"
 if [ "x$line" != "x" ] ; then
 	printf "%b\n" "Environment have been already set."
 	exit 1
 fi
 
-shell_env() {
-	cat ${DIR_ROOT}/_aux/${1} | sed -e "s/{YAAL_PREFIX}/${YAAL_PREFIX}/g"
-}
+yaalPrefix=`echo ${dirPrefix} | sed -e 's/\//\\\\\//g'`
 
-YAAL_PREFIX=`echo ${DIR_PREFIX} | sed -e 's/\//\\\\\//g'`
+shell_env() {
+	cat "${dirRoot}/_aux/${1}" | sed -e "s/{YAAL_PREFIX}/${yaalPrefix}/g"
+}
 
 printf "%b\n" "Compilation have been finished !"
 printf "%b\n" "It is need to be added several lines to your .SHELLrc file :"
@@ -42,33 +42,33 @@ printf "%b\n" "#v+"
 shell_env shellrc.csh
 printf "%b\n" "#v-"
 printf "%b" "Do it now ? (yes/[no]) "
-read ANSWER
+read answer
 if [ -f yaalrc ] ; then
 	cd _aux
 fi
-if [ "$ANSWER" ] ; then
-	if [ $ANSWER = "yes" ] ; then
-		export USER=`whoami`
-		export SH=`grep $USER /etc/passwd | tr \/ '\n'|tail -1`
-		case "$SH" in
+if [ "$answer" ] ; then
+	if [ $answer = "yes" ] ; then
+		user="$(whoami)"
+		shell="$(grep $user /etc/passwd | tr \/ '\n'|tail -1)"
+		case "${shell}" in
 			sh)
-				shell_env shellrc >> ${HOME}/.profile
+				shell_env shellrc >> "${HOME}/.profile"
 				;;
 			zsh)
-				if [ -f ${HOME}/.zsh/zshrc ] ; then
-					shell_env shellrc >> ${HOME}/.zsh/zshrc
-				elif [ -f ${HOME}/.zshrc ] ; then
-					shell_env shellrc >> ${HOME}/.zshrc
+				if [ -f "${HOME}/.zsh/zshrc" ] ; then
+					shell_env shellrc >> "${HOME}/.zsh/zshrc"
+				elif [ -f "${HOME}/.zshrc" ] ; then
+					shell_env shellrc >> "${HOME}/.zshrc"
 				fi
 				;;
 			bash)
-				shell_env shellrc >> ${HOME}/.bashrc
+				shell_env shellrc >> "${HOME}/.bashrc"
 				;;
 			csh)
-				shell_env shellrc.csh >> ${HOME}/.cshrc
+				shell_env shellrc.csh >> "${HOME}/.cshrc"
 				;;
 			tcsh)
-				shell_env shellrc.csh >> ${HOME}/.tcshrc
+				shell_env shellrc.csh >> "${HOME}/.tcshrc"
 				;;
 		esac
 	else
