@@ -1,41 +1,41 @@
 #! /bin/sh
 
-DIR_ROOT="${1}"
+dirRoot="${1}"
 
-if [ ! -f "${DIR_ROOT}/_aux/commit-id" ] ; then
-	echo "DIR_ROOT not set!"
+if [ ! -f "${dirRoot}/_aux/commit-id" ] ; then
+	echo "dirRoot not set!"
 	exit 1
 fi
 
 shift
 
-COMMIT_ID="${1}"
+commitId="${1}"
 
-if [ -z "${COMMIT_ID}" ] ; then
-	echo "COMMIT_ID path not set!"
+if [ -z "${commitId}" ] ; then
+	echo "commitId path not set!"
 	exit 1
 fi
 
 shift
 
-GITID="${@}"
+gitId="${@}"
 
-if [ -z "${GITID}" ] ; then
-	echo "GITID not set!"
+if [ -z "${gitId}" ] ; then
+	echo "gitId not set!"
 	exit 1
 fi
 
-if [ "x${GITID}" = "xtrue" ] ; then
+if [ "x${gitId}" = "xtrue" ] ; then
 	exit 0
 fi
 
-NEW_COMMIT_ID=`mktemp "${COMMIT_ID}.XXXXXXXXXX"`
+newCommitId="$(mktemp "${commitId}.XXXXXXXXXX")"
 
-echo "#define COMMIT_ID \"`${DIR_ROOT}/_aux/commit-id`\"" > "${NEW_COMMIT_ID}"
+echo "#define COMMIT_ID \"$(${dirRoot}/_aux/commit-id)\"" > "${newCommitId}"
 
-if ! diff -q "${NEW_COMMIT_ID}" "${COMMIT_ID}" > /dev/null 2>&1 ; then
-	mv "${NEW_COMMIT_ID}" "${COMMIT_ID}"
+if ! diff -q "${newCommitId}" "${commitId}" > /dev/null 2>&1 ; then
+	mv "${newCommitId}" "${commitId}"
 else
-	/bin/rm "${NEW_COMMIT_ID}"
+	/bin/rm "${newCommitId}"
 fi
 
