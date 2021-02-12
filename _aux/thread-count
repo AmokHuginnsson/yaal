@@ -1,26 +1,26 @@
 #! /bin/sh
 
-HOST_OS_TYPE=`uname -s`
+hostOsType="$(uname -s)"
 
-THREAD_COUNT=1
+threadCount=1
 
-case "${HOST_OS_TYPE}" in
+case "${hostOsType}" in
 	FreeBSD)
-		THREAD_COUNT=`/sbin/sysctl -n hw.ncpu`
+		threadCount="$(/sbin/sysctl -n hw.ncpu)"
 	;;
 	Linux|CYGWIN*)
-		THREAD_COUNT=`nproc`
+		threadCount="$(nproc)"
 	;;
 	SunOS)
-		THREAD_COUNT=`kstat -m cpu_info|grep -w core_id|uniq|wc -l`
+		threadCount="$(kstat -m cpu_info|grep -w core_id|uniq|wc -l)"
 	;;
 	Darwin)
-		THREAD_COUNT=`/usr/sbin/sysctl -n hw.ncpu`
+		threadCount="$(/usr/sbin/sysctl -n hw.ncpu)"
 	;;
 	*)
 	;;
 esac
 
-echo "${THREAD_COUNT}"
+echo "${threadCount}"
 
 exit 0
