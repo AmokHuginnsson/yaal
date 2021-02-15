@@ -30,6 +30,7 @@ yaalPrefix=`echo ${dirPrefix} | sed -e 's/\//\\\\\//g'`
 
 shell_env() {
 	cat "${dirRoot}/_aux/${1}" | sed -e "s/{YAAL_PREFIX}/${yaalPrefix}/g"
+	cat "${dirRoot}/_aux/set-limits.sh"
 }
 
 printf "%b\n" "Compilation have been finished !"
@@ -53,23 +54,23 @@ if [ "$answer" ] ; then
 		case "${shell}" in
 			sh)
 				shell_env shellrc >> "${HOME}/.profile"
-				;;
+			;;
 			zsh)
 				if [ -f "${HOME}/.zsh/zshrc" ] ; then
 					shell_env shellrc >> "${HOME}/.zsh/zshrc"
 				elif [ -f "${HOME}/.zshrc" ] ; then
 					shell_env shellrc >> "${HOME}/.zshrc"
 				fi
-				;;
+			;;
 			bash)
 				shell_env shellrc >> "${HOME}/.bashrc"
-				;;
+			;;
 			csh)
 				shell_env shellrc.csh >> "${HOME}/.cshrc"
-				;;
+			;;
 			tcsh)
 				shell_env shellrc.csh >> "${HOME}/.tcshrc"
-				;;
+			;;
 		esac
 	else
 		printf "%b\n" "Remember to add this lines so that libraries could work properly"
