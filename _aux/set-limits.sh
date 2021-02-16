@@ -1,5 +1,7 @@
 ### ! /bin/sh
 
+set -ue
+
 physMem=0
 osType="$(uname -s)"
 
@@ -22,12 +24,13 @@ physMem="$(expr "${physMem}" \* 1024)"
 
 ulimit -c unlimited
 
-if [ -z "${procLimit}" ] ; then
-	procLimit=400
+if [ -z "${procLimit+x}" ] ; then
+	procLimit=2000
 fi
 
 # bash proc limit is set with -u, dash proc limit is set with -p
-isBash="$(ulimit -a | grep 'max user processes')"
+isBash="$(ulimit -a | grep 'max user processes' || true)"
+
 if [ "x${isBash}" != "x" ] ; then
 	ulimit -u ${procLimit} > /dev/null 2>&1 || true
 else
