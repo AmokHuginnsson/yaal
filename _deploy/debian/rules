@@ -8,6 +8,11 @@
 export PREFIX=/usr
 export SYSCONFDIR=/etc
 export LOCALSTATEDIR=/var
+unexport SHAREDSTATEDIR
+
+ifneq ($(PACKAGE_VERSION),)
+override_dh_gencontrol=override_dh_gencontrol
+endif
 
 .PHONY: \
 	override_dh_auto_build \
@@ -16,7 +21,7 @@ export LOCALSTATEDIR=/var
 	override_dh_auto_install \
 	override_dh_autoreconf \
 	override_dh_dwz \
-	override_dh_gencontrol \
+	$(override_dh_gencontrol) \
 	override_dh_shlibdeps \
 	override_dh_strip
 
@@ -35,8 +40,10 @@ override_dh_auto_test: dropprivs
 override_dh_auto_install: dropprivs
 	umask 0077 && ./dropprivs dh_auto_install -Sautoconf -- install-debug install-release
 
+ifneq ($(PACKAGE_VERSION),)
 override_dh_gencontrol:
 	dh_gencontrol -- -v$(PACKAGE_VERSION)
+endif
 
 override_dh_shlibdeps:
 	dh_shlibdeps -Xyaal_sqlite3_driver -Xyaal_postgresql_driver -Xyaal_mysql_driver -Xyaal_firebird_driver -Xyaal_oracle_driver
