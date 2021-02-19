@@ -53,8 +53,8 @@ fi
 max64BitPhysMem="$(expr 16 \* 1024 \* 1024 - 1)"
 if [ ${physMem} -gt ${max64BitPhysMem} ] ; then
 	physMem=${max64BitPhysMem}
-	ulimit -v ${physMem}
-	ulimit -d ${physMem}
+	ulimit -v ${physMem} || test "x${osType}" = "xDarwin"
+	ulimit -d ${physMem} || test "x${osType}" = "xDarwin"
 fi
 
 umask 0077
