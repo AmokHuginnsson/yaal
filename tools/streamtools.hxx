@@ -70,6 +70,7 @@ yaal::hcore::HStreamInterface::ptr_t ensure( yaal::hcore::HStreamInterface::ptr_
 namespace stream {
 
 int long pump( yaal::hcore::HStreamInterface&, yaal::hcore::HStreamInterface& );
+int long pump( yaal::hcore::HStreamInterface&, yaal::hcore::HStreamInterface&, int );
 
 template<typename T>
 yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& stream_, T const& value_  ) {

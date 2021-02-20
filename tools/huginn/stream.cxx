@@ -137,7 +137,8 @@ public:
 			{ "flush",           runtime_->create_method( &HStream::flush ),       "flush write buffer associated with the stream" },
 			{ "deserialize",     runtime_->create_method( &HStream::deserialize ), "deserialize single Huginn object from this stream" },
 			{ "write_line",      runtime_->create_method( &HStream::write_line ),  "( *strVal* ) - write entriety of given *strVal* info this stream" },
-			{ "serialize",       runtime_->create_method( &HStream::serialize ),   "( *val* ) - serialize given *val* info this stream" }
+			{ "serialize",       runtime_->create_method( &HStream::serialize ),   "( *val* ) - serialize given *val* info this stream" },
+			{ "pump_to",         runtime_->create_method( &HStream::pump_to ),     "( *otherStream* ) - rewrite all data that could be read from *thisStream* to *otherStream*" },
 		};
 		redefine( nullptr, fd );
 		_seekEnumerationClass = add_enumeration_as_member(
@@ -363,6 +364,35 @@ HHuginn::value_t HStream::serialize( huginn::HThread* thread_, HHuginn::value_t*
 	HStream* s( static_cast<HStream*>( object_->raw() ) );
 	s->serialize_impl( thread_, values_[0], position_ );
 	return ( *object_ );
+	M_EPILOG
+}
+
+HHuginn::value_t HStream::pump_to( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	HObjectFactory& of( thread_->object_factory() );
+	verify_signature_by_class(  "Stream.pump_to", values_, 1, { of.stream_class(), nullptr }, thread_, position_ );
+	HStream* src( static_cast<HStream*>( object_->raw() ) );
+	HStream* dst( static_cast<HStream*>( values_.front().raw() ) );
+	int long copiedBytes( -1 );
+	try {
+		int bufferSize( 1024 * 1024 );
+		if ( values_.get_size() > 1 ) {
+			bufferSize = safe_int::cast<int>( get_integer( values_[1] ) );
+		}
+		if ( bufferSize < 1 ) {
+			throw HHuginn::HHuginnRuntimeException(
+				"Invalid buffer size: "_ys.append( bufferSize ),
+				thread_->file_id(),
+				position_
+			);
+		}
+		copiedBytes = stream::pump( *src->raw(), *dst->raw(), bufferSize );
+	} catch ( HOutOfRangeException const& e ) {
+		thread_->raise( of.arithmetic_exception_class(), e.what(), position_ );
+	} catch ( HException const& e ) {
+		src->raise( thread_, e.what(), position_ );
+	}
+	return ( copiedBytes >= 0 ? of.create_integer( copiedBytes ) : of.none_value() );
 	M_EPILOG
 }
 

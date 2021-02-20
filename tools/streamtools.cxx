@@ -200,13 +200,18 @@ namespace stream {
 
 int long pump( yaal::hcore::HStreamInterface& source_, yaal::hcore::HStreamInterface& sink_ ) {
 	M_PROLOG
-	static int const CHUNK_SIZE( system::get_page_size() );
-	HChunk chunk( CHUNK_SIZE );
+	return ( pump( source_, sink_, system::get_page_size() ) );
+	M_EPILOG
+}
+
+int long pump( yaal::hcore::HStreamInterface& source_, yaal::hcore::HStreamInterface& sink_, int bufferSize_ ) {
+	M_PROLOG
+	HChunk chunk( bufferSize_ );
 	char* buf( chunk.get<char>() );
 	bool ok( true );
 	int long nWrittenTotal( 0 );
 	while ( ok ) {
-		int nRead( static_cast<int>( M_TEMP_FAILURE_RETRY( source_.read( buf, CHUNK_SIZE ) ) ) );
+		int nRead( static_cast<int>( M_TEMP_FAILURE_RETRY( source_.read( buf, bufferSize_ ) ) ) );
 		if ( nRead <= 0 ) {
 			break;
 		}
