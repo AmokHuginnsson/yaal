@@ -45,9 +45,31 @@ void HDataProcess::do_init_xrc(
 		yaal::hcore::HString const& processName_,
 		yaal::hcore::HString const& resource_ ) {
 	M_PROLOG
+	init_xrc_db( processName_, resource_, HString() );
+	return;
+	M_EPILOG
+}
+
+void HDataProcess::init_xrc_db(
+		yaal::hcore::HString const& processName_,
+		yaal::hcore::HString const& resource_,
+		yaal::hcore::HString const& dsn_ ) {
+	M_PROLOG
+	do_init_xrc_db( processName_, resource_, dsn_ );
+	return;
+	M_EPILOG
+}
+
+void HDataProcess::do_init_xrc_db(
+		yaal::hcore::HString const& processName_,
+		yaal::hcore::HString const& resource_,
+		yaal::hcore::HString const& dsn_ ) {
+	M_PROLOG
 	HTUIProcess::do_init_xrc( processName_, resource_ );
 	xml::value_t dsn( _resource->get_value( "/resource/dsn" ) );
-	if ( !! dsn ) {
+	if ( ! dsn_.is_empty() ) {
+		_dataBase = dbwrapper::util::connect( dsn_ );
+	} else if ( !! dsn ) {
 		_dataBase = dbwrapper::util::connect( *dsn );
 	} else {
 		_dataBase = HDataBase::get_connector();
