@@ -941,21 +941,29 @@ void HExpression::try_collape( int fileId_, int position_ ) {
 		case ( OPERATOR::MULTIPLY ):
 		case ( OPERATOR::DIVIDE ):
 		case ( OPERATOR::MODULO ): {
+			int leftIdx( stepCount - 3 );
+			int rightIdx( stepCount - 2 );
+			OExecutionStep& left( _executionSteps[leftIdx] );
+			OExecutionStep& right( _executionSteps[rightIdx] );
 			if (
-				( _executionSteps[stepCount - 2]._literalType != HHuginn::TYPE::UNKNOWN )
-				&& ( _executionSteps[stepCount - 2]._literalType == _executionSteps[stepCount - 3]._literalType )
+				( right._literalType == left._literalType )
+				&& ( right._literalType != HHuginn::TYPE::UNKNOWN )
 			) {
 				_executionSteps.pop_back();
 				switch ( op ) {
-					case ( OPERATOR::PLUS ):     { _executionSteps[stepCount - 3] += _executionSteps.back(); } break;
-					case ( OPERATOR::MINUS ):    { _executionSteps[stepCount - 3] -= _executionSteps.back(); } break;
-					case ( OPERATOR::MULTIPLY ): { _executionSteps[stepCount - 3] *= _executionSteps.back(); } break;
-					case ( OPERATOR::DIVIDE ):   { _executionSteps[stepCount - 3].divide( _executionSteps.back(), fileId_, position_ ); } break;
-					case ( OPERATOR::MODULO ):   { _executionSteps[stepCount - 3].modulo( _executionSteps.back(), fileId_, position_ ); } break;
+					case ( OPERATOR::PLUS ):     { left += right; } break;
+					case ( OPERATOR::MINUS ):    { left -= right; } break;
+					case ( OPERATOR::MULTIPLY ): { left *= right; } break;
+					case ( OPERATOR::DIVIDE ):   { left.divide( right, fileId_, position_ ); } break;
+					case ( OPERATOR::MODULO ):   { left.modulo( right, fileId_, position_ ); } break;
 					default: {}
 				}
 				_executionSteps.pop_back();
 				_instructions.pop_back();
+				break;
+			} else if ( left._literalType != HHuginn::TYPE::UNKNOWN ) {
+			}
+			if ( right._literalType != HHuginn::TYPE::UNKNOWN ) {
 			}
 		} break;
 		case ( OPERATOR::POWER_TERM ): {
