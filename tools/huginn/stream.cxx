@@ -134,6 +134,7 @@ public:
 			{ "write_character", runtime_->create_method( &HStream::write_fwd, "Stream.write_character", HHuginn::TYPE::CHARACTER, &HStream::write_character ), "( *charVal*, *count* ) - write *count==(1|2|4)* number of bytes from given *charVal* info this stream" },
 			{ "seek",            runtime_->create_method( &HStream::seek ),        "( *offset*, *anchor* ) - move reading/writing position to the *offset* counted from an *anchor*" },
 			{ "read_line",       runtime_->create_method( &HStream::read_line ),   "read single line of text from this stream" },
+			{ "read_lines",      runtime_->create_method( &HStream::read_lines ),  "read all lines of text from this stream" },
 			{ "flush",           runtime_->create_method( &HStream::flush ),       "flush write buffer associated with the stream" },
 			{ "deserialize",     runtime_->create_method( &HStream::deserialize ), "deserialize single Huginn object from this stream" },
 			{ "write_line",      runtime_->create_method( &HStream::write_line ),  "( *strVal* ) - write entriety of given *strVal* info this stream" },
@@ -280,6 +281,14 @@ HHuginn::value_t HStream::read_line( huginn::HThread* thread_, HHuginn::value_t*
 	verify_arg_count( "Stream.read_line", values_, 0, 0, thread_, position_ );
 	HStream* s( static_cast<HStream*>( object_->raw() ) );
 	return ( s->read_line_impl( thread_, position_ ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HStream::read_lines( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "Stream.read_lines", values_, 0, 0, thread_, position_ );
+	HStream* s( static_cast<HStream*>( object_->raw() ) );
+	return ( s->read_lines_impl( thread_, position_ ) );
 	M_EPILOG
 }
 
@@ -794,6 +803,24 @@ HHuginn::value_t HStream::read_line_impl( HThread* thread_, int position_ ) {
 	M_PROLOG
 	hcore::HString& line( read_line_raw( thread_, position_ ) );
 	return ( ! line.is_empty() ? thread_->object_factory().create_string( yaal::move( line ) ) : thread_->runtime().none_value() );
+	M_EPILOG
+}
+
+HHuginn::value_t HStream::read_lines_impl( HThread* thread_, int position_ ) {
+	M_PROLOG
+	HHuginn::values_t linesData;
+	HObjectFactory& of( thread_->object_factory() );
+	while ( _stream->good() ) {
+		hcore::HString line( read_line_raw( thread_, position_ ) );
+		if ( line.is_empty() ) {
+			break;
+		}
+		if ( thread_->has_exception() || thread_->has_runtime_exception() ) {
+			break;
+		}
+		linesData.push_back( of.create_string( yaal::move( line ) ) );
+	}
+	return ( of.create_list( yaal::move( linesData ) ) );
 	M_EPILOG
 }
 

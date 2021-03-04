@@ -32,6 +32,7 @@ public:
 	HStream( HClass const*, yaal::hcore::HStreamInterface::ptr_t );
 	static HHuginn::value_t read_fwd( char const*, reader_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t read_line( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+	static HHuginn::value_t read_lines( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t flush( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t deserialize( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t write_fwd( char const*, HHuginn::TYPE, writer_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
@@ -54,6 +55,7 @@ private:
 	HHuginn::value_t read_real( HThread*, huginn::HInteger::value_type, int );
 	HHuginn::value_t read_character( HThread*, huginn::HInteger::value_type, int );
 	HHuginn::value_t read_line_impl( HThread*, int );
+	HHuginn::value_t read_lines_impl( HThread*, int );
 	HHuginn::value_t deserialize_impl( HThread*, int );
 	yaal::hcore::HString& read_line_raw( HThread*, int );
 	void write_blob( HThread*, HHuginn::value_t const&, huginn::HInteger::value_type, int );
