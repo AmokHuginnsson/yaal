@@ -306,7 +306,8 @@ class YaalHCoreHTimePrinter:
 		self._val = val_
 
 	def to_string( self ):
-		return time.strftime( str( self._val['_format'] )[1:-1], time.localtime( int( self._val['_value'] - self._val['SECONDS_TO_UNIX_EPOCH'] ) ) )
+		SECONDS_TO_UNIX_EPOCH = int( gdb.parse_and_eval( "yaal::hcore::HNumber::SECONDS_TO_UNIX_EPOCH" ) )
+		return time.strftime( str( self._val['_format'] )[1:-1], time.localtime( int( self._val['_value'] - SECONDS_TO_UNIX_EPOCH ) ) )
 
 	def display_hint( self ):
 		return 'string'
@@ -685,7 +686,7 @@ class YaalHCoreHHashMapPrinter:
 				elt = self._atom.cast( nodeType )['_value']['second']
 				self.do_next()
 			self._count = self._count + 1
-			return ( '[%d]' % count, elt.dereference() )
+			return ( '[%d]' % count, elt )
 
 	def __init__( self, val_ ):
 		self._val = val_
@@ -769,7 +770,6 @@ class YaalHCoreHNumberPrinter:
 
 	def to_string( self ):
 		s = ""
-		DDIL = int( gdb.parse_and_eval( "yaal::hcore::HNumber::DECIMAL_DIGITS_IN_LEAF" ) )
 		leftCount = self._val['_leafCount']
 		integralPartSize = self._val['_integralPartSize']
 		if leftCount > 0:
@@ -777,6 +777,7 @@ class YaalHCoreHNumberPrinter:
 				s = s + "-"
 			digit = 0
 			data = self._val['_canonical']['_data'].cast( gdb.lookup_type( 'yaal::i32_t' ).pointer() )
+			DDIL = int( gdb.parse_and_eval( "yaal::hcore::HNumber::DECIMAL_DIGITS_IN_LEAF" ) )
 			while digit < integralPartSize:
 				s += ( str( data[digit] ).zfill( DDIL ) if ( digit > 0 ) else str( data[digit] ) )
 				digit += 1
