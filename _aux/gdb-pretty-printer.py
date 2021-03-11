@@ -88,15 +88,18 @@ class YaalHCoreHPointerPrinter:
 		self._val = val_
 		self._ptr = 0
 		shared = self._val['_shared']
-		if shared != 0:
-			self._ptr = self._val['_object']
-			if self._ptr != 0:
-				self._innerPrinter = yaal_lookup_function( self._ptr.dereference() )
-				if self._innerPrinter != None:
-					if hasattr( self._innerPrinter, 'children' ):
-						def children( self ):
-							return self._innerPrinter.children()
-						setattr( self.__class__, 'children', children )
+		if shared == 0:
+			return
+		self._ptr = self._val['_object']
+		if self._ptr == 0:
+			return
+		self._innerPrinter = yaal_lookup_function( self._ptr.dereference() )
+		if self._innerPrinter is None:
+			return
+		if hasattr( self._innerPrinter, 'children' ):
+			def children( self ):
+				return self._innerPrinter.children()
+			self.children = types.MethodType( children, self )
 
 	def to_string( self ):
 		s = "NULL"
@@ -225,13 +228,15 @@ class YaalHCoreHResourcePrinter:
 	def __init__( self, val_ ):
 		self._val = val_
 		self._ptr = self._val['_holder']['_resource']
-		if self._ptr != 0:
-			self._innerPrinter = yaal_lookup_function( self._ptr.dereference() )
-			if self._innerPrinter != None:
-				if hasattr( self._innerPrinter, 'children' ):
-					def children( self ):
-						return self._innerPrinter.children()
-					self.children = types.MethodType( children, self )
+		if self._ptr == 0:
+			return
+		self._innerPrinter = yaal_lookup_function( self._ptr.dereference() )
+		if self._innerPrinter == None:
+			return
+		if hasattr( self._innerPrinter, 'children' ):
+			def children( self ):
+				return self._innerPrinter.children()
+			self.children = types.MethodType( children, self )
 
 	def to_string( self ):
 		s = "NULL"
@@ -802,16 +807,34 @@ class YaalHCoreHVariantPrinter:
 
 	def __init__( self, val_ ):
 		self._val = val_
+		self._ref = None
+		self._innerPrinter = None
+		typeid = self._val['_type']
+		if typeid == -1:
+			return
+		self._ref = self._val['_mem'].cast( self._val.type.template_argument( typeid ) )
+		self._innerPrinter = yaal_lookup_function( self._ref )
+		if self._innerPrinter is None:
+			return
+		if hasattr( self._innerPrinter, 'children' ):
+			def children( self ):
+				return self._innerPrinter.children()
+			self.children = types.MethodType( children, self )
 
 	def to_string( self ):
-		val = "<uninitialized variant>"
-		typeid = self._val['_type']
-		if typeid != -1:
-			val = self._val['_mem'].cast( self._val.type.template_argument( typeid ).pointer() ).dereference()
-		return val
+		s = "<uninitialized variant>"
+		if self._ref is not None:
+			if self._innerPrinter is not None:
+				s = self._innerPrinter.to_string()
+			else:
+				s = self._ref
+		return s
 
 	def display_hint( self ):
-		return 'string'
+		s = "string";
+		if ( self._ref is not None ) and ( self._innerPrinter is not None ):
+			s = self._innerPrinter.display_hint()
+		return s
 
 class YaalToolsHTwoWayMapPrinter:
 	def __init__( self, val_ ):
